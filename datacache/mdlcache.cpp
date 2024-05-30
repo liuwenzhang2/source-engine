@@ -103,56 +103,7 @@ enum
 	STUDIODATA_FLAGS_LOCKED_MDL			= 0x0040,
 };
 
-// only models with type "mod_studio" have this data
-class studiodata_t
-{
-public:
-	studiodata_t() {
-		memset(&m_VCollisionData, 0, sizeof(vcollide_t));
-		memset(&m_HardwareData, 0, sizeof(studiohwdata_t));
-#if defined( USE_HARDWARE_CACHE )
-		memset(&m_HardwareDataCache, 0, sizeof(DataCacheHandle_t));
-#endif
-	}
-
-	CStudioHdr			m_StudioHdr;
-
-	// The .mdl file
-	DataCacheHandle_t	m_MDLCache = 0;
-
-	// the vphysics.dll collision model
-	vcollide_t			m_VCollisionData;
-
-	studiohwdata_t		m_HardwareData;
-#if defined( USE_HARDWARE_CACHE )
-	DataCacheHandle_t	m_HardwareDataCache;
-#endif
-
-	unsigned short		m_nFlags = 0;
-
-	short				m_nRefCount = 0;
-
-	// pointer to the virtual version of the model
-	CVirtualModel		*m_pVirtualModel = 0;
-
-	// array of cache handles to demand loaded virtual model data
-	int					m_nAnimBlockCount = 0;
-	DataCacheHandle_t	*m_pAnimBlock = 0;
-	unsigned int	 	*m_iFakeAnimBlockStall = 0;
-
-	// vertex data is usually compressed to save memory (model decal code only needs some data)
-	DataCacheHandle_t	m_VertexCache = 0;
-	bool				m_VertexDataIsCompressed = 0;
-
-	int					m_nAutoplaySequenceCount = 0;
-	unsigned short		*m_pAutoplaySequenceList = 0;
-
-	void				*m_pUserData = 0;
-
-	DECLARE_FIXEDSIZE_ALLOCATOR_MT( studiodata_t );
-};
-
-DEFINE_FIXEDSIZE_ALLOCATOR_MT( studiodata_t, 128, CUtlMemoryPool::GROW_SLOW );
+DEFINE_FIXEDSIZE_ALLOCATOR_MT(CStudioHdr, 128, CUtlMemoryPool::GROW_SLOW );
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
@@ -384,17 +335,17 @@ inline CUtlDict<short, short>* GetAnimTable()
 class CModelLookupContext
 {
 public:
-	CModelLookupContext(int group, const studiohdr_t* pStudioHdr);
+	CModelLookupContext(int group, const CStudioHdr* pStudioHdr);
 	~CModelLookupContext();
 
 private:
 	int		m_lookupIndex;
 };
 
-CModelLookupContext::CModelLookupContext(int group, const studiohdr_t* pStudioHdr)
+CModelLookupContext::CModelLookupContext(int group, const CStudioHdr* pStudioHdr)
 {
 	m_lookupIndex = -1;
-	if (group == 0 && pStudioHdr->numincludemodels)
+	if (group == 0 && pStudioHdr->numincludemodels())
 	{
 		m_lookupIndex = g_ModelLookup.AddToTail();
 		g_ModelLookupIndex = g_ModelLookup.Count() - 1;
@@ -553,7 +504,7 @@ private:
 	unsigned char *UnserializeAnimBlock( MDLHandle_t handle, int nBlock );
 
 	// Allocates/frees the anim blocks
-	void AllocateAnimBlocks( studiodata_t *pStudioData, int nCount );
+	void AllocateAnimBlocks( CStudioHdr *pStudioData, int nCount );
 	void FreeAnimBlocks( MDLHandle_t handle );
 
 	// Allocates/frees the virtual model
@@ -568,14 +519,14 @@ private:
 	void UnloadHardwareData( MDLHandle_t handle, bool bCacheRemove = true, bool bLockedOk = false );
 
 	// Allocates/frees autoplay sequence list
-	void AllocateAutoplaySequences( studiodata_t *pStudioData, int nCount );
-	void FreeAutoplaySequences( studiodata_t *pStudioData );
+	void AllocateAutoplaySequences( CStudioHdr *pStudioData, int nCount );
+	void FreeAutoplaySequences( CStudioHdr *pStudioData );
 
 	FSAsyncStatus_t LoadData( const char *pszFilename, const char *pszPathID, bool bAsync, FSAsyncControl_t *pControl ) { return LoadData( pszFilename, pszPathID, NULL, 0, 0, bAsync, pControl ); }
 	FSAsyncStatus_t LoadData( const char *pszFilename, const char *pszPathID, void *pDest, int nBytes, int nOffset, bool bAsync, FSAsyncControl_t *pControl );
 	vertexFileHeader_t *LoadVertexData( studiohdr_t *pStudioHdr );
 	vertexFileHeader_t *BuildAndCacheVertexData( studiohdr_t *pStudioHdr, vertexFileHeader_t *pRawVvdHdr  );
-	bool BuildHardwareData( MDLHandle_t handle, studiodata_t *pStudioData, studiohdr_t *pStudioHdr, OptimizedModel::FileHeader_t *pVtxHdr );
+	bool BuildHardwareData( MDLHandle_t handle, CStudioHdr *pStudioData, studiohdr_t *pStudioHdr, OptimizedModel::FileHeader_t *pVtxHdr );
 	void ConvertFlexData( studiohdr_t *pStudioHdr );
 
 	int ProcessPendingAsync( intp iAsync );
@@ -613,7 +564,7 @@ private:
 	int m_nModelCacheFrameLocks;
 	int m_nMeshCacheFrameLocks;
 
-	CUtlDict< studiodata_t*, MDLHandle_t > m_MDLDict;
+	CUtlDict< CStudioHdr*, MDLHandle_t > m_MDLDict;
 
 	IMDLCacheNotify *m_pCacheNotify;
 
@@ -836,7 +787,7 @@ void CMDLCache::Shutdown()
 //-----------------------------------------------------------------------------
 void CMDLCache::Flush( MDLHandle_t handle, int nFlushFlags )
 {
-	studiodata_t *pStudioData = m_MDLDict[handle];
+	CStudioHdr *pStudioData = m_MDLDict[handle];
 	Assert( pStudioData != NULL );
 
 	bool bIgnoreLock = ( nFlushFlags & MDLCACHE_FLUSH_IGNORELOCK ) != 0;
@@ -920,7 +871,7 @@ void CMDLCache::InitStudioData( MDLHandle_t handle )
 {
 	Assert( m_MDLDict[handle] == NULL );
 
-	studiodata_t *pStudioData = new studiodata_t;
+	CStudioHdr *pStudioData = new CStudioHdr;
 	m_MDLDict[handle] = pStudioData;
 	//memset( pStudioData, 0, sizeof( studiodata_t ) );
 }
@@ -929,7 +880,7 @@ void CMDLCache::ShutdownStudioData( MDLHandle_t handle )
 {
 	Flush( handle );
 
-	studiodata_t *pStudioData = m_MDLDict[handle];
+	CStudioHdr *pStudioData = m_MDLDict[handle];
 	Assert( pStudioData != NULL );
 	delete pStudioData;
 	m_MDLDict[handle] = NULL;
@@ -1073,7 +1024,7 @@ void CMDLCache::UnserializeVCollide( MDLHandle_t handle, bool synchronousLoad )
 	VPROF( "CMDLCache::UnserializeVCollide" );
 
 	// FIXME: Should the vcollde be played into cacheable memory?
-	studiodata_t *pStudioData = m_MDLDict[handle];
+	CStudioHdr *pStudioData = m_MDLDict[handle];
 
 	intp iAsync = GetAsyncInfoIndex( handle, MDLCACHE_VCOLLIDE );
 
@@ -1097,7 +1048,7 @@ void CMDLCache::UnserializeVCollide( MDLHandle_t handle, bool synchronousLoad )
 				for ( int i = 1; i < pVirtualModel->m_group.Count(); i++ )
 				{
 					MDLHandle_t sharedHandle = VoidPtrToMDLHandle(pVirtualModel->m_group[i].cache);
-					studiodata_t *pData = m_MDLDict[sharedHandle];
+					CStudioHdr *pData = m_MDLDict[sharedHandle];
 					if ( !(pData->m_nFlags & STUDIODATA_FLAGS_VCOLLISION_LOADED) )
 					{
 						UnserializeVCollide( sharedHandle, synchronousLoad );
@@ -1162,7 +1113,7 @@ void CMDLCache::UnserializeVCollide( MDLHandle_t handle, bool synchronousLoad )
 //-----------------------------------------------------------------------------
 void CMDLCache::DestroyVCollide( MDLHandle_t handle )
 {
-	studiodata_t *pStudioData = m_MDLDict[handle];
+	CStudioHdr *pStudioData = m_MDLDict[handle];
 
 	if ( pStudioData->m_nFlags & STUDIODATA_FLAGS_VCOLLISION_SHARED )
 		return;
@@ -1196,7 +1147,7 @@ vcollide_t *CMDLCache::GetVCollideEx( MDLHandle_t handle, bool synchronousLoad /
 	if ( handle == MDLHANDLE_INVALID )
 		return NULL;
 
-	studiodata_t *pStudioData = m_MDLDict[handle];
+	CStudioHdr *pStudioData = m_MDLDict[handle];
 
 	if ( ( pStudioData->m_nFlags & STUDIODATA_FLAGS_VCOLLISION_LOADED ) == 0 )
 	{
@@ -1215,7 +1166,7 @@ bool CMDLCache::GetVCollideSize( MDLHandle_t handle, int *pVCollideSize )
 {
 	*pVCollideSize = 0;
 
-	studiodata_t *pStudioData = m_MDLDict[handle];
+	CStudioHdr *pStudioData = m_MDLDict[handle];
 	if ( ( pStudioData->m_nFlags & STUDIODATA_FLAGS_VCOLLISION_LOADED ) == 0 )
 		return false;
 
@@ -1231,7 +1182,7 @@ bool CMDLCache::GetVCollideSize( MDLHandle_t handle, int *pVCollideSize )
 //-----------------------------------------------------------------------------
 // Allocates/frees the anim blocks
 //-----------------------------------------------------------------------------
-void CMDLCache::AllocateAnimBlocks( studiodata_t *pStudioData, int nCount )
+void CMDLCache::AllocateAnimBlocks( CStudioHdr *pStudioData, int nCount )
 {
 	Assert( pStudioData->m_pAnimBlock == NULL );
 
@@ -1246,7 +1197,7 @@ void CMDLCache::AllocateAnimBlocks( studiodata_t *pStudioData, int nCount )
 
 void CMDLCache::FreeAnimBlocks( MDLHandle_t handle )
 {
-	studiodata_t *pStudioData = m_MDLDict[handle];
+	CStudioHdr *pStudioData = m_MDLDict[handle];
 
 	if ( pStudioData->m_pAnimBlock )
 	{
@@ -1288,7 +1239,7 @@ unsigned char *CMDLCache::UnserializeAnimBlock( MDLHandle_t handle, int nBlock )
 	// Block 0 is never used!!!
 	Assert( nBlock > 0 );
 
-	studiodata_t *pStudioData = m_MDLDict[handle];
+	CStudioHdr *pStudioData = m_MDLDict[handle];
 
 	intp iAsync = GetAsyncInfoIndex( handle, MDLCACHE_ANIMBLOCK, nBlock );
 
@@ -1354,7 +1305,7 @@ unsigned char *CMDLCache::GetAnimBlock( MDLHandle_t handle, int nBlock )
 		return NULL;
 
 	// Allocate animation blocks if we don't have them yet
-	studiodata_t *pStudioData = m_MDLDict[handle];
+	CStudioHdr *pStudioData = m_MDLDict[handle];
 	if ( pStudioData->m_pAnimBlock == NULL )
 	{
 		studiohdr_t *pStudioHdr = GetStudioHdrInternal( handle );
@@ -1395,7 +1346,7 @@ unsigned char *CMDLCache::GetAnimBlock( MDLHandle_t handle, int nBlock )
 //-----------------------------------------------------------------------------
 // Allocates/frees autoplay sequence list
 //-----------------------------------------------------------------------------
-void CMDLCache::AllocateAutoplaySequences( studiodata_t *pStudioData, int nCount )
+void CMDLCache::AllocateAutoplaySequences( CStudioHdr *pStudioData, int nCount )
 {
 	FreeAutoplaySequences( pStudioData );
 
@@ -1403,7 +1354,7 @@ void CMDLCache::AllocateAutoplaySequences( studiodata_t *pStudioData, int nCount
 	pStudioData->m_pAutoplaySequenceList = new unsigned short[nCount];
 }
 
-void CMDLCache::FreeAutoplaySequences( studiodata_t *pStudioData )
+void CMDLCache::FreeAutoplaySequences( CStudioHdr *pStudioData )
 {
 	if ( pStudioData->m_pAutoplaySequenceList )
 	{
@@ -1439,7 +1390,7 @@ int CMDLCache::GetAutoplayList( MDLHandle_t handle, unsigned short **pAutoplayLi
 	}
 
 	// FIXME: Should we cache autoplay info here on demand instead of in unserializeMDL?
-	studiodata_t *pStudioData = m_MDLDict[handle];
+	CStudioHdr *pStudioData = m_MDLDict[handle];
 	if ( pAutoplayList )
 	{
 		*pAutoplayList = pStudioData->m_pAutoplaySequenceList;
@@ -1454,9 +1405,9 @@ int CMDLCache::GetAutoplayList( MDLHandle_t handle, unsigned short **pAutoplayLi
 //-----------------------------------------------------------------------------
 void CMDLCache::AllocateVirtualModel( MDLHandle_t handle )
 {
-	studiodata_t *pStudioData = m_MDLDict[handle];
-	Assert( pStudioData->m_pVirtualModel == NULL );
-	pStudioData->m_pVirtualModel = new CVirtualModel;
+	CStudioHdr *pStudioData = m_MDLDict[handle];
+	//Assert( pStudioData->m_pVirtualModel == NULL );
+	pStudioData->m_pVirtualModel;// = new CVirtualModel;
 
 	// FIXME: The old code slammed these; could have leaked memory?
 	Assert( pStudioData->m_nAnimBlockCount == 0 );
@@ -1465,22 +1416,20 @@ void CMDLCache::AllocateVirtualModel( MDLHandle_t handle )
 
 void CMDLCache::FreeVirtualModel( MDLHandle_t handle )
 {
-	studiodata_t *pStudioData = m_MDLDict[handle];
-	if ( pStudioData && pStudioData->m_pVirtualModel )
+	CStudioHdr *pStudioData = m_MDLDict[handle];
+	if ( pStudioData && pStudioData->m_pVirtualModel.NumGroup()>0 )
 	{
-		int nGroupCount = pStudioData->m_pVirtualModel->m_group.Count();
-		Assert( (nGroupCount >= 1) && pStudioData->m_pVirtualModel->m_group[0].cache == MDLHandleToVirtual(handle) );
+		int nGroupCount = pStudioData->m_pVirtualModel.m_group.Count();
+		Assert( (nGroupCount >= 1) && pStudioData->m_pVirtualModel.m_group[0].cache == MDLHandleToVirtual(handle) );
 
 		// NOTE: Start at *1* here because the 0th element contains a reference to *this* handle
 		for ( int i = 1; i < nGroupCount; ++i )
 		{
-			MDLHandle_t h = VoidPtrToMDLHandle( pStudioData->m_pVirtualModel->m_group[i].cache );
+			MDLHandle_t h = VoidPtrToMDLHandle( pStudioData->m_pVirtualModel.m_group[i].cache );
 			FreeVirtualModel( h );
 			Release( h );
 		}
-
-		delete pStudioData->m_pVirtualModel;
-		pStudioData->m_pVirtualModel = NULL;
+		pStudioData->m_pVirtualModel.Clear();
 	}
 }
 
@@ -1496,12 +1445,12 @@ CVirtualModel *CMDLCache::GetVirtualModel( MDLHandle_t handle )
 	if ( handle == MDLHANDLE_INVALID )
 		return NULL;
 
-	studiohdr_t *pStudioHdr = GetStudioHdrInternal( handle );
+	CStudioHdr *pStudioHdr = GetStudioHdr( handle );
 
 	if ( pStudioHdr == NULL )
 		return NULL;
 
-	return GetVirtualModelFast( pStudioHdr, handle );
+	return GetVirtualModelFast( pStudioHdr->m_pStudioHdr, handle );
 }
 
 CVirtualModel *CMDLCache::GetVirtualModelFast( const studiohdr_t *pStudioHdr, MDLHandle_t handle )
@@ -1509,11 +1458,11 @@ CVirtualModel *CMDLCache::GetVirtualModelFast( const studiohdr_t *pStudioHdr, MD
 	if (pStudioHdr->numincludemodels == 0)
 		return NULL;
 
-	studiodata_t *pStudioData = m_MDLDict[handle];
+	CStudioHdr *pStudioData = m_MDLDict[handle];
 	if ( !pStudioData )
 		return NULL;
 	
-	if ( !pStudioData->m_pVirtualModel )
+	if ( pStudioData->m_pVirtualModel.NumGroup()==0 )
 	{
 		DevMsg( 2, "Loading virtual model for %s\n", pStudioHdr->pszName() );
 
@@ -1522,15 +1471,15 @@ CVirtualModel *CMDLCache::GetVirtualModelFast( const studiohdr_t *pStudioHdr, MD
 		AllocateVirtualModel( handle );
 
 		// Group has to be zero to ensure refcounting is correct
-		int nGroup = pStudioData->m_pVirtualModel->m_group.AddToTail( );
+		int nGroup = pStudioData->m_pVirtualModel.m_group.AddToTail( );
 		Assert( nGroup == 0 );
-		pStudioData->m_pVirtualModel->m_group[nGroup].cache = MDLHandleToVirtual(handle);
+		pStudioData->m_pVirtualModel.m_group[nGroup].cache = MDLHandleToVirtual(handle);
 
 		// Add all dependent data
-		pStudioData->m_pVirtualModel->AppendModels( 0, pStudioHdr );
+		pStudioData->m_pVirtualModel.AppendModels( 0, pStudioData);
 	}
 
-	return pStudioData->m_pVirtualModel;
+	return &pStudioData->m_pVirtualModel;
 }
 
 //-----------------------------------------------------------------------------
@@ -1587,7 +1536,7 @@ bool CMDLCache::LoadHardwareData( MDLHandle_t handle )
 	if ( m_bLostVideoMemory )
 		return false;
 
-	studiodata_t *pStudioData = m_MDLDict[handle];
+	CStudioHdr *pStudioData = m_MDLDict[handle];
 
 	CMDLCacheCriticalSection criticalSection( this );
 
@@ -1701,7 +1650,7 @@ void CMDLCache::ConvertFlexData( studiohdr_t *pStudioHdr )
 //-----------------------------------------------------------------------------
 //
 //-----------------------------------------------------------------------------
-bool CMDLCache::BuildHardwareData( MDLHandle_t handle, studiodata_t *pStudioData, studiohdr_t *pStudioHdr, OptimizedModel::FileHeader_t *pVtxHdr )
+bool CMDLCache::BuildHardwareData( MDLHandle_t handle, CStudioHdr *pStudioData, studiohdr_t *pStudioHdr, OptimizedModel::FileHeader_t *pVtxHdr )
 {
 	if ( pVtxHdr )
 	{
@@ -1782,7 +1731,7 @@ bool CMDLCache::BuildHardwareData( MDLHandle_t handle, studiodata_t *pStudioData
 	}
 
 	BeginLock();
-	bool bLoaded = g_pStudioRender->LoadModel( &pStudioData->m_StudioHdr, pVtxHdr, &pStudioData->m_HardwareData );
+	bool bLoaded = g_pStudioRender->LoadModel( pStudioData, pVtxHdr, &pStudioData->m_HardwareData );
 	EndLock();
 
 	if ( bLoaded )
@@ -1815,7 +1764,7 @@ void CMDLCache::UnloadHardwareData( MDLHandle_t handle, bool bCacheRemove, bool 
 		return;
 
 	// Don't load it if it's loaded
-	studiodata_t *pStudioData = m_MDLDict[handle];
+	CStudioHdr *pStudioData = m_MDLDict[handle];
 	if ( pStudioData->m_nFlags & STUDIODATA_FLAGS_STUDIOMESH_LOADED )
 	{
 #if defined( USE_HARDWARE_CACHE )
@@ -1859,7 +1808,7 @@ studiohwdata_t *CMDLCache::GetHardwareData( MDLHandle_t handle )
 	if ( mod_test_mesh_not_available.GetBool() )
 		return NULL;
 
-	studiodata_t *pStudioData = m_MDLDict[handle];
+	CStudioHdr *pStudioData = m_MDLDict[handle];
 	m_pMeshCacheSection->LockMutex();
 	if ( ( pStudioData->m_nFlags & (STUDIODATA_FLAGS_STUDIOMESH_LOADED | STUDIODATA_FLAGS_NO_STUDIOMESH) ) == 0 )
 	{
@@ -1917,7 +1866,7 @@ void CMDLCache::RestoreMaterialSystemObjects( int nChangeFlags )
 	MDLHandle_t i = m_MDLDict.First();
 	while ( i != m_MDLDict.InvalidIndex() )
 	{
-		studiodata_t *pStudioData = m_MDLDict[i];
+		CStudioHdr *pStudioData = m_MDLDict[i];
 
 		bool bIsMDLInMemory = GetCacheSection( MDLCACHE_STUDIOHDR )->IsPresent( pStudioData->m_MDLCache );
 
@@ -2259,17 +2208,23 @@ void CMDLCache::UnlockStudioHdr( MDLHandle_t handle )
 
 CStudioHdr::CStudioHdr(void)
 {
+	memset(&m_VCollisionData, 0, sizeof(vcollide_t));
+	memset(&m_HardwareData, 0, sizeof(studiohwdata_t));
+#if defined( USE_HARDWARE_CACHE )
+	memset(&m_HardwareDataCache, 0, sizeof(DataCacheHandle_t));
+#endif
+	m_pVirtualModel.Init(this);
 	// set pointer to bogus value
-	m_nFrameUnlockCounter = 0;
-	m_pFrameUnlockCounter = &m_nFrameUnlockCounter;
+	//m_nFrameUnlockCounter = 0;
+	//m_pFrameUnlockCounter = &m_nFrameUnlockCounter;
 	Init(NULL);
 }
 
 CStudioHdr::CStudioHdr(studiohdr_t* pStudioHdr, IMDLCache* mdlcache)
 {
 	// preset pointer to bogus value (it may be overwritten with legitimate data later)
-	m_nFrameUnlockCounter = 0;
-	m_pFrameUnlockCounter = &m_nFrameUnlockCounter;
+	//m_nFrameUnlockCounter = 0;
+	//m_pFrameUnlockCounter = &m_nFrameUnlockCounter;
 	Init(pStudioHdr, mdlcache);
 }
 
@@ -2280,18 +2235,11 @@ void CStudioHdr::Init(studiohdr_t* pStudioHdr, IMDLCache* mdlcache)
 {
 	m_pStudioHdr = pStudioHdr;
 
-	m_pVModel = NULL;
-	m_pStudioHdrCache.RemoveAll();
+	//(&m_pVirtualModel) = NULL;
 
 	if (m_pStudioHdr == NULL)
 	{
 		return;
-	}
-
-	if (mdlcache)
-	{
-		m_pFrameUnlockCounter = mdlcache->GetFrameUnlockCounterPtr(MDLCACHE_STUDIOHDR);
-		m_nFrameUnlockCounter = *m_pFrameUnlockCounter - 1;
 	}
 
 	if (m_pStudioHdr->numincludemodels == 0)
@@ -2303,7 +2251,7 @@ void CStudioHdr::Init(studiohdr_t* pStudioHdr, IMDLCache* mdlcache)
 	}
 	else
 	{
-		ResetVModel(m_pStudioHdr->GetVirtualModel());
+		//ResetVModel(m_pStudioHdr->GetVirtualModel());
 #if STUDIO_SEQUENCE_ACTIVITY_LAZY_INITIALIZE
 #else
 		m_ActivityToSequence.Initialize(this);
@@ -2334,44 +2282,47 @@ bool CStudioHdr::SequencesAvailable() const
 		return true;
 	}
 
-	if (m_pVModel == NULL)
+	if (m_pStudioHdr->numincludemodels == 0)
 	{
-		// repoll m_pVModel
-		return (ResetVModel(m_pStudioHdr->GetVirtualModel()) != NULL);
+		// repoll (&m_pVirtualModel)
+		return true;// (ResetVModel(m_pStudioHdr->GetVirtualModel()) != NULL);
 	}
 	else
 		return true;
 }
 
 
-const CVirtualModel* CStudioHdr::ResetVModel(const CVirtualModel* pVModel) const
-{
-	if (pVModel != NULL)
-	{
-		m_pVModel = (CVirtualModel*)pVModel;
-		Assert(!m_pVModel->m_Lock.GetOwnerId());
-		m_pStudioHdrCache.SetCount(m_pVModel->m_group.Count());
+//const CVirtualModel* CStudioHdr::ResetVModel(const CVirtualModel* pVModel) const
+//{
+//	if (pVModel != NULL)
+//	{
+//		if (pVModel != &m_pVirtualModel) {
+//			Error("can not happen");
+//		}
+//		//(&m_pVirtualModel) = (CVirtualModel*)pVModel;
+//		Assert(!pVModel->m_Lock.GetOwnerId());
+//		m_pStudioHdrCache.SetCount(pVModel->m_group.Count());
+//
+//		int i;
+//		for (i = 0; i < m_pStudioHdrCache.Count(); i++)
+//		{
+//			m_pStudioHdrCache[i] = NULL;
+//		}
+//
+//		return const_cast<CVirtualModel*>(pVModel);
+//	}
+//	else
+//	{
+//		//(&m_pVirtualModel) = NULL;
+//		return NULL;
+//	}
+//}
 
-		int i;
-		for (i = 0; i < m_pStudioHdrCache.Count(); i++)
-		{
-			m_pStudioHdrCache[i] = NULL;
-		}
-
-		return const_cast<CVirtualModel*>(pVModel);
-	}
-	else
-	{
-		m_pVModel = NULL;
-		return NULL;
-	}
-}
-
-const CStudioHdr* CStudioHdr::GroupStudioHdr(int i) const
+const CStudioHdr* CVirtualModel::GroupStudioHdr(int i) const
 {
 	if (!this)
 	{
-		ExecuteNTimes(5, Warning("Call to NULL CStudioHdr::GroupStudioHdr()\n"));
+		ExecuteNTimes(5, Warning("Call to NULL CVirtualModel::GroupStudioHdr()\n"));
 	}
 
 	if (m_nFrameUnlockCounter != *m_pFrameUnlockCounter)
@@ -2390,15 +2341,15 @@ const CStudioHdr* CStudioHdr::GroupStudioHdr(int i) const
 		const char* pszName = (m_pStudioHdr) ? m_pStudioHdr->pszName() : "<<null>>";
 		ExecuteNTimes(5, Warning("Invalid index passed to CStudioHdr(%s)::GroupStudioHdr(): %d, but max is %d\n", pszName, i, m_pStudioHdrCache.Count()));
 		DebuggerBreakIfDebugging();
-		return this;// m_pStudioHdr; // return something known to probably exist, certainly things will be messed up, but hopefully not crash before the warning is noticed
+		return m_pStudioHdr;// m_pStudioHdr; // return something known to probably exist, certainly things will be messed up, but hopefully not crash before the warning is noticed
 	}
 
 	CStudioHdr* pStudioHdr = m_pStudioHdrCache[i];
 
 	if (pStudioHdr == NULL)
 	{
-		Assert(!m_pVModel->m_Lock.GetOwnerId());
-		virtualgroup_t* pGroup = &m_pVModel->m_group[i];
+		Assert(!m_Lock.GetOwnerId());
+		const virtualgroup_t* pGroup = &m_group[i];
 		pStudioHdr = g_MDLCache.GetStudioHdr(VoidPtrToMDLHandle(pGroup->cache));
 		m_pStudioHdrCache[i] = pStudioHdr;
 	}
@@ -2410,12 +2361,12 @@ const CStudioHdr* CStudioHdr::GroupStudioHdr(int i) const
 
 const IStudioHdr* CStudioHdr::pSeqStudioHdr(int sequence) const
 {
-	if (m_pVModel == NULL)
+	if (m_pStudioHdr->numincludemodels == 0)
 	{
 		return this;
 	}
 
-	const CStudioHdr* pStudioHdr = GroupStudioHdr(m_pVModel->m_seq[sequence].group);
+	const CStudioHdr* pStudioHdr = m_pVirtualModel.GroupStudioHdr((&m_pVirtualModel)->m_seq[sequence].group);
 
 	return pStudioHdr;
 }
@@ -2423,12 +2374,12 @@ const IStudioHdr* CStudioHdr::pSeqStudioHdr(int sequence) const
 
 const IStudioHdr* CStudioHdr::pAnimStudioHdr(int animation) const
 {
-	if (m_pVModel == NULL)
+	if (m_pStudioHdr->numincludemodels == 0)
 	{
 		return this;
 	}
 
-	const CStudioHdr* pStudioHdr = GroupStudioHdr(m_pVModel->m_anim[animation].group);
+	const CStudioHdr* pStudioHdr = m_pVirtualModel.GroupStudioHdr((&m_pVirtualModel)->m_anim[animation].group);
 
 	return pStudioHdr;
 }
@@ -2443,14 +2394,14 @@ void CStudioHdr::FreeRealStudioHdr(const IStudioHdr* pStudioHdr) const {
 
 mstudioanimdesc_t& CStudioHdr::pAnimdesc(int i)
 {
-	if (m_pVModel == NULL)
+	if (m_pStudioHdr->numincludemodels == 0)
 	{
 		return *m_pStudioHdr->pLocalAnimdesc(i);
 	}
 
-	const studiohdr_t* pStudioHdr = GroupStudioHdr(m_pVModel->m_anim[i].group)->m_pStudioHdr;
+	const CStudioHdr* pStudioHdr = m_pVirtualModel.GroupStudioHdr((&m_pVirtualModel)->m_anim[i].group);
 
-	return *pStudioHdr->pLocalAnimdesc(m_pVModel->m_anim[i].index);
+	return *pStudioHdr->pLocalAnimdesc((&m_pVirtualModel)->m_anim[i].index);
 }
 
 //-----------------------------------------------------------------------------
@@ -2459,19 +2410,19 @@ mstudioanimdesc_t& CStudioHdr::pAnimdesc(int i)
 
 int CStudioHdr::GetNumSeq(void) const
 {
-	if (m_pVModel == NULL)
+	if (m_pStudioHdr->numincludemodels == 0)
 	{
 		return m_pStudioHdr->numlocalseq;
 	}
 
-	return m_pVModel->m_seq.Count();
+	return (&m_pVirtualModel)->m_seq.Count();
 }
 
 //-----------------------------------------------------------------------------
 // Purpose:
 //-----------------------------------------------------------------------------
 
-mstudioseqdesc_t& CStudioHdr::pSeqdesc(int i)
+mstudioseqdesc_t& CStudioHdr::pSeqdesc(int i) const
 {
 	Assert((i >= 0 && i < GetNumSeq()) || (i == 1 && GetNumSeq() <= 1));
 	if (i < 0 || i >= GetNumSeq())
@@ -2490,14 +2441,14 @@ mstudioseqdesc_t& CStudioHdr::pSeqdesc(int i)
 		i = 0;
 	}
 
-	if (m_pVModel == NULL)
+	if (m_pStudioHdr->numincludemodels == 0)
 	{
 		return *m_pStudioHdr->pLocalSeqdesc(i);
 	}
 
-	const studiohdr_t* pStudioHdr = GroupStudioHdr(m_pVModel->m_seq[i].group)->m_pStudioHdr;
+	const CStudioHdr* pStudioHdr = m_pVirtualModel.GroupStudioHdr((&m_pVirtualModel)->m_seq[i].group);
 
-	return *pStudioHdr->pLocalSeqdesc(m_pVModel->m_seq[i].index);
+	return *pStudioHdr->pLocalSeqdesc((&m_pVirtualModel)->m_seq[i].index);
 }
 
 //-----------------------------------------------------------------------------
@@ -2506,12 +2457,12 @@ mstudioseqdesc_t& CStudioHdr::pSeqdesc(int i)
 
 int CStudioHdr::iRelativeAnim(int baseseq, int relanim) const
 {
-	if (m_pVModel == NULL)
+	if (m_pStudioHdr->numincludemodels == 0)
 	{
 		return relanim;
 	}
 
-	virtualgroup_t* pGroup = &m_pVModel->m_group[m_pVModel->m_seq[baseseq].group];
+	virtualgroup_t* pGroup = &(&m_pVirtualModel)->m_group[(&m_pVirtualModel)->m_seq[baseseq].group];
 
 	return pGroup->masterAnim[relanim];
 }
@@ -2522,14 +2473,14 @@ int CStudioHdr::iRelativeAnim(int baseseq, int relanim) const
 
 int CStudioHdr::iRelativeSeq(int baseseq, int relseq) const
 {
-	if (m_pVModel == NULL)
+	if (m_pStudioHdr->numincludemodels == 0)
 	{
 		return relseq;
 	}
 
-	Assert(m_pVModel);
+	Assert(m_pStudioHdr->numincludemodels != 0);
 
-	virtualgroup_t* pGroup = &m_pVModel->m_group[m_pVModel->m_seq[baseseq].group];
+	virtualgroup_t* pGroup = &(&m_pVirtualModel)->m_group[(&m_pVirtualModel)->m_seq[baseseq].group];
 
 	return pGroup->masterSeq[relseq];
 }
@@ -2541,7 +2492,7 @@ int CStudioHdr::iRelativeSeq(int baseseq, int relseq) const
 
 int	CStudioHdr::GetNumPoseParameters(void) const
 {
-	if (m_pVModel == NULL)
+	if (m_pStudioHdr->numincludemodels == 0)
 	{
 		if (m_pStudioHdr)
 			return m_pStudioHdr->numlocalposeparameters;
@@ -2549,9 +2500,9 @@ int	CStudioHdr::GetNumPoseParameters(void) const
 			return 0;
 	}
 
-	Assert(m_pVModel);
+	Assert(m_pStudioHdr->numincludemodels != 0);
 
-	return m_pVModel->m_pose.Count();
+	return (&m_pVirtualModel)->m_pose.Count();
 }
 
 
@@ -2562,17 +2513,17 @@ int	CStudioHdr::GetNumPoseParameters(void) const
 
 const mstudioposeparamdesc_t& CStudioHdr::pPoseParameter(int i)
 {
-	if (m_pVModel == NULL)
+	if (m_pStudioHdr->numincludemodels == 0)
 	{
 		return *m_pStudioHdr->pLocalPoseParameter(i);
 	}
 
-	if (m_pVModel->m_pose[i].group == 0)
-		return *m_pStudioHdr->pLocalPoseParameter(m_pVModel->m_pose[i].index);
+	if ((&m_pVirtualModel)->m_pose[i].group == 0)
+		return *m_pStudioHdr->pLocalPoseParameter((&m_pVirtualModel)->m_pose[i].index);
 
-	const studiohdr_t* pStudioHdr = GroupStudioHdr(m_pVModel->m_pose[i].group)->m_pStudioHdr;
+	const CStudioHdr* pStudioHdr = m_pVirtualModel.GroupStudioHdr((&m_pVirtualModel)->m_pose[i].group);
 
-	return *pStudioHdr->pLocalPoseParameter(m_pVModel->m_pose[i].index);
+	return *pStudioHdr->pLocalPoseParameter((&m_pVirtualModel)->m_pose[i].index);
 }
 
 
@@ -2582,7 +2533,7 @@ const mstudioposeparamdesc_t& CStudioHdr::pPoseParameter(int i)
 
 int CStudioHdr::GetSharedPoseParameter(int iSequence, int iLocalPose) const
 {
-	if (m_pVModel == NULL)
+	if (m_pStudioHdr->numincludemodels == 0)
 	{
 		return iLocalPose;
 	}
@@ -2590,10 +2541,10 @@ int CStudioHdr::GetSharedPoseParameter(int iSequence, int iLocalPose) const
 	if (iLocalPose == -1)
 		return iLocalPose;
 
-	Assert(m_pVModel);
+	Assert(m_pStudioHdr->numincludemodels != 0);
 
-	int group = m_pVModel->m_seq[iSequence].group;
-	virtualgroup_t* pGroup = m_pVModel->m_group.IsValidIndex(group) ? &m_pVModel->m_group[group] : NULL;
+	int group = (&m_pVirtualModel)->m_seq[iSequence].group;
+	virtualgroup_t* pGroup = (&m_pVirtualModel)->m_group.IsValidIndex(group) ? &(&m_pVirtualModel)->m_group[group] : NULL;
 
 	return pGroup ? pGroup->masterPose[iLocalPose] : iLocalPose;
 }
@@ -2607,14 +2558,14 @@ int CStudioHdr::EntryNode(int iSequence)
 {
 	mstudioseqdesc_t& seqdesc = pSeqdesc(iSequence);
 
-	if (m_pVModel == NULL || seqdesc.localentrynode == 0)
+	if (m_pStudioHdr->numincludemodels == 0 || seqdesc.localentrynode == 0)
 	{
 		return seqdesc.localentrynode;
 	}
 
-	Assert(m_pVModel);
+	Assert(m_pStudioHdr->numincludemodels != 0);
 
-	virtualgroup_t* pGroup = &m_pVModel->m_group[m_pVModel->m_seq[iSequence].group];
+	virtualgroup_t* pGroup = &(&m_pVirtualModel)->m_group[(&m_pVirtualModel)->m_seq[iSequence].group];
 
 	return pGroup->masterNode[seqdesc.localentrynode - 1] + 1;
 }
@@ -2629,14 +2580,14 @@ int CStudioHdr::ExitNode(int iSequence)
 {
 	mstudioseqdesc_t& seqdesc = pSeqdesc(iSequence);
 
-	if (m_pVModel == NULL || seqdesc.localexitnode == 0)
+	if (m_pStudioHdr->numincludemodels == 0 || seqdesc.localexitnode == 0)
 	{
 		return seqdesc.localexitnode;
 	}
 
-	Assert(m_pVModel);
+	Assert(m_pStudioHdr->numincludemodels != 0);
 
-	virtualgroup_t* pGroup = &m_pVModel->m_group[m_pVModel->m_seq[iSequence].group];
+	virtualgroup_t* pGroup = &(&m_pVirtualModel)->m_group[(&m_pVirtualModel)->m_seq[iSequence].group];
 
 	return pGroup->masterNode[seqdesc.localexitnode - 1] + 1;
 }
@@ -2648,14 +2599,14 @@ int CStudioHdr::ExitNode(int iSequence)
 
 int	CStudioHdr::GetNumAttachments(void) const
 {
-	if (m_pVModel == NULL)
+	if (m_pStudioHdr->numincludemodels == 0)
 	{
 		return m_pStudioHdr->numlocalattachments;
 	}
 
-	Assert(m_pVModel);
+	Assert(m_pStudioHdr->numincludemodels != 0);
 
-	return m_pVModel->m_attachment.Count();
+	return (&m_pVirtualModel)->m_attachment.Count();
 }
 
 
@@ -2666,16 +2617,16 @@ int	CStudioHdr::GetNumAttachments(void) const
 
 const mstudioattachment_t& CStudioHdr::pAttachment(int i)
 {
-	if (m_pVModel == NULL)
+	if (m_pStudioHdr->numincludemodels == 0)
 	{
 		return *m_pStudioHdr->pLocalAttachment(i);
 	}
 
-	Assert(m_pVModel);
+	Assert(m_pStudioHdr->numincludemodels != 0);
 
-	const studiohdr_t* pStudioHdr = GroupStudioHdr(m_pVModel->m_attachment[i].group)->m_pStudioHdr;
+	const CStudioHdr* pStudioHdr = m_pVirtualModel.GroupStudioHdr((&m_pVirtualModel)->m_attachment[i].group);
 
-	return *pStudioHdr->pLocalAttachment(m_pVModel->m_attachment[i].index);
+	return *pStudioHdr->pLocalAttachment((&m_pVirtualModel)->m_attachment[i].index);
 }
 
 //-----------------------------------------------------------------------------
@@ -2684,12 +2635,12 @@ const mstudioattachment_t& CStudioHdr::pAttachment(int i)
 
 int	CStudioHdr::GetAttachmentBone(int i)
 {
-	if (m_pVModel == 0)
+	if (m_pStudioHdr->numincludemodels == 0)
 	{
 		return m_pStudioHdr->pLocalAttachment(i)->localbone;
 	}
 
-	virtualgroup_t* pGroup = &m_pVModel->m_group[m_pVModel->m_attachment[i].group];
+	virtualgroup_t* pGroup = &(&m_pVirtualModel)->m_group[(&m_pVirtualModel)->m_attachment[i].group];
 	const mstudioattachment_t& attachment = pAttachment(i);
 	int iBone = pGroup->masterBone[attachment.localbone];
 	if (iBone == -1)
@@ -2704,12 +2655,12 @@ int	CStudioHdr::GetAttachmentBone(int i)
 
 void CStudioHdr::SetAttachmentBone(int iAttachment, int iBone)
 {
-	mstudioattachment_t& attachment = (mstudioattachment_t&)m_pStudioHdr->pAttachment(iAttachment);
+	mstudioattachment_t& attachment = (mstudioattachment_t&)pAttachment(iAttachment);//m_pStudioHdr->
 
 	// remap bone
-	if (m_pVModel)
+	if (m_pStudioHdr->numincludemodels != 0)
 	{
-		virtualgroup_t* pGroup = &m_pVModel->m_group[m_pVModel->m_attachment[iAttachment].group];
+		virtualgroup_t* pGroup = &(&m_pVirtualModel)->m_group[(&m_pVirtualModel)->m_attachment[iAttachment].group];
 		iBone = pGroup->boneMap[iBone];
 	}
 	attachment.localbone = iBone;
@@ -2721,17 +2672,17 @@ void CStudioHdr::SetAttachmentBone(int iAttachment, int iBone)
 
 char* CStudioHdr::pszNodeName(int iNode)
 {
-	if (m_pVModel == NULL)
+	if (m_pStudioHdr->numincludemodels == 0)
 	{
 		return m_pStudioHdr->pszLocalNodeName(iNode);
 	}
 
-	if (m_pVModel->m_node.Count() <= iNode - 1)
+	if ((&m_pVirtualModel)->m_node.Count() <= iNode - 1)
 		return "Invalid node";
 
-	const studiohdr_t* pStudioHdr = GroupStudioHdr(m_pVModel->m_node[iNode - 1].group)->m_pStudioHdr;
+	const CStudioHdr* pStudioHdr = m_pVirtualModel.GroupStudioHdr((&m_pVirtualModel)->m_node[iNode - 1].group);
 
-	return pStudioHdr->pszLocalNodeName(m_pVModel->m_node[iNode - 1].index);
+	return pStudioHdr->pszLocalNodeName((&m_pVirtualModel)->m_node[iNode - 1].index);
 }
 
 
@@ -2741,7 +2692,7 @@ char* CStudioHdr::pszNodeName(int iNode)
 
 int CStudioHdr::GetTransition(int iFrom, int iTo) const
 {
-	if (m_pVModel == NULL)
+	if (m_pStudioHdr->numincludemodels == 0)
 	{
 		return *m_pStudioHdr->pLocalTransition((iFrom - 1) * m_pStudioHdr->numlocalnodes + (iTo - 1));
 	}
@@ -2762,7 +2713,7 @@ int CStudioHdr::GetTransition(int iFrom, int iTo) const
 
 int	CStudioHdr::GetActivityListVersion(void)
 {
-	if (m_pVModel == NULL)
+	if (m_pStudioHdr->numincludemodels == 0)
 	{
 		return m_pStudioHdr->activitylistversion;
 	}
@@ -2770,9 +2721,9 @@ int	CStudioHdr::GetActivityListVersion(void)
 	int version = m_pStudioHdr->activitylistversion;
 
 	int i;
-	for (i = 1; i < m_pVModel->m_group.Count(); i++)
+	for (i = 1; i < (&m_pVirtualModel)->m_group.Count(); i++)
 	{
-		const studiohdr_t* pStudioHdr = GroupStudioHdr(i)->m_pStudioHdr;
+		const studiohdr_t* pStudioHdr = m_pVirtualModel.GroupStudioHdr(i)->m_pStudioHdr;
 		Assert(pStudioHdr);
 		version = min(version, pStudioHdr->activitylistversion);
 	}
@@ -2784,15 +2735,15 @@ void CStudioHdr::SetActivityListVersion(int version) const
 {
 	m_pStudioHdr->activitylistversion = version;
 
-	if (m_pVModel == NULL)
+	if (m_pStudioHdr->numincludemodels == 0)
 	{
 		return;
 	}
 
 	int i;
-	for (i = 1; i < m_pVModel->m_group.Count(); i++)
+	for (i = 1; i < (&m_pVirtualModel)->m_group.Count(); i++)
 	{
-		const studiohdr_t* pStudioHdr = GroupStudioHdr(i)->m_pStudioHdr;
+		const CStudioHdr* pStudioHdr = m_pVirtualModel.GroupStudioHdr(i);
 		Assert(pStudioHdr);
 		pStudioHdr->SetActivityListVersion(version);
 	}
@@ -2805,7 +2756,7 @@ void CStudioHdr::SetActivityListVersion(int version) const
 
 int	CStudioHdr::GetEventListVersion(void)
 {
-	if (m_pVModel == NULL)
+	if (m_pStudioHdr->numincludemodels == 0)
 	{
 		return m_pStudioHdr->eventsindexed;
 	}
@@ -2813,9 +2764,9 @@ int	CStudioHdr::GetEventListVersion(void)
 	int version = m_pStudioHdr->eventsindexed;
 
 	int i;
-	for (i = 1; i < m_pVModel->m_group.Count(); i++)
+	for (i = 1; i < (&m_pVirtualModel)->m_group.Count(); i++)
 	{
-		const studiohdr_t* pStudioHdr = GroupStudioHdr(i)->m_pStudioHdr;
+		const studiohdr_t* pStudioHdr = m_pVirtualModel.GroupStudioHdr(i)->m_pStudioHdr;
 		Assert(pStudioHdr);
 		version = min(version, pStudioHdr->eventsindexed);
 	}
@@ -2827,15 +2778,15 @@ void CStudioHdr::SetEventListVersion(int version)
 {
 	m_pStudioHdr->eventsindexed = version;
 
-	if (m_pVModel == NULL)
+	if (m_pStudioHdr->numincludemodels == 0)
 	{
 		return;
 	}
 
 	int i;
-	for (i = 1; i < m_pVModel->m_group.Count(); i++)
+	for (i = 1; i < (&m_pVirtualModel)->m_group.Count(); i++)
 	{
-		const studiohdr_t* pStudioHdr = GroupStudioHdr(i)->m_pStudioHdr;
+		const studiohdr_t* pStudioHdr = m_pVirtualModel.GroupStudioHdr(i)->m_pStudioHdr;
 		Assert(pStudioHdr);
 		pStudioHdr->eventsindexed = version;
 	}
@@ -2848,27 +2799,27 @@ void CStudioHdr::SetEventListVersion(int version)
 
 int CStudioHdr::GetNumIKAutoplayLocks(void) const
 {
-	if (m_pVModel == NULL)
+	if (m_pStudioHdr->numincludemodels == 0)
 	{
 		return m_pStudioHdr->numlocalikautoplaylocks;
 	}
 
-	return m_pVModel->m_iklock.Count();
+	return (&m_pVirtualModel)->m_iklock.Count();
 }
 
 const mstudioiklock_t& CStudioHdr::pIKAutoplayLock(int i)
 {
-	if (m_pVModel == NULL)
+	if (m_pStudioHdr->numincludemodels == 0)
 	{
 		return *m_pStudioHdr->pLocalIKAutoplayLock(i);
 	}
 
-	const studiohdr_t* pStudioHdr = GroupStudioHdr(m_pVModel->m_iklock[i].group)->m_pStudioHdr;
+	const CStudioHdr* pStudioHdr = m_pVirtualModel.GroupStudioHdr((&m_pVirtualModel)->m_iklock[i].group);
 	Assert(pStudioHdr);
-	return *pStudioHdr->pLocalIKAutoplayLock(m_pVModel->m_iklock[i].index);
+	return *pStudioHdr->pLocalIKAutoplayLock((&m_pVirtualModel)->m_iklock[i].index);
 }
 
-#if 0
+
 int	CStudioHdr::CountAutoplaySequences() const
 {
 	int count = 0;
@@ -2898,8 +2849,6 @@ int	CStudioHdr::CopyAutoplaySequences(unsigned short* pOut, int outCount) const
 	return outIndex;
 }
 
-#endif
-
 //-----------------------------------------------------------------------------
 // Purpose:	maps local sequence bone to global bone
 //-----------------------------------------------------------------------------
@@ -2907,9 +2856,9 @@ int	CStudioHdr::CopyAutoplaySequences(unsigned short* pOut, int outCount) const
 int	CStudioHdr::RemapSeqBone(int iSequence, int iLocalBone) const
 {
 	// remap bone
-	if (m_pVModel)
+	if (m_pStudioHdr->numincludemodels != 0)
 	{
-		const virtualgroup_t* pSeqGroup = m_pVModel->pSeqGroup(iSequence);
+		const virtualgroup_t* pSeqGroup = (&m_pVirtualModel)->pSeqGroup(iSequence);
 		return pSeqGroup->masterBone[iLocalBone];
 	}
 	return iLocalBone;
@@ -2918,9 +2867,9 @@ int	CStudioHdr::RemapSeqBone(int iSequence, int iLocalBone) const
 int	CStudioHdr::RemapAnimBone(int iAnim, int iLocalBone) const
 {
 	// remap bone
-	if (m_pVModel)
+	if (m_pStudioHdr->numincludemodels != 0)
 	{
-		const virtualgroup_t* pAnimGroup = m_pVModel->pAnimGroup(iAnim);
+		const virtualgroup_t* pAnimGroup = (&m_pVirtualModel)->pAnimGroup(iAnim);
 		return pAnimGroup->masterBone[iLocalBone];
 	}
 	return iLocalBone;
@@ -3172,7 +3121,7 @@ void CStudioHdr::RunFlexRules(const float* src, float* dest)
 CUtlSymbolTable g_ActivityModifiersTable;
 
 extern void SetActivityForSequence(IStudioHdr* pstudiohdr, int i);
-void CStudioHdr::CActivityToSequenceMapping::Initialize(CStudioHdr* __restrict pstudiohdr)
+void CActivityToSequenceMapping::Initialize(CStudioHdr* __restrict pstudiohdr)
 {
 	// Algorithm: walk through every sequence in the model, determine to which activity
 	// it corresponds, and keep a count of sequences per activity. Once the total count
@@ -3336,7 +3285,7 @@ void CStudioHdr::CActivityToSequenceMapping::Initialize(CStudioHdr* __restrict p
 }
 
 /// Force Initialize() to occur again, even if it has already occured.
-void CStudioHdr::CActivityToSequenceMapping::Reinitialize(CStudioHdr* pstudiohdr)
+void CActivityToSequenceMapping::Reinitialize(CStudioHdr* pstudiohdr)
 {
 	m_bIsInitialized = false;
 	if (m_pSequenceTuples)
@@ -3352,7 +3301,7 @@ void CStudioHdr::CActivityToSequenceMapping::Reinitialize(CStudioHdr* pstudiohdr
 // Look up relevant data for an activity's sequences. This isn't terribly efficient, due to the
 // load-hit-store on the output parameters, so the most common case -- SelectWeightedSequence --
 // is specially implemented.
-const CStudioHdr::CActivityToSequenceMapping::SequenceTuple* CStudioHdr::CActivityToSequenceMapping::GetSequences(int forActivity, int* __restrict outSequenceCount, int* __restrict outTotalWeight)
+const CActivityToSequenceMapping::SequenceTuple* CActivityToSequenceMapping::GetSequences(int forActivity, int* __restrict outSequenceCount, int* __restrict outTotalWeight)
 {
 	// Construct a dummy entry so we can do a hash lookup (the UtlHash does not divorce keys from values)
 
@@ -3376,7 +3325,7 @@ const CStudioHdr::CActivityToSequenceMapping::SequenceTuple* CStudioHdr::CActivi
 	}
 }
 
-int CStudioHdr::CActivityToSequenceMapping::NumSequencesForActivity(int forActivity)
+int CActivityToSequenceMapping::NumSequencesForActivity(int forActivity)
 {
 	// If this trips, you've called this function on something that doesn't 
 	// have activities.
@@ -3397,7 +3346,7 @@ int CStudioHdr::CActivityToSequenceMapping::NumSequencesForActivity(int forActiv
 }
 
 // double-check that the data I point to hasn't changed
-bool CStudioHdr::CActivityToSequenceMapping::ValidateAgainst(const CStudioHdr* RESTRICT pstudiohdr) RESTRICT
+bool CActivityToSequenceMapping::ValidateAgainst(const CStudioHdr* RESTRICT pstudiohdr) RESTRICT
 {
 	if (m_bIsInitialized)
 	{
@@ -3410,7 +3359,7 @@ bool CStudioHdr::CActivityToSequenceMapping::ValidateAgainst(const CStudioHdr* R
 	}
 }
 
-void CStudioHdr::CActivityToSequenceMapping::SetValidationPair(const CStudioHdr* RESTRICT pstudiohdr) RESTRICT
+void CActivityToSequenceMapping::SetValidationPair(const CStudioHdr* RESTRICT pstudiohdr) RESTRICT
 {
 	m_expectedPStudioHdr = pstudiohdr->GetRenderHdr();
 	m_expectedVModel = pstudiohdr->GetVirtualModel();
@@ -3420,7 +3369,7 @@ void CStudioHdr::CActivityToSequenceMapping::SetValidationPair(const CStudioHdr*
 // current activity, and its stored weight is negative (whatever that means), always select
 // it. Otherwise perform a weighted selection -- imagine a large roulette wheel, with each
 // sequence having a number of spaces corresponding to its weight.
-int CStudioHdr::CActivityToSequenceMapping::SelectWeightedSequence(CStudioHdr* pstudiohdr, int activity, int curSequence, RandomWeightFunc pRandomWeightFunc)
+int CActivityToSequenceMapping::SelectWeightedSequence(CStudioHdr* pstudiohdr, int activity, int curSequence, RandomWeightFunc pRandomWeightFunc)
 {
 	if (!ValidateAgainst(pstudiohdr))
 	{
@@ -3495,22 +3444,22 @@ CStudioHdr* CMDLCache::GetStudioHdr(MDLHandle_t handle) {
 	if (handle == MDLHANDLE_INVALID)
 		return NULL;
 
-	studiodata_t* pStudioData = m_MDLDict[handle];
+	CStudioHdr* pStudioData = m_MDLDict[handle];
 
 	if (!pStudioData)
 		return NULL;
 
-	if (pStudioData->m_StudioHdr.IsValid()) {
-		return &pStudioData->m_StudioHdr;
+	if (pStudioData->IsValid()) {
+		return pStudioData;
 	}
 
 	GetStudioHdrInternal(handle);
 
-	if (!pStudioData->m_StudioHdr.IsValid()) {
+	if (!pStudioData->IsValid()) {
 		return NULL;
 	}
 
-	return &pStudioData->m_StudioHdr;
+	return pStudioData;
 }
 
 //-----------------------------------------------------------------------------
@@ -3527,7 +3476,7 @@ studiohdr_t *CMDLCache::GetStudioHdrInternal( MDLHandle_t handle )
 	// Assert( m_pModelCacheSection->IsFrameLocking() );
 	// Assert( m_pMeshCacheSection->IsFrameLocking() );
 
-	studiodata_t *pStudioData = m_MDLDict[handle];
+	CStudioHdr *pStudioData = m_MDLDict[handle];
 
 	if( !pStudioData )
 		return NULL;
@@ -3645,7 +3594,8 @@ void CMDLCache::TouchAllData( MDLHandle_t handle )
 		// Note that the animblocks start at 1!!!
 		for ( int i=1; i< (int)pStudioHdr->numanimblocks; ++i )
 		{
-			pStudioHdr->GetAnimBlock( i );
+			//pStudioHdr->GetAnimBlock( i );
+			GetAnimBlock(handle, i);
 		}
 	}
 
@@ -3841,7 +3791,7 @@ void CMDLCache::BeginMapLoad()
 {
 	BreakFrameLock();
 
-	studiodata_t *pStudioData;
+	CStudioHdr *pStudioData;
 
 	// Unlock prior map MDLs prior to load
 	MDLHandle_t i = m_MDLDict.First();
@@ -3867,7 +3817,7 @@ void CMDLCache::EndMapLoad()
 	// Remove all stray MDLs not referenced during load
 	if ( mod_lock_mdls_on_load.GetBool() )
 	{
-		studiodata_t *pStudioData;
+		CStudioHdr *pStudioData;
 		MDLHandle_t i = m_MDLDict.First();
 		while ( i != m_MDLDict.InvalidIndex() )
 		{
@@ -3892,7 +3842,7 @@ bool CMDLCache::IsDataLoaded( MDLHandle_t handle, MDLCacheDataType_t type )
 	if ( handle == MDLHANDLE_INVALID || !m_MDLDict.IsValidIndex( handle ) )
 		return false;
 
-	studiodata_t *pData = m_MDLDict[ handle ];
+	CStudioHdr *pData = m_MDLDict[ handle ];
 	switch( type )
 	{
 	case MDLCACHE_STUDIOHDR:
@@ -3921,7 +3871,7 @@ bool CMDLCache::IsDataLoaded( MDLHandle_t handle, MDLCacheDataType_t type )
 		}
 
 	case MDLCACHE_VIRTUALMODEL:
-		return ( pData->m_pVirtualModel != 0 );
+		return ( pData->m_pVirtualModel.NumGroup() != 0 );
 
 	case MDLCACHE_VERTEXES:
 		return m_pMeshCacheSection->IsPresent( pData->m_VertexCache );
@@ -4207,7 +4157,7 @@ bool CMDLCache::ProcessDataIntoCache( MDLHandle_t handle, MDLCacheDataType_t typ
 		}
 	}
 
-	studiodata_t *pStudioDataCurrent = m_MDLDict[handle];
+	CStudioHdr *pStudioDataCurrent = m_MDLDict[handle];
 
 	if ( !pStudioDataCurrent )
 	{
@@ -4224,26 +4174,26 @@ bool CMDLCache::ProcessDataIntoCache( MDLHandle_t handle, MDLCacheDataType_t typ
 				return false;
 			}
 
+			pStudioDataCurrent->Init(pStudioHdrCurrent, g_pMDLCache);
+
 			if (!Studio_ConvertStudioHdrToNewVersion( pStudioHdrCurrent ))
 			{
 				Warning( "MDLCache: %s needs to be recompiled\n", pStudioHdrCurrent->pszName() );
 			}
 
-			if ( pStudioHdrCurrent->numincludemodels == 0 )
+			if (pStudioDataCurrent->numincludemodels() == 0)
 			{
 				// perf optimization, calculate once and cache off the autoplay sequences
-				int nCount = pStudioHdrCurrent->CountAutoplaySequences();
+				int nCount = pStudioDataCurrent->CountAutoplaySequences();
 				if ( nCount )
 				{
 					AllocateAutoplaySequences( m_MDLDict[handle], nCount );
-					pStudioHdrCurrent->CopyAutoplaySequences( m_MDLDict[handle]->m_pAutoplaySequenceList, nCount );
+					pStudioDataCurrent->CopyAutoplaySequences( m_MDLDict[handle]->m_pAutoplaySequenceList, nCount );
 				}
 			}
 
 			// Load animations
 			UnserializeAllVirtualModelsAndAnimBlocks( handle );
-
-			pStudioDataCurrent->m_StudioHdr.Init(pStudioHdrCurrent, g_pMDLCache);
 
 			if (m_pCacheNotify)
 			{
@@ -4734,7 +4684,7 @@ vertexFileHeader_t *CMDLCache::LoadVertexData( studiohdr_t *pStudioHdr )
 	handle = VoidPtrToMDLHandle( pStudioHdr->VirtualModel() );
 	Assert( !m_MDLDict[handle]->m_VertexCache );
 
-	studiodata_t *pStudioData = m_MDLDict[handle];
+	CStudioHdr *pStudioData = m_MDLDict[handle];
 
 	if ( pStudioData->m_nFlags & STUDIODATA_FLAGS_NO_VERTEX_DATA )
 	{
@@ -4960,7 +4910,7 @@ void CMDLCache::ProcessQueuedData( ModelParts_t *pModelParts, bool bHeaderOnly )
 		nSize = bAbort ?  0 : pModelParts->Buffers[ModelParts_t::BUFFER_VTX].TellMaxPut();
 
 		// ProcessDataIntoCache() will do an unlock, so lock
-		studiodata_t *pStudioData = m_MDLDict[handle];
+		CStudioHdr *pStudioData = m_MDLDict[handle];
 		GetCacheSection( MDLCACHE_STUDIOHWDATA )->Lock( pStudioData->m_VertexCache );
 		{
 			// constructing the static meshes isn't thread safe
@@ -5293,25 +5243,25 @@ void CMDLCache::MarkFrame()
 //-----------------------------------------------------------------------------
 // Purpose: bind studiohdr_t support functions to the mdlcacher
 //-----------------------------------------------------------------------------
-const studiohdr_t *studiohdr_t::FindModel( void **cache, char const *pModelName ) const
-{
-	MDLHandle_t handle = g_MDLCache.FindMDL( pModelName );
-	*cache = MDLHandleToVirtual(handle);
-	return g_MDLCache.GetStudioHdrInternal( handle );
-}
+//const studiohdr_t *studiohdr_t::FindModel( void **cache, char const *pModelName ) const
+//{
+//	MDLHandle_t handle = g_MDLCache.FindMDL( pModelName );
+//	*cache = MDLHandleToVirtual(handle);
+//	return g_MDLCache.GetStudioHdrInternal( handle );
+//}
 
-CVirtualModel *studiohdr_t::GetVirtualModel( void ) const
-{
-	if (numincludemodels == 0)
-		return NULL;
+//CVirtualModel *studiohdr_t::GetVirtualModel( void ) const
+//{
+//	if (numincludemodels == 0)
+//		return NULL;
+//
+//    return g_MDLCache.GetVirtualModelFast( this, VoidPtrToMDLHandle( VirtualModel() ) );
+//}
 
-    return g_MDLCache.GetVirtualModelFast( this, VoidPtrToMDLHandle( VirtualModel() ) );
-}
-
-byte *studiohdr_t::GetAnimBlock( int i ) const
-{
-	return g_MDLCache.GetAnimBlock( VoidPtrToMDLHandle( VirtualModel() ), i );
-}
+//byte *studiohdr_t::GetAnimBlock( int i ) const
+//{
+//	return g_MDLCache.GetAnimBlock( VoidPtrToMDLHandle( VirtualModel() ), i );
+//}
 
 //int studiohdr_t::GetAutoplayList( unsigned short **pOut ) const
 //{
@@ -5323,141 +5273,26 @@ byte *studiohdr_t::GetAnimBlock( int i ) const
 // Purpose:
 //-----------------------------------------------------------------------------
 
-mstudioanimdesc_t& studiohdr_t::pAnimdesc(int i) const
-{
-	if (numincludemodels == 0)
-	{
-		return *pLocalAnimdesc(i);
-	}
-
-	CVirtualModel* pVModel = GetVirtualModel();
-	Assert(pVModel);
-
-	virtualgroup_t* pGroup = pVModel->pAnimGroup(i);// &pVModel->m_group[pVModel->m_anim[i].group];
-	const studiohdr_t* pStudioHdr = pVModel->GetGroupStudioHdr(pGroup);
-	Assert(pStudioHdr);
-
-	return *pStudioHdr->pLocalAnimdesc(pVModel->pAnimIndex(i));//m_anim[i].index
-}
-
-//-----------------------------------------------------------------------------
-// Purpose:
-//-----------------------------------------------------------------------------
-
-
+//mstudioanimdesc_t& studiohdr_t::pAnimdesc(int i) const
+//{
+//	if (numincludemodels == 0)
+//	{
+//		return *pLocalAnimdesc(i);
+//	}
+//
+//	CVirtualModel* pVModel = GetVirtualModel();
+//	Assert(pVModel);
+//
+//	virtualgroup_t* pGroup = pVModel->pAnimGroup(i);// &pVModel->m_group[pVModel->m_anim[i].group];
+//	const studiohdr_t* pStudioHdr = pVModel->GetGroupStudioHdr(pGroup);
+//	Assert(pStudioHdr);
+//
+//	return *pStudioHdr->pLocalAnimdesc(pVModel->pAnimIndex(i));//m_anim[i].index
+//}
 
 //-----------------------------------------------------------------------------
 // Purpose:
 //-----------------------------------------------------------------------------
-
-bool studiohdr_t::SequencesAvailable() const
-{
-	if (numincludemodels == 0)
-	{
-		return true;
-	}
-
-	return (GetVirtualModel() != NULL);
-}
-
-
-//-----------------------------------------------------------------------------
-// Purpose:
-//-----------------------------------------------------------------------------
-
-int studiohdr_t::GetNumSeq(void) const
-{
-	if (numincludemodels == 0)
-	{
-		return numlocalseq;
-	}
-
-	CVirtualModel* pVModel = GetVirtualModel();
-	Assert(pVModel);
-	return pVModel->NumSeq();// m_seq.Count();
-}
-
-//-----------------------------------------------------------------------------
-// Purpose:
-//-----------------------------------------------------------------------------
-
-mstudioseqdesc_t& studiohdr_t::pSeqdesc(int i) const
-{
-	if (numincludemodels == 0)
-	{
-		return *pLocalSeqdesc(i);
-	}
-
-	CVirtualModel* pVModel = GetVirtualModel();
-	Assert(pVModel);
-
-	if (!pVModel)
-	{
-		return *pLocalSeqdesc(i);
-	}
-
-	virtualgroup_t* pGroup = pVModel->pSeqGroup(i);// &pVModel->m_group[pVModel->m_seq[i].group];
-	const studiohdr_t* pStudioHdr = pVModel->GetGroupStudioHdr(pGroup);
-	Assert(pStudioHdr);
-
-	return *pStudioHdr->pLocalSeqdesc(pVModel->pSeqIndex(i));// m_seq[i].index
-}
-
-//-----------------------------------------------------------------------------
-// Purpose:
-//-----------------------------------------------------------------------------
-
-int studiohdr_t::iRelativeAnim(int baseseq, int relanim) const
-{
-	if (numincludemodels == 0)
-	{
-		return relanim;
-	}
-
-	CVirtualModel* pVModel = GetVirtualModel();
-	Assert(pVModel);
-
-	virtualgroup_t* pGroup = pVModel->pSeqGroup(baseseq);// & pVModel->m_group[pVModel->m_seq[baseseq].group];
-
-	return pGroup->masterAnim[relanim];
-}
-
-//-----------------------------------------------------------------------------
-// Purpose:
-//-----------------------------------------------------------------------------
-
-int studiohdr_t::iRelativeSeq(int baseseq, int relseq) const
-{
-	if (numincludemodels == 0)
-	{
-		return relseq;
-	}
-
-	CVirtualModel* pVModel = GetVirtualModel();
-	Assert(pVModel);
-
-	virtualgroup_t* pGroup = pVModel->pSeqGroup(baseseq);// &pVModel->m_group[pVModel->m_seq[baseseq].group];
-
-	return pGroup->masterSeq[relseq];
-}
-
-
-//-----------------------------------------------------------------------------
-// Purpose:
-//-----------------------------------------------------------------------------
-
-int	studiohdr_t::GetNumPoseParameters(void) const
-{
-	if (numincludemodels == 0)
-	{
-		return numlocalposeparameters;
-	}
-
-	CVirtualModel* pVModel = GetVirtualModel();
-	Assert(pVModel);
-
-	return pVModel->NumPose();// m_pose.Count();
-}
 
 
 
@@ -5465,112 +5300,114 @@ int	studiohdr_t::GetNumPoseParameters(void) const
 // Purpose:
 //-----------------------------------------------------------------------------
 
-const mstudioposeparamdesc_t& studiohdr_t::pPoseParameter(int i)
-{
-	if (numincludemodels == 0)
-	{
-		return *pLocalPoseParameter(i);
-	}
-
-	CVirtualModel* pVModel = GetVirtualModel();
-	Assert(pVModel);
-
-	if (pVModel->nPoseGroup(i) == 0)// m_pose[i].group
-		return *pLocalPoseParameter(pVModel->pPoseIndex(i));// m_pose[i].index
-
-	virtualgroup_t* pGroup = pVModel->pPoseGroup(i);// &pVModel->m_group[pVModel->m_pose[i].group];
-
-	const studiohdr_t* pStudioHdr = pVModel->GetGroupStudioHdr(pGroup);
-	Assert(pStudioHdr);
-
-	return *pStudioHdr->pLocalPoseParameter(pVModel->pPoseIndex(i));// m_pose[i].index
-}
+//bool studiohdr_t::SequencesAvailable() const
+//{
+//	if (numincludemodels == 0)
+//	{
+//		return true;
+//	}
+//
+//	return (GetVirtualModel() != NULL);
+//}
 
 
 //-----------------------------------------------------------------------------
 // Purpose:
 //-----------------------------------------------------------------------------
 
-int studiohdr_t::GetSharedPoseParameter(int iSequence, int iLocalPose) const
-{
-	if (numincludemodels == 0)
-	{
-		return iLocalPose;
-	}
+//int studiohdr_t::GetNumSeq(void) const
+//{
+//	if (numincludemodels == 0)
+//	{
+//		return numlocalseq;
+//	}
+//
+//	CVirtualModel* pVModel = GetVirtualModel();
+//	Assert(pVModel);
+//	return pVModel->NumSeq();// m_seq.Count();
+//}
 
-	if (iLocalPose == -1)
-		return iLocalPose;
+//-----------------------------------------------------------------------------
+// Purpose:
+//-----------------------------------------------------------------------------
 
-	CVirtualModel* pVModel = GetVirtualModel();
-	Assert(pVModel);
+//mstudioseqdesc_t& studiohdr_t::pSeqdesc(int i) const
+//{
+//	if (numincludemodels == 0)
+//	{
+//		return *pLocalSeqdesc(i);
+//	}
+//
+//	CVirtualModel* pVModel = GetVirtualModel();
+//	Assert(pVModel);
+//
+//	if (!pVModel)
+//	{
+//		return *pLocalSeqdesc(i);
+//	}
+//
+//	virtualgroup_t* pGroup = pVModel->pSeqGroup(i);// &pVModel->m_group[pVModel->m_seq[i].group];
+//	const studiohdr_t* pStudioHdr = pVModel->GetGroupStudioHdr(pGroup);
+//	Assert(pStudioHdr);
+//
+//	return *pStudioHdr->pLocalSeqdesc(pVModel->pSeqIndex(i));// m_seq[i].index
+//}
 
-	virtualgroup_t* pGroup = pVModel->pSeqGroup(iSequence);// &pVModel->m_group[pVModel->m_seq[iSequence].group];
+//-----------------------------------------------------------------------------
+// Purpose:
+//-----------------------------------------------------------------------------
 
-	return pGroup->masterPose[iLocalPose];
-}
+//int studiohdr_t::iRelativeAnim(int baseseq, int relanim) const
+//{
+//	if (numincludemodels == 0)
+//	{
+//		return relanim;
+//	}
+//
+//	CVirtualModel* pVModel = GetVirtualModel();
+//	Assert(pVModel);
+//
+//	virtualgroup_t* pGroup = pVModel->pSeqGroup(baseseq);// & pVModel->m_group[pVModel->m_seq[baseseq].group];
+//
+//	return pGroup->masterAnim[relanim];
+//}
+
+//-----------------------------------------------------------------------------
+// Purpose:
+//-----------------------------------------------------------------------------
+
+//int studiohdr_t::iRelativeSeq(int baseseq, int relseq) const
+//{
+//	if (numincludemodels == 0)
+//	{
+//		return relseq;
+//	}
+//
+//	CVirtualModel* pVModel = GetVirtualModel();
+//	Assert(pVModel);
+//
+//	virtualgroup_t* pGroup = pVModel->pSeqGroup(baseseq);// &pVModel->m_group[pVModel->m_seq[baseseq].group];
+//
+//	return pGroup->masterSeq[relseq];
+//}
 
 
 //-----------------------------------------------------------------------------
 // Purpose:
 //-----------------------------------------------------------------------------
 
-int studiohdr_t::EntryNode(int iSequence)
-{
-	mstudioseqdesc_t& seqdesc = pSeqdesc(iSequence);
-
-	if (numincludemodels == 0 || seqdesc.localentrynode == 0)
-	{
-		return seqdesc.localentrynode;
-	}
-
-	CVirtualModel* pVModel = GetVirtualModel();
-	Assert(pVModel);
-
-	virtualgroup_t* pGroup = pVModel->pSeqGroup(iSequence);// &pVModel->m_group[pVModel->m_seq[iSequence].group];
-
-	return pGroup->masterNode[seqdesc.localentrynode - 1] + 1;
-}
-
-
-//-----------------------------------------------------------------------------
-// Purpose:
-//-----------------------------------------------------------------------------
-
-
-int studiohdr_t::ExitNode(int iSequence)
-{
-	mstudioseqdesc_t& seqdesc = pSeqdesc(iSequence);
-
-	if (numincludemodels == 0 || seqdesc.localexitnode == 0)
-	{
-		return seqdesc.localexitnode;
-	}
-
-	CVirtualModel* pVModel = GetVirtualModel();
-	Assert(pVModel);
-
-	virtualgroup_t* pGroup = pVModel->pSeqGroup(iSequence);// &pVModel->m_group[pVModel->m_seq[iSequence].group];
-
-	return pGroup->masterNode[seqdesc.localexitnode - 1] + 1;
-}
-
-
-//-----------------------------------------------------------------------------
-// Purpose:
-//-----------------------------------------------------------------------------
-
-int	studiohdr_t::GetNumAttachments(void) const
-{
-	if (numincludemodels == 0)
-	{
-		return numlocalattachments;
-	}
-
-	CVirtualModel* pVModel = GetVirtualModel();
-	Assert(pVModel);
-
-	return pVModel->NumAttachment();// m_attachment.Count();
-}
+//int	studiohdr_t::GetNumPoseParameters(void) const
+//{
+//	if (numincludemodels == 0)
+//	{
+//		return numlocalposeparameters;
+//	}
+//
+//	CVirtualModel* pVModel = GetVirtualModel();
+//	Assert(pVModel);
+//
+//	return pVModel->NumPose();// m_pose.Count();
+//}
 
 
 
@@ -5578,155 +5415,71 @@ int	studiohdr_t::GetNumAttachments(void) const
 // Purpose:
 //-----------------------------------------------------------------------------
 
-const mstudioattachment_t& studiohdr_t::pAttachment(int i) const
-{
-	if (numincludemodels == 0)
-	{
-		return *pLocalAttachment(i);
-	}
-
-	CVirtualModel* pVModel = GetVirtualModel();
-	Assert(pVModel);
-
-	virtualgroup_t* pGroup = pVModel->pAttachmentGroup(i);// &pVModel->m_group[pVModel->m_attachment[i].group];
-	const studiohdr_t* pStudioHdr = pVModel->GetGroupStudioHdr(pGroup);
-	Assert(pStudioHdr);
-
-	return *pStudioHdr->pLocalAttachment(pVModel->pAttachmentIndex(i));// m_attachment[i].index
-}
-
-//-----------------------------------------------------------------------------
-// Purpose:
-//-----------------------------------------------------------------------------
-
-int	studiohdr_t::GetAttachmentBone(int i)
-{
-	const mstudioattachment_t& attachment = pAttachment(i);
-
-	// remap bone
-	CVirtualModel* pVModel = GetVirtualModel();
-	if (pVModel)
-	{
-		virtualgroup_t* pGroup = pVModel->pAttachmentGroup(i);// &pVModel->m_group[pVModel->m_attachment[i].group];
-		int iBone = pGroup->masterBone[attachment.localbone];
-		if (iBone == -1)
-			return 0;
-		return iBone;
-	}
-	return attachment.localbone;
-}
+//const mstudioposeparamdesc_t& studiohdr_t::pPoseParameter(int i)
+//{
+//	if (numincludemodels == 0)
+//	{
+//		return *pLocalPoseParameter(i);
+//	}
+//
+//	CVirtualModel* pVModel = GetVirtualModel();
+//	Assert(pVModel);
+//
+//	if (pVModel->nPoseGroup(i) == 0)// m_pose[i].group
+//		return *pLocalPoseParameter(pVModel->pPoseIndex(i));// m_pose[i].index
+//
+//	virtualgroup_t* pGroup = pVModel->pPoseGroup(i);// &pVModel->m_group[pVModel->m_pose[i].group];
+//
+//	const studiohdr_t* pStudioHdr = pVModel->GetGroupStudioHdr(pGroup);
+//	Assert(pStudioHdr);
+//
+//	return *pStudioHdr->pLocalPoseParameter(pVModel->pPoseIndex(i));// m_pose[i].index
+//}
 
 
 //-----------------------------------------------------------------------------
 // Purpose:
 //-----------------------------------------------------------------------------
 
-void studiohdr_t::SetAttachmentBone(int iAttachment, int iBone)
-{
-	mstudioattachment_t& attachment = (mstudioattachment_t&)pAttachment(iAttachment);
-
-	// remap bone
-	CVirtualModel* pVModel = GetVirtualModel();
-	if (pVModel)
-	{
-		virtualgroup_t* pGroup = pVModel->pAttachmentGroup(iAttachment);// &pVModel->m_group[pVModel->m_attachment[iAttachment].group];
-		iBone = pGroup->boneMap[iBone];
-	}
-	attachment.localbone = iBone;
-}
-
-//-----------------------------------------------------------------------------
-// Purpose:
-//-----------------------------------------------------------------------------
-
-char* studiohdr_t::pszNodeName(int iNode)
-{
-	if (numincludemodels == 0)
-	{
-		return pszLocalNodeName(iNode);
-	}
-
-	CVirtualModel* pVModel = GetVirtualModel();
-	Assert(pVModel);
-
-	if (pVModel->NumNode() <= iNode - 1)// m_node.Count()
-		return "Invalid node";
-	//pVModel->m_group[ pVModel->m_node[iNode-1].group ]
-	return pVModel->GetGroupStudioHdr(pVModel->pNodeGroup(iNode - 1))->pszLocalNodeName(pVModel->pNodeIndex(iNode - 1));// m_node[iNode - 1].index
-}
+//int studiohdr_t::GetSharedPoseParameter(int iSequence, int iLocalPose) const
+//{
+//	if (numincludemodels == 0)
+//	{
+//		return iLocalPose;
+//	}
+//
+//	if (iLocalPose == -1)
+//		return iLocalPose;
+//
+//	CVirtualModel* pVModel = GetVirtualModel();
+//	Assert(pVModel);
+//
+//	virtualgroup_t* pGroup = pVModel->pSeqGroup(iSequence);// &pVModel->m_group[pVModel->m_seq[iSequence].group];
+//
+//	return pGroup->masterPose[iLocalPose];
+//}
 
 
 //-----------------------------------------------------------------------------
 // Purpose:
 //-----------------------------------------------------------------------------
 
-int studiohdr_t::GetTransition(int iFrom, int iTo) const
-{
-	if (numincludemodels == 0)
-	{
-		return *pLocalTransition((iFrom - 1) * numlocalnodes + (iTo - 1));
-	}
-
-	return iTo;
-	/*
-	FIXME: not connected
-	CVirtualModel *pVModel = GetVirtualModel();
-	Assert( pVModel );
-
-	return pVModel->m_transition.Element( iFrom ).Element( iTo );
-	*/
-}
-
-
-int	studiohdr_t::GetActivityListVersion(void)
-{
-	if (numincludemodels == 0)
-	{
-		return activitylistversion;
-	}
-
-	CVirtualModel* pVModel = GetVirtualModel();
-	Assert(pVModel);
-
-	int ActVersion = activitylistversion;
-
-	int i;
-	for (i = 1; i < pVModel->NumGroup(); i++)//m_group.Count()
-	{
-		virtualgroup_t* pGroup = pVModel->pGroup(i);// &pVModel->m_group[i];
-		const studiohdr_t* pStudioHdr = pVModel->GetGroupStudioHdr(pGroup);
-
-		Assert(pStudioHdr);
-
-		ActVersion = min(ActVersion, pStudioHdr->activitylistversion);
-	}
-
-	return ActVersion;
-}
-
-void studiohdr_t::SetActivityListVersion(int ActVersion) const
-{
-	activitylistversion = ActVersion;
-
-	if (numincludemodels == 0)
-	{
-		return;
-	}
-
-	CVirtualModel* pVModel = GetVirtualModel();
-	Assert(pVModel);
-
-	int i;
-	for (i = 1; i < pVModel->NumGroup(); i++)//m_group.Count()
-	{
-		virtualgroup_t* pGroup = pVModel->pGroup(i);// &pVModel->m_group[i];
-		const studiohdr_t* pStudioHdr = pVModel->GetGroupStudioHdr(pGroup);
-
-		Assert(pStudioHdr);
-
-		pStudioHdr->SetActivityListVersion(ActVersion);
-	}
-}
+//int studiohdr_t::EntryNode(int iSequence)
+//{
+//	mstudioseqdesc_t& seqdesc = pSeqdesc(iSequence);
+//
+//	if (numincludemodels == 0 || seqdesc.localentrynode == 0)
+//	{
+//		return seqdesc.localentrynode;
+//	}
+//
+//	CVirtualModel* pVModel = GetVirtualModel();
+//	Assert(pVModel);
+//
+//	virtualgroup_t* pGroup = pVModel->pSeqGroup(iSequence);// &pVModel->m_group[pVModel->m_seq[iSequence].group];
+//
+//	return pGroup->masterNode[seqdesc.localentrynode - 1] + 1;
+//}
 
 
 //-----------------------------------------------------------------------------
@@ -5734,99 +5487,296 @@ void studiohdr_t::SetActivityListVersion(int ActVersion) const
 //-----------------------------------------------------------------------------
 
 
-int studiohdr_t::GetNumIKAutoplayLocks(void) const
-{
-	if (numincludemodels == 0)
-	{
-		return numlocalikautoplaylocks;
-	}
+//int studiohdr_t::ExitNode(int iSequence)
+//{
+//	mstudioseqdesc_t& seqdesc = pSeqdesc(iSequence);
+//
+//	if (numincludemodels == 0 || seqdesc.localexitnode == 0)
+//	{
+//		return seqdesc.localexitnode;
+//	}
+//
+//	CVirtualModel* pVModel = GetVirtualModel();
+//	Assert(pVModel);
+//
+//	virtualgroup_t* pGroup = pVModel->pSeqGroup(iSequence);// &pVModel->m_group[pVModel->m_seq[iSequence].group];
+//
+//	return pGroup->masterNode[seqdesc.localexitnode - 1] + 1;
+//}
 
-	CVirtualModel* pVModel = GetVirtualModel();
-	Assert(pVModel);
 
-	return pVModel->NumIKlock();// m_iklock.Count();
-}
+//-----------------------------------------------------------------------------
+// Purpose:
+//-----------------------------------------------------------------------------
 
-const mstudioiklock_t& studiohdr_t::pIKAutoplayLock(int i)
-{
-	if (numincludemodels == 0)
-	{
-		return *pLocalIKAutoplayLock(i);
-	}
+//int	studiohdr_t::GetNumAttachments(void) const
+//{
+//	if (numincludemodels == 0)
+//	{
+//		return numlocalattachments;
+//	}
+//
+//	CVirtualModel* pVModel = GetVirtualModel();
+//	Assert(pVModel);
+//
+//	return pVModel->NumAttachment();// m_attachment.Count();
+//}
 
-	CVirtualModel* pVModel = GetVirtualModel();
-	Assert(pVModel);
 
-	virtualgroup_t* pGroup = pVModel->pIKlockGroup(i);// &pVModel->m_group[pVModel->m_iklock[i].group];
-	const studiohdr_t* pStudioHdr = pVModel->GetGroupStudioHdr(pGroup);
-	Assert(pStudioHdr);
 
-	return *pStudioHdr->pLocalIKAutoplayLock(pVModel->pIKlockIndex(i));// m_iklock[i].index
-}
+//-----------------------------------------------------------------------------
+// Purpose:
+//-----------------------------------------------------------------------------
 
-int	studiohdr_t::CountAutoplaySequences() const
-{
-	int count = 0;
-	for (int i = 0; i < GetNumSeq(); i++)
-	{
-		mstudioseqdesc_t& seqdesc = pSeqdesc(i);
-		if (seqdesc.flags & STUDIO_AUTOPLAY)
-		{
-			count++;
-		}
-	}
-	return count;
-}
+//const mstudioattachment_t& studiohdr_t::pAttachment(int i) const
+//{
+//	if (numincludemodels == 0)
+//	{
+//		return *pLocalAttachment(i);
+//	}
+//
+//	CVirtualModel* pVModel = GetVirtualModel();
+//	Assert(pVModel);
+//
+//	virtualgroup_t* pGroup = pVModel->pAttachmentGroup(i);// &pVModel->m_group[pVModel->m_attachment[i].group];
+//	const studiohdr_t* pStudioHdr = pVModel->GetGroupStudioHdr(pGroup);
+//	Assert(pStudioHdr);
+//
+//	return *pStudioHdr->pLocalAttachment(pVModel->pAttachmentIndex(i));// m_attachment[i].index
+//}
 
-int	studiohdr_t::CopyAutoplaySequences(unsigned short* pOut, int outCount) const
-{
-	int outIndex = 0;
-	for (int i = 0; i < GetNumSeq() && outIndex < outCount; i++)
-	{
-		mstudioseqdesc_t& seqdesc = pSeqdesc(i);
-		if (seqdesc.flags & STUDIO_AUTOPLAY)
-		{
-			pOut[outIndex] = i;
-			outIndex++;
-		}
-	}
-	return outIndex;
-}
+//-----------------------------------------------------------------------------
+// Purpose:
+//-----------------------------------------------------------------------------
+
+//int	studiohdr_t::GetAttachmentBone(int i)
+//{
+//	const mstudioattachment_t& attachment = pAttachment(i);
+//
+//	// remap bone
+//	CVirtualModel* pVModel = GetVirtualModel();
+//	if (pVModel)
+//	{
+//		virtualgroup_t* pGroup = pVModel->pAttachmentGroup(i);// &pVModel->m_group[pVModel->m_attachment[i].group];
+//		int iBone = pGroup->masterBone[attachment.localbone];
+//		if (iBone == -1)
+//			return 0;
+//		return iBone;
+//	}
+//	return attachment.localbone;
+//}
+
+
+//-----------------------------------------------------------------------------
+// Purpose:
+//-----------------------------------------------------------------------------
+
+//void studiohdr_t::SetAttachmentBone(int iAttachment, int iBone)
+//{
+//	mstudioattachment_t& attachment = (mstudioattachment_t&)pAttachment(iAttachment);
+//
+//	// remap bone
+//	CVirtualModel* pVModel = GetVirtualModel();
+//	if (pVModel)
+//	{
+//		virtualgroup_t* pGroup = pVModel->pAttachmentGroup(iAttachment);// &pVModel->m_group[pVModel->m_attachment[iAttachment].group];
+//		iBone = pGroup->boneMap[iBone];
+//	}
+//	attachment.localbone = iBone;
+//}
+
+//-----------------------------------------------------------------------------
+// Purpose:
+//-----------------------------------------------------------------------------
+
+//char* studiohdr_t::pszNodeName(int iNode)
+//{
+//	if (numincludemodels == 0)
+//	{
+//		return pszLocalNodeName(iNode);
+//	}
+//
+//	CVirtualModel* pVModel = GetVirtualModel();
+//	Assert(pVModel);
+//
+//	if (pVModel->NumNode() <= iNode - 1)// m_node.Count()
+//		return "Invalid node";
+//	//pVModel->m_group[ pVModel->m_node[iNode-1].group ]
+//	return pVModel->GetGroupStudioHdr(pVModel->pNodeGroup(iNode - 1))->pszLocalNodeName(pVModel->pNodeIndex(iNode - 1));// m_node[iNode - 1].index
+//}
+
+
+//-----------------------------------------------------------------------------
+// Purpose:
+//-----------------------------------------------------------------------------
+
+//int studiohdr_t::GetTransition(int iFrom, int iTo) const
+//{
+//	if (numincludemodels == 0)
+//	{
+//		return *pLocalTransition((iFrom - 1) * numlocalnodes + (iTo - 1));
+//	}
+//
+//	return iTo;
+//	/*
+//	FIXME: not connected
+//	CVirtualModel *pVModel = GetVirtualModel();
+//	Assert( pVModel );
+//
+//	return pVModel->m_transition.Element( iFrom ).Element( iTo );
+//	*/
+//}
+
+
+//int	studiohdr_t::GetActivityListVersion(void)
+//{
+//	if (numincludemodels == 0)
+//	{
+//		return activitylistversion;
+//	}
+//
+//	CVirtualModel* pVModel = GetVirtualModel();
+//	Assert(pVModel);
+//
+//	int ActVersion = activitylistversion;
+//
+//	int i;
+//	for (i = 1; i < pVModel->NumGroup(); i++)//m_group.Count()
+//	{
+//		virtualgroup_t* pGroup = pVModel->pGroup(i);// &pVModel->m_group[i];
+//		const studiohdr_t* pStudioHdr = pVModel->GetGroupStudioHdr(pGroup);
+//
+//		Assert(pStudioHdr);
+//
+//		ActVersion = min(ActVersion, pStudioHdr->activitylistversion);
+//	}
+//
+//	return ActVersion;
+//}
+
+//void studiohdr_t::SetActivityListVersion(int ActVersion) const
+//{
+//	activitylistversion = ActVersion;
+//
+//	if (numincludemodels == 0)
+//	{
+//		return;
+//	}
+//
+//	CVirtualModel* pVModel = GetVirtualModel();
+//	Assert(pVModel);
+//
+//	int i;
+//	for (i = 1; i < pVModel->NumGroup(); i++)//m_group.Count()
+//	{
+//		virtualgroup_t* pGroup = pVModel->pGroup(i);// &pVModel->m_group[i];
+//		const studiohdr_t* pStudioHdr = pVModel->GetGroupStudioHdr(pGroup);
+//
+//		Assert(pStudioHdr);
+//
+//		pStudioHdr->SetActivityListVersion(ActVersion);
+//	}
+//}
+
+
+//-----------------------------------------------------------------------------
+// Purpose:
+//-----------------------------------------------------------------------------
+
+
+//int studiohdr_t::GetNumIKAutoplayLocks(void) const
+//{
+//	if (numincludemodels == 0)
+//	{
+//		return numlocalikautoplaylocks;
+//	}
+//
+//	CVirtualModel* pVModel = GetVirtualModel();
+//	Assert(pVModel);
+//
+//	return pVModel->NumIKlock();// m_iklock.Count();
+//}
+
+//const mstudioiklock_t& studiohdr_t::pIKAutoplayLock(int i)
+//{
+//	if (numincludemodels == 0)
+//	{
+//		return *pLocalIKAutoplayLock(i);
+//	}
+//
+//	CVirtualModel* pVModel = GetVirtualModel();
+//	Assert(pVModel);
+//
+//	virtualgroup_t* pGroup = pVModel->pIKlockGroup(i);// &pVModel->m_group[pVModel->m_iklock[i].group];
+//	const studiohdr_t* pStudioHdr = pVModel->GetGroupStudioHdr(pGroup);
+//	Assert(pStudioHdr);
+//
+//	return *pStudioHdr->pLocalIKAutoplayLock(pVModel->pIKlockIndex(i));// m_iklock[i].index
+//}
+
+//int	studiohdr_t::CountAutoplaySequences() const
+//{
+//	int count = 0;
+//	for (int i = 0; i < GetNumSeq(); i++)
+//	{
+//		mstudioseqdesc_t& seqdesc = pSeqdesc(i);
+//		if (seqdesc.flags & STUDIO_AUTOPLAY)
+//		{
+//			count++;
+//		}
+//	}
+//	return count;
+//}
+
+//int	studiohdr_t::CopyAutoplaySequences(unsigned short* pOut, int outCount) const
+//{
+//	int outIndex = 0;
+//	for (int i = 0; i < GetNumSeq() && outIndex < outCount; i++)
+//	{
+//		mstudioseqdesc_t& seqdesc = pSeqdesc(i);
+//		if (seqdesc.flags & STUDIO_AUTOPLAY)
+//		{
+//			pOut[outIndex] = i;
+//			outIndex++;
+//		}
+//	}
+//	return outIndex;
+//}
 
 //-----------------------------------------------------------------------------
 // Purpose:	maps local sequence bone to global bone
 //-----------------------------------------------------------------------------
 
-int	studiohdr_t::RemapSeqBone(int iSequence, int iLocalBone) const
-{
-	// remap bone
-	CVirtualModel* pVModel = GetVirtualModel();
-	if (pVModel)
-	{
-		const virtualgroup_t* pSeqGroup = pVModel->pSeqGroup(iSequence);
-		return pSeqGroup->masterBone[iLocalBone];
-	}
-	return iLocalBone;
-}
+//int	studiohdr_t::RemapSeqBone(int iSequence, int iLocalBone) const
+//{
+//	// remap bone
+//	CVirtualModel* pVModel = GetVirtualModel();
+//	if (pVModel)
+//	{
+//		const virtualgroup_t* pSeqGroup = pVModel->pSeqGroup(iSequence);
+//		return pSeqGroup->masterBone[iLocalBone];
+//	}
+//	return iLocalBone;
+//}
 
-int	studiohdr_t::RemapAnimBone(int iAnim, int iLocalBone) const
-{
-	// remap bone
-	CVirtualModel* pVModel = GetVirtualModel();
-	if (pVModel)
-	{
-		const virtualgroup_t* pAnimGroup = pVModel->pAnimGroup(iAnim);
-		return pAnimGroup->masterBone[iLocalBone];
-	}
-	return iLocalBone;
-}
+//int	studiohdr_t::RemapAnimBone(int iAnim, int iLocalBone) const
+//{
+//	// remap bone
+//	CVirtualModel* pVModel = GetVirtualModel();
+//	if (pVModel)
+//	{
+//		const virtualgroup_t* pAnimGroup = pVModel->pAnimGroup(iAnim);
+//		return pAnimGroup->masterBone[iLocalBone];
+//	}
+//	return iLocalBone;
+//}
 
 const studiohdr_t* CVirtualModel::GetGroupStudioHdr(virtualgroup_t* pGroup) const
 {
 	return g_MDLCache.GetStudioHdrInternal(VoidPtrToMDLHandle(pGroup->cache));
 }
 
-void CVirtualModel::AppendModels(int group, const studiohdr_t* pStudioHdr)
+void CVirtualModel::AppendModels(int group, const CStudioHdr* pStudioHdr)
 {
 	AUTO_LOCK(m_Lock);
 
@@ -5844,7 +5794,7 @@ void CVirtualModel::AppendModels(int group, const studiohdr_t* pStudioHdr)
 	struct HandleAndHeader_t
 	{
 		void* handle;
-		const studiohdr_t* pHdr;
+		const CStudioHdr* pHdr;
 	};
 	HandleAndHeader_t list[64];
 
@@ -5852,11 +5802,12 @@ void CVirtualModel::AppendModels(int group, const studiohdr_t* pStudioHdr)
 	// temporarily cache results off, otherwise FindModel() causes ref counting problems
 	int j;
 	int nValidIncludes = 0;
-	for (j = 0; j < pStudioHdr->numincludemodels; j++)
+	for (j = 0; j < pStudioHdr->numincludemodels(); j++)
 	{
 		// find model (increases ref count)
-		void* tmp = NULL;
-		const studiohdr_t* pTmpHdr = pStudioHdr->FindModel(&tmp, pStudioHdr->pModelGroup(j)->pszName());
+		MDLHandle_t handle = g_MDLCache.FindMDL(pStudioHdr->pModelGroup(j)->pszName());
+		void* tmp = MDLHandleToVirtual(handle);
+		const CStudioHdr* pTmpHdr = g_MDLCache.GetStudioHdr(handle);
 		if (pTmpHdr)
 		{
 			if (nValidIncludes >= ARRAYSIZE(list))
@@ -5882,12 +5833,24 @@ void CVirtualModel::AppendModels(int group, const studiohdr_t* pStudioHdr)
 			m_group[group].cache = list[j].handle;
 			AppendModels(group, list[j].pHdr);
 		}
+		m_pStudioHdrCache.SetCount(m_group.Count());
+
+		int i;
+		for (i = 0; i < m_pStudioHdrCache.Count(); i++)
+		{
+			m_pStudioHdrCache[i] = NULL;
+		}
 	}
 
+	if (g_pMDLCache)
+	{
+		m_pFrameUnlockCounter = g_pMDLCache->GetFrameUnlockCounterPtr(MDLCACHE_STUDIOHDR);
+		m_nFrameUnlockCounter = *m_pFrameUnlockCounter - 1;
+	}
 	UpdateAutoplaySequences(pStudioHdr);
 }
 
-void CVirtualModel::AppendSequences(int group, const studiohdr_t* pStudioHdr)
+void CVirtualModel::AppendSequences(int group, const CStudioHdr* pStudioHdr)
 {
 	AUTO_LOCK(m_Lock);
 	int numCheck = m_seq.Count();
@@ -5900,9 +5863,9 @@ void CVirtualModel::AppendSequences(int group, const studiohdr_t* pStudioHdr)
 
 	seq = m_seq;
 
-	m_group[group].masterSeq.SetCount(pStudioHdr->numlocalseq);
+	m_group[group].masterSeq.SetCount(pStudioHdr->numlocalseq());
 
-	for (j = 0; j < pStudioHdr->numlocalseq; j++)
+	for (j = 0; j < pStudioHdr->numlocalseq(); j++)
 	{
 		const mstudioseqdesc_t* seqdesc = pStudioHdr->pLocalSeqdesc(j);
 		char* s1 = seqdesc->pszLabel();
@@ -5965,7 +5928,7 @@ void CVirtualModel::AppendSequences(int group, const studiohdr_t* pStudioHdr)
 }
 
 
-void CVirtualModel::UpdateAutoplaySequences(const studiohdr_t* pStudioHdr)
+void CVirtualModel::UpdateAutoplaySequences(const CStudioHdr* pStudioHdr)
 {
 	AUTO_LOCK(m_Lock);
 	int autoplayCount = pStudioHdr->CountAutoplaySequences();
@@ -5977,7 +5940,7 @@ void CVirtualModel::UpdateAutoplaySequences(const studiohdr_t* pStudioHdr)
 // Purpose:
 //-----------------------------------------------------------------------------
 
-void CVirtualModel::AppendAnimations(int group, const studiohdr_t* pStudioHdr)
+void CVirtualModel::AppendAnimations(int group, const CStudioHdr* pStudioHdr)
 {
 	AUTO_LOCK(m_Lock);
 	int numCheck = m_anim.Count();
@@ -5989,9 +5952,9 @@ void CVirtualModel::AppendAnimations(int group, const studiohdr_t* pStudioHdr)
 
 	int j, k;
 
-	m_group[group].masterAnim.SetCount(pStudioHdr->numlocalanim);
+	m_group[group].masterAnim.SetCount(pStudioHdr->numlocalanim());
 
-	for (j = 0; j < pStudioHdr->numlocalanim; j++)
+	for (j = 0; j < pStudioHdr->numlocalanim(); j++)
 	{
 		char* s1 = pStudioHdr->pLocalAnimdesc(j)->pszName();
 		if (HasLookupTable())
@@ -6043,7 +6006,7 @@ void CVirtualModel::AppendAnimations(int group, const studiohdr_t* pStudioHdr)
 // Purpose:
 //-----------------------------------------------------------------------------
 
-void CVirtualModel::AppendBonemap(int group, const studiohdr_t* pStudioHdr)
+void CVirtualModel::AppendBonemap(int group, const CStudioHdr* pStudioHdr)
 {
 	AUTO_LOCK(m_Lock);
 	MEM_ALLOC_CREDIT();
@@ -6051,13 +6014,13 @@ void CVirtualModel::AppendBonemap(int group, const studiohdr_t* pStudioHdr)
 	const studiohdr_t* pBaseStudioHdr = GetGroupStudioHdr(&m_group[0]);
 
 	m_group[group].boneMap.SetCount(pBaseStudioHdr->numbones);
-	m_group[group].masterBone.SetCount(pStudioHdr->numbones);
+	m_group[group].masterBone.SetCount(pStudioHdr->numbones());
 
 	int j, k;
 
 	if (group == 0)
 	{
-		for (j = 0; j < pStudioHdr->numbones; j++)
+		for (j = 0; j < pStudioHdr->numbones(); j++)
 		{
 			m_group[group].boneMap[j] = j;
 			m_group[group].masterBone[j] = j;
@@ -6069,7 +6032,7 @@ void CVirtualModel::AppendBonemap(int group, const studiohdr_t* pStudioHdr)
 		{
 			m_group[group].boneMap[j] = -1;
 		}
-		for (j = 0; j < pStudioHdr->numbones; j++)
+		for (j = 0; j < pStudioHdr->numbones(); j++)
 		{
 			// NOTE: studiohdr has a bone table - using the table is ~5% faster than this for alyx.mdl on a P4/3.2GHz
 			for (k = 0; k < pBaseStudioHdr->numbones; k++)
@@ -6110,7 +6073,7 @@ void CVirtualModel::AppendBonemap(int group, const studiohdr_t* pStudioHdr)
 // Purpose:
 //-----------------------------------------------------------------------------
 
-void CVirtualModel::AppendAttachments(int group, const studiohdr_t* pStudioHdr)
+void CVirtualModel::AppendAttachments(int group, const CStudioHdr* pStudioHdr)
 {
 	AUTO_LOCK(m_Lock);
 	int numCheck = m_attachment.Count();
@@ -6122,9 +6085,9 @@ void CVirtualModel::AppendAttachments(int group, const studiohdr_t* pStudioHdr)
 
 	int j, k, n;
 
-	m_group[group].masterAttachment.SetCount(pStudioHdr->numlocalattachments);
+	m_group[group].masterAttachment.SetCount(pStudioHdr->numlocalattachments());
 
-	for (j = 0; j < pStudioHdr->numlocalattachments; j++)
+	for (j = 0; j < pStudioHdr->numlocalattachments(); j++)
 	{
 
 		n = m_group[group].masterBone[pStudioHdr->pLocalAttachment(j)->localbone];
@@ -6183,7 +6146,7 @@ void CVirtualModel::AppendAttachments(int group, const studiohdr_t* pStudioHdr)
 // Purpose:
 //-----------------------------------------------------------------------------
 
-void CVirtualModel::AppendPoseParameters(int group, const studiohdr_t* pStudioHdr)
+void CVirtualModel::AppendPoseParameters(int group, const CStudioHdr* pStudioHdr)
 {
 	AUTO_LOCK(m_Lock);
 	int numCheck = m_pose.Count();
@@ -6195,9 +6158,9 @@ void CVirtualModel::AppendPoseParameters(int group, const studiohdr_t* pStudioHd
 
 	int j, k;
 
-	m_group[group].masterPose.SetCount(pStudioHdr->numlocalposeparameters);
+	m_group[group].masterPose.SetCount(pStudioHdr->numlocalposeparameters());
 
-	for (j = 0; j < pStudioHdr->numlocalposeparameters; j++)
+	for (j = 0; j < pStudioHdr->numlocalposeparameters(); j++)
 	{
 		char* s1 = pStudioHdr->pLocalPoseParameter(j)->pszName();
 		for (k = 0; k < numCheck; k++)
@@ -6239,7 +6202,7 @@ void CVirtualModel::AppendPoseParameters(int group, const studiohdr_t* pStudioHd
 // Purpose:
 //-----------------------------------------------------------------------------
 
-void CVirtualModel::AppendNodes(int group, const studiohdr_t* pStudioHdr)
+void CVirtualModel::AppendNodes(int group, const CStudioHdr* pStudioHdr)
 {
 	AUTO_LOCK(m_Lock);
 	int numCheck = m_node.Count();
@@ -6251,9 +6214,9 @@ void CVirtualModel::AppendNodes(int group, const studiohdr_t* pStudioHdr)
 
 	int j, k;
 
-	m_group[group].masterNode.SetCount(pStudioHdr->numlocalnodes);
+	m_group[group].masterNode.SetCount(pStudioHdr->numlocalnodes());
 
-	for (j = 0; j < pStudioHdr->numlocalnodes; j++)
+	for (j = 0; j < pStudioHdr->numlocalnodes(); j++)
 	{
 		char* s1 = pStudioHdr->pszLocalNodeName(j);
 		for (k = 0; k < numCheck; k++)
@@ -6285,7 +6248,7 @@ void CVirtualModel::AppendNodes(int group, const studiohdr_t* pStudioHdr)
 //-----------------------------------------------------------------------------
 
 
-void CVirtualModel::AppendIKLocks(int group, const studiohdr_t* pStudioHdr)
+void CVirtualModel::AppendIKLocks(int group, const CStudioHdr* pStudioHdr)
 {
 	AUTO_LOCK(m_Lock);
 	int numCheck = m_iklock.Count();
@@ -6295,7 +6258,7 @@ void CVirtualModel::AppendIKLocks(int group, const studiohdr_t* pStudioHdr)
 
 	int j, k;
 
-	for (j = 0; j < pStudioHdr->numlocalikautoplaylocks; j++)
+	for (j = 0; j < pStudioHdr->numlocalikautoplaylocks(); j++)
 	{
 		int chain1 = pStudioHdr->pLocalIKAutoplayLock(j)->chain;
 		for (k = 0; k < numCheck; k++)
@@ -6325,9 +6288,9 @@ void CVirtualModel::AppendIKLocks(int group, const studiohdr_t* pStudioHdr)
 	if (group != 0)
 	{
 		studiohdr_t* pBaseHdr = (studiohdr_t*)GetGroupStudioHdr(&m_group[0]);
-		if (pStudioHdr->numikchains == pBaseHdr->numikchains)
+		if (pStudioHdr->numikchains() == pBaseHdr->numikchains)
 		{
-			for (j = 0; j < pStudioHdr->numikchains; j++)
+			for (j = 0; j < pStudioHdr->numikchains(); j++)
 			{
 				if (pBaseHdr->pIKChain(j)->pLink(0)->kneeDir.LengthSqr() == 0.0f)
 				{

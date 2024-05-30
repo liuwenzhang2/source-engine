@@ -2134,7 +2134,7 @@ public:
 	virtual bool				SequencesAvailable() const = 0;
 	virtual int					GetNumSeq(void) const = 0;
 	virtual mstudioanimdesc_t& pAnimdesc(int i) = 0;
-	virtual mstudioseqdesc_t& pSeqdesc(int iSequence) = 0;
+	virtual mstudioseqdesc_t& pSeqdesc(int iSequence) const = 0;
 	virtual int					iRelativeAnim(int baseseq, int relanim) const = 0;	// maps seq local anim reference to global anim index
 	virtual int					iRelativeSeq(int baseseq, int relseq) const = 0;		// maps seq local seq reference to global seq index
 
@@ -2272,14 +2272,14 @@ public:
 	virtual unsigned char* GetAnimBlock(int nBlock) const = 0;
 	virtual int numincludemodels() const = 0;
 	virtual const char* KeyValueText(void) const = 0;
-	virtual int length() = 0;
-	virtual mstudioanimdesc_t* pLocalAnimdesc(int i) const = 0;
-	virtual mstudioseqdesc_t* pLocalSeqdesc(int i) const = 0;
-	virtual mstudioposeparamdesc_t* pLocalPoseParameter(int i) const = 0;
-	virtual mstudioattachment_t* pLocalAttachment(int i) const = 0;
-	virtual char* pszLocalNodeName(int iNode) const = 0;
-	virtual int activitylistversion() const = 0;
-	virtual mstudioiklock_t* pLocalIKAutoplayLock(int i) const = 0;
+	//virtual int length() = 0;
+	//virtual mstudioanimdesc_t* pLocalAnimdesc(int i) const = 0;
+	//virtual mstudioseqdesc_t* pLocalSeqdesc(int i) const = 0;
+	//virtual mstudioposeparamdesc_t* pLocalPoseParameter(int i) const = 0;
+	//virtual mstudioattachment_t* pLocalAttachment(int i) const = 0;
+	//virtual char* pszLocalNodeName(int iNode) const = 0;
+	//virtual int activitylistversion() const = 0;
+	//virtual mstudioiklock_t* pLocalIKAutoplayLock(int i) const = 0;
 
 };
 

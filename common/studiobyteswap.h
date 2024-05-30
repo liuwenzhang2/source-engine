@@ -12,8 +12,12 @@
 #endif
 
 #include "byteswap.h"
+#include "datacache/idatacache.h"
 #include "datacache/imdlcache.h"
+#include "mempool.h"
+
 class IPhysicsCollision;
+class CStudioHdr;
 extern IMDLCache* g_pMDLCache;
 // NOTE! Next time we up the .mdl file format, remove studiohdr2_t
 // and insert all fields in this structure into studiohdr_t.
@@ -82,8 +86,8 @@ struct studiohdr_t
 	int					numbones;			// bones
 	int					boneindex;
 	inline mstudiobone_t* pBone(int i) const { Assert(i >= 0 && i < numbones); return (mstudiobone_t*)(((byte*)this) + boneindex) + i; };
-	int					RemapSeqBone(int iSequence, int iLocalBone) const;	// maps local sequence bone to global bone
-	int					RemapAnimBone(int iAnim, int iLocalBone) const;		// maps local animations bone to global bone
+	//int					RemapSeqBone(int iSequence, int iLocalBone) const;	// maps local sequence bone to global bone
+	//int					RemapAnimBone(int iAnim, int iLocalBone) const;		// maps local animations bone to global bone
 
 	int					numbonecontrollers;		// bone controllers
 	int					bonecontrollerindex;
@@ -130,12 +134,12 @@ struct studiohdr_t
 	inline mstudioseqdesc_t* pLocalSeqdesc(int i) const { if (i < 0 || i >= numlocalseq) i = 0; return (mstudioseqdesc_t*)(((byte*)this) + localseqindex) + i; };
 
 	//public:
-	bool				SequencesAvailable() const;
-	int					GetNumSeq() const;
-	mstudioanimdesc_t& pAnimdesc(int i) const;
-	mstudioseqdesc_t& pSeqdesc(int i) const;
-	int					iRelativeAnim(int baseseq, int relanim) const;	// maps seq local anim reference to global anim index
-	int					iRelativeSeq(int baseseq, int relseq) const;		// maps seq local seq reference to global seq index
+	//bool				SequencesAvailable() const;
+	//int					GetNumSeq() const;
+	//mstudioanimdesc_t&	pAnimdesc(int i) const;
+	//mstudioseqdesc_t&	pSeqdesc(int i) const;
+	//int					iRelativeAnim(int baseseq, int relanim) const;	// maps seq local anim reference to global anim index
+	//int					iRelativeSeq(int baseseq, int relseq) const;		// maps seq local seq reference to global seq index
 
 	//private:
 	mutable int			activitylistversion;	// initialization flag - have the sequences been indexed?
@@ -143,10 +147,10 @@ struct studiohdr_t
 	//public:
 		//int					GetSequenceActivity( int iSequence );
 		//void				SetSequenceActivity( int iSequence, int iActivity );
-	int					GetActivityListVersion(void);
-	void				SetActivityListVersion(int version) const;
-	int					GetEventListVersion(void);
-	void				SetEventListVersion(int version);
+	//int					GetActivityListVersion(void);
+	//void				SetActivityListVersion(int version) const;
+	//int					GetEventListVersion(void);
+	//void				SetEventListVersion(int version);
 
 	// raw textures
 	int					numtextures;
@@ -175,11 +179,11 @@ struct studiohdr_t
 	int					localattachmentindex;
 	inline mstudioattachment_t* pLocalAttachment(int i) const { Assert(i >= 0 && i < numlocalattachments); return (mstudioattachment_t*)(((byte*)this) + localattachmentindex) + i; };
 	//public:
-	int					GetNumAttachments(void) const;
-	const mstudioattachment_t& pAttachment(int i) const;
-	int					GetAttachmentBone(int i);
+	//int					GetNumAttachments(void) const;
+	//const mstudioattachment_t& pAttachment(int i) const;
+	//int					GetAttachmentBone(int i);
 	// used on my tools in hlmv, not persistant
-	void				SetAttachmentBone(int iAttachment, int iBone);
+	//void				SetAttachmentBone(int iAttachment, int iBone);
 
 	// animation node to animation node transition graph
 //private:
@@ -190,10 +194,10 @@ struct studiohdr_t
 	inline byte* pLocalTransition(int i) const { Assert(i >= 0 && i < (numlocalnodes * numlocalnodes)); return (byte*)(((byte*)this) + localnodeindex) + i; };
 
 	//public:
-	int					EntryNode(int iSequence);
-	int					ExitNode(int iSequence);
-	char* pszNodeName(int iNode);
-	int					GetTransition(int iFrom, int iTo) const;
+	//int					EntryNode(int iSequence);
+	//int					ExitNode(int iSequence);
+	//char* pszNodeName(int iNode);
+	//int					GetTransition(int iFrom, int iTo) const;
 
 	int					numflexdesc;
 	int					flexdescindex;
@@ -220,9 +224,9 @@ struct studiohdr_t
 	int					localposeparamindex;
 	inline mstudioposeparamdesc_t* pLocalPoseParameter(int i) const { Assert(i >= 0 && i < numlocalposeparameters); return (mstudioposeparamdesc_t*)(((byte*)this) + localposeparamindex) + i; };
 	//public:
-	int					GetNumPoseParameters(void) const;
-	const mstudioposeparamdesc_t& pPoseParameter(int i);
-	int					GetSharedPoseParameter(int iSequence, int iLocalPose) const;
+	//int					GetNumPoseParameters(void) const;
+	//const mstudioposeparamdesc_t& pPoseParameter(int i);
+	//int					GetSharedPoseParameter(int iSequence, int iLocalPose) const;
 
 	int					surfacepropindex;
 	inline char* const pszSurfaceProp(void) const { return ((char*)this) + surfacepropindex; }
@@ -236,10 +240,10 @@ struct studiohdr_t
 	int					localikautoplaylockindex;
 	inline mstudioiklock_t* pLocalIKAutoplayLock(int i) const { Assert(i >= 0 && i < numlocalikautoplaylocks); return (mstudioiklock_t*)(((byte*)this) + localikautoplaylockindex) + i; };
 
-	int					GetNumIKAutoplayLocks(void) const;
-	const mstudioiklock_t& pIKAutoplayLock(int i);
-	int					CountAutoplaySequences() const;
-	int					CopyAutoplaySequences(unsigned short* pOut, int outCount) const;
+	//int					GetNumIKAutoplayLocks(void) const;
+	//const mstudioiklock_t& pIKAutoplayLock(int i);
+	//int					CountAutoplaySequences() const;
+	//int					CopyAutoplaySequences(unsigned short* pOut, int outCount) const;
 	//int					GetAutoplayList( unsigned short **pOut ) const;
 
 	// The collision model mass that jay wanted
@@ -251,11 +255,11 @@ struct studiohdr_t
 	int					includemodelindex;
 	inline mstudiomodelgroup_t* pModelGroup(int i) const { Assert(i >= 0 && i < numincludemodels); return (mstudiomodelgroup_t*)(((byte*)this) + includemodelindex) + i; };
 	// implementation specific call to get a named model
-	const studiohdr_t* FindModel(void** cache, char const* modelname) const;
+	//const studiohdr_t* FindModel(void** cache, char const* modelname) const;
 
 	// implementation specific back pointer to virtual data
 	int                 unused_virtualModel;
-	CVirtualModel*		GetVirtualModel(void) const;
+	//CVirtualModel*		GetVirtualModel(void) const;
 
 	// for demand loaded animation blocks
 	int					szanimblocknameindex;
@@ -265,7 +269,7 @@ struct studiohdr_t
 	inline mstudioanimblock_t* pAnimBlock(int i) const { Assert(i > 0 && i < numanimblocks); return (mstudioanimblock_t*)(((byte*)this) + animblockindex) + i; };
 
 	int                 unused_animblockModel;
-	byte* GetAnimBlock(int i) const;
+	//byte* GetAnimBlock(int i) const;
 
 	int					bonetablebynameindex;
 	inline const byte* GetBoneTableSortedByName() const { return (byte*)this + bonetablebynameindex; }
@@ -465,16 +469,26 @@ inline bool Studio_ConvertStudioHdrToNewVersion(studiohdr_t* pStudioHdr)
 class CVirtualModel : public IVirtualModel
 {
 public:
-	void AppendSequences(int group, const studiohdr_t* pStudioHdr);
-	void AppendAnimations(int group, const studiohdr_t* pStudioHdr);
-	void AppendAttachments(int ground, const studiohdr_t* pStudioHdr);
-	void AppendPoseParameters(int group, const studiohdr_t* pStudioHdr);
-	void AppendBonemap(int group, const studiohdr_t* pStudioHdr);
-	void AppendNodes(int group, const studiohdr_t* pStudioHdr);
+	CVirtualModel() 
+	{
+		m_nFrameUnlockCounter = 0;
+		m_pFrameUnlockCounter = &m_nFrameUnlockCounter;
+	}
+
+	void Init(CStudioHdr* pStudioHdr) {
+		m_pStudioHdr = pStudioHdr;
+		Clear();
+	}
+	void AppendSequences(int group, const CStudioHdr* pStudioHdr);
+	void AppendAnimations(int group, const CStudioHdr* pStudioHdr);
+	void AppendAttachments(int ground, const CStudioHdr* pStudioHdr);
+	void AppendPoseParameters(int group, const CStudioHdr* pStudioHdr);
+	void AppendBonemap(int group, const CStudioHdr* pStudioHdr);
+	void AppendNodes(int group, const CStudioHdr* pStudioHdr);
 	//void AppendTransitions( int group, const studiohdr_t *pStudioHdr );
-	void AppendIKLocks(int group, const studiohdr_t* pStudioHdr);
-	void AppendModels(int group, const studiohdr_t* pStudioHdr);
-	void UpdateAutoplaySequences(const studiohdr_t* pStudioHdr);
+	void AppendIKLocks(int group, const CStudioHdr* pStudioHdr);
+	void AppendModels(int group, const CStudioHdr* pStudioHdr);
+	void UpdateAutoplaySequences(const CStudioHdr* pStudioHdr);
 
 	virtualgroup_t* pAnimGroup(int animation) { return &m_group[m_anim[animation].group]; } // Note: user must manage mutex for this
 	int				pAnimIndex(int animation) { return m_anim[animation].index; }
@@ -511,6 +525,18 @@ public:
 	virtualgroup_t* pIKlockGroup(int iklock) { return &m_group[m_iklock[iklock].group]; }
 	int pIKlockIndex(int iklock) { return m_iklock[iklock].index; }
 	const studiohdr_t* GetGroupStudioHdr(virtualgroup_t* pGroup) const;
+	const CStudioHdr* GroupStudioHdr(int group) const;
+	void Clear() {
+		m_seq.RemoveAll();
+		m_anim.RemoveAll();
+		m_attachment.RemoveAll();
+		m_pose.RemoveAll();
+		m_group.RemoveAll();
+		m_node.RemoveAll();
+		m_iklock.RemoveAll();
+		m_autoplaySequences.RemoveAll();
+		m_pStudioHdrCache.RemoveAll();
+	}
 
 	CThreadFastMutex m_Lock;
 
@@ -522,8 +548,171 @@ public:
 	CUtlVector< virtualgeneric_t > m_node;
 	CUtlVector< virtualgeneric_t > m_iklock;
 	CUtlVector< unsigned short > m_autoplaySequences;
+	mutable CUtlVector< CStudioHdr* > m_pStudioHdrCache;
+	mutable int			m_nFrameUnlockCounter = 0;
+	int* m_pFrameUnlockCounter = 0;
+	CThreadFastMutex	m_FrameUnlockCounterMutex;
+	CStudioHdr* m_pStudioHdr = NULL;
 };
 
+// This class maps an activity to sequences allowed for that activity, accelerating the resolution
+// of SelectWeightedSequence(), especially on PowerPC. Iterating through every sequence
+// attached to a model turned out to be a very destructive cache access pattern on 360.
+// 
+// I've encapsulated this behavior inside a nested class for organizational reasons; there is
+// no particular programmatic or efficiency benefit to it. It just makes clearer what particular
+// code in the otherwise very complicated StudioHdr class has to do with this particular
+// optimization, and it lets you collapse the whole definition down to a single line in Visual
+// Studio.
+class CActivityToSequenceMapping /* final */
+{
+public:
+	// A tuple of a sequence and its corresponding weight. Lists of these correspond to activities.
+	struct SequenceTuple
+	{
+		short		seqnum;
+		short		weight; // the absolute value of the weight from the sequence header
+		CUtlSymbol* pActivityModifiers;		// list of activity modifier symbols
+		int			iNumActivityModifiers;
+	};
+
+	// The type of the hash's stored data, a composite of both key and value
+	// (because that's how CUtlHash works):
+	// key: an int, the activity #
+	// values: an index into the m_pSequenceTuples array, a count of the
+	// total sequences present for an activity, and the sum of their
+	// weights.
+	// Note this struct is 128-bits wide, exactly coincident to a PowerPC 
+	// cache line and VMX register. Please consider very carefully the
+	// performance implications before adding any additional fields to this.
+	// You could probably do away with totalWeight if you really had to.
+	struct HashValueType
+	{
+		// KEY (hashed)
+		int activityIdx;
+
+		// VALUE (not hashed)
+		int startingIdx;
+		int count;
+		int totalWeight;
+
+		HashValueType(int _actIdx, int _stIdx, int _ct, int _tW) :
+			activityIdx(_actIdx), startingIdx(_stIdx), count(_ct), totalWeight(_tW) {}
+
+		// default constructor (ought not to be actually used)
+		HashValueType() : activityIdx(-1), startingIdx(-1), count(-1), totalWeight(-1)
+		{
+			AssertMsg(false, "Don't use default HashValueType()!");
+		}
+
+
+		class HashFuncs
+		{
+		public:
+			// dummy constructor (gndn)
+			HashFuncs(int) {}
+
+			// COMPARE
+			// compare two entries for uniqueness. We should never have two different
+			// entries for the same activity, so we only compare the activity index;
+			// this allows us to use the utlhash as a dict by constructing dummy entries
+			// as hash lookup keys.
+			bool operator()(const HashValueType& lhs, const HashValueType& rhs) const
+			{
+				return lhs.activityIdx == rhs.activityIdx;
+			}
+
+			// HASH
+			// We only hash on the activity index; everything else is data.
+			unsigned int operator()(const HashValueType& item) const
+			{
+				return HashInt(item.activityIdx);
+			}
+		};
+	};
+
+	typedef CUtlHash<HashValueType, HashValueType::HashFuncs, HashValueType::HashFuncs> ActivityToValueIdxHash;
+
+	// These must be here because IFM does not compile/link studio.cpp (?!?)
+
+	// ctor
+	CActivityToSequenceMapping(void)
+		: m_pSequenceTuples(NULL), m_iSequenceTuplesCount(0), m_ActToSeqHash(8, 0, 0), m_expectedPStudioHdr(NULL), m_expectedVModel(NULL)
+#if STUDIO_SEQUENCE_ACTIVITY_LAZY_INITIALIZE
+		, m_bIsInitialized(false)
+#endif
+	{};
+
+	// dtor -- not virtual because this class has no inheritors
+	~CActivityToSequenceMapping()
+	{
+		if (m_pSequenceTuples != NULL)
+		{
+			if (m_pSequenceTuples->pActivityModifiers != NULL)
+			{
+				delete[] m_pSequenceTuples->pActivityModifiers;
+			}
+			delete[] m_pSequenceTuples;
+		}
+	}
+
+	/// Get the list of sequences for an activity. Returns the pointer to the
+	/// first sequence tuple. Output parameters are a count of sequences present,
+	/// and the total weight of all the sequences. (it would be more LHS-friendly
+	/// to return these on registers, if only C++ offered more than one return 
+	/// value....)
+	const SequenceTuple* GetSequences(int forActivity, int* outSequenceCount, int* outTotalWeight);
+
+	/// The number of sequences available for an activity.
+	int NumSequencesForActivity(int forActivity);
+
+#if STUDIO_SEQUENCE_ACTIVITY_LAZY_INITIALIZE
+	inline bool IsInitialized(void) { return m_bIsInitialized; }
+#endif
+
+private:
+
+	/// Allocate my internal array. (It is freed in the destructor.) Also,
+	/// build the hash of activities to sequences and populate m_pSequenceTuples.
+	void Initialize(CStudioHdr* pstudiohdr);
+
+	/// Force Initialize() to occur again, even if it has already occured.
+	void Reinitialize(CStudioHdr* pstudiohdr);
+
+	/// A more efficient version of the old SelectWeightedSequence() function in animation.cpp. 
+	int SelectWeightedSequence(CStudioHdr* pstudiohdr, int activity, int curSequence, RandomWeightFunc pRandomWeightFunc);
+
+	// selects the sequence with the most matching modifiers
+	//int SelectWeightedSequenceFromModifiers( CStudioHdr *pstudiohdr, int activity, CUtlSymbol *pActivityModifiers, int iModifierCount );
+
+	// Actually a big array, into which the hash values index.
+	SequenceTuple* m_pSequenceTuples;
+	unsigned int m_iSequenceTuplesCount; // (size of the whole array)
+#if STUDIO_SEQUENCE_ACTIVITY_LAZY_INITIALIZE
+	bool m_bIsInitialized;
+#endif
+
+	// we don't store an outer pointer because we can't initialize it at construction time
+	// (warning c4355) -- there are ways around this but it's easier to just pass in a 
+	// pointer to the CStudioHdr when we need it, since this class isn't supposed to 
+	// export its interface outside the studio header anyway.
+	// CStudioHdr * const m_pOuter;
+
+	ActivityToValueIdxHash m_ActToSeqHash;
+
+	// we store these so we can know if the contents of the studiohdr have changed
+	// from underneath our feet (this is an emergency data integrity check)
+	const void* m_expectedPStudioHdr;
+	const void* m_expectedVModel;
+
+	// double-check that the data I point to hasn't changed
+	bool ValidateAgainst(const CStudioHdr* RESTRICT pstudiohdr) RESTRICT;
+	void SetValidationPair(const CStudioHdr* RESTRICT pstudiohdr) RESTRICT;
+
+	friend class CStudioHdr;
+};
+
+// only models with type "mod_studio" have this data
 class CStudioHdr : public IStudioHdr
 {
 	friend struct studiohdr_t;
@@ -538,10 +727,10 @@ public:
 	void Term();
 
 public:
-	inline bool IsVirtual(void) { return (m_pVModel != NULL); };
+	inline bool IsVirtual(void) { return m_pStudioHdr->numincludemodels != 0; };
 	inline bool IsValid(void) { return (m_pStudioHdr != NULL); };
 	inline bool IsReadyForAccess(void) const { return (m_pStudioHdr != NULL); };
-	inline CVirtualModel* GetVirtualModel(void) const { return m_pVModel; };
+	inline CVirtualModel* GetVirtualModel(void) const { return m_pStudioHdr->numincludemodels == 0 ? NULL : &m_pVirtualModel; }
 	inline const studiohdr_t* GetRenderHdr(void) const { return m_pStudioHdr; };
 	const IStudioHdr* pSeqStudioHdr(int sequence) const;
 	const IStudioHdr* pAnimStudioHdr(int animation) const;
@@ -550,15 +739,10 @@ public:
 
 private:
 	mutable studiohdr_t* m_pStudioHdr = NULL;
-	mutable CVirtualModel* m_pVModel = NULL;
+	//mutable CVirtualModel* m_pVModel = NULL;
 
-	const CVirtualModel* ResetVModel(const CVirtualModel* pVModel) const;
-	const CStudioHdr* GroupStudioHdr(int group) const;
-	mutable CUtlVector< CStudioHdr* > m_pStudioHdrCache;
+	//const CVirtualModel* ResetVModel(const CVirtualModel* pVModel) const;
 
-	mutable int			m_nFrameUnlockCounter = 0;
-	int* m_pFrameUnlockCounter = 0;
-	CThreadFastMutex	m_FrameUnlockCounterMutex;
 
 public:
 	inline int			numbones(void) const { return m_pStudioHdr->numbones; };
@@ -568,8 +752,8 @@ public:
 
 	bool				SequencesAvailable() const;
 	int					GetNumSeq(void) const;
-	mstudioanimdesc_t& pAnimdesc(int i);
-	mstudioseqdesc_t& pSeqdesc(int iSequence);
+	mstudioanimdesc_t&	pAnimdesc(int i);
+	mstudioseqdesc_t&	pSeqdesc(int iSequence) const;
 	int					iRelativeAnim(int baseseq, int relanim) const;	// maps seq local anim reference to global anim index
 	int					iRelativeSeq(int baseseq, int relseq) const;		// maps seq local seq reference to global seq index
 
@@ -599,8 +783,8 @@ public:
 	int					GetNumIKAutoplayLocks(void) const;
 	const mstudioiklock_t& pIKAutoplayLock(int i);
 
-	inline int			CountAutoplaySequences() const { return m_pStudioHdr->CountAutoplaySequences(); };
-	inline int			CopyAutoplaySequences(unsigned short* pOut, int outCount) const { return m_pStudioHdr->CopyAutoplaySequences(pOut, outCount); };
+	inline int			CountAutoplaySequences() const; // { return m_pStudioHdr->CountAutoplaySequences(); };
+	inline int			CopyAutoplaySequences(unsigned short* pOut, int outCount) const; // { return m_pStudioHdr->CopyAutoplaySequences(pOut, outCount); };
 	inline int			GetAutoplayList(unsigned short** pOut) const { return g_pMDLCache->GetAutoplayList(VoidPtrToMDLHandle(m_pStudioHdr->VirtualModel()), pOut); };
 
 	inline int			GetNumBoneControllers(void) const { return m_pStudioHdr->numbonecontrollers; };
@@ -699,6 +883,13 @@ public:
 	char* pszLocalNodeName(int iNode) const { return m_pStudioHdr->pszLocalNodeName(iNode); }
 	int activitylistversion() const { return m_pStudioHdr->activitylistversion; }
 	mstudioiklock_t* pLocalIKAutoplayLock(int i) const { return m_pStudioHdr->pLocalIKAutoplayLock(i); }
+	int numlocalikautoplaylocks() const { return m_pStudioHdr->numlocalikautoplaylocks; }
+	int numlocalnodes() const { return m_pStudioHdr->numlocalnodes; }
+	int numlocalposeparameters() const { return m_pStudioHdr->numlocalposeparameters; }
+	int numlocalattachments() const { return m_pStudioHdr->numlocalattachments; }
+	int numlocalanim() const { return m_pStudioHdr->numlocalanim; }
+	int numlocalseq() const { return m_pStudioHdr->numlocalseq; }
+	mstudiomodelgroup_t* pModelGroup(int i) const { return m_pStudioHdr->pModelGroup(i); }
 
 public:
 	inline int boneFlags(int iBone) const { return m_boneFlags[iBone]; }
@@ -709,163 +900,6 @@ private:
 	CUtlVector< int >  m_boneParent;
 
 public:
-
-	// This class maps an activity to sequences allowed for that activity, accelerating the resolution
-	// of SelectWeightedSequence(), especially on PowerPC. Iterating through every sequence
-	// attached to a model turned out to be a very destructive cache access pattern on 360.
-	// 
-	// I've encapsulated this behavior inside a nested class for organizational reasons; there is
-	// no particular programmatic or efficiency benefit to it. It just makes clearer what particular
-	// code in the otherwise very complicated StudioHdr class has to do with this particular
-	// optimization, and it lets you collapse the whole definition down to a single line in Visual
-	// Studio.
-	class CActivityToSequenceMapping /* final */
-	{
-	public:
-		// A tuple of a sequence and its corresponding weight. Lists of these correspond to activities.
-		struct SequenceTuple
-		{
-			short		seqnum;
-			short		weight; // the absolute value of the weight from the sequence header
-			CUtlSymbol* pActivityModifiers;		// list of activity modifier symbols
-			int			iNumActivityModifiers;
-		};
-
-		// The type of the hash's stored data, a composite of both key and value
-		// (because that's how CUtlHash works):
-		// key: an int, the activity #
-		// values: an index into the m_pSequenceTuples array, a count of the
-		// total sequences present for an activity, and the sum of their
-		// weights.
-		// Note this struct is 128-bits wide, exactly coincident to a PowerPC 
-		// cache line and VMX register. Please consider very carefully the
-		// performance implications before adding any additional fields to this.
-		// You could probably do away with totalWeight if you really had to.
-		struct HashValueType
-		{
-			// KEY (hashed)
-			int activityIdx;
-
-			// VALUE (not hashed)
-			int startingIdx;
-			int count;
-			int totalWeight;
-
-			HashValueType(int _actIdx, int _stIdx, int _ct, int _tW) :
-				activityIdx(_actIdx), startingIdx(_stIdx), count(_ct), totalWeight(_tW) {}
-
-			// default constructor (ought not to be actually used)
-			HashValueType() : activityIdx(-1), startingIdx(-1), count(-1), totalWeight(-1)
-			{
-				AssertMsg(false, "Don't use default HashValueType()!");
-			}
-
-
-			class HashFuncs
-			{
-			public:
-				// dummy constructor (gndn)
-				HashFuncs(int) {}
-
-				// COMPARE
-				// compare two entries for uniqueness. We should never have two different
-				// entries for the same activity, so we only compare the activity index;
-				// this allows us to use the utlhash as a dict by constructing dummy entries
-				// as hash lookup keys.
-				bool operator()(const HashValueType& lhs, const HashValueType& rhs) const
-				{
-					return lhs.activityIdx == rhs.activityIdx;
-				}
-
-				// HASH
-				// We only hash on the activity index; everything else is data.
-				unsigned int operator()(const HashValueType& item) const
-				{
-					return HashInt(item.activityIdx);
-				}
-			};
-		};
-
-		typedef CUtlHash<HashValueType, HashValueType::HashFuncs, HashValueType::HashFuncs> ActivityToValueIdxHash;
-
-		// These must be here because IFM does not compile/link studio.cpp (?!?)
-
-		// ctor
-		CActivityToSequenceMapping(void)
-			: m_pSequenceTuples(NULL), m_iSequenceTuplesCount(0), m_ActToSeqHash(8, 0, 0), m_expectedPStudioHdr(NULL), m_expectedVModel(NULL)
-#if STUDIO_SEQUENCE_ACTIVITY_LAZY_INITIALIZE
-			, m_bIsInitialized(false)
-#endif
-		{};
-
-		// dtor -- not virtual because this class has no inheritors
-		~CActivityToSequenceMapping()
-		{
-			if (m_pSequenceTuples != NULL)
-			{
-				if (m_pSequenceTuples->pActivityModifiers != NULL)
-				{
-					delete[] m_pSequenceTuples->pActivityModifiers;
-				}
-				delete[] m_pSequenceTuples;
-			}
-		}
-
-		/// Get the list of sequences for an activity. Returns the pointer to the
-		/// first sequence tuple. Output parameters are a count of sequences present,
-		/// and the total weight of all the sequences. (it would be more LHS-friendly
-		/// to return these on registers, if only C++ offered more than one return 
-		/// value....)
-		const SequenceTuple* GetSequences(int forActivity, int* outSequenceCount, int* outTotalWeight);
-
-		/// The number of sequences available for an activity.
-		int NumSequencesForActivity(int forActivity);
-
-#if STUDIO_SEQUENCE_ACTIVITY_LAZY_INITIALIZE
-		inline bool IsInitialized(void) { return m_bIsInitialized; }
-#endif
-
-	private:
-
-		/// Allocate my internal array. (It is freed in the destructor.) Also,
-		/// build the hash of activities to sequences and populate m_pSequenceTuples.
-		void Initialize(CStudioHdr* pstudiohdr);
-
-		/// Force Initialize() to occur again, even if it has already occured.
-		void Reinitialize(CStudioHdr* pstudiohdr);
-
-		/// A more efficient version of the old SelectWeightedSequence() function in animation.cpp. 
-		int SelectWeightedSequence(CStudioHdr* pstudiohdr, int activity, int curSequence, RandomWeightFunc pRandomWeightFunc);
-
-		// selects the sequence with the most matching modifiers
-		//int SelectWeightedSequenceFromModifiers( CStudioHdr *pstudiohdr, int activity, CUtlSymbol *pActivityModifiers, int iModifierCount );
-
-		// Actually a big array, into which the hash values index.
-		SequenceTuple* m_pSequenceTuples;
-		unsigned int m_iSequenceTuplesCount; // (size of the whole array)
-#if STUDIO_SEQUENCE_ACTIVITY_LAZY_INITIALIZE
-		bool m_bIsInitialized;
-#endif
-
-		// we don't store an outer pointer because we can't initialize it at construction time
-		// (warning c4355) -- there are ways around this but it's easier to just pass in a 
-		// pointer to the CStudioHdr when we need it, since this class isn't supposed to 
-		// export its interface outside the studio header anyway.
-		// CStudioHdr * const m_pOuter;
-
-		ActivityToValueIdxHash m_ActToSeqHash;
-
-		// we store these so we can know if the contents of the studiohdr have changed
-		// from underneath our feet (this is an emergency data integrity check)
-		const void* m_expectedPStudioHdr;
-		const void* m_expectedVModel;
-
-		// double-check that the data I point to hasn't changed
-		bool ValidateAgainst(const CStudioHdr* RESTRICT pstudiohdr) RESTRICT;
-		void SetValidationPair(const CStudioHdr* RESTRICT pstudiohdr) RESTRICT;
-
-		friend class CStudioHdr;
-	};
 
 	CActivityToSequenceMapping m_ActivityToSequence;
 
@@ -950,7 +984,39 @@ public:
 	mutable	int			m_nPerfAnimationLayers;
 #endif
 
+	// The .mdl file
+	DataCacheHandle_t	m_MDLCache = 0;
 
+	// the vphysics.dll collision model
+	vcollide_t			m_VCollisionData;
+
+	studiohwdata_t		m_HardwareData;
+#if defined( USE_HARDWARE_CACHE )
+	DataCacheHandle_t	m_HardwareDataCache;
+#endif
+
+	unsigned short		m_nFlags = 0;
+
+	short				m_nRefCount = 0;
+
+	// pointer to the virtual version of the model
+	mutable	CVirtualModel		m_pVirtualModel;
+
+	// array of cache handles to demand loaded virtual model data
+	int					m_nAnimBlockCount = 0;
+	DataCacheHandle_t* m_pAnimBlock = 0;
+	unsigned int* m_iFakeAnimBlockStall = 0;
+
+	// vertex data is usually compressed to save memory (model decal code only needs some data)
+	DataCacheHandle_t	m_VertexCache = 0;
+	bool				m_VertexDataIsCompressed = 0;
+
+	int					m_nAutoplaySequenceCount = 0;
+	unsigned short* m_pAutoplaySequenceList = 0;
+
+	void* m_pUserData = 0;
+
+	DECLARE_FIXEDSIZE_ALLOCATOR_MT(CStudioHdr);
 };
 
 namespace StudioByteSwap
