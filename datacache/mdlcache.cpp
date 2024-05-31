@@ -1635,7 +1635,7 @@ bool CStudioHdr::BuildHardwareData(OptimizedModel::FileHeader_t *pVtxHdr ) const
 
 	MdlCacheMsg( "MDLCache: Load studiomdl %s\n", m_pStudioHdr->pszName() );
 
-	Assert( GetVertexData( handle ) );
+	Assert( m_pMDLCache->GetVertexData( m_handle ) );
 
 	if( m_pStudioHdr->version == 49 )
 	{
