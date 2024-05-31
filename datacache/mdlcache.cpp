@@ -1353,7 +1353,7 @@ void CStudioHdr::FreeVirtualModel() const
 	if ( m_pVirtualModel.NumGroup()>0 )//pStudioData && pStudioData->
 	{
 		int nGroupCount = m_pVirtualModel.m_group.Count();
-		Assert( (nGroupCount >= 1) && m_pVirtualModel.m_group[0].cache == MDLHandleToVirtual(handle) );
+		Assert( (nGroupCount >= 1) && m_pVirtualModel.m_group[0].cache == MDLHandleToVirtual(m_handle) );
 
 		// NOTE: Start at *1* here because the 0th element contains a reference to *this* handle
 		for ( int i = 1; i < nGroupCount; ++i )
