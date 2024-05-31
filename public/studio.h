@@ -2117,6 +2117,8 @@ protected:
 	//virtual void Init(studiohdr_t* pStudioHdr, IMDLCache* mdlcache = NULL) = 0;
 	//virtual void Term() = 0;
 public:
+	virtual const char* GetModelName() const = 0;
+	virtual const char* GetActualModelName() const = 0;
 	virtual bool IsVirtual(void) = 0;
 	virtual bool IsValid(void) = 0;
 	virtual bool IsReadyForAccess(void) const = 0;
@@ -2125,7 +2127,6 @@ public:
 	virtual const IStudioHdr* pSeqStudioHdr(int sequence) const = 0;
 	virtual const IStudioHdr* pAnimStudioHdr(int animation) const = 0;
 	virtual const IStudioHdr* RealStudioHdr(studiohdr_t* pStudioHdr) const = 0;
-	virtual void FreeRealStudioHdr(const IStudioHdr* pStudioHdr) const = 0;
 	virtual int			numbones(void) const = 0;
 	virtual mstudiobone_t* pBone(int i) const = 0;
 	virtual int					RemapAnimBone(int iAnim, int iLocalBone) const = 0;		// maps local animations bone to global bone

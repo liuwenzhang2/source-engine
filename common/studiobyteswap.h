@@ -717,16 +717,22 @@ class CStudioHdr : public IStudioHdr
 {
 	friend struct studiohdr_t;
 	friend class CMDLCache;
-	friend class virtualgroup_t;
+	friend class CVirtualModel;
 public:
-	CStudioHdr(void);
-	CStudioHdr(studiohdr_t* pStudioHdr, IMDLCache* mdlcache = NULL);
+	CStudioHdr(CMDLCache* pMDLCache, MDLHandle_t handle, const char* pModelName);
+	//CStudioHdr(studiohdr_t* pStudioHdr, IMDLCache* mdlcache = NULL);
 	~CStudioHdr() { Term(); }
 
-	void Init(studiohdr_t* pStudioHdr, IMDLCache* mdlcache = NULL);
+	void Init(studiohdr_t* pStudioHdr) const;
 	void Term();
 
 public:
+	inline const char* GetModelName() const { return m_pModelName; }
+	inline const char* GetActualModelName()const {
+		if (m_nFlags & STUDIODATA_ERROR_MODEL)
+			return ERROR_MODEL;
+		return m_pModelName;
+	}
 	inline bool IsVirtual(void) { return m_pStudioHdr->numincludemodels != 0; };
 	inline bool IsValid(void) { return (m_pStudioHdr != NULL); };
 	inline bool IsReadyForAccess(void) const { return (m_pStudioHdr != NULL); };
@@ -735,9 +741,50 @@ public:
 	const IStudioHdr* pSeqStudioHdr(int sequence) const;
 	const IStudioHdr* pAnimStudioHdr(int animation) const;
 	const IStudioHdr* RealStudioHdr(studiohdr_t* pStudioHdr) const;
-	void FreeRealStudioHdr(const IStudioHdr* pStudioHdr) const;
+
+	// Attempts to load a MDL file, validates that it's ok.
+	bool ReadMDLFile(const char* pMDLFileName, CUtlBuffer& buf) const;
+	studiohdr_t* LoadStudioHdr() const;
+	// Unserializes the MDL
+	studiohdr_t* UnserializeMDL(void* pData, int nDataSize, bool bDataValid) const;
+	void ConvertFlexData(studiohdr_t* pStudioHdr) const;
+	// Purpose: Pulls all submodels/.ani file models into the cache
+	void UnserializeAllVirtualModelsAndAnimBlocks() const;
+	// Unserializes the VCollide file associated w/ models (the vphysics representation)
+	void UnserializeVCollide(bool synchronousLoad) const;
+	// Destroys the VCollide associated w/ models
+	void DestroyVCollide();
+	// Allocates/frees the anim blocks
+	void AllocateAnimBlocks(int nCount) const;
+	void FreeAnimBlocks() const;
+	// Unserializes an animation block from disk
+	unsigned char* UnserializeAnimBlock(int nBlock) const;
+	// Allocates/frees autoplay sequence list
+	void AllocateAutoplaySequences(int nCount) const;
+	void FreeAutoplaySequences() const;
+	// Allocates/frees the virtual model
+	void AllocateVirtualModel() const;
+	void FreeVirtualModel() const;
+	// Loads/unloads the static meshes
+	bool LoadHardwareData(); // returns false if not ready
+	bool BuildHardwareData(OptimizedModel::FileHeader_t* pVtxHdr) const;
+	void UnloadHardwareData(bool bCacheRemove = true, bool bLockedOk = false);
+
+	vertexFileHeader_t* LoadVertexData();
+	vertexFileHeader_t* BuildAndCacheVertexData(vertexFileHeader_t* pRawVvdHdr) const;
+	// Creates a thin cache entry (to be used for model decals) from fat vertex data
+	vertexFileHeader_t* CreateThinVertexes(vertexFileHeader_t* originalData, int* cacheLength) const;
+	vertexFileHeader_t* CacheVertexData();
+
+	bool ClearAsync(MDLCacheDataType_t type, int iAnimBlock, bool bAbort = false) const;
+	// Processes raw data (from an I/O source) into the cache. Sets the cache state as expected for bad data.
+	bool ProcessDataIntoCache(MDLCacheDataType_t type, int iAnimBlock, void* pData, int nDataSize, bool bDataValid) const;
 
 private:
+	mutable bool	m_bInLoad = false;
+	CMDLCache* const m_pMDLCache;
+	MDLHandle_t const m_handle;
+	const char* const m_pModelName;
 	mutable studiohdr_t* m_pStudioHdr = NULL;
 	//mutable CVirtualModel* m_pVModel = NULL;
 
@@ -864,7 +911,6 @@ public:
 	int numskinref() const { return m_pStudioHdr->numskinref; }
 	short* pSkinref(int i) const { return  m_pStudioHdr->pSkinref(i); }
 	byte constdirectionallightdot() { return m_pStudioHdr->constdirectionallightdot; }
-	vertexFileHeader_t* CacheVertexData() { return g_pMDLCache->GetVertexData(VoidPtrToMDLHandle(m_pStudioHdr->VirtualModel())); }
 	mstudiomouth_t* pMouth(int i) const { return m_pStudioHdr->pMouth(i); }
 	int checksum() { return m_pStudioHdr->checksum; }
 	byte rootLOD() { return m_pStudioHdr->rootLOD; }
@@ -896,8 +942,8 @@ public:
 	inline int boneParent(int iBone) const { return m_boneParent[iBone]; }
 
 private:
-	CUtlVector< int >  m_boneFlags;
-	CUtlVector< int >  m_boneParent;
+	mutable CUtlVector< int >  m_boneFlags;
+	mutable CUtlVector< int >  m_boneParent;
 
 public:
 
@@ -985,17 +1031,17 @@ public:
 #endif
 
 	// The .mdl file
-	DataCacheHandle_t	m_MDLCache = 0;
+	mutable DataCacheHandle_t	m_MDLCache = 0;
 
 	// the vphysics.dll collision model
-	vcollide_t			m_VCollisionData;
+	mutable	vcollide_t			m_VCollisionData;
 
 	studiohwdata_t		m_HardwareData;
 #if defined( USE_HARDWARE_CACHE )
 	DataCacheHandle_t	m_HardwareDataCache;
 #endif
 
-	unsigned short		m_nFlags = 0;
+	mutable	unsigned short		m_nFlags = 0;
 
 	short				m_nRefCount = 0;
 
@@ -1003,16 +1049,16 @@ public:
 	mutable	CVirtualModel		m_pVirtualModel;
 
 	// array of cache handles to demand loaded virtual model data
-	int					m_nAnimBlockCount = 0;
-	DataCacheHandle_t* m_pAnimBlock = 0;
-	unsigned int* m_iFakeAnimBlockStall = 0;
+	mutable int					m_nAnimBlockCount = 0;
+	mutable DataCacheHandle_t* m_pAnimBlock = 0;
+	mutable unsigned int* m_iFakeAnimBlockStall = 0;
 
 	// vertex data is usually compressed to save memory (model decal code only needs some data)
 	DataCacheHandle_t	m_VertexCache = 0;
 	bool				m_VertexDataIsCompressed = 0;
 
-	int					m_nAutoplaySequenceCount = 0;
-	unsigned short* m_pAutoplaySequenceList = 0;
+	mutable int					m_nAutoplaySequenceCount = 0;
+	mutable unsigned short* m_pAutoplaySequenceList = 0;
 
 	void* m_pUserData = 0;
 

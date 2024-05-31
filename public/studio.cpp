@@ -85,7 +85,6 @@ mstudioanim_t *mstudioanimdesc_t::pAnim(const IStudioHdr* pStudioHdr, int *piFra
 			}
 			const IStudioHdr* pRealStudioHdr = pStudioHdr->RealStudioHdr(pStudiohdr());
 			Msg("[%8.3f] hitch on %s:%s:%d:%d\n", Plat_FloatTime(), pRealStudioHdr->pszName(), pszName(), section, block );
-			pStudioHdr->FreeRealStudioHdr(pRealStudioHdr);
 		}
 		// back up until a previously loaded block is found
 		while (--section >= 0)
@@ -129,7 +128,6 @@ mstudioanim_t *mstudioanimdesc_t::pAnim(const IStudioHdr* pStudioHdr, int *piFra
 			}
 			const IStudioHdr* pRealStudioHdr = pStudioHdr->RealStudioHdr(pStudiohdr());
 			Msg("[%8.3f] stall blend %.2f on %s:%s:%d:%d\n", Plat_FloatTime(), flStall, pRealStudioHdr->pszName(), pszName(), section, block );
-			pStudioHdr->FreeRealStudioHdr(pRealStudioHdr);
 		}
 	}
 
@@ -140,7 +138,6 @@ mstudioanim_t *mstudioanimdesc_t::pAnim(const IStudioHdr* pStudioHdr, int *piFra
 		}
 		const IStudioHdr* pRealStudioHdr = pStudioHdr->RealStudioHdr(pStudiohdr());
 		Msg("[%8.3f] stall on %s:%s:%d:%d\n", Plat_FloatTime(), pRealStudioHdr->pszName(), pszName(), section, block );
-		pStudioHdr->FreeRealStudioHdr(pRealStudioHdr);
 	}
 
 	return panim;
@@ -165,7 +162,6 @@ mstudioikrule_t *mstudioanimdesc_t::pIKRule(const IStudioHdr* pStudioHdr, int i 
 			}
 			const IStudioHdr* pRealStudioHdr = pStudioHdr->RealStudioHdr(pStudiohdr());
 			byte *pAnimBlocks = pRealStudioHdr->GetAnimBlock( animblock );
-			pStudioHdr->FreeRealStudioHdr(pRealStudioHdr);
 			if ( pAnimBlocks )
 			{
 				return (mstudioikrule_t *)(pAnimBlocks + animblockikruleindex) + i;
@@ -192,7 +188,6 @@ mstudiolocalhierarchy_t *mstudioanimdesc_t::pHierarchy(const IStudioHdr* pStudio
 			}
 			const IStudioHdr* pRealStudioHdr = pStudioHdr->RealStudioHdr(pStudiohdr());
 			byte *pAnimBlocks = pRealStudioHdr->GetAnimBlock( animblock );
-			pStudioHdr->FreeRealStudioHdr(pRealStudioHdr);
 			if ( pAnimBlocks )
 			{
 				return (mstudiolocalhierarchy_t *)(pAnimBlocks + localhierarchyindex) + i;
@@ -218,7 +213,6 @@ mstudioanim_t* mstudioanimdesc_t::pAnimBlock(const IStudioHdr* pStudioHdr, int b
 	}
 	const IStudioHdr* pRealStudioHdr = pStudioHdr->RealStudioHdr(pStudiohdr());
 	byte* pAnimBlock = pRealStudioHdr->GetAnimBlock(block);
-	pStudioHdr->FreeRealStudioHdr(pRealStudioHdr);
 	if (pAnimBlock)
 	{
 		return (mstudioanim_t*)(pAnimBlock + index);
