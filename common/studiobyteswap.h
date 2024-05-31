@@ -712,6 +712,7 @@ private:
 	friend class CStudioHdr;
 };
 
+class CMDLCache;
 // only models with type "mod_studio" have this data
 class CStudioHdr : public IStudioHdr
 {

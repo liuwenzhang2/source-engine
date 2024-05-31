@@ -41,6 +41,7 @@ public:
 	virtual bool CSAnim_CanMove();
 
 public:	
+	bool Init(int entnum, int iSerialNum);
 	virtual void Spawn( void );
 	virtual void UpdateClientSideAnimation();
 

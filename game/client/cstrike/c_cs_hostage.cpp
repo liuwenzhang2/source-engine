@@ -208,9 +208,6 @@ C_CHostage::C_CHostage()
 	// TODO: Get IK working on the steep slopes CS has, then enable it on characters.
 	m_EntClientFlags |= ENTCLIENTFLAG_DONTUSEIK;
 
-	// set the model so the PlayerAnimState uses the Hostage activities/sequences
-	GetEngineObject()->SetModelName(MAKE_STRING("models/Characters/Hostage_01.mdl") );
-
 	m_PlayerAnimState = CreateHostageAnimState( this, this, LEGANIM_8WAY, false );
 	
 	m_leader = NULL;
@@ -227,6 +224,13 @@ C_CHostage::C_CHostage()
 	m_lookAt = Vector( 0, 0, 0 );
 	m_isInit = false;
 	m_lookAroundTimer.Invalidate();
+}
+
+bool C_CHostage::Init(int entnum, int iSerialNum) {
+	bool bRet = BaseClass::Init(entnum, iSerialNum);
+	// set the model so the PlayerAnimState uses the Hostage activities/sequences
+	GetEngineObject()->SetModelName(MAKE_STRING("models/Characters/Hostage_01.mdl"));
+	return bRet;
 }
 
 //-----------------------------------------------------------------------------
