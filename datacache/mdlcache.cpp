@@ -3452,7 +3452,7 @@ studiohdr_t *CStudioHdr::LoadStudioHdr() const
 	if ( !pHdr )
 	{
 		if (m_bInLoad) {
-			//Error("Recursive call LoadStudioHdr");
+			Error("Recursive call LoadStudioHdr");
 			return NULL;
 		}
 		m_bInLoad = true;
