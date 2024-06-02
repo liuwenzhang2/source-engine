@@ -14,7 +14,8 @@
 
 //#include "iclientrenderable.h"
 #include "c_baseanimating.h"
-#include "c_prop_portal.h"
+
+class C_Prop_Portal;
 
 class C_PortalGhostRenderable : public C_BaseAnimating//IClientRenderable, public IClientUnknown
 {
