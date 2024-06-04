@@ -1,9 +1,9 @@
-//======= Copyright © 1996-2006, Valve Corporation, All rights reserved. ======
+//======= Copyright ?1996-2006, Valve Corporation, All rights reserved. ======
 
 //  STATIC: "CONSTANTBASEDMORPH"	"0..1"
 
 #define HDRTYPE HDR_TYPE_NONE
-#include "common_ps_fxc.h"
+#include "common_ps_fxc.hlsli"
 
 struct PS_INPUT
 {

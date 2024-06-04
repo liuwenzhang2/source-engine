@@ -1,8 +1,8 @@
-//========= Copyright © 1996-2007, Valve Corporation, All rights reserved. ============//
+//========= Copyright ?1996-2007, Valve Corporation, All rights reserved. ============//
 
 // STATIC:  "STAGE"				"0..2"
 
-#include "common_ps_fxc.h"
+#include "common_ps_fxc.hlsli"
 
 sampler g_tPortalColorSampler	: register( s0 );
 sampler g_tPortalMaskSampler	: register( s1 );

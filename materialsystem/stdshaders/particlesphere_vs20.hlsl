@@ -1,6 +1,6 @@
 // DYNAMIC: "FOGTYPE" "0..1"
 
-#include "common_vs_fxc.h"
+#include "common_vs_fxc.hlsli"
 
 static const int g_FogType = FOGTYPE;
 const float4 cCustomConstants[6]	:  register( SHADER_SPECIFIC_CONST_0 );

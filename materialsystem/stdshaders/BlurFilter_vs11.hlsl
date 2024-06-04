@@ -1,4 +1,4 @@
-#include "common_vs_fxc.h"
+#include "common_vs_fxc.hlsli"
 
 struct VS_INPUT
 {

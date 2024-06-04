@@ -1,7 +1,7 @@
-//======= Copyright © 1996-2006, Valve Corporation, All rights reserved. ======
+//======= Copyright 1996-2006, Valve Corporation, All rights reserved. ======
 #define CONVERT_TO_SRGB 0
 
-#include "common_ps_fxc.h"
+#include "common_ps_fxc.hlsli"
 
 sampler TexSampler	: register( s0 );
 

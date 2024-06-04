@@ -13,7 +13,7 @@
 #	define WRITE_DEPTH_TO_DESTALPHA 0
 #endif
 
-#include "common_ps_fxc.h"
+#include "common_ps_fxc.hlsli"
 
 sampler RefractSampler			: register( s0 );
 sampler BaseTextureSampler		: register( s1 );

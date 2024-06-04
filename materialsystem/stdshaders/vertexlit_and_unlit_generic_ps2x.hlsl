@@ -71,8 +71,8 @@
 
 // SKIP: $CUBEMAP_SPHERE_LEGACY && ($CUBEMAP == 0)
 
-#include "common_flashlight_fxc.h"
-#include "common_vertexlitgeneric_dx9.h"
+#include "common_flashlight_fxc.hlsli"
+#include "common_vertexlitgeneric_dx9.hlsli"
  
 const float4 g_EnvmapTint_TintReplaceFactor		: register( c0 );
 const float4 g_DiffuseModulation				: register( c1 );

@@ -4,7 +4,7 @@
 // STATIC: "CSTRIKE"			"0..1"
 
 #define HDRTYPE HDR_TYPE_NONE
-#include "common_ps_fxc.h"
+#include "common_ps_fxc.hlsli"
 
 sampler TexSampler	: register( s0 );
 float4 params : register( c0 );

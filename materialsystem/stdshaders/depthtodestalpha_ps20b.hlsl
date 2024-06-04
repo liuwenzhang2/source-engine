@@ -1,4 +1,4 @@
-#include "common_ps_fxc.h"
+#include "common_ps_fxc.hlsli"
 
 struct PS_INPUT
 {

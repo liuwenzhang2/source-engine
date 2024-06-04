@@ -1,4 +1,4 @@
-#include "common_ps_fxc.h"
+#include "common_ps_fxc.hlsli"
 
 sampler TextureSampler		: register( s0 );
 

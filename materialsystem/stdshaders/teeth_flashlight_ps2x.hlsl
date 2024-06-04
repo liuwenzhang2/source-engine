@@ -1,4 +1,4 @@
-//====== Copyright © 1996-2004, Valve Corporation, All rights reserved. =======
+//====== Copyright ?1996-2004, Valve Corporation, All rights reserved. =======
 //
 // Purpose: 
 //
@@ -15,8 +15,8 @@
 // DYNAMIC: "FLASHLIGHTSHADOWS"			"0..1"	[ps20b]
 // DYNAMIC: "FLASHLIGHTSHADOWS"			"0..1"	[ps30]
 
-#include "common_flashlight_fxc.h"
-#include "shader_constant_register_map.h"
+#include "common_flashlight_fxc.hlsli"
+#include "shader_constant_register_map.hlsli"
 
 sampler BaseTextureSampler					: register( s0 );
 sampler SpotSampler							: register( s1 );

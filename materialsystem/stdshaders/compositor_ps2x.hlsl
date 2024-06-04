@@ -9,7 +9,7 @@
 // SKIP: ( $COMBINE_MODE == 4 || $COMBINE_MODE == 5 )		[ps30]
 // SKIP: ( $COMBINE_MODE != 6 && $DEBUG_MODE == 1 )
 
-#include "common_ps_fxc.h"
+#include "common_ps_fxc.hlsli"
 
 struct PS_INPUT
 {

@@ -9,8 +9,8 @@
 
 #define USESTATICTEXTURE (((ADDSTATIC == 1) && (HASSTATICTEXTURE == 1))?(1):(0))
 
-#include "common_ps_fxc.h"
-#include "shader_constant_register_map.h"
+#include "common_ps_fxc.hlsli"
+#include "shader_constant_register_map.hlsli"
 
 
 

@@ -3,7 +3,7 @@
 
 #define HDRTYPE HDR_TYPE_FLOAT
 #define HDRENABLED 1
-#include "common_ps_fxc.h"
+#include "common_ps_fxc.hlsli"
 
 sampler FBSampler	: register( s0 );
 sampler BloomSampler	: register( s1 );

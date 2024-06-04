@@ -3,8 +3,8 @@
 // STATIC: "CONVERT_TO_SRGB" "0..1"	[ps20b][= g_pHardwareConfig->NeedsShaderSRGBConversion()] [PC]
 // STATIC: "CONVERT_TO_SRGB" "0..0"	[= 0] [XBOX]
 
-#include "common_ps_fxc.h"
-#include "shader_constant_register_map.h"
+#include "common_ps_fxc.hlsli"
+#include "shader_constant_register_map.hlsli"
 
 const float4 g_FogParams				: register( PSREG_FOG_PARAMS );
 const float4 g_EyePos_SpecExponent		: register( PSREG_EYEPOS_SPEC_EXPONENT );

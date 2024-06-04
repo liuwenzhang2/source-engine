@@ -1,4 +1,4 @@
-//====== Copyright © 1996-2006, Valve Corporation, All rights reserved. =======
+//====== Copyright ?1996-2006, Valve Corporation, All rights reserved. =======
 //
 // Purpose: 
 //
@@ -9,8 +9,8 @@
 // DYNAMIC: "WRITE_DEPTH_TO_DESTALPHA"  "0..1"	[ps30]
 // DYNAMIC: "PIXELFOGTYPE"				"0..1"
 
-#include "common_ps_fxc.h"
-#include "shader_constant_register_map.h"
+#include "common_ps_fxc.hlsli"
+#include "shader_constant_register_map.hlsli"
 
 sampler BaseTextureSampler			: register( s0 );
 sampler IrisSampler					: register( s1 );

@@ -1,5 +1,5 @@
 //========= Copyright Valve Corporation, All rights reserved. ============//
-#include "common_ps_fxc.h"
+#include "common_ps_fxc.hlsli"
 
 struct DrawWater_params_t
 {

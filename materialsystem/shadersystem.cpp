@@ -1685,6 +1685,10 @@ void CShaderSystem::TakeSnapshot( )
 	// Take a snapshot...
 	snapshotList.m_Snapshot[snapshotList.m_nPassCount] = g_pShaderAPI->TakeSnapshot();
 	++snapshotList.m_nPassCount;
+	if (snapshotList.m_nPassCount > 1) {
+		int aaa = 0;
+		Msg("%d", aaa);
+	}
 }
 
 

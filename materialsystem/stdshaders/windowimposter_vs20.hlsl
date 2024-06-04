@@ -1,12 +1,12 @@
 //	DYNAMIC: "DOWATERFOG"				"0..1"
 
-//====== Copyright © 1996-2004, Valve Corporation, All rights reserved. =======
+//====== Copyright ?1996-2004, Valve Corporation, All rights reserved. =======
 //
 // Purpose: 
 //
 //=============================================================================
 
-#include "common_vs_fxc.h"
+#include "common_vs_fxc.hlsli"
 
 static const int g_FogType = DOWATERFOG;
 

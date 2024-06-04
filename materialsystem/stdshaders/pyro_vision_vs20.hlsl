@@ -20,7 +20,7 @@
 // SKIP: ( FULLBRIGHT == 1 ) &&  ( VERTEX_LIT == 0 || DYNAMIC_LIGHT == 1 || STATIC_LIGHT == 1 || NUM_LIGHTS != 0 )
 
 
-#include "common_vs_fxc.h"
+#include "common_vs_fxc.hlsli"
 
 
 static const bool g_bSkinning		= SKINNING ? true : false;

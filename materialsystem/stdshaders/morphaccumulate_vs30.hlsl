@@ -1,8 +1,8 @@
-//======= Copyright © 1996-2006, Valve Corporation, All rights reserved. ======
+//======= Copyright ?1996-2006, Valve Corporation, All rights reserved. ======
 
 //  STATIC: "CONSTANTBASEDMORPH"	"0..1"
 
-#include "common_vs_fxc.h"
+#include "common_vs_fxc.hlsli"
 
 struct VS_INPUT
 {

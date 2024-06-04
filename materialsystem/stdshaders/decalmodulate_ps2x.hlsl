@@ -1,4 +1,4 @@
-//======= Copyright © 1996-2006, Valve Corporation, All rights reserved. ======
+//======= Copyright ?1996-2006, Valve Corporation, All rights reserved. ======
 
 // STATIC: "CONVERT_TO_SRGB"	"0..1"	[ps20b][= g_pHardwareConfig->NeedsShaderSRGBConversion()] [PC]
 // STATIC: "CONVERT_TO_SRGB"	"0..1"	[ps30][= g_pHardwareConfig->NeedsShaderSRGBConversion()] [PC]
@@ -6,8 +6,8 @@
 
 // DYNAMIC: "PIXELFOGTYPE"		"0..1"
 
-#include "common_ps_fxc.h"
-#include "shader_constant_register_map.h"
+#include "common_ps_fxc.hlsli"
+#include "shader_constant_register_map.hlsli"
 
 sampler TexSampler	: register( s0 );
 

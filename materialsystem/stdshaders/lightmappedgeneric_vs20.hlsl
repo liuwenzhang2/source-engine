@@ -20,7 +20,7 @@
 //  SKIP: $BUMPMASK && $RELIEF_MAPPING
 //  SKIP: $BUMPMASK && $SEAMLESS
 
-#include "common_vs_fxc.h"
+#include "common_vs_fxc.hlsli"
 
 static const int g_FogType						= DOWATERFOG;
 static const bool g_UseSeparateEnvmapMask		= ENVMAP_MASK;

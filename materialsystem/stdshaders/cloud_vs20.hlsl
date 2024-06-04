@@ -1,4 +1,4 @@
-#include "common_vs_fxc.h"
+#include "common_vs_fxc.hlsli"
 
 const float4 g_matBaseTexCoordTransform[2] : register( SHADER_SPECIFIC_CONST_0 );
 const float4 g_matCloudTexCoordTransform[2] : register( SHADER_SPECIFIC_CONST_2 );

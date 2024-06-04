@@ -8,7 +8,7 @@
 #ifndef COMMON_FLASHLIGHT_FXC_H_
 #define COMMON_FLASHLIGHT_FXC_H_
 
-#include "common_ps_fxc.h"
+#include "common_ps_fxc.hlsli"
 
 
 // JasonM - TODO: remove this simpleton version

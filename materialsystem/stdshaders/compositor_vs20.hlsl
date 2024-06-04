@@ -1,6 +1,6 @@
-//======= Copyright © 1996-2007, Valve Corporation, All rights reserved. ======
+//======= Copyright ?1996-2007, Valve Corporation, All rights reserved. ======
 
-#include "common_vs_fxc.h"
+#include "common_vs_fxc.hlsli"
 
 // This could be packed more efficiently if needed.
 const float4x2 cXformTexCoord0			: register( c2  );

@@ -1,4 +1,4 @@
-//====== Copyright © 1996-2006, Valve Corporation, All rights reserved. =======
+//====== Copyright ?1996-2006, Valve Corporation, All rights reserved. =======
 
 // STATIC: "CONVERT_TO_SRGB"			"0..1"	[ps20b][= g_pHardwareConfig->NeedsShaderSRGBConversion()] [PC]
 // STATIC: "CONVERT_TO_SRGB"			"0..1"	[ps30][= g_pHardwareConfig->NeedsShaderSRGBConversion()] [PC]
@@ -17,7 +17,7 @@
 #	define WRITE_DEPTH_TO_DESTALPHA 0
 #endif
 
-#include "shader_constant_register_map.h"
+#include "shader_constant_register_map.hlsli"
 
 const float3 cAmbientCube[6]				: register( PSREG_AMBIENT_CUBE );
 const float4 g_FogParams					: register( PSREG_FOG_PARAMS );

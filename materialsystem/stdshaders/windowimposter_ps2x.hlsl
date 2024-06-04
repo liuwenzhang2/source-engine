@@ -1,4 +1,4 @@
-//====== Copyright © 1996-2004, Valve Corporation, All rights reserved. =======
+//====== Copyright ?1996-2004, Valve Corporation, All rights reserved. =======
 //
 // Purpose: 
 //
@@ -9,8 +9,8 @@
 // STATIC: "CONVERT_TO_SRGB"	"0..1"	[ps20b][= g_pHardwareConfig->NeedsShaderSRGBConversion()] [PC]
 // STATIC: "CONVERT_TO_SRGB"	"0..0"	[= 0] [XBOX]
 
-#include "common_ps_fxc.h"
-#include "shader_constant_register_map.h"
+#include "common_ps_fxc.hlsli"
+#include "shader_constant_register_map.hlsli"
 
 sampler EnvmapSampler		: register( s0 );
 

@@ -13,8 +13,8 @@
 
 #define USE_32BIT_LIGHTMAPS_ON_360 //uncomment to use 32bit lightmaps, be sure to keep this in sync with the same #define in materialsystem/cmatlightmaps.cpp
 
-#include "common_ps_fxc.h"
-#include "common_lightmappedgeneric_fxc.h"
+#include "common_ps_fxc.hlsli"
+#include "common_lightmappedgeneric_fxc.hlsli"
 
 const HALF4 g_EnvmapTint					: register( c0 );
 const HALF3 g_DiffuseModulation				: register( c1 );

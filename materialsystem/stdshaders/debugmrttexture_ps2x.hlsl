@@ -3,7 +3,7 @@
 // STATIC: "MRTINDEX"			"0..1"
 
 #define HDRTYPE HDR_TYPE_NONE
-#include "common_ps_fxc.h"
+#include "common_ps_fxc.hlsli"
 
 struct PS_INPUT
 {

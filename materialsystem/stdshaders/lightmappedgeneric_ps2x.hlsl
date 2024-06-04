@@ -55,5 +55,5 @@
 //  SKIP ($DETAIL_BLEND_MODE == 10 ) && ($BUMPMAP == 0 )
 //  SKIP ($DETAIL_BLEND_MODE == 11 ) && ($BUMPMAP != 0 )
 
-#include "lightmappedgeneric_ps2_3_x.h"
+#include "lightmappedgeneric_ps2_3_x.hlsli"
 

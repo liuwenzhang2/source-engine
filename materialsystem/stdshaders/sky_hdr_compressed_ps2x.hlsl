@@ -2,7 +2,7 @@
 // STATIC: "CONVERT_TO_SRGB"			"0..0"	[= 0] [XBOX]
 // DYNAMIC: "WRITE_DEPTH_TO_DESTALPHA"	"0..1"	[ps20b] [PC]
 // DYNAMIC: "WRITE_DEPTH_TO_DESTALPHA"	"0..0"	[ps20b] [XBOX]
-#include "common_ps_fxc.h"
+#include "common_ps_fxc.hlsli"
 
 #if defined( SHADER_MODEL_PS_2_0 )
 #	define WRITE_DEPTH_TO_DESTALPHA 0

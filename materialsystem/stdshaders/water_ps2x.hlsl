@@ -22,7 +22,7 @@
 #	define WRITE_DEPTH_TO_DESTALPHA 0
 #endif
 
-#include "water_ps2x_helper.h"
+#include "water_ps2x_helper.hlsli"
 
 
 sampler RefractSampler			: register( s0 );

@@ -1,10 +1,10 @@
-//====== Copyright © 1996-2004, Valve Corporation, All rights reserved. =======
+//====== Copyright ?1996-2004, Valve Corporation, All rights reserved. =======
 //
 // Purpose: 
 //
 //=============================================================================
 
-#include "common_vs_fxc.h"
+#include "common_vs_fxc.hlsli"
 
 struct VS_INPUT
 {

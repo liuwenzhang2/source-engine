@@ -1,6 +1,6 @@
-//======= Copyright © 1996-2006, Valve Corporation, All rights reserved. ======
+//======= Copyright ?1996-2006, Valve Corporation, All rights reserved. ======
 
-#include "common_ps_fxc.h"
+#include "common_ps_fxc.hlsli"
 
 sampler TexSampler : register( s0 );
 

@@ -2,7 +2,7 @@
 #ifndef COMMON_VERTEXLITGENERIC_DX9_H_
 #define COMMON_VERTEXLITGENERIC_DX9_H_
 
-#include "common_ps_fxc.h"
+#include "common_ps_fxc.hlsli"
 
 //  We store four light colors and positions in an
 //  array of three of these structures like so:

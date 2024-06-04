@@ -16,7 +16,7 @@
 #define COMBINE_MODE_USE_FIRST_OVER_SECOND				2
 
 #define HDRTYPE HDR_TYPE_NONE
-#include "common_ps_fxc.h"
+#include "common_ps_fxc.hlsli"
 
 const float4 g_Parameters	: register( c0 );
 const float4 g_DepthFeatheringConstants : register( c2 );

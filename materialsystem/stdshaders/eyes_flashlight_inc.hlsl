@@ -1,11 +1,11 @@
-//====== Copyright © 1996-2006, Valve Corporation, All rights reserved. =======
+//====== Copyright ?1996-2006, Valve Corporation, All rights reserved. =======
 //
 // Purpose: 
 //
 //=============================================================================
 
-#include "common_flashlight_fxc.h"
-#include "shader_constant_register_map.h"
+#include "common_flashlight_fxc.hlsli"
+#include "shader_constant_register_map.hlsli"
 
 
 const float4 g_vShadowTweaks	: register( PSREG_ENVMAP_TINT__SHADOW_TWEAKS );

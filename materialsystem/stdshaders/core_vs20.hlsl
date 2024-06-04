@@ -3,7 +3,7 @@
 //	DYNAMIC: "COMPRESSED_VERTS"		"0..1"
 //	DYNAMIC: "SKINNING"				"0..1"
 
-#include "common_vs_fxc.h"
+#include "common_vs_fxc.hlsli"
 
 static const bool g_bSkinning		= SKINNING ? true : false;
 static const bool g_bModel			= MODEL ? true : false;

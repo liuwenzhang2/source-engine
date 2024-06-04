@@ -9,8 +9,8 @@
 #	define WRITE_DEPTH_TO_DESTALPHA 0
 #endif
 
-#include "common_ps_fxc.h"
-#include "shader_constant_register_map.h"
+#include "common_ps_fxc.hlsli"
+#include "shader_constant_register_map.hlsli"
 
 sampler BaseTextureSampler	: register( s0 );
 

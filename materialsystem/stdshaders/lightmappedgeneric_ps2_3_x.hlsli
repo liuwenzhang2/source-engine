@@ -37,9 +37,9 @@
 
 #define USE_32BIT_LIGHTMAPS_ON_360 //uncomment to use 32bit lightmaps, be sure to keep this in sync with the same #define in materialsystem/cmatlightmaps.cpp
 
-#include "common_ps_fxc.h"
-#include "common_flashlight_fxc.h"
-#include "common_lightmappedgeneric_fxc.h"
+#include "common_ps_fxc.hlsli"
+#include "common_flashlight_fxc.hlsli"
+#include "common_lightmappedgeneric_fxc.hlsli"
 
 #if SEAMLESS
 #define USE_FAST_PATH 1
@@ -187,7 +187,9 @@ LPREVIEW_PS_OUT main( PS_INPUT i ) : COLOR
 #else
 HALF4 main( PS_INPUT i ) : COLOR
 #endif
-{
+{	
+	//HALF2 bumpCoord1 = ComputeLightmapCoordinates(i.lightmapTexCoord1And2, i.lightmapTexCoord3.xy);
+	//return tex2D(BaseTextureSampler, i.baseTexCoord) *float4(LightMapSample(LightmapSampler, bumpCoord1).xyz, 0);
 	bool bBaseTexture2 = BASETEXTURE2 ? true : false;
 	bool bDetailTexture = DETAILTEXTURE ? true : false;
 	bool bBumpmap = BUMPMAP ? true : false;

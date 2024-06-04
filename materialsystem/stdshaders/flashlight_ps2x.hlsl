@@ -22,9 +22,9 @@
 // SKIP: !$NORMALMAP && $NORMALMAP2
 // SKIP: !$DETAILTEXTURE && ( $DETAIL_BLEND_MODE != 0 )
 
-#include "shader_constant_register_map.h"
-#include "common_flashlight_fxc.h"
-#include "common_lightmappedgeneric_fxc.h"
+#include "shader_constant_register_map.hlsli"
+#include "common_flashlight_fxc.hlsli"
+#include "common_lightmappedgeneric_fxc.hlsli"
 
 const float4 g_vShadowTweaks				: register( PSREG_ENVMAP_TINT__SHADOW_TWEAKS );
 const float4 g_FogParams					: register( PSREG_FOG_PARAMS );

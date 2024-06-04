@@ -1,4 +1,4 @@
-//======= Copyright © 1996-2006, Valve Corporation, All rights reserved. ======
+//======= Copyright ?1996-2006, Valve Corporation, All rights reserved. ======
 // $SHADER_SPECIFIC_CONST_0	 = eyeball origin			
 // $SHADER_SPECIFIC_CONST_1	 = eyeball up * 0.5			
 // $SHADER_SPECIFIC_CONST_2	 = iris projection U		
@@ -22,7 +22,7 @@
 // If using static control flow on Direct3D, we should use the NUM_LIGHTS=0 combo
 //  SKIP: $USE_STATIC_CONTROL_FLOW && ( $NUM_LIGHTS > 0 ) [vs20]
 
-#include "vortwarp_vs20_helper.h"
+#include "vortwarp_vs20_helper.hlsli"
 
 static const int  g_bSkinning		= SKINNING ? true : false;
 static const int  g_FogType			= DOWATERFOG;

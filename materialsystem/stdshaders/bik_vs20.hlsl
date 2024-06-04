@@ -1,5 +1,5 @@
 //	DYNAMIC: "DOWATERFOG"			"0..1"
-#include "common_vs_fxc.h"
+#include "common_vs_fxc.hlsli"
  
 static const int  g_FogType			= DOWATERFOG;
 

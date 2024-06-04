@@ -3,7 +3,7 @@
 
 // SKIP: $MULTITEXTURE && $BASETEXTURE
 
-#include "common_vs_fxc.h"
+#include "common_vs_fxc.hlsli"
 
 const float4 cBumpTexCoordTransform[2]	:  register( SHADER_SPECIFIC_CONST_1 );
 const float4 TexOffsets	:  register( SHADER_SPECIFIC_CONST_3 );

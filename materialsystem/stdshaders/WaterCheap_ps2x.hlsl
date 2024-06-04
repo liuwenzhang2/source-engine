@@ -11,7 +11,7 @@
 // DYNAMIC: "HDRENABLED"			"0..1"
 // DYNAMIC: "PIXELFOGTYPE"			"0..1"
 
-#include "common_ps_fxc.h"
+#include "common_ps_fxc.hlsli"
 
 const HALF3 g_WaterFogColor			: register( c0 );
 const HALF4 g_CheapWaterParams		: register( c1 );

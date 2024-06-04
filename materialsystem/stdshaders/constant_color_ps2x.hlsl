@@ -2,7 +2,7 @@
 // STATIC: "CONVERT_TO_SRGB" "0..0"	[= 0] [XBOX]
 
 #define HDRTYPE HDR_TYPE_NONE
-#include "common_ps_fxc.h"
+#include "common_ps_fxc.hlsli"
 
 // this pixel shader compares the luminance against a conatnt value and retruns all 1s when
 // greater.

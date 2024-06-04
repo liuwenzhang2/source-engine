@@ -10,7 +10,7 @@
 //	DYNAMIC: "ORIENTATION"			"0..2"
 
 
-#include "common_vs_fxc.h"
+#include "common_vs_fxc.hlsli"
 
 const float4x3 cModelView			: register(SHADER_SPECIFIC_CONST_0);
 const float4x4 cProj				: register(SHADER_SPECIFIC_CONST_3);

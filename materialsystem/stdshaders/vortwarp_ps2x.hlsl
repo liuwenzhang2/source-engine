@@ -1,4 +1,4 @@
-//======= Copyright © 1996-2006, Valve Corporation, All rights reserved. ======
+//======= Copyright ?1996-2006, Valve Corporation, All rights reserved. ======
 
 // STATIC: "CONVERT_TO_SRGB"			"0..1"	[ps20b][= g_pHardwareConfig->NeedsShaderSRGBConversion()] [PC]
 // STATIC: "CONVERT_TO_SRGB"			"0..1"	[ps30][= g_pHardwareConfig->NeedsShaderSRGBConversion()] [PC]
@@ -22,8 +22,8 @@
 // We don't use other lights when doing the flashlight, so just skip that
 // SKIP: ( $FLASHLIGHT != 0 ) && ( $NUM_LIGHTS > 0 ) [PC]
 
-#include "common_flashlight_fxc.h"
-#include "common_vertexlitgeneric_dx9.h"
+#include "common_flashlight_fxc.hlsli"
+#include "common_vertexlitgeneric_dx9.hlsli"
 
 const HALF4 g_EnvmapTint						: register( c0 );
 const HALF4 g_DiffuseModulation					: register( c1 );

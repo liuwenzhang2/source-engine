@@ -15,7 +15,7 @@
 // DYNAMIC: "COL_CORRECT_NUM_LOOKUPS"		"0..4"
 
 #define HDRTYPE HDR_TYPE_NONE
-#include "common_ps_fxc.h"
+#include "common_ps_fxc.hlsli"
 
 
 #if !(defined(SHADER_MODEL_PS_2_B) || defined(SHADER_MODEL_PS_3_0))

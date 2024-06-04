@@ -1,6 +1,6 @@
 // DYNAMIC: "MODE" "0..9"
 
-#include "common_ps_fxc.h"
+#include "common_ps_fxc.hlsli"
 
 const float g_Alpha : register( c0 );
 

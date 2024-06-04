@@ -1,4 +1,4 @@
-//======= Copyright © 1996-2008, Valve Corporation, All rights reserved. ======
+//======= Copyright 1996-2008, Valve Corporation, All rights reserved. ======
 
 // STATIC: "CUBEMAP"					"0..1"
 // STATIC: "DIFFUSELIGHTING"			"0..1"
@@ -62,8 +62,8 @@
 // Meaningless combinations
 // SKIP: $NORMALMAPALPHAENVMAPMASK && !$CUBEMAP
 
-#include "common_flashlight_fxc.h"
-#include "common_vertexlitgeneric_dx9.h"
+#include "common_flashlight_fxc.hlsli"
+#include "common_vertexlitgeneric_dx9.hlsli"
 
 const float4 g_EnvmapTint_TintReplaceFactor		: register( c0 );
 const float4 g_DiffuseModulation				: register( c1 );

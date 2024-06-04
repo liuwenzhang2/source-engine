@@ -1,4 +1,4 @@
-//====== Copyright © 1996-2005, Valve Corporation, All rights reserved. =======
+//====== Copyright ?1996-2005, Valve Corporation, All rights reserved. =======
 //
 // Purpose: 
 //
@@ -14,7 +14,7 @@
 
 // SKIP: ( $REFRACT || $CORECOLORTEXTURE ) && $CUBEMAP
 
-#include "common_ps_fxc.h"
+#include "common_ps_fxc.hlsli"
 
 sampler RefractSampler	: register( s2 );
 sampler NormalSampler	: register( s3 );

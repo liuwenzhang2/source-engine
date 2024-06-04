@@ -1,4 +1,4 @@
-//====== Copyright © 1996-2007, Valve Corporation, All rights reserved. ===========================
+//====== Copyright ?1996-2007, Valve Corporation, All rights reserved. ===========================
 
 // STATIC: "CONVERT_TO_SRGB"	"0..1"	[ps20b][= g_pHardwareConfig->NeedsShaderSRGBConversion()] [PC]
 // STATIC: "CONVERT_TO_SRGB"	"0..0"	[= 0] [XBOX]
@@ -11,7 +11,7 @@
 #define HDRTYPE HDR_TYPE_NONE
 
 // Includes =======================================================================================
-#include "common_ps_fxc.h"
+#include "common_ps_fxc.hlsli"
 
 // Texture Samplers ===============================================================================
 sampler g_tTexSampler : register( s0 );

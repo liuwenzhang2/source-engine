@@ -9,8 +9,8 @@
 // DYNAMIC: "HDRENABLED"			"0..1"
 // DYNAMIC: "PIXELFOGTYPE"			"0..1"
 
-#include "common_ps_fxc.h"
-#include "shader_constant_register_map.h"
+#include "common_ps_fxc.hlsli"
+#include "shader_constant_register_map.hlsli"
 
 const HALF4 g_Color					: register( c0 );
 const float g_HDRColorScale			: register( c1 );

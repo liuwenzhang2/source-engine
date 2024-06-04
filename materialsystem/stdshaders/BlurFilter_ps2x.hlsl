@@ -3,7 +3,7 @@
 // STATIC: "APPROX_SRGB_ADAPTER"	"0..1" [ps20b] [PC]
 
 #define HDRTYPE HDR_TYPE_NONE
-#include "common_ps_fxc.h"
+#include "common_ps_fxc.hlsli"
 
 sampler TexSampler	: register( s0 );
 

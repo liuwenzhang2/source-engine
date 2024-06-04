@@ -17,8 +17,8 @@
 // SKIP: ( EFFECT == 2 || EFFECT == 3 ) && ( STRIPES == 1 || STRIPES_USE_NORMAL2 == 1 || COLOR_BAR == 1 || BASETEXTURE2 == 1 || FANCY_BLENDING == 1 || VERTEX_LIT == 1 || PIXELFOGTYPE == 1 || SELFILLUM == 1 )
 // SKIP: ( EFFECT != 3 ) && ( HEATHAZE == 1 )
 
-#include "shader_constant_register_map.h"
-#include "common_ps_fxc.h"
+#include "shader_constant_register_map.hlsli"
+#include "common_ps_fxc.hlsli"
 
 sampler BaseTextureSampler		: register( s0 );
 

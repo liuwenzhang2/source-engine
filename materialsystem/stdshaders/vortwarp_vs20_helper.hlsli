@@ -1,5 +1,5 @@
 //========= Copyright Valve Corporation, All rights reserved. ============//
-#include "common_vs_fxc.h"
+#include "common_vs_fxc.hlsli"
 
 float Sine( float min, float max, float t )
 {

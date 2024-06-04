@@ -1,9 +1,9 @@
-//========= Copyright © 1996-2006, Valve Corporation, All rights reserved. ============//
+//========= Copyright ?1996-2006, Valve Corporation, All rights reserved. ============//
 
 // STATIC: "STAGE" "0..2"
 
 // Includes
-#include "common_vs_fxc.h"
+#include "common_vs_fxc.hlsli"
 
 // Globals
 const float g_flTime : register( SHADER_SPECIFIC_CONST_0 );

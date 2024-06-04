@@ -6,8 +6,8 @@
 // DYNAMIC: "HDRENABLED"		"0..1"
 // DYNAMIC: "PIXELFOGTYPE"		"0..1"
 
-#include "common_ps_fxc.h"
-#include "shader_constant_register_map.h"
+#include "common_ps_fxc.hlsli"
+#include "shader_constant_register_map.hlsli"
 
 const HALF3 g_StaticAmount	: register( c0 ); //x is static, y is 1.0 - static
 

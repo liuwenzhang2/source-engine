@@ -1,4 +1,4 @@
-//======= Copyright © 1996-2006, Valve Corporation, All rights reserved. ======
+//======= Copyright ?1996-2006, Valve Corporation, All rights reserved. ======
 
 // STATIC: "CONVERT_TO_SRGB"	"0..1"	[ps20b][= g_pHardwareConfig->NeedsShaderSRGBConversion()] [PC]
 // STATIC: "CONVERT_TO_SRGB"	"0..0"	[= 0] [XBOX]
@@ -10,7 +10,7 @@
 // DYNAMIC: "NUM_LIGHTS"		"0..4"	[ps20b]
 
 #define HDRTYPE HDR_TYPE_NONE
-#include "common_vertexlitgeneric_dx9.h"
+#include "common_vertexlitgeneric_dx9.hlsli"
 
 const float4 g_OverbrightFactor		: register( c4 );
 const float3 cAmbientCube[6]		: register( c6 );

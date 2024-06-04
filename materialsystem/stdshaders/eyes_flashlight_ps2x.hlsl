@@ -1,4 +1,4 @@
-//====== Copyright © 1996-2004, Valve Corporation, All rights reserved. =======
+//====== Copyright ?1996-2004, Valve Corporation, All rights reserved. =======
 //
 // Purpose: 
 //
@@ -12,4 +12,4 @@
 // DYNAMIC: "FLASHLIGHTSHADOWS"			"0..1"	[ps20b]
 // DYNAMIC: "FLASHLIGHTSHADOWS"			"0..1"	[ps30]
 
-#include "eyes_flashlight_inc.fxc"
+#include "eyes_flashlight_inc.hlsl"

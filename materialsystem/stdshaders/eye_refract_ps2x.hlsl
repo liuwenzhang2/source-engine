@@ -1,4 +1,4 @@
-//====== Copyright © 1996-2007, Valve Corporation, All rights reserved. ===========================
+//====== Copyright ?1996-2007, Valve Corporation, All rights reserved. ===========================
 
 // STATIC: "FLASHLIGHT"					"0..1"
 // STATIC: "LIGHTWARPTEXTURE"			"0..1"
@@ -38,8 +38,8 @@
 
 
 // Includes =======================================================================================
-#include "common_flashlight_fxc.h"
-#include "shader_constant_register_map.h"
+#include "common_flashlight_fxc.hlsli"
+#include "shader_constant_register_map.hlsli"
 
 // Texture Samplers ===============================================================================
 sampler g_tCorneaSampler				: register( s0 );

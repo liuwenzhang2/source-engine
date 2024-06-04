@@ -11,7 +11,7 @@
 #define TEXTURESTAGES (MAXTEXTURESTAGES + 1)
 #define USESTATICTEXTURE (((ADDSTATIC == 1) && (HASSTATICTEXTURE == 1))?(1):(0))
 
-#include "common_ps_fxc.h"
+#include "common_ps_fxc.hlsli"
 
 
 

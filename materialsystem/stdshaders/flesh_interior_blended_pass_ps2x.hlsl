@@ -1,8 +1,8 @@
-//========= Copyright © 1996-2006, Valve Corporation, All rights reserved. ============//
+//========= Copyright ?1996-2006, Valve Corporation, All rights reserved. ============//
 // Includes =======================================================================================
 // STATIC: "CONVERT_TO_SRGB" "0..1"	[ps20b][= g_pHardwareConfig->NeedsShaderSRGBConversion()] [PC]
 // STATIC: "CONVERT_TO_SRGB" "0..0"	[= 0] [XBOX]
-#include "common_vertexlitgeneric_dx9.h"
+#include "common_vertexlitgeneric_dx9.hlsli"
 
 // Texture Samplers ===============================================================================
 sampler g_tBaseSampler		: register( s0 );

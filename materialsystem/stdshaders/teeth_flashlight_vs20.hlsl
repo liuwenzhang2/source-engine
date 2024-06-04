@@ -1,4 +1,4 @@
-//======= Copyright © 1996-2007, Valve Corporation, All rights reserved. ======
+//======= Copyright ?1996-2007, Valve Corporation, All rights reserved. ======
 
 //	STATIC: "INTRO"					"0..1"
 
@@ -7,7 +7,7 @@
 //	DYNAMIC: "SKINNING"				"0..1"
 //  DYNAMIC: "MORPHING"				"0..1" [vs30]
 
-#include "vortwarp_vs20_helper.h"
+#include "vortwarp_vs20_helper.hlsli"
 
 static const int g_FogType			= DOWATERFOG;
 static const bool g_bSkinning		= SKINNING ? true : false;

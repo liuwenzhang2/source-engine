@@ -4,7 +4,7 @@
 // DYNAMIC: "HDRENABLED"		"0..1"
 // DYNAMIC: "PIXELFOGTYPE"		"0..1"
 
-#include "common_ps_fxc.h"
+#include "common_ps_fxc.hlsli"
 
 const HALF3 g_StaticAmount	: register( c0 ); //x is static, y is 1.0 - static
 

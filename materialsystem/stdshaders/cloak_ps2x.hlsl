@@ -1,4 +1,4 @@
-//====== Copyright © 1996-2005, Valve Corporation, All rights reserved. =======
+//====== Copyright 1996-2005, Valve Corporation, All rights reserved. =======
 //
 // Purpose: 
 //
@@ -15,7 +15,7 @@
 // DYNAMIC: "NUM_LIGHTS"				"0..4"	[ps30]
 
 
-#include "shader_constant_register_map.h"
+#include "shader_constant_register_map.hlsli"
 
 sampler BaseSampler					: register( s0 );	// Base map
 sampler DiffuseWarpSampler			: register( s1 );	// 1D texture for diffuse lighting modification

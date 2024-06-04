@@ -6,7 +6,7 @@
 //=============================================================================
 
 #define C_CODE_HACK
-#include "shader_constant_register_map.h"
+#include "shader_constant_register_map.hlsli"
 #undef C_CODE_HACK
 
 // For the C code, map the above file's defines back to integers...

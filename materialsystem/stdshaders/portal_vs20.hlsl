@@ -7,7 +7,7 @@
 
 #define USESTATICTEXTURE (((ADDSTATIC == 1) && (HASSTATICTEXTURE == 1))?(1):(0))
 
-#include "common_vs_fxc.h"
+#include "common_vs_fxc.hlsli"
 
 static const bool g_bSkinning = SKINNING ? true : false;
 

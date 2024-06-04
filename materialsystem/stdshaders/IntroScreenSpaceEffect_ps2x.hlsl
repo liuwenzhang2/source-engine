@@ -5,7 +5,7 @@
 // STATIC: "LINEAR_TO_SRGB"		"0..1"	[ps20b]
 
 #define HDRTYPE HDR_TYPE_NONE
-#include "common_ps_fxc.h"
+#include "common_ps_fxc.hlsli"
 
 const float g_Alpha : register( c0 );
 

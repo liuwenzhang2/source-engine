@@ -13,7 +13,7 @@
 //  SKIP: $USE_STATIC_CONTROL_FLOW && ( $NUM_LIGHTS > 0 ) [vs20]
 //	SKIP: $DOWATERFOG
 
-#include "vortwarp_vs20_helper.h"
+#include "vortwarp_vs20_helper.hlsli"
 
 static const bool g_bSkinning		= SKINNING ? true : false;
 static const int g_FogType			= DOWATERFOG;

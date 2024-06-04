@@ -8,7 +8,7 @@
 // If using static control flow on Direct3D, we should use the NUM_LIGHTS=0 combo
 //  SKIP: $USE_STATIC_CONTROL_FLOW && ( $NUM_LIGHTS > 0 ) [vs20]
 
-#include "common_vs_fxc.h"
+#include "common_vs_fxc.hlsli"
 
 static const bool g_bHalfLambert	= HALFLAMBERT ? true : false;
 

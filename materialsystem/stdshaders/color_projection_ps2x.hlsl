@@ -4,8 +4,8 @@
 // DYNAMIC: "NEED_ANOMYLIZE"	"0..1"
 // DYNAMIC: "NEED_MONOCHROME"	"0..1"
 
-#include "shader_constant_register_map.h"
-#include "common_ps_fxc.h"
+#include "shader_constant_register_map.hlsli"
+#include "common_ps_fxc.hlsli"
 
 
 struct PS_INPUT

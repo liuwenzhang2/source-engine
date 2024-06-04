@@ -10,7 +10,7 @@
 //  DYNAMIC: "LIGHTING_PREVIEW"			"0..1"
 //  DYNAMIC: "NUM_LIGHTS"				"0..4"
 
-#include "common_vs_fxc.h"
+#include "common_vs_fxc.hlsli"
 
 static const bool g_bSkinning		= SKINNING ? true : false;
 static const int g_FogType			= DOWATERFOG;

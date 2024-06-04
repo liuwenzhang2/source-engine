@@ -1,10 +1,10 @@
-//========= Copyright © 1996-2006, Valve Corporation, All rights reserved. ============//
+//========= Copyright ?1996-2006, Valve Corporation, All rights reserved. ============//
 
 // DYNAMIC: "COMPRESSED_VERTS"			"0..1"
 // DYNAMIC: "SKINNING"					"0..1"
 
 // Includes
-#include "common_vs_fxc.h"
+#include "common_vs_fxc.hlsli"
 
 // Globals
 static const bool g_bSkinning = SKINNING ? true : false;

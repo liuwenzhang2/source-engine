@@ -11,7 +11,7 @@
 #ifndef COMMON_VS_FXC_H_
 #define COMMON_VS_FXC_H_
 
-#include "common_fxc.h"
+#include "common_fxc.hlsli"
 
 // Put global skip commands here. . make sure and check that the appropriate vars are defined
 // so these aren't used on the wrong shaders!

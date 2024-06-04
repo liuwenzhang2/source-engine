@@ -1,4 +1,4 @@
-//======= Copyright © 1996-2007, Valve Corporation, All rights reserved. ======
+//======= Copyright ?1996-2007, Valve Corporation, All rights reserved. ======
 // STATIC: "CONVERT_TO_SRGB"			"0..0"
 // STATIC: "CUBEMAP"					"0..1"
 // STATIC: "SELFILLUM"					"0..1"
@@ -61,8 +61,8 @@
 
 
 
-#include "common_flashlight_fxc.h"
-#include "shader_constant_register_map.h"
+#include "common_flashlight_fxc.hlsli"
+#include "shader_constant_register_map.hlsli"
 
 const float4 g_SelfIllumTint_and_DetailBlendFactor	: register( PSREG_SELFILLUMTINT );
 #if ( SELFILLUMFRESNEL == 1 )

@@ -1,4 +1,4 @@
-//====== Copyright © 1996-2007, Valve Corporation, All rights reserved. =======//
+//====== Copyright ?1996-2007, Valve Corporation, All rights reserved. =======//
 //
 // Purpose: 
 //
@@ -40,8 +40,8 @@
 
 
 #define HDRTYPE HDR_TYPE_NONE
-#include "common_flashlight_fxc.h"
-#include "common_ps_fxc.h"
+#include "common_flashlight_fxc.hlsli"
+#include "common_ps_fxc.hlsli"
 
 const HALF4 g_SelfIllumTint						: register( c7 );
 static const HALF g_OverbrightFactor = 2.0f;

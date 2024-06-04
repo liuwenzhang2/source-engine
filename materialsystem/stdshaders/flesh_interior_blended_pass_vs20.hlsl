@@ -1,4 +1,4 @@
-//========= Copyright © 1996-2006, Valve Corporation, All rights reserved. ============//
+//========= Copyright ?1996-2006, Valve Corporation, All rights reserved. ============//
 
 // STATIC: "HALFLAMBERT"				"0..1"
 // STATIC: "USE_STATIC_CONTROL_FLOW"	"0..1" [vs20]
@@ -14,7 +14,7 @@
 // SKIP: $USE_STATIC_CONTROL_FLOW && ( $NUM_LIGHTS > 0 ) [vs20]
 
 // Includes
-#include "common_vs_fxc.h"
+#include "common_vs_fxc.hlsli"
 
 // Globals
 static const int  g_iFogType		= DOWATERFOG;

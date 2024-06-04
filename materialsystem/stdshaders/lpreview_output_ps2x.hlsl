@@ -3,7 +3,7 @@
 
 #define HDRTYPE HDR_TYPE_NONE
 #define HDRENABLED 0
-#include "common_ps_fxc.h"
+#include "common_ps_fxc.hlsli"
 
 sampler InputTexture	: register( s0 );
 sampler Albedo	: register( s1 );

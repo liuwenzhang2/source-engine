@@ -1,4 +1,4 @@
-//====== Copyright © 1996-2007, Valve Corporation, All rights reserved. =======
+//====== Copyright ?1996-2007, Valve Corporation, All rights reserved. =======
 //
 //=============================================================================
 
@@ -25,8 +25,8 @@
 #	define WRITE_DEPTH_TO_DESTALPHA 0
 #endif
 
-#include "common_ps_fxc.h"
-#include "shader_constant_register_map.h"
+#include "common_ps_fxc.hlsli"
+#include "shader_constant_register_map.hlsli"
 
 sampler NormalSampler2				: register( s1 );
 sampler RefractSampler				: register( s2 );

@@ -1,7 +1,7 @@
-//====== Copyright © 1996-2007, Valve Corporation, All rights reserved. ===========================
+//====== Copyright ?1996-2007, Valve Corporation, All rights reserved. ===========================
 
 // Includes =======================================================================================
-#include "common_vs_fxc.h"
+#include "common_vs_fxc.hlsli"
 
 // Input values ===================================================================================
 struct VS_INPUT

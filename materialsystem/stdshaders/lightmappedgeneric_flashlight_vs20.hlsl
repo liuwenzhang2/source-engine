@@ -1,4 +1,4 @@
-//====== Copyright © 1996-2004, Valve Corporation, All rights reserved. =======
+//====== Copyright ?1996-2004, Valve Corporation, All rights reserved. =======
 //
 // Purpose: 
 //
@@ -10,7 +10,7 @@
 //  STATIC: "DETAIL"				"0..1"
 //	DYNAMIC: "DOWATERFOG"			"0..1"
 
-#include "common_vs_fxc.h"
+#include "common_vs_fxc.hlsli"
 
 const float3 g_FlashlightPos							: register( SHADER_SPECIFIC_CONST_0 );
 const float4x4 g_FlashlightWorldToTexture				: register( SHADER_SPECIFIC_CONST_1 );

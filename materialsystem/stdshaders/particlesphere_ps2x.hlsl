@@ -4,7 +4,7 @@
 // STATIC: "CONVERT_TO_SRGB"	"0..0"	[= 0] [XBOX]
 // STATIC: "DEPTHBLEND"			"0..1"	[ps20b]
 
-#include "shader_constant_register_map.h"
+#include "shader_constant_register_map.hlsli"
 
 const float4 g_FogParams				: register( PSREG_FOG_PARAMS );
 const float4 g_EyePos_SpecExponent		: register( PSREG_EYEPOS_SPEC_EXPONENT );

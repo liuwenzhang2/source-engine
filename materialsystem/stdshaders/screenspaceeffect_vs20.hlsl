@@ -1,8 +1,8 @@
-//========= Copyright © 1996-2006, Valve Corporation, All rights reserved. ============//
+//========= Copyright ?1996-2006, Valve Corporation, All rights reserved. ============//
 
 // STATIC: "X360APPCHOOSER" "0..1" [= 0]
 
-#include "common_vs_fxc.h"
+#include "common_vs_fxc.hlsli"
 
 struct VS_INPUT
 {

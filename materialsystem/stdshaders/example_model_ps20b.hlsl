@@ -22,8 +22,8 @@
 // Flashlight shadow filter mode is irrelevant if there is no flashlight
 // SKIP: ( $FLASHLIGHT == 0 ) && ( $FLASHLIGHTDEPTHFILTERMODE != 0 ) [ps20b]
 
-#include "common_flashlight_fxc.h"
-#include "shader_constant_register_map.h"
+#include "common_flashlight_fxc.hlsli"
+#include "shader_constant_register_map.hlsli"
 
 const float4 g_DiffuseModulation			: register( PSREG_DIFFUSE_MODULATION );
 const float4 g_ShadowTweaks					: register( PSREG_ENVMAP_TINT__SHADOW_TWEAKS );
