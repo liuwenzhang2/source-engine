@@ -257,6 +257,1183 @@
     <ClCompile Include="..\..\..\materialsystem\stdshaders\writez_dx9.cpp" />
     <ClCompile Include="..\..\..\public\tier0\memoverride.cpp" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\..\materialsystem\stdshaders\AccumBuff4Sample_ps2x.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">2.0</ShaderModel>
+      <FileType>Document</FileType>
+    </None>
+    <None Include="..\..\..\materialsystem\stdshaders\accumbuff5sample_ps2x.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">2.0</ShaderModel>
+      <FileType>Document</FileType>
+    </None>
+    <None Include="..\..\..\materialsystem\stdshaders\aftershock_ps2x.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">2.0</ShaderModel>
+      <FileType>Document</FileType>
+    </None>
+    <None Include="..\..\..\materialsystem\stdshaders\aftershock_vs20.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">2.0</ShaderModel>
+      <FileType>Document</FileType>
+    </None>
+    <None Include="..\..\..\materialsystem\stdshaders\alphadist_ps11.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">2.0</ShaderModel>
+      <FileType>Document</FileType>
+    </None>
+    <None Include="..\..\..\materialsystem\stdshaders\appchooser360movie_ps2x.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">2.0</ShaderModel>
+      <FileType>Document</FileType>
+    </None>
+    <None Include="..\..\..\materialsystem\stdshaders\bik_ps2x.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">2.0</ShaderModel>
+      <FileType>Document</FileType>
+    </None>
+    <None Include="..\..\..\materialsystem\stdshaders\bik_vs20.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">2.0</ShaderModel>
+      <FileType>Document</FileType>
+    </None>
+    <None Include="..\..\..\materialsystem\stdshaders\bloomadd_ps11.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">2.0</ShaderModel>
+      <FileType>Document</FileType>
+    </None>
+    <None Include="..\..\..\materialsystem\stdshaders\bloomadd_ps2x.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">2.0</ShaderModel>
+      <FileType>Document</FileType>
+    </None>
+    <None Include="..\..\..\materialsystem\stdshaders\Bloom_ps2x.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">2.0</ShaderModel>
+      <FileType>Document</FileType>
+    </None>
+    <None Include="..\..\..\materialsystem\stdshaders\BlurFilter_ps2x.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">2.0</ShaderModel>
+      <FileType>Document</FileType>
+    </None>
+    <None Include="..\..\..\materialsystem\stdshaders\BlurFilter_vs11.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">2.0</ShaderModel>
+      <FileType>Document</FileType>
+    </None>
+    <None Include="..\..\..\materialsystem\stdshaders\BlurFilter_vs20.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">2.0</ShaderModel>
+      <FileType>Document</FileType>
+    </None>
+    <None Include="..\..\..\materialsystem\stdshaders\bufferclearobeystencil_ps2x.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">2.0</ShaderModel>
+      <FileType>Document</FileType>
+    </None>
+    <None Include="..\..\..\materialsystem\stdshaders\bufferclearobeystencil_vs20.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">2.0</ShaderModel>
+      <FileType>Document</FileType>
+    </None>
+    <None Include="..\..\..\materialsystem\stdshaders\bumpmappedlightmap_vs11.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">2.0</ShaderModel>
+      <FileType>Document</FileType>
+    </None>
+    <None Include="..\..\..\materialsystem\stdshaders\cable_ps2x.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">2.0</ShaderModel>
+      <FileType>Document</FileType>
+    </None>
+    <None Include="..\..\..\materialsystem\stdshaders\cable_vs20.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">2.0</ShaderModel>
+      <FileType>Document</FileType>
+    </None>
+    <None Include="..\..\..\materialsystem\stdshaders\cloak_blended_pass_ps2x.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">2.0</ShaderModel>
+      <FileType>Document</FileType>
+    </None>
+    <None Include="..\..\..\materialsystem\stdshaders\cloak_blended_pass_vs20.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">2.0</ShaderModel>
+      <FileType>Document</FileType>
+    </None>
+    <None Include="..\..\..\materialsystem\stdshaders\cloak_ps2x.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">2.0</ShaderModel>
+      <FileType>Document</FileType>
+    </None>
+    <None Include="..\..\..\materialsystem\stdshaders\cloak_vs20.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">2.0</ShaderModel>
+      <FileType>Document</FileType>
+    </None>
+    <None Include="..\..\..\materialsystem\stdshaders\cloud_ps20.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">2.0</ShaderModel>
+      <FileType>Document</FileType>
+    </None>
+    <None Include="..\..\..\materialsystem\stdshaders\cloud_vs20.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">2.0</ShaderModel>
+      <FileType>Document</FileType>
+    </None>
+    <None Include="..\..\..\materialsystem\stdshaders\colorcorrection_ps2x.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">2.0</ShaderModel>
+      <FileType>Document</FileType>
+    </None>
+    <None Include="..\..\..\materialsystem\stdshaders\color_projection_ps2x.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">2.0</ShaderModel>
+      <FileType>Document</FileType>
+    </None>
+    <None Include="..\..\..\materialsystem\stdshaders\color_projection_vs20.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">2.0</ShaderModel>
+      <FileType>Document</FileType>
+    </None>
+    <None Include="..\..\..\materialsystem\stdshaders\common_vertexlitgeneric_vs20.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">2.0</ShaderModel>
+      <FileType>Document</FileType>
+    </None>
+    <None Include="..\..\..\materialsystem\stdshaders\compositor_ps2x.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">2.0</ShaderModel>
+      <FileType>Document</FileType>
+    </None>
+    <None Include="..\..\..\materialsystem\stdshaders\compositor_vs20.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">2.0</ShaderModel>
+      <FileType>Document</FileType>
+    </None>
+    <None Include="..\..\..\materialsystem\stdshaders\constant_color_ps2x.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">2.0</ShaderModel>
+      <FileType>Document</FileType>
+    </None>
+    <None Include="..\..\..\materialsystem\stdshaders\copy_fp_rt_ps2x.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">2.0</ShaderModel>
+      <FileType>Document</FileType>
+    </None>
+    <None Include="..\..\..\materialsystem\stdshaders\core_ps2x.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">2.0</ShaderModel>
+      <FileType>Document</FileType>
+    </None>
+    <None Include="..\..\..\materialsystem\stdshaders\core_vs11.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">2.0</ShaderModel>
+      <FileType>Document</FileType>
+    </None>
+    <None Include="..\..\..\materialsystem\stdshaders\core_vs20.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">2.0</ShaderModel>
+      <FileType>Document</FileType>
+    </None>
+    <None Include="..\..\..\materialsystem\stdshaders\DebugDrawDepth_ps2x.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">2.0</ShaderModel>
+      <FileType>Document</FileType>
+    </None>
+    <None Include="..\..\..\materialsystem\stdshaders\DebugDrawDepth_vs20.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">2.0</ShaderModel>
+      <FileType>Document</FileType>
+    </None>
+    <None Include="..\..\..\materialsystem\stdshaders\DebugDrawEnvmapMask_ps2x.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">2.0</ShaderModel>
+      <FileType>Document</FileType>
+    </None>
+    <None Include="..\..\..\materialsystem\stdshaders\DebugDrawEnvmapMask_vs20.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">2.0</ShaderModel>
+      <FileType>Document</FileType>
+    </None>
+    <None Include="..\..\..\materialsystem\stdshaders\debugluxel_ps2x.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">2.0</ShaderModel>
+      <FileType>Document</FileType>
+    </None>
+    <None Include="..\..\..\materialsystem\stdshaders\debugluxel_vs20.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">2.0</ShaderModel>
+      <FileType>Document</FileType>
+    </None>
+    <None Include="..\..\..\materialsystem\stdshaders\debugmorphaccumulator_ps30.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">2.0</ShaderModel>
+      <FileType>Document</FileType>
+    </None>
+    <None Include="..\..\..\materialsystem\stdshaders\debugmorphaccumulator_vs30.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">2.0</ShaderModel>
+      <FileType>Document</FileType>
+    </None>
+    <None Include="..\..\..\materialsystem\stdshaders\debugmrttexture_ps2x.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">2.0</ShaderModel>
+      <FileType>Document</FileType>
+    </None>
+    <None Include="..\..\..\materialsystem\stdshaders\debugmrttexture_vs20.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">2.0</ShaderModel>
+      <FileType>Document</FileType>
+    </None>
+    <None Include="..\..\..\materialsystem\stdshaders\debugtangentspace_vs11.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">2.0</ShaderModel>
+      <FileType>Document</FileType>
+    </None>
+    <None Include="..\..\..\materialsystem\stdshaders\debugtangentspace_vs20.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">2.0</ShaderModel>
+      <FileType>Document</FileType>
+    </None>
+    <None Include="..\..\..\materialsystem\stdshaders\DebugTextureView_ps2x.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">2.0</ShaderModel>
+      <FileType>Document</FileType>
+    </None>
+    <None Include="..\..\..\materialsystem\stdshaders\DebugTextureView_vs20.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">2.0</ShaderModel>
+      <FileType>Document</FileType>
+    </None>
+    <None Include="..\..\..\materialsystem\stdshaders\decalbasetimeslightmapalphablendselfillum2_ps2x.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">2.0</ShaderModel>
+      <FileType>Document</FileType>
+    </None>
+    <None Include="..\..\..\materialsystem\stdshaders\decalmodulate_ps2x.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">2.0</ShaderModel>
+      <FileType>Document</FileType>
+    </None>
+    <None Include="..\..\..\materialsystem\stdshaders\depthtodestalpha_ps20b.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">2.0</ShaderModel>
+      <FileType>Document</FileType>
+    </None>
+    <None Include="..\..\..\materialsystem\stdshaders\depthtodestalpha_vs20.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">2.0</ShaderModel>
+      <FileType>Document</FileType>
+    </None>
+    <None Include="..\..\..\materialsystem\stdshaders\depthwrite_ps2x.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">2.0</ShaderModel>
+      <FileType>Document</FileType>
+    </None>
+    <None Include="..\..\..\materialsystem\stdshaders\depthwrite_vs20.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">2.0</ShaderModel>
+      <FileType>Document</FileType>
+    </None>
+    <None Include="..\..\..\materialsystem\stdshaders\Downsample_nohdr_ps2x.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">2.0</ShaderModel>
+      <FileType>Document</FileType>
+    </None>
+    <None Include="..\..\..\materialsystem\stdshaders\Downsample_ps2x.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">2.0</ShaderModel>
+      <FileType>Document</FileType>
+    </None>
+    <None Include="..\..\..\materialsystem\stdshaders\Downsample_vs11.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">2.0</ShaderModel>
+      <FileType>Document</FileType>
+    </None>
+    <None Include="..\..\..\materialsystem\stdshaders\Downsample_vs20.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">2.0</ShaderModel>
+      <FileType>Document</FileType>
+    </None>
+    <None Include="..\..\..\materialsystem\stdshaders\emissive_scroll_blended_pass_ps2x.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">2.0</ShaderModel>
+      <FileType>Document</FileType>
+    </None>
+    <None Include="..\..\..\materialsystem\stdshaders\emissive_scroll_blended_pass_vs20.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">2.0</ShaderModel>
+      <FileType>Document</FileType>
+    </None>
+    <None Include="..\..\..\materialsystem\stdshaders\Engine_Post_ps2x.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">2.0</ShaderModel>
+      <FileType>Document</FileType>
+    </None>
+    <None Include="..\..\..\materialsystem\stdshaders\example_model_ps20b.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">2.0</ShaderModel>
+      <FileType>Document</FileType>
+    </None>
+    <None Include="..\..\..\materialsystem\stdshaders\example_model_vs20.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">2.0</ShaderModel>
+      <FileType>Document</FileType>
+    </None>
+    <None Include="..\..\..\materialsystem\stdshaders\eyeglint_ps2x.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">2.0</ShaderModel>
+      <FileType>Document</FileType>
+    </None>
+    <None Include="..\..\..\materialsystem\stdshaders\eyeglint_vs20.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">2.0</ShaderModel>
+      <FileType>Document</FileType>
+    </None>
+    <None Include="..\..\..\materialsystem\stdshaders\eyes_flashlight_inc.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">2.0</ShaderModel>
+      <FileType>Document</FileType>
+    </None>
+    <None Include="..\..\..\materialsystem\stdshaders\eyes_flashlight_ps11.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">2.0</ShaderModel>
+      <FileType>Document</FileType>
+    </None>
+    <None Include="..\..\..\materialsystem\stdshaders\eyes_flashlight_ps2x.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">2.0</ShaderModel>
+      <FileType>Document</FileType>
+    </None>
+    <None Include="..\..\..\materialsystem\stdshaders\eyes_flashlight_vs20.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">2.0</ShaderModel>
+      <FileType>Document</FileType>
+    </None>
+    <None Include="..\..\..\materialsystem\stdshaders\eyes_ps2x.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">2.0</ShaderModel>
+      <FileType>Document</FileType>
+    </None>
+    <None Include="..\..\..\materialsystem\stdshaders\Eyes_vs20.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">2.0</ShaderModel>
+      <FileType>Document</FileType>
+    </None>
+    <None Include="..\..\..\materialsystem\stdshaders\eye_refract_ps2x.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">2.0</ShaderModel>
+      <FileType>Document</FileType>
+    </None>
+    <None Include="..\..\..\materialsystem\stdshaders\eye_refract_vs20.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">2.0</ShaderModel>
+      <FileType>Document</FileType>
+    </None>
+    <None Include="..\..\..\materialsystem\stdshaders\fillrate_ps11.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">2.0</ShaderModel>
+      <FileType>Document</FileType>
+    </None>
+    <None Include="..\..\..\materialsystem\stdshaders\fillrate_ps2x.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">2.0</ShaderModel>
+      <FileType>Document</FileType>
+    </None>
+    <None Include="..\..\..\materialsystem\stdshaders\fillrate_vs11.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">2.0</ShaderModel>
+      <FileType>Document</FileType>
+    </None>
+    <None Include="..\..\..\materialsystem\stdshaders\fillrate_vs20.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">2.0</ShaderModel>
+      <FileType>Document</FileType>
+    </None>
+    <None Include="..\..\..\materialsystem\stdshaders\filmdust_ps11.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">2.0</ShaderModel>
+      <FileType>Document</FileType>
+    </None>
+    <None Include="..\..\..\materialsystem\stdshaders\filmdust_ps20.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">2.0</ShaderModel>
+      <FileType>Document</FileType>
+    </None>
+    <None Include="..\..\..\materialsystem\stdshaders\filmgrain_ps11.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">2.0</ShaderModel>
+      <FileType>Document</FileType>
+    </None>
+    <None Include="..\..\..\materialsystem\stdshaders\filmgrain_ps20.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">2.0</ShaderModel>
+      <FileType>Document</FileType>
+    </None>
+    <None Include="..\..\..\materialsystem\stdshaders\filmgrain_vs20.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">2.0</ShaderModel>
+      <FileType>Document</FileType>
+    </None>
+    <None Include="..\..\..\materialsystem\stdshaders\flashlight_ps11.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">2.0</ShaderModel>
+      <FileType>Document</FileType>
+    </None>
+    <None Include="..\..\..\materialsystem\stdshaders\flashlight_ps2x.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">2.0</ShaderModel>
+      <FileType>Document</FileType>
+    </None>
+    <None Include="..\..\..\materialsystem\stdshaders\flesh_interior_blended_pass_ps2x.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">2.0</ShaderModel>
+      <FileType>Document</FileType>
+    </None>
+    <None Include="..\..\..\materialsystem\stdshaders\flesh_interior_blended_pass_vs20.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">2.0</ShaderModel>
+      <FileType>Document</FileType>
+    </None>
+    <None Include="..\..\..\materialsystem\stdshaders\floatcombine_autoexpose_ps2x.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">2.0</ShaderModel>
+      <FileType>Document</FileType>
+    </None>
+    <None Include="..\..\..\materialsystem\stdshaders\floatcombine_ps2x.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">2.0</ShaderModel>
+      <FileType>Document</FileType>
+    </None>
+    <None Include="..\..\..\materialsystem\stdshaders\floattoscreen_notonemap_ps2x.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">2.0</ShaderModel>
+      <FileType>Document</FileType>
+    </None>
+    <None Include="..\..\..\materialsystem\stdshaders\floattoscreen_ps2x.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">2.0</ShaderModel>
+      <FileType>Document</FileType>
+    </None>
+    <None Include="..\..\..\materialsystem\stdshaders\floattoscreen_vanilla_ps2x.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">2.0</ShaderModel>
+      <FileType>Document</FileType>
+    </None>
+    <None Include="..\..\..\materialsystem\stdshaders\haloadd1d_ps2x.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">2.0</ShaderModel>
+      <FileType>Document</FileType>
+    </None>
+    <None Include="..\..\..\materialsystem\stdshaders\haloaddoutline_ps2x.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">2.0</ShaderModel>
+      <FileType>Document</FileType>
+    </None>
+    <None Include="..\..\..\materialsystem\stdshaders\haloadd_ps2x.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">2.0</ShaderModel>
+      <FileType>Document</FileType>
+    </None>
+    <None Include="..\..\..\materialsystem\stdshaders\HDRCombineTo16Bit_ps2x.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">2.0</ShaderModel>
+      <FileType>Document</FileType>
+    </None>
+    <None Include="..\..\..\materialsystem\stdshaders\HDRCombineTo16Bit_vs20.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">2.0</ShaderModel>
+      <FileType>Document</FileType>
+    </None>
+    <None Include="..\..\..\materialsystem\stdshaders\HDRSelectRange_ps2x.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">2.0</ShaderModel>
+      <FileType>Document</FileType>
+    </None>
+    <None Include="..\..\..\materialsystem\stdshaders\HDRSelectRange_vs20.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">2.0</ShaderModel>
+      <FileType>Document</FileType>
+    </None>
+    <None Include="..\..\..\materialsystem\stdshaders\hsl_filmgrain_pass1_ps2x.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">2.0</ShaderModel>
+      <FileType>Document</FileType>
+    </None>
+    <None Include="..\..\..\materialsystem\stdshaders\hsl_filmgrain_pass2_ps2x.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">2.0</ShaderModel>
+      <FileType>Document</FileType>
+    </None>
+    <None Include="..\..\..\materialsystem\stdshaders\hsv_ps2x.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">2.0</ShaderModel>
+      <FileType>Document</FileType>
+    </None>
+    <None Include="..\..\..\materialsystem\stdshaders\IntroScreenSpaceEffect_ps11.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">2.0</ShaderModel>
+      <FileType>Document</FileType>
+    </None>
+    <None Include="..\..\..\materialsystem\stdshaders\IntroScreenSpaceEffect_ps2x.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">2.0</ShaderModel>
+      <FileType>Document</FileType>
+    </None>
+    <None Include="..\..\..\materialsystem\stdshaders\lightingonly_vs20.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">2.0</ShaderModel>
+      <FileType>Document</FileType>
+    </None>
+    <None Include="..\..\..\materialsystem\stdshaders\lightmappedgeneric_decal_ps2x.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">2.0</ShaderModel>
+      <FileType>Document</FileType>
+    </None>
+    <None Include="..\..\..\materialsystem\stdshaders\lightmappedgeneric_decal_vs20.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">2.0</ShaderModel>
+      <FileType>Document</FileType>
+    </None>
+    <None Include="..\..\..\materialsystem\stdshaders\lightmappedgeneric_flashlight_vs11.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">2.0</ShaderModel>
+      <FileType>Document</FileType>
+    </None>
+    <None Include="..\..\..\materialsystem\stdshaders\lightmappedgeneric_flashlight_vs20.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">2.0</ShaderModel>
+      <FileType>Document</FileType>
+    </None>
+    <None Include="..\..\..\materialsystem\stdshaders\lightmappedgeneric_lightingonly_overbright2_ps11.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">2.0</ShaderModel>
+      <FileType>Document</FileType>
+    </None>
+    <None Include="..\..\..\materialsystem\stdshaders\lightmappedgeneric_lightingonly_vs11.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">2.0</ShaderModel>
+      <FileType>Document</FileType>
+    </None>
+    <None Include="..\..\..\materialsystem\stdshaders\lightmappedgeneric_ps11.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">2.0</ShaderModel>
+      <FileType>Document</FileType>
+    </None>
+    <None Include="..\..\..\materialsystem\stdshaders\lightmappedgeneric_ps2x.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">2.0</ShaderModel>
+      <FileType>Document</FileType>
+    </None>
+    <None Include="..\..\..\materialsystem\stdshaders\lightmappedgeneric_vs20.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">2.0</ShaderModel>
+      <FileType>Document</FileType>
+    </None>
+    <None Include="..\..\..\materialsystem\stdshaders\lightmappedreflective_ps2x.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">2.0</ShaderModel>
+      <FileType>Document</FileType>
+    </None>
+    <None Include="..\..\..\materialsystem\stdshaders\lightmappedreflective_vs20.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">2.0</ShaderModel>
+      <FileType>Document</FileType>
+    </None>
+    <None Include="..\..\..\materialsystem\stdshaders\lpreview1_ps2x.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">2.0</ShaderModel>
+      <FileType>Document</FileType>
+    </None>
+    <None Include="..\..\..\materialsystem\stdshaders\lpreview_output_ps2x.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">2.0</ShaderModel>
+      <FileType>Document</FileType>
+    </None>
+    <None Include="..\..\..\materialsystem\stdshaders\luminance_compare_ps2x.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">2.0</ShaderModel>
+      <FileType>Document</FileType>
+    </None>
+    <None Include="..\..\..\materialsystem\stdshaders\modulate_ps2x.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">2.0</ShaderModel>
+      <FileType>Document</FileType>
+    </None>
+    <None Include="..\..\..\materialsystem\stdshaders\monitorscreen_ps2x.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">2.0</ShaderModel>
+      <FileType>Document</FileType>
+    </None>
+    <None Include="..\..\..\materialsystem\stdshaders\morphaccumulate_ps30.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">2.0</ShaderModel>
+      <FileType>Document</FileType>
+    </None>
+    <None Include="..\..\..\materialsystem\stdshaders\morphaccumulate_vs30.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">2.0</ShaderModel>
+      <FileType>Document</FileType>
+    </None>
+    <None Include="..\..\..\materialsystem\stdshaders\morphweight_ps30.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">2.0</ShaderModel>
+      <FileType>Document</FileType>
+    </None>
+    <None Include="..\..\..\materialsystem\stdshaders\morphweight_vs30.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">2.0</ShaderModel>
+      <FileType>Document</FileType>
+    </None>
+    <None Include="..\..\..\materialsystem\stdshaders\motion_blur_ps2x.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">2.0</ShaderModel>
+      <FileType>Document</FileType>
+    </None>
+    <None Include="..\..\..\materialsystem\stdshaders\motion_blur_vs20.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">2.0</ShaderModel>
+      <FileType>Document</FileType>
+    </None>
+    <None Include="..\..\..\materialsystem\stdshaders\particlesphere_ps11.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">2.0</ShaderModel>
+      <FileType>Document</FileType>
+    </None>
+    <None Include="..\..\..\materialsystem\stdshaders\particlesphere_ps2x.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">2.0</ShaderModel>
+      <FileType>Document</FileType>
+    </None>
+    <None Include="..\..\..\materialsystem\stdshaders\particlesphere_vs11.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">2.0</ShaderModel>
+      <FileType>Document</FileType>
+    </None>
+    <None Include="..\..\..\materialsystem\stdshaders\particlesphere_vs20.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">2.0</ShaderModel>
+      <FileType>Document</FileType>
+    </None>
+    <None Include="..\..\..\materialsystem\stdshaders\pbr_ps20b.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">2.0</ShaderModel>
+      <FileType>Document</FileType>
+    </None>
+    <None Include="..\..\..\materialsystem\stdshaders\pbr_ps30.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">2.0</ShaderModel>
+      <FileType>Document</FileType>
+    </None>
+    <None Include="..\..\..\materialsystem\stdshaders\pbr_vs20b.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">2.0</ShaderModel>
+      <FileType>Document</FileType>
+    </None>
+    <None Include="..\..\..\materialsystem\stdshaders\pbr_vs30.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">2.0</ShaderModel>
+      <FileType>Document</FileType>
+    </None>
+    <None Include="..\..\..\materialsystem\stdshaders\portalstaticoverlay_ps11.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">2.0</ShaderModel>
+      <FileType>Document</FileType>
+    </None>
+    <None Include="..\..\..\materialsystem\stdshaders\portalstaticoverlay_ps2x.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">2.0</ShaderModel>
+      <FileType>Document</FileType>
+    </None>
+    <None Include="..\..\..\materialsystem\stdshaders\portalstaticoverlay_vs11.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">2.0</ShaderModel>
+      <FileType>Document</FileType>
+    </None>
+    <None Include="..\..\..\materialsystem\stdshaders\portalstaticoverlay_vs20.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">2.0</ShaderModel>
+      <FileType>Document</FileType>
+    </None>
+    <None Include="..\..\..\materialsystem\stdshaders\portal_ps11.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">2.0</ShaderModel>
+      <FileType>Document</FileType>
+    </None>
+    <None Include="..\..\..\materialsystem\stdshaders\portal_ps2x.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">2.0</ShaderModel>
+      <FileType>Document</FileType>
+    </None>
+    <None Include="..\..\..\materialsystem\stdshaders\portal_refract_ps11.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">2.0</ShaderModel>
+      <FileType>Document</FileType>
+    </None>
+    <None Include="..\..\..\materialsystem\stdshaders\portal_refract_ps2x.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">2.0</ShaderModel>
+      <FileType>Document</FileType>
+    </None>
+    <None Include="..\..\..\materialsystem\stdshaders\portal_refract_vs11.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">2.0</ShaderModel>
+      <FileType>Document</FileType>
+    </None>
+    <None Include="..\..\..\materialsystem\stdshaders\portal_refract_vs20.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">2.0</ShaderModel>
+      <FileType>Document</FileType>
+    </None>
+    <None Include="..\..\..\materialsystem\stdshaders\portal_vs11.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">2.0</ShaderModel>
+      <FileType>Document</FileType>
+    </None>
+    <None Include="..\..\..\materialsystem\stdshaders\portal_vs20.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">2.0</ShaderModel>
+      <FileType>Document</FileType>
+    </None>
+    <None Include="..\..\..\materialsystem\stdshaders\pyro_vision_ps2x.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">2.0</ShaderModel>
+      <FileType>Document</FileType>
+    </None>
+    <None Include="..\..\..\materialsystem\stdshaders\pyro_vision_vs20.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">2.0</ShaderModel>
+      <FileType>Document</FileType>
+    </None>
+    <None Include="..\..\..\materialsystem\stdshaders\refract_ps2x.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">2.0</ShaderModel>
+      <FileType>Document</FileType>
+    </None>
+    <None Include="..\..\..\materialsystem\stdshaders\Refract_vs20.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">2.0</ShaderModel>
+      <FileType>Document</FileType>
+    </None>
+    <None Include="..\..\..\materialsystem\stdshaders\rendertargetblit_ps2x.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">2.0</ShaderModel>
+      <FileType>Document</FileType>
+    </None>
+    <None Include="..\..\..\materialsystem\stdshaders\rendertargetblit_vs20.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">2.0</ShaderModel>
+      <FileType>Document</FileType>
+    </None>
+    <None Include="..\..\..\materialsystem\stdshaders\sample4x4delog_ps2x.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">2.0</ShaderModel>
+      <FileType>Document</FileType>
+    </None>
+    <None Include="..\..\..\materialsystem\stdshaders\sample4x4log_ps2x.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">2.0</ShaderModel>
+      <FileType>Document</FileType>
+    </None>
+    <None Include="..\..\..\materialsystem\stdshaders\sample4x4maxmin_ps2x.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">2.0</ShaderModel>
+      <FileType>Document</FileType>
+    </None>
+    <None Include="..\..\..\materialsystem\stdshaders\sample4x4_blend_ps2x.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">2.0</ShaderModel>
+      <FileType>Document</FileType>
+    </None>
+    <None Include="..\..\..\materialsystem\stdshaders\sample4x4_ps2x.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">2.0</ShaderModel>
+      <FileType>Document</FileType>
+    </None>
+    <None Include="..\..\..\materialsystem\stdshaders\screenspaceeffect_vs11.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">2.0</ShaderModel>
+      <FileType>Document</FileType>
+    </None>
+    <None Include="..\..\..\materialsystem\stdshaders\screenspaceeffect_vs20.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">2.0</ShaderModel>
+      <FileType>Document</FileType>
+    </None>
+    <None Include="..\..\..\materialsystem\stdshaders\sfm_combine_vs20.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">2.0</ShaderModel>
+      <FileType>Document</FileType>
+    </None>
+    <None Include="..\..\..\materialsystem\stdshaders\sfm_integercombine_ps2x.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">2.0</ShaderModel>
+      <FileType>Document</FileType>
+    </None>
+    <None Include="..\..\..\materialsystem\stdshaders\shadowbuildtexture_ps2x.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">2.0</ShaderModel>
+      <FileType>Document</FileType>
+    </None>
+    <None Include="..\..\..\materialsystem\stdshaders\shadowmodel_ps20.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">2.0</ShaderModel>
+      <FileType>Document</FileType>
+    </None>
+    <None Include="..\..\..\materialsystem\stdshaders\shadowmodel_vs20.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">2.0</ShaderModel>
+      <FileType>Document</FileType>
+    </None>
+    <None Include="..\..\..\materialsystem\stdshaders\shadow_ps2x.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">2.0</ShaderModel>
+      <FileType>Document</FileType>
+    </None>
+    <None Include="..\..\..\materialsystem\stdshaders\shadow_vs20.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">2.0</ShaderModel>
+      <FileType>Document</FileType>
+    </None>
+    <None Include="..\..\..\materialsystem\stdshaders\ShatteredGlass_ps2x.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">2.0</ShaderModel>
+      <FileType>Document</FileType>
+    </None>
+    <None Include="..\..\..\materialsystem\stdshaders\ShatteredGlass_vs20.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">2.0</ShaderModel>
+      <FileType>Document</FileType>
+    </None>
+    <None Include="..\..\..\materialsystem\stdshaders\showz_ps2x.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">2.0</ShaderModel>
+      <FileType>Document</FileType>
+    </None>
+    <None Include="..\..\..\materialsystem\stdshaders\showz_vs20.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">2.0</ShaderModel>
+      <FileType>Document</FileType>
+    </None>
+    <None Include="..\..\..\materialsystem\stdshaders\skin_ps20b.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">2.0</ShaderModel>
+      <FileType>Document</FileType>
+    </None>
+    <None Include="..\..\..\materialsystem\stdshaders\skin_vs20.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">2.0</ShaderModel>
+      <FileType>Document</FileType>
+    </None>
+    <None Include="..\..\..\materialsystem\stdshaders\sky_hdr_compressed_ps2x.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">2.0</ShaderModel>
+      <FileType>Document</FileType>
+    </None>
+    <None Include="..\..\..\materialsystem\stdshaders\sky_hdr_compressed_rgbs_ps2x.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">2.0</ShaderModel>
+      <FileType>Document</FileType>
+    </None>
+    <None Include="..\..\..\materialsystem\stdshaders\sky_ps2x.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">2.0</ShaderModel>
+      <FileType>Document</FileType>
+    </None>
+    <None Include="..\..\..\materialsystem\stdshaders\sky_vs20.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">2.0</ShaderModel>
+      <FileType>Document</FileType>
+    </None>
+    <None Include="..\..\..\materialsystem\stdshaders\splinecard_vsxx.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">2.0</ShaderModel>
+      <FileType>Document</FileType>
+    </None>
+    <None Include="..\..\..\materialsystem\stdshaders\spritecard_ps11.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">2.0</ShaderModel>
+      <FileType>Document</FileType>
+    </None>
+    <None Include="..\..\..\materialsystem\stdshaders\spritecard_ps2x.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">2.0</ShaderModel>
+      <FileType>Document</FileType>
+    </None>
+    <None Include="..\..\..\materialsystem\stdshaders\spritecard_vsxx.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">2.0</ShaderModel>
+      <FileType>Document</FileType>
+    </None>
+    <None Include="..\..\..\materialsystem\stdshaders\sprite_ps2x.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">2.0</ShaderModel>
+      <FileType>Document</FileType>
+    </None>
+    <None Include="..\..\..\materialsystem\stdshaders\sprite_vs20.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">2.0</ShaderModel>
+      <FileType>Document</FileType>
+    </None>
+    <None Include="..\..\..\materialsystem\stdshaders\teeth_bump_ps2x.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">2.0</ShaderModel>
+      <FileType>Document</FileType>
+    </None>
+    <None Include="..\..\..\materialsystem\stdshaders\teeth_bump_vs20.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">2.0</ShaderModel>
+      <FileType>Document</FileType>
+    </None>
+    <None Include="..\..\..\materialsystem\stdshaders\teeth_flashlight_ps2x.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">2.0</ShaderModel>
+      <FileType>Document</FileType>
+    </None>
+    <None Include="..\..\..\materialsystem\stdshaders\teeth_flashlight_vs20.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">2.0</ShaderModel>
+      <FileType>Document</FileType>
+    </None>
+    <None Include="..\..\..\materialsystem\stdshaders\teeth_ps2x.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">2.0</ShaderModel>
+      <FileType>Document</FileType>
+    </None>
+    <None Include="..\..\..\materialsystem\stdshaders\teeth_vs20.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">2.0</ShaderModel>
+      <FileType>Document</FileType>
+    </None>
+    <None Include="..\..\..\materialsystem\stdshaders\TreeLeaf_ps2x.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">2.0</ShaderModel>
+      <FileType>Document</FileType>
+    </None>
+    <None Include="..\..\..\materialsystem\stdshaders\TreeLeaf_vs20.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">2.0</ShaderModel>
+      <FileType>Document</FileType>
+    </None>
+    <None Include="..\..\..\materialsystem\stdshaders\unlitgeneric_lightingonly_vs11.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">2.0</ShaderModel>
+      <FileType>Document</FileType>
+    </None>
+    <None Include="..\..\..\materialsystem\stdshaders\UnlitGeneric_MaskBaseByDetailAlpha_ps11.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">2.0</ShaderModel>
+      <FileType>Document</FileType>
+    </None>
+    <None Include="..\..\..\materialsystem\stdshaders\unlitgeneric_notexture_ps11.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">2.0</ShaderModel>
+      <FileType>Document</FileType>
+    </None>
+    <None Include="..\..\..\materialsystem\stdshaders\unlitgeneric_notexture_ps2x.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">2.0</ShaderModel>
+      <FileType>Document</FileType>
+    </None>
+    <None Include="..\..\..\materialsystem\stdshaders\unlitgeneric_ps11.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">2.0</ShaderModel>
+      <FileType>Document</FileType>
+    </None>
+    <None Include="..\..\..\materialsystem\stdshaders\unlitgeneric_ps2x.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">2.0</ShaderModel>
+      <FileType>Document</FileType>
+    </None>
+    <None Include="..\..\..\materialsystem\stdshaders\unlitgeneric_vs20.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">2.0</ShaderModel>
+      <FileType>Document</FileType>
+    </None>
+    <None Include="..\..\..\materialsystem\stdshaders\unlittwotexture_ps2x.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">2.0</ShaderModel>
+      <FileType>Document</FileType>
+    </None>
+    <None Include="..\..\..\materialsystem\stdshaders\unlittwotexture_vs20.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">2.0</ShaderModel>
+      <FileType>Document</FileType>
+    </None>
+    <None Include="..\..\..\materialsystem\stdshaders\vertexlitgeneric_lightingonly_overbright2_ps11.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">2.0</ShaderModel>
+      <FileType>Document</FileType>
+    </None>
+    <None Include="..\..\..\materialsystem\stdshaders\vertexlit_and_unlit_generic_bump_ps2x.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">2.0</ShaderModel>
+      <FileType>Document</FileType>
+    </None>
+    <None Include="..\..\..\materialsystem\stdshaders\vertexlit_and_unlit_generic_bump_vs20.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">2.0</ShaderModel>
+      <FileType>Document</FileType>
+    </None>
+    <None Include="..\..\..\materialsystem\stdshaders\vertexlit_and_unlit_generic_ps2x.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">2.0</ShaderModel>
+      <FileType>Document</FileType>
+    </None>
+    <None Include="..\..\..\materialsystem\stdshaders\vertexlit_and_unlit_generic_vs20.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">2.0</ShaderModel>
+      <FileType>Document</FileType>
+    </None>
+    <None Include="..\..\..\materialsystem\stdshaders\vertexlit_lighting_only_ps2x.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">2.0</ShaderModel>
+      <FileType>Document</FileType>
+    </None>
+    <None Include="..\..\..\materialsystem\stdshaders\volume_clouds_ps2x.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">2.0</ShaderModel>
+      <FileType>Document</FileType>
+    </None>
+    <None Include="..\..\..\materialsystem\stdshaders\volume_clouds_vs20.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">2.0</ShaderModel>
+      <FileType>Document</FileType>
+    </None>
+    <None Include="..\..\..\materialsystem\stdshaders\vortwarp_ps2x.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">2.0</ShaderModel>
+      <FileType>Document</FileType>
+    </None>
+    <None Include="..\..\..\materialsystem\stdshaders\vortwarp_vs20.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">2.0</ShaderModel>
+      <FileType>Document</FileType>
+    </None>
+    <None Include="..\..\..\materialsystem\stdshaders\vr_distort_hud_ps2x.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">2.0</ShaderModel>
+      <FileType>Document</FileType>
+    </None>
+    <None Include="..\..\..\materialsystem\stdshaders\vr_distort_hud_vs20.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">2.0</ShaderModel>
+      <FileType>Document</FileType>
+    </None>
+    <None Include="..\..\..\materialsystem\stdshaders\vr_distort_texture_ps2x.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">2.0</ShaderModel>
+      <FileType>Document</FileType>
+    </None>
+    <None Include="..\..\..\materialsystem\stdshaders\vr_distort_texture_vs20.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">2.0</ShaderModel>
+      <FileType>Document</FileType>
+    </None>
+    <None Include="..\..\..\materialsystem\stdshaders\warp_ps2x.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">2.0</ShaderModel>
+      <FileType>Document</FileType>
+    </None>
+    <None Include="..\..\..\materialsystem\stdshaders\warp_vs20.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">2.0</ShaderModel>
+      <FileType>Document</FileType>
+    </None>
+    <None Include="..\..\..\materialsystem\stdshaders\WaterCheap_ps2x.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">2.0</ShaderModel>
+      <FileType>Document</FileType>
+    </None>
+    <None Include="..\..\..\materialsystem\stdshaders\WaterCheap_vs20.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">2.0</ShaderModel>
+      <FileType>Document</FileType>
+    </None>
+    <None Include="..\..\..\materialsystem\stdshaders\water_ps2x.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">2.0</ShaderModel>
+      <FileType>Document</FileType>
+    </None>
+    <None Include="..\..\..\materialsystem\stdshaders\Water_vs20.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">2.0</ShaderModel>
+      <FileType>Document</FileType>
+    </None>
+    <None Include="..\..\..\materialsystem\stdshaders\weapon_sheen_pass_ps2x.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">2.0</ShaderModel>
+      <FileType>Document</FileType>
+    </None>
+    <None Include="..\..\..\materialsystem\stdshaders\weapon_sheen_pass_vs20.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">2.0</ShaderModel>
+      <FileType>Document</FileType>
+    </None>
+    <None Include="..\..\..\materialsystem\stdshaders\white_ps2x.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">2.0</ShaderModel>
+      <FileType>Document</FileType>
+    </None>
+    <None Include="..\..\..\materialsystem\stdshaders\windowimposter_ps11.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">2.0</ShaderModel>
+      <FileType>Document</FileType>
+    </None>
+    <None Include="..\..\..\materialsystem\stdshaders\windowimposter_ps2x.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">2.0</ShaderModel>
+      <FileType>Document</FileType>
+    </None>
+    <None Include="..\..\..\materialsystem\stdshaders\windowimposter_vs11.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">2.0</ShaderModel>
+      <FileType>Document</FileType>
+    </None>
+    <None Include="..\..\..\materialsystem\stdshaders\windowimposter_vs20.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">2.0</ShaderModel>
+      <FileType>Document</FileType>
+    </None>
+    <None Include="..\..\..\materialsystem\stdshaders\worldtwotextureblend_ps2x.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">2.0</ShaderModel>
+      <FileType>Document</FileType>
+    </None>
+    <None Include="..\..\..\materialsystem\stdshaders\WorldVertexAlpha_ps2x.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">2.0</ShaderModel>
+      <FileType>Document</FileType>
+    </None>
+    <None Include="..\..\..\materialsystem\stdshaders\WorldVertexTransition_ps2x.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">2.0</ShaderModel>
+      <FileType>Document</FileType>
+    </None>
+    <None Include="..\..\..\materialsystem\stdshaders\WorldVertexTransition_vs20.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">2.0</ShaderModel>
+      <FileType>Document</FileType>
+    </None>
+    <None Include="..\..\..\materialsystem\stdshaders\writevertexalphatodestalpha_ps11.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">2.0</ShaderModel>
+      <FileType>Document</FileType>
+    </None>
+    <None Include="..\..\..\materialsystem\stdshaders\writevertexalphatodestalpha_vs11.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">2.0</ShaderModel>
+      <FileType>Document</FileType>
+    </None>
+    <None Include="..\..\..\materialsystem\stdshaders\writez_vs20.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">2.0</ShaderModel>
+      <FileType>Document</FileType>
+    </None>
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

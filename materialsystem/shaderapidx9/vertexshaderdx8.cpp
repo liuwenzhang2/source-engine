@@ -1190,7 +1190,7 @@ const CShaderManager::ShaderCombos_t *CShaderManager::FindOrCreateShaderCombos( 
 		Q_strncpy( filename, GetShaderSourcePath(), MAX_PATH );
 		Q_strncat( filename, "\\", MAX_PATH, COPY_ALL_CHARACTERS );
 		Q_strncat( filename, pShaderName, MAX_PATH, COPY_ALL_CHARACTERS );
-		Q_strncat( filename, ".fxc", MAX_PATH, COPY_ALL_CHARACTERS );
+		Q_strncat( filename, ".hlsl", MAX_PATH, COPY_ALL_CHARACTERS );
 		bOpenResult = g_pFullFileSystem->ReadFile( filename, NULL, bffr );
 
 		if ( !bOpenResult )
@@ -1199,44 +1199,44 @@ const CShaderManager::ShaderCombos_t *CShaderManager::FindOrCreateShaderCombos( 
 			if ( Q_strlen( pShaderName ) >= 3 )
 			{
 				char *pszEndFilename = filename + strlen( filename );
-				if ( !Q_stricmp( pszEndFilename - 6, "30.fxc" ) )
+				if ( !Q_stricmp( pszEndFilename - 7, "30.hlsl" ) )
 				{
 					// Total hack. Who knows what builds that 30 shader?
-					strcpy( pszEndFilename - 6, "20b.fxc" );
+					strcpy( pszEndFilename - 7, "20b.hlsl" );
 					bOpenResult = g_pFullFileSystem->ReadFile( filename, NULL, bffr );
 					if ( !bOpenResult )
 					{
-						strcpy( pszEndFilename - 6, "2x.fxc" );
+						strcpy( pszEndFilename - 7, "2x.hlsl" );
 						bOpenResult = g_pFullFileSystem->ReadFile( filename, NULL, bffr );
 					}
 					if ( !bOpenResult )
 					{
-						strcpy( pszEndFilename - 6, "20.fxc" );
+						strcpy( pszEndFilename - 7, "20.hlsl" );
 						bOpenResult = g_pFullFileSystem->ReadFile( filename, NULL, bffr );
 					}
 				}
 				else
 				{
-					if ( !stricmp( pszEndFilename - 6, "20.fxc" ) )
+					if ( !stricmp( pszEndFilename - 7, "20.hlsl" ) )
 					{
-						pszEndFilename[ -5 ] = 'x';
+						pszEndFilename[ -6 ] = 'x';
 					}
-					else if ( !stricmp( pszEndFilename - 7, "20b.fxc" ) )
+					else if ( !stricmp( pszEndFilename - 8, "20b.hlsl" ) )
 					{
-						strcpy( pszEndFilename - 7, "2x.fxc" );
+						strcpy( pszEndFilename - 8, "2x.hlsl" );
 						--pszEndFilename;
 					}
-					else if ( !stricmp( pszEndFilename - 6, "11.fxc" ) )
+					else if ( !stricmp( pszEndFilename - 7, "11.hlsl" ) )
 					{
-						strcpy( pszEndFilename - 6, "xx.fxc" );
+						strcpy( pszEndFilename - 7, "xx.hlsl" );
 					}
 
 					bOpenResult = g_pFullFileSystem->ReadFile( filename, NULL, bffr );
 					if ( !bOpenResult )
 					{
-						if ( !stricmp( pszEndFilename - 6, "2x.fxc" ) )
+						if ( !stricmp( pszEndFilename - 7, "2x.hlsl" ) )
 						{
-							pszEndFilename[ -6 ] = 'x';
+							pszEndFilename[ -7 ] = 'x';
 							bOpenResult = g_pFullFileSystem->ReadFile( filename, NULL, bffr );
 						}
 					}
@@ -1665,7 +1665,7 @@ HardwareShader_t CShaderManager::CompileShader( const char *pShaderName,
 	Q_strncpy( filename, GetShaderSourcePath(), MAX_PATH );
 	Q_strncat( filename, "\\", MAX_PATH, COPY_ALL_CHARACTERS );
 	Q_strncat( filename, pShaderName, MAX_PATH, COPY_ALL_CHARACTERS );
-	Q_strncat( filename, ".fxc", MAX_PATH, COPY_ALL_CHARACTERS );
+	Q_strncat( filename, ".hlsl", MAX_PATH, COPY_ALL_CHARACTERS );
 	
 	const char *pShaderModel = FileNameToShaderModel( pShaderName, bVertexShader );
 	
@@ -1707,44 +1707,44 @@ retry_compile:
 		if ( strlen( pShaderName ) >= 3 )
 		{
 			char *pszEndFilename = filename + strlen( filename );
-			if ( !Q_stricmp( pszEndFilename - 6, "30.fxc" ) )
+			if ( !Q_stricmp( pszEndFilename - 7, "30.hlsl" ) )
 			{
-				strcpy( pszEndFilename - 6, "20b.fxc" );
+				strcpy( pszEndFilename - 7, "20b.hlsl" );
 				fp = g_pFullFileSystem->Open( filename, "r" );
 				if ( fp == FILESYSTEM_INVALID_HANDLE )
 				{
-					strcpy( pszEndFilename - 6, "2x.fxc" );
+					strcpy( pszEndFilename - 7, "2x.hlsl" );
 					fp = g_pFullFileSystem->Open( filename, "r" );
 				}
 				if ( fp == FILESYSTEM_INVALID_HANDLE )
 				{
-					strcpy( pszEndFilename - 6, "20.fxc" );
+					strcpy( pszEndFilename - 7, "20.hlsl" );
 					fp = g_pFullFileSystem->Open( filename, "r" );
 				}
 			}
 			else
 			{
-				if ( !Q_stricmp( pszEndFilename - 6, "20.fxc" ) )
+				if ( !Q_stricmp( pszEndFilename - 7, "20.hlsl" ) )
 				{
-					pszEndFilename[ -5 ] = 'x';
+					pszEndFilename[ -6 ] = 'x';
 					fp = g_pFullFileSystem->Open( filename, "r" );
 				}
-				else if ( !Q_stricmp( pszEndFilename - 7, "20b.fxc" ) )
+				else if ( !Q_stricmp( pszEndFilename - 8, "20b.hlsl" ) )
 				{
-					strcpy( pszEndFilename - 7, "2x.fxc" );
+					strcpy( pszEndFilename - 8, "2x.hlsl" );
 					fp = g_pFullFileSystem->Open( filename, "r" );
 				}
-				else if ( !stricmp( pszEndFilename - 6, "11.fxc" ) )
+				else if ( !stricmp( pszEndFilename - 7, "11.hlsl" ) )
 				{
-					strcpy( pszEndFilename - 6, "xx.fxc" );
+					strcpy( pszEndFilename - 7, "xx.hlsl" );
 					fp = g_pFullFileSystem->Open( filename, "r" );
 				}
 
 				if ( fp == FILESYSTEM_INVALID_HANDLE )
 				{
-					if ( !stricmp( pszEndFilename - 6, "2x.fxc" ) )
+					if ( !stricmp( pszEndFilename - 7, "2x.hlsl" ) )
 					{
-						pszEndFilename[ -6 ] = 'x';
+						pszEndFilename[ -7 ] = 'x';
 						fp = g_pFullFileSystem->Open( filename, "r" );
 					}
 				}
@@ -1777,7 +1777,7 @@ retry_compile:
 		char pSendbuf[SEND_BUF_SIZE], pRecvbuf[RECV_BUF_SIZE], pFixedFilename[MAX_PATH], buf[MAX_PATH];
 		V_FixupPathName( pFixedFilename, MAX_PATH, filename );
 		V_FileBase( pFixedFilename, buf, MAX_PATH ); // Just find base filename
-		V_strncat( buf, ".fxc", MAX_PATH );
+		V_strncat( buf, ".hlsl", MAX_PATH );
 		V_snprintf( pSendbuf, SEND_BUF_SIZE, "%s\n", buf );
 		V_strncat( pSendbuf, pShaderModel, SEND_BUF_SIZE );
 		V_strncat( pSendbuf, "\n", SEND_BUF_SIZE );
