@@ -284,8 +284,9 @@ void CShaderSystem::ModShutdown()
 	{
 		if ( m_ShaderDLLs[i].m_bModShaderDLL )
 		{
-			UnloadShaderDLL(i);
 			delete[] m_ShaderDLLs[i].m_pFileName;
+			m_ShaderDLLs[i].m_ShaderDict.PurgeAndDeleteElements();
+			UnloadShaderDLL(i);
 			m_ShaderDLLs.Remove( i );
 		}
 	}
@@ -424,8 +425,9 @@ void CShaderSystem::UnloadAllShaderDLLs()
 
 	for ( int i = m_ShaderDLLs.Count(); --i >= 0; )
 	{
-		UnloadShaderDLL(i);
 		delete[] m_ShaderDLLs[i].m_pFileName;
+		m_ShaderDLLs[i].m_ShaderDict.PurgeAndDeleteElements();
+		UnloadShaderDLL(i);
 	}
 
 	m_ShaderDLLs.RemoveAll();
@@ -605,9 +607,10 @@ void CShaderSystem::UnloadShaderDLL( const char *pFullPath )
 	int nShaderDLLIndex = FindShaderDLL( pFullPath );
 	if ( nShaderDLLIndex >= 0 )
 	{
-		UnloadShaderDLL( nShaderDLLIndex );
 		delete[] m_ShaderDLLs[nShaderDLLIndex].m_pFileName;
-		m_ShaderDLLs.Remove( nShaderDLLIndex ); 
+		m_ShaderDLLs[nShaderDLLIndex].m_ShaderDict.PurgeAndDeleteElements();
+		UnloadShaderDLL(nShaderDLLIndex);
+		m_ShaderDLLs.Remove( nShaderDLLIndex );
 	}
 }
 

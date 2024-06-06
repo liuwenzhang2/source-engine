@@ -25,28 +25,7 @@
 //-----------------------------------------------------------------------------
 class IMaterialVar;
 
-//-----------------------------------------------------------------------------
-// Standard material vars
-//-----------------------------------------------------------------------------
-// Note: if you add to these, add to s_StandardParams in CBaseShader.cpp
-enum ShaderMaterialVars_t
-{
-	FLAGS = 0,
-	FLAGS_DEFINED,	// mask indicating if the flag was specified
-	FLAGS2,
-	FLAGS_DEFINED2,
-	COLOR,
-	ALPHA,
-	BASETEXTURE,
-	FRAME,
-	BASETEXTURETRANSFORM,
-	FLASHLIGHTTEXTURE,
-	FLASHLIGHTTEXTUREFRAME,
-	COLOR2,
-	SRGBTINT,
 
-	NUM_SHADER_MATERIAL_VARS
-};
 
 
 // Alpha belnd mode enums. Moved from basevsshader
@@ -88,15 +67,26 @@ enum BlendType_t
 	BT_BLENDADD
 };
 
-
+class CShaderParam;
 //-----------------------------------------------------------------------------
 // Base class for shaders, contains helper methods.
 //-----------------------------------------------------------------------------
 class CBaseShader : public IShader
 {
+	friend class CShaderParam;
 public:
 	// constructor
-	CBaseShader();
+	CBaseShader(const char* pName, const char* pHelpString, int nFlags);
+	virtual ~CBaseShader();
+
+	char const* GetName() const
+	{
+		return m_pName;
+	}
+	int GetFlags() const
+	{
+		return m_nFlags;
+	}
 
 	// Methods inherited from IShader
 	virtual char const* GetFallbackShader( IMaterialVar** params ) const { return 0; }
@@ -273,18 +263,75 @@ public:
 	static IMaterialVar **s_ppParams;
 
 protected:
+	const char* m_pName = NULL;
+	const char* m_HelpString = NULL;
+	int m_nFlags = 0;
 	SoftwareVertexShader_t m_SoftwareVertexShader;
+	CUtlVector<CShaderParam*> m_ShaderParams;
+	CShaderParam* m_pShaderParamOverrides[NUM_SHADER_MATERIAL_VARS];
+
 
 	static const char *s_pTextureGroupName; // Current material's texture group name.
 	static IShaderShadow *s_pShaderShadow;
 	static IShaderDynamicAPI *s_pShaderAPI;
 	static IShaderInit *s_pShaderInit;
-
 private:
 	static int s_nModulationFlags;
 	static CMeshBuilder *s_pMeshBuilder;
 };
 
+class CShaderParam
+{
+public:
+	
+	CShaderParam(int index, const char* pName, ShaderParamType_t type, const char* pDefaultParam, const char* pHelp, int nFlags)
+	{
+		m_pName = pName;
+		m_Type = type;
+		m_pDefaultValue = pDefaultParam;
+		m_pHelp = pHelp;
+		m_nFlags = nFlags;
+		m_nIndex = index;
+	}
+
+	~CShaderParam()
+	{
+		Msg("%s", "aaa");
+	}
+
+	const char* GetName()
+	{
+		return m_pName;
+	}
+
+	ShaderParamType_t GetType()
+	{
+		return m_Type;
+	}
+
+	const char* GetDefault()
+	{
+		return m_pDefaultValue;
+	}
+
+	int GetFlags() const
+	{
+		return m_nFlags;
+	}
+
+	const char* GetHelp()
+	{
+		return m_pHelp;
+	}
+
+private:
+	int m_nIndex = -1;
+	const char* m_pName = NULL;
+	const char* m_pHelp = NULL;
+	ShaderParamType_t m_Type = (ShaderParamType_t)0;
+	const char* m_pDefaultValue = NULL;
+	int m_nFlags = 0;
+};
 
 //-----------------------------------------------------------------------------
 // Gets at the current materialvar flags

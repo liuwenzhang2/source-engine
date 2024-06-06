@@ -18,6 +18,7 @@
 #include "tier1/strtools.h"
 #include "convar.h"
 #include "tier0/vprof.h"
+#include "shaderlib/cshader.h"
 
 // NOTE: This must be the last include file in a .cpp file!
 #include "tier0/memdbgon.h"
@@ -38,35 +39,47 @@ static ConVar mat_fullbright( "mat_fullbright","0", FCVAR_CHEAT );
 bool g_shaderConfigDumpEnable = false; //true;		//DO NOT CHECK IN ENABLED FIXME
 
 //-----------------------------------------------------------------------------
-// constructor
-//-----------------------------------------------------------------------------
-CBaseShader::CBaseShader()
-{
-}
-
-
-//-----------------------------------------------------------------------------
 // Shader parameter info
 //-----------------------------------------------------------------------------
 // Look in BaseShader.h for the enumeration for these.
 // Update there if you update here.
+static int s_Index = 0;
 static ShaderParamInfo_t s_StandardParams[NUM_SHADER_MATERIAL_VARS] =
 {
-	{ "$flags",				"flags",			SHADER_PARAM_TYPE_INTEGER,	"0", SHADER_PARAM_NOT_EDITABLE },
-	{ "$flags_defined",		"flags_defined",	SHADER_PARAM_TYPE_INTEGER,	"0", SHADER_PARAM_NOT_EDITABLE },
-	{ "$flags2",  			"flags2",			SHADER_PARAM_TYPE_INTEGER,	"0", SHADER_PARAM_NOT_EDITABLE },
-	{ "$flags_defined2",	"flags2_defined",	SHADER_PARAM_TYPE_INTEGER,	"0", SHADER_PARAM_NOT_EDITABLE },
-	{ "$color",		 		"color",			SHADER_PARAM_TYPE_COLOR,	"[1 1 1]", 0 },
-	{ "$alpha",	   			"alpha",			SHADER_PARAM_TYPE_FLOAT,	"1.0", 0 },
-	{ "$basetexture",  		"Base Texture with lighting built in", SHADER_PARAM_TYPE_TEXTURE, "shadertest/BaseTexture", 0 },
-	{ "$frame",	  			"Animation Frame",	SHADER_PARAM_TYPE_INTEGER,	"0", 0 },
-	{ "$basetexturetransform", "Base Texture Texcoord Transform",SHADER_PARAM_TYPE_MATRIX,	"center .5 .5 scale 1 1 rotate 0 translate 0 0", 0 },
-	{ "$flashlighttexture",  		"flashlight spotlight shape texture", SHADER_PARAM_TYPE_TEXTURE, "effects/flashlight001", SHADER_PARAM_NOT_EDITABLE },
-	{ "$flashlighttextureframe",	"Animation Frame for $flashlight",	SHADER_PARAM_TYPE_INTEGER, "0", SHADER_PARAM_NOT_EDITABLE },
-	{ "$color2",		 		"color2",			SHADER_PARAM_TYPE_COLOR,	"[1 1 1]", 0 },
-	{ "$srgbtint",		 		"tint value to be applied when running on new-style srgb parts",			SHADER_PARAM_TYPE_COLOR,	"[1 1 1]", 0 },
+	{ s_Index, "$flags",				"flags",			SHADER_PARAM_TYPE_INTEGER,	"0", SHADER_PARAM_NOT_EDITABLE, NULL },
+	{ s_Index, "$flags_defined",		"flags_defined",	SHADER_PARAM_TYPE_INTEGER,	"0", SHADER_PARAM_NOT_EDITABLE, NULL },
+	{ s_Index, "$flags2",  			"flags2",			SHADER_PARAM_TYPE_INTEGER,	"0", SHADER_PARAM_NOT_EDITABLE, NULL },
+	{ s_Index, "$flags_defined2",	"flags2_defined",	SHADER_PARAM_TYPE_INTEGER,	"0", SHADER_PARAM_NOT_EDITABLE, NULL },
+	{ s_Index, "$color",		 		"color",			SHADER_PARAM_TYPE_COLOR,	"[1 1 1]", 0, NULL },
+	{ s_Index, "$alpha",	   			"alpha",			SHADER_PARAM_TYPE_FLOAT,	"1.0", 0, NULL },
+	{ s_Index, "$basetexture",  		"Base Texture with lighting built in", SHADER_PARAM_TYPE_TEXTURE, "shadertest/BaseTexture", 0, NULL },
+	{ s_Index, "$frame",	  			"Animation Frame",	SHADER_PARAM_TYPE_INTEGER,	"0", 0, NULL },
+	{ s_Index, "$basetexturetransform", "Base Texture Texcoord Transform",SHADER_PARAM_TYPE_MATRIX,	"center .5 .5 scale 1 1 rotate 0 translate 0 0", 0, NULL },
+	{ s_Index, "$flashlighttexture",  		"flashlight spotlight shape texture", SHADER_PARAM_TYPE_TEXTURE, "effects/flashlight001", SHADER_PARAM_NOT_EDITABLE, NULL },
+	{ s_Index, "$flashlighttextureframe",	"Animation Frame for $flashlight",	SHADER_PARAM_TYPE_INTEGER, "0", SHADER_PARAM_NOT_EDITABLE, NULL },
+	{ s_Index, "$color2",		 		"color2",			SHADER_PARAM_TYPE_COLOR,	"[1 1 1]", 0, NULL },
+	{ s_Index, "$srgbtint",		 		"tint value to be applied when running on new-style srgb parts",			SHADER_PARAM_TYPE_COLOR,	"[1 1 1]", 0, NULL },
 };
 
+//-----------------------------------------------------------------------------
+// constructor
+//-----------------------------------------------------------------------------
+CBaseShader::CBaseShader(const char* pName, const char* pHelpString, int nFlags)
+:m_pName(pName), m_HelpString(pHelpString), m_nFlags(nFlags)
+{
+	for (int i = 0; i < NUM_SHADER_MATERIAL_VARS; i++) {
+		if (s_StandardParams[i].m_nIndex != m_ShaderParams.Count()) {
+			Error("data error");
+		}
+		CShaderParam* pShaderParam = new CShaderParam(s_StandardParams[i].m_nIndex, s_StandardParams[i].m_pName, s_StandardParams[i].m_Type, s_StandardParams[i].m_pDefaultValue, s_StandardParams[i].m_pHelp, s_StandardParams[i].m_nFlags);
+		m_ShaderParams.AddToTail(pShaderParam);
+	}
+}
+
+CBaseShader::~CBaseShader()
+{
+	m_ShaderParams.RemoveAll();
+}
 
 //-----------------------------------------------------------------------------
 // Gets the standard shader parameter names
@@ -74,37 +87,37 @@ static ShaderParamInfo_t s_StandardParams[NUM_SHADER_MATERIAL_VARS] =
 //-----------------------------------------------------------------------------
 int CBaseShader::GetNumParams( ) const
 { 
-	return NUM_SHADER_MATERIAL_VARS; 
+	return m_ShaderParams.Count();
 }
 
 char const* CBaseShader::GetParamName( int nParamIndex ) const
 {
-	Assert( nParamIndex < NUM_SHADER_MATERIAL_VARS );
-	return s_StandardParams[nParamIndex].m_pName;
+	Assert(nParamIndex < m_ShaderParams.Count());
+	return m_ShaderParams[nParamIndex]->GetName();
 }
 
 const char *CBaseShader::GetParamHelp( int nParamIndex ) const
 {
-	Assert( nParamIndex < NUM_SHADER_MATERIAL_VARS );
-	return s_StandardParams[nParamIndex].m_pHelp;
+	Assert(nParamIndex < m_ShaderParams.Count());
+	return m_ShaderParams[nParamIndex]->GetHelp();
 }
 
 ShaderParamType_t CBaseShader::GetParamType( int nParamIndex ) const
 {
-	Assert( nParamIndex < NUM_SHADER_MATERIAL_VARS );
-	return s_StandardParams[nParamIndex].m_Type;
+	Assert(nParamIndex < m_ShaderParams.Count());
+	return m_ShaderParams[nParamIndex]->GetType();
 }
 
 const char *CBaseShader::GetParamDefault( int nParamIndex ) const
 {
-	Assert( nParamIndex < NUM_SHADER_MATERIAL_VARS );
-	return s_StandardParams[nParamIndex].m_pDefaultValue;
+	Assert(nParamIndex < m_ShaderParams.Count());
+	return m_ShaderParams[nParamIndex]->GetDefault();
 }
 
 int CBaseShader::GetParamFlags( int nParamIndex ) const
 {
-	Assert( nParamIndex < NUM_SHADER_MATERIAL_VARS );
-	return s_StandardParams[nParamIndex].m_nFlags;
+	Assert( nParamIndex < m_ShaderParams.Count());
+	return m_ShaderParams[nParamIndex]->GetFlags();
 }
 
 //-----------------------------------------------------------------------------

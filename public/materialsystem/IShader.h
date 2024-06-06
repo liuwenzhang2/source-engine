@@ -47,10 +47,62 @@ class IShaderInit;
 class CBasePerMaterialContextData;
 
 //-----------------------------------------------------------------------------
+// Standard material vars
+//-----------------------------------------------------------------------------
+// Note: if you add to these, add to s_StandardParams in CBaseShader.cpp
+enum ShaderMaterialVars_t
+{
+	FLAGS = 0,
+	FLAGS_DEFINED,	// mask indicating if the flag was specified
+	FLAGS2,
+	FLAGS_DEFINED2,
+	COLOR,
+	ALPHA,
+	BASETEXTURE,
+	FRAME,
+	BASETEXTURETRANSFORM,
+	FLASHLIGHTTEXTURE,
+	FLASHLIGHTTEXTUREFRAME,
+	COLOR2,
+	SRGBTINT,
+
+	NUM_SHADER_MATERIAL_VARS
+};
+
+//-----------------------------------------------------------------------------
 // Information about each shader parameter
 //-----------------------------------------------------------------------------
 struct ShaderParamInfo_t
 {
+	ShaderParamInfo_t(int& index, const char* pName, const char* pHelp, ShaderParamType_t type, const char* pDefaultParam, int nFlags, CUtlVector<ShaderParamInfo_t*>* pList) {
+		m_nIndex = index++;
+		m_pName = pName;
+		m_Type = type;
+		m_pDefaultValue = pDefaultParam;
+		m_pHelp = pHelp;
+		m_nFlags = nFlags;
+		if (pList) {
+			pList->AddToTail(this);
+		}
+	}
+
+	ShaderParamInfo_t(ShaderMaterialVars_t var, ShaderParamType_t type, const char* pDefaultParam, const char* pHelp, int nFlags, CUtlVector<ShaderParamInfo_t*>* pList) {
+		m_nIndex = var;
+		m_pName = "override";
+		m_Type = type;
+		m_pDefaultValue = pDefaultParam;
+		m_pHelp = pHelp;
+		m_nFlags = nFlags;
+		if (pList) {
+			pList->AddToTail(this);
+		}
+	}
+
+	operator int()
+	{
+		return m_nIndex;
+	}
+	int m_nIndex;
 	const char *m_pName;
 	const char *m_pHelp;
 	ShaderParamType_t m_Type;
@@ -68,6 +120,7 @@ struct ShaderParamInfo_t
 abstract_class IShader
 {
 public:
+	virtual ~IShader() {}
 	// Returns the shader name
 	virtual char const* GetName( ) const = 0;
 

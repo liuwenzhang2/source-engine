@@ -71,6 +71,11 @@
 class CBaseVSShader : public CBaseShader
 {
 public:
+	CBaseVSShader(const char* pName, const char* pHelpString, int nFlags) 
+	:CBaseShader(pName, pHelpString, nFlags)
+	{
+		
+	}
 
 	// Loads bump lightmap coordinates into the pixel shader
 	void LoadBumpLightmapCoordinateAxes_PixelShader( int pixelReg );
