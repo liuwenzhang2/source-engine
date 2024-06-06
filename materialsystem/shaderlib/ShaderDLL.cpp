@@ -30,16 +30,20 @@ public:
 	// methods of IShaderDLL
 	virtual bool Connect( CreateInterfaceFn factory );
 	virtual void Disconnect();
-	virtual int ShaderCount() const;
-	virtual IShader *GetShader( int nShader );
+	//virtual int ShaderCount() const;
+	virtual int ShaderFactoryCount() const;
+	//virtual IShader *GetShader( int nShader );
+	virtual IShaderFactory* GetShaderFactory(int nShaderFactory);
 
 	// methods of IShaderDLLInternal
 	virtual bool Connect( CreateInterfaceFn factory, bool bIsMaterialSystem );
 	virtual void Disconnect( bool bIsMaterialSystem );
-	virtual void InsertShader( IShader *pShader );
+	//virtual void InsertShader( IShader *pShader );
+	virtual void InsertShaderFactory(IShaderFactory* pShaderFactory);
 
 private:
-	CUtlVector< IShader * >	m_ShaderList;
+	//CUtlVector< IShader * >	m_ShaderList;
+	CUtlVector< IShaderFactory* >	m_ShaderFactoryList;
 };
 
 
@@ -144,26 +148,42 @@ void CShaderDLL::Disconnect()
 //-----------------------------------------------------------------------------
 // Iterates over all shaders
 //-----------------------------------------------------------------------------
-int CShaderDLL::ShaderCount() const
+//int CShaderDLL::ShaderCount() const
+//{
+//	return m_ShaderList.Count();
+//}
+
+int CShaderDLL::ShaderFactoryCount() const
 {
-	return m_ShaderList.Count();
+	return m_ShaderFactoryList.Count();
 }
 
-IShader *CShaderDLL::GetShader( int nShader ) 
-{
-	if ( ( nShader < 0 ) || ( nShader >= m_ShaderList.Count() ) )
+//IShader *CShaderDLL::GetShader( int nShader ) 
+//{
+//	if ( ( nShader < 0 ) || ( nShader >= m_ShaderList.Count() ) )
+//		return NULL;
+//
+//	return m_ShaderList[nShader];
+//}
+
+IShaderFactory* CShaderDLL::GetShaderFactory(int nShaderFactory) {
+	if ((nShaderFactory < 0) || (nShaderFactory >= m_ShaderFactoryList.Count()))
 		return NULL;
 
-	return m_ShaderList[nShader];
+	return m_ShaderFactoryList[nShaderFactory];
 }
-
 
 //-----------------------------------------------------------------------------
 // Adds to the shader lists
 //-----------------------------------------------------------------------------
-void CShaderDLL::InsertShader( IShader *pShader )
-{
-	Assert( pShader );
-	m_ShaderList.AddToTail( pShader );
-}
+//void CShaderDLL::InsertShader( IShader *pShader )
+//{
+//	Assert( pShader );
+//	m_ShaderList.AddToTail( pShader );
+//}
 
+void CShaderDLL::InsertShaderFactory(IShaderFactory* pShaderFactory)
+{
+	Assert(pShaderFactory);
+	m_ShaderFactoryList.AddToTail(pShaderFactory);
+}

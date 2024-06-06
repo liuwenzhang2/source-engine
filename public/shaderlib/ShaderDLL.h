@@ -21,6 +21,12 @@
 class IShader;
 class ICvar;
 
+class IShaderFactory {
+public:
+	virtual const char* GetName() = 0;
+	virtual IShader* CreateShader() = 0;
+};
+
 //-----------------------------------------------------------------------------
 // The standard implementation of CShaderDLL
 //-----------------------------------------------------------------------------
@@ -28,7 +34,10 @@ class IShaderDLL
 {
 public:
 	// Adds a shader to the list of shaders
-	virtual void InsertShader( IShader *pShader ) = 0;
+	//virtual void InsertShader( IShader *pShader ) = 0;
+
+	virtual void InsertShaderFactory(IShaderFactory* pShaderFactory) = 0;
+
 };
 
 

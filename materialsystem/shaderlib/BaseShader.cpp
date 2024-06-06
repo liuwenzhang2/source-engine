@@ -42,7 +42,6 @@ bool g_shaderConfigDumpEnable = false; //true;		//DO NOT CHECK IN ENABLED FIXME
 //-----------------------------------------------------------------------------
 CBaseShader::CBaseShader()
 {
-	GetShaderDLL()->InsertShader( this );
 }
 
 

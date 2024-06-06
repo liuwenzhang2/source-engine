@@ -682,12 +682,12 @@ void CShaderSystem::SetupShaderDictionary( int nShaderDLLIndex )
 	// I'm not sure if that makes this system any less secure than it already is
 	int i;
 	ShaderDLLInfo_t &info = m_ShaderDLLs[nShaderDLLIndex];
-	int nCount = info.m_pShaderDLL->ShaderCount();
+	int nCount = info.m_pShaderDLL->ShaderFactoryCount();
 	for ( i = 0; i < nCount; ++i )
 	{
-		IShader *pShader = info.m_pShaderDLL->GetShader( i );
-		const char *pShaderName = pShader->GetName();
-
+		IShaderFactory *pShaderFactory = info.m_pShaderDLL->GetShaderFactory( i );
+		const char *pShaderName = pShaderFactory->GetName();
+		IShader* pShader = pShaderFactory->CreateShader();
 #ifdef POSIX
 		if (CommandLine()->FindParm("-glmspew"))
 			printf("CShaderSystem::SetupShaderDictionary: %s", pShaderName );

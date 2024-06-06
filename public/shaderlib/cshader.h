@@ -210,7 +210,23 @@ inline bool CShader_IsFlag2Set( IMaterialVar **params, MaterialVarFlags2_t _flag
 	public:
 			
 #define END_SHADER }; \
-	static CShader s_ShaderInstance;\
+	class CShaderFactory : public IShaderFactory {\
+	public:\
+		CShaderFactory() {\
+			GetShaderDLL()->InsertShaderFactory(this);\
+		}\
+		\
+		const char* GetName()\
+		{\
+			return s_Name;\
+		}\
+		\
+		IShader* CreateShader()\
+		{\
+			return new CShader();\
+		}\
+	};\
+	static CShaderFactory s_ShaderFactoryInstance;\
 } // namespace
 
 

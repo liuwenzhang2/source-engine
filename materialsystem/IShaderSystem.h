@@ -24,7 +24,7 @@
 enum Sampler_t;
 class ITexture;
 class IShader;
-
+class IShaderFactory;
 
 //-----------------------------------------------------------------------------
 // The Shader system interface version
@@ -88,10 +88,11 @@ public:
 	virtual void Disconnect( bool bIsMaterialSystem ) = 0;
 
 	// Returns the number of shaders defined in this DLL
-	virtual int ShaderCount() const = 0;
-
+	//virtual int ShaderCount() const = 0;
+	virtual int ShaderFactoryCount() const = 0;
 	// Returns information about each shader defined in this DLL
-	virtual IShader *GetShader( int nShader ) = 0;
+	//virtual IShader *GetShader( int nShader ) = 0;
+	virtual IShaderFactory* GetShaderFactory(int nShaderFactory) = 0;
 };
 
 
