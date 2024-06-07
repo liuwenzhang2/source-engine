@@ -1688,12 +1688,12 @@ public:
 	}
 
 	// Used to iterate over all shaders for editing purposes
-	virtual int	 ShaderCount() const
+	virtual int	 ShaderFactoryCount() const
 	{
 		return 0;
 	}
 
-	virtual int  GetShaders( int nFirstShader, int nCount, IShader **ppShaderList ) const
+	virtual int  GetShaderFactorys( int nFirstShader, int nCount, IShaderFactory **ppShaderFactoryList ) const
 	{
 		return 0;
 	}

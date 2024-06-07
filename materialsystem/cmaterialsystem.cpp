@@ -4120,14 +4120,14 @@ void CMaterialSystem::ToggleDebugMaterial( char const* pMaterialName )
 //-----------------------------------------------------------------------------
 // Used to iterate over all shaders for editing purposes
 //-----------------------------------------------------------------------------
-int CMaterialSystem::ShaderCount() const
+int CMaterialSystem::ShaderFactoryCount() const
 {
-	return ShaderSystem()->ShaderCount();
+	return ShaderSystem()->ShaderFactoryCount();
 }
 
-int CMaterialSystem::GetShaders( int nFirstShader, int nMaxCount, IShader **ppShaderList ) const
+int CMaterialSystem::GetShaderFactorys( int nFirstShader, int nMaxCount, IShaderFactory **ppShaderFactoryList ) const
 {
-	return ShaderSystem()->GetShaders( nFirstShader, nMaxCount, ppShaderList );
+	return ShaderSystem()->GetShaderFactorys( nFirstShader, nMaxCount, ppShaderFactoryList );
 }
 
 
@@ -4153,9 +4153,9 @@ void CMaterialSystem::GetShaderFallback( const char *pShaderName, char *pFallbac
 {
 	// FIXME: This is pretty much a hack. We need a better way for the
 	// editor to get ahold of shader fallbacks
-	int nCount = ShaderCount();
-	IShader** ppShaderList = (IShader**)_alloca( nCount * sizeof(IShader) );
-	GetShaders( 0, nCount, ppShaderList );
+	int nCount = ShaderFactoryCount();
+	IShaderFactory** ppShaderList = (IShaderFactory**)_alloca( nCount * sizeof(IShaderFactory) );
+	GetShaderFactorys( 0, nCount, ppShaderList );
 
 	do
 	{
@@ -4176,7 +4176,9 @@ void CMaterialSystem::GetShaderFallback( const char *pShaderName, char *pFallbac
 		// Found a match
 		// FIXME: Theoretically, getting fallbacks should require a param list
 		// In practice, it looks rare or maybe even neved done
-		const char *pFallback = ppShaderList[i]->GetFallbackShader( NULL );
+		IShader* pShader = ppShaderList[i]->CreateShader();
+		const char *pFallback = pShader->GetFallbackShader( NULL );
+		delete pShader;
 		if ( !pFallback )
 		{
 			Q_strncpy( pFallbackShader, pShaderName, nFallbackLength );

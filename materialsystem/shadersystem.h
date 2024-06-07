@@ -175,8 +175,8 @@ public:
 	virtual bool		LoadShaderDLL( const char *pFullPath ) = 0;
 	virtual void		UnloadShaderDLL( const char *pFullPath ) = 0;
 
-	// Find me a shader!
-	virtual IShader*	FindShader( char const* pShaderName ) = 0;
+	// Find me a shader Factory!
+	virtual IShaderFactory*	FindShaderFactory( char const* pShaderName ) = 0;
 
 	// returns strings associated with the shader state flags...
 	virtual char const* ShaderStateString( int i ) const = 0;
@@ -208,8 +208,8 @@ public:
 							   uint32 nMaterialVarTimeStamp ) = 0;
 
 	// Used to iterate over all shaders for editing purposes
-	virtual int	 ShaderCount() const = 0;
-	virtual int  GetShaders( int nFirstShader, int nCount, IShader **ppShaderList ) const = 0;
+	virtual int	 ShaderFactoryCount() const = 0;
+	virtual int  GetShaderFactorys( int nFirstShader, int nCount, IShaderFactory **ppShaderFactoryList ) const = 0;
 };
 
 

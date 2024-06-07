@@ -155,4 +155,10 @@ public:
 //	virtual const ShaderParamInfo_t& GetParamInfo( int paramIndex ) const = 0;
 };
 
+class IShaderFactory {
+public:
+	virtual const char* GetName() = 0;
+	virtual IShader* CreateShader() = 0;
+};
+
 #endif // ISHADER_H

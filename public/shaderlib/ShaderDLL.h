@@ -18,14 +18,8 @@
 //-----------------------------------------------------------------------------
 // forward declarations
 //-----------------------------------------------------------------------------
-class IShader;
+//class IShader;
 class ICvar;
-
-class IShaderFactory {
-public:
-	virtual const char* GetName() = 0;
-	virtual IShader* CreateShader() = 0;
-};
 
 //-----------------------------------------------------------------------------
 // The standard implementation of CShaderDLL

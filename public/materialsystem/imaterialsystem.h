@@ -48,6 +48,7 @@ class ITextureCompositor;
 struct MaterialSystemHardwareIdentifier_t;
 class KeyValues;
 class IShader;
+class IShaderFactory;
 class IVertexTexture;
 class IMorph;
 class IMatRenderContext;
@@ -745,8 +746,8 @@ public:
 
 	// Used to iterate over all shaders for editing purposes
 	// GetShaders returns the number of shaders it actually found
-	virtual int					ShaderCount() const = 0;
-	virtual int					GetShaders( int nFirstShader, int nMaxCount, IShader **ppShaderList ) const = 0;
+	virtual int					ShaderFactoryCount() const = 0;
+	virtual int					GetShaderFactorys( int nFirstShader, int nMaxCount, IShaderFactory **ppShaderFactoryList ) const = 0;
 
 	// FIXME: Is there a better way of doing this?
 	// Returns shader flag names for editors to be able to edit them

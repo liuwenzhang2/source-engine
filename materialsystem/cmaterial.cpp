@@ -537,7 +537,7 @@ CMaterial::~CMaterial()
 #if defined( _DEBUG )
 	delete [] m_pDebugName;
 #endif
-
+	delete m_pShader;
 	// Deliberately stomp our VTable so that we can detect cases where code tries to access freed materials.
 	int *p = (int *)this;
 	*p = 0xc0dedbad;
@@ -1470,7 +1470,8 @@ KeyValues* CMaterial::InitializeShader( KeyValues &keyValues, KeyValues &patchKe
 		pShaderName = szShaderName;
 	}
 
-	IShader* pShader;
+	IShaderFactory* pShaderFactory = NULL;
+	IShader* pShader = NULL;
 	IMaterialVar* ppVars[256];
 	char pFallbackShaderNameBuf[256];
 	char pFallbackMaterialNameBuf[256];
@@ -1482,8 +1483,8 @@ KeyValues* CMaterial::InitializeShader( KeyValues &keyValues, KeyValues &patchKe
 	{
 		// Find the shader for this material. Note that this may not be
 		// the actual shader we use due to fallbacks...
-		pShader = ShaderSystem()->FindShader( pShaderName );
-		if ( !pShader )
+		pShaderFactory = ShaderSystem()->FindShaderFactory( pShaderName );
+		if ( !pShaderFactory )
 		{
 			if ( g_pShaderDevice->IsUsingGraphics() )
 			{
@@ -1492,7 +1493,7 @@ KeyValues* CMaterial::InitializeShader( KeyValues &keyValues, KeyValues &patchKe
 			}
 
 			pShaderName = MissingShaderName();
-			pShader = ShaderSystem()->FindShader( pShaderName );
+			pShaderFactory = ShaderSystem()->FindShaderFactory( pShaderName );
 
 			if ( !HushAsserts() )
 			{
@@ -1500,7 +1501,7 @@ KeyValues* CMaterial::InitializeShader( KeyValues &keyValues, KeyValues &patchKe
 			}
 
 #ifndef DEDICATED
-			if ( !pShader ) 
+			if ( !pShaderFactory ) 
 	 		{
 #ifdef LINUX
 				// Exit out here. We're running into issues where this material is returned in a horribly broken
@@ -1529,6 +1530,7 @@ KeyValues* CMaterial::InitializeShader( KeyValues &keyValues, KeyValues &patchKe
 			}
 		}
 
+		pShader = pShaderFactory->CreateShader();
 		// Here we must set up all flags + material vars that the shader needs
 		// because it may look at them when choosing shader fallback.
 		varCount = ParseMaterialVars( pShader, keyValues, pFallbackSection, modelDefault, ppVars, nFindContext );
@@ -1552,6 +1554,8 @@ KeyValues* CMaterial::InitializeShader( KeyValues &keyValues, KeyValues &patchKe
 		{
 			break;
 		}
+		delete pShader;
+		pShader = NULL;
 		// Copy off the shader name, as it may be in a materialvar in the shader
 		// because we're about to delete all materialvars
 		Q_strncpy( pFallbackShaderNameBuf, pShaderName, 256 );
@@ -1719,8 +1723,9 @@ void CMaterial::SetupErrorShader()
 
 	// We had a failure; replace it with a valid shader...
 
-	m_pShader = ShaderSystem()->FindShader( MissingShaderName() );
-	Assert( m_pShader );
+	IShaderFactory* pShaderFactory = ShaderSystem()->FindShaderFactory(MissingShaderName());
+	Assert(pShaderFactory);
+	m_pShader = pShaderFactory->CreateShader();
 
 	// Create undefined vars for all the actual material vars
 	m_VarCount = m_pShader->GetNumParams();
@@ -2517,7 +2522,8 @@ void CMaterial::SetShader( const char *pShaderName )
 	Assert( pShaderName );
 
 	int i;
-	IShader* pShader;
+	IShaderFactory* pShaderFactory = NULL;
+	IShader* pShader = NULL;
 	IMaterialVar* ppVars[256];
 	int iVarCount = 0;
 
@@ -2529,16 +2535,17 @@ void CMaterial::SetShader( const char *pShaderName )
 	{
 		// Find the shader for this material. Note that this may not be
 		// the actual shader we use due to fallbacks...
-		pShader = ShaderSystem()->FindShader( pShaderName );
-		if (!pShader)
+		pShaderFactory = ShaderSystem()->FindShaderFactory( pShaderName );
+		if (!pShaderFactory)
 		{
 			// Couldn't find the shader we wanted to use; it's not defined...
 			Warning( "SetShader: Couldn't find shader %s for material %s!\n", pShaderName, GetName() );
 			pShaderName = MissingShaderName();
-			pShader = ShaderSystem()->FindShader( pShaderName );
-			Assert( pShader );
+			pShaderFactory = ShaderSystem()->FindShaderFactory( pShaderName );
+			Assert(pShaderFactory);
 		}
 
+		pShader = pShaderFactory->CreateShader();
 		// Create undefined vars for all the actual material vars
 		iVarCount = pShader->GetNumParams();
 		for (i = 0; i < iVarCount; ++i)

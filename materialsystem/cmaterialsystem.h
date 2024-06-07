@@ -277,8 +277,8 @@ public:
 	// -----------------------------------------------------------
 	// Shaders
 	// -----------------------------------------------------------
-	int										ShaderCount() const;
-	int										GetShaders( int nFirstShader, int nCount, IShader **ppShaderList ) const;
+	int										ShaderFactoryCount() const;
+	int										GetShaderFactorys( int nFirstShader, int nCount, IShaderFactory **ppShaderFactoryList ) const;
 	int										ShaderFlagCount() const;
 	const char *							ShaderFlagName( int nIndex ) const;
 	void									GetShaderFallback( const char *pShaderName, char *pFallbackShader, int nFallbackLength );
