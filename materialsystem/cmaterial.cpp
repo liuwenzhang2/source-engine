@@ -1530,7 +1530,7 @@ KeyValues* CMaterial::InitializeShader( KeyValues &keyValues, KeyValues &patchKe
 			}
 		}
 
-		pShader = pShaderFactory->CreateShader();
+		pShader = pShaderFactory ? pShaderFactory->CreateShader() : NULL;
 		// Here we must set up all flags + material vars that the shader needs
 		// because it may look at them when choosing shader fallback.
 		varCount = ParseMaterialVars( pShader, keyValues, pFallbackSection, modelDefault, ppVars, nFindContext );
