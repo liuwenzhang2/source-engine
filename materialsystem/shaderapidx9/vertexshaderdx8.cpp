@@ -87,7 +87,7 @@ typedef int SOCKET;
 #include "../utils/bzip2/bzlib.h"
 
 #else
-#undef small;
+#undef small
 int BZ2_bzBuffToBuffDecompress( 
       char*         dest, 
       unsigned int* destLen,
