@@ -5025,7 +5025,7 @@ void CMaterialSystem::Unlock( MaterialLock_t hMaterialLock )
 	{
 		if ( pRenderContext->GetCallQueueInternal() )
 		{
-			ThreadAcquire();
+			ThreadAcquire(true);
 		}
 	}
 
