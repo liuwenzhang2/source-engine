@@ -550,7 +550,7 @@ void CVMTPreviewPanel::SetupProjectionMatrix( int nWidth, int nHeight )
 
 	CMatRenderContextPtr pRenderContext( MaterialSystem() );
 	pRenderContext->MatrixMode( MATERIAL_PROJECTION );
-	pRenderContext->LoadMatrix( proj );
+	pRenderContext->LoadVMatrix( proj );
 }
 
 

@@ -3761,7 +3761,7 @@ bool CClientShadowMgr::DrawRenderToTextureShadow( unsigned short clientShadowHan
 		pRenderContext->ClearBuffers( true, false );
 
 		pRenderContext->MatrixMode( MATERIAL_VIEW );
-		pRenderContext->LoadMatrix( shadowmgr->GetInfo( shadow.m_ShadowHandle ).m_WorldToShadow );
+		pRenderContext->LoadVMatrix( shadowmgr->GetInfo( shadow.m_ShadowHandle ).m_WorldToShadow );
    
 		if ( DrawShadowHierarchy( pRenderable, shadow ) )
 		{

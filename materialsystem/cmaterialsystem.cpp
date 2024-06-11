@@ -1073,7 +1073,7 @@ IMatRenderContext *CMaterialSystem::GetRenderContext()
 		pResult = &m_HardwareRenderContext;
 		m_pRenderContext.Set( &m_HardwareRenderContext );
 	}
-	return RetAddRef( pResult ); 
+	return pResult;
 }
 
 //-----------------------------------------------------------------------------
@@ -1115,7 +1115,7 @@ IMatRenderContext *CMaterialSystem::SetRenderContext( IMatRenderContext *pNewCon
 	IMatRenderContext *pOldContext = m_pRenderContext.Get();
 	if ( pNewContext )
 	{
-		pNewContext->AddRef();
+		//pNewContext->AddRef();
 		m_pRenderContext.Set( assert_cast<IMatRenderContextInternal *>(pNewContext) );
 	}
 	else

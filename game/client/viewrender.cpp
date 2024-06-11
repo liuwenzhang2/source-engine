@@ -2632,8 +2632,8 @@ bool DoesViewPlaneIntersectWater( float waterZ, int leafWaterDataID )
 	CMatRenderContextPtr pRenderContext( materials );
 	
 	VMatrix viewMatrix, projectionMatrix, viewProjectionMatrix, inverseViewProjectionMatrix;
-	pRenderContext->GetMatrix( MATERIAL_VIEW, &viewMatrix );
-	pRenderContext->GetMatrix( MATERIAL_PROJECTION, &projectionMatrix );
+	pRenderContext->GetVMatrix( MATERIAL_VIEW, &viewMatrix );
+	pRenderContext->GetVMatrix( MATERIAL_PROJECTION, &projectionMatrix );
 	MatrixMultiply( projectionMatrix, viewMatrix, viewProjectionMatrix );
 	MatrixInverseGeneral( viewProjectionMatrix, inverseViewProjectionMatrix );
 

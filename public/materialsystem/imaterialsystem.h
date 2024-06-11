@@ -1120,7 +1120,7 @@ private:
 //-----------------------------------------------------------------------------
 // 
 //-----------------------------------------------------------------------------
-abstract_class IMatRenderContext : public IRefCounted
+abstract_class IMatRenderContext //: public IRefCounted
 {
 public:
 	virtual void				BeginRender() = 0;
@@ -1173,13 +1173,13 @@ public:
 	virtual void				MatrixMode( MaterialMatrixMode_t matrixMode ) = 0;
 	virtual void				PushMatrix( void ) = 0;
 	virtual void				PopMatrix( void ) = 0;
-	virtual void				LoadMatrix( VMatrix const& matrix ) = 0;
+	virtual void				LoadVMatrix( VMatrix const& matrix ) = 0;
 	virtual void				LoadMatrix( matrix3x4_t const& matrix ) = 0;
-	virtual void				MultMatrix( VMatrix const& matrix ) = 0;
+	virtual void				MultVMatrix( VMatrix const& matrix ) = 0;
 	virtual void				MultMatrix( matrix3x4_t const& matrix ) = 0;
-	virtual void				MultMatrixLocal( VMatrix const& matrix ) = 0;
+	virtual void				MultVMatrixLocal( VMatrix const& matrix ) = 0;
 	virtual void				MultMatrixLocal( matrix3x4_t const& matrix ) = 0;
-	virtual void				GetMatrix( MaterialMatrixMode_t matrixMode, VMatrix *matrix ) = 0;
+	virtual void				GetVMatrix( MaterialMatrixMode_t matrixMode, VMatrix *matrix ) = 0;
 	virtual void				GetMatrix( MaterialMatrixMode_t matrixMode, matrix3x4_t *matrix ) = 0;
 	virtual void				LoadIdentity( void ) = 0;
 	virtual void				Ortho( double left, double top, double right, double bottom, double zNear, double zFar ) = 0;
@@ -1765,24 +1765,59 @@ inline const E& CMatRenderData<E>::operator[]( int i ) const
 
 //-----------------------------------------------------------------------------
 
-class CMatRenderContextPtr : public CRefPtr<IMatRenderContext>
+class CMatRenderContextPtr //: public CRefPtr<IMatRenderContext>
 {
-	typedef CRefPtr<IMatRenderContext> BaseClass;
+	//typedef CRefPtr<IMatRenderContext> BaseClass;
 public:
 	CMatRenderContextPtr() = default;
-	CMatRenderContextPtr( IMatRenderContext *pInit )			: BaseClass( pInit )						{ if ( BaseClass::m_pObject ) BaseClass::m_pObject->BeginRender(); }
-	CMatRenderContextPtr( IMaterialSystem *pFrom )				: BaseClass( pFrom->GetRenderContext() )	{ if ( BaseClass::m_pObject ) BaseClass::m_pObject->BeginRender(); }
-	~CMatRenderContextPtr()																					{ if ( BaseClass::m_pObject ) BaseClass::m_pObject->EndRender(); }
+	CMatRenderContextPtr(IMatRenderContext* pInit) 
+	{ 
+		m_pMatRenderContext = pInit; 
+		m_pMatRenderContext->BeginRender(); 
+	}//: BaseClass(pInit) { if (BaseClass::m_pObject) BaseClass::m_pObject->BeginRender(); }
+	CMatRenderContextPtr(IMaterialSystem* pFrom) 
+	{ 
+		m_pMatRenderContext = pFrom->GetRenderContext(); 
+		m_pMatRenderContext->BeginRender(); 
+	}//			: BaseClass(pFrom->GetRenderContext()) { if (BaseClass::m_pObject) BaseClass::m_pObject->BeginRender(); }
+	~CMatRenderContextPtr() 
+	{ 
+		if (m_pMatRenderContext)
+			m_pMatRenderContext->EndRender(); 
+	}// { if (BaseClass::m_pObject) BaseClass::m_pObject->EndRender(); }
 
-	IMatRenderContext *operator=( IMatRenderContext *p )		{ if ( p ) p->BeginRender(); return BaseClass::operator=( p ); }
+	IMatRenderContext* operator=(IMatRenderContext* p) 
+	{ 
+		if (m_pMatRenderContext)
+			m_pMatRenderContext->EndRender();
+		m_pMatRenderContext = p; 
+		m_pMatRenderContext->BeginRender(); 
+		return m_pMatRenderContext;
+	}// { if (p) p->BeginRender();  return BaseClass::operator=(p); }
 
-	void SafeRelease()											{ if ( BaseClass::m_pObject ) BaseClass::m_pObject->EndRender(); BaseClass::SafeRelease(); }
-	void AssignAddRef( IMatRenderContext *pFrom )				{ if ( BaseClass::m_pObject ) BaseClass::m_pObject->EndRender(); BaseClass::AssignAddRef( pFrom ); BaseClass::m_pObject->BeginRender(); }
+	void SafeRelease() 
+	{ 
+		if (m_pMatRenderContext)
+			m_pMatRenderContext->EndRender(); 
+		m_pMatRenderContext = NULL;
+	}// { if (BaseClass::m_pObject) BaseClass::m_pObject->EndRender(); BaseClass::SafeRelease(); }
+	//void AssignAddRef( IMatRenderContext *pFrom )				{ if ( BaseClass::m_pObject ) BaseClass::m_pObject->EndRender(); BaseClass::AssignAddRef( pFrom ); BaseClass::m_pObject->BeginRender(); }
 
-	void GetFrom( IMaterialSystem *pFrom )						{ AssignAddRef( pFrom->GetRenderContext() ); }
+	void GetFrom(IMaterialSystem* pFrom) 
+	{ 
+		if (m_pMatRenderContext)
+			m_pMatRenderContext->EndRender(); 
+		m_pMatRenderContext = pFrom->GetRenderContext(); 
+		m_pMatRenderContext->BeginRender(); 
+	}// { AssignAddRef(pFrom->GetRenderContext()); }
 
-
+	IMatRenderContext* operator->() { return m_pMatRenderContext; }
+	bool        operator !() const { return (!m_pMatRenderContext); }
+	operator const IMatRenderContext* () const { return m_pMatRenderContext; }
+	operator const IMatRenderContext* () { return m_pMatRenderContext; }
+	operator IMatRenderContext* () { return m_pMatRenderContext; }
 private:
+	IMatRenderContext* m_pMatRenderContext = NULL;
 	CMatRenderContextPtr( const CMatRenderContextPtr &from );
 	void operator=( const CMatRenderContextPtr &from );
 

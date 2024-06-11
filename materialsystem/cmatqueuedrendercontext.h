@@ -169,10 +169,10 @@ public:
 	void									MatrixMode( MaterialMatrixMode_t);
 	void									PushMatrix();
 	void									PopMatrix();
-	void									LoadMatrix( const VMatrix& matrix );
+	void									LoadVMatrix( const VMatrix& matrix );
 	void									LoadMatrix( const matrix3x4_t& matrix );
-	void									MultMatrix( const VMatrix& matrix );
-	void									MultMatrixLocal( const VMatrix& matrix );
+	void									MultVMatrix( const VMatrix& matrix );
+	void									MultVMatrixLocal( const VMatrix& matrix );
 	void									MultMatrix( const matrix3x4_t& matrix );
 	void									MultMatrixLocal( const matrix3x4_t& matrix );
 	void									LoadIdentity();

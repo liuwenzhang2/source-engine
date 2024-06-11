@@ -1209,7 +1209,7 @@ public:
 	}
 */
 	// Methods that use VMatrix
-	virtual void		LoadMatrix( const VMatrix& matrix )
+	virtual void		LoadVMatrix( const VMatrix& matrix )
 	{
 	}
 
@@ -1221,25 +1221,25 @@ public:
 	{
 	}
 
-	virtual void		MultMatrix( const VMatrix& matrix )
+	virtual void		MultVMatrix( const VMatrix& matrix )
 	{
 	}
 
 	virtual void		MultMatrix( const matrix3x4_t& matrix )
 	{
 	}
-	virtual void		MultMatrixLocal( const VMatrix& matrix )
+	virtual void		MultVMatrixLocal( const VMatrix& matrix )
 	{
 	}
 
 	virtual void		MultMatrixLocal( const matrix3x4_t& matrix )
 	{
 	}
-	virtual void				GetMatrix( MaterialMatrixMode_t matrixMode, VMatrix *pMatrix )
+	virtual void		GetVMatrix( MaterialMatrixMode_t matrixMode, VMatrix *pMatrix )
 	{
 		pMatrix->Identity();
 	}
-	virtual void				GetMatrix( MaterialMatrixMode_t matrixMode, matrix3x4_t *pMatrix )
+	virtual void		GetMatrix( MaterialMatrixMode_t matrixMode, matrix3x4_t *pMatrix )
 	{
 		SetIdentityMatrix( *pMatrix );
 	}
@@ -2081,12 +2081,12 @@ public:
 
 	virtual IMatRenderContext *CreateRenderContext( MaterialContextType_t type )
 	{
-		return RetAddRef( (IMatRenderContext *)this );
+		return (IMatRenderContext *)this;
 	}
 
 	virtual IMatRenderContext *SetRenderContext( IMatRenderContext *pContext )
 	{
-		SafeRelease( pContext );
+		//SafeRelease( pContext );
 		return RetAddRef( this );
 	}
 	virtual IVertexBuffer *		GetDynamicVertexBuffer( /*VertexFormat_t vertexFormat, */bool buffered = true )

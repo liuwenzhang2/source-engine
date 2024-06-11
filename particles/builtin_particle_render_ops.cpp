@@ -373,7 +373,7 @@ void C_OP_RenderSprites::RenderNonSpriteCardCameraFacing( CParticleCollection *p
 	VMatrix tempView;
 
 	// Store matrices off so we can restore them in RenderEnd().
-	pRenderContext->GetMatrix(MATERIAL_VIEW, &tempView);
+	pRenderContext->GetVMatrix(MATERIAL_VIEW, &tempView);
 
 	// Force the user clip planes to use the old view matrix
 	pRenderContext->EnableUserClipTransformOverride( true );
@@ -2349,7 +2349,7 @@ void C_OP_RenderScreenVelocityRotate::Render( IMatRenderContext *pRenderContext,
 	VMatrix tempView;
 
 	// Store matrices off so we can restore them in RenderEnd().
-	pRenderContext->GetMatrix(MATERIAL_VIEW, &tempView);
+	pRenderContext->GetVMatrix(MATERIAL_VIEW, &tempView);
 
 	int nParticles;
 	const ParticleRenderData_t *pSortList = pParticles->GetRenderList( pRenderContext, false, &nParticles, &pCtx->m_VisibilityData );

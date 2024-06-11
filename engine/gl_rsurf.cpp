@@ -4570,7 +4570,7 @@ public:
 			pRenderContext->MatrixMode( MATERIAL_MODEL );
 			pRenderContext->PushMatrix();
 			g_BrushToWorldMatrix.SetupMatrixOrgAngles( origin, angles );
-			pRenderContext->LoadMatrix( g_BrushToWorldMatrix );
+			pRenderContext->LoadVMatrix( g_BrushToWorldMatrix );
 			modelorg = g_BrushToWorldMatrix.VMul4x3Transpose(g_EngineRenderer->ViewOrigin());
 		}
 	}

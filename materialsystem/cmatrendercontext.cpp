@@ -479,7 +479,7 @@ void CMatRenderContextBase::PopMatrix()
 	CurrentMatrixChanged();
 }
 
-void CMatRenderContextBase::LoadMatrix( const VMatrix& matrix )
+void CMatRenderContextBase::LoadVMatrix( const VMatrix& matrix )
 {
 	m_pCurMatrixItem->matrix = matrix;
 	m_pCurMatrixItem->flags = MSF_DIRTY; // clearing identity implicitly
@@ -493,7 +493,7 @@ void CMatRenderContextBase::LoadMatrix( const matrix3x4_t& matrix )
 	CurrentMatrixChanged();
 }
 
-void CMatRenderContextBase::MultMatrix( const VMatrix& matrix )
+void CMatRenderContextBase::MultVMatrix( const VMatrix& matrix )
 {
 	VMatrix result;
 
@@ -505,10 +505,10 @@ void CMatRenderContextBase::MultMatrix( const VMatrix& matrix )
 
 void CMatRenderContextBase::MultMatrix( const matrix3x4_t& matrix )
 {
-	CMatRenderContextBase::MultMatrix( VMatrix( matrix ) );
+	CMatRenderContextBase::MultVMatrix( VMatrix( matrix ) );
 }
 
-void CMatRenderContextBase::MultMatrixLocal( const VMatrix& matrix )
+void CMatRenderContextBase::MultVMatrixLocal( const VMatrix& matrix )
 {
 	VMatrix result;
 	MatrixMultiply( m_pCurMatrixItem->matrix, matrix, result );
@@ -519,7 +519,7 @@ void CMatRenderContextBase::MultMatrixLocal( const VMatrix& matrix )
 
 void CMatRenderContextBase::MultMatrixLocal( const matrix3x4_t& matrix )
 {
-	CMatRenderContextBase::MultMatrixLocal( VMatrix( matrix ) );
+	CMatRenderContextBase::MultVMatrixLocal( VMatrix( matrix ) );
 }
 
 void CMatRenderContextBase::LoadIdentity()
@@ -568,7 +568,7 @@ void CMatRenderContextBase::PickMatrix( int x, int y, int nWidth, int nHeight )
 	mat.m[0][3] = -2.0 * px / pw;
 	mat.m[1][3] = -2.0 * py / ph;
 
-	CMatRenderContextBase::MultMatrixLocal( mat );
+	CMatRenderContextBase::MultVMatrixLocal( mat );
 }
 
 void CMatRenderContextBase::Rotate( float flAngle, float x, float y, float z )
@@ -587,10 +587,10 @@ void CMatRenderContextBase::Scale( float x, float y, float z )
 {
 	VMatrix mat;
 	MatrixBuildScale( mat, x, y, z );
-	CMatRenderContextBase::MultMatrixLocal( mat );
+	CMatRenderContextBase::MultVMatrixLocal( mat );
 }
 
-void CMatRenderContextBase::GetMatrix( MaterialMatrixMode_t matrixMode, VMatrix *pMatrix )
+void CMatRenderContextBase::GetVMatrix( MaterialMatrixMode_t matrixMode, VMatrix *pMatrix )
 {
 	CUtlStack<MatrixStackItem_t> &stack = m_MatrixStacks[ matrixMode ];
 
@@ -874,8 +874,8 @@ void CMatRenderContextBase::RecomputeViewProjState()
 		VMatrix viewMatrix, projMatrix;
 
 		// FIXME: Should consider caching this upon change for projection or view matrix.
-		GetMatrix( MATERIAL_VIEW, &viewMatrix );
-		GetMatrix( MATERIAL_PROJECTION, &projMatrix );
+		GetVMatrix( MATERIAL_VIEW, &viewMatrix );
+		GetVMatrix( MATERIAL_PROJECTION, &projMatrix );
 		m_viewProjMatrix = projMatrix * viewMatrix;
 		m_bDirtyViewProjState = false;
 	}
@@ -1282,9 +1282,9 @@ void CMatRenderContext::PopMatrix()
 	}
 }
 
-void CMatRenderContext::LoadMatrix( const VMatrix& matrix )
+void CMatRenderContext::LoadVMatrix( const VMatrix& matrix )
 {
-	CMatRenderContextBase::LoadMatrix( matrix );
+	CMatRenderContextBase::LoadVMatrix( matrix );
 	ForceSync();
 	if ( ShouldValidateMatrices() )
 	{
@@ -1308,9 +1308,9 @@ void CMatRenderContext::LoadMatrix( const matrix3x4_t& matrix )
 	}
 }
 
-void CMatRenderContext::MultMatrix( const VMatrix& matrix )
+void CMatRenderContext::MultVMatrix( const VMatrix& matrix )
 {
-	CMatRenderContextBase::MultMatrix( matrix );
+	CMatRenderContextBase::MultVMatrix( matrix );
 	ForceSync();
 	if ( ShouldValidateMatrices() )
 	{
@@ -1323,7 +1323,7 @@ void CMatRenderContext::MultMatrix( const VMatrix& matrix )
 
 void CMatRenderContext::MultMatrix( const matrix3x4_t& matrix )
 {
-	CMatRenderContextBase::MultMatrix( VMatrix( matrix ) );
+	CMatRenderContextBase::MultVMatrix( VMatrix( matrix ) );
 	ForceSync();
 	if ( ShouldValidateMatrices() )
 	{
@@ -1334,9 +1334,9 @@ void CMatRenderContext::MultMatrix( const matrix3x4_t& matrix )
 	}
 }
 
-void CMatRenderContext::MultMatrixLocal( const VMatrix& matrix )
+void CMatRenderContext::MultVMatrixLocal( const VMatrix& matrix )
 {
-	CMatRenderContextBase::MultMatrixLocal( matrix );
+	CMatRenderContextBase::MultVMatrixLocal( matrix );
 	ForceSync();
 	if ( ShouldValidateMatrices() )
 	{
@@ -1349,7 +1349,7 @@ void CMatRenderContext::MultMatrixLocal( const VMatrix& matrix )
 
 void CMatRenderContext::MultMatrixLocal( const matrix3x4_t& matrix )
 {
-	CMatRenderContextBase::MultMatrixLocal( VMatrix( matrix ) );
+	CMatRenderContextBase::MultVMatrixLocal( VMatrix( matrix ) );
 	ForceSync();
 	if ( ShouldValidateMatrices() )
 	{
@@ -1448,9 +1448,9 @@ void CMatRenderContext::Scale( float x, float y, float z )
 	}
 }
 
-void CMatRenderContext::GetMatrix( MaterialMatrixMode_t matrixMode, VMatrix *pMatrix )
+void CMatRenderContext::GetVMatrix( MaterialMatrixMode_t matrixMode, VMatrix *pMatrix )
 {
-	CMatRenderContextBase::GetMatrix( matrixMode, pMatrix );
+	CMatRenderContextBase::GetVMatrix( matrixMode, pMatrix );
 
 	ForceSync();
 	if ( ShouldValidateMatrices() )
@@ -1473,7 +1473,7 @@ void CMatRenderContext::GetMatrix( MaterialMatrixMode_t matrixMode, matrix3x4_t 
 	else
 	{
 		VMatrix matrix;
-		CMatRenderContext::GetMatrix( matrixMode, &matrix );
+		CMatRenderContext::GetVMatrix( matrixMode, &matrix );
 		*pMatrix = matrix.As3x4();
 	}
 }

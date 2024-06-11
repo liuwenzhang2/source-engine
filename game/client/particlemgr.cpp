@@ -812,8 +812,8 @@ void CParticleEffectBinding::RenderStart( VMatrix &tempModel, VMatrix &tempView 
 		CMatRenderContextPtr pRenderContext( m_pParticleMgr->m_pMaterialSystem );
 
 		// Store matrices off so we can restore them in RenderEnd().
-		pRenderContext->GetMatrix(MATERIAL_VIEW, &tempView);
-		pRenderContext->GetMatrix(MATERIAL_MODEL, &tempModel);
+		pRenderContext->GetVMatrix(MATERIAL_VIEW, &tempView);
+		pRenderContext->GetVMatrix(MATERIAL_MODEL, &tempModel);
 
 		// We're gonna assume the model matrix was identity and blow it off
 		// This means that the particle positions are all specified in world space
@@ -858,11 +858,11 @@ void CParticleEffectBinding::RenderEnd( VMatrix &tempModel, VMatrix &tempView )
 
 		// Reset the model matrix.
 		pRenderContext->MatrixMode( MATERIAL_MODEL );
-		pRenderContext->LoadMatrix( tempModel );
+		pRenderContext->LoadVMatrix( tempModel );
 
 		// Reset the view matrix.
 		pRenderContext->MatrixMode( MATERIAL_VIEW );
-		pRenderContext->LoadMatrix( tempView );
+		pRenderContext->LoadVMatrix( tempView );
 	}
 }
 

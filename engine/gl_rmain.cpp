@@ -656,11 +656,11 @@ void CRender::Push3DView( const CViewSetup &view, int nFlags, ITexture* pRenderT
 
 		pRenderContext->MatrixMode( MATERIAL_PROJECTION );
 		pRenderContext->PushMatrix();
-		pRenderContext->LoadMatrix( m_matrixProjection );
+		pRenderContext->LoadVMatrix( m_matrixProjection );
 
 		pRenderContext->MatrixMode( MATERIAL_VIEW );
 		pRenderContext->PushMatrix();
-		pRenderContext->LoadMatrix( m_matrixView );
+		pRenderContext->LoadVMatrix( m_matrixView );
 
 		pRenderContext->MatrixMode( MATERIAL_MODEL );
 		pRenderContext->PushMatrix();

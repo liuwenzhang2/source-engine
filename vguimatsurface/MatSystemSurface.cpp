@@ -642,7 +642,7 @@ void CMatSystemSurface::StartDrawingIn3DSpace( const VMatrix &screenToWorld, int
 
 	pRenderContext->MatrixMode( MATERIAL_MODEL );
 	pRenderContext->PushMatrix();
-	pRenderContext->LoadMatrix( pixelToWorld );
+	pRenderContext->LoadVMatrix( pixelToWorld );
 
 	// These are only here so that FinishDrawing works...
 	pRenderContext->MatrixMode( MATERIAL_PROJECTION );

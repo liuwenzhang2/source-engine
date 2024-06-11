@@ -853,6 +853,9 @@ void CMatQueuedRenderContext::Bind( IMaterial *iMaterial, void *proxyData )
 	// We've always gotta call the bind proxy (assuming there is one)
 	// so we can copy off the material vars at this point.
 	IMaterialInternal* pIMaterial = GetCurrentMaterialInternal();
+	if (pIMaterial != iMaterial) {
+		Error("aaa");
+	}
 	pIMaterial->CallBindProxy( proxyData );
 
 	m_queue.QueueCall( m_pHardwareContext, &IMatRenderContext::Bind, iMaterial, proxyData );
@@ -870,6 +873,11 @@ void CMatQueuedRenderContext::BeginRender()
 
 		m_queue.QueueCall( m_pHardwareContext, &IMatRenderContext::BeginRender );
 	}
+	else {
+		if (m_iRenderDepth >= 5) {
+			Error("already begin");
+		}
+	}
 }
 
 //-----------------------------------------------------------------------------
@@ -880,6 +888,9 @@ void CMatQueuedRenderContext::EndRender()
 	if ( --m_iRenderDepth == 0 )
 	{
 		m_queue.QueueCall( m_pHardwareContext, &IMatRenderContext::EndRender );
+	}
+	else {
+		//Error("already end");
 	}
 }
 
@@ -1429,7 +1440,7 @@ bool CMatQueuedRenderContext::OnFlushBufferedPrimitives()
 //-----------------------------------------------------------------------------
 inline void CMatQueuedRenderContext::QueueMatrixSync()
 {
-	void (IMatRenderContext::*pfnLoadMatrix)( const VMatrix & ) = &IMatRenderContext::LoadMatrix; // need assignment to disambiguate overloaded function
+	void (IMatRenderContext::*pfnLoadMatrix)( const VMatrix & ) = &IMatRenderContext::LoadVMatrix; // need assignment to disambiguate overloaded function
 	m_queue.QueueCall( m_pHardwareContext, pfnLoadMatrix, RefToVal( AccessCurrentMatrix() ) );
 }
 
@@ -1451,40 +1462,46 @@ void CMatQueuedRenderContext::PopMatrix()
 	m_queue.QueueCall( m_pHardwareContext, &IMatRenderContext::PopMatrix );
 }
 
-void CMatQueuedRenderContext::LoadMatrix( const VMatrix& matrix )
+void CMatQueuedRenderContext::LoadVMatrix( const VMatrix& matrix )
 {
-	CMatRenderContextBase::LoadMatrix( matrix );
-	QueueMatrixSync();
+	CMatRenderContextBase::LoadVMatrix( matrix );
+	//QueueMatrixSync();
+	m_queue.QueueCall(m_pHardwareContext, &IMatRenderContext::LoadVMatrix, matrix);
 }
 
 void CMatQueuedRenderContext::LoadMatrix( const matrix3x4_t& matrix )
 {
 	CMatRenderContextBase::LoadMatrix( matrix );
-	QueueMatrixSync();
+	//QueueMatrixSync();
+	m_queue.QueueCall(m_pHardwareContext, &IMatRenderContext::LoadMatrix, matrix);
 }
 
-void CMatQueuedRenderContext::MultMatrix( const VMatrix& matrix )
+void CMatQueuedRenderContext::MultVMatrix( const VMatrix& matrix )
 {
-	CMatRenderContextBase::MultMatrix( matrix );
-	QueueMatrixSync();
+	CMatRenderContextBase::MultVMatrix( matrix );
+	//QueueMatrixSync();
+	m_queue.QueueCall(m_pHardwareContext, &IMatRenderContext::MultVMatrix, matrix);
 }
 
 void CMatQueuedRenderContext::MultMatrix( const matrix3x4_t& matrix )
 {
-	CMatRenderContextBase::MultMatrix( VMatrix( matrix ) );
-	QueueMatrixSync();
+	CMatRenderContextBase::MultVMatrix( VMatrix( matrix ) );
+	//QueueMatrixSync();
+	m_queue.QueueCall(m_pHardwareContext, &IMatRenderContext::MultMatrix, matrix);
 }
 
-void CMatQueuedRenderContext::MultMatrixLocal( const VMatrix& matrix )
+void CMatQueuedRenderContext::MultVMatrixLocal( const VMatrix& matrix )
 {
-	CMatRenderContextBase::MultMatrixLocal( matrix );
-	QueueMatrixSync();
+	CMatRenderContextBase::MultVMatrixLocal( matrix );
+	//QueueMatrixSync();
+	m_queue.QueueCall(m_pHardwareContext, &IMatRenderContext::MultVMatrixLocal, matrix);
 }
 
 void CMatQueuedRenderContext::MultMatrixLocal( const matrix3x4_t& matrix )
 {
-	CMatRenderContextBase::MultMatrixLocal( VMatrix( matrix ) );
-	QueueMatrixSync();
+	CMatRenderContextBase::MultVMatrixLocal( VMatrix( matrix ) );
+	//QueueMatrixSync();
+	m_queue.QueueCall(m_pHardwareContext, &IMatRenderContext::MultMatrixLocal, matrix);
 }
 
 void CMatQueuedRenderContext::LoadIdentity()
@@ -1496,43 +1513,50 @@ void CMatQueuedRenderContext::LoadIdentity()
 void CMatQueuedRenderContext::Ortho( double left, double top, double right, double bottom, double zNear, double zFar )
 {
 	CMatRenderContextBase::Ortho( left, top, right, bottom, zNear, zFar );
-	QueueMatrixSync();
+	//QueueMatrixSync();
+	m_queue.QueueCall(m_pHardwareContext, &IMatRenderContext::Ortho, left, top, right, bottom, zNear, zFar);
 }
 
 void CMatQueuedRenderContext::PerspectiveX( double flFovX, double flAspect, double flZNear, double flZFar )
 {
 	CMatRenderContextBase::PerspectiveX( flFovX, flAspect, flZNear, flZFar );
-	QueueMatrixSync();
+	//QueueMatrixSync();
+	m_queue.QueueCall(m_pHardwareContext, &IMatRenderContext::PerspectiveX, flFovX, flAspect, flZNear, flZFar);
 }
 
 void CMatQueuedRenderContext::PerspectiveOffCenterX( double flFovX, double flAspect, double flZNear, double flZFar, double bottom, double top, double left, double right )
 {
 	CMatRenderContextBase::PerspectiveOffCenterX( flFovX, flAspect, flZNear, flZFar, bottom, top, left, right );
-	QueueMatrixSync();
+	//QueueMatrixSync();
+	m_queue.QueueCall(m_pHardwareContext, &IMatRenderContext::PerspectiveOffCenterX, flFovX, flAspect, flZNear, flZFar, bottom, top, left, right);
 }
 
 void CMatQueuedRenderContext::PickMatrix( int x, int y, int nWidth, int nHeight )
 {
 	CMatRenderContextBase::PickMatrix( x, y, nWidth, nHeight );
-	QueueMatrixSync();
+	//QueueMatrixSync();
+	m_queue.QueueCall(m_pHardwareContext, &IMatRenderContext::PickMatrix, x, y, nWidth, nHeight);
 }
 
 void CMatQueuedRenderContext::Rotate( float flAngle, float x, float y, float z )
 {
 	CMatRenderContextBase::Rotate( flAngle, x, y, z );
-	QueueMatrixSync();
+	//QueueMatrixSync();
+	m_queue.QueueCall(m_pHardwareContext, &IMatRenderContext::Rotate, flAngle, x, y, z);
 }
 
 void CMatQueuedRenderContext::Translate( float x, float y, float z )
 {
 	CMatRenderContextBase::Translate( x, y, z );
-	QueueMatrixSync();
+	//QueueMatrixSync();
+	m_queue.QueueCall(m_pHardwareContext, &IMatRenderContext::Translate, x, y, z);
 }
 
 void CMatQueuedRenderContext::Scale( float x, float y, float z )
 {
 	CMatRenderContextBase::Scale( x, y, z );
-	QueueMatrixSync();
+	//QueueMatrixSync();
+	m_queue.QueueCall(m_pHardwareContext, &IMatRenderContext::Scale, x, y, z);
 }
 
 void CMatQueuedRenderContext::BeginBatch( IMesh* pIndices ) 

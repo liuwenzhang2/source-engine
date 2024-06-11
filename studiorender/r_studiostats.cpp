@@ -83,8 +83,8 @@ void CStudioRender::R_GatherStats( studiomeshgroup_t *pGroup, CMeshBuilder &Mesh
 	VMatrix		m_ViewMatrix, m_ProjectionMatrix, m_ViewProjectionMatrix;
 
 	CMatRenderContextPtr pRenderContext( g_pMaterialSystem );
-	pRenderContext->GetMatrix( MATERIAL_VIEW, &m_ViewMatrix );
-	pRenderContext->GetMatrix( MATERIAL_PROJECTION, &m_ProjectionMatrix );
+	pRenderContext->GetVMatrix( MATERIAL_VIEW, &m_ViewMatrix );
+	pRenderContext->GetVMatrix( MATERIAL_PROJECTION, &m_ProjectionMatrix );
 	MatrixMultiply( m_ProjectionMatrix, m_ViewMatrix, m_ViewProjectionMatrix );
 
 	Positions.EnsureCapacity( MeshBuilder.VertexCount() );

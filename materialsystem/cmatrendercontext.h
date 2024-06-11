@@ -52,7 +52,7 @@ class CMatCallQueue;
 //-----------------------------------------------------------------------------
 //
 //-----------------------------------------------------------------------------
-class CMatRenderContextBase : public CRefCounted1<IMatRenderContextInternal>
+class CMatRenderContextBase : public IMatRenderContextInternal// CRefCounted1<>
 {
 public:
 	virtual void							InitializeFrom( CMatRenderContextBase *pInitialState );
@@ -83,13 +83,13 @@ public:
 	void									MatrixMode( MaterialMatrixMode_t);
 	void									PushMatrix();
 	void									PopMatrix();
-	void									LoadMatrix( const VMatrix& matrix );
+	void									LoadVMatrix( const VMatrix& matrix );
 	void									LoadMatrix( const matrix3x4_t& matrix );
-	void									MultMatrix( const VMatrix& matrix );
-	void									MultMatrixLocal( const VMatrix& matrix );
+	void									MultVMatrix( const VMatrix& matrix );
+	void									MultVMatrixLocal( const VMatrix& matrix );
 	void									MultMatrix( const matrix3x4_t& matrix );
 	void									MultMatrixLocal( const matrix3x4_t& matrix );
-	void									GetMatrix( MaterialMatrixMode_t matrixMode, VMatrix *pMatrix );
+	void									GetVMatrix( MaterialMatrixMode_t matrixMode, VMatrix *pMatrix );
 	void									GetMatrix( MaterialMatrixMode_t matrixMode, matrix3x4_t *pMatrix );
 	void									LoadIdentity();
 	void									Ortho( double, double, double, double, double, double);
@@ -318,13 +318,13 @@ public:
 	void									MatrixMode( MaterialMatrixMode_t);
 	void									PushMatrix();
 	void									PopMatrix();
-	void									LoadMatrix( const VMatrix& matrix );
+	void									LoadVMatrix( const VMatrix& matrix );
 	void									LoadMatrix( const matrix3x4_t& matrix );
-	void									MultMatrix( const VMatrix& matrix );
-	void									MultMatrixLocal( const VMatrix& matrix );
+	void									MultVMatrix( const VMatrix& matrix );
+	void									MultVMatrixLocal( const VMatrix& matrix );
 	void									MultMatrix( const matrix3x4_t& matrix );
 	void									MultMatrixLocal( const matrix3x4_t& matrix );
-	void									GetMatrix( MaterialMatrixMode_t matrixMode, VMatrix *pMatrix );
+	void									GetVMatrix( MaterialMatrixMode_t matrixMode, VMatrix *pMatrix );
 	void									GetMatrix( MaterialMatrixMode_t matrixMode, matrix3x4_t *pMatrix );
 	void									LoadIdentity();
 	void									Ortho( double, double, double, double, double, double);

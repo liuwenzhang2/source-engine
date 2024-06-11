@@ -2862,8 +2862,8 @@ bool ScreenSpaceRectFromPoints( IMatRenderContext *pRenderContext, Vector vClipp
 		return false;
 
 	VMatrix matView, matProj, matViewProj;
-	pRenderContext->GetMatrix( MATERIAL_VIEW, &matView );
-	pRenderContext->GetMatrix( MATERIAL_PROJECTION, &matProj );
+	pRenderContext->GetVMatrix( MATERIAL_VIEW, &matView );
+	pRenderContext->GetVMatrix( MATERIAL_PROJECTION, &matProj );
 	MatrixMultiply( matProj, matView, matViewProj );
 
 	float fMinX, fMaxX, fMinY, fMaxY;								// Init bounding rect

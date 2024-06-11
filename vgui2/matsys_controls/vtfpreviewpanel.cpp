@@ -356,7 +356,7 @@ void CVTFPreviewPanel::SetupProjectionMatrix( int nWidth, int nHeight )
 	proj[2][3] = flZNear * flZFar / ( flZNear - flZFar );
 
 	pRenderContext->MatrixMode( MATERIAL_PROJECTION );
-	pRenderContext->LoadMatrix( proj );
+	pRenderContext->LoadVMatrix( proj );
 }
 
 

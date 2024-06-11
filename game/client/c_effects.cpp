@@ -586,7 +586,7 @@ void CClient_Precipitation::Render()
 	
 	// We want to do our calculations in view space.
 	VMatrix	tempView;
-	pRenderContext->GetMatrix( MATERIAL_VIEW, &tempView );
+	pRenderContext->GetVMatrix( MATERIAL_VIEW, &tempView );
 	pRenderContext->MatrixMode( MATERIAL_VIEW );
 	pRenderContext->LoadIdentity();
 
@@ -613,7 +613,7 @@ void CClient_Precipitation::Render()
 
 	pRenderContext->EnableUserClipTransformOverride( false );
 	pRenderContext->MatrixMode( MATERIAL_VIEW );
-	pRenderContext->LoadMatrix( tempView );
+	pRenderContext->LoadVMatrix( tempView );
 
 	if ( r_RainProfile.GetInt() )
 	{

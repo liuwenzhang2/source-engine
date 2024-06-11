@@ -524,7 +524,7 @@ void C_VGuiScreen::DrawScreenOverlay()
 	CMatRenderContextPtr pRenderContext( materials );
 	pRenderContext->MatrixMode( MATERIAL_MODEL );
 	pRenderContext->PushMatrix();
-	pRenderContext->LoadMatrix( m_PanelToWorld );
+	pRenderContext->LoadVMatrix( m_PanelToWorld );
 
 	unsigned char pColor[4] = {255, 255, 255, 255};
 
