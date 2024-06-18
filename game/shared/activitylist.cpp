@@ -2354,73 +2354,74 @@ ISaveRestoreOps* ActivityDataOps()
 
 
 
+#ifdef GAME_DLL
+void UTIL_LoadActivityRemapFile( const char *filename, const char *section, CUtlVector <CActivityRemap> &entries )
+{
+	int iIndex = m_ActivityRemapDatabase.Find( filename );
 
-//void UTIL_LoadActivityRemapFile( const char *filename, const char *section, CUtlVector <CActivityRemap> &entries )
-//{
-//	int iIndex = m_ActivityRemapDatabase.Find( filename );
-//
-//	if ( iIndex != m_ActivityRemapDatabase.InvalidIndex() )
-//	{
-//		CActivityRemapCache *actRemap = &m_ActivityRemapDatabase[iIndex];
-//		entries.AddVectorToTail( actRemap->m_cachedActivityRemaps );
-//		return;
-//	}
-//
-//	KeyValues *pkvFile = new KeyValues( section );
-//
-//	if ( pkvFile->LoadFromFile( filesystem, filename, NULL ) )
-//	{
-//		KeyValues *pTestKey = pkvFile->GetFirstSubKey();
-//
-//		CActivityRemapCache actRemap;
-//
-//		while ( pTestKey )
-//		{
-//			Activity ActBase = (Activity)ActivityList_IndexForName( pTestKey->GetName() );
-//
-//			if ( ActBase != ACT_INVALID )
-//			{
-//				KeyValues *pRemapKey = pTestKey->GetFirstSubKey();
-//
-//				CActivityRemap actMap;
-//				actMap.activity = ActBase;
-//
-//				while ( pRemapKey )
-//				{
-//					const char *pKeyName = pRemapKey->GetName();
-//					const char *pKeyValue = pRemapKey->GetString();
-//
-//					if ( !stricmp( pKeyName, "remapactivity" ) )
-//					{
-//						Activity Act = (Activity)ActivityList_IndexForName( pKeyValue );
-//
-//						if ( Act == ACT_INVALID )
-//						{
-//							actMap.mappedActivity = ActivityList_RegisterPrivateActivity( pKeyValue );
-//						}
-//						else
-//						{
-//							actMap.mappedActivity = Act;
-//						}
-//					}
-//					else if ( !stricmp( pKeyName, "extra" ) )
-//					{
-//						actMap.SetExtraKeyValueBlock( pRemapKey->MakeCopy() );
-//					}
-//
-//					pRemapKey = pRemapKey->GetNextKey();
-//				}
-//
-//				entries.AddToTail( actMap );
-//			}
-//
-//			pTestKey = pTestKey->GetNextKey();
-//		}
-//
-//		actRemap.m_cachedActivityRemaps.AddVectorToTail( entries );
-//		m_ActivityRemapDatabase.Insert( filename, actRemap );
-//	}
-//}
+	if ( iIndex != m_ActivityRemapDatabase.InvalidIndex() )
+	{
+		CActivityRemapCache *actRemap = &m_ActivityRemapDatabase[iIndex];
+		entries.AddVectorToTail( actRemap->m_cachedActivityRemaps );
+		return;
+	}
+
+	KeyValues *pkvFile = new KeyValues( section );
+
+	if ( pkvFile->LoadFromFile( filesystem, filename, NULL ) )
+	{
+		KeyValues *pTestKey = pkvFile->GetFirstSubKey();
+
+		CActivityRemapCache actRemap;
+
+		while ( pTestKey )
+		{
+			Activity ActBase = (Activity)ActivityList_IndexForName( pTestKey->GetName() );
+
+			if ( ActBase != ACT_INVALID )
+			{
+				KeyValues *pRemapKey = pTestKey->GetFirstSubKey();
+
+				CActivityRemap actMap;
+				actMap.activity = ActBase;
+
+				while ( pRemapKey )
+				{
+					const char *pKeyName = pRemapKey->GetName();
+					const char *pKeyValue = pRemapKey->GetString();
+
+					if ( !stricmp( pKeyName, "remapactivity" ) )
+					{
+						Activity Act = (Activity)ActivityList_IndexForName( pKeyValue );
+
+						if ( Act == ACT_INVALID )
+						{
+							actMap.mappedActivity = ActivityList_RegisterPrivateActivity( pKeyValue );
+						}
+						else
+						{
+							actMap.mappedActivity = Act;
+						}
+					}
+					else if ( !stricmp( pKeyName, "extra" ) )
+					{
+						actMap.SetExtraKeyValueBlock( pRemapKey->MakeCopy() );
+					}
+
+					pRemapKey = pRemapKey->GetNextKey();
+				}
+
+				entries.AddToTail( actMap );
+			}
+
+			pTestKey = pTestKey->GetNextKey();
+		}
+
+		actRemap.m_cachedActivityRemaps.AddVectorToTail( entries );
+		m_ActivityRemapDatabase.Insert( filename, actRemap );
+	}
+}
+#endif // GAME_DLL
 
 int ActivityList_HighestIndex()
 {

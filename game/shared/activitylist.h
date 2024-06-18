@@ -72,7 +72,9 @@ public:
 	CUtlVector< CActivityRemap > m_cachedActivityRemaps;
 };
 
-//void UTIL_LoadActivityRemapFile( const char *filename, const char *section, CUtlVector <CActivityRemap> &entries );
+#ifdef GAME_DLL
+void UTIL_LoadActivityRemapFile( const char *filename, const char *section, CUtlVector <CActivityRemap> &entries );
+#endif // GAME_DLL
 
 //=========================================================
 //=========================================================
