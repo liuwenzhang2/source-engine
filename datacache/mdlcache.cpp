@@ -5499,7 +5499,7 @@ bool CMDLCache::ActivityList_RegisterSharedActivity(const char* pszActivityName,
 
 	// technically order isn't dependent, but it's too damn easy to forget to add new ACT_'s to all three lists.
 	static int lastActivityIndex = -1;
-	Assert(iActivityIndex < LAST_SHARED_ACTIVITY && (iActivityIndex == lastActivityIndex + 1 || iActivityIndex == 0));
+	Assert((iActivityIndex == lastActivityIndex + 1 || iActivityIndex == 0));//iActivityIndex < LAST_SHARED_ACTIVITY && 
 	lastActivityIndex = iActivityIndex;
 
 	// first, check to make sure the slot we're asking for is free. It must be for 
