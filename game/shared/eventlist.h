@@ -97,7 +97,7 @@ typedef enum
 // reference it in the code are identical.
 #define REGISTER_SHARED_ANIMEVENT( _n, b ) mdlcache->EventList_RegisterSharedEvent(#_n, _n, b );
 #ifdef GAME_DLL
-#define REGISTER_PRIVATE_ANIMEVENT( _n ) _n = mdlcache->EventList_RegisterPrivateEvent( #_n );
+#define REGISTER_PRIVATE_ANIMEVENT( _n ) _n = (Animevent)mdlcache->EventList_RegisterPrivateEvent( #_n );
 #endif // GAME_DLL
 
 // Implemented in shared code

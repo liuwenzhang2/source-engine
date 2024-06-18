@@ -81,7 +81,7 @@ void UTIL_UnLoadActivityRemapFile();
 // reference it in the code are identical.
 #define REGISTER_SHARED_ACTIVITY( _n ) mdlcache->ActivityList_RegisterSharedActivity(#_n, _n);
 #ifdef GAME_DLL
-#define REGISTER_PRIVATE_ACTIVITY( _n ) _n = mdlcache->ActivityList_RegisterPrivateActivity( #_n );
+#define REGISTER_PRIVATE_ACTIVITY( _n ) _n = (Activity)mdlcache->ActivityList_RegisterPrivateActivity( #_n );
 #endif // GAME_DLL
 
 // Implemented in shared code
