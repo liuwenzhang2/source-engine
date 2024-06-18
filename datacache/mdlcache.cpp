@@ -635,7 +635,9 @@ public:
 	static void	ProcessDynamicLoad( ModelParts_t *pModelParts );
 	static void CleanupDynamicLoad( CleanupModelParts_t *pCleanup );
 
+	virtual bool ActivityList_Inited();
 	virtual void ActivityList_Init(void);
+	virtual void ActivityList_Clear(void);
 	virtual void ActivityList_Free(void);
 	virtual bool ActivityList_RegisterSharedActivity(const char* pszActivityName, int iActivityIndex);
 	//#ifdef GAME_DLL
@@ -645,6 +647,7 @@ public:
 	virtual const char* ActivityList_NameForIndex(int iActivityIndex);
 	virtual int ActivityList_HighestIndex();
 	virtual void EventList_Init(void);
+	virtual void EventList_Clear(void);
 	virtual void EventList_Free(void);
 	virtual bool EventList_RegisterSharedEvent(const char* pszEventName, int iEventIndex, int iType = 0);
 //#ifdef GAME_DLL
@@ -746,6 +749,8 @@ private:
 	static int g_HighestEvent;
 
 	int g_nEventListVersion = 1;
+
+	bool m_bActivityInited = false;
 };
 
 int CMDLCache::g_HighestActivity = 0;
@@ -5431,18 +5436,29 @@ void CMDLCache::MarkFrame()
 	ProcessPendingAsyncs();
 }
 
+bool CMDLCache::ActivityList_Inited() {
+	return m_bActivityInited;
+}
+
 void CMDLCache::ActivityList_Init(void)
 {
 	g_HighestActivity = 0;
+	m_bActivityInited = true;
 }
 
-void CMDLCache::ActivityList_Free(void)
+void CMDLCache::ActivityList_Clear(void) 
 {
 	g_ActivityStrings.ClearStrings();
 	g_ActivityList.Purge();
 
 	// So studiohdrs can reindex activity indices
 	++g_nActivityListVersion;
+}
+
+void CMDLCache::ActivityList_Free(void)
+{
+	ActivityList_Clear();
+	m_bActivityInited = false;
 }
 
 // add a new activity to the database
@@ -5591,13 +5607,18 @@ void CMDLCache::EventList_Init(void)
 	g_HighestEvent = 0;
 }
 
-void CMDLCache::EventList_Free(void)
+void CMDLCache::EventList_Clear(void)
 {
 	g_EventStrings.ClearStrings();
 	g_EventList.Purge();
 
 	// So studiohdrs can reindex event indices
 	++g_nEventListVersion;
+}
+
+void CMDLCache::EventList_Free(void)
+{
+	EventList_Clear();
 }
 
 // add a new event to the database

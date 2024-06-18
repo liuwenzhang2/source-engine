@@ -73,15 +73,22 @@ C_World::~C_World( void )
 bool C_World::Init( int entnum, int iSerialNum )
 {
 	m_flWaveHeight = 0.0f;
-	mdlcache->ActivityList_Init();
-	mdlcache->EventList_Init();
+	if (!mdlcache->ActivityList_Inited()) {
+		mdlcache->ActivityList_Init();
+		mdlcache->EventList_Init();
+		m_bActivityInitedByMe = true;
+	}
 
 	return BaseClass::Init( entnum, iSerialNum );
 }
 
 void C_World::Release()
 {
-	mdlcache->ActivityList_Free();
+	if (m_bActivityInitedByMe) {
+		mdlcache->ActivityList_Free();
+		mdlcache->EventList_Free();
+		m_bActivityInitedByMe = false;
+	}
 	//Term();
 	BaseClass::Release();
 }
@@ -165,10 +172,12 @@ void C_World::Precache( void )
 	// =================================================
 	//	Activities
 	// =================================================
-	mdlcache->ActivityList_Free();
-	mdlcache->EventList_Free();
+	if (m_bActivityInitedByMe) {
+		mdlcache->ActivityList_Clear();
+		mdlcache->EventList_Clear();
 
-	RegisterSharedActivities();
+		RegisterSharedActivities();
+	}
 
 	// Get weapon precaches
 	W_Precache();	

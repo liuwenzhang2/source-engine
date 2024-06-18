@@ -615,10 +615,10 @@ void CWorld::Precache( void )
 	//	Activities
 	// =================================================
 	UTIL_UnLoadActivityRemapFile();
-	mdlcache->ActivityList_Free();
+	mdlcache->ActivityList_Clear();
 	RegisterSharedActivities();
 
-	mdlcache->EventList_Free();
+	mdlcache->EventList_Clear();
 	RegisterSharedEvents();
 
 	InitBodyQue();

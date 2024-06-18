@@ -275,7 +275,9 @@ public:
 
 //=========================================================
 //=========================================================
+	virtual bool ActivityList_Inited() = 0;
 	virtual void ActivityList_Init(void) = 0;
+	virtual void ActivityList_Clear(void) = 0;
 	virtual void ActivityList_Free(void) = 0;
 	virtual bool ActivityList_RegisterSharedActivity(const char* pszActivityName, int iActivityIndex) = 0;
 //#ifdef GAME_DLL
@@ -288,6 +290,7 @@ public:
 //=========================================================
 //=========================================================
 	virtual void EventList_Init(void) = 0;
+	virtual void EventList_Clear(void) = 0;
 	virtual void EventList_Free(void) = 0;
 	virtual bool EventList_RegisterSharedEvent(const char* pszEventName, int iEventIndex, int iType = 0) = 0;
 //#ifdef GAME_DLL
