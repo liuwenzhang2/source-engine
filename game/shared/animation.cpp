@@ -82,7 +82,12 @@ void SetEventIndexForSequence( mstudioseqdesc_t &seqdesc )
 				
 			if ( iEventIndex == -1 )
 			{
-				pevent->event = EventList_RegisterPrivateEvent( pEventName );
+#ifdef CLIENT_DLL
+				Error("can not happen!");
+#endif // CLIENT_DLL
+#ifdef GAME_DLL
+				pevent->event = EventList_RegisterPrivateEvent(pEventName);
+#endif // GAME_DLL
 			}
 			else
 			{

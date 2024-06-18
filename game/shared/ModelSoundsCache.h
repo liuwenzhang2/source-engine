@@ -13,6 +13,8 @@
 #include "UtlCachedFileData.h"
 #include "SoundEmitterSystem/isoundemittersystembase.h"
 
+#ifdef GAME_DLL
+
 #define MODELSOUNDSCACHE_VERSION		5
 
 class IStudioHdr;
@@ -39,4 +41,5 @@ private:
 };
 #pragma pack()
 
+#endif // GAME_DLL
 #endif // MODELSOUNDSCACHE_H

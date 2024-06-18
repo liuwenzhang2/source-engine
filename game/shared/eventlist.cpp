@@ -134,6 +134,7 @@ bool EventList_RegisterSharedEvent( const char *pszEventName, int iEventIndex, i
 	return true;
 }
 
+#ifdef GAME_DLL
 Animevent EventList_RegisterPrivateEvent( const char *pszEventName )
 {
 	eventlist_t *pList = ListFromString( pszEventName );
@@ -157,6 +158,7 @@ Animevent EventList_RegisterPrivateEvent( const char *pszEventName )
 	pList = EventList_AddEventEntry( pszEventName, g_HighestEvent+1, true, AE_TYPE_SERVER );
 	return (Animevent)pList->eventIndex;
 }
+#endif // GAME_DLL
 
 // Get the index for a given Event name
 // Done at load time for all models

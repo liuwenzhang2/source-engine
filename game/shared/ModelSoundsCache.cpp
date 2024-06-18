@@ -3,6 +3,7 @@
 // Purpose: 
 //
 //=============================================================================
+#ifdef GAME_DLL
 
 #include "cbase.h"
 #include "ModelSoundsCache.h"
@@ -211,3 +212,5 @@ void CModelSoundsCache::BuildAnimationEventSoundList( IStudioHdr *hdr, CUtlVecto
 		}
 	}
 }
+
+#endif // GAME_DLL

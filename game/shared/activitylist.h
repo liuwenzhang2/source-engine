@@ -72,14 +72,16 @@ public:
 	CUtlVector< CActivityRemap > m_cachedActivityRemaps;
 };
 
-void UTIL_LoadActivityRemapFile( const char *filename, const char *section, CUtlVector <CActivityRemap> &entries );
+//void UTIL_LoadActivityRemapFile( const char *filename, const char *section, CUtlVector <CActivityRemap> &entries );
 
 //=========================================================
 //=========================================================
 extern void ActivityList_Init( void );
 extern void ActivityList_Free( void );
 extern bool ActivityList_RegisterSharedActivity( const char *pszActivityName, int iActivityIndex );
+#ifdef GAME_DLL
 extern Activity ActivityList_RegisterPrivateActivity( const char *pszActivityName );
+#endif // GAME_DLL
 extern int ActivityList_IndexForName( const char *pszActivityName );
 extern const char *ActivityList_NameForIndex( int iActivityIndex );
 extern int ActivityList_HighestIndex();
@@ -87,7 +89,9 @@ extern int ActivityList_HighestIndex();
 // This macro guarantees that the names of each activity and the constant used to
 // reference it in the code are identical.
 #define REGISTER_SHARED_ACTIVITY( _n ) ActivityList_RegisterSharedActivity(#_n, _n);
+#ifdef GAME_DLL
 #define REGISTER_PRIVATE_ACTIVITY( _n ) _n = ActivityList_RegisterPrivateActivity( #_n );
+#endif // GAME_DLL
 
 // Implemented in shared code
 extern void ActivityList_RegisterSharedActivities( void );
