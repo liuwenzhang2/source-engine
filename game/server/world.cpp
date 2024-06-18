@@ -38,7 +38,7 @@
 extern CBaseEntity				*g_pLastSpawn;
 void InitBodyQue(void);
 extern void W_Precache(void);
-extern void ActivityList_Free( void );
+//extern void ActivityList_Free( void );
 extern CUtlMemoryPool g_EntityListPool;
 
 #define SF_DECAL_NOTINDEATHMATCH		2048
@@ -459,8 +459,8 @@ CWorld* GetWorldEntity()
 CWorld::CWorld( )
 {
 	//NetworkProp()->AttachEdict( RequiredEdictIndex() );
-	ActivityList_Init();
-	EventList_Init();
+	mdlcache->ActivityList_Init();
+	mdlcache->EventList_Init();
 	m_bColdWorld = false;
 }
 
@@ -474,8 +474,9 @@ void CWorld::PostConstructor(const char* szClassname, int iForceEdictIndex)
 
 CWorld::~CWorld( )
 {
-	EventList_Free();
-	ActivityList_Free();
+	mdlcache->EventList_Free();
+	UTIL_UnLoadActivityRemapFile();
+	mdlcache->ActivityList_Free();
 	if ( g_pGameRules )
 	{
 		g_pGameRules->LevelShutdown();
@@ -613,10 +614,11 @@ void CWorld::Precache( void )
 	// =================================================
 	//	Activities
 	// =================================================
-	ActivityList_Free();
+	UTIL_UnLoadActivityRemapFile();
+	mdlcache->ActivityList_Free();
 	RegisterSharedActivities();
 
-	EventList_Free();
+	mdlcache->EventList_Free();
 	RegisterSharedEvents();
 
 	InitBodyQue();

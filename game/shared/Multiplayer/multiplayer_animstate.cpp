@@ -2059,7 +2059,7 @@ void CMultiPlayerAnimState::DebugGestureInfo( void )
 				Anim_StatePrintf( iLine++, "Gesture Slot %d(%s): %s %s(A:%s, C:%f P:%f)\n", 
 					iGesture, 
 					s_aGestureSlotNames[iGesture],
-					ActivityList_NameForIndex( pGesture->m_iActivity ),
+					mdlcache->ActivityList_NameForIndex( pGesture->m_iActivity ),
 					GetSequenceName( pPlayer->GetModelPtr(), pGesture->m_pAnimLayer->m_nSequence ),
 					( pGesture->m_bAutoKill ? "true" : "false" ),
 					(float)pGesture->m_pAnimLayer->m_flCycle, (float)pGesture->m_pAnimLayer->m_flPlaybackRate );

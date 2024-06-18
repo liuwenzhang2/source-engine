@@ -73,15 +73,15 @@ C_World::~C_World( void )
 bool C_World::Init( int entnum, int iSerialNum )
 {
 	m_flWaveHeight = 0.0f;
-	ActivityList_Init();
-	EventList_Init();
+	mdlcache->ActivityList_Init();
+	mdlcache->EventList_Init();
 
 	return BaseClass::Init( entnum, iSerialNum );
 }
 
 void C_World::Release()
 {
-	ActivityList_Free();
+	mdlcache->ActivityList_Free();
 	//Term();
 	BaseClass::Release();
 }
@@ -165,8 +165,8 @@ void C_World::Precache( void )
 	// =================================================
 	//	Activities
 	// =================================================
-	ActivityList_Free();
-	EventList_Free();
+	mdlcache->ActivityList_Free();
+	mdlcache->EventList_Free();
 
 	RegisterSharedActivities();
 

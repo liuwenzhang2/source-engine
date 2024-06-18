@@ -352,6 +352,179 @@ CModelLookupContext::~CModelLookupContext()
 	}
 }
 
+// NOTE: If CStringRegistry allowed storing arbitrary data, we could just use that.
+// in this case we have the "isPrivate" member and the replacement rules 
+// (activityIndex can be reused by private activities), so a custom table is necessary
+struct activitylist_t
+{
+	int					activityIndex;
+	unsigned short		stringKey;
+	short				isPrivate;
+};
+
+// NOTE: If CStringRegistry allowed storing arbitrary data, we could just use that.
+// in this case we have the "isPrivate" member and the replacement rules 
+// (eventIndex can be reused by private activities), so a custom table is necessary
+struct eventlist_t
+{
+	int					eventIndex;
+	int					iType;
+	unsigned short		stringKey;
+	short				isPrivate;
+};
+
+struct StringTable_t : public CUtlDict<int, unsigned short>
+{
+};
+
+//-----------------------------------------------------------------------------
+// Purpose: Just a convenience/legacy wrapper for CUtlDict<> .
+//-----------------------------------------------------------------------------
+class CStringRegistry
+{
+private:
+	StringTable_t* m_pStringList;
+
+public:
+	// returns a key for a given string
+	unsigned short AddString(const char* stringText, int stringID);
+
+	// This is optimized.  It will do 2 O(logN) searches
+	// Only one of the searches needs to compare strings, the other compares symbols (ints)
+	// returns -1 if the string is not present in the registry.
+	int		GetStringID(const char* stringText);
+
+	// This is unoptimized.  It will linearly search (but only compares ints, not strings)
+	const char* GetStringText(int stringID);
+
+	// This is O(1).  It will not search.  key MUST be a value that was returned by AddString
+	const char* GetStringForKey(unsigned short key);
+	// This is O(1).  It will not search.  key MUST be a value that was returned by AddString
+	int		GetIDForKey(unsigned short key);
+
+	void	ClearStrings(void);
+
+
+	// Iterate all the keys.
+	unsigned short First() const;
+	unsigned short Next(unsigned short key) const;
+	unsigned short InvalidIndex() const;
+
+	~CStringRegistry(void);			// Need to free allocated memory
+	CStringRegistry(void);
+};
+
+//-----------------------------------------------------------------------------
+// Purpose: Add null terminated string to the string registry 
+// Input  :
+// Output :
+//-----------------------------------------------------------------------------
+unsigned short CStringRegistry::AddString(const char* stringText, int stringID)
+{
+	return m_pStringList->Insert(stringText, stringID);
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: Given string text get the string ID
+// Input  :	Text of string to find
+// Output : Return string id or -1 if no such string exists
+//-----------------------------------------------------------------------------
+int	CStringRegistry::GetStringID(const char* stringText)
+{
+	unsigned short index = m_pStringList->Find(stringText);
+	if (m_pStringList->IsValidIndex(index))
+	{
+		return (*m_pStringList)[index];
+	}
+
+	return -1;
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: Given a string ID return the string text
+// Input  : ID of string to find
+// Output : Return string text of NULL of no such ID exists
+//-----------------------------------------------------------------------------
+char const* CStringRegistry::GetStringText(int stringID)
+{
+	for (unsigned short index = m_pStringList->First(); index != m_pStringList->InvalidIndex(); index = m_pStringList->Next(index))
+	{
+		if ((*m_pStringList)[index] == stringID)
+		{
+			return m_pStringList->GetElementName(index);
+		}
+	}
+
+	return NULL;
+}
+
+
+//-----------------------------------------------------------------------------
+// Purpose: Given a key return the string text
+//-----------------------------------------------------------------------------
+char const* CStringRegistry::GetStringForKey(unsigned short key)
+{
+	if (!m_pStringList->IsValidIndex(key))
+		return NULL;
+
+	return m_pStringList->GetElementName(key);
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: Given a key return the string text
+//-----------------------------------------------------------------------------
+int CStringRegistry::GetIDForKey(unsigned short key)
+{
+	if (!m_pStringList->IsValidIndex(key))
+		return 0;
+
+	return (*m_pStringList)[key];
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: Clear all strings from the string registry
+//-----------------------------------------------------------------------------
+void CStringRegistry::ClearStrings(void)
+{
+	m_pStringList->RemoveAll();
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: Destructor - delete the list of strings and maps
+// Input  :
+// Output :
+//-----------------------------------------------------------------------------
+CStringRegistry::~CStringRegistry(void)
+{
+	delete m_pStringList;
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: Constructor
+// Input  :
+// Output :
+//-----------------------------------------------------------------------------
+CStringRegistry::CStringRegistry(void)
+{
+	m_pStringList = new StringTable_t;
+}
+
+
+unsigned short CStringRegistry::First() const
+{
+	return m_pStringList->First();
+}
+
+unsigned short CStringRegistry::Next(unsigned short key) const
+{
+	return m_pStringList->Next(key);
+}
+
+unsigned short CStringRegistry::InvalidIndex() const
+{
+	return m_pStringList->InvalidIndex();
+}
+
 //-----------------------------------------------------------------------------
 // Implementation of the simple studio data cache (no caching)
 //-----------------------------------------------------------------------------
@@ -462,6 +635,25 @@ public:
 	static void	ProcessDynamicLoad( ModelParts_t *pModelParts );
 	static void CleanupDynamicLoad( CleanupModelParts_t *pCleanup );
 
+	virtual void ActivityList_Init(void);
+	virtual void ActivityList_Free(void);
+	virtual bool ActivityList_RegisterSharedActivity(const char* pszActivityName, int iActivityIndex);
+	//#ifdef GAME_DLL
+	virtual int ActivityList_RegisterPrivateActivity(const char* pszActivityName);
+	//#endif // GAME_DLL
+	virtual int ActivityList_IndexForName(const char* pszActivityName);
+	virtual const char* ActivityList_NameForIndex(int iActivityIndex);
+	virtual int ActivityList_HighestIndex();
+	virtual void EventList_Init(void);
+	virtual void EventList_Free(void);
+	virtual bool EventList_RegisterSharedEvent(const char* pszEventName, int iEventIndex, int iType = 0);
+//#ifdef GAME_DLL
+	virtual int EventList_RegisterPrivateEvent(const char* pszEventName);
+//#endif // GAME_DLL
+	virtual int EventList_IndexForName(const char* pszEventName);
+	virtual const char* EventList_NameForIndex(int iEventIndex);
+	virtual int EventList_GetEventType(int eventIndex);
+
 private:
 	// Inits, shuts downs studiodata_t
 	void InitStudioData( MDLHandle_t handle, const char* pModelName);
@@ -499,6 +691,19 @@ private:
 	void BreakFrameLock( bool bModels = true, bool bMesh = true );
 	void RestoreFrameLock();
 
+	activitylist_t* ListFromActivity(int activityIndex);
+	activitylist_t* ListFromString(const char* pString);
+	activitylist_t* ActivityList_AddActivityEntry(const char* pName, int iActivityIndex, bool isPrivate);
+	int ActivityListVersion(){
+		return g_nActivityListVersion;
+	}
+
+	eventlist_t* EventList_ListFromString(const char* pString);
+	eventlist_t* ListFromEvent(int eventIndex);
+	eventlist_t* EventList_AddEventEntry(const char* pName, int iEventIndex, bool isPrivate, int iType);
+	int EventListVersion() {
+		return g_nEventListVersion;
+	}
 private:
 	IDataCacheSection *m_pModelCacheSection;
 	IDataCacheSection *m_pMeshCacheSection;
@@ -519,7 +724,32 @@ private:
 	bool m_bLostVideoMemory : 1;
 	bool m_bConnected : 1;
 	bool m_bInitialized : 1;
+
+	// This stores the actual activity names.  Also, the string ID in the registry is simply an index 
+// into the g_ActivityList array.
+	CStringRegistry	g_ActivityStrings;
+
+	// this is just here to accelerate adds
+	static int g_HighestActivity;
+
+	int g_nActivityListVersion = 1;
+
+	CUtlVector<activitylist_t> g_ActivityList;
+
+	CUtlVector<eventlist_t> g_EventList;
+
+	// This stores the actual event names.  Also, the string ID in the registry is simply an index 
+	// into the g_EventList array.
+	CStringRegistry	g_EventStrings;
+
+	// this is just here to accelerate adds
+	static int g_HighestEvent;
+
+	int g_nEventListVersion = 1;
 };
+
+int CMDLCache::g_HighestActivity = 0;
+int CMDLCache::g_HighestEvent = 0;
 
 //-----------------------------------------------------------------------------
 // Singleton interface
@@ -5199,6 +5429,314 @@ void CMDLCache::ResetErrorModelStatus( MDLHandle_t handle )
 void CMDLCache::MarkFrame()
 {
 	ProcessPendingAsyncs();
+}
+
+void CMDLCache::ActivityList_Init(void)
+{
+	g_HighestActivity = 0;
+}
+
+void CMDLCache::ActivityList_Free(void)
+{
+	g_ActivityStrings.ClearStrings();
+	g_ActivityList.Purge();
+
+	// So studiohdrs can reindex activity indices
+	++g_nActivityListVersion;
+}
+
+// add a new activity to the database
+activitylist_t* CMDLCache::ActivityList_AddActivityEntry(const char* pName, int iActivityIndex, bool isPrivate)
+{
+	MEM_ALLOC_CREDIT();
+	int index = g_ActivityList.AddToTail();
+	activitylist_t* pList = &g_ActivityList[index];
+	pList->activityIndex = iActivityIndex;
+	pList->stringKey = g_ActivityStrings.AddString(pName, index);
+	pList->isPrivate = isPrivate;
+
+	// UNDONE: This implies that ALL shared activities are added before ANY custom activities
+	// UNDONE: Segment these instead?  It's a 32-bit int, how many activities do we need?
+	if (iActivityIndex > g_HighestActivity)
+	{
+		g_HighestActivity = iActivityIndex;
+	}
+
+	return pList;
+}
+
+// get the database entry from a string
+activitylist_t* CMDLCache::ListFromString(const char* pString)
+{
+	// just use the string registry to do this search/map
+	int stringID = g_ActivityStrings.GetStringID(pString);
+	if (stringID < 0)
+		return NULL;
+
+	return &g_ActivityList[stringID];
+}
+
+// Get the database entry for an index
+activitylist_t* CMDLCache::ListFromActivity(int activityIndex)
+{
+	// ugly linear search
+	for (int i = 0; i < g_ActivityList.Size(); i++)
+	{
+		if (g_ActivityList[i].activityIndex == activityIndex)
+		{
+			return &g_ActivityList[i];
+		}
+	}
+
+	return NULL;
+}
+
+bool CMDLCache::ActivityList_RegisterSharedActivity(const char* pszActivityName, int iActivityIndex)
+{
+	// UNDONE: Do we want to do these checks when not in developer mode? or maybe DEBUG only?
+	// They really only matter when you change the list of code controlled activities.  IDs
+	// for content controlled activities never collide because they are generated.
+
+	// technically order isn't dependent, but it's too damn easy to forget to add new ACT_'s to all three lists.
+	static int lastActivityIndex = -1;
+	Assert(iActivityIndex < LAST_SHARED_ACTIVITY && (iActivityIndex == lastActivityIndex + 1 || iActivityIndex == 0));
+	lastActivityIndex = iActivityIndex;
+
+	// first, check to make sure the slot we're asking for is free. It must be for 
+	// a shared activity.
+	activitylist_t* pList = ListFromString(pszActivityName);
+	if (!pList)
+	{
+		pList = ListFromActivity(iActivityIndex);
+	}
+
+	if (pList)
+	{
+		if (!V_strcmp(pszActivityName, g_ActivityStrings.GetStringForKey(pList->stringKey)) && iActivityIndex == pList->activityIndex) {
+			int aaa = 0;
+		}
+		else {
+			Warning("***\nShared activity collision! %s<->%s\n***\n", pszActivityName, g_ActivityStrings.GetStringForKey(pList->stringKey));
+			Assert(0);
+		}
+		return false;
+	}
+	// ----------------------------------------------------------------
+
+	ActivityList_AddActivityEntry(pszActivityName, iActivityIndex, false);
+	return true;
+}
+
+//#ifdef GAME_DLL
+int CMDLCache::ActivityList_RegisterPrivateActivity(const char* pszActivityName)
+{
+	activitylist_t* pList = ListFromString(pszActivityName);
+	if (pList)
+	{
+		// this activity is already in the list. If the activity we collided with is also private, 
+		// then the collision is OK. Otherwise, it's a bug.
+		if (pList->isPrivate)
+		{
+			return pList->activityIndex;
+		}
+		else
+		{
+			// this private activity collides with a shared activity. That is not allowed.
+			Warning("***\nShared<->Private Activity collision!\n***\n");
+			Assert(0);
+			return -1;// ACT_INVALID;
+		}
+	}
+
+	pList = ActivityList_AddActivityEntry(pszActivityName, g_HighestActivity + 1, true);
+	return pList->activityIndex;
+}
+//#endif // GAME_DLL
+
+// Get the index for a given activity name
+// Done at load time for all models
+int CMDLCache::ActivityList_IndexForName(const char* pszActivityName)
+{
+	// this is a fast O(lgn) search (actually does 2 O(lgn) searches)
+	activitylist_t* pList = ListFromString(pszActivityName);
+
+	if (pList)
+	{
+		return pList->activityIndex;
+	}
+
+	return -1;// kActivityLookup_Missing;
+}
+
+// Get the name for a given index
+// This should only be used in debug code, it does a linear search
+// But at least it only compares integers
+const char* CMDLCache::ActivityList_NameForIndex(int activityIndex)
+{
+	activitylist_t* pList = ListFromActivity(activityIndex);
+	if (pList)
+	{
+		return g_ActivityStrings.GetStringForKey(pList->stringKey);
+	}
+	return NULL;
+}
+
+int CMDLCache::ActivityList_HighestIndex()
+{
+	return g_HighestActivity;
+}
+
+void CMDLCache::EventList_Init(void)
+{
+	g_HighestEvent = 0;
+}
+
+void CMDLCache::EventList_Free(void)
+{
+	g_EventStrings.ClearStrings();
+	g_EventList.Purge();
+
+	// So studiohdrs can reindex event indices
+	++g_nEventListVersion;
+}
+
+// add a new event to the database
+eventlist_t* CMDLCache::EventList_AddEventEntry(const char* pName, int iEventIndex, bool isPrivate, int iType)
+{
+	MEM_ALLOC_CREDIT();
+	int index = g_EventList.AddToTail();
+	eventlist_t* pList = &g_EventList[index];
+	pList->eventIndex = iEventIndex;
+	pList->stringKey = g_EventStrings.AddString(pName, index);
+	pList->isPrivate = isPrivate;
+	pList->iType = iType;
+
+	// UNDONE: This implies that ALL shared activities are added before ANY custom activities
+	// UNDONE: Segment these instead?  It's a 32-bit int, how many activities do we need?
+	if (iEventIndex > g_HighestEvent)
+	{
+		g_HighestEvent = iEventIndex;
+	}
+
+	return pList;
+}
+
+// get the database entry from a string
+eventlist_t* CMDLCache::EventList_ListFromString(const char* pString)
+{
+	// just use the string registry to do this search/map
+	int stringID = g_EventStrings.GetStringID(pString);
+	if (stringID < 0)
+		return NULL;
+
+	return &g_EventList[stringID];
+}
+
+// Get the database entry for an index
+eventlist_t* CMDLCache::ListFromEvent(int eventIndex)
+{
+	// ugly linear search
+	for (int i = 0; i < g_EventList.Size(); i++)
+	{
+		if (g_EventList[i].eventIndex == eventIndex)
+		{
+			return &g_EventList[i];
+		}
+	}
+
+	return NULL;
+}
+
+int CMDLCache::EventList_GetEventType(int eventIndex)
+{
+	eventlist_t* pEvent = ListFromEvent(eventIndex);
+
+	if (pEvent)
+	{
+		return pEvent->iType;
+	}
+
+	return -1;
+}
+
+
+bool CMDLCache::EventList_RegisterSharedEvent(const char* pszEventName, int iEventIndex, int iType)
+{
+	// UNDONE: Do we want to do these checks when not in developer mode? or maybe DEBUG only?
+	// They really only matter when you change the list of code controlled activities.  IDs
+	// for content controlled activities never collide because they are generated.
+
+	// first, check to make sure the slot we're asking for is free. It must be for 
+	// a shared event.
+	eventlist_t* pList = EventList_ListFromString(pszEventName);
+	if (!pList)
+	{
+		pList = ListFromEvent(iEventIndex);
+	}
+
+	//Already in list.
+	if (pList)
+	{
+		return false;
+	}
+	// ----------------------------------------------------------------
+
+	EventList_AddEventEntry(pszEventName, iEventIndex, false, iType);
+	return true;
+}
+
+//#ifdef GAME_DLL
+int CMDLCache::EventList_RegisterPrivateEvent(const char* pszEventName)
+{
+	eventlist_t* pList = EventList_ListFromString(pszEventName);
+	if (pList)
+	{
+		// this activity is already in the list. If the activity we collided with is also private, 
+		// then the collision is OK. Otherwise, it's a bug.
+		if (pList->isPrivate)
+		{
+			return pList->eventIndex;
+		}
+		else
+		{
+			// this private activity collides with a shared activity. That is not allowed.
+			Warning("***\nShared<->Private Event collision!\n***\n");
+			Assert(0);
+			return -1;// AE_INVALID;
+		}
+	}
+
+	pList = EventList_AddEventEntry(pszEventName, g_HighestEvent + 1, true, 1 << 0);
+	return pList->eventIndex;
+}
+//#endif // GAME_DLL
+
+// Get the index for a given Event name
+// Done at load time for all models
+int CMDLCache::EventList_IndexForName(const char* pszEventName)
+{
+	// this is a fast O(lgn) search (actually does 2 O(lgn) searches)
+	eventlist_t* pList = EventList_ListFromString(pszEventName);
+
+	if (pList)
+	{
+		return pList->eventIndex;
+	}
+
+	return -1;
+}
+
+// Get the name for a given index
+// This should only be used in debug code, it does a linear search
+// But at least it only compares integers
+const char* CMDLCache::EventList_NameForIndex(int eventIndex)
+{
+	eventlist_t* pList = ListFromEvent(eventIndex);
+	if (pList)
+	{
+		return g_EventStrings.GetStringForKey(pList->stringKey);
+	}
+	return NULL;
 }
 
 //-----------------------------------------------------------------------------

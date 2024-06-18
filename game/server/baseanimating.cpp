@@ -1204,7 +1204,7 @@ void CBaseAnimating::HandleAnimEvent( animevent_t *pEvent )
 	}
 
 	// Failed to find a handler
-	const char *pName = EventList_NameForIndex( pEvent->event );
+	const char *pName = mdlcache->EventList_NameForIndex( pEvent->event );
 	if ( pName)
 	{
 		DevWarning( 1, "Unhandled animation event %s for %s\n", pName, GetClassname() );
@@ -2254,7 +2254,7 @@ void CBaseAnimating::SetSequenceBox( void )
 //=========================================================
 int CBaseAnimating::RegisterPrivateActivity( const char *pszActivityName )
 {
-	return ActivityList_RegisterPrivateActivity( pszActivityName );
+	return mdlcache->ActivityList_RegisterPrivateActivity( pszActivityName );
 }
 
 //-----------------------------------------------------------------------------
@@ -2274,7 +2274,7 @@ int CBaseAnimating::RegisterPrivateActivity( const char *pszActivityName )
 //-----------------------------------------------------------------------------
 void CBaseAnimating::ReportMissingActivity( int iActivity )
 {
-	Msg( "%s has no sequence for act:%s\n", GetClassname(), ActivityList_NameForIndex(iActivity) );
+	Msg( "%s has no sequence for act:%s\n", GetClassname(), mdlcache->ActivityList_NameForIndex(iActivity) );
 }
 
 

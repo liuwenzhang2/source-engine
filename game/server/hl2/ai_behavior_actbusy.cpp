@@ -2531,7 +2531,7 @@ void CAI_ActBusyGoal::InputForceNPCToActBusy( inputdata_t &inputdata )
 			// $ signs prepend custom movement sequences / activities
 			const char *pAnimName = pszParam+1;
 			// Try and resolve it as an activity name
-			activity = (Activity)ActivityList_IndexForName( pAnimName );
+			activity = (Activity)mdlcache->ActivityList_IndexForName( pAnimName );
 			if ( activity == ACT_INVALID )
 			{
 				// Try it as sequence name

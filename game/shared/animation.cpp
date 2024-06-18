@@ -54,8 +54,8 @@ int ExtractBbox( IStudioHdr *pstudiohdr, int sequence, Vector& mins, Vector& max
 // Output : mstudioseqdesc_t
 //-----------------------------------------------------------------------------
 
-extern int g_nActivityListVersion;
-extern int g_nEventListVersion;
+//extern int g_nActivityListVersion;
+//extern int g_nEventListVersion;
 
 void SetEventIndexForSequence( mstudioseqdesc_t &seqdesc )
 {
@@ -78,7 +78,7 @@ void SetEventIndexForSequence( mstudioseqdesc_t &seqdesc )
 		{
 			const char *pEventName = pevent->pszEventName();
 			
-			int iEventIndex = EventList_IndexForName( pEventName );
+			int iEventIndex = mdlcache->EventList_IndexForName( pEventName );
 				
 			if ( iEventIndex == -1 )
 			{
@@ -86,13 +86,13 @@ void SetEventIndexForSequence( mstudioseqdesc_t &seqdesc )
 				Error("can not happen!");
 #endif // CLIENT_DLL
 #ifdef GAME_DLL
-				pevent->event = EventList_RegisterPrivateEvent(pEventName);
+				pevent->event = mdlcache->EventList_RegisterPrivateEvent(pEventName);
 #endif // GAME_DLL
 			}
 			else
 			{
 				pevent->event = iEventIndex;
-				pevent->type |= EventList_GetEventType( iEventIndex );
+				pevent->type |= mdlcache->EventList_GetEventType( iEventIndex );
 			}
 		}
 	}
@@ -114,14 +114,14 @@ void BuildAllAnimationEventIndexes( IStudioHdr *pstudiohdr )
 	if ( !pstudiohdr )
 		return;
 
-	if( pstudiohdr->GetEventListVersion() != g_nEventListVersion )
+	if( pstudiohdr->GetEventListVersion() != mdlcache->EventListVersion() )
 	{
 		for ( int i = 0 ; i < pstudiohdr->GetNumSeq() ; i++ )
 		{
 			SetEventIndexForSequence( pstudiohdr->pSeqdesc( i ) );
 		}
 
-		pstudiohdr->SetEventListVersion( g_nEventListVersion );
+		pstudiohdr->SetEventListVersion(mdlcache->EventListVersion() );
 	}
 }
 
@@ -135,7 +135,7 @@ void ResetEventIndexes( IStudioHdr *pstudiohdr )
 	if (! pstudiohdr)
 		return;
 
-	pstudiohdr->SetEventListVersion( g_nEventListVersion - 1 );
+	pstudiohdr->SetEventListVersion(mdlcache->EventListVersion() - 1);
 }
 
 //-----------------------------------------------------------------------------
@@ -153,7 +153,7 @@ void SetActivityForSequence( IStudioHdr *pstudiohdr, int i )
 	pszActivityName = GetSequenceActivityName( pstudiohdr, i );
 	if ( pszActivityName[0] != '\0' )
 	{
-		iActivityIndex = ActivityList_IndexForName( pszActivityName );
+		iActivityIndex = mdlcache->ActivityList_IndexForName( pszActivityName );
 		
 		if ( iActivityIndex == -1 )
 		{
@@ -164,7 +164,7 @@ void SetActivityForSequence( IStudioHdr *pstudiohdr, int i )
 #ifdef CLIENT_DLL
 			seqdesc.flags &= ~STUDIO_ACTIVITY;
 #else
-			seqdesc.activity = ActivityList_RegisterPrivateActivity( pszActivityName );
+			seqdesc.activity = mdlcache->ActivityList_RegisterPrivateActivity( pszActivityName );
 #endif
 		}
 		else
@@ -195,7 +195,7 @@ void IndexModelSequences( IStudioHdr *pstudiohdr )
 		SetEventIndexForSequence( pstudiohdr->pSeqdesc( i ) );
 	}
 
-	pstudiohdr->SetActivityListVersion( g_nActivityListVersion );
+	pstudiohdr->SetActivityListVersion(mdlcache->ActivityListVersion() );
 }
 
 //-----------------------------------------------------------------------------
@@ -208,7 +208,7 @@ void ResetActivityIndexes( IStudioHdr *pstudiohdr )
 	if (! pstudiohdr)
 		return;
 
-	pstudiohdr->SetActivityListVersion( g_nActivityListVersion - 1 );
+	pstudiohdr->SetActivityListVersion(mdlcache->ActivityListVersion() - 1);
 }
 
 void VerifySequenceIndex( IStudioHdr *pstudiohdr )
@@ -218,7 +218,7 @@ void VerifySequenceIndex( IStudioHdr *pstudiohdr )
 		return;
 	}
 
-	if( pstudiohdr->GetActivityListVersion( ) != g_nActivityListVersion )
+	if( pstudiohdr->GetActivityListVersion( ) != mdlcache->ActivityListVersion() )
 	{
 		// this model's sequences have not yet been indexed by activity
 		IndexModelSequences( pstudiohdr );

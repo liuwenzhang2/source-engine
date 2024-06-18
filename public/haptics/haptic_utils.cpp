@@ -95,6 +95,15 @@ void HapticSetConstantForce(CBasePlayer* pPlayer, Vector force)
 #ifndef HAPTICS_TEST_PREFIX
 #define HAPTICS_TEST_PREFIX
 #endif
+
+int ActivityList_IndexForNameWrapper(const char* pszActivityName) {
+	return mdlcache->ActivityList_IndexForName(pszActivityName);
+}
+
+const char* ActivityList_NameForIndexWrapper(int iActivityIndex) {
+	return mdlcache->ActivityList_NameForIndex(iActivityIndex);
+}
+
 static CSysModule *pFalconModule =0;
 void ConnectHaptics(CreateInterfaceFn appFactory)
 {
@@ -116,8 +125,8 @@ void ConnectHaptics(CreateInterfaceFn appFactory)
 					g_pVGuiInput->GetIMEWindow(),
 					filesystem,
 					enginevgui,
-					ActivityList_IndexForName,
-					ActivityList_NameForIndex))
+					ActivityList_IndexForNameWrapper,
+					ActivityList_NameForIndexWrapper))
 			{
 				success = true;
 				hap_HasDevice.SetValue(1);

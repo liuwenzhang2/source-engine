@@ -272,6 +272,32 @@ public:
 	virtual void ResetErrorModelStatus( MDLHandle_t handle ) = 0;
 
 	virtual void MarkFrame() = 0;
+
+//=========================================================
+//=========================================================
+	virtual void ActivityList_Init(void) = 0;
+	virtual void ActivityList_Free(void) = 0;
+	virtual bool ActivityList_RegisterSharedActivity(const char* pszActivityName, int iActivityIndex) = 0;
+//#ifdef GAME_DLL
+	virtual int ActivityList_RegisterPrivateActivity(const char* pszActivityName) = 0;
+//#endif // GAME_DLL
+	virtual int ActivityList_IndexForName(const char* pszActivityName) = 0;
+	virtual const char* ActivityList_NameForIndex(int iActivityIndex) = 0;
+	virtual int ActivityList_HighestIndex() = 0;
+	virtual int ActivityListVersion() = 0;
+//=========================================================
+//=========================================================
+	virtual void EventList_Init(void) = 0;
+	virtual void EventList_Free(void) = 0;
+	virtual bool EventList_RegisterSharedEvent(const char* pszEventName, int iEventIndex, int iType = 0) = 0;
+//#ifdef GAME_DLL
+	virtual int EventList_RegisterPrivateEvent(const char* pszEventName) = 0;
+//#endif // GAME_DLL
+	virtual int EventList_IndexForName(const char* pszEventName) = 0;
+	virtual const char* EventList_NameForIndex(int iEventIndex) = 0;
+	virtual int EventList_GetEventType(int eventIndex) = 0;
+	virtual int EventListVersion() = 0;
+
 };
 
 

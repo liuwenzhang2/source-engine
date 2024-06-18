@@ -1345,7 +1345,7 @@ static Activity DetermineExpressionMoveActivity( CChoreoEvent *event, CAI_BaseNP
 	else 
 	{
 		// Try and resolve the activity name
-		activity = (Activity)ActivityList_IndexForName( pszAct );
+		activity = (Activity)mdlcache->ActivityList_IndexForName( pszAct );
 		if ( activity == ACT_INVALID )
 		{
 			// Assume it's a sequence name

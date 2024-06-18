@@ -6082,7 +6082,7 @@ void CAI_BaseNPC::ResolveActivityToSequence(Activity NewActivity, int &iSequence
 
 			if ( ( pLastWarn != this && lastWarnActivity != translatedActivity ) || gpGlobals->curtime - timeLastWarn > 5.0 )
 			{
-				DevWarning( "%s:%s:%s has no sequence for act:%s\n", GetClassname(), GetDebugName(), STRING(GetEngineObject()->GetModelName() ), ActivityList_NameForIndex(translatedActivity) );
+				DevWarning( "%s:%s:%s has no sequence for act:%s\n", GetClassname(), GetDebugName(), STRING(GetEngineObject()->GetModelName() ), mdlcache->ActivityList_NameForIndex(translatedActivity) );
 				pLastWarn = this;
 				lastWarnActivity = translatedActivity;
 				timeLastWarn = gpGlobals->curtime;
@@ -8657,7 +8657,7 @@ void CAI_BaseNPC::HandleAnimEvent( animevent_t *pEvent )
 					}
 					
 					// Bad data. Explain how to use this anim event.
-					const char *pName = EventList_NameForIndex( pEvent->event );
+					const char *pName = mdlcache->EventList_NameForIndex( pEvent->event );
 					DevWarning( 1, "Bad %s format. Should be: { AE_NPC_HURT_INTERACTION_PARTNER <frame number> \"<ME/THEM> <Amount of damage done>\" }\n", pName );
 					return;
 				}

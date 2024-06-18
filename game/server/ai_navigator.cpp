@@ -4033,7 +4033,7 @@ bool CAI_Navigator::SetGoalFromStoppingPath()
 		if ( m_PreviousMoveActivity <= ACT_RESET && GetMovementActivity() <= ACT_RESET  )
 		{
 			m_pClippedWaypoints->RemoveAll();
-			DevWarning( 2, "%s has a stopping path and no valid. Movement activity: %s (prev %s)\n", GetOuter()->GetDebugName(), ActivityList_NameForIndex(GetMovementActivity()), ActivityList_NameForIndex(m_PreviousMoveActivity) );
+			DevWarning( 2, "%s has a stopping path and no valid. Movement activity: %s (prev %s)\n", GetOuter()->GetDebugName(), mdlcache->ActivityList_NameForIndex(GetMovementActivity()), mdlcache->ActivityList_NameForIndex(m_PreviousMoveActivity) );
 			return false;
 		}
 

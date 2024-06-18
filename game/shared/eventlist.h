@@ -89,30 +89,19 @@ typedef enum
 } Animevent;
 
 
-typedef struct evententry_s evententry_t;
+//typedef struct evententry_s evententry_t;
 
-//=========================================================
-//=========================================================
-extern void EventList_Init( void );
-extern void EventList_Free( void );
-extern bool EventList_RegisterSharedEvent( const char *pszEventName, int iEventIndex, int iType = 0 );
-#ifdef GAME_DLL
-extern Animevent EventList_RegisterPrivateEvent( const char *pszEventName );
-Animevent EventList_RegisterPrivateEvent(const char* pszEventName);
-#endif // GAME_DLL
-extern int EventList_IndexForName( const char *pszEventName );
-extern const char *EventList_NameForIndex( int iEventIndex );
+
 
 // This macro guarantees that the names of each event and the constant used to
 // reference it in the code are identical.
-#define REGISTER_SHARED_ANIMEVENT( _n, b ) EventList_RegisterSharedEvent(#_n, _n, b );
+#define REGISTER_SHARED_ANIMEVENT( _n, b ) mdlcache->EventList_RegisterSharedEvent(#_n, _n, b );
 #ifdef GAME_DLL
-#define REGISTER_PRIVATE_ANIMEVENT( _n ) _n = EventList_RegisterPrivateEvent( #_n );
+#define REGISTER_PRIVATE_ANIMEVENT( _n ) _n = mdlcache->EventList_RegisterPrivateEvent( #_n );
 #endif // GAME_DLL
 
 // Implemented in shared code
 extern void EventList_RegisterSharedEvents( void );
-extern int EventList_GetEventType( int eventIndex );
 
 
 

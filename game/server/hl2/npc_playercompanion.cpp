@@ -1265,7 +1265,7 @@ void CNPC_PlayerCompanion::PrepareReadinessRemap( void )
 			}
 		}
 
-		const char *pActName = ActivityList_NameForIndex( (int)ActRemap.mappedActivity );
+		const char *pActName = mdlcache->ActivityList_NameForIndex( (int)ActRemap.mappedActivity );
 
 		if ( GetActivityID( pActName ) == ACT_INVALID )
 		{
