@@ -2108,7 +2108,7 @@ void ActivityList_RegisterSharedActivities( void )
 	REGISTER_SHARED_ACTIVITY( ACT_SPELL_VM_ARM );
 	REGISTER_SHARED_ACTIVITY( ACT_SPELL_VM_FIRE );
 
-	AssertMsg( g_HighestActivity == LAST_SHARED_ACTIVITY - 1, "Not all activities from ai_activity.h registered in activitylist.cpp" ); 
+	AssertMsg( mdlcache->ActivityList_HighestIndex() == LAST_SHARED_ACTIVITY - 1, "Not all activities from ai_activity.h registered in activitylist.cpp");
 } 
 
 // HACKHACK: Keep backwards compatibility on broken activities temporarily
