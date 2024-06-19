@@ -874,7 +874,7 @@ void CMatQueuedRenderContext::BeginRender()
 		m_queue.QueueCall( m_pHardwareContext, &IMatRenderContext::BeginRender );
 	}
 	else {
-		if (m_iRenderDepth >= 5) {
+		if (m_iRenderDepth >= 100) {
 			Error("already begin");
 		}
 	}
