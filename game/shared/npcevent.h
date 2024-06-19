@@ -11,7 +11,7 @@
 #pragma once
 #endif
 
-class CBaseAnimating;
+//class CBaseAnimating;
 
 struct animevent_t
 {
@@ -20,7 +20,9 @@ struct animevent_t
 	float			cycle;
 	float			eventtime;
 	int				type;
-	CBaseAnimating	*pSource;
+#ifdef GAME_DLL
+	void	*pSource;
+#endif // GAME_DLL
 };
 #define EVENT_SPECIFIC			0
 #define EVENT_SCRIPTED			1000		// see scriptevent.h

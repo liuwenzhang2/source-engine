@@ -546,7 +546,9 @@ int GetAnimationEvent( IStudioHdr *pstudiohdr, int sequence, animevent_t *pNPCEv
 
 		if (bOverlapEvent)
 		{
+#ifdef GAME_DLL
 			pNPCEvent->pSource = NULL;
+#endif // GAME_DLL
 			pNPCEvent->cycle = pevent[index].cycle;
 #if !defined( MAKEXVCD )
 			pNPCEvent->eventtime = gpGlobals->curtime;
