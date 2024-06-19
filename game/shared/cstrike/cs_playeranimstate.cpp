@@ -1008,8 +1008,8 @@ Activity CCSPlayerAnimState::CalcMainActivity()
 
 void CCSPlayerAnimState::DebugShowAnimState( int iStartLine )
 {
-	engine->Con_NPrintf( iStartLine++, "fire  : %s, cycle: %.2f\n", m_bFiring ? GetSequenceName( m_pOuter->GetModelPtr(), m_iFireSequence ) : "[not firing]", m_flFireCycle );
-	engine->Con_NPrintf( iStartLine++, "reload: %s, cycle: %.2f\n", m_bReloading ? GetSequenceName( m_pOuter->GetModelPtr(), m_iReloadSequence ) : "[not reloading]", m_flReloadCycle );
+	engine->Con_NPrintf( iStartLine++, "fire  : %s, cycle: %.2f\n", m_bFiring ? m_pOuter->GetModelPtr()->GetSequenceName( m_iFireSequence ) : "[not firing]", m_flFireCycle );
+	engine->Con_NPrintf( iStartLine++, "reload: %s, cycle: %.2f\n", m_bReloading ? m_pOuter->GetModelPtr()->GetSequenceName( m_iReloadSequence ) : "[not reloading]", m_flReloadCycle );
 	BaseClass::DebugShowAnimState( iStartLine );
 }
 

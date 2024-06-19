@@ -989,7 +989,7 @@ void CBasePlayerAnimState::DebugShowAnimState( int iStartLine )
 
 	int iLine = iStartLine;
 	AnimStatePrintf( iLine++, "main: %s(%d), cycle: %.2f cyclerate: %.2f playbackrate: %.2f\n", 
-		GetSequenceName( m_pOuter->GetModelPtr(), m_pOuter->GetSequence() ), 
+		m_pOuter->GetModelPtr()->GetSequenceName( m_pOuter->GetSequence() ),
 		m_pOuter->GetSequence(),
 		m_pOuter->GetCycle(), 
 		m_pOuter->GetSequenceCycleRate(m_pOuter->GetModelPtr(), m_pOuter->GetSequence()),
@@ -1001,7 +1001,7 @@ void CBasePlayerAnimState::DebugShowAnimState( int iStartLine )
 		CAnimationLayer *pLayer = m_pOuter->GetAnimOverlay( MAIN_IDLE_SEQUENCE_LAYER );
 
 		AnimStatePrintf( iLine++, "idle: %s, weight: %.2f\n",
-			GetSequenceName( m_pOuter->GetModelPtr(), pLayer->m_nSequence ), 
+			m_pOuter->GetModelPtr()->GetSequenceName( pLayer->m_nSequence ),
 			(float)pLayer->m_flWeight );
 	}
 
@@ -1010,7 +1010,7 @@ void CBasePlayerAnimState::DebugShowAnimState( int iStartLine )
 		CAnimationLayer *pLayer = m_pOuter->GetAnimOverlay( AIMSEQUENCE_LAYER + i );
 #ifdef CLIENT_DLL
 		AnimStatePrintf( iLine++, "%s(%d), weight: %.2f, cycle: %.2f, order (%d), aim (%d)", 
-			!pLayer->IsActive() ? "-- ": (pLayer->m_nSequence == 0 ? "-- " : GetSequenceName( m_pOuter->GetModelPtr(), pLayer->m_nSequence ) ), 
+			!pLayer->IsActive() ? "-- ": (pLayer->m_nSequence == 0 ? "-- " : m_pOuter->GetModelPtr()->GetSequenceName( pLayer->m_nSequence ) ),
 			!pLayer->IsActive() ? 0 : (int)pLayer->m_nSequence, 
 			!pLayer->IsActive() ? 0 : (float)pLayer->m_flWeight, 
 			!pLayer->IsActive() ? 0 : (float)pLayer->m_flCycle, 
@@ -1019,7 +1019,7 @@ void CBasePlayerAnimState::DebugShowAnimState( int iStartLine )
 			);
 #else
 		AnimStatePrintf( iLine++, "%s(%d), flags (%d), weight: %.2f, cycle: %.2f, order (%d), aim (%d)", 
-			!pLayer->IsActive() ? "-- " : ( pLayer->m_nSequence == 0 ? "-- " : GetSequenceName( m_pOuter->GetModelPtr(), pLayer->m_nSequence ) ), 
+			!pLayer->IsActive() ? "-- " : ( pLayer->m_nSequence == 0 ? "-- " : m_pOuter->GetModelPtr()->GetSequenceName( pLayer->m_nSequence ) ),
 			!pLayer->IsActive() ? 0 : (int)pLayer->m_nSequence, 
 			!pLayer->IsActive() ? 0 : (int)pLayer->m_fFlags,// Doesn't exist on client
 			!pLayer->IsActive() ? 0 : (float)pLayer->m_flWeight, 

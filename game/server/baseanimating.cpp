@@ -637,7 +637,7 @@ int CBaseAnimating::SelectWeightedSequence ( Activity activity )
 {
 	Assert( activity != ACT_INVALID );
 	Assert( GetModelPtr() );
-	return ::SelectWeightedSequence( GetModelPtr(), activity, GetSequence() );
+	return GetModelPtr()->SelectWeightedSequence( activity, GetSequence(), SharedRandomSelect);
 }
 
 
@@ -645,7 +645,7 @@ int CBaseAnimating::SelectWeightedSequence ( Activity activity, int curSequence 
 {
 	Assert( activity != ACT_INVALID );
 	Assert( GetModelPtr() );
-	return ::SelectWeightedSequence( GetModelPtr(), activity, curSequence );
+	return GetModelPtr()->SelectWeightedSequence( activity, curSequence, SharedRandomSelect);
 }
 
 //=========================================================
@@ -654,7 +654,7 @@ int CBaseAnimating::SelectWeightedSequence ( Activity activity, int curSequence 
 void CBaseAnimating::ResetActivityIndexes ( void )
 {
 	Assert( GetModelPtr() );
-	::ResetActivityIndexes( GetModelPtr() );
+	GetModelPtr()->ResetActivityIndexes();
 }
 
 //=========================================================
@@ -663,7 +663,7 @@ void CBaseAnimating::ResetActivityIndexes ( void )
 void CBaseAnimating::ResetEventIndexes ( void )
 {
 	Assert( GetModelPtr() );
-	::ResetEventIndexes( GetModelPtr() );
+	GetModelPtr()->ResetEventIndexes();
 }
 
 //=========================================================
@@ -675,7 +675,7 @@ void CBaseAnimating::ResetEventIndexes ( void )
 int CBaseAnimating::SelectHeaviestSequence ( Activity activity )
 {
 	Assert( GetModelPtr() );
-	return ::SelectHeaviestSequence( GetModelPtr(), activity );
+	return GetModelPtr()->SelectHeaviestSequence( activity );
 }
 
 
@@ -687,7 +687,7 @@ int CBaseAnimating::SelectHeaviestSequence ( Activity activity )
 int CBaseAnimating::LookupActivity( const char *label )
 {
 	Assert( GetModelPtr() );
-	return ::LookupActivity( GetModelPtr(), label );
+	return GetModelPtr()->LookupActivity( label );
 }
 
 //=========================================================
@@ -695,7 +695,7 @@ int CBaseAnimating::LookupActivity( const char *label )
 int CBaseAnimating::LookupSequence( const char *label )
 {
 	Assert( GetModelPtr() );
-	return ::LookupSequence( GetModelPtr(), label );
+	return GetModelPtr()->LookupSequence( label, SharedRandomSelect);
 }
 
 
@@ -735,7 +735,7 @@ float CBaseAnimating::GetSequenceMoveYaw( int iSequence )
 	Vector				vecReturn;
 	
 	Assert( GetModelPtr() );
-	::GetSequenceLinearMotion( GetModelPtr(), iSequence, GetPoseParameterArray(), &vecReturn );
+	GetModelPtr()->GetSequenceLinearMotion( iSequence, GetPoseParameterArray(), &vecReturn );
 
 	if (vecReturn.Length() > 0)
 	{
@@ -756,7 +756,7 @@ float CBaseAnimating::GetSequenceMoveDist( IStudioHdr *pStudioHdr, int iSequence
 {
 	Vector				vecReturn;
 	
-	::GetSequenceLinearMotion( pStudioHdr, iSequence, GetPoseParameterArray(), &vecReturn );
+	pStudioHdr->GetSequenceLinearMotion( iSequence, GetPoseParameterArray(), &vecReturn );
 
 	return vecReturn.Length();
 }
@@ -771,7 +771,7 @@ float CBaseAnimating::GetSequenceMoveDist( IStudioHdr *pStudioHdr, int iSequence
 void CBaseAnimating::GetSequenceLinearMotion( int iSequence, Vector *pVec )
 {
 	Assert( GetModelPtr() );
-	::GetSequenceLinearMotion( GetModelPtr(), iSequence, GetPoseParameterArray(), pVec );
+	GetModelPtr()->GetSequenceLinearMotion( iSequence, GetPoseParameterArray(), pVec );
 }
 
 //-----------------------------------------------------------------------------
@@ -791,7 +791,7 @@ const char *CBaseAnimating::GetSequenceName( int iSequence )
 	if ( !GetModelPtr() )
 		return "No model!";
 
-	return ::GetSequenceName( GetModelPtr(), iSequence );
+	return GetModelPtr()->GetSequenceName( iSequence );
 }
 //-----------------------------------------------------------------------------
 // Purpose: 
@@ -810,7 +810,7 @@ const char *CBaseAnimating::GetSequenceActivityName( int iSequence )
 	if ( !GetModelPtr() )
 		return "No model!";
 
-	return ::GetSequenceActivityName( GetModelPtr(), iSequence );
+	return GetModelPtr()->GetSequenceActivityName( iSequence );
 }
 
 //-----------------------------------------------------------------------------
@@ -897,7 +897,7 @@ void CBaseAnimating::ResetSequenceInfo ( )
 
 	IStudioHdr *pStudioHdr = GetModelPtr();
 	m_flGroundSpeed = GetSequenceGroundSpeed( pStudioHdr, GetSequence() ) * GetModelScale();
-	m_bSequenceLoops = ((GetSequenceFlags( pStudioHdr, GetSequence() ) & STUDIO_LOOPING) != 0);
+	m_bSequenceLoops = ((pStudioHdr->GetSequenceFlags( GetSequence() ) & STUDIO_LOOPING) != 0);
 	// m_flAnimTime = gpGlobals->time;
 	m_flPlaybackRate = 1.0;
 	m_bSequenceFinished = false;
@@ -909,7 +909,7 @@ void CBaseAnimating::ResetSequenceInfo ( )
 	// FIXME: why is this called here?  Nothing should have changed to make this nessesary
 	if ( pStudioHdr )
 	{
-		SetEventIndexForSequence( pStudioHdr->pSeqdesc( GetSequence() ) );
+		mdlcache->SetEventIndexForSequence( pStudioHdr->pSeqdesc( GetSequence() ) );
 	}
 }
 
@@ -979,7 +979,7 @@ float CBaseAnimating::GetLastVisibleCycle( IStudioHdr *pStudioHdr, int iSequence
 		return 1.0;
 	}
 
-	if (!(GetSequenceFlags( pStudioHdr, iSequence ) & STUDIO_LOOPING))
+	if (!(pStudioHdr->GetSequenceFlags( iSequence ) & STUDIO_LOOPING))
 	{
 		return 1.0f - (pStudioHdr->pSeqdesc( iSequence ).fadeouttime) * GetSequenceCycleRate( iSequence ) * m_flPlaybackRate;
 	}
@@ -1032,7 +1032,7 @@ bool CBaseAnimating::HasAnimEvent( int nSequence, int nEvent )
   	animevent_t event;
 
 	int index = 0;
-	while ( ( index = GetAnimationEvent( pstudiohdr, nSequence, &event, 0.0f, 1.0f, index ) ) != 0 )
+	while ( ( index = pstudiohdr->GetAnimationEvent( nSequence, &event, 0.0f, 1.0f, index ,gpGlobals->curtime) ) != 0 )
 	{
 		if ( event.event == nEvent )
 		{
@@ -1094,7 +1094,7 @@ void CBaseAnimating::DispatchAnimEvents ( CBaseAnimating *eventHandler )
 
 	// FIXME: does not handle negative framerates!
 	int index = 0;
-	while ( (index = GetAnimationEvent( pstudiohdr, GetSequence(), &event, flStart, flEnd, index ) ) != 0 )
+	while ( (index = pstudiohdr->GetAnimationEvent( GetSequence(), &event, flStart, flEnd, index ,gpGlobals->curtime) ) != 0 )
 	{
 		event.pSource = this;
 		// calc when this event should happen
@@ -2105,20 +2105,20 @@ int CBaseAnimating::FindTransitionSequence( int iCurrentSequence, int iGoalSeque
 	if (piDir == NULL)
 	{
 		int iDir = 1;
-		int sequence = ::FindTransitionSequence( GetModelPtr(), iCurrentSequence, iGoalSequence, &iDir );
+		int sequence = GetModelPtr()->FindTransitionSequence( iCurrentSequence, iGoalSequence, &iDir );
 		if (iDir != 1)
 			return -1;
 		else
 			return sequence;
 	}
 
-	return ::FindTransitionSequence( GetModelPtr(), iCurrentSequence, iGoalSequence, piDir );
+	return GetModelPtr()->FindTransitionSequence( iCurrentSequence, iGoalSequence, piDir );
 }
 
 
 bool CBaseAnimating::GotoSequence( int iCurrentSequence, float flCurrentCycle, float flCurrentRate, int iGoalSequence, int &nNextSequence, float &flNextCycle, int &iNextDir )
 {
-	return ::GotoSequence( GetModelPtr(), iCurrentSequence, flCurrentCycle, flCurrentRate, iGoalSequence, nNextSequence, flNextCycle, iNextDir );
+	return GetModelPtr()->GotoSequence( iCurrentSequence, flCurrentCycle, flCurrentRate, iGoalSequence, nNextSequence, flNextCycle, iNextDir );
 }
 
 
@@ -2151,44 +2151,44 @@ void CBaseAnimating::SetBodygroup( int iGroup, int iValue )
 	// XXX TODO we could buffer up the group and value if we really needed to. -henryg
 	Assert( GetModelPtr() );
 	int newBody = m_nBody;
-	::SetBodygroup( GetModelPtr( ), newBody, iGroup, iValue );
+	GetModelPtr()->SetBodygroup( newBody, iGroup, iValue );
 	m_nBody = newBody;
 }
 
 int CBaseAnimating::GetBodygroup( int iGroup )
 {
 	//Assert( IsDynamicModelLoading() || GetModelPtr() );
-	return ::GetBodygroup( GetModelPtr( ), m_nBody, iGroup );//IsDynamicModelLoading() ? 0 : 
+	return GetModelPtr()->GetBodygroup( m_nBody, iGroup );//IsDynamicModelLoading() ? 0 : 
 }
 
 const char *CBaseAnimating::GetBodygroupName( int iGroup )
 {
 	//Assert( IsDynamicModelLoading() || GetModelPtr() );
-	return ::GetBodygroupName( GetModelPtr( ), iGroup );//IsDynamicModelLoading() ? "" : 
+	return GetModelPtr()->GetBodygroupName( iGroup );//IsDynamicModelLoading() ? "" : 
 }
 
 int CBaseAnimating::FindBodygroupByName( const char *name )
 {
 	//Assert( IsDynamicModelLoading() || GetModelPtr() );
-	return ::FindBodygroupByName( GetModelPtr( ), name );//IsDynamicModelLoading() ? -1 : 
+	return GetModelPtr()->FindBodygroupByName( name );//IsDynamicModelLoading() ? -1 : 
 }
 
 int CBaseAnimating::GetBodygroupCount( int iGroup )
 {
 	//Assert( IsDynamicModelLoading() || GetModelPtr() );
-	return ::GetBodygroupCount( GetModelPtr( ), iGroup );//IsDynamicModelLoading() ? 0 : 
+	return GetModelPtr()->GetBodygroupCount( iGroup );//IsDynamicModelLoading() ? 0 : 
 }
 
 int CBaseAnimating::GetNumBodyGroups( void )
 {
 	//Assert( IsDynamicModelLoading() || GetModelPtr() );
-	return ::GetNumBodyGroups( GetModelPtr( ) );//IsDynamicModelLoading() ? 0 : 
+	return GetModelPtr()->GetNumBodyGroups( );//IsDynamicModelLoading() ? 0 : 
 }
 
 int CBaseAnimating::ExtractBbox( int sequence, Vector& mins, Vector& maxs )
 {
 	//Assert( IsDynamicModelLoading() || GetModelPtr() );
-	return ::ExtractBbox( GetModelPtr( ), sequence, mins, maxs );//IsDynamicModelLoading() ? 0 : 
+	return GetModelPtr()->ExtractBbox( sequence, mins, maxs );//IsDynamicModelLoading() ? 0 : 
 }
 
 //=========================================================
@@ -2426,7 +2426,7 @@ bool CBaseAnimating::GetIntervalMovement( float flIntervalUsed, bool &bMoveSeqFi
 	Vector deltaPos;
 	QAngle deltaAngles;
 
-	if (Studio_SeqMovement( pstudiohdr, GetSequence(), GetCycle(), flNextCycle, GetPoseParameterArray(), deltaPos, deltaAngles ))
+	if (pstudiohdr->Studio_SeqMovement( GetSequence(), GetCycle(), flNextCycle, GetPoseParameterArray(), deltaPos, deltaAngles ))
 	{
 		VectorYawRotate( deltaPos, GetEngineObject()->GetLocalAngles().y, deltaPos );
 		newPosition = GetEngineObject()->GetLocalOrigin() + deltaPos;
@@ -2454,7 +2454,7 @@ bool CBaseAnimating::GetSequenceMovement( int nSequence, float fromCycle, float 
 	if (! pstudiohdr)
 		return false;
 
-	return Studio_SeqMovement( pstudiohdr, nSequence, fromCycle, toCycle, GetPoseParameterArray(), deltaPosition, deltaAngles );
+	return pstudiohdr->Studio_SeqMovement( nSequence, fromCycle, toCycle, GetPoseParameterArray(), deltaPosition, deltaAngles );
 }
 
 
@@ -2487,7 +2487,7 @@ bool CBaseAnimating::HasMovement( int iSequence )
 	// FIXME: this needs to check to see if there are keys, and the object is walking
 	Vector deltaPos;
 	QAngle deltaAngles;
-	if (Studio_SeqMovement( pstudiohdr, iSequence, 0.0f, 1.0f, GetPoseParameterArray(), deltaPos, deltaAngles ))
+	if (pstudiohdr->Studio_SeqMovement( iSequence, 0.0f, 1.0f, GetPoseParameterArray(), deltaPos, deltaAngles ))
 	{
 		return true;
 	}
@@ -2957,7 +2957,7 @@ void CBaseAnimating::SetHitboxSet( int setnum )
 void CBaseAnimating::SetHitboxSetByName( const char *setname )
 {
 	Assert( GetModelPtr() );
-	m_nHitboxSet = FindHitboxSetByName( GetModelPtr(), setname );
+	m_nHitboxSet = GetModelPtr()->FindHitboxSetByName( setname );
 }
 
 //-----------------------------------------------------------------------------
@@ -2976,7 +2976,7 @@ int CBaseAnimating::GetHitboxSet( void )
 const char *CBaseAnimating::GetHitboxSetName( void )
 {
 	Assert( GetModelPtr() );
-	return ::GetHitboxSetName( GetModelPtr(), m_nHitboxSet );
+	return GetModelPtr()->GetHitboxSetName( m_nHitboxSet );
 }
 
 //-----------------------------------------------------------------------------
@@ -2986,7 +2986,7 @@ const char *CBaseAnimating::GetHitboxSetName( void )
 int CBaseAnimating::GetHitboxSetCount( void )
 {
 	Assert( GetModelPtr() );
-	return ::GetHitboxSetCount( GetModelPtr() );
+	return GetModelPtr()->GetHitboxSetCount();
 }
 
 static Vector	hullcolor[8] = 
@@ -3285,7 +3285,7 @@ Activity CBaseAnimating::GetSequenceActivity( int iSequence )
 	if ( !GetModelPtr() )
 		return ACT_INVALID;
 
-	return (Activity)::GetSequenceActivity( GetModelPtr(), iSequence );
+	return (Activity)GetModelPtr()->GetSequenceActivity( iSequence );
 }
 
 void CBaseAnimating::ModifyOrAppendCriteria( AI_CriteriaSet& set )
@@ -3580,7 +3580,7 @@ bool CBaseAnimating::PrefetchSequence( int iSequence )
 //-----------------------------------------------------------------------------
 bool CBaseAnimating::IsSequenceLooping( IStudioHdr *pStudioHdr, int iSequence )
 {
-	return (::GetSequenceFlags( pStudioHdr, iSequence ) & STUDIO_LOOPING) != 0;
+	return (pStudioHdr->GetSequenceFlags( iSequence ) & STUDIO_LOOPING) != 0;
 }
 
 //-----------------------------------------------------------------------------

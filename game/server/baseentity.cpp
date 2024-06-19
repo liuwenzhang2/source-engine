@@ -4242,7 +4242,7 @@ void CBaseEntity::PrecacheModelComponents( int nModelIndex )
 		if ( studioHdr->IsValid() )
 		{
 			// force animation event resolution!!!
-			VerifySequenceIndex( studioHdr );
+			studioHdr->VerifySequenceIndex();
 
 			int nSeqCount = studioHdr->GetNumSeq();
 			for ( int i = 0; i < nSeqCount; ++i )

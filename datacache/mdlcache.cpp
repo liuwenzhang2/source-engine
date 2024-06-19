@@ -656,6 +656,8 @@ public:
 	virtual int EventList_IndexForName(const char* pszEventName);
 	virtual const char* EventList_NameForIndex(int iEventIndex);
 	virtual int EventList_GetEventType(int eventIndex);
+	void SetEventIndexForSequence(mstudioseqdesc_t& seqdesc);
+	mstudioevent_t* GetEventIndexForSequence(mstudioseqdesc_t& seqdesc);
 
 private:
 	// Inits, shuts downs studiodata_t
@@ -3319,7 +3321,6 @@ void CStudioHdr::RunFlexRules(const float* src, float* dest)
 
 CUtlSymbolTable g_ActivityModifiersTable;
 
-extern void SetActivityForSequence(IStudioHdr* pstudiohdr, int i);
 void CActivityToSequenceMapping::Initialize(CStudioHdr* __restrict pstudiohdr)
 {
 	// Algorithm: walk through every sequence in the model, determine to which activity
@@ -3350,13 +3351,13 @@ void CActivityToSequenceMapping::Initialize(CStudioHdr* __restrict pstudiohdr)
 	for (int i = 0; i < NumSeq; ++i)
 	{
 		const mstudioseqdesc_t& seqdesc = pstudiohdr->pSeqdesc(i);
-#if defined(SERVER_DLL) || defined(CLIENT_DLL) || defined(GAME_DLL)
+//#if defined(SERVER_DLL) || defined(CLIENT_DLL) || defined(GAME_DLL)
 		if (!(seqdesc.flags & STUDIO_ACTIVITY))
 		{
 			// AssertMsg2( false, "Sequence %d on studiohdr %s didn't have its activity initialized!", i, pstudiohdr->pszName() );
-			SetActivityForSequence(pstudiohdr, i);
+			pstudiohdr->SetActivityForSequence(i);
 		}
-#endif
+//#endif
 
 		// is there an activity associated with this sequence?
 		if (seqdesc.activity >= 0)
@@ -5760,6 +5761,57 @@ const char* CMDLCache::EventList_NameForIndex(int eventIndex)
 	return NULL;
 }
 
+void CMDLCache::SetEventIndexForSequence(mstudioseqdesc_t& seqdesc)
+{
+	if (&seqdesc == NULL)
+		return;
+
+	seqdesc.flags |= STUDIO_EVENT;
+
+	if (seqdesc.numevents == 0)
+		return;
+
+	for (int index = 0; index < (int)seqdesc.numevents; index++)
+	{
+		mstudioevent_t* pevent = seqdesc.pEvent(index);
+
+		if (!pevent)
+			continue;
+
+		if (pevent->type & AE_TYPE_NEWEVENTSYSTEM)
+		{
+			const char* pEventName = pevent->pszEventName();
+
+			int iEventIndex = mdlcache->EventList_IndexForName(pEventName);
+
+			if (iEventIndex == -1)
+			{
+#ifdef CLIENT_DLL
+				Error("can not happen!");
+#endif // CLIENT_DLL
+//#ifdef GAME_DLL
+				pevent->event = mdlcache->EventList_RegisterPrivateEvent(pEventName);
+//#endif // GAME_DLL
+			}
+			else
+			{
+				pevent->event = iEventIndex;
+				pevent->type |= mdlcache->EventList_GetEventType(iEventIndex);
+			}
+		}
+	}
+}
+
+mstudioevent_t* CMDLCache::GetEventIndexForSequence(mstudioseqdesc_t& seqdesc)
+{
+	if (!(seqdesc.flags & STUDIO_EVENT))
+	{
+		SetEventIndexForSequence(seqdesc);
+	}
+
+	return seqdesc.pEvent(0);
+}
+
 //-----------------------------------------------------------------------------
 // Purpose: bind studiohdr_t support functions to the mdlcacher
 //-----------------------------------------------------------------------------
@@ -6822,4 +6874,1086 @@ void CVirtualModel::AppendIKLocks(int group, const CStudioHdr* pStudioHdr)
 			}
 		}
 	}
+}
+
+int CStudioHdr::ExtractBbox(int sequence, Vector& mins, Vector& maxs)
+{
+	if (!this)
+		return 0;
+
+	if (!this->SequencesAvailable())
+		return 0;
+
+	mstudioseqdesc_t& seqdesc = this->pSeqdesc(sequence);
+
+	mins = seqdesc.bbmin;
+
+	maxs = seqdesc.bbmax;
+
+	return 1;
+}
+
+void CStudioHdr::BuildAllAnimationEventIndexes()
+{
+	if (!this)
+		return;
+
+	if (this->GetEventListVersion() != mdlcache->EventListVersion())
+	{
+		for (int i = 0; i < this->GetNumSeq(); i++)
+		{
+			mdlcache->SetEventIndexForSequence(this->pSeqdesc(i));
+		}
+
+		this->SetEventListVersion(mdlcache->EventListVersion());
+	}
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: Ensures that activity / index relationship is recalculated
+// Input  :
+// Output :
+//-----------------------------------------------------------------------------
+void CStudioHdr::ResetEventIndexes()
+{
+	if (!this)
+		return;
+
+	this->SetEventListVersion(mdlcache->EventListVersion() - 1);
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
+
+void CStudioHdr::SetActivityForSequence(int i)
+{
+	int iActivityIndex;
+	const char* pszActivityName;
+	mstudioseqdesc_t& seqdesc = this->pSeqdesc(i);
+
+	seqdesc.flags |= STUDIO_ACTIVITY;
+
+	pszActivityName = GetSequenceActivityName(i);
+	if (pszActivityName[0] != '\0')
+	{
+		iActivityIndex = mdlcache->ActivityList_IndexForName(pszActivityName);
+
+		if (iActivityIndex == -1)
+		{
+			// Allow this now.  Animators can create custom activities that are referenced only on the client or by scripts, etc.
+			//Warning( "***\nModel %s tried to reference unregistered activity: %s \n***\n", pstudiohdr->name, pszActivityName );
+			//Assert(0);
+			// HACK: the client and server don't share the private activity list so registering it on the client would hose the server
+#ifdef CLIENT_DLL
+			seqdesc.flags &= ~STUDIO_ACTIVITY;
+#else
+			seqdesc.activity = mdlcache->ActivityList_RegisterPrivateActivity(pszActivityName);
+#endif
+		}
+		else
+		{
+			seqdesc.activity = iActivityIndex;
+		}
+	}
+}
+
+//=========================================================
+// IndexModelSequences - set activity and event indexes for all model
+// sequences that have them.
+//=========================================================
+
+void CStudioHdr::IndexModelSequences()
+{
+	int i;
+
+	if (!this)
+		return;
+
+	if (!this->SequencesAvailable())
+		return;
+
+	for (i = 0; i < this->GetNumSeq(); i++)
+	{
+		SetActivityForSequence(i);
+		mdlcache->SetEventIndexForSequence(this->pSeqdesc(i));
+	}
+
+	this->SetActivityListVersion(mdlcache->ActivityListVersion());
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: Ensures that activity / index relationship is recalculated
+// Input  :
+// Output :
+//-----------------------------------------------------------------------------
+void CStudioHdr::ResetActivityIndexes()
+{
+	if (!this)
+		return;
+
+	this->SetActivityListVersion(mdlcache->ActivityListVersion() - 1);
+}
+
+void CStudioHdr::VerifySequenceIndex()
+{
+	if (!this)
+	{
+		return;
+	}
+
+	if (this->GetActivityListVersion() != mdlcache->ActivityListVersion())
+	{
+		// this model's sequences have not yet been indexed by activity
+		IndexModelSequences();
+	}
+}
+
+int CStudioHdr::SelectWeightedSequence(int activity, int curSequence, RandomWeightFunc pRandomWeightFunc)
+{
+	VPROF("SelectWeightedSequence");
+
+	if (!this)
+		return 0;
+
+	if (!this->SequencesAvailable())
+		return 0;
+
+	this->VerifySequenceIndex();
+
+#if STUDIO_SEQUENCE_ACTIVITY_LOOKUPS_ARE_SLOW
+	int weighttotal = 0;
+	int seq = ACTIVITY_NOT_AVAILABLE;
+	int weight = 0;
+	for (int i = 0; i < this->GetNumSeq(); i++)
+	{
+		int curActivity = GetSequenceActivity(i, &weight);
+		if (curActivity == activity)
+		{
+			if (curSequence == i && weight < 0)
+			{
+				seq = i;
+				break;
+			}
+			weighttotal += iabs(weight);
+
+			int randomValue;
+
+			if (IsInPrediction())
+				randomValue = SharedRandomInt("SelectWeightedSequence", 0, weighttotal - 1, i);
+			else
+				randomValue = RandomInt(0, weighttotal - 1);
+
+			if (!weighttotal || randomValue < iabs(weight))
+				seq = i;
+		}
+	}
+
+	return seq;
+#else
+	return this->SelectWeightedSequenceInternal(activity, curSequence, pRandomWeightFunc);// &SharedRandomSelect);
+#endif
+}
+
+
+
+
+
+
+int CStudioHdr::SelectHeaviestSequence(int activity)
+{
+	if (!this)
+		return 0;
+
+	this->VerifySequenceIndex();
+
+	int maxweight = 0;
+	int seq = ACTIVITY_NOT_AVAILABLE;
+	int weight = 0;
+	for (int i = 0; i < this->GetNumSeq(); i++)
+	{
+		int curActivity = GetSequenceActivity(i, &weight);
+		if (curActivity == activity)
+		{
+			if (iabs(weight) > maxweight)
+			{
+				maxweight = iabs(weight);
+				seq = i;
+			}
+		}
+	}
+
+	return seq;
+}
+
+void CStudioHdr::GetEyePosition(Vector& vecEyePosition)
+{
+	if (!this)
+	{
+		Warning("GetEyePosition() Can't get pstudiohdr ptr!\n");
+		return;
+	}
+
+	vecEyePosition = this->eyeposition();
+}
+
+
+//-----------------------------------------------------------------------------
+// Purpose: Looks up an activity by name.
+// Input  : label - Name of the activity to look up, ie "ACT_IDLE"
+// Output : Activity index or ACT_INVALID if not found.
+//-----------------------------------------------------------------------------
+int CStudioHdr::LookupActivity(const char* label)
+{
+	VPROF("LookupActivity");
+
+	if (!this)
+	{
+		return 0;
+	}
+
+	for (int i = 0; i < this->GetNumSeq(); i++)
+	{
+		mstudioseqdesc_t& seqdesc = this->pSeqdesc(i);
+		if (stricmp(seqdesc.pszActivityName(), label) == 0)
+		{
+			return seqdesc.activity;
+		}
+	}
+
+	return -1;// ACT_INVALID;
+}
+
+#if !defined( MAKEXVCD )
+//-----------------------------------------------------------------------------
+// Purpose: Looks up a sequence by sequence name first, then by activity name.
+// Input  : label - The sequence name or activity name to look up.
+// Output : Returns the sequence index of the matching sequence, or ACT_INVALID.
+//-----------------------------------------------------------------------------
+int CStudioHdr::LookupSequence(const char* label, RandomWeightFunc pRandomWeightFunc)
+{
+	VPROF("LookupSequence");
+
+	if (!this)
+		return 0;
+
+	if (!this->SequencesAvailable())
+		return 0;
+
+	//
+	// Look up by sequence name.
+	//
+	for (int i = 0; i < this->GetNumSeq(); i++)
+	{
+		mstudioseqdesc_t& seqdesc = this->pSeqdesc(i);
+		if (stricmp(seqdesc.pszLabel(), label) == 0)
+			return i;
+	}
+
+	//
+	// Not found, look up by activity name.
+	//
+	int nActivity = this->LookupActivity(label);
+	if (nActivity != -1)//ACT_INVALID)
+	{
+		return SelectWeightedSequence(nActivity, nActivity, pRandomWeightFunc);
+	}
+
+	return -1;// ACT_INVALID;
+}
+
+void CStudioHdr::GetSequenceLinearMotion(int iSequence, const float poseParameter[], Vector* pVec)
+{
+	if (!this)
+	{
+		Msg("Bad pstudiohdr in GetSequenceLinearMotion()!\n");
+		return;
+	}
+
+	if (!this->SequencesAvailable())
+		return;
+
+	if (iSequence < 0 || iSequence >= this->GetNumSeq())
+	{
+		// Don't spam on bogus model
+		if (this->GetNumSeq() > 0)
+		{
+			static int msgCount = 0;
+			while (++msgCount <= 10)
+			{
+				Msg("Bad sequence (%i out of %i max) in GetSequenceLinearMotion() for model '%s'!\n", iSequence, this->GetNumSeq(), this->pszName());
+			}
+		}
+		pVec->Init();
+		return;
+	}
+
+	QAngle vecAngles;
+	Studio_SeqMovement(iSequence, 0, 1.0, poseParameter, (*pVec), vecAngles);
+}
+#endif
+
+const char* CStudioHdr::GetSequenceName(int iSequence)
+{
+	if (!this || iSequence < 0 || iSequence >= this->GetNumSeq())
+	{
+		if (this)
+		{
+			Msg("Bad sequence in GetSequenceName() for model '%s'!\n", this->pszName());
+		}
+		return "Unknown";
+	}
+
+	mstudioseqdesc_t& seqdesc = this->pSeqdesc(iSequence);
+	return seqdesc.pszLabel();
+}
+
+const char* CStudioHdr::GetSequenceActivityName(int iSequence)
+{
+	if (!this || iSequence < 0 || iSequence >= this->GetNumSeq())
+	{
+		if (this)
+		{
+			Msg("Bad sequence in GetSequenceActivityName() for model '%s'!\n", this->pszName());
+		}
+		return "Unknown";
+	}
+
+	mstudioseqdesc_t& seqdesc = this->pSeqdesc(iSequence);
+	return seqdesc.pszActivityName();
+}
+
+int CStudioHdr::GetSequenceFlags(int sequence)
+{
+	if (!this ||
+		!this->SequencesAvailable() ||
+		sequence < 0 ||
+		sequence >= this->GetNumSeq())
+	{
+		return 0;
+	}
+
+	mstudioseqdesc_t& seqdesc = this->pSeqdesc(sequence);
+
+	return seqdesc.flags;
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: 
+// Input  : *pstudiohdr - 
+//			sequence - 
+//			type - 
+// Output : Returns true on success, false on failure.
+//-----------------------------------------------------------------------------
+bool CStudioHdr::HasAnimationEventOfType(int sequence, int type)
+{
+	if (!this || sequence >= this->GetNumSeq())
+		return false;
+
+	mstudioseqdesc_t& seqdesc = this->pSeqdesc(sequence);
+	if (!&seqdesc)
+		return false;
+
+	mstudioevent_t* pevent = mdlcache->GetEventIndexForSequence(seqdesc);
+	if (!pevent)
+		return false;
+
+	if (seqdesc.numevents == 0)
+		return false;
+
+	int index;
+	for (index = 0; index < (int)seqdesc.numevents; index++)
+	{
+		if (pevent[index].event == type)
+		{
+			return true;
+		}
+	}
+
+	return false;
+}
+
+int CStudioHdr::GetAnimationEvent(int sequence, animevent_t* pNPCEvent, float flStart, float flEnd, int index, const float fCurtime)
+{
+	if (!this || sequence >= this->GetNumSeq() || !pNPCEvent)
+		return 0;
+
+	mstudioseqdesc_t& seqdesc = this->pSeqdesc(sequence);
+	if (seqdesc.numevents == 0 || index >= (int)seqdesc.numevents)
+		return 0;
+
+	// Msg( "flStart %f flEnd %f (%d) %s\n", flStart, flEnd, seqdesc.numevents, seqdesc.label );
+	mstudioevent_t* pevent = mdlcache->GetEventIndexForSequence(seqdesc);
+	for (; index < (int)seqdesc.numevents; index++)
+	{
+		// Don't send client-side events to the server AI
+		if (pevent[index].type & AE_TYPE_NEWEVENTSYSTEM)
+		{
+			if (!(pevent[index].type & AE_TYPE_SERVER))
+				continue;
+		}
+		else if (pevent[index].event >= EVENT_CLIENT) //Adrian - Support the old event system
+			continue;
+
+		bool bOverlapEvent = false;
+
+		if (pevent[index].cycle >= flStart && pevent[index].cycle < flEnd)
+		{
+			bOverlapEvent = true;
+		}
+		// FIXME: doesn't work with animations being played in reverse
+		else if ((seqdesc.flags & STUDIO_LOOPING) && flEnd < flStart)
+		{
+			if (pevent[index].cycle >= flStart || pevent[index].cycle < flEnd)
+			{
+				bOverlapEvent = true;
+			}
+		}
+
+		if (bOverlapEvent)
+		{
+//#ifdef GAME_DLL
+			pNPCEvent->pSource = NULL;
+//#endif // GAME_DLL
+			pNPCEvent->cycle = pevent[index].cycle;
+#if !defined( MAKEXVCD )
+			pNPCEvent->eventtime = fCurtime;// gpGlobals->curtime;
+#else
+			pNPCEvent->eventtime = 0.0f;
+#endif
+			pNPCEvent->event = pevent[index].event;
+			pNPCEvent->options = pevent[index].pszOptions();
+			pNPCEvent->type = pevent[index].type;
+			return index + 1;
+		}
+	}
+	return 0;
+}
+
+
+
+int CStudioHdr::FindTransitionSequence(int iCurrentSequence, int iGoalSequence, int* piDir)
+{
+	if (!this)
+		return iGoalSequence;
+
+	if (!this->SequencesAvailable())
+		return iGoalSequence;
+
+	if ((iCurrentSequence < 0) || (iCurrentSequence >= this->GetNumSeq()))
+		return iGoalSequence;
+
+	if ((iGoalSequence < 0) || (iGoalSequence >= this->GetNumSeq()))
+	{
+		// asking for a bogus sequence.  Punt.
+		Assert(0);
+		return iGoalSequence;
+	}
+
+
+	// bail if we're going to or from a node 0
+	if (this->EntryNode(iCurrentSequence) == 0 || this->EntryNode(iGoalSequence) == 0)
+	{
+		*piDir = 1;
+		return iGoalSequence;
+	}
+
+	int	iEndNode;
+
+	// Msg( "from %d to %d: ", pEndNode->iEndNode, pGoalNode->iStartNode );
+
+	// check to see if we should be going forward or backward through the graph
+	if (*piDir > 0)
+	{
+		iEndNode = this->ExitNode(iCurrentSequence);
+	}
+	else
+	{
+		iEndNode = this->EntryNode(iCurrentSequence);
+	}
+
+	// if both sequences are on the same node, just go there
+	if (iEndNode == this->EntryNode(iGoalSequence))
+	{
+		*piDir = 1;
+		return iGoalSequence;
+	}
+
+	int iInternNode = this->GetTransition(iEndNode, this->EntryNode(iGoalSequence));
+
+	// if there is no transitionial node, just go to the goal sequence
+	if (iInternNode == 0)
+		return iGoalSequence;
+
+	int i;
+
+	// look for someone going from the entry node to next node it should hit
+	// this may be the goal sequences node or an intermediate node
+	for (i = 0; i < this->GetNumSeq(); i++)
+	{
+		mstudioseqdesc_t& seqdesc = this->pSeqdesc(i);
+		if (this->EntryNode(i) == iEndNode && this->ExitNode(i) == iInternNode)
+		{
+			*piDir = 1;
+			return i;
+		}
+		if (seqdesc.nodeflags)
+		{
+			if (this->ExitNode(i) == iEndNode && this->EntryNode(i) == iInternNode)
+			{
+				*piDir = -1;
+				return i;
+			}
+		}
+	}
+
+	// this means that two parts of the node graph are not connected.
+	DevMsg(2, "error in transition graph: %s to %s\n", this->pszNodeName(iEndNode), this->pszNodeName(this->EntryNode(iGoalSequence)));
+	// Go ahead and jump to the goal sequence
+	return iGoalSequence;
+}
+
+
+
+
+
+
+bool CStudioHdr::GotoSequence(int iCurrentSequence, float flCurrentCycle, float flCurrentRate, int iGoalSequence, int& nNextSequence, float& flNextCycle, int& iNextDir)
+{
+	if (!this)
+		return false;
+
+	if (!this->SequencesAvailable())
+		return false;
+
+	if ((iCurrentSequence < 0) || (iCurrentSequence >= this->GetNumSeq()))
+		return false;
+
+	if ((iGoalSequence < 0) || (iGoalSequence >= this->GetNumSeq()))
+	{
+		// asking for a bogus sequence.  Punt.
+		Assert(0);
+		return false;
+	}
+
+	// bail if we're going to or from a node 0
+	if (this->EntryNode(iCurrentSequence) == 0 || this->EntryNode(iGoalSequence) == 0)
+	{
+		iNextDir = 1;
+		flNextCycle = 0.0;
+		nNextSequence = iGoalSequence;
+		return true;
+	}
+
+	int	iEndNode = this->ExitNode(iCurrentSequence);
+	// Msg( "from %d to %d: ", pEndNode->iEndNode, pGoalNode->iStartNode );
+
+	// if we're in a transition sequence
+	if (this->EntryNode(iCurrentSequence) != this->ExitNode(iCurrentSequence))
+	{
+		// are we done with it?
+		if (flCurrentRate > 0.0 && flCurrentCycle >= 0.999)
+		{
+			iEndNode = this->ExitNode(iCurrentSequence);
+		}
+		else if (flCurrentRate < 0.0 && flCurrentCycle <= 0.001)
+		{
+			iEndNode = this->EntryNode(iCurrentSequence);
+		}
+		else
+		{
+			// nope, exit
+			return false;
+		}
+	}
+
+	// if both sequences are on the same node, just go there
+	if (iEndNode == this->EntryNode(iGoalSequence))
+	{
+		iNextDir = 1;
+		flNextCycle = 0.0;
+		nNextSequence = iGoalSequence;
+		return true;
+	}
+
+	int iInternNode = this->GetTransition(iEndNode, this->EntryNode(iGoalSequence));
+
+	// if there is no transitionial node, just go to the goal sequence
+	if (iInternNode == 0)
+	{
+		iNextDir = 1;
+		flNextCycle = 0.0;
+		nNextSequence = iGoalSequence;
+		return true;
+	}
+
+	int i;
+
+	// look for someone going from the entry node to next node it should hit
+	// this may be the goal sequences node or an intermediate node
+	for (i = 0; i < this->GetNumSeq(); i++)
+	{
+		mstudioseqdesc_t& seqdesc = this->pSeqdesc(i);
+		if (this->EntryNode(i) == iEndNode && this->ExitNode(i) == iInternNode)
+		{
+			iNextDir = 1;
+			flNextCycle = 0.0;
+			nNextSequence = i;
+			return true;
+		}
+		if (seqdesc.nodeflags)
+		{
+			if (this->ExitNode(i) == iEndNode && this->EntryNode(i) == iInternNode)
+			{
+				iNextDir = -1;
+				flNextCycle = 0.999;
+				nNextSequence = i;
+				return true;
+			}
+		}
+	}
+
+	// this means that two parts of the node graph are not connected.
+	DevMsg(2, "error in transition graph: %s to %s\n", this->pszNodeName(iEndNode), this->pszNodeName(this->EntryNode(iGoalSequence)));
+	return false;
+}
+
+void CStudioHdr::SetBodygroup(int& body, int iGroup, int iValue)
+{
+	if (!this)
+		return;
+
+	if (iGroup >= this->numbodyparts())
+		return;
+
+	mstudiobodyparts_t* pbodypart = this->pBodypart(iGroup);
+
+	if (iValue >= pbodypart->nummodels)
+		return;
+
+	int iCurrent = (body / pbodypart->base) % pbodypart->nummodels;
+
+	body = (body - (iCurrent * pbodypart->base) + (iValue * pbodypart->base));
+}
+
+
+int CStudioHdr::GetBodygroup(int body, int iGroup)
+{
+	if (!this)
+		return 0;
+
+	if (iGroup >= this->numbodyparts())
+		return 0;
+
+	mstudiobodyparts_t* pbodypart = this->pBodypart(iGroup);
+
+	if (pbodypart->nummodels <= 1)
+		return 0;
+
+	int iCurrent = (body / pbodypart->base) % pbodypart->nummodels;
+
+	return iCurrent;
+}
+
+const char* CStudioHdr::GetBodygroupName(int iGroup)
+{
+	if (!this)
+		return "";
+
+	if (iGroup >= this->numbodyparts())
+		return "";
+
+	mstudiobodyparts_t* pbodypart = this->pBodypart(iGroup);
+	return pbodypart->pszName();
+}
+
+int CStudioHdr::FindBodygroupByName(const char* name)
+{
+	if (!this)
+		return -1;
+
+	int group;
+	for (group = 0; group < this->numbodyparts(); group++)
+	{
+		mstudiobodyparts_t* pbodypart = this->pBodypart(group);
+		if (!Q_strcasecmp(name, pbodypart->pszName()))
+		{
+			return group;
+		}
+	}
+
+	return -1;
+}
+
+int CStudioHdr::GetBodygroupCount(int iGroup)
+{
+	if (!this)
+		return 0;
+
+	if (iGroup >= this->numbodyparts())
+		return 0;
+
+	mstudiobodyparts_t* pbodypart = this->pBodypart(iGroup);
+	return pbodypart->nummodels;
+}
+
+int CStudioHdr::GetNumBodyGroups()
+{
+	if (!this)
+		return 0;
+
+	return this->numbodyparts();
+}
+
+int CStudioHdr::GetSequenceActivity(int sequence, int* pweight)
+{
+	if (!this || !this->SequencesAvailable())
+	{
+		if (pweight)
+			*pweight = 0;
+		return 0;
+	}
+
+	mstudioseqdesc_t& seqdesc = this->pSeqdesc(sequence);
+
+	if (!(seqdesc.flags & STUDIO_ACTIVITY))
+	{
+		SetActivityForSequence(sequence);
+	}
+	if (pweight)
+		*pweight = seqdesc.actweight;
+	return seqdesc.activity;
+}
+
+
+void CStudioHdr::GetAttachmentLocalSpace(int attachIndex, matrix3x4_t& pLocalToWorld)
+{
+	if (attachIndex >= 0)
+	{
+		const mstudioattachment_t& pAttachment = this->pAttachment(attachIndex);
+		//MatrixCopy(pAttachment.local, pLocalToWorld);
+		memcpy(pLocalToWorld.Base(), pAttachment.local.Base(), sizeof(float) * 3 * 4);
+	}
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: 
+// Input  : *pstudiohdr - 
+//			*name - 
+// Output : int
+//-----------------------------------------------------------------------------
+int CStudioHdr::FindHitboxSetByName(const char* name)
+{
+	if (!this)
+		return -1;
+
+	for (int i = 0; i < this->numhitboxsets(); i++)
+	{
+		mstudiohitboxset_t* set = this->pHitboxSet(i);
+		if (!set)
+			continue;
+
+		if (!stricmp(set->pszName(), name))
+			return i;
+	}
+
+	return -1;
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: 
+// Input  : *pstudiohdr - 
+//			setnumber - 
+// Output : char const
+//-----------------------------------------------------------------------------
+const char* CStudioHdr::GetHitboxSetName(int setnumber)
+{
+	if (!this)
+		return "";
+
+	mstudiohitboxset_t* set = this->pHitboxSet(setnumber);
+	if (!set)
+		return "";
+
+	return set->pszName();
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: 
+// Input  : *pstudiohdr - 
+// Output : int
+//-----------------------------------------------------------------------------
+int CStudioHdr::GetHitboxSetCount()
+{
+	if (!this)
+		return 0;
+
+	return this->numhitboxsets();
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: calculate changes in position and angle between two points in a sequences cycle
+// Output:	updated position and angle, relative to CycleFrom being at the origin
+//			returns false if sequence is not a movement sequence
+//-----------------------------------------------------------------------------
+
+bool CStudioHdr::Studio_SeqMovement(int iSequence, float flCycleFrom, float flCycleTo, const float poseParameter[], Vector& deltaPos, QAngle& deltaAngles)
+{
+	mstudioanimdesc_t* panim[4];
+	float	weight[4];
+
+	mstudioseqdesc_t& seqdesc = ((IStudioHdr*)this)->pSeqdesc(iSequence);
+
+	Studio_SeqAnims(seqdesc, iSequence, poseParameter, panim, weight);
+
+	deltaPos.Init();
+	deltaAngles.Init();
+
+	bool found = false;
+
+	for (int i = 0; i < 4; i++)
+	{
+		if (weight[i])
+		{
+			Vector localPos;
+			QAngle localAngles;
+
+			localPos.Init();
+			localAngles.Init();
+
+			if (Studio_AnimMovement(panim[i], flCycleFrom, flCycleTo, localPos, localAngles))
+			{
+				found = true;
+				deltaPos = deltaPos + localPos * weight[i];
+				// FIXME: this makes no sense
+				deltaAngles = deltaAngles + localAngles * weight[i];
+			}
+			else if (!(panim[i]->flags & STUDIO_DELTA) && panim[i]->nummovements == 0 && seqdesc.weight(0) > 0.0)
+			{
+				found = true;
+			}
+		}
+	}
+	return found;
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: returns array of animations and weightings for a sequence based on current pose parameters
+//-----------------------------------------------------------------------------
+
+void CStudioHdr::Studio_SeqAnims(mstudioseqdesc_t& seqdesc, int iSequence, const float poseParameter[], mstudioanimdesc_t* panim[4], float* weight) const
+{
+#if _DEBUG
+	VPROF_INCREMENT_COUNTER("SEQ_ANIMS", 1);
+#endif
+	if (!this || iSequence >= this->GetNumSeq())
+	{
+		weight[0] = weight[1] = weight[2] = weight[3] = 0.0;
+		return;
+	}
+
+	int i0 = 0, i1 = 0;
+	float s0 = 0, s1 = 0;
+
+	Studio_LocalPoseParameter(poseParameter, seqdesc, iSequence, 0, s0, i0);
+	Studio_LocalPoseParameter(poseParameter, seqdesc, iSequence, 1, s1, i1);
+
+	panim[0] = &((IStudioHdr*)this)->pAnimdesc(this->iRelativeAnim(iSequence, seqdesc.anim(i0, i1)));
+	weight[0] = (1 - s0) * (1 - s1);
+
+	panim[1] = &((IStudioHdr*)this)->pAnimdesc(this->iRelativeAnim(iSequence, seqdesc.anim(i0 + 1, i1)));
+	weight[1] = (s0) * (1 - s1);
+
+	panim[2] = &((IStudioHdr*)this)->pAnimdesc(this->iRelativeAnim(iSequence, seqdesc.anim(i0, i1 + 1)));
+	weight[2] = (1 - s0) * (s1);
+
+	panim[3] = &((IStudioHdr*)this)->pAnimdesc(this->iRelativeAnim(iSequence, seqdesc.anim(i0 + 1, i1 + 1)));
+	weight[3] = (s0) * (s1);
+
+	Assert(weight[0] >= 0.0f && weight[1] >= 0.0f && weight[2] >= 0.0f && weight[3] >= 0.0f);
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: calculate changes in position and angle between two points in an animation cycle
+// Output:	updated position and angle, relative to CycleFrom being at the origin
+//			returns false if animation is not a movement animation
+//-----------------------------------------------------------------------------
+
+bool CStudioHdr::Studio_AnimMovement(mstudioanimdesc_t* panim, float flCycleFrom, float flCycleTo, Vector& deltaPos, QAngle& deltaAngle)
+{
+	if (panim->nummovements == 0)
+		return false;
+
+	Vector startPos;
+	QAngle startA;
+	Studio_AnimPosition(panim, flCycleFrom, startPos, startA);
+
+	Vector endPos;
+	QAngle endA;
+	Studio_AnimPosition(panim, flCycleTo, endPos, endA);
+
+	Vector tmp = endPos - startPos;
+	deltaAngle.y = endA.y - startA.y;
+	//VectorYawRotate(tmp, -startA.y, deltaPos);
+	float sy, cy;
+
+	SinCos(DEG2RAD(-startA.y), &sy, &cy);
+
+	deltaPos.x = tmp.x * cy - tmp.y * sy;
+	deltaPos.y = tmp.x * sy + tmp.y * cy;
+	deltaPos.z = tmp.z;
+
+	return true;
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: resolve a global pose parameter to the specific setting for this sequence
+//-----------------------------------------------------------------------------
+void CStudioHdr::Studio_LocalPoseParameter(const float poseParameter[], mstudioseqdesc_t& seqdesc, int iSequence, int iLocalIndex, float& flSetting, int& index) const
+{
+	if (!this)
+	{
+		flSetting = 0;
+		index = 0;
+		return;
+	}
+
+	int iPose = this->GetSharedPoseParameter(iSequence, seqdesc.paramindex[iLocalIndex]);
+
+	if (iPose == -1)
+	{
+		flSetting = 0;
+		index = 0;
+		return;
+	}
+
+	const mstudioposeparamdesc_t& Pose = ((IStudioHdr*)this)->pPoseParameter(iPose);
+
+	float flValue = poseParameter[iPose];
+
+	if (Pose.loop)
+	{
+		float wrap = (Pose.start + Pose.end) / 2.0 + Pose.loop / 2.0;
+		float shift = Pose.loop - wrap;
+
+		flValue = flValue - Pose.loop * floor((flValue + shift) / Pose.loop);
+	}
+
+	if (seqdesc.posekeyindex == 0)
+	{
+		float flLocalStart = ((float)seqdesc.paramstart[iLocalIndex] - Pose.start) / (Pose.end - Pose.start);
+		float flLocalEnd = ((float)seqdesc.paramend[iLocalIndex] - Pose.start) / (Pose.end - Pose.start);
+
+		// convert into local range
+		flSetting = (flValue - flLocalStart) / (flLocalEnd - flLocalStart);
+
+		// clamp.  This shouldn't ever need to happen if it's looping.
+		if (flSetting < 0)
+			flSetting = 0;
+		if (flSetting > 1)
+			flSetting = 1;
+
+		index = 0;
+		if (seqdesc.groupsize[iLocalIndex] > 2)
+		{
+			// estimate index
+			index = (int)(flSetting * (seqdesc.groupsize[iLocalIndex] - 1));
+			if (index == seqdesc.groupsize[iLocalIndex] - 1) index = seqdesc.groupsize[iLocalIndex] - 2;
+			flSetting = flSetting * (seqdesc.groupsize[iLocalIndex] - 1) - index;
+		}
+	}
+	else
+	{
+		flValue = flValue * (Pose.end - Pose.start) + Pose.start;
+		index = 0;
+
+		// FIXME: this needs to be 2D
+		// FIXME: this shouldn't be a linear search
+
+		while (1)
+		{
+			flSetting = (flValue - seqdesc.poseKey(iLocalIndex, index)) / (seqdesc.poseKey(iLocalIndex, index + 1) - seqdesc.poseKey(iLocalIndex, index));
+			/*
+			if (index > 0 && flSetting < 0.0)
+			{
+				index--;
+				continue;
+			}
+			else
+			*/
+			if (index < seqdesc.groupsize[iLocalIndex] - 2 && flSetting > 1.0)
+			{
+				index++;
+				continue;
+			}
+			break;
+		}
+
+		// clamp.
+		if (flSetting < 0.0f)
+			flSetting = 0.0f;
+		if (flSetting > 1.0f)
+			flSetting = 1.0f;
+	}
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: calculate changes in position and angle relative to the start of an animations cycle
+// Output:	updated position and angle, relative to the origin
+//			returns false if animation is not a movement animation
+//-----------------------------------------------------------------------------
+
+bool CStudioHdr::Studio_AnimPosition(mstudioanimdesc_t* panim, float flCycle, Vector& vecPos, QAngle& vecAngle)
+{
+	float	prevframe = 0;
+	vecPos.Init();
+	vecAngle.Init();
+
+	if (panim->nummovements == 0)
+		return false;
+
+	int iLoops = 0;
+	if (flCycle > 1.0)
+	{
+		iLoops = (int)flCycle;
+	}
+	else if (flCycle < 0.0)
+	{
+		iLoops = (int)flCycle - 1;
+	}
+	flCycle = flCycle - iLoops;
+
+	float	flFrame = flCycle * (panim->numframes - 1);
+
+
+	for (int i = 0; i < panim->nummovements; i++)
+	{
+		mstudiomovement_t pmove;
+		// TODO(nillerusr): fix alignment on model loading
+		V_memcpy(&pmove, panim->pMovement(i), sizeof(mstudiomovement_t));
+
+		if (pmove.endframe >= flFrame)
+		{
+			float f = (flFrame - prevframe) / (pmove.endframe - prevframe);
+			float d = pmove.v0 * f + 0.5 * (pmove.v1 - pmove.v0) * f * f;
+
+			vecPos = vecPos + d * pmove.vector;
+			vecAngle.y = vecAngle.y * (1 - f) + pmove.angle * f;
+			if (iLoops != 0)
+			{
+				mstudiomovement_t* pmoveAnim = panim->pMovement(panim->nummovements - 1);
+				vecPos = vecPos + iLoops * pmoveAnim->position;
+				vecAngle.y = vecAngle.y + iLoops * pmoveAnim->angle;
+			}
+			return true;
+		}
+		else
+		{
+			prevframe = pmove.endframe;
+			vecPos = pmove.position;
+			vecAngle.y = pmove.angle;
+		}
+	}
+
+	return false;
 }

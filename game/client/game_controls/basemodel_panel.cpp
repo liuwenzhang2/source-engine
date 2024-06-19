@@ -262,7 +262,7 @@ void CBaseModelPanel::SetModelAnim( int iAnim )
 	}
 	else if ( m_BMPResData.m_aAnimations[iAnim].m_pszSequence && m_BMPResData.m_aAnimations[iAnim].m_pszSequence[0] )
 	{
-		iSequence = LookupSequence(pStudioHdr, m_BMPResData.m_aAnimations[iAnim].m_pszSequence );
+		iSequence = pStudioHdr->LookupSequence( m_BMPResData.m_aAnimations[iAnim].m_pszSequence, SharedRandomSelect);
 	}
 	
 	if ( iSequence != ACT_INVALID )
@@ -591,7 +591,7 @@ QAngle CBaseModelPanel::GetPlayerAngles() const
 void CBaseModelPanel::PlaySequence( const char *pszSequenceName )
 {
 	IStudioHdr* studioHDR = GetStudioHdr();//g_pMDLCache->GetIStudioHdr( )
-	int iSeq = ::LookupSequence( studioHDR, pszSequenceName );
+	int iSeq = studioHDR->LookupSequence( pszSequenceName, SharedRandomSelect);
 	if ( iSeq != ACT_INVALID )
 	{
 		m_nActiveSequence = iSeq;

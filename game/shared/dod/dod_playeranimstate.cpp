@@ -1360,7 +1360,7 @@ void CDODPlayerAnimState::DebugShowAnimStateForPlayer( bool bIsServer )
 	Anim_StatePrintf( iLine++, "-------------%s: frame %d -----------------\n", bIsServer ? "Server" : "Client", gpGlobals->framecount );
 
 	// Write out the main sequence and its data.
-	Anim_StatePrintf( iLine++, "Main: %s, Cycle: %.2f\n", GetSequenceName( GetOuter()->GetModelPtr(), GetOuter()->GetSequence() ), GetOuter()->GetCycle() );
+	Anim_StatePrintf( iLine++, "Main: %s, Cycle: %.2f\n", GetOuter()->GetModelPtr()->GetSequenceName( GetOuter()->GetSequence() ), GetOuter()->GetCycle() );
 
 	// Write out the layers and their data.
 	for ( int iAnim = 0; iAnim < GetOuter()->GetNumAnimOverlays(); ++iAnim )
@@ -1368,7 +1368,7 @@ void CDODPlayerAnimState::DebugShowAnimStateForPlayer( bool bIsServer )
 		CAnimationLayer *pLayer = GetOuter()->GetAnimOverlay( iAnim );
 		if ( pLayer && ( pLayer->m_nOrder != CBaseAnimatingOverlay::MAX_OVERLAYS ) )
 		{
-			Anim_StatePrintf( iLine++, "Layer %s: Weight: %.2f, Cycle: %.2f", GetSequenceName( GetOuter()->GetModelPtr(), pLayer->m_nSequence ), (float)pLayer->m_flWeight, (float)pLayer->m_flCycle );
+			Anim_StatePrintf( iLine++, "Layer %s: Weight: %.2f, Cycle: %.2f", GetOuter()->GetModelPtr()->GetSequenceName( pLayer->m_nSequence ), (float)pLayer->m_flWeight, (float)pLayer->m_flCycle );
 		}
 	}
 

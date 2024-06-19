@@ -2111,6 +2111,18 @@ class IMDLCache;
 
 typedef int (*RandomWeightFunc)(int iMinVal, int iMaxVal);
 
+struct animevent_t
+{
+	int				event;
+	const char* options;
+	float			cycle;
+	float			eventtime;
+	int				type;
+//#ifdef GAME_DLL
+	void* pSource;
+//#endif // GAME_DLL
+};
+
 class IStudioHdr {
 protected:
 	virtual ~IStudioHdr(){}
@@ -2256,7 +2268,7 @@ public:
 	virtual void ClearPerfCounters(void) = 0;
 
 	virtual bool HaveSequenceForActivity(int activity) = 0;
-	virtual int SelectWeightedSequence(int activity, int curSequence, RandomWeightFunc pRandomWeightFunc) = 0;
+	//virtual int SelectWeightedSequence(int activity, int curSequence, RandomWeightFunc pRandomWeightFunc) = 0;
 
 	virtual int nummouths() = 0;
 	virtual int	numskinref() const = 0;
@@ -2281,6 +2293,58 @@ public:
 	//virtual char* pszLocalNodeName(int iNode) const = 0;
 	//virtual int activitylistversion() const = 0;
 	//virtual mstudioiklock_t* pLocalIKAutoplayLock(int i) const = 0;
+	virtual int ExtractBbox(int sequence, Vector& mins, Vector& maxs) = 0;
+
+	virtual void IndexModelSequences() = 0;
+	virtual void ResetActivityIndexes() = 0;
+	virtual void VerifySequenceIndex() = 0;
+	virtual int SelectWeightedSequence(int activity, int curSequence, RandomWeightFunc pRandomWeightFunc) = 0;
+	virtual int SelectHeaviestSequence(int activity) = 0;
+	virtual void BuildAllAnimationEventIndexes() = 0;
+	virtual void ResetEventIndexes() = 0;
+
+	virtual void GetEyePosition(Vector& vecEyePosition) = 0;
+
+	virtual int LookupActivity(const char* label) = 0;
+	virtual int LookupSequence(const char* label, RandomWeightFunc pRandomWeightFunc) = 0;
+
+#define NOMOTION 99999
+	virtual void GetSequenceLinearMotion(int iSequence, const float poseParameter[], Vector* pVec) = 0;
+
+	virtual const char* GetSequenceName(int sequence) = 0;
+	virtual const char* GetSequenceActivityName(int iSequence) = 0;
+
+	virtual int GetSequenceFlags(int sequence) = 0;
+	virtual int GetAnimationEvent(int sequence, animevent_t* pNPCEvent, float flStart, float flEnd, int index, const float fCurtime) = 0;
+	virtual bool HasAnimationEventOfType(int sequence, int type) = 0;
+
+	virtual int FindTransitionSequence(int iCurrentSequence, int iGoalSequence, int* piDir) = 0;
+	virtual bool GotoSequence(int iCurrentSequence, float flCurrentCycle, float flCurrentRate, int iGoalSequence, int& nNextSequence, float& flNextCycle, int& iNextDir) = 0;
+
+	virtual void SetBodygroup(int& body, int iGroup, int iValue) = 0;
+	virtual int GetBodygroup(int body, int iGroup) = 0;
+
+	virtual const char* GetBodygroupName(int iGroup) = 0;
+	virtual int FindBodygroupByName(const char* name) = 0;
+	virtual int GetBodygroupCount(int iGroup) = 0;
+	virtual int GetNumBodyGroups() = 0;
+
+	virtual int GetSequenceActivity(int sequence, int* pweight = NULL) = 0;
+
+	virtual void GetAttachmentLocalSpace(int attachIndex, matrix3x4_t& pLocalToWorld) = 0;
+
+	//virtual float SetBlending(int sequence, int* pblendings, int iBlender, float flValue) = 0;
+
+	virtual int FindHitboxSetByName(const char* name) = 0;
+	virtual const char* GetHitboxSetName(int setnumber) = 0;
+	virtual int GetHitboxSetCount() = 0;
+
+	virtual bool Studio_SeqMovement(int iSequence, float flCycleFrom, float flCycleTo, const float poseParameter[], Vector& deltaMovement, QAngle& deltaAngle) = 0;
+	virtual void Studio_SeqAnims(mstudioseqdesc_t& seqdesc, int iSequence, const float poseParameter[], mstudioanimdesc_t* panim[4], float* weight) const = 0;
+	virtual bool Studio_AnimMovement(mstudioanimdesc_t* panim, float flCycleFrom, float flCycleTo, Vector& deltaPos, QAngle& deltaAngle) = 0;
+	// converts a global 0..1 pose parameter into the local sequences blending value
+	virtual void Studio_LocalPoseParameter(const float poseParameter[], mstudioseqdesc_t& seqdesc, int iSequence, int iLocalIndex, float& flSetting, int& index) const = 0;
+	virtual bool Studio_AnimPosition(mstudioanimdesc_t* panim, float flCycle, Vector& vecPos, QAngle& vecAngle) = 0;
 
 };
 

@@ -1689,96 +1689,7 @@ void ScaleBones(
 	}
 }
 
-//-----------------------------------------------------------------------------
-// Purpose: resolve a global pose parameter to the specific setting for this sequence
-//-----------------------------------------------------------------------------
-void Studio_LocalPoseParameter( const IStudioHdr *pStudioHdr, const float poseParameter[], mstudioseqdesc_t &seqdesc, int iSequence, int iLocalIndex, float &flSetting, int &index )
-{
-	if (!pStudioHdr)
-	{
-		flSetting = 0;
-		index = 0;
-		return;
-	}
 
-	int iPose = pStudioHdr->GetSharedPoseParameter( iSequence, seqdesc.paramindex[iLocalIndex] );
-
-	if (iPose == -1)
-	{
-		flSetting = 0;
-		index = 0;
-		return;
-	}
-
-	const mstudioposeparamdesc_t &Pose = ((IStudioHdr *)pStudioHdr)->pPoseParameter( iPose );
-
-	float flValue = poseParameter[iPose];
-
-	if (Pose.loop)
-	{
-		float wrap = (Pose.start + Pose.end) / 2.0 + Pose.loop / 2.0;
-		float shift = Pose.loop - wrap;
-
-		flValue = flValue - Pose.loop * floor((flValue + shift) / Pose.loop);
-	}
-
-	if (seqdesc.posekeyindex == 0)
-	{
-		float flLocalStart	= ((float)seqdesc.paramstart[iLocalIndex] - Pose.start) / (Pose.end - Pose.start);
-		float flLocalEnd	= ((float)seqdesc.paramend[iLocalIndex] - Pose.start) / (Pose.end - Pose.start);
-
-		// convert into local range
-		flSetting = (flValue - flLocalStart) / (flLocalEnd - flLocalStart);
-
-		// clamp.  This shouldn't ever need to happen if it's looping.
-		if (flSetting < 0)
-			flSetting = 0;
-		if (flSetting > 1)
-			flSetting = 1;
-
-		index = 0;
-		if (seqdesc.groupsize[iLocalIndex] > 2 )
-		{
-			// estimate index
-			index = (int)(flSetting * (seqdesc.groupsize[iLocalIndex] - 1));
-			if (index == seqdesc.groupsize[iLocalIndex] - 1) index = seqdesc.groupsize[iLocalIndex] - 2;
-			flSetting = flSetting * (seqdesc.groupsize[iLocalIndex] - 1) - index;
-		}
-	}
-	else
-	{
-		flValue = flValue * (Pose.end - Pose.start) + Pose.start;
-		index = 0;
-			
-		// FIXME: this needs to be 2D
-		// FIXME: this shouldn't be a linear search
-
-		while (1)
-		{
-			flSetting = (flValue - seqdesc.poseKey( iLocalIndex, index )) / (seqdesc.poseKey( iLocalIndex, index + 1 ) - seqdesc.poseKey( iLocalIndex, index ));
-			/*
-			if (index > 0 && flSetting < 0.0)
-			{
-				index--;
-				continue;
-			}
-			else 
-			*/
-			if (index < seqdesc.groupsize[iLocalIndex] - 2 && flSetting > 1.0)
-			{
-				index++;
-				continue;
-			}
-			break;
-		}
-
-		// clamp.
-		if (flSetting < 0.0f)
-			flSetting = 0.0f;
-		if (flSetting > 1.0f)
-			flSetting = 1.0f;
-	}
-}
 
 void Studio_CalcBoneToBoneTransform( const IStudioHdr *pStudioHdr, int inputBoneIndex, int outputBoneIndex, matrix3x4_t& matrixOut )
 {
@@ -1961,8 +1872,8 @@ bool CalcPoseSingle(
 	int i0 = 0, i1 = 0;
 	float s0 = 0, s1 = 0;
 
-	Studio_LocalPoseParameter( pStudioHdr, poseParameter, seqdesc, sequence, 0, s0, i0 );
-	Studio_LocalPoseParameter( pStudioHdr, poseParameter, seqdesc, sequence, 1, s1, i1 );
+	pStudioHdr->Studio_LocalPoseParameter( poseParameter, seqdesc, sequence, 0, s0, i0 );
+	pStudioHdr->Studio_LocalPoseParameter( poseParameter, seqdesc, sequence, 1, s1, i1 );
 
 
 	if (seqdesc.flags & STUDIO_REALTIME)
@@ -3303,7 +3214,7 @@ void CIKContext::AddDependencies( mstudioseqdesc_t &seqdesc, int iSequence, floa
 	mstudioanimdesc_t *panim[4];
 	float	weight[4];
 
-	Studio_SeqAnims( m_pStudioHdr, seqdesc, iSequence, poseParameters, panim, weight );
+	m_pStudioHdr->Studio_SeqAnims( seqdesc, iSequence, poseParameters, panim, weight );
 
 	// FIXME: add proper number of rules!!!
 	for (i = 0; i < seqdesc.numikrules; i++)
@@ -5084,7 +4995,7 @@ float Studio_GetController( const IStudioHdr *pStudioHdr, int iController, float
 // Output: 	fills in an array
 //-----------------------------------------------------------------------------
 
-void Studio_CalcDefaultPoseParameters( const IStudioHdr *pStudioHdr, float flPoseParameter[], int nCount )
+void Studio_CalcDefaultPoseParameters( const IStudioHdr *pStudioHdr, float flPoseParameter[MAXSTUDIOPOSEPARAM], int nCount )
 {
 	int nPoseCount = pStudioHdr->GetNumPoseParameters();
 	int nNumParams = MIN( nCount, MAXSTUDIOPOSEPARAM );
@@ -5451,41 +5362,7 @@ bool TraceToStudio( IPhysicsSurfaceProps *pProps, const Ray_t& ray, IStudioHdr *
 }
 
 
-//-----------------------------------------------------------------------------
-// Purpose: returns array of animations and weightings for a sequence based on current pose parameters
-//-----------------------------------------------------------------------------
 
-void Studio_SeqAnims( const IStudioHdr *pStudioHdr, mstudioseqdesc_t &seqdesc, int iSequence, const float poseParameter[], mstudioanimdesc_t *panim[4], float *weight )
-{
-#if _DEBUG
-	VPROF_INCREMENT_COUNTER("SEQ_ANIMS",1);
-#endif
-	if (!pStudioHdr || iSequence >= pStudioHdr->GetNumSeq())
-	{
-		weight[0] = weight[1] = weight[2] = weight[3] = 0.0;
-		return;
-	}
-
-	int i0 = 0, i1 = 0;
-	float s0 = 0, s1 = 0;
-	
-	Studio_LocalPoseParameter( pStudioHdr, poseParameter, seqdesc, iSequence, 0, s0, i0 );
-	Studio_LocalPoseParameter( pStudioHdr, poseParameter, seqdesc, iSequence, 1, s1, i1 );
-
-	panim[0] = &((IStudioHdr *)pStudioHdr)->pAnimdesc( pStudioHdr->iRelativeAnim( iSequence, seqdesc.anim( i0  , i1 ) ) );
-	weight[0] = (1 - s0) * (1 - s1);
-
-	panim[1] = &((IStudioHdr *)pStudioHdr)->pAnimdesc( pStudioHdr->iRelativeAnim( iSequence, seqdesc.anim( i0+1, i1 ) ) );
-	weight[1] = (s0) * (1 - s1);
-
-	panim[2] = &((IStudioHdr *)pStudioHdr)->pAnimdesc( pStudioHdr->iRelativeAnim( iSequence, seqdesc.anim( i0  , i1+1 ) ) );
-	weight[2] = (1 - s0) * (s1);
-
-	panim[3] = &((IStudioHdr *)pStudioHdr)->pAnimdesc( pStudioHdr->iRelativeAnim( iSequence, seqdesc.anim( i0+1, i1+1 ) ) );
-	weight[3] = (s0) * (s1);
-
-	Assert( weight[0] >= 0.0f && weight[1] >= 0.0f && weight[2] >= 0.0f && weight[3] >= 0.0f );
-}
 
 //-----------------------------------------------------------------------------
 // Purpose: returns max frame number for a sequence
@@ -5497,7 +5374,7 @@ int Studio_MaxFrame( const IStudioHdr *pStudioHdr, int iSequence, const float po
 	float	weight[4];
 
 	mstudioseqdesc_t &seqdesc = ((IStudioHdr *)pStudioHdr)->pSeqdesc( iSequence );
-	Studio_SeqAnims( pStudioHdr, seqdesc, iSequence, poseParameter, panim, weight );
+	pStudioHdr->Studio_SeqAnims( seqdesc, iSequence, poseParameter, panim, weight );
 
 	float maxFrame = 0;
 	for (int i = 0; i < 4; i++)
@@ -5527,7 +5404,7 @@ float Studio_FPS( const IStudioHdr *pStudioHdr, int iSequence, const float poseP
 	float	weight[4];
 
 	mstudioseqdesc_t &seqdesc = ((IStudioHdr *)pStudioHdr)->pSeqdesc( iSequence );
-	Studio_SeqAnims( pStudioHdr, seqdesc, iSequence, poseParameter, panim, weight );
+	pStudioHdr->Studio_SeqAnims( seqdesc, iSequence, poseParameter, panim, weight );
 
 	float t = 0;
 
@@ -5551,7 +5428,7 @@ float Studio_CPS( const IStudioHdr *pStudioHdr, mstudioseqdesc_t &seqdesc, int i
 	mstudioanimdesc_t *panim[4];
 	float	weight[4];
 
-	Studio_SeqAnims( pStudioHdr, seqdesc, iSequence, poseParameter, panim, weight );
+	pStudioHdr->Studio_SeqAnims( seqdesc, iSequence, poseParameter, panim, weight );
 
 	float t = 0;
 
@@ -5581,66 +5458,7 @@ float Studio_Duration( const IStudioHdr *pStudioHdr, int iSequence, const float 
 }
 
 
-//-----------------------------------------------------------------------------
-// Purpose: calculate changes in position and angle relative to the start of an animations cycle
-// Output:	updated position and angle, relative to the origin
-//			returns false if animation is not a movement animation
-//-----------------------------------------------------------------------------
 
-bool Studio_AnimPosition( mstudioanimdesc_t *panim, float flCycle, Vector &vecPos, QAngle &vecAngle )
-{
-	float	prevframe = 0;
-	vecPos.Init( );
-	vecAngle.Init( );
-
-	if (panim->nummovements == 0)
-		return false;
-
-	int iLoops = 0;
-	if (flCycle > 1.0)
-	{
-		iLoops = (int)flCycle;
-	}
-	else if (flCycle < 0.0)
-	{
-		iLoops = (int)flCycle - 1;
-	}
-	flCycle = flCycle - iLoops;
-
-	float	flFrame = flCycle * (panim->numframes - 1);
-
-
-	for (int i = 0; i < panim->nummovements; i++)
-	{
-		mstudiomovement_t pmove;
-		// TODO(nillerusr): fix alignment on model loading
-		V_memcpy(&pmove, panim->pMovement( i ), sizeof(mstudiomovement_t));
-
-		if (pmove.endframe >= flFrame)
-		{
-			float f = (flFrame - prevframe) / (pmove.endframe - prevframe);
-			float d = pmove.v0 * f + 0.5 * (pmove.v1 - pmove.v0) * f * f;
-
-			vecPos = vecPos + d * pmove.vector;
-			vecAngle.y = vecAngle.y * (1 - f) + pmove.angle * f;
-			if (iLoops != 0)
-			{
-				mstudiomovement_t *pmoveAnim = panim->pMovement( panim->nummovements - 1 );
-				vecPos = vecPos + iLoops * pmoveAnim->position;
-				vecAngle.y = vecAngle.y + iLoops * pmoveAnim->angle;
-			}
-			return true;
-		}
-		else
-		{
-			prevframe = pmove.endframe;
-			vecPos = pmove.position;
-			vecAngle.y = pmove.angle;
-		}
-	}
-
-	return false;
-}
 
 
 //-----------------------------------------------------------------------------
@@ -5681,31 +5499,7 @@ bool Studio_AnimVelocity( mstudioanimdesc_t *panim, float flCycle, Vector &vecVe
 }
 
 
-//-----------------------------------------------------------------------------
-// Purpose: calculate changes in position and angle between two points in an animation cycle
-// Output:	updated position and angle, relative to CycleFrom being at the origin
-//			returns false if animation is not a movement animation
-//-----------------------------------------------------------------------------
 
-bool Studio_AnimMovement( mstudioanimdesc_t *panim, float flCycleFrom, float flCycleTo, Vector &deltaPos, QAngle &deltaAngle )
-{
-	if (panim->nummovements == 0)
-		return false;
-
-	Vector startPos;
-	QAngle startA;
-	Studio_AnimPosition( panim, flCycleFrom, startPos, startA );
-
-	Vector endPos;
-	QAngle endA;
-	Studio_AnimPosition( panim, flCycleTo, endPos, endA );
-
-	Vector tmp = endPos - startPos;
-	deltaAngle.y = endA.y - startA.y;
-	VectorYawRotate( tmp, -startA.y, deltaPos );
-
-	return true;
-}
 
 
 //-----------------------------------------------------------------------------
@@ -5748,51 +5542,7 @@ float Studio_FindAnimDistance( mstudioanimdesc_t *panim, float flDist )
 }
 
 
-//-----------------------------------------------------------------------------
-// Purpose: calculate changes in position and angle between two points in a sequences cycle
-// Output:	updated position and angle, relative to CycleFrom being at the origin
-//			returns false if sequence is not a movement sequence
-//-----------------------------------------------------------------------------
 
-bool Studio_SeqMovement( const IStudioHdr *pStudioHdr, int iSequence, float flCycleFrom, float flCycleTo, const float poseParameter[], Vector &deltaPos, QAngle &deltaAngles )
-{
-	mstudioanimdesc_t *panim[4];
-	float	weight[4];
-
-	mstudioseqdesc_t &seqdesc = ((IStudioHdr *)pStudioHdr)->pSeqdesc( iSequence );
-
-	Studio_SeqAnims( pStudioHdr, seqdesc, iSequence, poseParameter, panim, weight );
-	
-	deltaPos.Init( );
-	deltaAngles.Init( );
-
-	bool found = false;
-
-	for (int i = 0; i < 4; i++)
-	{
-		if (weight[i])
-		{
-			Vector localPos;
-			QAngle localAngles;
-
-			localPos.Init();
-			localAngles.Init();
-
-			if (Studio_AnimMovement( panim[i], flCycleFrom, flCycleTo, localPos, localAngles ))
-			{
-				found = true;
-				deltaPos = deltaPos + localPos * weight[i];
-				// FIXME: this makes no sense
-				deltaAngles = deltaAngles + localAngles * weight[i];
-			}
-			else if (!(panim[i]->flags & STUDIO_DELTA) && panim[i]->nummovements == 0 && seqdesc.weight(0) > 0.0)
-			{
-				found = true;
-			}
-		}
-	}
-	return found;
-}
 
 
 //-----------------------------------------------------------------------------
@@ -5807,7 +5557,7 @@ bool Studio_SeqVelocity( const IStudioHdr *pStudioHdr, int iSequence, float flCy
 	float	weight[4];
 
 	mstudioseqdesc_t &seqdesc = ((IStudioHdr *)pStudioHdr)->pSeqdesc( iSequence );
-	Studio_SeqAnims( pStudioHdr, seqdesc, iSequence, poseParameter, panim, weight );
+	pStudioHdr->Studio_SeqAnims( seqdesc, iSequence, poseParameter, panim, weight );
 	
 	vecVelocity.Init( );
 
@@ -5839,7 +5589,7 @@ float Studio_FindSeqDistance( const IStudioHdr *pStudioHdr, int iSequence, const
 	float	weight[4];
 
 	mstudioseqdesc_t &seqdesc = ((IStudioHdr *)pStudioHdr)->pSeqdesc( iSequence );
-	Studio_SeqAnims( pStudioHdr, seqdesc, iSequence, poseParameter, panim, weight );
+	pStudioHdr->Studio_SeqAnims( seqdesc, iSequence, poseParameter, panim, weight );
 	
 	float flCycle = 0;
 

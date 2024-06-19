@@ -11,16 +11,7 @@
 #pragma once
 #endif
 
-#define AE_TYPE_SERVER			( 1 << 0 )
-#define AE_TYPE_SCRIPTED		( 1 << 1 )		// see scriptevent.h
-#define AE_TYPE_SHARED			( 1 << 2 )
-#define AE_TYPE_WEAPON			( 1 << 3 )
-#define AE_TYPE_CLIENT			( 1 << 4 )
-#define AE_TYPE_FACEPOSER		( 1 << 5 )
 
-#define AE_TYPE_NEWEVENTSYSTEM  ( 1 << 10 ) //Temporary flag.
-
-#define AE_NOT_AVAILABLE		-1
 
 typedef enum
 {

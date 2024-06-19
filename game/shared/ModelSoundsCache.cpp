@@ -22,7 +22,7 @@ void ModelSoundsCache_FinishModel( IStudioHdr *hdr );
 // Output : static void
 //-----------------------------------------------------------------------------
 
-void VerifySequenceIndex( IStudioHdr *pstudiohdr );
+//void VerifySequenceIndex( IStudioHdr *pstudiohdr );
 
 // HACK:  This must match the #define in cl_animevent.h in the client .dll code!!!
 #define CL_EVENT_SOUND				5004
@@ -130,7 +130,7 @@ void CModelSoundsCache::BuildAnimationEventSoundList( IStudioHdr *hdr, CUtlVecto
 	Assert( hdr );
 	
 	// force animation event resolution!!!
-	VerifySequenceIndex( hdr );
+	hdr->VerifySequenceIndex();
 
 	// Find all animation events which fire off sound script entries...
 	for ( int iSeq=0; iSeq < hdr->GetNumSeq(); iSeq++ )

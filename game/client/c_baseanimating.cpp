@@ -79,7 +79,6 @@ const float RUN_SPEED_ESTIMATE_SQR = 150.0f * 150.0f;
 static ConVar dbganimmodel( "dbganimmodel", "" );
 #endif
 
-mstudioevent_t *GetEventIndexForSequence( mstudioseqdesc_t &seqdesc );
 
 C_EntityDissolve *DissolveEffect( C_BaseEntity *pTarget, float flTime );
 C_EntityFlame *FireEffect( C_BaseAnimating *pTarget, C_BaseEntity *pServerFire, float *flScaleEnd, float *flTimeStart, float *flTimeEnd );
@@ -3407,7 +3406,7 @@ void C_BaseAnimating::DoAnimationEvents( IStudioHdr *pStudioHdr )
 		return;
 
 	// Forces anim event indices to get set and returns pEvent(0);
-	mstudioevent_t *pevent = GetEventIndexForSequence( seqdesc );
+	mstudioevent_t *pevent = mdlcache->GetEventIndexForSequence( seqdesc );
 
 	if ( watch )
 	{
@@ -5179,7 +5178,7 @@ float C_BaseAnimating::GetSequenceMoveDist( IStudioHdr *pStudioHdr, int iSequenc
 {
 	Vector				vecReturn;
 	
-	::GetSequenceLinearMotion( pStudioHdr, iSequence, m_flPoseParameter, &vecReturn );
+	pStudioHdr->GetSequenceLinearMotion( iSequence, m_flPoseParameter, &vecReturn );
 
 	return vecReturn.Length();
 }
@@ -5194,7 +5193,7 @@ float C_BaseAnimating::GetSequenceMoveDist( IStudioHdr *pStudioHdr, int iSequenc
 //-----------------------------------------------------------------------------
 void C_BaseAnimating::GetSequenceLinearMotion( int iSequence, Vector *pVec )
 {
-	::GetSequenceLinearMotion( GetModelPtr(), iSequence, m_flPoseParameter, pVec );
+	GetModelPtr()->GetSequenceLinearMotion( iSequence, m_flPoseParameter, pVec );
 }
 
 void C_BaseAnimating::GetBlendedLinearVelocity( Vector *pVec )
@@ -5330,7 +5329,7 @@ void C_BaseAnimating::ResetSequenceInfo( void )
 
 	IStudioHdr *pStudioHdr = GetModelPtr();
 	m_flGroundSpeed = GetSequenceGroundSpeed( pStudioHdr, GetSequence() ) * GetModelScale();
-	m_bSequenceLoops = ((GetSequenceFlags( pStudioHdr, GetSequence() ) & STUDIO_LOOPING) != 0);
+	m_bSequenceLoops = ((pStudioHdr->GetSequenceFlags( GetSequence() ) & STUDIO_LOOPING) != 0);
 	// m_flAnimTime = gpGlobals->time;
 	m_flPlaybackRate = 1.0;
 	m_bSequenceFinished = false;
@@ -5340,7 +5339,7 @@ void C_BaseAnimating::ResetSequenceInfo( void )
 	m_nResetEventsParity = ( m_nResetEventsParity + 1 ) & EF_PARITY_MASK;
 	
 	// FIXME: why is this called here?  Nothing should have changed to make this nessesary
-	SetEventIndexForSequence( pStudioHdr->pSeqdesc( GetSequence() ) );
+	mdlcache->SetEventIndexForSequence( pStudioHdr->pSeqdesc( GetSequence() ) );
 }
 
 //=========================================================
@@ -5348,7 +5347,7 @@ void C_BaseAnimating::ResetSequenceInfo( void )
 
 bool C_BaseAnimating::IsSequenceLooping( IStudioHdr *pStudioHdr, int iSequence )
 {
-	return (::GetSequenceFlags( pStudioHdr, iSequence ) & STUDIO_LOOPING) != 0;
+	return (pStudioHdr->GetSequenceFlags( iSequence ) & STUDIO_LOOPING) != 0;
 }
 
 float C_BaseAnimating::SequenceDuration( IStudioHdr *pStudioHdr, int iSequence )
@@ -5379,14 +5378,14 @@ int C_BaseAnimating::FindTransitionSequence( int iCurrentSequence, int iGoalSequ
 	if (piDir == NULL)
 	{
 		int iDir = 1;
-		int sequence = ::FindTransitionSequence( hdr, iCurrentSequence, iGoalSequence, &iDir );
+		int sequence = hdr->FindTransitionSequence( iCurrentSequence, iGoalSequence, &iDir );
 		if (iDir != 1)
 			return -1;
 		else
 			return sequence;
 	}
 
-	return ::FindTransitionSequence( hdr, iCurrentSequence, iGoalSequence, piDir );
+	return hdr->FindTransitionSequence( iCurrentSequence, iGoalSequence, piDir );
 
 }
 
@@ -5395,37 +5394,37 @@ void C_BaseAnimating::SetBodygroup( int iGroup, int iValue )
 	// SetBodygroup is not supported on pending dynamic models. Wait for it to load!
 	// XXX TODO we could buffer up the group and value if we really needed to. -henryg
 	Assert( GetModelPtr() );
-	::SetBodygroup( GetModelPtr( ), m_nBody, iGroup, iValue );
+	GetModelPtr()->SetBodygroup( m_nBody, iGroup, iValue );
 }
 
 int C_BaseAnimating::GetBodygroup( int iGroup )
 {
 	//Assert( IsDynamicModelLoading() || GetModelPtr() );
-	return ::GetBodygroup( GetModelPtr( ), m_nBody, iGroup );//IsDynamicModelLoading() ? 0 : 
+	return GetModelPtr()->GetBodygroup( m_nBody, iGroup );//IsDynamicModelLoading() ? 0 : 
 }
 
 const char *C_BaseAnimating::GetBodygroupName( int iGroup )
 {
 	//Assert( IsDynamicModelLoading() || GetModelPtr() );
-	return ::GetBodygroupName( GetModelPtr( ), iGroup );//IsDynamicModelLoading() ? "" : 
+	return GetModelPtr()->GetBodygroupName( iGroup );//IsDynamicModelLoading() ? "" : 
 }
 
 int C_BaseAnimating::FindBodygroupByName( const char *name )
 {
 	//Assert( IsDynamicModelLoading() || GetModelPtr() );
-	return ::FindBodygroupByName( GetModelPtr( ), name );//IsDynamicModelLoading() ? -1 : 
+	return GetModelPtr()->FindBodygroupByName( name );//IsDynamicModelLoading() ? -1 : 
 }
 
 int C_BaseAnimating::GetBodygroupCount( int iGroup )
 {
 	//Assert( IsDynamicModelLoading() || GetModelPtr() );
-	return ::GetBodygroupCount( GetModelPtr( ), iGroup );//IsDynamicModelLoading() ? 0 : 
+	return GetModelPtr()->GetBodygroupCount( iGroup );//IsDynamicModelLoading() ? 0 : 
 }
 
 int C_BaseAnimating::GetNumBodyGroups( void )
 {
 	//Assert( IsDynamicModelLoading() || GetModelPtr() );
-	return ::GetNumBodyGroups( GetModelPtr( ) );//IsDynamicModelLoading() ? 0 : 
+	return GetModelPtr()->GetNumBodyGroups();//IsDynamicModelLoading() ? 0 : 
 }
 
 //-----------------------------------------------------------------------------
@@ -5467,7 +5466,7 @@ void C_BaseAnimating::SetHitboxSetByName( const char *setname )
 	//if ( IsDynamicModelLoading() )
 	//	return;
 
-	m_nHitboxSet = FindHitboxSetByName( GetModelPtr(), setname );
+	m_nHitboxSet = GetModelPtr()->FindHitboxSetByName( setname );
 }
 
 //-----------------------------------------------------------------------------
@@ -5488,7 +5487,7 @@ const char *C_BaseAnimating::GetHitboxSetName( void )
 	//if ( IsDynamicModelLoading() )
 	//	return "";
 
-	return ::GetHitboxSetName( GetModelPtr(), m_nHitboxSet );
+	return GetModelPtr()->GetHitboxSetName( m_nHitboxSet );
 }
 
 //-----------------------------------------------------------------------------
@@ -5500,7 +5499,7 @@ int C_BaseAnimating::GetHitboxSetCount( void )
 	//if ( IsDynamicModelLoading() )
 	//	return 0;
 
-	return ::GetHitboxSetCount( GetModelPtr() );
+	return GetModelPtr()->GetHitboxSetCount();
 }
 
 static Vector	hullcolor[8] = 
@@ -5562,8 +5561,10 @@ void C_BaseAnimating::DrawClientHitboxes( float duration /*= 0.0f*/, bool monoco
 int C_BaseAnimating::SelectWeightedSequence ( int activity )
 {
 	Assert( activity != ACT_INVALID );
-
-	return ::SelectWeightedSequence( GetModelPtr(), activity );
+	if (!GetModelPtr()) {
+		return -1;
+	}
+	return GetModelPtr()->SelectWeightedSequence( activity ,-1, SharedRandomSelect);
 
 }
 
@@ -5619,7 +5620,7 @@ float C_BaseAnimating::SetPoseParameter( IStudioHdr *pStudioHdr, int iParameter,
 int C_BaseAnimating::LookupSequence( const char *label )
 {
 	Assert( GetModelPtr() );
-	return ::LookupSequence( GetModelPtr(), label );
+	return GetModelPtr()->LookupSequence( label, SharedRandomSelect);
 }
 
 void C_BaseAnimating::Release()
@@ -5690,7 +5691,7 @@ void C_BaseAnimating::ClearRagdoll()
 int C_BaseAnimating::LookupActivity( const char *label )
 {
 	Assert( GetModelPtr() );
-	return ::LookupActivity( GetModelPtr(), label );
+	return GetModelPtr()->LookupActivity( label );
 }
 
 //-----------------------------------------------------------------------------
@@ -5710,7 +5711,7 @@ const char *C_BaseAnimating::GetSequenceActivityName( int iSequence )
 	if ( !GetModelPtr() )
 		return "No model!";
 
-	return ::GetSequenceActivityName( GetModelPtr(), iSequence );
+	return GetModelPtr()->GetSequenceActivityName( iSequence );
 }
 
 //=========================================================
@@ -5764,7 +5765,7 @@ const char *C_BaseAnimating::GetSequenceName( int iSequence )
 	if ( !GetModelPtr() )
 		return "No model!";
 
-	return ::GetSequenceName( GetModelPtr(), iSequence );
+	return GetModelPtr()->GetSequenceName( iSequence );
 }
 
 Activity C_BaseAnimating::GetSequenceActivity( int iSequence )
@@ -5777,7 +5778,7 @@ Activity C_BaseAnimating::GetSequenceActivity( int iSequence )
 	if ( !GetModelPtr() )
 		return ACT_INVALID;
 
-	return (Activity)::GetSequenceActivity( GetModelPtr(), iSequence );
+	return (Activity)GetModelPtr()->GetSequenceActivity( iSequence );
 }
 
 

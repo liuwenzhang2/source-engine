@@ -413,7 +413,7 @@ void CAnimationLayer::DispatchAnimEvents( CBaseAnimating *eventHandler, CBaseAni
 
 	// FIXME: does not handle negative framerates!
 	int index = 0;
-	while ( (index = GetAnimationEvent( pstudiohdr, m_nSequence, &event, flStart, flEnd, index ) ) != 0 )
+	while ( (index = pstudiohdr->GetAnimationEvent( m_nSequence, &event, flStart, flEnd, index ,gpGlobals->curtime) ) != 0 )
 	{
 		event.pSource = pOwner;
 		// calc when this event should happen
@@ -652,7 +652,7 @@ int	CBaseAnimatingOverlay::AddLayeredSequence( int sequence, int iPriority )
 		m_AnimOverlay[i].m_flBlendOut = 0.0f;
 		m_AnimOverlay[i].m_bSequenceFinished = false;
 		m_AnimOverlay[i].m_flLastEventCheck = 0;
-		m_AnimOverlay[i].m_bLooping = ((GetSequenceFlags( GetModelPtr(), sequence ) & STUDIO_LOOPING) != 0);
+		m_AnimOverlay[i].m_bLooping = ((GetModelPtr()->GetSequenceFlags( sequence ) & STUDIO_LOOPING) != 0);
 		if (ai_sequence_debug.GetBool() == true && m_debugOverlays & OVERLAY_NPC_SELECTED_BIT)
 		{
 			Msg("%5.3f : adding %d (%d): %s : %5.3f (%.3f)\n", gpGlobals->curtime, i, m_AnimOverlay[ i ].m_nOrder.Get(), GetSequenceName( m_AnimOverlay[ i ].m_nSequence ), m_AnimOverlay[ i ].m_flCycle.Get(), m_AnimOverlay[ i ].m_flWeight.Get() );

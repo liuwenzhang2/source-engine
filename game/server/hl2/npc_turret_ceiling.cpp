@@ -132,7 +132,7 @@ public:
 	Vector	EyeOffset( Activity nActivity ) 
 	{
 		Vector vecEyeOffset(0,0,-64);
-		GetEyePosition( GetModelPtr(), vecEyeOffset );
+		GetModelPtr()->GetEyePosition( vecEyeOffset );
 		return vecEyeOffset;
 	}
 

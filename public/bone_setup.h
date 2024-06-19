@@ -352,10 +352,8 @@ void Studio_CalcDefaultPoseParameters( const IStudioHdr *pStudioHdr, float flPos
 float Studio_GetPoseParameter( const IStudioHdr *pStudioHdr, int iParameter, float ctlValue );
 float Studio_SetPoseParameter( const IStudioHdr *pStudioHdr, int iParameter, float flValue, float &ctlValue );
 
-// converts a global 0..1 pose parameter into the local sequences blending value
-void Studio_LocalPoseParameter( const IStudioHdr *pStudioHdr, const float poseParameter[], mstudioseqdesc_t &seqdesc, int iSequence, int iLocalIndex, float &flSetting, int &index );
 
-void Studio_SeqAnims( const IStudioHdr *pStudioHdr, mstudioseqdesc_t &seqdesc, int iSequence, const float poseParameter[], mstudioanimdesc_t *panim[4], float *weight );
+
 int Studio_MaxFrame( const IStudioHdr *pStudioHdr, int iSequence, const float poseParameter[] );
 float Studio_FPS( const IStudioHdr *pStudioHdr, int iSequence, const float poseParameter[] );
 float Studio_CPS( const IStudioHdr *pStudioHdr, mstudioseqdesc_t &seqdesc, int iSequence, const float poseParameter[] );
@@ -367,8 +365,6 @@ void Studio_MovementRate( const IStudioHdr *pStudioHdr, int iSequence, const flo
 //void Studio_AnimPosition( mstudioanimdesc_t *panim, float flCycle, Vector &vecPos, Vector &vecAngle );
 //void Studio_AnimVelocity( mstudioanimdesc_t *panim, float flCycle, Vector &vecVelocity );
 //float Studio_FindAnimDistance( mstudioanimdesc_t *panim, float flDist );
-bool Studio_AnimMovement( mstudioanimdesc_t *panim, float flCycleFrom, float flCycleTo, Vector &deltaPos, QAngle &deltaAngle );
-bool Studio_SeqMovement( const IStudioHdr *pStudioHdr, int iSequence, float flCycleFrom, float flCycleTo, const float poseParameter[], Vector &deltaMovement, QAngle &deltaAngle );
 bool Studio_SeqVelocity( const IStudioHdr *pStudioHdr, int iSequence, float flCycle, const float poseParameter[], Vector &vecVelocity );
 float Studio_FindSeqDistance( const IStudioHdr *pStudioHdr, int iSequence, const float poseParameter[], float flDist );
 float Studio_FindSeqVelocity( const IStudioHdr *pStudioHdr, int iSequence, const float poseParameter[], float flVelocity );

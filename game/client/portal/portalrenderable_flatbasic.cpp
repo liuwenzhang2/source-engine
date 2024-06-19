@@ -506,7 +506,7 @@ void CPortalRenderable_FlatBasic::RenderPortalViewToBackBuffer( CViewRender *pVi
 				//save the view matrix for usage with the depth doubler. 
 				//It's important that we do this AFTER using the depth doubler this frame to compensate for the fact that the front buffer is 1 frame behind the current view matrix
 				//otherwise we get a lag effect when the player changes their viewing angles
-				pRenderContext->GetMatrix( MATERIAL_VIEW, &m_InternallyMaintainedData.m_DepthDoublerTextureView );
+				pRenderContext->GetVMatrix( MATERIAL_VIEW, &m_InternallyMaintainedData.m_DepthDoublerTextureView );
 			}
 
 			SetViewRecursionLevel( g_pPortalRender->GetViewRecursionLevel() - 1 );
@@ -754,7 +754,7 @@ void CPortalRenderable_FlatBasic::DrawComplexPortalMesh( const IMaterial *pMater
 
 	CMatRenderContextPtr pRenderContext( materials );
 	VMatrix matView;
-	pRenderContext->GetMatrix( MATERIAL_VIEW, &matView );
+	pRenderContext->GetVMatrix( MATERIAL_VIEW, &matView );
 
 	const IMaterial *pMaterial;
 	if( pMaterialOverride )
@@ -1026,8 +1026,8 @@ void CPortalRenderable_FlatBasic::ClipFixToBoundingAreaAndDraw( PortalMeshPoint_
 	//project the points so we can fudge the numbers a bit and move them to exactly 0.0f depth
 	{
 		VMatrix matProj, matView, matViewProj;
-		pRenderContext->GetMatrix( MATERIAL_PROJECTION, &matProj );
-		pRenderContext->GetMatrix( MATERIAL_VIEW, &matView );
+		pRenderContext->GetVMatrix( MATERIAL_PROJECTION, &matProj );
+		pRenderContext->GetVMatrix( MATERIAL_VIEW, &matView );
 		MatrixMultiply( matProj, matView, matViewProj );
 
 		for( int i = 0; i != iVertCount; ++i )
@@ -1116,8 +1116,8 @@ void CPortalRenderable_FlatBasic::RenderFogQuad( void )
 	float FogEndOverFogRange = ooFogRange * fFogEnd;
 
 	VMatrix matView, matViewProj, matProj;
-	pRenderContext->GetMatrix( MATERIAL_VIEW, &matView );
-	pRenderContext->GetMatrix( MATERIAL_PROJECTION, &matProj );
+	pRenderContext->GetVMatrix( MATERIAL_VIEW, &matView );
+	pRenderContext->GetVMatrix( MATERIAL_PROJECTION, &matProj );
 	MatrixMultiply( matProj, matView, matViewProj );
 
 	Vector vUp = m_vUp * (PORTAL_HALF_HEIGHT * 2.0f);

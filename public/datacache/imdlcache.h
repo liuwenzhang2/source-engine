@@ -301,6 +301,9 @@ public:
 	virtual int EventList_GetEventType(int eventIndex) = 0;
 	virtual int EventListVersion() = 0;
 
+	virtual void SetEventIndexForSequence(mstudioseqdesc_t& seqdesc) = 0;
+	virtual mstudioevent_t* GetEventIndexForSequence(mstudioseqdesc_t& seqdesc) = 0;
+
 };
 
 

@@ -500,7 +500,7 @@ bool CBaseFlex::HandleStartSequenceSceneEvent( CSceneEventInfo *info, CChoreoSce
 	SetLayerNoRestore( info->m_iLayer, true );
 	SetLayerWeight( info->m_iLayer, 0.0 );
 
-	bool looping = ((GetSequenceFlags( GetModelPtr(), info->m_nSequence ) & STUDIO_LOOPING) != 0);
+	bool looping = ((GetModelPtr()->GetSequenceFlags( info->m_nSequence ) & STUDIO_LOOPING) != 0);
 	if (!looping)
 	{
 		// figure out the animtime when this was frame 0
@@ -665,7 +665,7 @@ bool CBaseFlex::HandleStartGestureSceneEvent( CSceneEventInfo *info, CChoreoScen
 	SetLayerDuration( info->m_iLayer, event->GetDuration() );
 	SetLayerWeight( info->m_iLayer, 0.0 );
 
-	bool looping = ((GetSequenceFlags( GetModelPtr(), info->m_nSequence ) & STUDIO_LOOPING) != 0);
+	bool looping = ((GetModelPtr()->GetSequenceFlags( info->m_nSequence ) & STUDIO_LOOPING) != 0);
 	if ( looping )
 	{
 		DevMsg( 1, "vcd error, gesture %s of model %s is marked as STUDIO_LOOPING!\n", 
@@ -1925,7 +1925,7 @@ bool CBaseFlex::ProcessSequenceSceneEvent( CSceneEventInfo *info, CChoreoScene *
 		float spline = 3 * info->m_flWeight * info->m_flWeight - 2 * info->m_flWeight * info->m_flWeight * info->m_flWeight;
 		SetLayerWeight( info->m_iLayer, flWeight * spline );
 
-		bool looping = ((GetSequenceFlags( GetModelPtr(), info->m_nSequence ) & STUDIO_LOOPING) != 0);
+		bool looping = ((GetModelPtr()->GetSequenceFlags( info->m_nSequence ) & STUDIO_LOOPING) != 0);
 		if (!looping)
 		{
 			float dt =  scene->GetTime() - event->GetStartTime();
@@ -2307,7 +2307,7 @@ void CFlexCycler::GenericCyclerSpawn(char *szModel, Vector vecMin, Vector vecMax
 	UTIL_SetSize(this, vecMin, vecMax);
 
 	Vector vecEyeOffset;
-	GetEyePosition( GetModelPtr(), vecEyeOffset );
+	GetModelPtr()->GetEyePosition( vecEyeOffset );
 	SetViewOffset( vecEyeOffset );
 
 	InitBoneControllers();

@@ -1865,7 +1865,7 @@ void CMultiPlayerAnimState::DebugShowAnimStateForPlayer( bool bIsServer )
 	Anim_StatePrintf( iLine++, "-------------%s: frame %d -----------------\n", bIsServer ? "Server" : "Client", gpGlobals->framecount );
 
 	// Write out the main sequence and its data.
-	Anim_StatePrintf( iLine++, "Main: %s, Cycle: %.2f\n", GetSequenceName( GetBasePlayer()->GetModelPtr(), GetBasePlayer()->GetSequence() ), GetBasePlayer()->GetCycle() );
+	Anim_StatePrintf( iLine++, "Main: %s, Cycle: %.2f\n", GetBasePlayer()->GetModelPtr()->GetSequenceName( GetBasePlayer()->GetSequence() ), GetBasePlayer()->GetCycle() );
 
 #if 0
 	if ( m_bPlayingGesture )
@@ -1883,13 +1883,13 @@ void CMultiPlayerAnimState::DebugShowAnimStateForPlayer( bool bIsServer )
 		C_AnimationLayer *pLayer = GetBasePlayer()->GetAnimOverlay( iAnim );
 		if ( pLayer && ( pLayer->m_nOrder != CBaseAnimatingOverlay::MAX_OVERLAYS ) )
 		{
-			Anim_StatePrintf( iLine++, "Layer %s: Weight: %.2f, Cycle: %.2f", GetSequenceName( GetBasePlayer()->GetModelPtr(), pLayer->m_nSequence ), (float)pLayer->m_flWeight, (float)pLayer->m_flCycle );
+			Anim_StatePrintf( iLine++, "Layer %s: Weight: %.2f, Cycle: %.2f", GetBasePlayer()->GetModelPtr()->GetSequenceName( pLayer->m_nSequence ), (float)pLayer->m_flWeight, (float)pLayer->m_flCycle );
 		}
 #else
 		CAnimationLayer *pLayer = GetBasePlayer()->GetAnimOverlay( iAnim );
 		if ( pLayer && ( pLayer->m_nOrder != CBaseAnimatingOverlay::MAX_OVERLAYS ) )
 		{
-			Anim_StatePrintf( iLine++, "Layer %s: Weight: %.2f, Cycle: %.2f", GetSequenceName( GetBasePlayer()->GetModelPtr(), pLayer->m_nSequence ), (float)pLayer->m_flWeight, (float)pLayer->m_flCycle );
+			Anim_StatePrintf( iLine++, "Layer %s: Weight: %.2f, Cycle: %.2f", GetBasePlayer()->GetModelPtr()->GetSequenceName( pLayer->m_nSequence ), (float)pLayer->m_flWeight, (float)pLayer->m_flCycle );
 		}
 #endif
 	}
@@ -1985,14 +1985,14 @@ void CMultiPlayerAnimState::DebugShowAnimState( int iStartLine )
 	Anim_StateLog( "----------------- frame %d -----------------\n", gpGlobals->framecount );
 
 	int iLine = iStartLine;
-	Anim_StatePrintf( iLine++, "main: %s, cycle: %.2f\n", GetSequenceName( GetBasePlayer()->GetModelPtr(), GetBasePlayer()->GetSequence() ), GetBasePlayer()->GetCycle() );
+	Anim_StatePrintf( iLine++, "main: %s, cycle: %.2f\n", GetBasePlayer()->GetModelPtr()->GetSequenceName( GetBasePlayer()->GetSequence() ), GetBasePlayer()->GetCycle() );
 
 #if defined( CLIENT_DLL )
 	for ( int i=0; i < GetBasePlayer()->GetNumAnimOverlays()-1; i++ )
 	{
 		C_AnimationLayer *pLayer = GetBasePlayer()->GetAnimOverlay( i /*i+1?*/ );
 		Anim_StatePrintf( iLine++, "%s, weight: %.2f, cycle: %.2f, aim (%d)", 
-			pLayer->m_nOrder == CBaseAnimatingOverlay::MAX_OVERLAYS ? "--" : GetSequenceName( GetBasePlayer()->GetModelPtr(), pLayer->m_nSequence ), 
+			pLayer->m_nOrder == CBaseAnimatingOverlay::MAX_OVERLAYS ? "--" : GetBasePlayer()->GetModelPtr()->GetSequenceName( pLayer->m_nSequence ),
 			pLayer->m_nOrder == CBaseAnimatingOverlay::MAX_OVERLAYS ? -1 :(float)pLayer->m_flWeight, 
 			pLayer->m_nOrder == CBaseAnimatingOverlay::MAX_OVERLAYS ? -1 :(float)pLayer->m_flCycle, 
 			i
@@ -2060,7 +2060,7 @@ void CMultiPlayerAnimState::DebugGestureInfo( void )
 					iGesture, 
 					s_aGestureSlotNames[iGesture],
 					mdlcache->ActivityList_NameForIndex( pGesture->m_iActivity ),
-					GetSequenceName( pPlayer->GetModelPtr(), pGesture->m_pAnimLayer->m_nSequence ),
+					pPlayer->GetModelPtr()->GetSequenceName( pGesture->m_pAnimLayer->m_nSequence ),
 					( pGesture->m_bAutoKill ? "true" : "false" ),
 					(float)pGesture->m_pAnimLayer->m_flCycle, (float)pGesture->m_pAnimLayer->m_flPlaybackRate );
 			}

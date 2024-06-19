@@ -1358,7 +1358,7 @@ CBaseEntity *CreateServerRagdoll( CBaseAnimating *pAnimating, int forceBone, con
 		{
 			Vector deltaPos;
 			QAngle deltaAngles;
-			if (Studio_SeqMovement( pstudiohdr, 
+			if (pstudiohdr->Studio_SeqMovement(
 				pAnimating->GetSequence(), 
 				fPreviousCycle, 
 				pAnimating->GetCycle(), 

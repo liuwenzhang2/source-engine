@@ -1123,7 +1123,7 @@ bool CAI_PassengerBehavior::LocalIntervalMovement( float flInterval, bool &bMove
 	QAngle deltaAngles;
 
 	// Find the delta position and delta angles for this sequence
-	if ( Studio_SeqMovement( pstudiohdr, GetOuter()->GetSequence(), GetOuter()->GetCycle(), flNextCycle, GetOuter()->GetPoseParameterArray(), deltaPos, deltaAngles ))
+	if (pstudiohdr->Studio_SeqMovement( GetOuter()->GetSequence(), GetOuter()->GetCycle(), flNextCycle, GetOuter()->GetPoseParameterArray(), deltaPos, deltaAngles ))
 	{
 		Vector vecPreDelta = deltaPos;
 		VectorRotate( vecPreDelta, GetOuter()->GetEngineObject()->GetLocalAngles(), deltaPos );

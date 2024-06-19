@@ -8060,7 +8060,7 @@ void CAI_BaseNPC::SetDefaultEyeOffset ( void )
 {
 	if  ( GetModelPtr() )
 	{
-		GetEyePosition( GetModelPtr(), m_vDefaultEyeOffset );
+		GetModelPtr()->GetEyePosition( m_vDefaultEyeOffset );
 
 		if ( m_vDefaultEyeOffset == vec3_origin )
 		{

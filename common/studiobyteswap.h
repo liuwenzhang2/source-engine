@@ -938,6 +938,60 @@ public:
 	int numlocalseq() const { return m_pStudioHdr->numlocalseq; }
 	mstudiomodelgroup_t* pModelGroup(int i) const { return m_pStudioHdr->pModelGroup(i); }
 
+	int ExtractBbox(int sequence, Vector& mins, Vector& maxs);
+
+	void IndexModelSequences();
+	void ResetActivityIndexes();
+	void VerifySequenceIndex();
+	int SelectWeightedSequence(int activity, int curSequence, RandomWeightFunc pRandomWeightFunc);
+	int SelectHeaviestSequence(int activity);
+	void BuildAllAnimationEventIndexes();
+	void ResetEventIndexes();
+
+	void GetEyePosition(Vector& vecEyePosition);
+
+	int LookupActivity(const char* label);
+	int LookupSequence(const char* label, RandomWeightFunc pRandomWeightFunc);
+
+//#define NOMOTION 99999
+	void GetSequenceLinearMotion(int iSequence, const float poseParameter[], Vector* pVec);
+
+	const char* GetSequenceName(int sequence);
+	const char* GetSequenceActivityName(int iSequence);
+
+	int GetSequenceFlags(int sequence);
+	int GetAnimationEvent(int sequence, animevent_t* pNPCEvent, float flStart, float flEnd, int index, const float fCurtime);
+	bool HasAnimationEventOfType(int sequence, int type);
+
+	int FindTransitionSequence(int iCurrentSequence, int iGoalSequence, int* piDir);
+	bool GotoSequence(int iCurrentSequence, float flCurrentCycle, float flCurrentRate, int iGoalSequence, int& nNextSequence, float& flNextCycle, int& iNextDir);
+
+	void SetBodygroup(int& body, int iGroup, int iValue);
+	int GetBodygroup(int body, int iGroup);
+
+	const char* GetBodygroupName(int iGroup);
+	int FindBodygroupByName(const char* name);
+	int GetBodygroupCount(int iGroup);
+	int GetNumBodyGroups();
+
+	int GetSequenceActivity(int sequence, int* pweight = NULL);
+
+	void GetAttachmentLocalSpace(int attachIndex, matrix3x4_t& pLocalToWorld);
+
+	//float SetBlending(int sequence, int* pblendings, int iBlender, float flValue);
+
+	int FindHitboxSetByName(const char* name);
+	const char* GetHitboxSetName(int setnumber);
+	int GetHitboxSetCount();
+
+	void SetActivityForSequence(int i);
+	bool Studio_SeqMovement(int iSequence, float flCycleFrom, float flCycleTo, const float poseParameter[], Vector& deltaMovement, QAngle& deltaAngle);
+	void Studio_SeqAnims(mstudioseqdesc_t& seqdesc, int iSequence, const float poseParameter[], mstudioanimdesc_t* panim[4], float* weight) const;
+	bool Studio_AnimMovement(mstudioanimdesc_t* panim, float flCycleFrom, float flCycleTo, Vector& deltaPos, QAngle& deltaAngle);
+	// converts a global 0..1 pose parameter into the local sequences blending value
+	void Studio_LocalPoseParameter(const float poseParameter[], mstudioseqdesc_t& seqdesc, int iSequence, int iLocalIndex, float& flSetting, int& index) const;
+	bool Studio_AnimPosition(mstudioanimdesc_t* panim, float flCycle, Vector& vecPos, QAngle& vecAngle);
+
 public:
 	inline int boneFlags(int iBone) const { return m_boneFlags[iBone]; }
 	inline int boneParent(int iBone) const { return m_boneParent[iBone]; }
@@ -952,7 +1006,7 @@ public:
 
 	/// A more efficient version of the old SelectWeightedSequence() function in animation.cpp. 
 	/// Returns -1 on failure to find a sequence
-	inline int SelectWeightedSequence(int activity, int curSequence, RandomWeightFunc pRandomWeightFunc)
+	inline int SelectWeightedSequenceInternal(int activity, int curSequence, RandomWeightFunc pRandomWeightFunc)
 	{
 #if STUDIO_SEQUENCE_ACTIVITY_LAZY_INITIALIZE
 		// We lazy-initialize the header on demand here, because CStudioHdr::Init() is

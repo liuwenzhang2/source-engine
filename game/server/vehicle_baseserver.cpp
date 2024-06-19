@@ -1191,7 +1191,7 @@ int CBaseServerVehicle::GetEntryAnimForPoint( const Vector &vecEyePoint )
 	IStudioHdr *pStudioHdr = pAnimating->GetModelPtr();
 	if (!pStudioHdr)
 		return 0;
-	int iHitboxSet = FindHitboxSetByName( pStudioHdr, "entryboxes" );
+	int iHitboxSet = pStudioHdr->FindHitboxSetByName( "entryboxes" );
 	mstudiohitboxset_t *set = pStudioHdr->pHitboxSet( iHitboxSet );
 	if ( !set || !set->numhitboxes )
 		return 0;
