@@ -4714,7 +4714,8 @@ void DoAimAtBone(
 	mstudiobone_t *pBones,
 	int	iBone,
 	IBoneAccessor* bonetoworld,
-	const IStudioHdr *pStudioHdr
+	const IStudioHdr *pStudioHdr,
+	bool attachment
 	)
 {
 	mstudioaimatbone_t *pProc = (mstudioaimatbone_t *)pBones[iBone].pProcedure();
@@ -4764,7 +4765,7 @@ void DoAimAtBone(
 
 	// The worldspace matrix of the bone to aim at
 	matrix3x4_t aimAtSpace;
-	if ( pStudioHdr )
+	if (attachment)
 	{
 		// This means it's AIMATATTACH
 		const mstudioattachment_t &attachment( ((IStudioHdr *)pStudioHdr)->pAttachment( pProc->aim ) );
@@ -4878,11 +4879,11 @@ bool CalcProceduralBone(
 			return true;
 
 		case STUDIO_PROC_AIMATBONE:
-			DoAimAtBone( pbones, iBone, bonetoworld, NULL );
+			DoAimAtBone( pbones, iBone, bonetoworld, pStudioHdr, false);
 			return true;
 
 		case STUDIO_PROC_AIMATATTACH:
-			DoAimAtBone( pbones, iBone, bonetoworld, pStudioHdr );
+			DoAimAtBone( pbones, iBone, bonetoworld, pStudioHdr ,true);
 			return true;
 
 		default:
