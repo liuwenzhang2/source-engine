@@ -19,7 +19,6 @@
 
 class CBoneToWorld;
 class CIKContext;
-class CBoneAccessor;
 class IPoseDebugger;
 
 
@@ -316,7 +315,7 @@ private:
 bool CalcProceduralBone(
 	const IStudioHdr *pStudioHdr,
 	int iBone,
-	CBoneAccessor &bonetoworld
+	IBoneAccessor* bonetoworld
 	);
 
 void Studio_BuildMatrices(

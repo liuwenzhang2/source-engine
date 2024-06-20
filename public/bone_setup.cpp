@@ -4513,14 +4513,14 @@ void Studio_BuildMatrices(
 void DoAxisInterpBone(
 	mstudiobone_t		*pbones,
 	int	ibone,
-	CBoneAccessor &bonetoworld
+	IBoneAccessor* bonetoworld
 	)
 {
 	matrix3x4_t			bonematrix;
 	Vector				control;
 
 	mstudioaxisinterpbone_t *pProc = (mstudioaxisinterpbone_t *)pbones[ibone].pProcedure( );
-	const matrix3x4_t &controlBone = bonetoworld.GetBone( pProc->control );
+	const matrix3x4_t &controlBone = bonetoworld->GetBone( pProc->control );
 	if (pProc && pbones[pProc->control].parent != -1)
 	{
 		Vector tmp;
@@ -4530,7 +4530,7 @@ void DoAxisInterpBone(
 		tmp.z = controlBone[2][pProc->axis];
 
 		// invert it back into parent's space.
-		VectorIRotate( tmp, bonetoworld.GetBone( pbones[pProc->control].parent ), control );
+		VectorIRotate( tmp, bonetoworld->GetBone( pbones[pProc->control].parent ), control );
 #if 0
 		matrix3x4_t	tmpmatrix;
 		matrix3x4_t	controlmatrix;
@@ -4615,7 +4615,7 @@ void DoAxisInterpBone(
 
 	QuaternionMatrix( v, p, bonematrix );
 
-	ConcatTransforms (bonetoworld.GetBone( pbones[ibone].parent ), bonematrix, bonetoworld.GetBoneForWrite( ibone ));
+	ConcatTransforms (bonetoworld->GetBone( pbones[ibone].parent ), bonematrix, bonetoworld->GetBoneForWrite( ibone ));
 }
 
 
@@ -4627,7 +4627,7 @@ void DoAxisInterpBone(
 void DoQuatInterpBone(
 	mstudiobone_t		*pbones,
 	int	ibone,
-	CBoneAccessor &bonetoworld
+	IBoneAccessor* bonetoworld
 	)
 {
 	matrix3x4_t			bonematrix;
@@ -4644,8 +4644,8 @@ void DoQuatInterpBone(
 
 		matrix3x4_t	tmpmatrix;
 		matrix3x4_t	controlmatrix;
-		MatrixInvert( bonetoworld.GetBone( pbones[pProc->control].parent), tmpmatrix );
-		ConcatTransforms( tmpmatrix, bonetoworld.GetBone( pProc->control ), controlmatrix );
+		MatrixInvert( bonetoworld->GetBone( pbones[pProc->control].parent), tmpmatrix );
+		ConcatTransforms( tmpmatrix, bonetoworld->GetBone( pProc->control ), controlmatrix );
 
 		MatrixAngles( controlmatrix, src, pos ); // FIXME: make a version without pos
 
@@ -4663,7 +4663,7 @@ void DoQuatInterpBone(
 		if (scale <= 0.001)  // EPSILON?
 		{
 			AngleMatrix( pProc->pTrigger( 0 )->quat, pProc->pTrigger( 0 )->pos, bonematrix );
-			ConcatTransforms ( bonetoworld.GetBone( pbones[ibone].parent ), bonematrix, bonetoworld.GetBoneForWrite( ibone ) );
+			ConcatTransforms ( bonetoworld->GetBone( pbones[ibone].parent ), bonematrix, bonetoworld->GetBoneForWrite( ibone ) );
 			return;
 		}
 
@@ -4694,7 +4694,7 @@ void DoQuatInterpBone(
 		QuaternionMatrix( quat, pos, bonematrix );
 	}
 
-	ConcatTransforms (bonetoworld.GetBone( pbones[ibone].parent ), bonematrix, bonetoworld.GetBoneForWrite( ibone ));
+	ConcatTransforms (bonetoworld->GetBone( pbones[ibone].parent ), bonematrix, bonetoworld->GetBoneForWrite( ibone ));
 }
 
 /*
@@ -4713,7 +4713,7 @@ static ConVar aim_constraint( "aim_constraint", "1", FCVAR_REPLICATED, "Toggle <
 void DoAimAtBone(
 	mstudiobone_t *pBones,
 	int	iBone,
-	CBoneAccessor &bonetoworld,
+	IBoneAccessor* bonetoworld,
 	const IStudioHdr *pStudioHdr
 	)
 {
@@ -4756,7 +4756,7 @@ void DoAimAtBone(
 
 	// Get to get position of bone but also for up reference
 	matrix3x4_t parentSpace;
-	MatrixCopy ( bonetoworld.GetBone( pProc->parent ), parentSpace );
+	MatrixCopy ( bonetoworld->GetBone( pProc->parent ), parentSpace );
 
 	// World space position of the bone to aim
 	Vector aimWorldPosition;
@@ -4769,13 +4769,13 @@ void DoAimAtBone(
 		// This means it's AIMATATTACH
 		const mstudioattachment_t &attachment( ((IStudioHdr *)pStudioHdr)->pAttachment( pProc->aim ) );
 		ConcatTransforms(
-			bonetoworld.GetBone( attachment.localbone ),
+			bonetoworld->GetBone( attachment.localbone ),
 			attachment.local,
 			aimAtSpace );
 	}
 	else
 	{
-		MatrixCopy( bonetoworld.GetBone( pProc->aim ), aimAtSpace );
+		MatrixCopy( bonetoworld->GetBone( pProc->aim ), aimAtSpace );
 	}
 
 	Vector aimAtWorldPosition;
@@ -4789,7 +4789,7 @@ void DoAimAtBone(
 	// The aim and up data is relative to this bone, not the parent bone
 	matrix3x4_t bonematrix, boneLocalToWorld;
 	AngleMatrix( pBones[iBone].quat, pProc->basepos, bonematrix );
-	ConcatTransforms( bonetoworld.GetBone( pProc->parent ), bonematrix, boneLocalToWorld );
+	ConcatTransforms( bonetoworld->GetBone( pProc->parent ), bonematrix, boneLocalToWorld );
 
 	Vector aimVector;
 	VectorSubtract( aimAtWorldPosition, aimWorldPosition, aimVector );
@@ -4849,7 +4849,7 @@ void DoAimAtBone(
 		QuaternionMatrix( aimRotation, aimWorldPosition, boneMatrix );
 	}
 
-	MatrixCopy( boneMatrix, bonetoworld.GetBoneForWrite( iBone ) );
+	MatrixCopy( boneMatrix, bonetoworld->GetBoneForWrite( iBone ) );
 }
 
 
@@ -4860,7 +4860,7 @@ void DoAimAtBone(
 bool CalcProceduralBone(
 	const IStudioHdr *pStudioHdr,
 	int iBone,
-	CBoneAccessor &bonetoworld
+	IBoneAccessor* bonetoworld
 	)
 {
 	mstudiobone_t		*pbones = pStudioHdr->pBone( 0 );

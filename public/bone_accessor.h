@@ -17,7 +17,7 @@
 class C_BaseAnimating;
 
 
-class CBoneAccessor
+class CBoneAccessor : public IBoneAccessor
 {
 public:
 	

@@ -1495,7 +1495,7 @@ void C_BaseAnimating::BuildTransformations( IStudioHdr *hdr, Vector *pos, Quater
 			continue;
 
 		// animate all non-simulated bones
-		if ( boneSimulated[i] || CalcProceduralBone( hdr, i, m_BoneAccessor ))
+		if ( boneSimulated[i] || CalcProceduralBone( hdr, i, &m_BoneAccessor ))
 		{
 			continue;
 		}

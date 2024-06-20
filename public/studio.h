@@ -2123,6 +2123,25 @@ struct animevent_t
 //#endif // GAME_DLL
 };
 
+class IBoneAccessor
+{
+public:
+
+	virtual int GetReadableBones() = 0;
+	virtual void SetReadableBones(int flags) = 0;
+
+	virtual int GetWritableBones() = 0;
+	virtual void SetWritableBones(int flags) = 0;
+
+	// Get bones for read or write access.
+	virtual const matrix3x4_t& GetBone(int iBone) const = 0;
+	virtual const matrix3x4_t& operator[](int iBone) const = 0;
+	virtual matrix3x4_t& GetBoneForWrite(int iBone) = 0;
+
+	virtual matrix3x4_t* GetBoneArrayForWrite() const = 0;
+
+};
+
 class IStudioHdr {
 protected:
 	virtual ~IStudioHdr(){}

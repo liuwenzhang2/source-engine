@@ -622,7 +622,7 @@ void C_ServerRagdoll::BuildTransformations( IStudioHdr *hdr, Vector *pos, Quater
 		// BUGBUG: Merge this code with the code in c_baseanimating somehow!!!
 		// animate all non-simulated bones
 		if ( boneSimulated[i] || 
-			CalcProceduralBone( hdr, i, m_BoneAccessor ) )
+			CalcProceduralBone( hdr, i, &m_BoneAccessor ) )
 		{
 			continue;
 		}
