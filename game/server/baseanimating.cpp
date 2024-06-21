@@ -707,7 +707,7 @@ int CBaseAnimating::LookupSequence( const char *label )
 //-----------------------------------------------------------------------------
 KeyValues *CBaseAnimating::GetSequenceKeyValues( int iSequence )
 {
-	const char *szText = Studio_GetKeyValueText( GetModelPtr(), iSequence );
+	const char *szText = GetModelPtr()->Studio_GetKeyValueText( iSequence );
 
 	if (szText)
 	{
@@ -953,7 +953,7 @@ float CBaseAnimating::SequenceDuration( IStudioHdr *pStudioHdr, int iSequence )
 		return 0.1;
 	}
 
-	return Studio_Duration( pStudioHdr, iSequence, GetPoseParameterArray() );
+	return pStudioHdr->Studio_Duration( iSequence, GetPoseParameterArray() );
 }
 
 float CBaseAnimating::GetSequenceCycleRate( IStudioHdr *pStudioHdr, int iSequence )
@@ -1236,7 +1236,7 @@ float CBaseAnimating::SetPoseParameter( IStudioHdr *pStudioHdr, int iParameter, 
 	if (iParameter >= 0)
 	{
 		float flNewValue;
-		flValue = Studio_SetPoseParameter( pStudioHdr, iParameter, flValue, flNewValue );
+		flValue = pStudioHdr->Studio_SetPoseParameter( iParameter, flValue, flNewValue );
 		m_flPoseParameter.Set( iParameter, flNewValue );
 	}
 
@@ -1267,7 +1267,7 @@ float CBaseAnimating::GetPoseParameter( int iParameter )
 
 	if (iParameter >= 0)
 	{
-		return Studio_GetPoseParameter( pstudiohdr, iParameter, m_flPoseParameter[ iParameter ] );
+		return pstudiohdr->Studio_GetPoseParameter( iParameter, m_flPoseParameter[ iParameter ] );
 	}
 
 	return 0.0;
@@ -1412,7 +1412,7 @@ int CBaseAnimating::LookupBone( const char *szName )
 	Assert( pStudioHdr );
 	if ( !pStudioHdr )
 		return -1;
-	return Studio_BoneIndexByName( pStudioHdr, szName );
+	return pStudioHdr->Studio_BoneIndexByName( szName );
 }
 
 
@@ -1730,7 +1730,7 @@ void CBaseAnimating::BuildMatricesWithBoneMerge(
 	{
 		// Now find the bone in the parent entity.
 		bool merged = false;
-		int parentBoneIndex = Studio_BoneIndexByName( fhdr, pbones[i].pszName() );
+		int parentBoneIndex = fhdr->Studio_BoneIndexByName( pbones[i].pszName() );
 		if ( parentBoneIndex >= 0 )
 		{
 			matrix3x4_t *pMat = pParentCache->GetCachedBone( parentBoneIndex );
@@ -1865,8 +1865,7 @@ void CBaseAnimating::SetupBones( matrix3x4_t *pBoneToWorld, int boneMask )
 		}
 	}
 
-	Studio_BuildMatrices( 
-		pStudioHdr, 
+	pStudioHdr->Studio_BuildMatrices(
 		GetEngineObject()->GetAbsAngles(),
 		adjOrigin, 
 		pos, 
@@ -1919,7 +1918,7 @@ int CBaseAnimating::LookupAttachment( const char *szName )
 	}
 
 	// The +1 is to make attachment indices be 1-based (namely 0 == invalid or unused attachment)
-	return Studio_FindAttachment( pStudioHdr, szName ) + 1;
+	return pStudioHdr->Studio_FindAttachment( szName ) + 1;
 }
 
 
@@ -2362,7 +2361,7 @@ float CBaseAnimating::GetInstantaneousVelocity( float flInterval )
 	float flNextCycle = GetCycle() + flInterval * GetSequenceCycleRate( GetSequence() ) * m_flPlaybackRate;
 
 	Vector vecVelocity;
-	Studio_SeqVelocity( pstudiohdr, GetSequence(), flNextCycle, GetPoseParameterArray(), vecVelocity );
+	pstudiohdr->Studio_SeqVelocity( GetSequence(), flNextCycle, GetPoseParameterArray(), vecVelocity );
 	vecVelocity *= m_flPlaybackRate;
 
 	return vecVelocity.Length();
@@ -2381,7 +2380,7 @@ float CBaseAnimating::GetEntryVelocity( int iSequence )
 		return 0;
 
 	Vector vecVelocity;
-	Studio_SeqVelocity( pstudiohdr, iSequence, 0.0, GetPoseParameterArray(), vecVelocity );
+	pstudiohdr->Studio_SeqVelocity( iSequence, 0.0, GetPoseParameterArray(), vecVelocity );
 
 	return vecVelocity.Length();
 }
@@ -2393,7 +2392,7 @@ float CBaseAnimating::GetExitVelocity( int iSequence )
 		return 0;
 
 	Vector vecVelocity;
-	Studio_SeqVelocity( pstudiohdr, iSequence, 1.0, GetPoseParameterArray(), vecVelocity );
+	pstudiohdr->Studio_SeqVelocity( iSequence, 1.0, GetPoseParameterArray(), vecVelocity );
 
 	return vecVelocity.Length();
 }
@@ -2468,7 +2467,7 @@ float CBaseAnimating::GetMovementFrame( float flDist )
 	if (! pstudiohdr)
 		return 0;
 
-	float t = Studio_FindSeqDistance( pstudiohdr, GetSequence(), GetPoseParameterArray(), flDist );
+	float t = pstudiohdr->Studio_FindSeqDistance(  GetSequence(), GetPoseParameterArray(), flDist );
 
 	return t;
 }
@@ -2754,7 +2753,7 @@ float CBaseAnimating::SetBoneController ( int iController, float flValue )
 	Assert(iController >= 0 && iController < NUM_BONECTRLS);
 
 	float newValue;
-	float retVal = Studio_SetController( pmodel, iController, flValue, newValue );
+	float retVal = pmodel->Studio_SetController( iController, flValue, newValue );
 
 	float &val = m_flEncodedController.GetForModify( iController );
 	val = newValue;
@@ -2769,7 +2768,7 @@ float CBaseAnimating::GetBoneController ( int iController )
 
 	IStudioHdr *pmodel = (IStudioHdr*)GetModelPtr();
 
-	return Studio_GetController( pmodel, iController, m_flEncodedController[iController] );
+	return pmodel->Studio_GetController(  iController, m_flEncodedController[iController] );
 }
 
 //------------------------------------------------------------------------------
@@ -3572,7 +3571,7 @@ bool CBaseAnimating::PrefetchSequence( int iSequence )
 	if ( !pStudioHdr )
 		return true;
 
-	return Studio_PrefetchSequence( pStudioHdr, iSequence );
+	return pStudioHdr->Studio_PrefetchSequence( iSequence );
 }
 
 //-----------------------------------------------------------------------------

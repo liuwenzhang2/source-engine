@@ -32,20 +32,6 @@ public:
 };
 
 
-
-class CBoneBitList : public CBitVec<MAXSTUDIOBONES>
-{
-public:
-	inline void MarkBone(int iBone)
-	{
-		Set(iBone);
-	}
-	inline bool IsBoneMarked(int iBone)
-	{
-		return Get(iBone) != 0 ? true : false;
-	}
-};
-
 class CBoneSetup;
 class IBoneSetup
 {
@@ -61,57 +47,11 @@ private:
 	CBoneSetup *m_pBoneSetup;
 };
 
-//-----------------------------------------------------------------------------
-// Purpose: blends together all the bones from two p:q lists
-//
-// p1 = p1 * (1 - s) + p2 * s
-// q1 = q1 * (1 - s) + q2 * s
-//-----------------------------------------------------------------------------
-void SlerpBones( 
-	const IStudioHdr *pStudioHdr,
-	Quaternion q1[MAXSTUDIOBONES], 
-	Vector pos1[MAXSTUDIOBONES], 
-	mstudioseqdesc_t &seqdesc, // source of q2 and pos2
-	int sequence, 
-	const Quaternion q2[MAXSTUDIOBONES], 
-	const Vector pos2[MAXSTUDIOBONES], 
-	float s,
-	int boneMask
-	);
-
 // Given two samples of a bone separated in time by dt, 
 // compute the velocity and angular velocity of that bone
 void CalcBoneDerivatives( Vector &velocity, AngularImpulse &angVel, const matrix3x4_t &prev, const matrix3x4_t &current, float dt );
 // Give a derivative of a bone, compute the velocity & angular velocity of that bone
 void CalcBoneVelocityFromDerivative( const QAngle &vecAngles, Vector &velocity, AngularImpulse &angVel, const matrix3x4_t &current );
-
-// This function sets up the local transform for a single frame of animation. It doesn't handle
-// pose parameters or interpolation between frames.
-void SetupSingleBoneMatrix( 
-	IStudioHdr *pOwnerHdr, 
-	int nSequence, 
-	int iFrame,
-	int iBone, 
-	matrix3x4_t &mBoneLocal );
-
-
-// Purpose: build boneToWorld transforms for a specific bone
-void BuildBoneChain(
-	const IStudioHdr *pStudioHdr,
-	const matrix3x4_t &rootxform,
-	const Vector pos[], 
-	const Quaternion q[], 
-	int	iBone,
-	matrix3x4_t *pBoneToWorld );
-
-void BuildBoneChain(
-	const IStudioHdr *pStudioHdr,
-	const matrix3x4_t &rootxform,
-	const Vector pos[], 
-	const Quaternion q[], 
-	int	iBone,
-	matrix3x4_t *pBoneToWorld,
-	CBoneBitList &boneComputed );
 
 
 //-----------------------------------------------------------------------------
@@ -212,50 +152,6 @@ struct ikchainresult_t
 };
 
 
-
-struct ikcontextikrule_t
-{
-	int			index;
-
-	int			type;
-	int			chain;
-
-	int			bone;
-
-	int			slot;	// iktarget slot.  Usually same as chain.
-	float		height;
-	float		radius;
-	float		floor;
-	Vector		pos;
-	Quaternion	q;
-
-	float		start;	// beginning of influence
-	float		peak;	// start of full influence
-	float		tail;	// end of full influence
-	float		end;	// end of all influence
-
-	float		top;
-	float		drop;
-
-	float		commit;		// frame footstep target should be committed
-	float		release;	// frame ankle should end rotation from latched orientation
-
-	float		flWeight;		// processed version of start-end cycle
-	float		flRuleWeight;	// blending weight
-	float		latched;		// does the IK rule use a latched value?
-	char		*szLabel;
-
-	Vector		kneeDir;
-	Vector		kneePos;
-
-	ikcontextikrule_t() = default;
-
-private:
-	// No copy constructors allowed
-	ikcontextikrule_t(const ikcontextikrule_t& vOther);
-};
-
-
 void Studio_AlignIKMatrix( matrix3x4_t &mMat, const Vector &vAlignTo );
 
 bool Studio_SolveIK( int iThigh, int iKnee, int iFoot, Vector &targetFoot, matrix3x4_t* pBoneToWorld );
@@ -306,73 +202,6 @@ private:
 	int m_boneMask;
 };
 
-
-//-----------------------------------------------------------------------------
-// Purpose: 
-//-----------------------------------------------------------------------------
-
-// replaces the bonetoworld transforms for all bones that are procedural
-bool CalcProceduralBone(
-	const IStudioHdr *pStudioHdr,
-	int iBone,
-	IBoneAccessor* bonetoworld
-	);
-
-void Studio_BuildMatrices(
-	const IStudioHdr *pStudioHdr,
-	const QAngle& angles, 
-	const Vector& origin, 
-	const Vector pos[],
-	const Quaternion q[],
-	int iBone,
-	float flScale,
-	matrix3x4_t bonetoworld[MAXSTUDIOBONES],
-	int boneMask
-	);
-
-
-// Get a bone->bone relative transform
-void Studio_CalcBoneToBoneTransform( const IStudioHdr *pStudioHdr, int inputBoneIndex, int outputBoneIndex, matrix3x4_t &matrixOut );
-
-// Given a bone rotation value, figures out the value you need to give to the controller
-// to have the bone at that value.
-// [in]  flValue  = the desired bone rotation value
-// [out] ctlValue = the (0-1) value to set the controller t.
-// return value   = flValue, unwrapped to lie between the controller's start and end.
-float Studio_SetController( const IStudioHdr *pStudioHdr, int iController, float flValue, float &ctlValue );
-
-
-// Given a 0-1 controller value, maps it into the controller's start and end and returns the bone rotation angle.
-// [in] ctlValue  = value in controller space (0-1).
-// return value   = value in bone space
-float Studio_GetController( const IStudioHdr *pStudioHdr, int iController, float ctlValue );
-
-void Studio_CalcDefaultPoseParameters( const IStudioHdr *pStudioHdr, float flPoseParameter[MAXSTUDIOPOSEPARAM], int nCount );
-float Studio_GetPoseParameter( const IStudioHdr *pStudioHdr, int iParameter, float ctlValue );
-float Studio_SetPoseParameter( const IStudioHdr *pStudioHdr, int iParameter, float flValue, float &ctlValue );
-
-
-
-int Studio_MaxFrame( const IStudioHdr *pStudioHdr, int iSequence, const float poseParameter[] );
-float Studio_FPS( const IStudioHdr *pStudioHdr, int iSequence, const float poseParameter[] );
-float Studio_CPS( const IStudioHdr *pStudioHdr, mstudioseqdesc_t &seqdesc, int iSequence, const float poseParameter[] );
-float Studio_Duration( const IStudioHdr *pStudioHdr, int iSequence, const float poseParameter[] );
-void Studio_MovementRate( const IStudioHdr *pStudioHdr, int iSequence, const float poseParameter[], Vector *pVec );
-
-// void Studio_Movement( const IStudioHdr *pStudioHdr, int iSequence, const float poseParameter[], Vector *pVec );
-
-//void Studio_AnimPosition( mstudioanimdesc_t *panim, float flCycle, Vector &vecPos, Vector &vecAngle );
-//void Studio_AnimVelocity( mstudioanimdesc_t *panim, float flCycle, Vector &vecVelocity );
-//float Studio_FindAnimDistance( mstudioanimdesc_t *panim, float flDist );
-bool Studio_SeqVelocity( const IStudioHdr *pStudioHdr, int iSequence, float flCycle, const float poseParameter[], Vector &vecVelocity );
-float Studio_FindSeqDistance( const IStudioHdr *pStudioHdr, int iSequence, const float poseParameter[], float flDist );
-float Studio_FindSeqVelocity( const IStudioHdr *pStudioHdr, int iSequence, const float poseParameter[], float flVelocity );
-int Studio_FindAttachment( const IStudioHdr *pStudioHdr, const char *pAttachmentName );
-int Studio_FindRandomAttachment( const IStudioHdr *pStudioHdr, const char *pAttachmentName );
-int Studio_BoneIndexByName( const IStudioHdr *pStudioHdr, const char *pName );
-const char *Studio_GetDefaultSurfaceProps( IStudioHdr *pstudiohdr );
-float Studio_GetMass( IStudioHdr *pstudiohdr );
-const char *Studio_GetKeyValueText( const IStudioHdr *pStudioHdr, int iSequence );
 
 FORWARD_DECLARE_HANDLE( memhandle_t );
 struct bonecacheparams_t
@@ -433,12 +262,5 @@ void Studio_InvalidateBoneCache( memhandle_t cacheHandle );
 
 // Given a ray, trace for an intersection with this studiomodel.  Get the array of bones from StudioSetupHitboxBones
 bool TraceToStudio( class IPhysicsSurfaceProps *pProps, const Ray_t& ray, IStudioHdr *pStudioHdr, mstudiohitboxset_t *set, matrix3x4_t **hitboxbones, int fContentsMask, const Vector &vecOrigin, float flScale, trace_t &trace );
-
-void QuaternionSM( float s, const Quaternion &p, const Quaternion &q, Quaternion &qt );
-void QuaternionMA( const Quaternion &p, float s, const Quaternion &q, Quaternion &qt );
-
-bool Studio_PrefetchSequence( const IStudioHdr *pStudioHdr, int iSequence );
-
-void Studio_RunBoneFlexDrivers( float *pFlexController, const IStudioHdr *pStudioHdr, const Vector *pPositions, const matrix3x4_t *pBoneToWorld, const matrix3x4_t &mRootToWorld );
 
 #endif // BONE_SETUP_H

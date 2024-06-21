@@ -179,7 +179,7 @@ static void RagdollAddSolid( IPhysicsEnvironment *pPhysEnv, ragdoll_t &ragdoll, 
 	if ( solid.index >= 0 && solid.index < params.pCollide->solidCount)
 	{
 		Assert( ragdoll.listCount == solid.index );
-		int boneIndex = Studio_BoneIndexByName( params.pStudioHdr, solid.name );
+		int boneIndex = params.pStudioHdr->Studio_BoneIndexByName( solid.name );
 		ragdoll.boneIndex[ragdoll.listCount] = boneIndex;
 
 		if ( boneIndex >= 0 )
@@ -239,7 +239,7 @@ static void RagdollAddConstraint( IPhysicsEnvironment *pPhysEnv, ragdoll_t &ragd
 		// this parent/child pair is not usually a parent/child pair in the skeleton.  There
 		// are often bones in between that are collapsed for simulation.  So we need to compute
 		// the transform.
-		Studio_CalcBoneToBoneTransform( params.pStudioHdr, ragdoll.boneIndex[constraint.childIndex], ragdoll.boneIndex[constraint.parentIndex], constraint.constraintToAttached );
+		params.pStudioHdr->Studio_CalcBoneToBoneTransform( ragdoll.boneIndex[constraint.childIndex], ragdoll.boneIndex[constraint.parentIndex], constraint.constraintToAttached );
 		MatrixGetColumn( constraint.constraintToAttached, 3, childElement.originParentSpace );
 		// UNDONE: We could transform the constraint limit axes relative to the bone space
 		// using this data.  Do we need that feature?
@@ -545,7 +545,7 @@ int RagdollExtractBoneIndices( int *boneIndexOut, IStudioHdr *pStudioHdr, vcolli
 			pParse->ParseSolid( &solid, NULL );
 			if ( elementCount < RAGDOLL_MAX_ELEMENTS )
 			{
-				boneIndexOut[elementCount] = Studio_BoneIndexByName( pStudioHdr, solid.name );
+				boneIndexOut[elementCount] = pStudioHdr->Studio_BoneIndexByName( solid.name );
 				elementCount++;
 			}
 		}

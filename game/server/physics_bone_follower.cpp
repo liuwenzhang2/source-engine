@@ -101,7 +101,7 @@ bool CBoneFollowerManager::CreatePhysicsFollower( CBaseAnimating *pParentEntity,
 	Vector bonePosition;
 	QAngle boneAngles;
 
-	int boneIndex = Studio_BoneIndexByName( pStudioHdr, pBoneName );
+	int boneIndex = pStudioHdr->Studio_BoneIndexByName( pBoneName );
 
 	if ( boneIndex >= 0 )
 	{
@@ -116,7 +116,7 @@ bool CBoneFollowerManager::CreatePhysicsFollower( CBaseAnimating *pParentEntity,
 		}
 
 		// fixup in case ragdoll is assigned to a parent of the requested follower bone
-		follow.boneIndex = Studio_BoneIndexByName( pStudioHdr, pSolid->name );
+		follow.boneIndex = pStudioHdr->Studio_BoneIndexByName( pSolid->name );
 		if ( follow.boneIndex < 0 )
 		{
 			follow.boneIndex = boneIndex;

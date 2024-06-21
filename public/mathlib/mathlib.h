@@ -2169,6 +2169,51 @@ inline bool AlmostEqual( const Vector &a, const Vector &b, int maxUlps = 10)
 		AlmostEqual( a.z, b.z, maxUlps );
 }
 
+//-----------------------------------------------------------------------------
+// Purpose: qt = ( s * p ) * q
+//-----------------------------------------------------------------------------
+inline void QuaternionSM(float s, const Quaternion& p, const Quaternion& q, Quaternion& qt)
+{
+	Quaternion		p1, q1;
+
+	QuaternionScale(p, s, p1);
+	QuaternionMult(p1, q, q1);
+	QuaternionNormalize(q1);
+	qt[0] = q1[0];
+	qt[1] = q1[1];
+	qt[2] = q1[2];
+	qt[3] = q1[3];
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: qt = p * ( s * q )
+//-----------------------------------------------------------------------------
+inline void QuaternionMA(const Quaternion& p, float s, const Quaternion& q, Quaternion& qt)
+{
+	Quaternion p1, q1;
+
+	QuaternionScale(q, s, q1);
+	QuaternionMult(p, q1, p1);
+	QuaternionNormalize(p1);
+	qt[0] = p1[0];
+	qt[1] = p1[1];
+	qt[2] = p1[2];
+	qt[3] = p1[3];
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: qt = p + s * q
+//-----------------------------------------------------------------------------
+inline void QuaternionAccumulate(const Quaternion& p, float s, const Quaternion& q, Quaternion& qt)
+{
+	Quaternion q2;
+	QuaternionAlign(p, q, q2);
+
+	qt[0] = p[0] + s * q2[0];
+	qt[1] = p[1] + s * q2[1];
+	qt[2] = p[2] + s * q2[2];
+	qt[3] = p[3] + s * q2[3];
+}
 
 #endif	// MATH_BASE_H
 

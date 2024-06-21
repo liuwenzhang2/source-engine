@@ -6573,7 +6573,7 @@ void CAI_BaseNPC::SetupVPhysicsHull()
 	IPhysicsObject *pPhysObj = VPhysicsGetObject();
 	if ( pPhysObj )
 	{
-		float mass = Studio_GetMass(GetModelPtr());
+		float mass = GetModelPtr()->Studio_GetMass();
 		if ( mass > 0 )
 		{
 			pPhysObj->SetMass( mass );

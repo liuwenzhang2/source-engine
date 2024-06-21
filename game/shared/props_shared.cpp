@@ -961,7 +961,7 @@ void PropBreakableCreateAll( int modelindex, IPhysicsObject *pPhysics, const bre
 	}
 
 	Vector parentOrigin = vec3_origin;
-	int parentAttachment = 	Studio_FindAttachment( studioHdr, "placementOrigin" ) + 1;
+	int parentAttachment = studioHdr->Studio_FindAttachment( "placementOrigin" ) + 1;
 	if ( parentAttachment > 0 )
 	{
 		studioHdr->GetAttachmentLocalSpace( parentAttachment-1, localToWorld );
@@ -1036,7 +1036,7 @@ void PropBreakableCreateAll( int modelindex, IPhysicsObject *pPhysics, const bre
 				}
 				else
 				{
-					int attachmentIndex = Studio_FindAttachment( studioHdr, list[i].placementName ) + 1;
+					int attachmentIndex = studioHdr->Studio_FindAttachment( list[i].placementName ) + 1;
 					if ( attachmentIndex > 0 )
 					{
 						pOwnerAnim->GetAttachment( attachmentIndex, matrix );
@@ -1046,7 +1046,7 @@ void PropBreakableCreateAll( int modelindex, IPhysicsObject *pPhysics, const bre
 			}
 			else
 			{
-				int placementIndex = Studio_FindAttachment( studioHdr, "placementOrigin" ) + 1;
+				int placementIndex = studioHdr->Studio_FindAttachment( "placementOrigin" ) + 1;
 				Vector placementOrigin = parentOrigin;
 				if ( placementIndex > 0 )
 				{
@@ -1347,7 +1347,7 @@ CBaseEntity *CreateGibsFromList( CUtlVector<breakmodel_t> &list, int modelindex,
 	}
 
 	Vector parentOrigin = vec3_origin;
-	int parentAttachment = 	Studio_FindAttachment( studioHdr, "placementOrigin" ) + 1;
+	int parentAttachment = studioHdr->Studio_FindAttachment( "placementOrigin" ) + 1;
 	if ( parentAttachment > 0 )
 	{
 		studioHdr->GetAttachmentLocalSpace( parentAttachment-1, localToWorld );
@@ -1423,7 +1423,7 @@ CBaseEntity *CreateGibsFromList( CUtlVector<breakmodel_t> &list, int modelindex,
 				}
 				else
 				{
-					int attachmentIndex = Studio_FindAttachment( studioHdr, list[i].placementName ) + 1;
+					int attachmentIndex = studioHdr->Studio_FindAttachment( list[i].placementName ) + 1;
 					if ( attachmentIndex > 0 )
 					{
 						pOwnerAnim->GetAttachment( attachmentIndex, matrix );
@@ -1433,7 +1433,7 @@ CBaseEntity *CreateGibsFromList( CUtlVector<breakmodel_t> &list, int modelindex,
 			}
 			else
 			{
-				int placementIndex = Studio_FindAttachment( studioHdr, "placementOrigin" ) + 1;
+				int placementIndex = studioHdr->Studio_FindAttachment( "placementOrigin" ) + 1;
 				Vector placementOrigin = parentOrigin;
 				if ( placementIndex > 0 )
 				{

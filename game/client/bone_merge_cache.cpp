@@ -80,7 +80,7 @@ void CBoneMergeCache::UpdateCache()
 			m_nFollowBoneSetupMask = BONE_USED_BY_BONE_MERGE;
 			for ( int i = 0; i < m_pOwnerHdr->numbones(); i++ )
 			{
-				int parentBoneIndex = Studio_BoneIndexByName( m_pFollowHdr, pOwnerBones[i].pszName() );
+				int parentBoneIndex = m_pFollowHdr->Studio_BoneIndexByName( pOwnerBones[i].pszName() );
 				if ( parentBoneIndex < 0 )
 					continue;
 
@@ -260,7 +260,7 @@ bool CBoneMergeCache::GetAimEntOrigin( Vector *pAbsOrigin, QAngle *pAbsAngles )
 
 	// Get Inverse( mBoneLocal )
 	matrix3x4_t mBoneLocal, mBoneLocalInv;
-	SetupSingleBoneMatrix( m_pOwnerHdr, m_pOwner->GetSequence(), 0, m_MergedBones[0].m_iMyBone, mBoneLocal );
+	m_pOwnerHdr->SetupSingleBoneMatrix( m_pOwner->GetSequence(), 0, m_MergedBones[0].m_iMyBone, mBoneLocal );
 	MatrixInvert( mBoneLocal, mBoneLocalInv );
 
 	// Now calculate mEntity = mFollowBone * Inverse( mBoneLocal )

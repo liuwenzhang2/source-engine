@@ -595,7 +595,7 @@ void CBaseModelPanel::PlaySequence( const char *pszSequenceName )
 	if ( iSeq != ACT_INVALID )
 	{
 		m_nActiveSequence = iSeq;
-		m_flActiveSequenceDuration = Studio_Duration( studioHDR, iSeq, NULL );
+		m_flActiveSequenceDuration = studioHDR->Studio_Duration( iSeq, NULL );
 		SetSequence( m_nActiveSequence, true );
 	}
 }

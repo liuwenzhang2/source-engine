@@ -2089,7 +2089,7 @@ void C_CSPlayer::PlayReloadEffect()
 		{
 			float poseParameters[MAXSTUDIOPOSEPARAM];
 			memset( poseParameters, 0, sizeof( poseParameters ) );
-			float cyclesPerSecond = Studio_CPS( studioHdr, *pSeq, iSeq, poseParameters );
+			float cyclesPerSecond = studioHdr->Studio_CPS( *pSeq, iSeq, poseParameters );
 
 			// Now read out all the sound events with their timing
 			for ( int iEvent=0; iEvent < pSeq->numevents; iEvent++ )

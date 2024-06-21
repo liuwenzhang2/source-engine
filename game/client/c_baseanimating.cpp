@@ -1179,7 +1179,7 @@ int C_BaseAnimating::LookupBone( const char *szName )
 {
 	Assert( GetModelPtr() );
 
-	return Studio_BoneIndexByName( GetModelPtr(), szName );
+	return  GetModelPtr()->Studio_BoneIndexByName( szName );
 }
 
 //=========================================================
@@ -1495,7 +1495,7 @@ void C_BaseAnimating::BuildTransformations( IStudioHdr *hdr, Vector *pos, Quater
 			continue;
 
 		// animate all non-simulated bones
-		if ( boneSimulated[i] || CalcProceduralBone( hdr, i, &m_BoneAccessor ))
+		if ( boneSimulated[i] || hdr->CalcProceduralBone( i, &m_BoneAccessor ))
 		{
 			continue;
 		}
@@ -4854,7 +4854,7 @@ int C_BaseAnimating::LookupAttachment( const char *pAttachmentName )
 	// NOTE: Currently, the network uses 0 to mean "no attachment" 
 	// thus the client must add one to the index of the attachment
 	// UNDONE: Make the server do this too to be consistent.
-	return Studio_FindAttachment( hdr, pAttachmentName ) + 1;
+	return hdr->Studio_FindAttachment( pAttachmentName ) + 1;
 }
 
 //-----------------------------------------------------------------------------
@@ -4871,7 +4871,7 @@ int C_BaseAnimating::LookupRandomAttachment( const char *pAttachmentNameSubstrin
 	// NOTE: Currently, the network uses 0 to mean "no attachment" 
 	// thus the client must add one to the index of the attachment
 	// UNDONE: Make the server do this too to be consistent.
-	return Studio_FindRandomAttachment( hdr, pAttachmentNameSubstring ) + 1;
+	return hdr->Studio_FindRandomAttachment(  pAttachmentNameSubstring ) + 1;
 }
 
 
@@ -5028,7 +5028,7 @@ float C_BaseAnimating::GetSequenceCycleRate( IStudioHdr *pStudioHdr, int iSequen
 	if ( !pStudioHdr )
 		return 0.0f;
 
-	return Studio_CPS( pStudioHdr, pStudioHdr->pSeqdesc(iSequence), iSequence, m_flPoseParameter );
+	return pStudioHdr->Studio_CPS( pStudioHdr->pSeqdesc(iSequence), iSequence, m_flPoseParameter );
 }
 
 float C_BaseAnimating::GetAnimTimeInterval( void ) const
@@ -5363,7 +5363,7 @@ float C_BaseAnimating::SequenceDuration( IStudioHdr *pStudioHdr, int iSequence )
 		return 0.1;
 	}
 
-	return Studio_Duration( pStudioHdr, iSequence, m_flPoseParameter );
+	return pStudioHdr->Studio_Duration( iSequence, m_flPoseParameter );
 
 }
 
@@ -5605,7 +5605,7 @@ float C_BaseAnimating::SetPoseParameter( IStudioHdr *pStudioHdr, int iParameter,
 	if (iParameter >= 0)
 	{
 		float flNewValue;
-		flValue = Studio_SetPoseParameter( pStudioHdr, iParameter, flValue, flNewValue );
+		flValue = pStudioHdr->Studio_SetPoseParameter( iParameter, flValue, flNewValue );
 		m_flPoseParameter[ iParameter ] = flNewValue;
 	}
 
@@ -5725,7 +5725,7 @@ float C_BaseAnimating::SetBoneController ( int iController, float flValue )
 	Assert(iController >= 0 && iController < NUM_BONECTRLS);
 
 	float controller = m_flEncodedController[iController];
-	float retVal = Studio_SetController( pmodel, iController, flValue, controller );
+	float retVal = pmodel->Studio_SetController(  iController, flValue, controller );
 	m_flEncodedController[iController] = controller;
 	return retVal;
 }
@@ -5788,7 +5788,7 @@ Activity C_BaseAnimating::GetSequenceActivity( int iSequence )
 //-----------------------------------------------------------------------------
 KeyValues *C_BaseAnimating::GetSequenceKeyValues( int iSequence )
 {
-	const char *szText = Studio_GetKeyValueText( GetModelPtr(), iSequence );
+	const char *szText = GetModelPtr()->Studio_GetKeyValueText( iSequence );
 
 	if (szText)
 	{

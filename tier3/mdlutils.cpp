@@ -281,7 +281,7 @@ void CMDL::SetUpBones( const matrix3x4_t& rootToWorld, int nMaxBoneCount, matrix
 		}
 	}
 
-	int nFrameCount = Studio_MaxFrame( studioHdr, m_nSequence, pPoseParameter );
+	int nFrameCount = studioHdr->Studio_MaxFrame( m_nSequence, pPoseParameter );
 	if ( nFrameCount == 0 )
 	{
 		nFrameCount = 1;
@@ -310,7 +310,7 @@ void CMDL::SetUpBones( const matrix3x4_t& rootToWorld, int nMaxBoneCount, matrix
 				float flWeight = pSequenceLayers[ i ].m_flWeight;
 
 				float flLayerCycle;
-				int nLayerFrameCount = MAX( 1, Studio_MaxFrame( studioHdr, nSeqIndex, pPoseParameter ) );
+				int nLayerFrameCount = MAX( 1, studioHdr->Studio_MaxFrame( nSeqIndex, pPoseParameter ) );
 
 				if ( pSequenceLayers[i].m_bNoLoop )
 				{
@@ -380,7 +380,7 @@ void CMDL::SetUpBones( const matrix3x4_t& rootToWorld, int nMaxBoneCount, matrix
 			ConcatTransforms( pBoneToWorld[ studioHdr->pBone(i)->parent ], boneMatrix, pBoneToWorld[i] );
 		}
 	}
-	Studio_RunBoneFlexDrivers( m_pFlexControls, studioHdr, pos, pBoneToWorld, rootToWorld );
+	studioHdr->Studio_RunBoneFlexDrivers( m_pFlexControls, pos, pBoneToWorld, rootToWorld );
 }
 
 //-----------------------------------------------------------------------------
@@ -409,7 +409,7 @@ void CMDL::SetupBonesWithBoneMerge( const IStudioHdr *pMergeHdr, matrix3x4_t *pM
 		}
 	}
 
-	int nFrameCount = Studio_MaxFrame( pMergeHdr, m_nSequence, pPoseParameter );
+	int nFrameCount = pMergeHdr->Studio_MaxFrame( m_nSequence, pPoseParameter );
 	if ( nFrameCount == 0 )
 	{
 		nFrameCount = 1;
@@ -432,7 +432,7 @@ void CMDL::SetupBonesWithBoneMerge( const IStudioHdr *pMergeHdr, matrix3x4_t *pM
 	{
 		// Now find the bone in the parent entity.
 		bool bMerged = false;
-		int iParentBoneIndex = Studio_BoneIndexByName( pFollow, pMergeBones[iMergeBone].pszName() );
+		int iParentBoneIndex = pFollow->Studio_BoneIndexByName( pMergeBones[iMergeBone].pszName() );
 		if ( iParentBoneIndex >= 0 )
 		{
 			MatrixCopy( pFollowBoneToWorld[iParentBoneIndex], pMergeBoneToWorld[iMergeBone] );

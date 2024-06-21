@@ -1509,7 +1509,7 @@ void CAI_PassengerBehavior::CacheBlendTargets( void )
 	}
 
 	// Find our frame range on this sequence
-	int nMaxFrames = Studio_MaxFrame( GetOuter()->GetModelPtr(), m_nTransitionSequence, GetOuter()->GetPoseParameterArray() );
+	int nMaxFrames = GetOuter()->GetModelPtr()->Studio_MaxFrame( m_nTransitionSequence, GetOuter()->GetPoseParameterArray() );
 
 	// Find a key by this name
 	KeyValues *subKeys = blendValues->FindKey( ORIGIN_KEYNAME );

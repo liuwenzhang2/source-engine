@@ -986,8 +986,7 @@ void CPortal_Player::SetupBones( matrix3x4_t *pBoneToWorld, int boneMask )
 		}
 	}
 
-	Studio_BuildMatrices( 
-		pStudioHdr, 
+	pStudioHdr->Studio_BuildMatrices(
 		m_PlayerAnimState->GetRenderAngles(),
 		adjOrigin, 
 		pos, 

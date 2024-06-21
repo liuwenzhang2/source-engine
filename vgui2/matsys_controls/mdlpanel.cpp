@@ -332,7 +332,7 @@ void CMDLPanel::DrawCollisionModel()
 			solid_t solid;
 
 			pParser->ParseSolid( &solid, NULL );
-			int boneIndex = Studio_BoneIndexByName( studioHdr, solid.name );
+			int boneIndex = studioHdr->Studio_BoneIndexByName( solid.name );
 			Vector *outVerts;
 			int vertCount = g_pPhysicsCollision->CreateDebugMesh( pCollide->solids[solid.index], &outVerts );
 
@@ -549,7 +549,7 @@ void CMDLPanel::SetPoseParameters( const float *pPoseParameters, int nCount )
 	else if ( m_RootMDL.m_MDL.GetMDL() != MDLHANDLE_INVALID )
 	{
 		IStudioHdr* studioHdr = g_pMDLCache->GetIStudioHdr( m_RootMDL.m_MDL.GetMDL() );
-		Studio_CalcDefaultPoseParameters( studioHdr, m_PoseParameters, MAXSTUDIOPOSEPARAM );
+		studioHdr->Studio_CalcDefaultPoseParameters( m_PoseParameters, MAXSTUDIOPOSEPARAM );
 	}
 }
 
@@ -704,7 +704,7 @@ void CMDLPanel::DoAnimationEvents( IStudioHdr *pStudioHdr, int nSeqNum, float fl
 
 	mstudioevent_t *pevent = seqdesc.pEvent( 0 );
 
-	int nFrameCount = Studio_MaxFrame( pStudioHdr, nSeqNum, m_PoseParameters );
+	int nFrameCount = pStudioHdr->Studio_MaxFrame( nSeqNum, m_PoseParameters );
 	if ( nFrameCount == 0 )
 	{
 		nFrameCount = 1;

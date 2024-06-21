@@ -4365,7 +4365,7 @@ Vector CNPC_Strider::BackFootHit( float eventtime )
 //---------------------------------------------------------
 static Vector GetAttachmentPositionInSpaceOfBone( IStudioHdr *pStudioHdr, const char *pAttachmentName, int outputBoneIndex )
 {
-	int attachment = Studio_FindAttachment( pStudioHdr, pAttachmentName );
+	int attachment = pStudioHdr->Studio_FindAttachment( pAttachmentName );
 
 	Vector localAttach;
 	const mstudioattachment_t &pAttachment = pStudioHdr->pAttachment(attachment);
@@ -4373,7 +4373,7 @@ static Vector GetAttachmentPositionInSpaceOfBone( IStudioHdr *pStudioHdr, const 
 	MatrixGetColumn( pAttachment.local, 3, localAttach );
 
 	matrix3x4_t inputToOutputBone;
-	Studio_CalcBoneToBoneTransform( pStudioHdr, iBone, outputBoneIndex, inputToOutputBone );
+	pStudioHdr->Studio_CalcBoneToBoneTransform( iBone, outputBoneIndex, inputToOutputBone );
 	
 	Vector out;
 	VectorTransform( localAttach, inputToOutputBone, out );

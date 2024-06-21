@@ -207,12 +207,12 @@ void C_NPC_Barnacle::StandardBlendingRules( IStudioHdr *hdr, Vector pos[], Quate
 	if ( !hdr )
 		return;
 
-	int firstBone = Studio_BoneIndexByName( hdr, "Barnacle.tongue1" );
+	int firstBone = hdr->Studio_BoneIndexByName( "Barnacle.tongue1" );
 
 	Vector vecPrevRight;
 	GetEngineObject()->GetVectors( NULL, &vecPrevRight, NULL );
 
-	Vector vecPrev = pos[Studio_BoneIndexByName( hdr, "Barnacle.base" )];
+	Vector vecPrev = pos[hdr->Studio_BoneIndexByName( "Barnacle.base" )];
 	Vector vecCurr = vec3_origin;
 	Vector vecForward;
 	for ( int i = 0; i <= BARNACLE_TONGUE_POINTS; i++ )

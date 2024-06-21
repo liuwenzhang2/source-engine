@@ -1402,7 +1402,7 @@ CBaseEntity *CreateServerRagdoll( CBaseAnimating *pAnimating, int forceBone, con
 		int count = pAnimating->GetHitboxesFrontside( boxList, ARRAYSIZE(boxList), normal, DotProduct( normal, info.GetDamagePosition() ) );
 		
 		// distribute force over mass of entire character
-		float massScale = Studio_GetMass(pAnimating->GetModelPtr());
+		float massScale = pAnimating->GetModelPtr()->Studio_GetMass();
 		massScale = clamp( massScale, 1.f, 1.e4f );
 		massScale = 1.f / massScale;
 

@@ -62,7 +62,7 @@ bool AutoAddGestureKeys( CChoreoEvent *e, IStudioHdr *pStudioHdr, float *pPosePa
 		return false;
 
 	KeyValues *pSeqKeyValues = new KeyValues( "" );
-	if ( !pSeqKeyValues->LoadFromBuffer( pStudioHdr->pszName(), Studio_GetKeyValueText( pStudioHdr, iSequence ) ) )
+	if ( !pSeqKeyValues->LoadFromBuffer( pStudioHdr->pszName(), pStudioHdr->Studio_GetKeyValueText( iSequence ) ) )
 	{
 		pSeqKeyValues->deleteThis();
 		return false;
@@ -76,7 +76,7 @@ bool AutoAddGestureKeys( CChoreoEvent *e, IStudioHdr *pStudioHdr, float *pPosePa
 		return false;
 	}
 
-	int nMaxFrame = Studio_MaxFrame( pStudioHdr, iSequence, pPoseParameters ) - 1;
+	int nMaxFrame = pStudioHdr->Studio_MaxFrame( iSequence, pPoseParameters ) - 1;
 
 	// Start grabbing the sounds and slotting them in
 	KeyValues *pkvFaceposer;
@@ -211,7 +211,7 @@ bool UpdateGestureLength( CChoreoEvent *e, IStudioHdr *pStudioHdr, float *pPoseP
 		return false;
 
 	bool bChanged = false;
-	float flSeqDuration = Studio_Duration( pStudioHdr, iSequence, pPoseParameters );
+	float flSeqDuration = pStudioHdr->Studio_Duration( iSequence, pPoseParameters );
 	float flCurDuration;
 	e->GetGestureSequenceDuration( flCurDuration );
 	if ( flSeqDuration != 0.0f && flSeqDuration != flCurDuration )
@@ -251,7 +251,7 @@ bool UpdateSequenceLength( CChoreoEvent *e, IStudioHdr *pStudioHdr, float *pPose
 
 	bool bChanged = false;
 	bool bLooping = DoesSequenceLoop( pStudioHdr, iSequence );
-	float flSeqDuration = Studio_Duration( pStudioHdr, iSequence, pPoseParameters );
+	float flSeqDuration = pStudioHdr->Studio_Duration( iSequence, pPoseParameters );
 
 	if ( bLooping )
 	{
