@@ -964,6 +964,8 @@ InitReturnVal_t CMDLCache::Init()
 	if ( m_bInitialized )
 		return INIT_OK;
 
+	MathLib_Init(2.2f, 2.2f, 0.0f, 2.0f);
+
 	InitReturnVal_t nRetVal = BaseClass::Init();
 	if ( nRetVal != INIT_OK )
 		return nRetVal;
