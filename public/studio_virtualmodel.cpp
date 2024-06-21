@@ -136,7 +136,7 @@ void VectorIRotate(const float* in1, const matrix3x4_t& in2, float* out)
 
 void MatrixCopy(const matrix3x4_t& in, matrix3x4_t& out)
 {
-	Assert(s_bMathlibInitialized);
+	//Assert(s_bMathlibInitialized);
 	memcpy(out.Base(), in.Base(), sizeof(float) * 3 * 4);
 }
 
