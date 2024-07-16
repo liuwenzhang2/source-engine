@@ -165,7 +165,7 @@ public:
 	Vector m_velocity;
 	bool m_fInCombat;
 
-	void SetSequence( int nSequence );
+	//void SetSequence( int nSequence );
 
 	int IRelationPriority( CBaseEntity *pTarget );
 };
@@ -739,10 +739,10 @@ void CNPC_Controller::RunTask ( const Task_t *pTask )
 	}
 }
 
-void CNPC_Controller::SetSequence( int nSequence )
-{
-	BaseClass::SetSequence( nSequence );
-}
+//void CNPC_Controller::SetSequence( int nSequence )
+//{
+//	BaseClass::SetSequence( nSequence );
+//}
 
 
 //=========================================================

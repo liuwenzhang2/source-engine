@@ -89,7 +89,7 @@ public:
 	inline void						SetPlaybackRate( float rate );
 
 	inline int GetSequence() { return m_nSequence; }
-	virtual void SetSequence(int nSequence);
+	void SetSequence(int nSequence);
 	/* inline */ void ResetSequence(int nSequence);
 	// FIXME: push transitions support down into CBaseAnimating?
 	virtual bool IsActivityFinished( void ) { return m_bSequenceFinished; }

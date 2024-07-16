@@ -175,6 +175,9 @@ public:
 		m_flGravity = 0.0f;
 		m_bSimulatedEveryTick = false;
 		m_bAnimatedEveryTick = false;
+		m_rgflCoordinateFrame[0][0] = 1.0f;
+		m_rgflCoordinateFrame[1][1] = 1.0f;
+		m_rgflCoordinateFrame[2][2] = 1.0f;
 	}
 
 	void Init(C_BaseEntity* pOuter) {

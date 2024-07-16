@@ -172,6 +172,9 @@ public:
 		SetFriction(1.0f);
 		m_nLastThinkTick = gpGlobals->tickcount;
 		SetMoveType(MOVETYPE_NONE);
+		m_rgflCoordinateFrame[0][0] = 1.0f;
+		m_rgflCoordinateFrame[1][1] = 1.0f;
+		m_rgflCoordinateFrame[2][2] = 1.0f;
 	}
 
 	~CEngineObjectInternal()
