@@ -1864,47 +1864,47 @@ void C_BaseAnimating::AccumulateLayers( IBoneSetup &boneSetup, Vector pos[], Qua
 	// Nothing here
 }
 
-void C_BaseAnimating::ChildLayerBlend( Vector pos[], Quaternion q[], float currentTime, int boneMask )
-{
-	return;
-
-	Vector		childPos[MAXSTUDIOBONES];
-	Quaternion	childQ[MAXSTUDIOBONES];
-	float		childPoseparam[MAXSTUDIOPOSEPARAM];
-
-	// go through all children
-	for ( IEngineObjectClient *pChild = GetEngineObject()->FirstMoveChild(); pChild; pChild = pChild->NextMovePeer() )
-	{
-		C_BaseAnimating *pChildAnimating = pChild->GetOuter()->GetBaseAnimating();
-
-		if ( pChildAnimating )
-		{
-			IStudioHdr *pChildHdr = pChildAnimating->GetModelPtr();
-
-			// FIXME: needs a new type of EF_BONEMERGE (EF_CHILDMERGE?)
-			if ( pChildHdr && pChild->IsEffectActive( EF_BONEMERGE ) && pChildHdr->SequencesAvailable() && pChildAnimating->m_pBoneMergeCache )
-			{
-				// FIXME: these should Inherit from the parent
-				GetPoseParameters( pChildHdr, childPoseparam );
-
-				IBoneSetup childBoneSetup( pChildHdr, boneMask, childPoseparam );
-				childBoneSetup.InitPose( childPos, childQ );
-
-				// set up the child into the parent's current pose
-				pChildAnimating->m_pBoneMergeCache->CopyParentToChild( pos, q, childPos, childQ, boneMask );
-
-				// FIXME: needs some kind of sequence
-				// merge over whatever bones the childs sequence modifies
-				childBoneSetup.AccumulatePose( childPos, childQ, 0, GetCycle(), 1.0, currentTime, NULL );
-
-				// copy the result back into the parents bones
-				pChildAnimating->m_pBoneMergeCache->CopyChildToParent( childPos, childQ, pos, q, boneMask );
-
-				// probably needs an IK merge system of some sort =(
-			}
-		}
-	}
-}
+//void C_BaseAnimating::ChildLayerBlend( Vector pos[], Quaternion q[], float currentTime, int boneMask )
+//{
+//	return;
+//
+//	Vector		childPos[MAXSTUDIOBONES];
+//	Quaternion	childQ[MAXSTUDIOBONES];
+//	float		childPoseparam[MAXSTUDIOPOSEPARAM];
+//
+//	// go through all children
+//	for ( IEngineObjectClient *pChild = GetEngineObject()->FirstMoveChild(); pChild; pChild = pChild->NextMovePeer() )
+//	{
+//		C_BaseAnimating *pChildAnimating = pChild->GetOuter()->GetBaseAnimating();
+//
+//		if ( pChildAnimating )
+//		{
+//			IStudioHdr *pChildHdr = pChildAnimating->GetModelPtr();
+//
+//			// FIXME: needs a new type of EF_BONEMERGE (EF_CHILDMERGE?)
+//			if ( pChildHdr && pChild->IsEffectActive( EF_BONEMERGE ) && pChildHdr->SequencesAvailable() && pChildAnimating->m_pBoneMergeCache )
+//			{
+//				// FIXME: these should Inherit from the parent
+//				GetPoseParameters( pChildHdr, childPoseparam );
+//
+//				IBoneSetup childBoneSetup( pChildHdr, boneMask, childPoseparam );
+//				childBoneSetup.InitPose( childPos, childQ );
+//
+//				// set up the child into the parent's current pose
+//				//pChildAnimating->m_pBoneMergeCache->CopyParentToChild( pos, q, childPos, childQ, boneMask );
+//
+//				// FIXME: needs some kind of sequence
+//				// merge over whatever bones the childs sequence modifies
+//				childBoneSetup.AccumulatePose( childPos, childQ, 0, GetCycle(), 1.0, currentTime, NULL );
+//
+//				// copy the result back into the parents bones
+//				//pChildAnimating->m_pBoneMergeCache->CopyChildToParent( childPos, childQ, pos, q, boneMask );
+//
+//				// probably needs an IK merge system of some sort =(
+//			}
+//		}
+//	}
+//}
 
 
 //-----------------------------------------------------------------------------
@@ -1962,7 +1962,7 @@ void C_BaseAnimating::StandardBlendingRules( IStudioHdr *hdr, Vector pos[], Quat
 		boneSetup.CalcBoneAdj( pos, q, controllers );
 	}
 
-	ChildLayerBlend( pos, q, currentTime, boneMask );
+	//ChildLayerBlend( pos, q, currentTime, boneMask );
 
 	UnragdollBlend( hdr, pos, q, currentTime );
 

@@ -188,7 +188,7 @@ public:
 	void MaintainSequenceTransitions( IBoneSetup &boneSetup, float flCycle, Vector pos[], Quaternion q[] );
 	virtual void AccumulateLayers( IBoneSetup &boneSetup, Vector pos[], Quaternion q[], float currentTime );
 
-	virtual void ChildLayerBlend( Vector pos[], Quaternion q[], float currentTime, int boneMask );
+	//virtual void ChildLayerBlend( Vector pos[], Quaternion q[], float currentTime, int boneMask );
 
 	// Attachments
 	int		LookupAttachment( const char *pAttachmentName );

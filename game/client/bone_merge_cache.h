@@ -26,16 +26,13 @@ public:
 	
 	void Init( C_BaseAnimating *pOwner );
 
-	// Updates the lookups that let it merge bones quickly.
-	void UpdateCache();
-	
 	// This copies the transform from all bones in the followed entity that have 
 	// names that match our bones.
 	void MergeMatchingBones( int boneMask );
 
 	// copy bones instead of matrices
-	void CopyParentToChild( const Vector parentPos[], const Quaternion parentQ[], Vector childPos[], Quaternion childQ[], int boneMask );
-	void CopyChildToParent( const Vector childPos[], const Quaternion childQ[], Vector parentPos[], Quaternion parentQ[], int boneMask );
+	//void CopyParentToChild( const Vector parentPos[], const Quaternion parentQ[], Vector childPos[], Quaternion childQ[], int boneMask );
+	//void CopyChildToParent( const Vector childPos[], const Quaternion childQ[], Vector parentPos[], Quaternion parentQ[], int boneMask );
 
 	// Returns true if the specified bone is one that gets merged in MergeMatchingBones.
 	int IsBoneMerged( int iBone ) const;
@@ -46,6 +43,9 @@ public:
 	bool GetRootBone( matrix3x4_t &rootBone );
 
 private:
+
+	// Updates the lookups that let it merge bones quickly.
+	void UpdateCache();
 
 	// This is the entity that we're keeping the cache updated for.
 	C_BaseAnimating *m_pOwner;

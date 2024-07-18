@@ -184,57 +184,57 @@ void CBoneMergeCache::MergeMatchingBones( int boneMask )
 
 
 	// copy bones instead of matrices
-void CBoneMergeCache::CopyParentToChild( const Vector parentPos[], const Quaternion parentQ[], Vector childPos[], Quaternion childQ[], int boneMask )
-{
-	UpdateCache();
+//void CBoneMergeCache::CopyParentToChild( const Vector parentPos[], const Quaternion parentQ[], Vector childPos[], Quaternion childQ[], int boneMask )
+//{
+//	UpdateCache();
+//
+//	// If this is set, then all the other cache data is set.
+//	if ( !m_pOwnerHdr || m_MergedBones.Count() == 0 )
+//		return;
+//
+//	// Now copy the bone matrices.
+//	for ( int i=0; i < m_MergedBones.Count(); i++ )
+//	{
+//		int iOwnerBone = m_MergedBones[i].m_iMyBone;
+//		int iParentBone = m_MergedBones[i].m_iParentBone;
+//		
+//		if ( m_pOwnerHdr->boneParent( iOwnerBone ) == -1 || m_pFollowHdr->boneParent( iParentBone ) == -1 )
+//			continue;
+//
+//		// Only update bones reference by the bone mask.
+//		if ( !( m_pOwnerHdr->boneFlags( iOwnerBone ) & boneMask ) )
+//			continue;
+//
+//		childPos[ iOwnerBone ] = parentPos[ iParentBone ];
+//		childQ[ iOwnerBone ] = parentQ[ iParentBone ];
+//	}
+//}
 
-	// If this is set, then all the other cache data is set.
-	if ( !m_pOwnerHdr || m_MergedBones.Count() == 0 )
-		return;
-
-	// Now copy the bone matrices.
-	for ( int i=0; i < m_MergedBones.Count(); i++ )
-	{
-		int iOwnerBone = m_MergedBones[i].m_iMyBone;
-		int iParentBone = m_MergedBones[i].m_iParentBone;
-		
-		if ( m_pOwnerHdr->boneParent( iOwnerBone ) == -1 || m_pFollowHdr->boneParent( iParentBone ) == -1 )
-			continue;
-
-		// Only update bones reference by the bone mask.
-		if ( !( m_pOwnerHdr->boneFlags( iOwnerBone ) & boneMask ) )
-			continue;
-
-		childPos[ iOwnerBone ] = parentPos[ iParentBone ];
-		childQ[ iOwnerBone ] = parentQ[ iParentBone ];
-	}
-}
-
-void CBoneMergeCache::CopyChildToParent( const Vector childPos[], const Quaternion childQ[], Vector parentPos[], Quaternion parentQ[], int boneMask )
-{
-	UpdateCache();
-
-	// If this is set, then all the other cache data is set.
-	if ( !m_pOwnerHdr || m_MergedBones.Count() == 0 )
-		return;
-
-	// Now copy the bone matrices.
-	for ( int i=0; i < m_MergedBones.Count(); i++ )
-	{
-		int iOwnerBone = m_MergedBones[i].m_iMyBone;
-		int iParentBone = m_MergedBones[i].m_iParentBone;
-		
-		if ( m_pOwnerHdr->boneParent( iOwnerBone ) == -1 || m_pFollowHdr->boneParent( iParentBone ) == -1 )
-			continue;
-
-		// Only update bones reference by the bone mask.
-		if ( !( m_pOwnerHdr->boneFlags( iOwnerBone ) & boneMask ) )
-			continue;
-
-		parentPos[ iParentBone ] = childPos[ iOwnerBone ];
-		parentQ[ iParentBone ] = childQ[ iOwnerBone ];
-	}
-}
+//void CBoneMergeCache::CopyChildToParent( const Vector childPos[], const Quaternion childQ[], Vector parentPos[], Quaternion parentQ[], int boneMask )
+//{
+//	UpdateCache();
+//
+//	// If this is set, then all the other cache data is set.
+//	if ( !m_pOwnerHdr || m_MergedBones.Count() == 0 )
+//		return;
+//
+//	// Now copy the bone matrices.
+//	for ( int i=0; i < m_MergedBones.Count(); i++ )
+//	{
+//		int iOwnerBone = m_MergedBones[i].m_iMyBone;
+//		int iParentBone = m_MergedBones[i].m_iParentBone;
+//		
+//		if ( m_pOwnerHdr->boneParent( iOwnerBone ) == -1 || m_pFollowHdr->boneParent( iParentBone ) == -1 )
+//			continue;
+//
+//		// Only update bones reference by the bone mask.
+//		if ( !( m_pOwnerHdr->boneFlags( iOwnerBone ) & boneMask ) )
+//			continue;
+//
+//		parentPos[ iParentBone ] = childPos[ iOwnerBone ];
+//		parentQ[ iParentBone ] = childQ[ iOwnerBone ];
+//	}
+//}
 
 
 bool CBoneMergeCache::GetAimEntOrigin( Vector *pAbsOrigin, QAngle *pAbsAngles )
