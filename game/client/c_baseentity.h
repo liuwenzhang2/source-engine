@@ -370,8 +370,8 @@ public:
 	// capabilities for save/restore
 	virtual int						ObjectCaps( void );
 	// only overload these if you have special data to serialize
-	virtual int						Save( ISave &save );
-	virtual int						Restore( IRestore &restore );
+	virtual int						Save(ISave& save) { return GetEngineObject()->Save(save); }
+	virtual int						Restore(IRestore& restore) { return GetEngineObject()->Restore(restore); }
 
 private:
 

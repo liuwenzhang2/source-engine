@@ -579,6 +579,45 @@ bool C_EngineObjectInternal::KeyValue(const char* szKeyName, const char* szValue
 }
 
 //-----------------------------------------------------------------------------
+// Purpose: Saves the current object out to disk, by iterating through the objects
+//			data description hierarchy
+// Input  : &save - save buffer which the class data is written to
+// Output : int	- 0 if the save failed, 1 on success
+//-----------------------------------------------------------------------------
+int C_EngineObjectInternal::Save(ISave& save)
+{
+	// loop through the data description list, saving each data desc block
+	int status = save.WriteEntity(this->m_pOuter);
+
+	return status;
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: Restores the current object from disk, by iterating through the objects
+//			data description hierarchy
+// Input  : &restore - restore buffer which the class data is read from
+// Output : int	- 0 if the restore failed, 1 on success
+//-----------------------------------------------------------------------------
+int C_EngineObjectInternal::Restore(IRestore& restore)
+{
+	// loops through the data description list, restoring each data desc block in order
+	int status = restore.ReadEntity(this->m_pOuter);
+
+	// NOTE: Do *not* use GetAbsOrigin() here because it will
+	// try to recompute m_rgflCoordinateFrame!
+	//MatrixSetColumn(GetEngineObject()->m_vecAbsOrigin, 3, GetEngineObject()->m_rgflCoordinateFrame);
+	ResetRgflCoordinateFrame();
+
+	// Restablish ground entity
+	if (GetGroundEntity() != NULL)
+	{
+		GetGroundEntity()->AddEntityToGroundList(this);
+	}
+
+	return status;
+}
+
+//-----------------------------------------------------------------------------
 // handler to do stuff before you are saved
 //-----------------------------------------------------------------------------
 void C_EngineObjectInternal::OnSave()

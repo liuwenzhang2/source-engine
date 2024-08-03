@@ -675,8 +675,16 @@ public:
 
 	// save/restore
 	// only overload these if you have special data to serialize
-	virtual int	Save( ISave &save );
-	virtual int	Restore( IRestore &restore );
+	virtual int	Save( ISave &save ) 
+	{ 
+		return GetEngineObject()->Save(save);
+	}
+	virtual int	Restore( IRestore &restore ) 
+	{ 
+		int status= GetEngineObject()->Restore(restore);
+		m_pModel = modelinfo->GetModel(GetEngineObject()->GetModelIndex());
+		return status;
+	}
 	virtual bool ShouldSavePhysics();
 
 	// handler to reset stuff before you are restored

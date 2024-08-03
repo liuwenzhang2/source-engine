@@ -1026,6 +1026,90 @@ bool CEngineObjectInternal::KeyValue(const char* szKeyName, const char* szValue)
 	return false;
 }
 
+//-----------------------------------------------------------------------------
+// Purpose: Saves the current object out to disk, by iterating through the objects
+//			data description hierarchy
+// Input  : &save - save buffer which the class data is written to
+// Output : int	- 0 if the save failed, 1 on success
+//-----------------------------------------------------------------------------
+int CEngineObjectInternal::Save(ISave& save)
+{
+	// loop through the data description list, saving each data desc block
+	int status = save.WriteEntity(this->m_pOuter);
+
+	return status;
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: Recursively saves all the classes in an object, in reverse order (top down)
+// Output : int 0 on failure, 1 on success
+//-----------------------------------------------------------------------------
+//int CBaseEntity::SaveDataDescBlock( ISave &save, datamap_t *dmap )
+//{
+//	return save.WriteAll( this, dmap );
+//}
+
+//-----------------------------------------------------------------------------
+// Purpose: Restores the current object from disk, by iterating through the objects
+//			data description hierarchy
+// Input  : &restore - restore buffer which the class data is read from
+// Output : int	- 0 if the restore failed, 1 on success
+//-----------------------------------------------------------------------------
+int CEngineObjectInternal::Restore(IRestore& restore)
+{
+	// This is essential to getting the spatial partition info correct
+	DestroyPartitionHandle();
+
+	// loops through the data description list, restoring each data desc block in order
+	int status = restore.ReadEntity(this->m_pOuter);;
+
+	// ---------------------------------------------------------------
+	// HACKHACK: We don't know the space of these vectors until now
+	// if they are worldspace, fix them up.
+	// ---------------------------------------------------------------
+	{
+		CGameSaveRestoreInfo* pGameInfo = restore.GetGameSaveRestoreInfo();
+		Vector parentSpaceOffset = pGameInfo->modelSpaceOffset;
+		if (!GetMoveParent())
+		{
+			// parent is the world, so parent space is worldspace
+			// so update with the worldspace leveltransition transform
+			parentSpaceOffset += pGameInfo->GetLandmark();
+		}
+
+		// NOTE: Do *not* use GetAbsOrigin() here because it will
+		// try to recompute m_rgflCoordinateFrame!
+		//MatrixSetColumn(GetEngineObject()->m_vecAbsOrigin, 3, GetEngineObject()->m_rgflCoordinateFrame );
+		ResetRgflCoordinateFrame();
+
+		m_vecOrigin += parentSpaceOffset;
+	}
+
+	// Gotta do this after the coordframe is set up as it depends on it.
+
+	// By definition, the surrounding bounds are dirty
+	// Also, twiddling with the flags here ensures it gets added to the KD tree dirty list
+	// (We don't want to use the saved version of this flag)
+	RemoveEFlags(EFL_DIRTY_SPATIAL_PARTITION);
+	MarkSurroundingBoundsDirty();
+
+	if (m_pOuter->IsNetworkable() && entindex() != -1 && GetModelIndex() != 0 && GetModelName() != NULL_STRING && restore.GetPrecacheMode())
+	{
+		engine->PrecacheModel(STRING(GetModelName()));
+
+		//Adrian: We should only need to do this after we precache. No point in setting the model again.
+		SetModelIndex(modelinfo->GetModelIndex(STRING(GetModelName())));
+	}
+
+	// Restablish ground entity
+	if (GetGroundEntity() != NULL)
+	{
+		GetGroundEntity()->AddEntityToGroundList(this);
+	}
+
+	return status;
+}
+
 
 //-----------------------------------------------------------------------------
 // handler to do stuff before you are saved
@@ -1078,8 +1162,9 @@ void CEngineObjectInternal::OnRestore()
 
 	// We're not save/loading the PVS dirty state. Assume everything is dirty after a restore
 	MarkPVSInformationDirty();
-
+	NetworkStateChanged();
 	m_pOuter->OnRestore();
+	m_pOuter->NetworkStateChanged();
 }
 
 //-----------------------------------------------------------------------------

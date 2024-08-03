@@ -4256,20 +4256,6 @@ void C_BaseEntity::OnRestore()
 }
 
 //-----------------------------------------------------------------------------
-// Purpose: Saves the current object out to disk, by iterating through the objects
-//			data description hierarchy
-// Input  : &save - save buffer which the class data is written to
-// Output : int	- 0 if the save failed, 1 on success
-//-----------------------------------------------------------------------------
-int C_BaseEntity::Save( ISave &save )
-{
-	// loop through the data description list, saving each data desc block
-	int status = save.WriteEntity(this);
-
-	return status;
-}
-
-//-----------------------------------------------------------------------------
 // Purpose: Recursively saves all the classes in an object, in reverse order (top down)
 // Output : int 0 on failure, 1 on success
 //-----------------------------------------------------------------------------
@@ -4278,31 +4264,6 @@ int C_BaseEntity::Save( ISave &save )
 //	int nResult = save.WriteAll( this, dmap );
 //	return nResult;
 //}
-
-//-----------------------------------------------------------------------------
-// Purpose: Restores the current object from disk, by iterating through the objects
-//			data description hierarchy
-// Input  : &restore - restore buffer which the class data is read from
-// Output : int	- 0 if the restore failed, 1 on success
-//-----------------------------------------------------------------------------
-int C_BaseEntity::Restore( IRestore &restore )
-{
-	// loops through the data description list, restoring each data desc block in order
-	int status = restore.ReadEntity(this);
-
-	// NOTE: Do *not* use GetAbsOrigin() here because it will
-	// try to recompute m_rgflCoordinateFrame!
-	//MatrixSetColumn(GetEngineObject()->m_vecAbsOrigin, 3, GetEngineObject()->m_rgflCoordinateFrame);
-	GetEngineObject()->ResetRgflCoordinateFrame();
-
-	// Restablish ground entity
-	if (GetEngineObject()->GetGroundEntity() != NULL )
-	{
-		GetEngineObject()->GetGroundEntity()->AddEntityToGroundList(this->GetEngineObject());
-	}
-
-	return status;
-}
 
 //-----------------------------------------------------------------------------
 // Purpose: Recursively restores all the classes in an object, in reverse order (top down)

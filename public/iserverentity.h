@@ -70,6 +70,9 @@ public:
 	virtual CBaseEntity* GetOuter() = 0;
 
 	virtual void ParseMapData(IEntityMapData* mapData) = 0;
+	virtual int	Save(ISave& save) = 0;
+	virtual int	Restore(IRestore& restore) = 0;
+
 	virtual void SetAbsVelocity(const Vector& vecVelocity) = 0;
 	//virtual const Vector& GetAbsVelocity() = 0;
 	virtual const Vector& GetAbsVelocity() const = 0;

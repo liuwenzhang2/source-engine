@@ -208,6 +208,8 @@ public:
 #endif // _DEBUG
 	void ParseMapData(IEntityMapData* mapData);
 	bool KeyValue(const char* szKeyName, const char* szValue);
+	int	Save(ISave& save);
+	int	Restore(IRestore& restore);
 	// handler to reset stuff before you are restored
 	// NOTE: Always chain to base class when implementing this!
 	void OnSave(IEntitySaveUtils* pSaveUtils);

@@ -190,6 +190,8 @@ public:
 
 	void ParseMapData(IEntityMapData* mapData);
 	bool KeyValue(const char* szKeyName, const char* szValue);
+	int Save(ISave& save);
+	int Restore(IRestore& restore);
 	void OnSave();
 	void OnRestore();
 
