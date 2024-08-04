@@ -26,10 +26,10 @@ END_NETWORK_TABLE()
 // Purpose: 
 //-----------------------------------------------------------------------------
 #ifdef CLIENT_DLL
-CDODViewModel::CDODViewModel() : m_LagAnglesHistory("CDODViewModel::m_LagAnglesHistory")
+CDODViewModel::CDODViewModel() : m_LagAnglesHistory("CDODViewModel::m_LagAnglesHistory", &m_vLagAngles, 0)
 {
 	m_vLagAngles.Init();
-	m_LagAnglesHistory.Setup( &m_vLagAngles, 0 );
+	//m_LagAnglesHistory.Setup( &m_vLagAngles, 0 );
 	m_vLoweredWeaponOffset.Init();
 }
 #else

@@ -166,7 +166,7 @@ public:
 	DECLARE_CLASS_NOBASE( CMultiPlayerAnimState );
 
 	// Creation/Destruction
-	CMultiPlayerAnimState() {}
+	CMultiPlayerAnimState();
 	CMultiPlayerAnimState( CBasePlayer *pPlayer, MultiPlayerMovementData_t &movementData );
 	virtual ~CMultiPlayerAnimState();
 

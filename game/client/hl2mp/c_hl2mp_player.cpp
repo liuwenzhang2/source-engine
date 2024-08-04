@@ -45,7 +45,7 @@ static ConVar cl_defaultweapon( "cl_defaultweapon", "weapon_physcannon", FCVAR_U
 
 void SpawnBlood (Vector vecSpot, const Vector &vecDir, int bloodColor, float flDamage);
 
-C_HL2MP_Player::C_HL2MP_Player() : m_PlayerAnimState( this ), m_iv_angEyeAngles( "C_HL2MP_Player::m_iv_angEyeAngles" )
+C_HL2MP_Player::C_HL2MP_Player() : m_PlayerAnimState( this ), m_iv_angEyeAngles( "C_HL2MP_Player::m_iv_angEyeAngles", &m_angEyeAngles, LATCH_SIMULATION_VAR)
 {
 	m_iIDEntIndex = 0;
 	m_iSpawnInterpCounterCache = 0;
@@ -60,7 +60,7 @@ C_HL2MP_Player::C_HL2MP_Player() : m_PlayerAnimState( this ), m_iv_angEyeAngles(
 
 bool C_HL2MP_Player::Init(int entnum, int iSerialNum) {
 	bool ret = BaseClass::Init(entnum, iSerialNum);
-	GetEngineObject()->AddVar(&m_angEyeAngles, &m_iv_angEyeAngles, LATCH_SIMULATION_VAR);
+	GetEngineObject()->AddVar(&m_iv_angEyeAngles);//&m_angEyeAngles, , LATCH_SIMULATION_VAR
 	return ret;
 }
 
@@ -849,7 +849,7 @@ void C_HL2MPRagdoll::CreateHL2MPRagdoll( void )
 		// move my current model instance to the ragdoll's so decals are preserved.
 		pPlayer->SnatchModelInstance( this );
 
-		VarMapping_t *varMap = GetEngineObject()->GetVarMapping();
+		//VarMapping_t *varMap = GetEngineObject()->GetVarMapping();
 
 		// Copy all the interpolated vars from the player entity.
 		// The entity uses the interpolated history to get bone velocity.
@@ -885,7 +885,7 @@ void C_HL2MPRagdoll::CreateHL2MPRagdoll( void )
 			SetSequence( iSeq );	// walk_lower, basic pose
 			SetCycle( 0.0 );
 
-			GetEngineObject()->Interp_Reset( varMap );
+			GetEngineObject()->Interp_Reset();
 		}		
 	}
 	else
@@ -897,7 +897,7 @@ void C_HL2MPRagdoll::CreateHL2MPRagdoll( void )
 		GetEngineObject()->SetAbsOrigin( m_vecRagdollOrigin );
 		GetEngineObject()->SetAbsVelocity( m_vecRagdollVelocity );
 
-		GetEngineObject()->Interp_Reset(GetEngineObject()->GetVarMapping() );
+		GetEngineObject()->Interp_Reset();
 		
 	}
 

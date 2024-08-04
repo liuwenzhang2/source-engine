@@ -74,7 +74,7 @@ private:
 
     QAngle m_angEyeAngles;
 
-	CInterpolatedVar< QAngle >	m_iv_angEyeAngles;
+	//CInterpolatedVar< QAngle >	m_iv_angEyeAngles;
 
     IHL1MPPlayerAnimState* m_PlayerAnimState;
     

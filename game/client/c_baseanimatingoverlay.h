@@ -48,7 +48,7 @@ public:
 
 	CUtlVector < C_AnimationLayer >	m_AnimOverlay;
 
-	CUtlVector < CInterpolatedVar< C_AnimationLayer > >	m_iv_AnimOverlay;
+	CUtlVector < CInterpolatedVar< C_AnimationLayer >* >	m_iv_AnimOverlay;
 
 	float m_flOverlayPrevEventCycle[ MAX_OVERLAYS ];
 

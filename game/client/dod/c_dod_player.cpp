@@ -435,7 +435,7 @@ void C_DODRagdoll::CreateLowViolenceRagdoll()
 			GetEngineObject()->SetNetworkAngles( pPlayer->GetRenderAngles() );
 		}
 	
-		GetEngineObject()->Interp_Reset(GetEngineObject()->GetVarMapping() );
+		GetEngineObject()->Interp_Reset();
 	}
 }
 
@@ -454,7 +454,7 @@ void C_DODRagdoll::CreateDODRagdoll()
 		// move my current model instance to the ragdoll's so decals are preserved.
 		pPlayer->SnatchModelInstance( this );
 
-		VarMapping_t *varMap = GetEngineObject()->GetVarMapping();
+		//VarMapping_t *varMap = GetEngineObject()->GetVarMapping();
 
 		// Copy all the interpolated vars from the player entity.
 		// The entity uses the interpolated history to get bone velocity.		
@@ -489,7 +489,7 @@ void C_DODRagdoll::CreateDODRagdoll()
 			SetSequence( iSeq );	// look_idle, basic pose
 			SetCycle( 0.0 );
 
-			GetEngineObject()->Interp_Reset( varMap );
+			GetEngineObject()->Interp_Reset();
 		}		
 
 		m_nBody = pPlayer->GetBody();
@@ -503,7 +503,7 @@ void C_DODRagdoll::CreateDODRagdoll()
 		GetEngineObject()->SetAbsOrigin( m_vecRagdollOrigin );
 		GetEngineObject()->SetAbsVelocity( m_vecRagdollVelocity );
 
-		GetEngineObject()->Interp_Reset(GetEngineObject()->GetVarMapping() );
+		GetEngineObject()->Interp_Reset();
 		
 	}
 
@@ -669,7 +669,7 @@ void C_DODRagdoll::StartFadeOut( float fDelay )
 // C_DODPlayer implementation.
 // ------------------------------------------------------------------------------------------ //
 C_DODPlayer::C_DODPlayer() : 
-	m_iv_angEyeAngles( "C_DODPlayer::m_iv_angEyeAngles" )
+	m_iv_angEyeAngles( "C_DODPlayer::m_iv_angEyeAngles", &m_angEyeAngles, LATCH_SIMULATION_VAR)
 {
 	m_PlayerAnimState = CreatePlayerAnimState( this );
 	
@@ -707,7 +707,7 @@ C_DODPlayer::C_DODPlayer() :
 
 bool C_DODPlayer::Init(int entnum, int iSerialNum) {
 	bool ret = BaseClass::Init(entnum, iSerialNum);
-	GetEngineObject()->AddVar(&m_angEyeAngles, &m_iv_angEyeAngles, LATCH_SIMULATION_VAR);
+	GetEngineObject()->AddVar(&m_iv_angEyeAngles);//&m_angEyeAngles, , LATCH_SIMULATION_VAR
 	return ret;
 }
 

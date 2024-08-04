@@ -68,7 +68,7 @@ void ResizeAnimationLayerCallback( void *pStruct, int offsetToUtlVector, int len
 {
 	C_BaseAnimatingOverlay *pEnt = (C_BaseAnimatingOverlay*)pStruct;
 	CUtlVector < C_AnimationLayer > *pVec = &pEnt->m_AnimOverlay;
-	CUtlVector< CInterpolatedVar< C_AnimationLayer > > *pVecIV = &pEnt->m_iv_AnimOverlay;
+	CUtlVector< CInterpolatedVar< C_AnimationLayer >* > *pVecIV = &pEnt->m_iv_AnimOverlay;
 	
 	Assert( (char*)pVec - (char*)pEnt == offsetToUtlVector );
 	Assert( pVec->Count() == pVecIV->Count() );
@@ -82,19 +82,25 @@ void ResizeAnimationLayerCallback( void *pStruct, int offsetToUtlVector, int len
 		return;
 
 	// remove all entries
-	for ( int i=0; i < pVec->Count(); i++ )
+	for ( int i=0; i < pVecIV->Count(); i++ )
 	{
-		pEnt->GetEngineObject()->RemoveVar( &pVec->Element( i ) );
+		pEnt->GetEngineObject()->RemoveVar( pVecIV->Element( i ) );
 	}
 
 	// adjust vector sizes
 	if ( diff > 0 )
 	{
+		for (int i = pVec->Count(); i < len; i++) {
+			pVecIV->AddToTail(NULL);
+		}
 		pVec->AddMultipleToTail( diff );
-		pVecIV->AddMultipleToTail( diff );
 	}
 	else
 	{
+		for (int i = len; i < pVec->Count(); i++) {
+			delete pVecIV->Element(i);
+			pVecIV->Element(i) = NULL;
+		}
 		pVec->RemoveMultiple( len, -diff );
 		pVecIV->RemoveMultiple( len, -diff );
 	}
@@ -102,9 +108,13 @@ void ResizeAnimationLayerCallback( void *pStruct, int offsetToUtlVector, int len
 	// Rebind all the variables in the ent's list.
 	for ( int i=0; i < len; i++ )
 	{
-		IInterpolatedVar *pWatcher = &pVecIV->Element( i );
-		pWatcher->SetDebugName( s_m_iv_AnimOverlayNames[i] );
-		pEnt->GetEngineObject()->AddVar( &pVec->Element( i ), pWatcher, LATCH_ANIMATION_VAR, true );
+		IInterpolatedVar *pWatcher = pVecIV->Element( i );
+		if (!pWatcher) {
+			pVecIV->Element(i) = new CInterpolatedVar< C_AnimationLayer >(s_m_iv_AnimOverlayNames[i], &pVec->Element(i), LATCH_ANIMATION_VAR);
+			pWatcher = pVecIV->Element(i);
+		}
+		//pWatcher->SetDebugName( s_m_iv_AnimOverlayNames[i] );
+		pEnt->GetEngineObject()->AddVar( pWatcher, true );//&pVec->Element( i ), LATCH_ANIMATION_VAR, 
 	}
 	// FIXME: need to set historical values of nOrder in pVecIV to MAX_OVERLAY
 	
@@ -217,17 +227,17 @@ void C_BaseAnimatingOverlay::CheckForLayerChanges( IStudioHdr *hdr, float curren
 		CDisableRangeChecks disableRangeChecks; 
 
 		int iHead, iPrev1, iPrev2;
-		m_iv_AnimOverlay[i].GetInterpolationInfo( currentTime, &iHead, &iPrev1, &iPrev2 );
+		m_iv_AnimOverlay[i]->GetInterpolationInfo( currentTime, &iHead, &iPrev1, &iPrev2 );
 
 		// fake up previous cycle values.
 		float t0;
-		C_AnimationLayer *pHead = m_iv_AnimOverlay[i].GetHistoryValue( iHead, t0 );
+		C_AnimationLayer *pHead = m_iv_AnimOverlay[i]->GetHistoryValue( iHead, t0 );
 		// reset previous
 		float t1;
-		C_AnimationLayer *pPrev1 = m_iv_AnimOverlay[i].GetHistoryValue( iPrev1, t1 );
+		C_AnimationLayer *pPrev1 = m_iv_AnimOverlay[i]->GetHistoryValue( iPrev1, t1 );
 		// reset previous previous
 		float t2;
-		C_AnimationLayer *pPrev2 = m_iv_AnimOverlay[i].GetHistoryValue( iPrev2, t2 );
+		C_AnimationLayer *pPrev2 = m_iv_AnimOverlay[i]->GetHistoryValue( iPrev2, t2 );
 
 		if ( pHead && pPrev1 && pHead->m_nSequence != pPrev1->m_nSequence )
 		{
@@ -276,8 +286,8 @@ void C_BaseAnimatingOverlay::CheckForLayerChanges( IStudioHdr *hdr, float curren
 			}
 			*/
 
-			m_iv_AnimOverlay[i].SetLooping( IsSequenceLooping( hdr, pHead->m_nSequence ) );
-			m_iv_AnimOverlay[i].Interpolate( currentTime );
+			m_iv_AnimOverlay[i]->SetLooping( IsSequenceLooping( hdr, pHead->m_nSequence ) );
+			m_iv_AnimOverlay[i]->Interpolate( currentTime );
 
 			// reset event indexes
 			m_flOverlayPrevEventCycle[i] = pHead->m_flPrevCycle - 0.01;
@@ -380,17 +390,17 @@ void C_BaseAnimatingOverlay::AccumulateLayers( IBoneSetup &boneSetup, Vector pos
 					else
 					{
 						int iHead, iPrev1, iPrev2;
-						m_iv_AnimOverlay[i].GetInterpolationInfo( currentTime, &iHead, &iPrev1, &iPrev2 );
+						m_iv_AnimOverlay[i]->GetInterpolationInfo( currentTime, &iHead, &iPrev1, &iPrev2 );
 
 						// fake up previous cycle values.
 						float t0;
-						C_AnimationLayer *pHead = m_iv_AnimOverlay[i].GetHistoryValue( iHead, t0 );
+						C_AnimationLayer *pHead = m_iv_AnimOverlay[i]->GetHistoryValue( iHead, t0 );
 						// reset previous
 						float t1;
-						C_AnimationLayer *pPrev1 = m_iv_AnimOverlay[i].GetHistoryValue( iPrev1, t1 );
+						C_AnimationLayer *pPrev1 = m_iv_AnimOverlay[i]->GetHistoryValue( iPrev1, t1 );
 						// reset previous previous
 						float t2;
-						C_AnimationLayer *pPrev2 = m_iv_AnimOverlay[i].GetHistoryValue( iPrev2, t2 );
+						C_AnimationLayer *pPrev2 = m_iv_AnimOverlay[i]->GetHistoryValue( iPrev2, t2 );
 
 						if ( pHead && pPrev1 && pPrev2 )
 						{

@@ -32,7 +32,7 @@ public:
 	unsigned short		type;
 	unsigned short		m_bNeedsToInterpolate;	// Set to false when this var doesn't
 	// need Interpolate() called on it anymore.
-	void* data;
+	//void* data;
 	IInterpolatedVar* watcher;
 };
 
@@ -175,8 +175,8 @@ public:
 	// Computes the abs position of a direction specified in local space
 	virtual void ComputeAbsDirection(const Vector& vecLocalDirection, Vector* pAbsDirection) = 0;
 
-	virtual void AddVar(void* data, IInterpolatedVar* watcher, int type, bool bSetup = false) = 0;
-	virtual void RemoveVar(void* data, bool bAssert = true) = 0;
+	virtual void AddVar(IInterpolatedVar* watcher, bool bSetup = false) = 0;
+	virtual void RemoveVar(IInterpolatedVar* watcher, bool bAssert = true) = 0;
 	virtual VarMapping_t* GetVarMapping() = 0;
 
 	// Set appropriate flags and store off data when these fields are about to change
@@ -184,14 +184,14 @@ public:
 	// For predictable entities, stores last networked value
 	virtual void OnStoreLastNetworkedValue() = 0;
 
-	virtual void Interp_SetupMappings(VarMapping_t* map) = 0;
+	virtual void Interp_SetupMappings() = 0;
 
 	// Returns 1 if there are no more changes (ie: we could call RemoveFromInterpolationList).
-	virtual int	Interp_Interpolate(VarMapping_t* map, float currentTime) = 0;
+	virtual int	Interp_Interpolate(float currentTime) = 0;
 
-	virtual void Interp_RestoreToLastNetworked(VarMapping_t* map) = 0;
-	virtual void Interp_UpdateInterpolationAmounts(VarMapping_t* map) = 0;
-	virtual void Interp_Reset(VarMapping_t* map) = 0;
+	virtual void Interp_RestoreToLastNetworked() = 0;
+	virtual void Interp_UpdateInterpolationAmounts() = 0;
+	virtual void Interp_Reset() = 0;
 	virtual void Interp_HierarchyUpdateInterpolationAmounts() = 0;
 
 

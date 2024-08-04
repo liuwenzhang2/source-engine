@@ -131,12 +131,12 @@ public:
 	void operator delete(void* pMem, int nBlockUse, const char* pFileName, int nLine) { operator delete(pMem); }
 
 	C_EngineObjectInternal() :
-		m_iv_vecOrigin("C_BaseEntity::m_iv_vecOrigin"),
-		m_iv_angRotation("C_BaseEntity::m_iv_angRotation"),
-		m_iv_vecVelocity("C_BaseEntity::m_iv_vecVelocity")
+		m_iv_vecOrigin("C_BaseEntity::m_iv_vecOrigin", &m_vecOrigin, LATCH_SIMULATION_VAR),
+		m_iv_angRotation("C_BaseEntity::m_iv_angRotation", &m_angRotation, LATCH_SIMULATION_VAR),
+		m_iv_vecVelocity("C_BaseEntity::m_iv_vecVelocity", &m_vecVelocity, LATCH_SIMULATION_VAR)
 	{
-		AddVar(&m_vecOrigin, &m_iv_vecOrigin, LATCH_SIMULATION_VAR);
-		AddVar(&m_angRotation, &m_iv_angRotation, LATCH_SIMULATION_VAR);
+		AddVar(&m_iv_vecOrigin);//&m_vecOrigin, , LATCH_SIMULATION_VAR
+		AddVar(&m_iv_angRotation);//&m_angRotation, , LATCH_SIMULATION_VAR
 
 #ifdef _DEBUG
 		m_vecAbsOrigin = vec3_origin;
@@ -283,8 +283,8 @@ public:
 
 public:
 
-	void AddVar(void* data, IInterpolatedVar* watcher, int type, bool bSetup = false);
-	void RemoveVar(void* data, bool bAssert = true);
+	void AddVar(IInterpolatedVar* watcher, bool bSetup = false);
+	void RemoveVar(IInterpolatedVar* watcher, bool bAssert = true);
 	VarMapping_t* GetVarMapping();
 
 	// Set appropriate flags and store off data when these fields are about to change
@@ -292,14 +292,14 @@ public:
 	// For predictable entities, stores last networked value
 	void OnStoreLastNetworkedValue();
 
-	void Interp_SetupMappings(VarMapping_t* map);
+	void Interp_SetupMappings();
 
 	// Returns 1 if there are no more changes (ie: we could call RemoveFromInterpolationList).
-	int Interp_Interpolate(VarMapping_t* map, float currentTime);
+	int Interp_Interpolate(float currentTime);
 
-	void Interp_RestoreToLastNetworked(VarMapping_t* map);
-	void Interp_UpdateInterpolationAmounts(VarMapping_t* map);
-	void Interp_Reset(VarMapping_t* map);
+	void Interp_RestoreToLastNetworked();
+	void Interp_UpdateInterpolationAmounts();
+	void Interp_Reset();
 	void Interp_HierarchyUpdateInterpolationAmounts();
 
 
@@ -1160,7 +1160,7 @@ inline void C_EngineObjectInternal::SetSimulatedEveryTick(bool sim)
 	{
 		m_bSimulatedEveryTick = sim;
 #ifdef CLIENT_DLL
-		Interp_UpdateInterpolationAmounts(GetVarMapping());
+		Interp_UpdateInterpolationAmounts();
 #endif
 	}
 }
@@ -1176,7 +1176,7 @@ inline void C_EngineObjectInternal::SetAnimatedEveryTick(bool anim)
 	{
 		m_bAnimatedEveryTick = anim;
 #ifdef CLIENT_DLL
-		Interp_UpdateInterpolationAmounts(GetVarMapping());
+		Interp_UpdateInterpolationAmounts();
 #endif
 	}
 }

@@ -207,7 +207,7 @@ void C_PortalRagdoll::CreatePortalRagdoll()
 		// Move my current model instance to the ragdoll's so decals are preserved.
 		pPlayer->SnatchModelInstance( this );
 
-		VarMapping_t *varMap = GetEngineObject()->GetVarMapping();
+		//VarMapping_t *varMap = GetEngineObject()->GetVarMapping();
 
 		// This is the local player, so set them in a default
 		// pose and slam their velocity, angles and origin
@@ -225,7 +225,7 @@ void C_PortalRagdoll::CreatePortalRagdoll()
 		SetSequence( iSeq );
 		SetCycle( 0.0 );
 
-		GetEngineObject()->Interp_Reset( varMap );
+		GetEngineObject()->Interp_Reset();
 
 		m_nBody = pPlayer->GetBody();
 		GetEngineObject()->SetModelIndex(GetEngineObject()->GetModelIndex() );
@@ -303,7 +303,7 @@ extern bool g_bUpsideDown;
 void SpawnBlood (Vector vecSpot, const Vector &vecDir, int bloodColor, float flDamage);
 
 C_Portal_Player::C_Portal_Player()
-: m_iv_angEyeAngles( "C_Portal_Player::m_iv_angEyeAngles" )
+: m_iv_angEyeAngles( "C_Portal_Player::m_iv_angEyeAngles", &m_angEyeAngles, LATCH_SIMULATION_VAR)
 {
 	m_PlayerAnimState = CreatePortalPlayerAnimState( this );
 
@@ -330,7 +330,7 @@ C_Portal_Player::C_Portal_Player()
 
 bool C_Portal_Player::Init(int entnum, int iSerialNum) {
 	bool ret = BaseClass::Init(entnum, iSerialNum);
-	GetEngineObject()->AddVar(&m_angEyeAngles, &m_iv_angEyeAngles, LATCH_SIMULATION_VAR);
+	GetEngineObject()->AddVar(&m_iv_angEyeAngles);//&m_angEyeAngles, , LATCH_SIMULATION_VAR
 	return ret;
 }
 

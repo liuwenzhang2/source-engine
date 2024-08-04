@@ -426,13 +426,12 @@ public:
 	// IInterpolatedVar overrides.
 public:
 	
-	virtual void Setup( void *pValue, int type );
 	virtual void SetInterpolationAmount( float seconds );
 	virtual void NoteLastNetworkedValue();
 	virtual bool NoteChanged( float changetime, bool bUpdateLastNetworkedValue );
 	virtual void Reset();
 	virtual int Interpolate( float currentTime );
-	virtual int GetType() const;
+	virtual int& GetType();
 	virtual void RestoreToLastNetworked();
 	virtual void Copy( IInterpolatedVar *pInSrc );
 	virtual const char *GetDebugName() { return m_pDebugName; }
@@ -499,6 +498,7 @@ protected:
 
 
 protected:
+	virtual void Setup(void* pValue, int type);
 
 	void RemoveOldEntries( float oldesttime );
 	void RemoveEntriesPreviousTo( float flTime );
@@ -547,7 +547,7 @@ protected:
 	// Store networked values so when we latch we can detect which values were changed via networking
 	Type *								m_LastNetworkedValue;
 	float								m_LastNetworkedTime;
-	byte								m_fType;
+	int									m_fType;
 	byte								m_nMaxCount;
 	byte *								m_bLooping;
 	float								m_InterpolationAmount;
@@ -592,7 +592,7 @@ inline void CInterpolatedVarArrayBase<Type, IS_ARRAY>::SetInterpolationAmount( f
 }
 
 template< typename Type, bool IS_ARRAY >
-inline int CInterpolatedVarArrayBase<Type, IS_ARRAY>::GetType() const
+inline int& CInterpolatedVarArrayBase<Type, IS_ARRAY>::GetType()
 {
 	return m_fType;
 }
@@ -1544,10 +1544,11 @@ template< typename Type, int COUNT >
 class CInterpolatedVarArray : public CInterpolatedVarArrayBase<Type, true >
 {
 public:
-	CInterpolatedVarArray( const char *pDebugName = "no debug name" )
+	CInterpolatedVarArray( const char *pDebugName, void* data, int type)// = "no debug name"
 		: CInterpolatedVarArrayBase<Type, true>( pDebugName )
 	{
 		this->SetMaxCount( COUNT );
+		this->Setup(data, type);
 	}
 };
 
@@ -1560,10 +1561,11 @@ template< typename Type >
 class CInterpolatedVar : public CInterpolatedVarArrayBase< Type, false >
 {
 public:
-	CInterpolatedVar( const char *pDebugName = NULL )
+	CInterpolatedVar( const char *pDebugName, void* data, int type)// = NULL
 		: CInterpolatedVarArrayBase< Type, false >(pDebugName) 
 	{
 		this->SetMaxCount( 1 );
+		this->Setup(data, type);
 	}
 };
 

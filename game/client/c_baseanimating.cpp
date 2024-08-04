@@ -665,9 +665,9 @@ class C_BaseAnimatingGameSystem : public CAutoGameSystem
 // Purpose: convert axis rotations to a quaternion
 //-----------------------------------------------------------------------------
 C_BaseAnimating::C_BaseAnimating() :
-	m_iv_flCycle( "C_BaseAnimating::m_iv_flCycle" ),
-	m_iv_flPoseParameter( "C_BaseAnimating::m_iv_flPoseParameter" ),
-	m_iv_flEncodedController("C_BaseAnimating::m_iv_flEncodedController")
+	m_iv_flCycle( "C_BaseAnimating::m_iv_flCycle", &m_flCycle, LATCH_ANIMATION_VAR),
+	m_iv_flPoseParameter( "C_BaseAnimating::m_iv_flPoseParameter", m_flPoseParameter, LATCH_ANIMATION_VAR),
+	m_iv_flEncodedController("C_BaseAnimating::m_iv_flEncodedController", m_flEncodedController, LATCH_ANIMATION_VAR)
 {
 	m_vecForce.Init();
 	m_nForceBone = -1;
@@ -881,20 +881,21 @@ void C_BaseAnimating::UpdateRelevantInterpolatedVars()
 
 void C_BaseAnimating::AddBaseAnimatingInterpolatedVars()
 {
-	GetEngineObject()->AddVar( m_flEncodedController, &m_iv_flEncodedController, LATCH_ANIMATION_VAR, true );
-	GetEngineObject()->AddVar( m_flPoseParameter, &m_iv_flPoseParameter, LATCH_ANIMATION_VAR, true );
+	GetEngineObject()->AddVar( &m_iv_flEncodedController, true );//LATCH_ANIMATION_VAR, 
+	GetEngineObject()->AddVar( &m_iv_flPoseParameter, true );//LATCH_ANIMATION_VAR, 
 	
 	int flags = LATCH_ANIMATION_VAR;
 	if ( m_bClientSideAnimation )
 		flags |= EXCLUDE_AUTO_INTERPOLATE;
+	m_iv_flCycle.GetType() = flags;
 		
-	GetEngineObject()->AddVar( &m_flCycle, &m_iv_flCycle, flags, true );
+	GetEngineObject()->AddVar( &m_iv_flCycle, true );//flags, 
 }
 
 void C_BaseAnimating::RemoveBaseAnimatingInterpolatedVars()
 {
-	GetEngineObject()->RemoveVar( m_flEncodedController, false );
-	GetEngineObject()->RemoveVar( m_flPoseParameter, false );
+	GetEngineObject()->RemoveVar(&m_iv_flEncodedController, false );
+	GetEngineObject()->RemoveVar(&m_iv_flPoseParameter, false );
 
 #ifdef HL2MP
 	// HACK:  Don't want to remove interpolation for predictables in hl2dm, though
@@ -904,7 +905,7 @@ void C_BaseAnimating::RemoveBaseAnimatingInterpolatedVars()
 	if ( !GetPredictable() )
 #endif
 	{
-		GetEngineObject()->RemoveVar( &m_flCycle, false );
+		GetEngineObject()->RemoveVar(&m_iv_flCycle, false );
 	}
 }
 

@@ -395,7 +395,7 @@ LINK_ENTITY_TO_CLASS( player, C_BasePlayer );
 // -------------------------------------------------------------------------------- //
 // Functions.
 // -------------------------------------------------------------------------------- //
-C_BasePlayer::C_BasePlayer() : m_iv_vecViewOffset( "C_BasePlayer::m_iv_vecViewOffset" )
+C_BasePlayer::C_BasePlayer() : m_iv_vecViewOffset( "C_BasePlayer::m_iv_vecViewOffset", &m_vecViewOffset, LATCH_SIMULATION_VAR)
 {
 #ifdef _DEBUG																
 	m_vecLadderNormal.Init();
@@ -434,7 +434,7 @@ C_BasePlayer::C_BasePlayer() : m_iv_vecViewOffset( "C_BasePlayer::m_iv_vecViewOf
 
 bool C_BasePlayer::Init(int entnum, int iSerialNum) {
 	bool ret = BaseClass::Init(entnum, iSerialNum);
-	GetEngineObject()->AddVar(&m_vecViewOffset, &m_iv_vecViewOffset, LATCH_SIMULATION_VAR);
+	GetEngineObject()->AddVar(&m_iv_vecViewOffset);//, LATCH_SIMULATION_VAR
 	return ret;
 }
 

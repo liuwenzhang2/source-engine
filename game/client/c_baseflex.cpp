@@ -118,11 +118,11 @@ bool GetHWMExpressionFileName( const char *pFilename, char *pHWMFilename )
 }
 
 C_BaseFlex::C_BaseFlex() : 
-	m_iv_viewtarget( "C_BaseFlex::m_iv_viewtarget" ), 
-	m_iv_flexWeight("C_BaseFlex:m_iv_flexWeight" ),
+	m_iv_viewtarget( "C_BaseFlex::m_iv_viewtarget", &m_viewtarget, LATCH_ANIMATION_VAR | INTERPOLATE_LINEAR_ONLY),
+	m_iv_flexWeight("C_BaseFlex:m_iv_flexWeight", m_flexWeight, LATCH_ANIMATION_VAR),
 #ifdef HL2_CLIENT_DLL
-	m_iv_vecLean("C_BaseFlex:m_iv_vecLean" ),
-	m_iv_vecShift("C_BaseFlex:m_iv_vecShift" ),
+	m_iv_vecLean("C_BaseFlex:m_iv_vecLean", &m_vecLean, LATCH_ANIMATION_VAR),
+	m_iv_vecShift("C_BaseFlex:m_iv_vecShift", &m_vecShift, LATCH_ANIMATION_VAR),
 #endif
 	m_LocalToGlobal( 0, 0, FlexSettingLessFunc )
 {
@@ -142,12 +142,12 @@ C_BaseFlex::C_BaseFlex() :
 
 bool C_BaseFlex::Init(int entnum, int iSerialNum) {
 	bool ret = BaseClass::Init(entnum, iSerialNum);
-	GetEngineObject()->AddVar(&m_viewtarget, &m_iv_viewtarget, LATCH_ANIMATION_VAR | INTERPOLATE_LINEAR_ONLY);
-	GetEngineObject()->AddVar(m_flexWeight, &m_iv_flexWeight, LATCH_ANIMATION_VAR);
+	GetEngineObject()->AddVar(&m_iv_viewtarget);//, LATCH_ANIMATION_VAR | INTERPOLATE_LINEAR_ONLY
+	GetEngineObject()->AddVar(&m_iv_flexWeight);//, LATCH_ANIMATION_VAR
 #ifdef HL2_CLIENT_DLL
 	// Get general lean vector
-	GetEngineObject()->AddVar(&m_vecLean, &m_iv_vecLean, LATCH_ANIMATION_VAR);
-	GetEngineObject()->AddVar(&m_vecShift, &m_iv_vecShift, LATCH_ANIMATION_VAR);
+	GetEngineObject()->AddVar(&m_iv_vecLean);//, LATCH_ANIMATION_VAR
+	GetEngineObject()->AddVar(&m_iv_vecShift);//, LATCH_ANIMATION_VAR
 #endif
 	return ret;
 }

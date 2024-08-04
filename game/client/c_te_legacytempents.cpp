@@ -111,7 +111,7 @@ C_LocalTempEntity::C_LocalTempEntity()
 //-----------------------------------------------------------------------------
 void C_LocalTempEntity::Prepare( const model_t *pmodel, float time )
 {
-	GetEngineObject()->Interp_SetupMappings(GetEngineObject()->GetVarMapping() );
+	GetEngineObject()->Interp_SetupMappings();
 
 	//index = -1;
 	Clear();

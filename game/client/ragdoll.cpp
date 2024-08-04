@@ -429,8 +429,8 @@ END_RECV_TABLE()
 
 
 C_ServerRagdoll::C_ServerRagdoll( void ) :
-	m_iv_ragPos("C_ServerRagdoll::m_iv_ragPos"),
-	m_iv_ragAngles("C_ServerRagdoll::m_iv_ragAngles")
+	m_iv_ragPos("C_ServerRagdoll::m_iv_ragPos", m_ragPos, LATCH_SIMULATION_VAR),
+	m_iv_ragAngles("C_ServerRagdoll::m_iv_ragAngles", m_ragAngles, LATCH_SIMULATION_VAR)
 {
 	m_elementCount = 0;
 	m_flLastBoneChangeTime = -FLT_MAX;
@@ -443,8 +443,8 @@ C_ServerRagdoll::C_ServerRagdoll( void ) :
 
 bool C_ServerRagdoll::Init(int entnum, int iSerialNum) {
 	bool ret = BaseClass::Init(entnum, iSerialNum);
-	GetEngineObject()->AddVar(m_ragPos, &m_iv_ragPos, LATCH_SIMULATION_VAR);
-	GetEngineObject()->AddVar(m_ragAngles, &m_iv_ragAngles, LATCH_SIMULATION_VAR);
+	GetEngineObject()->AddVar(&m_iv_ragPos);//, LATCH_SIMULATION_VAR
+	GetEngineObject()->AddVar(&m_iv_ragAngles);//, LATCH_SIMULATION_VAR
 	return ret;
 }
 

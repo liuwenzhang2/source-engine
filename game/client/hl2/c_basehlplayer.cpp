@@ -67,8 +67,8 @@ C_BaseHLPlayer::C_BaseHLPlayer()
 
 bool C_BaseHLPlayer::Init(int entnum, int iSerialNum) {
 	bool ret = BaseClass::Init(entnum, iSerialNum);
-	GetEngineObject()->AddVar(&m_Local.m_vecPunchAngle, &m_Local.m_iv_vecPunchAngle, LATCH_SIMULATION_VAR);
-	GetEngineObject()->AddVar(&m_Local.m_vecPunchAngleVel, &m_Local.m_iv_vecPunchAngleVel, LATCH_SIMULATION_VAR);
+	GetEngineObject()->AddVar(&m_Local.m_iv_vecPunchAngle);//, LATCH_SIMULATION_VAR
+	GetEngineObject()->AddVar(&m_Local.m_iv_vecPunchAngleVel);//, LATCH_SIMULATION_VAR
 	return ret;
 }
 

@@ -70,8 +70,8 @@ END_PREDICTION_DATA()
 
 static ConVar cl_playermodel( "cl_playermodel", "none", FCVAR_USERINFO | FCVAR_ARCHIVE | FCVAR_SERVER_CAN_EXECUTE, "Default Player Model");
     
-C_HL1MP_Player::C_HL1MP_Player( void ) :
-	m_iv_angEyeAngles( "C_HL1MP_Player::m_iv_angEyeAngles" )
+C_HL1MP_Player::C_HL1MP_Player( void ) 
+	//:m_iv_angEyeAngles( "C_HL1MP_Player::m_iv_angEyeAngles" )
 {
 	m_PlayerAnimState = CreatePlayerAnimState( this );
 	m_angEyeAngles.Init();
@@ -417,7 +417,7 @@ void C_HL1MPRagdoll::CreateHL1MPRagdoll( void )
 		// move my current model instance to the ragdoll's so decals are preserved.
 		pPlayer->SnatchModelInstance( this );
 
-		VarMapping_t *varMap = GetEngineObject()->GetVarMapping();
+		//VarMapping_t *varMap = GetEngineObject()->GetVarMapping();
 
 		// Copy all the interpolated vars from the player entity.
 		// The entity uses the interpolated history to get bone velocity.
@@ -453,7 +453,7 @@ void C_HL1MPRagdoll::CreateHL1MPRagdoll( void )
 			SetSequence( iSeq );	// walk_lower, basic pose
 			SetCycle( 0.0 );
 
-			GetEngineObject()->Interp_Reset( varMap );
+			GetEngineObject()->Interp_Reset();
 		}		
 	}
 	else
@@ -465,7 +465,7 @@ void C_HL1MPRagdoll::CreateHL1MPRagdoll( void )
 		GetEngineObject()->SetAbsOrigin( m_vecRagdollOrigin );
 		GetEngineObject()->SetAbsVelocity( m_vecRagdollVelocity );
 
-		GetEngineObject()->Interp_Reset(GetEngineObject()->GetVarMapping() );
+		GetEngineObject()->Interp_Reset();
 		
 	}
 

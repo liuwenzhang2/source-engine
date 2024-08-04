@@ -761,7 +761,7 @@ bool C_BaseEntity::Init( int entnum, int iSerialNum )
 }
 
 void C_BaseEntity::AfterInit() {
-	GetEngineObject()->Interp_SetupMappings(GetEngineObject()->GetVarMapping());
+	GetEngineObject()->Interp_SetupMappings();
 }
 
 //-----------------------------------------------------------------------------
@@ -787,7 +787,7 @@ bool C_BaseEntity::InitializeAsClientEntity( const char *pszModelName, RenderGro
 		nModelIndex = -1;
 	}
 
-	GetEngineObject()->Interp_SetupMappings(GetEngineObject()->GetVarMapping() );
+	GetEngineObject()->Interp_SetupMappings();
 
 	return InitializeAsClientEntityByIndex( nModelIndex, renderGroup );
 }
@@ -1678,7 +1678,7 @@ void C_BaseEntity::PreDataUpdate( DataUpdateType_t updateType )
 
 	if ( !bnewentity )
 	{
-		GetEngineObject()->Interp_RestoreToLastNetworked(GetEngineObject()->GetVarMapping() );
+		GetEngineObject()->Interp_RestoreToLastNetworked();
 	}
 
 	if ( bnewentity /*&& !IsClientCreated()*/)
@@ -2395,7 +2395,7 @@ void C_BaseEntity::InterpolateServerEntities()
 		C_BaseEntity *pEnt;
 		while ( (pEnt = iterator.Next()) != NULL )
 		{
-			pEnt->GetEngineObject()->Interp_UpdateInterpolationAmounts( pEnt->GetEngineObject()->GetVarMapping() );
+			pEnt->GetEngineObject()->Interp_UpdateInterpolationAmounts();
 		}
 	}
 
@@ -3389,7 +3389,7 @@ void C_BaseEntity::SetPredictable( bool state )
 	m_bPredictable = state;
 
 	// update interpolation times
-	GetEngineObject()->Interp_UpdateInterpolationAmounts(GetEngineObject()->GetVarMapping() );
+	GetEngineObject()->Interp_UpdateInterpolationAmounts();
 }
 
 //-----------------------------------------------------------------------------
@@ -4096,7 +4096,7 @@ void C_BaseEntity::ResetLatched()
 //	if ( IsClientCreated() )
 //		return;
 
-	GetEngineObject()->Interp_Reset(GetEngineObject()->GetVarMapping() );
+	GetEngineObject()->Interp_Reset();
 }
 
 //-----------------------------------------------------------------------------
@@ -4518,7 +4518,7 @@ void C_BaseEntity::CheckCLInterpChanged()
 		C_BaseEntity *pEnt;
 		while ( (pEnt = iterator.Next()) != NULL )
 		{
-			pEnt->GetEngineObject()->Interp_UpdateInterpolationAmounts( pEnt->GetEngineObject()->GetVarMapping() );
+			pEnt->GetEngineObject()->Interp_UpdateInterpolationAmounts();
 		}
 	}
 }

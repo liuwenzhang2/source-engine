@@ -405,7 +405,7 @@ void C_CSRagdoll::CreateLowViolenceRagdoll( void )
 	SetSequence( LookupSequence( str ) );
 	ForceClientSideAnimationOn();
 
-	GetEngineObject()->Interp_Reset(GetEngineObject()->GetVarMapping() );
+	GetEngineObject()->Interp_Reset();
 }
 
 
@@ -423,7 +423,7 @@ void C_CSRagdoll::CreateCSRagdoll()
 		// move my current model instance to the ragdoll's so decals are preserved.
 		pPlayer->SnatchModelInstance( this );
 
-		VarMapping_t *varMap = GetEngineObject()->GetVarMapping();
+		//VarMapping_t *varMap = GetEngineObject()->GetVarMapping();
 
 		// Copy all the interpolated vars from the player entity.
 		// The entity uses the interpolated history to get bone velocity.
@@ -464,7 +464,7 @@ void C_CSRagdoll::CreateCSRagdoll()
 			pPlayer->SetSequence( iSeq );	// walk_lower, basic pose
 			pPlayer->SetCycle( 0.0 );
 
-			GetEngineObject()->Interp_Reset( varMap );
+			GetEngineObject()->Interp_Reset();
 		}
 	}
 	else
@@ -476,7 +476,7 @@ void C_CSRagdoll::CreateCSRagdoll()
 		GetEngineObject()->SetAbsOrigin( m_vecRagdollOrigin );
 		GetEngineObject()->SetAbsVelocity( m_vecRagdollVelocity );
 
-		GetEngineObject()->Interp_Reset(GetEngineObject()->GetVarMapping() );
+		GetEngineObject()->Interp_Reset();
 	}
 
 	// Turn it into a ragdoll.
@@ -790,7 +790,7 @@ END_RECV_TABLE()
 
 
 C_CSPlayer::C_CSPlayer() :
-	m_iv_angEyeAngles( "C_CSPlayer::m_iv_angEyeAngles" )
+	m_iv_angEyeAngles( "C_CSPlayer::m_iv_angEyeAngles", &m_angEyeAngles, LATCH_SIMULATION_VAR)
 {
 	m_PlayerAnimState = CreatePlayerAnimState( this, this, LEGANIM_9WAY, true );
 
@@ -822,7 +822,7 @@ C_CSPlayer::C_CSPlayer() :
 
 bool C_CSPlayer::Init(int entnum, int iSerialNum) {
 	bool ret = BaseClass::Init(entnum, iSerialNum);
-	GetEngineObject()->AddVar(&m_angEyeAngles, &m_iv_angEyeAngles, LATCH_SIMULATION_VAR);
+	GetEngineObject()->AddVar(&m_iv_angEyeAngles);//&m_angEyeAngles, , LATCH_SIMULATION_VAR
 	return ret;
 }
 

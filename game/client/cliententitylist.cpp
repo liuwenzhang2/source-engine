@@ -306,7 +306,7 @@ void RecvProxy_InterpolationAmountChanged(const CRecvProxyData* pData, void* pSt
 		RecvProxy_Int32ToInt8(pData, pStruct, pOut);
 
 		C_EngineObjectInternal* pEntity = (C_EngineObjectInternal*)pStruct;
-		pEntity->Interp_UpdateInterpolationAmounts(pEntity->GetVarMapping());
+		pEntity->Interp_UpdateInterpolationAmounts();
 }
 }
 
@@ -643,25 +643,22 @@ void C_EngineObjectInternal::OnRestore()
 // Purpose: 
 // Input  : *map - 
 //-----------------------------------------------------------------------------
-void C_EngineObjectInternal::Interp_SetupMappings(VarMapping_t* map)
+void C_EngineObjectInternal::Interp_SetupMappings()
 {
-	if (!map)
-		return;
-
-	int c = map->m_Entries.Count();
+	int c = m_VarMap.m_Entries.Count();
 	for (int i = 0; i < c; i++)
 	{
-		VarMapEntry_t* e = &map->m_Entries[i];
+		VarMapEntry_t* e = &m_VarMap.m_Entries[i];
 		IInterpolatedVar* watcher = e->watcher;
-		void* data = e->data;
+		//void* data = e->data;
 		int type = e->type;
 
-		watcher->Setup(data, type);
+		//watcher->Setup(data, type);
 		watcher->SetInterpolationAmount(m_pOuter->GetInterpolationAmount(watcher->GetType()));
 	}
 }
 
-void C_EngineObjectInternal::Interp_RestoreToLastNetworked(VarMapping_t* map)
+void C_EngineObjectInternal::Interp_RestoreToLastNetworked()
 {
 	VPROF("C_BaseEntity::Interp_RestoreToLastNetworked");
 
@@ -671,10 +668,10 @@ void C_EngineObjectInternal::Interp_RestoreToLastNetworked(VarMapping_t* map)
 	QAngle oldAngles = GetLocalAngles();
 	Vector oldVel = GetLocalVelocity();
 
-	int c = map->m_Entries.Count();
+	int c = m_VarMap.m_Entries.Count();
 	for (int i = 0; i < c; i++)
 	{
-		VarMapEntry_t* e = &map->m_Entries[i];
+		VarMapEntry_t* e = &m_VarMap.m_Entries[i];
 		IInterpolatedVar* watcher = e->watcher;
 		watcher->RestoreToLastNetworked();
 	}
@@ -682,15 +679,12 @@ void C_EngineObjectInternal::Interp_RestoreToLastNetworked(VarMapping_t* map)
 	BaseInterpolatePart2(oldOrigin, oldAngles, oldVel, 0);
 }
 
-void C_EngineObjectInternal::Interp_UpdateInterpolationAmounts(VarMapping_t* map)
+void C_EngineObjectInternal::Interp_UpdateInterpolationAmounts()
 {
-	if (!map)
-		return;
-
-	int c = map->m_Entries.Count();
+	int c = m_VarMap.m_Entries.Count();
 	for (int i = 0; i < c; i++)
 	{
-		VarMapEntry_t* e = &map->m_Entries[i];
+		VarMapEntry_t* e = &m_VarMap.m_Entries[i];
 		IInterpolatedVar* watcher = e->watcher;
 		watcher->SetInterpolationAmount(m_pOuter->GetInterpolationAmount(watcher->GetType()));
 	}
@@ -698,7 +692,7 @@ void C_EngineObjectInternal::Interp_UpdateInterpolationAmounts(VarMapping_t* map
 
 void C_EngineObjectInternal::Interp_HierarchyUpdateInterpolationAmounts()
 {
-	Interp_UpdateInterpolationAmounts(GetVarMapping());
+	Interp_UpdateInterpolationAmounts();
 
 	for (C_EngineObjectInternal* pChild = FirstMoveChild(); pChild; pChild = pChild->NextMovePeer())
 	{
@@ -706,23 +700,23 @@ void C_EngineObjectInternal::Interp_HierarchyUpdateInterpolationAmounts()
 	}
 }
 
-inline int C_EngineObjectInternal::Interp_Interpolate(VarMapping_t* map, float currentTime)
+inline int C_EngineObjectInternal::Interp_Interpolate(float currentTime)
 {
 	int bNoMoreChanges = 1;
-	if (currentTime < map->m_lastInterpolationTime)
+	if (currentTime < m_VarMap.m_lastInterpolationTime)
 	{
-		for (int i = 0; i < map->m_nInterpolatedEntries; i++)
+		for (int i = 0; i < m_VarMap.m_nInterpolatedEntries; i++)
 		{
-			VarMapEntry_t* e = &map->m_Entries[i];
+			VarMapEntry_t* e = &m_VarMap.m_Entries[i];
 
 			e->m_bNeedsToInterpolate = true;
 		}
 	}
-	map->m_lastInterpolationTime = currentTime;
+	m_VarMap.m_lastInterpolationTime = currentTime;
 
-	for (int i = 0; i < map->m_nInterpolatedEntries; i++)
+	for (int i = 0; i < m_VarMap.m_nInterpolatedEntries; i++)
 	{
-		VarMapEntry_t* e = &map->m_Entries[i];
+		VarMapEntry_t* e = &m_VarMap.m_Entries[i];
 
 		if (!e->m_bNeedsToInterpolate)
 			continue;
@@ -1102,7 +1096,7 @@ int C_EngineObjectInternal::BaseInterpolatePart1(float& currentTime, Vector& old
 	oldAngles = m_angRotation;
 	oldVel = m_vecVelocity;
 
-	bNoMoreChanges = Interp_Interpolate(GetVarMapping(), currentTime);
+	bNoMoreChanges = Interp_Interpolate(currentTime);
 	if (cl_interp_all.GetInt() || (m_pOuter->m_EntClientFlags & ENTCLIENTFLAG_ALWAYS_INTERPOLATE))
 		bNoMoreChanges = 0;
 
@@ -2024,13 +2018,13 @@ void C_EngineObjectInternal::EstimateAbsVelocity(Vector& vel)
 	m_iv_vecOrigin.GetDerivative_SmoothVelocity(&vel, gpGlobals->curtime);
 }
 
-void C_EngineObjectInternal::Interp_Reset(VarMapping_t* map)
+void C_EngineObjectInternal::Interp_Reset()
 {
 	PREDICTION_TRACKVALUECHANGESCOPE_ENTITY(this->m_pOuter, "reset");
-	int c = map->m_Entries.Count();
+	int c = m_VarMap.m_Entries.Count();
 	for (int i = 0; i < c; i++)
 	{
-		VarMapEntry_t* e = &map->m_Entries[i];
+		VarMapEntry_t* e = &m_VarMap.m_Entries[i];
 		IInterpolatedVar* watcher = e->watcher;
 
 		watcher->Reset();
@@ -2047,7 +2041,7 @@ const QAngle& C_EngineObjectInternal::GetPrevLocalAngles() const
 	return m_iv_angRotation.GetPrev();
 }
 
-void C_EngineObjectInternal::AddVar(void* data, IInterpolatedVar* watcher, int type, bool bSetup)
+void C_EngineObjectInternal::AddVar(IInterpolatedVar* watcher, bool bSetup)
 {
 	// Only add it if it hasn't been added yet.
 	bool bAddIt = true;
@@ -2055,10 +2049,10 @@ void C_EngineObjectInternal::AddVar(void* data, IInterpolatedVar* watcher, int t
 	{
 		if (m_VarMap.m_Entries[i].watcher == watcher)
 		{
-			if ((type & EXCLUDE_AUTO_INTERPOLATE) != (watcher->GetType() & EXCLUDE_AUTO_INTERPOLATE))
+			if ((m_VarMap.m_Entries[i].type & EXCLUDE_AUTO_INTERPOLATE) != (watcher->GetType() & EXCLUDE_AUTO_INTERPOLATE))
 			{
 				// Its interpolation mode changed, so get rid of it and re-add it.
-				RemoveVar(m_VarMap.m_Entries[i].data, true);
+				RemoveVar(m_VarMap.m_Entries[i].watcher, true);
 			}
 			else
 			{
@@ -2076,11 +2070,11 @@ void C_EngineObjectInternal::AddVar(void* data, IInterpolatedVar* watcher, int t
 		Assert(watcher->GetDebugName() != NULL);
 
 		VarMapEntry_t map;
-		map.data = data;
+		//map.data = data;
 		map.watcher = watcher;
-		map.type = type;
+		map.type = watcher->GetType();
 		map.m_bNeedsToInterpolate = true;
-		if (type & EXCLUDE_AUTO_INTERPOLATE)
+		if (map.type & EXCLUDE_AUTO_INTERPOLATE)
 		{
 			m_VarMap.m_Entries.AddToTail(map);
 		}
@@ -2093,17 +2087,17 @@ void C_EngineObjectInternal::AddVar(void* data, IInterpolatedVar* watcher, int t
 
 	if (bSetup)
 	{
-		watcher->Setup(data, type);
+		//watcher->Setup(data, type);
 		watcher->SetInterpolationAmount(m_pOuter->GetInterpolationAmount(watcher->GetType()));
 	}
 }
 
 
-void C_EngineObjectInternal::RemoveVar(void* data, bool bAssert)
+void C_EngineObjectInternal::RemoveVar(IInterpolatedVar* watcher, bool bAssert)
 {
 	for (int i = 0; i < m_VarMap.m_Entries.Count(); i++)
 	{
-		if (m_VarMap.m_Entries[i].data == data)
+		if (m_VarMap.m_Entries[i].watcher == watcher)
 		{
 			if (!(m_VarMap.m_Entries[i].type & EXCLUDE_AUTO_INTERPOLATE))
 				--m_VarMap.m_nInterpolatedEntries;
