@@ -424,7 +424,7 @@ void CAnimationLayer::DispatchAnimEvents( CBaseAnimating *eventHandler, CBaseAni
 			{
 				flCycle = flCycle - 1.0;
 			}
-			event.eventtime = pOwner->m_flAnimTime + (flCycle - m_flCycle) / flCycleRate + pOwner->GetAnimTimeInterval();
+			event.eventtime = pOwner->GetEngineObject()->GetAnimTime() + (flCycle - m_flCycle) / flCycleRate + pOwner->GetAnimTimeInterval();
 		}
 
 		// Msg( "dispatch %d (%d : %.2f)\n", index - 1, event.event, event.eventtime );

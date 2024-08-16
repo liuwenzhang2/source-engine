@@ -366,7 +366,7 @@ void CBaseViewModel::SendViewModelMatchingSequence( int sequence )
 	m_nOldAnimationParity = m_nAnimationParity;
 
 	// Force frame interpolation to start at exactly frame zero
-	m_flAnimTime			= gpGlobals->curtime;
+	GetEngineObject()->SetAnimTime(gpGlobals->curtime);
 #else
 	CBaseCombatWeapon *weapon = m_hWeapon.Get();
 	bool showControlPanels = weapon && weapon->ShouldShowControlPanels();
@@ -545,7 +545,7 @@ static void RecvProxy_Weapon( const CRecvProxyData *pData, void *pStruct, void *
 	{
 		// Restart animation at frame 0
 		pViewModel->SetCycle( 0 );
-		pViewModel->m_flAnimTime = gpGlobals->curtime;
+		pViewModel->GetEngineObject()->SetAnimTime(gpGlobals->curtime);
 	}
 }
 #endif
@@ -611,7 +611,7 @@ BEGIN_PREDICTION_DATA( CBaseViewModel )
 	//DEFINE_PRED_FIELD( m_fEffects, FIELD_INTEGER, FTYPEDESC_INSENDTABLE | FTYPEDESC_OVERRIDE ),
 	DEFINE_PRED_FIELD( m_nAnimationParity, FIELD_INTEGER, FTYPEDESC_INSENDTABLE ),
 	DEFINE_PRED_FIELD( m_hWeapon, FIELD_EHANDLE, FTYPEDESC_INSENDTABLE ),
-	DEFINE_PRED_FIELD( m_flAnimTime, FIELD_FLOAT, 0 ),
+	//DEFINE_PRED_FIELD( m_flAnimTime, FIELD_FLOAT, 0 ),
 
 	DEFINE_FIELD( m_hOwner, FIELD_EHANDLE ),
 	DEFINE_FIELD( m_flTimeWeaponIdle, FIELD_FLOAT ),
@@ -628,7 +628,7 @@ void RecvProxy_SequenceNum( const CRecvProxyData *pData, void *pStruct, void *pO
 		MDLCACHE_CRITICAL_SECTION();
 
 		model->SetSequence(pData->m_Value.m_Int);
-		model->m_flAnimTime = gpGlobals->curtime;
+		model->GetEngineObject()->SetAnimTime(gpGlobals->curtime);
 		model->SetCycle(0);
 	}
 }

@@ -37,6 +37,7 @@ public:
 
 
 public:
+	virtual void PostConstructor(const char* szClassname, int iForceEdictIndex);
 	virtual void Spawn( void );
 	virtual void Precache();
 	int ObjectCaps( void ) { return (BaseClass::ObjectCaps() | FCAP_IMPULSE_USE); }	// make hostage "useable"

@@ -436,7 +436,7 @@ void CPropCombineBall::StartAnimating( void )
 	int nSequence = LookupSequence( "idle" );
 
 	SetCycle( 0 );
-	m_flAnimTime = gpGlobals->curtime;
+	GetEngineObject()->SetAnimTime(gpGlobals->curtime);
 	ResetSequence( nSequence );
 	ResetClientsideFrame();
 }

@@ -3963,7 +3963,7 @@ void CAI_BaseNPC::NPCThink( void )
 
 				PostMovement();
 
-				SetSimulationTime( gpGlobals->curtime );
+				GetEngineObject()->SetSimulationTime( gpGlobals->curtime );
 			}
 			else
 				m_flTimeLastMovement = FLT_MAX;

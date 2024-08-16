@@ -266,6 +266,7 @@ public:
 
 	CDynamicProp();
 
+	virtual void PostConstructor(const char* szClassname, int iForceEdictIndex);
 	void	Spawn( void );
 	bool	CreateVPhysics( void );
 	void	CreateBoneFollowers();

@@ -1009,7 +1009,7 @@ int CBeam::DrawModel( int flags )
 
 void CBeam::OnDataChanged( DataUpdateType_t updateType )
 {
-	MarkMessageReceived();
+	GetEngineObject()->MarkMessageReceived();
 
 	// Make sure that the correct model is referenced for this entity
 	SetModelPointer( modelinfo->GetModel(GetEngineObject()->GetModelIndex() ) );

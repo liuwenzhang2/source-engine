@@ -437,7 +437,7 @@ void CPropVehicleChoreoGeneric::InputOpen( inputdata_t &inputdata )
 	if ( nSequence > ACTIVITY_NOT_AVAILABLE )
 	{
 		SetCycle( 0 );
-		m_flAnimTime = gpGlobals->curtime;
+		GetEngineObject()->SetAnimTime(gpGlobals->curtime);
 		ResetSequence( nSequence );
 		ResetClientsideFrame();
 	}
@@ -464,7 +464,7 @@ void CPropVehicleChoreoGeneric::InputClose( inputdata_t &inputdata )
 	if ( nSequence > ACTIVITY_NOT_AVAILABLE )
 	{
 		SetCycle( 0 );
-		m_flAnimTime = gpGlobals->curtime;
+		GetEngineObject()->SetAnimTime(gpGlobals->curtime);
 		ResetSequence( nSequence );
 		ResetClientsideFrame();
 	}

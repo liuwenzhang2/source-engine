@@ -80,12 +80,15 @@ struct clientthinkfunc_t
 	int			m_nLastThinkTick;
 };
 
+class IClientEntity;
+
 class IEngineObjectClient : public IEngineObject {
 public:
 
 	virtual datamap_t* GetPredDescMap(void) = 0;
+	virtual IClientEntity* GetClientEntity() = 0;
 	virtual C_BaseEntity* GetOuter() = 0;
-
+	virtual int entindex() const = 0;
 	virtual void ParseMapData(IEntityMapData* mapData) = 0;
 	virtual int Save(ISave& save) = 0;
 	virtual int Restore(IRestore& restore) = 0;
@@ -387,6 +390,25 @@ public:
 	virtual void StopFollowingEntity() = 0;	// will also change to MOVETYPE_NONE
 	virtual bool IsFollowingEntity() = 0;
 	virtual IEngineObjectClient* GetFollowedEntity() = 0;
+	virtual void PreDataUpdate(DataUpdateType_t updateType) = 0;
+	virtual void PostDataUpdate(DataUpdateType_t updateType) = 0;
+	// This is called once per frame before any data is read in from the server.
+	virtual void OnPreDataChanged(DataUpdateType_t type) = 0;
+	virtual void OnDataChanged(DataUpdateType_t type) = 0;
+	virtual float GetSpawnTime() const = 0;
+	virtual float GetAnimTime() const = 0;
+	virtual void SetAnimTime(float at) = 0;
+	virtual float GetSimulationTime() const = 0;
+	virtual void SetSimulationTime(float st) = 0;
+	virtual float GetOldSimulationTime() const = 0;
+	virtual const Vector& GetOldOrigin() = 0;
+	virtual float ProxyRandomValue() const = 0;
+	virtual int& DataChangeEventRef() = 0;
+	virtual void MarkMessageReceived() = 0;
+	// Gets the last message time
+	virtual float GetLastChangeTime(int flags) = 0;
+	virtual void UseClientSideAnimation() = 0;
+	virtual bool IsUsingClientSideAnimation() = 0;
 
 };
 

@@ -209,7 +209,7 @@ public:
 		GetEngineObject()->SetAbsVelocity( m_hPlayer->GetEngineObject()->GetAbsVelocity() );
 		GetEngineObject()->AddSolidFlags( FSOLID_NOT_SOLID );
 		ChangeTeam( m_hPlayer->GetTeamNumber() );
-		UseClientSideAnimation();
+		GetEngineObject()->UseClientSideAnimation();
 	}
 
 public:
@@ -236,7 +236,7 @@ IMPLEMENT_SERVERCLASS_ST_NOBASE( CCSRagdoll, DT_CSRagdoll )
 	SendPropInt( SENDINFO( m_iDeathPose ), ANIMATION_SEQUENCE_BITS, SPROP_UNSIGNED ),
 	SendPropInt( SENDINFO( m_iDeathFrame ), 5 ),
 	SendPropInt( SENDINFO(m_iTeamNum), TEAMNUM_NUM_BITS, 0),
-	SendPropInt( SENDINFO( m_bClientSideAnimation ), 1, SPROP_UNSIGNED ),
+	//SendPropInt( SENDINFO( m_bClientSideAnimation ), 1, SPROP_UNSIGNED ),
 END_SEND_TABLE()
 
 
@@ -445,8 +445,6 @@ CCSPlayer::CCSPlayer()
 {
 	m_PlayerAnimState = CreatePlayerAnimState( this, this, LEGANIM_9WAY, true );
 
-	UseClientSideAnimation();
-
 	m_iLastWeaponFireUsercmd = 0;
 	m_iAddonBits = 0;
 	m_bEscaped = false;
@@ -544,6 +542,11 @@ CCSPlayer::CCSPlayer()
 	//=============================================================================
 	// HPE_END
 	//=============================================================================
+}
+
+void CCSPlayer::PostConstructor(const char* szClassname, int iForceEdictIndex) {
+	BaseClass::PostConstructor(szClassname, iForceEdictIndex);
+	GetEngineObject()->UseClientSideAnimation();
 }
 
 
@@ -5226,7 +5229,7 @@ ReturnSpot:
 void CCSPlayer::SetProgressBarTime( int barTime )
 {
 	m_iProgressBarDuration = barTime;
-	m_flProgressBarStartTime = this->m_flSimulationTime;
+	m_flProgressBarStartTime = this->GetEngineObject()->GetSimulationTime();
 }
 
 

@@ -1585,7 +1585,7 @@ void CBaseEntity::PhysicsStep()
 	// HACK:  Make sure that the client latches the networked origin/orientation changes with the current server tick count
 	//  so that we don't get jittery interpolation.  All of this is necessary to mimic actual continuous simulation of the underlying
 	//  variables.
-	SetSimulationTime( gpGlobals->curtime );
+	GetEngineObject()->SetSimulationTime( gpGlobals->curtime );
 	
 	// Run all but the base think function
 	GetEngineObject()->PhysicsRunThink( THINK_FIRE_ALL_BUT_BASE );

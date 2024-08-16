@@ -175,6 +175,7 @@ public:
 		m_rgflCoordinateFrame[0][0] = 1.0f;
 		m_rgflCoordinateFrame[1][1] = 1.0f;
 		m_rgflCoordinateFrame[2][2] = 1.0f;
+		m_bClientSideAnimation = false;
 	}
 
 	~CEngineObjectInternal()
@@ -192,6 +193,10 @@ public:
 		m_iCurrentThinkContext = NO_THINK_CONTEXT;
 #endif
 		SetCollisionBounds(vec3_origin, vec3_origin);
+	}
+
+	IServerEntity* GetServerEntity() {
+		return m_pOuter;
 	}
 
 	CBaseEntity* GetOuter() {
@@ -549,6 +554,21 @@ public:
 	bool IsFollowingEntity();
 	IEngineObjectServer* GetFollowedEntity();
 
+	float GetAnimTime() const;
+	void SetAnimTime(float at);
+
+	float GetSimulationTime() const;
+	void SetSimulationTime(float st);
+
+	// Call this in your constructor to tell it that you will not use animtime. Then the
+// interpolation will be done correctly on the client.
+// This defaults to off.
+	void	UseClientSideAnimation();
+
+	// Tells whether or not we're using client-side animation. Used for controlling
+	// the transmission of animtime.
+	bool	IsUsingClientSideAnimation() { return m_bClientSideAnimation; }
+
 public:
 	// Networking related methods
 	void NetworkStateChanged();
@@ -635,7 +655,11 @@ private:
 	CNetworkVar(bool, m_bSimulatedEveryTick);
 	CNetworkVar(bool, m_bAnimatedEveryTick);
 
+	CNetworkVar(float, m_flAnimTime);  // this is the point in time that the client will interpolate to position,angle,frame,etc.
+	CNetworkVar(float, m_flSimulationTime);
 
+	// Client-side animation (useful for looping animation objects)
+	CNetworkVar(bool, m_bClientSideAnimation);
 };
 
 inline PVSInfo_t* CEngineObjectInternal::GetPVSInfo()
@@ -1264,6 +1288,26 @@ inline void CEngineObjectInternal::SetAnimatedEveryTick(bool anim)
 	{
 		m_bAnimatedEveryTick = anim;
 	}
+}
+
+inline float CEngineObjectInternal::GetAnimTime() const
+{
+	return m_flAnimTime;
+}
+
+inline float CEngineObjectInternal::GetSimulationTime() const
+{
+	return m_flSimulationTime;
+}
+
+inline void CEngineObjectInternal::SetAnimTime(float at)
+{
+	m_flAnimTime = at;
+}
+
+inline void CEngineObjectInternal::SetSimulationTime(float st)
+{
+	m_flSimulationTime = st;
 }
 
 //-----------------------------------------------------------------------------

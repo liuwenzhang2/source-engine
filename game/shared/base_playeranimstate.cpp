@@ -226,7 +226,7 @@ void CBasePlayerAnimState::RestartMainSequence()
 {
 	CBaseAnimatingOverlay *pPlayer = GetOuter();
 
-	pPlayer->m_flAnimTime = gpGlobals->curtime;
+	pPlayer->GetEngineObject()->SetAnimTime(gpGlobals->curtime);
 	pPlayer->SetCycle( 0 );
 }
 

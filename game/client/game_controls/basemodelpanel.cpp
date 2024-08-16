@@ -458,7 +458,7 @@ void CModelPanel::SetupModel( void )
 				}
 			}
 
-			pEnt->m_flAnimTime = gpGlobals->curtime;
+			pEnt->GetEngineObject()->SetAnimTime(gpGlobals->curtime);
 		}
 	}
 
@@ -486,7 +486,7 @@ void CModelPanel::SetupModel( void )
 				pTemp->m_nSkin = pInfo->m_nSkin;
 			}
 
-			pTemp->m_flAnimTime = gpGlobals->curtime;
+			pTemp->GetEngineObject()->SetAnimTime(gpGlobals->curtime);
 			m_AttachedModels.AddToTail( pTemp );
 		}
 	}

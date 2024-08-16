@@ -280,7 +280,7 @@ void CLagCompensationManager::FrameUpdatePostEntityThink()
 			LagRecord &head = track->Element( track->Head() );
 
 			// check if player changed simulation time since last time updated
-			if ( head.m_flSimulationTime >= pPlayer->GetSimulationTime() )
+			if ( head.m_flSimulationTime >= pPlayer->GetEngineObject()->GetSimulationTime() )
 				continue; // don't add new entry for same or older time
 		}
 
@@ -293,7 +293,7 @@ void CLagCompensationManager::FrameUpdatePostEntityThink()
 			record.m_fFlags |= LC_ALIVE;
 		}
 
-		record.m_flSimulationTime	= pPlayer->GetSimulationTime();
+		record.m_flSimulationTime	= pPlayer->GetEngineObject()->GetSimulationTime();
 		record.m_vecAngles			= pPlayer->GetEngineObject()->GetLocalAngles();
 		record.m_vecOrigin			= pPlayer->GetEngineObject()->GetLocalOrigin();
 		record.m_vecMinsPreScaled	= pPlayer->GetEngineObject()->OBBMinsPreScaled();
@@ -579,7 +579,7 @@ void CLagCompensationManager::BacktrackPlayer( CBasePlayer *pPlayer, float flTar
 	Vector orgdiff = pPlayer->GetEngineObject()->GetLocalOrigin() - org;
 
 	// Always remember the pristine simulation time in case we need to restore it.
-	restore->m_flSimulationTime = pPlayer->GetSimulationTime();
+	restore->m_flSimulationTime = pPlayer->GetEngineObject()->GetSimulationTime();
 
 	if ( angdiff.LengthSqr() > LAG_COMPENSATION_EPS_SQR )
 	{
@@ -825,7 +825,7 @@ void CLagCompensationManager::FinishLagCompensation( CBasePlayer *player )
 
 		if ( restoreSimulationTime )
 		{
-			pPlayer->SetSimulationTime( restore->m_flSimulationTime );
+			pPlayer->GetEngineObject()->SetSimulationTime( restore->m_flSimulationTime );
 		}
 	}
 }

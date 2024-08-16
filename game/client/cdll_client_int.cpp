@@ -311,14 +311,14 @@ class CDataChangedEvent
 {
 public:
 	CDataChangedEvent() = default;
-	CDataChangedEvent( IClientNetworkable *ent, DataUpdateType_t updateType, int *pStoredEvent )
+	CDataChangedEvent( IEngineObjectClient *ent, DataUpdateType_t updateType, int *pStoredEvent )
 	{
 		m_pEntity = ent;
 		m_UpdateType = updateType;
 		m_pStoredEvent = pStoredEvent;
 	}
 
-	IClientNetworkable	*m_pEntity;
+	IEngineObjectClient	*m_pEntity;
 	DataUpdateType_t	m_UpdateType;
 	int					*m_pStoredEvent;
 };
@@ -2147,7 +2147,7 @@ void SimulateEntities()
 }
 
 
-bool AddDataChangeEvent( IClientNetworkable *ent, DataUpdateType_t updateType, int *pStoredEvent )
+bool AddDataChangeEvent( IEngineObjectClient *ent, DataUpdateType_t updateType, int *pStoredEvent )
 {
 	VPROF( "AddDataChangeEvent" );
 
@@ -2189,7 +2189,7 @@ void ProcessOnDataChangedEvents()
 		*pEvent->m_pStoredEvent = -1;
 
 		// Send the event.
-		IClientNetworkable *pNetworkable = pEvent->m_pEntity;
+		IEngineObjectClient *pNetworkable = pEvent->m_pEntity;
 		pNetworkable->OnDataChanged( pEvent->m_UpdateType );
 	}
 

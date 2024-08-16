@@ -94,16 +94,21 @@ CBaseCombatWeapon::CBaseCombatWeapon() : BASECOMBATWEAPON_DERIVED_FROM()
 
 	m_hWeaponFileInfo = GetInvalidWeaponInfoHandle();
 
-#if defined( TF_DLL )
-	UseClientSideAnimation();
-#endif
-
 #if defined ( TF_CLIENT_DLL ) || defined ( TF_DLL )
 	m_flCritTokenBucket = tf_weapon_criticals_bucket_default.GetFloat();
 	m_nCritChecks = 1;
 	m_nCritSeedRequests = 0;
 #endif // TF
 }
+
+#ifdef GAME_DLL
+void CBaseCombatWeapon::PostConstructor(const char* szClassname, int iForceEdictIndex) {
+	BaseClass::PostConstructor(szClassname, iForceEdictIndex);
+#if defined( TF_DLL )
+	GetEngineObject()->UseClientSideAnimation();
+#endif
+}
+#endif // GAME_DLL
 
 //-----------------------------------------------------------------------------
 // Purpose: Destructor

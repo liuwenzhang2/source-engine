@@ -551,9 +551,9 @@ void CNewRecharge::StudioFrameAdvance( void )
 	}
 
 	// Latch prev
-	m_flPrevAnimTime = m_flAnimTime;
+	m_flPrevAnimTime = GetEngineObject()->GetAnimTime();
 	// Set current
-	m_flAnimTime = gpGlobals->curtime;
+	GetEngineObject()->SetAnimTime(gpGlobals->curtime);
 }
 
 

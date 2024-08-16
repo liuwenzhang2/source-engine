@@ -242,6 +242,7 @@ public:
 	CCSPlayer();
 	~CCSPlayer();
 
+	virtual void PostConstructor(const char* szClassname, int iForceEdictIndex);
 	static CCSPlayer *CreatePlayer( const char *className, int ed );
 	static CCSPlayer* Instance( int iEnt );
 

@@ -115,72 +115,6 @@ void* CEntityNetworkProperty::GetDataTableBasePtr() {
 	return m_pOuter;
 }
 
-// This table encodes edict data.
-void SendProxy_AnimTime( const SendProp *pProp, const void *pStruct, const void *pVarData, DVariant *pOut, int iElement, int objectID )
-{
-	CBaseEntity *pEntity = (CBaseEntity *)pStruct;
-
-#if defined( _DEBUG )
-	CBaseAnimating *pAnimating = pEntity->GetBaseAnimating();
-	Assert( pAnimating );
-
-	if ( pAnimating )
-	{
-		Assert( !pAnimating->IsUsingClientSideAnimation() );
-	}
-#endif
-	
-	int ticknumber = TIME_TO_TICKS( pEntity->m_flAnimTime );
-	// Tickbase is current tick rounded down to closes 100 ticks
-	int tickbase = gpGlobals->GetNetworkBase( gpGlobals->tickcount, pEntity->entindex() );
-	int addt = 0;
-	// If it's within the last tick interval through the current one, then we can encode it
-	if ( ticknumber >= ( tickbase - 100 ) )
-	{
-		addt = ( ticknumber - tickbase ) & 0xFF;
-	}
-
-	pOut->m_Int = addt;
-}
-
-// This table encodes edict data.
-void SendProxy_SimulationTime( const SendProp *pProp, const void *pStruct, const void *pVarData, DVariant *pOut, int iElement, int objectID )
-{
-	CBaseEntity *pEntity = (CBaseEntity *)pStruct;
-
-	int ticknumber = TIME_TO_TICKS( pEntity->m_flSimulationTime );
-	// tickbase is current tick rounded down to closest 100 ticks
-	int tickbase = gpGlobals->GetNetworkBase( gpGlobals->tickcount, pEntity->entindex() );
-	int addt = 0;
-	if ( ticknumber >= tickbase )
-	{
-		addt = ( ticknumber - tickbase ) & 0xff;
-	}
-
-	pOut->m_Int = addt;
-}
-
-void* SendProxy_ClientSideAnimation( const SendProp *pProp, const void *pStruct, const void *pVarData, CSendProxyRecipients *pRecipients, int objectID )
-{
-	CBaseEntity *pEntity = (CBaseEntity *)pStruct;
-	CBaseAnimating *pAnimating = pEntity->GetBaseAnimating();
-
-	if ( pAnimating && !pAnimating->IsUsingClientSideAnimation() )
-		return (void*)pVarData;
-	else
-		return NULL;	// Don't send animtime unless the client needs it.
-}	
-REGISTER_SEND_PROXY_NON_MODIFIED_POINTER( SendProxy_ClientSideAnimation );
-
-
-BEGIN_SEND_TABLE_NOBASE( CBaseEntity, DT_AnimTimeMustBeFirst )
-	// NOTE:  Animtime must be sent before origin and angles ( from pev ) because it has a 
-	//  proxy on the client that stores off the old values before writing in the new values and
-	//  if it is sent after the new values, then it will only have the new origin and studio model, etc.
-	//  interpolation will be busted
-	SendPropInt	(SENDINFO(m_flAnimTime), 8, SPROP_UNSIGNED|SPROP_CHANGES_OFTEN|SPROP_ENCODED_AGAINST_TICKCOUNT, SendProxy_AnimTime),
-END_SEND_TABLE()
-
 //#if !defined( NO_ENTITY_PREDICTION )
 //BEGIN_SEND_TABLE_NOBASE( CBaseEntity, DT_PredictableId )
 //	SendPropPredictableId( SENDINFO( m_PredictableID ) ),
@@ -203,17 +137,8 @@ END_SEND_TABLE()
 //#endif
 
 
-
-
-
-
-
-
 // This table encodes the CBaseEntity data.
 IMPLEMENT_SERVERCLASS_ST_NOBASE( CBaseEntity, DT_BaseEntity )
-	SendPropDataTable( "AnimTimeMustBeFirst", 0, &REFERENCE_SEND_TABLE(DT_AnimTimeMustBeFirst), SendProxy_ClientSideAnimation ),
-	SendPropInt			(SENDINFO(m_flSimulationTime),	SIMULATION_TIME_WINDOW_BITS, SPROP_UNSIGNED|SPROP_CHANGES_OFTEN|SPROP_ENCODED_AGAINST_TICKCOUNT, SendProxy_SimulationTime),
-
 	SendPropInt		(SENDINFO( m_ubInterpolationFrame ), NOINTERP_PARITY_MAX_BITS, SPROP_UNSIGNED ),
 	SendPropInt		(SENDINFO(m_nRenderFX),		8, SPROP_UNSIGNED ),
 	SendPropInt		(SENDINFO(m_nRenderMode),	8, SPROP_UNSIGNED ),
@@ -1488,8 +1413,8 @@ BEGIN_DATADESC_NO_BASE( CBaseEntity )
 
 	// Consider moving to CBaseAnimating?
 	DEFINE_FIELD( m_flPrevAnimTime, FIELD_TIME ),
-	DEFINE_FIELD( m_flAnimTime, FIELD_TIME ),
-	DEFINE_FIELD( m_flSimulationTime, FIELD_TIME ),
+	//DEFINE_FIELD( m_flAnimTime, FIELD_TIME ),
+	//DEFINE_FIELD( m_flSimulationTime, FIELD_TIME ),
 	//DEFINE_FIELD( m_nLastThinkTick, FIELD_TICK ),
 
 	//DEFINE_KEYFIELD( m_nNextThinkTick, FIELD_TICK, "nextthink" ),

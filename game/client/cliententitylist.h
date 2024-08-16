@@ -113,14 +113,10 @@ public:
 	RecvTable* GetRecvTable();
 	//ClientClass* GetClientClass() { return NULL; }
 	void* GetDataTableBasePtr() { return this; }
-	void NotifyShouldTransmit(ShouldTransmitState_t state) {}
-	void OnPreDataChanged(DataUpdateType_t updateType) {}
-	void OnDataChanged(DataUpdateType_t updateType) {}
-	void PreDataUpdate(DataUpdateType_t updateType) {}
-	void PostDataUpdate(DataUpdateType_t updateType) {}
-	bool IsDormant(void) { return false; }
-	void ReceiveMessage(int classID, bf_read& msg) {}
-	void SetDestroyedOnRecreateEntities(void) {}
+	void NotifyShouldTransmit(ShouldTransmitState_t state) { m_pOuter->NotifyShouldTransmit(state); }
+	bool IsDormant(void) { return m_pOuter->IsDormant(); }
+	void ReceiveMessage(int classID, bf_read& msg) { m_pOuter->ReceiveMessage(classID, msg); }
+	void SetDestroyedOnRecreateEntities(void) { m_pOuter->SetDestroyedOnRecreateEntities(); }
 
 	// memory handling, uses calloc so members are zero'd out on instantiation
 	void* operator new(size_t stAllocateBlock);
@@ -178,10 +174,28 @@ public:
 		m_rgflCoordinateFrame[0][0] = 1.0f;
 		m_rgflCoordinateFrame[1][1] = 1.0f;
 		m_rgflCoordinateFrame[2][2] = 1.0f;
+		m_flAnimTime = 0;
+		m_flSimulationTime = 0;
+		m_flProxyRandomValue = 0.0f;
+		m_DataChangeEventRef = -1;
+		// Assume false.  Derived classes might fill in a receive table entry
+// and in that case this would show up as true
+		m_bClientSideAnimation = false;
+	}
+
+	~C_EngineObjectInternal()
+	{
+		ClearDataChangedEvent(m_DataChangeEventRef);
 	}
 
 	void Init(C_BaseEntity* pOuter) {
 		m_pOuter = pOuter;
+		m_nCreationTick = gpGlobals->tickcount;
+		CreatePartitionHandle();
+	}
+
+	IClientEntity* GetClientEntity() {
+		return m_pOuter;
 	}
 
 	C_BaseEntity* GetOuter() {
@@ -398,6 +412,9 @@ public:
 		m_nLastThinkTick = gpGlobals->tickcount;
 		SetMoveCollide(MOVECOLLIDE_DEFAULT);
 		SetMoveType(MOVETYPE_NONE);
+		m_flAnimTime = 0;
+		m_flSimulationTime = 0;
+		m_nCreationTick = -1;
 	}
 
 	// Invalidates the abs state of all children
@@ -556,6 +573,45 @@ public:
 	bool IsFollowingEntity();
 	IEngineObjectClient* GetFollowedEntity();
 
+	// save out interpolated values
+	void PreDataUpdate(DataUpdateType_t updateType);
+	void PostDataUpdate(DataUpdateType_t updateType);
+	// This is called once per frame before any data is read in from the server.
+	void OnPreDataChanged(DataUpdateType_t type);
+	// This event is triggered during the simulation phase if an entity's data has changed. It is 
+// better to hook this instead of PostDataUpdate() because in PostDataUpdate(), server entity origins
+// are incorrect and attachment points can't be used.
+	void OnDataChanged(DataUpdateType_t type);
+
+	// Call this in OnDataChanged if you don't chain it down!
+	void MarkMessageReceived();
+
+	// Gets the last message time
+	float GetLastMessageTime() const { return m_flLastMessageTime; }
+
+	// A random value 0-1 used by proxies to make sure they're not all in sync
+	float ProxyRandomValue() const { return m_flProxyRandomValue; }
+
+	// get network origin from previous update
+	const Vector& GetOldOrigin();
+
+	// The spawn time of this entity
+	float GetSpawnTime() const { return m_flSpawnTime; }
+
+	int GetCreationTick() const;
+
+	float GetAnimTime() const;
+	void SetAnimTime(float at);
+
+	float GetSimulationTime() const;
+	void SetSimulationTime(float st);
+	float GetLastChangeTime(int flags);
+	float GetOldSimulationTime() const;
+	int& DataChangeEventRef() { return m_DataChangeEventRef; }
+
+	void UseClientSideAnimation();
+	bool IsUsingClientSideAnimation() { return m_bClientSideAnimation; }
+
 private:
 
 	friend class C_BaseEntity;
@@ -644,6 +700,26 @@ private:
 	bool					m_bSimulatedEveryTick;
 	bool					m_bAnimatedEveryTick;
 
+	// Time animation sequence or frame was last changed
+	float							m_flAnimTime;
+	float							m_flOldAnimTime;
+
+	float							m_flSimulationTime;
+	float							m_flOldSimulationTime;
+	// The list that holds OnDataChanged events uses this to make sure we don't get multiple
+// OnDataChanged calls in the same frame if the client receives multiple packets.
+	int								m_DataChangeEventRef;
+	Vector							m_vecOldOrigin;
+	QAngle							m_vecOldAngRotation;
+	// Timestamp of message arrival
+	float							m_flLastMessageTime;
+	// A random value used by material proxies for each model instance.
+	float							m_flProxyRandomValue;
+	int								m_nCreationTick;
+	// The spawn time of the entity
+	float							m_flSpawnTime;
+	// Clientside animation
+	bool							m_bClientSideAnimation;
 };
 
 //-----------------------------------------------------------------------------
@@ -1179,6 +1255,31 @@ inline void C_EngineObjectInternal::SetAnimatedEveryTick(bool anim)
 		Interp_UpdateInterpolationAmounts();
 #endif
 	}
+}
+
+inline float C_EngineObjectInternal::GetAnimTime() const
+{
+	return m_flAnimTime;
+}
+
+inline float C_EngineObjectInternal::GetSimulationTime() const
+{
+	return m_flSimulationTime;
+}
+
+inline void C_EngineObjectInternal::SetAnimTime(float at)
+{
+	m_flAnimTime = at;
+}
+
+inline void C_EngineObjectInternal::SetSimulationTime(float st)
+{
+	m_flSimulationTime = st;
+}
+
+inline float C_EngineObjectInternal::GetOldSimulationTime() const
+{
+	return m_flOldSimulationTime;
 }
 
 // Use this to iterate over *all* (even dormant) the C_BaseEntities in the client entity list.

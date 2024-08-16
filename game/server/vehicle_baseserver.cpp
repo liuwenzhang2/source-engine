@@ -1060,7 +1060,7 @@ void CBaseServerVehicle::HandlePassengerEntry( CBaseCombatCharacter *pPassenger,
 			{
 				// Setup the "enter" vehicle sequence and skip the animation if it isn't present.
 				pAnimating->SetCycle( 0 );
-				pAnimating->m_flAnimTime = gpGlobals->curtime;
+				pAnimating->GetEngineObject()->SetAnimTime(gpGlobals->curtime);
 				pAnimating->ResetSequence( iEntryAnim );
 				pAnimating->ResetClientsideFrame();
 				pAnimating->InvalidateBoneCache();	// This is necessary because we need to query attachment points this frame for blending!
@@ -1125,7 +1125,7 @@ bool CBaseServerVehicle::HandlePassengerExit( CBaseCombatCharacter *pPassenger )
 			if ( pAnimating )
 			{
 				pAnimating->SetCycle( 0 );
-				pAnimating->m_flAnimTime = gpGlobals->curtime;
+				pAnimating->GetEngineObject()->SetAnimTime(gpGlobals->curtime);
 				pAnimating->ResetSequence( iSequence );
 				pAnimating->ResetClientsideFrame();
 				GetDrivableVehicle()->SetVehicleExitAnim( true, vecExitPoint );
@@ -1490,7 +1490,7 @@ void CBaseServerVehicle::HandleEntryExitFinish( bool bExitAnimOn, bool bResetAni
 		if ( iSequence > ACTIVITY_NOT_AVAILABLE )
 		{
 			pAnimating->SetCycle( 0 );
-			pAnimating->m_flAnimTime = gpGlobals->curtime;
+			pAnimating->GetEngineObject()->SetAnimTime(gpGlobals->curtime);
 			pAnimating->ResetSequence( iSequence );
 			pAnimating->ResetClientsideFrame();
 		}

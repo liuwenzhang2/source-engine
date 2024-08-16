@@ -28,6 +28,7 @@ public:
 	DECLARE_DATADESC();
 
 	CEnvParticleScript();
+	virtual void PostConstructor(const char* szClassname, int iForceEdictIndex);
 
 	virtual void Precache();
 	virtual void Spawn();
@@ -72,7 +73,12 @@ END_SEND_TABLE()
 //-----------------------------------------------------------------------------
 CEnvParticleScript::CEnvParticleScript()
 {
-	UseClientSideAnimation();
+	
+}
+
+void CEnvParticleScript::PostConstructor(const char* szClassname, int iForceEdictIndex) {
+	BaseClass::PostConstructor(szClassname, iForceEdictIndex);
+	GetEngineObject()->UseClientSideAnimation();
 }
 
 

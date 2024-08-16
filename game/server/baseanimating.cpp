@@ -180,7 +180,7 @@ BEGIN_DATADESC( CBaseAnimating )
 //	DEFINE_FIELD( m_BoneSetupMutex, CThreadFastMutex ),
 	DEFINE_CUSTOM_FIELD( m_pIk, &s_IKSaveRestoreOp ),
 	DEFINE_FIELD( m_iIKCounter, FIELD_INTEGER ),
-	DEFINE_FIELD( m_bClientSideAnimation, FIELD_BOOLEAN ),
+	//DEFINE_FIELD( m_bClientSideAnimation, FIELD_BOOLEAN ),
 	DEFINE_FIELD( m_bClientSideFrameReset, FIELD_BOOLEAN ),
 	DEFINE_FIELD( m_nNewSequenceParity, FIELD_INTEGER ),
 	DEFINE_FIELD( m_nResetEventsParity, FIELD_INTEGER ),
@@ -220,10 +220,25 @@ BEGIN_DATADESC( CBaseAnimating )
 // Sendtable for fields we don't want to send to clientside animating entities
 BEGIN_SEND_TABLE_NOBASE( CBaseAnimating, DT_ServerAnimationData )
 	// ANIMATION_CYCLE_BITS is defined in shareddefs.h
-	SendPropFloat	(SENDINFO(m_flCycle),		ANIMATION_CYCLE_BITS, SPROP_CHANGES_OFTEN|SPROP_ROUNDDOWN,	0.0f,   1.0f)
+	SendPropFloat	(SENDINFO(m_flCycle),		ANIMATION_CYCLE_BITS, SPROP_CHANGES_OFTEN|SPROP_ROUNDDOWN,	0.0f,   1.0f),
+	SendPropArray3(SENDINFO_ARRAY3(m_flPoseParameter), SendPropFloat(SENDINFO_ARRAY(m_flPoseParameter), ANIMATION_POSEPARAMETER_BITS, 0, 0.0f, 1.0f)),
+	SendPropFloat(SENDINFO(m_flPlaybackRate), ANIMATION_PLAYBACKRATE_BITS, SPROP_ROUNDUP, -4.0, 12.0f), // NOTE: if this isn't a power of 2 than "1.0" can't be encoded correctly
+	SendPropInt(SENDINFO(m_nSequence), ANIMATION_SEQUENCE_BITS, SPROP_UNSIGNED),
+	SendPropInt(SENDINFO(m_nNewSequenceParity), EF_PARITY_BITS, SPROP_UNSIGNED),
+	SendPropInt(SENDINFO(m_nResetEventsParity), EF_PARITY_BITS, SPROP_UNSIGNED),
+	SendPropInt(SENDINFO(m_nMuzzleFlashParity), EF_MUZZLEFLASH_BITS, SPROP_UNSIGNED),
+
 END_SEND_TABLE()
 
-void *SendProxy_ClientSideAnimation( const SendProp *pProp, const void *pStruct, const void *pVarData, CSendProxyRecipients *pRecipients, int objectID );
+void* SendProxy_ClientSideAnimationE(const SendProp* pProp, const void* pStruct, const void* pVarData, CSendProxyRecipients* pRecipients, int objectID)
+{
+	CBaseEntity* pEntity = (CBaseEntity*)pStruct;
+
+	if (!pEntity->GetEngineObject()->IsUsingClientSideAnimation())
+		return (void*)pVarData;
+	else
+		return NULL;	// Don't send animtime unless the client needs it.
+}
 
 // SendTable stuff.
 IMPLEMENT_SERVERCLASS_ST(CBaseAnimating, DT_BaseAnimating)
@@ -237,24 +252,17 @@ IMPLEMENT_SERVERCLASS_ST(CBaseAnimating, DT_BaseAnimating)
 
 	SendPropFloat	( SENDINFO(m_flModelScale) ),
 
-	SendPropArray3  ( SENDINFO_ARRAY3(m_flPoseParameter), SendPropFloat(SENDINFO_ARRAY(m_flPoseParameter), ANIMATION_POSEPARAMETER_BITS, 0, 0.0f, 1.0f ) ),
 	
-	SendPropInt		( SENDINFO(m_nSequence), ANIMATION_SEQUENCE_BITS, SPROP_UNSIGNED ),
-	SendPropFloat	( SENDINFO(m_flPlaybackRate), ANIMATION_PLAYBACKRATE_BITS, SPROP_ROUNDUP, -4.0, 12.0f ), // NOTE: if this isn't a power of 2 than "1.0" can't be encoded correctly
 
 	SendPropArray3 	(SENDINFO_ARRAY3(m_flEncodedController), SendPropFloat(SENDINFO_ARRAY(m_flEncodedController), 11, SPROP_ROUNDDOWN, 0.0f, 1.0f ) ),
 
-	SendPropInt( SENDINFO( m_bClientSideAnimation ), 1, SPROP_UNSIGNED ),
 	SendPropInt( SENDINFO( m_bClientSideFrameReset ), 1, SPROP_UNSIGNED ),
 
-	SendPropInt( SENDINFO( m_nNewSequenceParity ), EF_PARITY_BITS, SPROP_UNSIGNED ),
-	SendPropInt( SENDINFO( m_nResetEventsParity ), EF_PARITY_BITS, SPROP_UNSIGNED ),
-	SendPropInt( SENDINFO( m_nMuzzleFlashParity ), EF_MUZZLEFLASH_BITS, SPROP_UNSIGNED ),
 
 	SendPropEHandle( SENDINFO( m_hLightingOrigin ) ),
 	SendPropEHandle( SENDINFO( m_hLightingOriginRelative ) ),
 
-	SendPropDataTable( "serveranimdata", 0, &REFERENCE_SEND_TABLE( DT_ServerAnimationData ), SendProxy_ClientSideAnimation ),
+	SendPropDataTable( "serveranimdata", 0, &REFERENCE_SEND_TABLE( DT_ServerAnimationData ), SendProxy_ClientSideAnimationE),
 
 	// Fading
 	SendPropFloat( SENDINFO( m_fadeMinDist ), 0, SPROP_NOSCALE ),
@@ -270,7 +278,6 @@ CBaseAnimating::CBaseAnimating()
 	m_nForceBone = 0;
 
 	//m_bResetSequenceInfoOnLoad = false;
-	m_bClientSideAnimation = false;
 	m_pIk = NULL;
 	m_iIKCounter = 0;
 
@@ -278,7 +285,6 @@ CBaseAnimating::CBaseAnimating()
 
 	m_flModelScale = 1.0f;
 	// initialize anim clock
-	m_flAnimTime = gpGlobals->curtime;
 	m_flPrevAnimTime = gpGlobals->curtime;
 	m_nNewSequenceParity = 0;
 	m_nResetEventsParity = 0;
@@ -288,6 +294,11 @@ CBaseAnimating::CBaseAnimating()
 	m_fadeMaxDist = 0;
 	m_flFadeScale = 0.0f;
 	m_fBoneCacheFlags = 0;
+}
+
+void CBaseAnimating::PostConstructor(const char* szClassname, int iForceEdictIndex) {
+	BaseClass::PostConstructor(szClassname, iForceEdictIndex);
+	GetEngineObject()->SetAnimTime(gpGlobals->curtime);
 }
 
 void CBaseAnimating::UpdateOnRemove(void) {
@@ -387,12 +398,7 @@ void CBaseAnimating::Spawn()
 	InitStepHeightAdjust();
 }
 
-//-----------------------------------------------------------------------------
-//-----------------------------------------------------------------------------
-void CBaseAnimating::UseClientSideAnimation()
-{
-	m_bClientSideAnimation = true;
-}
+
 
 #define MAX_ANIMTIME_INTERVAL 0.2f
 
@@ -403,15 +409,15 @@ void CBaseAnimating::UseClientSideAnimation()
 float CBaseAnimating::GetAnimTimeInterval( void ) const
 {
 	float flInterval;
-	if (m_flAnimTime < gpGlobals->curtime)
+	if (GetEngineObject()->GetAnimTime() < gpGlobals->curtime)
 	{
 		// estimate what it'll be this frame
-		flInterval = clamp( gpGlobals->curtime - m_flAnimTime, 0.f, MAX_ANIMTIME_INTERVAL );
+		flInterval = clamp( gpGlobals->curtime - GetEngineObject()->GetAnimTime(), 0.f, MAX_ANIMTIME_INTERVAL);
 	}
 	else
 	{
 		// report actual
-		flInterval = clamp( m_flAnimTime - m_flPrevAnimTime, 0.f, MAX_ANIMTIME_INTERVAL );
+		flInterval = clamp(GetEngineObject()->GetAnimTime() - m_flPrevAnimTime, 0.f, MAX_ANIMTIME_INTERVAL);
 	}
 	return flInterval;
 }
@@ -476,8 +482,8 @@ void CBaseAnimating::StudioFrameAdvanceManual( float flInterval )
 		return;
 
 	UpdateModelScale();
-	m_flAnimTime = gpGlobals->curtime;
-	m_flPrevAnimTime = m_flAnimTime - flInterval;
+	GetEngineObject()->SetAnimTime(gpGlobals->curtime);
+	m_flPrevAnimTime = GetEngineObject()->GetAnimTime() - flInterval;
 	float flCycleRate = GetSequenceCycleRate( pStudioHdr, GetSequence() ) * m_flPlaybackRate;
 	StudioFrameAdvanceInternal( GetModelPtr(), flInterval * flCycleRate );
 }
@@ -499,11 +505,11 @@ void CBaseAnimating::StudioFrameAdvance()
 
 	if ( !m_flPrevAnimTime )
 	{
-		m_flPrevAnimTime = m_flAnimTime;
+		m_flPrevAnimTime = GetEngineObject()->GetAnimTime();
 	}
 
 	// Time since last animation
-	float flInterval = gpGlobals->curtime - m_flAnimTime;
+	float flInterval = gpGlobals->curtime - GetEngineObject()->GetAnimTime();
 	flInterval = clamp( flInterval, 0.f, MAX_ANIMTIME_INTERVAL );
 
 	//Msg( "%i %s interval %f\n", entindex(), GetClassname(), flInterval );
@@ -514,9 +520,9 @@ void CBaseAnimating::StudioFrameAdvance()
 	}
 
 	// Latch prev
-	m_flPrevAnimTime = m_flAnimTime;
+	m_flPrevAnimTime = GetEngineObject()->GetAnimTime();
 	// Set current
-	m_flAnimTime = gpGlobals->curtime;
+	GetEngineObject()->SetAnimTime(gpGlobals->curtime);
 
 	// Drive cycle
 	float flCycleRate = GetSequenceCycleRate( pStudioHdr, GetSequence() ) * m_flPlaybackRate;
@@ -1105,7 +1111,7 @@ void CBaseAnimating::DispatchAnimEvents ( CBaseAnimating *eventHandler )
 			{
 				flCycle = flCycle - 1.0;
 			}
-			event.eventtime = m_flAnimTime + (flCycle - GetCycle()) / flCycleRate + GetAnimTimeInterval();
+			event.eventtime = GetEngineObject()->GetAnimTime() + (flCycle - GetCycle()) / flCycleRate + GetAnimTimeInterval();
 		}
 
 		/*
@@ -2859,7 +2865,7 @@ int CBaseAnimating::DrawDebugTextOverlays(void)
 			text_offset++;
 		}
 
-		Q_snprintf(tempstr, sizeof(tempstr), "Cycle: %.5f (%.5f)", (float)GetCycle(), m_flAnimTime.Get() );
+		Q_snprintf(tempstr, sizeof(tempstr), "Cycle: %.5f (%.5f)", (float)GetCycle(), GetEngineObject()->GetAnimTime());
 		EntityText(text_offset,tempstr,0);
 		text_offset++;
 	}
@@ -3220,7 +3226,7 @@ void CBaseAnimating::CopyAnimationDataFrom( CBaseAnimating *pSource )
 	this->GetEngineObject()->SetEffects( pSource->GetEngineObject()->GetEffects() );
 	this->IncrementInterpolationFrame();
 	this->SetSequence( pSource->GetSequence() );
-	this->m_flAnimTime = pSource->m_flAnimTime;
+	this->GetEngineObject()->SetAnimTime(pSource->GetEngineObject()->GetAnimTime());
 	this->m_nBody = pSource->m_nBody;
 	this->m_nSkin = pSource->m_nSkin;
 	this->LockStudioHdr();

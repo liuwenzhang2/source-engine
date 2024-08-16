@@ -145,19 +145,14 @@ const unsigned int FCLIENTANIM_SEQUENCE_CYCLE = 0x00000001;
 
 static CUtlVector< clientanimating_t >	g_ClientSideAnimationList;
 
-BEGIN_RECV_TABLE_NOBASE( C_BaseAnimating, DT_ServerAnimationData )
-	RecvPropFloat(RECVINFO(m_flCycle)),
-END_RECV_TABLE()
-
-
-void RecvProxy_Sequence( const CRecvProxyData *pData, void *pStruct, void *pOut )
+void RecvProxy_Sequence(const CRecvProxyData* pData, void* pStruct, void* pOut)
 {
 	// Have the regular proxy store the data.
-	RecvProxy_Int32ToInt32( pData, pStruct, pOut );
+	RecvProxy_Int32ToInt32(pData, pStruct, pOut);
 
-	C_BaseAnimating *pAnimating = (C_BaseAnimating *)pStruct;
+	C_BaseAnimating* pAnimating = (C_BaseAnimating*)pStruct;
 
-	if ( !pAnimating )
+	if (!pAnimating)
 		return;
 
 	pAnimating->SetReceivedSequence();
@@ -166,8 +161,19 @@ void RecvProxy_Sequence( const CRecvProxyData *pData, void *pStruct, void *pOut 
 	pAnimating->UpdateVisibility();
 }
 
-IMPLEMENT_CLIENTCLASS_DT(C_BaseAnimating, DT_BaseAnimating, CBaseAnimating)
+BEGIN_RECV_TABLE_NOBASE( C_BaseAnimating, DT_ServerAnimationData )
+	RecvPropFloat(RECVINFO(m_flCycle)),
+	RecvPropArray3(RECVINFO_ARRAY(m_flPoseParameter), RecvPropFloat(RECVINFO(m_flPoseParameter[0]))),
+	RecvPropFloat(RECVINFO(m_flPlaybackRate)),
 	RecvPropInt(RECVINFO(m_nSequence), 0, RecvProxy_Sequence),
+	RecvPropInt(RECVINFO(m_nNewSequenceParity)),
+	RecvPropInt(RECVINFO(m_nResetEventsParity)),
+	RecvPropInt(RECVINFO(m_nMuzzleFlashParity)),
+
+END_RECV_TABLE()
+
+
+IMPLEMENT_CLIENTCLASS_DT(C_BaseAnimating, DT_BaseAnimating, CBaseAnimating)
 	RecvPropInt(RECVINFO(m_nForceBone)),
 	RecvPropVector(RECVINFO(m_vecForce)),
 	RecvPropInt(RECVINFO(m_nSkin)),
@@ -178,18 +184,12 @@ IMPLEMENT_CLIENTCLASS_DT(C_BaseAnimating, DT_BaseAnimating, CBaseAnimating)
 	RecvPropFloat(RECVINFO_NAME(m_flModelScale, m_flModelWidthScale)), // for demo compatibility only
 
 //	RecvPropArray(RecvPropFloat(RECVINFO(m_flPoseParameter[0])), m_flPoseParameter),
-	RecvPropArray3(RECVINFO_ARRAY(m_flPoseParameter), RecvPropFloat(RECVINFO(m_flPoseParameter[0])) ),
 	
-	RecvPropFloat(RECVINFO(m_flPlaybackRate)),
 
 	RecvPropArray3( RECVINFO_ARRAY(m_flEncodedController), RecvPropFloat(RECVINFO(m_flEncodedController[0]))),
 
-	RecvPropInt( RECVINFO( m_bClientSideAnimation )),
 	RecvPropInt( RECVINFO( m_bClientSideFrameReset )),
 
-	RecvPropInt( RECVINFO( m_nNewSequenceParity )),
-	RecvPropInt( RECVINFO( m_nResetEventsParity )),
-	RecvPropInt( RECVINFO( m_nMuzzleFlashParity ) ),
 
 	RecvPropEHandle(RECVINFO(m_hLightingOrigin)),
 	RecvPropEHandle(RECVINFO(m_hLightingOriginRelative)),
@@ -707,9 +707,7 @@ C_BaseAnimating::C_BaseAnimating() :
 
 	m_pIk = NULL;
 
-	// Assume false.  Derived classes might fill in a receive table entry
-	// and in that case this would show up as true
-	m_bClientSideAnimation = false;
+
 
 	m_nPrevNewSequenceParity = -1;
 	m_nPrevResetEventsParity = -1;
@@ -856,13 +854,7 @@ void C_BaseAnimating::SetPredictable( bool state )
 	UpdateRelevantInterpolatedVars();
 }
 
-//-----------------------------------------------------------------------------
-// Purpose: sets client side animation
-//-----------------------------------------------------------------------------
-void C_BaseAnimating::UseClientSideAnimation()
-{
-	m_bClientSideAnimation = true;
-}
+
 
 void C_BaseAnimating::UpdateRelevantInterpolatedVars()
 {
@@ -885,7 +877,7 @@ void C_BaseAnimating::AddBaseAnimatingInterpolatedVars()
 	GetEngineObject()->AddVar( &m_iv_flPoseParameter, true );//LATCH_ANIMATION_VAR, 
 	
 	int flags = LATCH_ANIMATION_VAR;
-	if ( m_bClientSideAnimation )
+	if (GetEngineObject()->IsUsingClientSideAnimation())
 		flags |= EXCLUDE_AUTO_INTERPOLATE;
 	m_iv_flCycle.GetType() = flags;
 		
@@ -1598,7 +1590,7 @@ void C_BaseAnimating::ApplyBoneMatrixTransform( matrix3x4_t& transform )
 		{
 			float scale;
 			
-			scale = 1.0 + (gpGlobals->curtime - m_flAnimTime) * 10.0;
+			scale = 1.0 + (gpGlobals->curtime - GetEngineObject()->GetAnimTime()) * 10.0;
 			if ( scale > 2 )	// Don't blow up more than 200%
 				scale = 2;
 			transform[0][1] *= scale;
@@ -4207,7 +4199,7 @@ void C_BaseAnimating::FireObsoleteEvent( const Vector& origin, const QAngle& ang
 //-----------------------------------------------------------------------------
 bool C_BaseAnimating::IsSelfAnimating()
 {
-	if ( m_bClientSideAnimation )
+	if (GetEngineObject()->IsUsingClientSideAnimation())
 		return true;
 
 	// Yes, we use animtime.
@@ -4262,7 +4254,7 @@ bool C_BaseAnimating::Interpolate( float flCurrentTime )
 	float flOldCycle = GetCycle();
 	int nChangeFlags = 0;
 
-	if ( !m_bClientSideAnimation )
+	if ( !GetEngineObject()->IsUsingClientSideAnimation())
 		m_iv_flCycle.SetLooping( IsSequenceLooping( GetSequence() ) );
 
 	int bNoMoreChanges;
@@ -4481,7 +4473,7 @@ void C_BaseAnimating::PostDataUpdate( DataUpdateType_t updateType )
 {
 	BaseClass::PostDataUpdate( updateType );
 
-	if ( m_bClientSideAnimation )
+	if (GetEngineObject()->IsUsingClientSideAnimation())
 	{
 		SetCycle( m_flOldCycle );
 		AddToClientSideAnimationList();
@@ -4523,7 +4515,7 @@ void C_BaseAnimating::PostDataUpdate( DataUpdateType_t updateType )
 
 	if ( bAnimationChanged || bSequenceChanged )
 	{
-		if ( m_bClientSideAnimation )
+		if (GetEngineObject()->IsUsingClientSideAnimation())
 		{
 			ClientSideAnimationChanged();
 		}
@@ -4788,7 +4780,7 @@ void C_BaseAnimating::OnDataChanged( DataUpdateType_t updateType )
 	}
 
 	// Only need to think if animating client side
-	if ( m_bClientSideAnimation )
+	if (GetEngineObject()->IsUsingClientSideAnimation())
 	{
 		// Check to see if we should reset our frame
 		if ( m_bClientSideFrameReset != m_bLastClientSideFrameReset )
@@ -4878,7 +4870,7 @@ int C_BaseAnimating::LookupRandomAttachment( const char *pAttachmentNameSubstrin
 
 void C_BaseAnimating::ClientSideAnimationChanged()
 {
-	if ( !m_bClientSideAnimation || m_ClientSideAnimationListHandle == INVALID_CLIENTSIDEANIMATION_LIST_HANDLE )
+	if ( !GetEngineObject()->IsUsingClientSideAnimation() || m_ClientSideAnimationListHandle == INVALID_CLIENTSIDEANIMATION_LIST_HANDLE )
 		return;
 
 	MDLCACHE_CRITICAL_SECTION();
@@ -4903,7 +4895,7 @@ unsigned int C_BaseAnimating::ComputeClientSideAnimationFlags()
 void C_BaseAnimating::UpdateClientSideAnimation()
 {
 	// Update client side animation
-	if ( m_bClientSideAnimation )
+	if (GetEngineObject()->IsUsingClientSideAnimation())
 	{
 		Assert( m_ClientSideAnimationListHandle != INVALID_CLIENTSIDEANIMATION_LIST_HANDLE );
 		if ( GetSequence() != -1 )
@@ -5036,7 +5028,7 @@ float C_BaseAnimating::GetAnimTimeInterval( void ) const
 {
 #define MAX_ANIMTIME_INTERVAL 0.2f
 
-	float flInterval = MIN( gpGlobals->curtime - m_flAnimTime, MAX_ANIMTIME_INTERVAL );
+	float flInterval = MIN( gpGlobals->curtime - GetEngineObject()->GetAnimTime(), MAX_ANIMTIME_INTERVAL);
 	return flInterval;
 }
 
@@ -5071,7 +5063,7 @@ void C_BaseAnimating::SetSequence( int nSequence )
 
 		m_nSequence = nSequence; 
 		GetEngineObject()->InvalidatePhysicsRecursive( ANIMATION_CHANGED );
-		if ( m_bClientSideAnimation )
+		if (GetEngineObject()->IsUsingClientSideAnimation())
 		{
 			ClientSideAnimationChanged();
 		}
@@ -5084,7 +5076,7 @@ void C_BaseAnimating::SetSequence( int nSequence )
 //=========================================================
 void C_BaseAnimating::StudioFrameAdvance()
 {
-	if ( m_bClientSideAnimation )
+	if (GetEngineObject()->IsUsingClientSideAnimation())
 		return;
 
 	IStudioHdr *hdr = GetModelPtr();
@@ -5116,11 +5108,11 @@ void C_BaseAnimating::StudioFrameAdvance()
 	//anim.prevanimtime = m_flAnimTime;
 	float cycleAdvance = flInterval * GetSequenceCycleRate( hdr, GetSequence() ) * m_flPlaybackRate;
 	float flNewCycle = GetCycle() + cycleAdvance;
-	m_flAnimTime = gpGlobals->curtime;
+	GetEngineObject()->SetAnimTime(gpGlobals->curtime);
 
 	if ( watch )
 	{
-		Msg("%s %6.3f : %6.3f (%.3f)\n", GetClassname(), gpGlobals->curtime, m_flAnimTime, flInterval );
+		Msg("%s %6.3f : %6.3f (%.3f)\n", GetClassname(), gpGlobals->curtime, GetEngineObject()->GetAnimTime(), flInterval);
 	}
 
 	if ( flNewCycle < 0.0f || flNewCycle >= 1.0f ) 
@@ -5243,14 +5235,14 @@ float C_BaseAnimating::FrameAdvance( float flInterval )
 
 	if (flInterval == 0.0f)
 	{
-		flInterval = ( curtime - m_flAnimTime );
+		flInterval = ( curtime - GetEngineObject()->GetAnimTime() );
 		if (flInterval <= 0.001f)
 		{
 			return 0.0f;
 		}
 	}
 
-	if ( !m_flAnimTime )
+	if ( !GetEngineObject()->GetAnimTime() )
 	{
 		flInterval = 0.0f;
 	}
@@ -5288,7 +5280,7 @@ float C_BaseAnimating::FrameAdvance( float flInterval )
 	}
 
 	float flNewCycle = GetCycle() + addcycle;
-	m_flAnimTime = curtime;
+	GetEngineObject()->SetAnimTime(curtime);
 
 	if ( bWatch )
 	{
@@ -6057,7 +6049,7 @@ void DevMsgRT( char const* pMsg, ... )
 
 void C_BaseAnimating::ForceClientSideAnimationOn()
 {
-	m_bClientSideAnimation = true;
+	GetEngineObject()->UseClientSideAnimation();
 	AddToClientSideAnimationList();
 }
 

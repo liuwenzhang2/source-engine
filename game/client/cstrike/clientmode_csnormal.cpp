@@ -831,7 +831,7 @@ void UpdateClassImageEntity(
 		pPlayerModel->SetPoseParameter( "body_yaw", 0.0f ); // body_yaw
 		pPlayerModel->SetPoseParameter( "move_y", 0.0f ); // move_y
 		pPlayerModel->SetPoseParameter( "move_x", 1.0f ); // move_x, walk forward
-		pPlayerModel->m_flAnimTime = gpGlobals->curtime;
+		pPlayerModel->GetEngineObject()->SetAnimTime(gpGlobals->curtime);
 
 		g_ClassImagePlayer = pPlayerModel;
 	}
@@ -848,7 +848,7 @@ void UpdateClassImageEntity(
 		pWeaponModel->InitializeAsClientEntity( pWeaponName, RENDER_GROUP_OPAQUE_ENTITY );
 		pWeaponModel->GetEngineObject()->AddEffects( EF_NODRAW ); // don't let the renderer draw the model normally
 		pWeaponModel->GetEngineObject()->FollowEntity( pPlayerModel->GetEngineObject()); // attach to player model
-		pWeaponModel->m_flAnimTime = gpGlobals->curtime;
+		pWeaponModel->GetEngineObject()->SetAnimTime(gpGlobals->curtime);
 		g_ClassImageWeapon = pWeaponModel;
 	}
 

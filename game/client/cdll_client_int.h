@@ -59,6 +59,7 @@ class IEngineReplay;
 class IEngineClientReplay;
 class IReplayScreenshotManager;
 class CSteamID;
+class IEngineObjectClient;
 
 //=============================================================================
 // HPE_BEGIN
@@ -135,7 +136,7 @@ extern class IClientPurchaseInterfaceV2 *g_pClientPurchaseInterface;
 
 
 // Returns true if a new OnDataChanged event is registered for this frame.
-bool AddDataChangeEvent( IClientNetworkable *ent, DataUpdateType_t updateType, int *pStoredEvent );
+bool AddDataChangeEvent( IEngineObjectClient *ent, DataUpdateType_t updateType, int *pStoredEvent );
 
 void ClearDataChangedEvent( int iStoredEvent );
 

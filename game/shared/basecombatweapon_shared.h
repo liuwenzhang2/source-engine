@@ -163,6 +163,9 @@ public:
 							CBaseCombatWeapon();
 	virtual 				~CBaseCombatWeapon();
 
+#ifdef GAME_DLL
+	virtual void PostConstructor(const char* szClassname, int iForceEdictIndex);
+#endif // GAME_DLL
 	virtual bool			IsBaseCombatWeapon( void ) const { return true; }
 	virtual CBaseCombatWeapon *MyCombatWeaponPointer( void ) { return this; }
 

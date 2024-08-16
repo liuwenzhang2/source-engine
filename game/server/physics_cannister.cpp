@@ -84,7 +84,7 @@ void CPhysicsCannister::Spawn( void )
 	if ( m_iHealth <= 0 )
 		m_iHealth = 25;
 
-	m_flAnimTime = gpGlobals->curtime;
+	GetEngineObject()->SetAnimTime(gpGlobals->curtime);
 	m_flPlaybackRate = 0.0;
 	SetCycle( 0 );
 	m_bFired = false;

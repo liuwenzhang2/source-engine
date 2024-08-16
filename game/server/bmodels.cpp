@@ -616,33 +616,33 @@ void SendProxy_FuncRotatingAngleZ(const SendProp* pProp, const void* pStruct, co
 
 
 extern void SendProxy_SimulationTime( const SendProp *pProp, const void *pStruct, const void *pVarData, DVariant *pOut, int iElement, int objectID );
-void SendProxy_FuncRotatingSimulationTime( const SendProp *pProp, const void *pStruct, const void *pVarData, DVariant *pOut, int iElement, int objectID )
-{
-#ifdef TF_DLL
-	CFuncRotating *entity = (CFuncRotating*)pStruct;
-	Assert( entity );
-
-	if ( entity->HasSpawnFlags(SF_BRUSH_ROTATE_CLIENTSIDE) )
-	{
-		pOut->m_Int = 0;
-		return;
-	}
-#endif
-
-	SendProxy_SimulationTime( pProp, pStruct, pVarData, pOut, iElement, objectID );
-}
+//void SendProxy_FuncRotatingSimulationTime( const SendProp *pProp, const void *pStruct, const void *pVarData, DVariant *pOut, int iElement, int objectID )
+//{
+//#ifdef TF_DLL
+//	CFuncRotating *entity = (CFuncRotating*)pStruct;
+//	Assert( entity );
+//
+//	if ( entity->HasSpawnFlags(SF_BRUSH_ROTATE_CLIENTSIDE) )
+//	{
+//		pOut->m_Int = 0;
+//		return;
+//	}
+//#endif
+//
+//	SendProxy_SimulationTime( pProp, pStruct, pVarData, pOut, iElement, objectID );
+//}
 
 IMPLEMENT_SERVERCLASS_ST(CFuncRotating, DT_FuncRotating)
 	//SendPropExclude( "DT_BaseEntity", "m_angRotation" ),
 	//SendPropExclude( "DT_BaseEntity", "m_vecOrigin" ),
-	SendPropExclude( "DT_BaseEntity", "m_flSimulationTime" ),
+	//SendPropExclude( "DT_BaseEntity", "m_flSimulationTime" ),
 
 	//SendPropVector(SENDINFO_ORIGIN(m_vecOrigin), -1,  SPROP_COORD|SPROP_CHANGES_OFTEN, 0.0f, HIGH_DEFAULT, SendProxy_FuncRotatingOrigin ),
 	//SendPropAngle(SENDINFO_ANGELS(m_angRotation[0]), 13, SPROP_CHANGES_OFTEN, SendProxy_FuncRotatingAngleX ),
 	//SendPropAngle(SENDINFO_ANGELS(m_angRotation[1]), 13, SPROP_CHANGES_OFTEN, SendProxy_FuncRotatingAngleY ),
 	//SendPropAngle(SENDINFO_ANGELS(m_angRotation[2]), 13, SPROP_CHANGES_OFTEN, SendProxy_FuncRotatingAngleZ ),
 
-	SendPropInt(SENDINFO(m_flSimulationTime), SIMULATION_TIME_WINDOW_BITS, SPROP_UNSIGNED|SPROP_CHANGES_OFTEN|SPROP_ENCODED_AGAINST_TICKCOUNT, SendProxy_FuncRotatingSimulationTime),
+	//SendPropInt(SENDINFO(m_flSimulationTime), SIMULATION_TIME_WINDOW_BITS, SPROP_UNSIGNED|SPROP_CHANGES_OFTEN|SPROP_ENCODED_AGAINST_TICKCOUNT, SendProxy_FuncRotatingSimulationTime),
 END_SEND_TABLE()
 
 

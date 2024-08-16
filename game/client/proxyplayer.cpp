@@ -313,7 +313,7 @@ void CEntityRandomProxy::OnBind( void *pC_BaseEntity )
 	C_BaseEntity *pEntity = BindArgToEntity( pC_BaseEntity );
 
 	Assert( m_pResult );
-	m_pResult->SetFloatValue( pEntity->ProxyRandomValue() * m_Factor.GetFloat() );
+	m_pResult->SetFloatValue( pEntity->GetEngineObject()->ProxyRandomValue() * m_Factor.GetFloat() );
 
 	if ( ToolsEnabled() )
 	{

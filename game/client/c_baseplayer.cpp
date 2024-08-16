@@ -817,10 +817,10 @@ void C_BasePlayer::PostDataUpdate( DataUpdateType_t updateType )
 		GetEngineObject()->SetSimulatedEveryTick( false );
 
 		// estimate velocity for non local players
-		float flTimeDelta = m_flSimulationTime - m_flOldSimulationTime;
+		float flTimeDelta = GetEngineObject()->GetSimulationTime() - GetEngineObject()->GetOldSimulationTime();
 		if ( flTimeDelta > 0  &&  !( IsNoInterpolationFrame() || bForceEFNoInterp ) )
 		{
-			Vector newVelo = (GetEngineObject()->GetNetworkOrigin() - GetOldOrigin()  ) / flTimeDelta;
+			Vector newVelo = (GetEngineObject()->GetNetworkOrigin() - GetEngineObject()->GetOldOrigin()  ) / flTimeDelta;
 			GetEngineObject()->SetAbsVelocity( newVelo);
 		}
 	}

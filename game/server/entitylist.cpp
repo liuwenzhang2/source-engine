@@ -341,6 +341,9 @@ BEGIN_DATADESC_NO_BASE(CEngineObjectInternal)
 	DEFINE_FIELD(m_MoveCollide, FIELD_CHARACTER),
 	DEFINE_FIELD(m_bSimulatedEveryTick, FIELD_BOOLEAN),
 	DEFINE_FIELD(m_bAnimatedEveryTick, FIELD_BOOLEAN),
+	DEFINE_FIELD(m_flAnimTime, FIELD_TIME),
+	DEFINE_FIELD(m_flSimulationTime, FIELD_TIME),
+	DEFINE_FIELD(m_bClientSideAnimation, FIELD_BOOLEAN),
 END_DATADESC()
 
 void SendProxy_Origin(const SendProp* pProp, const void* pStruct, const void* pData, DVariant* pOut, int iElement, int objectID)
@@ -449,7 +452,88 @@ void SendProxy_CropFlagsToPlayerFlagBitsLength(const SendProp* pProp, const void
 	pOut->m_Int = (data & mask);
 }
 
+// This table encodes edict data.
+void SendProxy_AnimTime(const SendProp* pProp, const void* pStruct, const void* pVarData, DVariant* pOut, int iElement, int objectID)
+{
+	CEngineObjectInternal* pEntity = (CEngineObjectInternal*)pStruct;
+
+#if defined( _DEBUG )
+	CBaseAnimating* pAnimating = pEntity->m_pOuter->GetBaseAnimating();
+	Assert(pAnimating);
+
+	if (pAnimating)
+	{
+		Assert(!pAnimating->IsUsingClientSideAnimation());
+	}
+#endif
+
+	int ticknumber = TIME_TO_TICKS(pEntity->m_flAnimTime);
+	// Tickbase is current tick rounded down to closes 100 ticks
+	int tickbase = gpGlobals->GetNetworkBase(gpGlobals->tickcount, pEntity->entindex());
+	int addt = 0;
+	// If it's within the last tick interval through the current one, then we can encode it
+	if (ticknumber >= (tickbase - 100))
+	{
+		addt = (ticknumber - tickbase) & 0xFF;
+	}
+
+	pOut->m_Int = addt;
+}
+
+// This table encodes edict data.
+void SendProxy_SimulationTime(const SendProp* pProp, const void* pStruct, const void* pVarData, DVariant* pOut, int iElement, int objectID)
+{
+	CEngineObjectInternal* pEntity = (CEngineObjectInternal*)pStruct;
+
+	int ticknumber = TIME_TO_TICKS(pEntity->m_flSimulationTime);
+	// tickbase is current tick rounded down to closest 100 ticks
+	int tickbase = gpGlobals->GetNetworkBase(gpGlobals->tickcount, pEntity->entindex());
+	int addt = 0;
+	if (ticknumber >= tickbase)
+	{
+		addt = (ticknumber - tickbase) & 0xff;
+	}
+
+	pOut->m_Int = addt;
+}
+
+void* SendProxy_ClientSideAnimation(const SendProp* pProp, const void* pStruct, const void* pVarData, CSendProxyRecipients* pRecipients, int objectID)
+{
+	CEngineObjectInternal* pEntity = (CEngineObjectInternal*)pStruct;
+
+	if (!pEntity->IsUsingClientSideAnimation() && !pEntity->GetOuter()->IsViewModel())
+		return (void*)pVarData;
+	else
+		return NULL;	// Don't send animtime unless the client needs it.
+}
+REGISTER_SEND_PROXY_NON_MODIFIED_POINTER(SendProxy_ClientSideAnimation);
+
+
+void* SendProxy_ClientSideSimulation(const SendProp* pProp, const void* pStruct, const void* pVarData, CSendProxyRecipients* pRecipients, int objectID)
+{
+	CEngineObjectInternal* pEntity = (CEngineObjectInternal*)pStruct;
+
+	if (!pEntity->GetOuter()->IsViewModel())
+		return (void*)pVarData;
+	else
+		return NULL;	// Don't send animtime unless the client needs it.
+}
+
+BEGIN_SEND_TABLE_NOBASE(CEngineObjectInternal, DT_AnimTimeMustBeFirst)
+// NOTE:  Animtime must be sent before origin and angles ( from pev ) because it has a 
+//  proxy on the client that stores off the old values before writing in the new values and
+//  if it is sent after the new values, then it will only have the new origin and studio model, etc.
+//  interpolation will be busted
+	SendPropInt(SENDINFO(m_flAnimTime), 8, SPROP_UNSIGNED | SPROP_CHANGES_OFTEN | SPROP_ENCODED_AGAINST_TICKCOUNT, SendProxy_AnimTime),
+END_SEND_TABLE()
+
+BEGIN_SEND_TABLE_NOBASE(CEngineObjectInternal, DT_SimulationTimeMustBeFirst)
+	SendPropInt(SENDINFO(m_flSimulationTime), SIMULATION_TIME_WINDOW_BITS, SPROP_UNSIGNED | SPROP_CHANGES_OFTEN | SPROP_ENCODED_AGAINST_TICKCOUNT, SendProxy_SimulationTime),
+END_SEND_TABLE()
+
 BEGIN_SEND_TABLE_NOBASE(CEngineObjectInternal, DT_EngineObject)
+	SendPropDataTable("AnimTimeMustBeFirst", 0, &REFERENCE_SEND_TABLE(DT_AnimTimeMustBeFirst), SendProxy_ClientSideAnimation),
+	SendPropDataTable("SimulationTimeMustBeFirst", 0, &REFERENCE_SEND_TABLE(DT_SimulationTimeMustBeFirst), SendProxy_ClientSideSimulation),
 	SendPropInt(SENDINFO(testNetwork), 32, SPROP_UNSIGNED),
 #if PREDICTION_ERROR_CHECK_LEVEL > 1 
 	SendPropVector(SENDINFO(m_vecOrigin), -1, SPROP_NOSCALE | SPROP_CHANGES_OFTEN, 0.0f, HIGH_DEFAULT, SendProxy_Origin),
@@ -477,6 +561,7 @@ BEGIN_SEND_TABLE_NOBASE(CEngineObjectInternal, DT_EngineObject)
 	SendPropInt(SENDINFO_NAME(m_MoveCollide, movecollide), MOVECOLLIDE_MAX_BITS, SPROP_UNSIGNED),
 	SendPropInt(SENDINFO(m_bSimulatedEveryTick), 1, SPROP_UNSIGNED),
 	SendPropInt(SENDINFO(m_bAnimatedEveryTick), 1, SPROP_UNSIGNED),
+	SendPropInt(SENDINFO(m_bClientSideAnimation), 1, SPROP_UNSIGNED),
 END_SEND_TABLE()
 
 IMPLEMENT_SERVERCLASS(CEngineObjectInternal, DT_EngineObject)
@@ -1667,7 +1752,7 @@ void CEngineObjectInternal::SetAbsOrigin(const Vector& absOrigin)
 	{
 		//m_pOuter->NetworkStateChanged(55554);
 		m_vecOrigin = vecNewOrigin;
-		m_pOuter->SetSimulationTime(gpGlobals->curtime);
+		SetSimulationTime(gpGlobals->curtime);
 	}
 }
 
@@ -1718,7 +1803,7 @@ void CEngineObjectInternal::SetAbsAngles(const QAngle& absAngles)
 	{
 		//m_pOuter->NetworkStateChanged(55555);
 		m_angRotation = angNewRotation;
-		m_pOuter->SetSimulationTime(gpGlobals->curtime);
+		SetSimulationTime(gpGlobals->curtime);
 	}
 }
 
@@ -1789,7 +1874,7 @@ void CEngineObjectInternal::SetLocalOrigin(const Vector& origin)
 		//m_pOuter->NetworkStateChanged(55554);
 		InvalidatePhysicsRecursive(POSITION_CHANGED);
 		m_vecOrigin = origin;
-		m_pOuter->SetSimulationTime(gpGlobals->curtime);
+		SetSimulationTime(gpGlobals->curtime);
 	}
 }
 
@@ -1819,7 +1904,7 @@ void CEngineObjectInternal::SetLocalAngles(const QAngle& angles)
 		//m_pOuter->NetworkStateChanged(55555);
 		InvalidatePhysicsRecursive(ANGLES_CHANGED);
 		m_angRotation = angles;
-		m_pOuter->SetSimulationTime(gpGlobals->curtime);
+		SetSimulationTime(gpGlobals->curtime);
 	}
 }
 
@@ -4020,6 +4105,12 @@ IEngineObjectServer* CEngineObjectInternal::GetFollowedEntity()
 	return GetMoveParent();
 }
 
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+void CEngineObjectInternal::UseClientSideAnimation()
+{
+	m_bClientSideAnimation = true;
+}
 
 struct collidelist_t
 {

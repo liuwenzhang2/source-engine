@@ -970,7 +970,7 @@ void CPointCommentaryNode::SetUnderCrosshair( bool bUnderCrosshair )
 	
 		if ( !m_bActive )
 		{
-			m_flAnimTime = gpGlobals->curtime;
+			GetEngineObject()->SetAnimTime(gpGlobals->curtime);
 		}
 	}
 	else
@@ -1110,7 +1110,7 @@ void CPointCommentaryNode::StartCommentary( void )
 
 	m_bActive = true;
 
-	m_flAnimTime = gpGlobals->curtime;
+	GetEngineObject()->SetAnimTime(gpGlobals->curtime);
 	m_flPrevAnimTime = gpGlobals->curtime;
 
 	// Switch to the greyed out skin 

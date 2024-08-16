@@ -227,6 +227,8 @@ BEGIN_PREDICTION_DATA_NO_BASE(C_EngineObjectInternal)
 	DEFINE_PRED_FIELD(m_nNextThinkTick, FIELD_INTEGER, FTYPEDESC_INSENDTABLE),
 	DEFINE_PRED_FIELD(m_MoveType, FIELD_CHARACTER, FTYPEDESC_INSENDTABLE),
 	DEFINE_PRED_FIELD(m_MoveCollide, FIELD_CHARACTER, FTYPEDESC_INSENDTABLE),
+	DEFINE_FIELD(m_flProxyRandomValue, FIELD_FLOAT),
+	//DEFINE_PRED_FIELD(m_flAnimTime, FIELD_FLOAT, 0),
 END_PREDICTION_DATA()
 
 BEGIN_DATADESC_NO_BASE(C_EngineObjectInternal)
@@ -307,10 +309,83 @@ void RecvProxy_InterpolationAmountChanged(const CRecvProxyData* pData, void* pSt
 
 		C_EngineObjectInternal* pEntity = (C_EngineObjectInternal*)pStruct;
 		pEntity->Interp_UpdateInterpolationAmounts();
-}
+	}
 }
 
+//-----------------------------------------------------------------------------
+// Purpose: Decodes animtime and notes when it changes
+// Input  : *pStruct - ( C_BaseEntity * ) used to flag animtime is changine
+//			*pVarData - 
+//			*pIn - 
+//			objectID - 
+//-----------------------------------------------------------------------------
+void RecvProxy_AnimTime(const CRecvProxyData* pData, void* pStruct, void* pOut)
+{
+	C_EngineObjectInternal* pEntity = (C_EngineObjectInternal*)pStruct;
+	Assert(pOut == &pEntity->m_flAnimTime);
+
+	int t;
+	int tickbase;
+	int addt;
+
+	// Unpack the data.
+	addt = pData->m_Value.m_Int;
+
+	// Note, this needs to be encoded relative to packet timestamp, not raw client clock
+	tickbase = gpGlobals->GetNetworkBase(gpGlobals->tickcount, pEntity->entindex());
+
+	t = tickbase;
+	//  and then go back to floating point time.
+	t += addt;				// Add in an additional up to 256 100ths from the server
+
+	// center m_flAnimTime around current time.
+	while (t < gpGlobals->tickcount - 127)
+		t += 256;
+	while (t > gpGlobals->tickcount + 127)
+		t -= 256;
+
+	pEntity->SetAnimTime(t * TICK_INTERVAL);
+}
+
+void RecvProxy_SimulationTime(const CRecvProxyData* pData, void* pStruct, void* pOut)
+{
+	C_EngineObjectInternal* pEntity = (C_EngineObjectInternal*)pStruct;
+	Assert(pOut == &pEntity->m_flSimulationTime);
+
+	int t;
+	int tickbase;
+	int addt;
+
+	// Unpack the data.
+	addt = pData->m_Value.m_Int;
+
+	// Note, this needs to be encoded relative to packet timestamp, not raw client clock
+	tickbase = gpGlobals->GetNetworkBase(gpGlobals->tickcount, pEntity->entindex());
+
+	t = tickbase;
+	//  and then go back to floating point time.
+	t += addt;				// Add in an additional up to 256 100ths from the server
+
+	// center m_flSimulationTime around current time.
+	while (t < gpGlobals->tickcount - 127)
+		t += 256;
+	while (t > gpGlobals->tickcount + 127)
+		t -= 256;
+
+	pEntity->SetSimulationTime(t * TICK_INTERVAL);
+}
+
+BEGIN_RECV_TABLE_NOBASE(C_EngineObjectInternal, DT_AnimTimeMustBeFirst)
+	RecvPropInt(RECVINFO(m_flAnimTime), 0, RecvProxy_AnimTime),
+END_RECV_TABLE()
+
+BEGIN_RECV_TABLE_NOBASE(C_EngineObjectInternal, DT_SimulationTimeMustBeFirst)
+	RecvPropInt(RECVINFO(m_flSimulationTime), 0, RecvProxy_SimulationTime),
+END_RECV_TABLE()
+
 BEGIN_RECV_TABLE_NOBASE(C_EngineObjectInternal, DT_EngineObject)
+	RecvPropDataTable("AnimTimeMustBeFirst", 0, 0, &REFERENCE_RECV_TABLE(DT_AnimTimeMustBeFirst)),
+	RecvPropDataTable("SimulationTimeMustBeFirst", 0, 0, &REFERENCE_RECV_TABLE(DT_SimulationTimeMustBeFirst)),
 	RecvPropInt(RECVINFO(testNetwork)),
 	RecvPropVector(RECVINFO_NAME(m_vecNetworkOrigin, m_vecOrigin)),
 #if PREDICTION_ERROR_CHECK_LEVEL > 1 
@@ -339,6 +414,7 @@ BEGIN_RECV_TABLE_NOBASE(C_EngineObjectInternal, DT_EngineObject)
 	RecvPropInt("movecollide", 0, SIZEOF_IGNORE, 0, RecvProxy_MoveCollide),
 	RecvPropInt(RECVINFO(m_bSimulatedEveryTick), 0, RecvProxy_InterpolationAmountChanged),
 	RecvPropInt(RECVINFO(m_bAnimatedEveryTick), 0, RecvProxy_InterpolationAmountChanged),
+	RecvPropInt(RECVINFO(m_bClientSideAnimation)),
 END_RECV_TABLE()
 
 IMPLEMENT_CLIENTCLASS_NO_FACTORY(C_EngineObjectInternal, DT_EngineObject, CEngineObjectInternal);
@@ -637,6 +713,197 @@ void C_EngineObjectInternal::OnRestore()
 	InvalidatePhysicsRecursive(POSITION_CHANGED | ANGLES_CHANGED | VELOCITY_CHANGED);
 
 	m_pOuter->OnRestore();
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: Entity is about to be decoded from the network stream
+// Input  : bnewentity - is this a new entity this update?
+//-----------------------------------------------------------------------------
+void C_EngineObjectInternal::PreDataUpdate(DataUpdateType_t updateType)
+{
+	VPROF("C_BaseEntity::PreDataUpdate");
+
+	// Register for an OnDataChanged call and call OnPreDataChanged().
+	if (AddDataChangeEvent(this, updateType, &m_DataChangeEventRef))
+	{
+		OnPreDataChanged(updateType);
+	}
+
+
+	// Need to spawn on client before receiving original network data 
+	// in case it overrides any values set up in spawn ( e.g., m_iState )
+	bool bnewentity = (updateType == DATA_UPDATE_CREATED);
+
+	if (!bnewentity)
+	{
+		this->Interp_RestoreToLastNetworked();
+	}
+
+	if (bnewentity /*&& !IsClientCreated()*/)
+	{
+		m_flSpawnTime = engine->GetLastTimeStamp();
+		MDLCACHE_CRITICAL_SECTION();
+		m_pOuter->Spawn();
+	}
+
+	m_vecOldOrigin = GetNetworkOrigin();
+	m_vecOldAngRotation = GetNetworkAngles();
+
+	m_flOldAnimTime = m_flAnimTime;
+	m_flOldSimulationTime = m_flSimulationTime;
+
+	m_pOuter->PreDataUpdate(updateType);
+}
+
+void C_EngineObjectInternal::OnPreDataChanged(DataUpdateType_t type)
+{
+	m_pOuter->OnPreDataChanged(type);
+}
+
+//-----------------------------------------------------------------------------
+// Call this in PostDataUpdate if you don't chain it down!
+//-----------------------------------------------------------------------------
+void C_EngineObjectInternal::MarkMessageReceived()
+{
+	m_flLastMessageTime = engine->GetLastTimeStamp();
+}
+
+
+//-----------------------------------------------------------------------------
+// Purpose: Entity data has been parsed and unpacked.  Now do any necessary decoding, munging
+// Input  : bnewentity - was this entity new in this update packet?
+//-----------------------------------------------------------------------------
+void C_EngineObjectInternal::PostDataUpdate(DataUpdateType_t updateType)
+{
+	MDLCACHE_CRITICAL_SECTION();
+
+	PREDICTION_TRACKVALUECHANGESCOPE_ENTITY(this, "postdataupdate");
+
+	// NOTE: This *has* to happen first. Otherwise, Origin + angles may be wrong 
+	if (m_pOuter->m_nRenderFX == kRenderFxRagdoll && updateType == DATA_UPDATE_CREATED)
+	{
+		m_pOuter->MoveToLastReceivedPosition(true);
+	}
+	else
+	{
+		m_pOuter->MoveToLastReceivedPosition(false);
+	}
+
+
+	// If it's the world, force solid flags
+	if (entindex() == 0)
+	{
+		SetModelIndex(1);
+		SetSolid(SOLID_BSP);
+
+		// FIXME: Should these be assertions?
+		SetAbsOrigin(vec3_origin);
+		SetAbsAngles(vec3_angle);
+	}
+
+	bool animTimeChanged = (m_flAnimTime != m_flOldAnimTime) ? true : false;
+	bool originChanged = (m_vecOldOrigin != GetLocalOrigin()) ? true : false;
+	bool anglesChanged = (m_vecOldAngRotation != GetLocalAngles()) ? true : false;
+	bool simTimeChanged = (m_flSimulationTime != m_flOldSimulationTime) ? true : false;
+
+	// Detect simulation changes 
+	bool simulationChanged = originChanged || anglesChanged || simTimeChanged;
+
+	bool bPredictable = m_pOuter->GetPredictable();
+
+	// For non-predicted and non-client only ents, we need to latch network values into the interpolation histories
+	if (!bPredictable /*&& !IsClientCreated()*/)
+	{
+		if (animTimeChanged)
+		{
+			this->OnLatchInterpolatedVariables(LATCH_ANIMATION_VAR);
+		}
+
+		if (simulationChanged)
+		{
+			this->OnLatchInterpolatedVariables(LATCH_SIMULATION_VAR);
+		}
+	}
+	// For predictables, we also need to store off the last networked value
+	else if (bPredictable)
+	{
+		// Just store off last networked value for use in prediction
+		this->OnStoreLastNetworkedValue();
+	}
+
+	// Deal with hierarchy. Have to do it here (instead of in a proxy)
+	// because this is the only point at which all entities are loaded
+	// If this condition isn't met, then a child was sent without its parent
+	//Assert( m_hNetworkMoveParent.Get() || !m_hNetworkMoveParent.IsValid() );
+	HierarchySetParent(GetNetworkMoveParent());
+
+	MarkMessageReceived();
+
+	// Make sure that the correct model is referenced for this entity
+	m_pOuter->ValidateModelIndex();
+
+	// If this entity was new, then latch in various values no matter what.
+	if (updateType == DATA_UPDATE_CREATED)
+	{
+		// Construct a random value for this instance
+		m_flProxyRandomValue = random->RandomFloat(0, 1);
+
+		m_pOuter->ResetLatched();
+
+		m_nCreationTick = gpGlobals->tickcount;
+	}
+
+	m_pOuter->CheckInitPredictable("PostDataUpdate");
+
+	m_pOuter->PostDataUpdate(updateType);
+}
+
+void C_EngineObjectInternal::OnDataChanged(DataUpdateType_t type)
+{
+	// See if it needs to allocate prediction stuff
+	m_pOuter->CheckInitPredictable("OnDataChanged");
+
+	m_pOuter->OnDataChanged(type);
+}
+
+const Vector& C_EngineObjectInternal::GetOldOrigin()
+{
+	return m_vecOldOrigin;
+}
+
+int C_EngineObjectInternal::GetCreationTick() const
+{
+	return m_nCreationTick;
+}
+
+float C_EngineObjectInternal::GetLastChangeTime(int flags)
+{
+	if (m_pOuter->GetPredictable() /*|| IsClientCreated()*/)
+	{
+		return gpGlobals->curtime;
+	}
+
+	// make sure not both flags are set, we can't resolve that
+	Assert(!((flags & LATCH_ANIMATION_VAR) && (flags & LATCH_SIMULATION_VAR)));
+
+	if (flags & LATCH_ANIMATION_VAR)
+	{
+		return GetAnimTime();
+	}
+
+	if (flags & LATCH_SIMULATION_VAR)
+	{
+		float st = GetSimulationTime();
+		if (st == 0.0f)
+		{
+			return gpGlobals->curtime;
+		}
+		return st;
+	}
+
+	Assert(0);
+
+	return gpGlobals->curtime;
 }
 
 //-----------------------------------------------------------------------------
@@ -1036,7 +1303,7 @@ void C_EngineObjectInternal::OnStoreLastNetworkedValue()
 
 void C_EngineObjectInternal::OnLatchInterpolatedVariables(int flags)
 {
-	float changetime = m_pOuter->GetLastChangeTime(flags);
+	float changetime = GetLastChangeTime(flags);
 
 	bool bUpdateLastNetworkedValue = !(flags & INTERPOLATE_OMIT_UPDATE_LAST_NETWORKED) ? true : false;
 
@@ -1598,7 +1865,7 @@ void C_EngineObjectInternal::PostEntityPacketReceived(void)
 	Assert(cl_predict->GetInt());
 
 	// Always mark as changed
-	AddDataChangeEvent(m_pOuter, DATA_UPDATE_DATATABLE_CHANGED, &m_pOuter->m_DataChangeEventRef);
+	AddDataChangeEvent(this, DATA_UPDATE_DATATABLE_CHANGED, &m_DataChangeEventRef);
 
 	// Save networked fields into "original data" store
 	SaveData("PostEntityPacketReceived", SLOT_ORIGINALDATA, PC_NETWORKED_ONLY);
@@ -3556,6 +3823,14 @@ IEngineObjectClient* C_EngineObjectInternal::GetFollowedEntity()
 	if (!IsFollowingEntity())
 		return NULL;
 	return GetMoveParent();
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: sets client side animation
+//-----------------------------------------------------------------------------
+void C_EngineObjectInternal::UseClientSideAnimation()
+{
+	m_bClientSideAnimation = true;
 }
 
 

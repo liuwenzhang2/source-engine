@@ -114,8 +114,12 @@ CHostage::CHostage()
 {
 	g_Hostages.AddToTail( this );
 	m_PlayerAnimState = CreateHostageAnimState( this, this, LEGANIM_8WAY, false );
-	UseClientSideAnimation();
 	SetBloodColor( BLOOD_COLOR_RED );
+}
+
+void CHostage::PostConstructor(const char* szClassname, int iForceEdictIndex) {
+	BaseClass::PostConstructor(szClassname, iForceEdictIndex);
+	GetEngineObject()->UseClientSideAnimation();
 }
 
 //-----------------------------------------------------------------------------------------------------

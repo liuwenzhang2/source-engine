@@ -60,7 +60,7 @@ void CPropVehicleViewController::Think(void)
 {
 	BaseClass::Think();
 
-	SetSimulationTime( gpGlobals->curtime );
+	GetEngineObject()->SetSimulationTime( gpGlobals->curtime );
 	GetEngineObject()->SetNextThink( gpGlobals->curtime );
 	GetEngineObject()->SetAnimatedEveryTick( true );
 
@@ -162,7 +162,7 @@ void CPropVehicleViewController::InputForcePlayerIn( inputdata_t &inputdata )
 
 	// Setup the "enter" vehicle sequence
 	SetCycle( 0 );
-	m_flAnimTime = gpGlobals->curtime;
+	GetEngineObject()->SetAnimTime(gpGlobals->curtime);
 	ResetSequence( iEntryAnim );
 	ResetClientsideFrame();
 	m_bEnterAnimOn = true;

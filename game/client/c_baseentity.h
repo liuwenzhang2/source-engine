@@ -566,11 +566,6 @@ public:
 
 	// Returns the aiment render origin + angles
 	virtual void					GetAimEntOrigin( IClientEntity *pAttachedTo, Vector *pAbsOrigin, QAngle *pAbsAngles );
-	
-	// get network origin from previous update
-	virtual const Vector&			GetOldOrigin();
-
-
 
 	inline ClientEntityHandle_t		GetClientHandle() const	{ return ClientEntityHandle_t( GetRefEHandle() ); }
 	inline bool						IsServerEntity( void );
@@ -604,7 +599,6 @@ public:
 	virtual void					ResetLatched();
 	
 	float							GetInterpolationAmount( int flags );
-	float							GetLastChangeTime( int flags );
 
 	// Interpolate the position for rendering
 	virtual bool					Interpolate( float currentTime );
@@ -673,11 +667,9 @@ public:
 	// Is this a brush model?
 	bool							IsBrushModel() const;
 
-	// A random value 0-1 used by proxies to make sure they're not all in sync
-	float							ProxyRandomValue() const { return m_flProxyRandomValue; }
 
-	// The spawn time of this entity
-	float							SpawnTime() const { return m_flSpawnTime; }
+
+
 
 	//virtual bool					IsClientCreated( void ) const;
 
@@ -916,16 +908,11 @@ public:
 	void	NetworkStateSetUpdateInterval( float N )	{ }
 	void	NetworkStateForceUpdate()					{ }
 
-	float	GetAnimTime() const;
-	void	SetAnimTime( float at );
 
-	float	GetSimulationTime() const;
-	void	SetSimulationTime( float st );
 
 	float	GetCreateTime()										{ return m_flCreateTime; }
 	void	SetCreateTime( float flCreateTime )					{ m_flCreateTime = flCreateTime; }
 
-	int		GetCreationTick() const;
 
 #ifdef _DEBUG
 	void FunctionCheck( void *pFunction, const char *name );
@@ -965,11 +952,7 @@ public:
 	virtual bool ShouldInterpolate();
 protected:
 
-	// Call this in OnDataChanged if you don't chain it down!
-	void MarkMessageReceived();
 
-	// Gets the last message time
-	float	GetLastMessageTime() const		{ return m_flLastMessageTime; }
 
 	// For non-players
 	int	PhysicsClipVelocity (const Vector& in, const Vector& normal, Vector& out, float overbounce );
@@ -1050,12 +1033,7 @@ private:
 	const model_t					*m_pModel;
 
 public:
-	// Time animation sequence or frame was last changed
-	float							m_flAnimTime;
-	float							m_flOldAnimTime;
 
-	float							m_flSimulationTime;
-	float							m_flOldSimulationTime;
 	
 	float							m_flCreateTime;
 
@@ -1255,16 +1233,9 @@ private:
 //	int								m_nIncomingPacketEntityBecameDormant;
 //#endif
 
-	// The spawn time of the entity
-	float							m_flSpawnTime;
-
-	// Timestamp of message arrival
-	float							m_flLastMessageTime;
 
 	// Base velocity
 	Vector							m_vecBaseVelocity;
-	
-
 
 	// Model instance data..
 	ModelInstanceHandle_t			m_ModelInstance;
@@ -1272,8 +1243,7 @@ private:
 	// Shadow data
 	ClientShadowHandle_t			m_ShadowHandle;
 
-	// A random value used by material proxies for each model instance.
-	float							m_flProxyRandomValue;
+
 
 	ClientThinkHandle_t				m_hThink;
 
@@ -1307,8 +1277,7 @@ private:
 
     
 
-	Vector							m_vecOldOrigin;
-	QAngle							m_vecOldAngRotation;
+
 
 	CNetworkVar( bool, m_bAlternateSorting );
 
@@ -1318,9 +1287,7 @@ private:
 	// Bbox visualization
 	unsigned char					m_fBBoxVisFlags;
 
-	// The list that holds OnDataChanged events uses this to make sure we don't get multiple
-	// OnDataChanged calls in the same frame if the client receives multiple packets.
-	int								m_DataChangeEventRef;
+
 
 //#if !defined( NO_ENTITY_PREDICTION )
 //	// Player who is driving my simulation
@@ -1343,7 +1310,6 @@ private:
 	
 
 	AimEntsListHandle_t				m_AimEntsListHandle;
-	int								m_nCreationTick;
 
 	
 public:

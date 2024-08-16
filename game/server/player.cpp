@@ -4640,7 +4640,7 @@ void CBasePlayer::PostThink()
 		DispatchAnimEvents( this );
 		VPROF_SCOPE_END();
 
-		SetSimulationTime( gpGlobals->curtime );
+		GetEngineObject()->SetSimulationTime( gpGlobals->curtime );
 
 		//Let the weapon update as well
 		VPROF_SCOPE_BEGIN( "CBasePlayer::PostThink-Weapon_FrameUpdate" );

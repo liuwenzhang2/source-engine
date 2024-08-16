@@ -44,7 +44,7 @@ public:
 
 	DECLARE_DATADESC();
 	DECLARE_SERVERCLASS();
-
+	virtual void PostConstructor(const char* szClassname, int iForceEdictIndex);
 	virtual void UpdateOnRemove(void);
 	virtual void SetModel( const char *szModelName );
 	virtual void Activate();
@@ -67,16 +67,6 @@ public:
 	float GetCycle() const;
 
 	float	GetAnimTimeInterval( void ) const;
-
-	// Call this in your constructor to tell it that you will not use animtime. Then the
-	// interpolation will be done correctly on the client.
-	// This defaults to off.
-	void	UseClientSideAnimation();
-
-	// Tells whether or not we're using client-side animation. Used for controlling
-	// the transmission of animtime.
-	bool	IsUsingClientSideAnimation()	{ return m_bClientSideAnimation; }
-
 
 	// Basic NPC Animation functions
 	virtual float	GetIdealSpeed( ) const;
@@ -389,8 +379,7 @@ private:
 	CNetworkArray( float, m_flPoseParameter, NUM_POSEPAREMETERS );	// must be private so manual mode works!
 	CNetworkArray( float, m_flEncodedController, NUM_BONECTRLS );		// bone controller setting (0..1)
 
-	// Client-side animation (useful for looping animation objects)
-	CNetworkVar( bool, m_bClientSideAnimation );
+
 	CNetworkVar( bool, m_bClientSideFrameReset );
 
 	CNetworkVar( int, m_nNewSequenceParity );

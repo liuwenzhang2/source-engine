@@ -759,7 +759,7 @@ void CItem_AmmoCrate::Spawn( void )
 	SetBodygroup( 1, true );
 
 	m_flCloseTime = gpGlobals->curtime;
-	m_flAnimTime = gpGlobals->curtime;
+	GetEngineObject()->SetAnimTime(gpGlobals->curtime);
 	m_flPlaybackRate = 0.0;
 	SetCycle( 0 );
 

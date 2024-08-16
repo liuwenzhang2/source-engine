@@ -225,7 +225,7 @@ void CBaseProp::Spawn( void )
 	m_takedamage = DAMAGE_NO;
 	GetEngineObject()->SetNextThink( TICK_NEVER_THINK );
 
-	m_flAnimTime = gpGlobals->curtime;
+	GetEngineObject()->SetAnimTime(gpGlobals->curtime);
 	m_flPlaybackRate = 0.0;
 	SetCycle( 0 );
 }
@@ -1882,13 +1882,16 @@ END_SEND_TABLE()
 CDynamicProp::CDynamicProp()
 {
 	m_nPendingSequence = -1;
-	if ( g_pGameRules->IsMultiplayer() )
-	{
-		UseClientSideAnimation();
-	}
 	m_iGoalSequence = -1;
 }
 
+void CDynamicProp::PostConstructor(const char* szClassname, int iForceEdictIndex) {
+	BaseClass::PostConstructor(szClassname, iForceEdictIndex);
+	if (g_pGameRules->IsMultiplayer())
+	{
+		GetEngineObject()->UseClientSideAnimation();
+	}
+}
 
 //------------------------------------------------------------------------------
 // Purpose:
@@ -2303,7 +2306,7 @@ void CDynamicProp::FinishSetSequence( int nSequence )
 {
 	// Msg("%.2f CDynamicProp::FinishSetSequence( %d )\n", gpGlobals->curtime, nSequence );
 	SetCycle( 0 );
-	m_flAnimTime = gpGlobals->curtime;
+	GetEngineObject()->SetAnimTime(gpGlobals->curtime);
 	ResetSequence( nSequence );
 	ResetClientsideFrame();
 	GetEngineObject()->RemoveFlag( FL_STATICPROP );

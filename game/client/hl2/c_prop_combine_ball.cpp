@@ -268,7 +268,7 @@ int C_PropCombineBall::DrawModel( int flags )
 
 		float sinOffs = 1.0f * sin( gpGlobals->curtime * 25 );
 
-		float roll = SpawnTime();
+		float roll = GetEngineObject()->GetSpawnTime();
 
 		// Draw the main ball body
 		CMatRenderContextPtr pRenderContext( materials );

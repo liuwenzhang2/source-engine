@@ -776,7 +776,7 @@ void CPropJeep::Think(void)
 	// Water!?
 	HandleWater();
 
-	SetSimulationTime( gpGlobals->curtime );
+	GetEngineObject()->SetSimulationTime( gpGlobals->curtime );
 	
 	GetEngineObject()->SetNextThink( gpGlobals->curtime );
 	GetEngineObject()->SetAnimatedEveryTick( true );
@@ -862,14 +862,14 @@ void CPropJeep::Think(void)
 	// See if the ammo crate needs to close
 	if ( ( m_flAmmoCrateCloseTime < gpGlobals->curtime ) && ( GetSequence() == LookupSequence( "ammo_open" ) ) )
 	{
-		m_flAnimTime = gpGlobals->curtime;
+		GetEngineObject()->SetAnimTime(gpGlobals->curtime);
 		m_flPlaybackRate = 0.0;
 		SetCycle( 0 );
 		ResetSequence( LookupSequence( "ammo_close" ) );
 	}
 	else if ( ( GetSequence() == LookupSequence( "ammo_close" ) ) && IsSequenceFinished() )
 	{
-		m_flAnimTime = gpGlobals->curtime;
+		GetEngineObject()->SetAnimTime(gpGlobals->curtime);
 		m_flPlaybackRate = 0.0;
 		SetCycle( 0 );
 		ResetSequence( LookupSequence( "idle" ) );
@@ -1157,7 +1157,7 @@ void CPropJeep::Use( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE use
 		if ( ( GetSequence() != LookupSequence( "ammo_open" ) ) && ( GetSequence() != LookupSequence( "ammo_close" ) ) )
 		{
 			// Open the crate
-			m_flAnimTime = gpGlobals->curtime;
+			GetEngineObject()->SetAnimTime(gpGlobals->curtime);
 			m_flPlaybackRate = 0.0;
 			SetCycle( 0 );
 			ResetSequence( LookupSequence( "ammo_open" ) );
@@ -1478,7 +1478,7 @@ void CPropJeep::ExitVehicle( int nRole )
 void CPropJeep::InputStartRemoveTauCannon( inputdata_t &inputdata )
 {
 	// Start the gun removal animation
-	m_flAnimTime = gpGlobals->curtime;
+	GetEngineObject()->SetAnimTime(gpGlobals->curtime);
 	m_flPlaybackRate = 0.0;
 	SetCycle( 0 );
 	ResetSequence( LookupSequence( "tau_levitate" ) );

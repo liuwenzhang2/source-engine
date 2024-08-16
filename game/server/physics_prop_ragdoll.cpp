@@ -297,7 +297,7 @@ int CRagdollProp::ObjectCaps()
 //-----------------------------------------------------------------------------
 void CRagdollProp::InitRagdollAnimation()
 {
-	m_flAnimTime = gpGlobals->curtime;
+	GetEngineObject()->SetAnimTime(gpGlobals->curtime);
 	m_flPlaybackRate = 0.0;
 	SetCycle( 0 );
 	

@@ -351,7 +351,7 @@ void CPropVehiclePrisonerPod::InputOpen( inputdata_t &inputdata )
 	if ( nSequence > ACTIVITY_NOT_AVAILABLE )
 	{
 		SetCycle( 0 );
-		m_flAnimTime = gpGlobals->curtime;
+		GetEngineObject()->SetAnimTime(gpGlobals->curtime);
 		ResetSequence( nSequence );
 		ResetClientsideFrame();
 		const char* soundname = "d3_citadel.pod_open";
@@ -388,7 +388,7 @@ void CPropVehiclePrisonerPod::InputClose( inputdata_t &inputdata )
 	if ( nSequence > ACTIVITY_NOT_AVAILABLE )
 	{
 		SetCycle( 0 );
-		m_flAnimTime = gpGlobals->curtime;
+		GetEngineObject()->SetAnimTime(gpGlobals->curtime);
 		ResetSequence( nSequence );
 		ResetClientsideFrame();
 		const char* soundname = "d3_citadel.pod_close";

@@ -178,7 +178,6 @@ public:
 	void InvalidateMdlCache();
 	
 	virtual void SetPredictable( bool state );
-	void UseClientSideAnimation();
 
 	// C_BaseClientShader **p_ClientShaders;
 
@@ -570,8 +569,7 @@ private:
 	CInterpolatedVarArray< float, MAXSTUDIOBONECTRLS >		m_iv_flEncodedController;
 	float							m_flOldEncodedController[MAXSTUDIOBONECTRLS];
 
-	// Clientside animation
-	bool							m_bClientSideAnimation;
+
 	bool							m_bLastClientSideFrameReset;
 
 	int								m_nNewSequenceParity;

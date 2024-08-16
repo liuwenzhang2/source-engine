@@ -249,7 +249,7 @@ IMPLEMENT_CLIENTCLASS_DT_NOBASE( C_CSRagdoll, DT_CSRagdoll, CCSRagdoll )
 	RecvPropInt( RECVINFO(m_iDeathPose) ),
 	RecvPropInt( RECVINFO(m_iDeathFrame) ),
 	RecvPropInt(RECVINFO(m_iTeamNum)),
-	RecvPropInt( RECVINFO(m_bClientSideAnimation)),
+	//RecvPropInt( RECVINFO(m_bClientSideAnimation)),
 END_RECV_TABLE()
 
 
@@ -435,7 +435,7 @@ void C_CSRagdoll::CreateCSRagdoll()
 			GetEngineObject()->SetAbsAngles( pPlayer->GetRenderAngles() );
 			GetEngineObject()->GetRotationInterpolator().Reset();
 
-			m_flAnimTime = pPlayer->m_flAnimTime;
+			GetEngineObject()->SetAnimTime(pPlayer->GetEngineObject()->GetAnimTime());
 			SetSequence( pPlayer->GetSequence() );
 			m_flPlaybackRate = pPlayer->GetPlaybackRate();
 		}

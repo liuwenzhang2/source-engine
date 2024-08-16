@@ -656,7 +656,7 @@ void CPropAPC::Think( void )
 		if ( iSequence > ACTIVITY_NOT_AVAILABLE )
 		{
 			SetCycle( 0 );
-			m_flAnimTime = gpGlobals->curtime;
+			GetEngineObject()->SetAnimTime(gpGlobals->curtime);
 			ResetSequence( iSequence );
 			ResetClientsideFrame();
 		}

@@ -152,7 +152,7 @@ bool C_BaseViewModel::Interpolate( float currentTime )
 	bool bret = BaseClass::Interpolate( currentTime );
 
 	// Hack to extrapolate cycle counter for view model
-	float elapsed_time = currentTime - m_flAnimTime;
+	float elapsed_time = currentTime - GetEngineObject()->GetAnimTime();
 	C_BasePlayer *pPlayer = C_BasePlayer::GetLocalPlayer();
 
 	// Predicted viewmodels have fixed up interval
@@ -160,7 +160,7 @@ bool C_BaseViewModel::Interpolate( float currentTime )
 	{
 		Assert( pPlayer );
 		float curtime = pPlayer ? pPlayer->GetFinalPredictedTime() : gpGlobals->curtime;
-		elapsed_time = curtime - m_flAnimTime;
+		elapsed_time = curtime - GetEngineObject()->GetAnimTime();
 		// Adjust for interpolated partial frame
 		if ( !engine->IsPaused() )
 		{
@@ -440,7 +440,7 @@ void C_BaseViewModel::UpdateAnimationParity( void )
 		// Simulate a networked m_flAnimTime and m_flCycle
 		// FIXME:  Do we need the magic 0.1?
 		SetCycle( 0.0f ); // GetSequenceCycleRate( GetSequence() ) * 0.1;
-		m_flAnimTime = curtime;
+		GetEngineObject()->SetAnimTime(curtime);
 	}
 }
 

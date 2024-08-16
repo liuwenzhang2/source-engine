@@ -477,13 +477,13 @@ void DeltaEntitiesDecoder::CopyNewEntity(
 
 	int start_bit = u.m_pBuf->GetNumBitsRead();
 
-	IClientNetworkable* pClientNetworkable = pClientEntity->GetClientNetworkable();
+	IEngineObjectClient* pEngineObjectClient = entitylist->GetEngineObject(u.m_nNewEntity);
 
 	DataUpdateType_t updateType = bNew ? DATA_UPDATE_CREATED : DATA_UPDATE_DATATABLE_CHANGED;
-	pClientNetworkable->PreDataUpdate( updateType );
+	pEngineObjectClient->PreDataUpdate( updateType );
 
-	m_EnginePackedEntityDecoder.ReadEnterPvsFromBuffer(u, entitylist->GetEngineObject(u.m_nNewEntity)->GetClientNetworkable());
-	m_PackedEntityDecoder.ReadEnterPvsFromBuffer(u, pClientNetworkable);
+	m_EnginePackedEntityDecoder.ReadEnterPvsFromBuffer(u, pEngineObjectClient->GetClientNetworkable());
+	m_PackedEntityDecoder.ReadEnterPvsFromBuffer(u, pClientEntity->GetClientNetworkable());
 
 	AddPostDataUpdateCall( u, u.m_nNewEntity, updateType );
 
@@ -685,8 +685,8 @@ void DeltaEntitiesDecoder::CopyExistingEntity(CEntityReadInfo& u)
 {
 	int start_bit = u.m_pBuf->GetNumBitsRead();
 
-	IClientNetworkable* pClientNetworkable = entitylist->GetClientNetworkable(u.m_nNewEntity);
-	if (!pClientNetworkable)
+	IEngineObjectClient* pEngineObjectClient = entitylist->GetEngineObject(u.m_nNewEntity);
+	if (!pEngineObjectClient)
 	{
 		Host_Error("CL_CopyExistingEntity: missing client entity %d.\n", u.m_nNewEntity);
 		return;
@@ -695,10 +695,10 @@ void DeltaEntitiesDecoder::CopyExistingEntity(CEntityReadInfo& u)
 	Assert(u.m_pFrom->transmit_entity.Get(u.m_nNewEntity));
 
 	// Read raw data from the network stream
-	pClientNetworkable->PreDataUpdate(DATA_UPDATE_DATATABLE_CHANGED);
+	pEngineObjectClient->PreDataUpdate(DATA_UPDATE_DATATABLE_CHANGED);
 
-	m_EnginePackedEntityDecoder.ReadDeltaEntFromBuffer(u, entitylist->GetEngineObject(u.m_nNewEntity)->GetClientNetworkable());
-	m_PackedEntityDecoder.ReadDeltaEntFromBuffer(u, pClientNetworkable);
+	m_EnginePackedEntityDecoder.ReadDeltaEntFromBuffer(u, pEngineObjectClient->GetClientNetworkable());
+	m_PackedEntityDecoder.ReadDeltaEntFromBuffer(u, pEngineObjectClient->GetClientEntity()->GetClientNetworkable());
 
 	AddPostDataUpdateCall(u, u.m_nNewEntity, DATA_UPDATE_DATATABLE_CHANGED);
 
@@ -914,11 +914,11 @@ void DeltaEntitiesDecoder::CallPostDataUpdates(CEntityReadInfo& u)
 		MDLCACHE_CRITICAL_SECTION_(g_pMDLCache);
 		CPostDataUpdateCall* pCall = &u.m_PostDataUpdateCalls[i];
 
-		IClientNetworkable* pClientNetworkable = entitylist->GetClientNetworkable(pCall->m_iEnt);
-		ErrorIfNot(pClientNetworkable,
+		IEngineObjectClient* pEngineObjectClient = entitylist->GetEngineObject(pCall->m_iEnt);
+		ErrorIfNot(pEngineObjectClient,
 			("CL_CallPostDataUpdates: missing ent %d", pCall->m_iEnt));
 
-		pClientNetworkable->PostDataUpdate(pCall->m_UpdateType);
+		pEngineObjectClient->PostDataUpdate(pCall->m_UpdateType);
 	}
 }
 //-----------------------------------------------------------------------------

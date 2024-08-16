@@ -153,68 +153,9 @@ int CRecordingList::Count()
 // Should these be somewhere else?
 #define PITCH 0
 
-//-----------------------------------------------------------------------------
-// Purpose: Decodes animtime and notes when it changes
-// Input  : *pStruct - ( C_BaseEntity * ) used to flag animtime is changine
-//			*pVarData - 
-//			*pIn - 
-//			objectID - 
-//-----------------------------------------------------------------------------
-void RecvProxy_AnimTime( const CRecvProxyData *pData, void *pStruct, void *pOut )
-{
-	C_BaseEntity *pEntity = ( C_BaseEntity * )pStruct;
-	Assert( pOut == &pEntity->m_flAnimTime );
 
-	int t;
-	int tickbase;
-	int addt;
 
-	// Unpack the data.
-	addt	= pData->m_Value.m_Int;
 
-	// Note, this needs to be encoded relative to packet timestamp, not raw client clock
-	tickbase = gpGlobals->GetNetworkBase( gpGlobals->tickcount, pEntity->entindex() );
-
-	t = tickbase;
-											//  and then go back to floating point time.
-	t += addt;				// Add in an additional up to 256 100ths from the server
-
-	// center m_flAnimTime around current time.
-	while (t < gpGlobals->tickcount - 127)
-		t += 256;
-	while (t > gpGlobals->tickcount + 127)
-		t -= 256;
-	
-	pEntity->m_flAnimTime = ( t * TICK_INTERVAL );
-}
-
-void RecvProxy_SimulationTime( const CRecvProxyData *pData, void *pStruct, void *pOut )
-{
-	C_BaseEntity *pEntity = ( C_BaseEntity * )pStruct;
-	Assert( pOut == &pEntity->m_flSimulationTime );
-
-	int t;
-	int tickbase;
-	int addt;
-
-	// Unpack the data.
-	addt	= pData->m_Value.m_Int;
-
-	// Note, this needs to be encoded relative to packet timestamp, not raw client clock
-	tickbase = gpGlobals->GetNetworkBase( gpGlobals->tickcount, pEntity->entindex() );
-
-	t = tickbase;
-											//  and then go back to floating point time.
-	t += addt;				// Add in an additional up to 256 100ths from the server
-
-	// center m_flSimulationTime around current time.
-	while (t < gpGlobals->tickcount - 127)
-		t += 256;
-	while (t > gpGlobals->tickcount + 127)
-		t -= 256;
-	
-	pEntity->m_flSimulationTime = ( t * TICK_INTERVAL );
-}
 
 void RecvProxy_ToolRecording( const CRecvProxyData *pData, void *pStruct, void *pOut )
 {
@@ -243,9 +184,7 @@ IMPLEMENT_CLIENTCLASS(C_BaseEntity, DT_BaseEntity, CBaseEntity);
 
 
 
-BEGIN_RECV_TABLE_NOBASE( C_BaseEntity, DT_AnimTimeMustBeFirst )
-	RecvPropInt( RECVINFO(m_flAnimTime), 0, RecvProxy_AnimTime ),
-END_RECV_TABLE()
+
 
 
 //#ifndef NO_ENTITY_PREDICTION
@@ -257,8 +196,7 @@ END_RECV_TABLE()
 
 
 BEGIN_RECV_TABLE_NOBASE(C_BaseEntity, DT_BaseEntity)
-	RecvPropDataTable( "AnimTimeMustBeFirst", 0, 0, &REFERENCE_RECV_TABLE(DT_AnimTimeMustBeFirst) ),
-	RecvPropInt( RECVINFO(m_flSimulationTime), 0, RecvProxy_SimulationTime ),
+
 	RecvPropInt( RECVINFO( m_ubInterpolationFrame ) ),
 	RecvPropInt(RECVINFO(m_nRenderMode)),
 	RecvPropInt(RECVINFO(m_nRenderFX)),
@@ -339,7 +277,7 @@ BEGIN_PREDICTION_DATA_NO_BASE( C_BaseEntity )
 	DEFINE_FIELD( m_vecBaseVelocity, FIELD_VECTOR ),
 	//DEFINE_FIELD( m_flGravity, FIELD_FLOAT ),
 //	DEFINE_FIELD( m_ModelInstance, FIELD_SHORT ),
-	DEFINE_FIELD( m_flProxyRandomValue, FIELD_FLOAT ),
+	//DEFINE_FIELD( m_flProxyRandomValue, FIELD_FLOAT ),
 
 //	DEFINE_FIELD( m_PredictableID, FIELD_INTEGER ),
 //	DEFINE_FIELD( m_pPredictionContext, FIELD_POINTER ),
@@ -592,7 +530,6 @@ void C_BaseEntity::SetTextureFrameIndex( int iIndex )
 //-----------------------------------------------------------------------------
 C_BaseEntity::C_BaseEntity()
 {
-	m_DataChangeEventRef = -1;
 	m_EntClientFlags = 0;
 	m_bEnableRenderingClipPlane = false;
 
@@ -613,7 +550,6 @@ C_BaseEntity::C_BaseEntity()
 
 	// Assume drawing everything
 	m_bReadyToDraw = true;
-	m_flProxyRandomValue = 0.0f;
 
 	m_fBBoxVisFlags = 0;
 //#if !defined( NO_ENTITY_PREDICTION )
@@ -664,7 +600,6 @@ const IEngineObjectClient* C_BaseEntity::GetEngineObject() const {
 void C_BaseEntity::Clear( void )
 {
 	m_bDormant = true;
-	m_nCreationTick = -1;
 	//m_RefEHandle.Term();
 	m_ModelInstance = MODEL_INSTANCE_INVALID;
 	m_ShadowHandle = CLIENTSHADOW_INVALID_HANDLE;
@@ -681,8 +616,7 @@ void C_BaseEntity::Clear( void )
 	}
 	m_vecViewOffset.Init();
 	m_vecBaseVelocity.Init();
-	m_flAnimTime = 0;
-	m_flSimulationTime = 0;
+
 
 
 	m_nRenderMode = 0;
@@ -752,10 +686,6 @@ bool C_BaseEntity::Init( int entnum, int iSerialNum )
 	if (entnum >= 0) {
 		//cl_entitylist->AddNetworkableEntity(this, entnum, iSerialNum);//GetIClientUnknown()
 	}
-
-	GetEngineObject()->CreatePartitionHandle();
-
-	m_nCreationTick = gpGlobals->tickcount;
 
 	return true;
 }
@@ -1649,44 +1579,12 @@ void C_BaseEntity::NotifyShouldTransmit( ShouldTransmitState_t state )
 }
 
 //-----------------------------------------------------------------------------
-// Call this in PostDataUpdate if you don't chain it down!
-//-----------------------------------------------------------------------------
-void C_BaseEntity::MarkMessageReceived()
-{
-	m_flLastMessageTime = engine->GetLastTimeStamp();
-}
-
-
-//-----------------------------------------------------------------------------
 // Purpose: Entity is about to be decoded from the network stream
 // Input  : bnewentity - is this a new entity this update?
 //-----------------------------------------------------------------------------
 void C_BaseEntity::PreDataUpdate( DataUpdateType_t updateType )
 {
 	VPROF( "C_BaseEntity::PreDataUpdate" );
-
-	// Register for an OnDataChanged call and call OnPreDataChanged().
-	if ( AddDataChangeEvent( this, updateType, &m_DataChangeEventRef ) )
-	{
-		OnPreDataChanged( updateType );
-	}
-
-
-	// Need to spawn on client before receiving original network data 
-	// in case it overrides any values set up in spawn ( e.g., m_iState )
-	bool bnewentity = (updateType == DATA_UPDATE_CREATED);
-
-	if ( !bnewentity )
-	{
-		GetEngineObject()->Interp_RestoreToLastNetworked();
-	}
-
-	if ( bnewentity /*&& !IsClientCreated()*/)
-	{
-		m_flSpawnTime = engine->GetLastTimeStamp();
-		MDLCACHE_CRITICAL_SECTION();
-		Spawn();
-	}
 
 #if 0 // Yahn suggesting commenting this out as a fix to demo recording not working
 	// If the entity moves itself every FRAME on the server but doesn't update animtime,
@@ -1696,12 +1594,6 @@ void C_BaseEntity::PreDataUpdate( DataUpdateType_t updateType )
 		m_flAnimTime = engine->GetLastTimeStamp();
 	}
 #endif
-
-	m_vecOldOrigin = GetEngineObject()->GetNetworkOrigin();
-	m_vecOldAngRotation = GetEngineObject()->GetNetworkAngles();
-
-	m_flOldAnimTime = m_flAnimTime;
-	m_flOldSimulationTime = m_flSimulationTime;
 
 	m_nOldRenderMode = m_nRenderMode;
 
@@ -1713,10 +1605,7 @@ void C_BaseEntity::PreDataUpdate( DataUpdateType_t updateType )
 	m_ubOldInterpolationFrame = m_ubInterpolationFrame;
 }
 
-const Vector& C_BaseEntity::GetOldOrigin()
-{
-	return m_vecOldOrigin;
-}
+
 
 
 
@@ -1889,85 +1778,11 @@ void C_BaseEntity::PostDataUpdate( DataUpdateType_t updateType )
 
 	PREDICTION_TRACKVALUECHANGESCOPE_ENTITY( this, "postdataupdate" );
 
-	// NOTE: This *has* to happen first. Otherwise, Origin + angles may be wrong 
-	if ( m_nRenderFX == kRenderFxRagdoll && updateType == DATA_UPDATE_CREATED )
-	{
-		MoveToLastReceivedPosition( true );
-	}
-	else
-	{
-		MoveToLastReceivedPosition( false );
-	}
-
-	// If it's the world, force solid flags
-	if (entindex() == 0 )
-	{
-		GetEngineObject()->SetModelIndex(1);
-		GetEngineObject()->SetSolid( SOLID_BSP );
-
-		// FIXME: Should these be assertions?
-		GetEngineObject()->SetAbsOrigin( vec3_origin );
-		GetEngineObject()->SetAbsAngles( vec3_angle );
-	}
 
 	if ( m_nOldRenderMode != m_nRenderMode )
 	{
 		SetRenderMode( (RenderMode_t)m_nRenderMode, true );
 	}
-
-	bool animTimeChanged = ( m_flAnimTime != m_flOldAnimTime ) ? true : false;
-	bool originChanged = ( m_vecOldOrigin != GetEngineObject()->GetLocalOrigin() ) ? true : false;
-	bool anglesChanged = ( m_vecOldAngRotation != GetEngineObject()->GetLocalAngles() ) ? true : false;
-	bool simTimeChanged = ( m_flSimulationTime != m_flOldSimulationTime ) ? true : false;
-
-	// Detect simulation changes 
-	bool simulationChanged = originChanged || anglesChanged || simTimeChanged;
-
-	bool bPredictable = GetPredictable();
-
-	// For non-predicted and non-client only ents, we need to latch network values into the interpolation histories
-	if ( !bPredictable /*&& !IsClientCreated()*/)
-	{
-		if ( animTimeChanged )
-		{
-			GetEngineObject()->OnLatchInterpolatedVariables( LATCH_ANIMATION_VAR );
-		}
-
-		if ( simulationChanged )
-		{
-			GetEngineObject()->OnLatchInterpolatedVariables( LATCH_SIMULATION_VAR );
-		}
-	}
-	// For predictables, we also need to store off the last networked value
-	else if ( bPredictable )
-	{
-		// Just store off last networked value for use in prediction
-		GetEngineObject()->OnStoreLastNetworkedValue();
-	}
-
-	// Deal with hierarchy. Have to do it here (instead of in a proxy)
-	// because this is the only point at which all entities are loaded
-	// If this condition isn't met, then a child was sent without its parent
-	//Assert( m_hNetworkMoveParent.Get() || !m_hNetworkMoveParent.IsValid() );
-	GetEngineObject()->HierarchySetParent(GetEngineObject()->GetNetworkMoveParent());
-
-	MarkMessageReceived();
-
-	// Make sure that the correct model is referenced for this entity
-	ValidateModelIndex();
-
-	// If this entity was new, then latch in various values no matter what.
-	if ( updateType == DATA_UPDATE_CREATED )
-	{
-		// Construct a random value for this instance
-		m_flProxyRandomValue = random->RandomFloat( 0, 1 );
-
-		ResetLatched();
-
-		m_nCreationTick = gpGlobals->tickcount;
-	}
-
-	CheckInitPredictable( "PostDataUpdate" );
 
 	// It's possible that a new entity will need to be forceably added to the 
 	//   player simulation list.  If so, do this here
@@ -2339,9 +2154,8 @@ void C_BaseEntity::GetAimEntOrigin( IClientEntity *pAttachedTo, Vector *pOrigin,
 //-----------------------------------------------------------------------------
 float C_BaseEntity::GetTextureAnimationStartTime()
 {
-	return m_flSpawnTime;
+	return GetEngineObject()->GetSpawnTime();
 }
-
 
 //-----------------------------------------------------------------------------
 // Default implementation, indicates that a texture animation has wrapped
@@ -3750,7 +3564,6 @@ void C_BaseEntity::UpdateOnRemove( void )
 	GetEngineObject()->SetGroundEntity( NULL );
 
 	Term();
-	ClearDataChangedEvent(m_DataChangeEventRef);
 //#if !defined( NO_ENTITY_PREDICTION )
 //	delete m_pPredictionContext;
 //#endif
@@ -4175,39 +3988,6 @@ float C_BaseEntity::GetInterpolationAmount( int flags )
 	return AdjustInterpolationAmount( this, TICKS_TO_TIME( TIME_TO_TICKS( GetClientInterpAmount() ) + serverTickMultiple ) );
 }
 
-
-float C_BaseEntity::GetLastChangeTime( int flags )
-{
-	if ( GetPredictable() /*|| IsClientCreated()*/)
-	{
-		return gpGlobals->curtime;
-	}
-	
-	// make sure not both flags are set, we can't resolve that
-	Assert( !( (flags & LATCH_ANIMATION_VAR) && (flags & LATCH_SIMULATION_VAR) ) );
-	
-	if ( flags & LATCH_ANIMATION_VAR )
-	{
-		return GetAnimTime();
-	}
-
-	if ( flags & LATCH_SIMULATION_VAR )
-	{
-		float st = GetSimulationTime();
-		if ( st == 0.0f )
-		{
-			return gpGlobals->curtime;
-		}
-		return st;
-	}
-
-	Assert( 0 );
-
-	return gpGlobals->curtime;
-}
-
-
-
 //-----------------------------------------------------------------------------
 // Simply here for game shared 
 //-----------------------------------------------------------------------------
@@ -4528,11 +4308,6 @@ void C_BaseEntity::DontRecordInTools()
 #ifndef NO_TOOLFRAMEWORK
 	m_bRecordInTools = false;
 #endif
-}
-
-int C_BaseEntity::GetCreationTick() const
-{
-	return m_nCreationTick;
 }
 
 //-----------------------------------------------------------------------------

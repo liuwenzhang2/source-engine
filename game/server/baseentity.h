@@ -745,11 +745,7 @@ public:
 
 
 
-	float				GetAnimTime() const;
-	void				SetAnimTime( float at );
 
-	float				GetSimulationTime() const;
-	void				SetSimulationTime( float st );
 
 	bool				IsTransparent() const;
 	void				SetRenderMode( RenderMode_t nRenderMode );
@@ -789,8 +785,7 @@ public:
 
 	// was pev->animtime:  consider moving to CBaseAnimating
 	float		m_flPrevAnimTime;
-	CNetworkVar( float, m_flAnimTime );  // this is the point in time that the client will interpolate to position,angle,frame,etc.
-	CNetworkVar( float, m_flSimulationTime );
+
 
 	void IncrementInterpolationFrame(); // Call this to cause a discontinuity (teleport)
 
@@ -916,6 +911,7 @@ public:
 	bool			IsCombatCharacter() { return MyCombatCharacterPointer() == NULL ? false : true; }
 	bool			IsInWorld( void ) const;
 	virtual bool	IsCombatItem( void ) const { return false; }
+	virtual bool	IsViewModel() { return false; }
 
 	virtual bool	IsBaseCombatWeapon( void ) const { return false; }
 	virtual bool	IsWearable( void ) const { return false; }

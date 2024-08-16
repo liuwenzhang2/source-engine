@@ -64,9 +64,12 @@ struct thinkfunc_t
 	DECLARE_SIMPLE_DATADESC();
 };
 
+class IServerEntity;
+
 class IEngineObjectServer : public IEngineObject {
 public:
 
+	virtual IServerEntity* GetServerEntity() = 0;
 	virtual CBaseEntity* GetOuter() = 0;
 
 	virtual void ParseMapData(IEntityMapData* mapData) = 0;
@@ -343,6 +346,12 @@ public:
 	virtual void StopFollowingEntity() = 0;	// will also change to MOVETYPE_NONE
 	virtual bool IsFollowingEntity() = 0;
 	virtual IEngineObjectServer* GetFollowedEntity() = 0;
+	virtual float GetAnimTime() const = 0;
+	virtual void SetAnimTime(float at) = 0;
+	virtual float GetSimulationTime() const = 0;
+	virtual void SetSimulationTime(float st) = 0;
+	virtual void UseClientSideAnimation() = 0;
+	virtual bool IsUsingClientSideAnimation() = 0;
 
 };
 

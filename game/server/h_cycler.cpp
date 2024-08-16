@@ -137,7 +137,7 @@ void CCycler::Think( void )
 	{
 		// ResetSequenceInfo();
 		// hack to avoid reloading model every frame
-		m_flAnimTime = gpGlobals->curtime;
+		GetEngineObject()->SetAnimTime(gpGlobals->curtime);
 		m_flPlaybackRate = 1.0;
 		m_bSequenceFinished = false;
 		m_flLastEventCheck = 0;
@@ -503,7 +503,7 @@ void CBlendingCycler::Think( void )
 	{
 		// ResetSequenceInfo();
 		// hack to avoid reloading model every frame
-		m_flAnimTime = gpGlobals->curtime;
+		GetEngineObject()->SetAnimTime(gpGlobals->curtime);
 		m_flPlaybackRate = 1.0;
 		m_bSequenceFinished = false;
 		m_flLastEventCheck = 0;

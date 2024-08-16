@@ -48,7 +48,7 @@ CHolidayGift* CHolidayGift::Create( const Vector &position, const QAngle &angles
 		pGift->GetEngineObject()->SetMoveType( MOVETYPE_FLYGRAVITY );
 		pGift->GetEngineObject()->SetAbsVelocity( vecImpulse * 2.f + Vector(0,0,200) );
 		pGift->GetEngineObject()->SetAbsAngles( QAngle(0,0,0) );
-		pGift->UseClientSideAnimation();
+		pGift->GetEngineObject()->UseClientSideAnimation();
 		pGift->ResetSequence( pGift->LookupSequence("idle") );
 
 		const char* soundname = "Christmas.GiftDrop";
