@@ -1708,6 +1708,10 @@ CVirtualModel *CMDLCache::GetVirtualModel( MDLHandle_t handle )
 	if ( pStudioHdr == NULL )
 		return NULL;
 
+	if (pStudioHdr->numincludemodels() == 0) {
+		return NULL;
+	}
+
 	return &pStudioHdr->m_pVirtualModel;
 }
 

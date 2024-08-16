@@ -740,7 +740,7 @@ bool C_BaseEntity::InitializeAsClientEntityByIndex( int iIndex, RenderGroup_t re
 	AddToLeafSystem( renderGroup );
 
 	// Add the client entity to the spatial partition. (Collidable)
-	GetEngineObject()->CreatePartitionHandle();
+	//GetEngineObject()->CreatePartitionHandle();
 
 	SpawnClientEntity();
 
@@ -778,7 +778,7 @@ void C_BaseEntity::Term()
 	}
 	
 	// Are we in the partition?
-	GetEngineObject()->DestroyPartitionHandle();
+	//GetEngineObject()->DestroyPartitionHandle();
 
 	// If Client side only entity index will be -1
 	if ( entindex() != -1 )

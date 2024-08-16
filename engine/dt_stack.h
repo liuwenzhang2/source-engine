@@ -133,13 +133,18 @@ inline unsigned char* UpdateRoutesExplicit_Template( DTStack *pStack, ProxyCalle
 		CSendTablePrecalc::CProxyPathEntry *pEntry = &pStack->m_pPrecalc->m_ProxyPathEntries[proxyPath.m_iFirstEntry + i];
 		int iProxy = pEntry->m_iProxy;
 		
-		if ( pStack->m_pProxies[iProxy] == (unsigned char*)-1 )
+		if (!pStack->m_pProxies[iProxy])
+		{
+			*pTest = NULL;
+			return NULL;
+		} 
+		else if ( pStack->m_pProxies[iProxy] == (unsigned char*)-1 )
 		{
 			pStack->m_pProxies[iProxy] = ProxyCaller::CallProxy( pStack, pStructBase, pEntry->m_iDatatableProp );
 			if ( !pStack->m_pProxies[iProxy] )
 			{
 				*pTest = NULL;
-				break;
+				return NULL;
 			}			
 		}
 		

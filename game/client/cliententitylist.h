@@ -186,6 +186,8 @@ public:
 	~C_EngineObjectInternal()
 	{
 		ClearDataChangedEvent(m_DataChangeEventRef);
+		// Are we in the partition?
+		DestroyPartitionHandle();
 	}
 
 	void Init(C_BaseEntity* pOuter) {

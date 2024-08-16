@@ -338,8 +338,8 @@ public:
 	virtual void MarkSurroundingBoundsDirty() = 0;
 	virtual void CalcNearestPoint(const Vector& vecWorldPt, Vector* pVecNearestWorldPt) const = 0;
 	virtual void SetSurroundingBoundsType(SurroundingBoundsType_t type, const Vector* pMins = NULL, const Vector* pMaxs = NULL) = 0;
-	virtual void CreatePartitionHandle() = 0;
-	virtual void DestroyPartitionHandle() = 0;
+	//virtual void CreatePartitionHandle() = 0;
+	//virtual void DestroyPartitionHandle() = 0;
 	virtual unsigned short	GetPartitionHandle() const = 0;
 	virtual float CalcDistanceFromPoint(const Vector& vecWorldPt) const = 0;
 	virtual bool DoesVPhysicsInvalidateSurroundingBox() const = 0;
