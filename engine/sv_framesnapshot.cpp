@@ -304,6 +304,7 @@ void CFrameSnapshotManager::PackEntities_NetworkBackDoor(
 			serverEntitylist->GetEngineObject(index)->GetNetworkable()->HasStateChanged();
 		g_pLocalNetworkBackdoor->EntState(pServerEntity, bHasChanged, bShouldTransmit);//serverEntitylist->GetNetworkSerialNumber(index),//pSVClass->m_pTable, pServerEntity, pSVClass->m_ClassID,
 		pServerEntity->GetNetworkable()->ClearStateChanged();
+		serverEntitylist->GetEngineObject(index)->GetNetworkable()->ClearStateChanged();
 	}
 
 	// Tell the client about any entities that are now dormant.

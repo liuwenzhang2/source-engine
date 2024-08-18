@@ -239,7 +239,7 @@ void* SendProxy_ClientSideAnimationE(const SendProp* pProp, const void* pStruct,
 	else
 		return NULL;	// Don't send animtime unless the client needs it.
 }
-
+REGISTER_SEND_PROXY_NON_MODIFIED_POINTER(SendProxy_ClientSideAnimationE);
 // SendTable stuff.
 IMPLEMENT_SERVERCLASS_ST(CBaseAnimating, DT_BaseAnimating)
 	SendPropInt		( SENDINFO(m_nForceBone), 8, 0 ),
