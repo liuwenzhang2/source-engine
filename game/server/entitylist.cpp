@@ -518,6 +518,7 @@ void* SendProxy_ClientSideSimulation(const SendProp* pProp, const void* pStruct,
 	else
 		return NULL;	// Don't send animtime unless the client needs it.
 }
+REGISTER_SEND_PROXY_NON_MODIFIED_POINTER(SendProxy_ClientSideSimulation);
 
 BEGIN_SEND_TABLE_NOBASE(CEngineObjectInternal, DT_AnimTimeMustBeFirst)
 // NOTE:  Animtime must be sent before origin and angles ( from pev ) because it has a 
@@ -4110,6 +4111,11 @@ IEngineObjectServer* CEngineObjectInternal::GetFollowedEntity()
 void CEngineObjectInternal::UseClientSideAnimation()
 {
 	m_bClientSideAnimation = true;
+}
+
+void CEngineObjectInternal::SimulationChanged() {
+	NetworkStateChanged(&m_vecOrigin);
+	NetworkStateChanged(&m_angRotation);
 }
 
 struct collidelist_t

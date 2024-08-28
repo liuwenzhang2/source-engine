@@ -574,6 +574,7 @@ public:
 	void NetworkStateChanged();
 	void NetworkStateChanged(void* pVar);
 	void NetworkStateChanged(unsigned short varOffset);
+	void SimulationChanged();
 private:
 	bool NameMatchesComplex(const char* pszNameOrWildcard);
 	bool ClassMatchesComplex(const char* pszClassOrWildcard);

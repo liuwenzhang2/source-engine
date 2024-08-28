@@ -1580,7 +1580,7 @@ void CBaseEntity::PhysicsStep()
 	// Getting them for modify marks them as changed automagically.
 	//m_vecOrigin.GetForModify();
 	//m_angRotation.GetForModify();
-	NetworkStateChanged();
+	GetEngineObject()->SimulationChanged();
 	
 	// HACK:  Make sure that the client latches the networked origin/orientation changes with the current server tick count
 	//  so that we don't get jittery interpolation.  All of this is necessary to mimic actual continuous simulation of the underlying

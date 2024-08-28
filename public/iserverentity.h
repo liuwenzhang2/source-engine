@@ -352,6 +352,7 @@ public:
 	virtual void SetSimulationTime(float st) = 0;
 	virtual void UseClientSideAnimation() = 0;
 	virtual bool IsUsingClientSideAnimation() = 0;
+	virtual void SimulationChanged() = 0;
 
 };
 
