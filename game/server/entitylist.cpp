@@ -458,13 +458,7 @@ void SendProxy_AnimTime(const SendProp* pProp, const void* pStruct, const void* 
 	CEngineObjectInternal* pEntity = (CEngineObjectInternal*)pStruct;
 
 #if defined( _DEBUG )
-	CBaseAnimating* pAnimating = pEntity->m_pOuter->GetBaseAnimating();
-	Assert(pAnimating);
-
-	if (pAnimating)
-	{
-		Assert(!pAnimating->IsUsingClientSideAnimation());
-	}
+	Assert(!pEntity->IsUsingClientSideAnimation());
 #endif
 
 	int ticknumber = TIME_TO_TICKS(pEntity->m_flAnimTime);
