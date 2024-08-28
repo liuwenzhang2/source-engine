@@ -129,7 +129,7 @@ public:
 
 	CDODPlayer();
 	~CDODPlayer();
-
+	virtual void PostConstructor(const char* szClassname, int iForceEdictIndex);
 	static CDODPlayer *CreatePlayer( const char *className, int ed );
 	static CDODPlayer* Instance( int iEnt );
 

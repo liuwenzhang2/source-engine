@@ -17,7 +17,7 @@ public:
 	DECLARE_SERVERCLASS();
 
 	CPropScalable();
-
+	virtual void PostConstructor(const char* szClassname, int iForceEdictIndex);
 	virtual void Spawn( void );
 	virtual void Precache( void );
 
@@ -79,7 +79,11 @@ CPropScalable::CPropScalable( void )
 	m_flScaleY = 1.0f;
 	m_flScaleZ = 1.0f;
 
-	UseClientSideAnimation();
+}
+
+void CPropScalable::PostConstructor(const char* szClassname, int iForceEdictIndex) {
+	BaseClass::PostConstructor(szClassname, iForceEdictIndex);
+	GetEngineObject()->UseClientSideAnimation();
 }
 
 void CPropScalable::Spawn( void )

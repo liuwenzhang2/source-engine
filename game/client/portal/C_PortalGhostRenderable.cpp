@@ -46,7 +46,7 @@ void C_PortalGhostRenderable::PerFrameUpdate( void )
 		GetEngineObject()->SetModelName( m_pGhostedRenderable->GetEngineObject()->GetModelName() );
 		GetEngineObject()->SetModelIndex( m_pGhostedRenderable->GetEngineObject()->GetModelIndex() );
 		GetEngineObject()->SetEffects( m_pGhostedRenderable->GetEngineObject()->GetEffects() | EF_NOINTERP );
-		m_flAnimTime = m_pGhostedRenderable->m_flAnimTime;		
+		GetEngineObject()->SetAnimTime( m_pGhostedRenderable->GetEngineObject()->GetAnimTime());
 
 		if( m_bSourceIsBaseAnimating )
 		{

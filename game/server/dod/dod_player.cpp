@@ -313,7 +313,6 @@ CDODPlayer::CDODPlayer()
 	m_PlayerAnimState = CreatePlayerAnimState( this );
 	m_Shared.Init( this );
 
-	UseClientSideAnimation();
 	m_angEyeAngles.Init();
 
 	SetViewOffset( DOD_PLAYER_VIEW_OFFSET );
@@ -372,6 +371,10 @@ CDODPlayer::CDODPlayer()
 	m_flTimeAsClassAccumulator = 0;
 }
 
+void CDODPlayer::PostConstructor(const char* szClassname, int iForceEdictIndex) {
+	BaseClass::PostConstructor(szClassname, iForceEdictIndex);
+	GetEngineObject()->UseClientSideAnimation();
+}
 
 CDODPlayer::~CDODPlayer()
 {

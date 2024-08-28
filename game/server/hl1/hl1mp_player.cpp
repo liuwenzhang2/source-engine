@@ -95,7 +95,6 @@ CHL1MP_Player::CHL1MP_Player()
 	m_PlayerAnimState = CreatePlayerAnimState( this );
 //	item_list = 0;
 
-	UseClientSideAnimation();
 	m_angEyeAngles.Init();
 //	m_pCurStateInfo = NULL;
 	m_lifeState = LIFE_DEAD; // Start "dead".
@@ -107,6 +106,11 @@ CHL1MP_Player::CHL1MP_Player()
 //	SetViewOffset( TFC_PLAYER_VIEW_OFFSET );
 
 //	SetContextThink( &CTFCPlayer::TFCPlayerThink, gpGlobals->curtime, "TFCPlayerThink" );
+}
+
+void CHL1MP_Player::PostConstructor(const char* szClassname, int iForceEdictIndex) {
+	BaseClass::PostConstructor(szClassname, iForceEdictIndex);
+	GetEngineObject()->UseClientSideAnimation();
 }
 
 CHL1MP_Player::~CHL1MP_Player()

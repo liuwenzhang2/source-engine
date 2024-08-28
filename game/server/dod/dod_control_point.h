@@ -33,7 +33,7 @@ public:
 	DECLARE_DATADESC();
 
 	CControlPoint();
-
+	virtual void PostConstructor(const char* szClassname, int iForceEdictIndex);
 	virtual void Spawn( void );
 	virtual bool KeyValue( const char *szKeyName, const char *szValue );
 	virtual void Precache( void );

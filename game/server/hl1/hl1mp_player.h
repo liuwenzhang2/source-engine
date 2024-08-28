@@ -30,7 +30,7 @@ public:
     
 	CHL1MP_Player();
 	~CHL1MP_Player( void );
-	
+	virtual void PostConstructor(const char* szClassname, int iForceEdictIndex);
     virtual void Event_Killed( const CTakeDamageInfo &info );
     virtual void Spawn( void );
     virtual void PostThink( void );

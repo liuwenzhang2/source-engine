@@ -760,7 +760,7 @@ void CMultiPlayerAnimState::RestartMainSequence( void )
 	CBaseAnimatingOverlay *pPlayer = GetBasePlayer();
 	if ( pPlayer )
 	{
-		pPlayer->m_flAnimTime = gpGlobals->curtime;
+		pPlayer->GetEngineObject()->SetAnimTime(gpGlobals->curtime);
 		pPlayer->SetCycle( 0 );
 	}
 }

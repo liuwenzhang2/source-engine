@@ -84,7 +84,6 @@ void CControlPoint::Spawn( void )
 
 	BaseClass::Spawn();
 
-	UseClientSideAnimation();
 
 	SetPlaybackRate( 1.0 );
 
@@ -99,6 +98,11 @@ void CControlPoint::Spawn( void )
 	}
 
 	m_iBombsRemaining = m_iBombsRequired;
+}
+
+void CControlPoint::PostConstructor(const char* szClassname, int iForceEdictIndex) {
+	BaseClass::PostConstructor(szClassname, iForceEdictIndex);
+	GetEngineObject()->UseClientSideAnimation();
 }
 
 void CControlPoint::SetNumCappersRequired( int alliesRequired, int axisRequired )

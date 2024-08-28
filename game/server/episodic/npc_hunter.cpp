@@ -321,7 +321,7 @@ public:
 
 	CHunterFlechette();
 	~CHunterFlechette();
-
+	virtual void PostConstructor(const char* szClassname, int iForceEdictIndex);
 	Class_T Classify() { return CLASS_NONE; }
 	
 	bool WasThrownBack()
@@ -444,9 +444,12 @@ static ConCommand ent_create("hunter_shoot_flechette", CC_Hunter_Shoot_Flechette
 //-----------------------------------------------------------------------------
 CHunterFlechette::CHunterFlechette()
 {
-	UseClientSideAnimation();
 }
 
+void CHunterFlechette::PostConstructor(const char* szClassname, int iForceEdictIndex) {
+	BaseClass::PostConstructor(szClassname, iForceEdictIndex);
+	GetEngineObject()->UseClientSideAnimation();
+}
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------

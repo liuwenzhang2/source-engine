@@ -245,8 +245,6 @@ CPortal_Player::CPortal_Player()
 	m_PlayerAnimState = CreatePortalPlayerAnimState( this );
 	CreateExpresser();
 
-	UseClientSideAnimation();
-
 	m_angEyeAngles.Init();
 
 	m_iLastWeaponFireUsercmd = 0;
@@ -266,6 +264,11 @@ CPortal_Player::CPortal_Player()
 	m_hExpressionSceneEnt = NULL;
 	m_flExpressionLoopTime = 0.0f;
 	m_bSuppressingCrosshair = false;
+}
+
+void CPortal_Player::PostConstructor(const char* szClassname, int iForceEdictIndex) {
+	BaseClass::PostConstructor(szClassname, iForceEdictIndex);
+	GetEngineObject()->UseClientSideAnimation();
 }
 
 CPortal_Player::~CPortal_Player( void )

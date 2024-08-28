@@ -355,7 +355,7 @@ void CLocalNetworkBackdoor::EntState(
 		IEngineObjectClient* pEngineObjectClient = entitylist->GetEngineObject(iEnt);
 		pEngineObjectClient->PreDataUpdate(updateType);
 
-		Assert( pCached->m_pClientEntity == pClientEntity->GetClientNetworkable()->GetDataTableBasePtr());
+		Assert( pCached->m_pEngineObjectClient == pEngineObjectClient);
 
 		LocalTransfer_TransferEntity(
 			serverEntitylist->GetEngineObject(iEnt)->GetNetworkable(),
