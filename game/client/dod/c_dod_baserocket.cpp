@@ -68,7 +68,7 @@ void C_DODBaseRocket::PostDataUpdate( DataUpdateType_t type )
 		ITypedInterpolatedVar< Vector > &interpolator = GetEngineObject()->GetOriginInterpolator();
 		
 		interpolator.ClearHistory();
-		float changeTime = GetLastChangeTime( LATCH_SIMULATION_VAR );
+		float changeTime = GetEngineObject()->GetLastChangeTime( LATCH_SIMULATION_VAR );
 
 		// Add a sample 1 second back.
 		Vector vCurOrigin = GetEngineObject()->GetLocalOrigin() - m_vInitialVelocity;

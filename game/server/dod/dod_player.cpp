@@ -4540,7 +4540,7 @@ void CDODPlayer::ResetProgressBar( void )
 void CDODPlayer::SetProgressBarTime( int barTime )
 {
 	m_iProgressBarDuration = barTime;
-	m_flProgressBarStartTime = this->m_flSimulationTime;
+	m_flProgressBarStartTime = this->GetEngineObject()->GetSimulationTime();
 }
 
 void CDODPlayer::SetDefusing( CDODBombTarget *pTarget )

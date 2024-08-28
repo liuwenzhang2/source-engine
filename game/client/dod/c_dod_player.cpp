@@ -465,7 +465,7 @@ void C_DODRagdoll::CreateDODRagdoll()
 			GetEngineObject()->SetAbsAngles( pPlayer->GetRenderAngles() );
 			GetEngineObject()->GetRotationInterpolator().Reset();
 
-			m_flAnimTime = pPlayer->m_flAnimTime;
+			GetEngineObject()->SetAnimTime(pPlayer->GetEngineObject()->GetAnimTime());
 			SetSequence( pPlayer->GetSequence() );
 			m_flPlaybackRate = pPlayer->GetPlaybackRate();
 		}

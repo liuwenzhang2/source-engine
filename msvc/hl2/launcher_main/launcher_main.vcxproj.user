@@ -4,14 +4,14 @@
     <LocalDebuggerCommand>C:\Games\Half-Life 2\hl2_launcher.exe</LocalDebuggerCommand>
     <LocalDebuggerWorkingDirectory>C:\Games\Half-Life 2</LocalDebuggerWorkingDirectory>
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
-    <LocalDebuggerCommandArguments>-game ep2 -w 1280 -h 720 -windowed -language schinese -audiolanguage schinese</LocalDebuggerCommandArguments>
+    <LocalDebuggerCommandArguments>-game hl1 -w 1280 -h 720 -windowed -language schinese -audiolanguage schinese</LocalDebuggerCommandArguments>
     <LocalDebuggerAttach>false</LocalDebuggerAttach>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LocalDebuggerCommand>C:\Games\Half-Life 2\hl2_launcher.exe</LocalDebuggerCommand>
     <LocalDebuggerWorkingDirectory>C:\Games\Half-Life 2</LocalDebuggerWorkingDirectory>
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
-    <LocalDebuggerCommandArguments>-game ep2 -w 1280 -h 720 -windowed -language schinese -audiolanguage schinese</LocalDebuggerCommandArguments>
+    <LocalDebuggerCommandArguments>-game hl1 -w 1280 -h 720 -windowed -language schinese -audiolanguage schinese</LocalDebuggerCommandArguments>
     <LocalDebuggerAttach>false</LocalDebuggerAttach>
   </PropertyGroup>
 </Project>

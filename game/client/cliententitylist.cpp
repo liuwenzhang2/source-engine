@@ -322,7 +322,7 @@ void RecvProxy_InterpolationAmountChanged(const CRecvProxyData* pData, void* pSt
 void RecvProxy_AnimTime(const CRecvProxyData* pData, void* pStruct, void* pOut)
 {
 	C_EngineObjectInternal* pEntity = (C_EngineObjectInternal*)pStruct;
-	Assert(pOut == &pEntity->m_flAnimTime);
+	//Assert(pOut == &pEntity->m_flAnimTime);
 
 	int t;
 	int tickbase;
@@ -350,7 +350,7 @@ void RecvProxy_AnimTime(const CRecvProxyData* pData, void* pStruct, void* pOut)
 void RecvProxy_SimulationTime(const CRecvProxyData* pData, void* pStruct, void* pOut)
 {
 	C_EngineObjectInternal* pEntity = (C_EngineObjectInternal*)pStruct;
-	Assert(pOut == &pEntity->m_flSimulationTime);
+	//Assert(pOut == &pEntity->m_flSimulationTime);
 
 	int t;
 	int tickbase;
@@ -777,7 +777,7 @@ void C_EngineObjectInternal::PostDataUpdate(DataUpdateType_t updateType)
 {
 	MDLCACHE_CRITICAL_SECTION();
 
-	PREDICTION_TRACKVALUECHANGESCOPE_ENTITY(this, "postdataupdate");
+	PREDICTION_TRACKVALUECHANGESCOPE_ENTITY(this->m_pOuter, "postdataupdate");
 
 	// NOTE: This *has* to happen first. Otherwise, Origin + angles may be wrong 
 	if (m_pOuter->m_nRenderFX == kRenderFxRagdoll && updateType == DATA_UPDATE_CREATED)

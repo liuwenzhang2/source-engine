@@ -118,7 +118,10 @@ IPhysicsObject *PhysModelCreateBox( CBaseEntity *pEntity, const Vector &mins, co
 		if ( model )
 		{
 			IStudioHdr* studioHdr = modelinfo->GetStudiomodel( model );
-			if ( studioHdr->IsValid() )
+			if (!studioHdr) {
+				studioHdr = modelinfo->GetStudiomodel(model);
+			}
+			if (studioHdr && studioHdr->IsValid())
 			{
 				pSurfaceProps = studioHdr->Studio_GetDefaultSurfaceProps(  );
 			}
