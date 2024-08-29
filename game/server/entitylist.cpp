@@ -876,53 +876,7 @@ void CEngineObjectInternal::ParseMapData(IEntityMapData* mapData)
 		{
 			if (!KeyValue(keyName, value)) {
 				if (!m_pOuter->KeyValue(keyName, value)) {
-					// loop through the data description, and try and place the keys in
-					if (!*ent_debugkeys.GetString())
-					{
-						for (datamap_t* dmap = m_pOuter->GetDataDescMap(); dmap != NULL; dmap = dmap->baseMap)
-						{
-							if (::ParseKeyvalue(m_pOuter, dmap->dataDesc, dmap->dataNumFields, keyName, value)) {
-								//return true;
-								break;
-							}
-						}
-					}
-					else
-					{
-						// debug version - can be used to see what keys have been parsed in
-						bool printKeyHits = false;
-						const char* debugName = "";
-
-						if (*ent_debugkeys.GetString() && !Q_stricmp(ent_debugkeys.GetString(), STRING(m_iClassname)))
-						{
-							// Msg( "-- found entity of type %s\n", STRING(m_iClassname) );
-							printKeyHits = true;
-							debugName = STRING(m_iClassname);
-						}
-
-						// loop through the data description, and try and place the keys in
-						for (datamap_t* dmap = m_pOuter->GetDataDescMap(); dmap != NULL; dmap = dmap->baseMap)
-						{
-							if (!printKeyHits && *ent_debugkeys.GetString() && !Q_stricmp(dmap->dataClassName, ent_debugkeys.GetString()))
-							{
-								// Msg( "-- found class of type %s\n", dmap->dataClassName );
-								printKeyHits = true;
-								debugName = dmap->dataClassName;
-							}
-
-							if (::ParseKeyvalue(m_pOuter, dmap->dataDesc, dmap->dataNumFields, keyName, value))
-							{
-								if (printKeyHits)
-									Msg("(%s) key: %-16s value: %s\n", debugName, keyName, value);
-
-								//return true;
-								break;
-							}
-						}
-
-						if (printKeyHits)
-							Msg("!! (%s) key not handled: \"%s\" \"%s\"\n", STRING(m_iClassname), keyName, value);
-					}
+					
 				}
 			}
 		} while (mapData->GetNextKey(keyName, value));

@@ -62,7 +62,7 @@ ConVar hl2_episodic( "hl2_episodic", "0", FCVAR_REPLICATED );
 
 #ifdef GAME_DLL
 	ConVar ent_debugkeys( "ent_debugkeys", "" );
-	//extern bool ParseKeyvalue( void *pObject, typedescription_t *pFields, int iNumFields, const char *szKeyName, const char *szValue );
+	extern bool ParseKeyvalue( void *pObject, typedescription_t *pFields, int iNumFields, const char *szKeyName, const char *szValue );
 	extern bool ExtractKeyvalue( void *pObject, typedescription_t *pFields, int iNumFields, const char *szKeyName, char *szValue, int iMaxLen );
 #endif
 	extern ISoundEmitterSystemBase* soundemitterbase;
@@ -478,7 +478,7 @@ bool CBaseEntity::KeyValue( const char *szKeyName, const char *szValue )
 	//	return true;
 	//}
 
-//#ifdef GAME_DLL	
+#ifdef GAME_DLL	
 	
 	//if ( FStrEq( szKeyName, "targetname" ) )
 	//{
@@ -486,9 +486,55 @@ bool CBaseEntity::KeyValue( const char *szKeyName, const char *szValue )
 	//	return true;
 	//}
 
+	// loop through the data description, and try and place the keys in
+	if (!*ent_debugkeys.GetString())
+	{
+		for (datamap_t* dmap = this->GetDataDescMap(); dmap != NULL; dmap = dmap->baseMap)
+		{
+			if (::ParseKeyvalue(this, dmap->dataDesc, dmap->dataNumFields, szKeyName, szValue)) {
+				//return true;
+				break;
+			}
+		}
+	}
+	else
+	{
+		// debug version - can be used to see what keys have been parsed in
+		bool printKeyHits = false;
+		const char* debugName = "";
 
+		if (*ent_debugkeys.GetString() && !Q_stricmp(ent_debugkeys.GetString(), GetClassname()))
+		{
+			// Msg( "-- found entity of type %s\n", STRING(m_iClassname) );
+			printKeyHits = true;
+			debugName = GetClassname();
+		}
 
-//#endif
+		// loop through the data description, and try and place the keys in
+		for (datamap_t* dmap = this->GetDataDescMap(); dmap != NULL; dmap = dmap->baseMap)
+		{
+			if (!printKeyHits && *ent_debugkeys.GetString() && !Q_stricmp(dmap->dataClassName, ent_debugkeys.GetString()))
+			{
+				// Msg( "-- found class of type %s\n", dmap->dataClassName );
+				printKeyHits = true;
+				debugName = dmap->dataClassName;
+			}
+
+			if (::ParseKeyvalue(this, dmap->dataDesc, dmap->dataNumFields, szKeyName, szValue))
+			{
+				if (printKeyHits)
+					Msg("(%s) key: %-16s value: %s\n", debugName, szKeyName, szValue);
+
+				//return true;
+				break;
+			}
+		}
+
+		if (printKeyHits)
+			Msg("!! (%s) key not handled: \"%s\" \"%s\"\n", GetClassname(), szKeyName, szValue);
+	}
+
+#endif
 
 	// key hasn't been handled
 	return false;
