@@ -861,7 +861,7 @@ void C_HL2MPRagdoll::CreateHL2MPRagdoll( void )
 			GetEngineObject()->SetAbsAngles( pPlayer->GetRenderAngles() );
 			GetEngineObject()->GetRotationInterpolator().Reset();
 
-			m_flAnimTime = pPlayer->m_flAnimTime;
+			GetEngineObject()->SetAnimTime(pPlayer->GetEngineObject()->GetAnimTime());
 			SetSequence( pPlayer->GetSequence() );
 			m_flPlaybackRate = pPlayer->GetPlaybackRate();
 		}
