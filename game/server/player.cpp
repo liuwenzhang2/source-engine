@@ -1893,7 +1893,7 @@ void CBasePlayer::SetAnimation( PLAYER_ANIM playerAnim )
 	}
 	else if (idealActivity == ACT_WALK)
 	{
-		if (GetActivity() != ACT_RANGE_ATTACK1 || IsActivityFinished())
+		if (GetActivity() != ACT_RANGE_ATTACK1 || IsSequenceFinished())
 		{
 			if (GetEngineObject()->GetFlags() & FL_DUCKING )	// crouching
 			{

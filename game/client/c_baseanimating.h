@@ -368,7 +368,7 @@ public:
 
 	C_BaseAnimating*				FindFollowedEntity();
 
-	virtual bool					IsActivityFinished( void ) { return m_bSequenceFinished; }
+	//virtual bool					IsActivityFinished( void ) { return m_bSequenceFinished; }
 	inline bool						IsSequenceFinished( void );
 	inline bool						SequenceLoops( void ) { return m_bSequenceLoops; }
 

@@ -2222,6 +2222,7 @@ public:
 
 	virtual bool				SequencesAvailable() const = 0;
 	virtual int					GetNumSeq(void) const = 0;
+	virtual bool				IsSequenceLooping(int iSequence) = 0;
 	virtual mstudioanimdesc_t& pAnimdesc(int i) = 0;
 	virtual mstudioseqdesc_t& pSeqdesc(int iSequence) const = 0;
 	virtual int					iRelativeAnim(int baseseq, int relanim) const = 0;	// maps seq local anim reference to global anim index

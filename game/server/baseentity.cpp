@@ -61,6 +61,9 @@
 #include "env_debughistory.h"
 #include "tier1/utlstring.h"
 #include "utlhashtable.h"
+#include "EntityFlame.h"
+#include "EntityDissolve.h"
+#include "ragdoll_shared.h"
 
 #if defined( TF_DLL )
 #include "tf_gamerules.h"
@@ -1568,6 +1571,11 @@ BEGIN_DATADESC_NO_BASE( CBaseEntity )
 	DEFINE_OUTPUT( m_OnUser2, "OnUser2" ),
 	DEFINE_OUTPUT( m_OnUser3, "OnUser3" ),
 	DEFINE_OUTPUT( m_OnUser4, "OnUser4" ),
+	DEFINE_OUTPUT(m_OnIgnite, "OnIgnite"),
+	DEFINE_INPUTFUNC( FIELD_VOID, "Ignite", InputIgnite ),
+	DEFINE_INPUTFUNC( FIELD_FLOAT, "IgniteLifetime", InputIgniteLifetime ),
+	DEFINE_INPUTFUNC( FIELD_INTEGER, "IgniteNumHitboxFires", InputIgniteNumHitboxFires ),
+	DEFINE_INPUTFUNC( FIELD_FLOAT, "IgniteHitboxFireScale", InputIgniteHitboxFireScale ),
 
 	// Function Pointers
 	DEFINE_FUNCTION( SUB_Remove ),
@@ -2631,7 +2639,7 @@ void CBaseEntity::OnRestore()
 		GetEngineObject()->AddEffects( EF_NODRAW );
 		GetEngineObject()->RemoveFlag( FL_DISSOLVING | FL_ONFIRE );
 	}
-
+	m_flEstIkFloor = GetEngineObject()->GetLocalOrigin().z;
 }
 
 
@@ -5442,6 +5450,200 @@ void CBaseEntity::InputFireUser4( inputdata_t& inputdata )
 	m_OnUser4.FireOutput( inputdata.pActivator, this );
 }
 
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+void CBaseEntity::Ignite(float flFlameLifetime, bool bNPCOnly, float flSize, bool bCalledByLevelDesigner)
+{
+	if (IsOnFire())
+		return;
+
+	bool bIsNPC = IsNPC();
+
+	// Right now this prevents stuff we don't want to catch on fire from catching on fire.
+	if (bNPCOnly && bIsNPC == false)
+	{
+		return;
+	}
+
+	if (bIsNPC == true && bCalledByLevelDesigner == false)
+	{
+		CAI_BaseNPC* pNPC = MyNPCPointer();
+
+		if (pNPC && pNPC->AllowedToIgnite() == false)
+			return;
+	}
+
+	CEntityFlame* pFlame = CEntityFlame::Create(this);
+	if (pFlame)
+	{
+		pFlame->SetLifetime(flFlameLifetime);
+		GetEngineObject()->AddFlag(FL_ONFIRE);
+
+		SetEffectEntity(pFlame);
+
+		if (flSize > 0.0f)
+		{
+			pFlame->SetSize(flSize);
+		}
+	}
+
+	m_OnIgnite.FireOutput(this, this);
+}
+
+void CBaseEntity::IgniteLifetime(float flFlameLifetime)
+{
+	if (!IsOnFire())
+		Ignite(30, false, 0.0f, true);
+
+	CEntityFlame* pFlame = dynamic_cast<CEntityFlame*>(GetEffectEntity());
+
+	if (!pFlame)
+		return;
+
+	pFlame->SetLifetime(flFlameLifetime);
+}
+
+void CBaseEntity::IgniteNumHitboxFires(int iNumHitBoxFires)
+{
+	if (!IsOnFire())
+		Ignite(30, false, 0.0f, true);
+
+	CEntityFlame* pFlame = dynamic_cast<CEntityFlame*>(GetEffectEntity());
+
+	if (!pFlame)
+		return;
+
+	pFlame->SetNumHitboxFires(iNumHitBoxFires);
+}
+
+void CBaseEntity::IgniteHitboxFireScale(float flHitboxFireScale)
+{
+	if (!IsOnFire())
+		Ignite(30, false, 0.0f, true);
+
+	CEntityFlame* pFlame = dynamic_cast<CEntityFlame*>(GetEffectEntity());
+
+	if (!pFlame)
+		return;
+
+	pFlame->SetHitboxFireScale(flHitboxFireScale);
+}
+
+//-----------------------------------------------------------------------------
+// Fades out!
+//-----------------------------------------------------------------------------
+bool CBaseEntity::Dissolve(const char* pMaterialName, float flStartTime, bool bNPCOnly, int nDissolveType, Vector vDissolverOrigin, int iMagnitude)
+{
+	// Right now this prevents stuff we don't want to catch on fire from catching on fire.
+	if (bNPCOnly && !(GetEngineObject()->GetFlags() & FL_NPC))
+		return false;
+
+	// Can't dissolve twice
+	if (IsDissolving())
+		return false;
+
+	bool bRagdollCreated = false;
+	CEntityDissolve* pDissolve = CEntityDissolve::Create(this, pMaterialName, flStartTime, nDissolveType, &bRagdollCreated);
+	if (pDissolve)
+	{
+		SetEffectEntity(pDissolve);
+
+		GetEngineObject()->AddFlag(FL_DISSOLVING);
+		m_flDissolveStartTime = flStartTime;
+		pDissolve->SetDissolverOrigin(vDissolverOrigin);
+		pDissolve->SetMagnitude(iMagnitude);
+	}
+
+	// if this is a ragdoll dissolving, fire an event
+	if ((CLASS_NONE == Classify()) && (ClassMatches("prop_ragdoll")))
+	{
+		IGameEvent* event = gameeventmanager->CreateEvent("ragdoll_dissolved");
+		if (event)
+		{
+			event->SetInt("entindex", entindex());
+			gameeventmanager->FireEvent(event);
+		}
+	}
+
+	return bRagdollCreated;
+}
+
+
+//-----------------------------------------------------------------------------
+// Transfer dissolve
+//-----------------------------------------------------------------------------
+void CBaseEntity::TransferDissolveFrom(CBaseEntity* pAnim)
+{
+	if (!pAnim || !pAnim->IsDissolving())
+		return;
+
+	CEntityDissolve* pDissolve = CEntityDissolve::Create(this, pAnim);
+	if (pDissolve)
+	{
+		GetEngineObject()->AddFlag(FL_DISSOLVING);
+		m_flDissolveStartTime = pAnim->m_flDissolveStartTime;
+
+		CEntityDissolve* pDissolveFrom = dynamic_cast <CEntityDissolve*> (pAnim->GetEffectEntity());
+
+		if (pDissolveFrom)
+		{
+			pDissolve->SetDissolverOrigin(pDissolveFrom->GetDissolverOrigin());
+			pDissolve->SetDissolveType(pDissolveFrom->GetDissolveType());
+
+			if (pDissolveFrom->GetDissolveType() == ENTITY_DISSOLVE_CORE)
+			{
+				pDissolve->SetMagnitude(pDissolveFrom->GetMagnitude());
+				pDissolve->m_flFadeOutStart = CORE_DISSOLVE_FADE_START;
+				pDissolve->m_flFadeOutModelStart = CORE_DISSOLVE_MODEL_FADE_START;
+				pDissolve->m_flFadeOutModelLength = CORE_DISSOLVE_MODEL_FADE_LENGTH;
+				pDissolve->m_flFadeInLength = CORE_DISSOLVE_FADEIN_LENGTH;
+			}
+		}
+	}
+}
+
+//-----------------------------------------------------------------------------
+// Make a model look as though it's burning. 
+//-----------------------------------------------------------------------------
+void CBaseEntity::Scorch(int rate, int floor)
+{
+	color32 color = GetRenderColor();
+
+	if (color.r > floor)
+		color.r -= rate;
+
+	if (color.g > floor)
+		color.g -= rate;
+
+	if (color.b > floor)
+		color.b -= rate;
+
+	SetRenderColor(color.r, color.g, color.b);
+}
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+void CBaseEntity::InputIgnite(inputdata_t& inputdata)
+{
+	Ignite(30, false, 0.0f, true);
+}
+
+void CBaseEntity::InputIgniteLifetime(inputdata_t& inputdata)
+{
+	IgniteLifetime(inputdata.value.Float());
+}
+
+void CBaseEntity::InputIgniteNumHitboxFires(inputdata_t& inputdata)
+{
+	IgniteNumHitboxFires(inputdata.value.Int());
+}
+
+void CBaseEntity::InputIgniteHitboxFireScale(inputdata_t& inputdata)
+{
+	IgniteHitboxFireScale(inputdata.value.Float());
+}
+
+
 
 //-----------------------------------------------------------------------------
 // Purpose: 
@@ -5723,14 +5925,116 @@ bool CBaseEntity::AddStepDiscontinuity( float flTime, const Vector &vecOrigin, c
 }
 
 
-Vector CBaseEntity::GetStepOrigin( void ) const 
-{ 
-	return GetEngineObject()->GetLocalOrigin();
+//Vector CBaseEntity::GetStepOrigin( void ) const 
+//{ 
+//	return GetEngineObject()->GetLocalOrigin();
+//}
+//
+//QAngle CBaseEntity::GetStepAngles( void ) const
+//{
+//	return GetEngineObject()->GetLocalAngles();
+//}
+
+//-----------------------------------------------------------------------------
+// Purpose: Returns the origin to use for model rendering
+//-----------------------------------------------------------------------------
+
+Vector CBaseEntity::GetStepOrigin(void) const
+{
+	Vector tmp = GetEngineObject()->GetLocalOrigin();
+	tmp.z += m_flEstIkOffset;
+	return tmp;
 }
 
-QAngle CBaseEntity::GetStepAngles( void ) const
+//-----------------------------------------------------------------------------
+// Purpose: Returns the origin to use for model rendering
+//-----------------------------------------------------------------------------
+
+QAngle CBaseEntity::GetStepAngles(void) const
 {
+	// TODO: Add in body lean
 	return GetEngineObject()->GetLocalAngles();
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: Receives the clients IK floor position
+//-----------------------------------------------------------------------------
+
+void CBaseEntity::SetIKGroundContactInfo(float minHeight, float maxHeight)
+{
+	m_flIKGroundContactTime = gpGlobals->curtime;
+	m_flIKGroundMinHeight = minHeight;
+	m_flIKGroundMaxHeight = maxHeight;
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: Initializes IK floor position
+//-----------------------------------------------------------------------------
+
+void CBaseEntity::InitStepHeightAdjust(void)
+{
+	m_flIKGroundContactTime = 0;
+	m_flIKGroundMinHeight = 0;
+	m_flIKGroundMaxHeight = 0;
+
+	// FIXME: not safe to call GetAbsOrigin here. Hierarchy might not be set up!
+	m_flEstIkFloor = GetEngineObject()->GetAbsOrigin().z;
+	m_flEstIkOffset = 0;
+}
+
+
+//-----------------------------------------------------------------------------
+// Purpose: Interpolates client IK floor position and drops entity down so that the feet will reach
+//-----------------------------------------------------------------------------
+
+ConVar npc_height_adjust("npc_height_adjust", "1", FCVAR_ARCHIVE, "Enable test mode for ik height adjustment");
+
+void CBaseEntity::UpdateStepOrigin()
+{
+	if (!npc_height_adjust.GetBool())
+	{
+		m_flEstIkOffset = 0;
+		m_flEstIkFloor = GetEngineObject()->GetLocalOrigin().z;
+		return;
+	}
+
+	/*
+	if (m_debugOverlays & OVERLAY_NPC_SELECTED_BIT)
+	{
+		Msg("%x : %x\n", GetMoveParent(), GetGroundEntity() );
+	}
+	*/
+
+	if (m_flIKGroundContactTime > 0.2 && m_flIKGroundContactTime > gpGlobals->curtime - 0.2)
+	{
+		if ((GetEngineObject()->GetFlags() & (FL_FLY | FL_SWIM)) == 0 && GetEngineObject()->GetMoveParent() == NULL && GetEngineObject()->GetGroundEntity() != NULL && !GetEngineObject()->GetGroundEntity()->GetOuter()->IsMoving())
+		{
+			Vector toAbs = GetEngineObject()->GetAbsOrigin() - GetEngineObject()->GetLocalOrigin();
+			if (toAbs.z == 0.0)
+			{
+				CAI_BaseNPC* pNPC = MyNPCPointer();
+				// FIXME:  There needs to be a default step height somewhere
+				float height = 18.0f;
+				if (pNPC)
+				{
+					height = pNPC->StepHeight();
+				}
+
+				// debounce floor location
+				m_flEstIkFloor = m_flEstIkFloor * 0.2 + m_flIKGroundMinHeight * 0.8;
+
+				// don't let heigth difference between min and max exceed step height
+				float bias = clamp((m_flIKGroundMaxHeight - m_flIKGroundMinHeight) - height, 0.f, height);
+				// save off reasonable offset
+				m_flEstIkOffset = clamp(m_flEstIkFloor - GetEngineObject()->GetAbsOrigin().z, -height + bias, 0.0f);
+				return;
+			}
+		}
+	}
+
+	// don't use floor offset, decay the value
+	m_flEstIkOffset *= 0.5;
+	m_flEstIkFloor = GetEngineObject()->GetLocalOrigin().z;
 }
 
 //-----------------------------------------------------------------------------

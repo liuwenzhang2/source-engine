@@ -637,6 +637,24 @@ public:
 	void InputFireUser3( inputdata_t &inputdata );
 	void InputFireUser4( inputdata_t &inputdata );
 
+	// Fire
+	virtual void Ignite(float flFlameLifetime, bool bNPCOnly = true, float flSize = 0.0f, bool bCalledByLevelDesigner = false);
+	virtual void IgniteLifetime(float flFlameLifetime);
+	virtual void IgniteNumHitboxFires(int iNumHitBoxFires);
+	virtual void IgniteHitboxFireScale(float flHitboxFireScale);
+	virtual void Extinguish() { GetEngineObject()->RemoveFlag(FL_ONFIRE); }
+	bool IsOnFire() { return ((GetEngineObject()->GetFlags() & FL_ONFIRE) != 0); }
+	void Scorch(int rate, int floor);
+	void InputIgnite(inputdata_t& inputdata);
+	void InputIgniteLifetime(inputdata_t& inputdata);
+	void InputIgniteNumHitboxFires(inputdata_t& inputdata);
+	void InputIgniteHitboxFireScale(inputdata_t& inputdata);
+
+	// Dissolve, returns true if the ragdoll has been created
+	bool Dissolve(const char* pMaterialName, float flStartTime, bool bNPCOnly = true, int nDissolveType = 0, Vector vDissolverOrigin = vec3_origin, int iMagnitude = 0);
+	bool IsDissolving() { return ((GetEngineObject()->GetFlags() & FL_DISSOLVING) != 0); }
+	void TransferDissolveFrom(CBaseEntity* pAnim);
+
 	// Returns the origin at which to play an inputted dispatcheffect 
 	virtual void GetInputDispatchEffectPosition( const char *sInputString, Vector &pOrigin, QAngle &pAngles );
 
@@ -1512,6 +1530,9 @@ public:
 	static void PrecacheModelComponents( int nModelIndex );
 	static void PrecacheSoundHelper( const char *pName );
 
+	void InitStepHeightAdjust(void);
+	void SetIKGroundContactInfo(float minHeight, float maxHeight);
+	void UpdateStepOrigin(void);
 protected:
 	// Which frame did I simulate?
 	int						m_nSimulationTick;
@@ -1574,7 +1595,14 @@ private:
 	// A counter to help quickly build a list of potentially pushed objects for physics
 	int				m_nPushEnumCount;
 
-	
+
+	float				m_flIKGroundContactTime;
+	float				m_flIKGroundMinHeight;
+	float				m_flIKGroundMaxHeight;
+
+	float				m_flEstIkFloor; // debounced
+	float				m_flEstIkOffset;
+
 	//Adrian
 	CNetworkVar( unsigned char, m_iTextureFrameIndex );
 	
@@ -1586,6 +1614,8 @@ private:
 	COutputEvent m_OnUser3;
 	COutputEvent m_OnUser4;
 
+	float				m_flDissolveStartTime;
+	COutputEvent m_OnIgnite;
 
 	
 	//CBaseHandle m_RefEHandle;

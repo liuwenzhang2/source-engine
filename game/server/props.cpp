@@ -1325,7 +1325,7 @@ bool CBreakableProp::OnAttemptPhysGunPickup( CBasePlayer *pPhysGunUser, PhysGunP
 		StudioFrameAdvanceManual( gpGlobals->frametime );
  		DispatchAnimEvents( this );
 
-		if ( IsActivityFinished() )
+		if (IsSequenceFinished() )
 		{
 			int iSequence = SelectWeightedSequence( ACT_PHYSCANNON_ANIMATE_POST );
 			if ( iSequence != ACTIVITY_NOT_AVAILABLE )
@@ -1352,7 +1352,7 @@ bool CBreakableProp::OnAttemptPhysGunPickup( CBasePlayer *pPhysGunUser, PhysGunP
 		ResetClientsideFrame();
 		DispatchAnimEvents( this );
 
-		if ( IsActivityFinished() )
+		if (IsSequenceFinished() )
 		{
 			// We're done, reset the playback rate.
 			SetPlaybackRate( 1.0f );
@@ -1375,7 +1375,7 @@ void CBreakableProp::AnimateThink( void )
 		DispatchAnimEvents( this );
 		GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.1, s_pPropAnimateThink );
 
-		if ( IsActivityFinished() )
+		if (IsSequenceFinished() )
 		{
 			if ( m_nPhysgunState == PHYSGUN_ANIMATE_IS_PRE_ANIMATING )
 			{

@@ -1227,40 +1227,4 @@ void C_BaseAnimating::TransferDissolveFrom( C_BaseAnimating *pSource )
 
 #endif
 
-//SERVER
-#if !defined( CLIENT_DLL )
 
-//-----------------------------------------------------------------------------
-// Transfer dissolve
-//-----------------------------------------------------------------------------
-void CBaseAnimating::TransferDissolveFrom( CBaseAnimating *pAnim )
-{
-	if ( !pAnim || !pAnim->IsDissolving() )
-		return;
-
-	CEntityDissolve *pDissolve = CEntityDissolve::Create( this, pAnim );
-	if (pDissolve)
-	{
-		GetEngineObject()->AddFlag( FL_DISSOLVING );
-		m_flDissolveStartTime = pAnim->m_flDissolveStartTime;
-
-		CEntityDissolve *pDissolveFrom = dynamic_cast < CEntityDissolve * > (pAnim->GetEffectEntity());
-
-		if ( pDissolveFrom )
-		{
-			pDissolve->SetDissolverOrigin( pDissolveFrom->GetDissolverOrigin() );
-			pDissolve->SetDissolveType( pDissolveFrom->GetDissolveType() );
-
-			if ( pDissolveFrom->GetDissolveType() == ENTITY_DISSOLVE_CORE )
-			{
-				pDissolve->SetMagnitude( pDissolveFrom->GetMagnitude() );
-				pDissolve->m_flFadeOutStart = CORE_DISSOLVE_FADE_START;
-				pDissolve->m_flFadeOutModelStart = CORE_DISSOLVE_MODEL_FADE_START;
-				pDissolve->m_flFadeOutModelLength = CORE_DISSOLVE_MODEL_FADE_LENGTH;
-				pDissolve->m_flFadeInLength = CORE_DISSOLVE_FADEIN_LENGTH;
-			}
-		}
-	}
-}
-
-#endif

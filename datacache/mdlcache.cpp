@@ -2583,6 +2583,13 @@ bool CStudioHdr::SequencesAvailable() const
 		return true;
 }
 
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
+bool CStudioHdr::IsSequenceLooping(int iSequence)
+{
+	return (this->GetSequenceFlags(iSequence) & STUDIO_LOOPING) != 0;
+}
 
 //const CVirtualModel* CStudioHdr::ResetVModel(const CVirtualModel* pVModel) const
 //{

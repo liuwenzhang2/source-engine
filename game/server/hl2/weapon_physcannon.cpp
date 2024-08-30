@@ -3049,7 +3049,7 @@ void CWeaponPhysCannon::WaitForUpgradeThink()
 	Assert( m_bIsCurrentlyUpgrading );
 
 	StudioFrameAdvance();
-	if ( !IsActivityFinished() )
+	if ( !IsSequenceFinished() )
 	{
 		SetContextThink( &CWeaponPhysCannon::WaitForUpgradeThink, gpGlobals->curtime + 0.1f, s_pWaitForUpgradeContext );
 		return;

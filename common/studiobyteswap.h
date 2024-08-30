@@ -799,6 +799,7 @@ public:
 	int					RemapSeqBone(int iSequence, int iLocalBone) const;	// maps local sequence bone to global bone
 
 	bool				SequencesAvailable() const;
+	bool				IsSequenceLooping(int iSequence);
 	int					GetNumSeq(void) const;
 	mstudioanimdesc_t&	pAnimdesc(int i);
 	mstudioseqdesc_t&	pSeqdesc(int iSequence) const;

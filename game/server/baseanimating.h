@@ -82,11 +82,10 @@ public:
 	void SetSequence(int nSequence);
 	/* inline */ void ResetSequence(int nSequence);
 	// FIXME: push transitions support down into CBaseAnimating?
-	virtual bool IsActivityFinished( void ) { return m_bSequenceFinished; }
+	//virtual bool IsActivityFinished( void ) { return m_bSequenceFinished; }
 	inline bool IsSequenceFinished( void ) { return m_bSequenceFinished; }
 	inline bool SequenceLoops( void ) { return m_bSequenceLoops; }
-	bool		 IsSequenceLooping( IStudioHdr *pStudioHdr, int iSequence );
-	inline bool	 IsSequenceLooping( int iSequence ) { return IsSequenceLooping(GetModelPtr(),iSequence); }
+	inline bool	 IsSequenceLooping( int iSequence ) { return GetModelPtr()->IsSequenceLooping(iSequence); }
 	inline float SequenceDuration( void ) { return SequenceDuration( m_nSequence ); }
 	float	SequenceDuration( IStudioHdr *pStudioHdr, int iSequence );
 	inline float SequenceDuration( int iSequence ) { return SequenceDuration(GetModelPtr(), iSequence); }
@@ -270,29 +269,12 @@ public:
 
 	void	GetInputDispatchEffectPosition( const char *sInputString, Vector &pOrigin, QAngle &pAngles );
 
-	virtual void	ModifyOrAppendCriteria( AI_CriteriaSet& set );
+	//virtual void	ModifyOrAppendCriteria( AI_CriteriaSet& set );
 
 	// Send a muzzle flash event to the client for this entity.
 	void DoMuzzleFlash();
 
-	// Fire
-	virtual void Ignite( float flFlameLifetime, bool bNPCOnly = true, float flSize = 0.0f, bool bCalledByLevelDesigner = false );
-	virtual void IgniteLifetime( float flFlameLifetime );
-	virtual void IgniteNumHitboxFires( int iNumHitBoxFires );
-	virtual void IgniteHitboxFireScale( float flHitboxFireScale );
-	virtual void Extinguish() { GetEngineObject()->RemoveFlag( FL_ONFIRE ); }
-	bool IsOnFire() { return ( (GetEngineObject()->GetFlags() & FL_ONFIRE) != 0 ); }
-	void Scorch( int rate, int floor );
-	void InputIgnite( inputdata_t &inputdata );
-	void InputIgniteLifetime( inputdata_t &inputdata );
-	void InputIgniteNumHitboxFires( inputdata_t &inputdata );
-	void InputIgniteHitboxFireScale( inputdata_t &inputdata );
-	void InputBecomeRagdoll( inputdata_t &inputdata );
-
-	// Dissolve, returns true if the ragdoll has been created
-	bool Dissolve( const char *pMaterialName, float flStartTime, bool bNPCOnly = true, int nDissolveType = 0, Vector vDissolverOrigin = vec3_origin, int iMagnitude = 0 );
-	bool IsDissolving() { return ( (GetEngineObject()->GetFlags() & FL_DISSOLVING) != 0 ); }
-	void TransferDissolveFrom( CBaseAnimating *pAnim );
+	void InputBecomeRagdoll(inputdata_t& inputdata);
 
 	// animation needs
 	float				m_flGroundSpeed;	// computed linear movement rate for current sequence
@@ -302,7 +284,7 @@ public:
 	void SetLightingOriginRelative( string_t strLightingOriginRelative );
 	CBaseEntity *GetLightingOriginRelative();
 
-	virtual void SetLightingOrigin( CBaseEntity *pLightingOrigin );
+	void SetLightingOrigin( CBaseEntity *pLightingOrigin );
 	void SetLightingOrigin( string_t strLightingOrigin );
 	CBaseEntity *GetLightingOrigin();
 
@@ -348,30 +330,21 @@ public:
 	CNetworkVar( float, m_flPlaybackRate );
 
 public:
-	void InitStepHeightAdjust( void );
-	void SetIKGroundContactInfo( float minHeight, float maxHeight );
-	void UpdateStepOrigin( void );
+	
 
-protected:
-	float				m_flIKGroundContactTime;
-	float				m_flIKGroundMinHeight;
-	float				m_flIKGroundMaxHeight;
 
-	float				m_flEstIkFloor; // debounced
-	float				m_flEstIkOffset;
 
   	CIKContext			*m_pIk;
 	int					m_iIKCounter;
 
 public:
-	Vector	GetStepOrigin( void ) const;
-	QAngle	GetStepAngles( void ) const;
+	//Vector	GetStepOrigin( void ) const;
+	//QAngle	GetStepAngles( void ) const;
 
 private:
 	bool				m_bSequenceFinished;// flag set when StudioAdvanceFrame moves across a frame boundry
 	bool				m_bSequenceLoops;	// true if the sequence loops
 	//bool				m_bResetSequenceInfoOnLoad; // true if a ResetSequenceInfo was queued up during dynamic load
-	float				m_flDissolveStartTime;
 
 	// was pev->frame
 	CNetworkVar( float, m_flCycle );
@@ -402,9 +375,6 @@ protected:
 	CNetworkVar( float, m_fadeMinDist );	// Point at which fading is absolute
 	CNetworkVar( float, m_fadeMaxDist );	// Point at which fading is inactive
 	CNetworkVar( float, m_flFadeScale );	// Scale applied to min / max
-
-public:
-	COutputEvent m_OnIgnite;
 
 private:
 	IStudioHdr			*m_pStudioHdr;
