@@ -53,14 +53,7 @@ typedef unsigned short MDLHandle_t;
 extern ConVar vcollide_wireframe;
 
 
-struct ClientModelRenderInfo_t : public ModelRenderInfo_t
-{
-	// Added space for lighting origin override. Just allocated space, need to set base pointer
-	matrix3x4_t lightingOffset;
 
-	// Added space for model to world matrix. Just allocated space, need to set base pointer
-	matrix3x4_t modelToWorld;
-};
 
 struct RagdollInfo_t
 {
@@ -118,7 +111,6 @@ public:
 
 	float	GetAnimTimeInterval( void ) const;
 
-	virtual unsigned char	GetClientSideFade( void );
 
 	// Get bone controller values.
 	virtual void	GetBoneControllers(float controllers[MAXSTUDIOBONECTRLS]);
@@ -152,8 +144,7 @@ public:
 	virtual bool ShouldDraw();
 	virtual int DrawModel( int flags );
 	virtual int	InternalDrawModel( int flags );
-	virtual bool OnInternalDrawModel( ClientModelRenderInfo_t *pInfo );
-	virtual bool OnPostInternalDrawModel( ClientModelRenderInfo_t *pInfo );
+
 	void		DoInternalDrawModel( ClientModelRenderInfo_t *pInfo, DrawModelState_t *pState, matrix3x4_t *pBoneToWorldArray = NULL );
 
 	//
@@ -308,7 +299,6 @@ public:
 	virtual int GetBody()			{ return m_nBody; }
 	virtual int GetSkin()			{ return m_nSkin; }
 
-	bool IsOnFire() { return ( (GetEngineObject()->GetFlags() & FL_ONFIRE) != 0 ); }
 
 	inline float					GetPlaybackRate();
 	inline void						SetPlaybackRate( float rate );
@@ -534,9 +524,7 @@ protected:
 
 protected:
 
-	float							m_fadeMinDist;
-	float							m_fadeMaxDist;
-	float							m_flFadeScale;
+
 
 private:
 
@@ -609,8 +597,7 @@ private:
 
 	void							SetupBones_AttachmentHelper( IStudioHdr *pStudioHdr );
 
-	EHANDLE							m_hLightingOrigin;
-	EHANDLE							m_hLightingOriginRelative;
+
 
 	// These are compared against each other to determine if the entity should muzzle flash.
 	CNetworkVar( unsigned char, m_nMuzzleFlashParity );

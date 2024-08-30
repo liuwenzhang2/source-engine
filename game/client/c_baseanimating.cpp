@@ -92,42 +92,7 @@ bool C_AnimationLayer::IsActive( void )
 	return (m_nOrder != C_BaseAnimatingOverlay::MAX_OVERLAYS);
 }
 
-//-----------------------------------------------------------------------------
-// Relative lighting entity
-//-----------------------------------------------------------------------------
-class C_InfoLightingRelative : public C_BaseEntity
-{
-public:
-	DECLARE_CLASS( C_InfoLightingRelative, C_BaseEntity );
-	DECLARE_CLIENTCLASS();
 
-	void GetLightingOffset( matrix3x4_t &offset );
-
-private:
-	EHANDLE			m_hLightingLandmark;
-};
-
-IMPLEMENT_CLIENTCLASS_DT(C_InfoLightingRelative, DT_InfoLightingRelative, CInfoLightingRelative)
-	RecvPropEHandle(RECVINFO(m_hLightingLandmark)),
-END_RECV_TABLE()
-
-
-//-----------------------------------------------------------------------------
-// Relative lighting entity
-//-----------------------------------------------------------------------------
-void C_InfoLightingRelative::GetLightingOffset( matrix3x4_t &offset )
-{
-	if ( m_hLightingLandmark.Get() )
-	{
-		matrix3x4_t matWorldToLandmark;
- 		MatrixInvert( m_hLightingLandmark->GetEngineObject()->EntityToWorldTransform(), matWorldToLandmark );
-		ConcatTransforms(GetEngineObject()->EntityToWorldTransform(), matWorldToLandmark, offset );
-	}
-	else
-	{
-		SetIdentityMatrix( offset );
-	}
-}
 
 
 //-----------------------------------------------------------------------------
@@ -190,15 +155,8 @@ IMPLEMENT_CLIENTCLASS_DT(C_BaseAnimating, DT_BaseAnimating, CBaseAnimating)
 
 	RecvPropInt( RECVINFO( m_bClientSideFrameReset )),
 
-
-	RecvPropEHandle(RECVINFO(m_hLightingOrigin)),
-	RecvPropEHandle(RECVINFO(m_hLightingOriginRelative)),
-
 	RecvPropDataTable( "serveranimdata", 0, 0, &REFERENCE_RECV_TABLE( DT_ServerAnimationData ) ),
 
-	RecvPropFloat( RECVINFO( m_fadeMinDist ) ), 
-	RecvPropFloat( RECVINFO( m_fadeMaxDist ) ), 
-	RecvPropFloat( RECVINFO( m_flFadeScale ) ), 
 
 END_RECV_TABLE()
 
@@ -3160,32 +3118,7 @@ bool C_BaseAnimating::HitboxToWorldTransforms( matrix3x4_t *pHitboxToWorld[MAXST
 	return true;
 }
 
-//-----------------------------------------------------------------------------
-// 
-//-----------------------------------------------------------------------------
-bool C_BaseAnimating::OnPostInternalDrawModel( ClientModelRenderInfo_t *pInfo )
-{
-	return true;
-}
 
-//-----------------------------------------------------------------------------
-// 
-//-----------------------------------------------------------------------------
-bool C_BaseAnimating::OnInternalDrawModel( ClientModelRenderInfo_t *pInfo )
-{
-	if ( m_hLightingOriginRelative.Get() )
-	{
-		C_InfoLightingRelative *pInfoLighting = assert_cast<C_InfoLightingRelative*>( m_hLightingOriginRelative.Get() );
-		pInfoLighting->GetLightingOffset( pInfo->lightingOffset );
-		pInfo->pLightingOffset = &pInfo->lightingOffset;
-	}
-	if ( m_hLightingOrigin )
-	{
-		pInfo->pLightingOrigin = &(m_hLightingOrigin->GetEngineObject()->GetAbsOrigin());
-	}
-
-	return true;
-}
 
 //-----------------------------------------------------------------------------
 // 
@@ -6263,14 +6196,7 @@ const char *C_BaseAnimating::GetFlexControllerType( LocalFlexController_t iFlexC
 	return pflexcontroller->pszType( );
 }
 
-//-----------------------------------------------------------------------------
-// Purpose: Returns the fade scale of the entity in question
-// Output : unsigned char - 0 - 255 alpha value
-//-----------------------------------------------------------------------------
-unsigned char C_BaseAnimating::GetClientSideFade( void )
-{
-	return UTIL_ComputeEntityFade( this, m_fadeMinDist, m_fadeMaxDist, m_flFadeScale );
-}
+
 
 //-----------------------------------------------------------------------------
 // Purpose: Note that we've been transmitted a sequence

@@ -220,7 +220,11 @@ BEGIN_RECV_TABLE_NOBASE(C_BaseEntity, DT_BaseEntity)
 #ifdef TF_CLIENT_DLL
 	RecvPropArray3( RECVINFO_ARRAY(m_nModelIndexOverrides),	RecvPropInt( RECVINFO(m_nModelIndexOverrides[0]) ) ),
 #endif
-
+	RecvPropEHandle(RECVINFO(m_hLightingOrigin)),
+	RecvPropEHandle(RECVINFO(m_hLightingOriginRelative)),
+	RecvPropFloat(RECVINFO(m_fadeMinDist)),
+	RecvPropFloat(RECVINFO(m_fadeMaxDist)),
+	RecvPropFloat(RECVINFO(m_flFadeScale)),
 END_RECV_TABLE()
 
 
@@ -1472,6 +1476,71 @@ int C_BaseEntity::DrawModel( int flags )
 	DrawBBoxVisualizations();
 
 	return drawn;
+}
+
+
+//-----------------------------------------------------------------------------
+// Relative lighting entity
+//-----------------------------------------------------------------------------
+class C_InfoLightingRelative : public C_BaseEntity
+{
+public:
+	DECLARE_CLASS(C_InfoLightingRelative, C_BaseEntity);
+	DECLARE_CLIENTCLASS();
+
+	void GetLightingOffset(matrix3x4_t& offset);
+
+private:
+	EHANDLE			m_hLightingLandmark;
+};
+
+IMPLEMENT_CLIENTCLASS_DT(C_InfoLightingRelative, DT_InfoLightingRelative, CInfoLightingRelative)
+RecvPropEHandle(RECVINFO(m_hLightingLandmark)),
+END_RECV_TABLE()
+
+
+//-----------------------------------------------------------------------------
+// Relative lighting entity
+//-----------------------------------------------------------------------------
+void C_InfoLightingRelative::GetLightingOffset(matrix3x4_t& offset)
+{
+	if (m_hLightingLandmark.Get())
+	{
+		matrix3x4_t matWorldToLandmark;
+		MatrixInvert(m_hLightingLandmark->GetEngineObject()->EntityToWorldTransform(), matWorldToLandmark);
+		ConcatTransforms(GetEngineObject()->EntityToWorldTransform(), matWorldToLandmark, offset);
+	}
+	else
+	{
+		SetIdentityMatrix(offset);
+	}
+}
+
+//-----------------------------------------------------------------------------
+// 
+//-----------------------------------------------------------------------------
+bool C_BaseEntity::OnPostInternalDrawModel(ClientModelRenderInfo_t* pInfo)
+{
+	return true;
+}
+
+//-----------------------------------------------------------------------------
+// 
+//-----------------------------------------------------------------------------
+bool C_BaseEntity::OnInternalDrawModel(ClientModelRenderInfo_t* pInfo)
+{
+	if (m_hLightingOriginRelative.Get())
+	{
+		C_InfoLightingRelative* pInfoLighting = assert_cast<C_InfoLightingRelative*>(m_hLightingOriginRelative.Get());
+		pInfoLighting->GetLightingOffset(pInfo->lightingOffset);
+		pInfo->pLightingOffset = &pInfo->lightingOffset;
+	}
+	if (m_hLightingOrigin)
+	{
+		pInfo->pLightingOrigin = &(m_hLightingOrigin->GetEngineObject()->GetAbsOrigin());
+	}
+
+	return true;
 }
 
 //-----------------------------------------------------------------------------
@@ -3882,6 +3951,24 @@ RenderGroup_t C_BaseEntity::GetRenderGroup()
 	}
 
 	return renderGroup;
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: Returns the fade scale of the entity in question
+// Output : unsigned char - 0 - 255 alpha value
+//-----------------------------------------------------------------------------
+unsigned char C_BaseEntity::GetClientSideFade(void)
+{
+	return UTIL_ComputeEntityFade(this, m_fadeMinDist, m_fadeMaxDist, m_flFadeScale);
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
+void C_BaseEntity::SetFadeMinMax(float fademin, float fademax)
+{
+	m_fadeMinDist = fademin;
+	m_fadeMaxDist = fademax;
 }
 
 void C_BaseEntity::OnPostRestoreData()

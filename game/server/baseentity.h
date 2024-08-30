@@ -649,6 +649,8 @@ public:
 	void InputIgniteLifetime(inputdata_t& inputdata);
 	void InputIgniteNumHitboxFires(inputdata_t& inputdata);
 	void InputIgniteHitboxFireScale(inputdata_t& inputdata);
+	void InputSetLightingOriginRelative(inputdata_t& inputdata);
+	void InputSetLightingOrigin(inputdata_t& inputdata);
 
 	// Dissolve, returns true if the ragdoll has been created
 	bool Dissolve(const char* pMaterialName, float flStartTime, bool bNPCOnly = true, int nDissolveType = 0, Vector vDissolverOrigin = vec3_origin, int iMagnitude = 0);
@@ -689,6 +691,7 @@ public:
 	void		 DrawOutputOverlay(CEventAction *ev);
 	void		 SendDebugPivotOverlay( void );
 	void		 AddTimedOverlay( const char *msg, int endTime );
+	void	SetFadeDistance(float minFadeDist, float maxFadeDist);
 
 
 	// save/restore
@@ -1533,6 +1536,15 @@ public:
 	void InitStepHeightAdjust(void);
 	void SetIKGroundContactInfo(float minHeight, float maxHeight);
 	void UpdateStepOrigin(void);
+
+	virtual void SetLightingOriginRelative(CBaseEntity* pLightingOriginRelative);
+	void SetLightingOriginRelative(string_t strLightingOriginRelative);
+	CBaseEntity* GetLightingOriginRelative();
+
+	void SetLightingOrigin(CBaseEntity* pLightingOrigin);
+	void SetLightingOrigin(string_t strLightingOrigin);
+	CBaseEntity* GetLightingOrigin();
+
 protected:
 	// Which frame did I simulate?
 	int						m_nSimulationTick;
@@ -1617,7 +1629,15 @@ private:
 	float				m_flDissolveStartTime;
 	COutputEvent m_OnIgnite;
 
+	CNetworkHandle(CBaseEntity, m_hLightingOrigin);
+	CNetworkHandle(CBaseEntity, m_hLightingOriginRelative);
+
+	string_t m_iszLightingOriginRelative;	// for reading from the file only
+	string_t m_iszLightingOrigin;			// for reading from the file only
 	
+	CNetworkVar(float, m_fadeMinDist);	// Point at which fading is absolute
+	CNetworkVar(float, m_fadeMaxDist);	// Point at which fading is inactive
+	CNetworkVar(float, m_flFadeScale);	// Scale applied to min / max
 	//CBaseHandle m_RefEHandle;
 
 	// was pev->view_ofs ( FIXME:  Move somewhere up the hierarch, CBaseAnimating, etc. )
@@ -2131,6 +2151,25 @@ inline void CBaseEntity::DecrementTransmitStateOwnedCounter()
 	m_nTransmitStateOwnedCounter--;
 }
 
+inline void CBaseEntity::SetLightingOrigin(CBaseEntity* pLightingOrigin)
+{
+	m_hLightingOrigin = pLightingOrigin;
+}
+
+inline CBaseEntity* CBaseEntity::GetLightingOrigin()
+{
+	return m_hLightingOrigin;
+}
+
+inline void CBaseEntity::SetLightingOriginRelative(CBaseEntity* pLightingOriginRelative)
+{
+	m_hLightingOriginRelative = pLightingOriginRelative;
+}
+
+inline CBaseEntity* CBaseEntity::GetLightingOriginRelative()
+{
+	return m_hLightingOriginRelative;
+}
 
 //-----------------------------------------------------------------------------
 // Bullet firing (legacy)...

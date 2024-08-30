@@ -36,6 +36,7 @@
 #include "toolframework/itoolentity.h"
 #include "tier0/threadtools.h"
 #include "SoundEmitterSystem/isoundemittersystembase.h"
+#include "engine\ivmodelrender.h"
 
 class C_Team;
 class IPhysicsObject;
@@ -163,6 +164,14 @@ enum
 	INTERPOLATE_CONTINUE
 };
 
+struct ClientModelRenderInfo_t : public ModelRenderInfo_t
+{
+	// Added space for lighting origin override. Just allocated space, need to set base pointer
+	matrix3x4_t lightingOffset;
+
+	// Added space for model to world matrix. Just allocated space, need to set base pointer
+	matrix3x4_t modelToWorld;
+};
 
 //-----------------------------------------------------------------------------
 // Purpose: Base client side entity object
@@ -285,6 +294,8 @@ public:
 	virtual bool					UsesFullFrameBufferTexture();
 	virtual const model_t			*GetModel( void ) const;
 	virtual int						DrawModel( int flags );
+	virtual bool OnInternalDrawModel(ClientModelRenderInfo_t* pInfo);
+	virtual bool OnPostInternalDrawModel(ClientModelRenderInfo_t* pInfo);
 	virtual void					ComputeFxBlend( void );
 	virtual int						GetFxBlend( void );
 	virtual bool					LODTest() { return true; }   // NOTE: UNUSED
@@ -958,7 +969,7 @@ protected:
 	int	PhysicsClipVelocity (const Vector& in, const Vector& normal, Vector& out, float overbounce );
 
 	// Allow entities to perform client-side fades
-    virtual unsigned char GetClientSideFade() { return 255; }
+    //virtual unsigned char GetClientSideFade() { return 255; }
 
 protected:
 	// Two part guts of Interpolate(). Shared with C_BaseAnimating.
@@ -1012,6 +1023,9 @@ public:
 	virtual bool IgnoresZBuffer(void) const;
 	void SetRenderMode( RenderMode_t nRenderMode, bool bForceUpdate = false );
 	RenderMode_t GetRenderMode() const;
+	virtual unsigned char	GetClientSideFade(void);
+	virtual void SetFadeMinMax(float fademin, float fademax);
+	bool IsOnFire() { return ((GetEngineObject()->GetFlags() & FL_ONFIRE) != 0); }
 
 public:	
 
@@ -1277,8 +1291,11 @@ private:
 
     
 
-
-
+	EHANDLE							m_hLightingOrigin;
+	EHANDLE							m_hLightingOriginRelative;
+	float							m_fadeMinDist;
+	float							m_fadeMaxDist;
+	float							m_flFadeScale;
 	CNetworkVar( bool, m_bAlternateSorting );
 
 	//Adrian

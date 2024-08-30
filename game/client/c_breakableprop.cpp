@@ -28,14 +28,7 @@ C_BreakableProp::C_BreakableProp( void )
 	m_takedamage = DAMAGE_YES;
 }
 
-//-----------------------------------------------------------------------------
-// Purpose: 
-//-----------------------------------------------------------------------------
-void C_BreakableProp::SetFadeMinMax( float fademin, float fademax )
-{
-	m_fadeMinDist = fademin;
-	m_fadeMaxDist = fademax;
-}
+
 
 //-----------------------------------------------------------------------------
 // Copy fade from another breakable prop

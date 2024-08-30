@@ -55,98 +55,7 @@ class CIKSaveRestoreOps : public CClassPtrSaveRestoreOps
 	}
 };
 
-//-----------------------------------------------------------------------------
-// Relative lighting entity
-//-----------------------------------------------------------------------------
-class CInfoLightingRelative : public CBaseEntity
-{
-public:
-	DECLARE_CLASS( CInfoLightingRelative, CBaseEntity );
-	DECLARE_DATADESC();
-	DECLARE_SERVERCLASS();
 
-	virtual void Activate();
-	virtual void SetTransmit( CCheckTransmitInfo *pInfo, bool bAlways );
-	virtual int  UpdateTransmitState( void );
-
-private:
-	CNetworkHandle( CBaseEntity, m_hLightingLandmark );
-	string_t		m_strLightingLandmark;
-};
-
-LINK_ENTITY_TO_CLASS( info_lighting_relative, CInfoLightingRelative );
-
-BEGIN_DATADESC( CInfoLightingRelative )
-	DEFINE_KEYFIELD( m_strLightingLandmark, FIELD_STRING, "LightingLandmark" ),
-	DEFINE_FIELD( m_hLightingLandmark, FIELD_EHANDLE ),
-END_DATADESC()
-
-IMPLEMENT_SERVERCLASS_ST(CInfoLightingRelative, DT_InfoLightingRelative)
-	SendPropEHandle( SENDINFO( m_hLightingLandmark ) ),
-END_SEND_TABLE()
-
-
-//-----------------------------------------------------------------------------
-// Activate!
-//-----------------------------------------------------------------------------
-void CInfoLightingRelative::Activate()
-{
-	BaseClass::Activate();
-	if ( m_strLightingLandmark == NULL_STRING )
-	{
-		m_hLightingLandmark = NULL;
-	}
-	else
-	{
-		m_hLightingLandmark = gEntList.FindEntityByName( NULL, m_strLightingLandmark );
-		if ( !m_hLightingLandmark )
-		{
-			DevWarning( "%s: Could not find lighting landmark '%s'!\n", GetClassname(), STRING( m_strLightingLandmark ) );
-		}
-		else
-		{
-			// Set a force transmit because we do not have a model.
-			m_hLightingLandmark->GetEngineObject()->AddEFlags( EFL_FORCE_CHECK_TRANSMIT );
-		}
-	}
-}
-
-
-//-----------------------------------------------------------------------------
-// Force our lighting landmark to be transmitted
-//-----------------------------------------------------------------------------
-void CInfoLightingRelative::SetTransmit( CCheckTransmitInfo *pInfo, bool bAlways )
-{
-	// Are we already marked for transmission?
-	if ( pInfo->m_pTransmitEdict->Get( entindex() ) )
-		return;
-
-	BaseClass::SetTransmit( pInfo, bAlways );
-	
-	// Force our constraint entity to be sent too.
-	if ( m_hLightingLandmark )
-	{
-		if ( m_hLightingLandmark->GetEngineObject()->GetMoveParent() )
-		{
-			// Set a full check because we have a move parent.
-			m_hLightingLandmark->SetTransmitState( FL_EDICT_FULLCHECK );
-		}
-		else
-		{
-			m_hLightingLandmark->SetTransmitState( FL_EDICT_ALWAYS );
-		}
-
-		m_hLightingLandmark->SetTransmit( pInfo, bAlways );
-	}
-}
-
-//-----------------------------------------------------------------------------
-// Purpose Force our lighting landmark to be transmitted
-//-----------------------------------------------------------------------------
-int CInfoLightingRelative::UpdateTransmitState( void )
-{
-	return SetTransmitState( FL_EDICT_ALWAYS );
-}
 
 static CIKSaveRestoreOps s_IKSaveRestoreOp;
 
@@ -186,26 +95,18 @@ BEGIN_DATADESC( CBaseAnimating )
 	DEFINE_FIELD( m_nResetEventsParity, FIELD_INTEGER ),
 	DEFINE_FIELD( m_nMuzzleFlashParity, FIELD_CHARACTER ),
 
-	DEFINE_KEYFIELD( m_iszLightingOriginRelative, FIELD_STRING, "LightingOriginHack" ),
-	DEFINE_KEYFIELD( m_iszLightingOrigin, FIELD_STRING, "LightingOrigin" ),
 
-	DEFINE_FIELD( m_hLightingOrigin, FIELD_EHANDLE ),
-	DEFINE_FIELD( m_hLightingOriginRelative, FIELD_EHANDLE ),
 
 	DEFINE_FIELD( m_flModelScale, FIELD_FLOAT ),
-	DEFINE_FIELD( m_flDissolveStartTime, FIELD_TIME ),
 
  // DEFINE_FIELD( m_boneCacheHandle, memhandle_t ),
 
 
 	DEFINE_INPUTFUNC( FIELD_VOID, "BecomeRagdoll", InputBecomeRagdoll ),
-	DEFINE_INPUTFUNC( FIELD_STRING, "SetLightingOriginHack", InputSetLightingOriginRelative ),
-	DEFINE_INPUTFUNC( FIELD_STRING, "SetLightingOrigin", InputSetLightingOrigin ),
+
 	//DEFINE_OUTPUT( m_OnIgnite, "OnIgnite" ),
 
-	DEFINE_INPUT( m_fadeMinDist, FIELD_FLOAT, "fademindist" ),
-	DEFINE_INPUT( m_fadeMaxDist, FIELD_FLOAT, "fademaxdist" ),
-	DEFINE_KEYFIELD( m_flFadeScale, FIELD_FLOAT, "fadescale" ),
+
 
 	DEFINE_KEYFIELD( m_flModelScale, FIELD_FLOAT, "modelscale" ),
 	DEFINE_INPUTFUNC( FIELD_VECTOR, "SetModelScale", InputSetModelScale ),
@@ -256,15 +157,11 @@ IMPLEMENT_SERVERCLASS_ST(CBaseAnimating, DT_BaseAnimating)
 	SendPropInt( SENDINFO( m_bClientSideFrameReset ), 1, SPROP_UNSIGNED ),
 
 
-	SendPropEHandle( SENDINFO( m_hLightingOrigin ) ),
-	SendPropEHandle( SENDINFO( m_hLightingOriginRelative ) ),
+
 
 	SendPropDataTable( "serveranimdata", 0, &REFERENCE_SEND_TABLE( DT_ServerAnimationData ), SendProxy_ClientSideAnimationE),
 
-	// Fading
-	SendPropFloat( SENDINFO( m_fadeMinDist ), 0, SPROP_NOSCALE ),
-	SendPropFloat( SENDINFO( m_fadeMaxDist ), 0, SPROP_NOSCALE ),
-	SendPropFloat( SENDINFO( m_flFadeScale ), 0, SPROP_NOSCALE ),
+
 
 END_SEND_TABLE()
 
@@ -287,9 +184,6 @@ CBaseAnimating::CBaseAnimating()
 	m_nResetEventsParity = 0;
 	m_boneCacheHandle = 0;
 	m_pStudioHdr = NULL;
-	m_fadeMinDist = 0;
-	m_fadeMaxDist = 0;
-	m_flFadeScale = 0.0f;
 	m_fBoneCacheFlags = 0;
 }
 
@@ -326,8 +220,6 @@ void CBaseAnimating::Precache()
 void CBaseAnimating::Activate()
 {
 	BaseClass::Activate();
-	SetLightingOrigin( m_iszLightingOrigin );
-	SetLightingOriginRelative( m_iszLightingOriginRelative );
 
 	// Scaled physics objects (re)create their physics here
 	if ( m_flModelScale != 1.0f && VPhysicsGetObject() )
@@ -350,16 +242,6 @@ void CBaseAnimating::SetTransmit( CCheckTransmitInfo *pInfo, bool bAlways )
 		return;
 
 	BaseClass::SetTransmit( pInfo, bAlways );
-	
-	// Force our lighting entities to be sent too.
-	if ( m_hLightingOrigin )
-	{
-		m_hLightingOrigin->SetTransmit( pInfo, bAlways );
-	}
-	if ( m_hLightingOriginRelative )
-	{
-		m_hLightingOriginRelative->SetTransmit( pInfo, bAlways );
-	}
 }
 
 //-----------------------------------------------------------------------------
@@ -531,94 +413,6 @@ void CBaseAnimating::StudioFrameAdvance()
 	}
 }
 
-
-//-----------------------------------------------------------------------------
-// Set the relative lighting origin
-//-----------------------------------------------------------------------------
-void CBaseAnimating::SetLightingOriginRelative( string_t strLightingOriginRelative )
-{
-	if ( strLightingOriginRelative == NULL_STRING )
-	{
-		SetLightingOriginRelative( NULL );
-	}
-	else
-	{
-		CBaseEntity *pLightingOrigin = gEntList.FindEntityByName( NULL, strLightingOriginRelative );
-		if ( !pLightingOrigin )
-		{
-			DevWarning( "%s: Could not find info_lighting_relative '%s'!\n", GetClassname(), STRING( strLightingOriginRelative ) );
-			return;
-		}
-		else if ( !dynamic_cast<CInfoLightingRelative *>(pLightingOrigin) )
-		{
-			if( !pLightingOrigin )
-			{
-				DevWarning( "%s: Cannot find Lighting Origin named: %s\n", GetEntityName().ToCStr(), STRING(strLightingOriginRelative) );
-			}
-			else
-			{
-				DevWarning( "%s: Specified entity '%s' must be a info_lighting_relative!\n", 
-					pLightingOrigin->GetClassname(), pLightingOrigin->GetEntityName().ToCStr() );
-			}
-			return;
-		}
-
-		SetLightingOriginRelative( pLightingOrigin );
-	}
-
-	// Save the name so that save/load will correctly restore it in Activate()
-	m_iszLightingOriginRelative = strLightingOriginRelative;
-}
-
-//-----------------------------------------------------------------------------
-// Set the lighting origin
-//-----------------------------------------------------------------------------
-void CBaseAnimating::SetLightingOrigin( string_t strLightingOrigin )
-{
-	if ( strLightingOrigin == NULL_STRING )
-	{
-		SetLightingOrigin( NULL );
-	}
-	else
-	{
-		CBaseEntity *pLightingOrigin = gEntList.FindEntityByName( NULL, strLightingOrigin );
-		if ( !pLightingOrigin )
-		{
-			DevWarning( "%s: Could not find lighting origin entity named '%s'!\n", GetClassname(), STRING( strLightingOrigin ) );
-			return;
-		}
-		else 
-		{
-			SetLightingOrigin( pLightingOrigin );
-		}
-	}
-
-	// Save the name so that save/load will correctly restore it in Activate()
-	m_iszLightingOrigin = strLightingOrigin;
-}
-
-
-//-----------------------------------------------------------------------------
-// Purpose: 
-// Input  : &inputdata - 
-//-----------------------------------------------------------------------------
-void CBaseAnimating::InputSetLightingOriginRelative( inputdata_t &inputdata )
-{ 
-	// Find our specified target
-	string_t strLightingOriginRelative = MAKE_STRING( inputdata.value.String() );
-	SetLightingOriginRelative( strLightingOriginRelative );
-}
-
-//-----------------------------------------------------------------------------
-// Purpose: 
-// Input  : &inputdata - 
-//-----------------------------------------------------------------------------
-void CBaseAnimating::InputSetLightingOrigin( inputdata_t &inputdata )
-{ 
-	// Find our specified target
-	string_t strLightingOrigin = MAKE_STRING( inputdata.value.String() );
-	SetLightingOrigin( strLightingOrigin );
-}
 
 //-----------------------------------------------------------------------------
 // Purpose: SetModelScale input handler
@@ -3293,14 +3087,6 @@ void CBaseAnimating::InputBecomeRagdoll(inputdata_t& inputdata)
 	BecomeRagdollOnClient(vec3_origin);
 }
 
-//-----------------------------------------------------------------------------
-// Purpose: 
-//-----------------------------------------------------------------------------
-void CBaseAnimating::SetFadeDistance( float minFadeDist, float maxFadeDist )
-{
-	m_fadeMinDist = minFadeDist;
-	m_fadeMaxDist = maxFadeDist;
-}
 
 //-----------------------------------------------------------------------------
 // Purpose: Async prefetches all anim data used by a particular sequence.  Returns true if all of the required data is memory resident

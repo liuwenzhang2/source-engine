@@ -165,7 +165,12 @@ IMPLEMENT_SERVERCLASS_ST_NOBASE( CBaseEntity, DT_BaseEntity )
 #ifdef TF_DLL
 	SendPropArray3( SENDINFO_ARRAY3(m_nModelIndexOverrides), SendPropInt( SENDINFO_ARRAY(m_nModelIndexOverrides), SP_MODEL_INDEX_BITS, 0 ) ),
 #endif
-
+	SendPropEHandle(SENDINFO(m_hLightingOrigin)),
+	SendPropEHandle(SENDINFO(m_hLightingOriginRelative)),
+	// Fading
+	SendPropFloat(SENDINFO(m_fadeMinDist), 0, SPROP_NOSCALE),
+	SendPropFloat(SENDINFO(m_fadeMaxDist), 0, SPROP_NOSCALE),
+	SendPropFloat(SENDINFO(m_flFadeScale), 0, SPROP_NOSCALE),
 END_SEND_TABLE()
 
 
@@ -251,7 +256,9 @@ CBaseEntity::CBaseEntity()
 	//}
 	//GetEngineObject()->MarkPVSInformationDirty();
 
-
+	m_fadeMinDist = 0;
+	m_fadeMaxDist = 0;
+	m_flFadeScale = 0.0f;
 }
 
 void CBaseEntity::PostConstructor(const char* szClassname, int iForceEdictIndex)
@@ -525,6 +532,14 @@ Vector CBaseEntity::HeadTarget( const Vector &posSrc )
 	return EyePosition();
 }
 
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
+void CBaseEntity::SetFadeDistance(float minFadeDist, float maxFadeDist)
+{
+	m_fadeMinDist = minFadeDist;
+	m_fadeMaxDist = maxFadeDist;
+}
 
 struct TimedOverlay_t
 {
@@ -1074,6 +1089,9 @@ void CBaseEntity::Activate( void )
 #ifdef HL1_DLL
 	ValidateEntityConnections();
 #endif //HL1_DLL
+
+	SetLightingOrigin(m_iszLightingOrigin);
+	SetLightingOriginRelative(m_iszLightingOriginRelative);
 }
 
 ////////////////////////////  old CBaseEntity stuff ///////////////////////////////////
@@ -1589,13 +1607,24 @@ BEGIN_DATADESC_NO_BASE( CBaseEntity )
 
 	DEFINE_FIELD( m_hEffectEntity, FIELD_EHANDLE ),
 
+	DEFINE_KEYFIELD(m_iszLightingOriginRelative, FIELD_STRING, "LightingOriginHack"),
+	DEFINE_KEYFIELD(m_iszLightingOrigin, FIELD_STRING, "LightingOrigin"),
+
+	DEFINE_FIELD(m_hLightingOrigin, FIELD_EHANDLE),
+	DEFINE_FIELD(m_hLightingOriginRelative, FIELD_EHANDLE),
+	DEFINE_INPUTFUNC(FIELD_STRING, "SetLightingOriginHack", InputSetLightingOriginRelative),
+	DEFINE_INPUTFUNC(FIELD_STRING, "SetLightingOrigin", InputSetLightingOrigin),
+	DEFINE_FIELD(m_flDissolveStartTime, FIELD_TIME),
+
 	//DEFINE_FIELD( m_DamageModifiers, FIELD_?? ), // can't save?
 	// DEFINE_FIELD( m_fDataObjectTypes, FIELD_INTEGER ),
 
 #ifdef TF_DLL
 	DEFINE_ARRAY( m_nModelIndexOverrides, FIELD_INTEGER, MAX_VISION_MODES ),
 #endif
-
+	DEFINE_INPUT(m_fadeMinDist, FIELD_FLOAT, "fademindist"),
+	DEFINE_INPUT(m_fadeMaxDist, FIELD_FLOAT, "fademaxdist"),
+	DEFINE_KEYFIELD(m_flFadeScale, FIELD_FLOAT, "fadescale"),
 END_DATADESC()
 
 
@@ -2934,6 +2963,16 @@ void CBaseEntity::SetTransmit( CCheckTransmitInfo *pInfo, bool bAlways )
 	{
 		//CBaseEntity *pMoveParent = pNetworkParent->GetBaseEntity();
 		pMoveParent->GetOuter()->SetTransmit(pInfo, bAlways);
+	}
+
+	// Force our lighting entities to be sent too.
+	if (m_hLightingOrigin)
+	{
+		m_hLightingOrigin->SetTransmit(pInfo, bAlways);
+	}
+	if (m_hLightingOriginRelative)
+	{
+		m_hLightingOriginRelative->SetTransmit(pInfo, bAlways);
 	}
 }
 
@@ -5643,7 +5682,27 @@ void CBaseEntity::InputIgniteHitboxFireScale(inputdata_t& inputdata)
 	IgniteHitboxFireScale(inputdata.value.Float());
 }
 
+//-----------------------------------------------------------------------------
+// Purpose: 
+// Input  : &inputdata - 
+//-----------------------------------------------------------------------------
+void CBaseEntity::InputSetLightingOriginRelative(inputdata_t& inputdata)
+{
+	// Find our specified target
+	string_t strLightingOriginRelative = MAKE_STRING(inputdata.value.String());
+	SetLightingOriginRelative(strLightingOriginRelative);
+}
 
+//-----------------------------------------------------------------------------
+// Purpose: 
+// Input  : &inputdata - 
+//-----------------------------------------------------------------------------
+void CBaseEntity::InputSetLightingOrigin(inputdata_t& inputdata)
+{
+	// Find our specified target
+	string_t strLightingOrigin = MAKE_STRING(inputdata.value.String());
+	SetLightingOrigin(strLightingOrigin);
+}
 
 //-----------------------------------------------------------------------------
 // Purpose: 
@@ -6035,6 +6094,164 @@ void CBaseEntity::UpdateStepOrigin()
 	// don't use floor offset, decay the value
 	m_flEstIkOffset *= 0.5;
 	m_flEstIkFloor = GetEngineObject()->GetLocalOrigin().z;
+}
+
+//-----------------------------------------------------------------------------
+// Relative lighting entity
+//-----------------------------------------------------------------------------
+class CInfoLightingRelative : public CBaseEntity
+{
+public:
+	DECLARE_CLASS(CInfoLightingRelative, CBaseEntity);
+	DECLARE_DATADESC();
+	DECLARE_SERVERCLASS();
+
+	virtual void Activate();
+	virtual void SetTransmit(CCheckTransmitInfo* pInfo, bool bAlways);
+	virtual int  UpdateTransmitState(void);
+
+private:
+	CNetworkHandle(CBaseEntity, m_hLightingLandmark);
+	string_t		m_strLightingLandmark;
+};
+
+LINK_ENTITY_TO_CLASS(info_lighting_relative, CInfoLightingRelative);
+
+BEGIN_DATADESC(CInfoLightingRelative)
+DEFINE_KEYFIELD(m_strLightingLandmark, FIELD_STRING, "LightingLandmark"),
+DEFINE_FIELD(m_hLightingLandmark, FIELD_EHANDLE),
+END_DATADESC()
+
+IMPLEMENT_SERVERCLASS_ST(CInfoLightingRelative, DT_InfoLightingRelative)
+SendPropEHandle(SENDINFO(m_hLightingLandmark)),
+END_SEND_TABLE()
+
+
+//-----------------------------------------------------------------------------
+// Activate!
+//-----------------------------------------------------------------------------
+void CInfoLightingRelative::Activate()
+{
+	BaseClass::Activate();
+	if (m_strLightingLandmark == NULL_STRING)
+	{
+		m_hLightingLandmark = NULL;
+	}
+	else
+	{
+		m_hLightingLandmark = gEntList.FindEntityByName(NULL, m_strLightingLandmark);
+		if (!m_hLightingLandmark)
+		{
+			DevWarning("%s: Could not find lighting landmark '%s'!\n", GetClassname(), STRING(m_strLightingLandmark));
+		}
+		else
+		{
+			// Set a force transmit because we do not have a model.
+			m_hLightingLandmark->GetEngineObject()->AddEFlags(EFL_FORCE_CHECK_TRANSMIT);
+		}
+	}
+}
+
+
+//-----------------------------------------------------------------------------
+// Force our lighting landmark to be transmitted
+//-----------------------------------------------------------------------------
+void CInfoLightingRelative::SetTransmit(CCheckTransmitInfo* pInfo, bool bAlways)
+{
+	// Are we already marked for transmission?
+	if (pInfo->m_pTransmitEdict->Get(entindex()))
+		return;
+
+	BaseClass::SetTransmit(pInfo, bAlways);
+
+	// Force our constraint entity to be sent too.
+	if (m_hLightingLandmark)
+	{
+		if (m_hLightingLandmark->GetEngineObject()->GetMoveParent())
+		{
+			// Set a full check because we have a move parent.
+			m_hLightingLandmark->SetTransmitState(FL_EDICT_FULLCHECK);
+		}
+		else
+		{
+			m_hLightingLandmark->SetTransmitState(FL_EDICT_ALWAYS);
+		}
+
+		m_hLightingLandmark->SetTransmit(pInfo, bAlways);
+	}
+}
+
+//-----------------------------------------------------------------------------
+// Purpose Force our lighting landmark to be transmitted
+//-----------------------------------------------------------------------------
+int CInfoLightingRelative::UpdateTransmitState(void)
+{
+	return SetTransmitState(FL_EDICT_ALWAYS);
+}
+
+//-----------------------------------------------------------------------------
+// Set the relative lighting origin
+//-----------------------------------------------------------------------------
+void CBaseEntity::SetLightingOriginRelative(string_t strLightingOriginRelative)
+{
+	if (strLightingOriginRelative == NULL_STRING)
+	{
+		SetLightingOriginRelative(NULL);
+	}
+	else
+	{
+		CBaseEntity* pLightingOrigin = gEntList.FindEntityByName(NULL, strLightingOriginRelative);
+		if (!pLightingOrigin)
+		{
+			DevWarning("%s: Could not find info_lighting_relative '%s'!\n", GetClassname(), STRING(strLightingOriginRelative));
+			return;
+		}
+		else if (!dynamic_cast<CInfoLightingRelative*>(pLightingOrigin))
+		{
+			if (!pLightingOrigin)
+			{
+				DevWarning("%s: Cannot find Lighting Origin named: %s\n", GetEntityName().ToCStr(), STRING(strLightingOriginRelative));
+			}
+			else
+			{
+				DevWarning("%s: Specified entity '%s' must be a info_lighting_relative!\n",
+					pLightingOrigin->GetClassname(), pLightingOrigin->GetEntityName().ToCStr());
+			}
+			return;
+		}
+
+		SetLightingOriginRelative(pLightingOrigin);
+	}
+
+	// Save the name so that save/load will correctly restore it in Activate()
+	m_iszLightingOriginRelative = strLightingOriginRelative;
+}
+
+//-----------------------------------------------------------------------------
+// Set the lighting origin
+//-----------------------------------------------------------------------------
+void CBaseEntity::SetLightingOrigin(string_t strLightingOrigin)
+{
+	if (strLightingOrigin == NULL_STRING)
+	{
+		SetLightingOrigin(NULL);
+	}
+	else
+	{
+		CBaseEntity* pLightingOrigin = gEntList.FindEntityByName(NULL, strLightingOrigin);
+		if (!pLightingOrigin)
+		{
+			DevWarning("%s: Could not find lighting origin entity named '%s'!\n", GetClassname(), STRING(strLightingOrigin));
+			return;
+		}
+		else
+		{
+			SetLightingOrigin(pLightingOrigin);
+		}
+	}
+
+	// Save the name so that save/load will correctly restore it in Activate()
+	m_iszLightingOrigin = strLightingOrigin;
 }
 
 //-----------------------------------------------------------------------------

@@ -280,13 +280,7 @@ public:
 	float				m_flGroundSpeed;	// computed linear movement rate for current sequence
 	float				m_flLastEventCheck;	// cycle index of when events were last checked
 
-	virtual void SetLightingOriginRelative( CBaseEntity *pLightingOriginRelative );
-	void SetLightingOriginRelative( string_t strLightingOriginRelative );
-	CBaseEntity *GetLightingOriginRelative();
 
-	void SetLightingOrigin( CBaseEntity *pLightingOrigin );
-	void SetLightingOrigin( string_t strLightingOrigin );
-	CBaseEntity *GetLightingOrigin();
 
 	const float* GetPoseParameterArray() { return m_flPoseParameter.Base(); }
 	const float* GetEncodedControllerArray() { return m_flEncodedController.Base(); }
@@ -296,7 +290,6 @@ public:
 		const Quaternion q[MAXSTUDIOBONES], matrix3x4_t bonetoworld[MAXSTUDIOBONES],
 		CBaseAnimating *pParent, CBoneCache *pParentCache );
 
-	void	SetFadeDistance( float minFadeDist, float maxFadeDist );
 
 	int		GetBoneCacheFlags( void ) { return m_fBoneCacheFlags; }
 	inline void	SetBoneCacheFlags( unsigned short fFlag ) { m_fBoneCacheFlags |= fFlag; }
@@ -309,8 +302,7 @@ private:
 	void UnlockStudioHdr();
 
 	void StudioFrameAdvanceInternal( IStudioHdr *pStudioHdr, float flInterval );
-	void InputSetLightingOriginRelative( inputdata_t &inputdata );
-	void InputSetLightingOrigin( inputdata_t &inputdata );
+
 	void InputSetModelScale( inputdata_t &inputdata );
 
 	bool CanSkipAnimation( void );
@@ -362,19 +354,11 @@ private:
 	// The client picks up the change and draws the flash.
 	CNetworkVar( unsigned char, m_nMuzzleFlashParity );
 
-	CNetworkHandle( CBaseEntity, m_hLightingOrigin );
-	CNetworkHandle( CBaseEntity, m_hLightingOriginRelative );
-
-	string_t m_iszLightingOriginRelative;	// for reading from the file only
-	string_t m_iszLightingOrigin;			// for reading from the file only
-
 	memhandle_t		m_boneCacheHandle;
 	unsigned short	m_fBoneCacheFlags;		// Used for bone cache state on model
 
 protected:
-	CNetworkVar( float, m_fadeMinDist );	// Point at which fading is absolute
-	CNetworkVar( float, m_fadeMaxDist );	// Point at which fading is inactive
-	CNetworkVar( float, m_flFadeScale );	// Scale applied to min / max
+
 
 private:
 	IStudioHdr			*m_pStudioHdr;
@@ -438,25 +422,7 @@ inline void CBaseAnimating::SetPlaybackRate( float rate )
 	m_flPlaybackRate = rate;
 }
 
-inline void CBaseAnimating::SetLightingOrigin( CBaseEntity *pLightingOrigin )
-{
-	m_hLightingOrigin = pLightingOrigin;
-}
 
-inline CBaseEntity *CBaseAnimating::GetLightingOrigin()
-{
-	return m_hLightingOrigin;
-}
-
-inline void CBaseAnimating::SetLightingOriginRelative( CBaseEntity *pLightingOriginRelative )
-{
-	m_hLightingOriginRelative = pLightingOriginRelative;
-}
-
-inline CBaseEntity *CBaseAnimating::GetLightingOriginRelative()
-{
-	return m_hLightingOriginRelative;
-}
 
 //-----------------------------------------------------------------------------
 // Cycle access

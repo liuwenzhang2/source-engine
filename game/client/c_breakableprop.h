@@ -21,7 +21,6 @@ public:
 
 	C_BreakableProp();
 	
-	virtual void SetFadeMinMax( float fademin, float fademax );
 
 	// Copy fade from another breakable prop
 	void CopyFadeFrom( C_BreakableProp *pSource );
