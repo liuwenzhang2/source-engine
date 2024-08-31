@@ -673,12 +673,11 @@ void CCollisionProperty::SetCollisionBounds( const Vector &mins, const Vector &m
 	bool bDirty = false;
 
 	// Check if it's a scaled model
-	CBaseAnimating *pAnim = GetOuter()->GetOuter()->GetBaseAnimating();
-	if ( pAnim && pAnim->GetModelScale() != 1.0f )
+	if (GetOuter() && GetOuter()->GetModelScale() != 1.0f )
 	{
 		// Do the scaling
-		Vector vecNewMins = mins * pAnim->GetModelScale();
-		Vector vecNewMaxs = maxs * pAnim->GetModelScale();
+		Vector vecNewMins = mins * GetOuter()->GetModelScale();
+		Vector vecNewMaxs = maxs * GetOuter()->GetModelScale();
 
 		if ( ( m_vecMins != vecNewMins ) || ( m_vecMaxs != vecNewMaxs ) )
 		{
@@ -1189,12 +1188,11 @@ void CCollisionProperty::SetSurroundingBoundsType( SurroundingBoundsType_t type,
 		m_vecSpecifiedSurroundingMaxsPreScaled = *pMaxs;
 
 		// Check if it's a scaled model
-		CBaseAnimating *pAnim = GetOuter()->GetOuter()->GetBaseAnimating();
-		if ( pAnim && pAnim->GetModelScale() != 1.0f )
+		if (GetOuter() && GetOuter()->GetModelScale() != 1.0f )
 		{
 			// Do the scaling
-			Vector vecNewMins = *pMins * pAnim->GetModelScale();
-			Vector vecNewMaxs = *pMaxs * pAnim->GetModelScale();
+			Vector vecNewMins = *pMins * GetOuter()->GetModelScale();
+			Vector vecNewMaxs = *pMaxs * GetOuter()->GetModelScale();
 
 			m_vecSpecifiedSurroundingMins = vecNewMins;
 			m_vecSpecifiedSurroundingMaxs = vecNewMaxs;

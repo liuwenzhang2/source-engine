@@ -845,6 +845,7 @@ public:
 
 	// Called by physics to see if we should avoid a collision test....
 	virtual bool		ShouldCollide( int collisionGroup, int contentsMask ) const;
+	virtual	void					RefreshCollisionBounds(void);
 
 
 
@@ -1172,7 +1173,7 @@ protected:
 	QAngle							m_EyeAngleOffset;    
 #endif
 	// Allow studio models to tell us what their m_nBody value is
-	virtual int						GetStudioBody( void ) { return 0; }
+	//virtual int						GetStudioBody( void ) { return 0; }
 
 public:
 	// This can be used to setup the entity as a client-only entity. It gets an entity handle,

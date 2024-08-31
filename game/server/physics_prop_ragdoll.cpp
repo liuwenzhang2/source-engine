@@ -832,7 +832,7 @@ void CRagdollProp::SetupBones( matrix3x4_t *pBoneToWorld, int boneMask )
 	}
 
 	// Not really ideal, but it'll work for now
-	UpdateModelScale();
+	GetEngineObject()->UpdateModelScale();
 
 	MDLCACHE_CRITICAL_SECTION();
 	IStudioHdr *pStudioHdr = GetModelPtr( );

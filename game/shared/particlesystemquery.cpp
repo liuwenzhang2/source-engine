@@ -252,9 +252,9 @@ void CParticleSystemQuery::GetRandomPointsOnControllingObjectHitBox(
 								float flTryW = pParticles->RandomFloat( flRandMin, flRandMax );
 
 								Vector vecLocalPosition;
-								vecLocalPosition.x = GetSurfaceCoord( flTryU, pBox->bbmin.x * pAnimating->GetModelScale(), pBox->bbmax.x * pAnimating->GetModelScale() );
-								vecLocalPosition.y = GetSurfaceCoord( flTryV, pBox->bbmin.y * pAnimating->GetModelScale(), pBox->bbmax.y * pAnimating->GetModelScale() );
-								vecLocalPosition.z = GetSurfaceCoord( flTryW, pBox->bbmin.z * pAnimating->GetModelScale(), pBox->bbmax.z * pAnimating->GetModelScale() );
+								vecLocalPosition.x = GetSurfaceCoord( flTryU, pBox->bbmin.x * pAnimating->GetEngineObject()->GetModelScale(), pBox->bbmax.x * pAnimating->GetEngineObject()->GetModelScale() );
+								vecLocalPosition.y = GetSurfaceCoord( flTryV, pBox->bbmin.y * pAnimating->GetEngineObject()->GetModelScale(), pBox->bbmax.y * pAnimating->GetEngineObject()->GetModelScale() );
+								vecLocalPosition.z = GetSurfaceCoord( flTryW, pBox->bbmin.z * pAnimating->GetEngineObject()->GetModelScale(), pBox->bbmax.z * pAnimating->GetEngineObject()->GetModelScale() );
 
 								Vector vecTryWorldPosition;
 

@@ -928,7 +928,7 @@ Vector PathFollower::Avoid( INextBot *bot, const Vector &goalPos, const Vector &
 	const float offset = size + 2.0f;
 
 	float range = mover->IsRunning() ? 50.0f : 30.0f;
-	range *= bot->GetEntity()->GetModelScale();
+	range *= bot->GetEntity()->GetEngineObject()->GetModelScale();
 
 	m_hullMin = Vector( -size, -size, mover->GetStepHeight()+0.1f );
 	

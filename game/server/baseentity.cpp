@@ -6507,6 +6507,12 @@ void CBaseEntity::SetCollisionBoundsFromModel()
 	}
 }
 
+void CBaseEntity::RefreshCollisionBounds(void)
+{
+	GetEngineObject()->RefreshScaledCollisionBounds();
+}
+
+
 //-----------------------------------------------------------------------------
 // Purpose: 
 // Input  : *ent - 

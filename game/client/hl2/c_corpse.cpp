@@ -58,7 +58,7 @@ int C_Corpse::DrawModel( int flags )
 			GetEngineObject()->GetAbsAngles(),
 			m_nSkin,
 			m_nBody,
-			m_nHitboxSet );
+			GetEngineObject()->GetHitboxSet() );
 	}
 
 	return drawn;

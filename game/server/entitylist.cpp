@@ -344,6 +344,12 @@ BEGIN_DATADESC_NO_BASE(CEngineObjectInternal)
 	DEFINE_FIELD(m_flAnimTime, FIELD_TIME),
 	DEFINE_FIELD(m_flSimulationTime, FIELD_TIME),
 	DEFINE_FIELD(m_bClientSideAnimation, FIELD_BOOLEAN),
+	DEFINE_INPUT(m_nSkin, FIELD_INTEGER, "skin"),
+	DEFINE_KEYFIELD(m_nBody, FIELD_INTEGER, "body"),
+	DEFINE_INPUT(m_nBody, FIELD_INTEGER, "SetBodyGroup"),
+	DEFINE_KEYFIELD(m_nHitboxSet, FIELD_INTEGER, "hitboxset"),
+	DEFINE_FIELD(m_flModelScale, FIELD_FLOAT),
+	DEFINE_KEYFIELD(m_flModelScale, FIELD_FLOAT, "modelscale"),
 END_DATADESC()
 
 void SendProxy_Origin(const SendProp* pProp, const void* pStruct, const void* pData, DVariant* pOut, int iElement, int objectID)
@@ -557,6 +563,14 @@ BEGIN_SEND_TABLE_NOBASE(CEngineObjectInternal, DT_EngineObject)
 	SendPropInt(SENDINFO(m_bSimulatedEveryTick), 1, SPROP_UNSIGNED),
 	SendPropInt(SENDINFO(m_bAnimatedEveryTick), 1, SPROP_UNSIGNED),
 	SendPropInt(SENDINFO(m_bClientSideAnimation), 1, SPROP_UNSIGNED),
+	SendPropInt(SENDINFO(m_nForceBone), 8, 0),
+	SendPropVector(SENDINFO(m_vecForce), -1, SPROP_NOSCALE),
+	SendPropInt(SENDINFO(m_nSkin), ANIMATION_SKIN_BITS),
+	SendPropInt(SENDINFO(m_nBody), ANIMATION_BODY_BITS),
+
+	SendPropInt(SENDINFO(m_nHitboxSet), ANIMATION_HITBOXSET_BITS, SPROP_UNSIGNED),
+
+	SendPropFloat(SENDINFO(m_flModelScale)),
 END_SEND_TABLE()
 
 IMPLEMENT_SERVERCLASS(CEngineObjectInternal, DT_EngineObject)
@@ -4065,6 +4079,60 @@ void CEngineObjectInternal::SimulationChanged() {
 	NetworkStateChanged(&m_vecOrigin);
 	NetworkStateChanged(&m_angRotation);
 }
+
+//-----------------------------------------------------------------------------
+// Purpose: 
+// Input  : scale - 
+//-----------------------------------------------------------------------------
+void CEngineObjectInternal::SetModelScale(float scale, float change_duration /*= 0.0f*/)
+{
+	if (change_duration > 0.0f)
+	{
+		ModelScale* mvs = (ModelScale*)CreateDataObject(MODELSCALE);
+		mvs->m_flModelScaleStart = m_flModelScale;
+		mvs->m_flModelScaleGoal = scale;
+		mvs->m_flModelScaleStartTime = gpGlobals->curtime;
+		mvs->m_flModelScaleFinishTime = mvs->m_flModelScaleStartTime + change_duration;
+	}
+	else
+	{
+		m_flModelScale = scale;
+		m_pOuter->RefreshCollisionBounds();
+
+		if (HasDataObjectType(MODELSCALE))
+		{
+			DestroyDataObject(MODELSCALE);
+		}
+	}
+}
+
+void CEngineObjectInternal::UpdateModelScale()
+{
+	ModelScale* mvs = (ModelScale*)GetDataObject(MODELSCALE);
+	if (!mvs)
+	{
+		return;
+	}
+
+	float dt = mvs->m_flModelScaleFinishTime - mvs->m_flModelScaleStartTime;
+	Assert(dt > 0.0f);
+
+	float frac = (gpGlobals->curtime - mvs->m_flModelScaleStartTime) / dt;
+	frac = clamp(frac, 0.0f, 1.0f);
+
+	if (gpGlobals->curtime >= mvs->m_flModelScaleFinishTime)
+	{
+		m_flModelScale = mvs->m_flModelScaleGoal;
+		DestroyDataObject(MODELSCALE);
+	}
+	else
+	{
+		m_flModelScale = Lerp(frac, mvs->m_flModelScaleStart, mvs->m_flModelScaleGoal);
+	}
+
+	m_pOuter->RefreshCollisionBounds();
+}
+
 
 struct collidelist_t
 {

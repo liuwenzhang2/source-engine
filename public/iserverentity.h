@@ -353,6 +353,19 @@ public:
 	virtual void UseClientSideAnimation() = 0;
 	virtual bool IsUsingClientSideAnimation() = 0;
 	virtual void SimulationChanged() = 0;
+	virtual Vector GetVecForce() = 0;
+	virtual void SetVecForce(Vector vecForce) = 0;
+	virtual int	GetForceBone() = 0;
+	virtual void SetForceBone(int nForceBone) = 0;
+	virtual int GetBody() = 0;
+	virtual void SetBody(int nBody) = 0;
+	virtual int GetSkin() = 0;
+	virtual void SetSkin(int nSkin) = 0;
+	virtual int GetHitboxSet() = 0;
+	virtual void SetHitboxSet(int nHitboxSet) = 0;
+	virtual void SetModelScale(float scale, float change_duration = 0.0f) = 0;
+	virtual float GetModelScale() const = 0;
+	virtual void UpdateModelScale() = 0;
 
 };
 
@@ -434,3 +447,4 @@ extern IServerEntityList* serverEntitylist;
 #define VSERVERENTITYLIST_INTERFACE_VERSION	"VServerEntityList003"
 
 #endif // ISERVERENTITY_H
+ 

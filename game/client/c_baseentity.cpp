@@ -1020,6 +1020,10 @@ void C_BaseEntity::ComputeWorldSpaceSurroundingBox( Vector *pVecWorldMins, Vecto
 	Assert(0);
 }
 
+void C_BaseEntity::RefreshCollisionBounds(void)
+{
+	GetEngineObject()->RefreshScaledCollisionBounds();
+}
 
 //-----------------------------------------------------------------------------
 // Purpose: Derived classes will have to write their own message cracking routines!!!
@@ -2677,11 +2681,11 @@ void C_BaseEntity::AddStudioDecal( const Ray_t& ray, int hitbox, int decalIndex,
 		VectorSubtract( tr.endpos, tr.plane.normal, temp );
 		Ray_t betterRay;
 		betterRay.Init( tr.endpos, temp );
-		modelrender->AddDecal( m_ModelInstance, betterRay, up, decalIndex, GetStudioBody(), true, maxLODToDecal );
+		modelrender->AddDecal( m_ModelInstance, betterRay, up, decalIndex, GetBody(), true, maxLODToDecal );
 	}
 	else
 	{
-		modelrender->AddDecal( m_ModelInstance, ray, up, decalIndex, GetStudioBody(), false, maxLODToDecal );
+		modelrender->AddDecal( m_ModelInstance, ray, up, decalIndex, GetBody(), false, maxLODToDecal );
 	}
 }
 
@@ -2719,11 +2723,11 @@ void C_BaseEntity::AddColoredStudioDecal( const Ray_t& ray, int hitbox, int deca
 		VectorSubtract( tr.endpos, tr.plane.normal, temp );
 		Ray_t betterRay;
 		betterRay.Init( tr.endpos, temp );
-		modelrender->AddColoredDecal( m_ModelInstance, betterRay, up, decalIndex, GetStudioBody(), cColor, true, maxLODToDecal );
+		modelrender->AddColoredDecal( m_ModelInstance, betterRay, up, decalIndex, GetBody(), cColor, true, maxLODToDecal );
 	}
 	else
 	{
-		modelrender->AddColoredDecal( m_ModelInstance, ray, up, decalIndex, GetStudioBody(), cColor, false, maxLODToDecal );
+		modelrender->AddColoredDecal( m_ModelInstance, ray, up, decalIndex, GetBody(), cColor, false, maxLODToDecal );
 	}
 }
 

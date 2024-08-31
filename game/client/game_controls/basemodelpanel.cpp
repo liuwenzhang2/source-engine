@@ -420,7 +420,7 @@ void CModelPanel::SetupModel( void )
 
 	if ( m_pModelInfo->m_nSkin >= 0 )
 	{
-		pEnt->m_nSkin = m_pModelInfo->m_nSkin;
+		pEnt->GetEngineObject()->SetSkin( m_pModelInfo->m_nSkin);
 	}
 
 	FOR_EACH_MAP_FAST( m_pModelInfo->m_mapBodygroupValues, i )
@@ -483,7 +483,7 @@ void CModelPanel::SetupModel( void )
 
 			if ( pInfo->m_nSkin >= 0 )
 			{
-				pTemp->m_nSkin = pInfo->m_nSkin;
+				pTemp->GetEngineObject()->SetSkin(pInfo->m_nSkin);
 			}
 
 			pTemp->GetEngineObject()->SetAnimTime(gpGlobals->curtime);

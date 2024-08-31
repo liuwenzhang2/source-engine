@@ -253,12 +253,6 @@ public:
 	// See note in code re: bandwidth usage!!!
 	void				DrawServerHitboxes( float duration = 0.0f, bool monocolor = false );
 	void				DrawRawSkeleton( matrix3x4_t boneToWorld[], int boneMask, bool noDepthTest = true, float duration = 0.0f, bool monocolor = false );
-
-	void				SetModelScale( float scale, float change_duration = 0.0f );
-	float				GetModelScale() const { return m_flModelScale; }
-
-	void				UpdateModelScale();
-	virtual	void		RefreshCollisionBounds( void );
 	
 	// also calculate IK on server? (always done on client)
 	void EnableServerIK();
@@ -308,15 +302,9 @@ private:
 	bool CanSkipAnimation( void );
 
 public:
-	CNetworkVar( int, m_nForceBone );
-	CNetworkVector( m_vecForce );
 
-	CNetworkVar( int, m_nSkin );
-	CNetworkVar( int, m_nBody );
-	CNetworkVar( int, m_nHitboxSet );
 
-	// For making things thin during barnacle swallowing, e.g.
-	CNetworkVar( float, m_flModelScale );
+
 
 	// was pev->framerate
 	CNetworkVar( float, m_flPlaybackRate );

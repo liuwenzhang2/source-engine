@@ -181,6 +181,12 @@ public:
 		// Assume false.  Derived classes might fill in a receive table entry
 // and in that case this would show up as true
 		m_bClientSideAnimation = false;
+		m_vecForce.Init();
+		m_nForceBone = -1;
+		m_nSkin = 0;
+		m_nBody = 0;
+		m_nHitboxSet = 0;
+		m_flModelScale = 1.0f;
 	}
 
 	~C_EngineObjectInternal()
@@ -417,6 +423,10 @@ public:
 		m_flAnimTime = 0;
 		m_flSimulationTime = 0;
 		m_nCreationTick = -1;
+		m_nSkin = 0;
+		m_nBody = 0;
+		m_nHitboxSet = 0;
+		m_flModelScale = 1.0f;
 	}
 
 	// Invalidates the abs state of all children
@@ -614,6 +624,43 @@ public:
 	void UseClientSideAnimation();
 	bool IsUsingClientSideAnimation() { return m_bClientSideAnimation; }
 
+	Vector GetVecForce(){
+		return 	m_vecForce;
+	}
+	void SetVecForce(Vector vecForce) {
+		m_vecForce = vecForce;
+	}
+	int	GetForceBone() {
+		return m_nForceBone;
+	}
+	void SetForceBone(int nForceBone) {
+		m_nForceBone = nForceBone;
+	}
+	int GetBody() { 
+		return m_nBody; 
+	}
+	void SetBody(int nBody) {
+		m_nBody = nBody;
+	}
+	int GetSkin() { 
+		return m_nSkin; 
+	}
+	void SetSkin(int nSkin) {
+		m_nSkin = nSkin;
+	}
+	int GetHitboxSet() {
+		return m_nHitboxSet;
+	}
+	void SetHitboxSet(int nHitboxSet) {
+		m_nHitboxSet = nHitboxSet;
+	}
+
+	void SetModelScale(float scale, float change_duration = 0.0f);
+	float GetModelScale() const { return m_flModelScale; }
+	inline bool IsModelScaleFractional() const;  /// very fast way to ask if the model scale is < 1.0f  (faster than if (GetModelScale() < 1.0f) )
+	inline bool IsModelScaled() const;
+	void UpdateModelScale(void);
+
 private:
 
 	friend class C_BaseEntity;
@@ -722,6 +769,19 @@ private:
 	float							m_flSpawnTime;
 	// Clientside animation
 	bool							m_bClientSideAnimation;
+
+	Vector							m_vecForce;
+	int								m_nForceBone;
+	// Texture group to use
+	int								m_nSkin;
+
+	// Object bodygroup
+	int								m_nBody;
+
+	// Hitbox set to use (default 0)
+	int								m_nHitboxSet;
+	float							m_flModelScale;
+
 };
 
 //-----------------------------------------------------------------------------
@@ -1282,6 +1342,17 @@ inline void C_EngineObjectInternal::SetSimulationTime(float st)
 inline float C_EngineObjectInternal::GetOldSimulationTime() const
 {
 	return m_flOldSimulationTime;
+}
+
+inline bool C_EngineObjectInternal::IsModelScaleFractional() const   /// very fast way to ask if the model scale is < 1.0f
+{
+	COMPILE_TIME_ASSERT(sizeof(m_flModelScale) == sizeof(int));
+	return *((const int*)&m_flModelScale) < 0x3f800000;
+}
+
+inline bool C_EngineObjectInternal::IsModelScaled() const
+{
+	return (m_flModelScale > 1.0f + FLT_EPSILON || m_flModelScale < 1.0f - FLT_EPSILON);
 }
 
 // Use this to iterate over *all* (even dormant) the C_BaseEntities in the client entity list.

@@ -1724,7 +1724,7 @@ void CBreakableProp::Break( CBaseEntity *pBreaker, const CTakeDamageInfo &info )
 		}
 		else
 		{
-			float flScale = GetModelScale();
+			float flScale = GetEngineObject()->GetModelScale();
 			ExplosionCreate( WorldSpaceCenter(), angles, pAttacker, m_explodeDamage * flScale, m_explodeRadius * flScale,
 				SF_ENVEXPLOSION_NOSPARKS | SF_ENVEXPLOSION_NODLIGHTS | SF_ENVEXPLOSION_NOSMOKE | SF_ENVEXPLOSION_SURFACEONLY,
 				0.0f, this );
@@ -1776,7 +1776,7 @@ void CBreakableProp::Break( CBaseEntity *pBreaker, const CTakeDamageInfo &info )
 		{
 		case MULTIPLAYER_BREAK_DEFAULT:		// default is to break client-side
 		case MULTIPLAYER_BREAK_CLIENTSIDE:
-			te->PhysicsProp( filter, -1, GetEngineObject()->GetModelIndex(), m_nSkin, GetEngineObject()->GetAbsOrigin(), GetEngineObject()->GetAbsAngles(), velocity, true, GetEngineObject()->GetEffects() );
+			te->PhysicsProp( filter, -1, GetEngineObject()->GetModelIndex(), GetEngineObject()->GetSkin(), GetEngineObject()->GetAbsOrigin(), GetEngineObject()->GetAbsAngles(), velocity, true, GetEngineObject()->GetEffects());
 			break;
 		case MULTIPLAYER_BREAK_SERVERSIDE:	// server-side break
 			if ( m_PerformanceMode != PM_NO_GIBS || breakable_disable_gib_limit.GetBool() )
@@ -1785,7 +1785,7 @@ void CBreakableProp::Break( CBaseEntity *pBreaker, const CTakeDamageInfo &info )
 			}
 			break;
 		case MULTIPLAYER_BREAK_BOTH:	// pieces break from both dlls
-			te->PhysicsProp( filter, -1, GetEngineObject()->GetModelIndex(), m_nSkin, GetEngineObject()->GetAbsOrigin(), GetEngineObject()->GetAbsAngles(), velocity, true, GetEngineObject()->GetEffects() );
+			te->PhysicsProp( filter, -1, GetEngineObject()->GetModelIndex(), GetEngineObject()->GetSkin(), GetEngineObject()->GetAbsOrigin(), GetEngineObject()->GetAbsAngles(), velocity, true, GetEngineObject()->GetEffects());
 			if ( m_PerformanceMode != PM_NO_GIBS || breakable_disable_gib_limit.GetBool() )
 			{
 				PropBreakableCreateAll(GetEngineObject()->GetModelIndex(), pPhysics, params, this, -1, ( m_PerformanceMode == PM_FULL_GIBS ), false );
@@ -3270,7 +3270,7 @@ int CPhysicsProp::DrawDebugTextOverlays(void)
 				text_offset++;
 			}
 
-			Q_snprintf(tempstr, sizeof(tempstr),"Skin: %d", m_nSkin.Get() );
+			Q_snprintf(tempstr, sizeof(tempstr),"Skin: %d", GetEngineObject()->GetSkin() );
 			EntityText( text_offset, tempstr, 0);
 			text_offset++;
 
@@ -3374,7 +3374,7 @@ CBaseEntity *BreakModelCreateSingle( CBaseEntity *pOwner, breakmodel_t *pModel, 
 	}
 	if ( pEntity )
 	{
-		pEntity->m_nSkin = nSkin;
+		pEntity->GetEngineObject()->SetSkin(nSkin);
 		pEntity->m_iHealth = pModel->health;
 		if ( g_ActiveGibCount >= ACTIVE_GIB_FADE )
 		{
@@ -3799,7 +3799,7 @@ void CBasePropDoor::CalcDoorSounds()
 		{
 			// Open / close / move sounds are looked up by skin index.
 			char szSkin[80];
-			int skin = m_nSkin;
+			int skin = GetEngineObject()->GetSkin();
 			Q_snprintf( szSkin, sizeof( szSkin ), "skin%d", skin );
 			KeyValues *pkvSkinData = pkvDoorSounds->FindKey( szSkin );
 			if ( pkvSkinData )
@@ -6163,7 +6163,7 @@ bool UTIL_CreateScaledPhysObject( CBaseAnimating *pInstance, float flScale )
 	}
 
 	// Scale the base model as well
-	pInstance->SetModelScale( flScale );
+	pInstance->GetEngineObject()->SetModelScale( flScale );
 
 	if ( pInstance->GetEngineObject()->GetMoveParent() )
 	{

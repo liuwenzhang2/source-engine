@@ -314,8 +314,8 @@ IMPLEMENT_CLIENTCLASS_DT_NOBASE( C_DODRagdoll, DT_DODRagdoll, CDODRagdoll )
 	RecvPropVector( RECVINFO(m_vecRagdollOrigin) ),
 	RecvPropEHandle( RECVINFO( m_hPlayer ) ),
 	//RecvPropInt( RECVINFO( m_nModelIndex ) ),
-	RecvPropInt( RECVINFO(m_nForceBone) ),
-	RecvPropVector( RECVINFO(m_vecForce) ),
+	//RecvPropInt( RECVINFO(m_nForceBone) ),
+	//RecvPropVector( RECVINFO(m_vecForce) ),
 	RecvPropVector( RECVINFO( m_vecRagdollVelocity ) )
 END_RECV_TABLE()
 

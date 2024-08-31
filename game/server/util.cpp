@@ -1188,7 +1188,7 @@ void UTIL_SetModel( CBaseEntity *pEntity, const char *pModelName )
 	CBaseAnimating *pAnimating = pEntity->GetBaseAnimating();
 	if ( pAnimating )
 	{
-		pAnimating->m_nForceBone = 0;
+		pAnimating->GetEngineObject()->SetForceBone(0);
 	}
 
 	pEntity->GetEngineObject()->SetModelName( AllocPooledString( pModelName ) );

@@ -77,7 +77,7 @@ void CGib::SpawnStickyGibs( CBaseEntity *pVictim, Vector vecOrigin, int cGibs )
 		CGib *pGib = (CGib *)gEntList.CreateEntityByName( "gib" );
 
 		pGib->Spawn( "models/stickygib.mdl" );
-		pGib->m_nBody = random->RandomInt(0,2);
+		pGib->GetEngineObject()->SetBody( random->RandomInt(0,2));
 
 		if ( pVictim )
 		{
@@ -122,12 +122,12 @@ void CGib::SpawnHeadGib( CBaseEntity *pVictim )
 	if ( g_Language.GetInt() == LANGUAGE_GERMAN )
 	{
 		pGib->Spawn( "models/germangibs.mdl" );// throw one head
-		pGib->m_nBody = 0;
+		pGib->GetEngineObject()->SetBody( 0);
 	}
 	else
 	{
 		pGib->Spawn( "models/gibs/hgibs.mdl" );// throw one head
-		pGib->m_nBody = 0;
+		pGib->GetEngineObject()->SetBody( 0);
 	}
 
 	if ( pVictim )
@@ -277,7 +277,7 @@ void CGib::SpawnSpecificGibs(	CBaseEntity*	pVictim,
 	{
 		CGib *pGib = (CGib*)gEntList.CreateEntityByName( "gib" );
 		pGib->Spawn( cModelName );
-		pGib->m_nBody = i;
+		pGib->GetEngineObject()->SetBody(i);
 		pGib->InitGib( pVictim, vMinVelocity, vMaxVelocity );
 		pGib->m_lifeTime = flLifetime;
 		
@@ -304,7 +304,7 @@ void CGib::SpawnRandomGibs( CBaseEntity *pVictim, int cGibs, GibType_e eGibType 
 		if ( g_Language.GetInt() == LANGUAGE_GERMAN )
 		{
 			pGib->Spawn( "models/germangibs.mdl" );
-			pGib->m_nBody = random->RandomInt(0,GERMAN_GIB_COUNT-1);
+			pGib->GetEngineObject()->SetBody(random->RandomInt(0,GERMAN_GIB_COUNT-1));
 		}
 		else
 		{
@@ -313,12 +313,12 @@ void CGib::SpawnRandomGibs( CBaseEntity *pVictim, int cGibs, GibType_e eGibType 
 			case GIB_HUMAN:
 				// human pieces
 				pGib->Spawn( "models/gibs/hgibs.mdl" );
-				pGib->m_nBody = random->RandomInt(1,HUMAN_GIB_COUNT-1);// start at one to avoid throwing random amounts of skulls (0th gib)
+				pGib->GetEngineObject()->SetBody(random->RandomInt(1,HUMAN_GIB_COUNT-1));// start at one to avoid throwing random amounts of skulls (0th gib)
 				break;
 			case GIB_ALIEN:
 				// alien pieces
 				pGib->Spawn( "models/gibs/agibs.mdl" );
-				pGib->m_nBody = random->RandomInt(0,ALIEN_GIB_COUNT-1);
+				pGib->GetEngineObject()->SetBody(random->RandomInt(0,ALIEN_GIB_COUNT-1));
 				break;
 			}
 		}

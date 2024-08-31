@@ -121,8 +121,8 @@ IMPLEMENT_SERVERCLASS_ST_NOBASE( CPortalRagdoll, DT_PortalRagdoll )
 	SendPropVector( SENDINFO(m_vecRagdollOrigin), -1,  SPROP_COORD ),
 	SendPropEHandle( SENDINFO( m_hPlayer ) ),
 	//SendPropModelIndex( SENDINFO( m_nModelIndex ) ),
-	SendPropInt		( SENDINFO(m_nForceBone), 8, 0 ),
-	SendPropVector	( SENDINFO(m_vecForce), -1, SPROP_NOSCALE ),
+	//SendPropInt		( SENDINFO(m_nForceBone), 8, 0 ),
+	//SendPropVector	( SENDINFO(m_vecForce), -1, SPROP_NOSCALE ),
 	SendPropVector( SENDINFO( m_vecRagdollVelocity ) ),
 END_SEND_TABLE()
 
@@ -1655,7 +1655,7 @@ void CPortal_Player::CreateRagdollEntity( const CTakeDamageInfo &info )
 	GetEngineObject()->AddEffects( EF_NODRAW | EF_NOSHADOW );
 	GetEngineObject()->AddEFlags( EFL_NO_DISSOLVE );
 #endif // PORTAL_HIDE_PLAYER_RAGDOLL
-	CBaseEntity *pRagdoll = CreateServerRagdoll( this, m_nForceBone, info, COLLISION_GROUP_INTERACTIVE_DEBRIS, true );
+	CBaseEntity *pRagdoll = CreateServerRagdoll( this, GetEngineObject()->GetForceBone(), info, COLLISION_GROUP_INTERACTIVE_DEBRIS, true);
 	pRagdoll->m_takedamage = DAMAGE_NO;
 	m_hRagdoll = pRagdoll;
 

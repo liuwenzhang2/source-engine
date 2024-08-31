@@ -296,19 +296,14 @@ public:
 	virtual void					GetRagdollInitBoneArrays( matrix3x4_t *pDeltaBones0, matrix3x4_t *pDeltaBones1, matrix3x4_t *pCurrentBones, float boneDt );
 
 	// For shadows rendering the correct body + sequence...
-	virtual int GetBody()			{ return m_nBody; }
-	virtual int GetSkin()			{ return m_nSkin; }
+	virtual int GetBody()			{ return GetEngineObject()->GetBody(); }
+	virtual int GetSkin()			{ return GetEngineObject()->GetSkin(); }
 
 
 	inline float					GetPlaybackRate();
 	inline void						SetPlaybackRate( float rate );
 
-	void							SetModelScale( float scale, float change_duration = 0.0f  );
-	float							GetModelScale() const { return m_flModelScale; }
-	inline bool						IsModelScaleFractional() const;  /// very fast way to ask if the model scale is < 1.0f  (faster than if (GetModelScale() < 1.0f) )
-	inline bool						IsModelScaled() const;
-	void							UpdateModelScale( void );
-	virtual	void					RefreshCollisionBounds( void );
+
 
 	int								GetSequence();
 	virtual void					SetSequence(int nSequence);
@@ -452,7 +447,7 @@ protected:
 	virtual bool					IsMenuModel() const;
 
 	// Allow studio models to tell C_BaseEntity what their m_nBody value is
-	virtual int						GetStudioBody( void ) { return m_nBody; }
+	//virtual int						GetStudioBody( void ) { return m_nBody; }
 
 	virtual bool					CalcAttachments();
 
@@ -474,14 +469,7 @@ private:
 public:
 	CRagdoll						*m_pRagdoll;
 
-	// Texture group to use
-	int								m_nSkin;
 
-	// Object bodygroup
-	int								m_nBody;
-
-	// Hitbox set to use (default 0)
-	int								m_nHitboxSet;
 
 	CSequenceTransitioner			m_SequenceTransitioner;
 
@@ -496,8 +484,7 @@ protected:
 	// Decomposed ragdoll info
 	bool							m_bStoreRagdollInfo;
 	RagdollInfo_t					*m_pRagdollInfo;
-	Vector							m_vecForce;
-	int								m_nForceBone;
+
 
 	// Is bone cache valid
 	// bone transformation matrix
@@ -536,7 +523,6 @@ private:
 	// Mouth lipsync/envelope following values
 	CMouthInfo						m_mouth;
 
-	CNetworkVar( float, m_flModelScale );
 
 	// Animation blending factors
 	float							m_flPoseParameter[MAXSTUDIOPOSEPARAM];
@@ -754,18 +740,6 @@ inline void C_BaseAnimating::InvalidateMdlCache()
 		UnlockStudioHdr();
 		m_pStudioHdr = NULL;
 	}
-}
-
-
-inline bool C_BaseAnimating::IsModelScaleFractional() const   /// very fast way to ask if the model scale is < 1.0f
-{
-	COMPILE_TIME_ASSERT( sizeof( m_flModelScale ) == sizeof( int ) );
-	return *((const int *) &m_flModelScale) < 0x3f800000;
-}
-
-inline bool C_BaseAnimating::IsModelScaled() const
-{
-	return ( m_flModelScale > 1.0f+FLT_EPSILON || m_flModelScale < 1.0f-FLT_EPSILON );
 }
 
 //-----------------------------------------------------------------------------

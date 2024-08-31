@@ -122,7 +122,7 @@ bool C_PhysPropClientside::KeyValue( const char *szKeyName, const char *szValue 
 	}
 	else if (FStrEq(szKeyName, "skin"))
 	{
-		m_nSkin  = Q_atoi(szValue);
+		GetEngineObject()->SetSkin(Q_atoi(szValue));
 	}
 	else if (FStrEq(szKeyName, "physicsmode"))
 	{
@@ -519,7 +519,7 @@ void C_PhysPropClientside::Clone( Vector &velocity )
 		return;
 	}
 
-	pEntity->m_nSkin = m_nSkin;
+	pEntity->GetEngineObject()->SetSkin(GetEngineObject()->GetSkin());
 	pEntity->m_iHealth = m_iHealth;
 
 	if ( pEntity->m_iHealth == 0 )
@@ -758,7 +758,7 @@ CBaseEntity *BreakModelCreateSingle( CBaseEntity *pOwner, breakmodel_t *pModel, 
 		return NULL;
 	}
 
-	pEntity->m_nSkin = nSkin;
+	pEntity->GetEngineObject()->SetSkin(nSkin);
 	pEntity->m_iHealth = pModel->health;
 
 #ifdef TF_CLIENT_DLL
@@ -918,7 +918,7 @@ void C_FuncPhysicsRespawnZone::InitializePropsWithin( void )
 			m_PropList[index].iszModelName = pProp->GetEngineObject()->GetModelName();
 			m_PropList[index].vecOrigin = pProp->GetEngineObject()->GetAbsOrigin();
 			m_PropList[index].vecAngles = pProp->GetEngineObject()->GetAbsAngles();
-			m_PropList[index].iSkin = pProp->m_nSkin;
+			m_PropList[index].iSkin = pProp->GetEngineObject()->GetSkin();
 			m_PropList[index].iHealth = pProp->m_iHealth;
 			m_PropList[index].iSpawnFlags = pProp->m_spawnflags;
 			m_PropList[index].hClientEntity = pProp->GetClientHandle();
@@ -986,7 +986,7 @@ void C_FuncPhysicsRespawnZone::RespawnProps( void )
 				pEntity->GetEngineObject()->SetAbsOrigin( m_PropList[i].vecOrigin );
 				pEntity->GetEngineObject()->SetAbsAngles( m_PropList[i].vecAngles );
 				pEntity->SetPhysicsMode( PHYSICS_MULTIPLAYER_CLIENTSIDE );
-				pEntity->m_nSkin = m_PropList[i].iSkin;
+				pEntity->GetEngineObject()->SetSkin(m_PropList[i].iSkin);
 				pEntity->m_iHealth = m_PropList[i].iHealth;
 				if ( pEntity->m_iHealth == 0 )
 				{

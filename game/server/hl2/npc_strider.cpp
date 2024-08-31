@@ -3459,7 +3459,7 @@ bool CNPC_Strider::BecomeRagdoll( const CTakeDamageInfo &info, const Vector &for
 				}
 			}
 
-			pRagdoll = assert_cast<CRagdollProp *>( CreateServerRagdoll( this, m_nForceBone, info, HL2COLLISION_GROUP_STRIDER ) );
+			pRagdoll = assert_cast<CRagdollProp *>( CreateServerRagdoll( this, GetEngineObject()->GetForceBone(), info, HL2COLLISION_GROUP_STRIDER));
 			pRagdoll->DisableAutoFade();
 
 			if ( maxRagdolls == 0 )
@@ -3475,7 +3475,7 @@ bool CNPC_Strider::BecomeRagdoll( const CTakeDamageInfo &info, const Vector &for
 		else
 		{
 			// Otherwise just keel over
-			pRagdoll = assert_cast<CRagdollProp *>( CreateServerRagdoll( this, m_nForceBone, info, HL2COLLISION_GROUP_STRIDER ) );
+			pRagdoll = assert_cast<CRagdollProp *>( CreateServerRagdoll( this, GetEngineObject()->GetForceBone(), info, HL2COLLISION_GROUP_STRIDER));
 			pRagdoll->DisableAutoFade();
 		}
 	}
@@ -4229,7 +4229,7 @@ void CNPC_Strider::VPhysicsShadowCollision( int index, gamevcollisionevent_t *pE
 		}
 
 		// UNDONE: Find one near damagePos?
-		m_nForceBone = 0;
+		GetEngineObject()->SetForceBone(0);
 		PhysCallbackDamage( this, dmgInfo, *pEvent, index );
 		return;
 	}

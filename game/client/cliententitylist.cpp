@@ -229,6 +229,8 @@ BEGIN_PREDICTION_DATA_NO_BASE(C_EngineObjectInternal)
 	DEFINE_PRED_FIELD(m_MoveCollide, FIELD_CHARACTER, FTYPEDESC_INSENDTABLE),
 	DEFINE_FIELD(m_flProxyRandomValue, FIELD_FLOAT),
 	//DEFINE_PRED_FIELD(m_flAnimTime, FIELD_FLOAT, 0),
+	DEFINE_PRED_FIELD(m_nSkin, FIELD_INTEGER, FTYPEDESC_INSENDTABLE),
+	DEFINE_PRED_FIELD(m_nBody, FIELD_INTEGER, FTYPEDESC_INSENDTABLE),
 END_PREDICTION_DATA()
 
 BEGIN_DATADESC_NO_BASE(C_EngineObjectInternal)
@@ -238,6 +240,8 @@ BEGIN_DATADESC_NO_BASE(C_EngineObjectInternal)
 	DEFINE_FIELD(m_fFlags, FIELD_INTEGER),
 	DEFINE_FIELD(m_iEFlags, FIELD_INTEGER),
 	DEFINE_FIELD(m_ModelName, FIELD_STRING),
+	DEFINE_FIELD(m_nBody, FIELD_INTEGER),
+	DEFINE_FIELD(m_nSkin, FIELD_INTEGER),
 END_DATADESC()
 
 //-----------------------------------------------------------------------------
@@ -415,6 +419,14 @@ BEGIN_RECV_TABLE_NOBASE(C_EngineObjectInternal, DT_EngineObject)
 	RecvPropInt(RECVINFO(m_bSimulatedEveryTick), 0, RecvProxy_InterpolationAmountChanged),
 	RecvPropInt(RECVINFO(m_bAnimatedEveryTick), 0, RecvProxy_InterpolationAmountChanged),
 	RecvPropInt(RECVINFO(m_bClientSideAnimation)),
+	RecvPropInt(RECVINFO(m_nForceBone)),
+	RecvPropVector(RECVINFO(m_vecForce)),
+	RecvPropInt(RECVINFO(m_nSkin)),
+	RecvPropInt(RECVINFO(m_nBody)),
+	RecvPropInt(RECVINFO(m_nHitboxSet)),
+
+	RecvPropFloat(RECVINFO(m_flModelScale)),
+	RecvPropFloat(RECVINFO_NAME(m_flModelScale, m_flModelWidthScale)), // for demo compatibility only
 END_RECV_TABLE()
 
 IMPLEMENT_CLIENTCLASS_NO_FACTORY(C_EngineObjectInternal, DT_EngineObject, CEngineObjectInternal);
@@ -3833,6 +3845,61 @@ void C_EngineObjectInternal::UseClientSideAnimation()
 	m_bClientSideAnimation = true;
 }
 
+//-----------------------------------------------------------------------------
+// Purpose: 
+// Input  : scale - 
+//-----------------------------------------------------------------------------
+void C_EngineObjectInternal::SetModelScale(float scale, float change_duration /*= 0.0f*/)
+{
+	if (change_duration > 0.0f)
+	{
+		ModelScale* mvs = (ModelScale*)CreateDataObject(MODELSCALE);
+		mvs->m_flModelScaleStart = m_flModelScale;
+		mvs->m_flModelScaleGoal = scale;
+		mvs->m_flModelScaleStartTime = gpGlobals->curtime;
+		mvs->m_flModelScaleFinishTime = mvs->m_flModelScaleStartTime + change_duration;
+	}
+	else
+	{
+		m_flModelScale = scale;
+		m_pOuter->RefreshCollisionBounds();
+
+		if (HasDataObjectType(MODELSCALE))
+		{
+			DestroyDataObject(MODELSCALE);
+		}
+	}
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
+void C_EngineObjectInternal::UpdateModelScale()
+{
+	ModelScale* mvs = (ModelScale*)GetDataObject(MODELSCALE);
+	if (!mvs)
+	{
+		return;
+	}
+
+	float dt = mvs->m_flModelScaleFinishTime - mvs->m_flModelScaleStartTime;
+	Assert(dt > 0.0f);
+
+	float frac = (gpGlobals->curtime - mvs->m_flModelScaleStartTime) / dt;
+	frac = clamp(frac, 0.0f, 1.0f);
+
+	if (gpGlobals->curtime >= mvs->m_flModelScaleFinishTime)
+	{
+		m_flModelScale = mvs->m_flModelScaleGoal;
+		DestroyDataObject(MODELSCALE);
+	}
+	else
+	{
+		m_flModelScale = Lerp(frac, mvs->m_flModelScaleStart, mvs->m_flModelScaleGoal);
+	}
+
+	m_pOuter->RefreshCollisionBounds();
+}
 
 bool PVSNotifierMap_LessFunc( IClientUnknown* const &a, IClientUnknown* const &b )
 {

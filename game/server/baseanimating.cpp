@@ -70,10 +70,10 @@ BEGIN_DATADESC( CBaseAnimating )
 //	DEFINE_FIELD( m_nForceBone, FIELD_INTEGER ),
 //	DEFINE_FIELD( m_vecForce, FIELD_VECTOR ),
 
-	DEFINE_INPUT( m_nSkin, FIELD_INTEGER, "skin" ),
-	DEFINE_KEYFIELD( m_nBody, FIELD_INTEGER, "body" ),
-	DEFINE_INPUT( m_nBody, FIELD_INTEGER, "SetBodyGroup" ),
-	DEFINE_KEYFIELD( m_nHitboxSet, FIELD_INTEGER, "hitboxset" ),
+	//DEFINE_INPUT( m_nSkin, FIELD_INTEGER, "skin" ),
+	//DEFINE_KEYFIELD( m_nBody, FIELD_INTEGER, "body" ),
+	//DEFINE_INPUT( m_nBody, FIELD_INTEGER, "SetBodyGroup" ),
+	//DEFINE_KEYFIELD( m_nHitboxSet, FIELD_INTEGER, "hitboxset" ),
 	DEFINE_KEYFIELD( m_nSequence, FIELD_INTEGER, "sequence" ),
 	DEFINE_ARRAY( m_flPoseParameter, FIELD_FLOAT, CBaseAnimating::NUM_POSEPAREMETERS ),
 	DEFINE_ARRAY( m_flEncodedController,	FIELD_FLOAT, CBaseAnimating::NUM_BONECTRLS ),
@@ -97,7 +97,7 @@ BEGIN_DATADESC( CBaseAnimating )
 
 
 
-	DEFINE_FIELD( m_flModelScale, FIELD_FLOAT ),
+	//DEFINE_FIELD( m_flModelScale, FIELD_FLOAT ),
 
  // DEFINE_FIELD( m_boneCacheHandle, memhandle_t ),
 
@@ -108,7 +108,7 @@ BEGIN_DATADESC( CBaseAnimating )
 
 
 
-	DEFINE_KEYFIELD( m_flModelScale, FIELD_FLOAT, "modelscale" ),
+	//DEFINE_KEYFIELD( m_flModelScale, FIELD_FLOAT, "modelscale" ),
 	DEFINE_INPUTFUNC( FIELD_VECTOR, "SetModelScale", InputSetModelScale ),
 
 	DEFINE_FIELD( m_fBoneCacheFlags, FIELD_SHORT ),
@@ -140,15 +140,9 @@ void* SendProxy_ClientSideAnimationE(const SendProp* pProp, const void* pStruct,
 REGISTER_SEND_PROXY_NON_MODIFIED_POINTER(SendProxy_ClientSideAnimationE);
 // SendTable stuff.
 IMPLEMENT_SERVERCLASS_ST(CBaseAnimating, DT_BaseAnimating)
-	SendPropInt		( SENDINFO(m_nForceBone), 8, 0 ),
-	SendPropVector	( SENDINFO(m_vecForce), -1, SPROP_NOSCALE ),
 
-	SendPropInt		( SENDINFO(m_nSkin), ANIMATION_SKIN_BITS),
-	SendPropInt		( SENDINFO(m_nBody), ANIMATION_BODY_BITS),
 
-	SendPropInt		( SENDINFO(m_nHitboxSet),ANIMATION_HITBOXSET_BITS, SPROP_UNSIGNED ),
 
-	SendPropFloat	( SENDINFO(m_flModelScale) ),
 
 	
 
@@ -168,8 +162,7 @@ END_SEND_TABLE()
 
 CBaseAnimating::CBaseAnimating()
 {
-	m_vecForce.GetForModify().Init();
-	m_nForceBone = 0;
+
 
 	//m_bResetSequenceInfoOnLoad = false;
 	m_pIk = NULL;
@@ -177,7 +170,6 @@ CBaseAnimating::CBaseAnimating()
 
 	//InitStepHeightAdjust();
 
-	m_flModelScale = 1.0f;
 	// initialize anim clock
 	m_flPrevAnimTime = gpGlobals->curtime;
 	m_nNewSequenceParity = 0;
@@ -222,12 +214,12 @@ void CBaseAnimating::Activate()
 	BaseClass::Activate();
 
 	// Scaled physics objects (re)create their physics here
-	if ( m_flModelScale != 1.0f && VPhysicsGetObject() )
+	if ( GetEngineObject()->GetModelScale() != 1.0f && VPhysicsGetObject() )
 	{	
 		// sanity check to make sure 'm_flModelScale' is in sync with the 
 		Assert( m_flModelScale > 0.0f );
 
-		UTIL_CreateScaledPhysObject( this, m_flModelScale );
+		UTIL_CreateScaledPhysObject( this, GetEngineObject()->GetModelScale() );
 	}
 }
 
@@ -249,8 +241,8 @@ void CBaseAnimating::SetTransmit( CCheckTransmitInfo *pInfo, bool bAlways )
 int CBaseAnimating::Restore( IRestore &restore )
 {
 	int result = BaseClass::Restore( restore );
-	if ( m_flModelScale <= 0.0f )
-		m_flModelScale = 1.0f;
+	if (GetEngineObject()->GetModelScale() <= 0.0f )
+		GetEngineObject()->SetModelScale(1.0f);
 	LockStudioHdr();
 	return result;
 }
@@ -333,7 +325,7 @@ void CBaseAnimating::StudioFrameAdvanceInternal( IStudioHdr *pStudioHdr, float f
 			m_flAnimTime.Get(), m_flPrevAnimTime, flInterval, GetCycle() );
 	*/
  
-	m_flGroundSpeed = GetSequenceGroundSpeed( pStudioHdr, GetSequence() ) * GetModelScale();
+	m_flGroundSpeed = GetSequenceGroundSpeed( pStudioHdr, GetSequence() ) * GetEngineObject()->GetModelScale();
 
 	// Msg("%s : %s : %5.1f\n", GetClassname(), GetSequenceName( GetSequence() ), GetCycle() );
 	GetEngineObject()->InvalidatePhysicsRecursive( ANIMATION_CHANGED );
@@ -359,7 +351,7 @@ void CBaseAnimating::StudioFrameAdvanceManual( float flInterval )
 	if ( !pStudioHdr )
 		return;
 
-	UpdateModelScale();
+	GetEngineObject()->UpdateModelScale();
 	GetEngineObject()->SetAnimTime(gpGlobals->curtime);
 	m_flPrevAnimTime = GetEngineObject()->GetAnimTime() - flInterval;
 	float flCycleRate = GetSequenceCycleRate( pStudioHdr, GetSequence() ) * m_flPlaybackRate;
@@ -379,7 +371,7 @@ void CBaseAnimating::StudioFrameAdvance()
 		return;
 	}
 
-	UpdateModelScale();
+	GetEngineObject()->UpdateModelScale();
 
 	if ( !m_flPrevAnimTime )
 	{
@@ -422,7 +414,7 @@ void CBaseAnimating::InputSetModelScale( inputdata_t &inputdata )
 	Vector vecScale;
 	inputdata.value.Vector3D( vecScale );
 
-	SetModelScale( vecScale.x, vecScale.y );
+	GetEngineObject()->SetModelScale( vecScale.x, vecScale.y );
 }
 
 
@@ -628,7 +620,7 @@ bool CBaseAnimating::BecomeRagdollOnClient( const Vector &force )
 		// and can't be sent to ClampRagdollForce as a Vector *
 		Vector vecClampedForce;
 		ClampRagdollForce( force, &vecClampedForce );
-		m_vecForce = vecClampedForce;
+		GetEngineObject()->SetVecForce(vecClampedForce);
 
 		GetEngineObject()->SetParent( NULL );
 
@@ -692,7 +684,7 @@ void CBaseAnimating::ResetSequenceInfo ( )
 	//}
 
 	IStudioHdr *pStudioHdr = GetModelPtr();
-	m_flGroundSpeed = GetSequenceGroundSpeed( pStudioHdr, GetSequence() ) * GetModelScale();
+	m_flGroundSpeed = GetSequenceGroundSpeed( pStudioHdr, GetSequence() ) * GetEngineObject()->GetModelScale();
 	m_bSequenceLoops = ((pStudioHdr->GetSequenceFlags( GetSequence() ) & STUDIO_LOOPING) != 0);
 	// m_flAnimTime = gpGlobals->time;
 	m_flPlaybackRate = 1.0;
@@ -1565,7 +1557,7 @@ void CBaseAnimating::SetupBones( matrix3x4_t *pBoneToWorld, int boneMask )
 		pos, 
 		q, 
 		-1,
-		GetModelScale(), // Scaling
+		GetEngineObject()->GetModelScale(), // Scaling
 		pBoneToWorld,
 		boneMask );
 
@@ -1843,15 +1835,15 @@ void CBaseAnimating::SetBodygroup( int iGroup, int iValue )
 	// SetBodygroup is not supported on pending dynamic models. Wait for it to load!
 	// XXX TODO we could buffer up the group and value if we really needed to. -henryg
 	Assert( GetModelPtr() );
-	int newBody = m_nBody;
+	int newBody = GetEngineObject()->GetBody();
 	GetModelPtr()->SetBodygroup( newBody, iGroup, iValue );
-	m_nBody = newBody;
+	GetEngineObject()->SetBody(newBody);
 }
 
 int CBaseAnimating::GetBodygroup( int iGroup )
 {
 	//Assert( IsDynamicModelLoading() || GetModelPtr() );
-	return GetModelPtr()->GetBodygroup( m_nBody, iGroup );//IsDynamicModelLoading() ? 0 : 
+	return GetModelPtr()->GetBodygroup(GetEngineObject()->GetBody(), iGroup);//IsDynamicModelLoading() ? 0 : 
 }
 
 const char *CBaseAnimating::GetBodygroupName( int iGroup )
@@ -2348,7 +2340,7 @@ void CBaseAnimating::InvalidateBoneCache( void )
 bool CBaseAnimating::TestCollision( const Ray_t &ray, unsigned int fContentsMask, trace_t& tr )
 {
 	// Return a special case for scaled physics objects
-	if ( GetModelScale() != 1.0f )
+	if (GetEngineObject()->GetModelScale() != 1.0f )
 	{
 		IPhysicsObject *pPhysObject = VPhysicsGetObject();
 		Vector vecPosition;
@@ -2382,7 +2374,7 @@ bool CBaseAnimating::TestHitboxes( const Ray_t &ray, unsigned int fContentsMask,
 		return false;
 	}
 
-	mstudiohitboxset_t *set = pStudioHdr->pHitboxSet( m_nHitboxSet );
+	mstudiohitboxset_t *set = pStudioHdr->pHitboxSet(GetEngineObject()->GetHitboxSet() );
 	if ( !set || !set->numhitboxes )
 		return false;
 
@@ -2391,7 +2383,7 @@ bool CBaseAnimating::TestHitboxes( const Ray_t &ray, unsigned int fContentsMask,
 	matrix3x4_t *hitboxbones[MAXSTUDIOBONES];
 	pcache->ReadCachedBonePointers( hitboxbones, pStudioHdr->numbones() );
 
-	if ( TraceToStudio( physprops, ray, pStudioHdr, set, hitboxbones, fContentsMask, GetEngineObject()->GetAbsOrigin(), GetModelScale(), tr ) )
+	if ( TraceToStudio( physprops, ray, pStudioHdr, set, hitboxbones, fContentsMask, GetEngineObject()->GetAbsOrigin(), GetEngineObject()->GetModelScale(), tr ) )
 	{
 		mstudiobbox_t *pbox = set->pHitbox( tr.hitbox );
 		mstudiobone_t *pBone = pStudioHdr->pBone(pbox->bone);
@@ -2640,7 +2632,7 @@ void CBaseAnimating::SetHitboxSet( int setnum )
 	}
 #endif
 
-	m_nHitboxSet = setnum;
+	GetEngineObject()->SetHitboxSet( setnum);
 }
 
 //-----------------------------------------------------------------------------
@@ -2650,7 +2642,7 @@ void CBaseAnimating::SetHitboxSet( int setnum )
 void CBaseAnimating::SetHitboxSetByName( const char *setname )
 {
 	Assert( GetModelPtr() );
-	m_nHitboxSet = GetModelPtr()->FindHitboxSetByName( setname );
+	GetEngineObject()->SetHitboxSet( GetModelPtr()->FindHitboxSetByName( setname ));
 }
 
 //-----------------------------------------------------------------------------
@@ -2659,7 +2651,7 @@ void CBaseAnimating::SetHitboxSetByName( const char *setname )
 //-----------------------------------------------------------------------------
 int CBaseAnimating::GetHitboxSet( void )
 {
-	return m_nHitboxSet;
+	return GetEngineObject()->GetHitboxSet();
 }
 
 //-----------------------------------------------------------------------------
@@ -2669,7 +2661,7 @@ int CBaseAnimating::GetHitboxSet( void )
 const char *CBaseAnimating::GetHitboxSetName( void )
 {
 	Assert( GetModelPtr() );
-	return GetModelPtr()->GetHitboxSetName( m_nHitboxSet );
+	return GetModelPtr()->GetHitboxSetName(GetEngineObject()->GetHitboxSet() );
 }
 
 //-----------------------------------------------------------------------------
@@ -2705,7 +2697,7 @@ void CBaseAnimating::DrawServerHitboxes( float duration /*= 0.0f*/, bool monocol
 	if ( !pStudioHdr )
 		return;
 
-	mstudiohitboxset_t *set =pStudioHdr->pHitboxSet( m_nHitboxSet );
+	mstudiohitboxset_t *set =pStudioHdr->pHitboxSet(GetEngineObject()->GetHitboxSet() );
 	if ( !set )
 		return;
 
@@ -2731,7 +2723,7 @@ void CBaseAnimating::DrawServerHitboxes( float duration /*= 0.0f*/, bool monocol
 			b = ( int ) ( 255.0f * hullcolor[j][2] );
 		}
 
-		NDebugOverlay::BoxAngles( position, pbox->bbmin * GetModelScale(), pbox->bbmax * GetModelScale(), angles, r, g, b, 0 ,duration );
+		NDebugOverlay::BoxAngles( position, pbox->bbmin * GetEngineObject()->GetModelScale(), pbox->bbmax * GetEngineObject()->GetModelScale(), angles, r, g, b, 0 ,duration );
 	}
 }
 
@@ -2770,7 +2762,7 @@ int CBaseAnimating::GetHitboxBone( int hitboxIndex )
 	IStudioHdr *pStudioHdr = GetModelPtr();
 	if ( pStudioHdr )
 	{
-		mstudiohitboxset_t *set =pStudioHdr->pHitboxSet( m_nHitboxSet );
+		mstudiohitboxset_t *set =pStudioHdr->pHitboxSet(GetEngineObject()->GetHitboxSet() );
 		if ( set && hitboxIndex < set->numhitboxes )
 		{
 			return set->pHitbox( hitboxIndex )->bone;
@@ -2794,7 +2786,7 @@ bool CBaseAnimating::ComputeHitboxSurroundingBox( Vector *pVecWorldMins, Vector 
 	if (!pStudioHdr)
 		return false;
 
-	mstudiohitboxset_t *set = pStudioHdr->pHitboxSet( m_nHitboxSet );
+	mstudiohitboxset_t *set = pStudioHdr->pHitboxSet(GetEngineObject()->GetHitboxSet() );
 	if ( !set || !set->numhitboxes )
 		return false;
 
@@ -2812,7 +2804,7 @@ bool CBaseAnimating::ComputeHitboxSurroundingBox( Vector *pVecWorldMins, Vector 
 
 		if ( pMatrix )
 		{
-			TransformAABB( *pMatrix, pbox->bbmin * GetModelScale(), pbox->bbmax * GetModelScale(), vecBoxAbsMins, vecBoxAbsMaxs );
+			TransformAABB( *pMatrix, pbox->bbmin * GetEngineObject()->GetModelScale(), pbox->bbmax * GetEngineObject()->GetModelScale(), vecBoxAbsMins, vecBoxAbsMaxs );
 			VectorMin( *pVecWorldMins, vecBoxAbsMins, *pVecWorldMins );
 			VectorMax( *pVecWorldMaxs, vecBoxAbsMaxs, *pVecWorldMaxs );
 		}
@@ -2834,7 +2826,7 @@ bool CBaseAnimating::ComputeEntitySpaceHitboxSurroundingBox( Vector *pVecWorldMi
 	if (!pStudioHdr)
 		return false;
 
-	mstudiohitboxset_t *set = pStudioHdr->pHitboxSet( m_nHitboxSet );
+	mstudiohitboxset_t *set = pStudioHdr->pHitboxSet(GetEngineObject()->GetHitboxSet() );
 	if ( !set || !set->numhitboxes )
 		return false;
 
@@ -2915,8 +2907,8 @@ void CBaseAnimating::CopyAnimationDataFrom( CBaseAnimating *pSource )
 	this->IncrementInterpolationFrame();
 	this->SetSequence( pSource->GetSequence() );
 	this->GetEngineObject()->SetAnimTime(pSource->GetEngineObject()->GetAnimTime());
-	this->m_nBody = pSource->m_nBody;
-	this->m_nSkin = pSource->m_nSkin;
+	this->GetEngineObject()->SetBody( pSource->GetEngineObject()->GetBody());
+	this->GetEngineObject()->SetSkin( pSource->GetEngineObject()->GetSkin());
 	this->LockStudioHdr();
 }
 
@@ -2926,7 +2918,7 @@ int CBaseAnimating::GetHitboxesFrontside( int *boxList, int boxMax, const Vector
 	IStudioHdr *pStudioHdr = GetModelPtr();
 	if ( pStudioHdr )
 	{
-		mstudiohitboxset_t *set = pStudioHdr->pHitboxSet( m_nHitboxSet );
+		mstudiohitboxset_t *set = pStudioHdr->pHitboxSet(GetEngineObject()->GetHitboxSet() );
 		if ( set )
 		{
 			matrix3x4_t matrix;
@@ -2994,67 +2986,6 @@ void CBaseAnimating::DoMuzzleFlash()
 {
 	m_nMuzzleFlashParity = (m_nMuzzleFlashParity+1) & ((1 << EF_MUZZLEFLASH_BITS) - 1);
 }
-
-
-//-----------------------------------------------------------------------------
-// Purpose: 
-// Input  : scale - 
-//-----------------------------------------------------------------------------
-void CBaseAnimating::SetModelScale( float scale, float change_duration /*= 0.0f*/  )
-{
-	if ( change_duration > 0.0f )
-	{
-		ModelScale *mvs = ( ModelScale * )GetEngineObject()->CreateDataObject( MODELSCALE );
-		mvs->m_flModelScaleStart = m_flModelScale;
-		mvs->m_flModelScaleGoal = scale;
-		mvs->m_flModelScaleStartTime = gpGlobals->curtime;
-		mvs->m_flModelScaleFinishTime = mvs->m_flModelScaleStartTime + change_duration;
-	}
-	else
-	{
-		m_flModelScale = scale;
-		RefreshCollisionBounds();
-
-		if (GetEngineObject()->HasDataObjectType( MODELSCALE ) )
-		{
-			GetEngineObject()->DestroyDataObject( MODELSCALE );
-		}
-	}
-}
-
-void CBaseAnimating::UpdateModelScale()
-{
-	ModelScale *mvs = ( ModelScale * )GetEngineObject()->GetDataObject( MODELSCALE );
-	if ( !mvs )
-	{
-		return;
-	}
-
-	float dt = mvs->m_flModelScaleFinishTime - mvs->m_flModelScaleStartTime;
-	Assert( dt > 0.0f );
-
-	float frac = ( gpGlobals->curtime - mvs->m_flModelScaleStartTime ) / dt;
-	frac = clamp( frac, 0.0f, 1.0f );
-
-	if ( gpGlobals->curtime >= mvs->m_flModelScaleFinishTime )
-	{
-		m_flModelScale = mvs->m_flModelScaleGoal;
-		GetEngineObject()->DestroyDataObject( MODELSCALE );
-	}
-	else
-	{
-		m_flModelScale = Lerp( frac, mvs->m_flModelScaleStart, mvs->m_flModelScaleGoal );
-	}
-
-	RefreshCollisionBounds();
-}
-
-void CBaseAnimating::RefreshCollisionBounds( void )
-{
-	GetEngineObject()->RefreshScaledCollisionBounds();
-}
-
-
 
 
 void CBaseAnimating::ResetSequence(int nSequence)

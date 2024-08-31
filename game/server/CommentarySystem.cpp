@@ -1000,7 +1000,7 @@ void CPointCommentaryNode::SpinThink( void )
 {
 	// Rotate if we're active, or under the crosshair. Don't rotate if we're
 	// under the crosshair, but we've already been listened to.
-	if ( m_bActive || (m_bUnderCrosshair && m_nSkin == 0) )
+	if ( m_bActive || (m_bUnderCrosshair && GetEngineObject()->GetSkin() == 0))
 	{
 		if ( m_bActive )
 		{
@@ -1114,7 +1114,7 @@ void CPointCommentaryNode::StartCommentary( void )
 	m_flPrevAnimTime = gpGlobals->curtime;
 
 	// Switch to the greyed out skin 
-	m_nSkin = 1;
+	GetEngineObject()->SetSkin(1);
 
 	m_pOnCommentaryStarted.FireOutput( this, this );
 

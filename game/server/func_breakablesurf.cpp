@@ -143,7 +143,7 @@ CWindowPane* CWindowPane::CreateWindowPane( const Vector &vecOrigin, const QAngl
 		pGlass->Spawn();
 		pGlass->SetTouch(&CWindowPane::PaneTouch);
 		pGlass->SetLocalAngularVelocity( RandomAngle(-50,50) );
-		pGlass->m_nBody = random->RandomInt(0,2);
+		pGlass->GetEngineObject()->SetBody( random->RandomInt(0,2));
 	}
 	return pGlass;
 }

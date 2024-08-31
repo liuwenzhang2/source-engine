@@ -948,7 +948,7 @@ void PropBreakableCreateAll( int modelindex, IPhysicsObject *pPhysics, const bre
 		pOwnerAnim = pOwnerEntity->GetBaseAnimating();
 		if ( pOwnerAnim )
 		{
-			nSkin = pOwnerAnim->m_nSkin;
+			nSkin = pOwnerAnim->GetEngineObject()->GetSkin();
 		}
 	}
 	static matrix3x4_t localToWorld;
@@ -1334,7 +1334,7 @@ CBaseEntity *CreateGibsFromList( CUtlVector<breakmodel_t> &list, int modelindex,
 		pOwnerAnim = dynamic_cast<CBaseAnimating*>(pOwnerEntity);
 		if ( pOwnerAnim )
 		{
-			nSkin = pOwnerAnim->m_nSkin;
+			nSkin = pOwnerAnim->GetEngineObject()->GetSkin();
 		}
 	}
 	matrix3x4_t localToWorld;

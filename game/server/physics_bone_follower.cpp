@@ -74,7 +74,7 @@ void CBoneFollowerManager::AddBoneFollower( CBaseAnimating *pParentEntity, const
 static int HitGroupFromPhysicsBone( CBaseAnimating *pAnim, int physicsBone )
 {
 	IStudioHdr *pStudioHdr = pAnim->GetModelPtr( );
-	mstudiohitboxset_t *set = pStudioHdr->pHitboxSet( pAnim->m_nHitboxSet );
+	mstudiohitboxset_t *set = pStudioHdr->pHitboxSet( pAnim->GetEngineObject()->GetHitboxSet() );
 	for ( int i = 0; i < set->numhitboxes; i++ )
 	{
 		if ( pStudioHdr->pBone( set->pHitbox(i)->bone )->physicsbone == physicsBone )

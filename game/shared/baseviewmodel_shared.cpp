@@ -558,8 +558,8 @@ IMPLEMENT_NETWORKCLASS_ALIASED( BaseViewModel, DT_BaseViewModel )
 BEGIN_NETWORK_TABLE_NOBASE(CBaseViewModel, DT_BaseViewModel)
 #if !defined( CLIENT_DLL )
 	//SendPropModelIndex(SENDINFO(m_nModelIndex)),
-	SendPropInt		(SENDINFO(m_nBody), 8),
-	SendPropInt		(SENDINFO(m_nSkin), 10),
+	//SendPropInt		(SENDINFO(m_nBody), 8),
+	//SendPropInt		(SENDINFO(m_nSkin), 10),
 	SendPropInt		(SENDINFO(m_nSequence),	8, SPROP_UNSIGNED),
 	SendPropInt		(SENDINFO(m_nViewModelIndex), VIEWMODEL_INDEX_BITS, SPROP_UNSIGNED),
 	SendPropFloat	(SENDINFO(m_flPlaybackRate),	8,	SPROP_ROUNDUP,	-4.0,	12.0f),
@@ -577,8 +577,8 @@ BEGIN_NETWORK_TABLE_NOBASE(CBaseViewModel, DT_BaseViewModel)
 #endif
 #else
 	//RecvPropInt		(RECVINFO(m_nModelIndex)),
-	RecvPropInt		(RECVINFO(m_nSkin)),
-	RecvPropInt		(RECVINFO(m_nBody)),
+	//RecvPropInt		(RECVINFO(m_nSkin)),
+	//RecvPropInt		(RECVINFO(m_nBody)),
 	RecvPropInt		(RECVINFO(m_nSequence), 0, RecvProxy_SequenceNum ),
 	RecvPropInt		(RECVINFO(m_nViewModelIndex)),
 	RecvPropFloat	(RECVINFO(m_flPlaybackRate)),
@@ -603,8 +603,8 @@ BEGIN_PREDICTION_DATA( CBaseViewModel )
 
 	// Networked
 	//DEFINE_PRED_FIELD( m_nModelIndex, FIELD_SHORT, FTYPEDESC_INSENDTABLE | FTYPEDESC_MODELINDEX ),
-	DEFINE_PRED_FIELD( m_nSkin, FIELD_INTEGER, FTYPEDESC_INSENDTABLE ),
-	DEFINE_PRED_FIELD( m_nBody, FIELD_INTEGER, FTYPEDESC_INSENDTABLE ),
+	//DEFINE_PRED_FIELD( m_nSkin, FIELD_INTEGER, FTYPEDESC_INSENDTABLE ),
+	//DEFINE_PRED_FIELD( m_nBody, FIELD_INTEGER, FTYPEDESC_INSENDTABLE ),
 	DEFINE_PRED_FIELD( m_nSequence, FIELD_INTEGER, FTYPEDESC_INSENDTABLE ),
 	DEFINE_PRED_FIELD( m_nViewModelIndex, FIELD_INTEGER, FTYPEDESC_INSENDTABLE ),
 	DEFINE_PRED_FIELD_TOL( m_flPlaybackRate, FIELD_FLOAT, FTYPEDESC_INSENDTABLE, 0.125f ),

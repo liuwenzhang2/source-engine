@@ -1510,14 +1510,10 @@ void C_BasePlayer::CalcChaseCamView(Vector& eyeOrigin, QAngle& eyeAngles, float&
 
 	if ( target )
 	{
-		C_BaseAnimating *pTargetAnimating = target->GetBaseAnimating();
-		if ( pTargetAnimating )
-		{
-			float flScaleSquared = pTargetAnimating->GetModelScale() * pTargetAnimating->GetModelScale();
-			flMinDistance *= flScaleSquared;
-			flMaxDistance *= flScaleSquared;
-			m_flObserverChaseDistance = flMaxDistance;
-		}
+		float flScaleSquared = target->GetEngineObject()->GetModelScale() * target->GetEngineObject()->GetModelScale();
+		flMinDistance *= flScaleSquared;
+		flMaxDistance *= flScaleSquared;
+		m_flObserverChaseDistance = flMaxDistance;
 	}
 
 	if ( target && !target->IsPlayer() && target->IsNextBot() )

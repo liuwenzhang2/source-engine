@@ -230,8 +230,8 @@ IMPLEMENT_SERVERCLASS_ST_NOBASE( CCSRagdoll, DT_CSRagdoll )
 	SendPropVector( SENDINFO(m_vecRagdollOrigin), -1,  SPROP_COORD ),
 	SendPropEHandle( SENDINFO( m_hPlayer ) ),
 	//SendPropModelIndex( SENDINFO( m_nModelIndex ) ),
-	SendPropInt		( SENDINFO(m_nForceBone), 8, 0 ),
-	SendPropVector	( SENDINFO(m_vecForce), -1, SPROP_NOSCALE ),
+	//SendPropInt		( SENDINFO(m_nForceBone), 8, 0 ),
+	//SendPropVector	( SENDINFO(m_vecForce), -1, SPROP_NOSCALE ),
 	SendPropVector( SENDINFO( m_vecRagdollVelocity ) ),
 	SendPropInt( SENDINFO( m_iDeathPose ), ANIMATION_SEQUENCE_BITS, SPROP_UNSIGNED ),
 	SendPropInt( SENDINFO( m_iDeathFrame ), 5 ),
@@ -454,7 +454,6 @@ CCSPlayer::CCSPlayer()
 	m_iClass = (int)CS_CLASS_NONE;
 	m_angEyeAngles.Init();
 
-	SetViewOffset( VEC_VIEW_SCALED( this ) );
 
 	m_pCurStateInfo = NULL;	// no state yet
 	m_iThrowGrenadeCounter = 0;
@@ -545,6 +544,7 @@ CCSPlayer::CCSPlayer()
 }
 
 void CCSPlayer::PostConstructor(const char* szClassname, int iForceEdictIndex) {
+	SetViewOffset(VEC_VIEW_SCALED(this));
 	BaseClass::PostConstructor(szClassname, iForceEdictIndex);
 	GetEngineObject()->UseClientSideAnimation();
 }
@@ -1021,8 +1021,8 @@ void CCSPlayer::CreateRagdollEntity()
 		pRagdoll->m_vecRagdollOrigin = GetEngineObject()->GetAbsOrigin();
 		pRagdoll->m_vecRagdollVelocity = GetEngineObject()->GetAbsVelocity();
 		pRagdoll->GetEngineObject()->SetModelIndex(GetEngineObject()->GetModelIndex());
-		pRagdoll->m_nForceBone = m_nForceBone;
-		pRagdoll->m_vecForce = m_vecTotalBulletForce;
+		pRagdoll->GetEngineObject()->SetForceBone(GetEngineObject()->GetForceBone());
+		pRagdoll->GetEngineObject()->SetVecForce( m_vecTotalBulletForce);
 		pRagdoll->m_iDeathPose = m_iDeathPose;
 		pRagdoll->m_iDeathFrame = m_iDeathFrame;
 		pRagdoll->Init();
@@ -2249,7 +2249,7 @@ void CCSPlayer::TraceAttack( const CTakeDamageInfo &info, const Vector &vecDir, 
 // HPE_END
 //=============================================================================
 
-	m_nForceBone = ptr->physicsbone;	//Save this bone for ragdoll
+	GetEngineObject()->SetForceBone( ptr->physicsbone);	//Save this bone for ragdoll
 
 	float flDamage = info.GetDamage();
 

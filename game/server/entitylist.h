@@ -176,6 +176,12 @@ public:
 		m_rgflCoordinateFrame[1][1] = 1.0f;
 		m_rgflCoordinateFrame[2][2] = 1.0f;
 		m_bClientSideAnimation = false;
+		m_vecForce.GetForModify().Init();
+		m_nForceBone = 0;
+		m_nSkin = 0;
+		m_nBody = 0;
+		m_nHitboxSet = 0;
+		m_flModelScale = 1.0f;
 	}
 
 	~CEngineObjectInternal()
@@ -569,6 +575,42 @@ public:
 	// the transmission of animtime.
 	bool	IsUsingClientSideAnimation() { return m_bClientSideAnimation; }
 
+	Vector GetVecForce() {
+		return 	m_vecForce;
+	}
+	void SetVecForce(Vector vecForce) {
+		m_vecForce = vecForce;
+	}
+
+	int	GetForceBone() {
+		return m_nForceBone;
+	}
+	void SetForceBone(int nForceBone) {
+		m_nForceBone = nForceBone;
+	}
+	int GetBody() {
+		return m_nBody;
+	}
+	void SetBody(int nBody) {
+		m_nBody = nBody;
+	}
+	int GetSkin() {
+		return m_nSkin;
+	}
+	void SetSkin(int nSkin) {
+		m_nSkin = nSkin;
+	}
+	int GetHitboxSet() {
+		return m_nHitboxSet;
+	}
+	void SetHitboxSet(int nHitboxSet) {
+		m_nHitboxSet = nHitboxSet;
+	}
+
+	void				SetModelScale(float scale, float change_duration = 0.0f);
+	float				GetModelScale() const { return m_flModelScale; }
+	void				UpdateModelScale();
+
 public:
 	// Networking related methods
 	void NetworkStateChanged();
@@ -661,6 +703,14 @@ private:
 
 	// Client-side animation (useful for looping animation objects)
 	CNetworkVar(bool, m_bClientSideAnimation);
+	CNetworkVar(int, m_nForceBone);
+	CNetworkVector(m_vecForce);
+	CNetworkVar(int, m_nSkin);
+	CNetworkVar(int, m_nBody);
+	CNetworkVar(int, m_nHitboxSet);
+
+	// For making things thin during barnacle swallowing, e.g.
+	CNetworkVar(float, m_flModelScale);
 };
 
 inline PVSInfo_t* CEngineObjectInternal::GetPVSInfo()

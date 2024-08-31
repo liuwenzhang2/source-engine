@@ -1131,9 +1131,9 @@ void CAI_BaseNPC::TraceAttack( const CTakeDamageInfo &info, const Vector &vecDir
 	CTakeDamageInfo subInfo = info;
 
 	SetLastHitGroup( ptr->hitgroup );
-	m_nForceBone = ptr->physicsbone;		// save this bone for physics forces
+	GetEngineObject()->SetForceBone(ptr->physicsbone);		// save this bone for physics forces
 
-	Assert( m_nForceBone > -255 && m_nForceBone < 256 );
+	Assert(GetEngineObject()->GetForceBone() > -255 && GetEngineObject()->GetForceBone() < 256);
 
 	bool bDebug = showhitlocation.GetBool();
 
@@ -6691,7 +6691,7 @@ void CAI_BaseNPC::SetHullSizeNormal( bool force )
 	if ( m_fIsUsingSmallHull || force )
 	{
 		// Find out what the height difference will be between the versions and adjust our bbox accordingly to keep us level
-		const float flScale = GetModelScale();
+		const float flScale = GetEngineObject()->GetModelScale();
 		Vector vecMins = ( GetHullMins() * flScale );
 		Vector vecMaxs = ( GetHullMaxs() * flScale );
 		
@@ -8096,7 +8096,7 @@ Vector CAI_BaseNPC::EyeOffset( Activity nActivity )
 	if ( IsCrouching() )
 		return GetCrouchEyeOffset();
 
-	return m_vDefaultEyeOffset * GetModelScale();
+	return m_vDefaultEyeOffset * GetEngineObject()->GetModelScale();
 }
 
 //-----------------------------------------------------------------------------

@@ -1657,6 +1657,7 @@ private:
 public:
 	//bool IsDynamicModelLoading() const { return m_bDynamicModelPending; } 
 	void SetCollisionBoundsFromModel();
+	virtual	void RefreshCollisionBounds(void);
 
 //#if !defined( NO_ENTITY_PREDICTION )
 //	CNetworkVar( bool, m_bIsPlayerSimulated );

@@ -139,14 +139,8 @@ END_RECV_TABLE()
 
 
 IMPLEMENT_CLIENTCLASS_DT(C_BaseAnimating, DT_BaseAnimating, CBaseAnimating)
-	RecvPropInt(RECVINFO(m_nForceBone)),
-	RecvPropVector(RECVINFO(m_vecForce)),
-	RecvPropInt(RECVINFO(m_nSkin)),
-	RecvPropInt(RECVINFO(m_nBody)),
-	RecvPropInt(RECVINFO(m_nHitboxSet)),
 
-	RecvPropFloat(RECVINFO(m_flModelScale)),
-	RecvPropFloat(RECVINFO_NAME(m_flModelScale, m_flModelWidthScale)), // for demo compatibility only
+
 
 //	RecvPropArray(RecvPropFloat(RECVINFO(m_flPoseParameter[0])), m_flPoseParameter),
 	
@@ -162,8 +156,8 @@ END_RECV_TABLE()
 
 BEGIN_PREDICTION_DATA( C_BaseAnimating )
 
-	DEFINE_PRED_FIELD( m_nSkin, FIELD_INTEGER, FTYPEDESC_INSENDTABLE ),
-	DEFINE_PRED_FIELD( m_nBody, FIELD_INTEGER, FTYPEDESC_INSENDTABLE ),
+	//DEFINE_PRED_FIELD( m_nSkin, FIELD_INTEGER, FTYPEDESC_INSENDTABLE ),
+	//DEFINE_PRED_FIELD( m_nBody, FIELD_INTEGER, FTYPEDESC_INSENDTABLE ),
 //	DEFINE_PRED_FIELD( m_nHitboxSet, FIELD_INTEGER, FTYPEDESC_INSENDTABLE ),
 //	DEFINE_PRED_FIELD( m_flModelScale, FIELD_FLOAT, FTYPEDESC_INSENDTABLE ),
 	DEFINE_PRED_FIELD( m_nSequence, FIELD_INTEGER, FTYPEDESC_INSENDTABLE | FTYPEDESC_NOERRORCHECK ),
@@ -220,8 +214,8 @@ BEGIN_DATADESC( C_ClientRagdoll )
 	DEFINE_FIELD( m_flFrictionTime, FIELD_TIME ),
 	DEFINE_FIELD( m_iFrictionAnimState, FIELD_INTEGER ),
 	DEFINE_FIELD( m_bReleaseRagdoll, FIELD_BOOLEAN ),
-	DEFINE_FIELD( m_nBody, FIELD_INTEGER ),
-	DEFINE_FIELD( m_nSkin, FIELD_INTEGER ),
+	//DEFINE_FIELD( m_nBody, FIELD_INTEGER ),
+	//DEFINE_FIELD( m_nSkin, FIELD_INTEGER ),
 	DEFINE_FIELD( m_nRenderFX, FIELD_CHARACTER ),
 	DEFINE_FIELD( m_nRenderMode, FIELD_CHARACTER ),
 	DEFINE_FIELD( m_clrRender, FIELD_COLOR32 ),
@@ -627,8 +621,7 @@ C_BaseAnimating::C_BaseAnimating() :
 	m_iv_flPoseParameter( "C_BaseAnimating::m_iv_flPoseParameter", m_flPoseParameter, LATCH_ANIMATION_VAR),
 	m_iv_flEncodedController("C_BaseAnimating::m_iv_flEncodedController", m_flEncodedController, LATCH_ANIMATION_VAR)
 {
-	m_vecForce.Init();
-	m_nForceBone = -1;
+
 	
 	m_ClientSideAnimationListHandle = INVALID_CLIENTSIDEANIMATION_LIST_HANDLE;
 
@@ -637,7 +630,6 @@ C_BaseAnimating::C_BaseAnimating() :
 	m_pRagdoll		= NULL;
 	m_builtRagdoll = false;
 	m_hitboxBoneCacheHandle = 0;
-	m_nHitboxSet = 0;
 
 	int i;
 	for ( i = 0; i < ARRAYSIZE( m_flEncodedController ); i++ )
@@ -673,7 +665,6 @@ C_BaseAnimating::C_BaseAnimating() :
 	m_nOldMuzzleFlashParity = 0;
 	m_nMuzzleFlashParity = 0;
 
-	m_flModelScale = 1.0f;
 
 	m_iEyeAttachment = 0;
 #ifdef _XBOX
@@ -1171,7 +1162,7 @@ int C_BaseAnimating::GetHitboxBone( int hitboxIndex )
 	IStudioHdr *pStudioHdr = GetModelPtr();
 	if ( pStudioHdr )
 	{
-		mstudiohitboxset_t *set =pStudioHdr->pHitboxSet( m_nHitboxSet );
+		mstudiohitboxset_t *set =pStudioHdr->pHitboxSet( GetEngineObject()->GetHitboxSet() );
 		if ( set && hitboxIndex < set->numhitboxes )
 		{
 			return set->pHitbox( hitboxIndex )->bone;
@@ -1561,10 +1552,10 @@ void C_BaseAnimating::ApplyBoneMatrixTransform( matrix3x4_t& transform )
 		
 	}
 
-	if ( IsModelScaled() )
+	if (GetEngineObject()->IsModelScaled() )
 	{
 		// The bone transform is in worldspace, so to scale this, we need to translate it back
-		float scale = GetModelScale();
+		float scale = GetEngineObject()->GetModelScale();
 
 		Vector pos;
 		MatrixGetColumn( transform, 3, pos );
@@ -2814,7 +2805,7 @@ bool C_BaseAnimating::SetupBones( matrix3x4_t *pBoneToWorldOut, int nMaxBones, i
 			GetEngineObject()->AddFlag( EFL_SETTING_UP_BONES );
 
 			// NOTE: For model scaling, we need to opt out of IK because it will mark the bones as already being calculated
-			if ( !IsModelScaled() )
+			if ( !GetEngineObject()->IsModelScaled() )
 			{
 				// only allocate an ik block if the npc can use it
 				if ( !m_pIk && hdr->numikchains() > 0 && !(m_EntClientFlags & ENTCLIENTFLAG_DONTUSEIK) )
@@ -3201,7 +3192,7 @@ int C_BaseAnimating::InternalDrawModel( int flags )
 	pInfo->angles = GetRenderAngles();
 	pInfo->skin = GetSkin();
 	pInfo->body = GetBody();
-	pInfo->hitboxset = m_nHitboxSet;
+	pInfo->hitboxset = GetEngineObject()->GetHitboxSet();
 
 	if ( !OnInternalDrawModel( pInfo ) )
 	{
@@ -3222,13 +3213,13 @@ int C_BaseAnimating::InternalDrawModel( int flags )
 	bool bMarkAsDrawn = modelrender->DrawModelSetup( *pInfo, &state, NULL, &pBoneToWorld );
 	
 	// Scale the base transform if we don't have a bone hierarchy
-	if ( IsModelScaled() )
+	if (GetEngineObject()->IsModelScaled() )
 	{
 		IStudioHdr *pHdr = GetModelPtr();
 		if ( pHdr && pBoneToWorld && pHdr->numbones() == 1 )
 		{
 			// Scale the bone to world at this point
-			const float flScale = GetModelScale();
+			const float flScale = GetEngineObject()->GetModelScale();
 			VectorScale( (*pBoneToWorld)[0], flScale, (*pBoneToWorld)[0] );
 			VectorScale( (*pBoneToWorld)[1], flScale, (*pBoneToWorld)[1] );
 			VectorScale( (*pBoneToWorld)[2], flScale, (*pBoneToWorld)[2] );
@@ -4289,7 +4280,7 @@ void C_BaseAnimating::GetRenderBounds( Vector& theMins, Vector& theMaxs )
 	}
 
 	// Scale this up depending on if our model is currently scaling
-	const float flScale = GetModelScale();
+	const float flScale = GetEngineObject()->GetModelScale();
 	theMaxs *= flScale;
 	theMins *= flScale;
 }
@@ -4367,7 +4358,7 @@ void C_BaseAnimating::PreDataUpdate( DataUpdateType_t updateType )
 
 	m_flOldCycle = GetCycle();
 	m_nOldSequence = GetSequence();
-	m_flOldModelScale = GetModelScale();
+	m_flOldModelScale = GetEngineObject()->GetModelScale();
 
 	int i;
 	for ( i=0;i<MAXSTUDIOBONECTRLS;i++ )
@@ -4440,7 +4431,7 @@ void C_BaseAnimating::PostDataUpdate( DataUpdateType_t updateType )
 	// Cycle change? Then re-render
 	bool bAnimationChanged = m_flOldCycle != GetCycle() || bBoneControllersChanged || bPoseParametersChanged;
 	bool bSequenceChanged = m_nOldSequence != GetSequence();
-	bool bScaleChanged = ( m_flOldModelScale != GetModelScale() );
+	bool bScaleChanged = ( m_flOldModelScale != GetEngineObject()->GetModelScale() );
 	if ( bAnimationChanged || bSequenceChanged || bScaleChanged )
 	{
 		GetEngineObject()->InvalidatePhysicsRecursive( ANIMATION_CHANGED );
@@ -4561,14 +4552,14 @@ C_BaseAnimating *C_BaseAnimating::CreateRagdollCopy()
 	pRagdoll->SetRenderMode( GetRenderMode() );
 	pRagdoll->SetRenderColor( GetRenderColor().r, GetRenderColor().g, GetRenderColor().b, GetRenderColor().a );
 
-	pRagdoll->m_nBody = m_nBody;
-	pRagdoll->m_nSkin = GetSkin();
-	pRagdoll->m_vecForce = m_vecForce;
-	pRagdoll->m_nForceBone = m_nForceBone;
+	pRagdoll->GetEngineObject()->SetBody(GetEngineObject()->GetBody());
+	pRagdoll->GetEngineObject()->SetSkin(GetSkin());
+	pRagdoll->GetEngineObject()->SetVecForce(GetEngineObject()->GetVecForce());
+	pRagdoll->GetEngineObject()->SetForceBone(GetEngineObject()->GetForceBone());
 	pRagdoll->SetNextClientThink( CLIENT_THINK_ALWAYS );
 
 	pRagdoll->GetEngineObject()->SetModelName( AllocPooledString(pModelName) );
-	pRagdoll->SetModelScale( GetModelScale() );
+	pRagdoll->GetEngineObject()->SetModelScale(GetEngineObject()->GetModelScale() );
 	return pRagdoll;
 }
 
@@ -4607,7 +4598,7 @@ bool C_BaseAnimating::InitAsClientRagdoll( const matrix3x4_t *pDeltaBones0, cons
 	// HACKHACK: force time to last interpolation position
 	m_flPlaybackRate = 1;
 	
-	m_pRagdoll = CreateRagdoll( this, hdr, m_vecForce, m_nForceBone, pDeltaBones0, pDeltaBones1, pCurrentBonePosition, boneDt, bFixedConstraints );
+	m_pRagdoll = CreateRagdoll( this, hdr, GetEngineObject()->GetVecForce(), GetEngineObject()->GetForceBone(), pDeltaBones0, pDeltaBones1, pCurrentBonePosition, boneDt, bFixedConstraints);
 
 	// Cause the entity to recompute its shadow	type and make a
 	// version which only updates when physics state changes
@@ -4907,7 +4898,7 @@ bool C_BaseAnimating::TestHitboxes( const Ray_t &ray, unsigned int fContentsMask
 	if (!pStudioHdr)
 		return false;
 
-	mstudiohitboxset_t *set = pStudioHdr->pHitboxSet( m_nHitboxSet );
+	mstudiohitboxset_t *set = pStudioHdr->pHitboxSet(GetEngineObject()->GetHitboxSet() );
 	if ( !set || !set->numhitboxes )
 		return false;
 
@@ -4922,7 +4913,7 @@ bool C_BaseAnimating::TestHitboxes( const Ray_t &ray, unsigned int fContentsMask
 	matrix3x4_t *hitboxbones[MAXSTUDIOBONES];
 	pCache->ReadCachedBonePointers( hitboxbones, pStudioHdr->numbones() );
 
-	if ( TraceToStudio( physprops, ray, pStudioHdr, set, hitboxbones, fContentsMask, GetRenderOrigin(), GetModelScale(), tr ) )
+	if ( TraceToStudio( physprops, ray, pStudioHdr, set, hitboxbones, fContentsMask, GetRenderOrigin(), GetEngineObject()->GetModelScale(), tr ) )
 	{
 		mstudiobbox_t *pbox = set->pHitbox( tr.hitbox );
 		mstudiobone_t *pBone = pStudioHdr->pBone(pbox->bone);
@@ -5036,7 +5027,7 @@ void C_BaseAnimating::StudioFrameAdvance()
 		return;
 	}
 
-	UpdateModelScale();
+	GetEngineObject()->UpdateModelScale();
 
 	//anim.prevanimtime = m_flAnimTime;
 	float cycleAdvance = flInterval * GetSequenceCycleRate( hdr, GetSequence() ) * m_flPlaybackRate;
@@ -5064,7 +5055,7 @@ void C_BaseAnimating::StudioFrameAdvance()
 
 	SetCycle( flNewCycle );
 
-	m_flGroundSpeed = GetSequenceGroundSpeed( hdr, GetSequence() ) * GetModelScale();
+	m_flGroundSpeed = GetSequenceGroundSpeed( hdr, GetSequence() ) * GetEngineObject()->GetModelScale();
 
 #if 0
 	// I didn't have a test case for this, but it seems like the right thing to do.  Check multi-player!
@@ -5254,7 +5245,7 @@ void C_BaseAnimating::ResetSequenceInfo( void )
 	//}
 
 	IStudioHdr *pStudioHdr = GetModelPtr();
-	m_flGroundSpeed = GetSequenceGroundSpeed( pStudioHdr, GetSequence() ) * GetModelScale();
+	m_flGroundSpeed = GetSequenceGroundSpeed( pStudioHdr, GetSequence() ) * GetEngineObject()->GetModelScale();
 	m_bSequenceLoops = ((pStudioHdr->GetSequenceFlags( GetSequence() ) & STUDIO_LOOPING) != 0);
 	// m_flAnimTime = gpGlobals->time;
 	m_flPlaybackRate = 1.0;
@@ -5320,13 +5311,15 @@ void C_BaseAnimating::SetBodygroup( int iGroup, int iValue )
 	// SetBodygroup is not supported on pending dynamic models. Wait for it to load!
 	// XXX TODO we could buffer up the group and value if we really needed to. -henryg
 	Assert( GetModelPtr() );
-	GetModelPtr()->SetBodygroup( m_nBody, iGroup, iValue );
+	int nBody = GetBody();
+	GetModelPtr()->SetBodygroup(nBody, iGroup, iValue);
+	GetEngineObject()->SetBody(nBody);//aaa need check
 }
 
 int C_BaseAnimating::GetBodygroup( int iGroup )
 {
 	//Assert( IsDynamicModelLoading() || GetModelPtr() );
-	return GetModelPtr()->GetBodygroup( m_nBody, iGroup );//IsDynamicModelLoading() ? 0 : 
+	return GetModelPtr()->GetBodygroup( GetBody(), iGroup);//IsDynamicModelLoading() ? 0 : 
 }
 
 const char *C_BaseAnimating::GetBodygroupName( int iGroup )
@@ -5380,7 +5373,7 @@ void C_BaseAnimating::SetHitboxSet( int setnum )
 	}
 #endif
 
-	m_nHitboxSet = setnum;
+	GetEngineObject()->SetHitboxSet(setnum);
 }
 
 //-----------------------------------------------------------------------------
@@ -5392,7 +5385,7 @@ void C_BaseAnimating::SetHitboxSetByName( const char *setname )
 	//if ( IsDynamicModelLoading() )
 	//	return;
 
-	m_nHitboxSet = GetModelPtr()->FindHitboxSetByName( setname );
+	GetEngineObject()->SetHitboxSet( GetModelPtr()->FindHitboxSetByName( setname ));
 }
 
 //-----------------------------------------------------------------------------
@@ -5401,7 +5394,7 @@ void C_BaseAnimating::SetHitboxSetByName( const char *setname )
 //-----------------------------------------------------------------------------
 int C_BaseAnimating::GetHitboxSet( void )
 {
-	return m_nHitboxSet;
+	return GetEngineObject()->GetHitboxSet();
 }
 
 //-----------------------------------------------------------------------------
@@ -5413,7 +5406,7 @@ const char *C_BaseAnimating::GetHitboxSetName( void )
 	//if ( IsDynamicModelLoading() )
 	//	return "";
 
-	return GetModelPtr()->GetHitboxSetName( m_nHitboxSet );
+	return GetModelPtr()->GetHitboxSetName(GetEngineObject()->GetHitboxSet() );
 }
 
 //-----------------------------------------------------------------------------
@@ -5449,7 +5442,7 @@ void C_BaseAnimating::DrawClientHitboxes( float duration /*= 0.0f*/, bool monoco
 	if ( !pStudioHdr )
 		return;
 
-	mstudiohitboxset_t *set =pStudioHdr->pHitboxSet( m_nHitboxSet );
+	mstudiohitboxset_t *set =pStudioHdr->pHitboxSet(GetEngineObject()->GetHitboxSet() );
 	if ( !set )
 		return;
 
@@ -5742,7 +5735,7 @@ bool C_BaseAnimating::ComputeHitboxSurroundingBox( Vector *pVecWorldMins, Vector
 	if (!pStudioHdr)
 		return false;
 
-	mstudiohitboxset_t *set = pStudioHdr->pHitboxSet( m_nHitboxSet );
+	mstudiohitboxset_t *set = pStudioHdr->pHitboxSet(GetEngineObject()->GetHitboxSet() );
 	if ( !set || !set->numhitboxes )
 		return false;
 
@@ -5780,7 +5773,7 @@ bool C_BaseAnimating::ComputeEntitySpaceHitboxSurroundingBox( Vector *pVecWorldM
 	if (!pStudioHdr)
 		return false;
 
-	mstudiohitboxset_t *set = pStudioHdr->pHitboxSet( m_nHitboxSet );
+	mstudiohitboxset_t *set = pStudioHdr->pHitboxSet(GetEngineObject()->GetHitboxSet() );
 	if ( !set || !set->numhitboxes )
 		return false;
 
@@ -5808,66 +5801,6 @@ bool C_BaseAnimating::ComputeEntitySpaceHitboxSurroundingBox( Vector *pVecWorldM
 	return true;
 }
 
-//-----------------------------------------------------------------------------
-// Purpose: 
-// Input  : scale - 
-//-----------------------------------------------------------------------------
-void C_BaseAnimating::SetModelScale( float scale, float change_duration /*= 0.0f*/  )
-{
-	if ( change_duration > 0.0f )
-	{
-		ModelScale *mvs = ( ModelScale * )GetEngineObject()->CreateDataObject( MODELSCALE );
-		mvs->m_flModelScaleStart = m_flModelScale;
-		mvs->m_flModelScaleGoal = scale;
-		mvs->m_flModelScaleStartTime = gpGlobals->curtime;
-		mvs->m_flModelScaleFinishTime = mvs->m_flModelScaleStartTime + change_duration;
-	}
-	else
-	{
-		m_flModelScale = scale;
-		RefreshCollisionBounds();
-		
-		if (GetEngineObject()->HasDataObjectType( MODELSCALE ) )
-		{
-			GetEngineObject()->DestroyDataObject( MODELSCALE );
-		}
-	}
-}
-
-//-----------------------------------------------------------------------------
-// Purpose: 
-//-----------------------------------------------------------------------------
-void C_BaseAnimating::UpdateModelScale()
-{
-	ModelScale *mvs = ( ModelScale * )GetEngineObject()->GetDataObject( MODELSCALE );
-	if ( !mvs )
-	{
-		return;
-	}
-
-	float dt = mvs->m_flModelScaleFinishTime - mvs->m_flModelScaleStartTime;
-	Assert( dt > 0.0f );
-
-	float frac = ( gpGlobals->curtime - mvs->m_flModelScaleStartTime ) / dt;
-	frac = clamp( frac, 0.0f, 1.0f );
-
-	if ( gpGlobals->curtime >= mvs->m_flModelScaleFinishTime )
-	{
-		m_flModelScale = mvs->m_flModelScaleGoal;
-		GetEngineObject()->DestroyDataObject( MODELSCALE );
-	}
-	else
-	{
-		m_flModelScale = Lerp( frac, mvs->m_flModelScaleStart, mvs->m_flModelScaleGoal );
-	}
-
-	RefreshCollisionBounds();
-}
-
-void C_BaseAnimating::RefreshCollisionBounds( void )
-{
-	GetEngineObject()->RefreshScaledCollisionBounds();
-}
 
 //-----------------------------------------------------------------------------
 // Purpose: Clientside bone follower class. Used just to visualize them.
@@ -6128,7 +6061,7 @@ void C_BaseAnimating::GetToolRecordingState( KeyValues *msg )
 
 	static BaseAnimatingRecordingState_t state;
 	state.m_nSkin = GetSkin();
-	state.m_nBody = m_nBody;
+	state.m_nBody = GetEngineObject()->GetBody();
 	state.m_nSequence = m_nSequence;
 	state.m_pBoneList = NULL;
 	msg->SetPtr( "baseanimating", &state );

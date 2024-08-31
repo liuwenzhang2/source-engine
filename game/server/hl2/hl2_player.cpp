@@ -3582,7 +3582,7 @@ bool CHL2_Player::TestHitboxes( const Ray_t &ray, unsigned int fContentsMask, tr
 			if (!pStudioHdr)
 				return false;
 
-			mstudiohitboxset_t *set = pStudioHdr->pHitboxSet( m_nHitboxSet );
+			mstudiohitboxset_t *set = pStudioHdr->pHitboxSet(GetEngineObject()->GetHitboxSet() );
 			if ( !set || !set->numhitboxes )
 				return false;
 

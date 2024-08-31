@@ -122,8 +122,8 @@ void C_LocalTempEntity::Prepare( const model_t *pmodel, float time )
 	SetModelPointer( pmodel );
 	SetRenderMode( kRenderNormal );
 	m_nRenderFX = kRenderFxNone;
-	m_nBody = 0;
-	m_nSkin = 0;
+	GetEngineObject()->SetBody(0);
+	GetEngineObject()->SetSkin(0);
 	fadeSpeed = 0.5;
 	hitSound = 0;
 	clientIndex = -1;
@@ -180,9 +180,9 @@ int C_LocalTempEntity::DrawStudioModel( int flags )
 			GetModel(),
 			GetEngineObject()->GetAbsOrigin(),
 			GetEngineObject()->GetAbsAngles(),
-			m_nSkin,
-			m_nBody,
-			m_nHitboxSet );
+			GetEngineObject()->GetSkin(),
+			GetEngineObject()->GetBody(),
+			GetEngineObject()->GetHitboxSet() );
 	}
 	return drawn;
 }
@@ -226,8 +226,8 @@ int	C_LocalTempEntity::DrawModel( int flags )
 			GetEngineObject()->GetAbsOrigin(),
 			GetEngineObject()->GetAbsAngles(),
 			m_flFrame,  // sprite frame to render
-			m_nBody > 0 ? cl_entitylist->GetBaseEntity( m_nBody ) : NULL,  // attach to
-			m_nSkin,  // attachment point
+			GetEngineObject()->GetBody() > 0 ? cl_entitylist->GetBaseEntity(GetEngineObject()->GetBody()) : NULL,  // attach to
+			GetEngineObject()->GetSkin(),  // attachment point
 			GetRenderMode(), // rendermode
 			m_nRenderFX, // renderfx
 			m_clrRender->a, // alpha
@@ -971,9 +971,9 @@ int BreakModelDrawHelper( C_LocalTempEntity *entity, int flags )
 	sInfo.pModel = entity->GetModel();
 	sInfo.origin = entity->GetRenderOrigin();
 	sInfo.angles = entity->GetRenderAngles();
-	sInfo.skin = entity->m_nSkin;
-	sInfo.body = entity->m_nBody;
-	sInfo.hitboxset = entity->m_nHitboxSet;
+	sInfo.skin = entity->GetEngineObject()->GetSkin();
+	sInfo.body = entity->GetEngineObject()->GetBody();
+	sInfo.hitboxset = entity->GetEngineObject()->GetHitboxSet();
 
 	// This is the main change, look up a lighting origin from the helper singleton
 	const Vector *pLightingOrigin = g_BreakableHelper.GetLightingOrigin( entity );
@@ -1053,7 +1053,7 @@ void CTempEnts::BreakModel( const Vector &pos, const QAngle &angles, const Vecto
 		}
 		else if ( modelinfo->GetModelType( pModel ) == mod_studio )
 		{
-			pTemp->m_nBody = random->RandomInt(0,frameCount-1);
+			pTemp->GetEngineObject()->SetBody( random->RandomInt(0,frameCount-1));
 		}
 
 		pTemp->flags |= FTENT_COLLIDEWORLD | FTENT_FADEOUT | FTENT_SLOWGRAVITY;
@@ -1114,7 +1114,7 @@ void CTempEnts::PhysicsProp( int modelindex, int skin, const Vector& pos, const 
 	}
 
 	pEntity->GetEngineObject()->SetModelName(MAKE_STRING(modelinfo->GetModelName(model)) );
-	pEntity->m_nSkin = skin;
+	pEntity->GetEngineObject()->SetSkin( skin);
 	pEntity->GetEngineObject()->SetAbsOrigin( pos );
 	pEntity->GetEngineObject()->SetAbsAngles( angles );
 	pEntity->SetPhysicsMode( PHYSICS_MULTIPLAYER_CLIENTSIDE );
@@ -1665,7 +1665,7 @@ void CTempEnts::EjectBrass( const Vector &pos1, const QAngle &angles, const QAng
 		pTemp->hitSound = BOUNCE_SHELL;
 	}
 
-	pTemp->m_nBody	= 0;
+	pTemp->GetEngineObject()->SetBody( 0);
 
 	pTemp->flags |= ( FTENT_COLLIDEWORLD | FTENT_FADEOUT | FTENT_GRAVITY | FTENT_ROTATE );
 
@@ -1705,7 +1705,7 @@ C_LocalTempEntity * CTempEnts::SpawnTempModel( const model_t *pModel, const Vect
 		return NULL;
 
 	pTemp->GetEngineObject()->SetAbsAngles( vecAngles );
-	pTemp->m_nBody	= 0;
+	pTemp->GetEngineObject()->SetBody( 0);
 	pTemp->flags |= iFlags;
 	pTemp->m_vecTempEntAngVelocity[0] = random->RandomFloat(-255,255);
 	pTemp->m_vecTempEntAngVelocity[1] = random->RandomFloat(-255,255);
@@ -1950,7 +1950,7 @@ C_LocalTempEntity *CTempEnts::FindTempEntByID( int nID, int nSubID )
 	FOR_EACH_LL( m_TempEnts, i )
 	{
 		C_LocalTempEntity *p = m_TempEnts[ i ];
-		if ( p && p->m_nSkin == nID && p->hitSound == nSubID )
+		if ( p && p->GetEngineObject()->GetSkin() == nID && p->hitSound == nSubID)
 		{
 			return p;
 		}
@@ -3308,7 +3308,7 @@ void CTempEnts::HL1EjectBrass( const Vector &vecPosition, const QAngle &angAngle
 		break;
 	}
 
-	pTemp->m_nBody	= 0;
+	pTemp->GetEngineObject()->SetBody( 0);
 	pTemp->flags |= ( FTENT_COLLIDEWORLD | FTENT_FADEOUT | FTENT_GRAVITY | FTENT_ROTATE );
 
 	pTemp->m_vecTempEntAngVelocity[0] = random->RandomFloat( -512,511 );
@@ -3402,7 +3402,7 @@ void CTempEnts::CSEjectBrass( const Vector &vecPosition, const QAngle &angVeloci
 
 	pTemp->GetEngineObject()->SetGravity( 0.4 );
 
-	pTemp->m_nBody	= 0;
+	pTemp->GetEngineObject()->SetBody(0);
 	pTemp->flags = FTENT_FADEOUT | FTENT_GRAVITY | FTENT_COLLIDEALL | FTENT_HITSOUND | FTENT_ROTATE | FTENT_CHANGERENDERONCOLLIDE;
 
 	pTemp->m_vecTempEntAngVelocity[0] = random->RandomFloat(-256,256);

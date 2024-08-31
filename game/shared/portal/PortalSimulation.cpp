@@ -517,7 +517,7 @@ bool CPortalSimulator::EntityHitBoxExtentIsInPortalHole( CBaseAnimating *pBaseAn
 	if ( !pStudioHdr )
 		return false;
 
-	mstudiohitboxset_t *set = pStudioHdr->pHitboxSet( pBaseAnimating->m_nHitboxSet );
+	mstudiohitboxset_t *set = pStudioHdr->pHitboxSet( pBaseAnimating->GetEngineObject()->GetHitboxSet() );
 	if ( !set )
 		return false;
 
