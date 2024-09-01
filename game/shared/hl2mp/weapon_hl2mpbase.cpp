@@ -196,7 +196,7 @@ void CWeaponHL2MPBase::Materialize( void )
 		g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 		
 		GetEngineObject()->RemoveEffects( EF_NODRAW );
-		DoMuzzleFlash();
+		GetEngineObject()->DoMuzzleFlash();
 	}
 
 	if (GetEngineObject()->HasSpawnFlags( SF_NORESPAWN ) == false )

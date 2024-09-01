@@ -1984,7 +1984,7 @@ void CServerGameDLL::InvalidateMdlCache()
 		pAnimating = dynamic_cast<CBaseAnimating *>(pEntity);
 		if ( pAnimating )
 		{
-			pAnimating->InvalidateMdlCache();
+			pAnimating->GetEngineObject()->InvalidateMdlCache();
 		}
 	}
 }

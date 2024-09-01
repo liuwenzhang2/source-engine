@@ -187,7 +187,7 @@ void CNPC_Leech::Activate( void )
 
 void CNPC_Leech::DeadThink( void )
 {
-	if ( IsSequenceFinished() )
+	if (GetEngineObject()->IsSequenceFinished() )
 	{
 		if ( GetActivity() == ACT_DIEFORWARD )
 		{
@@ -585,7 +585,7 @@ void CNPC_Leech::UpdateMotion( void )
 	if (flapspeed > 1.9) 
 		flapspeed = 1.9;
 
-	m_flPlaybackRate = flapspeed;
+	GetEngineObject()->SetPlaybackRate(flapspeed);
 
 	QAngle vAngularVelocity = GetLocalAngularVelocity();
 	QAngle vAngles = GetEngineObject()->GetLocalAngles();
@@ -632,7 +632,7 @@ void CNPC_Leech::UpdateMotion( void )
 		vAngles.z = 0;
 		vAngles.x = 0;
 
-		m_flPlaybackRate = random->RandomFloat( 0.8, 1.2 );
+		GetEngineObject()->SetPlaybackRate(random->RandomFloat( 0.8, 1.2 ));
 	}
 	else if (GetEngineObject()->GetMoveType() == MOVETYPE_FLYGRAVITY )
 	{

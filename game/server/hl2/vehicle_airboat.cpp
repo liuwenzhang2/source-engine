@@ -399,17 +399,17 @@ void CPropAirboat::Spawn( void )
 	SetBodygroup(AIRBOAT_BODYGROUP_GUN, m_bHasGun);
 	SetBodygroup(AIRBOAT_BODYGROUP_PROP, true);
 
-	SetPoseParameter( AIRBOAT_GUN_YAW, 0 );
-	SetPoseParameter( AIRBOAT_GUN_PITCH, 0 );
-	SetPoseParameter( AIRBOAT_FRAME_FLEX_LEFT, 0 );
-	SetPoseParameter( AIRBOAT_FRAME_FLEX_RIGHT, 0 );
+	GetEngineObject()->SetPoseParameter( AIRBOAT_GUN_YAW, 0 );
+	GetEngineObject()->SetPoseParameter( AIRBOAT_GUN_PITCH, 0 );
+	GetEngineObject()->SetPoseParameter( AIRBOAT_FRAME_FLEX_LEFT, 0 );
+	GetEngineObject()->SetPoseParameter( AIRBOAT_FRAME_FLEX_RIGHT, 0 );
 
 	m_aimYaw = 0;
 	m_aimPitch = 0;
 	m_bUnableToFire = true;
 	m_nGunState = GUN_STATE_IDLE;
 
-	SetPoseParameter( "Steer_Shock", 0.0f );
+	GetEngineObject()->SetPoseParameter( "Steer_Shock", 0.0f );
 
 	// Get the physics object so we can adjust the buoyancy.
 	IPhysicsObject *pPhysAirboat = VPhysicsGetObject();
@@ -997,15 +997,15 @@ void CPropAirboat::AimGunAt( const Vector &aimPos, float flInterval )
 	m_aimYaw = targetYaw;
 	m_aimPitch = targetPitch;
 
-	SetPoseParameter( AIRBOAT_GUN_YAW, m_aimYaw);
-	SetPoseParameter( AIRBOAT_GUN_PITCH, m_aimPitch );
+	GetEngineObject()->SetPoseParameter( AIRBOAT_GUN_YAW, m_aimYaw);
+	GetEngineObject()->SetPoseParameter( AIRBOAT_GUN_PITCH, m_aimPitch );
 
 	InvalidateBoneCache();
 
 	// read back to avoid drift when hitting limits
 	// as long as the velocity is less than the delta between the limit and 180, this is fine.
-	m_aimPitch = GetPoseParameter( AIRBOAT_GUN_PITCH );
-	m_aimYaw = GetPoseParameter( AIRBOAT_GUN_YAW );
+	m_aimPitch = GetEngineObject()->GetPoseParameter( AIRBOAT_GUN_PITCH );
+	m_aimYaw = GetEngineObject()->GetPoseParameter( AIRBOAT_GUN_YAW );
 }
 #pragma optimize("", on)
 
@@ -1161,7 +1161,7 @@ void CPropAirboat::Think(void)
 	StudioFrameAdvance();
 
 	// If the enter or exit animation has finished, tell the server vehicle
-	if ( IsSequenceFinished() && ( m_bEnterAnimOn ||  m_bExitAnimOn ) )
+	if (GetEngineObject()->IsSequenceFinished() && ( m_bEnterAnimOn ||  m_bExitAnimOn ) )
 	{
 		// The first few time we get into the jeep, print the jeep help
 		if ( m_iNumberOfEntries < hud_airboathint_numentries.GetInt() && !m_bExitAnimOn )
@@ -1173,8 +1173,8 @@ void CPropAirboat::Think(void)
 		GetServerVehicle()->HandleEntryExitFinish( m_bExitAnimOn, false );
 
 		// Start the vehicle's idle animation
-		ResetSequence(LookupSequence("propeller_spin1"));
-		ResetClientsideFrame();
+		GetEngineObject()->ResetSequence(LookupSequence("propeller_spin1"));
+		GetEngineObject()->ResetClientsideFrame();
 	}
 
 	// FIXME: Slam the crosshair every think -- if we don't do this it disappears randomly, never to return.
@@ -1263,7 +1263,7 @@ void CPropAirboat::UpdatePropeller()
 		{
 			SetBodygroup(AIRBOAT_BODYGROUP_PROP, false);
 			SetBodygroup(AIRBOAT_BODYGROUP_BLUR, true);
-			SetSequence(LookupSequence("propeller_spin1"));
+			GetEngineObject()->SetSequence(LookupSequence("propeller_spin1"));
 		}
 	}
 	else if (fabs(m_flSpinRate) > SPIN_RATE_MED)
@@ -1272,7 +1272,7 @@ void CPropAirboat::UpdatePropeller()
 		{
 			SetBodygroup(AIRBOAT_BODYGROUP_PROP, true);
 			SetBodygroup(AIRBOAT_BODYGROUP_BLUR, true);
-			SetSequence(LookupSequence("propeller_spin1"));
+			GetEngineObject()->SetSequence(LookupSequence("propeller_spin1"));
 		}
 	}
 	else
@@ -1281,11 +1281,11 @@ void CPropAirboat::UpdatePropeller()
 		{
 			SetBodygroup(AIRBOAT_BODYGROUP_PROP, true);
 			SetBodygroup(AIRBOAT_BODYGROUP_BLUR, false);
-			SetSequence(LookupSequence("propeller_spin1"));
+			GetEngineObject()->SetSequence(LookupSequence("propeller_spin1"));
 		}
 	}
 
-	SetPlaybackRate( m_flSpinRate );
+	GetEngineObject()->SetPlaybackRate( m_flSpinRate );
 
 	m_flPrevThrottle = m_flThrottle;
 }
@@ -1301,7 +1301,7 @@ void CPropAirboat::UpdateGauge()
 	int maxSpeed = pPhysics->GetMaxSpeed();
 	float speedRatio = clamp( (float)speed / (float)maxSpeed, 0, 1 );
 
-	SetPoseParameter( "Gauge", speedRatio );
+	GetEngineObject()->SetPoseParameter( "Gauge", speedRatio );
 }
 
 
@@ -1597,7 +1597,7 @@ void CPropAirboat::DoMuzzleFlash( void )
 	data.m_flScale = 1.0f;
 	DispatchEffect( "AirboatMuzzleFlash", data );
 
-	BaseClass::DoMuzzleFlash();
+	GetEngineObject()->DoMuzzleFlash();
 }
 
 //-----------------------------------------------------------------------------

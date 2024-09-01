@@ -60,7 +60,7 @@ void CGrenadeSpit::Spawn( void )
 
 	GetEngineObject()->SetGravity( SPIT_GRAVITY );
 	GetEngineObject()->SetFriction( 0.8 );
-	SetSequence( 1 );
+	GetEngineObject()->SetSequence( 1 );
 
 	GetEngineObject()->SetCollisionGroup( HL2COLLISION_GROUP_SPIT );
 }

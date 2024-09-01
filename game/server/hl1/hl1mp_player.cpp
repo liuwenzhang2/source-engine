@@ -141,7 +141,7 @@ void CHL1MP_Player::Spawn( void )
 		GetEngineObject()->RemoveSolidFlags( FSOLID_NOT_SOLID );
 
 		// if no model, force one
-		if ( !GetModelPtr() )
+		if ( !GetEngineObject()->GetModelPtr() )
 			SetModel( "models/player/mp/gordon/gordon.mdl" );
 	}
 
@@ -325,9 +325,9 @@ void CHL1MP_Player::SetAnimation( PLAYER_ANIM playerAnim )
 		if (animDesired == -1)
 			animDesired = 0;
 
-		if ( GetSequence() != animDesired || !SequenceLoops() )
+		if (GetEngineObject()->GetSequence() != animDesired || !GetEngineObject()->SequenceLoops() )
 		{
-			SetCycle( 0 );
+			GetEngineObject()->SetCycle( 0 );
 		}
 
 		// Tracker 24588:  In single player when firing own weapon this causes eye and punchangle to jitter
@@ -337,7 +337,7 @@ void CHL1MP_Player::SetAnimation( PLAYER_ANIM playerAnim )
 		//}
 
 		SetActivity( idealActivity );
-		ResetSequence( animDesired );
+		GetEngineObject()->ResetSequence( animDesired );
 	}
 	else if (idealActivity == ACT_IDLE)
 	{
@@ -378,25 +378,25 @@ void CHL1MP_Player::SetAnimation( PLAYER_ANIM playerAnim )
 		animDesired = SelectWeightedSequence( GetActivity() );
 
 		// Already using the desired animation?
-		if (GetSequence() == animDesired)
+		if (GetEngineObject()->GetSequence() == animDesired)
 			return;
 
 		m_iRealSequence = animDesired;
-		ResetSequence( animDesired );
-		SetCycle( 0 );
+		GetEngineObject()->ResetSequence( animDesired );
+		GetEngineObject()->SetCycle( 0 );
 		return;
 	}
 
 	// Already using the desired animation?
-	if (GetSequence() == animDesired)
+	if (GetEngineObject()->GetSequence() == animDesired)
 		return;
 
 	m_iRealSequence = animDesired;
 
 	//Msg( "Set animation to %d\n", animDesired );
 	// Reset to first frame of desired animation
-	ResetSequence( animDesired );
-	SetCycle( 0 );
+	GetEngineObject()->ResetSequence( animDesired );
+	GetEngineObject()->SetCycle( 0 );
 }
 
 static ConVar sv_debugweaponpickup( "sv_debugweaponpickup", "0", FCVAR_CHEAT, "Prints descriptive reasons as to why pickup did not work." );

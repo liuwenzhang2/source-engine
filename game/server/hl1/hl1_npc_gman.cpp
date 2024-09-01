@@ -176,7 +176,7 @@ void CNPC_GMan::RunTask( const Task_t *pTask )
 			AddLookTarget( m_hTalkTarget->GetEngineObject()->GetAbsOrigin(), 1.0, 2.0 );
 		}
 		// look at player, but only if playing a "safe" idle animation
-		else if (m_hPlayer != NULL && (GetSequence() == 0 || IsInC5A1()) )
+		else if (m_hPlayer != NULL && (GetEngineObject()->GetSequence() == 0 || IsInC5A1()) )
 		{
 			 AddLookTarget( m_hPlayer->EyePosition(), 1.0, 3.0 );
 		}
@@ -187,13 +187,13 @@ void CNPC_GMan::RunTask( const Task_t *pTask )
 			GetVectors( &forward, NULL, NULL );
 
 			AddLookTarget(GetEngineObject()->GetAbsOrigin() + forward * 12.0f, 1.0, 1.0 );
-			SetBoneController( 0, 0 );
+			GetEngineObject()->SetBoneController( 0, 0 );
 		}
 		BaseClass::RunTask( pTask );
 		break;
 	}
 
-	SetBoneController( 0, 0 );
+	GetEngineObject()->SetBoneController( 0, 0 );
 	BaseClass::RunTask( pTask );
 }
 

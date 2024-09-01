@@ -2087,7 +2087,7 @@ void CNPC_Manhack::SpinBlades(float flInterval)
 		SetBodygroup( MANHACK_BODYGROUP_BLADE, MANHACK_BODYGROUP_OFF );
 		SetBodygroup( MANHACK_BODYGROUP_BLUR, MANHACK_BODYGROUP_OFF );
 		m_flBladeSpeed = 0.0;
-		m_flPlaybackRate = 1.0;
+		GetEngineObject()->SetPlaybackRate(1.0);
 		return;
 	}
 
@@ -2129,7 +2129,7 @@ void CNPC_Manhack::SpinBlades(float flInterval)
 			SetBodygroup( MANHACK_BODYGROUP_BLUR, MANHACK_BODYGROUP_ON );
 		}
 
-		m_flPlaybackRate = m_flBladeSpeed / 100.0;
+		GetEngineObject()->SetPlaybackRate(m_flBladeSpeed / 100.0);
 	}
 	else
 	{
@@ -2474,10 +2474,10 @@ void CNPC_Manhack::Spawn(void)
 	m_fEnginePowerScale = GetMaxEnginePower();
 	
 	// find panels
-	m_iPanel1 = LookupPoseParameter( "Panel1" );
-	m_iPanel2 = LookupPoseParameter( "Panel2" );
-	m_iPanel3 = LookupPoseParameter( "Panel3" );
-	m_iPanel4 = LookupPoseParameter( "Panel4" );
+	m_iPanel1 = GetEngineObject()->LookupPoseParameter( "Panel1" );
+	m_iPanel2 = GetEngineObject()->LookupPoseParameter( "Panel2" );
+	m_iPanel3 = GetEngineObject()->LookupPoseParameter( "Panel3" );
+	m_iPanel4 = GetEngineObject()->LookupPoseParameter( "Panel4" );
 
 	m_fHeadYaw			= 0;
 
@@ -3148,14 +3148,14 @@ void CNPC_Manhack::UpdatePanels( void )
 {
 	if ( m_flEngineStallTime > gpGlobals->curtime )
 	{
-		SetPoseParameter( m_iPanel1, random->RandomFloat( 0.0f, 90.0f ) );
-		SetPoseParameter( m_iPanel2, random->RandomFloat( 0.0f, 90.0f ) );
-		SetPoseParameter( m_iPanel3, random->RandomFloat( 0.0f, 90.0f ) );
-		SetPoseParameter( m_iPanel4, random->RandomFloat( 0.0f, 90.0f ) );
+		GetEngineObject()->SetPoseParameter( m_iPanel1, random->RandomFloat( 0.0f, 90.0f ) );
+		GetEngineObject()->SetPoseParameter( m_iPanel2, random->RandomFloat( 0.0f, 90.0f ) );
+		GetEngineObject()->SetPoseParameter( m_iPanel3, random->RandomFloat( 0.0f, 90.0f ) );
+		GetEngineObject()->SetPoseParameter( m_iPanel4, random->RandomFloat( 0.0f, 90.0f ) );
 		return;
 	}
 
-	float panelPosition = GetPoseParameter( m_iPanel1 );
+	float panelPosition = GetEngineObject()->GetPoseParameter( m_iPanel1 );
 
 	if ( m_bShowingHostile )
 	{
@@ -3167,10 +3167,10 @@ void CNPC_Manhack::UpdatePanels( void )
 	}
 
 	//FIXME: If we're going to have all these be equal, there's no need for 4 poses..
-	SetPoseParameter( m_iPanel1, panelPosition );
-	SetPoseParameter( m_iPanel2, panelPosition );
-	SetPoseParameter( m_iPanel3, panelPosition );
-	SetPoseParameter( m_iPanel4, panelPosition );
+	GetEngineObject()->SetPoseParameter( m_iPanel1, panelPosition );
+	GetEngineObject()->SetPoseParameter( m_iPanel2, panelPosition );
+	GetEngineObject()->SetPoseParameter( m_iPanel3, panelPosition );
+	GetEngineObject()->SetPoseParameter( m_iPanel4, panelPosition );
 
 	//TODO: Make these waver randomly?
 }

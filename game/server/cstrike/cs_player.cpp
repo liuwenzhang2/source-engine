@@ -1696,7 +1696,7 @@ void CCSPlayer::PostThink()
 		m_cycleLatchTimer.Start( CycleLatchInterval );
 
 		// Cycle is a float from 0 to 1.  We don't need to transmit a whole float for that.  Compress it in to a small fixed point
-		m_cycleLatch.GetForModify() = 16 * GetCycle();// 4 point fixed
+		m_cycleLatch.GetForModify() = 16 * GetEngineObject()->GetCycle();// 4 point fixed
 	}
 }
 
@@ -3009,7 +3009,7 @@ bool CCSPlayer::CSWeaponDrop( CBaseCombatWeapon *pWeapon, bool bDropShield, bool
 		int iWeaponBoneIndex = -1;
 
 		MDLCACHE_CRITICAL_SECTION();
-		IStudioHdr *hdr = pWeapon->GetModelPtr();
+		IStudioHdr *hdr = pWeapon->GetEngineObject()->GetModelPtr();
 		// If I have a hand, set the weapon position to my hand bone position.
 		if ( hdr && hdr->numbones() > 0 )
 		{
@@ -7364,7 +7364,7 @@ void CCSPlayer::PlayStepSound( Vector &vecOrigin, surfacedata_t *psurface, float
 void CCSPlayer::SelectDeathPose( const CTakeDamageInfo &info )
 {
 	MDLCACHE_CRITICAL_SECTION();
-	if ( !GetModelPtr() )
+	if ( !GetEngineObject()->GetModelPtr() )
 		return;
 
 	Activity aActivity = ACT_INVALID;

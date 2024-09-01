@@ -549,7 +549,7 @@ void CAI_BaseNPC::CleanupOnDeath( CBaseEntity *pCulprit, bool bFireDeathOutput )
 
 void CAI_BaseNPC::SelectDeathPose( const CTakeDamageInfo &info )
 {
-	if ( !GetModelPtr() || (info.GetDamageType() & DMG_PREVENT_PHYSICS_FORCE) )
+	if ( !GetEngineObject()->GetModelPtr() || (info.GetDamageType() & DMG_PREVENT_PHYSICS_FORCE) )
 		return;
 
 	if ( ShouldPickADeathPose() == false )
@@ -2438,7 +2438,7 @@ void CAI_BaseNPC::SetHeadDirection( const Vector &vTargetPos, float flInterval)
 	}
 	if (m_flHeadYaw > 360) m_flHeadYaw = 0;
 
-	m_flHeadYaw = SetBoneController( 0, m_flHeadYaw );
+	m_flHeadYaw = GetEngineObject()->SetBoneController( 0, m_flHeadYaw );
 
 
 	//--------------------------------------
@@ -2458,7 +2458,7 @@ void CAI_BaseNPC::SetHeadDirection( const Vector &vTargetPos, float flInterval)
 	}
 	if (m_flHeadPitch > 360) m_flHeadPitch = 0;
 
-	SetBoneController( 1, m_flHeadPitch );
+	GetEngineObject()->SetBoneController( 1, m_flHeadPitch );
 
 }
 
@@ -2610,9 +2610,9 @@ bool CAI_BaseNPC::FInAimCone( const Vector &vecSpot )
 //-----------------------------------------------------------------------------
 void	CAI_BaseNPC::PopulatePoseParameters( void )
 {
-	m_poseAim_Pitch = LookupPoseParameter( "aim_pitch" );
-	m_poseAim_Yaw   = LookupPoseParameter( "aim_yaw"   );
-	m_poseMove_Yaw  = LookupPoseParameter( "move_yaw"  );
+	m_poseAim_Pitch = GetEngineObject()->LookupPoseParameter( "aim_pitch" );
+	m_poseAim_Yaw   = GetEngineObject()->LookupPoseParameter( "aim_yaw"   );
+	m_poseMove_Yaw  = GetEngineObject()->LookupPoseParameter( "move_yaw"  );
 
 	BaseClass::PopulatePoseParameters();
 }
@@ -2625,8 +2625,8 @@ void CAI_BaseNPC::SetAim( const Vector &aimDir )
 {
 	QAngle angDir;
 	VectorAngles( aimDir, angDir );
-	float curPitch = GetPoseParameter( m_poseAim_Pitch );
-	float curYaw = GetPoseParameter( m_poseAim_Yaw );
+	float curPitch = GetEngineObject()->GetPoseParameter( m_poseAim_Pitch );
+	float curYaw = GetEngineObject()->GetPoseParameter( m_poseAim_Yaw );
 
 	float newPitch;
 	float newYaw;
@@ -2653,8 +2653,8 @@ void CAI_BaseNPC::SetAim( const Vector &aimDir )
 	newPitch = AngleNormalize( newPitch );
 	newYaw = AngleNormalize( newYaw );
 
-	SetPoseParameter( m_poseAim_Pitch, newPitch );
-	SetPoseParameter( m_poseAim_Yaw, newYaw );
+	GetEngineObject()->SetPoseParameter( m_poseAim_Pitch, newPitch );
+	GetEngineObject()->SetPoseParameter( m_poseAim_Yaw, newYaw );
 
 	// Msg("yaw %.0f (%.0f %.0f)\n", newYaw, angDir.y, GetAbsAngles().y );
 
@@ -2674,15 +2674,15 @@ void CAI_BaseNPC::SetAim( const Vector &aimDir )
 
 void CAI_BaseNPC::RelaxAim( )
 {
-	float curPitch = GetPoseParameter( m_poseAim_Pitch );
-	float curYaw = GetPoseParameter( m_poseAim_Yaw );
+	float curPitch = GetEngineObject()->GetPoseParameter( m_poseAim_Pitch );
+	float curYaw = GetEngineObject()->GetPoseParameter( m_poseAim_Yaw );
 
 	// dampen existing aim
 	float newPitch = AngleNormalize( UTIL_ApproachAngle( 0, curPitch, 3 ) );
 	float newYaw = AngleNormalize( UTIL_ApproachAngle( 0, curYaw, 2 ) );
 
-	SetPoseParameter( m_poseAim_Pitch, newPitch );
-	SetPoseParameter( m_poseAim_Yaw, newYaw );
+	GetEngineObject()->SetPoseParameter( m_poseAim_Pitch, newPitch );
+	GetEngineObject()->SetPoseParameter( m_poseAim_Yaw, newYaw );
 	// DevMsg("relax aim %.0f %0.f\n", newPitch, newYaw ); 
 }
 
@@ -2863,7 +2863,7 @@ void CAI_BaseNPC::PostMovement()
 
 	InvalidateBoneCache();
 
-	if ( GetModelPtr() && GetModelPtr()->SequencesAvailable() )
+	if (GetEngineObject()->GetModelPtr() && GetEngineObject()->GetModelPtr()->SequencesAvailable() )
 	{
 		float flInterval = GetAnimTimeInterval();
 
@@ -2945,13 +2945,13 @@ bool CAI_BaseNPC::PreThink( void )
 		{
 			if (!GetNavigator()->IsGoalActive())
 			{
-				m_flPlaybackRate = 0;
+				GetEngineObject()->SetPlaybackRate(0);
 			}
 			return false;
 		}
 		else
 		{
-			m_flPlaybackRate = 1;
+			GetEngineObject()->SetPlaybackRate(1);
 		}
 	}
 
@@ -2969,7 +2969,7 @@ void CAI_BaseNPC::RunAnimation( void )
 {
 	VPROF_BUDGET( "CAI_BaseNPC_RunAnimation", VPROF_BUDGETGROUP_SERVER_ANIM );
 
-	if ( !GetModelPtr() )
+	if ( !GetEngineObject()->GetModelPtr() )
 		return;
 
 	float flInterval = GetAnimTimeInterval();
@@ -2989,7 +2989,7 @@ void CAI_BaseNPC::RunAnimation( void )
 		int iSequence;
 
 		// FIXME: this doesn't reissue a translation, so if the idle activity translation changes over time, it'll never get reset
-		if ( SequenceLoops() )
+		if (GetEngineObject()->SequenceLoops() )
 		{
 			// animation does loop, which means we're playing subtle idle. Might need to fidget.
 			iSequence = SelectWeightedSequence ( m_translatedActivity );
@@ -3002,7 +3002,7 @@ void CAI_BaseNPC::RunAnimation( void )
 		}
 		if ( iSequence != ACTIVITY_NOT_AVAILABLE )
 		{
-			ResetSequence( iSequence ); // Set to new anim (if it's there)
+			GetEngineObject()->ResetSequence( iSequence ); // Set to new anim (if it's there)
 
 			//Adrian: Basically everywhere else in the AI code this variable gets set to whatever our sequence is.
 			//But here it doesn't and not setting it causes any animation set through here to be stomped by the 
@@ -3824,7 +3824,7 @@ void CAI_BaseNPC::SetPlayerAvoidState( void )
 	bool bShouldPlayerAvoid = false;
 	Vector vNothing;
 
-	GetSequenceLinearMotion( GetSequence(), &vNothing );
+	GetEngineObject()->GetSequenceLinearMotion(GetEngineObject()->GetSequence(), &vNothing );
 	bool bIsMoving = ( IsMoving() || ( vNothing != vec3_origin ) );
 
 	//If we are coming out of a script, check if we are stuck inside the player.
@@ -6120,7 +6120,7 @@ void CAI_BaseNPC::SetActivityAndSequence(Activity NewActivity, int iSequence, Ac
 	if (ai_sequence_debug.GetBool() == true && (m_debugOverlays & OVERLAY_NPC_SELECTED_BIT))
 	{
 		DevMsg("SetActivityAndSequence : %s: %s:%s -> %s:%s / %s:%s\n", GetClassname(), 
-			GetActivityName(GetActivity()), GetSequenceName(GetSequence()),
+			GetActivityName(GetActivity()), GetSequenceName(GetEngineObject()->GetSequence()),
 			GetActivityName(NewActivity), GetSequenceName(iSequence), 
 			GetActivityName(translatedActivity), GetActivityName(weaponActivity) );
 	
@@ -6129,24 +6129,24 @@ void CAI_BaseNPC::SetActivityAndSequence(Activity NewActivity, int iSequence, Ac
 	// Set to the desired anim, or default anim if the desired is not present
 	if ( iSequence > ACTIVITY_NOT_AVAILABLE )
 	{
-		if ( GetSequence() != iSequence || !SequenceLoops() )
+		if (GetEngineObject()->GetSequence() != iSequence || !GetEngineObject()->SequenceLoops() )
 		{
 			//
 			// Don't reset frame between movement phased animations
 			if (!IsActivityMovementPhased( m_Activity ) || 
 				!IsActivityMovementPhased( NewActivity ))
 			{
-				SetCycle( 0 );
+				GetEngineObject()->SetCycle( 0 );
 			}
 		}
 
-		ResetSequence( iSequence );
-		Weapon_SetActivity( weaponActivity, SequenceDuration( iSequence ) );
+		GetEngineObject()->ResetSequence( iSequence );
+		Weapon_SetActivity( weaponActivity, GetEngineObject()->SequenceDuration( iSequence ) );
 	}
 	else
 	{
 		// Not available try to get default anim
-		ResetSequence( 0 );
+		GetEngineObject()->ResetSequence( 0 );
 	}
 
 	// Set the view position based on the current activity
@@ -6197,7 +6197,7 @@ void CAI_BaseNPC::SetActivity( Activity NewActivity )
 		DevMsg("SetActivity : %s: %s -> %s\n", GetClassname(), GetActivityName(GetActivity()), GetActivityName(NewActivity));
 	}
 
-	if ( !GetModelPtr() )
+	if ( !GetEngineObject()->GetModelPtr() )
 		return;
 
 	// In case someone calls this with something other than the ideal activity.
@@ -6246,7 +6246,7 @@ void CAI_BaseNPC::SetIdealActivity( Activity NewActivity )
 		return;
 	}
 
-	if ( !GetModelPtr() )
+	if ( !GetEngineObject()->GetModelPtr() )
 		return;
 
 	// Perform translation in case we need to change sequences within a single activity,
@@ -6261,7 +6261,7 @@ void CAI_BaseNPC::SetIdealActivity( Activity NewActivity )
 void CAI_BaseNPC::AdvanceToIdealActivity(void)
 {
 	// If there is a transition sequence between the current sequence and the ideal sequence...
-	int nNextSequence = FindTransitionSequence(GetSequence(), m_nIdealSequence, NULL);
+	int nNextSequence = FindTransitionSequence(GetEngineObject()->GetSequence(), m_nIdealSequence, NULL);
 	if (nNextSequence != -1)
 	{
 		// We found a transition sequence or possibly went straight to
@@ -6328,19 +6328,19 @@ void CAI_BaseNPC::MaintainActivity(void)
 		}
 	}
 
-	if( m_IdealActivity == ACT_DO_NOT_DISTURB || !GetModelPtr() )
+	if( m_IdealActivity == ACT_DO_NOT_DISTURB || !GetEngineObject()->GetModelPtr() )
 	{
 		return;
 	}
 
 	// We may have work to do if we aren't playing our ideal activity OR if we
 	// aren't playing our ideal sequence.
-	if ((GetActivity() != m_IdealActivity) || (GetSequence() != m_nIdealSequence))
+	if ((GetActivity() != m_IdealActivity) || (GetEngineObject()->GetSequence() != m_nIdealSequence))
 	{
 		if (ai_sequence_debug.GetBool() == true && (m_debugOverlays & OVERLAY_NPC_SELECTED_BIT))
 		{
 			DevMsg("MaintainActivity %s : %s:%s -> %s:%s\n", GetClassname(), 
-				GetActivityName(GetActivity()), GetSequenceName(GetSequence()), 
+				GetActivityName(GetActivity()), GetSequenceName(GetEngineObject()->GetSequence()),
 				GetActivityName(m_IdealActivity), GetSequenceName(m_nIdealSequence));
 		}
 		
@@ -6351,7 +6351,7 @@ void CAI_BaseNPC::MaintainActivity(void)
 		{
 			// If the current sequence is finished, try to go to the next one
 			// closer to our ideal sequence.
-			if (IsSequenceFinished())
+			if (GetEngineObject()->IsSequenceFinished())
 			{
 				bAdvance = true;
 			}
@@ -6380,7 +6380,7 @@ void CAI_BaseNPC::MaintainActivity(void)
 //-----------------------------------------------------------------------------
 bool CAI_BaseNPC::IsActivityFinished( void )
 {
-	return (IsSequenceFinished() && (GetSequence() == m_nIdealSequence));
+	return (GetEngineObject()->IsSequenceFinished() && (GetEngineObject()->GetSequence() == m_nIdealSequence));
 }
 
 //-----------------------------------------------------------------------------
@@ -6430,7 +6430,7 @@ void CAI_BaseNPC::SetSequenceByName( const char *szSequence )
 	else
 	{
 		DevWarning( 2, "%s has no sequence %s to match request\n", GetClassname(), szSequence );
-		SetSequence( 0 );	// Set to the reset anim (if it's there)
+		GetEngineObject()->SetSequence( 0 );	// Set to the reset anim (if it's there)
 	}
 }
 
@@ -6441,19 +6441,19 @@ void CAI_BaseNPC::SetSequenceById( int iSequence )
 	// Set to the desired anim, or default anim if the desired is not present
 	if ( iSequence > ACTIVITY_NOT_AVAILABLE )
 	{
-		if ( GetSequence() != iSequence || !SequenceLoops() )
+		if (GetEngineObject()->GetSequence() != iSequence || !GetEngineObject()->SequenceLoops() )
 		{
-			SetCycle( 0 );
+			GetEngineObject()->SetCycle( 0 );
 		}
 
-		ResetSequence( iSequence );	// Set to the reset anim (if it's there)
+		GetEngineObject()->ResetSequence( iSequence );	// Set to the reset anim (if it's there)
 		GetMotor()->RecalculateYawSpeed();
 	}
 	else
 	{
 		// Not available try to get default anim
 		DevWarning( 2, "%s invalid sequence requested\n", GetClassname() );
-		SetSequence( 0 );	// Set to the reset anim (if it's there)
+		GetEngineObject()->SetSequence( 0 );	// Set to the reset anim (if it's there)
 	}
 }
 
@@ -6573,7 +6573,7 @@ void CAI_BaseNPC::SetupVPhysicsHull()
 	IPhysicsObject *pPhysObj = VPhysicsGetObject();
 	if ( pPhysObj )
 	{
-		float mass = GetModelPtr()->Studio_GetMass();
+		float mass = GetEngineObject()->GetModelPtr()->Studio_GetMass();
 		if ( mass > 0 )
 		{
 			pPhysObj->SetMass( mass );
@@ -6827,7 +6827,7 @@ void CAI_BaseNPC::NPCInit ( void )
 	ClearSchedule( "Initializing NPC" );
 	GetNavigator()->ClearGoal();
 	InitBoneControllers( ); // FIX: should be done in Spawn
-	if ( GetModelPtr() )
+	if (GetEngineObject()->GetModelPtr() )
 	{
 		ResetActivityIndexes();
 		ResetEventIndexes();
@@ -6903,7 +6903,7 @@ void CAI_BaseNPC::NPCInit ( void )
 		const char *pStartSequence = CAI_ScriptedSequence::GetSpawnPreIdleSequenceForScript( this );
 		if ( pStartSequence )
 		{
-			SetSequence( LookupSequence( pStartSequence ) );
+			GetEngineObject()->SetSequence( LookupSequence( pStartSequence ) );
 		}
 	}
 
@@ -7408,7 +7408,7 @@ void CAI_BaseNPC::StartNPC( void )
 	{
 		SetState( NPC_STATE_IDLE );
 		m_Activity = m_IdealActivity;
-		m_nIdealSequence = GetSequence();
+		m_nIdealSequence = GetEngineObject()->GetSequence();
 		SetSchedule( SCHED_WAIT_FOR_SCRIPT );
 	}
 }
@@ -8058,9 +8058,9 @@ float CAI_BaseNPC::CalcIdealYaw( const Vector &vecTarget )
 //=========================================================
 void CAI_BaseNPC::SetDefaultEyeOffset ( void )
 {
-	if  ( GetModelPtr() )
+	if  (GetEngineObject()->GetModelPtr() )
 	{
-		GetModelPtr()->GetEyePosition( m_vDefaultEyeOffset );
+		GetEngineObject()->GetModelPtr()->GetEyePosition( m_vDefaultEyeOffset );
 
 		if ( m_vDefaultEyeOffset == vec3_origin )
 		{
@@ -8279,7 +8279,7 @@ void CAI_BaseNPC::HandleAnimEvent( animevent_t *pEvent )
 			//DevMsg( "Turned!\n" );
 			SetIdealActivity( ACT_IDLE );
 			Forget( bits_MEMORY_TURNING );
-			SetBoneController( 0, GetEngineObject()->GetLocalAngles().y );
+			GetEngineObject()->SetBoneController( 0, GetEngineObject()->GetLocalAngles().y );
 			IncrementInterpolationFrame();
 			break;
 		}
@@ -8359,7 +8359,7 @@ void CAI_BaseNPC::HandleAnimEvent( animevent_t *pEvent )
 			int nSequence = atoi(pEvent->options);
 			if (nSequence != -1)
 			{
-				pWeapon->ResetSequence(nSequence);
+				pWeapon->GetEngineObject()->ResetSequence(nSequence);
 			}
 		}
 		break;
@@ -8373,7 +8373,7 @@ void CAI_BaseNPC::HandleAnimEvent( animevent_t *pEvent )
 			int nSequence = pWeapon->LookupSequence(pEvent->options);
 			if (nSequence != -1)
 			{
-				pWeapon->ResetSequence(nSequence);
+				pWeapon->GetEngineObject()->ResetSequence(nSequence);
 			}
 		}
 		break;
@@ -10035,9 +10035,9 @@ void CAI_BaseNPC::NPCInitDead( void )
 	// so he'll fall to ground
 	GetEngineObject()->SetMoveType( MOVETYPE_FLYGRAVITY, MOVECOLLIDE_FLY_BOUNCE );
 
-	SetCycle( 0 );
-	ResetSequenceInfo( );
-	m_flPlaybackRate = 0;
+	GetEngineObject()->SetCycle( 0 );
+	GetEngineObject()->ResetSequenceInfo( );
+	GetEngineObject()->SetPlaybackRate(0);
 
 	// Copy health
 	m_iMaxHealth		= m_iHealth;
@@ -10888,7 +10888,7 @@ void CAI_BaseNPC::Activate( void )
 {
 	BaseClass::Activate();
 
-	if ( GetModelPtr() )
+	if (GetEngineObject()->GetModelPtr() )
 	{
 		ParseScriptedNPCInteractions();
 	}
@@ -11043,9 +11043,9 @@ int CAI_BaseNPC::Save( ISave &save )
 		}
 	}
 
-	if ( GetSequence() != ACT_INVALID && GetModelPtr() )
+	if (GetEngineObject()->GetSequence() != ACT_INVALID && GetEngineObject()->GetModelPtr() )
 	{
-		const char *pszSequenceName = GetSequenceName( GetSequence() );
+		const char *pszSequenceName = GetSequenceName(GetEngineObject()->GetSequence() );
 		if ( pszSequenceName && *pszSequenceName )
 		{
 			Assert( Q_strlen( pszSequenceName ) < sizeof( saveHeader.szSequence ) - 1 );
@@ -11171,13 +11171,13 @@ int CAI_BaseNPC::Restore( IRestore &restore )
 	}
 
 	bool bLostSequence = false;
-	if ( saveHeader.version >= AI_EXTENDED_SAVE_HEADER_FIRST_VERSION_WITH_SEQUENCE && saveHeader.szSequence[0] && GetModelPtr() )
+	if ( saveHeader.version >= AI_EXTENDED_SAVE_HEADER_FIRST_VERSION_WITH_SEQUENCE && saveHeader.szSequence[0] && GetEngineObject()->GetModelPtr() )
 	{
-		SetSequence( LookupSequence( saveHeader.szSequence ) );
-		if ( GetSequence() == ACT_INVALID )
+		GetEngineObject()->SetSequence( LookupSequence( saveHeader.szSequence ) );
+		if (GetEngineObject()->GetSequence() == ACT_INVALID )
 		{
 			DevMsg( this, AIMF_IGNORE_SELECTED, "Discarding missing sequence %s on load.\n", saveHeader.szSequence );
-			SetSequence( 0 );
+			GetEngineObject()->SetSequence( 0 );
 			bLostSequence = true;
 		}
 
@@ -12983,10 +12983,10 @@ void CAI_BaseNPC::ParseScriptedNPCInteractions( void )
 	KeyValues *modelKeyValues = new KeyValues("");
 	CUtlBuffer buf( 1024, 0, CUtlBuffer::TEXT_BUFFER );
 
-	if (! modelinfo->GetModelKeyValue( GetModel(), buf ))
+	if (! modelinfo->GetModelKeyValue(GetEngineObject()->GetModel(), buf ))
 		return;
 	
-	if ( modelKeyValues->LoadFromBuffer( modelinfo->GetModelName( GetModel() ), buf ) )
+	if ( modelKeyValues->LoadFromBuffer( modelinfo->GetModelName(GetEngineObject()->GetModel() ), buf ) )
 	{
 		// Do we have a dynamic interactions section?
 		KeyValues *pkvInteractions = modelKeyValues->FindKey("dynamic_interactions");
@@ -13503,7 +13503,7 @@ void CAI_BaseNPC::CalculateValidEnemyInteractions( void )
 		if ( pInteraction->iTriggerMethod != SNPCINT_AUTOMATIC_IN_COMBAT )
 			continue;
 
-		if ( !pNPC->GetModelPtr() )
+		if ( !pNPC->GetEngineObject()->GetModelPtr() )
 			continue;
 
 		// If we have a damage filter that prevents us hurting the enemy,
@@ -13746,8 +13746,8 @@ bool CAI_BaseNPC::InteractionCouldStart( CAI_BaseNPC *pOtherNPC, ScriptedNPCInte
 
 		if ( pOtherNPC )
 		{
-			float flOtherSpeed = pOtherNPC->GetSequenceGroundSpeed( pOtherNPC->GetSequence() );
-			Msg("   %s Speed: %.2f\n", pOtherNPC->GetSequenceName( pOtherNPC->GetSequence() ), flOtherSpeed);
+			float flOtherSpeed = pOtherNPC->GetEngineObject()->GetSequenceGroundSpeed( pOtherNPC->GetEngineObject()->GetSequence() );
+			Msg("   %s Speed: %.2f\n", pOtherNPC->GetSequenceName( pOtherNPC->GetEngineObject()->GetSequence() ), flOtherSpeed);
 		}
 	}
 
@@ -13881,7 +13881,7 @@ void CAI_BaseNPC::InputForceInteractionWithNPC( inputdata_t &inputdata )
 		return;
 	}
 	CAI_BaseNPC *pNPC = pTarget->MyNPCPointer();
-	if ( !pNPC || !pNPC->GetModelPtr() )
+	if ( !pNPC || !pNPC->GetEngineObject()->GetModelPtr() )
 	{
 		Warning("%s(%s) received ForceInteractionWithNPC input, but entity named %s cannot run dynamic interactions.\n", GetClassname(), GetDebugName(), pszParam );
 		return;

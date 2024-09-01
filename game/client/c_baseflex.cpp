@@ -644,7 +644,7 @@ Vector C_BaseFlex::SetViewTarget( IStudioHdr *pStudioHdr )
 		VectorTransform( local, attToWorld, tmp );
 	}
 
-	modelrender->SetViewTarget( GetModelPtr(), GetBody(), tmp );
+	modelrender->SetViewTarget(GetEngineObject()->GetModelPtr(), GetBody(), tmp );
 
 	/*
 	debugoverlay->AddTextOverlay( GetAbsOrigin() + Vector( 0, 0, 64 ), 0, 0, "%.2f %.2f %.2f  : %.2f %.2f %.2f", 
@@ -831,7 +831,7 @@ bool C_BaseFlex::SetupEmphasisBlend( Emphasized_Phoneme *classes, int phoneme )
 ConVar g_CV_PhonemeSnap("phonemesnap", "2", 0, "Lod at level at which visemes stops always considering two phonemes, regardless of duration." );
 void C_BaseFlex::AddVisemesForSentence( Emphasized_Phoneme *classes, float emphasis_intensity, CSentence *sentence, float t, float dt, bool juststarted )
 {
-	IStudioHdr *hdr = GetModelPtr();
+	IStudioHdr *hdr = GetEngineObject()->GetModelPtr();
 	if ( !hdr )
 	{
 		return;
@@ -926,13 +926,13 @@ void C_BaseFlex::AddVisemesForSentence( Emphasized_Phoneme *classes, float empha
 void C_BaseFlex::ProcessVisemes( Emphasized_Phoneme *classes )
 {
 	// Any sounds being played?
-	if ( !MouthInfo().IsActive() )
+	if ( !GetEngineObject()->MouthInfo().IsActive() )
 		return;
 
 	// Multiple phoneme tracks can overlap, look across all such tracks.
-	for ( int source = 0 ; source < MouthInfo().GetNumVoiceSources(); source++ )
+	for ( int source = 0 ; source < GetEngineObject()->MouthInfo().GetNumVoiceSources(); source++ )
 	{
-		CVoiceData *vd = MouthInfo().GetVoiceSource( source );
+		CVoiceData *vd = GetEngineObject()->MouthInfo().GetVoiceSource( source );
 		if ( !vd || vd->ShouldIgnorePhonemes() )
 			continue;
 
@@ -989,7 +989,7 @@ void C_BaseFlex::GetToolRecordingState( KeyValues *msg )
 
 	BaseClass::GetToolRecordingState( msg );
 
-	IStudioHdr *hdr = GetModelPtr();
+	IStudioHdr *hdr = GetEngineObject()->GetModelPtr();
 	if ( !hdr )
 		return;
 
@@ -1112,7 +1112,7 @@ void C_BaseFlex::OnThreadedDrawSetup()
 	if (m_iEyeAttachment < 0)
 		return;
 
-	IStudioHdr *hdr = GetModelPtr();
+	IStudioHdr *hdr = GetEngineObject()->GetModelPtr();
 	if ( !hdr )
 	{
 		return;
@@ -1151,7 +1151,7 @@ void C_BaseFlex::LinkToGlobalFlexControllers( IStudioHdr *hdr )
 void C_BaseFlex::SetupWeights( const matrix3x4_t *pBoneToWorld, int nFlexWeightCount, float *pFlexWeights, float *pFlexDelayedWeights )
 {
 	// hack in an initialization
-	LinkToGlobalFlexControllers( GetModelPtr() );
+	LinkToGlobalFlexControllers(GetEngineObject()->GetModelPtr() );
 	m_iBlink = AddGlobalFlexController( "blink" );
 
 	if ( SetupGlobalWeights( pBoneToWorld, nFlexWeightCount, pFlexWeights, pFlexDelayedWeights ) )
@@ -1193,7 +1193,7 @@ void C_BaseFlex::BuildTransformations( IStudioHdr *pStudioHdr, Vector *pos, Quat
 //-----------------------------------------------------------------------------
 bool C_BaseFlex::SetupGlobalWeights( const matrix3x4_t *pBoneToWorld, int nFlexWeightCount, float *pFlexWeights, float *pFlexDelayedWeights )
 {
-	IStudioHdr *hdr = GetModelPtr();
+	IStudioHdr *hdr = GetEngineObject()->GetModelPtr();
 	if ( !hdr )
 		return false;
 
@@ -1289,7 +1289,7 @@ void C_BaseFlex::RunFlexDelay( int nFlexWeightCount, float *pFlexWeights, float 
 //-----------------------------------------------------------------------------
 void C_BaseFlex::SetupLocalWeights( const matrix3x4_t *pBoneToWorld, int nFlexWeightCount, float *pFlexWeights, float *pFlexDelayedWeights )
 {
-	IStudioHdr *hdr = GetModelPtr();
+	IStudioHdr *hdr = GetEngineObject()->GetModelPtr();
 	if ( !hdr )
 		return;
 
@@ -1639,7 +1639,7 @@ void C_BaseFlex::SetFlexWeight( LocalFlexController_t index, float value )
 {
 	if (index >= 0 && index < GetNumFlexControllers())
 	{
-		IStudioHdr *pstudiohdr = GetModelPtr( );
+		IStudioHdr *pstudiohdr = GetEngineObject()->GetModelPtr( );
 		if (! pstudiohdr)
 			return;
 
@@ -1659,7 +1659,7 @@ float C_BaseFlex::GetFlexWeight( LocalFlexController_t index )
 {
 	if (index >= 0 && index < GetNumFlexControllers())
 	{
-		IStudioHdr *pstudiohdr = GetModelPtr( );
+		IStudioHdr *pstudiohdr = GetEngineObject()->GetModelPtr( );
 		if (! pstudiohdr)
 			return 0;
 
@@ -1694,7 +1694,7 @@ LocalFlexController_t C_BaseFlex::FindFlexController( const char *szName )
 //-----------------------------------------------------------------------------
 void C_BaseFlex::ProcessSceneEvents( bool bFlexEvents )
 {
-	IStudioHdr *hdr = GetModelPtr();
+	IStudioHdr *hdr = GetEngineObject()->GetModelPtr();
 	if ( !hdr )
 	{
 		return;
@@ -1945,7 +1945,7 @@ bool C_BaseFlex::ProcessSequenceSceneEvent( CSceneEventInfo *info, CChoreoScene 
 	if ( !info  || !event || !scene )
 		return false;
 
-	SetSequence( info->m_nSequence );
+	GetEngineObject()->SetSequence( info->m_nSequence );
 	return true;
 }
 

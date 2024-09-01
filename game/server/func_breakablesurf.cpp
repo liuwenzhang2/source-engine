@@ -1205,7 +1205,7 @@ void CBreakableSurface::Spawn(void)
 		UTIL_Remove(this);
 	}
 
-	int materialCount = modelinfo->GetModelMaterialCount( const_cast<model_t*>(GetModel()) );
+	int materialCount = modelinfo->GetModelMaterialCount( const_cast<model_t*>(GetEngineObject()->GetModel()) );
 	if( materialCount != 1 )
 	{
 		Warning( "Encountered func_breakablesurf that has a material applied to more than one surface!\n" );
@@ -1214,7 +1214,7 @@ void CBreakableSurface::Spawn(void)
 
 	// Get at the first material; even if there are more than one.
 	IMaterial* pMaterial;
-	modelinfo->GetModelMaterials( const_cast<model_t*>(GetModel()), 1, &pMaterial );
+	modelinfo->GetModelMaterials( const_cast<model_t*>(GetEngineObject()->GetModel()), 1, &pMaterial );
 
 	// The material should point to a cracked version of itself
 	bool foundVar;

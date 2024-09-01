@@ -292,7 +292,6 @@ public:
 	virtual bool					IsTwoPass( void );
 	virtual bool					UsesPowerOfTwoFrameBufferTexture();
 	virtual bool					UsesFullFrameBufferTexture();
-	virtual const model_t			*GetModel( void ) const;
 	virtual int						DrawModel( int flags );
 	virtual bool OnInternalDrawModel(ClientModelRenderInfo_t* pInfo);
 	virtual bool OnPostInternalDrawModel(ClientModelRenderInfo_t* pInfo);
@@ -470,7 +469,7 @@ public:
 
 
 
-	virtual class CMouthInfo		*GetMouth( void );
+	//virtual class CMouthInfo		*GetMouth( void );
 
 	// Retrieve sound spatialization info for the specified sound on this entity
 	// Return false to indicate sound is not audible
@@ -678,6 +677,7 @@ public:
 	// Is this a brush model?
 	bool							IsBrushModel() const;
 
+	virtual bool					IsViewModel() const { return false; }
 
 
 
@@ -858,11 +858,6 @@ public:
 	// Returns false if the model name is bogus or otherwise can't be loaded
 	bool				SetModel( const char *pModelName );
 
-	void				SetModelPointer( const model_t *pModel );
-
-
-
-
 	//friend class C_EngineObject;
 
 	virtual IEngineObjectClient* GetEngineObject();
@@ -938,6 +933,7 @@ public:
 	}
 #endif
 
+	const model_t* GetModel() const { return GetEngineObject()->GetModel(); }
 	// Gets the model instance + shadow handle
 	virtual ModelInstanceHandle_t GetModelInstance() { return m_ModelInstance; }
 	void SetModelInstance( ModelInstanceHandle_t hInstance) { m_ModelInstance = hInstance; }
@@ -950,9 +946,10 @@ public:
 	// Sets the origin + angles to match the last position received
 	void MoveToLastReceivedPosition( bool force = false );
 
-protected:
 	// Only meant to be called from subclasses
 	void DestroyModelInstance();
+protected:
+	
 
 	// Interpolate entity
 	static void ProcessTeleportList();
@@ -1027,7 +1024,9 @@ public:
 	virtual unsigned char	GetClientSideFade(void);
 	virtual void SetFadeMinMax(float fademin, float fademax);
 	bool IsOnFire() { return ((GetEngineObject()->GetFlags() & FL_ONFIRE) != 0); }
-
+	virtual void ClientSideAnimationChanged() {}
+	virtual void AddToClientSideAnimationList() {}
+	virtual void RemoveFromClientSideAnimationList() {}
 public:	
 
 	// Determine what entity this corresponds to
@@ -1044,8 +1043,7 @@ public:
 
 private:
 	
-	// Model for rendering
-	const model_t					*m_pModel;
+
 
 public:
 
@@ -1404,12 +1402,6 @@ inline const CParticleProperty *C_BaseEntity::ParticleProp() const
 inline bool C_BaseEntity::IsServerEntity( void )
 {
 	return entindex() >= 0 && entindex() < MAX_EDICTS;
-}
-
-
-inline const model_t *C_BaseEntity::GetModel( void ) const
-{
-	return m_pModel;
 }
 
 inline C_BaseEntity	*C_BaseEntity::Instance( IClientEntity *ent )

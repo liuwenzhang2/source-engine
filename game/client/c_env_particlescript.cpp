@@ -96,7 +96,7 @@ void C_EnvParticleScript::OnPreDataChanged( DataUpdateType_t updateType )
 {
 	BaseClass::OnPreDataChanged( updateType );
 
-	m_nOldSequence = GetSequence();
+	m_nOldSequence = GetEngineObject()->GetSequence();
 }
 
 
@@ -112,7 +112,7 @@ void C_EnvParticleScript::OnDataChanged( DataUpdateType_t updateType )
 		ParticleMgr()->AddEffect( &m_ParticleEffect, this );
 	}
 
-	if ( m_nOldSequence != GetSequence() )
+	if ( m_nOldSequence != GetEngineObject()->GetSequence() )
 	{
 		DestroyAllParticles();
 	}

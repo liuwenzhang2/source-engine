@@ -157,7 +157,7 @@ void CNPC_Houndeye::Precache()
 void CNPC_Houndeye::Event_Killed( const CTakeDamageInfo &info )
 {
 	// Close the eye to make death more obvious
-	m_nSkin = 1;
+	GetEngineObject()->SetSkin(1);
 	BaseClass::Event_Killed( info );
 }
 
@@ -353,7 +353,7 @@ void CNPC_Houndeye::HandleAnimEvent( animevent_t *pEvent )
 		case HOUND_AE_CLOSE_EYE:
 			if ( !m_fDontBlink )
 			{
-				m_nSkin = HOUNDEYE_EYE_FRAMES - 1;
+				GetEngineObject()->SetSkin(HOUNDEYE_EYE_FRAMES - 1);
 			}
 			break;
 
@@ -611,9 +611,9 @@ void CNPC_Houndeye::SetActivity ( Activity NewActivity )
 		// Set to the desired anim, or default anim if the desired is not present
 		if ( iSequence > ACTIVITY_NOT_AVAILABLE )
 		{
-			SetSequence( iSequence );	// Set to the reset anim (if it's there)
-			SetCycle( 0 );				// FIX: frame counter shouldn't be reset when its the same activity as before
-			ResetSequenceInfo();
+			GetEngineObject()->SetSequence( iSequence );	// Set to the reset anim (if it's there)
+			GetEngineObject()->SetCycle( 0 );				// FIX: frame counter shouldn't be reset when its the same activity as before
+			GetEngineObject()->ResetSequenceInfo();
 		}
 	}
 	else
@@ -649,7 +649,7 @@ void CNPC_Houndeye::StartTask ( const Task_t *pTask )
 		}
 	case TASK_HOUND_CLOSE_EYE:
 		{
-			m_nSkin = 0;
+		GetEngineObject()->SetSkin(0);
 			m_fDontBlink = TRUE; // tell blink code to leave the eye alone.
 			break;
 		}
@@ -697,7 +697,7 @@ void CNPC_Houndeye::RunTask ( const Task_t *pTask )
 				GetMotor()->SetIdealYawAndUpdate( idealYaw );
 			}
 
-			if ( IsSequenceFinished() )
+			if (GetEngineObject()->IsSequenceFinished() )
 			{
 				TaskComplete();
 			}
@@ -706,13 +706,13 @@ void CNPC_Houndeye::RunTask ( const Task_t *pTask )
 		}
 	case TASK_HOUND_CLOSE_EYE:
 		{
-			if ( m_nSkin < HOUNDEYE_EYE_FRAMES - 1 )
-				 m_nSkin++;
+			if (GetEngineObject()->GetSkin() < HOUNDEYE_EYE_FRAMES - 1 )
+				GetEngineObject()->SetSkin(GetEngineObject()->GetSkin()+1);
 			break;
 		}
 	case TASK_HOUND_HOP_BACK:
 		{
-			if ( IsSequenceFinished() )
+			if (GetEngineObject()->IsSequenceFinished() )
 			{
 				TaskComplete();
 			}
@@ -720,14 +720,14 @@ void CNPC_Houndeye::RunTask ( const Task_t *pTask )
 		}
 	case TASK_SPECIAL_ATTACK1:
 		{
-			m_nSkin = random->RandomInt(0, HOUNDEYE_EYE_FRAMES - 1);
+			GetEngineObject()->SetSkin(random->RandomInt(0, HOUNDEYE_EYE_FRAMES - 1));
 
 			float idealYaw;
 			idealYaw = UTIL_VecToYaw( GetNavigator()->GetGoalPos() );
 			GetMotor()->SetIdealYawAndUpdate( idealYaw );
 			
 			float life;
-			life = ((255 - GetCycle()) / ( m_flPlaybackRate * m_flPlaybackRate));
+			life = ((255 - GetEngineObject()->GetCycle()) / (GetEngineObject()->GetPlaybackRate() * GetEngineObject()->GetPlaybackRate()));
 			if (life < 0.1)
 			{
 				life = 0.1;
@@ -743,7 +743,7 @@ void CNPC_Houndeye::RunTask ( const Task_t *pTask )
 				WRITE_BYTE( life * 10 ); // life
 			MessageEnd();*/
 			
-			if ( IsSequenceFinished() )
+			if (GetEngineObject()->IsSequenceFinished() )
 			{
 				SonicAttack(); 
 				TaskComplete();
@@ -775,13 +775,13 @@ void CNPC_Houndeye::PrescheduleThink ( void )
 	// at random, initiate a blink if not already blinking or sleeping
 	if ( !m_fDontBlink )
 	{
-		if ( ( m_nSkin == 0 ) && random->RandomInt(0,0x7F) == 0 )
+		if ( (GetEngineObject()->GetSkin() == 0) && random->RandomInt(0, 0x7F) == 0)
 		{// start blinking!
-			m_nSkin = HOUNDEYE_EYE_FRAMES - 1;
+			GetEngineObject()->SetSkin(HOUNDEYE_EYE_FRAMES - 1);
 		}
-		else if ( m_nSkin != 0 )
+		else if (GetEngineObject()->GetSkin() != 0 )
 		{// already blinking
-			m_nSkin--;
+			GetEngineObject()->SetSkin(GetEngineObject()->GetSkin()-1);
 		}
 	}
 

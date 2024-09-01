@@ -96,6 +96,7 @@ bool CBaseEntity::s_bAbsQueriesValid = true;
 
 
 ConVar sv_netvisdist( "sv_netvisdist", "10000", FCVAR_CHEAT | FCVAR_DEVELOPMENTONLY, "Test networking visibility distance" );
+ConVar ai_sequence_debug("ai_sequence_debug", "0");
 
 void CEntityNetworkProperty::Init(CBaseEntity* pEntity) {
 	CServerNetworkProperty::Init();
@@ -1635,7 +1636,7 @@ END_DATADESC()
 int CBaseEntity::ObjectCaps( void ) 
 {
 #if 1
-	const model_t *pModel = GetModel();
+	const model_t *pModel = GetEngineObject()->GetModel();
 	bool bIsBrush = ( pModel && modelinfo->GetModelType( pModel ) == mod_brush );
 
 	// We inherit our parent's use capabilities so that we can forward use commands
@@ -3614,14 +3615,7 @@ void CBaseEntity::SetModel( const char *szModelName )
 	UTIL_SetModel( this, szModelName );
 }
 
-void CBaseEntity::SetModelPointer(const model_t* pModel)
-{
-	if (m_pModel != pModel)
-	{
-		m_pModel = pModel;
-		OnNewModel();
-	}
-}
+
 //------------------------------------------------------------------------------
 
 IStudioHdr *CBaseEntity::OnNewModel()
@@ -3629,7 +3623,6 @@ IStudioHdr *CBaseEntity::OnNewModel()
 	// Do nothing.
 	return NULL;
 }
-
 
 //================================================================================
 // TEAM HANDLING
@@ -5018,15 +5011,6 @@ void CC_Ent_Step( const CCommand& args )
 	CBaseEntity::Debug_SetSteps(nSteps);
 }
 static ConCommand ent_step("ent_step", CC_Ent_Step, "When 'ent_pause' is set this will step through one waiting input / output message at a time.", FCVAR_CHEAT);
-
-
-
-const model_t *CBaseEntity::GetModel( void ) const
-{
-	return m_pModel;
-}
-
-
 
 
 // FIXME: While we're using (dPitch, dYaw, dRoll) as our local angular velocity
@@ -6499,7 +6483,7 @@ void CBaseEntity::SetCollisionBoundsFromModel()
 	//	return;
 	//}
 
-	if ( const model_t *pModel = GetModel() )
+	if ( const model_t *pModel = GetEngineObject()->GetModel() )
 	{
 		Vector mns, mxs;
 		modelinfo->GetModelBounds( pModel, mns, mxs );

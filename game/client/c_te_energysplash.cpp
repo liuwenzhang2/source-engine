@@ -34,7 +34,7 @@ public:
 	Vector			m_vecDir;
 	bool			m_bExplosive;
 
-	const struct model_t *m_pModel;
+	//const struct model_t *m_pModel;
 };
 
 //-----------------------------------------------------------------------------
@@ -45,7 +45,7 @@ C_TEEnergySplash::C_TEEnergySplash( void )
 	m_vecPos.Init();
 	m_vecDir.Init();
 	m_bExplosive = false;
-	m_pModel = NULL;
+	//m_pModel = NULL;
 }
 
 //-----------------------------------------------------------------------------

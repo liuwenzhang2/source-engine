@@ -306,7 +306,7 @@ bool CWeaponShotgun::StartReload( void )
 	SetBodygroup(1,0);
 
 	pOwner->m_flNextAttack = gpGlobals->curtime;
-	m_flNextPrimaryAttack = gpGlobals->curtime + SequenceDuration();
+	m_flNextPrimaryAttack = gpGlobals->curtime + GetEngineObject()->SequenceDuration();
 
 	m_bInReload = true;
 	return true;
@@ -347,7 +347,7 @@ bool CWeaponShotgun::Reload( void )
 	SendWeaponAnim( ACT_VM_RELOAD );
 
 	pOwner->m_flNextAttack = gpGlobals->curtime;
-	m_flNextPrimaryAttack = gpGlobals->curtime + SequenceDuration();
+	m_flNextPrimaryAttack = gpGlobals->curtime + GetEngineObject()->SequenceDuration();
 
 	return true;
 }
@@ -373,7 +373,7 @@ void CWeaponShotgun::FinishReload( void )
 	SendWeaponAnim( ACT_SHOTGUN_RELOAD_FINISH );
 
 	pOwner->m_flNextAttack = gpGlobals->curtime;
-	m_flNextPrimaryAttack = gpGlobals->curtime + SequenceDuration();
+	m_flNextPrimaryAttack = gpGlobals->curtime + GetEngineObject()->SequenceDuration();
 }
 
 //-----------------------------------------------------------------------------
@@ -418,8 +418,8 @@ void CWeaponShotgun::Pump( void )
 	// Finish reload animation
 	SendWeaponAnim( ACT_SHOTGUN_PUMP );
 
-	pOwner->m_flNextAttack	= gpGlobals->curtime + SequenceDuration();
-	m_flNextPrimaryAttack	= gpGlobals->curtime + SequenceDuration();
+	pOwner->m_flNextAttack	= gpGlobals->curtime + GetEngineObject()->SequenceDuration();
+	m_flNextPrimaryAttack	= gpGlobals->curtime + GetEngineObject()->SequenceDuration();
 }
 
 //-----------------------------------------------------------------------------
@@ -432,7 +432,7 @@ void CWeaponShotgun::DryFire( void )
 	WeaponSound(EMPTY);
 	SendWeaponAnim( ACT_VM_DRYFIRE );
 	
-	m_flNextPrimaryAttack = gpGlobals->curtime + SequenceDuration();
+	m_flNextPrimaryAttack = gpGlobals->curtime + GetEngineObject()->SequenceDuration();
 }
 
 //-----------------------------------------------------------------------------
@@ -461,7 +461,7 @@ void CWeaponShotgun::PrimaryAttack( void )
 	pPlayer->SetAnimation( PLAYER_ATTACK1 );
 
 	// Don't fire again until fire animation has completed
-	m_flNextPrimaryAttack = gpGlobals->curtime + SequenceDuration();
+	m_flNextPrimaryAttack = gpGlobals->curtime + GetEngineObject()->SequenceDuration();
 	m_iClip1 -= 1;
 
 	Vector	vecSrc		= pPlayer->Weapon_ShootPosition( );
@@ -519,7 +519,7 @@ void CWeaponShotgun::SecondaryAttack( void )
 	pPlayer->SetAnimation( PLAYER_ATTACK1 );
 
 	// Don't fire again until fire animation has completed
-	m_flNextPrimaryAttack = gpGlobals->curtime + SequenceDuration();
+	m_flNextPrimaryAttack = gpGlobals->curtime + GetEngineObject()->SequenceDuration();
 	m_iClip1 -= 2;	// Shotgun uses same clip for primary and secondary attacks
 
 	Vector vecSrc	 = pPlayer->Weapon_ShootPosition();

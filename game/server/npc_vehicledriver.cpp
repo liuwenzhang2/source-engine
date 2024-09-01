@@ -111,8 +111,8 @@ void CNPC_VehicleDriver::Spawn( void )
 	GetEngineObject()->AddEffects( EF_NODRAW );
 
 	m_lifeState	= LIFE_ALIVE;
-	SetCycle( 0 );
-	ResetSequenceInfo();
+	GetEngineObject()->SetCycle( 0 );
+	GetEngineObject()->ResetSequenceInfo();
 
 	GetEngineObject()->AddFlag( FL_NPC );
 

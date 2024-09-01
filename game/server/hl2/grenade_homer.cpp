@@ -127,7 +127,7 @@ void CGrenadeHomer::Spawn( void )
 
 	GetEngineObject()->SetGravity( 1.0 );
 	GetEngineObject()->SetFriction( 0.8 );
-	SetSequence( 1 );
+	GetEngineObject()->SetSequence( 1 );
 
 	m_flHomingStrength	= 0;
 	m_flHomingDelay		= 0;

@@ -30,6 +30,12 @@
 #define MAX_ENTITY_BYTE_COUNT	(NUM_ENT_ENTRIES >> 3)
 #define DEBUG_TRANSITIONS_VERBOSE	2
 
+enum
+{
+	NUM_POSEPAREMETERS = 24,
+	NUM_BONECTRLS = 4
+};
+
 extern IVEngineServer* engine;
 //extern CUtlVector<IServerNetworkable*> g_DeleteList;
 extern bool g_fInCleanupDelete;
@@ -182,11 +188,16 @@ public:
 		m_nBody = 0;
 		m_nHitboxSet = 0;
 		m_flModelScale = 1.0f;
+		m_pStudioHdr = NULL;
+		m_nNewSequenceParity = 0;
+		m_nResetEventsParity = 0;
+		m_flSpeedScale = 1.0f;
 	}
 
 	~CEngineObjectInternal()
 	{
 		engine->CleanUpEntityClusterList(&m_PVSInfo);
+		UnlockStudioHdr();
 	}
 
 	void Init(CBaseEntity* pOuter) {
@@ -611,6 +622,81 @@ public:
 	float				GetModelScale() const { return m_flModelScale; }
 	void				UpdateModelScale();
 
+	const model_t* GetModel(void) const;
+	void SetModelPointer(const model_t* pModel);
+	IStudioHdr* GetModelPtr(void);
+	void InvalidateMdlCache();
+	void	ResetClientsideFrame(void);
+	// Cycle access
+	void SetCycle(float flCycle);
+	float GetCycle() const;
+	const float* GetPoseParameterArray() { return m_flPoseParameter.Base(); }
+	const float* GetEncodedControllerArray() { return m_flEncodedController.Base(); }
+	float GetPlaybackRate();
+	void SetPlaybackRate(float rate);
+	inline int GetSequence() { return m_nSequence; }
+	void SetSequence(int nSequence);
+	/* inline */ void ResetSequence(int nSequence);
+	void ResetSequenceInfo();
+	float GetGroundSpeed() const{
+		return m_flGroundSpeed;
+	}
+	void SetGroundSpeed(float flGroundSpeed) {
+		m_flGroundSpeed = flGroundSpeed;
+	}
+	float GetSpeedScale() {
+		return m_flSpeedScale;
+	}
+	void SetSpeedScale(float flSpeedScale) {
+		m_flSpeedScale = flSpeedScale;
+	}
+	bool SequenceLoops(void) { return m_bSequenceLoops; }
+	bool IsSequenceFinished(void) { return m_bSequenceFinished; }
+	void SetSequenceFinished(bool bFinished) {
+		m_bSequenceFinished = bFinished;
+	}
+	inline float SequenceDuration(void) { return SequenceDuration(m_nSequence); }
+	float	SequenceDuration(IStudioHdr* pStudioHdr, int iSequence);
+	inline float SequenceDuration(int iSequence) { return SequenceDuration(GetModelPtr(), iSequence); }
+	float	GetSequenceCycleRate(IStudioHdr* pStudioHdr, int iSequence);
+	inline float	GetSequenceCycleRate(int iSequence) { return GetSequenceCycleRate(GetModelPtr(), iSequence); }
+	float GetSequenceMoveDist(IStudioHdr* pStudioHdr, int iSequence);
+	inline float GetSequenceMoveDist(int iSequence) { return GetSequenceMoveDist(GetModelPtr(), iSequence); }
+	float GetSequenceMoveYaw(int iSequence);
+	void  GetSequenceLinearMotion(int iSequence, Vector* pVec);
+	bool HasMovement(int iSequence);
+	float GetMovementFrame(float flDist);
+	bool GetSequenceMovement(int nSequence, float fromCycle, float toCycle, Vector& deltaPosition, QAngle& deltaAngles);
+	bool GetIntervalMovement(float flIntervalUsed, bool& bMoveSeqFinished, Vector& newPosition, QAngle& newAngles);
+	float GetEntryVelocity(int iSequence);
+	float GetExitVelocity(int iSequence);
+	float GetInstantaneousVelocity(float flInterval = 0.0);
+	virtual float	GetSequenceGroundSpeed(IStudioHdr* pStudioHdr, int iSequence);
+	inline float GetSequenceGroundSpeed(int iSequence) { return GetSequenceGroundSpeed(GetModelPtr(), iSequence); }
+
+	float GetLastEventCheck() {
+		return m_flLastEventCheck;
+	}
+	void SetLastEventCheck(float flLastEventCheck) {
+		m_flLastEventCheck = flLastEventCheck;
+	}
+	// Send a muzzle flash event to the client for this entity.
+	void DoMuzzleFlash();
+
+	int		LookupPoseParameter(IStudioHdr* pStudioHdr, const char* szName);
+	int	    LookupPoseParameter(const char* szName) { return LookupPoseParameter(GetModelPtr(), szName); }
+	float	GetPoseParameter(const char* szName);
+	float	GetPoseParameter(int iParameter);
+	float	SetPoseParameter(IStudioHdr* pStudioHdr, const char* szName, float flValue);
+	float	SetPoseParameter(IStudioHdr* pStudioHdr, int iParameter, float flValue);
+	float   SetPoseParameter(const char* szName, float flValue) { return SetPoseParameter(GetModelPtr(), szName, flValue); }
+	float   SetPoseParameter(int iParameter, float flValue) { return SetPoseParameter(GetModelPtr(), iParameter, flValue); }
+	// Return's the controller's angle/position in bone space.
+	float					GetBoneController(int iController);
+	// Maps the angle/position value you specify into the bone's start/end and sets the specified controller to the value.
+	float					SetBoneController(int iController, float flValue);
+	bool	GetPoseParameterRange(int index, float& minValue, float& maxValue);
+
 public:
 	// Networking related methods
 	void NetworkStateChanged();
@@ -620,6 +706,8 @@ public:
 private:
 	bool NameMatchesComplex(const char* pszNameOrWildcard);
 	bool ClassMatchesComplex(const char* pszClassOrWildcard);
+	void LockStudioHdr();
+	void UnlockStudioHdr();
 private:
 
 	friend class CBaseEntity;
@@ -711,6 +799,32 @@ private:
 
 	// For making things thin during barnacle swallowing, e.g.
 	CNetworkVar(float, m_flModelScale);
+	CNetworkArray(float, m_flEncodedController, NUM_BONECTRLS);		// bone controller setting (0..1)
+	CNetworkVar(bool, m_bClientSideFrameReset);
+	CNetworkVar(float, m_flCycle);
+	CNetworkArray(float, m_flPoseParameter, NUM_POSEPAREMETERS);	// must be private so manual mode works!
+	// was pev->framerate
+	CNetworkVar(float, m_flPlaybackRate);
+
+	// was pev->frame
+	CNetworkVar(int, m_nSequence);
+
+	CNetworkVar(int, m_nNewSequenceParity);
+	CNetworkVar(int, m_nResetEventsParity);
+	// Incremented each time the entity is told to do a muzzle flash.
+// The client picks up the change and draws the flash.
+	CNetworkVar(unsigned char, m_nMuzzleFlashParity);
+	// animation needs
+	float				m_flGroundSpeed;	// computed linear movement rate for current sequence
+	float				m_flSpeedScale;
+
+	bool				m_bSequenceLoops;	// true if the sequence loops
+	bool				m_bSequenceFinished;// flag set when StudioAdvanceFrame moves across a frame boundry
+	float				m_flLastEventCheck;	// cycle index of when events were last checked
+
+	const model_t* m_pModel;
+	IStudioHdr* m_pStudioHdr;
+	CThreadFastMutex	m_StudioHdrInitLock;
 };
 
 inline PVSInfo_t* CEngineObjectInternal::GetPVSInfo()
@@ -1359,6 +1473,58 @@ inline void CEngineObjectInternal::SetAnimTime(float at)
 inline void CEngineObjectInternal::SetSimulationTime(float st)
 {
 	m_flSimulationTime = st;
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: return a pointer to an updated studiomdl cache cache
+//-----------------------------------------------------------------------------
+inline IStudioHdr* CEngineObjectInternal::GetModelPtr(void)
+{
+	//if ( IsDynamicModelLoading() )
+	//	return NULL;
+
+#ifdef _DEBUG
+	// GetModelPtr() is often called before OnNewModel() so go ahead and set it up first chance.
+	static IDataCacheSection* pModelCache = datacache->FindSection("ModelData");
+	AssertOnce(pModelCache->IsFrameLocking());
+#endif
+	if (!m_pStudioHdr && GetModel())
+	{
+		LockStudioHdr();
+	}
+	return (m_pStudioHdr && m_pStudioHdr->IsValid()) ? m_pStudioHdr : NULL;
+}
+
+inline void CEngineObjectInternal::InvalidateMdlCache()
+{
+	UnlockStudioHdr();
+	if (m_pStudioHdr != NULL)
+	{
+		m_pStudioHdr = NULL;
+	}
+}
+
+//-----------------------------------------------------------------------------
+// Cycle access
+//-----------------------------------------------------------------------------
+inline float CEngineObjectInternal::GetCycle() const
+{
+	return m_flCycle;
+}
+
+inline void CEngineObjectInternal::SetCycle(float flCycle)
+{
+	m_flCycle = flCycle;
+}
+
+inline float CEngineObjectInternal::GetPlaybackRate()
+{
+	return m_flPlaybackRate;
+}
+
+inline void CEngineObjectInternal::SetPlaybackRate(float rate)
+{
+	m_flPlaybackRate = rate;
 }
 
 //-----------------------------------------------------------------------------

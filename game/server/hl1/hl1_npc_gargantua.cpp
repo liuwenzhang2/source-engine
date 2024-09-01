@@ -665,8 +665,8 @@ void CNPC_Gargantua::RunTask( const Task_t *pTask )
 			FlameDestroy();
 			TaskComplete();
 			FlameControls( 0, 0 );
-			SetBoneController( 0, 0 );
-			SetBoneController( 1, 0 );
+			GetEngineObject()->SetBoneController( 0, 0 );
+			GetEngineObject()->SetBoneController( 1, 0 );
 		}
 		else
 		{
@@ -776,8 +776,8 @@ void CNPC_Gargantua::FlameControls( float angleX, float angleY )
 
 	m_flameX = UTIL_ApproachAngle( angleX, m_flameX, 4 );
 	m_flameY = UTIL_ApproachAngle( angleY, m_flameY, 8 );
-	SetBoneController( 0, m_flameY );
-	SetBoneController( 1, m_flameX );
+	GetEngineObject()->SetBoneController( 0, m_flameY );
+	GetEngineObject()->SetBoneController( 1, m_flameX );
 }
 
 

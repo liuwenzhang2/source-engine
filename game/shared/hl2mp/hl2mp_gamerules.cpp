@@ -779,7 +779,7 @@ void CHL2MPRules::ClientSettingsChanged( CBasePlayer *pPlayer )
 	if ( pHL2Player == NULL )
 		return;
 
-	const char *pCurrentModel = modelinfo->GetModelName( pPlayer->GetModel() );
+	const char *pCurrentModel = modelinfo->GetModelName( pPlayer->GetEngineObject()->GetModel() );
 	const char *szModelName = engine->GetClientConVarValue( pPlayer->entindex(), "cl_playermodel" );
 
 	//If we're different.
@@ -804,7 +804,7 @@ void CHL2MPRules::ClientSettingsChanged( CBasePlayer *pPlayer )
 		{
 			pHL2Player->SetPlayerModel();
 
-			const char *pszCurrentModelName = modelinfo->GetModelName( pHL2Player->GetModel() );
+			const char *pszCurrentModelName = modelinfo->GetModelName( pHL2Player->GetEngineObject()->GetModel() );
 
 			char szReturnString[128];
 			Q_snprintf( szReturnString, sizeof( szReturnString ), "Your player model is: %s\n", pszCurrentModelName );

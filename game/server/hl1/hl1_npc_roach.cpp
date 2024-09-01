@@ -399,7 +399,7 @@ void CNPC_Roach::Move ( float flInterval )
 	}
 
 	// if the waypoint is closer than step size, then stop after next step (ok for roach to overshoot)
-	if ( flWaypointDist <= m_flGroundSpeed * flInterval )
+	if ( flWaypointDist <= GetEngineObject()->GetGroundSpeed() * flInterval )
 	{
 		// take truncated step and stop
 

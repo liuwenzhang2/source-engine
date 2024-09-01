@@ -1671,7 +1671,7 @@ void CPhysMagnet::VPhysicsCollision( int index, gamevcollisionevent_t *pEvent )
 			return;
 
 		// If we have a model that wants to be metal, even though we hit a non-metal texture, we'll stick to it
-		if ( Q_strncmp(pOther->GetBaseAnimating()->GetModelPtr()->Studio_GetDefaultSurfaceProps(), "metal", 5 ) )
+		if ( Q_strncmp(pOther->GetBaseAnimating()->GetEngineObject()->GetModelPtr()->Studio_GetDefaultSurfaceProps(), "metal", 5 ) )
 			return;
 	}
 

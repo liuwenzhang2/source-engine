@@ -29,6 +29,8 @@ class CCheckTransmitInfo;
 struct matrix3x4_t;
 class CGameTrace;
 typedef CGameTrace trace_t;
+class IStudioHdr;
+struct model_t;
 
 struct servertouchlink_t
 {
@@ -366,7 +368,56 @@ public:
 	virtual void SetModelScale(float scale, float change_duration = 0.0f) = 0;
 	virtual float GetModelScale() const = 0;
 	virtual void UpdateModelScale() = 0;
-
+	virtual const model_t* GetModel(void) const = 0;
+	virtual IStudioHdr* GetModelPtr(void) = 0;
+	virtual void InvalidateMdlCache() = 0;
+	virtual float GetCycle() const = 0;
+	virtual void SetCycle(float flCycle) = 0;
+	virtual float GetPlaybackRate() = 0;
+	virtual void SetPlaybackRate(float rate) = 0;
+	virtual int GetSequence() = 0;
+	virtual void SetSequence(int nSequence) = 0;
+	virtual void ResetSequence(int nSequence) = 0;
+	virtual void ResetSequenceInfo() = 0;
+	virtual bool SequenceLoops(void) = 0;
+	virtual bool IsSequenceFinished(void) = 0;
+	virtual void SetSequenceFinished(bool bFinished) = 0;
+	virtual float GetLastEventCheck() = 0;
+	virtual void SetLastEventCheck(float flLastEventCheck) = 0;
+	virtual float SequenceDuration(int iSequence) = 0;
+	virtual float SequenceDuration(void) = 0;
+	virtual float GetSequenceMoveYaw(int iSequence) = 0;
+	virtual void GetSequenceLinearMotion(int iSequence, Vector* pVec) = 0;
+	virtual float GetSequenceCycleRate(IStudioHdr* pStudioHdr, int iSequence) = 0;
+	virtual float GetSequenceCycleRate(int iSequence) = 0;
+	virtual float GetSequenceGroundSpeed(IStudioHdr* pStudioHdr, int iSequence) = 0;
+	virtual float GetSequenceGroundSpeed(int iSequence) = 0;
+	virtual float GetGroundSpeed() const = 0;
+	virtual void SetGroundSpeed(float flGroundSpeed) = 0;
+	virtual float GetSpeedScale() = 0;
+	virtual void SetSpeedScale(float flSpeedScale) = 0;
+	virtual float GetEntryVelocity(int iSequence) = 0;
+	virtual float GetExitVelocity(int iSequence) = 0;
+	virtual float GetInstantaneousVelocity(float flInterval = 0.0) = 0;
+	virtual float GetMovementFrame(float flDist) = 0;
+	virtual bool HasMovement(int iSequence) = 0;
+	virtual bool GetSequenceMovement(int nSequence, float fromCycle, float toCycle, Vector& deltaPosition, QAngle& deltaAngles) = 0;
+	virtual bool GetIntervalMovement(float flIntervalUsed, bool& bMoveSeqFinished, Vector& newPosition, QAngle& newAngles) = 0;
+	virtual const float* GetEncodedControllerArray() = 0;
+	virtual float GetBoneController(int iController) = 0;
+	virtual float SetBoneController(int iController, float flValue) = 0;
+	virtual int LookupPoseParameter(IStudioHdr* pStudioHdr, const char* szName) = 0;
+	virtual int LookupPoseParameter(const char* szName) = 0;
+	virtual bool GetPoseParameterRange(int index, float& minValue, float& maxValue) = 0;
+	virtual const float* GetPoseParameterArray() = 0;
+	virtual float GetPoseParameter(const char* szName) = 0;
+	virtual float GetPoseParameter(int iParameter) = 0;
+	virtual float SetPoseParameter(IStudioHdr* pStudioHdr, const char* szName, float flValue) = 0;
+	virtual float SetPoseParameter(IStudioHdr* pStudioHdr, int iParameter, float flValue) = 0;
+	virtual float SetPoseParameter(const char* szName, float flValue) = 0;
+	virtual float SetPoseParameter(int iParameter, float flValue) = 0;
+	virtual void ResetClientsideFrame(void) = 0;
+	virtual void DoMuzzleFlash() = 0;
 };
 
 // This class is how the engine talks to entities in the game DLL.

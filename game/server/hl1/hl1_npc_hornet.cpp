@@ -107,7 +107,7 @@ void CNPC_Hornet::Spawn( void )
 	}
 	
 	GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.1f );
-	ResetSequenceInfo();
+	GetEngineObject()->ResetSequenceInfo();
 
 	m_vecEnemyLKP = vec3_origin;
 }

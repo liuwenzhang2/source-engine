@@ -360,7 +360,7 @@ void CNPC_Antlion::Spawn( void )
 
 	BaseClass::Spawn();
 
-	m_nSkin = random->RandomInt( 0, ANTLION_SKIN_COUNT-1 );
+	GetEngineObject()->SetSkin(random->RandomInt( 0, ANTLION_SKIN_COUNT-1 ));
 }
 
 //-----------------------------------------------------------------------------
@@ -502,8 +502,8 @@ inline CBaseEntity *CNPC_Antlion::EntityToWatch( void )
 //-----------------------------------------------------------------------------
 void	CNPC_Antlion::PopulatePoseParameters( void )
 {
-	m_poseHead_Pitch = LookupPoseParameter("head_pitch");
-	m_poseHead_Yaw   = LookupPoseParameter("head_yaw" );
+	m_poseHead_Pitch = GetEngineObject()->LookupPoseParameter("head_pitch");
+	m_poseHead_Yaw   = GetEngineObject()->LookupPoseParameter("head_yaw" );
 
 	BaseClass::PopulatePoseParameters();
 }
@@ -513,8 +513,8 @@ void	CNPC_Antlion::PopulatePoseParameters( void )
 //-----------------------------------------------------------------------------
 void CNPC_Antlion::UpdateHead( void )
 {
-	float yaw = GetPoseParameter( m_poseHead_Yaw );
-	float pitch = GetPoseParameter( m_poseHead_Pitch );
+	float yaw = GetEngineObject()->GetPoseParameter( m_poseHead_Yaw );
+	float pitch = GetEngineObject()->GetPoseParameter( m_poseHead_Pitch );
 
 	CBaseEntity *pTarget = EntityToWatch();
 
@@ -525,8 +525,8 @@ void CNPC_Antlion::UpdateHead( void )
 		
 		if ( DotProduct( enemyDir, BodyDirection3D() ) < 0.0f )
 		{
-			SetPoseParameter( m_poseHead_Yaw,	UTIL_Approach( 0, yaw, 10 ) );
-			SetPoseParameter( m_poseHead_Pitch, UTIL_Approach( 0, pitch, 10 ) );
+			GetEngineObject()->SetPoseParameter( m_poseHead_Yaw,	UTIL_Approach( 0, yaw, 10 ) );
+			GetEngineObject()->SetPoseParameter( m_poseHead_Pitch, UTIL_Approach( 0, pitch, 10 ) );
 			
 			return;
 		}
@@ -539,13 +539,13 @@ void CNPC_Antlion::UpdateHead( void )
 		float pitchDiff = UTIL_VecToPitch( enemyDir );
 		pitchDiff = UTIL_AngleDiff( pitchDiff, facingPitch + pitch );
 
-		SetPoseParameter( m_poseHead_Yaw, UTIL_Approach( yaw + yawDiff, yaw, 50 ) );
-		SetPoseParameter( m_poseHead_Pitch, UTIL_Approach( pitch + pitchDiff, pitch, 50 ) );
+		GetEngineObject()->SetPoseParameter( m_poseHead_Yaw, UTIL_Approach( yaw + yawDiff, yaw, 50 ) );
+		GetEngineObject()->SetPoseParameter( m_poseHead_Pitch, UTIL_Approach( pitch + pitchDiff, pitch, 50 ) );
 	}
 	else
 	{
-		SetPoseParameter( m_poseHead_Yaw,	UTIL_Approach( 0, yaw, 10 ) );
-		SetPoseParameter( m_poseHead_Pitch, UTIL_Approach( 0, pitch, 10 ) );
+		GetEngineObject()->SetPoseParameter( m_poseHead_Yaw,	UTIL_Approach( 0, yaw, 10 ) );
+		GetEngineObject()->SetPoseParameter( m_poseHead_Pitch, UTIL_Approach( 0, pitch, 10 ) );
 	}
 }
 
@@ -3469,7 +3469,7 @@ bool CNPC_Antlion::CheckLanding( void )
 	{
 		int	sequence = SelectWeightedSequence( (Activity)ACT_ANTLION_LAND );
 
-		if ( GetSequence() != sequence )
+		if (GetEngineObject()->GetSequence() != sequence )
 		{
 			SetWings( false );
 			VacateStrategySlot();
@@ -4477,7 +4477,7 @@ void CNPC_Antlion::Flip( bool bZapped /*= false*/ )
 
 	if ( bZapped )
 	{
-		m_flZapDuration = gpGlobals->curtime + SequenceDuration( SelectWeightedSequence( (Activity) ACT_ANTLION_ZAP_FLIP) ) + 0.1f;
+		m_flZapDuration = gpGlobals->curtime + GetEngineObject()->SequenceDuration( SelectWeightedSequence( (Activity) ACT_ANTLION_ZAP_FLIP) ) + 0.1f;
 
 		const char* soundname = "NPC_Antlion.ZappedFlip";
 		CPASAttenuationFilter filter(this, soundname);

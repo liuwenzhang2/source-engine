@@ -755,13 +755,13 @@ void CItem_AmmoCrate::Spawn( void )
 	GetEngineObject()->SetSolid( SOLID_VPHYSICS );
 	CreateVPhysics();
 
-	ResetSequence( LookupSequence( "Idle" ) );
+	GetEngineObject()->ResetSequence( LookupSequence( "Idle" ) );
 	SetBodygroup( 1, true );
 
 	m_flCloseTime = gpGlobals->curtime;
 	GetEngineObject()->SetAnimTime(gpGlobals->curtime);
-	m_flPlaybackRate = 0.0;
-	SetCycle( 0 );
+	GetEngineObject()->SetPlaybackRate(0.0);
+	GetEngineObject()->SetCycle( 0 );
 
 	m_takedamage = DAMAGE_EVENTS_ONLY;
 
@@ -827,7 +827,7 @@ void CItem_AmmoCrate::Use( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TY
 	int iSequence = LookupSequence( "Open" );
 
 	// See if we're not opening already
-	if ( GetSequence() != iSequence )
+	if (GetEngineObject()->GetSequence() != iSequence )
 	{
 		Vector mins, maxs;
 		trace_t tr;
@@ -848,7 +848,7 @@ void CItem_AmmoCrate::Use( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TY
 		m_hActivator = pPlayer;
 
 		// Animate!
-		ResetSequence( iSequence );
+		GetEngineObject()->ResetSequence( iSequence );
 
 		// Make sound
 		CPASAttenuationFilter sndFilter( this, "AmmoCrate.Open" );
@@ -953,20 +953,20 @@ void CItem_AmmoCrate::CrateThink( void )
 	GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.1f );
 
 	// Start closing if we're not already
-	if ( GetSequence() != LookupSequence( "Close" ) )
+	if (GetEngineObject()->GetSequence() != LookupSequence( "Close" ) )
 	{
 		// Not ready to close?
 		if ( m_flCloseTime <= gpGlobals->curtime )
 		{
 			m_hActivator = NULL;
 
-			ResetSequence( LookupSequence( "Close" ) );
+			GetEngineObject()->ResetSequence( LookupSequence( "Close" ) );
 		}
 	}
 	else
 	{
 		// See if we're fully closed
-		if ( IsSequenceFinished() )
+		if (GetEngineObject()->IsSequenceFinished() )
 		{
 			// Stop thinking
 			SetThink( NULL );
@@ -976,7 +976,7 @@ void CItem_AmmoCrate::CrateThink( void )
 			// FIXME: We're resetting the sequence here
 			// but setting Think to NULL will cause this to never have
 			// StudioFrameAdvance called. What are the consequences of that?
-			ResetSequence( LookupSequence( "Idle" ) );
+			GetEngineObject()->ResetSequence( LookupSequence( "Idle" ) );
 			SetBodygroup( 1, true );
 		}
 	}

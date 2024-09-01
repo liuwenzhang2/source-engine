@@ -35,7 +35,7 @@ public:
 	Vector			m_vecPos;
 	Vector			m_vecDir;
 
-	const struct model_t *m_pModel;
+	//const struct model_t *m_pModel;
 };
 
 //-----------------------------------------------------------------------------
@@ -45,7 +45,7 @@ C_TEMetalSparks::C_TEMetalSparks( void )
 {
 	m_vecPos.Init();
 	m_vecDir.Init();
-	m_pModel = NULL;
+	//m_pModel = NULL;
 }
 
 //-----------------------------------------------------------------------------

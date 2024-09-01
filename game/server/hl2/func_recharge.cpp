@@ -497,7 +497,7 @@ void CNewRecharge::Spawn()
 	SetModel( HEALTH_CHARGER_MODEL_NAME );
 	GetEngineObject()->AddEffects( EF_NOSHADOW );
 
-	ResetSequence( LookupSequence( "idle" ) );
+	GetEngineObject()->ResetSequence( LookupSequence( "idle" ) );
 
 	SetInitialCharge();
 
@@ -512,7 +512,7 @@ void CNewRecharge::Spawn()
 
 	m_iReactivate = 0;
 
-	SetCycle( 1.0f - ( m_flJuice / MaxJuice() ) );
+	GetEngineObject()->SetCycle( 1.0f - ( m_flJuice / MaxJuice() ) );
 }
 
 bool CNewRecharge::CreateVPhysics()
@@ -537,12 +537,12 @@ int CNewRecharge::DrawDebugTextOverlays(void)
 
 void CNewRecharge::StudioFrameAdvance( void )
 {
-	m_flPlaybackRate = 0;
+	GetEngineObject()->SetPlaybackRate(0);
 
 	float flMaxJuice = MaxJuice() + 0.1f;
 	float flNewJuice = 1.0f - (float)( m_flJuice / flMaxJuice );
 
-	SetCycle( flNewJuice );
+	GetEngineObject()->SetCycle( flNewJuice );
 //	Msg( "Cycle: %f - Juice: %d - m_flJuice :%f - Interval: %f\n", (float)GetCycle(), (int)m_iJuice, (float)m_flJuice, GetAnimTimeInterval() );
 
 	if ( !m_flPrevAnimTime )
@@ -603,7 +603,7 @@ void CNewRecharge::InputRecharge( inputdata_t &inputdata )
 
 void CNewRecharge::InputSetCharge( inputdata_t &inputdata )
 {
-	ResetSequence( LookupSequence( "idle" ) );
+	GetEngineObject()->ResetSequence( LookupSequence( "idle" ) );
 
 	int iJuice = inputdata.value.Int();
 
@@ -657,7 +657,7 @@ void CNewRecharge::Use( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE 
 	if ( m_iJuice <= 0 )
 	{
 		// Start our deny animation over again
-		ResetSequence( LookupSequence( "emptyclick" ) );
+		GetEngineObject()->ResetSequence( LookupSequence( "emptyclick" ) );
 		
 		m_nState = 1;
 		
@@ -790,7 +790,7 @@ void CNewRecharge::Recharge(void)
 	params.m_pflSoundDuration = NULL;
 	params.m_bWarnOnDirectWaveReference = true;
 	g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
-	ResetSequence( LookupSequence( "idle" ) );
+	GetEngineObject()->ResetSequence( LookupSequence( "idle" ) );
 
 	UpdateJuice( MaxJuice() );
 
@@ -812,7 +812,7 @@ void CNewRecharge::Off(void)
 	
 	if ( m_nState == 1 )
 	{
-		SetCycle( 1.0f );
+		GetEngineObject()->SetCycle( 1.0f );
 	}
 
 	m_iOn = 0;

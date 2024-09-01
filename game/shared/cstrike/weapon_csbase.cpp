@@ -813,7 +813,7 @@ bool CWeaponCSBase::DefaultDeploy( char *szViewModel, char *szWeaponModel, int i
 	SetViewModel();
 	SendWeaponAnim( GetDeployActivity() );
 
-	pOwner->SetNextAttack( gpGlobals->curtime + SequenceDuration() );
+	pOwner->SetNextAttack( gpGlobals->curtime + GetEngineObject()->SequenceDuration() );
 	m_flNextPrimaryAttack	= gpGlobals->curtime;
 	m_flNextSecondaryAttack	= gpGlobals->curtime;
 
@@ -1429,7 +1429,7 @@ void CWeaponCSBase::DefaultTouch(CBaseEntity *pOther)
 		{
 			// changing from invisible state to visible.
 			GetEngineObject()->RemoveEffects( EF_NODRAW );
-			DoMuzzleFlash();
+			GetEngineObject()->DoMuzzleFlash();
 		}
 
 		GetEngineObject()->AddSolidFlags( FSOLID_TRIGGER );

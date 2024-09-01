@@ -537,8 +537,8 @@ void CWateryDeathLeech::Spawn( void )
 	SetThink( &CWateryDeathLeech::LeechThink );
 	GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.1 );
 
-	m_flPlaybackRate = random->RandomFloat( 0.5, 1.5 );
-	SetCycle( random->RandomFloat( 0.0f, 0.9f ) );
+	GetEngineObject()->SetPlaybackRate(random->RandomFloat( 0.5, 1.5 ));
+	GetEngineObject()->SetCycle( random->RandomFloat( 0.0f, 0.9f ) );
 
 	QAngle vAngle;
 	vAngle[YAW] = random->RandomFloat( 0, 360 );
@@ -695,10 +695,10 @@ void CTriggerWateryDeath::SpawnLeeches( CBaseEntity *pOther )
 			pLeech->SetOwnerEntity( pOther );
 
 			if ( i <= 8 )
-				 pLeech->SetSequence( i % 4 );
+				 pLeech->GetEngineObject()->SetSequence( i % 4 );
 			else 
-				 pLeech->SetSequence( ( i % 4 ) + 4 ) ;
-			pLeech->ResetSequenceInfo();
+				 pLeech->GetEngineObject()->SetSequence( ( i % 4 ) + 4 ) ;
+			pLeech->GetEngineObject()->ResetSequenceInfo();
 		}
 	}
 }

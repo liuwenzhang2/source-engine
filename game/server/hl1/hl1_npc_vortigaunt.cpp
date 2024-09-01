@@ -345,13 +345,13 @@ void CNPC_Vortigaunt::HandleAnimEvent( animevent_t *pEvent )
 		{
 			// speed up attack when on hard
 			if ( g_iSkillLevel == SKILL_HARD )
-				 m_flPlaybackRate = 1.5;
+				GetEngineObject()->SetPlaybackRate(1.5);
 
 			Vector v_forward;
 			GetVectors( &v_forward, NULL, NULL );
 
 			CBroadcastRecipientFilter filter;
-			te->DynamicLight( filter, 0.0, &GetEngineObject()->GetAbsOrigin(), 125, 200, 100, 2, 120, 0.2 / m_flPlaybackRate, 0 );
+			te->DynamicLight( filter, 0.0, &GetEngineObject()->GetAbsOrigin(), 125, 200, 100, 2, 120, 0.2 / GetEngineObject()->GetPlaybackRate(), 0);
 
 			if ( m_hDead != NULL )
 			{
@@ -710,7 +710,7 @@ void CNPC_Vortigaunt::ClearBeams( )
 	}
 
 	m_iBeams = 0;
-	m_nSkin = 0;
+	GetEngineObject()->SetSkin(0);
 }
 
 

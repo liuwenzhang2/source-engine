@@ -788,7 +788,7 @@ void CBaseServerVehicle::ParseNPCRoles( KeyValues *pkvPassengerList )
 		return;
 
 	// For attachment polling
-	IStudioHdr *pStudioHdr = pAnimating->GetModelPtr();
+	IStudioHdr *pStudioHdr = pAnimating->GetEngineObject()->GetModelPtr();
 	Assert( pStudioHdr != NULL );
 	if ( pStudioHdr == NULL )
 		return;
@@ -887,12 +887,12 @@ bool CBaseServerVehicle::GetLocalAttachmentAtTime( int nQuerySequence, int nAtta
 	//		 should really leave the car in an acceptable state to run this query -- jdw
 
 	// Store this off for restoration later
-	int nOldSequence = pAnimating->GetSequence();
-	float flOldCycle = pAnimating->GetCycle();
+	int nOldSequence = pAnimating->GetEngineObject()->GetSequence();
+	float flOldCycle = pAnimating->GetEngineObject()->GetCycle();
 
 	// Setup the model for the query
-	pAnimating->SetSequence( nQuerySequence );
-	pAnimating->SetCycle( flCyclePoint );
+	pAnimating->GetEngineObject()->SetSequence( nQuerySequence );
+	pAnimating->GetEngineObject()->SetCycle( flCyclePoint );
 	pAnimating->InvalidateBoneCache();
 
 	// Query for the point
@@ -911,8 +911,8 @@ bool CBaseServerVehicle::GetLocalAttachmentAtTime( int nQuerySequence, int nAtta
 	}
 
 	// Restore the model after the query
-	pAnimating->SetSequence( nOldSequence );
-	pAnimating->SetCycle( flOldCycle );
+	pAnimating->GetEngineObject()->SetSequence( nOldSequence );
+	pAnimating->GetEngineObject()->SetCycle( flOldCycle );
 	pAnimating->InvalidateBoneCache();
 
 	return true;
@@ -976,7 +976,7 @@ void CBaseServerVehicle::ParseEntryExitAnims( void )
 {
 	// Try and find the right animation to play in the model's keyvalues
 	KeyValues *modelKeyValues = new KeyValues("");
-	if ( modelKeyValues->LoadFromBuffer( modelinfo->GetModelName( m_pVehicle->GetModel() ), modelinfo->GetModelKeyValueText( m_pVehicle->GetModel() ) ) )
+	if ( modelKeyValues->LoadFromBuffer( modelinfo->GetModelName( m_pVehicle->GetEngineObject()->GetModel() ), modelinfo->GetModelKeyValueText( m_pVehicle->GetEngineObject()->GetModel() ) ) )
 	{
 		// Do we have an entry section?
 		KeyValues *pkvEntryList = modelKeyValues->FindKey("vehicle_entry");
@@ -1059,10 +1059,10 @@ void CBaseServerVehicle::HandlePassengerEntry( CBaseCombatCharacter *pPassenger,
 			if ( pPlayer->CanEnterVehicle( this, VEHICLE_ROLE_DRIVER ) )
 			{
 				// Setup the "enter" vehicle sequence and skip the animation if it isn't present.
-				pAnimating->SetCycle( 0 );
+				pAnimating->GetEngineObject()->SetCycle( 0 );
 				pAnimating->GetEngineObject()->SetAnimTime(gpGlobals->curtime);
-				pAnimating->ResetSequence( iEntryAnim );
-				pAnimating->ResetClientsideFrame();
+				pAnimating->GetEngineObject()->ResetSequence( iEntryAnim );
+				pAnimating->GetEngineObject()->ResetClientsideFrame();
 				pAnimating->InvalidateBoneCache();	// This is necessary because we need to query attachment points this frame for blending!
 				GetDrivableVehicle()->SetVehicleEntryAnim( true );
 
@@ -1124,10 +1124,10 @@ bool CBaseServerVehicle::HandlePassengerExit( CBaseCombatCharacter *pPassenger )
 			CBaseAnimating *pAnimating = dynamic_cast<CBaseAnimating *>(m_pVehicle);
 			if ( pAnimating )
 			{
-				pAnimating->SetCycle( 0 );
+				pAnimating->GetEngineObject()->SetCycle( 0 );
 				pAnimating->GetEngineObject()->SetAnimTime(gpGlobals->curtime);
-				pAnimating->ResetSequence( iSequence );
-				pAnimating->ResetClientsideFrame();
+				pAnimating->GetEngineObject()->ResetSequence( iSequence );
+				pAnimating->GetEngineObject()->ResetClientsideFrame();
 				GetDrivableVehicle()->SetVehicleExitAnim( true, vecExitPoint );
 
 				// Re-deploy our weapon
@@ -1188,7 +1188,7 @@ int CBaseServerVehicle::GetEntryAnimForPoint( const Vector &vecEyePoint )
 	if ( !pAnimating )
 		return 0;
 
-	IStudioHdr *pStudioHdr = pAnimating->GetModelPtr();
+	IStudioHdr *pStudioHdr = pAnimating->GetEngineObject()->GetModelPtr();
 	if (!pStudioHdr)
 		return 0;
 	int iHitboxSet = pStudioHdr->FindHitboxSetByName( "entryboxes" );
@@ -1257,7 +1257,7 @@ int CBaseServerVehicle::GetExitAnimToUse( Vector &vecEyeExitEndpoint, bool &bAll
 	if ( !pAnimating )
 		return ACTIVITY_NOT_AVAILABLE;
 
-	IStudioHdr *pStudioHdr = pAnimating->GetModelPtr();
+	IStudioHdr *pStudioHdr = pAnimating->GetEngineObject()->GetModelPtr();
 	if (!pStudioHdr)
 		return ACTIVITY_NOT_AVAILABLE;
 
@@ -1489,10 +1489,10 @@ void CBaseServerVehicle::HandleEntryExitFinish( bool bExitAnimOn, bool bResetAni
 		int iSequence = pAnimating->SelectWeightedSequence( ACT_IDLE );
 		if ( iSequence > ACTIVITY_NOT_AVAILABLE )
 		{
-			pAnimating->SetCycle( 0 );
+			pAnimating->GetEngineObject()->SetCycle( 0 );
 			pAnimating->GetEngineObject()->SetAnimTime(gpGlobals->curtime);
-			pAnimating->ResetSequence( iSequence );
-			pAnimating->ResetClientsideFrame();
+			pAnimating->GetEngineObject()->ResetSequence( iSequence );
+			pAnimating->GetEngineObject()->ResetClientsideFrame();
 		}
 	}
 

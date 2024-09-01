@@ -226,8 +226,8 @@ void CBaseProp::Spawn( void )
 	GetEngineObject()->SetNextThink( TICK_NEVER_THINK );
 
 	GetEngineObject()->SetAnimTime(gpGlobals->curtime);
-	m_flPlaybackRate = 0.0;
-	SetCycle( 0 );
+	GetEngineObject()->SetPlaybackRate(0.0);
+	GetEngineObject()->SetCycle( 0 );
 }
 
 //-----------------------------------------------------------------------------
@@ -327,7 +327,7 @@ void CBaseProp::CalculateBlockLOS( void )
 int CBaseProp::ParsePropData( void )
 {
 	KeyValues *modelKeyValues = new KeyValues("");
-	if ( !modelKeyValues->LoadFromBuffer( modelinfo->GetModelName( GetModel() ), modelinfo->GetModelKeyValueText( GetModel() ) ) )
+	if ( !modelKeyValues->LoadFromBuffer( modelinfo->GetModelName(GetEngineObject()->GetModel() ), modelinfo->GetModelKeyValueText(GetEngineObject()->GetModel() ) ) )
 	{
 		modelKeyValues->deleteThis();
 		return PARSE_FAILED_NO_DATA;
@@ -852,7 +852,7 @@ void CBreakableProp::Spawn()
 	if (GetEngineObject()->IsMarkedForDeletion() )
 		return;
 
-	IStudioHdr *pStudioHdr = GetModelPtr( );
+	IStudioHdr *pStudioHdr = GetEngineObject()->GetModelPtr( );
 	if ( pStudioHdr->flags() & STUDIOHDR_FLAGS_NO_FORCED_FADE )
 	{
 		DisableAutoFade();
@@ -1275,9 +1275,9 @@ bool CBreakableProp::OnAttemptPhysGunPickup( CBasePlayer *pPhysGunUser, PhysGunP
 	if ( m_nPhysgunState == PHYSGUN_MUST_BE_DETACHED )
 	{
 		// A punt advances 
-		ResetSequence( SelectWeightedSequence( ACT_PHYSCANNON_DETACH ) );
-		SetPlaybackRate( 0.0f );
-		ResetClientsideFrame();
+		GetEngineObject()->ResetSequence( SelectWeightedSequence( ACT_PHYSCANNON_DETACH ) );
+		GetEngineObject()->SetPlaybackRate( 0.0f );
+		GetEngineObject()->ResetClientsideFrame();
 		m_nPhysgunState = PHYSGUN_IS_DETACHING;
 		return false;
 	}
@@ -1306,9 +1306,9 @@ bool CBreakableProp::OnAttemptPhysGunPickup( CBasePlayer *pPhysGunUser, PhysGunP
 			m_OnPhysCannonAnimatePullStarted.FireOutput( NULL,this );
 		}
 
- 		ResetSequence( iSequence );
-		SetPlaybackRate( 1.0f );
-		ResetClientsideFrame();
+		GetEngineObject()->ResetSequence( iSequence );
+		GetEngineObject()->SetPlaybackRate( 1.0f );
+		GetEngineObject()->ResetClientsideFrame();
 	}
 
 	// If we're running PRE or POST ANIMATE sequences, wait for them to be done
@@ -1325,16 +1325,16 @@ bool CBreakableProp::OnAttemptPhysGunPickup( CBasePlayer *pPhysGunUser, PhysGunP
 		StudioFrameAdvanceManual( gpGlobals->frametime );
  		DispatchAnimEvents( this );
 
-		if (IsSequenceFinished() )
+		if (GetEngineObject()->IsSequenceFinished() )
 		{
 			int iSequence = SelectWeightedSequence( ACT_PHYSCANNON_ANIMATE_POST );
 			if ( iSequence != ACTIVITY_NOT_AVAILABLE )
 			{
 				m_nPhysgunState = PHYSGUN_ANIMATE_IS_POST_ANIMATING;
 				SetContextThink( &CBreakableProp::AnimateThink, gpGlobals->curtime + 0.1, s_pPropAnimateThink );
-				ResetSequence( iSequence );
-				SetPlaybackRate( 1.0f );
-				ResetClientsideFrame();
+				GetEngineObject()->ResetSequence( iSequence );
+				GetEngineObject()->SetPlaybackRate( 1.0f );
+				GetEngineObject()->ResetClientsideFrame();
 
 				m_OnPhysCannonAnimatePostStarted.FireOutput( NULL,this );
 			}
@@ -1349,13 +1349,13 @@ bool CBreakableProp::OnAttemptPhysGunPickup( CBasePlayer *pPhysGunUser, PhysGunP
 	{
 		// Here, we're grabbing it. If we try to punt it, advance frames by quite a bit.
 		StudioFrameAdvanceManual( (reason == PICKED_UP_BY_CANNON) ? gpGlobals->frametime : 0.5f );
-		ResetClientsideFrame();
+		GetEngineObject()->ResetClientsideFrame();
 		DispatchAnimEvents( this );
 
-		if (IsSequenceFinished() )
+		if (GetEngineObject()->IsSequenceFinished() )
 		{
 			// We're done, reset the playback rate.
-			SetPlaybackRate( 1.0f );
+			GetEngineObject()->SetPlaybackRate( 1.0f );
 			m_nPhysgunState = PHYSGUN_CAN_BE_GRABBED;
 			m_OnPhysCannonDetach.FireOutput( NULL,this );
 		}
@@ -1375,16 +1375,16 @@ void CBreakableProp::AnimateThink( void )
 		DispatchAnimEvents( this );
 		GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.1, s_pPropAnimateThink );
 
-		if (IsSequenceFinished() )
+		if (GetEngineObject()->IsSequenceFinished() )
 		{
 			if ( m_nPhysgunState == PHYSGUN_ANIMATE_IS_PRE_ANIMATING )
 			{
 				// Start the animate sequence
 				m_nPhysgunState = PHYSGUN_ANIMATE_IS_ANIMATING;
 
-				ResetSequence( SelectWeightedSequence( ACT_PHYSCANNON_ANIMATE ) );
-				SetPlaybackRate( 1.0f );
-				ResetClientsideFrame();
+				GetEngineObject()->ResetSequence( SelectWeightedSequence( ACT_PHYSCANNON_ANIMATE ) );
+				GetEngineObject()->SetPlaybackRate( 1.0f );
+				GetEngineObject()->ResetClientsideFrame();
 
 				m_OnPhysCannonAnimatePullStarted.FireOutput( NULL,this );
 			}
@@ -1507,7 +1507,7 @@ void CBreakableProp::CreateFlare( float flLifetime )
 		SetThink( &CBreakable::SUB_FadeOut );
 		GetEngineObject()->SetNextThink( gpGlobals->curtime + flLifetime + 5.0f );
 
-		m_nSkin = 1;
+		GetEngineObject()->SetSkin(1);
 
 		AddEntityToDarknessCheck( pFlare );
 
@@ -2064,7 +2064,7 @@ void CDynamicProp::CreateBoneFollowers()
 		return;
 
 	KeyValues *modelKeyValues = new KeyValues("");
-	if ( modelKeyValues->LoadFromBuffer( modelinfo->GetModelName( GetModel() ), modelinfo->GetModelKeyValueText( GetModel() ) ) )
+	if ( modelKeyValues->LoadFromBuffer( modelinfo->GetModelName(GetEngineObject()->GetModel() ), modelinfo->GetModelKeyValueText(GetEngineObject()->GetModel() ) ) )
 	{
 		// Do we have a bone follower section?
 		KeyValues *pkvBoneFollowers = modelKeyValues->FindKey("bone_followers");
@@ -2201,8 +2201,8 @@ void CDynamicProp::AnimThink( void )
 
 	if ( m_bRandomAnimator && m_flNextRandAnim < gpGlobals->curtime )
 	{
-		ResetSequence( SelectWeightedSequence( ACT_IDLE ) );
-		ResetClientsideFrame();
+		GetEngineObject()->ResetSequence( SelectWeightedSequence( ACT_IDLE ) );
+		GetEngineObject()->ResetClientsideFrame();
 
 		// Fire output
 		m_pOutputAnimBegun.FireOutput( NULL,this );
@@ -2210,10 +2210,10 @@ void CDynamicProp::AnimThink( void )
 		m_flNextRandAnim = gpGlobals->curtime + random->RandomFloat( m_flMinRandAnimTime, m_flMaxRandAnimTime );
 	}
 
-	if ( ((m_iTransitionDirection > 0 && GetCycle() >= 0.999f) || (m_iTransitionDirection < 0 && GetCycle() <= 0.0f)) && !SequenceLoops() )
+	if ( ((m_iTransitionDirection > 0 && GetEngineObject()->GetCycle() >= 0.999f) || (m_iTransitionDirection < 0 && GetEngineObject()->GetCycle() <= 0.0f)) && !GetEngineObject()->SequenceLoops() )
 	{
 		Assert( m_iGoalSequence >= 0 );
-		if (GetSequence() != m_iGoalSequence)
+		if (GetEngineObject()->GetSequence() != m_iGoalSequence)
 		{
 			PropSetSequence( m_iGoalSequence );
 		}
@@ -2269,7 +2269,7 @@ void CDynamicProp::PropSetAnim( const char *szAnim )
 	{
 		// Not available try to get default anim
 		Warning( "Dynamic prop %s: no sequence named:%s\n", GetDebugName(), szAnim );
-		SetSequence( 0 );
+		GetEngineObject()->SetSequence( 0 );
 	}
 }
 
@@ -2295,7 +2295,7 @@ void CDynamicProp::InputSetDefaultAnimation( inputdata_t &inputdata )
 //-----------------------------------------------------------------------------
 void CDynamicProp::InputSetPlaybackRate( inputdata_t &inputdata )
 {
-	SetPlaybackRate( inputdata.value.Float() );
+	GetEngineObject()->SetPlaybackRate( inputdata.value.Float() );
 }
 
 //-----------------------------------------------------------------------------
@@ -2305,13 +2305,13 @@ void CDynamicProp::InputSetPlaybackRate( inputdata_t &inputdata )
 void CDynamicProp::FinishSetSequence( int nSequence )
 {
 	// Msg("%.2f CDynamicProp::FinishSetSequence( %d )\n", gpGlobals->curtime, nSequence );
-	SetCycle( 0 );
+	GetEngineObject()->SetCycle( 0 );
 	GetEngineObject()->SetAnimTime(gpGlobals->curtime);
-	ResetSequence( nSequence );
-	ResetClientsideFrame();
+	GetEngineObject()->ResetSequence( nSequence );
+	GetEngineObject()->ResetClientsideFrame();
 	GetEngineObject()->RemoveFlag( FL_STATICPROP );
-	SetPlaybackRate( m_iTransitionDirection > 0 ? 1.0f : -1.0f );
-	SetCycle( m_iTransitionDirection > 0 ? 0.0f : 0.999f );
+	GetEngineObject()->SetPlaybackRate( m_iTransitionDirection > 0 ? 1.0f : -1.0f );
+	GetEngineObject()->SetCycle( m_iTransitionDirection > 0 ? 0.0f : 0.999f );
 }
 
 //-----------------------------------------------------------------------------
@@ -2328,7 +2328,7 @@ void CDynamicProp::PropSetSequence( int nSequence )
 	float nextCycle;
 	float flInterval = 0.1f;
 
-	if (GotoSequence( GetSequence(), GetCycle(), GetPlaybackRate(), m_iGoalSequence, nNextSequence, nextCycle, m_iTransitionDirection ))
+	if (GotoSequence(GetEngineObject()->GetSequence(), GetEngineObject()->GetCycle(), GetEngineObject()->GetPlaybackRate(), m_iGoalSequence, nNextSequence, nextCycle, m_iTransitionDirection ))
 	{
 		FinishSetSequence( nNextSequence );
 	}
@@ -2861,7 +2861,7 @@ void CPhysicsProp::OnPhysGunDrop( CBasePlayer *pPhysGunUser, PhysGunDrop_t Reaso
 bool CPhysicsProp::GetPropDataAngles( const char *pKeyName, QAngle &vecAngles )
 {
 	KeyValues *modelKeyValues = new KeyValues("");
-	if ( modelKeyValues->LoadFromBuffer( modelinfo->GetModelName( GetModel() ), modelinfo->GetModelKeyValueText( GetModel() ) ) )
+	if ( modelKeyValues->LoadFromBuffer( modelinfo->GetModelName(GetEngineObject()->GetModel() ), modelinfo->GetModelKeyValueText(GetEngineObject()->GetModel() ) ) )
 	{
 		KeyValues *pkvPropData = modelKeyValues->FindKey( "physgun_interactions" );
 		if ( pkvPropData )
@@ -2886,7 +2886,7 @@ bool CPhysicsProp::GetPropDataAngles( const char *pKeyName, QAngle &vecAngles )
 float CPhysicsProp::GetCarryDistanceOffset( void )
 {
 	KeyValues *modelKeyValues = new KeyValues("");
-	if ( modelKeyValues->LoadFromBuffer( modelinfo->GetModelName( GetModel() ), modelinfo->GetModelKeyValueText( GetModel() ) ) )
+	if ( modelKeyValues->LoadFromBuffer( modelinfo->GetModelName(GetEngineObject()->GetModel() ), modelinfo->GetModelKeyValueText(GetEngineObject()->GetModel() ) ) )
 	{
 		KeyValues *pkvPropData = modelKeyValues->FindKey( "physgun_interactions" );
 		if ( pkvPropData )
@@ -3780,7 +3780,7 @@ void CBasePropDoor::HandleAnimEvent(animevent_t *pEvent)
 //-----------------------------------------------------------------------------
 void CBasePropDoor::CalcDoorSounds()
 {
-	ErrorIfNot( GetModel() != NULL, ( "prop_door with no model at %.2f %.2f %.2f\n", GetEngineObject()->GetAbsOrigin().x, GetEngineObject()->GetAbsOrigin().y, GetEngineObject()->GetAbsOrigin().z ) );
+	ErrorIfNot(GetEngineObject()->GetModel() != NULL, ( "prop_door with no model at %.2f %.2f %.2f\n", GetEngineObject()->GetAbsOrigin().x, GetEngineObject()->GetAbsOrigin().y, GetEngineObject()->GetAbsOrigin().z ) );
 
 	string_t strSoundOpen = NULL_STRING;
 	string_t strSoundClose = NULL_STRING;
@@ -3792,7 +3792,7 @@ void CBasePropDoor::CalcDoorSounds()
 	// Otherwise, use the sounds specified by the model keyvalues. These are looked up
 	// based on skin and hardware.
 	KeyValues *modelKeyValues = new KeyValues("");
-	if ( modelKeyValues->LoadFromBuffer( modelinfo->GetModelName( GetModel() ), modelinfo->GetModelKeyValueText( GetModel() ) ) )
+	if ( modelKeyValues->LoadFromBuffer( modelinfo->GetModelName(GetEngineObject()->GetModel() ), modelinfo->GetModelKeyValueText(GetEngineObject()->GetModel() ) ) )
 	{
 		KeyValues *pkvDoorSounds = modelKeyValues->FindKey("door_options");
 		if ( pkvDoorSounds )
@@ -3846,7 +3846,7 @@ void CBasePropDoor::CalcDoorSounds()
 	modelKeyValues = NULL;
 	if ( !bFoundSkin && VPhysicsGetObject() )
 	{
-		Warning( "%s has Door model (%s) with no door_options! Verify that SKIN is valid, and has a corresponding options block in the model QC file\n", GetDebugName(), modelinfo->GetModelName( GetModel() ) );
+		Warning( "%s has Door model (%s) with no door_options! Verify that SKIN is valid, and has a corresponding options block in the model QC file\n", GetDebugName(), modelinfo->GetModelName(GetEngineObject()->GetModel() ) );
 		VPhysicsGetObject()->SetMaterialIndex( physprops->GetSurfaceIndex("wood") );
 	}
 
@@ -4638,7 +4638,7 @@ bool CBasePropDoor::TestCollision( const Ray_t &ray, unsigned int mask, trace_t&
 	if ( !VPhysicsGetObject() )
 		return false;
 
-	IStudioHdr *pStudioHdr = GetModelPtr( );
+	IStudioHdr *pStudioHdr = GetEngineObject()->GetModelPtr( );
 	if (!pStudioHdr)
 		return false;
 

@@ -148,16 +148,16 @@ C_HL2MP_Player* C_HL2MP_Player::GetLocalHL2MPPlayer()
 
 void C_HL2MP_Player::Initialize( void )
 {
-	m_headYawPoseParam = LookupPoseParameter( "head_yaw" );
-	GetPoseParameterRange( m_headYawPoseParam, m_headYawMin, m_headYawMax );
+	m_headYawPoseParam = GetEngineObject()->LookupPoseParameter( "head_yaw" );
+	GetEngineObject()->GetPoseParameterRange( m_headYawPoseParam, m_headYawMin, m_headYawMax );
 
-	m_headPitchPoseParam = LookupPoseParameter( "head_pitch" );
-	GetPoseParameterRange( m_headPitchPoseParam, m_headPitchMin, m_headPitchMax );
+	m_headPitchPoseParam = GetEngineObject()->LookupPoseParameter( "head_pitch" );
+	GetEngineObject()->GetPoseParameterRange( m_headPitchPoseParam, m_headPitchMin, m_headPitchMax );
 
-	IStudioHdr *hdr = GetModelPtr();
+	IStudioHdr *hdr = GetEngineObject()->GetModelPtr();
 	for ( int i = 0; i < hdr->GetNumPoseParameters() ; i++ )
 	{
-		SetPoseParameter( hdr, i, 0.0 );
+		GetEngineObject()->SetPoseParameter( hdr, i, 0.0 );
 	}
 }
 
@@ -213,7 +213,7 @@ void C_HL2MP_Player::UpdateLookAt( void )
 	m_flCurrentHeadYaw = AngleNormalize( m_flCurrentHeadYaw - flBodyYawDiff );
 	desired = clamp( desired, m_headYawMin, m_headYawMax );
 	
-	SetPoseParameter( m_headYawPoseParam, m_flCurrentHeadYaw );
+	GetEngineObject()->SetPoseParameter( m_headYawPoseParam, m_flCurrentHeadYaw );
 
 	
 	// Set the head's yaw.
@@ -222,7 +222,7 @@ void C_HL2MP_Player::UpdateLookAt( void )
 	
 	m_flCurrentHeadPitch = ApproachAngle( desired, m_flCurrentHeadPitch, 130 * gpGlobals->frametime );
 	m_flCurrentHeadPitch = AngleNormalize( m_flCurrentHeadPitch );
-	SetPoseParameter( m_headPitchPoseParam, m_flCurrentHeadPitch );
+	GetEngineObject()->SetPoseParameter( m_headPitchPoseParam, m_flCurrentHeadPitch );
 }
 
 void C_HL2MP_Player::ClientThink( void )
@@ -862,8 +862,8 @@ void C_HL2MPRagdoll::CreateHL2MPRagdoll( void )
 			GetEngineObject()->GetRotationInterpolator().Reset();
 
 			GetEngineObject()->SetAnimTime(pPlayer->GetEngineObject()->GetAnimTime());
-			SetSequence( pPlayer->GetSequence() );
-			m_flPlaybackRate = pPlayer->GetPlaybackRate();
+			GetEngineObject()->SetSequence( pPlayer->GetEngineObject()->GetSequence() );
+			GetEngineObject()->SetPlaybackRate(pPlayer->GetEngineObject()->GetPlaybackRate());
 		}
 		else
 		{
@@ -875,15 +875,15 @@ void C_HL2MPRagdoll::CreateHL2MPRagdoll( void )
 
 			GetEngineObject()->SetAbsVelocity( m_vecRagdollVelocity );
 
-			int iSeq = pPlayer->GetSequence();
+			int iSeq = pPlayer->GetEngineObject()->GetSequence();
 			if ( iSeq == -1 )
 			{
 				Assert( false );	// missing walk_lower?
 				iSeq = 0;
 			}
 			
-			SetSequence( iSeq );	// walk_lower, basic pose
-			SetCycle( 0.0 );
+			GetEngineObject()->SetSequence( iSeq );	// walk_lower, basic pose
+			GetEngineObject()->SetCycle( 0.0 );
 
 			GetEngineObject()->Interp_Reset();
 		}		
@@ -956,7 +956,7 @@ void C_HL2MPRagdoll::SetupWeights( const matrix3x4_t *pBoneToWorld, int nFlexWei
 	static float destweight[128];
 	static bool bIsInited = false;
 
-	IStudioHdr *hdr = GetModelPtr();
+	IStudioHdr *hdr = GetEngineObject()->GetModelPtr();
 	if ( !hdr )
 		return;
 
@@ -975,7 +975,7 @@ void C_HL2MPRagdoll::SetupWeights( const matrix3x4_t *pBoneToWorld, int nFlexWei
 			Vector local, tmp;
 			local.Init( 1000.0f, 0.0f, 0.0f );
 			VectorTransform( local, attToWorld, tmp );
-			modelrender->SetViewTarget( GetModelPtr(), GetBody(), tmp );
+			modelrender->SetViewTarget(GetEngineObject()->GetModelPtr(), GetBody(), tmp );
 		}
 	}
 }

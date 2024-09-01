@@ -148,9 +148,9 @@ void CBaseCSGrenade::PrimaryAttack()
 
 	// Don't let weapon idle interfere in the middle of a throw!
 	MDLCACHE_CRITICAL_SECTION();
-	SetWeaponIdleTime( gpGlobals->curtime + SequenceDuration() );
+	SetWeaponIdleTime( gpGlobals->curtime + GetEngineObject()->SequenceDuration() );
 
-	m_flNextPrimaryAttack	= gpGlobals->curtime + SequenceDuration();
+	m_flNextPrimaryAttack	= gpGlobals->curtime + GetEngineObject()->SequenceDuration();
 }
 
 //-----------------------------------------------------------------------------
@@ -179,9 +179,9 @@ void CBaseCSGrenade::SecondaryAttack()
 	}
 
 	// Don't let weapon idle interfere in the middle of a throw!
-	SetWeaponIdleTime( gpGlobals->curtime + SequenceDuration() );
+	SetWeaponIdleTime( gpGlobals->curtime + GetEngineObject()->SequenceDuration() );
 
-	m_flNextSecondaryAttack	= gpGlobals->curtime + SequenceDuration();
+	m_flNextSecondaryAttack	= gpGlobals->curtime + GetEngineObject()->SequenceDuration();
 }
 
 //-----------------------------------------------------------------------------
@@ -196,10 +196,10 @@ bool CBaseCSGrenade::Reload()
 		SendWeaponAnim( ACT_VM_DRAW );
 
 		//Update our times
-		m_flNextPrimaryAttack	= gpGlobals->curtime + SequenceDuration();
-		m_flNextSecondaryAttack	= gpGlobals->curtime + SequenceDuration();
+		m_flNextPrimaryAttack	= gpGlobals->curtime + GetEngineObject()->SequenceDuration();
+		m_flNextSecondaryAttack	= gpGlobals->curtime + GetEngineObject()->SequenceDuration();
 
-		SetWeaponIdleTime( gpGlobals->curtime + SequenceDuration() );
+		SetWeaponIdleTime( gpGlobals->curtime + GetEngineObject()->SequenceDuration() );
 		
 		//Mark this as done
 	//	m_bRedraw = false;
@@ -231,9 +231,9 @@ void CBaseCSGrenade::ItemPostFrame()
 		MDLCACHE_CRITICAL_SECTION();
 		m_bPinPulled = false;
 		SendWeaponAnim( ACT_VM_THROW );	
-		SetWeaponIdleTime( gpGlobals->curtime + SequenceDuration() );
+		SetWeaponIdleTime( gpGlobals->curtime + GetEngineObject()->SequenceDuration() );
 
-		m_flNextPrimaryAttack	= gpGlobals->curtime + SequenceDuration(); // we're still throwing, so reset our next primary attack
+		m_flNextPrimaryAttack	= gpGlobals->curtime + GetEngineObject()->SequenceDuration(); // we're still throwing, so reset our next primary attack
 
 #ifndef CLIENT_DLL
 		IGameEvent * event = gameeventmanager->CreateEvent( "weapon_fire" );

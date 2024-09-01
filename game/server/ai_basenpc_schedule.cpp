@@ -827,7 +827,7 @@ void CAI_BaseNPC::MaintainSchedule ( void )
 		if (!GetNavigator()->IsGoalActive() && 
 			m_nDebugCurIndex >= CAI_BaseNPC::m_nDebugPauseIndex)
 		{
-			m_flPlaybackRate = 0;
+			GetEngineObject()->SetPlaybackRate(0);
 		}
 	}
 }
@@ -1209,12 +1209,12 @@ void CAI_BaseNPC::StartTask( const Task_t *pTask )
 
 	case TASK_RANDOMIZE_FRAMERATE:
 		{
-			float newRate = GetPlaybackRate();
+			float newRate = GetEngineObject()->GetPlaybackRate();
 			float percent = pTask->flTaskData / 100.0f;
 
 			newRate += ( newRate * random->RandomFloat(-percent, percent) );
 
-			SetPlaybackRate(newRate);
+			GetEngineObject()->SetPlaybackRate(newRate);
 
 			TaskComplete();
 		}
@@ -1376,7 +1376,7 @@ void CAI_BaseNPC::StartTask( const Task_t *pTask )
 			// E3 Hack
 			if  ( HasPoseMoveYaw() ) 
 			{
-				SetPoseParameter( m_poseMove_Yaw, 0 );
+				GetEngineObject()->SetPoseParameter( m_poseMove_Yaw, 0 );
 			}
 		}
 		else
@@ -2802,7 +2802,7 @@ void CAI_BaseNPC::StartTask( const Task_t *pTask )
 			// won't be able to resume them after the sequence.
 			GetNavigator()->IgnoreStoppingPath();
 
-			if ( HasMovement( GetSequence() ) || m_hCine->m_bIgnoreGravity )
+			if (GetEngineObject()->HasMovement(GetEngineObject()->GetSequence() ) || m_hCine->m_bIgnoreGravity )
 			{
 				GetEngineObject()->AddFlag( FL_FLY );
 				GetEngineObject()->SetGroundEntity( NULL );
@@ -2860,7 +2860,7 @@ void CAI_BaseNPC::StartTask( const Task_t *pTask )
 				m_hCine->StartSequence( ( CAI_BaseNPC * )this, m_hCine->m_iszPreIdle, false );
 				if ( FStrEq( STRING( m_hCine->m_iszPreIdle ), STRING( m_hCine->m_iszPlay ) ) )
 				{
-					m_flPlaybackRate = 0;
+					GetEngineObject()->SetPlaybackRate(0);
 				}
 			}
 			else if ( m_scriptState != SCRIPT_CUSTOM_MOVE_TO_MARK )
@@ -3059,7 +3059,7 @@ void CAI_BaseNPC::StartTask( const Task_t *pTask )
 		break;
 
 	case TASK_FREEZE:
-		m_flPlaybackRate = 0;
+		GetEngineObject()->SetPlaybackRate(0);
 		break;
 
 	case TASK_GATHER_CONDITIONS:
@@ -3126,7 +3126,7 @@ void CAI_BaseNPC::RunDieTask()
 {
 	AutoMovement();
 
-	if ( IsActivityFinished() && GetCycle() >= 1.0f )
+	if ( IsActivityFinished() && GetEngineObject()->GetCycle() >= 1.0f )
 	{
 		m_lifeState = LIFE_DEAD;
 		
@@ -3899,7 +3899,7 @@ void CAI_BaseNPC::RunTask( const Task_t *pTask )
 					ClearSchedule( "Waiting for script, but lost script!" );
 				}
 
-				m_flPlaybackRate = 1.0;
+				GetEngineObject()->SetPlaybackRate(1.0);
 				//DevMsg( 2, "Script %s has begun for %s\n", STRING( m_hCine->m_iszPlay ), GetClassname() );
 			}
 			else if (!m_hCine)
@@ -3924,7 +3924,7 @@ void CAI_BaseNPC::RunTask( const Task_t *pTask )
 			//
 			AutoMovement( );
 
-			if ( IsSequenceFinished() )
+			if (GetEngineObject()->IsSequenceFinished() )
 			{
 				// Check to see if we are done with the action sequence.
 				if ( m_hCine->FinishedActionSequence( this ) )
@@ -3968,7 +3968,7 @@ void CAI_BaseNPC::RunTask( const Task_t *pTask )
 			//
 			// Playing a scripted post idle sequence. Quit early if another sequence has grabbed the NPC.
 			//
-			if ( IsSequenceFinished() || ( m_hCine->m_hNextCine != NULL ) )
+			if (GetEngineObject()->IsSequenceFinished() || ( m_hCine->m_hNextCine != NULL ) )
 			{
 				m_hCine->PostIdleDone( this );
 			}
@@ -4663,7 +4663,7 @@ void CAI_BaseNPC::PlayFlinchGesture()
 
 		if ( iSequence != ACT_INVALID )
 		{
-			flNextFlinch += SequenceDuration( iSequence );
+			flNextFlinch += GetEngineObject()->SequenceDuration( iSequence );
 		}
 
 		m_flNextFlinchTime = gpGlobals->curtime + flNextFlinch;

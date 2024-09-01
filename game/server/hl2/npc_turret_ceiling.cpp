@@ -132,7 +132,7 @@ public:
 	Vector	EyeOffset( Activity nActivity ) 
 	{
 		Vector vecEyeOffset(0,0,-64);
-		GetModelPtr()->GetEyePosition( vecEyeOffset );
+		GetEngineObject()->GetModelPtr()->GetEyePosition( vecEyeOffset );
 		return vecEyeOffset;
 	}
 
@@ -298,8 +298,8 @@ void CNPC_CeilingTurret::Spawn( void )
 	GetEngineObject()->AddFlag( FL_AIMTARGET );
 	GetEngineObject()->AddEFlags( EFL_NO_DISSOLVE );
 
-	SetPoseParameter( m_poseAim_Yaw, 0 );
-	SetPoseParameter( m_poseAim_Pitch, 0 );
+	GetEngineObject()->SetPoseParameter( m_poseAim_Yaw, 0 );
+	GetEngineObject()->SetPoseParameter( m_poseAim_Pitch, 0 );
 
 	m_iAmmoType = GetAmmoDef()->Index( "AR2" );
 
@@ -478,7 +478,7 @@ void CNPC_CeilingTurret::Deploy( void )
 
 		m_flShotTime  = gpGlobals->curtime + 1.0f;
 
-		m_flPlaybackRate = 0;
+		GetEngineObject()->SetPlaybackRate(0);
 		SetThink( &CNPC_CeilingTurret::SearchThink );
 
 		const char* soundname = "NPC_CeilingTurret.Move";
@@ -557,7 +557,7 @@ bool CNPC_CeilingTurret::UpdateFacing( void )
 	// Update pitch
 	float flDiff = AngleNormalize( UTIL_ApproachAngle(  vecGoalLocalAngles.x, 0.0, 0.1f * MaxYawSpeed() ) );
 	
-	SetPoseParameter( m_poseAim_Pitch, GetPoseParameter( m_poseAim_Pitch ) + ( flDiff / 1.5f ) );
+	GetEngineObject()->SetPoseParameter( m_poseAim_Pitch, GetEngineObject()->GetPoseParameter( m_poseAim_Pitch ) + ( flDiff / 1.5f ) );
 
 	if ( fabs( flDiff ) > 0.1f )
 	{
@@ -567,7 +567,7 @@ bool CNPC_CeilingTurret::UpdateFacing( void )
 	// Update yaw
 	flDiff = AngleNormalize( UTIL_ApproachAngle(  vecGoalLocalAngles.y, 0.0, 0.1f * MaxYawSpeed() ) );
 
-	SetPoseParameter( m_poseAim_Yaw, GetPoseParameter( m_poseAim_Yaw ) + ( flDiff / 1.5f ) );
+	GetEngineObject()->SetPoseParameter( m_poseAim_Yaw, GetEngineObject()->GetPoseParameter( m_poseAim_Yaw ) + ( flDiff / 1.5f ) );
 
 	if ( fabs( flDiff ) > 0.1f )
 	{
@@ -1158,7 +1158,7 @@ void CNPC_CeilingTurret::DeathThink( void )
 	{
 		SetHeight( CEILING_TURRET_RETRACT_HEIGHT );
 
-		m_flPlaybackRate = 0;
+		GetEngineObject()->SetPlaybackRate(0);
 		SetThink( NULL );
 	}
 }

@@ -1337,7 +1337,7 @@ void CProp_Portal::Touch( CBaseEntity *pOther )
 
 	if( vVelocityCheck != vec3_origin || vAngularImpulseCheck != vec3_origin )
 	{
-		if ( modelinfo->GetModelType( pOther->GetModel() ) == mod_brush )
+		if ( modelinfo->GetModelType( pOther->GetEngineObject()->GetModel() ) == mod_brush )
 		{
 			if ( !FClassnameIs( pOther, "func_physbox" ) && !FClassnameIs( pOther, "simple_physics_brush" ) )	// except CPhysBox
 			{

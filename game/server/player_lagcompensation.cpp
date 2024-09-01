@@ -311,8 +311,8 @@ void CLagCompensationManager::FrameUpdatePostEntityThink()
 				record.m_layerRecords[layerIndex].m_weight = currentLayer->m_flWeight;
 			}
 		}
-		record.m_masterSequence = pPlayer->GetSequence();
-		record.m_masterCycle = pPlayer->GetCycle();
+		record.m_masterSequence = pPlayer->GetEngineObject()->GetSequence();
+		record.m_masterCycle = pPlayer->GetEngineObject()->GetCycle();
 	}
 
 	//Clear the current player.
@@ -616,8 +616,8 @@ void CLagCompensationManager::BacktrackPlayer( CBasePlayer *pPlayer, float flTar
 	// standing still, but you breathe even on the server.
 	// This is quicker than actually comparing all bazillion floats.
 	flags |= LC_ANIMATION_CHANGED;
-	restore->m_masterSequence = pPlayer->GetSequence();
-	restore->m_masterCycle = pPlayer->GetCycle();
+	restore->m_masterSequence = pPlayer->GetEngineObject()->GetSequence();
+	restore->m_masterCycle = pPlayer->GetEngineObject()->GetCycle();
 
 	bool interpolationAllowed = false;
 	if( prevRecord && (record->m_masterSequence == prevRecord->m_masterSequence) )
@@ -632,25 +632,25 @@ void CLagCompensationManager::BacktrackPlayer( CBasePlayer *pPlayer, float flTar
 	if( frac > 0.0f && interpolationAllowed )
 	{
 		interpolatedMasters = true;
-		pPlayer->SetSequence( Lerp( frac, record->m_masterSequence, prevRecord->m_masterSequence ) );
-		pPlayer->SetCycle( Lerp( frac, record->m_masterCycle, prevRecord->m_masterCycle ) );
+		pPlayer->GetEngineObject()->SetSequence( Lerp( frac, record->m_masterSequence, prevRecord->m_masterSequence ) );
+		pPlayer->GetEngineObject()->SetCycle( Lerp( frac, record->m_masterCycle, prevRecord->m_masterCycle ) );
 
 		if( record->m_masterCycle > prevRecord->m_masterCycle )
 		{
 			// the older record is higher in frame than the newer, it must have wrapped around from 1 back to 0
 			// add one to the newer so it is lerping from .9 to 1.1 instead of .9 to .1, for example.
 			float newCycle = Lerp( frac, record->m_masterCycle, prevRecord->m_masterCycle + 1 );
-			pPlayer->SetCycle(newCycle < 1 ? newCycle : newCycle - 1 );// and make sure .9 to 1.2 does not end up 1.05
+			pPlayer->GetEngineObject()->SetCycle(newCycle < 1 ? newCycle : newCycle - 1 );// and make sure .9 to 1.2 does not end up 1.05
 		}
 		else
 		{
-			pPlayer->SetCycle( Lerp( frac, record->m_masterCycle, prevRecord->m_masterCycle ) );
+			pPlayer->GetEngineObject()->SetCycle( Lerp( frac, record->m_masterCycle, prevRecord->m_masterCycle ) );
 		}
 	}
 	if( !interpolatedMasters )
 	{
-		pPlayer->SetSequence(record->m_masterSequence);
-		pPlayer->SetCycle(record->m_masterCycle);
+		pPlayer->GetEngineObject()->SetSequence(record->m_masterSequence);
+		pPlayer->GetEngineObject()->SetCycle(record->m_masterCycle);
 	}
 
 	////////////////////////
@@ -806,8 +806,8 @@ void CLagCompensationManager::FinishLagCompensation( CBasePlayer *player )
 		{
 			restoreSimulationTime = true;
 
-			pPlayer->SetSequence(restore->m_masterSequence);
-			pPlayer->SetCycle(restore->m_masterCycle);
+			pPlayer->GetEngineObject()->SetSequence(restore->m_masterSequence);
+			pPlayer->GetEngineObject()->SetCycle(restore->m_masterCycle);
 
 			int layerCount = pPlayer->GetNumAnimOverlays();
 			for( int layerIndex = 0; layerIndex < layerCount; ++layerIndex )

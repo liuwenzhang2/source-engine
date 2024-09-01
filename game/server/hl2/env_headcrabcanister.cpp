@@ -759,7 +759,7 @@ void CEnvHeadcrabCanister::StartSpawningHeadcrabs( float flDelay )
 //-----------------------------------------------------------------------------
 void CEnvHeadcrabCanister::CanisterFinishedOpening( void )
 {
-	ResetSequence( LookupSequence( "idle_open" ) );
+	GetEngineObject()->ResetSequence( LookupSequence( "idle_open" ) );
 	m_OnOpened.FireOutput( this, this, 0 );
 	m_bOpened = true;
 	SetContextThink( NULL, gpGlobals->curtime, s_pOpenThinkContext );
@@ -780,7 +780,7 @@ void CEnvHeadcrabCanister::CanisterFinishedOpening( void )
 void CEnvHeadcrabCanister::WaitForOpenSequenceThink()
 {
 	StudioFrameAdvance();
-	if ( ( GetSequence() == LookupSequence( "open" ) ) && IsSequenceFinished() )
+	if ( (GetEngineObject()->GetSequence() == LookupSequence( "open" ) ) && GetEngineObject()->IsSequenceFinished() )
 	{
 		CanisterFinishedOpening();
 	}
@@ -812,7 +812,7 @@ void CEnvHeadcrabCanister::OpenCanister( void )
 		params.m_bWarnOnDirectWaveReference = true;
 		g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 
-		ResetSequence( nOpenSequence );
+		GetEngineObject()->ResetSequence( nOpenSequence );
 		SetContextThink( &CEnvHeadcrabCanister::WaitForOpenSequenceThink, gpGlobals->curtime + 0.01f, s_pOpenThinkContext );
 	}
 	else

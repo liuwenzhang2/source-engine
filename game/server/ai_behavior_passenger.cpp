@@ -543,7 +543,7 @@ bool CAI_PassengerBehavior::GetExitPoint( int nSequence, Vector *vecExitPoint, Q
 	// Get the delta to the final position as will be dictated by this animation's auto movement
 	Vector vecDeltaPos;
 	QAngle vecDeltaAngles;
-	GetOuter()->GetSequenceMovement( nSequence, 0.0f, 1.0f, vecDeltaPos, vecDeltaAngles );
+	GetOuter()->GetEngineObject()->GetSequenceMovement( nSequence, 0.0f, 1.0f, vecDeltaPos, vecDeltaAngles );
 
 	// Rotate the delta position by our starting angles
 	Vector vecRotPos = vecDeltaPos;
@@ -783,7 +783,7 @@ bool CAI_PassengerBehavior::GetEntryPoint( int nSequence, Vector *vecEntryPoint,
 	// Get the delta to the final position as will be dictated by this animation's auto movement
 	Vector vecDeltaPos;
 	QAngle vecDeltaAngles;
-	GetOuter()->GetSequenceMovement( nSequence, 1.0f, 0.0f, vecDeltaPos, vecDeltaAngles );
+	GetOuter()->GetEngineObject()->GetSequenceMovement( nSequence, 1.0f, 0.0f, vecDeltaPos, vecDeltaAngles );
 
 	// Get the final position we're trying to end up at
 	Vector vecTargetPos;
@@ -1072,7 +1072,7 @@ void CAI_PassengerBehavior::GetTransitionAnimationIdeal( float flCycle, const Ve
 	// Get the position in time working backwards from our goal
 	Vector vecDeltaPos;
 	QAngle vecDeltaAngles;
-	GetOuter()->GetSequenceMovement( GetSequence(), 1.0f, flCycle, vecDeltaPos, vecDeltaAngles );
+	GetOuter()->GetEngineObject()->GetSequenceMovement( GetSequence(), 1.0f, flCycle, vecDeltaPos, vecDeltaAngles );
 
 	// Rotate the delta by our local angles
 	Vector vecPreDelta = vecDeltaPos;
@@ -1100,7 +1100,7 @@ void CAI_PassengerBehavior::GetTransitionAnimationIdeal( float flCycle, const Ve
 //-----------------------------------------------------------------------------
 bool CAI_PassengerBehavior::LocalIntervalMovement( float flInterval, bool &bMoveSeqFinished, Vector &newPosition, QAngle &newAngles )
 {
-	IStudioHdr *pstudiohdr = GetOuter()->GetModelPtr();
+	IStudioHdr *pstudiohdr = GetOuter()->GetEngineObject()->GetModelPtr();
 	if ( pstudiohdr == NULL )
 		return false;
 
@@ -1108,9 +1108,9 @@ bool CAI_PassengerBehavior::LocalIntervalMovement( float flInterval, bool &bMove
 	float flNextCycle = GetNextCycleForInterval( GetSequence(), flInterval );
 
 	// Fix-up loops
-	if ( ( GetOuter()->SequenceLoops() == false ) && flNextCycle > 1.0f )
+	if ( ( GetOuter()->GetEngineObject()->SequenceLoops() == false ) && flNextCycle > 1.0f )
 	{
-		flInterval = GetOuter()->GetCycle() / ( GetOuter()->GetSequenceCycleRate( GetSequence() ) * GetOuter()->GetPlaybackRate() );
+		flInterval = GetOuter()->GetEngineObject()->GetCycle() / ( GetOuter()->GetEngineObject()->GetSequenceCycleRate( GetSequence() ) * GetOuter()->GetEngineObject()->GetPlaybackRate() );
 		flNextCycle = 1.0f;
 		bMoveSeqFinished = true;
 	}
@@ -1123,7 +1123,7 @@ bool CAI_PassengerBehavior::LocalIntervalMovement( float flInterval, bool &bMove
 	QAngle deltaAngles;
 
 	// Find the delta position and delta angles for this sequence
-	if (pstudiohdr->Studio_SeqMovement( GetOuter()->GetSequence(), GetOuter()->GetCycle(), flNextCycle, GetOuter()->GetPoseParameterArray(), deltaPos, deltaAngles ))
+	if (pstudiohdr->Studio_SeqMovement( GetOuter()->GetEngineObject()->GetSequence(), GetOuter()->GetEngineObject()->GetCycle(), flNextCycle, GetOuter()->GetEngineObject()->GetPoseParameterArray(), deltaPos, deltaAngles ))
 	{
 		Vector vecPreDelta = deltaPos;
 		VectorRotate( vecPreDelta, GetOuter()->GetEngineObject()->GetLocalAngles(), deltaPos );
@@ -1149,7 +1149,7 @@ bool CAI_PassengerBehavior::LocalIntervalMovement( float flInterval, bool &bMove
 //-----------------------------------------------------------------------------
 float CAI_PassengerBehavior::GetNextCycleForInterval( int nSequence, float flInterval )
 {
-	return GetOuter()->GetCycle() + flInterval * GetOuter()->GetSequenceCycleRate( GetSequence() ) * GetOuter()->GetPlaybackRate();
+	return GetOuter()->GetEngineObject()->GetCycle() + flInterval * GetOuter()->GetEngineObject()->GetSequenceCycleRate( GetSequence() ) * GetOuter()->GetEngineObject()->GetPlaybackRate();
 }
 
 //-----------------------------------------------------------------------------
@@ -1201,7 +1201,7 @@ bool CAI_PassengerBehavior::DoTransitionMovement( void )
 		// Get the position we'd ideally be in
 		Vector vecIdealPos;
 		QAngle vecIdealAngles;
-		float flNextCycle = GetNextCycleForInterval( GetOuter()->GetSequence(), flInterval );
+		float flNextCycle = GetNextCycleForInterval( GetOuter()->GetEngineObject()->GetSequence(), flInterval );
 		flNextCycle = clamp( flNextCycle, 0.0f, 1.0f );
 		GetTransitionAnimationIdeal( flNextCycle, m_vecTargetPosition, m_vecTargetAngles, &vecIdealPos, &vecIdealAngles );
 
@@ -1509,7 +1509,7 @@ void CAI_PassengerBehavior::CacheBlendTargets( void )
 	}
 
 	// Find our frame range on this sequence
-	int nMaxFrames = GetOuter()->GetModelPtr()->Studio_MaxFrame( m_nTransitionSequence, GetOuter()->GetPoseParameterArray() );
+	int nMaxFrames = GetOuter()->GetEngineObject()->GetModelPtr()->Studio_MaxFrame( m_nTransitionSequence, GetOuter()->GetEngineObject()->GetPoseParameterArray() );
 
 	// Find a key by this name
 	KeyValues *subKeys = blendValues->FindKey( ORIGIN_KEYNAME );

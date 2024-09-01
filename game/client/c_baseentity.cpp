@@ -612,7 +612,6 @@ void C_BaseEntity::Clear( void )
 	m_AimEntsListHandle = INVALID_AIMENTS_LIST_HANDLE;
 
 	//index = -1;
-	m_pModel = NULL;
 	if (entindex() >= 0) {
 		GetEngineObject()->SetLocalOrigin(vec3_origin);
 		GetEngineObject()->SetLocalAngles(vec3_angle);
@@ -644,8 +643,9 @@ void C_BaseEntity::Clear( void )
 	// Do not enable this on all entities. It forces bone setup for entities that
 	// don't need it.
 	//AddEFlags( EFL_USE_PARTITION_WHEN_NOT_SOLID );
-
-	UpdateVisibility();
+	if (entindex() >= 0) {
+		UpdateVisibility();
+	}
 }
 
 //-----------------------------------------------------------------------------
@@ -1272,18 +1272,6 @@ void C_BaseEntity::GetShadowRenderBounds( Vector &mins, Vector &maxs, ShadowType
 	m_EntClientFlags &= ~ENTCLIENTFLAG_GETTINGSHADOWRENDERBOUNDS;
 }
 
-void C_BaseEntity::SetModelPointer( const model_t *pModel )
-{
-	if (m_pModel != pModel)
-	{
-		DestroyModelInstance();
-		m_pModel = pModel;
-		OnNewModel();
-
-		UpdateVisibility();
-	}
-}
-
 bool C_BaseEntity::IsTwoPass( void )
 {
 	return modelinfo->IsTranslucentTwoPass( GetModel() );
@@ -1303,10 +1291,10 @@ bool C_BaseEntity::UsesFullFrameBufferTexture()
 // Purpose: Get pointer to CMouthInfo data
 // Output : CMouthInfo
 //-----------------------------------------------------------------------------
-CMouthInfo *C_BaseEntity::GetMouth( void )
-{
-	return NULL;
-}
+//CMouthInfo *C_BaseEntity::GetMouth( void )
+//{
+//	return NULL;
+//}
 
 
 //-----------------------------------------------------------------------------

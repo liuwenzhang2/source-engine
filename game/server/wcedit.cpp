@@ -499,7 +499,7 @@ void NWCEdit::UpdateEntityPosition( CBaseEntity *pEntity )
 	EditorSendResult_t result = Editor_BadCommand;
 	const char *pClassname = STRING(g_EntityClassnames[entIndex]);
 
-	if ( pEntity->GetModel() && modelinfo->GetModelType(pEntity->GetModel()) == mod_brush )
+	if ( pEntity->GetEngineObject()->GetModel() && modelinfo->GetModelType(pEntity->GetEngineObject()->GetModel()) == mod_brush )
 	{
 		QAngle xformAngles;
 		RotationDelta( g_EntityOrientations[entIndex], newAng, &xformAngles );

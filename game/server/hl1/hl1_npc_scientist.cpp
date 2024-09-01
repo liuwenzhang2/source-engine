@@ -123,7 +123,7 @@ void CNPC_Scientist::TalkInit()
 	m_szFriends[2] = "monster_barney";
 
 	// get voice for head
-	switch (m_nBody % 3)
+	switch (GetEngineObject()->GetBody() % 3)
 	{
 	default:
 	case HEAD_GLASSES:	GetExpresser()->SetVoicePitch( 105 );	break;	//glasses
@@ -142,8 +142,8 @@ void CNPC_Scientist::Spawn( void )
 {
 
 	//Select the body first if it's going to be random cause we set his voice pitch in Precache.
-	if ( m_nBody == -1 )
-		 m_nBody = random->RandomInt( 0, NUM_SCIENTIST_HEADS-1 );// pick a head, any head
+	if (GetEngineObject()->GetBody() == -1)
+		GetEngineObject()->SetBody(random->RandomInt( 0, NUM_SCIENTIST_HEADS-1 ));// pick a head, any head
 	
 
 	SetRenderColor( 255, 255, 255, 255 );
@@ -169,12 +169,12 @@ void CNPC_Scientist::Spawn( void )
 	CapabilitiesAdd( bits_CAP_TURN_HEAD | bits_CAP_ANIMATEDFACE );
 
 	// White hands
-	m_nSkin = 0;
+	GetEngineObject()->SetSkin(0);
 
 	
 	// Luther is black, make his hands black
-	if ( m_nBody == HEAD_LUTHER )
-		 m_nSkin = 1;
+	if (GetEngineObject()->GetBody() == HEAD_LUTHER)
+		GetEngineObject()->SetSkin(1);
 	
 	NPCInit();
 
@@ -223,14 +223,14 @@ void CNPC_Scientist::HandleAnimEvent( animevent_t *pEvent )
 		break;
 	case SCIENTIST_AE_NEEDLEON:
 	{
-		int oldBody = m_nBody;
-		m_nBody = (oldBody % NUM_SCIENTIST_HEADS) + NUM_SCIENTIST_HEADS * 1;
+		int oldBody = GetEngineObject()->GetBody();
+		GetEngineObject()->SetBody((oldBody % NUM_SCIENTIST_HEADS) + NUM_SCIENTIST_HEADS * 1);
 	}
 		break;
 	case SCIENTIST_AE_NEEDLEOFF:
 	{
-		int oldBody = m_nBody;
-		m_nBody = (oldBody % NUM_SCIENTIST_HEADS) + NUM_SCIENTIST_HEADS * 0;
+		int oldBody = GetEngineObject()->GetBody();
+		GetEngineObject()->SetBody((oldBody % NUM_SCIENTIST_HEADS) + NUM_SCIENTIST_HEADS * 0);
 	}
 		break;
 
@@ -465,7 +465,7 @@ void CNPC_Scientist::RunTask( const Task_t *pTask )
 		break;
 
 	case TASK_HEAL:
-		if ( IsSequenceFinished() )
+		if (GetEngineObject()->IsSequenceFinished() )
 		{
 			TaskComplete();
 		}
@@ -915,24 +915,24 @@ void CNPC_DeadScientist::Spawn( void )
 	SetModel( "models/scientist.mdl" );
 	
 	GetEngineObject()->ClearEffects();
-	SetSequence( 0 );
+	GetEngineObject()->SetSequence( 0 );
 	m_bloodColor		= BLOOD_COLOR_RED;
 
 	SetRenderColor( 255, 255, 255, 255 );
 
-	if ( m_nBody == -1 )
+	if (GetEngineObject()->GetBody() == -1)
 	{// -1 chooses a random head
-		m_nBody = random->RandomInt( 0, NUM_SCIENTIST_HEADS-1);// pick a head, any head
+		GetEngineObject()->SetBody(random->RandomInt( 0, NUM_SCIENTIST_HEADS-1));// pick a head, any head
 	}
 	// Luther is black, make his hands black
-	if ( m_nBody == HEAD_LUTHER )
-		m_nSkin = 1;
+	if (GetEngineObject()->GetBody() == HEAD_LUTHER)
+		GetEngineObject()->SetSkin(1);
 	else
-		m_nSkin = 0;
+		GetEngineObject()->SetSkin(0);
 
-	SetSequence( LookupSequence( m_szPoses[m_iPose] ) );
+	GetEngineObject()->SetSequence( LookupSequence( m_szPoses[m_iPose] ) );
 
-	if ( GetSequence() == -1)
+	if (GetEngineObject()->GetSequence() == -1)
 	{
 		Msg ( "Dead scientist with bad pose\n" );
 	}
@@ -1009,13 +1009,13 @@ void CNPC_SittingScientist::Spawn( )
 
 	GetEngineObject()->AddSpawnFlags(SF_NPC_PREDISASTER); // predisaster only!
 
-	if ( m_nBody == -1 )
+	if (GetEngineObject()->GetBody() == -1)
 	{// -1 chooses a random head
-		m_nBody = random->RandomInt( 0, NUM_SCIENTIST_HEADS-1 );// pick a head, any head
+		GetEngineObject()->SetBody(random->RandomInt( 0, NUM_SCIENTIST_HEADS-1 ));// pick a head, any head
 	}
 	// Luther is black, make his hands black
-	if ( m_nBody == HEAD_LUTHER )
-		 m_nBody = 1;
+	if (GetEngineObject()->GetBody() == HEAD_LUTHER)
+		GetEngineObject()->SetBody(1);
 	
 	UTIL_DropToFloor( this,MASK_SOLID );
 
@@ -1025,8 +1025,8 @@ void CNPC_SittingScientist::Spawn( )
 	GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.1f );
 
 	m_baseSequence = LookupSequence( "sitlookleft" );
-	SetSequence( m_baseSequence + random->RandomInt(0,4) );
-	ResetSequenceInfo( );
+	GetEngineObject()->SetSequence( m_baseSequence + random->RandomInt(0,4) );
+	GetEngineObject()->ResetSequenceInfo( );
 }
 
 void CNPC_SittingScientist::Precache( void )
@@ -1067,18 +1067,18 @@ void CNPC_SittingScientist::SittingThink( void )
 			if (yaw < -180) yaw += 360;
 				
 			if (yaw > 0)
-				SetSequence( m_baseSequence + SITTING_ANIM_sitlookleft );
+				GetEngineObject()->SetSequence( m_baseSequence + SITTING_ANIM_sitlookleft );
 			else
-				SetSequence ( m_baseSequence + SITTING_ANIM_sitlookright );
+				GetEngineObject()->SetSequence ( m_baseSequence + SITTING_ANIM_sitlookright );
 		
-			ResetSequenceInfo( );
-			SetCycle( 0 );
-			SetBoneController( 0, 0 );
+			GetEngineObject()->ResetSequenceInfo( );
+			GetEngineObject()->SetCycle( 0 );
+			GetEngineObject()->SetBoneController( 0, 0 );
 
 			GetExpresser()->Speak( TLK_HELLO );
 		}
 	}
-	else if ( IsSequenceFinished() )
+	else if (GetEngineObject()->IsSequenceFinished() )
 	{
 		int i = random->RandomInt(0,99);
 		m_iHeadTurn = 0;
@@ -1087,12 +1087,12 @@ void CNPC_SittingScientist::SittingThink( void )
 		{
 			// respond to question
 			GetExpresser()->Speak( TLK_QUESTION );
-			SetSequence( m_baseSequence + SITTING_ANIM_sitscared );
+			GetEngineObject()->SetSequence( m_baseSequence + SITTING_ANIM_sitscared );
 			m_flResponseDelay = 0;
 		}
 		else if (i < 30)
 		{
-			SetSequence( m_baseSequence + SITTING_ANIM_sitting3 );
+			GetEngineObject()->SetSequence( m_baseSequence + SITTING_ANIM_sitting3 );
 
 			// turn towards player or nearest friend and speak
 
@@ -1105,7 +1105,7 @@ void CNPC_SittingScientist::SittingThink( void )
 			if (!FIdleSpeak() || !pent)
 			{	
 				m_iHeadTurn = random->RandomInt(0,8) * 10 - 40;
-				SetSequence( m_baseSequence + SITTING_ANIM_sitting3 );
+				GetEngineObject()->SetSequence( m_baseSequence + SITTING_ANIM_sitting3 );
 			}
 			else
 			{
@@ -1116,16 +1116,16 @@ void CNPC_SittingScientist::SittingThink( void )
 				if (yaw < -180) yaw += 360;
 				
 				if (yaw > 0)
-					SetSequence( m_baseSequence + SITTING_ANIM_sitlookleft );
+					GetEngineObject()->SetSequence( m_baseSequence + SITTING_ANIM_sitlookleft );
 				else
-					SetSequence( m_baseSequence + SITTING_ANIM_sitlookright );
+					GetEngineObject()->SetSequence( m_baseSequence + SITTING_ANIM_sitlookright );
 
 				//ALERT(at_console, "sitting speak\n");
 			}
 		}
 		else if (i < 60)
 		{
-			SetSequence( m_baseSequence + SITTING_ANIM_sitting3 );
+			GetEngineObject()->SetSequence( m_baseSequence + SITTING_ANIM_sitting3 );
 			m_iHeadTurn = random->RandomInt(0,8) * 10 - 40;
 			if ( random->RandomInt(0,99) < 5)
 			{
@@ -1135,16 +1135,16 @@ void CNPC_SittingScientist::SittingThink( void )
 		}
 		else if (i < 80)
 		{
-			SetSequence( m_baseSequence + SITTING_ANIM_sitting2 );
+			GetEngineObject()->SetSequence( m_baseSequence + SITTING_ANIM_sitting2 );
 		}
 		else if (i < 100)
 		{
-			SetSequence( m_baseSequence + SITTING_ANIM_sitscared );
+			GetEngineObject()->SetSequence( m_baseSequence + SITTING_ANIM_sitscared );
 		}
 
-		ResetSequenceInfo( );
-		SetCycle( 0 );
-		SetBoneController( 0, m_iHeadTurn );
+		GetEngineObject()->ResetSequenceInfo( );
+		GetEngineObject()->SetCycle( 0 );
+		GetEngineObject()->SetBoneController( 0, m_iHeadTurn );
 	}
 
 	GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.1f );

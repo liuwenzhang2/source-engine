@@ -896,7 +896,7 @@ void CPointCommentaryNode::Spawn( void )
 	GetEngineObject()->AddEffects( EF_NOSHADOW );
 
 	// Setup for animation
-	ResetSequence( LookupSequence("idle") );
+	GetEngineObject()->ResetSequence( LookupSequence("idle") );
 	SetThink( &CPointCommentaryNode::SpinThink );
 	GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.1f );
 
@@ -1004,11 +1004,11 @@ void CPointCommentaryNode::SpinThink( void )
 	{
 		if ( m_bActive )
 		{
-			m_flPlaybackRate = 3.0;
+			GetEngineObject()->SetPlaybackRate(3.0);
 		}
 		else
 		{
-			m_flPlaybackRate = 1.0;
+			GetEngineObject()->SetPlaybackRate(1.0);
 		}
 		StudioFrameAdvance();
 		DispatchAnimEvents(this);
@@ -1331,7 +1331,7 @@ void CPointCommentaryNode::FinishCommentary( bool bBlendOut )
 	if ( bBlendOut && m_hViewPositionMover )
 	{
  		m_bActive = false;
-		m_flPlaybackRate = 1.0;
+		GetEngineObject()->SetPlaybackRate(1.0);
 		m_vecFinishOrigin = m_hViewPositionMover->GetEngineObject()->GetAbsOrigin();
 		m_vecFinishAngles = m_hViewPositionMover->GetEngineObject()->GetAbsAngles();
 
@@ -1372,7 +1372,7 @@ void CPointCommentaryNode::CleanupPostCommentary( void )
 	UTIL_Remove( m_hViewPositionMover );
 
 	m_bActive = false;
-	m_flPlaybackRate = 1.0;
+	GetEngineObject()->SetPlaybackRate(1.0);
 	m_bUnstoppable = false;
 	m_flFinishedTime = 0;
 	SetContextThink( NULL, 0, s_pCommentaryUpdateViewThink );

@@ -542,7 +542,7 @@ void CNewWallHealth::Spawn(void)
 	SetModel( HEALTH_CHARGER_MODEL_NAME );
 	GetEngineObject()->AddEffects( EF_NOSHADOW );
 
-	ResetSequence( LookupSequence( "idle" ) );
+	GetEngineObject()->ResetSequence( LookupSequence( "idle" ) );
 
 	m_iJuice = sk_healthcharger.GetFloat();
 
@@ -554,7 +554,7 @@ void CNewWallHealth::Spawn(void)
 	CreateVPhysics();
 
 	m_flJuice = m_iJuice;
-	SetCycle( 1.0f - ( m_flJuice /  sk_healthcharger.GetFloat() ) );
+	GetEngineObject()->SetCycle( 1.0f - ( m_flJuice /  sk_healthcharger.GetFloat() ) );
 }
 
 int CNewWallHealth::DrawDebugTextOverlays(void) 
@@ -594,11 +594,11 @@ void CNewWallHealth::Precache(void)
 
 void CNewWallHealth::StudioFrameAdvance( void )
 {
-	m_flPlaybackRate = 0;
+	GetEngineObject()->SetPlaybackRate(0);
 
 	float flMaxJuice = sk_healthcharger.GetFloat();
 	
-	SetCycle( 1.0f - (float)( m_flJuice / flMaxJuice ) );
+	GetEngineObject()->SetCycle( 1.0f - (float)( m_flJuice / flMaxJuice ) );
 //	Msg( "Cycle: %f - Juice: %d - m_flJuice :%f - Interval: %f\n", (float)GetCycle(), (int)m_iJuice, (float)m_flJuice, GetAnimTimeInterval() );
 
 	if ( !m_flPrevAnimTime )
@@ -645,7 +645,7 @@ void CNewWallHealth::Use( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYP
 	// if there is no juice left, turn it off
 	if (m_iJuice <= 0)
 	{
-		ResetSequence( LookupSequence( "emptyclick" ) );
+		GetEngineObject()->ResetSequence( LookupSequence( "emptyclick" ) );
 		m_nState = 1;			
 		Off();
 	}
@@ -758,7 +758,7 @@ void CNewWallHealth::Recharge(void)
 	m_flJuice = m_iJuice = sk_healthcharger.GetFloat();
 	m_nState = 0;
 
-	ResetSequence( LookupSequence( "idle" ) );
+	GetEngineObject()->ResetSequence( LookupSequence( "idle" ) );
 	StudioFrameAdvance();
 
 	m_iReactivate = 0;
@@ -778,7 +778,7 @@ void CNewWallHealth::Off(void)
 
 	if ( m_nState == 1 )
 	{
-		SetCycle( 1.0f );
+		GetEngineObject()->SetCycle( 1.0f );
 	}
 
 	m_iOn = 0;

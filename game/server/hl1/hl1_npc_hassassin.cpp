@@ -351,7 +351,7 @@ void CNPC_HAssassin::RunTask ( const Task_t *pTask )
 	case TASK_ASSASSIN_FALL_TO_GROUND:
 		GetMotor()->SetIdealYawAndUpdate( GetEnemyLKP() );
 
-		if ( IsSequenceFinished() )
+		if (GetEngineObject()->IsSequenceFinished() )
 		{
 			if (GetEngineObject()->GetAbsVelocity().z > 0)
 			{
@@ -360,15 +360,15 @@ void CNPC_HAssassin::RunTask ( const Task_t *pTask )
 			else if ( HasCondition ( COND_SEE_ENEMY ))
 			{
 				SetActivity( ACT_ASSASSIN_FLY_ATTACK );
-				SetCycle( 0 );
+				GetEngineObject()->SetCycle( 0 );
 			}
 			else
 			{
 				SetActivity( ACT_ASSASSIN_FLY_DOWN );
-				SetCycle( 0 );
+				GetEngineObject()->SetCycle( 0 );
 			}
 						
-			ResetSequenceInfo( );
+			GetEngineObject()->ResetSequenceInfo( );
 		}
 
 		if (GetEngineObject()->GetFlags() & FL_ONGROUND)
@@ -609,7 +609,7 @@ void CNPC_HAssassin::Shoot ( void )
 	DoMuzzleFlash();
 
 	VectorAngles( vecShootDir, vAngles );
-	SetPoseParameter( "shoot", vecShootDir.x );
+	GetEngineObject()->SetPoseParameter( "shoot", vecShootDir.x );
 
 	m_cAmmoLoaded--;
 }

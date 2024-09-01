@@ -268,8 +268,8 @@ void CNPC_Furniture::Spawn( )
 	SetBloodColor( DONT_BLEED );
 	m_iHealth = TOO_MUCH_HEALTH_TO_DIE; //wow
 	m_takedamage = DAMAGE_AIM;
-	SetSequence( 0 );
-	SetCycle( 0 );
+	GetEngineObject()->SetSequence( 0 );
+	GetEngineObject()->SetCycle( 0 );
 	SetNavType( NAV_FLY );
 	GetEngineObject()->AddFlag( FL_FLY );
 
@@ -280,8 +280,8 @@ void CNPC_Furniture::Spawn( )
 //	pev->nextthink += 1.0;
 //	SetThink (WalkMonsterDelay);
 
-	ResetSequenceInfo( );
-	SetCycle( 0 );
+	GetEngineObject()->ResetSequenceInfo( );
+	GetEngineObject()->SetCycle( 0 );
 	NPCInit();
 
 	// Furniture needs to block LOS
@@ -341,7 +341,7 @@ bool CNPC_Furniture::CreateVPhysics( void )
 	if ( !m_BoneFollowerManager.GetNumBoneFollowers() )
 	{
 		KeyValues *modelKeyValues = new KeyValues("");
-		if ( modelKeyValues->LoadFromBuffer( modelinfo->GetModelName( GetModel() ), modelinfo->GetModelKeyValueText( GetModel() ) ) )
+		if ( modelKeyValues->LoadFromBuffer( modelinfo->GetModelName(GetEngineObject()->GetModel() ), modelinfo->GetModelKeyValueText(GetEngineObject()->GetModel() ) ) )
 		{
 			// Do we have a bone follower section?
 			KeyValues *pkvBoneFollowers = modelKeyValues->FindKey("bone_followers");

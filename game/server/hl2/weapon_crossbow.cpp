@@ -180,7 +180,7 @@ void CCrossbowBolt::Spawn( void )
 	CreateSprites();
 
 	// Make us glow until we've hit the wall
-	m_nSkin = BOLT_SKIN_GLOW;
+	GetEngineObject()->SetSkin(BOLT_SKIN_GLOW);
 }
 
 
@@ -560,7 +560,7 @@ void CWeaponCrossbow::PrimaryAttack( void )
 	// Signal a reload
 	m_bMustReload = true;
 
-	SetWeaponIdleTime( gpGlobals->curtime + SequenceDuration( ACT_VM_PRIMARYATTACK ) );
+	SetWeaponIdleTime( gpGlobals->curtime + GetEngineObject()->SequenceDuration( ACT_VM_PRIMARYATTACK ) );
 
 	CBasePlayer *pPlayer = ToBasePlayer( GetOwner() );
 	if ( pPlayer )
@@ -808,7 +808,7 @@ void CWeaponCrossbow::SetSkin( int skinNum )
 	if ( pViewModel == NULL )
 		return;
 
-	pViewModel->m_nSkin = skinNum;
+	pViewModel->GetEngineObject()->SetSkin(skinNum);
 }
 
 //-----------------------------------------------------------------------------

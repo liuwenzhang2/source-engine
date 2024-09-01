@@ -384,18 +384,18 @@ void CNPC_CombineDropship::PopulatePoseParameters( void )
 {
 	if (!m_sbStaticPoseParamsLoaded)
 	{
-		m_poseBody_Accel		= LookupPoseParameter( "body_accel");
-		m_poseBody_Sway			= LookupPoseParameter( "body_sway" );
-		m_poseCargo_Body_Accel  = LookupPoseParameter( "cargo_body_accel" );
-		m_poseCargo_Body_Sway   = LookupPoseParameter( "cargo_body_sway" );
+		m_poseBody_Accel		= GetEngineObject()->LookupPoseParameter( "body_accel");
+		m_poseBody_Sway			= GetEngineObject()->LookupPoseParameter( "body_sway" );
+		m_poseCargo_Body_Accel  = GetEngineObject()->LookupPoseParameter( "cargo_body_accel" );
+		m_poseCargo_Body_Sway   = GetEngineObject()->LookupPoseParameter( "cargo_body_sway" );
 
 		m_sbStaticPoseParamsLoaded = true;
 	}
 
 	if( m_hContainer )
 	{
-		m_poseWeapon_Pitch = m_hContainer->LookupPoseParameter( "weapon_pitch" );
-		m_poseWeapon_Yaw = m_hContainer->LookupPoseParameter( "weapon_yaw" );
+		m_poseWeapon_Pitch = m_hContainer->GetEngineObject()->LookupPoseParameter( "weapon_pitch" );
+		m_poseWeapon_Yaw = m_hContainer->GetEngineObject()->LookupPoseParameter( "weapon_yaw" );
 	}
 
 	BaseClass::PopulatePoseParameters();
@@ -902,8 +902,8 @@ void CNPC_CombineDropship::Spawn( void )
 			// NOTE: gun_ref must have the same position as gun_base, but rotates with the gun
 			m_iMachineGunRefAttachment = m_hContainer->LookupAttachment( "gun_ref" );
 
-			m_poseWeapon_Pitch = m_hContainer->LookupPoseParameter( "weapon_pitch" );
-			m_poseWeapon_Yaw = m_hContainer->LookupPoseParameter( "weapon_yaw" );
+			m_poseWeapon_Pitch = m_hContainer->GetEngineObject()->LookupPoseParameter( "weapon_pitch" );
+			m_poseWeapon_Yaw = m_hContainer->GetEngineObject()->LookupPoseParameter( "weapon_yaw" );
 		}
 		break;
 
@@ -1356,15 +1356,15 @@ void CNPC_CombineDropship::Flight( void )
 	{
 		poseBodyAccel = m_poseCargo_Body_Accel;
 		poseBodySway = m_poseCargo_Body_Sway;
-		SetPoseParameter( m_poseBody_Accel, 0 );
-		SetPoseParameter( m_poseBody_Sway, 0 );
+		GetEngineObject()->SetPoseParameter( m_poseBody_Accel, 0 );
+		GetEngineObject()->SetPoseParameter( m_poseBody_Sway, 0 );
 	}
 	else
 	{
 		poseBodyAccel = m_poseBody_Accel;
 		poseBodySway = m_poseBody_Sway;
-		SetPoseParameter( m_poseCargo_Body_Accel, 0 );
-		SetPoseParameter( m_poseCargo_Body_Sway, 0 );
+		GetEngineObject()->SetPoseParameter( m_poseCargo_Body_Accel, 0 );
+		GetEngineObject()->SetPoseParameter( m_poseCargo_Body_Sway, 0 );
 	}
 
 	// If we're landing, deliberately tuck in the back end
@@ -1376,15 +1376,15 @@ void CNPC_CombineDropship::Flight( void )
 
 	// Apply the acceleration blend to the fins
 	float finAccelBlend = SimpleSplineRemapVal( finspeed, -60, 60, -1, 1 );
-	float curFinAccel = GetPoseParameter( poseBodyAccel );
+	float curFinAccel = GetEngineObject()->GetPoseParameter( poseBodyAccel );
 	curFinAccel = UTIL_Approach( finAccelBlend, curFinAccel, 0.1f );
-	SetPoseParameter( poseBodyAccel, EdgeLimitPoseParameter( poseBodyAccel, curFinAccel ) );
+	GetEngineObject()->SetPoseParameter( poseBodyAccel, EdgeLimitPoseParameter( poseBodyAccel, curFinAccel ) );
 
 	// Apply the spin sway to the fins
 	float finSwayBlend = SimpleSplineRemapVal( swayspeed, -60, 60, -1, 1 );
-	float curFinSway = GetPoseParameter( poseBodySway );
+	float curFinSway = GetEngineObject()->GetPoseParameter( poseBodySway );
 	curFinSway = UTIL_Approach( finSwayBlend, curFinSway, 0.1f );
-	SetPoseParameter( poseBodySway, EdgeLimitPoseParameter( poseBodySway, curFinSway ) );
+	GetEngineObject()->SetPoseParameter( poseBodySway, EdgeLimitPoseParameter( poseBodySway, curFinSway ) );
 
 	if ( bRunFlight )
 	{
@@ -2167,7 +2167,7 @@ void CNPC_CombineDropship::PrescheduleThink( void )
 				m_flNextTroopSpawnAttempt = 0;
 
 				// Open our container
-				m_hContainer->SetSequence( m_hContainer->LookupSequence("open_idle") );
+				m_hContainer->GetEngineObject()->SetSequence( m_hContainer->LookupSequence("open_idle") );
 
 				// Start unloading troops
 				m_iCurrentTroopExiting = 0;
@@ -2270,7 +2270,7 @@ void CNPC_CombineDropship::PrescheduleThink( void )
 
 			if ( m_hContainer )
 			{
-				m_hContainer->SetSequence( m_hContainer->LookupSequence("close_idle") );
+				m_hContainer->GetEngineObject()->SetSequence( m_hContainer->LookupSequence("close_idle") );
 			}
 		}
 		break;
@@ -2844,11 +2844,11 @@ void CNPC_CombineDropship::UpdateContainerGunFacing( Vector &vecMuzzle, Vector &
 		QAngle angles;
 		angles.Init( RAD2DEG(targetToCenterPitch+centerToGunPitch), RAD2DEG( targetToCenterYaw + centerToGunYaw ), 0 );
 
-		float flNewAngle = AngleNormalize( UTIL_ApproachAngle( angles.x, m_hContainer->GetPoseParameter(m_poseWeapon_Pitch), DROPSHIP_GUN_SPEED));
-		m_hContainer->SetPoseParameter( m_poseWeapon_Pitch, flNewAngle );
+		float flNewAngle = AngleNormalize( UTIL_ApproachAngle( angles.x, m_hContainer->GetEngineObject()->GetPoseParameter(m_poseWeapon_Pitch), DROPSHIP_GUN_SPEED));
+		m_hContainer->GetEngineObject()->SetPoseParameter( m_poseWeapon_Pitch, flNewAngle );
 
-		flNewAngle = AngleNormalize( UTIL_ApproachAngle( angles.y, m_hContainer->GetPoseParameter(m_poseWeapon_Yaw), DROPSHIP_GUN_SPEED));
-		m_hContainer->SetPoseParameter( m_poseWeapon_Yaw, flNewAngle );
+		flNewAngle = AngleNormalize( UTIL_ApproachAngle( angles.y, m_hContainer->GetEngineObject()->GetPoseParameter(m_poseWeapon_Yaw), DROPSHIP_GUN_SPEED));
+		m_hContainer->GetEngineObject()->SetPoseParameter( m_poseWeapon_Yaw, flNewAngle );
 		m_hContainer->StudioFrameAdvance();
 	}
 

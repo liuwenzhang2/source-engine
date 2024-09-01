@@ -72,7 +72,7 @@ void CDODBombTarget::Spawn( void )
 	BaseClass::Spawn();
 
 	// incase we have any animating bomb models
-	SetPlaybackRate( 1.0 );
+	GetEngineObject()->SetPlaybackRate( 1.0 );
 }
 
 //-----------------------------------------------------------------------------
@@ -254,7 +254,7 @@ void CDODBombTarget::State_Enter_ARMED( void )
 	g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 
 	static int iWickSeq = LookupSequence( "w_tnt_wick" );
-	ResetSequence( iWickSeq );
+	GetEngineObject()->ResetSequence( iWickSeq );
 }
 
 void CDODBombTarget::State_Leave_Armed( void )
@@ -474,7 +474,7 @@ void CDODBombTarget::State_Think_ARMED( void )
 	// manually advance frame so that it matches bomb timer length.
 	float flTimerLength = GetBombTimerLength();
 	float flTimeLeft = m_flExplodeTime - gpGlobals->curtime;
-	SetCycle( clamp( 1.0 - ( flTimeLeft / flTimerLength ), 0.0, 1.0 ) );
+	GetEngineObject()->SetCycle( clamp( 1.0 - ( flTimeLeft / flTimerLength ), 0.0, 1.0 ) );
 
 	static int iAttachment = LookupAttachment( "wick" );//ed awesome
 

@@ -209,8 +209,8 @@ void CNPC_BaseTurret::Spawn()
 	Precache( );
 	GetEngineObject()->SetNextThink( gpGlobals->curtime + 1 );
 	GetEngineObject()->SetMoveType( MOVETYPE_FLY );
-	SetSequence( 0 );
-	SetCycle( 0 );
+	GetEngineObject()->SetSequence( 0 );
+	GetEngineObject()->SetCycle( 0 );
 	GetEngineObject()->SetSolid( SOLID_BBOX );
 	GetEngineObject()->AddSolidFlags( FSOLID_NOT_STANDABLE );
 	m_takedamage		= DAMAGE_YES;
@@ -225,10 +225,10 @@ void CNPC_BaseTurret::Spawn()
 		m_iAutoStart = true;
 	}
 
-	ResetSequenceInfo( );
+	GetEngineObject()->ResetSequenceInfo( );
 
-	SetBoneController(0, 0);
-	SetBoneController(1, 0);
+	GetEngineObject()->SetBoneController(0, 0);
+	GetEngineObject()->SetBoneController(1, 0);
 
 	m_flFieldOfView = VIEW_FIELD_FULL;
 
@@ -238,8 +238,8 @@ void CNPC_BaseTurret::Spawn()
 	if (GetEngineObject()->GetSpawnFlags() & SF_MONSTER_TURRET_STARTINACTIVE )
 	{
 		 SetTurretAnim( TURRET_ANIM_RETIRE );
-		 SetCycle( 0.0f );
-		 m_flPlaybackRate = 0.0f;
+		 GetEngineObject()->SetCycle( 0.0f );
+		 GetEngineObject()->SetPlaybackRate(0.0f);
 	}
 }
 
@@ -403,31 +403,31 @@ void CNPC_BaseTurret::SetTurretAnim( TURRET_ANIM anim )
 	}
 	*/
 
-	if (GetSequence() != anim)
+	if (GetEngineObject()->GetSequence() != anim)
 	{
-		SetSequence( anim );
+		GetEngineObject()->SetSequence( anim );
 
-		ResetSequenceInfo( );
+		GetEngineObject()->ResetSequenceInfo( );
 
 		switch(anim)
 		{
 		case TURRET_ANIM_FIRE:
 		case TURRET_ANIM_SPIN:
-			if (GetSequence() != TURRET_ANIM_FIRE && GetSequence() != TURRET_ANIM_SPIN)
+			if (GetEngineObject()->GetSequence() != TURRET_ANIM_FIRE && GetEngineObject()->GetSequence() != TURRET_ANIM_SPIN)
 			{
-				SetCycle( 0 );
+				GetEngineObject()->SetCycle( 0 );
 			}
 			break;
 		case TURRET_ANIM_RETIRE:
-			SetCycle( 1.0 );
-			m_flPlaybackRate		= -1.0;	//play the animation backwards
+			GetEngineObject()->SetCycle( 1.0 );
+			GetEngineObject()->SetPlaybackRate(- 1.0);	//play the animation backwards
 			break;
 		case TURRET_ANIM_DIE:
-			SetCycle( 0.0 );
-			m_flPlaybackRate		= 1.0;
+			GetEngineObject()->SetCycle( 0.0 );
+			GetEngineObject()->SetPlaybackRate(1.0);
 			break;
 		default:
-			SetCycle( 0 );
+			GetEngineObject()->SetCycle( 0 );
 			break;
 		}
 
@@ -444,8 +444,8 @@ void CNPC_BaseTurret::Initialize(void)
 	m_fBeserk = 0;
 	m_iSpin = 0;
 
-	SetBoneController( 0, 0 );
-	SetBoneController( 1, 0 );
+	GetEngineObject()->SetBoneController( 0, 0 );
+	GetEngineObject()->SetBoneController( 1, 0 );
 
 	if (m_iBaseTurnRate == 0) m_iBaseTurnRate = TURRET_TURNRATE;
 	if (m_flMaxWait == 0) m_flMaxWait = TURRET_MAXWAIT;
@@ -818,9 +818,9 @@ void CNPC_BaseTurret::TurretDeath(void)
 		g_pEffects->Sparks( vecSrc );
 	}
 
-	if (IsSequenceFinished() && !MoveTurret() && m_flDamageTime + 5 < gpGlobals->curtime)
+	if (GetEngineObject()->IsSequenceFinished() && !MoveTurret() && m_flDamageTime + 5 < gpGlobals->curtime)
 	{
-		m_flPlaybackRate = 0;
+		GetEngineObject()->SetPlaybackRate(0);
 		SetThink( NULL );
 	}
 }
@@ -833,7 +833,7 @@ void CNPC_BaseTurret::Deploy(void)
 	GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.1 );
 	StudioFrameAdvance( );
 
-	if (GetSequence() != TURRET_ANIM_DEPLOY)
+	if (GetEngineObject()->GetSequence() != TURRET_ANIM_DEPLOY)
 	{
 		m_iOn = 1;
 		SetTurretAnim(TURRET_ANIM_DEPLOY);
@@ -842,7 +842,7 @@ void CNPC_BaseTurret::Deploy(void)
 		m_OnActivate.FireOutput(this, this);
 	}
 
-	if (IsSequenceFinished())
+	if (GetEngineObject()->IsSequenceFinished())
 	{
 		Vector curmins, curmaxs;
 		curmins = WorldAlignMins();
@@ -867,7 +867,7 @@ void CNPC_BaseTurret::Deploy(void)
 		}
 
 		SetTurretAnim(TURRET_ANIM_SPIN);
-		m_flPlaybackRate = 0;
+		GetEngineObject()->SetPlaybackRate(0);
 		SetThink(&CNPC_BaseTurret::SearchThink);
 	}
 
@@ -895,7 +895,7 @@ void CNPC_BaseTurret::Retire(void)
 		{
 			SpinDownCall();
 		}
-		else if (GetSequence() != TURRET_ANIM_RETIRE)
+		else if (GetEngineObject()->GetSequence() != TURRET_ANIM_RETIRE)
 		{
 			SetTurretAnim(TURRET_ANIM_RETIRE);
 			CPASAttenuationFilter filter( this );
@@ -903,7 +903,7 @@ void CNPC_BaseTurret::Retire(void)
 			m_OnDeactivate.FireOutput(this, this);
 		}
 		//else if (IsSequenceFinished()) 
-		else if( GetSequence() == TURRET_ANIM_RETIRE && GetCycle() <= 0.0 )
+		else if(GetEngineObject()->GetSequence() == TURRET_ANIM_RETIRE && GetEngineObject()->GetCycle() <= 0.0 )
 		{	
 			m_iOn = 0;
 			m_flLastSight = 0;
@@ -982,9 +982,9 @@ int CNPC_BaseTurret::MoveTurret(void)
 		}
 
 		if (m_iOrientation == TURRET_ORIENTATION_FLOOR)
-			SetBoneController(1, m_vecCurAngles.x);
+			GetEngineObject()->SetBoneController(1, m_vecCurAngles.x);
 		else
-			SetBoneController(1, -m_vecCurAngles.x);		
+			GetEngineObject()->SetBoneController(1, -m_vecCurAngles.x);
 
 		bMoved = 1;
 	}
@@ -1030,9 +1030,9 @@ int CNPC_BaseTurret::MoveTurret(void)
 		//ALERT(at_console, "%.2f -> %.2f\n", m_vecCurAngles.y, y);
 
 		if (m_iOrientation == TURRET_ORIENTATION_FLOOR)
-			SetBoneController(0, m_vecCurAngles.y - angles.y );
+			GetEngineObject()->SetBoneController(0, m_vecCurAngles.y - angles.y );
 		else 
-			SetBoneController(0, angles.y - 180 - m_vecCurAngles.y );
+			GetEngineObject()->SetBoneController(0, angles.y - 180 - m_vecCurAngles.y );
 		bMoved = 1;
 	}
 
@@ -1256,10 +1256,10 @@ void CNPC_Turret::SpinUpCall(void)
 			CPASAttenuationFilter filter( this );
 			g_pSoundEmitterSystem->EmitSound( filter, entindex(), "Turret.SpinUpCall" );
 			m_iStartSpin = 1;
-			m_flPlaybackRate = 0.1;
+			GetEngineObject()->SetPlaybackRate(0.1);
 		}
 		// after the barrel is spun up, turn on the hum
-		else if (m_flPlaybackRate >= 1.0)
+		else if (GetEngineObject()->GetPlaybackRate() >= 1.0)
 		{
 			GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.1 );// retarget delay
 			CPASAttenuationFilter filter( this );
@@ -1270,7 +1270,7 @@ void CNPC_Turret::SpinUpCall(void)
 		} 
 		else
 		{
-			m_flPlaybackRate += 0.075;
+			GetEngineObject()->SetPlaybackRate(GetEngineObject()->GetPlaybackRate() + 0.075);
 		}
 	}
 
@@ -1288,15 +1288,15 @@ void CNPC_Turret::SpinDownCall(void)
 
 		SetTurretAnim(TURRET_ANIM_SPIN);
 
-		if ( m_flPlaybackRate == 1.0)
+		if (GetEngineObject()->GetPlaybackRate() == 1.0)
 		{
 			g_pSoundEmitterSystem->StopSound( entindex(), "Turret.Spinup" );
 			g_pSoundEmitterSystem->EmitSound( filter, entindex(), "Turret.SpinDownCall" );
 		}
-		m_flPlaybackRate -= 0.02;
-		if (m_flPlaybackRate <= 0)
+		GetEngineObject()->SetPlaybackRate(GetEngineObject()->GetPlaybackRate() - 0.02);
+		if (GetEngineObject()->GetPlaybackRate() <= 0)
 		{
-			m_flPlaybackRate = 0;
+			GetEngineObject()->SetPlaybackRate(0);
 			m_iSpin = 0;
 		}
 	}
@@ -1409,9 +1409,9 @@ void CNPC_Sentry::Spawn()
 
 	BaseClass::Spawn();
 
-	SetSequence( TURRET_ANIM_RETIRE );
-	SetCycle( 0.0 );
-	m_flPlaybackRate = 0.0;
+	GetEngineObject()->SetSequence( TURRET_ANIM_RETIRE );
+	GetEngineObject()->SetCycle( 0.0 );
+	GetEngineObject()->SetPlaybackRate(0.0);
 
 	m_iRetractHeight = 64;
 	m_iDeployHeight = 64;

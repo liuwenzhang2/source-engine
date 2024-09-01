@@ -444,8 +444,8 @@ void CModelPanel::SetupModel( void )
 		}
 		if ( sequence != ACT_INVALID )
 		{
-			pEnt->ResetSequence( sequence );
-			pEnt->SetCycle( 0 );
+			pEnt->GetEngineObject()->ResetSequence( sequence );
+			pEnt->GetEngineObject()->SetCycle( 0 );
 
 			if ( pAnim->m_pPoseParameters )
 			{
@@ -454,7 +454,7 @@ void CModelPanel::SetupModel( void )
 					const char *pName = pData->GetName();
 					float flValue = pData->GetFloat();
 		
-					pEnt->SetPoseParameter( pName, flValue );
+					pEnt->GetEngineObject()->SetPoseParameter( pName, flValue );
 				}
 			}
 
@@ -591,7 +591,7 @@ void CModelPanel::Paint()
 	m_hModel->GetEngineObject()->SetAbsAngles( QAngle( m_pModelInfo->m_vecAbsAngles.x, m_pModelInfo->m_vecAbsAngles.y, m_pModelInfo->m_vecAbsAngles.z ) );
 
 	// do we have a valid sequence?
-	if ( m_hModel->GetSequence() != -1 )
+	if ( m_hModel->GetEngineObject()->GetSequence() != -1 )
 	{
 		m_hModel->FrameAdvance( gpGlobals->frametime );
 	}
@@ -731,8 +731,8 @@ bool CModelPanel::SetSequence( const char *pszName )
 			int sequence = m_hModel->LookupSequence( pszAnim );
 			if ( sequence != ACT_INVALID )
 			{
-				m_hModel->ResetSequence( sequence );
-				m_hModel->SetCycle( 0 );
+				m_hModel->GetEngineObject()->ResetSequence( sequence );
+				m_hModel->GetEngineObject()->SetCycle( 0 );
 
 				bRetVal = true;
 			}
@@ -782,8 +782,8 @@ void CModelPanel::OnSetAnimation( KeyValues *data )
 				int sequence = m_hModel->SelectWeightedSequence( activity );
 				if ( sequence != ACT_INVALID )
 				{
-					m_hModel->ResetSequence( sequence );
-					m_hModel->SetCycle( 0 );
+					m_hModel->GetEngineObject()->ResetSequence( sequence );
+					m_hModel->GetEngineObject()->SetCycle( 0 );
 				}
 			}
 		}

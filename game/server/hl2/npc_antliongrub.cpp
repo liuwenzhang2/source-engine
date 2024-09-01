@@ -324,7 +324,7 @@ int CAntlionGrub::OnTakeDamage( const CTakeDamageInfo &info )
 	bool bSquashed = ( (GetEngineObject()->GetEffects() & EF_NODRAW ) != 0 );
 	if ( bSquashed == false )
 	{
-		SetSequence( SelectWeightedSequence( ACT_SMALL_FLINCH ) );
+		GetEngineObject()->SetSequence( SelectWeightedSequence( ACT_SMALL_FLINCH ) );
 		m_flFlinchTime = gpGlobals->curtime + random->RandomFloat( 0.5f, 1.0f );
 
 		SetThink( &CAntlionGrub::FlinchThink );
@@ -399,9 +399,9 @@ void CAntlionGrub::Spawn( void )
 	UTIL_SetSize( this, vecMins, vecMaxs );
 
 	// Start our idle activity
-	SetSequence( SelectWeightedSequence( ACT_IDLE ) );
-	SetCycle( random->RandomFloat( 0.0f, 1.0f ) );
-	ResetSequenceInfo();
+	GetEngineObject()->SetSequence( SelectWeightedSequence( ACT_IDLE ) );
+	GetEngineObject()->SetCycle( random->RandomFloat( 0.0f, 1.0f ) );
+	GetEngineObject()->ResetSequenceInfo();
 
 	m_State = GRUB_STATE_IDLE;
 
@@ -618,30 +618,30 @@ void CAntlionGrub::IdleThink( void )
 	// If we're idle and the player has come close enough, get agry
 	if ( ( m_State == GRUB_STATE_IDLE ) && bAgitated )
 	{
-		SetSequence( SelectWeightedSequence( ACT_SMALL_FLINCH ) );
+		GetEngineObject()->SetSequence( SelectWeightedSequence( ACT_SMALL_FLINCH ) );
 		m_State = GRUB_STATE_AGITATED;
 	}
-	else if ( IsSequenceFinished() )
+	else if (GetEngineObject()->IsSequenceFinished() )
 	{
 		// See if it's time to choose a new sequence
-		ResetSequenceInfo();
-		SetCycle( 0.0f );
+		GetEngineObject()->ResetSequenceInfo();
+		GetEngineObject()->SetCycle( 0.0f );
 
 		// If we're near enough, we want to play an "alert" animation
 		if ( bAgitated )
 		{
-			SetSequence( SelectWeightedSequence( ACT_SMALL_FLINCH ) );
+			GetEngineObject()->SetSequence( SelectWeightedSequence( ACT_SMALL_FLINCH ) );
 			m_State = GRUB_STATE_AGITATED;
 		}
 		else
 		{
 			// Just idle
-			SetSequence( SelectWeightedSequence( ACT_IDLE ) );
+			GetEngineObject()->SetSequence( SelectWeightedSequence( ACT_IDLE ) );
 			m_State = GRUB_STATE_IDLE;
 		}
 
 		// Add some variation because we're often in large bunches
-		SetPlaybackRate( random->RandomFloat( 0.8f, 1.2f ) );
+		GetEngineObject()->SetPlaybackRate( random->RandomFloat( 0.8f, 1.2f ) );
 	}
 
 	// Idle normally
@@ -661,7 +661,7 @@ void CAntlionGrub::FlinchThink( void )
 	// See if we're done
 	if ( m_flFlinchTime < gpGlobals->curtime )
 	{
-		SetSequence( SelectWeightedSequence( ACT_IDLE ) );
+		GetEngineObject()->SetSequence( SelectWeightedSequence( ACT_IDLE ) );
 		SetThink( &CAntlionGrub::IdleThink );
 	}
 }
@@ -857,7 +857,7 @@ void CAntlionGrub::TraceAttack( const CTakeDamageInfo &info, const Vector &vecDi
 //-----------------------------------------------------------------------------
 void CAntlionGrub::InputAgitate( inputdata_t &inputdata )
 {
-	SetSequence( SelectWeightedSequence( ACT_SMALL_FLINCH ) );
+	GetEngineObject()->SetSequence( SelectWeightedSequence( ACT_SMALL_FLINCH ) );
 	m_State = GRUB_STATE_AGITATED;
 	m_flNextSquealSoundTime = gpGlobals->curtime;
 

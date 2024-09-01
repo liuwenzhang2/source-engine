@@ -140,11 +140,11 @@ void CPropTelescopicArm::Spawn( void )
 
 	if ( iSequence != ACT_INVALID )
 	{
-		 SetSequence( iSequence );
-		 ResetSequenceInfo();
+		 GetEngineObject()->SetSequence( iSequence );
+		 GetEngineObject()->ResetSequenceInfo();
 
 		 //Do this so we get the nice ramp-up effect.
-		 m_flPlaybackRate = random->RandomFloat( 0.0f, 1.0f );
+		 GetEngineObject()->SetPlaybackRate(random->RandomFloat( 0.0f, 1.0f ));
 	}
 
 	m_iFrontMarkerAttachment = LookupAttachment( "Front_marker" );

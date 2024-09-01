@@ -1771,7 +1771,7 @@ void CFastZombie::OnChangeActivity( Activity NewActivity )
 		params.m_pflSoundDuration = NULL;
 		params.m_bWarnOnDirectWaveReference = true;
 		g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
-		SetPlaybackRate( random->RandomFloat( .9, 1.1 ) );	
+		GetEngineObject()->SetPlaybackRate( random->RandomFloat( .9, 1.1 ) );
 	}
 
 	if( NewActivity == ACT_JUMP )

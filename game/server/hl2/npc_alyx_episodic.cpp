@@ -826,7 +826,7 @@ void CNPC_Alyx::GatherConditions()
 					if ( !IsPlayingGesture(ACT_GESTURE_FLINCH_BLAST_SHOTGUN) && !IsPlayingGesture(ACT_GESTURE_FLINCH_BLAST_DAMAGED_SHOTGUN) )
 					{
 						RestartGesture( ACT_GESTURE_FLINCH_BLAST_SHOTGUN );
-						GetShotRegulator()->FireNoEarlierThan( gpGlobals->curtime + SequenceDuration( ACT_GESTURE_FLINCH_BLAST_SHOTGUN ) + 0.5f ); // Allow another second for Alyx to bring her weapon to bear after the flinch.
+						GetShotRegulator()->FireNoEarlierThan( gpGlobals->curtime + GetEngineObject()->SequenceDuration( ACT_GESTURE_FLINCH_BLAST_SHOTGUN ) + 0.5f ); // Allow another second for Alyx to bring her weapon to bear after the flinch.
 					}
 				}
 				else
@@ -834,7 +834,7 @@ void CNPC_Alyx::GatherConditions()
 					if ( !IsPlayingGesture(ACT_GESTURE_FLINCH_BLAST) && !IsPlayingGesture(ACT_GESTURE_FLINCH_BLAST_DAMAGED) )
 					{
 						RestartGesture( ACT_GESTURE_FLINCH_BLAST );
-						GetShotRegulator()->FireNoEarlierThan( gpGlobals->curtime + SequenceDuration( ACT_GESTURE_FLINCH_BLAST ) + 0.5f ); // Allow another second for Alyx to bring her weapon to bear after the flinch.
+						GetShotRegulator()->FireNoEarlierThan( gpGlobals->curtime + GetEngineObject()->SequenceDuration( ACT_GESTURE_FLINCH_BLAST ) + 0.5f ); // Allow another second for Alyx to bring her weapon to bear after the flinch.
 					}
 				}
 			}
@@ -1991,7 +1991,7 @@ void CNPC_Alyx::StartTask( const Task_t *pTask )
 				// E3 Hack
 				if ( HasPoseMoveYaw() ) 
 				{
-					SetPoseParameter( m_poseMove_Yaw, 0 );
+					GetEngineObject()->SetPoseParameter( m_poseMove_Yaw, 0 );
 				}
 			}
 			else
@@ -2310,7 +2310,7 @@ int CNPC_Alyx::OnTakeDamage_Alive( const CTakeDamageInfo &info )
 			if ( !IsPlayingGesture(ACT_GESTURE_FLINCH_BLAST) && !IsPlayingGesture(ACT_GESTURE_FLINCH_BLAST_DAMAGED_SHOTGUN) )
 			{
 				RestartGesture( ACT_GESTURE_FLINCH_BLAST_DAMAGED_SHOTGUN );
-				GetShotRegulator()->FireNoEarlierThan( gpGlobals->curtime + SequenceDuration( ACT_GESTURE_FLINCH_BLAST_DAMAGED_SHOTGUN ) + 0.5f );
+				GetShotRegulator()->FireNoEarlierThan( gpGlobals->curtime + GetEngineObject()->SequenceDuration( ACT_GESTURE_FLINCH_BLAST_DAMAGED_SHOTGUN ) + 0.5f );
 			}
 		}
 		else
@@ -2318,7 +2318,7 @@ int CNPC_Alyx::OnTakeDamage_Alive( const CTakeDamageInfo &info )
 			if ( !IsPlayingGesture(ACT_GESTURE_FLINCH_BLAST) && !IsPlayingGesture(ACT_GESTURE_FLINCH_BLAST_DAMAGED) )
 			{
 				RestartGesture( ACT_GESTURE_FLINCH_BLAST_DAMAGED );
-				GetShotRegulator()->FireNoEarlierThan( gpGlobals->curtime + SequenceDuration( ACT_GESTURE_FLINCH_BLAST_DAMAGED ) + 0.5f );
+				GetShotRegulator()->FireNoEarlierThan( gpGlobals->curtime + GetEngineObject()->SequenceDuration( ACT_GESTURE_FLINCH_BLAST_DAMAGED ) + 0.5f );
 			}
 		}
 	}

@@ -419,7 +419,7 @@ bool CAI_BaseNPC::AutoMovement( float flInterval, CBaseEntity *pTarget, AIMoveTr
 
 	m_ScheduleState.bTaskRanAutomovement = true;
 
-	if (GetIntervalMovement( flInterval, ignored, newPos, newAngles ))
+	if (GetEngineObject()->GetIntervalMovement( flInterval, ignored, newPos, newAngles ))
 	{
 		// DevMsg( "%.2f : (%.1f) %.1f %.1f %.1f\n", gpGlobals->curtime, (newPos - GetLocalOrigin()).Length(), newPos.x, newPos.y, newAngles.y );
 	

@@ -773,7 +773,7 @@ void CNPC_AntlionGuard::Spawn( void )
 	// Switch our skin (for now), if we're the cavern guard
 	if ( m_bCavernBreed )
 	{
-		m_nSkin = 1;
+		GetEngineObject()->SetSkin(1);
 		
 		// Add glows
 		CreateGlow( &(m_hCaveGlow[0]), "attach_glow1" );
@@ -2514,7 +2514,7 @@ void CNPC_AntlionGuard::StartTask( const Task_t *pTask )
 			}
 
 			//Blend properly
-			SetPoseParameter( m_poseThrow, offset );
+			GetEngineObject()->SetPoseParameter( m_poseThrow, offset );
 
 			//Start playing the animation
 			SetActivity( ACT_ANTLIONGUARD_SHOVE_PHYSOBJECT );
@@ -2844,7 +2844,7 @@ void CNPC_AntlionGuard::ChargeLookAhead( void )
 	trace_t	tr;
 	Vector vecForward;
 	GetVectors( &vecForward, NULL, NULL );
-	Vector vecTestPos = GetEngineObject()->GetAbsOrigin() + ( vecForward * m_flGroundSpeed * 0.75 );
+	Vector vecTestPos = GetEngineObject()->GetAbsOrigin() + ( vecForward * GetEngineObject()->GetGroundSpeed() * 0.75 );
 	Vector testHullMins = GetHullMins();
 	testHullMins.z += (StepHeight() * 2);
 	TraceHull_SkipPhysics(GetEngineObject()->GetAbsOrigin(), vecTestPos, testHullMins, GetHullMaxs(), MASK_SHOT_HULL, this, COLLISION_GROUP_NONE, &tr, VPhysicsGetObject()->GetMass() * 0.5 );
@@ -2982,7 +2982,7 @@ float CNPC_AntlionGuard::ChargeSteer( void )
 	trace_t	tr;
 	Vector	testPos, steer, forward, right;
 	QAngle	angles;
-	const float	testLength = m_flGroundSpeed * 0.15f;
+	const float	testLength = GetEngineObject()->GetGroundSpeed() * 0.15f;
 
 	//Get our facing
 	GetVectors( &forward, &right, NULL );
@@ -3586,8 +3586,8 @@ bool CNPC_AntlionGuard::ShouldWatchEnemy( void )
 //-----------------------------------------------------------------------------
 void CNPC_AntlionGuard::UpdateHead( void )
 {
-	float yaw = GetPoseParameter( m_poseHead_Yaw );
-	float pitch = GetPoseParameter( m_poseHead_Pitch );
+	float yaw = GetEngineObject()->GetPoseParameter( m_poseHead_Yaw );
+	float pitch = GetEngineObject()->GetPoseParameter( m_poseHead_Pitch );
 
 	// If we should be watching our enemy, turn our head
 	if ( ShouldWatchEnemy() && ( GetEnemy() != NULL ) )
@@ -3599,19 +3599,19 @@ void CNPC_AntlionGuard::UpdateHead( void )
 		float angleDiff = VecToYaw( enemyDir );
 		angleDiff = UTIL_AngleDiff( angleDiff, angle + yaw );
 
-		SetPoseParameter( m_poseHead_Yaw, UTIL_Approach( yaw + angleDiff, yaw, 50 ) );
+		GetEngineObject()->SetPoseParameter( m_poseHead_Yaw, UTIL_Approach( yaw + angleDiff, yaw, 50 ) );
 
 		angle = UTIL_VecToPitch( BodyDirection3D() );
 		angleDiff = UTIL_VecToPitch( enemyDir );
 		angleDiff = UTIL_AngleDiff( angleDiff, angle + pitch );
 
-		SetPoseParameter( m_poseHead_Pitch, UTIL_Approach( pitch + angleDiff, pitch, 50 ) );
+		GetEngineObject()->SetPoseParameter( m_poseHead_Pitch, UTIL_Approach( pitch + angleDiff, pitch, 50 ) );
 	}
 	else
 	{
 		// Otherwise turn the head back to its normal position
-		SetPoseParameter( m_poseHead_Yaw,	UTIL_Approach( 0, yaw, 10 ) );
-		SetPoseParameter( m_poseHead_Pitch, UTIL_Approach( 0, pitch, 10 ) );
+		GetEngineObject()->SetPoseParameter( m_poseHead_Yaw,	UTIL_Approach( 0, yaw, 10 ) );
+		GetEngineObject()->SetPoseParameter( m_poseHead_Pitch, UTIL_Approach( 0, pitch, 10 ) );
 	}
 }
 
@@ -3742,7 +3742,7 @@ void CNPC_AntlionGuard::PrescheduleThink( void )
 
 	UpdateHead();
 
-	if ( ( m_flGroundSpeed <= 0.0f ) )
+	if ( (GetEngineObject()->GetGroundSpeed() <= 0.0f ) )
 	{
 		if ( m_bStopped == false )
 		{
@@ -4782,9 +4782,9 @@ bool CNPC_AntlionGuard::HandleInteraction( int interactionType, void *data, CBas
 //-----------------------------------------------------------------------------
 void	CNPC_AntlionGuard::PopulatePoseParameters( void )
 {
-	m_poseThrow = LookupPoseParameter("throw");
-	m_poseHead_Pitch = LookupPoseParameter("head_pitch");
-	m_poseHead_Yaw   = LookupPoseParameter("head_yaw" );
+	m_poseThrow = GetEngineObject()->LookupPoseParameter("throw");
+	m_poseHead_Pitch = GetEngineObject()->LookupPoseParameter("head_pitch");
+	m_poseHead_Yaw   = GetEngineObject()->LookupPoseParameter("head_yaw" );
 
 	BaseClass::PopulatePoseParameters();
 }

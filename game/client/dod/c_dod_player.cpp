@@ -258,8 +258,8 @@ END_PREDICTION_DATA()
 
 BEGIN_PREDICTION_DATA( C_DODPlayer )
 	DEFINE_PRED_TYPEDESCRIPTION( m_Shared, CDODPlayerShared ),
-	DEFINE_PRED_FIELD( m_flCycle, FIELD_FLOAT, FTYPEDESC_OVERRIDE | FTYPEDESC_PRIVATE | FTYPEDESC_NOERRORCHECK ),
-	DEFINE_PRED_FIELD( m_nSequence, FIELD_INTEGER, FTYPEDESC_OVERRIDE | FTYPEDESC_PRIVATE | FTYPEDESC_NOERRORCHECK ),
+	//DEFINE_PRED_FIELD( m_flCycle, FIELD_FLOAT, FTYPEDESC_OVERRIDE | FTYPEDESC_PRIVATE | FTYPEDESC_NOERRORCHECK ),
+	//DEFINE_PRED_FIELD( m_nSequence, FIELD_INTEGER, FTYPEDESC_OVERRIDE | FTYPEDESC_PRIVATE | FTYPEDESC_NOERRORCHECK ),
 END_PREDICTION_DATA()
 
 
@@ -418,7 +418,7 @@ void C_DODRagdoll::CreateLowViolenceRagdoll()
 		char str[512];
 		Q_snprintf( str, sizeof( str ), "death%d", iDeathAnim );
 
-		SetSequence( LookupSequence( str ) );
+		GetEngineObject()->SetSequence( LookupSequence( str ) );
 		ForceClientSideAnimationOn();
 
 		GetEngineObject()->SetNetworkOrigin( m_vecRagdollOrigin );
@@ -466,8 +466,8 @@ void C_DODRagdoll::CreateDODRagdoll()
 			GetEngineObject()->GetRotationInterpolator().Reset();
 
 			GetEngineObject()->SetAnimTime(pPlayer->GetEngineObject()->GetAnimTime());
-			SetSequence( pPlayer->GetSequence() );
-			m_flPlaybackRate = pPlayer->GetPlaybackRate();
+			GetEngineObject()->SetSequence( pPlayer->GetEngineObject()->GetSequence() );
+			GetEngineObject()->SetPlaybackRate(pPlayer->GetEngineObject()->GetPlaybackRate());
 		}
 		else
 		{
@@ -486,13 +486,13 @@ void C_DODRagdoll::CreateDODRagdoll()
 				iSeq = 0;
 			}
 			
-			SetSequence( iSeq );	// look_idle, basic pose
-			SetCycle( 0.0 );
+			GetEngineObject()->SetSequence( iSeq );	// look_idle, basic pose
+			GetEngineObject()->SetCycle( 0.0 );
 
 			GetEngineObject()->Interp_Reset();
 		}		
 
-		m_nBody = pPlayer->GetBody();
+		GetEngineObject()->SetBody(pPlayer->GetBody());
 	}
 	else
 	{

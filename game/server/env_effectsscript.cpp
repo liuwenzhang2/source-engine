@@ -362,10 +362,10 @@ void CEnvEffectsScript::InputSetSequence( inputdata_t &inputdata )
 		int nSequence = LookupSequence( STRING( inputdata.value.StringID() ) );
 		if ( nSequence != ACT_INVALID )
 		{
-			SetSequence( nSequence );
-			ResetSequenceInfo();
-			SetCycle( 0.0f );
-			m_flPlaybackRate = 1.0f;
+			GetEngineObject()->SetSequence( nSequence );
+			GetEngineObject()->ResetSequenceInfo();
+			GetEngineObject()->SetCycle( 0.0f );
+			GetEngineObject()->SetPlaybackRate(1.0f);
 		}
 	}
 }

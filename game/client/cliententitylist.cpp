@@ -231,6 +231,13 @@ BEGIN_PREDICTION_DATA_NO_BASE(C_EngineObjectInternal)
 	//DEFINE_PRED_FIELD(m_flAnimTime, FIELD_FLOAT, 0),
 	DEFINE_PRED_FIELD(m_nSkin, FIELD_INTEGER, FTYPEDESC_INSENDTABLE),
 	DEFINE_PRED_FIELD(m_nBody, FIELD_INTEGER, FTYPEDESC_INSENDTABLE),
+	DEFINE_PRED_ARRAY_TOL(m_flEncodedController, FIELD_FLOAT, MAXSTUDIOBONECTRLS, FTYPEDESC_INSENDTABLE, 0.02f),
+	DEFINE_PRED_FIELD(m_nSequence, FIELD_INTEGER, FTYPEDESC_INSENDTABLE | FTYPEDESC_NOERRORCHECK),
+	DEFINE_PRED_FIELD(m_flPlaybackRate, FIELD_FLOAT, FTYPEDESC_INSENDTABLE | FTYPEDESC_NOERRORCHECK),
+	DEFINE_PRED_FIELD(m_flCycle, FIELD_FLOAT, FTYPEDESC_INSENDTABLE | FTYPEDESC_NOERRORCHECK),
+	DEFINE_PRED_FIELD(m_nNewSequenceParity, FIELD_INTEGER, FTYPEDESC_INSENDTABLE | FTYPEDESC_NOERRORCHECK),
+	DEFINE_PRED_FIELD(m_nResetEventsParity, FIELD_INTEGER, FTYPEDESC_INSENDTABLE | FTYPEDESC_NOERRORCHECK),
+	DEFINE_PRED_FIELD(m_nMuzzleFlashParity, FIELD_CHARACTER, FTYPEDESC_INSENDTABLE),
 END_PREDICTION_DATA()
 
 BEGIN_DATADESC_NO_BASE(C_EngineObjectInternal)
@@ -387,6 +394,32 @@ BEGIN_RECV_TABLE_NOBASE(C_EngineObjectInternal, DT_SimulationTimeMustBeFirst)
 	RecvPropInt(RECVINFO(m_flSimulationTime), 0, RecvProxy_SimulationTime),
 END_RECV_TABLE()
 
+void RecvProxy_Sequence(const CRecvProxyData* pData, void* pStruct, void* pOut)
+{
+	// Have the regular proxy store the data.
+	RecvProxy_Int32ToInt32(pData, pStruct, pOut);
+
+	C_EngineObjectInternal* pAnimating = (C_EngineObjectInternal*)pStruct;
+
+	if (!pAnimating)
+		return;
+
+	pAnimating->SetReceivedSequence();
+
+	// render bounds may have changed
+	pAnimating->GetOuter()->UpdateVisibility();
+}
+
+BEGIN_RECV_TABLE_NOBASE(C_EngineObjectInternal, DT_ServerAnimationData)
+	RecvPropFloat(RECVINFO(m_flCycle)),
+	RecvPropArray3(RECVINFO_ARRAY(m_flPoseParameter), RecvPropFloat(RECVINFO(m_flPoseParameter[0]))),
+	RecvPropFloat(RECVINFO(m_flPlaybackRate)),
+	RecvPropInt(RECVINFO(m_nSequence), 0, RecvProxy_Sequence),
+	RecvPropInt(RECVINFO(m_nNewSequenceParity)),
+	RecvPropInt(RECVINFO(m_nResetEventsParity)),
+	RecvPropInt(RECVINFO(m_nMuzzleFlashParity)),
+END_RECV_TABLE()
+
 BEGIN_RECV_TABLE_NOBASE(C_EngineObjectInternal, DT_EngineObject)
 	RecvPropDataTable("AnimTimeMustBeFirst", 0, 0, &REFERENCE_RECV_TABLE(DT_AnimTimeMustBeFirst)),
 	RecvPropDataTable("SimulationTimeMustBeFirst", 0, 0, &REFERENCE_RECV_TABLE(DT_SimulationTimeMustBeFirst)),
@@ -427,6 +460,10 @@ BEGIN_RECV_TABLE_NOBASE(C_EngineObjectInternal, DT_EngineObject)
 
 	RecvPropFloat(RECVINFO(m_flModelScale)),
 	RecvPropFloat(RECVINFO_NAME(m_flModelScale, m_flModelWidthScale)), // for demo compatibility only
+	RecvPropArray3(RECVINFO_ARRAY(m_flEncodedController), RecvPropFloat(RECVINFO(m_flEncodedController[0]))),
+	RecvPropInt(RECVINFO(m_bClientSideFrameReset)),
+	RecvPropDataTable("serveranimdata", 0, 0, &REFERENCE_RECV_TABLE(DT_ServerAnimationData)),
+
 END_RECV_TABLE()
 
 IMPLEMENT_CLIENTCLASS_NO_FACTORY(C_EngineObjectInternal, DT_EngineObject, CEngineObjectInternal);
@@ -764,11 +801,27 @@ void C_EngineObjectInternal::PreDataUpdate(DataUpdateType_t updateType)
 	m_flOldAnimTime = m_flAnimTime;
 	m_flOldSimulationTime = m_flSimulationTime;
 
+	m_flOldCycle = GetCycle();
+	m_nOldSequence = GetSequence();
+	m_flOldModelScale = GetModelScale();
+
+	int i;
+	for (i = 0; i < MAXSTUDIOBONECTRLS; i++)
+	{
+		m_flOldEncodedController[i] = m_flEncodedController[i];
+	}
+
+	for (i = 0; i < MAXSTUDIOPOSEPARAM; i++)
+	{
+		m_flOldPoseParameters[i] = m_flPoseParameter[i];
+	}
+
 	m_pOuter->PreDataUpdate(updateType);
 }
 
 void C_EngineObjectInternal::OnPreDataChanged(DataUpdateType_t type)
 {
+	m_bLastClientSideFrameReset = m_bClientSideFrameReset;
 	m_pOuter->OnPreDataChanged(type);
 }
 
@@ -867,14 +920,87 @@ void C_EngineObjectInternal::PostDataUpdate(DataUpdateType_t updateType)
 
 	m_pOuter->CheckInitPredictable("PostDataUpdate");
 
+	if (IsUsingClientSideAnimation())
+	{
+		SetCycle(m_flOldCycle);
+		m_pOuter->AddToClientSideAnimationList();
+	}
+	else
+	{
+		if (m_pOuter->IsViewModel()) {
+			SetCycle(m_flOldCycle);
+		}
+		m_pOuter->RemoveFromClientSideAnimationList();
+	}
+
+	bool bBoneControllersChanged = false;
+
+	int i;
+	for (i = 0; i < MAXSTUDIOBONECTRLS && !bBoneControllersChanged; i++)
+	{
+		if (m_flOldEncodedController[i] != m_flEncodedController[i])
+		{
+			bBoneControllersChanged = true;
+		}
+	}
+
+	bool bPoseParametersChanged = false;
+
+	for (i = 0; i < MAXSTUDIOPOSEPARAM && !bPoseParametersChanged; i++)
+	{
+		if (m_flOldPoseParameters[i] != m_flPoseParameter[i])
+		{
+			bPoseParametersChanged = true;
+		}
+	}
+
+	// Cycle change? Then re-render
+	bool bAnimationChanged = m_flOldCycle != GetCycle() || bBoneControllersChanged || bPoseParametersChanged;
+	bool bSequenceChanged = m_nOldSequence != GetSequence();
+	bool bScaleChanged = (m_flOldModelScale != GetModelScale());
+	if (bAnimationChanged || bSequenceChanged || bScaleChanged)
+	{
+		InvalidatePhysicsRecursive(ANIMATION_CHANGED);
+	}
+
+	if (bAnimationChanged || bSequenceChanged)
+	{
+		if (IsUsingClientSideAnimation())
+		{
+			m_pOuter->ClientSideAnimationChanged();
+		}
+	}
+
+	// reset prev cycle if new sequence
+	if (m_nNewSequenceParity != m_nPrevNewSequenceParity)
+	{
+		// It's important not to call Reset() on a static prop, because if we call
+		// Reset(), then the entity will stay in the interpolated entities list
+		// forever, wasting CPU.
+		MDLCACHE_CRITICAL_SECTION();
+		IStudioHdr* hdr = GetModelPtr();
+		if (hdr && !(hdr->flags() & STUDIOHDR_FLAGS_STATIC_PROP))
+		{
+			m_iv_flCycle.Reset();
+		}
+	}
+
 	m_pOuter->PostDataUpdate(updateType);
 }
 
 void C_EngineObjectInternal::OnDataChanged(DataUpdateType_t type)
 {
+	// Only need to think if animating client side
+	if (IsUsingClientSideAnimation())
+	{
+		// Check to see if we should reset our frame
+		if (m_bClientSideFrameReset != m_bLastClientSideFrameReset)
+		{
+			ResetClientsideFrame();
+		}
+	}
 	// See if it needs to allocate prediction stuff
 	m_pOuter->CheckInitPredictable("OnDataChanged");
-
 	m_pOuter->OnDataChanged(type);
 }
 
@@ -1359,6 +1485,8 @@ int C_EngineObjectInternal::BaseInterpolatePart1(float& currentTime, Vector& old
 		return INTERPOLATE_STOP;
 	}
 
+	if (GetModelPtr()&&!IsUsingClientSideAnimation())
+		m_iv_flCycle.SetLooping(IsSequenceLooping(GetSequence()));
 
 	if (m_pOuter->GetPredictable() /*|| IsClientCreated()*/)
 	{
@@ -2212,7 +2340,7 @@ int C_EngineObjectInternal::SaveData(const char* context, int slot, int type)
 //-----------------------------------------------------------------------------
 int C_EngineObjectInternal::RestoreData(const char* context, int slot, int type)
 {
-	IStudioHdr* pHdr = ((C_BaseAnimating*)m_pOuter)->GetModelPtr();
+	IStudioHdr* pHdr = GetModelPtr();
 #if !defined( NO_ENTITY_PREDICTION )
 	VPROF("C_BaseEntity::RestoreData");
 
@@ -3158,9 +3286,10 @@ string_t C_EngineObjectInternal::GetModelName(void) const
 //-----------------------------------------------------------------------------
 void C_EngineObjectInternal::SetModelIndex(int index)
 {
+	InvalidateMdlCache();
 	m_nModelIndex = index;
 	const model_t* pModel = modelinfo->GetModel(m_nModelIndex);
-	m_pOuter->SetModelPointer(pModel);
+	SetModelPointer(pModel);
 }
 
 void C_EngineObjectInternal::SetCollisionGroup(int collisionGroup)
@@ -3899,6 +4028,499 @@ void C_EngineObjectInternal::UpdateModelScale()
 	}
 
 	m_pOuter->RefreshCollisionBounds();
+}
+
+void C_EngineObjectInternal::LockStudioHdr()
+{
+	Assert(m_hStudioHdr == MDLHANDLE_INVALID && m_pStudioHdr == NULL);
+
+	AUTO_LOCK(m_StudioHdrInitLock);
+
+	if (m_hStudioHdr != MDLHANDLE_INVALID || m_pStudioHdr != NULL)
+	{
+		Assert(m_pStudioHdr ? m_pStudioHdr == mdlcache->GetIStudioHdr(m_hStudioHdr) : m_hStudioHdr == MDLHANDLE_INVALID);
+		return;
+	}
+
+	const model_t* mdl = GetModel();
+	if (!mdl)
+		return;
+
+	m_hStudioHdr = modelinfo->GetCacheHandle(mdl);
+	if (m_hStudioHdr == MDLHANDLE_INVALID)
+		return;
+
+	IStudioHdr* pStudioHdr = mdlcache->LockStudioHdr(m_hStudioHdr);
+	if (!pStudioHdr)
+	{
+		m_hStudioHdr = MDLHANDLE_INVALID;
+		return;
+	}
+
+	//IStudioHdr *pNewWrapper = mdlcache->GetIStudioHdr(pStudioHdr);
+	//pNewWrapper->Init( pStudioHdr, mdlcache );
+	Assert(pStudioHdr->IsValid());
+
+	//if ( pStudioHdr->GetVirtualModel() )
+	//{
+	//	MDLHandle_t hVirtualModel = VoidPtrToMDLHandle( pStudioHdr->VirtualModel() );
+	//	mdlcache->LockStudioHdr( hVirtualModel );
+	//}
+
+	m_pStudioHdr = pStudioHdr;// pNewWrapper; // must be last to ensure virtual model correctly set up
+	Assert(hdr->GetNumPoseParameters() <= ARRAYSIZE(m_flPoseParameter));
+
+	m_iv_flPoseParameter.SetMaxCount(pStudioHdr->GetNumPoseParameters());
+
+	int i;
+	for (i = 0; i < pStudioHdr->GetNumPoseParameters(); i++)
+	{
+		const mstudioposeparamdesc_t& Pose = pStudioHdr->pPoseParameter(i);
+		m_iv_flPoseParameter.SetLooping(Pose.loop != 0.0f, i);
+		// Note:  We can't do this since if we get a DATA_UPDATE_CREATED (i.e., new entity) with both a new model and some valid pose parameters this will slam the 
+		//  pose parameters to zero and if the model goes dormant the pose parameter field will never be set to the true value.  We shouldn't have to zero these out
+		//  as they are under the control of the server and should be properly set
+		if (!m_pOuter->IsServerEntity())
+		{
+			SetPoseParameter(pStudioHdr, i, 0.0);
+		}
+	}
+
+	int boneControllerCount = MIN(pStudioHdr->numbonecontrollers(), ARRAYSIZE(m_flEncodedController));
+
+	m_iv_flEncodedController.SetMaxCount(boneControllerCount);
+
+	for (i = 0; i < boneControllerCount; i++)
+	{
+		bool loop = (pStudioHdr->pBonecontroller(i)->type & (STUDIO_XR | STUDIO_YR | STUDIO_ZR)) != 0;
+		m_iv_flEncodedController.SetLooping(loop, i);
+		SetBoneController(i, 0.0);
+	}
+}
+
+void C_EngineObjectInternal::UnlockStudioHdr()
+{
+	if (m_hStudioHdr != MDLHANDLE_INVALID)
+	{
+		//studiohdr_t *pStudioHdr = mdlcache->GetStudioHdr( m_hStudioHdr );
+		//Assert( m_pStudioHdr && m_pStudioHdr->GetRenderHdr() == pStudioHdr );
+
+#if 0
+		// XXX need to figure out where to flush the queue on map change to not crash
+		if (ICallQueue* pCallQueue = materials->GetRenderContext()->GetCallQueue())
+		{
+			// Parallel rendering: don't unlock model data until end of rendering
+			if (pStudioHdr->GetVirtualModel())
+			{
+				MDLHandle_t hVirtualModel = VoidPtrToMDLHandle(m_pStudioHdr->GetRenderHdr()->VirtualModel());
+				pCallQueue->QueueCall(mdlcache, &IMDLCache::UnlockStudioHdr, hVirtualModel);
+			}
+			pCallQueue->QueueCall(mdlcache, &IMDLCache::UnlockStudioHdr, m_hStudioHdr);
+		}
+		else
+#endif
+		{
+			// Immediate-mode rendering, can unlock immediately
+			//if ( pStudioHdr->GetVirtualModel() )
+			//{
+			//	MDLHandle_t hVirtualModel = VoidPtrToMDLHandle( m_pStudioHdr->GetRenderHdr()->VirtualModel() );
+			//	mdlcache->UnlockStudioHdr( hVirtualModel );
+			//}
+			mdlcache->UnlockStudioHdr(m_hStudioHdr);
+		}
+		m_hStudioHdr = MDLHANDLE_INVALID;
+		m_pStudioHdr = NULL;
+	}
+}
+
+void C_EngineObjectInternal::SetModelPointer(const model_t* pModel)
+{
+	if (m_pModel != pModel)
+	{
+		m_pOuter->DestroyModelInstance();
+		m_pModel = pModel;
+		m_pOuter->OnNewModel();
+
+		m_pOuter->UpdateVisibility();
+	}
+}
+
+//-----------------------------------------------------------------------------
+// Sets the cycle, marks the entity as being dirty
+//-----------------------------------------------------------------------------
+void C_EngineObjectInternal::SetCycle(float flCycle)
+{
+	if (m_flCycle != flCycle)
+	{
+		m_flCycle = flCycle;
+		InvalidatePhysicsRecursive(ANIMATION_CHANGED);
+	}
+}
+
+//-----------------------------------------------------------------------------
+// Sets the sequence, marks the entity as being dirty
+//-----------------------------------------------------------------------------
+void C_EngineObjectInternal::SetSequence(int nSequence)
+{
+	if (m_nSequence != nSequence)
+	{
+		/*
+		IStudioHdr *hdr = GetModelPtr();
+		// Assert( hdr );
+		if ( hdr )
+		{
+			Assert( nSequence >= 0 && nSequence < hdr->GetNumSeq() );
+		}
+		*/
+
+		m_nSequence = nSequence;
+		InvalidatePhysicsRecursive(ANIMATION_CHANGED);
+		if (IsUsingClientSideAnimation())
+		{
+			m_pOuter->ClientSideAnimationChanged();
+		}
+	}
+}
+
+// Stubs for weapon prediction
+void C_EngineObjectInternal::ResetSequenceInfo(void)
+{
+	if (GetSequence() == -1)
+	{
+		SetSequence(0);
+	}
+
+	//if ( IsDynamicModelLoading() )
+	//{
+	//	m_bResetSequenceInfoOnLoad = true;
+	//	return;
+	//}
+
+	IStudioHdr* pStudioHdr = GetModelPtr();
+	m_flGroundSpeed = GetSequenceGroundSpeed(pStudioHdr, GetSequence()) * GetModelScale();
+	m_bSequenceLoops = ((pStudioHdr->GetSequenceFlags(GetSequence()) & STUDIO_LOOPING) != 0);
+	// m_flAnimTime = gpGlobals->time;
+	m_flPlaybackRate = 1.0;
+	m_bSequenceFinished = false;
+	m_flLastEventCheck = 0;
+
+	m_nNewSequenceParity = (m_nNewSequenceParity + 1) & EF_PARITY_MASK;
+	m_nResetEventsParity = (m_nResetEventsParity + 1) & EF_PARITY_MASK;
+
+	// FIXME: why is this called here?  Nothing should have changed to make this nessesary
+	mdlcache->SetEventIndexForSequence(pStudioHdr->pSeqdesc(GetSequence()));
+}
+
+void C_EngineObjectInternal::DisableMuzzleFlash()
+{
+	m_nOldMuzzleFlashParity = m_nMuzzleFlashParity;
+}
+
+
+void C_EngineObjectInternal::DoMuzzleFlash()
+{
+	m_nMuzzleFlashParity = (m_nMuzzleFlashParity + 1) & ((1 << EF_MUZZLEFLASH_BITS) - 1);
+}
+
+// FIXME: redundant?
+void C_EngineObjectInternal::GetBoneControllers(float controllers[MAXSTUDIOBONECTRLS])
+{
+	// interpolate two 0..1 encoded controllers to a single 0..1 controller
+	int i;
+	for (i = 0; i < MAXSTUDIOBONECTRLS; i++)
+	{
+		controllers[i] = m_flEncodedController[i];
+	}
+}
+
+//=========================================================
+//=========================================================
+float C_EngineObjectInternal::SetBoneController(int iController, float flValue)
+{
+	Assert(GetModelPtr());
+
+	IStudioHdr* pmodel = GetModelPtr();
+
+	Assert(iController >= 0 && iController < NUM_BONECTRLS);
+
+	float controller = m_flEncodedController[iController];
+	float retVal = pmodel->Studio_SetController(iController, flValue, controller);
+	m_flEncodedController[iController] = controller;
+	return retVal;
+}
+
+float C_EngineObjectInternal::GetPoseParameter(int iPoseParameter)
+{
+	IStudioHdr* pStudioHdr = GetModelPtr();
+
+	if (pStudioHdr == NULL)
+		return 0.0f;
+
+	if (pStudioHdr->GetNumPoseParameters() < iPoseParameter)
+		return 0.0f;
+
+	if (iPoseParameter < 0)
+		return 0.0f;
+
+	return m_flPoseParameter[iPoseParameter];
+}
+
+// FIXME: redundant?
+void C_EngineObjectInternal::GetPoseParameters(IStudioHdr* pStudioHdr, float poseParameter[MAXSTUDIOPOSEPARAM])
+{
+	if (!pStudioHdr)
+		return;
+
+	// interpolate pose parameters
+	int i;
+	for (i = 0; i < pStudioHdr->GetNumPoseParameters(); i++)
+	{
+		poseParameter[i] = m_flPoseParameter[i];
+	}
+
+
+#if 0 // _DEBUG
+	if (/* Q_stristr( pStudioHdr->pszName(), r_sequence_debug.GetString()) != NULL || */ r_sequence_debug.GetInt() == entindex())
+	{
+		DevMsgRT("%s\n", pStudioHdr->pszName());
+		DevMsgRT("%6.2f : ", gpGlobals->curtime);
+		for (i = 0; i < pStudioHdr->GetNumPoseParameters(); i++)
+		{
+			const mstudioposeparamdesc_t& Pose = pStudioHdr->pPoseParameter(i);
+
+			DevMsgRT("%s %6.2f ", Pose.pszName(), poseParameter[i] * Pose.end + (1 - poseParameter[i]) * Pose.start);
+		}
+		DevMsgRT("\n");
+	}
+#endif
+}
+
+CMouthInfo* C_EngineObjectInternal::GetMouth(void)
+{
+	return &m_mouth;
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: Do HL1 style lipsynch
+//-----------------------------------------------------------------------------
+void C_EngineObjectInternal::ControlMouth(IStudioHdr* pstudiohdr)
+{
+	if (!MouthInfo().NeedsEnvelope())
+		return;
+
+	if (!pstudiohdr)
+		return;
+
+	int index = LookupPoseParameter(pstudiohdr, LIPSYNC_POSEPARAM_NAME);
+
+	if (index != -1)
+	{
+		float value = GetMouth()->mouthopen / 64.0;
+
+		float raw = value;
+
+		if (value > 1.0)
+			value = 1.0;
+
+		float start, end;
+		GetPoseParameterRange(index, start, end);
+
+		value = (1.0 - value) * start + value * end;
+
+		//Adrian - Set the pose parameter value. 
+		//It has to be called "mouth".
+		SetPoseParameter(pstudiohdr, index, value);
+		// Reset interpolation here since the client is controlling this rather than the server...
+		m_iv_flPoseParameter.SetHistoryValuesForItem(index, raw);
+	}
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: Check sequence framerate
+// Input  : iSequence - 
+// Output : float
+//-----------------------------------------------------------------------------
+float C_EngineObjectInternal::GetSequenceCycleRate(IStudioHdr* pStudioHdr, int iSequence)
+{
+	if (!pStudioHdr)
+		return 0.0f;
+
+	return pStudioHdr->Studio_CPS(pStudioHdr->pSeqdesc(iSequence), iSequence, m_flPoseParameter);
+}
+
+float C_EngineObjectInternal::SequenceDuration(IStudioHdr* pStudioHdr, int iSequence)
+{
+	if (!pStudioHdr)
+	{
+		return 0.1f;
+	}
+
+	if (iSequence >= pStudioHdr->GetNumSeq() || iSequence < 0)
+	{
+		DevWarning(2, "C_BaseAnimating::SequenceDuration( %d ) out of range\n", iSequence);
+		return 0.1;
+	}
+
+	return pStudioHdr->Studio_Duration(iSequence, m_flPoseParameter);
+
+}
+
+//=========================================================
+//=========================================================
+int C_EngineObjectInternal::LookupPoseParameter(IStudioHdr* pstudiohdr, const char* szName)
+{
+	if (!pstudiohdr)
+		return 0;
+
+	for (int i = 0; i < pstudiohdr->GetNumPoseParameters(); i++)
+	{
+		if (stricmp(pstudiohdr->pPoseParameter(i).pszName(), szName) == 0)
+		{
+			return i;
+		}
+	}
+
+	// AssertMsg( 0, UTIL_VarArgs( "poseparameter %s couldn't be mapped!!!\n", szName ) );
+	return -1; // Error
+}
+
+//=========================================================
+//=========================================================
+float C_EngineObjectInternal::SetPoseParameter(IStudioHdr* pStudioHdr, const char* szName, float flValue)
+{
+	return SetPoseParameter(pStudioHdr, LookupPoseParameter(pStudioHdr, szName), flValue);
+}
+
+float C_EngineObjectInternal::SetPoseParameter(IStudioHdr* pStudioHdr, int iParameter, float flValue)
+{
+	if (!pStudioHdr)
+	{
+		Assert(!"C_BaseAnimating::SetPoseParameter: model missing");
+		return flValue;
+	}
+
+	if (iParameter >= 0)
+	{
+		float flNewValue;
+		flValue = pStudioHdr->Studio_SetPoseParameter(iParameter, flValue, flNewValue);
+		m_flPoseParameter[iParameter] = flNewValue;
+	}
+
+	return flValue;
+}
+
+void C_EngineObjectInternal::GetSequenceLinearMotion(int iSequence, Vector* pVec)
+{
+	GetModelPtr()->GetSequenceLinearMotion(iSequence, m_flPoseParameter, pVec);
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: 
+//
+// Input  : iSequence - 
+//
+// Output : float
+//-----------------------------------------------------------------------------
+float C_EngineObjectInternal::GetSequenceMoveDist(IStudioHdr* pStudioHdr, int iSequence)
+{
+	Vector				vecReturn;
+
+	pStudioHdr->GetSequenceLinearMotion(iSequence, m_flPoseParameter, &vecReturn);
+
+	return vecReturn.Length();
+}
+
+float C_EngineObjectInternal::GetSequenceGroundSpeed(IStudioHdr* pStudioHdr, int iSequence)
+{
+	float t = SequenceDuration(pStudioHdr, iSequence);
+
+	if (t > 0)
+	{
+		return GetSequenceMoveDist(pStudioHdr, iSequence) / t;
+	}
+	else
+	{
+		return 0;
+	}
+}
+
+//=========================================================
+//=========================================================
+
+bool C_EngineObjectInternal::IsSequenceLooping(IStudioHdr* pStudioHdr, int iSequence)
+{
+	return (pStudioHdr->GetSequenceFlags(iSequence) & STUDIO_LOOPING) != 0;
+}
+
+bool C_EngineObjectInternal::GetPoseParameterRange(int index, float& minValue, float& maxValue)
+{
+	IStudioHdr* pStudioHdr = GetModelPtr();
+
+	if (pStudioHdr)
+	{
+		if (index >= 0 && index < pStudioHdr->GetNumPoseParameters())
+		{
+			const mstudioposeparamdesc_t& pose = pStudioHdr->pPoseParameter(index);
+			minValue = pose.start;
+			maxValue = pose.end;
+			return true;
+		}
+	}
+	minValue = 0.0f;
+	maxValue = 1.0f;
+	return false;
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: Note that we've been transmitted a sequence
+//-----------------------------------------------------------------------------
+void C_EngineObjectInternal::SetReceivedSequence(void)
+{
+	m_bReceivedSequence = true;
+}
+
+void C_EngineObjectInternal::UpdateRelevantInterpolatedVars()
+{
+	MDLCACHE_CRITICAL_SECTION();
+	// Remove any interpolated vars that need to be removed.
+	if (!m_pOuter->GetPredictable() /*&& !IsClientCreated()*/ && GetModelPtr() && GetModelPtr()->SequencesAvailable())
+	{
+		AddBaseAnimatingInterpolatedVars();
+	}
+	else
+	{
+		RemoveBaseAnimatingInterpolatedVars();
+	}
+}
+
+
+void C_EngineObjectInternal::AddBaseAnimatingInterpolatedVars()
+{
+	AddVar(&m_iv_flEncodedController, true);//LATCH_ANIMATION_VAR, 
+	AddVar(&m_iv_flPoseParameter, true);// LATCH_ANIMATION_VAR, 
+	int flags = LATCH_ANIMATION_VAR;
+	if (IsUsingClientSideAnimation())
+		flags |= EXCLUDE_AUTO_INTERPOLATE;
+	m_iv_flCycle.GetType() = flags;
+
+	AddVar(&m_iv_flCycle, true);//flags, 
+}
+
+void C_EngineObjectInternal::RemoveBaseAnimatingInterpolatedVars()
+{
+	RemoveVar(&m_iv_flEncodedController, false);
+	RemoveVar(&m_iv_flPoseParameter, false);
+
+#ifdef HL2MP
+	// HACK:  Don't want to remove interpolation for predictables in hl2dm, though
+	// The animation state stuff sets the pose parameters -- so they should interp
+	//  but m_flCycle is not touched, so it's only set during prediction (which occurs on tick boundaries)
+	//  and so needs to continue to be interpolated for smooth rendering of the lower body of the local player in third person, etc.
+	if (!m_pOuter->GetPredictable())
+#endif
+	{
+		RemoveVar(&m_iv_flCycle, false);
+	}
 }
 
 bool PVSNotifierMap_LessFunc( IClientUnknown* const &a, IClientUnknown* const &b )

@@ -147,7 +147,7 @@ void CPropCrane::Spawn( void )
 
 	InitCraneSpeeds();
 
-	SetPoseParameter( "armextensionpose", m_flExtension );
+	GetEngineObject()->SetPoseParameter( "armextensionpose", m_flExtension );
 
 	CreateVPhysics();
 	GetEngineObject()->SetNextThink( gpGlobals->curtime );
@@ -332,7 +332,7 @@ void CPropCrane::Think(void)
 		StudioFrameAdvance();
 
 		// If the enter or exit animation has finished, tell the server vehicle
-		if ( IsSequenceFinished() && (m_bExitAnimOn || m_bEnterAnimOn) )
+		if (GetEngineObject()->IsSequenceFinished() && (m_bExitAnimOn || m_bEnterAnimOn) )
 		{
 			if ( m_bEnterAnimOn )
 			{
@@ -666,7 +666,7 @@ void CPropCrane::RunCraneMovement( float flTime )
 	{
 		// Extend / Retract the crane
 		m_flExtension = clamp( m_flExtension + (m_flExtensionRate * 10 * flTime), 0, 2 );
-		SetPoseParameter( "armextensionpose", m_flExtension );
+		GetEngineObject()->SetPoseParameter( "armextensionpose", m_flExtension );
 		StudioFrameAdvance();
 	}
 

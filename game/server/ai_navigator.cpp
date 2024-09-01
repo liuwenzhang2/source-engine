@@ -1082,7 +1082,7 @@ float CAI_Navigator::GetArrivalSpeed( void )
 
 	if (sequence != ACT_INVALID)
 	{
-		flSpeed = GetOuter()->GetEntryVelocity( sequence );
+		flSpeed = GetOuter()->GetEngineObject()->GetEntryVelocity( sequence );
 		SetArrivalSpeed( flSpeed );
 	}
 	else
@@ -1212,8 +1212,8 @@ float CAI_Navigator::GetPathDistanceToGoal()
 
 float CAI_Navigator::GetPathTimeToGoal()
 {
-	if ( GetOuter()->m_flGroundSpeed )
-		return (GetPathDistanceToGoal() / GetOuter()->m_flGroundSpeed);
+	if ( GetOuter()->GetEngineObject()->GetGroundSpeed() )
+		return (GetPathDistanceToGoal() / GetOuter()->GetEngineObject()->GetGroundSpeed());
 	return 0;
 }
 
@@ -1967,7 +1967,7 @@ bool CAI_Navigator::OnFailedSteer( AILocalMoveGoal_t *pMoveGoal, float distClear
 	}
 	else if ( GetNavType() == NAV_GROUND && 
 			  gpGlobals->curtime - m_timeBeginFailedSteer > TIME_TOLERANCE && 
-			  GetOuter()->m_flGroundSpeed * TIME_TOLERANCE > MOVE_TOLERANCE )
+			  GetOuter()->GetEngineObject()->GetGroundSpeed() * TIME_TOLERANCE > MOVE_TOLERANCE )
 	{
 		*pResult = AIMR_ILLEGAL;
 		return true;
@@ -2261,7 +2261,7 @@ AIMoveResult_t CAI_Navigator::MoveNormal()
 	// Set activity to be the Navigation activity
 	float		preMoveSpeed		= GetIdealSpeed();
 	Activity	preMoveActivity		= GetActivity();
-	int			nPreMoveSequence	= GetOuter()->GetSequence(); // this is an unfortunate necessity to ensure setting back the activity picks the right one if it had been sticky
+	int			nPreMoveSequence	= GetOuter()->GetEngineObject()->GetSequence(); // this is an unfortunate necessity to ensure setting back the activity picks the right one if it had been sticky
 	Vector		vStart				= GetAbsOrigin();
 
 	// --------------------------------
@@ -2294,7 +2294,7 @@ AIMoveResult_t CAI_Navigator::MoveNormal()
 	{
 		if ( ( GetAbsOrigin() - vStart ).Length() < 0.01 )
 		{
-			GetOuter()->SetSequence( nPreMoveSequence );
+			GetOuter()->GetEngineObject()->SetSequence( nPreMoveSequence );
 			SetActivity( preMoveActivity );
 		}
 	}

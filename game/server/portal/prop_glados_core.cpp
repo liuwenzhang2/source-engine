@@ -130,8 +130,8 @@ void CPropGladosCore::Spawn( void )
 	BaseClass::Spawn();
 
 	//Default to 'dropped' animation
-	ResetSequence(LookupSequence("drop"));
-	SetCycle( 1.0f );
+	GetEngineObject()->ResetSequence(LookupSequence("drop"));
+	GetEngineObject()->SetCycle( 1.0f );
 
 	DisableAutoFade();
 	m_iEyeballAttachment = LookupAttachment( "eyeball" );
@@ -245,7 +245,7 @@ void CPropGladosCore::InputPanic( inputdata_t &inputdata )
 
 void CPropGladosCore::StartPanic( void )
 {
-	ResetSequence( LookupSequence( STRING(m_iszLookAnimationName) ) );
+	GetEngineObject()->ResetSequence( LookupSequence( STRING(m_iszLookAnimationName) ) );
 	SetThink( &CPropGladosCore::PanicThink );
 	GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.1f );
 }
@@ -313,11 +313,11 @@ void CPropGladosCore::TalkingThink( void )
 	}
 
 	// Loop the 'look around' animation after the first line.
-	int iCurSequence = GetSequence();
+	int iCurSequence = GetEngineObject()->GetSequence();
 	int iLookSequence = LookupSequence( STRING(m_iszLookAnimationName) );
 	if ( iCurSequence != iLookSequence && m_iSpeechIter > 0 )
 	{
-		ResetSequence( iLookSequence );
+		GetEngineObject()->ResetSequence( iLookSequence );
 	}
 
 	int iPrevIter = m_iSpeechIter-1;
@@ -381,7 +381,7 @@ void CPropGladosCore::SetupVOList( void )
 			m_speechEvents.AddToTail( AllocPooledString( "Portal.Glados_core.Curiosity_17" ) );
 			m_iszPanicSoundScriptName =  AllocPooledString( "Portal.Glados_core.Curiosity_15" );
 			m_iszLookAnimationName = AllocPooledString( CURIOUS_LOOK_ANINAME );
-			m_nSkin = CURIOUS_SKIN;
+			GetEngineObject()->SetSkin(CURIOUS_SKIN);
 			
 		}
 		break;
@@ -410,7 +410,7 @@ void CPropGladosCore::SetupVOList( void )
 			m_speechEvents.AddToTail( AllocPooledString( "Portal.Glados_core.Aggressive_21" ) );
 			m_iszPanicSoundScriptName = AllocPooledString( "Portal.Glados_core.Aggressive_panic_01" );
 			m_iszLookAnimationName = AllocPooledString( AGGRESSIVE_LOOK_ANINAME );
-			m_nSkin = AGGRESSIVE_SKIN;
+			GetEngineObject()->SetSkin(AGGRESSIVE_SKIN);
 		}
 		break;
 	case CORETYPE_CRAZY:
@@ -457,13 +457,13 @@ void CPropGladosCore::SetupVOList( void )
 			m_speechEvents.AddToTail( AllocPooledString( "Portal.Glados_core.Crazy_40" ) );
 			m_speechEvents.AddToTail( AllocPooledString( "Portal.Glados_core.Crazy_41" ) );
 			m_iszLookAnimationName = AllocPooledString( CRAZY_LOOK_ANINAME );
-			m_nSkin = CRAZY_SKIN;
+			GetEngineObject()->SetSkin(CRAZY_SKIN);
 		}
 		break;
 	default:
 		{
 			m_iszLookAnimationName = AllocPooledString( DEFAULT_LOOK_ANINAME );
-			m_nSkin = DEFAULT_SKIN;
+			GetEngineObject()->SetSkin(DEFAULT_SKIN);
 		}
 		break;
 	};
@@ -487,7 +487,7 @@ void CPropGladosCore::OnPhysGunPickup( CBasePlayer* pPhysGunUser, PhysGunPickup_
 	}
 
 	m_bFirstPickup = false;
-	ResetSequence(LookupSequence("turn"));
+	GetEngineObject()->ResetSequence(LookupSequence("turn"));
 
 	// +use always enables motion on these props
 	EnableMotion();

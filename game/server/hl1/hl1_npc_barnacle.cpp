@@ -387,7 +387,7 @@ void CNPC_Barnacle::BarnacleThink ( void )
 	//Msg("tounge %f\n", m_flAltitude + m_flTongueAdj );
 	//NDebugOverlay::Box( GetAbsOrigin() - Vector( 0, 0, m_flAltitude ), Vector( -2, -2, -2 ), Vector( 2, 2, 2 ), 255,255,255, 0, 0.1 );
 
-	SetBoneController( 0, -(m_flAltitude + m_flTongueAdj) );
+	GetEngineObject()->SetBoneController( 0, -(m_flAltitude + m_flTongueAdj) );
 	StudioFrameAdvance();
 }
 
@@ -415,7 +415,7 @@ void CNPC_Barnacle::Event_Killed( const CTakeDamageInfo &info )
 	g_pSoundEmitterSystem->EmitSound( filter, entindex(), "Barnacle.Die" );
 
 	SetActivity ( ACT_DIESIMPLE );
-	SetBoneController( 0, 0 );
+	GetEngineObject()->SetBoneController( 0, 0 );
 
 	StudioFrameAdvance();
 

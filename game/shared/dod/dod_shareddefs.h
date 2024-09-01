@@ -95,8 +95,8 @@ enum
 #define VEC_PRONE_HULL_MIN	DODGameRules()->GetDODViewVectors()->m_vProneHullMin
 #define VEC_PRONE_HULL_MAX	DODGameRules()->GetDODViewVectors()->m_vProneHullMax	// MUST be shorter than duck hull for deploy check
 
-#define VEC_PRONE_HULL_MIN_SCALED( player )	( DODGameRules()->GetDODViewVectors()->m_vProneHullMin * player->GetModelScale() )
-#define VEC_PRONE_HULL_MAX_SCALED( player )	( DODGameRules()->GetDODViewVectors()->m_vProneHullMax * player->GetModelScale() )
+#define VEC_PRONE_HULL_MIN_SCALED( player )	( DODGameRules()->GetDODViewVectors()->m_vProneHullMin * player->GetEngineObject()->GetModelScale() )
+#define VEC_PRONE_HULL_MAX_SCALED( player )	( DODGameRules()->GetDODViewVectors()->m_vProneHullMax * player->GetEngineObject()->GetModelScale() )
 
 #define VEC_PRONE_HELPER_HULL_MIN	Vector(-48, -48, 0 )
 #define VEC_PRONE_HELPER_HULL_MAX	Vector( 48,  48,  24 )
@@ -404,7 +404,7 @@ extern const char *m_pszHelmetModels[NUM_HELMETS];
 #define PUSHAWAY_THINK_INTERVAL		(1.0f / 20.0f)
 
 #define VEC_PRONE_VIEW			Vector(0,0,10)
-#define VEC_PRONE_VIEW_SCALED( player )			( Vector(0,0,10) * player->GetModelScale() )
+#define VEC_PRONE_VIEW_SCALED( player )			( Vector(0,0,10) * player->GetEngineObject()->GetModelScale() )
 
 #define TIME_TO_PRONE	1.2f	// should be 1.5!
 

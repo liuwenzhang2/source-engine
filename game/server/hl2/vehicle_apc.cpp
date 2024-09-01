@@ -143,7 +143,7 @@ void CPropAPC::Spawn( void )
 	BaseClass::Spawn();
 	SetBlocksLOS( true );
 	m_iHealth = m_iMaxHealth = sk_apc_health.GetFloat();
-	SetCycle( 0 );
+	GetEngineObject()->SetCycle( 0 );
 	m_iMachineGunBurstLeft = MACHINE_GUN_BURST_SIZE;
 	m_iRocketSalvoLeft = ROCKET_SALVO_SIZE;
 	m_nRocketSide = 0;
@@ -154,8 +154,8 @@ void CPropAPC::Spawn( void )
 	m_bInitialHandbrake = false;
 
 	// Reset the gun to a default pose.
-	SetPoseParameter( "vehicle_weapon_pitch", 0 );
-	SetPoseParameter( "vehicle_weapon_yaw", 90 );
+	GetEngineObject()->SetPoseParameter( "vehicle_weapon_pitch", 0 );
+	GetEngineObject()->SetPoseParameter( "vehicle_weapon_yaw", 90 );
 
 	CreateAPCLaserDot();
 
@@ -650,15 +650,15 @@ void CPropAPC::Think( void )
 
 	StudioFrameAdvance();
 
-	if ( IsSequenceFinished() )
+	if (GetEngineObject()->IsSequenceFinished() )
 	{
 		int iSequence = SelectWeightedSequence( ACT_IDLE );
 		if ( iSequence > ACTIVITY_NOT_AVAILABLE )
 		{
-			SetCycle( 0 );
+			GetEngineObject()->SetCycle( 0 );
 			GetEngineObject()->SetAnimTime(gpGlobals->curtime);
-			ResetSequence( iSequence );
-			ResetClientsideFrame();
+			GetEngineObject()->ResetSequence( iSequence );
+			GetEngineObject()->ResetClientsideFrame();
 		}
 	}
 
@@ -776,12 +776,12 @@ void CPropAPC::AimPrimaryWeapon( const Vector &vecWorldTarget )
 		QAngle angles;
 		angles.Init( -RAD2DEG(targetToCenterPitch+centerToGunPitch), RAD2DEG( targetToCenterYaw + centerToGunYaw ), 0 );
 
-		SetPoseParameter( "vehicle_weapon_yaw", angles.y );
-		SetPoseParameter( "vehicle_weapon_pitch", angles.x );
+		GetEngineObject()->SetPoseParameter( "vehicle_weapon_yaw", angles.y );
+		GetEngineObject()->SetPoseParameter( "vehicle_weapon_pitch", angles.x );
 		StudioFrameAdvance();
 
-		float curPitch = GetPoseParameter( "vehicle_weapon_pitch" );
-		float curYaw = GetPoseParameter( "vehicle_weapon_yaw" );
+		float curPitch = GetEngineObject()->GetPoseParameter( "vehicle_weapon_pitch" );
+		float curYaw = GetEngineObject()->GetPoseParameter( "vehicle_weapon_yaw" );
 		m_bInFiringCone = (fabs(curPitch - angles.x) < 1e-3) && (fabs(curYaw - angles.y) < 1e-3);
 	}
 	else
@@ -820,7 +820,7 @@ void CPropAPC::DoMuzzleFlash( void )
 	data.m_flScale = 1.0f;
 	DispatchEffect( "ChopperMuzzleFlash", data );
 
-	BaseClass::DoMuzzleFlash();
+	GetEngineObject()->DoMuzzleFlash();
 }
 
 

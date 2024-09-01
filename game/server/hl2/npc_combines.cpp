@@ -183,7 +183,7 @@ void CNPC_CombineS::PrescheduleThink( void )
 void CNPC_CombineS::BuildScheduleTestBits( void )
 {
 	//Interrupt any schedule with physics danger (as long as I'm not moving or already trying to block)
-	if ( m_flGroundSpeed == 0.0 && !IsCurSchedule( SCHED_FLINCH_PHYSICS ) )
+	if (GetEngineObject()->GetGroundSpeed() == 0.0 && !IsCurSchedule(SCHED_FLINCH_PHYSICS))
 	{
 		SetCustomInterruptCondition( COND_HEAR_PHYSICS_DANGER );
 	}
@@ -247,7 +247,7 @@ void CNPC_CombineS::OnChangeActivity( Activity eNewActivity )
 	// pose param gets overwritten.
 	if (m_iUseMarch)
 	{
-		SetPoseParameter("casual", RandomFloat());
+		GetEngineObject()->SetPoseParameter("casual", RandomFloat());
 	}
 #endif
 }

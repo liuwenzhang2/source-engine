@@ -236,7 +236,7 @@ public:
 	float			GetMinHeight() const		{ return 200.0; }
 	float			GetHeightRange() const		{ return GetMaxHeight() - GetMinHeight(); }
 	void			SetHeight( float h );
-	float			GetHeight()					{ return GetPoseParameter( gm_BodyHeightPoseParam ); }
+	float			GetHeight()					{ return GetEngineObject()->GetPoseParameter( gm_BodyHeightPoseParam ); }
 	void 			SetIdealHeight( float h );
 	void 			SetAbsIdealHeight( float z );
 	float			GetIdealHeight()			{ return m_idealHeight; }
@@ -288,7 +288,7 @@ public:
 	void			SetTargetPath();
 	float			GetDefaultNavGoalTolerance();
 	void			OnMovementComplete();
-	float			GetSequenceGroundSpeed( IStudioHdr *pStudioHdr, int iSequence );
+	//float			GetSequenceGroundSpeed( IStudioHdr *pStudioHdr, int iSequence );
 
 	float			MaxYawSpeed();
 
@@ -452,7 +452,6 @@ private:
 	EHANDLE			m_hCannonTarget;
 	CSimpleSimTimer	m_AttemptCannonLOSTimer;
 
-	float			m_flSpeedScale;
 	float			m_flTargetSpeedScale;
 
 	CSimpleSimTimer	m_LowZCorrectionTimer;

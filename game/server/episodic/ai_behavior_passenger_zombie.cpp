@@ -546,7 +546,7 @@ void CAI_PassengerBehaviorZombie::RunTask( const Task_t *pTask )
 
 	case TASK_MELEE_ATTACK1:
 
-		if ( GetOuter()->IsSequenceFinished() )
+		if ( GetOuter()->GetEngineObject()->IsSequenceFinished() )
 		{
 			TaskComplete();
 		}
@@ -555,7 +555,7 @@ void CAI_PassengerBehaviorZombie::RunTask( const Task_t *pTask )
 
 	case TASK_PASSENGER_ZOMBIE_DISMOUNT:
 		{
-			if ( GetOuter()->IsSequenceFinished() )
+			if ( GetOuter()->GetEngineObject()->IsSequenceFinished() )
 			{
 				// Completely separate from the vehicle
 				FinishDismount();
@@ -684,8 +684,8 @@ void CAI_PassengerBehaviorZombie::CalculateBodyLean( void )
 	m_flLastVerticalLean = ( m_flLastVerticalLean * 0.75f ) + ( flVerticalDisp * 0.25f );
 	
 	// Set these parameters
-	GetOuter()->SetPoseParameter( "lean_lateral", m_flLastLateralLean );
-	GetOuter()->SetPoseParameter( "lean_vertical", m_flLastVerticalLean );
+	GetOuter()->GetEngineObject()->SetPoseParameter( "lean_lateral", m_flLastLateralLean );
+	GetOuter()->GetEngineObject()->SetPoseParameter( "lean_vertical", m_flLastVerticalLean );
 }
 
 //-----------------------------------------------------------------------------

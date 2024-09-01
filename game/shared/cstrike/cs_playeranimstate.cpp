@@ -619,7 +619,7 @@ int CCSPlayerAnimState::CalcReloadLayerSequence( PlayerAnimEvent_t event )
 		return;
 
 		// Increment the fire sequence's cycle.
-		flCurCycle += m_pOuter->GetSequenceCycleRate( pStudioHdr, iSequence ) * gpGlobals->frametime;
+		flCurCycle += m_pOuter->GetEngineObject()->GetSequenceCycleRate( pStudioHdr, iSequence ) * gpGlobals->frametime;
 		if ( flCurCycle > 1 )
 		{
 			if ( bWaitAtEnd )
@@ -900,7 +900,7 @@ bool CCSPlayerAnimState::CanThePlayerMove()
 
 float CCSPlayerAnimState::GetCurrentMaxGroundSpeed()
 {
-	Activity currentActivity = 	m_pOuter->GetSequenceActivity( m_pOuter->GetSequence() );
+	Activity currentActivity = 	m_pOuter->GetSequenceActivity( m_pOuter->GetEngineObject()->GetSequence() );
 	if ( currentActivity == ACT_WALK || currentActivity == ACT_IDLE )
 		return ANIM_TOPSPEED_WALK;
 	else if ( currentActivity == ACT_RUN )
@@ -1008,8 +1008,8 @@ Activity CCSPlayerAnimState::CalcMainActivity()
 
 void CCSPlayerAnimState::DebugShowAnimState( int iStartLine )
 {
-	engine->Con_NPrintf( iStartLine++, "fire  : %s, cycle: %.2f\n", m_bFiring ? m_pOuter->GetModelPtr()->GetSequenceName( m_iFireSequence ) : "[not firing]", m_flFireCycle );
-	engine->Con_NPrintf( iStartLine++, "reload: %s, cycle: %.2f\n", m_bReloading ? m_pOuter->GetModelPtr()->GetSequenceName( m_iReloadSequence ) : "[not reloading]", m_flReloadCycle );
+	engine->Con_NPrintf( iStartLine++, "fire  : %s, cycle: %.2f\n", m_bFiring ? m_pOuter->GetEngineObject()->GetModelPtr()->GetSequenceName( m_iFireSequence ) : "[not firing]", m_flFireCycle );
+	engine->Con_NPrintf( iStartLine++, "reload: %s, cycle: %.2f\n", m_bReloading ? m_pOuter->GetEngineObject()->GetModelPtr()->GetSequenceName( m_iReloadSequence ) : "[not reloading]", m_flReloadCycle );
 	BaseClass::DebugShowAnimState( iStartLine );
 }
 

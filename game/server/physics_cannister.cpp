@@ -85,8 +85,8 @@ void CPhysicsCannister::Spawn( void )
 		m_iHealth = 25;
 
 	GetEngineObject()->SetAnimTime(gpGlobals->curtime);
-	m_flPlaybackRate = 0.0;
-	SetCycle( 0 );
+	GetEngineObject()->SetPlaybackRate(0.0);
+	GetEngineObject()->SetCycle( 0 );
 	m_bFired = false;
 
 	// not thrusting

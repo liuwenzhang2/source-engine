@@ -119,7 +119,7 @@ void C_LocalTempEntity::Prepare( const model_t *pmodel, float time )
 	// Use these to set per-frame and termination conditions / actions
 	flags = FTENT_NONE;		
 	die = time + 0.75;
-	SetModelPointer( pmodel );
+	GetEngineObject()->SetModelPointer( pmodel );
 	SetRenderMode( kRenderNormal );
 	m_nRenderFX = kRenderFxNone;
 	GetEngineObject()->SetBody(0);
@@ -163,7 +163,7 @@ int C_LocalTempEntity::DrawStudioModel( int flags )
 	
 	// Make sure m_pstudiohdr is valid for drawing
 	MDLCACHE_CRITICAL_SECTION();
-	if ( !GetModelPtr() )
+	if ( !GetEngineObject()->GetModelPtr() )
 		return drawn;
 
 	if ( m_pfnDrawHelper )

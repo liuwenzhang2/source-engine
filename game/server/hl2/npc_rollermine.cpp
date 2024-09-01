@@ -587,7 +587,7 @@ void CNPC_RollerMine::Spawn( void )
 	}
 
 	//Suppress superfluous warnings from animation system
-	m_flGroundSpeed = 20;
+	GetEngineObject()->SetGroundSpeed(20);
 	m_NPCState		= NPC_STATE_NONE;
 
 	m_rollingSoundState = ROLL_SOUND_OFF;
@@ -1725,15 +1725,15 @@ void CNPC_RollerMine::SetRollerSkin( void )
 {
 	if ( m_bPowerDown == true )
 	{
-		m_nSkin = (int)ROLLER_SKIN_DETONATE;
+		GetEngineObject()->SetSkin((int)ROLLER_SKIN_DETONATE);
 	}
 	else if ( m_bHackedByAlyx == true )
 	{
-		m_nSkin = (int)ROLLER_SKIN_FRIENDLY;
+		GetEngineObject()->SetSkin((int)ROLLER_SKIN_FRIENDLY);
 	}
 	else
 	{
-		m_nSkin = (int)ROLLER_SKIN_REGULAR;
+		GetEngineObject()->SetSkin((int)ROLLER_SKIN_REGULAR);
 	}
 }
 
@@ -1925,7 +1925,7 @@ void CNPC_RollerMine::ShockTarget( CBaseEntity *pOther )
 	{
 		pBeam->EntsInit( pOther, this );
 
-		if ( pAnimating && pAnimating->GetModel() )
+		if ( pAnimating && pAnimating->GetEngineObject()->GetModel() )
 		{
 			startAttach = pAnimating->LookupAttachment("beam_damage" );
 			pBeam->SetStartAttachment( startAttach );

@@ -275,7 +275,7 @@ void CNPC_Ichthyosaur::Spawn( void )
 	GetEngineObject()->SetMoveType( MOVETYPE_STEP );
 	GetEngineObject()->AddFlag( FL_FLY | FL_STEPMOVEMENT );
 
-	m_flGroundSpeed			= ICH_SWIM_SPEED_RUN;
+	GetEngineObject()->SetGroundSpeed(ICH_SWIM_SPEED_RUN);
 
 	m_bIgnoreSurface		= false;
 
@@ -352,7 +352,7 @@ int CNPC_Ichthyosaur::SelectSchedule( void )
 //-----------------------------------------------------------------------------
 bool CNPC_Ichthyosaur::OverrideMove( float flInterval )
 {
-	m_flGroundSpeed = GetGroundSpeed();
+	GetEngineObject()->SetGroundSpeed(GetGroundSpeed());
 
 	if ( m_bHasMoveTarget )
 	{
@@ -546,14 +546,14 @@ void CNPC_Ichthyosaur::SetPoses( Vector moveRel, float speed )
 	m_flSwimSpeed	= ( m_flSwimSpeed * 0.8f ) + ( flSwimSpeed * 0.2f );
 
 	//Pose the body
-	SetPoseParameter( 0, m_flSwimSpeed );
-	SetPoseParameter( 1, m_flTailYaw );
-	SetPoseParameter( 2, m_flTailPitch );
+	GetEngineObject()->SetPoseParameter( 0, m_flSwimSpeed );
+	GetEngineObject()->SetPoseParameter( 1, m_flTailYaw );
+	GetEngineObject()->SetPoseParameter( 2, m_flTailPitch );
 	
 	//FIXME: Until the sequence info is reset properly after SetPoseParameter
 	if ( ( GetActivity() == ACT_RUN ) || ( GetActivity() == ACT_WALK ) )
 	{
-		ResetSequenceInfo();
+		GetEngineObject()->ResetSequenceInfo();
 	}
 
 	//Face our current velocity
@@ -691,10 +691,10 @@ void CNPC_Ichthyosaur::DoMovement( float flInterval, const Vector &MoveTarget, i
 	float flLength = vecNewVelocity.Length();
 
 	//Clamp our final speed
-	if ( flLength > m_flGroundSpeed )
+	if ( flLength > GetEngineObject()->GetGroundSpeed() )
 	{
-		vecNewVelocity *= ( m_flGroundSpeed / flLength );
-		flLength = m_flGroundSpeed;
+		vecNewVelocity *= (GetEngineObject()->GetGroundSpeed() / flLength );
+		flLength = GetEngineObject()->GetGroundSpeed();
 	}
 
 	Vector	workVelocity = vecNewVelocity;
@@ -742,8 +742,8 @@ void CNPC_Ichthyosaur::SteerArrive(Vector &Steer, const Vector &Target)
 	Vector Offset = Target - GetEngineObject()->GetLocalOrigin();
 	float fTargetDistance = Offset.Length();
 
-	float fIdealSpeed = m_flGroundSpeed * (fTargetDistance / ICH_WAYPOINT_DISTANCE);
-	float fClippedSpeed = MIN( fIdealSpeed, m_flGroundSpeed );
+	float fIdealSpeed = GetEngineObject()->GetGroundSpeed() * (fTargetDistance / ICH_WAYPOINT_DISTANCE);
+	float fClippedSpeed = MIN( fIdealSpeed, GetEngineObject()->GetGroundSpeed() );
 	
 	Vector DesiredVelocity( 0, 0, 0 );
 
@@ -768,7 +768,7 @@ void CNPC_Ichthyosaur::SteerSeek( Vector &Steer, const Vector &Target )
 	
 	VectorNormalize( offset );
 	
-	Vector DesiredVelocity = m_flGroundSpeed * offset;
+	Vector DesiredVelocity = GetEngineObject()->GetGroundSpeed() * offset;
 	
 	Steer = DesiredVelocity - GetEngineObject()->GetAbsVelocity();
 }
@@ -939,7 +939,7 @@ void CNPC_Ichthyosaur::MoveFlyExecute( CBaseEntity *pTargetEnt, const Vector &ve
 {
 	IchthyosaurMoveType_t eMoveType = ( GetNavigator()->CurWaypointIsGoal() ) ? ICH_MOVETYPE_ARRIVE : ICH_MOVETYPE_SEEK;
 
-	m_flGroundSpeed = GetGroundSpeed();
+	GetEngineObject()->SetGroundSpeed(GetGroundSpeed());
 
 	Vector	moveGoal = GetNavigator()->GetCurWaypointPos();
 
@@ -1376,7 +1376,7 @@ void CNPC_Ichthyosaur::StartTask( const Task_t *pTask )
 		break;
 
 	case TASK_MELEE_ATTACK1:
-		m_flPlaybackRate = 1.0f;
+		GetEngineObject()->SetPlaybackRate(1.0f);
 		BaseClass::StartTask(pTask);
 		break;
 

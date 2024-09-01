@@ -247,9 +247,9 @@ void CDODBipodWeapon::DeployBipod( float flHeight, CBaseEntity *pDeployedOn, flo
 	// recalc our yaw limits if the item we're deployed on has moved or rotated
 	// if our new limits are outside our current eye angles, undeploy us
 
-	m_flNextPrimaryAttack = gpGlobals->curtime + SequenceDuration();
-	m_flNextSecondaryAttack = gpGlobals->curtime + SequenceDuration();
-	m_flTimeWeaponIdle = gpGlobals->curtime + SequenceDuration();
+	m_flNextPrimaryAttack = gpGlobals->curtime + GetEngineObject()->SequenceDuration();
+	m_flNextSecondaryAttack = gpGlobals->curtime + GetEngineObject()->SequenceDuration();
+	m_flTimeWeaponIdle = gpGlobals->curtime + GetEngineObject()->SequenceDuration();
 }
 
 // Do the work of undeploying the gun
@@ -265,10 +265,10 @@ void CDODBipodWeapon::UndeployBipod( void )
 	if ( m_bInReload )
 		m_bInReload = false;
 
-	m_flNextPrimaryAttack = gpGlobals->curtime + SequenceDuration();
-	m_flNextSecondaryAttack = gpGlobals->curtime + SequenceDuration();
+	m_flNextPrimaryAttack = gpGlobals->curtime + GetEngineObject()->SequenceDuration();
+	m_flNextSecondaryAttack = gpGlobals->curtime + GetEngineObject()->SequenceDuration();
 	pPlayer->m_flNextAttack = m_flNextPrimaryAttack;
-	m_flTimeWeaponIdle = gpGlobals->curtime + SequenceDuration();
+	m_flTimeWeaponIdle = gpGlobals->curtime + GetEngineObject()->SequenceDuration();
 }
 
 #ifndef CLIENT_DLL

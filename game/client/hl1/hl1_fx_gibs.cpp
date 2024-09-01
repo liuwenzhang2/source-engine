@@ -165,7 +165,7 @@ void FX_HL1Gib( const Vector &origin, const Vector &direction, float scale, int 
 		//Spawn a head.
 		if ( pGib )
 		{
-			pGib->m_nBody = 0;
+			pGib->GetEngineObject()->SetBody(0);
 			pGib->m_iType = iType;
 		}
 	}
@@ -222,9 +222,9 @@ void FX_HL1Gib( const Vector &origin, const Vector &direction, float scale, int 
 		if ( pGib )
 		{
 			if ( iType == HUMAN_GIBS )
-				 pGib->m_nBody = random->RandomInt( 1, iNumBody-1 );
+				 pGib->GetEngineObject()->SetBody(random->RandomInt( 1, iNumBody-1 ));
 			else 
-				 pGib->m_nBody = random->RandomInt( 0, iNumBody-1 );
+				 pGib->GetEngineObject()->SetBody(random->RandomInt( 0, iNumBody-1 ));
 
 			pGib->m_iType = iType;
 		}

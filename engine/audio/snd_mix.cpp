@@ -3971,12 +3971,12 @@ static CMouthInfo *GetMouthInfoForChannel( channel_t *pChannel )
 
 	int mouthentity = pChannel->speakerentity == -1 ? pChannel->soundsource : pChannel->speakerentity;
 
-	IClientEntity *pClientEntity = entitylist->GetClientEntity( mouthentity );
+	IEngineObjectClient *pEngineObjectClient = entitylist->GetEngineObject( mouthentity );
 	
-	if( !pClientEntity )
+	if( !pEngineObjectClient)
 		return NULL;
 
-	return pClientEntity->GetMouth();
+	return pEngineObjectClient->GetMouth();
 }
 
 void SND_InitMouth( channel_t *pChannel )

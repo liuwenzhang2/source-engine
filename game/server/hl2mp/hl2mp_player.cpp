@@ -238,7 +238,7 @@ void CHL2MP_Player::PickDefaultSpawnTeam( void )
 	{
 		if ( HL2MPRules()->IsTeamplay() == false )
 		{
-			if ( GetModelPtr() == NULL )
+			if (GetEngineObject()->GetModelPtr() == NULL )
 			{
 				const char *szModelName = NULL;
 				szModelName = engine->GetClientConVarValue( entindex(), "cl_playermodel" );
@@ -416,7 +416,7 @@ void CHL2MP_Player::SetPlayerTeamModel( void )
 void CHL2MP_Player::SetPlayerModel( void )
 {
 	const char *szModelName = NULL;
-	const char *pszCurrentModelName = modelinfo->GetModelName( GetModel());
+	const char *pszCurrentModelName = modelinfo->GetModelName(GetEngineObject()->GetModel());
 
 	szModelName = engine->GetClientConVarValue( entindex(), "cl_playermodel" );
 
@@ -509,7 +509,7 @@ void CHL2MP_Player::ResetAnimation( void )
 {
 	if ( IsAlive() )
 	{
-		SetSequence ( -1 );
+		GetEngineObject()->SetSequence ( -1 );
 		SetActivity( ACT_INVALID );
 
 		if (!GetEngineObject()->GetAbsVelocity().x && !GetEngineObject()->GetAbsVelocity().y)
@@ -815,23 +815,23 @@ void CHL2MP_Player::SetAnimation( PLAYER_ANIM playerAnim )
 		}
 	
 		// Already using the desired animation?
-		if ( GetSequence() == animDesired )
+		if (GetEngineObject()->GetSequence() == animDesired )
 			return;
 
-		m_flPlaybackRate = 1.0;
-		ResetSequence( animDesired );
-		SetCycle( 0 );
+		GetEngineObject()->SetPlaybackRate(1.0);
+		GetEngineObject()->ResetSequence( animDesired );
+		GetEngineObject()->SetCycle( 0 );
 		return;
 	}
 
 	// Already using the desired animation?
-	if ( GetSequence() == animDesired )
+	if (GetEngineObject()->GetSequence() == animDesired )
 		return;
 
 	//Msg( "Set animation to %d\n", animDesired );
 	// Reset to first frame of desired animation
-	ResetSequence( animDesired );
-	SetCycle( 0 );
+	GetEngineObject()->ResetSequence( animDesired );
+	GetEngineObject()->SetCycle( 0 );
 }
 
 

@@ -379,8 +379,8 @@ void CNPC_RocketTurret::Spawn( void )
 	m_iMuzzleAttachment = LookupAttachment ( "barrel" );
 	m_iLightAttachment = LookupAttachment ( "eye" );
 
-	m_iPosePitch = LookupPoseParameter( "aim_pitch" );
-	m_iPoseYaw   = LookupPoseParameter( "aim_yaw" );
+	m_iPosePitch = GetEngineObject()->LookupPoseParameter( "aim_pitch" );
+	m_iPoseYaw   = GetEngineObject()->LookupPoseParameter( "aim_yaw" );
 
 	m_vecCurrentAngles = m_vecGoalAngles = GetEngineObject()->GetAbsAngles();
 
@@ -393,18 +393,18 @@ void CNPC_RocketTurret::Spawn( void )
 	if ( m_bEnabled )
 	{
 		m_iLaserState = 1;
-		SetSequence(LookupSequence("idle"));
+		GetEngineObject()->SetSequence(LookupSequence("idle"));
 	}
 	else
 	{
 		m_iLaserState = 0;
-		SetSequence(LookupSequence("inactive"));
+		GetEngineObject()->SetSequence(LookupSequence("inactive"));
 	}
-	SetCycle(1.0f);
+	GetEngineObject()->SetCycle(1.0f);
 	UpdateSkin( ROCKET_SKIN_IDLE );
 
-	SetPoseParameter( "aim_pitch", 0 );
-	SetPoseParameter( "aim_yaw", -180 );
+	GetEngineObject()->SetPoseParameter( "aim_pitch", 0 );
+	GetEngineObject()->SetPoseParameter( "aim_yaw", -180 );
 
 	if ( m_bEnabled )
 	{
@@ -539,7 +539,7 @@ void CNPC_RocketTurret::SearchThink()
 	if ( PreThink() || GetEnemy() == NULL )
 		return;
 
-	SetSequence ( LookupSequence( "idle" ) );
+	GetEngineObject()->SetSequence ( LookupSequence( "idle" ) );
 	UpdateAimPoint();
 
 	//Update our think time
@@ -595,7 +595,7 @@ void CNPC_RocketTurret::FollowThink( void )
 		SetEnemy( UTIL_GetLocalPlayer() );
 	}
 
-	SetSequence ( LookupSequence( "idle" ) );
+	GetEngineObject()->SetSequence ( LookupSequence( "idle" ) );
 	//Allow descended classes a chance to do something before the think function
 	if ( PreThink() || GetEnemy() == NULL )
 	{
@@ -703,7 +703,7 @@ void CNPC_RocketTurret::LockingThink( void )
 			//g_pSoundEmitterSystem->EmitSound(this, ROCKET_TURRET_SOUND_LOCKED, gpGlobals->curtime + ROCKET_TURRET_HALF_LOCKON_TIME);
 		}
 
-		ResetSequence(LookupSequence("load"));
+		GetEngineObject()->ResetSequence(LookupSequence("load"));
 
 		// Change lockon sprite
 		UpdateSkin( ROCKET_SKIN_LOCKING );
@@ -779,7 +779,7 @@ void CNPC_RocketTurret::FireRocket ( void )
 	params.m_pflSoundDuration = NULL;
 	params.m_bWarnOnDirectWaveReference = true;
 	g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
-	ResetSequence(LookupSequence("fire"));
+	GetEngineObject()->ResetSequence(LookupSequence("fire"));
 
 	pRocket->SetThink( NULL );
 	pRocket->GetEngineObject()->SetMoveType( MOVETYPE_FLY );
@@ -795,7 +795,7 @@ void CNPC_RocketTurret::FireRocket ( void )
 
 void CNPC_RocketTurret::UpdateSkin( int nSkin )
 {
-	m_nSkin = nSkin;
+	GetEngineObject()->SetSkin(nSkin);
 }
 
 
@@ -881,7 +881,7 @@ void CNPC_RocketTurret::OpeningThink()
 	SyncPoseToAimAngles();
 
 	// Start following player after we're fully opened
-	float flCurProgress = GetCycle();
+	float flCurProgress = GetEngineObject()->GetCycle();
 	if ( flCurProgress >= 0.99f )
 	{
 		
@@ -913,7 +913,7 @@ void CNPC_RocketTurret::ClosingThink()
 	GetEngineObject()->SetNextThink( gpGlobals->curtime + ROCKET_TURRET_THINK_RATE );
 
 	// Start following player after we're fully opened
-	float flCurProgress = GetCycle();
+	float flCurProgress = GetEngineObject()->GetCycle();
 	if ( flCurProgress >= 0.99f )
 	{
 		SetThink( NULL );
@@ -930,11 +930,11 @@ void CNPC_RocketTurret::SyncPoseToAimAngles ( void )
 	QAngle localAngles = TransformAnglesToLocalSpace( m_vecCurrentAngles.Get(), GetEngineObject()->EntityToWorldTransform() );
 
 	// Update pitch
-	SetPoseParameter( m_iPosePitch, localAngles.x );
+	GetEngineObject()->SetPoseParameter( m_iPosePitch, localAngles.x );
 
 	// Update yaw -- NOTE: This yaw movement is screwy for this model, we must invert the yaw delta and also skew an extra 90 deg to
 	// get the 'forward face' of the turret to match up with the look direction. If the model and it's pose parameters change, this will be wrong.
-	SetPoseParameter( m_iPoseYaw, AngleNormalize( -localAngles.y - 90 ) );
+	GetEngineObject()->SetPoseParameter( m_iPoseYaw, AngleNormalize( -localAngles.y - 90 ) );
 
 	InvalidateBoneCache();
 }
@@ -1172,7 +1172,7 @@ void CNPC_RocketTurret::Enable( void )
 		return;
 
 	m_bEnabled = true;
-	ResetSequence( LookupSequence("open") );
+	GetEngineObject()->ResetSequence( LookupSequence("open") );
 
 	SetThink( &CNPC_RocketTurret::OpeningThink );
 	GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.05 );
@@ -1189,7 +1189,7 @@ void CNPC_RocketTurret::Disable( void )
 	UpdateSkin( ROCKET_SKIN_IDLE );
 
 	m_bEnabled = false;
-	ResetSequence(LookupSequence("close"));
+	GetEngineObject()->ResetSequence(LookupSequence("close"));
 
 	SetThink( &CNPC_RocketTurret::ClosingThink );
 	GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.05 );

@@ -74,7 +74,7 @@ void CGrenadePathfollower::Spawn( void )
 
 	GetEngineObject()->SetGravity( 0.00001 );
 	GetEngineObject()->SetFriction( 0.8 );
-	SetSequence( 1 );
+	GetEngineObject()->SetSequence( 1 );
 }
 
 void CGrenadePathfollower::Event_Killed( const CTakeDamageInfo &info )

@@ -327,7 +327,7 @@ void CNPC_Dog::SetPlayerAvoidState( void )
 
 	Vector vNothing;
 
-	GetSequenceLinearMotion( GetSequence(), &vNothing );
+	GetEngineObject()->GetSequenceLinearMotion(GetEngineObject()->GetSequence(), &vNothing );
 	bool bIsMoving = ( IsMoving() || ( vNothing != vec3_origin ) );
 
 	//If we are coming out of a script, check if we are stuck inside the player.

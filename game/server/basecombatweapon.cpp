@@ -112,15 +112,15 @@ void CBaseCombatWeapon::Operator_FrameUpdate( CBaseCombatCharacter *pOperator )
 {
 	StudioFrameAdvance( ); // animate
 
-	if ( IsSequenceFinished() )
+	if (GetEngineObject()->IsSequenceFinished() )
 	{
-		if ( SequenceLoops() )
+		if (GetEngineObject()->SequenceLoops() )
 		{
 			// animation does loop, which means we're playing subtle idle. Might need to fidget.
 			int iSequence = SelectWeightedSequence( GetActivity() );
 			if ( iSequence != ACTIVITY_NOT_AVAILABLE )
 			{
-				ResetSequence( iSequence );	// Set to new anim (if it's there)
+				GetEngineObject()->ResetSequence( iSequence );	// Set to new anim (if it's there)
 			}
 		}
 #if 0
@@ -598,7 +598,7 @@ void CBaseCombatWeapon::Materialize( void )
 #endif
 		
 		GetEngineObject()->RemoveEffects( EF_NODRAW );
-		DoMuzzleFlash();
+		GetEngineObject()->DoMuzzleFlash();
 	}
 #ifdef HL2MP
 	if (GetEngineObject()->HasSpawnFlags( SF_NORESPAWN ) == false )

@@ -102,9 +102,9 @@ void CNPC_MissileDefense::GetGunAim( Vector *vecAim )
 
 	GetAttachment( MD_AP_LGUN, vecPos, vecAng );
 
-	vecAng.x = GetEngineObject()->GetLocalAngles().x + GetBoneController( MD_BC_PITCH );
+	vecAng.x = GetEngineObject()->GetLocalAngles().x + GetEngineObject()->GetBoneController( MD_BC_PITCH );
 	vecAng.z = 0;
-	vecAng.y = GetEngineObject()->GetLocalAngles().y + GetBoneController( MD_BC_YAW );
+	vecAng.y = GetEngineObject()->GetLocalAngles().y + GetEngineObject()->GetBoneController( MD_BC_YAW );
 
 	Vector vecForward;
 	AngleVectors( vecAng, &vecForward );
@@ -292,8 +292,8 @@ void CNPC_MissileDefense::Spawn( void )
 
 	NPCInit();
 
-	SetBoneController( MD_BC_YAW, 10 );
-	SetBoneController( MD_BC_PITCH, 0 );
+	GetEngineObject()->SetBoneController( MD_BC_YAW, 10 );
+	GetEngineObject()->SetBoneController( MD_BC_PITCH, 0 );
 
 	SetBodygroup( 1, 1 );
 	SetBodygroup( 2, 1 );
@@ -486,8 +486,8 @@ void CNPC_MissileDefense::AimGun( void )
 	if (angles.y < m_vGunAng.y)
 		m_vGunAng.y = MAX( angles.y, m_vGunAng.y - MD_YAW_SPEED );
 
-	m_vGunAng.y = SetBoneController( MD_BC_YAW,		m_vGunAng.y );
-	m_vGunAng.x = SetBoneController( MD_BC_PITCH,	m_vGunAng.x );
+	m_vGunAng.y = GetEngineObject()->SetBoneController( MD_BC_YAW,		m_vGunAng.y );
+	m_vGunAng.x = GetEngineObject()->SetBoneController( MD_BC_PITCH,	m_vGunAng.x );
 
 	if (flOldX != m_vGunAng.x || flOldY != m_vGunAng.y)
 	{

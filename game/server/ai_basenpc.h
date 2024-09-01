@@ -2132,7 +2132,7 @@ public:
 //-----------------------------------------------------------------------------
 inline bool CAI_BaseNPC::IsActivityStarted(void)
 {
-	return (GetSequence() == m_nIdealSequence);
+	return (GetEngineObject()->GetSequence() == m_nIdealSequence);
 }
 
 //-----------------------------------------------------------------------------
@@ -2280,9 +2280,9 @@ inline void	CAI_BaseNPC::ClearForceCrouch( void )
 inline bool	CAI_BaseNPC::HaveSequenceForActivity( Activity activity )				
 {
 #if STUDIO_SEQUENCE_ACTIVITY_LOOKUPS_ARE_SLOW
-	return ( (GetModelPtr()) ? (SelectWeightedSequence( activity ) != ACTIVITY_NOT_AVAILABLE) : false ); 
+	return ( (GetEngineObject()->GetModelPtr()) ? (SelectWeightedSequence( activity ) != ACTIVITY_NOT_AVAILABLE) : false );
 #else
-	return ( (GetModelPtr()) ? GetModelPtr()->HaveSequenceForActivity(activity) : false ); 
+	return ( (GetEngineObject()->GetModelPtr()) ? GetEngineObject()->GetModelPtr()->HaveSequenceForActivity(activity) : false );
 #endif
 }
 
@@ -2920,7 +2920,7 @@ inline float CAI_Component::GetIdealAccel() const
 
 inline int CAI_Component::GetSequence()
 {
-	return GetOuter()->GetSequence();
+	return GetOuter()->GetEngineObject()->GetSequence();
 }
 
 //-----------------------------------------------------------------------------

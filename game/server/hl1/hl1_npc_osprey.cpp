@@ -197,9 +197,9 @@ void CNPC_Osprey::Spawn( void )
 
 	m_flFieldOfView = 0; // 180 degrees
 
-	SetSequence( 0 );
-	ResetSequenceInfo( );
-	SetCycle( random->RandomInt( 0,0xFF ) );
+	GetEngineObject()->SetSequence( 0 );
+	GetEngineObject()->ResetSequenceInfo( );
+	GetEngineObject()->SetCycle( random->RandomInt( 0,0xFF ) );
 
 //	InitBoneControllers();
 
@@ -219,7 +219,7 @@ void CNPC_Osprey::Spawn( void )
 	m_flPrevGoalVel = 9999;
 
 	m_iRotorAngle = -1;
-	SetBoneController( 0, m_iRotorAngle );
+	GetEngineObject()->SetBoneController( 0, m_iRotorAngle );
 	
 	m_hLeftSmoke = NULL;
 	m_hRightSmoke = NULL;
@@ -505,7 +505,7 @@ void CNPC_Osprey::Flight( void )
 		{
 			m_iRotorAngle = UTIL_Approach(-1, m_iRotorAngle, 5);
 		}
-		SetBoneController( 0, m_iRotorAngle );
+		GetEngineObject()->SetBoneController( 0, m_iRotorAngle );
 
 	}
 }
@@ -724,8 +724,8 @@ void CBaseHelicopter::Spawn( void )
 
 	m_pRotorSound = NULL;
 
-	SetCycle( 0 );
-	ResetSequenceInfo();
+	GetEngineObject()->SetCycle( 0 );
+	GetEngineObject()->ResetSequenceInfo();
 
 	GetEngineObject()->AddFlag( FL_NPC );
 

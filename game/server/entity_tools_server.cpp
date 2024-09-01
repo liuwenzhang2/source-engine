@@ -329,12 +329,12 @@ void CServerTools::SetMoveType( CBaseEntity *pEntity, int val, int moveCollide )
 
 void CServerTools::ResetSequence( CBaseAnimating *pEntity, int nSequence )
 {
-	pEntity->ResetSequence( nSequence );
+	pEntity->GetEngineObject()->ResetSequence( nSequence );
 }
 
 void CServerTools::ResetSequenceInfo( CBaseAnimating *pEntity )
 {
-	pEntity->ResetSequenceInfo();
+	pEntity->GetEngineObject()->ResetSequenceInfo();
 }
 
 

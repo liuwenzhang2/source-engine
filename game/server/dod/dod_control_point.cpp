@@ -85,9 +85,9 @@ void CControlPoint::Spawn( void )
 	BaseClass::Spawn();
 
 
-	SetPlaybackRate( 1.0 );
+	GetEngineObject()->SetPlaybackRate( 1.0 );
 
-	SetCycle( random->RandomFloat( 0, 1.0 ) );
+	GetEngineObject()->SetCycle( random->RandomFloat( 0, 1.0 ) );
 
 	m_iAlliesRequired = 0;
 	m_iAxisRequired = 0;

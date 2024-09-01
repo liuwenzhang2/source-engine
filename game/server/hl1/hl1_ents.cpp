@@ -864,16 +864,16 @@ void CNPC_DeadHEV::Spawn( void )
 	SetModel( "models/player.mdl" );
 
 	GetEngineObject()->ClearEffects();
-	SetSequence( 0 );
-	m_nBody				= 1;
+	GetEngineObject()->SetSequence( 0 );
+	GetEngineObject()->SetBody(1);
 	m_bloodColor		= BLOOD_COLOR_RED;
 
-	SetSequence( LookupSequence( m_szPoses[m_iPose] ) );
+	GetEngineObject()->SetSequence( LookupSequence( m_szPoses[m_iPose] ) );
 
-	if ( GetSequence() == -1 )
+	if (GetEngineObject()->GetSequence() == -1 )
 	{
 		Msg ( "Dead hevsuit with bad pose\n" );
-		SetSequence( 0 );
+		GetEngineObject()->SetSequence( 0 );
 		GetEngineObject()->ClearEffects();
 		GetEngineObject()->AddEffects( EF_BRIGHTLIGHT );
 	}
@@ -1008,7 +1008,7 @@ void CXenPLight::Spawn( void )
 	UTIL_SetSize( this, Vector(-80,-80,0), Vector(80,80,32));
 	SetActivity( ACT_IDLE );
 	GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.1 );
-	SetCycle( random->RandomFloat(0,1) );
+	GetEngineObject()->SetCycle( random->RandomFloat(0,1) );
 
 	m_pGlow = CSprite::SpriteCreate( XEN_PLANT_GLOW_SPRITE, GetEngineObject()->GetLocalOrigin() + Vector(0,0,(WorldAlignMins().z+WorldAlignMaxs().z)*0.5), FALSE );
 	m_pGlow->SetTransparency( kRenderGlow, GetRenderColor().r, GetRenderColor().g, GetRenderColor().b, GetRenderColor().a, m_nRenderFX );
@@ -1031,7 +1031,7 @@ void CXenPLight::Think( void )
 	switch( GetActivity() )
 	{
 	case ACT_CROUCH:
-		if ( IsSequenceFinished() )
+		if (GetEngineObject()->IsSequenceFinished() )
 		{
 			SetActivity( ACT_CROUCHIDLE );
 			LightOff();
@@ -1047,7 +1047,7 @@ void CXenPLight::Think( void )
 		break;
 
 	case ACT_STAND:
-		if ( IsSequenceFinished() )
+		if (GetEngineObject()->IsSequenceFinished() )
 			SetActivity( ACT_IDLE );
 		break;
 
@@ -1109,14 +1109,14 @@ void CXenHair::Spawn( void )
 	Precache();
 	SetModel( "models/hair.mdl" );
 	UTIL_SetSize( this, Vector(-4,-4,0), Vector(4,4,32));
-	SetSequence( 0 );
+	GetEngineObject()->SetSequence( 0 );
 	
 	if ( !GetEngineObject()->HasSpawnFlags( SF_HAIR_SYNC ) )
 	{
-		SetCycle( random->RandomFloat( 0,1) );
-		m_flPlaybackRate = random->RandomFloat( 0.7, 1.4 );
+		GetEngineObject()->SetCycle( random->RandomFloat( 0,1) );
+		GetEngineObject()->SetPlaybackRate(random->RandomFloat( 0.7, 1.4 ));
 	}
-	ResetSequenceInfo( );
+	GetEngineObject()->ResetSequenceInfo( );
 
 	GetEngineObject()->SetSolid( SOLID_NONE );
 	GetEngineObject()->SetMoveType( MOVETYPE_NONE );
@@ -1207,8 +1207,8 @@ void CXenTree::Spawn( void )
 	UTIL_SetSize( this, Vector(-30,-30,0), Vector(30,30,188));
 	SetActivity( ACT_IDLE );
 	GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.1 );
-	SetCycle( random->RandomFloat( 0,1 ) );
-	m_flPlaybackRate = random->RandomFloat( 0.7, 1.4 );
+	GetEngineObject()->SetCycle( random->RandomFloat( 0,1 ) );
+	GetEngineObject()->SetPlaybackRate(random->RandomFloat( 0.7, 1.4 ));
 
 	Vector triggerPosition, vForward;
 
@@ -1244,7 +1244,7 @@ void CXenTree::Attack( void )
 	if ( GetActivity() == ACT_IDLE )
 	{
 		SetActivity( ACT_MELEE_ATTACK1 );
-		m_flPlaybackRate = random->RandomFloat( 1.0, 1.4 );
+		GetEngineObject()->SetPlaybackRate(random->RandomFloat( 1.0, 1.4 ));
 
 		CPASAttenuationFilter filter( this );
 		g_pSoundEmitterSystem->EmitSound( filter, entindex(), "XenTree.AttackMiss" );
@@ -1301,10 +1301,10 @@ void CXenTree::Think( void )
 	switch( GetActivity() )
 	{
 	case ACT_MELEE_ATTACK1:
-		if ( IsSequenceFinished() )
+		if (GetEngineObject()->IsSequenceFinished() )
 		{
 			SetActivity( ACT_IDLE );
-			m_flPlaybackRate = random->RandomFloat( 0.6f, 1.4f );
+			GetEngineObject()->SetPlaybackRate(random->RandomFloat( 0.6f, 1.4f ));
 		}
 		break;
 
@@ -1379,13 +1379,13 @@ LINK_ENTITY_TO_CLASS( xen_hull, CXenHull );
 
 void CXenSporeSmall::Spawn( void )
 {
-	m_nSkin = 0;
+	GetEngineObject()->SetSkin(0);
 	CXenSpore::Spawn();
 	UTIL_SetSize( this, Vector(-16,-16,0), Vector(16,16,64));
 }
 void CXenSporeMed::Spawn( void )
 {
-	m_nSkin = 1;
+	GetEngineObject()->SetSkin(1);
 	CXenSpore::Spawn();
 	UTIL_SetSize( this, Vector(-40,-40,0), Vector(40,40,120));
 }
@@ -1403,7 +1403,7 @@ const Vector CXenSporeLarge::m_hullSizes[] =
 
 void CXenSporeLarge::Spawn( void )
 {
-	m_nSkin = 2;
+	GetEngineObject()->SetSkin(2);
 	CXenSpore::Spawn();
 	UTIL_SetSize( this, Vector(-48,-48,110), Vector(48,48,240));
 	
@@ -1422,16 +1422,16 @@ void CXenSpore::Spawn( void )
 {
 	Precache();
 
-	SetModel( pModelNames[m_nSkin] );
+	SetModel( pModelNames[GetEngineObject()->GetSkin()]);
 	GetEngineObject()->SetMoveType( MOVETYPE_NONE );
 	GetEngineObject()->SetSolid( SOLID_BBOX );
 	m_takedamage = DAMAGE_NO;
 
 //	SetActivity( ACT_IDLE );
-	SetSequence( 0 );
-	SetCycle( random->RandomFloat( 0.0f, 1.0f ) );
-	m_flPlaybackRate = random->RandomFloat( 0.7f, 1.4f );
-	ResetSequenceInfo( );
+	GetEngineObject()->SetSequence( 0 );
+	GetEngineObject()->SetCycle( random->RandomFloat( 0.0f, 1.0f ) );
+	GetEngineObject()->SetPlaybackRate(random->RandomFloat( 0.7f, 1.4f ));
+	GetEngineObject()->ResetSequenceInfo( );
 	GetEngineObject()->SetNextThink( gpGlobals->curtime + random->RandomFloat( 0.1f, 0.4f ) );	// Load balance these a bit
 }
 
@@ -1445,7 +1445,7 @@ const char *CXenSpore::pModelNames[] =
 
 void CXenSpore::Precache( void )
 {
-	engine->PrecacheModel( (char *)pModelNames[m_nSkin] );
+	engine->PrecacheModel( (char *)pModelNames[GetEngineObject()->GetSkin()]);
 }
 
 

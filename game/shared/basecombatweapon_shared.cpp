@@ -1031,20 +1031,20 @@ void CBaseCombatWeapon::SetActivity( Activity act, float duration )
 
 	if ( sequence != ACTIVITY_NOT_AVAILABLE )
 	{
-		SetSequence( sequence );
+		GetEngineObject()->SetSequence( sequence );
 		SetActivity( act ); 
-		SetCycle( 0 );
-		ResetSequenceInfo( );
+		GetEngineObject()->SetCycle( 0 );
+		GetEngineObject()->ResetSequenceInfo( );
 
 		if ( duration > 0 )
 		{
 			// FIXME: does this even make sense in non-shoot animations?
-			m_flPlaybackRate = SequenceDuration( sequence ) / duration;
-			m_flPlaybackRate = MIN( m_flPlaybackRate, 12.0);  // FIXME; magic number!, network encoding range
+			GetEngineObject()->SetPlaybackRate(GetEngineObject()->SequenceDuration( sequence ) / duration);
+			GetEngineObject()->SetPlaybackRate(MIN(GetEngineObject()->GetPlaybackRate(), 12.0));  // FIXME; magic number!, network encoding range
 		}
 		else
 		{
-			m_flPlaybackRate = 1.0;
+			GetEngineObject()->SetPlaybackRate(1.0);
 		}
 	}
 }
@@ -1138,7 +1138,7 @@ float CBaseCombatWeapon::GetViewModelSequenceDuration()
 
 	SetViewModel();
 	Assert( vm->ViewModelIndex() == m_nViewModelIndex );
-	return vm->SequenceDuration();
+	return vm->GetEngineObject()->SequenceDuration();
 }
 
 bool CBaseCombatWeapon::IsViewModelSequenceFinished( void )
@@ -1161,7 +1161,7 @@ bool CBaseCombatWeapon::IsViewModelSequenceFinished( void )
 		return false;
 	}
 
-	return vm->IsSequenceFinished();
+	return vm->GetEngineObject()->IsSequenceFinished();
 }
 
 //-----------------------------------------------------------------------------
@@ -1410,12 +1410,12 @@ bool CBaseCombatWeapon::DefaultDeploy( char *szViewModel, char *szWeaponModel, i
 		SetViewModel();
 		SendWeaponAnim( iActivity );
 
-		pOwner->SetNextAttack( gpGlobals->curtime + SequenceDuration() );
+		pOwner->SetNextAttack( gpGlobals->curtime + GetEngineObject()->SequenceDuration() );
 	}
 
 	// Can't shoot again until we've finished deploying
-	m_flNextPrimaryAttack	= gpGlobals->curtime + SequenceDuration();
-	m_flNextSecondaryAttack	= gpGlobals->curtime + SequenceDuration();
+	m_flNextPrimaryAttack	= gpGlobals->curtime + GetEngineObject()->SequenceDuration();
+	m_flNextSecondaryAttack	= gpGlobals->curtime + GetEngineObject()->SequenceDuration();
 	m_flHudHintMinDisplayTime = 0;
 
 	m_bAltFireHudHintDisplayed = false;
@@ -1473,7 +1473,7 @@ bool CBaseCombatWeapon::Holster( CBaseCombatWeapon *pSwitchingTo )
 	float flSequenceDuration = 0;
 	if ( GetActivity() == ACT_VM_HOLSTER )
 	{
-		flSequenceDuration = SequenceDuration();
+		flSequenceDuration = GetEngineObject()->SequenceDuration();
 	}
 
 	CBaseCombatCharacter *pOwner = GetOwner();
@@ -2011,7 +2011,7 @@ bool CBaseCombatWeapon::DefaultReload( int iClipSize1, int iClipSize2, int iActi
 	}
 
 	MDLCACHE_CRITICAL_SECTION();
-	float flSequenceEndTime = gpGlobals->curtime + SequenceDuration();
+	float flSequenceEndTime = gpGlobals->curtime + GetEngineObject()->SequenceDuration();
 	pOwner->SetNextAttack( flSequenceEndTime );
 	m_flNextPrimaryAttack = m_flNextSecondaryAttack = flSequenceEndTime;
 
@@ -2333,7 +2333,7 @@ void CBaseCombatWeapon::MaintainIdealActivity( void )
 		return;
 
 	// Must not be at our ideal already 
-	if ( ( GetActivity() == m_IdealActivity ) && ( GetSequence() == m_nIdealSequence ) )
+	if ( ( GetActivity() == m_IdealActivity ) && (GetEngineObject()->GetSequence() == m_nIdealSequence ) )
 		return;
 	
 	// Must be finished with the current animation
@@ -2361,26 +2361,26 @@ bool CBaseCombatWeapon::SetIdealActivity( Activity ideal )
 	m_nIdealSequence = idealSequence;
 
 	//Find the next sequence in the potential chain of sequences leading to our ideal one
-	int nextSequence = FindTransitionSequence( GetSequence(), m_nIdealSequence, NULL );
+	int nextSequence = FindTransitionSequence(GetEngineObject()->GetSequence(), m_nIdealSequence, NULL );
 
 	// Don't use transitions when we're deploying
 	if ( ideal != ACT_VM_DRAW && IsWeaponVisible() && nextSequence != m_nIdealSequence )
 	{
 		//Set our activity to the next transitional animation
 		SetActivity( ACT_TRANSITION );
-		SetSequence( nextSequence );	
+		GetEngineObject()->SetSequence( nextSequence );
 		SendViewModelAnim( nextSequence );
 	}
 	else
 	{
 		//Set our activity to the ideal
 		SetActivity( m_IdealActivity );
-		SetSequence( m_nIdealSequence );	
+		GetEngineObject()->SetSequence( m_nIdealSequence );
 		SendViewModelAnim( m_nIdealSequence );
 	}
 
 	//Set the next time the weapon will idle
-	SetWeaponIdleTime( gpGlobals->curtime + SequenceDuration() );
+	SetWeaponIdleTime( gpGlobals->curtime + GetEngineObject()->SequenceDuration() );
 	return true;
 }
 

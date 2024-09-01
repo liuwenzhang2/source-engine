@@ -885,9 +885,9 @@ void CHostage::HostageThink( void )
 	StudioFrameAdvance();
 
 	int sequence = SelectWeightedSequence( ACT_IDLE );
-	if (GetSequence() != sequence)
+	if (GetEngineObject()->GetSequence() != sequence)
 	{
-		SetSequence( sequence );
+		GetEngineObject()->SetSequence( sequence );
 	}
 
 	m_PlayerAnimState->Update(GetEngineObject()->GetAbsAngles()[YAW], GetEngineObject()->GetAbsAngles()[PITCH] );

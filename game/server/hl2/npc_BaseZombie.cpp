@@ -442,7 +442,7 @@ float CNPC_BaseZombie::MaxYawSpeed( void )
 	{
 		return( 60 );
 	}
-	else if (IsMoving() && HasPoseParameter( GetSequence(), m_poseMove_Yaw ))
+	else if (IsMoving() && HasPoseParameter(GetEngineObject()->GetSequence(), m_poseMove_Yaw ))
 	{
 		return( 15 );
 	}
@@ -480,7 +480,7 @@ float CNPC_BaseZombie::MaxYawSpeed( void )
 //-----------------------------------------------------------------------------
 bool CNPC_BaseZombie::OverrideMoveFacing( const AILocalMoveGoal_t &move, float flInterval )
 {
-	if (!HasPoseParameter( GetSequence(), m_poseMove_Yaw ))
+	if (!HasPoseParameter(GetEngineObject()->GetSequence(), m_poseMove_Yaw ))
 	{
 		return BaseClass::OverrideMoveFacing( move, flInterval );
 	}
@@ -513,9 +513,9 @@ bool CNPC_BaseZombie::OverrideMoveFacing( const AILocalMoveGoal_t &move, float f
 	GetMotor()->SetIdealYawAndUpdate( idealYaw );
 
 	// find movement direction to compensate for not being turned far enough
-	float fSequenceMoveYaw = GetSequenceMoveYaw( GetSequence() );
+	float fSequenceMoveYaw = GetEngineObject()->GetSequenceMoveYaw(GetEngineObject()->GetSequence() );
 	float flDiff = UTIL_AngleDiff( flMoveYaw, GetEngineObject()->GetLocalAngles().y + fSequenceMoveYaw );
-	SetPoseParameter( m_poseMove_Yaw, GetPoseParameter( m_poseMove_Yaw ) + flDiff );
+	GetEngineObject()->SetPoseParameter( m_poseMove_Yaw, GetEngineObject()->GetPoseParameter( m_poseMove_Yaw ) + flDiff );
 
 	return true;
 }
@@ -1969,7 +1969,7 @@ bool CNPC_BaseZombie::IsSlumped( void )
 	}
 	else
 	{
-		int sequence = GetSequence();
+		int sequence = GetEngineObject()->GetSequence();
 		if ( sequence != -1 )
 		{
 			return ( strncmp( GetSequenceName( sequence ), "slump", 5 ) == 0 );

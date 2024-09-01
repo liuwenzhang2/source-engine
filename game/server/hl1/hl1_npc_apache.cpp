@@ -494,8 +494,8 @@ bool CNPC_Apache::FireGun( )
 	m_angGun.y = clamp( m_angGun.y, -89.9, 89.9 );
 	m_angGun.x = clamp( m_angGun.x, -9.9, 44.9 );
 
-	m_angGun.y = SetBoneController( 0, m_angGun.y );
-	m_angGun.x = SetBoneController( 1, m_angGun.x );
+	m_angGun.y = GetEngineObject()->SetBoneController( 0, m_angGun.y );
+	m_angGun.x = GetEngineObject()->SetBoneController( 1, m_angGun.x );
 
 	Vector posBarrel;
 	QAngle angBarrel;

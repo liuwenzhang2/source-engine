@@ -478,7 +478,7 @@ void CNPC_Bullsquid::HandleAnimEvent( animevent_t *pEvent )
 		case BSQUID_AE_BLINK:
 		{
 			// close eye. 
-			m_nSkin = 1;
+			GetEngineObject()->SetSkin(1);
 		}
 		break;
 
@@ -746,15 +746,15 @@ void CNPC_Bullsquid::RunAI ( void )
 	// first, do base class stuff
 	BaseClass::RunAI();
 
-	if ( m_nSkin != 0 )
+	if (GetEngineObject()->GetSkin() != 0 )
 	{
 		// close eye if it was open.
-		m_nSkin = 0; 
+		GetEngineObject()->SetSkin(0);
 	}
 
 	if ( random->RandomInt( 0,39 ) == 0 )
 	{
-		m_nSkin = 1;
+		GetEngineObject()->SetSkin(1);
 	}
 
 	if ( GetEnemy() != NULL && GetActivity() == ACT_RUN )
@@ -762,7 +762,7 @@ void CNPC_Bullsquid::RunAI ( void )
 		// chasing enemy. Sprint for last bit
 		if ( (GetEngineObject()->GetAbsOrigin() - GetEnemy()->GetEngineObject()->GetAbsOrigin()).Length2D() < SQUID_SPRINT_DIST )
 		{
-			m_flPlaybackRate = 1.25;
+			GetEngineObject()->SetPlaybackRate(1.25);
 		}
 	}
 
@@ -976,7 +976,7 @@ void CNPC_Bullsquid::RunTask ( const Task_t *pTask )
 				GetMotor()->SetIdealYaw( vecFacing );
 			}
 
-			if ( IsSequenceFinished() )
+			if (GetEngineObject()->IsSequenceFinished() )
 			{
 				TaskComplete(); 
 			}

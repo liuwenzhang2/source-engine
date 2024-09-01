@@ -480,7 +480,7 @@ void CSatchelCharge::Spawn( void )
 
 	GetEngineObject()->SetGravity( UTIL_ScaleForGravity( 560 ) );	// slightly lower gravity
 	GetEngineObject()->SetFriction( 0.97 );	//used in SatchelTouch to slow us when sliding
-	SetSequence( LookupSequence( "onback" ) );
+	GetEngineObject()->SetSequence( LookupSequence( "onback" ) );
 
 	m_bInAir				= false;
 	m_flNextBounceSoundTime	= 0;

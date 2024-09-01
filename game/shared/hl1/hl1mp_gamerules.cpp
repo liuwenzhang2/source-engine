@@ -399,7 +399,7 @@ void CHL1MPRules::ClientSettingsChanged( CBasePlayer *pPlayer )
 
 	// strip down to just the name
 	char szTempCurrentModel[128];
-	Q_FileBase( modelinfo->GetModelName( pPlayer->GetModel() ), szTempCurrentModel, 128 );
+	Q_FileBase( modelinfo->GetModelName( pPlayer->GetEngineObject()->GetModel() ), szTempCurrentModel, 128 );
 	const char *pCurrentModel = szTempCurrentModel;
 
 	char szTempModelName[128];

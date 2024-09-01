@@ -188,7 +188,7 @@ void C_BaseAnimatingOverlay::GetRenderBounds( Vector& theMins, Vector& theMaxs )
 
 	if ( !IsRagdoll() )
 	{
-		IStudioHdr *pStudioHdr = GetModelPtr();
+		IStudioHdr *pStudioHdr = GetEngineObject()->GetModelPtr();
 		if ( !pStudioHdr || !pStudioHdr->SequencesAvailable() )
 			return;
 
@@ -267,7 +267,7 @@ void C_BaseAnimatingOverlay::CheckForLayerChanges( IStudioHdr *hdr, float curren
 
 				pPrev2->m_nSequence = pHead->m_nSequence;
 				float flTemp;
-				if (IsSequenceLooping( hdr, pHead->m_nSequence ))
+				if (GetEngineObject()->IsSequenceLooping( hdr, pHead->m_nSequence ))
 				{
 					flTemp = LoopingLerp( num, (float)pHead->m_flPrevCycle, (float)pHead->m_flCycle );
 				}
@@ -286,7 +286,7 @@ void C_BaseAnimatingOverlay::CheckForLayerChanges( IStudioHdr *hdr, float curren
 			}
 			*/
 
-			m_iv_AnimOverlay[i]->SetLooping( IsSequenceLooping( hdr, pHead->m_nSequence ) );
+			m_iv_AnimOverlay[i]->SetLooping(GetEngineObject()->IsSequenceLooping( hdr, pHead->m_nSequence ) );
 			m_iv_AnimOverlay[i]->Interpolate( currentTime );
 
 			// reset event indexes
@@ -373,7 +373,7 @@ void C_BaseAnimatingOverlay::AccumulateLayers( IBoneSetup &boneSetup, Vector pos
 				// if ( m_AnimOverlay[i].m_nSequence != m_iv_AnimOverlay.GetPrev( i )->nSequence )
 				float fCycle = m_AnimOverlay[ i ].m_flCycle;
 
-				fCycle = ClampCycle( fCycle, IsSequenceLooping( m_AnimOverlay[i].m_nSequence ) );
+				fCycle = ClampCycle( fCycle, GetEngineObject()->IsSequenceLooping( m_AnimOverlay[i].m_nSequence ) );
 
 				if (fWeight > 1)
 					fWeight = 1;
@@ -468,7 +468,7 @@ void C_BaseAnimatingOverlay::DoAnimationEvents( IStudioHdr *pStudioHdr )
 		if (m_AnimOverlay[j].m_flCycle == m_flOverlayPrevEventCycle[j])
 			continue;
 
-		bool bLoopingSequence = IsSequenceLooping( m_AnimOverlay[j].m_nSequence );
+		bool bLoopingSequence = GetEngineObject()->IsSequenceLooping( m_AnimOverlay[j].m_nSequence );
 
 		bool bLooped = false;
 

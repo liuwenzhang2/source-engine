@@ -335,8 +335,8 @@ void CWeapon_SLAM::StartSatchelDetonate()
 	}
 	SatchelDetonate();
 
-	m_flNextPrimaryAttack	= gpGlobals->curtime + SequenceDuration();
-	m_flNextSecondaryAttack = gpGlobals->curtime + SequenceDuration();
+	m_flNextPrimaryAttack	= gpGlobals->curtime + GetEngineObject()->SequenceDuration();
+	m_flNextSecondaryAttack = gpGlobals->curtime + GetEngineObject()->SequenceDuration();
 }
 
 
@@ -452,8 +452,8 @@ void CWeapon_SLAM::StartTripmineAttach( void )
 		}
 	}
 	
-	m_flNextPrimaryAttack	= gpGlobals->curtime + SequenceDuration();
-	m_flNextSecondaryAttack	= gpGlobals->curtime + SequenceDuration();
+	m_flNextPrimaryAttack	= gpGlobals->curtime + GetEngineObject()->SequenceDuration();
+	m_flNextSecondaryAttack	= gpGlobals->curtime + GetEngineObject()->SequenceDuration();
 //	SetWeaponIdleTime( gpGlobals->curtime + SequenceDuration() );
 }
 
@@ -543,8 +543,8 @@ void CWeapon_SLAM::StartSatchelThrow( void )
 	m_bNeedReload		= true;
 	m_bThrowSatchel		= true;
 
-	m_flNextPrimaryAttack	= gpGlobals->curtime + SequenceDuration();
-	m_flNextSecondaryAttack = gpGlobals->curtime + SequenceDuration();
+	m_flNextPrimaryAttack	= gpGlobals->curtime + GetEngineObject()->SequenceDuration();
+	m_flNextSecondaryAttack = gpGlobals->curtime + GetEngineObject()->SequenceDuration();
 }
 
 //-----------------------------------------------------------------------------
@@ -647,7 +647,7 @@ void CWeapon_SLAM::StartSatchelAttach( void )
 			m_bNeedReload		= true;
 			m_bAttachSatchel	= true;
 
-			m_flNextPrimaryAttack = gpGlobals->curtime + SequenceDuration();
+			m_flNextPrimaryAttack = gpGlobals->curtime + GetEngineObject()->SequenceDuration();
 		}
 	}
 #endif
@@ -689,7 +689,7 @@ void CWeapon_SLAM::SLAMThink( void )
 				SetSlamState(SLAM_TRIPMINE_READY);
 				int iAnim =	m_bDetonatorArmed ? ACT_SLAM_THROW_TO_STICKWALL : ACT_SLAM_THROW_TO_TRIPMINE_ND;
 				SendWeaponAnim( iAnim );
-				m_flWallSwitchTime = gpGlobals->curtime + SequenceDuration();
+				m_flWallSwitchTime = gpGlobals->curtime + GetEngineObject()->SequenceDuration();
 				m_bNeedReload = false;
 			}
 		}
@@ -700,7 +700,7 @@ void CWeapon_SLAM::SLAMThink( void )
 				SetSlamState(SLAM_SATCHEL_THROW);
 				int iAnim =	m_bDetonatorArmed ? ACT_SLAM_STICKWALL_TO_THROW : ACT_SLAM_TRIPMINE_TO_THROW_ND;
 				SendWeaponAnim( iAnim );
-				m_flWallSwitchTime = gpGlobals->curtime + SequenceDuration();
+				m_flWallSwitchTime = gpGlobals->curtime + GetEngineObject()->SequenceDuration();
 				m_bNeedReload = false;
 			}
 		}

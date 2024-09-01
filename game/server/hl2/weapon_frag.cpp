@@ -217,9 +217,9 @@ bool CWeaponFrag::Reload( void )
 		SendWeaponAnim( ACT_VM_DRAW );
 
 		//Update our times
-		m_flNextPrimaryAttack	= gpGlobals->curtime + SequenceDuration();
-		m_flNextSecondaryAttack	= gpGlobals->curtime + SequenceDuration();
-		m_flTimeWeaponIdle = gpGlobals->curtime + SequenceDuration();
+		m_flNextPrimaryAttack	= gpGlobals->curtime + GetEngineObject()->SequenceDuration();
+		m_flNextSecondaryAttack	= gpGlobals->curtime + GetEngineObject()->SequenceDuration();
+		m_flTimeWeaponIdle = gpGlobals->curtime + GetEngineObject()->SequenceDuration();
 
 		//Mark this as done
 		m_bRedraw = false;

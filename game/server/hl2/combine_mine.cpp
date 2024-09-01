@@ -147,17 +147,17 @@ void CBounceBomb::Spawn()
 	m_takedamage = DAMAGE_EVENTS_ONLY;
 
 	// Find my feet!
-	m_iHookN = LookupPoseParameter( "blendnorth" );
-	m_iHookE = LookupPoseParameter( "blendeast" );
-	m_iHookS = LookupPoseParameter( "blendsouth" );
-	m_iAllHooks = LookupPoseParameter( "blendstates" );
+	m_iHookN = GetEngineObject()->LookupPoseParameter( "blendnorth" );
+	m_iHookE = GetEngineObject()->LookupPoseParameter( "blendeast" );
+	m_iHookS = GetEngineObject()->LookupPoseParameter( "blendsouth" );
+	m_iAllHooks = GetEngineObject()->LookupPoseParameter( "blendstates" );
 	m_flHookPositions = 0;
 
 	SetHealth( 100 );
 
 	m_bBounce = true;
 
-	SetSequence( SelectWeightedSequence( ACT_IDLE ) );
+	GetEngineObject()->SetSequence( SelectWeightedSequence( ACT_IDLE ) );
 
 	OpenHooks( true );
 
@@ -209,7 +209,7 @@ void CBounceBomb::Spawn()
 			// using a static variable to provide better distribution. The static isn't saved but
 			// really it's only cosmetic.
 			static unsigned int nextSkin = MINE_CITIZEN_SKIN_MIN;
-			m_nSkin = nextSkin;
+			GetEngineObject()->SetSkin(nextSkin);
 			// increment the skin for next time
 			nextSkin = (nextSkin >= MINE_CITIZEN_SKIN_MAX) ? MINE_CITIZEN_SKIN_MIN : nextSkin + 1;
 		}	
@@ -613,7 +613,7 @@ void CBounceBomb::CaptiveThink()
 
 	float phase = fabs( sin( gpGlobals->curtime * 4.0f ) );
 	phase *= BOUNCEBOMB_HOOK_RANGE;
-	SetPoseParameter( m_iAllHooks, phase );
+	GetEngineObject()->SetPoseParameter( m_iAllHooks, phase );
 	return;
 }
 
@@ -1154,7 +1154,7 @@ void CBounceBomb::OpenHooks( bool bSilent )
 		VPhysicsGetObject()->EnableMotion( true );
 	}
 
-	SetPoseParameter( m_iAllHooks, BOUNCEBOMB_HOOK_RANGE );
+	GetEngineObject()->SetPoseParameter( m_iAllHooks, BOUNCEBOMB_HOOK_RANGE );
 
 #ifdef _XBOX 
 	GetEngineObject()->RemoveEffects( EF_NOSHADOW );
@@ -1188,7 +1188,7 @@ void CBounceBomb::CloseHooks()
 	// Only lock silently the first time we call this.
 	m_bLockSilently = false;
 
-	SetPoseParameter( m_iAllHooks, 0 );
+	GetEngineObject()->SetPoseParameter( m_iAllHooks, 0 );
 
 	VPhysicsGetObject()->EnableMotion( false );
 

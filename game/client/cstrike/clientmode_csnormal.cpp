@@ -825,12 +825,12 @@ void UpdateClassImageEntity(
 		pPlayerModel->GetEngineObject()->AddEffects( EF_NODRAW ); // don't let the renderer draw the model normally
 
 		// let player walk ahead
-		pPlayerModel->SetSequence( pPlayerModel->LookupSequence( "walk_lower" ) );
-		pPlayerModel->SetPoseParameter( "move_yaw", 0.0f ); // move_yaw
-		pPlayerModel->SetPoseParameter( "body_pitch", 10.0f ); // body_pitch, look down a bit
-		pPlayerModel->SetPoseParameter( "body_yaw", 0.0f ); // body_yaw
-		pPlayerModel->SetPoseParameter( "move_y", 0.0f ); // move_y
-		pPlayerModel->SetPoseParameter( "move_x", 1.0f ); // move_x, walk forward
+		pPlayerModel->GetEngineObject()->SetSequence( pPlayerModel->LookupSequence( "walk_lower" ) );
+		pPlayerModel->GetEngineObject()->SetPoseParameter( "move_yaw", 0.0f ); // move_yaw
+		pPlayerModel->GetEngineObject()->SetPoseParameter( "body_pitch", 10.0f ); // body_pitch, look down a bit
+		pPlayerModel->GetEngineObject()->SetPoseParameter( "body_yaw", 0.0f ); // body_yaw
+		pPlayerModel->GetEngineObject()->SetPoseParameter( "move_y", 0.0f ); // move_y
+		pPlayerModel->GetEngineObject()->SetPoseParameter( "move_x", 1.0f ); // move_x, walk forward
 		pPlayerModel->GetEngineObject()->SetAnimTime(gpGlobals->curtime);
 
 		g_ClassImagePlayer = pPlayerModel;
@@ -879,16 +879,16 @@ void UpdateClassImageEntity(
 
 	// wacky hacky, set upper body animation
 	pPlayerModel->m_SequenceTransitioner.CheckForSequenceChange( 
-		pPlayerModel->GetModelPtr(),
+		pPlayerModel->GetEngineObject()->GetModelPtr(),
 		pPlayerModel->LookupSequence( "walk_lower" ),
 		false,
 		true
 	);
 	pPlayerModel->m_SequenceTransitioner.UpdateCurrent( 
-		pPlayerModel->GetModelPtr(),
+		pPlayerModel->GetEngineObject()->GetModelPtr(),
 		pPlayerModel->LookupSequence( "walk_lower" ),
-		pPlayerModel->GetCycle(),
-		pPlayerModel->GetPlaybackRate(),
+		pPlayerModel->GetEngineObject()->GetCycle(),
+		pPlayerModel->GetEngineObject()->GetPlaybackRate(),
 		gpGlobals->realtime
 	);
 
@@ -899,7 +899,7 @@ void UpdateClassImageEntity(
 	{
 		C_AnimationLayer *layer = pPlayerModel->GetAnimOverlay( i );
 
-		layer->m_flCycle = pPlayerModel->GetCycle();
+		layer->m_flCycle = pPlayerModel->GetEngineObject()->GetCycle();
 		if ( i )
 			layer->m_nSequence = pPlayerModel->LookupSequence( pWeaponSequence );
 		else

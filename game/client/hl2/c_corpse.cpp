@@ -33,7 +33,7 @@ int C_Corpse::DrawModel( int flags )
 	};
 
 	// Make sure m_pstudiohdr is valid for drawing
-	if ( !GetModelPtr() )
+	if ( !GetEngineObject()->GetModelPtr() )
 	{
 		return drawn;
 	}
@@ -56,8 +56,8 @@ int C_Corpse::DrawModel( int flags )
 			GetModel(),
 			GetEngineObject()->GetAbsOrigin(),
 			GetEngineObject()->GetAbsAngles(),
-			m_nSkin,
-			m_nBody,
+			GetEngineObject()->GetSkin(),
+			GetEngineObject()->GetBody(),
 			GetEngineObject()->GetHitboxSet() );
 	}
 

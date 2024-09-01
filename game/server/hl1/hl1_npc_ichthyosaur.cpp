@@ -210,7 +210,7 @@ void CNPC_Ichthyosaur::Spawn( void )
 	GetEngineObject()->SetMoveType( MOVETYPE_STEP );
 	GetEngineObject()->AddFlag( FL_FLY | FL_STEPMOVEMENT );
 
-	m_flGroundSpeed			= ICH_SWIM_SPEED_RUN;
+	GetEngineObject()->SetGroundSpeed(ICH_SWIM_SPEED_RUN);
 
 	m_bloodColor		= BLOOD_COLOR_YELLOW;
 	m_iHealth			= sk_ichthyosaur_health.GetFloat();
@@ -361,14 +361,14 @@ void CNPC_Ichthyosaur::MoveExecute_Alive(float flInterval)
 		if (GetIdealActivity() == ACT_SWIM)
 			SetActivity( ACT_GLIDE );
 		if (GetIdealActivity() == ACT_GLIDE)
-			m_flPlaybackRate = m_flFlyingSpeed / 150.0;
+			GetEngineObject()->SetPlaybackRate(m_flFlyingSpeed / 150.0);
 	}
 	else
 	{
 		if (GetIdealActivity() == ACT_GLIDE)
 			SetActivity( ACT_SWIM );
 		if (GetIdealActivity() == ACT_SWIM)
-			m_flPlaybackRate = m_flFlyingSpeed / 300.0;
+			GetEngineObject()->SetPlaybackRate(m_flFlyingSpeed / 300.0);
 	}
 
 	// Steering
@@ -559,7 +559,7 @@ void CNPC_Ichthyosaur::StartTask(const Task_t *pTask)
 		break;
 
 	case TASK_ICHTHYOSAUR_FLOAT:
-		m_nSkin = EYE_BASE;
+		GetEngineObject()->SetSkin(EYE_BASE);
 		SetSequenceByName( "bellyup" );
 		break;
 
@@ -660,13 +660,13 @@ void CNPC_Ichthyosaur::RunTask(const Task_t *pTask )
 
 		break;
 	case TASK_ICHTHYOSAUR_SWIM:
-		if ( IsSequenceFinished() )
+		if (GetEngineObject()->IsSequenceFinished() )
 		{
 			TaskComplete( );
 		}
 		break;
 	case TASK_DIE:
-		if ( IsSequenceFinished() )
+		if (GetEngineObject()->IsSequenceFinished() )
 		{
 //			pev->deadflag = DEAD_DEAD;
 
@@ -837,14 +837,14 @@ void CNPC_Ichthyosaur::NPCThink ( void )
 	// blink the eye
 	if (m_flBlink < gpGlobals->curtime)
 	{
-		m_nSkin = EYE_CLOSED;
+		GetEngineObject()->SetSkin(EYE_CLOSED);
 		if (m_flBlink + 0.2 < gpGlobals->curtime)
 		{
 			m_flBlink = gpGlobals->curtime + random->RandomFloat( 3, 4 );
 			if (m_bOnAttack)
-				m_nSkin = EYE_MAD;
+				GetEngineObject()->SetSkin(EYE_MAD);
 			else
-				m_nSkin = EYE_BASE;
+				GetEngineObject()->SetSkin(EYE_BASE);
 		}
 	}
 

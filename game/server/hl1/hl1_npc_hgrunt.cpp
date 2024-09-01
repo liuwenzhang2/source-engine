@@ -276,9 +276,9 @@ void CNPC_HGrunt::Spawn()
 	m_cAmmoLoaded		= m_iClipSize;
 
 	if ( random->RandomInt( 0, 99 ) < 80)
-		m_nSkin = 0;	// light skin
+		GetEngineObject()->SetSkin(0);	// light skin
 	else
-		m_nSkin = 1;	// dark skin
+		GetEngineObject()->SetSkin(1);	// dark skin
 
 	if (FBitSet( m_iWeapons, HGRUNT_SHOTGUN ))
 	{
@@ -287,7 +287,7 @@ void CNPC_HGrunt::Spawn()
 	else if (FBitSet( m_iWeapons, HGRUNT_GRENADELAUNCHER ))
 	{
 		SetBodygroup( HEAD_GROUP, HEAD_M203 );
-		m_nSkin = 1; // alway dark skin
+		GetEngineObject()->SetSkin(1); // alway dark skin
 	}
 
 	m_flTalkWaitTime = 0;
@@ -588,7 +588,7 @@ void CNPC_HGrunt::StartNPC ( void )
 	if ( m_pSquad && m_pSquad->IsLeader( this ) )
 	{
 		SetBodygroup( 1, 1 ); // UNDONE: truly ugly hack
-		m_nSkin = 0;
+		GetEngineObject()->SetSkin(0);
 	}
 }
 
@@ -665,7 +665,7 @@ int CNPC_HGrunt::GetGrenadeConditions( float flDot, float flDist  )
 	if (gpGlobals->curtime < m_flNextGrenadeCheck )
 		return m_iLastGrenadeCondition;
 	
-	if ( m_flGroundSpeed != 0 )
+	if (GetEngineObject()->GetGroundSpeed() != 0 )
 		return COND_NONE;
 
 	CBaseEntity *pEnemy = GetEnemy();
@@ -1211,10 +1211,10 @@ void CNPC_HGrunt::SetAim( const Vector &aimDir )
 	QAngle angDir;
 	VectorAngles( aimDir, angDir );
 
-	float curPitch = GetPoseParameter( "XR" );
+	float curPitch = GetEngineObject()->GetPoseParameter( "XR" );
 	float newPitch = curPitch + UTIL_AngleDiff( UTIL_ApproachAngle( angDir.x, curPitch, 60 ), curPitch );
 
-	SetPoseParameter( "XR", -newPitch );
+	GetEngineObject()->SetPoseParameter( "XR", -newPitch );
 }
 
 //=========================================================
@@ -2598,12 +2598,12 @@ void CNPC_DeadHGrunt::Spawn( void )
 	SetModel( "models/hgrunt.mdl" );
 
 	GetEngineObject()->ClearEffects();
-	SetSequence( 0 );
+	GetEngineObject()->SetSequence( 0 );
 	m_bloodColor		= BLOOD_COLOR_RED;
 
-	SetSequence( LookupSequence( m_szPoses[m_iPose] ) );
+	GetEngineObject()->SetSequence( LookupSequence( m_szPoses[m_iPose] ) );
 
-	if ( GetSequence() == -1 )
+	if (GetEngineObject()->GetSequence() == -1 )
 	{
 		Msg ( "Dead hgrunt with bad pose\n" );
 	}
@@ -2612,29 +2612,29 @@ void CNPC_DeadHGrunt::Spawn( void )
 	m_iHealth			= 8;
 
 	// map old bodies onto new bodies
-	switch( m_nBody )
+	switch(GetEngineObject()->GetBody() )
 	{
 	case 0: // Grunt with Gun
-		m_nBody = 0;
-		m_nSkin = 0;
+		GetEngineObject()->SetBody(0);
+		GetEngineObject()->SetSkin(0);
 		SetBodygroup( HEAD_GROUP, HEAD_GRUNT );
 		SetBodygroup( GUN_GROUP, GUN_MP5 );
 		break;
 	case 1: // Commander with Gun
-		m_nBody = 0;
-		m_nSkin = 0;
+		GetEngineObject()->SetBody(0);
+		GetEngineObject()->SetSkin(0);
 		SetBodygroup( HEAD_GROUP, HEAD_COMMANDER );
 		SetBodygroup( GUN_GROUP, GUN_MP5 );
 		break;
 	case 2: // Grunt no Gun
-		m_nBody = 0;
-		m_nSkin = 0;
+		GetEngineObject()->SetBody(0);
+		GetEngineObject()->SetSkin(0);
 		SetBodygroup( HEAD_GROUP, HEAD_GRUNT );
 		SetBodygroup( GUN_GROUP, GUN_NONE );
 		break;
 	case 3: // Commander no Gun
-		m_nBody = 0;
-		m_nSkin = 0;
+		GetEngineObject()->SetBody(0);
+		GetEngineObject()->SetSkin(0);
 		SetBodygroup( HEAD_GROUP, HEAD_COMMANDER );
 		SetBodygroup( GUN_GROUP, GUN_NONE );
 		break;

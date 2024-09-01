@@ -474,7 +474,7 @@ void CAI_PassengerBehaviorCompanion::GatherConditions( void )
 				// Add the gesture to be played.  If it's already playing, the underlying function will simply opt-out
 				int nSequence = GetOuter()->AddGesture( GetOuter()->NPC_TranslateActivity( ACT_PASSENGER_GESTURE_JOSTLE_LARGE ), true );
 
-				GetOuter()->SetNextAttack( gpGlobals->curtime + ( GetOuter()->SequenceDuration( nSequence ) * 2.0f ) );
+				GetOuter()->SetNextAttack( gpGlobals->curtime + ( GetOuter()->GetEngineObject()->SequenceDuration( nSequence ) * 2.0f ) );
 				GetOuter()->GetShotRegulator()->FireNoEarlierThan( GetOuter()->GetNextAttack() );
 
 				// Push out our fidget into the future so that we don't act unnaturally over bumpy terrain
@@ -1386,7 +1386,7 @@ void CAI_PassengerBehaviorCompanion::StartTask( const Task_t *pTask )
 			
 			// Delay for twice the duration of our impact animation
 			int nSequence = GetOuter()->SelectWeightedSequence( ACT_PASSENGER_IMPACT ); 
-			float flSeqDuration = GetOuter()->SequenceDuration( nSequence );
+			float flSeqDuration = GetOuter()->GetEngineObject()->SequenceDuration( nSequence );
 			float flStunTime = flSeqDuration  + random->RandomFloat( 1.0f, 2.0f );
 			GetOuter()->SetNextAttack( gpGlobals->curtime + flStunTime );
 			ExtendFidgetDelay( flStunTime );
@@ -1467,7 +1467,7 @@ void CAI_PassengerBehaviorCompanion::RunTask( const Task_t *pTask )
 	{
 	case TASK_PASSENGER_RELOAD:
 		{
-			if ( GetOuter()->IsSequenceFinished() )
+			if ( GetOuter()->GetEngineObject()->IsSequenceFinished() )
 			{
 				TaskComplete();
 			}
@@ -1476,7 +1476,7 @@ void CAI_PassengerBehaviorCompanion::RunTask( const Task_t *pTask )
 
 	case TASK_PASSENGER_IMPACT:
 		{
-			if ( GetOuter()->IsSequenceFinished() )
+			if ( GetOuter()->GetEngineObject()->IsSequenceFinished() )
 			{
 				TaskComplete();
 				return;
@@ -1805,7 +1805,7 @@ void CAI_PassengerBehaviorCompanion::CalculateBodyLean( void )
 	}
 
 	// Set these parameters
-	GetOuter()->SetPoseParameter( "vehicle_lean", m_flLastLateralLean );
+	GetOuter()->GetEngineObject()->SetPoseParameter( "vehicle_lean", m_flLastLateralLean );
 }
 
 //-----------------------------------------------------------------------------

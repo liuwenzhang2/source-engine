@@ -539,7 +539,7 @@ AIMotorMoveResult_t CAI_BlendedMotor::MoveGroundExecute( const AILocalMoveGoal_t
 
 	// FIXME: this should be based on 
 
-	GetOuter()->m_flGroundSpeed = GetSequenceGroundSpeed( GetSequence());
+	GetOuter()->GetEngineObject()->SetGroundSpeed(GetSequenceGroundSpeed( GetSequence()));
 
 
 
@@ -596,7 +596,7 @@ AIMotorMoveResult_t CAI_BlendedMotor::MoveFlyExecute( const AILocalMoveGoal_t &m
 	// turn in the direction needed
 	MoveFacing( move2 );
 
-	GetOuter()->m_flGroundSpeed = GetSequenceGroundSpeed( GetSequence());
+	GetOuter()->GetEngineObject()->SetGroundSpeed(GetSequenceGroundSpeed( GetSequence()));
 
 	SetMoveScriptAnim( flNewSpeed );
 

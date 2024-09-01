@@ -2029,7 +2029,7 @@ void CAI_ActBusyBehavior::RunTask( const Task_t *pTask )
 		{
 			if( m_bUseRenderBoundsForCollision )
 			{
-				if( GetOuter()->IsSequenceFinished() && m_bNeedToSetBounds )
+				if( GetOuter()->GetEngineObject()->IsSequenceFinished() && m_bNeedToSetBounds )
 				{
 					ComputeAndSetRenderBounds();
 					m_bNeedToSetBounds = false;
@@ -2080,7 +2080,7 @@ void CAI_ActBusyBehavior::RunTask( const Task_t *pTask )
 	case TASK_ACTBUSY_PLAY_ENTRY:
 		{
 			GetOuter()->AutoMovement();
-			if ( !ActBusyNodeStillActive() || GetOuter()->IsSequenceFinished() )
+			if ( !ActBusyNodeStillActive() || GetOuter()->GetEngineObject()->IsSequenceFinished() )
 			{
 				TaskComplete();
 			}
@@ -2115,7 +2115,7 @@ void CAI_ActBusyBehavior::RunTask( const Task_t *pTask )
 	case TASK_ACTBUSY_PLAY_EXIT:
 		{
 			GetOuter()->AutoMovement();
-			if ( GetOuter()->IsSequenceFinished() )
+			if ( GetOuter()->GetEngineObject()->IsSequenceFinished() )
 			{
 				m_bNeedsToPlayExitAnim = false;
 				GetOuter()->GetEngineObject()->RemoveFlag( FL_FLY );

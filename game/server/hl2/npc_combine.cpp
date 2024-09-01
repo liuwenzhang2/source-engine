@@ -457,7 +457,7 @@ void CNPC_Combine::PrescheduleThink()
 		}
 	}
 
-	if( m_flGroundSpeed > 0 && GetState() == NPC_STATE_COMBAT && m_MoveAndShootOverlay.IsSuspended() )
+	if(GetEngineObject()->GetGroundSpeed() > 0 && GetState() == NPC_STATE_COMBAT && m_MoveAndShootOverlay.IsSuspended())
 	{
 		// Return to move and shoot when near my goal so that I 'tuck into' the location facing my enemy.
 		if( GetNavigator()->GetPathTimeToGoal() <= 1.0f )
@@ -2828,7 +2828,7 @@ bool CNPC_Combine::CanThrowGrenade( const Vector &vecTarget )
 	// -----------------------
 	// If moving, don't check.
 	// -----------------------
-	if ( m_flGroundSpeed != 0 )
+	if (GetEngineObject()->GetGroundSpeed() != 0 )
 		return false;
 
 #if 0
@@ -3202,9 +3202,9 @@ WeaponProficiency_t CNPC_Combine::CalcWeaponProficiency( CBaseCombatWeapon *pWea
 	}
 	else if( FClassnameIs( pWeapon, "weapon_shotgun" )	)
 	{
-		if( m_nSkin != COMBINE_SKIN_SHOTGUNNER )
+		if(GetEngineObject()->GetSkin() != COMBINE_SKIN_SHOTGUNNER )
 		{
-			m_nSkin = COMBINE_SKIN_SHOTGUNNER;
+			GetEngineObject()->SetSkin(COMBINE_SKIN_SHOTGUNNER);
 		}
 
 		return WEAPON_PROFICIENCY_PERFECT;

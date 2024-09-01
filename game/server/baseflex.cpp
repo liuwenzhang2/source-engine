@@ -138,7 +138,7 @@ void CBaseFlex::SetFlexWeight( LocalFlexController_t index, float value )
 {
 	if (index >= 0 && index < GetNumFlexControllers())
 	{
-		IStudioHdr *pstudiohdr = GetModelPtr( );
+		IStudioHdr *pstudiohdr = GetEngineObject()->GetModelPtr( );
 		if (! pstudiohdr)
 			return;
 
@@ -158,7 +158,7 @@ float CBaseFlex::GetFlexWeight( LocalFlexController_t index )
 {
 	if (index >= 0 && index < GetNumFlexControllers())
 	{
-		IStudioHdr *pstudiohdr = GetModelPtr( );
+		IStudioHdr *pstudiohdr = GetEngineObject()->GetModelPtr( );
 		if (! pstudiohdr)
 			return 0;
 
@@ -500,12 +500,12 @@ bool CBaseFlex::HandleStartSequenceSceneEvent( CSceneEventInfo *info, CChoreoSce
 	SetLayerNoRestore( info->m_iLayer, true );
 	SetLayerWeight( info->m_iLayer, 0.0 );
 
-	bool looping = ((GetModelPtr()->GetSequenceFlags( info->m_nSequence ) & STUDIO_LOOPING) != 0);
+	bool looping = ((GetEngineObject()->GetModelPtr()->GetSequenceFlags( info->m_nSequence ) & STUDIO_LOOPING) != 0);
 	if (!looping)
 	{
 		// figure out the animtime when this was frame 0
 		float dt =  scene->GetTime() - event->GetStartTime();
-		float seq_duration = SequenceDuration( info->m_nSequence );
+		float seq_duration = GetEngineObject()->SequenceDuration( info->m_nSequence );
 		float flCycle = dt / seq_duration;
 		flCycle = flCycle - (int)flCycle; // loop
 		SetLayerCycle( info->m_iLayer, flCycle, flCycle );
@@ -601,7 +601,7 @@ bool CBaseFlex::HandleStartGestureSceneEvent( CSceneEventInfo *info, CChoreoScen
 
 		if ( pkvAllFaceposer )
 		{
-			IStudioHdr *pstudiohdr = GetModelPtr();
+			IStudioHdr *pstudiohdr = GetEngineObject()->GetModelPtr();
 			
 			mstudioseqdesc_t &seqdesc = pstudiohdr->pSeqdesc( info->m_nSequence );
 			mstudioanimdesc_t &animdesc = pstudiohdr->pAnimdesc( pstudiohdr->iRelativeAnim( info->m_nSequence, seqdesc.anim(0,0) ) );
@@ -665,7 +665,7 @@ bool CBaseFlex::HandleStartGestureSceneEvent( CSceneEventInfo *info, CChoreoScen
 	SetLayerDuration( info->m_iLayer, event->GetDuration() );
 	SetLayerWeight( info->m_iLayer, 0.0 );
 
-	bool looping = ((GetModelPtr()->GetSequenceFlags( info->m_nSequence ) & STUDIO_LOOPING) != 0);
+	bool looping = ((GetEngineObject()->GetModelPtr()->GetSequenceFlags( info->m_nSequence ) & STUDIO_LOOPING) != 0);
 	if ( looping )
 	{
 		DevMsg( 1, "vcd error, gesture %s of model %s is marked as STUDIO_LOOPING!\n", 
@@ -1925,11 +1925,11 @@ bool CBaseFlex::ProcessSequenceSceneEvent( CSceneEventInfo *info, CChoreoScene *
 		float spline = 3 * info->m_flWeight * info->m_flWeight - 2 * info->m_flWeight * info->m_flWeight * info->m_flWeight;
 		SetLayerWeight( info->m_iLayer, flWeight * spline );
 
-		bool looping = ((GetModelPtr()->GetSequenceFlags( info->m_nSequence ) & STUDIO_LOOPING) != 0);
+		bool looping = ((GetEngineObject()->GetModelPtr()->GetSequenceFlags( info->m_nSequence ) & STUDIO_LOOPING) != 0);
 		if (!looping)
 		{
 			float dt =  scene->GetTime() - event->GetStartTime();
-			float seq_duration = SequenceDuration( info->m_nSequence );
+			float seq_duration = GetEngineObject()->SequenceDuration( info->m_nSequence );
 			float flCycle = dt / seq_duration;
 			flCycle = clamp( flCycle, 0.f, 1.0f );
 			SetLayerCycle( info->m_iLayer, flCycle );
@@ -2307,7 +2307,7 @@ void CFlexCycler::GenericCyclerSpawn(char *szModel, Vector vecMin, Vector vecMax
 	UTIL_SetSize(this, vecMin, vecMax);
 
 	Vector vecEyeOffset;
-	GetModelPtr()->GetEyePosition( vecEyeOffset );
+	GetEngineObject()->GetModelPtr()->GetEyePosition( vecEyeOffset );
 	SetViewOffset( vecEyeOffset );
 
 	InitBoneControllers();
@@ -2337,15 +2337,15 @@ void CFlexCycler::Spawn( )
 	m_takedamage		= DAMAGE_YES;
 	m_iHealth			= 80000;// no cycler should die
 	
-	m_flPlaybackRate	= 1.0f;
-	m_flGroundSpeed		= 0;
+	GetEngineObject()->SetPlaybackRate(1.0f);
+	GetEngineObject()->SetGroundSpeed(0);
 
 
 	GetEngineObject()->SetNextThink( gpGlobals->curtime + 1.0f );
 
-	ResetSequenceInfo( );
+	GetEngineObject()->ResetSequenceInfo( );
 
-	m_flCycle = random->RandomFloat( 0, 1.0 );
+	GetEngineObject()->SetCycle(random->RandomFloat( 0, 1.0 ));
 }
 
 const char *predef_flexcontroller_names[] = { 
@@ -2396,14 +2396,14 @@ float predef_flexcontroller_values[7][30] = {
 //-----------------------------------------------------------------------------
 int CFlexCycler::OnTakeDamage( const CTakeDamageInfo &info )
 {
-	int nSequence = GetSequence() + 1;
+	int nSequence = GetEngineObject()->GetSequence() + 1;
 	if (!IsValidSequence( nSequence ))
 	{
 		nSequence = 0;
 	}
 
-	ResetSequence( nSequence );
-	m_flCycle = 0;
+	GetEngineObject()->ResetSequence( nSequence );
+	GetEngineObject()->SetCycle(0);
 
 	return 0;
 }
@@ -2460,15 +2460,15 @@ void CFlexCycler::Think( void )
 
 	StudioFrameAdvance ( );
 
-	if (IsSequenceFinished() && !SequenceLoops())
+	if (GetEngineObject()->IsSequenceFinished() && !GetEngineObject()->SequenceLoops())
 	{
 		// ResetSequenceInfo();
 		// hack to avoid reloading model every frame
 		GetEngineObject()->SetAnimTime(gpGlobals->curtime);
-		m_flPlaybackRate = 1.0;
-		m_bSequenceFinished = false;
-		m_flLastEventCheck = 0;
-		m_flCycle = 0;
+		GetEngineObject()->SetPlaybackRate(1.0);
+		GetEngineObject()->SetSequenceFinished(false);
+		GetEngineObject()->SetLastEventCheck(0);
+		GetEngineObject()->SetCycle(0);
 	}
 
 	// only do this if they have more than eyelid movement

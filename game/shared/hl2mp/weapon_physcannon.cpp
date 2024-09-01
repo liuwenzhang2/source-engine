@@ -2513,13 +2513,13 @@ void CWeaponPhysCannon::UpdateElementPosition( void )
 			
 			if ( vm != NULL )
 			{
-				vm->SetPoseParameter( "active", flElementPosition );
+				vm->GetEngineObject()->SetPoseParameter( "active", flElementPosition );
 			}
 		}
 	}
 	else
 	{
-		SetPoseParameter( "active", flElementPosition );
+		GetEngineObject()->SetPoseParameter( "active", flElementPosition );
 	}
 }
 

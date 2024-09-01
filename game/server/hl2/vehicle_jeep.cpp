@@ -223,10 +223,10 @@ void CPropJeep::Spawn( void )
 		SetBodygroup( 1, true );
 
 		// Initialize pose parameters
-		SetPoseParameter( JEEP_GUN_YAW, 0 );
-		SetPoseParameter( JEEP_GUN_PITCH, 0 );
+		GetEngineObject()->SetPoseParameter( JEEP_GUN_YAW, 0 );
+		GetEngineObject()->SetPoseParameter( JEEP_GUN_PITCH, 0 );
 		m_nSpinPos = 0;
-		SetPoseParameter( JEEP_GUN_SPIN, m_nSpinPos );
+		GetEngineObject()->SetPoseParameter( JEEP_GUN_SPIN, m_nSpinPos );
 		m_aimYaw = 0;
 		m_aimPitch = 0;
 	}
@@ -383,9 +383,9 @@ void CPropJeep::AimGunAt( Vector *endPos, float flInterval )
 	// See if the gun should be allowed to aim
 	if ( IsOverturned() || m_bEngineLocked || m_bHasGun == false )
 	{
-		SetPoseParameter( JEEP_GUN_YAW, 0 );
-		SetPoseParameter( JEEP_GUN_PITCH, 0 );
-		SetPoseParameter( JEEP_GUN_SPIN, 0 );
+		GetEngineObject()->SetPoseParameter( JEEP_GUN_YAW, 0 );
+		GetEngineObject()->SetPoseParameter( JEEP_GUN_PITCH, 0 );
+		GetEngineObject()->SetPoseParameter( JEEP_GUN_SPIN, 0 );
 		return;
 
 		// Make the gun go limp and look "down"
@@ -432,15 +432,15 @@ void CPropJeep::AimGunAt( Vector *endPos, float flInterval )
 	m_aimYaw = UTIL_Approach( targetYaw, m_aimYaw, yawSpeed );
 	m_aimPitch = UTIL_Approach( targetPitch, m_aimPitch, pitchSpeed );
 
-	SetPoseParameter( JEEP_GUN_YAW, -m_aimYaw);
-	SetPoseParameter( JEEP_GUN_PITCH, -m_aimPitch );
+	GetEngineObject()->SetPoseParameter( JEEP_GUN_YAW, -m_aimYaw);
+	GetEngineObject()->SetPoseParameter( JEEP_GUN_PITCH, -m_aimPitch );
 
 	InvalidateBoneCache();
 
 	// read back to avoid drift when hitting limits
 	// as long as the velocity is less than the delta between the limit and 180, this is fine.
-	m_aimPitch = -GetPoseParameter( JEEP_GUN_PITCH );
-	m_aimYaw = -GetPoseParameter( JEEP_GUN_YAW );
+	m_aimPitch = -GetEngineObject()->GetPoseParameter( JEEP_GUN_PITCH );
+	m_aimYaw = -GetEngineObject()->GetPoseParameter( JEEP_GUN_YAW );
 
 	// Now draw crosshair for actual aiming point
 	Vector	vecMuzzle, vecMuzzleDir;
@@ -729,7 +729,7 @@ void CPropJeep::Think( void )
 	if ( m_bCannonCharging )
 	{
 		m_nSpinPos += JEEP_GUN_SPIN_RATE;
-		SetPoseParameter( JEEP_GUN_SPIN, m_nSpinPos );
+		GetEngineObject()->SetPoseParameter( JEEP_GUN_SPIN, m_nSpinPos );
 	}
 
 	// Aim gun based on the player view direction.
@@ -768,7 +768,7 @@ void CPropJeep::Think( void )
 	StudioFrameAdvance();
 
 	// If the enter or exit animation has finished, tell the server vehicle
-	if ( IsSequenceFinished() && (m_bExitAnimOn || m_bEnterAnimOn) )
+	if (GetEngineObject()->IsSequenceFinished() && (m_bExitAnimOn || m_bEnterAnimOn) )
 	{
 		if ( m_bEnterAnimOn )
 		{
@@ -801,10 +801,10 @@ void CPropJeep::Think( void )
 				int nSequence = SelectWeightedSequence( ACT_IDLE_STIMULATED );
 				if ( nSequence > ACTIVITY_NOT_AVAILABLE )
 				{
-					SetCycle( 0 );
+					GetEngineObject()->SetCycle( 0 );
 					GetEngineObject()->SetAnimTime(gpGlobals->curtime);
-					ResetSequence( nSequence );
-					ResetClientsideFrame();					
+					GetEngineObject()->ResetSequence( nSequence );
+					GetEngineObject()->ResetClientsideFrame();
 				}
 			}
 		}
@@ -822,21 +822,21 @@ void CPropJeep::Think( void )
 	}
 
 	// See if the ammo crate needs to close
-	if ( ( m_flAmmoCrateCloseTime < gpGlobals->curtime ) && ( GetSequence() == LookupSequence( "ammo_open" ) ) )
+	if ( ( m_flAmmoCrateCloseTime < gpGlobals->curtime ) && (GetEngineObject()->GetSequence() == LookupSequence( "ammo_open" ) ) )
 	{
 		GetEngineObject()->SetAnimTime(gpGlobals->curtime);
-		m_flPlaybackRate = 0.0;
-		SetCycle( 0 );
-		ResetSequence( LookupSequence( "ammo_close" ) );
+		GetEngineObject()->SetPlaybackRate(0.0);
+		GetEngineObject()->SetCycle( 0 );
+		GetEngineObject()->ResetSequence( LookupSequence( "ammo_close" ) );
 	}
-	else if ( ( GetSequence() == LookupSequence( "ammo_close" ) ) && IsSequenceFinished() )
+	else if ( (GetEngineObject()->GetSequence() == LookupSequence( "ammo_close" ) ) && GetEngineObject()->IsSequenceFinished() )
 	{
 		GetEngineObject()->SetAnimTime(gpGlobals->curtime);
-		m_flPlaybackRate = 0.0;
-		SetCycle( 0 );
+		GetEngineObject()->SetPlaybackRate(0.0);
+		GetEngineObject()->SetCycle( 0 );
 		
 		int nSequence = SelectWeightedSequence( ACT_IDLE );
-		ResetSequence( nSequence );
+		GetEngineObject()->ResetSequence( nSequence );
 
 		CPASAttenuationFilter sndFilter( this, "PropJeep.AmmoClose" );
 		g_pSoundEmitterSystem->EmitSound( sndFilter, entindex(), "PropJeep.AmmoClose" );
@@ -1155,13 +1155,13 @@ void CPropJeep::Use( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE use
 		// Fill up his SMG ammo.
 		pPlayer->GiveAmmo( 300, "SMG1");
 		
-		if ( ( GetSequence() != LookupSequence( "ammo_open" ) ) && ( GetSequence() != LookupSequence( "ammo_close" ) ) )
+		if ( (GetEngineObject()->GetSequence() != LookupSequence( "ammo_open" ) ) && (GetEngineObject()->GetSequence() != LookupSequence( "ammo_close" ) ) )
 		{
 			// Open the crate
 			GetEngineObject()->SetAnimTime(gpGlobals->curtime);
-			m_flPlaybackRate = 0.0;
-			SetCycle( 0 );
-			ResetSequence( LookupSequence( "ammo_open" ) );
+			GetEngineObject()->SetPlaybackRate(0.0);
+			GetEngineObject()->SetCycle( 0 );
+			GetEngineObject()->ResetSequence( LookupSequence( "ammo_open" ) );
 			
 			CPASAttenuationFilter sndFilter( this, "PropJeep.AmmoOpen" );
 			g_pSoundEmitterSystem->EmitSound( sndFilter, entindex(), "PropJeep.AmmoOpen" );
@@ -1579,7 +1579,7 @@ void CPropJeep::SpawnPerchedSeagull( void )
 	// Find a point on the car to sit
 	Vector vecOrigin;
 	QAngle vecAngles;
-	int iAttachment = GetModelPtr()->Studio_FindRandomAttachment( "seagull_perch" );
+	int iAttachment = GetEngineObject()->GetModelPtr()->Studio_FindRandomAttachment( "seagull_perch" );
 	if ( iAttachment == -1 )
 		return;
 
@@ -1657,9 +1657,9 @@ void CPropJeep::InputStartRemoveTauCannon( inputdata_t &inputdata )
 {
 	// Start the gun removal animation
 	GetEngineObject()->SetAnimTime(gpGlobals->curtime);
-	m_flPlaybackRate = 0.0;
-	SetCycle( 0 );
-	ResetSequence( LookupSequence( "tau_levitate" ) );
+	GetEngineObject()->SetPlaybackRate(0.0);
+	GetEngineObject()->SetCycle( 0 );
+	GetEngineObject()->ResetSequence( LookupSequence( "tau_levitate" ) );
 
 	m_bGunHasBeenCutOff = true;
 }

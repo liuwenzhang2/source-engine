@@ -669,7 +669,7 @@ bool CAI_BaseActor::CheckSceneEventCompletion( CSceneEventInfo *info, float curr
 					{
 						return true;
 					}
-					float t = (1.0 - GetLayerCycle( info->m_iLayer )) * SequenceDuration( GetLayerSequence( info->m_iLayer ) );
+					float t = (1.0 - GetLayerCycle( info->m_iLayer )) * GetEngineObject()->SequenceDuration( GetLayerSequence( info->m_iLayer ) );
 
 					return (t <= preload);
 				}

@@ -67,7 +67,7 @@ void CPropVehicleViewController::Think(void)
 	StudioFrameAdvance();
 
 	// If the exit anim has finished, move the player to the right spot and stop animating
-	if ( IsSequenceFinished() && (m_bExitAnimOn || m_bEnterAnimOn) )
+	if (GetEngineObject()->IsSequenceFinished() && (m_bExitAnimOn || m_bEnterAnimOn) )
 	{
 		// If we're exiting and have had the tau cannon removed, we don't want to reset the animation
 		GetServerVehicle()->HandleEntryExitFinish( m_bExitAnimOn, false );
@@ -161,10 +161,10 @@ void CPropVehicleViewController::InputForcePlayerIn( inputdata_t &inputdata )
 	}
 
 	// Setup the "enter" vehicle sequence
-	SetCycle( 0 );
+	GetEngineObject()->SetCycle( 0 );
 	GetEngineObject()->SetAnimTime(gpGlobals->curtime);
-	ResetSequence( iEntryAnim );
-	ResetClientsideFrame();
+	GetEngineObject()->ResetSequence( iEntryAnim );
+	GetEngineObject()->ResetClientsideFrame();
 	m_bEnterAnimOn = true;
 }
 

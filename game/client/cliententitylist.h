@@ -129,10 +129,14 @@ public:
 	C_EngineObjectInternal() :
 		m_iv_vecOrigin("C_BaseEntity::m_iv_vecOrigin", &m_vecOrigin, LATCH_SIMULATION_VAR),
 		m_iv_angRotation("C_BaseEntity::m_iv_angRotation", &m_angRotation, LATCH_SIMULATION_VAR),
-		m_iv_vecVelocity("C_BaseEntity::m_iv_vecVelocity", &m_vecVelocity, LATCH_SIMULATION_VAR)
+		m_iv_vecVelocity("C_BaseEntity::m_iv_vecVelocity", &m_vecVelocity, LATCH_SIMULATION_VAR), 
+		m_iv_flCycle("C_BaseAnimating::m_iv_flCycle", &m_flCycle, LATCH_ANIMATION_VAR),
+		m_iv_flPoseParameter("C_BaseAnimating::m_iv_flPoseParameter", m_flPoseParameter, LATCH_ANIMATION_VAR),
+		m_iv_flEncodedController("C_BaseAnimating::m_iv_flEncodedController", m_flEncodedController, LATCH_ANIMATION_VAR)
 	{
 		AddVar(&m_iv_vecOrigin);//&m_vecOrigin, , LATCH_SIMULATION_VAR
 		AddVar(&m_iv_angRotation);//&m_angRotation, , LATCH_SIMULATION_VAR
+
 
 #ifdef _DEBUG
 		m_vecAbsOrigin = vec3_origin;
@@ -187,6 +191,24 @@ public:
 		m_nBody = 0;
 		m_nHitboxSet = 0;
 		m_flModelScale = 1.0f;
+		m_flOldModelScale = 0.0f;
+		int i;
+		for (i = 0; i < ARRAYSIZE(m_flEncodedController); i++)
+		{
+			m_flEncodedController[i] = 0.0f;
+		}
+		m_pModel = NULL;
+		m_pStudioHdr = NULL;
+		m_hStudioHdr = MDLHANDLE_INVALID;
+		m_flCycle = 0;
+		m_flOldCycle = 0;
+		m_flPlaybackRate = 1.0f;
+		m_nMuzzleFlashParity = 0;
+		m_nOldMuzzleFlashParity = 0;
+		Q_memset(&m_mouth, 0, sizeof(m_mouth));
+		m_nPrevNewSequenceParity = -1;
+		m_bReceivedSequence = false;
+
 	}
 
 	~C_EngineObjectInternal()
@@ -194,12 +216,14 @@ public:
 		ClearDataChangedEvent(m_DataChangeEventRef);
 		// Are we in the partition?
 		DestroyPartitionHandle();
+		InvalidateMdlCache();
 	}
 
 	void Init(C_BaseEntity* pOuter) {
 		m_pOuter = pOuter;
 		m_nCreationTick = gpGlobals->tickcount;
 		CreatePartitionHandle();
+		AddBaseAnimatingInterpolatedVars();
 	}
 
 	IClientEntity* GetClientEntity() {
@@ -427,6 +451,18 @@ public:
 		m_nBody = 0;
 		m_nHitboxSet = 0;
 		m_flModelScale = 1.0f;
+		m_flOldModelScale = 0.0f;
+		InvalidateMdlCache();
+		m_pModel = NULL;
+		m_flCycle = 0;
+		m_flOldCycle = 0;
+		m_flPlaybackRate = 1.0f;
+		m_nMuzzleFlashParity = 0;
+		m_nOldMuzzleFlashParity = 0;
+		Q_memset(&m_mouth, 0, sizeof(m_mouth));
+		m_nPrevNewSequenceParity = -1;
+		m_bReceivedSequence = false;
+
 	}
 
 	// Invalidates the abs state of all children
@@ -660,7 +696,82 @@ public:
 	inline bool IsModelScaleFractional() const;  /// very fast way to ask if the model scale is < 1.0f  (faster than if (GetModelScale() < 1.0f) )
 	inline bool IsModelScaled() const;
 	void UpdateModelScale(void);
+	const model_t* GetModel(void) const;
+	void SetModelPointer(const model_t* pModel);
+	IStudioHdr* GetModelPtr() const;
+	void InvalidateMdlCache();
+	void SetCycle(float flCycle);
+	float GetCycle() const;
+	float GetPlaybackRate();
+	void SetPlaybackRate(float rate);
+	void SetReceivedSequence(void);
+	bool GetReceivedSequence() {
+		return m_bReceivedSequence;
+	}
+	int GetSequence();
+	virtual void SetSequence(int nSequence);
+	inline void ResetSequence(int nSequence);
+	void ResetSequenceInfo(void);
+	int GetNewSequenceParity(){
+		return m_nNewSequenceParity;
+	}
+	int GetPrevNewSequenceParity() {
+		return m_nPrevNewSequenceParity;
+	}
+	void SetPrevNewSequenceParity(int nPrevNewSequenceParity) {
+		m_nPrevNewSequenceParity = nPrevNewSequenceParity;
+	}
+	int GetResetEventsParity() {
+		return m_nResetEventsParity;
+	}
+	float GetGroundSpeed() const {
+		return m_flGroundSpeed;
+	}
+	void SetGroundSpeed(float flGroundSpeed) {
+		m_flGroundSpeed = flGroundSpeed;
+	}
+	bool SequenceLoops(void) { return m_bSequenceLoops; }
+	bool IsSequenceFinished(void);
+	void SetSequenceFinished(bool bFinished) {
+		m_bSequenceFinished = bFinished;
+	}
 
+	void DisableMuzzleFlash();		// Turn off the muzzle flash (ie: signal that we handled the server's event).
+	virtual void DoMuzzleFlash();	// Force a muzzle flash event. Note: this only QUEUES an event, so
+	// ProcessMuzzleFlashEvent will get called later.
+	bool ShouldMuzzleFlash() const;	// Is the muzzle flash event on?
+	// Get bone controller values.
+	virtual void GetBoneControllers(float controllers[MAXSTUDIOBONECTRLS]);
+	virtual float SetBoneController(int iController, float flValue);
+	virtual CMouthInfo* GetMouth();
+	CMouthInfo& MouthInfo();
+	virtual void ControlMouth(IStudioHdr* pStudioHdr);
+	bool IsSequenceLooping(IStudioHdr* pStudioHdr, int iSequence);
+	bool IsSequenceLooping(int iSequence) { return IsSequenceLooping(GetModelPtr(), iSequence); }
+	virtual float GetSequenceCycleRate(IStudioHdr* pStudioHdr, int iSequence);
+	void GetSequenceLinearMotion(int iSequence, Vector* pVec);
+	float GetSequenceMoveDist(IStudioHdr* pStudioHdr, int iSequence);
+	float GetSequenceGroundSpeed(IStudioHdr* pStudioHdr, int iSequence);
+	float GetSequenceGroundSpeed(int iSequence) { return GetSequenceGroundSpeed(GetModelPtr(), iSequence); }
+	float SequenceDuration(void);
+	float SequenceDuration(IStudioHdr* pStudioHdr, int iSequence);
+	float SequenceDuration(int iSequence) { return SequenceDuration(GetModelPtr(), iSequence); }
+	int LookupPoseParameter(IStudioHdr* pStudioHdr, const char* szName);
+	int LookupPoseParameter(const char* szName) { return LookupPoseParameter(GetModelPtr(), szName); }
+	float GetPoseParameter(int iPoseParameter);
+	virtual void GetPoseParameters(IStudioHdr* pStudioHdr, float poseParameter[MAXSTUDIOPOSEPARAM]);
+	float SetPoseParameter(IStudioHdr* pStudioHdr, const char* szName, float flValue);
+	float SetPoseParameter(IStudioHdr* pStudioHdr, int iParameter, float flValue);
+	float SetPoseParameter(const char* szName, float flValue) { return SetPoseParameter(GetModelPtr(), szName, flValue); }
+	float SetPoseParameter(int iParameter, float flValue) { return SetPoseParameter(GetModelPtr(), iParameter, flValue); }
+	virtual void ResetClientsideFrame(void) { SetCycle(0); }
+	bool GetPoseParameterRange(int iPoseParameter, float& minValue, float& maxValue);
+	void UpdateRelevantInterpolatedVars();
+	void AddBaseAnimatingInterpolatedVars();
+	void RemoveBaseAnimatingInterpolatedVars();
+private:
+	void LockStudioHdr();
+	void UnlockStudioHdr();
 private:
 
 	friend class C_BaseEntity;
@@ -781,7 +892,52 @@ private:
 	// Hitbox set to use (default 0)
 	int								m_nHitboxSet;
 	float							m_flModelScale;
+	float							m_flOldModelScale;
 
+	float							m_flEncodedController[MAXSTUDIOBONECTRLS];
+	CInterpolatedVarArray< float, MAXSTUDIOBONECTRLS >		m_iv_flEncodedController;
+	float							m_flOldEncodedController[MAXSTUDIOBONECTRLS];
+
+	// Client-side animation
+	bool							m_bClientSideFrameReset;
+	bool							m_bLastClientSideFrameReset;
+
+	float							m_flCycle;
+	CInterpolatedVar< float >		m_iv_flCycle;
+	float							m_flOldCycle;
+
+	// Animation blending factors
+	float							m_flPoseParameter[MAXSTUDIOPOSEPARAM];
+	CInterpolatedVarArray< float, MAXSTUDIOPOSEPARAM >		m_iv_flPoseParameter;
+	float							m_flOldPoseParameters[MAXSTUDIOPOSEPARAM];
+
+	// Animation playback framerate
+	float							m_flPlaybackRate;
+
+	bool							m_bReceivedSequence;
+	// Current animation sequence
+	int								m_nSequence;
+	int								m_nOldSequence;
+
+	int								m_nNewSequenceParity;
+	int								m_nPrevNewSequenceParity;
+
+	int								m_nResetEventsParity;
+	// These are compared against each other to determine if the entity should muzzle flash.
+	unsigned char					m_nMuzzleFlashParity;
+	unsigned char					m_nOldMuzzleFlashParity;
+	float							m_flGroundSpeed;	// computed linear movement rate for current sequence
+	bool							m_bSequenceLoops;	// true if the sequence loops
+	bool							m_bSequenceFinished;// flag set when StudioAdvanceFrame moves across a frame boundry
+	float							m_flLastEventCheck;	// cycle index of when events were last checked
+	// Mouth lipsync/envelope following values
+	CMouthInfo						m_mouth;
+
+	// Model for rendering
+	const model_t* m_pModel;
+	mutable IStudioHdr* m_pStudioHdr;
+	mutable MDLHandle_t				m_hStudioHdr;
+	CThreadFastMutex				m_StudioHdrInitLock;
 };
 
 //-----------------------------------------------------------------------------
@@ -1353,6 +1509,98 @@ inline bool C_EngineObjectInternal::IsModelScaleFractional() const   /// very fa
 inline bool C_EngineObjectInternal::IsModelScaled() const
 {
 	return (m_flModelScale > 1.0f + FLT_EPSILON || m_flModelScale < 1.0f - FLT_EPSILON);
+}
+
+inline const model_t* C_EngineObjectInternal::GetModel(void) const
+{
+	return m_pModel;
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: return a pointer to an updated studiomdl cache cache
+//-----------------------------------------------------------------------------
+
+inline IStudioHdr* C_EngineObjectInternal::GetModelPtr() const
+{
+	//if ( IsDynamicModelLoading() )
+	//	return NULL;
+
+#ifdef _DEBUG
+	// GetModelPtr() is often called before OnNewModel() so go ahead and set it up first chance.
+//	static IDataCacheSection *pModelCache = datacache->FindSection( "ModelData" );
+//	AssertOnce( pModelCache->IsFrameLocking() );
+#endif
+	if (!m_pStudioHdr)
+	{
+		const_cast<C_EngineObjectInternal*>(this)->LockStudioHdr();
+	}
+	Assert(m_pStudioHdr ? m_pStudioHdr == mdlcache->GetIStudioHdr(m_hStudioHdr) : m_hStudioHdr == MDLHANDLE_INVALID);
+	return m_pStudioHdr;
+}
+
+
+inline void C_EngineObjectInternal::InvalidateMdlCache()
+{
+	if (m_pStudioHdr)
+	{
+		UnlockStudioHdr();
+		m_pStudioHdr = NULL;
+	}
+}
+
+inline float C_EngineObjectInternal::GetCycle() const
+{
+	return m_flCycle;
+}
+
+inline float C_EngineObjectInternal::GetPlaybackRate()
+{
+	return m_flPlaybackRate;
+}
+
+inline void C_EngineObjectInternal::SetPlaybackRate(float rate)
+{
+	m_flPlaybackRate = rate;
+}
+
+//-----------------------------------------------------------------------------
+// Sequence access
+//-----------------------------------------------------------------------------
+inline int C_EngineObjectInternal::GetSequence()
+{
+	return m_nSequence;
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: Serves the 90% case of calling SetSequence / ResetSequenceInfo.
+//-----------------------------------------------------------------------------
+inline void C_EngineObjectInternal::ResetSequence(int nSequence)
+{
+	SetSequence(nSequence);
+	ResetSequenceInfo();
+}
+
+inline bool C_EngineObjectInternal::IsSequenceFinished(void)
+{
+	return m_bSequenceFinished;
+}
+
+inline bool C_EngineObjectInternal::ShouldMuzzleFlash() const
+{
+	return m_nOldMuzzleFlashParity != m_nMuzzleFlashParity;
+}
+
+//-----------------------------------------------------------------------------
+// Mouth
+//-----------------------------------------------------------------------------
+inline CMouthInfo& C_EngineObjectInternal::MouthInfo()
+{
+	return m_mouth;
+}
+
+inline float C_EngineObjectInternal::SequenceDuration(void)
+{
+	return SequenceDuration(GetSequence());
 }
 
 // Use this to iterate over *all* (even dormant) the C_BaseEntities in the client entity list.

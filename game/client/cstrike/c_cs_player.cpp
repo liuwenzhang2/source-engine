@@ -150,7 +150,7 @@ BEGIN_PREDICTION_DATA( C_CSPlayer )
 	DEFINE_PRED_FIELD( m_bShieldDrawn, FIELD_BOOLEAN, FTYPEDESC_INSENDTABLE ),
 #endif
 	DEFINE_PRED_FIELD_TOL( m_flStamina, FIELD_FLOAT, FTYPEDESC_INSENDTABLE, 0.1f ),
-	DEFINE_PRED_FIELD( m_flCycle, FIELD_FLOAT, FTYPEDESC_OVERRIDE | FTYPEDESC_PRIVATE | FTYPEDESC_NOERRORCHECK ),
+	//DEFINE_PRED_FIELD( m_flCycle, FIELD_FLOAT, FTYPEDESC_OVERRIDE | FTYPEDESC_PRIVATE | FTYPEDESC_NOERRORCHECK ),
 	DEFINE_PRED_FIELD( m_iShotsFired, FIELD_INTEGER, FTYPEDESC_INSENDTABLE ),
 	DEFINE_PRED_FIELD( m_iDirection, FIELD_INTEGER, FTYPEDESC_INSENDTABLE ),
 	DEFINE_PRED_FIELD( m_bResumeZoom, FIELD_BOOLEAN, FTYPEDESC_INSENDTABLE ),
@@ -402,7 +402,7 @@ void C_CSRagdoll::CreateLowViolenceRagdoll( void )
 	int iDeathAnim = RandomInt( iMinDeathAnim, iMaxDeathAnim );
 	char str[512];
 	Q_snprintf( str, sizeof( str ), "death%d", iDeathAnim );
-	SetSequence( LookupSequence( str ) );
+	GetEngineObject()->SetSequence( LookupSequence( str ) );
 	ForceClientSideAnimationOn();
 
 	GetEngineObject()->Interp_Reset();
@@ -416,7 +416,7 @@ void C_CSRagdoll::CreateCSRagdoll()
 	C_CSPlayer *pPlayer = dynamic_cast< C_CSPlayer* >( m_hPlayer.Get() );
 
 	// mark this to prevent model changes from overwriting the death sequence with the server sequence
-	SetReceivedSequence();
+	GetEngineObject()->SetReceivedSequence();
 
 	if ( pPlayer && !pPlayer->IsDormant() )
 	{
@@ -436,8 +436,8 @@ void C_CSRagdoll::CreateCSRagdoll()
 			GetEngineObject()->GetRotationInterpolator().Reset();
 
 			GetEngineObject()->SetAnimTime(pPlayer->GetEngineObject()->GetAnimTime());
-			SetSequence( pPlayer->GetSequence() );
-			m_flPlaybackRate = pPlayer->GetPlaybackRate();
+			GetEngineObject()->SetSequence( pPlayer->GetEngineObject()->GetSequence() );
+			GetEngineObject()->SetPlaybackRate(pPlayer->GetEngineObject()->GetPlaybackRate());
 		}
 		else
 		{
@@ -456,13 +456,13 @@ void C_CSRagdoll::CreateCSRagdoll()
 				iSeq = 0;
 			}
 
-			SetSequence( iSeq );	// walk_lower, basic pose
-			SetCycle( 0.0 );
+			GetEngineObject()->SetSequence( iSeq );	// walk_lower, basic pose
+			GetEngineObject()->SetCycle( 0.0 );
 
 			// go ahead and set these on the player in case the code below decides to set up bones using
 			// that entity instead of this one.  The local player may not have valid animation
-			pPlayer->SetSequence( iSeq );	// walk_lower, basic pose
-			pPlayer->SetCycle( 0.0 );
+			pPlayer->GetEngineObject()->SetSequence( iSeq );	// walk_lower, basic pose
+			pPlayer->GetEngineObject()->SetCycle( 0.0 );
 
 			GetEngineObject()->Interp_Reset();
 		}
@@ -676,7 +676,7 @@ void C_CSPlayer::RecvProxy_CycleLatch( const CRecvProxyData *pData, void *pStruc
 		return; // Don't need to fixup ourselves.
 
 	float incomingCycle = (float)(pData->m_Value.m_Int) / 16; // Came in as 4 bit fixed point
-	float currentCycle = pPlayer->GetCycle();
+	float currentCycle = pPlayer->GetEngineObject()->GetCycle();
 	bool closeEnough = fabs(currentCycle - incomingCycle) < CycleLatchTolerance;
 	if( fabs(currentCycle - incomingCycle) > (1 - CycleLatchTolerance) )
 	{
@@ -1723,7 +1723,7 @@ void C_CSPlayer::UpdateClientSideAnimation()
 	// We do this in a different order than the base class.
 	// We need our cycle to be valid for when we call the playeranimstate update code,
 	// or else it'll synchronize the upper body anims with the wrong cycle.
-	if ( GetSequence() != -1 )
+	if (GetEngineObject()->GetSequence() != -1 )
 	{
 		// move frame forward
 		FrameAdvance( 0.0f ); // 0 means to use the time we last advanced instead of a constant
@@ -1736,7 +1736,7 @@ void C_CSPlayer::UpdateClientSideAnimation()
 	else
 		m_PlayerAnimState->Update( m_angEyeAngles[YAW], m_angEyeAngles[PITCH] );
 
-	if ( GetSequence() != -1 )
+	if (GetEngineObject()->GetSequence() != -1 )
 	{
 		// latch old values
 		GetEngineObject()->OnLatchInterpolatedVariables( LATCH_ANIMATION_VAR );
@@ -1860,7 +1860,7 @@ bool FindWeaponAttachmentBone( C_BaseCombatWeapon *pWeapon, int &iWeaponBone )
 	if ( !pWeapon )
 		return false;
 
-	IStudioHdr *pHdr = pWeapon->GetModelPtr();
+	IStudioHdr *pHdr = pWeapon->GetEngineObject()->GetModelPtr();
 	if ( !pHdr )
 		return false;
 
@@ -1910,7 +1910,7 @@ void ApplyDifferenceTransformToChildren(
 	const matrix3x4_t &mDest,
 	int iParentBone )
 {
-	IStudioHdr *pHdr = pModel->GetModelPtr();
+	IStudioHdr *pHdr = pModel->GetEngineObject()->GetModelPtr();
 	if ( !pHdr )
 		return;
 

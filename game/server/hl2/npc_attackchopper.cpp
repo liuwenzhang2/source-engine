@@ -2211,8 +2211,8 @@ bool CNPC_AttackHelicopter::PoseGunTowardTargetDirection( const Vector &vTargetD
 		m_angGun.y = MAX( angles.y, m_angGun.y - 12 );
 	}
 
-	SetPoseParameter( m_poseWeapon_Pitch, -m_angGun.x );
-	SetPoseParameter( m_poseWeapon_Yaw, m_angGun.y );
+	GetEngineObject()->SetPoseParameter( m_poseWeapon_Pitch, -m_angGun.x );
+	GetEngineObject()->SetPoseParameter( m_poseWeapon_Yaw, m_angGun.y );
 
 	return true;
 }
@@ -4150,7 +4150,7 @@ void CNPC_AttackHelicopter::ComputeAngularVelocity( const Vector &vecGoalUp, con
 
 	float flAmt = clamp( angVel.y, -30, 30 ); 
 	float flRudderPose = RemapVal( flAmt, -30, 30, 45, -45 );
-	SetPoseParameter( "rudder", flRudderPose );
+	GetEngineObject()->SetPoseParameter( "rudder", flRudderPose );
 }
 
 
@@ -4872,9 +4872,9 @@ void CNPC_AttackHelicopter::Hunt( void )
 //-----------------------------------------------------------------------------
 void	CNPC_AttackHelicopter::PopulatePoseParameters( void )
 {
-	m_poseWeapon_Pitch = LookupPoseParameter("weapon_pitch");
-	m_poseWeapon_Yaw = LookupPoseParameter("weapon_yaw");
-	m_poseRudder = LookupPoseParameter("rudder");
+	m_poseWeapon_Pitch = GetEngineObject()->LookupPoseParameter("weapon_pitch");
+	m_poseWeapon_Yaw = GetEngineObject()->LookupPoseParameter("weapon_yaw");
+	m_poseRudder = GetEngineObject()->LookupPoseParameter("rudder");
 
 	BaseClass::PopulatePoseParameters();
 }
@@ -5056,7 +5056,7 @@ void CGrenadeHelicopter::Spawn( void )
 
 	if (GetEngineObject()->HasSpawnFlags( SF_HELICOPTER_GRENADE_DUD ) )
 	{
-		m_nSkin = (int)SKIN_DUD;
+		GetEngineObject()->SetSkin((int)SKIN_DUD);
 	}
 
 	if ( !GetEngineObject()->HasSpawnFlags( SF_GRENADE_HELICOPTER_MEGABOMB ) )
@@ -5155,7 +5155,7 @@ void CGrenadeHelicopter::InputExplodeIn( inputdata_t &inputdata )
 	{
 		// We are a dud no more!
 		GetEngineObject()->RemoveSpawnFlags( SF_HELICOPTER_GRENADE_DUD );
-		m_nSkin = (int)SKIN_REGULAR;
+		GetEngineObject()->SetSkin((int)SKIN_REGULAR);
 	}
 
 	m_bActivated = false;
@@ -5268,13 +5268,13 @@ void CGrenadeHelicopter::WarningBlinkerThink()
 		if( m_bBlinkerAtTop )
 		{
 			//m_hWarningSprite->SetParentAttachment( "SetParentAttachment", "bottom", false );
-			m_nSkin = (int)SKIN_REGULAR;
+			GetEngineObject()->SetSkin((int)SKIN_REGULAR);
 			m_bBlinkerAtTop = false;
 		}
 		else
 		{
 			//m_hWarningSprite->SetParentAttachment( "SetParentAttachment", "top", false );
-			m_nSkin = (int)SKIN_DUD;
+			GetEngineObject()->SetSkin((int)SKIN_DUD);
 			m_bBlinkerAtTop = true;
 		}
 	}
@@ -5592,7 +5592,7 @@ void CGrenadeHelicopter::OnPhysGunPickup(CBasePlayer *pPhysGunUser, PhysGunPicku
 			SetContextThink( &CGrenadeHelicopter::WarningBlinkerThink, gpGlobals->curtime + GetBombLifetime() - 2.0f, s_pWarningBlinkerContext );
 
 #ifdef HL2_EPISODIC
-			m_nSkin = (int)SKIN_REGULAR;
+			GetEngineObject()->SetSkin((int)SKIN_REGULAR);
 			m_flBlinkFastTime = gpGlobals->curtime + GetBombLifetime() - 1.0f;
 #endif//HL2_EPISODIC
 			

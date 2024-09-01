@@ -247,7 +247,7 @@ void CAI_Motor::MoveClimbStart(  const Vector &climbDest, const Vector &climbDir
 	m_nDismountSequence = SelectWeightedSequence( ACT_CLIMB_DISMOUNT );
 	if (m_nDismountSequence != ACT_INVALID)
 	{
-		GetOuter()->GetSequenceLinearMotion( m_nDismountSequence, &m_vecDismount );
+		GetOuter()->GetEngineObject()->GetSequenceLinearMotion( m_nDismountSequence, &m_vecDismount );
 	}
 	else
 	{
@@ -287,13 +287,13 @@ AIMoveResult_t CAI_Motor::MoveClimbExecute( const Vector &climbDest, const Vecto
 				{
 					// fixme: No other way to force m_nIdealSequence?
 					GetOuter()->SetActivity( ACT_CLIMB_DISMOUNT );
-					GetOuter()->SetCycle( GetOuter()->GetMovementFrame( m_vecDismount.z - climbDist ) );
+					GetOuter()->GetEngineObject()->SetCycle( GetOuter()->GetEngineObject()->GetMovementFrame( m_vecDismount.z - climbDist ) );
 				}
 			}
 		}
 	}
 
-	float climbSpeed = GetOuter()->GetInstantaneousVelocity();
+	float climbSpeed = GetOuter()->GetEngineObject()->GetInstantaneousVelocity();
 
 	if (m_nDismountSequence != ACT_INVALID)
 	{
@@ -948,7 +948,7 @@ int CAI_Motor::SelectWeightedSequence ( Activity activity )
 
 float	CAI_Motor::GetSequenceGroundSpeed( int iSequence )
 {
-	return GetOuter()->GetSequenceGroundSpeed( iSequence );
+	return GetOuter()->GetEngineObject()->GetSequenceGroundSpeed( iSequence );
 }
 
 
@@ -981,32 +981,32 @@ float CAI_Motor::CalcIdealYaw( const Vector &vecTarget )
 
 float CAI_Motor::SetBoneController( int iController, float flValue )
 {
-	return GetOuter()->SetBoneController( iController, flValue );
+	return GetOuter()->GetEngineObject()->SetBoneController( iController, flValue );
 }
 
 float CAI_Motor::GetSequenceMoveYaw( int iSequence )
 {
-	return GetOuter()->GetSequenceMoveYaw( iSequence );
+	return GetOuter()->GetEngineObject()->GetSequenceMoveYaw( iSequence );
 }
 
 void CAI_Motor::SetPlaybackRate( float flRate )
 {
-	return GetOuter()->SetPlaybackRate( flRate );
+	return GetOuter()->GetEngineObject()->SetPlaybackRate( flRate );
 }
 
 float CAI_Motor::GetPlaybackRate()
 {
-	return GetOuter()->GetPlaybackRate();
+	return GetOuter()->GetEngineObject()->GetPlaybackRate();
 }
 
 float CAI_Motor::SetPoseParameter( const char *szName, float flValue )
 {
-	return GetOuter()->SetPoseParameter( szName, flValue );
+	return GetOuter()->GetEngineObject()->SetPoseParameter( szName, flValue );
 }
 
 float CAI_Motor::GetPoseParameter( const char *szName )
 {
-	return GetOuter()->GetPoseParameter( szName );
+	return GetOuter()->GetEngineObject()->GetPoseParameter( szName );
 }
 
 bool CAI_Motor::HasPoseParameter( int iSequence, const char *szName )
@@ -1016,7 +1016,7 @@ bool CAI_Motor::HasPoseParameter( int iSequence, const char *szName )
 
 float CAI_Motor::SetPoseParameter( int iParameter, float flValue ) 
 { 
-	return GetOuter()->SetPoseParameter( iParameter, flValue );  
+	return GetOuter()->GetEngineObject()->SetPoseParameter( iParameter, flValue );
 }
 
 bool CAI_Motor::HasPoseParameter( int iSequence, int iParameter ) 

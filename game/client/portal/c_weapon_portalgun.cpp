@@ -1000,7 +1000,7 @@ void C_WeaponPortalgun::ViewModelDrawn( C_BaseViewModel *pBaseViewModel )
 
 void UpdatePoseParameter( C_BaseAnimating *pBaseAnimating, int iPose, float fValue )
 {
-	pBaseAnimating->SetPoseParameter( iPose, fValue );
+	pBaseAnimating->GetEngineObject()->SetPoseParameter( iPose, fValue );
 }
 
 void InterpToward( float *pfCurrent, float fGoal, float fRate )

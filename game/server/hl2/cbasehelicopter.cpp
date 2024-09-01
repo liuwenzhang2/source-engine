@@ -188,8 +188,8 @@ void CBaseHelicopter::Spawn( void )
 	m_pRotorSound = NULL;
 	m_pRotorBlast = NULL;
 
-	SetCycle( 0 );
-	ResetSequenceInfo();
+	GetEngineObject()->SetCycle( 0 );
+	GetEngineObject()->ResetSequenceInfo();
 
 	GetEngineObject()->AddFlag( FL_NPC );
 

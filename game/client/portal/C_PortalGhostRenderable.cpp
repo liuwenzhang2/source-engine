@@ -51,10 +51,10 @@ void C_PortalGhostRenderable::PerFrameUpdate( void )
 		if( m_bSourceIsBaseAnimating )
 		{
 			C_BaseAnimating *pSource = (C_BaseAnimating *)m_pGhostedRenderable;
-			SetCycle( pSource->GetCycle() );
-			SetSequence( pSource->GetSequence() );
-			m_nBody = pSource->m_nBody;
-			m_nSkin = pSource->m_nSkin;
+			GetEngineObject()->SetCycle( pSource->GetEngineObject()->GetCycle() );
+			GetEngineObject()->SetSequence( pSource->GetEngineObject()->GetSequence() );
+			GetEngineObject()->SetBody( pSource->GetEngineObject()->GetBody());
+			GetEngineObject()->SetSkin( pSource->GetEngineObject()->GetSkin());
 		}
 	}
 

@@ -1877,9 +1877,9 @@ void CBasePlayer::SetAnimation( PLAYER_ANIM playerAnim )
 		if (animDesired == -1)
 			animDesired = 0;
 
-		if ( GetSequence() != animDesired || !SequenceLoops() )
+		if (GetEngineObject()->GetSequence() != animDesired || !GetEngineObject()->SequenceLoops() )
 		{
-			SetCycle( 0 );
+			GetEngineObject()->SetCycle( 0 );
 		}
 
 		// Tracker 24588:  In single player when firing own weapon this causes eye and punchangle to jitter
@@ -1889,11 +1889,11 @@ void CBasePlayer::SetAnimation( PLAYER_ANIM playerAnim )
 		//}
 
 		SetActivity( idealActivity );
-		ResetSequence( animDesired );
+		GetEngineObject()->ResetSequence( animDesired );
 	}
 	else if (idealActivity == ACT_WALK)
 	{
-		if (GetActivity() != ACT_RANGE_ATTACK1 || IsSequenceFinished())
+		if (GetActivity() != ACT_RANGE_ATTACK1 || GetEngineObject()->IsSequenceFinished())
 		{
 			if (GetEngineObject()->GetFlags() & FL_DUCKING )	// crouching
 			{
@@ -1911,7 +1911,7 @@ void CBasePlayer::SetAnimation( PLAYER_ANIM playerAnim )
 		}
 		else
 		{
-			animDesired = GetSequence();
+			animDesired = GetEngineObject()->GetSequence();
 		}
 	}
 	else
@@ -1924,22 +1924,22 @@ void CBasePlayer::SetAnimation( PLAYER_ANIM playerAnim )
 		animDesired = SelectWeightedSequence( m_Activity );
 
 		// Already using the desired animation?
-		if (GetSequence() == animDesired)
+		if (GetEngineObject()->GetSequence() == animDesired)
 			return;
 
-		ResetSequence( animDesired );
-		SetCycle( 0 );
+		GetEngineObject()->ResetSequence( animDesired );
+		GetEngineObject()->SetCycle( 0 );
 		return;
 	}
 
 	// Already using the desired animation?
-	if (GetSequence() == animDesired)
+	if (GetEngineObject()->GetSequence() == animDesired)
 		return;
 
 	//Msg( "Set animation to %d\n", animDesired );
 	// Reset to first frame of desired animation
-	ResetSequence( animDesired );
-	SetCycle( 0 );
+	GetEngineObject()->ResetSequence( animDesired );
+	GetEngineObject()->SetCycle( 0 );
 }
 
 /*
@@ -2147,7 +2147,7 @@ void CBasePlayer::PlayerDeathThink(void)
 		PackDeadPlayerItems();
 	}
 
-	if (GetEngineObject()->GetModelIndex() && (!IsSequenceFinished()) && (m_lifeState == LIFE_DYING))
+	if (GetEngineObject()->GetModelIndex() && (!GetEngineObject()->IsSequenceFinished()) && (m_lifeState == LIFE_DYING))
 	{
 		StudioFrameAdvance( );
 
@@ -2165,7 +2165,7 @@ void CBasePlayer::PlayerDeathThink(void)
 	StopAnimation();
 
 	IncrementInterpolationFrame();
-	m_flPlaybackRate = 0.0;
+	GetEngineObject()->SetPlaybackRate(0.0);
 	
 	int fAnyButtonDown = (m_nButtons & ~IN_SCORE);
 	
@@ -4627,9 +4627,9 @@ void CBasePlayer::PostThink()
 		}
 
 		// Don't allow bogus sequence on player
-		if ( GetSequence() == -1 )
+		if (GetEngineObject()->GetSequence() == -1 )
 		{
-			SetSequence( 0 );
+			GetEngineObject()->SetSequence( 0 );
 		}
 
 		VPROF_SCOPE_BEGIN( "CBasePlayer::PostThink-StudioFrameAdvance" );
@@ -5286,7 +5286,7 @@ void CBasePlayer::OnRestore( void )
 	// Calculate this immediately
 	m_nVehicleViewSavedFrame = 0;
 
-	m_nBodyPitchPoseParam = LookupPoseParameter( "body_pitch" );
+	m_nBodyPitchPoseParam = GetEngineObject()->LookupPoseParameter( "body_pitch" );
 }
 
 /* void CBasePlayer::SetTeamName( const char *pTeamName )
@@ -9396,14 +9396,14 @@ void CBasePlayer::Event_KilledOther( CBaseEntity *pVictim, const CTakeDamageInfo
 void CBasePlayer::SetModel( const char *szModelName )
 {
 	BaseClass::SetModel( szModelName );
-	m_nBodyPitchPoseParam = LookupPoseParameter( "body_pitch" );
+	m_nBodyPitchPoseParam = GetEngineObject()->LookupPoseParameter( "body_pitch" );
 }
 
 void CBasePlayer::SetBodyPitch( float flPitch )
 {
 	if ( m_nBodyPitchPoseParam >= 0 )
 	{
-		SetPoseParameter( m_nBodyPitchPoseParam, flPitch );
+		GetEngineObject()->SetPoseParameter( m_nBodyPitchPoseParam, flPitch );
 	}
 }
 

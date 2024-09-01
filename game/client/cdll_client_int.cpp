@@ -1715,7 +1715,7 @@ void CHLClient::InvalidateMdlCache()
 		pAnimating = dynamic_cast<C_BaseAnimating *>(pEntity);
 		if ( pAnimating )
 		{
-			pAnimating->InvalidateMdlCache();
+			pAnimating->GetEngineObject()->InvalidateMdlCache();
 		}
 	}
 }

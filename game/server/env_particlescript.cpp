@@ -84,7 +84,7 @@ void CEnvParticleScript::PostConstructor(const char* szClassname, int iForceEdic
 
 void CEnvParticleScript::PrecacheAnimationEventMaterials()
 {
-	IStudioHdr *hdr = GetModelPtr();
+	IStudioHdr *hdr = GetEngineObject()->GetModelPtr();
 	if ( hdr )
 	{
 		int numseq = hdr->GetNumSeq();
@@ -162,7 +162,7 @@ void CEnvParticleScript::Activate()
 		m_flSequenceScale = 1.0f;
 	}
 
-	m_flPlaybackRate = 1.0f;
+	GetEngineObject()->SetPlaybackRate(1.0f);
 }
 
 //-----------------------------------------------------------------------------
@@ -194,7 +194,7 @@ void CEnvParticleScript::InputSetSequence( inputdata_t &inputdata )
 		int nSequence = LookupSequence( STRING( inputdata.value.StringID() ) );
 		if ( nSequence != ACT_INVALID )
 		{
-			SetSequence( nSequence );
+			GetEngineObject()->SetSequence( nSequence );
 		}
 	}
 }

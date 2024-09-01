@@ -193,7 +193,7 @@ void CNPC_Headcrab::RunTask( const Task_t *pTask )
 		case TASK_RANGE_ATTACK1:
 		case TASK_RANGE_ATTACK2:
 		{
-			if ( IsSequenceFinished() )
+			if (GetEngineObject()->IsSequenceFinished() )
 			{
 				TaskComplete();
 				SetTouch( NULL );

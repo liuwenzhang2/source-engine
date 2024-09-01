@@ -281,11 +281,11 @@ void CNPC_CScanner::Spawn(void)
 	m_vCurrentBanking		= m_vSpotlightDir;
 	m_flSpotlightCurLength	= m_flSpotlightMaxLength;
 
-	m_nPoseTail = LookupPoseParameter( "tail_control" );
-	m_nPoseDynamo = LookupPoseParameter( "dynamo_wheel" );
-	m_nPoseFlare = LookupPoseParameter( "alert_control" );
-	m_nPoseFaceVert = LookupPoseParameter( "flex_vert" );
-	m_nPoseFaceHoriz = LookupPoseParameter( "flex_horz" );
+	m_nPoseTail = GetEngineObject()->LookupPoseParameter( "tail_control" );
+	m_nPoseDynamo = GetEngineObject()->LookupPoseParameter( "dynamo_wheel" );
+	m_nPoseFlare = GetEngineObject()->LookupPoseParameter( "alert_control" );
+	m_nPoseFaceVert = GetEngineObject()->LookupPoseParameter( "flex_vert" );
+	m_nPoseFaceHoriz = GetEngineObject()->LookupPoseParameter( "flex_horz" );
 
 	// --------------------------------------------
 
@@ -1283,7 +1283,7 @@ void CNPC_CScanner::PrescheduleThink(void)
 	// Go back to idling if we're done
 	if ( GetIdealActivity() == ACT_SCANNER_FLARE_START )
 	{
-		if ( IsSequenceFinished() )
+		if (GetEngineObject()->IsSequenceFinished() )
 		{
 			SetIdealActivity( (Activity) ACT_IDLE );
 		}

@@ -282,7 +282,7 @@ void CWeaponPortalBase::DoAnimationEvents( IStudioHdr *pStudioHdr )
 		C_BaseViewModel *pViewModel = pPlayer->GetViewModel();
 		if ( pViewModel )
 		{
-			pStudioHdr = pViewModel->GetModelPtr();
+			pStudioHdr = pViewModel->GetEngineObject()->GetModelPtr();
 		}
 	}
 
@@ -310,15 +310,15 @@ void CWeaponPortalBase::GetRenderBounds( Vector& theMins, Vector& theMaxs )
 			C_BaseViewModel *pViewModel = pPlayer->GetViewModel();
 			if ( pViewModel )
 			{
-				pStudioHdr = pViewModel->GetModelPtr();
+				pStudioHdr = pViewModel->GetEngineObject()->GetModelPtr();
 			}
 		}
 		else
 		{
-			pStudioHdr = GetModelPtr();
+			pStudioHdr = GetEngineObject()->GetModelPtr();
 		}
 
-		if ( !pStudioHdr || !pStudioHdr->SequencesAvailable() || GetSequence() == -1 )
+		if ( !pStudioHdr || !pStudioHdr->SequencesAvailable() || GetEngineObject()->GetSequence() == -1 )
 		{
 			theMins = vec3_origin;
 			theMaxs = vec3_origin;
@@ -337,7 +337,7 @@ void CWeaponPortalBase::GetRenderBounds( Vector& theMins, Vector& theMaxs )
 			VectorCopy ( pStudioHdr->hull_max(), theMaxs);
 		}
 
-		mstudioseqdesc_t &seqdesc = pStudioHdr->pSeqdesc( GetSequence() );
+		mstudioseqdesc_t &seqdesc = pStudioHdr->pSeqdesc(GetEngineObject()->GetSequence() );
 		VectorMin( seqdesc.bbmin, theMins, theMins );
 		VectorMax( seqdesc.bbmax, theMaxs, theMaxs );
 	}
@@ -378,7 +378,7 @@ void CWeaponPortalBase::	Materialize( void )
 		g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 		
 		GetEngineObject()->RemoveEffects( EF_NODRAW );
-		DoMuzzleFlash();
+		GetEngineObject()->DoMuzzleFlash();
 	}
 
 	if (GetEngineObject()->HasSpawnFlags( SF_NORESPAWN ) == false )

@@ -699,7 +699,7 @@ void CNPC_Controller::RunTask ( const Task_t *pTask )
 				GetMotor()->SetIdealYawAndUpdate( idealYaw );
 			}
 
-			if ( IsSequenceFinished() || GetActivity() == ACT_IDLE)
+			if (GetEngineObject()->IsSequenceFinished() || GetActivity() == ACT_IDLE)
 			{
 				m_fInCombat = false;
 			}
@@ -711,21 +711,21 @@ void CNPC_Controller::RunTask ( const Task_t *pTask )
 				if( HasCondition( COND_CAN_RANGE_ATTACK1 ))
 				{
 					SetActivity( ACT_RANGE_ATTACK1 );
-					SetCycle( 0 ); 
-					ResetSequenceInfo( );
+					GetEngineObject()->SetCycle( 0 );
+					GetEngineObject()->ResetSequenceInfo( );
 					m_fInCombat = true;
 				}
 				else if( HasCondition( COND_CAN_RANGE_ATTACK2 ) )
 				{
 					SetActivity( ACT_RANGE_ATTACK2 );
-					SetCycle( 0 );
-					ResetSequenceInfo( );
+					GetEngineObject()->SetCycle( 0 );
+					GetEngineObject()->ResetSequenceInfo( );
 					m_fInCombat = true;
 				}
 				else
 				{
 					int iFloatActivity = LookupFloat();
-					if( IsSequenceFinished() || iFloatActivity != GetActivity() )
+					if(GetEngineObject()->IsSequenceFinished() || iFloatActivity != GetActivity() )
 					{
 						SetActivity( (Activity)iFloatActivity );
 					}
@@ -838,7 +838,7 @@ Activity CNPC_Controller::NPC_TranslateActivity( Activity eNewActivity )
 void CNPC_Controller::SetActivity ( Activity NewActivity )
 {
 	BaseClass::SetActivity( NewActivity );
-	m_flGroundSpeed = 100;
+	GetEngineObject()->SetGroundSpeed(100);
 }
 
 //=========================================================
@@ -909,22 +909,22 @@ bool CNPC_Controller::OverridePathMove( float flInterval )
 	// cut corner?
 	if (flWaypointDist < 128)
 	{
-		if (m_flGroundSpeed > 100)
-			m_flGroundSpeed -= 40;
+		if (GetEngineObject()->GetGroundSpeed() > 100)
+			GetEngineObject()->SetGroundSpeed(GetEngineObject()->GetGroundSpeed() - 40);
 	}
 	else
 	{
-		if (m_flGroundSpeed < 400)
-			m_flGroundSpeed += 10;
+		if (GetEngineObject()->GetGroundSpeed() < 400)
+			GetEngineObject()->SetGroundSpeed(GetEngineObject()->GetGroundSpeed() + 10);
 	}
 
-	m_velocity = m_velocity * 0.8 + m_flGroundSpeed * waypointDir * 0.5;
+	m_velocity = m_velocity * 0.8 + GetEngineObject()->GetGroundSpeed() * waypointDir * 0.5;
 	GetEngineObject()->SetAbsVelocity( m_velocity );
 
 	// -----------------------------------------------------------------
 	// Check route is blocked
 	// ------------------------------------------------------------------
-	Vector checkPos = GetEngineObject()->GetLocalOrigin() + (waypointDir * (m_flGroundSpeed * flInterval));
+	Vector checkPos = GetEngineObject()->GetLocalOrigin() + (waypointDir * (GetEngineObject()->GetGroundSpeed() * flInterval));
 
 	AIMoveTrace_t moveTrace;
 	GetMoveProbe()->MoveLimit( NAV_FLY, GetEngineObject()->GetLocalOrigin(), checkPos, MASK_NPCSOLID|CONTENTS_WATER,
@@ -953,9 +953,9 @@ bool CNPC_Controller::OverridePathMove( float flInterval )
 
 bool CNPC_Controller::OverrideMove( float flInterval )
 {
-	if (m_flGroundSpeed == 0)
+	if (GetEngineObject()->GetGroundSpeed() == 0)
 	{
-		m_flGroundSpeed = 100;
+		GetEngineObject()->SetGroundSpeed(100);
 	}
 
 	// ----------------------------------------------
@@ -1261,7 +1261,7 @@ void CNPC_ControllerZapBall::AnimateThink( void  )
 {
 	GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.1 );
 	
-	SetCycle( ((int)GetCycle() + 1) % 11 );
+	GetEngineObject()->SetCycle( ((int)GetEngineObject()->GetCycle() + 1) % 11 );
 
 	if (gpGlobals->curtime - m_flSpawnTime > 5 || GetEngineObject()->GetAbsVelocity().Length() < 10)
 	{

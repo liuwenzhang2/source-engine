@@ -332,7 +332,7 @@ void CPhysicsShadowClone::FullSync( bool bAllowAssumedSync )
 		GetEngineObject()->SetModelIndex( pClonedEntity->GetEngineObject()->GetModelIndex() );
 		GetEngineObject()->SetModelName( pClonedEntity->GetEngineObject()->GetModelName() );
 
-		if( modelinfo->GetModelType( pClonedEntity->GetModel() ) == mod_studio )
+		if( modelinfo->GetModelType( pClonedEntity->GetEngineObject()->GetModel() ) == mod_studio )
 			SetModel( STRING( pClonedEntity->GetEngineObject()->GetModelName() ) );
 
 		SetSize(pClonedEntity->GetEngineObject()->OBBMins(), pClonedEntity->GetEngineObject()->OBBMaxs() );

@@ -146,7 +146,7 @@ public:
 	Vector EyeOffset(Activity nActivity) 
 	{
 		Vector vecEyeOffset(0,0,-64);
-		GetModelPtr()->GetEyePosition( vecEyeOffset);
+		GetEngineObject()->GetModelPtr()->GetEyePosition( vecEyeOffset);
 		return vecEyeOffset;
 	}
 
@@ -329,8 +329,8 @@ void CNPC_CombineCamera::Spawn()
 
 	GetEngineObject()->AddFlag(FL_AIMTARGET);
 
-	SetPoseParameter(COMBINE_CAMERA_BC_YAW, 0);
-	SetPoseParameter(COMBINE_CAMERA_BC_PITCH, 0);
+	GetEngineObject()->SetPoseParameter(COMBINE_CAMERA_BC_YAW, 0);
+	GetEngineObject()->SetPoseParameter(COMBINE_CAMERA_BC_PITCH, 0);
 
 	m_iAmmoType = GetAmmoDef()->Index("Pistol");
 
@@ -445,7 +445,7 @@ void CNPC_CombineCamera::Deploy()
 
 	SetHeight(COMBINE_CAMERA_DEPLOY_HEIGHT);
 	SetIdealActivity((Activity) ACT_COMBINE_CAMERA_OPEN_IDLE);
-	m_flPlaybackRate = 0;
+	GetEngineObject()->SetPlaybackRate(0);
 	SetThink(&CNPC_CombineCamera::SearchThink);
 
 	const char* soundname = "NPC_CombineCamera.Move";
@@ -494,8 +494,8 @@ bool CNPC_CombineCamera::UpdateFacing()
 	// Update pitch
 	float flDiff = AngleNormalize(UTIL_ApproachAngle( vecGoalLocalAngles.x, 0.0, 0.1f * MaxYawSpeed()));
 	
-	int iPose = LookupPoseParameter(COMBINE_CAMERA_BC_PITCH);
-	SetPoseParameter(iPose, GetPoseParameter(iPose) + (flDiff / 1.5f));
+	int iPose = GetEngineObject()->LookupPoseParameter(COMBINE_CAMERA_BC_PITCH);
+	GetEngineObject()->SetPoseParameter(iPose, GetEngineObject()->GetPoseParameter(iPose) + (flDiff / 1.5f));
 
 	if (fabs(flDiff) > 0.1f)
 	{
@@ -505,8 +505,8 @@ bool CNPC_CombineCamera::UpdateFacing()
 	// Update yaw
 	flDiff = AngleNormalize(UTIL_ApproachAngle( vecGoalLocalAngles.y, 0.0, 0.1f * MaxYawSpeed()));
 
-	iPose = LookupPoseParameter(COMBINE_CAMERA_BC_YAW);
-	SetPoseParameter(iPose, GetPoseParameter(iPose) + (flDiff / 1.5f));
+	iPose = GetEngineObject()->LookupPoseParameter(COMBINE_CAMERA_BC_YAW);
+	GetEngineObject()->SetPoseParameter(iPose, GetEngineObject()->GetPoseParameter(iPose) + (flDiff / 1.5f));
 
 	if (fabs(flDiff) > 0.1f)
 	{
@@ -1163,7 +1163,7 @@ void CNPC_CombineCamera::DeathThink()
 	{
 		SetHeight(COMBINE_CAMERA_RETRACT_HEIGHT);
 
-		m_flPlaybackRate = 0;
+		GetEngineObject()->SetPlaybackRate(0);
 		SetThink(NULL);
 	}
 }

@@ -919,7 +919,7 @@ void CHL2_Player::StartAdmireGlovesAnimation( void )
 		if ( idealSequence >= 0 )
 		{
 			vm->SendViewModelMatchingSequence( idealSequence );
-			m_flAdmireGlovesAnimTime = gpGlobals->curtime + vm->SequenceDuration( idealSequence ); 
+			m_flAdmireGlovesAnimTime = gpGlobals->curtime + vm->GetEngineObject()->SequenceDuration( idealSequence );
 		}
 	}
 }
@@ -934,7 +934,7 @@ void CHL2_Player::HandleAdmireGlovesAnimation( void )
 		{
 			if ( m_flAdmireGlovesAnimTime > gpGlobals->curtime )
 			{
-				pVM->m_flPlaybackRate = 1.0f;
+				pVM->GetEngineObject()->SetPlaybackRate(1.0f);
 				pVM->StudioFrameAdvance( );
 			}
 			else if ( m_flAdmireGlovesAnimTime < gpGlobals->curtime )
@@ -3578,7 +3578,7 @@ bool CHL2_Player::TestHitboxes( const Ray_t &ray, unsigned int fContentsMask, tr
 		if ( IntersectRayWithAACylinder( ray, WorldSpaceCenter(), maxs.x * PLAYER_HULL_REDUCTION, maxs.z - mins.z, &tr ) )
 		{
 			tr.hitbox = 0;
-			IStudioHdr *pStudioHdr = GetModelPtr( );
+			IStudioHdr *pStudioHdr = GetEngineObject()->GetModelPtr( );
 			if (!pStudioHdr)
 				return false;
 

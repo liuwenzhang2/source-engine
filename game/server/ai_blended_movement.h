@@ -100,7 +100,7 @@ private:
 	// --------------------------------
 
 	// helpers to simplify code
-	float	GetCycle()														{ return GetOuter()->GetCycle();								}
+	float	GetCycle()														{ return GetOuter()->GetEngineObject()->GetCycle();								}
 	int		AddLayeredSequence( int sequence, int iPriority )				{ return GetOuter()->AddLayeredSequence( sequence, iPriority ); }
 	void	SetLayerWeight( int iLayer, float flWeight )					{ GetOuter()->SetLayerWeight( iLayer, flWeight );				}
 	void	SetLayerPlaybackRate( int iLayer, float flPlaybackRate )		{ GetOuter()->SetLayerPlaybackRate( iLayer, flPlaybackRate );	}

@@ -1784,7 +1784,7 @@ void CBasePlayer::DoMuzzleFlash()
 		if ( !vm )
 			continue;
 
-		vm->DoMuzzleFlash();
+		vm->GetEngineObject()->DoMuzzleFlash();
 	}
 
 	BaseClass::DoMuzzleFlash();
@@ -1846,7 +1846,7 @@ void CBasePlayer::SharedSpawn()
 	m_flMaxspeed		= 0.0f;
 
 	MDLCACHE_CRITICAL_SECTION();
-	SetSequence( SelectWeightedSequence( ACT_IDLE ) );
+	GetEngineObject()->SetSequence( SelectWeightedSequence( ACT_IDLE ) );
 
 	if (GetEngineObject()->GetFlags() & FL_DUCKING )
 		GetEngineObject()->SetCollisionBounds( VEC_DUCK_HULL_MIN, VEC_DUCK_HULL_MAX );

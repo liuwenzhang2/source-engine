@@ -756,7 +756,7 @@ void CAntlionTemplateMaker::MakeNPC( void )
 	pent->Activate();
 
 	m_iSkinCount = ( m_iSkinCount + 1 ) % ANTLION_SKIN_COUNT;
-	pent->m_nSkin = m_iSkinCount; 
+	pent->GetEngineObject()->SetSkin(m_iSkinCount);
 
 	ChildPostSpawn( pent );
 

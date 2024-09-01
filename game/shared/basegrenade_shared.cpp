@@ -420,11 +420,11 @@ void CBaseGrenade::BounceTouch( CBaseEntity *pOther )
 		// play bounce sound
 		BounceSound();
 	}
-	m_flPlaybackRate = GetEngineObject()->GetAbsVelocity().Length() / 200.0;
-	if (m_flPlaybackRate > 1.0)
-		m_flPlaybackRate = 1;
-	else if (m_flPlaybackRate < 0.5)
-		m_flPlaybackRate = 0;
+	GetEngineObject()->SetPlaybackRate(GetEngineObject()->GetAbsVelocity().Length() / 200.0);
+	if (GetEngineObject()->GetPlaybackRate() > 1.0)
+		GetEngineObject()->SetPlaybackRate(1);
+	else if (GetEngineObject()->GetPlaybackRate() < 0.5)
+		GetEngineObject()->SetPlaybackRate(0);
 
 }
 
@@ -488,7 +488,7 @@ void CBaseGrenade ::TumbleThink( void )
 	if (GetWaterLevel() != 0)
 	{
 		GetEngineObject()->SetAbsVelocity(GetEngineObject()->GetAbsVelocity() * 0.5 );
-		m_flPlaybackRate = 0.2;
+		GetEngineObject()->SetPlaybackRate(0.2);
 	}
 }
 

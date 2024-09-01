@@ -2030,9 +2030,9 @@ void C_BasePlayer::PostThink( void )
 		}
 
 		// Don't allow bogus sequence on player
-		if ( GetSequence() == -1 )
+		if (GetEngineObject()->GetSequence() == -1 )
 		{
-			SetSequence( 0 );
+			GetEngineObject()->SetSequence( 0 );
 		}
 
 		StudioFrameAdvance();
@@ -2591,7 +2591,7 @@ void C_BasePlayer::NotePredictionError( const Vector &vDelta )
 void C_BasePlayer::ForceSetupBonesAtTimeFakeInterpolation( matrix3x4_t *pBonesOut, float curtimeOffset )
 {
 	// we don't have any interpolation data, so fake it
-	float cycle = m_flCycle;
+	float cycle = GetEngineObject()->GetCycle();
 	Vector origin = GetEngineObject()->GetLocalOrigin();
 
 	// blow the cached prev bones
@@ -2600,12 +2600,12 @@ void C_BasePlayer::ForceSetupBonesAtTimeFakeInterpolation( matrix3x4_t *pBonesOu
 	Interpolate( gpGlobals->curtime + curtimeOffset );
 
 	// force cycle back by boneDt
-	m_flCycle = fmod( 10 + cycle + m_flPlaybackRate * curtimeOffset, 1.0f );
+	GetEngineObject()->SetCycle(fmod( 10 + cycle + GetEngineObject()->GetPlaybackRate() * curtimeOffset, 1.0f ));
 	GetEngineObject()->SetLocalOrigin( origin + curtimeOffset * GetEngineObject()->GetLocalVelocity() );
 	// Setup bone state to extrapolate physics velocity
 	SetupBones( pBonesOut, MAXSTUDIOBONES, BONE_USED_BY_ANYTHING, gpGlobals->curtime + curtimeOffset );
 
-	m_flCycle = cycle;
+	GetEngineObject()->SetCycle(cycle);
 	GetEngineObject()->SetLocalOrigin( origin );
 }
 

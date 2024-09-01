@@ -145,7 +145,7 @@ void C_BaseViewModel::FireEvent( const Vector& origin, const QAngle& angles, int
 
 bool C_BaseViewModel::Interpolate( float currentTime )
 {
-	IStudioHdr *pStudioHdr = GetModelPtr();
+	IStudioHdr *pStudioHdr = GetEngineObject()->GetModelPtr();
 	// Make sure we reset our animation information if we've switch sequences
 	UpdateAnimationParity();
 
@@ -174,10 +174,10 @@ bool C_BaseViewModel::Interpolate( float currentTime )
 		elapsed_time = 0;
 	}
 
-	float dt = elapsed_time * GetSequenceCycleRate( pStudioHdr, GetSequence() ) * GetPlaybackRate();
+	float dt = elapsed_time * GetEngineObject()->GetSequenceCycleRate( pStudioHdr, GetEngineObject()->GetSequence() ) * GetEngineObject()->GetPlaybackRate();
 	if ( dt >= 1.0f )
 	{
-		if ( !IsSequenceLooping( GetSequence() ) )
+		if ( !GetEngineObject()->IsSequenceLooping(GetEngineObject()->GetSequence() ) )
 		{
 			dt = 0.999f;
 		}
@@ -187,7 +187,7 @@ bool C_BaseViewModel::Interpolate( float currentTime )
 		}
 	}
 
-	SetCycle( dt );
+	GetEngineObject()->SetCycle( dt );
 	return bret;
 }
 
@@ -439,7 +439,7 @@ void C_BaseViewModel::UpdateAnimationParity( void )
 		// FIXME: this is bad
 		// Simulate a networked m_flAnimTime and m_flCycle
 		// FIXME:  Do we need the magic 0.1?
-		SetCycle( 0.0f ); // GetSequenceCycleRate( GetSequence() ) * 0.1;
+		GetEngineObject()->SetCycle( 0.0f ); // GetSequenceCycleRate( GetSequence() ) * 0.1;
 		GetEngineObject()->SetAnimTime(curtime);
 	}
 }
@@ -477,17 +477,17 @@ void C_BaseViewModel::AddEntity( void )
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-void C_BaseViewModel::GetBoneControllers(float controllers[MAXSTUDIOBONECTRLS])
-{
-	BaseClass::GetBoneControllers( controllers );
-
-	// Tell the weapon itself that we've rendered, in case it wants to do something
-	C_BaseCombatWeapon *pWeapon = GetActiveWeapon();
-	if ( pWeapon )
-	{
-		pWeapon->GetViewmodelBoneControllers( this, controllers );
-	}
-}
+//void C_BaseViewModel::GetBoneControllers(float controllers[MAXSTUDIOBONECTRLS])
+//{
+//	BaseClass::GetBoneControllers( controllers );
+//
+//	// Tell the weapon itself that we've rendered, in case it wants to do something
+//	C_BaseCombatWeapon *pWeapon = GetActiveWeapon();
+//	if ( pWeapon )
+//	{
+//		pWeapon->GetViewmodelBoneControllers( this, controllers );
+//	}
+//}
 
 //-----------------------------------------------------------------------------
 // Purpose: 

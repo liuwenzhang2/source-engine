@@ -1970,7 +1970,7 @@ void CBaseCombatCharacter::Weapon_Drop( CBaseCombatWeapon *pWeapon, const Vector
 		int iBIndex = -1;
 		int iWeaponBoneIndex = -1;
 
-		IStudioHdr *hdr = pWeapon->GetModelPtr();
+		IStudioHdr *hdr = pWeapon->GetEngineObject()->GetModelPtr();
 		// If I have a hand, set the weapon position to my hand bone position.
 		if ( hdr && hdr->numbones() > 0 )
 		{
@@ -3360,12 +3360,12 @@ void CBaseCombatCharacter::DoMuzzleFlash()
 	CBaseCombatWeapon *pWeapon = GetActiveWeapon();
 	if ( pWeapon )
 	{
-		pWeapon->DoMuzzleFlash();
+		pWeapon->GetEngineObject()->DoMuzzleFlash();
 		//NOTENOTE: We do not chain to the base here
 	}
 	else
 	{
-		BaseClass::DoMuzzleFlash();
+		GetEngineObject()->DoMuzzleFlash();
 	}
 }
 

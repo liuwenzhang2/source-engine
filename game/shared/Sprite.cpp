@@ -197,7 +197,7 @@ void CSprite::Spawn( void )
 	SetModel( STRING(GetEngineObject()->GetModelName() ) );
 	GetEngineObject()->SetSurroundingBoundsType( USE_GAME_CODE );
 
-	m_flMaxFrame = (float)modelinfo->GetModelFrameCount( GetModel() ) - 1;
+	m_flMaxFrame = (float)modelinfo->GetModelFrameCount(GetEngineObject()->GetModel() ) - 1;
 	GetEngineObject()->AddEffects( EF_NOSHADOW | EF_NORECEIVESHADOW );
 
 #if defined( CLIENT_DLL )
@@ -267,8 +267,8 @@ void CSprite::ComputeWorldSpaceSurroundingBox( Vector *pVecWorldMins, Vector *pV
 	if ( m_bWorldSpaceScale == false )
 	{
 		// Find the height and width of the source of the sprite
-		float width = modelinfo->GetModelSpriteWidth( GetModel() );
-		float height = modelinfo->GetModelSpriteHeight( GetModel() );
+		float width = modelinfo->GetModelSpriteWidth(GetEngineObject()->GetModel() );
+		float height = modelinfo->GetModelSpriteHeight(GetEngineObject()->GetModel() );
 		flScale *= MAX( width, height );
 	}
 

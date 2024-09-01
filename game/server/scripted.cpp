@@ -860,7 +860,7 @@ void CAI_ScriptedSequence::SynchronizeSequence( CAI_BaseNPC *pNPC )
 	m_bForceSynch = false;
 
 	// Reset cycle position
-	float flCycleRate = pNPC->GetSequenceCycleRate( pNPC->GetSequence() );
+	float flCycleRate = pNPC->GetEngineObject()->GetSequenceCycleRate( pNPC->GetEngineObject()->GetSequence() );
 	float flInterval = gpGlobals->curtime - m_startTime;
 
 	// Msg("%.2f \"%s\"  %s : %f (%f): interval %f\n", gpGlobals->curtime, GetEntityName().ToCStr(), pNPC->GetClassname(), pNPC->m_flAnimTime.Get(), m_startTime, flInterval );
@@ -871,11 +871,11 @@ void CAI_ScriptedSequence::SynchronizeSequence( CAI_BaseNPC *pNPC )
 		return;
 
 	// do the movement for the missed portion of the sequence
-	pNPC->SetCycle( 0.0f );
+	pNPC->GetEngineObject()->SetCycle( 0.0f );
 	pNPC->AutoMovement( flInterval );
 
 	// reset the cycle to a common basis
-	pNPC->SetCycle( flInterval * flCycleRate );
+	pNPC->GetEngineObject()->SetCycle( flInterval * flCycleRate );
 }
 
 //-----------------------------------------------------------------------------
@@ -1283,7 +1283,7 @@ void CAI_ScriptedSequence::ModifyScriptedAutoMovement( Vector *vecNewPos )
 		{
 			Vector vecDeltaPos;
 			QAngle vecDeltaAngles;
- 			pAnimating->GetSequenceMovement( pAnimating->GetSequence(), 0.0f, pAnimating->GetCycle(), vecDeltaPos, vecDeltaAngles );
+ 			pAnimating->GetEngineObject()->GetSequenceMovement( pAnimating->GetEngineObject()->GetSequence(), 0.0f, pAnimating->GetEngineObject()->GetCycle(), vecDeltaPos, vecDeltaAngles );
  			VectorYawRotate( vecDeltaPos, pAnimating->GetEngineObject()->GetLocalAngles().y, vecDeltaPos );
 
 			if ( bDebug )
@@ -1323,7 +1323,7 @@ void CAI_ScriptedSequence::ModifyScriptedAutoMovement( Vector *vecNewPos )
 			Msg("Automovement's output origin: %f %f\n", (*vecNewPos).x, (*vecNewPos).y );
 			Msg("Vector from automovement to desired: %f %f\n", vecToTarget.x, vecToTarget.y );
 		}
-		*vecNewPos += (vecToTarget * pAnimating->GetCycle());
+		*vecNewPos += (vecToTarget * pAnimating->GetEngineObject()->GetCycle());
 	}
 }
 

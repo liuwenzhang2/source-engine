@@ -27,12 +27,12 @@ void GetRagdollCurSequenceWithDeathPose( C_BaseAnimating *entity, matrix3x4_t *c
 
 		Vector vAdjustedOrigin = vNewOrigin + vDirection * ( ( flVelocity * flVelocity ) * gpGlobals->frametime );
 
-		int iTempSequence = entity->GetSequence();
-		float flTempCycle = entity->GetCycle();
+		int iTempSequence = entity->GetEngineObject()->GetSequence();
+		float flTempCycle = entity->GetEngineObject()->GetCycle();
 
-		entity->SetSequence( activity );
+		entity->GetEngineObject()->SetSequence( activity );
 
-		entity->SetCycle( (float)frame / MAX_DEATHPOSE_FRAMES );
+		entity->GetEngineObject()->SetCycle( (float)frame / MAX_DEATHPOSE_FRAMES );
 
 		entity->GetEngineObject()->SetAbsOrigin( vAdjustedOrigin );
 
@@ -44,8 +44,8 @@ void GetRagdollCurSequenceWithDeathPose( C_BaseAnimating *entity, matrix3x4_t *c
 		// blow the cached prev bones
 		entity->InvalidateBoneCache();
 
-		entity->SetSequence( iTempSequence );
-		entity->SetCycle( flTempCycle );
+		entity->GetEngineObject()->SetSequence( iTempSequence );
+		entity->GetEngineObject()->SetCycle( flTempCycle );
 
 		entity->Interpolate( gpGlobals->curtime );
 
@@ -120,7 +120,7 @@ void SelectDeathPoseActivityAndFrame( CBaseAnimating *entity, const CTakeDamageI
 	activity = ACT_INVALID;
 	frame = 0;
 
-	if ( !entity->GetModelPtr() )
+	if ( !entity->GetEngineObject()->GetModelPtr() )
 		return;
 
 	activity = GetDeathPoseActivity( entity, info );

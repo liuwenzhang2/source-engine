@@ -108,13 +108,13 @@ public:
 		// FIXME: Move this into the GetModelContents() function in base entity
 
 		// Find the contents based on the model type
-		int nModelType = modelinfo->GetModelType( pEntity->GetModel() );
+		int nModelType = modelinfo->GetModelType( pEntity->GetEngineObject()->GetModel() );
 		if ( nModelType == mod_studio )
 		{
 			CBaseAnimating *pAnim = dynamic_cast<CBaseAnimating *>(pEntity);
 			if ( pAnim != NULL )
 			{
-				IStudioHdr *pStudioHdr = pAnim->GetModelPtr();
+				IStudioHdr *pStudioHdr = pAnim->GetEngineObject()->GetModelPtr();
 				if ( pStudioHdr != NULL && (pStudioHdr->contents() & CONTENTS_GRATE) )
 					return true;
 			}
@@ -1674,7 +1674,7 @@ void CWeaponPhysCannon::Spawn( void )
 	// The megacannon uses a different skin
 	if ( IsMegaPhysCannon() )
 	{
-		m_nSkin = MEGACANNON_SKIN;
+		GetEngineObject()->SetSkin(MEGACANNON_SKIN);
 	}
 }
 
@@ -3190,7 +3190,7 @@ void CWeaponPhysCannon::ItemPreFrame()
 	
 	if ( vm != NULL )
 	{
-		vm->SetPoseParameter( "active", m_flElementPosition );
+		vm->GetEngineObject()->SetPoseParameter( "active", m_flElementPosition );
 	}
 
 	// Update the object if the weapon is switched on.
@@ -3267,8 +3267,8 @@ void CWeaponPhysCannon::BeginUpgrade()
 	if ( m_bIsCurrentlyUpgrading )
 		return;
 
-	SetSequence( SelectWeightedSequence( ACT_PHYSCANNON_UPGRADE ) );
-	ResetSequenceInfo();
+	GetEngineObject()->SetSequence( SelectWeightedSequence( ACT_PHYSCANNON_UPGRADE ) );
+	GetEngineObject()->ResetSequenceInfo();
 
 	m_bIsCurrentlyUpgrading = true;
 
@@ -3288,7 +3288,7 @@ void CWeaponPhysCannon::BeginUpgrade()
 	GetEngineObject()->UseTriggerBounds( true, 32.0f );
 
 	// Turn on the new skin
-	m_nSkin = MEGACANNON_SKIN;
+	GetEngineObject()->SetSkin(MEGACANNON_SKIN);
 }
 
 
@@ -3300,7 +3300,7 @@ void CWeaponPhysCannon::WaitForUpgradeThink()
 	Assert( m_bIsCurrentlyUpgrading );
 
 	StudioFrameAdvance();
-	if ( !IsSequenceFinished() )
+	if ( !GetEngineObject()->IsSequenceFinished() )
 	{
 		SetContextThink( &CWeaponPhysCannon::WaitForUpgradeThink, gpGlobals->curtime + 0.1f, s_pWaitForUpgradeContext );
 		return;
@@ -3416,7 +3416,7 @@ void CWeaponPhysCannon::DoEffectIdle( void )
 				pCore->SetThink ( &CCitadelEnergyCore::SUB_Remove );
 				pCore->GetEngineObject()->SetNextThink( gpGlobals->curtime + 10.0f );
 
-				m_nSkin = 0;
+				GetEngineObject()->SetSkin(0);
 			}
 		}
 	}

@@ -359,5 +359,5 @@ void CBaseHL2MPBludgeonWeapon::Swing( int bIsSecondary )
 
 	//Setup our next attack times
 	m_flNextPrimaryAttack = gpGlobals->curtime + GetFireRate();
-	m_flNextSecondaryAttack = gpGlobals->curtime + SequenceDuration();
+	m_flNextSecondaryAttack = gpGlobals->curtime + GetEngineObject()->SequenceDuration();
 }

@@ -173,18 +173,18 @@ CFourWheelVehiclePhysics::~CFourWheelVehiclePhysics ()
 //-----------------------------------------------------------------------------
 inline int CFourWheelVehiclePhysics::LookupPoseParameter( const char *szName )
 {
-	return m_pOuter->LookupPoseParameter( szName );
+	return m_pOuter->GetEngineObject()->LookupPoseParameter( szName );
 }
 
 inline float CFourWheelVehiclePhysics::GetPoseParameter( int iParameter )
 {
-	return m_pOuter->GetPoseParameter( iParameter );
+	return m_pOuter->GetEngineObject()->GetPoseParameter( iParameter );
 }
 
 inline float CFourWheelVehiclePhysics::SetPoseParameter( int iParameter, float flValue )
 {
 	Assert(IsFinite(flValue));
-	return m_pOuter->SetPoseParameter( iParameter, flValue );
+	return m_pOuter->GetEngineObject()->SetPoseParameter( iParameter, flValue );
 }
 
 inline bool CFourWheelVehiclePhysics::GetAttachment( const char *szName, Vector &origin, QAngle &angles )

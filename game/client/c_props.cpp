@@ -78,7 +78,7 @@ void C_DynamicProp::GetRenderBounds( Vector& theMins, Vector& theMaxs )
 		if ( GetModel() )
 		{
 			IStudioHdr *pStudioHdr = modelinfo->GetStudiomodel( GetModel() );
-			if ( !pStudioHdr || GetSequence() == -1 )
+			if ( !pStudioHdr || GetEngineObject()->GetSequence() == -1 )
 			{
 				theMins = vec3_origin;
 				theMaxs = vec3_origin;
@@ -102,10 +102,10 @@ void C_DynamicProp::GetRenderBounds( Vector& theMins, Vector& theMaxs )
 
 unsigned int C_DynamicProp::ComputeClientSideAnimationFlags()
 {
-	if ( GetSequence() != -1 )
+	if (GetEngineObject()->GetSequence() != -1 )
 	{
-		IStudioHdr *pStudioHdr = GetModelPtr();
-		if ( GetSequenceCycleRate(pStudioHdr, GetSequence()) != 0.0f )
+		IStudioHdr *pStudioHdr = GetEngineObject()->GetModelPtr();
+		if (GetEngineObject()->GetSequenceCycleRate(pStudioHdr, GetEngineObject()->GetSequence()) != 0.0f )
 		{
 			return BaseClass::ComputeClientSideAnimationFlags();
 		}
@@ -166,7 +166,7 @@ bool C_BasePropDoor::TestCollision( const Ray_t &ray, unsigned int mask, trace_t
 	if ( !VPhysicsGetObject() )
 		return false;
 
-	IStudioHdr *pStudioHdr = GetModelPtr( );
+	IStudioHdr *pStudioHdr = GetEngineObject()->GetModelPtr( );
 	if (!pStudioHdr)
 		return false;
 

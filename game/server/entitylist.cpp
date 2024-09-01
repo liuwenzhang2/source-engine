@@ -350,6 +350,20 @@ BEGIN_DATADESC_NO_BASE(CEngineObjectInternal)
 	DEFINE_KEYFIELD(m_nHitboxSet, FIELD_INTEGER, "hitboxset"),
 	DEFINE_FIELD(m_flModelScale, FIELD_FLOAT),
 	DEFINE_KEYFIELD(m_flModelScale, FIELD_FLOAT, "modelscale"),
+	DEFINE_ARRAY(m_flEncodedController, FIELD_FLOAT, NUM_BONECTRLS),
+	DEFINE_FIELD(m_bClientSideFrameReset, FIELD_BOOLEAN),
+	DEFINE_KEYFIELD(m_nSequence, FIELD_INTEGER, "sequence"),
+	DEFINE_ARRAY(m_flPoseParameter, FIELD_FLOAT, NUM_POSEPAREMETERS),
+	DEFINE_KEYFIELD(m_flPlaybackRate, FIELD_FLOAT, "playbackrate"),
+	DEFINE_KEYFIELD(m_flCycle, FIELD_FLOAT, "cycle"),
+	DEFINE_FIELD(m_nNewSequenceParity, FIELD_INTEGER),
+	DEFINE_FIELD(m_nResetEventsParity, FIELD_INTEGER),
+	DEFINE_FIELD(m_nMuzzleFlashParity, FIELD_CHARACTER),
+	DEFINE_FIELD(m_flGroundSpeed, FIELD_FLOAT),
+	DEFINE_FIELD(m_flLastEventCheck, FIELD_TIME),
+	DEFINE_FIELD(m_bSequenceFinished, FIELD_BOOLEAN),
+	DEFINE_FIELD(m_bSequenceLoops, FIELD_BOOLEAN),
+	DEFINE_FIELD(m_flSpeedScale, FIELD_FLOAT),
 END_DATADESC()
 
 void SendProxy_Origin(const SendProp* pProp, const void* pStruct, const void* pData, DVariant* pOut, int iElement, int objectID)
@@ -532,6 +546,29 @@ BEGIN_SEND_TABLE_NOBASE(CEngineObjectInternal, DT_SimulationTimeMustBeFirst)
 	SendPropInt(SENDINFO(m_flSimulationTime), SIMULATION_TIME_WINDOW_BITS, SPROP_UNSIGNED | SPROP_CHANGES_OFTEN | SPROP_ENCODED_AGAINST_TICKCOUNT, SendProxy_SimulationTime),
 END_SEND_TABLE()
 
+// Sendtable for fields we don't want to send to clientside animating entities
+BEGIN_SEND_TABLE_NOBASE(CEngineObjectInternal, DT_ServerAnimationData)
+	// ANIMATION_CYCLE_BITS is defined in shareddefs.h
+	SendPropFloat(SENDINFO(m_flCycle), ANIMATION_CYCLE_BITS, SPROP_CHANGES_OFTEN | SPROP_ROUNDDOWN, 0.0f, 1.0f),
+	SendPropArray3(SENDINFO_ARRAY3(m_flPoseParameter), SendPropFloat(SENDINFO_ARRAY(m_flPoseParameter), ANIMATION_POSEPARAMETER_BITS, 0, 0.0f, 1.0f)),
+	SendPropFloat(SENDINFO(m_flPlaybackRate), ANIMATION_PLAYBACKRATE_BITS, SPROP_ROUNDUP, -4.0, 12.0f), // NOTE: if this isn't a power of 2 than "1.0" can't be encoded correctly
+	SendPropInt(SENDINFO(m_nSequence), ANIMATION_SEQUENCE_BITS, SPROP_UNSIGNED),
+	SendPropInt(SENDINFO(m_nNewSequenceParity), EF_PARITY_BITS, SPROP_UNSIGNED),
+	SendPropInt(SENDINFO(m_nResetEventsParity), EF_PARITY_BITS, SPROP_UNSIGNED),
+	SendPropInt(SENDINFO(m_nMuzzleFlashParity), EF_MUZZLEFLASH_BITS, SPROP_UNSIGNED),
+END_SEND_TABLE()
+
+void* SendProxy_ClientSideAnimationE(const SendProp* pProp, const void* pStruct, const void* pVarData, CSendProxyRecipients* pRecipients, int objectID)
+{
+	CEngineObjectInternal* pEntity = (CEngineObjectInternal*)pStruct;
+
+	if (!pEntity->IsUsingClientSideAnimation())
+		return (void*)pVarData;
+	else
+		return NULL;	// Don't send animtime unless the client needs it.
+}
+REGISTER_SEND_PROXY_NON_MODIFIED_POINTER(SendProxy_ClientSideAnimationE);
+
 BEGIN_SEND_TABLE_NOBASE(CEngineObjectInternal, DT_EngineObject)
 	SendPropDataTable("AnimTimeMustBeFirst", 0, &REFERENCE_SEND_TABLE(DT_AnimTimeMustBeFirst), SendProxy_ClientSideAnimation),
 	SendPropDataTable("SimulationTimeMustBeFirst", 0, &REFERENCE_SEND_TABLE(DT_SimulationTimeMustBeFirst), SendProxy_ClientSideSimulation),
@@ -571,6 +608,10 @@ BEGIN_SEND_TABLE_NOBASE(CEngineObjectInternal, DT_EngineObject)
 	SendPropInt(SENDINFO(m_nHitboxSet), ANIMATION_HITBOXSET_BITS, SPROP_UNSIGNED),
 
 	SendPropFloat(SENDINFO(m_flModelScale)),
+	SendPropArray3(SENDINFO_ARRAY3(m_flEncodedController), SendPropFloat(SENDINFO_ARRAY(m_flEncodedController), 11, SPROP_ROUNDDOWN, 0.0f, 1.0f)),
+	SendPropInt(SENDINFO(m_bClientSideFrameReset), 1, SPROP_UNSIGNED),
+	SendPropDataTable("serveranimdata", 0, &REFERENCE_SEND_TABLE(DT_ServerAnimationData), SendProxy_ClientSideAnimationE),
+
 END_SEND_TABLE()
 
 IMPLEMENT_SERVERCLASS(CEngineObjectInternal, DT_EngineObject)
@@ -1141,6 +1182,7 @@ int CEngineObjectInternal::Restore(IRestore& restore)
 	RemoveEFlags(EFL_DIRTY_SPATIAL_PARTITION);
 	MarkSurroundingBoundsDirty();
 
+	m_pModel = modelinfo->GetModel(GetModelIndex());
 	if (m_pOuter->IsNetworkable() && entindex() != -1 && GetModelIndex() != 0 && GetModelName() != NULL_STRING && restore.GetPrecacheMode())
 	{
 		engine->PrecacheModel(STRING(GetModelName()));
@@ -1154,7 +1196,9 @@ int CEngineObjectInternal::Restore(IRestore& restore)
 	{
 		GetGroundEntity()->AddEntityToGroundList(this);
 	}
-
+	if (GetModelScale() <= 0.0f)
+		SetModelScale(1.0f);
+	LockStudioHdr();
 	return status;
 }
 
@@ -2300,7 +2344,7 @@ void CEngineObjectInternal::PhysicsTouchTriggers(const Vector* pPrevAbsOrigin)
 
 		if (GetSolid() == SOLID_BSP)
 		{
-			if (!m_pOuter->GetModel() && Q_strlen(STRING(m_pOuter->GetEngineObject()->GetModelName())) == 0)
+			if (!GetModel() && Q_strlen(STRING(GetModelName())) == 0)
 			{
 				Warning("Inserted %s with no model\n", GetClassname());
 				return;
@@ -2872,14 +2916,15 @@ void CEngineObjectInternal::SetModelIndex(int index)
 	//	AssertMsg( false, "dynamic model support not enabled on server entity" );
 	//	index = -1;
 	//}
-
+		// delete exiting studio model container
 	if (index != m_nModelIndex)
 	{
 		/*if ( m_bDynamicModelPending )
 		{
 			sg_DynamicLoadHandlers.Remove( this );
 		}*/
-
+		UnlockStudioHdr();
+		m_pStudioHdr = NULL;
 		//modelinfo->ReleaseDynamicModel( m_nModelIndex );
 		//modelinfo->AddRefDynamicModel( index );
 		m_nModelIndex = index;
@@ -2896,7 +2941,7 @@ void CEngineObjectInternal::SetModelIndex(int index)
 		//	m_bDynamicModelPending = false;
 		//m_pOuter->OnNewModel();
 		const model_t* pModel = modelinfo->GetModel(m_nModelIndex);
-		m_pOuter->SetModelPointer(pModel);
+		SetModelPointer(pModel);
 		//}
 	}
 	m_pOuter->DispatchUpdateTransmitState();
@@ -4133,6 +4178,524 @@ void CEngineObjectInternal::UpdateModelScale()
 	m_pOuter->RefreshCollisionBounds();
 }
 
+//-----------------------------------------------------------------------------
+// Purpose: 
+// Input  :
+//-----------------------------------------------------------------------------
+void CEngineObjectInternal::LockStudioHdr()
+{
+	AUTO_LOCK(m_StudioHdrInitLock);
+	const model_t* mdl = GetModel();
+	if (mdl)
+	{
+		MDLHandle_t hStudioHdr = modelinfo->GetCacheHandle(mdl);
+		if (hStudioHdr != MDLHANDLE_INVALID)
+		{
+			IStudioHdr* pStudioHdr = mdlcache->LockStudioHdr(hStudioHdr);
+			IStudioHdr* pStudioHdrContainer = NULL;
+			if (!m_pStudioHdr)
+			{
+				if (pStudioHdr)
+				{
+					pStudioHdrContainer = pStudioHdr;// mdlcache->GetIStudioHdr(pStudioHdr);
+					//pStudioHdrContainer->Init( pStudioHdr, mdlcache );
+				}
+			}
+			else
+			{
+				pStudioHdrContainer = m_pStudioHdr;
+			}
+
+			Assert((pStudioHdr == NULL && pStudioHdrContainer == NULL) || pStudioHdrContainer->GetRenderHdr() == pStudioHdr->GetRenderHdr());
+
+			//if ( pStudioHdrContainer && pStudioHdrContainer->GetVirtualModel() )
+			//{
+			//	MDLHandle_t hVirtualModel = VoidPtrToMDLHandle( pStudioHdrContainer->GetRenderHdr()->VirtualModel() );
+			//	mdlcache->LockStudioHdr( hVirtualModel );
+			//}
+			m_pStudioHdr = pStudioHdrContainer; // must be last to ensure virtual model correctly set up
+		}
+	}
+}
+
+void CEngineObjectInternal::UnlockStudioHdr()
+{
+	if (m_pStudioHdr)
+	{
+		const model_t* mdl = GetModel();
+		if (mdl)
+		{
+			mdlcache->UnlockStudioHdr(modelinfo->GetCacheHandle(mdl));
+			//if ( m_pStudioHdr->GetVirtualModel() )
+			//{
+			//	MDLHandle_t hVirtualModel = VoidPtrToMDLHandle( m_pStudioHdr->GetRenderHdr()->VirtualModel() );
+			//	mdlcache->UnlockStudioHdr( hVirtualModel );
+			//}
+		}
+	}
+}
+
+void CEngineObjectInternal::SetModelPointer(const model_t* pModel)
+{
+	if (m_pModel != pModel)
+	{
+		m_pModel = pModel;
+		m_pOuter->OnNewModel();
+	}
+}
+
+const model_t* CEngineObjectInternal::GetModel(void) const
+{
+	return m_pModel;
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: Force a clientside-animating entity to reset it's frame
+//-----------------------------------------------------------------------------
+void CEngineObjectInternal::ResetClientsideFrame(void)
+{
+	// TODO: Once we can chain MSG_ENTITY messages, use one of them
+	m_bClientSideFrameReset = !(bool)m_bClientSideFrameReset;
+}
+
+//=========================================================
+//=========================================================
+void CEngineObjectInternal::SetSequence(int nSequence)
+{
+	Assert(nSequence == 0 /* || IsDynamicModelLoading()*/ || (GetModelPtr() && (nSequence < GetModelPtr()->GetNumSeq()) && (GetModelPtr()->GetNumSeq() < (1 << ANIMATION_SEQUENCE_BITS))));
+	m_nSequence = nSequence;
+}
+
+void CEngineObjectInternal::ResetSequence(int nSequence)
+{
+	m_pOuter->OnResetSequence(nSequence);
+
+	if (!SequenceLoops())
+	{
+		SetCycle(0);
+	}
+
+	// Tracker 17868:  If the sequence number didn't actually change, but you call resetsequence info, it changes
+	//  the newsequenceparity bit which causes the client to call m_flCycle.Reset() which causes a very slight 
+	//  discontinuity in looping animations as they reset around to cycle 0.0.  This was causing the parentattached
+	//  helmet on barney to hitch every time barney's idle cycled back around to its start.
+	bool changed = nSequence != GetSequence() ? true : false;
+
+	SetSequence(nSequence);
+	if (changed || !SequenceLoops())
+	{
+		ResetSequenceInfo();
+	}
+}
+
+//=========================================================
+//=========================================================
+void CEngineObjectInternal::ResetSequenceInfo()
+{
+	if (GetSequence() == -1)
+	{
+		// This shouldn't happen.  Setting m_nSequence blindly is a horrible coding practice.
+		SetSequence(0);
+	}
+
+	//if ( IsDynamicModelLoading() )
+	//{
+	//	m_bResetSequenceInfoOnLoad = true;
+	//	return;
+	//}
+
+	IStudioHdr* pStudioHdr = GetModelPtr();
+	m_flGroundSpeed = GetSequenceGroundSpeed(pStudioHdr, GetSequence()) * GetModelScale();
+	m_bSequenceLoops = ((pStudioHdr->GetSequenceFlags(GetSequence()) & STUDIO_LOOPING) != 0);
+	// m_flAnimTime = gpGlobals->time;
+	m_flPlaybackRate = 1.0;
+	m_bSequenceFinished = false;
+	m_flLastEventCheck = 0;
+
+	m_nNewSequenceParity = (m_nNewSequenceParity + 1) & EF_PARITY_MASK;
+	m_nResetEventsParity = (m_nResetEventsParity + 1) & EF_PARITY_MASK;
+
+	// FIXME: why is this called here?  Nothing should have changed to make this nessesary
+	if (pStudioHdr)
+	{
+		mdlcache->SetEventIndexForSequence(pStudioHdr->pSeqdesc(GetSequence()));
+	}
+}
+
+void CEngineObjectInternal::DoMuzzleFlash()
+{
+	m_nMuzzleFlashParity = (m_nMuzzleFlashParity + 1) & ((1 << EF_MUZZLEFLASH_BITS) - 1);
+}
+
+//=========================================================
+//=========================================================
+int CEngineObjectInternal::LookupPoseParameter(IStudioHdr* pStudioHdr, const char* szName)
+{
+	if (!pStudioHdr)
+		return 0;
+
+	if (!pStudioHdr->SequencesAvailable())
+	{
+		return 0;
+	}
+
+	for (int i = 0; i < pStudioHdr->GetNumPoseParameters(); i++)
+	{
+		if (Q_stricmp(pStudioHdr->pPoseParameter(i).pszName(), szName) == 0)
+		{
+			return i;
+		}
+	}
+
+	// AssertMsg( 0, UTIL_VarArgs( "poseparameter %s couldn't be mapped!!!\n", szName ) );
+	return -1; // Error
+}
+
+//=========================================================
+//=========================================================
+float CEngineObjectInternal::GetPoseParameter(const char* szName)
+{
+	return GetPoseParameter(LookupPoseParameter(szName));
+}
+
+float CEngineObjectInternal::GetPoseParameter(int iParameter)
+{
+	IStudioHdr* pstudiohdr = GetModelPtr();
+
+	if (!pstudiohdr)
+	{
+		Assert(!"CBaseAnimating::GetPoseParameter: model missing");
+		return 0.0;
+	}
+
+	if (!pstudiohdr->SequencesAvailable())
+	{
+		return 0;
+	}
+
+	if (iParameter >= 0)
+	{
+		return pstudiohdr->Studio_GetPoseParameter(iParameter, m_flPoseParameter[iParameter]);
+	}
+
+	return 0.0;
+}
+
+//=========================================================
+//=========================================================
+float CEngineObjectInternal::SetPoseParameter(IStudioHdr* pStudioHdr, const char* szName, float flValue)
+{
+	int poseParam = LookupPoseParameter(pStudioHdr, szName);
+	AssertMsg2(poseParam >= 0, "SetPoseParameter called with invalid argument %s by %s", szName, GetDebugName());
+	return SetPoseParameter(pStudioHdr, poseParam, flValue);
+}
+
+float CEngineObjectInternal::SetPoseParameter(IStudioHdr* pStudioHdr, int iParameter, float flValue)
+{
+	if (!pStudioHdr)
+	{
+		return flValue;
+	}
+
+	if (iParameter >= 0)
+	{
+		float flNewValue;
+		flValue = pStudioHdr->Studio_SetPoseParameter(iParameter, flValue, flNewValue);
+		m_flPoseParameter.Set(iParameter, flNewValue);
+	}
+
+	return flValue;
+}
+
+//=========================================================
+//=========================================================
+float CEngineObjectInternal::SetBoneController(int iController, float flValue)
+{
+	Assert(GetModelPtr());
+
+	IStudioHdr* pmodel = (IStudioHdr*)GetModelPtr();
+
+	Assert(iController >= 0 && iController < NUM_BONECTRLS);
+
+	float newValue;
+	float retVal = pmodel->Studio_SetController(iController, flValue, newValue);
+
+	float& val = m_flEncodedController.GetForModify(iController);
+	val = newValue;
+	return retVal;
+}
+
+//=========================================================
+//=========================================================
+float CEngineObjectInternal::GetBoneController(int iController)
+{
+	Assert(GetModelPtr());
+
+	IStudioHdr* pmodel = (IStudioHdr*)GetModelPtr();
+
+	return pmodel->Studio_GetController(iController, m_flEncodedController[iController]);
+}
+
+//=========================================================
+//=========================================================
+float CEngineObjectInternal::SequenceDuration(IStudioHdr* pStudioHdr, int iSequence)
+{
+	if (!pStudioHdr)
+	{
+		DevWarning(2, "CBaseAnimating::SequenceDuration( %d ) NULL pstudiohdr on %s!\n", iSequence, GetClassname());
+		return 0.1;
+	}
+	if (!pStudioHdr->SequencesAvailable())
+	{
+		return 0.1;
+	}
+	if (iSequence >= pStudioHdr->GetNumSeq() || iSequence < 0)
+	{
+		DevWarning(2, "CBaseAnimating::SequenceDuration( %d ) out of range\n", iSequence);
+		return 0.1;
+	}
+
+	return pStudioHdr->Studio_Duration(iSequence, GetPoseParameterArray());
+}
+
+float CEngineObjectInternal::GetSequenceCycleRate(IStudioHdr* pStudioHdr, int iSequence)
+{
+	float t = SequenceDuration(pStudioHdr, iSequence);
+
+	if (t > 0.0f)
+	{
+		return 1.0f / t;
+	}
+	else
+	{
+		return 1.0f / 0.1f;
+	}
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: 
+//
+// Input  : iSequence - 
+//
+// Output : float
+//-----------------------------------------------------------------------------
+float CEngineObjectInternal::GetSequenceMoveDist(IStudioHdr* pStudioHdr, int iSequence)
+{
+	Vector				vecReturn;
+
+	pStudioHdr->GetSequenceLinearMotion(iSequence, GetPoseParameterArray(), &vecReturn);
+
+	return vecReturn.Length();
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: 
+//
+// Input  : iSequence - 
+//
+// Output : float - 
+//-----------------------------------------------------------------------------
+float CEngineObjectInternal::GetSequenceMoveYaw(int iSequence)
+{
+	Vector				vecReturn;
+
+	Assert(GetModelPtr());
+	GetModelPtr()->GetSequenceLinearMotion(iSequence, GetPoseParameterArray(), &vecReturn);
+
+	if (vecReturn.Length() > 0)
+	{
+		return UTIL_VecToYaw(vecReturn);
+	}
+
+	return NOMOTION;
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: 
+//
+// Input  : iSequence - 
+//			*pVec - 
+//
+//-----------------------------------------------------------------------------
+void CEngineObjectInternal::GetSequenceLinearMotion(int iSequence, Vector* pVec)
+{
+	Assert(GetModelPtr());
+	GetModelPtr()->GetSequenceLinearMotion(iSequence, GetPoseParameterArray(), pVec);
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: does a specific sequence have movement?
+// Output :
+//-----------------------------------------------------------------------------
+bool CEngineObjectInternal::HasMovement(int iSequence)
+{
+	IStudioHdr* pstudiohdr = GetModelPtr();
+	if (!pstudiohdr)
+		return false;
+
+	// FIXME: this needs to check to see if there are keys, and the object is walking
+	Vector deltaPos;
+	QAngle deltaAngles;
+	if (pstudiohdr->Studio_SeqMovement(iSequence, 0.0f, 1.0f, GetPoseParameterArray(), deltaPos, deltaAngles))
+	{
+		return true;
+	}
+
+	return false;
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: find frame where they animation has moved a given distance.
+// Output :
+//-----------------------------------------------------------------------------
+float CEngineObjectInternal::GetMovementFrame(float flDist)
+{
+	IStudioHdr* pstudiohdr = GetModelPtr();
+	if (!pstudiohdr)
+		return 0;
+
+	float t = pstudiohdr->Studio_FindSeqDistance(GetSequence(), GetPoseParameterArray(), flDist);
+
+	return t;
+}
+
+//-----------------------------------------------------------------------------
+// Purpose:
+// Output :
+//-----------------------------------------------------------------------------
+bool CEngineObjectInternal::GetSequenceMovement(int nSequence, float fromCycle, float toCycle, Vector& deltaPosition, QAngle& deltaAngles)
+{
+	IStudioHdr* pstudiohdr = GetModelPtr();
+	if (!pstudiohdr)
+		return false;
+
+	return pstudiohdr->Studio_SeqMovement(nSequence, fromCycle, toCycle, GetPoseParameterArray(), deltaPosition, deltaAngles);
+}
+
+//-----------------------------------------------------------------------------
+// Purpose:
+// Output :
+//-----------------------------------------------------------------------------
+bool CEngineObjectInternal::GetIntervalMovement(float flIntervalUsed, bool& bMoveSeqFinished, Vector& newPosition, QAngle& newAngles)
+{
+	IStudioHdr* pstudiohdr = GetModelPtr();
+	if (!pstudiohdr || !pstudiohdr->SequencesAvailable())
+		return false;
+
+	float flComputedCycleRate = GetSequenceCycleRate(GetSequence());
+
+	float flNextCycle = GetCycle() + flIntervalUsed * flComputedCycleRate * GetPlaybackRate();
+
+	if ((!SequenceLoops()) && flNextCycle > 1.0)
+	{
+		flIntervalUsed = GetCycle() / (flComputedCycleRate * GetPlaybackRate());
+		flNextCycle = 1.0;
+		bMoveSeqFinished = true;
+	}
+	else
+	{
+		bMoveSeqFinished = false;
+	}
+
+	Vector deltaPos;
+	QAngle deltaAngles;
+
+	if (pstudiohdr->Studio_SeqMovement(GetSequence(), GetCycle(), flNextCycle, GetPoseParameterArray(), deltaPos, deltaAngles))
+	{
+		VectorYawRotate(deltaPos, GetLocalAngles().y, deltaPos);
+		newPosition = GetLocalOrigin() + deltaPos;
+		newAngles.Init();
+		newAngles.y = GetLocalAngles().y + deltaAngles.y;
+		return true;
+	}
+	else
+	{
+		newPosition = GetLocalOrigin();
+		newAngles = GetLocalAngles();
+		return false;
+	}
+}
+
+//-----------------------------------------------------------------------------
+// Purpose:
+// Output :
+//-----------------------------------------------------------------------------
+float CEngineObjectInternal::GetEntryVelocity(int iSequence)
+{
+	IStudioHdr* pstudiohdr = GetModelPtr();
+	if (!pstudiohdr)
+		return 0;
+
+	Vector vecVelocity;
+	pstudiohdr->Studio_SeqVelocity(iSequence, 0.0, GetPoseParameterArray(), vecVelocity);
+
+	return vecVelocity.Length();
+}
+
+float CEngineObjectInternal::GetExitVelocity(int iSequence)
+{
+	IStudioHdr* pstudiohdr = GetModelPtr();
+	if (!pstudiohdr)
+		return 0;
+
+	Vector vecVelocity;
+	pstudiohdr->Studio_SeqVelocity(iSequence, 1.0, GetPoseParameterArray(), vecVelocity);
+
+	return vecVelocity.Length();
+}
+
+//-----------------------------------------------------------------------------
+// Purpose:
+// Output :
+//-----------------------------------------------------------------------------
+float CEngineObjectInternal::GetInstantaneousVelocity(float flInterval)
+{
+	IStudioHdr* pstudiohdr = GetModelPtr();
+	if (!pstudiohdr)
+		return 0;
+
+	// FIXME: someone needs to check for last frame, etc.
+	float flNextCycle = GetCycle() + flInterval * GetSequenceCycleRate(GetSequence()) * GetPlaybackRate();
+
+	Vector vecVelocity;
+	pstudiohdr->Studio_SeqVelocity(GetSequence(), flNextCycle, GetPoseParameterArray(), vecVelocity);
+	vecVelocity *= GetPlaybackRate();
+
+	return vecVelocity.Length();
+}
+
+float CEngineObjectInternal::GetSequenceGroundSpeed(IStudioHdr* pStudioHdr, int iSequence)
+{
+	float t = SequenceDuration(pStudioHdr, iSequence);
+
+	if (t > 0)
+	{
+		return (GetSequenceMoveDist(pStudioHdr, iSequence) / t) * m_flSpeedScale;
+	}
+	else
+	{
+		return 0;
+	}
+}
+
+bool CEngineObjectInternal::GetPoseParameterRange(int index, float& minValue, float& maxValue)
+{
+	IStudioHdr* pStudioHdr = GetModelPtr();
+
+	if (pStudioHdr)
+	{
+		if (index >= 0 && index < pStudioHdr->GetNumPoseParameters())
+		{
+			const mstudioposeparamdesc_t& pose = pStudioHdr->pPoseParameter(index);
+			minValue = pose.start;
+			maxValue = pose.end;
+			return true;
+		}
+	}
+	minValue = 0.0f;
+	maxValue = 1.0f;
+	return false;
+}
 
 struct collidelist_t
 {

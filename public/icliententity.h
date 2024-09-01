@@ -424,8 +424,54 @@ public:
 	virtual bool IsModelScaleFractional() const = 0;
 	virtual bool IsModelScaled() const = 0;
 	virtual void UpdateModelScale(void) = 0;
-
-
+	virtual const model_t* GetModel(void) const = 0;
+	virtual IStudioHdr* GetModelPtr() const = 0;
+	virtual void InvalidateMdlCache() = 0;
+	virtual float GetCycle() const = 0;
+	virtual void SetCycle(float flCycle) = 0;
+	virtual float GetPlaybackRate() = 0;
+	virtual void SetPlaybackRate(float rate) = 0;
+	virtual void SetReceivedSequence(void) = 0;
+	virtual bool GetReceivedSequence() = 0;
+	virtual int GetSequence() = 0;
+	virtual void SetSequence(int nSequence) = 0;
+	virtual void ResetSequence(int nSequence) = 0;
+	virtual void ResetSequenceInfo() = 0;
+	virtual bool IsSequenceFinished(void) = 0;
+	virtual void SetSequenceFinished(bool bFinished) = 0;
+	virtual bool IsSequenceLooping(IStudioHdr* pStudioHdr, int iSequence) = 0;
+	virtual bool IsSequenceLooping(int iSequence) = 0;
+	virtual int GetNewSequenceParity() = 0;
+	virtual int GetPrevNewSequenceParity() = 0;
+	virtual void SetPrevNewSequenceParity(int nPrevNewSequenceParity) = 0;
+	virtual int GetResetEventsParity() = 0;
+	virtual float GetSequenceCycleRate(IStudioHdr* pStudioHdr, int iSequence) = 0;
+	virtual float SequenceDuration(int iSequence) = 0;
+	virtual float SequenceDuration(void) = 0;
+	virtual void GetSequenceLinearMotion(int iSequence, Vector* pVec) = 0;
+	virtual float GetSequenceGroundSpeed(IStudioHdr* pStudioHdr, int iSequence) = 0;
+	virtual float GetSequenceGroundSpeed(int iSequence) = 0;
+	virtual float GetGroundSpeed() const = 0;
+	virtual void SetGroundSpeed(float flGroundSpeed) = 0;
+	virtual void GetBoneControllers(float controllers[MAXSTUDIOBONECTRLS]) = 0;
+	virtual float SetBoneController(int iController, float flValue) = 0;
+	virtual int LookupPoseParameter(IStudioHdr* pStudioHdr, const char* szName) = 0;
+	virtual int LookupPoseParameter(const char* szName) = 0;
+	virtual bool GetPoseParameterRange(int iPoseParameter, float& minValue, float& maxValue) = 0;
+	virtual void GetPoseParameters(IStudioHdr* pStudioHdr, float poseParameter[MAXSTUDIOPOSEPARAM]) = 0;
+	virtual float GetPoseParameter(int iPoseParameter) = 0;
+	virtual float SetPoseParameter(IStudioHdr* pStudioHdr, const char* szName, float flValue) = 0;
+	virtual float SetPoseParameter(IStudioHdr* pStudioHdr, int iParameter, float flValue) = 0;
+	virtual float SetPoseParameter(const char* szName, float flValue) = 0;
+	virtual float SetPoseParameter(int iParameter, float flValue) = 0;
+	virtual CMouthInfo* GetMouth(void) = 0;
+	virtual CMouthInfo& MouthInfo() = 0;
+	virtual void ControlMouth(IStudioHdr* pStudioHdr) = 0;
+	virtual bool ShouldMuzzleFlash() const = 0;
+	virtual void DisableMuzzleFlash() = 0;
+	virtual void DoMuzzleFlash() = 0;
+	virtual void SetModelPointer(const model_t* pModel) = 0;
+	virtual void UpdateRelevantInterpolatedVars() = 0;
 };
 
 //-----------------------------------------------------------------------------
@@ -441,7 +487,7 @@ public:
 	//virtual const Vector&	GetAbsOrigin( void ) const = 0;
 	//virtual const QAngle&	GetAbsAngles( void ) const = 0;
 
-	virtual CMouthInfo		*GetMouth( void ) = 0;
+	//virtual CMouthInfo		*GetMouth( void ) = 0;
 
 	// Retrieve sound spatialization info for the specified sound on this entity
 	// Return false to indicate sound is not audible

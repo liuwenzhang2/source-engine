@@ -474,7 +474,7 @@ void CNPC_Citizen::Spawn()
 	}
 
 	if ( IsAmmoResupplier() )
-		m_nSkin = 2;
+		GetEngineObject()->SetSkin(2);
 	
 	m_bRPGAvoidPlayer = false;
 
@@ -1657,7 +1657,7 @@ void CNPC_Citizen::RunTask( const Task_t *pTask )
 		{
 			AutoMovement();
 			
-			if ( IsSequenceFinished() )
+			if (GetEngineObject()->IsSequenceFinished() )
 			{
 				TaskComplete();
 			}
@@ -1677,7 +1677,7 @@ void CNPC_Citizen::RunTask( const Task_t *pTask )
 
 		case TASK_CIT_LEAVE_TRAIN:
 		{
-			if ( IsSequenceFinished() )
+			if (GetEngineObject()->IsSequenceFinished() )
 			{
 				SetupVPhysicsHull();
 				TaskComplete();
@@ -1686,7 +1686,7 @@ void CNPC_Citizen::RunTask( const Task_t *pTask )
 		}
 
 		case TASK_CIT_HEAL:
-			if ( IsSequenceFinished() )
+			if (GetEngineObject()->IsSequenceFinished() )
 			{
 				TaskComplete();
 			}
@@ -1707,7 +1707,7 @@ void CNPC_Citizen::RunTask( const Task_t *pTask )
 
 #if HL2_EPISODIC
 		case TASK_CIT_HEAL_TOSS:
-			if ( IsSequenceFinished() )
+			if (GetEngineObject()->IsSequenceFinished() )
 			{
 				TaskComplete();
 			}

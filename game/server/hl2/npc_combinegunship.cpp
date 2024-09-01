@@ -571,10 +571,10 @@ void CNPC_CombineGunship::Spawn( void )
 	m_flNextSeeEnemySound = gpGlobals->curtime;
 
 	// Init the pose parameters
-	SetPoseParameter( "flex_horz", 0 );
-	SetPoseParameter( "flex_vert", 0 );
-	SetPoseParameter( "fin_accel", 0 );
-	SetPoseParameter( "fin_sway", 0 );
+	GetEngineObject()->SetPoseParameter( "flex_horz", 0 );
+	GetEngineObject()->SetPoseParameter( "flex_vert", 0 );
+	GetEngineObject()->SetPoseParameter( "fin_accel", 0 );
+	GetEngineObject()->SetPoseParameter( "fin_sway", 0 );
 
 	if( m_iAmmoType == -1 )
 	{
@@ -708,15 +708,15 @@ void	CNPC_CombineGunship::PopulatePoseParameters( void )
 {
 	if (!m_sbStaticPoseParamsLoaded)
 	{
-		m_poseFlex_Horz		= LookupPoseParameter( "flex_horz");
-		m_poseFlex_Vert			= LookupPoseParameter( "flex_vert" );
-		m_posePitch  = LookupPoseParameter( "pitch" );
-		m_poseYaw   = LookupPoseParameter( "yaw" );
-		m_poseFin_Accel   = LookupPoseParameter( "fin_accel" );
-		m_poseFin_Sway   = LookupPoseParameter( "fin_sway" );
+		m_poseFlex_Horz		= GetEngineObject()->LookupPoseParameter( "flex_horz");
+		m_poseFlex_Vert			= GetEngineObject()->LookupPoseParameter( "flex_vert" );
+		m_posePitch  = GetEngineObject()->LookupPoseParameter( "pitch" );
+		m_poseYaw   = GetEngineObject()->LookupPoseParameter( "yaw" );
+		m_poseFin_Accel   = GetEngineObject()->LookupPoseParameter( "fin_accel" );
+		m_poseFin_Sway   = GetEngineObject()->LookupPoseParameter( "fin_sway" );
 
-		m_poseWeapon_Pitch		= LookupPoseParameter( "weapon_pitch" );
-		m_poseWeapon_Yaw		= LookupPoseParameter( "weapon_yaw" );
+		m_poseWeapon_Pitch		= GetEngineObject()->LookupPoseParameter( "weapon_pitch" );
+		m_poseWeapon_Yaw		= GetEngineObject()->LookupPoseParameter( "weapon_yaw" );
 
 		m_sbStaticPoseParamsLoaded = true;
 	}
@@ -1425,8 +1425,8 @@ bool CNPC_CombineGunship::ChooseEnemy( void )
 //-----------------------------------------------------------------------------
 void CNPC_CombineGunship::MoveHead( void )
 {
-	float flYaw = GetPoseParameter( m_poseFlex_Horz );
-	float flPitch = GetPoseParameter( m_poseFlex_Vert );
+	float flYaw = GetEngineObject()->GetPoseParameter( m_poseFlex_Horz );
+	float flPitch = GetEngineObject()->GetPoseParameter( m_poseFlex_Vert );
 
 /*
 	This head-turning code will cause the head to POP when switching from looking at the enemy
@@ -1484,8 +1484,8 @@ void CNPC_CombineGunship::MoveHead( void )
 	}
 
 	// Set the body flexes
-	SetPoseParameter( m_poseFlex_Vert, flPitch );
-	SetPoseParameter( m_poseFlex_Horz, flYaw );
+	GetEngineObject()->SetPoseParameter( m_poseFlex_Vert, flPitch );
+	GetEngineObject()->SetPoseParameter( m_poseFlex_Horz, flYaw );
 }
 
 
@@ -2028,7 +2028,7 @@ void CNPC_CombineGunship::BeginDestruct( void )
 		return;
 
 	// Switch to damaged skin
-	m_nSkin = 1;
+	GetEngineObject()->SetSkin(1);
 
 	if (GetEngineObject()->HasSpawnFlags( SF_GUNSHIP_USE_CHOPPER_MODEL ) )
 	{
@@ -2321,19 +2321,19 @@ void CNPC_CombineGunship::Flight( void )
 
 	// Apply the acceleration blend to the fins
 	float finAccelBlend = SimpleSplineRemapVal( speed, -60, 60, -1, 1 );
-	float curFinAccel = GetPoseParameter( m_poseFin_Accel );
+	float curFinAccel = GetEngineObject()->GetPoseParameter( m_poseFin_Accel );
 	
 	curFinAccel = UTIL_Approach( finAccelBlend, curFinAccel, 0.5f );
-	SetPoseParameter( m_poseFin_Accel, curFinAccel );
+	GetEngineObject()->SetPoseParameter( m_poseFin_Accel, curFinAccel );
 
 	speed = m_flForce * DotProduct( vecVelDir, right );
 
 	// Apply the spin sway to the fins
 	float finSwayBlend = SimpleSplineRemapVal( speed, -60, 60, -1, 1 );
-	float curFinSway = GetPoseParameter( m_poseFin_Sway );
+	float curFinSway = GetEngineObject()->GetPoseParameter( m_poseFin_Sway );
 
 	curFinSway = UTIL_Approach( finSwayBlend, curFinSway, 0.5f );
-	SetPoseParameter( m_poseFin_Sway, curFinSway );
+	GetEngineObject()->SetPoseParameter( m_poseFin_Sway, curFinSway );
 
 	if ( g_debug_gunship.GetInt() == GUNSHIP_DEBUG_PATH )
 	{
@@ -2792,8 +2792,8 @@ bool CNPC_CombineGunship::PoseGunTowardTargetDirection( const Vector &vTargetDir
 		m_angGun.y = MAX( angles.y, m_angGun.y - 12 );
 	}
 
-	SetPoseParameter( m_poseWeapon_Pitch, -m_angGun.x );
-	SetPoseParameter( m_poseWeapon_Yaw, m_angGun.y );
+	GetEngineObject()->SetPoseParameter( m_poseWeapon_Pitch, -m_angGun.x );
+	GetEngineObject()->SetPoseParameter( m_poseWeapon_Yaw, m_angGun.y );
 
 	return true;
 }

@@ -161,7 +161,7 @@ void CPlayerAnimState::Update()
 	m_angRender[ PITCH ] = m_angRender[ ROLL ] = 0.0f;
 
 	ComputePoseParam_BodyYaw();
-	ComputePoseParam_BodyPitch(GetOuter()->GetModelPtr());
+	ComputePoseParam_BodyPitch(GetOuter()->GetEngineObject()->GetModelPtr());
 	ComputePoseParam_BodyLookYaw();
 
 	ComputePlaybackRate();
@@ -185,21 +185,21 @@ void CPlayerAnimState::ComputePlaybackRate()
 
 	bool isMoving = ( speed > 0.5f ) ? true : false;
 
-	float maxspeed = GetOuter()->GetSequenceGroundSpeed( GetOuter()->GetSequence() );
+	float maxspeed = GetOuter()->GetEngineObject()->GetSequenceGroundSpeed( GetOuter()->GetEngineObject()->GetSequence() );
 	
 	if ( isMoving && ( maxspeed > 0.0f ) )
 	{
 		float flFactor = 1.0f;
 
 		// Note this gets set back to 1.0 if sequence changes due to ResetSequenceInfo below
-		GetOuter()->SetPlaybackRate( ( speed * flFactor ) / maxspeed );
+		GetOuter()->GetEngineObject()->SetPlaybackRate( ( speed * flFactor ) / maxspeed );
 
 		// BUG BUG:
 		// This stuff really should be m_flPlaybackRate = speed / m_flGroundSpeed
 	}
 	else
 	{
-		GetOuter()->SetPlaybackRate( 1.0f );
+		GetOuter()->GetEngineObject()->SetPlaybackRate( 1.0f );
 	}
 }
 
@@ -266,7 +266,7 @@ void CPlayerAnimState::EstimateYaw( void )
 //-----------------------------------------------------------------------------
 void CPlayerAnimState::ComputePoseParam_BodyYaw( void )
 {
-	int iYaw = GetOuter()->LookupPoseParameter( "move_yaw" );
+	int iYaw = GetOuter()->GetEngineObject()->LookupPoseParameter( "move_yaw" );
 	if ( iYaw < 0 )
 		return;
 
@@ -301,7 +301,7 @@ void CPlayerAnimState::ComputePoseParam_BodyYaw( void )
 		flYaw = flYaw - 360;
 	}
 	
-	GetOuter()->SetPoseParameter( iYaw, flYaw );
+	GetOuter()->GetEngineObject()->SetPoseParameter( iYaw, flYaw );
 
 #ifndef CLIENT_DLL
 		//Adrian: Make the model's angle match the legs so the hitboxes match on both sides.
@@ -329,7 +329,7 @@ void CPlayerAnimState::ComputePoseParam_BodyPitch( IStudioHdr *pStudioHdr )
 	m_angRender[ PITCH ] = m_angRender[ ROLL ] = 0.0f;
 
 	// See if we have a blender for pitch
-	GetOuter()->SetPoseParameter( pStudioHdr, "aim_pitch", flPitch );
+	GetOuter()->GetEngineObject()->SetPoseParameter( pStudioHdr, "aim_pitch", flPitch );
 }
 
 //-----------------------------------------------------------------------------
@@ -390,7 +390,7 @@ void CPlayerAnimState::ComputePoseParam_BodyLookYaw( void )
 	m_angRender[ PITCH ] = m_angRender[ ROLL ] = 0.0f;
 
 	// See if we even have a blender for pitch
-	int upper_body_yaw = GetOuter()->LookupPoseParameter( "aim_yaw" );
+	int upper_body_yaw = GetOuter()->GetEngineObject()->LookupPoseParameter( "aim_yaw" );
 	if ( upper_body_yaw < 0 )
 	{
 		return;
@@ -513,7 +513,7 @@ void CPlayerAnimState::ComputePoseParam_BodyLookYaw( void )
 	m_angRender = absangles;
 	m_angRender[ PITCH ] = m_angRender[ ROLL ] = 0.0f;
 
-	GetOuter()->SetPoseParameter( upper_body_yaw, clamp( m_flCurrentTorsoYaw, -60.0f, 60.0f ) );
+	GetOuter()->GetEngineObject()->SetPoseParameter( upper_body_yaw, clamp( m_flCurrentTorsoYaw, -60.0f, 60.0f ) );
 
 	/*
 	// FIXME: Adrian, what is this?

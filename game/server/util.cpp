@@ -1877,7 +1877,7 @@ void EntityMatrix::InitFromEntity( CBaseEntity *pEntity, int iAttachment )
 	if ( iAttachment != 0 )
 	{
 		CBaseAnimating *pAnimating = pEntity->GetBaseAnimating();
-		if ( pAnimating && pAnimating->GetModelPtr() )
+		if ( pAnimating && pAnimating->GetEngineObject()->GetModelPtr() )
 		{
 			Vector vOrigin;
 			QAngle vAngles;
@@ -2396,7 +2396,7 @@ bool UTIL_TransferPoseParameters( CBaseEntity *pSourceEntity, CBaseEntity *pDest
 
 	for ( int iPose = 0; iPose < MAXSTUDIOPOSEPARAM; ++iPose )
 	{
-		pDestBaseAnimating->SetPoseParameter( iPose, pSourceBaseAnimating->GetPoseParameter( iPose ) );
+		pDestBaseAnimating->GetEngineObject()->SetPoseParameter( iPose, pSourceBaseAnimating->GetEngineObject()->GetPoseParameter( iPose ) );
 	}
 	
 	return true;

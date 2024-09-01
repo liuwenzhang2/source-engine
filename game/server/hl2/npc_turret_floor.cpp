@@ -283,14 +283,14 @@ void CNPC_FloorTurret::Spawn( void )
 			// frankly I don't care so much about that.
 			// m_nSkin = random->RandomInt( 1, 4 );
 			static unsigned int nextSkin = 0;
-			m_nSkin = nextSkin + 1;
+			GetEngineObject()->SetSkin(nextSkin + 1);
 
 			// add one mod 4
 			nextSkin = (nextSkin + 1) & 0x03;
 		}
 		else
 		{	// at least make sure that it's in the right range
-			m_nSkin = clamp(m_iKeySkin,1,4);
+			GetEngineObject()->SetSkin(clamp(m_iKeySkin,1,4));
 		}
 	}
 
@@ -307,8 +307,8 @@ void CNPC_FloorTurret::Spawn( void )
 
 	GetEngineObject()->AddEFlags( EFL_NO_DISSOLVE );
 
-	SetPoseParameter( m_poseAim_Yaw, 0 );
-	SetPoseParameter( m_poseAim_Pitch, 0 );
+	GetEngineObject()->SetPoseParameter( m_poseAim_Yaw, 0 );
+	GetEngineObject()->SetPoseParameter( m_poseAim_Pitch, 0 );
 
 	m_iAmmoType = GetAmmoDef()->Index( "PISTOL" );
 
@@ -491,7 +491,7 @@ void CNPC_FloorTurret::Deploy( void )
 
 		m_flShotTime  = gpGlobals->curtime + 1.0f;
 
-		m_flPlaybackRate = 0;
+		GetEngineObject()->SetPlaybackRate(0);
 		SetThink( &CNPC_FloorTurret::SearchThink );
 
 		const char* soundname = "NPC_FloorTurret.Move";
@@ -705,7 +705,7 @@ bool CNPC_FloorTurret::UpdateFacing( void )
 	// Update pitch
 	float flDiff = AngleNormalize( UTIL_ApproachAngle(  vecGoalLocalAngles.x, 0.0, 0.05f * MaxYawSpeed() ) );
 	
-	SetPoseParameter( m_poseAim_Pitch, GetPoseParameter( m_poseAim_Pitch ) + ( flDiff / 1.5f ) );
+	GetEngineObject()->SetPoseParameter( m_poseAim_Pitch, GetEngineObject()->GetPoseParameter( m_poseAim_Pitch ) + ( flDiff / 1.5f ) );
 
 	if ( fabs( flDiff ) > 0.1f )
 	{
@@ -715,7 +715,7 @@ bool CNPC_FloorTurret::UpdateFacing( void )
 	// Update yaw
 	flDiff = AngleNormalize( UTIL_ApproachAngle(  vecGoalLocalAngles.y, 0.0, 0.05f * MaxYawSpeed() ) );
 
-	SetPoseParameter( m_poseAim_Yaw, GetPoseParameter( m_poseAim_Yaw ) + ( flDiff / 1.5f ) );
+	GetEngineObject()->SetPoseParameter( m_poseAim_Yaw, GetEngineObject()->GetPoseParameter( m_poseAim_Yaw ) + ( flDiff / 1.5f ) );
 
 	if ( fabs( flDiff ) > 0.1f )
 	{

@@ -216,7 +216,7 @@ void CNPC_FlockingFlyerFlock::SpawnFlock( void )
 		pBoid->GetEngineObject()->SetAbsVelocity( Vector ( 0, 0, 0 ) );
 		pBoid->GetEngineObject()->SetAbsAngles(GetEngineObject()->GetAbsAngles() );
 		
-		pBoid->SetCycle( 0 );
+		pBoid->GetEngineObject()->SetCycle( 0 );
 		pBoid->SetThink( &CNPC_FlockingFlyer::IdleThink );
 		pBoid->GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.2 );
 
@@ -239,7 +239,7 @@ void CNPC_FlockingFlyer::Spawn( )
 	Precache( );
 	SpawnCommonCode();
 	
-	SetCycle( 0 );
+	GetEngineObject()->SetCycle( 0 );
 	GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.1f );
 	SetThink( &CNPC_FlockingFlyer::IdleThink );
 }
@@ -435,7 +435,7 @@ void CNPC_FlockingFlyer::Start( void )
 	}
 
 	SetActivity ( ACT_FLY );
-	ResetSequenceInfo( );
+	GetEngineObject()->ResetSequenceInfo( );
 	BoidAdvanceFrame( );
 
 	m_flSpeed = AFLOCK_FLY_SPEED;// no delay!
@@ -452,7 +452,7 @@ void CNPC_FlockingFlyer::BoidAdvanceFrame ( void )
 	if (flapspeed < 0.25) flapspeed = 0.25;
 	if (flapspeed > 1.9) flapspeed = 1.9;
 
-	m_flPlaybackRate = flapspeed;
+	GetEngineObject()->SetPlaybackRate(flapspeed);
 
 	QAngle angVel = GetLocalAngularVelocity();
 
@@ -829,7 +829,7 @@ void CNPC_FlockingFlyer::Event_Killed( const CTakeDamageInfo &info )
 
 	m_lifeState = LIFE_DEAD;
 
-	m_flPlaybackRate = 0;
+	GetEngineObject()->SetPlaybackRate(0);
 	IncrementInterpolationFrame();
 
 	UTIL_SetSize( this, Vector(0,0,0), Vector(0,0,0) );

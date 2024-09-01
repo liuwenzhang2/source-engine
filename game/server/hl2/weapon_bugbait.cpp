@@ -249,7 +249,7 @@ void CWeaponBugBait::SecondaryAttack( void )
 	}
 
 	SendWeaponAnim( ACT_VM_SECONDARYATTACK );
-	m_flNextSecondaryAttack = gpGlobals->curtime + SequenceDuration();
+	m_flNextSecondaryAttack = gpGlobals->curtime + GetEngineObject()->SequenceDuration();
 
 	CBasePlayer *pOwner = ToBasePlayer( GetOwner() );
 	if ( pOwner )
@@ -330,7 +330,7 @@ bool CWeaponBugBait::Reload( void )
 		SendWeaponAnim( ACT_VM_DRAW );
 
 		//Update our times
-		m_flNextPrimaryAttack = gpGlobals->curtime + SequenceDuration();
+		m_flNextPrimaryAttack = gpGlobals->curtime + GetEngineObject()->SequenceDuration();
 
 		//Mark this as done
 		m_bRedraw = false;
@@ -355,7 +355,7 @@ void CWeaponBugBait::ItemPostFrame( void )
 		if ( ( pOwner->m_nButtons & IN_ATTACK ) == false )
 		{
 			SendWeaponAnim( ACT_VM_THROW );
-			m_flNextPrimaryAttack  = gpGlobals->curtime + SequenceDuration();
+			m_flNextPrimaryAttack  = gpGlobals->curtime + GetEngineObject()->SequenceDuration();
 			m_bDrawBackFinished = false;
 		}
 	}

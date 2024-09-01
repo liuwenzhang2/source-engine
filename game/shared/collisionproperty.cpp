@@ -789,7 +789,7 @@ int CCollisionProperty::GetCollisionModelIndex()
 
 const model_t* CCollisionProperty::GetCollisionModel()
 {
-	return m_pOuter->GetOuter()->GetModel();
+	return m_pOuter->GetOuter()->GetEngineObject()->GetModel();
 }
 
 

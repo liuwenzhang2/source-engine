@@ -773,8 +773,8 @@ void CFuncTank::Spawn( void )
 		{
 			if ( m_bUsePoseParameters )
 			{
-				pAnim->SetPoseParameter( STRING( m_iszYawPoseParam ), 0 );
-				pAnim->SetPoseParameter( STRING( m_iszPitchPoseParam ), 0 );
+				pAnim->GetEngineObject()->SetPoseParameter( STRING( m_iszYawPoseParam ), 0 );
+				pAnim->GetEngineObject()->SetPoseParameter( STRING( m_iszPitchPoseParam ), 0 );
 				pAnim->InvalidateBoneCache();
 			}
 
@@ -894,8 +894,8 @@ void CFuncTank::Activate( void )
 		{
 			if ( m_bUsePoseParameters )
 			{
-				pAnim->SetPoseParameter( STRING( m_iszYawPoseParam ), 0 );
-				pAnim->SetPoseParameter( STRING( m_iszPitchPoseParam ), 0 );
+				pAnim->GetEngineObject()->SetPoseParameter( STRING( m_iszYawPoseParam ), 0 );
+				pAnim->GetEngineObject()->SetPoseParameter( STRING( m_iszPitchPoseParam ), 0 );
 				pAnim->InvalidateBoneCache();
 			}
 
@@ -1020,8 +1020,8 @@ void CFuncTank::PhysicsSimulate( void )
 	{
 		const QAngle &angles = GetEngineObject()->GetLocalAngles();
 		CBaseAnimating *pAnim = GetEngineObject()->GetMoveParent()->GetOuter()->GetBaseAnimating();
-		pAnim->SetPoseParameter( STRING( m_iszYawPoseParam ), angles.y );
-		pAnim->SetPoseParameter( STRING( m_iszPitchPoseParam ), angles.x );
+		pAnim->GetEngineObject()->SetPoseParameter( STRING( m_iszYawPoseParam ), angles.y );
+		pAnim->GetEngineObject()->SetPoseParameter( STRING( m_iszPitchPoseParam ), angles.x );
 		pAnim->StudioFrameAdvance();
 	}
 }
@@ -2219,7 +2219,7 @@ void CFuncTank::DoMuzzleFlash( void )
 	if ( m_bUsePoseParameters && GetEngineObject()->GetMoveParent() )
 	{
 		CBaseAnimating *pAnim = GetEngineObject()->GetMoveParent()->GetOuter()->GetBaseAnimating();
-		pAnim->DoMuzzleFlash();
+		pAnim->GetEngineObject()->DoMuzzleFlash();
 
 		// Do the AR2 muzzle flash
 		if ( m_iEffectHandling == EH_COMBINE_CANNON )

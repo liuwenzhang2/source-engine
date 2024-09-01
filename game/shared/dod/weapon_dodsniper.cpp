@@ -111,7 +111,7 @@ void CDODSniperWeapon::PrimaryAttack( void )
 	if ( m_bRezoomAfterShot && m_iClip1 > 0 )
 		m_flNextSecondaryAttack = gpGlobals->curtime + 2.0;
 	else
-		m_flNextSecondaryAttack = SequenceDuration();
+		m_flNextSecondaryAttack = GetEngineObject()->SequenceDuration();
 }
 
 void CDODSniperWeapon::SecondaryAttack( void )

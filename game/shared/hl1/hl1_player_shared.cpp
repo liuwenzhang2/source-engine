@@ -157,7 +157,7 @@ int CPlayerAnimState::CalcAimLayerSequence( float *flCycle, float *flAimSequence
 	// Check if we're done firing.
 	if ( m_bFiring )
 	{
-		float dur = m_pOuter->SequenceDuration( iSequence );
+		float dur = m_pOuter->GetEngineObject()->SequenceDuration( iSequence );
 		*flCycle = (gpGlobals->curtime - m_flFireStartTime) / dur;
 		if ( *flCycle >= 1 )
 		{
@@ -196,7 +196,7 @@ float CPlayerAnimState::SetOuterBodyYaw( float flValue )
 
 	for ( int i = 0; i < 4; i++ )
 	{
-		m_pOuter->SetBoneController( i, fAcc );
+		m_pOuter->GetEngineObject()->SetBoneController( i, fAcc );
 	}
 
 	return flValue;
@@ -327,7 +327,7 @@ float CPlayerAnimState::CalcMovementPlaybackRate( bool *bIsMoving )
 
 	float flReturnValue = BaseClass::CalcMovementPlaybackRate( bIsMoving );
 
-	Activity eActivity = GetOuter()->GetSequenceActivity( GetOuter()->GetSequence() ) ;
+	Activity eActivity = GetOuter()->GetSequenceActivity( GetOuter()->GetEngineObject()->GetSequence() ) ;
 
 	if ( eActivity == ACT_RUN || eActivity == ACT_WALK || eActivity == ACT_CROUCH )
 	{
@@ -363,11 +363,11 @@ void CPlayerAnimState::ComputePoseParam_BodyPitch( IStudioHdr *pStudioHdr )
 	flPitch = clamp( flPitch, -50, 45 );
 
 	// See if we have a blender for pitch
-	int pitch = GetOuter()->LookupPoseParameter( pStudioHdr, "XR" );
+	int pitch = GetOuter()->GetEngineObject()->LookupPoseParameter( pStudioHdr, "XR" );
 	if ( pitch < 0 )
 		return;
 
-	GetOuter()->SetPoseParameter( pStudioHdr, pitch, flPitch );
+	GetOuter()->GetEngineObject()->SetPoseParameter( pStudioHdr, pitch, flPitch );
 	g_flLastBodyPitch = flPitch;
 }
 

@@ -99,7 +99,7 @@ void CRagdollBoogie::ZapThink()
 		return;
 
 	// Make electricity on the client
-	IStudioHdr *pStudioHdr = pRagdoll->GetModelPtr( );
+	IStudioHdr *pStudioHdr = pRagdoll->GetEngineObject()->GetModelPtr( );
 	if (!pStudioHdr)
 		return;
 

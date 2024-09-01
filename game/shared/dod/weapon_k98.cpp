@@ -132,7 +132,7 @@ float CWeaponK98::GetFireDelay( void )
 {
 	if ( m_iClip1 <= 0 )
 	{
-		return SequenceDuration();
+		return GetEngineObject()->SequenceDuration();
 	}
 
 	return BaseClass::GetFireDelay();

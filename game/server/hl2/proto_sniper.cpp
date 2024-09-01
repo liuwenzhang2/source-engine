@@ -2558,7 +2558,7 @@ Vector CProtoSniper::LeadTarget( CBaseEntity *pTarget )
 			Assert( pAnimating != NULL );
 
 			QAngle vecAngle;
-			vecAngle.y = pAnimating->GetSequenceMoveYaw( pAnimating->GetSequence() );
+			vecAngle.y = pAnimating->GetEngineObject()->GetSequenceMoveYaw( pAnimating->GetEngineObject()->GetSequence() );
 			vecAngle.x = 0;
 			vecAngle.z = 0;
 
@@ -2566,7 +2566,7 @@ Vector CProtoSniper::LeadTarget( CBaseEntity *pTarget )
 
 			AngleVectors( vecAngle, &vecVelocity );
 
-			vecVelocity = vecVelocity * pAnimating->m_flGroundSpeed;
+			vecVelocity = vecVelocity * pAnimating->GetEngineObject()->GetGroundSpeed();
 		}
 	}
 

@@ -49,9 +49,9 @@ public:
 
 	// FIXME: this method is lame, isn't there some sort of template thing that would get rid of the Outer pointer?
 
-	void	Init( PoseParameter_t &index, const char *szName ) { index = (PoseParameter_t)LookupPoseParameter( szName ); };
-	void	Set( PoseParameter_t index, float flValue ) { SetPoseParameter( (int)index, flValue ); }
-	float	Get( PoseParameter_t index ) { return GetPoseParameter( (int)index ); }
+	void	Init( PoseParameter_t &index, const char *szName ) { index = (PoseParameter_t)GetEngineObject()->LookupPoseParameter( szName ); };
+	void	Set( PoseParameter_t index, float flValue ) { GetEngineObject()->SetPoseParameter( (int)index, flValue ); }
+	float	Get( PoseParameter_t index ) { return GetEngineObject()->GetPoseParameter( (int)index ); }
 
 	float	ClampWithBias( PoseParameter_t index, float value, float base );
 

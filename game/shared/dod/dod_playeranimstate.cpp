@@ -361,7 +361,7 @@ bool CDODPlayerAnimState::HandleJumping( Activity *idealActivity )
 //-----------------------------------------------------------------------------
 bool CDODPlayerAnimState::HandleProneDown( CDODPlayer *pPlayer, Activity *idealActivity )
 {
-	if ( ( pPlayer->GetCycle() > 0.99f ) || ( pPlayer->m_Shared.IsProne() ) )
+	if ( ( pPlayer->GetEngineObject()->GetCycle() > 0.99f ) || ( pPlayer->m_Shared.IsProne() ) )
 	{
 		*idealActivity = ACT_PRONE_IDLE;
 		if ( GetOuterXYSpeed() > MOVING_MINIMUM_SPEED )
@@ -389,7 +389,7 @@ bool CDODPlayerAnimState::HandleProneDown( CDODPlayer *pPlayer, Activity *idealA
 //-----------------------------------------------------------------------------
 bool CDODPlayerAnimState::HandleProneUp( CDODPlayer *pPlayer, Activity *idealActivity )
 {
-	if ( ( m_pOuter->GetCycle() > 0.99f ) || ( !pPlayer->m_Shared.IsGettingUpFromProne() ) )
+	if ( ( m_pOuter->GetEngineObject()->GetCycle() > 0.99f ) || ( !pPlayer->m_Shared.IsGettingUpFromProne() ) )
 	{
 		m_bGettingUp = false;
 		RestartMainSequence();
@@ -852,7 +852,7 @@ void CDODPlayerAnimState::UpdateLayerSequenceGeneric( IStudioHdr *pStudioHdr, in
 		flCurCycle = 1.0;
 
 	// Increment the fire sequence's cycle.
-	flCurCycle += m_pOuter->GetSequenceCycleRate( pStudioHdr, iSequence ) * gpGlobals->frametime;
+	flCurCycle += m_pOuter->GetEngineObject()->GetSequenceCycleRate( pStudioHdr, iSequence ) * gpGlobals->frametime;
 	if ( flCurCycle > 1 )
 	{
 		if ( bWaitAtEnd )
@@ -891,7 +891,7 @@ void CDODPlayerAnimState::Update( float eyeYaw, float eyePitch )
 	VPROF( "CDODPlayerAnimState::Update" );
 
 	// Get the studio header for the player.
-	IStudioHdr *pStudioHdr = GetOuterDOD()->GetModelPtr();
+	IStudioHdr *pStudioHdr = GetOuterDOD()->GetEngineObject()->GetModelPtr();
 	if ( !pStudioHdr )
 		return;
 
@@ -942,23 +942,23 @@ bool CDODPlayerAnimState::SetupPoseParameters( IStudioHdr *pStudioHdr )
 		return false;
 
 	// Look for the movement blenders.
-	m_iMoveX = GetOuterDOD()->LookupPoseParameter( pStudioHdr, "move_x" );
-	m_iMoveY = GetOuterDOD()->LookupPoseParameter( pStudioHdr, "move_y" );
+	m_iMoveX = GetOuterDOD()->GetEngineObject()->LookupPoseParameter( pStudioHdr, "move_x" );
+	m_iMoveY = GetOuterDOD()->GetEngineObject()->LookupPoseParameter( pStudioHdr, "move_y" );
 	if ( ( m_iMoveX < 0 ) || ( m_iMoveY < 0 ) )
 		return false;
 
 	// Look for the aim pitch blender.
-	m_iAimPitch = GetOuterDOD()->LookupPoseParameter( pStudioHdr, "body_pitch" );
+	m_iAimPitch = GetOuterDOD()->GetEngineObject()->LookupPoseParameter( pStudioHdr, "body_pitch" );
 	if ( m_iAimPitch < 0 )
 		return false;
 
 	// Look for aim yaw blender.
-	m_iAimYaw = GetOuterDOD()->LookupPoseParameter( pStudioHdr, "body_yaw" );
+	m_iAimYaw = GetOuterDOD()->GetEngineObject()->LookupPoseParameter( pStudioHdr, "body_yaw" );
 	if ( m_iAimYaw < 0 )
 		return false;
 
 	// Look for the body height blender.
-	m_iBodyHeight = GetOuterDOD()->LookupPoseParameter( pStudioHdr, "body_height" );
+	m_iBodyHeight = GetOuterDOD()->GetEngineObject()->LookupPoseParameter( pStudioHdr, "body_height" );
 	if ( m_iBodyHeight < 0 )
 		return false;
 
@@ -979,8 +979,8 @@ void CDODPlayerAnimState::ComputePoseParam_MoveYaw( IStudioHdr *pStudioHdr )
 	{
 		// Set the 9-way blend movement pose parameters.
 		Vector2D vecCurrentMoveYaw( 0.0f, 0.0f );
-		GetOuter()->SetPoseParameter( pStudioHdr, m_iMoveX, vecCurrentMoveYaw.x );
-		GetOuter()->SetPoseParameter( pStudioHdr, m_iMoveY, vecCurrentMoveYaw.y );
+		GetOuter()->GetEngineObject()->SetPoseParameter( pStudioHdr, m_iMoveX, vecCurrentMoveYaw.x );
+		GetOuter()->GetEngineObject()->SetPoseParameter( pStudioHdr, m_iMoveY, vecCurrentMoveYaw.y );
 
 		m_vecLastMoveYaw = vecCurrentMoveYaw;
 
@@ -1029,8 +1029,8 @@ void CDODPlayerAnimState::ComputePoseParam_MoveYaw( IStudioHdr *pStudioHdr )
 		}
 
 #ifndef CLIENT_DLL
-		GetOuter()->SetPoseParameter( pStudioHdr, m_iMoveX, vecCurrentMoveYaw.x );
-		GetOuter()->SetPoseParameter( pStudioHdr, m_iMoveY, vecCurrentMoveYaw.y );
+		GetOuter()->GetEngineObject()->SetPoseParameter( pStudioHdr, m_iMoveX, vecCurrentMoveYaw.x );
+		GetOuter()->GetEngineObject()->SetPoseParameter( pStudioHdr, m_iMoveY, vecCurrentMoveYaw.y );
 #else
 
 		// refine pose parameters to be more accurate
@@ -1052,8 +1052,8 @@ void CDODPlayerAnimState::ComputePoseParam_MoveYaw( IStudioHdr *pStudioHdr )
 		do 
 		{
 			// Set the 9-way blend movement pose parameters.
-			GetOuter()->SetPoseParameter( pStudioHdr, m_iMoveX, vecCurrentMoveYaw.x );
-			GetOuter()->SetPoseParameter( pStudioHdr, m_iMoveY, vecCurrentMoveYaw.y );
+			GetOuter()->GetEngineObject()->SetPoseParameter( pStudioHdr, m_iMoveX, vecCurrentMoveYaw.x );
+			GetOuter()->GetEngineObject()->SetPoseParameter( pStudioHdr, m_iMoveY, vecCurrentMoveYaw.y );
 
 			GetOuterDOD()->GetBlendedLinearVelocity( &vecAnimVelocity );
 
@@ -1065,7 +1065,7 @@ void CDODPlayerAnimState::ComputePoseParam_MoveYaw( IStudioHdr *pStudioHdr )
 			else
 			{
 				vecCurrentMoveYaw.x = 0;
-				GetOuter()->SetPoseParameter( pStudioHdr, m_iMoveX, vecCurrentMoveYaw.x );
+				GetOuter()->GetEngineObject()->SetPoseParameter( pStudioHdr, m_iMoveX, vecCurrentMoveYaw.x );
 			}
 			// adjust Y pose parameter based on movement error
 			if (fabs( vecAnimVelocity.y ) > 0.001)
@@ -1075,7 +1075,7 @@ void CDODPlayerAnimState::ComputePoseParam_MoveYaw( IStudioHdr *pStudioHdr )
 			else
 			{
 				vecCurrentMoveYaw.y = 0;
-				GetOuter()->SetPoseParameter( pStudioHdr, m_iMoveY, vecCurrentMoveYaw.y );
+				GetOuter()->GetEngineObject()->SetPoseParameter( pStudioHdr, m_iMoveY, vecCurrentMoveYaw.y );
 			}
 
 			dx =  vecEstVelocity.x - vecAnimVelocity.x;
@@ -1168,7 +1168,7 @@ void CDODPlayerAnimState::ComputePoseParam_AimPitch( IStudioHdr *pStudioHdr )
 #endif
 
 	// Set the aim pitch pose parameter and save.
-	GetOuter()->SetPoseParameter( pStudioHdr, m_iAimPitch, -flAimPitch );
+	GetOuter()->GetEngineObject()->SetPoseParameter( pStudioHdr, m_iAimPitch, -flAimPitch );
 	m_flLastAimPitch = flAimPitch;
 }
 
@@ -1245,7 +1245,7 @@ void CDODPlayerAnimState::ComputePoseParam_AimYaw( IStudioHdr *pStudioHdr )
 	flAimYaw = AngleNormalize( flAimYaw );
 
 	// Set the aim yaw and save.
-	GetOuter()->SetPoseParameter( pStudioHdr, m_iAimYaw, -flAimYaw );
+	GetOuter()->GetEngineObject()->SetPoseParameter( pStudioHdr, m_iAimYaw, -flAimYaw );
 	m_flLastAimYaw	= flAimYaw;
 }
 
@@ -1291,7 +1291,7 @@ void CDODPlayerAnimState::ComputePoseParam_BodyHeight( IStudioHdr *pStudioHdr )
 	{
 //		float flHeight = m_pOuterDOD->m_Shared.GetDeployedHeight() - 4.0f;
 		float flHeight = m_pOuterDOD->m_Shared.GetDeployedHeight() - dod_bodyheightoffset.GetFloat();
-		GetOuter()->SetPoseParameter( pStudioHdr, m_iBodyHeight, flHeight );
+		GetOuter()->GetEngineObject()->SetPoseParameter( pStudioHdr, m_iBodyHeight, flHeight );
 		m_flLastBodyHeight = flHeight;
 	}
 }
@@ -1360,7 +1360,7 @@ void CDODPlayerAnimState::DebugShowAnimStateForPlayer( bool bIsServer )
 	Anim_StatePrintf( iLine++, "-------------%s: frame %d -----------------\n", bIsServer ? "Server" : "Client", gpGlobals->framecount );
 
 	// Write out the main sequence and its data.
-	Anim_StatePrintf( iLine++, "Main: %s, Cycle: %.2f\n", GetOuter()->GetModelPtr()->GetSequenceName( GetOuter()->GetSequence() ), GetOuter()->GetCycle() );
+	Anim_StatePrintf( iLine++, "Main: %s, Cycle: %.2f\n", GetOuter()->GetEngineObject()->GetModelPtr()->GetSequenceName( GetOuter()->GetEngineObject()->GetSequence() ), GetOuter()->GetEngineObject()->GetCycle() );
 
 	// Write out the layers and their data.
 	for ( int iAnim = 0; iAnim < GetOuter()->GetNumAnimOverlays(); ++iAnim )
@@ -1368,7 +1368,7 @@ void CDODPlayerAnimState::DebugShowAnimStateForPlayer( bool bIsServer )
 		CAnimationLayer *pLayer = GetOuter()->GetAnimOverlay( iAnim );
 		if ( pLayer && ( pLayer->m_nOrder != CBaseAnimatingOverlay::MAX_OVERLAYS ) )
 		{
-			Anim_StatePrintf( iLine++, "Layer %s: Weight: %.2f, Cycle: %.2f", GetOuter()->GetModelPtr()->GetSequenceName( pLayer->m_nSequence ), (float)pLayer->m_flWeight, (float)pLayer->m_flCycle );
+			Anim_StatePrintf( iLine++, "Layer %s: Weight: %.2f, Cycle: %.2f", GetOuter()->GetEngineObject()->GetModelPtr()->GetSequenceName( pLayer->m_nSequence ), (float)pLayer->m_flWeight, (float)pLayer->m_flCycle );
 		}
 	}
 

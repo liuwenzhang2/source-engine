@@ -83,20 +83,20 @@ void C_NPC_Puppet::ClientThink( void )
 	if ( pTarget == NULL )
 		return;
 
-	int nTargetSequence = pTarget->GetSequence();
+	int nTargetSequence = pTarget->GetEngineObject()->GetSequence();
 	const char *pSequenceName = pTarget->GetSequenceName( nTargetSequence );
 
 	int nSequence = LookupSequence( pSequenceName );
 	if ( nSequence >= 0 )
 	{
-		if ( nSequence != GetSequence() )
+		if ( nSequence != GetEngineObject()->GetSequence() )
 		{
-			SetSequence( nSequence );
+			GetEngineObject()->SetSequence( nSequence );
 			UpdateVisibility();
 		}
 
-		SetCycle( pTarget->GetCycle() );
-		SetPlaybackRate( pTarget->GetPlaybackRate() );	
+		GetEngineObject()->SetCycle( pTarget->GetEngineObject()->GetCycle() );
+		GetEngineObject()->SetPlaybackRate( pTarget->GetEngineObject()->GetPlaybackRate() );
 	}
 }
 
@@ -145,7 +145,7 @@ void C_NPC_Puppet::AccumulateLayers( IBoneSetup &boneSetup, Vector pos[], Quater
 				{
 					float fCycle = pTarget->m_AnimOverlay[ i ].m_flCycle;
 
-					fCycle = ClampCycle( fCycle, IsSequenceLooping( nSequence ) );
+					fCycle = ClampCycle( fCycle, GetEngineObject()->IsSequenceLooping( nSequence ) );
 
 					if (fWeight > 1)
 						fWeight = 1;

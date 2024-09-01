@@ -348,7 +348,7 @@ void CBaseHeadcrab::OnChangeActivity( Activity NewActivity )
 
 	if( fRandomize )
 	{
-		SetCycle( random->RandomFloat( 0.0, flRandomRange ) );
+		GetEngineObject()->SetCycle( random->RandomFloat( 0.0, flRandomRange ) );
 	}
 }
 
@@ -2736,9 +2736,9 @@ void CFastHeadcrab::PrescheduleThink( void )
 		case HEADCRAB_RUNMODE_IDLE:
 			if ( GetActivity() == ACT_RUN )
 			{
-				m_flRealGroundSpeed = m_flGroundSpeed;
+				m_flRealGroundSpeed = GetEngineObject()->GetGroundSpeed();
 				m_iRunMode = HEADCRAB_RUNMODE_ACCELERATE;
-				m_flPlaybackRate = HEADCRAB_RUN_MINSPEED;
+				GetEngineObject()->SetPlaybackRate(HEADCRAB_RUN_MINSPEED);
 			}
 			break;
 
@@ -2750,14 +2750,14 @@ void CFastHeadcrab::PrescheduleThink( void )
 			break;
 
 		case HEADCRAB_RUNMODE_ACCELERATE:
-			if( m_flPlaybackRate < HEADCRAB_RUN_MAXSPEED )
+			if(GetEngineObject()->GetPlaybackRate() < HEADCRAB_RUN_MAXSPEED )
 			{
-				m_flPlaybackRate += HEADCRAB_ACCELERATION;
+				GetEngineObject()->SetPlaybackRate(GetEngineObject()->GetPlaybackRate() + HEADCRAB_ACCELERATION);
 			}
 
-			if( m_flPlaybackRate >= HEADCRAB_RUN_MAXSPEED )
+			if(GetEngineObject()->GetPlaybackRate() >= HEADCRAB_RUN_MAXSPEED)
 			{
-				m_flPlaybackRate = HEADCRAB_RUN_MAXSPEED;
+				GetEngineObject()->SetPlaybackRate(HEADCRAB_RUN_MAXSPEED);
 				m_iRunMode = HEADCRAB_RUNMODE_FULLSPEED;
 
 				m_flSlowRunTime = gpGlobals->curtime + random->RandomFloat( 0.1, 1.0 );
@@ -2765,11 +2765,11 @@ void CFastHeadcrab::PrescheduleThink( void )
 			break;
 
 		case HEADCRAB_RUNMODE_DECELERATE:
-			m_flPlaybackRate -= HEADCRAB_ACCELERATION;
+			GetEngineObject()->SetPlaybackRate(GetEngineObject()->GetPlaybackRate() - HEADCRAB_ACCELERATION);
 
-			if( m_flPlaybackRate <= HEADCRAB_RUN_MINSPEED )
+			if(GetEngineObject()->GetPlaybackRate() <= HEADCRAB_RUN_MINSPEED )
 			{
-				m_flPlaybackRate = HEADCRAB_RUN_MINSPEED;
+				GetEngineObject()->SetPlaybackRate( HEADCRAB_RUN_MINSPEED);
 
 				// Now stop the crab.
 				m_iRunMode = HEADCRAB_RUNMODE_PAUSE;
@@ -2788,7 +2788,7 @@ void CFastHeadcrab::PrescheduleThink( void )
 					SetActivity( ACT_RUN );
 					GetNavigator()->SetMovementActivity(ACT_RUN);
 					m_flPauseTime = gpGlobals->curtime - 1;
-					m_flRealGroundSpeed = m_flGroundSpeed;
+					m_flRealGroundSpeed = GetEngineObject()->GetGroundSpeed();
 				}
 			}
 			break;
@@ -2798,7 +2798,7 @@ void CFastHeadcrab::PrescheduleThink( void )
 			break;
 		}
 
-		m_flGroundSpeed = m_flRealGroundSpeed * m_flPlaybackRate;
+		GetEngineObject()->SetGroundSpeed(m_flRealGroundSpeed * GetEngineObject()->GetPlaybackRate());
 	}
 	else
 	{

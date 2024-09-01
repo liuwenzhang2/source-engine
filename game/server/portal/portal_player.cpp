@@ -492,7 +492,7 @@ bool CPortal_Player::ValidatePlayerModel( const char *pModel )
 void CPortal_Player::SetPlayerModel( void )
 {
 	const char *szModelName = NULL;
-	const char *pszCurrentModelName = modelinfo->GetModelName( GetModel());
+	const char *pszCurrentModelName = modelinfo->GetModelName(GetEngineObject()->GetModel());
 
 	szModelName = engine->GetClientConVarValue( entindex(), "cl_playermodel" );
 
@@ -707,7 +707,7 @@ void CPortal_Player::PlayerDeathThink(void)
 		PackDeadPlayerItems();
 	}
 
-	if (GetEngineObject()->GetModelIndex() && (!IsSequenceFinished()) && (m_lifeState == LIFE_DYING))
+	if (GetEngineObject()->GetModelIndex() && (!GetEngineObject()->IsSequenceFinished()) && (m_lifeState == LIFE_DYING))
 	{
 		StudioFrameAdvance( );
 
@@ -722,7 +722,7 @@ void CPortal_Player::PlayerDeathThink(void)
 	StopAnimation();
 
 	IncrementInterpolationFrame();
-	m_flPlaybackRate = 0.0;
+	GetEngineObject()->SetPlaybackRate(0.0);
 
 	int fAnyButtonDown = (m_nButtons & ~IN_SCORE);
 
@@ -943,7 +943,7 @@ void CPortal_Player::SetupBones( matrix3x4_t *pBoneToWorld, int boneMask )
 
 	// Get the studio header.
 	Assert( GetModelPtr() );
-	IStudioHdr *pStudioHdr = GetModelPtr( );
+	IStudioHdr *pStudioHdr = GetEngineObject()->GetModelPtr( );
 
 	Vector pos[MAXSTUDIOBONES];
 	Quaternion q[MAXSTUDIOBONES];
@@ -995,7 +995,7 @@ void CPortal_Player::SetupBones( matrix3x4_t *pBoneToWorld, int boneMask )
 		pos, 
 		q, 
 		-1,
-		GetModelScale(), // Scaling
+		GetEngineObject()->GetModelScale(), // Scaling
 		pBoneToWorld,
 		boneMask );
 }

@@ -216,7 +216,7 @@ void CWeaponPistol::DryFire( void )
 	SendWeaponAnim( ACT_VM_DRYFIRE );
 	
 	m_flSoonestPrimaryAttack	= gpGlobals->curtime + PISTOL_FASTEST_DRY_REFIRE_TIME;
-	m_flNextPrimaryAttack		= gpGlobals->curtime + SequenceDuration();
+	m_flNextPrimaryAttack		= gpGlobals->curtime + GetEngineObject()->SequenceDuration();
 }
 
 //-----------------------------------------------------------------------------

@@ -329,7 +329,7 @@ BEGIN_DATADESC( CNPC_Strider )
 	DEFINE_FIELD( m_hCannonTarget,		FIELD_EHANDLE ),
 	DEFINE_EMBEDDED( m_AttemptCannonLOSTimer ),
 
-	DEFINE_FIELD( m_flSpeedScale, FIELD_FLOAT ),
+	//DEFINE_FIELD( m_flSpeedScale, FIELD_FLOAT ),
 	DEFINE_FIELD( m_flTargetSpeedScale, FIELD_FLOAT ),
 
 	DEFINE_EMBEDDED( m_LowZCorrectionTimer ),
@@ -499,8 +499,9 @@ void CNPC_Strider::Spawn()
 	SetDefaultEyeOffset();
 	
 	SetNavType( NAV_FLY );
-	m_flGroundSpeed	= STRIDER_SPEED;
-	m_flSpeedScale = m_flTargetSpeedScale = 1.0;
+	GetEngineObject()->SetGroundSpeed(STRIDER_SPEED);
+	m_flTargetSpeedScale = 1.0;
+	GetEngineObject()->SetSpeedScale(1.0f);
 	m_NPCState = NPC_STATE_NONE;
 	m_bloodColor = DONT_BLEED;
 	
@@ -566,9 +567,9 @@ void CNPC_Strider::Spawn()
 
 void CNPC_Strider::SetupGlobalModelData()
 {
-	gm_BodyHeightPoseParam = LookupPoseParameter( "body_height" );
-	gm_YawControl = LookupPoseParameter( "yaw" );
-	gm_PitchControl = LookupPoseParameter( "pitch" );
+	gm_BodyHeightPoseParam = GetEngineObject()->LookupPoseParameter( "body_height" );
+	gm_YawControl = GetEngineObject()->LookupPoseParameter( "yaw" );
+	gm_PitchControl = GetEngineObject()->LookupPoseParameter( "pitch" );
 	gm_CannonAttachment = LookupAttachment( "BigGun" );
 
 	// BMCD: Get the conservative boxes from sequences
@@ -601,8 +602,8 @@ void CNPC_Strider::PopulatePoseParameters( void )
 {
 	if (!m_sbStaticPoseParamsLoaded)
 	{
-		m_poseMiniGunYaw		= LookupPoseParameter( "miniGunYaw");
-		m_poseMiniGunPitch		= LookupPoseParameter( "miniGunPitch" );
+		m_poseMiniGunYaw		= GetEngineObject()->LookupPoseParameter( "miniGunYaw");
+		m_poseMiniGunPitch		= GetEngineObject()->LookupPoseParameter( "miniGunPitch" );
 
 		m_sbStaticPoseParamsLoaded = true;
 	}
@@ -686,9 +687,9 @@ void CNPC_Strider::Activate()
 		DevMsg( "Couldn't find npc_strider bone %s, which is used as target for others\n", pszBodyTargetBone );
 	}
 
-	gm_BodyHeightPoseParam = LookupPoseParameter( "body_height" );
-	gm_YawControl = LookupPoseParameter( "yaw" );
-	gm_PitchControl = LookupPoseParameter( "pitch" );
+	gm_BodyHeightPoseParam = GetEngineObject()->LookupPoseParameter( "body_height" );
+	gm_YawControl = GetEngineObject()->LookupPoseParameter( "yaw" );
+	gm_PitchControl = GetEngineObject()->LookupPoseParameter( "pitch" );
 	gm_CannonAttachment = LookupAttachment( "BigGun" );
 
 	if ( gm_zCannonDist == 0 )
@@ -803,7 +804,7 @@ int	CNPC_Strider::DrawDebugTextOverlays()
 
 		if ( m_flTargetSpeedScale != 1.0 )
 		{
-			EntityText(text_offset,CFmtStr( "Speed scaled to %.1f", m_flGroundSpeed ),0);
+			EntityText(text_offset,CFmtStr( "Speed scaled to %.1f", GetEngineObject()->GetGroundSpeed() ),0);
 			text_offset++;
 		}
 	}
@@ -879,29 +880,29 @@ void CNPC_Strider::NPCThink(void)
 
 	if ( m_flTargetSpeedScale > 0.01 )
 	{
-		float deltaSpeedScale = m_flSpeedScale - m_flTargetSpeedScale;
+		float deltaSpeedScale = GetEngineObject()->GetSpeedScale() - m_flTargetSpeedScale;
 		if ( fabsf( deltaSpeedScale ) > .01 )
 		{
 			if ( deltaSpeedScale < 0 )
 			{
-				m_flSpeedScale += STRIDER_SPEED_CHANGE;
-				if ( m_flSpeedScale > m_flTargetSpeedScale )
+				GetEngineObject()->SetSpeedScale( GetEngineObject()->GetSpeedScale() + STRIDER_SPEED_CHANGE);
+				if (GetEngineObject()->GetSpeedScale() > m_flTargetSpeedScale)
 				{
-					m_flSpeedScale = m_flTargetSpeedScale;
+					GetEngineObject()->SetSpeedScale(m_flTargetSpeedScale);
 				}
 			}
 			else
 			{
-				m_flSpeedScale -= STRIDER_SPEED_CHANGE;
-				if ( m_flSpeedScale < m_flTargetSpeedScale )
+				GetEngineObject()->SetSpeedScale( GetEngineObject()->GetSpeedScale() - STRIDER_SPEED_CHANGE);
+				if (GetEngineObject()->GetSpeedScale() < m_flTargetSpeedScale )
 				{
-					m_flSpeedScale = m_flTargetSpeedScale;
+					GetEngineObject()->SetSpeedScale(m_flTargetSpeedScale);
 				}
 			}
 		}
 		else
 		{
-			m_flSpeedScale = m_flTargetSpeedScale;
+			GetEngineObject()->SetSpeedScale( m_flTargetSpeedScale);
 		}
 	}
 	else
@@ -1534,8 +1535,8 @@ void CNPC_Strider::StartTask( const Task_t *pTask )
 			m_aimYaw = 0;
 			m_aimPitch = 0;
 			// clear out the previous shooting
-			SetPoseParameter( gm_YawControl, m_aimYaw );
-			SetPoseParameter( gm_PitchControl, m_aimPitch );
+			GetEngineObject()->SetPoseParameter( gm_YawControl, m_aimYaw );
+			GetEngineObject()->SetPoseParameter( gm_PitchControl, m_aimPitch );
 			Vector vecShootPos;
 			GetAttachment( gm_CannonAttachment, vecShootPos );
 		
@@ -1783,15 +1784,15 @@ void CNPC_Strider::RunTask( const Task_t *pTask )
 	case TASK_PLAY_SEQUENCE:
 		if( m_bFastCrouch && pTask->flTaskData == ACT_CROUCH )
 		{
-			SetPlaybackRate( 10.0f );
-			if( IsSequenceFinished() )
+			GetEngineObject()->SetPlaybackRate( 10.0f );
+			if(GetEngineObject()->IsSequenceFinished() )
 			{
 				m_bFastCrouch = false;
 			}
 		}
 
 		// Hack to make sure client doesn't pop after stand/crouch is done
-		if ( GetCycle() > 0.5 )
+		if (GetEngineObject()->GetCycle() > 0.5 )
 		{
 			if ( IsStriderStanding() && GetHeight() != GetMaxHeight() )
 				SetHeight( GetMaxHeight() );
@@ -1879,8 +1880,8 @@ void CNPC_Strider::HandleAnimEvent( animevent_t *pEvent )
 			m_aimPitch = 0;
 
 			// clear out the previous shooting
-			SetPoseParameter( gm_YawControl, m_aimYaw );
-			SetPoseParameter( gm_PitchControl, m_aimPitch );
+			GetEngineObject()->SetPoseParameter( gm_YawControl, m_aimYaw );
+			GetEngineObject()->SetPoseParameter( gm_PitchControl, m_aimPitch );
 			Vector vecShootPos;
 			GetAttachment( gm_CannonAttachment, vecShootPos );
 		
@@ -3531,7 +3532,7 @@ void CNPC_Strider::SetHeight( float h )
 	else if ( h < GetMinHeight() )
 		h = GetMinHeight();
 
-	SetPoseParameter( gm_BodyHeightPoseParam, h );
+	GetEngineObject()->SetPoseParameter( gm_BodyHeightPoseParam, h );
 }
 
 //---------------------------------------------------------
@@ -3822,10 +3823,10 @@ void CNPC_Strider::OnMovementComplete()
 
 //---------------------------------------------------------
 //---------------------------------------------------------
-float CNPC_Strider::GetSequenceGroundSpeed( IStudioHdr *pStudioHdr, int iSequence )
-{
-	return ( BaseClass::GetSequenceGroundSpeed( pStudioHdr, iSequence ) * m_flSpeedScale );
-}
+//float CNPC_Strider::GetSequenceGroundSpeed( IStudioHdr *pStudioHdr, int iSequence )
+//{
+//	return ( BaseClass::GetSequenceGroundSpeed( pStudioHdr, iSequence ) * m_flSpeedScale );
+//}
 
 
 //---------------------------------------------------------
@@ -3909,11 +3910,11 @@ void CNPC_Strider::ShootMinigun( const Vector *pTarget, float aimError, const Ve
 //---------------------------------------------------------
 void CNPC_Strider::UpdateMinigunControls( float &yaw, float &pitch ) 
 {
-	SetPoseParameter( m_poseMiniGunYaw, yaw );
-	SetPoseParameter( m_poseMiniGunPitch, pitch );
+	GetEngineObject()->SetPoseParameter( m_poseMiniGunYaw, yaw );
+	GetEngineObject()->SetPoseParameter( m_poseMiniGunPitch, pitch );
 
-	yaw = GetPoseParameter( m_poseMiniGunYaw );
-	pitch = GetPoseParameter( m_poseMiniGunPitch );
+	yaw = GetEngineObject()->GetPoseParameter( m_poseMiniGunYaw );
+	pitch = GetEngineObject()->GetPoseParameter( m_poseMiniGunPitch );
 }
 
 //---------------------------------------------------------
@@ -4098,13 +4099,13 @@ bool CNPC_Strider::AimCannonAt( CBaseEntity *pEntity, float flInterval )
 	m_aimYaw = UTIL_Approach( targetYaw, m_aimYaw, yawSpeed );
 	m_aimPitch = UTIL_Approach( targetPitch, m_aimPitch, pitchSpeed );
 
-	SetPoseParameter( gm_YawControl, m_aimYaw );
-	SetPoseParameter( gm_PitchControl, m_aimPitch );
+	GetEngineObject()->SetPoseParameter( gm_YawControl, m_aimYaw );
+	GetEngineObject()->SetPoseParameter( gm_PitchControl, m_aimPitch );
 
 	// read back to avoid drift when hitting limits
 	// as long as the velocity is less than the delta between the limit and 180, this is fine.
-	m_aimPitch = GetPoseParameter( gm_PitchControl );
-	m_aimYaw = GetPoseParameter( gm_YawControl );
+	m_aimPitch = GetEngineObject()->GetPoseParameter( gm_PitchControl );
+	m_aimYaw = GetEngineObject()->GetPoseParameter( gm_YawControl );
 
 	// UNDONE: Zero out any movement past the limit and go ahead and fire if the strider hit its 
 	// target except for clamping.  Need to clamp targets to limits and compare?
@@ -4385,7 +4386,7 @@ static Vector GetAttachmentPositionInSpaceOfBone( IStudioHdr *pStudioHdr, const 
 
 void CNPC_Strider::StompHit( int followerBoneIndex )
 {
-	IStudioHdr *pStudioHdr = GetModelPtr();
+	IStudioHdr *pStudioHdr = GetEngineObject()->GetModelPtr();
 	physfollower_t *bone = m_BoneFollowerManager.GetBoneFollower( followerBoneIndex );
 	if ( !bone )
 		return;
@@ -4404,7 +4405,7 @@ void CNPC_Strider::StompHit( int followerBoneIndex )
 	//NDebugOverlay::Box( hitPosition, Vector(-16,-16,-16), Vector(16,16,16), 0, 255, 0, 255, 1.0 );
 	CBaseEntity *pEnemy = GetEnemy();
 	CAI_BaseNPC *pNPC = pEnemy ? pEnemy->MyNPCPointer() : NULL;
-	bool bIsValidTarget = pNPC && pNPC->GetModelPtr();
+	bool bIsValidTarget = pNPC && pNPC->GetEngineObject()->GetModelPtr();
 	if (GetEngineObject()->HasSpawnFlags( SF_CAN_STOMP_PLAYER ) )
 	{
 		bIsValidTarget = bIsValidTarget || ( pEnemy && pEnemy->IsPlayer() );

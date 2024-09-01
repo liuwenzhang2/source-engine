@@ -150,11 +150,11 @@ void CWeaponAR2::ItemPostFrame( void )
 		{
 			if ( m_nVentPose == -1 )
 			{
-				m_nVentPose = pVM->LookupPoseParameter( "VentPoses" );
+				m_nVentPose = pVM->GetEngineObject()->LookupPoseParameter( "VentPoses" );
 			}
 			
 			float flVentPose = RemapValClamped( m_nShotsFired, 0, 5, 0.0f, 1.0f );
-			pVM->SetPoseParameter( m_nVentPose, flVentPose );
+			pVM->GetEngineObject()->SetPoseParameter( m_nVentPose, flVentPose );
 		}
 	}
 
@@ -210,7 +210,7 @@ void CWeaponAR2::DelayedAttack( void )
 
 	// Deplete the clip completely
 	SendWeaponAnim( ACT_VM_SECONDARYATTACK );
-	m_flNextSecondaryAttack = pOwner->m_flNextAttack = gpGlobals->curtime + SequenceDuration();
+	m_flNextSecondaryAttack = pOwner->m_flNextAttack = gpGlobals->curtime + GetEngineObject()->SequenceDuration();
 
 	// Register a muzzleflash for the AI
 	pOwner->DoMuzzleFlash();

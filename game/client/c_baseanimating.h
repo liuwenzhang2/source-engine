@@ -112,9 +112,7 @@ public:
 	float	GetAnimTimeInterval( void ) const;
 
 
-	// Get bone controller values.
-	virtual void	GetBoneControllers(float controllers[MAXSTUDIOBONECTRLS]);
-	virtual float	SetBoneController ( int iController, float flValue );
+
 
 	LocalFlexController_t GetNumFlexControllers( void );
 	const char *GetFlexDescFacs( int iFlexDesc );
@@ -132,7 +130,6 @@ public:
 
 	// base model functionality
 	float		  ClampCycle( float cycle, bool isLooping );
-	virtual void GetPoseParameters( IStudioHdr *pStudioHdr, float poseParameter[MAXSTUDIOPOSEPARAM] );
 	virtual void BuildTransformations( IStudioHdr *pStudioHdr, Vector *pos, Quaternion q[], const matrix3x4_t& cameraTransform, int boneMask, CBoneBitList &boneComputed );
 	virtual void ApplyBoneMatrixTransform( matrix3x4_t& transform );
  	virtual int	VPhysicsGetObjectList( IPhysicsObject **pList, int listMax );
@@ -148,8 +145,6 @@ public:
 	void		DoInternalDrawModel( ClientModelRenderInfo_t *pInfo, DrawModelState_t *pState, matrix3x4_t *pBoneToWorldArray = NULL );
 
 	//
-	virtual CMouthInfo *GetMouth();
-	virtual void	ControlMouth( IStudioHdr *pStudioHdr );
 	
 	// override in sub-classes
 	virtual void DoAnimationEvents( IStudioHdr *pStudio );
@@ -165,8 +160,7 @@ public:
 
 	virtual void ValidateModelIndex( void );
 	virtual IStudioHdr *OnNewModel( void );
-	IStudioHdr	*GetModelPtr() const;
-	void InvalidateMdlCache();
+
 	
 	virtual void SetPredictable( bool state );
 
@@ -184,17 +178,9 @@ public:
 	int		LookupAttachment( const char *pAttachmentName );
 	int		LookupRandomAttachment( const char *pAttachmentNameSubstring );
 
-	int		LookupPoseParameter( IStudioHdr *pStudioHdr, const char *szName );
-	inline int LookupPoseParameter( const char *szName ) { return LookupPoseParameter(GetModelPtr(), szName); }
 
-	float	SetPoseParameter( IStudioHdr *pStudioHdr, const char *szName, float flValue );
-	inline float SetPoseParameter( const char *szName, float flValue ) { return SetPoseParameter( GetModelPtr(), szName, flValue ); }
-	float	SetPoseParameter( IStudioHdr *pStudioHdr, int iParameter, float flValue );
-	inline float SetPoseParameter( int iParameter, float flValue ) { return SetPoseParameter( GetModelPtr(), iParameter, flValue ); }
 
-	float	GetPoseParameter( int iPoseParameter );
 
-	bool	GetPoseParameterRange( int iPoseParameter, float &minValue, float &maxValue );
 
 	int		LookupBone( const char *szName );
 	void	GetBonePosition( int iBone, Vector &origin, QAngle &angles );
@@ -299,21 +285,6 @@ public:
 	virtual int GetBody()			{ return GetEngineObject()->GetBody(); }
 	virtual int GetSkin()			{ return GetEngineObject()->GetSkin(); }
 
-
-	inline float					GetPlaybackRate();
-	inline void						SetPlaybackRate( float rate );
-
-
-
-	int								GetSequence();
-	virtual void					SetSequence(int nSequence);
-	inline void						ResetSequence(int nSequence);
-	float							GetSequenceGroundSpeed( IStudioHdr *pStudioHdr, int iSequence );
-	inline float					GetSequenceGroundSpeed( int iSequence ) { return GetSequenceGroundSpeed(GetModelPtr(), iSequence); }
-	bool							IsSequenceLooping( IStudioHdr *pStudioHdr, int iSequence );
-	inline bool						IsSequenceLooping( int iSequence ) { return IsSequenceLooping(GetModelPtr(),iSequence); }
-	float							GetSequenceMoveDist( IStudioHdr *pStudioHdr, int iSequence );
-	void							GetSequenceLinearMotion( int iSequence, Vector *pVec );
 	void							GetBlendedLinearVelocity( Vector *pVec );
 	int								LookupSequence ( const char *label );
 	int								LookupActivity( const char *label );
@@ -325,15 +296,12 @@ public:
 
 	// Clientside animation
 	virtual float					FrameAdvance( float flInterval = 0.0f );
-	virtual float					GetSequenceCycleRate( IStudioHdr *pStudioHdr, int iSequence );
 	virtual void					UpdateClientSideAnimation();
 	void							ClientSideAnimationChanged();
 	virtual unsigned int			ComputeClientSideAnimationFlags();
 
-	virtual void ResetClientsideFrame( void ) { SetCycle( 0 ); }
 
-	void SetCycle( float flCycle );
-	float GetCycle() const;
+
 
 	void SetBodygroup( int iGroup, int iValue );
 	int GetBodygroup( int iGroup );
@@ -354,8 +322,6 @@ public:
 	C_BaseAnimating*				FindFollowedEntity();
 
 	//virtual bool					IsActivityFinished( void ) { return m_bSequenceFinished; }
-	inline bool						IsSequenceFinished( void );
-	inline bool						SequenceLoops( void ) { return m_bSequenceLoops; }
 
 	// All view model attachments origins are stretched so you can place entities at them and
 	// they will match up with where the attachment winds up being drawn on the view model, since
@@ -397,10 +363,7 @@ public:
 	// Purpose: My physics object has been updated, react or extract data
 	virtual void					VPhysicsUpdate( IPhysicsObject *pPhysics );
 
-	void DisableMuzzleFlash();		// Turn off the muzzle flash (ie: signal that we handled the server's event).
-	virtual void DoMuzzleFlash();	// Force a muzzle flash event. Note: this only QUEUES an event, so
-									// ProcessMuzzleFlashEvent will get called later.
-	bool ShouldMuzzleFlash() const;	// Is the muzzle flash event on?
+
 
 	// This is called to do the actual muzzle flash effect.
 	virtual void ProcessMuzzleFlashEvent();
@@ -417,10 +380,7 @@ public:
 
 	// For prediction
 	int								SelectWeightedSequence ( int activity );
-	void							ResetSequenceInfo( void );
-	float							SequenceDuration( void );
-	float							SequenceDuration( IStudioHdr *pStudioHdr, int iSequence );
-	inline float					SequenceDuration( int iSequence ) { return SequenceDuration(GetModelPtr(), iSequence); }
+
 	int								FindTransitionSequence( int iCurrentSequence, int iGoalSequence, int *piDir );
 
 	void							RagdollMoved( void );
@@ -428,7 +388,6 @@ public:
 	virtual void					GetToolRecordingState( KeyValues *msg );
 	virtual void					CleanupToolRecordingState( KeyValues *msg );
 
-	void							SetReceivedSequence( void );
 	virtual bool					ShouldResetSequenceOnNewModel( void );
 
 	virtual bool					IsViewModel() const;
@@ -441,7 +400,6 @@ protected:
 
 	// View models say yes to this.
 	bool							IsBoneAccessAllowed() const;
-	CMouthInfo&						MouthInfo();
 
 	// Models used in a ModelPanel say yes to this
 	virtual bool					IsMenuModel() const;
@@ -462,9 +420,7 @@ private:
 
 	void							DelayedInitModelEffects( void );
 
-	void							UpdateRelevantInterpolatedVars();
-	void							AddBaseAnimatingInterpolatedVars();
-	void							RemoveBaseAnimatingInterpolatedVars();
+
 
 public:
 	CRagdoll						*m_pRagdoll;
@@ -478,8 +434,7 @@ protected:
 
 	int								m_iEyeAttachment;
 
-	// Animation playback framerate
-	float							m_flPlaybackRate;
+
 
 	// Decomposed ragdoll info
 	bool							m_bStoreRagdollInfo;
@@ -498,8 +453,7 @@ protected:
 
 	ClientSideAnimationListHandle_t	m_ClientSideAnimationListHandle;
 
-	// Client-side animation
-	bool							m_bClientSideFrameReset;
+
 
 	// Bone attachments. Used for attaching one BaseAnimating to another's bones.
 	// Client side only.
@@ -515,19 +469,11 @@ protected:
 
 private:
 
-	float							m_flGroundSpeed;	// computed linear movement rate for current sequence
-	float							m_flLastEventCheck;	// cycle index of when events were last checked
-	bool							m_bSequenceFinished;// flag set when StudioAdvanceFrame moves across a frame boundry
-	bool							m_bSequenceLoops;	// true if the sequence loops
 
-	// Mouth lipsync/envelope following values
-	CMouthInfo						m_mouth;
+	
 
 
-	// Animation blending factors
-	float							m_flPoseParameter[MAXSTUDIOPOSEPARAM];
-	CInterpolatedVarArray< float, MAXSTUDIOPOSEPARAM >		m_iv_flPoseParameter;
-	float							m_flOldPoseParameters[MAXSTUDIOPOSEPARAM];
+
 
 	int								m_nPrevSequence;
 	int								m_nRestoreSequence;
@@ -539,37 +485,27 @@ private:
 	float							m_flPrevEventCycle;
 	int								m_nEventSequence;
 
-	float							m_flEncodedController[MAXSTUDIOBONECTRLS];	
-	CInterpolatedVarArray< float, MAXSTUDIOBONECTRLS >		m_iv_flEncodedController;
-	float							m_flOldEncodedController[MAXSTUDIOBONECTRLS];
 
 
-	bool							m_bLastClientSideFrameReset;
 
-	int								m_nNewSequenceParity;
-	int								m_nResetEventsParity;
 
-	int								m_nPrevNewSequenceParity;
+
+
 	int								m_nPrevResetEventsParity;
 
 	bool							m_builtRagdoll;
 	Vector							m_vecPreRagdollMins;
 	Vector							m_vecPreRagdollMaxs;
 
-	// Current animation sequence
-	int								m_nSequence;
-	bool							m_bReceivedSequence;
+
 
 	// Current cycle location from server
 protected:
-	float							m_flCycle;
-	CInterpolatedVar< float >		m_iv_flCycle;
-	float							m_flOldCycle;
+
 	bool							m_bNoModelParticles;
 
 private:
-	float							m_flOldModelScale;
-	int								m_nOldSequence;
+
 	CBoneMergeCache					*m_pBoneMergeCache;	// This caches the strcmp lookups that it has to do
 														// when merg
 	
@@ -585,9 +521,7 @@ private:
 
 
 
-	// These are compared against each other to determine if the entity should muzzle flash.
-	CNetworkVar( unsigned char, m_nMuzzleFlashParity );
-	unsigned char m_nOldMuzzleFlashParity;
+
 
 	bool							m_bInitModelEffects;
 
@@ -603,11 +537,7 @@ public:
 	//virtual void					OnModelLoadComplete( const model_t* pModel );
 
 private:
-	void							LockStudioHdr();
-	void							UnlockStudioHdr();
-	mutable IStudioHdr				*m_pStudioHdr;
-	mutable MDLHandle_t				m_hStudioHdr;
-	CThreadFastMutex				m_StudioHdrInitLock;
+
 };
 
 enum 
@@ -670,24 +600,9 @@ private:
 	float m_flScaleTimeEnd[NUM_HITBOX_FIRES];
 };
 
-//-----------------------------------------------------------------------------
-// Purpose: Serves the 90% case of calling SetSequence / ResetSequenceInfo.
-//-----------------------------------------------------------------------------
-inline void C_BaseAnimating::ResetSequence(int nSequence)
-{
-	SetSequence( nSequence );
-	ResetSequenceInfo();
-}
 
-inline float C_BaseAnimating::GetPlaybackRate()
-{
-	return m_flPlaybackRate;
-}
 
-inline void C_BaseAnimating::SetPlaybackRate( float rate )
-{
-	m_flPlaybackRate = rate;
-}
+
 
 inline const matrix3x4_t& C_BaseAnimating::GetBone( int iBone ) const
 {
@@ -700,74 +615,18 @@ inline matrix3x4_t& C_BaseAnimating::GetBoneForWrite( int iBone )
 }
 
 
-inline bool C_BaseAnimating::ShouldMuzzleFlash() const
-{
-	return m_nOldMuzzleFlashParity != m_nMuzzleFlashParity;
-}
-
-inline float C_BaseAnimating::GetCycle() const
-{
-	return m_flCycle;
-}
-
-//-----------------------------------------------------------------------------
-// Purpose: return a pointer to an updated studiomdl cache cache
-//-----------------------------------------------------------------------------
-
-inline IStudioHdr *C_BaseAnimating::GetModelPtr() const
-{ 
-	//if ( IsDynamicModelLoading() )
-	//	return NULL;
-
-#ifdef _DEBUG
-	// GetModelPtr() is often called before OnNewModel() so go ahead and set it up first chance.
-//	static IDataCacheSection *pModelCache = datacache->FindSection( "ModelData" );
-//	AssertOnce( pModelCache->IsFrameLocking() );
-#endif
-	if ( !m_pStudioHdr )
-	{
-		const_cast<C_BaseAnimating *>(this)->LockStudioHdr();
-	}
-	Assert( m_pStudioHdr ? m_pStudioHdr == mdlcache->GetIStudioHdr(m_hStudioHdr) : m_hStudioHdr == MDLHANDLE_INVALID );
-	return m_pStudioHdr;
-}
 
 
-inline void C_BaseAnimating::InvalidateMdlCache()
-{
-	if ( m_pStudioHdr )
-	{
-		UnlockStudioHdr();
-		m_pStudioHdr = NULL;
-	}
-}
-
-//-----------------------------------------------------------------------------
-// Sequence access
-//-----------------------------------------------------------------------------
-inline int C_BaseAnimating::GetSequence() 
-{ 
-	return m_nSequence; 
-}
-
-inline bool C_BaseAnimating::IsSequenceFinished( void ) 
-{ 
-	return m_bSequenceFinished; 
-}
-
-inline float C_BaseAnimating::SequenceDuration( void )
-{ 
-	return SequenceDuration( GetSequence() ); 
-}
 
 
-//-----------------------------------------------------------------------------
-// Mouth
-//-----------------------------------------------------------------------------
-inline CMouthInfo& C_BaseAnimating::MouthInfo()			
-{ 
-	return m_mouth; 
-}
+
+
+
+
+
+
+
+
 
 
 // FIXME: move these to somewhere that makes sense

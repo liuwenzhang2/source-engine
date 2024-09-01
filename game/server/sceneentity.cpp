@@ -2428,7 +2428,7 @@ void CSceneEntity::PrefetchAnimBlocks( CChoreoScene *scene )
 						int seq = pActor->LookupSequence( event->GetParameters() );
 						if ( seq >= 0 )
 						{
-							IStudioHdr *pStudioHdr = pActor->GetModelPtr();
+							IStudioHdr *pStudioHdr = pActor->GetEngineObject()->GetModelPtr();
 							if ( pStudioHdr )
 							{
 								// Now look up the animblock
@@ -4041,8 +4041,8 @@ void CSceneEntity::ClearSchedules( CChoreoScene *scene )
 		}
 		else
 		{
-			pActor->ResetSequence( pActor->SelectWeightedSequence( ACT_IDLE ) );
-			pActor->SetCycle( 0 );
+			pActor->GetEngineObject()->ResetSequence( pActor->SelectWeightedSequence( ACT_IDLE ) );
+			pActor->GetEngineObject()->SetCycle( 0 );
 		}
 		// Clear any existing expressions
 	}

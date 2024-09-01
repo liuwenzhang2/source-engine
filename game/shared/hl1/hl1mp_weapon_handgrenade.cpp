@@ -90,8 +90,8 @@ void CHandGrenade::ShootTimed( CBaseCombatCharacter *pOwner, Vector vecVelocity,
 	}
 
 //	SetSequence( SelectWeightedSequence( ACT_GRENADE_TOSS ) );
-	SetSequence( 0 );
-	m_flPlaybackRate = 1.0;
+	GetEngineObject()->SetSequence( 0 );
+	GetEngineObject()->SetPlaybackRate(1.0);
 
 	GetEngineObject()->SetAbsAngles( QAngle( 0,0,60) );
 
@@ -184,18 +184,18 @@ void CHandGrenade::BounceTouch( CBaseEntity *pOther )
 	{
 		// add a bit of static friction
 //		SetAbsVelocity( GetAbsVelocity() * 0.8 );
-		SetSequence( SelectWeightedSequence( ACT_IDLE ) );
+		GetEngineObject()->SetSequence( SelectWeightedSequence( ACT_IDLE ) );
 		GetEngineObject()->SetAbsAngles( vec3_angle );
 	}
 
 	// play bounce sound
 	BounceSound();
 
-	m_flPlaybackRate = GetEngineObject()->GetAbsVelocity().Length() / 200.0;
-	if (m_flPlaybackRate > 1.0)
-		m_flPlaybackRate = 1;
-	else if (m_flPlaybackRate < 0.5)
-		m_flPlaybackRate = 0;
+	GetEngineObject()->SetPlaybackRate(GetEngineObject()->GetAbsVelocity().Length() / 200.0);
+	if (GetEngineObject()->GetPlaybackRate() > 1.0)
+		GetEngineObject()->SetPlaybackRate(1);
+	else if (GetEngineObject()->GetPlaybackRate() < 0.5)
+		GetEngineObject()->SetPlaybackRate(0);
 }
 
 #endif

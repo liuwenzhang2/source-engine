@@ -203,8 +203,8 @@ void CDODBaseRocketWeapon::PrimaryAttack()
 			Lower();
 		}
 
-		m_flNextPrimaryAttack = gpGlobals->curtime + SequenceDuration() + 0.5;
-		m_flTimeWeaponIdle = gpGlobals->curtime + SequenceDuration() + 0.5;	//length of the fire anim!
+		m_flNextPrimaryAttack = gpGlobals->curtime + GetEngineObject()->SequenceDuration() + 0.5;
+		m_flTimeWeaponIdle = gpGlobals->curtime + GetEngineObject()->SequenceDuration() + 0.5;	//length of the fire anim!
 
 #ifndef CLIENT_DLL
 		IGameEvent * event = gameeventmanager->CreateEvent( "dod_stats_weapon_attack" );
@@ -272,7 +272,7 @@ void CDODBaseRocketWeapon::WeaponIdle()
 
 	SendWeaponAnim( GetIdleActivity() );
 
-	m_flTimeWeaponIdle = gpGlobals->curtime + SequenceDuration();
+	m_flTimeWeaponIdle = gpGlobals->curtime + GetEngineObject()->SequenceDuration();
 }
 
 Activity CDODBaseRocketWeapon::GetIdleActivity( void )
@@ -295,9 +295,9 @@ void CDODBaseRocketWeapon::Raise()
 
 	m_bDeployed = true;
 
-	m_flNextPrimaryAttack = gpGlobals->curtime + SequenceDuration();
-	m_flNextSecondaryAttack = gpGlobals->curtime + SequenceDuration();
-	m_flTimeWeaponIdle = gpGlobals->curtime + SequenceDuration();
+	m_flNextPrimaryAttack = gpGlobals->curtime + GetEngineObject()->SequenceDuration();
+	m_flNextSecondaryAttack = gpGlobals->curtime + GetEngineObject()->SequenceDuration();
+	m_flTimeWeaponIdle = gpGlobals->curtime + GetEngineObject()->SequenceDuration();
 }
 
 /* Lower the bazooka to running position */
@@ -310,9 +310,9 @@ bool CDODBaseRocketWeapon::Lower()
 	CDODPlayer *pPlayer = ToDODPlayer( GetPlayerOwner() );
 	pPlayer->SetBazookaDeployed( m_bDeployed );
 	
-	m_flNextPrimaryAttack = gpGlobals->curtime + SequenceDuration();
-	m_flNextSecondaryAttack = gpGlobals->curtime + SequenceDuration();
-	m_flTimeWeaponIdle = gpGlobals->curtime + SequenceDuration();
+	m_flNextPrimaryAttack = gpGlobals->curtime + GetEngineObject()->SequenceDuration();
+	m_flNextSecondaryAttack = gpGlobals->curtime + GetEngineObject()->SequenceDuration();
+	m_flTimeWeaponIdle = gpGlobals->curtime + GetEngineObject()->SequenceDuration();
 
 	return true;
 }

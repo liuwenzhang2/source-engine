@@ -358,7 +358,7 @@ void CBaseViewModel::SendViewModelMatchingSequence( int sequence )
 {
 	// since all we do is send a sequence number down to the client, 
 	// set this here so other weapons code knows which sequence is playing.
-	SetSequence( sequence );
+	GetEngineObject()->SetSequence( sequence );
 
 	m_nAnimationParity = ( m_nAnimationParity + 1 ) & ( (1<<VIEWMODEL_ANIMATION_PARITY_BITS) - 1 );
 
@@ -374,8 +374,8 @@ void CBaseViewModel::SendViewModelMatchingSequence( int sequence )
 #endif
 
 	// Restart animation at frame 0
-	SetCycle( 0 );
-	ResetSequenceInfo();
+	GetEngineObject()->SetCycle( 0 );
+	GetEngineObject()->ResetSequenceInfo();
 }
 
 #if defined( CLIENT_DLL )
@@ -544,7 +544,7 @@ static void RecvProxy_Weapon( const CRecvProxyData *pData, void *pStruct, void *
 	if ( pNewWeapon != pOldWeapon )
 	{
 		// Restart animation at frame 0
-		pViewModel->SetCycle( 0 );
+		pViewModel->GetEngineObject()->SetCycle( 0 );
 		pViewModel->GetEngineObject()->SetAnimTime(gpGlobals->curtime);
 	}
 }
@@ -560,39 +560,39 @@ BEGIN_NETWORK_TABLE_NOBASE(CBaseViewModel, DT_BaseViewModel)
 	//SendPropModelIndex(SENDINFO(m_nModelIndex)),
 	//SendPropInt		(SENDINFO(m_nBody), 8),
 	//SendPropInt		(SENDINFO(m_nSkin), 10),
-	SendPropInt		(SENDINFO(m_nSequence),	8, SPROP_UNSIGNED),
+	//SendPropInt		(SENDINFO(m_nSequence),	8, SPROP_UNSIGNED),
 	SendPropInt		(SENDINFO(m_nViewModelIndex), VIEWMODEL_INDEX_BITS, SPROP_UNSIGNED),
-	SendPropFloat	(SENDINFO(m_flPlaybackRate),	8,	SPROP_ROUNDUP,	-4.0,	12.0f),
+	//SendPropFloat	(SENDINFO(m_flPlaybackRate),	8,	SPROP_ROUNDUP,	-4.0,	12.0f),
 	//SendPropInt		(SENDINFO(m_fEffects),		10, SPROP_UNSIGNED),
 	SendPropInt		(SENDINFO(m_nAnimationParity), 3, SPROP_UNSIGNED ),
 	SendPropEHandle (SENDINFO(m_hWeapon)),
 	SendPropEHandle (SENDINFO(m_hOwner)),
 
-	SendPropInt( SENDINFO( m_nNewSequenceParity ), EF_PARITY_BITS, SPROP_UNSIGNED ),
-	SendPropInt( SENDINFO( m_nResetEventsParity ), EF_PARITY_BITS, SPROP_UNSIGNED ),
-	SendPropInt( SENDINFO( m_nMuzzleFlashParity ), EF_MUZZLEFLASH_BITS, SPROP_UNSIGNED ),
+	//SendPropInt( SENDINFO( m_nNewSequenceParity ), EF_PARITY_BITS, SPROP_UNSIGNED ),
+	//SendPropInt( SENDINFO( m_nResetEventsParity ), EF_PARITY_BITS, SPROP_UNSIGNED ),
+	//SendPropInt( SENDINFO( m_nMuzzleFlashParity ), EF_MUZZLEFLASH_BITS, SPROP_UNSIGNED ),
 
 #if !defined( INVASION_DLL ) && !defined( INVASION_CLIENT_DLL )
-	SendPropArray	(SendPropFloat(SENDINFO_ARRAY(m_flPoseParameter),	8, 0, 0.0f, 1.0f), m_flPoseParameter),
+	//SendPropArray	(SendPropFloat(SENDINFO_ARRAY(m_flPoseParameter),	8, 0, 0.0f, 1.0f), m_flPoseParameter),
 #endif
 #else
 	//RecvPropInt		(RECVINFO(m_nModelIndex)),
 	//RecvPropInt		(RECVINFO(m_nSkin)),
 	//RecvPropInt		(RECVINFO(m_nBody)),
-	RecvPropInt		(RECVINFO(m_nSequence), 0, RecvProxy_SequenceNum ),
+	//RecvPropInt		(RECVINFO(m_nSequence), 0, RecvProxy_SequenceNum ),
 	RecvPropInt		(RECVINFO(m_nViewModelIndex)),
-	RecvPropFloat	(RECVINFO(m_flPlaybackRate)),
+	//RecvPropFloat	(RECVINFO(m_flPlaybackRate)),
 	//RecvPropInt		(RECVINFO(m_fEffects), 0, RecvProxy_EffectFlags ),
 	RecvPropInt		(RECVINFO(m_nAnimationParity)),
 	RecvPropEHandle (RECVINFO(m_hWeapon), RecvProxy_Weapon ),
 	RecvPropEHandle (RECVINFO(m_hOwner)),
 
-	RecvPropInt( RECVINFO( m_nNewSequenceParity )),
-	RecvPropInt( RECVINFO( m_nResetEventsParity )),
-	RecvPropInt( RECVINFO( m_nMuzzleFlashParity )),
+	//RecvPropInt( RECVINFO( m_nNewSequenceParity )),
+	//RecvPropInt( RECVINFO( m_nResetEventsParity )),
+	//RecvPropInt( RECVINFO( m_nMuzzleFlashParity )),
 
 #if !defined( INVASION_DLL ) && !defined( INVASION_CLIENT_DLL )
-	RecvPropArray(RecvPropFloat(RECVINFO(m_flPoseParameter[0]) ), m_flPoseParameter ),
+	//RecvPropArray(RecvPropFloat(RECVINFO(m_flPoseParameter[0]) ), m_flPoseParameter ),
 #endif
 #endif
 END_NETWORK_TABLE()
@@ -605,9 +605,9 @@ BEGIN_PREDICTION_DATA( CBaseViewModel )
 	//DEFINE_PRED_FIELD( m_nModelIndex, FIELD_SHORT, FTYPEDESC_INSENDTABLE | FTYPEDESC_MODELINDEX ),
 	//DEFINE_PRED_FIELD( m_nSkin, FIELD_INTEGER, FTYPEDESC_INSENDTABLE ),
 	//DEFINE_PRED_FIELD( m_nBody, FIELD_INTEGER, FTYPEDESC_INSENDTABLE ),
-	DEFINE_PRED_FIELD( m_nSequence, FIELD_INTEGER, FTYPEDESC_INSENDTABLE ),
+	//DEFINE_PRED_FIELD( m_nSequence, FIELD_INTEGER, FTYPEDESC_INSENDTABLE ),
 	DEFINE_PRED_FIELD( m_nViewModelIndex, FIELD_INTEGER, FTYPEDESC_INSENDTABLE ),
-	DEFINE_PRED_FIELD_TOL( m_flPlaybackRate, FIELD_FLOAT, FTYPEDESC_INSENDTABLE, 0.125f ),
+	//DEFINE_PRED_FIELD_TOL( m_flPlaybackRate, FIELD_FLOAT, FTYPEDESC_INSENDTABLE, 0.125f ),
 	//DEFINE_PRED_FIELD( m_fEffects, FIELD_INTEGER, FTYPEDESC_INSENDTABLE | FTYPEDESC_OVERRIDE ),
 	DEFINE_PRED_FIELD( m_nAnimationParity, FIELD_INTEGER, FTYPEDESC_INSENDTABLE ),
 	DEFINE_PRED_FIELD( m_hWeapon, FIELD_EHANDLE, FTYPEDESC_INSENDTABLE ),
@@ -616,20 +616,20 @@ BEGIN_PREDICTION_DATA( CBaseViewModel )
 	DEFINE_FIELD( m_hOwner, FIELD_EHANDLE ),
 	DEFINE_FIELD( m_flTimeWeaponIdle, FIELD_FLOAT ),
 	DEFINE_FIELD( m_Activity, FIELD_INTEGER ),
-	DEFINE_PRED_FIELD( m_flCycle, FIELD_FLOAT, FTYPEDESC_PRIVATE | FTYPEDESC_OVERRIDE | FTYPEDESC_NOERRORCHECK ),
+	//DEFINE_PRED_FIELD( m_flCycle, FIELD_FLOAT, FTYPEDESC_PRIVATE | FTYPEDESC_OVERRIDE | FTYPEDESC_NOERRORCHECK ),
 
 END_PREDICTION_DATA()
 
 void RecvProxy_SequenceNum( const CRecvProxyData *pData, void *pStruct, void *pOut )
 {
 	CBaseViewModel *model = (CBaseViewModel *)pStruct;
-	if (pData->m_Value.m_Int != model->GetSequence())
+	if (pData->m_Value.m_Int != model->GetEngineObject()->GetSequence())
 	{
 		MDLCACHE_CRITICAL_SECTION();
 
-		model->SetSequence(pData->m_Value.m_Int);
+		model->GetEngineObject()->SetSequence(pData->m_Value.m_Int);
 		model->GetEngineObject()->SetAnimTime(gpGlobals->curtime);
-		model->SetCycle(0);
+		model->GetEngineObject()->SetCycle(0);
 	}
 }
 

@@ -63,10 +63,10 @@ void CTripmineGrenade::Spawn( void )
 	pObject->EnableMotion( false );
 	GetEngineObject()->SetCollisionGroup( COLLISION_GROUP_WEAPON );
 
-	SetCycle( 0.0f );
-	m_nBody			= 3;
-	ResetSequenceInfo( );
-	m_flPlaybackRate	= 0;
+	GetEngineObject()->SetCycle( 0.0f );
+	GetEngineObject()->SetBody(3);
+	GetEngineObject()->ResetSequenceInfo( );
+	GetEngineObject()->SetPlaybackRate(0);
 
 	UTIL_SetSize(this, Vector( -4, -4, -2), Vector(4, 4, 2));
 

@@ -1012,7 +1012,7 @@ void CBeam::OnDataChanged( DataUpdateType_t updateType )
 	GetEngineObject()->MarkMessageReceived();
 
 	// Make sure that the correct model is referenced for this entity
-	SetModelPointer( modelinfo->GetModel(GetEngineObject()->GetModelIndex() ) );
+	GetEngineObject()->SetModelPointer( modelinfo->GetModel(GetEngineObject()->GetModelIndex() ) );
 
 	// Convert weapon world models to viewmodels if they're weapons being carried by the local player
 	for (int i=0;i<MAX_BEAM_ENTS;i++)

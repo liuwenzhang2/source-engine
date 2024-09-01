@@ -329,7 +329,7 @@ void CPropVehiclePrisonerPod::Think(void)
 		BaseClass::Think();
 		
 		// If the enter or exit animation has finished, tell the server vehicle
-		if ( IsSequenceFinished() && (m_bExitAnimOn || m_bEnterAnimOn) )
+		if (GetEngineObject()->IsSequenceFinished() && (m_bExitAnimOn || m_bEnterAnimOn) )
 		{
 			GetServerVehicle()->HandleEntryExitFinish( m_bExitAnimOn, true );
 		}
@@ -350,10 +350,10 @@ void CPropVehiclePrisonerPod::InputOpen( inputdata_t &inputdata )
 	// Set to the desired anim, or default anim if the desired is not present
 	if ( nSequence > ACTIVITY_NOT_AVAILABLE )
 	{
-		SetCycle( 0 );
+		GetEngineObject()->SetCycle( 0 );
 		GetEngineObject()->SetAnimTime(gpGlobals->curtime);
-		ResetSequence( nSequence );
-		ResetClientsideFrame();
+		GetEngineObject()->ResetSequence( nSequence );
+		GetEngineObject()->ResetClientsideFrame();
 		const char* soundname = "d3_citadel.pod_open";
 		CPASAttenuationFilter filter(this, soundname);
 
@@ -368,7 +368,7 @@ void CPropVehiclePrisonerPod::InputOpen( inputdata_t &inputdata )
 	{
 		// Not available try to get default anim
 		Msg( "Prisoner pod %s: missing open sequence\n", GetDebugName() );
-		SetSequence( 0 );
+		GetEngineObject()->SetSequence( 0 );
 	}
 }
 
@@ -387,10 +387,10 @@ void CPropVehiclePrisonerPod::InputClose( inputdata_t &inputdata )
 	// Set to the desired anim, or default anim if the desired is not present
 	if ( nSequence > ACTIVITY_NOT_AVAILABLE )
 	{
-		SetCycle( 0 );
+		GetEngineObject()->SetCycle( 0 );
 		GetEngineObject()->SetAnimTime(gpGlobals->curtime);
-		ResetSequence( nSequence );
-		ResetClientsideFrame();
+		GetEngineObject()->ResetSequence( nSequence );
+		GetEngineObject()->ResetClientsideFrame();
 		const char* soundname = "d3_citadel.pod_close";
 		CPASAttenuationFilter filter(this, soundname);
 
@@ -405,7 +405,7 @@ void CPropVehiclePrisonerPod::InputClose( inputdata_t &inputdata )
 	{
 		// Not available try to get default anim
 		Msg( "Prisoner pod %s: missing close sequence\n", GetDebugName() );
-		SetSequence( 0 );
+		GetEngineObject()->SetSequence( 0 );
 	}
 }
 

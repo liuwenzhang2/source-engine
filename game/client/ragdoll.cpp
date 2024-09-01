@@ -515,7 +515,7 @@ void C_ServerRagdoll::SetupWeights( const matrix3x4_t *pBoneToWorld, int nFlexWe
 {
 	BaseClass::SetupWeights( pBoneToWorld, nFlexWeightCount, pFlexWeights, pFlexDelayedWeights );
 
-	IStudioHdr *hdr = GetModelPtr();
+	IStudioHdr *hdr = GetEngineObject()->GetModelPtr();
 	if ( !hdr )
 		return;
 
@@ -534,7 +534,7 @@ void C_ServerRagdoll::SetupWeights( const matrix3x4_t *pBoneToWorld, int nFlexWe
 			Vector local, tmp;
 			local.Init( 1000.0f, 0.0f, 0.0f );
 			VectorTransform( local, attToWorld, tmp );
-			modelrender->SetViewTarget( GetModelPtr(), GetBody(), tmp );
+			modelrender->SetViewTarget(GetEngineObject()->GetModelPtr(), GetBody(), tmp );
 		}
 	}
 }
@@ -567,7 +567,7 @@ void C_ServerRagdoll::AccumulateLayers( IBoneSetup &boneSetup, Vector pos[], Qua
 
 	if ( m_nOverlaySequence >= 0 && m_nOverlaySequence < boneSetup.GetStudioHdr()->GetNumSeq() )
 	{
-		boneSetup.AccumulatePose( pos, q, m_nOverlaySequence, GetCycle(), m_flBlendWeightCurrent, currentTime, m_pIk );
+		boneSetup.AccumulatePose( pos, q, m_nOverlaySequence, GetEngineObject()->GetCycle(), m_flBlendWeightCurrent, currentTime, m_pIk );
 	}
 }
 
@@ -709,7 +709,7 @@ public:
 		{
 			// HACKHACK: Force the attached bone to be set up
 			int index = m_boneIndex[m_ragdollAttachedObjectIndex];
-			int boneFlags = GetModelPtr()->boneFlags(index);
+			int boneFlags = GetEngineObject()->GetModelPtr()->boneFlags(index);
 			if ( !(boneFlags & boneMask) )
 			{
 				// BUGBUG: The attached bone is required and this call is going to skip it, so force it

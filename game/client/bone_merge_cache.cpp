@@ -39,7 +39,7 @@ void CBoneMergeCache::Init( C_BaseAnimating *pOwner )
 
 void CBoneMergeCache::UpdateCache()
 {
-	IStudioHdr *pOwnerHdr = m_pOwner ? m_pOwner->GetModelPtr() : NULL;
+	IStudioHdr *pOwnerHdr = m_pOwner ? m_pOwner->GetEngineObject()->GetModelPtr() : NULL;
 	if ( !pOwnerHdr )
 	{
 		if ( m_pOwnerHdr )
@@ -57,7 +57,7 @@ void CBoneMergeCache::UpdateCache()
 	}
 
 	C_BaseAnimating *pTestFollow = m_pOwner->FindFollowedEntity();
-	IStudioHdr *pTestHdr = (pTestFollow ? pTestFollow->GetModelPtr() : NULL);
+	IStudioHdr *pTestHdr = (pTestFollow ? pTestFollow->GetEngineObject()->GetModelPtr() : NULL);
 	const IStudioHdr *pTestStudioHDR = (pTestHdr ? pTestHdr : NULL);
 	if ( pTestFollow != m_pFollow || pTestHdr != m_pFollowHdr || pTestStudioHDR != m_pFollowRenderHdr || pOwnerHdr != m_pOwnerHdr )
 	{
@@ -260,7 +260,7 @@ bool CBoneMergeCache::GetAimEntOrigin( Vector *pAbsOrigin, QAngle *pAbsAngles )
 
 	// Get Inverse( mBoneLocal )
 	matrix3x4_t mBoneLocal, mBoneLocalInv;
-	m_pOwnerHdr->SetupSingleBoneMatrix( m_pOwner->GetSequence(), 0, m_MergedBones[0].m_iMyBone, mBoneLocal );
+	m_pOwnerHdr->SetupSingleBoneMatrix( m_pOwner->GetEngineObject()->GetSequence(), 0, m_MergedBones[0].m_iMyBone, mBoneLocal );
 	MatrixInvert( mBoneLocal, mBoneLocalInv );
 
 	// Now calculate mEntity = mFollowBone * Inverse( mBoneLocal )

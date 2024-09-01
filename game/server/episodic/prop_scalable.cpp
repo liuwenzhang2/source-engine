@@ -114,8 +114,8 @@ void CPropScalable::Spawn( void )
 
 	GetEngineObject()->AddEffects( EF_NOSHADOW );
 
-	SetSequence( 0 );
-	SetPlaybackRate( 1.0f );
+	GetEngineObject()->SetSequence( 0 );
+	GetEngineObject()->SetPlaybackRate( 1.0f );
 }
 
 void CPropScalable::Precache( void )

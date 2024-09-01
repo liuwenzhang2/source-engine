@@ -170,7 +170,7 @@ bool CWeaponAnnabelle::StartReload( void )
 	SetBodygroup(1,0);
 
 	pOwner->m_flNextAttack = gpGlobals->curtime;
-	m_flNextPrimaryAttack = gpGlobals->curtime + SequenceDuration();
+	m_flNextPrimaryAttack = gpGlobals->curtime + GetEngineObject()->SequenceDuration();
 
 	m_bInReload = true;
 	return true;
@@ -211,7 +211,7 @@ bool CWeaponAnnabelle::Reload( void )
 	SendWeaponAnim( ACT_VM_RELOAD );
 
 	pOwner->m_flNextAttack = gpGlobals->curtime;
-	m_flNextPrimaryAttack = gpGlobals->curtime + SequenceDuration();
+	m_flNextPrimaryAttack = gpGlobals->curtime + GetEngineObject()->SequenceDuration();
 
 	return true;
 }
@@ -237,7 +237,7 @@ void CWeaponAnnabelle::FinishReload( void )
 	SendWeaponAnim( ACT_SHOTGUN_RELOAD_FINISH );
 
 	pOwner->m_flNextAttack = gpGlobals->curtime;
-	m_flNextPrimaryAttack = gpGlobals->curtime + SequenceDuration();
+	m_flNextPrimaryAttack = gpGlobals->curtime + GetEngineObject()->SequenceDuration();
 }
 
 //-----------------------------------------------------------------------------
@@ -282,8 +282,8 @@ void CWeaponAnnabelle::Pump( void )
 	// Finish reload animation
 	SendWeaponAnim( ACT_SHOTGUN_PUMP );
 
-	pOwner->m_flNextAttack	= gpGlobals->curtime + SequenceDuration();
-	m_flNextPrimaryAttack	= gpGlobals->curtime + SequenceDuration();
+	pOwner->m_flNextAttack	= gpGlobals->curtime + GetEngineObject()->SequenceDuration();
+	m_flNextPrimaryAttack	= gpGlobals->curtime + GetEngineObject()->SequenceDuration();
 }
 
 //-----------------------------------------------------------------------------
@@ -296,7 +296,7 @@ void CWeaponAnnabelle::DryFire( void )
 	WeaponSound(EMPTY);
 	SendWeaponAnim( ACT_VM_DRYFIRE );
 	
-	m_flNextPrimaryAttack = gpGlobals->curtime + SequenceDuration();
+	m_flNextPrimaryAttack = gpGlobals->curtime + GetEngineObject()->SequenceDuration();
 }
 
 //-----------------------------------------------------------------------------

@@ -288,7 +288,7 @@ void CNPC_Tentacle::Spawn( )
 	GetEngineObject()->SetMoveType( MOVETYPE_NONE );
 	GetEngineObject()->ClearEffects();
 	m_iHealth			= 75;
-	SetSequence( 0 );
+	GetEngineObject()->SetSequence( 0 );
 
 	SetModel( "models/tentacle2.mdl" );
 	UTIL_SetSize( this, Vector( -32, -32, 0 ), Vector( 32, 32, 64 ) );
@@ -301,7 +301,7 @@ void CNPC_Tentacle::Spawn( )
 	
 	m_bloodColor		= BLOOD_COLOR_GREEN;
 
-	ResetSequenceInfo( );
+	GetEngineObject()->ResetSequenceInfo( );
 	m_iDir = 1;
 
 	SetThink( &CNPC_Tentacle::Start );
@@ -381,7 +381,7 @@ float CNPC_Tentacle::MyHeight( )
 
 int CNPC_Tentacle::MyLevel( )
 {
-	switch( GetSequence() )
+	switch(GetEngineObject()->GetSequence() )
 	{
 	case TENTACLE_ANIM_Pit_Idle: 
 		return -1;
@@ -551,7 +551,7 @@ void CNPC_Tentacle::Cycle( void )
 
 	// clip ideal_yaw
 	float dy = m_flSoundYaw;
-	switch( GetSequence() )
+	switch(GetEngineObject()->GetSequence() )
 	{
 	case TENTACLE_ANIM_Floor_Rear:
 	case TENTACLE_ANIM_Floor_Rear_Idle:
@@ -574,14 +574,14 @@ void CNPC_Tentacle::Cycle( void )
 	}
 	GetMotor()->SetIdealYaw( m_flInitialYaw + dy );
 
-	if ( IsSequenceFinished() )
+	if (GetEngineObject()->IsSequenceFinished() )
 	{
 		// ALERT( at_console, "%s done %d %d\n", STRING( pev->targetname ), pev->sequence, m_iGoalAnim );
 		if ( m_iHealth <= 1)
 		{
 			m_iGoalAnim = TENTACLE_ANIM_Pit_Idle;
 
-			if ( GetSequence() == TENTACLE_ANIM_Pit_Idle)
+			if (GetEngineObject()->GetSequence() == TENTACLE_ANIM_Pit_Idle)
 			{
 				m_iHealth = 75;
 			}
@@ -649,12 +649,12 @@ void CNPC_Tentacle::Cycle( void )
 				}
 			}
 		}
-		else if ( GetSequence() == TENTACLE_ANIM_Pit_Idle)
+		else if (GetEngineObject()->GetSequence() == TENTACLE_ANIM_Pit_Idle)
 		{
 			// stay in pit until hear noise
 			m_iGoalAnim = TENTACLE_ANIM_Pit_Idle;
 		}
-		else if ( GetSequence() == m_iGoalAnim)
+		else if (GetEngineObject()->GetSequence() == m_iGoalAnim)
 		{
 			if ( MyLevel() >= 0 && gpGlobals->curtime < m_flSoundTime)
 			{
@@ -776,25 +776,25 @@ void CNPC_Tentacle::Cycle( void )
 				m_flSoundYaw -= random->RandomFloat( 2, 8 );
 		}
 
-		SetSequence( FindTransitionSequence( GetSequence(), m_iGoalAnim, &m_iDir ) );
+		GetEngineObject()->SetSequence( FindTransitionSequence(GetEngineObject()->GetSequence(), m_iGoalAnim, &m_iDir ) );
 		
 
 		if (m_iDir > 0)
 		{
-			SetCycle( 0 );
+			GetEngineObject()->SetCycle( 0 );
 		}
 		else
 		{
 			m_iDir = -1; // just to safe
-			SetCycle( 1.0f );
+			GetEngineObject()->SetCycle( 1.0f );
 		}
 
-		ResetSequenceInfo( );
+		GetEngineObject()->ResetSequenceInfo( );
 
 		m_flFramerateAdj = random->RandomFloat( -0.2, 0.2 );
-		m_flPlaybackRate = m_iDir * 1.0 + m_flFramerateAdj;
+		GetEngineObject()->SetPlaybackRate(m_iDir * 1.0 + m_flFramerateAdj);
 
-		switch( GetSequence() )
+		switch(GetEngineObject()->GetSequence() )
 		{
 		case TENTACLE_ANIM_Floor_Tap:
 		case TENTACLE_ANIM_Lev1_Tap:
@@ -814,7 +814,7 @@ void CNPC_Tentacle::Cycle( void )
 
 				// ALERT( at_console, "%f %f\n", tr1.flFraction * 512, tr2.flFraction * 512 );
 
-				m_flTapRadius = SetPoseParameter( 0, random->RandomFloat( tr1.fraction * 512, tr2.fraction * 512 ) );
+				m_flTapRadius = GetEngineObject()->SetPoseParameter( 0, random->RandomFloat( tr1.fraction * 512, tr2.fraction * 512 ) );
 			}
 			break;
 		default:
@@ -828,12 +828,12 @@ void CNPC_Tentacle::Cycle( void )
 	if (m_flPrevSoundTime + 2.0 > gpGlobals->curtime)
 	{
 		// 1.5 normal speed if hears sounds
-		m_flPlaybackRate = m_iDir * 1.5 + m_flFramerateAdj;
+		GetEngineObject()->SetPlaybackRate(m_iDir * 1.5 + m_flFramerateAdj);
 	}
 	else if (m_flPrevSoundTime + 5.0 > gpGlobals->curtime)
 	{
 		// slowdown to normal
-		m_flPlaybackRate = m_iDir + m_iDir * (5 - (gpGlobals->curtime - m_flPrevSoundTime)) / 2 + m_flFramerateAdj;
+		GetEngineObject()->SetPlaybackRate(m_iDir + m_iDir * (5 - (gpGlobals->curtime - m_flPrevSoundTime)) / 2 + m_flFramerateAdj);
 	}
 }
 

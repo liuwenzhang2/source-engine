@@ -326,7 +326,7 @@ void CNPC_Crow::OnChangeActivity( Activity eNewActivity )
 	BaseClass::OnChangeActivity( eNewActivity );
 	if ( fRandomize )
 	{
-		SetCycle( random->RandomFloat( 0.0, 0.75 ) );
+		GetEngineObject()->SetCycle( random->RandomFloat( 0.0, 0.75 ) );
 	}
 }
 

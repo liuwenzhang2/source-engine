@@ -111,7 +111,7 @@ bool C_LowViolenceHostageDeathModel::SetupLowViolenceModel( C_CHostage *pHostage
 	m_flFadeOutStart = gpGlobals->curtime + 5.0f;
 	SetNextClientThink( CLIENT_THINK_ALWAYS );
 
-	SetSequence( LookupSequence( "death1" ) );
+	GetEngineObject()->SetSequence( LookupSequence( "death1" ) );
 	ForceClientSideAnimationOn();
 
 	if ( pHostage && !pHostage->IsDormant() )
@@ -126,15 +126,15 @@ bool C_LowViolenceHostageDeathModel::SetupLowViolenceModel( C_CHostage *pHostage
 		GetEngineObject()->SetAbsAngles( pHostage->GetRenderAngles() );
 		GetEngineObject()->SetNetworkAngles( pHostage->GetRenderAngles() );
 
-		IStudioHdr *pStudioHdr = GetModelPtr();
+		IStudioHdr *pStudioHdr = GetEngineObject()->GetModelPtr();
 
 		// update pose parameters
 		float poseParameter[MAXSTUDIOPOSEPARAM];
-		GetPoseParameters( pStudioHdr, poseParameter );
+		GetEngineObject()->GetPoseParameters( pStudioHdr, poseParameter );
 		for ( int i=0; i<NumInterestingPoseParameters; ++i )
 		{
-			int poseParameterIndex = LookupPoseParameter( pStudioHdr, InterestingPoseParameters[i] );
-			SetPoseParameter( pStudioHdr, poseParameterIndex, poseParameter[poseParameterIndex] );
+			int poseParameterIndex = GetEngineObject()->LookupPoseParameter( pStudioHdr, InterestingPoseParameters[i] );
+			GetEngineObject()->SetPoseParameter( pStudioHdr, poseParameterIndex, poseParameter[poseParameterIndex] );
 		}
 	}
 
@@ -299,14 +299,14 @@ void C_CHostage::Initialize( )
 	m_eyeAttachment = LookupAttachment( "eyes" );
 	m_chestAttachment = LookupAttachment( "chest" );
 
-	m_headYawPoseParam = LookupPoseParameter( "head_yaw" );
-	GetPoseParameterRange( m_headYawPoseParam, m_headYawMin, m_headYawMax );
+	m_headYawPoseParam = GetEngineObject()->LookupPoseParameter( "head_yaw" );
+	GetEngineObject()->GetPoseParameterRange( m_headYawPoseParam, m_headYawMin, m_headYawMax );
 
-	m_headPitchPoseParam = LookupPoseParameter( "head_pitch" );
-	GetPoseParameterRange( m_headPitchPoseParam, m_headPitchMin, m_headPitchMax );
+	m_headPitchPoseParam = GetEngineObject()->LookupPoseParameter( "head_pitch" );
+	GetEngineObject()->GetPoseParameterRange( m_headPitchPoseParam, m_headPitchMin, m_headPitchMax );
 
-	m_bodyYawPoseParam = LookupPoseParameter( "body_yaw" );
-	GetPoseParameterRange( m_bodyYawPoseParam, m_bodyYawMin, m_bodyYawMax );
+	m_bodyYawPoseParam = GetEngineObject()->LookupPoseParameter( "body_yaw" );
+	GetEngineObject()->GetPoseParameterRange( m_bodyYawPoseParam, m_bodyYawMin, m_bodyYawMax );
 
 	Vector pos;
 	QAngle angles;
@@ -384,7 +384,7 @@ void C_CHostage::UpdateLookAt( IStudioHdr *pStudioHdr )
 
 	// Figure out where our body is facing in world space.
 	float poseParams[MAXSTUDIOPOSEPARAM];
-	GetPoseParameters( pStudioHdr, poseParams );
+	GetEngineObject()->GetPoseParameters( pStudioHdr, poseParams );
 	QAngle bodyAngles( 0, 0, 0 );
 	bodyAngles[YAW] = GetRenderAngles()[YAW] + RemapVal( poseParams[m_bodyYawPoseParam], 0, 1, m_bodyYawMin, m_bodyYawMax );
 
@@ -402,7 +402,7 @@ void C_CHostage::UpdateLookAt( IStudioHdr *pStudioHdr )
 	m_flCurrentHeadYaw = AngleNormalize( m_flCurrentHeadYaw - flBodyYawDiff );
 	desired = clamp( desired, m_headYawMin, m_headYawMax );
 	
-	SetPoseParameter( pStudioHdr, m_headYawPoseParam, m_flCurrentHeadYaw );
+	GetEngineObject()->SetPoseParameter( pStudioHdr, m_headYawPoseParam, m_flCurrentHeadYaw );
 
 	
 	// Set the head's yaw.
@@ -411,9 +411,9 @@ void C_CHostage::UpdateLookAt( IStudioHdr *pStudioHdr )
 	
 	m_flCurrentHeadPitch = ApproachAngle( desired, m_flCurrentHeadPitch, HOSTAGE_HEAD_TURN_RATE * gpGlobals->frametime );
 	m_flCurrentHeadPitch = AngleNormalize( m_flCurrentHeadPitch );
-	SetPoseParameter( pStudioHdr, m_headPitchPoseParam, m_flCurrentHeadPitch );
+	GetEngineObject()->SetPoseParameter( pStudioHdr, m_headPitchPoseParam, m_flCurrentHeadPitch );
 
-	SetPoseParameter( pStudioHdr, "head_roll", 0.0f );
+	GetEngineObject()->SetPoseParameter( pStudioHdr, "head_roll", 0.0f );
 }
 
 
@@ -452,12 +452,12 @@ void C_CHostage::UpdateClientSideAnimation()
 		"spine_yaw",
 		"head_roll"
 	};
-	IStudioHdr *pStudioHdr = GetModelPtr();
+	IStudioHdr *pStudioHdr = GetEngineObject()->GetModelPtr();
 	for ( int i=0; i < ARRAYSIZE( setToZero ); i++ )
 	{
-		int index = LookupPoseParameter( pStudioHdr, setToZero[i] );
+		int index = GetEngineObject()->LookupPoseParameter( pStudioHdr, setToZero[i] );
 		if ( index >= 0 )
-			SetPoseParameter( pStudioHdr, index, 0 );
+			GetEngineObject()->SetPoseParameter( pStudioHdr, index, 0 );
 	}
 
 	// orient head and eyes

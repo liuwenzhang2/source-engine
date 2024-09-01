@@ -513,7 +513,7 @@ void CItem::Materialize( void )
 		g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 #endif
 		GetEngineObject()->RemoveEffects( EF_NODRAW );
-		DoMuzzleFlash();
+		GetEngineObject()->DoMuzzleFlash();
 	}
 
 	SetTouch( &CItem::ItemTouch );

@@ -129,7 +129,7 @@ void CTeamControlPoint::Spawn( void )
 
 	BaseClass::Spawn();
 
-	SetPlaybackRate( 1.0 );
+	GetEngineObject()->SetPlaybackRate( 1.0 );
 	SetThink( &CTeamControlPoint::AnimThink );
 	GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.1f );
 
@@ -601,8 +601,8 @@ void CTeamControlPoint::InternalSetOwner( int iCapTeam, bool bMakeSound, int iNu
 	// Update visuals
 	SetModel( STRING(m_TeamData[m_iTeam].iszModel) );
 	SetBodygroup( 0, m_iTeam );
-	m_nSkin = ( m_iTeam == TEAM_UNASSIGNED ) ? 2 : (m_iTeam - 2);
-	ResetSequence( LookupSequence("idle") );
+	GetEngineObject()->SetSkin(( m_iTeam == TEAM_UNASSIGNED ) ? 2 : (m_iTeam - 2));
+	GetEngineObject()->ResetSequence( LookupSequence("idle") );
 
 	// We add 1 to the index because we consider the default "no points capped" as 0.
 	TeamplayGameRules()->SetLastCapPointChanged( m_iPointIndex+1 );
@@ -614,9 +614,9 @@ void CTeamControlPoint::InternalSetOwner( int iCapTeam, bool bMakeSound, int iNu
 		if ( i == TEAM_SPECTATOR )
 			continue;
 
-		if ( GetModelPtr() && GetModelPtr()->SequencesAvailable() )
+		if (GetEngineObject()->GetModelPtr() && GetEngineObject()->GetModelPtr()->SequencesAvailable() )
 		{
-			m_TeamData[i].iTeamPoseParam = LookupPoseParameter( UTIL_VarArgs( "cappoint_%d_percentage", i ) );
+			m_TeamData[i].iTeamPoseParam = GetEngineObject()->LookupPoseParameter( UTIL_VarArgs( "cappoint_%d_percentage", i ) );
 		}
 		else
 		{
@@ -870,7 +870,7 @@ void CTeamControlPoint::UpdateCapPercentage( void )
 
 		if ( m_TeamData[i].iTeamPoseParam != -1 )
 		{
-			SetPoseParameter( m_TeamData[i].iTeamPoseParam, flPerc );
+			GetEngineObject()->SetPoseParameter( m_TeamData[i].iTeamPoseParam, flPerc );
 		}
 	}
 }

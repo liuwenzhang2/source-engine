@@ -84,7 +84,7 @@ void CWeaponDODBaseMelee::WeaponIdle( void )
 
 	SendWeaponAnim( ACT_VM_IDLE );
 
-	m_flTimeWeaponIdle = gpGlobals->curtime + SequenceDuration();
+	m_flTimeWeaponIdle = gpGlobals->curtime + GetEngineObject()->SequenceDuration();
 }
 
 void CWeaponDODBaseMelee::PrimaryAttack()
@@ -217,7 +217,7 @@ CBaseEntity *CWeaponDODBaseMelee::MeleeAttack( int iDamageAmount, int iDamageTyp
 
 	m_flNextPrimaryAttack = gpGlobals->curtime + flAttackDelay;
 	m_flNextSecondaryAttack = gpGlobals->curtime + flAttackDelay;
-	m_flTimeWeaponIdle = gpGlobals->curtime + SequenceDuration();
+	m_flTimeWeaponIdle = gpGlobals->curtime + GetEngineObject()->SequenceDuration();
 
 
 #ifndef CLIENT_DLL

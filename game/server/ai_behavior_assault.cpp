@@ -598,7 +598,7 @@ void CAI_AssaultBehavior::StartTask( const Task_t *pTask )
 				int sequence = GetOuter()->LookupSequence( STRING( m_hRallyPoint->m_RallySequenceName ) );
 				if( sequence != -1 )
 				{
-					GetOuter()->ResetSequence( sequence );
+					GetOuter()->GetEngineObject()->ResetSequence( sequence );
 					GetOuter()->SetIdealActivity( ACT_DO_NOT_DISTURB );
 				}
 			}

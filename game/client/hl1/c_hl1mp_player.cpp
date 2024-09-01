@@ -430,8 +430,8 @@ void C_HL1MPRagdoll::CreateHL1MPRagdoll( void )
 			GetEngineObject()->GetRotationInterpolator().Reset();
 
 			GetEngineObject()->SetAnimTime(pPlayer->GetEngineObject()->GetAnimTime());
-			SetSequence( pPlayer->GetSequence() );
-			m_flPlaybackRate = pPlayer->GetPlaybackRate();
+			GetEngineObject()->SetSequence( pPlayer->GetEngineObject()->GetSequence() );
+			GetEngineObject()->SetPlaybackRate(pPlayer->GetEngineObject()->GetPlaybackRate());
 		}
 		else
 		{
@@ -443,15 +443,15 @@ void C_HL1MPRagdoll::CreateHL1MPRagdoll( void )
 
 			GetEngineObject()->SetAbsVelocity( m_vecRagdollVelocity );
 
-			int iSeq = pPlayer->GetSequence();
+			int iSeq = pPlayer->GetEngineObject()->GetSequence();
 			if ( iSeq == -1 )
 			{
 				Assert( false );	// missing walk_lower?
 				iSeq = 0;
 			}
 			
-			SetSequence( iSeq );	// walk_lower, basic pose
-			SetCycle( 0.0 );
+			GetEngineObject()->SetSequence( iSeq );	// walk_lower, basic pose
+			GetEngineObject()->SetCycle( 0.0 );
 
 			GetEngineObject()->Interp_Reset();
 		}		
@@ -524,7 +524,7 @@ void C_HL1MPRagdoll::SetupWeights( const matrix3x4_t *pBoneToWorld, int nFlexWei
 	static float destweight[128];
 	static bool bIsInited = false;
 
-	IStudioHdr *hdr = GetModelPtr();
+	IStudioHdr *hdr = GetEngineObject()->GetModelPtr();
 	if ( !hdr )
 		return;
 
@@ -543,7 +543,7 @@ void C_HL1MPRagdoll::SetupWeights( const matrix3x4_t *pBoneToWorld, int nFlexWei
 			Vector local, tmp;
 			local.Init( 1000.0f, 0.0f, 0.0f );
 			VectorTransform( local, attToWorld, tmp );
-			modelrender->SetViewTarget( GetModelPtr(), GetBody(), tmp );
+			modelrender->SetViewTarget(GetEngineObject()->GetModelPtr(), GetBody(), tmp );
 		}
 	}
 }

@@ -115,8 +115,8 @@ void CSnark::Spawn( void )
 
 	m_flNextBounceSoundTime = gpGlobals->curtime;// reset each time a snark is spawned.
 
-	SetSequence( WSQUEAK_RUN );
-	ResetSequenceInfo( );
+	GetEngineObject()->SetSequence( WSQUEAK_RUN );
+	GetEngineObject()->ResetSequenceInfo( );
 
 	m_iMyClass = CLASS_NONE;
 

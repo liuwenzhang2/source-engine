@@ -335,7 +335,7 @@ void CDODBaseBombWeapon::ItemPostFrame()
 
 		SendWeaponAnim( GetIdleActivity() );
 
-		m_flTimeWeaponIdle = gpGlobals->curtime + SequenceDuration();
+		m_flTimeWeaponIdle = gpGlobals->curtime + GetEngineObject()->SequenceDuration();
 
 		// if we're not planting, why do we have the bomb out?
 		// switch to our next best weapon

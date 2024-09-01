@@ -307,11 +307,11 @@ void CNPC_BaseScanner::OnStateChange( NPC_STATE eOldState, NPC_STATE eNewState )
 {
 	if (( eNewState == NPC_STATE_ALERT ) || ( eNewState == NPC_STATE_COMBAT ))
 	{
-		SetPoseParameter(m_nPoseFlare, 1.0f);
+		GetEngineObject()->SetPoseParameter(m_nPoseFlare, 1.0f);
 	}
 	else
 	{
-		SetPoseParameter(m_nPoseFlare, 0);
+		GetEngineObject()->SetPoseParameter(m_nPoseFlare, 0);
 	}
 }
 
@@ -978,10 +978,10 @@ void CNPC_BaseScanner::MoveExecute_Alive(float flInterval)
 	float tailPerc = clamp( GetCurrentVelocity().z, -150, 250 );
 	tailPerc = SimpleSplineRemapVal( tailPerc, -150, 250, -25, 80 );
 
-	SetPoseParameter( m_nPoseTail, tailPerc );
+	GetEngineObject()->SetPoseParameter( m_nPoseTail, tailPerc );
 
 	// Spin the dynamo based upon our speed
-	float flCurrentDynamo = GetPoseParameter( m_nPoseDynamo );
+	float flCurrentDynamo = GetEngineObject()->GetPoseParameter( m_nPoseDynamo );
 	float speed	= GetCurrentVelocity().Length();
 	float flDynamoSpeed = (maxSpeed > 0 ? speed / maxSpeed : 1.0) * 60;
 	flCurrentDynamo -= flDynamoSpeed;
@@ -989,7 +989,7 @@ void CNPC_BaseScanner::MoveExecute_Alive(float flInterval)
 	{
 		flCurrentDynamo += 360.0;
 	}
-	SetPoseParameter( m_nPoseDynamo, flCurrentDynamo );
+	GetEngineObject()->SetPoseParameter( m_nPoseDynamo, flCurrentDynamo );
 
 	PlayFlySound();
 }
@@ -1519,8 +1519,8 @@ inline CBaseEntity *CNPC_BaseScanner::EntityToWatch( void )
 //-----------------------------------------------------------------------------
 void CNPC_BaseScanner::UpdateHead( float flInterval )
 {
-	float yaw = GetPoseParameter( m_nPoseFaceHoriz );
-	float pitch = GetPoseParameter( m_nPoseFaceVert );
+	float yaw = GetEngineObject()->GetPoseParameter( m_nPoseFaceHoriz );
+	float pitch = GetEngineObject()->GetPoseParameter( m_nPoseFaceVert );
 
 	CBaseEntity *pTarget = EntityToWatch();
 
@@ -1538,8 +1538,8 @@ void CNPC_BaseScanner::UpdateHead( float flInterval )
 
 		if ( DotProduct( lookDir, BodyDirection3D() ) < 0.0f )
 		{
-			SetPoseParameter( m_nPoseFaceHoriz,	UTIL_Approach( 0, yaw, 10 ) );
-			SetPoseParameter( m_nPoseFaceVert, UTIL_Approach( 0, pitch, 10 ) );
+			GetEngineObject()->SetPoseParameter( m_nPoseFaceHoriz,	UTIL_Approach( 0, yaw, 10 ) );
+			GetEngineObject()->SetPoseParameter( m_nPoseFaceVert, UTIL_Approach( 0, pitch, 10 ) );
 
 			return;
 		}
@@ -1552,13 +1552,13 @@ void CNPC_BaseScanner::UpdateHead( float flInterval )
 		float pitchDiff = UTIL_VecToPitch( lookDir );
 		pitchDiff = UTIL_AngleDiff( pitchDiff, facingPitch + pitch );
 
-		SetPoseParameter( m_nPoseFaceHoriz, UTIL_Approach( yaw + yawDiff, yaw, 50 ) );
-		SetPoseParameter( m_nPoseFaceVert, UTIL_Approach( pitch + pitchDiff, pitch, 50 ) );
+		GetEngineObject()->SetPoseParameter( m_nPoseFaceHoriz, UTIL_Approach( yaw + yawDiff, yaw, 50 ) );
+		GetEngineObject()->SetPoseParameter( m_nPoseFaceVert, UTIL_Approach( pitch + pitchDiff, pitch, 50 ) );
 	}
 	else
 	{
-		SetPoseParameter( m_nPoseFaceHoriz,	UTIL_Approach( 0, yaw, 10 ) );
-		SetPoseParameter( m_nPoseFaceVert, UTIL_Approach( 0, pitch, 10 ) );
+		GetEngineObject()->SetPoseParameter( m_nPoseFaceHoriz,	UTIL_Approach( 0, yaw, 10 ) );
+		GetEngineObject()->SetPoseParameter( m_nPoseFaceVert, UTIL_Approach( 0, pitch, 10 ) );
 	}
 }
 

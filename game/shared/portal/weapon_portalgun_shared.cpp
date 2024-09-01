@@ -136,7 +136,7 @@ void CWeaponPortalgun::DryFire( void )
 	WeaponSound(EMPTY);
 	SendWeaponAnim( ACT_VM_DRYFIRE );
 	
-	m_flNextPrimaryAttack = gpGlobals->curtime + SequenceDuration();
+	m_flNextPrimaryAttack = gpGlobals->curtime + GetEngineObject()->SequenceDuration();
 }
 
 void CWeaponPortalgun::SetCanFirePortal1( bool bCanFire /*= true*/ )

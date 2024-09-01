@@ -222,12 +222,12 @@ void C_PortalRagdoll::CreatePortalRagdoll()
 			Assert( false );
 			iSeq = 0;
 		}			
-		SetSequence( iSeq );
-		SetCycle( 0.0 );
+		GetEngineObject()->SetSequence( iSeq );
+		GetEngineObject()->SetCycle( 0.0 );
 
 		GetEngineObject()->Interp_Reset();
 
-		m_nBody = pPlayer->GetBody();
+		GetEngineObject()->SetBody(pPlayer->GetBody());
 		GetEngineObject()->SetModelIndex(GetEngineObject()->GetModelIndex() );
 		// Make us a ragdoll..
 		m_nRenderFX = kRenderFxRagdoll;
@@ -409,16 +409,16 @@ void C_Portal_Player::TraceAttack( const CTakeDamageInfo &info, const Vector &ve
 
 void C_Portal_Player::Initialize( void )
 {
-	m_headYawPoseParam = LookupPoseParameter(  "head_yaw" );
-	GetPoseParameterRange( m_headYawPoseParam, m_headYawMin, m_headYawMax );
+	m_headYawPoseParam = GetEngineObject()->LookupPoseParameter(  "head_yaw" );
+	GetEngineObject()->GetPoseParameterRange( m_headYawPoseParam, m_headYawMin, m_headYawMax );
 
-	m_headPitchPoseParam = LookupPoseParameter( "head_pitch" );
-	GetPoseParameterRange( m_headPitchPoseParam, m_headPitchMin, m_headPitchMax );
+	m_headPitchPoseParam = GetEngineObject()->LookupPoseParameter( "head_pitch" );
+	GetEngineObject()->GetPoseParameterRange( m_headPitchPoseParam, m_headPitchMin, m_headPitchMax );
 
-	IStudioHdr *hdr = GetModelPtr();
+	IStudioHdr *hdr = GetEngineObject()->GetModelPtr();
 	for ( int i = 0; i < hdr->GetNumPoseParameters() ; i++ )
 	{
-		SetPoseParameter( hdr, i, 0.0 );
+		GetEngineObject()->SetPoseParameter( hdr, i, 0.0 );
 	}
 }
 
@@ -539,11 +539,11 @@ void C_Portal_Player::UpdateLookAt( void )
 
 	m_flCurrentHeadYaw = m_flCurrentHeadYaw + flSpeed * ( desiredYaw - m_flCurrentHeadYaw );
 	m_flCurrentHeadYaw	= AngleNormalize( m_flCurrentHeadYaw );
-	SetPoseParameter( m_headYawPoseParam, m_flCurrentHeadYaw );	
+	GetEngineObject()->SetPoseParameter( m_headYawPoseParam, m_flCurrentHeadYaw );
 
 	m_flCurrentHeadPitch = m_flCurrentHeadPitch + flSpeed * ( desiredPitch - m_flCurrentHeadPitch );
 	m_flCurrentHeadPitch = AngleNormalize( m_flCurrentHeadPitch );
-	SetPoseParameter( m_headPitchPoseParam, m_flCurrentHeadPitch );
+	GetEngineObject()->SetPoseParameter( m_headPitchPoseParam, m_flCurrentHeadPitch );
 
 	// This orients the eyes
 	m_viewtarget = m_vLookAtTarget = vCurLookTarget;

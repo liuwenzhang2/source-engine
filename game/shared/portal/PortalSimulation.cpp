@@ -513,7 +513,7 @@ bool CPortalSimulator::EntityHitBoxExtentIsInPortalHole( CBaseAnimating *pBaseAn
 	Vector vMinExtent;
 	Vector vMaxExtent;
 
-	IStudioHdr *pStudioHdr = pBaseAnimating->GetModelPtr();
+	IStudioHdr *pStudioHdr = pBaseAnimating->GetEngineObject()->GetModelPtr();
 	if ( !pStudioHdr )
 		return false;
 

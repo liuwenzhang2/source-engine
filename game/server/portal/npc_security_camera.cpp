@@ -323,8 +323,8 @@ void CNPC_SecurityCamera::Spawn( void )
 	GetEngineObject()->RemoveFlag( FL_AIMTARGET );
 	GetEngineObject()->AddEFlags( EFL_NO_DISSOLVE );
 
-	SetPoseParameter( SECURITY_CAMERA_BC_YAW, 0 );
-	SetPoseParameter( SECURITY_CAMERA_BC_PITCH, 0 );
+	GetEngineObject()->SetPoseParameter( SECURITY_CAMERA_BC_YAW, 0 );
+	GetEngineObject()->SetPoseParameter( SECURITY_CAMERA_BC_PITCH, 0 );
 
 	//Set our autostart state
 	m_bAutoStart = !!(GetEngineObject()->GetSpawnFlags() & SF_SECURITY_CAMERA_AUTOACTIVATE );
@@ -498,7 +498,7 @@ void CNPC_SecurityCamera::Deploy( void )
 		m_OnDeploy.FireOutput( NULL, this );
 	}
 
-	m_flPlaybackRate = 0;
+	GetEngineObject()->SetPlaybackRate(0);
 	SetThink( &CNPC_SecurityCamera::SearchThink );
 
 	//EmitSound( "NPC_SecurityCamera.Move" );
@@ -577,12 +577,12 @@ bool CNPC_SecurityCamera::UpdateFacing( void )
 		}
 
 		// Update pitch
-		int iPose = LookupPoseParameter( SECURITY_CAMERA_BC_PITCH );
-		SetPoseParameter( iPose, m_vecCurrentAngles.x );
+		int iPose = GetEngineObject()->LookupPoseParameter( SECURITY_CAMERA_BC_PITCH );
+		GetEngineObject()->SetPoseParameter( iPose, m_vecCurrentAngles.x );
 
 		// Update yaw
-		iPose = LookupPoseParameter( SECURITY_CAMERA_BC_YAW );
-		SetPoseParameter( iPose, m_vecCurrentAngles.y );
+		iPose = GetEngineObject()->LookupPoseParameter( SECURITY_CAMERA_BC_YAW );
+		GetEngineObject()->SetPoseParameter( iPose, m_vecCurrentAngles.y );
 
 		InvalidateBoneCache();
 	}
@@ -1086,7 +1086,7 @@ void CNPC_SecurityCamera::DeathThink( void )
 
 	if ( !UpdateFacing() )
 	{
-		m_flPlaybackRate = 0;
+		GetEngineObject()->SetPlaybackRate(0);
 		SetThink( NULL );
 	}
 }

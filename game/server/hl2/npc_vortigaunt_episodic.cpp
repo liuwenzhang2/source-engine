@@ -466,7 +466,7 @@ void CNPC_Vortigaunt::RunTask( const Task_t *pTask )
 
 	case TASK_VORTIGAUNT_DISPEL_ANTLIONS:
 	{
-		if ( IsSequenceFinished() )
+		if (GetEngineObject()->IsSequenceFinished() )
 		{
 			TaskComplete();
 		}

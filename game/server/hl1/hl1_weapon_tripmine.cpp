@@ -81,8 +81,8 @@ void CWeaponTripMine::Spawn( void )
 	SetModel( TRIPMINE_MODEL );
 
 	SetActivity( ACT_TRIPMINE_GROUND );
-	ResetSequenceInfo( );
-	m_flPlaybackRate = 0;
+	GetEngineObject()->ResetSequenceInfo( );
+	GetEngineObject()->SetPlaybackRate(0);
 
 	if ( !g_pGameRules->IsDeathmatch() )
 	{
@@ -302,10 +302,10 @@ void CTripmineGrenade::Spawn( void )
 	// Don't collide with the player (the beam will still be tripped by one, however)
 	GetEngineObject()->SetCollisionGroup( COLLISION_GROUP_WEAPON );
 
-	SetCycle( 0 );
-	SetSequence( SelectWeightedSequence( ACT_TRIPMINE_WORLD ) );
-	ResetSequenceInfo();
-	m_flPlaybackRate = 0;
+	GetEngineObject()->SetCycle( 0 );
+	GetEngineObject()->SetSequence( SelectWeightedSequence( ACT_TRIPMINE_WORLD ) );
+	GetEngineObject()->ResetSequenceInfo();
+	GetEngineObject()->SetPlaybackRate(0);
 	
 	UTIL_SetSize( this, Vector( -8, -8, -8), Vector(8, 8, 8) );
 

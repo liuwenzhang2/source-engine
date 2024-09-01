@@ -163,7 +163,7 @@ void CRagdollProp::Spawn( void )
 	Precache();
 	SetModel( STRING(GetEngineObject()->GetModelName() ) );
 
-	IStudioHdr *pStudioHdr = GetModelPtr( );
+	IStudioHdr *pStudioHdr = GetEngineObject()->GetModelPtr( );
 	if ( pStudioHdr->flags() & STUDIOHDR_FLAGS_NO_FORCED_FADE )
 	{
 		DisableAutoFade();
@@ -298,18 +298,18 @@ int CRagdollProp::ObjectCaps()
 void CRagdollProp::InitRagdollAnimation()
 {
 	GetEngineObject()->SetAnimTime(gpGlobals->curtime);
-	m_flPlaybackRate = 0.0;
-	SetCycle( 0 );
+	GetEngineObject()->SetPlaybackRate(0.0);
+	GetEngineObject()->SetCycle( 0 );
 	
 	// put into ACT_DIERAGDOLL if it exists, otherwise use sequence 0
 	int nSequence = SelectWeightedSequence( ACT_DIERAGDOLL );
 	if ( nSequence < 0 )
 	{
-		ResetSequence( 0 );
+		GetEngineObject()->ResetSequence( 0 );
 	}
 	else
 	{
-		ResetSequence( nSequence );
+		GetEngineObject()->ResetSequence( nSequence );
 	}
 }
 
@@ -538,7 +538,7 @@ void CRagdollProp::VPhysicsCollision( int index, gamevcollisionevent_t *pEvent )
 bool CRagdollProp::HasPhysgunInteraction( const char *pszKeyName, const char *pszValue )
 {
 	KeyValues *modelKeyValues = new KeyValues("");
-	if ( modelKeyValues->LoadFromBuffer( modelinfo->GetModelName( GetModel() ), modelinfo->GetModelKeyValueText( GetModel() ) ) )
+	if ( modelKeyValues->LoadFromBuffer( modelinfo->GetModelName(GetEngineObject()->GetModel() ), modelinfo->GetModelKeyValueText(GetEngineObject()->GetModel() ) ) )
 	{
 		KeyValues *pkvPropData = modelKeyValues->FindKey("physgun_interactions");
 		if ( pkvPropData )
@@ -693,7 +693,7 @@ void CRagdollProp::InitRagdoll( const Vector &forceVector, int forceBone, const 
 	params.pGameData = static_cast<void *>( static_cast<CBaseEntity *>(this) );
 	params.modelIndex = GetEngineObject()->GetModelIndex();
 	params.pCollide = modelinfo->GetVCollide( params.modelIndex );
-	params.pStudioHdr = GetModelPtr();
+	params.pStudioHdr = GetEngineObject()->GetModelPtr();
 	params.forceVector = forceVector;
 	params.forceBoneIndex = forceBone;
 	params.forcePosition = forcePos;
@@ -835,7 +835,7 @@ void CRagdollProp::SetupBones( matrix3x4_t *pBoneToWorld, int boneMask )
 	GetEngineObject()->UpdateModelScale();
 
 	MDLCACHE_CRITICAL_SECTION();
-	IStudioHdr *pStudioHdr = GetModelPtr( );
+	IStudioHdr *pStudioHdr = GetEngineObject()->GetModelPtr( );
 	bool sim[MAXSTUDIOBONES];
 	memset( sim, 0, pStudioHdr->numbones() );
 
@@ -879,7 +879,7 @@ bool CRagdollProp::TestCollision( const Ray_t &ray, unsigned int mask, trace_t& 
 	}
 #endif
 
-	IStudioHdr *pStudioHdr = GetModelPtr( );
+	IStudioHdr *pStudioHdr = GetEngineObject()->GetModelPtr( );
 	if (!pStudioHdr)
 		return false;
 
@@ -1276,7 +1276,7 @@ CBaseAnimating *CreateServerRagdollSubmodel( CBaseAnimating *pOwner, const char 
 	pRagdoll->GetEngineObject()->SetModelName( AllocPooledString( pModelName ) );
 	pRagdoll->SetModel( STRING(pRagdoll->GetEngineObject()->GetModelName()) );
 	matrix3x4_t pBoneToWorld[MAXSTUDIOBONES], pBoneToWorldNext[MAXSTUDIOBONES];
-	pRagdoll->ResetSequence( 0 );
+	pRagdoll->GetEngineObject()->ResetSequence( 0 );
 
 	// let bone merging do the work of copying everything over for us
 	pRagdoll->GetEngineObject()->SetParent( pOwner?pOwner->GetEngineObject():NULL );
@@ -1326,8 +1326,8 @@ CBaseEntity *CreateServerRagdoll( CBaseAnimating *pAnimating, int forceBone, con
 	// UNDONE: For now, just move each bone by the total entity velocity if set.
 	// Get Bones positions before
 	// Store current cycle
-	float fSequenceDuration = pAnimating->SequenceDuration( pAnimating->GetSequence() );
-	float fSequenceTime = pAnimating->GetCycle() * fSequenceDuration;		
+	float fSequenceDuration = pAnimating->GetEngineObject()->SequenceDuration( pAnimating->GetEngineObject()->GetSequence() );
+	float fSequenceTime = pAnimating->GetEngineObject()->GetCycle() * fSequenceDuration;
 
 	if( fSequenceTime <= dt && fSequenceTime > 0.0f )
 	{
@@ -1335,15 +1335,15 @@ CBaseEntity *CreateServerRagdoll( CBaseAnimating *pAnimating, int forceBone, con
 		dt = fSequenceTime;
 	}
 
-	float fPreviousCycle = clamp(pAnimating->GetCycle()-( dt * ( 1 / fSequenceDuration ) ),0.f,1.f);
-	float fCurCycle = pAnimating->GetCycle();
+	float fPreviousCycle = clamp(pAnimating->GetEngineObject()->GetCycle()-( dt * ( 1 / fSequenceDuration ) ),0.f,1.f);
+	float fCurCycle = pAnimating->GetEngineObject()->GetCycle();
 	// Get current bones positions
 	pAnimating->SetupBones( pBoneToWorldNext, BONE_USED_BY_ANYTHING );
 	// Get previous bones positions
-	pAnimating->SetCycle( fPreviousCycle );
+	pAnimating->GetEngineObject()->SetCycle( fPreviousCycle );
 	pAnimating->SetupBones( pBoneToWorld, BONE_USED_BY_ANYTHING );		
 	// Restore current cycle
-	pAnimating->SetCycle( fCurCycle );
+	pAnimating->GetEngineObject()->SetCycle( fCurCycle );
 
 	// Reset previous bone flags
 	pAnimating->ClearBoneCacheFlags( BCF_NO_ANIMATION_SKIP );
@@ -1353,16 +1353,16 @@ CBaseEntity *CreateServerRagdoll( CBaseAnimating *pAnimating, int forceBone, con
 	if( ( vel.Length() == 0 ) && ( dt > 0 ) )
 	{
 		// Compute animation velocity
-		IStudioHdr *pstudiohdr = pAnimating->GetModelPtr();
+		IStudioHdr *pstudiohdr = pAnimating->GetEngineObject()->GetModelPtr();
 		if ( pstudiohdr )
 		{
 			Vector deltaPos;
 			QAngle deltaAngles;
 			if (pstudiohdr->Studio_SeqMovement(
-				pAnimating->GetSequence(), 
+				pAnimating->GetEngineObject()->GetSequence(),
 				fPreviousCycle, 
-				pAnimating->GetCycle(), 
-				pAnimating->GetPoseParameterArray(), 
+				pAnimating->GetEngineObject()->GetCycle(),
+				pAnimating->GetEngineObject()->GetPoseParameterArray(),
 				deltaPos, 
 				deltaAngles ))
 			{
@@ -1374,7 +1374,7 @@ CBaseEntity *CreateServerRagdoll( CBaseAnimating *pAnimating, int forceBone, con
 
 	if ( vel.LengthSqr() > 0 )
 	{
-		int numbones = pAnimating->GetModelPtr()->numbones();
+		int numbones = pAnimating->GetEngineObject()->GetModelPtr()->numbones();
 		vel *= dt;
 		for ( int i = 0; i < numbones; i++ )
 		{
@@ -1402,7 +1402,7 @@ CBaseEntity *CreateServerRagdoll( CBaseAnimating *pAnimating, int forceBone, con
 		int count = pAnimating->GetHitboxesFrontside( boxList, ARRAYSIZE(boxList), normal, DotProduct( normal, info.GetDamagePosition() ) );
 		
 		// distribute force over mass of entire character
-		float massScale = pAnimating->GetModelPtr()->Studio_GetMass();
+		float massScale = pAnimating->GetEngineObject()->GetModelPtr()->Studio_GetMass();
 		massScale = clamp( massScale, 1.f, 1.e4f );
 		massScale = 1.f / massScale;
 
@@ -1500,7 +1500,7 @@ void CRagdollPropAttached::InitRagdollAttached(
 	int ragdollAttachedIndex = 0;
 	if ( parentBoneAttach > 0 )
 	{
-		IStudioHdr *pStudioHdr = GetModelPtr();
+		IStudioHdr *pStudioHdr = GetEngineObject()->GetModelPtr();
 		mstudiobone_t *pBone = pStudioHdr->pBone( parentBoneAttach );
 		ragdollAttachedIndex = pBone->physicsbone;
 	}

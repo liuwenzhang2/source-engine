@@ -23,9 +23,9 @@ void CActAnimating::SetActivity( Activity act )
 	int sequence = SelectWeightedSequence( act ); 
 	if ( sequence != ACTIVITY_NOT_AVAILABLE )
 	{
-		ResetSequence( sequence );
+		GetEngineObject()->ResetSequence( sequence );
 		m_Activity = act; 
-		SetCycle( 0 );
+		GetEngineObject()->SetCycle( 0 );
 	}
 }
 

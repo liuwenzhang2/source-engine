@@ -113,8 +113,8 @@ void CDODFireSelectWeapon::SecondaryAttack( void )
 	}
 #endif
 
-	m_flNextSecondaryAttack = gpGlobals->curtime + SequenceDuration();
-	m_flNextPrimaryAttack = gpGlobals->curtime + SequenceDuration();
+	m_flNextSecondaryAttack = gpGlobals->curtime + GetEngineObject()->SequenceDuration();
+	m_flNextPrimaryAttack = gpGlobals->curtime + GetEngineObject()->SequenceDuration();
 }
 
 bool CDODFireSelectWeapon::IsSemiAuto( void )

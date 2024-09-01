@@ -126,7 +126,7 @@ void CAnimationLayer::Init( CBaseAnimatingOverlay *pOverlay )
 
 void CAnimationLayer::StudioFrameAdvance( float flInterval, CBaseAnimating *pOwner )
 {
-	float flCycleRate = pOwner->GetSequenceCycleRate( m_nSequence );
+	float flCycleRate = pOwner->GetEngineObject()->GetSequenceCycleRate( m_nSequence );
 
 	m_flPrevCycle = m_flCycle;
 	m_flCycle += flInterval * flCycleRate * m_flPlaybackRate;
@@ -365,7 +365,7 @@ void CAnimationLayer::DispatchAnimEvents( CBaseAnimating *eventHandler, CBaseAni
 {
   	animevent_t	event;
 
-	IStudioHdr *pstudiohdr = pOwner->GetModelPtr( );
+	IStudioHdr *pstudiohdr = pOwner->GetEngineObject()->GetModelPtr( );
 
 	if ( !pstudiohdr )
 	{
@@ -388,7 +388,7 @@ void CAnimationLayer::DispatchAnimEvents( CBaseAnimating *eventHandler, CBaseAni
 	}
 
 	// look from when it last checked to some short time in the future	
-	float flCycleRate = pOwner->GetSequenceCycleRate( m_nSequence ) * m_flPlaybackRate;
+	float flCycleRate = pOwner->GetEngineObject()->GetSequenceCycleRate( m_nSequence ) * m_flPlaybackRate;
 	float flStart = m_flLastEventCheck;
 	float flEnd = m_flCycle;
 
@@ -447,10 +447,10 @@ void CBaseAnimatingOverlay::GetSkeleton( IStudioHdr *pStudioHdr, Vector pos[], Q
 		return;
 	}
 
-	IBoneSetup boneSetup( pStudioHdr, boneMask, GetPoseParameterArray() );
+	IBoneSetup boneSetup( pStudioHdr, boneMask, GetEngineObject()->GetPoseParameterArray() );
 	boneSetup.InitPose( pos, q );
 
-	boneSetup.AccumulatePose( pos, q, GetSequence(), GetCycle(), 1.0, gpGlobals->curtime, m_pIk );
+	boneSetup.AccumulatePose( pos, q, GetEngineObject()->GetSequence(), GetEngineObject()->GetCycle(), 1.0, gpGlobals->curtime, m_pIk );
 
 	// sort the layers
 	int layer[MAX_OVERLAYS] = {};
@@ -487,7 +487,7 @@ void CBaseAnimatingOverlay::GetSkeleton( IStudioHdr *pStudioHdr, Vector pos[], Q
 	{
 		boneSetup.CalcAutoplaySequences( pos, q, gpGlobals->curtime, NULL );
 	}
-	boneSetup.CalcBoneAdj( pos, q, GetEncodedControllerArray() );
+	boneSetup.CalcBoneAdj( pos, q, GetEngineObject()->GetEncodedControllerArray() );
 }
 
 
@@ -516,7 +516,7 @@ void CBaseAnimatingOverlay::OnRestore( )
 	for (i = 0; i < m_AnimOverlay.Count(); i++)
 	{
 		if ( ( m_AnimOverlay[i].IsActive() && (m_AnimOverlay[i].m_fFlags & ANIM_LAYER_DONTRESTORE) ) ||
-			 ( GetModelPtr() && !IsValidSequence(m_AnimOverlay[i].m_nSequence) ) )
+			 (GetEngineObject()->GetModelPtr() && !IsValidSequence(m_AnimOverlay[i].m_nSequence) ) )
 		{
 			FastRemoveLayer( i );
 		}
@@ -553,7 +553,7 @@ int CBaseAnimatingOverlay::AddGestureSequence( int nSequence, float flDuration, 
 
 	if (iLayer >= 0 && flDuration > 0)
 	{
-		m_AnimOverlay[iLayer].m_flPlaybackRate = SequenceDuration( nSequence ) / flDuration;
+		m_AnimOverlay[iLayer].m_flPlaybackRate = GetEngineObject()->SequenceDuration( nSequence ) / flDuration;
 	}
 	return iLayer;
 }
@@ -607,7 +607,7 @@ void CBaseAnimatingOverlay::SetLayerDuration( int iLayer, float flDuration )
 {
 	if (IsValidLayer( iLayer ) && flDuration > 0)
 	{
-		m_AnimOverlay[iLayer].m_flPlaybackRate = SequenceDuration( m_AnimOverlay[iLayer].m_nSequence ) / flDuration;
+		m_AnimOverlay[iLayer].m_flPlaybackRate = GetEngineObject()->SequenceDuration( m_AnimOverlay[iLayer].m_nSequence ) / flDuration;
 	}
 }
 
@@ -624,9 +624,9 @@ float CBaseAnimatingOverlay::GetLayerDuration( int iLayer )
 	{
 		if (m_AnimOverlay[iLayer].m_flPlaybackRate != 0.0f)
 		{
-			return (1.0 - m_AnimOverlay[iLayer].m_flCycle) * SequenceDuration( m_AnimOverlay[iLayer].m_nSequence ) / m_AnimOverlay[iLayer].m_flPlaybackRate;
+			return (1.0 - m_AnimOverlay[iLayer].m_flCycle) * GetEngineObject()->SequenceDuration( m_AnimOverlay[iLayer].m_nSequence ) / m_AnimOverlay[iLayer].m_flPlaybackRate;
 		}
-		return SequenceDuration( m_AnimOverlay[iLayer].m_nSequence );
+		return GetEngineObject()->SequenceDuration( m_AnimOverlay[iLayer].m_nSequence );
 	}
 	return 0.0;
 }
@@ -652,7 +652,7 @@ int	CBaseAnimatingOverlay::AddLayeredSequence( int sequence, int iPriority )
 		m_AnimOverlay[i].m_flBlendOut = 0.0f;
 		m_AnimOverlay[i].m_bSequenceFinished = false;
 		m_AnimOverlay[i].m_flLastEventCheck = 0;
-		m_AnimOverlay[i].m_bLooping = ((GetModelPtr()->GetSequenceFlags( sequence ) & STUDIO_LOOPING) != 0);
+		m_AnimOverlay[i].m_bLooping = ((GetEngineObject()->GetModelPtr()->GetSequenceFlags( sequence ) & STUDIO_LOOPING) != 0);
 		if (ai_sequence_debug.GetBool() == true && m_debugOverlays & OVERLAY_NPC_SELECTED_BIT)
 		{
 			Msg("%5.3f : adding %d (%d): %s : %5.3f (%.3f)\n", gpGlobals->curtime, i, m_AnimOverlay[ i ].m_nOrder.Get(), GetSequenceName( m_AnimOverlay[ i ].m_nSequence ), m_AnimOverlay[ i ].m_flCycle.Get(), m_AnimOverlay[ i ].m_flWeight.Get() );

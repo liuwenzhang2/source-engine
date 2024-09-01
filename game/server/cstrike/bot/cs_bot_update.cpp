@@ -1042,7 +1042,7 @@ void CCSBot::DebugDisplay( void ) const
 	// show aim targets
 	if (false)
 	{
-		IStudioHdr *pStudioHdr = const_cast< CCSBot *>( this )->GetModelPtr();
+		IStudioHdr *pStudioHdr = const_cast< CCSBot *>( this )->GetEngineObject()->GetModelPtr();
 		if ( !pStudioHdr )
 			return;
 

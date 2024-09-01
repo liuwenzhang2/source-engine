@@ -113,11 +113,11 @@ void CPropThumper::Spawn( void )
 
 	if ( iSequence != ACT_INVALID )
 	{
-		 SetSequence( iSequence );
-		 ResetSequenceInfo();
+		GetEngineObject()->SetSequence( iSequence );
+		GetEngineObject()->ResetSequenceInfo();
 
 		 //Do this so we get the nice ramp-up effect.
-		 m_flPlaybackRate = random->RandomFloat( 0.0f, 1.0f);
+		GetEngineObject()->SetPlaybackRate(random->RandomFloat( 0.0f, 1.0f));
 	}
 
 	m_iHammerAttachment = LookupAttachment( "hammer" );
@@ -171,14 +171,14 @@ void CPropThumper::HandleState( void )
 {
 	if ( m_bEnabled == false )
 	{
-		 m_flPlaybackRate = MAX( m_flPlaybackRate - STATE_CHANGE_MODIFIER, 0.0f );
+		GetEngineObject()->SetPlaybackRate(MAX(GetEngineObject()->GetPlaybackRate() - STATE_CHANGE_MODIFIER, 0.0f));
 	}
 	else
 	{
- 		 m_flPlaybackRate = MIN( m_flPlaybackRate + STATE_CHANGE_MODIFIER, 1.0f );
+		GetEngineObject()->SetPlaybackRate(MIN(GetEngineObject()->GetPlaybackRate() + STATE_CHANGE_MODIFIER, 1.0f));
 	}
 
-	(CSoundEnvelopeController::GetController()).Play( m_sndMotor, 1.0f, m_flPlaybackRate * 100 );
+	(CSoundEnvelopeController::GetController()).Play( m_sndMotor, 1.0f, GetEngineObject()->GetPlaybackRate() * 100 );
 }
 
 void CPropThumper::Think( void )
@@ -204,9 +204,9 @@ void CPropThumper::Thump ( void )
 
 		data.m_nEntIndex = entindex();
 		data.m_vOrigin = vOrigin;
-		data.m_flScale = m_iDustScale * m_flPlaybackRate;
+		data.m_flScale = m_iDustScale * GetEngineObject()->GetPlaybackRate();
 		DispatchEffect( "ThumperDust", data );
-		UTIL_ScreenShake( vOrigin, 10.0 * m_flPlaybackRate, m_flPlaybackRate, m_flPlaybackRate / 2, THUMPER_RADIUS * m_flPlaybackRate, SHAKE_START, false );
+		UTIL_ScreenShake( vOrigin, 10.0 * GetEngineObject()->GetPlaybackRate(), GetEngineObject()->GetPlaybackRate(), GetEngineObject()->GetPlaybackRate() / 2, THUMPER_RADIUS * GetEngineObject()->GetPlaybackRate(), SHAKE_START, false);
 	}
 
 	{
@@ -220,7 +220,7 @@ void CPropThumper::Thump ( void )
 		params.m_bWarnOnDirectWaveReference = true;
 		g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 	}
-	CSoundEnt::InsertSound ( SOUND_THUMPER, GetEngineObject()->GetAbsOrigin(), THUMPER_RADIUS * m_flPlaybackRate, THUMPER_SOUND_DURATION, this );
+	CSoundEnt::InsertSound ( SOUND_THUMPER, GetEngineObject()->GetAbsOrigin(), THUMPER_RADIUS * GetEngineObject()->GetPlaybackRate(), THUMPER_SOUND_DURATION, this);
 
 	if ( thumper_show_radius.GetBool() )
 	{
@@ -228,7 +228,7 @@ void CPropThumper::Thump ( void )
 			255, 64, 64, 255, THUMPER_SOUND_DURATION );
 	}
 
-	if ( m_flPlaybackRate < 0.7f )
+	if (GetEngineObject()->GetPlaybackRate() < 0.7f )
 		 return;
 
 	const char* soundname = "";

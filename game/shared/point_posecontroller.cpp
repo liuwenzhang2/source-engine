@@ -122,7 +122,7 @@ void CPoseController::BuildPropList( void )
 			}
 
 			// Update the pose parameter index
-			SetPoseIndex( iPropNum, pProp->LookupPoseParameter( m_iszPoseParameterName.ToCStr() ) );
+			SetPoseIndex( iPropNum, pProp->GetEngineObject()->LookupPoseParameter( m_iszPoseParameterName.ToCStr() ) );
 			
 			++iPropNum;
 		}
@@ -152,7 +152,7 @@ void CPoseController::BuildPoseIndexList( void )
 		if ( pProp )
 		{
 			// Update the pose parameter index
-			SetPoseIndex( iPropNum, pProp->LookupPoseParameter( m_iszPoseParameterName.ToCStr() ) );
+			SetPoseIndex( iPropNum, pProp->GetEngineObject()->LookupPoseParameter( m_iszPoseParameterName.ToCStr() ) );
 		}
 	}
 }
@@ -187,7 +187,7 @@ void CPoseController::SetProp( CBaseAnimating *pProp )
 	}
 
 	// Update the pose parameter index
-	SetPoseIndex( 0, pProp->LookupPoseParameter( m_iszPoseParameterName.ToCStr() ) );
+	SetPoseIndex( 0, pProp->GetEngineObject()->LookupPoseParameter( m_iszPoseParameterName.ToCStr() ) );
 
 	// Nullify the remaining handles
 	for ( int iPropNum = 1; iPropNum < MAX_POSE_CONTROLLED_PROPS; ++iPropNum )
@@ -538,8 +538,8 @@ void CPoseController::SetCurrentPose( float fCurrentPoseValue )
 			float fPoseValueMax;
 
 			// Map to the pose parameter's range
-			pProp->GetPoseParameterRange( m_chPoseIndex[ iPropNum ], fPoseValueMin, fPoseValueMax );
-			pProp->SetPoseParameter( m_chPoseIndex[ iPropNum ], fPoseValueMin + fCurrentPoseValue * ( fPoseValueMax - fPoseValueMin ) );
+			pProp->GetEngineObject()->GetPoseParameterRange( m_chPoseIndex[ iPropNum ], fPoseValueMin, fPoseValueMax );
+			pProp->GetEngineObject()->SetPoseParameter( m_chPoseIndex[ iPropNum ], fPoseValueMin + fCurrentPoseValue * ( fPoseValueMax - fPoseValueMin ) );
 		}
 	}
 }

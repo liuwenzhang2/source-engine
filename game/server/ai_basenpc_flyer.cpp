@@ -71,7 +71,7 @@ void CAI_BaseFlyingBot::TurnHeadToTarget(float flInterval, const Vector &MoveTar
 	}
 
 	// Set us to face that way
-	SetBoneController( 0, m_fHeadYaw );
+	GetEngineObject()->SetBoneController( 0, m_fHeadYaw );
 }
 
 //------------------------------------------------------------------------------

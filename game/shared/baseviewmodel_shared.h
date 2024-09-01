@@ -153,7 +153,7 @@ public:
 	// Add entity to visible view models list?
 	virtual void			AddEntity( void );
 
-	virtual void			GetBoneControllers(float controllers[MAXSTUDIOBONECTRLS]);
+	//virtual void			GetBoneControllers(float controllers[MAXSTUDIOBONECTRLS]);
 
 	// See C_StudioModel's definition of this.
 	virtual void			UncorrectViewModelAttachment( Vector &vOrigin );

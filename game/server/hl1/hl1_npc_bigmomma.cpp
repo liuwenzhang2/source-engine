@@ -686,10 +686,10 @@ void CNPC_BigMomma::StartTask( const Task_t *pTask )
 				if ( iSequence != -1 )
 				{
 					SetIdealActivity( ACT_DO_NOT_DISTURB );
-					SetSequence( iSequence );
-					SetCycle( 0.0f );
+					GetEngineObject()->SetSequence( iSequence );
+					GetEngineObject()->SetCycle( 0.0f );
 
-					ResetSequenceInfo();
+					GetEngineObject()->ResetSequenceInfo();
 					//Msg( "BM: Sequence %s %f\n", GetNodeSequence(), gpGlobals->curtime );
 					return;
 				}
@@ -807,7 +807,7 @@ void CNPC_BigMomma::RunTask( const Task_t *pTask )
 	case TASK_PLAY_NODE_PRESEQUENCE:
 	case TASK_PLAY_NODE_SEQUENCE:
 
-		if ( IsSequenceFinished() )
+		if (GetEngineObject()->IsSequenceFinished() )
 		{
 			CBaseEntity *pTarget = NULL;
 
@@ -1168,7 +1168,7 @@ void CBMortar:: Spawn( void )
 
 	UTIL_SetSize( this, Vector( 0, 0, 0), Vector(0, 0, 0) );
 
-	m_maxFrame = (float)modelinfo->GetModelFrameCount( GetModel() ) - 1;
+	m_maxFrame = (float)modelinfo->GetModelFrameCount(GetEngineObject()->GetModel() ) - 1;
 	m_flDmgTime = gpGlobals->curtime + 0.4;
 }
 

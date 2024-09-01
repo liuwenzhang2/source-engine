@@ -415,7 +415,7 @@ void CPropVehicleChoreoGeneric::Think(void)
 		BaseClass::Think();
 		
 		// If the enter or exit animation has finished, tell the server vehicle
-		if ( IsSequenceFinished() && (m_bExitAnimOn || m_bEnterAnimOn) )
+		if (GetEngineObject()->IsSequenceFinished() && (m_bExitAnimOn || m_bEnterAnimOn) )
 		{
 			GetServerVehicle()->HandleEntryExitFinish( m_bExitAnimOn, true );
 		}
@@ -436,16 +436,16 @@ void CPropVehicleChoreoGeneric::InputOpen( inputdata_t &inputdata )
 	// Set to the desired anim, or default anim if the desired is not present
 	if ( nSequence > ACTIVITY_NOT_AVAILABLE )
 	{
-		SetCycle( 0 );
+		GetEngineObject()->SetCycle( 0 );
 		GetEngineObject()->SetAnimTime(gpGlobals->curtime);
-		ResetSequence( nSequence );
-		ResetClientsideFrame();
+		GetEngineObject()->ResetSequence( nSequence );
+		GetEngineObject()->ResetClientsideFrame();
 	}
 	else
 	{
 		// Not available try to get default anim
 		Msg( "Choreo Generic Vehicle %s: missing open sequence\n", GetDebugName() );
-		SetSequence( 0 );
+		GetEngineObject()->SetSequence( 0 );
 	}
 }
 
@@ -463,16 +463,16 @@ void CPropVehicleChoreoGeneric::InputClose( inputdata_t &inputdata )
 	// Set to the desired anim, or default anim if the desired is not present
 	if ( nSequence > ACTIVITY_NOT_AVAILABLE )
 	{
-		SetCycle( 0 );
+		GetEngineObject()->SetCycle( 0 );
 		GetEngineObject()->SetAnimTime(gpGlobals->curtime);
-		ResetSequence( nSequence );
-		ResetClientsideFrame();
+		GetEngineObject()->ResetSequence( nSequence );
+		GetEngineObject()->ResetClientsideFrame();
 	}
 	else
 	{
 		// Not available try to get default anim
 		Msg( "Choreo Generic Vehicle %s: missing close sequence\n", GetDebugName() );
-		SetSequence( 0 );
+		GetEngineObject()->SetSequence( 0 );
 	}
 }
 

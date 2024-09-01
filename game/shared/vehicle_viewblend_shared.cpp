@@ -236,7 +236,7 @@ void SharedVehicleViewSmoothing(CBasePlayer *pPlayer,
 	{
 		pData->bRunningEnterExit = true;
 		pData->flEnterExitStartTime = gpGlobals->curtime;
-		pData->flEnterExitDuration = pData->pVehicle->SequenceDuration( pData->pVehicle->GetSequence() );
+		pData->flEnterExitDuration = pData->pVehicle->GetEngineObject()->SequenceDuration( pData->pVehicle->GetEngineObject()->GetSequence() );
 
 #ifdef CLIENT_DLL
 		pData->vecOriginSaved = PrevMainViewOrigin();

@@ -497,10 +497,9 @@ public:
 	virtual void Spawn( void );
 	virtual void Precache( void ) {}
 
-	const model_t* GetModel(void) const;
+
 	virtual void SetModel( const char *szModelName );
-	void SetModelPointer(const model_t* pModel);
-protected:
+public:
 	// Notification on model load. May be called multiple times for dynamic models.
 	// Implementations must call BaseClass::OnNewModel and pass return value through.
 	virtual IStudioHdr *OnNewModel();
@@ -703,7 +702,6 @@ public:
 	virtual int	Restore( IRestore &restore ) 
 	{ 
 		int status= GetEngineObject()->Restore(restore);
-		m_pModel = modelinfo->GetModel(GetEngineObject()->GetModelIndex());
 		return status;
 	}
 	virtual bool ShouldSavePhysics();
@@ -802,7 +800,6 @@ public:
 	void SetRenderColorB( byte b );
 	void SetRenderColorA( byte a );
 
-	const model_t* m_pModel;
 
 	// was pev->animtime:  consider moving to CBaseAnimating
 	float		m_flPrevAnimTime;
@@ -818,7 +815,7 @@ public:
 //	CNetworkVar( CPredictableId, m_PredictableID );
 //#endif
 
-
+	void OnResetSequence(int nSequence) {}
 
 protected:
 

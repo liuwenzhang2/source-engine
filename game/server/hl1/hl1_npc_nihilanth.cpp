@@ -310,8 +310,8 @@ void CNPC_Nihilanth::Spawn( void )
 
 	m_flFieldOfView = -1; // 360 degrees
 
-	SetSequence( 0 );
-	ResetSequenceInfo( );
+	GetEngineObject()->SetSequence( 0 );
+	GetEngineObject()->ResetSequenceInfo( );
 
 	InitBoneControllers();
 
@@ -549,7 +549,7 @@ void CNPC_Nihilanth::HuntThink( void )
 	if ( m_bDead )
 	{
 		SetThink( &CNPC_Nihilanth::DyingThink );
-		SetCycle( 1.0f );
+		GetEngineObject()->SetCycle( 1.0f );
 
 		StudioFrameAdvance();
 		return;
@@ -564,13 +564,13 @@ void CNPC_Nihilanth::HuntThink( void )
 	}
 
 	// get new sequence
-	if ( IsSequenceFinished() )
+	if (GetEngineObject()->IsSequenceFinished() )
 	{
-		SetCycle( 0 );
+		GetEngineObject()->SetCycle( 0 );
 
 		NextActivity( );
-		ResetSequenceInfo( );
-		m_flPlaybackRate = 2.0 - 1.0 * ( m_iHealth / sk_nihilanth_health.GetFloat() );
+		GetEngineObject()->ResetSequenceInfo( );
+		GetEngineObject()->SetPlaybackRate(2.0 - 1.0 * ( m_iHealth / sk_nihilanth_health.GetFloat() ));
 	}
 
 	// look for current enemy	
@@ -767,7 +767,7 @@ void CNPC_Nihilanth::NextActivity( )
 		{
 			int iseq = LookupSequence( "recharge" );
 
-			if (iseq != GetSequence())
+			if (iseq != GetEngineObject()->GetSequence())
 			{
 				char szText[64];
 
@@ -776,7 +776,7 @@ void CNPC_Nihilanth::NextActivity( )
 
 				Msg( "fireing %s\n", szText );
 			}
-			SetSequence ( LookupSequence( "recharge" ) );
+			GetEngineObject()->SetSequence ( LookupSequence( "recharge" ) );
 		}
 		else
 		{
@@ -807,13 +807,13 @@ void CNPC_Nihilanth::NextActivity( )
 		{
 			if (m_irritation >= 2 && m_iHealth < sk_nihilanth_health.GetFloat() / 2.0)
 			{
-				SetSequence( LookupSequence( "attack1_open" ) );
+				GetEngineObject()->SetSequence( LookupSequence( "attack1_open" ) );
 			}
 			else 
 			{
 				if ( random->RandomInt(0, 1 ) == 0)
 				{
-					SetSequence( LookupSequence( "attack1" ) ); // zap
+					GetEngineObject()->SetSequence( LookupSequence( "attack1" ) ); // zap
 				}
 				else
 				{
@@ -827,12 +827,12 @@ void CNPC_Nihilanth::NextActivity( )
 
 					if (pTrigger != NULL || pTouch != NULL)
 					{
-						SetSequence( LookupSequence( "attack2" ) ); // teleport
+						GetEngineObject()->SetSequence( LookupSequence( "attack2" ) ); // teleport
 					}
 					else
 					{
 						m_iTeleport++;
-						SetSequence( LookupSequence( "attack1" ) ); // zap
+						GetEngineObject()->SetSequence( LookupSequence( "attack1" ) ); // zap
 					}
 				}
 			}
@@ -960,27 +960,27 @@ void CNPC_Nihilanth::FloatSequence( void )
 {
 	if (m_irritation >= 2)
 	{
-		SetSequence( LookupSequence( "float_open" ) );
+		GetEngineObject()->SetSequence( LookupSequence( "float_open" ) );
 	}
 	else if (m_avelocity.y > 30)
 	{
-		SetSequence( LookupSequence( "walk_r" ) );
+		GetEngineObject()->SetSequence( LookupSequence( "walk_r" ) );
 	}
 	else if (m_avelocity.y < -30)
 	{
-		SetSequence( LookupSequence( "walk_l" ) );
+		GetEngineObject()->SetSequence( LookupSequence( "walk_l" ) );
 	}
 	else if (m_velocity.z > 30)
 	{
-		SetSequence( LookupSequence( "walk_u" ) );
+		GetEngineObject()->SetSequence( LookupSequence( "walk_u" ) );
 	} 
 	else if (m_velocity.z < -30)
 	{
-		SetSequence( LookupSequence( "walk_d" ) );
+		GetEngineObject()->SetSequence( LookupSequence( "walk_d" ) );
 	}
 	else
 	{
-		SetSequence( LookupSequence( "float" ) );
+		GetEngineObject()->SetSequence( LookupSequence( "float" ) );
 	}
 }
 
@@ -1026,7 +1026,7 @@ void CNPC_Nihilanth::DyingThink( void )
 		}
 	}
 
-	if ( IsSequenceFinished() )
+	if (GetEngineObject()->IsSequenceFinished() )
 	{
 		QAngle qAngularVel = GetLocalAngularVelocity();
 
@@ -1038,7 +1038,7 @@ void CNPC_Nihilanth::DyingThink( void )
 			 qAngularVel.y = 100;
 
 		SetLocalAngularVelocity( qAngularVel );
-		SetSequence( LookupSequence( "die1" ) );
+		GetEngineObject()->SetSequence( LookupSequence( "die1" ) );
 	}
 
 	if ( m_pBall )

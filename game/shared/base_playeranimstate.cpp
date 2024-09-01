@@ -133,7 +133,7 @@ void CBasePlayerAnimState::Update( float eyeYaw, float eyePitch )
 	}
 	
 	
-	IStudioHdr *pStudioHdr = GetOuter()->GetModelPtr();
+	IStudioHdr *pStudioHdr = GetOuter()->GetEngineObject()->GetModelPtr();
 	// Store these. All the calculations are based on them.
 	m_flEyeYaw = AngleNormalize( eyeYaw );
 	m_flEyePitch = AngleNormalize( eyePitch );
@@ -201,7 +201,7 @@ bool CBasePlayerAnimState::ShouldChangeSequences( void ) const
 void CBasePlayerAnimState::SetOuterPoseParameter( int iParam, float flValue )
 {
 	// Make sure to set all the history values too, otherwise the server can overwrite them.
-	GetOuter()->SetPoseParameter( iParam, flValue );
+	GetOuter()->GetEngineObject()->SetPoseParameter( iParam, flValue );
 }
 
 
@@ -227,7 +227,7 @@ void CBasePlayerAnimState::RestartMainSequence()
 	CBaseAnimatingOverlay *pPlayer = GetOuter();
 
 	pPlayer->GetEngineObject()->SetAnimTime(gpGlobals->curtime);
-	pPlayer->SetCycle( 0 );
+	pPlayer->GetEngineObject()->SetCycle( 0 );
 }
 
 
@@ -269,14 +269,14 @@ void CBasePlayerAnimState::ComputeMainSequence()
 	int animDesired = SelectWeightedSequence( TranslateActivity(idealActivity) );
 
 #if !defined( HL1_CLIENT_DLL ) && !defined ( HL1_DLL )
-	if ( pPlayer->GetSequenceActivity( pPlayer->GetSequence() ) == pPlayer->GetSequenceActivity( animDesired ) )
+	if ( pPlayer->GetSequenceActivity( pPlayer->GetEngineObject()->GetSequence() ) == pPlayer->GetSequenceActivity( animDesired ) )
 		return;
 #endif
 
 	if ( animDesired < 0 )
 		 animDesired = 0;
 
-	pPlayer->ResetSequence( animDesired );
+	pPlayer->GetEngineObject()->ResetSequence( animDesired );
 
 #ifdef CLIENT_DLL
 	// If we went from idle to walk, reset the interpolation history.
@@ -310,17 +310,17 @@ void CBasePlayerAnimState::UpdateAimSequenceLayers(
 	// It will hand back either 1 or 2 animations in the queue to set, depending on whether
 	// it's transitioning or not. We just dump those into the animation layers.
 	pTransitioner->CheckForSequenceChange(
-		m_pOuter->GetModelPtr(),
+		m_pOuter->GetEngineObject()->GetModelPtr(),
 		iAimSequence,
 		false,	// don't force transitions on the same anim
 		true	// yes, interpolate when transitioning
 		);
 
 	pTransitioner->UpdateCurrent(
-		m_pOuter->GetModelPtr(),
+		m_pOuter->GetEngineObject()->GetModelPtr(),
 		iAimSequence,
 		flCycle,
-		GetOuter()->GetPlaybackRate(),
+		GetOuter()->GetEngineObject()->GetPlaybackRate(),
 		gpGlobals->curtime
 		);
 
@@ -434,7 +434,7 @@ void CBasePlayerAnimState::ComputeAimSequence()
 	VPROF( "CBasePlayerAnimState::ComputeAimSequence" );
 
 	// Synchronize the lower and upper body cycles.
-	float flCycle = m_pOuter->GetCycle();
+	float flCycle = m_pOuter->GetEngineObject()->GetCycle();
 
 	// Figure out the new cycle time.
 	UpdateAimSequenceLayers( flCycle, AIMSEQUENCE_LAYER, true, &m_IdleSequenceTransitioner, 1 );
@@ -546,9 +546,9 @@ void CBasePlayerAnimState::ComputePlaybackRate()
 		bool bIsMoving;
 		float flRate = CalcMovementPlaybackRate( &bIsMoving );
 		if ( bIsMoving )
-			GetOuter()->SetPlaybackRate( flRate );
+			GetOuter()->GetEngineObject()->SetPlaybackRate( flRate );
 		else
-			GetOuter()->SetPlaybackRate( 1 );
+			GetOuter()->GetEngineObject()->SetPlaybackRate( 1 );
 	}
 }
 
@@ -640,8 +640,8 @@ void CBasePlayerAnimState::ComputePoseParam_MoveYaw( IStudioHdr *pStudioHdr )
 		GetOuter()->GetEngineObject()->SetLocalAngles( QAngle( 0, m_flCurrentFeetYaw, 0 ) );
 #endif
 
-		int iMoveX = GetOuter()->LookupPoseParameter( pStudioHdr, "move_x" );
-		int iMoveY = GetOuter()->LookupPoseParameter( pStudioHdr, "move_y" );
+		int iMoveX = GetOuter()->GetEngineObject()->LookupPoseParameter( pStudioHdr, "move_x" );
+		int iMoveY = GetOuter()->GetEngineObject()->LookupPoseParameter( pStudioHdr, "move_y" );
 		if ( iMoveX < 0 || iMoveY < 0 )
 			return;
 
@@ -657,17 +657,17 @@ void CBasePlayerAnimState::ComputePoseParam_MoveYaw( IStudioHdr *pStudioHdr )
 			vCurMovePose.y = -sin( DEG2RAD( flYaw ) ) * flPlaybackRate;
 		}
 
-		GetOuter()->SetPoseParameter( pStudioHdr, iMoveX, vCurMovePose.x );
-		GetOuter()->SetPoseParameter( pStudioHdr, iMoveY, vCurMovePose.y );
+		GetOuter()->GetEngineObject()->SetPoseParameter( pStudioHdr, iMoveX, vCurMovePose.x );
+		GetOuter()->GetEngineObject()->SetPoseParameter( pStudioHdr, iMoveY, vCurMovePose.y );
 
 		m_vLastMovePose = vCurMovePose;
 	}
 	else
 	{
-		int iMoveYaw = GetOuter()->LookupPoseParameter( pStudioHdr, "move_yaw" );
+		int iMoveYaw = GetOuter()->GetEngineObject()->LookupPoseParameter( pStudioHdr, "move_yaw" );
 		if ( iMoveYaw >= 0 )
 		{
-			GetOuter()->SetPoseParameter( pStudioHdr, iMoveYaw, flYaw );
+			GetOuter()->GetEngineObject()->SetPoseParameter( pStudioHdr, iMoveYaw, flYaw );
 			m_flLastMoveYaw = flYaw;
 
 			// Now blend in his idle animation.
@@ -700,7 +700,7 @@ void CBasePlayerAnimState::ComputePoseParam_MoveYaw( IStudioHdr *pStudioHdr )
 			}
 			
 			pLayer->m_flPlaybackRate = 1;
-			pLayer->m_flCycle += m_pOuter->GetSequenceCycleRate( pStudioHdr, pLayer->m_nSequence ) * gpGlobals->frametime;
+			pLayer->m_flCycle += m_pOuter->GetEngineObject()->GetSequenceCycleRate( pStudioHdr, pLayer->m_nSequence ) * gpGlobals->frametime;
 			pLayer->m_flCycle = fmod( pLayer->m_flCycle, 1 );
 			pLayer->m_nOrder = MAIN_IDLE_SEQUENCE_LAYER;
 #endif
@@ -724,11 +724,11 @@ void CBasePlayerAnimState::ComputePoseParam_BodyPitch( IStudioHdr *pStudioHdr )
 	flPitch = clamp( flPitch, -90.f, 90.f );
 
 	// See if we have a blender for pitch
-	int pitch = GetOuter()->LookupPoseParameter( pStudioHdr, "body_pitch" );
+	int pitch = GetOuter()->GetEngineObject()->LookupPoseParameter( pStudioHdr, "body_pitch" );
 	if ( pitch < 0 )
 		return;
 
-	GetOuter()->SetPoseParameter( pStudioHdr, pitch, flPitch );
+	GetOuter()->GetEngineObject()->SetPoseParameter( pStudioHdr, pitch, flPitch );
 	g_flLastBodyPitch = flPitch;
 }
 
@@ -873,7 +873,7 @@ void CBasePlayerAnimState::ComputePoseParam_BodyYaw()
 
 float CBasePlayerAnimState::SetOuterBodyYaw( float flValue )
 {
-	int body_yaw = GetOuter()->LookupPoseParameter( "body_yaw" );
+	int body_yaw = GetOuter()->GetEngineObject()->LookupPoseParameter( "body_yaw" );
 	if ( body_yaw < 0 )
 	{
 		return 0;
@@ -989,11 +989,11 @@ void CBasePlayerAnimState::DebugShowAnimState( int iStartLine )
 
 	int iLine = iStartLine;
 	AnimStatePrintf( iLine++, "main: %s(%d), cycle: %.2f cyclerate: %.2f playbackrate: %.2f\n", 
-		m_pOuter->GetModelPtr()->GetSequenceName( m_pOuter->GetSequence() ),
-		m_pOuter->GetSequence(),
-		m_pOuter->GetCycle(), 
-		m_pOuter->GetSequenceCycleRate(m_pOuter->GetModelPtr(), m_pOuter->GetSequence()),
-		m_pOuter->GetPlaybackRate()
+		m_pOuter->GetEngineObject()->GetModelPtr()->GetSequenceName( m_pOuter->GetEngineObject()->GetSequence() ),
+		m_pOuter->GetEngineObject()->GetSequence(),
+		m_pOuter->GetEngineObject()->GetCycle(),
+		m_pOuter->GetEngineObject()->GetSequenceCycleRate(m_pOuter->GetEngineObject()->GetModelPtr(), m_pOuter->GetEngineObject()->GetSequence()),
+		m_pOuter->GetEngineObject()->GetPlaybackRate()
 		);
 
 	if ( m_AnimConfig.m_LegAnimType == LEGANIM_8WAY )
@@ -1001,7 +1001,7 @@ void CBasePlayerAnimState::DebugShowAnimState( int iStartLine )
 		CAnimationLayer *pLayer = m_pOuter->GetAnimOverlay( MAIN_IDLE_SEQUENCE_LAYER );
 
 		AnimStatePrintf( iLine++, "idle: %s, weight: %.2f\n",
-			m_pOuter->GetModelPtr()->GetSequenceName( pLayer->m_nSequence ),
+			m_pOuter->GetEngineObject()->GetModelPtr()->GetSequenceName( pLayer->m_nSequence ),
 			(float)pLayer->m_flWeight );
 	}
 
@@ -1010,7 +1010,7 @@ void CBasePlayerAnimState::DebugShowAnimState( int iStartLine )
 		CAnimationLayer *pLayer = m_pOuter->GetAnimOverlay( AIMSEQUENCE_LAYER + i );
 #ifdef CLIENT_DLL
 		AnimStatePrintf( iLine++, "%s(%d), weight: %.2f, cycle: %.2f, order (%d), aim (%d)", 
-			!pLayer->IsActive() ? "-- ": (pLayer->m_nSequence == 0 ? "-- " : m_pOuter->GetModelPtr()->GetSequenceName( pLayer->m_nSequence ) ),
+			!pLayer->IsActive() ? "-- ": (pLayer->m_nSequence == 0 ? "-- " : m_pOuter->GetEngineObject()->GetModelPtr()->GetSequenceName( pLayer->m_nSequence ) ),
 			!pLayer->IsActive() ? 0 : (int)pLayer->m_nSequence, 
 			!pLayer->IsActive() ? 0 : (float)pLayer->m_flWeight, 
 			!pLayer->IsActive() ? 0 : (float)pLayer->m_flCycle, 
@@ -1019,7 +1019,7 @@ void CBasePlayerAnimState::DebugShowAnimState( int iStartLine )
 			);
 #else
 		AnimStatePrintf( iLine++, "%s(%d), flags (%d), weight: %.2f, cycle: %.2f, order (%d), aim (%d)", 
-			!pLayer->IsActive() ? "-- " : ( pLayer->m_nSequence == 0 ? "-- " : m_pOuter->GetModelPtr()->GetSequenceName( pLayer->m_nSequence ) ),
+			!pLayer->IsActive() ? "-- " : ( pLayer->m_nSequence == 0 ? "-- " : m_pOuter->GetEngineObject()->GetModelPtr()->GetSequenceName( pLayer->m_nSequence ) ),
 			!pLayer->IsActive() ? 0 : (int)pLayer->m_nSequence, 
 			!pLayer->IsActive() ? 0 : (int)pLayer->m_fFlags,// Doesn't exist on client
 			!pLayer->IsActive() ? 0 : (float)pLayer->m_flWeight, 
@@ -1031,7 +1031,7 @@ void CBasePlayerAnimState::DebugShowAnimState( int iStartLine )
 	}
 
 	AnimStatePrintf( iLine++, "vel: %.2f, time: %.2f, max: %.2f, animspeed: %.2f", 
-		vOuterVel.Length2D(), gpGlobals->curtime, GetInterpolatedGroundSpeed(), m_pOuter->GetSequenceGroundSpeed(m_pOuter->GetSequence()) );
+		vOuterVel.Length2D(), gpGlobals->curtime, GetInterpolatedGroundSpeed(), m_pOuter->GetEngineObject()->GetSequenceGroundSpeed(m_pOuter->GetEngineObject()->GetSequence()) );
 	
 	if ( m_AnimConfig.m_LegAnimType == LEGANIM_8WAY )
 	{

@@ -326,7 +326,7 @@ void CWeaponDODBase::WeaponIdle()
 
 	SendWeaponAnim( GetIdleActivity() );
 
-	m_flTimeWeaponIdle = gpGlobals->curtime + SequenceDuration();
+	m_flTimeWeaponIdle = gpGlobals->curtime + GetEngineObject()->SequenceDuration();
 }
 
 Activity CWeaponDODBase::GetIdleActivity( void )
@@ -409,7 +409,7 @@ bool CWeaponDODBase::DefaultDeploy( char *szViewModel, char *szWeaponModel, int 
 	SetViewModel();
 	SendWeaponAnim( iActivity );
 
-	pOwner->SetNextAttack( gpGlobals->curtime + SequenceDuration() );
+	pOwner->SetNextAttack( gpGlobals->curtime + GetEngineObject()->SequenceDuration() );
 	m_flNextPrimaryAttack	= MAX( m_flNextPrimaryAttack, gpGlobals->curtime );
 	m_flNextSecondaryAttack	= gpGlobals->curtime;
 
@@ -426,10 +426,10 @@ bool CWeaponDODBase::DefaultDeploy( char *szViewModel, char *szWeaponModel, int 
 		switch( pOwner->GetTeamNumber() )
 		{
 		case TEAM_ALLIES:
-			vm->m_nSkin = SLEEVE_ALLIES;
+			vm->GetEngineObject()->SetSkin(SLEEVE_ALLIES);
 			break;
 		case TEAM_AXIS:
-			vm->m_nSkin = SLEEVE_AXIS;
+			vm->GetEngineObject()->SetSkin(SLEEVE_AXIS);
 			break;
 		default:
 			Assert( !"TEAM_UNASSIGNED or spectator getting a view model assigned" );
@@ -545,7 +545,7 @@ bool CWeaponDODBase::Deploy()
 			iDesiredModelIndex = GetWorldModelIndex();
 
 			// Our world models never animate
-			SetSequence( 0 );
+			GetEngineObject()->SetSequence( 0 );
 		}
 
 		if (GetEngineObject()->GetModelIndex() != iDesiredModelIndex )
@@ -675,7 +675,7 @@ bool CWeaponDODBase::Deploy()
 		if (GetEngineObject()->IsEffectActive( EF_NODRAW ) )
 		{
 			GetEngineObject()->RemoveEffects( EF_NODRAW );
-			DoMuzzleFlash();
+			GetEngineObject()->DoMuzzleFlash();
 		}
 
 		GetEngineObject()->AddSolidFlags( FSOLID_TRIGGER );
@@ -837,7 +837,7 @@ bool CWeaponDODBase::DefaultReload( int iClipSize1, int iClipSize2, int iActivit
 		( ( CBasePlayer * )pOwner)->SetAnimation( PLAYER_RELOAD );
 	}
 
-	float flSequenceEndTime = gpGlobals->curtime + SequenceDuration();
+	float flSequenceEndTime = gpGlobals->curtime + GetEngineObject()->SequenceDuration();
 	pOwner->SetNextAttack( flSequenceEndTime );
 	m_flNextPrimaryAttack = m_flNextSecondaryAttack = flSequenceEndTime;
 
@@ -996,7 +996,7 @@ CBaseEntity *CWeaponDODBase::MeleeAttack( int iDamageAmount, int iDamageType, fl
 
 	m_flNextPrimaryAttack = gpGlobals->curtime + flAttackDelay;
 	m_flNextSecondaryAttack = gpGlobals->curtime + flAttackDelay;
-	m_flTimeWeaponIdle = gpGlobals->curtime + SequenceDuration();
+	m_flTimeWeaponIdle = gpGlobals->curtime + GetEngineObject()->SequenceDuration();
 
 #ifndef CLIENT_DLL
 	IGameEvent * event = gameeventmanager->CreateEvent( "dod_stats_weapon_attack" );

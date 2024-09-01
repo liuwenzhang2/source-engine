@@ -544,7 +544,7 @@ void CHunterFlechette::Spawn()
 	SetTouch( &CHunterFlechette::FlechetteTouch );
 
 	// Make us glow until we've hit the wall
-	m_nSkin = 1;
+	GetEngineObject()->SetSkin(1);
 }
 
 
@@ -649,7 +649,7 @@ void CHunterFlechette::StickTo( CBaseEntity *pOther, trace_t &tr )
 	}
 
 	// Play our impact animation.
-	ResetSequence( s_nHunterFlechetteImpact );
+	GetEngineObject()->ResetSequence( s_nHunterFlechetteImpact );
 
 	static int s_nImpactCount = 0;
 	s_nImpactCount++;
@@ -1791,7 +1791,7 @@ void CNPC_Hunter::Spawn()
 	SetDefaultEyeOffset();
 	
 	SetNavType( NAV_GROUND );
-	m_flGroundSpeed	= 500;
+	GetEngineObject()->SetGroundSpeed(500);
 	m_NPCState = NPC_STATE_NONE;
 
 	SetBloodColor( DONT_BLEED );
@@ -1877,11 +1877,11 @@ void CNPC_Hunter::SetupGlobalModelData()
 	if ( gm_nBodyYawPoseParam != -1 )
 		return;
 
-	gm_nAimYawPoseParam = LookupPoseParameter( "aim_yaw" );
-	gm_nAimPitchPoseParam = LookupPoseParameter( "aim_pitch" );
+	gm_nAimYawPoseParam = GetEngineObject()->LookupPoseParameter( "aim_yaw" );
+	gm_nAimPitchPoseParam = GetEngineObject()->LookupPoseParameter( "aim_pitch" );
 
-	gm_nBodyYawPoseParam = LookupPoseParameter( "body_yaw" );
-	gm_nBodyPitchPoseParam = LookupPoseParameter( "body_pitch" );
+	gm_nBodyYawPoseParam = GetEngineObject()->LookupPoseParameter( "body_yaw" );
+	gm_nBodyPitchPoseParam = GetEngineObject()->LookupPoseParameter( "body_pitch" );
 
 	gm_nTopGunAttachment = LookupAttachment( "top_eye" );
 	gm_nBottomGunAttachment = LookupAttachment( "bottom_eye" );
@@ -2232,7 +2232,7 @@ void CNPC_Hunter::NPCThink()
 	BaseClass::NPCThink();
 
 	// Update our planted/unplanted state.
-	m_bPlanted = ( GetEntryNode( GetSequence() ) == gm_nPlantedNode );
+	m_bPlanted = ( GetEntryNode(GetEngineObject()->GetSequence() ) == gm_nPlantedNode );
 
 	UpdateAim();
 	UpdateEyes();
@@ -3350,7 +3350,7 @@ void CNPC_Hunter::TaskFindDodgeActivity()
 		// See where the dodge will put us.
 		Vector vecLocalDelta;
 		int nSeq = SelectWeightedSequence( m_eDodgeActivity );
-		GetSequenceLinearMotion( nSeq, &vecLocalDelta );
+		GetEngineObject()->GetSequenceLinearMotion( nSeq, &vecLocalDelta );
 
 		// Transform the sequence delta into local space.
 		matrix3x4_t fRotateMatrix;
@@ -3553,7 +3553,7 @@ void CNPC_Hunter::StartTask( const Task_t *pTask )
 			Vector vecLocalStaggerDir = worldToLocalRotation.InverseTR().ApplyRotation( m_vecStaggerDir );
 			
 			float flStaggerYaw = VecToYaw( vecLocalStaggerDir );
-			SetPoseParameter( gm_nStaggerYawPoseParam, flStaggerYaw );
+			GetEngineObject()->SetPoseParameter( gm_nStaggerYawPoseParam, flStaggerYaw );
 
 			// Go straight there!
 			SetActivity( ACT_RESET );
@@ -4034,7 +4034,7 @@ float CNPC_Hunter::ChargeSteer()
 	trace_t	tr;
 	Vector	testPos, steer, forward, right;
 	QAngle	angles;
-	const float	testLength = m_flGroundSpeed * 0.15f;
+	const float	testLength = GetEngineObject()->GetGroundSpeed() * 0.15f;
 
 	//Get our facing
 	GetVectors( &forward, &right, NULL );
@@ -6549,7 +6549,7 @@ void CNPC_Hunter::DrawDebugGeometryOverlays()
 		vRightDir.y			= vEyeDir.x * fSin + vEyeDir.y * fCos;
 		vRightDir.z			=  vEyeDir.z;
 
-		int nSeq = GetSequence();
+		int nSeq = GetEngineObject()->GetSequence();
 		if ( ( GetEntryNode( nSeq ) == gm_nPlantedNode ) && ( GetExitNode( nSeq ) == gm_nPlantedNode ) )
 		{
 			// planted - green
@@ -6573,7 +6573,7 @@ void CNPC_Hunter::DrawDebugGeometryOverlays()
 		else
 		{
 			// unknown / other node - red
-			Msg( "UNKNOWN: %s\n", GetSequenceName( GetSequence() ) );
+			Msg( "UNKNOWN: %s\n", GetSequenceName(GetEngineObject()->GetSequence() ) );
 			NDebugOverlay::Box(GetEngineObject()->GetAbsOrigin(), GetHullMins(), GetHullMaxs(), 255, 0, 0, 128, 0 );
 		}
 
@@ -6715,8 +6715,8 @@ void CNPC_Hunter::SetAim( const Vector &aimDir, float flInterval )
 {
 	QAngle angDir;
 	VectorAngles( aimDir, angDir );
-	float curPitch = GetPoseParameter( gm_nBodyPitchPoseParam );
-	float curYaw = GetPoseParameter( gm_nBodyYawPoseParam );
+	float curPitch = GetEngineObject()->GetPoseParameter( gm_nBodyPitchPoseParam );
+	float curYaw = GetEngineObject()->GetPoseParameter( gm_nBodyYawPoseParam );
 
 	float newPitch;
 	float newYaw;
@@ -6743,11 +6743,11 @@ void CNPC_Hunter::SetAim( const Vector &aimDir, float flInterval )
 
 	//Msg( "pitch=%f, yaw=%f\n", newPitch, newYaw );
 
-	SetPoseParameter( gm_nAimPitchPoseParam, 0 );
-	SetPoseParameter( gm_nAimYawPoseParam, 0 );
+	GetEngineObject()->SetPoseParameter( gm_nAimPitchPoseParam, 0 );
+	GetEngineObject()->SetPoseParameter( gm_nAimYawPoseParam, 0 );
 
-	SetPoseParameter( gm_nBodyPitchPoseParam, clamp( newPitch, -45, 45 ) );
-	SetPoseParameter( gm_nBodyYawPoseParam, clamp( newYaw, -45, 45 ) );
+	GetEngineObject()->SetPoseParameter( gm_nBodyPitchPoseParam, clamp( newPitch, -45, 45 ) );
+	GetEngineObject()->SetPoseParameter( gm_nBodyYawPoseParam, clamp( newYaw, -45, 45 ) );
 }
 
 
@@ -6755,18 +6755,18 @@ void CNPC_Hunter::SetAim( const Vector &aimDir, float flInterval )
 //-----------------------------------------------------------------------------
 void CNPC_Hunter::RelaxAim( float flInterval )
 {
-	float curPitch = GetPoseParameter( gm_nBodyPitchPoseParam );
-	float curYaw = GetPoseParameter( gm_nBodyYawPoseParam );
+	float curPitch = GetEngineObject()->GetPoseParameter( gm_nBodyPitchPoseParam );
+	float curYaw = GetEngineObject()->GetPoseParameter( gm_nBodyYawPoseParam );
 
 	// dampen existing aim
 	float newPitch = AngleNormalize( UTIL_ApproachAngle( 0, curPitch, 3 ) );
 	float newYaw = AngleNormalize( UTIL_ApproachAngle( 0, curYaw, 2 ) );
 
-	SetPoseParameter( gm_nAimPitchPoseParam, 0 );
-	SetPoseParameter( gm_nAimYawPoseParam, 0 );
+	GetEngineObject()->SetPoseParameter( gm_nAimPitchPoseParam, 0 );
+	GetEngineObject()->SetPoseParameter( gm_nAimYawPoseParam, 0 );
 
-	SetPoseParameter( gm_nBodyPitchPoseParam, clamp( newPitch, -45, 45 ) );
-	SetPoseParameter( gm_nBodyYawPoseParam, clamp( newYaw, -45, 45 ) );
+	GetEngineObject()->SetPoseParameter( gm_nBodyPitchPoseParam, clamp( newPitch, -45, 45 ) );
+	GetEngineObject()->SetPoseParameter( gm_nBodyYawPoseParam, clamp( newYaw, -45, 45 ) );
 }
 
 
@@ -6774,7 +6774,7 @@ void CNPC_Hunter::RelaxAim( float flInterval )
 //-----------------------------------------------------------------------------
 void CNPC_Hunter::UpdateAim()
 {
-	if ( !GetModelPtr() || !GetModelPtr()->SequencesAvailable() )
+	if ( !GetEngineObject()->GetModelPtr() || !GetEngineObject()->GetModelPtr()->SequencesAvailable() )
 		return;
 		
 	float flInterval = GetAnimTimeInterval();

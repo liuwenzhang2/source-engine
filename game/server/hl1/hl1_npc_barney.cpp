@@ -446,7 +446,7 @@ void CNPC_Barney::TraceAttack( const CTakeDamageInfo &inputInfo, const Vector &v
 
 void CNPC_Barney::Event_Killed( const CTakeDamageInfo &info )
 {
-	if ( m_nBody < BARNEY_BODY_GUNGONE )
+	if (GetEngineObject()->GetBody() < BARNEY_BODY_GUNGONE )
 	{
 		// drop the gun!
 		Vector vecGunPos;
@@ -529,7 +529,7 @@ void CNPC_Barney::RunTask( const Task_t *pTask )
 	case TASK_RANGE_ATTACK1:
 		if (GetEnemy() != NULL && (GetEnemy()->IsPlayer()))
 		{
-			m_flPlaybackRate = 1.5;
+			GetEngineObject()->SetPlaybackRate(1.5);
 		}
 		BaseClass::RunTask( pTask );
 		break;
@@ -921,13 +921,13 @@ void CNPC_DeadBarney::Spawn( void )
 	SetModel( "models/barney.mdl");
 
 	GetEngineObject()->ClearEffects();
-	SetSequence( 0 );
+	GetEngineObject()->SetSequence( 0 );
 	m_bloodColor		= BLOOD_COLOR_RED;
 
 	SetRenderColor( 255, 255, 255, 255 );
 
-	SetSequence( m_iDesiredSequence = LookupSequence( m_szPoses[m_iPose] ) );
-	if ( GetSequence() == -1 )
+	GetEngineObject()->SetSequence( m_iDesiredSequence = LookupSequence( m_szPoses[m_iPose] ) );
+	if (GetEngineObject()->GetSequence() == -1 )
 	{
 		Msg ( "Dead barney with bad pose\n" );
 	}

@@ -96,20 +96,20 @@ void CCycler::Spawn( )
 	GetMotor()->SetIdealYaw(GetEngineObject()->GetLocalAngles().y );
 	GetMotor()->SnapYaw();
 	
-	m_flPlaybackRate	= 1.0;
-	m_flGroundSpeed		= 0;
+	GetEngineObject()->SetPlaybackRate(1.0);
+	GetEngineObject()->SetGroundSpeed(0);
 
 	GetEngineObject()->SetNextThink( gpGlobals->curtime + 1.0f );
 
-	ResetSequenceInfo( );
+	GetEngineObject()->ResetSequenceInfo( );
 
-	if (GetSequence() != 0 || m_flCycle != 0)
+	if (GetEngineObject()->GetSequence() != 0 || GetEngineObject()->GetCycle() != 0)
 	{
 #ifdef TF2_DLL
 		m_animate = 1;
 #else
 		m_animate = 0;
-		m_flPlaybackRate = 0;
+		GetEngineObject()->SetPlaybackRate(0);
 #endif
 	}
 	else
@@ -133,17 +133,17 @@ void CCycler::Think( void )
 		StudioFrameAdvance ( );
 		DispatchAnimEvents( this );
 	}
-	if (IsSequenceFinished() && !SequenceLoops())
+	if (GetEngineObject()->IsSequenceFinished() && !GetEngineObject()->SequenceLoops())
 	{
 		// ResetSequenceInfo();
 		// hack to avoid reloading model every frame
 		GetEngineObject()->SetAnimTime(gpGlobals->curtime);
-		m_flPlaybackRate = 1.0;
-		m_bSequenceFinished = false;
-		m_flLastEventCheck = 0;
-		m_flCycle = 0;
+		GetEngineObject()->SetPlaybackRate(1.0);
+		GetEngineObject()->SetSequenceFinished(false);
+		GetEngineObject()->SetLastEventCheck(0);
+		GetEngineObject()->SetCycle(0);
 		if (!m_animate)
-			m_flPlaybackRate = 0.0;	// FIX: don't reset framerate
+			GetEngineObject()->SetPlaybackRate(0.0);	// FIX: don't reset framerate
 	}
 }
 
@@ -154,9 +154,9 @@ void CCycler::Use ( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useT
 {
 	m_animate = !m_animate;
 	if (m_animate)
-		m_flPlaybackRate = 1.0;
+		GetEngineObject()->SetPlaybackRate(1.0);
 	else
-		m_flPlaybackRate = 0.0;
+		GetEngineObject()->SetPlaybackRate(0.0);
 }
 
 //-----------------------------------------------------------------------------
@@ -166,21 +166,21 @@ int CCycler::OnTakeDamage( const CTakeDamageInfo &info )
 {
 	if (m_animate)
 	{
-		int nSequence = GetSequence() + 1;
+		int nSequence = GetEngineObject()->GetSequence() + 1;
 		if ( !IsValidSequence(nSequence) )
 		{
 			nSequence = 0;
 		}
 
-		ResetSequence( nSequence );
-		m_flCycle = 0;
+		GetEngineObject()->ResetSequence( nSequence );
+		GetEngineObject()->SetCycle(0);
 	}
 	else
 	{
-		m_flPlaybackRate = 1.0;
+		GetEngineObject()->SetPlaybackRate(1.0);
 		StudioFrameAdvance ();
-		m_flPlaybackRate = 0;
-		Msg( "sequence: %d, frame %.0f\n", GetSequence(), m_flCycle.Get() );
+		GetEngineObject()->SetPlaybackRate(0);
+		Msg( "sequence: %d, frame %.0f\n", GetEngineObject()->GetSequence(), GetEngineObject()->GetCycle() );
 	}
 
 	return 0;
@@ -199,19 +199,19 @@ void CCycler::InputSetSequence( inputdata_t &inputdata )
 		if ( !iSeqNum && sChar[0] != '0' )
 		{
 			// Treat it as a sequence name
-			ResetSequence( LookupSequence( sChar ) );
+			GetEngineObject()->ResetSequence( LookupSequence( sChar ) );
 		}
 		else
 		{
-			ResetSequence( iSeqNum );
+			GetEngineObject()->ResetSequence( iSeqNum );
 		}
 
-		if (m_flPlaybackRate == 0.0)
+		if (GetEngineObject()->GetPlaybackRate() == 0.0)
 		{
-			ResetSequence( 0 );
+			GetEngineObject()->ResetSequence( 0 );
 		}
 
-		m_flCycle = 0;
+		GetEngineObject()->SetCycle(0);
 	}
 }
 
@@ -297,7 +297,7 @@ bool CWeaponCycler::Holster( CBaseCombatWeapon *pSwitchingTo )
 
 void CWeaponCycler::PrimaryAttack()
 {
-	SendWeaponAnim( GetSequence() );
+	SendWeaponAnim(GetEngineObject()->GetSequence() );
 	m_flNextPrimaryAttack = gpGlobals->curtime + 0.3;
 }
 
@@ -306,7 +306,7 @@ void CWeaponCycler::SecondaryAttack( void )
 {
 	float flFrameRate;
 
-	int nSequence = (GetSequence() + 1) % 8;
+	int nSequence = (GetEngineObject()->GetSequence() + 1) % 8;
 
 	// BUG:  Why do we set this here and then set to zero right after?
 	GetEngineObject()->SetModelIndex( m_iModel );
@@ -319,7 +319,7 @@ void CWeaponCycler::SecondaryAttack( void )
 		nSequence = 0;
 	}
 
-	SetSequence( nSequence );
+	GetEngineObject()->SetSequence( nSequence );
 	SendWeaponAnim( nSequence );
 
 	m_flNextSecondaryAttack = gpGlobals->curtime + 0.3;
@@ -359,7 +359,7 @@ void CWreckage::Spawn( void )
 	GetEngineObject()->SetMoveType( MOVETYPE_NONE );
 	m_takedamage		= 0;
 
-	SetCycle( 0 );
+	GetEngineObject()->SetCycle( 0 );
 	GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.1f );
 
 	if (GetEngineObject()->GetModelName() != NULL_STRING)
@@ -454,7 +454,7 @@ void CBlendingCycler::Spawn( void )
 	// Initialise Sequence
 	if (m_iszSequence != NULL_STRING)
 	{
-		SetSequence( LookupSequence( STRING(m_iszSequence) ) );
+		GetEngineObject()->SetSequence( LookupSequence( STRING(m_iszSequence) ) );
 	}
 
 	m_iCurrent = m_iLowerBound;
@@ -495,22 +495,22 @@ void CBlendingCycler::Think( void )
 		m_iBlendspeed = m_iBlendspeed * -1;
 
 	// Set blend
-	SetPoseParameter( 0, m_iCurrent );
+	GetEngineObject()->SetPoseParameter( 0, m_iCurrent );
 
 	Msg( "Current Blend: %d\n", m_iCurrent );
 
-	if (IsSequenceFinished() && !SequenceLoops())
+	if (GetEngineObject()->IsSequenceFinished() && !GetEngineObject()->SequenceLoops())
 	{
 		// ResetSequenceInfo();
 		// hack to avoid reloading model every frame
 		GetEngineObject()->SetAnimTime(gpGlobals->curtime);
-		m_flPlaybackRate = 1.0;
-		m_bSequenceFinished = false;
-		m_flLastEventCheck = 0;
-		m_flCycle = 0;
+		GetEngineObject()->SetPlaybackRate(1.0);
+		GetEngineObject()->SetSequenceFinished(false);
+		GetEngineObject()->SetLastEventCheck(0);
+		GetEngineObject()->SetCycle(0);
 		if (!m_animate)
 		{
-			m_flPlaybackRate = 0.0;	// FIX: don't reset framerate
+			GetEngineObject()->SetPlaybackRate(0.0);	// FIX: don't reset framerate
 		}
 	}
 }
