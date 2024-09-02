@@ -396,18 +396,25 @@ END_RECV_TABLE()
 
 void RecvProxy_Sequence(const CRecvProxyData* pData, void* pStruct, void* pOut)
 {
-	// Have the regular proxy store the data.
-	RecvProxy_Int32ToInt32(pData, pStruct, pOut);
+	C_EngineObjectInternal* pEntity = (C_EngineObjectInternal*)pStruct;
+	if (pEntity->GetOuter()->IsViewModel()) {
+		if (pData->m_Value.m_Int != pEntity->GetSequence())
+		{
+			MDLCACHE_CRITICAL_SECTION();
 
-	C_EngineObjectInternal* pAnimating = (C_EngineObjectInternal*)pStruct;
+			pEntity->SetSequence(pData->m_Value.m_Int);
+			pEntity->SetAnimTime(gpGlobals->curtime);
+			pEntity->SetCycle(0);
+		}
+	}else{
+		// Have the regular proxy store the data.
+		RecvProxy_Int32ToInt32(pData, pStruct, pOut);
 
-	if (!pAnimating)
-		return;
+		pEntity->SetReceivedSequence();
 
-	pAnimating->SetReceivedSequence();
-
-	// render bounds may have changed
-	pAnimating->GetOuter()->UpdateVisibility();
+		// render bounds may have changed
+		pEntity->GetOuter()->UpdateVisibility();
+	}
 }
 
 BEGIN_RECV_TABLE_NOBASE(C_EngineObjectInternal, DT_ServerAnimationData)
