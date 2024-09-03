@@ -430,7 +430,7 @@ private:
 
 	// The list of all static props
 	CUtlVector <StaticPropDict_t>	m_StaticPropDict;
-	CUtlVector <CStaticProp>		m_StaticProps;
+	CUtlVector <CStaticProp*>		m_StaticProps;
 	CUtlVector <StaticPropLeafLump_t> m_StaticPropLeaves;
 
 	// Static props that fade...
@@ -1327,7 +1327,9 @@ void CStaticPropMgr::UnserializeModels( CUtlBuffer& buf )
 
 	// Gotta preallocate the static props here so no rellocations take place
 	// the leaf list stores pointers to these tricky little guys.
-	m_StaticProps.AddMultipleToTail(count);
+	for (int i = 0; i < count; i++) {
+		m_StaticProps.AddToTail(new CStaticProp());
+	}
 	for ( int i = 0; i < count; ++i )
 	{
 		StaticPropLump_t lump;
@@ -1351,7 +1353,7 @@ void CStaticPropMgr::UnserializeModels( CUtlBuffer& buf )
 				Assert("Unexpected version while deserializing lumps.");
 		}
 
-		m_StaticProps[i].Init( i, lump, m_StaticPropDict[lump.m_PropType].m_pModel );
+		m_StaticProps[i]->Init( i, lump, m_StaticPropDict[lump.m_PropType].m_pModel );
 
 		// For distance-based fading, keep a list of the things that need
 		// to be faded out. Not sure if this is the optimal way of doing it
@@ -1360,7 +1362,7 @@ void CStaticPropMgr::UnserializeModels( CUtlBuffer& buf )
 		if (lump.m_Flags & STATIC_PROP_FLAG_FADES)
 		{
 			int idx = m_StaticPropFade.AddToTail();
-			m_StaticProps[i].SetFadeIndex( (unsigned short)idx );
+			m_StaticProps[i]->SetFadeIndex( (unsigned short)idx );
 			StaticPropFade_t& fade = m_StaticPropFade[idx];
 			fade.m_Model = i;
 			fade.m_MinDistSq = lump.m_FadeMinDist;
@@ -1390,7 +1392,7 @@ void CStaticPropMgr::UnserializeModels( CUtlBuffer& buf )
 		}
 
 		// Add the prop to the K-D tree for collision
-		m_StaticProps[i].InsertPropIntoKDTree( );
+		m_StaticProps[i]->InsertPropIntoKDTree( );
 	}
 }
 
@@ -1401,7 +1403,7 @@ void CStaticPropMgr::OutputLevelStats( void )
 	int totalVerts = 0;
 	for( i = 0; i < m_StaticProps.Count(); i++ )
 	{
-		CStaticProp *pStaticProp = &m_StaticProps[i];
+		CStaticProp *pStaticProp = m_StaticProps[i];
 		model_t *pModel = (model_t*)pStaticProp->GetModel();
 		if( !pModel )
 		{
@@ -1491,7 +1493,7 @@ void CStaticPropMgr::LevelShutdown()
 		g_pMDLCache->UnlockStudioHdr( m_StaticPropDict[i].m_hMDL );
 	}
 
-	m_StaticProps.Purge();
+	m_StaticProps.PurgeAndDeleteElements();
 	m_StaticPropDict.Purge();
 	m_StaticPropFade.Purge();
 }
@@ -1518,23 +1520,23 @@ void CStaticPropMgr::LevelInitClient()
 	int nCount = m_StaticProps.Count();
 	for ( int i = 0; i < nCount; ++i )
 	{
-		CStaticProp &prop = m_StaticProps[i];
-		clientleafsystem->CreateRenderableHandle( &m_StaticProps[i], true );
-		if ( !prop.ShouldDraw() )
+		CStaticProp* prop = m_StaticProps[i];
+		clientleafsystem->CreateRenderableHandle( m_StaticProps[i], true );
+		if ( !prop->ShouldDraw() )
 			continue;
 
-		ClientRenderHandle_t handle = m_StaticProps[i].RenderHandle();
-		if ( prop.LeafCount() > 0 )
+		ClientRenderHandle_t handle = m_StaticProps[i]->RenderHandle();
+		if ( prop->LeafCount() > 0 )
 		{
 			// Add the prop to all the leaves it lies in
-			clientleafsystem->AddRenderableToLeaves( handle, prop.LeafCount(), (unsigned short*)&m_StaticPropLeaves[prop.FirstLeaf()] ); 
+			clientleafsystem->AddRenderableToLeaves( handle, prop->LeafCount(), (unsigned short*)&m_StaticPropLeaves[prop->FirstLeaf()] ); 
 		}
 		else
 		{
-			Vector origin = prop.GetCollisionOrigin();
-			Vector mins = prop.OBBMins();
-			Vector maxs = prop.OBBMaxs();
-			DevMsg( 1, "Static prop in 0 leaves! %s, @ %.1f, %.1f, %.1f\n", modelloader->GetName( prop.GetModel() ), origin.x, origin.y, origin.z );
+			Vector origin = prop->GetCollisionOrigin();
+			Vector mins = prop->OBBMins();
+			Vector maxs = prop->OBBMaxs();
+			DevMsg( 1, "Static prop in 0 leaves! %s, @ %.1f, %.1f, %.1f\n", modelloader->GetName( prop->GetModel() ), origin.x, origin.y, origin.z );
 		}
 	}
 
@@ -1558,8 +1560,8 @@ void CStaticPropMgr::LevelShutdownClient()
 
 	for (int i = m_StaticProps.Count(); --i >= 0; )
 	{
-		m_StaticProps[i].CleanUpRenderHandle( );
-		modelrender->SetStaticLighting( m_StaticProps[i].GetModelInstance(), NULL );
+		m_StaticProps[i]->CleanUpRenderHandle( );
+		modelrender->SetStaticLighting( m_StaticProps[i]->GetModelInstance(), NULL );
 	}
 
 #ifndef SWDS
@@ -1579,7 +1581,7 @@ void CStaticPropMgr::CreateVPhysicsRepresentations( IPhysicsEnvironment	*pPhysEn
 	int nCount = m_StaticProps.Count();
 	for ( int i = nCount; --i >= 0; )
 	{
-		m_StaticProps[i].CreateVPhysics( pPhysEnv, pDefaults, pGameData );
+		m_StaticProps[i]->CreateVPhysics( pPhysEnv, pDefaults, pGameData );
 	}
 }
 
@@ -1605,7 +1607,7 @@ ICollideable *CStaticPropMgr::GetStaticProp( IHandleEntity *pHandleEntity )
 	{
 		return NULL;
 	}
-	return &m_StaticProps[nIndex];
+	return m_StaticProps[nIndex];
 }
 
 
@@ -1613,7 +1615,7 @@ ICollideable *CStaticPropMgr::GetStaticPropByIndex( int propIndex )
 {
 	if ( propIndex < m_StaticProps.Count() )
 	{
-		return &m_StaticProps[propIndex];
+		return m_StaticProps[propIndex];
 	}
 	Assert(0);
 	return NULL;
@@ -1633,7 +1635,7 @@ void CStaticPropMgr::GetAllStaticProps( CUtlVector<ICollideable *> *pOutput )
 	int counter;
 	for ( counter = 0; counter != iPropVectorSize; ++counter )
 	{
-		pOutput->AddToTail( &m_StaticProps[counter] );
+		pOutput->AddToTail( m_StaticProps[counter] );
 	}
 }
 
@@ -1645,7 +1647,7 @@ void CStaticPropMgr::GetAllStaticPropsInAABB( const Vector &vMins, const Vector 
 	int counter;
 	for ( counter = 0; counter != iPropVectorSize; ++counter )
 	{
-		CStaticProp *pProp = &m_StaticProps[counter];
+		CStaticProp *pProp = m_StaticProps[counter];
 
 		Vector vPropMins, vPropMaxs;
 		pProp->WorldSpaceSurroundingBounds( &vPropMins, &vPropMaxs );
@@ -1715,7 +1717,7 @@ void CStaticPropMgr::GetAllStaticPropsInOBB( const Vector &ptOrigin, const Vecto
 
 	for ( counter = 0; counter != iPropVectorSize; ++counter )
 	{
-		CStaticProp *pProp = &m_StaticProps[counter];
+		CStaticProp *pProp = m_StaticProps[counter];
 
 		Vector vPropMins, vPropMaxs;
 		pProp->WorldSpaceSurroundingBounds( &vPropMins, &vPropMaxs );
@@ -1805,9 +1807,9 @@ bool CStaticPropMgr::PropHasBakedLightingDisabled( IHandleEntity *pHandleEntity 
 	int nIndex = HandleEntityToIndex( pHandleEntity );
 
 	// Get the prop
-	const CStaticProp &prop = m_StaticProps[nIndex];
+	const CStaticProp* prop = m_StaticProps[nIndex];
 
-	return ( (prop.Flags() & STATIC_PROP_NO_PER_VERTEX_LIGHTING ) != 0 );
+	return ( (prop->Flags() & STATIC_PROP_NO_PER_VERTEX_LIGHTING ) != 0 );
 }
 
 //-----------------------------------------------------------------------------
@@ -1826,12 +1828,12 @@ void CStaticPropMgr::PrecacheLighting()
 			int i = m_StaticProps.Count();
 			while ( --i >= 0 )
 			{
-				if ( PropHasBakedLightingDisabled( m_StaticProps[i].GetEntityHandle() ) ) 
+				if ( PropHasBakedLightingDisabled( m_StaticProps[i]->GetEntityHandle() ) ) 
 				{
 					continue;
 				}
 
-				studiohwdata_t *pStudioHWData = g_pMDLCache->GetHardwareData( ( (model_t*)m_StaticProps[i].GetModel() )->studio );
+				studiohwdata_t *pStudioHWData = g_pMDLCache->GetHardwareData( ( (model_t*)m_StaticProps[i]->GetModel() )->studio );
 				for ( int lodID = pStudioHWData->m_RootLOD; lodID < pStudioHWData->m_NumLODs; lodID++ )
 				{
 					studioloddata_t *pLOD = &pStudioHWData->m_pLODs[lodID];
@@ -1853,9 +1855,9 @@ void CStaticPropMgr::PrecacheLighting()
 	while ( --i >= 0 )
 	{
 		MDLCACHE_CRITICAL_SECTION_( g_pMDLCache );
-		if ( !m_StaticProps[i].ShouldDraw() )
+		if ( !m_StaticProps[i]->ShouldDraw() )
 			continue;
-		m_StaticProps[i].PrecacheLighting();
+		m_StaticProps[i]->PrecacheLighting();
 	}
 
 	COM_TimestampedLog( "CStaticPropMgr::PrecacheLighting - end");
@@ -1866,9 +1868,9 @@ void CStaticPropMgr::RecomputeStaticLighting( )
 	int i = m_StaticProps.Count();
 	while ( --i >= 0 )
 	{
-		if ( !m_StaticProps[i].ShouldDraw() )
+		if ( !m_StaticProps[i]->ShouldDraw() )
 			continue;
-		m_StaticProps[i].RecomputeStaticLighting();
+		m_StaticProps[i]->RecomputeStaticLighting();
 	}
 }
 
@@ -1882,11 +1884,11 @@ bool CStaticPropMgr::IsPropInPVS( IHandleEntity *pHandleEntity, const byte *pVis
 	int nIndex = HandleEntityToIndex( pHandleEntity );
 
 	// Get the prop
-	const CStaticProp &prop = m_StaticProps[nIndex];
+	const CStaticProp* prop = m_StaticProps[nIndex];
 
 	int i;
-	int end = prop.FirstLeaf() + prop.LeafCount();
-	for( i = prop.FirstLeaf(); i < end; i++ )
+	int end = prop->FirstLeaf() + prop->LeafCount();
+	for( i = prop->FirstLeaf(); i < end; i++ )
 	{
 		Assert( i >= 0 && i < m_StaticPropLeaves.Count() );
 		int clusterID = CM_LeafCluster( m_StaticPropLeaves[i].m_Leaf );
@@ -2024,7 +2026,7 @@ void CStaticPropMgr::DrawStaticProps( IClientRenderable **pProps, int count, boo
 LightCacheHandle_t CStaticPropMgr::GetLightCacheHandleForStaticProp( IHandleEntity *pHandleEntity )
 {
 	int nIndex = HandleEntityToIndex(pHandleEntity);
-	return modelrender->GetStaticLighting( m_StaticProps[ nIndex ].GetModelInstance() );
+	return modelrender->GetStaticLighting( m_StaticProps[ nIndex ]->GetModelInstance() );
 }
 
 
@@ -2203,15 +2205,15 @@ void CStaticPropMgr::TraceRayAgainstStaticProp( const Ray_t& ray, int staticProp
 {
 #ifndef SWDS
 	// Get the prop
-	CStaticProp& prop = m_StaticProps[staticPropIndex];
+	CStaticProp* prop = m_StaticProps[staticPropIndex];
 
-	if (prop.GetSolid() != SOLID_NONE)
+	if (prop->GetSolid() != SOLID_NONE)
 	{
 		// FIXME: Better bloat?
 		// Bloat a little bit so we get the intersection
 		Ray_t temp = ray;
 		temp.m_Delta *= 1.1f;
-		g_pEngineTraceClient->ClipRayToEntity( temp, MASK_ALL, &prop, &tr );
+		g_pEngineTraceClient->ClipRayToEntity( temp, MASK_ALL, prop, &tr );
 	}
 	else
 	{
@@ -2259,7 +2261,7 @@ void CStaticPropMgr::AddColorDecalToStaticProp( Vector const& rayStart, Vector c
 		return;
 
 	// Get the prop
-	CStaticProp& prop = m_StaticProps[staticPropIndex];
+	CStaticProp* prop = m_StaticProps[staticPropIndex];
 
 	// Found the point, now lets apply the decals
 	Assert( prop.GetModelInstance() != MODEL_INSTANCE_INVALID );
@@ -2267,7 +2269,7 @@ void CStaticPropMgr::AddColorDecalToStaticProp( Vector const& rayStart, Vector c
 	// Choose a new ray along which to project the decal based on
 	// surface normal. This prevents decal skewing
 	bool noPokethru = false;
-	if (doTrace && (prop.GetSolid() == SOLID_VPHYSICS) && !tr.startsolid && !tr.allsolid)
+	if (doTrace && (prop->GetSolid() == SOLID_VPHYSICS) && !tr.startsolid && !tr.allsolid)
 	{
 		Vector temp;
 		VectorSubtract( tr.endpos, tr.plane.normal, temp );
@@ -2280,11 +2282,11 @@ void CStaticPropMgr::AddColorDecalToStaticProp( Vector const& rayStart, Vector c
 	Vector up(0, 0, 1);
 	if ( bUseColor )
 	{
-		modelrender->AddColoredDecal( prop.GetModelInstance(), ray, up, decalIndex, 0, cColor, noPokethru );
+		modelrender->AddColoredDecal( prop->GetModelInstance(), ray, up, decalIndex, 0, cColor, noPokethru );
 	}
 	else
 	{
-		modelrender->AddDecal( prop.GetModelInstance(), ray, up, decalIndex, 0, noPokethru );
+		modelrender->AddDecal( prop->GetModelInstance(), ray, up, decalIndex, 0, noPokethru );
 	}
 	
 #endif
@@ -2332,11 +2334,11 @@ void CStaticPropMgr::GetStaticPropMaterialColorAndLighting( trace_t* pTrace,
 	}
 
 	// Get the prop
-	CStaticProp& prop = m_StaticProps[staticPropIndex];
+	CStaticProp* prop = m_StaticProps[staticPropIndex];
 
 	// Ask the model info about what we need to know
-	modelinfoclient->GetModelMaterialColorAndLighting( (model_t*)prop.GetModel(), 
-		prop.GetRenderOrigin(), prop.GetRenderAngles(), pTrace, lighting, matColor );
+	modelinfoclient->GetModelMaterialColorAndLighting( (model_t*)prop->GetModel(), 
+		prop->GetRenderOrigin(), prop->GetRenderAngles(), pTrace, lighting, matColor );
 #endif
 }
 
