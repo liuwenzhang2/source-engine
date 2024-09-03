@@ -990,18 +990,9 @@ public:
 	static bool						IsServer( void );
 	static bool						IsClient( void );
 	static char const				*GetDLLType( void );
-	static void	SetAbsQueriesValid( bool bValid );
-	static bool IsAbsQueriesValid( void );
 
-	// Enable/disable abs recomputations on a stack.
-	static void PushEnableAbsRecomputations( bool bEnable );
-	static void PopEnableAbsRecomputations();
 
-	// This requires the abs recomputation stack to be empty and just sets the global state. 
-	// It should only be used at the scope of the frame loop.
-	static void EnableAbsRecomputations( bool bEnable );		
-	
-	static bool IsAbsRecomputationsEnabled( void );
+
 
 
 	// Bloat the culling bbox past the parent ent's bbox in local space if EF_BONEMERGE_FASTCULL is set.
@@ -1319,8 +1310,6 @@ private:
 	//  usercmd input.
 	static int						m_nPredictionRandomSeed;
 	static C_BasePlayer				*m_pPredictionPlayer;
-	static bool						s_bAbsQueriesValid;
-	static bool						s_bAbsRecomputationEnabled;
 
 	static bool						s_bInterpolate;
 	

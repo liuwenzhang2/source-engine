@@ -63,15 +63,12 @@ ConVar  r_drawmodeldecals( "r_drawmodeldecals", "1" );
 extern ConVar	cl_showerror;
 int C_BaseEntity::m_nPredictionRandomSeed = -1;
 C_BasePlayer *C_BaseEntity::m_pPredictionPlayer = NULL;
-bool C_BaseEntity::s_bAbsQueriesValid = true;
-bool C_BaseEntity::s_bAbsRecomputationEnabled = true;
 bool C_BaseEntity::s_bInterpolate = true;
 
 
 static ConVar  r_drawrenderboxes( "r_drawrenderboxes", "0", FCVAR_CHEAT );  
 
-static bool g_bAbsRecomputationStack[8];
-static unsigned short g_iAbsRecomputationStackPos = 0;
+
 
 // All the entities that want Interpolate() called on them.
 static CUtlLinkedList<C_BaseEntity*, unsigned short> g_InterpolationList;
@@ -441,81 +438,6 @@ void GetInterpolatedVarTimeRange( CInterpolatedVar<T> *pVar, float &flMin, float
 	}
 }
 
-
-//-----------------------------------------------------------------------------
-// Global methods related to when abs data is correct
-//-----------------------------------------------------------------------------
-void C_BaseEntity::SetAbsQueriesValid( bool bValid )
-{
-	// @MULTICORE: Always allow in worker threads, assume higher level code is handling correctly
-	if ( !ThreadInMainThread() )
-		return;
-
-	if ( !bValid )
-	{
-		s_bAbsQueriesValid = false;
-	}
-	else
-	{
-		s_bAbsQueriesValid = true;
-	}
-}
-
-bool C_BaseEntity::IsAbsQueriesValid( void )
-{
-	if ( !ThreadInMainThread() )
-		return true;
-	return s_bAbsQueriesValid;
-}
-
-void C_BaseEntity::PushEnableAbsRecomputations( bool bEnable )
-{
-	if ( !ThreadInMainThread() )
-		return;
-	if ( g_iAbsRecomputationStackPos < ARRAYSIZE( g_bAbsRecomputationStack ) )
-	{
-		g_bAbsRecomputationStack[g_iAbsRecomputationStackPos] = s_bAbsRecomputationEnabled;
-		++g_iAbsRecomputationStackPos;
-		s_bAbsRecomputationEnabled = bEnable;
-	}
-	else
-	{
-		Assert( false );
-	}
-}
-
-void C_BaseEntity::PopEnableAbsRecomputations()
-{
-	if ( !ThreadInMainThread() )
-		return;
-	if ( g_iAbsRecomputationStackPos > 0 )
-	{
-		--g_iAbsRecomputationStackPos;
-		s_bAbsRecomputationEnabled = g_bAbsRecomputationStack[g_iAbsRecomputationStackPos];
-	}
-	else
-	{
-		Assert( false );
-	}
-}
-
-void C_BaseEntity::EnableAbsRecomputations( bool bEnable )
-{
-	if ( !ThreadInMainThread() )
-		return;
-	// This should only be called at the frame level. Use PushEnableAbsRecomputations
-	// if you're blocking out a section of code.
-	Assert( g_iAbsRecomputationStackPos == 0 );
-
-	s_bAbsRecomputationEnabled = bEnable;
-}
-
-bool C_BaseEntity::IsAbsRecomputationsEnabled()
-{
-	if ( !ThreadInMainThread() )
-		return true;
-	return s_bAbsRecomputationEnabled;
-}
 
 int	C_BaseEntity::GetTextureFrameIndex( void )
 {

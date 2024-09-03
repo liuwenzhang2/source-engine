@@ -80,6 +80,9 @@ bool g_bTestMoveTypeStepSimulation = true;
 ConVar sv_teststepsimulation("sv_teststepsimulation", "1", 0);
 ConVar step_spline("step_spline", "0");
 
+// When this is false, throw an assert in debug when GetAbsAnything is called. Used when hierachy is incomplete/invalid.
+bool CEngineObjectInternal::s_bAbsQueriesValid = true;
+
 //-----------------------------------------------------------------------------
 // Portal-specific hack designed to eliminate re-entrancy in touch functions
 //-----------------------------------------------------------------------------
@@ -1949,7 +1952,7 @@ const Vector& CEngineObjectInternal::GetLocalVelocity() const
 
 const Vector& CEngineObjectInternal::GetAbsVelocity()
 {
-	Assert(CBaseEntity::IsAbsQueriesValid());
+	Assert(CEngineObjectInternal::IsAbsQueriesValid());
 
 	if (IsEFlagSet(EFL_DIRTY_ABSVELOCITY))
 	{
@@ -1960,7 +1963,7 @@ const Vector& CEngineObjectInternal::GetAbsVelocity()
 
 const Vector& CEngineObjectInternal::GetAbsVelocity() const
 {
-	Assert(CBaseEntity::IsAbsQueriesValid());
+	Assert(CEngineObjectInternal::IsAbsQueriesValid());
 
 	if (IsEFlagSet(EFL_DIRTY_ABSVELOCITY))
 	{
@@ -1985,7 +1988,7 @@ const QAngle& CEngineObjectInternal::GetLocalAngles(void) const
 
 const Vector& CEngineObjectInternal::GetAbsOrigin(void)
 {
-	Assert(CBaseEntity::IsAbsQueriesValid());
+	Assert(CEngineObjectInternal::IsAbsQueriesValid());
 
 	if (IsEFlagSet(EFL_DIRTY_ABSTRANSFORM))
 	{
@@ -1996,7 +1999,7 @@ const Vector& CEngineObjectInternal::GetAbsOrigin(void)
 
 const Vector& CEngineObjectInternal::GetAbsOrigin(void) const
 {
-	Assert(CBaseEntity::IsAbsQueriesValid());
+	Assert(CEngineObjectInternal::IsAbsQueriesValid());
 
 	if (IsEFlagSet(EFL_DIRTY_ABSTRANSFORM))
 	{
@@ -2007,7 +2010,7 @@ const Vector& CEngineObjectInternal::GetAbsOrigin(void) const
 
 const QAngle& CEngineObjectInternal::GetAbsAngles(void)
 {
-	Assert(CBaseEntity::IsAbsQueriesValid());
+	Assert(CEngineObjectInternal::IsAbsQueriesValid());
 
 	if (IsEFlagSet(EFL_DIRTY_ABSTRANSFORM))
 	{
@@ -2018,7 +2021,7 @@ const QAngle& CEngineObjectInternal::GetAbsAngles(void)
 
 const QAngle& CEngineObjectInternal::GetAbsAngles(void) const
 {
-	Assert(CBaseEntity::IsAbsQueriesValid());
+	Assert(CEngineObjectInternal::IsAbsQueriesValid());
 
 	if (IsEFlagSet(EFL_DIRTY_ABSTRANSFORM))
 	{
@@ -2080,7 +2083,7 @@ void CEngineObjectInternal::ResetRgflCoordinateFrame() {
 //-----------------------------------------------------------------------------
 matrix3x4_t& CEngineObjectInternal::EntityToWorldTransform()
 {
-	Assert(CBaseEntity::IsAbsQueriesValid());
+	Assert(CEngineObjectInternal::IsAbsQueriesValid());
 
 	if (IsEFlagSet(EFL_DIRTY_ABSTRANSFORM))
 	{
@@ -2091,7 +2094,7 @@ matrix3x4_t& CEngineObjectInternal::EntityToWorldTransform()
 
 const matrix3x4_t& CEngineObjectInternal::EntityToWorldTransform() const
 {
-	Assert(CBaseEntity::IsAbsQueriesValid());
+	Assert(CEngineObjectInternal::IsAbsQueriesValid());
 
 	if (IsEFlagSet(EFL_DIRTY_ABSTRANSFORM))
 	{

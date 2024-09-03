@@ -72,6 +72,10 @@ ConVar debug_touchlinks("debug_touchlinks", "0", 0, "Spew touch link activity");
 
 template<>
 bool CClientEntityList<C_BaseEntity>::sm_bDisableTouchFuncs = false;	// Disables PhysicsTouch and PhysicsStartTouch function calls
+bool C_EngineObjectInternal::s_bAbsQueriesValid = true;
+bool C_EngineObjectInternal::s_bAbsRecomputationEnabled = true;
+static bool g_bAbsRecomputationStack[8];
+static unsigned short g_iAbsRecomputationStackPos = 0;
 
 //-----------------------------------------------------------------------------
 // Portal-specific hack designed to eliminate re-entrancy in touch functions
@@ -481,6 +485,81 @@ int	C_EngineObjectInternal::entindex() const {
 
 RecvTable* C_EngineObjectInternal::GetRecvTable() {
 	return &DT_EngineObject::g_RecvTable;
+}
+
+//-----------------------------------------------------------------------------
+// Global methods related to when abs data is correct
+//-----------------------------------------------------------------------------
+void C_EngineObjectInternal::SetAbsQueriesValid(bool bValid)
+{
+	// @MULTICORE: Always allow in worker threads, assume higher level code is handling correctly
+	if (!ThreadInMainThread())
+		return;
+
+	if (!bValid)
+	{
+		s_bAbsQueriesValid = false;
+	}
+	else
+	{
+		s_bAbsQueriesValid = true;
+	}
+}
+
+bool C_EngineObjectInternal::IsAbsQueriesValid(void)
+{
+	if (!ThreadInMainThread())
+		return true;
+	return s_bAbsQueriesValid;
+}
+
+void C_EngineObjectInternal::EnableAbsRecomputations(bool bEnable)
+{
+	if (!ThreadInMainThread())
+		return;
+	// This should only be called at the frame level. Use PushEnableAbsRecomputations
+	// if you're blocking out a section of code.
+	Assert(g_iAbsRecomputationStackPos == 0);
+
+	s_bAbsRecomputationEnabled = bEnable;
+}
+
+bool C_EngineObjectInternal::IsAbsRecomputationsEnabled()
+{
+	if (!ThreadInMainThread())
+		return true;
+	return s_bAbsRecomputationEnabled;
+}
+
+void C_EngineObjectInternal::PushEnableAbsRecomputations(bool bEnable)
+{
+	if (!ThreadInMainThread())
+		return;
+	if (g_iAbsRecomputationStackPos < ARRAYSIZE(g_bAbsRecomputationStack))
+	{
+		g_bAbsRecomputationStack[g_iAbsRecomputationStackPos] = s_bAbsRecomputationEnabled;
+		++g_iAbsRecomputationStackPos;
+		s_bAbsRecomputationEnabled = bEnable;
+	}
+	else
+	{
+		Assert(false);
+	}
+}
+
+void C_EngineObjectInternal::PopEnableAbsRecomputations()
+{
+	if (!ThreadInMainThread())
+		return;
+	if (g_iAbsRecomputationStackPos > 0)
+	{
+		--g_iAbsRecomputationStackPos;
+		s_bAbsRecomputationEnabled = g_bAbsRecomputationStack[g_iAbsRecomputationStackPos];
+	}
+	else
+	{
+		Assert(false);
+	}
 }
 
 #include "tier0/memdbgoff.h"
@@ -1740,10 +1819,10 @@ const Vector& C_EngineObjectInternal::GetAbsVelocity() const
 //-----------------------------------------------------------------------------
 // Velocity
 //-----------------------------------------------------------------------------
-Vector& C_EngineObjectInternal::GetLocalVelocity()
-{
-	return m_vecVelocity;
-}
+//Vector& C_EngineObjectInternal::GetLocalVelocity()
+//{
+//	return m_vecVelocity;
+//}
 
 //-----------------------------------------------------------------------------
 // Velocity
@@ -1820,7 +1899,7 @@ void C_EngineObjectInternal::CalcAbsolutePosition()
 	// fact that we're in an indeterminant state and abs queries (which
 	// shouldn't be happening at all; I have assertions for those), will
 	// just have to accept stale data.
-	if (!m_pOuter->s_bAbsRecomputationEnabled)
+	if (!s_bAbsRecomputationEnabled)
 		return;
 
 	// FIXME: Recompute absbox!!!

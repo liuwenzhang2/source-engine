@@ -1711,19 +1711,7 @@ public:
 	// Used to access m_vecAbsOrigin during restore when it's unsafe to call GetAbsOrigin.
 	friend class CPlayerRestoreHelper;
 	
-	static bool s_bAbsQueriesValid;
-
-	// Call this when hierarchy is not completely set up (such as during Restore) to throw asserts
-	// when people call GetAbsAnything. 
-	static inline void SetAbsQueriesValid( bool bValid )
-	{
-		s_bAbsQueriesValid = bValid;
-	}
 	
-	static inline bool IsAbsQueriesValid()
-	{
-		return s_bAbsQueriesValid;
-	}
 
 };
 

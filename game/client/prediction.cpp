@@ -1589,7 +1589,7 @@ bool CPrediction::PerformPrediction( bool received_new_world_update, C_BasePlaye
 	VPROF( "CPrediction::PerformPrediction" );
 
 	// This makes sure , tahe we are allwoed to sample the world when it may not be ready to be sampled
-	Assert( C_BaseEntity::IsAbsQueriesValid() );
+	Assert(C_EngineObjectInternal::IsAbsQueriesValid() );
 	Assert( C_BaseEntity::IsAbsRecomputationsEnabled() );
 
 	m_bInPrediction = true;

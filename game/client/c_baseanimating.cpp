@@ -2050,7 +2050,7 @@ void C_BaseAnimating::CalculateIKLocks( float currentTime )
 	// partition that early in the rendering loop. So we allow access right here for that special case.
 	SpatialPartitionListMask_t curSuppressed = partition->GetSuppressedLists();
 	partition->SuppressLists( PARTITION_ALL_CLIENT_EDICTS, false );
-	CBaseEntity::PushEnableAbsRecomputations( false );
+	C_EngineObjectInternal::PushEnableAbsRecomputations( false );
 
 	Ray_t ray;
 	CTraceFilterSkipNPCsAndPlayers traceFilter( this, GetEngineObject()->GetCollisionGroup() );
@@ -2268,7 +2268,7 @@ void C_BaseAnimating::CalculateIKLocks( float currentTime )
 	}
 #endif
 
-	CBaseEntity::PopEnableAbsRecomputations();
+	C_EngineObjectInternal::PopEnableAbsRecomputations();
 	partition->SuppressLists( curSuppressed, true );
 }
 

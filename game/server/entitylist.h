@@ -200,6 +200,20 @@ public:
 		UnlockStudioHdr();
 	}
 
+	static bool s_bAbsQueriesValid;
+
+	// Call this when hierarchy is not completely set up (such as during Restore) to throw asserts
+	// when people call GetAbsAnything. 
+	static inline void SetAbsQueriesValid(bool bValid)
+	{
+		s_bAbsQueriesValid = bValid;
+	}
+
+	static inline bool IsAbsQueriesValid()
+	{
+		return s_bAbsQueriesValid;
+	}
+
 	void Init(CBaseEntity* pOuter) {
 		m_pOuter = pOuter;
 		m_PVSInfo.m_nClusterCount = 0;

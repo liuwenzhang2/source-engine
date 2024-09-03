@@ -175,7 +175,7 @@ void CDirtySpatialPartitionEntityList::OnPreQuery( SpatialPartitionListMask_t li
 
 #ifdef CLIENT_DLL
 	// FIXME: This should really be an assertion... feh!
-	if ( !C_BaseEntity::IsAbsRecomputationsEnabled() )
+	if ( !C_EngineObjectInternal::IsAbsRecomputationsEnabled() )
 	{
 		LockPartitionForRead();
 		return;
