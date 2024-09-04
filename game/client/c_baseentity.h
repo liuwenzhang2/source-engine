@@ -36,7 +36,7 @@
 #include "toolframework/itoolentity.h"
 #include "tier0/threadtools.h"
 #include "SoundEmitterSystem/isoundemittersystembase.h"
-#include "engine\ivmodelrender.h"
+//#include "engine\ivmodelrender.h"
 
 class C_Team;
 class IPhysicsObject;
@@ -430,7 +430,7 @@ public:
 	virtual bool					SetupBones( matrix3x4_t *pBoneToWorldOut, int nMaxBones, int boneMask, float currentTime );
 	virtual void					SetupWeights( const matrix3x4_t *pBoneToWorld, int nFlexWeightCount, float *pFlexWeights, float *pFlexDelayedWeights );
 	virtual bool					UsesFlexDelayedWeights() { return false; }
-	virtual void					DoAnimationEvents( void );
+	//virtual void					DoAnimationEvents( void );
 
 	// Add entity to visible entities list?
 	virtual void					AddEntity( void );

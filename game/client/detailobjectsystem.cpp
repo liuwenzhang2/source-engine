@@ -154,7 +154,7 @@ public:
 	virtual bool				SetupBones( matrix3x4_t *pBoneToWorldOut, int nMaxBones, int boneMask, float currentTime );
 	virtual void				SetupWeights( const matrix3x4_t *pBoneToWorld, int nFlexWeightCount, float *pFlexWeights, float *pFlexDelayedWeights );
 	virtual bool				UsesFlexDelayedWeights() { return false; }
-	virtual void				DoAnimationEvents( void );
+	//virtual void				DoAnimationEvents( void );
 	virtual void				GetRenderBounds( Vector& mins, Vector& maxs );
 	virtual IPVSNotify*			GetPVSNotifyInterface();
 	virtual void				GetRenderBoundsWorldspace( Vector& mins, Vector& maxs );
@@ -675,9 +675,9 @@ void	CDetailModel::SetupWeights( const matrix3x4_t *pBoneToWorld, int nFlexWeigh
 {
 }
 
-void	CDetailModel::DoAnimationEvents( void )
-{
-}
+//void	CDetailModel::DoAnimationEvents( void )
+//{
+//}
 
 
 //-----------------------------------------------------------------------------

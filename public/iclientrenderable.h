@@ -107,7 +107,7 @@ public:
 	virtual bool	SetupBones( matrix3x4_t *pBoneToWorldOut, int nMaxBones, int boneMask, float currentTime ) = 0;
 
 	virtual void	SetupWeights( const matrix3x4_t *pBoneToWorld, int nFlexWeightCount, float *pFlexWeights, float *pFlexDelayedWeights ) = 0;
-	virtual void	DoAnimationEvents( void ) = 0;
+	//virtual void	DoAnimationEvents( void ) = 0;
 	
 	// Return this if you want PVS notifications. See IPVSNotify for more info.	
 	// Note: you must always return the same value from this function. If you don't,
@@ -214,7 +214,7 @@ public:
 	virtual bool					LODTest()				{ return true; }
 	virtual bool					SetupBones( matrix3x4_t *pBoneToWorldOut, int nMaxBones, int boneMask, float currentTime )	{ return true; }
 	virtual void					SetupWeights( const matrix3x4_t *pBoneToWorld, int nFlexWeightCount, float *pFlexWeights, float *pFlexDelayedWeights ) {}
-	virtual void					DoAnimationEvents( void )						{}
+	//virtual void					DoAnimationEvents( void )						{}
 	virtual IPVSNotify*				GetPVSNotifyInterface() { return NULL; }
 	virtual void					GetRenderBoundsWorldspace( Vector& absMins, Vector& absMaxs ) { DefaultRenderBoundsWorldspace( this, absMins, absMaxs ); }
 

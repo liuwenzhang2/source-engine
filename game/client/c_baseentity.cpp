@@ -1476,9 +1476,9 @@ void C_BaseEntity::SetupWeights( const matrix3x4_t *pBoneToWorld, int nFlexWeigh
 //-----------------------------------------------------------------------------
 // Purpose: Process any local client-side animation events
 //-----------------------------------------------------------------------------
-void C_BaseEntity::DoAnimationEvents( )
-{
-}
+//void C_BaseEntity::DoAnimationEvents( )
+//{
+//}
 
 
 void C_BaseEntity::UpdatePartitionListEntry()
