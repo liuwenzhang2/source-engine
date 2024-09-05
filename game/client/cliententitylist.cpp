@@ -1804,14 +1804,14 @@ void C_EngineObjectInternal::SetLocalAnglesDim(int iDim, vec_t flValue)
 
 const Vector& C_EngineObjectInternal::GetAbsVelocity()
 {
-	Assert(C_BaseEntity::s_bAbsQueriesValid);
+	Assert(C_EngineObjectInternal::s_bAbsQueriesValid);
 	const_cast<C_EngineObjectInternal*>(this)->CalcAbsoluteVelocity();
 	return m_vecAbsVelocity;
 }
 
 const Vector& C_EngineObjectInternal::GetAbsVelocity() const
 {
-	Assert(C_BaseEntity::s_bAbsQueriesValid);
+	Assert(C_EngineObjectInternal::s_bAbsQueriesValid);
 	const_cast<C_EngineObjectInternal*>(this)->CalcAbsoluteVelocity();
 	return m_vecAbsVelocity;
 }
@@ -1850,14 +1850,14 @@ void C_EngineObjectInternal::ResetRgflCoordinateFrame() {
 //-----------------------------------------------------------------------------
 matrix3x4_t& C_EngineObjectInternal::EntityToWorldTransform()
 {
-	Assert(C_BaseEntity::s_bAbsQueriesValid);
+	Assert(C_EngineObjectInternal::s_bAbsQueriesValid);
 	CalcAbsolutePosition();
 	return m_rgflCoordinateFrame;
 }
 
 const matrix3x4_t& C_EngineObjectInternal::EntityToWorldTransform() const
 {
-	Assert(C_BaseEntity::s_bAbsQueriesValid);
+	Assert(C_EngineObjectInternal::s_bAbsQueriesValid);
 	const_cast<C_EngineObjectInternal*>(this)->CalcAbsolutePosition();
 	return m_rgflCoordinateFrame;
 }
