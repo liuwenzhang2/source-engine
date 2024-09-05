@@ -1582,7 +1582,7 @@ int CHLClient::IN_KeyEvent( int eventcode, ButtonCode_t keynum, const char *pszC
 
 void CHLClient::ExtraMouseSample( float frametime, bool active )
 {
-	Assert( C_BaseEntity::IsAbsRecomputationsEnabled() );
+	Assert(C_EngineObjectInternal::IsAbsRecomputationsEnabled() );
 	Assert(C_EngineObjectInternal::IsAbsQueriesValid() );
 
 	C_BaseAnimating::AutoAllowBoneAccess boneaccess( true, false ); 
@@ -1609,8 +1609,8 @@ void CHLClient::IN_SetSampleTime( float frametime )
 void CHLClient::CreateMove ( int sequence_number, float input_sample_frametime, bool active )
 {
 
-	Assert( C_BaseEntity::IsAbsRecomputationsEnabled() );
-	Assert( C_BaseEntity::IsAbsQueriesValid() );
+	Assert(C_EngineObjectInternal::IsAbsRecomputationsEnabled() );
+	Assert(C_EngineObjectInternal::IsAbsQueriesValid() );
 
 	C_BaseAnimating::AutoAllowBoneAccess boneaccess( true, false ); 
 

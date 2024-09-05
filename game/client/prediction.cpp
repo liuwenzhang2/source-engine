@@ -1216,7 +1216,7 @@ void CPrediction::RestoreOriginalEntityState( void )
 	VPROF( "CPrediction::RestoreOriginalEntityState" );
 	PREDICTION_TRACKVALUECHANGESCOPE( "restore" );
 
-	Assert( C_BaseEntity::IsAbsRecomputationsEnabled() );
+	Assert(C_EngineObjectInternal::IsAbsRecomputationsEnabled() );
 
 	// Transfer intermediate data from other predictables
 	int pc = predictables->GetPredictableCount();
@@ -1590,7 +1590,7 @@ bool CPrediction::PerformPrediction( bool received_new_world_update, C_BasePlaye
 
 	// This makes sure , tahe we are allwoed to sample the world when it may not be ready to be sampled
 	Assert(C_EngineObjectInternal::IsAbsQueriesValid() );
-	Assert( C_BaseEntity::IsAbsRecomputationsEnabled() );
+	Assert(C_EngineObjectInternal::IsAbsRecomputationsEnabled() );
 
 	m_bInPrediction = true;
 
