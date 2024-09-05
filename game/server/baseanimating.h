@@ -15,7 +15,7 @@
 #include "studio.h"
 #include "datacache/idatacache.h"
 #include "tier0/threadtools.h"
-#include <entitylist.h>
+//#include <entitylist.h>
 
 
 struct animevent_t;
