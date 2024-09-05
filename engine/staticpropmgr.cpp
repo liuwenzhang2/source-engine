@@ -2264,7 +2264,7 @@ void CStaticPropMgr::AddColorDecalToStaticProp( Vector const& rayStart, Vector c
 	CStaticProp* prop = m_StaticProps[staticPropIndex];
 
 	// Found the point, now lets apply the decals
-	Assert( prop.GetModelInstance() != MODEL_INSTANCE_INVALID );
+	Assert( prop->GetModelInstance() != MODEL_INSTANCE_INVALID );
 
 	// Choose a new ray along which to project the decal based on
 	// surface normal. This prevents decal skewing
