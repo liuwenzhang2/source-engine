@@ -4154,7 +4154,7 @@ void C_EngineObjectInternal::LockStudioHdr()
 	//}
 
 	m_pStudioHdr = pStudioHdr;// pNewWrapper; // must be last to ensure virtual model correctly set up
-	Assert(hdr->GetNumPoseParameters() <= ARRAYSIZE(m_flPoseParameter));
+	Assert(pStudioHdr->GetNumPoseParameters() <= ARRAYSIZE(m_flPoseParameter));
 
 	m_iv_flPoseParameter.SetMaxCount(pStudioHdr->GetNumPoseParameters());
 

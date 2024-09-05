@@ -89,11 +89,7 @@ public:
 	DECLARE_PREDICTABLE();
 	DECLARE_INTERPOLATION();
 
-	enum
-	{
-		NUM_POSEPAREMETERS = 24,
-		NUM_BONECTRLS = 4
-	};
+
 
 	C_BaseAnimating();
 	~C_BaseAnimating();

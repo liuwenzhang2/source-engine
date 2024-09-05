@@ -101,6 +101,12 @@ public:
 	unsigned short m_PVSNotifiersLink;			// Into m_PVSNotifyInfos.
 };
 
+enum
+{
+	NUM_POSEPAREMETERS = 24,
+	NUM_BONECTRLS = 4
+};
+
 class C_EngineObjectInternal : public IEngineObjectClient, public IClientNetworkable {
 public:
 	DECLARE_CLASS_NOBASE(C_EngineObjectInternal);
