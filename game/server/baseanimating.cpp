@@ -176,7 +176,7 @@ void CBaseAnimating::Activate()
 	if ( GetEngineObject()->GetModelScale() != 1.0f && VPhysicsGetObject() )
 	{	
 		// sanity check to make sure 'm_flModelScale' is in sync with the 
-		Assert( m_flModelScale > 0.0f );
+		Assert(GetEngineObject()->GetModelScale() > 0.0f );
 
 		UTIL_CreateScaledPhysObject( this, GetEngineObject()->GetModelScale() );
 	}
