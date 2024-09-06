@@ -381,7 +381,7 @@ void CBaseAnimating::InputSetModelScale( inputdata_t &inputdata )
 int CBaseAnimating::SelectWeightedSequence ( Activity activity )
 {
 	Assert( activity != ACT_INVALID );
-	Assert( GetModelPtr() );
+	Assert(GetEngineObject()->GetModelPtr() );
 	return GetEngineObject()->GetModelPtr()->SelectWeightedSequence( activity, GetEngineObject()->GetSequence(), SharedRandomSelect);
 }
 
@@ -389,7 +389,7 @@ int CBaseAnimating::SelectWeightedSequence ( Activity activity )
 int CBaseAnimating::SelectWeightedSequence ( Activity activity, int curSequence )
 {
 	Assert( activity != ACT_INVALID );
-	Assert( GetModelPtr() );
+	Assert(GetEngineObject()->GetModelPtr() );
 	return GetEngineObject()->GetModelPtr()->SelectWeightedSequence( activity, curSequence, SharedRandomSelect);
 }
 
@@ -398,7 +398,7 @@ int CBaseAnimating::SelectWeightedSequence ( Activity activity, int curSequence 
 //=========================================================
 void CBaseAnimating::ResetActivityIndexes ( void )
 {
-	Assert( GetModelPtr() );
+	Assert(GetEngineObject()->GetModelPtr() );
 	GetEngineObject()->GetModelPtr()->ResetActivityIndexes();
 }
 
@@ -407,7 +407,7 @@ void CBaseAnimating::ResetActivityIndexes ( void )
 //=========================================================
 void CBaseAnimating::ResetEventIndexes ( void )
 {
-	Assert( GetModelPtr() );
+	Assert(GetEngineObject()->GetModelPtr() );
 	GetEngineObject()->GetModelPtr()->ResetEventIndexes();
 }
 
@@ -419,7 +419,7 @@ void CBaseAnimating::ResetEventIndexes ( void )
 //=========================================================
 int CBaseAnimating::SelectHeaviestSequence ( Activity activity )
 {
-	Assert( GetModelPtr() );
+	Assert(GetEngineObject()->GetModelPtr() );
 	return GetEngineObject()->GetModelPtr()->SelectHeaviestSequence( activity );
 }
 
@@ -431,7 +431,7 @@ int CBaseAnimating::SelectHeaviestSequence ( Activity activity )
 //-----------------------------------------------------------------------------
 int CBaseAnimating::LookupActivity( const char *label )
 {
-	Assert( GetModelPtr() );
+	Assert(GetEngineObject()->GetModelPtr() );
 	return GetEngineObject()->GetModelPtr()->LookupActivity( label );
 }
 
@@ -439,7 +439,7 @@ int CBaseAnimating::LookupActivity( const char *label )
 //=========================================================
 int CBaseAnimating::LookupSequence( const char *label )
 {
-	Assert( GetModelPtr() );
+	Assert(GetEngineObject()->GetModelPtr() );
 	return GetEngineObject()->GetModelPtr()->LookupSequence( label, SharedRandomSelect);
 }
 
@@ -585,7 +585,7 @@ bool CBaseAnimating::CanBecomeRagdoll( void )
 //=========================================================
 bool CBaseAnimating::IsValidSequence( int iSequence )
 {
-	Assert( GetModelPtr() );
+	Assert(GetEngineObject()->GetModelPtr() );
 	IStudioHdr* pstudiohdr = GetEngineObject()->GetModelPtr( );
 	if (iSequence < 0 || iSequence >= pstudiohdr->GetNumSeq())
 	{
@@ -1213,7 +1213,7 @@ void CBaseAnimating::SetupBones( matrix3x4_t *pBoneToWorld, int boneMask )
 	
 	MDLCACHE_CRITICAL_SECTION();
 
-	Assert( GetModelPtr() );
+	Assert(GetEngineObject()->GetModelPtr() );
 
 	IStudioHdr *pStudioHdr = GetEngineObject()->GetModelPtr( );
 
@@ -1520,7 +1520,7 @@ void CBaseAnimating::GetEyeballs( Vector &origin, QAngle &angles )
 //=========================================================
 int CBaseAnimating::FindTransitionSequence( int iCurrentSequence, int iGoalSequence, int *piDir )
 {
-	Assert( GetModelPtr() );
+	Assert(GetEngineObject()->GetModelPtr() );
 
 	if (piDir == NULL)
 	{
@@ -1569,7 +1569,7 @@ void CBaseAnimating::SetBodygroup( int iGroup, int iValue )
 {
 	// SetBodygroup is not supported on pending dynamic models. Wait for it to load!
 	// XXX TODO we could buffer up the group and value if we really needed to. -henryg
-	Assert( GetModelPtr() );
+	Assert(GetEngineObject()->GetModelPtr() );
 	int newBody = GetEngineObject()->GetBody();
 	GetEngineObject()->GetModelPtr()->SetBodygroup( newBody, iGroup, iValue );
 	GetEngineObject()->SetBody(newBody);
@@ -2108,7 +2108,7 @@ void CBaseAnimating::GetInputDispatchEffectPosition( const char *sInputString, V
 void CBaseAnimating::SetHitboxSet( int setnum )
 {
 #ifdef _DEBUG
-	IStudioHdr *pStudioHdr = GetModelPtr();
+	IStudioHdr *pStudioHdr = GetEngineObject()->GetModelPtr();
 	if ( !pStudioHdr )
 		return;
 
@@ -2134,7 +2134,7 @@ void CBaseAnimating::SetHitboxSet( int setnum )
 //-----------------------------------------------------------------------------
 void CBaseAnimating::SetHitboxSetByName( const char *setname )
 {
-	Assert( GetModelPtr() );
+	Assert(GetEngineObject()->GetModelPtr() );
 	GetEngineObject()->SetHitboxSet(GetEngineObject()->GetModelPtr()->FindHitboxSetByName( setname ));
 }
 
@@ -2153,7 +2153,7 @@ int CBaseAnimating::GetHitboxSet( void )
 //-----------------------------------------------------------------------------
 const char *CBaseAnimating::GetHitboxSetName( void )
 {
-	Assert( GetModelPtr() );
+	Assert(GetEngineObject()->GetModelPtr() );
 	return GetEngineObject()->GetModelPtr()->GetHitboxSetName(GetEngineObject()->GetHitboxSet() );
 }
 
@@ -2163,7 +2163,7 @@ const char *CBaseAnimating::GetHitboxSetName( void )
 //-----------------------------------------------------------------------------
 int CBaseAnimating::GetHitboxSetCount( void )
 {
-	Assert( GetModelPtr() );
+	Assert(GetEngineObject()->GetModelPtr() );
 	return GetEngineObject()->GetModelPtr()->GetHitboxSetCount();
 }
 
