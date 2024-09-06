@@ -11181,7 +11181,7 @@ int CAI_BaseNPC::Restore( IRestore &restore )
 			bLostSequence = true;
 		}
 
-		Assert( IsValidSequence( GetSequence() ) );
+		Assert( IsValidSequence(GetEngineObject()->GetSequence() ) );
 	}
 
 	bool bLostScript = ( m_NPCState == NPC_STATE_SCRIPT && m_hCine == NULL );
