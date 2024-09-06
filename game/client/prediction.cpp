@@ -1805,7 +1805,7 @@ void CPrediction::_Update( bool received_new_world_update, bool validframe,
 	localPlayer->GetEngineObject()->SetLocalAngles( viewangles );
 
 	// This allows us to sample the world when it may not be ready to be sampled
-	Assert( C_BaseEntity::IsAbsQueriesValid() );
+	Assert( C_EngineObjectInternal::IsAbsQueriesValid() );
 	
 	// FIXME: What about hierarchy here?!?
 	SetIdealPitch( localPlayer, localPlayer->GetEngineObject()->GetLocalOrigin(), localPlayer->GetEngineObject()->GetLocalAngles(), localPlayer->m_vecViewOffset );
