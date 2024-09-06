@@ -4389,7 +4389,7 @@ float CEngineObjectInternal::GetPoseParameter(int iParameter)
 float CEngineObjectInternal::SetPoseParameter(IStudioHdr* pStudioHdr, const char* szName, float flValue)
 {
 	int poseParam = LookupPoseParameter(pStudioHdr, szName);
-	AssertMsg2(poseParam >= 0, "SetPoseParameter called with invalid argument %s by %s", szName, GetDebugName());
+	AssertMsg2(poseParam >= 0, "SetPoseParameter called with invalid argument %s by %s", szName, m_pOuter->GetDebugName());
 	return SetPoseParameter(pStudioHdr, poseParam, flValue);
 }
 
