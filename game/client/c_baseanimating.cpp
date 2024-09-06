@@ -911,7 +911,7 @@ IStudioHdr *C_BaseAnimating::OnNewModel()
 //-----------------------------------------------------------------------------
 int C_BaseAnimating::LookupBone( const char *szName )
 {
-	Assert( GetModelPtr() );
+	Assert(GetEngineObject()->GetModelPtr() );
 
 	return  GetEngineObject()->GetModelPtr()->Studio_BoneIndexByName( szName );
 }
@@ -928,7 +928,7 @@ void C_BaseAnimating::GetBonePosition ( int iBone, Vector &origin, QAngle &angle
 
 void C_BaseAnimating::GetBoneTransform( int iBone, matrix3x4_t &pBoneToWorld )
 {
-	Assert( GetModelPtr() && iBone >= 0 && iBone < GetModelPtr()->numbones() );
+	Assert(GetEngineObject()->GetModelPtr() && iBone >= 0 && iBone < GetEngineObject()->GetModelPtr()->numbones() );
 	CBoneCache *pcache = GetBoneCache( NULL );
 
 	matrix3x4_t *pmatrix = pcache->GetCachedBone( iBone );
@@ -4774,7 +4774,7 @@ void C_BaseAnimating::SetBodygroup( int iGroup, int iValue )
 {
 	// SetBodygroup is not supported on pending dynamic models. Wait for it to load!
 	// XXX TODO we could buffer up the group and value if we really needed to. -henryg
-	Assert( GetModelPtr() );
+	Assert(GetEngineObject()->GetModelPtr() );
 	int nBody = GetBody();
 	GetEngineObject()->GetModelPtr()->SetBodygroup(nBody, iGroup, iValue);
 	GetEngineObject()->SetBody(nBody);//aaa need check
@@ -4820,7 +4820,7 @@ void C_BaseAnimating::SetHitboxSet( int setnum )
 	//	return;
 
 #ifdef _DEBUG
-	IStudioHdr *pStudioHdr = GetModelPtr();
+	IStudioHdr *pStudioHdr = GetEngineObject()->GetModelPtr();
 	if ( !pStudioHdr )
 		return;
 
@@ -4962,7 +4962,7 @@ int C_BaseAnimating::SelectWeightedSequence ( int activity )
 //-----------------------------------------------------------------------------
 int C_BaseAnimating::LookupSequence( const char *label )
 {
-	Assert( GetModelPtr() );
+	Assert(GetEngineObject()->GetModelPtr() );
 	return GetEngineObject()->GetModelPtr()->LookupSequence( label, SharedRandomSelect);
 }
 
@@ -5030,7 +5030,7 @@ void C_BaseAnimating::ClearRagdoll()
 //-----------------------------------------------------------------------------
 int C_BaseAnimating::LookupActivity( const char *label )
 {
-	Assert( GetModelPtr() );
+	Assert(GetEngineObject()->GetModelPtr() );
 	return GetEngineObject()->GetModelPtr()->LookupActivity( label );
 }
 
