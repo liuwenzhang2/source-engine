@@ -139,7 +139,7 @@ public:
 	//int						DrawOverriddenViewmodel( int flags );
 	//virtual int				GetFxBlend( void );
 	//virtual bool			IsTransparent( void );
-	virtual bool			UsesPowerOfTwoFrameBufferTexture( void );
+	//virtual bool			UsesPowerOfTwoFrameBufferTexture( void );
 	
 	// Should this object cast shadows?
 	virtual ShadowType_t	ShadowCastType() { return SHADOWS_NONE; }

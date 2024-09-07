@@ -405,10 +405,10 @@ int C_BaseViewModel::InternalDrawModel( int flags )
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-bool C_BaseViewModel::UsesPowerOfTwoFrameBufferTexture( void )
-{
+//bool C_BaseViewModel::UsesPowerOfTwoFrameBufferTexture( void )
+//{
 	// See if the local player wants to override the viewmodel's rendering
-	C_BasePlayer *pPlayer = C_BasePlayer::GetLocalPlayer();
+	//C_BasePlayer *pPlayer = C_BasePlayer::GetLocalPlayer();
 	//if ( pPlayer && pPlayer->IsOverridingViewmodel() )
 	//{
 	//	return pPlayer->ViewModel_IsUsingFBTexture();
@@ -420,8 +420,8 @@ bool C_BaseViewModel::UsesPowerOfTwoFrameBufferTexture( void )
 	//	return pWeapon->ViewModel_IsUsingFBTexture();
 	//}
 
-	return BaseClass::UsesPowerOfTwoFrameBufferTexture();
-}
+	//return BaseClass::UsesPowerOfTwoFrameBufferTexture();
+//}
 
 //-----------------------------------------------------------------------------
 // Purpose: If the animation parity of the weapon has changed, we reset cycle to avoid popping
