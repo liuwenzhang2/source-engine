@@ -508,11 +508,11 @@ public:
 
 #if !defined USES_ECON_ITEMS
 	// Viewmodel overriding
-	virtual bool			ViewModel_IsTransparent( void ) { return IsTransparent(); }
-	virtual bool			ViewModel_IsUsingFBTexture( void ) { return UsesPowerOfTwoFrameBufferTexture(); }
-	virtual bool			IsOverridingViewmodel( void ) { return false; };
-	virtual int				DrawOverriddenViewmodel( C_BaseViewModel *pViewmodel, int flags ) { return 0; };
-	bool					WantsToOverrideViewmodelAttachments( void ) { return false; }
+	//virtual bool			ViewModel_IsTransparent( void ) { return IsTransparent(); }
+	//virtual bool			ViewModel_IsUsingFBTexture( void ) { return UsesPowerOfTwoFrameBufferTexture(); }
+	//virtual bool			IsOverridingViewmodel( void ) { return false; };
+	//virtual int				DrawOverriddenViewmodel( C_BaseViewModel *pViewmodel, int flags ) { return 0; };
+	//bool					WantsToOverrideViewmodelAttachments( void ) { return false; }
 #endif
 
 #endif // End client-only methods

@@ -300,22 +300,22 @@ int C_BaseViewModel::DrawModel( int flags )
 		render->SetColorModulation(	color );
 	}
 		
-	C_BasePlayer *pPlayer = C_BasePlayer::GetLocalPlayer();
+	//C_BasePlayer *pPlayer = C_BasePlayer::GetLocalPlayer();
 	C_BaseCombatWeapon *pWeapon = GetOwningWeapon();
 	int ret;
 	// If the local player's overriding the viewmodel rendering, let him do it
-	if ( pPlayer && pPlayer->IsOverridingViewmodel() )
-	{
-		ret = pPlayer->DrawOverriddenViewmodel( this, flags );
-	}
-	else if ( pWeapon && pWeapon->IsOverridingViewmodel() )
-	{
-		ret = pWeapon->DrawOverriddenViewmodel( this, flags );
-	}
-	else
-	{
+	//if ( pPlayer && pPlayer->IsOverridingViewmodel() )
+	//{
+	//	ret = pPlayer->DrawOverriddenViewmodel( this, flags );
+	//}
+	//else if ( pWeapon && pWeapon->IsOverridingViewmodel() )
+	//{
+	//	ret = pWeapon->DrawOverriddenViewmodel( this, flags );
+	//}
+	//else
+	//{
 		ret = BaseClass::DrawModel( flags );
-	}
+	//}
 
 	// Now that we've rendered, reset the animation restart flag
 	if ( flags & STUDIO_RENDER )
@@ -353,54 +353,54 @@ int C_BaseViewModel::InternalDrawModel( int flags )
 //-----------------------------------------------------------------------------
 // Purpose: Called by the player when the player's overriding the viewmodel drawing. Avoids infinite recursion.
 //-----------------------------------------------------------------------------
-int C_BaseViewModel::DrawOverriddenViewmodel( int flags )
-{
-	return BaseClass::DrawModel( flags );
-}
+//int C_BaseViewModel::DrawOverriddenViewmodel( int flags )
+//{
+//	return BaseClass::DrawModel( flags );
+//}
 
 //-----------------------------------------------------------------------------
 // Purpose: 
 // Output : int
 //-----------------------------------------------------------------------------
-int C_BaseViewModel::GetFxBlend( void )
-{
+//int C_BaseViewModel::GetFxBlend( void )
+//{
 	// See if the local player wants to override the viewmodel's rendering
-	C_BasePlayer *pPlayer = C_BasePlayer::GetLocalPlayer();
-	if ( pPlayer && pPlayer->IsOverridingViewmodel() )
-	{
-		pPlayer->ComputeFxBlend();
-		return pPlayer->GetFxBlend();
-	}
+	//C_BasePlayer *pPlayer = C_BasePlayer::GetLocalPlayer();
+	//if ( pPlayer && pPlayer->IsOverridingViewmodel() )
+	//{
+	//	pPlayer->ComputeFxBlend();
+	//	return pPlayer->GetFxBlend();
+	//}
 
-	C_BaseCombatWeapon *pWeapon = GetOwningWeapon();
-	if ( pWeapon && pWeapon->IsOverridingViewmodel() )
-	{
-		pWeapon->ComputeFxBlend();
-		return pWeapon->GetFxBlend();
-	}
+	//C_BaseCombatWeapon *pWeapon = GetOwningWeapon();
+	//if ( pWeapon && pWeapon->IsOverridingViewmodel() )
+	//{
+	//	pWeapon->ComputeFxBlend();
+	//	return pWeapon->GetFxBlend();
+	//}
 
-	return BaseClass::GetFxBlend();
-}
+	//return BaseClass::GetFxBlend();
+//}
 
 //-----------------------------------------------------------------------------
 // Purpose: 
 // Output : Returns true on success, false on failure.
 //-----------------------------------------------------------------------------
-bool C_BaseViewModel::IsTransparent( void )
-{
+//bool C_BaseViewModel::IsTransparent( void )
+//{
 	// See if the local player wants to override the viewmodel's rendering
-	C_BasePlayer *pPlayer = C_BasePlayer::GetLocalPlayer();
-	if ( pPlayer && pPlayer->IsOverridingViewmodel() )
-	{
-		return pPlayer->ViewModel_IsTransparent();
-	}
+	//C_BasePlayer *pPlayer = C_BasePlayer::GetLocalPlayer();
+	//if ( pPlayer && pPlayer->IsOverridingViewmodel() )
+	//{
+	//	return pPlayer->ViewModel_IsTransparent();
+	//}
 
-	C_BaseCombatWeapon *pWeapon = GetOwningWeapon();
-	if ( pWeapon && pWeapon->IsOverridingViewmodel() )
-		return pWeapon->ViewModel_IsTransparent();
+	//C_BaseCombatWeapon *pWeapon = GetOwningWeapon();
+	//if ( pWeapon && pWeapon->IsOverridingViewmodel() )
+	//	return pWeapon->ViewModel_IsTransparent();
 
-	return BaseClass::IsTransparent();
-}
+	//return BaseClass::IsTransparent();
+//}
 
 //-----------------------------------------------------------------------------
 // Purpose: 
@@ -409,16 +409,16 @@ bool C_BaseViewModel::UsesPowerOfTwoFrameBufferTexture( void )
 {
 	// See if the local player wants to override the viewmodel's rendering
 	C_BasePlayer *pPlayer = C_BasePlayer::GetLocalPlayer();
-	if ( pPlayer && pPlayer->IsOverridingViewmodel() )
-	{
-		return pPlayer->ViewModel_IsUsingFBTexture();
-	}
+	//if ( pPlayer && pPlayer->IsOverridingViewmodel() )
+	//{
+	//	return pPlayer->ViewModel_IsUsingFBTexture();
+	//}
 
-	C_BaseCombatWeapon *pWeapon = GetOwningWeapon();
-	if ( pWeapon && pWeapon->IsOverridingViewmodel() )
-	{
-		return pWeapon->ViewModel_IsUsingFBTexture();
-	}
+	//C_BaseCombatWeapon *pWeapon = GetOwningWeapon();
+	//if ( pWeapon && pWeapon->IsOverridingViewmodel() )
+	//{
+	//	return pWeapon->ViewModel_IsUsingFBTexture();
+	//}
 
 	return BaseClass::UsesPowerOfTwoFrameBufferTexture();
 }

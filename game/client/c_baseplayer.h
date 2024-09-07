@@ -196,8 +196,8 @@ public:
 	// (and its appropriate left/right weapon if this is TF2).
 	virtual C_BaseAnimating*	GetRenderedWeaponModel();
 
-	virtual bool				IsOverridingViewmodel( void ) { return false; };
-	virtual int					DrawOverriddenViewmodel( C_BaseViewModel *pViewmodel, int flags ) { return 0; };
+	//virtual bool				IsOverridingViewmodel( void ) { return false; };
+	//virtual int					DrawOverriddenViewmodel( C_BaseViewModel *pViewmodel, int flags ) { return 0; };
 
 	virtual float				GetDefaultAnimSpeed( void ) { return 1.0; }
 
@@ -232,8 +232,8 @@ public:
 	bool						ShouldDrawThisPlayer();
 
 	// Called by the view model if its rendering is being overridden.
-	virtual bool				ViewModel_IsTransparent( void );
-	virtual bool				ViewModel_IsUsingFBTexture( void );
+	//virtual bool				ViewModel_IsTransparent( void );
+	//virtual bool				ViewModel_IsUsingFBTexture( void );
 
 //#if !defined( NO_ENTITY_PREDICTION )
 //	void						AddToPlayerSimulationList( C_BaseEntity *other );

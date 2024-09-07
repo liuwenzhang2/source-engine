@@ -638,8 +638,8 @@ void RecvProxy_SequenceNum( const CRecvProxyData *pData, void *pStruct, void *pO
 //-----------------------------------------------------------------------------
 int	CBaseViewModel::LookupAttachment( const char *pAttachmentName )
 {
-	if ( m_hWeapon.Get() && m_hWeapon.Get()->WantsToOverrideViewmodelAttachments() )
-		return m_hWeapon.Get()->LookupAttachment( pAttachmentName );
+	//if ( m_hWeapon.Get() && m_hWeapon.Get()->WantsToOverrideViewmodelAttachments() )
+	//	return m_hWeapon.Get()->LookupAttachment( pAttachmentName );
 
 	return BaseClass::LookupAttachment( pAttachmentName );
 }
@@ -649,8 +649,8 @@ int	CBaseViewModel::LookupAttachment( const char *pAttachmentName )
 //-----------------------------------------------------------------------------
 bool CBaseViewModel::GetAttachment( int number, matrix3x4_t &matrix )
 {
-	if ( m_hWeapon.Get() && m_hWeapon.Get()->WantsToOverrideViewmodelAttachments() )
-		return m_hWeapon.Get()->GetAttachment( number, matrix );
+	//if ( m_hWeapon.Get() && m_hWeapon.Get()->WantsToOverrideViewmodelAttachments() )
+	//	return m_hWeapon.Get()->GetAttachment( number, matrix );
 
 	return BaseClass::GetAttachment( number, matrix );
 }
@@ -660,8 +660,8 @@ bool CBaseViewModel::GetAttachment( int number, matrix3x4_t &matrix )
 //-----------------------------------------------------------------------------
 bool CBaseViewModel::GetAttachment( int number, Vector &origin )
 {
-	if ( m_hWeapon.Get() && m_hWeapon.Get()->WantsToOverrideViewmodelAttachments() )
-		return m_hWeapon.Get()->GetAttachment( number, origin );
+	//if ( m_hWeapon.Get() && m_hWeapon.Get()->WantsToOverrideViewmodelAttachments() )
+	//	return m_hWeapon.Get()->GetAttachment( number, origin );
 
 	return BaseClass::GetAttachment( number, origin );
 }
@@ -671,8 +671,8 @@ bool CBaseViewModel::GetAttachment( int number, Vector &origin )
 //-----------------------------------------------------------------------------
 bool CBaseViewModel::GetAttachment( int number, Vector &origin, QAngle &angles )
 {
-	if ( m_hWeapon.Get() && m_hWeapon.Get()->WantsToOverrideViewmodelAttachments() )
-		return m_hWeapon.Get()->GetAttachment( number, origin, angles );
+	//if ( m_hWeapon.Get() && m_hWeapon.Get()->WantsToOverrideViewmodelAttachments() )
+	//	return m_hWeapon.Get()->GetAttachment( number, origin, angles );
 
 	return BaseClass::GetAttachment( number, origin, angles );
 }
@@ -682,8 +682,8 @@ bool CBaseViewModel::GetAttachment( int number, Vector &origin, QAngle &angles )
 //-----------------------------------------------------------------------------
 bool CBaseViewModel::GetAttachmentVelocity( int number, Vector &originVel, Quaternion &angleVel )
 {
-	if ( m_hWeapon.Get() && m_hWeapon.Get()->WantsToOverrideViewmodelAttachments() )
-		return m_hWeapon.Get()->GetAttachmentVelocity( number, originVel, angleVel );
+	//if ( m_hWeapon.Get() && m_hWeapon.Get()->WantsToOverrideViewmodelAttachments() )
+	//	return m_hWeapon.Get()->GetAttachmentVelocity( number, originVel, angleVel );
 
 	return BaseClass::GetAttachmentVelocity( number, originVel, angleVel );
 }

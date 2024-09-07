@@ -650,15 +650,15 @@ int C_BasePlayer::GetObserverMode() const
 	return m_iObserverMode; 
 }
 
-bool C_BasePlayer::ViewModel_IsTransparent( void )
-{
-	return IsTransparent();
-}
+//bool C_BasePlayer::ViewModel_IsTransparent( void )
+//{
+//	return IsTransparent();
+//}
 
-bool C_BasePlayer::ViewModel_IsUsingFBTexture( void )
-{
-	return UsesPowerOfTwoFrameBufferTexture();
-}
+//bool C_BasePlayer::ViewModel_IsUsingFBTexture( void )
+//{
+//	return UsesPowerOfTwoFrameBufferTexture();
+//}
 
 //-----------------------------------------------------------------------------
 // Used by prediction, sets the view angles for the player

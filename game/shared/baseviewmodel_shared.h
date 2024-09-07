@@ -136,9 +136,9 @@ public:
 	virtual bool			ShouldDraw();
 	virtual int				DrawModel( int flags );
 	virtual int				InternalDrawModel( int flags );
-	int						DrawOverriddenViewmodel( int flags );
-	virtual int				GetFxBlend( void );
-	virtual bool			IsTransparent( void );
+	//int						DrawOverriddenViewmodel( int flags );
+	//virtual int				GetFxBlend( void );
+	//virtual bool			IsTransparent( void );
 	virtual bool			UsesPowerOfTwoFrameBufferTexture( void );
 	
 	// Should this object cast shadows?
