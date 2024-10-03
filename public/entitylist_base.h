@@ -1234,6 +1234,10 @@ public:
 #endif // GAME_DLL
 	}
 
+	virtual int GetEngineObjectType() {
+		return T::GetEngineObjectTypeStatic();
+	}
+
 private:
 
 	bool IsInDestruction(CEntityProxy* entityProxy) const{

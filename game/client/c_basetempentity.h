@@ -34,7 +34,7 @@ public:
 
 // IClientUnknown implementation.
 public:
-
+	static int GetEngineObjectTypeStatic() { return ENGINEOBJECT_BASE; }
 	//virtual void SetRefEHandle( const CBaseHandle &handle )	{ Assert( false ); }
 	//virtual const CBaseHandle& GetRefEHandle() const		{ return *((CBaseHandle*)0); }
 

@@ -1541,6 +1541,16 @@ inline void CEngineObjectInternal::SetPlaybackRate(float rate)
 	m_flPlaybackRate = rate;
 }
 
+class CEngineObjectWorld : public CEngineObjectInternal {
+public:
+
+};
+
+class CEngineObjectPlayer : public CEngineObjectInternal {
+public:
+
+};
+
 //-----------------------------------------------------------------------------
 // Utilities entities can use when saving
 //-----------------------------------------------------------------------------
@@ -2822,6 +2832,28 @@ inline CBaseEntity* CGlobalEntityList<T>::CreateEntityByName(const char* classNa
 	}
 	iForceEdictIndex = BaseClass::AllocateFreeSlot(EntityFactoryDictionary()->IsNetworkable(className), iForceEdictIndex);
 	iSerialNum = BaseClass::GetNetworkSerialNumber(iForceEdictIndex);
+	if (m_EngineObjectArray[iForceEdictIndex]) {
+		Error("slot not free!");
+	}
+	IEntityFactory* pFactory = EntityFactoryDictionary()->FindFactory(className);
+	if (!pFactory)
+	{
+		Error("Attempted to create unknown entity type %s!\n", className);
+		return NULL;
+	}
+	switch (pFactory->GetEngineObjectType()) {
+	case ENGINEOBJECT_BASE:
+		m_EngineObjectArray[iForceEdictIndex] = new CEngineObjectInternal();
+		break;
+	case ENGINEOBJECT_WORLD:
+		m_EngineObjectArray[iForceEdictIndex] = new CEngineObjectWorld();
+		break;
+	case ENGINEOBJECT_PLAYER:
+		m_EngineObjectArray[iForceEdictIndex] = new CEngineObjectPlayer();
+		break;
+	default:
+		Error("GetEngineObjectType error!\n");
+	}
 	return (CBaseEntity*)EntityFactoryDictionary()->Create(this, className, iForceEdictIndex, iSerialNum, this);
 }
 
@@ -3750,7 +3782,7 @@ void CGlobalEntityList<T>::OnAddEntity(T* pEnt, CBaseHandle handle)
 
 	// If it's a CBaseEntity, notify the listeners.
 	CBaseEntity* pBaseEnt = (pEnt)->GetBaseEntity();
-	m_EngineObjectArray[i] = new CEngineObjectInternal();
+	//m_EngineObjectArray[i] = new CEngineObjectInternal();
 	m_EngineObjectArray[i]->Init(pBaseEnt);
 
 	if (pBaseEnt->IsNetworkable()) {

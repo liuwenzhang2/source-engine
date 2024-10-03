@@ -1623,6 +1623,16 @@ inline float C_EngineObjectInternal::SequenceDuration(void)
 	return SequenceDuration(GetSequence());
 }
 
+class C_EngineObjectWorld : public C_EngineObjectInternal {
+public:
+
+};
+
+class C_EngineObjectPlayer : public C_EngineObjectInternal {
+public:
+
+};
+
 // Use this to iterate over *all* (even dormant) the C_BaseEntities in the client entity list.
 //class C_AllBaseEntityIterator
 //{
@@ -2158,6 +2168,28 @@ inline C_BaseEntity* CClientEntityList<T>::CreateEntityByName(const char* classN
 			Error("iSerialNum == -1");
 		}
 	}
+	if (m_EngineObjectArray[iForceEdictIndex]) {
+		Error("slot not free!");
+	}
+	IEntityFactory* pFactory = EntityFactoryDictionary()->FindFactory(className);
+	if (!pFactory)
+	{
+		Error("Attempted to create unknown entity type %s!\n", className);
+		return NULL;
+	}
+	switch (pFactory->GetEngineObjectType()) {
+	case ENGINEOBJECT_BASE:
+		m_EngineObjectArray[iForceEdictIndex] = new C_EngineObjectInternal();
+		break;
+	case ENGINEOBJECT_WORLD:
+		m_EngineObjectArray[iForceEdictIndex] = new C_EngineObjectWorld();
+		break;
+	case ENGINEOBJECT_PLAYER:
+		m_EngineObjectArray[iForceEdictIndex] = new C_EngineObjectPlayer();
+		break;
+	default:
+		Error("GetEngineObjectType error!\n");
+	}
 	return (C_BaseEntity*)EntityFactoryDictionary()->Create(this, className, iForceEdictIndex, iSerialNum, this);
 }
 
@@ -2540,7 +2572,7 @@ void CClientEntityList<T>::OnAddEntity(T* pEnt, CBaseHandle handle)
 
 	// Store it in a special list for fast iteration if it's a C_BaseEntity.
 	C_BaseEntity* pBaseEntity = pUnknown->GetBaseEntity();
-	m_EngineObjectArray[entnum] = new C_EngineObjectInternal();
+	//m_EngineObjectArray[entnum] = new C_EngineObjectInternal();
 	m_EngineObjectArray[entnum]->Init(pBaseEntity);
 
 //	if (pBaseEntity)

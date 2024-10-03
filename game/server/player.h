@@ -268,6 +268,7 @@ public:
 	CPlayerState			*PlayerData( void ) { return &pl; }
 	
 	int						RequiredEdictIndex( void ) { return entindex(); } 
+	static int GetEngineObjectTypeStatic() { return ENGINEOBJECT_PLAYER; }
 
 	void					LockPlayerInPlace( void );
 	void					UnlockPlayer( void );

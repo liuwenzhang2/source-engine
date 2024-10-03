@@ -193,6 +193,7 @@ public:
 	virtual							~C_BaseEntity();
 
 	virtual bool IsNetworkable(void) { return C_BaseEntity::IsServerEntity(); }
+	static int GetEngineObjectTypeStatic() { return ENGINEOBJECT_BASE; }
 	//static C_BaseEntity				*CreatePredictedEntityByName( const char *classname, const char *module, int line, bool persist = false );
 	
 	// FireBullets uses shared code for prediction.

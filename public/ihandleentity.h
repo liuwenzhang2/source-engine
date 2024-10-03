@@ -45,6 +45,7 @@ public:
 abstract_class IEntityFactory
 {
 public:
+	virtual int GetEngineObjectType() = 0;
 	virtual IHandleEntity * Create(IEntityList* pEntityList, int iForceEdictIndex,int iSerialNum ,IEntityCallBack* pCallBack) = 0;//const char* pClassName, 
 	virtual void Destroy(IHandleEntity* pEntity) = 0;
 	virtual const char* GetMapClassName() = 0;

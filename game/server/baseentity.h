@@ -745,6 +745,7 @@ public:
 	virtual int RequiredEdictIndex(void) { return CBaseEntity::RequiredEdictIndexStatic(); }
 	static bool IsNetworkableStatic(void) { return true; }
 	virtual bool IsNetworkable(void) { return CBaseEntity::IsNetworkableStatic(); }
+	static int GetEngineObjectTypeStatic() { return ENGINEOBJECT_BASE; }
 
 	// interface function pts
 	void (CBaseEntity::*m_pfnMoveDone)(void);
