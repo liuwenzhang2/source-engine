@@ -217,7 +217,7 @@ public:
 
 	}
 
-	~C_EngineObjectInternal()
+	virtual ~C_EngineObjectInternal()
 	{
 		ClearDataChangedEvent(m_DataChangeEventRef);
 		// Are we in the partition?

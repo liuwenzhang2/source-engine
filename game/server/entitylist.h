@@ -194,7 +194,7 @@ public:
 		m_flSpeedScale = 1.0f;
 	}
 
-	~CEngineObjectInternal()
+	virtual ~CEngineObjectInternal()
 	{
 		engine->CleanUpEntityClusterList(&m_PVSInfo);
 		UnlockStudioHdr();
