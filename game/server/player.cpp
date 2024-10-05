@@ -639,7 +639,7 @@ CBasePlayer::CBasePlayer( )
 
 CBasePlayer::~CBasePlayer( )
 {
-	VPhysicsDestroyObject();
+	//GetEngineObject()->VPhysicsDestroyObject();
 }
 
 //-----------------------------------------------------------------------------
@@ -649,7 +649,7 @@ CBasePlayer::~CBasePlayer( )
 //-----------------------------------------------------------------------------
 void CBasePlayer::UpdateOnRemove( void )
 {
-	VPhysicsDestroyObject();
+	GetEngineObject()->VPhysicsDestroyObject();
 
 	// Remove him from his current team
 	if ( GetTeam() )
@@ -1647,7 +1647,7 @@ int CBasePlayer::OnTakeDamage_Alive( const CTakeDamageInfo &info )
 	if ( info.GetInflictor() && (GetEngineObject()->GetMoveType() == MOVETYPE_WALK) &&
 		( !attacker->GetEngineObject()->IsSolidFlagSet(FSOLID_TRIGGER)) )
 	{
-		Vector force = vecDir * -DamageForce( WorldAlignSize(), info.GetBaseDamage() );
+		Vector force = vecDir * -DamageForce(GetEngineObject()->WorldAlignSize(), info.GetBaseDamage() );
 		if ( force.z > 250.0f )
 		{
 			force.z = 250.0f;
@@ -3406,11 +3406,11 @@ void CBasePlayer::PhysicsSimulate( void )
 			PlayerRunCommand( &vecAvailCommands[ i ], MoveHelperServer() );
 
 			// Update our vphysics object.
-			if ( m_pPhysicsController )
+			if (GetEngineObject()->GetPhysicsController() )
 			{
 				VPROF( "CBasePlayer::PhysicsSimulate-UpdateVPhysicsPosition" );
 				// If simulating at 2 * TICK_INTERVAL, add an extra TICK_INTERVAL to position arrival computation
-				UpdateVPhysicsPosition( m_vNewVPhysicsPosition, m_vNewVPhysicsVelocity, vphysicsArrivalTime );
+				GetEngineObject()->UpdateVPhysicsPosition( m_vNewVPhysicsPosition, m_vNewVPhysicsVelocity, vphysicsArrivalTime );
 				vphysicsArrivalTime += TICK_INTERVAL;
 			}
 		}
@@ -4517,30 +4517,9 @@ void FixPlayerCrouchStuck( CBasePlayer *pPlayer )
 #define SMOOTHING_FACTOR 0.9
 extern CMoveData *g_pMoveData;
 
-// UNDONE: Look and see if the ground entity is in hierarchy with a MOVETYPE_VPHYSICS?
-// Behavior in that case is not as good currently when the parent is rideable
-bool CBasePlayer::IsRideablePhysics( IPhysicsObject *pPhysics )
-{
-	if ( pPhysics )
-	{
-		if ( pPhysics->GetMass() > (VPhysicsGetObject()->GetMass()*2) )
-			return true;
-	}
 
-	return false;
-}
 
-IPhysicsObject *CBasePlayer::GetGroundVPhysics()
-{
-	CBaseEntity* pGroundEntity = GetEngineObject()->GetGroundEntity() ? GetEngineObject()->GetGroundEntity()->GetOuter() : NULL;
-;	if ( pGroundEntity && pGroundEntity->GetEngineObject()->GetMoveType() == MOVETYPE_VPHYSICS )
-	{
-		IPhysicsObject *pPhysGround = pGroundEntity->VPhysicsGetObject();
-		if ( pPhysGround && pPhysGround->IsMoveable() )
-			return pPhysGround;
-	}
-	return NULL;
-}
+
 
 
 //-----------------------------------------------------------------------------
@@ -4693,7 +4672,7 @@ void CBasePlayer::Touch( CBaseEntity *pOther )
 void CBasePlayer::PostThinkVPhysics( void )
 {
 	// Check to see if things are initialized!
-	if ( !m_pPhysicsController )
+	if ( !GetEngineObject()->GetPhysicsController())
 		return;
 
 	Vector newPosition = GetEngineObject()->GetAbsOrigin();
@@ -4701,7 +4680,7 @@ void CBasePlayer::PostThinkVPhysics( void )
 	if ( frametime <= 0 || frametime > 0.1f )
 		frametime = 0.1f;
 
-	IPhysicsObject *pPhysGround = GetGroundVPhysics();
+	IPhysicsObject *pPhysGround = GetEngineObject()->GetGroundVPhysics();
 
 	if ( !pPhysGround && m_touchedPhysObject && g_pMoveData->m_outStepHeight <= 0.f && (GetEngineObject()->GetFlags() & FL_ONGROUND) )
 	{
@@ -4719,9 +4698,9 @@ void CBasePlayer::PostThinkVPhysics( void )
 		collisionState = VPHYS_CROUCH;
 	}
 
-	if ( collisionState != m_vphysicsCollisionState )
+	if ( collisionState != GetEngineObject()->GetVphysicsCollisionState() )
 	{
-		SetVCollisionState(GetEngineObject()->GetAbsOrigin(), GetEngineObject()->GetAbsVelocity(), collisionState );
+		GetEngineObject()->SetVCollisionState(GetEngineObject()->GetAbsOrigin(), GetEngineObject()->GetAbsVelocity(), collisionState );
 	}
 
 	if ( !(TouchedPhysics() || pPhysGround) )
@@ -4750,9 +4729,9 @@ void CBasePlayer::PostThinkVPhysics( void )
 			{
 				g_pMoveData->m_outStepHeight = trace.endpos.z - position.z;
 			}
-			m_pPhysicsController->StepUp( g_pMoveData->m_outStepHeight );
+			GetEngineObject()->GetPhysicsController()->StepUp( g_pMoveData->m_outStepHeight );
 		}
-		m_pPhysicsController->Jump();
+		GetEngineObject()->GetPhysicsController()->Jump();
 	}
 	g_pMoveData->m_outStepHeight = 0.0f;
 	
@@ -4764,30 +4743,14 @@ void CBasePlayer::PostThinkVPhysics( void )
 	m_oldOrigin = GetEngineObject()->GetAbsOrigin();
 }
 
-void CBasePlayer::UpdateVPhysicsPosition( const Vector &position, const Vector &velocity, float secondsToArrival )
-{
-	bool onground = (GetEngineObject()->GetFlags() & FL_ONGROUND) ? true : false;
-	IPhysicsObject *pPhysGround = GetGroundVPhysics();
-	
-	// if the object is much heavier than the player, treat it as a local coordinate system
-	// the player controller will solve movement differently in this case.
-	if ( !IsRideablePhysics(pPhysGround) )
-	{
-		pPhysGround = NULL;
-	}
 
-	m_pPhysicsController->Update( position, velocity, secondsToArrival, onground, pPhysGround );
-}
 
 void CBasePlayer::UpdatePhysicsShadowToCurrentPosition()
 {
-	UpdateVPhysicsPosition(GetEngineObject()->GetAbsOrigin(), vec3_origin, gpGlobals->frametime );
+	GetEngineObject()->UpdateVPhysicsPosition(GetEngineObject()->GetAbsOrigin(), vec3_origin, gpGlobals->frametime );
 }
 
-void CBasePlayer::UpdatePhysicsShadowToPosition( const Vector &vecAbsOrigin )
-{
-	UpdateVPhysicsPosition( vecAbsOrigin, vec3_origin, gpGlobals->frametime );
-}
+
 
 Vector CBasePlayer::GetSmoothedVelocity( void )
 { 
@@ -8091,46 +8054,7 @@ void CMovementSpeedMod::InputSpeedMod(inputdata_t &data)
 // Player Physics Shadow Code
 //
 
-void CBasePlayer::SetupVPhysicsShadow( const Vector &vecAbsOrigin, const Vector &vecAbsVelocity, CPhysCollide *pStandModel, const char *pStandHullName, CPhysCollide *pCrouchModel, const char *pCrouchHullName )
-{
-	solid_t solid;
-	Q_strncpy( solid.surfaceprop, "player", sizeof(solid.surfaceprop) );
-	solid.params = g_PhysDefaultObjectParams;
-	solid.params.mass = 85.0f;
-	solid.params.inertia = 1e24f;
-	solid.params.enableCollisions = false;
-	//disable drag
-	solid.params.dragCoefficient = 0;
-	// create standing hull
-	m_pShadowStand = PhysModelCreateCustom( this, pStandModel, GetEngineObject()->GetLocalOrigin(), GetEngineObject()->GetLocalAngles(), pStandHullName, false, &solid );
-	m_pShadowStand->SetCallbackFlags( CALLBACK_GLOBAL_COLLISION | CALLBACK_SHADOW_COLLISION );
 
-	// create crouchig hull
-	m_pShadowCrouch = PhysModelCreateCustom( this, pCrouchModel, GetEngineObject()->GetLocalOrigin(), GetEngineObject()->GetLocalAngles(), pCrouchHullName, false, &solid );
-	m_pShadowCrouch->SetCallbackFlags( CALLBACK_GLOBAL_COLLISION | CALLBACK_SHADOW_COLLISION );
-
-	// default to stand
-	VPhysicsSetObject( m_pShadowStand );
-
-	// tell physics lists I'm a shadow controller object
-	PhysAddShadow( this );	
-	m_pPhysicsController = physenv->CreatePlayerController( m_pShadowStand );
-	m_pPhysicsController->SetPushMassLimit( 350.0f );
-	m_pPhysicsController->SetPushSpeedLimit( 50.0f );
-	
-	// Give the controller a valid position so it doesn't do anything rash.
-	UpdatePhysicsShadowToPosition( vecAbsOrigin );
-
-	// init state
-	if (GetEngineObject()->GetFlags() & FL_DUCKING )
-	{
-		SetVCollisionState( vecAbsOrigin, vecAbsVelocity, VPHYS_CROUCH );
-	}
-	else
-	{
-		SetVCollisionState( vecAbsOrigin, vecAbsVelocity, VPHYS_WALK );
-	}
-}
 
 //-----------------------------------------------------------------------------
 // Purpose: Empty, just want to keep the baseentity version from being called
@@ -8176,7 +8100,7 @@ void CBasePlayer::VPhysicsShadowUpdate( IPhysicsObject *pPhysics )
 
 	Vector newPosition;
 
-	bool physicsUpdated = m_pPhysicsController->GetShadowPosition( &newPosition, NULL ) > 0 ? true : false;
+	bool physicsUpdated = GetEngineObject()->GetPhysicsController()->GetShadowPosition(&newPosition, NULL) > 0 ? true : false;
 
 	// UNDONE: If the player is penetrating, but the player's game collisions are not stuck, teleport the physics shadow to the game position
 	if ( pPhysics->GetGameFlags() & FVPHYSICS_PENETRATING )
@@ -8209,7 +8133,7 @@ void CBasePlayer::VPhysicsShadowUpdate( IPhysicsObject *pPhysics )
 		bCheckStuck = true;
 		m_afPhysicsFlags &= ~PFLAG_GAMEPHYSICS_ROTPUSH;
 	}
-	if ( m_pPhysicsController->IsInContact() || (m_afPhysicsFlags & PFLAG_VPHYSICS_MOTIONCONTROLLER) )
+	if (GetEngineObject()->GetPhysicsController()->IsInContact() || (m_afPhysicsFlags & PFLAG_VPHYSICS_MOTIONCONTROLLER) )
 	{
 		m_touchedPhysObject = true;
 	}
@@ -8233,18 +8157,18 @@ void CBasePlayer::VPhysicsShadowUpdate( IPhysicsObject *pPhysics )
 	if ( !physicsUpdated )
 		return;
 
-	IPhysicsObject *pPhysGround = GetGroundVPhysics();
+	IPhysicsObject *pPhysGround = GetEngineObject()->GetGroundVPhysics();
 
 	Vector newVelocity;
 	pPhysics->GetPosition( &newPosition, 0 );
-	m_pPhysicsController->GetShadowVelocity( &newVelocity );
+	GetEngineObject()->GetPhysicsController()->GetShadowVelocity( &newVelocity );
 	// assume vphysics gave us back a position without penetration
 	Vector lastValidPosition = newPosition;
 
 	if ( physicsshadowupdate_render.GetBool() )
 	{
-		NDebugOverlay::Box(GetEngineObject()->GetAbsOrigin(), WorldAlignMins(), WorldAlignMaxs(), 255, 0, 0, 24, 15.0f );
-		NDebugOverlay::Box( newPosition, WorldAlignMins(), WorldAlignMaxs(), 0,0,255, 24, 15.0f);
+		NDebugOverlay::Box(GetEngineObject()->GetAbsOrigin(), GetEngineObject()->WorldAlignMins(), GetEngineObject()->WorldAlignMaxs(), 255, 0, 0, 24, 15.0f );
+		NDebugOverlay::Box( newPosition, GetEngineObject()->WorldAlignMins(), GetEngineObject()->WorldAlignMaxs(), 0,0,255, 24, 15.0f);
 		//	NDebugOverlay::Box( newPosition, WorldAlignMins(), WorldAlignMaxs(), 0,0,255, 24, .01f);
 	}
 
@@ -8259,14 +8183,14 @@ void CBasePlayer::VPhysicsShadowUpdate( IPhysicsObject *pPhysics )
 
 	float maxDistErrorSqr = VPHYS_MAX_DISTSQR;
 	float maxVelErrorSqr = VPHYS_MAX_VELSQR;
-	if ( IsRideablePhysics(pPhysGround) )
+	if (GetEngineObject()->IsRideablePhysics(pPhysGround) )
 	{
 		maxDistErrorSqr *= 0.25;
 		maxVelErrorSqr *= 0.25;
 	}
 
 	// player's physics was frozen, try moving to the game's simulated position if possible
-	if ( m_pPhysicsController->WasFrozen() )
+	if (GetEngineObject()->GetPhysicsController()->WasFrozen() )
 	{
 		m_bPhysicsWasFrozen = true;
 		// check my position (physics object could have simulated into my position
@@ -8282,7 +8206,7 @@ void CBasePlayer::VPhysicsShadowUpdate( IPhysicsObject *pPhysics )
 		{
 			// found a valid position between the two?  take it.
 			GetEngineObject()->SetAbsOrigin( trace.endpos );
-			UpdateVPhysicsPosition(trace.endpos, vec3_origin, 0);
+			GetEngineObject()->UpdateVPhysicsPosition(trace.endpos, vec3_origin, 0);
 			return;
 		}
 
@@ -8314,7 +8238,7 @@ void CBasePlayer::VPhysicsShadowUpdate( IPhysicsObject *pPhysics )
 					VectorMA( newVelocity, val - len, dir, newVelocity );
 				}
 
-				if ( !IsRideablePhysics(pPhysGround) )
+				if ( !GetEngineObject()->IsRideablePhysics(pPhysGround) )
 				{
 					if ( !(m_afPhysicsFlags & PFLAG_VPHYSICS_MOTIONCONTROLLER ) && IsSimulatingOnAlternateTicks() )
 					{
@@ -8394,7 +8318,7 @@ void CBasePlayer::RefreshCollisionBounds( void )
 void CBasePlayer::InitVCollision( const Vector &vecAbsOrigin, const Vector &vecAbsVelocity )
 {
 	// Cleanup any old vphysics stuff.
-	VPhysicsDestroyObject();
+	GetEngineObject()->VPhysicsDestroyObject();
 
 	// in turbo physics players dont have a physics shadow
 	if ( sv_turbophysics.GetBool() )
@@ -8403,74 +8327,14 @@ void CBasePlayer::InitVCollision( const Vector &vecAbsOrigin, const Vector &vecA
 	CPhysCollide *pModel = PhysCreateBbox( VEC_HULL_MIN_SCALED( this ), VEC_HULL_MAX_SCALED( this ) );
 	CPhysCollide *pCrouchModel = PhysCreateBbox( VEC_DUCK_HULL_MIN_SCALED( this ), VEC_DUCK_HULL_MAX_SCALED( this ) );
 
-	SetupVPhysicsShadow( vecAbsOrigin, vecAbsVelocity, pModel, "player_stand", pCrouchModel, "player_crouch" );
+	GetEngineObject()->SetupVPhysicsShadow( vecAbsOrigin, vecAbsVelocity, pModel, "player_stand", pCrouchModel, "player_crouch" );
 }
 
 
-void CBasePlayer::VPhysicsDestroyObject()
-{
-	// Since CBasePlayer aliases its pointer to the physics object, tell CBaseEntity to 
-	// clear out its physics object pointer so we don't wind up deleting one of
-	// the aliased objects twice.
-	VPhysicsSetObject( NULL );
-
-	PhysRemoveShadow( this );
-	
-	if ( m_pPhysicsController )
-	{
-		physenv->DestroyPlayerController( m_pPhysicsController );
-		m_pPhysicsController = NULL;
-	}
-
-	if ( m_pShadowStand )
-	{
-		m_pShadowStand->EnableCollisions( false );
-		PhysDestroyObject( m_pShadowStand );
-		m_pShadowStand = NULL;
-	}
-	if ( m_pShadowCrouch )
-	{
-		m_pShadowCrouch->EnableCollisions( false );
-		PhysDestroyObject( m_pShadowCrouch );
-		m_pShadowCrouch = NULL;
-	}
-
-	BaseClass::VPhysicsDestroyObject();
-}
 
 
-//-----------------------------------------------------------------------------
-// Purpose:
-//-----------------------------------------------------------------------------
-void CBasePlayer::SetVCollisionState( const Vector &vecAbsOrigin, const Vector &vecAbsVelocity, int collisionState )
-{
-	m_vphysicsCollisionState = collisionState;
-	switch( collisionState )
-	{
-	case VPHYS_WALK:
- 		m_pShadowStand->SetPosition( vecAbsOrigin, vec3_angle, true );
-		m_pShadowStand->SetVelocity( &vecAbsVelocity, NULL );
-		m_pShadowCrouch->EnableCollisions( false );
-		m_pPhysicsController->SetObject( m_pShadowStand );
-		VPhysicsSwapObject( m_pShadowStand );
-		m_pShadowStand->EnableCollisions( true );
-		break;
 
-	case VPHYS_CROUCH:
-		m_pShadowCrouch->SetPosition( vecAbsOrigin, vec3_angle, true );
-		m_pShadowCrouch->SetVelocity( &vecAbsVelocity, NULL );
-		m_pShadowStand->EnableCollisions( false );
-		m_pPhysicsController->SetObject( m_pShadowCrouch );
-		VPhysicsSwapObject( m_pShadowCrouch );
-		m_pShadowCrouch->EnableCollisions( true );
-		break;
-	
-	case VPHYS_NOCLIP:
-		m_pShadowCrouch->EnableCollisions( false );
-		m_pShadowStand->EnableCollisions( false );
-		break;
-	}
-}
+
 
 //-----------------------------------------------------------------------------
 // Purpose: 

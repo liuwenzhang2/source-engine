@@ -73,7 +73,7 @@ bool CFuncBrush::CreateVPhysics( void )
 	// NOTE: Don't init this static.  It's pretty common for these to be constrained
 	// and dynamically parented.  Initing shadow avoids having to destroy the physics
 	// object later and lose the constraints.
-	IPhysicsObject *pPhys = VPhysicsInitShadow(false, false);
+	IPhysicsObject *pPhys = GetEngineObject()->VPhysicsInitShadow(false, false);
 	if ( pPhys )
 	{
 		int contents = modelinfo->GetModelContents(GetEngineObject()->GetModelIndex() );

@@ -118,7 +118,7 @@ void CWeaponBugBait::FallInit( void )
 	// The game will break if the player can't pick it up, so it must stay still.
 	SetModel( GetWorldModel() );
 
-	VPhysicsDestroyObject();
+	GetEngineObject()->VPhysicsDestroyObject();
 	GetEngineObject()->SetMoveType( MOVETYPE_FLYGRAVITY );
 	GetEngineObject()->SetSolid( SOLID_BBOX );
 	GetEngineObject()->AddSolidFlags( FSOLID_TRIGGER );

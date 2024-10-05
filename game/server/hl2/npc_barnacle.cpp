@@ -281,7 +281,7 @@ void CNPC_Barnacle::Spawn()
 	m_pConstraint		= NULL;
 	m_nShakeCount = 0;
 #if HL2_EPISODIC // the episodic barnacle is solid, so it can be sawbladed.
-	IPhysicsObject *pPhys = VPhysicsInitShadow( false, false );
+	IPhysicsObject *pPhys = GetEngineObject()->VPhysicsInitShadow( false, false );
 	if (pPhys)
 	{
 		pPhys->SetMass(500);
@@ -1469,10 +1469,10 @@ void CNPC_Barnacle::AttachTongueToTarget( CBaseEntity *pTouchEnt, Vector vecGrab
 
 		CTraceFilterSkipTwoEntities traceFilter( this, pTouchEnt, COLLISION_GROUP_NONE );
 		trace_t placementTrace;
-		UTIL_TraceHull( origin, origin, pTouchEnt->WorldAlignMins(), pTouchEnt->WorldAlignMaxs(), MASK_NPCSOLID, &traceFilter, &placementTrace );
+		UTIL_TraceHull( origin, origin, pTouchEnt->GetEngineObject()->WorldAlignMins(), pTouchEnt->GetEngineObject()->WorldAlignMaxs(), MASK_NPCSOLID, &traceFilter, &placementTrace );
 		if ( placementTrace.startsolid )
 		{
-			UTIL_TraceHull( origin + Vector(0, 0, 24), origin, pTouchEnt->WorldAlignMins(), pTouchEnt->WorldAlignMaxs(), MASK_NPCSOLID, &traceFilter, &placementTrace );
+			UTIL_TraceHull( origin + Vector(0, 0, 24), origin, pTouchEnt->GetEngineObject()->WorldAlignMins(), pTouchEnt->GetEngineObject()->WorldAlignMaxs(), MASK_NPCSOLID, &traceFilter, &placementTrace );
 			if ( !placementTrace.startsolid )
 			{
 				pTouchEnt->GetEngineObject()->SetAbsOrigin( placementTrace.endpos );
@@ -1681,7 +1681,7 @@ void CNPC_Barnacle::BitePrey( void )
 	params.m_bWarnOnDirectWaveReference = true;
 	g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 
-	m_flVictimHeight = GetEnemy()->WorldAlignSize().z;
+	m_flVictimHeight = GetEnemy()->GetEngineObject()->WorldAlignSize().z;
 
 	// Kill the victim instantly
 	int iDamageType = DMG_SLASH | DMG_ALWAYSGIB;
@@ -2574,7 +2574,7 @@ CBaseEntity *CNPC_Barnacle::TongueTouchEnt ( float *pflLength )
 				VectorMA( pDriver->GetEngineObject()->GetAbsOrigin(), -0.1f, vecPrevDriverPos, vecPrevDriverPos );
 
 				Ray_t sweptDriver;
-				sweptDriver.Init( vecPrevDriverPos, pDriver->GetEngineObject()->GetAbsOrigin(), pDriver->WorldAlignMins(), pDriver->WorldAlignMaxs() );
+				sweptDriver.Init( vecPrevDriverPos, pDriver->GetEngineObject()->GetAbsOrigin(), pDriver->GetEngineObject()->WorldAlignMins(), pDriver->GetEngineObject()->WorldAlignMaxs() );
 				if ( IsBoxIntersectingRay( mins, maxs, sweptDriver ) )
 				{
 					pTest = pDriver;
@@ -2755,7 +2755,7 @@ CBarnacleTongueTip *CBarnacleTongueTip::CreateTongueTip( CNPC_Barnacle *pBarnacl
 	if ( !pTip )
 		return NULL;
 
-	pTip->VPhysicsInitNormal( pTip->GetEngineObject()->GetSolid(), pTip->GetEngineObject()->GetSolidFlags(), false );
+	pTip->GetEngineObject()->VPhysicsInitNormal( pTip->GetEngineObject()->GetSolid(), pTip->GetEngineObject()->GetSolidFlags(), false );
 	if ( !pTip->CreateSpring( pTongueRoot ) )
 		return NULL;
 
@@ -2783,7 +2783,7 @@ CBarnacleTongueTip *CBarnacleTongueTip::CreateTongueRoot( const Vector &vecOrigi
 	pTip->GetEngineObject()->AddSolidFlags( FSOLID_NOT_SOLID );
 
 	// Disable movement on the root, we'll move this thing manually.
-	pTip->VPhysicsInitShadow( false, false );
+	pTip->GetEngineObject()->VPhysicsInitShadow( false, false );
 	pTip->GetEngineObject()->SetMoveType( MOVETYPE_NONE );
 	return pTip;
 }

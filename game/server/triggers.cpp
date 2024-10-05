@@ -1380,7 +1380,7 @@ void CChangeLevel::Activate( void )
 	{
 		if (GetEngineObject()->HasSpawnFlags( SF_CHANGELEVEL_CHAPTER ) )
 		{
-			VPhysicsInitStatic();
+			GetEngineObject()->VPhysicsInitStatic();
 			GetEngineObject()->RemoveSolidFlags( FSOLID_NOT_SOLID | FSOLID_TRIGGER );
 			SetTouch( NULL );
 			return;
@@ -1859,7 +1859,7 @@ void CTriggerTeleport::Touch( CBaseEntity *pOther )
 	if (!pentLandmark && pOther->IsPlayer())
 	{
 		// make origin adjustments in case the teleportee is a player. (origin in center, not at feet)
-		tmp.z -= pOther->WorldAlignMins().z;
+		tmp.z -= pOther->GetEngineObject()->WorldAlignMins().z;
 	}
 
 	//
@@ -3758,11 +3758,11 @@ bool CBaseVPhysicsTrigger::CreateVPhysics()
 	IPhysicsObject *pPhysics;
 	if ( !GetEngineObject()->HasSpawnFlags( SF_VPHYSICS_MOTION_MOVEABLE ) )
 	{
-		pPhysics = VPhysicsInitStatic();
+		pPhysics = GetEngineObject()->VPhysicsInitStatic();
 	}
 	else
 	{
-		pPhysics = VPhysicsInitShadow( false, false );
+		pPhysics = GetEngineObject()->VPhysicsInitShadow( false, false );
 	}
 
 	pPhysics->BecomeTrigger();

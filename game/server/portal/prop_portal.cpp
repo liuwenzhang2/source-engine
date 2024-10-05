@@ -1191,7 +1191,7 @@ void CProp_Portal::TeleportTouchingEntity( CBaseEntity *pOther )
 			
 			pOtherAsPlayer->pl.v_angle = qTransformedEyeAngles;
 			pOtherAsPlayer->pl.fixangle = FIXANGLE_ABSOLUTE;
-			pOtherAsPlayer->UpdateVPhysicsPosition( ptNewOrigin, vNewVelocity, 0.0f );
+			pOtherAsPlayer->GetEngineObject()->UpdateVPhysicsPosition( ptNewOrigin, vNewVelocity, 0.0f );
 			pOtherAsPlayer->Teleport( &ptNewOrigin, &qNewAngles, &vNewVelocity );
 			//pOtherAsPlayer->UnDuck();
 
@@ -1392,7 +1392,7 @@ void CProp_Portal::Touch( CBaseEntity *pOther )
 		if( SharedEnvironmentCheck( pOther ) )
 		{
 			bool bObjectCenterInFrontOfPortal	= (m_plane_Origin.normal.Dot( pOther->WorldSpaceCenter() ) > m_plane_Origin.dist);
-			bool bIsStuckPlayer					= ( pOther->IsPlayer() )? ( !UTIL_IsSpaceEmpty( pOther, pOther->WorldAlignMins(), pOther->WorldAlignMaxs() ) ) : ( false );
+			bool bIsStuckPlayer					= ( pOther->IsPlayer() )? ( !UTIL_IsSpaceEmpty( pOther, pOther->GetEngineObject()->WorldAlignMins(), pOther->GetEngineObject()->WorldAlignMaxs() ) ) : ( false );
 
 			if ( bIsStuckPlayer )
 			{

@@ -3141,7 +3141,7 @@ void CAI_BaseNPC::RunDieTask()
 			UTIL_SetSize ( this, Vector ( -4, -4, 0 ), Vector ( 4, 4, 1 ) );
 		}
 		else // !!!HACKHACK - put NPC in a thin, wide bounding box until we fix the solid type/bounding volume problem
-			UTIL_SetSize ( this, WorldAlignMins(), Vector ( WorldAlignMaxs().x, WorldAlignMaxs().y, WorldAlignMins().z + 1 ) );
+			UTIL_SetSize ( this, GetEngineObject()->WorldAlignMins(), Vector (GetEngineObject()->WorldAlignMaxs().x, GetEngineObject()->WorldAlignMaxs().y, GetEngineObject()->WorldAlignMins().z + 1 ) );
 	}
 }
 
@@ -4104,8 +4104,8 @@ void CAI_BaseNPC::RunTask( const Task_t *pTask )
 			{
 				// After 4 seconds of trying to fall to ground, Assume that we're in a bad case where the NPC
 				// isn't actually falling, and make an attempt to slam the ground entity to whatever's under the NPC.
-				Vector maxs = WorldAlignMaxs() - Vector( .1, .1, .2 );
-				Vector mins = WorldAlignMins() + Vector( .1, .1, 0 );
+				Vector maxs = GetEngineObject()->WorldAlignMaxs() - Vector( .1, .1, .2 );
+				Vector mins = GetEngineObject()->WorldAlignMins() + Vector( .1, .1, 0 );
 				Vector vecStart	= GetEngineObject()->GetAbsOrigin() + Vector( 0, 0, .1 );
 				Vector vecDown	= GetEngineObject()->GetAbsOrigin();
 				vecDown.z -= 0.2;

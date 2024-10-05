@@ -419,7 +419,7 @@ void CNPC_Manhack::HitPhysicsObject( CBaseEntity *pOther )
 	Vector dir = posOther - pos;
 	VectorNormalize(dir);
 	// size/2 is approx radius
-	pos += dir * WorldAlignSize().x * 0.5;
+	pos += dir * GetEngineObject()->WorldAlignSize().x * 0.5;
 	Vector cross;
 
 	// UNDONE: Use actual manhack up vector so the fake blade is

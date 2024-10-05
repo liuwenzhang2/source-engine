@@ -16,7 +16,7 @@
 #include "string_t.h"
 #include "platform.h"
 #include "isaverestore.h"
-
+#include "vcollide_parse.h"
 
 struct Ray_t;
 class ServerClass;
@@ -31,6 +31,8 @@ class CGameTrace;
 typedef CGameTrace trace_t;
 class IStudioHdr;
 struct model_t;
+class IPhysicsObject;
+class IPhysicsPlayerController;
 
 struct servertouchlink_t
 {
@@ -418,6 +420,24 @@ public:
 	virtual float SetPoseParameter(int iParameter, float flValue) = 0;
 	virtual void ResetClientsideFrame(void) = 0;
 	virtual void DoMuzzleFlash() = 0;
+	virtual void VPhysicsDestroyObject(void) = 0;
+	virtual IPhysicsObject* VPhysicsGetObject(void) const = 0;
+	virtual void VPhysicsSetObject(IPhysicsObject* pPhysics) = 0;
+	virtual void VPhysicsSwapObject(IPhysicsObject* pSwap) = 0;
+	virtual const Vector& WorldAlignMins() const = 0;
+	virtual const Vector& WorldAlignMaxs() const = 0;
+	virtual const Vector& WorldAlignSize() const = 0;
+	virtual IPhysicsObject* VPhysicsInitStatic(void) = 0;
+	virtual IPhysicsObject* VPhysicsInitNormal(SolidType_t solidType, int nSolidFlags, bool createAsleep, solid_t* pSolid = NULL) = 0;
+	virtual IPhysicsObject* VPhysicsInitShadow(bool allowPhysicsMovement, bool allowPhysicsRotation, solid_t* pSolid = NULL) = 0;
+	virtual void SetupVPhysicsShadow(const Vector& vecAbsOrigin, const Vector& vecAbsVelocity, CPhysCollide* pStandModel, const char* pStandHullName, CPhysCollide* pCrouchModel, const char* pCrouchHullName) = 0;
+	virtual IPhysicsPlayerController* GetPhysicsController() = 0;
+	virtual void UpdateVPhysicsPosition(const Vector& position, const Vector& velocity, float secondsToArrival) = 0;
+	virtual void SetVCollisionState(const Vector& vecAbsOrigin, const Vector& vecAbsVelocity, int collisionState) = 0;
+	virtual int GetVphysicsCollisionState() = 0;
+	virtual IPhysicsObject* GetGroundVPhysics() = 0;
+	virtual bool IsRideablePhysics(IPhysicsObject* pPhysics) = 0;
+
 };
 
 // This class is how the engine talks to entities in the game DLL.

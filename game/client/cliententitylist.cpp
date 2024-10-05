@@ -4609,6 +4609,176 @@ void C_EngineObjectInternal::RemoveBaseAnimatingInterpolatedVars()
 	}
 }
 
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
+void C_EngineObjectInternal::VPhysicsDestroyObject(void)
+{
+	if (m_pPhysicsObject)
+	{
+#ifndef CLIENT_DLL
+		PhysRemoveShadow(this);
+#endif
+		PhysDestroyObject(m_pPhysicsObject, this->m_pOuter);
+		m_pPhysicsObject = NULL;
+	}
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: 
+// Input  : *pPhysics - 
+//-----------------------------------------------------------------------------
+void C_EngineObjectInternal::VPhysicsSetObject(IPhysicsObject* pPhysics)
+{
+	if (m_pPhysicsObject && pPhysics)
+	{
+		Warning("Overwriting physics object for %s\n", GetClassname());
+	}
+	m_pPhysicsObject = pPhysics;
+	if (pPhysics && !m_pPhysicsObject)
+	{
+		CollisionRulesChanged();
+	}
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: Init this object's physics as a static
+//-----------------------------------------------------------------------------
+IPhysicsObject* C_EngineObjectInternal::VPhysicsInitStatic(void)
+{
+	if (!VPhysicsInitSetup())
+		return NULL;
+
+#ifndef CLIENT_DLL
+	// If this entity has a move parent, it needs to be shadow, not static
+	if (GetMoveParent())
+	{
+		// must be SOLID_VPHYSICS if in hierarchy to solve collisions correctly
+		if (GetSolid() == SOLID_BSP && GetRootMoveParent()->GetSolid() != SOLID_BSP)
+		{
+			SetSolid(SOLID_VPHYSICS);
+		}
+
+		return VPhysicsInitShadow(false, false);
+	}
+#endif
+
+	// No physics
+	if (GetSolid() == SOLID_NONE)
+		return NULL;
+
+	// create a static physics objct
+	IPhysicsObject* pPhysicsObject = NULL;
+	if (GetSolid() == SOLID_BBOX)
+	{
+		pPhysicsObject = PhysModelCreateBox(this->m_pOuter, WorldAlignMins(), WorldAlignMaxs(), GetAbsOrigin(), true);
+	}
+	else
+	{
+		pPhysicsObject = PhysModelCreateUnmoveable(this->m_pOuter, GetModelIndex(), GetAbsOrigin(), GetAbsAngles());
+	}
+	VPhysicsSetObject(pPhysicsObject);
+	return pPhysicsObject;
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: This creates a normal vphysics simulated object
+//			physics alone determines where it goes (gravity, friction, etc)
+//			and the entity receives updates from vphysics.  SetAbsOrigin(), etc do not affect the object!
+//-----------------------------------------------------------------------------
+IPhysicsObject* C_EngineObjectInternal::VPhysicsInitNormal(SolidType_t solidType, int nSolidFlags, bool createAsleep, solid_t* pSolid)
+{
+	if (!VPhysicsInitSetup())
+		return NULL;
+
+	// NOTE: This has to occur before PhysModelCreate because that call will
+	// call back into ShouldCollide(), which uses solidtype for rules.
+	SetSolid(solidType);
+	SetSolidFlags(nSolidFlags);
+
+	// No physics
+	if (solidType == SOLID_NONE)
+	{
+		return NULL;
+	}
+
+	// create a normal physics object
+	IPhysicsObject* pPhysicsObject = PhysModelCreate(this->m_pOuter, GetModelIndex(), GetAbsOrigin(), GetAbsAngles(), pSolid);
+	if (pPhysicsObject)
+	{
+		VPhysicsSetObject(pPhysicsObject);
+		SetMoveType(MOVETYPE_VPHYSICS);
+
+		if (!createAsleep)
+		{
+			pPhysicsObject->Wake();
+		}
+	}
+
+	return pPhysicsObject;
+}
+
+// This creates a vphysics object with a shadow controller that follows the AI
+IPhysicsObject* C_EngineObjectInternal::VPhysicsInitShadow(bool allowPhysicsMovement, bool allowPhysicsRotation, solid_t* pSolid)
+{
+	if (!VPhysicsInitSetup())
+		return NULL;
+
+	// No physics
+	if (GetSolid() == SOLID_NONE)
+		return NULL;
+
+	const Vector& origin = GetAbsOrigin();
+	QAngle angles = GetAbsAngles();
+	IPhysicsObject* pPhysicsObject = NULL;
+
+	if (GetSolid() == SOLID_BBOX)
+	{
+		// adjust these so the game tracing epsilons match the physics minimum separation distance
+		// this will shrink the vphysics version of the model by the difference in epsilons
+		float radius = 0.25f - DIST_EPSILON;
+		Vector mins = WorldAlignMins() + Vector(radius, radius, radius);
+		Vector maxs = WorldAlignMaxs() - Vector(radius, radius, radius);
+		pPhysicsObject = PhysModelCreateBox(this->m_pOuter, mins, maxs, origin, false);
+		angles = vec3_angle;
+	}
+	else if (GetSolid() == SOLID_OBB)
+	{
+		pPhysicsObject = PhysModelCreateOBB(this->m_pOuter, OBBMins(), OBBMaxs(), origin, angles, false);
+	}
+	else
+	{
+		pPhysicsObject = PhysModelCreate(this->m_pOuter, GetModelIndex(), origin, angles, pSolid);
+	}
+	if (!pPhysicsObject)
+		return NULL;
+
+	VPhysicsSetObject(pPhysicsObject);
+	// UNDONE: Tune these speeds!!!
+	pPhysicsObject->SetShadow(1e4, 1e4, allowPhysicsMovement, allowPhysicsRotation);
+	pPhysicsObject->UpdateShadow(origin, angles, false, 0);
+	return pPhysicsObject;
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
+bool C_EngineObjectInternal::VPhysicsInitSetup()
+{
+#ifndef CLIENT_DLL
+	// don't support logical ents
+	if (entindex() == -1 || IsMarkedForDeletion())
+		return false;
+#endif
+
+	// If this entity already has a physics object, then it should have been deleted prior to making this call.
+	Assert(!m_pPhysicsObject);
+	VPhysicsDestroyObject();
+
+	// make sure absorigin / absangles are correct
+	return true;
+}
+
 bool PVSNotifierMap_LessFunc( IClientUnknown* const &a, IClientUnknown* const &b )
 {
 	return a < b;

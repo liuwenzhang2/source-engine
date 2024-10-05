@@ -216,7 +216,7 @@ void C_Func_Dust::AttemptSpawnNewParticle()
 	for( int iTest=0; iTest < nTests; iTest++ )
 	{
 		Vector vPercent = RandomVector( 0, 1 );
-		Vector vTest = WorldAlignMins() + (WorldAlignMaxs() - WorldAlignMins()) * vPercent;
+		Vector vTest = GetEngineObject()->WorldAlignMins() + (GetEngineObject()->WorldAlignMaxs() - GetEngineObject()->WorldAlignMins()) * vPercent;
 
 		int contents = enginetrace->GetPointContents_Collideable( GetCollideable(), vTest );
 		if( contents & CONTENTS_SOLID )

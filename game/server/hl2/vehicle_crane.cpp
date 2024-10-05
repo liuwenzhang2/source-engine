@@ -1036,7 +1036,7 @@ void CCraneTip::Spawn( void )
 	// We don't want this to be solid, because we don't want it to collide with the hydra.
 	GetEngineObject()->SetSolid( SOLID_VPHYSICS );
 	GetEngineObject()->AddSolidFlags( FSOLID_NOT_SOLID );
-	VPhysicsInitShadow( false, false );
+	GetEngineObject()->VPhysicsInitShadow( false, false );
 
 	// Disable movement on this sucker, we're going to move him manually
 	GetEngineObject()->SetMoveType( MOVETYPE_NONE );

@@ -256,8 +256,8 @@ void C_ClientRagdoll::OnRestore( void )
 		SetEffectEntity( pNewFireChild );
 	}
 
-	VPhysicsSetObject( NULL );
-	VPhysicsSetObject( pRagdollT->list[0].pObject );
+	GetEngineObject()->VPhysicsSetObject( NULL );
+	GetEngineObject()->VPhysicsSetObject( pRagdollT->list[0].pObject );
 
 	SetupBones( NULL, -1, BONE_USED_BY_ANYTHING, gpGlobals->curtime );
 
@@ -4190,8 +4190,8 @@ bool C_BaseAnimating::InitAsClientRagdoll( const matrix3x4_t *pDeltaBones0, cons
 	m_builtRagdoll = true;
 
 	// Store off our old mins & maxs
-	m_vecPreRagdollMins = WorldAlignMins();
-	m_vecPreRagdollMaxs = WorldAlignMaxs();
+	m_vecPreRagdollMins = GetEngineObject()->WorldAlignMins();
+	m_vecPreRagdollMaxs = GetEngineObject()->WorldAlignMaxs();
 
 
 	// Force MOVETYPE_STEP interpolation
@@ -4520,8 +4520,8 @@ bool C_BaseAnimating::TestHitboxes( const Ray_t &ray, unsigned int fContentsMask
 			IPhysicsObject *pReplace = m_pRagdoll->GetElement( tr.physicsbone );
 			if ( pReplace )
 			{
-				VPhysicsSetObject( NULL );
-				VPhysicsSetObject( pReplace );
+				GetEngineObject()->VPhysicsSetObject( NULL );
+				GetEngineObject()->VPhysicsSetObject( pReplace );
 			}
 		}
 	}
@@ -5002,7 +5002,7 @@ void C_BaseAnimating::ClearRagdoll()
 
 		// Set to null so that the destructor's call to DestroyObject won't destroy
 		//  m_pObjects[ 0 ] twice since that's the physics object for the prop
-		VPhysicsSetObject( NULL );
+		GetEngineObject()->VPhysicsSetObject( NULL );
 
 		// If we have ragdoll mins/maxs, we've just come out of ragdoll, so restore them
 		if ( m_vecPreRagdollMins != vec3_origin || m_vecPreRagdollMaxs != vec3_origin )

@@ -1104,7 +1104,7 @@ CBaseEntity *CBaseCombatCharacter::CheckTraceHullAttack( float flDist, const Vec
 	// The ideal place to start the trace is in the center of the attacker's bounding box.
 	// however, we need to make sure there's enough clearance. Some of the smaller monsters aren't 
 	// as big as the hull we try to trace with. (SJB)
-	float flVerticalOffset = WorldAlignSize().z * 0.5;
+	float flVerticalOffset = GetEngineObject()->WorldAlignSize().z * 0.5;
 
 	if( flVerticalOffset < maxs.z )
 	{
@@ -1408,7 +1408,7 @@ Vector CBaseCombatCharacter::CalcDamageForceVector( const CTakeDamageInfo &info 
 		if( info.GetDamageType() & DMG_BLAST )
 		{
 			// exaggerate the force from explosions a little (37.5%)
-			forceVector = (GetEngineObject()->GetLocalOrigin() + Vector(0, 0, WorldAlignSize().z) ) - pForce->GetEngineObject()->GetLocalOrigin();
+			forceVector = (GetEngineObject()->GetLocalOrigin() + Vector(0, 0, GetEngineObject()->WorldAlignSize().z) ) - pForce->GetEngineObject()->GetLocalOrigin();
 			VectorNormalize(forceVector);
 			forceVector *= 1.375f;
 		}
@@ -1506,7 +1506,7 @@ bool CBaseCombatCharacter::BecomeRagdoll( const CTakeDamageInfo &info, const Vec
 		CTakeDamageInfo info2 = info;
 		info2.SetDamageForce( forceVector );
 		Vector pos = info2.GetDamagePosition();
-		float flAbsMinsZ = GetEngineObject()->GetAbsOrigin().z + WorldAlignMins().z;
+		float flAbsMinsZ = GetEngineObject()->GetAbsOrigin().z + GetEngineObject()->WorldAlignMins().z;
 		if ( (pos.z - flAbsMinsZ) < 24 )
 		{
 			// HACKHACK: Make sure the vehicle impact is at least 2ft off the ground

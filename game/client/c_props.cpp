@@ -153,7 +153,7 @@ void C_BasePropDoor::OnDataChanged( DataUpdateType_t type )
 	if ( type == DATA_UPDATE_CREATED )
 	{
 		GetEngineObject()->SetSolid(SOLID_VPHYSICS);
-		VPhysicsInitShadow( false, false );
+		GetEngineObject()->VPhysicsInitShadow( false, false );
 	}
 	else if ( VPhysicsGetObject() )
 	{

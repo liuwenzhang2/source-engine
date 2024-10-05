@@ -25,7 +25,7 @@ void CBaseHL1CombatWeapon::Precache()
 
 bool CBaseHL1CombatWeapon::CreateVPhysics( void )
 {
-	VPhysicsInitNormal( SOLID_BBOX, GetEngineObject()->GetSolidFlags() | FSOLID_TRIGGER, false );
+	GetEngineObject()->VPhysicsInitNormal( SOLID_BBOX, GetEngineObject()->GetSolidFlags() | FSOLID_TRIGGER, false );
 	IPhysicsObject *pPhysObj = VPhysicsGetObject();
         if ( pPhysObj )
 	{

@@ -118,7 +118,7 @@ void CRecharge::Precache()
 
 bool CRecharge::CreateVPhysics()
 {
-	VPhysicsInitStatic();
+	GetEngineObject()->VPhysicsInitStatic();
 	return true;
 }
 

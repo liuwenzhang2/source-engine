@@ -118,7 +118,7 @@ void CGunTarget::Spawn( void )
 
 bool CGunTarget::CreateVPhysics( void )
 {
-	VPhysicsInitShadow( false, false );
+	GetEngineObject()->VPhysicsInitShadow( false, false );
 	return true;
 }
 

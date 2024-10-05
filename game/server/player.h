@@ -623,15 +623,11 @@ public:
 #endif
 
 public:
-	// Player Physics Shadow
-	void					SetupVPhysicsShadow( const Vector &vecAbsOrigin, const Vector &vecAbsVelocity, CPhysCollide *pStandModel, const char *pStandHullName, CPhysCollide *pCrouchModel, const char *pCrouchHullName );
-	IPhysicsPlayerController* GetPhysicsController() { return m_pPhysicsController; }
+
 	virtual void			VPhysicsCollision( int index, gamevcollisionevent_t *pEvent );
 	void					VPhysicsUpdate( IPhysicsObject *pPhysics );
 	virtual void			VPhysicsShadowUpdate( IPhysicsObject *pPhysics );
 	virtual bool			IsFollowingPhysics( void ) { return false; }
-	bool					IsRideablePhysics( IPhysicsObject *pPhysics );
-	IPhysicsObject			*GetGroundVPhysics();
 
 	virtual void			Touch( CBaseEntity *pOther );
 	void					SetTouchedPhysics( bool bTouch );
@@ -640,12 +636,8 @@ public:
 
 	virtual	void			RefreshCollisionBounds( void );
 	virtual void			InitVCollision( const Vector &vecAbsOrigin, const Vector &vecAbsVelocity );
-	virtual void			VPhysicsDestroyObject();
-	void					SetVCollisionState( const Vector &vecAbsOrigin, const Vector &vecAbsVelocity, int collisionState );
 	void					PostThinkVPhysics( void );
 	virtual void			UpdatePhysicsShadowToCurrentPosition();
-	void					UpdatePhysicsShadowToPosition( const Vector &vecAbsOrigin );
-	void					UpdateVPhysicsPosition( const Vector &position, const Vector &velocity, float secondsToArrival );
 
 	// Hint system
 	virtual CHintSystem		*Hints( void ) { return NULL; }
@@ -965,8 +957,7 @@ protected:
 	// NOTE: bits damage type appears to only be used for time-based damage
 	BYTE					m_rgbTimeBasedDamage[CDMG_TIMEBASED];
 
-	// Player Physics Shadow
-	int						m_vphysicsCollisionState;
+
 
 	virtual int SpawnArmorValue( void ) const { return 0; }
 
@@ -987,9 +978,7 @@ private:
 	// Player Physics Shadow
 
 protected: //used to be private, but need access for portal mod (Dave Kircher)
-	IPhysicsPlayerController	*m_pPhysicsController;
-	IPhysicsObject				*m_pShadowStand;
-	IPhysicsObject				*m_pShadowCrouch;
+
 	Vector						m_oldOrigin;
 	Vector						m_vecSmoothedVelocity;
 	bool						m_touchedPhysObject;

@@ -369,7 +369,7 @@ void CGrenadeHopwire::Spawn( void )
 bool CGrenadeHopwire::CreateVPhysics()
 {
 	// Create the object in the physics system
-	VPhysicsInitNormal( SOLID_BBOX, 0, false );
+	GetEngineObject()->VPhysicsInitNormal( SOLID_BBOX, 0, false );
 	return true;
 }
 
@@ -482,7 +482,7 @@ void CGrenadeHopwire::CombatThink( void )
 	// Stop the grenade from moving
 	GetEngineObject()->AddEFlags( EF_NODRAW );
 	GetEngineObject()->AddFlag( FSOLID_NOT_SOLID );
-	VPhysicsDestroyObject();
+	GetEngineObject()->VPhysicsDestroyObject();
 	GetEngineObject()->SetAbsVelocity( vec3_origin );
 	GetEngineObject()->SetMoveType( MOVETYPE_NONE );
 

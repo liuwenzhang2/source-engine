@@ -23,6 +23,7 @@
 #include "saverestoretypes.h"
 #include "gameinterface.h"
 #include "globalstate.h"
+#include "vphysics/player_controller.h"
 
 //class CBaseEntity;
 // We can only ever move 512 entities across a transition
@@ -192,12 +193,15 @@ public:
 		m_nNewSequenceParity = 0;
 		m_nResetEventsParity = 0;
 		m_flSpeedScale = 1.0f;
+		m_pPhysicsObject = NULL;
+
 	}
 
 	virtual ~CEngineObjectInternal()
 	{
 		engine->CleanUpEntityClusterList(&m_PVSInfo);
 		UnlockStudioHdr();
+		VPhysicsDestroyObject();
 	}
 
 	static bool s_bAbsQueriesValid;
@@ -711,6 +715,41 @@ public:
 	float					SetBoneController(int iController, float flValue);
 	bool	GetPoseParameterRange(int index, float& minValue, float& maxValue);
 
+	inline IPhysicsObject* VPhysicsGetObject(void) const { return m_pPhysicsObject; }
+	// destroy and remove the physics object for this entity
+	virtual void	VPhysicsDestroyObject(void);
+	void			VPhysicsSetObject(IPhysicsObject* pPhysics);
+	void			VPhysicsSwapObject(IPhysicsObject* pSwap);
+	// Convenience routines to init the vphysics simulation for this object.
+// This creates a static object.  Something that behaves like world geometry - solid, but never moves
+	IPhysicsObject* VPhysicsInitStatic(void);
+
+	// This creates a normal vphysics simulated object - physics determines where it goes (gravity, friction, etc)
+	// and the entity receives updates from vphysics.  SetAbsOrigin(), etc do not affect the object!
+	IPhysicsObject* VPhysicsInitNormal(SolidType_t solidType, int nSolidFlags, bool createAsleep, solid_t* pSolid = NULL);
+
+	// This creates a vphysics object with a shadow controller that follows the AI
+	// Move the object to where it should be and call UpdatePhysicsShadowToCurrentPosition()
+	IPhysicsObject* VPhysicsInitShadow(bool allowPhysicsMovement, bool allowPhysicsRotation, solid_t* pSolid = NULL);
+
+	// These methods return a *world-aligned* box relative to the absorigin of the entity.
+	// This is used for collision purposes and is *not* guaranteed
+	// to surround the entire entity's visual representation
+	// NOTE: It is illegal to ask for the world-aligned bounds for
+	// SOLID_BSP objects
+	const Vector& WorldAlignMins() const;
+	const Vector& WorldAlignMaxs() const;
+	const Vector& WorldAlignSize() const;
+
+	void SetupVPhysicsShadow(const Vector& vecAbsOrigin, const Vector& vecAbsVelocity, CPhysCollide* pStandModel, const char* pStandHullName, CPhysCollide* pCrouchModel, const char* pCrouchHullName) {}
+	IPhysicsPlayerController* GetPhysicsController() { return NULL; }
+	void UpdateVPhysicsPosition(const Vector& position, const Vector& velocity, float secondsToArrival) {}
+	void SetVCollisionState(const Vector& vecAbsOrigin, const Vector& vecAbsVelocity, int collisionState) {}
+	int GetVphysicsCollisionState() { return 0; }
+
+	IPhysicsObject* GetGroundVPhysics();
+	bool IsRideablePhysics(IPhysicsObject* pPhysics);
+
 public:
 	// Networking related methods
 	void NetworkStateChanged();
@@ -722,6 +761,8 @@ private:
 	bool ClassMatchesComplex(const char* pszClassOrWildcard);
 	void LockStudioHdr();
 	void UnlockStudioHdr();
+	// called by all vphysics inits
+	bool			VPhysicsInitSetup();
 private:
 
 	friend class CBaseEntity;
@@ -839,6 +880,9 @@ private:
 	const model_t* m_pModel;
 	IStudioHdr* m_pStudioHdr;
 	CThreadFastMutex	m_StudioHdrInitLock;
+
+	IPhysicsObject* m_pPhysicsObject;	// pointer to the entity's physics object (vphysics.dll)
+
 };
 
 inline PVSInfo_t* CEngineObjectInternal::GetPVSInfo()
@@ -1541,6 +1585,30 @@ inline void CEngineObjectInternal::SetPlaybackRate(float rate)
 	m_flPlaybackRate = rate;
 }
 
+//-----------------------------------------------------------------------------
+// Methods relating to bounds
+//-----------------------------------------------------------------------------
+inline const Vector& CEngineObjectInternal::WorldAlignMins() const
+{
+	Assert(!IsBoundsDefinedInEntitySpace());
+	Assert(GetCollisionAngles() == vec3_angle);
+	return OBBMins();
+}
+
+inline const Vector& CEngineObjectInternal::WorldAlignMaxs() const
+{
+	Assert(!IsBoundsDefinedInEntitySpace());
+	Assert(GetCollisionAngles() == vec3_angle);
+	return OBBMaxs();
+}
+
+inline const Vector& CEngineObjectInternal::WorldAlignSize() const
+{
+	Assert(!IsBoundsDefinedInEntitySpace());
+	Assert(GetCollisionAngles() == vec3_angle);
+	return OBBSize();
+}
+
 class CEngineObjectWorld : public CEngineObjectInternal {
 public:
 
@@ -1548,7 +1616,22 @@ public:
 
 class CEngineObjectPlayer : public CEngineObjectInternal {
 public:
+	virtual void			VPhysicsDestroyObject();
+	// Player Physics Shadow
+	void					SetupVPhysicsShadow(const Vector& vecAbsOrigin, const Vector& vecAbsVelocity, CPhysCollide* pStandModel, const char* pStandHullName, CPhysCollide* pCrouchModel, const char* pCrouchHullName);
+	IPhysicsPlayerController* GetPhysicsController() { return m_pPhysicsController; }
+	void UpdateVPhysicsPosition(const Vector& position, const Vector& velocity, float secondsToArrival);
+	void					SetVCollisionState(const Vector& vecAbsOrigin, const Vector& vecAbsVelocity, int collisionState);
+	int GetVphysicsCollisionState() { return m_vphysicsCollisionState; }
+private:
+	void UpdatePhysicsShadowToPosition(const Vector& vecAbsOrigin);
 
+private:
+	IPhysicsPlayerController* m_pPhysicsController;
+	IPhysicsObject* m_pShadowStand;
+	IPhysicsObject* m_pShadowCrouch;
+	// Player Physics Shadow
+	int m_vphysicsCollisionState;
 };
 
 //-----------------------------------------------------------------------------
@@ -2164,7 +2247,7 @@ int CGlobalEntityList<T>::RestoreGlobalEntity(T* pEntity, CSaveRestoreData* pSav
 		pEntity = pNewEntity;// we're going to restore this data OVER the old entity
 		pEntInfo->hEnt = pEntity;
 		// HACKHACK: Do we need system-wide support for removing non-global spawn allocated resources?
-		pEntity->VPhysicsDestroyObject();
+		pEntity->GetEngineObject()->VPhysicsDestroyObject();
 		Assert(pEntInfo->edictindex == -1);
 		// Update the global table to say that the global definition of this entity should come from this level
 		engine->GlobalEntity_SetMap(globalIndex, gpGlobals->mapname);

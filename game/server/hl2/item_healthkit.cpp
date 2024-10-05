@@ -270,7 +270,7 @@ int CWallHealth::DrawDebugTextOverlays(void)
 
 bool CWallHealth::CreateVPhysics(void)
 {
-	VPhysicsInitStatic();
+	GetEngineObject()->VPhysicsInitStatic();
 	return true;
 
 }
@@ -575,7 +575,7 @@ int CNewWallHealth::DrawDebugTextOverlays(void)
 
 bool CNewWallHealth::CreateVPhysics(void)
 {
-	VPhysicsInitStatic();
+	GetEngineObject()->VPhysicsInitStatic();
 	return true;
 }
 

@@ -243,7 +243,7 @@ void CWallHealth::Spawn(void)
 
 bool CWallHealth::CreateVPhysics(void)
 {
-	VPhysicsInitStatic();
+	GetEngineObject()->VPhysicsInitStatic();
 	return true;
 
 }

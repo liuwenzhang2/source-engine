@@ -551,7 +551,7 @@ void CCombineDropshipContainer::ThrowFlamingGib( void )
 	pChunk->SetOwnerEntity( this );
 	pChunk->m_lifeTime = random->RandomFloat( 6.0f, 8.0f );
 	pChunk->GetEngineObject()->SetCollisionGroup( COLLISION_GROUP_DEBRIS );
-	IPhysicsObject *pPhysicsObject = pChunk->VPhysicsInitNormal( SOLID_VPHYSICS, pChunk->GetEngineObject()->GetSolidFlags(), false );
+	IPhysicsObject *pPhysicsObject = pChunk->GetEngineObject()->VPhysicsInitNormal( SOLID_VPHYSICS, pChunk->GetEngineObject()->GetSolidFlags(), false );
 	
 	// Set the velocity
 	if ( pPhysicsObject )
@@ -993,8 +993,8 @@ void CNPC_CombineDropship::Spawn( void )
 		SetIdealActivity( (Activity)ACT_DROPSHIP_FLY_IDLE_EXAGG );
 	}
 
-	m_cullBoxMins = WorldAlignMins() - Vector(300,300,200);
-	m_cullBoxMaxs = WorldAlignMaxs() + Vector(300,300,200);
+	m_cullBoxMins = GetEngineObject()->WorldAlignMins() - Vector(300,300,200);
+	m_cullBoxMaxs = GetEngineObject()->WorldAlignMaxs() + Vector(300,300,200);
 	BaseClass::Spawn();
 
 	// Dropship ignores all damage, but can deal it to its carried container
@@ -2089,7 +2089,7 @@ void CNPC_CombineDropship::PrescheduleThink( void )
 
 			// place danger sounds 1 foot above ground to get troops to scatter if they are below dropship
 			Vector vecBottom = GetEngineObject()->GetAbsOrigin();
-			vecBottom.z += WorldAlignMins().z;
+			vecBottom.z += GetEngineObject()->WorldAlignMins().z;
 			Vector vecSpot = vecBottom + Vector(0, 0, -1) * (flAltitude - 12 );
 			CSoundEnt::InsertSound( SOUND_DANGER, vecSpot, 400, 0.1, this, 0 );
 			CSoundEnt::InsertSound( SOUND_PHYSICS_DANGER, vecSpot, 400, 0.1, this, 1 );

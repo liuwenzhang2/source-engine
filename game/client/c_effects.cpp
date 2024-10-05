@@ -422,7 +422,7 @@ void CClient_Precipitation::Simulate( float dt )
 	if ( r_RainHack.GetInt() )
 		m_Lifetime = (GetClientWorldEntity()->m_WorldMaxs[2] - GetClientWorldEntity()->m_WorldMins[2]) / m_Speed;
 	else
-		m_Lifetime = (WorldAlignMaxs()[2] - WorldAlignMins()[2]) / m_Speed;
+		m_Lifetime = (GetEngineObject()->WorldAlignMaxs()[2] - GetEngineObject()->WorldAlignMins()[2]) / m_Speed;
 
 
 	if ( !r_RainSimulate.GetInt() )
@@ -746,8 +746,8 @@ bool CClient_Precipitation::ComputeEmissionArea( Vector& origin, Vector2D& size 
 	// FIXME: Compute the precipitation area based on computational power
 	float emissionSize = r_RainRadius.GetFloat();	// size of box to emit particles in
 
-	Vector vMins = WorldAlignMins();
-	Vector vMaxs = WorldAlignMaxs();
+	Vector vMins = GetEngineObject()->WorldAlignMins();
+	Vector vMaxs = GetEngineObject()->WorldAlignMaxs();
 	if ( r_RainHack.GetInt() )
 	{
 		vMins = GetClientWorldEntity()->m_WorldMins;
@@ -864,8 +864,8 @@ void CClient_Precipitation::CreateAshParticle( void )
 
 		Vector vPushOrigin;
 
-		Vector absmins = WorldAlignMins();
-		Vector absmaxs = WorldAlignMaxs();
+		Vector absmins = GetEngineObject()->WorldAlignMins();
+		Vector absmaxs = GetEngineObject()->WorldAlignMaxs();
 
 		//15 Traces a second.
 	while ( m_tAshParticleTraceTimer.NextEvent( curTime ) )
@@ -1767,8 +1767,8 @@ void CSnowFallManager::AddSnowFallEntity( CClient_Precipitation *pSnowEntity )
 	m_aSnow[iSnow].m_pEffect = SnowFallEffect::Create( "snowfall" );
 	m_aSnow[iSnow].m_hMaterial = ParticleMgr()->GetPMaterial( "particle/snow" );
 
-	VectorCopy( pSnowEntity->WorldAlignMins(), m_aSnow[iSnow].m_vecMin );
-	VectorCopy( pSnowEntity->WorldAlignMaxs(), m_aSnow[iSnow].m_vecMax );
+	VectorCopy( pSnowEntity->GetEngineObject()->WorldAlignMins(), m_aSnow[iSnow].m_vecMin );
+	VectorCopy( pSnowEntity->GetEngineObject()->WorldAlignMaxs(), m_aSnow[iSnow].m_vecMax );
 
 	UpdateBounds( m_aSnow[iSnow].m_vecMin, m_aSnow[iSnow].m_vecMax );
 }

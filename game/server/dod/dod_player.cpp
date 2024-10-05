@@ -924,7 +924,7 @@ void CDODPlayer::InitVCollision( const Vector &vecAbsOrigin, const Vector &vecAb
 		BaseClass::InitVCollision( vecAbsOrigin, vecAbsVelocity );
 
 		// Setup the HL2 specific callback.
-		GetPhysicsController()->SetEventHandler( &playerCallback );
+		GetEngineObject()->GetPhysicsController()->SetEventHandler( &playerCallback );
 	}
 }
 

@@ -845,8 +845,8 @@ void CNPC_BaseTurret::Deploy(void)
 	if (GetEngineObject()->IsSequenceFinished())
 	{
 		Vector curmins, curmaxs;
-		curmins = WorldAlignMins();
-		curmaxs = WorldAlignMaxs();
+		curmins = GetEngineObject()->WorldAlignMins();
+		curmaxs = GetEngineObject()->WorldAlignMaxs();
 
 		curmaxs.z = m_iDeployHeight;
 		curmins.z = -m_iDeployHeight;
@@ -910,8 +910,8 @@ void CNPC_BaseTurret::Retire(void)
 			//SetTurretAnim(TURRET_ANIM_NONE);
 
 			Vector curmins, curmaxs;
-			curmins = WorldAlignMins();
-			curmaxs = WorldAlignMaxs();
+			curmins = GetEngineObject()->WorldAlignMins();
+			curmaxs = GetEngineObject()->WorldAlignMaxs();
 
 			curmaxs.z = m_iRetractHeight;
 			curmins.z = -m_iRetractHeight;

@@ -582,12 +582,12 @@ bool CDODBipodWeapon::TestDeployAngle( CDODPlayer *pPlayer, float *flDeployedHei
 	// fix prediction hitch when coming up from prone. client thinks we aren't
 	// prone, but hull is still prone hull
 	// assumes prone hull is shorter than duck hull!
-	if ( pPlayer->WorldAlignMaxs().z <= VEC_PRONE_HULL_MAX.z )
+	if ( pPlayer->GetEngineObject()->WorldAlignMaxs().z <= VEC_PRONE_HULL_MAX.z )
 		return false;
 
 	// Else trace down
 	Vector vecDownTraceStart = vecStart + forward * ( VEC_HULL_MAX_SCALED( pPlayer )[0] + DEPLOY_DOWNTRACE_FORWARD_DIST );
-	int iTraceHeight = -( pPlayer->WorldAlignMaxs().z );
+	int iTraceHeight = -( pPlayer->GetEngineObject()->WorldAlignMaxs().z );
 
 
 	// search down from the forward trace

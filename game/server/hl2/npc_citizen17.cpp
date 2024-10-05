@@ -1016,8 +1016,8 @@ void CNPC_Citizen::PrescheduleThink()
 
 	if ( !npc_citizen_insignia.GetBool() && npc_citizen_squad_marker.GetBool() && IsInPlayerSquad() )
 	{
-		Vector mins = WorldAlignMins() * .5 + GetEngineObject()->GetAbsOrigin();
-		Vector maxs = WorldAlignMaxs() * .5 + GetEngineObject()->GetAbsOrigin();
+		Vector mins = GetEngineObject()->WorldAlignMins() * .5 + GetEngineObject()->GetAbsOrigin();
+		Vector maxs = GetEngineObject()->WorldAlignMaxs() * .5 + GetEngineObject()->GetAbsOrigin();
 		
 		float rMax = 255;
 		float gMax = 255;

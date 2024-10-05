@@ -344,11 +344,11 @@ void CNPC_Dog::SetPlayerAvoidState( void )
 
 		if ( pLocalPlayer )
 		{
-			vWorldMins = WorldAlignMins();
-			vWorldMaxs = WorldAlignMaxs();
+			vWorldMins = GetEngineObject()->WorldAlignMins();
+			vWorldMaxs = GetEngineObject()->WorldAlignMaxs();
 
-			vPlayerMins = pLocalPlayer->GetEngineObject()->GetAbsOrigin() + pLocalPlayer->WorldAlignMins();
-			vPlayerMaxs = pLocalPlayer->GetEngineObject()->GetAbsOrigin() + pLocalPlayer->WorldAlignMaxs();
+			vPlayerMins = pLocalPlayer->GetEngineObject()->GetAbsOrigin() + pLocalPlayer->GetEngineObject()->WorldAlignMins();
+			vPlayerMaxs = pLocalPlayer->GetEngineObject()->GetAbsOrigin() + pLocalPlayer->GetEngineObject()->WorldAlignMaxs();
 
 			// check if the player intersects the bounds of any of the bone followers
 			for ( i = 0; i < m_BoneFollowerManager.GetNumBoneFollowers(); i++ )

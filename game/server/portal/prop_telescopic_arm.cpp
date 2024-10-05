@@ -126,7 +126,7 @@ void CPropTelescopicArm::Spawn( void )
 
 	GetEngineObject()->SetSolid( SOLID_VPHYSICS );
 	GetEngineObject()->SetMoveType( MOVETYPE_PUSH );
-	VPhysicsInitStatic();
+	GetEngineObject()->VPhysicsInitStatic();
 
 	BaseClass::Spawn();
 
@@ -307,7 +307,7 @@ Vector CPropTelescopicArm::FindTargetAimPoint( void )
 		GetAttachment( m_iFrontMarkerAttachment, vFrontPoint, NULL, NULL, NULL );
 
 		// Aim at the target through the world
-		Vector vAimPoint = pTarget->GetEngineObject()->GetAbsOrigin() + ( pTarget->WorldAlignMins() + pTarget->WorldAlignMaxs() ) * 0.5f;
+		Vector vAimPoint = pTarget->GetEngineObject()->GetAbsOrigin() + ( pTarget->GetEngineObject()->WorldAlignMins() + pTarget->GetEngineObject()->WorldAlignMaxs() ) * 0.5f;
 		//float  fDistToPoint = vFrontPoint.DistToSqr( vAimPoint );
 
 		CProp_Portal *pShortestDistPortal = NULL;
@@ -344,7 +344,7 @@ Vector CPropTelescopicArm::FindAimPointThroughPortal( const CProp_Portal* pPorta
 		if ( pLinked && pLinked->m_bActivated && pTarget )
 		{
 			VMatrix matToPortalView = pLinked->m_matrixThisToLinked;
-			Vector vTargetAimPoint = pTarget->GetEngineObject()->GetAbsOrigin() + ( pTarget->WorldAlignMins() + pTarget->WorldAlignMaxs() ) * 0.5f;
+			Vector vTargetAimPoint = pTarget->GetEngineObject()->GetAbsOrigin() + ( pTarget->GetEngineObject()->WorldAlignMins() + pTarget->GetEngineObject()->WorldAlignMaxs() ) * 0.5f;
 
 			return matToPortalView * vTargetAimPoint;
 		}

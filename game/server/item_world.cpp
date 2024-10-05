@@ -127,7 +127,7 @@ bool CItem::CreateItemVPhysicsObject( void )
 		nSolidFlags |= FSOLID_TRIGGER;
 	}
 
-	if ( VPhysicsInitNormal( SOLID_VPHYSICS, nSolidFlags, false ) == NULL )
+	if (GetEngineObject()->VPhysicsInitNormal( SOLID_VPHYSICS, nSolidFlags, false ) == NULL )
 	{
 		GetEngineObject()->SetSolid( SOLID_BBOX );
 		GetEngineObject()->AddSolidFlags( nSolidFlags );
@@ -463,7 +463,7 @@ CBaseEntity* CItem::Respawn( void )
 	SetTouch( NULL );
 	GetEngineObject()->AddEffects( EF_NODRAW );
 
-	VPhysicsDestroyObject();
+	GetEngineObject()->VPhysicsDestroyObject();
 
 	GetEngineObject()->SetMoveType( MOVETYPE_NONE );
 	GetEngineObject()->SetSolid( SOLID_BBOX );

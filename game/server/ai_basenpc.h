@@ -2745,14 +2745,14 @@ inline SolidType_t CAI_Component::GetSolid() const
 
 inline const Vector &CAI_Component::WorldAlignMins() const
 {
-	return GetOuter()->WorldAlignMins();
+	return GetOuter()->GetEngineObject()->WorldAlignMins();
 }
 
 //-----------------------------------------------------------------------------
 
 inline const Vector &CAI_Component::WorldAlignMaxs() const
 {
-	return GetOuter()->WorldAlignMaxs();
+	return GetOuter()->GetEngineObject()->WorldAlignMaxs();
 }
 	
 //-----------------------------------------------------------------------------

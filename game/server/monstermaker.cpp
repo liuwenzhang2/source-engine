@@ -495,7 +495,7 @@ void CBaseNPCMaker::ChildPostSpawn( CAI_BaseNPC *pChild )
 	while ( bFound )
 	{
 		trace_t tr;
-		UTIL_TraceHull( pChild->GetEngineObject()->GetAbsOrigin(), pChild->GetEngineObject()->GetAbsOrigin(), pChild->WorldAlignMins(), pChild->WorldAlignMaxs(), MASK_NPCSOLID, pChild, COLLISION_GROUP_NONE, &tr );
+		UTIL_TraceHull( pChild->GetEngineObject()->GetAbsOrigin(), pChild->GetEngineObject()->GetAbsOrigin(), pChild->GetEngineObject()->WorldAlignMins(), pChild->GetEngineObject()->WorldAlignMaxs(), MASK_NPCSOLID, pChild, COLLISION_GROUP_NONE, &tr );
 		//NDebugOverlay::Box( pChild->GetAbsOrigin(), pChild->WorldAlignMins(), pChild->WorldAlignMaxs(), 0, 255, 0, 32, 5.0 );
 		if ( tr.fraction != 1.0 && tr.m_pEnt )
 		{

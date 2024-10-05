@@ -596,7 +596,7 @@ bool CAI_ActBusyBehavior::FValidateHintType( CAI_Hint *pHint )
 
 	// Check for clearance
 	trace_t tr;
-	AI_TraceHull( pHint->GetEngineObject()->GetAbsOrigin(), pHint->GetEngineObject()->GetAbsOrigin(), GetOuter()->WorldAlignMins(), GetOuter()->WorldAlignMaxs(), MASK_SOLID, GetOuter(), COLLISION_GROUP_NONE, &tr );
+	AI_TraceHull( pHint->GetEngineObject()->GetAbsOrigin(), pHint->GetEngineObject()->GetAbsOrigin(), GetOuter()->GetEngineObject()->WorldAlignMins(), GetOuter()->GetEngineObject()->WorldAlignMaxs(), MASK_SOLID, GetOuter(), COLLISION_GROUP_NONE, &tr );
 	if ( tr.fraction == 1.0 )
 		return true;
 
@@ -604,7 +604,7 @@ bool CAI_ActBusyBehavior::FValidateHintType( CAI_Hint *pHint )
 	if ( ai_debug_actbusy.GetInt() == 3 && GetOuter()->m_debugOverlays & OVERLAY_NPC_SELECTED_BIT )
 	{
 		NDebugOverlay::Text( pHint->GetEngineObject()->GetAbsOrigin(), "Node isn't clear.", false, 60 );
-		NDebugOverlay::Box( pHint->GetEngineObject()->GetAbsOrigin(), GetOuter()->WorldAlignMins(), GetOuter()->WorldAlignMaxs(), 255,0,0, 8, 2.0 );
+		NDebugOverlay::Box( pHint->GetEngineObject()->GetAbsOrigin(), GetOuter()->GetEngineObject()->WorldAlignMins(), GetOuter()->GetEngineObject()->WorldAlignMaxs(), 255,0,0, 8, 2.0 );
 	}
 
 	return false;
@@ -1251,7 +1251,7 @@ int CAI_ActBusyBehavior::SelectScheduleWhileNotBusy( int iBase )
 					{
 						// Show which actbusy we're moving towards
 						NDebugOverlay::Line( GetOuter()->WorldSpaceCenter(), pNode->GetEngineObject()->GetAbsOrigin(), 0, 255, 0, true, 5.0 );
-						NDebugOverlay::Box( pNode->GetEngineObject()->GetAbsOrigin(), GetOuter()->WorldAlignMins(), GetOuter()->WorldAlignMaxs(), 0, 255, 0, 64, 5.0 );
+						NDebugOverlay::Box( pNode->GetEngineObject()->GetAbsOrigin(), GetOuter()->GetEngineObject()->WorldAlignMins(), GetOuter()->GetEngineObject()->WorldAlignMaxs(), 0, 255, 0, 64, 5.0 );
 					}
 
 					// Let our act busy know we're moving to a node

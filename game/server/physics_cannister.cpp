@@ -113,7 +113,7 @@ bool CPhysicsCannister::CreateVPhysics()
 {
 	bool asleep = GetEngineObject()->HasSpawnFlags(SF_CANNISTER_ASLEEP);
 
-	VPhysicsInitNormal( SOLID_VPHYSICS, 0, asleep );
+	GetEngineObject()->VPhysicsInitNormal( SOLID_VPHYSICS, 0, asleep );
 	return true;
 }
 

@@ -233,7 +233,6 @@ CBaseEntity::CBaseEntity()
 	// clear debug overlays
 	m_debugOverlays  = 0;
 	m_pTimedOverlay  = NULL;
-	m_pPhysicsObject = NULL;
 	m_flShadowCastDistance = m_flDesiredShadowCastDistance = 0;
 	SetRenderColor( 255, 255, 255, 255 );
 	m_iTeamNum = m_iInitialTeamNum = TEAM_UNASSIGNED;
@@ -403,7 +402,7 @@ void CBaseEntity::UpdateOnRemove(void)
 		engine->GlobalEntity_SetState(GetEngineObject()->GetGlobalname(), GLOBAL_DEAD);
 	}
 
-	VPhysicsDestroyObject();
+	GetEngineObject()->VPhysicsDestroyObject();
 
 	// This is only here to allow the MOVETYPE_NONE to be set without the
 	// assertion triggering. Why do we bother setting the MOVETYPE to none here?
@@ -470,7 +469,7 @@ CBaseEntity::~CBaseEntity( )
 	// Deletion should only occur via UTIL_Remove(Immediate) calls, not via naked delete calls
 	Assert( g_bDisableEhandleAccess );
 
-	VPhysicsDestroyObject();
+	//GetEngineObject()->VPhysicsDestroyObject();
 
 
 }
@@ -1164,7 +1163,7 @@ int CBaseEntity::OnTakeDamage( const CTakeDamageInfo &info )
 				vecDir -= vecInflictorCentroid;
 				VectorNormalize( vecDir );
 
-				float flForce = info.GetDamage() * ((32 * 32 * 72.0) / (WorldAlignSize().x * WorldAlignSize().y * WorldAlignSize().z)) * 5;
+				float flForce = info.GetDamage() * ((32 * 32 * 72.0) / (GetEngineObject()->WorldAlignSize().x * GetEngineObject()->WorldAlignSize().y * GetEngineObject()->WorldAlignSize().z)) * 5;
 				
 				if (flForce > 1000.0) 
 					flForce = 1000.0;
@@ -1483,7 +1482,7 @@ BEGIN_DATADESC_NO_BASE( CBaseEntity )
 	//DEFINE_FIELD( m_MoveCollide, FIELD_CHARACTER ),
 	DEFINE_FIELD( m_hOwnerEntity, FIELD_EHANDLE ),
 	//DEFINE_FIELD( m_CollisionGroup, FIELD_INTEGER ),
-	DEFINE_PHYSPTR( m_pPhysicsObject),
+	//DEFINE_PHYSPTR( m_pPhysicsObject),
 	//DEFINE_FIELD( m_flElasticity, FIELD_FLOAT ),
 	DEFINE_KEYFIELD( m_flShadowCastDistance, FIELD_FLOAT, "shadowcastdist" ),
 	DEFINE_FIELD( m_flDesiredShadowCastDistance, FIELD_FLOAT ),
@@ -2229,19 +2228,7 @@ void CBaseEntity::VPhysicsFriction( IPhysicsObject *pObject, float energy, int s
 }
 
 
-void CBaseEntity::VPhysicsSwapObject( IPhysicsObject *pSwap )
-{
-	if ( !pSwap )
-	{
-		PhysRemoveShadow(this);
-	}
 
-	if ( !m_pPhysicsObject )
-	{
-		Warning( "Bad vphysics swap for %s\n", STRING(GetEngineObject()->GetClassname()) );
-	}
-	m_pPhysicsObject = pSwap;
-}
 
 
 // Tells the physics shadow to update it's target to the current position
@@ -3545,9 +3532,9 @@ void CBaseEntity::InputClearParent( inputdata_t &inputdata )
 //------------------------------------------------------------------------------
 void CBaseEntity::GetVelocity(Vector *vVelocity, AngularImpulse *vAngVelocity)
 {
-	if (GetEngineObject()->GetMoveType()==MOVETYPE_VPHYSICS && m_pPhysicsObject)
+	if (GetEngineObject()->GetMoveType()==MOVETYPE_VPHYSICS && VPhysicsGetObject())
 	{
-		m_pPhysicsObject->GetVelocity(vVelocity,vAngVelocity);
+		VPhysicsGetObject()->GetVelocity(vVelocity,vAngVelocity);
 	}
 	else
 	{

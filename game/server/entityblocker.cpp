@@ -29,7 +29,7 @@ CEntityBlocker *CEntityBlocker::Create( const Vector &origin, const Vector &mins
 		pBlocker->SetSize( mins, maxs );
 		if ( bBlockPhysics )
 		{
-			pBlocker->VPhysicsInitStatic();
+			pBlocker->GetEngineObject()->VPhysicsInitStatic();
 		}
 	}
 

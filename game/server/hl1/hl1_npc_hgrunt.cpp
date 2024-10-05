@@ -674,7 +674,7 @@ int CNPC_HGrunt::GetGrenadeConditions( float flDot, float flDist  )
 		return COND_NONE;
 	
 	Vector flEnemyLKP = GetEnemyLKP();
-	if ( !(pEnemy->GetEngineObject()->GetFlags() & FL_ONGROUND) && pEnemy->GetWaterLevel() == 0 && flEnemyLKP.z > (GetEngineObject()->GetAbsOrigin().z + WorldAlignMaxs().z)  )
+	if ( !(pEnemy->GetEngineObject()->GetFlags() & FL_ONGROUND) && pEnemy->GetWaterLevel() == 0 && flEnemyLKP.z > (GetEngineObject()->GetAbsOrigin().z + GetEngineObject()->WorldAlignMaxs().z)  )
 	{
 		//!!!BUGBUG - we should make this check movetype and make sure it isn't FLY? Players who jump a lot are unlikely to 
 		// be grenaded.
@@ -1004,7 +1004,7 @@ CBaseEntity *CNPC_HGrunt::Kick( void )
 	Vector forward;
 	AngleVectors(GetEngineObject()->GetAbsAngles(), &forward );
 	Vector vecStart = GetEngineObject()->GetAbsOrigin();
-	vecStart.z += WorldAlignSize().z * 0.5;
+	vecStart.z += GetEngineObject()->WorldAlignSize().z * 0.5;
 	Vector vecEnd = vecStart + (forward * 70);
 
 	UTIL_TraceHull( vecStart, vecEnd, Vector(-16,-16,-18), Vector(16,16,18), MASK_SHOT_HULL, this, COLLISION_GROUP_NONE, &tr );

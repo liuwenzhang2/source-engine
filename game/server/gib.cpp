@@ -237,7 +237,7 @@ void CGib::InitGib( CBaseEntity *pVictim, float fMinVelocity, float fMaxVelocity
 		AdjustVelocityBasedOnHealth( pVictim->m_iHealth, vecNewVelocity );
 
 		// Attempt to be physical if we can
-		if ( VPhysicsInitNormal( SOLID_BBOX, 0, false ) )
+		if (GetEngineObject()->VPhysicsInitNormal( SOLID_BBOX, 0, false ) )
 		{
 			IPhysicsObject *pObj = VPhysicsGetObject();
 

@@ -17,6 +17,7 @@
 #include "iclientthinkable.h"
 #include "client_class.h"
 #include "isaverestore.h"
+#include "vcollide_parse.h"
 
 struct Ray_t;
 class CGameTrace;
@@ -25,6 +26,7 @@ class CMouthInfo;
 class IClientEntityInternal;
 struct SpatializationInfo_t;
 struct string_t;
+class IPhysicsObject;
 
 class VarMapEntry_t
 {
@@ -472,6 +474,16 @@ public:
 	virtual void DoMuzzleFlash() = 0;
 	virtual void SetModelPointer(const model_t* pModel) = 0;
 	virtual void UpdateRelevantInterpolatedVars() = 0;
+	virtual void VPhysicsDestroyObject(void) = 0;
+	virtual IPhysicsObject* VPhysicsGetObject(void) const = 0;
+	virtual void VPhysicsSetObject(IPhysicsObject* pPhysics) = 0;
+	virtual const Vector& WorldAlignMins() const = 0;
+	virtual const Vector& WorldAlignMaxs() const = 0;
+	virtual const Vector& WorldAlignSize() const = 0;
+	virtual IPhysicsObject* VPhysicsInitStatic(void) = 0;
+	virtual IPhysicsObject* VPhysicsInitNormal(SolidType_t solidType, int nSolidFlags, bool createAsleep, solid_t* pSolid = NULL) = 0;
+	virtual IPhysicsObject* VPhysicsInitShadow(bool allowPhysicsMovement, bool allowPhysicsRotation, solid_t* pSolid = NULL) = 0;
+
 };
 
 //-----------------------------------------------------------------------------

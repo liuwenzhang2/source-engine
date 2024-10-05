@@ -112,8 +112,8 @@ void CRagdoll::Init(
 	params.allowStretch = false;
 	params.fixedConstraints = bFixedConstraints;
 	RagdollCreate( m_ragdoll, params, physenv );
-	ent->VPhysicsSetObject( NULL );
-	ent->VPhysicsSetObject( m_ragdoll.list[0].pObject );
+	ent->GetEngineObject()->VPhysicsSetObject( NULL );
+	ent->GetEngineObject()->VPhysicsSetObject( m_ragdoll.list[0].pObject );
 	// Mark the ragdoll as debris.
 	ent->GetEngineObject()->SetCollisionGroup( COLLISION_GROUP_DEBRIS );
 

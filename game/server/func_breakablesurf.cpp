@@ -709,7 +709,7 @@ void CBreakableSurface::Die( CBaseEntity *pBreaker, const Vector &vAttackDir )
 	// have been standing on me
 	ResetOnGroundFlags();
 
-	VPhysicsDestroyObject();
+	GetEngineObject()->VPhysicsDestroyObject();
 	GetEngineObject()->AddSolidFlags( FSOLID_TRIGGER );
 	GetEngineObject()->AddSolidFlags( FSOLID_NOT_SOLID );
 	SetTouch(&CBreakableSurface::SurfaceTouch);

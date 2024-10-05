@@ -448,8 +448,8 @@ void CNPC_Ichthyosaur::DragVictim( float moveDist )
 	Vector	mins, maxs;
 	float	width;
 	
-	mins	= WorldAlignMins();
-	maxs	= WorldAlignMaxs();
+	mins	= GetEngineObject()->WorldAlignMins();
+	maxs	= GetEngineObject()->WorldAlignMaxs();
 	width	= ( maxs.y - mins.y ) * 0.5f;
 
 	Vector	forward, up;

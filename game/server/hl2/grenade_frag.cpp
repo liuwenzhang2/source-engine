@@ -196,7 +196,7 @@ void CGrenadeFrag::CreateEffects( void )
 bool CGrenadeFrag::CreateVPhysics()
 {
 	// Create the object in the physics system
-	VPhysicsInitNormal( SOLID_BBOX, 0, false );
+	GetEngineObject()->VPhysicsInitNormal( SOLID_BBOX, 0, false );
 	return true;
 }
 

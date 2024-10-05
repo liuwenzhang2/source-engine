@@ -274,7 +274,7 @@ CAssaultPoint *CAI_AssaultBehavior::FindAssaultPoint( string_t iszAssaultPointNa
 		CAI_BaseNPC *pNPC = GetOuter();
 		CAssaultPoint *pAssaultPoint = pAssaultPoints[i];
 
-		AI_TraceHull ( pAssaultPoint->GetEngineObject()->GetAbsOrigin(), pAssaultPoint->GetEngineObject()->GetAbsOrigin(), pNPC->WorldAlignMins(), pNPC->WorldAlignMaxs(), MASK_SOLID, pNPC, COLLISION_GROUP_NONE, &tr );
+		AI_TraceHull ( pAssaultPoint->GetEngineObject()->GetAbsOrigin(), pAssaultPoint->GetEngineObject()->GetAbsOrigin(), pNPC->GetEngineObject()->WorldAlignMins(), pNPC->GetEngineObject()->WorldAlignMaxs(), MASK_SOLID, pNPC, COLLISION_GROUP_NONE, &tr );
 
 		if ( tr.fraction == 1.0 )
 		{

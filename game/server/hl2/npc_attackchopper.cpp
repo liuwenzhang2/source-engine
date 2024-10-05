@@ -3416,7 +3416,7 @@ void Chopper_CreateChunk( CBaseEntity *pChopper, const Vector &vecChunkPos, cons
 
 	if ( bSmall == false )
 	{
-		IPhysicsObject *pPhysicsObject = pChunk->VPhysicsInitNormal( SOLID_VPHYSICS, pChunk->GetEngineObject()->GetSolidFlags(), false );
+		IPhysicsObject *pPhysicsObject = pChunk->GetEngineObject()->VPhysicsInitNormal( SOLID_VPHYSICS, pChunk->GetEngineObject()->GetSolidFlags(), false );
 		
 		if ( pPhysicsObject )
 		{
@@ -5061,7 +5061,7 @@ void CGrenadeHelicopter::Spawn( void )
 
 	if ( !GetEngineObject()->HasSpawnFlags( SF_GRENADE_HELICOPTER_MEGABOMB ) )
 	{
-		IPhysicsObject *pPhysicsObject = VPhysicsInitNormal( SOLID_VPHYSICS, GetEngineObject()->GetSolidFlags(), false );
+		IPhysicsObject *pPhysicsObject = GetEngineObject()->VPhysicsInitNormal( SOLID_VPHYSICS, GetEngineObject()->GetSolidFlags(), false );
 		GetEngineObject()->SetMoveType( MOVETYPE_VPHYSICS );
 
 		Vector vecAbsVelocity = GetEngineObject()->GetAbsVelocity();
@@ -5071,7 +5071,7 @@ void CGrenadeHelicopter::Spawn( void )
 	{
 		GetEngineObject()->SetSolid( SOLID_BBOX );
 		GetEngineObject()->SetCollisionBounds( Vector( -12.5, -12.5, -12.5 ), Vector( 12.5, 12.5, 12.5 ) );
-		VPhysicsInitShadow( false, false );
+		GetEngineObject()->VPhysicsInitShadow( false, false );
 		GetEngineObject()->SetMoveType( MOVETYPE_FLYGRAVITY, MOVECOLLIDE_FLY_CUSTOM );
 		GetEngineObject()->SetElasticity( 0.5f );
 		GetEngineObject()->AddEffects( EF_NOSHADOW );
@@ -6154,7 +6154,7 @@ CHelicopterChunk *CHelicopterChunk::CreateHelicopterChunk( const Vector &vecPos,
 	pChunk->m_nChunkID = chunkID;
 	pChunk->GetEngineObject()->SetCollisionGroup( COLLISION_GROUP_INTERACTIVE );
 
-	IPhysicsObject *pPhysicsObject = pChunk->VPhysicsInitNormal( SOLID_VPHYSICS, pChunk->GetEngineObject()->GetSolidFlags(), false );
+	IPhysicsObject *pPhysicsObject = pChunk->GetEngineObject()->VPhysicsInitNormal( SOLID_VPHYSICS, pChunk->GetEngineObject()->GetSolidFlags(), false );
 	
 	// Set the velocity
 	if ( pPhysicsObject )

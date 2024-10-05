@@ -830,7 +830,7 @@ void CEnvHeadcrabCanister::SetLanded( void )
 	SetModel( ENV_HEADCRABCANISTER_BROKEN_MODEL );
 	GetEngineObject()->SetMoveType( MOVETYPE_NONE );
 	GetEngineObject()->SetSolid( SOLID_VPHYSICS );
-	VPhysicsInitStatic();
+	GetEngineObject()->VPhysicsInitStatic();
 	
 	IncrementInterpolationFrame();
 	m_bLanded = true;

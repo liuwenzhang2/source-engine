@@ -1371,7 +1371,7 @@ void CHL2_Player::InitVCollision( const Vector &vecAbsOrigin, const Vector &vecA
 	BaseClass::InitVCollision( vecAbsOrigin, vecAbsVelocity );
 
 	// Setup the HL2 specific callback.
-	IPhysicsPlayerController *pPlayerController = GetPhysicsController();
+	IPhysicsPlayerController *pPlayerController = GetEngineObject()->GetPhysicsController();
 	if ( pPlayerController )
 	{
 		pPlayerController->SetEventHandler( &playerCallback );
@@ -3572,8 +3572,8 @@ bool CHL2_Player::TestHitboxes( const Ray_t &ray, unsigned int fContentsMask, tr
 
 		Vector mins, maxs;
 
-		mins = WorldAlignMins();
-		maxs = WorldAlignMaxs();
+		mins = GetEngineObject()->WorldAlignMins();
+		maxs = GetEngineObject()->WorldAlignMaxs();
 
 		if ( IntersectRayWithAACylinder( ray, WorldSpaceCenter(), maxs.x * PLAYER_HULL_REDUCTION, maxs.z - mins.z, &tr ) )
 		{
@@ -3609,8 +3609,8 @@ void CHL2_Player::DrawDebugGeometryOverlays(void)
 	{	
 		Vector mins, maxs;
 
-		mins = WorldAlignMins();
-		maxs = WorldAlignMaxs();
+		mins = GetEngineObject()->WorldAlignMins();
+		maxs = GetEngineObject()->WorldAlignMaxs();
 
 		mins.x *= PLAYER_HULL_REDUCTION;
 		mins.y *= PLAYER_HULL_REDUCTION;

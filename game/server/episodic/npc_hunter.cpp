@@ -476,7 +476,7 @@ void CHunterFlechette::SetSeekTarget( CBaseEntity *pTargetEntity )
 bool CHunterFlechette::CreateVPhysics()
 {
 	// Create the object in the physics system
-	VPhysicsInitNormal( SOLID_BBOX, FSOLID_NOT_STANDABLE, false );
+	GetEngineObject()->VPhysicsInitNormal( SOLID_BBOX, FSOLID_NOT_STANDABLE, false );
 
 	return true;
 }
@@ -2725,7 +2725,7 @@ bool CNPC_Hunter::ShouldCharge( const Vector &startPos, const Vector &endPos, bo
 	// We only need to hit the endpos with the edge of our bounding box
 	Vector vecDir = endPos - startPos;
 	VectorNormalize( vecDir );
-	float flWidth = WorldAlignSize().x * 0.5;
+	float flWidth = GetEngineObject()->WorldAlignSize().x * 0.5;
 	Vector vecTargetPos = endPos - (vecDir * flWidth);
 
 	// See if we can directly move there

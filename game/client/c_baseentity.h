@@ -400,29 +400,17 @@ public:
 	// Called after spawn, and in the case of self-managing objects, after load
 	virtual bool	CreateVPhysics();
 
-	// Convenience routines to init the vphysics simulation for this object.
-	// This creates a static object.  Something that behaves like world geometry - solid, but never moves
-	IPhysicsObject *VPhysicsInitStatic( void );
 
-	// This creates a normal vphysics simulated object
-	IPhysicsObject *VPhysicsInitNormal( SolidType_t solidType, int nSolidFlags, bool createAsleep, solid_t *pSolid = NULL );
-
-	// This creates a vphysics object with a shadow controller that follows the AI
-	// Move the object to where it should be and call UpdatePhysicsShadowToCurrentPosition()
-	IPhysicsObject *VPhysicsInitShadow( bool allowPhysicsMovement, bool allowPhysicsRotation, solid_t *pSolid = NULL );
 
 private:
-	// called by all vphysics inits
-	bool			VPhysicsInitSetup();
+	
 public:
 
-	void			VPhysicsSetObject( IPhysicsObject *pPhysics );
-	// destroy and remove the physics object for this entity
-	virtual void	VPhysicsDestroyObject( void );
+
 
 	// Purpose: My physics object has been updated, react or extract data
 	virtual void					VPhysicsUpdate( IPhysicsObject *pPhysics );
-	inline IPhysicsObject			*VPhysicsGetObject( void ) const { return m_pPhysicsObject; }
+	IPhysicsObject			*VPhysicsGetObject( void ) const { return GetEngineObject()->VPhysicsGetObject(); }
 	virtual int						VPhysicsGetObjectList( IPhysicsObject **pList, int listMax );
 	virtual bool					VPhysicsIsFlesh( void );
 
@@ -444,21 +432,14 @@ public:
 
 	virtual int						CalcOverrideModelIndex() { return -1; }
 
-	// These methods return a *world-aligned* box relative to the absorigin of the entity.
-	// This is used for collision purposes and is *not* guaranteed
-	// to surround the entire entity's visual representation
-	// NOTE: It is illegal to ask for the world-aligned bounds for
-	// SOLID_BSP objects
-	virtual const Vector&			WorldAlignMins( ) const;
-	virtual const Vector&			WorldAlignMaxs( ) const;
+
 
 	
 
 	// NOTE: These use the collision OBB to compute a reasonable center point for the entity
 	virtual const Vector&			WorldSpaceCenter( ) const;
 
-	// FIXME: Do we want this?
-	const Vector&					WorldAlignSize( ) const;
+
 
 	// Returns a radius of a sphere 
 	// *centered at the world space center* bounding the collision representation 
@@ -1144,8 +1125,7 @@ private:
 #endif
 
 protected:
-	// pointer to the entity's physics object (vphysics.dll)
-	IPhysicsObject					*m_pPhysicsObject;	
+
 
 //#if !defined( NO_ENTITY_PREDICTION )
 //	bool							m_bPredictionEligible;
@@ -1416,29 +1396,8 @@ inline const char *C_BaseEntity::GetDLLType( void )
 }
 
 
-//-----------------------------------------------------------------------------
-// Methods relating to bounds
-//-----------------------------------------------------------------------------
-inline const Vector& C_BaseEntity::WorldAlignMins( ) const
-{
-	Assert( !GetEngineObject()->IsBoundsDefinedInEntitySpace() );
-	Assert(GetEngineObject()->GetCollisionAngles() == vec3_angle );
-	return GetEngineObject()->OBBMins();
-}
 
-inline const Vector& C_BaseEntity::WorldAlignMaxs( ) const
-{
-	Assert( !GetEngineObject()->IsBoundsDefinedInEntitySpace() );
-	Assert(GetEngineObject()->GetCollisionAngles() == vec3_angle );
-	return GetEngineObject()->OBBMaxs();
-}
 
-inline const Vector& C_BaseEntity::WorldAlignSize( ) const
-{
-	Assert( !GetEngineObject()->IsBoundsDefinedInEntitySpace() );
-	Assert(GetEngineObject()->GetCollisionAngles() == vec3_angle );
-	return GetEngineObject()->OBBSize();
-}
 
 //inline float C_BaseEntity::BoundingRadius() const
 //{

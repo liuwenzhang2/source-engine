@@ -79,7 +79,7 @@ void CFuncNavCost::Spawn( void )
 	GetEngineObject()->AddEffects( EF_NODRAW );
 	GetEngineObject()->SetCollisionGroup( COLLISION_GROUP_NONE );
 
-	VPhysicsInitShadow( false, false );
+	GetEngineObject()->VPhysicsInitShadow( false, false );
 
 	SetThink( &CFuncNavCost::CostThink );
 	GetEngineObject()->SetNextThink( gpGlobals->curtime + UPDATE_DIRTY_TIME );

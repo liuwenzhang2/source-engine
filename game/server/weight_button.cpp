@@ -62,7 +62,7 @@ void CWeightButton::Spawn()
 //-----------------------------------------------------------------------------
 bool CWeightButton::CreateVPhysics()
 {
-	VPhysicsInitShadow( false, false );
+	GetEngineObject()->VPhysicsInitShadow( false, false );
 	return true;
 }
 

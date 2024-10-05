@@ -183,8 +183,8 @@ bool CPhysicsNPCSolver::IsIntersecting()
 	{
 		Ray_t ray;
 		// bloated bounds to force slight separation
-		Vector mins = pNPC->WorldAlignMins() - Vector(1,1,1);
-		Vector maxs = pNPC->WorldAlignMaxs() + Vector(1,1,1);
+		Vector mins = pNPC->GetEngineObject()->WorldAlignMins() - Vector(1,1,1);
+		Vector maxs = pNPC->GetEngineObject()->WorldAlignMaxs() + Vector(1,1,1);
 
 		ray.Init( pNPC->GetEngineObject()->GetAbsOrigin(), pNPC->GetEngineObject()->GetAbsOrigin(), mins, maxs );
 		trace_t tr;

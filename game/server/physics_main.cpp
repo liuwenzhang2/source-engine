@@ -1696,8 +1696,8 @@ void CBaseEntity::PhysicsStepRecheckGround()
 	int		x, y;
 	trace_t trace;
 	
-	VectorAdd (GetEngineObject()->GetAbsOrigin(), WorldAlignMins(), mins);
-	VectorAdd (GetEngineObject()->GetAbsOrigin(), WorldAlignMaxs(), maxs);
+	VectorAdd (GetEngineObject()->GetAbsOrigin(), GetEngineObject()->WorldAlignMins(), mins);
+	VectorAdd (GetEngineObject()->GetAbsOrigin(), GetEngineObject()->WorldAlignMaxs(), maxs);
 	point[2] = mins[2] - 1;
 	for	(x=0 ; x<=1 ; x++)
 	{

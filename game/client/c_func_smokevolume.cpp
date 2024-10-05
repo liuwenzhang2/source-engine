@@ -112,7 +112,7 @@ private:
 
 	inline Vector GetSmokeParticlePos(int x, int y, int z )	
 	{
-		return WorldAlignMins() + 
+		return GetEngineObject()->WorldAlignMins() +
 			Vector( x * m_SpacingRadius * 2 + m_SpacingRadius,
 				    y * m_SpacingRadius * 2 + m_SpacingRadius,
 				    z * m_SpacingRadius * 2 + m_SpacingRadius );
@@ -293,7 +293,7 @@ void C_FuncSmokeVolume::OnDataChanged( DataUpdateType_t updateType )
 	
 	if( updateType == DATA_UPDATE_CREATED )
 	{
-		Vector size = WorldAlignMaxs() - WorldAlignMins();
+		Vector size = GetEngineObject()->WorldAlignMaxs() - GetEngineObject()->WorldAlignMins();
 		m_xCount = 0.5f + ( size.x / ( m_SpacingRadius * 2.0f ) );
 		m_yCount = 0.5f + ( size.y / ( m_SpacingRadius * 2.0f ) );
 		m_zCount = 0.5f + ( size.z / ( m_SpacingRadius * 2.0f ) );

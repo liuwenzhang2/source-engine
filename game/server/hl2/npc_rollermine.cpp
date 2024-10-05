@@ -767,12 +767,12 @@ NPC_STATE CNPC_RollerMine::SelectIdealState( void )
 //-----------------------------------------------------------------------------
 bool CNPC_RollerMine::BecomePhysical( void )
 {
-	VPhysicsDestroyObject();
+	GetEngineObject()->VPhysicsDestroyObject();
 
 	GetEngineObject()->RemoveSolidFlags( FSOLID_NOT_SOLID );
 
 	//Setup the physics controller on the roller
-	IPhysicsObject *pPhysicsObject = VPhysicsInitNormal( SOLID_VPHYSICS, GetEngineObject()->GetSolidFlags() , false );
+	IPhysicsObject *pPhysicsObject = GetEngineObject()->VPhysicsInitNormal( SOLID_VPHYSICS, GetEngineObject()->GetSolidFlags() , false );
 
 	if ( pPhysicsObject == NULL )
 		return false;
@@ -813,7 +813,7 @@ bool CNPC_RollerMine::CreateVPhysics()
 {
 	if ( m_bBuried )
 	{
-		VPhysicsInitStatic();
+		GetEngineObject()->VPhysicsInitStatic();
 		return true;
 	}
 	else
@@ -1840,7 +1840,7 @@ void CNPC_RollerMine::EmbedTouch( CBaseEntity *pOther )
 		Bury( &tr );
 
 		// Destroy out physics object and become static
-		VPhysicsDestroyObject();
+		GetEngineObject()->VPhysicsDestroyObject();
 		CreateVPhysics();
 
 		// Drop a decal on the ground where we impacted

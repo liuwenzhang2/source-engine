@@ -63,8 +63,8 @@ bool CHL1BaseNPC::NoFriendlyFire( void )
 		return false;
 	}
 	
-	vecLeftSide = GetEngineObject()->GetAbsOrigin() - ( vRight * ( WorldAlignSize().x * 1.5 ) );
-	vecRightSide = GetEngineObject()->GetAbsOrigin() + ( vRight * ( WorldAlignSize().x * 1.5 ) );
+	vecLeftSide = GetEngineObject()->GetAbsOrigin() - ( vRight * (GetEngineObject()->WorldAlignSize().x * 1.5 ) );
+	vecRightSide = GetEngineObject()->GetAbsOrigin() + ( vRight * (GetEngineObject()->WorldAlignSize().x * 1.5 ) );
 	v_left = vRight * -1;
 
 	leftPlane.InitializePlane ( vRight, vecLeftSide );

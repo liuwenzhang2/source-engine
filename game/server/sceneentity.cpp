@@ -3624,7 +3624,7 @@ public:
 		// We only want marks that are clear
 		trace_t tr;
 		Vector vecOrigin = pEntity->GetEngineObject()->GetAbsOrigin();
-		AI_TraceHull( vecOrigin, vecOrigin, m_hActor->WorldAlignMins(), m_hActor->WorldAlignMaxs(), MASK_SOLID, m_hActor, COLLISION_GROUP_NONE, &tr );
+		AI_TraceHull( vecOrigin, vecOrigin, m_hActor->GetEngineObject()->WorldAlignMins(), m_hActor->GetEngineObject()->WorldAlignMaxs(), MASK_SOLID, m_hActor, COLLISION_GROUP_NONE, &tr );
 		if ( tr.startsolid )
 		{
 			return false;
@@ -3692,7 +3692,7 @@ public:
 		// We only want marks that are clear
 		trace_t tr;
 		Vector vecOrigin = pEntity->GetEngineObject()->GetAbsOrigin();
-		AI_TraceHull( vecOrigin, vecOrigin, m_hActor->WorldAlignMins(), m_hActor->WorldAlignMaxs(), MASK_SOLID, m_hActor, COLLISION_GROUP_NONE, &tr );
+		AI_TraceHull( vecOrigin, vecOrigin, m_hActor->GetEngineObject()->WorldAlignMins(), m_hActor->GetEngineObject()->WorldAlignMaxs(), MASK_SOLID, m_hActor, COLLISION_GROUP_NONE, &tr );
 		if ( !tr.startsolid || tr.m_pEnt == m_hActor)
 		{
 			float dist1 = (m_vecPos1 - pEntity->GetEngineObject()->GetAbsOrigin()).Length();

@@ -3147,7 +3147,7 @@ int CNPC_Strider::OnTakeDamage_Alive( const CTakeDamageInfo &info )
 	{
 		Vector headPos = BodyTarget( info.GetDamagePosition(), false );
 		
-		float dist = CalcDistanceToAABB( WorldAlignMins(), WorldAlignMaxs(), info.GetDamagePosition() - headPos );
+		float dist = CalcDistanceToAABB(GetEngineObject()->WorldAlignMins(), GetEngineObject()->WorldAlignMaxs(), info.GetDamagePosition() - headPos );
 		// close enough to do damage?
 		if ( dist < 200 )
 		{
@@ -3447,7 +3447,7 @@ bool CNPC_Strider::BecomeRagdoll( const CTakeDamageInfo &info, const Vector &for
 
 					for ( int i = 0; i < striderRagdolls.Count(); i++ )
 					{
-						float distSqrCur = CalcSqrDistanceToAABB( striderRagdolls[i]->WorldAlignMins(), striderRagdolls[i]->WorldAlignMaxs(), pPlayer->GetEngineObject()->GetAbsOrigin() );
+						float distSqrCur = CalcSqrDistanceToAABB( striderRagdolls[i]->GetEngineObject()->WorldAlignMins(), striderRagdolls[i]->GetEngineObject()->WorldAlignMaxs(), pPlayer->GetEngineObject()->GetAbsOrigin() );
 						if ( distSqrCur < distSqrFurthest )
 						{
 							distSqrFurthest = distSqrCur;
@@ -3731,11 +3731,11 @@ void CNPC_Strider::TranslateNavGoal( CBaseEntity *pEnemy, Vector &chasePosition 
 	{
 		if ( ! (pEnemy->GetEngineObject()->GetFlags() & FL_ONGROUND) )
 		{
-			MoveToGround( &chasePosition, pEnemy, pEnemy->WorldAlignMins(), pEnemy->WorldAlignMaxs() );
+			MoveToGround( &chasePosition, pEnemy, pEnemy->GetEngineObject()->WorldAlignMins(), pEnemy->GetEngineObject()->WorldAlignMaxs() );
 		}
 
 		// move down to enemy's feet for enemy origin at chasePosition
-		chasePosition.z += pEnemy->WorldAlignMins().z;
+		chasePosition.z += pEnemy->GetEngineObject()->WorldAlignMins().z;
 
 	}
 	else
@@ -4248,7 +4248,7 @@ bool CNPC_Strider::TestCollision( const Ray_t &ray, unsigned int mask, trace_t& 
 		return BaseClass::TestCollision( ray, mask, trace );
 	}
 
-	if ( IntersectRayWithBox( ray, WorldAlignMins() + GetEngineObject()->GetAbsOrigin(), WorldAlignMaxs() + GetEngineObject()->GetAbsOrigin(), DIST_EPSILON, &trace ) )
+	if ( IntersectRayWithBox( ray, GetEngineObject()->WorldAlignMins() + GetEngineObject()->GetAbsOrigin(), GetEngineObject()->WorldAlignMaxs() + GetEngineObject()->GetAbsOrigin(), DIST_EPSILON, &trace ) )
 	{
 		trace.hitbox = 0;
 		trace.hitgroup = HITGROUP_HEAD;

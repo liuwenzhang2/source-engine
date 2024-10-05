@@ -132,7 +132,7 @@ void CRecharge::Spawn()
 
 bool CRecharge::CreateVPhysics()
 {
-	VPhysicsInitStatic();
+	GetEngineObject()->VPhysicsInitStatic();
 	return true;
 }
 
@@ -517,7 +517,7 @@ void CNewRecharge::Spawn()
 
 bool CNewRecharge::CreateVPhysics()
 {
-	VPhysicsInitStatic();
+	GetEngineObject()->VPhysicsInitStatic();
 	return true;
 }
 

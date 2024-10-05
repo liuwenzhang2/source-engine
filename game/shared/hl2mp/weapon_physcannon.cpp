@@ -235,7 +235,7 @@ static void ComputePlayerMatrix( CBasePlayer *pPlayer, matrix3x4_t &out )
 	//angles.x = clamp( angles.x, -PLAYER_LOOK_PITCH_RANGE, PLAYER_LOOK_PITCH_RANGE );
 	angles.x = 0;
 
-	float feet = pPlayer->GetEngineObject()->GetAbsOrigin().z + pPlayer->WorldAlignMins().z;
+	float feet = pPlayer->GetEngineObject()->GetAbsOrigin().z + pPlayer->GetEngineObject()->WorldAlignMins().z;
 	float eyes = origin.z;
 	float zoffset = 0;
 	// moving up (negative pitch is up)
@@ -1417,12 +1417,12 @@ void CWeaponPhysCannon::OnDataChanged( DataUpdateType_t type )
 	{
 		if ( m_hAttachedObject )
 		{
-			m_hAttachedObject->VPhysicsDestroyObject();
+			m_hAttachedObject->GetEngineObject()->VPhysicsDestroyObject();
 		}
 
 		if ( m_hOldAttachedObject )
 		{
-			m_hOldAttachedObject->VPhysicsDestroyObject();
+			m_hOldAttachedObject->GetEngineObject()->VPhysicsDestroyObject();
 		}
 	}
 
@@ -2440,7 +2440,7 @@ void CWeaponPhysCannon::DetachObject( bool playSound, bool wasLaunched )
 
 	if ( m_hAttachedObject )
 	{
-		m_hAttachedObject->VPhysicsDestroyObject();
+		m_hAttachedObject->GetEngineObject()->VPhysicsDestroyObject();
 	}
 #endif
 }
@@ -2463,7 +2463,7 @@ void CWeaponPhysCannon::ManagePredictedObject( void )
 				solid_t tmpSolid;
 				PhysModelParseSolid( tmpSolid, m_hAttachedObject, pAttachedObject->GetEngineObject()->GetModelIndex() );
 
-				pAttachedObject->VPhysicsInitNormal( SOLID_VPHYSICS, 0, false, &tmpSolid );
+				pAttachedObject->GetEngineObject()->VPhysicsInitNormal( SOLID_VPHYSICS, 0, false, &tmpSolid );
 			}
 
 			pPhysics = pAttachedObject->VPhysicsGetObject();
@@ -2485,7 +2485,7 @@ void CWeaponPhysCannon::ManagePredictedObject( void )
 		{
 			GetGrabController().DetachEntity( false );
 
-			m_hOldAttachedObject->VPhysicsDestroyObject();
+			m_hOldAttachedObject->GetEngineObject()->VPhysicsDestroyObject();
 		}
 	}
 

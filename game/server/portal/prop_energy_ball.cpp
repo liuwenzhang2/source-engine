@@ -187,7 +187,7 @@ void CPropEnergyBall::VPhysicsCollision( int index, gamevcollisionevent_t *pEven
 		// Only lock to the portal's forward axis if we're in it's world bounds
 		// We use a tolerance of four, because the render bounds thickness for a portal is 4, and this function
 		// intersects with a plane.
-		bool bHitPortal = UTIL_IsBoxIntersectingPortal(GetEngineObject()->GetAbsOrigin(), WorldAlignSize(), pPortal, 4.0f );
+		bool bHitPortal = UTIL_IsBoxIntersectingPortal(GetEngineObject()->GetAbsOrigin(), GetEngineObject()->WorldAlignSize(), pPortal, 4.0f );
 
 		// We definitely hit a portal
 		if ( bHitPortal && pPortal && pPortal->IsActivedAndLinked() )

@@ -1581,7 +1581,7 @@ void CNPC_Antlion::StartTask( const Task_t *pTask )
 			{
 				trace_t trace;
 				CTraceFilterAntlion traceFilter( this );
-				AI_TraceHull(GetEngineObject()->GetAbsOrigin(), GetEngineObject()->GetAbsOrigin(), WorldAlignMins(), WorldAlignMaxs(), MASK_SOLID, &traceFilter, &trace );
+				AI_TraceHull(GetEngineObject()->GetAbsOrigin(), GetEngineObject()->GetAbsOrigin(), GetEngineObject()->WorldAlignMins(), GetEngineObject()->WorldAlignMaxs(), MASK_SOLID, &traceFilter, &trace );
 
 				if ( trace.m_pEnt )
 				{

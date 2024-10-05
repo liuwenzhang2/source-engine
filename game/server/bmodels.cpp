@@ -61,7 +61,7 @@ void CFuncWall::Spawn( void )
 bool CFuncWall::CreateVPhysics( void )
 {
 	GetEngineObject()->SetSolid( SOLID_BSP );
-	IPhysicsObject *pPhys = VPhysicsInitStatic();
+	IPhysicsObject *pPhys = GetEngineObject()->VPhysicsInitStatic();
 	if ( pPhys )
 	{
 		int contents = modelinfo->GetModelContents(GetEngineObject()->GetModelIndex() );
@@ -227,7 +227,7 @@ void CFuncVehicleClip::Spawn()
 bool CFuncVehicleClip::CreateVPhysics( void )
 {
 	GetEngineObject()->SetSolid( SOLID_BSP );
-	VPhysicsInitStatic();
+	GetEngineObject()->VPhysicsInitStatic();
 
 	return true;
 }
@@ -818,7 +818,7 @@ bool CFuncRotating::CreateVPhysics( void )
 {
 	if ( !GetEngineObject()->IsSolidFlagSet( FSOLID_NOT_SOLID ))
 	{
-		VPhysicsInitShadow( false, false );
+		GetEngineObject()->VPhysicsInitShadow( false, false );
 	}
 	return true;
 }
@@ -1472,7 +1472,7 @@ void CFuncVPhysicsClip::Spawn( void )
 
 bool CFuncVPhysicsClip::CreateVPhysics( void )
 {
-	VPhysicsInitStatic();
+	GetEngineObject()->VPhysicsInitStatic();
 	return true;
 }
 

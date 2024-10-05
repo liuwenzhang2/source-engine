@@ -772,7 +772,7 @@ void CItem_AmmoCrate::Spawn( void )
 //------------------------------------------------------------------------------
 bool CItem_AmmoCrate::CreateVPhysics( void )
 {
-	return ( VPhysicsInitStatic() != NULL );
+	return (GetEngineObject()->VPhysicsInitStatic() != NULL );
 }
 
 //-----------------------------------------------------------------------------

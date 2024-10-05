@@ -175,7 +175,7 @@ void CNPC_Bullseye::Spawn( void )
 	
 	if (GetEngineObject()->GetSpawnFlags() & SF_BULLSEYE_VPHYSICSSHADOW)
 	{
-		VPhysicsInitShadow( false, false );
+		GetEngineObject()->VPhysicsInitShadow( false, false );
 	}
 	
 	if(GetEngineObject()->GetSpawnFlags() & SF_BULLSEYE_NODAMAGE)
@@ -325,7 +325,7 @@ void CNPC_Bullseye::OnRestore( void )
 
 		if ( pObject == NULL )
 		{
-			VPhysicsInitShadow( false, false );
+			GetEngineObject()->VPhysicsInitShadow( false, false );
 		}
 	}
 

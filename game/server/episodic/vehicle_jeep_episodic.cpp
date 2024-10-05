@@ -192,7 +192,7 @@ public:
 		Pickup_ForcePlayerToDropThisObject( pOther );
 
 		// Stop colliding with things
-		pOther->VPhysicsDestroyObject();
+		pOther->GetEngineObject()->VPhysicsDestroyObject();
 		pOther->GetEngineObject()->SetSolidFlags( FSOLID_NOT_SOLID );
 		pOther->GetEngineObject()->SetMoveType( MOVETYPE_NONE );
 

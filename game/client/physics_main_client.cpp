@@ -61,7 +61,7 @@ void C_BaseEntity::PhysicsCheckSweep( const Vector& vecAbsStart, const Vector &v
 		mask &= ~CONTENTS_MONSTER;
 	}
 
-	Physics_TraceHull( this, vecAbsStart, vecAbsEnd, WorldAlignMins(), WorldAlignMaxs(), mask, pTrace );
+	Physics_TraceHull( this, vecAbsStart, vecAbsEnd, GetEngineObject()->WorldAlignMins(), GetEngineObject()->WorldAlignMaxs(), mask, pTrace );
 }
 
 

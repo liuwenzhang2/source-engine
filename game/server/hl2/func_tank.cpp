@@ -938,7 +938,7 @@ void CFuncTank::Activate( void )
 
 bool CFuncTank::CreateVPhysics()
 {
-	VPhysicsInitShadow( false, false );
+	GetEngineObject()->VPhysicsInitShadow( false, false );
 	return true;
 }
 

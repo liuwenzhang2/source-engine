@@ -299,7 +299,7 @@ CAI_BasePhysicsFlyingBot::~CAI_BasePhysicsFlyingBot( void )
 bool CAI_BasePhysicsFlyingBot::CreateVPhysics( void )
 {
 	// Create the object in the physics system
-	IPhysicsObject *pPhysicsObject = VPhysicsInitNormal( SOLID_BBOX, FSOLID_NOT_STANDABLE, false );
+	IPhysicsObject *pPhysicsObject = GetEngineObject()->VPhysicsInitNormal( SOLID_BBOX, FSOLID_NOT_STANDABLE, false );
 
 	m_pMotionController = physenv->CreateMotionController( this );
 	m_pMotionController->AttachObject( pPhysicsObject, true );

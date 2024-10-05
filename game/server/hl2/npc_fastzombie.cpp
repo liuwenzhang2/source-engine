@@ -525,7 +525,7 @@ void CFastZombie::PrescheduleThink( void )
 		if( GetEnemy() && m_NPCState == NPC_STATE_COMBAT )
 		{
 			flDistNoBBox = ( GetEnemy()->WorldSpaceCenter() - WorldSpaceCenter() ).Length();
-			flDistNoBBox -= WorldAlignSize().x;
+			flDistNoBBox -= GetEngineObject()->WorldAlignSize().x;
 		}
 		else
 		{

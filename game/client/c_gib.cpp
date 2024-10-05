@@ -21,7 +21,7 @@ static CEntityFactory<C_Gib> g_C_Gib_Factory("","C_Gib");
 //-----------------------------------------------------------------------------
 C_Gib::~C_Gib( void )
 {
-	VPhysicsDestroyObject();
+	//GetEngineObject()->VPhysicsDestroyObject();
 }
 
 //-----------------------------------------------------------------------------
@@ -67,15 +67,15 @@ bool C_Gib::InitializeGib( const char *pszModelName, Vector vecOrigin, Vector ve
 	solid_t tmpSolid;
 	PhysModelParseSolid( tmpSolid, this, GetEngineObject()->GetModelIndex() );
 	
-	m_pPhysicsObject = VPhysicsInitNormal( SOLID_VPHYSICS, 0, false, &tmpSolid );
+	GetEngineObject()->VPhysicsInitNormal( SOLID_VPHYSICS, 0, false, &tmpSolid );
 	
-	if ( m_pPhysicsObject )
+	if (VPhysicsGetObject())
 	{
-		float flForce = m_pPhysicsObject->GetMass();
+		float flForce = VPhysicsGetObject()->GetMass();
 		vecForceDir *= flForce;	
 
-		m_pPhysicsObject->ApplyForceOffset( vecForceDir, GetEngineObject()->GetAbsOrigin() );
-		m_pPhysicsObject->SetCallbackFlags( m_pPhysicsObject->GetCallbackFlags() | CALLBACK_GLOBAL_TOUCH | CALLBACK_GLOBAL_TOUCH_STATIC );
+		VPhysicsGetObject()->ApplyForceOffset( vecForceDir, GetEngineObject()->GetAbsOrigin() );
+		VPhysicsGetObject()->SetCallbackFlags(VPhysicsGetObject()->GetCallbackFlags() | CALLBACK_GLOBAL_TOUCH | CALLBACK_GLOBAL_TOUCH_STATIC );
 	}
 	else
 	{

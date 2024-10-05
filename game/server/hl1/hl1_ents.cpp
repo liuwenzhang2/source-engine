@@ -467,7 +467,7 @@ void CPendulum::Spawn( void )
 		m_flSpeed = 0;
 		SetUse( &CPendulum::PendulumUse );
 
-		VPhysicsInitShadow( false, false );
+		GetEngineObject()->VPhysicsInitShadow( false, false );
 		///VPhysicsGetObject()->SetPosition( GetAbsOrigin(), pev->absangles );
 	}
 
@@ -1010,7 +1010,7 @@ void CXenPLight::Spawn( void )
 	GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.1 );
 	GetEngineObject()->SetCycle( random->RandomFloat(0,1) );
 
-	m_pGlow = CSprite::SpriteCreate( XEN_PLANT_GLOW_SPRITE, GetEngineObject()->GetLocalOrigin() + Vector(0,0,(WorldAlignMins().z+WorldAlignMaxs().z)*0.5), FALSE );
+	m_pGlow = CSprite::SpriteCreate( XEN_PLANT_GLOW_SPRITE, GetEngineObject()->GetLocalOrigin() + Vector(0,0,(GetEngineObject()->WorldAlignMins().z+ GetEngineObject()->WorldAlignMaxs().z)*0.5), FALSE );
 	m_pGlow->SetTransparency( kRenderGlow, GetRenderColor().r, GetRenderColor().g, GetRenderColor().b, GetRenderColor().a, m_nRenderFX );
 	m_pGlow->SetAttachment( this, 1 );
 }
@@ -1260,7 +1260,7 @@ void CXenTree::HandleAnimEvent( animevent_t *pEvent )
 		{
 			CBaseEntity *pList[8];
 			BOOL sound = FALSE;
-			int count = UTIL_EntitiesInBox( pList, 8, m_pTrigger->GetEngineObject()->GetAbsOrigin() + m_pTrigger->WorldAlignMins(), m_pTrigger->GetEngineObject()->GetAbsOrigin() +  m_pTrigger->WorldAlignMaxs(), FL_NPC|FL_CLIENT );
+			int count = UTIL_EntitiesInBox( pList, 8, m_pTrigger->GetEngineObject()->GetAbsOrigin() + m_pTrigger->GetEngineObject()->WorldAlignMins(), m_pTrigger->GetEngineObject()->GetAbsOrigin() +  m_pTrigger->GetEngineObject()->WorldAlignMaxs(), FL_NPC|FL_CLIENT );
 
 			Vector forward;
 			AngleVectors(GetEngineObject()->GetAbsAngles(), &forward );

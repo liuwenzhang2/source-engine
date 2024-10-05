@@ -323,7 +323,7 @@ void CBreakable::ParsePropData( void )
 //-----------------------------------------------------------------------------
 bool CBreakable::CreateVPhysics( void )
 {
-	VPhysicsInitStatic();
+	GetEngineObject()->VPhysicsInitStatic();
 	return true;
 }
 
@@ -1117,7 +1117,7 @@ void CBreakable::Die( void )
 	// Fire targets on break
 	m_OnBreak.FireOutput( m_hBreaker, this );
 
-	VPhysicsDestroyObject();
+	GetEngineObject()->VPhysicsDestroyObject();
 	SetThink( &CBreakable::SUB_Remove );
 	GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.1f );
 	if ( m_iszSpawnObject != NULL_STRING )
@@ -1266,7 +1266,7 @@ void CPushable::Spawn( void )
 
 bool CPushable::CreateVPhysics( void )
 {
-	VPhysicsInitNormal( SOLID_VPHYSICS, 0, false );
+	GetEngineObject()->VPhysicsInitNormal( SOLID_VPHYSICS, 0, false );
 	IPhysicsObject *pPhysObj = VPhysicsGetObject();
 	if ( pPhysObj )
 	{

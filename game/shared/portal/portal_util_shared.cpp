@@ -867,8 +867,8 @@ void UTIL_Portal_TraceEntity( CBaseEntity *pEntity, const Vector &vecAbsStart, c
 	// For the below box test, we need to add the tolerance onto the extents, because the underlying
 	// box on plane side test doesn't use the parameter tolerance.
 	float flTolerance = 0.1f;
-	Vector vEntExtents = pEntity->WorldAlignSize() * 0.5 + Vector ( flTolerance, flTolerance, flTolerance );
-	Vector vColCenter = realTrace.endpos + ( pEntity->WorldAlignMaxs() + pEntity->WorldAlignMins() ) * 0.5f;
+	Vector vEntExtents = pEntity->GetEngineObject()->WorldAlignSize() * 0.5 + Vector ( flTolerance, flTolerance, flTolerance );
+	Vector vColCenter = realTrace.endpos + ( pEntity->GetEngineObject()->WorldAlignMaxs() + pEntity->GetEngineObject()->WorldAlignMins() ) * 0.5f;
 
 	// If this entity is not simulated in a portal environment, trace as normal
     if( pPortalSimulator == NULL )

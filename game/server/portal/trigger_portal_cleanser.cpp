@@ -97,7 +97,7 @@ CBaseEntity* ConvertToSimpleProp ( CBaseEntity* pEnt )
 	pRetVal->GetEngineObject()->SetAbsOrigin( pEnt->GetEngineObject()->GetAbsOrigin() );
 	pRetVal->GetEngineObject()->SetAbsAngles( pEnt->GetEngineObject()->GetAbsAngles() );
 	pRetVal->Spawn();
-	pRetVal->VPhysicsInitNormal( SOLID_VPHYSICS, 0, false );
+	pRetVal->GetEngineObject()->VPhysicsInitNormal( SOLID_VPHYSICS, 0, false );
 	
 	return pRetVal;
 }

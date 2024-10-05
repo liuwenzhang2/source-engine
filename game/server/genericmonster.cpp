@@ -177,7 +177,7 @@ void CGenericNPC::Spawn()
 	{
 		GetEngineObject()->AddSolidFlags( FSOLID_NOT_SOLID );
 		m_takedamage = DAMAGE_NO;
-		VPhysicsDestroyObject();
+		GetEngineObject()->VPhysicsDestroyObject();
 	}
 }
 

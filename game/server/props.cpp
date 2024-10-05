@@ -2052,7 +2052,7 @@ bool CDynamicProp::CreateVPhysics( void )
 	}
 	else
 	{
-		VPhysicsInitStatic();
+		GetEngineObject()->VPhysicsInitStatic();
 	}
 	return true;
 }
@@ -2614,7 +2614,7 @@ bool CPhysicsProp::CreateVPhysics()
 	}
 	PhysSolidOverride( tmpSolid, m_iszOverrideScript );
 
-	IPhysicsObject *pPhysicsObject = VPhysicsInitNormal( SOLID_VPHYSICS, 0, asleep, &tmpSolid );
+	IPhysicsObject *pPhysicsObject = GetEngineObject()->VPhysicsInitNormal( SOLID_VPHYSICS, 0, asleep, &tmpSolid );
 
 	if ( !pPhysicsObject )
 	{
@@ -3655,7 +3655,7 @@ void CBasePropDoor::Spawn()
 	GetEngineObject()->RemoveFlag(FL_STATICPROP);
 
 	GetEngineObject()->SetSolid(SOLID_VPHYSICS);
-	VPhysicsInitShadow(false, false);
+	GetEngineObject()->VPhysicsInitShadow(false, false);
 	GetEngineObject()->AddSolidFlags( FSOLID_CUSTOMRAYTEST | FSOLID_CUSTOMBOXTEST );
 
 	SetBodygroup( DOOR_HARDWARE_GROUP, m_nHardwareType );
@@ -5525,7 +5525,7 @@ public:
 		IPhysicsObject *pPhysicsObject = physenv->CreateSphereObject( 12, 0, GetEngineObject()->GetAbsOrigin(), GetEngineObject()->GetAbsAngles(), &params, false );
 		if ( pPhysicsObject )
 		{
-			VPhysicsSetObject( pPhysicsObject );
+			GetEngineObject()->VPhysicsSetObject( pPhysicsObject );
 			GetEngineObject()->SetMoveType( MOVETYPE_VPHYSICS );
 			pPhysicsObject->Wake();
 		}
@@ -5831,7 +5831,7 @@ void CPhysicsPropRespawnable::Event_Killed( const CTakeDamageInfo &info )
 
 	PhysCleanupFrictionSounds( this );
 
-	VPhysicsDestroyObject();
+	GetEngineObject()->VPhysicsDestroyObject();
 
 	GetEngineObject()->PhysicsRemoveTouchedList();
 	GetEngineObject()->PhysicsRemoveGroundList();
@@ -6150,8 +6150,8 @@ bool UTIL_CreateScaledPhysObject( CBaseAnimating *pInstance, float flScale )
 	}
 	Assert( pNewObject );
 
-	pInstance->VPhysicsDestroyObject();
-	pInstance->VPhysicsSetObject( pNewObject );
+	pInstance->GetEngineObject()->VPhysicsDestroyObject();
+	pInstance->GetEngineObject()->VPhysicsSetObject( pNewObject );
 
 	// Increase our model bounds
 	const model_t *pModel = modelinfo->GetModel( pInstance->GetEngineObject()->GetModelIndex() );

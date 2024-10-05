@@ -382,7 +382,7 @@ void CNPC_FloorTurret::Activate( void )
 bool CNPC_FloorTurret::CreateVPhysics( void )
 {
 	//Spawn our physics hull
-	if ( VPhysicsInitNormal( SOLID_VPHYSICS, 0, false ) == NULL )
+	if (GetEngineObject()->VPhysicsInitNormal( SOLID_VPHYSICS, 0, false ) == NULL )
 	{
 		DevMsg( "npc_turret_floor unable to spawn physics object!\n" );
 	}

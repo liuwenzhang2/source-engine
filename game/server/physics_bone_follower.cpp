@@ -249,7 +249,7 @@ bool CBoneFollower::Init( CBaseEntity *pOwner, const char *pModelName, solid_t &
 	GetEngineObject()->SetCollisionGroup( pOwner->GetEngineObject()->GetCollisionGroup() );
 	GetEngineObject()->AddSolidFlags( FSOLID_CUSTOMRAYTEST | FSOLID_CUSTOMBOXTEST );
 	solid.params.pGameData = (void *)this;
-	IPhysicsObject *pPhysics = VPhysicsInitShadow( false, false, &solid );
+	IPhysicsObject *pPhysics = GetEngineObject()->VPhysicsInitShadow( false, false, &solid );
 	if ( !pPhysics )
 		return false;
 
@@ -302,16 +302,16 @@ public:
 		m_pPhysics = m_pEntity->VPhysicsGetObject();
 		if ( m_pPhysics )
 		{
-			m_pEntity->VPhysicsSwapObject( pTmpPhysics );
+			m_pEntity->GetEngineObject()->VPhysicsSwapObject( pTmpPhysics );
 		}
 		else
 		{
-			m_pEntity->VPhysicsSetObject( pTmpPhysics );
+			m_pEntity->GetEngineObject()->VPhysicsSetObject( pTmpPhysics );
 		}
 	}
 	~CPhysicsSwapTemp()
 	{
-		m_pEntity->VPhysicsSwapObject( m_pPhysics );
+		m_pEntity->GetEngineObject()->VPhysicsSwapObject( m_pPhysics );
 	}
 
 private:

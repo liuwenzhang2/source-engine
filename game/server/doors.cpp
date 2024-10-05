@@ -423,7 +423,7 @@ bool CBaseDoor::CreateVPhysics( )
 	{
 		//normal door
 		// NOTE: Create this even when the door is not solid to support constraints.
-		VPhysicsInitShadow( false, false );
+		GetEngineObject()->VPhysicsInitShadow( false, false );
 	}
 	else
 	{
@@ -431,7 +431,7 @@ bool CBaseDoor::CreateVPhysics( )
 		GetEngineObject()->AddSolidFlags( FSOLID_VOLUME_CONTENTS );
 		GetEngineObject()->AddSpawnFlags(SF_DOOR_SILENT);	// water is silent for now
 
-		IPhysicsObject *pPhysics = VPhysicsInitShadow( false, false );
+		IPhysicsObject *pPhysics = GetEngineObject()->VPhysicsInitShadow( false, false );
 		fluidparams_t fluid;
 		
 		Assert(GetEngineObject()->GetCollisionAngles() == vec3_angle );
@@ -1413,7 +1413,7 @@ bool CRotDoor::CreateVPhysics()
 {
 	if ( !GetEngineObject()->IsSolidFlagSet( FSOLID_NOT_SOLID ) )
 	{
-		VPhysicsInitShadow( false, false );
+		GetEngineObject()->VPhysicsInitShadow( false, false );
 	}
 
 	return true;

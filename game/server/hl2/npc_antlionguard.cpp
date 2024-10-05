@@ -1108,7 +1108,7 @@ bool CNPC_AntlionGuard::ShouldCharge( const Vector &startPos, const Vector &endP
 	// We only need to hit the endpos with the edge of our bounding box
 	Vector vecDir = endPos - startPos;
 	VectorNormalize( vecDir );
-	float flWidth = WorldAlignSize().x * 0.5;
+	float flWidth = GetEngineObject()->WorldAlignSize().x * 0.5;
 	Vector vecTargetPos = endPos - (vecDir * flWidth);
 
 	// See if we can directly move there

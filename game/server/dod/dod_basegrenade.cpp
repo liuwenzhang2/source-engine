@@ -81,7 +81,7 @@ void CDODBaseGrenade::Spawn( void )
 	if( m_bUseVPhysics )
 	{		 
 		GetEngineObject()->SetCollisionGroup( COLLISION_GROUP_WEAPON );
-		IPhysicsObject *pPhysicsObject = VPhysicsInitNormal( SOLID_BBOX, 0, false );
+		IPhysicsObject *pPhysicsObject = GetEngineObject()->VPhysicsInitNormal( SOLID_BBOX, 0, false );
 
 		if ( pPhysicsObject )
 		{
@@ -363,7 +363,7 @@ void CDODBaseGrenade::Detonate()
 bool CDODBaseGrenade::CreateVPhysics()
 {
 	// Create the object in the physics system
-	VPhysicsInitNormal( SOLID_BBOX, 0, false );
+	GetEngineObject()->VPhysicsInitNormal( SOLID_BBOX, 0, false );
 	return true;
 }
 

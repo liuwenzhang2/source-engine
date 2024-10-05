@@ -354,7 +354,7 @@ void CNPC_SecurityCamera::Activate( void )
 
 bool CNPC_SecurityCamera::CreateVPhysics( void )
 {
-	IPhysicsObject *pPhysics = VPhysicsInitNormal( SOLID_VPHYSICS, FSOLID_NOT_STANDABLE, false );
+	IPhysicsObject *pPhysics = GetEngineObject()->VPhysicsInitNormal( SOLID_VPHYSICS, FSOLID_NOT_STANDABLE, false );
 	if ( !pPhysics )
 		DevMsg( "npc_turret_floor unable to spawn physics object!\n" );
 	else

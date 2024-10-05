@@ -1086,7 +1086,7 @@ void CPointCommentaryNode::TeleportTo( CBasePlayer *pPlayer )
 	}
 
 	trace_t trace;
-	UTIL_TraceHull( vecTarget, vecTarget + Vector( 0, 0, -500 ), pPlayer->WorldAlignMins(), pPlayer->WorldAlignMaxs(), MASK_SOLID, pPlayer, COLLISION_GROUP_NONE, &trace );
+	UTIL_TraceHull( vecTarget, vecTarget + Vector( 0, 0, -500 ), pPlayer->GetEngineObject()->WorldAlignMins(), pPlayer->GetEngineObject()->WorldAlignMaxs(), MASK_SOLID, pPlayer, COLLISION_GROUP_NONE, &trace );
 
 	pPlayer->Teleport( &trace.endpos, NULL, &vec3_origin );
 

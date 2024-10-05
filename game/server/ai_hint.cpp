@@ -1311,7 +1311,7 @@ bool CAI_Hint::HintMatchesCriteria( CAI_BaseNPC *pNPC, const CHintCriteria &hint
 		{
 			trace_t tr;
 			// Can my bounding box fit there?
-			AI_TraceHull (GetEngineObject()->GetAbsOrigin(), GetEngineObject()->GetAbsOrigin(), pNPC->WorldAlignMins(), pNPC->WorldAlignMaxs(),
+			AI_TraceHull (GetEngineObject()->GetAbsOrigin(), GetEngineObject()->GetAbsOrigin(), pNPC->GetEngineObject()->WorldAlignMins(), pNPC->GetEngineObject()->WorldAlignMaxs(),
 				MASK_SOLID, pNPC, COLLISION_GROUP_NONE, &tr );
 
 			if ( tr.fraction != 1.0 )

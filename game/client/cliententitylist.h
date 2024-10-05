@@ -214,6 +214,7 @@ public:
 		Q_memset(&m_mouth, 0, sizeof(m_mouth));
 		m_nPrevNewSequenceParity = -1;
 		m_bReceivedSequence = false;
+		m_pPhysicsObject = NULL;
 
 	}
 
@@ -223,6 +224,7 @@ public:
 		// Are we in the partition?
 		DestroyPartitionHandle();
 		InvalidateMdlCache();
+		VPhysicsDestroyObject();
 	}
 
 	static bool s_bAbsQueriesValid;
@@ -789,9 +791,37 @@ public:
 	void UpdateRelevantInterpolatedVars();
 	void AddBaseAnimatingInterpolatedVars();
 	void RemoveBaseAnimatingInterpolatedVars();
+	// destroy and remove the physics object for this entity
+	virtual void	VPhysicsDestroyObject(void);
+	inline IPhysicsObject* VPhysicsGetObject(void) const { return m_pPhysicsObject; }
+	void			VPhysicsSetObject(IPhysicsObject* pPhysics);
+
+	// Convenience routines to init the vphysics simulation for this object.
+// This creates a static object.  Something that behaves like world geometry - solid, but never moves
+	IPhysicsObject* VPhysicsInitStatic(void);
+
+	// This creates a normal vphysics simulated object
+	IPhysicsObject* VPhysicsInitNormal(SolidType_t solidType, int nSolidFlags, bool createAsleep, solid_t* pSolid = NULL);
+
+	// This creates a vphysics object with a shadow controller that follows the AI
+	// Move the object to where it should be and call UpdatePhysicsShadowToCurrentPosition()
+	IPhysicsObject* VPhysicsInitShadow(bool allowPhysicsMovement, bool allowPhysicsRotation, solid_t* pSolid = NULL);
+
+	// These methods return a *world-aligned* box relative to the absorigin of the entity.
+// This is used for collision purposes and is *not* guaranteed
+// to surround the entire entity's visual representation
+// NOTE: It is illegal to ask for the world-aligned bounds for
+// SOLID_BSP objects
+	virtual const Vector& WorldAlignMins() const;
+	virtual const Vector& WorldAlignMaxs() const;
+	// FIXME: Do we want this?
+	const Vector& WorldAlignSize() const;
 private:
 	void LockStudioHdr();
 	void UnlockStudioHdr();
+
+	// called by all vphysics inits
+	bool			VPhysicsInitSetup();
 private:
 
 	friend class C_BaseEntity;
@@ -958,6 +988,9 @@ private:
 	mutable IStudioHdr* m_pStudioHdr;
 	mutable MDLHandle_t				m_hStudioHdr;
 	CThreadFastMutex				m_StudioHdrInitLock;
+
+	// pointer to the entity's physics object (vphysics.dll)
+	IPhysicsObject* m_pPhysicsObject;
 };
 
 //-----------------------------------------------------------------------------
@@ -1621,6 +1654,31 @@ inline CMouthInfo& C_EngineObjectInternal::MouthInfo()
 inline float C_EngineObjectInternal::SequenceDuration(void)
 {
 	return SequenceDuration(GetSequence());
+}
+
+
+//-----------------------------------------------------------------------------
+// Methods relating to bounds
+//-----------------------------------------------------------------------------
+inline const Vector& C_EngineObjectInternal::WorldAlignMins() const
+{
+	Assert(!IsBoundsDefinedInEntitySpace());
+	Assert(GetCollisionAngles() == vec3_angle);
+	return OBBMins();
+}
+
+inline const Vector& C_EngineObjectInternal::WorldAlignMaxs() const
+{
+	Assert(!IsBoundsDefinedInEntitySpace());
+	Assert(GetCollisionAngles() == vec3_angle);
+	return OBBMaxs();
+}
+
+inline const Vector& C_EngineObjectInternal::WorldAlignSize() const
+{
+	Assert(!IsBoundsDefinedInEntitySpace());
+	Assert(GetCollisionAngles() == vec3_angle);
+	return OBBSize();
 }
 
 class C_EngineObjectWorld : public C_EngineObjectInternal {

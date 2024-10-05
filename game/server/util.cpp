@@ -282,8 +282,8 @@ bool UTIL_CheckBottom( CBaseEntity *pEntity, ITraceFilter *pTraceFilter, float f
 
 	unsigned int mask = pEntity->PhysicsSolidMaskForEntity();
 
-	VectorAdd (pEntity->GetEngineObject()->GetAbsOrigin(), pEntity->WorldAlignMins(), mins);
-	VectorAdd (pEntity->GetEngineObject()->GetAbsOrigin(), pEntity->WorldAlignMaxs(), maxs);
+	VectorAdd (pEntity->GetEngineObject()->GetAbsOrigin(), pEntity->GetEngineObject()->WorldAlignMins(), mins);
+	VectorAdd (pEntity->GetEngineObject()->GetAbsOrigin(), pEntity->GetEngineObject()->WorldAlignMaxs(), maxs);
 
 	// if all of the points under the corners are solid world, don't bother
 	// with the tougher checks

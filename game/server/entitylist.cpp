@@ -32,6 +32,8 @@
 #include "tier1/callqueue.h"
 #include "saverestore_utlvector.h"
 #include "tier0/vcrmode.h"
+#include "coordsize.h"
+#include "physics_saverestore.h"
 
 #ifdef HL2_DLL
 #include "npc_playercompanion.h"
@@ -367,6 +369,7 @@ BEGIN_DATADESC_NO_BASE(CEngineObjectInternal)
 	DEFINE_FIELD(m_bSequenceFinished, FIELD_BOOLEAN),
 	DEFINE_FIELD(m_bSequenceLoops, FIELD_BOOLEAN),
 	DEFINE_FIELD(m_flSpeedScale, FIELD_FLOAT),
+	DEFINE_PHYSPTR(m_pPhysicsObject),
 END_DATADESC()
 
 void SendProxy_Origin(const SendProp* pProp, const void* pStruct, const void* pData, DVariant* pOut, int iElement, int objectID)
@@ -1458,8 +1461,8 @@ void CEngineObjectInternal::SetParent(IEngineObjectServer* pParentEntity, int iA
 			{
 				Warning("SetParent on static object, all constraints attached to %s (%s)will now be broken!\n", m_pOuter->GetDebugName(), m_pOuter->GetClassname());
 			}
-			m_pOuter->VPhysicsDestroyObject();
-			m_pOuter->VPhysicsInitShadow(false, false);
+			VPhysicsDestroyObject();
+			VPhysicsInitShadow(false, false);
 		}
 	}
 	CollisionRulesChanged();
@@ -4700,6 +4703,343 @@ bool CEngineObjectInternal::GetPoseParameterRange(int index, float& minValue, fl
 	return false;
 }
 
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
+void CEngineObjectInternal::VPhysicsDestroyObject(void)
+{
+	if (m_pPhysicsObject)
+	{
+#ifndef CLIENT_DLL
+		PhysRemoveShadow(this->m_pOuter);
+#endif
+		PhysDestroyObject(m_pPhysicsObject, this->m_pOuter);
+		m_pPhysicsObject = NULL;
+	}
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: 
+// Input  : *pPhysics - 
+//-----------------------------------------------------------------------------
+void CEngineObjectInternal::VPhysicsSetObject(IPhysicsObject* pPhysics)
+{
+	if (m_pPhysicsObject && pPhysics)
+	{
+		Warning("Overwriting physics object for %s\n", GetClassname());
+	}
+	m_pPhysicsObject = pPhysics;
+	if (pPhysics && !m_pPhysicsObject)
+	{
+		CollisionRulesChanged();
+	}
+}
+
+void CEngineObjectInternal::VPhysicsSwapObject(IPhysicsObject* pSwap)
+{
+	if (!pSwap)
+	{
+		PhysRemoveShadow(this->m_pOuter);
+	}
+
+	if (!m_pPhysicsObject)
+	{
+		Warning("Bad vphysics swap for %s\n", STRING(GetClassname()));
+	}
+	m_pPhysicsObject = pSwap;
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: Init this object's physics as a static
+//-----------------------------------------------------------------------------
+IPhysicsObject* CEngineObjectInternal::VPhysicsInitStatic(void)
+{
+	if (!VPhysicsInitSetup())
+		return NULL;
+
+#ifndef CLIENT_DLL
+	// If this entity has a move parent, it needs to be shadow, not static
+	if (GetMoveParent())
+	{
+		// must be SOLID_VPHYSICS if in hierarchy to solve collisions correctly
+		if (GetSolid() == SOLID_BSP && GetRootMoveParent()->GetSolid() != SOLID_BSP)
+		{
+			SetSolid(SOLID_VPHYSICS);
+		}
+
+		return VPhysicsInitShadow(false, false);
+	}
+#endif
+
+	// No physics
+	if (GetSolid() == SOLID_NONE)
+		return NULL;
+
+	// create a static physics objct
+	IPhysicsObject* pPhysicsObject = NULL;
+	if (GetSolid() == SOLID_BBOX)
+	{
+		pPhysicsObject = PhysModelCreateBox(this->m_pOuter, WorldAlignMins(), WorldAlignMaxs(), GetAbsOrigin(), true);
+	}
+	else
+	{
+		pPhysicsObject = PhysModelCreateUnmoveable(this->m_pOuter, GetModelIndex(), GetAbsOrigin(), GetAbsAngles());
+	}
+	VPhysicsSetObject(pPhysicsObject);
+	return pPhysicsObject;
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: This creates a normal vphysics simulated object
+//			physics alone determines where it goes (gravity, friction, etc)
+//			and the entity receives updates from vphysics.  SetAbsOrigin(), etc do not affect the object!
+//-----------------------------------------------------------------------------
+IPhysicsObject* CEngineObjectInternal::VPhysicsInitNormal(SolidType_t solidType, int nSolidFlags, bool createAsleep, solid_t* pSolid)
+{
+	if (!VPhysicsInitSetup())
+		return NULL;
+
+	// NOTE: This has to occur before PhysModelCreate because that call will
+	// call back into ShouldCollide(), which uses solidtype for rules.
+	SetSolid(solidType);
+	SetSolidFlags(nSolidFlags);
+
+	// No physics
+	if (solidType == SOLID_NONE)
+	{
+		return NULL;
+	}
+
+	// create a normal physics object
+	IPhysicsObject* pPhysicsObject = PhysModelCreate(this->m_pOuter, GetModelIndex(), GetAbsOrigin(), GetAbsAngles(), pSolid);
+	if (pPhysicsObject)
+	{
+		VPhysicsSetObject(pPhysicsObject);
+		SetMoveType(MOVETYPE_VPHYSICS);
+
+		if (!createAsleep)
+		{
+			pPhysicsObject->Wake();
+		}
+	}
+
+	return pPhysicsObject;
+}
+
+// This creates a vphysics object with a shadow controller that follows the AI
+IPhysicsObject* CEngineObjectInternal::VPhysicsInitShadow(bool allowPhysicsMovement, bool allowPhysicsRotation, solid_t* pSolid)
+{
+	if (!VPhysicsInitSetup())
+		return NULL;
+
+	// No physics
+	if (GetSolid() == SOLID_NONE)
+		return NULL;
+
+	const Vector& origin = GetAbsOrigin();
+	QAngle angles = GetAbsAngles();
+	IPhysicsObject* pPhysicsObject = NULL;
+
+	if (GetSolid() == SOLID_BBOX)
+	{
+		// adjust these so the game tracing epsilons match the physics minimum separation distance
+		// this will shrink the vphysics version of the model by the difference in epsilons
+		float radius = 0.25f - DIST_EPSILON;
+		Vector mins = WorldAlignMins() + Vector(radius, radius, radius);
+		Vector maxs = WorldAlignMaxs() - Vector(radius, radius, radius);
+		pPhysicsObject = PhysModelCreateBox(this->m_pOuter, mins, maxs, origin, false);
+		angles = vec3_angle;
+	}
+	else if (GetSolid() == SOLID_OBB)
+	{
+		pPhysicsObject = PhysModelCreateOBB(this->m_pOuter, OBBMins(), OBBMaxs(), origin, angles, false);
+	}
+	else
+	{
+		pPhysicsObject = PhysModelCreate(this->m_pOuter, GetModelIndex(), origin, angles, pSolid);
+	}
+	if (!pPhysicsObject)
+		return NULL;
+
+	VPhysicsSetObject(pPhysicsObject);
+	// UNDONE: Tune these speeds!!!
+	pPhysicsObject->SetShadow(1e4, 1e4, allowPhysicsMovement, allowPhysicsRotation);
+	pPhysicsObject->UpdateShadow(origin, angles, false, 0);
+	return pPhysicsObject;
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
+bool CEngineObjectInternal::VPhysicsInitSetup()
+{
+#ifndef CLIENT_DLL
+	// don't support logical ents
+	if (entindex() == -1 || IsMarkedForDeletion())
+		return false;
+#endif
+
+	// If this entity already has a physics object, then it should have been deleted prior to making this call.
+	Assert(!m_pPhysicsObject);
+	VPhysicsDestroyObject();
+
+	// make sure absorigin / absangles are correct
+	return true;
+}
+
+IPhysicsObject* CEngineObjectInternal::GetGroundVPhysics()
+{
+	CBaseEntity* pGroundEntity = GetGroundEntity() ? GetGroundEntity()->GetOuter() : NULL;
+	;	if (pGroundEntity && pGroundEntity->GetEngineObject()->GetMoveType() == MOVETYPE_VPHYSICS)
+	{
+		IPhysicsObject* pPhysGround = pGroundEntity->VPhysicsGetObject();
+		if (pPhysGround && pPhysGround->IsMoveable())
+			return pPhysGround;
+	}
+	return NULL;
+}
+
+// UNDONE: Look and see if the ground entity is in hierarchy with a MOVETYPE_VPHYSICS?
+// Behavior in that case is not as good currently when the parent is rideable
+bool CEngineObjectInternal::IsRideablePhysics(IPhysicsObject* pPhysics)
+{
+	if (pPhysics)
+	{
+		if (pPhysics->GetMass() > (VPhysicsGetObject()->GetMass() * 2))
+			return true;
+	}
+
+	return false;
+}
+
+void CEngineObjectPlayer::VPhysicsDestroyObject()
+{
+	// Since CBasePlayer aliases its pointer to the physics object, tell CBaseEntity to 
+	// clear out its physics object pointer so we don't wind up deleting one of
+	// the aliased objects twice.
+	VPhysicsSetObject(NULL);
+
+	PhysRemoveShadow(this->m_pOuter);
+
+	if (m_pPhysicsController)
+	{
+		physenv->DestroyPlayerController(m_pPhysicsController);
+		m_pPhysicsController = NULL;
+	}
+
+	if (m_pShadowStand)
+	{
+		m_pShadowStand->EnableCollisions(false);
+		PhysDestroyObject(m_pShadowStand);
+		m_pShadowStand = NULL;
+	}
+	if (m_pShadowCrouch)
+	{
+		m_pShadowCrouch->EnableCollisions(false);
+		PhysDestroyObject(m_pShadowCrouch);
+		m_pShadowCrouch = NULL;
+	}
+
+	CEngineObjectInternal::VPhysicsDestroyObject();
+}
+
+void CEngineObjectPlayer::SetupVPhysicsShadow(const Vector& vecAbsOrigin, const Vector& vecAbsVelocity, CPhysCollide* pStandModel, const char* pStandHullName, CPhysCollide* pCrouchModel, const char* pCrouchHullName)
+{
+	solid_t solid;
+	Q_strncpy(solid.surfaceprop, "player", sizeof(solid.surfaceprop));
+	solid.params = g_PhysDefaultObjectParams;
+	solid.params.mass = 85.0f;
+	solid.params.inertia = 1e24f;
+	solid.params.enableCollisions = false;
+	//disable drag
+	solid.params.dragCoefficient = 0;
+	// create standing hull
+	m_pShadowStand = PhysModelCreateCustom(this->m_pOuter, pStandModel, GetLocalOrigin(), GetLocalAngles(), pStandHullName, false, &solid);
+	m_pShadowStand->SetCallbackFlags(CALLBACK_GLOBAL_COLLISION | CALLBACK_SHADOW_COLLISION);
+
+	// create crouchig hull
+	m_pShadowCrouch = PhysModelCreateCustom(this->m_pOuter, pCrouchModel, GetLocalOrigin(), GetLocalAngles(), pCrouchHullName, false, &solid);
+	m_pShadowCrouch->SetCallbackFlags(CALLBACK_GLOBAL_COLLISION | CALLBACK_SHADOW_COLLISION);
+
+	// default to stand
+	VPhysicsSetObject(m_pShadowStand);
+
+	// tell physics lists I'm a shadow controller object
+	PhysAddShadow(this->m_pOuter);
+	m_pPhysicsController = physenv->CreatePlayerController(m_pShadowStand);
+	m_pPhysicsController->SetPushMassLimit(350.0f);
+	m_pPhysicsController->SetPushSpeedLimit(50.0f);
+
+	// Give the controller a valid position so it doesn't do anything rash.
+	UpdatePhysicsShadowToPosition(vecAbsOrigin);
+
+	// init state
+	if (GetFlags() & FL_DUCKING)
+	{
+		SetVCollisionState(vecAbsOrigin, vecAbsVelocity, VPHYS_CROUCH);
+	}
+	else
+	{
+		SetVCollisionState(vecAbsOrigin, vecAbsVelocity, VPHYS_WALK);
+	}
+}
+
+void CEngineObjectPlayer::UpdatePhysicsShadowToPosition(const Vector& vecAbsOrigin)
+{
+	UpdateVPhysicsPosition(vecAbsOrigin, vec3_origin, gpGlobals->frametime);
+}
+
+void CEngineObjectPlayer::UpdateVPhysicsPosition(const Vector& position, const Vector& velocity, float secondsToArrival)
+{
+	bool onground = (GetFlags() & FL_ONGROUND) ? true : false;
+	IPhysicsObject* pPhysGround = GetGroundVPhysics();
+
+	// if the object is much heavier than the player, treat it as a local coordinate system
+	// the player controller will solve movement differently in this case.
+	if (!IsRideablePhysics(pPhysGround))
+	{
+		pPhysGround = NULL;
+	}
+
+	m_pPhysicsController->Update(position, velocity, secondsToArrival, onground, pPhysGround);
+}
+
+//-----------------------------------------------------------------------------
+// Purpose:
+//-----------------------------------------------------------------------------
+void CEngineObjectPlayer::SetVCollisionState(const Vector& vecAbsOrigin, const Vector& vecAbsVelocity, int collisionState)
+{
+	m_vphysicsCollisionState = collisionState;
+	switch (collisionState)
+	{
+	case VPHYS_WALK:
+		m_pShadowStand->SetPosition(vecAbsOrigin, vec3_angle, true);
+		m_pShadowStand->SetVelocity(&vecAbsVelocity, NULL);
+		m_pShadowCrouch->EnableCollisions(false);
+		m_pPhysicsController->SetObject(m_pShadowStand);
+		VPhysicsSwapObject(m_pShadowStand);
+		m_pShadowStand->EnableCollisions(true);
+		break;
+
+	case VPHYS_CROUCH:
+		m_pShadowCrouch->SetPosition(vecAbsOrigin, vec3_angle, true);
+		m_pShadowCrouch->SetVelocity(&vecAbsVelocity, NULL);
+		m_pShadowStand->EnableCollisions(false);
+		m_pPhysicsController->SetObject(m_pShadowCrouch);
+		VPhysicsSwapObject(m_pShadowCrouch);
+		m_pShadowCrouch->EnableCollisions(true);
+		break;
+
+	case VPHYS_NOCLIP:
+		m_pShadowCrouch->EnableCollisions(false);
+		m_pShadowStand->EnableCollisions(false);
+		break;
+	}
+}
+
+
+
+
 struct collidelist_t
 {
 	const CPhysCollide* pCollide;
@@ -4722,7 +5062,7 @@ bool TestEntityTriggerIntersection_Accurate(IEngineObjectServer* pTrigger, IEngi
 			ICollideable* pCollide = pTrigger->GetCollideable();
 			Ray_t ray;
 			trace_t tr;
-			ray.Init(pEntity->GetAbsOrigin(), pEntity->GetAbsOrigin(), pEntity->GetOuter()->WorldAlignMins(), pEntity->GetOuter()->WorldAlignMaxs());
+			ray.Init(pEntity->GetAbsOrigin(), pEntity->GetAbsOrigin(), pEntity->WorldAlignMins(), pEntity->WorldAlignMaxs());
 			enginetrace->ClipRayToCollideable(ray, MASK_ALL, pCollide, &tr);
 
 			if (tr.startsolid)

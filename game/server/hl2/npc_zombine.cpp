@@ -546,7 +546,7 @@ void CNPC_Zombine::HandleAnimEvent( animevent_t *pEvent )
 
 			if ( pPhysicsObject )
 			{
-				pGrenade->VPhysicsDestroyObject();
+				pGrenade->GetEngineObject()->VPhysicsDestroyObject();
 
 				int iAttachment = LookupAttachment( "grenade_attachment");
 

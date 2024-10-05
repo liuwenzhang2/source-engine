@@ -1148,7 +1148,7 @@ void CPortal_Player::VPhysicsShadowUpdate( IPhysicsObject *pPhysics )
 
 	Vector newPosition;
 
-	bool physicsUpdated = m_pPhysicsController->GetShadowPosition( &newPosition, NULL ) > 0 ? true : false;
+	bool physicsUpdated = GetEngineObject()->GetPhysicsController()->GetShadowPosition(&newPosition, NULL) > 0 ? true : false;
 
 	// UNDONE: If the player is penetrating, but the player's game collisions are not stuck, teleport the physics shadow to the game position
 	if ( pPhysics->GetGameFlags() & FVPHYSICS_PENETRATING )
@@ -1168,7 +1168,7 @@ void CPortal_Player::VPhysicsShadowUpdate( IPhysicsObject *pPhysics )
 		}
 	}
 
-	if ( m_pPhysicsController->IsInContact() || (m_afPhysicsFlags & PFLAG_VPHYSICS_MOTIONCONTROLLER) )
+	if (GetEngineObject()->GetPhysicsController()->IsInContact() || (m_afPhysicsFlags & PFLAG_VPHYSICS_MOTIONCONTROLLER))
 	{
 		m_touchedPhysObject = true;
 	}
@@ -1192,11 +1192,11 @@ void CPortal_Player::VPhysicsShadowUpdate( IPhysicsObject *pPhysics )
 	if ( !physicsUpdated )
 		return;
 
-	IPhysicsObject *pPhysGround = GetGroundVPhysics();
+	IPhysicsObject *pPhysGround = GetEngineObject()->GetGroundVPhysics();
 
 	Vector newVelocity;
 	pPhysics->GetPosition( &newPosition, 0 );
-	m_pPhysicsController->GetShadowVelocity( &newVelocity );
+	GetEngineObject()->GetPhysicsController()->GetShadowVelocity(&newVelocity);
 
 
 
@@ -1211,7 +1211,7 @@ void CPortal_Player::VPhysicsShadowUpdate( IPhysicsObject *pPhysics )
 
 	float maxDistErrorSqr = VPHYS_MAX_DISTSQR;
 	float maxVelErrorSqr = VPHYS_MAX_VELSQR;
-	if ( IsRideablePhysics(pPhysGround) )
+	if (GetEngineObject()->IsRideablePhysics(pPhysGround) )
 	{
 		maxDistErrorSqr *= 0.25;
 		maxVelErrorSqr *= 0.25;
@@ -1244,7 +1244,7 @@ void CPortal_Player::VPhysicsShadowUpdate( IPhysicsObject *pPhysics )
 					VectorMA( newVelocity, val - len, dir, newVelocity );
 				}
 
-				if ( !IsRideablePhysics(pPhysGround) )
+				if ( !GetEngineObject()->IsRideablePhysics(pPhysGround) )
 				{
 					if ( !(m_afPhysicsFlags & PFLAG_VPHYSICS_MOTIONCONTROLLER ) && IsSimulatingOnAlternateTicks() )
 					{
@@ -1266,7 +1266,7 @@ void CPortal_Player::VPhysicsShadowUpdate( IPhysicsObject *pPhysics )
 			trace_t trace;
 
 			Ray_t ray;
-			ray.Init(GetEngineObject()->GetAbsOrigin(), GetEngineObject()->GetAbsOrigin(), WorldAlignMins(), WorldAlignMaxs() );
+			ray.Init(GetEngineObject()->GetAbsOrigin(), GetEngineObject()->GetAbsOrigin(), GetEngineObject()->WorldAlignMins(), GetEngineObject()->WorldAlignMaxs() );
 
 			CTraceFilterSimple OriginalTraceFilter( this, COLLISION_GROUP_PLAYER_MOVEMENT );
 			CTraceFilterTranslateClones traceFilter( &OriginalTraceFilter );
@@ -1276,7 +1276,7 @@ void CPortal_Player::VPhysicsShadowUpdate( IPhysicsObject *pPhysics )
 			if ( trace.allsolid || trace.startsolid )
 			{
 				//try again with new position
-				ray.Init( newPosition, newPosition, WorldAlignMins(), WorldAlignMaxs() );
+				ray.Init( newPosition, newPosition, GetEngineObject()->WorldAlignMins(), GetEngineObject()->WorldAlignMaxs() );
 				UTIL_Portal_TraceRay_With( m_hPortalEnvironment, ray, MASK_PLAYERSOLID, &traceFilter, &trace );
 
 				if( trace.startsolid == false )
@@ -1937,7 +1937,7 @@ void CPortal_Player::ForceDuckThisFrame( void )
 		m_Local.m_bDucked = true;
 		ForceButtons( IN_DUCK );
 		GetEngineObject()->AddFlag( FL_DUCKING );
-		SetVCollisionState(GetEngineObject()->GetAbsOrigin(), GetEngineObject()->GetAbsVelocity(), VPHYS_CROUCH );
+		GetEngineObject()->SetVCollisionState(GetEngineObject()->GetAbsOrigin(), GetEngineObject()->GetAbsVelocity(), VPHYS_CROUCH );
 	}
 }
 
@@ -1948,7 +1948,7 @@ void CPortal_Player::UnDuck( void )
 		m_Local.m_bDucked = false;
 		UnforceButtons( IN_DUCK );
 		GetEngineObject()->RemoveFlag( FL_DUCKING );
-		SetVCollisionState(GetEngineObject()->GetAbsOrigin(), GetEngineObject()->GetAbsVelocity(), VPHYS_WALK );
+		GetEngineObject()->SetVCollisionState(GetEngineObject()->GetAbsOrigin(), GetEngineObject()->GetAbsVelocity(), VPHYS_WALK );
 	}
 }
 

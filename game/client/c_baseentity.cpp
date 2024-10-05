@@ -465,7 +465,6 @@ C_BaseEntity::C_BaseEntity()
 	m_bPredictable = false;
 
 
-	m_pPhysicsObject = NULL;
 	//GetEngineObject()->Init(this);
 #ifdef _DEBUG
 	m_vecViewOffset.Init();
@@ -3540,7 +3539,7 @@ void C_BaseEntity::ChangeTeam( int iTeamNum )
 //-----------------------------------------------------------------------------
 void C_BaseEntity::UpdateOnRemove( void )
 {
-	VPhysicsDestroyObject(); 
+	GetEngineObject()->VPhysicsDestroyObject();
 
 	Assert( !GetEngineObject()->GetMoveParent() );
 	GetEngineObject()->UnlinkFromHierarchy();

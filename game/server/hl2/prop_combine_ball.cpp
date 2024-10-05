@@ -343,7 +343,7 @@ bool CPropCombineBall::CreateVPhysics()
 	if ( !pPhysicsObject )
 		return false;
 
-	VPhysicsSetObject( pPhysicsObject );
+	GetEngineObject()->VPhysicsSetObject( pPhysicsObject );
 	GetEngineObject()->SetMoveType( MOVETYPE_VPHYSICS );
 	pPhysicsObject->Wake();
 

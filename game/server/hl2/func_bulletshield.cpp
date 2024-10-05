@@ -45,7 +45,7 @@ void CFuncBulletShield::Spawn( void )
 	GetEngineObject()->AddSolidFlags( FSOLID_CUSTOMBOXTEST );
 	// SetSolid(SOLID_CUSTOM);
 
-	VPhysicsDestroyObject();
+	GetEngineObject()->VPhysicsDestroyObject();
 }
 
 /*

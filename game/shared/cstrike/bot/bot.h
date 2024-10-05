@@ -48,8 +48,8 @@ inline Vector GetCentroid( const CBaseEntity *player )
 {
 	Vector centroid = player->GetEngineObject()->GetAbsOrigin();
 
-	const Vector &mins = player->WorldAlignMins();
-	const Vector &maxs = player->WorldAlignMaxs();
+	const Vector &mins = player->GetEngineObject()->WorldAlignMins();
+	const Vector &maxs = player->GetEngineObject()->WorldAlignMaxs();
 
 	centroid.z += (maxs.z - mins.z)/2.0f;
 

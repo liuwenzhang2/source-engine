@@ -458,7 +458,7 @@ void CBaseButton::Spawn( )
 
 bool CBaseButton::CreateVPhysics()
 {
-	VPhysicsInitShadow( false, false );
+	GetEngineObject()->VPhysicsInitShadow( false, false );
 	return true;
 }
 
@@ -916,7 +916,7 @@ void CRotButton::Spawn( void )
 
 bool CRotButton::CreateVPhysics( void )
 {
-	VPhysicsInitShadow( false, false );
+	GetEngineObject()->VPhysicsInitShadow( false, false );
 	return true;
 }
 
@@ -1085,7 +1085,7 @@ int	CMomentaryRotButton::ObjectCaps( void )
 //-----------------------------------------------------------------------------
 bool CMomentaryRotButton::CreateVPhysics( void )
 {
-	VPhysicsInitShadow( false, false );
+	GetEngineObject()->VPhysicsInitShadow( false, false );
 
 	return true;
 }

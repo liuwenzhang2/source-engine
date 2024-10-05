@@ -252,7 +252,7 @@ CBaseEntity *CNPC_MetroPolice::CheckTraceHullAttack( float flDist, const Vector 
 	// The ideal place to start the trace is in the center of the attacker's bounding box.
 	// however, we need to make sure there's enough clearance. Some of the smaller monsters aren't 
 	// as big as the hull we try to trace with. (SJB)
-	float flVerticalOffset = WorldAlignSize().z * 0.5;
+	float flVerticalOffset = GetEngineObject()->WorldAlignSize().z * 0.5;
 
 	if( flVerticalOffset < maxs.z )
 	{
@@ -1310,7 +1310,7 @@ Vector CNPC_MetroPolice::StitchAimTarget( const Vector &posSrc, bool bNoisy )
 		// Trace down...
 		trace_t	trace;
 		GetEnemy()->GetEngineObject()->NormalizedToWorldSpace( Vector( 0.5f, 0.5f, 1.0f ), &vecBodyTarget );
-		float flHeight = GetEnemy()->WorldAlignSize().z;
+		float flHeight = GetEnemy()->GetEngineObject()->WorldAlignSize().z;
 		UTIL_TraceLine( vecBodyTarget, vecBodyTarget + Vector( 0, 0, -flHeight -80 ), 
 			(MASK_SOLID_BRUSHONLY | MASK_WATER), NULL, COLLISION_GROUP_NONE, &trace );
 		return trace.endpos;

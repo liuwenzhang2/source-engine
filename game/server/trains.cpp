@@ -363,7 +363,7 @@ void CFuncPlat::Spawn( )
 
 bool CFuncPlat::CreateVPhysics()
 {
-	VPhysicsInitShadow( false, false );
+	GetEngineObject()->VPhysicsInitShadow( false, false );
 	return true;
 }
 
@@ -994,7 +994,7 @@ void CFuncTrain::Activate( void )
 		UTIL_SetOrigin( this, m_hCurrentTarget->GetEngineObject()->GetLocalOrigin() - GetEngineObject()->OBBCenter() );
 		if (GetEngineObject()->GetSolid() == SOLID_BSP )
 		{
-			VPhysicsInitShadow( false, false );
+			GetEngineObject()->VPhysicsInitShadow( false, false );
 		}
 
 		// Start immediately if not triggered
@@ -2485,8 +2485,8 @@ void CFuncTrackTrain::SetControls( CBaseEntity *pControls )
 {
 	Vector offset = pControls->GetEngineObject()->GetLocalOrigin();
 
-	m_controlMins = pControls->WorldAlignMins() + offset;
-	m_controlMaxs = pControls->WorldAlignMaxs() + offset;
+	m_controlMins = pControls->GetEngineObject()->WorldAlignMins() + offset;
+	m_controlMaxs = pControls->GetEngineObject()->WorldAlignMaxs() + offset;
 }
 
 
@@ -2717,7 +2717,7 @@ void CFuncTrackTrain::Spawn( void )
 
 bool CFuncTrackTrain::CreateVPhysics( void )
 {
-	VPhysicsInitShadow( false, false );
+	GetEngineObject()->VPhysicsInitShadow( false, false );
 	return true;
 }
 

@@ -438,7 +438,7 @@ int CWeaponSMG1::WeaponRangeAttack2Condition(/* float flDot, float flDist */)
 		return COND_NONE;
 
 	Vector vecEnemyLKP = npcOwner->GetEnemyLKP();
-	if ( !( pEnemy->GetEngineObject()->GetFlags() & FL_ONGROUND ) && pEnemy->GetWaterLevel() == 0 && vecEnemyLKP.z > (GetEngineObject()->GetAbsOrigin().z + WorldAlignMaxs().z) )
+	if ( !( pEnemy->GetEngineObject()->GetFlags() & FL_ONGROUND ) && pEnemy->GetWaterLevel() == 0 && vecEnemyLKP.z > (GetEngineObject()->GetAbsOrigin().z + GetEngineObject()->WorldAlignMaxs().z) )
 	{
 		//!!!BUGBUG - we should make this check movetype and make sure it isn't FLY? Players who jump a lot are unlikely to 
 		// be grenaded.

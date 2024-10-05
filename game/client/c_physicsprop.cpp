@@ -38,7 +38,7 @@ END_RECV_TABLE()
 //-----------------------------------------------------------------------------
 C_PhysicsProp::C_PhysicsProp( void )
 {
-	m_pPhysicsObject = NULL;
+	//m_pPhysicsObject = NULL;
 	m_takedamage = DAMAGE_YES;
 
 	// default true so static lighting will get recomputed when we go to sleep

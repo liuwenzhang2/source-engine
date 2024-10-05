@@ -70,7 +70,7 @@ CPhysicsShadowClone::CPhysicsShadowClone( void )
 CPhysicsShadowClone::~CPhysicsShadowClone( void )
 {
 	VPhysicsDestroyObject();
-	VPhysicsSetObject( NULL );
+	GetEngineObject()->VPhysicsSetObject( NULL );
 	m_hClonedEntity = NULL;
 	s_ActiveShadowClones.FindAndRemove( this ); //also removed in UpdateOnRemove()
 	
@@ -123,7 +123,7 @@ void CPhysicsShadowClone::UpdateOnRemove( void )
 	}
 #endif
 	VPhysicsDestroyObject();
-	VPhysicsSetObject( NULL );
+	GetEngineObject()->VPhysicsSetObject( NULL );
 	m_hClonedEntity = NULL;
 	s_ActiveShadowClones.FindAndRemove( this ); //also removed in Destructor
 	Assert(s_IsShadowClone[entindex()] == true);
@@ -708,7 +708,7 @@ void CPhysicsShadowClone::FullSyncClonedPhysicsObjects( bool bTeleport )
 	}
 
 
-	VPhysicsSetObject( NULL );
+	GetEngineObject()->VPhysicsSetObject( NULL );
 
 	IPhysicsObject *pSource = m_hClonedEntity->VPhysicsGetObject();
 
@@ -717,14 +717,14 @@ void CPhysicsShadowClone::FullSyncClonedPhysicsObjects( bool bTeleport )
 		if( m_CloneLinks[i].pSource == pSource )
 		{
 			//m_CloneLinks[i].pClone->Wake();
-			VPhysicsSetObject( m_CloneLinks[i].pClone );
+			GetEngineObject()->VPhysicsSetObject( m_CloneLinks[i].pClone );
 			break;
 		}
 	}
 
 	if( (i < 0) && (m_CloneLinks.Count() != 0) )
 	{
-		VPhysicsSetObject( m_CloneLinks[0].pClone );
+		GetEngineObject()->VPhysicsSetObject( m_CloneLinks[0].pClone );
 	}
 
 	stackfree( pExistingLinks );
@@ -779,7 +779,7 @@ int CPhysicsShadowClone::VPhysicsGetObjectList( IPhysicsObject **pList, int list
 
 void CPhysicsShadowClone::VPhysicsDestroyObject( void )
 {
-	VPhysicsSetObject( NULL );
+	GetEngineObject()->VPhysicsSetObject( NULL );
 	
 	for( int i = m_CloneLinks.Count(); --i >= 0; )
 	{
@@ -788,7 +788,7 @@ void CPhysicsShadowClone::VPhysicsDestroyObject( void )
 	}
 	m_CloneLinks.RemoveAll();
 
-	BaseClass::VPhysicsDestroyObject();
+	//BaseClass::VPhysicsDestroyObject();
 }
 
 

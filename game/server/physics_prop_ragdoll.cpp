@@ -218,8 +218,8 @@ void CRagdollProp::OnSave( IEntitySaveUtils *pUtils )
 	Assert( m_ragdoll.list[0].pConstraint == NULL );
 	Assert( m_ragdoll.list[0].originParentSpace == vec3_origin );
 	Assert( m_ragdoll.list[0].pObject != NULL );
-	VPhysicsSetObject( NULL );	// squelch a warning message
-	VPhysicsSetObject( m_ragdoll.list[0].pObject );	// make sure object zero is saved by CBaseEntity
+	GetEngineObject()->VPhysicsSetObject( NULL );	// squelch a warning message
+	GetEngineObject()->VPhysicsSetObject( m_ragdoll.list[0].pObject );	// make sure object zero is saved by CBaseEntity
 	BaseClass::OnSave( pUtils );
 }
 
@@ -258,7 +258,7 @@ void CRagdollProp::UpdateOnRemove( void )
 
 	// Set to null so that the destructor's call to DestroyObject won't destroy
 	//  m_pObjects[ 0 ] twice since that's the physics object for the prop
-	VPhysicsSetObject( NULL );
+	GetEngineObject()->VPhysicsSetObject( NULL );
 
 	RagdollDestroy( m_ragdoll );
 	// Chain to base after doing our own cleanup to mimic
@@ -756,7 +756,7 @@ void CRagdollProp::InitRagdoll( const Vector &forceVector, int forceBone, const 
 		g_pPhysSaveRestoreManager->AssociateModel( m_ragdoll.list[i].pObject, GetEngineObject()->GetModelIndex() );
 		physcollision->CollideGetAABB( &m_ragdollMins[i], &m_ragdollMaxs[i], m_ragdoll.list[i].pObject->GetCollide(), vec3_origin, vec3_angle );
 	}
-	VPhysicsSetObject( m_ragdoll.list[0].pObject );
+	GetEngineObject()->VPhysicsSetObject( m_ragdoll.list[0].pObject );
 
 	CalcRagdollSize();
 }
@@ -817,7 +817,7 @@ void CRagdollProp::TraceAttack( const CTakeDamageInfo &info, const Vector &dir, 
 {
 	if ( ptr->physicsbone >= 0 && ptr->physicsbone < m_ragdoll.listCount )
 	{
-		VPhysicsSwapObject( m_ragdoll.list[ptr->physicsbone].pObject );
+		GetEngineObject()->VPhysicsSwapObject( m_ragdoll.list[ptr->physicsbone].pObject );
 	}
 	BaseClass::TraceAttack( info, dir, ptr, pAccumulator );
 }
@@ -942,7 +942,7 @@ void CRagdollProp::Teleport( const Vector *newPosition, const QAngle *newAngles,
 
 	// we need to call the base class and it will teleport our vphysics object, 
 	// so set object 0 up and compute the origin/angles for its new position (base implementation has side effects)
-	VPhysicsSwapObject( m_ragdoll.list[0].pObject );
+	GetEngineObject()->VPhysicsSwapObject( m_ragdoll.list[0].pObject );
 	matrix3x4_t obj0source, obj0Target;
 	m_ragdoll.list[0].pObject->GetPositionMatrix( &obj0source );
 	ConcatTransforms( xform, obj0source, obj0Target );

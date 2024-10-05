@@ -935,7 +935,7 @@ CAI_Hint *CAI_FollowBehavior::FindFollowPoint()
 
 	// Add the search position
 	hintCriteria.AddIncludePosition( GetGoalPosition(), MAX( m_FollowNavGoal.followPointTolerance, GetGoalRange() ) );
-	hintCriteria.AddExcludePosition( GetGoalPosition(), (GetFollowTarget()->WorldAlignMins().AsVector2D() - GetFollowTarget()->WorldAlignMaxs().AsVector2D()).Length());
+	hintCriteria.AddExcludePosition( GetGoalPosition(), (GetFollowTarget()->GetEngineObject()->WorldAlignMins().AsVector2D() - GetFollowTarget()->GetEngineObject()->WorldAlignMaxs().AsVector2D()).Length());
 
 	return CAI_HintManager::FindHint( GetOuter(), hintCriteria );
 }

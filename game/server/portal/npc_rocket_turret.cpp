@@ -475,7 +475,7 @@ void CNPC_RocketTurret::UpdateAimPoint ( void )
 
 	//Get our shot positions
 	Vector vecMid = EyePosition();
-	Vector vecMidEnemy = GetEnemy()->GetEngineObject()->GetAbsOrigin() + (GetEnemy()->WorldAlignMins() + GetEnemy()->WorldAlignMaxs()) * 0.5f;
+	Vector vecMidEnemy = GetEnemy()->GetEngineObject()->GetAbsOrigin() + (GetEnemy()->GetEngineObject()->WorldAlignMins() + GetEnemy()->GetEngineObject()->WorldAlignMaxs()) * 0.5f;
 
 	//Calculate dir and dist to enemy
 	m_vecDirToEnemy = vecMidEnemy - vecMid;	
@@ -1012,7 +1012,7 @@ bool CNPC_RocketTurret::TestPortalsForLOS( Vector* pOutVec, bool bConsiderNonPor
 	{
 		return false;
 	}
-	Vector vAimPoint = pTarget->GetEngineObject()->GetAbsOrigin() + (pTarget->WorldAlignMins() + pTarget->WorldAlignMaxs()) * 0.5f;
+	Vector vAimPoint = pTarget->GetEngineObject()->GetAbsOrigin() + (pTarget->GetEngineObject()->WorldAlignMins() + pTarget->GetEngineObject()->WorldAlignMaxs()) * 0.5f;
 
 	int iPortalCount = CProp_Portal_Shared::AllPortals.Count();
 	if( iPortalCount == 0 )
@@ -1111,7 +1111,7 @@ bool CNPC_RocketTurret::FindAimPointThroughPortal( const CProp_Portal* pPortal, 
 		if ( fDot < 0.0f && pLinked && pLinked->m_bActivated && pTarget )
 		{
 			VMatrix matToPortalView = pLinked->m_matrixThisToLinked;
-			Vector vTargetAimPoint = pTarget->GetEngineObject()->GetAbsOrigin() + (pTarget->WorldAlignMins() + pTarget->WorldAlignMaxs()) * 0.5f;
+			Vector vTargetAimPoint = pTarget->GetEngineObject()->GetAbsOrigin() + (pTarget->GetEngineObject()->WorldAlignMins() + pTarget->GetEngineObject()->WorldAlignMaxs()) * 0.5f;
 			*pVecOut =  matToPortalView * vTargetAimPoint;   
 			return true;
 		}

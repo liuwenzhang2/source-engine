@@ -124,7 +124,7 @@ CCrossbowBolt::~CCrossbowBolt( void )
 bool CCrossbowBolt::CreateVPhysics( void )
 {
 	// Create the object in the physics system
-	VPhysicsInitNormal( SOLID_BBOX, FSOLID_NOT_STANDABLE, false );
+	GetEngineObject()->VPhysicsInitNormal( SOLID_BBOX, FSOLID_NOT_STANDABLE, false );
 
 	return true;
 }

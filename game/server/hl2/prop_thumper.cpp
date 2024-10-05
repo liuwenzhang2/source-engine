@@ -100,7 +100,7 @@ void CPropThumper::Spawn( void )
 
 	GetEngineObject()->SetSolid( SOLID_VPHYSICS );
 	GetEngineObject()->SetMoveType( MOVETYPE_NONE );
-	VPhysicsInitStatic();
+	GetEngineObject()->VPhysicsInitStatic();
 
 	BaseClass::Spawn();
 

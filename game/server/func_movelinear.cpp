@@ -126,7 +126,7 @@ bool CFuncMoveLinear::CreateVPhysics( void )
 		//normal door
 		if ( !GetEngineObject()->IsSolidFlagSet( FSOLID_NOT_SOLID ) )
 		{
-			VPhysicsInitShadow( false, false );
+			GetEngineObject()->VPhysicsInitShadow( false, false );
 		}
 	}
 	else
@@ -135,7 +135,7 @@ bool CFuncMoveLinear::CreateVPhysics( void )
 		GetEngineObject()->AddSolidFlags( FSOLID_VOLUME_CONTENTS );
 		//SETBITS( m_spawnflags, SF_DOOR_SILENT );	// water is silent for now
 
-		IPhysicsObject *pPhysics = VPhysicsInitShadow( false, false );
+		IPhysicsObject *pPhysics = GetEngineObject()->VPhysicsInitShadow( false, false );
 		fluidparams_t fluid;
 		
 		Assert(GetEngineObject()->GetCollisionAngles() == vec3_angle );

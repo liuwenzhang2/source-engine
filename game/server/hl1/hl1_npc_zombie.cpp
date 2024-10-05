@@ -229,7 +229,7 @@ int CNPC_Zombie::OnTakeDamage_Alive( const CTakeDamageInfo &inputInfo )
 	{
 		Vector vecDir = GetEngineObject()->GetAbsOrigin() - info.GetInflictor()->WorldSpaceCenter();
 		VectorNormalize( vecDir );
-		float flForce = DamageForce( WorldAlignSize(), info.GetDamage() );
+		float flForce = DamageForce(GetEngineObject()->WorldAlignSize(), info.GetDamage() );
 		GetEngineObject()->SetAbsVelocity(GetEngineObject()->GetAbsVelocity() + vecDir * flForce );
 		info.ScaleDamage( 0.3f );
 	}

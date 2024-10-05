@@ -379,7 +379,7 @@ bool CFourWheelVehiclePhysics::Initialize( const char *pVehicleScript, unsigned 
 	{
 		m_pOuter->VPhysicsGetObject()->EnableCollisions(false);
 	}
-	m_pOuter->VPhysicsDestroyObject();
+	m_pOuter->GetEngineObject()->VPhysicsDestroyObject();
 
 	// Create the vphysics model + teleport it into position
 	solid_t solid;
@@ -399,7 +399,7 @@ bool CFourWheelVehiclePhysics::Initialize( const char *pVehicleScript, unsigned 
 
 	m_flMaxSpeed = vehicle.engine.maxSpeed;
 
-	IPhysicsObject *pBody = m_pOuter->VPhysicsInitNormal( SOLID_VPHYSICS, 0, false, &solid );
+	IPhysicsObject *pBody = m_pOuter->GetEngineObject()->VPhysicsInitNormal( SOLID_VPHYSICS, 0, false, &solid );
 	PhysSetGameFlags( pBody, FVPHYSICS_NO_SELF_COLLISIONS | FVPHYSICS_MULTIOBJECT_ENTITY );
 	m_pVehicle = physenv->CreateVehicleController( pBody, vehicle, nVehicleType, physgametrace );
 	m_wheelCount = m_pVehicle->GetWheelCount();

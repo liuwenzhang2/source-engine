@@ -155,7 +155,7 @@ void CNPC_GroundTurret::Spawn( void )
 bool CNPC_GroundTurret::CreateVPhysics( void )
 {
 	//Spawn our physics hull
-	if ( !VPhysicsInitStatic() )
+	if ( !GetEngineObject()->VPhysicsInitStatic() )
 	{
 		DevMsg( "npc_turret_ground unable to spawn physics object!\n" );
 	}

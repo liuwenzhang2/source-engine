@@ -2014,9 +2014,9 @@ void C_DODPlayer::CalcDODDeathCamView(Vector& eyeOrigin, QAngle& eyeAngles, floa
 	VectorMA( origin, -m_flObserverChaseDistance, vForward, eyeOrigin );
 
 	trace_t trace; // clip against world
-	C_BaseEntity::PushEnableAbsRecomputations( false ); // HACK don't recompute positions while doing RayTrace
+	C_EngineObjectInternal::PushEnableAbsRecomputations( false ); // HACK don't recompute positions while doing RayTrace
 	UTIL_TraceHull( origin, eyeOrigin, WALL_MIN, WALL_MAX, MASK_SOLID, this, COLLISION_GROUP_NONE, &trace );
-	C_BaseEntity::PopEnableAbsRecomputations();
+	C_EngineObjectInternal::PopEnableAbsRecomputations();
 
 	if (trace.fraction < 1.0)
 	{
@@ -2088,9 +2088,9 @@ void C_DODPlayer::CalcChaseCamView(Vector& eyeOrigin, QAngle& eyeAngles, float& 
 	VectorMA(origin, -m_flObserverChaseDistance, forward, viewpoint );
 
 	trace_t trace;
-	C_BaseEntity::PushEnableAbsRecomputations( false ); // HACK don't recompute positions while doing RayTrace
+	C_EngineObjectInternal::PushEnableAbsRecomputations( false ); // HACK don't recompute positions while doing RayTrace
 	UTIL_TraceHull( origin, viewpoint, WALL_MIN, WALL_MAX, MASK_SOLID, target, COLLISION_GROUP_NONE, &trace );
-	C_BaseEntity::PopEnableAbsRecomputations();
+	C_EngineObjectInternal::PopEnableAbsRecomputations();
 
 	if (trace.fraction < 1.0)
 	{
@@ -2148,9 +2148,9 @@ void C_DODPlayer::CalcFreezeCamView( Vector& eyeOrigin, QAngle& eyeAngles, float
 
 	// Now trace out from the target, so that we're put in front of any walls
 	trace_t trace;
-	C_BaseEntity::PushEnableAbsRecomputations( false ); // HACK don't recompute positions while doing RayTrace
+	C_EngineObjectInternal::PushEnableAbsRecomputations( false ); // HACK don't recompute positions while doing RayTrace
 	UTIL_TraceLine( vecCamTarget, vecTargetPos, MASK_SOLID, pTarget, COLLISION_GROUP_NONE, &trace );
-	C_BaseEntity::PopEnableAbsRecomputations();
+	C_EngineObjectInternal::PopEnableAbsRecomputations();
 	if (trace.fraction < 1.0 )
 	{
 		// The camera's going to be really close to the target. So we don't end up
@@ -2160,9 +2160,9 @@ void C_DODPlayer::CalcFreezeCamView( Vector& eyeOrigin, QAngle& eyeAngles, float
 
 		// To stop all close in views looking up at character's chins, move the view up.
 		vecTargetPos.z += fabs(vecCamTarget.z - vecTargetPos.z) * 0.85;
-		C_BaseEntity::PushEnableAbsRecomputations( false ); // HACK don't recompute positions while doing RayTrace
+		C_EngineObjectInternal::PushEnableAbsRecomputations( false ); // HACK don't recompute positions while doing RayTrace
 		UTIL_TraceLine( vecCamTarget, vecTargetPos, MASK_SOLID, pTarget, COLLISION_GROUP_NONE, &trace );
-		C_BaseEntity::PopEnableAbsRecomputations();
+		C_EngineObjectInternal::PopEnableAbsRecomputations();
 		vecTargetPos = trace.endpos;
 	}
 
@@ -2358,7 +2358,7 @@ void C_DODPlayer::CalculateIKLocks( float currentTime )
 	// partition that early in the rendering loop. So we allow access right here for that special case.
 	SpatialPartitionListMask_t curSuppressed = partition->GetSuppressedLists();
 	partition->SuppressLists( PARTITION_ALL_CLIENT_EDICTS, false );
-	CBaseEntity::PushEnableAbsRecomputations( false );
+	C_EngineObjectInternal::PushEnableAbsRecomputations( false );
 
 	for (int i = 0; i < targetCount; i++)
 	{
@@ -2422,7 +2422,7 @@ void C_DODPlayer::CalculateIKLocks( float currentTime )
 		}
 	}
 
-	CBaseEntity::PopEnableAbsRecomputations();
+	C_EngineObjectInternal::PopEnableAbsRecomputations();
 	partition->SuppressLists( curSuppressed, true );
 }
 
@@ -2592,7 +2592,7 @@ void C_DODPlayer::AvoidPlayers( CUserCmd *pCmd )
 	{
 		VectorSubtract( pIntersectPlayer->WorldSpaceCenter(), vecDODPlayerCenter, vecDelta );
 
-		Vector vRad = pIntersectPlayer->WorldAlignMaxs() - pIntersectPlayer->WorldAlignMins();
+		Vector vRad = pIntersectPlayer->GetEngineObject()->WorldAlignMaxs() - pIntersectPlayer->GetEngineObject()->WorldAlignMins();
 		vRad.z = 0;
 
 		flAvoidRadius = vRad.Length();

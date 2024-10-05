@@ -210,7 +210,7 @@ void C_PhysPropClientside::UpdateOnRemove(void)
 		m_pRespawnZone->PropDestroyed(this);
 	}
 	PhysCleanupFrictionSounds(this);
-	VPhysicsDestroyObject();
+	GetEngineObject()->VPhysicsDestroyObject();
 	s_PhysPropList.FindAndRemove(this);
 
 	BaseClass::UpdateOnRemove();
@@ -268,9 +268,9 @@ bool C_PhysPropClientside::Initialize()
 	}
 	else
 	{
-		m_pPhysicsObject = VPhysicsInitNormal( SOLID_VPHYSICS, 0, m_spawnflags & SF_PHYSPROP_START_ASLEEP, &tmpSolid );
+		GetEngineObject()->VPhysicsInitNormal( SOLID_VPHYSICS, 0, m_spawnflags & SF_PHYSPROP_START_ASLEEP, &tmpSolid );
 	
-		if ( !m_pPhysicsObject )
+		if ( !VPhysicsGetObject())
 		{
 			// failed to create a physics object
 		DevMsg(" C_PhysPropClientside::Initialize: VPhysicsInitNormal() failed for %s.\n", STRING(GetEngineObject()->GetModelName()) );
@@ -284,7 +284,7 @@ bool C_PhysPropClientside::Initialize()
 
 	if ( m_spawnflags & SF_PHYSPROP_MOTIONDISABLED )
 	{
-		m_pPhysicsObject->EnableMotion( false );
+		VPhysicsGetObject()->EnableMotion( false );
 	}
 		
 	Spawn(); // loads breakable & prop data
@@ -292,7 +292,7 @@ bool C_PhysPropClientside::Initialize()
 	if ( m_iPhysicsMode == PHYSICS_MULTIPLAYER_AUTODETECT )
 	{
 		m_iPhysicsMode = GetAutoMultiplayerPhysicsMode( 
-			GetEngineObject()->OBBSize(), m_pPhysicsObject->GetMass() );
+			GetEngineObject()->OBBSize(), VPhysicsGetObject()->GetMass() );
 	}
 
 	if 	( m_spawnflags & SF_PHYSPROP_FORCE_SERVER_SIDE )

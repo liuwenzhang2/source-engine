@@ -82,7 +82,7 @@ void CFunc_LOD::Spawn()
 
 bool CFunc_LOD::CreateVPhysics()
 {
-	VPhysicsInitStatic();
+	GetEngineObject()->VPhysicsInitStatic();
 	return true;
 }
 

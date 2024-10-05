@@ -522,7 +522,7 @@ bool CPhysBox::CreateVPhysics()
 	{
 		tmpSolid.params.rotdamping = 1.0f;
 	}
-	IPhysicsObject *pPhysics = VPhysicsInitNormal(GetEngineObject()->GetSolid(), GetEngineObject()->GetSolidFlags(), true, &tmpSolid );
+	IPhysicsObject *pPhysics = GetEngineObject()->VPhysicsInitNormal(GetEngineObject()->GetSolid(), GetEngineObject()->GetSolidFlags(), true, &tmpSolid );
 
 	if ( m_damageType == 1 )
 	{
@@ -1293,11 +1293,11 @@ bool TransferPhysicsObject( CBaseEntity *pFrom, CBaseEntity *pTo, bool wakeUp )
 		return false;
 
 	// clear out the pointer so it won't get deleted
-	pFrom->VPhysicsSwapObject( NULL );
+	pFrom->GetEngineObject()->VPhysicsSwapObject( NULL );
 	// remove any AI behavior bound to it
 	pVPhysics->RemoveShadowController();
 	// transfer to the new owner
-	pTo->VPhysicsSetObject( pVPhysics );
+	pTo->GetEngineObject()->VPhysicsSetObject( pVPhysics );
 	pVPhysics->SetGameData( (void *)pTo );
 	pTo->VPhysicsUpdate( pVPhysics );
 	
@@ -1336,7 +1336,7 @@ static CBaseEntity *CreateSimplePhysicsObject( CBaseEntity *pEntity, bool create
 	pPhysEntity->Spawn();
 	if ( !TransferPhysicsObject( pEntity, pPhysEntity, !createAsleep ) )
 	{
-		pPhysEntity->VPhysicsInitNormal( SOLID_VPHYSICS, 0, createAsleep );
+		pPhysEntity->GetEngineObject()->VPhysicsInitNormal( SOLID_VPHYSICS, 0, createAsleep );
 		if ( createAsDebris )
 			pPhysEntity->GetEngineObject()->SetCollisionGroup( COLLISION_GROUP_DEBRIS );
 	}
@@ -1427,7 +1427,7 @@ void CPhysConvert::InputConvertTarget( inputdata_t &inputdata )
 		if ( pSwap )
 		{
 			// we can't reuse this physics object, so kill it
-			pEntity->VPhysicsDestroyObject();
+			pEntity->GetEngineObject()->VPhysicsDestroyObject();
 			pEntity->SetModel( STRING(pSwap->GetEngineObject()->GetModelName()) );
 		}
 
@@ -1574,7 +1574,7 @@ void CPhysMagnet::Spawn( void )
 		tmpSolid.params.mass *= m_massScale;
 	}
 	PhysSolidOverride( tmpSolid, m_iszOverrideScript );
-	VPhysicsInitNormal(GetEngineObject()->GetSolid(), GetEngineObject()->GetSolidFlags(), true, &tmpSolid );
+	GetEngineObject()->VPhysicsInitNormal(GetEngineObject()->GetSolid(), GetEngineObject()->GetSolidFlags(), true, &tmpSolid );
 
 	// Wake it up if not asleep
 	if ( !GetEngineObject()->HasSpawnFlags(SF_MAGNET_ASLEEP) )

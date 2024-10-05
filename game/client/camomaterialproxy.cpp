@@ -364,8 +364,8 @@ void CCamoMaterialProxy::GenerateCamoTexture( ITexture* pTexture, IVTFTexture *p
 
 	// Get the bounding box for the entity
 	Vector mins, maxs;
-	mins = m_pEnt->WorldAlignMins();
-	maxs = m_pEnt->WorldAlignMaxs();
+	mins = m_pEnt->GetEngineObject()->WorldAlignMins();
+	maxs = m_pEnt->GetEngineObject()->WorldAlignMaxs();
 	
 	Vector traceDirection;
 	Vector traceEnd;

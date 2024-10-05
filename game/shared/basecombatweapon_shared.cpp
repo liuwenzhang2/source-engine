@@ -995,7 +995,7 @@ void CBaseCombatWeapon::Equip( CBaseCombatCharacter *pOwner )
 	SetTouch( NULL );
 	SetThink( NULL );
 #if !defined( CLIENT_DLL )
-	VPhysicsDestroyObject();
+	GetEngineObject()->VPhysicsDestroyObject();
 #endif
 
 	if ( pOwner->IsPlayer() )

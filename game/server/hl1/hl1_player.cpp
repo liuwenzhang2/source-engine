@@ -689,7 +689,7 @@ void CHL1_Player::InitVCollision( const Vector &vecAbsOrigin, const Vector &vecA
 	BaseClass::InitVCollision( vecAbsOrigin, vecAbsVelocity );
 
 	// Setup the HL2 specific callback.
-	GetPhysicsController()->SetEventHandler( &playerCallback );
+	GetEngineObject()->GetPhysicsController()->SetEventHandler( &playerCallback );
 }
 
 
@@ -1389,7 +1389,7 @@ static void ComputePlayerMatrix( CBasePlayer *pPlayer, matrix3x4_t &out )
 	//angles.x = clamp( angles.x, -PLAYER_LOOK_PITCH_RANGE, PLAYER_LOOK_PITCH_RANGE );
 	angles.x = 0;
 
-	float feet = pPlayer->GetEngineObject()->GetAbsOrigin().z + pPlayer->WorldAlignMins().z;
+	float feet = pPlayer->GetEngineObject()->GetAbsOrigin().z + pPlayer->GetEngineObject()->WorldAlignMins().z;
 	float eyes = origin.z;
 	float zoffset = 0;
 	// moving up (negative pitch is up)

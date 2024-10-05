@@ -3813,8 +3813,8 @@ private:
 
 void CAI_BaseNPC::GetPlayerAvoidBounds( Vector *pMins, Vector *pMaxs )
 {
-	*pMins = WorldAlignMins();
-	*pMaxs = WorldAlignMaxs();
+	*pMins = GetEngineObject()->WorldAlignMins();
+	*pMaxs = GetEngineObject()->WorldAlignMaxs();
 }
 
 ConVar ai_debug_avoidancebounds( "ai_debug_avoidancebounds", "0" );
@@ -3840,7 +3840,7 @@ void CAI_BaseNPC::SetPlayerAvoidState( void )
 		if ( pLocalPlayer )
 		{
 			bShouldPlayerAvoid = IsBoxIntersectingBox(GetEngineObject()->GetAbsOrigin() + vMins, GetEngineObject()->GetAbsOrigin() + vMaxs,
-				pLocalPlayer->GetEngineObject()->GetAbsOrigin() + pLocalPlayer->WorldAlignMins(), pLocalPlayer->GetEngineObject()->GetAbsOrigin() + pLocalPlayer->WorldAlignMaxs() );
+				pLocalPlayer->GetEngineObject()->GetAbsOrigin() + pLocalPlayer->GetEngineObject()->WorldAlignMins(), pLocalPlayer->GetEngineObject()->GetAbsOrigin() + pLocalPlayer->GetEngineObject()->WorldAlignMaxs() );
 		}
 
 		if ( ai_debug_avoidancebounds.GetBool() )
@@ -4513,8 +4513,8 @@ void CAI_BaseNPC::CheckOnGround( void )
 				m_CheckOnGroundTimer.Set(0.5);
 
 				// check a shrunk box centered around the foot
-				Vector maxs = WorldAlignMaxs();
-				Vector mins = WorldAlignMins();
+				Vector maxs = GetEngineObject()->WorldAlignMaxs();
+				Vector mins = GetEngineObject()->WorldAlignMins();
 
 				if ( mins != maxs ) // some NPCs have no hull, so mins == maxs == vec3_origin
 				{
@@ -6567,9 +6567,9 @@ void CAI_BaseNPC::SetupVPhysicsHull()
 	{
 		// Disable collisions to get 
 		VPhysicsGetObject()->EnableCollisions(false);
-		VPhysicsDestroyObject();
+		GetEngineObject()->VPhysicsDestroyObject();
 	}
-	VPhysicsInitShadow( true, false );
+	GetEngineObject()->VPhysicsInitShadow( true, false );
 	IPhysicsObject *pPhysObj = VPhysicsGetObject();
 	if ( pPhysObj )
 	{
@@ -6585,7 +6585,7 @@ void CAI_BaseNPC::SetupVPhysicsHull()
 		}
 #endif
 		IPhysicsShadowController *pController = pPhysObj->GetShadowController();
-		float avgsize = (WorldAlignSize().x + WorldAlignSize().y) * 0.5;
+		float avgsize = (GetEngineObject()->WorldAlignSize().x + GetEngineObject()->WorldAlignSize().y) * 0.5;
 		pController->SetTeleportDistance( avgsize * 0.5 );
 		m_bCheckContacts = true;
 	}
@@ -6737,8 +6737,8 @@ bool CAI_BaseNPC::IsNavHullValid() const
 	Vector vecMins, vecMaxs;
 	if (GetEngineObject()->GetSolid() == SOLID_BBOX )
 	{
-		vecMins = WorldAlignMins();
-		vecMaxs = WorldAlignMaxs();
+		vecMins = GetEngineObject()->WorldAlignMins();
+		vecMaxs = GetEngineObject()->WorldAlignMaxs();
 	}
 	else if (GetEngineObject()->GetSolid() == SOLID_VPHYSICS )
 	{
@@ -8068,7 +8068,7 @@ void CAI_BaseNPC::SetDefaultEyeOffset ( void )
 			{
 				DevMsg( "WARNING: %s(%s) has no eye offset in .qc!\n", GetClassname(), STRING(GetEngineObject()->GetModelName()) );
 			}
-			VectorAdd( WorldAlignMins(), WorldAlignMaxs(), m_vDefaultEyeOffset );
+			VectorAdd(GetEngineObject()->WorldAlignMins(), GetEngineObject()->WorldAlignMaxs(), m_vDefaultEyeOffset );
 			m_vDefaultEyeOffset *= 0.75;
 		}
 	}
@@ -10064,8 +10064,8 @@ bool CAI_BaseNPC::BBoxFlat ( void )
 	float		flLength;
 	float		flLength2;
 
-	flXSize = WorldAlignSize().x / 2;
-	flYSize = WorldAlignSize().y / 2;
+	flXSize = GetEngineObject()->WorldAlignSize().x / 2;
+	flYSize = GetEngineObject()->WorldAlignSize().y / 2;
 
 	vecPoint.x = GetEngineObject()->GetAbsOrigin().x + flXSize;
 	vecPoint.y = GetEngineObject()->GetAbsOrigin().y + flYSize;
@@ -11886,7 +11886,7 @@ bool CAI_BaseNPC::CineCleanup()
 		GetEngineObject()->AddSolidFlags( FSOLID_NOT_SOLID );
 		SetState( NPC_STATE_DEAD );
 		m_lifeState = LIFE_DEAD;
-		UTIL_SetSize( this, WorldAlignMins(), Vector(WorldAlignMaxs().x, WorldAlignMaxs().y, WorldAlignMins().z + 2) );
+		UTIL_SetSize( this, GetEngineObject()->WorldAlignMins(), Vector(GetEngineObject()->WorldAlignMaxs().x, GetEngineObject()->WorldAlignMaxs().y, GetEngineObject()->WorldAlignMins().z + 2) );
 
 		if ( pOldCine && pOldCine->GetEngineObject()->HasSpawnFlags( SF_SCRIPT_LEAVECORPSE ) )
 		{

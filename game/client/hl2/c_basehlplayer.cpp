@@ -257,7 +257,7 @@ void C_BaseHLPlayer::PerformClientSideObstacleAvoidance( float flFrameTime, CUse
 	}
 
 	// Try to steer away from any objects/players we might interpenetrate
-	Vector size = WorldAlignSize();
+	Vector size = GetEngineObject()->WorldAlignSize();
 
 	float radius = 0.7f * sqrt( size.x * size.x + size.y * size.y );
 	float curspeed = GetEngineObject()->GetLocalVelocity().Length2D();

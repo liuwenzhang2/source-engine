@@ -67,7 +67,7 @@ public:
 
 	bool CreateVPhysics()
 	{
-		VPhysicsInitNormal( SOLID_VPHYSICS, 0, false );
+		GetEngineObject()->VPhysicsInitNormal( SOLID_VPHYSICS, 0, false );
 		return true;
 	}
 

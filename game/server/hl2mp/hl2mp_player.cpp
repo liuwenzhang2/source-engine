@@ -1577,7 +1577,7 @@ bool CHL2MP_Player::StartObserverMode(int mode)
 	//we only want to go into observer mode if the player asked to, not on a death timeout
 	if ( m_bEnterObserver == true )
 	{
-		VPhysicsDestroyObject();
+		GetEngineObject()->VPhysicsDestroyObject();
 		return BaseClass::StartObserverMode( mode );
 	}
 	return false;

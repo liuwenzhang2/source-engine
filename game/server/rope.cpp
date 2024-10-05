@@ -519,7 +519,7 @@ void CRopeKeyframe::UpdateBBox( bool bForceRelink )
 		vMin = vMax = Vector( 0, 0, 0 );
 	}
 
-	if ( WorldAlignMins() != vMin || WorldAlignMaxs() != vMax )
+	if (GetEngineObject()->WorldAlignMins() != vMin || GetEngineObject()->WorldAlignMaxs() != vMax )
 	{
 		UTIL_SetSize( this, vMin, vMax );
 	}
