@@ -7378,7 +7378,7 @@ void CCSPlayer::SelectDeathPose( const CTakeDamageInfo &info )
 		return;
 	}
 
-	SetDeathPose( SelectWeightedSequence( aActivity ) );
+	SetDeathPose(GetEngineObject()->SelectWeightedSequence( aActivity ) );
 	SetDeathPoseFrame( iDeathFrame );
 }
 

@@ -82,7 +82,6 @@ static ConVar dbganimmodel( "dbganimmodel", "" );
 
 C_EntityDissolve *DissolveEffect( C_BaseEntity *pTarget, float flTime );
 C_EntityFlame *FireEffect( C_BaseAnimating *pTarget, C_BaseEntity *pServerFire, float *flScaleEnd, float *flTimeStart, float *flTimeEnd );
-bool NPC_IsImportantNPC( C_BaseAnimating *pAnimating );
 void VCollideWireframe_ChangeCallback( IConVar *pConVar, char const *pOldString, float flOldValue );
 
 ConVar vcollide_wireframe( "vcollide_wireframe", "0", FCVAR_CHEAT, "Render physics collision models in wireframe", VCollideWireframe_ChangeCallback );
@@ -127,7 +126,7 @@ BEGIN_PREDICTION_DATA( C_BaseAnimating )
 //	DEFINE_PRED_ARRAY( m_flPoseParameter, FIELD_FLOAT, MAXSTUDIOPOSEPARAM, FTYPEDESC_INSENDTABLE ),
 	//DEFINE_PRED_ARRAY_TOL( m_flEncodedController, FIELD_FLOAT, MAXSTUDIOBONECTRLS, FTYPEDESC_INSENDTABLE, 0.02f ),
 
-	DEFINE_FIELD( m_nPrevSequence, FIELD_INTEGER ),
+	//DEFINE_FIELD( m_nPrevSequence, FIELD_INTEGER ),
 	//DEFINE_FIELD( m_flPrevEventCycle, FIELD_FLOAT ),
 	//DEFINE_FIELD( m_flEventCycle, FIELD_FLOAT ),
 	//DEFINE_FIELD( m_nEventSequence, FIELD_INTEGER ),
@@ -186,7 +185,7 @@ BEGIN_DATADESC( C_ClientRagdoll )
 	DEFINE_AUTO_ARRAY( m_flScaleEnd, FIELD_FLOAT ),
 	DEFINE_AUTO_ARRAY( m_flScaleTimeStart, FIELD_FLOAT ),
 	DEFINE_AUTO_ARRAY( m_flScaleTimeEnd, FIELD_FLOAT ),
-	DEFINE_EMBEDDEDBYREF( m_pRagdoll ),
+	//DEFINE_EMBEDDEDBYREF( m_pRagdoll ),
 
 END_DATADESC()
 
@@ -230,15 +229,16 @@ void C_ClientRagdoll::OnRestore( void )
 			return;
 	}
 	
-	if ( m_pRagdoll == NULL )
+	if ( !GetEngineObject()->RagdollBoneCount())
 		 return;
 
-	ragdoll_t *pRagdollT = m_pRagdoll->GetRagdoll();
+	ragdoll_t *pRagdollT = GetEngineObject()->GetRagdoll();
 
 	if ( pRagdollT == NULL || pRagdollT->list[0].pObject == NULL )
 	{
 		m_bReleaseRagdoll = true;
-		m_pRagdoll = NULL;
+		//m_pRagdoll = NULL;
+		Error("Attempted to restore a ragdoll without physobjects!");
 		Assert( !"Attempted to restore a ragdoll without physobjects!" );
 		return;
 	}
@@ -267,7 +267,7 @@ void C_ClientRagdoll::OnRestore( void )
 	RagdollActivate( *pRagdollT, modelinfo->GetVCollide(GetEngineObject()->GetModelIndex() ), GetEngineObject()->GetModelIndex(), true );
 	RagdollSetupAnimatedFriction( physenv, pRagdollT, GetEngineObject()->GetModelIndex() );
 
-	m_pRagdoll->BuildRagdollBounds( this );
+	GetEngineObject()->BuildRagdollBounds( this );
 
 	// UNDONE: The shadow & leaf system cleanup should probably be in C_BaseEntity::OnRestore()
 	// this must be recomputed because the model was NULL when this was set up
@@ -322,7 +322,7 @@ void C_ClientRagdoll::ImpactTrace( trace_t *pTrace, int iDamageType, const char 
 		pPhysicsObject->ApplyForceOffset( dir, hitpos );	
 	}
 
-	m_pRagdoll->ResetRagdollSleepAfterTime();
+	GetEngineObject()->ResetRagdollSleepAfterTime();
 }
 
 ConVar g_debug_ragdoll_visualize( "g_debug_ragdoll_visualize", "0", FCVAR_CHEAT );
@@ -335,10 +335,10 @@ void C_ClientRagdoll::HandleAnimatedFriction( void )
 	ragdoll_t *pRagdollT = NULL;
 	int iBoneCount = 0;
 
-	if ( m_pRagdoll )
+	if ( GetEngineObject()->RagdollBoneCount() )
 	{
-		pRagdollT = m_pRagdoll->GetRagdoll();
-		iBoneCount = m_pRagdoll->RagdollBoneCount();
+		pRagdollT = GetEngineObject()->GetRagdoll();
+		iBoneCount = GetEngineObject()->RagdollBoneCount();
 
 	}
 
@@ -480,8 +480,8 @@ void C_ClientRagdoll::ClientThink( void )
 	{
 		Vector vMins, vMaxs;
 			
-		Vector origin = m_pRagdoll->GetRagdollOrigin();
-		m_pRagdoll->GetRagdollBounds( vMins, vMaxs );
+		Vector origin = GetEngineObject()->GetRagdollOrigin();
+		GetEngineObject()->GetRagdollBounds( vMins, vMaxs );
 
 		debugoverlay->AddBoxOverlay( origin, vMins, vMaxs, QAngle( 0, 0, 0 ), 0, 255, 0, 16, 0 );
 	}
@@ -497,7 +497,7 @@ void C_ClientRagdoll::ClientThink( void )
 float C_ClientRagdoll::LastBoneChangedTime()
 {
 	// When did this last change?
-	return m_pRagdoll ? m_pRagdoll->GetLastVPhysicsUpdateTime() : -FLT_MAX;
+	return GetEngineObject()->RagdollBoneCount() ? GetEngineObject()->GetLastVPhysicsUpdateTime() : -FLT_MAX;
 }
 
 
@@ -581,10 +581,8 @@ C_BaseAnimating::C_BaseAnimating()
 {
 	m_ClientSideAnimationListHandle = INVALID_CLIENTSIDEANIMATION_LIST_HANDLE;
 
-	m_nPrevSequence = -1;
-	m_nRestoreSequence = -1;
-	m_pRagdoll		= NULL;
-	m_builtRagdoll = false;
+
+	//m_pRagdoll		= NULL;
 	m_hitboxBoneCacheHandle = 0;
 
 
@@ -595,11 +593,7 @@ C_BaseAnimating::C_BaseAnimating()
 	m_iMostRecentBoneSetupRequest = g_iPreviousBoneCounter - 1;
 	m_flLastBoneSetupTime = -FLT_MAX;
 
-	m_vecPreRagdollMins = vec3_origin;
-	m_vecPreRagdollMaxs = vec3_origin;
-
-	m_bStoreRagdollInfo = false;
-	m_pRagdollInfo = NULL;
+	
 	m_pJiggleBones = NULL;
 	m_pBoneMergeCache = NULL;
 
@@ -652,8 +646,7 @@ C_BaseAnimating::~C_BaseAnimating()
 		g_PreviousBoneSetups.FastRemove( i );
 
 	TermRopes();
-	delete m_pRagdollInfo;
-	Assert(!m_pRagdoll);
+	//Assert(!m_pRagdoll);
 	delete m_pIk;
 	delete m_pBoneMergeCache;
 	Studio_DestroyBoneCache( m_hitboxBoneCacheHandle );
@@ -683,12 +676,12 @@ int C_BaseAnimating::VPhysicsGetObjectList( IPhysicsObject **pList, int listMax 
 	if ( IsRagdoll() )
 	{
 		int i;
-		for ( i = 0; i < m_pRagdoll->RagdollBoneCount(); ++i )
+		for ( i = 0; i < GetEngineObject()->RagdollBoneCount(); ++i )
 		{
 			if ( i >= listMax )
 				break;
 
-			pList[i] = m_pRagdoll->GetElement(i);
+			pList[i] = GetEngineObject()->GetElement(i);
 		}
 		return i;
 	}
@@ -1116,7 +1109,7 @@ void C_BaseAnimating::BuildTransformations( IStudioHdr *hdr, Vector *pos, Quater
 	memset( boneSimulated, 0, sizeof(boneSimulated) );
 	mstudiobone_t *pbones = hdr->pBone( 0 );
 
-	if ( m_pRagdoll )
+	if (GetEngineObject()->RagdollBoneCount())
 	{
 		// simulate bones and update flags
 		int oldWritableBones = m_BoneAccessor.GetWritableBones();
@@ -1131,7 +1124,7 @@ void C_BaseAnimating::BuildTransformations( IStudioHdr *hdr, Vector *pos, Quater
 			 !CReplayRagdollCache::Instance().GetFrame( this, engine->GetDemoPlaybackTick(), boneSimulated, &m_BoneAccessor ) )
 #endif
 		{
-			m_pRagdoll->RagdollBone( this, pbones, hdr->numbones(), boneSimulated, m_BoneAccessor );
+			GetEngineObject()->RagdollBone( this, pbones, hdr->numbones(), boneSimulated, m_BoneAccessor );
 		}
 		
 		m_BoneAccessor.SetWritableBones( oldWritableBones );
@@ -1303,134 +1296,7 @@ void C_BaseAnimating::ApplyBoneMatrixTransform( matrix3x4_t& transform )
 	}
 }
 
-void C_BaseAnimating::CreateUnragdollInfo( C_BaseAnimating *pRagdoll )
-{
-	IStudioHdr *hdr = GetEngineObject()->GetModelPtr();
-	if ( !hdr )
-	{
-		return;
-	}
 
-	// It's already an active ragdoll, sigh
-	if ( m_pRagdollInfo && m_pRagdollInfo->m_bActive )
-	{
-		Assert( 0 );
-		return;
-	}
-
-	// Now do the current bone setup
-	pRagdoll->SetupBones( NULL, -1, BONE_USED_BY_ANYTHING, gpGlobals->curtime );
-
-	matrix3x4_t parentTransform;
-	QAngle newAngles( 0, pRagdoll->GetEngineObject()->GetAbsAngles()[YAW], 0 );
-
-	AngleMatrix(GetEngineObject()->GetAbsAngles(), GetEngineObject()->GetAbsOrigin(), parentTransform );
-	// pRagdoll->SaveRagdollInfo( hdr->numbones, parentTransform, m_BoneAccessor );
-	
-	if ( !m_pRagdollInfo )
-	{
-		m_pRagdollInfo = new RagdollInfo_t;
-		Assert( m_pRagdollInfo );
-		if ( !m_pRagdollInfo )
-		{
-			Msg( "Memory allocation of RagdollInfo_t failed!\n" );
-			return;
-		}
-	}
-
-	Q_memset( m_pRagdollInfo, 0, sizeof( *m_pRagdollInfo ) );
-
-	int numbones = hdr->numbones();
-
-	m_pRagdollInfo->m_bActive = true;
-	m_pRagdollInfo->m_flSaveTime = gpGlobals->curtime;
-	m_pRagdollInfo->m_nNumBones = numbones;
-
-	for ( int i = 0;  i < numbones; i++ )
-	{
-		matrix3x4_t inverted;
-		matrix3x4_t output;
-
-		if ( hdr->boneParent(i) == -1 )
-		{
-			// Decompose into parent space
-			MatrixInvert( parentTransform, inverted );
-		}
-		else
-		{
-			MatrixInvert( pRagdoll->m_BoneAccessor.GetBone( hdr->boneParent(i) ), inverted );
-		}
-
-		ConcatTransforms( inverted, pRagdoll->m_BoneAccessor.GetBone( i ), output );
-
-		MatrixAngles( output, 
-			m_pRagdollInfo->m_rgBoneQuaternion[ i ],
-			m_pRagdollInfo->m_rgBonePos[ i ] );
-	}
-}
-
-void C_BaseAnimating::SaveRagdollInfo( int numbones, const matrix3x4_t &cameraTransform, CBoneAccessor &pBoneToWorld )
-{
-	IStudioHdr *hdr = GetEngineObject()->GetModelPtr();
-	if ( !hdr )
-	{
-		return;
-	}
-
-	if ( !m_pRagdollInfo )
-	{
-		m_pRagdollInfo = new RagdollInfo_t;
-		Assert( m_pRagdollInfo );
-		if ( !m_pRagdollInfo )
-		{
-			Msg( "Memory allocation of RagdollInfo_t failed!\n" );
-			return;
-		}
-		memset( m_pRagdollInfo, 0, sizeof( *m_pRagdollInfo ) );
-	}
-
-	mstudiobone_t *pbones = hdr->pBone( 0 );
-
-	m_pRagdollInfo->m_bActive = true;
-	m_pRagdollInfo->m_flSaveTime = gpGlobals->curtime;
-	m_pRagdollInfo->m_nNumBones = numbones;
-
-	for ( int i = 0;  i < numbones; i++ )
-	{
-		matrix3x4_t inverted;
-		matrix3x4_t output;
-
-		if ( pbones[i].parent == -1 )
-		{
-			// Decompose into parent space
-			MatrixInvert( cameraTransform, inverted );
-		}
-		else
-		{
-			MatrixInvert( pBoneToWorld.GetBone( pbones[ i ].parent ), inverted );
-		}
-
-		ConcatTransforms( inverted, pBoneToWorld.GetBone( i ), output );
-
-		MatrixAngles( output, 
-			m_pRagdollInfo->m_rgBoneQuaternion[ i ],
-			m_pRagdollInfo->m_rgBonePos[ i ] );
-	}
-}
-
-bool C_BaseAnimating::RetrieveRagdollInfo( Vector *pos, Quaternion *q )
-{
-	if ( !m_bStoreRagdollInfo || !m_pRagdollInfo || !m_pRagdollInfo->m_bActive )
-		return false;
-
-	for ( int i = 0; i < m_pRagdollInfo->m_nNumBones; i++ )
-	{
-		pos[ i ] = m_pRagdollInfo->m_rgBonePos[ i ];
-		q[ i ] = m_pRagdollInfo->m_rgBoneQuaternion[ i ];
-	}
-
-	return true;
-}
 
 //-----------------------------------------------------------------------------
 // Should we collide?
@@ -1499,40 +1365,7 @@ void C_BaseAnimating::MaintainSequenceTransitions( IBoneSetup &boneSetup, float 
 	}
 }
 
-//-----------------------------------------------------------------------------
-// Purpose: 
-// Input  : *hdr - 
-//			pos[] - 
-//			q[] - 
-//-----------------------------------------------------------------------------
-void C_BaseAnimating::UnragdollBlend( IStudioHdr *hdr, Vector pos[], Quaternion q[], float currentTime )
-{
-	if ( !hdr )
-	{
-		return;
-	}
 
-	if ( !m_pRagdollInfo || !m_pRagdollInfo->m_bActive )
-		return;
-
-	float dt = currentTime - m_pRagdollInfo->m_flSaveTime;
-	if ( dt > 0.2f )
-	{
-		m_pRagdollInfo->m_bActive = false;
-		return;
-	}
-
-	// Slerp bone sets together
-	float frac = dt / 0.2f;
-	frac = clamp( frac, 0.0f, 1.0f );
-
-	int i;
-	for ( i = 0; i < hdr->numbones(); i++ )
-	{
-		VectorLerp( m_pRagdollInfo->m_rgBonePos[ i ], pos[ i ], frac, pos[ i ] );
-		QuaternionSlerp( m_pRagdollInfo->m_rgBoneQuaternion[ i ], q[ i ], frac, q[ i ] );
-	}
-}
 
 void C_BaseAnimating::AccumulateLayers( IBoneSetup &boneSetup, Vector pos[], Quaternion q[], float currentTime )
 {
@@ -1639,7 +1472,7 @@ void C_BaseAnimating::StandardBlendingRules( IStudioHdr *hdr, Vector pos[], Quat
 
 	//ChildLayerBlend( pos, q, currentTime, boneMask );
 
-	UnragdollBlend( hdr, pos, q, currentTime );
+	GetEngineObject()->UnragdollBlend( hdr, pos, q, currentTime );
 
 #ifdef STUDIO_ENABLE_PERF_COUNTERS
 #if _DEBUG
@@ -2805,7 +2638,7 @@ void C_BaseAnimating::DoInternalDrawModel( ClientModelRenderInfo_t *pInfo, DrawM
 	{
 		if ( IsRagdoll() )
 		{
-			m_pRagdoll->DrawWireframe();
+			GetEngineObject()->DrawWireframe();
 		}
 		else if (GetEngineObject()->IsSolid() && GetEngineObject()->GetSolid() == SOLID_VPHYSICS )
 		{
@@ -3847,7 +3680,7 @@ void C_BaseAnimating::ResetLatched( void )
 bool C_BaseAnimating::Interpolate( float flCurrentTime )
 {
 	// ragdolls don't need interpolation
-	if ( m_pRagdoll )
+	if (GetEngineObject()->RagdollBoneCount())
 		return true;
 
 	VPROF( "C_BaseAnimating::Interpolate" );
@@ -3887,7 +3720,7 @@ bool C_BaseAnimating::Interpolate( float flCurrentTime )
 //-----------------------------------------------------------------------------
 bool C_BaseAnimating::IsRagdoll() const
 {
-	return m_pRagdoll && (m_nRenderFX == kRenderFxRagdoll);
+	return GetEngineObject()->RagdollBoneCount() && (m_nRenderFX == kRenderFxRagdoll);
 }
 
 //-----------------------------------------------------------------------------
@@ -3924,7 +3757,7 @@ void C_BaseAnimating::GetRenderBounds( Vector& theMins, Vector& theMaxs )
 {
 	if ( IsRagdoll() )
 	{
-		m_pRagdoll->GetRagdollBounds( theMins, theMaxs );
+		GetEngineObject()->GetRagdollBounds( theMins, theMaxs );
 	}
 	else if ( GetModel() )
 	{
@@ -3972,7 +3805,7 @@ const Vector& C_BaseAnimating::GetRenderOrigin( void )
 {
 	if ( IsRagdoll() )
 	{
-		return m_pRagdoll->GetRagdollOrigin();
+		return GetEngineObject()->GetRagdollOrigin();
 	}
 	else
 	{
@@ -3995,11 +3828,11 @@ const QAngle& C_BaseAnimating::GetRenderAngles( void )
 
 void C_BaseAnimating::RagdollMoved( void ) 
 {
-	GetEngineObject()->SetAbsOrigin( m_pRagdoll->GetRagdollOrigin() );
+	GetEngineObject()->SetAbsOrigin(GetEngineObject()->GetRagdollOrigin() );
 	GetEngineObject()->SetAbsAngles( vec3_angle );
 
 	Vector mins, maxs;
-	m_pRagdoll->GetRagdollBounds( mins, maxs );
+	GetEngineObject()->GetRagdollBounds( mins, maxs );
 	GetEngineObject()->SetCollisionBounds( mins, maxs );
 
 	// If the ragdoll moves, its render-to-texture shadow is dirty
@@ -4016,7 +3849,7 @@ void C_BaseAnimating::VPhysicsUpdate( IPhysicsObject *pPhysics )
 	// is the ragdoll physics object, but I think it's pretty safe not to check
 	if (IsRagdoll())
 	{	 
-		m_pRagdoll->VPhysicsUpdate( pPhysics );
+		GetEngineObject()->VPhysicsUpdate( pPhysics );
 		
 		RagdollMoved();
 
@@ -4105,147 +3938,24 @@ void C_BaseAnimating::GetRagdollInitBoneArrays( matrix3x4_t *pDeltaBones0, matri
 	}
 }
 
-C_BaseAnimating *C_BaseAnimating::CreateRagdollCopy()
-{
-	//Adrian: We now create a separate entity that becomes this entity's ragdoll.
-	//That way the server side version of this entity can go away. 
-	//Plus we can hook save/restore code to these ragdolls so they don't fall on restore anymore.
-	C_ClientRagdoll *pRagdoll = (C_ClientRagdoll*)cl_entitylist->CreateEntityByName( "C_ClientRagdoll" );//false
-	if ( pRagdoll == NULL )
-		return NULL;
 
-	TermRopes();
 
-	const model_t *model = GetModel();
-	const char *pModelName = modelinfo->GetModelName( model );
-
-	if ( pRagdoll->InitializeAsClientEntity( pModelName, RENDER_GROUP_OPAQUE_ENTITY ) == false )
-	{
-		DestroyEntity(pRagdoll);// ->Release();
-		return NULL;
-	}
-
-	// move my current model instance to the ragdoll's so decals are preserved.
-	SnatchModelInstance( pRagdoll );
-
-	// We need to take these from the entity
-	pRagdoll->GetEngineObject()->SetAbsOrigin(GetEngineObject()->GetAbsOrigin() );
-	pRagdoll->GetEngineObject()->SetAbsAngles(GetEngineObject()->GetAbsAngles() );
-
-	pRagdoll->IgniteRagdoll( this );
-	pRagdoll->TransferDissolveFrom( this );
-	pRagdoll->InitModelEffects();
-
-	if ( AddRagdollToFadeQueue() == true )
-	{
-		pRagdoll->m_bImportant = NPC_IsImportantNPC( this );
-		s_RagdollLRU.MoveToTopOfLRU( pRagdoll, pRagdoll->m_bImportant );
-		pRagdoll->m_bFadeOut = true;
-	}
-
-	m_builtRagdoll = true;
-	GetEngineObject()->AddEffects( EF_NODRAW );
-
-	if (GetEngineObject()->IsEffectActive( EF_NOSHADOW ) )
-	{
-		pRagdoll->GetEngineObject()->AddEffects( EF_NOSHADOW );
-	}
-
-	pRagdoll->m_nRenderFX = kRenderFxRagdoll;
-	pRagdoll->SetRenderMode( GetRenderMode() );
-	pRagdoll->SetRenderColor( GetRenderColor().r, GetRenderColor().g, GetRenderColor().b, GetRenderColor().a );
-
-	pRagdoll->GetEngineObject()->SetBody(GetEngineObject()->GetBody());
-	pRagdoll->GetEngineObject()->SetSkin(GetSkin());
-	pRagdoll->GetEngineObject()->SetVecForce(GetEngineObject()->GetVecForce());
-	pRagdoll->GetEngineObject()->SetForceBone(GetEngineObject()->GetForceBone());
-	pRagdoll->SetNextClientThink( CLIENT_THINK_ALWAYS );
-
-	pRagdoll->GetEngineObject()->SetModelName( AllocPooledString(pModelName) );
-	pRagdoll->GetEngineObject()->SetModelScale(GetEngineObject()->GetModelScale() );
-	return pRagdoll;
-}
-
-C_BaseAnimating *C_BaseAnimating::BecomeRagdollOnClient()
+C_BaseEntity *C_BaseAnimating::BecomeRagdollOnClient()
 {
 	MoveToLastReceivedPosition( true );
 	GetEngineObject()->GetAbsOrigin();
-	C_BaseAnimating *pRagdoll = CreateRagdollCopy();
+	C_BaseEntity *pRagdoll = GetEngineObject()->CreateRagdollCopy();
 
 	matrix3x4_t boneDelta0[MAXSTUDIOBONES];
 	matrix3x4_t boneDelta1[MAXSTUDIOBONES];
 	matrix3x4_t currentBones[MAXSTUDIOBONES];
 	const float boneDt = 0.1f;
 	GetRagdollInitBoneArrays( boneDelta0, boneDelta1, currentBones, boneDt );
-	pRagdoll->InitAsClientRagdoll( boneDelta0, boneDelta1, currentBones, boneDt );
+	pRagdoll->GetEngineObject()->InitAsClientRagdoll( boneDelta0, boneDelta1, currentBones, boneDt );
 	return pRagdoll;
 }
 
-bool C_BaseAnimating::InitAsClientRagdoll( const matrix3x4_t *pDeltaBones0, const matrix3x4_t *pDeltaBones1, const matrix3x4_t *pCurrentBonePosition, float boneDt, bool bFixedConstraints )
-{
-	IStudioHdr *hdr = GetEngineObject()->GetModelPtr();
-	if ( !hdr || m_pRagdoll || m_builtRagdoll )
-		return false;
 
-	m_builtRagdoll = true;
-
-	// Store off our old mins & maxs
-	m_vecPreRagdollMins = GetEngineObject()->WorldAlignMins();
-	m_vecPreRagdollMaxs = GetEngineObject()->WorldAlignMaxs();
-
-
-	// Force MOVETYPE_STEP interpolation
-	MoveType_t savedMovetype = GetEngineObject()->GetMoveType();
-	GetEngineObject()->SetMoveType( MOVETYPE_STEP );
-
-	// HACKHACK: force time to last interpolation position
-	GetEngineObject()->SetPlaybackRate(1);
-	
-	m_pRagdoll = CreateRagdoll( this, hdr, GetEngineObject()->GetVecForce(), GetEngineObject()->GetForceBone(), pDeltaBones0, pDeltaBones1, pCurrentBonePosition, boneDt, bFixedConstraints);
-
-	// Cause the entity to recompute its shadow	type and make a
-	// version which only updates when physics state changes
-	// NOTE: We have to do this after m_pRagdoll is assigned above
-	// because that's what ShadowCastType uses to figure out which type of shadow to use.
-	DestroyShadow();
-	CreateShadow();
-
-	// Cache off ragdoll bone positions/quaternions
-	if ( m_bStoreRagdollInfo && m_pRagdoll )
-	{
-		matrix3x4_t parentTransform;
-		AngleMatrix(GetEngineObject()->GetAbsAngles(), GetEngineObject()->GetAbsOrigin(), parentTransform );
-		// FIXME/CHECK:  This might be too expensive to do every frame???
-		SaveRagdollInfo( hdr->numbones(), parentTransform, m_BoneAccessor );
-	}
-	
-	GetEngineObject()->SetMoveType( savedMovetype );
-
-	// Now set the dieragdoll sequence to get transforms for all
-	// non-simulated bones
-	m_nRestoreSequence = GetEngineObject()->GetSequence();
-	GetEngineObject()->SetSequence( SelectWeightedSequence( ACT_DIERAGDOLL ) );
-	m_nPrevSequence = GetEngineObject()->GetSequence();
-	GetEngineObject()->SetPlaybackRate(0);
-	UpdatePartitionListEntry();
-
-	NoteRagdollCreationTick( this );
-
-	UpdateVisibility();
-
-#if defined( REPLAY_ENABLED )
-	// If Replay is enabled on server, add an entry to the ragdoll recorder for this entity
-	ConVar* pReplayEnable = (ConVar*)cvar->FindVar( "replay_enable" );
-	if ( m_pRagdoll && pReplayEnable && pReplayEnable->GetInt() && !engine->IsPlayingDemo() && !engine->IsPlayingTimeDemo() )
-	{
-		CReplayRagdollRecorder& RagdollRecorder = CReplayRagdollRecorder::Instance();
-		int nStartTick = TIME_TO_TICKS( engine->GetLastTimeStamp() );
-		RagdollRecorder.AddEntry( this, nStartTick, m_pRagdoll->RagdollBoneCount() );
-	}
-#endif
-
-	return true;
-}
 
 
 
@@ -4255,87 +3965,11 @@ bool C_BaseAnimating::InitAsClientRagdoll( const matrix3x4_t *pDeltaBones0, cons
 //-----------------------------------------------------------------------------
 void C_BaseAnimating::OnDataChanged( DataUpdateType_t updateType )
 {
-	// don't let server change sequences after becoming a ragdoll
-	if ( m_pRagdoll && GetEngineObject()->GetSequence() != m_nPrevSequence )
-	{
-		GetEngineObject()->SetSequence( m_nPrevSequence );
-		GetEngineObject()->SetPlaybackRate(0);
-	}
 
-	if ( !m_pRagdoll && m_nRestoreSequence != -1 )
-	{
-		GetEngineObject()->SetSequence( m_nRestoreSequence );
-		m_nRestoreSequence = -1;
-	}
-
-	if (updateType == DATA_UPDATE_CREATED)
-	{
-		m_nPrevSequence = -1;
-		m_nRestoreSequence = -1;
-	}
-
-
-
-	bool modelchanged = false;
-
-	// UNDONE: The base class does this as well.  So this is kind of ugly
-	// but getting a model by index is pretty cheap...
-	const model_t *pModel = modelinfo->GetModel(GetEngineObject()->GetModelIndex() );
-	
-	if ( pModel != GetModel() )
-	{
-		modelchanged = true;
-	}
 
 	BaseClass::OnDataChanged( updateType );
 
-	if ( (updateType == DATA_UPDATE_CREATED) || modelchanged )
-	{
-		ResetLatched();
-		// if you have this pose parameter, activate HL1-style lipsync/wave envelope tracking
-		if (GetEngineObject()->LookupPoseParameter( LIPSYNC_POSEPARAM_NAME ) != -1 )
-		{
-			GetEngineObject()->MouthInfo().ActivateEnvelope();
-		}
-	}
-
-	// If there's a significant change, make sure the shadow updates
-	if ( modelchanged || (GetEngineObject()->GetSequence() != m_nPrevSequence))
-	{
-		GetEngineObject()->InvalidatePhysicsRecursive( ANIMATION_CHANGED );
-		m_nPrevSequence = GetEngineObject()->GetSequence();
-	}
-
-
-	// build a ragdoll if necessary
-	if ( m_nRenderFX == kRenderFxRagdoll && !m_builtRagdoll )
-	{
-		BecomeRagdollOnClient();
-	}
-
-	//HACKHACK!!!
-	if ( m_nRenderFX == kRenderFxRagdoll && m_builtRagdoll == true )
-	{
-		if ( m_pRagdoll == NULL )
-			GetEngineObject()->AddEffects( EF_NODRAW );
-	}
-
-	if ( m_pRagdoll && m_nRenderFX != kRenderFxRagdoll )
-	{
-		ClearRagdoll();
-	}
-
-	// If ragdolling and get EF_NOINTERP, we probably were dead and are now respawning,
-	//  don't do blend out of ragdoll at respawn spot.
-	if ( IsNoInterpolationFrame() && 
-		m_pRagdollInfo &&
-		m_pRagdollInfo->m_bActive )
-	{
-		Msg( "delete ragdoll due to nointerp\n" );
-		// Remove ragdoll info
-		delete m_pRagdollInfo;
-		m_pRagdollInfo = NULL;
-	}
+	
 }
 
 //-----------------------------------------------------------------------------
@@ -4448,10 +4082,6 @@ void C_BaseAnimating::Simulate()
 	{
 		ResetLatched();
 	}
-	if (GetEngineObject()->GetSequence() != -1 && m_pRagdoll && ( m_nRenderFX != kRenderFxRagdoll ) )
-	{
-		ClearRagdoll();
-	}
 }
 
 
@@ -4517,7 +4147,7 @@ bool C_BaseAnimating::TestHitboxes( const Ray_t &ray, unsigned int fContentsMask
 		tr.surface.surfaceProps = physprops->GetSurfaceIndex( pBone->pszSurfaceProp() );
 		if ( IsRagdoll() )
 		{
-			IPhysicsObject *pReplace = m_pRagdoll->GetElement( tr.physicsbone );
+			IPhysicsObject *pReplace = GetEngineObject()->GetElement( tr.physicsbone );
 			if ( pReplace )
 			{
 				GetEngineObject()->VPhysicsSetObject( NULL );
@@ -4936,20 +4566,7 @@ void C_BaseAnimating::DrawClientHitboxes( float duration /*= 0.0f*/, bool monoco
 }
 
 
-//-----------------------------------------------------------------------------
-// Purpose: 
-// Input  : activity - 
-// Output : int C_BaseAnimating::SelectWeightedSequence
-//-----------------------------------------------------------------------------
-int C_BaseAnimating::SelectWeightedSequence ( int activity )
-{
-	Assert( activity != ACT_INVALID );
-	if (!GetEngineObject()->GetModelPtr()) {
-		return -1;
-	}
-	return GetEngineObject()->GetModelPtr()->SelectWeightedSequence( activity ,-1, SharedRandomSelect);
 
-}
 
 
 
@@ -4968,7 +4585,6 @@ int C_BaseAnimating::LookupSequence( const char *label )
 
 void C_BaseAnimating::Release()
 {
-	ClearRagdoll();
 	BaseClass::Release();
 }
 
@@ -4981,47 +4597,7 @@ void C_BaseAnimating::Clear( void )
 	BaseClass::Clear();	
 }
 
-//-----------------------------------------------------------------------------
-// Purpose: Clear current ragdoll
-//-----------------------------------------------------------------------------
-void C_BaseAnimating::ClearRagdoll()
-{
-	if ( m_pRagdoll )
-	{
-		// immediately mark the member ragdoll as being NULL,
-		// so that we have no reentrancy problems with the delete
-		// (such as the disappearance of the ragdoll physics waking up
-		// IVP which causes other objects to move and have a touch 
-		// callback on the ragdoll entity, which was a crash on TF)
-		// That is to say: it is vital that the member be cleared out
-		// BEFORE the delete occurs.
-		CRagdoll * RESTRICT pDoomed = m_pRagdoll;
-		m_pRagdoll = NULL;
 
-		delete pDoomed;
-
-		// Set to null so that the destructor's call to DestroyObject won't destroy
-		//  m_pObjects[ 0 ] twice since that's the physics object for the prop
-		GetEngineObject()->VPhysicsSetObject( NULL );
-
-		// If we have ragdoll mins/maxs, we've just come out of ragdoll, so restore them
-		if ( m_vecPreRagdollMins != vec3_origin || m_vecPreRagdollMaxs != vec3_origin )
-		{
-			GetEngineObject()->SetCollisionBounds( m_vecPreRagdollMins, m_vecPreRagdollMaxs );
-		}
-
-#if defined( REPLAY_ENABLED )
-		// Delete entry from ragdoll recorder if Replay is enabled on server
-		ConVar* pReplayEnable = (ConVar*)cvar->FindVar( "replay_enable" );
-		if ( pReplayEnable && pReplayEnable->GetInt() && !engine->IsPlayingDemo() && !engine->IsPlayingTimeDemo() )
-		{
-			CReplayRagdollRecorder& RagdollRecorder = CReplayRagdollRecorder::Instance();
-			RagdollRecorder.StopRecordingRagdoll( this );
-		}
-#endif
-	}
-	m_builtRagdoll = false;
-}
 
 //-----------------------------------------------------------------------------
 // Purpose: Looks up an activity by name.

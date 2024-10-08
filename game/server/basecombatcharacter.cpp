@@ -977,7 +977,7 @@ Activity CBaseCombatCharacter::GetDeathActivity ( void )
 
 
 	// can we perform the prescribed death?
-	if ( SelectWeightedSequence ( deathActivity ) == ACTIVITY_NOT_AVAILABLE )
+	if (GetEngineObject()->SelectWeightedSequence ( deathActivity ) == ACTIVITY_NOT_AVAILABLE )
 	{
 		// no! did we fail to perform a directional death? 
 		if ( fTriedDirection )
@@ -999,12 +999,12 @@ Activity CBaseCombatCharacter::GetDeathActivity ( void )
 		}
 	}
 
-	if ( SelectWeightedSequence ( deathActivity ) == ACTIVITY_NOT_AVAILABLE )
+	if (GetEngineObject()->SelectWeightedSequence ( deathActivity ) == ACTIVITY_NOT_AVAILABLE )
 	{
 		// if we're still invalid, simple is our only option.
 		deathActivity = ACT_DIESIMPLE;
 
-		if ( SelectWeightedSequence ( deathActivity ) == ACTIVITY_NOT_AVAILABLE )
+		if (GetEngineObject()->SelectWeightedSequence ( deathActivity ) == ACTIVITY_NOT_AVAILABLE )
 		{
 			Msg( "ERROR! %s missing ACT_DIESIMPLE\n", STRING(GetEngineObject()->GetModelName()) );
 		}
@@ -2315,7 +2315,7 @@ bool CBaseCombatCharacter::Weapon_CanUse( CBaseCombatWeapon *pWeapon )
 			// The NPC might translate the weapon activity into another activity
 			Activity translatedActivity = NPC_TranslateActivity( (Activity)(pTable->weaponAct) );
 
-			if ( SelectWeightedSequence(translatedActivity) == ACTIVITY_NOT_AVAILABLE )
+			if (GetEngineObject()->SelectWeightedSequence(translatedActivity) == ACTIVITY_NOT_AVAILABLE )
 			{
 				return false;
 			}

@@ -511,7 +511,7 @@ void CBaseServerVehicle::GetPassengerSeatPoint( int nRole, Vector *pPoint, QAngl
 		char pAttachmentName[32];
 		Q_snprintf( pAttachmentName, sizeof( pAttachmentName ), "vehicle_feet_passenger%d", nRole );
 		int nFeetAttachmentIndex = pAnimating->LookupAttachment(pAttachmentName);
-		int nIdleSequence = pAnimating->SelectWeightedSequence( ACT_IDLE );
+		int nIdleSequence = pAnimating->GetEngineObject()->SelectWeightedSequence( ACT_IDLE );
 		if ( nFeetAttachmentIndex > 0 && nIdleSequence != -1 )
 		{
 			// FIXME: This really wants to be a faster query than this implementation!
@@ -1486,7 +1486,7 @@ void CBaseServerVehicle::HandleEntryExitFinish( bool bExitAnimOn, bool bResetAni
 	if ( bResetAnim )
 	{
 		// Start the vehicle idling again
-		int iSequence = pAnimating->SelectWeightedSequence( ACT_IDLE );
+		int iSequence = pAnimating->GetEngineObject()->SelectWeightedSequence( ACT_IDLE );
 		if ( iSequence > ACTIVITY_NOT_AVAILABLE )
 		{
 			pAnimating->GetEngineObject()->SetCycle( 0 );

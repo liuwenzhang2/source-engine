@@ -689,8 +689,8 @@ void CBasePlayerAnimState::ComputePoseParam_MoveYaw( IStudioHdr *pStudioHdr )
 				// doesn't always use the same idle.
 				if ( pLayer->m_flWeight < 0.02f || m_iCurrent8WayIdleSequence == -1 )
 				{
-					m_iCurrent8WayIdleSequence = m_pOuter->SelectWeightedSequence( ACT_IDLE );
-					m_iCurrent8WayCrouchIdleSequence = m_pOuter->SelectWeightedSequence( ACT_CROUCHIDLE );
+					m_iCurrent8WayIdleSequence = m_pOuter->GetEngineObject()->SelectWeightedSequence( ACT_IDLE );
+					m_iCurrent8WayCrouchIdleSequence = m_pOuter->GetEngineObject()->SelectWeightedSequence( ACT_CROUCHIDLE );
 				}
 
 				if ( m_eCurrentMainSequenceActivity == ACT_CROUCHIDLE || m_eCurrentMainSequenceActivity == ACT_RUN_CROUCH )
@@ -1074,6 +1074,6 @@ void CBasePlayerAnimState::DebugShowAnimStateFull( int iStartLine )
 // -----------------------------------------------------------------------------
 int CBasePlayerAnimState::SelectWeightedSequence( Activity activity ) 
 {
-	return GetOuter()->SelectWeightedSequence( activity ); 
+	return GetOuter()->GetEngineObject()->SelectWeightedSequence( activity );
 }
 

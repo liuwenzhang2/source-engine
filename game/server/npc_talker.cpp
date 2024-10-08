@@ -283,12 +283,12 @@ Activity CNPCSimpleTalker::NPC_TranslateActivity( Activity eNewActivity )
 {
 	if ((eNewActivity == ACT_IDLE)										&& 
 		(GetExpresser()->IsSpeaking())										&&
-		(SelectWeightedSequence ( ACT_SIGNAL3 ) != ACTIVITY_NOT_AVAILABLE)	)
+		(GetEngineObject()->SelectWeightedSequence ( ACT_SIGNAL3 ) != ACTIVITY_NOT_AVAILABLE)	)
 	{
 		return ACT_SIGNAL3;
 	}
 	else if ((eNewActivity == ACT_SIGNAL3)									&& 
-			 (SelectWeightedSequence ( ACT_SIGNAL3 ) == ACTIVITY_NOT_AVAILABLE)	)
+			 (GetEngineObject()->SelectWeightedSequence ( ACT_SIGNAL3 ) == ACTIVITY_NOT_AVAILABLE)	)
 	{
 		return ACT_IDLE;
 	}

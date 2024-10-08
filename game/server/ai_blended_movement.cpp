@@ -459,14 +459,14 @@ int CAI_BlendedMotor::GetInteriorSequence( int fromSequence )
 			Activity activity = ( Activity )GetOuter()->LookupActivity( szActivity );
 			if ( activity != ACT_INVALID )
 			{
-				m_nInteriorSequence = GetOuter()->SelectWeightedSequence( GetOuter()->TranslateActivity( activity ), fromSequence );
+				m_nInteriorSequence = GetOuter()->GetEngineObject()->SelectWeightedSequence( GetOuter()->TranslateActivity( activity ), fromSequence );
 			}
 			else
 			{
 				activity = (Activity)GetOuter()->GetActivityID( szActivity );
 				if ( activity != ACT_INVALID )
 				{
-					m_nInteriorSequence = GetOuter()->SelectWeightedSequence( GetOuter()->TranslateActivity( activity ), fromSequence );
+					m_nInteriorSequence = GetOuter()->GetEngineObject()->SelectWeightedSequence( GetOuter()->TranslateActivity( activity ), fromSequence );
 				}
 			}
 
@@ -488,7 +488,7 @@ int CAI_BlendedMotor::GetInteriorSequence( int fromSequence )
 		{
 			activity = ACT_IDLE;
 		}
-		m_nInteriorSequence = GetOuter()->SelectWeightedSequence( GetOuter()->TranslateActivity( activity ), fromSequence );
+		m_nInteriorSequence = GetOuter()->GetEngineObject()->SelectWeightedSequence( GetOuter()->TranslateActivity( activity ), fromSequence );
 
 		Assert( m_nInteriorSequence != ACT_INVALID );
 	}

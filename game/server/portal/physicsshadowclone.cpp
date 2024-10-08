@@ -69,8 +69,8 @@ CPhysicsShadowClone::CPhysicsShadowClone( void )
 
 CPhysicsShadowClone::~CPhysicsShadowClone( void )
 {
-	VPhysicsDestroyObject();
-	GetEngineObject()->VPhysicsSetObject( NULL );
+	//VPhysicsDestroyObject();
+	//GetEngineObject()->VPhysicsSetObject( NULL );
 	m_hClonedEntity = NULL;
 	s_ActiveShadowClones.FindAndRemove( this ); //also removed in UpdateOnRemove()
 	

@@ -652,7 +652,7 @@ void CPropAPC::Think( void )
 
 	if (GetEngineObject()->IsSequenceFinished() )
 	{
-		int iSequence = SelectWeightedSequence( ACT_IDLE );
+		int iSequence = GetEngineObject()->SelectWeightedSequence( ACT_IDLE );
 		if ( iSequence > ACTIVITY_NOT_AVAILABLE )
 		{
 			GetEngineObject()->SetCycle( 0 );

@@ -109,7 +109,7 @@ void CPropThumper::Spawn( void )
 	SetThink( &CPropThumper::Think );
 	GetEngineObject()->SetNextThink( gpGlobals->curtime + 1.0f );
 
-	int iSequence = SelectHeaviestSequence ( ACT_IDLE );
+	int iSequence = GetEngineObject()->SelectHeaviestSequence ( ACT_IDLE );
 
 	if ( iSequence != ACT_INVALID )
 	{

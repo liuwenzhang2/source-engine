@@ -184,7 +184,7 @@ void CHandGrenade::BounceTouch( CBaseEntity *pOther )
 	{
 		// add a bit of static friction
 //		SetAbsVelocity( GetAbsVelocity() * 0.8 );
-		GetEngineObject()->SetSequence( SelectWeightedSequence( ACT_IDLE ) );
+		GetEngineObject()->SetSequence(GetEngineObject()->SelectWeightedSequence( ACT_IDLE ) );
 		GetEngineObject()->SetAbsAngles( vec3_angle );
 	}
 

@@ -296,7 +296,7 @@ void CWeaponPortalBase::GetRenderBounds( Vector& theMins, Vector& theMaxs )
 {
 	if ( IsRagdoll() )
 	{
-		m_pRagdoll->GetRagdollBounds( theMins, theMaxs );
+		GetEngineObject()->GetRagdollBounds( theMins, theMaxs );
 	}
 	else if ( GetModel() )
 	{

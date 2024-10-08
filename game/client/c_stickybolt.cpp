@@ -66,19 +66,19 @@ public:
 		//Find the real object we hit.
 		if( tr.physicsbone >= 0 )
 		{
-			if ( pModel->m_pRagdoll )
+			if ( pModel->GetEngineObject()->RagdollBoneCount())
 			{
-				CRagdoll *pCRagdoll = dynamic_cast < CRagdoll * > ( pModel->m_pRagdoll );
+				//CRagdoll *pCRagdoll = dynamic_cast < CRagdoll * > ( pModel->m_pRagdoll );
 
-				if ( pCRagdoll )
-				{
-					ragdoll_t *pRagdollT = pCRagdoll->GetRagdoll();
+				//if ( pCRagdoll )
+				//{
+					ragdoll_t *pRagdollT = pModel->GetEngineObject()->GetRagdoll();
 
 					if ( tr.physicsbone < pRagdollT->listCount )
 					{
 						pPhysicsObject = pRagdollT->list[tr.physicsbone].pObject;
 					}
-				}
+				//}
 			}
 		}
 

@@ -914,7 +914,7 @@ void CHL2_Player::StartAdmireGlovesAnimation( void )
 		vm->SetWeaponModel( "models/weapons/v_hands.mdl", NULL );
 		ShowViewModel( true );
 						
-		int	idealSequence = vm->SelectWeightedSequence( ACT_VM_IDLE );
+		int	idealSequence = vm->GetEngineObject()->SelectWeightedSequence( ACT_VM_IDLE );
 		
 		if ( idealSequence >= 0 )
 		{

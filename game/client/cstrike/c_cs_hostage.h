@@ -58,7 +58,7 @@ public:
 
 	C_CSPlayer *GetLeader( void ) const;			// return who we are following or NULL
 
-	virtual C_BaseAnimating * BecomeRagdollOnClient();
+	virtual C_BaseEntity* BecomeRagdollOnClient();
 	virtual bool ShouldDraw( void );
 
 	void ImpactTrace( trace_t *pTrace, int iDamageType, const char *pCustomImpactName );

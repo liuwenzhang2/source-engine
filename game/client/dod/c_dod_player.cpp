@@ -283,7 +283,7 @@ public:
 	virtual void OnDataChanged( DataUpdateType_t type );
 
 	int GetPlayerEntIndex() const;
-	IRagdoll* GetIRagdoll() const;
+	//IRagdoll* GetIRagdoll() const;
 
 	void ImpactTrace( trace_t *pTrace, int iDamageType, const char *pCustomImpactName );
 
@@ -388,7 +388,7 @@ void C_DODRagdoll::ImpactTrace( trace_t *pTrace, int iDamageType, const char *pC
 		FX_DOD_BloodSpray( hitpos, dir, 10 );
 	}
 
-	m_pRagdoll->ResetRagdollSleepAfterTime();
+	GetEngineObject()->ResetRagdollSleepAfterTime();
 }
 
 
@@ -529,7 +529,7 @@ void C_DODRagdoll::CreateDODRagdoll()
 			GetRagdollInitBoneArrays( boneDelta0, boneDelta1, currentBones, boneDt );
 		}
 
-		InitAsClientRagdoll( boneDelta0, boneDelta1, currentBones, boneDt );
+		GetEngineObject()->InitAsClientRagdoll( boneDelta0, boneDelta1, currentBones, boneDt );
 	}
 	else
 	{
@@ -566,10 +566,10 @@ void C_DODRagdoll::OnDataChanged( DataUpdateType_t type )
 	}
 }
 
-IRagdoll* C_DODRagdoll::GetIRagdoll() const
-{
-	return m_pRagdoll;
-}
+//IRagdoll* C_DODRagdoll::GetIRagdoll() const
+//{
+//	return m_pRagdoll;
+//}
 
 bool C_DODRagdoll::IsRagdollVisible()
 {
@@ -734,13 +734,13 @@ C_DODPlayer* C_DODPlayer::GetLocalDODPlayer()
 	return ToDODPlayer( C_BasePlayer::GetLocalPlayer() );
 }
 
-IRagdoll* C_DODPlayer::GetRepresentativeRagdoll() const
+const IEngineObjectClient* C_DODPlayer::GetRepresentativeRagdoll() const
 {
 	if ( m_hRagdoll.Get() )
 	{
 		C_DODRagdoll *pRagdoll = (C_DODRagdoll*)m_hRagdoll.Get();
 
-		return pRagdoll->GetIRagdoll();
+		return pRagdoll->GetEngineObject();
 	}
 	else
 	{
@@ -1973,10 +1973,10 @@ void C_DODPlayer::CalcDODDeathCamView(Vector& eyeOrigin, QAngle& eyeAngles, floa
 	QAngle aForward = eyeAngles = EyeAngles();
 	Vector origin = EyePosition();			
 
-	IRagdoll *pRagdoll = GetRepresentativeRagdoll();
-	if ( pRagdoll )
+	const IEngineObjectClient *pRagdoll = GetRepresentativeRagdoll();
+	if ( pRagdoll && pRagdoll->RagdollBoneCount())
 	{
-		origin = pRagdoll->GetRagdollOrigin();
+		origin = ((IEngineObjectClient*)pRagdoll)->GetRagdollOrigin();
 		origin.z += VEC_DEAD_VIEWHEIGHT_SCALED( this ).z; // look over ragdoll, not through
 	}
 

@@ -302,7 +302,7 @@ void CRagdollProp::InitRagdollAnimation()
 	GetEngineObject()->SetCycle( 0 );
 	
 	// put into ACT_DIERAGDOLL if it exists, otherwise use sequence 0
-	int nSequence = SelectWeightedSequence( ACT_DIERAGDOLL );
+	int nSequence = GetEngineObject()->SelectWeightedSequence( ACT_DIERAGDOLL );
 	if ( nSequence < 0 )
 	{
 		GetEngineObject()->ResetSequence( 0 );
@@ -663,7 +663,7 @@ AngularImpulse CRagdollProp::PhysGunLaunchAngularImpulse()
 //-----------------------------------------------------------------------------
 void CRagdollProp::SetOverlaySequence( Activity activity )
 {
-	int seq = SelectWeightedSequence( activity );
+	int seq = GetEngineObject()->SelectWeightedSequence( activity );
 	if ( seq < 0 )
 	{
 		m_nOverlaySequence = -1;

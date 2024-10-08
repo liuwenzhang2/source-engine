@@ -468,14 +468,14 @@ Activity CAI_BaseNPC::GetFlinchActivity( bool bHeavyDamage, bool bGesture )
 	}
 
 	// do we have a sequence for the ideal activity?
-	if ( SelectWeightedSequence ( flinchActivity ) == ACTIVITY_NOT_AVAILABLE )
+	if (GetEngineObject()->SelectWeightedSequence ( flinchActivity ) == ACTIVITY_NOT_AVAILABLE )
 	{
 		if ( bHeavyDamage )
 		{
 			flinchActivity = bGesture ? ACT_GESTURE_BIG_FLINCH : ACT_BIG_FLINCH;
 
 			// If we fail at finding a big flinch, resort to a small one
-			if ( SelectWeightedSequence ( flinchActivity ) == ACTIVITY_NOT_AVAILABLE )
+			if (GetEngineObject()->SelectWeightedSequence ( flinchActivity ) == ACTIVITY_NOT_AVAILABLE )
 			{
 				flinchActivity = bGesture ? ACT_GESTURE_SMALL_FLINCH : ACT_SMALL_FLINCH;
 			}
@@ -566,7 +566,7 @@ void CAI_BaseNPC::SelectDeathPose( const CTakeDamageInfo &info )
 		return;
 	}
 
-	SetDeathPose( SelectWeightedSequence( aActivity ) );
+	SetDeathPose(GetEngineObject()->SelectWeightedSequence( aActivity ) );
 	SetDeathPoseFrame( iDeathFrame );
 }
 
@@ -2992,13 +2992,13 @@ void CAI_BaseNPC::RunAnimation( void )
 		if (GetEngineObject()->SequenceLoops() )
 		{
 			// animation does loop, which means we're playing subtle idle. Might need to fidget.
-			iSequence = SelectWeightedSequence ( m_translatedActivity );
+			iSequence = GetEngineObject()->SelectWeightedSequence ( m_translatedActivity );
 		}
 		else
 		{
 			// animation that just ended doesn't loop! That means we just finished a fidget
 			// and should return to our heaviest weighted idle (the subtle one)
-			iSequence = SelectHeaviestSequence ( m_translatedActivity );
+			iSequence = GetEngineObject()->SelectHeaviestSequence ( m_translatedActivity );
 		}
 		if ( iSequence != ACTIVITY_NOT_AVAILABLE )
 		{
@@ -5959,7 +5959,7 @@ Activity CAI_BaseNPC::NPC_TranslateActivity( Activity eNewActivity )
 			// ---------------------------------------------------------------
 			// Some NPCs don't have a cover activity defined so just use idle
 			// ---------------------------------------------------------------
-			if (SelectWeightedSequence( nCoverActivity ) == ACTIVITY_NOT_AVAILABLE)
+			if (GetEngineObject()->SelectWeightedSequence( nCoverActivity ) == ACTIVITY_NOT_AVAILABLE)
 			{
 				nCoverActivity = ACT_IDLE;
 			}
@@ -6072,7 +6072,7 @@ void CAI_BaseNPC::ResolveActivityToSequence(Activity NewActivity, int &iSequence
 	}
 	else
 	{
-		iSequence = SelectWeightedSequence( translatedActivity );
+		iSequence = GetEngineObject()->SelectWeightedSequence( translatedActivity );
 
 		if ( iSequence == ACTIVITY_NOT_AVAILABLE )
 		{
@@ -6091,7 +6091,7 @@ void CAI_BaseNPC::ResolveActivityToSequence(Activity NewActivity, int &iSequence
 			if ( translatedActivity == ACT_RUN )
 			{
 				translatedActivity = ACT_WALK;
-				iSequence = SelectWeightedSequence( translatedActivity );
+				iSequence = GetEngineObject()->SelectWeightedSequence( translatedActivity );
 			}
 		}
 	}
@@ -6983,7 +6983,7 @@ void CAI_BaseNPC::OnChangeActiveWeapon( CBaseCombatWeapon *pOldWeapon, CBaseComb
 //-----------------------------------------------------------------------------
 bool CAI_BaseNPC::CanHolsterWeapon( void )
 {
-	int seq = SelectWeightedSequence( ACT_DISARM );
+	int seq = GetEngineObject()->SelectWeightedSequence( ACT_DISARM );
 	return (seq >= 0);
 }
 
@@ -7966,7 +7966,7 @@ Activity CAI_BaseNPC::GetReloadActivity( CAI_Hint* pHint )
 			case HINT_TACTICAL_COVER_LOW:
 			case HINT_TACTICAL_COVER_MED:
 			{
-				if (SelectWeightedSequence( ACT_RELOAD_LOW ) != ACTIVITY_NOT_AVAILABLE)
+				if (GetEngineObject()->SelectWeightedSequence( ACT_RELOAD_LOW ) != ACTIVITY_NOT_AVAILABLE)
 				{
 					Vector vEyePos = GetEngineObject()->GetAbsOrigin() + EyeOffset(ACT_RELOAD_LOW);
 					// Check if this location will block the threat's line of sight to me
@@ -13187,7 +13187,7 @@ const char *CAI_BaseNPC::GetScriptedNPCInteractionSequence( ScriptedNPCInteracti
 {
 	if ( pInteraction->sPhases[iPhase].iActivity != ACT_INVALID )
 	{
-		int iSequence = SelectWeightedSequence( (Activity)pInteraction->sPhases[iPhase].iActivity );
+		int iSequence = GetEngineObject()->SelectWeightedSequence( (Activity)pInteraction->sPhases[iPhase].iActivity );
 		return GetSequenceName( iSequence );
 	}
 
@@ -13909,7 +13909,7 @@ void CAI_BaseNPC::InputForceInteractionWithNPC( inputdata_t &inputdata )
 			{
 				// Other NPC may have all the matching sequences, but just without the activity specified.
 				// Lets find a single sequence for us, and ensure they have a matching one.
-				int iMySeq = SelectWeightedSequence( (Activity)m_ScriptedInteractions[i].sPhases[SNPCINT_SEQUENCE].iActivity );
+				int iMySeq = GetEngineObject()->SelectWeightedSequence( (Activity)m_ScriptedInteractions[i].sPhases[SNPCINT_SEQUENCE].iActivity );
 				if ( pNPC->LookupSequence( GetSequenceName(iMySeq) ) == -1 )
 					continue;
 			}

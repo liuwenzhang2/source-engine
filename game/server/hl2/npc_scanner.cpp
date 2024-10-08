@@ -1415,7 +1415,7 @@ int CNPC_CScanner::SelectSchedule(void)
 			if ( m_iHealth < ( 3 * sk_scanner_health.GetFloat() / 4 ))
 				return SCHED_TAKE_COVER_FROM_ORIGIN;
 
-			if ( SelectWeightedSequence( ACT_SMALL_FLINCH ) != -1 )
+			if (GetEngineObject()->SelectWeightedSequence( ACT_SMALL_FLINCH ) != -1 )
 				return SCHED_SMALL_FLINCH;
 		}
 		else

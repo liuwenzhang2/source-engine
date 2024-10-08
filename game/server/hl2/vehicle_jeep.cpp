@@ -798,7 +798,7 @@ void CPropJeep::Think( void )
 			if ( m_bEnterAnimOn )
 			{
 				// Idle running
-				int nSequence = SelectWeightedSequence( ACT_IDLE_STIMULATED );
+				int nSequence = GetEngineObject()->SelectWeightedSequence( ACT_IDLE_STIMULATED );
 				if ( nSequence > ACTIVITY_NOT_AVAILABLE )
 				{
 					GetEngineObject()->SetCycle( 0 );
@@ -835,7 +835,7 @@ void CPropJeep::Think( void )
 		GetEngineObject()->SetPlaybackRate(0.0);
 		GetEngineObject()->SetCycle( 0 );
 		
-		int nSequence = SelectWeightedSequence( ACT_IDLE );
+		int nSequence = GetEngineObject()->SelectWeightedSequence( ACT_IDLE );
 		GetEngineObject()->ResetSequence( nSequence );
 
 		CPASAttenuationFilter sndFilter( this, "PropJeep.AmmoClose" );

@@ -196,7 +196,7 @@ void CPropPortalStatsDisplay::Spawn( void )
 
 	m_bEnabled = false;
 
-	int iSequence = SelectHeaviestSequence ( ACT_IDLE );
+	int iSequence = GetEngineObject()->SelectHeaviestSequence ( ACT_IDLE );
 
 	if ( iSequence != ACT_INVALID )
 	{

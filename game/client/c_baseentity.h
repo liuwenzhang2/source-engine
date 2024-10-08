@@ -37,6 +37,7 @@
 #include "tier0/threadtools.h"
 #include "SoundEmitterSystem/isoundemittersystembase.h"
 //#include "engine\ivmodelrender.h"
+#include "bone_accessor.h"
 
 class C_Team;
 class IPhysicsObject;
@@ -1013,6 +1014,7 @@ public:
 	unsigned short					m_EntClientFlags;
 
 	CNetworkColor32( m_clrRender );
+	CBoneAccessor					m_BoneAccessor;
 
 private:
 	

@@ -3016,7 +3016,7 @@ void CWeaponPhysCannon::BeginUpgrade()
 	if ( m_bIsCurrentlyUpgrading )
 		return;
 
-	GetEngineObject()->SetSequence( SelectWeightedSequence( ACT_PHYSCANNON_UPGRADE ) );
+	GetEngineObject()->SetSequence(GetEngineObject()->SelectWeightedSequence( ACT_PHYSCANNON_UPGRADE ) );
 	GetEngineObject()->ResetSequenceInfo();
 
 	m_bIsCurrentlyUpgrading = true;

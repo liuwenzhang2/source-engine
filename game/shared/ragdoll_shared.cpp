@@ -744,8 +744,8 @@ bool ShouldRemoveThisRagdoll( CBaseAnimating *pRagdoll )
 
 	Vector vMins, vMaxs;
 		
-	Vector origin = pRagdoll->m_pRagdoll->GetRagdollOrigin();
-	pRagdoll->m_pRagdoll->GetRagdollBounds( vMins, vMaxs );
+	Vector origin = pRagdoll->GetEngineObject()->GetRagdollOrigin();
+	pRagdoll->GetEngineObject()->GetRagdollBounds( vMins, vMaxs );
 
 	if( engine->IsBoxInViewCluster( vMins + origin, vMaxs + origin) == false )
 	{
@@ -1165,65 +1165,7 @@ C_EntityFlame *FireEffect( C_BaseAnimating *pTarget, C_BaseEntity *pServerFire, 
 	return pFire;
 }
 
-void C_BaseAnimating::IgniteRagdoll( C_BaseAnimating *pSource )
-{
-	C_BaseEntity *pChild = pSource->GetEffectEntity();
-	
-	if ( pChild )
-	{
-		C_EntityFlame *pFireChild = dynamic_cast<C_EntityFlame *>( pChild );
-		C_ClientRagdoll *pRagdoll = dynamic_cast< C_ClientRagdoll * > ( this );
 
-		if ( pFireChild )
-		{
-			pRagdoll->SetEffectEntity ( FireEffect( pRagdoll, pFireChild, NULL, NULL, NULL ) );
-		}
-	}
-}
-
-
-
-void C_BaseAnimating::TransferDissolveFrom( C_BaseAnimating *pSource )
-{
-	C_BaseEntity *pChild = pSource->GetEffectEntity();
-	
-	if ( pChild )
-	{
-		C_EntityDissolve *pDissolveChild = dynamic_cast<C_EntityDissolve *>( pChild );
-
-		if ( pDissolveChild )
-		{
-			C_ClientRagdoll *pRagdoll = dynamic_cast< C_ClientRagdoll * > ( this );
-
-			if ( pRagdoll )
-			{
-				pRagdoll->m_flEffectTime = pDissolveChild->m_flStartTime;
-
-				C_EntityDissolve *pDissolve = DissolveEffect( pRagdoll, pRagdoll->m_flEffectTime );
-
-				if ( pDissolve )
-				{
-					pDissolve->SetRenderMode( pDissolveChild->GetRenderMode() );
-					pDissolve->m_nRenderFX = pDissolveChild->m_nRenderFX;
-					pDissolve->SetRenderColor( 255, 255, 255, 255 );
-					pDissolveChild->SetRenderColorA( 0 );
-
-					pDissolve->m_vDissolverOrigin = pDissolveChild->m_vDissolverOrigin;
-					pDissolve->m_nDissolveType = pDissolveChild->m_nDissolveType;
-
-					if ( pDissolve->m_nDissolveType == ENTITY_DISSOLVE_CORE )
-					{
-						pDissolve->m_nMagnitude = pDissolveChild->m_nMagnitude;
-						pDissolve->m_flFadeOutStart = CORE_DISSOLVE_FADE_START;
-						pDissolve->m_flFadeOutModelStart = CORE_DISSOLVE_MODEL_FADE_START;
-						pDissolve->m_flFadeOutModelLength = CORE_DISSOLVE_MODEL_FADE_LENGTH;
-						pDissolve->m_flFadeInLength = CORE_DISSOLVE_FADEIN_LENGTH;
-					}
-				}
-			}
-		}
-	}
-}
 
 #endif
 

@@ -259,7 +259,7 @@ bool C_CHostage::ShouldDraw( void )
 }
 
 //-----------------------------------------------------------------------------
-C_BaseAnimating * C_CHostage::BecomeRagdollOnClient()
+C_BaseEntity* C_CHostage::BecomeRagdollOnClient()
 {
 	if ( g_RagdollLVManager.IsLowViolence() )
 	{
@@ -280,7 +280,7 @@ C_BaseAnimating * C_CHostage::BecomeRagdollOnClient()
 		}
 	}
 
-	C_BaseAnimating *pRagdoll = BaseClass::BecomeRagdollOnClient();
+	C_BaseEntity *pRagdoll = BaseClass::BecomeRagdollOnClient();
 	if ( pRagdoll && pRagdoll != this )
 	{
 		g_HostageRagdolls.AddToTail( pRagdoll );

@@ -1018,11 +1018,11 @@ void CBaseCombatWeapon::SetActivity( Activity act, float duration )
 	SetModel( GetWorldModel() );
 #endif
 	
-	int sequence = SelectWeightedSequence( act ); 
+	int sequence = GetEngineObject()->SelectWeightedSequence( act );
 	
 	// FORCE IDLE on sequences we don't have (which should be many)
 	if ( sequence == ACTIVITY_NOT_AVAILABLE )
-		sequence = SelectWeightedSequence( ACT_VM_IDLE );
+		sequence = GetEngineObject()->SelectWeightedSequence( ACT_VM_IDLE );
 
 	//Adrian: Oh man again...
 #if !defined( CLIENT_DLL ) && (defined( HL2MP ) || defined( PORTAL ))
@@ -2351,7 +2351,7 @@ void CBaseCombatWeapon::MaintainIdealActivity( void )
 bool CBaseCombatWeapon::SetIdealActivity( Activity ideal )
 {
 	MDLCACHE_CRITICAL_SECTION();
-	int	idealSequence = SelectWeightedSequence( ideal );
+	int	idealSequence = GetEngineObject()->SelectWeightedSequence( ideal );
 
 	if ( idealSequence == -1 )
 		return false;

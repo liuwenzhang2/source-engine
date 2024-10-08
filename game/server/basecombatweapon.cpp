@@ -117,7 +117,7 @@ void CBaseCombatWeapon::Operator_FrameUpdate( CBaseCombatCharacter *pOperator )
 		if (GetEngineObject()->SequenceLoops() )
 		{
 			// animation does loop, which means we're playing subtle idle. Might need to fidget.
-			int iSequence = SelectWeightedSequence( GetActivity() );
+			int iSequence = GetEngineObject()->SelectWeightedSequence( GetActivity() );
 			if ( iSequence != ACTIVITY_NOT_AVAILABLE )
 			{
 				GetEngineObject()->ResetSequence( iSequence );	// Set to new anim (if it's there)

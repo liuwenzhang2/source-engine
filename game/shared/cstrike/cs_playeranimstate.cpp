@@ -162,7 +162,7 @@ public:
 	virtual Activity CalcMainActivity();
 
 	// No need to cache sequences, and we *do* have multiple sequences per activity
-	virtual int SelectWeightedSequence( Activity activity ) { return GetOuter()->SelectWeightedSequence( activity ); }
+	virtual int SelectWeightedSequence( Activity activity ) { return GetOuter()->GetEngineObject()->SelectWeightedSequence( activity ); }
 };
 
 
@@ -291,13 +291,13 @@ void CCSPlayerAnimState::CheckCachedSequenceValidity( void )
 		// precache the sequences we'll be using for movement
 		if ( m_cachedModelIndex > 0 )
 		{
-			m_sequenceCache[ACT_HOP - 1] = GetOuter()->SelectWeightedSequence( ACT_HOP );
-			m_sequenceCache[ACT_IDLE - 1] = GetOuter()->SelectWeightedSequence( ACT_IDLE );
-			m_sequenceCache[ACT_RUN_CROUCH - 1] = GetOuter()->SelectWeightedSequence( ACT_RUN_CROUCH );
-			m_sequenceCache[ACT_CROUCHIDLE - 1] = GetOuter()->SelectWeightedSequence( ACT_CROUCHIDLE );
-			m_sequenceCache[ACT_RUN - 1] = GetOuter()->SelectWeightedSequence( ACT_RUN );
-			m_sequenceCache[ACT_WALK - 1] = GetOuter()->SelectWeightedSequence( ACT_WALK );
-			m_sequenceCache[ACT_IDLE - 1] = GetOuter()->SelectWeightedSequence( ACT_IDLE );
+			m_sequenceCache[ACT_HOP - 1] = GetOuter()->GetEngineObject()->SelectWeightedSequence( ACT_HOP );
+			m_sequenceCache[ACT_IDLE - 1] = GetOuter()->GetEngineObject()->SelectWeightedSequence( ACT_IDLE );
+			m_sequenceCache[ACT_RUN_CROUCH - 1] = GetOuter()->GetEngineObject()->SelectWeightedSequence( ACT_RUN_CROUCH );
+			m_sequenceCache[ACT_CROUCHIDLE - 1] = GetOuter()->GetEngineObject()->SelectWeightedSequence( ACT_CROUCHIDLE );
+			m_sequenceCache[ACT_RUN - 1] = GetOuter()->GetEngineObject()->SelectWeightedSequence( ACT_RUN );
+			m_sequenceCache[ACT_WALK - 1] = GetOuter()->GetEngineObject()->SelectWeightedSequence( ACT_WALK );
+			m_sequenceCache[ACT_IDLE - 1] = GetOuter()->GetEngineObject()->SelectWeightedSequence( ACT_IDLE );
 		}
 	}
 }
@@ -314,7 +314,7 @@ int CCSPlayerAnimState::SelectWeightedSequence( Activity activity )
 
 	if ( activity > ACT_CROUCHIDLE || activity < 1 )
 	{
-		return GetOuter()->SelectWeightedSequence( activity );
+		return GetOuter()->GetEngineObject()->SelectWeightedSequence( activity );
 	}
 
 	CheckCachedSequenceValidity();
@@ -323,7 +323,7 @@ int CCSPlayerAnimState::SelectWeightedSequence( Activity activity )
 	if ( sequence < 0 )
 	{
 		// just in case, look up the sequence if we didn't precache it above
-		sequence = m_sequenceCache[ activity - 1 ] = GetOuter()->SelectWeightedSequence( activity );
+		sequence = m_sequenceCache[ activity - 1 ] = GetOuter()->GetEngineObject()->SelectWeightedSequence( activity );
 	}
 
 #if defined(CLIENT_DLL) && defined(_DEBUG)

@@ -375,23 +375,7 @@ void CBaseAnimating::InputSetModelScale( inputdata_t &inputdata )
 }
 
 
-//=========================================================
-// SelectWeightedSequence
-//=========================================================
-int CBaseAnimating::SelectWeightedSequence ( Activity activity )
-{
-	Assert( activity != ACT_INVALID );
-	Assert(GetEngineObject()->GetModelPtr() );
-	return GetEngineObject()->GetModelPtr()->SelectWeightedSequence( activity, GetEngineObject()->GetSequence(), SharedRandomSelect);
-}
 
-
-int CBaseAnimating::SelectWeightedSequence ( Activity activity, int curSequence )
-{
-	Assert( activity != ACT_INVALID );
-	Assert(GetEngineObject()->GetModelPtr() );
-	return GetEngineObject()->GetModelPtr()->SelectWeightedSequence( activity, curSequence, SharedRandomSelect);
-}
 
 //=========================================================
 // ResetActivityIndexes
@@ -411,17 +395,7 @@ void CBaseAnimating::ResetEventIndexes ( void )
 	GetEngineObject()->GetModelPtr()->ResetEventIndexes();
 }
 
-//=========================================================
-// LookupHeaviestSequence
-//
-// Get sequence with highest 'weight' for this activity
-//
-//=========================================================
-int CBaseAnimating::SelectHeaviestSequence ( Activity activity )
-{
-	Assert(GetEngineObject()->GetModelPtr() );
-	return GetEngineObject()->GetModelPtr()->SelectHeaviestSequence( activity );
-}
+
 
 
 //-----------------------------------------------------------------------------
@@ -567,7 +541,7 @@ bool CBaseAnimating::IsRagdoll()
 bool CBaseAnimating::CanBecomeRagdoll( void ) 
 {
 	MDLCACHE_CRITICAL_SECTION();
-	int ragdollSequence = SelectWeightedSequence( ACT_DIERAGDOLL );
+	int ragdollSequence = GetEngineObject()->SelectWeightedSequence( ACT_DIERAGDOLL );
 
 	//Can't cause we don't have a ragdoll sequence.
 	if ( ragdollSequence == ACTIVITY_NOT_AVAILABLE )

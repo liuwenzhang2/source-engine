@@ -26,6 +26,7 @@
 #include "gamestringpool.h"
 #include "saverestoretypes.h"
 #include "saverestore.h"
+#include "physics_saverestore.h"
 
 //class C_Beam;
 //class C_BaseViewModel;
@@ -215,7 +216,19 @@ public:
 		m_nPrevNewSequenceParity = -1;
 		m_bReceivedSequence = false;
 		m_pPhysicsObject = NULL;
+		m_ragdoll.listCount = 0;
+		m_vecLastOrigin.Init();
+		m_flLastOriginChangeTime = -1.0f;
 
+		m_lastUpdate = -FLT_MAX;
+		m_nPrevSequence = -1;
+		m_nRestoreSequence = -1;
+		m_builtRagdoll = false;
+		m_vecPreRagdollMins = vec3_origin;
+		m_vecPreRagdollMaxs = vec3_origin;
+
+		m_bStoreRagdollInfo = false;
+		m_pRagdollInfo = NULL;
 	}
 
 	virtual ~C_EngineObjectInternal()
@@ -224,6 +237,8 @@ public:
 		// Are we in the partition?
 		DestroyPartitionHandle();
 		InvalidateMdlCache();
+		ClearRagdoll();
+		delete m_pRagdollInfo;
 		VPhysicsDestroyObject();
 	}
 
@@ -816,12 +831,70 @@ public:
 	virtual const Vector& WorldAlignMaxs() const;
 	// FIXME: Do we want this?
 	const Vector& WorldAlignSize() const;
+
+	void Init(
+		C_BaseEntity* ent,
+		IStudioHdr* pstudiohdr,
+		const Vector& forceVector,
+		int forceBone,
+		const matrix3x4_t* pDeltaBones0,
+		const matrix3x4_t* pDeltaBones1,
+		const matrix3x4_t* pCurrentBonePosition,
+		float boneDt,
+		bool bFixedConstraints = false);
+
+	virtual void RagdollBone(C_BaseEntity* ent, mstudiobone_t* pbones, int boneCount, bool* boneSimulated, CBoneAccessor& pBoneToWorld);
+	virtual const Vector& GetRagdollOrigin();
+	virtual void GetRagdollBounds(Vector& theMins, Vector& theMaxs);
+	void	BuildRagdollBounds(C_BaseEntity* ent);
+
+	virtual IPhysicsObject* GetElement(int elementNum);
+	virtual IPhysicsConstraintGroup* GetConstraintGroup() { return m_ragdoll.pGroup; }
+	virtual void DrawWireframe();
+	virtual void VPhysicsUpdate(IPhysicsObject* pPhysics);
+	virtual int RagdollBoneCount() const { return m_ragdoll.listCount; }
+	//=============================================================================
+	// HPE_BEGIN:
+	// [menglish] Transforms a vector from the given bone's space to world space
+	//=============================================================================
+
+	virtual bool TransformVectorToWorld(int iBoneIndex, const Vector* vTemp, Vector* vOut);
+
+	//=============================================================================
+	// HPE_END
+	//=============================================================================
+
+
+	//void	SetInitialBonePosition( IStudioHdr *pstudiohdr, const CBoneAccessor &pDesiredBonePosition );
+
+	bool IsValid() { return m_ragdoll.listCount > 0; }
+
+	void ResetRagdollSleepAfterTime(void);
+	float GetLastVPhysicsUpdateTime() const { return m_lastUpdate; }
+
+	ragdoll_t* GetRagdoll(void) { return &m_ragdoll; }
+
+	C_BaseEntity* CreateRagdollCopy();
+	void							IgniteRagdoll(C_BaseEntity* pSource);
+	void							TransferDissolveFrom(C_BaseEntity* pSource);
+	bool InitAsClientRagdoll(const matrix3x4_t* pDeltaBones0, const matrix3x4_t* pDeltaBones1, const matrix3x4_t* pCurrentBonePosition, float boneDt, bool bFixedConstraints = false);
+	virtual void SaveRagdollInfo(int numbones, const matrix3x4_t& cameraTransform, CBoneAccessor& pBoneToWorld);
+	void							ClearRagdoll();
+	void							CreateUnragdollInfo(C_BaseEntity* pRagdoll);
+	virtual bool					RetrieveRagdollInfo(Vector* pos, Quaternion* q);
+	void UnragdollBlend(IStudioHdr* hdr, Vector pos[], Quaternion q[], float currentTime);
+
+	// For prediction
+	int								SelectWeightedSequence(int activity);
+	virtual void					Simulate();
 private:
 	void LockStudioHdr();
 	void UnlockStudioHdr();
 
 	// called by all vphysics inits
 	bool			VPhysicsInitSetup();
+	void			CheckSettleStationaryRagdoll();
+	void			PhysForceRagdollToSleep();
 private:
 
 	friend class C_BaseEntity;
@@ -991,6 +1064,30 @@ private:
 
 	// pointer to the entity's physics object (vphysics.dll)
 	IPhysicsObject* m_pPhysicsObject;
+	ragdoll_t	m_ragdoll;
+	Vector		m_mins, m_maxs;
+	Vector		m_origin;
+	float		m_radius;
+	float		m_lastUpdate;
+	bool		m_allAsleep;
+	Vector		m_vecLastOrigin;
+	float		m_flLastOriginChangeTime;
+
+#if RAGDOLL_VISUALIZE
+	matrix3x4_t			m_savedBone1[MAXSTUDIOBONES];
+	matrix3x4_t			m_savedBone2[MAXSTUDIOBONES];
+	matrix3x4_t			m_savedBone3[MAXSTUDIOBONES];
+#endif
+
+	bool							m_builtRagdoll;
+	Vector							m_vecPreRagdollMins;
+	Vector							m_vecPreRagdollMaxs;
+	// Decomposed ragdoll info
+	bool							m_bStoreRagdollInfo;
+	RagdollInfo_t*					m_pRagdollInfo;
+
+	int								m_nPrevSequence;
+	int								m_nRestoreSequence;
 };
 
 //-----------------------------------------------------------------------------

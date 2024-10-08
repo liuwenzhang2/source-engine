@@ -225,7 +225,7 @@ int CNPC_Headcrab::SelectSchedule( void )
 				{
 					return SCHED_TAKE_COVER_FROM_ORIGIN;
 				}
-				else if ( SelectWeightedSequence( ACT_SMALL_FLINCH ) != -1 )
+				else if (GetEngineObject()->SelectWeightedSequence( ACT_SMALL_FLINCH ) != -1 )
 				{
 					return SCHED_SMALL_FLINCH;
 				}

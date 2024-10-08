@@ -35,15 +35,7 @@ END_RECV_TABLE()
 
 extern ConVar cl_npc_speedmod_intime;
 
-bool NPC_IsImportantNPC( C_BaseAnimating *pAnimating )
-{
-	C_AI_BaseNPC *pBaseNPC = dynamic_cast < C_AI_BaseNPC* > ( pAnimating );
 
-	if ( pBaseNPC == NULL )
-		return false;
-
-	return pBaseNPC->ImportantRagdoll();
-}
 
 C_AI_BaseNPC::C_AI_BaseNPC()
 {

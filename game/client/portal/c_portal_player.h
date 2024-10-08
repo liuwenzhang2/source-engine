@@ -65,7 +65,7 @@ public:
 
 	// Should this object cast shadows?
 	virtual ShadowType_t	ShadowCastType( void );
-	virtual C_BaseAnimating* BecomeRagdollOnClient();
+	virtual C_BaseEntity* BecomeRagdollOnClient();
 	virtual bool			ShouldDraw( void );
 	virtual const QAngle&	EyeAngles();
 	virtual void			OnPreDataChanged( DataUpdateType_t type );
@@ -132,7 +132,7 @@ private:
 	QAngle	m_angEyeAngles;
 	CInterpolatedVar< QAngle >	m_iv_angEyeAngles;
 
-	virtual IRagdoll		*GetRepresentativeRagdoll() const;
+	virtual const IEngineObjectClient* GetRepresentativeRagdoll() const;
 	EHANDLE	m_hRagdoll;
 
 	int	m_headYawPoseParam;

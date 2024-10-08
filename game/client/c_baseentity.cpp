@@ -2153,6 +2153,7 @@ void C_BaseEntity::ClientThink()
 
 void C_BaseEntity::Simulate()
 {
+	GetEngineObject()->Simulate();
 	AddEntity();	// Legacy support. Once-per-frame stuff should go in Simulate().
 }
 

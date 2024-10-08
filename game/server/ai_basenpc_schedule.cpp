@@ -4182,33 +4182,33 @@ void CAI_BaseNPC::SetTurnActivity ( void )
 	}
 	*/
 
-	if( flYD <= -80 && flYD >= -100 && SelectWeightedSequence( ACT_90_RIGHT ) != ACTIVITY_NOT_AVAILABLE )
+	if( flYD <= -80 && flYD >= -100 && GetEngineObject()->SelectWeightedSequence( ACT_90_RIGHT ) != ACTIVITY_NOT_AVAILABLE )
 	{
 		// 90 degree right.
 		Remember( bits_MEMORY_TURNING );
 		SetIdealActivity( ACT_90_RIGHT );
 		return;
 	}
-	if( flYD >= 80 && flYD <= 100 && SelectWeightedSequence( ACT_90_LEFT ) != ACTIVITY_NOT_AVAILABLE )
+	if( flYD >= 80 && flYD <= 100 && GetEngineObject()->SelectWeightedSequence( ACT_90_LEFT ) != ACTIVITY_NOT_AVAILABLE )
 	{
 		// 90 degree left.
 		Remember( bits_MEMORY_TURNING );
 		SetIdealActivity( ACT_90_LEFT );
 		return;
 	}
-	if( fabs( flYD ) >= 160 && SelectWeightedSequence ( ACT_180_LEFT ) != ACTIVITY_NOT_AVAILABLE )
+	if( fabs( flYD ) >= 160 && GetEngineObject()->SelectWeightedSequence ( ACT_180_LEFT ) != ACTIVITY_NOT_AVAILABLE )
 	{
 		Remember( bits_MEMORY_TURNING );
 		SetIdealActivity( ACT_180_LEFT );
 		return;
 	}
 
-	if ( flYD <= -45 && SelectWeightedSequence ( ACT_TURN_RIGHT ) != ACTIVITY_NOT_AVAILABLE )
+	if ( flYD <= -45 && GetEngineObject()->SelectWeightedSequence ( ACT_TURN_RIGHT ) != ACTIVITY_NOT_AVAILABLE )
 	{// big right turn
 		SetIdealActivity( ACT_TURN_RIGHT );
 		return;
 	}
-	if ( flYD >= 45 && SelectWeightedSequence ( ACT_TURN_LEFT ) != ACTIVITY_NOT_AVAILABLE )
+	if ( flYD >= 45 && GetEngineObject()->SelectWeightedSequence ( ACT_TURN_LEFT ) != ACTIVITY_NOT_AVAILABLE )
 	{// big left turn
 		SetIdealActivity( ACT_TURN_LEFT );
 		return;
@@ -4324,7 +4324,7 @@ int CAI_BaseNPC::GetScriptCustomMoveSequence( void )
 	// Failed? Use walk.
 	if ( iSequence == ACTIVITY_NOT_AVAILABLE )
 	{
-		iSequence = SelectWeightedSequence( ACT_WALK );
+		iSequence = GetEngineObject()->SelectWeightedSequence( ACT_WALK );
 	}
 
 	return iSequence;
@@ -4425,7 +4425,7 @@ int CAI_BaseNPC::SelectAlertSchedule()
 		return nSched;
 
 	// Scan around for new enemies
-	if ( HasCondition( COND_ENEMY_DEAD ) && SelectWeightedSequence( ACT_VICTORY_DANCE ) != ACTIVITY_NOT_AVAILABLE )
+	if ( HasCondition( COND_ENEMY_DEAD ) && GetEngineObject()->SelectWeightedSequence( ACT_VICTORY_DANCE ) != ACTIVITY_NOT_AVAILABLE )
 		return SCHED_ALERT_SCAN;
 
 	if( IsPlayerAlly() && HasCondition(COND_HEAR_COMBAT) )

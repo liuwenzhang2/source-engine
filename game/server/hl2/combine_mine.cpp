@@ -157,7 +157,7 @@ void CBounceBomb::Spawn()
 
 	m_bBounce = true;
 
-	GetEngineObject()->SetSequence( SelectWeightedSequence( ACT_IDLE ) );
+	GetEngineObject()->SetSequence(GetEngineObject()->SelectWeightedSequence( ACT_IDLE ) );
 
 	OpenHooks( true );
 

@@ -1897,10 +1897,10 @@ void CNPC_Hunter::SetupGlobalModelData()
 	GetAttachment( gm_nHeadBottomAttachment, vecHeadBottom );
 	gm_flHeadRadius = ( vecHeadCenter - vecHeadBottom ).Length();
 
-	int nSequence = SelectWeightedSequence( ACT_HUNTER_RANGE_ATTACK2_UNPLANTED );
+	int nSequence = GetEngineObject()->SelectWeightedSequence( ACT_HUNTER_RANGE_ATTACK2_UNPLANTED );
 	gm_nUnplantedNode = GetEntryNode( nSequence );
 
-	nSequence = SelectWeightedSequence( ACT_RANGE_ATTACK2 );
+	nSequence = GetEngineObject()->SelectWeightedSequence( ACT_RANGE_ATTACK2 );
 	gm_nPlantedNode = GetEntryNode( nSequence );
 
 	GetEngineObject()->SetSurroundingBoundsType( USE_HITBOXES );
@@ -3349,7 +3349,7 @@ void CNPC_Hunter::TaskFindDodgeActivity()
 
 		// See where the dodge will put us.
 		Vector vecLocalDelta;
-		int nSeq = SelectWeightedSequence( m_eDodgeActivity );
+		int nSeq = GetEngineObject()->SelectWeightedSequence( m_eDodgeActivity );
 		GetEngineObject()->GetSequenceLinearMotion( nSeq, &vecLocalDelta );
 
 		// Transform the sequence delta into local space.

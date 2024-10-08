@@ -436,7 +436,7 @@ void CModelPanel::SetupModel( void )
 		if ( pAnim->m_pszActivity && pAnim->m_pszActivity[0] )
 		{
 			Activity activity = (Activity)mdlcache->ActivityList_IndexForName( pAnim->m_pszActivity );
-			sequence = pEnt->SelectWeightedSequence( activity );
+			sequence = pEnt->GetEngineObject()->SelectWeightedSequence( activity );
 		}
 		else if ( pAnim->m_pszSequence && pAnim->m_pszSequence[0] )
 		{
@@ -779,7 +779,7 @@ void CModelPanel::OnSetAnimation( KeyValues *data )
 				}
 
 				Activity activity = (Activity)mdlcache->ActivityList_IndexForName( pszActivity );
-				int sequence = m_hModel->SelectWeightedSequence( activity );
+				int sequence = m_hModel->GetEngineObject()->SelectWeightedSequence( activity );
 				if ( sequence != ACT_INVALID )
 				{
 					m_hModel->GetEngineObject()->ResetSequence( sequence );

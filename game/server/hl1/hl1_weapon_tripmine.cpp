@@ -303,7 +303,7 @@ void CTripmineGrenade::Spawn( void )
 	GetEngineObject()->SetCollisionGroup( COLLISION_GROUP_WEAPON );
 
 	GetEngineObject()->SetCycle( 0 );
-	GetEngineObject()->SetSequence( SelectWeightedSequence( ACT_TRIPMINE_WORLD ) );
+	GetEngineObject()->SetSequence(GetEngineObject()->SelectWeightedSequence( ACT_TRIPMINE_WORLD ) );
 	GetEngineObject()->ResetSequenceInfo();
 	GetEngineObject()->SetPlaybackRate(0);
 	

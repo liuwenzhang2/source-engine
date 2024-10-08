@@ -549,7 +549,7 @@ void CDODPlayerAnimState::RestartGesture( int iGestureType, Activity act, bool b
 	m_iGestureType = iGestureType;
 
 #ifdef CLIENT_DLL
-	m_iGestureSequence = m_pOuter->SelectWeightedSequence( idealActivity );
+	m_iGestureSequence = m_pOuter->GetEngineObject()->SelectWeightedSequence( idealActivity );
 
 	if( m_iGestureSequence == -1 )
 	{

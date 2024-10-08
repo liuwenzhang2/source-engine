@@ -3467,7 +3467,7 @@ bool CNPC_Antlion::CheckLanding( void )
 	//See if we're about to contact, or have already contacted the ground
 	if ( ( tr.fraction != 1.0f ) || (GetEngineObject()->GetFlags() & FL_ONGROUND ) )
 	{
-		int	sequence = SelectWeightedSequence( (Activity)ACT_ANTLION_LAND );
+		int	sequence = GetEngineObject()->SelectWeightedSequence( (Activity)ACT_ANTLION_LAND );
 
 		if (GetEngineObject()->GetSequence() != sequence )
 		{
@@ -4477,7 +4477,7 @@ void CNPC_Antlion::Flip( bool bZapped /*= false*/ )
 
 	if ( bZapped )
 	{
-		m_flZapDuration = gpGlobals->curtime + GetEngineObject()->SequenceDuration( SelectWeightedSequence( (Activity) ACT_ANTLION_ZAP_FLIP) ) + 0.1f;
+		m_flZapDuration = gpGlobals->curtime + GetEngineObject()->SequenceDuration(GetEngineObject()->SelectWeightedSequence( (Activity) ACT_ANTLION_ZAP_FLIP) ) + 0.1f;
 
 		const char* soundname = "NPC_Antlion.ZappedFlip";
 		CPASAttenuationFilter filter(this, soundname);

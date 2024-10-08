@@ -98,7 +98,7 @@ public:
 	virtual void OnDataChanged( DataUpdateType_t type );
 
 	int GetPlayerEntIndex() const;
-	IRagdoll* GetIRagdoll() const;
+	//IRagdoll* GetIRagdoll() const;
 
 	virtual void SetupWeights( const matrix3x4_t *pBoneToWorld, int nFlexWeightCount, float *pFlexWeights, float *pFlexDelayedWeights );
 
@@ -239,7 +239,7 @@ void C_PortalRagdoll::CreatePortalRagdoll()
 
 		pPlayer->GetRagdollInitBoneArrays( boneDelta0, boneDelta1, currentBones, boneDt );
 
-		InitAsClientRagdoll( boneDelta0, boneDelta1, currentBones, boneDt );
+		GetEngineObject()->InitAsClientRagdoll( boneDelta0, boneDelta1, currentBones, boneDt );
 	}
 }
 
@@ -249,10 +249,10 @@ void C_PortalRagdoll::CreatePortalRagdoll()
 // Input  :  - 
 // Output : IRagdoll*
 //-----------------------------------------------------------------------------
-IRagdoll* C_PortalRagdoll::GetIRagdoll() const
-{
-	return m_pRagdoll;
-}
+//IRagdoll* C_PortalRagdoll::GetIRagdoll() const
+//{
+//	return m_pRagdoll;
+//}
 
 //-----------------------------------------------------------------------------
 // Purpose: 
@@ -1010,7 +1010,7 @@ const QAngle& C_Portal_Player::EyeAngles()
 // Input  :  - 
 // Output : IRagdoll*
 //-----------------------------------------------------------------------------
-IRagdoll* C_Portal_Player::GetRepresentativeRagdoll() const
+const IEngineObjectClient* C_Portal_Player::GetRepresentativeRagdoll() const
 {
 	if ( m_hRagdoll.Get() )
 	{
@@ -1018,7 +1018,7 @@ IRagdoll* C_Portal_Player::GetRepresentativeRagdoll() const
 		if ( !pRagdoll )
 			return NULL;
 
-		return pRagdoll->GetIRagdoll();
+		return pRagdoll->GetEngineObject();
 	}
 	else
 	{
@@ -1293,7 +1293,7 @@ void C_Portal_Player::ItemPostFrame( void )
 	BaseClass::ItemPostFrame();
 }
 
-C_BaseAnimating *C_Portal_Player::BecomeRagdollOnClient()
+C_BaseEntity *C_Portal_Player::BecomeRagdollOnClient()
 {
 	// Let the C_CSRagdoll entity do this.
 	// m_builtRagdoll = true;

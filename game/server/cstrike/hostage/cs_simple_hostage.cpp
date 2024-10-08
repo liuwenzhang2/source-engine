@@ -884,7 +884,7 @@ void CHostage::HostageThink( void )
 	// set animation to idle for now
 	StudioFrameAdvance();
 
-	int sequence = SelectWeightedSequence( ACT_IDLE );
+	int sequence = GetEngineObject()->SelectWeightedSequence( ACT_IDLE );
 	if (GetEngineObject()->GetSequence() != sequence)
 	{
 		GetEngineObject()->SetSequence( sequence );

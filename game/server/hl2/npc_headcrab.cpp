@@ -1955,7 +1955,7 @@ int CBaseHeadcrab::SelectSchedule( void )
 				{
 					return SCHED_TAKE_COVER_FROM_ORIGIN;
 				}
-				else if ( SelectWeightedSequence( ACT_SMALL_FLINCH ) != -1 )
+				else if (GetEngineObject()->SelectWeightedSequence( ACT_SMALL_FLINCH ) != -1 )
 				{
 					m_flNextFlinchTime = gpGlobals->curtime + random->RandomFloat( 1, 3 );
 					return SCHED_SMALL_FLINCH;
@@ -3382,7 +3382,7 @@ int CBlackHeadcrab::SelectSchedule( void )
 
 		if ( HasCondition( COND_LIGHT_DAMAGE ) || HasCondition( COND_HEAVY_DAMAGE ) )
 		{
-			if ( ( gpGlobals->curtime >= m_flNextHopTime ) && SelectWeightedSequence( ACT_SMALL_FLINCH ) != -1 )
+			if ( ( gpGlobals->curtime >= m_flNextHopTime ) && GetEngineObject()->SelectWeightedSequence( ACT_SMALL_FLINCH ) != -1 )
 			{
 				m_flNextHopTime = gpGlobals->curtime + random->RandomFloat( 1, 3 );
 				return SCHED_SMALL_FLINCH;

@@ -910,11 +910,11 @@ void CBreakableProp::Spawn()
  	m_preferredCarryAngles = QAngle( -5, 0, 0 );
 
 	// The presence of this activity causes us to have to detach it before it can be grabbed.
-	if ( SelectWeightedSequence( ACT_PHYSCANNON_ANIMATE ) != ACTIVITY_NOT_AVAILABLE )
+	if (GetEngineObject()->SelectWeightedSequence( ACT_PHYSCANNON_ANIMATE ) != ACTIVITY_NOT_AVAILABLE )
 	{
 		m_nPhysgunState = PHYSGUN_ANIMATE_ON_PULL;
 	}
-	else if ( SelectWeightedSequence( ACT_PHYSCANNON_DETACH ) != ACTIVITY_NOT_AVAILABLE )
+	else if (GetEngineObject()->SelectWeightedSequence( ACT_PHYSCANNON_DETACH ) != ACTIVITY_NOT_AVAILABLE )
 	{
 		m_nPhysgunState = PHYSGUN_MUST_BE_DETACHED;
 	}
@@ -1275,7 +1275,7 @@ bool CBreakableProp::OnAttemptPhysGunPickup( CBasePlayer *pPhysGunUser, PhysGunP
 	if ( m_nPhysgunState == PHYSGUN_MUST_BE_DETACHED )
 	{
 		// A punt advances 
-		GetEngineObject()->ResetSequence( SelectWeightedSequence( ACT_PHYSCANNON_DETACH ) );
+		GetEngineObject()->ResetSequence(GetEngineObject()->SelectWeightedSequence( ACT_PHYSCANNON_DETACH ) );
 		GetEngineObject()->SetPlaybackRate( 0.0f );
 		GetEngineObject()->ResetClientsideFrame();
 		m_nPhysgunState = PHYSGUN_IS_DETACHING;
@@ -1289,7 +1289,7 @@ bool CBreakableProp::OnAttemptPhysGunPickup( CBasePlayer *pPhysGunUser, PhysGunP
 			return false;
 
 		// Do we have a pre sequence?
-		int iSequence = SelectWeightedSequence( ACT_PHYSCANNON_ANIMATE_PRE );
+		int iSequence = GetEngineObject()->SelectWeightedSequence( ACT_PHYSCANNON_ANIMATE_PRE );
 		if ( iSequence != ACTIVITY_NOT_AVAILABLE )
 		{
 			m_nPhysgunState = PHYSGUN_ANIMATE_IS_PRE_ANIMATING;
@@ -1300,7 +1300,7 @@ bool CBreakableProp::OnAttemptPhysGunPickup( CBasePlayer *pPhysGunUser, PhysGunP
 		else
 		{
 			// Go straight to the animate sequence
-			iSequence = SelectWeightedSequence( ACT_PHYSCANNON_ANIMATE );
+			iSequence = GetEngineObject()->SelectWeightedSequence( ACT_PHYSCANNON_ANIMATE );
 			m_nPhysgunState = PHYSGUN_ANIMATE_IS_ANIMATING;
 
 			m_OnPhysCannonAnimatePullStarted.FireOutput( NULL,this );
@@ -1327,7 +1327,7 @@ bool CBreakableProp::OnAttemptPhysGunPickup( CBasePlayer *pPhysGunUser, PhysGunP
 
 		if (GetEngineObject()->IsSequenceFinished() )
 		{
-			int iSequence = SelectWeightedSequence( ACT_PHYSCANNON_ANIMATE_POST );
+			int iSequence = GetEngineObject()->SelectWeightedSequence( ACT_PHYSCANNON_ANIMATE_POST );
 			if ( iSequence != ACTIVITY_NOT_AVAILABLE )
 			{
 				m_nPhysgunState = PHYSGUN_ANIMATE_IS_POST_ANIMATING;
@@ -1382,7 +1382,7 @@ void CBreakableProp::AnimateThink( void )
 				// Start the animate sequence
 				m_nPhysgunState = PHYSGUN_ANIMATE_IS_ANIMATING;
 
-				GetEngineObject()->ResetSequence( SelectWeightedSequence( ACT_PHYSCANNON_ANIMATE ) );
+				GetEngineObject()->ResetSequence(GetEngineObject()->SelectWeightedSequence( ACT_PHYSCANNON_ANIMATE ) );
 				GetEngineObject()->SetPlaybackRate( 1.0f );
 				GetEngineObject()->ResetClientsideFrame();
 
@@ -2201,7 +2201,7 @@ void CDynamicProp::AnimThink( void )
 
 	if ( m_bRandomAnimator && m_flNextRandAnim < gpGlobals->curtime )
 	{
-		GetEngineObject()->ResetSequence( SelectWeightedSequence( ACT_IDLE ) );
+		GetEngineObject()->ResetSequence(GetEngineObject()->SelectWeightedSequence( ACT_IDLE ) );
 		GetEngineObject()->ResetClientsideFrame();
 
 		// Fire output
@@ -3951,7 +3951,7 @@ void CBasePropDoor::OnUse( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TY
 		// Ready to be opened or closed.
 		if (m_bLocked)
 		{
-			PropSetSequence(SelectWeightedSequence((Activity)ACT_DOOR_LOCKED));
+			PropSetSequence(GetEngineObject()->SelectWeightedSequence((Activity)ACT_DOOR_LOCKED));
 			PlayLockSounds(this, &m_ls, TRUE, FALSE);
 			m_OnLockedUse.FireOutput( pActivator, pCaller );
 		}
@@ -3960,7 +3960,7 @@ void CBasePropDoor::OnUse( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TY
 			m_hActivator = pActivator;
 
 			PlayLockSounds(this, &m_ls, FALSE, FALSE);
-			int nSequence = SelectWeightedSequence((Activity)ACT_DOOR_OPEN);
+			int nSequence = GetEngineObject()->SelectWeightedSequence((Activity)ACT_DOOR_OPEN);
 			PropSetSequence(nSequence);
 
 			if ((nSequence == -1) || !HasAnimEvent(nSequence, AE_DOOR_OPEN))

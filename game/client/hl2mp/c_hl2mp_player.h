@@ -62,7 +62,7 @@ public:
 	virtual void PlayStepSound( Vector &vecOrigin, surfacedata_t *psurface, float fvol, bool force );
 	virtual void PreThink( void );
 	virtual void DoImpactEffect( trace_t &tr, int nDamageType );
-	IRagdoll* GetRepresentativeRagdoll() const;
+	const IEngineObjectClient* GetRepresentativeRagdoll() const;
 	virtual void CalcView( Vector &eyeOrigin, QAngle &eyeAngles, float &zNear, float &zFar, float &fov );
 	virtual const QAngle& EyeAngles( void );
 
@@ -151,7 +151,7 @@ public:
 	virtual void OnDataChanged( DataUpdateType_t type );
 
 	int GetPlayerEntIndex() const;
-	IRagdoll* GetIRagdoll() const;
+	//IRagdoll* GetIRagdoll() const;
 
 	void ImpactTrace( trace_t *pTrace, int iDamageType, const char *pCustomImpactName );
 	void UpdateOnRemove( void );

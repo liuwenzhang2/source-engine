@@ -750,6 +750,10 @@ public:
 	IPhysicsObject* GetGroundVPhysics();
 	bool IsRideablePhysics(IPhysicsObject* pPhysics);
 
+	int		SelectWeightedSequence(int activity);
+	int		SelectWeightedSequence(int activity, int curSequence);
+	int		SelectHeaviestSequence(int activity);
+
 public:
 	// Networking related methods
 	void NetworkStateChanged();

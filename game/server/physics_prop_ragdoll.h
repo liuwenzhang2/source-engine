@@ -109,7 +109,7 @@ public:
 
 protected:
 	void CalcRagdollSize( void );
-	ragdoll_t			m_ragdoll;
+	ragdoll_t	m_ragdoll;
 
 private:
 	void UpdateNetworkDataFromVPhysics( IPhysicsObject *pPhysics, int index );

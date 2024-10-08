@@ -315,9 +315,9 @@ int CCollisionEvent::ShouldSolvePenetration( IPhysicsObject *pObj0, IPhysicsObje
 			C_BaseEntity *pEnt = reinterpret_cast<C_BaseEntity *>(pGameData0);
 			C_BaseAnimating *pAnim = pEnt->GetBaseAnimating();
 
-			if ( pAnim && pAnim->m_pRagdoll )
+			if ( pAnim && pAnim->GetEngineObject()->RagdollBoneCount() )
 			{
-				IPhysicsConstraintGroup *pGroup = pAnim->m_pRagdoll->GetConstraintGroup();
+				IPhysicsConstraintGroup *pGroup = pAnim->GetEngineObject()->GetConstraintGroup();
 				if ( pGroup )
 				{
 					pGroup->SolvePenetration( pObj0, pObj1 );

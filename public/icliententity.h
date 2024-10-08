@@ -27,6 +27,8 @@ class IClientEntityInternal;
 struct SpatializationInfo_t;
 struct string_t;
 class IPhysicsObject;
+struct ragdoll_t;
+class CBoneAccessor;
 
 class VarMapEntry_t
 {
@@ -483,6 +485,28 @@ public:
 	virtual IPhysicsObject* VPhysicsInitStatic(void) = 0;
 	virtual IPhysicsObject* VPhysicsInitNormal(SolidType_t solidType, int nSolidFlags, bool createAsleep, solid_t* pSolid = NULL) = 0;
 	virtual IPhysicsObject* VPhysicsInitShadow(bool allowPhysicsMovement, bool allowPhysicsRotation, solid_t* pSolid = NULL) = 0;
+
+	virtual void RagdollBone(C_BaseEntity* ent, mstudiobone_t* pbones, int boneCount, bool* boneSimulated, CBoneAccessor& pBoneToWorld) = 0;
+	virtual const Vector& GetRagdollOrigin() = 0;
+	virtual void GetRagdollBounds(Vector& mins, Vector& maxs) = 0;
+	virtual int RagdollBoneCount() const = 0;
+	virtual IPhysicsObject* GetElement(int elementNum) = 0;
+	virtual void DrawWireframe(void) = 0;
+	virtual void VPhysicsUpdate(IPhysicsObject* pObject) = 0;
+	virtual bool TransformVectorToWorld(int boneIndex, const Vector* vTemp, Vector* vOut) = 0;
+	virtual ragdoll_t* GetRagdoll(void) = 0;
+	virtual void BuildRagdollBounds(C_BaseEntity* ent) = 0;
+	virtual void ResetRagdollSleepAfterTime(void) = 0;
+	virtual float GetLastVPhysicsUpdateTime() const = 0;
+	virtual void UnragdollBlend(IStudioHdr* hdr, Vector pos[], Quaternion q[], float currentTime) = 0;
+	virtual void IgniteRagdoll(C_BaseEntity* pSource) = 0;
+	virtual void TransferDissolveFrom(C_BaseEntity* pSource) = 0;
+	virtual C_BaseEntity* CreateRagdollCopy() = 0;
+	virtual bool InitAsClientRagdoll(const matrix3x4_t* pDeltaBones0, const matrix3x4_t* pDeltaBones1, const matrix3x4_t* pCurrentBonePosition, float boneDt, bool bFixedConstraints = false) = 0;
+	virtual void Simulate() = 0;
+	virtual void CreateUnragdollInfo(C_BaseEntity* pRagdoll) = 0;
+	virtual IPhysicsConstraintGroup* GetConstraintGroup() = 0;
+	virtual int SelectWeightedSequence(int activity) = 0;
 
 };
 

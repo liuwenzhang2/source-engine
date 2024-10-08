@@ -1921,7 +1921,7 @@ void CBasePlayer::SetAnimation( PLAYER_ANIM playerAnim )
 	
 		SetActivity( idealActivity );
 
-		animDesired = SelectWeightedSequence( m_Activity );
+		animDesired = GetEngineObject()->SelectWeightedSequence( m_Activity );
 
 		// Already using the desired animation?
 		if (GetEngineObject()->GetSequence() == animDesired)

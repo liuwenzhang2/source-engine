@@ -20,7 +20,7 @@ END_DATADESC()
 
 void CActAnimating::SetActivity( Activity act ) 
 { 
-	int sequence = SelectWeightedSequence( act ); 
+	int sequence = GetEngineObject()->SelectWeightedSequence( act );
 	if ( sequence != ACTIVITY_NOT_AVAILABLE )
 	{
 		GetEngineObject()->ResetSequence( sequence );

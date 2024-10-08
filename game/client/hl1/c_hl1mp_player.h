@@ -33,7 +33,7 @@ public:
 
 	virtual bool ShouldPredict( void );
 	virtual void CalcView( Vector &eyeOrigin, QAngle &eyeAngles, float &zNear, float &zFar, float &fov );
-	IRagdoll* GetRepresentativeRagdoll() const;
+	const IEngineObjectClient* GetRepresentativeRagdoll() const;
 
     virtual void Spawn( void );
 	virtual void AddEntity( void );
@@ -97,7 +97,7 @@ public:
 	virtual void OnDataChanged( DataUpdateType_t type );
 
 	int GetPlayerEntIndex() const;
-	IRagdoll* GetIRagdoll() const;
+	//IRagdoll* GetIRagdoll() const;
 
 	void ImpactTrace( trace_t *pTrace, int iDamageType, const char *pCustomImpactName );
 	void UpdateOnRemove( void );

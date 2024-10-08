@@ -3851,7 +3851,7 @@ Activity CNPC_MetroPolice::GetFlinchActivity( bool bHeavyDamage, bool bGesture )
 		if ( ( m_flLastHitYaw > 90 ) && ( m_flLastHitYaw < 270 ) )
 		{
 			Activity flinchActivity = (Activity)ACT_METROPOLICE_FLINCH_BEHIND;
-			if ( SelectWeightedSequence ( flinchActivity ) != ACTIVITY_NOT_AVAILABLE )
+			if (GetEngineObject()->SelectWeightedSequence ( flinchActivity ) != ACTIVITY_NOT_AVAILABLE )
 				return flinchActivity;
 		}
 
@@ -3860,7 +3860,7 @@ Activity CNPC_MetroPolice::GetFlinchActivity( bool bHeavyDamage, bool bGesture )
 			( LastHitGroup() == HITGROUP_RIGHTLEG ) )
 		{
 			Activity flinchActivity = ACT_FLINCH_STOMACH;
-			if ( SelectWeightedSequence ( ACT_FLINCH_STOMACH ) != ACTIVITY_NOT_AVAILABLE )
+			if (GetEngineObject()->SelectWeightedSequence ( ACT_FLINCH_STOMACH ) != ACTIVITY_NOT_AVAILABLE )
 				return flinchActivity;
 		}
 	}

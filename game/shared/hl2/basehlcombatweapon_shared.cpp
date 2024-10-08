@@ -77,7 +77,7 @@ void CBaseHLCombatWeapon::ItemHolsterFrame( void )
 //-----------------------------------------------------------------------------
 bool CBaseHLCombatWeapon::CanLower()
 {
-	if ( SelectWeightedSequence( ACT_VM_IDLE_LOWERED ) == ACTIVITY_NOT_AVAILABLE )
+	if (GetEngineObject()->SelectWeightedSequence( ACT_VM_IDLE_LOWERED ) == ACTIVITY_NOT_AVAILABLE )
 		return false;
 	return true;
 }
@@ -89,7 +89,7 @@ bool CBaseHLCombatWeapon::CanLower()
 bool CBaseHLCombatWeapon::Lower( void )
 {
 	//Don't bother if we don't have the animation
-	if ( SelectWeightedSequence( ACT_VM_IDLE_LOWERED ) == ACTIVITY_NOT_AVAILABLE )
+	if (GetEngineObject()->SelectWeightedSequence( ACT_VM_IDLE_LOWERED ) == ACTIVITY_NOT_AVAILABLE )
 		return false;
 
 	m_bLowered = true;
@@ -103,7 +103,7 @@ bool CBaseHLCombatWeapon::Lower( void )
 bool CBaseHLCombatWeapon::Ready( void )
 {
 	//Don't bother if we don't have the animation
-	if ( SelectWeightedSequence( ACT_VM_LOWERED_TO_IDLE ) == ACTIVITY_NOT_AVAILABLE )
+	if (GetEngineObject()->SelectWeightedSequence( ACT_VM_LOWERED_TO_IDLE ) == ACTIVITY_NOT_AVAILABLE )
 		return false;
 
 	m_bLowered = false;	
@@ -124,7 +124,7 @@ bool CBaseHLCombatWeapon::Deploy( void )
 		CHL2_Player *pPlayer = assert_cast<CHL2_Player*>( GetOwner() );
 		if ( pPlayer->IsWeaponLowered() )
 		{
-			if ( SelectWeightedSequence( ACT_VM_IDLE_LOWERED ) != ACTIVITY_NOT_AVAILABLE )
+			if (GetEngineObject()->SelectWeightedSequence( ACT_VM_IDLE_LOWERED ) != ACTIVITY_NOT_AVAILABLE )
 			{
 				if ( DefaultDeploy( (char*)GetViewModel(), (char*)GetWorldModel(), ACT_VM_IDLE_LOWERED, (char*)GetAnimPrefix() ) )
 				{

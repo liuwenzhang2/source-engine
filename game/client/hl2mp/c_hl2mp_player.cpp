@@ -697,11 +697,11 @@ void C_HL2MP_Player::CalcView( Vector &eyeOrigin, QAngle &eyeAngles, float &zNea
 	{
 		Vector origin = EyePosition();			
 
-		IRagdoll *pRagdoll = GetRepresentativeRagdoll();
+		const IEngineObjectClient *pRagdoll = GetRepresentativeRagdoll();
 
-		if ( pRagdoll )
+		if ( pRagdoll && pRagdoll->RagdollBoneCount())
 		{
-			origin = pRagdoll->GetRagdollOrigin();
+			origin = ((IEngineObjectClient*)pRagdoll)->GetRagdollOrigin();
 			origin.z += VEC_DEAD_VIEWHEIGHT_SCALED( this ).z; // look over ragdoll, not through
 		}
 
@@ -734,13 +734,13 @@ void C_HL2MP_Player::CalcView( Vector &eyeOrigin, QAngle &eyeAngles, float &zNea
 	BaseClass::CalcView( eyeOrigin, eyeAngles, zNear, zFar, fov );
 }
 
-IRagdoll* C_HL2MP_Player::GetRepresentativeRagdoll() const
+const IEngineObjectClient* C_HL2MP_Player::GetRepresentativeRagdoll() const
 {
 	if ( m_hRagdoll.Get() )
 	{
 		C_HL2MPRagdoll *pRagdoll = (C_HL2MPRagdoll*)m_hRagdoll.Get();
 
-		return pRagdoll->GetIRagdoll();
+		return pRagdoll->GetEngineObject();
 	}
 	else
 	{
@@ -834,7 +834,7 @@ void C_HL2MPRagdoll::ImpactTrace( trace_t *pTrace, int iDamageType, const char *
 //		FX_CS_BloodSpray( hitpos, dir, 10 );
 	}
 
-	m_pRagdoll->ResetRagdollSleepAfterTime();
+	GetEngineObject()->ResetRagdollSleepAfterTime();
 }
 
 
@@ -920,7 +920,7 @@ void C_HL2MPRagdoll::CreateHL2MPRagdoll( void )
 		GetRagdollInitBoneArrays( boneDelta0, boneDelta1, currentBones, boneDt );
 	}
 
-	InitAsClientRagdoll( boneDelta0, boneDelta1, currentBones, boneDt );
+	GetEngineObject()->InitAsClientRagdoll( boneDelta0, boneDelta1, currentBones, boneDt );
 }
 
 
@@ -934,10 +934,10 @@ void C_HL2MPRagdoll::OnDataChanged( DataUpdateType_t type )
 	}
 }
 
-IRagdoll* C_HL2MPRagdoll::GetIRagdoll() const
-{
-	return m_pRagdoll;
-}
+//IRagdoll* C_HL2MPRagdoll::GetIRagdoll() const
+//{
+//	return m_pRagdoll;
+//}
 
 void C_HL2MPRagdoll::UpdateOnRemove( void )
 {

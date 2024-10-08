@@ -358,12 +358,12 @@ void CHL1MP_Player::SetAnimation( PLAYER_ANIM playerAnim )
 	{
 		if (GetEngineObject()->GetFlags() & FL_DUCKING )
 		{
-			animDesired = SelectWeightedSequence( ACT_CROUCH );
+			animDesired = GetEngineObject()->SelectWeightedSequence( ACT_CROUCH );
 			SetActivity( ACT_CROUCH );
 		}
 		else
 		{
-			animDesired = SelectWeightedSequence( ACT_RUN );
+			animDesired = GetEngineObject()->SelectWeightedSequence( ACT_RUN );
 			SetActivity( ACT_RUN );
 		}
 		
@@ -375,7 +375,7 @@ void CHL1MP_Player::SetAnimation( PLAYER_ANIM playerAnim )
 
 		SetActivity( idealActivity );
 
-		animDesired = SelectWeightedSequence( GetActivity() );
+		animDesired = GetEngineObject()->SelectWeightedSequence( GetActivity() );
 
 		// Already using the desired animation?
 		if (GetEngineObject()->GetSequence() == animDesired)

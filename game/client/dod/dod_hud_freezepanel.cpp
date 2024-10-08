@@ -399,8 +399,8 @@ void CDODFreezePanel::UpdateCallout( void )
 		return;
 
 	// Abort early if we have no ragdoll
-	IRagdoll *pRagdoll = pPlayer->GetRepresentativeRagdoll();
-	if ( !pRagdoll )
+	const IEngineObjectClient *pRagdoll = pPlayer->GetRepresentativeRagdoll();
+	if ( !pRagdoll || !pRagdoll->RagdollBoneCount())
 		return;
 
 	if ( m_pFreezePanelBG == NULL )
@@ -422,8 +422,8 @@ void CDODFreezePanel::UpdateCallout( void )
 
 	if ( pRagdoll )
 	{
-		Vector origin = pRagdoll->GetRagdollOrigin();
-		pRagdoll->GetRagdollBounds( vMins, vMaxs );
+		Vector origin = ((IEngineObjectClient*)pRagdoll)->GetRagdollOrigin();
+		((IEngineObjectClient*)pRagdoll)->GetRagdollBounds( vMins, vMaxs );
 
 		// Try and add the callout
 		//CDODFreezePanelCallout *pCallout = 

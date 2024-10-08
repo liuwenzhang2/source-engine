@@ -198,7 +198,7 @@ public:
 	virtual void OnDataChanged( DataUpdateType_t type );
 
 	int GetPlayerEntIndex() const;
-	IRagdoll* GetIRagdoll() const;
+	//IRagdoll* GetIRagdoll() const;
 	void GetRagdollInitBoneArrays( matrix3x4_t *pDeltaBones0, matrix3x4_t *pDeltaBones1, matrix3x4_t *pCurrentBones, float boneDt ) OVERRIDE;
 
 	void ImpactTrace( trace_t *pTrace, int iDamageType, const char *pCustomImpactName );
@@ -330,7 +330,7 @@ void C_CSRagdoll::ImpactTrace( trace_t *pTrace, int iDamageType, const char *pCu
 		FX_CS_BloodSpray( hitpos, dir, 10 );
 	}
 
-	m_pRagdoll->ResetRagdollSleepAfterTime();
+	GetEngineObject()->ResetRagdollSleepAfterTime();
 }
 
 
@@ -507,7 +507,7 @@ void C_CSRagdoll::CreateCSRagdoll()
 			GetRagdollInitBoneArrays( boneDelta0, boneDelta1, currentBones, boneDt );
 		}
 
-		InitAsClientRagdoll( boneDelta0, boneDelta1, currentBones, boneDt );
+		GetEngineObject()->InitAsClientRagdoll( boneDelta0, boneDelta1, currentBones, boneDt );
 		m_flRagdollSinkStart = -1;
 	}
 	else
@@ -588,10 +588,10 @@ void C_CSRagdoll::OnDataChanged( DataUpdateType_t type )
 	}
 }
 
-IRagdoll* C_CSRagdoll::GetIRagdoll() const
-{
-	return m_pRagdoll;
-}
+//IRagdoll* C_CSRagdoll::GetIRagdoll() const
+//{
+//	return m_pRagdoll;
+//}
 
 //-----------------------------------------------------------------------------
 // Purpose: Called when the player toggles nightvision
@@ -2036,19 +2036,19 @@ void C_CSPlayer::BuildTransformations( IStudioHdr *pHdr, Vector *pos, Quaternion
 }
 
 
-C_BaseAnimating * C_CSPlayer::BecomeRagdollOnClient()
+C_BaseEntity* C_CSPlayer::BecomeRagdollOnClient()
 {
 	return NULL;
 }
 
 
-IRagdoll* C_CSPlayer::GetRepresentativeRagdoll() const
+const IEngineObjectClient* C_CSPlayer::GetRepresentativeRagdoll() const
 {
 	if ( m_hRagdoll.Get() )
 	{
 		C_CSRagdoll *pRagdoll = (C_CSRagdoll*)m_hRagdoll.Get();
 
-		return pRagdoll->GetIRagdoll();
+		return pRagdoll->GetEngineObject();
 	}
 	else
 	{

@@ -570,7 +570,7 @@ int CBaseAnimatingOverlay::AddGesture( Activity activity, bool autokill /*= true
 		return FindGestureLayer( activity );
 	}
 
-	int seq = SelectWeightedSequence( activity );
+	int seq = GetEngineObject()->SelectWeightedSequence( activity );
 	if ( seq <= 0 )
 	{
 		const char *actname = CAI_BaseNPC::GetActivityName( activity );

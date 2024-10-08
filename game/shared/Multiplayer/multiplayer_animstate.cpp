@@ -292,7 +292,7 @@ void CMultiPlayerAnimState::DoAnimationEvent( PlayerAnimEvent_t event, int nData
 	case PLAYERANIMEVENT_CUSTOM:
 		{
 			Activity iIdealActivity = TranslateActivity( (Activity)nData );
-			m_nSpecificMainSequence = GetBasePlayer()->SelectWeightedSequence( iIdealActivity );
+			m_nSpecificMainSequence = GetBasePlayer()->GetEngineObject()->SelectWeightedSequence( iIdealActivity );
 			RestartMainSequence();
 		}
 		break;
@@ -344,7 +344,7 @@ void CMultiPlayerAnimState::PlayFlinchGesture( Activity iActivity )
 	if ( !IsGestureSlotActive( GESTURE_SLOT_FLINCH ) )
 	{
 		// See if we have the custom flinch. If not, revert to chest
-		if ( iActivity != ACT_MP_GESTURE_FLINCH_CHEST && GetBasePlayer()->SelectWeightedSequence( iActivity ) == -1 )
+		if ( iActivity != ACT_MP_GESTURE_FLINCH_CHEST && GetBasePlayer()->GetEngineObject()->SelectWeightedSequence( iActivity ) == -1 )
 		{
 			RestartGesture( GESTURE_SLOT_FLINCH, ACT_MP_GESTURE_FLINCH_CHEST );
 		}
@@ -456,7 +456,7 @@ void CMultiPlayerAnimState::ResetGestureSlot( int iGestureSlot )
 void CMultiPlayerAnimState::RunGestureSlotAnimEventsToCompletion( GestureSlot_t *pGesture )
 {
 	CBasePlayer *pPlayer = GetBasePlayer();
-	if( !pPlayer )
+	if( !pPlayer || pPlayer->entindex()==-1)
 		return;
 
 	// Get the studio header for the player.
@@ -601,7 +601,7 @@ void CMultiPlayerAnimState::AddToGestureSlot( int iGestureSlot, Activity iGestur
 		return;
 
 	// Get the sequence.
-	int iGestureSequence = pPlayer->SelectWeightedSequence( iGestureActivity );
+	int iGestureSequence = pPlayer->GetEngineObject()->SelectWeightedSequence( iGestureActivity );
 	if ( iGestureSequence <= 0 )
 		return;
 

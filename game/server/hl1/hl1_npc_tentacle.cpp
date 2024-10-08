@@ -594,16 +594,16 @@ void CNPC_Tentacle::Cycle( void )
 				switch ( m_iSoundLevel )
 				{
 					case 0:
-						m_iGoalAnim = SelectWeightedSequence ( ACT_1030 );
+						m_iGoalAnim = GetEngineObject()->SelectWeightedSequence ( ACT_1030 );
 						break;
 					case 1:
-						m_iGoalAnim = SelectWeightedSequence ( ACT_1031 );
+						m_iGoalAnim = GetEngineObject()->SelectWeightedSequence ( ACT_1031 );
 						break;
 					case 2:
-						m_iGoalAnim = SelectWeightedSequence ( ACT_1032 );
+						m_iGoalAnim = GetEngineObject()->SelectWeightedSequence ( ACT_1032 );
 						break;
 					case 3:
-						m_iGoalAnim = SelectWeightedSequence ( ACT_1033 );
+						m_iGoalAnim = GetEngineObject()->SelectWeightedSequence ( ACT_1033 );
 						break;
 				}
 			}
@@ -613,16 +613,16 @@ void CNPC_Tentacle::Cycle( void )
 				switch ( m_iSoundLevel )
 				{
 					case 0:
-						m_iGoalAnim = SelectWeightedSequence ( ACT_1020 );
+						m_iGoalAnim = GetEngineObject()->SelectWeightedSequence ( ACT_1020 );
 						break;
 					case 1:
-						m_iGoalAnim = SelectWeightedSequence ( ACT_1021 );
+						m_iGoalAnim = GetEngineObject()->SelectWeightedSequence ( ACT_1021 );
 						break;
 					case 2:
-						m_iGoalAnim = SelectWeightedSequence ( ACT_1022 );
+						m_iGoalAnim = GetEngineObject()->SelectWeightedSequence ( ACT_1022 );
 						break;
 					case 3:
-						m_iGoalAnim = SelectWeightedSequence ( ACT_1023 );
+						m_iGoalAnim = GetEngineObject()->SelectWeightedSequence ( ACT_1023 );
 						break;
 				}
 			}
@@ -632,19 +632,19 @@ void CNPC_Tentacle::Cycle( void )
 				switch ( m_iSoundLevel )
 				{
 					case 0:
-						m_iGoalAnim = SelectWeightedSequence ( ACT_1040 );
+						m_iGoalAnim = GetEngineObject()->SelectWeightedSequence ( ACT_1040 );
 						break;
 					case 1:
-						m_iGoalAnim = SelectWeightedSequence ( ACT_1041 );
+						m_iGoalAnim = GetEngineObject()->SelectWeightedSequence ( ACT_1041 );
 						break;
 					case 2:
-						m_iGoalAnim = SelectWeightedSequence ( ACT_1042 );
+						m_iGoalAnim = GetEngineObject()->SelectWeightedSequence ( ACT_1042 );
 						break;
 					case 3:
-						m_iGoalAnim = SelectWeightedSequence ( ACT_1043 );
+						m_iGoalAnim = GetEngineObject()->SelectWeightedSequence ( ACT_1043 );
 						break;
 					case 4:
-						m_iGoalAnim = SelectWeightedSequence ( ACT_1044 );
+						m_iGoalAnim = GetEngineObject()->SelectWeightedSequence ( ACT_1044 );
 						break;
 				}
 			}
@@ -664,16 +664,16 @@ void CNPC_Tentacle::Cycle( void )
 					switch ( m_iSoundLevel )
 					{
 						case 0:
-							m_iGoalAnim = SelectWeightedSequence ( ACT_1030 );
+							m_iGoalAnim = GetEngineObject()->SelectWeightedSequence ( ACT_1030 );
 							break;
 						case 1:
-							m_iGoalAnim = SelectWeightedSequence ( ACT_1031 );
+							m_iGoalAnim = GetEngineObject()->SelectWeightedSequence ( ACT_1031 );
 							break;
 						case 2:
-							m_iGoalAnim = SelectWeightedSequence ( ACT_1032 );
+							m_iGoalAnim = GetEngineObject()->SelectWeightedSequence ( ACT_1032 );
 							break;
 						case 3:
-							m_iGoalAnim = SelectWeightedSequence ( ACT_1033 );
+							m_iGoalAnim = GetEngineObject()->SelectWeightedSequence ( ACT_1033 );
 							break;
 					}
 				}
@@ -683,23 +683,23 @@ void CNPC_Tentacle::Cycle( void )
 					switch ( m_iSoundLevel )
 					{
 						case 0:
-							m_iGoalAnim = SelectWeightedSequence ( ACT_1020 );
+							m_iGoalAnim = GetEngineObject()->SelectWeightedSequence ( ACT_1020 );
 							break;
 						case 1:
-							m_iGoalAnim = SelectWeightedSequence ( ACT_1021 );
+							m_iGoalAnim = GetEngineObject()->SelectWeightedSequence ( ACT_1021 );
 							break;
 						case 2:
-							m_iGoalAnim = SelectWeightedSequence ( ACT_1022 );
+							m_iGoalAnim = GetEngineObject()->SelectWeightedSequence ( ACT_1022 );
 							break;
 						case 3:
-							m_iGoalAnim = SelectWeightedSequence ( ACT_1023 );
+							m_iGoalAnim = GetEngineObject()->SelectWeightedSequence ( ACT_1023 );
 							break;
 					}
 				}
 			}
 			else if ( MyLevel( ) < 0 )
 			{
-				m_iGoalAnim = SelectWeightedSequence( ACT_1010 );
+				m_iGoalAnim = GetEngineObject()->SelectWeightedSequence( ACT_1010 );
 			}
 			else
 			{
@@ -718,16 +718,16 @@ void CNPC_Tentacle::Cycle( void )
 					switch ( random->RandomInt( 0, 3 ) )
 					{
 						case 0:
-							m_iGoalAnim = SelectWeightedSequence ( ACT_1010 );
+							m_iGoalAnim = GetEngineObject()->SelectWeightedSequence ( ACT_1010 );
 							break;
 						case 1:
-							m_iGoalAnim = SelectWeightedSequence ( ACT_1011 );
+							m_iGoalAnim = GetEngineObject()->SelectWeightedSequence ( ACT_1011 );
 							break;
 						case 2:
-							m_iGoalAnim = SelectWeightedSequence ( ACT_1012 );
+							m_iGoalAnim = GetEngineObject()->SelectWeightedSequence ( ACT_1012 );
 							break;
 						case 3:
-							m_iGoalAnim = SelectWeightedSequence ( ACT_1013 );
+							m_iGoalAnim = GetEngineObject()->SelectWeightedSequence ( ACT_1013 );
 							break;
 					}
 				}
@@ -737,16 +737,16 @@ void CNPC_Tentacle::Cycle( void )
 					switch ( MyLevel() )
 					{
 						case 0:
-							m_iGoalAnim = SelectWeightedSequence ( ACT_1020 );
+							m_iGoalAnim = GetEngineObject()->SelectWeightedSequence ( ACT_1020 );
 							break;
 						case 1:
-							m_iGoalAnim = SelectWeightedSequence ( ACT_1021 );
+							m_iGoalAnim = GetEngineObject()->SelectWeightedSequence ( ACT_1021 );
 							break;
 						case 2:
-							m_iGoalAnim = SelectWeightedSequence ( ACT_1022 );
+							m_iGoalAnim = GetEngineObject()->SelectWeightedSequence ( ACT_1022 );
 							break;
 						case 3:
-							m_iGoalAnim = SelectWeightedSequence ( ACT_1023 );
+							m_iGoalAnim = GetEngineObject()->SelectWeightedSequence ( ACT_1023 );
 							break;
 					}
 				}
@@ -756,16 +756,16 @@ void CNPC_Tentacle::Cycle( void )
 					switch ( MyLevel() )
 					{
 						case 0:
-							m_iGoalAnim = SelectWeightedSequence ( ACT_1010 );
+							m_iGoalAnim = GetEngineObject()->SelectWeightedSequence ( ACT_1010 );
 							break;
 						case 1:
-							m_iGoalAnim = SelectWeightedSequence ( ACT_1011 );
+							m_iGoalAnim = GetEngineObject()->SelectWeightedSequence ( ACT_1011 );
 							break;
 						case 2:
-							m_iGoalAnim = SelectWeightedSequence ( ACT_1012 );
+							m_iGoalAnim = GetEngineObject()->SelectWeightedSequence ( ACT_1012 );
 							break;
 						case 3:
-							m_iGoalAnim = SelectWeightedSequence ( ACT_1013 );
+							m_iGoalAnim = GetEngineObject()->SelectWeightedSequence ( ACT_1013 );
 							break;
 					}
 				}

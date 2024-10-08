@@ -1385,7 +1385,7 @@ void CAI_PassengerBehaviorCompanion::StartTask( const Task_t *pTask )
 			GetOuter()->ResetIdealActivity( ACT_PASSENGER_IMPACT );
 			
 			// Delay for twice the duration of our impact animation
-			int nSequence = GetOuter()->SelectWeightedSequence( ACT_PASSENGER_IMPACT ); 
+			int nSequence = GetOuter()->GetEngineObject()->SelectWeightedSequence( ACT_PASSENGER_IMPACT );
 			float flSeqDuration = GetOuter()->GetEngineObject()->SequenceDuration( nSequence );
 			float flStunTime = flSeqDuration  + random->RandomFloat( 1.0f, 2.0f );
 			GetOuter()->SetNextAttack( gpGlobals->curtime + flStunTime );

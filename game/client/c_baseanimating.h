@@ -37,7 +37,7 @@ class C_BaseClientShader
 };
 */
 
-class IRagdoll;
+//class IRagdoll;
 class CIKContext;
 class CIKState;
 class ConVar;
@@ -163,7 +163,6 @@ public:
 	// C_BaseClientShader **p_ClientShaders;
 
 	virtual	void StandardBlendingRules( IStudioHdr *pStudioHdr, Vector pos[], Quaternion q[], float currentTime, int boneMask );
-	void UnragdollBlend( IStudioHdr *hdr, Vector pos[], Quaternion q[], float currentTime );
 
 	void MaintainSequenceTransitions( IBoneSetup &boneSetup, float flCycle, Vector pos[], Quaternion q[] );
 	virtual void AccumulateLayers( IBoneSetup &boneSetup, Vector pos[], Quaternion q[], float currentTime );
@@ -264,16 +263,10 @@ public:
 	// returns true if we're currently being ragdolled
 	bool							IsRagdoll() const;
 	bool							IsAboutToRagdoll() const;
-	virtual C_BaseAnimating			*BecomeRagdollOnClient();
-	C_BaseAnimating					*CreateRagdollCopy();
-	bool							InitAsClientRagdoll( const matrix3x4_t *pDeltaBones0, const matrix3x4_t *pDeltaBones1, const matrix3x4_t *pCurrentBonePosition, float boneDt, bool bFixedConstraints=false );
-	void							IgniteRagdoll( C_BaseAnimating *pSource );
-	void							TransferDissolveFrom( C_BaseAnimating *pSource );
-	virtual void					SaveRagdollInfo( int numbones, const matrix3x4_t &cameraTransform, CBoneAccessor &pBoneToWorld );
-	virtual bool					RetrieveRagdollInfo( Vector *pos, Quaternion *q );
+	virtual C_BaseEntity			*BecomeRagdollOnClient();
+
+
 	virtual void					Clear( void );
-	void							ClearRagdoll();
-	void							CreateUnragdollInfo( C_BaseAnimating *pRagdoll );
 	void							ForceSetupBonesAtTime( matrix3x4_t *pBonesOut, float flTime );
 	virtual void					GetRagdollInitBoneArrays( matrix3x4_t *pDeltaBones0, matrix3x4_t *pDeltaBones1, matrix3x4_t *pCurrentBones, float boneDt );
 
@@ -374,8 +367,7 @@ public:
 	virtual void SetServerIntendedCycle( float intended ) { (void)intended; }
 	virtual float GetServerIntendedCycle( void ) { return -1.0f; }
 
-	// For prediction
-	int								SelectWeightedSequence ( int activity );
+
 
 	int								FindTransitionSequence( int iCurrentSequence, int iGoalSequence, int *piDir );
 
@@ -387,6 +379,7 @@ public:
 	virtual bool					ShouldResetSequenceOnNewModel( void );
 
 	virtual bool					IsViewModel() const;
+	void							TermRopes();
 
 protected:
 	// View models scale their attachment positions to account for FOV. To get the unmodified
@@ -412,14 +405,13 @@ private:
 	CBoneList*						RecordBones( IStudioHdr *hdr, matrix3x4_t *pBoneState );
 
 	bool							PutAttachment( int number, const matrix3x4_t &attachmentToWorld );
-	void							TermRopes();
 
 	void							DelayedInitModelEffects( void );
 
 
 
 public:
-	CRagdoll						*m_pRagdoll;
+	//CRagdoll						*m_pRagdoll;
 
 
 
@@ -432,9 +424,7 @@ protected:
 
 
 
-	// Decomposed ragdoll info
-	bool							m_bStoreRagdollInfo;
-	RagdollInfo_t					*m_pRagdollInfo;
+
 
 
 	// Is bone cache valid
@@ -444,7 +434,6 @@ protected:
 	int								m_iPrevBoneMask;
 	int								m_iAccumulatedBoneMask;
 
-	CBoneAccessor					m_BoneAccessor;
 	CThreadFastMutex				m_BoneSetupLock;
 
 	ClientSideAnimationListHandle_t	m_ClientSideAnimationListHandle;
@@ -471,8 +460,7 @@ private:
 
 
 
-	int								m_nPrevSequence;
-	int								m_nRestoreSequence;
+
 
 	// Ropes that got spawned when the model was created.
 	CUtlLinkedList<C_RopeKeyframe*,unsigned short> m_Ropes;
@@ -489,9 +477,7 @@ private:
 
 	int								m_nPrevResetEventsParity;
 
-	bool							m_builtRagdoll;
-	Vector							m_vecPreRagdollMins;
-	Vector							m_vecPreRagdollMaxs;
+
 
 
 

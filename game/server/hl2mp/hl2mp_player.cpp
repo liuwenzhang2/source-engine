@@ -802,11 +802,11 @@ void CHL2MP_Player::SetAnimation( PLAYER_ANIM playerAnim )
 	{
 		SetActivity( idealActivity );
 
-		animDesired = SelectWeightedSequence( Weapon_TranslateActivity ( idealActivity ) );
+		animDesired = GetEngineObject()->SelectWeightedSequence( Weapon_TranslateActivity ( idealActivity ) );
 
 		if (animDesired == -1)
 		{
-			animDesired = SelectWeightedSequence( idealActivity );
+			animDesired = GetEngineObject()->SelectWeightedSequence( idealActivity );
 
 			if ( animDesired == -1 )
 			{

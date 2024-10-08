@@ -211,7 +211,7 @@ protected:
 	CBasePlayer *GetBasePlayer( void )				{ return m_pPlayer; }
 
 	// Allow inheriting classes to override SelectWeightedSequence
-	virtual int SelectWeightedSequence( Activity activity ) { return GetBasePlayer()->SelectWeightedSequence( activity ); }
+	virtual int SelectWeightedSequence( Activity activity ) { return GetBasePlayer()->GetEngineObject()->SelectWeightedSequence( activity ); }
 	virtual void RestartMainSequence();
 
 	virtual void GetOuterAbsVelocity( Vector& vel );

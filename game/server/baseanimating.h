@@ -81,9 +81,7 @@ public:
 
 	void	ResetActivityIndexes ( void );
 	void    ResetEventIndexes ( void );
-	int		SelectWeightedSequence ( Activity activity );
-	int		SelectWeightedSequence ( Activity activity, int curSequence );
-	int		SelectHeaviestSequence ( Activity activity );
+
 	int		LookupActivity( const char *label );
 	int		LookupSequence ( const char *label );
 	KeyValues *GetSequenceKeyValues( int iSequence );

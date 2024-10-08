@@ -1707,7 +1707,7 @@ int CNPC_HGrunt::SelectSchedule( void )
 			}
 		}
 		case NPC_STATE_ALERT:
-			if ( HasCondition( COND_ENEMY_DEAD ) && SelectWeightedSequence( ACT_VICTORY_DANCE ) != ACTIVITY_NOT_AVAILABLE )
+			if ( HasCondition( COND_ENEMY_DEAD ) && GetEngineObject()->SelectWeightedSequence( ACT_VICTORY_DANCE ) != ACTIVITY_NOT_AVAILABLE )
 			{
 				// Scan around for new enemies
 				return SCHED_VICTORY_DANCE;

@@ -437,6 +437,9 @@ public:
 	virtual int GetVphysicsCollisionState() = 0;
 	virtual IPhysicsObject* GetGroundVPhysics() = 0;
 	virtual bool IsRideablePhysics(IPhysicsObject* pPhysics) = 0;
+	virtual int SelectWeightedSequence(int activity) = 0;
+	virtual int SelectWeightedSequence(int activity, int curSequence) = 0;
+	virtual int SelectHeaviestSequence(int activity) = 0;
 
 };
 

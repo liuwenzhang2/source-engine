@@ -574,7 +574,7 @@ void CNPC_Strider::SetupGlobalModelData()
 
 	// BMCD: Get the conservative boxes from sequences
 	Vector mins, maxs;
-	ExtractBbox( SelectHeaviestSequence( ACT_WALK ), mins, maxs );
+	ExtractBbox(GetEngineObject()->SelectHeaviestSequence( ACT_WALK ), mins, maxs );
 	CNPC_Strider::gm_strideLength = (maxs.x - mins.x) * 0.5;
 
 	// UNDONE: use crouch when crouched
@@ -3681,11 +3681,11 @@ void CNPC_Strider::MaintainTurnActivity( void )
 		int iSeq = ACT_INVALID;
 		if (m_doLeft > m_doRight)
 		{
-			iSeq = SelectWeightedSequence( ACT_GESTURE_TURN_LEFT );
+			iSeq = GetEngineObject()->SelectWeightedSequence( ACT_GESTURE_TURN_LEFT );
 		}
 		else
 		{
-			iSeq = SelectWeightedSequence( ACT_GESTURE_TURN_RIGHT );
+			iSeq = GetEngineObject()->SelectWeightedSequence( ACT_GESTURE_TURN_RIGHT );
 		}
 		if (iSeq != ACT_INVALID)
 		{

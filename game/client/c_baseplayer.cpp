@@ -1753,10 +1753,10 @@ void C_BasePlayer::CalcDeathCamView(Vector& eyeOrigin, QAngle& eyeAngles, float&
 	Vector origin = EyePosition();			
 
 	// NOTE:  This will create the ragdoll in CSS if m_hRagdoll is set, but m_pRagdoll is not yet presetn
-	IRagdoll *pRagdoll = GetRepresentativeRagdoll();
-	if ( pRagdoll )
+	const IEngineObjectClient *pRagdoll = GetRepresentativeRagdoll();
+	if ( pRagdoll && pRagdoll->RagdollBoneCount())
 	{
-		origin = pRagdoll->GetRagdollOrigin();
+		origin = ((IEngineObjectClient*)pRagdoll)->GetRagdollOrigin();
 		origin.z += VEC_DEAD_VIEWHEIGHT_SCALED( this ).z;
 	}
 	
@@ -2656,9 +2656,9 @@ void C_BasePlayer::GetPredictionErrorSmoothingVector( Vector &vOffset )
 }
 
 
-IRagdoll* C_BasePlayer::GetRepresentativeRagdoll() const
+const IEngineObjectClient* C_BasePlayer::GetRepresentativeRagdoll() const
 {
-	return m_pRagdoll;
+	return GetEngineObject();
 }
 
 IMaterial *C_BasePlayer::GetHeadLabelMaterial( void )

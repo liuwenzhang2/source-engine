@@ -34,6 +34,7 @@
 #include "tier0/vcrmode.h"
 #include "coordsize.h"
 #include "physics_saverestore.h"
+#include "animation.h"
 
 #ifdef HL2_DLL
 #include "npc_playercompanion.h"
@@ -4910,6 +4911,36 @@ bool CEngineObjectInternal::IsRideablePhysics(IPhysicsObject* pPhysics)
 	}
 
 	return false;
+}
+
+//=========================================================
+// SelectWeightedSequence
+//=========================================================
+int CEngineObjectInternal::SelectWeightedSequence(int activity)
+{
+	Assert(activity != ACT_INVALID);
+	Assert(GetModelPtr());
+	return GetModelPtr()->SelectWeightedSequence(activity, GetSequence(), SharedRandomSelect);
+}
+
+
+int CEngineObjectInternal::SelectWeightedSequence(int activity, int curSequence)
+{
+	Assert(activity != ACT_INVALID);
+	Assert(GetModelPtr());
+	return GetModelPtr()->SelectWeightedSequence(activity, curSequence, SharedRandomSelect);
+}
+
+//=========================================================
+// LookupHeaviestSequence
+//
+// Get sequence with highest 'weight' for this activity
+//
+//=========================================================
+int CEngineObjectInternal::SelectHeaviestSequence(int activity)
+{
+	Assert(GetModelPtr());
+	return GetModelPtr()->SelectHeaviestSequence(activity);
 }
 
 void CEngineObjectPlayer::VPhysicsDestroyObject()

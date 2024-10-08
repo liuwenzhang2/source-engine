@@ -4041,7 +4041,7 @@ void CSceneEntity::ClearSchedules( CChoreoScene *scene )
 		}
 		else
 		{
-			pActor->GetEngineObject()->ResetSequence( pActor->SelectWeightedSequence( ACT_IDLE ) );
+			pActor->GetEngineObject()->ResetSequence( pActor->GetEngineObject()->SelectWeightedSequence( ACT_IDLE ) );
 			pActor->GetEngineObject()->SetCycle( 0 );
 		}
 		// Clear any existing expressions

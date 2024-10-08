@@ -943,7 +943,7 @@ CAI_Navigator *CAI_Motor::GetNavigator( void )
 							
 int CAI_Motor::SelectWeightedSequence ( Activity activity )
 {
-	return GetOuter()->SelectWeightedSequence ( activity );
+	return GetOuter()->GetEngineObject()->SelectWeightedSequence ( activity );
 }
 
 float	CAI_Motor::GetSequenceGroundSpeed( int iSequence )

@@ -23,349 +23,38 @@
 extern ConVar r_FadeProps;
 #endif
 
-CRagdoll::CRagdoll()
-{
-	m_ragdoll.listCount = 0;
-	m_vecLastOrigin.Init();
-	m_flLastOriginChangeTime = - 1.0f;
-	
-	m_lastUpdate = -FLT_MAX;
-}
+//CRagdoll::CRagdoll()
+//{
+//
+//}
+//
+//CRagdoll::~CRagdoll(void)
+//{
+//
+//}
 
-#define DEFINE_RAGDOLL_ELEMENT( i ) \
-	DEFINE_FIELD( m_ragdoll.list[i].originParentSpace, FIELD_VECTOR ), \
-	DEFINE_PHYSPTR( m_ragdoll.list[i].pObject ), \
-	DEFINE_PHYSPTR( m_ragdoll.list[i].pConstraint ), \
-	DEFINE_FIELD( m_ragdoll.list[i].parentIndex, FIELD_INTEGER )
-
-BEGIN_SIMPLE_DATADESC( CRagdoll )
-
-	DEFINE_AUTO_ARRAY( m_ragdoll.boneIndex,	FIELD_INTEGER ),
-	DEFINE_FIELD( m_ragdoll.listCount, FIELD_INTEGER ),
-	DEFINE_FIELD( m_ragdoll.allowStretch, FIELD_BOOLEAN ),
-	DEFINE_PHYSPTR( m_ragdoll.pGroup ),
-
-	DEFINE_RAGDOLL_ELEMENT( 0 ),
-	DEFINE_RAGDOLL_ELEMENT( 1 ),
-	DEFINE_RAGDOLL_ELEMENT( 2 ),
-	DEFINE_RAGDOLL_ELEMENT( 3 ),
-	DEFINE_RAGDOLL_ELEMENT( 4 ),
-	DEFINE_RAGDOLL_ELEMENT( 5 ),
-	DEFINE_RAGDOLL_ELEMENT( 6 ),
-	DEFINE_RAGDOLL_ELEMENT( 7 ),
-	DEFINE_RAGDOLL_ELEMENT( 8 ),
-	DEFINE_RAGDOLL_ELEMENT( 9 ),
-	DEFINE_RAGDOLL_ELEMENT( 10 ),
-	DEFINE_RAGDOLL_ELEMENT( 11 ),
-	DEFINE_RAGDOLL_ELEMENT( 12 ),
-	DEFINE_RAGDOLL_ELEMENT( 13 ),
-	DEFINE_RAGDOLL_ELEMENT( 14 ),
-	DEFINE_RAGDOLL_ELEMENT( 15 ),
-	DEFINE_RAGDOLL_ELEMENT( 16 ),
-	DEFINE_RAGDOLL_ELEMENT( 17 ),
-	DEFINE_RAGDOLL_ELEMENT( 18 ),
-	DEFINE_RAGDOLL_ELEMENT( 19 ),
-	DEFINE_RAGDOLL_ELEMENT( 20 ),
-	DEFINE_RAGDOLL_ELEMENT( 21 ),
-	DEFINE_RAGDOLL_ELEMENT( 22 ),
-	DEFINE_RAGDOLL_ELEMENT( 23 ),
-
-END_DATADESC()
-
-IPhysicsObject *CRagdoll::GetElement( int elementNum )
-{ 
-	return m_ragdoll.list[elementNum].pObject;
-}
-
-void CRagdoll::BuildRagdollBounds( C_BaseEntity *ent )
-{
-	Vector mins, maxs, size;
-	modelinfo->GetModelBounds( ent->GetModel(), mins, maxs );
-	size = (maxs - mins) * 0.5;
-	m_radius = size.Length();
-
-	m_mins.Init(-m_radius,-m_radius,-m_radius);
-	m_maxs.Init(m_radius,m_radius,m_radius);
-}
-
-void CRagdoll::Init( 
-	C_BaseEntity *ent, 
-	IStudioHdr *pstudiohdr, 
-	const Vector &forceVector, 
-	int forceBone, 
-	const matrix3x4_t *pDeltaBones0, 
-	const matrix3x4_t *pDeltaBones1, 
-	const matrix3x4_t *pCurrentBonePosition, 
-	float dt,
-	bool bFixedConstraints )
-{
-	ragdollparams_t params;
-	params.pGameData = static_cast<void *>( ent );
-	params.modelIndex = ent->GetEngineObject()->GetModelIndex();
-	params.pCollide = modelinfo->GetVCollide( params.modelIndex );
-	params.pStudioHdr = pstudiohdr;
-	params.forceVector = forceVector;
-	params.forceBoneIndex = forceBone;
-	params.forcePosition.Init();
-	params.pCurrentBones = pCurrentBonePosition;
-	params.jointFrictionScale = 1.0;
-	params.allowStretch = false;
-	params.fixedConstraints = bFixedConstraints;
-	RagdollCreate( m_ragdoll, params, physenv );
-	ent->GetEngineObject()->VPhysicsSetObject( NULL );
-	ent->GetEngineObject()->VPhysicsSetObject( m_ragdoll.list[0].pObject );
-	// Mark the ragdoll as debris.
-	ent->GetEngineObject()->SetCollisionGroup( COLLISION_GROUP_DEBRIS );
-
-	RagdollApplyAnimationAsVelocity( m_ragdoll, pDeltaBones0, pDeltaBones1, dt );
-	RagdollActivate( m_ragdoll, params.pCollide, ent->GetEngineObject()->GetModelIndex() );
-
-	// It's moving now...
-	m_flLastOriginChangeTime = gpGlobals->curtime;
-
-	// So traces hit it.
-	ent->GetEngineObject()->AddEFlags( EFL_USE_PARTITION_WHEN_NOT_SOLID );
-
-	if ( !m_ragdoll.listCount )
-		return;
-
-	BuildRagdollBounds( ent );
-
-	for ( int i = 0; i < m_ragdoll.listCount; i++ )
-	{
-		g_pPhysSaveRestoreManager->AssociateModel( m_ragdoll.list[i].pObject, ent->GetEngineObject()->GetModelIndex() );
-	}
-
-#if RAGDOLL_VISUALIZE
-	memcpy( m_savedBone1, &pDeltaBones0[0], sizeof(matrix3x4_t) * pstudiohdr->numbones() );
-	memcpy( m_savedBone2, &pDeltaBones1[0], sizeof(matrix3x4_t) * pstudiohdr->numbones() );
-	memcpy( m_savedBone3, &pCurrentBonePosition[0], sizeof(matrix3x4_t) * pstudiohdr->numbones() );
-#endif
-}
-
-CRagdoll::~CRagdoll( void )
-{
-	for ( int i = 0; i < m_ragdoll.listCount; i++ )
-	{
-		IPhysicsObject *pObject = m_ragdoll.list[i].pObject;
-		if ( pObject )
-		{
-			g_pPhysSaveRestoreManager->ForgetModel( m_ragdoll.list[i].pObject );
-			// Disable collision on all ragdoll parts before calling RagdollDestroy
-			// (which might cause touch callbacks on the ragdoll otherwise, which is
-			// very bad for a half deleted ragdoll).
-			pObject->EnableCollisions( false );
-		}
-	}
-
-	RagdollDestroy( m_ragdoll );
-}
-
-
-void CRagdoll::RagdollBone( C_BaseEntity *ent, mstudiobone_t *pbones, int boneCount, bool *boneSimulated, CBoneAccessor &pBoneToWorld )
-{
-	for ( int i = 0; i < m_ragdoll.listCount; i++ )
-	{
-		if ( RagdollGetBoneMatrix( m_ragdoll, pBoneToWorld, i ) )
-		{
-			boneSimulated[m_ragdoll.boneIndex[i]] = true;
-		}
-	}
-}
-
-const Vector& CRagdoll::GetRagdollOrigin( )
-{
-	m_ragdoll.list[0].pObject->GetPosition( &m_origin, 0 );
-	return m_origin;
-}
-
-void CRagdoll::GetRagdollBounds( Vector &theMins, Vector &theMaxs )
-{
-	theMins = m_mins;
-	theMaxs = m_maxs;
-}
-
-void CRagdoll::VPhysicsUpdate( IPhysicsObject *pPhysics )
-{
-	if ( m_lastUpdate == gpGlobals->curtime )
-		return;
-	m_lastUpdate = gpGlobals->curtime;
-	m_allAsleep = RagdollIsAsleep( m_ragdoll );
-	if ( m_allAsleep )
-	{
-		// NOTE: This is the bbox of the ragdoll's physics
-		// It's not always correct to use for culling, but it sure beats 
-		// using the radius box!
-		Vector origin = GetRagdollOrigin();
-		RagdollComputeExactBbox( m_ragdoll, origin, m_mins, m_maxs );
-		m_mins -= origin;
-		m_maxs -= origin;
-	}
-	else
-	{
-		m_mins.Init(-m_radius,-m_radius,-m_radius);
-		m_maxs.Init(m_radius,m_radius,m_radius);
-
-		if ( m_ragdoll.pGroup->IsInErrorState() )
-		{
-			C_BaseEntity *pEntity = static_cast<C_BaseEntity *>(m_ragdoll.list[0].pObject->GetGameData());
-			RagdollSolveSeparation( m_ragdoll, pEntity );
-		}
-	}
-
-	// See if we should go to sleep...
-	CheckSettleStationaryRagdoll();
-}
-
-//=============================================================================
-// HPE_BEGIN:
-// [menglish] Transforms a vector from the given bone's space to world space
-//=============================================================================
- 
-bool CRagdoll::TransformVectorToWorld(int iBoneIndex, const Vector *vPosition, Vector *vOut)
-{
-	int listIndex = -1;
-	if( iBoneIndex >= 0 && iBoneIndex < m_ragdoll.listCount)
-	{
-		for ( int i = 0; i < m_ragdoll.listCount; ++i )
-		{
-			if(m_ragdoll.boneIndex[i] == iBoneIndex)
-				listIndex = i;
-		}
-		if(listIndex != -1)
-		{
-			m_ragdoll.list[listIndex].pObject->LocalToWorld(vOut, *vPosition);
-			return true;
-		}
-	}
-	return false;
-}
- 
-//=============================================================================
-// HPE_END
-//=============================================================================
-
-//-----------------------------------------------------------------------------
-// Purpose: 
-// Input  :  - 
-//-----------------------------------------------------------------------------
-void CRagdoll::PhysForceRagdollToSleep()
-{
-	for ( int i = 0; i < m_ragdoll.listCount; i++ )
-	{
-		if ( m_ragdoll.list[i].pObject )
-		{
-			PhysForceClearVelocity( m_ragdoll.list[i].pObject );
-			m_ragdoll.list[i].pObject->Sleep();
-		}
-	}
-}
-
-#define RAGDOLL_SLEEP_TOLERANCE	1.0f
-static ConVar ragdoll_sleepaftertime( "ragdoll_sleepaftertime", "5.0f", 0, "After this many seconds of being basically stationary, the ragdoll will go to sleep." );
-
-void CRagdoll::CheckSettleStationaryRagdoll()
-{
-	Vector delta = GetRagdollOrigin() - m_vecLastOrigin;
-	m_vecLastOrigin = GetRagdollOrigin();
-	for ( int i = 0; i < 3; ++i )
-	{
-		// It's still moving...
-		if ( fabs( delta[ i ] ) > RAGDOLL_SLEEP_TOLERANCE )
-		{
-			m_flLastOriginChangeTime = gpGlobals->curtime;
-			// Msg( "%d [%p] Still moving\n", gpGlobals->tickcount, this );
-			return;
-		}
-	}
-
-	// It's totally asleep, don't worry about forcing it to settle
-	if ( m_allAsleep )
-		return;
-
-	// Msg( "%d [%p] Settling\n", gpGlobals->tickcount, this );
-
-	// It has stopped moving, see if it
-	float dt = gpGlobals->curtime - m_flLastOriginChangeTime;
-	if ( dt < ragdoll_sleepaftertime.GetFloat() )
-		return;
-
-	// Msg( "%d [%p] FORCE SLEEP\n",gpGlobals->tickcount, this );
-
-	// Force it to go to sleep
-	PhysForceRagdollToSleep();
-}
-
-void CRagdoll::ResetRagdollSleepAfterTime( void )
-{
-	m_flLastOriginChangeTime = gpGlobals->curtime;
-}
-
-void CRagdoll::DrawWireframe()
-{
-	IMaterial *pWireframe = materials->FindMaterial("shadertest/wireframevertexcolor", TEXTURE_GROUP_OTHER);
-
-	int i;
-	matrix3x4_t matrix;
-	for ( i = 0; i < m_ragdoll.listCount; i++ )
-	{
-		static color32 debugColor = {0,255,255,0};
-
-		// draw the actual physics positions, not the cleaned up animation position
-		m_ragdoll.list[i].pObject->GetPositionMatrix( &matrix );
-		const CPhysCollide *pCollide = m_ragdoll.list[i].pObject->GetCollide();
-		engine->DebugDrawPhysCollide( pCollide, pWireframe, matrix, debugColor );
-	}
-
-#if RAGDOLL_VISUALIZE
-	for ( i = 0; i < m_ragdoll.listCount; i++ )
-	{
-		static color32 debugColor = {255,0,0,0};
-
-		const CPhysCollide *pCollide = m_ragdoll.list[i].pObject->GetCollide();
-		engine->DebugDrawPhysCollide( pCollide, pWireframe, m_savedBone1[m_ragdoll.boneIndex[i]], debugColor );
-	}
-	for ( i = 0; i < m_ragdoll.listCount; i++ )
-	{
-		static color32 debugColor = {0,255,0,0};
-
-		const CPhysCollide *pCollide = m_ragdoll.list[i].pObject->GetCollide();
-		engine->DebugDrawPhysCollide( pCollide, pWireframe, m_savedBone2[m_ragdoll.boneIndex[i]], debugColor );
-	}
-
-	for ( i = 0; i < m_ragdoll.listCount; i++ )
-	{
-		static color32 debugColor = {0,0,255,0};
-
-		const CPhysCollide *pCollide = m_ragdoll.list[i].pObject->GetCollide();
-		engine->DebugDrawPhysCollide( pCollide, pWireframe, m_savedBone3[m_ragdoll.boneIndex[i]], debugColor );
-	}
-#endif
-}
-
-
-CRagdoll *CreateRagdoll( 
-	C_BaseEntity *ent, 
-	IStudioHdr *pstudiohdr, 
-	const Vector &forceVector, 
-	int forceBone, 
-	const matrix3x4_t *pDeltaBones0, 
-	const matrix3x4_t *pDeltaBones1, 
-	const matrix3x4_t *pCurrentBonePosition,
-	float dt,
-	bool bFixedConstraints )
-{
-	CRagdoll *pRagdoll = new CRagdoll;
-	pRagdoll->Init( ent, pstudiohdr, forceVector, forceBone, pDeltaBones0, pDeltaBones1, pCurrentBonePosition, dt, bFixedConstraints );
-
-	if ( !pRagdoll->IsValid() )
-	{
-		Msg("Bad ragdoll for %s\n", pstudiohdr->pszName() );
-		delete pRagdoll;
-		pRagdoll = NULL;
-	}
-	return pRagdoll;
-}
+//CRagdoll* CreateRagdoll(
+//	C_BaseEntity* ent,
+//	IStudioHdr* pstudiohdr,
+//	const Vector& forceVector,
+//	int forceBone,
+//	const matrix3x4_t* pDeltaBones0,
+//	const matrix3x4_t* pDeltaBones1,
+//	const matrix3x4_t* pCurrentBonePosition,
+//	float dt,
+//	bool bFixedConstraints)
+//{
+//	CRagdoll* pRagdoll = new CRagdoll;
+//	pRagdoll->Init(ent, pstudiohdr, forceVector, forceBone, pDeltaBones0, pDeltaBones1, pCurrentBonePosition, dt, bFixedConstraints);
+//
+//	if (!pRagdoll->IsValid())
+//	{
+//		Msg("Bad ragdoll for %s\n", pstudiohdr->pszName());
+//		delete pRagdoll;
+//		pRagdoll = NULL;
+//	}
+//	return pRagdoll;
+//}
 
 //-----------------------------------------------------------------------------
 // Purpose: 
@@ -666,7 +355,7 @@ void C_ServerRagdoll::UpdateOnRemove()
 	{
 		// Need to tell C_BaseAnimating to blend out of the ragdoll data that we received last
 		C_BaseAnimating::AutoAllowBoneAccess boneaccess( true, false );
-		anim->CreateUnragdollInfo( this );
+		anim->GetEngineObject()->CreateUnragdollInfo(this);
 	}
 
 	// Do last to mimic destrictor order

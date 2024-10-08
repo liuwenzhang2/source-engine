@@ -65,7 +65,7 @@ public:
 	bool ShouldDraw( void );
 
 	virtual C_BaseAnimating * BecomeRagdollOnClient();
-	virtual IRagdoll* GetRepresentativeRagdoll() const;
+	virtual const IEngineObjectClient* GetRepresentativeRagdoll() const;
 
 	virtual void ReceiveMessage( int classID, bf_read &msg );
 	void PopHelmet( Vector vecDir, Vector vecForceOffset, int model );

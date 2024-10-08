@@ -113,8 +113,8 @@ public:
 	virtual bool ShouldDraw( void );
 	virtual void BuildTransformations( IStudioHdr *pStudioHdr, Vector *pos, Quaternion q[], const matrix3x4_t& cameraTransform, int boneMask, CBoneBitList &boneComputed );
 
-	virtual C_BaseAnimating * BecomeRagdollOnClient();
-	virtual IRagdoll* GetRepresentativeRagdoll() const;
+	virtual C_BaseEntity* BecomeRagdollOnClient();
+	virtual const IEngineObjectClient* GetRepresentativeRagdoll() const;
 
 	void ImpactTrace( trace_t *pTrace, int iDamageType, const char *pCustomImpactName );
 

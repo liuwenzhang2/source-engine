@@ -1814,7 +1814,7 @@ void CNPC_PlayerCompanion::SetAimTarget( CBaseEntity *pTarget )
 	Activity NewActivity = NPC_TranslateActivity(GetActivity());
 
 	//Don't set the ideal activity to an activity that might not be there.
-	if ( SelectWeightedSequence( NewActivity ) == ACT_INVALID )
+	if (GetEngineObject()->SelectWeightedSequence( NewActivity ) == ACT_INVALID )
 		 return;
 
 	if (NewActivity != GetActivity() )
