@@ -25,7 +25,7 @@ class CSoundPatch;
 #define BOUNCEBOMB_EXPLODE_DAMAGE	150.0
 #include "player_pickup.h"
 
-class CBounceBomb : public CBaseAnimating, public CDefaultPlayerPickupVPhysics
+class CBounceBomb : public CBaseAnimating//, public CDefaultPlayerPickupVPhysics
 {
 	DECLARE_CLASS( CBounceBomb, CBaseAnimating );
 

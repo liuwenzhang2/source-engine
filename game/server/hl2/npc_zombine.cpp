@@ -75,7 +75,7 @@ ConVar	sk_zombie_soldier_health( "sk_zombie_soldier_health","0");
 
 float g_flZombineGrenadeTimes = 0;
 
-class CNPC_Zombine : public CAI_BlendingHost<CNPC_BaseZombie>, public CDefaultPlayerPickupVPhysics
+class CNPC_Zombine : public CAI_BlendingHost<CNPC_BaseZombie>//, public CDefaultPlayerPickupVPhysics
 {
 	DECLARE_DATADESC();
 	DECLARE_CLASS( CNPC_Zombine, CAI_BlendingHost<CNPC_BaseZombie> );

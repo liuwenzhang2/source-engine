@@ -25,7 +25,7 @@ class CSpriteTrail;
 //-----------------------------------------------------------------------------
 // Looks for enemies, bounces a max # of times before it breaks
 //-----------------------------------------------------------------------------
-class CPropCombineBall : public CBaseAnimating, public CDefaultPlayerPickupVPhysics
+class CPropCombineBall : public CBaseAnimating//, public CDefaultPlayerPickupVPhysics
 {
 public:
 	DECLARE_CLASS( CPropCombineBall, CBaseAnimating );

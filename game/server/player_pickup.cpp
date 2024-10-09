@@ -32,20 +32,16 @@ void Pickup_ForcePlayerToDropThisObject( CBaseEntity *pTarget )
 
 void Pickup_OnPhysGunDrop( CBaseEntity *pDroppedObject, CBasePlayer *pPlayer, PhysGunDrop_t Reason )
 {
-	IPlayerPickupVPhysics *pPickup = dynamic_cast<IPlayerPickupVPhysics *>(pDroppedObject);
-	if ( pPickup )
-	{
-		pPickup->OnPhysGunDrop( pPlayer, Reason );
+	if (pDroppedObject) {
+		pDroppedObject->OnPhysGunDrop(pPlayer, Reason);
 	}
 }
 
 
 void Pickup_OnPhysGunPickup( CBaseEntity *pPickedUpObject, CBasePlayer *pPlayer, PhysGunPickup_t reason )
 {
-	IPlayerPickupVPhysics *pPickup = dynamic_cast<IPlayerPickupVPhysics *>(pPickedUpObject);
-	if ( pPickup )
-	{
-		pPickup->OnPhysGunPickup( pPlayer, reason );
+	if (pPickedUpObject) {
+		pPickedUpObject->OnPhysGunPickup(pPlayer, reason);
 	}
 
 	// send phys gun pickup item event, but only in single player
@@ -62,55 +58,43 @@ void Pickup_OnPhysGunPickup( CBaseEntity *pPickedUpObject, CBasePlayer *pPlayer,
 
 bool Pickup_OnAttemptPhysGunPickup( CBaseEntity *pPickedUpObject, CBasePlayer *pPlayer, PhysGunPickup_t reason )
 {
-	IPlayerPickupVPhysics *pPickup = dynamic_cast<IPlayerPickupVPhysics *>(pPickedUpObject);
-	if ( pPickup )
-	{
-		return pPickup->OnAttemptPhysGunPickup( pPlayer, reason );
+	if (pPickedUpObject) {
+		return pPickedUpObject->OnAttemptPhysGunPickup(pPlayer, reason);
 	}
 	return true;
 }
 
 CBaseEntity	*Pickup_OnFailedPhysGunPickup( CBaseEntity *pPickedUpObject, Vector vPhysgunPos )
 {
-	IPlayerPickupVPhysics *pPickup = dynamic_cast<IPlayerPickupVPhysics *>(pPickedUpObject);
-	if ( pPickup )
-	{
-		return pPickup->OnFailedPhysGunPickup( vPhysgunPos );
+	if (pPickedUpObject) {
+		return pPickedUpObject->OnFailedPhysGunPickup(vPhysgunPos);
 	}
-
 	return NULL;
 }
 
 bool Pickup_GetPreferredCarryAngles( CBaseEntity *pObject, CBasePlayer *pPlayer, const matrix3x4_t &localToWorld, QAngle &outputAnglesWorldSpace )
 {
-	IPlayerPickupVPhysics *pPickup = dynamic_cast<IPlayerPickupVPhysics *>(pObject);
-	if ( pPickup )
+	if (pObject != NULL && pObject->HasPreferredCarryAnglesForPlayer( pPlayer ) )
 	{
-		if ( pPickup->HasPreferredCarryAnglesForPlayer( pPlayer ) )
-		{
-			outputAnglesWorldSpace = TransformAnglesToWorldSpace( pPickup->PreferredCarryAngles(), localToWorld );
-			return true;
-		}
+		outputAnglesWorldSpace = TransformAnglesToWorldSpace(pObject->PreferredCarryAngles(), localToWorld );
+		return true;
 	}
 	return false;
 }
 
 bool Pickup_ForcePhysGunOpen( CBaseEntity *pObject, CBasePlayer *pPlayer )
 {
-	IPlayerPickupVPhysics *pPickup = dynamic_cast<IPlayerPickupVPhysics *>(pObject);
-	if ( pPickup )
-	{
-		return pPickup->ForcePhysgunOpen( pPlayer );
+	if (pObject) {
+		return pObject->ForcePhysgunOpen(pPlayer);
 	}
 	return false;
 }
 
 AngularImpulse Pickup_PhysGunLaunchAngularImpulse( CBaseEntity *pObject, PhysGunForce_t reason )
 {
-	IPlayerPickupVPhysics *pPickup = dynamic_cast<IPlayerPickupVPhysics *>(pObject);
-	if ( pPickup != NULL && pPickup->ShouldPuntUseLaunchForces( reason ) )
+	if (pObject != NULL && pObject->ShouldPuntUseLaunchForces( reason ) )
 	{
-		return pPickup->PhysGunLaunchAngularImpulse();
+		return pObject->PhysGunLaunchAngularImpulse();
 	}
 	return RandomAngularImpulse( -600, 600 );
 }
@@ -155,9 +139,8 @@ Vector Pickup_PhysGunLaunchVelocity( CBaseEntity *pObject, const Vector &vecForw
 	}
 
 	// Call the pickup entity's callback
-	IPlayerPickupVPhysics *pPickup = dynamic_cast<IPlayerPickupVPhysics *>(pObject);
-	if ( pPickup != NULL && pPickup->ShouldPuntUseLaunchForces( reason ) )
-		return pPickup->PhysGunLaunchVelocity( vecForward, pPhysicsObject->GetMass() );
+	if (pObject != NULL && pObject->ShouldPuntUseLaunchForces( reason ) )
+		return pObject->PhysGunLaunchVelocity( vecForward, pPhysicsObject->GetMass() );
 
 	// Do our default behavior
 	return Pickup_DefaultPhysGunLaunchVelocity(	vecForward, pPhysicsObject->GetMass() );
@@ -165,10 +148,8 @@ Vector Pickup_PhysGunLaunchVelocity( CBaseEntity *pObject, const Vector &vecForw
 
 bool Pickup_ShouldPuntUseLaunchForces( CBaseEntity *pObject, PhysGunForce_t reason )
 {
-	IPlayerPickupVPhysics *pPickup = dynamic_cast<IPlayerPickupVPhysics *>(pObject);
-	if ( pPickup )
-	{
-		return pPickup->ShouldPuntUseLaunchForces( reason );
+	if (pObject) {
+		return pObject->ShouldPuntUseLaunchForces(reason);
 	}
 	return false;
 }

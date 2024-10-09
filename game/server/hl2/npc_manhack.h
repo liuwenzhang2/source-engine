@@ -51,7 +51,7 @@ class CSoundPatch;
 //-----------------------------------------------------------------------------
 // Manhack 
 //-----------------------------------------------------------------------------
-class CNPC_Manhack : public CNPCBaseInteractive<CAI_BasePhysicsFlyingBot>, public CDefaultPlayerPickupVPhysics
+class CNPC_Manhack : public CNPCBaseInteractive<CAI_BasePhysicsFlyingBot>//, public CDefaultPlayerPickupVPhysics
 {
 DECLARE_CLASS( CNPC_Manhack, CNPCBaseInteractive<CAI_BasePhysicsFlyingBot> );
 DECLARE_SERVERCLASS();

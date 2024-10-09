@@ -393,7 +393,7 @@ void CRagdollProp::OnPhysGunPickup( CBasePlayer *pPhysGunUser, PhysGunPickup_t r
 //-----------------------------------------------------------------------------
 void CRagdollProp::OnPhysGunDrop( CBasePlayer *pPhysGunUser, PhysGunDrop_t Reason )
 {
-	CDefaultPlayerPickupVPhysics::OnPhysGunDrop( pPhysGunUser, Reason );
+	BaseClass::OnPhysGunDrop( pPhysGunUser, Reason );
 	m_hPhysicsAttacker = pPhysGunUser;
 	m_flLastPhysicsInfluenceTime = gpGlobals->curtime;
 
@@ -653,7 +653,7 @@ AngularImpulse CRagdollProp::PhysGunLaunchAngularImpulse()
 		return ang;
 	}
 
-	return CDefaultPlayerPickupVPhysics::PhysGunLaunchAngularImpulse();
+	return BaseClass::PhysGunLaunchAngularImpulse();
 }
 
 

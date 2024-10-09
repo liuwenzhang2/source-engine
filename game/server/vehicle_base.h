@@ -75,7 +75,7 @@ private:
 //-----------------------------------------------------------------------------
 // Purpose: Base class for four wheel physics vehicles
 //-----------------------------------------------------------------------------
-class CPropVehicle : public CBaseProp, public CDefaultPlayerPickupVPhysics
+class CPropVehicle : public CBaseProp//, public CDefaultPlayerPickupVPhysics
 {
 	DECLARE_CLASS( CPropVehicle, CBaseProp );
 public:

@@ -51,7 +51,7 @@ class CSprite;
 //-----------------------------------------------------------------------------
 // Purpose: Floor turret
 //-----------------------------------------------------------------------------
-class CNPC_FloorTurret : public CNPCBaseInteractive<CAI_BaseNPC>, public CDefaultPlayerPickupVPhysics
+class CNPC_FloorTurret : public CNPCBaseInteractive<CAI_BaseNPC>//, public CDefaultPlayerPickupVPhysics
 {
 	DECLARE_CLASS( CNPC_FloorTurret, CNPCBaseInteractive<CAI_BaseNPC> );
 public:

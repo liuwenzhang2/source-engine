@@ -172,7 +172,7 @@ enum rollingsoundstate_t { ROLL_SOUND_NOT_READY = 0, ROLL_SOUND_OFF, ROLL_SOUND_
 
 //=========================================================
 //=========================================================
-class CNPC_RollerMine : public CNPCBaseInteractive<CAI_BaseNPC>, public CDefaultPlayerPickupVPhysics
+class CNPC_RollerMine : public CNPCBaseInteractive<CAI_BaseNPC>//, public CDefaultPlayerPickupVPhysics
 {
 	DECLARE_CLASS( CNPC_RollerMine, CNPCBaseInteractive<CAI_BaseNPC> );
 	DECLARE_SERVERCLASS();

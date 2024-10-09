@@ -30,8 +30,7 @@ enum GibType_e
 	GIB_ALIEN,
 };
 
-class CGib : public CBaseAnimating,
-			 public CDefaultPlayerPickupVPhysics
+class CGib : public CBaseAnimating//, public CDefaultPlayerPickupVPhysics
 {
 public:
 	DECLARE_CLASS( CGib, CBaseAnimating );

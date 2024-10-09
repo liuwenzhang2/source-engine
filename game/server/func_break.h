@@ -34,7 +34,7 @@ typedef enum { matGlass = 0, matWood, matMetal, matFlesh, matCinderBlock, matCei
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-class CBreakable : public CBaseEntity, public IBreakableWithPropData, public CDefaultPlayerPickupVPhysics
+class CBreakable : public CBaseEntity, public IBreakableWithPropData//, public CDefaultPlayerPickupVPhysics
 {
 public:
 	DECLARE_CLASS( CBreakable, CBaseEntity );

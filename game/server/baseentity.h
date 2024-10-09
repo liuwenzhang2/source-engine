@@ -304,6 +304,33 @@ enum DebugOverlayBits_t
 	OVERLAY_VIEWOFFSET			=	0x40000000,		// show view offset
 };
 
+// Reasons behind a pickup
+enum PhysGunPickup_t
+{
+	PICKED_UP_BY_CANNON,
+	PUNTED_BY_CANNON,
+	PICKED_UP_BY_PLAYER, // Picked up by +USE, not physgun.
+};
+
+// Reasons behind a drop
+enum PhysGunDrop_t
+{
+	DROPPED_BY_PLAYER,
+	THROWN_BY_PLAYER,
+	DROPPED_BY_CANNON,
+	LAUNCHED_BY_CANNON,
+};
+
+enum PhysGunForce_t
+{
+	PHYSGUN_FORCE_DROPPED,	// Dropped by +USE
+	PHYSGUN_FORCE_THROWN,	// Thrown from +USE
+	PHYSGUN_FORCE_PUNTED,	// Punted by cannon
+	PHYSGUN_FORCE_LAUNCHED,	// Launched by cannon
+};
+
+extern Vector Pickup_DefaultPhysGunLaunchVelocity(const Vector& vecForward, float flMass);
+
 struct TimedOverlay_t;
 
 /* =========  CBaseEntity  ======== 
@@ -1372,6 +1399,20 @@ public:
 		// Is the entity floating?
 	bool					IsFloating();
 	void SetScaledPhysics(IPhysicsObject* pNewObject);
+
+	virtual bool			OnAttemptPhysGunPickup(CBasePlayer* pPhysGunUser, PhysGunPickup_t reason = PICKED_UP_BY_CANNON) { return true; }
+	virtual CBaseEntity* OnFailedPhysGunPickup(Vector vPhysgunPos) { return NULL; }
+	virtual void			OnPhysGunPickup(CBasePlayer* pPhysGunUser, PhysGunPickup_t reason = PICKED_UP_BY_CANNON) {}
+	virtual void			OnPhysGunDrop(CBasePlayer* pPhysGunUser, PhysGunDrop_t reason) {}
+	virtual bool			HasPreferredCarryAnglesForPlayer(CBasePlayer* pPlayer) { return false; }
+	virtual QAngle			PreferredCarryAngles(void) { return vec3_angle; }
+	virtual bool			ForcePhysgunOpen(CBasePlayer* pPlayer) { return false; }
+	virtual AngularImpulse	PhysGunLaunchAngularImpulse() { return RandomAngularImpulse(-600, 600); }
+	virtual bool			ShouldPuntUseLaunchForces(PhysGunForce_t reason) { return reason == PHYSGUN_FORCE_LAUNCHED; }
+	virtual Vector			PhysGunLaunchVelocity(const Vector& vecForward, float flMass)
+	{
+		return Pickup_DefaultPhysGunLaunchVelocity(vecForward, flMass);
+	}
 public:
 //#if !defined( NO_ENTITY_PREDICTION )
 //	// The player drives simulation of this entity

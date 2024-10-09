@@ -40,7 +40,7 @@ public:
 	float			m_thrust;
 };
 
-class CPhysicsCannister : public CBaseCombatCharacter, public CDefaultPlayerPickupVPhysics
+class CPhysicsCannister : public CBaseCombatCharacter//, public CDefaultPlayerPickupVPhysics
 {
 	DECLARE_CLASS( CPhysicsCannister, CBaseCombatCharacter );
 public:

@@ -62,7 +62,7 @@ enum ScannerInspectAct_t
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-class CNPC_BaseScanner : public CAI_BasePhysicsFlyingBot, public CDefaultPlayerPickupVPhysics
+class CNPC_BaseScanner : public CAI_BasePhysicsFlyingBot//, public CDefaultPlayerPickupVPhysics
 {
 	DECLARE_CLASS( CNPC_BaseScanner, CAI_BasePhysicsFlyingBot );
 

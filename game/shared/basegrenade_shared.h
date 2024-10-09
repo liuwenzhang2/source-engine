@@ -31,7 +31,7 @@
 class CTakeDamageInfo;
 
 #if !defined( CLIENT_DLL )
-class CBaseGrenade : public CBaseProjectile, public CDefaultPlayerPickupVPhysics
+class CBaseGrenade : public CBaseProjectile//, public CDefaultPlayerPickupVPhysics
 #else
 class CBaseGrenade : public CBaseProjectile
 #endif

@@ -1545,7 +1545,7 @@ AngularImpulse CBreakableProp::PhysGunLaunchAngularImpulse()
 		return ang;
 	}
 
-	return CDefaultPlayerPickupVPhysics::PhysGunLaunchAngularImpulse();
+	return BaseClass::PhysGunLaunchAngularImpulse();
 }
 
 //-----------------------------------------------------------------------------

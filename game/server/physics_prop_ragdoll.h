@@ -19,7 +19,7 @@
 //-----------------------------------------------------------------------------
 
 // UNDONE: Move this to a private header
-class CRagdollProp : public CBaseAnimating, public CDefaultPlayerPickupVPhysics
+class CRagdollProp : public CBaseAnimating//, public CDefaultPlayerPickupVPhysics
 {
 	DECLARE_CLASS( CRagdollProp, CBaseAnimating );
 

@@ -791,7 +791,7 @@ void CPropCombineBall::SetBallAsLaunched( void )
 //-----------------------------------------------------------------------------
 void CPropCombineBall::OnPhysGunPickup( CBasePlayer *pPhysGunUser, PhysGunPickup_t reason )
 {
-	CDefaultPlayerPickupVPhysics::OnPhysGunPickup( pPhysGunUser, reason );
+	BaseClass::OnPhysGunPickup( pPhysGunUser, reason );
 
 	if ( m_nMaxBounces == -1 )
 	{
@@ -900,7 +900,7 @@ void CPropCombineBall::SetPlayerLaunched( CBasePlayer *pOwner )
 //-----------------------------------------------------------------------------
 void CPropCombineBall::OnPhysGunDrop( CBasePlayer *pPhysGunUser, PhysGunDrop_t Reason )
 {
-	CDefaultPlayerPickupVPhysics::OnPhysGunDrop( pPhysGunUser, Reason );
+	BaseClass::OnPhysGunDrop( pPhysGunUser, Reason );
 
 	SetState( STATE_THROWN );
 	WhizSoundThink();

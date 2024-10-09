@@ -45,7 +45,7 @@ public:
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-class CBreakableProp : public CBaseProp, public IBreakableWithPropData, public CDefaultPlayerPickupVPhysics
+class CBreakableProp : public CBaseProp, public IBreakableWithPropData//, public CDefaultPlayerPickupVPhysics
 {
 public:
 	CBreakableProp();
