@@ -24,12 +24,23 @@
 #include "gameinterface.h"
 #include "globalstate.h"
 #include "vphysics/player_controller.h"
+#include "ragdoll_shared.h"
 
 //class CBaseEntity;
 // We can only ever move 512 entities across a transition
 #define MAX_ENTITY 512
 #define MAX_ENTITY_BYTE_COUNT	(NUM_ENT_ENTRIES >> 3)
 #define DEBUG_TRANSITIONS_VERBOSE	2
+
+//-----------------------------------------------------------------------------
+// Spawnflags
+//-----------------------------------------------------------------------------
+#define	SF_RAGDOLLPROP_DEBRIS		0x0004
+#define SF_RAGDOLLPROP_USE_LRU_RETIREMENT	0x1000
+#define	SF_RAGDOLLPROP_ALLOW_DISSOLVE		0x2000	// Allow this prop to be dissolved
+#define	SF_RAGDOLLPROP_MOTIONDISABLED		0x4000
+#define	SF_RAGDOLLPROP_ALLOW_STRETCH		0x8000
+#define	SF_RAGDOLLPROP_STARTASLEEP			0x10000
 
 enum
 {
@@ -194,6 +205,10 @@ public:
 		m_nResetEventsParity = 0;
 		m_flSpeedScale = 1.0f;
 		m_pPhysicsObject = NULL;
+		m_ragdoll.listCount = 0;
+		m_allAsleep = false;
+		m_lastUpdateTickCount = -1;
+		m_anglesOverrideString = NULL_STRING;
 
 	}
 
@@ -201,6 +216,7 @@ public:
 	{
 		engine->CleanUpEntityClusterList(&m_PVSInfo);
 		UnlockStudioHdr();
+		ClearRagdoll();
 		VPhysicsDestroyObject();
 	}
 
@@ -754,6 +770,19 @@ public:
 	int		SelectWeightedSequence(int activity, int curSequence);
 	int		SelectHeaviestSequence(int activity);
 
+	void							ClearRagdoll();
+	virtual void VPhysicsUpdate(IPhysicsObject* pPhysics);
+	void InitRagdoll(const Vector& forceVector, int forceBone, const Vector& forcePos, matrix3x4_t* pPrevBones, matrix3x4_t* pBoneToWorld, float dt, int collisionGroup, bool activateRagdoll, bool bWakeRagdoll = true);
+
+	virtual int RagdollBoneCount() const { return m_ragdoll.listCount; }
+	virtual IPhysicsObject* GetElement(int elementNum);
+	void RecheckCollisionFilter(void);
+	void			GetAngleOverrideFromCurrentState(char* pOut, int size);
+	virtual void RagdollBone(bool* boneSimulated, CBoneAccessor& pBoneToWorld);
+	void UpdateNetworkDataFromVPhysics(int index);
+	bool GetAllAsleep() { return m_allAsleep; }
+	IPhysicsConstraintGroup* GetConstraintGroup() { return m_ragdoll.pGroup; }
+	ragdoll_t* GetRagdoll(void) { return &m_ragdoll; }
 public:
 	// Networking related methods
 	void NetworkStateChanged();
@@ -767,6 +796,8 @@ private:
 	void UnlockStudioHdr();
 	// called by all vphysics inits
 	bool			VPhysicsInitSetup();
+	void CalcRagdollSize(void);
+
 private:
 
 	friend class CBaseEntity;
@@ -886,6 +917,15 @@ private:
 	CThreadFastMutex	m_StudioHdrInitLock;
 
 	IPhysicsObject* m_pPhysicsObject;	// pointer to the entity's physics object (vphysics.dll)
+	ragdoll_t	m_ragdoll;
+	CNetworkArray(Vector, m_ragPos, RAGDOLL_MAX_ELEMENTS);
+	CNetworkArray(QAngle, m_ragAngles, RAGDOLL_MAX_ELEMENTS);
+	unsigned int		m_lastUpdateTickCount;
+	bool				m_allAsleep;
+	Vector				m_ragdollMins[RAGDOLL_MAX_ELEMENTS];
+	Vector				m_ragdollMaxs[RAGDOLL_MAX_ELEMENTS];
+	string_t			m_anglesOverrideString;
+
 
 };
 
@@ -3063,8 +3103,6 @@ void CGlobalEntityList<T>::CleanupDeleteList(void)
 {
 	VPROF("CGlobalEntityList::CleanupDeleteList");
 	g_fInCleanupDelete = true;
-	// clean up the vphysics delete list as well
-	PhysOnCleanupDeleteList();
 
 	g_bDisableEhandleAccess = true;
 	for (int i = 0; i < m_DeleteList.Count(); i++)
@@ -3073,7 +3111,8 @@ void CGlobalEntityList<T>::CleanupDeleteList(void)
 	}
 	g_bDisableEhandleAccess = false;
 	m_DeleteList.RemoveAll();
-
+	// clean up the vphysics delete list as well
+	PhysOnCleanupDeleteList();
 	g_fInCleanupDelete = false;
 }
 

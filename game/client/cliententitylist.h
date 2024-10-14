@@ -139,11 +139,14 @@ public:
 		m_iv_vecVelocity("C_BaseEntity::m_iv_vecVelocity", &m_vecVelocity, LATCH_SIMULATION_VAR), 
 		m_iv_flCycle("C_BaseAnimating::m_iv_flCycle", &m_flCycle, LATCH_ANIMATION_VAR),
 		m_iv_flPoseParameter("C_BaseAnimating::m_iv_flPoseParameter", m_flPoseParameter, LATCH_ANIMATION_VAR),
-		m_iv_flEncodedController("C_BaseAnimating::m_iv_flEncodedController", m_flEncodedController, LATCH_ANIMATION_VAR)
+		m_iv_flEncodedController("C_BaseAnimating::m_iv_flEncodedController", m_flEncodedController, LATCH_ANIMATION_VAR),
+		m_iv_ragPos("C_ServerRagdoll::m_iv_ragPos", m_ragPos, LATCH_SIMULATION_VAR),
+		m_iv_ragAngles("C_ServerRagdoll::m_iv_ragAngles", m_ragAngles, LATCH_SIMULATION_VAR)
 	{
 		AddVar(&m_iv_vecOrigin);//&m_vecOrigin, , LATCH_SIMULATION_VAR
 		AddVar(&m_iv_angRotation);//&m_angRotation, , LATCH_SIMULATION_VAR
-
+		AddVar(&m_iv_ragPos);//, LATCH_SIMULATION_VAR
+		AddVar(&m_iv_ragAngles);//, LATCH_SIMULATION_VAR
 
 #ifdef _DEBUG
 		m_vecAbsOrigin = vec3_origin;
@@ -229,6 +232,8 @@ public:
 
 		m_bStoreRagdollInfo = false;
 		m_pRagdollInfo = NULL;
+		m_flLastBoneChangeTime = -FLT_MAX;
+
 	}
 
 	virtual ~C_EngineObjectInternal()
@@ -499,6 +504,7 @@ public:
 		Q_memset(&m_mouth, 0, sizeof(m_mouth));
 		m_nPrevNewSequenceParity = -1;
 		m_bReceivedSequence = false;
+		m_elementCount = 0;
 
 	}
 
@@ -887,6 +893,12 @@ public:
 	// For prediction
 	int								SelectWeightedSequence(int activity);
 	virtual void					Simulate();
+
+	float GetLastBoneChangeTime() { return m_flLastBoneChangeTime; }
+	int	 GetElementCount() { return m_elementCount; }
+	int GetBoneIndex(int index) { return m_boneIndex[index]; }
+	const Vector& GetRagPos(int index) { return m_ragPos[index]; }
+	const QAngle& GetRagAngles(int index) { return m_ragAngles[index]; }
 private:
 	void LockStudioHdr();
 	void UnlockStudioHdr();
@@ -1088,6 +1100,16 @@ private:
 
 	int								m_nPrevSequence;
 	int								m_nRestoreSequence;
+
+	// Incoming from network
+	Vector		m_ragPos[RAGDOLL_MAX_ELEMENTS];
+	QAngle		m_ragAngles[RAGDOLL_MAX_ELEMENTS];
+	CInterpolatedVarArray< Vector, RAGDOLL_MAX_ELEMENTS >	m_iv_ragPos;
+	CInterpolatedVarArray< QAngle, RAGDOLL_MAX_ELEMENTS >	m_iv_ragAngles;
+	int			m_elementCount;
+	int			m_boneIndex[RAGDOLL_MAX_ELEMENTS];
+	float m_flLastBoneChangeTime;
+
 };
 
 //-----------------------------------------------------------------------------

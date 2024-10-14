@@ -85,15 +85,11 @@ public:
 	virtual void UpdateOnRemove();
 	virtual float LastBoneChangedTime();
 
-	// Incoming from network
-	Vector		m_ragPos[RAGDOLL_MAX_ELEMENTS];
-	QAngle		m_ragAngles[RAGDOLL_MAX_ELEMENTS];
 
-	CInterpolatedVarArray< Vector, RAGDOLL_MAX_ELEMENTS >	m_iv_ragPos;
-	CInterpolatedVarArray< QAngle, RAGDOLL_MAX_ELEMENTS >	m_iv_ragAngles;
 
-	int			m_elementCount;
-	int			m_boneIndex[RAGDOLL_MAX_ELEMENTS];
+
+
+
 
 private:
 	C_ServerRagdoll( const C_ServerRagdoll &src );
@@ -103,27 +99,21 @@ private:
 	CNetworkVar( float, m_flBlendWeight );
 	float m_flBlendWeightCurrent;
 	CNetworkVar( int, m_nOverlaySequence );
-	float m_flLastBoneChangeTime;
 };
 
 
 EXTERN_RECV_TABLE(DT_Ragdoll);
 IMPLEMENT_CLIENTCLASS_DT(C_ServerRagdoll, DT_Ragdoll, CRagdollProp)
-	RecvPropArray(RecvPropQAngles(RECVINFO(m_ragAngles[0])), m_ragAngles),
-	RecvPropArray(RecvPropVector(RECVINFO(m_ragPos[0])), m_ragPos),
+
 	RecvPropEHandle(RECVINFO(m_hUnragdoll)),
 	RecvPropFloat(RECVINFO(m_flBlendWeight)),
 	RecvPropInt(RECVINFO(m_nOverlaySequence)),
 END_RECV_TABLE()
 
 
-C_ServerRagdoll::C_ServerRagdoll( void ) :
-	m_iv_ragPos("C_ServerRagdoll::m_iv_ragPos", m_ragPos, LATCH_SIMULATION_VAR),
-	m_iv_ragAngles("C_ServerRagdoll::m_iv_ragAngles", m_ragAngles, LATCH_SIMULATION_VAR)
-{
-	m_elementCount = 0;
-	m_flLastBoneChangeTime = -FLT_MAX;
+C_ServerRagdoll::C_ServerRagdoll( void )
 
+{
 	m_flBlendWeight = 0.0f;
 	m_flBlendWeightCurrent = 0.0f;
 	m_nOverlaySequence = -1;
@@ -132,24 +122,18 @@ C_ServerRagdoll::C_ServerRagdoll( void ) :
 
 bool C_ServerRagdoll::Init(int entnum, int iSerialNum) {
 	bool ret = BaseClass::Init(entnum, iSerialNum);
-	GetEngineObject()->AddVar(&m_iv_ragPos);//, LATCH_SIMULATION_VAR
-	GetEngineObject()->AddVar(&m_iv_ragAngles);//, LATCH_SIMULATION_VAR
+
 	return ret;
 }
 
 void C_ServerRagdoll::PostDataUpdate( DataUpdateType_t updateType )
 {
 	BaseClass::PostDataUpdate( updateType );
-
-	m_iv_ragPos.NoteChanged( gpGlobals->curtime, true );
-	m_iv_ragAngles.NoteChanged( gpGlobals->curtime, true );
-	// this is the local client time at which this update becomes stale
-	m_flLastBoneChangeTime = gpGlobals->curtime + GetInterpolationAmount(m_iv_ragPos.GetType());
 }
 
 float C_ServerRagdoll::LastBoneChangedTime()
 {
-	return m_flLastBoneChangeTime;
+	return GetEngineObject()->GetLastBoneChangeTime();
 }
 
 int C_ServerRagdoll::InternalDrawModel( int flags )
@@ -161,11 +145,11 @@ int C_ServerRagdoll::InternalDrawModel( int flags )
 		IMaterial *pWireframe = materials->FindMaterial("shadertest/wireframevertexcolor", TEXTURE_GROUP_OTHER);
 
 		matrix3x4_t matrix;
-		for ( int i = 0; i < m_elementCount; i++ )
+		for ( int i = 0; i < GetEngineObject()->GetElementCount(); i++ )
 		{
 			static color32 debugColor = {0,255,255,0};
 
-			AngleMatrix( m_ragAngles[i], m_ragPos[i], matrix );
+			AngleMatrix(GetEngineObject()->GetRagAngles(i), GetEngineObject()->GetRagPos(i), matrix );
 			engine->DebugDrawPhysCollide( pCollide->solids[i], pWireframe, matrix, debugColor );
 		}
 	}
@@ -177,22 +161,7 @@ IStudioHdr *C_ServerRagdoll::OnNewModel( void )
 {
 	IStudioHdr *hdr = BaseClass::OnNewModel();
 
-	if ( !m_elementCount )
-	{
-		vcollide_t *pCollide = modelinfo->GetVCollide(GetEngineObject()->GetModelIndex() );
-		if ( !pCollide )
-		{
-			const char *pszName = modelinfo->GetModelName( modelinfo->GetModel(GetEngineObject()->GetModelIndex() ) );
-			Msg( "*** ERROR: C_ServerRagdoll::InitModel: %s missing vcollide data ***\n", (pszName) ? pszName : "<null>" );
-			m_elementCount = 0;
-		}
-		else
-		{
-			m_elementCount = RagdollExtractBoneIndices( m_boneIndex, hdr, pCollide );
-		}
-		m_iv_ragPos.SetMaxCount( m_elementCount );
-		m_iv_ragAngles.SetMaxCount( m_elementCount );
-	}
+
 
 	return hdr;
 }
@@ -278,9 +247,9 @@ void C_ServerRagdoll::BuildTransformations( IStudioHdr *hdr, Vector *pos, Quater
 	}
 
 	int i;
-	for ( i = 0; i < m_elementCount; i++ )
+	for ( i = 0; i < GetEngineObject()->GetElementCount(); i++ )
 	{
-		int index = m_boneIndex[i];
+		int index = GetEngineObject()->GetBoneIndex(i);
 		if ( index >= 0 )
 		{
 			if ( hdr->boneFlags(index) & boneMask )
@@ -297,7 +266,7 @@ void C_ServerRagdoll::BuildTransformations( IStudioHdr *hdr, Vector *pos, Quater
 				}
 				else
 				{	
-					AngleMatrix( m_ragAngles[i], m_ragPos[i], matrix );
+					AngleMatrix(GetEngineObject()->GetRagAngles(i), GetEngineObject()->GetRagPos(i), matrix );
 				}
 			}
 		}
@@ -397,7 +366,7 @@ public:
 		if (GetEngineObject()->GetMoveParent() )
 		{
 			// HACKHACK: Force the attached bone to be set up
-			int index = m_boneIndex[m_ragdollAttachedObjectIndex];
+			int index = GetEngineObject()->GetBoneIndex(m_ragdollAttachedObjectIndex);
 			int boneFlags = GetEngineObject()->GetModelPtr()->boneFlags(index);
 			if ( !(boneFlags & boneMask) )
 			{
@@ -439,7 +408,7 @@ public:
 
 		if ( parent )
 		{
-			int index = m_boneIndex[m_ragdollAttachedObjectIndex];
+			int index = GetEngineObject()->GetBoneIndex(m_ragdollAttachedObjectIndex);
 			const matrix3x4_t &matrix = GetBone( index );
 			Vector ragOrigin;
 			VectorTransform( m_attachmentPointRagdollSpace, matrix, ragOrigin );

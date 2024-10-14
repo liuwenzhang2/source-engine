@@ -782,7 +782,7 @@ bool CNPC_Barnacle::WaitForRagdollToSettle( float flBiteZOffset )
 	IStudioHdr *pStudioHdr = m_hRagdoll->GetEngineObject()->GetModelPtr();
 	mstudiobone_t *pBone = pStudioHdr->pBone( m_iGrabbedBoneIndex );
 	int iBoneIndex = pBone->physicsbone;
-	ragdoll_t *pRagdoll = m_hRagdoll->GetRagdoll();
+	ragdoll_t *pRagdoll = m_hRagdoll->GetEngineObject()->GetRagdoll();
 	IPhysicsObject *pRagdollPhys = pRagdoll->list[iBoneIndex].pObject;
 	pRagdollPhys->GetVelocity( &vecVelocity, &angVel );
 	return ( vecVelocity.LengthSqr() < 20 );
@@ -1143,7 +1143,7 @@ void CNPC_Barnacle::LiftRagdoll( float flBiteZOffset )
 			pAnimating->SetupBones( pBoneToWorld, BONE_USED_BY_ANYTHING );
 
 			// Apply the forces to the ragdoll
-			RagdollApplyAnimationAsVelocity( *(m_hRagdoll->GetRagdoll()), m_pRagdollBones, pBoneToWorld, 0.2 );
+			RagdollApplyAnimationAsVelocity( *(m_hRagdoll->GetEngineObject()->GetRagdoll()), m_pRagdollBones, pBoneToWorld, 0.2 );
 
 			// Store off the current bone matrix for next time
 			pAnimating->SetupBones( m_pRagdollBones, BONE_USED_BY_ANYTHING );
@@ -1569,7 +1569,7 @@ You can use this stanza to try to counterplace the constraint on the player's he
 
 	// Apply the target's current velocity to each of the ragdoll's bones
 	Vector vecVelocity = pAnimating->GetGroundSpeedVelocity() * 0.5;
-	ragdoll_t *pRagdoll = m_hRagdoll->GetRagdoll();
+	ragdoll_t *pRagdoll = m_hRagdoll->GetEngineObject()->GetRagdoll();
 	
 	// barnacle might let go if ragdoll is separated - so increase the separation checking a bit
 	constraint_groupparams_t params;
@@ -2117,7 +2117,7 @@ void CNPC_Barnacle::Event_Killed( const CTakeDamageInfo &info )
 		m_hRagdoll->GetEngineObject()->SetAbsOrigin( m_hTongueTip->GetEngineObject()->GetAbsOrigin() );
 		m_hRagdoll->GetEngineObject()->RemoveSolidFlags( FSOLID_NOT_SOLID );
 		m_hRagdoll->GetEngineObject()->SetCollisionGroup( COLLISION_GROUP_DEBRIS );
-		m_hRagdoll->RecheckCollisionFilter();
+		m_hRagdoll->GetEngineObject()->RecheckCollisionFilter();
 		if ( npc_barnacle_swallow.GetBool() )
 		{
 			m_hRagdoll->SetThink( NULL );

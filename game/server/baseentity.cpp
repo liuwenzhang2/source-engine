@@ -365,6 +365,8 @@ extern bool g_bReceivedChainedUpdateOnRemove;
 //-----------------------------------------------------------------------------
 void CBaseEntity::UpdateOnRemove(void)
 {
+	Msg("%p ===== %s \n", this, GetClassName());
+
 	g_bReceivedChainedUpdateOnRemove = true;
 
 	// Virtual call to shut down any looping sounds.

@@ -2132,7 +2132,7 @@ void CNPC_Vortigaunt::ZapBeam( int nHand )
 
 		if ( pTest )
 		{
-			ragdoll_t *m_ragdoll = pTest->GetRagdoll();
+			ragdoll_t *m_ragdoll = pTest->GetEngineObject()->GetRagdoll();
 
 			if ( m_ragdoll )
 			{

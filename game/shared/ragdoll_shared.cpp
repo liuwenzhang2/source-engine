@@ -520,6 +520,7 @@ void RagdollDestroy( ragdoll_t &ragdoll )
 		// since that is saved separately.
 		if ( ragdoll.list[i].pObject )
 		{
+			ragdoll.list[i].pObject->SetGameData(NULL);
 			physenv->DestroyObject( ragdoll.list[i].pObject );
 		}
 		ragdoll.list[i].pObject = NULL;

@@ -517,7 +517,8 @@ BEGIN_RECV_TABLE_NOBASE(C_EngineObjectInternal, DT_EngineObject)
 	RecvPropArray3(RECVINFO_ARRAY(m_flEncodedController), RecvPropFloat(RECVINFO(m_flEncodedController[0]))),
 	RecvPropInt(RECVINFO(m_bClientSideFrameReset)),
 	RecvPropDataTable("serveranimdata", 0, 0, &REFERENCE_RECV_TABLE(DT_ServerAnimationData)),
-
+	RecvPropArray(RecvPropQAngles(RECVINFO(m_ragAngles[0])), m_ragAngles),
+	RecvPropArray(RecvPropVector(RECVINFO(m_ragPos[0])), m_ragPos),
 END_RECV_TABLE()
 
 IMPLEMENT_CLIENTCLASS_NO_FACTORY(C_EngineObjectInternal, DT_EngineObject, CEngineObjectInternal);
@@ -1114,6 +1115,10 @@ void C_EngineObjectInternal::PostDataUpdate(DataUpdateType_t updateType)
 		}
 	}
 
+	m_iv_ragPos.NoteChanged(gpGlobals->curtime, true);
+	m_iv_ragAngles.NoteChanged(gpGlobals->curtime, true);
+	// this is the local client time at which this update becomes stale
+	m_flLastBoneChangeTime = gpGlobals->curtime + m_pOuter->GetInterpolationAmount(m_iv_ragPos.GetType());
 	m_pOuter->PostDataUpdate(updateType);
 }
 
@@ -4347,6 +4352,24 @@ void C_EngineObjectInternal::SetModelPointer(const model_t* pModel)
 	{
 		m_pOuter->DestroyModelInstance();
 		m_pModel = pModel;
+		if (GetModelPtr()) {
+			if (!m_elementCount)
+			{
+				vcollide_t* pCollide = modelinfo->GetVCollide(GetModelIndex());
+				if (!pCollide)
+				{
+					const char* pszName = modelinfo->GetModelName(modelinfo->GetModel(GetModelIndex()));
+					Msg("*** ERROR: C_ServerRagdoll::InitModel: %s missing vcollide data ***\n", (pszName) ? pszName : "<null>");
+					m_elementCount = 0;
+				}
+				else
+				{
+					m_elementCount = RagdollExtractBoneIndices(m_boneIndex, GetModelPtr(), pCollide);
+				}
+				m_iv_ragPos.SetMaxCount(m_elementCount);
+				m_iv_ragAngles.SetMaxCount(m_elementCount);
+			}
+		}
 		m_pOuter->OnNewModel();
 
 		m_pOuter->UpdateVisibility();

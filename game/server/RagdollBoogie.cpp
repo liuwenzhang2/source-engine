@@ -262,7 +262,7 @@ void CRagdollBoogie::BoogieThink( void )
 #ifndef _XBOX
 	if ( m_nSuppressionCount == 0 )
 	{
-		ragdoll_t *pRagdollPhys = pRagdoll->GetRagdoll( );
+		ragdoll_t *pRagdollPhys = pRagdoll->GetEngineObject()->GetRagdoll( );
 		for ( int j = 0; j < pRagdollPhys->listCount; ++j )
 		{
 			float flMass = pRagdollPhys->list[j].pObject->GetMass();

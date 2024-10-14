@@ -62,12 +62,9 @@ public:
 
 	// locals
 	void InitRagdollAnimation( void );
-	void InitRagdoll( const Vector &forceVector, int forceBone, const Vector &forcePos, matrix3x4_t *pPrevBones, matrix3x4_t *pBoneToWorld, float dt, int collisionGroup, bool activateRagdoll, bool bWakeRagdoll = true );
 	
-	void RecheckCollisionFilter( void );
 	void SetDebrisThink();
 	void ClearFlagsThink( void );
-	inline ragdoll_t *GetRagdoll( void ) { return &m_ragdoll; }
 
 	virtual bool	IsRagdoll() { return true; }
 
@@ -93,7 +90,6 @@ public:
 	bool			IsFading();
 	CBaseEntity*	GetKiller() { return m_hKiller; }
 	void			SetKiller( CBaseEntity *pKiller ) { m_hKiller = pKiller; }
-	void			GetAngleOverrideFromCurrentState( char *pOut, int size );
 
 	void			DisableMotion( void );
 
@@ -108,26 +104,20 @@ public:
 	DECLARE_DATADESC();
 
 protected:
-	void CalcRagdollSize( void );
-	ragdoll_t	m_ragdoll;
 
 private:
-	void UpdateNetworkDataFromVPhysics( IPhysicsObject *pPhysics, int index );
 	void FadeOutThink();
 
 	bool				m_bStartDisabled;
 
-	CNetworkArray( Vector, m_ragPos, RAGDOLL_MAX_ELEMENTS );
-	CNetworkArray( QAngle, m_ragAngles, RAGDOLL_MAX_ELEMENTS );
 
-	string_t			m_anglesOverrideString;
+
 
 	typedef CHandle<CBaseAnimating> CBaseAnimatingHandle;
 	CNetworkVar( CBaseAnimatingHandle, m_hUnragdoll );
 
 
-	unsigned int		m_lastUpdateTickCount;
-	bool				m_allAsleep;
+	
 	bool				m_bFirstCollisionAfterLaunch;
 	EHANDLE				m_hDamageEntity;
 	EHANDLE				m_hKiller;	// Who killed me?
@@ -145,8 +135,7 @@ private:
 	CNetworkVar( int, m_nOverlaySequence );
 	float	m_flDefaultFadeScale;
 	
-	Vector				m_ragdollMins[RAGDOLL_MAX_ELEMENTS];
-	Vector				m_ragdollMaxs[RAGDOLL_MAX_ELEMENTS];
+
 };
 
 CBaseEntity *CreateServerRagdoll( CBaseAnimating *pAnimating, int forceBone, const CTakeDamageInfo &info, int collisionGroup, bool bUseLRURetirement = false );

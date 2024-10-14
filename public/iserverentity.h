@@ -33,6 +33,8 @@ class IStudioHdr;
 struct model_t;
 class IPhysicsObject;
 class IPhysicsPlayerController;
+class CBoneAccessor;
+struct ragdoll_t;
 
 struct servertouchlink_t
 {
@@ -440,6 +442,18 @@ public:
 	virtual int SelectWeightedSequence(int activity) = 0;
 	virtual int SelectWeightedSequence(int activity, int curSequence) = 0;
 	virtual int SelectHeaviestSequence(int activity) = 0;
+	virtual void InitRagdoll(const Vector& forceVector, int forceBone, const Vector& forcePos, matrix3x4_t* pPrevBones, matrix3x4_t* pBoneToWorld, float dt, int collisionGroup, bool activateRagdoll, bool bWakeRagdoll = true) = 0;
+	virtual void RecheckCollisionFilter(void) = 0;
+	virtual int RagdollBoneCount() const = 0;
+	virtual IPhysicsObject* GetElement(int elementNum) = 0;
+	virtual void GetAngleOverrideFromCurrentState(char* pOut, int size) = 0;
+	virtual void RagdollBone(bool* boneSimulated, CBoneAccessor& pBoneToWorld) = 0;
+	virtual void UpdateNetworkDataFromVPhysics(int index) = 0;
+	virtual void VPhysicsUpdate(IPhysicsObject* pPhysics) = 0;
+	virtual bool GetAllAsleep() = 0;
+	virtual IPhysicsConstraintGroup* GetConstraintGroup() = 0;
+	virtual ragdoll_t* GetRagdoll(void) = 0;
+	virtual void ClearRagdoll() = 0;
 
 };
 

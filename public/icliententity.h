@@ -507,6 +507,11 @@ public:
 	virtual void CreateUnragdollInfo(C_BaseEntity* pRagdoll) = 0;
 	virtual IPhysicsConstraintGroup* GetConstraintGroup() = 0;
 	virtual int SelectWeightedSequence(int activity) = 0;
+	virtual float GetLastBoneChangeTime() = 0;
+	virtual int GetElementCount() = 0;
+	virtual int GetBoneIndex(int index) = 0;
+	virtual const Vector& GetRagPos(int index) = 0;
+	virtual const QAngle& GetRagAngles(int index) = 0;
 
 };
 

@@ -375,7 +375,7 @@ void CEntityDissolve::ElectrocuteThink( void )
 	if ( !pRagdoll )
 		return;
 
-	ragdoll_t *pRagdollPhys = pRagdoll->GetRagdoll( );
+	ragdoll_t *pRagdollPhys = pRagdoll->GetEngineObject()->GetRagdoll( );
 	for ( int j = 0; j < pRagdollPhys->listCount; ++j )
 	{
 		Vector vecForce;

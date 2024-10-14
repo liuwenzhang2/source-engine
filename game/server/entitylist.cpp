@@ -35,6 +35,7 @@
 #include "coordsize.h"
 #include "physics_saverestore.h"
 #include "animation.h"
+#include "vphysics\constraints.h"
 
 #ifdef HL2_DLL
 #include "npc_playercompanion.h"
@@ -308,6 +309,11 @@ BEGIN_SIMPLE_DATADESC(thinkfunc_t)
 	DEFINE_FIELD(m_nLastThinkTick, FIELD_TICK),
 END_DATADESC()
 
+#define DEFINE_RAGDOLL_ELEMENT( i ) \
+	DEFINE_FIELD( m_ragdoll.list[i].originParentSpace, FIELD_VECTOR ), \
+	DEFINE_PHYSPTR( m_ragdoll.list[i].pObject ), \
+	DEFINE_PHYSPTR( m_ragdoll.list[i].pConstraint ), \
+	DEFINE_FIELD( m_ragdoll.list[i].parentIndex, FIELD_INTEGER )
 
 BEGIN_DATADESC_NO_BASE(CEngineObjectInternal)
 	DEFINE_FIELD(m_vecOrigin, FIELD_VECTOR),			// NOTE: MUST BE IN LOCAL SPACE, NOT POSITION_VECTOR!!! (see CBaseEntity::Restore)
@@ -371,6 +377,40 @@ BEGIN_DATADESC_NO_BASE(CEngineObjectInternal)
 	DEFINE_FIELD(m_bSequenceLoops, FIELD_BOOLEAN),
 	DEFINE_FIELD(m_flSpeedScale, FIELD_FLOAT),
 	DEFINE_PHYSPTR(m_pPhysicsObject),
+	DEFINE_AUTO_ARRAY(m_ragdoll.boneIndex, FIELD_INTEGER),
+	DEFINE_AUTO_ARRAY(m_ragPos, FIELD_POSITION_VECTOR),
+	DEFINE_AUTO_ARRAY(m_ragAngles, FIELD_VECTOR),
+	DEFINE_FIELD(m_ragdoll.listCount, FIELD_INTEGER),
+	DEFINE_FIELD(m_ragdoll.allowStretch, FIELD_BOOLEAN),
+	DEFINE_PHYSPTR(m_ragdoll.pGroup),
+	DEFINE_FIELD(m_lastUpdateTickCount, FIELD_INTEGER),
+	DEFINE_FIELD(m_allAsleep, FIELD_BOOLEAN),
+	DEFINE_AUTO_ARRAY(m_ragdollMins, FIELD_VECTOR),
+	DEFINE_AUTO_ARRAY(m_ragdollMaxs, FIELD_VECTOR),
+	DEFINE_KEYFIELD(m_anglesOverrideString, FIELD_STRING, "angleOverride"),
+	DEFINE_RAGDOLL_ELEMENT(1),
+	DEFINE_RAGDOLL_ELEMENT(2),
+	DEFINE_RAGDOLL_ELEMENT(3),
+	DEFINE_RAGDOLL_ELEMENT(4),
+	DEFINE_RAGDOLL_ELEMENT(5),
+	DEFINE_RAGDOLL_ELEMENT(6),
+	DEFINE_RAGDOLL_ELEMENT(7),
+	DEFINE_RAGDOLL_ELEMENT(8),
+	DEFINE_RAGDOLL_ELEMENT(9),
+	DEFINE_RAGDOLL_ELEMENT(10),
+	DEFINE_RAGDOLL_ELEMENT(11),
+	DEFINE_RAGDOLL_ELEMENT(12),
+	DEFINE_RAGDOLL_ELEMENT(13),
+	DEFINE_RAGDOLL_ELEMENT(14),
+	DEFINE_RAGDOLL_ELEMENT(15),
+	DEFINE_RAGDOLL_ELEMENT(16),
+	DEFINE_RAGDOLL_ELEMENT(17),
+	DEFINE_RAGDOLL_ELEMENT(18),
+	DEFINE_RAGDOLL_ELEMENT(19),
+	DEFINE_RAGDOLL_ELEMENT(20),
+	DEFINE_RAGDOLL_ELEMENT(21),
+	DEFINE_RAGDOLL_ELEMENT(22),
+	DEFINE_RAGDOLL_ELEMENT(23),
 END_DATADESC()
 
 void SendProxy_Origin(const SendProp* pProp, const void* pStruct, const void* pData, DVariant* pOut, int iElement, int objectID)
@@ -618,7 +658,8 @@ BEGIN_SEND_TABLE_NOBASE(CEngineObjectInternal, DT_EngineObject)
 	SendPropArray3(SENDINFO_ARRAY3(m_flEncodedController), SendPropFloat(SENDINFO_ARRAY(m_flEncodedController), 11, SPROP_ROUNDDOWN, 0.0f, 1.0f)),
 	SendPropInt(SENDINFO(m_bClientSideFrameReset), 1, SPROP_UNSIGNED),
 	SendPropDataTable("serveranimdata", 0, &REFERENCE_SEND_TABLE(DT_ServerAnimationData), SendProxy_ClientSideAnimationE),
-
+	SendPropArray(SendPropQAngles(SENDINFO_ARRAY(m_ragAngles), 13, 0), m_ragAngles),
+	SendPropArray(SendPropVector(SENDINFO_ARRAY(m_ragPos), -1, SPROP_COORD), m_ragPos),
 END_SEND_TABLE()
 
 IMPLEMENT_SERVERCLASS(CEngineObjectInternal, DT_EngineObject)
@@ -1219,6 +1260,16 @@ void CEngineObjectInternal::OnSave(IEntitySaveUtils* pUtils)
 	// We can't leave the dirty bits set because the loader can't cope with it.
 	CalcAbsolutePosition();
 	CalcAbsoluteVelocity();
+	if (m_ragdoll.listCount) {
+		// Don't save ragdoll element 0, base class saves the pointer in 
+		// m_pPhysicsObject
+		Assert(m_ragdoll.list[0].parentIndex == -1);
+		Assert(m_ragdoll.list[0].pConstraint == NULL);
+		Assert(m_ragdoll.list[0].originParentSpace == vec3_origin);
+		Assert(m_ragdoll.list[0].pObject != NULL);
+		VPhysicsSetObject(NULL);	// squelch a warning message
+		VPhysicsSetObject(m_ragdoll.list[0].pObject);	// make sure object zero is saved by CBaseEntity
+	}
 	m_pOuter->OnSave(pUtils);
 }
 
@@ -1262,6 +1313,15 @@ void CEngineObjectInternal::OnRestore()
 	// We're not save/loading the PVS dirty state. Assume everything is dirty after a restore
 	MarkPVSInformationDirty();
 	NetworkStateChanged();
+	if (m_ragdoll.listCount) {
+		// rebuild element 0 since it isn't saved
+		// NOTE: This breaks the rules - the pointer needs to get fixed in Restore()
+		m_ragdoll.list[0].pObject = VPhysicsGetObject();
+		m_ragdoll.list[0].parentIndex = -1;
+		m_ragdoll.list[0].originParentSpace.Init();
+		// JAY: Reset collision relationships
+		RagdollSetupCollisions(m_ragdoll, modelinfo->GetVCollide(GetModelIndex()), GetModelIndex());
+	}
 	m_pOuter->OnRestore();
 	m_pOuter->NetworkStateChanged();
 }
@@ -4709,7 +4769,7 @@ bool CEngineObjectInternal::GetPoseParameterRange(int index, float& minValue, fl
 //-----------------------------------------------------------------------------
 void CEngineObjectInternal::VPhysicsDestroyObject(void)
 {
-	if (m_pPhysicsObject)
+	if (m_pPhysicsObject && !m_ragdoll.listCount)
 	{
 #ifndef CLIENT_DLL
 		PhysRemoveShadow(this->m_pOuter);
@@ -4941,6 +5001,262 @@ int CEngineObjectInternal::SelectHeaviestSequence(int activity)
 {
 	Assert(GetModelPtr());
 	return GetModelPtr()->SelectHeaviestSequence(activity);
+}
+
+void CEngineObjectInternal::ClearRagdoll() {
+	if (m_ragdoll.listCount) {
+		for (int i = 0; i < m_ragdoll.listCount; i++)
+		{
+			if (m_ragdoll.list[i].pObject)
+			{
+				g_pPhysSaveRestoreManager->ForgetModel(m_ragdoll.list[i].pObject);
+				m_ragdoll.list[i].pObject->EnableCollisions(false);
+			}
+		}
+
+		// Set to null so that the destructor's call to DestroyObject won't destroy
+		//  m_pObjects[ 0 ] twice since that's the physics object for the prop
+		VPhysicsSetObject(NULL);
+
+		RagdollDestroy(m_ragdoll);
+	}
+}
+
+void CEngineObjectInternal::VPhysicsUpdate(IPhysicsObject* pPhysics)
+{
+	if (m_lastUpdateTickCount == (unsigned int)gpGlobals->tickcount)
+		return;
+
+	m_lastUpdateTickCount = gpGlobals->tickcount;
+	//NetworkStateChanged();
+
+	matrix3x4_t boneToWorld[MAXSTUDIOBONES];
+	QAngle angles;
+	Vector surroundingMins, surroundingMaxs;
+
+	int i;
+	for (i = 0; i < m_ragdoll.listCount; i++)
+	{
+		CBoneAccessor boneaccessor(boneToWorld);
+		if (RagdollGetBoneMatrix(m_ragdoll, boneaccessor, i))
+		{
+			Vector vNewPos;
+			MatrixAngles(boneToWorld[m_ragdoll.boneIndex[i]], angles, vNewPos);
+			m_ragPos.Set(i, vNewPos);
+			m_ragAngles.Set(i, angles);
+		}
+		else
+		{
+			m_ragPos.GetForModify(i).Init();
+			m_ragAngles.GetForModify(i).Init();
+		}
+	}
+
+	// BUGBUG: Use the ragdollmins/maxs to do this instead of the collides
+	m_allAsleep = RagdollIsAsleep(m_ragdoll);
+
+	if (m_allAsleep)
+	{
+
+	}
+	else
+	{
+		if (m_ragdoll.pGroup->IsInErrorState())
+		{
+			RagdollSolveSeparation(m_ragdoll, this->m_pOuter);
+		}
+	}
+
+	Vector vecFullMins, vecFullMaxs;
+	vecFullMins = m_ragPos[0];
+	vecFullMaxs = m_ragPos[0];
+	for (i = 0; i < m_ragdoll.listCount; i++)
+	{
+		Vector mins, maxs;
+		matrix3x4_t update;
+		if (!m_ragdoll.list[i].pObject)
+		{
+			m_ragdollMins[i].Init();
+			m_ragdollMaxs[i].Init();
+			continue;
+		}
+		m_ragdoll.list[i].pObject->GetPositionMatrix(&update);
+		TransformAABB(update, m_ragdollMins[i], m_ragdollMaxs[i], mins, maxs);
+		for (int j = 0; j < 3; j++)
+		{
+			if (mins[j] < vecFullMins[j])
+			{
+				vecFullMins[j] = mins[j];
+			}
+			if (maxs[j] > vecFullMaxs[j])
+			{
+				vecFullMaxs[j] = maxs[j];
+			}
+		}
+	}
+
+	SetAbsOrigin(m_ragPos[0]);
+	SetAbsAngles(vec3_angle);
+	const Vector& vecOrigin = GetCollisionOrigin();
+	AddSolidFlags(FSOLID_FORCE_WORLD_ALIGNED);
+	SetSurroundingBoundsType(USE_COLLISION_BOUNDS_NEVER_VPHYSICS);
+	SetCollisionBounds(vecFullMins - vecOrigin, vecFullMaxs - vecOrigin);
+	MarkSurroundingBoundsDirty();
+
+	PhysicsTouchTriggers();
+}
+
+void CEngineObjectInternal::InitRagdoll(const Vector& forceVector, int forceBone, const Vector& forcePos, matrix3x4_t* pPrevBones, matrix3x4_t* pBoneToWorld, float dt, int collisionGroup, bool activateRagdoll, bool bWakeRagdoll)
+{
+	if (m_ragdoll.listCount) {
+		return;
+	}
+	SetCollisionGroup(collisionGroup);
+	SetMoveType(MOVETYPE_VPHYSICS);
+	SetSolid(SOLID_VPHYSICS);
+	AddSolidFlags(FSOLID_CUSTOMRAYTEST | FSOLID_CUSTOMBOXTEST);
+	m_pOuter->m_takedamage = DAMAGE_EVENTS_ONLY;
+
+	ragdollparams_t params;
+	params.pGameData = static_cast<void*>(static_cast<CBaseEntity*>(this->m_pOuter));
+	params.modelIndex = GetModelIndex();
+	params.pCollide = modelinfo->GetVCollide(params.modelIndex);
+	params.pStudioHdr = GetModelPtr();
+	params.forceVector = forceVector;
+	params.forceBoneIndex = forceBone;
+	params.forcePosition = forcePos;
+	params.pCurrentBones = pBoneToWorld;
+	params.jointFrictionScale = 1.0;
+	params.allowStretch = HasSpawnFlags(SF_RAGDOLLPROP_ALLOW_STRETCH);
+	params.fixedConstraints = false;
+	RagdollCreate(m_ragdoll, params, physenv);
+	RagdollApplyAnimationAsVelocity(m_ragdoll, pPrevBones, pBoneToWorld, dt);
+	if (m_anglesOverrideString != NULL_STRING && Q_strlen(m_anglesOverrideString.ToCStr()) > 0)
+	{
+		char szToken[2048];
+		const char* pStr = nexttoken(szToken, STRING(m_anglesOverrideString), ',');
+		// anglesOverride is index,angles,index,angles (e.g. "1, 22.5 123.0 0.0, 2, 0 0 0, 3, 0 0 180.0")
+		while (szToken[0] != 0)
+		{
+			int objectIndex = atoi(szToken);
+			// sanity check to make sure this token is an integer
+			Assert(atof(szToken) == ((float)objectIndex));
+			pStr = nexttoken(szToken, pStr, ',');
+			Assert(szToken[0]);
+			if (objectIndex >= m_ragdoll.listCount)
+			{
+				Warning("Bad ragdoll pose in entity %s, model (%s) at %s, model changed?\n", m_pOuter->GetDebugName(), GetModelName().ToCStr(), VecToString(GetAbsOrigin()));
+			}
+			else if (szToken[0] != 0)
+			{
+				QAngle angles;
+				Assert(objectIndex >= 0 && objectIndex < RAGDOLL_MAX_ELEMENTS);
+				UTIL_StringToVector(angles.Base(), szToken);
+				int boneIndex = m_ragdoll.boneIndex[objectIndex];
+				AngleMatrix(angles, pBoneToWorld[boneIndex]);
+				const ragdollelement_t& element = m_ragdoll.list[objectIndex];
+				Vector out;
+				if (element.parentIndex >= 0)
+				{
+					int parentBoneIndex = m_ragdoll.boneIndex[element.parentIndex];
+					VectorTransform(element.originParentSpace, pBoneToWorld[parentBoneIndex], out);
+				}
+				else
+				{
+					out = GetAbsOrigin();
+				}
+				MatrixSetColumn(out, 3, pBoneToWorld[boneIndex]);
+				element.pObject->SetPositionMatrix(pBoneToWorld[boneIndex], true);
+			}
+			pStr = nexttoken(szToken, pStr, ',');
+		}
+	}
+
+	if (activateRagdoll)
+	{
+		MEM_ALLOC_CREDIT();
+		RagdollActivate(m_ragdoll, params.pCollide, GetModelIndex(), bWakeRagdoll);
+	}
+
+	for (int i = 0; i < m_ragdoll.listCount; i++)
+	{
+		UpdateNetworkDataFromVPhysics(i);
+		g_pPhysSaveRestoreManager->AssociateModel(m_ragdoll.list[i].pObject, GetModelIndex());
+		physcollision->CollideGetAABB(&m_ragdollMins[i], &m_ragdollMaxs[i], m_ragdoll.list[i].pObject->GetCollide(), vec3_origin, vec3_angle);
+	}
+	VPhysicsSetObject(m_ragdoll.list[0].pObject);
+
+	CalcRagdollSize();
+}
+
+void CEngineObjectInternal::CalcRagdollSize(void)
+{
+	SetSurroundingBoundsType(USE_HITBOXES);
+	RemoveSolidFlags(FSOLID_FORCE_WORLD_ALIGNED);
+}
+
+void CEngineObjectInternal::UpdateNetworkDataFromVPhysics(int index)
+{
+	Assert(index < m_ragdoll.listCount);
+
+	QAngle angles;
+	Vector vPos;
+	m_ragdoll.list[index].pObject->GetPosition(&vPos, &angles);
+	m_ragPos.Set(index, vPos);
+	m_ragAngles.Set(index, angles);
+
+	// move/relink if root moved
+	if (index == 0)
+	{
+		SetAbsOrigin(m_ragPos[0]);
+		PhysicsTouchTriggers();
+	}
+}
+
+IPhysicsObject* CEngineObjectInternal::GetElement(int elementNum)
+{
+	return m_ragdoll.list[elementNum].pObject;
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: Force all the ragdoll's bone's physics objects to recheck their collision filters
+//-----------------------------------------------------------------------------
+void CEngineObjectInternal::RecheckCollisionFilter(void)
+{
+	for (int i = 0; i < m_ragdoll.listCount; i++)
+	{
+		m_ragdoll.list[i].pObject->RecheckCollisionFilter();
+	}
+}
+
+void CEngineObjectInternal::GetAngleOverrideFromCurrentState(char* pOut, int size)
+{
+	pOut[0] = 0;
+	for (int i = 0; i < m_ragdoll.listCount; i++)
+	{
+		if (i != 0)
+		{
+			Q_strncat(pOut, ",", size, COPY_ALL_CHARACTERS);
+
+		}
+		CFmtStr str("%d,%.2f %.2f %.2f", i, m_ragAngles[i].x, m_ragAngles[i].y, m_ragAngles[i].z);
+		Q_strncat(pOut, str, size, COPY_ALL_CHARACTERS);
+	}
+}
+
+void CEngineObjectInternal::RagdollBone(bool* boneSimulated, CBoneAccessor& pBoneToWorld)
+{
+	for (int i = 0; i < m_ragdoll.listCount; i++)
+	{
+		// during restore this may be NULL
+		if (!GetElement(i))
+			continue;
+
+		if (RagdollGetBoneMatrix(m_ragdoll, pBoneToWorld, i))
+		{
+			boneSimulated[m_ragdoll.boneIndex[i]] = true;
+		}
+	}
 }
 
 void CEngineObjectPlayer::VPhysicsDestroyObject()

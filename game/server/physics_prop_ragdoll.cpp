@@ -39,15 +39,7 @@ const char *s_pDebrisContext = "DebrisContext";
 
 const float ATTACHED_DAMPING_SCALE = 50.0f;
 
-//-----------------------------------------------------------------------------
-// Spawnflags
-//-----------------------------------------------------------------------------
-#define	SF_RAGDOLLPROP_DEBRIS		0x0004
-#define SF_RAGDOLLPROP_USE_LRU_RETIREMENT	0x1000
-#define	SF_RAGDOLLPROP_ALLOW_DISSOLVE		0x2000	// Allow this prop to be dissolved
-#define	SF_RAGDOLLPROP_MOTIONDISABLED		0x4000
-#define	SF_RAGDOLLPROP_ALLOW_STRETCH		0x8000
-#define	SF_RAGDOLLPROP_STARTASLEEP			0x10000
+
 
 //-----------------------------------------------------------------------------
 // Networking
@@ -57,27 +49,18 @@ LINK_ENTITY_TO_CLASS( prop_ragdoll, CRagdollProp );
 EXTERN_SEND_TABLE(DT_Ragdoll)
 
 IMPLEMENT_SERVERCLASS_ST(CRagdollProp, DT_Ragdoll)
-	SendPropArray	(SendPropQAngles(SENDINFO_ARRAY(m_ragAngles), 13, 0 ), m_ragAngles),
-	SendPropArray	(SendPropVector(SENDINFO_ARRAY(m_ragPos), -1, SPROP_COORD ), m_ragPos),
+
 	SendPropEHandle(SENDINFO( m_hUnragdoll ) ),
 	SendPropFloat(SENDINFO(m_flBlendWeight), 8, SPROP_ROUNDDOWN, 0.0f, 1.0f ),
 	SendPropInt(SENDINFO(m_nOverlaySequence), 11),
 END_SEND_TABLE()
 
-#define DEFINE_RAGDOLL_ELEMENT( i ) \
-	DEFINE_FIELD( m_ragdoll.list[i].originParentSpace, FIELD_VECTOR ), \
-	DEFINE_PHYSPTR( m_ragdoll.list[i].pObject ), \
-	DEFINE_PHYSPTR( m_ragdoll.list[i].pConstraint ), \
-	DEFINE_FIELD( m_ragdoll.list[i].parentIndex, FIELD_INTEGER )
+
 
 BEGIN_DATADESC(CRagdollProp)
 //					m_ragdoll (custom handling)
-	DEFINE_AUTO_ARRAY	( m_ragdoll.boneIndex,	FIELD_INTEGER	),
-	DEFINE_AUTO_ARRAY	( m_ragPos,		FIELD_POSITION_VECTOR	),
-	DEFINE_AUTO_ARRAY	( m_ragAngles,	FIELD_VECTOR	),
-	DEFINE_KEYFIELD(m_anglesOverrideString,	FIELD_STRING, "angleOverride" ),
-	DEFINE_FIELD( m_lastUpdateTickCount, FIELD_INTEGER ),
-	DEFINE_FIELD( m_allAsleep, FIELD_BOOLEAN ),
+
+
 	DEFINE_FIELD( m_hDamageEntity, FIELD_EHANDLE ),
 	DEFINE_FIELD( m_hKiller, FIELD_EHANDLE ),
 
@@ -95,8 +78,6 @@ BEGIN_DATADESC(CRagdollProp)
 
 	DEFINE_FIELD( m_flBlendWeight, FIELD_FLOAT ),
 	DEFINE_FIELD( m_nOverlaySequence, FIELD_INTEGER ),
-	DEFINE_AUTO_ARRAY( m_ragdollMins, FIELD_VECTOR ),
-	DEFINE_AUTO_ARRAY( m_ragdollMaxs, FIELD_VECTOR ),
 
 	// Physics Influence
 	DEFINE_FIELD( m_hPhysicsAttacker, FIELD_EHANDLE ),
@@ -111,35 +92,9 @@ BEGIN_DATADESC(CRagdollProp)
 	DEFINE_THINKFUNC( ClearFlagsThink ),
 	DEFINE_THINKFUNC( FadeOutThink ),
 
-	DEFINE_FIELD( m_ragdoll.listCount, FIELD_INTEGER ),
-	DEFINE_FIELD( m_ragdoll.allowStretch, FIELD_BOOLEAN ),
-	DEFINE_PHYSPTR( m_ragdoll.pGroup ),
 	DEFINE_FIELD( m_flDefaultFadeScale, FIELD_FLOAT ),
 
 	//DEFINE_RAGDOLL_ELEMENT( 0 ),
-	DEFINE_RAGDOLL_ELEMENT( 1 ),
-	DEFINE_RAGDOLL_ELEMENT( 2 ),
-	DEFINE_RAGDOLL_ELEMENT( 3 ),
-	DEFINE_RAGDOLL_ELEMENT( 4 ),
-	DEFINE_RAGDOLL_ELEMENT( 5 ),
-	DEFINE_RAGDOLL_ELEMENT( 6 ),
-	DEFINE_RAGDOLL_ELEMENT( 7 ),
-	DEFINE_RAGDOLL_ELEMENT( 8 ),
-	DEFINE_RAGDOLL_ELEMENT( 9 ),
-	DEFINE_RAGDOLL_ELEMENT( 10 ),
-	DEFINE_RAGDOLL_ELEMENT( 11 ),
-	DEFINE_RAGDOLL_ELEMENT( 12 ),
-	DEFINE_RAGDOLL_ELEMENT( 13 ),
-	DEFINE_RAGDOLL_ELEMENT( 14 ),
-	DEFINE_RAGDOLL_ELEMENT( 15 ),
-	DEFINE_RAGDOLL_ELEMENT( 16 ),
-	DEFINE_RAGDOLL_ELEMENT( 17 ),
-	DEFINE_RAGDOLL_ELEMENT( 18 ),
-	DEFINE_RAGDOLL_ELEMENT( 19 ),
-	DEFINE_RAGDOLL_ELEMENT( 20 ),
-	DEFINE_RAGDOLL_ELEMENT( 21 ),
-	DEFINE_RAGDOLL_ELEMENT( 22 ),
-	DEFINE_RAGDOLL_ELEMENT( 23 ),
 
 END_DATADESC()
 
@@ -179,8 +134,12 @@ void CRagdollProp::Spawn( void )
 	GetEngineObject()->SetAbsAngles( vec3_angle );
 	int collisionGroup = (GetEngineObject()->GetSpawnFlags() & SF_RAGDOLLPROP_DEBRIS) ? COLLISION_GROUP_DEBRIS : COLLISION_GROUP_NONE;
 	bool bWake = (GetEngineObject()->GetSpawnFlags() & SF_RAGDOLLPROP_STARTASLEEP) ? false : true;
-	InitRagdoll( vec3_origin, 0, vec3_origin, pBoneToWorld, pBoneToWorld, 0, collisionGroup, true, bWake );
-	m_lastUpdateTickCount = 0;
+	GetEngineObject()->InitRagdoll( vec3_origin, 0, vec3_origin, pBoneToWorld, pBoneToWorld, 0, collisionGroup, true, bWake );
+	// Make sure it's interactive debris for at most 5 seconds
+	if (collisionGroup == COLLISION_GROUP_INTERACTIVE_DEBRIS)
+	{
+		SetContextThink(&CRagdollProp::SetDebrisThink, gpGlobals->curtime + 5, s_pDebrisContext);
+	}
 	m_flBlendWeight = 0.0f;
 	m_nOverlaySequence = -1;
 
@@ -209,76 +168,37 @@ void CRagdollProp::SetSourceClassName( const char *pClassname )
 
 void CRagdollProp::OnSave( IEntitySaveUtils *pUtils )
 {
-	if ( !m_ragdoll.listCount )
-		return;
-
-	// Don't save ragdoll element 0, base class saves the pointer in 
-	// m_pPhysicsObject
-	Assert( m_ragdoll.list[0].parentIndex == -1 );
-	Assert( m_ragdoll.list[0].pConstraint == NULL );
-	Assert( m_ragdoll.list[0].originParentSpace == vec3_origin );
-	Assert( m_ragdoll.list[0].pObject != NULL );
-	GetEngineObject()->VPhysicsSetObject( NULL );	// squelch a warning message
-	GetEngineObject()->VPhysicsSetObject( m_ragdoll.list[0].pObject );	// make sure object zero is saved by CBaseEntity
 	BaseClass::OnSave( pUtils );
 }
 
 void CRagdollProp::OnRestore()
 {
-	// rebuild element 0 since it isn't saved
-	// NOTE: This breaks the rules - the pointer needs to get fixed in Restore()
-	m_ragdoll.list[0].pObject = VPhysicsGetObject();
-	m_ragdoll.list[0].parentIndex = -1;
-	m_ragdoll.list[0].originParentSpace.Init();
-
 	BaseClass::OnRestore();
-	if ( !m_ragdoll.listCount )
-		return;
-
-	// JAY: Reset collision relationships
-	RagdollSetupCollisions( m_ragdoll, modelinfo->GetVCollide(GetEngineObject()->GetModelIndex() ), GetEngineObject()->GetModelIndex() );
 	VPhysicsUpdate( VPhysicsGetObject() );
 }
 
-void CRagdollProp::CalcRagdollSize( void )
-{
-	GetEngineObject()->SetSurroundingBoundsType( USE_HITBOXES );
-	GetEngineObject()->RemoveSolidFlags( FSOLID_FORCE_WORLD_ALIGNED );
-}
+
 
 void CRagdollProp::UpdateOnRemove( void )
 {
-	for ( int i = 0; i < m_ragdoll.listCount; i++ )
-	{
-		if ( m_ragdoll.list[i].pObject )
-		{
-			g_pPhysSaveRestoreManager->ForgetModel( m_ragdoll.list[i].pObject );
-		}
-	}
 
-	// Set to null so that the destructor's call to DestroyObject won't destroy
-	//  m_pObjects[ 0 ] twice since that's the physics object for the prop
-	GetEngineObject()->VPhysicsSetObject( NULL );
-
-	RagdollDestroy( m_ragdoll );
 	// Chain to base after doing our own cleanup to mimic
 	//  destructor unwind order
 	BaseClass::UpdateOnRemove();
+	//GetEngineObject()->ClearRagdoll();
 }
 
 CRagdollProp::CRagdollProp( void )
 {
 	m_strSourceClassName = NULL_STRING;
-	m_anglesOverrideString = NULL_STRING;
-	m_ragdoll.listCount = 0;
 	Assert( (1<<RAGDOLL_INDEX_BITS) >=RAGDOLL_MAX_ELEMENTS );
-	m_allAsleep = false;
 	m_flFadeScale = 1;
 	m_flDefaultFadeScale = 1;
 }
 
 CRagdollProp::~CRagdollProp( void )
 {
+	int aaa = 0;
 }
 
 void CRagdollProp::Precache( void )
@@ -379,7 +299,7 @@ void CRagdollProp::OnPhysGunPickup( CBasePlayer *pPhysGunUser, PhysGunPickup_t r
 	if ( !GetEngineObject()->HasSpawnFlags( SF_PHYSPROP_ENABLE_ON_PHYSCANNON ) )
 		return;
 
-	ragdoll_t *pRagdollPhys = GetRagdoll( );
+	ragdoll_t *pRagdollPhys = GetEngineObject()->GetRagdoll( );
 	for ( int j = 0; j < pRagdollPhys->listCount; ++j )
 	{
 		pRagdollPhys->list[j].pObject->Wake();
@@ -422,7 +342,7 @@ void CRagdollProp::OnPhysGunDrop( CBasePlayer *pPhysGunUser, PhysGunDrop_t Reaso
 
 		// Get the average position, apply forces to produce a spin
 		int j;
-		ragdoll_t *pRagdollPhys = GetRagdoll( );
+		ragdoll_t *pRagdollPhys = GetEngineObject()->GetRagdoll( );
 		for ( j = 0; j < pRagdollPhys->listCount; ++j )
 		{
 			Vector vecCenter;
@@ -674,97 +594,12 @@ void CRagdollProp::SetOverlaySequence( Activity activity )
 	}
 }
 
-void CRagdollProp::InitRagdoll( const Vector &forceVector, int forceBone, const Vector &forcePos, matrix3x4_t *pPrevBones, matrix3x4_t *pBoneToWorld, float dt, int collisionGroup, bool activateRagdoll, bool bWakeRagdoll )
-{
-	GetEngineObject()->SetCollisionGroup( collisionGroup );
 
-	// Make sure it's interactive debris for at most 5 seconds
-	if ( collisionGroup == COLLISION_GROUP_INTERACTIVE_DEBRIS )
-	{
-		SetContextThink( &CRagdollProp::SetDebrisThink, gpGlobals->curtime + 5, s_pDebrisContext );
-	}
-
-	GetEngineObject()->SetMoveType( MOVETYPE_VPHYSICS );
-	GetEngineObject()->SetSolid( SOLID_VPHYSICS );
-	GetEngineObject()->AddSolidFlags( FSOLID_CUSTOMRAYTEST | FSOLID_CUSTOMBOXTEST );
-	m_takedamage = DAMAGE_EVENTS_ONLY;
-
-	ragdollparams_t params;
-	params.pGameData = static_cast<void *>( static_cast<CBaseEntity *>(this) );
-	params.modelIndex = GetEngineObject()->GetModelIndex();
-	params.pCollide = modelinfo->GetVCollide( params.modelIndex );
-	params.pStudioHdr = GetEngineObject()->GetModelPtr();
-	params.forceVector = forceVector;
-	params.forceBoneIndex = forceBone;
-	params.forcePosition = forcePos;
-	params.pCurrentBones = pBoneToWorld;
-	params.jointFrictionScale = 1.0;
-	params.allowStretch = GetEngineObject()->HasSpawnFlags(SF_RAGDOLLPROP_ALLOW_STRETCH);
-	params.fixedConstraints = false;
-	RagdollCreate( m_ragdoll, params, physenv );
-	RagdollApplyAnimationAsVelocity( m_ragdoll, pPrevBones, pBoneToWorld, dt );
-	if ( m_anglesOverrideString != NULL_STRING && Q_strlen(m_anglesOverrideString.ToCStr()) > 0 )
-	{
-		char szToken[2048];
-		const char *pStr = nexttoken(szToken, STRING(m_anglesOverrideString), ',');
-		// anglesOverride is index,angles,index,angles (e.g. "1, 22.5 123.0 0.0, 2, 0 0 0, 3, 0 0 180.0")
-		while ( szToken[0] != 0 )
-		{
-			int objectIndex = atoi(szToken);
-			// sanity check to make sure this token is an integer
-			Assert( atof(szToken) == ((float)objectIndex) );
-			pStr = nexttoken(szToken, pStr, ',');
-			Assert( szToken[0] );
-			if ( objectIndex >= m_ragdoll.listCount )
-			{
-				Warning("Bad ragdoll pose in entity %s, model (%s) at %s, model changed?\n", GetDebugName(), GetEngineObject()->GetModelName().ToCStr(), VecToString(GetEngineObject()->GetAbsOrigin()) );
-			}
-			else if ( szToken[0] != 0 )
-			{
-				QAngle angles;
-				Assert( objectIndex >= 0 && objectIndex < RAGDOLL_MAX_ELEMENTS );
-				UTIL_StringToVector( angles.Base(), szToken );
-				int boneIndex = m_ragdoll.boneIndex[objectIndex];
-				AngleMatrix( angles, pBoneToWorld[boneIndex] );
-				const ragdollelement_t &element = m_ragdoll.list[objectIndex];
-				Vector out;
-				if ( element.parentIndex >= 0 )
-				{
-					int parentBoneIndex = m_ragdoll.boneIndex[element.parentIndex];
-					VectorTransform( element.originParentSpace, pBoneToWorld[parentBoneIndex], out );
-				}
-				else
-				{
-					out = GetEngineObject()->GetAbsOrigin();
-				}
-				MatrixSetColumn( out, 3, pBoneToWorld[boneIndex] );
-				element.pObject->SetPositionMatrix( pBoneToWorld[boneIndex], true );
-			}
-			pStr = nexttoken(szToken, pStr, ',');
-		}
-	}
-
-	if ( activateRagdoll )
-	{
-		MEM_ALLOC_CREDIT();
-		RagdollActivate( m_ragdoll, params.pCollide, GetEngineObject()->GetModelIndex(), bWakeRagdoll );
-	}
-
-	for ( int i = 0; i < m_ragdoll.listCount; i++ )
-	{
-		UpdateNetworkDataFromVPhysics( m_ragdoll.list[i].pObject, i );
-		g_pPhysSaveRestoreManager->AssociateModel( m_ragdoll.list[i].pObject, GetEngineObject()->GetModelIndex() );
-		physcollision->CollideGetAABB( &m_ragdollMins[i], &m_ragdollMaxs[i], m_ragdoll.list[i].pObject->GetCollide(), vec3_origin, vec3_angle );
-	}
-	GetEngineObject()->VPhysicsSetObject( m_ragdoll.list[0].pObject );
-
-	CalcRagdollSize();
-}
 
 void CRagdollProp::SetDebrisThink()
 {
 	GetEngineObject()->SetCollisionGroup( COLLISION_GROUP_DEBRIS );
-	RecheckCollisionFilter();
+	GetEngineObject()->RecheckCollisionFilter();
 }
 
 void CRagdollProp::SetDamageEntity( CBaseEntity *pEntity )
@@ -801,23 +636,14 @@ int	CRagdollProp::OnTakeDamage( const CTakeDamageInfo &info )
 	return BaseClass::OnTakeDamage( info );
 }
 
-//-----------------------------------------------------------------------------
-// Purpose: Force all the ragdoll's bone's physics objects to recheck their collision filters
-//-----------------------------------------------------------------------------
-void CRagdollProp::RecheckCollisionFilter( void )
-{
-	for ( int i = 0; i < m_ragdoll.listCount; i++ )
-	{
-		m_ragdoll.list[i].pObject->RecheckCollisionFilter();
-	}
-}
+
 
 
 void CRagdollProp::TraceAttack( const CTakeDamageInfo &info, const Vector &dir, trace_t *ptr, CDmgAccumulator *pAccumulator )
 {
-	if ( ptr->physicsbone >= 0 && ptr->physicsbone < m_ragdoll.listCount )
+	if ( ptr->physicsbone >= 0 && ptr->physicsbone < GetEngineObject()->RagdollBoneCount() )
 	{
-		GetEngineObject()->VPhysicsSwapObject( m_ragdoll.list[ptr->physicsbone].pObject );
+		GetEngineObject()->VPhysicsSwapObject(GetEngineObject()->GetElement(ptr->physicsbone));
 	}
 	BaseClass::TraceAttack( info, dir, ptr, pAccumulator );
 }
@@ -825,7 +651,7 @@ void CRagdollProp::TraceAttack( const CTakeDamageInfo &info, const Vector &dir, 
 void CRagdollProp::SetupBones( matrix3x4_t *pBoneToWorld, int boneMask )
 {
 	// no ragdoll, fall through to base class 
-	if ( !m_ragdoll.listCount )
+	if ( !GetEngineObject()->RagdollBoneCount())
 	{
 		BaseClass::SetupBones( pBoneToWorld, boneMask );
 		return;
@@ -842,17 +668,7 @@ void CRagdollProp::SetupBones( matrix3x4_t *pBoneToWorld, int boneMask )
 	int i;
 
 	CBoneAccessor boneaccessor( pBoneToWorld );
-	for ( i = 0; i < m_ragdoll.listCount; i++ )
-	{
-		// during restore this may be NULL
-		if ( !m_ragdoll.list[i].pObject )
-			continue;
-
-		if ( RagdollGetBoneMatrix( m_ragdoll, boneaccessor, i ) )
-		{
-			sim[m_ragdoll.boneIndex[i]] = true;
-		}
-	}
+	GetEngineObject()->RagdollBone(sim, boneaccessor);
 
 	mstudiobone_t *pbones = pStudioHdr->pBone( 0 );
 	for ( i = 0; i < pStudioHdr->numbones(); i++ )
@@ -886,20 +702,20 @@ bool CRagdollProp::TestCollision( const Ray_t &ray, unsigned int mask, trace_t& 
 	// Just iterate all of the elements and trace the box against each one.
 	// NOTE: This is pretty expensive for small/dense characters
 	trace_t tr;
-	for ( int i = 0; i < m_ragdoll.listCount; i++ )
+	for ( int i = 0; i < GetEngineObject()->RagdollBoneCount(); i++ )
 	{
 		Vector position;
 		QAngle angles;
 
-		if( m_ragdoll.list[i].pObject )
+		if(GetEngineObject()->GetElement(i) )
 		{
-			m_ragdoll.list[i].pObject->GetPosition( &position, &angles );
-			physcollision->TraceBox( ray, m_ragdoll.list[i].pObject->GetCollide(), position, angles, &tr );
+			GetEngineObject()->GetElement(i)->GetPosition( &position, &angles );
+			physcollision->TraceBox( ray, GetEngineObject()->GetElement(i)->GetCollide(), position, angles, &tr );
 
 			if ( tr.fraction < trace.fraction )
 			{
 				tr.physicsbone = i;
-				tr.surface.surfaceProps = m_ragdoll.list[i].pObject->GetMaterialIndex();
+				tr.surface.surfaceProps = GetEngineObject()->GetElement(i)->GetMaterialIndex();
 				trace = tr;
 			}
 		}
@@ -942,151 +758,58 @@ void CRagdollProp::Teleport( const Vector *newPosition, const QAngle *newAngles,
 
 	// we need to call the base class and it will teleport our vphysics object, 
 	// so set object 0 up and compute the origin/angles for its new position (base implementation has side effects)
-	GetEngineObject()->VPhysicsSwapObject( m_ragdoll.list[0].pObject );
+	GetEngineObject()->VPhysicsSwapObject(GetEngineObject()->GetElement(0));
 	matrix3x4_t obj0source, obj0Target;
-	m_ragdoll.list[0].pObject->GetPositionMatrix( &obj0source );
+	GetEngineObject()->GetElement(0)->GetPositionMatrix( &obj0source );
 	ConcatTransforms( xform, obj0source, obj0Target );
 	Vector obj0Pos;
 	QAngle obj0Angles;
 	MatrixAngles( obj0Target, obj0Angles, obj0Pos );
 	BaseClass::Teleport( &obj0Pos, &obj0Angles, newVelocity );
 	
-	for ( int i = 1; i < m_ragdoll.listCount; i++ )
+	for ( int i = 1; i < GetEngineObject()->RagdollBoneCount(); i++ )
 	{
 		matrix3x4_t matrix, newMatrix;
-		m_ragdoll.list[i].pObject->GetPositionMatrix( &matrix );
+		GetEngineObject()->GetElement(i)->GetPositionMatrix( &matrix );
 		ConcatTransforms( xform, matrix, newMatrix );
-		m_ragdoll.list[i].pObject->SetPositionMatrix( newMatrix, true );
-		UpdateNetworkDataFromVPhysics( m_ragdoll.list[i].pObject, i );
+		GetEngineObject()->GetElement(i)->SetPositionMatrix( newMatrix, true );
+		GetEngineObject()->UpdateNetworkDataFromVPhysics(i );
 	}
 	// fixup/relink object 0
-	UpdateNetworkDataFromVPhysics( m_ragdoll.list[0].pObject, 0 );
+	GetEngineObject()->UpdateNetworkDataFromVPhysics(0 );
 }
 
 void CRagdollProp::VPhysicsUpdate( IPhysicsObject *pPhysics )
 {
-	if ( m_lastUpdateTickCount == (unsigned int)gpGlobals->tickcount )
-		return;
-
-	m_lastUpdateTickCount = gpGlobals->tickcount;
-	//NetworkStateChanged();
-
-	matrix3x4_t boneToWorld[MAXSTUDIOBONES];
-	QAngle angles;
-	Vector surroundingMins, surroundingMaxs;
-
-	int i;
-	for ( i = 0; i < m_ragdoll.listCount; i++ )
-	{
-		CBoneAccessor boneaccessor( boneToWorld );
-		if ( RagdollGetBoneMatrix( m_ragdoll, boneaccessor, i ) )
-		{
-			Vector vNewPos;
-			MatrixAngles( boneToWorld[m_ragdoll.boneIndex[i]], angles, vNewPos );
-			m_ragPos.Set( i, vNewPos );
-			m_ragAngles.Set( i, angles );
-		}
-		else
-		{
-			m_ragPos.GetForModify(i).Init();
-			m_ragAngles.GetForModify(i).Init();
-		}
-	}
-
-	// BUGBUG: Use the ragdollmins/maxs to do this instead of the collides
-	m_allAsleep = RagdollIsAsleep( m_ragdoll );
+	GetEngineObject()->VPhysicsUpdate(pPhysics);
 
 	// Don't scream after you've come to rest
-	if ( m_allAsleep )
+	if (GetEngineObject()->GetAllAsleep() )
 	{
 		m_strSourceClassName = NULL_STRING;
 	}
-	else
-	{
-		if ( m_ragdoll.pGroup->IsInErrorState() )
-		{
-			RagdollSolveSeparation( m_ragdoll, this );
-		}
-	}
 	
 	// Interactive debris converts back to debris when it comes to rest
-	if ( m_allAsleep && GetEngineObject()->GetCollisionGroup() == COLLISION_GROUP_INTERACTIVE_DEBRIS )
+	if (GetEngineObject()->GetAllAsleep() && GetEngineObject()->GetCollisionGroup() == COLLISION_GROUP_INTERACTIVE_DEBRIS)
 	{
 		GetEngineObject()->SetCollisionGroup( COLLISION_GROUP_DEBRIS );
-		RecheckCollisionFilter();
+		GetEngineObject()->RecheckCollisionFilter();
 		SetContextThink( NULL, gpGlobals->curtime, s_pDebrisContext );
 	}
-
-	Vector vecFullMins, vecFullMaxs;
-	vecFullMins = m_ragPos[0];
-	vecFullMaxs = m_ragPos[0];
-	for ( i = 0; i < m_ragdoll.listCount; i++ )
-	{
-		Vector mins, maxs;
-		matrix3x4_t update;
-		if ( !m_ragdoll.list[i].pObject )
-		{
-			m_ragdollMins[i].Init();
-			m_ragdollMaxs[i].Init();
-			continue;
-		}
-		m_ragdoll.list[i].pObject->GetPositionMatrix( &update );
-		TransformAABB( update, m_ragdollMins[i], m_ragdollMaxs[i], mins, maxs );
-		for ( int j = 0; j < 3; j++ )
-		{
-			if ( mins[j] < vecFullMins[j] )
-			{
-				vecFullMins[j] = mins[j];
-			}
-			if ( maxs[j] > vecFullMaxs[j] )
-			{
-				vecFullMaxs[j] = maxs[j];
-			}
-		}
-	}
-
-	GetEngineObject()->SetAbsOrigin( m_ragPos[0] );
-	GetEngineObject()->SetAbsAngles( vec3_angle );
-	const Vector &vecOrigin = GetEngineObject()->GetCollisionOrigin();
-	GetEngineObject()->AddSolidFlags( FSOLID_FORCE_WORLD_ALIGNED );
-	GetEngineObject()->SetSurroundingBoundsType( USE_COLLISION_BOUNDS_NEVER_VPHYSICS );
-	GetEngineObject()->SetCollisionBounds( vecFullMins - vecOrigin, vecFullMaxs - vecOrigin );
-	GetEngineObject()->MarkSurroundingBoundsDirty();
-
-	GetEngineObject()->PhysicsTouchTriggers();
 }
 
 int CRagdollProp::VPhysicsGetObjectList( IPhysicsObject **pList, int listMax )
 {
-	for ( int i = 0; i < m_ragdoll.listCount; i++ )
+	for ( int i = 0; i < GetEngineObject()->RagdollBoneCount(); i++ )
 	{
 		if ( i < listMax )
 		{
-			pList[i] = m_ragdoll.list[i].pObject;
+			pList[i] = GetEngineObject()->GetElement(i);
 		}
 	}
 
-	return m_ragdoll.listCount;
+	return GetEngineObject()->RagdollBoneCount();
 }
-
-void CRagdollProp::UpdateNetworkDataFromVPhysics( IPhysicsObject *pPhysics, int index )
-{
-	Assert(index < m_ragdoll.listCount);
-
-	QAngle angles;
-	Vector vPos;
-	m_ragdoll.list[index].pObject->GetPosition( &vPos, &angles );
-	m_ragPos.Set( index, vPos );
-	m_ragAngles.Set( index, angles );
-
-	// move/relink if root moved
-	if ( index == 0 )
-	{
-		GetEngineObject()->SetAbsOrigin( m_ragPos[0] );
-		GetEngineObject()->PhysicsTouchTriggers();
-	}
-}
-
 
 //-----------------------------------------------------------------------------
 // Fade out due to the LRU telling it do
@@ -1149,14 +872,14 @@ int CRagdollProp::DrawDebugTextOverlays(void)
 
 	if (m_debugOverlays & OVERLAY_TEXT_BIT) 
 	{
-		if (m_ragdoll.listCount)
+		if (GetEngineObject()->RagdollBoneCount())
 		{
 			float mass = 0;
-			for ( int i = 0; i < m_ragdoll.listCount; i++ )
+			for ( int i = 0; i < GetEngineObject()->RagdollBoneCount(); i++ )
 			{
-				if ( m_ragdoll.list[i].pObject != NULL )
+				if (GetEngineObject()->GetElement(i))
 				{
-					mass += m_ragdoll.list[i].pObject->GetMass();
+					mass += GetEngineObject()->GetElement(i)->GetMass();
 				}
 			}
 
@@ -1178,13 +901,13 @@ void CRagdollProp::DrawDebugGeometryOverlays()
 	}
 	if (m_debugOverlays & OVERLAY_PIVOT_BIT)
 	{
-		for ( int i = 0; i < m_ragdoll.listCount; i++ )
+		for ( int i = 0; i < GetEngineObject()->RagdollBoneCount(); i++ )
 		{
-			if ( m_ragdoll.list[i].pObject )
+			if (GetEngineObject()->GetElement(i))
 			{
-				float mass = m_ragdoll.list[i].pObject->GetMass();
+				float mass = GetEngineObject()->GetElement(i)->GetMass();
 				Vector pos;
-				m_ragdoll.list[i].pObject->GetPosition( &pos, NULL );
+				GetEngineObject()->GetElement(i)->GetPosition( &pos, NULL );
 				CFmtStr str("mass %.1f", mass );
 				NDebugOverlay::EntityTextAtPosition( pos, 0, str.Access(), 0, 0, 255, 0, 255 );
 			}
@@ -1286,7 +1009,12 @@ CBaseAnimating *CreateServerRagdollSubmodel( CBaseAnimating *pOwner, const char 
 
 	memcpy( pBoneToWorldNext, pBoneToWorld, sizeof(pBoneToWorld) );
 
-	pRagdoll->InitRagdoll( vec3_origin, -1, vec3_origin, pBoneToWorld, pBoneToWorldNext, 0.1, collisionGroup, true );
+	pRagdoll->GetEngineObject()->InitRagdoll( vec3_origin, -1, vec3_origin, pBoneToWorld, pBoneToWorldNext, 0.1, collisionGroup, true );
+	// Make sure it's interactive debris for at most 5 seconds
+	if (collisionGroup == COLLISION_GROUP_INTERACTIVE_DEBRIS)
+	{
+		pRagdoll->SetContextThink(&CRagdollProp::SetDebrisThink, gpGlobals->curtime + 5, s_pDebrisContext);
+	}
 	return pRagdoll;
 }
 
@@ -1393,8 +1121,12 @@ CBaseEntity *CreateServerRagdoll( CBaseAnimating *pAnimating, int forceBone, con
 	if ( (info.GetDamageType() & DMG_VEHICLE) && pAnimating->MyNPCPointer() )
 	{
 		// init the ragdoll with no forces
-		pRagdoll->InitRagdoll( vec3_origin, -1, vec3_origin, pBoneToWorld, pBoneToWorldNext, dt, collisionGroup, true );
-
+		pRagdoll->GetEngineObject()->InitRagdoll( vec3_origin, -1, vec3_origin, pBoneToWorld, pBoneToWorldNext, dt, collisionGroup, true );
+		// Make sure it's interactive debris for at most 5 seconds
+		if (collisionGroup == COLLISION_GROUP_INTERACTIVE_DEBRIS)
+		{
+			pRagdoll->SetContextThink(&CRagdollProp::SetDebrisThink, gpGlobals->curtime + 5, s_pDebrisContext);
+		}
 		// apply vehicle forces
 		// Get a list of bones with hitboxes below the plane of impact
 		int boxList[128];
@@ -1408,7 +1140,7 @@ CBaseEntity *CreateServerRagdoll( CBaseAnimating *pAnimating, int forceBone, con
 
 		// distribute the force
 		// BUGBUG: This will hit the same bone twice if it has two hitboxes!!!!
-		ragdoll_t *pRagInfo = pRagdoll->GetRagdoll();
+		ragdoll_t *pRagInfo = pRagdoll->GetEngineObject()->GetRagdoll();
 		for ( int i = 0; i < count; i++ )
 		{
 			int physBone = pAnimating->GetPhysicsBone( pAnimating->GetHitboxBone( boxList[i] ) );
@@ -1418,7 +1150,12 @@ CBaseEntity *CreateServerRagdoll( CBaseAnimating *pAnimating, int forceBone, con
 	}
 	else
 	{
-		pRagdoll->InitRagdoll( info.GetDamageForce(), forceBone, info.GetDamagePosition(), pBoneToWorld, pBoneToWorldNext, dt, collisionGroup, true );
+		pRagdoll->GetEngineObject()->InitRagdoll( info.GetDamageForce(), forceBone, info.GetDamagePosition(), pBoneToWorld, pBoneToWorldNext, dt, collisionGroup, true );
+		// Make sure it's interactive debris for at most 5 seconds
+		if (collisionGroup == COLLISION_GROUP_INTERACTIVE_DEBRIS)
+		{
+			pRagdoll->SetContextThink(&CRagdollProp::SetDebrisThink, gpGlobals->curtime + 5, s_pDebrisContext);
+		}
 	}
 
 	// Are we dissolving?
@@ -1469,18 +1206,18 @@ void CRagdollPropAttached::Detach()
 	physenv->DestroyConstraint( m_pAttachConstraint );
 	m_pAttachConstraint = NULL;
 	const float dampingScale = 1.0f / ATTACHED_DAMPING_SCALE;
-	for ( int i = 0; i < m_ragdoll.listCount; i++ )
+	for ( int i = 0; i < GetEngineObject()->RagdollBoneCount(); i++ )
 	{
 		float damping, rotdamping;
-		m_ragdoll.list[i].pObject->GetDamping( &damping, &rotdamping );
+		GetEngineObject()->GetElement(i)->GetDamping(&damping, &rotdamping);
 		damping *= dampingScale;
 		rotdamping *= dampingScale;
-		m_ragdoll.list[i].pObject->SetDamping( &damping, &damping );
+		GetEngineObject()->GetElement(i)->SetDamping( &damping, &damping );
 	}
 
 	// Go non-solid
 	GetEngineObject()->SetCollisionGroup( COLLISION_GROUP_DEBRIS );
-	RecheckCollisionFilter();
+	GetEngineObject()->RecheckCollisionFilter();
 }
 
 void CRagdollPropAttached::InitRagdollAttached( 
@@ -1505,9 +1242,13 @@ void CRagdollPropAttached::InitRagdollAttached(
 		ragdollAttachedIndex = pBone->physicsbone;
 	}
 
-	InitRagdoll( forceVector, forceBone, vec3_origin, pPrevBones, pBoneToWorld, dt, collisionGroup, false );
-	
-	IPhysicsObject *pRefObject = m_ragdoll.list[ragdollAttachedIndex].pObject;
+	GetEngineObject()->InitRagdoll( forceVector, forceBone, vec3_origin, pPrevBones, pBoneToWorld, dt, collisionGroup, false );
+	// Make sure it's interactive debris for at most 5 seconds
+	if (collisionGroup == COLLISION_GROUP_INTERACTIVE_DEBRIS)
+	{
+		SetContextThink(&CRagdollProp::SetDebrisThink, gpGlobals->curtime + 5, s_pDebrisContext);
+	}
+	IPhysicsObject *pRefObject = GetEngineObject()->GetElement(ragdollAttachedIndex);
 
 	Vector attachmentPointRagdollSpace;
 	pRefObject->WorldToLocal( &attachmentPointRagdollSpace, worldAttachOrigin );
@@ -1541,22 +1282,22 @@ void CRagdollPropAttached::InitRagdollAttached(
 	// for now, just slam this to be the passed in value
 	MatrixSetColumn( attachmentPointRagdollSpace, 3, constraint.constraintToReference );
 
-	PhysDisableEntityCollisions( pAttached, m_ragdoll.list[0].pObject );
-	m_pAttachConstraint = physenv->CreateRagdollConstraint( pRefObject, pAttached, m_ragdoll.pGroup, constraint );
+	PhysDisableEntityCollisions( pAttached, GetEngineObject()->GetElement(0));
+	m_pAttachConstraint = physenv->CreateRagdollConstraint( pRefObject, pAttached, GetEngineObject()->GetConstraintGroup(), constraint);
 
 	GetEngineObject()->SetParent( pFollow->GetEngineObject() );
 	SetOwnerEntity( pFollow );
 
-	RagdollActivate( m_ragdoll, modelinfo->GetVCollide(GetEngineObject()->GetModelIndex() ), GetEngineObject()->GetModelIndex() );
+	RagdollActivate(*GetEngineObject()->GetRagdoll(), modelinfo->GetVCollide(GetEngineObject()->GetModelIndex() ), GetEngineObject()->GetModelIndex() );
 
 	// add a bunch of dampening to the ragdoll
-	for ( int i = 0; i < m_ragdoll.listCount; i++ )
+	for ( int i = 0; i < GetEngineObject()->RagdollBoneCount(); i++ )
 	{
 		float damping, rotdamping;
-		m_ragdoll.list[i].pObject->GetDamping( &damping, &rotdamping );
+		GetEngineObject()->GetElement(i)->GetDamping(&damping, &rotdamping);
 		damping *= ATTACHED_DAMPING_SCALE;
 		rotdamping *= ATTACHED_DAMPING_SCALE;
-		m_ragdoll.list[i].pObject->SetDamping( &damping, &rotdamping );
+		GetEngineObject()->GetElement(i)->SetDamping( &damping, &rotdamping );
 	}
 
 	m_boneIndexAttached = boneIndexRoot;
@@ -1616,30 +1357,17 @@ ragdoll_t *Ragdoll_GetRagdoll( CBaseEntity *pEntity )
 {
 	CRagdollProp *pProp = dynamic_cast<CRagdollProp *>(pEntity);
 	if ( pProp )
-		return pProp->GetRagdoll();
+		return pProp->GetEngineObject()->GetRagdoll();
 	return NULL;
 }
 
-void CRagdollProp::GetAngleOverrideFromCurrentState( char *pOut, int size )
-{
-	pOut[0] = 0;
-	for ( int i = 0; i < m_ragdoll.listCount; i++ )
-	{
-		if ( i != 0 )
-		{
-			Q_strncat( pOut, ",", size, COPY_ALL_CHARACTERS );
 
-		}
-		CFmtStr str("%d,%.2f %.2f %.2f", i, m_ragAngles[i].x, m_ragAngles[i].y, m_ragAngles[i].z );
-		Q_strncat( pOut, str, size, COPY_ALL_CHARACTERS );
-	}
-}
 
 void CRagdollProp::DisableMotion( void )
 {
-	for ( int iRagdoll = 0; iRagdoll < m_ragdoll.listCount; ++iRagdoll )
+	for ( int iRagdoll = 0; iRagdoll < GetEngineObject()->RagdollBoneCount(); ++iRagdoll )
 	{
-		IPhysicsObject *pPhysicsObject = m_ragdoll.list[ iRagdoll ].pObject;
+		IPhysicsObject *pPhysicsObject = GetEngineObject()->GetElement(iRagdoll);
 		if ( pPhysicsObject != NULL )
 		{
 			pPhysicsObject->EnableMotion( false );
@@ -1664,9 +1392,9 @@ void CRagdollProp::InputStartRadgollBoogie( inputdata_t &inputdata )
 //-----------------------------------------------------------------------------
 void CRagdollProp::InputEnableMotion( inputdata_t &inputdata )
 {
-	for ( int iRagdoll = 0; iRagdoll < m_ragdoll.listCount; ++iRagdoll )
+	for ( int iRagdoll = 0; iRagdoll < GetEngineObject()->RagdollBoneCount(); ++iRagdoll )
 	{
-		IPhysicsObject *pPhysicsObject = m_ragdoll.list[ iRagdoll ].pObject;
+		IPhysicsObject *pPhysicsObject = GetEngineObject()->GetElement(iRagdoll);
 		if ( pPhysicsObject != NULL )
 		{
 			pPhysicsObject->EnableMotion( true );
@@ -1708,6 +1436,6 @@ void Ragdoll_GetAngleOverrideString( char *pOut, int size, CBaseEntity *pEntity 
 	CRagdollProp *pRagdoll = dynamic_cast<CRagdollProp *>(pEntity);
 	if ( pRagdoll )
 	{
-		pRagdoll->GetAngleOverrideFromCurrentState( pOut, size );
+		pRagdoll->GetEngineObject()->GetAngleOverrideFromCurrentState( pOut, size );
 	}
 }
