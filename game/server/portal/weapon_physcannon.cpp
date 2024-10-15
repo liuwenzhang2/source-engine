@@ -2122,7 +2122,7 @@ void CWeaponPhysCannon::ApplyVelocityBasedForce( CBaseEntity *pEntity, const Vec
 		Vector	vTempVel;
 		AngularImpulse vTempAVel;
 
-		ragdoll_t *pRagdollPhys = pRagdoll->GetRagdoll( );
+		ragdoll_t *pRagdollPhys = pRagdoll->GetEngineObject()->GetRagdoll( );
 		for ( int j = 0; j < pRagdollPhys->listCount; ++j )
 		{
 			pRagdollPhys->list[j].pObject->AddVelocity( &vVel, &aVel ); 
@@ -2163,7 +2163,7 @@ void CWeaponPhysCannon::PuntRagdoll( CBaseEntity *pEntity, const Vector &vecForw
 		AngularImpulse	aVel = Pickup_PhysGunLaunchAngularImpulse( pEntity, PHYSGUN_FORCE_PUNTED );
 
 		CRagdollProp *pRagdoll = dynamic_cast<CRagdollProp*>( pEntity );
-		ragdoll_t *pRagdollPhys = pRagdoll->GetRagdoll( );
+		ragdoll_t *pRagdollPhys = pRagdoll->GetEngineObject()->GetRagdoll( );
 
 		int j;
 		for ( j = 0; j < pRagdollPhys->listCount; ++j )

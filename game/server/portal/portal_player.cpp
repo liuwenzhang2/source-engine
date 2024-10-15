@@ -86,7 +86,7 @@ void TE_PlayerAnimEvent( CBasePlayer *pPlayer, PlayerAnimEvent_t event, int nDat
 //
 // Ragdoll Entity
 //
-class CPortalRagdoll : public CBaseAnimatingOverlay, public CDefaultPlayerPickupVPhysics
+class CPortalRagdoll : public CBaseAnimatingOverlay//, public CDefaultPlayerPickupVPhysics
 {
 public:
 

@@ -81,7 +81,7 @@ void CGravityVortexController::ConsumeEntity( CBaseEntity *pEnt )
 	if ( pRagdoll != NULL )
 	{		
 		// Find the aggregate mass of the whole ragdoll
-		ragdoll_t *pRagdollPhys = pRagdoll->GetRagdoll();
+		ragdoll_t *pRagdollPhys = pRagdoll->GetEngineObject()->GetRagdoll();
 		for ( int j = 0; j < pRagdollPhys->listCount; ++j )
 		{
 			m_flMass += pRagdollPhys->list[j].pObject->GetMass();
@@ -239,7 +239,7 @@ void CGravityVortexController::PullThink( void )
 		CRagdollProp *pRagdoll = dynamic_cast< CRagdollProp* >( pEnts[i] );
 		if ( pRagdoll != NULL )
 		{
-			ragdoll_t *pRagdollPhys = pRagdoll->GetRagdoll();
+			ragdoll_t *pRagdollPhys = pRagdoll->GetEngineObject()->GetRagdoll();
 			mass = 0.0f;
 			
 			// Find the aggregate mass of the whole ragdoll

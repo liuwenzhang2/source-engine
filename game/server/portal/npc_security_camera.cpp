@@ -84,7 +84,7 @@ void PlayDismountSounds( void );
 // Security Camera
 //
 
-class CNPC_SecurityCamera : public CNPCBaseInteractive<CAI_BaseNPC>, public CDefaultPlayerPickupVPhysics
+class CNPC_SecurityCamera : public CNPCBaseInteractive<CAI_BaseNPC>//, public CDefaultPlayerPickupVPhysics
 {
 	DECLARE_CLASS( CNPC_SecurityCamera, CNPCBaseInteractive<CAI_BaseNPC> );
 public:
