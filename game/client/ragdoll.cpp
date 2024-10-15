@@ -95,7 +95,7 @@ private:
 	C_ServerRagdoll( const C_ServerRagdoll &src );
 
 	typedef CHandle<C_BaseAnimating> CBaseAnimatingHandle;
-	CNetworkVar( CBaseAnimatingHandle, m_hUnragdoll );
+	//CNetworkVar( CBaseAnimatingHandle, m_hUnragdoll );
 	CNetworkVar( float, m_flBlendWeight );
 	float m_flBlendWeightCurrent;
 	CNetworkVar( int, m_nOverlaySequence );
@@ -105,7 +105,7 @@ private:
 EXTERN_RECV_TABLE(DT_Ragdoll);
 IMPLEMENT_CLIENTCLASS_DT(C_ServerRagdoll, DT_Ragdoll, CRagdollProp)
 
-	RecvPropEHandle(RECVINFO(m_hUnragdoll)),
+	//RecvPropEHandle(RECVINFO(m_hUnragdoll)),
 	RecvPropFloat(RECVINFO(m_flBlendWeight)),
 	RecvPropInt(RECVINFO(m_nOverlaySequence)),
 END_RECV_TABLE()
@@ -317,15 +317,15 @@ IPhysicsObject *C_ServerRagdoll::GetElement( int elementNum )
 //-----------------------------------------------------------------------------
 void C_ServerRagdoll::UpdateOnRemove()
 {
-	C_BaseAnimating *anim = m_hUnragdoll.Get();
-	if ( NULL != anim && 
-		anim->GetModel() && 
-		( anim->GetModel() == GetModel() ) )
-	{
-		// Need to tell C_BaseAnimating to blend out of the ragdoll data that we received last
-		C_BaseAnimating::AutoAllowBoneAccess boneaccess( true, false );
-		anim->GetEngineObject()->CreateUnragdollInfo(this);
-	}
+	//C_BaseAnimating *anim = m_hUnragdoll.Get();
+	//if ( NULL != anim && 
+	//	anim->GetModel() && 
+	//	( anim->GetModel() == GetModel() ) )
+	//{
+	//	// Need to tell C_BaseAnimating to blend out of the ragdoll data that we received last
+	//	C_BaseAnimating::AutoAllowBoneAccess boneaccess( true, false );
+	//	anim->GetEngineObject()->CreateUnragdollInfo(this);
+	//}
 
 	// Do last to mimic destrictor order
 	BaseClass::UpdateOnRemove();

@@ -230,8 +230,8 @@ public:
 		m_vecPreRagdollMins = vec3_origin;
 		m_vecPreRagdollMaxs = vec3_origin;
 
-		m_bStoreRagdollInfo = false;
-		m_pRagdollInfo = NULL;
+		//m_bStoreRagdollInfo = false;
+		//m_pRagdollInfo = NULL;
 		m_flLastBoneChangeTime = -FLT_MAX;
 
 	}
@@ -243,7 +243,7 @@ public:
 		DestroyPartitionHandle();
 		InvalidateMdlCache();
 		ClearRagdoll();
-		delete m_pRagdollInfo;
+		//delete m_pRagdollInfo;
 		VPhysicsDestroyObject();
 	}
 
@@ -884,11 +884,11 @@ public:
 	void							IgniteRagdoll(C_BaseEntity* pSource);
 	void							TransferDissolveFrom(C_BaseEntity* pSource);
 	bool InitAsClientRagdoll(const matrix3x4_t* pDeltaBones0, const matrix3x4_t* pDeltaBones1, const matrix3x4_t* pCurrentBonePosition, float boneDt, bool bFixedConstraints = false);
-	virtual void SaveRagdollInfo(int numbones, const matrix3x4_t& cameraTransform, CBoneAccessor& pBoneToWorld);
+	//virtual void SaveRagdollInfo(int numbones, const matrix3x4_t& cameraTransform, CBoneAccessor& pBoneToWorld);
 	void							ClearRagdoll();
-	void							CreateUnragdollInfo(C_BaseEntity* pRagdoll);
-	virtual bool					RetrieveRagdollInfo(Vector* pos, Quaternion* q);
-	void UnragdollBlend(IStudioHdr* hdr, Vector pos[], Quaternion q[], float currentTime);
+	//void							CreateUnragdollInfo(C_BaseEntity* pRagdoll);
+	//virtual bool					RetrieveRagdollInfo(Vector* pos, Quaternion* q);
+	//void UnragdollBlend(IStudioHdr* hdr, Vector pos[], Quaternion q[], float currentTime);
 
 	// For prediction
 	int								SelectWeightedSequence(int activity);
@@ -1095,8 +1095,8 @@ private:
 	Vector							m_vecPreRagdollMins;
 	Vector							m_vecPreRagdollMaxs;
 	// Decomposed ragdoll info
-	bool							m_bStoreRagdollInfo;
-	RagdollInfo_t*					m_pRagdollInfo;
+	//bool							m_bStoreRagdollInfo;
+	//RagdollInfo_t*					m_pRagdollInfo;
 
 	int								m_nPrevSequence;
 	int								m_nRestoreSequence;

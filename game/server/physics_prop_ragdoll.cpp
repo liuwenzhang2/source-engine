@@ -50,7 +50,7 @@ EXTERN_SEND_TABLE(DT_Ragdoll)
 
 IMPLEMENT_SERVERCLASS_ST(CRagdollProp, DT_Ragdoll)
 
-	SendPropEHandle(SENDINFO( m_hUnragdoll ) ),
+	//SendPropEHandle(SENDINFO( m_hUnragdoll ) ),
 	SendPropFloat(SENDINFO(m_flBlendWeight), 8, SPROP_ROUNDDOWN, 0.0f, 1.0f ),
 	SendPropInt(SENDINFO(m_nOverlaySequence), 11),
 END_SEND_TABLE()
@@ -73,7 +73,7 @@ BEGIN_DATADESC(CRagdollProp)
 	DEFINE_INPUTFUNC( FIELD_VOID, "Disable",	InputTurnOff ),
 	DEFINE_INPUTFUNC( FIELD_FLOAT, "FadeAndRemove", InputFadeAndRemove ),
 
-	DEFINE_FIELD( m_hUnragdoll, FIELD_EHANDLE ),
+	//DEFINE_FIELD( m_hUnragdoll, FIELD_EHANDLE ),
 	DEFINE_FIELD( m_bFirstCollisionAfterLaunch, FIELD_BOOLEAN ),
 
 	DEFINE_FIELD( m_flBlendWeight, FIELD_FLOAT ),
@@ -920,10 +920,10 @@ void CRagdollProp::DrawDebugGeometryOverlays()
 // Purpose: 
 // Input  : *pOther - 
 //-----------------------------------------------------------------------------
-void CRagdollProp::SetUnragdoll( CBaseAnimating *pOther )
-{
-	m_hUnragdoll = pOther;
-}
+//void CRagdollProp::SetUnragdoll( CBaseAnimating *pOther )
+//{
+//	m_hUnragdoll = pOther;
+//}
 
 //===============================================================================================================
 // RagdollPropAttached

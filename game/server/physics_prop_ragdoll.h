@@ -82,7 +82,7 @@ public:
 	bool HasPhysgunInteraction( const char *pszKeyName, const char *pszValue );
 	void HandleFirstCollisionInteractions( int index, gamevcollisionevent_t *pEvent );
 
-	void			SetUnragdoll( CBaseAnimating *pOther );
+	//void			SetUnragdoll( CBaseAnimating *pOther );
 
 	void			SetBlendWeight( float weight ) { m_flBlendWeight = weight; }
 	void			SetOverlaySequence( Activity activity );
@@ -114,7 +114,7 @@ private:
 
 
 	typedef CHandle<CBaseAnimating> CBaseAnimatingHandle;
-	CNetworkVar( CBaseAnimatingHandle, m_hUnragdoll );
+	//CNetworkVar( CBaseAnimatingHandle, m_hUnragdoll );
 
 
 	

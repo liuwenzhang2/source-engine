@@ -1202,15 +1202,15 @@ void C_EngineObjectInternal::OnDataChanged(DataUpdateType_t type)
 
 	// If ragdolling and get EF_NOINTERP, we probably were dead and are now respawning,
 	//  don't do blend out of ragdoll at respawn spot.
-	if (m_pOuter->IsNoInterpolationFrame() &&
-		m_pRagdollInfo &&
-		m_pRagdollInfo->m_bActive)
-	{
-		Msg("delete ragdoll due to nointerp\n");
-		// Remove ragdoll info
-		delete m_pRagdollInfo;
-		m_pRagdollInfo = NULL;
-	}
+	//if (m_pOuter->IsNoInterpolationFrame() &&
+	//	m_pRagdollInfo &&
+	//	m_pRagdollInfo->m_bActive)
+	//{
+	//	Msg("delete ragdoll due to nointerp\n");
+	//	// Remove ragdoll info
+	//	delete m_pRagdollInfo;
+	//	m_pRagdollInfo = NULL;
+	//}
 
 	// See if it needs to allocate prediction stuff
 	m_pOuter->CheckInitPredictable("OnDataChanged");
@@ -5214,13 +5214,13 @@ bool C_EngineObjectInternal::InitAsClientRagdoll(const matrix3x4_t* pDeltaBones0
 	m_pOuter->CreateShadow();
 
 	// Cache off ragdoll bone positions/quaternions
-	if (m_bStoreRagdollInfo && m_ragdoll.listCount)
-	{
-		matrix3x4_t parentTransform;
-		AngleMatrix(GetAbsAngles(), GetAbsOrigin(), parentTransform);
-		// FIXME/CHECK:  This might be too expensive to do every frame???
-		SaveRagdollInfo(hdr->numbones(), parentTransform, m_pOuter->m_BoneAccessor);
-	}
+	//if (m_bStoreRagdollInfo && m_ragdoll.listCount)
+	//{
+	//	matrix3x4_t parentTransform;
+	//	AngleMatrix(GetAbsAngles(), GetAbsOrigin(), parentTransform);
+	//	// FIXME/CHECK:  This might be too expensive to do every frame???
+	//	SaveRagdollInfo(hdr->numbones(), parentTransform, m_pOuter->m_BoneAccessor);
+	//}
 
 	SetMoveType(savedMovetype);
 
@@ -5295,134 +5295,134 @@ void C_EngineObjectInternal::ClearRagdoll()
 	m_builtRagdoll = false;
 }
 
-void C_EngineObjectInternal::SaveRagdollInfo(int numbones, const matrix3x4_t& cameraTransform, CBoneAccessor& pBoneToWorld)
-{
-	IStudioHdr* hdr = GetModelPtr();
-	if (!hdr)
-	{
-		return;
-	}
+//void C_EngineObjectInternal::SaveRagdollInfo(int numbones, const matrix3x4_t& cameraTransform, CBoneAccessor& pBoneToWorld)
+//{
+//	IStudioHdr* hdr = GetModelPtr();
+//	if (!hdr)
+//	{
+//		return;
+//	}
+//
+//	if (!m_pRagdollInfo)
+//	{
+//		m_pRagdollInfo = new RagdollInfo_t;
+//		Assert(m_pRagdollInfo);
+//		if (!m_pRagdollInfo)
+//		{
+//			Msg("Memory allocation of RagdollInfo_t failed!\n");
+//			return;
+//		}
+//		memset(m_pRagdollInfo, 0, sizeof(*m_pRagdollInfo));
+//	}
+//
+//	mstudiobone_t* pbones = hdr->pBone(0);
+//
+//	m_pRagdollInfo->m_bActive = true;
+//	m_pRagdollInfo->m_flSaveTime = gpGlobals->curtime;
+//	m_pRagdollInfo->m_nNumBones = numbones;
+//
+//	for (int i = 0; i < numbones; i++)
+//	{
+//		matrix3x4_t inverted;
+//		matrix3x4_t output;
+//
+//		if (pbones[i].parent == -1)
+//		{
+//			// Decompose into parent space
+//			MatrixInvert(cameraTransform, inverted);
+//		}
+//		else
+//		{
+//			MatrixInvert(pBoneToWorld.GetBone(pbones[i].parent), inverted);
+//		}
+//
+//		ConcatTransforms(inverted, pBoneToWorld.GetBone(i), output);
+//
+//		MatrixAngles(output,
+//			m_pRagdollInfo->m_rgBoneQuaternion[i],
+//			m_pRagdollInfo->m_rgBonePos[i]);
+//	}
+//}
 
-	if (!m_pRagdollInfo)
-	{
-		m_pRagdollInfo = new RagdollInfo_t;
-		Assert(m_pRagdollInfo);
-		if (!m_pRagdollInfo)
-		{
-			Msg("Memory allocation of RagdollInfo_t failed!\n");
-			return;
-		}
-		memset(m_pRagdollInfo, 0, sizeof(*m_pRagdollInfo));
-	}
+//void C_EngineObjectInternal::CreateUnragdollInfo(C_BaseEntity* pRagdoll)
+//{
+//	IStudioHdr* hdr = GetModelPtr();
+//	if (!hdr)
+//	{
+//		return;
+//	}
+//
+//	// It's already an active ragdoll, sigh
+//	if (m_pRagdollInfo && m_pRagdollInfo->m_bActive)
+//	{
+//		Assert(0);
+//		return;
+//	}
+//
+//	// Now do the current bone setup
+//	pRagdoll->SetupBones(NULL, -1, BONE_USED_BY_ANYTHING, gpGlobals->curtime);
+//
+//	matrix3x4_t parentTransform;
+//	QAngle newAngles(0, pRagdoll->GetEngineObject()->GetAbsAngles()[YAW], 0);
+//
+//	AngleMatrix(GetAbsAngles(), GetAbsOrigin(), parentTransform);
+//	// pRagdoll->SaveRagdollInfo( hdr->numbones, parentTransform, m_BoneAccessor );
+//
+//	if (!m_pRagdollInfo)
+//	{
+//		m_pRagdollInfo = new RagdollInfo_t;
+//		Assert(m_pRagdollInfo);
+//		if (!m_pRagdollInfo)
+//		{
+//			Msg("Memory allocation of RagdollInfo_t failed!\n");
+//			return;
+//		}
+//	}
+//
+//	Q_memset(m_pRagdollInfo, 0, sizeof(*m_pRagdollInfo));
+//
+//	int numbones = hdr->numbones();
+//
+//	m_pRagdollInfo->m_bActive = true;
+//	m_pRagdollInfo->m_flSaveTime = gpGlobals->curtime;
+//	m_pRagdollInfo->m_nNumBones = numbones;
+//
+//	for (int i = 0; i < numbones; i++)
+//	{
+//		matrix3x4_t inverted;
+//		matrix3x4_t output;
+//
+//		if (hdr->boneParent(i) == -1)
+//		{
+//			// Decompose into parent space
+//			MatrixInvert(parentTransform, inverted);
+//		}
+//		else
+//		{
+//			MatrixInvert(pRagdoll->m_BoneAccessor.GetBone(hdr->boneParent(i)), inverted);
+//		}
+//
+//		ConcatTransforms(inverted, pRagdoll->m_BoneAccessor.GetBone(i), output);
+//
+//		MatrixAngles(output,
+//			m_pRagdollInfo->m_rgBoneQuaternion[i],
+//			m_pRagdollInfo->m_rgBonePos[i]);
+//	}
+//}
 
-	mstudiobone_t* pbones = hdr->pBone(0);
-
-	m_pRagdollInfo->m_bActive = true;
-	m_pRagdollInfo->m_flSaveTime = gpGlobals->curtime;
-	m_pRagdollInfo->m_nNumBones = numbones;
-
-	for (int i = 0; i < numbones; i++)
-	{
-		matrix3x4_t inverted;
-		matrix3x4_t output;
-
-		if (pbones[i].parent == -1)
-		{
-			// Decompose into parent space
-			MatrixInvert(cameraTransform, inverted);
-		}
-		else
-		{
-			MatrixInvert(pBoneToWorld.GetBone(pbones[i].parent), inverted);
-		}
-
-		ConcatTransforms(inverted, pBoneToWorld.GetBone(i), output);
-
-		MatrixAngles(output,
-			m_pRagdollInfo->m_rgBoneQuaternion[i],
-			m_pRagdollInfo->m_rgBonePos[i]);
-	}
-}
-
-void C_EngineObjectInternal::CreateUnragdollInfo(C_BaseEntity* pRagdoll)
-{
-	IStudioHdr* hdr = GetModelPtr();
-	if (!hdr)
-	{
-		return;
-	}
-
-	// It's already an active ragdoll, sigh
-	if (m_pRagdollInfo && m_pRagdollInfo->m_bActive)
-	{
-		Assert(0);
-		return;
-	}
-
-	// Now do the current bone setup
-	pRagdoll->SetupBones(NULL, -1, BONE_USED_BY_ANYTHING, gpGlobals->curtime);
-
-	matrix3x4_t parentTransform;
-	QAngle newAngles(0, pRagdoll->GetEngineObject()->GetAbsAngles()[YAW], 0);
-
-	AngleMatrix(GetAbsAngles(), GetAbsOrigin(), parentTransform);
-	// pRagdoll->SaveRagdollInfo( hdr->numbones, parentTransform, m_BoneAccessor );
-
-	if (!m_pRagdollInfo)
-	{
-		m_pRagdollInfo = new RagdollInfo_t;
-		Assert(m_pRagdollInfo);
-		if (!m_pRagdollInfo)
-		{
-			Msg("Memory allocation of RagdollInfo_t failed!\n");
-			return;
-		}
-	}
-
-	Q_memset(m_pRagdollInfo, 0, sizeof(*m_pRagdollInfo));
-
-	int numbones = hdr->numbones();
-
-	m_pRagdollInfo->m_bActive = true;
-	m_pRagdollInfo->m_flSaveTime = gpGlobals->curtime;
-	m_pRagdollInfo->m_nNumBones = numbones;
-
-	for (int i = 0; i < numbones; i++)
-	{
-		matrix3x4_t inverted;
-		matrix3x4_t output;
-
-		if (hdr->boneParent(i) == -1)
-		{
-			// Decompose into parent space
-			MatrixInvert(parentTransform, inverted);
-		}
-		else
-		{
-			MatrixInvert(pRagdoll->m_BoneAccessor.GetBone(hdr->boneParent(i)), inverted);
-		}
-
-		ConcatTransforms(inverted, pRagdoll->m_BoneAccessor.GetBone(i), output);
-
-		MatrixAngles(output,
-			m_pRagdollInfo->m_rgBoneQuaternion[i],
-			m_pRagdollInfo->m_rgBonePos[i]);
-	}
-}
-
-bool C_EngineObjectInternal::RetrieveRagdollInfo(Vector* pos, Quaternion* q)
-{
-	if (!m_bStoreRagdollInfo || !m_pRagdollInfo || !m_pRagdollInfo->m_bActive)
-		return false;
-
-	for (int i = 0; i < m_pRagdollInfo->m_nNumBones; i++)
-	{
-		pos[i] = m_pRagdollInfo->m_rgBonePos[i];
-		q[i] = m_pRagdollInfo->m_rgBoneQuaternion[i];
-	}
-
-	return true;
-}
+//bool C_EngineObjectInternal::RetrieveRagdollInfo(Vector* pos, Quaternion* q)
+//{
+//	if (!m_bStoreRagdollInfo || !m_pRagdollInfo || !m_pRagdollInfo->m_bActive)
+//		return false;
+//
+//	for (int i = 0; i < m_pRagdollInfo->m_nNumBones; i++)
+//	{
+//		pos[i] = m_pRagdollInfo->m_rgBonePos[i];
+//		q[i] = m_pRagdollInfo->m_rgBoneQuaternion[i];
+//	}
+//
+//	return true;
+//}
 
 //-----------------------------------------------------------------------------
 // Purpose: 
@@ -5430,34 +5430,34 @@ bool C_EngineObjectInternal::RetrieveRagdollInfo(Vector* pos, Quaternion* q)
 //			pos[] - 
 //			q[] - 
 //-----------------------------------------------------------------------------
-void C_EngineObjectInternal::UnragdollBlend(IStudioHdr* hdr, Vector pos[], Quaternion q[], float currentTime)
-{
-	if (!hdr)
-	{
-		return;
-	}
-
-	if (!m_pRagdollInfo || !m_pRagdollInfo->m_bActive)
-		return;
-
-	float dt = currentTime - m_pRagdollInfo->m_flSaveTime;
-	if (dt > 0.2f)
-	{
-		m_pRagdollInfo->m_bActive = false;
-		return;
-	}
-
-	// Slerp bone sets together
-	float frac = dt / 0.2f;
-	frac = clamp(frac, 0.0f, 1.0f);
-
-	int i;
-	for (i = 0; i < hdr->numbones(); i++)
-	{
-		VectorLerp(m_pRagdollInfo->m_rgBonePos[i], pos[i], frac, pos[i]);
-		QuaternionSlerp(m_pRagdollInfo->m_rgBoneQuaternion[i], q[i], frac, q[i]);
-	}
-}
+//void C_EngineObjectInternal::UnragdollBlend(IStudioHdr* hdr, Vector pos[], Quaternion q[], float currentTime)
+//{
+//	if (!hdr)
+//	{
+//		return;
+//	}
+//
+//	if (!m_pRagdollInfo || !m_pRagdollInfo->m_bActive)
+//		return;
+//
+//	float dt = currentTime - m_pRagdollInfo->m_flSaveTime;
+//	if (dt > 0.2f)
+//	{
+//		m_pRagdollInfo->m_bActive = false;
+//		return;
+//	}
+//
+//	// Slerp bone sets together
+//	float frac = dt / 0.2f;
+//	frac = clamp(frac, 0.0f, 1.0f);
+//
+//	int i;
+//	for (i = 0; i < hdr->numbones(); i++)
+//	{
+//		VectorLerp(m_pRagdollInfo->m_rgBonePos[i], pos[i], frac, pos[i]);
+//		QuaternionSlerp(m_pRagdollInfo->m_rgBoneQuaternion[i], q[i], frac, q[i]);
+//	}
+//}
 
 C_EntityDissolve* DissolveEffect(C_BaseEntity* pTarget, float flTime);
 C_EntityFlame* FireEffect(C_BaseAnimating* pTarget, C_BaseEntity* pServerFire, float* flScaleEnd, float* flTimeStart, float* flTimeEnd);

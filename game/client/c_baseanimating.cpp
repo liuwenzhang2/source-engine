@@ -1472,7 +1472,7 @@ void C_BaseAnimating::StandardBlendingRules( IStudioHdr *hdr, Vector pos[], Quat
 
 	//ChildLayerBlend( pos, q, currentTime, boneMask );
 
-	GetEngineObject()->UnragdollBlend( hdr, pos, q, currentTime );
+	//GetEngineObject()->UnragdollBlend( hdr, pos, q, currentTime );
 
 #ifdef STUDIO_ENABLE_PERF_COUNTERS
 #if _DEBUG
