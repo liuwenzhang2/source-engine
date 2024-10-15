@@ -3103,7 +3103,8 @@ void CGlobalEntityList<T>::CleanupDeleteList(void)
 {
 	VPROF("CGlobalEntityList::CleanupDeleteList");
 	g_fInCleanupDelete = true;
-
+	// clean up the vphysics delete list as well
+	PhysOnCleanupDeleteList();
 	g_bDisableEhandleAccess = true;
 	for (int i = 0; i < m_DeleteList.Count(); i++)
 	{
@@ -3111,8 +3112,7 @@ void CGlobalEntityList<T>::CleanupDeleteList(void)
 	}
 	g_bDisableEhandleAccess = false;
 	m_DeleteList.RemoveAll();
-	// clean up the vphysics delete list as well
-	PhysOnCleanupDeleteList();
+	
 	g_fInCleanupDelete = false;
 }
 
