@@ -1543,7 +1543,7 @@ void C_Portal_Player::CalcPortalView( Vector &eyeOrigin, QAngle &eyeAngles )
 	bool bTransformEye = false;
 	if( fEyeDist < 0.0f ) //eye behind portal
 	{
-		if( pPortal->m_PortalSimulator.EntityIsInPortalHole( this ) ) //player standing in portal
+		if( pPortal->m_hPortalSimulator->EntityIsInPortalHole( this ) ) //player standing in portal
 		{
 			bTransformEye = true;
 		}

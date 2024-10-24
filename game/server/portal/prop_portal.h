@@ -117,7 +117,7 @@ public:
 	// The four corners of the portal in worldspace, updated on placement. The four points will be coplanar on the portal plane.
 	Vector m_vPortalCorners[4];
 
-	CPortalSimulator		m_PortalSimulator;
+	CNetworkHandle(CPortalSimulator, m_hPortalSimulator);
 
 	//virtual bool			CreateVPhysics( void );
 	//virtual void			VPhysicsDestroyObject( void );

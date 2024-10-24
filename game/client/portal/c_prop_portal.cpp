@@ -44,6 +44,7 @@
 LINK_ENTITY_TO_CLASS( prop_portal, C_Prop_Portal );
 
 IMPLEMENT_CLIENTCLASS_DT( C_Prop_Portal, DT_Prop_Portal, CProp_Portal )
+	RecvPropEHandle(RECVINFO(m_hPortalSimulator)),
 	RecvPropEHandle( RECVINFO(m_hLinkedPortal) ),
 	RecvPropBool( RECVINFO(m_bActivated) ),
 	RecvPropBool( RECVINFO(m_bIsPortal2) ),
@@ -185,6 +186,7 @@ static C_PortalInitHelper s_PortalInitHelper;
 
 C_Prop_Portal::C_Prop_Portal( void )
 {
+	//m_hPortalSimulator = (CPortalSimulator*)ClientEntityList().CreateEntityByName("portal_simulator");
 	TransformedLighting.m_LightShadowHandle = CLIENTSHADOW_INVALID_HANDLE;
 	CProp_Portal_Shared::AllPortals.AddToTail( this );
 }
@@ -354,18 +356,18 @@ void C_Prop_Portal::Simulate()
 
 			if ( bActivePlayerWeapon )
 			{
-				if( !m_PortalSimulator.EntityHitBoxExtentIsInPortalHole( pWeapon->GetOwner() ) && 
-					!m_PortalSimulator.EntityHitBoxExtentIsInPortalHole( pWeapon ) )
+				if( !m_hPortalSimulator->EntityHitBoxExtentIsInPortalHole( pWeapon->GetOwner() ) && 
+					!m_hPortalSimulator->EntityHitBoxExtentIsInPortalHole( pWeapon ) )
 					continue;
 			}
 			else if( pEntity->IsPlayer() )
 			{
-				if( !m_PortalSimulator.EntityHitBoxExtentIsInPortalHole( (C_BaseAnimating*)pEntity ) )
+				if( !m_hPortalSimulator->EntityHitBoxExtentIsInPortalHole( (C_BaseAnimating*)pEntity ) )
 					continue;
 			}
 			else
 			{
-				if( !m_PortalSimulator.EntityIsInPortalHole( pEntity ) )
+				if( !m_hPortalSimulator->EntityIsInPortalHole( pEntity ) )
 					continue;
 			}
 
@@ -489,7 +491,10 @@ void C_Prop_Portal::UpdateOnRemove( void )
 	}
 
 	g_pPortalRender->RemovePortal( this );
-
+	if (m_hPortalSimulator.Get() && !m_hPortalSimulator.Get()->GetEngineObject()->IsMarkedForDeletion()) {
+		ClientEntityList().DestroyEntity(m_hPortalSimulator);
+		m_hPortalSimulator = NULL;
+	}
 	BaseClass::UpdateOnRemove();
 }
 
@@ -559,7 +564,7 @@ void C_Prop_Portal::OnDataChanged( DataUpdateType_t updateType )
 
 	bool bNewLinkage = ( (PreDataChanged.m_hLinkedTo.Get() != m_hLinkedPortal.Get()) );
 	if( bNewLinkage )
-		m_PortalSimulator.DetachFromLinked(); //detach now so moves are theoretically faster
+		m_hPortalSimulator->DetachFromLinked(); //detach now so moves are theoretically faster
 
 	if( m_bActivated )
 	{
@@ -578,7 +583,7 @@ void C_Prop_Portal::OnDataChanged( DataUpdateType_t updateType )
 			Vector vScaledRight = m_vRight * (PORTAL_HALF_WIDTH * 0.95f);
 			Vector vScaledUp = m_vUp * (PORTAL_HALF_HEIGHT  * 0.95f);
 
-			m_PortalSimulator.MoveTo(GetEngineObject()->GetNetworkOrigin(), GetEngineObject()->GetNetworkAngles() );
+			m_hPortalSimulator->MoveTo(GetEngineObject()->GetNetworkOrigin(), GetEngineObject()->GetNetworkAngles() );
 
 			//update our associated portal environment
 			//CPortal_PhysicsEnvironmentMgr::CreateEnvironment( this );
@@ -798,7 +803,7 @@ void C_Prop_Portal::OnDataChanged( DataUpdateType_t updateType )
 	{
 		g_pPortalRender->RemovePortal( this );
 
-		m_PortalSimulator.DetachFromLinked();
+		m_hPortalSimulator->DetachFromLinked();
 
 		if( TransformedLighting.m_pEntityLight )
 		{
@@ -814,7 +819,7 @@ void C_Prop_Portal::OnDataChanged( DataUpdateType_t updateType )
 	}
 
 	if( (PreDataChanged.m_hLinkedTo.Get() != m_hLinkedPortal.Get()) && m_hLinkedPortal.Get() )
-		m_PortalSimulator.AttachTo( &m_hLinkedPortal.Get()->m_PortalSimulator );
+		m_hPortalSimulator->AttachTo( m_hLinkedPortal.Get()->m_hPortalSimulator );
 	
 
 	BaseClass::OnDataChanged( updateType );

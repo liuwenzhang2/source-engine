@@ -83,7 +83,7 @@ int CPortal_CollisionEvent::ShouldCollide( IPhysicsObject *pObj0, IPhysicsObject
 					{
 						if( bStatic[i] )
 						{
-							if( CPSCollisionEntity::IsPortalSimulatorCollisionEntity( pEntities[i] ) )
+							if( CPortalSimulator::IsPortalSimulatorCollisionEntity( pEntities[i] ) )
 							{
 								PS_PhysicsObjectSourceType_t objectSource;
 								if(	pSimulators[i]->CreatedPhysicsObject( pPhysObjects[i], &objectSource ) && 
@@ -142,8 +142,8 @@ int CPortal_CollisionEvent::ShouldCollide( IPhysicsObject *pObj0, IPhysicsObject
 			}
 			else
 			{
-				Assert( CPSCollisionEntity::IsPortalSimulatorCollisionEntity( pEntities[0] ) == false );
-				Assert( CPSCollisionEntity::IsPortalSimulatorCollisionEntity( pEntities[1] ) == false );
+				Assert(CPortalSimulator::IsPortalSimulatorCollisionEntity( pEntities[0] ) == false );
+				Assert(CPortalSimulator::IsPortalSimulatorCollisionEntity( pEntities[1] ) == false );
 
 				for( int i = 0; i != 2; ++i )
 				{
@@ -170,8 +170,8 @@ int CPortal_CollisionEvent::ShouldSolvePenetration( IPhysicsObject *pObj0, IPhys
 	if( (pGameData0 == NULL) || (pGameData1 == NULL) )
 		return 0;
 
-	if( CPSCollisionEntity::IsPortalSimulatorCollisionEntity( (CBaseEntity *)pGameData0 ) ||
-		CPSCollisionEntity::IsPortalSimulatorCollisionEntity( (CBaseEntity *)pGameData1 ) )
+	if(CPortalSimulator::IsPortalSimulatorCollisionEntity( (CBaseEntity *)pGameData0 ) ||
+		CPortalSimulator::IsPortalSimulatorCollisionEntity( (CBaseEntity *)pGameData1 ) )
 		return 0;
 
 	// For portal, don't solve penetrations on combine balls

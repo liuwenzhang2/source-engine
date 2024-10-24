@@ -92,6 +92,7 @@ BEGIN_DATADESC( CProp_Portal )
 END_DATADESC()
 
 IMPLEMENT_SERVERCLASS_ST( CProp_Portal, DT_Prop_Portal )
+	SendPropEHandle(SENDINFO(m_hPortalSimulator)),
 	SendPropEHandle( SENDINFO(m_hLinkedPortal) ),
 	SendPropBool( SENDINFO(m_bActivated) ),
 	SendPropBool( SENDINFO(m_bIsPortal2) ),
@@ -107,7 +108,8 @@ LINK_ENTITY_TO_CLASS( prop_portal, CProp_Portal );
 CProp_Portal::CProp_Portal( void )
 {
 	m_vPrevForward = Vector( 0.0f, 0.0f, 0.0f );
-	m_PortalSimulator.SetPortalSimulatorCallbacks( this );
+	m_hPortalSimulator = (CPortalSimulator*)gEntList.CreateEntityByName("portal_simulator");
+	m_hPortalSimulator->SetPortalSimulatorCallbacks( this );
 
 	// Init to something safe
 	for ( int i = 0; i < 4; ++i )
@@ -166,14 +168,14 @@ CProp_Portal::~CProp_Portal( void )
 
 void CProp_Portal::UpdateOnRemove( void )
 {
-	m_PortalSimulator.ClearEverything();
+	m_hPortalSimulator->ClearEverything();
 
 	RemovePortalMicAndSpeaker();
 
 	CProp_Portal *pRemote = m_hLinkedPortal;
 	if( pRemote != NULL )
 	{
-		m_PortalSimulator.DetachFromLinked();
+		m_hPortalSimulator->DetachFromLinked();
 		m_hLinkedPortal = NULL;
 		m_bActivated = false;
 		pRemote->UpdatePortalLinkage();
@@ -186,7 +188,10 @@ void CProp_Portal::UpdateOnRemove( void )
 		m_pAttachedCloningArea = NULL;
 	}
 	
-
+	if (m_hPortalSimulator.Get() && !m_hPortalSimulator.Get()->GetEngineObject()->IsMarkedForDeletion()) {
+		gEntList.DestroyEntity(m_hPortalSimulator);
+		m_hPortalSimulator = NULL;
+	}
 	BaseClass::UpdateOnRemove();
 }
 
@@ -634,8 +639,8 @@ void CProp_Portal::FizzleThink( void )
 
 	m_bActivated = false;
 	m_hLinkedPortal = NULL;
-	m_PortalSimulator.DetachFromLinked();
-	m_PortalSimulator.ReleaseAllEntityOwnership();
+	m_hPortalSimulator->DetachFromLinked();
+	m_hPortalSimulator->ReleaseAllEntityOwnership();
 
 	if( pRemotePortal )
 	{
@@ -707,7 +712,7 @@ void CProp_Portal::RemovePortalMicAndSpeaker()
 
 void CProp_Portal::PunchPenetratingPlayer( CBaseEntity *pPlayer )
 {
-	if( m_PortalSimulator.IsReadyToSimulate() )
+	if( m_hPortalSimulator->IsReadyToSimulate() )
 	{
 		ICollideable *pCollideable = pPlayer->GetCollideable();
 		if ( pCollideable )
@@ -759,7 +764,7 @@ void CProp_Portal::Activate( void )
 	{
 		Vector ptCenter = GetEngineObject()->GetAbsOrigin();
 		QAngle qAngles = GetEngineObject()->GetAbsAngles();
-		m_PortalSimulator.MoveTo( ptCenter, qAngles );
+		m_hPortalSimulator->MoveTo( ptCenter, qAngles );
 
 		//resimulate everything we're touching
 		servertouchlink_t *root = ( servertouchlink_t * )GetEngineObject()->GetDataObject( TOUCHLINK );
@@ -779,14 +784,14 @@ void CProp_Portal::Activate( void )
 						//we should be interacting with this object, add it to our environment
 						if( SharedEnvironmentCheck( pOther ) )
 						{
-							Assert( ((m_PortalSimulator.GetLinkedPortalSimulator() == NULL) && (m_hLinkedPortal.Get() == NULL)) || 
-								(m_PortalSimulator.GetLinkedPortalSimulator() == &m_hLinkedPortal->m_PortalSimulator) ); //make sure this entity is linked to the same portal as our simulator
+							Assert( ((m_hPortalSimulator->GetLinkedPortalSimulator() == NULL) && (m_hLinkedPortal.Get() == NULL)) || 
+								(m_hPortalSimulator->GetLinkedPortalSimulator() == &m_hLinkedPortal->m_PortalSimulator) ); //make sure this entity is linked to the same portal as our simulator
 
 							CPortalSimulator *pOwningSimulator = CPortalSimulator::GetSimulatorThatOwnsEntity( pOther );
-							if( pOwningSimulator && (pOwningSimulator != &m_PortalSimulator) )
+							if( pOwningSimulator && (pOwningSimulator != m_hPortalSimulator) )
 								pOwningSimulator->ReleaseOwnershipOfEntity( pOther );
 
-							m_PortalSimulator.TakeOwnershipOfEntity( pOther );
+							m_hPortalSimulator->TakeOwnershipOfEntity( pOther );
 						}
 					}
 				}
@@ -797,7 +802,7 @@ void CProp_Portal::Activate( void )
 
 bool CProp_Portal::ShouldTeleportTouchingEntity( CBaseEntity *pOther )
 {
-	if( !m_PortalSimulator.OwnsEntity( pOther ) ) //can't teleport an entity we don't own
+	if( !m_hPortalSimulator->OwnsEntity( pOther ) ) //can't teleport an entity we don't own
 	{
 #if !defined ( DISABLE_DEBUG_HISTORY )
 		if ( !GetEngineObject()->IsMarkedForDeletion() )
@@ -886,10 +891,10 @@ bool CProp_Portal::ShouldTeleportTouchingEntity( CBaseEntity *pOther )
 	}
 
 	// Test for entity's center being past portal plane
-	if(m_PortalSimulator.m_DataAccess.Placement.PortalPlane.m_Normal.Dot( ptOtherCenter ) < m_PortalSimulator.m_DataAccess.Placement.PortalPlane.m_Dist)
+	if(m_hPortalSimulator->m_DataAccess.Placement.PortalPlane.m_Normal.Dot( ptOtherCenter ) < m_hPortalSimulator->m_DataAccess.Placement.PortalPlane.m_Dist)
 	{
 		//entity wants to go further into the plane
-		if( m_PortalSimulator.EntityIsInPortalHole( pOther ) )
+		if( m_hPortalSimulator->EntityIsInPortalHole( pOther ) )
 		{
 #ifdef _DEBUG
 			static int iAntiRecurse = 0;
@@ -995,8 +1000,8 @@ void CProp_Portal::TeleportTouchingEntity( CBaseEntity *pOther )
 		}
 	}
 
-	const PS_InternalData_t &RemotePortalDataAccess = m_hLinkedPortal->m_PortalSimulator.m_DataAccess;
-	const PS_InternalData_t &LocalPortalDataAccess = m_PortalSimulator.m_DataAccess;
+	const PS_InternalData_t &RemotePortalDataAccess = m_hLinkedPortal->m_hPortalSimulator->m_DataAccess;
+	const PS_InternalData_t &LocalPortalDataAccess = m_hPortalSimulator->m_DataAccess;
 
 	
 	if( bPlayer )
@@ -1157,11 +1162,11 @@ void CProp_Portal::TeleportTouchingEntity( CBaseEntity *pOther )
 
 	//untouch the portal(s), will force a touch on destination after the teleport
 	{
-		m_PortalSimulator.ReleaseOwnershipOfEntity( pOther, true );
+		m_hPortalSimulator->ReleaseOwnershipOfEntity( pOther, true );
 		this->GetEngineObject()->PhysicsNotifyOtherOfUntouch( pOther->GetEngineObject());
 		pOther->GetEngineObject()->PhysicsNotifyOtherOfUntouch( this->GetEngineObject());
 
-		m_hLinkedPortal->m_PortalSimulator.TakeOwnershipOfEntity( pOther );
+		m_hLinkedPortal->m_hPortalSimulator->TakeOwnershipOfEntity( pOther );
 
 		//m_hLinkedPortal->PhysicsNotifyOtherOfUntouch( m_hLinkedPortal, pOther );
 		//pOther->PhysicsNotifyOtherOfUntouch( pOther, m_hLinkedPortal );
@@ -1319,16 +1324,16 @@ void CProp_Portal::Touch( CBaseEntity *pOther )
 	// Don't do anything on touch if it's not active
 	if( !m_bActivated || (m_hLinkedPortal.Get() == NULL) )
 	{
-		Assert( !m_PortalSimulator.OwnsEntity( pOther ) );
+		Assert( !m_hPortalSimulator->OwnsEntity( pOther ) );
 		Assert( !pOther->IsPlayer() || (((CPortal_Player *)pOther)->m_hPortalEnvironment.Get() != this) );
 		
 		//I'd really like to fix the root cause, but this will keep the game going
-		m_PortalSimulator.ReleaseOwnershipOfEntity( pOther );
+		m_hPortalSimulator->ReleaseOwnershipOfEntity( pOther );
 		return;
 	}
 
-	Assert( ((m_PortalSimulator.GetLinkedPortalSimulator() == NULL) && (m_hLinkedPortal.Get() == NULL)) || 
-		(m_PortalSimulator.GetLinkedPortalSimulator() == &m_hLinkedPortal->m_PortalSimulator) ); //make sure this entity is linked to the same portal as our simulator
+	Assert( ((m_hPortalSimulator->GetLinkedPortalSimulator() == NULL) && (m_hLinkedPortal.Get() == NULL)) || 
+		(m_hPortalSimulator->GetLinkedPortalSimulator() == &m_hLinkedPortal->m_PortalSimulator) ); //make sure this entity is linked to the same portal as our simulator
 
 	// Fizzle portal with any moving brush
 	Vector vVelocityCheck;
@@ -1386,7 +1391,7 @@ void CProp_Portal::Touch( CBaseEntity *pOther )
 		return;
 
 	//see if we should even be interacting with this object, this is a bugfix where some objects get added to physics environments through walls
-	if( !m_PortalSimulator.OwnsEntity( pOther ) )
+	if( !m_hPortalSimulator->OwnsEntity( pOther ) )
 	{
 		//hmm, not in our environment, plane tests, sharing tests
 		if( SharedEnvironmentCheck( pOther ) )
@@ -1415,10 +1420,10 @@ void CProp_Portal::Touch( CBaseEntity *pOther )
 
 				//we should be interacting with this object, add it to our environment
 				CPortalSimulator *pOwningSimulator = CPortalSimulator::GetSimulatorThatOwnsEntity( pOther );
-				if( pOwningSimulator && (pOwningSimulator != &m_PortalSimulator) )
+				if( pOwningSimulator && (pOwningSimulator != m_hPortalSimulator) )
 					pOwningSimulator->ReleaseOwnershipOfEntity( pOther );
 
-				m_PortalSimulator.TakeOwnershipOfEntity( pOther );
+				m_hPortalSimulator->TakeOwnershipOfEntity( pOther );
 			}
 		}
 		else
@@ -1463,14 +1468,14 @@ void CProp_Portal::StartTouch( CBaseEntity *pOther )
 			//we should be interacting with this object, add it to our environment
 			if( SharedEnvironmentCheck( pOther ) )
 			{
-				Assert( ((m_PortalSimulator.GetLinkedPortalSimulator() == NULL) && (m_hLinkedPortal.Get() == NULL)) || 
-					(m_PortalSimulator.GetLinkedPortalSimulator() == &m_hLinkedPortal->m_PortalSimulator) ); //make sure this entity is linked to the same portal as our simulator
+				Assert( ((m_hPortalSimulator->GetLinkedPortalSimulator() == NULL) && (m_hLinkedPortal.Get() == NULL)) || 
+					(m_hPortalSimulator->GetLinkedPortalSimulator() == &m_hLinkedPortal->m_PortalSimulator) ); //make sure this entity is linked to the same portal as our simulator
 
 				CPortalSimulator *pOwningSimulator = CPortalSimulator::GetSimulatorThatOwnsEntity( pOther );
-				if( pOwningSimulator && (pOwningSimulator != &m_PortalSimulator) )
+				if( pOwningSimulator && (pOwningSimulator != m_hPortalSimulator) )
 					pOwningSimulator->ReleaseOwnershipOfEntity( pOther );
 
-				m_PortalSimulator.TakeOwnershipOfEntity( pOther );
+				m_hPortalSimulator->TakeOwnershipOfEntity( pOther );
 			}
 		}
 	}	
@@ -1492,8 +1497,8 @@ void CProp_Portal::EndTouch( CBaseEntity *pOther )
 	if( ShouldTeleportTouchingEntity( pOther ) ) //an object passed through the plane and all the way out of the touch box
 		TeleportTouchingEntity( pOther );
 	else if( pOther->IsPlayer() && //player
-			(m_PortalSimulator.m_DataAccess.Placement.vForward.z < -0.7071f) && //most likely falling out of the portal
-			(m_PortalSimulator.m_DataAccess.Placement.PortalPlane.m_Normal.Dot( pOther->WorldSpaceCenter() ) < m_PortalSimulator.m_DataAccess.Placement.PortalPlane.m_Dist) && //but behind the portal plane
+			(m_hPortalSimulator->m_DataAccess.Placement.vForward.z < -0.7071f) && //most likely falling out of the portal
+			(m_hPortalSimulator->m_DataAccess.Placement.PortalPlane.m_Normal.Dot( pOther->WorldSpaceCenter() ) < m_hPortalSimulator->m_DataAccess.Placement.PortalPlane.m_Dist) && //but behind the portal plane
 			(((CPortal_Player *)pOther)->m_Local.m_bInDuckJump) ) //while ducking
 	{
 		//player has pulled their feet up (moving their center instantaneously) while falling downward out of the portal, send them back (probably only for a frame)
@@ -1502,7 +1507,7 @@ void CProp_Portal::EndTouch( CBaseEntity *pOther )
 		//TeleportTouchingEntity( pOther );
 	}
 	else
-		m_PortalSimulator.ReleaseOwnershipOfEntity( pOther );
+		m_hPortalSimulator->ReleaseOwnershipOfEntity( pOther );
 
 	if( sv_portal_debug_touch.GetBool() )
 	{
@@ -1531,26 +1536,26 @@ void CProp_Portal::PortalSimulator_ReleasedOwnershipOfEntity( CBaseEntity *pEnti
 
 bool CProp_Portal::SharedEnvironmentCheck( CBaseEntity *pEntity )
 {
-	Assert( ((m_PortalSimulator.GetLinkedPortalSimulator() == NULL) && (m_hLinkedPortal.Get() == NULL)) || 
-		(m_PortalSimulator.GetLinkedPortalSimulator() == &m_hLinkedPortal->m_PortalSimulator) ); //make sure this entity is linked to the same portal as our simulator
+	Assert( ((m_hPortalSimulator->GetLinkedPortalSimulator() == NULL) && (m_hLinkedPortal.Get() == NULL)) || 
+		(m_hPortalSimulator->GetLinkedPortalSimulator() == &m_hLinkedPortal->m_PortalSimulator) ); //make sure this entity is linked to the same portal as our simulator
 
 	CPortalSimulator *pOwningSimulator = CPortalSimulator::GetSimulatorThatOwnsEntity( pEntity );
-	if( (pOwningSimulator == NULL) || (pOwningSimulator == &m_PortalSimulator) )
+	if( (pOwningSimulator == NULL) || (pOwningSimulator == m_hPortalSimulator) )
 	{
 		//nobody else is claiming ownership
 		return true;
 	}
 
 	Vector ptCenter = pEntity->WorldSpaceCenter();
-	if( (ptCenter - m_PortalSimulator.m_DataAccess.Placement.ptCenter).LengthSqr() < (ptCenter - pOwningSimulator->m_DataAccess.Placement.ptCenter).LengthSqr() )
+	if( (ptCenter - m_hPortalSimulator->m_DataAccess.Placement.ptCenter).LengthSqr() < (ptCenter - pOwningSimulator->m_DataAccess.Placement.ptCenter).LengthSqr() )
 		return true;
 
-	/*if( !m_hLinkedPortal->m_PortalSimulator.EntityIsInPortalHole( pEntity ) )
+	/*if( !m_hLinkedPortal->m_hPortalSimulator->EntityIsInPortalHole( pEntity ) )
 	{
 		Vector vOtherVelocity;
 		pEntity->GetVelocity( &vOtherVelocity );
 
-		if( vOtherVelocity.Dot( m_PortalSimulator.m_DataAccess.Placement.vForward ) < vOtherVelocity.Dot( m_hLinkedPortal->m_PortalSimulator.m_DataAccess.Placement.vForward ) )
+		if( vOtherVelocity.Dot( m_hPortalSimulator->m_DataAccess.Placement.vForward ) < vOtherVelocity.Dot( m_hLinkedPortal->m_hPortalSimulator->m_DataAccess.Placement.vForward ) )
 			return true; //entity is going towards this portal more than the other
 	}*/
 	return false;
@@ -1696,7 +1701,7 @@ void CProp_Portal::ForceEntityToFitInPortalWall( CBaseEntity *pEntity )
 
 	Vector ptDest;
 
-	if ( m_PortalSimulator.IsReadyToSimulate() )
+	if ( m_hPortalSimulator->IsReadyToSimulate() )
 	{
 		Ray_t ray;
 		ray.Init( ptProjectedEntityCenter, ptCenter, vWorldMins - ptCenter, vWorldMaxs - ptCenter );
@@ -1704,9 +1709,9 @@ void CProp_Portal::ForceEntityToFitInPortalWall( CBaseEntity *pEntity )
 		trace_t ShortestTrace;
 		ShortestTrace.fraction = 2.0f;
 
-		if( m_PortalSimulator.m_DataAccess.Simulation.Static.Wall.Local.Brushes.pCollideable )
+		if( m_hPortalSimulator->m_DataAccess.Simulation.Static.Wall.Local.Brushes.pCollideable )
 		{
-			physcollision->TraceBox( ray, m_PortalSimulator.m_DataAccess.Simulation.Static.Wall.Local.Brushes.pCollideable, vec3_origin, vec3_angle, &ShortestTrace );
+			physcollision->TraceBox( ray, m_hPortalSimulator->m_DataAccess.Simulation.Static.Wall.Local.Brushes.pCollideable, vec3_origin, vec3_angle, &ShortestTrace );
 		}
 
 		/*if( pEnvironment->LocalCollide.pWorldCollide )
@@ -1954,16 +1959,16 @@ void CProp_Portal::UpdatePortalLinkage( void )
 		}
 		else
 		{
-			m_PortalSimulator.DetachFromLinked();
-			m_PortalSimulator.ReleaseAllEntityOwnership();
+			m_hPortalSimulator->DetachFromLinked();
+			m_hPortalSimulator->ReleaseAllEntityOwnership();
 		}
 
 		Vector ptCenter = GetEngineObject()->GetAbsOrigin();
 		QAngle qAngles = GetEngineObject()->GetAbsAngles();
-		m_PortalSimulator.MoveTo( ptCenter, qAngles );
+		m_hPortalSimulator->MoveTo( ptCenter, qAngles );
 
 		if( pLink )
-			m_PortalSimulator.AttachTo( &pLink->m_PortalSimulator );
+			m_hPortalSimulator->AttachTo( pLink->m_hPortalSimulator );
 
 		if( m_pAttachedCloningArea )
 			m_pAttachedCloningArea->UpdatePosition();
@@ -1972,8 +1977,8 @@ void CProp_Portal::UpdatePortalLinkage( void )
 	{
 		CProp_Portal *pRemote = m_hLinkedPortal;
 		//apparently we've been deactivated
-		m_PortalSimulator.DetachFromLinked();
-		m_PortalSimulator.ReleaseAllEntityOwnership();
+		m_hPortalSimulator->DetachFromLinked();
+		m_hPortalSimulator->ReleaseAllEntityOwnership();
 
 		m_hLinkedPortal = NULL;
 		if( pRemote )
@@ -2058,7 +2063,7 @@ void CProp_Portal::NewLocation( const Vector &vOrigin, const QAngle &qAngles )
 {
 	// Tell our physics environment to stop simulating it's entities.
 	// Fast moving objects can pass through the hole this frame while it's in the old location.
-	m_PortalSimulator.ReleaseAllEntityOwnership();
+	m_hPortalSimulator->ReleaseAllEntityOwnership();
 	Vector vOldForward;
 	GetVectors( &vOldForward, 0, 0 );
 

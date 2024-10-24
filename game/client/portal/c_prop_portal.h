@@ -76,7 +76,7 @@ public:
 
 	bool					IsActivedAndLinked( void ) const;
 
-	CPortalSimulator		m_PortalSimulator;
+	CHandle<CPortalSimulator>		m_hPortalSimulator = NULL;
 
 	virtual C_BaseEntity *	PortalRenderable_GetPairedEntity( void ) { return this; };
 

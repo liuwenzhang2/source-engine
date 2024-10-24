@@ -251,7 +251,7 @@ struct PS_SD_Dynamic_t //stuff that moves around
 	}
 };
 
-class CPSCollisionEntity;
+//class CPSCollisionEntity;
 
 struct PS_SimulationData_t //compartmentalized data for coherent management
 {
@@ -261,9 +261,9 @@ struct PS_SimulationData_t //compartmentalized data for coherent management
 	PS_SD_Dynamic_t Dynamic;
 
 	IPhysicsEnvironment *pPhysicsEnvironment;
-	CPSCollisionEntity *pCollisionEntity; //the entity we'll be tying physics objects to for collision
+	//CPSCollisionEntity *pCollisionEntity; //the entity we'll be tying physics objects to for collision
 
-	PS_SimulationData_t() : pPhysicsEnvironment(NULL), pCollisionEntity(NULL) {};
+	PS_SimulationData_t() : pPhysicsEnvironment(NULL) {};// , pCollisionEntity(NULL) {};
 #endif
 };
 
@@ -273,13 +273,43 @@ struct PS_InternalData_t
 	PS_SimulationData_t Simulation;
 };
 
+#ifdef CLIENT_DLL
+#define CPortalSimulator C_PortalSimulator
+#endif // CLIENT_DLL
 
-class CPortalSimulator
+
+class CPortalSimulator : public CBaseEntity
 {
+	DECLARE_CLASS(CPortalSimulator, CBaseEntity);
 public:
+	DECLARE_NETWORKCLASS();
+
 	CPortalSimulator( void );
 	~CPortalSimulator( void );
+	//static bool IsNetworkableStatic(void) { return false; }
+	//virtual bool IsNetworkable(void) { return CPortalSimulator::IsNetworkableStatic(); }
+#ifdef CLIENT_DLL
+	virtual bool					Init(int entnum, int iSerialNum);
+#endif // CLIENT_DLL
 
+#ifdef GAME_DLL
+	virtual int UpdateTransmitState(void)	// set transmit filter to transmit always
+	{
+		return SetTransmitState(FL_EDICT_ALWAYS);
+	}
+	virtual void PostConstructor(const char* szClassname, int iForceEdictIndex);
+	virtual void	Spawn(void);
+	virtual void	Activate(void);
+	virtual int		ObjectCaps(void);
+	virtual IPhysicsObject* VPhysicsGetObject(void);
+	virtual int		VPhysicsGetObjectList(IPhysicsObject** pList, int listMax);
+	virtual void	UpdateOnRemove(void);
+	virtual	bool	ShouldCollide(int collisionGroup, int contentsMask) const;
+	virtual void	VPhysicsCollision(int index, gamevcollisionevent_t* pEvent) {}
+	virtual void	VPhysicsFriction(IPhysicsObject* pObject, float energy, int surfaceProps, int surfacePropsHit) {}
+#endif // GAME_DLL
+
+	static bool		IsPortalSimulatorCollisionEntity(const CBaseEntity* pEntity);
 	void				MoveTo( const Vector &ptCenter, const QAngle &angles );
 	void				ClearEverything( void );
 
@@ -355,7 +385,7 @@ protected:
 		bool			bLinkedPhysicsGenerated;
 	} m_CreationChecklist;
 
-	friend class CPSCollisionEntity;
+	//friend class CPSCollisionEntity;
 
 #ifndef CLIENT_DLL //physics handled purely by server side
 	void				TakePhysicsOwnership( CBaseEntity *pEntity );
@@ -401,31 +431,7 @@ public:
 extern CUtlVector<CPortalSimulator *> const &g_PortalSimulators;
 
 
-#ifndef CLIENT_DLL
-class CPSCollisionEntity : public CBaseEntity
-{
-	DECLARE_CLASS( CPSCollisionEntity, CBaseEntity );
-private:
-	CPortalSimulator *m_pOwningSimulator;
 
-public:
-	CPSCollisionEntity( void );
-	virtual ~CPSCollisionEntity( void );
-
-	virtual void	Spawn( void );
-	virtual void	Activate( void );
-	virtual int		ObjectCaps( void );
-	virtual IPhysicsObject *VPhysicsGetObject( void );
-	virtual int		VPhysicsGetObjectList( IPhysicsObject **pList, int listMax );
-	virtual void	UpdateOnRemove( void );
-	virtual	bool	ShouldCollide( int collisionGroup, int contentsMask ) const;
-	virtual void	VPhysicsCollision( int index, gamevcollisionevent_t *pEvent ) {}
-	virtual void	VPhysicsFriction( IPhysicsObject *pObject, float energy, int surfaceProps, int surfacePropsHit ) {}
-
-	static bool		IsPortalSimulatorCollisionEntity( const CBaseEntity *pEntity );
-	friend class CPortalSimulator;
-};
-#endif
 
 
 

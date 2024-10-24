@@ -118,6 +118,18 @@ const int PS_SD_Static_World_StaticProps_ClippedProp_t::iTraceSurfaceFlags = 0;
 CBaseEntity *PS_SD_Static_World_StaticProps_ClippedProp_t::pTraceEntity = NULL;
 
 
+//-----------------------------------------------------------------------------
+// Networking
+//-----------------------------------------------------------------------------
+IMPLEMENT_NETWORKCLASS_ALIASED(PortalSimulator, DT_PortalSimulator);
+
+BEGIN_NETWORK_TABLE(CPortalSimulator, DT_PortalSimulator)
+	#if !defined( CLIENT_DLL )
+
+	#else
+
+	#endif
+END_NETWORK_TABLE()
 
 CPortalSimulator::CPortalSimulator( void )
 : m_bLocalDataIsReady(false),
@@ -149,20 +161,37 @@ CPortalSimulator::CPortalSimulator( void )
 #ifndef CLIENT_DLL
 	PS_SD_Static_World_StaticProps_ClippedProp_t::pTraceEntity = GetWorldEntity(); //will overinitialize, but it's cheap
 
-	m_InternalData.Simulation.pCollisionEntity = (CPSCollisionEntity *)gEntList.CreateEntityByName( "portalsimulator_collisionentity" );
-	Assert( m_InternalData.Simulation.pCollisionEntity != NULL );
-	if( m_InternalData.Simulation.pCollisionEntity )
-	{
-		m_InternalData.Simulation.pCollisionEntity->m_pOwningSimulator = this;
-		MarkAsOwned( m_InternalData.Simulation.pCollisionEntity );
-		m_InternalData.Simulation.Dynamic.EntFlags[m_InternalData.Simulation.pCollisionEntity->entindex()] |= PSEF_OWNS_PHYSICS;
-		DispatchSpawn( m_InternalData.Simulation.pCollisionEntity );
-	}
+	//m_InternalData.Simulation.pCollisionEntity = (CPSCollisionEntity *)gEntList.CreateEntityByName( "portalsimulator_collisionentity" );
+	//Assert( m_InternalData.Simulation.pCollisionEntity != NULL );
+	//if( m_InternalData.Simulation.pCollisionEntity )
+	//{
+		//m_InternalData.Simulation.pCollisionEntity->m_pOwningSimulator = this;
+		//MarkAsOwned( m_InternalData.Simulation.pCollisionEntity );
+		//m_InternalData.Simulation.Dynamic.EntFlags[m_InternalData.Simulation.pCollisionEntity->entindex()] |= PSEF_OWNS_PHYSICS;
+		//DispatchSpawn( m_InternalData.Simulation.pCollisionEntity );
+	//}
 #else
 	PS_SD_Static_World_StaticProps_ClippedProp_t::pTraceEntity = GetClientWorldEntity();
 #endif
 }
 
+#ifdef CLIENT_DLL
+bool CPortalSimulator::Init(int entnum, int iSerialNum) {
+	bool ret = BaseClass::Init(entnum, iSerialNum);
+	//MarkAsOwned(this);
+	//m_InternalData.Simulation.Dynamic.EntFlags[entindex()] |= PSEF_OWNS_PHYSICS;
+	return ret;
+}
+#endif // CLIENT_DLL
+
+
+#ifdef GAME_DLL
+void CPortalSimulator::PostConstructor(const char* szClassname, int iForceEdictIndex) {
+	BaseClass::PostConstructor(szClassname, iForceEdictIndex);
+	MarkAsOwned(this);
+	m_InternalData.Simulation.Dynamic.EntFlags[entindex()] |= PSEF_OWNS_PHYSICS;
+}
+#endif // GAME_DLL
 
 
 CPortalSimulator::~CPortalSimulator( void )
@@ -184,14 +213,14 @@ CPortalSimulator::~CPortalSimulator( void )
 		physcollision->DestroyCollide( m_InternalData.Placement.pHoleShapeCollideable );
 
 #ifndef CLIENT_DLL
-	if( m_InternalData.Simulation.pCollisionEntity )
-	{
-		m_InternalData.Simulation.pCollisionEntity->m_pOwningSimulator = NULL;
-		m_InternalData.Simulation.Dynamic.EntFlags[m_InternalData.Simulation.pCollisionEntity->entindex()] &= ~PSEF_OWNS_PHYSICS;
-		MarkAsReleased( m_InternalData.Simulation.pCollisionEntity );
-		UTIL_Remove( m_InternalData.Simulation.pCollisionEntity );
-		m_InternalData.Simulation.pCollisionEntity = NULL;
-	}
+	//if( m_InternalData.Simulation.pCollisionEntity )
+	//{
+	//	m_InternalData.Simulation.pCollisionEntity->m_pOwningSimulator = NULL;
+	//	m_InternalData.Simulation.Dynamic.EntFlags[m_InternalData.Simulation.pCollisionEntity->entindex()] &= ~PSEF_OWNS_PHYSICS;
+	//	MarkAsReleased( m_InternalData.Simulation.pCollisionEntity );
+	//	UTIL_Remove( m_InternalData.Simulation.pCollisionEntity );
+	//	m_InternalData.Simulation.pCollisionEntity = NULL;
+	//}
 #endif
 }
 
@@ -216,7 +245,7 @@ void CPortalSimulator::MoveTo( const Vector &ptCenter, const QAngle &angles )
 	{
 		CBaseEntity *pEntity = m_InternalData.Simulation.Dynamic.OwnedEntities[i];
 		if( CPhysicsShadowClone::IsShadowClone( pEntity ) ||
-			CPSCollisionEntity::IsPortalSimulatorCollisionEntity( pEntity ) )
+			CPortalSimulator::IsPortalSimulatorCollisionEntity( pEntity ) )
 			continue;
 
 		if( EntityIsInPortalHole( pEntity) )
@@ -741,7 +770,7 @@ void CPortalSimulator::TakePhysicsOwnership( CBaseEntity *pEntity )
 	if( m_InternalData.Simulation.pPhysicsEnvironment == NULL )
 		return;
 
-	if( CPSCollisionEntity::IsPortalSimulatorCollisionEntity( pEntity ) )
+	if(CPortalSimulator::IsPortalSimulatorCollisionEntity( pEntity ) )
 		return;
 
 	Assert( CPhysicsShadowClone::IsShadowClone( pEntity ) == false );
@@ -922,7 +951,7 @@ void CPortalSimulator::ReleaseAllEntityOwnership( void )
 	{
 		CBaseEntity *pEntity = m_InternalData.Simulation.Dynamic.OwnedEntities[iSkippedObjects];
 		if( CPhysicsShadowClone::IsShadowClone( pEntity ) ||
-			CPSCollisionEntity::IsPortalSimulatorCollisionEntity( pEntity ) )
+			CPortalSimulator::IsPortalSimulatorCollisionEntity( pEntity ) )
 		{
 			++iSkippedObjects;
 			continue;
@@ -941,7 +970,7 @@ void CPortalSimulator::ReleasePhysicsOwnership( CBaseEntity *pEntity, bool bCont
 		return;
 	}
 
-	if( CPSCollisionEntity::IsPortalSimulatorCollisionEntity( pEntity ) )
+	if(CPortalSimulator::IsPortalSimulatorCollisionEntity( pEntity ) )
 		return;
 
 	Assert( OwnsEntity( pEntity ) ); //releasing physics ownership happens BEFORE releasing general ownership
@@ -1058,7 +1087,7 @@ void CPortalSimulator::StartCloningEntity( CBaseEntity *pEntity )
 		return;
 	}
 
-	if( CPhysicsShadowClone::IsShadowClone( pEntity ) || CPSCollisionEntity::IsPortalSimulatorCollisionEntity( pEntity ) )
+	if( CPhysicsShadowClone::IsShadowClone( pEntity ) || CPortalSimulator::IsPortalSimulatorCollisionEntity( pEntity ) )
 		return;
 
 	if( (m_InternalData.Simulation.Dynamic.EntFlags[pEntity->entindex()] & PSEF_CLONES_ENTITY_FROM_MAIN) != 0 )
@@ -1136,7 +1165,7 @@ void CPortalSimulator::MarkAsReleased( CBaseEntity *pEntity )
 	Assert( pEntity != NULL );
 	int iEntIndex = pEntity->entindex();
 	Assert( s_OwnedEntityMap[iEntIndex] == this );
-	Assert( ((m_InternalData.Simulation.Dynamic.EntFlags[iEntIndex] & PSEF_OWNS_ENTITY) != 0) || CPSCollisionEntity::IsPortalSimulatorCollisionEntity(pEntity) );
+	Assert( ((m_InternalData.Simulation.Dynamic.EntFlags[iEntIndex] & PSEF_OWNS_ENTITY) != 0) || CPortalSimulator::IsPortalSimulatorCollisionEntity(pEntity) );
 
 	s_OwnedEntityMap[iEntIndex] = NULL;
 	m_InternalData.Simulation.Dynamic.EntFlags[iEntIndex] &= ~PSEF_OWNS_ENTITY;
@@ -1227,10 +1256,10 @@ void CPortalSimulator::CreateLocalPhysics( void )
 	objectparams_t params = g_PhysDefaultObjectParams;
 
 	// Any non-moving object can point to world safely-- Make sure we dont use 'params' for something other than that beyond this point.
-	if( m_InternalData.Simulation.pCollisionEntity )
-		params.pGameData = m_InternalData.Simulation.pCollisionEntity;
-	else
-		GetWorldEntity();
+	//if( m_InternalData.Simulation.pCollisionEntity )
+	params.pGameData = this;// m_InternalData.Simulation.pCollisionEntity;
+	//else
+	//	GetWorldEntity();
 
 	//World
 	{
@@ -1239,8 +1268,8 @@ void CPortalSimulator::CreateLocalPhysics( void )
 		{
 			m_InternalData.Simulation.Static.World.Brushes.pPhysicsObject = m_InternalData.Simulation.pPhysicsEnvironment->CreatePolyObjectStatic( m_InternalData.Simulation.Static.World.Brushes.pCollideable, m_InternalData.Simulation.Static.SurfaceProperties.surface.surfaceProps, vec3_origin, vec3_angle, &params );
 			
-			if( (m_InternalData.Simulation.pCollisionEntity != NULL) && (m_InternalData.Simulation.pCollisionEntity->VPhysicsGetObject() == NULL) )
-				m_InternalData.Simulation.pCollisionEntity->GetEngineObject()->VPhysicsSetObject(m_InternalData.Simulation.Static.World.Brushes.pPhysicsObject);
+			//if( (m_InternalData.Simulation.pCollisionEntity != NULL) && (m_InternalData.Simulation.pCollisionEntity->VPhysicsGetObject() == NULL) )
+				this->GetEngineObject()->VPhysicsSetObject(m_InternalData.Simulation.Static.World.Brushes.pPhysicsObject);
 
 			m_InternalData.Simulation.Static.World.Brushes.pPhysicsObject->RecheckCollisionFilter(); //some filters only work after the variable is stored in the class
 		}
@@ -1277,8 +1306,8 @@ void CPortalSimulator::CreateLocalPhysics( void )
 		{
 			m_InternalData.Simulation.Static.Wall.Local.Brushes.pPhysicsObject = m_InternalData.Simulation.pPhysicsEnvironment->CreatePolyObjectStatic( m_InternalData.Simulation.Static.Wall.Local.Brushes.pCollideable, m_InternalData.Simulation.Static.SurfaceProperties.surface.surfaceProps, vec3_origin, vec3_angle, &params );
 			
-			if( (m_InternalData.Simulation.pCollisionEntity != NULL) && (m_InternalData.Simulation.pCollisionEntity->VPhysicsGetObject() == NULL) )
-				m_InternalData.Simulation.pCollisionEntity->GetEngineObject()->VPhysicsSetObject(m_InternalData.Simulation.Static.World.Brushes.pPhysicsObject);
+			//if( (m_InternalData.Simulation.pCollisionEntity != NULL) && (m_InternalData.Simulation.pCollisionEntity->VPhysicsGetObject() == NULL) )
+				this->GetEngineObject()->VPhysicsSetObject(m_InternalData.Simulation.Static.World.Brushes.pPhysicsObject);
 
 			m_InternalData.Simulation.Static.Wall.Local.Brushes.pPhysicsObject->RecheckCollisionFilter(); //some filters only work after the variable is stored in the class
 		}
@@ -1288,8 +1317,8 @@ void CPortalSimulator::CreateLocalPhysics( void )
 		{
 			m_InternalData.Simulation.Static.Wall.Local.Tube.pPhysicsObject = m_InternalData.Simulation.pPhysicsEnvironment->CreatePolyObjectStatic( m_InternalData.Simulation.Static.Wall.Local.Tube.pCollideable, m_InternalData.Simulation.Static.SurfaceProperties.surface.surfaceProps, vec3_origin, vec3_angle, &params );
 			
-			if( (m_InternalData.Simulation.pCollisionEntity != NULL) && (m_InternalData.Simulation.pCollisionEntity->VPhysicsGetObject() == NULL) )
-				m_InternalData.Simulation.pCollisionEntity->GetEngineObject()->VPhysicsSetObject(m_InternalData.Simulation.Static.World.Brushes.pPhysicsObject);
+			//if( (m_InternalData.Simulation.pCollisionEntity != NULL) && (m_InternalData.Simulation.pCollisionEntity->VPhysicsGetObject() == NULL) )
+				this->GetEngineObject()->VPhysicsSetObject(m_InternalData.Simulation.Static.World.Brushes.pPhysicsObject);
 
 			m_InternalData.Simulation.Static.Wall.Local.Tube.pPhysicsObject->RecheckCollisionFilter(); //some filters only work after the variable is stored in the class
 		}
@@ -1299,8 +1328,8 @@ void CPortalSimulator::CreateLocalPhysics( void )
 	for( int i = m_InternalData.Simulation.Dynamic.OwnedEntities.Count(); --i >= 0; )
 		TakePhysicsOwnership( m_InternalData.Simulation.Dynamic.OwnedEntities[i] );
 
-	if( m_InternalData.Simulation.pCollisionEntity )
-		m_InternalData.Simulation.pCollisionEntity->GetEngineObject()->CollisionRulesChanged();
+	//if( m_InternalData.Simulation.pCollisionEntity )
+		this->GetEngineObject()->CollisionRulesChanged();
 	
 	STOPDEBUGTIMER( functionTimer );
 	DECREMENTTABSPACING();
@@ -1334,10 +1363,10 @@ void CPortalSimulator::CreateLinkedPhysics( void )
 	//int iDefaultSurfaceIndex = physprops->GetSurfaceIndex( "default" );
 	objectparams_t params = g_PhysDefaultObjectParams;
 
-	if( m_InternalData.Simulation.pCollisionEntity )
-		params.pGameData = m_InternalData.Simulation.pCollisionEntity;
-	else
-		params.pGameData = GetWorldEntity();
+	//if( m_InternalData.Simulation.pCollisionEntity )
+	params.pGameData = this;// m_InternalData.Simulation.pCollisionEntity;
+	//else
+	//	params.pGameData = GetWorldEntity();
 
 	//everything in our linked collision should be based on the linked portal's world collision
 	PS_SD_Static_World_t &RemoteSimulationStaticWorld = m_pLinkedPortal->m_InternalData.Simulation.Static.World;
@@ -1370,7 +1399,7 @@ void CPortalSimulator::CreateLinkedPhysics( void )
 	for( int i = RemoteOwnedEntities.Count(); --i >= 0; )
 	{
 		if( CPhysicsShadowClone::IsShadowClone( RemoteOwnedEntities[i] ) ||
-			CPSCollisionEntity::IsPortalSimulatorCollisionEntity( RemoteOwnedEntities[i] ) )
+			CPortalSimulator::IsPortalSimulatorCollisionEntity( RemoteOwnedEntities[i] ) )
 			continue;
 
 		int j;
@@ -1404,8 +1433,8 @@ void CPortalSimulator::CreateLinkedPhysics( void )
 		m_bInCrossLinkedFunction = false;
 	}
 
-	if( m_InternalData.Simulation.pCollisionEntity )
-		m_InternalData.Simulation.pCollisionEntity->GetEngineObject()->CollisionRulesChanged();
+	//if( m_InternalData.Simulation.pCollisionEntity )
+		this->GetEngineObject()->CollisionRulesChanged();
 
 	STOPDEBUGTIMER( functionTimer );
 	DECREMENTTABSPACING();
@@ -1531,8 +1560,8 @@ void CPortalSimulator::ClearLocalPhysics( void )
 	m_InternalData.Simulation.pPhysicsEnvironment->CleanupDeleteList();
 	m_InternalData.Simulation.pPhysicsEnvironment->SetQuickDelete( false );
 
-	if( m_InternalData.Simulation.pCollisionEntity )
-		m_InternalData.Simulation.pCollisionEntity->GetEngineObject()->CollisionRulesChanged();
+	//if( m_InternalData.Simulation.pCollisionEntity )
+		this->GetEngineObject()->CollisionRulesChanged();
 
 	STOPDEBUGTIMER( functionTimer );
 	DECREMENTTABSPACING();
@@ -1605,8 +1634,8 @@ void CPortalSimulator::ClearLinkedPhysics( void )
 	m_InternalData.Simulation.pPhysicsEnvironment->CleanupDeleteList();
 	m_InternalData.Simulation.pPhysicsEnvironment->SetQuickDelete( false );
 
-	if( m_InternalData.Simulation.pCollisionEntity )
-		m_InternalData.Simulation.pCollisionEntity->GetEngineObject()->CollisionRulesChanged();
+	//if( m_InternalData.Simulation.pCollisionEntity )
+		this->GetEngineObject()->CollisionRulesChanged();
 
 	STOPDEBUGTIMER( functionTimer );
 	DECREMENTTABSPACING();
@@ -1752,8 +1781,8 @@ void CPortalSimulator::CreateLocalCollision( void )
 		}
 		
 #ifndef CLIENT_DLL
-		if( m_InternalData.Simulation.pCollisionEntity )
-			m_InternalData.Simulation.Static.SurfaceProperties.pEntity = m_InternalData.Simulation.pCollisionEntity;
+		//if( m_InternalData.Simulation.pCollisionEntity )
+		m_InternalData.Simulation.Static.SurfaceProperties.pEntity = this;// m_InternalData.Simulation.pCollisionEntity;
 #endif		
 	}
 
@@ -2473,7 +2502,7 @@ void CPortalSimulator::PostPhysFrame( void )
 		CPortal_Player* pPlayer = dynamic_cast<CPortal_Player*>( UTIL_GetLocalPlayer() );
 		CProp_Portal* pTouchedPortal = pPlayer->m_hPortalEnvironment.Get();
 		CPortalSimulator* pSim = GetSimulatorThatOwnsEntity( pPlayer );
-		if ( pTouchedPortal && pSim && (pTouchedPortal->m_PortalSimulator.GetPortalSimulatorGUID() != pSim->GetPortalSimulatorGUID()) )
+		if ( pTouchedPortal && pSim && (pTouchedPortal->m_hPortalSimulator->GetPortalSimulatorGUID() != pSim->GetPortalSimulatorGUID()) )
 		{
 			Warning ( "Player is simulated in a physics environment but isn't touching a portal! Can't teleport, but can fall through portal hole. Returning player to main environment.\n" );
 			ADD_DEBUG_HISTORY( HISTORY_PLAYER_DAMAGE, UTIL_VarArgs( "Player in PortalSimulator but not touching a portal, removing from sim at : %f\n",  gpGlobals->curtime ) );
@@ -2502,7 +2531,7 @@ int CPortalSimulator::GetMoveableOwnedEntities( CBaseEntity **pEntsOut, int iEnt
 		if( CPhysicsShadowClone::IsShadowClone( pEnt ) )
 			continue;
 
-		if( CPSCollisionEntity::IsPortalSimulatorCollisionEntity( pEnt ) )
+		if(CPortalSimulator::IsPortalSimulatorCollisionEntity( pEnt ) )
 			continue;
 
 		if( pEnt->GetEngineObject()->GetMoveType() == MOVETYPE_NONE )
@@ -2771,7 +2800,7 @@ void CPortalSimulator::Pre_UTIL_Remove( CBaseEntity *pEntity )
 	//NDebugOverlay::EntityBounds( pEntity, 0, 0, 0, 50, 5.0f );
 
 	if( (CPhysicsShadowClone::IsShadowClone( pEntity ) == false) &&
-		(CPSCollisionEntity::IsPortalSimulatorCollisionEntity( pEntity ) == false) )
+		(CPortalSimulator::IsPortalSimulatorCollisionEntity( pEntity ) == false) )
 	{
 		CPortalSimulator *pOwningSimulator = CPortalSimulator::GetSimulatorThatOwnsEntity( pEntity );
 		if( pOwningSimulator )
@@ -2882,9 +2911,24 @@ static CPS_AutoGameSys_EntityListener s_CPS_AGS_EL_Singleton;
 
 
 
-
+LINK_ENTITY_TO_CLASS(portal_simulator, CPortalSimulator);
 
 #ifndef CLIENT_DLL
+
+class CPSCollisionEntity : public CBaseEntity
+{
+	DECLARE_CLASS(CPSCollisionEntity, CBaseEntity);
+private:
+	CPortalSimulator* m_pOwningSimulator;
+
+public:
+	CPSCollisionEntity(void);
+	virtual ~CPSCollisionEntity(void);
+
+
+	friend class CPortalSimulator;
+};
+
 LINK_ENTITY_TO_CLASS( portalsimulator_collisionentity, CPSCollisionEntity );
 
 static bool s_PortalSimulatorCollisionEntities[MAX_EDICTS] = { false };
@@ -2907,22 +2951,19 @@ CPSCollisionEntity::~CPSCollisionEntity( void )
 	//s_PortalSimulatorCollisionEntities[entindex()] = false;
 }
 
-void CPSCollisionEntity::UpdateOnRemove( void )
+
+void CPortalSimulator::UpdateOnRemove( void )
 {
 	GetEngineObject()->VPhysicsSetObject( NULL );
-	if( m_pOwningSimulator )
-	{
-		m_pOwningSimulator->m_InternalData.Simulation.Dynamic.EntFlags[entindex()] &= ~PSEF_OWNS_PHYSICS;
-		m_pOwningSimulator->MarkAsReleased( this );
-		m_pOwningSimulator->m_InternalData.Simulation.pCollisionEntity = NULL;
-		m_pOwningSimulator = NULL;
-	}
+	
+	m_InternalData.Simulation.Dynamic.EntFlags[entindex()] &= ~PSEF_OWNS_PHYSICS;
+	MarkAsReleased( this );	
 	s_PortalSimulatorCollisionEntities[entindex()] = false;
 
 	BaseClass::UpdateOnRemove();
 }
 
-void CPSCollisionEntity::Spawn( void )
+void CPortalSimulator::Spawn( void )
 {
 	BaseClass::Spawn();
 	GetEngineObject()->SetSolid( SOLID_CUSTOM );
@@ -2935,76 +2976,70 @@ void CPSCollisionEntity::Spawn( void )
 	IncrementInterpolationFrame();
 }
 
-void CPSCollisionEntity::Activate( void )
+void CPortalSimulator::Activate( void )
 {
 	BaseClass::Activate();
 	GetEngineObject()->CollisionRulesChanged();
 }
 
-int CPSCollisionEntity::ObjectCaps( void )
+int CPortalSimulator::ObjectCaps( void )
 {
 	return ((BaseClass::ObjectCaps() | FCAP_DONT_SAVE) & ~(FCAP_FORCE_TRANSITION | FCAP_ACROSS_TRANSITION | FCAP_MUST_SPAWN | FCAP_SAVE_NON_NETWORKABLE));
 }
 
-bool CPSCollisionEntity::ShouldCollide( int collisionGroup, int contentsMask ) const
+bool CPortalSimulator::ShouldCollide( int collisionGroup, int contentsMask ) const
 {
 	return GetWorldEntity()->ShouldCollide( collisionGroup, contentsMask );
 }
 
-IPhysicsObject *CPSCollisionEntity::VPhysicsGetObject( void )
+IPhysicsObject * CPortalSimulator::VPhysicsGetObject( void )
 {
-	if( m_pOwningSimulator == NULL )
-		return NULL;
-
-	if( m_pOwningSimulator->m_DataAccess.Simulation.Static.World.Brushes.pPhysicsObject != NULL )
-		return m_pOwningSimulator->m_DataAccess.Simulation.Static.World.Brushes.pPhysicsObject;
-	else if( m_pOwningSimulator->m_DataAccess.Simulation.Static.Wall.Local.Brushes.pPhysicsObject != NULL )
-		return m_pOwningSimulator->m_DataAccess.Simulation.Static.Wall.Local.Brushes.pPhysicsObject;
-	else if( m_pOwningSimulator->m_DataAccess.Simulation.Static.Wall.Local.Tube.pPhysicsObject != NULL )
-		return m_pOwningSimulator->m_DataAccess.Simulation.Static.Wall.Local.Brushes.pPhysicsObject;
-	else if( m_pOwningSimulator->m_DataAccess.Simulation.Static.Wall.RemoteTransformedToLocal.Brushes.pPhysicsObject != NULL )
-		return m_pOwningSimulator->m_DataAccess.Simulation.Static.Wall.RemoteTransformedToLocal.Brushes.pPhysicsObject;
+	if( m_DataAccess.Simulation.Static.World.Brushes.pPhysicsObject != NULL )
+		return m_DataAccess.Simulation.Static.World.Brushes.pPhysicsObject;
+	else if( m_DataAccess.Simulation.Static.Wall.Local.Brushes.pPhysicsObject != NULL )
+		return m_DataAccess.Simulation.Static.Wall.Local.Brushes.pPhysicsObject;
+	else if( m_DataAccess.Simulation.Static.Wall.Local.Tube.pPhysicsObject != NULL )
+		return m_DataAccess.Simulation.Static.Wall.Local.Brushes.pPhysicsObject;
+	else if( m_DataAccess.Simulation.Static.Wall.RemoteTransformedToLocal.Brushes.pPhysicsObject != NULL )
+		return m_DataAccess.Simulation.Static.Wall.RemoteTransformedToLocal.Brushes.pPhysicsObject;
 	else
 		return NULL;
 }
 
-int CPSCollisionEntity::VPhysicsGetObjectList( IPhysicsObject **pList, int listMax )
+int CPortalSimulator::VPhysicsGetObjectList( IPhysicsObject **pList, int listMax )
 {
-	if( m_pOwningSimulator == NULL )
-		return 0;
-
 	if( (pList == NULL) || (listMax == 0) )
 		return 0;
 
 	int iRetVal = 0;
 
-	if( m_pOwningSimulator->m_DataAccess.Simulation.Static.World.Brushes.pPhysicsObject != NULL )
+	if( m_DataAccess.Simulation.Static.World.Brushes.pPhysicsObject != NULL )
 	{
-		pList[iRetVal] = m_pOwningSimulator->m_DataAccess.Simulation.Static.World.Brushes.pPhysicsObject;
+		pList[iRetVal] = m_DataAccess.Simulation.Static.World.Brushes.pPhysicsObject;
 		++iRetVal;
 		if( iRetVal == listMax )
 			return iRetVal;
 	}
 
-	if( m_pOwningSimulator->m_DataAccess.Simulation.Static.Wall.Local.Brushes.pPhysicsObject != NULL )
+	if( m_DataAccess.Simulation.Static.Wall.Local.Brushes.pPhysicsObject != NULL )
 	{
-		pList[iRetVal] = m_pOwningSimulator->m_DataAccess.Simulation.Static.Wall.Local.Brushes.pPhysicsObject;
+		pList[iRetVal] = m_DataAccess.Simulation.Static.Wall.Local.Brushes.pPhysicsObject;
 		++iRetVal;
 		if( iRetVal == listMax )
 			return iRetVal;
 	}
 
-	if( m_pOwningSimulator->m_DataAccess.Simulation.Static.Wall.Local.Tube.pPhysicsObject != NULL )
+	if( m_DataAccess.Simulation.Static.Wall.Local.Tube.pPhysicsObject != NULL )
 	{
-		pList[iRetVal] = m_pOwningSimulator->m_DataAccess.Simulation.Static.Wall.Local.Tube.pPhysicsObject;
+		pList[iRetVal] = m_DataAccess.Simulation.Static.Wall.Local.Tube.pPhysicsObject;
 		++iRetVal;
 		if( iRetVal == listMax )
 			return iRetVal;
 	}
 
-	if( m_pOwningSimulator->m_DataAccess.Simulation.Static.Wall.RemoteTransformedToLocal.Brushes.pPhysicsObject != NULL )
+	if( m_DataAccess.Simulation.Static.Wall.RemoteTransformedToLocal.Brushes.pPhysicsObject != NULL )
 	{
-		pList[iRetVal] = m_pOwningSimulator->m_DataAccess.Simulation.Static.Wall.RemoteTransformedToLocal.Brushes.pPhysicsObject;
+		pList[iRetVal] = m_DataAccess.Simulation.Static.Wall.RemoteTransformedToLocal.Brushes.pPhysicsObject;
 		++iRetVal;
 		if( iRetVal == listMax )
 			return iRetVal;
@@ -3013,7 +3048,7 @@ int CPSCollisionEntity::VPhysicsGetObjectList( IPhysicsObject **pList, int listM
 	return iRetVal;
 }
 
-bool CPSCollisionEntity::IsPortalSimulatorCollisionEntity( const CBaseEntity *pEntity )
+bool CPortalSimulator::IsPortalSimulatorCollisionEntity( const CBaseEntity *pEntity )
 {
 	if (!((CBaseEntity*)pEntity)->IsNetworkable() || pEntity->entindex() == -1) {
 		return false;

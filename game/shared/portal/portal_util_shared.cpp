@@ -357,7 +357,7 @@ bool UTIL_Portal_Trace_Beam( const CBeam *pBeam, Vector &vecStart, Vector &vecEn
 void UTIL_Portal_TraceRay_With( const CProp_Portal *pPortal, const Ray_t &ray, unsigned int fMask, ITraceFilter *pTraceFilter, trace_t *pTrace, bool bTraceHolyWall )
 {
 	//check to see if the player is theoretically in a portal environment
-	if( !pPortal || !pPortal->m_PortalSimulator.IsReadyToSimulate() )
+	if( !pPortal || !pPortal->m_hPortalSimulator->IsReadyToSimulate() )
 	{
 		//not in a portal environment, use regular traces
 		enginetrace->TraceRay( ray, fMask, pTraceFilter, pTrace );
@@ -574,7 +574,7 @@ void UTIL_Portal_TraceRay( const CProp_Portal *pPortal, const Ray_t &ray, unsign
 #ifdef CLIENT_DLL
 	Assert( (GameRules() == NULL) || GameRules()->IsMultiplayer() );
 #endif
-	Assert( pPortal->m_PortalSimulator.IsReadyToSimulate() ); //a trace shouldn't make it down this far if the portal is incapable of changing the results of the trace
+	Assert( pPortal->m_hPortalSimulator->IsReadyToSimulate() ); //a trace shouldn't make it down this far if the portal is incapable of changing the results of the trace
 
 	CTraceFilterHitAll traceFilterHitAll;
 	if ( !pTraceFilter )
@@ -589,15 +589,15 @@ void UTIL_Portal_TraceRay( const CProp_Portal *pPortal, const Ray_t &ray, unsign
 	trace_t TempTrace;
 	int counter;
 
-	const CPortalSimulator &portalSimulator = pPortal->m_PortalSimulator;
-	CPortalSimulator *pLinkedPortalSimulator = portalSimulator.GetLinkedPortalSimulator();
+	const CPortalSimulator* portalSimulator = pPortal->m_hPortalSimulator;
+	CPortalSimulator *pLinkedPortalSimulator = portalSimulator->GetLinkedPortalSimulator();
 
 	//bool bTraceDisplacements = sv_portal_trace_vs_displacements.GetBool();
 	bool bTraceStaticProps = sv_portal_trace_vs_staticprops.GetBool();
 	if( sv_portal_trace_vs_holywall.GetBool() == false )
 		bTraceHolyWall = false;
 
-	bool bTraceTransformedGeometry = ( (pLinkedPortalSimulator != NULL) && bTraceHolyWall && portalSimulator.RayIsInPortalHole( ray ) );	
+	bool bTraceTransformedGeometry = ( (pLinkedPortalSimulator != NULL) && bTraceHolyWall && portalSimulator->RayIsInPortalHole( ray ) );	
 
 	bool bCopyBackBrushTraceData = false;
 
@@ -608,17 +608,17 @@ void UTIL_Portal_TraceRay( const CProp_Portal *pPortal, const Ray_t &ray, unsign
 	{
 		//trace_t RealTrace;
 		//enginetrace->TraceRay( ray, fMask, pTraceFilter, &RealTrace );
-		if( portalSimulator.m_DataAccess.Simulation.Static.World.Brushes.pCollideable && sv_portal_trace_vs_world.GetBool() )
+		if( portalSimulator->m_DataAccess.Simulation.Static.World.Brushes.pCollideable && sv_portal_trace_vs_world.GetBool() )
 		{
-			physcollision->TraceBox( ray, portalSimulator.m_DataAccess.Simulation.Static.World.Brushes.pCollideable, vec3_origin, vec3_angle, pTrace );
+			physcollision->TraceBox( ray, portalSimulator->m_DataAccess.Simulation.Static.World.Brushes.pCollideable, vec3_origin, vec3_angle, pTrace );
 			bCopyBackBrushTraceData = true;
 		}
 
 		if( bTraceHolyWall )
 		{
-			if( portalSimulator.m_DataAccess.Simulation.Static.Wall.Local.Tube.pCollideable )
+			if( portalSimulator->m_DataAccess.Simulation.Static.Wall.Local.Tube.pCollideable )
 			{
-				physcollision->TraceBox( ray, portalSimulator.m_DataAccess.Simulation.Static.Wall.Local.Tube.pCollideable, vec3_origin, vec3_angle, &TempTrace );
+				physcollision->TraceBox( ray, portalSimulator->m_DataAccess.Simulation.Static.Wall.Local.Tube.pCollideable, vec3_origin, vec3_angle, &TempTrace );
 
 				if( (TempTrace.startsolid == false) && (TempTrace.fraction < pTrace->fraction) ) //never allow something to be stuck in the tube, it's more of a last-resort guide than a real collideable
 				{
@@ -627,9 +627,9 @@ void UTIL_Portal_TraceRay( const CProp_Portal *pPortal, const Ray_t &ray, unsign
 				}
 			}
 
-			if( portalSimulator.m_DataAccess.Simulation.Static.Wall.Local.Brushes.pCollideable )
+			if( portalSimulator->m_DataAccess.Simulation.Static.Wall.Local.Brushes.pCollideable )
 			{
-				physcollision->TraceBox( ray, portalSimulator.m_DataAccess.Simulation.Static.Wall.Local.Brushes.pCollideable, vec3_origin, vec3_angle, &TempTrace );
+				physcollision->TraceBox( ray, portalSimulator->m_DataAccess.Simulation.Static.Wall.Local.Brushes.pCollideable, vec3_origin, vec3_angle, &TempTrace );
 				if( (TempTrace.fraction < pTrace->fraction) )
 				{
 					*pTrace = TempTrace;
@@ -637,10 +637,10 @@ void UTIL_Portal_TraceRay( const CProp_Portal *pPortal, const Ray_t &ray, unsign
 				}
 			}
 
-			//if( portalSimulator.m_DataAccess.Simulation.Static.Wall.RemoteTransformedToLocal.Brushes.pCollideable && sv_portal_trace_vs_world.GetBool() )
+			//if( portalSimulator->m_DataAccess.Simulation.Static.Wall.RemoteTransformedToLocal.Brushes.pCollideable && sv_portal_trace_vs_world.GetBool() )
 			if( bTraceTransformedGeometry && pLinkedPortalSimulator->m_DataAccess.Simulation.Static.World.Brushes.pCollideable )
 			{
-				physcollision->TraceBox( ray, pLinkedPortalSimulator->m_DataAccess.Simulation.Static.World.Brushes.pCollideable, portalSimulator.m_DataAccess.Placement.ptaap_LinkedToThis.ptOriginTransform, portalSimulator.m_DataAccess.Placement.ptaap_LinkedToThis.qAngleTransform, &TempTrace );
+				physcollision->TraceBox( ray, pLinkedPortalSimulator->m_DataAccess.Simulation.Static.World.Brushes.pCollideable, portalSimulator->m_DataAccess.Placement.ptaap_LinkedToThis.ptOriginTransform, portalSimulator->m_DataAccess.Placement.ptaap_LinkedToThis.qAngleTransform, &TempTrace );
 				if( (TempTrace.fraction < pTrace->fraction) )
 				{
 					*pTrace = TempTrace;
@@ -651,9 +651,9 @@ void UTIL_Portal_TraceRay( const CProp_Portal *pPortal, const Ray_t &ray, unsign
 
 		if( bCopyBackBrushTraceData )
 		{
-			pTrace->surface = portalSimulator.m_DataAccess.Simulation.Static.SurfaceProperties.surface;
-			pTrace->contents = portalSimulator.m_DataAccess.Simulation.Static.SurfaceProperties.contents;
-			pTrace->m_pEnt = portalSimulator.m_DataAccess.Simulation.Static.SurfaceProperties.pEntity;
+			pTrace->surface = portalSimulator->m_DataAccess.Simulation.Static.SurfaceProperties.surface;
+			pTrace->contents = portalSimulator->m_DataAccess.Simulation.Static.SurfaceProperties.contents;
+			pTrace->m_pEnt = portalSimulator->m_DataAccess.Simulation.Static.SurfaceProperties.pEntity;
 
 			bCopyBackBrushTraceData = false;
 		}
@@ -691,10 +691,10 @@ void UTIL_Portal_TraceRay( const CProp_Portal *pPortal, const Ray_t &ray, unsign
 		{
 			//local clipped static props
 			{
-				int iLocalStaticCount = portalSimulator.m_DataAccess.Simulation.Static.World.StaticProps.ClippedRepresentations.Count();
-				if( iLocalStaticCount != 0 && portalSimulator.m_DataAccess.Simulation.Static.World.StaticProps.bCollisionExists )
+				int iLocalStaticCount = portalSimulator->m_DataAccess.Simulation.Static.World.StaticProps.ClippedRepresentations.Count();
+				if( iLocalStaticCount != 0 && portalSimulator->m_DataAccess.Simulation.Static.World.StaticProps.bCollisionExists )
 				{
-					const PS_SD_Static_World_StaticProps_ClippedProp_t *pCurrentProp = portalSimulator.m_DataAccess.Simulation.Static.World.StaticProps.ClippedRepresentations.Base();
+					const PS_SD_Static_World_StaticProps_ClippedProp_t *pCurrentProp = portalSimulator->m_DataAccess.Simulation.Static.World.StaticProps.ClippedRepresentations.Base();
 					const PS_SD_Static_World_StaticProps_ClippedProp_t *pStop = pCurrentProp + iLocalStaticCount;
 					Vector vTransform = vec3_origin;
 					QAngle qTransform = vec3_angle;
@@ -731,8 +731,8 @@ void UTIL_Portal_TraceRay( const CProp_Portal *pPortal, const Ray_t &ray, unsign
 					{
 						const PS_SD_Static_World_StaticProps_ClippedProp_t *pCurrentProp = pLinkedPortalSimulator->m_DataAccess.Simulation.Static.World.StaticProps.ClippedRepresentations.Base();
 						const PS_SD_Static_World_StaticProps_ClippedProp_t *pStop = pCurrentProp + iLocalStaticCount;
-						Vector vTransform = portalSimulator.m_DataAccess.Placement.ptaap_LinkedToThis.ptOriginTransform;
-						QAngle qTransform = portalSimulator.m_DataAccess.Placement.ptaap_LinkedToThis.qAngleTransform;
+						Vector vTransform = portalSimulator->m_DataAccess.Placement.ptaap_LinkedToThis.ptOriginTransform;
+						QAngle qTransform = portalSimulator->m_DataAccess.Placement.ptaap_LinkedToThis.qAngleTransform;
 
 						do
 						{
@@ -772,9 +772,9 @@ void UTIL_Portal_TraceRay( const CProp_Portal *pPortal, const Ray_t &ray, unsign
 		// For all brush traces, use the 'portal backbrush' surface surface contents
 		// BUGBUG: Doing this is a great solution because brushes near a portal
 		// will have their contents and surface properties homogenized to the brush the portal ray hit.
-		pTrace->contents = portalSimulator.m_DataAccess.Simulation.Static.SurfaceProperties.contents;
-		pTrace->surface = portalSimulator.m_DataAccess.Simulation.Static.SurfaceProperties.surface;
-		pTrace->m_pEnt = portalSimulator.m_DataAccess.Simulation.Static.SurfaceProperties.pEntity;
+		pTrace->contents = portalSimulator->m_DataAccess.Simulation.Static.SurfaceProperties.contents;
+		pTrace->surface = portalSimulator->m_DataAccess.Simulation.Static.SurfaceProperties.surface;
+		pTrace->m_pEnt = portalSimulator->m_DataAccess.Simulation.Static.SurfaceProperties.pEntity;
 	}
 }
 
@@ -803,17 +803,17 @@ void UTIL_PortalLinked_TraceRay( const CProp_Portal *pPortal, const Ray_t &ray, 
 
 	AssertMsg ( ray.m_IsRay, "Ray with extents across portal tracing not implemented!" );
 
-	const CPortalSimulator &portalSimulator = pPortal->m_PortalSimulator;
+	const CPortalSimulator* portalSimulator = pPortal->m_hPortalSimulator;
 	CProp_Portal *pLinkedPortal = (CProp_Portal*)(pPortal->m_hLinkedPortal.Get());
-	if( (pLinkedPortal == NULL) || (portalSimulator.RayIsInPortalHole( ray ) == false) )
+	if( (pLinkedPortal == NULL) || (portalSimulator->RayIsInPortalHole( ray ) == false) )
 	{
 		memset( pTrace, 0, sizeof(trace_t));
 		pTrace->fraction = 1.0f;
 		pTrace->fractionleftsolid = 0;
 
-		pTrace->contents = pPortal->m_PortalSimulator.m_DataAccess.Simulation.Static.SurfaceProperties.contents;
-		pTrace->surface  = pPortal->m_PortalSimulator.m_DataAccess.Simulation.Static.SurfaceProperties.surface;
-		pTrace->m_pEnt	 = pPortal->m_PortalSimulator.m_DataAccess.Simulation.Static.SurfaceProperties.pEntity;
+		pTrace->contents = pPortal->m_hPortalSimulator->m_DataAccess.Simulation.Static.SurfaceProperties.contents;
+		pTrace->surface  = pPortal->m_hPortalSimulator->m_DataAccess.Simulation.Static.SurfaceProperties.surface;
+		pTrace->m_pEnt	 = pPortal->m_hPortalSimulator->m_DataAccess.Simulation.Static.SurfaceProperties.pEntity;
 		return;
 	}
 	UTIL_Portal_TraceRay( pLinkedPortal, rayTransformed, fMask, pTraceFilter, pTrace, bTraceHolyWall );
@@ -847,7 +847,7 @@ void UTIL_Portal_TraceEntity( CBaseEntity *pEntity, const Vector &vecAbsStart, c
 	{
 		C_Prop_Portal *pPortal = ((C_Portal_Player *)pEntity)->m_hPortalEnvironment.Get();
 		if( pPortal )
-			pPortalSimulator = &pPortal->m_PortalSimulator;
+			pPortalSimulator = pPortal->m_hPortalSimulator;
 	}
 #else
 	CPortalSimulator *pPortalSimulator = CPortalSimulator::GetSimulatorThatOwnsEntity( pEntity );
