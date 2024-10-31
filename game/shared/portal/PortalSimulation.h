@@ -115,12 +115,12 @@ struct PS_SD_Static_World_Brushes_t
 {
 	CUtlVector<CPolyhedron *> Polyhedrons; //the building blocks of more complex collision
 	CPhysCollide *pCollideable;
-#ifndef CLIENT_DLL
+//#ifndef CLIENT_DLL
 	IPhysicsObject *pPhysicsObject;
 	PS_SD_Static_World_Brushes_t() : pCollideable(NULL), pPhysicsObject(NULL) {};
-#else
-	PS_SD_Static_World_Brushes_t() : pCollideable(NULL) {};
-#endif
+//#else
+//	PS_SD_Static_World_Brushes_t() : pCollideable(NULL) {};
+//#endif
 	
 };
 
@@ -129,9 +129,9 @@ struct PS_SD_Static_World_StaticProps_ClippedProp_t
 {
 	StaticPropPolyhedronGroups_t	PolyhedronGroup;
 	CPhysCollide *					pCollide;
-#ifndef CLIENT_DLL
+//#ifndef CLIENT_DLL
 	IPhysicsObject *				pPhysicsObject;
-#endif
+//#endif
 	IHandleEntity *					pSourceProp;
 
 	int								iTraceContents;
@@ -161,12 +161,12 @@ struct PS_SD_Static_Wall_Local_Tube_t //a minimal tube, an object must fit insid
 	CUtlVector<CPolyhedron *> Polyhedrons; //the building blocks of more complex collision
 	CPhysCollide *pCollideable;
 
-#ifndef CLIENT_DLL
+//#ifndef CLIENT_DLL
 	IPhysicsObject *pPhysicsObject;
 	PS_SD_Static_Wall_Local_Tube_t() : pCollideable(NULL), pPhysicsObject(NULL) {};
-#else
-	PS_SD_Static_Wall_Local_Tube_t() : pCollideable(NULL) {};
-#endif
+//#else
+//	PS_SD_Static_Wall_Local_Tube_t() : pCollideable(NULL) {};
+//#endif
 };
 
 struct PS_SD_Static_Wall_Local_Brushes_t 
@@ -174,12 +174,12 @@ struct PS_SD_Static_Wall_Local_Brushes_t
 	CUtlVector<CPolyhedron *> Polyhedrons; //the building blocks of more complex collision
 	CPhysCollide *pCollideable;
 
-#ifndef CLIENT_DLL
+//#ifndef CLIENT_DLL
 	IPhysicsObject *pPhysicsObject;
 	PS_SD_Static_Wall_Local_Brushes_t() : pCollideable(NULL), pPhysicsObject(NULL) {};
-#else
-	PS_SD_Static_Wall_Local_Brushes_t() : pCollideable(NULL) {};
-#endif
+//#else
+//	PS_SD_Static_Wall_Local_Brushes_t() : pCollideable(NULL) {};
+//#endif
 };
 
 struct PS_SD_Static_Wall_Local_t //things in the wall that are completely independant of having a linked portal
@@ -208,9 +208,9 @@ struct PS_SD_Static_Wall_RemoteTransformedToLocal_t //things taken from the link
 struct PS_SD_Static_Wall_t //stuff behind the portal
 {
 	PS_SD_Static_Wall_Local_t Local;
-#ifndef CLIENT_DLL
+//#ifndef CLIENT_DLL
 	PS_SD_Static_Wall_RemoteTransformedToLocal_t RemoteTransformedToLocal;
-#endif
+//#endif
 };
 
 struct PS_SD_Static_SurfaceProperties_t //surface properties to pretend every collideable here is using
@@ -237,19 +237,16 @@ struct PS_SD_Dynamic_PhysicsShadowClones_t
 	CUtlVector<CPhysicsShadowClone *> FromLinkedPortal;
 };
 
-struct PS_SD_Dynamic_t //stuff that moves around
-{
-	unsigned int EntFlags[MAX_EDICTS]; //flags maintained for every entity in the world based on its index
+//struct PS_SD_Dynamic_t //stuff that moves around
+//{
+//	PS_SD_Dynamic_t()
+//	{
+//	}
+//};
 
-	PS_SD_Dynamic_PhysicsShadowClones_t ShadowClones;
-
-	CUtlVector<CBaseEntity *> OwnedEntities;
-
-	PS_SD_Dynamic_t()
-	{
-		memset( EntFlags, 0, sizeof( EntFlags ) );
-	}
-};
+#ifdef CLIENT_DLL
+#define CPSCollisionEntity C_PSCollisionEntity
+#endif // CLIENT_DLL
 
 class CPSCollisionEntity;
 
@@ -257,13 +254,12 @@ struct PS_SimulationData_t //compartmentalized data for coherent management
 {
 	PS_SD_Static_t Static;
 
-#ifndef CLIENT_DLL
-	PS_SD_Dynamic_t Dynamic;
+//#ifndef CLIENT_DLL
+	//PS_SD_Dynamic_t Dynamic;
 
-	IPhysicsEnvironment *pPhysicsEnvironment;
 
-	PS_SimulationData_t() : pPhysicsEnvironment(NULL) {};// , pCollisionEntity(NULL) {};
-#endif
+	//PS_SimulationData_t() : pPhysicsEnvironment(NULL) {};// , pCollisionEntity(NULL) {};
+//#endif
 };
 
 struct PS_InternalData_t
@@ -297,10 +293,9 @@ public:
 	{
 		return SetTransmitState(FL_EDICT_ALWAYS);
 	}
-
+	static bool		IsPortalSimulatorCollisionEntity(const CBaseEntity* pEntity);
 #endif // GAME_DLL
 
-	static bool		IsPortalSimulatorCollisionEntity(const CBaseEntity* pEntity);
 	void				MoveTo( const Vector &ptCenter, const QAngle &angles );
 	void				ClearEverything( void );
 
@@ -311,7 +306,17 @@ public:
 	void				SetPortalSimulatorCallbacks( CPortalSimulatorEventCallbacks *pCallbacks );
 	
 	bool				IsReadyToSimulate( void ) const; //is active and linked to another portal
-	
+	const Vector& GetOrigin() const;
+	const QAngle& GetAngles() const;
+	const VMatrix&		MatrixThisToLinked() const;
+	const VMatrix&		MatrixLinkedToThis() const;
+	const VPlane&		GetPortalPlane() const;
+	const PS_InternalData_t& GetDataAccess() const;
+	const Vector& GetVectorForward() const;
+	const Vector& GetVectorUp() const;
+	const Vector& GetVectorRight() const;
+	const PS_SD_Static_SurfaceProperties_t& GetSurfaceProperties() const;
+
 	void				SetCollisionGenerationEnabled( bool bEnabled ); //enable/disable collision generation for the hole in the wall, needed for proper vphysics simulation
 	bool				IsCollisionGenerationEnabled( void ) const;
 
@@ -320,10 +325,9 @@ public:
 	
 	bool				EntityIsInPortalHole( CBaseEntity *pEntity ) const; //true if the entity is within the portal cutout bounds and crossing the plane. Not just *near* the portal
 	bool				EntityHitBoxExtentIsInPortalHole( CBaseAnimating *pBaseAnimating ) const; //true if the entity is within the portal cutout bounds and crossing the plane. Not just *near* the portal
-	void				RemoveEntityFromPortalHole( CBaseEntity *pEntity ); //if the entity is in the portal hole, this forcibly moves it out by any means possible
-
-	bool				RayIsInPortalHole( const Ray_t &ray ) const; //traces a ray against the same detector for EntityIsInPortalHole(), bias is towards false positives
-
+	bool				RayIsInPortalHole(const Ray_t& ray) const;
+	void				TraceRay(const Ray_t& ray, unsigned int fMask, ITraceFilter* pTraceFilter, trace_t* pTrace, bool bTraceHolyWall = true); //traces against a specific portal's environment, does no *real* tracing
+	void				TraceEntity(CBaseEntity* pEntity, const Vector& vecAbsStart, const Vector& vecAbsEnd, unsigned int mask, ITraceFilter* pFilter, trace_t* ptr);
 #ifndef CLIENT_DLL
 	int				GetMoveableOwnedEntities( CBaseEntity **pEntsOut, int iEntOutLimit ); //gets owned entities that aren't either world or static props. Excludes fake portal ents such as physics clones
 
@@ -408,14 +412,18 @@ protected:
 
 	void				UpdateLinkMatrix( void );
 
+#ifdef GAME_DLL
 	void				MarkAsOwned( CBaseEntity *pEntity );
 	void				MarkAsReleased( CBaseEntity *pEntity );
+#endif // GAME_DLL
 
-	PS_InternalData_t m_InternalData;
-	CPSCollisionEntity *pCollisionEntity; //the entity we'll be tying physics objects to for collision
+	CNetworkHandle(CPSCollisionEntity, pCollisionEntity); //the entity we'll be tying physics objects to for collision
+	PS_SD_Dynamic_PhysicsShadowClones_t ShadowClones;
+	CUtlVector<CBaseEntity*> OwnedEntities;
+	IPhysicsEnvironment* pPhysicsEnvironment = NULL;
 
 public:
-	const PS_InternalData_t &m_DataAccess;
+	unsigned int EntFlags[MAX_EDICTS]; //flags maintained for every entity in the world based on its index
 
 	friend class CPS_AutoGameSys_EntityListener;
 };
@@ -443,12 +451,12 @@ extern CUtlVector<CPortalSimulator *> const &g_PortalSimulators;
 #ifndef CLIENT_DLL
 inline bool CPortalSimulator::OwnsEntity( const CBaseEntity *pEntity ) const
 {
-	return ((m_InternalData.Simulation.Dynamic.EntFlags[pEntity->entindex()] & PSEF_OWNS_ENTITY) != 0);
+	return ((EntFlags[pEntity->entindex()] & PSEF_OWNS_ENTITY) != 0);
 }
 
 inline bool CPortalSimulator::OwnsPhysicsForEntity( const CBaseEntity *pEntity ) const
 {
-	return ((m_InternalData.Simulation.Dynamic.EntFlags[pEntity->entindex()] & PSEF_OWNS_PHYSICS) != 0);
+	return ((EntFlags[pEntity->entindex()] & PSEF_OWNS_PHYSICS) != 0);
 }
 #endif
 

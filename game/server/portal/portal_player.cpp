@@ -942,7 +942,7 @@ void CPortal_Player::SetupBones( matrix3x4_t *pBoneToWorld, int boneMask )
 	MDLCACHE_CRITICAL_SECTION();
 
 	// Get the studio header.
-	Assert( GetModelPtr() );
+	Assert(GetEngineObject()->GetModelPtr() );
 	IStudioHdr *pStudioHdr = GetEngineObject()->GetModelPtr( );
 
 	Vector pos[MAXSTUDIOBONES];

@@ -785,7 +785,7 @@ void CProp_Portal::Activate( void )
 						if( SharedEnvironmentCheck( pOther ) )
 						{
 							Assert( ((m_hPortalSimulator->GetLinkedPortalSimulator() == NULL) && (m_hLinkedPortal.Get() == NULL)) || 
-								(m_hPortalSimulator->GetLinkedPortalSimulator() == &m_hLinkedPortal->m_PortalSimulator) ); //make sure this entity is linked to the same portal as our simulator
+								(m_hPortalSimulator->GetLinkedPortalSimulator() == m_hLinkedPortal->m_hPortalSimulator) ); //make sure this entity is linked to the same portal as our simulator
 
 							CPortalSimulator *pOwningSimulator = CPortalSimulator::GetSimulatorThatOwnsEntity( pOther );
 							if( pOwningSimulator && (pOwningSimulator != m_hPortalSimulator) )
@@ -891,7 +891,7 @@ bool CProp_Portal::ShouldTeleportTouchingEntity( CBaseEntity *pOther )
 	}
 
 	// Test for entity's center being past portal plane
-	if(m_hPortalSimulator->m_DataAccess.Placement.PortalPlane.m_Normal.Dot( ptOtherCenter ) < m_hPortalSimulator->m_DataAccess.Placement.PortalPlane.m_Dist)
+	if(m_hPortalSimulator->GetPortalPlane().m_Normal.Dot(ptOtherCenter) < m_hPortalSimulator->GetPortalPlane().m_Dist)
 	{
 		//entity wants to go further into the plane
 		if( m_hPortalSimulator->EntityIsInPortalHole( pOther ) )
@@ -1000,8 +1000,8 @@ void CProp_Portal::TeleportTouchingEntity( CBaseEntity *pOther )
 		}
 	}
 
-	const PS_InternalData_t &RemotePortalDataAccess = m_hLinkedPortal->m_hPortalSimulator->m_DataAccess;
-	const PS_InternalData_t &LocalPortalDataAccess = m_hPortalSimulator->m_DataAccess;
+	const PS_InternalData_t &RemotePortalDataAccess = m_hLinkedPortal->m_hPortalSimulator->GetDataAccess();
+	const PS_InternalData_t &LocalPortalDataAccess = m_hPortalSimulator->GetDataAccess();
 
 	
 	if( bPlayer )
@@ -1333,7 +1333,7 @@ void CProp_Portal::Touch( CBaseEntity *pOther )
 	}
 
 	Assert( ((m_hPortalSimulator->GetLinkedPortalSimulator() == NULL) && (m_hLinkedPortal.Get() == NULL)) || 
-		(m_hPortalSimulator->GetLinkedPortalSimulator() == &m_hLinkedPortal->m_PortalSimulator) ); //make sure this entity is linked to the same portal as our simulator
+		(m_hPortalSimulator->GetLinkedPortalSimulator() == m_hLinkedPortal->m_hPortalSimulator) ); //make sure this entity is linked to the same portal as our simulator
 
 	// Fizzle portal with any moving brush
 	Vector vVelocityCheck;
@@ -1469,7 +1469,7 @@ void CProp_Portal::StartTouch( CBaseEntity *pOther )
 			if( SharedEnvironmentCheck( pOther ) )
 			{
 				Assert( ((m_hPortalSimulator->GetLinkedPortalSimulator() == NULL) && (m_hLinkedPortal.Get() == NULL)) || 
-					(m_hPortalSimulator->GetLinkedPortalSimulator() == &m_hLinkedPortal->m_PortalSimulator) ); //make sure this entity is linked to the same portal as our simulator
+					(m_hPortalSimulator->GetLinkedPortalSimulator() == m_hLinkedPortal->m_hPortalSimulator) ); //make sure this entity is linked to the same portal as our simulator
 
 				CPortalSimulator *pOwningSimulator = CPortalSimulator::GetSimulatorThatOwnsEntity( pOther );
 				if( pOwningSimulator && (pOwningSimulator != m_hPortalSimulator) )
@@ -1497,8 +1497,8 @@ void CProp_Portal::EndTouch( CBaseEntity *pOther )
 	if( ShouldTeleportTouchingEntity( pOther ) ) //an object passed through the plane and all the way out of the touch box
 		TeleportTouchingEntity( pOther );
 	else if( pOther->IsPlayer() && //player
-			(m_hPortalSimulator->m_DataAccess.Placement.vForward.z < -0.7071f) && //most likely falling out of the portal
-			(m_hPortalSimulator->m_DataAccess.Placement.PortalPlane.m_Normal.Dot( pOther->WorldSpaceCenter() ) < m_hPortalSimulator->m_DataAccess.Placement.PortalPlane.m_Dist) && //but behind the portal plane
+			(m_hPortalSimulator->GetVectorForward().z < -0.7071f) && //most likely falling out of the portal
+			(m_hPortalSimulator->GetPortalPlane().m_Normal.Dot(pOther->WorldSpaceCenter()) < m_hPortalSimulator->GetPortalPlane().m_Dist) && //but behind the portal plane
 			(((CPortal_Player *)pOther)->m_Local.m_bInDuckJump) ) //while ducking
 	{
 		//player has pulled their feet up (moving their center instantaneously) while falling downward out of the portal, send them back (probably only for a frame)
@@ -1537,7 +1537,7 @@ void CProp_Portal::PortalSimulator_ReleasedOwnershipOfEntity( CBaseEntity *pEnti
 bool CProp_Portal::SharedEnvironmentCheck( CBaseEntity *pEntity )
 {
 	Assert( ((m_hPortalSimulator->GetLinkedPortalSimulator() == NULL) && (m_hLinkedPortal.Get() == NULL)) || 
-		(m_hPortalSimulator->GetLinkedPortalSimulator() == &m_hLinkedPortal->m_PortalSimulator) ); //make sure this entity is linked to the same portal as our simulator
+		(m_hPortalSimulator->GetLinkedPortalSimulator() == m_hLinkedPortal->m_hPortalSimulator) ); //make sure this entity is linked to the same portal as our simulator
 
 	CPortalSimulator *pOwningSimulator = CPortalSimulator::GetSimulatorThatOwnsEntity( pEntity );
 	if( (pOwningSimulator == NULL) || (pOwningSimulator == m_hPortalSimulator) )
@@ -1547,7 +1547,7 @@ bool CProp_Portal::SharedEnvironmentCheck( CBaseEntity *pEntity )
 	}
 
 	Vector ptCenter = pEntity->WorldSpaceCenter();
-	if( (ptCenter - m_hPortalSimulator->m_DataAccess.Placement.ptCenter).LengthSqr() < (ptCenter - pOwningSimulator->m_DataAccess.Placement.ptCenter).LengthSqr() )
+	if( (ptCenter - m_hPortalSimulator->GetOrigin()).LengthSqr() < (ptCenter - pOwningSimulator->GetOrigin()).LengthSqr() )
 		return true;
 
 	/*if( !m_hLinkedPortal->m_hPortalSimulator->EntityIsInPortalHole( pEntity ) )
@@ -1684,83 +1684,83 @@ void CProp_Portal::WakeNearbyEntities( void )
 	}
 }
 
-void CProp_Portal::ForceEntityToFitInPortalWall( CBaseEntity *pEntity )
-{
-	Vector vWorldMins, vWorldMaxs;
-	pEntity->GetEngineObject()->WorldSpaceAABB( &vWorldMins, &vWorldMaxs );
-	Vector ptCenter = pEntity->WorldSpaceCenter(); //(vWorldMins + vWorldMaxs) / 2.0f;
-	Vector ptOrigin = pEntity->GetEngineObject()->GetAbsOrigin();
-	Vector vEntityCenterToOrigin = ptOrigin - ptCenter;
-
-
-	Vector ptPortalCenter = GetEngineObject()->GetAbsOrigin();
-	Vector vPortalCenterToEntityCenter = ptCenter - ptPortalCenter;
-	Vector vPortalForward;
-	GetVectors( &vPortalForward, NULL, NULL );
-	Vector ptProjectedEntityCenter = ptPortalCenter + ( vPortalForward * vPortalCenterToEntityCenter.Dot( vPortalForward ) );
-
-	Vector ptDest;
-
-	if ( m_hPortalSimulator->IsReadyToSimulate() )
-	{
-		Ray_t ray;
-		ray.Init( ptProjectedEntityCenter, ptCenter, vWorldMins - ptCenter, vWorldMaxs - ptCenter );
-
-		trace_t ShortestTrace;
-		ShortestTrace.fraction = 2.0f;
-
-		if( m_hPortalSimulator->m_DataAccess.Simulation.Static.Wall.Local.Brushes.pCollideable )
-		{
-			physcollision->TraceBox( ray, m_hPortalSimulator->m_DataAccess.Simulation.Static.Wall.Local.Brushes.pCollideable, vec3_origin, vec3_angle, &ShortestTrace );
-		}
-
-		/*if( pEnvironment->LocalCollide.pWorldCollide )
-		{
-			trace_t TempTrace;
-			physcollision->TraceBox( ray, pEnvironment->LocalCollide.pWorldCollide, vec3_origin, vec3_angle, &TempTrace );
-			if( TempTrace.fraction < ShortestTrace.fraction )
-				ShortestTrace = TempTrace;
-		}
-
-		if( pEnvironment->LocalCollide.pWallShellCollide )
-		{
-			trace_t TempTrace;
-			physcollision->TraceBox( ray, pEnvironment->LocalCollide.pWallShellCollide, vec3_origin, vec3_angle, &TempTrace );
-			if( TempTrace.fraction < ShortestTrace.fraction )
-				ShortestTrace = TempTrace;
-		}
-
-		if( pEnvironment->LocalCollide.pRemoteWorldWallCollide )
-		{
-			trace_t TempTrace;
-			physcollision->TraceBox( ray, pEnvironment->LocalCollide.pRemoteWorldWallCollide, vec3_origin, vec3_angle, &TempTrace );
-			if( TempTrace.fraction < ShortestTrace.fraction )
-				ShortestTrace = TempTrace;
-		}
-
-		//Add displacement checks here too?
-
-		*/
-
-		if( ShortestTrace.fraction < 2.0f )
-		{
-			Vector ptNewPos = ShortestTrace.endpos + vEntityCenterToOrigin;
-			pEntity->Teleport( &ptNewPos, NULL, NULL );
-			pEntity->IncrementInterpolationFrame();
-#if !defined ( DISABLE_DEBUG_HISTORY )
-			if ( !GetEngineObject()->IsMarkedForDeletion() )
-			{
-				ADD_DEBUG_HISTORY( HISTORY_PLAYER_DAMAGE, UTIL_VarArgs( "Teleporting %s inside 'ForceEntityToFitInPortalWall'\n", pEntity->GetDebugName() ) );
-			}
-#endif
-			if( sv_portal_debug_touch.GetBool() )
-			{
-				DevMsg( "Teleporting %s inside 'ForceEntityToFitInPortalWall'\n", pEntity->GetDebugName() );
-			}
-			//pEntity->SetAbsOrigin( ShortestTrace.endpos + vEntityCenterToOrigin );
-		}
-	}	
-}
+//void CProp_Portal::ForceEntityToFitInPortalWall( CBaseEntity *pEntity )
+//{
+//	Vector vWorldMins, vWorldMaxs;
+//	pEntity->GetEngineObject()->WorldSpaceAABB( &vWorldMins, &vWorldMaxs );
+//	Vector ptCenter = pEntity->WorldSpaceCenter(); //(vWorldMins + vWorldMaxs) / 2.0f;
+//	Vector ptOrigin = pEntity->GetEngineObject()->GetAbsOrigin();
+//	Vector vEntityCenterToOrigin = ptOrigin - ptCenter;
+//
+//
+//	Vector ptPortalCenter = GetEngineObject()->GetAbsOrigin();
+//	Vector vPortalCenterToEntityCenter = ptCenter - ptPortalCenter;
+//	Vector vPortalForward;
+//	GetVectors( &vPortalForward, NULL, NULL );
+//	Vector ptProjectedEntityCenter = ptPortalCenter + ( vPortalForward * vPortalCenterToEntityCenter.Dot( vPortalForward ) );
+//
+//	Vector ptDest;
+//
+//	if ( m_hPortalSimulator->IsReadyToSimulate() )
+//	{
+//		Ray_t ray;
+//		ray.Init( ptProjectedEntityCenter, ptCenter, vWorldMins - ptCenter, vWorldMaxs - ptCenter );
+//
+//		trace_t ShortestTrace;
+//		ShortestTrace.fraction = 2.0f;
+//
+//		if( m_hPortalSimulator->m_DataAccess.Simulation.Static.Wall.Local.Brushes.pCollideable )
+//		{
+//			physcollision->TraceBox( ray, m_hPortalSimulator->m_DataAccess.Simulation.Static.Wall.Local.Brushes.pCollideable, vec3_origin, vec3_angle, &ShortestTrace );
+//		}
+//
+//		/*if( pEnvironment->LocalCollide.pWorldCollide )
+//		{
+//			trace_t TempTrace;
+//			physcollision->TraceBox( ray, pEnvironment->LocalCollide.pWorldCollide, vec3_origin, vec3_angle, &TempTrace );
+//			if( TempTrace.fraction < ShortestTrace.fraction )
+//				ShortestTrace = TempTrace;
+//		}
+//
+//		if( pEnvironment->LocalCollide.pWallShellCollide )
+//		{
+//			trace_t TempTrace;
+//			physcollision->TraceBox( ray, pEnvironment->LocalCollide.pWallShellCollide, vec3_origin, vec3_angle, &TempTrace );
+//			if( TempTrace.fraction < ShortestTrace.fraction )
+//				ShortestTrace = TempTrace;
+//		}
+//
+//		if( pEnvironment->LocalCollide.pRemoteWorldWallCollide )
+//		{
+//			trace_t TempTrace;
+//			physcollision->TraceBox( ray, pEnvironment->LocalCollide.pRemoteWorldWallCollide, vec3_origin, vec3_angle, &TempTrace );
+//			if( TempTrace.fraction < ShortestTrace.fraction )
+//				ShortestTrace = TempTrace;
+//		}
+//
+//		//Add displacement checks here too?
+//
+//		*/
+//
+//		if( ShortestTrace.fraction < 2.0f )
+//		{
+//			Vector ptNewPos = ShortestTrace.endpos + vEntityCenterToOrigin;
+//			pEntity->Teleport( &ptNewPos, NULL, NULL );
+//			pEntity->IncrementInterpolationFrame();
+//#if !defined ( DISABLE_DEBUG_HISTORY )
+//			if ( !GetEngineObject()->IsMarkedForDeletion() )
+//			{
+//				ADD_DEBUG_HISTORY( HISTORY_PLAYER_DAMAGE, UTIL_VarArgs( "Teleporting %s inside 'ForceEntityToFitInPortalWall'\n", pEntity->GetDebugName() ) );
+//			}
+//#endif
+//			if( sv_portal_debug_touch.GetBool() )
+//			{
+//				DevMsg( "Teleporting %s inside 'ForceEntityToFitInPortalWall'\n", pEntity->GetDebugName() );
+//			}
+//			//pEntity->SetAbsOrigin( ShortestTrace.endpos + vEntityCenterToOrigin );
+//		}
+//	}	
+//}
 
 void CProp_Portal::UpdatePortalTeleportMatrix( void )
 {

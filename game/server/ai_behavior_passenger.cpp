@@ -1427,7 +1427,7 @@ void CAI_PassengerBehavior::PrescheduleThink( void )
 		else
 		{
 			Warning( "Passenger is in vehicle without a valid seat position! -- EJECTED\n" );
-			GetOuter()->SetParent( NULL );
+			GetOuter()->GetEngineObject()->SetParent( NULL );
 			Disable();
 
 			return;
