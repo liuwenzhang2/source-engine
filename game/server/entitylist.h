@@ -2965,7 +2965,7 @@ inline CBaseEntity* CGlobalEntityList<T>::CreateEntityByName(const char* classNa
 	IEntityFactory* pFactory = EntityFactoryDictionary()->FindFactory(className);
 	if (!pFactory)
 	{
-		Error("Attempted to create unknown entity type %s!\n", className);
+		Warning("Attempted to create unknown entity type %s!\n", className);
 		return NULL;
 	}
 	switch (pFactory->GetEngineObjectType()) {

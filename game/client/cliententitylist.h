@@ -2351,7 +2351,7 @@ inline C_BaseEntity* CClientEntityList<T>::CreateEntityByName(const char* classN
 	IEntityFactory* pFactory = EntityFactoryDictionary()->FindFactory(className);
 	if (!pFactory)
 	{
-		Error("Attempted to create unknown entity type %s!\n", className);
+		Warning("Attempted to create unknown entity type %s!\n", className);
 		return NULL;
 	}
 	switch (pFactory->GetEngineObjectType()) {
