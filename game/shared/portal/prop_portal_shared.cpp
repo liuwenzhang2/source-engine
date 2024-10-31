@@ -18,22 +18,22 @@ CUtlVector<CProp_Portal *> CProp_Portal_Shared::AllPortals;
 const Vector CProp_Portal_Shared::vLocalMins( 0.0f, -PORTAL_HALF_WIDTH, -PORTAL_HALF_HEIGHT );
 const Vector CProp_Portal_Shared::vLocalMaxs( 64.0f, PORTAL_HALF_WIDTH, PORTAL_HALF_HEIGHT );
 
-void CProp_Portal_Shared::UpdatePortalTransformationMatrix( const matrix3x4_t &localToWorld, const matrix3x4_t &remoteToWorld, VMatrix *pMatrix )
-{
-	VMatrix matPortal1ToWorldInv, matPortal2ToWorld, matRotation;
-
-	//inverse of this
-	MatrixInverseTR( localToWorld, matPortal1ToWorldInv );
-
-	//180 degree rotation about up
-	matRotation.Identity();
-	matRotation.m[0][0] = -1.0f;
-	matRotation.m[1][1] = -1.0f;
-
-	//final
-	matPortal2ToWorld = remoteToWorld;	
-	*pMatrix = matPortal2ToWorld * matRotation * matPortal1ToWorldInv;
-}
+//void CProp_Portal_Shared::UpdatePortalTransformationMatrix( const matrix3x4_t &localToWorld, const matrix3x4_t &remoteToWorld, VMatrix *pMatrix )
+//{
+//	VMatrix matPortal1ToWorldInv, matPortal2ToWorld, matRotation;
+//
+//	//inverse of this
+//	MatrixInverseTR( localToWorld, matPortal1ToWorldInv );
+//
+//	//180 degree rotation about up
+//	matRotation.Identity();
+//	matRotation.m[0][0] = -1.0f;
+//	matRotation.m[1][1] = -1.0f;
+//
+//	//final
+//	matPortal2ToWorld = remoteToWorld;	
+//	*pMatrix = matPortal2ToWorld * matRotation * matPortal1ToWorldInv;
+//}
 
 static char *g_pszPortalNonTeleportable[] = 
 { 

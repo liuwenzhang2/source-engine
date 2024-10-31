@@ -23,10 +23,10 @@ static const char *s_pFizzleThink = "FizzleThink";
 
 class CPhysicsCloneArea;
 
-class CProp_Portal : public CBaseAnimating, public CPortalSimulatorEventCallbacks
+class CProp_Portal : public CPortalSimulator, public CPortalSimulatorEventCallbacks
 {
 public:
-	DECLARE_CLASS( CProp_Portal, CBaseAnimating );
+	DECLARE_CLASS( CProp_Portal, CPortalSimulator);
 	DECLARE_SERVERCLASS();
 	DECLARE_DATADESC();
 
@@ -36,7 +36,7 @@ public:
 	CNetworkHandle( CProp_Portal, m_hLinkedPortal ); //the portal this portal is linked to
 	
 
-	VMatrix					m_matrixThisToLinked; //the matrix that will transform a point relative to this portal, to a point relative to the linked portal
+	//VMatrix					m_matrixThisToLinked; //the matrix that will transform a point relative to this portal, to a point relative to the linked portal
 	CNetworkVar( bool, m_bActivated ); //a portal can exist and not be active
 	CNetworkVar( bool, m_bIsPortal2 ); //For teleportation, this doesn't matter, but for drawing and moving, it matters
 	Vector	m_vPrevForward; //used for the indecisive push in find closest passable spaces when portal is moved
@@ -62,7 +62,7 @@ public:
 	
 	bool	IsPortal2() const;
 	void	SetIsPortal2( bool bIsPortal2 );
-	const VMatrix& MatrixThisToLinked() const;
+	//const VMatrix& MatrixThisToLinked() const;
 
 	virtual int UpdateTransmitState( void )	// set transmit filter to transmit always
 	{
@@ -117,7 +117,7 @@ public:
 	// The four corners of the portal in worldspace, updated on placement. The four points will be coplanar on the portal plane.
 	Vector m_vPortalCorners[4];
 
-	CNetworkHandle(CPortalSimulator, m_hPortalSimulator);
+	//CNetworkHandle(CPortalSimulator, m_hPortalSimulator);
 
 	//virtual bool			CreateVPhysics( void );
 	//virtual void			VPhysicsDestroyObject( void );
@@ -157,10 +157,10 @@ inline void	CProp_Portal::SetIsPortal2( bool bIsPortal2 )
 	m_bIsPortal2 = bIsPortal2;
 }
 
-inline const VMatrix& CProp_Portal::MatrixThisToLinked() const
-{
-	return m_matrixThisToLinked;
-}
+//inline const VMatrix& CProp_Portal::MatrixThisToLinked() const
+//{
+//	return m_matrixThisToLinked;
+//}
 
 
 #endif //#ifndef PROP_PORTAL_H

@@ -16,6 +16,10 @@
 #include "const.h"
 #include "tier1/utlmap.h"
 #include "tier1/utlvector.h"
+#ifdef CLIENT_DLL
+#include "PortalRender.h"
+#endif // CLIENT_DLL
+
 
 #define PORTAL_SIMULATORS_EMBED_GUID //define this to embed a unique integer with each portal simulator for debugging purposes
 
@@ -108,6 +112,8 @@ struct PS_PlacementData_t //stuff useful for geometric operations
 	PS_PlacementData_t( void )
 	{
 		memset( this, 0, sizeof( PS_PlacementData_t ) );
+		matThisToLinked.Identity();
+		matLinkedToThis.Identity();
 	}
 };
 
@@ -274,6 +280,9 @@ struct PS_InternalData_t
 
 
 class CPortalSimulator : public CBaseEntity
+#ifdef CLIENT_DLL
+	, public CPortalRenderable
+#endif // CLIENT_DLL
 {
 	DECLARE_CLASS(CPortalSimulator, CBaseEntity);
 public:
@@ -285,6 +294,7 @@ public:
 	//virtual bool IsNetworkable(void) { return CPortalSimulator::IsNetworkableStatic(); }
 #ifdef CLIENT_DLL
 	virtual bool					Init(int entnum, int iSerialNum);
+	virtual void					GetToolRecordingState(KeyValues* msg);
 #endif // CLIENT_DLL
 
 #ifdef GAME_DLL
@@ -326,8 +336,8 @@ public:
 	bool				EntityIsInPortalHole( CBaseEntity *pEntity ) const; //true if the entity is within the portal cutout bounds and crossing the plane. Not just *near* the portal
 	bool				EntityHitBoxExtentIsInPortalHole( CBaseAnimating *pBaseAnimating ) const; //true if the entity is within the portal cutout bounds and crossing the plane. Not just *near* the portal
 	bool				RayIsInPortalHole(const Ray_t& ray) const;
-	void				TraceRay(const Ray_t& ray, unsigned int fMask, ITraceFilter* pTraceFilter, trace_t* pTrace, bool bTraceHolyWall = true); //traces against a specific portal's environment, does no *real* tracing
-	void				TraceEntity(CBaseEntity* pEntity, const Vector& vecAbsStart, const Vector& vecAbsEnd, unsigned int mask, ITraceFilter* pFilter, trace_t* ptr);
+	void				TraceRay(const Ray_t& ray, unsigned int fMask, ITraceFilter* pTraceFilter, trace_t* pTrace, bool bTraceHolyWall = true) const; //traces against a specific portal's environment, does no *real* tracing
+	void				TraceEntity(CBaseEntity* pEntity, const Vector& vecAbsStart, const Vector& vecAbsEnd, unsigned int mask, ITraceFilter* pFilter, trace_t* ptr) const;
 #ifndef CLIENT_DLL
 	int				GetMoveableOwnedEntities( CBaseEntity **pEntsOut, int iEntOutLimit ); //gets owned entities that aren't either world or static props. Excludes fake portal ents such as physics clones
 

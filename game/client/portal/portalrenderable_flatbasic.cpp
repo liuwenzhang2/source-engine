@@ -183,19 +183,19 @@ void CPortalRenderable_FlatBasic::PortalMoved( void )
 
 
 	//lastly, update link matrix
-	if ( m_pLinkedPortal != NULL )
-	{
-		matrix3x4_t localToWorld( m_vForward, -m_vRight, m_vUp, m_ptOrigin );
-		matrix3x4_t remoteToWorld( m_pLinkedPortal->m_vForward, -m_pLinkedPortal->m_vRight, m_pLinkedPortal->m_vUp, m_pLinkedPortal->m_ptOrigin );
-		CProp_Portal_Shared::UpdatePortalTransformationMatrix( localToWorld, remoteToWorld, &m_matrixThisToLinked );
+	//if ( m_pLinkedPortal != NULL )
+	//{
+	//	matrix3x4_t localToWorld( m_vForward, -m_vRight, m_vUp, m_ptOrigin );
+	//	matrix3x4_t remoteToWorld( m_pLinkedPortal->m_vForward, -m_pLinkedPortal->m_vRight, m_pLinkedPortal->m_vUp, m_pLinkedPortal->m_ptOrigin );
+	//	CProp_Portal_Shared::UpdatePortalTransformationMatrix( localToWorld, remoteToWorld, &m_matrixThisToLinked );
 
-		// update the remote portal
-		MatrixInverseTR( m_matrixThisToLinked, m_pLinkedPortal->m_matrixThisToLinked );
-	}
-	else
-	{
-		m_matrixThisToLinked.Identity(); // don't accidentally teleport objects to zero space
-	}
+	//	// update the remote portal
+	//	MatrixInverseTR( m_matrixThisToLinked, m_pLinkedPortal->m_matrixThisToLinked );
+	//}
+	//else
+	//{
+	//	m_matrixThisToLinked.Identity(); // don't accidentally teleport objects to zero space
+	//}
 }
 
 
@@ -268,7 +268,7 @@ bool CPortalRenderable_FlatBasic::CalcFrustumThroughPortal( const Vector &ptCurr
 
 	g_pPortalRender->m_RecursiveViewComplexFrustums[iNextViewRecursionLevel].SetCount( iVertCount + 2 ); //+2 for near and far z planes
 
-	Vector ptTransformedCamera = m_matrixThisToLinked * ptCurrentViewOrigin;
+	Vector ptTransformedCamera = MatrixThisToLinked() * ptCurrentViewOrigin;
 
 	//generate planes defined by each line around the convex and the camera origin
 	for( i = 0; i != iVertCount; ++i )
@@ -282,7 +282,7 @@ bool CPortalRenderable_FlatBasic::CalcFrustumThroughPortal( const Vector &ptCurr
 		Vector vNormal = vLine1.Cross( vLine2 );
 		vNormal.NormalizeInPlace();
 
-		vNormal = m_matrixThisToLinked.ApplyRotation( vNormal );
+		vNormal = MatrixThisToLinked().ApplyRotation(vNormal);
 		g_pPortalRender->m_RecursiveViewComplexFrustums[iNextViewRecursionLevel].Element(i).Init( vNormal, vNormal.Dot( ptTransformedCamera ) );
 	}
 
@@ -292,9 +292,9 @@ bool CPortalRenderable_FlatBasic::CalcFrustumThroughPortal( const Vector &ptCurr
 	//Far Z
 	++i;
 	{
-		Vector vNormal = m_matrixThisToLinked.ApplyRotation( pInputFrustum[iInputFrustumPlaneCount - 1].m_Normal );
+		Vector vNormal = MatrixThisToLinked().ApplyRotation(pInputFrustum[iInputFrustumPlaneCount - 1].m_Normal);
 		Vector ptOnPlane = pInputFrustum[iInputFrustumPlaneCount - 1].m_Dist * pInputFrustum[iInputFrustumPlaneCount - 1].m_Normal;
-		g_pPortalRender->m_RecursiveViewComplexFrustums[iNextViewRecursionLevel].Element(i).Init( vNormal, vNormal.Dot( m_matrixThisToLinked * ptOnPlane ) );
+		g_pPortalRender->m_RecursiveViewComplexFrustums[iNextViewRecursionLevel].Element(i).Init( vNormal, vNormal.Dot( MatrixThisToLinked() * ptOnPlane ) );
 	}
 
 
@@ -443,8 +443,8 @@ void CPortalRenderable_FlatBasic::RenderPortalViewToBackBuffer( CViewRender *pVi
 	AngleVectors( cameraView.angles, &vCameraForward, NULL, NULL );
 
 	// Setup fog state for the camera.
-	Vector ptPOVOrigin = m_matrixThisToLinked * cameraView.origin;	
-	Vector vPOVForward = m_matrixThisToLinked.ApplyRotation( vCameraForward );
+	Vector ptPOVOrigin = MatrixThisToLinked() * cameraView.origin;	
+	Vector vPOVForward = MatrixThisToLinked().ApplyRotation(vCameraForward);
 
 	Vector ptRemotePortalPosition = m_pLinkedPortal->m_ptOrigin;
 	Vector vRemotePortalForward = m_pLinkedPortal->m_vForward;
@@ -454,7 +454,7 @@ void CPortalRenderable_FlatBasic::RenderPortalViewToBackBuffer( CViewRender *pVi
 	if( portalView.zNear < 1.0f )
 		portalView.zNear = 1.0f;
 
-	QAngle qPOVAngles = TransformAnglesToWorldSpace( cameraView.angles, m_matrixThisToLinked.As3x4() );	
+	QAngle qPOVAngles = TransformAnglesToWorldSpace( cameraView.angles, MatrixThisToLinked().As3x4());
 
 	portalView.width = cameraView.width;
 	portalView.height = cameraView.height;
@@ -559,8 +559,8 @@ void CPortalRenderable_FlatBasic::RenderPortalViewToTexture( CViewRender *pViewR
 	bool bUseSeeThroughFrustum = CalcFrustumThroughPortal( cameraView.origin, seeThroughFrustum );
 
 	// Setup fog state for the camera.
-	Vector ptPOVOrigin = m_matrixThisToLinked * cameraView.origin;	
-	Vector vPOVForward = m_matrixThisToLinked.ApplyRotation( vCameraForward );
+	Vector ptPOVOrigin = MatrixThisToLinked() * cameraView.origin;	
+	Vector vPOVForward = MatrixThisToLinked().ApplyRotation(vCameraForward);
 
 	Vector vCameraToPortal = m_ptOrigin - cameraView.origin;
 
@@ -568,7 +568,7 @@ void CPortalRenderable_FlatBasic::RenderPortalViewToTexture( CViewRender *pViewR
 	Frustum frustumBackup;
 	memcpy( frustumBackup, pViewRender->GetFrustum(), sizeof( Frustum ) );
 
-	QAngle qPOVAngles = TransformAnglesToWorldSpace( cameraView.angles, m_matrixThisToLinked.As3x4() );	
+	QAngle qPOVAngles = TransformAnglesToWorldSpace( cameraView.angles, MatrixThisToLinked().As3x4());
 
 	portalView.width = pRenderTarget->GetActualWidth();
 	portalView.height = pRenderTarget->GetActualHeight();

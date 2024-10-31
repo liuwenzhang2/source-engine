@@ -66,12 +66,12 @@ public:
 	// Misc
 	//-----------------------------------------------------------------------------
 	virtual CPortalRenderable* GetLinkedPortal() const { return NULL; };
-	const VMatrix&	MatrixThisToLinked() const;
+	virtual const VMatrix&	MatrixThisToLinked() const = 0;
 	virtual bool	ShouldUpdateDepthDoublerTexture( const CViewSetup &viewSetup ) { return false; };
 	virtual void	DrawPortal( void ) { }; //sort of like what you'd expect to happen in C_BaseAnimating::DrawModel() if portals were fully compatible with models
 
 	virtual C_BaseEntity *PortalRenderable_GetPairedEntity( void ) { return NULL; }; //Pairing a portal with an entity is common but not required. Accessing that entity allows the CPortalRender system to better optimize.
-	VMatrix			m_matrixThisToLinked; //Always going to need a matrix
+	//VMatrix			m_matrixThisToLinked; //Always going to need a matrix
 
 
 	//-----------------------------------------------------------------------------
@@ -108,10 +108,10 @@ private:
 //-----------------------------------------------------------------------------
 // inline state querying methods
 //-----------------------------------------------------------------------------
-inline const VMatrix& CPortalRenderable::MatrixThisToLinked() const
-{
-	return m_matrixThisToLinked;
-}
+//inline const VMatrix& CPortalRenderable::MatrixThisToLinked() const
+//{
+//	return m_matrixThisToLinked;
+//}
 
 //-----------------------------------------------------------------------------
 // Portal rendering materials

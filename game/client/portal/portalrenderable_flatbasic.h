@@ -13,6 +13,7 @@
 #endif
 
 #include "PortalRender.h"
+#include "PortalSimulation.h"
 
 struct PortalMeshPoint_t;
 #define PORTALRENDERFIXMESH_OUTERBOUNDPLANES 12
@@ -32,9 +33,9 @@ struct FlatBasicPortalRenderingMaterials_t
 };
 
 //As seen in "Portal"
-class CPortalRenderable_FlatBasic : public C_BaseAnimating, public CPortalRenderable
+class CPortalRenderable_FlatBasic : public CPortalSimulator// , public CPortalRenderable
 {
-	DECLARE_CLASS( CPortalRenderable_FlatBasic, C_BaseAnimating );
+	DECLARE_CLASS( CPortalRenderable_FlatBasic, CPortalSimulator);
 
 public:
 	CPortalRenderable_FlatBasic( void );

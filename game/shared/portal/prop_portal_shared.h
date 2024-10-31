@@ -26,7 +26,7 @@ enum PortalCorners_t { PORTAL_DOWN_RIGHT = 0, PORTAL_DOWN_LEFT, PORTAL_UP_RIGHT,
 class CProp_Portal_Shared  //defined as a class to make intellisense more intelligent
 {
 public:
-	static void UpdatePortalTransformationMatrix( const matrix3x4_t &localToWorld, const matrix3x4_t &remoteToWorld, VMatrix *pMatrix );
+	//static void UpdatePortalTransformationMatrix( const matrix3x4_t &localToWorld, const matrix3x4_t &remoteToWorld, VMatrix *pMatrix );
 
 	static bool IsEntityTeleportable( CBaseEntity *pEntity );
 	//static CProp_Portal *GetPortal1( bool bCreateIfNotFound = false );

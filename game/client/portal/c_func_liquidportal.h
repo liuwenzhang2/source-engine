@@ -95,8 +95,12 @@ public:
 	void ComputeLinkMatrix( void );
 
 	virtual void OnDataChanged( DataUpdateType_t updateType );
-
+	const VMatrix& CPortalRenderable::MatrixThisToLinked() const
+	{
+		return m_matrixThisToLinked;
+	}
 	CHandle<C_Func_LiquidPortal> m_hLinkedPortal;
+	VMatrix			m_matrixThisToLinked;
 };
 
 

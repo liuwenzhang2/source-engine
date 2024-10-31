@@ -405,7 +405,7 @@ void TracePlayerBBoxForGround2( const Vector& start, const Vector& end, const Ve
 	CProp_Portal *pPlayerPortal = pPortalPlayer->m_hPortalEnvironment;
 
 #ifndef CLIENT_DLL
-	if( pPlayerPortal && pPlayerPortal->m_hPortalSimulator->IsReadyToSimulate() == false )
+	if( pPlayerPortal && pPlayerPortal->IsReadyToSimulate() == false )//m_hPortalSimulator->
 		pPlayerPortal = NULL;
 #endif
 

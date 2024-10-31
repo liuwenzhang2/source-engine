@@ -167,12 +167,12 @@ void CPortalRenderable_Func_LiquidPortal::RenderPortalViewToBackBuffer( CViewRen
 	AngleVectors( cameraView.angles, &vCameraForward, NULL, NULL );
 
 	// Setup fog state for the camera.
-	Vector ptPOVOrigin = m_matrixThisToLinked * cameraView.origin;	
-	Vector vPOVForward = m_matrixThisToLinked.ApplyRotation( vCameraForward );
+	Vector ptPOVOrigin = MatrixThisToLinked() * cameraView.origin;	
+	Vector vPOVForward = MatrixThisToLinked().ApplyRotation(vCameraForward);
 
 	CViewSetup portalView = cameraView;
 
-	QAngle qPOVAngles = TransformAnglesToWorldSpace( cameraView.angles, m_matrixThisToLinked.As3x4() );	
+	QAngle qPOVAngles = TransformAnglesToWorldSpace( cameraView.angles, MatrixThisToLinked().As3x4());
 
 	portalView.width = cameraView.width;
 	portalView.height = cameraView.height;

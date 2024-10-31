@@ -242,7 +242,7 @@ bool UTIL_Portal_Trace_Beam( const CBeam *pBeam, Vector &vecStart, Vector &vecEn
 void UTIL_Portal_TraceRay_With( const CProp_Portal *pPortal, const Ray_t &ray, unsigned int fMask, ITraceFilter *pTraceFilter, trace_t *pTrace, bool bTraceHolyWall )
 {
 	//check to see if the player is theoretically in a portal environment
-	if( !pPortal || !pPortal->m_hPortalSimulator->IsReadyToSimulate() )
+	if( !pPortal || !pPortal->IsReadyToSimulate() )//m_hPortalSimulator->
 	{
 		//not in a portal environment, use regular traces
 		enginetrace->TraceRay( ray, fMask, pTraceFilter, pTrace );
@@ -456,7 +456,7 @@ CProp_Portal* UTIL_Portal_TraceRay( const Ray_t &ray, unsigned int fMask, const 
 //-----------------------------------------------------------------------------
 void UTIL_Portal_TraceRay( const CProp_Portal *pPortal, const Ray_t &ray, unsigned int fMask, ITraceFilter *pTraceFilter, trace_t *pTrace, bool bTraceHolyWall )
 {
-	pPortal->m_hPortalSimulator->TraceRay(ray, fMask, pTraceFilter, pTrace, bTraceHolyWall);
+	pPortal->TraceRay(ray, fMask, pTraceFilter, pTrace, bTraceHolyWall);//m_hPortalSimulator->
 }
 
 void UTIL_Portal_TraceRay( const CProp_Portal *pPortal, const Ray_t &ray, unsigned int fMask, const IHandleEntity *ignore, int collisionGroup, trace_t *pTrace, bool bTraceHolyWall )
@@ -484,7 +484,7 @@ void UTIL_PortalLinked_TraceRay( const CProp_Portal *pPortal, const Ray_t &ray, 
 
 	AssertMsg ( ray.m_IsRay, "Ray with extents across portal tracing not implemented!" );
 
-	const CPortalSimulator* portalSimulator = pPortal->m_hPortalSimulator;
+	const CPortalSimulator* portalSimulator = pPortal;//->m_hPortalSimulator
 	CProp_Portal *pLinkedPortal = (CProp_Portal*)(pPortal->m_hLinkedPortal.Get());
 	if( (pLinkedPortal == NULL) || (portalSimulator->RayIsInPortalHole( ray ) == false) )
 	{
@@ -492,9 +492,9 @@ void UTIL_PortalLinked_TraceRay( const CProp_Portal *pPortal, const Ray_t &ray, 
 		pTrace->fraction = 1.0f;
 		pTrace->fractionleftsolid = 0;
 
-		pTrace->contents = pPortal->m_hPortalSimulator->GetSurfaceProperties().contents;
-		pTrace->surface  = pPortal->m_hPortalSimulator->GetSurfaceProperties().surface;
-		pTrace->m_pEnt	 = pPortal->m_hPortalSimulator->GetSurfaceProperties().pEntity;
+		pTrace->contents = pPortal->GetSurfaceProperties().contents;//m_hPortalSimulator->
+		pTrace->surface  = pPortal->GetSurfaceProperties().surface;//m_hPortalSimulator->
+		pTrace->m_pEnt	 = pPortal->GetSurfaceProperties().pEntity;//m_hPortalSimulator->
 		return;
 	}
 	UTIL_Portal_TraceRay( pLinkedPortal, rayTransformed, fMask, pTraceFilter, pTrace, bTraceHolyWall );
@@ -528,7 +528,7 @@ void UTIL_Portal_TraceEntity( CBaseEntity *pEntity, const Vector &vecAbsStart, c
 	{
 		C_Prop_Portal *pPortal = ((C_Portal_Player *)pEntity)->m_hPortalEnvironment.Get();
 		if( pPortal )
-			pPortalSimulator = pPortal->m_hPortalSimulator;
+			pPortalSimulator = pPortal;//->m_hPortalSimulator
 	}
 #else
 	CPortalSimulator *pPortalSimulator = CPortalSimulator::GetSimulatorThatOwnsEntity( pEntity );

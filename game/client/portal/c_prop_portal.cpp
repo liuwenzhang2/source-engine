@@ -44,7 +44,7 @@
 LINK_ENTITY_TO_CLASS( prop_portal, C_Prop_Portal );
 
 IMPLEMENT_CLIENTCLASS_DT( C_Prop_Portal, DT_Prop_Portal, CProp_Portal )
-	RecvPropEHandle(RECVINFO(m_hPortalSimulator)),
+	//RecvPropEHandle(RECVINFO(m_hPortalSimulator)),
 	RecvPropEHandle( RECVINFO(m_hLinkedPortal) ),
 	RecvPropBool( RECVINFO(m_bActivated) ),
 	RecvPropBool( RECVINFO(m_bIsPortal2) ),
@@ -208,7 +208,7 @@ void C_Prop_Portal::Spawn( void )
 	SetThink( &C_Prop_Portal::ClientThink );
 	SetNextClientThink( CLIENT_THINK_ALWAYS );
 
-	m_matrixThisToLinked.Identity(); //don't accidentally teleport objects to zero space
+	//m_matrixThisToLinked.Identity(); //don't accidentally teleport objects to zero space
 	BaseClass::Spawn();
 }
 
@@ -356,18 +356,18 @@ void C_Prop_Portal::Simulate()
 
 			if ( bActivePlayerWeapon )
 			{
-				if( !m_hPortalSimulator->EntityHitBoxExtentIsInPortalHole( pWeapon->GetOwner() ) && 
-					!m_hPortalSimulator->EntityHitBoxExtentIsInPortalHole( pWeapon ) )
+				if( !EntityHitBoxExtentIsInPortalHole( pWeapon->GetOwner() ) && //m_hPortalSimulator->
+					!EntityHitBoxExtentIsInPortalHole( pWeapon ) )//m_hPortalSimulator->
 					continue;
 			}
 			else if( pEntity->IsPlayer() )
 			{
-				if( !m_hPortalSimulator->EntityHitBoxExtentIsInPortalHole( (C_BaseAnimating*)pEntity ) )
+				if( !EntityHitBoxExtentIsInPortalHole( (C_BaseAnimating*)pEntity ) )//m_hPortalSimulator->
 					continue;
 			}
 			else
 			{
-				if( !m_hPortalSimulator->EntityIsInPortalHole( pEntity ) )
+				if( !EntityIsInPortalHole( pEntity ) )//m_hPortalSimulator->
 					continue;
 			}
 
@@ -416,7 +416,7 @@ void C_Prop_Portal::Simulate()
 			pNewGhost->Init(this,
 				pRenderable,
 				pEntity->GetRenderGroup(),
-				m_matrixThisToLinked,
+				MatrixThisToLinked(),
 				m_fGhostRenderablesClip,
 				(pEntity == pLocalPlayer || bIsHeldWeapon));
 
@@ -491,10 +491,10 @@ void C_Prop_Portal::UpdateOnRemove( void )
 	}
 
 	g_pPortalRender->RemovePortal( this );
-	if (m_hPortalSimulator.Get() && !m_hPortalSimulator.Get()->GetEngineObject()->IsMarkedForDeletion()) {
-		ClientEntityList().DestroyEntity(m_hPortalSimulator);
-		m_hPortalSimulator = NULL;
-	}
+	//if (m_hPortalSimulator.Get() && !m_hPortalSimulator.Get()->GetEngineObject()->IsMarkedForDeletion()) {
+	//	ClientEntityList().DestroyEntity(m_hPortalSimulator);
+	//	m_hPortalSimulator = NULL;
+	//}
 	BaseClass::UpdateOnRemove();
 }
 
@@ -564,7 +564,7 @@ void C_Prop_Portal::OnDataChanged( DataUpdateType_t updateType )
 
 	bool bNewLinkage = ( (PreDataChanged.m_hLinkedTo.Get() != m_hLinkedPortal.Get()) );
 	if( bNewLinkage )
-		m_hPortalSimulator->DetachFromLinked(); //detach now so moves are theoretically faster
+		DetachFromLinked(); //detach now so moves are theoretically faster m_hPortalSimulator->
 
 	if( m_bActivated )
 	{
@@ -583,7 +583,7 @@ void C_Prop_Portal::OnDataChanged( DataUpdateType_t updateType )
 			Vector vScaledRight = m_vRight * (PORTAL_HALF_WIDTH * 0.95f);
 			Vector vScaledUp = m_vUp * (PORTAL_HALF_HEIGHT  * 0.95f);
 
-			m_hPortalSimulator->MoveTo(GetEngineObject()->GetNetworkOrigin(), GetEngineObject()->GetNetworkAngles() );
+			MoveTo(GetEngineObject()->GetNetworkOrigin(), GetEngineObject()->GetNetworkAngles() );//m_hPortalSimulator->
 
 			//update our associated portal environment
 			//CPortal_PhysicsEnvironmentMgr::CreateEnvironment( this );
@@ -803,7 +803,7 @@ void C_Prop_Portal::OnDataChanged( DataUpdateType_t updateType )
 	{
 		g_pPortalRender->RemovePortal( this );
 
-		m_hPortalSimulator->DetachFromLinked();
+		DetachFromLinked();//m_hPortalSimulator->
 
 		if( TransformedLighting.m_pEntityLight )
 		{
@@ -819,7 +819,7 @@ void C_Prop_Portal::OnDataChanged( DataUpdateType_t updateType )
 	}
 
 	if( (PreDataChanged.m_hLinkedTo.Get() != m_hLinkedPortal.Get()) && m_hLinkedPortal.Get() )
-		m_hPortalSimulator->AttachTo( m_hLinkedPortal.Get()->m_hPortalSimulator );
+		AttachTo( m_hLinkedPortal.Get() );//m_hPortalSimulator-> ->m_hPortalSimulator
 	
 
 	BaseClass::OnDataChanged( updateType );
@@ -847,7 +847,7 @@ void C_Prop_Portal::UpdateGhostRenderables( void )
 	//lastly, update all ghost renderables
 	for( int i = m_GhostRenderables.Count(); --i >= 0; )
 	{
-		m_GhostRenderables[i]->m_matGhostTransform = m_matrixThisToLinked;;
+		m_GhostRenderables[i]->m_matGhostTransform = MatrixThisToLinked();
 	}
 }
 

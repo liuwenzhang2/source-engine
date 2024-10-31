@@ -271,7 +271,7 @@ void CPropEnergyBall::NotifySystemEvent(CBaseEntity *pNotify, notify_system_even
 		CProp_Portal *pEnteredPortal = dynamic_cast<CProp_Portal*>( pNotify );
 		if( pEnteredPortal )
 		{
-			m_vLastKnownDirection = pEnteredPortal->m_matrixThisToLinked.ApplyRotation( m_vLastKnownDirection );
+			m_vLastKnownDirection = pEnteredPortal->MatrixThisToLinked().ApplyRotation(m_vLastKnownDirection);
 			m_vLastKnownDirection.NormalizeInPlace();
 
 			IPhysicsObject *pPhysObject = VPhysicsGetObject();

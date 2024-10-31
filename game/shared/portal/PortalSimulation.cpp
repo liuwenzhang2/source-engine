@@ -361,6 +361,11 @@ bool CPortalSimulator::Init(int entnum, int iSerialNum) {
 	bool ret = BaseClass::Init(entnum, iSerialNum);
 	return ret;
 }
+
+void CPortalSimulator::GetToolRecordingState(KeyValues* msg) {
+	BaseClass::GetToolRecordingState(msg);
+	//CPortalRenderable::GetToolRecordingState(m_bActivated, msg);
+}
 #endif // CLIENT_DLL
 
 
@@ -553,7 +558,7 @@ bool CPortalSimulator::RayIsInPortalHole(const Ray_t& ray) const
 	return pCollisionEntity->RayIsInPortalHole(ray);
 }
 
-void CPortalSimulator::TraceRay(const Ray_t& ray, unsigned int fMask, ITraceFilter* pTraceFilter, trace_t* pTrace, bool bTraceHolyWall) //traces against a specific portal's environment, does no *real* tracing
+void CPortalSimulator::TraceRay(const Ray_t& ray, unsigned int fMask, ITraceFilter* pTraceFilter, trace_t* pTrace, bool bTraceHolyWall) const//traces against a specific portal's environment, does no *real* tracing
 {
 #ifdef CLIENT_DLL
 	Assert((GameRules() == NULL) || GameRules()->IsMultiplayer());
@@ -759,7 +764,7 @@ void CPortalSimulator::TraceRay(const Ray_t& ray, unsigned int fMask, ITraceFilt
 	}
 }
 
-void CPortalSimulator::TraceEntity(CBaseEntity* pEntity, const Vector& vecAbsStart, const Vector& vecAbsEnd, unsigned int mask, ITraceFilter* pFilter, trace_t* pTrace)
+void CPortalSimulator::TraceEntity(CBaseEntity* pEntity, const Vector& vecAbsStart, const Vector& vecAbsEnd, unsigned int mask, ITraceFilter* pFilter, trace_t* pTrace) const
 {
 
 	CPortalSimulator* pLinkedPortalSimulator = this->GetLinkedPortalSimulator();
@@ -2188,7 +2193,7 @@ void CPortalSimulator::PostPhysFrame( void )
 		CPortal_Player* pPlayer = dynamic_cast<CPortal_Player*>( UTIL_GetLocalPlayer() );
 		CProp_Portal* pTouchedPortal = pPlayer->m_hPortalEnvironment.Get();
 		CPortalSimulator* pSim = GetSimulatorThatOwnsEntity( pPlayer );
-		if ( pTouchedPortal && pSim && (pTouchedPortal->m_hPortalSimulator->GetPortalSimulatorGUID() != pSim->GetPortalSimulatorGUID()) )
+		if ( pTouchedPortal && pSim && (pTouchedPortal->GetPortalSimulatorGUID() != pSim->GetPortalSimulatorGUID()) )//m_hPortalSimulator->
 		{
 			Warning ( "Player is simulated in a physics environment but isn't touching a portal! Can't teleport, but can fall through portal hole. Returning player to main environment.\n" );
 			ADD_DEBUG_HISTORY( HISTORY_PLAYER_DAMAGE, UTIL_VarArgs( "Player in PortalSimulator but not touching a portal, removing from sim at : %f\n",  gpGlobals->curtime ) );

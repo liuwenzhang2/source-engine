@@ -343,7 +343,7 @@ Vector CPropTelescopicArm::FindAimPointThroughPortal( const CProp_Portal* pPorta
 
 		if ( pLinked && pLinked->m_bActivated && pTarget )
 		{
-			VMatrix matToPortalView = pLinked->m_matrixThisToLinked;
+			VMatrix matToPortalView = pLinked->MatrixThisToLinked();
 			Vector vTargetAimPoint = pTarget->GetEngineObject()->GetAbsOrigin() + ( pTarget->GetEngineObject()->WorldAlignMins() + pTarget->GetEngineObject()->WorldAlignMaxs() ) * 0.5f;
 
 			return matToPortalView * vTargetAimPoint;

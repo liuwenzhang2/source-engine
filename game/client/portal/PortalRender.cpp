@@ -139,7 +139,7 @@ void RemovePortalViewIDChildLinkIndex( PortalViewIDNode_t *pNode, int iRemoveInd
 CPortalRenderable::CPortalRenderable( void ) : 	
 	m_bIsPlaybackPortal( false )
 {
-	m_matrixThisToLinked.Identity();
+	//m_matrixThisToLinked.Identity();
 	
 	//Portal view ID indexing setup
 	IncreasePortalViewIDChildLinkCount( &s_PortalRender.m_HeadPortalViewIDNode );

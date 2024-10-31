@@ -1110,7 +1110,7 @@ bool CNPC_RocketTurret::FindAimPointThroughPortal( const CProp_Portal* pPortal, 
 		// Portal must be facing the turret, and have a linked partner
 		if ( fDot < 0.0f && pLinked && pLinked->m_bActivated && pTarget )
 		{
-			VMatrix matToPortalView = pLinked->m_matrixThisToLinked;
+			VMatrix matToPortalView = pLinked->MatrixThisToLinked();
 			Vector vTargetAimPoint = pTarget->GetEngineObject()->GetAbsOrigin() + (pTarget->GetEngineObject()->WorldAlignMins() + pTarget->GetEngineObject()->WorldAlignMaxs()) * 0.5f;
 			*pVecOut =  matToPortalView * vTargetAimPoint;   
 			return true;
