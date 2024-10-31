@@ -3321,7 +3321,7 @@ int TestAreaPortalVisibilityThroughPortals ( CFuncAreaPortalBase* pAreaPortal, I
 		CProp_Portal* pLocalPortal = pPortals[ i ];
 		if ( pLocalPortal && pLocalPortal->m_bActivated )
 		{
-			CProp_Portal* pRemotePortal = pLocalPortal->m_hLinkedPortal.Get();
+			CProp_Portal* pRemotePortal = pLocalPortal->GetLinkedPortal();
 
 			// Make sure this portal's linked portal is in the PVS before we add what it can see
 			if ( pRemotePortal && pRemotePortal->m_bActivated && pRemotePortal->NetworkProp() && 

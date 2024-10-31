@@ -279,7 +279,7 @@ bool CPortalRenderable_Func_LiquidPortal::ShouldUpdatePortalView_BasedOnView( co
 	return IsFillingNow();
 }
 
-CPortalRenderable* CPortalRenderable_Func_LiquidPortal::GetLinkedPortal() const
+CPortalRenderable* CPortalRenderable_Func_LiquidPortal::GetLinkedPortal()
 {
 	return m_pLinkedPortal;
 }

@@ -55,7 +55,7 @@ bool UTIL_TestForOrientationVolumes( QAngle& vecCurAngles, const Vector& vecCurO
 			{
 				// This feature requires a linked portal on a floor or ceiling. Bail without effecting
 				// the placement angles if we fail those requirements.
-				CProp_Portal* pLinked = pPortal->m_hLinkedPortal.Get();
+				CProp_Portal* pLinked = ((CProp_Portal*)pPortal)->GetLinkedPortal();
 				if ( !pLinked || !(AnglesAreEqual( vecCurAngles.x, -90.0f, 0.1f ) || AnglesAreEqual( vecCurAngles.x, 90.0f, 0.1f )) )
 					return false;
 
@@ -137,7 +137,7 @@ void CFuncPortalOrientation::OnActivate( void )
 				QAngle angNewAngles;
 				if ( m_bMatchLinkedAngles )
 				{
-					CProp_Portal* pLinked = pTempPortal->m_hLinkedPortal.Get();
+					CProp_Portal* pLinked = pTempPortal->GetLinkedPortal();
 					if ( !pLinked )
 						return;
 

@@ -37,7 +37,7 @@ public:
 	virtual void			ShiftFogForExitPortalView() const;
 
 	virtual bool	ShouldUpdatePortalView_BasedOnView( const CViewSetup &currentView, Frustum currentFrustum ); //portal is both visible, and will display at least some portion of a remote view
-	virtual CPortalRenderable* GetLinkedPortal() const;
+	virtual CPortalRenderable* GetLinkedPortal();
 	virtual bool	ShouldUpdateDepthDoublerTexture( const CViewSetup &viewSetup );
 	virtual void	DrawPortal( void ); //sort of like what you'd expect to happen in C_BaseAnimating::DrawModel() if portals were fully compatible with models
 

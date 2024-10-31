@@ -93,9 +93,7 @@ END_DATADESC()
 
 IMPLEMENT_SERVERCLASS_ST( CProp_Portal, DT_Prop_Portal )
 	//SendPropEHandle(SENDINFO(m_hPortalSimulator)),
-	SendPropEHandle( SENDINFO(m_hLinkedPortal) ),
-	SendPropBool( SENDINFO(m_bActivated) ),
-	SendPropBool( SENDINFO(m_bIsPortal2) ),
+
 END_SEND_TABLE()
 
 LINK_ENTITY_TO_CLASS( prop_portal, CProp_Portal );
@@ -172,14 +170,14 @@ void CProp_Portal::UpdateOnRemove( void )
 
 	RemovePortalMicAndSpeaker();
 
-	CProp_Portal *pRemote = m_hLinkedPortal;
+	CProp_Portal *pRemote = GetLinkedPortal();
 	if( pRemote != NULL )
 	{
 		DetachFromLinked();//m_hPortalSimulator->
 		m_hLinkedPortal = NULL;
 		m_bActivated = false;
 		pRemote->UpdatePortalLinkage();
-		pRemote->UpdatePortalTeleportMatrix();
+		//pRemote->UpdatePortalTeleportMatrix();
 	}
 
 	if( m_pAttachedCloningArea )
@@ -624,7 +622,7 @@ void CProp_Portal::DoFizzleEffect( int iEffect, bool bDelayedPos /*= true*/ )
 //-----------------------------------------------------------------------------
 void CProp_Portal::FizzleThink( void )
 {
-	CProp_Portal *pRemotePortal = m_hLinkedPortal;
+	CProp_Portal *pRemotePortal = GetLinkedPortal();
 
 	RemovePortalMicAndSpeaker();
 
@@ -687,9 +685,9 @@ void CProp_Portal::RemovePortalMicAndSpeaker()
 		if ( pSpeaker )
 		{
 			// Remove the remote portal's microphone, as it references the speaker we're about to remove.
-			if ( m_hLinkedPortal.Get() )
+			if (GetLinkedPortal())
 			{
-				CProp_Portal* pRemotePortal =  m_hLinkedPortal.Get();
+				CProp_Portal* pRemotePortal = GetLinkedPortal();
 				if ( pRemotePortal->m_hMicrophone )
 				{
 					inputdata_t inputdata;
@@ -750,7 +748,7 @@ void CProp_Portal::Activate( void )
 	if( m_pAttachedCloningArea == NULL )
 		m_pAttachedCloningArea = CPhysicsCloneArea::CreatePhysicsCloneArea( this );
 
-	UpdatePortalTeleportMatrix();
+	//UpdatePortalTeleportMatrix();
 	
 	UpdatePortalLinkage();
 
@@ -779,7 +777,7 @@ void CProp_Portal::Activate( void )
 					pOther->GetEngineObject()->WorldSpaceAABB( &vWorldMins, &vWorldMaxs );
 					Vector ptOtherCenter = (vWorldMins + vWorldMaxs) / 2.0f;
 
-					if( m_plane_Origin.normal.Dot( ptOtherCenter ) > m_plane_Origin.dist )
+					if(GetPortalPlane().normal.Dot( ptOtherCenter ) > GetPortalPlane().dist )
 					{
 						//we should be interacting with this object, add it to our environment
 						if( SharedEnvironmentCheck( pOther ) )
@@ -891,7 +889,7 @@ bool CProp_Portal::ShouldTeleportTouchingEntity( CBaseEntity *pOther )
 	}
 
 	// Test for entity's center being past portal plane
-	if(GetPortalPlane().m_Normal.Dot(ptOtherCenter) < GetPortalPlane().m_Dist)//m_hPortalSimulator->m_hPortalSimulator->
+	if(GetPortalPlane().normal.Dot(ptOtherCenter) < GetPortalPlane().dist)//m_hPortalSimulator->m_hPortalSimulator->
 	{
 		//entity wants to go further into the plane
 		if( EntityIsInPortalHole( pOther ) )//m_hPortalSimulator->
@@ -1237,7 +1235,7 @@ void CProp_Portal::TeleportTouchingEntity( CBaseEntity *pOther )
 			pOtherAsPlayer->ToggleHeldObjectOnOppositeSideOfPortal();
 			if( pOtherAsPlayer->IsHeldObjectOnOppositeSideOfPortal() )
 			{
-				pOtherAsPlayer->SetHeldObjectPortal( m_hLinkedPortal );
+				pOtherAsPlayer->SetHeldObjectPortal(GetLinkedPortal());
 			}
 			else
 			{
@@ -1396,7 +1394,7 @@ void CProp_Portal::Touch( CBaseEntity *pOther )
 		//hmm, not in our environment, plane tests, sharing tests
 		if( SharedEnvironmentCheck( pOther ) )
 		{
-			bool bObjectCenterInFrontOfPortal	= (m_plane_Origin.normal.Dot( pOther->WorldSpaceCenter() ) > m_plane_Origin.dist);
+			bool bObjectCenterInFrontOfPortal	= (GetPortalPlane().normal.Dot( pOther->WorldSpaceCenter() ) > GetPortalPlane().dist);
 			bool bIsStuckPlayer					= ( pOther->IsPlayer() )? ( !UTIL_IsSpaceEmpty( pOther, pOther->GetEngineObject()->WorldAlignMins(), pOther->GetEngineObject()->WorldAlignMaxs() ) ) : ( false );
 
 			if ( bIsStuckPlayer )
@@ -1463,7 +1461,7 @@ void CProp_Portal::StartTouch( CBaseEntity *pOther )
 		pOther->GetEngineObject()->WorldSpaceAABB( &vWorldMins, &vWorldMaxs );
 		Vector ptOtherCenter = (vWorldMins + vWorldMaxs) / 2.0f;
 
-		if( m_plane_Origin.normal.Dot( ptOtherCenter ) > m_plane_Origin.dist )
+		if(GetPortalPlane().normal.Dot( ptOtherCenter ) > GetPortalPlane().dist )
 		{
 			//we should be interacting with this object, add it to our environment
 			if( SharedEnvironmentCheck( pOther ) )
@@ -1498,7 +1496,7 @@ void CProp_Portal::EndTouch( CBaseEntity *pOther )
 		TeleportTouchingEntity( pOther );
 	else if( pOther->IsPlayer() && //player
 			(GetVectorForward().z < -0.7071f) && //most likely falling out of the portal m_hPortalSimulator->
-			(GetPortalPlane().m_Normal.Dot(pOther->WorldSpaceCenter()) < GetPortalPlane().m_Dist) && //but behind the portal plane m_hPortalSimulator->
+			(GetPortalPlane().normal.Dot(pOther->WorldSpaceCenter()) < GetPortalPlane().dist) && //but behind the portal plane m_hPortalSimulator->
 			(((CPortal_Player *)pOther)->m_Local.m_bInDuckJump) ) //while ducking
 	{
 		//player has pulled their feet up (moving their center instantaneously) while falling downward out of the portal, send them back (probably only for a frame)
@@ -1651,7 +1649,7 @@ void CProp_Portal::WakeNearbyEntities( void )
 							{
 								pPortalDetector->m_OnStartTouchLinkedPortal.FireOutput( this, pPortalDetector );
 
-								if ( UTIL_IsBoxIntersectingPortal( vBoxCenter, vBoxExtents, m_hLinkedPortal ) )
+								if ( UTIL_IsBoxIntersectingPortal( vBoxCenter, vBoxExtents, GetLinkedPortal()) )
 								{
 									pPortalDetector->m_OnStartTouchBothLinkedPortals.FireOutput( this, pPortalDetector );
 								}
@@ -1762,76 +1760,16 @@ void CProp_Portal::WakeNearbyEntities( void )
 //	}	
 //}
 
-void CProp_Portal::UpdatePortalTeleportMatrix( void )
-{
-	ResetModel();
-
-	//setup our origin plane
-	GetVectors( &m_plane_Origin.normal, NULL, NULL );
-	m_plane_Origin.dist = m_plane_Origin.normal.Dot(GetEngineObject()->GetAbsOrigin() );
-	m_plane_Origin.signbits = SignbitsForPlane( &m_plane_Origin );
-
-	Vector vAbsNormal;
-	vAbsNormal.x = fabs(m_plane_Origin.normal.x);
-	vAbsNormal.y = fabs(m_plane_Origin.normal.y);
-	vAbsNormal.z = fabs(m_plane_Origin.normal.z);
-
-	if( vAbsNormal.x > vAbsNormal.y )
-	{
-		if( vAbsNormal.x > vAbsNormal.z )
-		{
-			if( vAbsNormal.x > 0.999f )
-				m_plane_Origin.type = PLANE_X;
-			else
-				m_plane_Origin.type = PLANE_ANYX;
-		}
-		else
-		{
-			if( vAbsNormal.z > 0.999f )
-				m_plane_Origin.type = PLANE_Z;
-			else
-				m_plane_Origin.type = PLANE_ANYZ;
-		}
-	}
-	else
-	{
-		if( vAbsNormal.y > vAbsNormal.z )
-		{
-			if( vAbsNormal.y > 0.999f )
-				m_plane_Origin.type = PLANE_Y;
-			else
-				m_plane_Origin.type = PLANE_ANYY;
-		}
-		else
-		{
-			if( vAbsNormal.z > 0.999f )
-				m_plane_Origin.type = PLANE_Z;
-			else
-				m_plane_Origin.type = PLANE_ANYZ;
-		}
-	}
-
-
-
-	//if ( m_hLinkedPortal != NULL )
-	//{
-	//	CProp_Portal_Shared::UpdatePortalTransformationMatrix(GetEngineObject()->EntityToWorldTransform(), m_hLinkedPortal->GetEngineObject()->EntityToWorldTransform(), &m_matrixThisToLinked );
-
-	//	m_hLinkedPortal->ResetModel();
-	//	//update the remote portal
-	//	MatrixInverseTR( m_matrixThisToLinked, m_hLinkedPortal->m_matrixThisToLinked );
-	//}
-	//else
-	//{
-	//	m_matrixThisToLinked.Identity(); //don't accidentally teleport objects to zero space
-	//}
-}
+//void CProp_Portal::UpdatePortalTeleportMatrix( void )
+//{
+//	ResetModel();
+//}
 
 void CProp_Portal::UpdatePortalLinkage( void )
 {
 	if( m_bActivated )
 	{
-		CProp_Portal *pLink = m_hLinkedPortal.Get();
+		CProp_Portal *pLink = GetLinkedPortal();
 
 		if( !(pLink && pLink->m_bActivated) )
 		{
@@ -1911,18 +1849,18 @@ void CProp_Portal::UpdatePortalLinkage( void )
 				}
 			}
 
-			if ( m_hLinkedPortal->m_hMicrophone == 0 )
+			if (GetLinkedPortal()->m_hMicrophone == 0 )
 			{
 				inputdata_t inputdata;
 
-				m_hLinkedPortal->m_hMicrophone = gEntList.CreateEntityByName( "env_microphone" );
-				CEnvMicrophone *pLinkedMicrophone = static_cast<CEnvMicrophone*>( m_hLinkedPortal->m_hMicrophone.Get() );
+				GetLinkedPortal()->m_hMicrophone = gEntList.CreateEntityByName( "env_microphone" );
+				CEnvMicrophone *pLinkedMicrophone = static_cast<CEnvMicrophone*>(GetLinkedPortal()->m_hMicrophone.Get() );
 				pLinkedMicrophone->GetEngineObject()->AddSpawnFlags( SF_MICROPHONE_IGNORE_NONATTENUATED );
 				pLinkedMicrophone->GetEngineObject()->AddSpawnFlags( SF_MICROPHONE_SOUND_COMBAT | SF_MICROPHONE_SOUND_WORLD | SF_MICROPHONE_SOUND_PLAYER | SF_MICROPHONE_SOUND_BULLET_IMPACT | SF_MICROPHONE_SOUND_EXPLOSION );
 				DispatchSpawn( pLinkedMicrophone );
 
-				m_hLinkedPortal->m_hSpeaker = gEntList.CreateEntityByName( "env_speaker" );
-				CSpeaker *pLinkedSpeaker = static_cast<CSpeaker*>( m_hLinkedPortal->m_hSpeaker.Get() );
+				GetLinkedPortal()->m_hSpeaker = gEntList.CreateEntityByName( "env_speaker" );
+				CSpeaker *pLinkedSpeaker = static_cast<CSpeaker*>(GetLinkedPortal()->m_hSpeaker.Get() );
 
 				if ( !m_bIsPortal2 )
 				{
@@ -1955,7 +1893,7 @@ void CProp_Portal::UpdatePortalLinkage( void )
 			pSpeaker->Teleport( &GetEngineObject()->GetAbsOrigin(), &GetEngineObject()->GetAbsAngles(), &vZero );
 			pSpeaker->InputTurnOn( in );
 
-			UpdatePortalTeleportMatrix();
+			//UpdatePortalTeleportMatrix();
 		}
 		else
 		{
@@ -1975,7 +1913,7 @@ void CProp_Portal::UpdatePortalLinkage( void )
 	}
 	else
 	{
-		CProp_Portal *pRemote = m_hLinkedPortal;
+		CProp_Portal *pRemote = GetLinkedPortal();
 		//apparently we've been deactivated
 		DetachFromLinked();//m_hPortalSimulator->
 		ReleaseAllEntityOwnership();//m_hPortalSimulator->
@@ -2108,19 +2046,19 @@ void CProp_Portal::NewLocation( const Vector &vOrigin, const QAngle &qAngles )
 	m_bActivated = true;
 
 	UpdatePortalLinkage();
-	UpdatePortalTeleportMatrix();
+	//UpdatePortalTeleportMatrix();
 
 	// Update the four corners of this portal for faster reference
 	UpdateCorners();
 
 	WakeNearbyEntities();
 
-	if ( m_hLinkedPortal )
+	if (GetLinkedPortal())
 	{
-		m_hLinkedPortal->WakeNearbyEntities();
+		GetLinkedPortal()->WakeNearbyEntities();
 		if( !bOtherShouldBeStatic ) 
 		{
-			m_hLinkedPortal->PunchAllPenetratingPlayers();
+			GetLinkedPortal()->PunchAllPenetratingPlayers();
 		}
 	}
 
@@ -2231,7 +2169,7 @@ void CProp_Portal::InputSetActivatedState( inputdata_t &inputdata )
 		StopParticleEffects( this );
 	}
 
-	UpdatePortalTeleportMatrix();
+	//UpdatePortalTeleportMatrix();
 
 	UpdatePortalLinkage();
 }

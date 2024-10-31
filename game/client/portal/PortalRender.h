@@ -65,7 +65,7 @@ public:
 	//-----------------------------------------------------------------------------
 	// Misc
 	//-----------------------------------------------------------------------------
-	virtual CPortalRenderable* GetLinkedPortal() const { return NULL; };
+	virtual CPortalRenderable* GetLinkedPortal() = 0;
 	virtual const VMatrix&	MatrixThisToLinked() const = 0;
 	virtual bool	ShouldUpdateDepthDoublerTexture( const CViewSetup &viewSetup ) { return false; };
 	virtual void	DrawPortal( void ) { }; //sort of like what you'd expect to happen in C_BaseAnimating::DrawModel() if portals were fully compatible with models

@@ -33,13 +33,12 @@ public:
 
 	// Handle recording for the SFM
 	virtual void GetToolRecordingState( KeyValues *msg );
-
-	CHandle<C_Prop_Portal>	m_hLinkedPortal; //the portal this portal is linked to
-	bool					m_bActivated; //a portal can exist and not be active
+	C_Prop_Portal* GetLinkedPortal() { return (C_Prop_Portal*)CPortalSimulator::GetLinkedPortal(); }
+	//CHandle<C_Prop_Portal>	m_hLinkedPortal; //the portal this portal is linked to
 	
 	bool					m_bSharedEnvironmentConfiguration; //this will be set by an instance of CPortal_Environment when two environments are in close proximity
 	
-	cplane_t				m_plane_Origin;	// The plane on which this portal is placed, normal facing outward (matching model forward vec)
+	//cplane_t				m_plane_Origin;	// The plane on which this portal is placed, normal facing outward (matching model forward vec)
 
 	virtual void			Spawn( void );
 	virtual void			Activate( void );
@@ -69,10 +68,9 @@ public:
 	virtual void			OnPreDataChanged( DataUpdateType_t updateType );
 	virtual void			OnDataChanged( DataUpdateType_t updateType );
 	virtual int				DrawModel( int flags );
-	void					UpdateOriginPlane( void );
 	void					UpdateGhostRenderables( void );
 
-	void					SetIsPortal2( bool bValue );
+	//void					SetIsPortal2( bool bValue );
 
 	bool					IsActivedAndLinked( void ) const;
 

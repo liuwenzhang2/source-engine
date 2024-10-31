@@ -338,7 +338,7 @@ Vector CPropTelescopicArm::FindAimPointThroughPortal( const CProp_Portal* pPorta
 { 
 	if ( pPortal && pPortal->m_bActivated )
 	{
-		CProp_Portal* pLinked = pPortal->m_hLinkedPortal.Get();
+		CProp_Portal* pLinked = ((CProp_Portal*)pPortal)->GetLinkedPortal();
 		CBaseEntity*  pTarget = m_hAimTarget.Get();
 
 		if ( pLinked && pLinked->m_bActivated && pTarget )

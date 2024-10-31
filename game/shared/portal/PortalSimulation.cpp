@@ -273,7 +273,7 @@ public:
 	const QAngle& GetAngles() const;
 	const VMatrix& MatrixThisToLinked() const;
 	const VMatrix& MatrixLinkedToThis() const;
-	const VPlane& GetPortalPlane() const;
+	const cplane_t& GetPortalPlane() const;
 	const PS_InternalData_t& GetDataAccess() const;
 	const Vector& GetVectorForward() const;
 	const Vector& GetVectorUp() const;
@@ -317,8 +317,14 @@ IMPLEMENT_NETWORKCLASS_ALIASED(PortalSimulator, DT_PortalSimulator);
 BEGIN_NETWORK_TABLE(CPortalSimulator, DT_PortalSimulator)
 #if !defined( CLIENT_DLL )
 	SendPropEHandle(SENDINFO(pCollisionEntity)),
+	SendPropEHandle(SENDINFO(m_hLinkedPortal)),
+	SendPropBool(SENDINFO(m_bActivated)),
+	SendPropBool(SENDINFO(m_bIsPortal2)),
 #else
 	RecvPropEHandle(RECVINFO(pCollisionEntity)),
+	RecvPropEHandle(RECVINFO(m_hLinkedPortal)),
+	RecvPropBool(RECVINFO(m_bActivated)),
+	RecvPropBool(RECVINFO(m_bIsPortal2)),
 #endif
 END_NETWORK_TABLE()
 
@@ -337,7 +343,8 @@ CPortalSimulator::CPortalSimulator( void )
 #ifdef CLIENT_DLL
 	m_bGenerateCollision = (GameRules() && GameRules()->IsMultiplayer());
 #endif
-
+	m_bActivated = false;
+	m_bIsPortal2 = false;
 	m_CreationChecklist.bPolyhedronsGenerated = false;
 	m_CreationChecklist.bLocalCollisionGenerated = false;
 	m_CreationChecklist.bLinkedCollisionGenerated = false;
@@ -443,7 +450,7 @@ void CPortalSimulator::MoveTo( const Vector &ptCenter, const QAngle &angles )
 			++iFixEntityCount;
 		}
 	}
-	VPlane OldPlane = pCollisionEntity->m_InternalData.Placement.PortalPlane; //used in fixing code
+	cplane_t OldPlane = pCollisionEntity->m_InternalData.Placement.PortalPlane; //used in fixing code
 #endif
 
 	//update geometric data
@@ -470,7 +477,7 @@ void CPortalSimulator::MoveTo( const Vector &ptCenter, const QAngle &angles )
 		{
 			//this entity is most definitely stuck in a solid wall right now
 			//pFixEntities[i]->SetAbsOrigin( pFixEntities[i]->GetAbsOrigin() + (OldPlane.m_Normal * 50.0f) );
-			FindClosestPassableSpace( pFixEntities[i], OldPlane.m_Normal );
+			FindClosestPassableSpace( pFixEntities[i], OldPlane.normal );
 			continue;
 		}
 
@@ -2644,6 +2651,7 @@ void CPSCollisionEntity::UpdateOnRemove( void )
 	if (m_pOwningSimulator) {
 		m_pOwningSimulator->EntFlags[entindex()] &= ~PSEF_OWNS_PHYSICS;
 		m_pOwningSimulator->MarkAsReleased(this);
+		m_pOwningSimulator->m_bActivated = false;
 		m_pOwningSimulator->pCollisionEntity = NULL;
 		m_pOwningSimulator = NULL;
 	}
@@ -2750,8 +2758,49 @@ void CPSCollisionEntity::MoveTo(const Vector& ptCenter, const QAngle& angles)
 		m_InternalData.Placement.ptCenter = ptCenter;
 		m_InternalData.Placement.qAngles = angles;
 		AngleVectors(angles, &m_InternalData.Placement.vForward, &m_InternalData.Placement.vRight, &m_InternalData.Placement.vUp);
+		m_InternalData.Placement.PortalPlane.normal = m_InternalData.Placement.vForward;
+		m_InternalData.Placement.PortalPlane.dist = m_InternalData.Placement.PortalPlane.normal.Dot(m_InternalData.Placement.ptCenter);
+		m_InternalData.Placement.PortalPlane.signbits = SignbitsForPlane(&m_InternalData.Placement.PortalPlane);
+		//m_InternalData.Placement.PortalPlane.Init(m_InternalData.Placement.vForward, m_InternalData.Placement.vForward.Dot(m_InternalData.Placement.ptCenter));
+		Vector vAbsNormal;
+		vAbsNormal.x = fabs(m_InternalData.Placement.PortalPlane.normal.x);
+		vAbsNormal.y = fabs(m_InternalData.Placement.PortalPlane.normal.y);
+		vAbsNormal.z = fabs(m_InternalData.Placement.PortalPlane.normal.z);
 
-		m_InternalData.Placement.PortalPlane.Init(m_InternalData.Placement.vForward, m_InternalData.Placement.vForward.Dot(m_InternalData.Placement.ptCenter));
+		if (vAbsNormal.x > vAbsNormal.y)
+		{
+			if (vAbsNormal.x > vAbsNormal.z)
+			{
+				if (vAbsNormal.x > 0.999f)
+					m_InternalData.Placement.PortalPlane.type = PLANE_X;
+				else
+					m_InternalData.Placement.PortalPlane.type = PLANE_ANYX;
+			}
+			else
+			{
+				if (vAbsNormal.z > 0.999f)
+					m_InternalData.Placement.PortalPlane.type = PLANE_Z;
+				else
+					m_InternalData.Placement.PortalPlane.type = PLANE_ANYZ;
+			}
+		}
+		else
+		{
+			if (vAbsNormal.y > vAbsNormal.z)
+			{
+				if (vAbsNormal.y > 0.999f)
+					m_InternalData.Placement.PortalPlane.type = PLANE_Y;
+				else
+					m_InternalData.Placement.PortalPlane.type = PLANE_ANYY;
+			}
+			else
+			{
+				if (vAbsNormal.z > 0.999f)
+					m_InternalData.Placement.PortalPlane.type = PLANE_Z;
+				else
+					m_InternalData.Placement.PortalPlane.type = PLANE_ANYZ;
+			}
+		}
 	}
 }
 
@@ -2963,7 +3012,7 @@ void CPSCollisionEntity::RemoveEntityFromPortalHole(CBaseEntity* pEntity) //if t
 {
 	if (EntityIsInPortalHole(pEntity))
 	{
-		FindClosestPassableSpace(pEntity, m_InternalData.Placement.PortalPlane.m_Normal);
+		FindClosestPassableSpace(pEntity, m_InternalData.Placement.PortalPlane.normal);
 	}
 }
 
@@ -2993,7 +3042,7 @@ const VMatrix& CPSCollisionEntity::MatrixLinkedToThis() const
 	return m_InternalData.Placement.matLinkedToThis;
 }
 
-const VPlane& CPSCollisionEntity::GetPortalPlane() const 
+const cplane_t& CPSCollisionEntity::GetPortalPlane() const
 {
 	return m_DataAccess.Placement.PortalPlane;
 }
@@ -3026,20 +3075,20 @@ void CPSCollisionEntity::CreatePolyhedrons(void)
 	//forward reverse conventions signify whether the normal is the same direction as m_InternalData.Placement.PortalPlane.m_Normal
 //World and wall conventions signify whether it's been shifted in front of the portal plane or behind it
 
-	float fWorldClipPlane_Forward[4] = { m_InternalData.Placement.PortalPlane.m_Normal.x,
-											m_InternalData.Placement.PortalPlane.m_Normal.y,
-											m_InternalData.Placement.PortalPlane.m_Normal.z,
-											m_InternalData.Placement.PortalPlane.m_Dist + PORTAL_WORLD_WALL_HALF_SEPARATION_AMOUNT };
+	float fWorldClipPlane_Forward[4] = { m_InternalData.Placement.PortalPlane.normal.x,
+											m_InternalData.Placement.PortalPlane.normal.y,
+											m_InternalData.Placement.PortalPlane.normal.z,
+											m_InternalData.Placement.PortalPlane.dist + PORTAL_WORLD_WALL_HALF_SEPARATION_AMOUNT };
 
 	float fWorldClipPlane_Reverse[4] = { -fWorldClipPlane_Forward[0],
 											-fWorldClipPlane_Forward[1],
 											-fWorldClipPlane_Forward[2],
 											-fWorldClipPlane_Forward[3] };
 
-	float fWallClipPlane_Forward[4] = { m_InternalData.Placement.PortalPlane.m_Normal.x,
-											m_InternalData.Placement.PortalPlane.m_Normal.y,
-											m_InternalData.Placement.PortalPlane.m_Normal.z,
-											m_InternalData.Placement.PortalPlane.m_Dist }; // - PORTAL_WORLD_WALL_HALF_SEPARATION_AMOUNT
+	float fWallClipPlane_Forward[4] = { m_InternalData.Placement.PortalPlane.normal.x,
+											m_InternalData.Placement.PortalPlane.normal.y,
+											m_InternalData.Placement.PortalPlane.normal.z,
+											m_InternalData.Placement.PortalPlane.dist }; // - PORTAL_WORLD_WALL_HALF_SEPARATION_AMOUNT
 
 	//float fWallClipPlane_Reverse[4] = {		-fWallClipPlane_Forward[0],
 	//										-fWallClipPlane_Forward[1],
@@ -3744,15 +3793,15 @@ void CPSCollisionEntity::CreateHoleShapeCollideable()
 		float fHolePlanes[6 * 4];
 
 		//first and second planes are always forward and backward planes
-		fHolePlanes[(0 * 4) + 0] = m_InternalData.Placement.PortalPlane.m_Normal.x;
-		fHolePlanes[(0 * 4) + 1] = m_InternalData.Placement.PortalPlane.m_Normal.y;
-		fHolePlanes[(0 * 4) + 2] = m_InternalData.Placement.PortalPlane.m_Normal.z;
-		fHolePlanes[(0 * 4) + 3] = m_InternalData.Placement.PortalPlane.m_Dist - 0.5f;
+		fHolePlanes[(0 * 4) + 0] = m_InternalData.Placement.PortalPlane.normal.x;
+		fHolePlanes[(0 * 4) + 1] = m_InternalData.Placement.PortalPlane.normal.y;
+		fHolePlanes[(0 * 4) + 2] = m_InternalData.Placement.PortalPlane.normal.z;
+		fHolePlanes[(0 * 4) + 3] = m_InternalData.Placement.PortalPlane.dist - 0.5f;
 
-		fHolePlanes[(1 * 4) + 0] = -m_InternalData.Placement.PortalPlane.m_Normal.x;
-		fHolePlanes[(1 * 4) + 1] = -m_InternalData.Placement.PortalPlane.m_Normal.y;
-		fHolePlanes[(1 * 4) + 2] = -m_InternalData.Placement.PortalPlane.m_Normal.z;
-		fHolePlanes[(1 * 4) + 3] = (-m_InternalData.Placement.PortalPlane.m_Dist) + 500.0f;
+		fHolePlanes[(1 * 4) + 0] = -m_InternalData.Placement.PortalPlane.normal.x;
+		fHolePlanes[(1 * 4) + 1] = -m_InternalData.Placement.PortalPlane.normal.y;
+		fHolePlanes[(1 * 4) + 2] = -m_InternalData.Placement.PortalPlane.normal.z;
+		fHolePlanes[(1 * 4) + 3] = (-m_InternalData.Placement.PortalPlane.dist) + 500.0f;
 
 
 		//the remaining planes will always have the same ordering of normals, with different distances plugged in for each convex we're creating
@@ -3810,7 +3859,7 @@ const Vector& CPortalSimulator::GetOrigin() const { return pCollisionEntity->Get
 const QAngle& CPortalSimulator::GetAngles() const { return pCollisionEntity->GetAngles(); }
 const VMatrix& CPortalSimulator::MatrixThisToLinked() const { return pCollisionEntity->MatrixThisToLinked(); }
 const VMatrix& CPortalSimulator::MatrixLinkedToThis() const { return pCollisionEntity->MatrixLinkedToThis(); }
-const VPlane& CPortalSimulator::GetPortalPlane() const { return pCollisionEntity->GetPortalPlane(); }
+const cplane_t& CPortalSimulator::GetPortalPlane() const { return pCollisionEntity->GetPortalPlane(); }
 const PS_InternalData_t& CPortalSimulator::GetDataAccess() const { return pCollisionEntity->GetDataAccess(); }
 const Vector& CPortalSimulator::GetVectorForward() const { return pCollisionEntity->GetVectorForward(); }
 const Vector& CPortalSimulator::GetVectorUp() const { return pCollisionEntity->GetVectorUp(); }

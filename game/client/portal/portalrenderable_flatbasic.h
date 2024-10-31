@@ -76,7 +76,7 @@ public:
 
 	bool			WillUseDepthDoublerThisDraw( void ) const; //returns true if the DrawPortal() would draw a depth doubler mesh if you were to call it right now
 
-	virtual CPortalRenderable *GetLinkedPortal() const { return m_pLinkedPortal; };
+	virtual CPortalRenderable_FlatBasic* GetLinkedPortal() { return (CPortalRenderable_FlatBasic*)CPortalSimulator::GetLinkedPortal(); }
 	bool			CalcFrustumThroughPortal( const Vector &ptCurrentViewOrigin, Frustum OutputFrustum );
 
 protected:
@@ -110,13 +110,13 @@ protected:
 	FlatBasicPortal_InternalData_t m_InternallyMaintainedData;
 
 public:
-	CPortalRenderable_FlatBasic	*m_pLinkedPortal;
+	//CPortalRenderable_FlatBasic	*m_pLinkedPortal;
 	Vector			m_ptOrigin;
 	Vector			m_vForward, m_vUp, m_vRight;
 	float			m_fStaticAmount;
 	float			m_fSecondaryStaticAmount; // used to help kludge the end of our recursive rendering chain
 	float			m_fOpenAmount;	
-	bool			m_bIsPortal2; //for any set of portals, one must be portal 1, and the other portal 2. Uses different render targets
+	//bool			m_bIsPortal2; //for any set of portals, one must be portal 1, and the other portal 2. Uses different render targets
 };
 
 #endif //#ifndef PORTALRENDERABLE_FLATBASIC_H

@@ -45,9 +45,7 @@ LINK_ENTITY_TO_CLASS( prop_portal, C_Prop_Portal );
 
 IMPLEMENT_CLIENTCLASS_DT( C_Prop_Portal, DT_Prop_Portal, CProp_Portal )
 	//RecvPropEHandle(RECVINFO(m_hPortalSimulator)),
-	RecvPropEHandle( RECVINFO(m_hLinkedPortal) ),
-	RecvPropBool( RECVINFO(m_bActivated) ),
-	RecvPropBool( RECVINFO(m_bIsPortal2) ),
+
 END_RECV_TABLE()
 
 
@@ -292,10 +290,10 @@ void C_Prop_Portal::Simulate()
 	if( iEntsNearPortal != 0 )
 	{
 		float fClipPlane[4];
-		fClipPlane[0] = m_plane_Origin.normal.x;
-		fClipPlane[1] = m_plane_Origin.normal.y;
-		fClipPlane[2] = m_plane_Origin.normal.z;
-		fClipPlane[3] = m_plane_Origin.dist - 0.3f;
+		fClipPlane[0] = GetPortalPlane().normal.x;
+		fClipPlane[1] = GetPortalPlane().normal.y;
+		fClipPlane[2] = GetPortalPlane().normal.z;
+		fClipPlane[3] = GetPortalPlane().dist - 0.3f;
 
 		for( int i = 0; i != iEntsNearPortal; ++i )
 		{
@@ -348,7 +346,7 @@ void C_Prop_Portal::Simulate()
 			if( bActivePlayerWeapon )
 				ptEntCenter = pWeapon->GetOwner()->WorldSpaceCenter();
 
-			if( (m_plane_Origin.normal.Dot( ptEntCenter ) - m_plane_Origin.dist) < -5.0f )
+			if( (GetPortalPlane().normal.Dot( ptEntCenter ) - GetPortalPlane().dist) < -5.0f )
 				continue; //entity is behind the portal, most likely behind the wall the portal is placed on
 
 			if( !CProp_Portal_Shared::IsEntityTeleportable( pEntity ) )
@@ -474,12 +472,12 @@ void C_Prop_Portal::Simulate()
 	}
 
 	//ensure the shared clip plane is up to date
-	C_Prop_Portal *pLinkedPortal = m_hLinkedPortal.Get();
+	C_Prop_Portal *pLinkedPortal = GetLinkedPortal();
 
-	m_fGhostRenderablesClip[0] = pLinkedPortal->m_plane_Origin.normal.x;
-	m_fGhostRenderablesClip[1] = pLinkedPortal->m_plane_Origin.normal.y;
-	m_fGhostRenderablesClip[2] = pLinkedPortal->m_plane_Origin.normal.z;
-	m_fGhostRenderablesClip[3] = pLinkedPortal->m_plane_Origin.dist - 0.75f;
+	m_fGhostRenderablesClip[0] = pLinkedPortal->GetPortalPlane().normal.x;
+	m_fGhostRenderablesClip[1] = pLinkedPortal->GetPortalPlane().normal.y;
+	m_fGhostRenderablesClip[2] = pLinkedPortal->GetPortalPlane().normal.z;
+	m_fGhostRenderablesClip[3] = pLinkedPortal->GetPortalPlane().dist - 0.75f;
 }
 
 void C_Prop_Portal::UpdateOnRemove( void )
@@ -552,7 +550,7 @@ void C_Prop_Portal::OnPreDataChanged( DataUpdateType_t updateType )
 
 void C_Prop_Portal::OnDataChanged( DataUpdateType_t updateType )
 {
-	C_Prop_Portal *pRemote = m_hLinkedPortal;
+	C_Prop_Portal *pRemote = GetLinkedPortal();
 	m_pLinkedPortal = pRemote;
 	GetEngineObject()->GetVectors( &m_vForward, &m_vRight, &m_vUp );
 	m_ptOrigin = GetEngineObject()->GetNetworkOrigin();
@@ -579,9 +577,9 @@ void C_Prop_Portal::OnDataChanged( DataUpdateType_t updateType )
 		 
 		if( bPortalMoved )
 		{			
-			Vector ptForwardOrigin = m_ptOrigin + m_vForward;// * 3.0f;
-			Vector vScaledRight = m_vRight * (PORTAL_HALF_WIDTH * 0.95f);
-			Vector vScaledUp = m_vUp * (PORTAL_HALF_HEIGHT  * 0.95f);
+			//Vector ptForwardOrigin = m_ptOrigin + m_vForward;// * 3.0f;
+			//Vector vScaledRight = m_vRight * (PORTAL_HALF_WIDTH * 0.95f);
+			//Vector vScaledUp = m_vUp * (PORTAL_HALF_HEIGHT  * 0.95f);
 
 			MoveTo(GetEngineObject()->GetNetworkOrigin(), GetEngineObject()->GetNetworkAngles() );//m_hPortalSimulator->
 
@@ -831,7 +829,7 @@ void C_Prop_Portal::OnDataChanged( DataUpdateType_t updateType )
 
 	if ( bPortalMoved )
 	{
-		UpdateOriginPlane();
+		//UpdateOriginPlane();
 	}
 
 	if( bPortalMoved || bNewLinkage )
@@ -861,7 +859,7 @@ int C_Prop_Portal::DrawModel( int flags )
 
 	int iRetVal = 0;
 
-	C_Prop_Portal *pLinkedPortal = m_hLinkedPortal.Get();
+	C_Prop_Portal *pLinkedPortal = GetLinkedPortal();
 
 	if ( pLinkedPortal == NULL )
 	{
@@ -900,58 +898,10 @@ void C_Prop_Portal::GetToolRecordingState( KeyValues *msg )
 	}
 }
 
-void C_Prop_Portal::UpdateOriginPlane( void )
-{
-	//setup our origin plane
-	GetEngineObject()->GetVectors( &m_plane_Origin.normal, NULL, NULL );
-	m_plane_Origin.dist = m_plane_Origin.normal.Dot(GetEngineObject()->GetAbsOrigin() );
-	m_plane_Origin.signbits = SignbitsForPlane( &m_plane_Origin );
-
-	Vector vAbsNormal;
-	vAbsNormal.x = fabs(m_plane_Origin.normal.x);
-	vAbsNormal.y = fabs(m_plane_Origin.normal.y);
-	vAbsNormal.z = fabs(m_plane_Origin.normal.z);
-
-	if( vAbsNormal.x > vAbsNormal.y )
-	{
-		if( vAbsNormal.x > vAbsNormal.z )
-		{
-			if( vAbsNormal.x > 0.999f )
-				m_plane_Origin.type = PLANE_X;
-			else
-				m_plane_Origin.type = PLANE_ANYX;
-		}
-		else
-		{
-			if( vAbsNormal.z > 0.999f )
-				m_plane_Origin.type = PLANE_Z;
-			else
-				m_plane_Origin.type = PLANE_ANYZ;
-		}
-	}
-	else
-	{
-		if( vAbsNormal.y > vAbsNormal.z )
-		{
-			if( vAbsNormal.y > 0.999f )
-				m_plane_Origin.type = PLANE_Y;
-			else
-				m_plane_Origin.type = PLANE_ANYY;
-		}
-		else
-		{
-			if( vAbsNormal.z > 0.999f )
-				m_plane_Origin.type = PLANE_Z;
-			else
-				m_plane_Origin.type = PLANE_ANYZ;
-		}
-	}
-}
-
-void C_Prop_Portal::SetIsPortal2( bool bValue )
-{
-	m_bIsPortal2 = bValue;
-}
+//void C_Prop_Portal::SetIsPortal2( bool bValue )
+//{
+//	m_bIsPortal2 = bValue;
+//}
 
 bool C_Prop_Portal::IsActivedAndLinked( void ) const
 {

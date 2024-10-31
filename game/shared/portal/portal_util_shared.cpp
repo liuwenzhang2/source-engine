@@ -82,7 +82,7 @@ CProp_Portal* UTIL_Portal_FirstAlongRay( const Ray_t &ray, float &fMustBeCloserT
 				if( fIntersection >= 0.0f && fIntersection < fMustBeCloserThan )
 				{
 					//within range, now check directionality
-					if( pTempPortal->m_plane_Origin.normal.Dot( ray.m_Delta ) < 0.0f )
+					if( pTempPortal->GetPortalPlane().normal.Dot(ray.m_Delta) < 0.0f)
 					{
 						//qualifies for consideration, now it just has to compete for closest
 						pIntersectedPortal = pTempPortal;
@@ -402,7 +402,7 @@ bool UTIL_DidTraceTouchPortals( const Ray_t& ray, const trace_t& trace, CProp_Po
 			*pOutLocal = pIntersectedPortal;
 
 		if( pOutRemote )
-			*pOutRemote = pIntersectedPortal->m_hLinkedPortal.Get();
+			*pOutRemote = pIntersectedPortal->GetLinkedPortal();
 
 		return true;
 	}
@@ -669,7 +669,7 @@ float UTIL_Portal_DistanceThroughPortalSqr( const CProp_Portal *pPortal, const V
 	if ( !pPortal || !pPortal->m_bActivated )
 		return -1.0f;
 
-	CProp_Portal *pPortalLinked = pPortal->m_hLinkedPortal;
+	CProp_Portal *pPortalLinked = ((CProp_Portal*)pPortal)->GetLinkedPortal();
 	if ( !pPortalLinked || !pPortalLinked->m_bActivated )
 		return -1.0f;
 
@@ -701,7 +701,7 @@ float UTIL_Portal_ShortestDistanceSqr( const Vector &vPoint1, const Vector &vPoi
 		CProp_Portal *pTempPortal = pPortals[i];
 		if( pTempPortal->m_bActivated )
 		{
-			CProp_Portal *pLinkedPortal = pTempPortal->m_hLinkedPortal.Get();
+			CProp_Portal *pLinkedPortal = pTempPortal->GetLinkedPortal();
 			if( pLinkedPortal != NULL )
 			{
 				Vector vPoint1Transformed = pTempPortal->MatrixThisToLinked() * vPoint1;
@@ -711,8 +711,8 @@ float UTIL_Portal_ShortestDistanceSqr( const Vector &vPoint1, const Vector &vPoi
 				{
 					//worth investigating further
 					//find out if it's a straight line through the portal, or if we have to wrap around a corner
-					float fPoint1TransformedDist = pLinkedPortal->m_plane_Origin.normal.Dot( vPoint1Transformed ) - pLinkedPortal->m_plane_Origin.dist;
-					float fPoint2Dist = pLinkedPortal->m_plane_Origin.normal.Dot( vPoint2 ) - pLinkedPortal->m_plane_Origin.dist;
+					float fPoint1TransformedDist = pLinkedPortal->GetPortalPlane().normal.Dot( vPoint1Transformed ) - pLinkedPortal->GetPortalPlane().dist;
+					float fPoint2Dist = pLinkedPortal->GetPortalPlane().normal.Dot( vPoint2 ) - pLinkedPortal->GetPortalPlane().dist;
 
 					bool bStraightLine = true;
 					if( (fPoint1TransformedDist > 0.0f) || (fPoint2Dist < 0.0f) ) //straight line through portal impossible, part of the line has to backtrack to get to the portal surface

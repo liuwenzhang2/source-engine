@@ -33,12 +33,11 @@ public:
 							CProp_Portal( void );
 	virtual					~CProp_Portal( void );
 
-	CNetworkHandle( CProp_Portal, m_hLinkedPortal ); //the portal this portal is linked to
-	
+	//CNetworkHandle( CProp_Portal, m_hLinkedPortal ); //the portal this portal is linked to
+	CProp_Portal* GetLinkedPortal() { return (CProp_Portal*)CPortalSimulator::GetLinkedPortal(); }
 
 	//VMatrix					m_matrixThisToLinked; //the matrix that will transform a point relative to this portal, to a point relative to the linked portal
-	CNetworkVar( bool, m_bActivated ); //a portal can exist and not be active
-	CNetworkVar( bool, m_bIsPortal2 ); //For teleportation, this doesn't matter, but for drawing and moving, it matters
+
 	Vector	m_vPrevForward; //used for the indecisive push in find closest passable spaces when portal is moved
 
 	bool	m_bSharedEnvironmentConfiguration; //this will be set by an instance of CPortal_Environment when two environments are in close proximity
@@ -56,12 +55,11 @@ public:
 
 	COutputEvent m_OnPlacedSuccessfully;		// Output in hammer for when this portal was successfully placed (not attempted and fizzed).
 
-	cplane_t m_plane_Origin; //a portal plane on the entity origin
+	//cplane_t m_plane_Origin; //a portal plane on the entity origin
 
 	CPhysicsCloneArea		*m_pAttachedCloningArea;
 	
-	bool	IsPortal2() const;
-	void	SetIsPortal2( bool bIsPortal2 );
+
 	//const VMatrix& MatrixThisToLinked() const;
 
 	virtual int UpdateTransmitState( void )	// set transmit filter to transmit always
@@ -108,7 +106,7 @@ public:
 	void					InputNewLocation( inputdata_t &inputdata );
 
 	void					UpdatePortalLinkage( void );
-	void					UpdatePortalTeleportMatrix( void ); //computes the transformation from this portal to the linked portal, and will update the remote matrix as well
+	//void					UpdatePortalTeleportMatrix( void ); //computes the transformation from this portal to the linked portal, and will update the remote matrix as well
 
 	//void					SendInteractionMessage( CBaseEntity *pEntity, bool bEntering ); //informs clients that the entity is interacting with a portal (mostly used for clip planes)
 
@@ -144,18 +142,7 @@ public:
 };
 
 
-//-----------------------------------------------------------------------------
-// inline state querying methods
-//-----------------------------------------------------------------------------
-inline bool	CProp_Portal::IsPortal2() const
-{
-	return m_bIsPortal2;
-}
 
-inline void	CProp_Portal::SetIsPortal2( bool bIsPortal2 )
-{
-	m_bIsPortal2 = bIsPortal2;
-}
 
 //inline const VMatrix& CProp_Portal::MatrixThisToLinked() const
 //{

@@ -103,7 +103,7 @@ struct PS_PlacementData_t //stuff useful for geometric operations
 	Vector vForward;
 	Vector vUp;
 	Vector vRight;
-	VPlane PortalPlane;
+	cplane_t PortalPlane;
 	VMatrix matThisToLinked;
 	VMatrix matLinkedToThis;
 	PortalTransformAsAngledPosition_t ptaap_ThisToLinked;
@@ -312,7 +312,7 @@ public:
 	void				AttachTo( CPortalSimulator *pLinkedPortalSimulator );
 	void				DetachFromLinked( void ); //detach portals to sever the connection, saves work when planning on moving both portals
 	CPortalSimulator	*GetLinkedPortalSimulator( void ) const;
-
+	CPortalSimulator*	GetLinkedPortal() { return m_hLinkedPortal.Get(); }
 	void				SetPortalSimulatorCallbacks( CPortalSimulatorEventCallbacks *pCallbacks );
 	
 	bool				IsReadyToSimulate( void ) const; //is active and linked to another portal
@@ -320,7 +320,7 @@ public:
 	const QAngle& GetAngles() const;
 	const VMatrix&		MatrixThisToLinked() const;
 	const VMatrix&		MatrixLinkedToThis() const;
-	const VPlane&		GetPortalPlane() const;
+	const cplane_t&		GetPortalPlane() const;
 	const PS_InternalData_t& GetDataAccess() const;
 	const Vector& GetVectorForward() const;
 	const Vector& GetVectorUp() const;
@@ -368,13 +368,15 @@ public:
 #ifdef PORTAL_SIMULATORS_EMBED_GUID
 	int					GetPortalSimulatorGUID( void ) const { return m_iPortalSimulatorGUID; };
 #endif
-
+	bool	IsPortal2() const;
+	void	SetIsPortal2(bool bIsPortal2);
 protected:
 	bool				m_bLocalDataIsReady; //this side of the portal is properly setup, no guarantees as to linkage to another portal
 	bool				m_bSimulateVPhysics;
 	bool				m_bGenerateCollision;
 	bool				m_bSharedCollisionConfiguration; //when portals are in certain configurations, they need to cross-clip and share some collision data and things get nasty. For the love of all that is holy, pray that this is false.
 	CPortalSimulator	*m_pLinkedPortal;
+	CNetworkHandle(CPortalSimulator, m_hLinkedPortal); //the portal this portal is linked to
 	bool				m_bInCrossLinkedFunction; //A flag to mark that we're already in a linked function and that the linked portal shouldn't call our side
 	CPortalSimulatorEventCallbacks *m_pCallbacks; 
 #ifdef PORTAL_SIMULATORS_EMBED_GUID
@@ -431,12 +433,27 @@ protected:
 	PS_SD_Dynamic_PhysicsShadowClones_t ShadowClones;
 	CUtlVector<CBaseEntity*> OwnedEntities;
 	IPhysicsEnvironment* pPhysicsEnvironment = NULL;
+	CNetworkVar(bool, m_bActivated); //a portal can exist and not be active
+	CNetworkVar(bool, m_bIsPortal2); //For teleportation, this doesn't matter, but for drawing and moving, it matters
 
 public:
 	unsigned int EntFlags[MAX_EDICTS]; //flags maintained for every entity in the world based on its index
 
 	friend class CPS_AutoGameSys_EntityListener;
 };
+
+//-----------------------------------------------------------------------------
+// inline state querying methods
+//-----------------------------------------------------------------------------
+inline bool	CPortalSimulator::IsPortal2() const
+{
+	return m_bIsPortal2;
+}
+
+inline void	CPortalSimulator::SetIsPortal2(bool bIsPortal2)
+{
+	m_bIsPortal2 = bIsPortal2;
+}
 
 extern CUtlVector<CPortalSimulator *> const &g_PortalSimulators;
 

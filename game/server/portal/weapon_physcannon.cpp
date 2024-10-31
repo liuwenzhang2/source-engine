@@ -3069,7 +3069,7 @@ bool CGrabController::UpdateObject( CBasePlayer *pPlayer, float flError )
 	// Translate hold position and angles across portal
 	if ( pPortalPlayer->IsHeldObjectOnOppositeSideOfPortal() )
 	{
-		CProp_Portal *pPortalLinked = pPortal->m_hLinkedPortal;
+		CProp_Portal *pPortalLinked = pPortal->GetLinkedPortal();
 		if ( pPortal && pPortal->m_bActivated && pPortalLinked != NULL )
 		{
 			Vector vTeleportedPosition;

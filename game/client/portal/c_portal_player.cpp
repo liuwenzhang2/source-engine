@@ -1524,7 +1524,7 @@ void C_Portal_Player::CalcPortalView( Vector &eyeOrigin, QAngle &eyeAngles )
 	C_Prop_Portal *pPortal = m_hPortalEnvironment.Get();
 	assert( pPortal );
 
-	C_Prop_Portal *pRemotePortal = pPortal->m_hLinkedPortal;
+	C_Prop_Portal *pRemotePortal = pPortal->GetLinkedPortal();
 	if( !pRemotePortal )
 	{
 		return; //no hacks possible/necessary

@@ -2063,7 +2063,7 @@ void CPortal_Player::UpdatePortalViewAreaBits( unsigned char *pvs, int pvssize )
 		// Make sure this portal is active before adding it's location to the pvs
 		if ( pLocalPortal && pLocalPortal->m_bActivated )
 		{
-			CProp_Portal* pRemotePortal = pLocalPortal->m_hLinkedPortal.Get();
+			CProp_Portal* pRemotePortal = pLocalPortal->GetLinkedPortal();
 
 			// Make sure this portal's linked portal is in the PVS before we add what it can see
 			if ( pRemotePortal && pRemotePortal->m_bActivated && pRemotePortal->NetworkProp() && 
@@ -2172,7 +2172,7 @@ void CPortal_Player::SetupVisibility( CBaseEntity *pViewEntity, unsigned char *p
 	{
 		CProp_Portal *pPortal = NULL, *pRemotePortal = NULL;
 		pPortal = m_hPortalEnvironment;
-		pRemotePortal = pPortal->m_hLinkedPortal;
+		pRemotePortal = pPortal->GetLinkedPortal();
 
 		if ( pPortal && pRemotePortal && pPortal->m_bActivated && pRemotePortal->m_bActivated )
 		{		

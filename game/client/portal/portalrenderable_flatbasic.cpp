@@ -74,15 +74,15 @@ LINK_ENTITY_TO_CLASS( prop_portal_flatbasic, CPortalRenderable_FlatBasic );
 
 
 CPortalRenderable_FlatBasic::CPortalRenderable_FlatBasic( void ) 
-: m_pLinkedPortal( NULL ),
+: //m_pLinkedPortal( NULL ),
 	m_ptOrigin( 0.0f, 0.0f, 0.0f ),
 	m_vForward( 1.0f, 0.0f, 0.0f ),
 	m_vUp( 0.0f, 0.0f, 1.0f ),
 	m_vRight( 0.0f, 1.0f, 0.0f ),
 	m_fStaticAmount( 0.0f ),
 	m_fSecondaryStaticAmount( 0.0f ),
-	m_fOpenAmount( 0.0f ),
-	m_bIsPortal2( false )
+	m_fOpenAmount( 0.0f )
+	//,m_bIsPortal2( false )
 {
 	m_InternallyMaintainedData.m_VisData.m_fDistToAreaPortalTolerance = 64.0f;
 	m_InternallyMaintainedData.m_VisData.m_vecVisOrigin = Vector(0,0,0);
@@ -110,7 +110,7 @@ void CPortalRenderable_FlatBasic::GetToolRecordingState( bool bActive, KeyValues
 	BaseClass::GetToolRecordingState( msg );
 	CPortalRenderable::GetToolRecordingState( bActive, msg );
 
-	C_Prop_Portal *pLinkedPortal = static_cast<C_Prop_Portal*>( m_pLinkedPortal );
+	C_Prop_Portal *pLinkedPortal = static_cast<C_Prop_Portal*>(GetLinkedPortal());
 
 	static PortalRecordingState_t state;
 	state.m_nPortalId = static_cast<C_Prop_Portal*>( this )->entindex();
@@ -173,12 +173,12 @@ void CPortalRenderable_FlatBasic::PortalMoved( void )
 
 	//update depth doubler usability flag
 	m_InternallyMaintainedData.m_bUsableDepthDoublerConfiguration = 
-		( m_pLinkedPortal && //linked to another portal
-		( m_vForward.Dot( m_pLinkedPortal->m_ptOrigin - m_ptOrigin ) > 0.0f ) && //this portal looking in the general direction of the other portal
-		( m_vForward.Dot( m_pLinkedPortal->m_vForward ) < -0.7071f ) ); //within 45 degrees of facing directly at each other
+		(GetLinkedPortal() && //linked to another portal
+		( m_vForward.Dot(GetLinkedPortal()->m_ptOrigin - m_ptOrigin ) > 0.0f ) && //this portal looking in the general direction of the other portal
+		( m_vForward.Dot(GetLinkedPortal()->m_vForward ) < -0.7071f ) ); //within 45 degrees of facing directly at each other
 
-	if( m_pLinkedPortal )
-		m_pLinkedPortal->m_InternallyMaintainedData.m_bUsableDepthDoublerConfiguration = true;
+	if(GetLinkedPortal())
+		GetLinkedPortal()->m_InternallyMaintainedData.m_bUsableDepthDoublerConfiguration = true;
 
 
 
@@ -231,7 +231,7 @@ bool CPortalRenderable_FlatBasic::CalcFrustumThroughPortal( const Vector &ptCurr
 		return false;
 	}
 
-	if( m_pLinkedPortal == NULL )
+	if( GetLinkedPortal() == NULL )
 		return false;
 
 	if( m_vForward.Dot( ptCurrentViewOrigin ) <= m_InternallyMaintainedData.m_fPlaneDist )
@@ -287,7 +287,7 @@ bool CPortalRenderable_FlatBasic::CalcFrustumThroughPortal( const Vector &ptCurr
 	}
 
 	//Near Z
-	g_pPortalRender->m_RecursiveViewComplexFrustums[iNextViewRecursionLevel].Element(i).Init( m_pLinkedPortal->m_vForward, m_pLinkedPortal->m_InternallyMaintainedData.m_fPlaneDist );
+	g_pPortalRender->m_RecursiveViewComplexFrustums[iNextViewRecursionLevel].Element(i).Init( GetLinkedPortal()->m_vForward, GetLinkedPortal()->m_InternallyMaintainedData.m_fPlaneDist );
 
 	//Far Z
 	++i;
@@ -428,7 +428,7 @@ void CPortalRenderable_FlatBasic::RenderPortalViewToBackBuffer( CViewRender *pVi
 	if( m_fStaticAmount == 1.0f )
 		return; //not going to see anything anyways
 
-	if( m_pLinkedPortal == NULL ) //not linked to any portal, so we'll be all static anyways
+	if( GetLinkedPortal() == NULL ) //not linked to any portal, so we'll be all static anyways
 		return;
 
 	Frustum FrustumBackup;
@@ -446,8 +446,8 @@ void CPortalRenderable_FlatBasic::RenderPortalViewToBackBuffer( CViewRender *pVi
 	Vector ptPOVOrigin = MatrixThisToLinked() * cameraView.origin;	
 	Vector vPOVForward = MatrixThisToLinked().ApplyRotation(vCameraForward);
 
-	Vector ptRemotePortalPosition = m_pLinkedPortal->m_ptOrigin;
-	Vector vRemotePortalForward = m_pLinkedPortal->m_vForward;
+	Vector ptRemotePortalPosition = GetLinkedPortal()->m_ptOrigin;
+	Vector vRemotePortalForward = GetLinkedPortal()->m_vForward;
 
 	CViewSetup portalView = cameraView;
 
@@ -483,7 +483,7 @@ void CPortalRenderable_FlatBasic::RenderPortalViewToBackBuffer( CViewRender *pVi
 
 	{
 		ViewCustomVisibility_t customVisibility;
-		m_pLinkedPortal->AddToVisAsExitPortal( &customVisibility );
+		GetLinkedPortal()->AddToVisAsExitPortal( &customVisibility );
 		render->Push3DView( portalView, 0, NULL, pViewRender->GetFrustum() );		
 		{
 			if( bUseSeeThroughFrustum)
@@ -494,7 +494,7 @@ void CPortalRenderable_FlatBasic::RenderPortalViewToBackBuffer( CViewRender *pVi
 
 			CPortalRenderable *pRenderingViewForPortalBackup = g_pPortalRender->GetCurrentViewEntryPortal();
 			CPortalRenderable *pRenderingViewExitPortalBackup = g_pPortalRender->GetCurrentViewExitPortal();
-			SetViewEntranceAndExitPortals( this, m_pLinkedPortal );
+			SetViewEntranceAndExitPortals( this, GetLinkedPortal() );
 
 			//DRAW!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 			ViewDrawScene_PortalStencil( pViewRender, portalView, &customVisibility );
@@ -530,7 +530,7 @@ void CPortalRenderable_FlatBasic::RenderPortalViewToTexture( CViewRender *pViewR
 	if( m_fStaticAmount == 1.0f )
 		return; //not going to see anything anyways
 
-	if( m_pLinkedPortal == NULL ) //not linked to any portal, so we'll be all static anyways
+	if( GetLinkedPortal() == NULL ) //not linked to any portal, so we'll be all static anyways
 		return;
 
 	float fPixelVisibilty = g_pPortalRender->GetPixelVisilityForPortalSurface( this );
@@ -583,10 +583,10 @@ void CPortalRenderable_FlatBasic::RenderPortalViewToTexture( CViewRender *pViewR
 	//pRenderContext->Flush( false );
 
 	float fCustomClipPlane[4];
-	fCustomClipPlane[0] = m_pLinkedPortal->m_vForward.x;
-	fCustomClipPlane[1] = m_pLinkedPortal->m_vForward.y;
-	fCustomClipPlane[2] = m_pLinkedPortal->m_vForward.z;
-	fCustomClipPlane[3] = m_pLinkedPortal->m_vForward.Dot( m_pLinkedPortal->m_ptOrigin - (m_pLinkedPortal->m_vForward * 0.5f) ); //moving it back a smidge to eliminate visual artifacts for half-in objects
+	fCustomClipPlane[0] = GetLinkedPortal()->m_vForward.x;
+	fCustomClipPlane[1] = GetLinkedPortal()->m_vForward.y;
+	fCustomClipPlane[2] = GetLinkedPortal()->m_vForward.z;
+	fCustomClipPlane[3] = GetLinkedPortal()->m_vForward.Dot( GetLinkedPortal()->m_ptOrigin - (GetLinkedPortal()->m_vForward * 0.5f) ); //moving it back a smidge to eliminate visual artifacts for half-in objects
 
 	pRenderContext->PushCustomClipPlane( fCustomClipPlane );
 
@@ -595,14 +595,14 @@ void CPortalRenderable_FlatBasic::RenderPortalViewToTexture( CViewRender *pViewR
 
 		{
 			ViewCustomVisibility_t customVisibility;
-			m_pLinkedPortal->AddToVisAsExitPortal( &customVisibility );
+			GetLinkedPortal()->AddToVisAsExitPortal( &customVisibility );
 
 			SetRemainingViewDepth( 0 );
 			SetViewRecursionLevel( 1 );
 
 			CPortalRenderable *pRenderingViewForPortalBackup = g_pPortalRender->GetCurrentViewEntryPortal();
 			CPortalRenderable *pRenderingViewExitPortalBackup = g_pPortalRender->GetCurrentViewExitPortal();
-			SetViewEntranceAndExitPortals( this, m_pLinkedPortal );
+			SetViewEntranceAndExitPortals( this, GetLinkedPortal() );
 
 			bool bDrew3dSkybox = false;
 			SkyboxVisibility_t nSkyboxVisible = SKYBOX_NOT_VISIBLE;
@@ -694,7 +694,7 @@ void CPortalRenderable_FlatBasic::DrawPostStencilFixes( void )
 bool CPortalRenderable_FlatBasic::ShouldUpdateDepthDoublerTexture( const CViewSetup &viewSetup )
 {
 	return	( (m_InternallyMaintainedData.m_bUsableDepthDoublerConfiguration) && 
-		(m_pLinkedPortal != NULL) &&
+		(GetLinkedPortal() != NULL) &&
 		(m_fStaticAmount < 1.0f) );
 }
 
@@ -705,7 +705,7 @@ void CPortalRenderable_FlatBasic::HandlePortalPlaybackMessage( KeyValues *pKeyVa
 	m_fStaticAmount = pKeyValues->GetFloat( "staticAmount" );
 	m_fSecondaryStaticAmount = pKeyValues->GetFloat( "secondaryStaticAmount" );
 	m_bIsPortal2 = pKeyValues->GetInt( "isPortal2" ) != 0;
-	m_pLinkedPortal = nLinkedPortalId >= 0 ? (CPortalRenderable_FlatBasic *)FindRecordedPortal( nLinkedPortalId ) : NULL;
+	//GetLinkedPortal() = nLinkedPortalId >= 0 ? (CPortalRenderable_FlatBasic *)FindRecordedPortal( nLinkedPortalId ) : NULL;
 	matrix3x4_t *pMat = (matrix3x4_t*)pKeyValues->GetPtr( "portalToWorld" );
 
 	MatrixGetColumn( *pMat, 3, m_ptOrigin );
@@ -1174,7 +1174,7 @@ void CPortalRenderable_FlatBasic::DrawPortal( void )
 		//stencil-based rendering
 		if( g_pPortalRender->IsRenderingPortal() == false ) //main view
 		{
-			if( m_pLinkedPortal == NULL ) //didn't pass through pre-stencil mask
+			if( GetLinkedPortal() == NULL ) //didn't pass through pre-stencil mask
 			{
 				if ( ( m_fOpenAmount > 0.0f ) && ( m_fOpenAmount < 1.0f ) )
 				{
@@ -1187,7 +1187,7 @@ void CPortalRenderable_FlatBasic::DrawPortal( void )
 		}
 		else if( g_pPortalRender->GetCurrentViewExitPortal() != this )
 		{
-			if( m_pLinkedPortal == NULL ) //didn't pass through pre-stencil mask
+			if( GetLinkedPortal() == NULL ) //didn't pass through pre-stencil mask
 			{
 				if ( ( m_fOpenAmount > 0.0f ) && ( m_fOpenAmount < 1.0f ) )
 				{
@@ -1249,7 +1249,7 @@ bool CPortalRenderable_FlatBasic::DoesExitViewIntersectWaterPlane( float waterZ,
 
 bool CPortalRenderable_FlatBasic::ShouldUpdatePortalView_BasedOnView( const CViewSetup &currentView, CUtlVector<VPlane> &currentComplexFrustum  )
 {
-	if( m_pLinkedPortal == NULL )
+	if( GetLinkedPortal() == NULL )
 		return false;
 
 	if( m_fStaticAmount == 1.0f )
