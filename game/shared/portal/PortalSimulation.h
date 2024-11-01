@@ -279,7 +279,7 @@ struct PS_InternalData_t
 #endif // CLIENT_DLL
 
 
-class CPortalSimulator : public CBaseEntity
+class CPortalSimulator : public CBaseAnimating
 #ifdef CLIENT_DLL
 	, public CPortalRenderable
 #endif // CLIENT_DLL
