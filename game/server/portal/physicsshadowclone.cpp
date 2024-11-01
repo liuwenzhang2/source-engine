@@ -15,6 +15,7 @@
 #include "portal/weapon_physcannon.h" //grab controllers
 
 #include "PortalSimulation.h"
+#include "prop_portal.h"
 
 #define MAX_SHADOW_CLONE_COUNT 200
 
@@ -1066,7 +1067,7 @@ bool CTraceFilterTranslateClones::ShouldHitEntity( IHandleEntity *pEntity, int c
 	if( CPhysicsShadowClone::IsShadowClone( pEnt ) )
 	{
 		CBaseEntity *pClonedEntity = ((CPhysicsShadowClone *)pEnt)->GetClonedEntity();
-		CPortalSimulator *pSimulator = CPortalSimulator::GetSimulatorThatOwnsEntity( pClonedEntity );
+		CProp_Portal *pSimulator = CProp_Portal::GetSimulatorThatOwnsEntity( pClonedEntity );
 		if( pSimulator->EntFlags[pClonedEntity->entindex()] & PSEF_IS_IN_PORTAL_HOLE )
 			return m_pActualFilter->ShouldHitEntity( pClonedEntity, contentsMask );
 		else

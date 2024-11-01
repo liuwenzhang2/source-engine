@@ -50,6 +50,7 @@
 #include "portal_physics_collisionevent.h"
 #include "physicsshadowclone.h"
 #include "PortalSimulation.h"
+#include "prop_portal.h"
 void PortalPhysFrame( float deltaTime ); //small wrapper for PhysFrame that simulates all 3 environments at once
 #endif
 
@@ -1651,7 +1652,7 @@ CON_COMMAND( physics_budget, "Times the cost of each active object" )
 ConVar sv_fullsyncclones("sv_fullsyncclones", "1", FCVAR_CHEAT );
 void PortalPhysFrame( float deltaTime ) //small wrapper for PhysFrame that simulates all environments at once
 {
-	CPortalSimulator::PrePhysFrame();
+	CProp_Portal::PrePhysFrame();
 
 	if( sv_fullsyncclones.GetBool() )
 		CPhysicsShadowClone::FullSyncAllClones();
@@ -1665,7 +1666,7 @@ void PortalPhysFrame( float deltaTime ) //small wrapper for PhysFrame that simul
 	g_Collisions.BufferTouchEvents( false );
 	g_Collisions.FrameUpdate();
 
-	CPortalSimulator::PostPhysFrame();
+	CProp_Portal::PostPhysFrame();
 }
 #endif
 

@@ -531,7 +531,7 @@ void UTIL_Portal_TraceEntity( CBaseEntity *pEntity, const Vector &vecAbsStart, c
 			pPortalSimulator = pPortal;//->m_hPortalSimulator
 	}
 #else
-	CPortalSimulator *pPortalSimulator = CPortalSimulator::GetSimulatorThatOwnsEntity( pEntity );
+	CProp_Portal *pPortalSimulator = CProp_Portal::GetSimulatorThatOwnsEntity( pEntity );
 #endif
 
 	memset( pTrace, 0, sizeof(trace_t));

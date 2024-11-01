@@ -122,6 +122,46 @@ public:
 
 	virtual bool			TestCollision( const Ray_t &ray, unsigned int fContentsMask, trace_t& tr );
 
+	virtual void				AfterCollisionEntityCreated();
+	virtual void				BeforeCollisionEntityDestroy();
+
+	virtual void		BeforeMove();
+	virtual void        AfterMove();
+	virtual void		BeforeDetachFromLinked();
+
+	virtual void		OnClearEverything();
+	virtual void		BeforeLocalPhysicsClear();
+	virtual	void		AfterLocalPhysicsCreated();
+	virtual void		BeforeLinkedPhysicsClear();
+	virtual void		AfterLinkedPhysicsCreated();
+
+	int				GetMoveableOwnedEntities(CBaseEntity** pEntsOut, int iEntOutLimit); //gets owned entities that aren't either world or static props. Excludes fake portal ents such as physics clones
+
+	static CProp_Portal* GetSimulatorThatOwnsEntity(const CBaseEntity* pEntity); //fairly cheap to call
+	static void			Pre_UTIL_Remove(CBaseEntity* pEntity);
+	static void			Post_UTIL_Remove(CBaseEntity* pEntity);
+
+	//these three really should be made internal and the public interface changed to a "watch this entity" setup
+	void				TakeOwnershipOfEntity(CBaseEntity* pEntity); //general ownership, not necessarily physics ownership
+	void				ReleaseOwnershipOfEntity(CBaseEntity* pEntity, bool bMovingToLinkedSimulator = false); //if bMovingToLinkedSimulator is true, the code skips some steps that are going to be repeated when the entity is added to the other simulator
+	void				ReleaseAllEntityOwnership(void); //go back to not owning any entities
+
+	void				TakePhysicsOwnership(CBaseEntity* pEntity);
+	void				ReleasePhysicsOwnership(CBaseEntity* pEntity, bool bContinuePhysicsCloning = true, bool bMovingToLinkedSimulator = false);
+	void				ClearLinkedEntities(void); //gets rid of transformed shadow clones
+
+	//void				TeleportEntityToLinkedPortal( CBaseEntity *pEntity );
+	void				StartCloningEntity(CBaseEntity* pEntity);
+	void				StopCloningEntity(CBaseEntity* pEntity);
+
+	bool				OwnsEntity(const CBaseEntity* pEntity) const;
+	bool				OwnsPhysicsForEntity(const CBaseEntity* pEntity) const;
+	void				MarkAsOwned(CBaseEntity* pEntity);
+	void				MarkAsReleased(CBaseEntity* pEntity);
+
+	static void			PrePhysFrame(void);
+	static void			PostPhysFrame(void);
+
 	virtual void			PortalSimulator_TookOwnershipOfEntity( CBaseEntity *pEntity );
 	virtual void			PortalSimulator_ReleasedOwnershipOfEntity( CBaseEntity *pEntity );
 
@@ -139,6 +179,13 @@ public:
 	//find a portal with the designated attributes, or creates one with them, favors active portals over inactive
 	static CProp_Portal		*FindPortal( unsigned char iLinkageGroupID, bool bPortal2, bool bCreateIfNothingFound = false );
 	static const CUtlVector<CProp_Portal *> *GetPortalLinkageGroup( unsigned char iLinkageGroupID );
+
+	PS_SD_Dynamic_PhysicsShadowClones_t ShadowClones;
+	CUtlVector<CBaseEntity*> OwnedEntities;
+	unsigned int EntFlags[MAX_EDICTS]; //flags maintained for every entity in the world based on its index
+	int iFixEntityCount;
+	CBaseEntity** pFixEntities;
+	cplane_t OldPlane;
 };
 
 
@@ -148,6 +195,16 @@ public:
 //{
 //	return m_matrixThisToLinked;
 //}
+
+inline bool CProp_Portal::OwnsEntity(const CBaseEntity* pEntity) const
+{
+	return ((EntFlags[pEntity->entindex()] & PSEF_OWNS_ENTITY) != 0);
+}
+
+inline bool CProp_Portal::OwnsPhysicsForEntity(const CBaseEntity* pEntity) const
+{
+	return ((EntFlags[pEntity->entindex()] & PSEF_OWNS_PHYSICS) != 0);
+}
 
 
 #endif //#ifndef PROP_PORTAL_H

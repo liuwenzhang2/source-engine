@@ -41,7 +41,7 @@ public:
 private:
 
 	CProp_Portal			*m_pAttachedPortal;
-	CPortalSimulator		*m_pAttachedSimulator;
+	CProp_Portal		*m_pAttachedSimulator;
 	bool					m_bActive;
 
 

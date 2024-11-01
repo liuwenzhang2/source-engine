@@ -39,6 +39,7 @@
 
 #ifdef PORTAL
 #include "PortalSimulation.h"
+#include "prop_portal.h"
 //#include "Portal_PhysicsEnvironmentMgr.h"
 #endif
 
@@ -378,7 +379,7 @@ void UTIL_Remove( CBaseEntity *oldObj )
 		bool bNetworkable = pBaseEnt->IsNetworkable();
 		int nEntIndex = bNetworkable ? oldObj->entindex() : -1;
 		if (bNetworkable && nEntIndex != -1) {
-			CPortalSimulator::Pre_UTIL_Remove(pBaseEnt);
+			CProp_Portal::Pre_UTIL_Remove(pBaseEnt);
 		}
 #endif
 		g_bReceivedChainedUpdateOnRemove = false;
@@ -391,7 +392,7 @@ void UTIL_Remove( CBaseEntity *oldObj )
 
 #ifdef PORTAL
 		if (bNetworkable && nEntIndex != -1) {
-			CPortalSimulator::Post_UTIL_Remove(pBaseEnt);
+			CProp_Portal::Post_UTIL_Remove(pBaseEnt);
 		}
 #endif
 
@@ -430,7 +431,7 @@ void UTIL_RemoveImmediate( CBaseEntity *oldObj )
 	bool bNetworkable = oldObj->IsNetworkable();
 	int nEntIndex = bNetworkable ? oldObj->entindex() : -1;
 	if (bNetworkable && nEntIndex != -1) {
-		CPortalSimulator::Pre_UTIL_Remove(oldObj);
+		CProp_Portal::Pre_UTIL_Remove(oldObj);
 	}
 #endif
 
@@ -448,7 +449,7 @@ void UTIL_RemoveImmediate( CBaseEntity *oldObj )
 
 #ifdef PORTAL
 	if (bNetworkable && nEntIndex != -1) {
-		CPortalSimulator::Post_UTIL_Remove(oldObj);
+		CProp_Portal::Post_UTIL_Remove(oldObj);
 	}
 #endif
 }

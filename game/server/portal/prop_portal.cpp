@@ -49,6 +49,9 @@ ConVar sv_portal_placement_never_fail("sv_portal_placement_never_fail", "0", FCV
 ConVar sv_portal_new_velocity_check("sv_portal_new_velocity_check", "1", FCVAR_CHEAT );
 
 static CUtlVector<CProp_Portal *> s_PortalLinkageGroups[256];
+static CProp_Portal* s_OwnedEntityMap[MAX_EDICTS] = { NULL };
+static void UpdateShadowClonesPortalSimulationFlags(const CBaseEntity* pSourceEntity, unsigned int iFlags, int iSourceFlags);
+static bool g_bPlayerIsInSimulator = false;
 
 
 BEGIN_DATADESC( CProp_Portal )
@@ -114,6 +117,8 @@ CProp_Portal::CProp_Portal( void )
 	{
 		m_vPortalCorners[i] = Vector(0,0,0);
 	}
+
+	memset(EntFlags, 0, sizeof(EntFlags));
 
 	//create the collision shape.... TODO: consider having one shared collideable between all portals
 	float fPlanes[6*4];
@@ -782,10 +787,10 @@ void CProp_Portal::Activate( void )
 						//we should be interacting with this object, add it to our environment
 						if( SharedEnvironmentCheck( pOther ) )
 						{
-							Assert( ((m_hPortalSimulator->GetLinkedPortalSimulator() == NULL) && (m_hLinkedPortal.Get() == NULL)) || 
-								(m_hPortalSimulator->GetLinkedPortalSimulator() == m_hLinkedPortal->m_hPortalSimulator) ); //make sure this entity is linked to the same portal as our simulator
+							Assert( ((GetLinkedPortalSimulator() == NULL) && (m_hLinkedPortal.Get() == NULL)) || //m_hPortalSimulator->
+								(GetLinkedPortalSimulator() == m_hLinkedPortal) ); //make sure this entity is linked to the same portal as our simulator m_hPortalSimulator->->m_hPortalSimulator
 
-							CPortalSimulator *pOwningSimulator = CPortalSimulator::GetSimulatorThatOwnsEntity( pOther );
+							CProp_Portal*pOwningSimulator = CProp_Portal::GetSimulatorThatOwnsEntity( pOther );
 							if( pOwningSimulator && (pOwningSimulator != this) )//m_hPortalSimulator
 								pOwningSimulator->ReleaseOwnershipOfEntity( pOther );
 
@@ -1164,7 +1169,7 @@ void CProp_Portal::TeleportTouchingEntity( CBaseEntity *pOther )
 		this->GetEngineObject()->PhysicsNotifyOtherOfUntouch( pOther->GetEngineObject());
 		pOther->GetEngineObject()->PhysicsNotifyOtherOfUntouch( this->GetEngineObject());
 
-		m_hLinkedPortal->TakeOwnershipOfEntity( pOther );//m_hPortalSimulator->
+		GetLinkedPortal()->TakeOwnershipOfEntity(pOther);//m_hPortalSimulator->
 
 		//m_hLinkedPortal->PhysicsNotifyOtherOfUntouch( m_hLinkedPortal, pOther );
 		//pOther->PhysicsNotifyOtherOfUntouch( pOther, m_hLinkedPortal );
@@ -1296,8 +1301,8 @@ void CProp_Portal::TeleportTouchingEntity( CBaseEntity *pOther )
 		Vector ptTestCenter = pOther->WorldSpaceCenter();
 
 		float fNewDist, fOldDist;
-		fNewDist = RemotePortalDataAccess.Placement.PortalPlane.m_Normal.Dot( ptTestCenter ) - RemotePortalDataAccess.Placement.PortalPlane.m_Dist;
-		fOldDist = LocalPortalDataAccess.Placement.PortalPlane.m_Normal.Dot( ptOtherCenter ) - LocalPortalDataAccess.Placement.PortalPlane.m_Dist;
+		fNewDist = RemotePortalDataAccess.Placement.PortalPlane.normal.Dot( ptTestCenter ) - RemotePortalDataAccess.Placement.PortalPlane.dist;
+		fOldDist = LocalPortalDataAccess.Placement.PortalPlane.normal.Dot( ptOtherCenter ) - LocalPortalDataAccess.Placement.PortalPlane.dist;
 		AssertMsg( fNewDist >= 0.0f, "Entity portalled behind the destination portal." );
 	}
 #endif
@@ -1322,7 +1327,7 @@ void CProp_Portal::Touch( CBaseEntity *pOther )
 	// Don't do anything on touch if it's not active
 	if( !m_bActivated || (m_hLinkedPortal.Get() == NULL) )
 	{
-		Assert( !m_hPortalSimulator->OwnsEntity( pOther ) );
+		Assert( !OwnsEntity( pOther ) );//m_hPortalSimulator->
 		Assert( !pOther->IsPlayer() || (((CPortal_Player *)pOther)->m_hPortalEnvironment.Get() != this) );
 		
 		//I'd really like to fix the root cause, but this will keep the game going
@@ -1330,8 +1335,8 @@ void CProp_Portal::Touch( CBaseEntity *pOther )
 		return;
 	}
 
-	Assert( ((m_hPortalSimulator->GetLinkedPortalSimulator() == NULL) && (m_hLinkedPortal.Get() == NULL)) || 
-		(m_hPortalSimulator->GetLinkedPortalSimulator() == m_hLinkedPortal->m_hPortalSimulator) ); //make sure this entity is linked to the same portal as our simulator
+	Assert( ((GetLinkedPortalSimulator() == NULL) && (m_hLinkedPortal.Get() == NULL)) || //m_hPortalSimulator->
+		(GetLinkedPortalSimulator() == m_hLinkedPortal) ); //make sure this entity is linked to the same portal as our simulator m_hPortalSimulator->->m_hPortalSimulator
 
 	// Fizzle portal with any moving brush
 	Vector vVelocityCheck;
@@ -1417,7 +1422,7 @@ void CProp_Portal::Touch( CBaseEntity *pOther )
 #endif
 
 				//we should be interacting with this object, add it to our environment
-				CPortalSimulator *pOwningSimulator = CPortalSimulator::GetSimulatorThatOwnsEntity( pOther );
+				CProp_Portal *pOwningSimulator = CProp_Portal::GetSimulatorThatOwnsEntity( pOther );
 				if( pOwningSimulator && (pOwningSimulator != this) )//m_hPortalSimulator
 					pOwningSimulator->ReleaseOwnershipOfEntity( pOther );
 
@@ -1466,10 +1471,10 @@ void CProp_Portal::StartTouch( CBaseEntity *pOther )
 			//we should be interacting with this object, add it to our environment
 			if( SharedEnvironmentCheck( pOther ) )
 			{
-				Assert( ((m_hPortalSimulator->GetLinkedPortalSimulator() == NULL) && (m_hLinkedPortal.Get() == NULL)) || 
-					(m_hPortalSimulator->GetLinkedPortalSimulator() == m_hLinkedPortal->m_hPortalSimulator) ); //make sure this entity is linked to the same portal as our simulator
+				Assert( ((GetLinkedPortalSimulator() == NULL) && (m_hLinkedPortal.Get() == NULL)) || //m_hPortalSimulator->
+					(GetLinkedPortalSimulator() == m_hLinkedPortal) ); //make sure this entity is linked to the same portal as our simulator m_hPortalSimulator->->m_hPortalSimulator
 
-				CPortalSimulator *pOwningSimulator = CPortalSimulator::GetSimulatorThatOwnsEntity( pOther );
+				CProp_Portal *pOwningSimulator = CProp_Portal::GetSimulatorThatOwnsEntity( pOther );
 				if( pOwningSimulator && (pOwningSimulator != this) )//m_hPortalSimulator
 					pOwningSimulator->ReleaseOwnershipOfEntity( pOther );
 
@@ -1534,10 +1539,10 @@ void CProp_Portal::PortalSimulator_ReleasedOwnershipOfEntity( CBaseEntity *pEnti
 
 bool CProp_Portal::SharedEnvironmentCheck( CBaseEntity *pEntity )
 {
-	Assert( ((m_hPortalSimulator->GetLinkedPortalSimulator() == NULL) && (m_hLinkedPortal.Get() == NULL)) || 
-		(m_hPortalSimulator->GetLinkedPortalSimulator() == m_hLinkedPortal->m_hPortalSimulator) ); //make sure this entity is linked to the same portal as our simulator
+	Assert( ((GetLinkedPortalSimulator() == NULL) && (m_hLinkedPortal.Get() == NULL)) || //m_hPortalSimulator->
+		(GetLinkedPortalSimulator() == m_hLinkedPortal) ); //make sure this entity is linked to the same portal as our simulator m_hPortalSimulator->->m_hPortalSimulator
 
-	CPortalSimulator *pOwningSimulator = CPortalSimulator::GetSimulatorThatOwnsEntity( pEntity );
+	CProp_Portal *pOwningSimulator = CProp_Portal::GetSimulatorThatOwnsEntity( pEntity );
 	if( (pOwningSimulator == NULL) || (pOwningSimulator == this) )//m_hPortalSimulator
 	{
 		//nobody else is claiming ownership
@@ -2281,5 +2286,904 @@ const CUtlVector<CProp_Portal *> *CProp_Portal::GetPortalLinkageGroup( unsigned 
 	return &s_PortalLinkageGroups[iLinkageGroupID];
 }
 
+void CProp_Portal::AfterCollisionEntityCreated() 
+{
+	MarkAsOwned(pCollisionEntity);
+	EntFlags[pCollisionEntity->entindex()] |= PSEF_OWNS_PHYSICS;
+}
 
 
+void CProp_Portal::BeforeCollisionEntityDestroy() 
+{
+	EntFlags[pCollisionEntity->entindex()] &= ~PSEF_OWNS_PHYSICS;
+	MarkAsReleased(pCollisionEntity);
+}
+
+void CProp_Portal::BeforeMove() 
+{
+	//create a list of all entities that are actually within the portal hole, they will likely need to be moved out of solid space when the portal moves
+	pFixEntities = new CBaseEntity*[OwnedEntities.Count()]; //(CBaseEntity**)stackalloc(sizeof(CBaseEntity*) * OwnedEntities.Count());
+	iFixEntityCount = 0;
+	for (int i = OwnedEntities.Count(); --i >= 0; )
+	{
+		CBaseEntity* pEntity = OwnedEntities[i];
+		if (CPhysicsShadowClone::IsShadowClone(pEntity) ||
+			CPortalSimulator::IsPortalSimulatorCollisionEntity(pEntity))
+			continue;
+
+		if (EntityIsInPortalHole(pEntity))
+		{
+			pFixEntities[iFixEntityCount] = pEntity;
+			++iFixEntityCount;
+		}
+	}
+	OldPlane = pCollisionEntity->m_InternalData.Placement.PortalPlane; //used in fixing code
+}
+
+void CProp_Portal::AfterMove()
+{
+	for (int i = 0; i != iFixEntityCount; ++i)
+	{
+		if (!EntityIsInPortalHole(pFixEntities[i]))
+		{
+			//this entity is most definitely stuck in a solid wall right now
+			//pFixEntities[i]->SetAbsOrigin( pFixEntities[i]->GetAbsOrigin() + (OldPlane.m_Normal * 50.0f) );
+			FindClosestPassableSpace(pFixEntities[i], OldPlane.normal);
+			continue;
+		}
+
+		//entity is still in the hole, but it's possible the hole moved enough where they're in part of the wall
+		{
+			//TODO: figure out if that's the case and fix it
+		}
+	}
+	delete[] pFixEntities;
+	pFixEntities = NULL;
+
+	Assert((pCollisionEntity == NULL) || OwnsEntity(pCollisionEntity));
+}
+
+void CProp_Portal::BeforeDetachFromLinked()
+{
+	ClearLinkedEntities();
+}
+
+void CProp_Portal::TakeOwnershipOfEntity(CBaseEntity* pEntity)
+{
+	AssertMsg(m_bLocalDataIsReady, "Tell the portal simulator where it is with MoveTo() before using it in any other way.");
+
+	Assert(pEntity != NULL);
+	if (pEntity == NULL)
+		return;
+
+	if (!pEntity->IsNetworkable() || pEntity->entindex() == -1) {
+		return;
+	}
+
+	if (pEntity->IsWorld())
+		return;
+
+	if (CPhysicsShadowClone::IsShadowClone(pEntity))
+		return;
+
+	if (pEntity->GetServerVehicle() != NULL) //we don't take kindly to vehicles in these here parts. Their physics controllers currently don't migrate properly and cause a crash
+		return;
+
+	if (OwnsEntity(pEntity))
+		return;
+
+	Assert(GetSimulatorThatOwnsEntity(pEntity) == NULL);
+	MarkAsOwned(pEntity);
+	Assert(GetSimulatorThatOwnsEntity(pEntity) == this);
+
+	if (EntityIsInPortalHole(pEntity))
+		EntFlags[pEntity->entindex()] |= PSEF_IS_IN_PORTAL_HOLE;
+	else
+		EntFlags[pEntity->entindex()] &= ~PSEF_IS_IN_PORTAL_HOLE;
+
+	UpdateShadowClonesPortalSimulationFlags(pEntity, PSEF_IS_IN_PORTAL_HOLE, EntFlags[pEntity->entindex()]);
+
+	m_pCallbacks->PortalSimulator_TookOwnershipOfEntity(pEntity);
+
+	if (IsSimulatingVPhysics())
+		TakePhysicsOwnership(pEntity);
+
+	pEntity->GetEngineObject()->CollisionRulesChanged(); //absolutely necessary in single-environment mode, possibly expendable in multi-environment moder
+	//pEntity->SetGroundEntity( NULL );
+	IPhysicsObject* pObject = pEntity->VPhysicsGetObject();
+	if (pObject)
+	{
+		pObject->Wake();
+		pObject->RecheckContactPoints();
+	}
+
+	CUtlVector<IEngineObjectServer*> childrenList;
+	GetAllChildren(pEntity->GetEngineObject(), childrenList);
+	for (int i = childrenList.Count(); --i >= 0; )
+	{
+		CBaseEntity* pEnt = childrenList[i]->GetOuter();
+		CProp_Portal* pOwningSimulator = GetSimulatorThatOwnsEntity(pEnt);
+		if (pOwningSimulator != this)
+		{
+			if (pOwningSimulator != NULL)
+				pOwningSimulator->ReleaseOwnershipOfEntity(pEnt, (pOwningSimulator == m_pLinkedPortal));
+
+			TakeOwnershipOfEntity(childrenList[i]->GetOuter());
+		}
+	}
+}
+
+
+
+void CProp_Portal::TakePhysicsOwnership(CBaseEntity* pEntity)
+{
+	if (!pEntity->IsNetworkable() || pEntity->entindex() == -1) {
+		return;
+	}
+
+	if (pPhysicsEnvironment == NULL)
+		return;
+
+	if (CPortalSimulator::IsPortalSimulatorCollisionEntity(pEntity))
+		return;
+
+	Assert(CPhysicsShadowClone::IsShadowClone(pEntity) == false);
+	Assert(OwnsEntity(pEntity)); //taking physics ownership happens AFTER general ownership
+
+	if (OwnsPhysicsForEntity(pEntity))
+		return;
+
+	int iEntIndex = pEntity->entindex();
+	EntFlags[iEntIndex] |= PSEF_OWNS_PHYSICS;
+
+
+	//physics cloning
+	{
+#ifdef _DEBUG
+		{
+			int iDebugIndex;
+			for (iDebugIndex = ShadowClones.FromLinkedPortal.Count(); --iDebugIndex >= 0; )
+			{
+				if (ShadowClones.FromLinkedPortal[iDebugIndex]->GetClonedEntity() == pEntity)
+					break;
+			}
+			AssertMsg(iDebugIndex < 0, "Trying to own an entity, when a clone from the linked portal already exists");
+
+			if (GetLinkedPortal())
+			{
+				for (iDebugIndex = GetLinkedPortal()->ShadowClones.FromLinkedPortal.Count(); --iDebugIndex >= 0; )
+				{
+					if (GetLinkedPortal()->ShadowClones.FromLinkedPortal[iDebugIndex]->GetClonedEntity() == pEntity)
+						break;
+				}
+				AssertMsg(iDebugIndex < 0, "Trying to own an entity, when we're already exporting a clone to the linked portal");
+			}
+
+			//Don't require a copy from main to already exist
+		}
+#endif
+
+		EHANDLE hEnt = pEntity;
+
+		//To linked portal
+		if (GetLinkedPortal() && GetLinkedPortal()->pPhysicsEnvironment)
+		{
+
+			DBG_CODE(
+				for (int i = GetLinkedPortal()->ShadowClones.FromLinkedPortal.Count(); --i >= 0; )
+					AssertMsg(GetLinkedPortal()->ShadowClones.FromLinkedPortal[i]->GetClonedEntity() != pEntity, "Already cloning to linked portal.");
+					);
+
+			CPhysicsShadowClone* pClone = CPhysicsShadowClone::CreateShadowClone(GetLinkedPortal()->pPhysicsEnvironment, hEnt, "CPortalSimulator::TakePhysicsOwnership(): To Linked Portal", &pCollisionEntity->MatrixThisToLinked().As3x4());
+			if (pClone)
+			{
+				//bool bHeldByPhyscannon = false;
+				CBaseEntity* pHeldEntity = NULL;
+				CPortal_Player* pPlayer = (CPortal_Player*)GetPlayerHoldingEntity(pEntity);
+
+				if (!pPlayer && pEntity->IsPlayer())
+				{
+					pPlayer = (CPortal_Player*)pEntity;
+				}
+
+				if (pPlayer)
+				{
+					pHeldEntity = GetPlayerHeldEntity(pPlayer);
+					/*if ( !pHeldEntity )
+					{
+						pHeldEntity = PhysCannonGetHeldEntity( pPlayer->GetActiveWeapon() );
+						bHeldByPhyscannon = true;
+					}*/
+				}
+
+				if (pHeldEntity)
+				{
+					//player is holding the entity, force them to pick it back up again
+					bool bIsHeldObjectOnOppositeSideOfPortal = pPlayer->IsHeldObjectOnOppositeSideOfPortal();
+					pPlayer->m_bSilentDropAndPickup = true;
+					pPlayer->ForceDropOfCarriedPhysObjects(pHeldEntity);
+					pPlayer->SetHeldObjectOnOppositeSideOfPortal(bIsHeldObjectOnOppositeSideOfPortal);
+				}
+
+				GetLinkedPortal()->ShadowClones.FromLinkedPortal.AddToTail(pClone);
+				GetLinkedPortal()->MarkAsOwned(pClone);
+				GetLinkedPortal()->EntFlags[pClone->entindex()] |= PSEF_OWNS_PHYSICS;
+				GetLinkedPortal()->EntFlags[pClone->entindex()] |= EntFlags[pEntity->entindex()] & PSEF_IS_IN_PORTAL_HOLE;
+				pClone->GetEngineObject()->CollisionRulesChanged(); //adding the clone to the portal simulator changes how it collides
+
+				if (pHeldEntity)
+				{
+					/*if ( bHeldByPhyscannon )
+					{
+						PhysCannonPickupObject( pPlayer, pHeldEntity );
+					}
+					else*/
+					{
+						PlayerPickupObject(pPlayer, pHeldEntity);
+					}
+					pPlayer->m_bSilentDropAndPickup = false;
+				}
+			}
+		}
+	}
+
+	m_pCallbacks->PortalSimulator_TookPhysicsOwnershipOfEntity(pEntity);
+}
+
+void RecheckEntityCollision(CBaseEntity* pEntity)
+{
+	CCallQueue* pCallQueue;
+	if ((pCallQueue = GetPortalCallQueue()) != NULL)
+	{
+		pCallQueue->QueueCall(RecheckEntityCollision, pEntity);
+		return;
+	}
+
+	pEntity->GetEngineObject()->CollisionRulesChanged(); //absolutely necessary in single-environment mode, possibly expendable in multi-environment mode
+	//pEntity->SetGroundEntity( NULL );
+	IPhysicsObject* pObject = pEntity->VPhysicsGetObject();
+	if (pObject)
+	{
+		pObject->Wake();
+		pObject->RecheckContactPoints();
+	}
+}
+
+void CProp_Portal::ReleaseOwnershipOfEntity(CBaseEntity* pEntity, bool bMovingToLinkedSimulator /*= false*/)
+{
+	if (pEntity == NULL)
+		return;
+
+	if (!pEntity->IsNetworkable() || pEntity->entindex() == -1) {
+		return;
+	}
+
+	if (pEntity->IsWorld())
+		return;
+
+	if (!OwnsEntity(pEntity))
+		return;
+
+	if (pPhysicsEnvironment)
+		ReleasePhysicsOwnership(pEntity, true, bMovingToLinkedSimulator);
+
+	EntFlags[pEntity->entindex()] &= ~PSEF_IS_IN_PORTAL_HOLE;
+	UpdateShadowClonesPortalSimulationFlags(pEntity, PSEF_IS_IN_PORTAL_HOLE, EntFlags[pEntity->entindex()]);
+
+	Assert(GetSimulatorThatOwnsEntity(pEntity) == this);
+	MarkAsReleased(pEntity);
+	Assert(GetSimulatorThatOwnsEntity(pEntity) == NULL);
+
+	for (int i = OwnedEntities.Count(); --i >= 0; )
+	{
+		if (OwnedEntities[i] == pEntity)
+		{
+			OwnedEntities.FastRemove(i);
+			break;
+		}
+	}
+
+	if (bMovingToLinkedSimulator == false)
+	{
+		RecheckEntityCollision(pEntity);
+	}
+
+	m_pCallbacks->PortalSimulator_ReleasedOwnershipOfEntity(pEntity);
+
+	CUtlVector<IEngineObjectServer*> childrenList;
+	GetAllChildren(pEntity->GetEngineObject(), childrenList);
+	for (int i = childrenList.Count(); --i >= 0; )
+		ReleaseOwnershipOfEntity(childrenList[i]->GetOuter());
+}
+
+void CProp_Portal::OnClearEverything() 
+{
+	ReleaseAllEntityOwnership();
+
+	Assert((pCollisionEntity == NULL) || OwnsEntity(pCollisionEntity));
+}
+
+void CProp_Portal::BeforeLocalPhysicsClear()
+{
+	//all physics clones
+	{
+		for (int i = ShadowClones.FromLinkedPortal.Count(); --i >= 0; )
+		{
+			CPhysicsShadowClone* pClone = ShadowClones.FromLinkedPortal[i];
+			Assert(GetSimulatorThatOwnsEntity(pClone) == this);
+			EntFlags[pClone->entindex()] &= ~PSEF_OWNS_PHYSICS;
+			MarkAsReleased(pClone);
+			Assert(GetSimulatorThatOwnsEntity(pClone) == NULL);
+			CPhysicsShadowClone::ReleaseShadowClone(pClone);
+		}
+
+		ShadowClones.FromLinkedPortal.RemoveAll();
+	}
+
+	Assert(ShadowClones.FromLinkedPortal.Count() == 0);
+
+	//release physics ownership of owned entities
+	for (int i = OwnedEntities.Count(); --i >= 0; )
+		ReleasePhysicsOwnership(OwnedEntities[i], false);
+
+	Assert(ShadowClones.FromLinkedPortal.Count() == 0);
+}
+
+void CProp_Portal::AfterLocalPhysicsCreated() 
+{
+	//re-acquire environment physics for owned entities
+	for (int i = OwnedEntities.Count(); --i >= 0; )
+		TakePhysicsOwnership(OwnedEntities[i]);
+}
+
+
+void CProp_Portal::BeforeLinkedPhysicsClear()
+{
+	//clones from the linked portal
+	{
+		for (int i = ShadowClones.FromLinkedPortal.Count(); --i >= 0; )
+		{
+			CPhysicsShadowClone* pClone = ShadowClones.FromLinkedPortal[i];
+			EntFlags[pClone->entindex()] &= ~PSEF_OWNS_PHYSICS;
+			MarkAsReleased(pClone);
+			CPhysicsShadowClone::ReleaseShadowClone(pClone);
+		}
+
+		ShadowClones.FromLinkedPortal.RemoveAll();
+	}
+}
+
+void CProp_Portal::AfterLinkedPhysicsCreated()
+{
+	//re-clone physicsshadowclones from the remote environment
+	CUtlVector<CBaseEntity*>& RemoteOwnedEntities = GetLinkedPortal()->OwnedEntities;
+	for (int i = RemoteOwnedEntities.Count(); --i >= 0; )
+	{
+		if (CPhysicsShadowClone::IsShadowClone(RemoteOwnedEntities[i]) ||
+			CPortalSimulator::IsPortalSimulatorCollisionEntity(RemoteOwnedEntities[i]))
+			continue;
+
+		int j;
+		for (j = ShadowClones.FromLinkedPortal.Count(); --j >= 0; )
+		{
+			if (ShadowClones.FromLinkedPortal[j]->GetClonedEntity() == RemoteOwnedEntities[i])
+				break;
+		}
+
+		if (j >= 0) //already cloning
+			continue;
+
+
+
+		EHANDLE hEnt = RemoteOwnedEntities[i];
+		CPhysicsShadowClone* pClone = CPhysicsShadowClone::CreateShadowClone(pPhysicsEnvironment, hEnt, "CPortalSimulator::CreateLinkedPhysics(): From Linked Portal", &pCollisionEntity->MatrixLinkedToThis().As3x4());
+		if (pClone)
+		{
+			MarkAsOwned(pClone);
+			EntFlags[pClone->entindex()] |= PSEF_OWNS_PHYSICS;
+			ShadowClones.FromLinkedPortal.AddToTail(pClone);
+			pClone->GetEngineObject()->CollisionRulesChanged(); //adding the clone to the portal simulator changes how it collides
+		}
+	}
+}
+
+void CProp_Portal::ReleaseAllEntityOwnership(void)
+{
+	//Assert( m_bLocalDataIsReady || (m_InternalData.Simulation.Dynamic.OwnedEntities.Count() == 0) );
+	int iSkippedObjects = 0;
+	while (OwnedEntities.Count() != iSkippedObjects) //the release function changes OwnedEntities
+	{
+		CBaseEntity* pEntity = OwnedEntities[iSkippedObjects];
+		if (CPhysicsShadowClone::IsShadowClone(pEntity) ||
+			CPortalSimulator::IsPortalSimulatorCollisionEntity(pEntity))
+		{
+			++iSkippedObjects;
+			continue;
+		}
+		if (pCollisionEntity.Get()&&EntityIsInPortalHole(pEntity))
+		{
+			FindClosestPassableSpace(pEntity, GetPortalPlane().normal);
+		}
+		ReleaseOwnershipOfEntity(pEntity);
+	}
+
+	Assert((pCollisionEntity == NULL) || OwnsEntity(pCollisionEntity));
+}
+
+
+void CProp_Portal::ReleasePhysicsOwnership(CBaseEntity* pEntity, bool bContinuePhysicsCloning /*= true*/, bool bMovingToLinkedSimulator /*= false*/)
+{
+	if (!pEntity->IsNetworkable() || pEntity->entindex() == -1) {
+		return;
+	}
+
+	if (CPortalSimulator::IsPortalSimulatorCollisionEntity(pEntity))
+		return;
+
+	Assert(OwnsEntity(pEntity)); //releasing physics ownership happens BEFORE releasing general ownership
+	Assert(CPhysicsShadowClone::IsShadowClone(pEntity) == false);
+
+	if (pPhysicsEnvironment == NULL)
+		return;
+
+	if (!OwnsPhysicsForEntity(pEntity))
+		return;
+
+	if (IsSimulatingVPhysics() == false)
+		bContinuePhysicsCloning = false;
+
+	int iEntIndex = pEntity->entindex();
+	EntFlags[iEntIndex] &= ~PSEF_OWNS_PHYSICS;
+
+	//physics cloning
+	{
+#ifdef _DEBUG
+		{
+			int iDebugIndex;
+			for (iDebugIndex = ShadowClones.FromLinkedPortal.Count(); --iDebugIndex >= 0; )
+			{
+				if (ShadowClones.FromLinkedPortal[iDebugIndex]->GetClonedEntity() == pEntity)
+					break;
+			}
+			AssertMsg(iDebugIndex < 0, "Trying to release an entity, when a clone from the linked portal already exists.");
+		}
+#endif
+
+		//clear exported clones
+		{
+			DBG_CODE_NOSCOPE(bool bFoundAlready = false; );
+			DBG_CODE_NOSCOPE(const char* szLastFoundMarker = NULL; );
+
+			//to linked portal
+			if (GetLinkedPortal())
+			{
+				DBG_CODE_NOSCOPE(bFoundAlready = false; );
+				for (int i = GetLinkedPortal()->ShadowClones.FromLinkedPortal.Count(); --i >= 0; )
+				{
+					if (GetLinkedPortal()->ShadowClones.FromLinkedPortal[i]->GetClonedEntity() == pEntity)
+					{
+						CPhysicsShadowClone* pClone = GetLinkedPortal()->ShadowClones.FromLinkedPortal[i];
+						AssertMsg(bFoundAlready == false, "Multiple clones to linked portal found.");
+						DBG_CODE_NOSCOPE(bFoundAlready = true; );
+						DBG_CODE_NOSCOPE(szLastFoundMarker = pClone->m_szDebugMarker);
+
+						//bool bHeldByPhyscannon = false;
+						CBaseEntity* pHeldEntity = NULL;
+						CPortal_Player* pPlayer = (CPortal_Player*)GetPlayerHoldingEntity(pEntity);
+
+						if (!pPlayer && pEntity->IsPlayer())
+						{
+							pPlayer = (CPortal_Player*)pEntity;
+						}
+
+						if (pPlayer)
+						{
+							pHeldEntity = GetPlayerHeldEntity(pPlayer);
+							/*if ( !pHeldEntity )
+							{
+								pHeldEntity = PhysCannonGetHeldEntity( pPlayer->GetActiveWeapon() );
+								bHeldByPhyscannon = true;
+							}*/
+						}
+
+						if (pHeldEntity)
+						{
+							//player is holding the entity, force them to pick it back up again
+							bool bIsHeldObjectOnOppositeSideOfPortal = pPlayer->IsHeldObjectOnOppositeSideOfPortal();
+							pPlayer->m_bSilentDropAndPickup = true;
+							pPlayer->ForceDropOfCarriedPhysObjects(pHeldEntity);
+							pPlayer->SetHeldObjectOnOppositeSideOfPortal(bIsHeldObjectOnOppositeSideOfPortal);
+						}
+						else
+						{
+							pHeldEntity = NULL;
+						}
+
+						GetLinkedPortal()->EntFlags[pClone->entindex()] &= ~PSEF_OWNS_PHYSICS;
+						GetLinkedPortal()->MarkAsReleased(pClone);
+						CPhysicsShadowClone::ReleaseShadowClone(pClone);
+						GetLinkedPortal()->ShadowClones.FromLinkedPortal.FastRemove(i);
+
+						if (pHeldEntity)
+						{
+							/*if ( bHeldByPhyscannon )
+							{
+								PhysCannonPickupObject( pPlayer, pHeldEntity );
+							}
+							else*/
+							{
+								PlayerPickupObject(pPlayer, pHeldEntity);
+							}
+							pPlayer->m_bSilentDropAndPickup = false;
+						}
+
+						DBG_CODE_NOSCOPE(continue; );
+						break;
+					}
+				}
+			}
+		}
+	}
+
+	m_pCallbacks->PortalSimulator_ReleasedPhysicsOwnershipOfEntity(pEntity);
+}
+
+void CProp_Portal::StartCloningEntity(CBaseEntity* pEntity)
+{
+	if (!pEntity->IsNetworkable() || pEntity->entindex() == -1) {
+		return;
+	}
+
+	if (CPhysicsShadowClone::IsShadowClone(pEntity) || CPortalSimulator::IsPortalSimulatorCollisionEntity(pEntity))
+		return;
+
+	if ((EntFlags[pEntity->entindex()] & PSEF_CLONES_ENTITY_FROM_MAIN) != 0)
+		return; //already cloned, no work to do
+
+#ifdef _DEBUG
+	for (int i = ShadowClones.ShouldCloneFromMain.Count(); --i >= 0; )
+		Assert(ShadowClones.ShouldCloneFromMain[i] != pEntity);
+#endif
+
+	//NDebugOverlay::EntityBounds( pEntity, 0, 255, 0, 50, 5.0f );
+
+	ShadowClones.ShouldCloneFromMain.AddToTail(pEntity);
+	EntFlags[pEntity->entindex()] |= PSEF_CLONES_ENTITY_FROM_MAIN;
+}
+
+void CProp_Portal::StopCloningEntity(CBaseEntity* pEntity)
+{
+	if (!pEntity->IsNetworkable() || pEntity->entindex() == -1) {
+		return;
+	}
+
+	if ((EntFlags[pEntity->entindex()] & PSEF_CLONES_ENTITY_FROM_MAIN) == 0)
+	{
+		Assert(ShadowClones.ShouldCloneFromMain.Find(pEntity) == -1);
+		return; //not cloned, no work to do
+	}
+
+	//NDebugOverlay::EntityBounds( pEntity, 255, 0, 0, 50, 5.0f );
+
+	ShadowClones.ShouldCloneFromMain.FastRemove(ShadowClones.ShouldCloneFromMain.Find(pEntity));
+	EntFlags[pEntity->entindex()] &= ~PSEF_CLONES_ENTITY_FROM_MAIN;
+}
+
+void CProp_Portal::MarkAsOwned(CBaseEntity* pEntity)
+{
+	if (!pEntity->IsNetworkable() || pEntity->entindex() == -1) {
+		return;
+	}
+
+	Assert(pEntity != NULL);
+	int iEntIndex = pEntity->entindex();
+	Assert(s_OwnedEntityMap[iEntIndex] == NULL);
+#ifdef _DEBUG
+	for (int i = OwnedEntities.Count(); --i >= 0; )
+		Assert(OwnedEntities[i] != pEntity);
+#endif
+	Assert((EntFlags[iEntIndex] & PSEF_OWNS_ENTITY) == 0);
+
+	EntFlags[iEntIndex] |= PSEF_OWNS_ENTITY;
+	s_OwnedEntityMap[iEntIndex] = this;
+	OwnedEntities.AddToTail(pEntity);
+
+	if (pEntity->IsPlayer())
+	{
+		g_bPlayerIsInSimulator = true;
+	}
+}
+
+void CProp_Portal::MarkAsReleased(CBaseEntity* pEntity)
+{
+	if (!pEntity->IsNetworkable() || pEntity->entindex() == -1) {
+		return;
+	}
+
+	Assert(pEntity != NULL);
+	int iEntIndex = pEntity->entindex();
+	Assert(s_OwnedEntityMap[iEntIndex] == this);
+	Assert(((EntFlags[iEntIndex] & PSEF_OWNS_ENTITY) != 0) || CPortalSimulator::IsPortalSimulatorCollisionEntity(pEntity));
+
+	s_OwnedEntityMap[iEntIndex] = NULL;
+	EntFlags[iEntIndex] &= ~PSEF_OWNS_ENTITY;
+	int i;
+	for (i = OwnedEntities.Count(); --i >= 0; )
+	{
+		if (OwnedEntities[i] == pEntity)
+		{
+			OwnedEntities.FastRemove(i);
+			break;
+		}
+	}
+	Assert(i >= 0);
+
+
+	if (pEntity->IsPlayer())
+	{
+		g_bPlayerIsInSimulator = false;
+	}
+}
+
+int CProp_Portal::GetMoveableOwnedEntities(CBaseEntity** pEntsOut, int iEntOutLimit)
+{
+	int iOwnedEntCount = OwnedEntities.Count();
+	int iOutputCount = 0;
+
+	for (int i = 0; i != iOwnedEntCount; ++i)
+	{
+		CBaseEntity* pEnt = OwnedEntities[i];
+		Assert(pEnt != NULL);
+
+		if (CPhysicsShadowClone::IsShadowClone(pEnt))
+			continue;
+
+		if (CPortalSimulator::IsPortalSimulatorCollisionEntity(pEnt))
+			continue;
+
+		if (pEnt->GetEngineObject()->GetMoveType() == MOVETYPE_NONE)
+			continue;
+
+		pEntsOut[iOutputCount] = pEnt;
+		++iOutputCount;
+
+		if (iOutputCount == iEntOutLimit)
+			break;
+	}
+
+	return iOutputCount;
+}
+
+CProp_Portal* CProp_Portal::GetSimulatorThatOwnsEntity(const CBaseEntity* pEntity)
+{
+	if (!((CBaseEntity*)pEntity)->IsNetworkable() || pEntity->entindex() == -1) {
+		return NULL;
+	}
+#ifdef _DEBUG
+	int iEntIndex = pEntity->entindex();
+	CProp_Portal* pOwningSimulatorCheck = NULL;
+
+	for (int i = CProp_Portal_Shared::AllPortals.Count(); --i >= 0; )
+	{
+		if (CProp_Portal_Shared::AllPortals[i]->EntFlags[iEntIndex] & PSEF_OWNS_ENTITY)
+		{
+			AssertMsg(pOwningSimulatorCheck == NULL, "More than one portal simulator found owning the same entity.");
+			pOwningSimulatorCheck = CProp_Portal_Shared::AllPortals[i];
+		}
+	}
+
+	AssertMsg(pOwningSimulatorCheck == s_OwnedEntityMap[iEntIndex], "Owned entity mapping out of sync with individual simulator ownership flags.");
+#endif
+
+	return s_OwnedEntityMap[pEntity->entindex()];
+}
+
+void CProp_Portal::ClearLinkedEntities(void)
+{
+	//clones from the linked portal
+	{
+		for (int i = ShadowClones.FromLinkedPortal.Count(); --i >= 0; )
+		{
+			CPhysicsShadowClone* pClone = ShadowClones.FromLinkedPortal[i];
+			EntFlags[pClone->entindex()] &= ~PSEF_OWNS_PHYSICS;
+			MarkAsReleased(pClone);
+			CPhysicsShadowClone::ReleaseShadowClone(pClone);
+		}
+
+		ShadowClones.FromLinkedPortal.RemoveAll();
+	}
+}
+
+class CPortal_AutoGameSys_EntityListener : public CAutoGameSystem, public IEntityListener<CBaseEntity>
+{
+public:
+	virtual void LevelInitPreEntity(void)
+	{
+		
+	}
+
+	virtual void LevelShutdownPreEntity(void)
+	{
+		
+	}
+
+	virtual bool Init(void)
+	{
+		gEntList.AddListenerEntity(this);
+		return true;
+	}
+
+	//virtual void OnEntityCreated( CBaseEntity *pEntity ) {}
+	virtual void OnEntitySpawned(CBaseEntity* pEntity)
+	{
+
+	}
+	virtual void OnEntityDeleted(CBaseEntity* pEntity)
+	{
+		CProp_Portal* pSimulator = CProp_Portal::GetSimulatorThatOwnsEntity(pEntity);
+		if (pSimulator)
+		{
+			pSimulator->ReleasePhysicsOwnership(pEntity, false);
+			pSimulator->ReleaseOwnershipOfEntity(pEntity);
+		}
+		Assert(CProp_Portal::GetSimulatorThatOwnsEntity(pEntity) == NULL);
+	}
+};
+static CPortal_AutoGameSys_EntityListener s_CPortal_AGS_EL_Singleton;
+
+//Move all entities back to the main environment for removal, and make sure the main environment is in control during the UTIL_Remove process
+struct UTIL_Remove_PhysicsStack_t
+{
+	IPhysicsEnvironment* pPhysicsEnvironment;
+	CEntityList* pShadowList;
+};
+static CUtlVector<UTIL_Remove_PhysicsStack_t> s_UTIL_Remove_PhysicsStack;
+
+void CProp_Portal::Pre_UTIL_Remove(CBaseEntity* pEntity)
+{
+	if (!pEntity->IsNetworkable() || pEntity->entindex() == -1) {
+		return;
+	}
+	int index = s_UTIL_Remove_PhysicsStack.AddToTail();
+	s_UTIL_Remove_PhysicsStack[index].pPhysicsEnvironment = physenv;
+	s_UTIL_Remove_PhysicsStack[index].pShadowList = g_pShadowEntities;
+	int iEntIndex = pEntity->entindex();
+
+	//NDebugOverlay::EntityBounds( pEntity, 0, 0, 0, 50, 5.0f );
+
+	if ((CPhysicsShadowClone::IsShadowClone(pEntity) == false) &&
+		(CPortalSimulator::IsPortalSimulatorCollisionEntity(pEntity) == false))
+	{
+		CProp_Portal* pOwningSimulator = CProp_Portal::GetSimulatorThatOwnsEntity(pEntity);
+		if (pOwningSimulator)
+		{
+			pOwningSimulator->ReleasePhysicsOwnership(pEntity, false);
+			pOwningSimulator->ReleaseOwnershipOfEntity(pEntity);
+		}
+
+		//might be cloned from main to a few environments
+		for (int i = CProp_Portal_Shared::AllPortals.Count(); --i >= 0; )
+			CProp_Portal_Shared::AllPortals[i]->StopCloningEntity(pEntity);
+	}
+
+	for (int i = CProp_Portal_Shared::AllPortals.Count(); --i >= 0; )
+	{
+		CProp_Portal_Shared::AllPortals[i]->EntFlags[iEntIndex] = 0;
+	}
+
+
+	physenv = physenv_main;
+	g_pShadowEntities = g_pShadowEntities_Main;
+}
+
+void CProp_Portal::Post_UTIL_Remove(CBaseEntity* pEntity)
+{
+	int index = s_UTIL_Remove_PhysicsStack.Count() - 1;
+	Assert(index >= 0);
+	UTIL_Remove_PhysicsStack_t& PhysicsStackEntry = s_UTIL_Remove_PhysicsStack[index];
+	physenv = PhysicsStackEntry.pPhysicsEnvironment;
+	g_pShadowEntities = PhysicsStackEntry.pShadowList;
+	s_UTIL_Remove_PhysicsStack.FastRemove(index);
+
+#ifdef _DEBUG
+	for (int i = CPhysicsShadowClone::g_ShadowCloneList.Count(); --i >= 0; )
+	{
+		Assert(CPhysicsShadowClone::g_ShadowCloneList[i]->GetClonedEntity() != pEntity); //shouldn't be any clones of this object anymore
+	}
+#endif
+}
+
+void UpdateShadowClonesPortalSimulationFlags(const CBaseEntity* pSourceEntity, unsigned int iFlags, int iSourceFlags)
+{
+	unsigned int iOrFlags = iSourceFlags & iFlags;
+
+	CPhysicsShadowCloneLL* pClones = CPhysicsShadowClone::GetClonesOfEntity(pSourceEntity);
+	while (pClones)
+	{
+		CPhysicsShadowClone* pClone = pClones->pClone;
+		CProp_Portal* pCloneSimulator = CProp_Portal::GetSimulatorThatOwnsEntity(pClone);
+
+		unsigned int* pFlags = (unsigned int*)&pCloneSimulator->EntFlags[pClone->entindex()];
+		*pFlags &= ~iFlags;
+		*pFlags |= iOrFlags;
+
+		Assert(((iSourceFlags ^ *pFlags) & iFlags) == 0);
+
+		pClones = pClones->pNext;
+	}
+}
+
+void CProp_Portal::PrePhysFrame(void)
+{
+	int iPortalSimulators = CProp_Portal_Shared::AllPortals.Count();
+
+	if (iPortalSimulators != 0)
+	{
+		CProp_Portal** pAllSimulators = CProp_Portal_Shared::AllPortals.Base();
+		for (int i = 0; i != iPortalSimulators; ++i)
+		{
+			CProp_Portal* pSimulator = pAllSimulators[i];
+			if (!pSimulator->IsReadyToSimulate())
+				continue;
+
+			int iOwnedEntities = pSimulator->OwnedEntities.Count();
+			if (iOwnedEntities != 0)
+			{
+				CBaseEntity** pOwnedEntities = pSimulator->OwnedEntities.Base();
+
+				for (int j = 0; j != iOwnedEntities; ++j)
+				{
+					CBaseEntity* pEntity = pOwnedEntities[j];
+					if (CPhysicsShadowClone::IsShadowClone(pEntity))
+						continue;
+
+					Assert((pEntity != NULL) && (pEntity->GetEngineObject()->IsMarkedForDeletion() == false));
+					IPhysicsObject* pPhysObject = pEntity->VPhysicsGetObject();
+					if ((pPhysObject == NULL) || pPhysObject->IsAsleep())
+						continue;
+
+					int iEntIndex = pEntity->entindex();
+					int iExistingFlags = pSimulator->EntFlags[iEntIndex];
+					if (pSimulator->EntityIsInPortalHole(pEntity))
+						pSimulator->EntFlags[iEntIndex] |= PSEF_IS_IN_PORTAL_HOLE;
+					else
+						pSimulator->EntFlags[iEntIndex] &= ~PSEF_IS_IN_PORTAL_HOLE;
+
+					UpdateShadowClonesPortalSimulationFlags(pEntity, PSEF_IS_IN_PORTAL_HOLE, pSimulator->EntFlags[iEntIndex]);
+
+					if (((iExistingFlags ^ pSimulator->EntFlags[iEntIndex]) & PSEF_IS_IN_PORTAL_HOLE) != 0) //value changed
+					{
+						pEntity->GetEngineObject()->CollisionRulesChanged(); //entity moved into or out of the portal hole, need to either add or remove collision with transformed geometry
+
+						CPhysicsShadowCloneLL* pClones = CPhysicsShadowClone::GetClonesOfEntity(pEntity);
+						while (pClones)
+						{
+							pClones->pClone->GetEngineObject()->CollisionRulesChanged();
+							pClones = pClones->pNext;
+						}
+					}
+				}
+			}
+		}
+	}
+}
+
+void CProp_Portal::PostPhysFrame(void)
+{
+	if (g_bPlayerIsInSimulator)
+	{
+		CPortal_Player* pPlayer = dynamic_cast<CPortal_Player*>(UTIL_GetLocalPlayer());
+		CProp_Portal* pTouchedPortal = pPlayer->m_hPortalEnvironment.Get();
+		CProp_Portal* pSim = GetSimulatorThatOwnsEntity(pPlayer);
+		if (pTouchedPortal && pSim && (pTouchedPortal->GetPortalSimulatorGUID() != pSim->GetPortalSimulatorGUID()))//m_hPortalSimulator->
+		{
+			Warning("Player is simulated in a physics environment but isn't touching a portal! Can't teleport, but can fall through portal hole. Returning player to main environment.\n");
+			ADD_DEBUG_HISTORY(HISTORY_PLAYER_DAMAGE, UTIL_VarArgs("Player in PortalSimulator but not touching a portal, removing from sim at : %f\n", gpGlobals->curtime));
+
+			if (pSim)
+			{
+				pSim->ReleaseOwnershipOfEntity(pPlayer, false);
+			}
+		}
+	}
+}

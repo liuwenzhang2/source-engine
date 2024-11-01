@@ -51,9 +51,9 @@ int CPortal_CollisionEvent::ShouldCollide( IPhysicsObject *pObj0, IPhysicsObject
 		CBaseEntity *pEntities[2] = { (CBaseEntity *)pGameData0, (CBaseEntity *)pGameData1 };
 		IPhysicsObject *pPhysObjects[2] = { pObj0, pObj1 };
 		bool bStatic[2] = { pObj0->IsStatic(), pObj1->IsStatic() };
-		CPortalSimulator *pSimulators[2];
+		CProp_Portal *pSimulators[2];
 		for( int i = 0; i != 2; ++i )
-			pSimulators[i] = CPortalSimulator::GetSimulatorThatOwnsEntity( pEntities[i] );
+			pSimulators[i] = CProp_Portal::GetSimulatorThatOwnsEntity( pEntities[i] );
 
 		AssertOnce( (bStatic[0] && bStatic[1]) == false ); //hopefully the system doesn't even call in for this, they're both static and can't collide
 		if( bStatic[0] && bStatic[1] )
@@ -67,7 +67,7 @@ int CPortal_CollisionEvent::ShouldCollide( IPhysicsObject *pObj0, IPhysicsObject
 				CPhysicsShadowClone *pClone = (CPhysicsShadowClone *)pEntities[i];
 				CBaseEntity *pSource = pClone->GetClonedEntity();
 
-				CPortalSimulator *pSourceSimulator = CPortalSimulator::GetSimulatorThatOwnsEntity( pSource );
+				CProp_Portal *pSourceSimulator = CProp_Portal::GetSimulatorThatOwnsEntity( pSource );
 				Assert( (pSimulators[i]->EntFlags[pClone->entindex()] & PSEF_IS_IN_PORTAL_HOLE) == (pSourceSimulator->EntFlags[pSource->entindex()] & PSEF_IS_IN_PORTAL_HOLE) );
 			}
 		}
