@@ -56,15 +56,15 @@ struct PortalTransformAsAngledPosition_t //a matrix transformation from this por
 inline bool LessFunc_Integer( const int &a, const int &b ) { return a < b; };
 
 
-class CPortalSimulatorEventCallbacks //sends out notifications of events to game specific code
-{
-public:
-	virtual void PortalSimulator_TookOwnershipOfEntity( CBaseEntity *pEntity ) { };
-	virtual void PortalSimulator_ReleasedOwnershipOfEntity( CBaseEntity *pEntity ) { };
-
-	virtual void PortalSimulator_TookPhysicsOwnershipOfEntity( CBaseEntity *pEntity ) { };
-	virtual void PortalSimulator_ReleasedPhysicsOwnershipOfEntity( CBaseEntity *pEntity ) { };
-};
+//class CPortalSimulatorEventCallbacks //sends out notifications of events to game specific code
+//{
+//public:
+//	virtual void PortalSimulator_TookOwnershipOfEntity( CBaseEntity *pEntity ) { };
+//	virtual void PortalSimulator_ReleasedOwnershipOfEntity( CBaseEntity *pEntity ) { };
+//
+//	virtual void PortalSimulator_TookPhysicsOwnershipOfEntity( CBaseEntity *pEntity ) { };
+//	virtual void PortalSimulator_ReleasedPhysicsOwnershipOfEntity( CBaseEntity *pEntity ) { };
+//};
 
 //====================================================================================
 // To any coder trying to understand the following nested structures....
@@ -98,8 +98,8 @@ public:
 
 struct PS_PlacementData_t //stuff useful for geometric operations
 {
-	Vector ptCenter;
-	QAngle qAngles;
+	//Vector ptCenter;
+	//QAngle qAngles;
 	Vector vForward;
 	Vector vUp;
 	Vector vRight;
@@ -310,8 +310,8 @@ public:
 	bool				EntityHitBoxExtentIsInPortalHole(CBaseAnimating* pBaseAnimating) const; //true if the entity is within the portal cutout bounds and crossing the plane. Not just *near* the portal
 	bool				RayIsInPortalHole(const Ray_t& ray) const; //traces a ray against the same detector for EntityIsInPortalHole(), bias is towards false positives
 
-	const Vector& GetOrigin() const;
-	const QAngle& GetAngles() const;
+	//const Vector& GetOrigin() const;
+	//const QAngle& GetAngles() const;
 	const VMatrix& MatrixThisToLinked() const;
 	const VMatrix& MatrixLinkedToThis() const;
 	const cplane_t& GetPortalPlane() const;
@@ -375,11 +375,11 @@ public:
 	void				DetachFromLinked( void ); //detach portals to sever the connection, saves work when planning on moving both portals
 	CPortalSimulator	*GetLinkedPortalSimulator( void ) const;
 	CPortalSimulator*	GetLinkedPortal() { return m_hLinkedPortal.Get(); }
-	void				SetPortalSimulatorCallbacks( CPortalSimulatorEventCallbacks *pCallbacks );
+	//void				SetPortalSimulatorCallbacks( CPortalSimulatorEventCallbacks *pCallbacks );
 	
 	bool				IsReadyToSimulate( void ) const; //is active and linked to another portal
-	const Vector&		GetOrigin() const;
-	const QAngle&		GetAngles() const;
+	//const Vector&		GetOrigin() const;
+	//const QAngle&		GetAngles() const;
 	const VMatrix&		MatrixThisToLinked() const;
 	const VMatrix&		MatrixLinkedToThis() const;
 	const cplane_t&		GetPortalPlane() const;
@@ -416,7 +416,7 @@ protected:
 	CPortalSimulator	*m_pLinkedPortal;
 	CNetworkHandle(CPortalSimulator, m_hLinkedPortal); //the portal this portal is linked to
 	bool				m_bInCrossLinkedFunction; //A flag to mark that we're already in a linked function and that the linked portal shouldn't call our side
-	CPortalSimulatorEventCallbacks *m_pCallbacks; 
+	//CPortalSimulatorEventCallbacks *m_pCallbacks; 
 #ifdef PORTAL_SIMULATORS_EMBED_GUID
 	int					m_iPortalSimulatorGUID;
 #endif

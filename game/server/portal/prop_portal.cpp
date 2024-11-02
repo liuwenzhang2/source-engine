@@ -110,7 +110,7 @@ CProp_Portal::CProp_Portal( void )
 {
 	m_vPrevForward = Vector( 0.0f, 0.0f, 0.0f );
 	//m_hPortalSimulator = (CPortalSimulator*)gEntList.CreateEntityByName("portal_simulator");
-	SetPortalSimulatorCallbacks( this );//m_hPortalSimulator->
+	//SetPortalSimulatorCallbacks( this );//m_hPortalSimulator->
 
 	// Init to something safe
 	for ( int i = 0; i < 4; ++i )
@@ -1550,7 +1550,7 @@ bool CProp_Portal::SharedEnvironmentCheck( CBaseEntity *pEntity )
 	}
 
 	Vector ptCenter = pEntity->WorldSpaceCenter();
-	if( (ptCenter - GetOrigin()).LengthSqr() < (ptCenter - pOwningSimulator->GetOrigin()).LengthSqr() )//m_hPortalSimulator->
+	if( (ptCenter - GetEngineObject()->GetAbsOrigin()).LengthSqr() < (ptCenter - pOwningSimulator->GetEngineObject()->GetAbsOrigin()).LengthSqr() )//m_hPortalSimulator->
 		return true;
 
 	/*if( !m_hLinkedPortal->m_hPortalSimulator->EntityIsInPortalHole( pEntity ) )
@@ -2383,7 +2383,7 @@ void CProp_Portal::TakeOwnershipOfEntity(CBaseEntity* pEntity)
 
 	UpdateShadowClonesPortalSimulationFlags(pEntity, PSEF_IS_IN_PORTAL_HOLE, EntFlags[pEntity->entindex()]);
 
-	m_pCallbacks->PortalSimulator_TookOwnershipOfEntity(pEntity);
+	PortalSimulator_TookOwnershipOfEntity(pEntity);
 
 	if (IsSimulatingVPhysics())
 		TakePhysicsOwnership(pEntity);
@@ -2527,7 +2527,7 @@ void CProp_Portal::TakePhysicsOwnership(CBaseEntity* pEntity)
 		}
 	}
 
-	m_pCallbacks->PortalSimulator_TookPhysicsOwnershipOfEntity(pEntity);
+	//PortalSimulator_TookPhysicsOwnershipOfEntity(pEntity);
 }
 
 void RecheckEntityCollision(CBaseEntity* pEntity)
@@ -2588,7 +2588,7 @@ void CProp_Portal::ReleaseOwnershipOfEntity(CBaseEntity* pEntity, bool bMovingTo
 		RecheckEntityCollision(pEntity);
 	}
 
-	m_pCallbacks->PortalSimulator_ReleasedOwnershipOfEntity(pEntity);
+	PortalSimulator_ReleasedOwnershipOfEntity(pEntity);
 
 	CUtlVector<IEngineObjectServer*> childrenList;
 	GetAllChildren(pEntity->GetEngineObject(), childrenList);
@@ -2825,7 +2825,7 @@ void CProp_Portal::ReleasePhysicsOwnership(CBaseEntity* pEntity, bool bContinueP
 		}
 	}
 
-	m_pCallbacks->PortalSimulator_ReleasedPhysicsOwnershipOfEntity(pEntity);
+	//PortalSimulator_ReleasedPhysicsOwnershipOfEntity(pEntity);
 }
 
 void CProp_Portal::StartCloningEntity(CBaseEntity* pEntity)

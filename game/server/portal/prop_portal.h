@@ -23,7 +23,7 @@ static const char *s_pFizzleThink = "FizzleThink";
 
 class CPhysicsCloneArea;
 
-class CProp_Portal : public CPortalSimulator, public CPortalSimulatorEventCallbacks
+class CProp_Portal : public CPortalSimulator//, public CPortalSimulatorEventCallbacks
 {
 public:
 	DECLARE_CLASS( CProp_Portal, CPortalSimulator);
