@@ -31,6 +31,7 @@
 #include "func_portal_orientation.h"
 #include "env_debughistory.h"
 #include "tier1/callqueue.h"
+#include "mathlib/polyhedron.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
@@ -2317,7 +2318,7 @@ void CProp_Portal::BeforeMove()
 			++iFixEntityCount;
 		}
 	}
-	OldPlane = pCollisionEntity->m_InternalData.Placement.PortalPlane; //used in fixing code
+	OldPlane = pCollisionEntity->GetPortalPlane(); //used in fixing code
 }
 
 void CProp_Portal::AfterMove()

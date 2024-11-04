@@ -495,18 +495,15 @@ void CPortalSimulator::TraceRay(const Ray_t& ray, unsigned int fMask, ITraceFilt
 	{
 		//trace_t RealTrace;
 		//enginetrace->TraceRay( ray, fMask, pTraceFilter, &RealTrace );
-		if (pCollisionEntity->m_DataAccess.Simulation.Static.World.Brushes.pCollideable && sv_portal_trace_vs_world.GetBool())
+		if (pCollisionEntity->TraceWorldBrushes(ray, pTrace))
 		{
-			physcollision->TraceBox(ray, pCollisionEntity->m_DataAccess.Simulation.Static.World.Brushes.pCollideable, vec3_origin, vec3_angle, pTrace);
 			bCopyBackBrushTraceData = true;
 		}
 
 		if (bTraceHolyWall)
 		{
-			if (pCollisionEntity->m_DataAccess.Simulation.Static.Wall.Local.Tube.pCollideable)
+			if (pCollisionEntity->TraceWallTube(ray, &TempTrace))
 			{
-				physcollision->TraceBox(ray, pCollisionEntity->m_DataAccess.Simulation.Static.Wall.Local.Tube.pCollideable, vec3_origin, vec3_angle, &TempTrace);
-
 				if ((TempTrace.startsolid == false) && (TempTrace.fraction < pTrace->fraction)) //never allow something to be stuck in the tube, it's more of a last-resort guide than a real collideable
 				{
 					*pTrace = TempTrace;
@@ -514,9 +511,8 @@ void CPortalSimulator::TraceRay(const Ray_t& ray, unsigned int fMask, ITraceFilt
 				}
 			}
 
-			if (pCollisionEntity->m_DataAccess.Simulation.Static.Wall.Local.Brushes.pCollideable)
+			if (pCollisionEntity->TraceWallBrushes(ray, &TempTrace))
 			{
-				physcollision->TraceBox(ray, pCollisionEntity->m_DataAccess.Simulation.Static.Wall.Local.Brushes.pCollideable, vec3_origin, vec3_angle, &TempTrace);
 				if ((TempTrace.fraction < pTrace->fraction))
 				{
 					*pTrace = TempTrace;
@@ -525,9 +521,8 @@ void CPortalSimulator::TraceRay(const Ray_t& ray, unsigned int fMask, ITraceFilt
 			}
 
 			//if( portalSimulator->m_DataAccess.Simulation.Static.Wall.RemoteTransformedToLocal.Brushes.pCollideable && sv_portal_trace_vs_world.GetBool() )
-			if (bTraceTransformedGeometry && pLinkedPortalSimulator->pCollisionEntity->m_DataAccess.Simulation.Static.World.Brushes.pCollideable)
+			if (bTraceTransformedGeometry && pCollisionEntity->TraceTransformedWorldBrushes(pLinkedPortalSimulator->pCollisionEntity, ray, &TempTrace))
 			{
-				physcollision->TraceBox(ray, pLinkedPortalSimulator->pCollisionEntity->m_DataAccess.Simulation.Static.World.Brushes.pCollideable, pCollisionEntity->m_DataAccess.Placement.ptaap_LinkedToThis.ptOriginTransform, pCollisionEntity->m_DataAccess.Placement.ptaap_LinkedToThis.qAngleTransform, &TempTrace);
 				if ((TempTrace.fraction < pTrace->fraction))
 				{
 					*pTrace = TempTrace;
@@ -538,9 +533,9 @@ void CPortalSimulator::TraceRay(const Ray_t& ray, unsigned int fMask, ITraceFilt
 
 		if (bCopyBackBrushTraceData)
 		{
-			pTrace->surface = pCollisionEntity->m_DataAccess.Simulation.Static.SurfaceProperties.surface;
-			pTrace->contents = pCollisionEntity->m_DataAccess.Simulation.Static.SurfaceProperties.contents;
-			pTrace->m_pEnt = pCollisionEntity->m_DataAccess.Simulation.Static.SurfaceProperties.pEntity;
+			pTrace->surface = pCollisionEntity->GetSurfaceProperties().surface;
+			pTrace->contents = pCollisionEntity->GetSurfaceProperties().contents;
+			pTrace->m_pEnt = pCollisionEntity->GetSurfaceProperties().pEntity;
 
 			bCopyBackBrushTraceData = false;
 		}
@@ -578,16 +573,16 @@ void CPortalSimulator::TraceRay(const Ray_t& ray, unsigned int fMask, ITraceFilt
 		{
 			//local clipped static props
 			{
-				int iLocalStaticCount = pCollisionEntity->m_DataAccess.Simulation.Static.World.StaticProps.ClippedRepresentations.Count();
-				if (iLocalStaticCount != 0 && pCollisionEntity->m_DataAccess.Simulation.Static.World.StaticProps.bCollisionExists)
+				int iLocalStaticCount = pCollisionEntity->GetStaticPropsCount();
+				if (iLocalStaticCount != 0 && pCollisionEntity->StaticPropsCollisionExists())
 				{
-					const PS_SD_Static_World_StaticProps_ClippedProp_t* pCurrentProp = pCollisionEntity->m_DataAccess.Simulation.Static.World.StaticProps.ClippedRepresentations.Base();
-					const PS_SD_Static_World_StaticProps_ClippedProp_t* pStop = pCurrentProp + iLocalStaticCount;
+					int iIndex = 0;
 					Vector vTransform = vec3_origin;
 					QAngle qTransform = vec3_angle;
 
 					do
 					{
+						const PS_SD_Static_World_StaticProps_ClippedProp_t* pCurrentProp = pCollisionEntity->GetStaticProps(iIndex);
 						if ((!bFilterStaticProps) || pTraceFilter->ShouldHitEntity(pCurrentProp->pSourceProp, fMask))
 						{
 							physcollision->TraceBox(ray, pCurrentProp->pCollide, vTransform, qTransform, &TempTrace);
@@ -602,8 +597,8 @@ void CPortalSimulator::TraceRay(const Ray_t& ray, unsigned int fMask, ITraceFilt
 							}
 						}
 
-						++pCurrentProp;
-					} while (pCurrentProp != pStop);
+						++iIndex;
+					} while (iIndex != iLocalStaticCount);
 				}
 			}
 
@@ -612,16 +607,16 @@ void CPortalSimulator::TraceRay(const Ray_t& ray, unsigned int fMask, ITraceFilt
 				//remote clipped static props transformed into our wall space
 				if (bTraceTransformedGeometry && (pTraceFilter->GetTraceType() != TRACE_WORLD_ONLY) && sv_portal_trace_vs_staticprops.GetBool())
 				{
-					int iLocalStaticCount = pLinkedPortalSimulator->pCollisionEntity->m_DataAccess.Simulation.Static.World.StaticProps.ClippedRepresentations.Count();
+					int iLocalStaticCount = pLinkedPortalSimulator->pCollisionEntity->GetStaticPropsCount();
 					if (iLocalStaticCount != 0)
 					{
-						const PS_SD_Static_World_StaticProps_ClippedProp_t* pCurrentProp = pLinkedPortalSimulator->pCollisionEntity->m_DataAccess.Simulation.Static.World.StaticProps.ClippedRepresentations.Base();
-						const PS_SD_Static_World_StaticProps_ClippedProp_t* pStop = pCurrentProp + iLocalStaticCount;
-						Vector vTransform = pCollisionEntity->m_DataAccess.Placement.ptaap_LinkedToThis.ptOriginTransform;
-						QAngle qTransform = pCollisionEntity->m_DataAccess.Placement.ptaap_LinkedToThis.qAngleTransform;
+						int iIndex = 0;
+						Vector vTransform = pCollisionEntity->GetTransformedOrigin();
+						QAngle qTransform = pCollisionEntity->GetTransformedAngles();
 
 						do
 						{
+							const PS_SD_Static_World_StaticProps_ClippedProp_t* pCurrentProp = pLinkedPortalSimulator->pCollisionEntity->GetStaticProps(iIndex);
 							if ((!bFilterStaticProps) || pTraceFilter->ShouldHitEntity(pCurrentProp->pSourceProp, fMask))
 							{
 								physcollision->TraceBox(ray, pCurrentProp->pCollide, vTransform, qTransform, &TempTrace);
@@ -636,8 +631,8 @@ void CPortalSimulator::TraceRay(const Ray_t& ray, unsigned int fMask, ITraceFilt
 								}
 							}
 
-							++pCurrentProp;
-						} while (pCurrentProp != pStop);
+							++iIndex;
+						} while (iIndex != iLocalStaticCount);
 					}
 				}
 			}
@@ -657,9 +652,9 @@ void CPortalSimulator::TraceRay(const Ray_t& ray, unsigned int fMask, ITraceFilt
 		// For all brush traces, use the 'portal backbrush' surface surface contents
 		// BUGBUG: Doing this is a great solution because brushes near a portal
 		// will have their contents and surface properties homogenized to the brush the portal ray hit.
-		pTrace->contents = pCollisionEntity->m_DataAccess.Simulation.Static.SurfaceProperties.contents;
-		pTrace->surface = pCollisionEntity->m_DataAccess.Simulation.Static.SurfaceProperties.surface;
-		pTrace->m_pEnt = pCollisionEntity->m_DataAccess.Simulation.Static.SurfaceProperties.pEntity;
+		pTrace->contents = pCollisionEntity->GetSurfaceProperties().contents;
+		pTrace->surface = pCollisionEntity->GetSurfaceProperties().surface;
+		pTrace->m_pEnt = pCollisionEntity->GetSurfaceProperties().pEntity;
 	}
 }
 
@@ -704,14 +699,10 @@ void CPortalSimulator::TraceEntity(CBaseEntity* pEntity, const Vector& vecAbsSta
 	// Hit the world
 	if (pFilter->GetTraceType() != TRACE_ENTITIES_ONLY)
 	{
-		if (pCollisionEntity->m_DataAccess.Simulation.Static.World.Brushes.pCollideable &&
-			sv_portal_trace_vs_world.GetBool())
+		if (pCollisionEntity->TraceWorldBrushes(entRay, &tempTrace))
 		{
 			//physcollision->TraceCollide( vecAbsStart, vecAbsEnd, pCollision, qCollisionAngles, 
 			//							pPortalSimulator->m_DataAccess.Simulation.Static.World.Brushes.pCollideable, vec3_origin, vec3_angle, &tempTrace );
-
-			physcollision->TraceBox(entRay, MASK_ALL, NULL, pCollisionEntity->m_DataAccess.Simulation.Static.World.Brushes.pCollideable, vec3_origin, vec3_angle, &tempTrace);
-
 			if (tempTrace.startsolid || (tempTrace.fraction < pTrace->fraction))
 			{
 				*pTrace = tempTrace;
@@ -719,15 +710,10 @@ void CPortalSimulator::TraceEntity(CBaseEntity* pEntity, const Vector& vecAbsSta
 		}
 
 		//if( pPortalSimulator->m_DataAccess.Simulation.Static.Wall.RemoteTransformedToLocal.Brushes.pCollideable &&
-		if (pLinkedPortalSimulator &&
-			pLinkedPortalSimulator->pCollisionEntity->m_DataAccess.Simulation.Static.World.Brushes.pCollideable &&
-			sv_portal_trace_vs_world.GetBool() &&
-			sv_portal_trace_vs_holywall.GetBool())
+		if (pLinkedPortalSimulator && pCollisionEntity->TraceTransformedWorldBrushes(pLinkedPortalSimulator->pCollisionEntity, entRay, &tempTrace))
 		{
 			//physcollision->TraceCollide( vecAbsStart, vecAbsEnd, pCollision, qCollisionAngles,
 			//							pLinkedPortalSimulator->m_DataAccess.Simulation.Static.World.Brushes.pCollideable, pPortalSimulator->m_DataAccess.Placement.ptaap_LinkedToThis.ptOriginTransform, pPortalSimulator->m_DataAccess.Placement.ptaap_LinkedToThis.qAngleTransform, &tempTrace );
-
-			physcollision->TraceBox(entRay, MASK_ALL, NULL, pLinkedPortalSimulator->pCollisionEntity->m_DataAccess.Simulation.Static.World.Brushes.pCollideable, pCollisionEntity->m_DataAccess.Placement.ptaap_LinkedToThis.ptOriginTransform, pCollisionEntity->m_DataAccess.Placement.ptaap_LinkedToThis.qAngleTransform, &tempTrace);
 
 			if (tempTrace.startsolid || (tempTrace.fraction < pTrace->fraction))
 			{
@@ -735,13 +721,10 @@ void CPortalSimulator::TraceEntity(CBaseEntity* pEntity, const Vector& vecAbsSta
 			}
 		}
 
-		if (pCollisionEntity->m_DataAccess.Simulation.Static.Wall.Local.Brushes.pCollideable &&
-			sv_portal_trace_vs_holywall.GetBool())
+		if (pCollisionEntity->TraceWallBrushes(entRay, &tempTrace))
 		{
 			//physcollision->TraceCollide( vecAbsStart, vecAbsEnd, pCollision, qCollisionAngles,
 			//							pPortalSimulator->m_DataAccess.Simulation.Static.Wall.Local.Brushes.pCollideable, vec3_origin, vec3_angle, &tempTrace );
-
-			physcollision->TraceBox(entRay, MASK_ALL, NULL, pCollisionEntity->m_DataAccess.Simulation.Static.Wall.Local.Brushes.pCollideable, vec3_origin, vec3_angle, &tempTrace);
 
 			if (tempTrace.startsolid || (tempTrace.fraction < pTrace->fraction))
 			{
@@ -755,13 +738,10 @@ void CPortalSimulator::TraceEntity(CBaseEntity* pEntity, const Vector& vecAbsSta
 			}
 		}
 
-		if (pCollisionEntity->m_DataAccess.Simulation.Static.Wall.Local.Tube.pCollideable &&
-			sv_portal_trace_vs_holywall.GetBool())
+		if (pCollisionEntity->TraceWallTube(entRay, &tempTrace))
 		{
 			//physcollision->TraceCollide( vecAbsStart, vecAbsEnd, pCollision, qCollisionAngles,
 			//							pPortalSimulator->m_DataAccess.Simulation.Static.Wall.Local.Tube.pCollideable, vec3_origin, vec3_angle, &tempTrace );
-
-			physcollision->TraceBox(entRay, MASK_ALL, NULL, pCollisionEntity->m_DataAccess.Simulation.Static.Wall.Local.Tube.pCollideable, vec3_origin, vec3_angle, &tempTrace);
 
 			if ((tempTrace.startsolid == false) && (tempTrace.fraction < pTrace->fraction)) //never allow something to be stuck in the tube, it's more of a last-resort guide than a real collideable
 			{
@@ -774,9 +754,9 @@ void CPortalSimulator::TraceEntity(CBaseEntity* pEntity, const Vector& vecAbsSta
 		// will have their contents and surface properties homogenized to the brush the portal ray hit.
 		if (pTrace->startsolid || (pTrace->fraction < 1.0f))
 		{
-			pTrace->surface = pCollisionEntity->m_DataAccess.Simulation.Static.SurfaceProperties.surface;
-			pTrace->contents = pCollisionEntity->m_DataAccess.Simulation.Static.SurfaceProperties.contents;
-			pTrace->m_pEnt = pCollisionEntity->m_DataAccess.Simulation.Static.SurfaceProperties.pEntity;
+			pTrace->surface = pCollisionEntity->GetSurfaceProperties().surface;
+			pTrace->contents = pCollisionEntity->GetSurfaceProperties().contents;
+			pTrace->m_pEnt = pCollisionEntity->GetSurfaceProperties().pEntity;
 		}
 	}
 
@@ -789,16 +769,16 @@ void CPortalSimulator::TraceEntity(CBaseEntity* pEntity, const Vector& vecAbsSta
 
 			//local clipped static props
 			{
-				int iLocalStaticCount = pCollisionEntity->m_DataAccess.Simulation.Static.World.StaticProps.ClippedRepresentations.Count();
-				if (iLocalStaticCount != 0 && pCollisionEntity->m_DataAccess.Simulation.Static.World.StaticProps.bCollisionExists)
+				int iLocalStaticCount = pCollisionEntity->GetStaticPropsCount();
+				if (iLocalStaticCount != 0 && pCollisionEntity->StaticPropsCollisionExists())
 				{
-					const PS_SD_Static_World_StaticProps_ClippedProp_t* pCurrentProp = pCollisionEntity->m_DataAccess.Simulation.Static.World.StaticProps.ClippedRepresentations.Base();
-					const PS_SD_Static_World_StaticProps_ClippedProp_t* pStop = pCurrentProp + iLocalStaticCount;
+					int iIndex = 0;
 					Vector vTransform = vec3_origin;
 					QAngle qTransform = vec3_angle;
 
 					do
 					{
+						const PS_SD_Static_World_StaticProps_ClippedProp_t* pCurrentProp = pCollisionEntity->GetStaticProps(iIndex);
 						if ((!bFilterStaticProps) || pFilter->ShouldHitEntity(pCurrentProp->pSourceProp, mask))
 						{
 							//physcollision->TraceCollide( vecAbsStart, vecAbsEnd, pCollision, qCollisionAngles,
@@ -817,8 +797,8 @@ void CPortalSimulator::TraceEntity(CBaseEntity* pEntity, const Vector& vecAbsSta
 							}
 						}
 
-						++pCurrentProp;
-					} while (pCurrentProp != pStop);
+						++iIndex;
+					} while (iIndex != iLocalStaticCount);
 				}
 			}
 
@@ -833,8 +813,8 @@ void CPortalSimulator::TraceEntity(CBaseEntity* pEntity, const Vector& vecAbsSta
 					int iEntCount = pLinkedPortalSimulator->GetMoveableOwnedEntities(pEnts, 1024);
 
 					CTransformedCollideable transformedCollideable;
-					transformedCollideable.m_matTransform = pLinkedPortalSimulator->pCollisionEntity->m_DataAccess.Placement.matThisToLinked;
-					transformedCollideable.m_matInvTransform = pLinkedPortalSimulator->pCollisionEntity->m_DataAccess.Placement.matLinkedToThis;
+					transformedCollideable.m_matTransform = pLinkedPortalSimulator->pCollisionEntity->MatrixThisToLinked();
+					transformedCollideable.m_matInvTransform = pLinkedPortalSimulator->pCollisionEntity->MatrixLinkedToThis();
 					for (int i = 0; i != iEntCount; ++i)
 					{
 						CBaseEntity* pRemoteEntity = pEnts[i];
@@ -2105,6 +2085,61 @@ bool CPSCollisionEntity::RayIsInPortalHole(const Ray_t& ray) const //traces a ra
 	return Trace.DidHit();
 }
 
+bool CPSCollisionEntity::TraceWorldBrushes(const Ray_t& ray, trace_t* pTrace) const
+{
+	if (m_DataAccess.Simulation.Static.World.Brushes.pCollideable && sv_portal_trace_vs_world.GetBool())
+	{
+		physcollision->TraceBox(ray, m_DataAccess.Simulation.Static.World.Brushes.pCollideable, vec3_origin, vec3_angle, pTrace);
+		return true;
+	}
+	return false;
+}
+
+bool CPSCollisionEntity::TraceWallTube(const Ray_t& ray, trace_t* pTrace) const
+{
+	if (m_DataAccess.Simulation.Static.Wall.Local.Tube.pCollideable && sv_portal_trace_vs_holywall.GetBool())
+	{
+		physcollision->TraceBox(ray, m_DataAccess.Simulation.Static.Wall.Local.Tube.pCollideable, vec3_origin, vec3_angle, pTrace);
+		return true;
+	}
+	return false;
+}
+
+bool CPSCollisionEntity::TraceWallBrushes(const Ray_t& ray, trace_t* pTrace) const
+{
+	if (m_DataAccess.Simulation.Static.Wall.Local.Brushes.pCollideable && sv_portal_trace_vs_holywall.GetBool())
+	{
+		physcollision->TraceBox(ray, m_DataAccess.Simulation.Static.Wall.Local.Brushes.pCollideable, vec3_origin, vec3_angle, pTrace);
+		return true;
+	}
+	return false;
+}
+
+bool CPSCollisionEntity::TraceTransformedWorldBrushes(CPSCollisionEntity* pRemoteCollisionEntity, const Ray_t& ray, trace_t* pTrace) const
+{
+	if (pRemoteCollisionEntity->m_DataAccess.Simulation.Static.World.Brushes.pCollideable && sv_portal_trace_vs_world.GetBool())
+	{
+		physcollision->TraceBox(ray, pRemoteCollisionEntity->m_DataAccess.Simulation.Static.World.Brushes.pCollideable, m_DataAccess.Placement.ptaap_LinkedToThis.ptOriginTransform, m_DataAccess.Placement.ptaap_LinkedToThis.qAngleTransform, pTrace);
+		return true;
+	}
+	return false;
+}
+
+int CPSCollisionEntity::GetStaticPropsCount() const
+{
+	return m_DataAccess.Simulation.Static.World.StaticProps.ClippedRepresentations.Count();
+}
+
+const PS_SD_Static_World_StaticProps_ClippedProp_t* CPSCollisionEntity::GetStaticProps(int index) const
+{
+	return &m_DataAccess.Simulation.Static.World.StaticProps.ClippedRepresentations[index];
+}
+
+bool CPSCollisionEntity::StaticPropsCollisionExists() const
+{
+	return m_DataAccess.Simulation.Static.World.StaticProps.bCollisionExists;
+}
+
 //const Vector& CPSCollisionEntity::GetOrigin() const
 //{
 //	return m_DataAccess.Placement.ptCenter;
@@ -2114,6 +2149,16 @@ bool CPSCollisionEntity::RayIsInPortalHole(const Ray_t& ray) const //traces a ra
 //{
 //	return m_DataAccess.Placement.qAngles;
 //}
+
+const Vector& CPSCollisionEntity::GetTransformedOrigin() const
+{
+	return m_DataAccess.Placement.ptaap_LinkedToThis.ptOriginTransform;
+}
+
+const QAngle& CPSCollisionEntity::GetTransformedAngles() const
+{
+	return m_DataAccess.Placement.ptaap_LinkedToThis.qAngleTransform;
+}
 
 const VMatrix& CPSCollisionEntity::MatrixThisToLinked() const
 {
