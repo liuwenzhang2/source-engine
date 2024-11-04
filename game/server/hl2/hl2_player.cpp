@@ -1371,7 +1371,7 @@ void CHL2_Player::InitVCollision( const Vector &vecAbsOrigin, const Vector &vecA
 	BaseClass::InitVCollision( vecAbsOrigin, vecAbsVelocity );
 
 	// Setup the HL2 specific callback.
-	IPhysicsPlayerController *pPlayerController = GetEngineObject()->GetPhysicsController();
+	IPhysicsPlayerController *pPlayerController = GetEnginePlayer()->GetPhysicsController();
 	if ( pPlayerController )
 	{
 		pPlayerController->SetEventHandler( &playerCallback );

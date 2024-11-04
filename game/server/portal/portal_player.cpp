@@ -1148,7 +1148,7 @@ void CPortal_Player::VPhysicsShadowUpdate( IPhysicsObject *pPhysics )
 
 	Vector newPosition;
 
-	bool physicsUpdated = GetEngineObject()->GetPhysicsController()->GetShadowPosition(&newPosition, NULL) > 0 ? true : false;
+	bool physicsUpdated = GetEnginePlayer()->GetPhysicsController()->GetShadowPosition(&newPosition, NULL) > 0 ? true : false;
 
 	// UNDONE: If the player is penetrating, but the player's game collisions are not stuck, teleport the physics shadow to the game position
 	if ( pPhysics->GetGameFlags() & FVPHYSICS_PENETRATING )
@@ -1168,7 +1168,7 @@ void CPortal_Player::VPhysicsShadowUpdate( IPhysicsObject *pPhysics )
 		}
 	}
 
-	if (GetEngineObject()->GetPhysicsController()->IsInContact() || (m_afPhysicsFlags & PFLAG_VPHYSICS_MOTIONCONTROLLER))
+	if (GetEnginePlayer()->GetPhysicsController()->IsInContact() || (m_afPhysicsFlags & PFLAG_VPHYSICS_MOTIONCONTROLLER))
 	{
 		m_touchedPhysObject = true;
 	}
@@ -1196,7 +1196,7 @@ void CPortal_Player::VPhysicsShadowUpdate( IPhysicsObject *pPhysics )
 
 	Vector newVelocity;
 	pPhysics->GetPosition( &newPosition, 0 );
-	GetEngineObject()->GetPhysicsController()->GetShadowVelocity(&newVelocity);
+	GetEnginePlayer()->GetPhysicsController()->GetShadowVelocity(&newVelocity);
 
 
 
@@ -1937,7 +1937,7 @@ void CPortal_Player::ForceDuckThisFrame( void )
 		m_Local.m_bDucked = true;
 		ForceButtons( IN_DUCK );
 		GetEngineObject()->AddFlag( FL_DUCKING );
-		GetEngineObject()->SetVCollisionState(GetEngineObject()->GetAbsOrigin(), GetEngineObject()->GetAbsVelocity(), VPHYS_CROUCH );
+		GetEnginePlayer()->SetVCollisionState(GetEngineObject()->GetAbsOrigin(), GetEngineObject()->GetAbsVelocity(), VPHYS_CROUCH );
 	}
 }
 
@@ -1948,7 +1948,7 @@ void CPortal_Player::UnDuck( void )
 		m_Local.m_bDucked = false;
 		UnforceButtons( IN_DUCK );
 		GetEngineObject()->RemoveFlag( FL_DUCKING );
-		GetEngineObject()->SetVCollisionState(GetEngineObject()->GetAbsOrigin(), GetEngineObject()->GetAbsVelocity(), VPHYS_WALK );
+		GetEnginePlayer()->SetVCollisionState(GetEngineObject()->GetAbsOrigin(), GetEngineObject()->GetAbsVelocity(), VPHYS_WALK );
 	}
 }
 

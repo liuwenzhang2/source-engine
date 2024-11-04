@@ -432,11 +432,7 @@ public:
 	virtual IPhysicsObject* VPhysicsInitStatic(void) = 0;
 	virtual IPhysicsObject* VPhysicsInitNormal(SolidType_t solidType, int nSolidFlags, bool createAsleep, solid_t* pSolid = NULL) = 0;
 	virtual IPhysicsObject* VPhysicsInitShadow(bool allowPhysicsMovement, bool allowPhysicsRotation, solid_t* pSolid = NULL) = 0;
-	virtual void SetupVPhysicsShadow(const Vector& vecAbsOrigin, const Vector& vecAbsVelocity, CPhysCollide* pStandModel, const char* pStandHullName, CPhysCollide* pCrouchModel, const char* pCrouchHullName) = 0;
-	virtual IPhysicsPlayerController* GetPhysicsController() = 0;
-	virtual void UpdateVPhysicsPosition(const Vector& position, const Vector& velocity, float secondsToArrival) = 0;
-	virtual void SetVCollisionState(const Vector& vecAbsOrigin, const Vector& vecAbsVelocity, int collisionState) = 0;
-	virtual int GetVphysicsCollisionState() = 0;
+	
 	virtual IPhysicsObject* GetGroundVPhysics() = 0;
 	virtual bool IsRideablePhysics(IPhysicsObject* pPhysics) = 0;
 	virtual int SelectWeightedSequence(int activity) = 0;
@@ -455,6 +451,20 @@ public:
 	virtual ragdoll_t* GetRagdoll(void) = 0;
 	virtual void ClearRagdoll() = 0;
 
+};
+
+class IEngineObjectWorld{
+public:
+
+};
+
+class IEngineObjectPlayer{
+public:
+	virtual void SetupVPhysicsShadow(const Vector& vecAbsOrigin, const Vector& vecAbsVelocity, CPhysCollide* pStandModel, const char* pStandHullName, CPhysCollide* pCrouchModel, const char* pCrouchHullName) = 0;
+	virtual IPhysicsPlayerController* GetPhysicsController() = 0;
+	virtual void UpdateVPhysicsPosition(const Vector& position, const Vector& velocity, float secondsToArrival) = 0;
+	virtual void SetVCollisionState(const Vector& vecAbsOrigin, const Vector& vecAbsVelocity, int collisionState) = 0;
+	virtual int GetVphysicsCollisionState() = 0;
 };
 
 // This class is how the engine talks to entities in the game DLL.

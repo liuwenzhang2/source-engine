@@ -1371,7 +1371,7 @@ void CCSPlayer::InitVCollision( const Vector &vecAbsOrigin, const Vector &vecAbs
 		return;
 
 	// Setup the HL2 specific callback.
-	GetEngineObject()->GetPhysicsController()->SetEventHandler( &playerCallback );
+	GetEnginePlayer()->GetPhysicsController()->SetEventHandler( &playerCallback );
 }
 
 void CCSPlayer::VPhysicsShadowUpdate( IPhysicsObject *pPhysics )

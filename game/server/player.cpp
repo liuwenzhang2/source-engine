@@ -3406,11 +3406,11 @@ void CBasePlayer::PhysicsSimulate( void )
 			PlayerRunCommand( &vecAvailCommands[ i ], MoveHelperServer() );
 
 			// Update our vphysics object.
-			if (GetEngineObject()->GetPhysicsController() )
+			if (GetEnginePlayer()->GetPhysicsController() )
 			{
 				VPROF( "CBasePlayer::PhysicsSimulate-UpdateVPhysicsPosition" );
 				// If simulating at 2 * TICK_INTERVAL, add an extra TICK_INTERVAL to position arrival computation
-				GetEngineObject()->UpdateVPhysicsPosition( m_vNewVPhysicsPosition, m_vNewVPhysicsVelocity, vphysicsArrivalTime );
+				GetEnginePlayer()->UpdateVPhysicsPosition( m_vNewVPhysicsPosition, m_vNewVPhysicsVelocity, vphysicsArrivalTime );
 				vphysicsArrivalTime += TICK_INTERVAL;
 			}
 		}
@@ -4672,7 +4672,7 @@ void CBasePlayer::Touch( CBaseEntity *pOther )
 void CBasePlayer::PostThinkVPhysics( void )
 {
 	// Check to see if things are initialized!
-	if ( !GetEngineObject()->GetPhysicsController())
+	if ( !GetEnginePlayer()->GetPhysicsController())
 		return;
 
 	Vector newPosition = GetEngineObject()->GetAbsOrigin();
@@ -4698,9 +4698,9 @@ void CBasePlayer::PostThinkVPhysics( void )
 		collisionState = VPHYS_CROUCH;
 	}
 
-	if ( collisionState != GetEngineObject()->GetVphysicsCollisionState() )
+	if ( collisionState != GetEnginePlayer()->GetVphysicsCollisionState() )
 	{
-		GetEngineObject()->SetVCollisionState(GetEngineObject()->GetAbsOrigin(), GetEngineObject()->GetAbsVelocity(), collisionState );
+		GetEnginePlayer()->SetVCollisionState(GetEngineObject()->GetAbsOrigin(), GetEngineObject()->GetAbsVelocity(), collisionState );
 	}
 
 	if ( !(TouchedPhysics() || pPhysGround) )
@@ -4729,9 +4729,9 @@ void CBasePlayer::PostThinkVPhysics( void )
 			{
 				g_pMoveData->m_outStepHeight = trace.endpos.z - position.z;
 			}
-			GetEngineObject()->GetPhysicsController()->StepUp( g_pMoveData->m_outStepHeight );
+			GetEnginePlayer()->GetPhysicsController()->StepUp( g_pMoveData->m_outStepHeight );
 		}
-		GetEngineObject()->GetPhysicsController()->Jump();
+		GetEnginePlayer()->GetPhysicsController()->Jump();
 	}
 	g_pMoveData->m_outStepHeight = 0.0f;
 	
@@ -4747,7 +4747,7 @@ void CBasePlayer::PostThinkVPhysics( void )
 
 void CBasePlayer::UpdatePhysicsShadowToCurrentPosition()
 {
-	GetEngineObject()->UpdateVPhysicsPosition(GetEngineObject()->GetAbsOrigin(), vec3_origin, gpGlobals->frametime );
+	GetEnginePlayer()->UpdateVPhysicsPosition(GetEngineObject()->GetAbsOrigin(), vec3_origin, gpGlobals->frametime );
 }
 
 
@@ -8100,7 +8100,7 @@ void CBasePlayer::VPhysicsShadowUpdate( IPhysicsObject *pPhysics )
 
 	Vector newPosition;
 
-	bool physicsUpdated = GetEngineObject()->GetPhysicsController()->GetShadowPosition(&newPosition, NULL) > 0 ? true : false;
+	bool physicsUpdated = GetEnginePlayer()->GetPhysicsController()->GetShadowPosition(&newPosition, NULL) > 0 ? true : false;
 
 	// UNDONE: If the player is penetrating, but the player's game collisions are not stuck, teleport the physics shadow to the game position
 	if ( pPhysics->GetGameFlags() & FVPHYSICS_PENETRATING )
@@ -8133,7 +8133,7 @@ void CBasePlayer::VPhysicsShadowUpdate( IPhysicsObject *pPhysics )
 		bCheckStuck = true;
 		m_afPhysicsFlags &= ~PFLAG_GAMEPHYSICS_ROTPUSH;
 	}
-	if (GetEngineObject()->GetPhysicsController()->IsInContact() || (m_afPhysicsFlags & PFLAG_VPHYSICS_MOTIONCONTROLLER) )
+	if (GetEnginePlayer()->GetPhysicsController()->IsInContact() || (m_afPhysicsFlags & PFLAG_VPHYSICS_MOTIONCONTROLLER) )
 	{
 		m_touchedPhysObject = true;
 	}
@@ -8161,7 +8161,7 @@ void CBasePlayer::VPhysicsShadowUpdate( IPhysicsObject *pPhysics )
 
 	Vector newVelocity;
 	pPhysics->GetPosition( &newPosition, 0 );
-	GetEngineObject()->GetPhysicsController()->GetShadowVelocity( &newVelocity );
+	GetEnginePlayer()->GetPhysicsController()->GetShadowVelocity( &newVelocity );
 	// assume vphysics gave us back a position without penetration
 	Vector lastValidPosition = newPosition;
 
@@ -8190,7 +8190,7 @@ void CBasePlayer::VPhysicsShadowUpdate( IPhysicsObject *pPhysics )
 	}
 
 	// player's physics was frozen, try moving to the game's simulated position if possible
-	if (GetEngineObject()->GetPhysicsController()->WasFrozen() )
+	if (GetEnginePlayer()->GetPhysicsController()->WasFrozen() )
 	{
 		m_bPhysicsWasFrozen = true;
 		// check my position (physics object could have simulated into my position
@@ -8206,7 +8206,7 @@ void CBasePlayer::VPhysicsShadowUpdate( IPhysicsObject *pPhysics )
 		{
 			// found a valid position between the two?  take it.
 			GetEngineObject()->SetAbsOrigin( trace.endpos );
-			GetEngineObject()->UpdateVPhysicsPosition(trace.endpos, vec3_origin, 0);
+			GetEnginePlayer()->UpdateVPhysicsPosition(trace.endpos, vec3_origin, 0);
 			return;
 		}
 
@@ -8327,7 +8327,7 @@ void CBasePlayer::InitVCollision( const Vector &vecAbsOrigin, const Vector &vecA
 	CPhysCollide *pModel = PhysCreateBbox( VEC_HULL_MIN_SCALED( this ), VEC_HULL_MAX_SCALED( this ) );
 	CPhysCollide *pCrouchModel = PhysCreateBbox( VEC_DUCK_HULL_MIN_SCALED( this ), VEC_DUCK_HULL_MAX_SCALED( this ) );
 
-	GetEngineObject()->SetupVPhysicsShadow( vecAbsOrigin, vecAbsVelocity, pModel, "player_stand", pCrouchModel, "player_crouch" );
+	GetEnginePlayer()->SetupVPhysicsShadow( vecAbsOrigin, vecAbsVelocity, pModel, "player_stand", pCrouchModel, "player_crouch" );
 }
 
 

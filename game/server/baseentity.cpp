@@ -492,6 +492,26 @@ const IEngineObjectServer* CBaseEntity::GetEngineObject() const {
 	return gEntList.GetEngineObject(entindex());
 }
 
+IEngineObjectPlayer* CBaseEntity::GetEnginePlayer()
+{
+	return dynamic_cast<IEngineObjectPlayer*>(GetEngineObject());
+}
+
+const IEngineObjectPlayer* CBaseEntity::GetEnginePlayer() const
+{
+	return dynamic_cast<const IEngineObjectPlayer*>(GetEngineObject());
+}
+
+IEngineObjectWorld* CBaseEntity::GetEngineWorld()
+{
+	return dynamic_cast<IEngineObjectWorld*>(GetEngineObject());
+}
+
+const IEngineObjectWorld* CBaseEntity::GetEngineWorld() const
+{
+	return dynamic_cast<const IEngineObjectWorld*>(GetEngineObject());
+}
+
 void CBaseEntity::Release() {
 	//GetEngineObject()->PhysicsRemoveTouchedList();
 	//CBaseEntity::PhysicsRemoveGroundList(this);

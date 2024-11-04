@@ -1200,7 +1200,7 @@ void CProp_Portal::TeleportTouchingEntity( CBaseEntity *pOther )
 			
 			pOtherAsPlayer->pl.v_angle = qTransformedEyeAngles;
 			pOtherAsPlayer->pl.fixangle = FIXANGLE_ABSOLUTE;
-			pOtherAsPlayer->GetEngineObject()->UpdateVPhysicsPosition( ptNewOrigin, vNewVelocity, 0.0f );
+			pOtherAsPlayer->GetEnginePlayer()->UpdateVPhysicsPosition( ptNewOrigin, vNewVelocity, 0.0f );
 			pOtherAsPlayer->Teleport( &ptNewOrigin, &qNewAngles, &vNewVelocity );
 			//pOtherAsPlayer->UnDuck();
 

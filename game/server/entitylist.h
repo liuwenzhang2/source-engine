@@ -757,12 +757,6 @@ public:
 	const Vector& WorldAlignMaxs() const;
 	const Vector& WorldAlignSize() const;
 
-	void SetupVPhysicsShadow(const Vector& vecAbsOrigin, const Vector& vecAbsVelocity, CPhysCollide* pStandModel, const char* pStandHullName, CPhysCollide* pCrouchModel, const char* pCrouchHullName) {}
-	IPhysicsPlayerController* GetPhysicsController() { return NULL; }
-	void UpdateVPhysicsPosition(const Vector& position, const Vector& velocity, float secondsToArrival) {}
-	void SetVCollisionState(const Vector& vecAbsOrigin, const Vector& vecAbsVelocity, int collisionState) {}
-	int GetVphysicsCollisionState() { return 0; }
-
 	IPhysicsObject* GetGroundVPhysics();
 	bool IsRideablePhysics(IPhysicsObject* pPhysics);
 
@@ -1653,12 +1647,12 @@ inline const Vector& CEngineObjectInternal::WorldAlignSize() const
 	return OBBSize();
 }
 
-class CEngineObjectWorld : public CEngineObjectInternal {
+class CEngineObjectWorld : public CEngineObjectInternal, public IEngineObjectWorld {
 public:
 
 };
 
-class CEngineObjectPlayer : public CEngineObjectInternal {
+class CEngineObjectPlayer : public CEngineObjectInternal, public IEngineObjectPlayer {
 public:
 	virtual void			VPhysicsDestroyObject();
 	// Player Physics Shadow
@@ -1667,6 +1661,7 @@ public:
 	void UpdateVPhysicsPosition(const Vector& position, const Vector& velocity, float secondsToArrival);
 	void					SetVCollisionState(const Vector& vecAbsOrigin, const Vector& vecAbsVelocity, int collisionState);
 	int GetVphysicsCollisionState() { return m_vphysicsCollisionState; }
+
 private:
 	void UpdatePhysicsShadowToPosition(const Vector& vecAbsOrigin);
 

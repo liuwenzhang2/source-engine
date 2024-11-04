@@ -658,7 +658,7 @@ float CalculateObjectStress( IPhysicsObject *pObject, CBaseEntity *pInputOwnerEn
 			if ( ( pObject->GetCallbackFlags() & CALLBACK_IS_PLAYER_CONTROLLER ) )
 			{
 				CBasePlayer *pPlayer = ToBasePlayer( pInputOwnerEntity );
-				IPhysicsPlayerController *pController = pPlayer ? pPlayer->GetEngineObject()->GetPhysicsController() : NULL;
+				IPhysicsPlayerController *pController = pPlayer ? pPlayer->GetEnginePlayer()->GetPhysicsController() : NULL;
 				if ( pController )
 				{
 					pController->GetLastImpulse( &lastVel );
