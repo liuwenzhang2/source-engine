@@ -35,9 +35,7 @@
 #include "coordsize.h"
 #include "physics_saverestore.h"
 #include "animation.h"
-#ifdef WIN32
-#include "vphysics\constraints.h"
-#endif // WIN32
+#include "vphysics/constraints.h"
 
 #ifdef HL2_DLL
 #include "npc_playercompanion.h"
