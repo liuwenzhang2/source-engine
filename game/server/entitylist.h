@@ -1647,12 +1647,12 @@ inline const Vector& CEngineObjectInternal::WorldAlignSize() const
 	return OBBSize();
 }
 
-class CEngineObjectWorld : public CEngineObjectInternal, public IEngineObjectWorld {
+class CEngineWorldInternal : public CEngineObjectInternal, public IEngineWorldServer {
 public:
 
 };
 
-class CEngineObjectPlayer : public CEngineObjectInternal, public IEngineObjectPlayer {
+class CEnginePlayerInternal : public CEngineObjectInternal, public IEnginePlayerServer {
 public:
 	virtual void			VPhysicsDestroyObject();
 	// Player Physics Shadow
@@ -2968,10 +2968,10 @@ inline CBaseEntity* CGlobalEntityList<T>::CreateEntityByName(const char* classNa
 		m_EngineObjectArray[iForceEdictIndex] = new CEngineObjectInternal();
 		break;
 	case ENGINEOBJECT_WORLD:
-		m_EngineObjectArray[iForceEdictIndex] = new CEngineObjectWorld();
+		m_EngineObjectArray[iForceEdictIndex] = new CEngineWorldInternal();
 		break;
 	case ENGINEOBJECT_PLAYER:
-		m_EngineObjectArray[iForceEdictIndex] = new CEngineObjectPlayer();
+		m_EngineObjectArray[iForceEdictIndex] = new CEnginePlayerInternal();
 		break;
 	default:
 		Error("GetEngineObjectType error!\n");

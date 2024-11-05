@@ -1217,10 +1217,10 @@ public:
 	//can not call this in constructor!
 	virtual IEngineObjectServer* GetEngineObject();
 	virtual const IEngineObjectServer* GetEngineObject() const;
-	virtual IEngineObjectPlayer* GetEnginePlayer();
-	virtual const IEngineObjectPlayer* GetEnginePlayer() const;
-	virtual IEngineObjectWorld* GetEngineWorld();
-	virtual const IEngineObjectWorld* GetEngineWorld() const;
+	virtual IEnginePlayerServer* GetEnginePlayer();
+	virtual const IEnginePlayerServer* GetEnginePlayer() const;
+	virtual IEngineWorldServer* GetEngineWorld();
+	virtual const IEngineWorldServer* GetEngineWorld() const;
 	// NOTE: Setting the abs velocity in either space will cause a recomputation
 	// in the other space, so setting the abs velocity will also set the local vel
 	void			ApplyLocalVelocityImpulse( const Vector &vecImpulse );

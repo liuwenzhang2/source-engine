@@ -492,24 +492,24 @@ const IEngineObjectServer* CBaseEntity::GetEngineObject() const {
 	return gEntList.GetEngineObject(entindex());
 }
 
-IEngineObjectPlayer* CBaseEntity::GetEnginePlayer()
+IEnginePlayerServer* CBaseEntity::GetEnginePlayer()
 {
-	return dynamic_cast<IEngineObjectPlayer*>(GetEngineObject());
+	return dynamic_cast<IEnginePlayerServer*>(GetEngineObject());
 }
 
-const IEngineObjectPlayer* CBaseEntity::GetEnginePlayer() const
+const IEnginePlayerServer* CBaseEntity::GetEnginePlayer() const
 {
-	return dynamic_cast<const IEngineObjectPlayer*>(GetEngineObject());
+	return dynamic_cast<const IEnginePlayerServer*>(GetEngineObject());
 }
 
-IEngineObjectWorld* CBaseEntity::GetEngineWorld()
+IEngineWorldServer* CBaseEntity::GetEngineWorld()
 {
-	return dynamic_cast<IEngineObjectWorld*>(GetEngineObject());
+	return dynamic_cast<IEngineWorldServer*>(GetEngineObject());
 }
 
-const IEngineObjectWorld* CBaseEntity::GetEngineWorld() const
+const IEngineWorldServer* CBaseEntity::GetEngineWorld() const
 {
-	return dynamic_cast<const IEngineObjectWorld*>(GetEngineObject());
+	return dynamic_cast<const IEngineWorldServer*>(GetEngineObject());
 }
 
 void CBaseEntity::Release() {

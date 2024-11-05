@@ -5259,7 +5259,7 @@ void CEngineObjectInternal::RagdollBone(bool* boneSimulated, CBoneAccessor& pBon
 	}
 }
 
-void CEngineObjectPlayer::VPhysicsDestroyObject()
+void CEnginePlayerInternal::VPhysicsDestroyObject()
 {
 	// Since CBasePlayer aliases its pointer to the physics object, tell CBaseEntity to 
 	// clear out its physics object pointer so we don't wind up deleting one of
@@ -5290,7 +5290,7 @@ void CEngineObjectPlayer::VPhysicsDestroyObject()
 	CEngineObjectInternal::VPhysicsDestroyObject();
 }
 
-void CEngineObjectPlayer::SetupVPhysicsShadow(const Vector& vecAbsOrigin, const Vector& vecAbsVelocity, CPhysCollide* pStandModel, const char* pStandHullName, CPhysCollide* pCrouchModel, const char* pCrouchHullName)
+void CEnginePlayerInternal::SetupVPhysicsShadow(const Vector& vecAbsOrigin, const Vector& vecAbsVelocity, CPhysCollide* pStandModel, const char* pStandHullName, CPhysCollide* pCrouchModel, const char* pCrouchHullName)
 {
 	solid_t solid;
 	Q_strncpy(solid.surfaceprop, "player", sizeof(solid.surfaceprop));
@@ -5331,12 +5331,12 @@ void CEngineObjectPlayer::SetupVPhysicsShadow(const Vector& vecAbsOrigin, const 
 	}
 }
 
-void CEngineObjectPlayer::UpdatePhysicsShadowToPosition(const Vector& vecAbsOrigin)
+void CEnginePlayerInternal::UpdatePhysicsShadowToPosition(const Vector& vecAbsOrigin)
 {
 	UpdateVPhysicsPosition(vecAbsOrigin, vec3_origin, gpGlobals->frametime);
 }
 
-void CEngineObjectPlayer::UpdateVPhysicsPosition(const Vector& position, const Vector& velocity, float secondsToArrival)
+void CEnginePlayerInternal::UpdateVPhysicsPosition(const Vector& position, const Vector& velocity, float secondsToArrival)
 {
 	bool onground = (GetFlags() & FL_ONGROUND) ? true : false;
 	IPhysicsObject* pPhysGround = GetGroundVPhysics();
@@ -5354,7 +5354,7 @@ void CEngineObjectPlayer::UpdateVPhysicsPosition(const Vector& position, const V
 //-----------------------------------------------------------------------------
 // Purpose:
 //-----------------------------------------------------------------------------
-void CEngineObjectPlayer::SetVCollisionState(const Vector& vecAbsOrigin, const Vector& vecAbsVelocity, int collisionState)
+void CEnginePlayerInternal::SetVCollisionState(const Vector& vecAbsOrigin, const Vector& vecAbsVelocity, int collisionState)
 {
 	m_vphysicsCollisionState = collisionState;
 	switch (collisionState)

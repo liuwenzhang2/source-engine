@@ -453,12 +453,12 @@ public:
 
 };
 
-class IEngineObjectWorld{
+class IEngineWorldServer{
 public:
 
 };
 
-class IEngineObjectPlayer{
+class IEnginePlayerServer{
 public:
 	virtual void SetupVPhysicsShadow(const Vector& vecAbsOrigin, const Vector& vecAbsVelocity, CPhysCollide* pStandModel, const char* pStandHullName, CPhysCollide* pCrouchModel, const char* pCrouchHullName) = 0;
 	virtual IPhysicsPlayerController* GetPhysicsController() = 0;
