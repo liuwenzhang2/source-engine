@@ -16,37 +16,4 @@
 
 
 
-class CStaticCollisionPolyhedronCache : public CAutoGameSystem
-{
-public:
-	CStaticCollisionPolyhedronCache( void );
-	~CStaticCollisionPolyhedronCache( void );
 
-	void LevelInitPreEntity( void );
-	void Shutdown( void );
-
-	const CPolyhedron *GetBrushPolyhedron( int iBrushNumber );
-	int GetStaticPropPolyhedrons( ICollideable *pStaticProp, CPolyhedron **pOutputPolyhedronArray, int iOutputArraySize );
-
-private:
-	// See comments in LevelInitPreEntity for why these members are commented out
-//	CUtlString	m_CachedMap;
-
-	CUtlVector<CPolyhedron *> m_BrushPolyhedrons;
-
-	struct StaticPropPolyhedronCacheInfo_t
-	{
-		int iStartIndex;
-		int iNumPolyhedrons;
-		int iStaticPropIndex; //helps us remap ICollideable pointers when the map is restarted
-	};
-
-	CUtlVector<CPolyhedron *> m_StaticPropPolyhedrons;
-	CUtlMap<ICollideable *, StaticPropPolyhedronCacheInfo_t> m_CollideableIndicesMap;
-
-
-	void Clear( void );
-	void Update( void );
-};
-
-extern CStaticCollisionPolyhedronCache g_StaticCollisionPolyhedronCache;

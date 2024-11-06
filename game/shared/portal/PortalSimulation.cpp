@@ -42,14 +42,11 @@ CCallQueue *GetPortalCallQueue();
 
 extern IPhysicsConstraintEvent *g_pConstraintEvents;
 
-static ConVar sv_portal_collision_sim_bounds_x( "sv_portal_collision_sim_bounds_x", "200", FCVAR_REPLICATED, "Size of box used to grab collision geometry around placed portals. These should be at the default size or larger only!" );
-static ConVar sv_portal_collision_sim_bounds_y( "sv_portal_collision_sim_bounds_y", "200", FCVAR_REPLICATED, "Size of box used to grab collision geometry around placed portals. These should be at the default size or larger only!" );
-static ConVar sv_portal_collision_sim_bounds_z( "sv_portal_collision_sim_bounds_z", "252", FCVAR_REPLICATED, "Size of box used to grab collision geometry around placed portals. These should be at the default size or larger only!" );
-ConVar sv_portal_trace_vs_world("sv_portal_trace_vs_world", "1", FCVAR_REPLICATED | FCVAR_CHEAT, "Use traces against portal environment world geometry");
-ConVar sv_portal_trace_vs_displacements("sv_portal_trace_vs_displacements", "1", FCVAR_REPLICATED | FCVAR_CHEAT, "Use traces against portal environment displacement geometry");
-ConVar sv_portal_trace_vs_holywall("sv_portal_trace_vs_holywall", "1", FCVAR_REPLICATED | FCVAR_CHEAT, "Use traces against portal environment carved wall");
-ConVar sv_portal_trace_vs_staticprops("sv_portal_trace_vs_staticprops", "1", FCVAR_REPLICATED | FCVAR_CHEAT, "Use traces against portal environment static prop geometry");
-ConVar sv_use_transformed_collideables("sv_use_transformed_collideables", "1", FCVAR_REPLICATED | FCVAR_CHEAT, "Disables traces against remote portal moving entities using transforms to bring them into local space.");
+extern ConVar sv_portal_trace_vs_world;
+extern ConVar sv_portal_trace_vs_displacements;
+extern ConVar sv_portal_trace_vs_holywall;
+extern ConVar sv_portal_trace_vs_staticprops;
+extern ConVar sv_use_transformed_collideables;
 class CTransformedCollideable : public ICollideable //wraps an existing collideable, but transforms everything that pertains to world space by another transform
 {
 public:
@@ -174,12 +171,7 @@ const matrix3x4_t* CTransformedCollideable::GetRootParentToWorldTransform() cons
 void DumpActiveCollision( const CPortalSimulator *pPortalSimulator, const char *szFileName ); //appends to the existing file if it exists
 #endif
 
-#define PORTAL_WALL_FARDIST 200.0f
-#define PORTAL_WALL_TUBE_DEPTH 1.0f
-#define PORTAL_WALL_TUBE_OFFSET 0.01f
-#define PORTAL_WALL_MIN_THICKNESS 0.1f
-#define PORTAL_POLYHEDRON_CUT_EPSILON (1.0f/1099511627776.0f) //    1 / (1<<40)
-#define PORTAL_WORLD_WALL_HALF_SEPARATION_AMOUNT 0.1f //separating the world collision from wall collision by a small amount gets rid of extremely thin erroneous collision at the separating plane
+
 
 #ifdef DEBUG_PORTAL_COLLISION_ENVIRONMENTS
 static ConVar sv_dump_portalsimulator_collision( "sv_dump_portalsimulator_collision", "0", FCVAR_REPLICATED | FCVAR_CHEAT ); //whether to actually dump out the data now that the possibility exists
@@ -187,36 +179,11 @@ static void PortalSimulatorDumps_DumpCollideToGlView( CPhysCollide *pCollide, co
 static void PortalSimulatorDumps_DumpBoxToGlView( const Vector &vMins, const Vector &vMaxs, float fRed, float fGreen, float fBlue, const char *pszFileName );
 #endif
 
-#ifdef DEBUG_PORTAL_SIMULATION_CREATION_TIMES
-#define STARTDEBUGTIMER(x) { x.Start(); }
-#define STOPDEBUGTIMER(x) { x.End(); }
-#define DEBUGTIMERONLY(x) x
-#define CREATEDEBUGTIMER(x) CFastTimer x;
-static const char *s_szTabSpacing[] = { "", "\t", "\t\t", "\t\t\t", "\t\t\t\t", "\t\t\t\t\t", "\t\t\t\t\t\t", "\t\t\t\t\t\t\t", "\t\t\t\t\t\t\t\t", "\t\t\t\t\t\t\t\t\t", "\t\t\t\t\t\t\t\t\t\t" };
-static int s_iTabSpacingIndex = 0;
-static int s_iPortalSimulatorGUID = 0; //used in standalone function that have no idea what a portal simulator is
-#define INCREMENTTABSPACING() ++s_iTabSpacingIndex;
-#define DECREMENTTABSPACING() --s_iTabSpacingIndex;
-#define TABSPACING (s_szTabSpacing[s_iTabSpacingIndex])
-#else
-#define STARTDEBUGTIMER(x)
-#define STOPDEBUGTIMER(x)
-#define DEBUGTIMERONLY(x)
-#define CREATEDEBUGTIMER(x)
-#define INCREMENTTABSPACING()
-#define DECREMENTTABSPACING()
-#define TABSPACING
-#endif
-
-#define PORTAL_HOLE_HALF_HEIGHT (PORTAL_HALF_HEIGHT + 0.1f)
-#define PORTAL_HOLE_HALF_WIDTH (PORTAL_HALF_WIDTH + 0.1f)
 
 
-static void ConvertBrushListToClippedPolyhedronList( const int *pBrushes, int iBrushCount, const float *pOutwardFacingClipPlanes, int iClipPlaneCount, float fClipEpsilon, CUtlVector<CPolyhedron *> *pPolyhedronList );
-static void ClipPolyhedrons( CPolyhedron * const *pExistingPolyhedrons, int iPolyhedronCount, const float *pOutwardFacingClipPlanes, int iClipPlaneCount, float fClipEpsilon, CUtlVector<CPolyhedron *> *pPolyhedronList );
+
 static inline CPolyhedron *TransformAndClipSinglePolyhedron( CPolyhedron *pExistingPolyhedron, const VMatrix &Transform, const float *pOutwardFacingClipPlanes, int iClipPlaneCount, float fCutEpsilon, bool bUseTempMemory );
 static int GetEntityPhysicsObjects( IPhysicsEnvironment *pEnvironment, CBaseEntity *pEntity, IPhysicsObject **pRetList, int iRetListArraySize );
-static CPhysCollide *ConvertPolyhedronsToCollideable( CPolyhedron **pPolyhedrons, int iPolyhedronCount );
 
 static CUtlVector<CPortalSimulator *> s_PortalSimulators;
 CUtlVector<CPortalSimulator *> const &g_PortalSimulators = s_PortalSimulators;
@@ -318,12 +285,30 @@ void CPortalSimulator::PostConstructor(const char* szClassname, int iForceEdictI
 #endif // GAME_DLL
 
 
-CPortalSimulator::~CPortalSimulator( void )
+void CPortalSimulator::UpdateOnRemove(void)
 {
 	//go assert crazy here
 	DetachFromLinked();
 	ClearEverything();
 
+	if (pCollisionEntity.Get()) {
+		pCollisionEntity->GetEnginePortal()->ClearHoleShapeCollideable();
+	}
+
+#ifndef CLIENT_DLL
+	if (pCollisionEntity.Get())
+	{
+		BeforeCollisionEntityDestroy();
+		pCollisionEntity->m_pOwningSimulator = NULL;
+		UTIL_Remove(pCollisionEntity);
+		pCollisionEntity = NULL;
+	}
+#endif
+	BaseClass::UpdateOnRemove();
+}
+
+CPortalSimulator::~CPortalSimulator( void )
+{
 	for( int i = s_PortalSimulators.Count(); --i >= 0; )
 	{
 		if( s_PortalSimulators[i] == this )
@@ -332,20 +317,6 @@ CPortalSimulator::~CPortalSimulator( void )
 			break;
 		}
 	}
-
-	if (pCollisionEntity.Get()) {
-		pCollisionEntity->ClearHoleShapeCollideable();
-	}
-
-#ifndef CLIENT_DLL
-	if( pCollisionEntity.Get() )
-	{
-		BeforeCollisionEntityDestroy();
-		pCollisionEntity->m_pOwningSimulator = NULL;
-		UTIL_Remove( pCollisionEntity );
-		pCollisionEntity = NULL;
-	}
-#endif
 }
 
 
@@ -365,7 +336,7 @@ void CPortalSimulator::MoveTo( const Vector &ptCenter, const QAngle &angles )
 
 	BeforeMove();
 	//update geometric data
-	pCollisionEntity->MoveTo(ptCenter, angles);
+	pCollisionEntity->GetEnginePortal()->MoveTo(ptCenter, angles);
 
 	//Clear();
 #ifndef CLIENT_DLL
@@ -379,7 +350,7 @@ void CPortalSimulator::MoveTo( const Vector &ptCenter, const QAngle &angles )
 	m_bLocalDataIsReady = true;
 	UpdateLinkMatrix();
 
-	pCollisionEntity->CreateHoleShapeCollideable();
+	pCollisionEntity->GetEnginePortal()->CreateHoleShapeCollideable();
 
 	CreatePolyhedrons();	
 	CreateAllCollision();
@@ -416,11 +387,11 @@ void CPortalSimulator::UpdateLinkMatrix( void )
 {
 	if( m_pLinkedPortal && m_pLinkedPortal->m_bLocalDataIsReady )
 	{
-		pCollisionEntity->UpdateLinkMatrix(m_pLinkedPortal->pCollisionEntity);
+		pCollisionEntity->GetEnginePortal()->UpdateLinkMatrix(m_pLinkedPortal->pCollisionEntity->GetEnginePortal());
 	}
 	else
 	{
-		pCollisionEntity->UpdateLinkMatrix(NULL);
+		pCollisionEntity->GetEnginePortal()->UpdateLinkMatrix(NULL);
 	}
 	
 	if( m_pLinkedPortal && (m_pLinkedPortal->m_bInCrossLinkedFunction == false) )
@@ -441,7 +412,7 @@ bool CPortalSimulator::EntityIsInPortalHole( CBaseEntity *pEntity ) const
 	if( m_bLocalDataIsReady == false )
 		return false;
 
-	return pCollisionEntity->EntityIsInPortalHole(pEntity);
+	return pCollisionEntity->GetEnginePortal()->EntityIsInPortalHole(pEntity->GetEngineObject());
 }
 
 bool CPortalSimulator::EntityHitBoxExtentIsInPortalHole( CBaseAnimating *pBaseAnimating ) const
@@ -449,12 +420,12 @@ bool CPortalSimulator::EntityHitBoxExtentIsInPortalHole( CBaseAnimating *pBaseAn
 	if( m_bLocalDataIsReady == false )
 		return false;
 
-	return pCollisionEntity->EntityHitBoxExtentIsInPortalHole(pBaseAnimating);
+	return pCollisionEntity->GetEnginePortal()->EntityHitBoxExtentIsInPortalHole(pBaseAnimating->GetEngineObject());
 }
 
 bool CPortalSimulator::RayIsInPortalHole(const Ray_t& ray) const
 {
-	return pCollisionEntity->RayIsInPortalHole(ray);
+	return pCollisionEntity->GetEnginePortal()->RayIsInPortalHole(ray);
 }
 
 void CPortalSimulator::TraceRay(const Ray_t& ray, unsigned int fMask, ITraceFilter* pTraceFilter, trace_t* pTrace, bool bTraceHolyWall) const//traces against a specific portal's environment, does no *real* tracing
@@ -495,14 +466,14 @@ void CPortalSimulator::TraceRay(const Ray_t& ray, unsigned int fMask, ITraceFilt
 	{
 		//trace_t RealTrace;
 		//enginetrace->TraceRay( ray, fMask, pTraceFilter, &RealTrace );
-		if (pCollisionEntity->TraceWorldBrushes(ray, pTrace))
+		if (pCollisionEntity->GetEnginePortal()->TraceWorldBrushes(ray, pTrace))
 		{
 			bCopyBackBrushTraceData = true;
 		}
 
 		if (bTraceHolyWall)
 		{
-			if (pCollisionEntity->TraceWallTube(ray, &TempTrace))
+			if (pCollisionEntity->GetEnginePortal()->TraceWallTube(ray, &TempTrace))
 			{
 				if ((TempTrace.startsolid == false) && (TempTrace.fraction < pTrace->fraction)) //never allow something to be stuck in the tube, it's more of a last-resort guide than a real collideable
 				{
@@ -511,7 +482,7 @@ void CPortalSimulator::TraceRay(const Ray_t& ray, unsigned int fMask, ITraceFilt
 				}
 			}
 
-			if (pCollisionEntity->TraceWallBrushes(ray, &TempTrace))
+			if (pCollisionEntity->GetEnginePortal()->TraceWallBrushes(ray, &TempTrace))
 			{
 				if ((TempTrace.fraction < pTrace->fraction))
 				{
@@ -521,7 +492,7 @@ void CPortalSimulator::TraceRay(const Ray_t& ray, unsigned int fMask, ITraceFilt
 			}
 
 			//if( portalSimulator->m_DataAccess.Simulation.Static.Wall.RemoteTransformedToLocal.Brushes.pCollideable && sv_portal_trace_vs_world.GetBool() )
-			if (bTraceTransformedGeometry && pCollisionEntity->TraceTransformedWorldBrushes(pLinkedPortalSimulator->pCollisionEntity, ray, &TempTrace))
+			if (bTraceTransformedGeometry && pCollisionEntity->GetEnginePortal()->TraceTransformedWorldBrushes(pLinkedPortalSimulator->pCollisionEntity->GetEnginePortal(), ray, &TempTrace))
 			{
 				if ((TempTrace.fraction < pTrace->fraction))
 				{
@@ -533,9 +504,9 @@ void CPortalSimulator::TraceRay(const Ray_t& ray, unsigned int fMask, ITraceFilt
 
 		if (bCopyBackBrushTraceData)
 		{
-			pTrace->surface = pCollisionEntity->GetSurfaceProperties().surface;
-			pTrace->contents = pCollisionEntity->GetSurfaceProperties().contents;
-			pTrace->m_pEnt = pCollisionEntity->GetSurfaceProperties().pEntity;
+			pTrace->surface = pCollisionEntity->GetEnginePortal()->GetSurfaceProperties().surface;
+			pTrace->contents = pCollisionEntity->GetEnginePortal()->GetSurfaceProperties().contents;
+			pTrace->m_pEnt = pCollisionEntity->GetEnginePortal()->GetSurfaceProperties().pEntity;
 
 			bCopyBackBrushTraceData = false;
 		}
@@ -573,8 +544,8 @@ void CPortalSimulator::TraceRay(const Ray_t& ray, unsigned int fMask, ITraceFilt
 		{
 			//local clipped static props
 			{
-				int iLocalStaticCount = pCollisionEntity->GetStaticPropsCount();
-				if (iLocalStaticCount != 0 && pCollisionEntity->StaticPropsCollisionExists())
+				int iLocalStaticCount = pCollisionEntity->GetEnginePortal()->GetStaticPropsCount();
+				if (iLocalStaticCount != 0 && pCollisionEntity->GetEnginePortal()->StaticPropsCollisionExists())
 				{
 					int iIndex = 0;
 					Vector vTransform = vec3_origin;
@@ -582,7 +553,7 @@ void CPortalSimulator::TraceRay(const Ray_t& ray, unsigned int fMask, ITraceFilt
 
 					do
 					{
-						const PS_SD_Static_World_StaticProps_ClippedProp_t* pCurrentProp = pCollisionEntity->GetStaticProps(iIndex);
+						const PS_SD_Static_World_StaticProps_ClippedProp_t* pCurrentProp = pCollisionEntity->GetEnginePortal()->GetStaticProps(iIndex);
 						if ((!bFilterStaticProps) || pTraceFilter->ShouldHitEntity(pCurrentProp->pSourceProp, fMask))
 						{
 							physcollision->TraceBox(ray, pCurrentProp->pCollide, vTransform, qTransform, &TempTrace);
@@ -607,16 +578,16 @@ void CPortalSimulator::TraceRay(const Ray_t& ray, unsigned int fMask, ITraceFilt
 				//remote clipped static props transformed into our wall space
 				if (bTraceTransformedGeometry && (pTraceFilter->GetTraceType() != TRACE_WORLD_ONLY) && sv_portal_trace_vs_staticprops.GetBool())
 				{
-					int iLocalStaticCount = pLinkedPortalSimulator->pCollisionEntity->GetStaticPropsCount();
+					int iLocalStaticCount = pLinkedPortalSimulator->pCollisionEntity->GetEnginePortal()->GetStaticPropsCount();
 					if (iLocalStaticCount != 0)
 					{
 						int iIndex = 0;
-						Vector vTransform = pCollisionEntity->GetTransformedOrigin();
-						QAngle qTransform = pCollisionEntity->GetTransformedAngles();
+						Vector vTransform = pCollisionEntity->GetEnginePortal()->GetTransformedOrigin();
+						QAngle qTransform = pCollisionEntity->GetEnginePortal()->GetTransformedAngles();
 
 						do
 						{
-							const PS_SD_Static_World_StaticProps_ClippedProp_t* pCurrentProp = pLinkedPortalSimulator->pCollisionEntity->GetStaticProps(iIndex);
+							const PS_SD_Static_World_StaticProps_ClippedProp_t* pCurrentProp = pLinkedPortalSimulator->pCollisionEntity->GetEnginePortal()->GetStaticProps(iIndex);
 							if ((!bFilterStaticProps) || pTraceFilter->ShouldHitEntity(pCurrentProp->pSourceProp, fMask))
 							{
 								physcollision->TraceBox(ray, pCurrentProp->pCollide, vTransform, qTransform, &TempTrace);
@@ -652,9 +623,9 @@ void CPortalSimulator::TraceRay(const Ray_t& ray, unsigned int fMask, ITraceFilt
 		// For all brush traces, use the 'portal backbrush' surface surface contents
 		// BUGBUG: Doing this is a great solution because brushes near a portal
 		// will have their contents and surface properties homogenized to the brush the portal ray hit.
-		pTrace->contents = pCollisionEntity->GetSurfaceProperties().contents;
-		pTrace->surface = pCollisionEntity->GetSurfaceProperties().surface;
-		pTrace->m_pEnt = pCollisionEntity->GetSurfaceProperties().pEntity;
+		pTrace->contents = pCollisionEntity->GetEnginePortal()->GetSurfaceProperties().contents;
+		pTrace->surface = pCollisionEntity->GetEnginePortal()->GetSurfaceProperties().surface;
+		pTrace->m_pEnt = pCollisionEntity->GetEnginePortal()->GetSurfaceProperties().pEntity;
 	}
 }
 
@@ -699,7 +670,7 @@ void CPortalSimulator::TraceEntity(CBaseEntity* pEntity, const Vector& vecAbsSta
 	// Hit the world
 	if (pFilter->GetTraceType() != TRACE_ENTITIES_ONLY)
 	{
-		if (pCollisionEntity->TraceWorldBrushes(entRay, &tempTrace))
+		if (pCollisionEntity->GetEnginePortal()->TraceWorldBrushes(entRay, &tempTrace))
 		{
 			//physcollision->TraceCollide( vecAbsStart, vecAbsEnd, pCollision, qCollisionAngles, 
 			//							pPortalSimulator->m_DataAccess.Simulation.Static.World.Brushes.pCollideable, vec3_origin, vec3_angle, &tempTrace );
@@ -710,7 +681,7 @@ void CPortalSimulator::TraceEntity(CBaseEntity* pEntity, const Vector& vecAbsSta
 		}
 
 		//if( pPortalSimulator->m_DataAccess.Simulation.Static.Wall.RemoteTransformedToLocal.Brushes.pCollideable &&
-		if (pLinkedPortalSimulator && pCollisionEntity->TraceTransformedWorldBrushes(pLinkedPortalSimulator->pCollisionEntity, entRay, &tempTrace))
+		if (pLinkedPortalSimulator && pCollisionEntity->GetEnginePortal()->TraceTransformedWorldBrushes(pLinkedPortalSimulator->pCollisionEntity->GetEnginePortal(), entRay, &tempTrace))
 		{
 			//physcollision->TraceCollide( vecAbsStart, vecAbsEnd, pCollision, qCollisionAngles,
 			//							pLinkedPortalSimulator->m_DataAccess.Simulation.Static.World.Brushes.pCollideable, pPortalSimulator->m_DataAccess.Placement.ptaap_LinkedToThis.ptOriginTransform, pPortalSimulator->m_DataAccess.Placement.ptaap_LinkedToThis.qAngleTransform, &tempTrace );
@@ -721,7 +692,7 @@ void CPortalSimulator::TraceEntity(CBaseEntity* pEntity, const Vector& vecAbsSta
 			}
 		}
 
-		if (pCollisionEntity->TraceWallBrushes(entRay, &tempTrace))
+		if (pCollisionEntity->GetEnginePortal()->TraceWallBrushes(entRay, &tempTrace))
 		{
 			//physcollision->TraceCollide( vecAbsStart, vecAbsEnd, pCollision, qCollisionAngles,
 			//							pPortalSimulator->m_DataAccess.Simulation.Static.Wall.Local.Brushes.pCollideable, vec3_origin, vec3_angle, &tempTrace );
@@ -738,7 +709,7 @@ void CPortalSimulator::TraceEntity(CBaseEntity* pEntity, const Vector& vecAbsSta
 			}
 		}
 
-		if (pCollisionEntity->TraceWallTube(entRay, &tempTrace))
+		if (pCollisionEntity->GetEnginePortal()->TraceWallTube(entRay, &tempTrace))
 		{
 			//physcollision->TraceCollide( vecAbsStart, vecAbsEnd, pCollision, qCollisionAngles,
 			//							pPortalSimulator->m_DataAccess.Simulation.Static.Wall.Local.Tube.pCollideable, vec3_origin, vec3_angle, &tempTrace );
@@ -754,9 +725,9 @@ void CPortalSimulator::TraceEntity(CBaseEntity* pEntity, const Vector& vecAbsSta
 		// will have their contents and surface properties homogenized to the brush the portal ray hit.
 		if (pTrace->startsolid || (pTrace->fraction < 1.0f))
 		{
-			pTrace->surface = pCollisionEntity->GetSurfaceProperties().surface;
-			pTrace->contents = pCollisionEntity->GetSurfaceProperties().contents;
-			pTrace->m_pEnt = pCollisionEntity->GetSurfaceProperties().pEntity;
+			pTrace->surface = pCollisionEntity->GetEnginePortal()->GetSurfaceProperties().surface;
+			pTrace->contents = pCollisionEntity->GetEnginePortal()->GetSurfaceProperties().contents;
+			pTrace->m_pEnt = pCollisionEntity->GetEnginePortal()->GetSurfaceProperties().pEntity;
 		}
 	}
 
@@ -769,8 +740,8 @@ void CPortalSimulator::TraceEntity(CBaseEntity* pEntity, const Vector& vecAbsSta
 
 			//local clipped static props
 			{
-				int iLocalStaticCount = pCollisionEntity->GetStaticPropsCount();
-				if (iLocalStaticCount != 0 && pCollisionEntity->StaticPropsCollisionExists())
+				int iLocalStaticCount = pCollisionEntity->GetEnginePortal()->GetStaticPropsCount();
+				if (iLocalStaticCount != 0 && pCollisionEntity->GetEnginePortal()->StaticPropsCollisionExists())
 				{
 					int iIndex = 0;
 					Vector vTransform = vec3_origin;
@@ -778,7 +749,7 @@ void CPortalSimulator::TraceEntity(CBaseEntity* pEntity, const Vector& vecAbsSta
 
 					do
 					{
-						const PS_SD_Static_World_StaticProps_ClippedProp_t* pCurrentProp = pCollisionEntity->GetStaticProps(iIndex);
+						const PS_SD_Static_World_StaticProps_ClippedProp_t* pCurrentProp = pCollisionEntity->GetEnginePortal()->GetStaticProps(iIndex);
 						if ((!bFilterStaticProps) || pFilter->ShouldHitEntity(pCurrentProp->pSourceProp, mask))
 						{
 							//physcollision->TraceCollide( vecAbsStart, vecAbsEnd, pCollision, qCollisionAngles,
@@ -802,7 +773,7 @@ void CPortalSimulator::TraceEntity(CBaseEntity* pEntity, const Vector& vecAbsSta
 				}
 			}
 
-			if (pLinkedPortalSimulator && pCollisionEntity->EntityIsInPortalHole(pEntity))
+			if (pLinkedPortalSimulator && pCollisionEntity->GetEnginePortal()->EntityIsInPortalHole(pEntity->GetEngineObject()))
 			{
 
 #ifndef CLIENT_DLL
@@ -813,8 +784,8 @@ void CPortalSimulator::TraceEntity(CBaseEntity* pEntity, const Vector& vecAbsSta
 					int iEntCount = pLinkedPortalSimulator->GetMoveableOwnedEntities(pEnts, 1024);
 
 					CTransformedCollideable transformedCollideable;
-					transformedCollideable.m_matTransform = pLinkedPortalSimulator->pCollisionEntity->MatrixThisToLinked();
-					transformedCollideable.m_matInvTransform = pLinkedPortalSimulator->pCollisionEntity->MatrixLinkedToThis();
+					transformedCollideable.m_matTransform = pLinkedPortalSimulator->pCollisionEntity->GetEnginePortal()->MatrixThisToLinked();
+					transformedCollideable.m_matInvTransform = pLinkedPortalSimulator->pCollisionEntity->GetEnginePortal()->MatrixLinkedToThis();
 					for (int i = 0; i != iEntCount; ++i)
 					{
 						CBaseEntity* pRemoteEntity = pEnts[i];
@@ -955,7 +926,7 @@ void CPortalSimulator::CreateMinimumPhysics( void )
 	if( IsSimulatingVPhysics() == false )
 		return;
 
-	if( pPhysicsEnvironment != NULL )
+	if(GetPhysicsEnvironment() != NULL )
 		return;
 
 	CREATEDEBUGTIMER( functionTimer );
@@ -964,7 +935,7 @@ void CPortalSimulator::CreateMinimumPhysics( void )
 	DEBUGTIMERONLY( DevMsg( 2, "[PSDT:%d] %sCPortalSimulator::CreateMinimumPhysics() START\n", GetPortalSimulatorGUID(), TABSPACING ); );
 	INCREMENTTABSPACING();
 
-	pPhysicsEnvironment = physenv_main;
+	pCollisionEntity->GetEnginePortal()->CreatePhysicsEnvironment();
 
 	STOPDEBUGTIMER( functionTimer );
 	DECREMENTTABSPACING();
@@ -991,7 +962,7 @@ void CPortalSimulator::CreateLocalPhysics( void )
 	
 	CreateMinimumPhysics();
 
-	pCollisionEntity->CreateLocalPhysics();
+	pCollisionEntity->GetEnginePortal()->CreateLocalPhysics();
 	//if( pCollisionEntity )
 	pCollisionEntity->GetEngineObject()->CollisionRulesChanged();
 
@@ -1026,7 +997,7 @@ void CPortalSimulator::CreateLinkedPhysics( void )
 	
 	CreateMinimumPhysics();
 
-	pCollisionEntity->CreateLinkedPhysics(m_pLinkedPortal->pCollisionEntity);
+	pCollisionEntity->GetEnginePortal()->CreateLinkedPhysics(m_pLinkedPortal->pCollisionEntity->GetEnginePortal());
 	//if( pCollisionEntity )
 	pCollisionEntity->GetEngineObject()->CollisionRulesChanged();
 
@@ -1070,7 +1041,7 @@ void CPortalSimulator::ClearAllPhysics( void )
 
 void CPortalSimulator::ClearMinimumPhysics( void )
 {
-	if( pPhysicsEnvironment == NULL )
+	if(GetPhysicsEnvironment() == NULL )
 		return;
 
 	CREATEDEBUGTIMER( functionTimer );
@@ -1079,7 +1050,7 @@ void CPortalSimulator::ClearMinimumPhysics( void )
 	DEBUGTIMERONLY( DevMsg( 2, "[PSDT:%d] %sCPortalSimulator::ClearMinimumPhysics() START\n", GetPortalSimulatorGUID(), TABSPACING ); );
 	INCREMENTTABSPACING();
 
-	pPhysicsEnvironment = NULL;
+	pCollisionEntity->GetEnginePortal()->ClearPhysicsEnvironment();
 
 	STOPDEBUGTIMER( functionTimer );
 	DECREMENTTABSPACING();
@@ -1093,7 +1064,7 @@ void CPortalSimulator::ClearLocalPhysics( void )
 	if( m_CreationChecklist.bLocalPhysicsGenerated == false )
 		return;
 
-	if( pPhysicsEnvironment == NULL )
+	if(GetPhysicsEnvironment() == NULL )
 		return;
 
 	CREATEDEBUGTIMER( functionTimer );
@@ -1102,17 +1073,17 @@ void CPortalSimulator::ClearLocalPhysics( void )
 	DEBUGTIMERONLY( DevMsg( 2, "[PSDT:%d] %sCPortalSimulator::ClearLocalPhysics() START\n", GetPortalSimulatorGUID(), TABSPACING ); );
 	INCREMENTTABSPACING();
 	
-	pPhysicsEnvironment->CleanupDeleteList();
-	pPhysicsEnvironment->SetQuickDelete( true ); //if we don't do this, things crash the next time we cleanup the delete list while checking mindists
+	GetPhysicsEnvironment()->CleanupDeleteList();
+	GetPhysicsEnvironment()->SetQuickDelete( true ); //if we don't do this, things crash the next time we cleanup the delete list while checking mindists
 
 	BeforeLocalPhysicsClear();
 
 	if (pCollisionEntity.Get()) {
-		pCollisionEntity->ClearLocalPhysics();
+		pCollisionEntity->GetEnginePortal()->ClearLocalPhysics();
 	}
 
-	pPhysicsEnvironment->CleanupDeleteList();
-	pPhysicsEnvironment->SetQuickDelete( false );
+	GetPhysicsEnvironment()->CleanupDeleteList();
+	GetPhysicsEnvironment()->SetQuickDelete( false );
 
 	if (pCollisionEntity.Get()) {
 		pCollisionEntity->GetEngineObject()->CollisionRulesChanged();
@@ -1132,7 +1103,7 @@ void CPortalSimulator::ClearLinkedPhysics( void )
 	if( m_CreationChecklist.bLinkedPhysicsGenerated == false )
 		return;
 
-	if( pPhysicsEnvironment == NULL )
+	if(GetPhysicsEnvironment() == NULL )
 		return;
 
 	CREATEDEBUGTIMER( functionTimer );
@@ -1141,13 +1112,13 @@ void CPortalSimulator::ClearLinkedPhysics( void )
 	DEBUGTIMERONLY( DevMsg( 2, "[PSDT:%d] %sCPortalSimulator::ClearLinkedPhysics() START\n", GetPortalSimulatorGUID(), TABSPACING ); );
 	INCREMENTTABSPACING();
 
-	pPhysicsEnvironment->CleanupDeleteList();
-	pPhysicsEnvironment->SetQuickDelete( true ); //if we don't do this, things crash the next time we cleanup the delete list while checking mindists
+	GetPhysicsEnvironment()->CleanupDeleteList();
+	GetPhysicsEnvironment()->SetQuickDelete( true ); //if we don't do this, things crash the next time we cleanup the delete list while checking mindists
 
 	BeforeLinkedPhysicsClear();
 
 	if (pCollisionEntity.Get()) {
-		pCollisionEntity->ClearLinkedPhysics();
+		pCollisionEntity->GetEnginePortal()->ClearLinkedPhysics();
 	}
 
 	if( m_pLinkedPortal && (m_pLinkedPortal->m_bInCrossLinkedFunction == false) )
@@ -1161,8 +1132,8 @@ void CPortalSimulator::ClearLinkedPhysics( void )
 	//Assert( (ShadowClones.FromLinkedPortal.Count() == 0) && 
 	//	((m_pLinkedPortal == NULL) || (m_pLinkedPortal->ShadowClones.FromLinkedPortal.Count() == 0)) );
 
-	pPhysicsEnvironment->CleanupDeleteList();
-	pPhysicsEnvironment->SetQuickDelete( false );
+	GetPhysicsEnvironment()->CleanupDeleteList();
+	GetPhysicsEnvironment()->SetQuickDelete( false );
 
 	if (pCollisionEntity.Get()) {
 		pCollisionEntity->GetEngineObject()->CollisionRulesChanged();
@@ -1213,7 +1184,7 @@ void CPortalSimulator::CreateLocalCollision( void )
 	DEBUGTIMERONLY( DevMsg( 2, "[PSDT:%d] %sCPortalSimulator::CreateLocalCollision() START\n", GetPortalSimulatorGUID(), TABSPACING ); );
 	INCREMENTTABSPACING();
 	
-	pCollisionEntity->CreateLocalCollision();
+	pCollisionEntity->GetEnginePortal()->CreateLocalCollision();
 
 	STOPDEBUGTIMER( functionTimer );
 	DECREMENTTABSPACING();
@@ -1281,7 +1252,7 @@ void CPortalSimulator::ClearLocalCollision( void )
 	INCREMENTTABSPACING();
 	
 	if (pCollisionEntity.Get()) {
-		pCollisionEntity->ClearLocalCollision();
+		pCollisionEntity->GetEnginePortal()->ClearLocalCollision();
 	}
 
 	STOPDEBUGTIMER( functionTimer );
@@ -1307,7 +1278,7 @@ void CPortalSimulator::CreatePolyhedrons( void )
 	DEBUGTIMERONLY( DevMsg( 2, "[PSDT:%d] %sCPortalSimulator::CreatePolyhedrons() START\n", GetPortalSimulatorGUID(), TABSPACING ); );
 	INCREMENTTABSPACING();
 
-	pCollisionEntity->CreatePolyhedrons();
+	pCollisionEntity->GetEnginePortal()->CreatePolyhedrons();
 
 	STOPDEBUGTIMER( functionTimer );
 	DECREMENTTABSPACING();
@@ -1330,7 +1301,7 @@ void CPortalSimulator::ClearPolyhedrons( void )
 	INCREMENTTABSPACING();
 	
 	if (pCollisionEntity.Get()) {
-		pCollisionEntity->ClearPolyhedrons();
+		pCollisionEntity->GetEnginePortal()->ClearPolyhedrons();
 	}
 
 	STOPDEBUGTIMER( functionTimer );
@@ -1436,7 +1407,7 @@ CPortalSimulator *CPortalSimulator::GetSimulatorThatCreatedPhysicsObject( const 
 {
 	for( int i = s_PortalSimulators.Count(); --i >= 0; )
 	{
-		if( s_PortalSimulators[i]->pCollisionEntity->CreatedPhysicsObject( pObject, pOut_SourceType ) )
+		if( s_PortalSimulators[i]->pCollisionEntity->GetEnginePortal()->CreatedPhysicsObject( pObject, pOut_SourceType ) )
 			return s_PortalSimulators[i];
 	}
 	
@@ -1445,58 +1416,10 @@ CPortalSimulator *CPortalSimulator::GetSimulatorThatCreatedPhysicsObject( const 
 
 bool CPortalSimulator::CreatedPhysicsObject( const IPhysicsObject *pObject, PS_PhysicsObjectSourceType_t *pOut_SourceType ) const
 {
-	return pCollisionEntity->CreatedPhysicsObject(pObject, pOut_SourceType);
+	return pCollisionEntity->GetEnginePortal()->CreatedPhysicsObject(pObject, pOut_SourceType);
 }
 
-bool CPSCollisionEntity::CreatedPhysicsObject( const IPhysicsObject *pObject, PS_PhysicsObjectSourceType_t *pOut_SourceType ) const
-{
-	if( (pObject == m_InternalData.Simulation.Static.World.Brushes.pPhysicsObject) || (pObject == m_InternalData.Simulation.Static.Wall.Local.Brushes.pPhysicsObject) )
-	{
-		if( pOut_SourceType )
-			*pOut_SourceType = PSPOST_LOCAL_BRUSHES;
 
-		return true;
-	}
-
-	if( pObject == m_InternalData.Simulation.Static.Wall.RemoteTransformedToLocal.Brushes.pPhysicsObject )
-	{
-		if( pOut_SourceType )
-			*pOut_SourceType = PSPOST_REMOTE_BRUSHES;
-
-		return true;
-	}
-
-	for( int i = m_InternalData.Simulation.Static.World.StaticProps.ClippedRepresentations.Count(); --i >= 0; )
-	{
-		if( m_InternalData.Simulation.Static.World.StaticProps.ClippedRepresentations[i].pPhysicsObject == pObject )
-		{
-			if( pOut_SourceType )
-				*pOut_SourceType = PSPOST_LOCAL_STATICPROPS;
-			return true;
-		}
-	}
-
-	for( int i = m_InternalData.Simulation.Static.Wall.RemoteTransformedToLocal.StaticProps.PhysicsObjects.Count(); --i >= 0; )
-	{
-		if( m_InternalData.Simulation.Static.Wall.RemoteTransformedToLocal.StaticProps.PhysicsObjects[i] == pObject )
-		{
-			if( pOut_SourceType )
-				*pOut_SourceType = PSPOST_REMOTE_STATICPROPS;
-
-			return true;
-		}
-	}
-
-	if( pObject == m_InternalData.Simulation.Static.Wall.Local.Tube.pPhysicsObject )
-	{
-		if( pOut_SourceType )
-			*pOut_SourceType = PSPOST_HOLYWALL_TUBE;
-
-		return true;
-	}	
-
-	return false;
-}
 #endif //#ifndef CLIENT_DLL
 
 
@@ -1506,87 +1429,11 @@ bool CPSCollisionEntity::CreatedPhysicsObject( const IPhysicsObject *pObject, PS
 
 
 
-static void ConvertBrushListToClippedPolyhedronList( const int *pBrushes, int iBrushCount, const float *pOutwardFacingClipPlanes, int iClipPlaneCount, float fClipEpsilon, CUtlVector<CPolyhedron *> *pPolyhedronList )
-{
-	if( pPolyhedronList == NULL )
-		return;
-
-	if( (pBrushes == NULL) || (iBrushCount == 0) )
-		return;
-
-	for( int i = 0; i != iBrushCount; ++i )
-	{
-		CPolyhedron *pPolyhedron = ClipPolyhedron( g_StaticCollisionPolyhedronCache.GetBrushPolyhedron( pBrushes[i] ), pOutwardFacingClipPlanes, iClipPlaneCount, fClipEpsilon );
-		if( pPolyhedron )
-			pPolyhedronList->AddToTail( pPolyhedron );
-	}
-}
-
-static void ClipPolyhedrons( CPolyhedron * const *pExistingPolyhedrons, int iPolyhedronCount, const float *pOutwardFacingClipPlanes, int iClipPlaneCount, float fClipEpsilon, CUtlVector<CPolyhedron *> *pPolyhedronList )
-{
-	if( pPolyhedronList == NULL )
-		return;
-
-	if( (pExistingPolyhedrons == NULL) || (iPolyhedronCount == 0) )
-		return;
-
-	for( int i = 0; i != iPolyhedronCount; ++i )
-	{
-		CPolyhedron *pPolyhedron = ClipPolyhedron( pExistingPolyhedrons[i], pOutwardFacingClipPlanes, iClipPlaneCount, fClipEpsilon );
-		if( pPolyhedron )
-			pPolyhedronList->AddToTail( pPolyhedron );
-	}
-}
-
-static CPhysCollide *ConvertPolyhedronsToCollideable( CPolyhedron **pPolyhedrons, int iPolyhedronCount )
-{
-	if( (pPolyhedrons == NULL) || (iPolyhedronCount == 0 ) )
-		return NULL;
-
-	CREATEDEBUGTIMER( functionTimer );
-
-	STARTDEBUGTIMER( functionTimer );
-	DEBUGTIMERONLY( DevMsg( 2, "[PSDT:%d] %sConvertPolyhedronsToCollideable() START\n", s_iPortalSimulatorGUID, TABSPACING ); );
-	INCREMENTTABSPACING();
-
-	CPhysConvex **pConvexes = (CPhysConvex **)stackalloc( iPolyhedronCount * sizeof( CPhysConvex * ) );
-	int iConvexCount = 0;
-
-	CREATEDEBUGTIMER( convexTimer );
-	STARTDEBUGTIMER( convexTimer );
-	for( int i = 0; i != iPolyhedronCount; ++i )
-	{
-		pConvexes[iConvexCount] = physcollision->ConvexFromConvexPolyhedron( *pPolyhedrons[i] );
-
-		Assert( pConvexes[iConvexCount] != NULL );
-		
-		if( pConvexes[iConvexCount] )
-			++iConvexCount;		
-	}
-	STOPDEBUGTIMER( convexTimer );
-	DEBUGTIMERONLY( DevMsg( 2, "[PSDT:%d] %sConvex Generation:%fms\n", s_iPortalSimulatorGUID, TABSPACING, convexTimer.GetDuration().GetMillisecondsF() ); );
 
 
-	CPhysCollide *pReturn;
-	if( iConvexCount != 0 )
-	{
-		CREATEDEBUGTIMER( collideTimer );
-		STARTDEBUGTIMER( collideTimer );
-		pReturn = physcollision->ConvertConvexToCollide( pConvexes, iConvexCount );
-		STOPDEBUGTIMER( collideTimer );
-		DEBUGTIMERONLY( DevMsg( 2, "[PSDT:%d] %sCollideable Generation:%fms\n", s_iPortalSimulatorGUID, TABSPACING, collideTimer.GetDuration().GetMillisecondsF() ); );
-	}
-	else
-	{
-		pReturn = NULL;
-	}
 
-	STOPDEBUGTIMER( functionTimer );
-	DECREMENTTABSPACING();
-	DEBUGTIMERONLY( DevMsg( 2, "[PSDT:%d] %sConvertPolyhedronsToCollideable() FINISH: %fms\n", s_iPortalSimulatorGUID, TABSPACING, functionTimer.GetDuration().GetMillisecondsF() ); );
 
-	return pReturn;
-}
+
 
 
 static inline CPolyhedron *TransformAndClipSinglePolyhedron( CPolyhedron *pExistingPolyhedron, const VMatrix &Transform, const float *pOutwardFacingClipPlanes, int iClipPlaneCount, float fCutEpsilon, bool bUseTempMemory )
@@ -1688,7 +1535,6 @@ public:
 static CPS_AutoGameSys_EntityListener s_CPS_AGS_EL_Singleton;
 
 CPSCollisionEntity::CPSCollisionEntity( void )
-: m_DataAccess(m_InternalData)
 {
 	m_pOwningSimulator = NULL;
 }
@@ -1710,11 +1556,11 @@ CPSCollisionEntity::~CPSCollisionEntity( void )
 void CPSCollisionEntity::UpdateOnRemove( void )
 {
 	GetEngineObject()->VPhysicsSetObject( NULL );
-	ClearHoleShapeCollideable();
-	ClearLinkedPhysics();
-	ClearLocalPhysics();
-	ClearLocalCollision();
-	ClearPolyhedrons();
+	GetEnginePortal()->ClearHoleShapeCollideable();
+	GetEnginePortal()->ClearLinkedPhysics();
+	GetEnginePortal()->ClearLocalPhysics();
+	GetEnginePortal()->ClearLocalCollision();
+	GetEnginePortal()->ClearPolyhedrons();
 #ifdef GAME_DLL
 	if (m_pOwningSimulator) {
 		m_pOwningSimulator->BeforeCollisionEntityDestroy();
@@ -1765,14 +1611,14 @@ bool CPSCollisionEntity::ShouldCollide( int collisionGroup, int contentsMask ) c
 
 IPhysicsObject * CPSCollisionEntity::VPhysicsGetObject( void )
 {
-	if(m_DataAccess.Simulation.Static.World.Brushes.pPhysicsObject != NULL )
-		return m_DataAccess.Simulation.Static.World.Brushes.pPhysicsObject;
-	else if(m_DataAccess.Simulation.Static.Wall.Local.Brushes.pPhysicsObject != NULL )
-		return m_DataAccess.Simulation.Static.Wall.Local.Brushes.pPhysicsObject;
-	else if(m_DataAccess.Simulation.Static.Wall.Local.Tube.pPhysicsObject != NULL )
-		return m_DataAccess.Simulation.Static.Wall.Local.Brushes.pPhysicsObject;
-	else if(m_DataAccess.Simulation.Static.Wall.RemoteTransformedToLocal.Brushes.pPhysicsObject != NULL )
-		return m_DataAccess.Simulation.Static.Wall.RemoteTransformedToLocal.Brushes.pPhysicsObject;
+	if(GetEnginePortal()->GetWorldBrushesPhysicsObject() != NULL)
+		return GetEnginePortal()->GetWorldBrushesPhysicsObject();
+	else if(GetEnginePortal()->GetWallBrushesPhysicsObject() != NULL )
+		return GetEnginePortal()->GetWallBrushesPhysicsObject();
+	else if(GetEnginePortal()->GetWallTubePhysicsObject() != NULL )
+		return GetEnginePortal()->GetWallTubePhysicsObject();
+	else if(GetEnginePortal()->GetRemoteWallBrushesPhysicsObject() != NULL )
+		return GetEnginePortal()->GetRemoteWallBrushesPhysicsObject();
 	else
 		return NULL;
 }
@@ -1784,33 +1630,33 @@ int CPSCollisionEntity::VPhysicsGetObjectList( IPhysicsObject **pList, int listM
 
 	int iRetVal = 0;
 
-	if(m_DataAccess.Simulation.Static.World.Brushes.pPhysicsObject != NULL )
+	if(GetEnginePortal()->GetWorldBrushesPhysicsObject() != NULL )
 	{
-		pList[iRetVal] = m_DataAccess.Simulation.Static.World.Brushes.pPhysicsObject;
+		pList[iRetVal] = GetEnginePortal()->GetWorldBrushesPhysicsObject();
 		++iRetVal;
 		if( iRetVal == listMax )
 			return iRetVal;
 	}
 
-	if(m_DataAccess.Simulation.Static.Wall.Local.Brushes.pPhysicsObject != NULL )
+	if(GetEnginePortal()->GetWallBrushesPhysicsObject() != NULL )
 	{
-		pList[iRetVal] = m_DataAccess.Simulation.Static.Wall.Local.Brushes.pPhysicsObject;
+		pList[iRetVal] = GetEnginePortal()->GetWallBrushesPhysicsObject();
 		++iRetVal;
 		if( iRetVal == listMax )
 			return iRetVal;
 	}
 
-	if(m_DataAccess.Simulation.Static.Wall.Local.Tube.pPhysicsObject != NULL )
+	if(GetEnginePortal()->GetWallTubePhysicsObject() != NULL )
 	{
-		pList[iRetVal] = m_DataAccess.Simulation.Static.Wall.Local.Tube.pPhysicsObject;
+		pList[iRetVal] = GetEnginePortal()->GetWallTubePhysicsObject();
 		++iRetVal;
 		if( iRetVal == listMax )
 			return iRetVal;
 	}
 
-	if(m_DataAccess.Simulation.Static.Wall.RemoteTransformedToLocal.Brushes.pPhysicsObject != NULL )
+	if(GetEnginePortal()->GetRemoteWallBrushesPhysicsObject() != NULL )
 	{
-		pList[iRetVal] = m_DataAccess.Simulation.Static.Wall.RemoteTransformedToLocal.Brushes.pPhysicsObject;
+		pList[iRetVal] = GetEnginePortal()->GetRemoteWallBrushesPhysicsObject();
 		++iRetVal;
 		if( iRetVal == listMax )
 			return iRetVal;
@@ -1819,1157 +1665,7 @@ int CPSCollisionEntity::VPhysicsGetObjectList( IPhysicsObject **pList, int listM
 	return iRetVal;
 }
 
-void CPSCollisionEntity::MoveTo(const Vector& ptCenter, const QAngle& angles)
-{
-	{
-		GetEngineObject()->SetAbsOrigin(ptCenter);
-		GetEngineObject()->SetAbsAngles(angles);
-		//m_InternalData.Placement.ptCenter = ptCenter;
-		//m_InternalData.Placement.qAngles = angles;
-		AngleVectors(angles, &m_InternalData.Placement.vForward, &m_InternalData.Placement.vRight, &m_InternalData.Placement.vUp);
-		m_InternalData.Placement.PortalPlane.normal = m_InternalData.Placement.vForward;
-		m_InternalData.Placement.PortalPlane.dist = m_InternalData.Placement.PortalPlane.normal.Dot(GetEngineObject()->GetAbsOrigin());
-		m_InternalData.Placement.PortalPlane.signbits = SignbitsForPlane(&m_InternalData.Placement.PortalPlane);
-		//m_InternalData.Placement.PortalPlane.Init(m_InternalData.Placement.vForward, m_InternalData.Placement.vForward.Dot(GetEngineObject()->GetAbsOrigin()));
-		Vector vAbsNormal;
-		vAbsNormal.x = fabs(m_InternalData.Placement.PortalPlane.normal.x);
-		vAbsNormal.y = fabs(m_InternalData.Placement.PortalPlane.normal.y);
-		vAbsNormal.z = fabs(m_InternalData.Placement.PortalPlane.normal.z);
 
-		if (vAbsNormal.x > vAbsNormal.y)
-		{
-			if (vAbsNormal.x > vAbsNormal.z)
-			{
-				if (vAbsNormal.x > 0.999f)
-					m_InternalData.Placement.PortalPlane.type = PLANE_X;
-				else
-					m_InternalData.Placement.PortalPlane.type = PLANE_ANYX;
-			}
-			else
-			{
-				if (vAbsNormal.z > 0.999f)
-					m_InternalData.Placement.PortalPlane.type = PLANE_Z;
-				else
-					m_InternalData.Placement.PortalPlane.type = PLANE_ANYZ;
-			}
-		}
-		else
-		{
-			if (vAbsNormal.y > vAbsNormal.z)
-			{
-				if (vAbsNormal.y > 0.999f)
-					m_InternalData.Placement.PortalPlane.type = PLANE_Y;
-				else
-					m_InternalData.Placement.PortalPlane.type = PLANE_ANYY;
-			}
-			else
-			{
-				if (vAbsNormal.z > 0.999f)
-					m_InternalData.Placement.PortalPlane.type = PLANE_Z;
-				else
-					m_InternalData.Placement.PortalPlane.type = PLANE_ANYZ;
-			}
-		}
-	}
-}
-
-void CPSCollisionEntity::UpdateLinkMatrix(CPSCollisionEntity* pRemoteCollisionEntity) 
-{
-	if (pRemoteCollisionEntity) {
-		Vector vLocalLeft = -m_InternalData.Placement.vRight;
-		VMatrix matLocalToWorld(m_InternalData.Placement.vForward, vLocalLeft, m_InternalData.Placement.vUp);
-		matLocalToWorld.SetTranslation(GetEngineObject()->GetAbsOrigin());
-
-		VMatrix matLocalToWorldInverse;
-		MatrixInverseTR(matLocalToWorld, matLocalToWorldInverse);
-
-		//180 degree rotation about up
-		VMatrix matRotation;
-		matRotation.Identity();
-		matRotation.m[0][0] = -1.0f;
-		matRotation.m[1][1] = -1.0f;
-
-		Vector vRemoteLeft = -pRemoteCollisionEntity->m_InternalData.Placement.vRight;
-		VMatrix matRemoteToWorld(pRemoteCollisionEntity->m_InternalData.Placement.vForward, vRemoteLeft, pRemoteCollisionEntity->m_InternalData.Placement.vUp);
-		matRemoteToWorld.SetTranslation(pRemoteCollisionEntity->GetEngineObject()->GetAbsOrigin());
-
-		//final
-		m_InternalData.Placement.matThisToLinked = matRemoteToWorld * matRotation * matLocalToWorldInverse;
-	}
-	else {
-		m_InternalData.Placement.matThisToLinked.Identity();
-	}
-
-	m_InternalData.Placement.matThisToLinked.InverseTR(m_InternalData.Placement.matLinkedToThis);
-
-	MatrixAngles(m_InternalData.Placement.matThisToLinked.As3x4(), m_InternalData.Placement.ptaap_ThisToLinked.qAngleTransform, m_InternalData.Placement.ptaap_ThisToLinked.ptOriginTransform);
-	MatrixAngles(m_InternalData.Placement.matLinkedToThis.As3x4(), m_InternalData.Placement.ptaap_LinkedToThis.qAngleTransform, m_InternalData.Placement.ptaap_LinkedToThis.ptOriginTransform);
-
-}
-
-bool CPSCollisionEntity::EntityIsInPortalHole(CBaseEntity* pEntity) const //true if the entity is within the portal cutout bounds and crossing the plane. Not just *near* the portal
-{
-	Assert(m_InternalData.Placement.pHoleShapeCollideable != NULL);
-
-#ifdef DEBUG_PORTAL_COLLISION_ENVIRONMENTS
-	const char* szDumpFileName = "ps_entholecheck.txt";
-	if (sv_debug_dumpportalhole_nextcheck.GetBool())
-	{
-		filesystem->RemoveFile(szDumpFileName);
-
-		DumpActiveCollision(this, szDumpFileName);
-		PortalSimulatorDumps_DumpCollideToGlView(m_InternalData.Placement.pHoleShapeCollideable, vec3_origin, vec3_angle, 1.0f, szDumpFileName);
-	}
-#endif
-
-	trace_t Trace;
-
-	switch (pEntity->GetEngineObject()->GetSolid())
-	{
-	case SOLID_VPHYSICS:
-	{
-		ICollideable* pCollideable = pEntity->GetCollideable();
-		vcollide_t* pVCollide = modelinfo->GetVCollide(pCollideable->GetCollisionModel());
-
-		//Assert( pVCollide != NULL ); //brush models?
-		if (pVCollide != NULL)
-		{
-			Vector ptEntityPosition = pCollideable->GetCollisionOrigin();
-			QAngle qEntityAngles = pCollideable->GetCollisionAngles();
-
-#ifdef DEBUG_PORTAL_COLLISION_ENVIRONMENTS
-			if (sv_debug_dumpportalhole_nextcheck.GetBool())
-			{
-				for (int i = 0; i != pVCollide->solidCount; ++i)
-					PortalSimulatorDumps_DumpCollideToGlView(m_InternalData.Placement.pHoleShapeCollideable, vec3_origin, vec3_angle, 0.4f, szDumpFileName);
-
-				sv_debug_dumpportalhole_nextcheck.SetValue(false);
-			}
-#endif
-
-			for (int i = 0; i != pVCollide->solidCount; ++i)
-			{
-				physcollision->TraceCollide(ptEntityPosition, ptEntityPosition, pVCollide->solids[i], qEntityAngles, m_InternalData.Placement.pHoleShapeCollideable, vec3_origin, vec3_angle, &Trace);
-
-				if (Trace.startsolid)
-					return true;
-			}
-		}
-		else
-		{
-			//energy balls lack a vcollide
-			Vector vMins, vMaxs, ptCenter;
-			pCollideable->WorldSpaceSurroundingBounds(&vMins, &vMaxs);
-			ptCenter = (vMins + vMaxs) * 0.5f;
-			vMins -= ptCenter;
-			vMaxs -= ptCenter;
-			physcollision->TraceBox(ptCenter, ptCenter, vMins, vMaxs, m_InternalData.Placement.pHoleShapeCollideable, vec3_origin, vec3_angle, &Trace);
-
-			return Trace.startsolid;
-		}
-		break;
-	}
-
-	case SOLID_BBOX:
-	{
-		physcollision->TraceBox(pEntity->GetEngineObject()->GetAbsOrigin(), pEntity->GetEngineObject()->GetAbsOrigin(),
-			pEntity->GetEngineObject()->OBBMins(), pEntity->GetEngineObject()->OBBMaxs(),
-			m_InternalData.Placement.pHoleShapeCollideable, vec3_origin, vec3_angle, &Trace);
-
-#ifdef DEBUG_PORTAL_COLLISION_ENVIRONMENTS
-		if (sv_debug_dumpportalhole_nextcheck.GetBool())
-		{
-			Vector vMins = pEntity->GetEngineObject()->GetAbsOrigin() + pEntity->GetEngineObject()->OBBMins();
-			Vector vMaxs = pEntity->GetEngineObject()->GetAbsOrigin() + pEntity->GetEngineObject()->OBBMaxs();
-			PortalSimulatorDumps_DumpBoxToGlView(vMins, vMaxs, 1.0f, 1.0f, 1.0f, szDumpFileName);
-
-			sv_debug_dumpportalhole_nextcheck.SetValue(false);
-		}
-#endif
-
-		if (Trace.startsolid)
-			return true;
-
-		break;
-	}
-	case SOLID_NONE:
-#ifdef DEBUG_PORTAL_COLLISION_ENVIRONMENTS
-		if (sv_debug_dumpportalhole_nextcheck.GetBool())
-			sv_debug_dumpportalhole_nextcheck.SetValue(false);
-#endif
-
-		return false;
-
-	default:
-		Assert(false); //make a handler
-	};
-
-#ifdef DEBUG_PORTAL_COLLISION_ENVIRONMENTS
-	if (sv_debug_dumpportalhole_nextcheck.GetBool())
-		sv_debug_dumpportalhole_nextcheck.SetValue(false);
-#endif
-
-	return false;
-}
-bool CPSCollisionEntity::EntityHitBoxExtentIsInPortalHole(CBaseAnimating* pBaseAnimating) const //true if the entity is within the portal cutout bounds and crossing the plane. Not just *near* the portal
-{
-	bool bFirstVert = true;
-	Vector vMinExtent;
-	Vector vMaxExtent;
-
-	IStudioHdr* pStudioHdr = pBaseAnimating->GetEngineObject()->GetModelPtr();
-	if (!pStudioHdr)
-		return false;
-
-	mstudiohitboxset_t* set = pStudioHdr->pHitboxSet(pBaseAnimating->GetEngineObject()->GetHitboxSet());
-	if (!set)
-		return false;
-
-	Vector position;
-	QAngle angles;
-
-	for (int i = 0; i < set->numhitboxes; i++)
-	{
-		mstudiobbox_t* pbox = set->pHitbox(i);
-
-		pBaseAnimating->GetBonePosition(pbox->bone, position, angles);
-
-		// Build a rotation matrix from orientation
-		matrix3x4_t fRotateMatrix;
-		AngleMatrix(angles, fRotateMatrix);
-
-		//Vector pVerts[8];
-		Vector vecPos;
-		for (int i = 0; i < 8; ++i)
-		{
-			vecPos[0] = (i & 0x1) ? pbox->bbmax[0] : pbox->bbmin[0];
-			vecPos[1] = (i & 0x2) ? pbox->bbmax[1] : pbox->bbmin[1];
-			vecPos[2] = (i & 0x4) ? pbox->bbmax[2] : pbox->bbmin[2];
-
-			Vector vRotVec;
-
-			VectorRotate(vecPos, fRotateMatrix, vRotVec);
-			vRotVec += position;
-
-			if (bFirstVert)
-			{
-				vMinExtent = vRotVec;
-				vMaxExtent = vRotVec;
-				bFirstVert = false;
-			}
-			else
-			{
-				vMinExtent = vMinExtent.Min(vRotVec);
-				vMaxExtent = vMaxExtent.Max(vRotVec);
-			}
-			}
-	}
-
-	Vector ptCenter = (vMinExtent + vMaxExtent) * 0.5f;
-	vMinExtent -= ptCenter;
-	vMaxExtent -= ptCenter;
-
-	trace_t Trace;
-	physcollision->TraceBox(ptCenter, ptCenter, vMinExtent, vMaxExtent, m_InternalData.Placement.pHoleShapeCollideable, vec3_origin, vec3_angle, &Trace);
-
-	if (Trace.startsolid)
-		return true;
-
-	return false;
-}
-
-bool CPSCollisionEntity::RayIsInPortalHole(const Ray_t& ray) const //traces a ray against the same detector for EntityIsInPortalHole(), bias is towards false positives
-{
-	trace_t Trace;
-	physcollision->TraceBox(ray, m_InternalData.Placement.pHoleShapeCollideable, vec3_origin, vec3_angle, &Trace);
-	return Trace.DidHit();
-}
-
-bool CPSCollisionEntity::TraceWorldBrushes(const Ray_t& ray, trace_t* pTrace) const
-{
-	if (m_DataAccess.Simulation.Static.World.Brushes.pCollideable && sv_portal_trace_vs_world.GetBool())
-	{
-		physcollision->TraceBox(ray, m_DataAccess.Simulation.Static.World.Brushes.pCollideable, vec3_origin, vec3_angle, pTrace);
-		return true;
-	}
-	return false;
-}
-
-bool CPSCollisionEntity::TraceWallTube(const Ray_t& ray, trace_t* pTrace) const
-{
-	if (m_DataAccess.Simulation.Static.Wall.Local.Tube.pCollideable && sv_portal_trace_vs_holywall.GetBool())
-	{
-		physcollision->TraceBox(ray, m_DataAccess.Simulation.Static.Wall.Local.Tube.pCollideable, vec3_origin, vec3_angle, pTrace);
-		return true;
-	}
-	return false;
-}
-
-bool CPSCollisionEntity::TraceWallBrushes(const Ray_t& ray, trace_t* pTrace) const
-{
-	if (m_DataAccess.Simulation.Static.Wall.Local.Brushes.pCollideable && sv_portal_trace_vs_holywall.GetBool())
-	{
-		physcollision->TraceBox(ray, m_DataAccess.Simulation.Static.Wall.Local.Brushes.pCollideable, vec3_origin, vec3_angle, pTrace);
-		return true;
-	}
-	return false;
-}
-
-bool CPSCollisionEntity::TraceTransformedWorldBrushes(CPSCollisionEntity* pRemoteCollisionEntity, const Ray_t& ray, trace_t* pTrace) const
-{
-	if (pRemoteCollisionEntity->m_DataAccess.Simulation.Static.World.Brushes.pCollideable && sv_portal_trace_vs_world.GetBool())
-	{
-		physcollision->TraceBox(ray, pRemoteCollisionEntity->m_DataAccess.Simulation.Static.World.Brushes.pCollideable, m_DataAccess.Placement.ptaap_LinkedToThis.ptOriginTransform, m_DataAccess.Placement.ptaap_LinkedToThis.qAngleTransform, pTrace);
-		return true;
-	}
-	return false;
-}
-
-int CPSCollisionEntity::GetStaticPropsCount() const
-{
-	return m_DataAccess.Simulation.Static.World.StaticProps.ClippedRepresentations.Count();
-}
-
-const PS_SD_Static_World_StaticProps_ClippedProp_t* CPSCollisionEntity::GetStaticProps(int index) const
-{
-	return &m_DataAccess.Simulation.Static.World.StaticProps.ClippedRepresentations[index];
-}
-
-bool CPSCollisionEntity::StaticPropsCollisionExists() const
-{
-	return m_DataAccess.Simulation.Static.World.StaticProps.bCollisionExists;
-}
-
-//const Vector& CPSCollisionEntity::GetOrigin() const
-//{
-//	return m_DataAccess.Placement.ptCenter;
-//}
-
-//const QAngle& CPSCollisionEntity::GetAngles() const
-//{
-//	return m_DataAccess.Placement.qAngles;
-//}
-
-const Vector& CPSCollisionEntity::GetTransformedOrigin() const
-{
-	return m_DataAccess.Placement.ptaap_LinkedToThis.ptOriginTransform;
-}
-
-const QAngle& CPSCollisionEntity::GetTransformedAngles() const
-{
-	return m_DataAccess.Placement.ptaap_LinkedToThis.qAngleTransform;
-}
-
-const VMatrix& CPSCollisionEntity::MatrixThisToLinked() const
-{
-	return m_InternalData.Placement.matThisToLinked;
-}
-const VMatrix& CPSCollisionEntity::MatrixLinkedToThis() const
-{
-	return m_InternalData.Placement.matLinkedToThis;
-}
-
-const cplane_t& CPSCollisionEntity::GetPortalPlane() const
-{
-	return m_DataAccess.Placement.PortalPlane;
-}
-
-const PS_InternalData_t& CPSCollisionEntity::GetDataAccess() const
-{
-	return m_DataAccess;
-}
-
-const Vector& CPSCollisionEntity::GetVectorForward() const
-{
-	return m_DataAccess.Placement.vForward;
-}
-const Vector& CPSCollisionEntity::GetVectorUp() const
-{
-	return m_DataAccess.Placement.vUp;
-}
-const Vector& CPSCollisionEntity::GetVectorRight() const
-{
-	return m_DataAccess.Placement.vRight;
-}
-
-const PS_SD_Static_SurfaceProperties_t& CPSCollisionEntity::GetSurfaceProperties() const 
-{
-	return m_DataAccess.Simulation.Static.SurfaceProperties;
-}
-
-void CPSCollisionEntity::CreatePolyhedrons(void)
-{
-	//forward reverse conventions signify whether the normal is the same direction as m_InternalData.Placement.PortalPlane.m_Normal
-//World and wall conventions signify whether it's been shifted in front of the portal plane or behind it
-
-	float fWorldClipPlane_Forward[4] = { m_InternalData.Placement.PortalPlane.normal.x,
-											m_InternalData.Placement.PortalPlane.normal.y,
-											m_InternalData.Placement.PortalPlane.normal.z,
-											m_InternalData.Placement.PortalPlane.dist + PORTAL_WORLD_WALL_HALF_SEPARATION_AMOUNT };
-
-	float fWorldClipPlane_Reverse[4] = { -fWorldClipPlane_Forward[0],
-											-fWorldClipPlane_Forward[1],
-											-fWorldClipPlane_Forward[2],
-											-fWorldClipPlane_Forward[3] };
-
-	float fWallClipPlane_Forward[4] = { m_InternalData.Placement.PortalPlane.normal.x,
-											m_InternalData.Placement.PortalPlane.normal.y,
-											m_InternalData.Placement.PortalPlane.normal.z,
-											m_InternalData.Placement.PortalPlane.dist }; // - PORTAL_WORLD_WALL_HALF_SEPARATION_AMOUNT
-
-	//float fWallClipPlane_Reverse[4] = {		-fWallClipPlane_Forward[0],
-	//										-fWallClipPlane_Forward[1],
-	//										-fWallClipPlane_Forward[2],
-	//										-fWallClipPlane_Forward[3] };
-
-
-	//World
-	{
-		Vector vOBBForward = m_InternalData.Placement.vForward;
-		Vector vOBBRight = m_InternalData.Placement.vRight;
-		Vector vOBBUp = m_InternalData.Placement.vUp;
-
-
-		//scale the extents to usable sizes
-		float flScaleX = sv_portal_collision_sim_bounds_x.GetFloat();
-		if (flScaleX < 200.0f)
-			flScaleX = 200.0f;
-		float flScaleY = sv_portal_collision_sim_bounds_y.GetFloat();
-		if (flScaleY < 200.0f)
-			flScaleY = 200.0f;
-		float flScaleZ = sv_portal_collision_sim_bounds_z.GetFloat();
-		if (flScaleZ < 252.0f)
-			flScaleZ = 252.0f;
-
-		vOBBForward *= flScaleX;
-		vOBBRight *= flScaleY;
-		vOBBUp *= flScaleZ;	// default size for scale z (252) is player (height + portal half height) * 2. Any smaller than this will allow for players to 
-		// reach unsimulated geometry before an end touch with teh portal.
-
-		Vector ptOBBOrigin = GetEngineObject()->GetAbsOrigin();
-		ptOBBOrigin -= vOBBRight / 2.0f;
-		ptOBBOrigin -= vOBBUp / 2.0f;
-
-		Vector vAABBMins, vAABBMaxs;
-		vAABBMins = vAABBMaxs = ptOBBOrigin;
-
-		for (int i = 1; i != 8; ++i)
-		{
-			Vector ptTest = ptOBBOrigin;
-			if (i & (1 << 0)) ptTest += vOBBForward;
-			if (i & (1 << 1)) ptTest += vOBBRight;
-			if (i & (1 << 2)) ptTest += vOBBUp;
-
-			if (ptTest.x < vAABBMins.x) vAABBMins.x = ptTest.x;
-			if (ptTest.y < vAABBMins.y) vAABBMins.y = ptTest.y;
-			if (ptTest.z < vAABBMins.z) vAABBMins.z = ptTest.z;
-			if (ptTest.x > vAABBMaxs.x) vAABBMaxs.x = ptTest.x;
-			if (ptTest.y > vAABBMaxs.y) vAABBMaxs.y = ptTest.y;
-			if (ptTest.z > vAABBMaxs.z) vAABBMaxs.z = ptTest.z;
-		}
-
-		//Brushes
-		{
-			Assert(m_InternalData.Simulation.Static.World.Brushes.Polyhedrons.Count() == 0);
-
-			CUtlVector<int> WorldBrushes;
-			enginetrace->GetBrushesInAABB(vAABBMins, vAABBMaxs, &WorldBrushes, MASK_SOLID_BRUSHONLY | CONTENTS_PLAYERCLIP | CONTENTS_MONSTERCLIP);
-
-			//create locally clipped polyhedrons for the world
-			{
-				int* pBrushList = WorldBrushes.Base();
-				int iBrushCount = WorldBrushes.Count();
-				ConvertBrushListToClippedPolyhedronList(pBrushList, iBrushCount, fWorldClipPlane_Reverse, 1, PORTAL_POLYHEDRON_CUT_EPSILON, &m_InternalData.Simulation.Static.World.Brushes.Polyhedrons);
-			}
-		}
-
-		//static props
-		{
-			Assert(m_InternalData.Simulation.Static.World.StaticProps.Polyhedrons.Count() == 0);
-
-			CUtlVector<ICollideable*> StaticProps;
-			staticpropmgr->GetAllStaticPropsInAABB(vAABBMins, vAABBMaxs, &StaticProps);
-
-			for (int i = StaticProps.Count(); --i >= 0; )
-			{
-				ICollideable* pProp = StaticProps[i];
-
-				CPolyhedron* PolyhedronArray[1024];
-				int iPolyhedronCount = g_StaticCollisionPolyhedronCache.GetStaticPropPolyhedrons(pProp, PolyhedronArray, 1024);
-
-				StaticPropPolyhedronGroups_t indices;
-				indices.iStartIndex = m_InternalData.Simulation.Static.World.StaticProps.Polyhedrons.Count();
-
-				for (int j = 0; j != iPolyhedronCount; ++j)
-				{
-					CPolyhedron* pPropPolyhedronPiece = PolyhedronArray[j];
-					if (pPropPolyhedronPiece)
-					{
-						CPolyhedron* pClippedPropPolyhedron = ClipPolyhedron(pPropPolyhedronPiece, fWorldClipPlane_Reverse, 1, 0.01f, false);
-						if (pClippedPropPolyhedron)
-							m_InternalData.Simulation.Static.World.StaticProps.Polyhedrons.AddToTail(pClippedPropPolyhedron);
-					}
-				}
-
-				indices.iNumPolyhedrons = m_InternalData.Simulation.Static.World.StaticProps.Polyhedrons.Count() - indices.iStartIndex;
-				if (indices.iNumPolyhedrons != 0)
-				{
-					int index = m_InternalData.Simulation.Static.World.StaticProps.ClippedRepresentations.AddToTail();
-					PS_SD_Static_World_StaticProps_ClippedProp_t& NewEntry = m_InternalData.Simulation.Static.World.StaticProps.ClippedRepresentations[index];
-
-					NewEntry.PolyhedronGroup = indices;
-					NewEntry.pCollide = NULL;
-#ifndef CLIENT_DLL
-					NewEntry.pPhysicsObject = NULL;
-#endif
-					NewEntry.pSourceProp = pProp->GetEntityHandle();
-
-					const model_t* pModel = pProp->GetCollisionModel();
-					bool bIsStudioModel = pModel && (modelinfo->GetModelType(pModel) == mod_studio);
-					AssertOnce(bIsStudioModel);
-					if (bIsStudioModel)
-					{
-						IStudioHdr* pStudioHdr = modelinfo->GetStudiomodel(pModel);
-						Assert(pStudioHdr != NULL);
-						NewEntry.iTraceContents = pStudioHdr->contents();
-						NewEntry.iTraceSurfaceProps = physprops->GetSurfaceIndex(pStudioHdr->pszSurfaceProp());
-					}
-					else
-					{
-						NewEntry.iTraceContents = m_InternalData.Simulation.Static.SurfaceProperties.contents;
-						NewEntry.iTraceSurfaceProps = m_InternalData.Simulation.Static.SurfaceProperties.surface.surfaceProps;
-					}
-				}
-			}
-		}
-	}
-
-
-
-	//(Holy) Wall
-	{
-		Assert(m_InternalData.Simulation.Static.Wall.Local.Tube.Polyhedrons.Count() == 0);
-		Assert(m_InternalData.Simulation.Static.Wall.Local.Brushes.Polyhedrons.Count() == 0);
-
-		Vector vBackward = -m_InternalData.Placement.vForward;
-		Vector vLeft = -m_InternalData.Placement.vRight;
-		Vector vDown = -m_InternalData.Placement.vUp;
-
-		Vector vOBBForward = -m_InternalData.Placement.vForward;
-		Vector vOBBRight = -m_InternalData.Placement.vRight;
-		Vector vOBBUp = m_InternalData.Placement.vUp;
-
-		//scale the extents to usable sizes
-		vOBBForward *= PORTAL_WALL_FARDIST / 2.0f;
-		vOBBRight *= PORTAL_WALL_FARDIST * 2.0f;
-		vOBBUp *= PORTAL_WALL_FARDIST * 2.0f;
-
-		Vector ptOBBOrigin = GetEngineObject()->GetAbsOrigin();
-		ptOBBOrigin -= vOBBRight / 2.0f;
-		ptOBBOrigin -= vOBBUp / 2.0f;
-
-		Vector vAABBMins, vAABBMaxs;
-		vAABBMins = vAABBMaxs = ptOBBOrigin;
-
-		for (int i = 1; i != 8; ++i)
-		{
-			Vector ptTest = ptOBBOrigin;
-			if (i & (1 << 0)) ptTest += vOBBForward;
-			if (i & (1 << 1)) ptTest += vOBBRight;
-			if (i & (1 << 2)) ptTest += vOBBUp;
-
-			if (ptTest.x < vAABBMins.x) vAABBMins.x = ptTest.x;
-			if (ptTest.y < vAABBMins.y) vAABBMins.y = ptTest.y;
-			if (ptTest.z < vAABBMins.z) vAABBMins.z = ptTest.z;
-			if (ptTest.x > vAABBMaxs.x) vAABBMaxs.x = ptTest.x;
-			if (ptTest.y > vAABBMaxs.y) vAABBMaxs.y = ptTest.y;
-			if (ptTest.z > vAABBMaxs.z) vAABBMaxs.z = ptTest.z;
-		}
-
-
-		float fPlanes[6 * 4];
-
-		//first and second planes are always forward and backward planes
-		fPlanes[(0 * 4) + 0] = fWallClipPlane_Forward[0];
-		fPlanes[(0 * 4) + 1] = fWallClipPlane_Forward[1];
-		fPlanes[(0 * 4) + 2] = fWallClipPlane_Forward[2];
-		fPlanes[(0 * 4) + 3] = fWallClipPlane_Forward[3] - PORTAL_WALL_TUBE_OFFSET;
-
-		fPlanes[(1 * 4) + 0] = vBackward.x;
-		fPlanes[(1 * 4) + 1] = vBackward.y;
-		fPlanes[(1 * 4) + 2] = vBackward.z;
-		float fTubeDepthDist = vBackward.Dot(GetEngineObject()->GetAbsOrigin() + (vBackward * (PORTAL_WALL_TUBE_DEPTH + PORTAL_WALL_TUBE_OFFSET)));
-		fPlanes[(1 * 4) + 3] = fTubeDepthDist;
-
-
-		//the remaining planes will always have the same ordering of normals, with different distances plugged in for each convex we're creating
-		//normal order is up, down, left, right
-
-		fPlanes[(2 * 4) + 0] = m_InternalData.Placement.vUp.x;
-		fPlanes[(2 * 4) + 1] = m_InternalData.Placement.vUp.y;
-		fPlanes[(2 * 4) + 2] = m_InternalData.Placement.vUp.z;
-		fPlanes[(2 * 4) + 3] = m_InternalData.Placement.vUp.Dot(GetEngineObject()->GetAbsOrigin() + (m_InternalData.Placement.vUp * PORTAL_HOLE_HALF_HEIGHT));
-
-		fPlanes[(3 * 4) + 0] = vDown.x;
-		fPlanes[(3 * 4) + 1] = vDown.y;
-		fPlanes[(3 * 4) + 2] = vDown.z;
-		fPlanes[(3 * 4) + 3] = vDown.Dot(GetEngineObject()->GetAbsOrigin() + (vDown * PORTAL_HOLE_HALF_HEIGHT));
-
-		fPlanes[(4 * 4) + 0] = vLeft.x;
-		fPlanes[(4 * 4) + 1] = vLeft.y;
-		fPlanes[(4 * 4) + 2] = vLeft.z;
-		fPlanes[(4 * 4) + 3] = vLeft.Dot(GetEngineObject()->GetAbsOrigin() + (vLeft * PORTAL_HOLE_HALF_WIDTH));
-
-		fPlanes[(5 * 4) + 0] = m_InternalData.Placement.vRight.x;
-		fPlanes[(5 * 4) + 1] = m_InternalData.Placement.vRight.y;
-		fPlanes[(5 * 4) + 2] = m_InternalData.Placement.vRight.z;
-		fPlanes[(5 * 4) + 3] = m_InternalData.Placement.vRight.Dot(GetEngineObject()->GetAbsOrigin() + (m_InternalData.Placement.vRight * PORTAL_HOLE_HALF_WIDTH));
-
-		float* fSidePlanesOnly = &fPlanes[(2 * 4)];
-
-		//these 2 get re-used a bit
-		float fFarRightPlaneDistance = m_InternalData.Placement.vRight.Dot(GetEngineObject()->GetAbsOrigin() + m_InternalData.Placement.vRight * (PORTAL_WALL_FARDIST * 10.0f));
-		float fFarLeftPlaneDistance = vLeft.Dot(GetEngineObject()->GetAbsOrigin() + vLeft * (PORTAL_WALL_FARDIST * 10.0f));
-
-
-		CUtlVector<int> WallBrushes;
-		CUtlVector<CPolyhedron*> WallBrushPolyhedrons_ClippedToWall;
-		CPolyhedron** pWallClippedPolyhedrons = NULL;
-		int iWallClippedPolyhedronCount = 0;
-		if (m_pOwningSimulator->IsSimulatingVPhysics()) //if not simulating vphysics, we skip making the entire wall, and just create the minimal tube instead
-		{
-			enginetrace->GetBrushesInAABB(vAABBMins, vAABBMaxs, &WallBrushes, MASK_SOLID_BRUSHONLY);
-
-			if (WallBrushes.Count() != 0)
-				ConvertBrushListToClippedPolyhedronList(WallBrushes.Base(), WallBrushes.Count(), fPlanes, 1, PORTAL_POLYHEDRON_CUT_EPSILON, &WallBrushPolyhedrons_ClippedToWall);
-
-			if (WallBrushPolyhedrons_ClippedToWall.Count() != 0)
-			{
-				for (int i = WallBrushPolyhedrons_ClippedToWall.Count(); --i >= 0; )
-				{
-					CPolyhedron* pPolyhedron = ClipPolyhedron(WallBrushPolyhedrons_ClippedToWall[i], fSidePlanesOnly, 4, PORTAL_POLYHEDRON_CUT_EPSILON, true);
-					if (pPolyhedron)
-					{
-						//a chunk of this brush passes through the hole, not eligible to be removed from cutting
-						pPolyhedron->Release();
-					}
-					else
-					{
-						//no part of this brush interacts with the hole, no point in cutting the brush any later
-						m_InternalData.Simulation.Static.Wall.Local.Brushes.Polyhedrons.AddToTail(WallBrushPolyhedrons_ClippedToWall[i]);
-						WallBrushPolyhedrons_ClippedToWall.FastRemove(i);
-					}
-				}
-
-				if (WallBrushPolyhedrons_ClippedToWall.Count() != 0) //might have become 0 while removing uncut brushes
-				{
-					pWallClippedPolyhedrons = WallBrushPolyhedrons_ClippedToWall.Base();
-					iWallClippedPolyhedronCount = WallBrushPolyhedrons_ClippedToWall.Count();
-				}
-			}
-		}
-
-
-		//upper wall
-		{
-			//minimal portion that extends into the hole space
-			//fPlanes[(1*4) + 3] = fTubeDepthDist;
-			fPlanes[(2 * 4) + 3] = m_InternalData.Placement.vUp.Dot(GetEngineObject()->GetAbsOrigin() + m_InternalData.Placement.vUp * (PORTAL_HOLE_HALF_HEIGHT + PORTAL_WALL_MIN_THICKNESS));
-			fPlanes[(3 * 4) + 3] = vDown.Dot(GetEngineObject()->GetAbsOrigin() + m_InternalData.Placement.vUp * PORTAL_HOLE_HALF_HEIGHT);
-			fPlanes[(4 * 4) + 3] = vLeft.Dot(GetEngineObject()->GetAbsOrigin() + vLeft * (PORTAL_HOLE_HALF_WIDTH + PORTAL_WALL_MIN_THICKNESS));
-			fPlanes[(5 * 4) + 3] = m_InternalData.Placement.vRight.Dot(GetEngineObject()->GetAbsOrigin() + m_InternalData.Placement.vRight * (PORTAL_HOLE_HALF_WIDTH + PORTAL_WALL_MIN_THICKNESS));
-
-			CPolyhedron* pTubePolyhedron = GeneratePolyhedronFromPlanes(fPlanes, 6, PORTAL_POLYHEDRON_CUT_EPSILON);
-			if (pTubePolyhedron)
-				m_InternalData.Simulation.Static.Wall.Local.Tube.Polyhedrons.AddToTail(pTubePolyhedron);
-
-			//general hole cut
-			//fPlanes[(1*4) + 3] += 2000.0f;
-			fPlanes[(2 * 4) + 3] = m_InternalData.Placement.vUp.Dot(GetEngineObject()->GetAbsOrigin() + m_InternalData.Placement.vUp * (PORTAL_WALL_FARDIST * 10.0f));
-			fPlanes[(3 * 4) + 3] = vDown.Dot(GetEngineObject()->GetAbsOrigin() + m_InternalData.Placement.vUp * (PORTAL_HOLE_HALF_HEIGHT + PORTAL_WALL_MIN_THICKNESS));
-			fPlanes[(4 * 4) + 3] = fFarLeftPlaneDistance;
-			fPlanes[(5 * 4) + 3] = fFarRightPlaneDistance;
-
-
-
-			ClipPolyhedrons(pWallClippedPolyhedrons, iWallClippedPolyhedronCount, fSidePlanesOnly, 4, PORTAL_POLYHEDRON_CUT_EPSILON, &m_InternalData.Simulation.Static.Wall.Local.Brushes.Polyhedrons);
-		}
-
-		//lower wall
-		{
-			//minimal portion that extends into the hole space
-			//fPlanes[(1*4) + 3] = fTubeDepthDist;
-			fPlanes[(2 * 4) + 3] = m_InternalData.Placement.vUp.Dot(GetEngineObject()->GetAbsOrigin() + (vDown * PORTAL_HOLE_HALF_HEIGHT));
-			fPlanes[(3 * 4) + 3] = vDown.Dot(GetEngineObject()->GetAbsOrigin() + vDown * (PORTAL_HOLE_HALF_HEIGHT + PORTAL_WALL_MIN_THICKNESS));
-			fPlanes[(4 * 4) + 3] = vLeft.Dot(GetEngineObject()->GetAbsOrigin() + vLeft * (PORTAL_HOLE_HALF_WIDTH + PORTAL_WALL_MIN_THICKNESS));
-			fPlanes[(5 * 4) + 3] = m_InternalData.Placement.vRight.Dot(GetEngineObject()->GetAbsOrigin() + m_InternalData.Placement.vRight * (PORTAL_HOLE_HALF_WIDTH + PORTAL_WALL_MIN_THICKNESS));
-
-			CPolyhedron* pTubePolyhedron = GeneratePolyhedronFromPlanes(fPlanes, 6, PORTAL_POLYHEDRON_CUT_EPSILON);
-			if (pTubePolyhedron)
-				m_InternalData.Simulation.Static.Wall.Local.Tube.Polyhedrons.AddToTail(pTubePolyhedron);
-
-			//general hole cut
-			//fPlanes[(1*4) + 3] += 2000.0f;
-			fPlanes[(2 * 4) + 3] = m_InternalData.Placement.vUp.Dot(GetEngineObject()->GetAbsOrigin() + (vDown * (PORTAL_HOLE_HALF_HEIGHT + PORTAL_WALL_MIN_THICKNESS)));
-			fPlanes[(3 * 4) + 3] = vDown.Dot(GetEngineObject()->GetAbsOrigin() + (vDown * (PORTAL_WALL_FARDIST * 10.0f)));
-			fPlanes[(4 * 4) + 3] = fFarLeftPlaneDistance;
-			fPlanes[(5 * 4) + 3] = fFarRightPlaneDistance;
-
-			ClipPolyhedrons(pWallClippedPolyhedrons, iWallClippedPolyhedronCount, fSidePlanesOnly, 4, PORTAL_POLYHEDRON_CUT_EPSILON, &m_InternalData.Simulation.Static.Wall.Local.Brushes.Polyhedrons);
-		}
-
-		//left wall
-		{
-			//minimal portion that extends into the hole space
-			//fPlanes[(1*4) + 3] = fTubeDepthDist;
-			fPlanes[(2 * 4) + 3] = m_InternalData.Placement.vUp.Dot(GetEngineObject()->GetAbsOrigin() + (m_InternalData.Placement.vUp * PORTAL_HOLE_HALF_HEIGHT));
-			fPlanes[(3 * 4) + 3] = vDown.Dot(GetEngineObject()->GetAbsOrigin() + (vDown * PORTAL_HOLE_HALF_HEIGHT));
-			fPlanes[(4 * 4) + 3] = vLeft.Dot(GetEngineObject()->GetAbsOrigin() + (vLeft * (PORTAL_HOLE_HALF_WIDTH + PORTAL_WALL_MIN_THICKNESS)));
-			fPlanes[(5 * 4) + 3] = m_InternalData.Placement.vRight.Dot(GetEngineObject()->GetAbsOrigin() + (vLeft * PORTAL_HOLE_HALF_WIDTH));
-
-			CPolyhedron* pTubePolyhedron = GeneratePolyhedronFromPlanes(fPlanes, 6, PORTAL_POLYHEDRON_CUT_EPSILON);
-			if (pTubePolyhedron)
-				m_InternalData.Simulation.Static.Wall.Local.Tube.Polyhedrons.AddToTail(pTubePolyhedron);
-
-			//general hole cut
-			//fPlanes[(1*4) + 3] += 2000.0f;
-			fPlanes[(2 * 4) + 3] = m_InternalData.Placement.vUp.Dot(GetEngineObject()->GetAbsOrigin() + (m_InternalData.Placement.vUp * (PORTAL_HOLE_HALF_HEIGHT + PORTAL_WALL_MIN_THICKNESS)));
-			fPlanes[(3 * 4) + 3] = vDown.Dot(GetEngineObject()->GetAbsOrigin() - (m_InternalData.Placement.vUp * (PORTAL_HOLE_HALF_HEIGHT + PORTAL_WALL_MIN_THICKNESS)));
-			fPlanes[(4 * 4) + 3] = fFarLeftPlaneDistance;
-			fPlanes[(5 * 4) + 3] = m_InternalData.Placement.vRight.Dot(GetEngineObject()->GetAbsOrigin() + (vLeft * (PORTAL_HOLE_HALF_WIDTH + PORTAL_WALL_MIN_THICKNESS)));
-
-			ClipPolyhedrons(pWallClippedPolyhedrons, iWallClippedPolyhedronCount, fSidePlanesOnly, 4, PORTAL_POLYHEDRON_CUT_EPSILON, &m_InternalData.Simulation.Static.Wall.Local.Brushes.Polyhedrons);
-		}
-
-		//right wall
-		{
-			//minimal portion that extends into the hole space
-			//fPlanes[(1*4) + 3] = fTubeDepthDist;
-			fPlanes[(2 * 4) + 3] = m_InternalData.Placement.vUp.Dot(GetEngineObject()->GetAbsOrigin() + (m_InternalData.Placement.vUp * (PORTAL_HOLE_HALF_HEIGHT)));
-			fPlanes[(3 * 4) + 3] = vDown.Dot(GetEngineObject()->GetAbsOrigin() + (vDown * (PORTAL_HOLE_HALF_HEIGHT)));
-			fPlanes[(4 * 4) + 3] = vLeft.Dot(GetEngineObject()->GetAbsOrigin() + m_InternalData.Placement.vRight * PORTAL_HOLE_HALF_WIDTH);
-			fPlanes[(5 * 4) + 3] = m_InternalData.Placement.vRight.Dot(GetEngineObject()->GetAbsOrigin() + m_InternalData.Placement.vRight * (PORTAL_HOLE_HALF_WIDTH + PORTAL_WALL_MIN_THICKNESS));
-
-			CPolyhedron* pTubePolyhedron = GeneratePolyhedronFromPlanes(fPlanes, 6, PORTAL_POLYHEDRON_CUT_EPSILON);
-			if (pTubePolyhedron)
-				m_InternalData.Simulation.Static.Wall.Local.Tube.Polyhedrons.AddToTail(pTubePolyhedron);
-
-			//general hole cut
-			//fPlanes[(1*4) + 3] += 2000.0f;
-			fPlanes[(2 * 4) + 3] = m_InternalData.Placement.vUp.Dot(GetEngineObject()->GetAbsOrigin() + (m_InternalData.Placement.vUp * (PORTAL_HOLE_HALF_HEIGHT + PORTAL_WALL_MIN_THICKNESS)));
-			fPlanes[(3 * 4) + 3] = vDown.Dot(GetEngineObject()->GetAbsOrigin() + (vDown * (PORTAL_HOLE_HALF_HEIGHT + PORTAL_WALL_MIN_THICKNESS)));
-			fPlanes[(4 * 4) + 3] = vLeft.Dot(GetEngineObject()->GetAbsOrigin() + m_InternalData.Placement.vRight * (PORTAL_HOLE_HALF_WIDTH + PORTAL_WALL_MIN_THICKNESS));
-			fPlanes[(5 * 4) + 3] = fFarRightPlaneDistance;
-
-			ClipPolyhedrons(pWallClippedPolyhedrons, iWallClippedPolyhedronCount, fSidePlanesOnly, 4, PORTAL_POLYHEDRON_CUT_EPSILON, &m_InternalData.Simulation.Static.Wall.Local.Brushes.Polyhedrons);
-		}
-
-		for (int i = WallBrushPolyhedrons_ClippedToWall.Count(); --i >= 0; )
-			WallBrushPolyhedrons_ClippedToWall[i]->Release();
-
-		WallBrushPolyhedrons_ClippedToWall.RemoveAll();
-		}
-}
-
-void CPSCollisionEntity::ClearPolyhedrons(void)
-{
-	if (m_InternalData.Simulation.Static.World.Brushes.Polyhedrons.Count() != 0)
-	{
-		for (int i = m_InternalData.Simulation.Static.World.Brushes.Polyhedrons.Count(); --i >= 0; )
-			m_InternalData.Simulation.Static.World.Brushes.Polyhedrons[i]->Release();
-
-		m_InternalData.Simulation.Static.World.Brushes.Polyhedrons.RemoveAll();
-	}
-
-	if (m_InternalData.Simulation.Static.World.StaticProps.Polyhedrons.Count() != 0)
-	{
-		for (int i = m_InternalData.Simulation.Static.World.StaticProps.Polyhedrons.Count(); --i >= 0; )
-			m_InternalData.Simulation.Static.World.StaticProps.Polyhedrons[i]->Release();
-
-		m_InternalData.Simulation.Static.World.StaticProps.Polyhedrons.RemoveAll();
-	}
-#ifdef _DEBUG
-	for (int i = m_InternalData.Simulation.Static.World.StaticProps.ClippedRepresentations.Count(); --i >= 0; )
-	{
-#ifndef CLIENT_DLL
-		Assert(m_InternalData.Simulation.Static.World.StaticProps.ClippedRepresentations[i].pPhysicsObject == NULL);
-#endif
-		Assert(m_InternalData.Simulation.Static.World.StaticProps.ClippedRepresentations[i].pCollide == NULL);
-	}
-#endif
-	m_InternalData.Simulation.Static.World.StaticProps.ClippedRepresentations.RemoveAll();
-
-	if (m_InternalData.Simulation.Static.Wall.Local.Brushes.Polyhedrons.Count() != 0)
-	{
-		for (int i = m_InternalData.Simulation.Static.Wall.Local.Brushes.Polyhedrons.Count(); --i >= 0; )
-			m_InternalData.Simulation.Static.Wall.Local.Brushes.Polyhedrons[i]->Release();
-
-		m_InternalData.Simulation.Static.Wall.Local.Brushes.Polyhedrons.RemoveAll();
-	}
-
-	if (m_InternalData.Simulation.Static.Wall.Local.Tube.Polyhedrons.Count() != 0)
-	{
-		for (int i = m_InternalData.Simulation.Static.Wall.Local.Tube.Polyhedrons.Count(); --i >= 0; )
-			m_InternalData.Simulation.Static.Wall.Local.Tube.Polyhedrons[i]->Release();
-
-		m_InternalData.Simulation.Static.Wall.Local.Tube.Polyhedrons.RemoveAll();
-	}
-}
-
-void CPSCollisionEntity::CreateLocalCollision(void)
-{
-	CREATEDEBUGTIMER(worldBrushTimer);
-	STARTDEBUGTIMER(worldBrushTimer);
-	Assert(m_InternalData.Simulation.Static.World.Brushes.pCollideable == NULL); //Be sure to find graceful fixes for asserts, performance is a big concern with portal simulation
-	if (m_InternalData.Simulation.Static.World.Brushes.Polyhedrons.Count() != 0)
-		m_InternalData.Simulation.Static.World.Brushes.pCollideable = ConvertPolyhedronsToCollideable(m_InternalData.Simulation.Static.World.Brushes.Polyhedrons.Base(), m_InternalData.Simulation.Static.World.Brushes.Polyhedrons.Count());
-	STOPDEBUGTIMER(worldBrushTimer);
-	DEBUGTIMERONLY(DevMsg(2, "[PSDT:%d] %sWorld Brushes=%fms\n", GetPortalSimulatorGUID(), TABSPACING, worldBrushTimer.GetDuration().GetMillisecondsF()); );
-
-	CREATEDEBUGTIMER(worldPropTimer);
-	STARTDEBUGTIMER(worldPropTimer);
-#ifdef _DEBUG
-	for (int i = m_InternalData.Simulation.Static.World.StaticProps.ClippedRepresentations.Count(); --i >= 0; )
-	{
-		Assert(m_InternalData.Simulation.Static.World.StaticProps.ClippedRepresentations[i].pCollide == NULL);
-	}
-#endif
-	Assert(m_InternalData.Simulation.Static.World.StaticProps.bCollisionExists == false); //Be sure to find graceful fixes for asserts, performance is a big concern with portal simulation
-	if (m_InternalData.Simulation.Static.World.StaticProps.ClippedRepresentations.Count() != 0)
-	{
-		Assert(m_InternalData.Simulation.Static.World.StaticProps.Polyhedrons.Count() != 0);
-		CPolyhedron** pPolyhedronsBase = m_InternalData.Simulation.Static.World.StaticProps.Polyhedrons.Base();
-		for (int i = m_InternalData.Simulation.Static.World.StaticProps.ClippedRepresentations.Count(); --i >= 0; )
-		{
-			PS_SD_Static_World_StaticProps_ClippedProp_t& Representation = m_InternalData.Simulation.Static.World.StaticProps.ClippedRepresentations[i];
-
-			Assert(Representation.pCollide == NULL);
-			Representation.pCollide = ConvertPolyhedronsToCollideable(&pPolyhedronsBase[Representation.PolyhedronGroup.iStartIndex], Representation.PolyhedronGroup.iNumPolyhedrons);
-			Assert(Representation.pCollide != NULL);
-		}
-	}
-	m_InternalData.Simulation.Static.World.StaticProps.bCollisionExists = true;
-	STOPDEBUGTIMER(worldPropTimer);
-	DEBUGTIMERONLY(DevMsg(2, "[PSDT:%d] %sWorld Props=%fms\n", GetPortalSimulatorGUID(), TABSPACING, worldPropTimer.GetDuration().GetMillisecondsF()); );
-
-	if (m_pOwningSimulator->IsSimulatingVPhysics())
-	{
-		//only need the tube when simulating player movement
-
-		//TODO: replace the complete wall with the wall shell
-		CREATEDEBUGTIMER(wallBrushTimer);
-		STARTDEBUGTIMER(wallBrushTimer);
-		Assert(m_InternalData.Simulation.Static.Wall.Local.Brushes.pCollideable == NULL); //Be sure to find graceful fixes for asserts, performance is a big concern with portal simulation
-		if (m_InternalData.Simulation.Static.Wall.Local.Brushes.Polyhedrons.Count() != 0)
-			m_InternalData.Simulation.Static.Wall.Local.Brushes.pCollideable = ConvertPolyhedronsToCollideable(m_InternalData.Simulation.Static.Wall.Local.Brushes.Polyhedrons.Base(), m_InternalData.Simulation.Static.Wall.Local.Brushes.Polyhedrons.Count());
-		STOPDEBUGTIMER(wallBrushTimer);
-		DEBUGTIMERONLY(DevMsg(2, "[PSDT:%d] %sWall Brushes=%fms\n", GetPortalSimulatorGUID(), TABSPACING, wallBrushTimer.GetDuration().GetMillisecondsF()); );
-	}
-
-	CREATEDEBUGTIMER(wallTubeTimer);
-	STARTDEBUGTIMER(wallTubeTimer);
-	Assert(m_InternalData.Simulation.Static.Wall.Local.Tube.pCollideable == NULL); //Be sure to find graceful fixes for asserts, performance is a big concern with portal simulation
-	if (m_InternalData.Simulation.Static.Wall.Local.Tube.Polyhedrons.Count() != 0)
-		m_InternalData.Simulation.Static.Wall.Local.Tube.pCollideable = ConvertPolyhedronsToCollideable(m_InternalData.Simulation.Static.Wall.Local.Tube.Polyhedrons.Base(), m_InternalData.Simulation.Static.Wall.Local.Tube.Polyhedrons.Count());
-	STOPDEBUGTIMER(wallTubeTimer);
-	DEBUGTIMERONLY(DevMsg(2, "[PSDT:%d] %sWall Tube=%fms\n", GetPortalSimulatorGUID(), TABSPACING, wallTubeTimer.GetDuration().GetMillisecondsF()); );
-
-	//grab surface properties to use for the portal environment
-	{
-		CTraceFilterWorldAndPropsOnly filter;
-		trace_t Trace;
-		UTIL_TraceLine(GetEngineObject()->GetAbsOrigin() + m_InternalData.Placement.vForward, GetEngineObject()->GetAbsOrigin() - (m_InternalData.Placement.vForward * 500.0f), MASK_SOLID_BRUSHONLY, &filter, &Trace);
-
-		if (Trace.fraction != 1.0f)
-		{
-			m_InternalData.Simulation.Static.SurfaceProperties.contents = Trace.contents;
-			m_InternalData.Simulation.Static.SurfaceProperties.surface = Trace.surface;
-			m_InternalData.Simulation.Static.SurfaceProperties.pEntity = (CBaseEntity*)Trace.m_pEnt;
-		}
-		else
-		{
-			m_InternalData.Simulation.Static.SurfaceProperties.contents = CONTENTS_SOLID;
-			m_InternalData.Simulation.Static.SurfaceProperties.surface.name = "**empty**";
-			m_InternalData.Simulation.Static.SurfaceProperties.surface.flags = 0;
-			m_InternalData.Simulation.Static.SurfaceProperties.surface.surfaceProps = 0;
-#ifndef CLIENT_DLL
-			m_InternalData.Simulation.Static.SurfaceProperties.pEntity = GetWorldEntity();
-#else
-			m_InternalData.Simulation.Static.SurfaceProperties.pEntity = GetClientWorldEntity();
-#endif
-		}
-
-#ifndef CLIENT_DLL
-		//if( pCollisionEntity )
-		m_InternalData.Simulation.Static.SurfaceProperties.pEntity = this;
-#endif		
-	}
-}
-
-void CPSCollisionEntity::ClearLocalCollision(void)
-{
-	if (m_InternalData.Simulation.Static.Wall.Local.Brushes.pCollideable)
-	{
-		physcollision->DestroyCollide(m_InternalData.Simulation.Static.Wall.Local.Brushes.pCollideable);
-		m_InternalData.Simulation.Static.Wall.Local.Brushes.pCollideable = NULL;
-	}
-
-	if (m_InternalData.Simulation.Static.Wall.Local.Tube.pCollideable)
-	{
-		physcollision->DestroyCollide(m_InternalData.Simulation.Static.Wall.Local.Tube.pCollideable);
-		m_InternalData.Simulation.Static.Wall.Local.Tube.pCollideable = NULL;
-	}
-
-	if (m_InternalData.Simulation.Static.World.Brushes.pCollideable)
-	{
-		physcollision->DestroyCollide(m_InternalData.Simulation.Static.World.Brushes.pCollideable);
-		m_InternalData.Simulation.Static.World.Brushes.pCollideable = NULL;
-	}
-
-	if (m_InternalData.Simulation.Static.World.StaticProps.bCollisionExists &&
-		(m_InternalData.Simulation.Static.World.StaticProps.ClippedRepresentations.Count() != 0) )
-	{
-		for (int i = m_InternalData.Simulation.Static.World.StaticProps.ClippedRepresentations.Count(); --i >= 0; )
-		{
-			PS_SD_Static_World_StaticProps_ClippedProp_t& Representation = m_InternalData.Simulation.Static.World.StaticProps.ClippedRepresentations[i];
-			if (Representation.pCollide)
-			{
-				physcollision->DestroyCollide(Representation.pCollide);
-				Representation.pCollide = NULL;
-			}
-		}
-	}
-	m_InternalData.Simulation.Static.World.StaticProps.bCollisionExists = false;
-}
-
-void CPSCollisionEntity::CreateLocalPhysics(void)
-{
-	//int iDefaultSurfaceIndex = physprops->GetSurfaceIndex( "default" );
-	objectparams_t params = g_PhysDefaultObjectParams;
-
-	// Any non-moving object can point to world safely-- Make sure we dont use 'params' for something other than that beyond this point.
-	//if( m_InternalData.Simulation.pCollisionEntity )
-	params.pGameData = this;
-	//else
-	//	GetWorldEntity();
-
-	//World
-	{
-		Assert(m_InternalData.Simulation.Static.World.Brushes.pPhysicsObject == NULL); //Be sure to find graceful fixes for asserts, performance is a big concern with portal simulation
-		if (m_InternalData.Simulation.Static.World.Brushes.pCollideable != NULL)
-		{
-			m_InternalData.Simulation.Static.World.Brushes.pPhysicsObject = m_pOwningSimulator->pPhysicsEnvironment->CreatePolyObjectStatic(m_InternalData.Simulation.Static.World.Brushes.pCollideable, m_InternalData.Simulation.Static.SurfaceProperties.surface.surfaceProps, vec3_origin, vec3_angle, &params);
-
-			if (VPhysicsGetObject() == NULL)
-				GetEngineObject()->VPhysicsSetObject(m_InternalData.Simulation.Static.World.Brushes.pPhysicsObject);
-
-			m_InternalData.Simulation.Static.World.Brushes.pPhysicsObject->RecheckCollisionFilter(); //some filters only work after the variable is stored in the class
-		}
-
-		//Assert( m_InternalData.Simulation.Static.World.StaticProps.PhysicsObjects.Count() == 0 ); //Be sure to find graceful fixes for asserts, performance is a big concern with portal simulation
-#ifdef _DEBUG
-		for (int i = m_InternalData.Simulation.Static.World.StaticProps.ClippedRepresentations.Count(); --i >= 0; )
-		{
-			Assert(m_InternalData.Simulation.Static.World.StaticProps.ClippedRepresentations[i].pPhysicsObject == NULL); //Be sure to find graceful fixes for asserts, performance is a big concern with portal simulation
-		}
-#endif
-
-		if (m_InternalData.Simulation.Static.World.StaticProps.ClippedRepresentations.Count() != 0)
-		{
-			Assert(m_InternalData.Simulation.Static.World.StaticProps.bCollisionExists);
-			for (int i = m_InternalData.Simulation.Static.World.StaticProps.ClippedRepresentations.Count(); --i >= 0; )
-			{
-				PS_SD_Static_World_StaticProps_ClippedProp_t& Representation = m_InternalData.Simulation.Static.World.StaticProps.ClippedRepresentations[i];
-				Assert(Representation.pCollide != NULL);
-				Assert(Representation.pPhysicsObject == NULL);
-
-				Representation.pPhysicsObject = m_pOwningSimulator->pPhysicsEnvironment->CreatePolyObjectStatic(Representation.pCollide, Representation.iTraceSurfaceProps, vec3_origin, vec3_angle, &params);
-				Assert(Representation.pPhysicsObject != NULL);
-				Representation.pPhysicsObject->RecheckCollisionFilter(); //some filters only work after the variable is stored in the class
-			}
-		}
-		m_InternalData.Simulation.Static.World.StaticProps.bPhysicsExists = true;
-	}
-
-	//Wall
-	{
-		Assert(m_InternalData.Simulation.Static.Wall.Local.Brushes.pPhysicsObject == NULL); //Be sure to find graceful fixes for asserts, performance is a big concern with portal simulation
-		if (m_InternalData.Simulation.Static.Wall.Local.Brushes.pCollideable != NULL)
-		{
-			m_InternalData.Simulation.Static.Wall.Local.Brushes.pPhysicsObject = m_pOwningSimulator->pPhysicsEnvironment->CreatePolyObjectStatic(m_InternalData.Simulation.Static.Wall.Local.Brushes.pCollideable, m_InternalData.Simulation.Static.SurfaceProperties.surface.surfaceProps, vec3_origin, vec3_angle, &params);
-
-			if (VPhysicsGetObject() == NULL)
-				GetEngineObject()->VPhysicsSetObject(m_InternalData.Simulation.Static.World.Brushes.pPhysicsObject);
-
-			m_InternalData.Simulation.Static.Wall.Local.Brushes.pPhysicsObject->RecheckCollisionFilter(); //some filters only work after the variable is stored in the class
-		}
-
-		Assert(m_InternalData.Simulation.Static.Wall.Local.Tube.pPhysicsObject == NULL); //Be sure to find graceful fixes for asserts, performance is a big concern with portal simulation
-		if (m_InternalData.Simulation.Static.Wall.Local.Tube.pCollideable != NULL)
-		{
-			m_InternalData.Simulation.Static.Wall.Local.Tube.pPhysicsObject = m_pOwningSimulator->pPhysicsEnvironment->CreatePolyObjectStatic(m_InternalData.Simulation.Static.Wall.Local.Tube.pCollideable, m_InternalData.Simulation.Static.SurfaceProperties.surface.surfaceProps, vec3_origin, vec3_angle, &params);
-
-			if (VPhysicsGetObject() == NULL)
-				GetEngineObject()->VPhysicsSetObject(m_InternalData.Simulation.Static.World.Brushes.pPhysicsObject);
-
-			m_InternalData.Simulation.Static.Wall.Local.Tube.pPhysicsObject->RecheckCollisionFilter(); //some filters only work after the variable is stored in the class
-		}
-	}
-}
-
-void CPSCollisionEntity::CreateLinkedPhysics(CPSCollisionEntity* pRemoteCollisionEntity)
-{
-	//int iDefaultSurfaceIndex = physprops->GetSurfaceIndex( "default" );
-	objectparams_t params = g_PhysDefaultObjectParams;
-
-	//if( pCollisionEntity )
-	params.pGameData = this;
-	//else
-	//	params.pGameData = GetWorldEntity();
-
-	//everything in our linked collision should be based on the linked portal's world collision
-	PS_SD_Static_World_t& RemoteSimulationStaticWorld = pRemoteCollisionEntity->m_InternalData.Simulation.Static.World;
-
-	Assert(m_InternalData.Simulation.Static.Wall.RemoteTransformedToLocal.Brushes.pPhysicsObject == NULL); //Be sure to find graceful fixes for asserts, performance is a big concern with portal simulation
-	if (RemoteSimulationStaticWorld.Brushes.pCollideable != NULL)
-	{
-		m_InternalData.Simulation.Static.Wall.RemoteTransformedToLocal.Brushes.pPhysicsObject = m_pOwningSimulator->pPhysicsEnvironment->CreatePolyObjectStatic(RemoteSimulationStaticWorld.Brushes.pCollideable, pRemoteCollisionEntity->m_InternalData.Simulation.Static.SurfaceProperties.surface.surfaceProps, m_InternalData.Placement.ptaap_LinkedToThis.ptOriginTransform, m_InternalData.Placement.ptaap_LinkedToThis.qAngleTransform, &params);
-		m_InternalData.Simulation.Static.Wall.RemoteTransformedToLocal.Brushes.pPhysicsObject->RecheckCollisionFilter(); //some filters only work after the variable is stored in the class
-	}
-
-
-	Assert(m_InternalData.Simulation.Static.Wall.RemoteTransformedToLocal.StaticProps.PhysicsObjects.Count() == 0); //Be sure to find graceful fixes for asserts, performance is a big concern with portal simulation
-	if (RemoteSimulationStaticWorld.StaticProps.ClippedRepresentations.Count() != 0)
-	{
-		for (int i = RemoteSimulationStaticWorld.StaticProps.ClippedRepresentations.Count(); --i >= 0; )
-		{
-			PS_SD_Static_World_StaticProps_ClippedProp_t& Representation = RemoteSimulationStaticWorld.StaticProps.ClippedRepresentations[i];
-			IPhysicsObject* pPhysObject = m_pOwningSimulator->pPhysicsEnvironment->CreatePolyObjectStatic(Representation.pCollide, Representation.iTraceSurfaceProps, m_InternalData.Placement.ptaap_LinkedToThis.ptOriginTransform, m_InternalData.Placement.ptaap_LinkedToThis.qAngleTransform, &params);
-			if (pPhysObject)
-			{
-				m_InternalData.Simulation.Static.Wall.RemoteTransformedToLocal.StaticProps.PhysicsObjects.AddToTail(pPhysObject);
-				pPhysObject->RecheckCollisionFilter(); //some filters only work after the variable is stored in the class
-			}
-		}
-	}
-}
-
-void CPSCollisionEntity::ClearLocalPhysics(void)
-{
-	if (m_InternalData.Simulation.Static.World.Brushes.pPhysicsObject)
-	{
-		m_pOwningSimulator->pPhysicsEnvironment->DestroyObject(m_InternalData.Simulation.Static.World.Brushes.pPhysicsObject);
-		m_InternalData.Simulation.Static.World.Brushes.pPhysicsObject = NULL;
-	}
-
-	if (m_InternalData.Simulation.Static.World.StaticProps.bPhysicsExists &&
-		(m_InternalData.Simulation.Static.World.StaticProps.ClippedRepresentations.Count() != 0))
-	{
-		for (int i = m_InternalData.Simulation.Static.World.StaticProps.ClippedRepresentations.Count(); --i >= 0; )
-		{
-			PS_SD_Static_World_StaticProps_ClippedProp_t& Representation = m_InternalData.Simulation.Static.World.StaticProps.ClippedRepresentations[i];
-			if (Representation.pPhysicsObject)
-			{
-				m_pOwningSimulator->pPhysicsEnvironment->DestroyObject(Representation.pPhysicsObject);
-				Representation.pPhysicsObject = NULL;
-			}
-		}
-	}
-	m_InternalData.Simulation.Static.World.StaticProps.bPhysicsExists = false;
-
-	if (m_InternalData.Simulation.Static.Wall.Local.Brushes.pPhysicsObject)
-	{
-		m_pOwningSimulator->pPhysicsEnvironment->DestroyObject(m_InternalData.Simulation.Static.Wall.Local.Brushes.pPhysicsObject);
-		m_InternalData.Simulation.Static.Wall.Local.Brushes.pPhysicsObject = NULL;
-	}
-
-	if (m_InternalData.Simulation.Static.Wall.Local.Tube.pPhysicsObject)
-	{
-		m_pOwningSimulator->pPhysicsEnvironment->DestroyObject(m_InternalData.Simulation.Static.Wall.Local.Tube.pPhysicsObject);
-		m_InternalData.Simulation.Static.Wall.Local.Tube.pPhysicsObject = NULL;
-	}
-}
-
-void CPSCollisionEntity::ClearLinkedPhysics(void)
-{
-	//static collideables
-	{
-		if (m_InternalData.Simulation.Static.Wall.RemoteTransformedToLocal.Brushes.pPhysicsObject)
-		{
-			m_pOwningSimulator->pPhysicsEnvironment->DestroyObject(m_InternalData.Simulation.Static.Wall.RemoteTransformedToLocal.Brushes.pPhysicsObject);
-			m_InternalData.Simulation.Static.Wall.RemoteTransformedToLocal.Brushes.pPhysicsObject = NULL;
-		}
-
-		if (m_InternalData.Simulation.Static.Wall.RemoteTransformedToLocal.StaticProps.PhysicsObjects.Count())
-		{
-			for (int i = m_InternalData.Simulation.Static.Wall.RemoteTransformedToLocal.StaticProps.PhysicsObjects.Count(); --i >= 0; )
-				m_pOwningSimulator->pPhysicsEnvironment->DestroyObject(m_InternalData.Simulation.Static.Wall.RemoteTransformedToLocal.StaticProps.PhysicsObjects[i]);
-
-			m_InternalData.Simulation.Static.Wall.RemoteTransformedToLocal.StaticProps.PhysicsObjects.RemoveAll();
-		}
-	}
-}
-
-void CPSCollisionEntity::CreateHoleShapeCollideable()
-{
-	//update hole shape - used to detect if an entity is within the portal hole bounds
-	{
-		if (m_InternalData.Placement.pHoleShapeCollideable)
-			physcollision->DestroyCollide(m_InternalData.Placement.pHoleShapeCollideable);
-
-		float fHolePlanes[6 * 4];
-
-		//first and second planes are always forward and backward planes
-		fHolePlanes[(0 * 4) + 0] = m_InternalData.Placement.PortalPlane.normal.x;
-		fHolePlanes[(0 * 4) + 1] = m_InternalData.Placement.PortalPlane.normal.y;
-		fHolePlanes[(0 * 4) + 2] = m_InternalData.Placement.PortalPlane.normal.z;
-		fHolePlanes[(0 * 4) + 3] = m_InternalData.Placement.PortalPlane.dist - 0.5f;
-
-		fHolePlanes[(1 * 4) + 0] = -m_InternalData.Placement.PortalPlane.normal.x;
-		fHolePlanes[(1 * 4) + 1] = -m_InternalData.Placement.PortalPlane.normal.y;
-		fHolePlanes[(1 * 4) + 2] = -m_InternalData.Placement.PortalPlane.normal.z;
-		fHolePlanes[(1 * 4) + 3] = (-m_InternalData.Placement.PortalPlane.dist) + 500.0f;
-
-
-		//the remaining planes will always have the same ordering of normals, with different distances plugged in for each convex we're creating
-		//normal order is up, down, left, right
-
-		fHolePlanes[(2 * 4) + 0] = m_InternalData.Placement.vUp.x;
-		fHolePlanes[(2 * 4) + 1] = m_InternalData.Placement.vUp.y;
-		fHolePlanes[(2 * 4) + 2] = m_InternalData.Placement.vUp.z;
-		fHolePlanes[(2 * 4) + 3] = m_InternalData.Placement.vUp.Dot(GetEngineObject()->GetAbsOrigin() + (m_InternalData.Placement.vUp * (PORTAL_HALF_HEIGHT * 0.98f)));
-
-		fHolePlanes[(3 * 4) + 0] = -m_InternalData.Placement.vUp.x;
-		fHolePlanes[(3 * 4) + 1] = -m_InternalData.Placement.vUp.y;
-		fHolePlanes[(3 * 4) + 2] = -m_InternalData.Placement.vUp.z;
-		fHolePlanes[(3 * 4) + 3] = -m_InternalData.Placement.vUp.Dot(GetEngineObject()->GetAbsOrigin() - (m_InternalData.Placement.vUp * (PORTAL_HALF_HEIGHT * 0.98f)));
-
-		fHolePlanes[(4 * 4) + 0] = -m_InternalData.Placement.vRight.x;
-		fHolePlanes[(4 * 4) + 1] = -m_InternalData.Placement.vRight.y;
-		fHolePlanes[(4 * 4) + 2] = -m_InternalData.Placement.vRight.z;
-		fHolePlanes[(4 * 4) + 3] = -m_InternalData.Placement.vRight.Dot(GetEngineObject()->GetAbsOrigin() - (m_InternalData.Placement.vRight * (PORTAL_HALF_WIDTH * 0.98f)));
-
-		fHolePlanes[(5 * 4) + 0] = m_InternalData.Placement.vRight.x;
-		fHolePlanes[(5 * 4) + 1] = m_InternalData.Placement.vRight.y;
-		fHolePlanes[(5 * 4) + 2] = m_InternalData.Placement.vRight.z;
-		fHolePlanes[(5 * 4) + 3] = m_InternalData.Placement.vRight.Dot(GetEngineObject()->GetAbsOrigin() + (m_InternalData.Placement.vRight * (PORTAL_HALF_WIDTH * 0.98f)));
-
-		CPolyhedron* pPolyhedron = GeneratePolyhedronFromPlanes(fHolePlanes, 6, PORTAL_POLYHEDRON_CUT_EPSILON, true);
-		Assert(pPolyhedron != NULL);
-		CPhysConvex* pConvex = physcollision->ConvexFromConvexPolyhedron(*pPolyhedron);
-		pPolyhedron->Release();
-		Assert(pConvex != NULL);
-		m_InternalData.Placement.pHoleShapeCollideable = physcollision->ConvertConvexToCollide(&pConvex, 1);
-	}
-}
-
-void CPSCollisionEntity::ClearHoleShapeCollideable()
-{
-	if (m_InternalData.Placement.pHoleShapeCollideable) {
-		physcollision->DestroyCollide(m_InternalData.Placement.pHoleShapeCollideable);
-		m_InternalData.Placement.pHoleShapeCollideable = NULL;
-	}
-}
 
 #ifdef GAME_DLL
 bool CPortalSimulator::IsPortalSimulatorCollisionEntity( const CBaseEntity *pEntity )
@@ -2984,15 +1680,15 @@ bool CPortalSimulator::IsPortalSimulatorCollisionEntity( const CBaseEntity *pEnt
 
 //const Vector& CPortalSimulator::GetOrigin() const { return pCollisionEntity->GetOrigin(); }
 //const QAngle& CPortalSimulator::GetAngles() const { return pCollisionEntity->GetAngles(); }
-const VMatrix& CPortalSimulator::MatrixThisToLinked() const { return pCollisionEntity->MatrixThisToLinked(); }
-const VMatrix& CPortalSimulator::MatrixLinkedToThis() const { return pCollisionEntity->MatrixLinkedToThis(); }
-const cplane_t& CPortalSimulator::GetPortalPlane() const { return pCollisionEntity->GetPortalPlane(); }
-const PS_InternalData_t& CPortalSimulator::GetDataAccess() const { return pCollisionEntity->GetDataAccess(); }
-const Vector& CPortalSimulator::GetVectorForward() const { return pCollisionEntity->GetVectorForward(); }
-const Vector& CPortalSimulator::GetVectorUp() const { return pCollisionEntity->GetVectorUp(); }
-const Vector& CPortalSimulator::GetVectorRight() const { return pCollisionEntity->GetVectorRight(); }
-const PS_SD_Static_SurfaceProperties_t& CPortalSimulator::GetSurfaceProperties() const { return pCollisionEntity->GetSurfaceProperties(); }
-
+const VMatrix& CPortalSimulator::MatrixThisToLinked() const { return pCollisionEntity->GetEnginePortal()->MatrixThisToLinked(); }
+const VMatrix& CPortalSimulator::MatrixLinkedToThis() const { return pCollisionEntity->GetEnginePortal()->MatrixLinkedToThis(); }
+const cplane_t& CPortalSimulator::GetPortalPlane() const { return pCollisionEntity->GetEnginePortal()->GetPortalPlane(); }
+const PS_InternalData_t& CPortalSimulator::GetDataAccess() const { return pCollisionEntity->GetEnginePortal()->GetDataAccess(); }
+const Vector& CPortalSimulator::GetVectorForward() const { return pCollisionEntity->GetEnginePortal()->GetVectorForward(); }
+const Vector& CPortalSimulator::GetVectorUp() const { return pCollisionEntity->GetEnginePortal()->GetVectorUp(); }
+const Vector& CPortalSimulator::GetVectorRight() const { return pCollisionEntity->GetEnginePortal()->GetVectorRight(); }
+const PS_SD_Static_SurfaceProperties_t& CPortalSimulator::GetSurfaceProperties() const { return pCollisionEntity->GetEnginePortal()->GetSurfaceProperties(); }
+IPhysicsEnvironment* CPortalSimulator::GetPhysicsEnvironment() { return pCollisionEntity->GetEnginePortal()->GetPhysicsEnvironment(); }
 
 #ifdef DEBUG_PORTAL_COLLISION_ENVIRONMENTS
 

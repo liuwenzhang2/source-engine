@@ -22,6 +22,15 @@ static const char *s_pTestRestingSurfaceContext = "TestRestingSurfaceContext";
 static const char *s_pFizzleThink = "FizzleThink";
 
 class CPhysicsCloneArea;
+class CPhysicsShadowClone;
+
+struct PS_SD_Dynamic_PhysicsShadowClones_t
+{
+	CUtlVector<CBaseEntity*> ShouldCloneFromMain; //a list of entities that should be cloned from main if physics simulation is enabled
+	//in single-environment mode, this helps us track who should collide with who
+
+	CUtlVector<CPhysicsShadowClone*> FromLinkedPortal;
+};
 
 class CProp_Portal : public CPortalSimulator//, public CPortalSimulatorEventCallbacks
 {

@@ -2318,7 +2318,7 @@ void CProp_Portal::BeforeMove()
 			++iFixEntityCount;
 		}
 	}
-	OldPlane = pCollisionEntity->GetPortalPlane(); //used in fixing code
+	OldPlane = pCollisionEntity->GetEnginePortal()->GetPortalPlane(); //used in fixing code
 }
 
 void CProp_Portal::AfterMove()
@@ -2422,7 +2422,7 @@ void CProp_Portal::TakePhysicsOwnership(CBaseEntity* pEntity)
 		return;
 	}
 
-	if (pPhysicsEnvironment == NULL)
+	if ( GetPhysicsEnvironment() == NULL)
 		return;
 
 	if (CPortalSimulator::IsPortalSimulatorCollisionEntity(pEntity))
@@ -2467,7 +2467,7 @@ void CProp_Portal::TakePhysicsOwnership(CBaseEntity* pEntity)
 		EHANDLE hEnt = pEntity;
 
 		//To linked portal
-		if (GetLinkedPortal() && GetLinkedPortal()->pPhysicsEnvironment)
+		if (GetLinkedPortal() && GetLinkedPortal()->GetPhysicsEnvironment())
 		{
 
 			DBG_CODE(
@@ -2475,7 +2475,7 @@ void CProp_Portal::TakePhysicsOwnership(CBaseEntity* pEntity)
 					AssertMsg(GetLinkedPortal()->ShadowClones.FromLinkedPortal[i]->GetClonedEntity() != pEntity, "Already cloning to linked portal.");
 					);
 
-			CPhysicsShadowClone* pClone = CPhysicsShadowClone::CreateShadowClone(GetLinkedPortal()->pPhysicsEnvironment, hEnt, "CPortalSimulator::TakePhysicsOwnership(): To Linked Portal", &pCollisionEntity->MatrixThisToLinked().As3x4());
+			CPhysicsShadowClone* pClone = CPhysicsShadowClone::CreateShadowClone(GetLinkedPortal()->GetPhysicsEnvironment(), hEnt, "CPortalSimulator::TakePhysicsOwnership(): To Linked Portal", &pCollisionEntity->GetEnginePortal()->MatrixThisToLinked().As3x4());
 			if (pClone)
 			{
 				//bool bHeldByPhyscannon = false;
@@ -2565,7 +2565,7 @@ void CProp_Portal::ReleaseOwnershipOfEntity(CBaseEntity* pEntity, bool bMovingTo
 	if (!OwnsEntity(pEntity))
 		return;
 
-	if (pPhysicsEnvironment)
+	if (GetPhysicsEnvironment())
 		ReleasePhysicsOwnership(pEntity, true, bMovingToLinkedSimulator);
 
 	EntFlags[pEntity->entindex()] &= ~PSEF_IS_IN_PORTAL_HOLE;
@@ -2677,7 +2677,7 @@ void CProp_Portal::AfterLinkedPhysicsCreated()
 
 
 		EHANDLE hEnt = RemoteOwnedEntities[i];
-		CPhysicsShadowClone* pClone = CPhysicsShadowClone::CreateShadowClone(pPhysicsEnvironment, hEnt, "CPortalSimulator::CreateLinkedPhysics(): From Linked Portal", &pCollisionEntity->MatrixLinkedToThis().As3x4());
+		CPhysicsShadowClone* pClone = CPhysicsShadowClone::CreateShadowClone(GetPhysicsEnvironment(), hEnt, "CPortalSimulator::CreateLinkedPhysics(): From Linked Portal", &pCollisionEntity->GetEnginePortal()->MatrixLinkedToThis().As3x4());
 		if (pClone)
 		{
 			MarkAsOwned(pClone);
@@ -2724,7 +2724,7 @@ void CProp_Portal::ReleasePhysicsOwnership(CBaseEntity* pEntity, bool bContinueP
 	Assert(OwnsEntity(pEntity)); //releasing physics ownership happens BEFORE releasing general ownership
 	Assert(CPhysicsShadowClone::IsShadowClone(pEntity) == false);
 
-	if (pPhysicsEnvironment == NULL)
+	if (GetPhysicsEnvironment() == NULL)
 		return;
 
 	if (!OwnsPhysicsForEntity(pEntity))

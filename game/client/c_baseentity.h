@@ -313,7 +313,7 @@ public:
 public:
 	virtual bool					TestCollision( const Ray_t &ray, unsigned int fContentsMask, trace_t& tr );
 	virtual bool					TestHitboxes( const Ray_t &ray, unsigned int fContentsMask, trace_t& tr );
-
+	virtual void GetBonePosition(int iBone, Vector& origin, QAngle& angles) {}
 	// To mimic server call convention
 	C_BaseEntity					*GetOwnerEntity( void ) const;
 	void							SetOwnerEntity( C_BaseEntity *pOwner );
@@ -845,7 +845,8 @@ public:
 
 	virtual IEngineObjectClient* GetEngineObject();
 	virtual const IEngineObjectClient* GetEngineObject() const;
-
+	virtual IEnginePortalClient* GetEnginePortal();
+	virtual const IEnginePortalClient* GetEnginePortal() const;
 	void				ApplyLocalVelocityImpulse( const Vector &vecImpulse );
 	void				ApplyAbsVelocityImpulse( const Vector &vecImpulse );
 	void				ApplyLocalAngularVelocityImpulse( const AngularImpulse &angImpulse );

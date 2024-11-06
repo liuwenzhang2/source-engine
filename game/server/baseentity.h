@@ -452,7 +452,7 @@ public:
 	virtual bool			TestCollision( const Ray_t& ray, unsigned int mask, trace_t& trace );
 	virtual	bool			TestHitboxes( const Ray_t &ray, unsigned int fContentsMask, trace_t& tr );
 	virtual void			ComputeWorldSpaceSurroundingBox( Vector *pWorldMins, Vector *pWorldMaxs );
-
+	virtual void GetBonePosition(int iBone, Vector& origin, QAngle& angles) {}
 public:
 
 	CEntityNetworkProperty *NetworkProp();
@@ -1221,6 +1221,8 @@ public:
 	virtual const IEnginePlayerServer* GetEnginePlayer() const;
 	virtual IEngineWorldServer* GetEngineWorld();
 	virtual const IEngineWorldServer* GetEngineWorld() const;
+	virtual IEnginePortalServer* GetEnginePortal();
+	virtual const IEnginePortalServer* GetEnginePortal() const;
 	// NOTE: Setting the abs velocity in either space will cause a recomputation
 	// in the other space, so setting the abs velocity will also set the local vel
 	void			ApplyLocalVelocityImpulse( const Vector &vecImpulse );

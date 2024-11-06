@@ -512,6 +512,16 @@ const IEngineWorldServer* CBaseEntity::GetEngineWorld() const
 	return dynamic_cast<const IEngineWorldServer*>(GetEngineObject());
 }
 
+IEnginePortalServer* CBaseEntity::GetEnginePortal()
+{
+	return dynamic_cast<IEnginePortalServer*>(GetEngineObject());
+}
+
+const IEnginePortalServer* CBaseEntity::GetEnginePortal() const
+{
+	return dynamic_cast<const IEnginePortalServer*>(GetEngineObject());
+}
+
 void CBaseEntity::Release() {
 	//GetEngineObject()->PhysicsRemoveTouchedList();
 	//CBaseEntity::PhysicsRemoveGroundList(this);

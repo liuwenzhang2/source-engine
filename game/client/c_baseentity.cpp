@@ -522,6 +522,16 @@ const IEngineObjectClient* C_BaseEntity::GetEngineObject() const {
 	return ClientEntityList().GetEngineObject(entindex());
 }
 
+IEnginePortalClient* C_BaseEntity::GetEnginePortal()
+{
+	return dynamic_cast<IEnginePortalClient*>(GetEngineObject());
+}
+
+const IEnginePortalClient* C_BaseEntity::GetEnginePortal() const
+{
+	return dynamic_cast<const IEnginePortalClient*>(GetEngineObject());
+}
+
 void C_BaseEntity::Clear( void )
 {
 	m_bDormant = true;
