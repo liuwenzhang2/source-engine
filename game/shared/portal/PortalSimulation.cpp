@@ -1609,7 +1609,7 @@ bool CPSCollisionEntity::ShouldCollide( int collisionGroup, int contentsMask ) c
 #endif // CLIENT_DLL
 }
 
-IPhysicsObject * CPSCollisionEntity::VPhysicsGetObject( void )
+IPhysicsObject * CPSCollisionEntity::VPhysicsGetObject( void ) const
 {
 	if(GetEnginePortal()->GetWorldBrushesPhysicsObject() != NULL)
 		return GetEnginePortal()->GetWorldBrushesPhysicsObject();

@@ -6021,22 +6021,22 @@ const PS_SD_Static_SurfaceProperties_t& C_EnginePortalInternal::GetSurfaceProper
 	return m_DataAccess.Simulation.Static.SurfaceProperties;
 }
 
-IPhysicsObject* C_EnginePortalInternal::GetWorldBrushesPhysicsObject()
+IPhysicsObject* C_EnginePortalInternal::GetWorldBrushesPhysicsObject() const
 {
 	return m_DataAccess.Simulation.Static.World.Brushes.pPhysicsObject;
 }
 
-IPhysicsObject* C_EnginePortalInternal::GetWallBrushesPhysicsObject()
+IPhysicsObject* C_EnginePortalInternal::GetWallBrushesPhysicsObject() const
 {
 	return m_DataAccess.Simulation.Static.Wall.Local.Brushes.pPhysicsObject;
 }
 
-IPhysicsObject* C_EnginePortalInternal::GetWallTubePhysicsObject()
+IPhysicsObject* C_EnginePortalInternal::GetWallTubePhysicsObject() const
 {
 	return m_DataAccess.Simulation.Static.Wall.Local.Tube.pPhysicsObject;
 }
 
-IPhysicsObject* C_EnginePortalInternal::GetRemoteWallBrushesPhysicsObject()
+IPhysicsObject* C_EnginePortalInternal::GetRemoteWallBrushesPhysicsObject() const
 {
 	return m_DataAccess.Simulation.Static.Wall.RemoteTransformedToLocal.Brushes.pPhysicsObject;
 }

@@ -731,7 +731,7 @@ public:
 	float					SetBoneController(int iController, float flValue);
 	bool	GetPoseParameterRange(int index, float& minValue, float& maxValue);
 
-	inline IPhysicsObject* VPhysicsGetObject(void) const { return m_pPhysicsObject; }
+	virtual IPhysicsObject* VPhysicsGetObject(void) const { return m_pPhysicsObject; }
 	// destroy and remove the physics object for this entity
 	virtual void	VPhysicsDestroyObject(void);
 	void			VPhysicsSetObject(IPhysicsObject* pPhysics);
@@ -1703,10 +1703,10 @@ public:
 	const Vector& GetVectorUp() const;
 	const Vector& GetVectorRight() const;
 	const PS_SD_Static_SurfaceProperties_t& GetSurfaceProperties() const;
-	IPhysicsObject* GetWorldBrushesPhysicsObject();
-	IPhysicsObject* GetWallBrushesPhysicsObject();
-	IPhysicsObject* GetWallTubePhysicsObject();
-	IPhysicsObject* GetRemoteWallBrushesPhysicsObject();
+	IPhysicsObject* GetWorldBrushesPhysicsObject() const;
+	IPhysicsObject* GetWallBrushesPhysicsObject() const;
+	IPhysicsObject* GetWallTubePhysicsObject() const;
+	IPhysicsObject* GetRemoteWallBrushesPhysicsObject() const;
 	IPhysicsEnvironment* GetPhysicsEnvironment();
 	void				CreatePhysicsEnvironment();
 	void				ClearPhysicsEnvironment();

@@ -496,10 +496,10 @@ public:
 	virtual const Vector& GetVectorUp() const = 0;
 	virtual const Vector& GetVectorRight() const = 0;
 	virtual const PS_SD_Static_SurfaceProperties_t& GetSurfaceProperties() const = 0;
-	virtual IPhysicsObject* GetWorldBrushesPhysicsObject() = 0;
-	virtual IPhysicsObject* GetWallBrushesPhysicsObject() = 0;
-	virtual IPhysicsObject* GetWallTubePhysicsObject() = 0;
-	virtual IPhysicsObject* GetRemoteWallBrushesPhysicsObject() = 0;
+	virtual IPhysicsObject* GetWorldBrushesPhysicsObject() const = 0;
+	virtual IPhysicsObject* GetWallBrushesPhysicsObject() const = 0;
+	virtual IPhysicsObject* GetWallTubePhysicsObject() const = 0;
+	virtual IPhysicsObject* GetRemoteWallBrushesPhysicsObject() const = 0;
 	virtual IPhysicsEnvironment* GetPhysicsEnvironment() = 0;
 	virtual void				CreatePhysicsEnvironment() = 0;
 	virtual void				ClearPhysicsEnvironment() = 0;

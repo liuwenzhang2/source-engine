@@ -411,7 +411,7 @@ public:
 
 	// Purpose: My physics object has been updated, react or extract data
 	virtual void					VPhysicsUpdate( IPhysicsObject *pPhysics );
-	IPhysicsObject			*VPhysicsGetObject( void ) const { return GetEngineObject()->VPhysicsGetObject(); }
+	virtual IPhysicsObject			*VPhysicsGetObject( void ) const { return GetEngineObject()->VPhysicsGetObject(); }
 	virtual int						VPhysicsGetObjectList( IPhysicsObject **pList, int listMax );
 	virtual bool					VPhysicsIsFlesh( void );
 

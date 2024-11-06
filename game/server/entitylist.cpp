@@ -2744,7 +2744,9 @@ void CEngineObjectInternal::PhysicsRemoveTouchedList()
 			nextLink = link->nextLink;
 
 			// notify the other entity that this ent has gone away
-			((CBaseEntity*)gEntList.GetServerEntityFromHandle(link->entityTouched))->GetEngineObject()->PhysicsNotifyOtherOfUntouch(this);
+			if (gEntList.GetServerEntityFromHandle(link->entityTouched)) {
+				((CBaseEntity*)gEntList.GetServerEntityFromHandle(link->entityTouched))->GetEngineObject()->PhysicsNotifyOtherOfUntouch(this);
+			}
 
 			// kill it
 			if (DebugTouchlinks())
@@ -5790,22 +5792,22 @@ const PS_SD_Static_SurfaceProperties_t& CEnginePortalInternal::GetSurfacePropert
 	return m_DataAccess.Simulation.Static.SurfaceProperties;
 }
 
-IPhysicsObject* CEnginePortalInternal::GetWorldBrushesPhysicsObject()
+IPhysicsObject* CEnginePortalInternal::GetWorldBrushesPhysicsObject() const
 {
 	return m_DataAccess.Simulation.Static.World.Brushes.pPhysicsObject;
 }
 
-IPhysicsObject* CEnginePortalInternal::GetWallBrushesPhysicsObject()
+IPhysicsObject* CEnginePortalInternal::GetWallBrushesPhysicsObject() const
 {
 	return m_DataAccess.Simulation.Static.Wall.Local.Brushes.pPhysicsObject;
 }
 
-IPhysicsObject* CEnginePortalInternal::GetWallTubePhysicsObject()
+IPhysicsObject* CEnginePortalInternal::GetWallTubePhysicsObject() const
 {
 	return m_DataAccess.Simulation.Static.Wall.Local.Tube.pPhysicsObject;
 }
 
-IPhysicsObject* CEnginePortalInternal::GetRemoteWallBrushesPhysicsObject()
+IPhysicsObject* CEnginePortalInternal::GetRemoteWallBrushesPhysicsObject() const
 {
 	return m_DataAccess.Simulation.Static.Wall.RemoteTransformedToLocal.Brushes.pPhysicsObject;
 }

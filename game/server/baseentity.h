@@ -1385,7 +1385,7 @@ public:
 
 
 
-	IPhysicsObject *VPhysicsGetObject( void ) const { return GetEngineObject()->VPhysicsGetObject(); }
+	virtual IPhysicsObject *VPhysicsGetObject( void ) const { return GetEngineObject()->VPhysicsGetObject(); }
 	virtual void	VPhysicsUpdate( IPhysicsObject *pPhysics );
 	void			VPhysicsUpdatePusher( IPhysicsObject *pPhysics );
 	

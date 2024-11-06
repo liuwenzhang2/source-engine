@@ -53,7 +53,7 @@ public:
 	virtual void	Spawn(void);
 	virtual void	Activate(void);
 	virtual int		ObjectCaps(void);
-	virtual IPhysicsObject* VPhysicsGetObject(void);
+	virtual IPhysicsObject* VPhysicsGetObject(void) const;
 	virtual int		VPhysicsGetObjectList(IPhysicsObject** pList, int listMax);
 	virtual void	UpdateOnRemove(void);
 	virtual	bool	ShouldCollide(int collisionGroup, int contentsMask) const;
