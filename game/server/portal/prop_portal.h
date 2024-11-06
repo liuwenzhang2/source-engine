@@ -90,7 +90,6 @@ public:
 	void					TestRestingSurfaceThink ( void );
 	void					FizzleThink( void );
 
-	bool					IsActivedAndLinked( void ) const;
 
     void					WakeNearbyEntities( void ); //wakes all nearby entities in-case there's been a significant change in how they can rest near a portal
 
@@ -189,12 +188,12 @@ public:
 	static CProp_Portal		*FindPortal( unsigned char iLinkageGroupID, bool bPortal2, bool bCreateIfNothingFound = false );
 	static const CUtlVector<CProp_Portal *> *GetPortalLinkageGroup( unsigned char iLinkageGroupID );
 
-	PS_SD_Dynamic_PhysicsShadowClones_t ShadowClones;
-	CUtlVector<CBaseEntity*> OwnedEntities;
-	unsigned int EntFlags[MAX_EDICTS]; //flags maintained for every entity in the world based on its index
-	int iFixEntityCount;
-	CBaseEntity** pFixEntities;
-	cplane_t OldPlane;
+	PS_SD_Dynamic_PhysicsShadowClones_t m_ShadowClones;
+	CUtlVector<CBaseEntity*> m_OwnedEntities;
+	unsigned int m_EntFlags[MAX_EDICTS]; //flags maintained for every entity in the world based on its index
+	int m_iFixEntityCount;
+	CBaseEntity** m_pFixEntities;
+	cplane_t m_OldPlane;
 };
 
 
@@ -207,12 +206,12 @@ public:
 
 inline bool CProp_Portal::OwnsEntity(const CBaseEntity* pEntity) const
 {
-	return ((EntFlags[pEntity->entindex()] & PSEF_OWNS_ENTITY) != 0);
+	return ((m_EntFlags[pEntity->entindex()] & PSEF_OWNS_ENTITY) != 0);
 }
 
 inline bool CProp_Portal::OwnsPhysicsForEntity(const CBaseEntity* pEntity) const
 {
-	return ((EntFlags[pEntity->entindex()] & PSEF_OWNS_PHYSICS) != 0);
+	return ((m_EntFlags[pEntity->entindex()] & PSEF_OWNS_PHYSICS) != 0);
 }
 
 

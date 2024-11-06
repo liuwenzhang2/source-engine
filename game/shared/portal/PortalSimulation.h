@@ -109,12 +109,13 @@ public:
 	//void				SetPortalSimulatorCallbacks( CPortalSimulatorEventCallbacks *pCallbacks );
 	
 	bool				IsReadyToSimulate( void ) const; //is active and linked to another portal
+	bool				IsActivedAndLinked(void) const;
 	//const Vector&		GetOrigin() const;
 	//const QAngle&		GetAngles() const;
 	const VMatrix&		MatrixThisToLinked() const;
 	const VMatrix&		MatrixLinkedToThis() const;
 	const cplane_t&		GetPortalPlane() const;
-	const PS_InternalData_t& GetDataAccess() const;
+	//const PS_InternalData_t& GetDataAccess() const;
 	const Vector&		GetVectorForward() const;
 	const Vector&		GetVectorUp() const;
 	const Vector&		GetVectorRight() const;
@@ -227,6 +228,11 @@ extern CUtlVector<CPortalSimulator *> const &g_PortalSimulators;
 inline bool CPortalSimulator::IsReadyToSimulate( void ) const
 {
 	return m_bLocalDataIsReady && m_pLinkedPortal && m_pLinkedPortal->m_bLocalDataIsReady;
+}
+
+inline bool CPortalSimulator::IsActivedAndLinked(void) const
+{
+	return (m_bActivated && m_hLinkedPortal.Get() != NULL);
 }
 
 inline bool CPortalSimulator::IsSimulatingVPhysics( void ) const

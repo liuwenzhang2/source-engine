@@ -119,7 +119,7 @@ CProp_Portal::CProp_Portal( void )
 		m_vPortalCorners[i] = Vector(0,0,0);
 	}
 
-	memset(EntFlags, 0, sizeof(EntFlags));
+	memset(m_EntFlags, 0, sizeof(m_EntFlags));
 
 	//create the collision shape.... TODO: consider having one shared collideable between all portals
 	float fPlanes[6*4];
@@ -444,11 +444,6 @@ void CProp_Portal::TestRestingSurfaceThink( void )
 		// All corners on world, we don't need to test
 		SetContextThink( NULL, TICK_NEVER_THINK, s_pTestRestingSurfaceContext );
 	}
-}
-
-bool CProp_Portal::IsActivedAndLinked( void ) const
-{
-	return ( m_bActivated && m_hLinkedPortal.Get() != NULL );
 }
 
 void CProp_Portal::ResetModel( void )
@@ -1004,8 +999,8 @@ void CProp_Portal::TeleportTouchingEntity( CBaseEntity *pOther )
 		}
 	}
 
-	const PS_InternalData_t &RemotePortalDataAccess = m_hLinkedPortal->GetDataAccess();//m_hPortalSimulator->
-	const PS_InternalData_t &LocalPortalDataAccess = GetDataAccess();//m_hPortalSimulator->
+	//const PS_InternalData_t &RemotePortalDataAccess = m_hLinkedPortal->GetDataAccess();//m_hPortalSimulator->
+	//const PS_InternalData_t &LocalPortalDataAccess = GetDataAccess();//m_hPortalSimulator->
 
 	
 	if( bPlayer )
@@ -1016,12 +1011,12 @@ void CProp_Portal::TeleportTouchingEntity( CBaseEntity *pOther )
 		pOtherAsPlayer->m_matLastPortalled = MatrixThisToLinked();
 		bNonPhysical = true;
 		//if( (fabs( RemotePortalDataAccess.Placement.vForward.z ) + fabs( LocalPortalDataAccess.Placement.vForward.z )) > 0.7071f ) //some combination of floor/ceiling
-		if( fabs( LocalPortalDataAccess.Placement.vForward.z ) > 0.0f )
+		if( fabs( GetVectorForward().z) > 0.0f)
 		{
 			//we may have to compensate for the fact that AABB's don't rotate ever
 			
-			float fAbsLocalZ = fabs( LocalPortalDataAccess.Placement.vForward.z );
-			float fAbsRemoteZ = fabs( RemotePortalDataAccess.Placement.vForward.z );
+			float fAbsLocalZ = fabs(GetVectorForward().z );
+			float fAbsRemoteZ = fabs(m_hLinkedPortal->GetVectorForward().z);
 			
 			if( (fabs(fAbsLocalZ - 1.0f) < 0.01f) &&
 				(fabs(fAbsRemoteZ - 1.0f) < 0.01f) )
@@ -1040,7 +1035,7 @@ void CProp_Portal::TeleportTouchingEntity( CBaseEntity *pOther )
 					pOtherAsPlayer->ForceDuckThisFrame();
 					pOtherAsPlayer->m_Local.m_bInDuckJump = true;
 
-					if( LocalPortalDataAccess.Placement.vForward.z > 0.0f )
+					if(GetVectorForward().z > 0.0f )
 						ptOtherCenter.z -= 16.0f; //portal facing up, shrink downwards
 					else
 						ptOtherCenter.z += 16.0f; //portal facing down, shrink upwards
@@ -1097,8 +1092,8 @@ void CProp_Portal::TeleportTouchingEntity( CBaseEntity *pOther )
 			VectorNormalize( vPlayerForward );
 		}
 
-		float fPlayerFaceDotPortalFace = LocalPortalDataAccess.Placement.vForward.Dot( vPlayerForward );
-		float fPlayerFaceDotPortalUp = LocalPortalDataAccess.Placement.vUp.Dot( vPlayerForward );
+		float fPlayerFaceDotPortalFace = GetVectorForward().Dot( vPlayerForward );
+		float fPlayerFaceDotPortalUp = GetVectorUp().Dot( vPlayerForward );
 
 		CBaseEntity *pHeldEntity = GetPlayerHeldEntity( pOtherAsPlayer );
 
@@ -1107,7 +1102,7 @@ void CProp_Portal::TeleportTouchingEntity( CBaseEntity *pOther )
 		{
 			pOtherAsPlayer->m_bPitchReorientation = false;
 		}
-		else if ( LocalPortalDataAccess.Placement.vUp.z > 0.99f && // entering wall portal
+		else if (GetVectorUp().z > 0.99f && // entering wall portal
 				  ( fForwardLength == 0.0f ||			// facing strait up or down
 				    fPlayerFaceDotPortalFace > 0.5f ||	// facing mostly away from portal
 					fPlayerFaceDotPortalFace < -0.5f )	// facing mostly toward portal
@@ -1115,14 +1110,14 @@ void CProp_Portal::TeleportTouchingEntity( CBaseEntity *pOther )
 		{
 			pOtherAsPlayer->m_bPitchReorientation = true;
 		}
-		else if ( ( LocalPortalDataAccess.Placement.vForward.z > 0.99f || LocalPortalDataAccess.Placement.vForward.z < -0.99f ) &&	// entering floor or ceiling portal
-				  ( RemotePortalDataAccess.Placement.vForward.z > 0.99f || RemotePortalDataAccess.Placement.vForward.z < -0.99f ) && // exiting floor or ceiling portal 
+		else if ( (GetVectorForward().z > 0.99f || GetVectorForward().z < -0.99f ) &&	// entering floor or ceiling portal
+				  (m_hLinkedPortal->GetVectorForward().z > 0.99f || m_hLinkedPortal->GetVectorForward().z < -0.99f ) && // exiting floor or ceiling portal 
 				  (	fPlayerForwardZ < -0.5f || fPlayerForwardZ > 0.5f )		// facing mustly up or down
 				)
 		{
 			pOtherAsPlayer->m_bPitchReorientation = true;
 		}
-		else if ( ( RemotePortalDataAccess.Placement.vForward.z > 0.75f && RemotePortalDataAccess.Placement.vForward.z <= 0.99f ) && // exiting wedge portal
+		else if ( (m_hLinkedPortal->GetVectorForward().z > 0.75f && m_hLinkedPortal->GetVectorForward().z <= 0.99f ) && // exiting wedge portal
 				  ( fPlayerFaceDotPortalUp > 0.0f ) // facing toward the top of the portal
 				)
 		{
@@ -1137,7 +1132,7 @@ void CProp_Portal::TeleportTouchingEntity( CBaseEntity *pOther )
 	//velocity hacks
 	{
 		//minimum floor exit velocity if both portals are on the floor or the player is coming out of the floor
-		if( RemotePortalDataAccess.Placement.vForward.z > 0.7071f )
+		if(m_hLinkedPortal->GetVectorForward().z > 0.7071f )
 		{
 			if ( bPlayer )
 			{
@@ -1146,7 +1141,7 @@ void CProp_Portal::TeleportTouchingEntity( CBaseEntity *pOther )
 			}
 			else
 			{
-				if( LocalPortalDataAccess.Placement.vForward.z > 0.7071f )
+				if(GetVectorForward().z > 0.7071f )
 				{
 					if( vNewVelocity.z < MINIMUM_FLOOR_TO_FLOOR_PORTAL_EXIT_VELOCITY ) 
 						vNewVelocity.z = MINIMUM_FLOOR_TO_FLOOR_PORTAL_EXIT_VELOCITY;
@@ -1254,7 +1249,7 @@ void CProp_Portal::TeleportTouchingEntity( CBaseEntity *pOther )
 
 				pHeldEntity->Teleport( &vTargetPosition, &qTargetOrientation, 0 );
 
-				FindClosestPassableSpace( pHeldEntity, RemotePortalDataAccess.Placement.vForward );
+				FindClosestPassableSpace( pHeldEntity, m_hLinkedPortal->GetVectorForward());
 			}
 		}
 		
@@ -2290,46 +2285,46 @@ const CUtlVector<CProp_Portal *> *CProp_Portal::GetPortalLinkageGroup( unsigned 
 void CProp_Portal::AfterCollisionEntityCreated() 
 {
 	MarkAsOwned(pCollisionEntity);
-	EntFlags[pCollisionEntity->entindex()] |= PSEF_OWNS_PHYSICS;
+	m_EntFlags[pCollisionEntity->entindex()] |= PSEF_OWNS_PHYSICS;
 }
 
 
 void CProp_Portal::BeforeCollisionEntityDestroy() 
 {
-	EntFlags[pCollisionEntity->entindex()] &= ~PSEF_OWNS_PHYSICS;
+	m_EntFlags[pCollisionEntity->entindex()] &= ~PSEF_OWNS_PHYSICS;
 	MarkAsReleased(pCollisionEntity);
 }
 
 void CProp_Portal::BeforeMove() 
 {
 	//create a list of all entities that are actually within the portal hole, they will likely need to be moved out of solid space when the portal moves
-	pFixEntities = new CBaseEntity*[OwnedEntities.Count()]; //(CBaseEntity**)stackalloc(sizeof(CBaseEntity*) * OwnedEntities.Count());
-	iFixEntityCount = 0;
-	for (int i = OwnedEntities.Count(); --i >= 0; )
+	m_pFixEntities = new CBaseEntity*[m_OwnedEntities.Count()]; //(CBaseEntity**)stackalloc(sizeof(CBaseEntity*) * m_OwnedEntities.Count());
+	m_iFixEntityCount = 0;
+	for (int i = m_OwnedEntities.Count(); --i >= 0; )
 	{
-		CBaseEntity* pEntity = OwnedEntities[i];
+		CBaseEntity* pEntity = m_OwnedEntities[i];
 		if (CPhysicsShadowClone::IsShadowClone(pEntity) ||
 			CPortalSimulator::IsPortalSimulatorCollisionEntity(pEntity))
 			continue;
 
 		if (EntityIsInPortalHole(pEntity))
 		{
-			pFixEntities[iFixEntityCount] = pEntity;
-			++iFixEntityCount;
+			m_pFixEntities[m_iFixEntityCount] = pEntity;
+			++m_iFixEntityCount;
 		}
 	}
-	OldPlane = pCollisionEntity->GetEnginePortal()->GetPortalPlane(); //used in fixing code
+	m_OldPlane = pCollisionEntity->GetEnginePortal()->GetPortalPlane(); //used in fixing code
 }
 
 void CProp_Portal::AfterMove()
 {
-	for (int i = 0; i != iFixEntityCount; ++i)
+	for (int i = 0; i != m_iFixEntityCount; ++i)
 	{
-		if (!EntityIsInPortalHole(pFixEntities[i]))
+		if (!EntityIsInPortalHole(m_pFixEntities[i]))
 		{
 			//this entity is most definitely stuck in a solid wall right now
 			//pFixEntities[i]->SetAbsOrigin( pFixEntities[i]->GetAbsOrigin() + (OldPlane.m_Normal * 50.0f) );
-			FindClosestPassableSpace(pFixEntities[i], OldPlane.normal);
+			FindClosestPassableSpace(m_pFixEntities[i], m_OldPlane.normal);
 			continue;
 		}
 
@@ -2338,8 +2333,8 @@ void CProp_Portal::AfterMove()
 			//TODO: figure out if that's the case and fix it
 		}
 	}
-	delete[] pFixEntities;
-	pFixEntities = NULL;
+	delete[] m_pFixEntities;
+	m_pFixEntities = NULL;
 
 	Assert((pCollisionEntity == NULL) || OwnsEntity(pCollisionEntity));
 }
@@ -2378,11 +2373,11 @@ void CProp_Portal::TakeOwnershipOfEntity(CBaseEntity* pEntity)
 	Assert(GetSimulatorThatOwnsEntity(pEntity) == this);
 
 	if (EntityIsInPortalHole(pEntity))
-		EntFlags[pEntity->entindex()] |= PSEF_IS_IN_PORTAL_HOLE;
+		m_EntFlags[pEntity->entindex()] |= PSEF_IS_IN_PORTAL_HOLE;
 	else
-		EntFlags[pEntity->entindex()] &= ~PSEF_IS_IN_PORTAL_HOLE;
+		m_EntFlags[pEntity->entindex()] &= ~PSEF_IS_IN_PORTAL_HOLE;
 
-	UpdateShadowClonesPortalSimulationFlags(pEntity, PSEF_IS_IN_PORTAL_HOLE, EntFlags[pEntity->entindex()]);
+	UpdateShadowClonesPortalSimulationFlags(pEntity, PSEF_IS_IN_PORTAL_HOLE, m_EntFlags[pEntity->entindex()]);
 
 	PortalSimulator_TookOwnershipOfEntity(pEntity);
 
@@ -2435,7 +2430,7 @@ void CProp_Portal::TakePhysicsOwnership(CBaseEntity* pEntity)
 		return;
 
 	int iEntIndex = pEntity->entindex();
-	EntFlags[iEntIndex] |= PSEF_OWNS_PHYSICS;
+	m_EntFlags[iEntIndex] |= PSEF_OWNS_PHYSICS;
 
 
 	//physics cloning
@@ -2443,18 +2438,18 @@ void CProp_Portal::TakePhysicsOwnership(CBaseEntity* pEntity)
 #ifdef _DEBUG
 		{
 			int iDebugIndex;
-			for (iDebugIndex = ShadowClones.FromLinkedPortal.Count(); --iDebugIndex >= 0; )
+			for (iDebugIndex = m_ShadowClones.FromLinkedPortal.Count(); --iDebugIndex >= 0; )
 			{
-				if (ShadowClones.FromLinkedPortal[iDebugIndex]->GetClonedEntity() == pEntity)
+				if (m_ShadowClones.FromLinkedPortal[iDebugIndex]->GetClonedEntity() == pEntity)
 					break;
 			}
 			AssertMsg(iDebugIndex < 0, "Trying to own an entity, when a clone from the linked portal already exists");
 
 			if (GetLinkedPortal())
 			{
-				for (iDebugIndex = GetLinkedPortal()->ShadowClones.FromLinkedPortal.Count(); --iDebugIndex >= 0; )
+				for (iDebugIndex = GetLinkedPortal()->m_ShadowClones.FromLinkedPortal.Count(); --iDebugIndex >= 0; )
 				{
-					if (GetLinkedPortal()->ShadowClones.FromLinkedPortal[iDebugIndex]->GetClonedEntity() == pEntity)
+					if (GetLinkedPortal()->m_ShadowClones.FromLinkedPortal[iDebugIndex]->GetClonedEntity() == pEntity)
 						break;
 				}
 				AssertMsg(iDebugIndex < 0, "Trying to own an entity, when we're already exporting a clone to the linked portal");
@@ -2471,8 +2466,8 @@ void CProp_Portal::TakePhysicsOwnership(CBaseEntity* pEntity)
 		{
 
 			DBG_CODE(
-				for (int i = GetLinkedPortal()->ShadowClones.FromLinkedPortal.Count(); --i >= 0; )
-					AssertMsg(GetLinkedPortal()->ShadowClones.FromLinkedPortal[i]->GetClonedEntity() != pEntity, "Already cloning to linked portal.");
+				for (int i = GetLinkedPortal()->m_ShadowClones.FromLinkedPortal.Count(); --i >= 0; )
+					AssertMsg(GetLinkedPortal()->m_ShadowClones.FromLinkedPortal[i]->GetClonedEntity() != pEntity, "Already cloning to linked portal.");
 					);
 
 			CPhysicsShadowClone* pClone = CPhysicsShadowClone::CreateShadowClone(GetLinkedPortal()->GetPhysicsEnvironment(), hEnt, "CPortalSimulator::TakePhysicsOwnership(): To Linked Portal", &pCollisionEntity->GetEnginePortal()->MatrixThisToLinked().As3x4());
@@ -2506,10 +2501,10 @@ void CProp_Portal::TakePhysicsOwnership(CBaseEntity* pEntity)
 					pPlayer->SetHeldObjectOnOppositeSideOfPortal(bIsHeldObjectOnOppositeSideOfPortal);
 				}
 
-				GetLinkedPortal()->ShadowClones.FromLinkedPortal.AddToTail(pClone);
+				GetLinkedPortal()->m_ShadowClones.FromLinkedPortal.AddToTail(pClone);
 				GetLinkedPortal()->MarkAsOwned(pClone);
-				GetLinkedPortal()->EntFlags[pClone->entindex()] |= PSEF_OWNS_PHYSICS;
-				GetLinkedPortal()->EntFlags[pClone->entindex()] |= EntFlags[pEntity->entindex()] & PSEF_IS_IN_PORTAL_HOLE;
+				GetLinkedPortal()->m_EntFlags[pClone->entindex()] |= PSEF_OWNS_PHYSICS;
+				GetLinkedPortal()->m_EntFlags[pClone->entindex()] |= m_EntFlags[pEntity->entindex()] & PSEF_IS_IN_PORTAL_HOLE;
 				pClone->GetEngineObject()->CollisionRulesChanged(); //adding the clone to the portal simulator changes how it collides
 
 				if (pHeldEntity)
@@ -2568,18 +2563,18 @@ void CProp_Portal::ReleaseOwnershipOfEntity(CBaseEntity* pEntity, bool bMovingTo
 	if (GetPhysicsEnvironment())
 		ReleasePhysicsOwnership(pEntity, true, bMovingToLinkedSimulator);
 
-	EntFlags[pEntity->entindex()] &= ~PSEF_IS_IN_PORTAL_HOLE;
-	UpdateShadowClonesPortalSimulationFlags(pEntity, PSEF_IS_IN_PORTAL_HOLE, EntFlags[pEntity->entindex()]);
+	m_EntFlags[pEntity->entindex()] &= ~PSEF_IS_IN_PORTAL_HOLE;
+	UpdateShadowClonesPortalSimulationFlags(pEntity, PSEF_IS_IN_PORTAL_HOLE, m_EntFlags[pEntity->entindex()]);
 
 	Assert(GetSimulatorThatOwnsEntity(pEntity) == this);
 	MarkAsReleased(pEntity);
 	Assert(GetSimulatorThatOwnsEntity(pEntity) == NULL);
 
-	for (int i = OwnedEntities.Count(); --i >= 0; )
+	for (int i = m_OwnedEntities.Count(); --i >= 0; )
 	{
-		if (OwnedEntities[i] == pEntity)
+		if (m_OwnedEntities[i] == pEntity)
 		{
-			OwnedEntities.FastRemove(i);
+			m_OwnedEntities.FastRemove(i);
 			break;
 		}
 	}
@@ -2608,33 +2603,33 @@ void CProp_Portal::BeforeLocalPhysicsClear()
 {
 	//all physics clones
 	{
-		for (int i = ShadowClones.FromLinkedPortal.Count(); --i >= 0; )
+		for (int i = m_ShadowClones.FromLinkedPortal.Count(); --i >= 0; )
 		{
-			CPhysicsShadowClone* pClone = ShadowClones.FromLinkedPortal[i];
+			CPhysicsShadowClone* pClone = m_ShadowClones.FromLinkedPortal[i];
 			Assert(GetSimulatorThatOwnsEntity(pClone) == this);
-			EntFlags[pClone->entindex()] &= ~PSEF_OWNS_PHYSICS;
+			m_EntFlags[pClone->entindex()] &= ~PSEF_OWNS_PHYSICS;
 			MarkAsReleased(pClone);
 			Assert(GetSimulatorThatOwnsEntity(pClone) == NULL);
 			CPhysicsShadowClone::ReleaseShadowClone(pClone);
 		}
 
-		ShadowClones.FromLinkedPortal.RemoveAll();
+		m_ShadowClones.FromLinkedPortal.RemoveAll();
 	}
 
-	Assert(ShadowClones.FromLinkedPortal.Count() == 0);
+	Assert(m_ShadowClones.FromLinkedPortal.Count() == 0);
 
 	//release physics ownership of owned entities
-	for (int i = OwnedEntities.Count(); --i >= 0; )
-		ReleasePhysicsOwnership(OwnedEntities[i], false);
+	for (int i = m_OwnedEntities.Count(); --i >= 0; )
+		ReleasePhysicsOwnership(m_OwnedEntities[i], false);
 
-	Assert(ShadowClones.FromLinkedPortal.Count() == 0);
+	Assert(m_ShadowClones.FromLinkedPortal.Count() == 0);
 }
 
 void CProp_Portal::AfterLocalPhysicsCreated() 
 {
 	//re-acquire environment physics for owned entities
-	for (int i = OwnedEntities.Count(); --i >= 0; )
-		TakePhysicsOwnership(OwnedEntities[i]);
+	for (int i = m_OwnedEntities.Count(); --i >= 0; )
+		TakePhysicsOwnership(m_OwnedEntities[i]);
 }
 
 
@@ -2642,22 +2637,22 @@ void CProp_Portal::BeforeLinkedPhysicsClear()
 {
 	//clones from the linked portal
 	{
-		for (int i = ShadowClones.FromLinkedPortal.Count(); --i >= 0; )
+		for (int i = m_ShadowClones.FromLinkedPortal.Count(); --i >= 0; )
 		{
-			CPhysicsShadowClone* pClone = ShadowClones.FromLinkedPortal[i];
-			EntFlags[pClone->entindex()] &= ~PSEF_OWNS_PHYSICS;
+			CPhysicsShadowClone* pClone = m_ShadowClones.FromLinkedPortal[i];
+			m_EntFlags[pClone->entindex()] &= ~PSEF_OWNS_PHYSICS;
 			MarkAsReleased(pClone);
 			CPhysicsShadowClone::ReleaseShadowClone(pClone);
 		}
 
-		ShadowClones.FromLinkedPortal.RemoveAll();
+		m_ShadowClones.FromLinkedPortal.RemoveAll();
 	}
 }
 
 void CProp_Portal::AfterLinkedPhysicsCreated()
 {
 	//re-clone physicsshadowclones from the remote environment
-	CUtlVector<CBaseEntity*>& RemoteOwnedEntities = GetLinkedPortal()->OwnedEntities;
+	CUtlVector<CBaseEntity*>& RemoteOwnedEntities = GetLinkedPortal()->m_OwnedEntities;
 	for (int i = RemoteOwnedEntities.Count(); --i >= 0; )
 	{
 		if (CPhysicsShadowClone::IsShadowClone(RemoteOwnedEntities[i]) ||
@@ -2665,9 +2660,9 @@ void CProp_Portal::AfterLinkedPhysicsCreated()
 			continue;
 
 		int j;
-		for (j = ShadowClones.FromLinkedPortal.Count(); --j >= 0; )
+		for (j = m_ShadowClones.FromLinkedPortal.Count(); --j >= 0; )
 		{
-			if (ShadowClones.FromLinkedPortal[j]->GetClonedEntity() == RemoteOwnedEntities[i])
+			if (m_ShadowClones.FromLinkedPortal[j]->GetClonedEntity() == RemoteOwnedEntities[i])
 				break;
 		}
 
@@ -2681,8 +2676,8 @@ void CProp_Portal::AfterLinkedPhysicsCreated()
 		if (pClone)
 		{
 			MarkAsOwned(pClone);
-			EntFlags[pClone->entindex()] |= PSEF_OWNS_PHYSICS;
-			ShadowClones.FromLinkedPortal.AddToTail(pClone);
+			m_EntFlags[pClone->entindex()] |= PSEF_OWNS_PHYSICS;
+			m_ShadowClones.FromLinkedPortal.AddToTail(pClone);
 			pClone->GetEngineObject()->CollisionRulesChanged(); //adding the clone to the portal simulator changes how it collides
 		}
 	}
@@ -2690,11 +2685,11 @@ void CProp_Portal::AfterLinkedPhysicsCreated()
 
 void CProp_Portal::ReleaseAllEntityOwnership(void)
 {
-	//Assert( m_bLocalDataIsReady || (m_InternalData.Simulation.Dynamic.OwnedEntities.Count() == 0) );
+	//Assert( m_bLocalDataIsReady || (m_InternalData.Simulation.Dynamic.m_OwnedEntities.Count() == 0) );
 	int iSkippedObjects = 0;
-	while (OwnedEntities.Count() != iSkippedObjects) //the release function changes OwnedEntities
+	while (m_OwnedEntities.Count() != iSkippedObjects) //the release function changes m_OwnedEntities
 	{
-		CBaseEntity* pEntity = OwnedEntities[iSkippedObjects];
+		CBaseEntity* pEntity = m_OwnedEntities[iSkippedObjects];
 		if (CPhysicsShadowClone::IsShadowClone(pEntity) ||
 			CPortalSimulator::IsPortalSimulatorCollisionEntity(pEntity))
 		{
@@ -2734,16 +2729,16 @@ void CProp_Portal::ReleasePhysicsOwnership(CBaseEntity* pEntity, bool bContinueP
 		bContinuePhysicsCloning = false;
 
 	int iEntIndex = pEntity->entindex();
-	EntFlags[iEntIndex] &= ~PSEF_OWNS_PHYSICS;
+	m_EntFlags[iEntIndex] &= ~PSEF_OWNS_PHYSICS;
 
 	//physics cloning
 	{
 #ifdef _DEBUG
 		{
 			int iDebugIndex;
-			for (iDebugIndex = ShadowClones.FromLinkedPortal.Count(); --iDebugIndex >= 0; )
+			for (iDebugIndex = m_ShadowClones.FromLinkedPortal.Count(); --iDebugIndex >= 0; )
 			{
-				if (ShadowClones.FromLinkedPortal[iDebugIndex]->GetClonedEntity() == pEntity)
+				if (m_ShadowClones.FromLinkedPortal[iDebugIndex]->GetClonedEntity() == pEntity)
 					break;
 			}
 			AssertMsg(iDebugIndex < 0, "Trying to release an entity, when a clone from the linked portal already exists.");
@@ -2759,11 +2754,11 @@ void CProp_Portal::ReleasePhysicsOwnership(CBaseEntity* pEntity, bool bContinueP
 			if (GetLinkedPortal())
 			{
 				DBG_CODE_NOSCOPE(bFoundAlready = false; );
-				for (int i = GetLinkedPortal()->ShadowClones.FromLinkedPortal.Count(); --i >= 0; )
+				for (int i = GetLinkedPortal()->m_ShadowClones.FromLinkedPortal.Count(); --i >= 0; )
 				{
-					if (GetLinkedPortal()->ShadowClones.FromLinkedPortal[i]->GetClonedEntity() == pEntity)
+					if (GetLinkedPortal()->m_ShadowClones.FromLinkedPortal[i]->GetClonedEntity() == pEntity)
 					{
-						CPhysicsShadowClone* pClone = GetLinkedPortal()->ShadowClones.FromLinkedPortal[i];
+						CPhysicsShadowClone* pClone = GetLinkedPortal()->m_ShadowClones.FromLinkedPortal[i];
 						AssertMsg(bFoundAlready == false, "Multiple clones to linked portal found.");
 						DBG_CODE_NOSCOPE(bFoundAlready = true; );
 						DBG_CODE_NOSCOPE(szLastFoundMarker = pClone->m_szDebugMarker);
@@ -2800,10 +2795,10 @@ void CProp_Portal::ReleasePhysicsOwnership(CBaseEntity* pEntity, bool bContinueP
 							pHeldEntity = NULL;
 						}
 
-						GetLinkedPortal()->EntFlags[pClone->entindex()] &= ~PSEF_OWNS_PHYSICS;
+						GetLinkedPortal()->m_EntFlags[pClone->entindex()] &= ~PSEF_OWNS_PHYSICS;
 						GetLinkedPortal()->MarkAsReleased(pClone);
 						CPhysicsShadowClone::ReleaseShadowClone(pClone);
-						GetLinkedPortal()->ShadowClones.FromLinkedPortal.FastRemove(i);
+						GetLinkedPortal()->m_ShadowClones.FromLinkedPortal.FastRemove(i);
 
 						if (pHeldEntity)
 						{
@@ -2838,18 +2833,18 @@ void CProp_Portal::StartCloningEntity(CBaseEntity* pEntity)
 	if (CPhysicsShadowClone::IsShadowClone(pEntity) || CPortalSimulator::IsPortalSimulatorCollisionEntity(pEntity))
 		return;
 
-	if ((EntFlags[pEntity->entindex()] & PSEF_CLONES_ENTITY_FROM_MAIN) != 0)
+	if ((m_EntFlags[pEntity->entindex()] & PSEF_CLONES_ENTITY_FROM_MAIN) != 0)
 		return; //already cloned, no work to do
 
 #ifdef _DEBUG
-	for (int i = ShadowClones.ShouldCloneFromMain.Count(); --i >= 0; )
-		Assert(ShadowClones.ShouldCloneFromMain[i] != pEntity);
+	for (int i = m_ShadowClones.ShouldCloneFromMain.Count(); --i >= 0; )
+		Assert(m_ShadowClones.ShouldCloneFromMain[i] != pEntity);
 #endif
 
 	//NDebugOverlay::EntityBounds( pEntity, 0, 255, 0, 50, 5.0f );
 
-	ShadowClones.ShouldCloneFromMain.AddToTail(pEntity);
-	EntFlags[pEntity->entindex()] |= PSEF_CLONES_ENTITY_FROM_MAIN;
+	m_ShadowClones.ShouldCloneFromMain.AddToTail(pEntity);
+	m_EntFlags[pEntity->entindex()] |= PSEF_CLONES_ENTITY_FROM_MAIN;
 }
 
 void CProp_Portal::StopCloningEntity(CBaseEntity* pEntity)
@@ -2858,16 +2853,16 @@ void CProp_Portal::StopCloningEntity(CBaseEntity* pEntity)
 		return;
 	}
 
-	if ((EntFlags[pEntity->entindex()] & PSEF_CLONES_ENTITY_FROM_MAIN) == 0)
+	if ((m_EntFlags[pEntity->entindex()] & PSEF_CLONES_ENTITY_FROM_MAIN) == 0)
 	{
-		Assert(ShadowClones.ShouldCloneFromMain.Find(pEntity) == -1);
+		Assert(m_ShadowClones.ShouldCloneFromMain.Find(pEntity) == -1);
 		return; //not cloned, no work to do
 	}
 
 	//NDebugOverlay::EntityBounds( pEntity, 255, 0, 0, 50, 5.0f );
 
-	ShadowClones.ShouldCloneFromMain.FastRemove(ShadowClones.ShouldCloneFromMain.Find(pEntity));
-	EntFlags[pEntity->entindex()] &= ~PSEF_CLONES_ENTITY_FROM_MAIN;
+	m_ShadowClones.ShouldCloneFromMain.FastRemove(m_ShadowClones.ShouldCloneFromMain.Find(pEntity));
+	m_EntFlags[pEntity->entindex()] &= ~PSEF_CLONES_ENTITY_FROM_MAIN;
 }
 
 void CProp_Portal::MarkAsOwned(CBaseEntity* pEntity)
@@ -2880,14 +2875,14 @@ void CProp_Portal::MarkAsOwned(CBaseEntity* pEntity)
 	int iEntIndex = pEntity->entindex();
 	Assert(s_OwnedEntityMap[iEntIndex] == NULL);
 #ifdef _DEBUG
-	for (int i = OwnedEntities.Count(); --i >= 0; )
-		Assert(OwnedEntities[i] != pEntity);
+	for (int i = m_OwnedEntities.Count(); --i >= 0; )
+		Assert(m_OwnedEntities[i] != pEntity);
 #endif
-	Assert((EntFlags[iEntIndex] & PSEF_OWNS_ENTITY) == 0);
+	Assert((m_EntFlags[iEntIndex] & PSEF_OWNS_ENTITY) == 0);
 
-	EntFlags[iEntIndex] |= PSEF_OWNS_ENTITY;
+	m_EntFlags[iEntIndex] |= PSEF_OWNS_ENTITY;
 	s_OwnedEntityMap[iEntIndex] = this;
-	OwnedEntities.AddToTail(pEntity);
+	m_OwnedEntities.AddToTail(pEntity);
 
 	if (pEntity->IsPlayer())
 	{
@@ -2904,16 +2899,16 @@ void CProp_Portal::MarkAsReleased(CBaseEntity* pEntity)
 	Assert(pEntity != NULL);
 	int iEntIndex = pEntity->entindex();
 	Assert(s_OwnedEntityMap[iEntIndex] == this);
-	Assert(((EntFlags[iEntIndex] & PSEF_OWNS_ENTITY) != 0) || CPortalSimulator::IsPortalSimulatorCollisionEntity(pEntity));
+	Assert(((m_EntFlags[iEntIndex] & PSEF_OWNS_ENTITY) != 0) || CPortalSimulator::IsPortalSimulatorCollisionEntity(pEntity));
 
 	s_OwnedEntityMap[iEntIndex] = NULL;
-	EntFlags[iEntIndex] &= ~PSEF_OWNS_ENTITY;
+	m_EntFlags[iEntIndex] &= ~PSEF_OWNS_ENTITY;
 	int i;
-	for (i = OwnedEntities.Count(); --i >= 0; )
+	for (i = m_OwnedEntities.Count(); --i >= 0; )
 	{
-		if (OwnedEntities[i] == pEntity)
+		if (m_OwnedEntities[i] == pEntity)
 		{
-			OwnedEntities.FastRemove(i);
+			m_OwnedEntities.FastRemove(i);
 			break;
 		}
 	}
@@ -2928,12 +2923,12 @@ void CProp_Portal::MarkAsReleased(CBaseEntity* pEntity)
 
 int CProp_Portal::GetMoveableOwnedEntities(CBaseEntity** pEntsOut, int iEntOutLimit)
 {
-	int iOwnedEntCount = OwnedEntities.Count();
+	int iOwnedEntCount = m_OwnedEntities.Count();
 	int iOutputCount = 0;
 
 	for (int i = 0; i != iOwnedEntCount; ++i)
 	{
-		CBaseEntity* pEnt = OwnedEntities[i];
+		CBaseEntity* pEnt = m_OwnedEntities[i];
 		Assert(pEnt != NULL);
 
 		if (CPhysicsShadowClone::IsShadowClone(pEnt))
@@ -2966,7 +2961,7 @@ CProp_Portal* CProp_Portal::GetSimulatorThatOwnsEntity(const CBaseEntity* pEntit
 
 	for (int i = CProp_Portal_Shared::AllPortals.Count(); --i >= 0; )
 	{
-		if (CProp_Portal_Shared::AllPortals[i]->EntFlags[iEntIndex] & PSEF_OWNS_ENTITY)
+		if (CProp_Portal_Shared::AllPortals[i]->m_EntFlags[iEntIndex] & PSEF_OWNS_ENTITY)
 		{
 			AssertMsg(pOwningSimulatorCheck == NULL, "More than one portal simulator found owning the same entity.");
 			pOwningSimulatorCheck = CProp_Portal_Shared::AllPortals[i];
@@ -2983,15 +2978,15 @@ void CProp_Portal::ClearLinkedEntities(void)
 {
 	//clones from the linked portal
 	{
-		for (int i = ShadowClones.FromLinkedPortal.Count(); --i >= 0; )
+		for (int i = m_ShadowClones.FromLinkedPortal.Count(); --i >= 0; )
 		{
-			CPhysicsShadowClone* pClone = ShadowClones.FromLinkedPortal[i];
-			EntFlags[pClone->entindex()] &= ~PSEF_OWNS_PHYSICS;
+			CPhysicsShadowClone* pClone = m_ShadowClones.FromLinkedPortal[i];
+			m_EntFlags[pClone->entindex()] &= ~PSEF_OWNS_PHYSICS;
 			MarkAsReleased(pClone);
 			CPhysicsShadowClone::ReleaseShadowClone(pClone);
 		}
 
-		ShadowClones.FromLinkedPortal.RemoveAll();
+		m_ShadowClones.FromLinkedPortal.RemoveAll();
 	}
 }
 
@@ -3069,7 +3064,7 @@ void CProp_Portal::Pre_UTIL_Remove(CBaseEntity* pEntity)
 
 	for (int i = CProp_Portal_Shared::AllPortals.Count(); --i >= 0; )
 	{
-		CProp_Portal_Shared::AllPortals[i]->EntFlags[iEntIndex] = 0;
+		CProp_Portal_Shared::AllPortals[i]->m_EntFlags[iEntIndex] = 0;
 	}
 
 
@@ -3104,7 +3099,7 @@ void UpdateShadowClonesPortalSimulationFlags(const CBaseEntity* pSourceEntity, u
 		CPhysicsShadowClone* pClone = pClones->pClone;
 		CProp_Portal* pCloneSimulator = CProp_Portal::GetSimulatorThatOwnsEntity(pClone);
 
-		unsigned int* pFlags = (unsigned int*)&pCloneSimulator->EntFlags[pClone->entindex()];
+		unsigned int* pFlags = (unsigned int*)&pCloneSimulator->m_EntFlags[pClone->entindex()];
 		*pFlags &= ~iFlags;
 		*pFlags |= iOrFlags;
 
@@ -3127,10 +3122,10 @@ void CProp_Portal::PrePhysFrame(void)
 			if (!pSimulator->IsReadyToSimulate())
 				continue;
 
-			int iOwnedEntities = pSimulator->OwnedEntities.Count();
+			int iOwnedEntities = pSimulator->m_OwnedEntities.Count();
 			if (iOwnedEntities != 0)
 			{
-				CBaseEntity** pOwnedEntities = pSimulator->OwnedEntities.Base();
+				CBaseEntity** pOwnedEntities = pSimulator->m_OwnedEntities.Base();
 
 				for (int j = 0; j != iOwnedEntities; ++j)
 				{
@@ -3144,15 +3139,15 @@ void CProp_Portal::PrePhysFrame(void)
 						continue;
 
 					int iEntIndex = pEntity->entindex();
-					int iExistingFlags = pSimulator->EntFlags[iEntIndex];
+					int iExistingFlags = pSimulator->m_EntFlags[iEntIndex];
 					if (pSimulator->EntityIsInPortalHole(pEntity))
-						pSimulator->EntFlags[iEntIndex] |= PSEF_IS_IN_PORTAL_HOLE;
+						pSimulator->m_EntFlags[iEntIndex] |= PSEF_IS_IN_PORTAL_HOLE;
 					else
-						pSimulator->EntFlags[iEntIndex] &= ~PSEF_IS_IN_PORTAL_HOLE;
+						pSimulator->m_EntFlags[iEntIndex] &= ~PSEF_IS_IN_PORTAL_HOLE;
 
-					UpdateShadowClonesPortalSimulationFlags(pEntity, PSEF_IS_IN_PORTAL_HOLE, pSimulator->EntFlags[iEntIndex]);
+					UpdateShadowClonesPortalSimulationFlags(pEntity, PSEF_IS_IN_PORTAL_HOLE, pSimulator->m_EntFlags[iEntIndex]);
 
-					if (((iExistingFlags ^ pSimulator->EntFlags[iEntIndex]) & PSEF_IS_IN_PORTAL_HOLE) != 0) //value changed
+					if (((iExistingFlags ^ pSimulator->m_EntFlags[iEntIndex]) & PSEF_IS_IN_PORTAL_HOLE) != 0) //value changed
 					{
 						pEntity->GetEngineObject()->CollisionRulesChanged(); //entity moved into or out of the portal hole, need to either add or remove collision with transformed geometry
 

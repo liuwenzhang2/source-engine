@@ -5998,11 +5998,6 @@ const cplane_t& C_EnginePortalInternal::GetPortalPlane() const
 	return m_DataAccess.Placement.PortalPlane;
 }
 
-const PS_InternalData_t& C_EnginePortalInternal::GetDataAccess() const
-{
-	return m_DataAccess;
-}
-
 const Vector& C_EnginePortalInternal::GetVectorForward() const
 {
 	return m_DataAccess.Placement.vForward;

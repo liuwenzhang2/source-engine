@@ -1129,8 +1129,8 @@ void CPortalSimulator::ClearLinkedPhysics( void )
 		m_bInCrossLinkedFunction = false;
 	}
 
-	//Assert( (ShadowClones.FromLinkedPortal.Count() == 0) && 
-	//	((m_pLinkedPortal == NULL) || (m_pLinkedPortal->ShadowClones.FromLinkedPortal.Count() == 0)) );
+	//Assert( (m_ShadowClones.FromLinkedPortal.Count() == 0) && 
+	//	((m_pLinkedPortal == NULL) || (m_pLinkedPortal->m_ShadowClones.FromLinkedPortal.Count() == 0)) );
 
 	GetPhysicsEnvironment()->CleanupDeleteList();
 	GetPhysicsEnvironment()->SetQuickDelete( false );
@@ -1544,7 +1544,7 @@ CPSCollisionEntity::~CPSCollisionEntity( void )
 	if( m_pOwningSimulator )
 	{
 		Error("entindex() not valid in destruct");
-		//m_pOwningSimulator->m_InternalData.Simulation.Dynamic.EntFlags[entindex()] &= ~PSEF_OWNS_PHYSICS;
+		//m_pOwningSimulator->m_InternalData.Simulation.Dynamic.m_EntFlags[entindex()] &= ~PSEF_OWNS_PHYSICS;
 		//m_pOwningSimulator->MarkAsReleased( this );
 		//m_pOwningSimulator->m_InternalData.Simulation.pCollisionEntity = NULL;
 		//m_pOwningSimulator = NULL;
@@ -1683,7 +1683,7 @@ bool CPortalSimulator::IsPortalSimulatorCollisionEntity( const CBaseEntity *pEnt
 const VMatrix& CPortalSimulator::MatrixThisToLinked() const { return pCollisionEntity->GetEnginePortal()->MatrixThisToLinked(); }
 const VMatrix& CPortalSimulator::MatrixLinkedToThis() const { return pCollisionEntity->GetEnginePortal()->MatrixLinkedToThis(); }
 const cplane_t& CPortalSimulator::GetPortalPlane() const { return pCollisionEntity->GetEnginePortal()->GetPortalPlane(); }
-const PS_InternalData_t& CPortalSimulator::GetDataAccess() const { return pCollisionEntity->GetEnginePortal()->GetDataAccess(); }
+//const PS_InternalData_t& CPortalSimulator::GetDataAccess() const { return pCollisionEntity->GetEnginePortal()->GetDataAccess(); }
 const Vector& CPortalSimulator::GetVectorForward() const { return pCollisionEntity->GetEnginePortal()->GetVectorForward(); }
 const Vector& CPortalSimulator::GetVectorUp() const { return pCollisionEntity->GetEnginePortal()->GetVectorUp(); }
 const Vector& CPortalSimulator::GetVectorRight() const { return pCollisionEntity->GetEnginePortal()->GetVectorRight(); }

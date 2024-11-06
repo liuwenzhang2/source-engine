@@ -1698,7 +1698,6 @@ public:
 	const VMatrix& MatrixThisToLinked() const;
 	const VMatrix& MatrixLinkedToThis() const;
 	const cplane_t& GetPortalPlane() const;
-	const PS_InternalData_t& GetDataAccess() const;
 	const Vector& GetVectorForward() const;
 	const Vector& GetVectorUp() const;
 	const Vector& GetVectorRight() const;

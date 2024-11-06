@@ -903,7 +903,7 @@ void C_Prop_Portal::GetToolRecordingState( KeyValues *msg )
 //	m_bIsPortal2 = bValue;
 //}
 
-bool C_Prop_Portal::IsActivedAndLinked( void ) const
-{
-	return ( m_bActivated && m_hLinkedPortal.Get() != NULL );
-}
+//bool C_Prop_Portal::IsActivedAndLinked( void ) const
+//{
+//	return ( m_bActivated && m_hLinkedPortal.Get() != NULL );
+//}

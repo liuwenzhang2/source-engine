@@ -72,7 +72,7 @@ public:
 
 	//void					SetIsPortal2( bool bValue );
 
-	bool					IsActivedAndLinked( void ) const;
+	//bool					IsActivedAndLinked( void ) const;
 
 	//CHandle<CPortalSimulator>		m_hPortalSimulator = NULL;
 
