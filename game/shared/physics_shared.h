@@ -58,6 +58,7 @@ extern const objectparams_t g_PhysDefaultObjectParams;
 #define FVPHYSICS_NO_IMPACT_DMG			0x0400		// don't do impact damage to anything
 #define FVPHYSICS_NO_NPC_IMPACT_DMG		0x0800		// Don't do impact damage to NPC's. This is temporary for NPC's shooting combine balls (sjb)
 #define FVPHYSICS_NO_SELF_COLLISIONS	0x8000		// don't collide with other objects that are part of the same entity
+#define FVPHYSICS_IS_SHADOWCLONE		0x4000
 
 //-----------------------------------------------------------------------------
 // Purpose: A little cache of current objects making noises

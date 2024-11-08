@@ -522,6 +522,16 @@ const IEnginePortalServer* CBaseEntity::GetEnginePortal() const
 	return dynamic_cast<const IEnginePortalServer*>(GetEngineObject());
 }
 
+IEngineShadowCloneServer* CBaseEntity::GetEngineShadowClone()
+{
+	return dynamic_cast<IEngineShadowCloneServer*>(GetEngineObject());
+}
+
+const IEngineShadowCloneServer* CBaseEntity::GetEngineShadowClone() const
+{
+	return dynamic_cast<const IEngineShadowCloneServer*>(GetEngineObject());
+}
+
 void CBaseEntity::Release() {
 	//GetEngineObject()->PhysicsRemoveTouchedList();
 	//CBaseEntity::PhysicsRemoveGroundList(this);

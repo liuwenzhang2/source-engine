@@ -18,12 +18,7 @@
 
 class CPhysicsShadowClone;
 
-struct PhysicsObjectCloneLink_t
-{
-	IPhysicsObject *pSource;
-	IPhysicsShadowController *pShadowController;
-	IPhysicsObject *pClone;
-};
+
 
 struct CPhysicsShadowCloneLL
 {
@@ -31,33 +26,21 @@ struct CPhysicsShadowCloneLL
 	CPhysicsShadowCloneLL *pNext;
 };
 
-#define FVPHYSICS_IS_SHADOWCLONE 0x4000
 
 class CPhysicsShadowClone : public CBaseAnimating
 {
 	DECLARE_CLASS( CPhysicsShadowClone, CBaseAnimating );
 
 private:
-	EHANDLE			m_hClonedEntity; //the entity we're supposed to be cloning the physics of
-	VMatrix			m_matrixShadowTransform; //all cloned coordinates and angles will be run through this matrix before being applied
-	VMatrix			m_matrixShadowTransform_Inverse;
-	
-	CUtlVector<PhysicsObjectCloneLink_t> m_CloneLinks; //keeps track of which of our physics objects are linked to the source's objects
-	bool			m_bShadowTransformIsIdentity; //the shadow transform doesn't update often, so we can cache this
-	bool			m_bImmovable; //cloning a track train or door, something that doesn't really work on a force-based level
-	bool			m_bInAssumedSyncState;
 
-	void			FullSyncClonedPhysicsObjects( bool bTeleport );
-	void			SyncEntity( bool bPullChanges );
-
-	IPhysicsEnvironment *m_pOwnerPhysEnvironment; //clones exist because of multi-environment situations
 
 
 public:
 	CPhysicsShadowClone( void );
 	virtual ~CPhysicsShadowClone( void );
 	
-	bool			m_bShouldUpSync;
+	static int GetEngineObjectTypeStatic() { return ENGINEOBJECT_SHADOWCLONE; }
+
 	DBG_CODE_NOSCOPE( const char *m_szDebugMarker; );
 
 	//do the thing with the stuff, you know, the one that goes WooooWooooWooooWooooWoooo
@@ -66,14 +49,9 @@ public:
 	//crush, kill, DESTROY!!!!!
 	//void			Free( void );
 
-	//syncs to the source entity in every way possible, assumed sync does some rudimentary tests to see if the object is in sync, and if so, skips the update
-	void			FullSync( bool bAllowAssumedSync = false );
 
-	//syncs just the physics objects, bPullChanges should be true when this clone should match it's source, false when it should force differences onto the source entity
-	void			PartialSync( bool bPullChanges );
 
 	//virtual bool CreateVPhysics( void );
-	virtual void	VPhysicsDestroyObject( void );
 	virtual int		VPhysicsGetObjectList( IPhysicsObject **pList, int listMax );
 	virtual int		ObjectCaps( void );
 	virtual void	UpdateOnRemove( void );
@@ -89,18 +67,6 @@ public:
 
 
 
-	//is this clone occupying the exact same space as the object it's cloning?
-	inline bool		IsUntransformedClone( void ) const { return m_bShadowTransformIsIdentity; };
-	void			SetCloneTransformationMatrix( const matrix3x4_t &matTransform );
-
-	inline bool		IsInAssumedSyncState( void ) const { return m_bInAssumedSyncState; }
-	inline IPhysicsEnvironment *GetOwnerEnvironment( void ) const { return m_pOwnerPhysEnvironment; }
-
-	//what entity are we cloning?
-	void			SetClonedEntity( EHANDLE hEntToClone );
-	EHANDLE			GetClonedEntity( void );
-
-
 	virtual void	VPhysicsCollision( int index, gamevcollisionevent_t *pEvent );
 
 	//damage relays to source entity if anything ever hits the clone
@@ -114,8 +80,7 @@ public:
 	static CPhysicsShadowClone *CreateShadowClone( IPhysicsEnvironment *pInPhysicsEnvironment, EHANDLE hEntToClone, const char *szDebugMarker, const matrix3x4_t *pTransformationMatrix = NULL );
 	static void ReleaseShadowClone(CPhysicsShadowClone* pShadowClone);
 
-	//given a physics object that is part of this clone, tells you which physics object in the source
-	IPhysicsObject *TranslatePhysicsToClonedEnt( const IPhysicsObject *pPhysics );
+	
 
 	static bool IsShadowClone( const CBaseEntity *pEntity );
 	static CPhysicsShadowCloneLL *GetClonesOfEntity( const CBaseEntity *pEntity );

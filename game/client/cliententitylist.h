@@ -1883,6 +1883,11 @@ static int s_iPortalSimulatorGUID = 0; //used in standalone function that have n
 #define TABSPACING
 #endif
 
+class C_EngineShadowCloneInternal : public C_EngineObjectInternal {
+public:
+
+};
+
 // Use this to iterate over *all* (even dormant) the C_BaseEntities in the client entity list.
 //class C_AllBaseEntityIterator
 //{
@@ -2439,6 +2444,9 @@ inline C_BaseEntity* CClientEntityList<T>::CreateEntityByName(const char* classN
 		break;
 	case ENGINEOBJECT_PORTAL:
 		m_EngineObjectArray[iForceEdictIndex] = new C_EnginePortalInternal();
+		break;
+	case ENGINEOBJECT_SHADOWCLONE:
+		m_EngineObjectArray[iForceEdictIndex] = new C_EngineShadowCloneInternal();
 		break;
 	default:
 		Error("GetEngineObjectType error!\n");

@@ -43,9 +43,9 @@ static inline CBaseEntity *TranslateGroundEntity( CBaseEntity *pGroundEntity )
 #ifndef CLIENT_DLL
 	CPhysicsShadowClone *pClone = dynamic_cast<CPhysicsShadowClone *>(pGroundEntity);
 
-	if( pClone && pClone->IsUntransformedClone() )
+	if( pClone && pClone->GetEngineShadowClone()->IsUntransformedClone() )
 	{
-		CBaseEntity *pSource = pClone->GetClonedEntity();
+		CBaseEntity *pSource = pClone->GetEngineShadowClone()->GetClonedEntity();
 
 		if( pSource )
 			return pSource;

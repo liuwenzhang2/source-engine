@@ -2662,7 +2662,7 @@ void CProp_Portal::AfterLinkedPhysicsCreated()
 		int j;
 		for (j = m_ShadowClones.FromLinkedPortal.Count(); --j >= 0; )
 		{
-			if (m_ShadowClones.FromLinkedPortal[j]->GetClonedEntity() == RemoteOwnedEntities[i])
+			if (m_ShadowClones.FromLinkedPortal[j]->GetEngineShadowClone()->GetClonedEntity() == RemoteOwnedEntities[i])
 				break;
 		}
 
@@ -2756,7 +2756,7 @@ void CProp_Portal::ReleasePhysicsOwnership(CBaseEntity* pEntity, bool bContinueP
 				DBG_CODE_NOSCOPE(bFoundAlready = false; );
 				for (int i = GetLinkedPortal()->m_ShadowClones.FromLinkedPortal.Count(); --i >= 0; )
 				{
-					if (GetLinkedPortal()->m_ShadowClones.FromLinkedPortal[i]->GetClonedEntity() == pEntity)
+					if (GetLinkedPortal()->m_ShadowClones.FromLinkedPortal[i]->GetEngineShadowClone()->GetClonedEntity() == pEntity)
 					{
 						CPhysicsShadowClone* pClone = GetLinkedPortal()->m_ShadowClones.FromLinkedPortal[i];
 						AssertMsg(bFoundAlready == false, "Multiple clones to linked portal found.");

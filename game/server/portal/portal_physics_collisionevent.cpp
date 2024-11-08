@@ -210,7 +210,7 @@ int CPortal_CollisionEvent::ShouldSolvePenetration( IPhysicsObject *pObj0, IPhys
 		//Note that we're not actually going to change whether it should solve, we're just going to tack on some hacks
 		CPortal_Player *pHoldingPlayer = (CPortal_Player *)GetPlayerHoldingEntity( pHeld );
 		if( !pHoldingPlayer && CPhysicsShadowClone::IsShadowClone( pHeld ) )
-			pHoldingPlayer = (CPortal_Player *)GetPlayerHoldingEntity( ((CPhysicsShadowClone *)pHeld)->GetClonedEntity() );
+			pHoldingPlayer = (CPortal_Player *)GetPlayerHoldingEntity( ((CPhysicsShadowClone *)pHeld)->GetEngineShadowClone()->GetClonedEntity() );
 		
 		Assert( pHoldingPlayer );
 		if( pHoldingPlayer )
@@ -253,7 +253,7 @@ int CPortal_CollisionEvent::ShouldSolvePenetration( IPhysicsObject *pObj0, IPhys
 				if( !pObjects[j]->IsMoveable() )
 					return 0; //don't solve between shadow clones and statics
 
-				if( ((CPhysicsShadowClone *)(pObjects[i]->GetGameData()))->GetClonedEntity() == (pObjects[j]->GetGameData()) )
+				if( ((CPhysicsShadowClone *)(pObjects[i]->GetGameData()))->GetEngineShadowClone()->GetClonedEntity() == (pObjects[j]->GetGameData()) )
 					return 0; //don't solve between a shadow clone and its source entity
 			}
 		}	
@@ -283,12 +283,12 @@ static void ModifyWeight_PreCollision( vcollisionevent_t *pEvent )
 		if( pEvent->pObjects[i]->GetGameFlags() & FVPHYSICS_IS_SHADOWCLONE )
 		{
 			CPhysicsShadowClone *pClone = ((CPhysicsShadowClone *)pEvent->pObjects[i]->GetGameData());
-			pUnshadowedEntities[i] = pClone->GetClonedEntity();
+			pUnshadowedEntities[i] = pClone->GetEngineShadowClone()->GetClonedEntity();
 		
 			if( pUnshadowedEntities[i] == NULL )
 				return;
 
-            pUnshadowedObjects[i] = pClone->TranslatePhysicsToClonedEnt( pEvent->pObjects[i] );
+            pUnshadowedObjects[i] = pClone->GetEngineShadowClone()->TranslatePhysicsToClonedEnt( pEvent->pObjects[i] );
 
 			if( pUnshadowedObjects[i] == NULL )
 				return;

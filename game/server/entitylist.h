@@ -1747,6 +1747,65 @@ static int s_iPortalSimulatorGUID = 0; //used in standalone function that have n
 #define TABSPACING
 #endif
 
+struct PhysicsObjectCloneLink_t
+{
+	IPhysicsObject* pSource;
+	IPhysicsShadowController* pShadowController;
+	IPhysicsObject* pClone;
+};
+
+class CEngineShadowCloneInternal : public CEngineObjectInternal, public IEngineShadowCloneServer {
+public:
+	CEngineShadowCloneInternal() {
+		m_matrixShadowTransform.Identity();
+		m_matrixShadowTransform_Inverse.Identity();
+		m_bShadowTransformIsIdentity = true;
+	}
+
+	~CEngineShadowCloneInternal() {
+		m_hClonedEntity = NULL;
+	}
+
+	virtual void	VPhysicsDestroyObject(void);
+	virtual int		VPhysicsGetObjectList(IPhysicsObject** pList, int listMax);
+
+	//what entity are we cloning?
+	void			SetClonedEntity(CBaseEntity* pEntToClone);
+	CBaseEntity*	GetClonedEntity(void);
+	void			SetCloneTransformationMatrix(const matrix3x4_t& matTransform);
+	void			SetOwnerEnvironment(IPhysicsEnvironment* pOwnerPhysEnvironment) { m_pOwnerPhysEnvironment = pOwnerPhysEnvironment; }
+	IPhysicsEnvironment* GetOwnerEnvironment(void) const { return m_pOwnerPhysEnvironment; }
+
+	//is this clone occupying the exact same space as the object it's cloning?
+	bool		IsUntransformedClone(void) const { return m_bShadowTransformIsIdentity; };
+	void		SetInAssumedSyncState(bool bInAssumedSyncState) { m_bInAssumedSyncState = bInAssumedSyncState; }
+	bool		IsInAssumedSyncState(void) const { return m_bInAssumedSyncState; }
+
+	void			FullSyncClonedPhysicsObjects(bool bTeleport);
+	void			SyncEntity(bool bPullChanges);
+	//syncs to the source entity in every way possible, assumed sync does some rudimentary tests to see if the object is in sync, and if so, skips the update
+	void			FullSync(bool bAllowAssumedSync = false);
+	//syncs just the physics objects, bPullChanges should be true when this clone should match it's source, false when it should force differences onto the source entity
+	void			PartialSync(bool bPullChanges);
+	//given a physics object that is part of this clone, tells you which physics object in the source
+	IPhysicsObject* TranslatePhysicsToClonedEnt(const IPhysicsObject* pPhysics);
+	
+private:
+	EHANDLE			m_hClonedEntity; //the entity we're supposed to be cloning the physics of
+	VMatrix			m_matrixShadowTransform; //all cloned coordinates and angles will be run through this matrix before being applied
+	VMatrix			m_matrixShadowTransform_Inverse;
+
+	CUtlVector<PhysicsObjectCloneLink_t> m_CloneLinks; //keeps track of which of our physics objects are linked to the source's objects
+	bool			m_bShadowTransformIsIdentity; //the shadow transform doesn't update often, so we can cache this
+	bool			m_bImmovable; //cloning a track train or door, something that doesn't really work on a force-based level
+	bool			m_bInAssumedSyncState;
+
+	IPhysicsEnvironment* m_pOwnerPhysEnvironment; //clones exist because of multi-environment situations
+	bool			m_bShouldUpSync;
+
+};
+
+
 //-----------------------------------------------------------------------------
 // Utilities entities can use when saving
 //-----------------------------------------------------------------------------
@@ -3049,6 +3108,9 @@ inline CBaseEntity* CGlobalEntityList<T>::CreateEntityByName(const char* classNa
 		break;
 	case ENGINEOBJECT_PORTAL:
 		m_EngineObjectArray[iForceEdictIndex] = new CEnginePortalInternal();
+		break;
+	case ENGINEOBJECT_SHADOWCLONE:
+		m_EngineObjectArray[iForceEdictIndex] = new CEngineShadowCloneInternal();
 		break;
 	default:
 		Error("GetEngineObjectType error!\n");

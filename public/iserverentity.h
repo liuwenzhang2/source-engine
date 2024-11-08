@@ -515,6 +515,27 @@ public:
 	virtual void				ClearHoleShapeCollideable() = 0;
 };
 
+class IEngineShadowCloneServer {
+public:
+	virtual int				VPhysicsGetObjectList(IPhysicsObject** pList, int listMax) = 0;
+	virtual void			SetClonedEntity(CBaseEntity* pEntToClone) = 0;
+	virtual CBaseEntity*	GetClonedEntity(void) = 0;
+	virtual void			SetCloneTransformationMatrix(const matrix3x4_t& matTransform) = 0;
+	virtual void			SetOwnerEnvironment(IPhysicsEnvironment* pOwnerPhysEnvironment) = 0;
+	virtual IPhysicsEnvironment* GetOwnerEnvironment(void) const = 0;
+	virtual bool			IsUntransformedClone(void) const = 0;
+	virtual void			SetInAssumedSyncState(bool bInAssumedSyncState) = 0;
+	virtual bool			IsInAssumedSyncState(void) const = 0;
+	virtual void			FullSyncClonedPhysicsObjects(bool bTeleport) = 0;
+	virtual void			SyncEntity(bool bPullChanges) = 0;
+	//syncs to the source entity in every way possible, assumed sync does some rudimentary tests to see if the object is in sync, and if so, skips the update
+	virtual void			FullSync(bool bAllowAssumedSync = false) = 0;
+	//syncs just the physics objects, bPullChanges should be true when this clone should match it's source, false when it should force differences onto the source entity
+	virtual void			PartialSync(bool bPullChanges) = 0;
+	//given a physics object that is part of this clone, tells you which physics object in the source
+	virtual IPhysicsObject* TranslatePhysicsToClonedEnt(const IPhysicsObject* pPhysics) = 0;
+};
+
 // This class is how the engine talks to entities in the game DLL.
 // CBaseEntity implements this interface.
 class IServerEntity	: public IServerUnknown
