@@ -96,16 +96,16 @@ protected:
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-class CPropCrane : public CBaseProp, public IDrivableVehicle
+class CPropCrane : public CCraneServerVehicle, public IDrivableVehicle
 {
-	DECLARE_CLASS( CPropCrane, CBaseProp );
+	DECLARE_CLASS( CPropCrane, CCraneServerVehicle);
 public:
 	DECLARE_DATADESC();
 	DECLARE_SERVERCLASS();
 
 	CPropCrane( void )
 	{
-		m_ServerVehicle.SetVehicle( this );
+		//m_ServerVehicle.SetVehicle( this );
 	}
 
 	~CPropCrane( void )
@@ -186,11 +186,11 @@ public:
 	virtual string_t GetVehicleScriptName() { return m_vehicleScript; }
 
 	// If this is a vehicle, returns the vehicle interface
-	virtual IServerVehicle *GetServerVehicle() { return &m_ServerVehicle; }
+	virtual IServerVehicle *GetServerVehicle() { return this; }
 
 protected:
 	// Contained IServerVehicle
-	CCraneServerVehicle		m_ServerVehicle;
+	//CCraneServerVehicle		m_ServerVehicle;
 	// Contained Bone Follower manager
 	CBoneFollowerManager	m_BoneFollowerManager;
 

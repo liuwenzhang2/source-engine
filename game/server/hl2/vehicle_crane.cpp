@@ -62,7 +62,7 @@ BEGIN_DATADESC( CPropCrane )
 	DEFINE_INPUTFUNC( FIELD_VOID, "ForcePlayerIn",	InputForcePlayerIn ),
 
 	// Keys
-	DEFINE_EMBEDDED( m_ServerVehicle ),
+	//DEFINE_EMBEDDED( m_ServerVehicle ),
 	DEFINE_EMBEDDED( m_BoneFollowerManager ),
 
 	DEFINE_FIELD( m_hPlayer, FIELD_EHANDLE ),
@@ -116,7 +116,7 @@ END_SEND_TABLE();
 void CPropCrane::Precache( void )
 {
 	BaseClass::Precache();
-	m_ServerVehicle.Initialize( STRING(m_vehicleScript) );
+	this->Initialize( STRING(m_vehicleScript) );
 }
 
 
@@ -442,7 +442,7 @@ void CPropCrane::EnterVehicle( CBaseCombatCharacter *pPassenger )
 		m_hPlayer->RumbleEffect( RUMBLE_FLAT_BOTH, 0, RUMBLE_FLAG_LOOP );
 		m_hPlayer->RumbleEffect( RUMBLE_FLAT_BOTH, 10, RUMBLE_FLAG_UPDATE_SCALE );
 
-		m_ServerVehicle.SoundStart();
+		this->SoundStart();
 	}
 	else
 	{
@@ -465,7 +465,7 @@ void CPropCrane::ExitVehicle( int nRole )
 	m_playerOff.FireOutput( pPlayer, this, 0 );
 	m_bEnterAnimOn = false;
 
-	m_ServerVehicle.SoundShutdown( 1.0 );
+	this->SoundShutdown( 1.0 );
 }
 
 //-----------------------------------------------------------------------------
@@ -612,7 +612,7 @@ void CPropCrane::DriveCrane( int iDriverButtons, int iButtonsPressed, float flNP
 			m_hCraneMagnet->ResetHasHitSomething();
 			m_hCraneTip->m_pSpring->SetSpringConstant( CRANE_SPRING_CONSTANT_LOWERING );
 
-			m_ServerVehicle.PlaySound( VS_MISC1 );
+			this->PlaySound( VS_MISC1 );
 		}
 	}
 
@@ -623,18 +623,18 @@ void CPropCrane::DriveCrane( int iDriverButtons, int iButtonsPressed, float flNP
 	params.flCurrentSpeedFraction = flSpeedPercentage;
 	params.flWorldSpaceSpeed = 0;
 
-	m_ServerVehicle.SoundUpdate( params );
+	this->SoundUpdate( params );
 
 	// Play sounds for arm extension / retraction
 	if ( m_bExtending && !bWasExtending )
 	{
-		m_ServerVehicle.StopSound( VS_ENGINE2_STOP );
-		m_ServerVehicle.PlaySound( VS_ENGINE2_START );
+		this->StopSound( VS_ENGINE2_STOP );
+		this->PlaySound( VS_ENGINE2_START );
 	}
 	else if ( !m_bExtending && bWasExtending )
 	{
-		m_ServerVehicle.StopSound( VS_ENGINE2_START );
-		m_ServerVehicle.PlaySound( VS_ENGINE2_STOP );
+		this->StopSound( VS_ENGINE2_START );
+		this->PlaySound( VS_ENGINE2_STOP );
 	}
 }
 
@@ -682,7 +682,7 @@ void CPropCrane::RunCraneMovement( float flTime )
 			m_flNextDropAllowedTime = gpGlobals->curtime + 3.0;
 			m_flSlowRaiseTime = gpGlobals->curtime;
 
-			m_ServerVehicle.PlaySound( VS_MISC2 );
+			this->PlaySound( VS_MISC2 );
 		}
 	}
 	else if ( (m_flSlowRaiseTime + CRANE_SLOWRAISE_TIME) > gpGlobals->curtime )
@@ -732,13 +732,13 @@ void CPropCrane::RunCraneMovement( float flTime )
 		float flSpeedPercentage = clamp( fabs(m_flTurn) / m_flMaxTurnSpeed, 0, 1 );
 		if ( RandomFloat(0,1) > (0.95 - (0.1 * flSpeedPercentage)) )
 		{
-			if ( m_ServerVehicle.m_vehicleSounds.iszSound[VS_MISC4] != NULL_STRING )
+			if (this->m_vehicleSounds.iszSound[VS_MISC4] != NULL_STRING )
 			{
 				CPASAttenuationFilter filter( m_hCraneMagnet );
 
 				EmitSound_t ep;
 				ep.m_nChannel = CHAN_VOICE;
-				ep.m_pSoundName = STRING(m_ServerVehicle.m_vehicleSounds.iszSound[VS_MISC4]);
+				ep.m_pSoundName = STRING(this->m_vehicleSounds.iszSound[VS_MISC4]);
 				ep.m_flVolume = 1.0f;
 				ep.m_SoundLevel = SNDLVL_NORM;
 
@@ -758,7 +758,7 @@ void CPropCrane::TurnMagnetOn( void )
 	{
 		variant_t emptyVariant;
 		m_hCraneMagnet->AcceptInput( "Toggle", this, this, emptyVariant, USE_TOGGLE );
-		m_ServerVehicle.PlaySound( VS_MISC3 );
+		this->PlaySound( VS_MISC3 );
 
 		m_bMagnetOn = true;
 	}
@@ -773,7 +773,7 @@ void CPropCrane::TurnMagnetOff( void )
 	{
 		variant_t emptyVariant;
 		m_hCraneMagnet->AcceptInput( "Toggle", this, this, emptyVariant, USE_TOGGLE );
-		m_ServerVehicle.PlaySound( VS_MISC3 );
+		this->PlaySound( VS_MISC3 );
 
 		m_bMagnetOn = false;
 	}
@@ -886,7 +886,7 @@ void CPropCrane::SetNPCDriver( CNPC_VehicleDriver *pDriver )
 		SetOwnerEntity( NULL );
 
 		// Shutdown the crane's sounds
-		m_ServerVehicle.SoundShutdown( 1.0 );
+		this->SoundShutdown( 1.0 );
 	}
 }
 

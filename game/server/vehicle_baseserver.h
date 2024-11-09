@@ -120,11 +120,11 @@ private:
 // Purpose: Base class for drivable vehicle handling. Contain it in your 
 //			drivable vehicle.
 //-----------------------------------------------------------------------------
-class CBaseServerVehicle : public IServerVehicle
+class CBaseServerVehicle : public CBaseProp, public IServerVehicle
 {
 public:
-	DECLARE_SIMPLE_DATADESC();
-	DECLARE_CLASS_NOBASE( CBaseServerVehicle );
+	DECLARE_DATADESC();
+	DECLARE_CLASS( CBaseServerVehicle, CBaseProp);
 
 	CBaseServerVehicle( void );
 	~CBaseServerVehicle( void );
@@ -145,7 +145,7 @@ public:
 
 // IServerVehicle
 public:
-	virtual CBaseEntity		*GetVehicleEnt( void ) { return m_pVehicle; }
+	virtual CBaseEntity		*GetVehicleEnt( void ) { return this; }
 	virtual void			SetPassenger( int nRole, CBaseCombatCharacter *pPassenger );
 	virtual bool			IsPassengerVisible( int nRole = VEHICLE_ROLE_DRIVER ) { return false; }
 	virtual bool			IsPassengerDamagable( int nRole  = VEHICLE_ROLE_DRIVER ) { return true; }
@@ -243,7 +243,7 @@ public:
 	virtual int				GetExitAnimToUse( Vector &vecEyeExitEndpoint, bool &bAllPointsBlocked );
 	virtual void			HandleEntryExitFinish( bool bExitAnimOn, bool bResetAnim );
 
-	virtual void			SetVehicle( CBaseEntity *pVehicle );
+	//virtual void			SetVehicle( CBaseEntity *pVehicle );
 	IDrivableVehicle 		*GetDrivableVehicle( void );
 
 	// Sound handling
@@ -262,8 +262,8 @@ public:
 	virtual void			StopEngineRumble();
 
 public:
-	CBaseEntity			*m_pVehicle;
-	IDrivableVehicle 	*m_pDrivableVehicle;
+	//CBaseEntity			*m_pVehicle;
+	//IDrivableVehicle 	*m_pDrivableVehicle;
 
 	// NPC Driving
 	int								m_nNPCButtons;

@@ -18,9 +18,9 @@
 //-----------------------------------------------------------------------------
 // Purpose: Four wheel physics vehicle server vehicle with weaponry
 //-----------------------------------------------------------------------------
-class CAPCFourWheelServerVehicle : public CFourWheelServerVehicle
+class CAPCFourWheelServerVehicle : public CPropVehicleDriveable
 {
-	typedef CFourWheelServerVehicle BaseClass;
+	typedef CPropVehicleDriveable BaseClass;
 // IServerVehicle
 public:
 	bool		NPC_HasPrimaryWeapon( void ) { return true; }
@@ -39,9 +39,9 @@ public:
 //-----------------------------------------------------------------------------
 // A driveable vehicle with a gun that shoots wherever the driver looks.
 //-----------------------------------------------------------------------------
-class CPropAPC : public CPropVehicleDriveable
+class CPropAPC : public CAPCFourWheelServerVehicle
 {
-	DECLARE_CLASS( CPropAPC, CPropVehicleDriveable );
+	DECLARE_CLASS( CPropAPC, CAPCFourWheelServerVehicle);
 public:
 	// CBaseEntity
 	virtual void Precache( void );
@@ -52,7 +52,7 @@ public:
 	virtual void OnRestore( void );
 
 	// CPropVehicle
-	virtual void	CreateServerVehicle( void );
+	//virtual void	CreateServerVehicle( void );
 	virtual void	DriveVehicle( float flFrameTime, CUserCmd *ucmd, int iButtonsDown, int iButtonsReleased );
 	virtual void	ProcessMovement( CBasePlayer *pPlayer, CMoveData *pMoveData );
 	virtual Class_T	ClassifyPassenger( CBaseCombatCharacter *pPassenger, Class_T defaultClassification );

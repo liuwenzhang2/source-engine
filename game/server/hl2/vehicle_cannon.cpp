@@ -80,16 +80,16 @@ protected:
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-class CPropCannon : public CBaseProp, public IDrivableVehicle
+class CPropCannon : public CCannonServerVehicle, public IDrivableVehicle
 {
-	DECLARE_CLASS( CPropCannon, CBaseProp );
+	DECLARE_CLASS( CPropCannon, CCannonServerVehicle);
 public:
 	DECLARE_DATADESC();
 	DECLARE_SERVERCLASS();
 
 	CPropCannon( void )
 	{
-		m_ServerVehicle.SetVehicle( this );
+		//m_ServerVehicle.SetVehicle( this );
 	}
 
 	//IDrivableVehicle's Pure Virtuals
@@ -111,7 +111,7 @@ public:
 	virtual bool		PassengerShouldReceiveDamage( CTakeDamageInfo &info ) { return false; }
 	
 	// If this is a vehicle, returns the vehicle interface
-	virtual IServerVehicle *GetServerVehicle() { return &m_ServerVehicle; }
+	virtual IServerVehicle *GetServerVehicle() { return this; }
 
 	virtual void Precache( void );
 	virtual void Spawn( void );
@@ -168,7 +168,7 @@ private:
 
 protected:
 	// Contained IServerVehicle
-	CCannonServerVehicle		m_ServerVehicle;
+	//CCannonServerVehicle		m_ServerVehicle;
 
 	// Contained Bone Follower manager
 	CBoneFollowerManager		m_BoneFollowerManager;
@@ -219,7 +219,7 @@ END_SEND_TABLE();
 void CPropCannon::Precache( void )
 {
 	BaseClass::Precache();
-	m_ServerVehicle.Initialize( STRING( m_vehicleScript ) );
+	this->Initialize( STRING( m_vehicleScript ) );
 
 	engine->PrecacheModel( CANNON_PROJECTILE_MODEL );
 	
@@ -453,18 +453,18 @@ void CPropCannon::DriveCannon( int iDriverButtons, int iButtonsPressed )
 	params.flCurrentSpeedFraction = flSpeedPercentage;
 	params.flWorldSpaceSpeed = 0;
 
-	m_ServerVehicle.SoundUpdate( params );
+	this->SoundUpdate( params );
 
 	// Play sounds for arm extension / retraction
 	if ( m_bExtending && !bWasExtending )
 	{
-		m_ServerVehicle.StopSound( VS_ENGINE2_STOP );
-		m_ServerVehicle.PlaySound( VS_ENGINE2_START );
+		this->StopSound( VS_ENGINE2_STOP );
+		this->PlaySound( VS_ENGINE2_START );
 	}
 	else if ( !m_bExtending && bWasExtending )
 	{
-		m_ServerVehicle.StopSound( VS_ENGINE2_START );
-		m_ServerVehicle.PlaySound( VS_ENGINE2_STOP );
+		this->StopSound( VS_ENGINE2_START );
+		this->PlaySound( VS_ENGINE2_STOP );
 	}
 }
 

@@ -71,9 +71,9 @@ protected:
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-class CPropVehiclePrisonerPod : public CPhysicsProp, public IDrivableVehicle
+class CPropVehiclePrisonerPod : public CPrisonerPodServerVehicle, public IDrivableVehicle
 {
-	DECLARE_CLASS( CPropVehiclePrisonerPod, CPhysicsProp );
+	DECLARE_CLASS( CPropVehiclePrisonerPod, CPrisonerPodServerVehicle);
 
 public:
 	DECLARE_DATADESC();
@@ -81,7 +81,7 @@ public:
 
 	CPropVehiclePrisonerPod( void )
 	{
-		m_ServerVehicle.SetVehicle( this );
+		//m_ServerVehicle.SetVehicle( this );
 	}
 
 	~CPropVehiclePrisonerPod( void )
@@ -155,12 +155,12 @@ public:
 	virtual string_t GetVehicleScriptName() { return m_vehicleScript; }
 	
 	// If this is a vehicle, returns the vehicle interface
-	virtual IServerVehicle *GetServerVehicle() { return &m_ServerVehicle; }
+	virtual IServerVehicle *GetServerVehicle() { return this; }
 
 protected:
 
 	// Contained IServerVehicle
-	CPrisonerPodServerVehicle m_ServerVehicle;
+	//CPrisonerPodServerVehicle m_ServerVehicle;
 
 private:
 
@@ -195,7 +195,7 @@ BEGIN_DATADESC( CPropVehiclePrisonerPod )
 	DEFINE_INPUTFUNC( FIELD_VOID, "Close", InputClose ),
 
 	// Keys
-	DEFINE_EMBEDDED( m_ServerVehicle ),
+	//DEFINE_EMBEDDED( m_ServerVehicle ),
 
 	DEFINE_FIELD( m_hPlayer, FIELD_EHANDLE ),
 	DEFINE_FIELD( m_bEnterAnimOn, FIELD_BOOLEAN ),
@@ -231,7 +231,7 @@ void CPropVehiclePrisonerPod::Precache( void )
 	g_pSoundEmitterSystem->PrecacheScriptSound( "d3_citadel.pod_open" );
 	g_pSoundEmitterSystem->PrecacheScriptSound( "d3_citadel.pod_close" );
 
-	m_ServerVehicle.Initialize( STRING(m_vehicleScript) );
+	this->Initialize( STRING(m_vehicleScript) );
 }
 
 
@@ -501,7 +501,7 @@ void CPropVehiclePrisonerPod::EnterVehicle( CBaseCombatCharacter *pPassenger )
 		m_hPlayer = pPlayer;
 		m_playerOn.FireOutput( pPlayer, this, 0 );
 
-		m_ServerVehicle.SoundStart();
+		this->SoundStart();
 	}
 	else
 	{
@@ -535,7 +535,7 @@ void CPropVehiclePrisonerPod::ExitVehicle( int nRole )
 	m_playerOff.FireOutput( pPlayer, this, 0 );
 	m_bEnterAnimOn = false;
 
-	m_ServerVehicle.SoundShutdown( 1.0 );
+	this->SoundShutdown( 1.0 );
 }
 
 

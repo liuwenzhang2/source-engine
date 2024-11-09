@@ -5816,7 +5816,10 @@ IPhysicsEnvironment* CEnginePortalInternal::GetPhysicsEnvironment()
 
 void CEnginePortalInternal::CreatePhysicsEnvironment()
 {
+	pPhysicsEnvironment = physenv;
+#ifdef PORTAL
 	pPhysicsEnvironment = physenv_main;
+#endif
 }
 
 void CEnginePortalInternal::ClearPhysicsEnvironment()
@@ -7552,6 +7555,7 @@ static void FullSyncPhysicsObject(IPhysicsObject* pSource, IPhysicsObject* pDest
 		pDest->Wake();
 
 	float fSavedMass = 0.0f, fSavedRotationalDamping; //setting mass to 0.0f purely to kill a warning that I can't seem to kill with pragmas
+#ifdef PORTAL
 	if (pSource->GetGameFlags() & FVPHYSICS_PLAYER_HELD)
 	{
 		//CBasePlayer *pPlayer = UTIL_PlayerByIndex( 1 );
@@ -7571,6 +7575,7 @@ static void FullSyncPhysicsObject(IPhysicsObject* pSource, IPhysicsObject* pDest
 		AssertMsg(pGrabController, "Physics object is held, but we can't find the holding controller.");
 		GetSavedParamsForCarriedPhysObject(pGrabController, pSource, &fSavedMass, &fSavedRotationalDamping);
 	}
+#endif // PORTAL
 
 	//Boiler plate
 	{

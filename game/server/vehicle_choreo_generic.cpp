@@ -99,9 +99,9 @@ protected:
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-class CPropVehicleChoreoGeneric : public CDynamicProp, public IDrivableVehicle
+class CPropVehicleChoreoGeneric : public CChoreoGenericServerVehicle, public IDrivableVehicle
 {
-	DECLARE_CLASS( CPropVehicleChoreoGeneric, CDynamicProp );
+	DECLARE_CLASS( CPropVehicleChoreoGeneric, CChoreoGenericServerVehicle);
 
 public:
 	DECLARE_DATADESC();
@@ -109,7 +109,7 @@ public:
 
 	CPropVehicleChoreoGeneric( void )
 	{
-		m_ServerVehicle.SetVehicle( this );
+		//m_ServerVehicle.SetVehicle( this );
 		m_bIgnoreMoveParent = false;
 		m_bForcePlayerEyePoint = false;
 	}
@@ -195,7 +195,7 @@ public:
 	virtual string_t GetVehicleScriptName() { return m_vehicleScript; }
 
 	// If this is a vehicle, returns the vehicle interface
-	virtual IServerVehicle *GetServerVehicle() { return &m_ServerVehicle; }
+	virtual IServerVehicle *GetServerVehicle() { return this; }
 
 	bool ShouldCollide( int collisionGroup, int contentsMask ) const;
 
@@ -204,7 +204,7 @@ public:
 protected:
 
 	// Contained IServerVehicle
-	CChoreoGenericServerVehicle m_ServerVehicle;
+	//CChoreoGenericServerVehicle m_ServerVehicle;
 
 private:
 
@@ -241,7 +241,7 @@ BEGIN_DATADESC( CPropVehicleChoreoGeneric )
 	DEFINE_INPUTFUNC( FIELD_BOOLEAN, "Viewlock", InputViewlock ),
 
 	// Keys
-	DEFINE_EMBEDDED( m_ServerVehicle ),
+	//DEFINE_EMBEDDED( m_ServerVehicle ),
 
 	DEFINE_FIELD( m_hPlayer, FIELD_EHANDLE ),
 	DEFINE_FIELD( m_bEnterAnimOn, FIELD_BOOLEAN ),
@@ -314,8 +314,8 @@ void CPropVehicleChoreoGeneric::Precache( void )
 {
 	BaseClass::Precache();
 
-	m_ServerVehicle.Initialize( STRING(m_vehicleScript) );
-	m_ServerVehicle.UseLegacyExitChecks( true );
+	this->Initialize( STRING(m_vehicleScript) );
+	this->UseLegacyExitChecks( true );
 }
 
 
@@ -609,7 +609,7 @@ void CPropVehicleChoreoGeneric::EnterVehicle( CBaseCombatCharacter *pPassenger )
 		m_hPlayer = pPlayer;
 		m_playerOn.FireOutput( pPlayer, this, 0 );
 
-		m_ServerVehicle.SoundStart();
+		this->SoundStart();
 	}
 	else
 	{
@@ -643,7 +643,7 @@ void CPropVehicleChoreoGeneric::ExitVehicle( int nRole )
 	m_playerOff.FireOutput( pPlayer, this, 0 );
 	m_bEnterAnimOn = false;
 
-	m_ServerVehicle.SoundShutdown( 1.0 );
+	this->SoundShutdown( 1.0 );
 }
 
 

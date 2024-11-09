@@ -228,12 +228,12 @@ void CPropAPC::UpdateOnRemove( void )
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-void CPropAPC::CreateServerVehicle( void )
-{
+//void CPropAPC::CreateServerVehicle( void )
+//{
 	// Create our armed server vehicle
-	m_pServerVehicle = new CAPCFourWheelServerVehicle();
-	m_pServerVehicle->SetVehicle( this );
-}
+	//m_pServerVehicle = new CAPCFourWheelServerVehicle();
+	//m_pServerVehicle->SetVehicle( this );
+//}
 
 
 //-----------------------------------------------------------------------------
@@ -1079,7 +1079,7 @@ void CPropAPC::OnRestore( void )
 //-----------------------------------------------------------------------------
 void CAPCFourWheelServerVehicle::NPC_AimPrimaryWeapon( Vector vecTarget )
 {
-	CPropAPC *pAPC = ((CPropAPC*)m_pVehicle);
+	CPropAPC *pAPC = ((CPropAPC*)this);
 	pAPC->AimPrimaryWeapon( vecTarget );
 }
 
@@ -1116,7 +1116,7 @@ void CAPCFourWheelServerVehicle::Weapon_SecondaryRanges( float *flMinRange, floa
 //-----------------------------------------------------------------------------
 float CAPCFourWheelServerVehicle::Weapon_PrimaryCanFireAt( void )
 {
-	return ((CPropAPC*)m_pVehicle)->PrimaryWeaponFireTime();
+	return ((CPropAPC*)this)->PrimaryWeaponFireTime();
 }
 
 //-----------------------------------------------------------------------------
@@ -1124,6 +1124,6 @@ float CAPCFourWheelServerVehicle::Weapon_PrimaryCanFireAt( void )
 //-----------------------------------------------------------------------------
 float CAPCFourWheelServerVehicle::Weapon_SecondaryCanFireAt( void )
 {
-	return ((CPropAPC*)m_pVehicle)->SecondaryWeaponFireTime();
+	return ((CPropAPC*)this)->SecondaryWeaponFireTime();
 }
 

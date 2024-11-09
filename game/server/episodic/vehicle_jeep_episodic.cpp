@@ -731,8 +731,8 @@ void CPropJeepEpisodic::Use( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_
 void CPropJeepEpisodic::UpdateWheelDust( void )
 {
 	// See if this wheel should emit dust
-	const vehicleparams_t *vehicleData = m_pServerVehicle->GetVehicleParams();
-	const vehicle_operatingparams_t *carState = m_pServerVehicle->GetVehicleOperatingParams();
+	const vehicleparams_t *vehicleData = this->GetVehicleParams();
+	const vehicle_operatingparams_t *carState = this->GetVehicleOperatingParams();
 	bool bAllowDust = vehicleData->steering.dustCloud;
 	
 	// Car must be active
@@ -747,7 +747,7 @@ void CPropJeepEpisodic::UpdateWheelDust( void )
 	Vector	vecPos;
 	for ( int i = 0; i < NUM_WHEEL_EFFECTS; i++ )
 	{
-		m_pServerVehicle->GetWheelContactPoint( i, vecPos );
+		this->GetWheelContactPoint( i, vecPos );
 		
 		// Make sure the effect is created
 		if ( m_hWheelDust[i] == NULL )
@@ -792,7 +792,7 @@ void CPropJeepEpisodic::UpdateWheelDust( void )
 			Vector vecForward, vecRight, vecUp;
 			GetVectors( &vecForward, &vecRight, &vecUp );
 			
-			const vehicle_controlparams_t *vehicleControls = m_pServerVehicle->GetVehicleControlParams();
+			const vehicle_controlparams_t *vehicleControls = this->GetVehicleControlParams();
 			float flWheelDir = ( i & 1 ) ? 1.0f : -1.0f;
 			QAngle vecAngles;
 			vecForward += vecRight * flWheelDir;

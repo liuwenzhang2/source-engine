@@ -6043,7 +6043,10 @@ IPhysicsEnvironment* C_EnginePortalInternal::GetPhysicsEnvironment()
 
 void C_EnginePortalInternal::CreatePhysicsEnvironment()
 {
+	pPhysicsEnvironment = physenv;
+#ifdef PORTAL
 	pPhysicsEnvironment = physenv_main;
+#endif
 }
 
 void C_EnginePortalInternal::ClearPhysicsEnvironment()

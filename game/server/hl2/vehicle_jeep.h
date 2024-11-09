@@ -27,12 +27,25 @@ struct JeepWaterData_t
 };
 
 //-----------------------------------------------------------------------------
+// Purpose: Four wheel physics vehicle server vehicle with weaponry
+//-----------------------------------------------------------------------------
+class CJeepFourWheelServerVehicle : public CPropVehicleDriveable
+{
+	typedef CPropVehicleDriveable BaseClass;
+	// IServerVehicle
+public:
+	bool		NPC_HasPrimaryWeapon(void) { return true; }
+	void		NPC_AimPrimaryWeapon(Vector vecTarget);
+	int			GetExitAnimToUse(Vector& vecEyeExitEndpoint, bool& bAllPointsBlocked);
+};
+
+//-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-class CPropJeep : public CPropVehicleDriveable
+class CPropJeep : public CJeepFourWheelServerVehicle
 {
 public:
-	DECLARE_CLASS( CPropJeep, CPropVehicleDriveable );
+	DECLARE_CLASS( CPropJeep, CJeepFourWheelServerVehicle);
 
 	DECLARE_SERVERCLASS();
 	DECLARE_DATADESC();
@@ -67,7 +80,7 @@ public:
 	void			Spawn( void ); 
 	void			Activate( void );
 
-	virtual void	CreateServerVehicle( void );
+	//virtual void	CreateServerVehicle( void );
 	virtual Vector	BodyTarget( const Vector &posSrc, bool bNoisy = true );
 	virtual void	TraceAttack( const CTakeDamageInfo &info, const Vector &vecDir, trace_t *ptr, CDmgAccumulator *pAccumulator );
 	virtual int		OnTakeDamage( const CTakeDamageInfo &info );
@@ -81,7 +94,7 @@ public:
 
 	// NPC Driving
 	bool			NPC_HasPrimaryWeapon( void ) { return true; }
-	void			NPC_AimPrimaryWeapon( Vector vecTarget );
+	//void			NPC_AimPrimaryWeapon( Vector vecTarget );
 
 	const char		*GetTracerType( void ) { return "AR2Tracer"; }
 	void			DoImpactEffect( trace_t &tr, int nDamageType );

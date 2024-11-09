@@ -78,9 +78,9 @@ END_DATADESC()
 //-----------------------------------------------------------------------------
 // Purpose: Four wheel physics vehicle server vehicle with weaponry
 //-----------------------------------------------------------------------------
-class CJeepFourWheelServerVehicle : public CFourWheelServerVehicle
+class CJeepFourWheelServerVehicle : public CPropVehicleDriveable
 {
-	typedef CFourWheelServerVehicle BaseClass;
+	typedef CPropVehicleDriveable BaseClass;
 // IServerVehicle
 public:
 	bool		NPC_HasPrimaryWeapon( void ) { return true; }
@@ -91,7 +91,7 @@ public:
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-class CPropJeep : public CPropVehicleDriveable
+class CPropJeep : public CJeepFourWheelServerVehicle
 {
 	DECLARE_CLASS( CPropJeep, CPropVehicleDriveable );
 
@@ -118,7 +118,7 @@ public:
 	void			Precache( void );
 	void			Spawn( void ); 
 
-	virtual void	CreateServerVehicle( void );
+	//virtual void	CreateServerVehicle( void );
 	virtual Vector	BodyTarget( const Vector &posSrc, bool bNoisy = true );
 	virtual void	TraceAttack( const CTakeDamageInfo &info, const Vector &vecDir, trace_t *ptr, CDmgAccumulator *pAccumulator );
 	virtual int		OnTakeDamage( const CTakeDamageInfo &info );
@@ -130,7 +130,7 @@ public:
 
 	// NPC Driving
 	bool			NPC_HasPrimaryWeapon( void ) { return true; }
-	void			NPC_AimPrimaryWeapon( Vector vecTarget );
+	//void			NPC_AimPrimaryWeapon( Vector vecTarget );
 
 	const char		*GetTracerType( void ) { return "AR2Tracer"; }
 	void			DoImpactEffect( trace_t &tr, int nDamageType );
@@ -275,12 +275,12 @@ CPropJeep::CPropJeep( void )
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-void CPropJeep::CreateServerVehicle( void )
-{
-	// Create our armed server vehicle
-	m_pServerVehicle = new CJeepFourWheelServerVehicle();
-	m_pServerVehicle->SetVehicle( this );
-}
+//void CPropJeep::CreateServerVehicle( void )
+//{
+//	// Create our armed server vehicle
+//	m_pServerVehicle = new CJeepFourWheelServerVehicle();
+//	m_pServerVehicle->SetVehicle( this );
+//}
 
 //-----------------------------------------------------------------------------
 // Purpose: 
@@ -1517,7 +1517,7 @@ void CPropJeep::OnRestore( void )
 //-----------------------------------------------------------------------------
 void CJeepFourWheelServerVehicle::NPC_AimPrimaryWeapon( Vector vecTarget )
 {
-	((CPropJeep*)m_pVehicle)->AimGunAt( &vecTarget, 0.1f );
+	((CPropJeep*)this)->AimGunAt( &vecTarget, 0.1f );
 }
 
 //-----------------------------------------------------------------------------
@@ -1536,9 +1536,9 @@ int CJeepFourWheelServerVehicle::GetExitAnimToUse( Vector &vecEyeExitEndpoint, b
 		m_bParsedAnimations = true;
 	}
 
-	CBaseAnimating *pAnimating = dynamic_cast<CBaseAnimating *>(m_pVehicle);
+	//CBaseAnimating *pAnimating = dynamic_cast<CBaseAnimating *>(m_pVehicle);
 	// If we don't have the gun anymore, we want to get out using the "gun-less" animation
-	if ( pAnimating && ((CPropJeep*)m_pVehicle)->TauCannonHasBeenCutOff() )
+	if ( this && ((CPropJeep*)this)->TauCannonHasBeenCutOff() )
 	{
 		// HACK: We know the tau-cannon removed exit anim uses the first upright anim's exit details
 		trace_t tr;
@@ -1546,7 +1546,7 @@ int CJeepFourWheelServerVehicle::GetExitAnimToUse( Vector &vecEyeExitEndpoint, b
 		// Convert our offset points to worldspace ones
 		Vector vehicleExitOrigin = m_ExitAnimations[0].vecExitPointLocal;
 		QAngle vehicleExitAngles = m_ExitAnimations[0].vecExitAnglesLocal;
-		UTIL_ParentToWorldSpace( pAnimating, vehicleExitOrigin, vehicleExitAngles );
+		UTIL_ParentToWorldSpace(this, vehicleExitOrigin, vehicleExitAngles );
 
 		// Ensure the endpoint is clear by dropping a point down from above
 		vehicleExitOrigin -= VEC_VIEW;
@@ -1559,7 +1559,7 @@ int CJeepFourWheelServerVehicle::GetExitAnimToUse( Vector &vecEyeExitEndpoint, b
 		m_vecCurrentExitEndPoint = vecStart + ((vecEnd - vecStart) * tr.fraction);
 		vecEyeExitEndpoint = m_vecCurrentExitEndPoint + VEC_VIEW;
 		m_iCurrentExitAnim = 0;
-		return pAnimating->LookupSequence( "exit_tauremoved" );
+		return this->LookupSequence( "exit_tauremoved" );
 	}
 
 	return BaseClass::GetExitAnimToUse( vecEyeExitEndpoint, bAllPointsBlocked );

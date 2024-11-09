@@ -345,7 +345,7 @@ BEGIN_DATADESC( CPropVehicleDriveable )
 	DEFINE_OUTPUT( m_attack2axis, "Attack2Axis" ),
 	DEFINE_FIELD( m_hPlayer, FIELD_EHANDLE ),
 
-	DEFINE_EMBEDDEDBYREF( m_pServerVehicle ),
+	//DEFINE_EMBEDDEDBYREF( m_pServerVehicle ),
 	DEFINE_FIELD( m_nSpeed, FIELD_INTEGER ),
 	DEFINE_FIELD( m_nRPM, FIELD_INTEGER ),
 	DEFINE_FIELD( m_flThrottle, FIELD_FLOAT ),
@@ -377,7 +377,7 @@ LINK_ENTITY_TO_CLASS( prop_vehicle_driveable, CPropVehicleDriveable );
 // Purpose: 
 //-----------------------------------------------------------------------------
 CPropVehicleDriveable::CPropVehicleDriveable( void ) :
-	m_pServerVehicle( NULL ),
+	//m_pServerVehicle( NULL ),
 	m_hKeepUpright( NULL ),
 	m_flTurnOffKeepUpright( 0 ),
 	m_flNoImpactDamageTime( 0 )
@@ -391,30 +391,30 @@ CPropVehicleDriveable::CPropVehicleDriveable( void ) :
 //-----------------------------------------------------------------------------
 CPropVehicleDriveable::~CPropVehicleDriveable( void )
 {
-	DestroyServerVehicle();
+	//DestroyServerVehicle();
 }
 
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-void CPropVehicleDriveable::CreateServerVehicle( void )
-{
+//void CPropVehicleDriveable::CreateServerVehicle( void )
+//{
 	// Create our server vehicle
-	m_pServerVehicle = new CFourWheelServerVehicle();
-	m_pServerVehicle->SetVehicle( this );
-}
+	//m_pServerVehicle = new CFourWheelServerVehicle();
+	//m_pServerVehicle->SetVehicle( this );
+//}
 
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-void CPropVehicleDriveable::DestroyServerVehicle()
-{
-	if ( m_pServerVehicle )
-	{
-		delete m_pServerVehicle;
-		m_pServerVehicle = NULL;
-	}
-}
+//void CPropVehicleDriveable::DestroyServerVehicle()
+//{
+	//if ( m_pServerVehicle )
+	//{
+	//	delete m_pServerVehicle;
+	//	m_pServerVehicle = NULL;
+	//}
+//}
 
 //------------------------------------------------
 // Precache
@@ -425,15 +425,15 @@ void CPropVehicleDriveable::Precache( void )
 
 	// This step is needed because if we're precaching from a templated instance, we'll miss our vehicle 
 	// script sounds unless we do the parse below.  This instance of the vehicle will be nuked when we're actually created.
-	if ( m_pServerVehicle == NULL )
-	{
-		CreateServerVehicle();
-	}
+	//if ( m_pServerVehicle == NULL )
+	//{
+	//	CreateServerVehicle();
+	//}
 	
 	// Load the script file and precache our assets
-	if ( m_pServerVehicle )
+	//if ( m_pServerVehicle )
 	{
-		m_pServerVehicle->Initialize( STRING( m_vehicleScript ) );
+		this->Initialize( STRING( m_vehicleScript ) );
 	}
 }
 
@@ -444,11 +444,11 @@ void CPropVehicleDriveable::Precache( void )
 void CPropVehicleDriveable::Spawn( void )
 {
 	// Has to be created before Spawn is called (since that causes Precache to be called)
-	DestroyServerVehicle();
-	CreateServerVehicle();
+	//DestroyServerVehicle();
+	//CreateServerVehicle();
 	
 	// Initialize our vehicle via script
-	if ( m_pServerVehicle->Initialize( STRING(m_vehicleScript) ) == false )
+	if ( this->Initialize( STRING(m_vehicleScript) ) == false )
 	{
 		Warning( "Vehicle (%s) unable to properly initialize due to script error in (%s)!\n", GetEntityName().ToCStr(), STRING( m_vehicleScript ) );
 		SetThink( &CBaseEntity::SUB_Remove );
@@ -472,8 +472,8 @@ int CPropVehicleDriveable::Restore( IRestore &restore )
 	// Has to be created before	we can restore
 	// and we can't create it in the constructor because it could be
 	// overridden by a derived class.
-	DestroyServerVehicle();
-	CreateServerVehicle();
+	//DestroyServerVehicle();
+	//CreateServerVehicle();
 
 	int nRetVal = BaseClass::Restore( restore );
 	 
@@ -557,7 +557,7 @@ void CPropVehicleDriveable::Use( CBaseEntity *pActivator, CBaseEntity *pCaller, 
 
 	ResetUseKey( pPlayer );
 
-	m_pServerVehicle->HandlePassengerEntry( pPlayer, (value>0) );
+	this->HandlePassengerEntry( pPlayer, (value>0) );
 }
 
 //-----------------------------------------------------------------------------
@@ -601,10 +601,10 @@ void CPropVehicleDriveable::EnterVehicle( CBaseCombatCharacter *pPassenger )
 		// Start Thinking
 		GetEngineObject()->SetNextThink( gpGlobals->curtime );
 
-		Vector vecViewOffset = m_pServerVehicle->GetSavedViewOffset();
+		Vector vecViewOffset = this->GetSavedViewOffset();
 
 		// Clear our state
-		m_pServerVehicle->InitViewSmoothing( pPlayer->GetEngineObject()->GetAbsOrigin() + vecViewOffset, pPlayer->EyeAngles() );
+		this->InitViewSmoothing( pPlayer->GetEngineObject()->GetAbsOrigin() + vecViewOffset, pPlayer->EyeAngles() );
 
 		m_VehiclePhysics.GetVehicle()->OnVehicleEnter();
 	}
@@ -641,7 +641,7 @@ void CPropVehicleDriveable::ExitVehicle( int nRole )
 	m_VehiclePhysics.GetVehicle()->OnVehicleExit();
 
 	// Clear our state
-	m_pServerVehicle->InitViewSmoothing( vec3_origin, vec3_angle );
+	this->InitViewSmoothing( vec3_origin, vec3_angle );
 }
 
 //-----------------------------------------------------------------------------
@@ -1096,7 +1096,7 @@ CFourWheelServerVehicle::CFourWheelServerVehicle( void )
 {
 	// Setup our smoothing data
 	memset( &m_ViewSmoothing, 0, sizeof( m_ViewSmoothing ) );
-
+	m_ViewSmoothing.pVehicle = this;
 	m_ViewSmoothing.bClampEyeAngles		= true;
 	m_ViewSmoothing.bDampenEyePosition	= true;
 	m_ViewSmoothing.flPitchCurveZero	= PITCH_CURVE_ZERO;
@@ -1125,17 +1125,17 @@ void CFourWheelServerVehicle::InitViewSmoothing( const Vector &vecOrigin, const 
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-void CFourWheelServerVehicle::SetVehicle( CBaseEntity *pVehicle )
-{
-	ASSERT( dynamic_cast<CPropVehicleDriveable*>(pVehicle) );
-	BaseClass::SetVehicle( pVehicle );
-	
-	// Save this for view smoothing
-	if ( pVehicle != NULL )
-	{
-		m_ViewSmoothing.pVehicle = pVehicle->GetBaseAnimating();
-	}
-}
+//void CFourWheelServerVehicle::SetVehicle( CBaseEntity *pVehicle )
+//{
+//	ASSERT( dynamic_cast<CPropVehicleDriveable*>(pVehicle) );
+//	BaseClass::SetVehicle( pVehicle );
+//	
+//	// Save this for view smoothing
+//	if ( pVehicle != NULL )
+//	{
+//		m_ViewSmoothing.pVehicle = pVehicle->GetBaseAnimating();
+//	}
+//}
 
 //-----------------------------------------------------------------------------
 // Purpose: Modify the player view/camera while in a vehicle
@@ -1195,7 +1195,7 @@ IPhysicsVehicleController *CFourWheelServerVehicle::GetVehicleController()
 //-----------------------------------------------------------------------------
 CPropVehicleDriveable *CFourWheelServerVehicle::GetFourWheelVehicle( void )
 {
-	return (CPropVehicleDriveable *)m_pVehicle;
+	return (CPropVehicleDriveable *)this;
 }
 
 //-----------------------------------------------------------------------------

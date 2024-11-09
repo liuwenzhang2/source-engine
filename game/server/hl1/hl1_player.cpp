@@ -689,7 +689,7 @@ void CHL1_Player::InitVCollision( const Vector &vecAbsOrigin, const Vector &vecA
 	BaseClass::InitVCollision( vecAbsOrigin, vecAbsVelocity );
 
 	// Setup the HL2 specific callback.
-	GetEngineObject()->GetPhysicsController()->SetEventHandler( &playerCallback );
+	GetEnginePlayer()->GetPhysicsController()->SetEventHandler( &playerCallback );
 }
 
 

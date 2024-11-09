@@ -59,7 +59,7 @@ public:
 	bool					GetWheelContactPoint( int nWheelIndex, Vector &vecPos );
 
 public:
-	virtual void	SetVehicle( CBaseEntity *pVehicle );
+	//virtual void	SetVehicle( CBaseEntity *pVehicle );
 	void	InitViewSmoothing( const Vector &vecStartOrigin, const QAngle &vecStartAngles );
 	bool	IsPassengerEntering( void );
 	bool	IsPassengerExiting( void );
@@ -75,9 +75,9 @@ private:
 //-----------------------------------------------------------------------------
 // Purpose: Base class for four wheel physics vehicles
 //-----------------------------------------------------------------------------
-class CPropVehicle : public CBaseProp//, public CDefaultPlayerPickupVPhysics
+class CPropVehicle : public CFourWheelServerVehicle//, public CDefaultPlayerPickupVPhysics
 {
-	DECLARE_CLASS( CPropVehicle, CBaseProp );
+	DECLARE_CLASS( CPropVehicle, CFourWheelServerVehicle);
 public:
 	CPropVehicle();
 	virtual ~CPropVehicle();
@@ -174,7 +174,7 @@ public:
 	virtual void	Spawn( void );
 	virtual int		Restore( IRestore &restore );
 	virtual void	OnRestore();
-	virtual void	CreateServerVehicle( void );
+	//virtual void	CreateServerVehicle( void );
 	virtual int		ObjectCaps( void ) { return BaseClass::ObjectCaps() | FCAP_IMPULSE_USE; };
 	virtual void	GetVectors(Vector* pForward, Vector* pRight, Vector* pUp) const;
 	virtual void	VehicleAngleVectors( const QAngle &angles, Vector *pForward, Vector *pRight, Vector *pUp );
@@ -230,17 +230,17 @@ public:
 	virtual bool		PassengerShouldReceiveDamage( CTakeDamageInfo &info ) { return true; }
 
 	// If this is a vehicle, returns the vehicle interface
-	virtual IServerVehicle *GetServerVehicle() { return m_pServerVehicle; }
+	virtual IServerVehicle *GetServerVehicle() { return this; }
 
 protected:
 
 	virtual bool	ShouldThink() { return ( GetDriver() != NULL ); }
 
 	inline bool HasGun();
-	void DestroyServerVehicle();
+	//void DestroyServerVehicle();
 
 	// Contained IServerVehicle
-	CFourWheelServerVehicle	*m_pServerVehicle;
+	//CFourWheelServerVehicle	*m_pServerVehicle;
 
 	COutputEvent		m_playerOn;
 	COutputEvent		m_playerOff;

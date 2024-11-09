@@ -86,18 +86,7 @@ BEGIN_SIMPLE_DATADESC( JeepWaterData_t )
 	DEFINE_FIELD( m_bBodyWasInWater,			FIELD_BOOLEAN ),
 END_DATADESC()	
 
-//-----------------------------------------------------------------------------
-// Purpose: Four wheel physics vehicle server vehicle with weaponry
-//-----------------------------------------------------------------------------
-class CJeepFourWheelServerVehicle : public CFourWheelServerVehicle
-{
-	typedef CFourWheelServerVehicle BaseClass;
-// IServerVehicle
-public:
-	bool		NPC_HasPrimaryWeapon( void ) { return true; }
-	void		NPC_AimPrimaryWeapon( Vector vecTarget );
-	int			GetExitAnimToUse( Vector &vecEyeExitEndpoint, bool &bAllPointsBlocked );
-};
+
 
 BEGIN_DATADESC( CPropJeep )
 	DEFINE_FIELD( m_bGunHasBeenCutOff, FIELD_BOOLEAN ),
@@ -173,12 +162,12 @@ CPropJeep::CPropJeep( void )
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-void CPropJeep::CreateServerVehicle( void )
-{
+//void CPropJeep::CreateServerVehicle( void )
+//{
 	// Create our armed server vehicle
-	m_pServerVehicle = new CJeepFourWheelServerVehicle();
-	m_pServerVehicle->SetVehicle( this );
-}
+	//m_pServerVehicle = new CJeepFourWheelServerVehicle();
+	//m_pServerVehicle->SetVehicle( this );
+//}
 
 //-----------------------------------------------------------------------------
 // Purpose: 
@@ -1682,7 +1671,7 @@ void CPropJeep::InputFinishRemoveTauCannon( inputdata_t &inputdata )
 //-----------------------------------------------------------------------------
 void CJeepFourWheelServerVehicle::NPC_AimPrimaryWeapon( Vector vecTarget )
 {
-	((CPropJeep*)m_pVehicle)->AimGunAt( &vecTarget, 0.1f );
+	((CPropJeep*)this)->AimGunAt( &vecTarget, 0.1f );
 }
 
 //-----------------------------------------------------------------------------
@@ -1701,9 +1690,9 @@ int CJeepFourWheelServerVehicle::GetExitAnimToUse( Vector &vecEyeExitEndpoint, b
 		m_bParsedAnimations = true;
 	}
 
-	CBaseAnimating *pAnimating = dynamic_cast<CBaseAnimating *>(m_pVehicle);
+	//CBaseAnimating *pAnimating = dynamic_cast<CBaseAnimating *>(m_pVehicle);
 	// If we don't have the gun anymore, we want to get out using the "gun-less" animation
-	if ( pAnimating && ((CPropJeep*)m_pVehicle)->TauCannonHasBeenCutOff() )
+	if ( this && ((CPropJeep*)this)->TauCannonHasBeenCutOff() )
 	{
 		// HACK: We know the tau-cannon removed exit anim uses the first upright anim's exit details
 		trace_t tr;
@@ -1711,7 +1700,7 @@ int CJeepFourWheelServerVehicle::GetExitAnimToUse( Vector &vecEyeExitEndpoint, b
 		// Convert our offset points to worldspace ones
 		Vector vehicleExitOrigin = m_ExitAnimations[0].vecExitPointLocal;
 		QAngle vehicleExitAngles = m_ExitAnimations[0].vecExitAnglesLocal;
-		UTIL_ParentToWorldSpace( pAnimating, vehicleExitOrigin, vehicleExitAngles );
+		UTIL_ParentToWorldSpace( this, vehicleExitOrigin, vehicleExitAngles );
 
 		// Ensure the endpoint is clear by dropping a point down from above
 		vehicleExitOrigin -= VEC_VIEW;
@@ -1724,7 +1713,7 @@ int CJeepFourWheelServerVehicle::GetExitAnimToUse( Vector &vecEyeExitEndpoint, b
 		m_vecCurrentExitEndPoint = vecStart + ((vecEnd - vecStart) * tr.fraction);
 		vecEyeExitEndpoint = m_vecCurrentExitEndPoint + VEC_VIEW;
 		m_iCurrentExitAnim = 0;
-		return pAnimating->LookupSequence( "exit_tauremoved" );
+		return this->LookupSequence( "exit_tauremoved" );
 	}
 
 	return BaseClass::GetExitAnimToUse( vecEyeExitEndpoint, bAllPointsBlocked );
