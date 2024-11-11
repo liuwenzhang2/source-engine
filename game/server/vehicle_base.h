@@ -22,12 +22,10 @@
 #include "vehicle_viewblend_shared.h"
 
 class CNPC_VehicleDriver;
-class CFourWheelVehiclePhysics;
+//class CFourWheelVehiclePhysics;
 class CPropVehicleDriveable;
 class CSoundPatch;
 
-// the tires are considered to be skidding if they have sliding velocity of 10 in/s or more
-const float DEFAULT_SKID_THRESHOLD = 10.0f;
 
 //-----------------------------------------------------------------------------
 // Purpose: Four wheel physics vehicle server vehicle
@@ -67,7 +65,7 @@ public:
 	DECLARE_SIMPLE_DATADESC();
 
 private:
-	CFourWheelVehiclePhysics	*GetFourWheelVehiclePhysics( void );
+	//CFourWheelVehiclePhysics	*GetFourWheelVehiclePhysics( void );
 	
 	ViewSmoothingData_t		m_ViewSmoothing;
 };
@@ -81,7 +79,7 @@ class CPropVehicle : public CFourWheelServerVehicle//, public CDefaultPlayerPick
 public:
 	CPropVehicle();
 	virtual ~CPropVehicle();
-
+	static int GetEngineObjectTypeStatic() { return ENGINEOBJECT_VEHICLE; }
 	void SetVehicleType( unsigned int nVehicleType )			{ m_nVehicleType = nVehicleType; }
 	unsigned int GetVehicleType( void )							{ return m_nVehicleType; }
 
@@ -93,7 +91,7 @@ public:
 	int				DrawDebugTextOverlays();
 	void			Teleport( const Vector *newPosition, const QAngle *newAngles, const Vector *newVelocity );
 	virtual void	Think( void );
-	CFourWheelVehiclePhysics *GetPhysics( void ) { return &m_VehiclePhysics; }
+	//CFourWheelVehiclePhysics *GetPhysics( void ) { return &m_VehiclePhysics; }
 	CBasePlayer		*HasPhysicsAttacker( float dt );
 	void			OnPhysGunPickup( CBasePlayer *pPhysGunUser, PhysGunPickup_t reason );
 
@@ -128,7 +126,7 @@ protected:
 	virtual float GetUprightTime( void ) { return 5.0f; }
 
 protected:
-	CFourWheelVehiclePhysics		m_VehiclePhysics;
+	//CFourWheelVehiclePhysics		m_VehiclePhysics;
 	unsigned int					m_nVehicleType;
 	string_t						m_vehicleScript;
 
@@ -211,7 +209,7 @@ public:
 // IDrivableVehicle
 public:
 	virtual CBaseEntity *GetDriver( void );
-	virtual void		ItemPostFrame( CBasePlayer *pPlayer ) { return; }
+	//virtual void		ItemPostFrame( CBasePlayer *pPlayer ) { return; }
 	virtual void		SetupMove( CBasePlayer *player, CUserCmd *ucmd, IMoveHelper *pHelper, CMoveData *move );
 	virtual void		ProcessMovement( CBasePlayer *pPlayer, CMoveData *pMoveData ) { return; }
 	virtual void		FinishMove( CBasePlayer *player, CUserCmd *ucmd, CMoveData *move ) { return; }
@@ -227,7 +225,7 @@ public:
 	virtual void		ExitVehicle( int nRole );
 	virtual string_t	GetVehicleScriptName() { return m_vehicleScript; }
 	
-	virtual bool		PassengerShouldReceiveDamage( CTakeDamageInfo &info ) { return true; }
+	//virtual bool		PassengerShouldReceiveDamage( CTakeDamageInfo &info ) { return true; }
 
 	// If this is a vehicle, returns the vehicle interface
 	virtual IServerVehicle *GetServerVehicle() { return this; }

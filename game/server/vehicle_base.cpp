@@ -37,11 +37,11 @@ END_DATADESC()
 // CPropVehicle
 BEGIN_DATADESC( CPropVehicle )
 
-	DEFINE_EMBEDDED( m_VehiclePhysics ),
+	//DEFINE_EMBEDDED( m_VehiclePhysics ),
 
 	// These are necessary to save here because the 'owner' of these fields must be the prop_vehicle
-	DEFINE_PHYSPTR( m_VehiclePhysics.m_pVehicle ),
-	DEFINE_PHYSPTR_ARRAY( m_VehiclePhysics.m_pWheels ),
+	//DEFINE_PHYSPTR( m_VehiclePhysics.m_pVehicle ),
+	//DEFINE_PHYSPTR_ARRAY( m_VehiclePhysics.m_pWheels ),
 
 	DEFINE_FIELD( m_nVehicleType, FIELD_INTEGER ),
 
@@ -72,7 +72,7 @@ LINK_ENTITY_TO_CLASS( prop_vehicle, CPropVehicle );
 // Purpose: 
 //-----------------------------------------------------------------------------
 #pragma warning (disable:4355)
-CPropVehicle::CPropVehicle() : m_VehiclePhysics( this )
+CPropVehicle::CPropVehicle()// : m_VehiclePhysics( this )
 {
 	SetVehicleType( VEHICLE_TYPE_CAR_WHEELS );
 }
@@ -90,15 +90,15 @@ CPropVehicle::~CPropVehicle ()
 //-----------------------------------------------------------------------------
 void CPropVehicle::Spawn( )
 {
-	CFourWheelServerVehicle *pServerVehicle = dynamic_cast<CFourWheelServerVehicle*>(GetServerVehicle());
-	m_VehiclePhysics.SetOuter( this, pServerVehicle );
+	//CFourWheelServerVehicle *pServerVehicle = dynamic_cast<CFourWheelServerVehicle*>(GetServerVehicle());
+	//GetPhysics()->SetOuter( this, pServerVehicle );
 
 	// NOTE: The model has to be set before we can spawn vehicle physics
 	BaseClass::Spawn();
 	GetEngineObject()->SetCollisionGroup( COLLISION_GROUP_VEHICLE );
 
-	m_VehiclePhysics.Spawn();
-	if (!m_VehiclePhysics.Initialize( STRING(m_vehicleScript), m_nVehicleType ))
+	GetEngineVehicle()->Spawn();
+	if (!GetEngineVehicle()->Initialize( STRING(m_vehicleScript), m_nVehicleType ))
 		return;
 	GetEngineObject()->SetNextThink( gpGlobals->curtime );
 
@@ -124,8 +124,8 @@ CON_COMMAND(vehicle_flushscript, "Flush and reload all vehicle scripts")
 //-----------------------------------------------------------------------------
 int CPropVehicle::Restore( IRestore &restore )
 {
-	CFourWheelServerVehicle *pServerVehicle = dynamic_cast<CFourWheelServerVehicle*>(GetServerVehicle());
-	m_VehiclePhysics.SetOuter( this, pServerVehicle );
+	//CFourWheelServerVehicle *pServerVehicle = dynamic_cast<CFourWheelServerVehicle*>(GetServerVehicle());
+	//GetPhysics()->SetOuter( this, pServerVehicle );
 	return BaseClass::Restore( restore );
 }
 
@@ -143,7 +143,7 @@ void CPropVehicle::Teleport( const Vector *newPosition, const QAngle *newAngles,
 	// Calculate the relative transform of the teleport
 	matrix3x4_t xform;
 	ConcatTransforms(GetEngineObject()->EntityToWorldTransform(), startMatrixInv, xform );
-	m_VehiclePhysics.Teleport( xform );
+	GetEngineVehicle()->Teleport( xform );
 }
 
 //-----------------------------------------------------------------------------
@@ -153,7 +153,7 @@ void CPropVehicle::DrawDebugGeometryOverlays()
 {
 	if (m_debugOverlays & OVERLAY_BBOX_BIT) 
 	{	
-		m_VehiclePhysics.DrawDebugGeometryOverlays();
+		GetEngineVehicle()->DrawDebugGeometryOverlays();
 	}
 	BaseClass::DrawDebugGeometryOverlays();
 }
@@ -166,7 +166,7 @@ int CPropVehicle::DrawDebugTextOverlays()
 	int nOffset = BaseClass::DrawDebugTextOverlays();
 	if (m_debugOverlays & OVERLAY_TEXT_BIT) 
 	{
-		nOffset = m_VehiclePhysics.DrawDebugTextOverlays( nOffset );
+		nOffset = GetEngineVehicle()->DrawDebugTextOverlays( nOffset );
 	}
 	return nOffset;
 }
@@ -197,7 +197,7 @@ void CPropVehicle::OnPhysGunPickup( CBasePlayer *pPhysGunUser, PhysGunPickup_t r
 //-----------------------------------------------------------------------------
 void CPropVehicle::InputThrottle( inputdata_t &inputdata )
 {
-	m_VehiclePhysics.SetThrottle( inputdata.value.Float() );
+	GetEngineVehicle()->SetThrottle( inputdata.value.Float() );
 }
 
 //-----------------------------------------------------------------------------
@@ -205,7 +205,7 @@ void CPropVehicle::InputThrottle( inputdata_t &inputdata )
 //-----------------------------------------------------------------------------
 void CPropVehicle::InputSteering( inputdata_t &inputdata )
 {
-	m_VehiclePhysics.SetSteering( inputdata.value.Float(), 2*gpGlobals->frametime );
+	GetEngineVehicle()->SetSteering( inputdata.value.Float(), 2*gpGlobals->frametime );
 }
 
 //-----------------------------------------------------------------------------
@@ -213,17 +213,17 @@ void CPropVehicle::InputSteering( inputdata_t &inputdata )
 //-----------------------------------------------------------------------------
 void CPropVehicle::InputAction( inputdata_t &inputdata )
 {
-	m_VehiclePhysics.SetAction( inputdata.value.Float() );
+	GetEngineVehicle()->SetAction( inputdata.value.Float() );
 }
 
 void CPropVehicle::InputHandBrakeOn( inputdata_t &inputdata )
 {
-	m_VehiclePhysics.SetHandbrake( true );
+	GetEngineVehicle()->SetHandbrake( true );
 }
 
 void CPropVehicle::InputHandBrakeOff( inputdata_t &inputdata )
 {
-	m_VehiclePhysics.ReleaseHandbrake();
+	GetEngineVehicle()->ReleaseHandbrake();
 }
 
 //-----------------------------------------------------------------------------
@@ -231,7 +231,7 @@ void CPropVehicle::InputHandBrakeOff( inputdata_t &inputdata )
 //-----------------------------------------------------------------------------
 void CPropVehicle::Think()
 {
-	m_VehiclePhysics.Think();
+	GetEngineVehicle()->Think();
 
 	// Derived classes of CPropVehicle have their own code to determine how frequently to think.
 	// But the prop_vehicle entity native to this class will only think one time, so this flag
@@ -259,7 +259,7 @@ void CPropVehicle::VPhysicsUpdate( IPhysicsObject *pPhysics )
 	m_vecSmoothedVelocity = m_vecSmoothedVelocity * SMOOTHING_FACTOR + velocity * ( 1 - SMOOTHING_FACTOR );
 
 	// must be a wheel
-	if (!m_VehiclePhysics.VPhysicsUpdate( pPhysics ))
+	if (!GetEngineVehicle()->VPhysicsUpdate( pPhysics ))
 		return;
 	
 	BaseClass::VPhysicsUpdate( pPhysics );
@@ -606,7 +606,7 @@ void CPropVehicleDriveable::EnterVehicle( CBaseCombatCharacter *pPassenger )
 		// Clear our state
 		this->InitViewSmoothing( pPlayer->GetEngineObject()->GetAbsOrigin() + vecViewOffset, pPlayer->EyeAngles() );
 
-		m_VehiclePhysics.GetVehicle()->OnVehicleEnter();
+		GetEngineVehicle()->GetVehicle()->OnVehicleEnter();
 	}
 	else
 	{
@@ -638,7 +638,7 @@ void CPropVehicleDriveable::ExitVehicle( int nRole )
 
 	StopEngine();
 
-	m_VehiclePhysics.GetVehicle()->OnVehicleExit();
+	GetEngineVehicle()->GetVehicle()->OnVehicleExit();
 
 	// Clear our state
 	this->InitViewSmoothing( vec3_origin, vec3_angle );
@@ -671,13 +671,13 @@ void CPropVehicleDriveable::DriveVehicle( float flFrameTime, CUserCmd *ucmd, int
 {
 	int iButtons = ucmd->buttons;
 
-	m_VehiclePhysics.UpdateDriverControls( ucmd, flFrameTime );
+	GetEngineVehicle()->UpdateDriverControls( ucmd, flFrameTime );
 
-	m_nSpeed = m_VehiclePhysics.GetSpeed();	//send speed to client
-	m_nRPM = clamp( m_VehiclePhysics.GetRPM(), 0, 4095 );
-	m_nBoostTimeLeft = m_VehiclePhysics.BoostTimeLeft();
-	m_nHasBoost = m_VehiclePhysics.HasBoost();
-	m_flThrottle = m_VehiclePhysics.GetThrottle();
+	m_nSpeed = GetEngineVehicle()->GetSpeed();	//send speed to client
+	m_nRPM = clamp(GetEngineVehicle()->GetRPM(), 0, 4095 );
+	m_nBoostTimeLeft = GetEngineVehicle()->BoostTimeLeft();
+	m_nHasBoost = GetEngineVehicle()->HasBoost();
+	m_flThrottle = GetEngineVehicle()->GetThrottle();
 
 	m_nScannerDisabledWeapons = false;		// off for now, change once we have scanners
 	m_nScannerDisabledVehicle = false;		// off for now, change once we have scanners
@@ -832,7 +832,7 @@ void CPropVehicleDriveable::InputTurnOn( inputdata_t &inputdata )
 	m_bEngineLocked = false;
 
 	StartEngine();
-	m_VehiclePhysics.SetDisableEngine( false );
+	GetEngineVehicle()->SetDisableEngine( false );
 
 }
 
@@ -844,7 +844,7 @@ void CPropVehicleDriveable::InputTurnOff( inputdata_t &inputdata )
 	m_bEngineLocked = true;
 
 	StopEngine();
-	m_VehiclePhysics.SetDisableEngine( true );
+	GetEngineVehicle()->SetDisableEngine( true );
 }
 
 //-----------------------------------------------------------------------------
@@ -852,7 +852,7 @@ void CPropVehicleDriveable::InputTurnOff( inputdata_t &inputdata )
 //-----------------------------------------------------------------------------
 bool CPropVehicleDriveable::IsEngineOn( void )
 {
-	return m_VehiclePhysics.IsOn();
+	return GetEngineVehicle()->IsOn();
 }
 
 //-----------------------------------------------------------------------------
@@ -862,11 +862,11 @@ void CPropVehicleDriveable::StartEngine( void )
 {
 	if ( m_bEngineLocked )
 	{
-		m_VehiclePhysics.SetHandbrake( true );
+		GetEngineVehicle()->SetHandbrake( true );
 		return;
 	}
 
-	m_VehiclePhysics.TurnOn();
+	GetEngineVehicle()->TurnOn();
 }
 
 //-----------------------------------------------------------------------------
@@ -874,7 +874,7 @@ void CPropVehicleDriveable::StartEngine( void )
 //-----------------------------------------------------------------------------
 void CPropVehicleDriveable::StopEngine( void )
 {
-	m_VehiclePhysics.TurnOff();
+	GetEngineVehicle()->TurnOff();
 }
 
 //-----------------------------------------------------------------------------
@@ -956,7 +956,7 @@ void CPropVehicleDriveable::VPhysicsCollision( int index, gamevcollisionevent_t 
 
 int CPropVehicleDriveable::VPhysicsGetObjectList( IPhysicsObject **pList, int listMax )
 {
-	return GetPhysics()->VPhysicsGetObjectList( pList, listMax );
+	return GetEngineVehicle()->VPhysicsGetObjectList( pList, listMax );
 }
 
 //-----------------------------------------------------------------------------
@@ -1166,7 +1166,7 @@ void CFourWheelServerVehicle::GetVehicleViewPosition( int nRole, Vector *pAbsOri
 //-----------------------------------------------------------------------------
 const vehicleparams_t *CFourWheelServerVehicle::GetVehicleParams( void )
 { 
-	return &GetFourWheelVehiclePhysics()->GetVehicleParams(); 
+	return &GetEngineVehicle()->GetVehicleParams();
 }
 
 //-----------------------------------------------------------------------------
@@ -1174,7 +1174,7 @@ const vehicleparams_t *CFourWheelServerVehicle::GetVehicleParams( void )
 //-----------------------------------------------------------------------------
 const vehicle_operatingparams_t	*CFourWheelServerVehicle::GetVehicleOperatingParams( void )
 {
-	return &GetFourWheelVehiclePhysics()->GetVehicleOperatingParams();
+	return &GetEngineVehicle()->GetVehicleOperatingParams();
 }
 
 //-----------------------------------------------------------------------------
@@ -1182,12 +1182,12 @@ const vehicle_operatingparams_t	*CFourWheelServerVehicle::GetVehicleOperatingPar
 //-----------------------------------------------------------------------------
 const vehicle_controlparams_t *CFourWheelServerVehicle::GetVehicleControlParams( void )
 {
-	return &GetFourWheelVehiclePhysics()->GetVehicleControls();
+	return &GetEngineVehicle()->GetVehicleControls();
 }
 
 IPhysicsVehicleController *CFourWheelServerVehicle::GetVehicleController()
 {
-	return GetFourWheelVehiclePhysics()->GetVehicleController();
+	return GetEngineVehicle()->GetVehicleController();
 }
 
 //-----------------------------------------------------------------------------
@@ -1201,11 +1201,11 @@ CPropVehicleDriveable *CFourWheelServerVehicle::GetFourWheelVehicle( void )
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-CFourWheelVehiclePhysics *CFourWheelServerVehicle::GetFourWheelVehiclePhysics( void )
-{
-	CPropVehicleDriveable *pVehicle = GetFourWheelVehicle();
-	return pVehicle->GetPhysics();
-}
+//CFourWheelVehiclePhysics *CFourWheelServerVehicle::GetFourWheelVehiclePhysics( void )
+//{
+//	CPropVehicleDriveable *pVehicle = GetFourWheelVehicle();
+//	return pVehicle->GetPhysics();
+//}
 
 //-----------------------------------------------------------------------------
 // Purpose: 
@@ -1315,7 +1315,7 @@ void CFourWheelServerVehicle::NPC_DriveVehicle( void )
 	m_nPrevNPCButtons = m_nNPCButtons;
 
 	// NPC's cheat by using analog steering.
-	GetFourWheelVehiclePhysics()->SetSteering( m_flTurnDegrees, 0 );
+	GetEngineVehicle()->SetSteering( m_flTurnDegrees, 0 );
 
 	// Clear out attack buttons each frame
 	m_nNPCButtons &= ~IN_ATTACK;
@@ -1330,7 +1330,7 @@ void CFourWheelServerVehicle::NPC_DriveVehicle( void )
 bool CFourWheelServerVehicle::GetWheelContactPoint( int nWheelIndex, Vector &vecPos )
 {
 	// Dig through a couple layers to get to our data
-	CFourWheelVehiclePhysics  *pVehiclePhysics = GetFourWheelVehiclePhysics();
+	IEngineVehicleServer  *pVehiclePhysics = GetEngineVehicle();
 	if ( pVehiclePhysics )
 	{
 		IPhysicsVehicleController *pVehicleController = pVehiclePhysics->GetVehicle();

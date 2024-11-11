@@ -102,7 +102,7 @@ void CPropVehicleViewController::EnterVehicle( CBasePlayer *pPlayer )
 	// Start Thinking
 	GetEngineObject()->SetNextThink( gpGlobals->curtime );
 
-	m_VehiclePhysics.GetVehicle()->OnVehicleEnter();
+	GetEngineVehicle()->GetVehicle()->OnVehicleEnter();
 
 	// Stop the player sprint and flashlight.
 	CHL2_Player *pHL2Player = dynamic_cast<CHL2_Player*>( pPlayer );

@@ -25,6 +25,7 @@
 #include "globalstate.h"
 #include "vphysics/player_controller.h"
 #include "ragdoll_shared.h"
+#include "iservervehicle.h"
 
 //class CBaseEntity;
 // We can only ever move 512 entities across a transition
@@ -765,7 +766,7 @@ public:
 	int		SelectHeaviestSequence(int activity);
 
 	void							ClearRagdoll();
-	virtual void VPhysicsUpdate(IPhysicsObject* pPhysics);
+	virtual bool VPhysicsUpdate(IPhysicsObject* pPhysics);
 	void InitRagdoll(const Vector& forceVector, int forceBone, const Vector& forcePos, matrix3x4_t* pPrevBones, matrix3x4_t* pBoneToWorld, float dt, int collisionGroup, bool activateRagdoll, bool bWakeRagdoll = true);
 
 	virtual int RagdollBoneCount() const { return m_ragdoll.listCount; }
@@ -1805,6 +1806,210 @@ private:
 
 };
 
+
+#define DUST_SPEED			5		// speed at which dust starts
+#define REAR_AXLE			1		// indexes of axlex
+#define	FRONT_AXLE			0
+#define MAX_GUAGE_SPEED		100.0	// 100 mph is max speed shown on guage
+
+#define BRAKE_MAX_VALUE				1.0f
+#define BRAKE_BACK_FORWARD_SCALAR	2.0f
+// in/sec to miles/hour
+#define INS2MPH_SCALE	( 3600 * (1/5280.0f) * (1/12.0f) )
+#define INS2MPH(x)		( (x) * INS2MPH_SCALE )
+#define MPH2INS(x)		( (x) * (1/INS2MPH_SCALE) )
+
+#define ROLL_CURVE_ZERO		5		// roll less than this is clamped to zero
+#define ROLL_CURVE_LINEAR	45		// roll greater than this is copied out
+
+#define PITCH_CURVE_ZERO		10	// pitch less than this is clamped to zero
+#define PITCH_CURVE_LINEAR		45	// pitch greater than this is copied out
+
+#define STICK_EXTENTS	400.0f
+
+// the tires are considered to be skidding if they have sliding velocity of 10 in/s or more
+const float DEFAULT_SKID_THRESHOLD = 10.0f;
+
+float RemapAngleRange(float startInterval, float endInterval, float value);
+
+class CEngineVehicleInternal : public CEngineObjectInternal, public IEngineVehicleServer {
+public:
+	DECLARE_DATADESC();
+	DECLARE_CLASS(CEngineVehicleInternal, CEngineObjectInternal);
+	CEngineVehicleInternal();
+	~CEngineVehicleInternal();
+
+	// Call Precache + Spawn from the containing entity's Precache + Spawn methods
+	void Spawn();
+	//void SetOuter(CBaseAnimating* pOuter, CFourWheelServerVehicle* pServerVehicle);
+
+	// Initializes the vehicle physics so we can drive it
+	bool Initialize(const char* pScriptName, unsigned int nVehicleType);
+
+	void Teleport(matrix3x4_t& relativeTransform);
+	bool VPhysicsUpdate(IPhysicsObject* pPhysics);
+	bool Think();
+	void PlaceWheelDust(int wheelIndex, bool ignoreSpeed = false);
+
+	void DrawDebugGeometryOverlays();
+	int DrawDebugTextOverlays(int nOffset);
+
+	// Updates the controls based on user input
+	void UpdateDriverControls(CUserCmd* cmd, float flFrameTime);
+
+	// Various steering parameters
+	void SetThrottle(float flThrottle);
+	void SetMaxThrottle(float flMaxThrottle);
+	void SetMaxReverseThrottle(float flMaxThrottle);
+	void SetSteering(float flSteering, float flSteeringRate);
+	void SetSteeringDegrees(float flDegrees);
+	void SetAction(float flAction);
+	void TurnOn();
+	void TurnOff();
+	void ReleaseHandbrake();
+	void SetHandbrake(bool bBrake);
+	bool IsOn() const { return m_bIsOn; }
+	void ResetControls();
+	void SetBoost(float flBoost);
+	bool UpdateBooster(void);
+	void SetHasBrakePedal(bool bHasBrakePedal);
+
+	// Engine
+	void SetDisableEngine(bool bDisable);
+	bool IsEngineDisabled(void) { return m_pVehicle->IsEngineDisabled(); }
+
+	// Enable/Disable Motion
+	void EnableMotion(void);
+	void DisableMotion(void);
+
+	// Shared code to compute the vehicle view position
+	void GetVehicleViewPosition(const char* pViewAttachment, float flPitchFactor, Vector* pAbsPosition, QAngle* pAbsAngles);
+
+	IPhysicsObject* GetWheel(int iWheel) { return m_pWheels[iWheel]; }
+
+	int	GetSpeed() const;
+	int GetMaxSpeed() const;
+	int GetRPM() const;
+	float GetThrottle() const;
+	bool HasBoost() const;
+	int BoostTimeLeft() const;
+	bool IsBoosting(void);
+	float GetHLSpeed() const;
+	float GetSteering() const;
+	float GetSteeringDegrees() const;
+	IPhysicsVehicleController* GetVehicle(void) { return m_pVehicle; }
+	float GetWheelBaseHeight(int wheelIndex) { return m_wheelBaseHeight[wheelIndex]; }
+	float GetWheelTotalHeight(int wheelIndex) { return m_wheelTotalHeight[wheelIndex]; }
+
+	IPhysicsVehicleController* GetVehicleController() { return m_pVehicle; }
+	const vehicleparams_t& GetVehicleParams(void) { return m_pVehicle->GetVehicleParams(); }
+	const vehicle_controlparams_t& GetVehicleControls(void) { return m_controls; }
+	const vehicle_operatingparams_t& GetVehicleOperatingParams(void) { return m_pVehicle->GetOperatingParams(); }
+
+	int VPhysicsGetObjectList(IPhysicsObject** pList, int listMax);
+
+private:
+	IServerVehicle* GetOuterServerVehicle() {
+		return dynamic_cast<IServerVehicle*>(m_pOuter);
+	}
+	// engine sounds
+	void CalcWheelData(vehicleparams_t& vehicle);
+
+	void SteeringRest(float carSpeed, const vehicleparams_t& vehicleData);
+	void SteeringTurn(float carSpeed, const vehicleparams_t& vehicleData, bool bTurnLeft, bool bBrake, bool bThrottle);
+	void SteeringTurnAnalog(float carSpeed, const vehicleparams_t& vehicleData, float sidemove);
+
+	// A couple wrapper methods to perform common operations
+	//int		LookupPoseParameter(const char* szName);
+	//float	GetPoseParameter(int iParameter);
+	//float	SetPoseParameter(int iParameter, float flValue);
+	bool	GetAttachment(const char* szName, Vector& origin, QAngle& angles);
+
+	void InitializePoseParameters();
+	bool ParseVehicleScript(const char* pScriptName, solid_t& solid, vehicleparams_t& vehicle);
+private:
+	// This is the entity that contains this class
+	//CHandle<CBaseAnimating>		m_pOuter;
+	//CFourWheelServerVehicle* m_pOuterServerVehicle;
+
+	vehicle_controlparams_t		m_controls;
+	IPhysicsVehicleController* m_pVehicle;
+
+	// Vehicle state info
+	int					m_nSpeed;
+	int					m_nLastSpeed;
+	int					m_nRPM;
+	float				m_fLastBoost;
+	int					m_nBoostTimeLeft;
+	int					m_nHasBoost;
+
+	float				m_maxThrottle;
+	float				m_flMaxRevThrottle;
+	float				m_flMaxSpeed;
+	float				m_actionSpeed;
+	IPhysicsObject*		m_pWheels[4];
+
+	int					m_wheelCount;
+
+	Vector				m_wheelPosition[4];
+	QAngle				m_wheelRotation[4];
+	float				m_wheelBaseHeight[4];
+	float				m_wheelTotalHeight[4];
+	int					m_poseParameters[12];
+	float				m_actionValue;
+	float				m_actionScale;
+	float				m_debugRadius;
+	float				m_throttleRate;
+	float				m_throttleStartTime;
+	float				m_throttleActiveTime;
+	float				m_turboTimer;
+
+	float				m_flVehicleVolume;		// NPC driven vehicles used louder sounds
+	bool				m_bIsOn;
+	bool				m_bLastThrottle;
+	bool				m_bLastBoost;
+	bool				m_bLastSkid;
+};
+
+
+//-----------------------------------------------------------------------------
+// Physics state..
+//-----------------------------------------------------------------------------
+inline int CEngineVehicleInternal::GetSpeed() const
+{
+	return m_nSpeed;
+}
+
+inline int CEngineVehicleInternal::GetMaxSpeed() const
+{
+	return INS2MPH(m_pVehicle->GetVehicleParams().engine.maxSpeed);
+}
+
+inline int CEngineVehicleInternal::GetRPM() const
+{
+	return m_nRPM;
+}
+
+inline float CEngineVehicleInternal::GetThrottle() const
+{
+	return m_controls.throttle;
+}
+
+inline bool CEngineVehicleInternal::HasBoost() const
+{
+	return m_nHasBoost != 0;
+}
+
+inline int CEngineVehicleInternal::BoostTimeLeft() const
+{
+	return m_nBoostTimeLeft;
+}
+
+//inline void CEngineVehicleInternal::SetOuter(CBaseAnimating* pOuter, CFourWheelServerVehicle* pServerVehicle)
+//{
+//	m_pOuter = pOuter;
+//	m_pOuterServerVehicle = pServerVehicle;
+//}
 
 //-----------------------------------------------------------------------------
 // Utilities entities can use when saving
@@ -3111,6 +3316,9 @@ inline CBaseEntity* CGlobalEntityList<T>::CreateEntityByName(const char* classNa
 		break;
 	case ENGINEOBJECT_SHADOWCLONE:
 		m_EngineObjectArray[iForceEdictIndex] = new CEngineShadowCloneInternal();
+		break;
+	case ENGINEOBJECT_VEHICLE:
+		m_EngineObjectArray[iForceEdictIndex] = new CEngineVehicleInternal();
 		break;
 	default:
 		Error("GetEngineObjectType error!\n");

@@ -644,8 +644,8 @@ void CPropAPC::Think( void )
 	if ( !m_bInitialHandbrake )	// after initial timer expires, set the handbrake
 	{
 		m_bInitialHandbrake = true;
-		m_VehiclePhysics.SetHandbrake( true );
-		m_VehiclePhysics.Think();
+		GetEngineVehicle()->SetHandbrake( true );
+		GetEngineVehicle()->Think();
 	}
 
 	StudioFrameAdvance();

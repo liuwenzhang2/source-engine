@@ -563,6 +563,11 @@ public:
 	virtual void				ClearHoleShapeCollideable() = 0;
 };
 
+class IEngineVehicleClient {
+public:
+
+};
+
 //-----------------------------------------------------------------------------
 // Purpose: All client entities must implement this interface.
 //-----------------------------------------------------------------------------

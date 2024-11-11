@@ -14,12 +14,37 @@
 
 #include "IVehicle.h"
 #include "vphysics/vehicles.h"
+#include "vehicle_sounds.h"
 
 class CBaseEntity;
 class CBasePlayer;
 class CBaseCombatCharacter;
 class CNPC_VehicleDriver;
 enum VehicleSeatQuery_e;
+
+struct vbs_sound_update_t
+{
+	float	flFrameTime;
+	float	flCurrentSpeedFraction;
+	float	flWorldSpaceSpeed;
+	bool	bThrottleDown;
+	bool	bReverse;
+	bool	bTurbo;
+	bool	bVehicleInWater;
+	bool	bExitVehicle;
+
+	void Defaults()
+	{
+		flFrameTime = gpGlobals->frametime;
+		flCurrentSpeedFraction = 0;
+		flWorldSpaceSpeed = 0;
+		bThrottleDown = false;
+		bReverse = false;
+		bTurbo = false;
+		bVehicleInWater = false;
+		bExitVehicle = false;
+	}
+};
 
 // This is used by the player to access vehicles. It's an interface so the
 // vehicles are not restricted in what they can derive from.
@@ -105,6 +130,15 @@ public:
 
 	// debugging, script file flushed
 	virtual void			ReloadScript() = 0;
+
+	virtual void			PlaySound(vehiclesound iSound) = 0;
+	virtual void			StopSound(vehiclesound iSound) = 0;
+	virtual void			SoundStart() = 0;
+	virtual void			SoundUpdate(vbs_sound_update_t& params) = 0;
+	virtual void			SoundShutdown(float flFadeTime = 0.0) = 0;
+	virtual void			DampenEyePosition(Vector& vecVehicleEyePos, QAngle& vecVehicleEyeAngles) = 0;
+	virtual bool			IsVehicleBodyInWater(void) = 0;
+
 };
 
 // This is an interface to derive from if your class contains an IServerVehicle 
@@ -115,7 +149,7 @@ public:
 	virtual CBaseEntity		*GetDriver( void ) = 0;
 
 	// Process movement
-	virtual void			ItemPostFrame( CBasePlayer *pPlayer ) = 0;
+	//virtual void			ItemPostFrame( CBasePlayer *pPlayer ) = 0;
 	virtual void			SetupMove( CBasePlayer *player, CUserCmd *ucmd, IMoveHelper *pHelper, CMoveData *move ) = 0;
 	virtual void			ProcessMovement( CBasePlayer *pPlayer, CMoveData *pMoveData ) = 0;
 	virtual void			FinishMove( CBasePlayer *player, CUserCmd *ucmd, CMoveData *move ) = 0;
@@ -133,7 +167,7 @@ public:
 	virtual bool			AllowMidairExit( CBaseCombatCharacter *pPassenger, int nRole ) = 0;
 	virtual string_t		GetVehicleScriptName() = 0;
 
-	virtual bool			PassengerShouldReceiveDamage( CTakeDamageInfo &info ) = 0;
+	//virtual bool			PassengerShouldReceiveDamage( CTakeDamageInfo &info ) = 0;
 };
 
 #endif // IVEHICLE_H

@@ -15,30 +15,6 @@
 
 class CSoundPatch;
 
-struct vbs_sound_update_t
-{
-	float	flFrameTime;
-	float	flCurrentSpeedFraction;
-	float	flWorldSpaceSpeed;
-	bool	bThrottleDown;
-	bool	bReverse;
-	bool	bTurbo;
-	bool	bVehicleInWater;
-	bool	bExitVehicle;
-
-	void Defaults()
-	{
-		flFrameTime = gpGlobals->frametime;
-		flCurrentSpeedFraction = 0;
-		flWorldSpaceSpeed = 0;
-		bThrottleDown = false;
-		bReverse = false;
-		bTurbo = false;
-		bVehicleInWater = false;
-		bExitVehicle = false;
-	}
-};
-
 // -----------------------------------------
 //  Information about the passenger in the car 
 // -----------------------------------------
@@ -208,6 +184,7 @@ public:
 	virtual CBaseCombatCharacter		*NPC_GetPassengerInSeat( int nRoleID, int nSeatID );
 
 	Vector	GetSavedViewOffset( void ) { return m_savedViewOffset; }
+	virtual void DampenEyePosition(Vector& vecVehicleEyePos, QAngle& vecVehicleEyeAngles) {}
 
 private:
 

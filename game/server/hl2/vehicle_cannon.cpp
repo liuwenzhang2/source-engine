@@ -94,7 +94,7 @@ public:
 
 	//IDrivableVehicle's Pure Virtuals
 	virtual CBaseEntity *GetDriver( void );
-	virtual void		ItemPostFrame( CBasePlayer *pPlayer );
+	//virtual void		ItemPostFrame( CBasePlayer *pPlayer );
 	virtual void		SetupMove( CBasePlayer *player, CUserCmd *ucmd, IMoveHelper *pHelper, CMoveData *move );
 	virtual void		ProcessMovement( CBasePlayer *pPlayer, CMoveData *pMoveData ) { return; }
 	virtual void		FinishMove( CBasePlayer *player, CUserCmd *ucmd, CMoveData *move ) { return; }
@@ -488,10 +488,10 @@ void CPropCannon::RunCraneMovement( float flTime )
 // Purpose: 
 // Input  : *player - 
 //-----------------------------------------------------------------------------
-void CPropCannon::ItemPostFrame( CBasePlayer *player )
-{
-
-}
+//void CPropCannon::ItemPostFrame( CBasePlayer *player )
+//{
+//
+//}
 
 void CPropCannon::ProjectileExplosion( void )
 {

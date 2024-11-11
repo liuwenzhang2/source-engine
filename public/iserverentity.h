@@ -38,6 +38,10 @@ struct ragdoll_t;
 struct PS_SD_Static_World_StaticProps_ClippedProp_t;
 struct PS_InternalData_t;
 struct PS_SD_Static_SurfaceProperties_t;
+class CUserCmd;
+struct vehicleparams_t;
+struct vehicle_controlparams_t;
+struct vehicle_operatingparams_t;
 
 struct servertouchlink_t
 {
@@ -448,7 +452,7 @@ public:
 	virtual void GetAngleOverrideFromCurrentState(char* pOut, int size) = 0;
 	virtual void RagdollBone(bool* boneSimulated, CBoneAccessor& pBoneToWorld) = 0;
 	virtual void UpdateNetworkDataFromVPhysics(int index) = 0;
-	virtual void VPhysicsUpdate(IPhysicsObject* pPhysics) = 0;
+	virtual bool VPhysicsUpdate(IPhysicsObject* pPhysics) = 0;
 	virtual bool GetAllAsleep() = 0;
 	virtual IPhysicsConstraintGroup* GetConstraintGroup() = 0;
 	virtual ragdoll_t* GetRagdoll(void) = 0;
@@ -534,6 +538,78 @@ public:
 	virtual void			PartialSync(bool bPullChanges) = 0;
 	//given a physics object that is part of this clone, tells you which physics object in the source
 	virtual IPhysicsObject* TranslatePhysicsToClonedEnt(const IPhysicsObject* pPhysics) = 0;
+};
+
+class IEngineVehicleServer {
+public:
+	// Call Precache + Spawn from the containing entity's Precache + Spawn methods
+	virtual void Spawn() = 0;
+	//void SetOuter(CBaseAnimating* pOuter, CFourWheelServerVehicle* pServerVehicle);
+
+	// Initializes the vehicle physics so we can drive it
+	virtual bool Initialize(const char* pScriptName, unsigned int nVehicleType) = 0;
+
+	virtual void Teleport(matrix3x4_t& relativeTransform) = 0;
+	virtual bool VPhysicsUpdate(IPhysicsObject* pPhysics) = 0;
+	virtual bool Think() = 0;
+	virtual void PlaceWheelDust(int wheelIndex, bool ignoreSpeed = false) = 0;
+
+	virtual void DrawDebugGeometryOverlays() = 0;
+	virtual int DrawDebugTextOverlays(int nOffset) = 0;
+
+	// Updates the controls based on user input
+	virtual void UpdateDriverControls(CUserCmd* cmd, float flFrameTime) = 0;
+
+	// Various steering parameters
+	virtual void SetThrottle(float flThrottle) = 0;
+	virtual void SetMaxThrottle(float flMaxThrottle) = 0;
+	virtual void SetMaxReverseThrottle(float flMaxThrottle) = 0;
+	virtual void SetSteering(float flSteering, float flSteeringRate) = 0;
+	virtual void SetSteeringDegrees(float flDegrees) = 0;
+	virtual void SetAction(float flAction) = 0;
+	virtual void TurnOn() = 0;
+	virtual void TurnOff() = 0;
+	virtual void ReleaseHandbrake() = 0;
+	virtual void SetHandbrake(bool bBrake) = 0;
+	virtual bool IsOn() const = 0;
+	virtual void ResetControls() = 0;
+	virtual void SetBoost(float flBoost) = 0;
+	virtual bool UpdateBooster(void) = 0;
+	virtual void SetHasBrakePedal(bool bHasBrakePedal) = 0;
+
+	// Engine
+	virtual void SetDisableEngine(bool bDisable) = 0;
+	virtual bool IsEngineDisabled(void) = 0;
+
+	// Enable/Disable Motion
+	virtual void EnableMotion(void) = 0;
+	virtual void DisableMotion(void) = 0;
+
+	// Shared code to compute the vehicle view position
+	virtual void GetVehicleViewPosition(const char* pViewAttachment, float flPitchFactor, Vector* pAbsPosition, QAngle* pAbsAngles) = 0;
+
+	virtual IPhysicsObject* GetWheel(int iWheel) = 0;
+
+	virtual int	GetSpeed() const = 0;
+	virtual int GetMaxSpeed() const = 0;
+	virtual int GetRPM() const = 0;
+	virtual float GetThrottle() const = 0;
+	virtual bool HasBoost() const = 0;
+	virtual int BoostTimeLeft() const = 0;
+	virtual bool IsBoosting(void) = 0;
+	virtual float GetHLSpeed() const = 0;
+	virtual float GetSteering() const = 0;
+	virtual float GetSteeringDegrees() const = 0;
+	virtual IPhysicsVehicleController* GetVehicle(void) = 0;
+	virtual float GetWheelBaseHeight(int wheelIndex) = 0;
+	virtual float GetWheelTotalHeight(int wheelIndex) = 0;
+
+	virtual IPhysicsVehicleController* GetVehicleController() = 0;
+	virtual const vehicleparams_t& GetVehicleParams(void) = 0;
+	virtual const vehicle_controlparams_t& GetVehicleControls(void) = 0;
+	virtual const vehicle_operatingparams_t& GetVehicleOperatingParams(void) = 0;
+
+	virtual int VPhysicsGetObjectList(IPhysicsObject** pList, int listMax) = 0;
 };
 
 // This class is how the engine talks to entities in the game DLL.

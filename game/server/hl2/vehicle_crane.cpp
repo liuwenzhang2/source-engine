@@ -357,9 +357,9 @@ void CPropCrane::Think(void)
 // Purpose: 
 // Input  : *player - 
 //-----------------------------------------------------------------------------
-void CPropCrane::ItemPostFrame( CBasePlayer *player )
-{
-}
+//void CPropCrane::ItemPostFrame( CBasePlayer *player )
+//{
+//}
 
 //-----------------------------------------------------------------------------
 // Purpose: 

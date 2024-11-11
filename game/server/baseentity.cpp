@@ -365,7 +365,7 @@ extern bool g_bReceivedChainedUpdateOnRemove;
 //-----------------------------------------------------------------------------
 void CBaseEntity::UpdateOnRemove(void)
 {
-	Msg("%p ===== %s \n", this, GetClassName());
+	//Msg("%p ===== %s \n", this, GetClassName());
 
 	g_bReceivedChainedUpdateOnRemove = true;
 
@@ -530,6 +530,16 @@ IEngineShadowCloneServer* CBaseEntity::GetEngineShadowClone()
 const IEngineShadowCloneServer* CBaseEntity::GetEngineShadowClone() const
 {
 	return dynamic_cast<const IEngineShadowCloneServer*>(GetEngineObject());
+}
+
+IEngineVehicleServer* CBaseEntity::GetEngineVehicle()
+{
+	return dynamic_cast<IEngineVehicleServer*>(GetEngineObject());
+}
+
+const IEngineVehicleServer* CBaseEntity::GetEngineVehicle() const
+{
+	return dynamic_cast<const IEngineVehicleServer*>(GetEngineObject());
 }
 
 void CBaseEntity::Release() {

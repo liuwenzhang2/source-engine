@@ -1888,6 +1888,11 @@ public:
 
 };
 
+class C_EngineVehicleInternal : public C_EngineObjectInternal, public IEngineVehicleClient {
+public:
+
+};
+
 // Use this to iterate over *all* (even dormant) the C_BaseEntities in the client entity list.
 //class C_AllBaseEntityIterator
 //{
@@ -2447,6 +2452,9 @@ inline C_BaseEntity* CClientEntityList<T>::CreateEntityByName(const char* classN
 		break;
 	case ENGINEOBJECT_SHADOWCLONE:
 		m_EngineObjectArray[iForceEdictIndex] = new C_EngineShadowCloneInternal();
+		break;
+	case ENGINEOBJECT_VEHICLE:
+		m_EngineObjectArray[iForceEdictIndex] = new C_EngineVehicleInternal();
 		break;
 	default:
 		Error("GetEngineObjectType error!\n");

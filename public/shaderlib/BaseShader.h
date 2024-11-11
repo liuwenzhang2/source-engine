@@ -296,7 +296,7 @@ public:
 
 	~CShaderParam()
 	{
-		Msg("%s", "aaa");
+		//Msg("%s", "aaa");
 	}
 
 	const char* GetName()

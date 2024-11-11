@@ -1582,7 +1582,7 @@ void CBaseServerVehicle::ItemPostFrame( CBasePlayer *player )
 {
 	Assert( player == GetDriver() );
 
-	GetDrivableVehicle()->ItemPostFrame( player );
+	//GetDrivableVehicle()->ItemPostFrame( player );
 
 	if ( player->m_afButtonPressed & IN_USE )
 	{
@@ -2585,8 +2585,8 @@ void CBaseServerVehicle::ReloadScript()
 //-----------------------------------------------------------------------------
 bool CBaseServerVehicle::PassengerShouldReceiveDamage( CTakeDamageInfo &info )
 { 
-	if ( GetDrivableVehicle() )
-		return GetDrivableVehicle()->PassengerShouldReceiveDamage( info );
+	//if ( GetDrivableVehicle() )
+	//	return GetDrivableVehicle()->PassengerShouldReceiveDamage( info );
 
 	return true;
 }

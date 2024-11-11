@@ -81,7 +81,9 @@ public:
 
 	DECLARE_SERVERCLASS();
 	DECLARE_DATADESC();
-
+	CPropAirboat() {
+		int aaa = 0;
+	}
 	// CPropVehicle
 	virtual void	ProcessMovement( CBasePlayer *pPlayer, CMoveData *pMoveData );
 	virtual void	DriveVehicle( float flFrameTime, CUserCmd *ucmd, int iButtonsDown, int iButtonsReleased );
@@ -343,7 +345,7 @@ END_DATADESC()
 void CPropAirboat::Precache( void )
 {
 	BaseClass::Precache();
-
+	
 	g_pSoundEmitterSystem->PrecacheScriptSound( "Airboat_engine_stop" );
 	g_pSoundEmitterSystem->PrecacheScriptSound( "Airboat_engine_start" );
 
@@ -390,7 +392,7 @@ void CPropAirboat::Spawn( void )
 	// Handbrake data.
 	//m_flHandbrakeTime = gpGlobals->curtime + 0.1;
 	//m_bInitialHandbrake = false;
-	m_VehiclePhysics.SetHasBrakePedal( false );
+	GetEngineVehicle()->SetHasBrakePedal( false );
 
 	m_flMinimumSpeedToEnterExit = AIRBOAT_LOCK_SPEED;
 
@@ -674,7 +676,7 @@ void CPropAirboat::EnterVehicle( CBaseCombatCharacter *pPlayer )
 	params.m_pflSoundDuration = &flDuration;
 	params.m_bWarnOnDirectWaveReference = true;
 	g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
-	m_VehiclePhysics.TurnOn();
+	GetEngineVehicle()->TurnOn();
 
 	// Start playing the engine's idle sound as the startup sound finishes.
 	m_flEngineIdleTime = gpGlobals->curtime + flDuration - 0.1;
@@ -746,7 +748,7 @@ void CPropAirboat::ExitVehicle( int nRole )
 	ep.m_nPitch = controller.SoundGetPitch( m_pEngineSound );
 
 	g_pSoundEmitterSystem->EmitSound( filter, entindex(), ep );
-	m_VehiclePhysics.TurnOff();
+	GetEngineVehicle()->TurnOff();
 
 	// Shut off the airboat sounds.
 	controller.SoundChangeVolume( m_pEngineSound, 0.0, 0.0 );
@@ -1296,7 +1298,7 @@ void CPropAirboat::UpdatePropeller()
 //-----------------------------------------------------------------------------
 void CPropAirboat::UpdateGauge()
 {
-	CFourWheelVehiclePhysics *pPhysics = GetPhysics();
+	IEngineVehicleServer *pPhysics = GetEngineVehicle();
 	int speed = pPhysics->GetSpeed();
 	int maxSpeed = pPhysics->GetMaxSpeed();
 	float speedRatio = clamp( (float)speed / (float)maxSpeed, 0, 1 );
@@ -1549,7 +1551,7 @@ void CPropAirboat::UpdateSound()
 	CSoundEnvelopeController &controller = CSoundEnvelopeController::GetController();
 
 	// Sample the data that we need for sounds.
-	CFourWheelVehiclePhysics *pPhysics = GetPhysics();
+	IEngineVehicleServer *pPhysics = GetEngineVehicle();
 	int speed = pPhysics->GetSpeed();
 	int maxSpeed = pPhysics->GetMaxSpeed();
 	float speedRatio = clamp((float)speed / (float)maxSpeed, 0, 1);
@@ -1848,15 +1850,15 @@ void CPropAirboat::DriveVehicle( float flFrameTime, CUserCmd *ucmd, int iButtons
 		UpdateGunState( ucmd );
 	}
 
-	m_VehiclePhysics.UpdateDriverControls( ucmd, TICK_INTERVAL );
+	GetEngineVehicle()->UpdateDriverControls( ucmd, TICK_INTERVAL );
 
 	// Create splashes.
 	UpdateSplashEffects();
 
 	// Save this data.
-	m_flThrottle = m_VehiclePhysics.GetThrottle();
-	m_nSpeed = m_VehiclePhysics.GetSpeed();
-	m_nRPM = m_VehiclePhysics.GetRPM();
+	m_flThrottle = GetEngineVehicle()->GetThrottle();
+	m_nSpeed = GetEngineVehicle()->GetSpeed();
+	m_nRPM = GetEngineVehicle()->GetRPM();
 }
 
 
@@ -1875,7 +1877,7 @@ void CPropAirboat::ProcessMovement( CBasePlayer *pPlayer, CMoveData *pMoveData )
 		CreateDangerSounds();
 
 		// Play a sound around us to make NPCs pay attention to us
-		if ( m_VehiclePhysics.GetThrottle() > 0 )
+		if (GetEngineVehicle()->GetThrottle() > 0 )
 		{
 			CSoundEnt::InsertSound( SOUND_PLAYER_VEHICLE, pPlayer->GetEngineObject()->GetAbsOrigin(), 3500, 0.1f, pPlayer, SOUNDENT_CHANNEL_REPEATED_PHYSICS_DANGER );
 		}
@@ -1902,14 +1904,14 @@ void CPropAirboat::CreateDangerSounds( void )
 	GetVectors( &vecDir, &vecRight, NULL );
 
 	const float soundDuration = 0.25;
-	float speed = m_VehiclePhysics.GetHLSpeed();
+	float speed = GetEngineVehicle()->GetHLSpeed();
 
 	// Make danger sounds ahead of the vehicle
 	if ( fabs(speed) > 120 )
 	{
 		Vector	vecSpot;
 
-		float steering = m_VehiclePhysics.GetSteering();
+		float steering = GetEngineVehicle()->GetSteering();
 		if ( steering != 0 )
 		{
 			if ( speed > 0 )

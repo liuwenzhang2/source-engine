@@ -190,7 +190,7 @@ public:
 	virtual void PreExitVehicle( CBaseCombatCharacter *pPassenger, int nRole ) {}
 	virtual void ExitVehicle( int nRole );
 
-	virtual void ItemPostFrame( CBasePlayer *pPlayer ) {}
+	//virtual void ItemPostFrame( CBasePlayer *pPlayer ) {}
 	virtual void SetupMove( CBasePlayer *player, CUserCmd *ucmd, IMoveHelper *pHelper, CMoveData *move ) {}
 	virtual string_t GetVehicleScriptName() { return m_vehicleScript; }
 
@@ -823,7 +823,7 @@ void CChoreoGenericServerVehicle::ItemPostFrame( CBasePlayer *player )
 {
 	Assert( player == GetDriver() );
 
-	GetDrivableVehicle()->ItemPostFrame( player );
+	//GetDrivableVehicle()->ItemPostFrame( player );
 
 	if (( player->m_afButtonPressed & IN_USE ) || GetVehicle()->ShouldForceExit() )
 	{

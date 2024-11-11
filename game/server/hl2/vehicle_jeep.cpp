@@ -517,7 +517,7 @@ bool CPropJeep::CheckWater( void )
 	for ( int iWheel = 0; iWheel < JEEP_WHEEL_COUNT; ++iWheel )
 	{
 		// Get the current wheel and get its contact point.
-		IPhysicsObject *pWheel = m_VehiclePhysics.GetWheel( iWheel );
+		IPhysicsObject *pWheel = GetEngineVehicle()->GetWheel( iWheel );
 		if ( !pWheel )
 			continue;
 
@@ -547,16 +547,16 @@ bool CPropJeep::CheckWater( void )
 			m_bHasPoop = false;
 		}
 
-		if ( !m_VehiclePhysics.IsEngineDisabled() )
+		if ( !GetEngineVehicle()->IsEngineDisabled() )
 		{
-			m_VehiclePhysics.SetDisableEngine( true );
+			GetEngineVehicle()->SetDisableEngine( true );
 		}
 	}
 	else
 	{
-		if ( m_VehiclePhysics.IsEngineDisabled() )
+		if (GetEngineVehicle()->IsEngineDisabled() )
 		{
-			m_VehiclePhysics.SetDisableEngine( false );
+			GetEngineVehicle()->SetDisableEngine( false );
 		}
 	}
 
@@ -699,8 +699,8 @@ void CPropJeep::Think( void )
     if ( !m_bInitialHandbrake )	// after initial timer expires, set the handbrake
 	{
 		m_bInitialHandbrake = true;
-		m_VehiclePhysics.SetHandbrake( true );
-		m_VehiclePhysics.Think();
+		GetEngineVehicle()->SetHandbrake( true );
+		GetEngineVehicle()->Think();
 	}
 
 	// Check overturned status.
@@ -761,11 +761,11 @@ void CPropJeep::Think( void )
 	{
 		if ( m_bEnterAnimOn )
 		{
-			m_VehiclePhysics.ReleaseHandbrake();
+			GetEngineVehicle()->ReleaseHandbrake();
 			StartEngine();
 
 			// HACKHACK: This forces the jeep to play a sound when it gets entered underwater
-			if ( m_VehiclePhysics.IsEngineDisabled() )
+			if (GetEngineVehicle()->IsEngineDisabled() )
 			{
 				CBaseServerVehicle *pServerVehicle = dynamic_cast<CBaseServerVehicle *>(GetServerVehicle());
 				if ( pServerVehicle )
@@ -1390,14 +1390,14 @@ void CPropJeep::CreateDangerSounds( void )
 	GetVectors( &vecDir, &vecRight, NULL );
 
 	const float soundDuration = 0.25;
-	float speed = m_VehiclePhysics.GetHLSpeed();
+	float speed = GetEngineVehicle()->GetHLSpeed();
 
 	// Make danger sounds ahead of the jeep
 	if ( fabs(speed) > 120 )
 	{
 		Vector	vecSpot;
 
-		float steering = m_VehiclePhysics.GetSteering();
+		float steering = GetEngineVehicle()->GetSteering();
 		if ( steering != 0 )
 		{
 			if ( speed > 0 )
