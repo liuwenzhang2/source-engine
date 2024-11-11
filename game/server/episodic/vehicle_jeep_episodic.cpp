@@ -736,12 +736,12 @@ void CPropJeepEpisodic::UpdateWheelDust( void )
 	bool bAllowDust = vehicleData->steering.dustCloud;
 	
 	// Car must be active
-	bool bCarOn = m_VehiclePhysics.IsOn();
+	bool bCarOn = GetEngineVehicle()->IsOn();
 
 	// Must be moving quickly enough or skidding along the ground
 	bool bCreateDust = ( bCarOn &&
 						 bAllowDust && 
-					   ( m_VehiclePhysics.GetSpeed() >= MIN_WHEEL_DUST_SPEED || carState->skidSpeed > DEFAULT_SKID_THRESHOLD ) );
+					   (GetEngineVehicle()->GetSpeed() >= MIN_WHEEL_DUST_SPEED || carState->skidSpeed > DEFAULT_SKID_THRESHOLD ) );
 
 	// Update our wheel dust
 	Vector	vecPos;
@@ -1051,7 +1051,7 @@ void CPropJeepEpisodic::CreateAvoidanceZone( void )
 		return;
 
 	// Only do this when we're stopped
-	if ( m_VehiclePhysics.GetSpeed() > 5.0f )
+	if (GetEngineVehicle()->GetSpeed() > 5.0f )
 		return;
 
 	float flHullRadius = GetEngineObject()->BoundingRadius2D();
