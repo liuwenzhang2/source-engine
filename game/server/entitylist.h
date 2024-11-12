@@ -778,6 +778,9 @@ public:
 	bool GetAllAsleep() { return m_allAsleep; }
 	IPhysicsConstraintGroup* GetConstraintGroup() { return m_ragdoll.pGroup; }
 	ragdoll_t* GetRagdoll(void) { return &m_ragdoll; }
+
+	unsigned char GetRenderFX() { return m_nRenderFX; }
+	void SetRenderFX(unsigned char nRenderFX) { m_nRenderFX = nRenderFX; }
 public:
 	// Networking related methods
 	void NetworkStateChanged();
@@ -921,7 +924,8 @@ private:
 	Vector				m_ragdollMaxs[RAGDOLL_MAX_ELEMENTS];
 	string_t			m_anglesOverrideString;
 
-
+	// was pev->renderfx
+	CNetworkVar(unsigned char, m_nRenderFX);
 };
 
 inline PVSInfo_t* CEngineObjectInternal::GetPVSInfo()

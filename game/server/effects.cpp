@@ -518,7 +518,7 @@ void CGibShooter::InitPointGib( CGib *pGib, const Vector &vecShootDir, float flS
 				pSprite->SetOwnerEntity( pGib );
 
 				pSprite->SetScale( 1 );
-				pSprite->SetTransparency( m_nRenderMode, m_clrRender->r, m_clrRender->g, m_clrRender->b, m_clrRender->a, m_nRenderFX );
+				pSprite->SetTransparency( m_nRenderMode, m_clrRender->r, m_clrRender->g, m_clrRender->b, m_clrRender->a, GetEngineObject()->GetRenderFX() );
 				pSprite->AnimateForTime( 5, m_flGibLife + 1 ); //This framerate is totally wrong
 			}
 		}
@@ -759,7 +759,7 @@ CGib *CEnvShooter::CreateGib ( void )
 
 	pGib->m_nRenderMode = m_nRenderMode;
 	pGib->m_clrRender = m_clrRender;
-	pGib->m_nRenderFX = m_nRenderFX;
+	pGib->GetEngineObject()->SetRenderFX(GetEngineObject()->GetRenderFX());
 	pGib->GetEngineObject()->SetSkin(GetEngineObject()->GetSkin());
 	pGib->m_lifeTime = gpGlobals->curtime + m_flGibLife;
 

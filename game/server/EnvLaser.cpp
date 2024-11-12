@@ -66,7 +66,7 @@ void CEnvLaser::Spawn( void )
 	if ( m_pSprite )
 	{
 		m_pSprite->GetEngineObject()->SetParent(GetEngineObject()->GetMoveParent());
-		m_pSprite->SetTransparency( kRenderGlow, m_clrRender->r, m_clrRender->g, m_clrRender->b, m_clrRender->a, m_nRenderFX );
+		m_pSprite->SetTransparency( kRenderGlow, m_clrRender->r, m_clrRender->g, m_clrRender->b, m_clrRender->a, GetEngineObject()->GetRenderFX() );
 	}
 
 	if ( GetEntityName() != NULL_STRING && !(GetEngineObject()->GetSpawnFlags() & SF_BEAM_STARTON) )

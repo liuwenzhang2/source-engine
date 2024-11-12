@@ -143,7 +143,6 @@ void* CEntityNetworkProperty::GetDataTableBasePtr() {
 // This table encodes the CBaseEntity data.
 IMPLEMENT_SERVERCLASS_ST_NOBASE( CBaseEntity, DT_BaseEntity )
 	SendPropInt		(SENDINFO( m_ubInterpolationFrame ), NOINTERP_PARITY_MAX_BITS, SPROP_UNSIGNED ),
-	SendPropInt		(SENDINFO(m_nRenderFX),		8, SPROP_UNSIGNED ),
 	SendPropInt		(SENDINFO(m_nRenderMode),	8, SPROP_UNSIGNED ),
 	SendPropInt		(SENDINFO(m_clrRender),	32, SPROP_UNSIGNED),
 	SendPropInt		(SENDINFO(m_iTeamNum),		TEAMNUM_NUM_BITS, 0),
@@ -1480,7 +1479,7 @@ BEGIN_DATADESC_NO_BASE( CBaseEntity )
 	DEFINE_KEYFIELD( m_iHammerID, FIELD_INTEGER, "hammerid" ), // save ID numbers so that entities can be tracked between save/restore and vmf
 
 	DEFINE_KEYFIELD( m_flSpeed, FIELD_FLOAT, "speed" ),
-	DEFINE_KEYFIELD( m_nRenderFX, FIELD_CHARACTER, "renderfx" ),
+	//DEFINE_KEYFIELD( m_nRenderFX, FIELD_CHARACTER, "renderfx" ),
 	DEFINE_KEYFIELD( m_nRenderMode, FIELD_CHARACTER, "rendermode" ),
 
 	// Consider moving to CBaseAnimating?
@@ -2703,7 +2702,7 @@ void CBaseEntity::OnRestore()
 	//Don't create another one, just wait until is my time of being removed.
 	if (GetEngineObject()->GetFlags() & FL_TRANSRAGDOLL )
 	{
-		m_nRenderFX = kRenderFxNone;
+		GetEngineObject()->SetRenderFX(kRenderFxNone);
 		GetEngineObject()->AddEffects( EF_NODRAW );
 		GetEngineObject()->RemoveFlag( FL_DISSOLVING | FL_ONFIRE );
 	}

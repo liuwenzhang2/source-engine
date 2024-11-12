@@ -798,7 +798,7 @@ int CSprite::DrawModel( int flags )
 		m_hAttachedToEntity,	// attach to
 		m_nAttachment,			// attachment point
 		GetRenderMode(),		// rendermode
-		m_nRenderFX,
+		GetEngineObject()->GetRenderFX(),
 		GetRenderBrightness(),	// alpha
 		m_clrRender->r,
 		m_clrRender->g,

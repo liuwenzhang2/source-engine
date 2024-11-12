@@ -500,7 +500,7 @@ bool CBaseAnimating::BecomeRagdollOnClient( const Vector &force )
 	{
 		GetEngineObject()->VPhysicsDestroyObject();
 		GetEngineObject()->AddSolidFlags( FSOLID_NOT_SOLID );
-		m_nRenderFX = kRenderFxRagdoll;
+		GetEngineObject()->SetRenderFX(kRenderFxRagdoll);
 		
 		// Have to do this dance because m_vecForce is a network vector
 		// and can't be sent to ClampRagdollForce as a Vector *
@@ -535,7 +535,7 @@ bool CBaseAnimating::BecomeRagdollOnClient( const Vector &force )
 
 bool CBaseAnimating::IsRagdoll()
 {
-	return ( m_nRenderFX == kRenderFxRagdoll ) ? true : false;
+	return (GetEngineObject()->GetRenderFX() == kRenderFxRagdoll) ? true : false;
 }
 
 bool CBaseAnimating::CanBecomeRagdoll( void ) 

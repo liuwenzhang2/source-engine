@@ -483,7 +483,7 @@ void C_CSRagdoll::CreateCSRagdoll()
 	if ( cl_ragdoll_physics_enable.GetInt() )
 	{
 		// Make us a ragdoll..
-		m_nRenderFX = kRenderFxRagdoll;
+		GetEngineObject()->SetRenderFX(kRenderFxRagdoll);
 
 		matrix3x4_t boneDelta0[MAXSTUDIOBONES];
 		matrix3x4_t boneDelta1[MAXSTUDIOBONES];
@@ -583,7 +583,7 @@ void C_CSRagdoll::OnDataChanged( DataUpdateType_t type )
 		if ( !cl_ragdoll_physics_enable.GetInt() )
 		{
 			// Don't let it set us back to a ragdoll with data from the server.
-			m_nRenderFX = kRenderFxNone;
+			GetEngineObject()->SetRenderFX(kRenderFxNone);
 		}
 	}
 }

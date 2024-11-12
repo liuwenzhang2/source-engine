@@ -809,8 +809,7 @@ public:
 public:
 	// was pev->speed
 	float		m_flSpeed;
-	// was pev->renderfx
-	CNetworkVar( unsigned char, m_nRenderFX );
+
 	// was pev->rendermode
 	CNetworkVar( unsigned char, m_nRenderMode );
 	

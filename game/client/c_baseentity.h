@@ -1007,8 +1007,7 @@ public:
 	// Determine what entity this corresponds to
 	//int								index;	
 
-	// Render information
-	unsigned char					m_nRenderFX;
+	
 	unsigned char					m_nRenderFXBlend;
 
 	// Entity flags that are only for the client (ENTCLIENTFLAG_ defines).

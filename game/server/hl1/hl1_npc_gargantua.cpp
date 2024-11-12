@@ -616,7 +616,7 @@ void CNPC_Gargantua::RunTask( const Task_t *pTask )
 		if ( gpGlobals->curtime > m_flWaitFinished )
 		{
 			//TEMP TEMP
-			m_nRenderFX = kRenderFxExplode;
+			GetEngineObject()->SetRenderFX(kRenderFxExplode);
 			SetRenderColor( 255, 0, 0 , 255 );
 			StopAnimation();
 			GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.15 );

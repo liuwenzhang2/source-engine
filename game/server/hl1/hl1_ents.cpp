@@ -935,7 +935,7 @@ void CRenderFxManager::Use( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_T
 		while ( ( pEntity = gEntList.FindEntityByName( pEntity, STRING( m_target ) ) ) != NULL )
 		{
 			if ( !GetEngineObject()->HasSpawnFlags( SF_RENDER_MASKFX ) )
-				pEntity->m_nRenderFX = m_nRenderFX;
+				pEntity->GetEngineObject()->SetRenderFX(GetEngineObject()->GetRenderFX());
 			if ( !GetEngineObject()->HasSpawnFlags( SF_RENDER_MASKAMT ) )
 				pEntity->SetRenderColorA( GetRenderColor().a );
 			if ( !GetEngineObject()->HasSpawnFlags( SF_RENDER_MASKMODE ) )
@@ -1011,7 +1011,7 @@ void CXenPLight::Spawn( void )
 	GetEngineObject()->SetCycle( random->RandomFloat(0,1) );
 
 	m_pGlow = CSprite::SpriteCreate( XEN_PLANT_GLOW_SPRITE, GetEngineObject()->GetLocalOrigin() + Vector(0,0,(GetEngineObject()->WorldAlignMins().z+ GetEngineObject()->WorldAlignMaxs().z)*0.5), FALSE );
-	m_pGlow->SetTransparency( kRenderGlow, GetRenderColor().r, GetRenderColor().g, GetRenderColor().b, GetRenderColor().a, m_nRenderFX );
+	m_pGlow->SetTransparency( kRenderGlow, GetRenderColor().r, GetRenderColor().g, GetRenderColor().b, GetRenderColor().a, GetEngineObject()->GetRenderFX() );
 	m_pGlow->SetAttachment( this, 1 );
 }
 
@@ -1577,7 +1577,7 @@ void CHL1Gib::Spawn( const char *szGibModel )
 	// and will spawn using the same render FX or rendermode! bad!
 	SetRenderColorA( 255 );
 	m_nRenderMode = kRenderNormal;
-	m_nRenderFX = kRenderFxNone;
+	GetEngineObject()->SetRenderFX(kRenderFxNone);
 	GetEngineObject()->SetSolid( SOLID_BBOX );
 	GetEngineObject()->AddSolidFlags( FSOLID_NOT_STANDABLE );
 	SetClassname( "gib" );

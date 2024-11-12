@@ -515,7 +515,8 @@ public:
 	virtual int GetBoneIndex(int index) = 0;
 	virtual const Vector& GetRagPos(int index) = 0;
 	virtual const QAngle& GetRagAngles(int index) = 0;
-
+	virtual unsigned char GetRenderFX() = 0;
+	virtual void SetRenderFX(unsigned char nRenderFX) = 0;
 };
 
 class IEnginePortalClient {

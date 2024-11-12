@@ -95,7 +95,7 @@ bool C_Gib::InitializeGib( const char *pszModelName, Vector vecOrigin, Vector ve
 void C_Gib::ClientThink( void )
 {
 	SetRenderMode( kRenderTransAlpha );
-	m_nRenderFX		= kRenderFxFadeFast;
+	GetEngineObject()->SetRenderFX(kRenderFxFadeFast);
 
 	if ( m_clrRender->a == 0 )
 	{

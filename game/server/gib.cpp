@@ -589,7 +589,7 @@ void CGib::Spawn( const char *szGibModel )
 	// and will spawn using the same render FX or m_nRenderMode! bad!
 	SetRenderColorA( 255 );
 	m_nRenderMode = kRenderNormal;
-	m_nRenderFX = kRenderFxNone;
+	GetEngineObject()->SetRenderFX(kRenderFxNone);
 	
 	// hopefully this will fix the VELOCITY TOO LOW crap
 	m_takedamage = DAMAGE_EVENTS_ONLY;

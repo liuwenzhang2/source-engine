@@ -458,6 +458,8 @@ public:
 	virtual ragdoll_t* GetRagdoll(void) = 0;
 	virtual void ClearRagdoll() = 0;
 
+	virtual unsigned char GetRenderFX() = 0;
+	virtual void SetRenderFX(unsigned char nRenderFX) = 0;
 };
 
 class IEngineWorldServer{

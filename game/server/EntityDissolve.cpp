@@ -147,7 +147,7 @@ void CEntityDissolve::Spawn()
 
 	m_nRenderMode = kRenderTransColor;
 	SetRenderColor( 255, 255, 255, 255 );
-	m_nRenderFX = kRenderFxNone;
+	GetEngineObject()->SetRenderFX(kRenderFxNone);
 
 	SetThink( &CEntityDissolve::DissolveThink );
 	if ( gpGlobals->curtime > m_flStartTime )

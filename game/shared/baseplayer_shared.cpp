@@ -1841,7 +1841,7 @@ void CBasePlayer::SharedSpawn()
 	m_Local.m_flStepSize = sv_stepsize.GetFloat();
 	m_Local.m_bAllowAutoMovement = true;
 
-	m_nRenderFX = kRenderFxNone;
+	GetEngineObject()->SetRenderFX(kRenderFxNone);
 	m_flNextAttack	= gpGlobals->curtime;
 	m_flMaxspeed		= 0.0f;
 

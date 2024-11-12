@@ -46,7 +46,7 @@ void CGrenadeSpit::Spawn( void )
 
 	m_nRenderMode		= kRenderTransAdd;
 	SetRenderColor( 255, 255, 255, 255 );
-	m_nRenderFX		= kRenderFxNone;
+	GetEngineObject()->SetRenderFX(kRenderFxNone);
 
 	SetThink( &CGrenadeSpit::SpitThink );
 	SetUse( &CBaseGrenade::DetonateUse ); 

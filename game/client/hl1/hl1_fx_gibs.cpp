@@ -111,7 +111,7 @@ static CEntityFactory<C_HL1Gib> g_C_HL1Gib_Factory("","C_HL1Gib");
 void C_HL1Gib::ClientThink( void )
 {
 	SetRenderMode( kRenderTransAlpha );
-	m_nRenderFX		= kRenderFxFadeSlow;
+	GetEngineObject()->SetRenderFX(kRenderFxFadeSlow);
 
 	if ( m_clrRender->a == 5 )
 	{

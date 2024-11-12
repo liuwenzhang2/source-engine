@@ -196,7 +196,6 @@ BEGIN_RECV_TABLE_NOBASE(C_BaseEntity, DT_BaseEntity)
 
 	RecvPropInt( RECVINFO( m_ubInterpolationFrame ) ),
 	RecvPropInt(RECVINFO(m_nRenderMode)),
-	RecvPropInt(RECVINFO(m_nRenderFX)),
 	RecvPropInt(RECVINFO(m_clrRender)),
 	RecvPropInt(RECVINFO(m_iTeamNum)),
 	RecvPropFloat(RECVINFO(m_flShadowCastDistance)),
@@ -237,7 +236,7 @@ BEGIN_PREDICTION_DATA_NO_BASE( C_BaseEntity )
 	//DEFINE_PRED_FIELD_TOL( m_vecVelocity, FIELD_VECTOR, FTYPEDESC_INSENDTABLE, 0.5f ),
 //	DEFINE_PRED_FIELD( m_fEffects, FIELD_INTEGER, FTYPEDESC_INSENDTABLE ),
 	DEFINE_PRED_FIELD( m_nRenderMode, FIELD_CHARACTER, FTYPEDESC_INSENDTABLE ),
-	DEFINE_PRED_FIELD( m_nRenderFX, FIELD_CHARACTER, FTYPEDESC_INSENDTABLE ),
+	//DEFINE_PRED_FIELD( m_nRenderFX, FIELD_CHARACTER, FTYPEDESC_INSENDTABLE ),
 //	DEFINE_PRED_FIELD( m_flAnimTime, FIELD_FLOAT, FTYPEDESC_INSENDTABLE ),
 //	DEFINE_PRED_FIELD( m_flSimulationTime, FIELD_FLOAT, FTYPEDESC_INSENDTABLE ),
 	//DEFINE_PRED_FIELD( m_fFlags, FIELD_INTEGER, FTYPEDESC_INSENDTABLE ),
@@ -556,7 +555,6 @@ void C_BaseEntity::Clear( void )
 	m_nRenderMode = 0;
 	m_nOldRenderMode = 0;
 	SetRenderColor( 255, 255, 255, 255 );
-	m_nRenderFX = 0;
 
 	m_ShadowDirUseOtherEntity = NULL;
 
@@ -1998,7 +1996,7 @@ void C_BaseEntity::CreateLightEffects( void )
 
 void C_BaseEntity::MoveToLastReceivedPosition( bool force )
 {
-	if ( force || ( m_nRenderFX != kRenderFxRagdoll ) )
+	if ( force || (GetEngineObject()->GetRenderFX() != kRenderFxRagdoll ) )
 	{
 		GetEngineObject()->SetLocalOrigin( GetEngineObject()->GetNetworkOrigin() );
 		GetEngineObject()->SetLocalAngles(GetEngineObject()->GetNetworkAngles() );
@@ -2307,7 +2305,7 @@ void C_BaseEntity::ComputeFxBlend( void )
 
 	offset = ((int)entindex()) * 363.0;// Use ent index to de-sync these fx
 
-	switch( m_nRenderFX ) 
+	switch(GetEngineObject()->GetRenderFX() )
 	{
 	case kRenderFxPulseSlowWide:
 		blend = m_clrRender->a + 0x40 * sin( gpGlobals->curtime * 2 + offset );	
@@ -2449,7 +2447,7 @@ void C_BaseEntity::ComputeFxBlend( void )
 			dist = DotProduct( tmp, CurrentViewForward() );
 			
 			// Turn off distance fade
-			if ( m_nRenderFX == kRenderFxDistort )
+			if (GetEngineObject()->GetRenderFX() == kRenderFxDistort)
 			{
 				dist = 1;
 			}

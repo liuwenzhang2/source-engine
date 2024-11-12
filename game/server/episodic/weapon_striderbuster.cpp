@@ -493,7 +493,7 @@ bool CWeaponStriderBuster::StickToEntity( CBaseEntity *pOther )
 						m_hGlowSprite->SetTransparency( kRenderWorldGlow, 255, 255, 255, 255, kRenderFxNoDissipation );
 						m_hGlowSprite->GetEngineObject()->SetAbsOrigin(GetEngineObject()->GetAbsOrigin() );
 						m_hGlowSprite->SetScale( 5.0f );
-						m_hGlowSprite->m_nRenderFX = kRenderFxStrobeFaster;
+						m_hGlowSprite->GetEngineObject()->SetRenderFX(kRenderFxStrobeFaster);
 						m_hGlowSprite->SetGlowProxySize( 16.0f );
 						m_hGlowSprite->GetEngineObject()->SetParent( this->GetEngineObject() );
 					}

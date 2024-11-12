@@ -176,7 +176,7 @@ BEGIN_DATADESC( C_ClientRagdoll )
 	DEFINE_FIELD( m_bReleaseRagdoll, FIELD_BOOLEAN ),
 	//DEFINE_FIELD( m_nBody, FIELD_INTEGER ),
 	//DEFINE_FIELD( m_nSkin, FIELD_INTEGER ),
-	DEFINE_FIELD( m_nRenderFX, FIELD_CHARACTER ),
+	//DEFINE_FIELD( m_nRenderFX, FIELD_CHARACTER ),
 	DEFINE_FIELD( m_nRenderMode, FIELD_CHARACTER ),
 	DEFINE_FIELD( m_clrRender, FIELD_COLOR32 ),
 	DEFINE_FIELD( m_flEffectTime, FIELD_TIME ),
@@ -1240,7 +1240,7 @@ void C_BaseAnimating::BuildTransformations( IStudioHdr *hdr, Vector *pos, Quater
 //-----------------------------------------------------------------------------
 void C_BaseAnimating::ApplyBoneMatrixTransform( matrix3x4_t& transform )
 {
-	switch( m_nRenderFX )
+	switch( GetEngineObject()->GetRenderFX() )
 	{
 	case kRenderFxDistort:
 	case kRenderFxHologram:
@@ -3720,7 +3720,7 @@ bool C_BaseAnimating::Interpolate( float flCurrentTime )
 //-----------------------------------------------------------------------------
 bool C_BaseAnimating::IsRagdoll() const
 {
-	return GetEngineObject()->RagdollBoneCount() && (m_nRenderFX == kRenderFxRagdoll);
+	return GetEngineObject()->RagdollBoneCount() && (((C_BaseAnimating*)this)->GetEngineObject()->GetRenderFX() == kRenderFxRagdoll);
 }
 
 //-----------------------------------------------------------------------------
@@ -3728,7 +3728,7 @@ bool C_BaseAnimating::IsRagdoll() const
 //-----------------------------------------------------------------------------
 bool C_BaseAnimating::IsAboutToRagdoll() const
 {
-	return (m_nRenderFX == kRenderFxRagdoll);
+	return (((C_BaseAnimating*)this)->GetEngineObject()->GetRenderFX() == kRenderFxRagdoll);
 }
 
 

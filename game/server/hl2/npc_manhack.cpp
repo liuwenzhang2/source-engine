@@ -3270,7 +3270,7 @@ void CNPC_Manhack::SetEyeState( int state )
 				m_pEyeGlow->SetColor( 255, 128, 0 );
 				m_pEyeGlow->SetScale( 0.15f, 0.1f );
 				m_pEyeGlow->SetBrightness( 164, 0.1f );
-				m_pEyeGlow->m_nRenderFX = kRenderFxStrobeFast;
+				m_pEyeGlow->GetEngineObject()->SetRenderFX(kRenderFxStrobeFast);
 			}
 			
 			if ( m_pLightGlow )
@@ -3278,7 +3278,7 @@ void CNPC_Manhack::SetEyeState( int state )
 				m_pLightGlow->SetColor( 255, 128, 0 );
 				m_pLightGlow->SetScale( 0.15f, 0.1f );
 				m_pLightGlow->SetBrightness( 164, 0.1f );
-				m_pLightGlow->m_nRenderFX = kRenderFxStrobeFast;
+				m_pLightGlow->GetEngineObject()->SetRenderFX(kRenderFxStrobeFast);
 			}
 
 			const char* soundname = "NPC_Manhack.Stunned";
@@ -3310,7 +3310,7 @@ void CNPC_Manhack::SetEyeState( int state )
 
 				m_pEyeGlow->SetScale( 0.25f, 0.5f );
 				m_pEyeGlow->SetBrightness( 164, 0.1f );
-				m_pEyeGlow->m_nRenderFX = kRenderFxNone;
+				m_pEyeGlow->GetEngineObject()->SetRenderFX(kRenderFxNone);
 			}
 			
 			if ( m_pLightGlow )
@@ -3326,7 +3326,7 @@ void CNPC_Manhack::SetEyeState( int state )
 
 				m_pLightGlow->SetScale( 0.25f, 0.5f );
 				m_pLightGlow->SetBrightness( 164, 0.1f );
-				m_pLightGlow->m_nRenderFX = kRenderFxNone;
+				m_pLightGlow->GetEngineObject()->SetRenderFX(kRenderFxNone);
 			}
 
 			break;
@@ -3334,7 +3334,7 @@ void CNPC_Manhack::SetEyeState( int state )
 	
 	default:
 		if ( m_pEyeGlow )
-			m_pEyeGlow->m_nRenderFX = kRenderFxNone;
+			m_pEyeGlow->GetEngineObject()->SetRenderFX(kRenderFxNone);
 		break;
 	}
 }

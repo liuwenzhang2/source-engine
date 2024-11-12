@@ -121,7 +121,7 @@ void C_LocalTempEntity::Prepare( const model_t *pmodel, float time )
 	die = time + 0.75;
 	GetEngineObject()->SetModelPointer( pmodel );
 	SetRenderMode( kRenderNormal );
-	m_nRenderFX = kRenderFxNone;
+	GetEngineObject()->SetRenderFX(kRenderFxNone);
 	GetEngineObject()->SetBody(0);
 	GetEngineObject()->SetSkin(0);
 	fadeSpeed = 0.5;
@@ -229,7 +229,7 @@ int	C_LocalTempEntity::DrawModel( int flags )
 			GetEngineObject()->GetBody() > 0 ? cl_entitylist->GetBaseEntity(GetEngineObject()->GetBody()) : NULL,  // attach to
 			GetEngineObject()->GetSkin(),  // attachment point
 			GetRenderMode(), // rendermode
-			m_nRenderFX, // renderfx
+			GetEngineObject()->GetRenderFX(), // renderfx
 			m_clrRender->a, // alpha
 			m_clrRender->r,
 			m_clrRender->g,
@@ -1235,7 +1235,7 @@ C_LocalTempEntity *CTempEnts::TempSprite( const Vector &pos, const Vector &dir, 
 	pTemp->m_flFrameMax = frameCount - 1;
 	pTemp->m_flFrameRate = 10;
 	pTemp->SetRenderMode( (RenderMode_t)rendermode );
-	pTemp->m_nRenderFX = renderfx;
+	pTemp->GetEngineObject()->SetRenderFX(renderfx);
 	pTemp->m_flSpriteScale = scale;
 	pTemp->tempent_renderamt = a * 255;
 	pTemp->m_vecNormal = normal;
@@ -1301,7 +1301,7 @@ void CTempEnts::Sprite_Spray( const Vector &pos, const Vector &dir, int modelInd
 		pTemp->SetRenderMode( kRenderTransAlpha );
 		pTemp->SetRenderColor( 255, 255, 255, 255 );
 		pTemp->tempent_renderamt = 255;
-		pTemp->m_nRenderFX = kRenderFxNoDissipation;
+		pTemp->GetEngineObject()->SetRenderFX(kRenderFxNoDissipation);
 		//pTemp->scale = random->RandomFloat( 0.1, 0.25 );
 		pTemp->m_flSpriteScale = 0.5;
 		pTemp->flags |= FTENT_FADEOUT | FTENT_SLOWGRAVITY;
@@ -1377,7 +1377,7 @@ void CTempEnts::Sprite_Trail( const Vector &vecStart, const Vector &vecEnd, int 
 
 		pTemp->m_flSpriteScale		= flSize;
 		pTemp->SetRenderMode( kRenderGlow );
-		pTemp->m_nRenderFX			= kRenderFxNoDissipation;
+		pTemp->GetEngineObject()->SetRenderFX(kRenderFxNoDissipation);
 		pTemp->tempent_renderamt	= nRenderamt;
 		pTemp->SetRenderColor( 255, 255, 255 );
 
@@ -1435,7 +1435,7 @@ void CTempEnts::AttachTentToPlayer( int client, int modelIndex, float zoffset, f
 	pTemp->SetRenderMode( kRenderNormal );
 	pTemp->SetRenderColorA( 255 );
 	pTemp->tempent_renderamt = 255;
-	pTemp->m_nRenderFX = kRenderFxNoDissipation;
+	pTemp->GetEngineObject()->SetRenderFX(kRenderFxNoDissipation);
 	
 	pTemp->clientIndex = client;
 	pTemp->tentOffset[ 0 ] = 0;
@@ -1506,7 +1506,7 @@ void CTempEnts::RicochetSprite( const Vector &pos, model_t *pmodel, float durati
 		return;
 
 	pTemp->SetRenderMode( kRenderGlow );
-	pTemp->m_nRenderFX = kRenderFxNoDissipation;
+	pTemp->GetEngineObject()->SetRenderFX(kRenderFxNoDissipation);
 	pTemp->SetRenderColorA( 200 );
 	pTemp->tempent_renderamt = 200;
 	pTemp->m_flSpriteScale = scale;
@@ -1546,7 +1546,7 @@ void CTempEnts::BloodSprite( const Vector &org, int r, int g, int b, int a, int 
 		if ( ( pTemp = TempEntAllocHigh( org, model ) ) != NULL )
 		{
 			pTemp->SetRenderMode( kRenderTransTexture );
-			pTemp->m_nRenderFX		= kRenderFxClampMinScale;
+			pTemp->GetEngineObject()->SetRenderFX(kRenderFxClampMinScale);
 			pTemp->m_flSpriteScale	= random->RandomFloat( size / 25, size / 35);
 			pTemp->flags			= FTENT_SPRANIMATE;
  
@@ -1621,7 +1621,7 @@ void CTempEnts::Sprite_Smoke( C_LocalTempEntity *pTemp, float scale )
 		return;
 
 	pTemp->SetRenderMode( kRenderTransAlpha );
-	pTemp->m_nRenderFX = kRenderFxNone;
+	pTemp->GetEngineObject()->SetRenderFX(kRenderFxNone);
 	pTemp->SetVelocity( Vector( 0, 0, 30 ) );
 	int iColor = random->RandomInt(20,35);
 	pTemp->SetRenderColor( iColor,
@@ -1912,7 +1912,7 @@ void CTempEnts::Sprite_Explode( C_LocalTempEntity *pTemp, float scale, int flags
 		pTemp->GetEngineObject()->SetLocalAnglesDim( Z_INDEX, random->RandomInt( 0, 360 ) );
 	}
 
-	pTemp->m_nRenderFX = kRenderFxNone;
+	pTemp->GetEngineObject()->SetRenderFX(kRenderFxNone);
 	pTemp->SetVelocity( Vector( 0, 0, 8 ) );
 	pTemp->SetRenderColor( 255, 255, 255 );
 	pTemp->GetEngineObject()->SetLocalOriginDim( Z_INDEX, pTemp->GetEngineObject()->GetLocalOriginDim( Z_INDEX ) + 10 );
@@ -3263,7 +3263,7 @@ void CTempEnts::RocketFlare( const Vector& pos )
 
 	pTemp->m_flFrameMax = nframeCount - 1;
 	pTemp->SetRenderMode( kRenderGlow );
-	pTemp->m_nRenderFX = kRenderFxNoDissipation;
+	pTemp->GetEngineObject()->SetRenderFX(kRenderFxNoDissipation);
 	pTemp->tempent_renderamt = 255;
 	pTemp->m_flFrameRate = 1.0;
 	pTemp->m_flFrame = random->RandomInt( 0, nframeCount - 1);

@@ -260,6 +260,8 @@ BEGIN_PREDICTION_DATA_NO_BASE(C_EngineObjectInternal)
 	DEFINE_PRED_FIELD(m_nResetEventsParity, FIELD_INTEGER, FTYPEDESC_INSENDTABLE | FTYPEDESC_NOERRORCHECK),
 	DEFINE_PRED_FIELD(m_nMuzzleFlashParity, FIELD_CHARACTER, FTYPEDESC_INSENDTABLE),
 	DEFINE_FIELD(m_nPrevSequence, FIELD_INTEGER),
+	DEFINE_PRED_FIELD(m_nRenderFX, FIELD_CHARACTER, FTYPEDESC_INSENDTABLE),
+
 END_PREDICTION_DATA()
 
 #define DEFINE_RAGDOLL_ELEMENT( i ) \
@@ -307,6 +309,8 @@ BEGIN_DATADESC_NO_BASE(C_EngineObjectInternal)
 	DEFINE_RAGDOLL_ELEMENT(21),
 	DEFINE_RAGDOLL_ELEMENT(22),
 	DEFINE_RAGDOLL_ELEMENT(23),
+	DEFINE_FIELD(m_nRenderFX, FIELD_CHARACTER),
+
 END_DATADESC()
 
 //-----------------------------------------------------------------------------
@@ -530,6 +534,8 @@ BEGIN_RECV_TABLE_NOBASE(C_EngineObjectInternal, DT_EngineObject)
 	RecvPropDataTable("serveranimdata", 0, 0, &REFERENCE_RECV_TABLE(DT_ServerAnimationData)),
 	RecvPropArray(RecvPropQAngles(RECVINFO(m_ragAngles[0])), m_ragAngles),
 	RecvPropArray(RecvPropVector(RECVINFO(m_ragPos[0])), m_ragPos),
+	RecvPropInt(RECVINFO(m_nRenderFX)),
+
 END_RECV_TABLE()
 
 IMPLEMENT_CLIENTCLASS_NO_FACTORY(C_EngineObjectInternal, DT_EngineObject, CEngineObjectInternal);
@@ -986,7 +992,7 @@ void C_EngineObjectInternal::PostDataUpdate(DataUpdateType_t updateType)
 	PREDICTION_TRACKVALUECHANGESCOPE_ENTITY(this->m_pOuter, "postdataupdate");
 
 	// NOTE: This *has* to happen first. Otherwise, Origin + angles may be wrong 
-	if (m_pOuter->m_nRenderFX == kRenderFxRagdoll && updateType == DATA_UPDATE_CREATED)
+	if (m_nRenderFX == kRenderFxRagdoll && updateType == DATA_UPDATE_CREATED)
 	{
 		m_pOuter->MoveToLastReceivedPosition(true);
 	}
@@ -1194,19 +1200,19 @@ void C_EngineObjectInternal::OnDataChanged(DataUpdateType_t type)
 
 
 	// build a ragdoll if necessary
-	if (m_pOuter->m_nRenderFX == kRenderFxRagdoll && !m_builtRagdoll)
+	if (m_nRenderFX == kRenderFxRagdoll && !m_builtRagdoll)
 	{
 		((C_BaseAnimating*)m_pOuter)->BecomeRagdollOnClient();
 	}
 
 	//HACKHACK!!!
-	if (m_pOuter->m_nRenderFX == kRenderFxRagdoll && m_builtRagdoll == true)
+	if (m_nRenderFX == kRenderFxRagdoll && m_builtRagdoll == true)
 	{
 		if (!m_ragdoll.listCount)
 			AddEffects(EF_NODRAW);
 	}
 
-	if (m_ragdoll.listCount && m_pOuter->m_nRenderFX != kRenderFxRagdoll)
+	if (m_ragdoll.listCount && m_nRenderFX != kRenderFxRagdoll)
 	{
 		ClearRagdoll();
 	}
@@ -1627,7 +1633,7 @@ void C_EngineObjectInternal::OnStoreLastNetworkedValue()
 
 	// Kind of a hack, but we want to latch the actual networked value for origin/angles, not what's sitting in m_vecOrigin in the
 	//  ragdoll case where we don't copy it over in MoveToLastNetworkOrigin
-	if (m_pOuter->m_nRenderFX == kRenderFxRagdoll && m_pOuter->GetPredictable())
+	if (m_nRenderFX == kRenderFxRagdoll && m_pOuter->GetPredictable())
 	{
 		bRestore = true;
 		savePos = GetLocalOrigin();
@@ -5528,7 +5534,7 @@ C_BaseEntity* C_EngineObjectInternal::CreateRagdollCopy()
 		pRagdoll->GetEngineObject()->AddEffects(EF_NOSHADOW);
 	}
 
-	pRagdoll->m_nRenderFX = kRenderFxRagdoll;
+	pRagdoll->GetEngineObject()->SetRenderFX(kRenderFxRagdoll);
 	pRagdoll->SetRenderMode(m_pOuter->GetRenderMode());
 	pRagdoll->SetRenderColor(m_pOuter->GetRenderColor().r, m_pOuter->GetRenderColor().g, m_pOuter->GetRenderColor().b, m_pOuter->GetRenderColor().a);
 
@@ -5582,7 +5588,7 @@ void C_EngineObjectInternal::TransferDissolveFrom(C_BaseEntity* pSource)
 				if (pDissolve)
 				{
 					pDissolve->SetRenderMode(pDissolveChild->GetRenderMode());
-					pDissolve->m_nRenderFX = pDissolveChild->m_nRenderFX;
+					pDissolve->GetEngineObject()->SetRenderFX(pDissolveChild->GetEngineObject()->GetRenderFX());
 					pDissolve->SetRenderColor(255, 255, 255, 255);
 					pDissolveChild->SetRenderColorA(0);
 
@@ -5619,7 +5625,7 @@ int C_EngineObjectInternal::SelectWeightedSequence(int activity)
 }
 
 void C_EngineObjectInternal::Simulate() {
-	if (GetSequence() != -1 && m_ragdoll.listCount && (m_pOuter->m_nRenderFX != kRenderFxRagdoll))
+	if (GetSequence() != -1 && m_ragdoll.listCount && (m_nRenderFX != kRenderFxRagdoll))
 	{
 		ClearRagdoll();
 	}

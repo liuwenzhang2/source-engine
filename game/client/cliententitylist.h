@@ -27,6 +27,8 @@
 #include "saverestoretypes.h"
 #include "saverestore.h"
 #include "physics_saverestore.h"
+#include "mouthinfo.h"
+#include "ragdoll_shared.h"
 
 //class C_Beam;
 //class C_BaseViewModel;
@@ -233,6 +235,7 @@ public:
 		//m_bStoreRagdollInfo = false;
 		//m_pRagdollInfo = NULL;
 		m_flLastBoneChangeTime = -FLT_MAX;
+		m_nRenderFX = 0;
 
 	}
 
@@ -505,6 +508,7 @@ public:
 		m_nPrevNewSequenceParity = -1;
 		m_bReceivedSequence = false;
 		m_elementCount = 0;
+		m_nRenderFX = 0;
 
 	}
 
@@ -899,6 +903,8 @@ public:
 	int GetBoneIndex(int index) { return m_boneIndex[index]; }
 	const Vector& GetRagPos(int index) { return m_ragPos[index]; }
 	const QAngle& GetRagAngles(int index) { return m_ragAngles[index]; }
+	unsigned char GetRenderFX() { return m_nRenderFX; }
+	void SetRenderFX(unsigned char nRenderFX) { m_nRenderFX = nRenderFX; }
 private:
 	void LockStudioHdr();
 	void UnlockStudioHdr();
@@ -1110,6 +1116,8 @@ protected:
 	int			m_boneIndex[RAGDOLL_MAX_ELEMENTS];
 	float m_flLastBoneChangeTime;
 
+	// Render information
+	unsigned char					m_nRenderFX;
 };
 
 //-----------------------------------------------------------------------------

@@ -413,7 +413,7 @@ void CPortal_Player::Spawn(void)
 
 	GiveDefaultItems();
 
-	m_nRenderFX = kRenderNormal;
+	GetEngineObject()->SetRenderFX(kRenderNormal);
 
 	m_Local.m_iHideHUD = 0;
 

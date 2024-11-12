@@ -472,7 +472,7 @@ void C_HL1MPRagdoll::CreateHL1MPRagdoll( void )
 	GetEngineObject()->SetModelIndex(GetEngineObject()->GetModelIndex() );
 
 	// Make us a ragdoll..
-	m_nRenderFX = kRenderFxRagdoll;
+	GetEngineObject()->SetRenderFX(kRenderFxRagdoll);
 
 	matrix3x4_t boneDelta0[MAXSTUDIOBONES];
 	matrix3x4_t boneDelta1[MAXSTUDIOBONES];

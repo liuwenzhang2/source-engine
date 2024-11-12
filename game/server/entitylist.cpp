@@ -433,6 +433,8 @@ BEGIN_DATADESC_NO_BASE(CEngineObjectInternal)
 	DEFINE_RAGDOLL_ELEMENT(21),
 	DEFINE_RAGDOLL_ELEMENT(22),
 	DEFINE_RAGDOLL_ELEMENT(23),
+	DEFINE_KEYFIELD(m_nRenderFX, FIELD_CHARACTER, "renderfx"),
+
 END_DATADESC()
 
 void SendProxy_Origin(const SendProp* pProp, const void* pStruct, const void* pData, DVariant* pOut, int iElement, int objectID)
@@ -682,6 +684,8 @@ BEGIN_SEND_TABLE_NOBASE(CEngineObjectInternal, DT_EngineObject)
 	SendPropDataTable("serveranimdata", 0, &REFERENCE_SEND_TABLE(DT_ServerAnimationData), SendProxy_ClientSideAnimationE),
 	SendPropArray(SendPropQAngles(SENDINFO_ARRAY(m_ragAngles), 13, 0), m_ragAngles),
 	SendPropArray(SendPropVector(SENDINFO_ARRAY(m_ragPos), -1, SPROP_COORD), m_ragPos),
+	SendPropInt(SENDINFO(m_nRenderFX), 8, SPROP_UNSIGNED),
+
 END_SEND_TABLE()
 
 IMPLEMENT_SERVERCLASS(CEngineObjectInternal, DT_EngineObject)

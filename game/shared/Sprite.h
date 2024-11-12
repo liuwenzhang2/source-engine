@@ -159,7 +159,7 @@ public:
 		SetRenderMode( (RenderMode_t)rendermode );
 		SetColor( r, g, b );
 		SetBrightness( a );
-		m_nRenderFX = fx;
+		GetEngineObject()->SetRenderFX(fx);
 	}
 	inline void SetTexture( int spriteIndex ) { GetEngineObject()->SetModelIndex( spriteIndex ); }
 	inline void SetColor( int r, int g, int b ) { SetRenderColor( r, g, b, GetRenderColor().a ); }
