@@ -5951,7 +5951,7 @@ void CBasePlayer::ImpulseCommands( )
 		if ( tr.fraction != 1.0 )
 		{// line hit something, so paint a decal
 			m_flNextDecalTime = gpGlobals->curtime + decalfrequency.GetFloat();
-			CSprayCan *pCan = CREATE_UNSAVED_ENTITY( CSprayCan, "spraycan" );
+			CSprayCan *pCan = (CSprayCan*)gEntList.CreateEntityByName( "spraycan" );
 			pCan->Spawn( this );
 
 #ifdef CSTRIKE_DLL
@@ -6307,7 +6307,7 @@ void CBasePlayer::CheatImpulseCommands( int iImpulse )
 
 			if ( tr.fraction != 1.0 )
 			{// line hit something, so paint a decal
-				CBloodSplat *pBlood = CREATE_UNSAVED_ENTITY( CBloodSplat, "bloodsplat" );
+				CBloodSplat *pBlood = (CBloodSplat*)gEntList.CreateEntityByName( "bloodsplat" );
 				pBlood->Spawn( this );
 			}
 		}

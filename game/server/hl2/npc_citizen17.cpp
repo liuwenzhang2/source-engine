@@ -755,7 +755,7 @@ void CNPC_Citizen::FixupMattWeapon()
 	{
 		Weapon_Drop( pWeapon );
 		UTIL_Remove( pWeapon );
-		pWeapon = (CBaseCombatWeapon *)CREATE_UNSAVED_ENTITY( CMattsPipe, "weapon_crowbar" );
+		pWeapon = (CBaseCombatWeapon *)gEntList.CreateEntityByName( "weapon_crowbar" );
 		pWeapon->SetName( "matt_weapon" );
 		DispatchSpawn( pWeapon );
 

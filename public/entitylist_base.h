@@ -1094,20 +1094,20 @@ inline void DestroyEntity(IHandleEntity* pEntity) {
 
 // entity creation
 // creates an entity that has not been linked to a classname
-template< class T >
-T* _CreateEntityTemplate(T* newEnt, const char* className, int iForceEdictIndex, int iSerialNum)
-{
-	newEnt = new T; // this is the only place 'new' should be used!
-#ifdef CLIENT_DLL
-	newEnt->Init(iForceEdictIndex, iSerialNum);
-#endif
-#ifdef GAME_DLL
-	newEnt->PostConstructor(className, iForceEdictIndex);
-#endif // GAME_DLL
-	return newEnt;
-}
+//template< class T >
+//T* _CreateEntityTemplate(T* newEnt, const char* className, int iForceEdictIndex, int iSerialNum)
+//{
+//	newEnt = new T; // this is the only place 'new' should be used!
+//#ifdef CLIENT_DLL
+//	newEnt->Init(iForceEdictIndex, iSerialNum);
+//#endif
+//#ifdef GAME_DLL
+//	newEnt->PostConstructor(className, iForceEdictIndex);
+//#endif // GAME_DLL
+//	return newEnt;
+//}
 
-#define CREATE_UNSAVED_ENTITY( newClass, className ) _CreateEntityTemplate( (newClass*)NULL, className, -1, -1 )
+//#define CREATE_UNSAVED_ENTITY( newClass, className ) _CreateEntityTemplate( (newClass*)NULL, className, -1, -1 )
 
 #include "tier0/memdbgoff.h"
 

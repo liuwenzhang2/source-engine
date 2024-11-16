@@ -371,7 +371,7 @@ bool CFuncPlat::CreateVPhysics()
 static void PlatSpawnInsideTrigger(CFuncPlat* pevPlatform)
 {
 	// old code: //GetClassPtr( (CPlatTrigger *)NULL)->SpawnInsideTrigger( GetClassPtr( (CFuncPlat *)pevPlatform ) );
-	CPlatTrigger *plattrig = CREATE_UNSAVED_ENTITY( CPlatTrigger, "plat_trigger" );
+	CPlatTrigger *plattrig = (CPlatTrigger*)gEntList.CreateEntityByName( "plat_trigger" );
 	plattrig->SpawnInsideTrigger( pevPlatform );
 }
 		
