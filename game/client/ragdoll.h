@@ -15,6 +15,7 @@
 #endif
 
 #include "ragdoll_shared.h"
+#include "c_baseanimating.h"
 
 #define RAGDOLL_VISUALIZE	0
 
@@ -67,5 +68,50 @@ class CBoneAccessor;
 void NoteRagdollCreationTick( C_BaseEntity *pRagdoll );
 // returns true if the ragdoll was created on this tick
 bool WasRagdollCreatedOnCurrentTick( C_BaseEntity *pRagdoll );
+
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
+class C_ServerRagdoll : public C_BaseAnimating
+{
+public:
+	DECLARE_CLASS(C_ServerRagdoll, C_BaseAnimating);
+	DECLARE_CLIENTCLASS();
+	DECLARE_INTERPOLATION();
+
+	C_ServerRagdoll(void);
+
+	bool Init(int entnum, int iSerialNum);
+
+	virtual void PostDataUpdate(DataUpdateType_t updateType);
+
+	virtual int InternalDrawModel(int flags);
+	virtual IStudioHdr* OnNewModel(void);
+	virtual unsigned char GetClientSideFade();
+	virtual void	SetupWeights(const matrix3x4_t* pBoneToWorld, int nFlexWeightCount, float* pFlexWeights, float* pFlexDelayedWeights);
+
+	void GetRenderBounds(Vector& theMins, Vector& theMaxs);
+	virtual void AddEntity(void);
+	virtual void AccumulateLayers(IBoneSetup& boneSetup, Vector pos[], Quaternion q[], float currentTime);
+	virtual void BuildTransformations(IStudioHdr* pStudioHdr, Vector* pos, Quaternion q[], const matrix3x4_t& cameraTransform, int boneMask, CBoneBitList& boneComputed);
+	IPhysicsObject* GetElement(int elementNum);
+	virtual void UpdateOnRemove();
+	virtual float LastBoneChangedTime();
+
+
+
+
+
+
+
+private:
+	C_ServerRagdoll(const C_ServerRagdoll& src);
+
+	typedef CHandle<C_BaseAnimating> CBaseAnimatingHandle;
+	//CNetworkVar( CBaseAnimatingHandle, m_hUnragdoll );
+	CNetworkVar(float, m_flBlendWeight);
+	float m_flBlendWeightCurrent;
+	CNetworkVar(int, m_nOverlaySequence);
+};
 
 #endif // RAGDOLL_H

@@ -201,7 +201,7 @@ void FX_FireBullets(
 	// Let the player remember the usercmd he fired a weapon on. Assists in making decisions about lag compensation.
 	pPlayer->NoteWeaponFired();
 
-	bDoEffects = false; // no effects on server
+	//bDoEffects = false; // no effects on server
 #endif
 
 	iSeed++;

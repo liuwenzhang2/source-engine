@@ -165,7 +165,7 @@ bool CGravityVortexController::KillNPCInRange( CBaseEntity *pVictim, IPhysicsObj
 
 		// Become ragdoll
 		CTakeDamageInfo info( this, this, 1.0f, DMG_GENERIC );
-		CBaseEntity *pRagdoll = CreateServerRagdoll( pBCC, 0, info, COLLISION_GROUP_INTERACTIVE_DEBRIS, true );
+		CBaseEntity *pRagdoll = pBCC->CreateServerRagdoll( 0, info, COLLISION_GROUP_INTERACTIVE_DEBRIS, true );
 		pRagdoll->GetEngineObject()->SetCollisionBounds( pVictim->GetEngineObject()->OBBMins(), pVictim->GetEngineObject()->OBBMaxs() );
 
 		// Necessary to cause it to do the appropriate death cleanup

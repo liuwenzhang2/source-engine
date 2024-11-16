@@ -2040,7 +2040,7 @@ void CNPC_CombineGunship::BeginDestruct( void )
 	}
 
 	// Create the ragdoll
-	m_hRagdoll = CreateServerRagdoll( this, 0, info, COLLISION_GROUP_NONE );
+	m_hRagdoll = CreateServerRagdoll( 0, info, COLLISION_GROUP_NONE );
 	if ( !m_hRagdoll )
 	{
 		// Failed, just explode

@@ -42,6 +42,7 @@
 #include "gamestats.h"
 #include "gameinterface.h"
 #include "holiday_gift.h"
+#include "physics_prop_ragdoll.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
@@ -108,10 +109,10 @@ static CPhysicsPlayerCallback playerCallback;
 // Ragdoll entities.
 // -------------------------------------------------------------------------------- //
 
-class CDODRagdoll : public CBaseAnimatingOverlay
+class CDODRagdoll : public CRagdollProp
 {
 public:
-	DECLARE_CLASS( CDODRagdoll, CBaseAnimatingOverlay );
+	DECLARE_CLASS( CDODRagdoll, CRagdollProp);
 	DECLARE_SERVERCLASS();
 
 	// Transmit ragdolls to everyone.
@@ -120,24 +121,60 @@ public:
 		return SetTransmitState( FL_EDICT_ALWAYS );
 	}
 
+	void ImpactTrace(trace_t* pTrace, int iDamageType, const char* pCustomImpactName);
 public:
 	// In case the client has the player entity, we transmit the player index.
 	// In case the client doesn't have it, we transmit the player's model index, origin, and angles
 	// so they can create a ragdoll in the right place.
 	CNetworkHandle( CBaseEntity, m_hPlayer );	// networked entity handle 
-	CNetworkVector( m_vecRagdollVelocity );
-	CNetworkVector( m_vecRagdollOrigin );
+	//CNetworkVector( m_vecRagdollVelocity );
+	//CNetworkVector( m_vecRagdollOrigin );
 };
+
+void CDODRagdoll::ImpactTrace(trace_t* pTrace, int iDamageType, const char* pCustomImpactName)
+{
+	IPhysicsObject* pPhysicsObject = VPhysicsGetObject();
+
+	if (!pPhysicsObject)
+		return;
+
+	Vector dir = pTrace->endpos - pTrace->startpos;
+
+	if (iDamageType == DMG_BLAST)
+	{
+		dir *= 4000;  // adjust impact strength
+
+		// apply force at object mass center
+		pPhysicsObject->ApplyForceCenter(dir);
+	}
+	else
+	{
+		Vector hitpos;
+
+		VectorMA(pTrace->startpos, pTrace->fraction, dir, hitpos);
+		VectorNormalize(dir);
+
+		dir *= 4000;  // adjust impact strength
+
+		// apply force where we hit it
+		pPhysicsObject->ApplyForceOffset(dir, hitpos);
+
+		// Blood spray!
+		//FX_DOD_BloodSpray(hitpos, dir, 10);
+	}
+
+	GetEngineObject()->VPhysicsUpdate(pPhysicsObject);
+}
 
 LINK_ENTITY_TO_CLASS( dod_ragdoll, CDODRagdoll );
 
-IMPLEMENT_SERVERCLASS_ST_NOBASE( CDODRagdoll, DT_DODRagdoll )
-	SendPropVector( SENDINFO(m_vecRagdollOrigin), -1,  SPROP_COORD ),
+IMPLEMENT_SERVERCLASS_ST( CDODRagdoll, DT_DODRagdoll )
+	//SendPropVector( SENDINFO(m_vecRagdollOrigin), -1,  SPROP_COORD ),
 	SendPropEHandle( SENDINFO( m_hPlayer ) ),
 	//SendPropModelIndex( SENDINFO( m_nModelIndex ) ),
 	//SendPropInt		( SENDINFO(m_nForceBone), 8, 0 ),
 	//SendPropVector	( SENDINFO(m_vecForce), -1, SPROP_NOSCALE ),
-	SendPropVector( SENDINFO( m_vecRagdollVelocity ) )
+	//SendPropVector( SENDINFO( m_vecRagdollVelocity ) )
 END_SEND_TABLE()
 
 
@@ -594,7 +631,7 @@ void CDODPlayer::PlayerDeathThink()
 	//overridden, do nothing
 }
 
-void CDODPlayer::CreateRagdollEntity()
+CRagdollProp* CDODPlayer::CreateRagdollProp()
 {
 	// If we already have a ragdoll, don't make another one.
 	CDODRagdoll *pRagdoll = dynamic_cast< CDODRagdoll* >( m_hRagdoll.Get() );
@@ -616,8 +653,8 @@ void CDODPlayer::CreateRagdollEntity()
 	if ( pRagdoll )
 	{
 		pRagdoll->m_hPlayer = this;
-		pRagdoll->m_vecRagdollOrigin = GetEngineObject()->GetAbsOrigin();
-		pRagdoll->m_vecRagdollVelocity = GetEngineObject()->GetAbsVelocity();
+		//pRagdoll->m_vecRagdollOrigin = GetEngineObject()->GetAbsOrigin();
+		//pRagdoll->m_vecRagdollVelocity = GetEngineObject()->GetAbsVelocity();
 		pRagdoll->GetEngineObject()->SetModelIndex(GetEngineObject()->GetModelIndex());
 		pRagdoll->GetEngineObject()->SetForceBone(GetEngineObject()->GetForceBone());
 		pRagdoll->GetEngineObject()->SetVecForce( m_vecTotalBulletForce);
@@ -625,6 +662,7 @@ void CDODPlayer::CreateRagdollEntity()
 
 	// ragdolls will be removed on round restart automatically
 	m_hRagdoll = pRagdoll;
+	return pRagdoll;
 }
 
 // Called when a player is disconnecting
@@ -778,7 +816,7 @@ void CDODPlayer::Event_Killed( const CTakeDamageInfo &info )
 	
 	// Note: since we're dead, it won't draw us on the client, but we don't set EF_NODRAW
 	// because we still want to transmit to the clients in our PVS.
-	CreateRagdollEntity();
+	//CreateRagdollEntity();
 
 	State_Transition( STATE_DEATH_ANIM );	// Transition into the dying state.
 	BaseClass::Event_Killed( subinfo );

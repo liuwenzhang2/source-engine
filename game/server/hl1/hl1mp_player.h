@@ -36,7 +36,7 @@ public:
     virtual void PostThink( void );
     virtual void SetAnimation( PLAYER_ANIM playerAnim );
     void GiveDefaultItems( void );
-    void CreateRagdollEntity( void );
+	CRagdollProp* CreateRagdollProp();
     void UpdateOnRemove( void );
     virtual bool BecomeRagdollOnClient( const Vector &force ) { return true; };
     virtual void CreateCorpse( void );

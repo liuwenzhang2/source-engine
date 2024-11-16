@@ -734,7 +734,8 @@ private:
 
 protected:
 
-	void CreateRagdollEntity();
+	CRagdollProp* CreateRagdollProp();
+	//void CreateRagdollEntity();
 
 	bool IsHittingShield( const Vector &vecDirection, trace_t *ptr );
 

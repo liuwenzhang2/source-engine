@@ -51,6 +51,7 @@
 #include "weapon_dodbasegrenade.h"
 // NVNT - for planting bomb effect
 #include "weapon_dodbasebomb.h"
+#include "ragdoll.h"
 
 #if defined( CDODPlayer )
 	#undef CDODPlayer
@@ -271,10 +272,10 @@ ConVar cl_low_violence( "cl_low_violence", "0" );
 ConVar cl_ragdoll_fade_time( "cl_ragdoll_fade_time", "15", FCVAR_CLIENTDLL );
 ConVar cl_ragdoll_pronecheck_distance( "cl_ragdoll_pronecheck_distance", "64", FCVAR_GAMEDLL );
 
-class C_DODRagdoll : public C_BaseAnimatingOverlay
+class C_DODRagdoll : public C_ServerRagdoll
 {
 public:
-	DECLARE_CLASS( C_DODRagdoll, C_BaseAnimatingOverlay );
+	DECLARE_CLASS( C_DODRagdoll, C_ServerRagdoll);
 	DECLARE_CLIENTCLASS();
 	
 	C_DODRagdoll();
@@ -303,20 +304,20 @@ private:
 private:
 
 	EHANDLE	m_hPlayer;
-	CNetworkVector( m_vecRagdollVelocity );
-	CNetworkVector( m_vecRagdollOrigin );
+	//CNetworkVector( m_vecRagdollVelocity );
+	//CNetworkVector( m_vecRagdollOrigin );
 	float m_fDeathTime;
 	bool  m_bFadingOut;
 };
 
 
-IMPLEMENT_CLIENTCLASS_DT_NOBASE( C_DODRagdoll, DT_DODRagdoll, CDODRagdoll )
-	RecvPropVector( RECVINFO(m_vecRagdollOrigin) ),
+IMPLEMENT_CLIENTCLASS_DT( C_DODRagdoll, DT_DODRagdoll, CDODRagdoll )
+	//RecvPropVector( RECVINFO(m_vecRagdollOrigin) ),
 	RecvPropEHandle( RECVINFO( m_hPlayer ) ),
 	//RecvPropInt( RECVINFO( m_nModelIndex ) ),
 	//RecvPropInt( RECVINFO(m_nForceBone) ),
 	//RecvPropVector( RECVINFO(m_vecForce) ),
-	RecvPropVector( RECVINFO( m_vecRagdollVelocity ) )
+	//RecvPropVector( RECVINFO( m_vecRagdollVelocity ) )
 END_RECV_TABLE()
 
 
@@ -421,9 +422,9 @@ void C_DODRagdoll::CreateLowViolenceRagdoll()
 		GetEngineObject()->SetSequence( LookupSequence( str ) );
 		ForceClientSideAnimationOn();
 
-		GetEngineObject()->SetNetworkOrigin( m_vecRagdollOrigin );
-		GetEngineObject()->SetAbsOrigin( m_vecRagdollOrigin );
-		GetEngineObject()->SetAbsVelocity( m_vecRagdollVelocity );
+		//GetEngineObject()->SetNetworkOrigin( m_vecRagdollOrigin );
+		//GetEngineObject()->SetAbsOrigin( m_vecRagdollOrigin );
+		//GetEngineObject()->SetAbsVelocity( m_vecRagdollVelocity );
 
 		C_DODPlayer *pPlayer = dynamic_cast< C_DODPlayer* >( m_hPlayer.Get() );
 		if ( pPlayer && !pPlayer->IsDormant() )
@@ -473,11 +474,11 @@ void C_DODRagdoll::CreateDODRagdoll()
 		{
 			// This is the local player, so set them in a default
 			// pose and slam their velocity, angles and origin
-			GetEngineObject()->SetAbsOrigin( m_vecRagdollOrigin );
+			//GetEngineObject()->SetAbsOrigin( m_vecRagdollOrigin );
 			
 			GetEngineObject()->SetAbsAngles( pPlayer->GetRenderAngles() );
 
-			GetEngineObject()->SetAbsVelocity( m_vecRagdollVelocity );
+			//GetEngineObject()->SetAbsVelocity( m_vecRagdollVelocity );
 
 			int iSeq = LookupSequence( "RagdollSpawn" );	// hax, find a neutral standing pose
 			if ( iSeq == -1 )
@@ -498,10 +499,10 @@ void C_DODRagdoll::CreateDODRagdoll()
 	{
 		// overwrite network origin so later interpolation will
 		// use this position
-		GetEngineObject()->SetNetworkOrigin( m_vecRagdollOrigin );
+		//GetEngineObject()->SetNetworkOrigin( m_vecRagdollOrigin );
 
-		GetEngineObject()->SetAbsOrigin( m_vecRagdollOrigin );
-		GetEngineObject()->SetAbsVelocity( m_vecRagdollVelocity );
+		//GetEngineObject()->SetAbsOrigin( m_vecRagdollOrigin );
+		//GetEngineObject()->SetAbsVelocity( m_vecRagdollVelocity );
 
 		GetEngineObject()->Interp_Reset();
 		
@@ -544,7 +545,7 @@ void C_DODRagdoll::CreateDODRagdoll()
 void C_DODRagdoll::OnDataChanged( DataUpdateType_t type )
 {
 	BaseClass::OnDataChanged( type );
-
+	return;
 	if ( type == DATA_UPDATE_CREATED )
 	{
 		if ( cl_low_violence.GetInt() )

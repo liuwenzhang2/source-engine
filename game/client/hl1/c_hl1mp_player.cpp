@@ -264,13 +264,13 @@ void C_HL1MP_Player::ClientThink( void )
 //HL1MPRAGDOLL
 
 
-IMPLEMENT_CLIENTCLASS_DT_NOBASE( C_HL1MPRagdoll, DT_HL1MPRagdoll, CHL1MPRagdoll )
-	RecvPropVector( RECVINFO(m_vecRagdollOrigin) ),
+IMPLEMENT_CLIENTCLASS_DT( C_HL1MPRagdoll, DT_HL1MPRagdoll, CHL1MPRagdoll )
+	//RecvPropVector( RECVINFO(m_vecRagdollOrigin) ),
 	RecvPropEHandle( RECVINFO( m_hPlayer ) ),
 	//RecvPropInt( RECVINFO( m_nModelIndex ) ),
 	//RecvPropInt( RECVINFO(m_nForceBone) ),
 	//RecvPropVector( RECVINFO(m_vecForce) ),
-	RecvPropVector( RECVINFO( m_vecRagdollVelocity ) )
+	//RecvPropVector( RECVINFO( m_vecRagdollVelocity ) )
 END_RECV_TABLE()
 
 
@@ -437,11 +437,11 @@ void C_HL1MPRagdoll::CreateHL1MPRagdoll( void )
 		{
 			// This is the local player, so set them in a default
 			// pose and slam their velocity, angles and origin
-			GetEngineObject()->SetAbsOrigin( m_vecRagdollOrigin );
+			//GetEngineObject()->SetAbsOrigin( m_vecRagdollOrigin );
 			
 			GetEngineObject()->SetAbsAngles( pPlayer->GetRenderAngles() );
 
-			GetEngineObject()->SetAbsVelocity( m_vecRagdollVelocity );
+			//GetEngineObject()->SetAbsVelocity( m_vecRagdollVelocity );
 
 			int iSeq = pPlayer->GetEngineObject()->GetSequence();
 			if ( iSeq == -1 )
@@ -460,10 +460,10 @@ void C_HL1MPRagdoll::CreateHL1MPRagdoll( void )
 	{
 		// overwrite network origin so later interpolation will
 		// use this position
-		GetEngineObject()->SetNetworkOrigin( m_vecRagdollOrigin );
+		//GetEngineObject()->SetNetworkOrigin( m_vecRagdollOrigin );
 
-		GetEngineObject()->SetAbsOrigin( m_vecRagdollOrigin );
-		GetEngineObject()->SetAbsVelocity( m_vecRagdollVelocity );
+		//GetEngineObject()->SetAbsOrigin( m_vecRagdollOrigin );
+		//GetEngineObject()->SetAbsVelocity( m_vecRagdollVelocity );
 
 		GetEngineObject()->Interp_Reset();
 		

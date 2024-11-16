@@ -22,6 +22,7 @@
 #include "portal_shareddefs.h"
 #include "ivieweffects.h"		// for screenshake
 #include "prop_portal_shared.h"
+#include "ragdoll.h"
 
 // NVNT for fov updates
 #include "haptics/ihaptics.h"
@@ -85,11 +86,11 @@ END_RECV_TABLE()
 //
 // Ragdoll Entity
 //
-class C_PortalRagdoll : public C_BaseFlex
+class C_PortalRagdoll : public C_ServerRagdoll
 {
 public:
 
-	DECLARE_CLASS( C_PortalRagdoll, C_BaseFlex );
+	DECLARE_CLASS( C_PortalRagdoll, C_ServerRagdoll);
 	DECLARE_CLIENTCLASS();
 
 	C_PortalRagdoll();
@@ -112,18 +113,18 @@ private:
 private:
 
 	EHANDLE	m_hPlayer;
-	CNetworkVector( m_vecRagdollVelocity );
-	CNetworkVector( m_vecRagdollOrigin );
+	//CNetworkVector( m_vecRagdollVelocity );
+	//CNetworkVector( m_vecRagdollOrigin );
 
 };
 
-IMPLEMENT_CLIENTCLASS_DT_NOBASE( C_PortalRagdoll, DT_PortalRagdoll, CPortalRagdoll )
-RecvPropVector( RECVINFO(m_vecRagdollOrigin) ),
+IMPLEMENT_CLIENTCLASS_DT( C_PortalRagdoll, DT_PortalRagdoll, CPortalRagdoll )
+//RecvPropVector( RECVINFO(m_vecRagdollOrigin) ),
 RecvPropEHandle( RECVINFO( m_hPlayer ) ),
 //RecvPropInt( RECVINFO( m_nModelIndex ) ),
 //RecvPropInt( RECVINFO(m_nForceBone) ),
 //RecvPropVector( RECVINFO(m_vecForce) ),
-RecvPropVector( RECVINFO( m_vecRagdollVelocity ) ),
+//RecvPropVector( RECVINFO( m_vecRagdollVelocity ) ),
 END_RECV_TABLE()
 
 
@@ -213,7 +214,7 @@ void C_PortalRagdoll::CreatePortalRagdoll()
 		// pose and slam their velocity, angles and origin
 		GetEngineObject()->SetAbsOrigin( /* m_vecRagdollOrigin : */ pPlayer->GetRenderOrigin() );
 		GetEngineObject()->SetAbsAngles( pPlayer->GetRenderAngles() );
-		GetEngineObject()->SetAbsVelocity( m_vecRagdollVelocity );
+		//GetEngineObject()->SetAbsVelocity( m_vecRagdollVelocity );
 
 		// Hack! Find a neutral standing pose or use the idle.
 		int iSeq = LookupSequence( "ragdoll" );

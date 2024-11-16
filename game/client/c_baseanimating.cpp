@@ -54,6 +54,7 @@
 #include "replay/replay_ragdoll.h"
 #include "studio_stats.h"
 #include "tier1/callqueue.h"
+#include "ragdoll.h"
 
 #ifdef TF_CLIENT_DLL
 #include "c_tf_player.h"

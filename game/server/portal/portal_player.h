@@ -118,7 +118,7 @@ public:
 	Vector GetAttackSpread( CBaseCombatWeapon *pWeapon, CBaseEntity *pTarget = NULL );
 
 	void CheatImpulseCommands( int iImpulse );
-	void CreateRagdollEntity( const CTakeDamageInfo &info );
+	CRagdollProp* CreateRagdollProp();
 	void GiveAllItems( void );
 	void GiveDefaultItems( void );
 

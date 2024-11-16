@@ -12,6 +12,7 @@
 #include "cbase.h"
 #include "hl1_c_player.h"
 #include "hl1_player_shared.h"
+#include "ragdoll.h"
 
 
 class C_HL1MP_Player : public C_HL1_Player
@@ -85,10 +86,10 @@ private:
 };
 
 
-class C_HL1MPRagdoll : public C_BaseAnimatingOverlay
+class C_HL1MPRagdoll : public C_ServerRagdoll
 {
 public:
-	DECLARE_CLASS( C_HL1MPRagdoll, C_BaseAnimatingOverlay );
+	DECLARE_CLASS( C_HL1MPRagdoll, C_ServerRagdoll);
 	DECLARE_CLIENTCLASS();
 	
 	C_HL1MPRagdoll();
@@ -113,8 +114,8 @@ private:
 private:
 
 	EHANDLE	m_hPlayer;
-	CNetworkVector( m_vecRagdollVelocity );
-	CNetworkVector( m_vecRagdollOrigin );
+	//CNetworkVector( m_vecRagdollVelocity );
+	//CNetworkVector( m_vecRagdollOrigin );
 };
 
 

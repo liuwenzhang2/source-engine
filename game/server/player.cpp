@@ -8881,7 +8881,9 @@ void CBasePlayer::HandleAnimEvent( animevent_t *pEvent )
 		if ( pEvent->event == AE_RAGDOLL )
 		{
 			// Convert to ragdoll immediately
-			CreateRagdollEntity();
+			CTakeDamageInfo info;
+			CBaseEntity* pRagdoll = CreateServerRagdoll(0, info, COLLISION_GROUP_DEBRIS, true);
+			//CreateRagdollEntity();
 			BecomeRagdollOnClient( vec3_origin );
  
 			// Force the player to start death thinking

@@ -609,7 +609,7 @@ public:
 
 	virtual void			CheckChatText( char *p, int bufsize ) {}
 
-	virtual void			CreateRagdollEntity( void ) { return; }
+	//virtual void			CreateRagdollEntity( void ) { return; }
 
 	virtual void			HandleAnimEvent( animevent_t *pEvent );
 

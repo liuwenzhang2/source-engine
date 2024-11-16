@@ -56,6 +56,7 @@
 #include "gamestats.h"
 #include "holiday_gift.h"
 #include "../../shared/cstrike/cs_achievement_constants.h"
+#include "physics_prop_ragdoll.h"
 
 //=============================================================================
 // HPE_BEGIN
@@ -185,10 +186,10 @@ static CPhysicsPlayerCallback playerCallback;
 // Ragdoll entities.
 // -------------------------------------------------------------------------------- //
 
-class CCSRagdoll : public CBaseAnimatingOverlay
+class CCSRagdoll : public CRagdollProp
 {
 public:
-	DECLARE_CLASS( CCSRagdoll, CBaseAnimatingOverlay );
+	DECLARE_CLASS( CCSRagdoll, CRagdollProp);
 	DECLARE_SERVERCLASS();
 
 	// Transmit ragdolls to everyone.
@@ -207,32 +208,69 @@ public:
 		GetEngineObject()->SetCollisionGroup( COLLISION_GROUP_DEBRIS );
 		GetEngineObject()->SetAbsOrigin( m_hPlayer->GetEngineObject()->GetAbsOrigin() );
 		GetEngineObject()->SetAbsVelocity( m_hPlayer->GetEngineObject()->GetAbsVelocity() );
-		GetEngineObject()->AddSolidFlags( FSOLID_NOT_SOLID );
+		//GetEngineObject()->AddSolidFlags( FSOLID_NOT_SOLID );
 		ChangeTeam( m_hPlayer->GetTeamNumber() );
-		GetEngineObject()->UseClientSideAnimation();
+		//GetEngineObject()->UseClientSideAnimation();
 	}
+
+	void ImpactTrace(trace_t* pTrace, int iDamageType, const char* pCustomImpactName);
 
 public:
 	// In case the client has the player entity, we transmit the player index.
 	// In case the client doesn't have it, we transmit the player's model index, origin, and angles
 	// so they can create a ragdoll in the right place.
 	CNetworkHandle( CBaseEntity, m_hPlayer );	// networked entity handle
-	CNetworkVector( m_vecRagdollVelocity );
-	CNetworkVector( m_vecRagdollOrigin );
+	//CNetworkVector( m_vecRagdollVelocity );
+	//CNetworkVector( m_vecRagdollOrigin );
 	CNetworkVar(int, m_iDeathPose );
 	CNetworkVar(int, m_iDeathFrame );
 };
 
+void CCSRagdoll::ImpactTrace(trace_t* pTrace, int iDamageType, const char* pCustomImpactName)
+{
+	IPhysicsObject* pPhysicsObject = VPhysicsGetObject();
+
+	if (!pPhysicsObject)
+		return;
+
+	Vector dir = pTrace->endpos - pTrace->startpos;
+
+	if (iDamageType == DMG_BLAST)
+	{
+		dir *= 4000;  // adjust impact strenght
+
+		// apply force at object mass center
+		pPhysicsObject->ApplyForceCenter(dir);
+	}
+	else
+	{
+		Vector hitpos;
+
+		VectorMA(pTrace->startpos, pTrace->fraction, dir, hitpos);
+		VectorNormalize(dir);
+
+		dir *= 4000;  // adjust impact strenght
+
+		// apply force where we hit it
+		pPhysicsObject->ApplyForceOffset(dir, hitpos);
+
+		// Blood spray!
+		//FX_CS_BloodSpray(hitpos, dir, 10);
+	}
+
+	GetEngineObject()->VPhysicsUpdate(pPhysicsObject);
+}
+
 LINK_ENTITY_TO_CLASS( cs_ragdoll, CCSRagdoll );
 
-IMPLEMENT_SERVERCLASS_ST_NOBASE( CCSRagdoll, DT_CSRagdoll )
+IMPLEMENT_SERVERCLASS_ST( CCSRagdoll, DT_CSRagdoll )
 	//SendPropVector	(SENDINFO_ORIGIN(m_vecOrigin), -1,  SPROP_COORD|SPROP_CHANGES_OFTEN, 0.0f, HIGH_DEFAULT, SendProxy_Origin ),
-	SendPropVector( SENDINFO(m_vecRagdollOrigin), -1,  SPROP_COORD ),
+	//SendPropVector( SENDINFO(m_vecRagdollOrigin), -1,  SPROP_COORD ),
 	SendPropEHandle( SENDINFO( m_hPlayer ) ),
 	//SendPropModelIndex( SENDINFO( m_nModelIndex ) ),
 	//SendPropInt		( SENDINFO(m_nForceBone), 8, 0 ),
 	//SendPropVector	( SENDINFO(m_vecForce), -1, SPROP_NOSCALE ),
-	SendPropVector( SENDINFO( m_vecRagdollVelocity ) ),
+	//SendPropVector( SENDINFO( m_vecRagdollVelocity ) ),
 	SendPropInt( SENDINFO( m_iDeathPose ), ANIMATION_SEQUENCE_BITS, SPROP_UNSIGNED ),
 	SendPropInt( SENDINFO( m_iDeathFrame ), 5 ),
 	SendPropInt( SENDINFO(m_iTeamNum), TEAMNUM_NUM_BITS, 0),
@@ -1004,25 +1042,26 @@ void CCSPlayer::SetClanTag( const char *pTag )
 		Q_strncpy( m_szClanTag, pTag, sizeof( m_szClanTag ) );
 	}
 }
-void CCSPlayer::CreateRagdollEntity()
+
+CRagdollProp* CCSPlayer::CreateRagdollProp() 
 {
 	// If we already have a ragdoll, don't make another one.
-	CCSRagdoll *pRagdoll = dynamic_cast< CCSRagdoll* >( m_hRagdoll.Get() );
+	CCSRagdoll* pRagdoll = dynamic_cast<CCSRagdoll*>(m_hRagdoll.Get());
 
-	if ( !pRagdoll )
+	if (!pRagdoll)
 	{
 		// create a new one
-		pRagdoll = dynamic_cast< CCSRagdoll* >(gEntList.CreateEntityByName( "cs_ragdoll" ) );
+		pRagdoll = dynamic_cast<CCSRagdoll*>(gEntList.CreateEntityByName("cs_ragdoll"));
 	}
 
-	if ( pRagdoll )
+	if (pRagdoll)
 	{
 		pRagdoll->m_hPlayer = this;
-		pRagdoll->m_vecRagdollOrigin = GetEngineObject()->GetAbsOrigin();
-		pRagdoll->m_vecRagdollVelocity = GetEngineObject()->GetAbsVelocity();
+		//pRagdoll->m_vecRagdollOrigin = GetEngineObject()->GetAbsOrigin();
+		//pRagdoll->m_vecRagdollVelocity = GetEngineObject()->GetAbsVelocity();
 		pRagdoll->GetEngineObject()->SetModelIndex(GetEngineObject()->GetModelIndex());
 		pRagdoll->GetEngineObject()->SetForceBone(GetEngineObject()->GetForceBone());
-		pRagdoll->GetEngineObject()->SetVecForce( m_vecTotalBulletForce);
+		pRagdoll->GetEngineObject()->SetVecForce(m_vecTotalBulletForce);
 		pRagdoll->m_iDeathPose = m_iDeathPose;
 		pRagdoll->m_iDeathFrame = m_iDeathFrame;
 		pRagdoll->Init();
@@ -1030,7 +1069,13 @@ void CCSPlayer::CreateRagdollEntity()
 
 	// ragdolls will be removed on round restart automatically
 	m_hRagdoll = pRagdoll;
+	return pRagdoll;
 }
+
+//void CCSPlayer::CreateRagdollEntity()
+//{
+//
+//}
 
 int CCSPlayer::OnTakeDamage_Alive( const CTakeDamageInfo &info )
 {
@@ -1239,7 +1284,7 @@ void CCSPlayer::Event_Killed( const CTakeDamageInfo &info )
 
 	// Note: since we're dead, it won't draw us on the client, but we don't set EF_NODRAW
 	// because we still want to transmit to the clients in our PVS.
-	CreateRagdollEntity();
+	//CreateRagdollEntity();
 
 	// Special code to drop holiday gifts for the holiday achievement
 	if ( ( mp_holiday_nogifts.GetBool() == false ) && UTIL_IsHolidayActive( 3 /*kHoliday_Christmas*/ ) )
@@ -1250,8 +1295,8 @@ void CCSPlayer::Event_Killed( const CTakeDamageInfo &info )
 		}
 	}
 
-	State_Transition( STATE_DEATH_ANIM );	// Transition into the dying state.
 	BaseClass::Event_Killed( subinfo );
+	State_Transition(STATE_DEATH_ANIM);	// Transition into the dying state.
 
 	//=============================================================================
 	// HPE_BEGIN:

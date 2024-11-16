@@ -22,6 +22,7 @@ struct animevent_t;
 struct matrix3x4_t;
 class CIKContext;
 class KeyValues;
+class CRagdollProp;
 FORWARD_DECLARE_HANDLE( memhandle_t );
 
 #define	BCF_NO_ANIMATION_SKIP	( 1 << 0 )	// Do not allow PVS animation skipping (mostly for attachments being critical to an entity)
@@ -93,7 +94,8 @@ public:
 
 	// This will stop animation until you call ResetSequenceInfo() at some point in the future
 	inline void StopAnimation( void ) { GetEngineObject()->SetPlaybackRate(0); }
-
+	virtual CRagdollProp* CreateRagdollProp();
+	virtual CBaseEntity* CreateServerRagdoll(int forceBone, const CTakeDamageInfo& info, int collisionGroup, bool bUseLRURetirement = false);
 	virtual void ClampRagdollForce( const Vector &vecForceIn, Vector *vecForceOut ) { *vecForceOut = vecForceIn; } // Base class does nothing.
 	virtual bool BecomeRagdollOnClient( const Vector &force );
 	virtual bool IsRagdoll();

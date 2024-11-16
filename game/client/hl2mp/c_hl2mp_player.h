@@ -13,6 +13,7 @@ class C_HL2MP_Player;
 #include "c_basehlplayer.h"
 #include "hl2mp_player_shared.h"
 #include "beamdraw.h"
+#include "ragdoll.h"
 
 //=============================================================================
 // >> HL2MP_Player
@@ -139,10 +140,10 @@ inline C_HL2MP_Player *ToHL2MPPlayer( CBaseEntity *pEntity )
 }
 
 
-class C_HL2MPRagdoll : public C_BaseAnimatingOverlay
+class C_HL2MPRagdoll : public C_ServerRagdoll
 {
 public:
-	DECLARE_CLASS( C_HL2MPRagdoll, C_BaseAnimatingOverlay );
+	DECLARE_CLASS( C_HL2MPRagdoll, C_ServerRagdoll);
 	DECLARE_CLIENTCLASS();
 	
 	C_HL2MPRagdoll();
@@ -167,8 +168,8 @@ private:
 private:
 
 	EHANDLE	m_hPlayer;
-	CNetworkVector( m_vecRagdollVelocity );
-	CNetworkVector( m_vecRagdollOrigin );
+	//CNetworkVector( m_vecRagdollVelocity );
+	//CNetworkVector( m_vecRagdollOrigin );
 };
 
 #endif //HL2MP_PLAYER_H

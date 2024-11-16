@@ -9,6 +9,7 @@
 #include "hl1mp_player.h"
 #include "client.h"
 #include "team.h"
+#include "physics_prop_ragdoll.h"
 
 class CTEPlayerAnimEvent : public CBaseTempEntity
 {
@@ -208,8 +209,8 @@ void CHL1MP_Player::Event_Killed( const CTakeDamageInfo &info )
     
 	// Note: since we're dead, it won't draw us on the client, but we don't set EF_NODRAW
 	// because we still want to transmit to the clients in our PVS.
-	if ( !IsHLTV() )
-		CreateRagdollEntity();
+	//if ( !IsHLTV() )
+	//	CreateRagdollEntity();
 
 	DetonateSatchelCharges();
 
@@ -568,10 +569,10 @@ void CHL1MP_Player::SetPlayerModel( void )
 // Ragdoll entities.
 // -------------------------------------------------------------------------------- //
 
-class CHL1MPRagdoll : public CBaseAnimatingOverlay
+class CHL1MPRagdoll : public CRagdollProp
 {
 public:
-	DECLARE_CLASS( CHL1MPRagdoll, CBaseAnimatingOverlay );
+	DECLARE_CLASS( CHL1MPRagdoll, CRagdollProp);
 	DECLARE_SERVERCLASS();
 
 	// Transmit ragdolls to everyone.
@@ -580,28 +581,62 @@ public:
 		return SetTransmitState( FL_EDICT_ALWAYS );
 	}
 
+	void ImpactTrace(trace_t* pTrace, int iDamageType, const char* pCustomImpactName);
 public:
 	// In case the client has the player entity, we transmit the player index.
 	// In case the client doesn't have it, we transmit the player's model index, origin, and angles
 	// so they can create a ragdoll in the right place.
 	CNetworkHandle( CBaseEntity, m_hPlayer );	// networked entity handle 
-	CNetworkVector( m_vecRagdollVelocity );
-	CNetworkVector( m_vecRagdollOrigin );
+	//CNetworkVector( m_vecRagdollVelocity );
+	//CNetworkVector( m_vecRagdollOrigin );
 };
+
+void CHL1MPRagdoll::ImpactTrace(trace_t* pTrace, int iDamageType, const char* pCustomImpactName)
+{
+	IPhysicsObject* pPhysicsObject = VPhysicsGetObject();
+
+	if (!pPhysicsObject)
+		return;
+
+	Vector dir = pTrace->endpos - pTrace->startpos;
+
+	if (iDamageType == DMG_BLAST)
+	{
+		dir *= 4000;  // adjust impact strenght
+
+		// apply force at object mass center
+		pPhysicsObject->ApplyForceCenter(dir);
+	}
+	else
+	{
+		Vector hitpos;
+
+		VectorMA(pTrace->startpos, pTrace->fraction, dir, hitpos);
+		VectorNormalize(dir);
+
+		dir *= 4000;  // adjust impact strenght
+
+		// apply force where we hit it
+		pPhysicsObject->ApplyForceOffset(dir, hitpos);
+
+	}
+
+	GetEngineObject()->VPhysicsUpdate(pPhysicsObject);
+}
 
 LINK_ENTITY_TO_CLASS( hl1mp_ragdoll, CHL1MPRagdoll );
 
-IMPLEMENT_SERVERCLASS_ST_NOBASE( CHL1MPRagdoll, DT_HL1MPRagdoll )
-	SendPropVector    ( SENDINFO( m_vecRagdollOrigin), -1,  SPROP_COORD ),
+IMPLEMENT_SERVERCLASS_ST( CHL1MPRagdoll, DT_HL1MPRagdoll )
+	//SendPropVector    ( SENDINFO( m_vecRagdollOrigin), -1,  SPROP_COORD ),
 	SendPropEHandle   ( SENDINFO( m_hPlayer ) ),
 	//SendPropModelIndex( SENDINFO( m_nModelIndex ) ),
 	//SendPropInt		  ( SENDINFO( m_nForceBone), 8, 0 ),
 	//SendPropVector	  ( SENDINFO( m_vecForce), -1, SPROP_NOSCALE ),
-	SendPropVector    ( SENDINFO( m_vecRagdollVelocity ) )
+	//SendPropVector    ( SENDINFO( m_vecRagdollVelocity ) )
 END_SEND_TABLE()
 
 
-void CHL1MP_Player::CreateRagdollEntity( void )
+CRagdollProp* CHL1MP_Player::CreateRagdollProp()
 {
     if ( m_hRagdoll )
     {
@@ -621,8 +656,8 @@ void CHL1MP_Player::CreateRagdollEntity( void )
     if ( pRagdoll )
     {
 		pRagdoll->m_hPlayer = this;
-		pRagdoll->m_vecRagdollOrigin = GetEngineObject()->GetAbsOrigin();
-		pRagdoll->m_vecRagdollVelocity = GetEngineObject()->GetAbsVelocity();
+		//pRagdoll->m_vecRagdollOrigin = GetEngineObject()->GetAbsOrigin();
+		//pRagdoll->m_vecRagdollVelocity = GetEngineObject()->GetAbsVelocity();
 		pRagdoll->GetEngineObject()->SetModelIndex(GetEngineObject()->GetModelIndex());
 		pRagdoll->GetEngineObject()->SetForceBone(GetEngineObject()->GetForceBone());
 		//pRagdoll->m_vecForce = m_vecTotalBulletForce;
@@ -631,6 +666,7 @@ void CHL1MP_Player::CreateRagdollEntity( void )
     }
 
 	m_hRagdoll = pRagdoll;    
+	return pRagdoll;
 }
 
 void CHL1MP_Player::CreateCorpse( void )

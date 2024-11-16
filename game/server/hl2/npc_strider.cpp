@@ -1766,7 +1766,7 @@ void CNPC_Strider::RunTask( const Task_t *pTask )
 			if ( !GetEngineObject()->IsMarkedForDeletion() )
 			{
 				CTakeDamageInfo info;
-				CreateServerRagdoll( this, 0, info, COLLISION_GROUP_NONE );
+				CreateServerRagdoll( 0, info, COLLISION_GROUP_NONE );
 				TaskComplete();
 				UTIL_Remove(this);
 			}
@@ -3460,7 +3460,7 @@ bool CNPC_Strider::BecomeRagdoll( const CTakeDamageInfo &info, const Vector &for
 				}
 			}
 
-			pRagdoll = assert_cast<CRagdollProp *>( CreateServerRagdoll( this, GetEngineObject()->GetForceBone(), info, HL2COLLISION_GROUP_STRIDER));
+			pRagdoll = assert_cast<CRagdollProp *>( CreateServerRagdoll( GetEngineObject()->GetForceBone(), info, HL2COLLISION_GROUP_STRIDER));
 			pRagdoll->DisableAutoFade();
 
 			if ( maxRagdolls == 0 )
@@ -3476,7 +3476,7 @@ bool CNPC_Strider::BecomeRagdoll( const CTakeDamageInfo &info, const Vector &for
 		else
 		{
 			// Otherwise just keel over
-			pRagdoll = assert_cast<CRagdollProp *>( CreateServerRagdoll( this, GetEngineObject()->GetForceBone(), info, HL2COLLISION_GROUP_STRIDER));
+			pRagdoll = assert_cast<CRagdollProp *>( CreateServerRagdoll( GetEngineObject()->GetForceBone(), info, HL2COLLISION_GROUP_STRIDER));
 			pRagdoll->DisableAutoFade();
 		}
 	}

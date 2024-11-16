@@ -493,7 +493,7 @@ private:
 
 protected:
 
-	void CreateRagdollEntity();
+	CRagdollProp* CreateRagdollProp();
 
 
 	void PhysObjectSleep();

@@ -26,6 +26,7 @@
 #include "c_ai_basenpc.h"
 #include "mathlib/polyhedron.h"
 #include "model_types.h"
+#include "ragdoll.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"

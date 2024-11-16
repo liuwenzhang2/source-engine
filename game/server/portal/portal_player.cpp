@@ -33,6 +33,7 @@
 #include "soundenvelope.h"
 #include "ai_speech.h"		// For expressors, vcd playing
 #include "sceneentity.h"	// has the VCD precache function
+#include "physics_prop_ragdoll.h"
 
 // Max mass the player can lift with +use
 #define PORTAL_PLAYER_MAX_LIFT_MASS 85
@@ -86,19 +87,19 @@ void TE_PlayerAnimEvent( CBasePlayer *pPlayer, PlayerAnimEvent_t event, int nDat
 //
 // Ragdoll Entity
 //
-class CPortalRagdoll : public CBaseAnimatingOverlay//, public CDefaultPlayerPickupVPhysics
+class CPortalRagdoll : public CRagdollProp//, public CDefaultPlayerPickupVPhysics
 {
 public:
 
-	DECLARE_CLASS( CPortalRagdoll, CBaseAnimatingOverlay );
+	DECLARE_CLASS( CPortalRagdoll, CRagdollProp);
 	DECLARE_SERVERCLASS();
 	DECLARE_DATADESC();
 
 	CPortalRagdoll()
 	{
 		m_hPlayer.Set( NULL );
-		m_vecRagdollOrigin.Init();
-		m_vecRagdollVelocity.Init();
+		//m_vecRagdollOrigin.Init();
+		//m_vecRagdollVelocity.Init();
 	}
 
 	// Transmit ragdolls to everyone.
@@ -111,27 +112,27 @@ public:
 	// In case the client doesn't have it, we transmit the player's model index, origin, and angles
 	// so they can create a ragdoll in the right place.
 	CNetworkHandle( CBaseEntity, m_hPlayer );	// networked entity handle 
-	CNetworkVector( m_vecRagdollVelocity );
-	CNetworkVector( m_vecRagdollOrigin );
+	//CNetworkVector( m_vecRagdollVelocity );
+	//CNetworkVector( m_vecRagdollOrigin );
 };
 
 LINK_ENTITY_TO_CLASS( portal_ragdoll, CPortalRagdoll );
 
-IMPLEMENT_SERVERCLASS_ST_NOBASE( CPortalRagdoll, DT_PortalRagdoll )
-	SendPropVector( SENDINFO(m_vecRagdollOrigin), -1,  SPROP_COORD ),
+IMPLEMENT_SERVERCLASS_ST( CPortalRagdoll, DT_PortalRagdoll )
+	//SendPropVector( SENDINFO(m_vecRagdollOrigin), -1,  SPROP_COORD ),
 	SendPropEHandle( SENDINFO( m_hPlayer ) ),
 	//SendPropModelIndex( SENDINFO( m_nModelIndex ) ),
 	//SendPropInt		( SENDINFO(m_nForceBone), 8, 0 ),
 	//SendPropVector	( SENDINFO(m_vecForce), -1, SPROP_NOSCALE ),
-	SendPropVector( SENDINFO( m_vecRagdollVelocity ) ),
+	//SendPropVector( SENDINFO( m_vecRagdollVelocity ) ),
 END_SEND_TABLE()
 
 
 BEGIN_DATADESC( CPortalRagdoll )
 
-	DEFINE_FIELD( m_vecRagdollOrigin, FIELD_POSITION_VECTOR ),
+	//DEFINE_FIELD( m_vecRagdollOrigin, FIELD_POSITION_VECTOR ),
 	DEFINE_FIELD( m_hPlayer, FIELD_EHANDLE ),
-	DEFINE_FIELD( m_vecRagdollVelocity, FIELD_VECTOR ),
+	//DEFINE_FIELD( m_vecRagdollVelocity, FIELD_VECTOR ),
 
 END_DATADESC()
 
@@ -1642,7 +1643,7 @@ bool CPortal_Player::BecomeRagdollOnClient( const Vector &force )
 	return true;//BaseClass::BecomeRagdollOnClient( force );
 }
 
-void CPortal_Player::CreateRagdollEntity( const CTakeDamageInfo &info )
+CRagdollProp* CPortal_Player::CreateRagdollProp()
 {
 	if ( m_hRagdoll )
 	{
@@ -1655,7 +1656,8 @@ void CPortal_Player::CreateRagdollEntity( const CTakeDamageInfo &info )
 	GetEngineObject()->AddEffects( EF_NODRAW | EF_NOSHADOW );
 	GetEngineObject()->AddEFlags( EFL_NO_DISSOLVE );
 #endif // PORTAL_HIDE_PLAYER_RAGDOLL
-	CBaseEntity *pRagdoll = CreateServerRagdoll( this, GetEngineObject()->GetForceBone(), info, COLLISION_GROUP_INTERACTIVE_DEBRIS, true);
+	CPortalRagdoll* pRagdoll = (CPortalRagdoll*)gEntList.CreateEntityByName("portal_ragdoll");
+	//CBaseEntity *pRagdoll = CreateServerRagdoll( GetEngineObject()->GetForceBone(), info, COLLISION_GROUP_INTERACTIVE_DEBRIS, true);
 	pRagdoll->m_takedamage = DAMAGE_NO;
 	m_hRagdoll = pRagdoll;
 
@@ -1719,6 +1721,7 @@ void CPortal_Player::CreateRagdollEntity( const CTakeDamageInfo &info )
 	// Save ragdoll handle.
 	m_hRagdoll = pRagdoll;
 */
+	return pRagdoll;
 }
 
 void CPortal_Player::Jump( void )
@@ -1747,7 +1750,7 @@ void CPortal_Player::Event_Killed( const CTakeDamageInfo &info )
 
 	// Note: since we're dead, it won't draw us on the client, but we don't set EF_NODRAW
 	// because we still want to transmit to the clients in our PVS.
-	CreateRagdollEntity( info );
+	//CreateRagdollEntity( info );
 
 	BaseClass::Event_Killed( subinfo );
 

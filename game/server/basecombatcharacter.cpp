@@ -1482,7 +1482,7 @@ bool CBaseCombatCharacter::BecomeRagdollBoogie( CBaseEntity *pKiller, const Vect
 
 	info.SetDamageForce( forceVector );
 
-	CBaseEntity *pRagdoll = CreateServerRagdoll( this, 0, info, COLLISION_GROUP_INTERACTIVE_DEBRIS, true );
+	CBaseEntity *pRagdoll = CreateServerRagdoll( 0, info, COLLISION_GROUP_INTERACTIVE_DEBRIS, true );
 
 	pRagdoll->GetEngineObject()->SetCollisionBounds(GetEngineObject()->OBBMins(), GetEngineObject()->OBBMaxs() );
 
@@ -1530,7 +1530,7 @@ bool CBaseCombatCharacter::BecomeRagdoll( const CTakeDamageInfo &info, const Vec
 #endif
 		// in single player create ragdolls on the server when the player hits someone
 		// with their vehicle - for more dramatic death/collisions
-		CBaseEntity *pRagdoll = CreateServerRagdoll( this, GetEngineObject()->GetForceBone(), info2, COLLISION_GROUP_INTERACTIVE_DEBRIS, true);
+		CBaseEntity *pRagdoll = CreateServerRagdoll( GetEngineObject()->GetForceBone(), info2, COLLISION_GROUP_INTERACTIVE_DEBRIS, true);
 		FixupBurningServerRagdoll( pRagdoll );
 		RemoveDeferred();
 		return true;
@@ -1544,7 +1544,7 @@ bool CBaseCombatCharacter::BecomeRagdoll( const CTakeDamageInfo &info, const Vec
 	// Burning corpses are server-side in episodic, if we're in darkness mode
 	if ( IsOnFire() && HL2GameRules()->IsAlyxInDarknessMode() )
 	{
-		CBaseEntity *pRagdoll = CreateServerRagdoll( this, GetEngineObject()->GetForceBone(), newinfo, COLLISION_GROUP_DEBRIS);
+		CBaseEntity *pRagdoll = CreateServerRagdoll( GetEngineObject()->GetForceBone(), newinfo, COLLISION_GROUP_DEBRIS);
 		FixupBurningServerRagdoll( pRagdoll );
 		RemoveDeferred();
 		return true;
@@ -1565,7 +1565,7 @@ bool CBaseCombatCharacter::BecomeRagdoll( const CTakeDamageInfo &info, const Vec
 			return false;
 
 		//FIXME: This is fairly leafy to be here, but time is short!
-		CBaseEntity *pRagdoll = CreateServerRagdoll( this, GetEngineObject()->GetForceBone(), newinfo, COLLISION_GROUP_INTERACTIVE_DEBRIS, true);
+		CBaseEntity *pRagdoll = CreateServerRagdoll( GetEngineObject()->GetForceBone(), newinfo, COLLISION_GROUP_INTERACTIVE_DEBRIS, true);
 		FixupBurningServerRagdoll( pRagdoll );
 		PhysSetEntityGameFlags( pRagdoll, FVPHYSICS_NO_SELF_COLLISIONS );
 		RemoveDeferred();
@@ -1575,12 +1575,14 @@ bool CBaseCombatCharacter::BecomeRagdoll( const CTakeDamageInfo &info, const Vec
 
 	if( hl2_episodic.GetBool() && Classify() == CLASS_PLAYER_ALLY_VITAL )
 	{
-		CreateServerRagdoll( this, GetEngineObject()->GetForceBone(), newinfo, COLLISION_GROUP_INTERACTIVE_DEBRIS, true);
+		CreateServerRagdoll( GetEngineObject()->GetForceBone(), newinfo, COLLISION_GROUP_INTERACTIVE_DEBRIS, true);
 		RemoveDeferred();
 		return true;
 	}
 #endif //HL2_DLL
 
+	CreateServerRagdoll(GetEngineObject()->GetForceBone(), newinfo, COLLISION_GROUP_INTERACTIVE_DEBRIS, true);
+	return true;
 	return BecomeRagdollOnClient( forceVector );
 }
 

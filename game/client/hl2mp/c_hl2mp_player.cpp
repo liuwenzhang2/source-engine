@@ -751,13 +751,13 @@ const IEngineObjectClient* C_HL2MP_Player::GetRepresentativeRagdoll() const
 //HL2MPRAGDOLL
 
 
-IMPLEMENT_CLIENTCLASS_DT_NOBASE( C_HL2MPRagdoll, DT_HL2MPRagdoll, CHL2MPRagdoll )
-	RecvPropVector( RECVINFO(m_vecRagdollOrigin) ),
+IMPLEMENT_CLIENTCLASS_DT( C_HL2MPRagdoll, DT_HL2MPRagdoll, CHL2MPRagdoll )
+	//RecvPropVector( RECVINFO(m_vecRagdollOrigin) ),
 	RecvPropEHandle( RECVINFO( m_hPlayer ) ),
 	//RecvPropInt( RECVINFO( m_nModelIndex ) ),
 	//RecvPropInt( RECVINFO(m_nForceBone) ),
 	//RecvPropVector( RECVINFO(m_vecForce) ),
-	RecvPropVector( RECVINFO( m_vecRagdollVelocity ) )
+	//RecvPropVector( RECVINFO( m_vecRagdollVelocity ) )
 END_RECV_TABLE()
 
 
@@ -869,11 +869,11 @@ void C_HL2MPRagdoll::CreateHL2MPRagdoll( void )
 		{
 			// This is the local player, so set them in a default
 			// pose and slam their velocity, angles and origin
-			GetEngineObject()->SetAbsOrigin( m_vecRagdollOrigin );
+			//GetEngineObject()->SetAbsOrigin( m_vecRagdollOrigin );
 			
 			GetEngineObject()->SetAbsAngles( pPlayer->GetRenderAngles() );
 
-			GetEngineObject()->SetAbsVelocity( m_vecRagdollVelocity );
+			//GetEngineObject()->SetAbsVelocity( m_vecRagdollVelocity );
 
 			int iSeq = pPlayer->GetEngineObject()->GetSequence();
 			if ( iSeq == -1 )
@@ -892,10 +892,10 @@ void C_HL2MPRagdoll::CreateHL2MPRagdoll( void )
 	{
 		// overwrite network origin so later interpolation will
 		// use this position
-		GetEngineObject()->SetNetworkOrigin( m_vecRagdollOrigin );
+		//GetEngineObject()->SetNetworkOrigin( m_vecRagdollOrigin );
 
-		GetEngineObject()->SetAbsOrigin( m_vecRagdollOrigin );
-		GetEngineObject()->SetAbsVelocity( m_vecRagdollVelocity );
+		//GetEngineObject()->SetAbsOrigin( m_vecRagdollOrigin );
+		//GetEngineObject()->SetAbsVelocity( m_vecRagdollVelocity );
 
 		GetEngineObject()->Interp_Reset();
 		
@@ -927,7 +927,7 @@ void C_HL2MPRagdoll::CreateHL2MPRagdoll( void )
 void C_HL2MPRagdoll::OnDataChanged( DataUpdateType_t type )
 {
 	BaseClass::OnDataChanged( type );
-
+	return;
 	if ( type == DATA_UPDATE_CREATED )
 	{
 		CreateHL2MPRagdoll();

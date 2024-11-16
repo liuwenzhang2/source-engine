@@ -55,6 +55,7 @@
 #include "iviewrender.h"				//for view->
 
 #include "iviewrender_beams.h"			// flashlight beam
+#include "ragdoll.h"
 
 //=============================================================================
 // HPE_BEGIN:
@@ -186,10 +187,10 @@ vgui::IImage* GetDefaultAvatarImage( C_BasePlayer *pPlayer )
 
 float g_flDieTranslucentTime = 0.6;
 
-class C_CSRagdoll : public C_BaseAnimatingOverlay
+class C_CSRagdoll : public C_ServerRagdoll
 {
 public:
-	DECLARE_CLASS( C_CSRagdoll, C_BaseAnimatingOverlay );
+	DECLARE_CLASS( C_CSRagdoll, C_ServerRagdoll);
 	DECLARE_CLIENTCLASS();
 
 	C_CSRagdoll();
@@ -199,7 +200,7 @@ public:
 
 	int GetPlayerEntIndex() const;
 	//IRagdoll* GetIRagdoll() const;
-	void GetRagdollInitBoneArrays( matrix3x4_t *pDeltaBones0, matrix3x4_t *pDeltaBones1, matrix3x4_t *pCurrentBones, float boneDt ) OVERRIDE;
+	void GetRagdollInitBoneArrays(matrix3x4_t* pDeltaBones0, matrix3x4_t* pDeltaBones1, matrix3x4_t* pCurrentBones, float boneDt);// OVERRIDE;
 
 	void ImpactTrace( trace_t *pTrace, int iDamageType, const char *pCustomImpactName );
 
@@ -228,8 +229,8 @@ private:
 private:
 
 	EHANDLE	m_hPlayer;
-	CNetworkVector( m_vecRagdollVelocity );
-	CNetworkVector( m_vecRagdollOrigin );
+	//CNetworkVector( m_vecRagdollVelocity );
+	//CNetworkVector( m_vecRagdollOrigin );
 	CNetworkVar(int, m_iDeathPose );
 	CNetworkVar(int, m_iDeathFrame );
 	float m_flRagdollSinkStart;
@@ -238,14 +239,14 @@ private:
 };
 
 
-IMPLEMENT_CLIENTCLASS_DT_NOBASE( C_CSRagdoll, DT_CSRagdoll, CCSRagdoll )
+IMPLEMENT_CLIENTCLASS_DT( C_CSRagdoll, DT_CSRagdoll, CCSRagdoll )
 	//RecvPropVector( RECVINFO_NAME( m_vecNetworkOrigin, m_vecOrigin ) ),
-	RecvPropVector( RECVINFO(m_vecRagdollOrigin) ),
+	//RecvPropVector( RECVINFO(m_vecRagdollOrigin) ),
 	RecvPropEHandle( RECVINFO( m_hPlayer ) ),
 	//RecvPropInt( RECVINFO( m_nModelIndex ) ),
 	//RecvPropInt( RECVINFO(m_nForceBone) ),
 	//RecvPropVector( RECVINFO(m_vecForce) ),
-	RecvPropVector( RECVINFO( m_vecRagdollVelocity ) ),
+	//RecvPropVector( RECVINFO( m_vecRagdollVelocity ) ),
 	RecvPropInt( RECVINFO(m_iDeathPose) ),
 	RecvPropInt( RECVINFO(m_iDeathFrame) ),
 	RecvPropInt(RECVINFO(m_iTeamNum)),
@@ -382,9 +383,9 @@ void C_CSRagdoll::CreateLowViolenceRagdoll( void )
 		return;
 	}
 
-	GetEngineObject()->SetNetworkOrigin( m_vecRagdollOrigin );
-	GetEngineObject()->SetAbsOrigin( m_vecRagdollOrigin );
-	GetEngineObject()->SetAbsVelocity( m_vecRagdollVelocity );
+	//GetEngineObject()->SetNetworkOrigin( m_vecRagdollOrigin );
+	//GetEngineObject()->SetAbsOrigin( m_vecRagdollOrigin );
+	//GetEngineObject()->SetAbsVelocity( m_vecRagdollVelocity );
 
 	C_CSPlayer *pPlayer = dynamic_cast< C_CSPlayer* >( m_hPlayer.Get() );
 	if ( pPlayer )
@@ -443,11 +444,11 @@ void C_CSRagdoll::CreateCSRagdoll()
 		{
 			// This is the local player, so set them in a default
 			// pose and slam their velocity, angles and origin
-			GetEngineObject()->SetAbsOrigin( m_vecRagdollOrigin );
+			//GetEngineObject()->SetAbsOrigin( m_vecRagdollOrigin );
 
 			GetEngineObject()->SetAbsAngles( pPlayer->GetRenderAngles() );
 
-			GetEngineObject()->SetAbsVelocity( m_vecRagdollVelocity );
+			//GetEngineObject()->SetAbsVelocity( m_vecRagdollVelocity );
 
 			int iSeq = LookupSequence( "walk_lower" );
 			if ( iSeq == -1 )
@@ -471,10 +472,10 @@ void C_CSRagdoll::CreateCSRagdoll()
 	{
 		// overwrite network origin so later interpolation will
 		// use this position
-		GetEngineObject()->SetNetworkOrigin( m_vecRagdollOrigin );
+		//GetEngineObject()->SetNetworkOrigin( m_vecRagdollOrigin );
 
-		GetEngineObject()->SetAbsOrigin( m_vecRagdollOrigin );
-		GetEngineObject()->SetAbsVelocity( m_vecRagdollVelocity );
+		//GetEngineObject()->SetAbsOrigin( m_vecRagdollOrigin );
+		//GetEngineObject()->SetAbsVelocity( m_vecRagdollVelocity );
 
 		GetEngineObject()->Interp_Reset();
 	}
@@ -556,7 +557,7 @@ bool C_CSRagdoll::IsTransparent( void )
 void C_CSRagdoll::OnDataChanged( DataUpdateType_t type )
 {
 	BaseClass::OnDataChanged( type );
-
+	return;
 	if ( type == DATA_UPDATE_CREATED )
 	{
 		// Prevent replays from creating ragdolls on the first frame of playback after skipping through playback.

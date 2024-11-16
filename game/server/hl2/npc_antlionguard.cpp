@@ -4570,7 +4570,7 @@ bool CNPC_AntlionGuard::BecomeRagdollOnClient( const Vector &force )
 		info.SetDamageForce( force );
 		info.SetDamagePosition( WorldSpaceCenter() );
 
-		CBaseEntity *pRagdoll = CreateServerRagdoll( this, 0, info, COLLISION_GROUP_NONE );
+		CBaseEntity *pRagdoll = CreateServerRagdoll( 0, info, COLLISION_GROUP_NONE );
 
 		// Transfer our name to the new ragdoll
 		pRagdoll->SetName( STRING(GetEntityName()) );

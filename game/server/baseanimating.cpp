@@ -487,6 +487,198 @@ const char *CBaseAnimating::GetSequenceActivityName( int iSequence )
 	return GetEngineObject()->GetModelPtr()->GetSequenceActivityName( iSequence );
 }
 
+static void SyncAnimatingWithPhysics(CBaseAnimating* pAnimating)
+{
+	IPhysicsObject* pPhysics = pAnimating->VPhysicsGetObject();
+	if (pPhysics)
+	{
+		Vector pos;
+		pPhysics->GetShadowPosition(&pos, NULL);
+		pAnimating->GetEngineObject()->SetAbsOrigin(pos);
+	}
+}
+
+CRagdollProp* CBaseAnimating::CreateRagdollProp()
+{
+	CRagdollProp* pRagdoll = (CRagdollProp*)gEntList.CreateEntityByName("prop_ragdoll");
+	return pRagdoll;
+}
+
+CBaseEntity* CBaseAnimating::CreateServerRagdoll(int forceBone, const CTakeDamageInfo& info, int collisionGroup, bool bUseLRURetirement)
+{
+	if (info.GetDamageType() & (DMG_VEHICLE | DMG_CRUSH))
+	{
+		// if the entity was killed by physics or a vehicle, move to the vphysics shadow position before creating the ragdoll.
+		SyncAnimatingWithPhysics(this);
+	}
+	//CRagdollProp* pRagdoll = (CRagdollProp*)CBaseEntity::CreateNoSpawn("prop_ragdoll", this->GetEngineObject()->GetAbsOrigin(), vec3_angle, NULL);
+	CRagdollProp* pRagdoll = CreateRagdollProp();
+	if (!pRagdoll)
+	{
+		Assert(!"CreateNoSpawn: only works for CBaseEntities");
+		return NULL;
+	}
+
+	pRagdoll->GetEngineObject()->SetLocalOrigin(this->GetEngineObject()->GetAbsOrigin());
+	pRagdoll->GetEngineObject()->SetLocalAngles(vec3_angle);
+	pRagdoll->SetOwnerEntity(NULL);
+
+	gEntList.NotifyCreateEntity(pRagdoll);
+
+	pRagdoll->CopyAnimationDataFrom(this);
+	pRagdoll->SetOwnerEntity(this);
+
+	pRagdoll->InitRagdollAnimation();
+	matrix3x4_t pBoneToWorld[MAXSTUDIOBONES], pBoneToWorldNext[MAXSTUDIOBONES];
+
+	float dt = 0.1f;
+
+	// Copy over dissolve state...
+	if (this->GetEngineObject()->IsEFlagSet(EFL_NO_DISSOLVE))
+	{
+		pRagdoll->GetEngineObject()->AddEFlags(EFL_NO_DISSOLVE);
+	}
+
+	// NOTE: This currently is only necessary to prevent manhacks from
+	// colliding with server ragdolls they kill
+	pRagdoll->SetKiller(info.GetInflictor());
+	pRagdoll->SetSourceClassName(this->GetClassname());
+
+	// NPC_STATE_DEAD npc's will have their COND_IN_PVS cleared, so this needs to force SetupBones to happen
+	unsigned short fPrevFlags = this->GetBoneCacheFlags();
+	this->SetBoneCacheFlags(BCF_NO_ANIMATION_SKIP);
+
+	// UNDONE: Extract velocity from bones via animation (like we do on the client)
+	// UNDONE: For now, just move each bone by the total entity velocity if set.
+	// Get Bones positions before
+	// Store current cycle
+	float fSequenceDuration = this->GetEngineObject()->SequenceDuration(this->GetEngineObject()->GetSequence());
+	float fSequenceTime = this->GetEngineObject()->GetCycle() * fSequenceDuration;
+
+	if (fSequenceTime <= dt && fSequenceTime > 0.0f)
+	{
+		// Avoid having negative cycle
+		dt = fSequenceTime;
+	}
+
+	float fPreviousCycle = clamp(this->GetEngineObject()->GetCycle() - (dt * (1 / fSequenceDuration)), 0.f, 1.f);
+	float fCurCycle = this->GetEngineObject()->GetCycle();
+	// Get current bones positions
+	this->SetupBones(pBoneToWorldNext, BONE_USED_BY_ANYTHING);
+	// Get previous bones positions
+	this->GetEngineObject()->SetCycle(fPreviousCycle);
+	this->SetupBones(pBoneToWorld, BONE_USED_BY_ANYTHING);
+	// Restore current cycle
+	this->GetEngineObject()->SetCycle(fCurCycle);
+
+	// Reset previous bone flags
+	this->ClearBoneCacheFlags(BCF_NO_ANIMATION_SKIP);
+	this->SetBoneCacheFlags(fPrevFlags);
+
+	Vector vel = this->GetEngineObject()->GetAbsVelocity();
+	if ((vel.Length() == 0) && (dt > 0))
+	{
+		// Compute animation velocity
+		IStudioHdr* pstudiohdr = this->GetEngineObject()->GetModelPtr();
+		if (pstudiohdr)
+		{
+			Vector deltaPos;
+			QAngle deltaAngles;
+			if (pstudiohdr->Studio_SeqMovement(
+				this->GetEngineObject()->GetSequence(),
+				fPreviousCycle,
+				this->GetEngineObject()->GetCycle(),
+				this->GetEngineObject()->GetPoseParameterArray(),
+				deltaPos,
+				deltaAngles))
+			{
+				VectorRotate(deltaPos, this->GetEngineObject()->EntityToWorldTransform(), vel);
+				vel /= dt;
+			}
+		}
+	}
+
+	if (vel.LengthSqr() > 0)
+	{
+		int numbones = this->GetEngineObject()->GetModelPtr()->numbones();
+		vel *= dt;
+		for (int i = 0; i < numbones; i++)
+		{
+			Vector pos;
+			MatrixGetColumn(pBoneToWorld[i], 3, pos);
+			pos -= vel;
+			MatrixSetColumn(pos, 3, pBoneToWorld[i]);
+		}
+	}
+
+#if RAGDOLL_VISUALIZE
+	this->DrawRawSkeleton(pBoneToWorld, BONE_USED_BY_ANYTHING, true, 20, false);
+	this->DrawRawSkeleton(pBoneToWorldNext, BONE_USED_BY_ANYTHING, true, 20, true);
+#endif
+	// Is this a vehicle / NPC collision?
+	if ((info.GetDamageType() & DMG_VEHICLE) && this->MyNPCPointer())
+	{
+		// init the ragdoll with no forces
+		pRagdoll->GetEngineObject()->InitRagdoll(vec3_origin, -1, vec3_origin, pBoneToWorld, pBoneToWorldNext, dt, collisionGroup, true);
+		// Make sure it's interactive debris for at most 5 seconds
+		if (collisionGroup == COLLISION_GROUP_INTERACTIVE_DEBRIS)
+		{
+			pRagdoll->SetContextThink(&CRagdollProp::SetDebrisThink, gpGlobals->curtime + 5, s_pDebrisContext);
+		}
+		// apply vehicle forces
+		// Get a list of bones with hitboxes below the plane of impact
+		int boxList[128];
+		Vector normal(0, 0, -1);
+		int count = this->GetHitboxesFrontside(boxList, ARRAYSIZE(boxList), normal, DotProduct(normal, info.GetDamagePosition()));
+
+		// distribute force over mass of entire character
+		float massScale = this->GetEngineObject()->GetModelPtr()->Studio_GetMass();
+		massScale = clamp(massScale, 1.f, 1.e4f);
+		massScale = 1.f / massScale;
+
+		// distribute the force
+		// BUGBUG: This will hit the same bone twice if it has two hitboxes!!!!
+		ragdoll_t* pRagInfo = pRagdoll->GetEngineObject()->GetRagdoll();
+		for (int i = 0; i < count; i++)
+		{
+			int physBone = this->GetPhysicsBone(this->GetHitboxBone(boxList[i]));
+			IPhysicsObject* pPhysics = pRagInfo->list[physBone].pObject;
+			pPhysics->ApplyForceCenter(info.GetDamageForce() * pPhysics->GetMass() * massScale);
+		}
+	}
+	else
+	{
+		pRagdoll->GetEngineObject()->InitRagdoll(info.GetDamageForce(), forceBone, info.GetDamagePosition(), pBoneToWorld, pBoneToWorldNext, dt, collisionGroup, true);
+		// Make sure it's interactive debris for at most 5 seconds
+		if (collisionGroup == COLLISION_GROUP_INTERACTIVE_DEBRIS)
+		{
+			pRagdoll->SetContextThink(&CRagdollProp::SetDebrisThink, gpGlobals->curtime + 5, s_pDebrisContext);
+		}
+	}
+
+	// Are we dissolving?
+	if (this->IsDissolving())
+	{
+		pRagdoll->TransferDissolveFrom(this);
+	}
+	else if (bUseLRURetirement)
+	{
+		pRagdoll->GetEngineObject()->AddSpawnFlags(SF_RAGDOLLPROP_USE_LRU_RETIREMENT);
+		s_RagdollLRU.MoveToTopOfLRU(pRagdoll);
+	}
+
+	// Tracker 22598:  If we don't set the OBB mins/maxs to something valid here, then the client will have a zero sized hull
+	//  for the ragdoll for one frame until Vphysics updates the real obb bounds after the first simulation frame.  Having
+	//  a zero sized hull makes the ragdoll think it should be faded/alpha'd to zero for a frame, so you get a blink where
+	//  the ragdoll doesn't draw initially.
+	Vector mins, maxs;
+	mins = this->GetEngineObject()->OBBMins();
+	maxs = this->GetEngineObject()->OBBMaxs();
+	pRagdoll->GetEngineObject()->SetCollisionBounds(mins, maxs);
+
+	return pRagdoll;
+}
+
 //-----------------------------------------------------------------------------
 // Purpose: Make this a client-side simulated entity
 // Input  : force - vector of force to be exerted in the physics simulation
