@@ -327,7 +327,7 @@ int CCSPlayerAnimState::SelectWeightedSequence( Activity activity )
 	}
 
 #if defined(CLIENT_DLL) && defined(_DEBUG)
-	int realSequence = GetOuter()->SelectWeightedSequence( activity );
+	int realSequence = GetOuter()->GetEngineObject()->SelectWeightedSequence( activity );
 	Assert( realSequence == sequence );
 #endif
 

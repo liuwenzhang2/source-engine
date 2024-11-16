@@ -200,7 +200,7 @@ public:
 
 	int GetPlayerEntIndex() const;
 	//IRagdoll* GetIRagdoll() const;
-	void GetRagdollInitBoneArrays(matrix3x4_t* pDeltaBones0, matrix3x4_t* pDeltaBones1, matrix3x4_t* pCurrentBones, float boneDt);// OVERRIDE;
+	void GetRagdollInitBoneArrays(matrix3x4_t* pDeltaBones0, matrix3x4_t* pDeltaBones1, matrix3x4_t* pCurrentBones, float boneDt) OVERRIDE;
 
 	void ImpactTrace( trace_t *pTrace, int iDamageType, const char *pCustomImpactName );
 
