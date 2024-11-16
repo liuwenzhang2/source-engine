@@ -9589,7 +9589,7 @@ public:
 				int entinfoIndex = m_simThinkList[i].entEntry;
 				const CEntInfo<CBaseEntity>* pInfo = gEntList.GetEntInfoPtrByIndex(entinfoIndex);
 				pList[out] = (CBaseEntity*)pInfo->m_pEntity;
-				Assert(m_simThinkList[i].nextThinkTick == 0 || pList[out]->GetFirstThinkTick() == m_simThinkList[i].nextThinkTick);
+				Assert(m_simThinkList[i].nextThinkTick == 0 || pList[out]->GetEngineObject()->GetFirstThinkTick() == m_simThinkList[i].nextThinkTick);
 				Assert(gEntList.IsEntityPtr(pList[out]));
 				out++;
 			}
