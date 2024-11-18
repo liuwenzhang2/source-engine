@@ -937,7 +937,11 @@ int CNPC_BaseZombie::OnTakeDamage_Alive( const CTakeDamageInfo &inputInfo )
 				if (flDamageThreshold >= 1.0)
 				{
 					m_iHealth = 0;
-					BecomeRagdollOnClient( info.GetDamageForce() );
+					CBaseEntity* pRagdoll = CreateServerRagdoll(GetEngineObject()->GetForceBone(), info, COLLISION_GROUP_INTERACTIVE_DEBRIS, true);
+					FixupBurningServerRagdoll(pRagdoll);
+					PhysSetEntityGameFlags(pRagdoll, FVPHYSICS_NO_SELF_COLLISIONS);
+					RemoveDeferred();
+					//BecomeRagdollOnClient( info.GetDamageForce() );
 				}
 			}
 			else if ( random->RandomInt(1, 3) == 1 )
@@ -2543,7 +2547,12 @@ void CNPC_BaseZombie::ReleaseHeadcrab( const Vector &vecOrigin, const Vector &ve
 
 	if( fRagdollBody )
 	{
-		BecomeRagdollOnClient( vec3_origin );
+		CTakeDamageInfo info;
+		CBaseEntity* pRagdoll = CreateServerRagdoll(GetEngineObject()->GetForceBone(), info, COLLISION_GROUP_INTERACTIVE_DEBRIS, true);
+		FixupBurningServerRagdoll(pRagdoll);
+		PhysSetEntityGameFlags(pRagdoll, FVPHYSICS_NO_SELF_COLLISIONS);
+		RemoveDeferred();
+		//BecomeRagdollOnClient( vec3_origin );
 	}
 }
 

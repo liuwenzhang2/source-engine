@@ -675,7 +675,7 @@ CBaseEntity* CBaseAnimating::CreateServerRagdoll(int forceBone, const CTakeDamag
 	mins = this->GetEngineObject()->OBBMins();
 	maxs = this->GetEngineObject()->OBBMaxs();
 	pRagdoll->GetEngineObject()->SetCollisionBounds(mins, maxs);
-
+	GetEngineObject()->AddFlag(FL_TRANSRAGDOLL);
 	return pRagdoll;
 }
 
@@ -685,45 +685,45 @@ CBaseEntity* CBaseAnimating::CreateServerRagdoll(int forceBone, const CTakeDamag
 //			forceBone - bone to exert force upon
 // Output : Returns true on success, false on failure.
 //-----------------------------------------------------------------------------
-bool CBaseAnimating::BecomeRagdollOnClient( const Vector &force )
-{
-	// If this character has a ragdoll animation, turn it over to the physics system
-	if ( CanBecomeRagdoll() ) 
-	{
-		GetEngineObject()->VPhysicsDestroyObject();
-		GetEngineObject()->AddSolidFlags( FSOLID_NOT_SOLID );
-		GetEngineObject()->SetRenderFX(kRenderFxRagdoll);
-		
-		// Have to do this dance because m_vecForce is a network vector
-		// and can't be sent to ClampRagdollForce as a Vector *
-		Vector vecClampedForce;
-		ClampRagdollForce( force, &vecClampedForce );
-		GetEngineObject()->SetVecForce(vecClampedForce);
-
-		GetEngineObject()->SetParent( NULL );
-
-		GetEngineObject()->AddFlag( FL_TRANSRAGDOLL );
-
-		GetEngineObject()->SetMoveType( MOVETYPE_NONE );
-		//UTIL_SetSize( this, vec3_origin, vec3_origin );
-		SetThink( NULL );
-	
-		GetEngineObject()->SetNextThink( gpGlobals->curtime + 2.0f );
-		//If we're here, then we can vanish safely
-		SetThink( &CBaseEntity::SUB_Remove );
-
-		// Remove our flame entity if it's attached to us
-		CEntityFlame *pFireChild = dynamic_cast<CEntityFlame *>( GetEffectEntity() );
-		if ( pFireChild )
-		{
-			pFireChild->SetThink( &CBaseEntity::SUB_Remove );
-			pFireChild->GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.1f );
-		}
-
-		return true;
-	}
-	return false;
-}
+//bool CBaseAnimating::BecomeRagdollOnClient( const Vector &force )
+//{
+//	// If this character has a ragdoll animation, turn it over to the physics system
+//	if ( CanBecomeRagdoll() ) 
+//	{
+//		GetEngineObject()->VPhysicsDestroyObject();
+//		GetEngineObject()->AddSolidFlags( FSOLID_NOT_SOLID );
+//		//GetEngineObject()->SetRenderFX(kRenderFxRagdoll);
+//		
+//		// Have to do this dance because m_vecForce is a network vector
+//		// and can't be sent to ClampRagdollForce as a Vector *
+//		Vector vecClampedForce;
+//		ClampRagdollForce( force, &vecClampedForce );
+//		GetEngineObject()->SetVecForce(vecClampedForce);
+//
+//		GetEngineObject()->SetParent( NULL );
+//
+//		GetEngineObject()->AddFlag( FL_TRANSRAGDOLL );
+//
+//		GetEngineObject()->SetMoveType( MOVETYPE_NONE );
+//		//UTIL_SetSize( this, vec3_origin, vec3_origin );
+//		SetThink( NULL );
+//	
+//		GetEngineObject()->SetNextThink( gpGlobals->curtime + 2.0f );
+//		//If we're here, then we can vanish safely
+//		SetThink( &CBaseEntity::SUB_Remove );
+//
+//		// Remove our flame entity if it's attached to us
+//		CEntityFlame *pFireChild = dynamic_cast<CEntityFlame *>( GetEffectEntity() );
+//		if ( pFireChild )
+//		{
+//			pFireChild->SetThink( &CBaseEntity::SUB_Remove );
+//			pFireChild->GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.1f );
+//		}
+//
+//		return true;
+//	}
+//	return false;
+//}
 
 bool CBaseAnimating::IsRagdoll()
 {
@@ -945,7 +945,12 @@ void CBaseAnimating::HandleAnimEvent( animevent_t *pEvent )
 		else if ( pEvent->event == AE_RAGDOLL )
 		{
 			// Convert to ragdoll immediately
-			BecomeRagdollOnClient( vec3_origin );
+			CTakeDamageInfo info;
+			CBaseEntity* pRagdoll = CreateServerRagdoll(GetEngineObject()->GetForceBone(), info, COLLISION_GROUP_INTERACTIVE_DEBRIS, true);
+			FixupBurningServerRagdoll(pRagdoll);
+			PhysSetEntityGameFlags(pRagdoll, FVPHYSICS_NO_SELF_COLLISIONS);
+			RemoveDeferred();
+			//BecomeRagdollOnClient( vec3_origin );
 			return;
 		}
 #ifdef HL2_EPISODIC
@@ -2649,7 +2654,12 @@ void CBaseAnimating::OnResetSequence(int nSequence) {
 
 void CBaseAnimating::InputBecomeRagdoll(inputdata_t& inputdata)
 {
-	BecomeRagdollOnClient(vec3_origin);
+	CTakeDamageInfo info;
+	CBaseEntity* pRagdoll = CreateServerRagdoll(GetEngineObject()->GetForceBone(), info, COLLISION_GROUP_INTERACTIVE_DEBRIS, true);
+	FixupBurningServerRagdoll(pRagdoll);
+	PhysSetEntityGameFlags(pRagdoll, FVPHYSICS_NO_SELF_COLLISIONS);
+	RemoveDeferred();
+	//BecomeRagdollOnClient(vec3_origin);
 }
 
 

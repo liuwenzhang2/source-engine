@@ -1638,10 +1638,10 @@ void CPortal_Player::CreateViewModel( int index /*=0*/ )
 	}
 }
 
-bool CPortal_Player::BecomeRagdollOnClient( const Vector &force )
-{
-	return true;//BaseClass::BecomeRagdollOnClient( force );
-}
+//bool CPortal_Player::BecomeRagdollOnClient( const Vector &force )
+//{
+//	return true;//BaseClass::BecomeRagdollOnClient( force );
+//}
 
 CRagdollProp* CPortal_Player::CreateRagdollProp()
 {

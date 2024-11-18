@@ -112,7 +112,7 @@ public:
 	//
 	virtual int OnTakeDamage_Alive( const CTakeDamageInfo &info );
 	virtual bool CorpseGib( const CTakeDamageInfo &info );
-	bool	BecomeRagdollOnClient( const Vector &force );
+	//bool	BecomeRagdollOnClient( const Vector &force );
 
 	//
 	// CAI_BaseNPC:

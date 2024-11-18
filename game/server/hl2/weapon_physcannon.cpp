@@ -2232,7 +2232,8 @@ void CWeaponPhysCannon::PrimaryAttack( void )
 			{
 				CTakeDamageInfo info( pOwner, pOwner, 1.0f, DMG_GENERIC );
 				CBaseEntity *pRagdoll = pEntity->MyNPCPointer()->CreateServerRagdoll( 0, info, COLLISION_GROUP_INTERACTIVE_DEBRIS, true );
-				PhysSetEntityGameFlags( pRagdoll, FVPHYSICS_NO_SELF_COLLISIONS );
+				pEntity->MyNPCPointer()->FixupBurningServerRagdoll(pRagdoll);
+				PhysSetEntityGameFlags(pRagdoll, FVPHYSICS_NO_SELF_COLLISIONS);
 				pRagdoll->GetEngineObject()->SetCollisionBounds( pEntity->GetEngineObject()->OBBMins(), pEntity->GetEngineObject()->OBBMaxs() );
 
 				// Necessary to cause it to do the appropriate death cleanup
@@ -2378,7 +2379,8 @@ bool CWeaponPhysCannon::AttachObject( CBaseEntity *pObject, const Vector &vPosit
 			Assert( pObject->MyNPCPointer()->CanBecomeRagdoll() );
 			CTakeDamageInfo info( GetOwner(), GetOwner(), 1.0f, DMG_GENERIC );
 			CBaseEntity *pRagdoll = pObject->MyNPCPointer()->CreateServerRagdoll( 0, info, COLLISION_GROUP_INTERACTIVE_DEBRIS, true );
-			PhysSetEntityGameFlags( pRagdoll, FVPHYSICS_NO_SELF_COLLISIONS );
+			pObject->MyNPCPointer()->FixupBurningServerRagdoll(pRagdoll);
+			PhysSetEntityGameFlags(pRagdoll, FVPHYSICS_NO_SELF_COLLISIONS);
 
 			pRagdoll->GetEngineObject()->SetCollisionBounds( pObject->GetEngineObject()->OBBMins(), pObject->GetEngineObject()->OBBMaxs() );
 

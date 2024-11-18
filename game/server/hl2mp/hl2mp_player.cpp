@@ -1075,10 +1075,10 @@ void CHL2MP_Player::CreateViewModel( int index /*=0*/ )
 	}
 }
 
-bool CHL2MP_Player::BecomeRagdollOnClient( const Vector &force )
-{
-	return true;
-}
+//bool CHL2MP_Player::BecomeRagdollOnClient( const Vector &force )
+//{
+//	return true;
+//}
 
 // -------------------------------------------------------------------------------- //
 // Ragdoll entities.

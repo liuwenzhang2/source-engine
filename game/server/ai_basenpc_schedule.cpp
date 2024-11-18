@@ -4591,9 +4591,14 @@ int CAI_BaseNPC::SelectCombatSchedule()
 //-----------------------------------------------------------------------------
 int CAI_BaseNPC::SelectDeadSchedule()
 {
-	if ( BecomeRagdollOnClient( vec3_origin ) )
+	if (CanBecomeRagdoll() )
 	{
 		CleanupOnDeath();
+		CTakeDamageInfo info;
+		CBaseEntity* pRagdoll = CreateServerRagdoll(GetEngineObject()->GetForceBone(), info, COLLISION_GROUP_INTERACTIVE_DEBRIS, true);
+		FixupBurningServerRagdoll(pRagdoll);
+		PhysSetEntityGameFlags(pRagdoll, FVPHYSICS_NO_SELF_COLLISIONS);
+		RemoveDeferred();
 		return SCHED_DIE_RAGDOLL;
 	}
 

@@ -257,6 +257,7 @@ public:
 	void					SetBodyPitch( float flPitch );
 
 	virtual void			UpdateOnRemove( void );
+	virtual void			RemoveDeferred(void) {}
 
 	static CBasePlayer		*CreatePlayer( const char *className, int ed );
 

@@ -665,15 +665,21 @@ void CRagGib::Spawn( const char *szModel, const Vector &vecOrigin, const Vector 
 	SetModel( szModel );
 	UTIL_SetSize(this, vec3_origin, vec3_origin);
 	UTIL_SetOrigin( this, vecOrigin );
-	if ( !BecomeRagdollOnClient( vecForce ) )
-	{
-		GetEngineObject()->AddSolidFlags( FSOLID_NOT_STANDABLE );
-		GetEngineObject()->RemoveSolidFlags( FSOLID_NOT_SOLID );
-		if( flFadeTime > 0.0 )
-		{
-			SUB_StartFadeOut( flFadeTime );
-		}
-	}
+	CTakeDamageInfo info;
+	info.SetDamageForce(vecForce);
+	CBaseEntity* pRagdoll = CreateServerRagdoll(GetEngineObject()->GetForceBone(), info, COLLISION_GROUP_INTERACTIVE_DEBRIS, true);
+	FixupBurningServerRagdoll(pRagdoll);
+	PhysSetEntityGameFlags(pRagdoll, FVPHYSICS_NO_SELF_COLLISIONS);
+	RemoveDeferred();
+	//if ( !BecomeRagdollOnClient( vecForce ) )
+	//{
+	//	GetEngineObject()->AddSolidFlags( FSOLID_NOT_STANDABLE );
+	//	GetEngineObject()->RemoveSolidFlags( FSOLID_NOT_SOLID );
+	//	if( flFadeTime > 0.0 )
+	//	{
+	//		SUB_StartFadeOut( flFadeTime );
+	//	}
+	//}
 }
 
 LINK_ENTITY_TO_CLASS( raggib, CRagGib );

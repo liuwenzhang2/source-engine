@@ -275,7 +275,7 @@ public:
 	virtual bool	IsLightDamage( const CTakeDamageInfo &info );
 	virtual bool	IsHeavyDamage( const CTakeDamageInfo &info );
 	virtual bool	OverrideMoveFacing( const AILocalMoveGoal_t &move, float flInterval );
-	virtual bool	BecomeRagdollOnClient( const Vector &force );
+	//virtual bool	BecomeRagdollOnClient( const Vector &force );
 	virtual void UpdateOnRemove( void );
 	virtual bool		IsUnreachable( CBaseEntity* pEntity );			// Is entity is unreachable?
 
@@ -4545,45 +4545,47 @@ bool CNPC_AntlionGuard::CanBecomeRagdoll( void )
 // Input  : &force - 
 // Output : Returns true on success, false on failure.
 //-----------------------------------------------------------------------------
-bool CNPC_AntlionGuard::BecomeRagdollOnClient( const Vector &force )
-{
-	if ( !CanBecomeRagdoll() ) 
-		return false;
-
-	const char* soundname = "NPC_AntlionGuard.Fallover";
-	CPASAttenuationFilter filter(this, soundname);
-
-	EmitSound_t params;
-	params.m_pSoundName = soundname;
-	params.m_flSoundTime = 0.0f;
-	params.m_pflSoundDuration = NULL;
-	params.m_bWarnOnDirectWaveReference = true;
-	g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
-
-	// Become server-side ragdoll if we're flagged to do it
-	if (GetEngineObject()->GetSpawnFlags() & SF_ANTLIONGUARD_SERVERSIDE_RAGDOLL)
-	{
-		CTakeDamageInfo	info;
-
-		// Fake the info
-		info.SetDamageType( DMG_GENERIC );
-		info.SetDamageForce( force );
-		info.SetDamagePosition( WorldSpaceCenter() );
-
-		CBaseEntity *pRagdoll = CreateServerRagdoll( 0, info, COLLISION_GROUP_NONE );
-
-		// Transfer our name to the new ragdoll
-		pRagdoll->SetName( STRING(GetEntityName()) );
-		pRagdoll->GetEngineObject()->SetCollisionGroup( COLLISION_GROUP_DEBRIS );
-		
-		// Get rid of our old body
-		UTIL_Remove(this);
-
-		return true;
-	}
-
-	return BaseClass::BecomeRagdollOnClient( force );
-}
+//bool CNPC_AntlionGuard::BecomeRagdollOnClient( const Vector &force )
+//{
+//	if ( !CanBecomeRagdoll() ) 
+//		return false;
+//
+//	const char* soundname = "NPC_AntlionGuard.Fallover";
+//	CPASAttenuationFilter filter(this, soundname);
+//
+//	EmitSound_t params;
+//	params.m_pSoundName = soundname;
+//	params.m_flSoundTime = 0.0f;
+//	params.m_pflSoundDuration = NULL;
+//	params.m_bWarnOnDirectWaveReference = true;
+//	g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
+//
+//	// Become server-side ragdoll if we're flagged to do it
+//	if (GetEngineObject()->GetSpawnFlags() & SF_ANTLIONGUARD_SERVERSIDE_RAGDOLL)
+//	{
+//		CTakeDamageInfo	info;
+//
+//		// Fake the info
+//		info.SetDamageType( DMG_GENERIC );
+//		info.SetDamageForce( force );
+//		info.SetDamagePosition( WorldSpaceCenter() );
+//
+//		CBaseEntity *pRagdoll = CreateServerRagdoll( 0, info, COLLISION_GROUP_NONE );
+//		FixupBurningServerRagdoll(pRagdoll);
+//		PhysSetEntityGameFlags(pRagdoll, FVPHYSICS_NO_SELF_COLLISIONS);
+//
+//		// Transfer our name to the new ragdoll
+//		pRagdoll->SetName( STRING(GetEntityName()) );
+//		pRagdoll->GetEngineObject()->SetCollisionGroup( COLLISION_GROUP_DEBRIS );
+//		
+//		// Get rid of our old body
+//		UTIL_Remove(this);
+//
+//		return true;
+//	}
+//
+//	return BaseClass::BecomeRagdollOnClient( force );
+//}
 
 //-----------------------------------------------------------------------------
 // Purpose: Override how we face our target as we move

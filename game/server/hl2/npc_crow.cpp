@@ -1099,21 +1099,21 @@ bool CNPC_Crow::CorpseGib( const CTakeDamageInfo &info )
 // Don't allow ridiculous forces to be applied to the crow. It only weighs
 // 1.5kg, so extreme forces will give it ridiculous velocity.
 //-----------------------------------------------------------------------------
-#define CROW_RAGDOLL_SPEED_LIMIT	1000.0f  // Crow ragdoll speed limit in inches per second.
-bool CNPC_Crow::BecomeRagdollOnClient( const Vector &force )
-{
-	Vector newForce = force;
-	
-	if( VPhysicsGetObject() )
-	{
-		float flMass = VPhysicsGetObject()->GetMass();
-		float speed = VectorNormalize( newForce );
-		speed = MIN( speed, (CROW_RAGDOLL_SPEED_LIMIT * flMass) );
-		newForce *= speed;
-	}
-
-	return BaseClass::BecomeRagdollOnClient( newForce );
-}
+//#define CROW_RAGDOLL_SPEED_LIMIT	1000.0f  // Crow ragdoll speed limit in inches per second.
+//bool CNPC_Crow::BecomeRagdollOnClient( const Vector &force )
+//{
+//	Vector newForce = force;
+//	
+//	if( VPhysicsGetObject() )
+//	{
+//		float flMass = VPhysicsGetObject()->GetMass();
+//		float speed = VectorNormalize( newForce );
+//		speed = MIN( speed, (CROW_RAGDOLL_SPEED_LIMIT * flMass) );
+//		newForce *= speed;
+//	}
+//
+//	return BaseClass::BecomeRagdollOnClient( newForce );
+//}
 
 //-----------------------------------------------------------------------------
 // Purpose: 

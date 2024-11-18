@@ -38,7 +38,7 @@ public:
     void GiveDefaultItems( void );
 	CRagdollProp* CreateRagdollProp();
     void UpdateOnRemove( void );
-    virtual bool BecomeRagdollOnClient( const Vector &force ) { return true; };
+    //virtual bool BecomeRagdollOnClient( const Vector &force ) { return true; };
     virtual void CreateCorpse( void );
 
 	virtual bool BumpWeapon( CBaseCombatWeapon *pWeapon );

@@ -80,7 +80,7 @@ public:
 
 	virtual bool ClientCommand( const CCommand &args );
 	virtual void CreateViewModel( int viewmodelindex = 0 );
-	virtual bool BecomeRagdollOnClient( const Vector &force );
+	//virtual bool BecomeRagdollOnClient( const Vector &force );
 	virtual int	OnTakeDamage( const CTakeDamageInfo &inputInfo );
 	virtual int	OnTakeDamage_Alive( const CTakeDamageInfo &info );
 	virtual bool WantsLagCompensationOnEntity( const CBasePlayer *pPlayer, const CUserCmd *pCmd, const CBitVec<MAX_EDICTS> *pEntityTransmitBits ) const;

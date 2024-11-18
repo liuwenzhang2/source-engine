@@ -2047,7 +2047,8 @@ void CNPC_CombineGunship::BeginDestruct( void )
 		SelfDestruct();
 		return;
 	}
-
+	FixupBurningServerRagdoll(m_hRagdoll);
+	PhysSetEntityGameFlags(m_hRagdoll, FVPHYSICS_NO_SELF_COLLISIONS);
 	m_hRagdoll->SetName( UTIL_VarArgs("%s_ragdoll", STRING(GetEntityName()) ) );
 
 	// Tell the smoke trail to follow the ragdoll

@@ -621,7 +621,7 @@ public:
 	void		MakeDormant( void );
 	int			IsDormant( void );
 
-	void		RemoveDeferred( void );	// Sets the entity invisible, and makes it remove itself on the next frame
+	virtual void		RemoveDeferred( void );	// Sets the entity invisible, and makes it remove itself on the next frame
 
 
 

@@ -8882,9 +8882,12 @@ void CBasePlayer::HandleAnimEvent( animevent_t *pEvent )
 		{
 			// Convert to ragdoll immediately
 			CTakeDamageInfo info;
-			CBaseEntity* pRagdoll = CreateServerRagdoll(0, info, COLLISION_GROUP_DEBRIS, true);
+			CBaseEntity* pRagdoll = CreateServerRagdoll(GetEngineObject()->GetForceBone(), info, COLLISION_GROUP_INTERACTIVE_DEBRIS, true);
+			FixupBurningServerRagdoll(pRagdoll);
+			PhysSetEntityGameFlags(pRagdoll, FVPHYSICS_NO_SELF_COLLISIONS);
+			RemoveDeferred();
 			//CreateRagdollEntity();
-			BecomeRagdollOnClient( vec3_origin );
+			//BecomeRagdollOnClient( vec3_origin );
  
 			// Force the player to start death thinking
 			SetThink(&CBasePlayer::PlayerDeathThink);

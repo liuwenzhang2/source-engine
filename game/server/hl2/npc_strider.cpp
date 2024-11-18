@@ -1766,7 +1766,9 @@ void CNPC_Strider::RunTask( const Task_t *pTask )
 			if ( !GetEngineObject()->IsMarkedForDeletion() )
 			{
 				CTakeDamageInfo info;
-				CreateServerRagdoll( 0, info, COLLISION_GROUP_NONE );
+				CBaseEntity* pRagdoll = CreateServerRagdoll( 0, info, COLLISION_GROUP_NONE );
+				FixupBurningServerRagdoll(pRagdoll);
+				PhysSetEntityGameFlags(pRagdoll, FVPHYSICS_NO_SELF_COLLISIONS);
 				TaskComplete();
 				UTIL_Remove(this);
 			}
@@ -3461,6 +3463,8 @@ bool CNPC_Strider::BecomeRagdoll( const CTakeDamageInfo &info, const Vector &for
 			}
 
 			pRagdoll = assert_cast<CRagdollProp *>( CreateServerRagdoll( GetEngineObject()->GetForceBone(), info, HL2COLLISION_GROUP_STRIDER));
+			FixupBurningServerRagdoll(pRagdoll);
+			PhysSetEntityGameFlags(pRagdoll, FVPHYSICS_NO_SELF_COLLISIONS);
 			pRagdoll->DisableAutoFade();
 
 			if ( maxRagdolls == 0 )
@@ -3477,6 +3481,8 @@ bool CNPC_Strider::BecomeRagdoll( const CTakeDamageInfo &info, const Vector &for
 		{
 			// Otherwise just keel over
 			pRagdoll = assert_cast<CRagdollProp *>( CreateServerRagdoll( GetEngineObject()->GetForceBone(), info, HL2COLLISION_GROUP_STRIDER));
+			FixupBurningServerRagdoll(pRagdoll);
+			PhysSetEntityGameFlags(pRagdoll, FVPHYSICS_NO_SELF_COLLISIONS);
 			pRagdoll->DisableAutoFade();
 		}
 	}

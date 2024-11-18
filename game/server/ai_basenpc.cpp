@@ -8538,7 +8538,12 @@ void CAI_BaseNPC::HandleAnimEvent( animevent_t *pEvent )
 			else if ( pEvent->event == AE_NPC_RAGDOLL )
 			{
 				// Convert to ragdoll immediately
-				BecomeRagdollOnClient( vec3_origin );
+				CTakeDamageInfo info;
+				CBaseEntity* pRagdoll = CreateServerRagdoll(GetEngineObject()->GetForceBone(), info, COLLISION_GROUP_INTERACTIVE_DEBRIS, true);
+				FixupBurningServerRagdoll(pRagdoll);
+				PhysSetEntityGameFlags(pRagdoll, FVPHYSICS_NO_SELF_COLLISIONS);
+				RemoveDeferred();
+				//BecomeRagdollOnClient( vec3_origin );
 				return;
 			}
 			else if ( pEvent->event == AE_NPC_ADDGESTURE )
