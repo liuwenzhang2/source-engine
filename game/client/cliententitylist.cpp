@@ -3545,7 +3545,7 @@ void C_EngineObjectInternal::CollisionRulesChanged()
 			Assert(0);
 		}
 		IPhysicsObject* pList[VPHYSICS_MAX_OBJECT_LIST_COUNT];
-		int count = m_pOuter->VPhysicsGetObjectList(pList, ARRAYSIZE(pList));
+		int count = VPhysicsGetObjectList(pList, ARRAYSIZE(pList));
 		for (int i = 0; i < count; i++)
 		{
 			if (pList[i] != NULL) //this really shouldn't happen, but it does >_<
@@ -4805,6 +4805,38 @@ void C_EngineObjectInternal::VPhysicsSetObject(IPhysicsObject* pPhysics)
 	{
 		CollisionRulesChanged();
 	}
+}
+
+//-----------------------------------------------------------------------------
+// VPhysics object
+//-----------------------------------------------------------------------------
+int C_EngineObjectInternal::VPhysicsGetObjectList(IPhysicsObject** pList, int listMax)
+{
+	if (IsRagdoll())
+	{
+		int i;
+		for (i = 0; i < RagdollBoneCount(); ++i)
+		{
+			if (i >= listMax)
+				break;
+
+			pList[i] = GetElement(i);
+		}
+		return i;
+	}
+
+	IPhysicsObject* pPhys = VPhysicsGetObject();
+	if (pPhys)
+	{
+		// multi-object entities must implement this function
+		Assert(!(pPhys->GetGameFlags() & FVPHYSICS_MULTIOBJECT_ENTITY));
+		if (listMax > 0)
+		{
+			pList[0] = pPhys;
+			return 1;
+		}
+	}
+	return 0;
 }
 
 //-----------------------------------------------------------------------------

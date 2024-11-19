@@ -669,26 +669,7 @@ bool C_BaseAnimating::UsesPowerOfTwoFrameBufferTexture( void )
 	return modelinfo->IsUsingFBTexture( GetModel(), GetSkin(), GetBody(), GetClientRenderable() );
 }
 
-//-----------------------------------------------------------------------------
-// VPhysics object
-//-----------------------------------------------------------------------------
-int C_BaseAnimating::VPhysicsGetObjectList( IPhysicsObject **pList, int listMax )
-{
-	if (GetEngineObject()->IsRagdoll() )
-	{
-		int i;
-		for ( i = 0; i < GetEngineObject()->RagdollBoneCount(); ++i )
-		{
-			if ( i >= listMax )
-				break;
 
-			pList[i] = GetEngineObject()->GetElement(i);
-		}
-		return i;
-	}
-
-	return BaseClass::VPhysicsGetObjectList( pList, listMax );
-}
 
 
 //-----------------------------------------------------------------------------

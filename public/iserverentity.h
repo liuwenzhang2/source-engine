@@ -431,6 +431,7 @@ public:
 	virtual void DoMuzzleFlash() = 0;
 	virtual void VPhysicsDestroyObject(void) = 0;
 	virtual IPhysicsObject* VPhysicsGetObject(void) const = 0;
+	virtual int VPhysicsGetObjectList(IPhysicsObject** pList, int listMax) = 0;
 	virtual void VPhysicsSetObject(IPhysicsObject* pPhysics) = 0;
 	virtual void VPhysicsSwapObject(IPhysicsObject* pSwap) = 0;
 	virtual const Vector& WorldAlignMins() const = 0;
@@ -524,7 +525,6 @@ public:
 
 class IEngineShadowCloneServer {
 public:
-	virtual int				VPhysicsGetObjectList(IPhysicsObject** pList, int listMax) = 0;
 	virtual void			SetClonedEntity(CBaseEntity* pEntToClone) = 0;
 	virtual CBaseEntity*	GetClonedEntity(void) = 0;
 	virtual void			SetCloneTransformationMatrix(const matrix3x4_t& matTransform) = 0;
@@ -612,7 +612,6 @@ public:
 	virtual const vehicle_controlparams_t& GetVehicleControls(void) = 0;
 	virtual const vehicle_operatingparams_t& GetVehicleOperatingParams(void) = 0;
 
-	virtual int VPhysicsGetObjectList(IPhysicsObject** pList, int listMax) = 0;
 };
 
 // This class is how the engine talks to entities in the game DLL.

@@ -299,7 +299,7 @@ float CalculatePhysicsImpactDamage( int index, gamevcollisionevent_t *pEvent, co
 	{
 		// UNDONE: Add up mass here for car wheels and prop_ragdoll pieces?
 		IPhysicsObject *pList[VPHYSICS_MAX_OBJECT_LIST_COUNT];
-		int count = pEvent->pEntities[otherIndex]->VPhysicsGetObjectList( pList, ARRAYSIZE(pList) );
+		int count = pEvent->pEntities[otherIndex]->GetEngineObject()->VPhysicsGetObjectList( pList, ARRAYSIZE(pList) );
 		for ( int i = 0; i < count; i++ )
 		{
 			if ( pList[i]->GetGameFlags() & gameFlagsNoDamage )

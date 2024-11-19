@@ -183,7 +183,6 @@ public:
 
 	// Vehicle handling
 	virtual void	VPhysicsCollision( int index, gamevcollisionevent_t *pEvent );
-	virtual int		VPhysicsGetObjectList( IPhysicsObject **pList, int listMax );
 
 	// Inputs
 	void	InputLock( inputdata_t &inputdata );

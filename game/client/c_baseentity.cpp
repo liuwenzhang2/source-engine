@@ -796,29 +796,10 @@ void C_BaseEntity::SetRemovalFlag( bool bRemove )
 }
 
 
-//-----------------------------------------------------------------------------
-// VPhysics objects..
-//-----------------------------------------------------------------------------
-int C_BaseEntity::VPhysicsGetObjectList( IPhysicsObject **pList, int listMax )
-{
-	IPhysicsObject *pPhys = VPhysicsGetObject();
-	if ( pPhys )
-	{
-		// multi-object entities must implement this function
-		Assert( !(pPhys->GetGameFlags() & FVPHYSICS_MULTIOBJECT_ENTITY) );
-		if ( listMax > 0 )
-		{
-			pList[0] = pPhys;
-			return 1;
-		}
-	}
-	return 0;
-}
-
 bool C_BaseEntity::VPhysicsIsFlesh( void )
 {
 	IPhysicsObject *pList[VPHYSICS_MAX_OBJECT_LIST_COUNT];
-	int count = VPhysicsGetObjectList( pList, ARRAYSIZE(pList) );
+	int count = GetEngineObject()->VPhysicsGetObjectList( pList, ARRAYSIZE(pList) );
 	for ( int i = 0; i < count; i++ )
 	{
 		int material = pList[i]->GetMaterialIndex();

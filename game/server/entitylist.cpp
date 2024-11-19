@@ -3074,7 +3074,7 @@ void CEngineObjectInternal::CollisionRulesChanged()
 			Assert(0);
 		}
 		IPhysicsObject* pList[VPHYSICS_MAX_OBJECT_LIST_COUNT];
-		int count = m_pOuter->VPhysicsGetObjectList(pList, ARRAYSIZE(pList));
+		int count = VPhysicsGetObjectList(pList, ARRAYSIZE(pList));
 		for (int i = 0; i < count; i++)
 		{
 			if (pList[i] != NULL) //this really shouldn't happen, but it does >_<
@@ -4807,6 +4807,34 @@ void CEngineObjectInternal::VPhysicsDestroyObject(void)
 	}
 }
 
+int CEngineObjectInternal::VPhysicsGetObjectList(IPhysicsObject** pList, int listMax)
+{
+	if (RagdollBoneCount()) {
+		for (int i = 0; i < RagdollBoneCount(); i++)
+		{
+			if (i < listMax)
+			{
+				pList[i] = GetElement(i);
+			}
+		}
+
+		return RagdollBoneCount();
+	}
+
+	IPhysicsObject* pPhys = VPhysicsGetObject();
+	if (pPhys)
+	{
+		// multi-object entities must implement this function
+		Assert(!(pPhys->GetGameFlags() & FVPHYSICS_MULTIOBJECT_ENTITY));
+		if (listMax > 0)
+		{
+			pList[0] = pPhys;
+			return 1;
+		}
+	}
+	return 0;
+}
+
 //-----------------------------------------------------------------------------
 // Purpose: 
 // Input  : *pPhysics - 
@@ -5448,6 +5476,48 @@ CEnginePortalInternal::CEnginePortalInternal()
 
 CEnginePortalInternal::~CEnginePortalInternal(){
 	
+}
+
+int CEnginePortalInternal::VPhysicsGetObjectList(IPhysicsObject** pList, int listMax)
+{
+	if ((pList == NULL) || (listMax == 0))
+		return 0;
+
+	int iRetVal = 0;
+
+	if (GetWorldBrushesPhysicsObject() != NULL)
+	{
+		pList[iRetVal] = GetWorldBrushesPhysicsObject();
+		++iRetVal;
+		if (iRetVal == listMax)
+			return iRetVal;
+	}
+
+	if (GetWallBrushesPhysicsObject() != NULL)
+	{
+		pList[iRetVal] = GetWallBrushesPhysicsObject();
+		++iRetVal;
+		if (iRetVal == listMax)
+			return iRetVal;
+	}
+
+	if (GetWallTubePhysicsObject() != NULL)
+	{
+		pList[iRetVal] = GetWallTubePhysicsObject();
+		++iRetVal;
+		if (iRetVal == listMax)
+			return iRetVal;
+	}
+
+	if (GetRemoteWallBrushesPhysicsObject() != NULL)
+	{
+		pList[iRetVal] = GetRemoteWallBrushesPhysicsObject();
+		++iRetVal;
+		if (iRetVal == listMax)
+			return iRetVal;
+	}
+
+	return iRetVal;
 }
 
 void CEnginePortalInternal::VPhysicsDestroyObject(void)
@@ -7353,7 +7423,7 @@ void CEngineShadowCloneInternal::FullSync(bool bAllowAssumedSync)
 	if (bAllowAssumedSync)
 	{
 		IPhysicsObject* pSourceObjects[1024];
-		int iObjectCount = pClonedEntity->VPhysicsGetObjectList(pSourceObjects, 1024);
+		int iObjectCount = pClonedEntity->GetEngineObject()->VPhysicsGetObjectList(pSourceObjects, 1024);
 
 		//scan for really big differences that would definitely require a full sync
 		bBigChanges = (iObjectCount != m_CloneLinks.Count());
@@ -7794,7 +7864,7 @@ void CEngineShadowCloneInternal::FullSyncClonedPhysicsObjects(bool bTeleport)
 		pTransform = &m_matrixShadowTransform;
 
 	IPhysicsObject* (pSourceObjects[1024]);
-	int iObjectCount = pClonedEntity->VPhysicsGetObjectList(pSourceObjects, 1024);
+	int iObjectCount = pClonedEntity->GetEngineObject()->VPhysicsGetObjectList(pSourceObjects, 1024);
 
 	//easy out if nothing has changed
 	if (iObjectCount == m_CloneLinks.Count())
@@ -9407,7 +9477,7 @@ bool TestEntityTriggerIntersection_Accurate(IEngineObjectServer* pTrigger, IEngi
 
 			CUtlVector<collidelist_t> collideList;
 			IPhysicsObject* pList[VPHYSICS_MAX_OBJECT_LIST_COUNT];
-			int physicsCount = pEntity->GetOuter()->VPhysicsGetObjectList(pList, ARRAYSIZE(pList));
+			int physicsCount = pEntity->VPhysicsGetObjectList(pList, ARRAYSIZE(pList));
 			if (physicsCount)
 			{
 				for (int i = 0; i < physicsCount; i++)

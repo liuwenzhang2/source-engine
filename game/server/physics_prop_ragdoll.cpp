@@ -798,19 +798,6 @@ void CRagdollProp::VPhysicsUpdate( IPhysicsObject *pPhysics )
 	}
 }
 
-int CRagdollProp::VPhysicsGetObjectList( IPhysicsObject **pList, int listMax )
-{
-	for ( int i = 0; i < GetEngineObject()->RagdollBoneCount(); i++ )
-	{
-		if ( i < listMax )
-		{
-			pList[i] = GetEngineObject()->GetElement(i);
-		}
-	}
-
-	return GetEngineObject()->RagdollBoneCount();
-}
-
 //-----------------------------------------------------------------------------
 // Fade out due to the LRU telling it do
 //-----------------------------------------------------------------------------

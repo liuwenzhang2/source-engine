@@ -481,6 +481,7 @@ public:
 	virtual void UpdateRelevantInterpolatedVars() = 0;
 	virtual void VPhysicsDestroyObject(void) = 0;
 	virtual IPhysicsObject* VPhysicsGetObject(void) const = 0;
+	virtual int VPhysicsGetObjectList(IPhysicsObject** pList, int listMax) = 0;
 	virtual void VPhysicsSetObject(IPhysicsObject* pPhysics) = 0;
 	virtual const Vector& WorldAlignMins() const = 0;
 	virtual const Vector& WorldAlignMaxs() const = 0;

@@ -137,11 +137,6 @@ void CPhysicsShadowClone::Spawn( void )
 	s_IsShadowClone[entindex()] = true;
 }
 
-int CPhysicsShadowClone::VPhysicsGetObjectList( IPhysicsObject **pList, int listMax )
-{
-	return GetEngineShadowClone()->VPhysicsGetObjectList(pList, listMax);
-}
-
 bool CPhysicsShadowClone::ShouldCollide( int collisionGroup, int contentsMask ) const
 {
 	CBaseEntity *pClonedEntity = ((CPhysicsShadowClone*)(this))->GetEngineShadowClone()->GetClonedEntity();

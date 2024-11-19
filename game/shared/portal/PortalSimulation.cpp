@@ -1623,47 +1623,7 @@ IPhysicsObject * CPSCollisionEntity::VPhysicsGetObject( void ) const
 		return NULL;
 }
 
-int CPSCollisionEntity::VPhysicsGetObjectList( IPhysicsObject **pList, int listMax )
-{
-	if( (pList == NULL) || (listMax == 0) )
-		return 0;
 
-	int iRetVal = 0;
-
-	if(GetEnginePortal()->GetWorldBrushesPhysicsObject() != NULL )
-	{
-		pList[iRetVal] = GetEnginePortal()->GetWorldBrushesPhysicsObject();
-		++iRetVal;
-		if( iRetVal == listMax )
-			return iRetVal;
-	}
-
-	if(GetEnginePortal()->GetWallBrushesPhysicsObject() != NULL )
-	{
-		pList[iRetVal] = GetEnginePortal()->GetWallBrushesPhysicsObject();
-		++iRetVal;
-		if( iRetVal == listMax )
-			return iRetVal;
-	}
-
-	if(GetEnginePortal()->GetWallTubePhysicsObject() != NULL )
-	{
-		pList[iRetVal] = GetEnginePortal()->GetWallTubePhysicsObject();
-		++iRetVal;
-		if( iRetVal == listMax )
-			return iRetVal;
-	}
-
-	if(GetEnginePortal()->GetRemoteWallBrushesPhysicsObject() != NULL )
-	{
-		pList[iRetVal] = GetEnginePortal()->GetRemoteWallBrushesPhysicsObject();
-		++iRetVal;
-		if( iRetVal == listMax )
-			return iRetVal;
-	}
-
-	return iRetVal;
-}
 
 
 

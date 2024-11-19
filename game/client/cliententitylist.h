@@ -819,6 +819,7 @@ public:
 	// destroy and remove the physics object for this entity
 	virtual void	VPhysicsDestroyObject(void);
 	virtual IPhysicsObject* VPhysicsGetObject(void) const { return m_pPhysicsObject; }
+	virtual int VPhysicsGetObjectList(IPhysicsObject** pList, int listMax);
 	void			VPhysicsSetObject(IPhysicsObject* pPhysics);
 
 	// Convenience routines to init the vphysics simulation for this object.

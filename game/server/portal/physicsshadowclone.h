@@ -52,7 +52,6 @@ public:
 
 
 	//virtual bool CreateVPhysics( void );
-	virtual int		VPhysicsGetObjectList( IPhysicsObject **pList, int listMax );
 	virtual int		ObjectCaps( void );
 	virtual void	UpdateOnRemove( void );
 

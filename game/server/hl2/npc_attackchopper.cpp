@@ -2514,7 +2514,7 @@ bool CNPC_AttackHelicopter::IsValidZapTarget( CBaseEntity *pTarget )
 
 	Assert( pTarget );
 	IPhysicsObject *pList[VPHYSICS_MAX_OBJECT_LIST_COUNT];
-	int count = pTarget->VPhysicsGetObjectList( pList, ARRAYSIZE(pList) );
+	int count = pTarget->GetEngineObject()->VPhysicsGetObjectList( pList, ARRAYSIZE(pList) );
 	for ( int i = 0; i < count; i++ )
 	{
 		int material = pList[i]->GetMaterialIndex();

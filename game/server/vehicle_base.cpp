@@ -954,11 +954,6 @@ void CPropVehicleDriveable::VPhysicsCollision( int index, gamevcollisionevent_t 
 	}
 }
 
-int CPropVehicleDriveable::VPhysicsGetObjectList( IPhysicsObject **pList, int listMax )
-{
-	return GetEngineVehicle()->VPhysicsGetObjectList( pList, listMax );
-}
-
 //-----------------------------------------------------------------------------
 // Purpose: Handle trace attacks from the physcannon
 //-----------------------------------------------------------------------------

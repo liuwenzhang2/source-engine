@@ -128,7 +128,6 @@ public:
 	float		  ClampCycle( float cycle, bool isLooping );
 	virtual void BuildTransformations( IStudioHdr *pStudioHdr, Vector *pos, Quaternion q[], const matrix3x4_t& cameraTransform, int boneMask, CBoneBitList &boneComputed );
 	virtual void ApplyBoneMatrixTransform( matrix3x4_t& transform );
- 	virtual int	VPhysicsGetObjectList( IPhysicsObject **pList, int listMax );
 
 	// model specific
 	virtual bool SetupBones( matrix3x4_t *pBoneToWorldOut, int nMaxBones, int boneMask, float currentTime );

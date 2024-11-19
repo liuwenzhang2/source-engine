@@ -733,6 +733,7 @@ public:
 	bool	GetPoseParameterRange(int index, float& minValue, float& maxValue);
 
 	virtual IPhysicsObject* VPhysicsGetObject(void) const { return m_pPhysicsObject; }
+	virtual int		VPhysicsGetObjectList(IPhysicsObject** pList, int listMax);
 	// destroy and remove the physics object for this entity
 	virtual void	VPhysicsDestroyObject(void);
 	void			VPhysicsSetObject(IPhysicsObject* pPhysics);
@@ -1685,6 +1686,7 @@ public:
 
 	CEnginePortalInternal();
 	~CEnginePortalInternal();
+	virtual int		VPhysicsGetObjectList(IPhysicsObject** pList, int listMax);
 	void	VPhysicsDestroyObject(void);
 	void				MoveTo(const Vector& ptCenter, const QAngle& angles);
 	void				UpdateLinkMatrix(IEnginePortalServer* pRemoteCollisionEntity);

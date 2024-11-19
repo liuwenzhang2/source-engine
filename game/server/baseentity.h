@@ -1402,7 +1402,6 @@ public:
 	// update the shadow so it will coincide with the current AI position at some time
 	// in the future (or 0 for now)
 	virtual void	UpdatePhysicsShadowToCurrentPosition( float deltaTime );
-	virtual int		VPhysicsGetObjectList( IPhysicsObject **pList, int listMax );
 	virtual bool	VPhysicsIsFlesh( void );
 	// --------------------------------------------------------------------
 		// Is the entity floating?

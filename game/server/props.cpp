@@ -3392,7 +3392,7 @@ CBaseEntity *BreakModelCreateSingle( CBaseEntity *pOwner, breakmodel_t *pModel, 
 		}
 
 		IPhysicsObject *pList[VPHYSICS_MAX_OBJECT_LIST_COUNT];
-		int count = pEntity->VPhysicsGetObjectList( pList, ARRAYSIZE(pList) );
+		int count = pEntity->GetEngineObject()->VPhysicsGetObjectList( pList, ARRAYSIZE(pList) );
 		if ( count )
 		{
 			for ( int i = 0; i < count; i++ )

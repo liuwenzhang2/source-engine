@@ -1389,7 +1389,7 @@ int CBaseEntity::VPhysicsTakeDamage( const CTakeDamageInfo &info )
 		else if ( (gameFlags & FVPHYSICS_PART_OF_RAGDOLL) && (gameFlags & FVPHYSICS_CONSTRAINT_STATIC) )
 		{
 			IPhysicsObject *pList[VPHYSICS_MAX_OBJECT_LIST_COUNT];
-			int count = VPhysicsGetObjectList( pList, ARRAYSIZE(pList) );
+			int count = GetEngineObject()->VPhysicsGetObjectList( pList, ARRAYSIZE(pList) );
 			for ( int i = 0; i < count; i++ )
 			{
 				if ( !(pList[i]->GetGameFlags() & FVPHYSICS_CONSTRAINT_STATIC) )
@@ -2295,28 +2295,14 @@ void CBaseEntity::UpdatePhysicsShadowToCurrentPosition( float deltaTime )
 	}
 }
 
-int CBaseEntity::VPhysicsGetObjectList( IPhysicsObject **pList, int listMax )
-{
-	IPhysicsObject *pPhys = VPhysicsGetObject();
-	if ( pPhys )
-	{
-		// multi-object entities must implement this function
-		Assert( !(pPhys->GetGameFlags() & FVPHYSICS_MULTIOBJECT_ENTITY) );
-		if ( listMax > 0 )
-		{
-			pList[0] = pPhys;
-			return 1;
-		}
-	}
-	return 0;
-}
+
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
 bool CBaseEntity::VPhysicsIsFlesh( void )
 {
 	IPhysicsObject *pList[VPHYSICS_MAX_OBJECT_LIST_COUNT];
-	int count = VPhysicsGetObjectList( pList, ARRAYSIZE(pList) );
+	int count = GetEngineObject()->VPhysicsGetObjectList( pList, ARRAYSIZE(pList) );
 	for ( int i = 0; i < count; i++ )
 	{
 		int material = pList[i]->GetMaterialIndex();
