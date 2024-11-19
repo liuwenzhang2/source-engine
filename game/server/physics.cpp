@@ -1730,7 +1730,7 @@ void PhysFrame( float deltaTime )
 				{
 					pEntity->GetEngineObject()->MarkSurroundingBoundsDirty();
 				}
-				pEntity->VPhysicsUpdate( pActiveList[i] );
+				pEntity->GetEngineObject()->VPhysicsUpdate( pActiveList[i] );
 			}
 		}
 		stackfree( pActiveList );

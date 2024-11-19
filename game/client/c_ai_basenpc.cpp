@@ -47,7 +47,7 @@ C_AI_BaseNPC::C_AI_BaseNPC()
 unsigned int C_AI_BaseNPC::PhysicsSolidMaskForEntity( void ) const 
 {
 	// This allows ragdolls to move through npcclip brushes
-	if ( !IsRagdoll() )
+	if ( !GetEngineObject()->IsRagdoll() )
 	{
 		return MASK_NPCSOLID; 
 	}

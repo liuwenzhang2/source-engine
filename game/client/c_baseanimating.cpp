@@ -289,7 +289,7 @@ void C_ClientRagdoll::OnRestore( void )
 	
 	BaseClass::OnRestore();
 
-	RagdollMoved();
+	GetEngineObject()->RagdollMoved();
 }
 
 void C_ClientRagdoll::ImpactTrace( trace_t *pTrace, int iDamageType, const char *pCustomImpactName )
@@ -674,7 +674,7 @@ bool C_BaseAnimating::UsesPowerOfTwoFrameBufferTexture( void )
 //-----------------------------------------------------------------------------
 int C_BaseAnimating::VPhysicsGetObjectList( IPhysicsObject **pList, int listMax )
 {
-	if ( IsRagdoll() )
+	if (GetEngineObject()->IsRagdoll() )
 	{
 		int i;
 		for ( i = 0; i < GetEngineObject()->RagdollBoneCount(); ++i )
@@ -706,7 +706,7 @@ ShadowType_t C_BaseAnimating::ShadowCastType()
 	if (pStudioHdr->GetNumSeq() == 0)
 		return SHADOWS_RENDER_TO_TEXTURE;
 		  
-	if ( !IsRagdoll() )
+	if ( !GetEngineObject()->IsRagdoll() )
 	{
 		// If we have pose parameters, always update
 		if ( pStudioHdr->GetNumPoseParameters() > 0 )
@@ -1305,7 +1305,7 @@ void C_BaseAnimating::ApplyBoneMatrixTransform( matrix3x4_t& transform )
 
 CollideType_t C_BaseAnimating::GetCollideType( void )
 {
-	if ( IsRagdoll() )
+	if (GetEngineObject()->IsRagdoll() )
 		return ENTITY_SHOULD_RESPOND;
 
 	return BaseClass::GetCollideType();
@@ -2363,7 +2363,7 @@ bool C_BaseAnimating::SetupBones( matrix3x4_t *pBoneToWorldOut, int nMaxBones, i
 
 			CBoneBitList boneComputed;
 			// don't calculate IK on ragdolls
-			if ( m_pIk && !IsRagdoll() )
+			if ( m_pIk && !GetEngineObject()->IsRagdoll() )
 			{
 				UpdateIKLocks( currentTime );
 
@@ -2637,7 +2637,7 @@ void C_BaseAnimating::DoInternalDrawModel( ClientModelRenderInfo_t *pInfo, DrawM
 
 	if ( vcollide_wireframe.GetBool() )
 	{
-		if ( IsRagdoll() )
+		if (GetEngineObject()->IsRagdoll() )
 		{
 			GetEngineObject()->DrawWireframe();
 		}
@@ -3716,21 +3716,7 @@ bool C_BaseAnimating::Interpolate( float flCurrentTime )
 }
 
 
-//-----------------------------------------------------------------------------
-// returns true if we're currently being ragdolled
-//-----------------------------------------------------------------------------
-bool C_BaseAnimating::IsRagdoll() const
-{
-	return GetEngineObject()->RagdollBoneCount() && (((C_BaseAnimating*)this)->GetEngineObject()->GetRenderFX() == kRenderFxRagdoll);
-}
 
-//-----------------------------------------------------------------------------
-// returns true if we're currently being ragdolled
-//-----------------------------------------------------------------------------
-bool C_BaseAnimating::IsAboutToRagdoll() const
-{
-	return (((C_BaseAnimating*)this)->GetEngineObject()->GetRenderFX() == kRenderFxRagdoll);
-}
 
 
 //-----------------------------------------------------------------------------
@@ -3756,7 +3742,7 @@ void C_BaseAnimating::OnPostRestoreData()// const char *context, int slot, int t
 
 void C_BaseAnimating::GetRenderBounds( Vector& theMins, Vector& theMaxs )
 {
-	if ( IsRagdoll() )
+	if (GetEngineObject()->IsRagdoll() )
 	{
 		GetEngineObject()->GetRagdollBounds( theMins, theMaxs );
 	}
@@ -3804,7 +3790,7 @@ void C_BaseAnimating::GetRenderBounds( Vector& theMins, Vector& theMaxs )
 //-----------------------------------------------------------------------------
 const Vector& C_BaseAnimating::GetRenderOrigin( void )
 {
-	if ( IsRagdoll() )
+	if (GetEngineObject()->IsRagdoll() )
 	{
 		return GetEngineObject()->GetRagdollOrigin();
 	}
@@ -3816,7 +3802,7 @@ const Vector& C_BaseAnimating::GetRenderOrigin( void )
 
 const QAngle& C_BaseAnimating::GetRenderAngles( void )
 {
-	if ( IsRagdoll() )
+	if (GetEngineObject()->IsRagdoll() )
 	{
 		return vec3_angle;
 			
@@ -3827,18 +3813,7 @@ const QAngle& C_BaseAnimating::GetRenderAngles( void )
 	}
 }
 
-void C_BaseAnimating::RagdollMoved( void ) 
-{
-	GetEngineObject()->SetAbsOrigin(GetEngineObject()->GetRagdollOrigin() );
-	GetEngineObject()->SetAbsAngles( vec3_angle );
 
-	Vector mins, maxs;
-	GetEngineObject()->GetRagdollBounds( mins, maxs );
-	GetEngineObject()->SetCollisionBounds( mins, maxs );
-
-	// If the ragdoll moves, its render-to-texture shadow is dirty
-	GetEngineObject()->InvalidatePhysicsRecursive( ANIMATION_CHANGED );
-}
 
 
 //-----------------------------------------------------------------------------
@@ -3848,14 +3823,14 @@ void C_BaseAnimating::VPhysicsUpdate( IPhysicsObject *pPhysics )
 {
 	// FIXME: Should make sure the physics objects being passed in
 	// is the ragdoll physics object, but I think it's pretty safe not to check
-	if (IsRagdoll())
-	{	 
-		GetEngineObject()->VPhysicsUpdate( pPhysics );
-		
-		RagdollMoved();
+	//if (GetEngineObject()->IsRagdoll())
+	//{	 
+	//	GetEngineObject()->VPhysicsUpdate( pPhysics );
+	//	
+	//	GetEngineObject()->RagdollMoved();
 
-		return;
-	}
+	//	return;
+	//}
 
 	BaseClass::VPhysicsUpdate( pPhysics );
 }
@@ -4146,7 +4121,7 @@ bool C_BaseAnimating::TestHitboxes( const Ray_t &ray, unsigned int fContentsMask
 		tr.surface.name = "**studio**";
 		tr.surface.flags = SURF_HITBOX;
 		tr.surface.surfaceProps = physprops->GetSurfaceIndex( pBone->pszSurfaceProp() );
-		if ( IsRagdoll() )
+		if (GetEngineObject()->IsRagdoll() )
 		{
 			IPhysicsObject *pReplace = GetEngineObject()->GetElement( tr.physicsbone );
 			if ( pReplace )

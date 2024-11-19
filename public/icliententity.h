@@ -495,6 +495,7 @@ public:
 	virtual int RagdollBoneCount() const = 0;
 	virtual IPhysicsObject* GetElement(int elementNum) = 0;
 	virtual void DrawWireframe(void) = 0;
+	virtual void RagdollMoved(void) = 0;
 	virtual void VPhysicsUpdate(IPhysicsObject* pObject) = 0;
 	virtual bool TransformVectorToWorld(int boneIndex, const Vector* vTemp, Vector* vOut) = 0;
 	virtual ragdoll_t* GetRagdoll(void) = 0;
@@ -506,6 +507,8 @@ public:
 	virtual void TransferDissolveFrom(C_BaseEntity* pSource) = 0;
 	virtual C_BaseEntity* CreateRagdollCopy() = 0;
 	virtual bool InitAsClientRagdoll(const matrix3x4_t* pDeltaBones0, const matrix3x4_t* pDeltaBones1, const matrix3x4_t* pCurrentBonePosition, float boneDt, bool bFixedConstraints = false) = 0;
+	virtual bool IsRagdoll() const = 0;
+	virtual bool IsAboutToRagdoll() const = 0;
 	virtual void Simulate() = 0;
 	//virtual void CreateUnragdollInfo(C_BaseEntity* pRagdoll) = 0;
 	virtual IPhysicsConstraintGroup* GetConstraintGroup() = 0;
@@ -515,7 +518,7 @@ public:
 	virtual int GetBoneIndex(int index) = 0;
 	virtual const Vector& GetRagPos(int index) = 0;
 	virtual const QAngle& GetRagAngles(int index) = 0;
-	virtual unsigned char GetRenderFX() = 0;
+	virtual unsigned char GetRenderFX() const = 0;
 	virtual void SetRenderFX(unsigned char nRenderFX) = 0;
 };
 

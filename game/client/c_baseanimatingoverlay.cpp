@@ -186,7 +186,7 @@ void C_BaseAnimatingOverlay::GetRenderBounds( Vector& theMins, Vector& theMaxs )
 {
 	BaseClass::GetRenderBounds( theMins, theMaxs );
 
-	if ( !IsRagdoll() )
+	if ( !GetEngineObject()->IsRagdoll() )
 	{
 		IStudioHdr *pStudioHdr = GetEngineObject()->GetModelPtr();
 		if ( !pStudioHdr || !pStudioHdr->SequencesAvailable() )

@@ -464,7 +464,7 @@ void CPhysicsSystem::PhysicsSimulate()
 					{
 						pEntity->GetEngineObject()->MarkSurroundingBoundsDirty();
 					}
-					pEntity->VPhysicsUpdate( pActiveList[i] );
+					pEntity->GetEngineObject()->VPhysicsUpdate( pActiveList[i] );
 				}
 			}
 		}

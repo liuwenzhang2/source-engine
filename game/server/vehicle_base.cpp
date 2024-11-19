@@ -259,8 +259,8 @@ void CPropVehicle::VPhysicsUpdate( IPhysicsObject *pPhysics )
 	m_vecSmoothedVelocity = m_vecSmoothedVelocity * SMOOTHING_FACTOR + velocity * ( 1 - SMOOTHING_FACTOR );
 
 	// must be a wheel
-	if (!GetEngineVehicle()->VPhysicsUpdate( pPhysics ))
-		return;
+	//if (!GetEngineVehicle()->VPhysicsUpdate( pPhysics ))
+	//	return;
 	
 	BaseClass::VPhysicsUpdate( pPhysics );
 }

@@ -862,6 +862,7 @@ public:
 	virtual IPhysicsConstraintGroup* GetConstraintGroup() { return m_ragdoll.pGroup; }
 	virtual void DrawWireframe();
 	virtual void VPhysicsUpdate(IPhysicsObject* pPhysics);
+	void RagdollMoved(void);
 	virtual int RagdollBoneCount() const { return m_ragdoll.listCount; }
 	//=============================================================================
 	// HPE_BEGIN:
@@ -883,7 +884,9 @@ public:
 	float GetLastVPhysicsUpdateTime() const { return m_lastUpdate; }
 
 	ragdoll_t* GetRagdoll(void) { return &m_ragdoll; }
-
+	// returns true if we're currently being ragdolled
+	bool							IsRagdoll() const;
+	bool							IsAboutToRagdoll() const;
 	C_BaseEntity* CreateRagdollCopy();
 	void							IgniteRagdoll(C_BaseEntity* pSource);
 	void							TransferDissolveFrom(C_BaseEntity* pSource);
@@ -903,7 +906,7 @@ public:
 	int GetBoneIndex(int index) { return m_boneIndex[index]; }
 	const Vector& GetRagPos(int index) { return m_ragPos[index]; }
 	const QAngle& GetRagAngles(int index) { return m_ragAngles[index]; }
-	unsigned char GetRenderFX() { return m_nRenderFX; }
+	unsigned char GetRenderFX() const{ return m_nRenderFX; }
 	void SetRenderFX(unsigned char nRenderFX) { m_nRenderFX = nRenderFX; }
 private:
 	void LockStudioHdr();

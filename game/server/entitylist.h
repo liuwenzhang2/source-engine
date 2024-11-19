@@ -766,7 +766,7 @@ public:
 	int		SelectHeaviestSequence(int activity);
 
 	void							ClearRagdoll();
-	virtual bool VPhysicsUpdate(IPhysicsObject* pPhysics);
+	virtual void VPhysicsUpdate(IPhysicsObject* pPhysics);
 	void InitRagdoll(const Vector& forceVector, int forceBone, const Vector& forcePos, matrix3x4_t* pPrevBones, matrix3x4_t* pBoneToWorld, float dt, int collisionGroup, bool activateRagdoll, bool bWakeRagdoll = true);
 
 	virtual int RagdollBoneCount() const { return m_ragdoll.listCount; }
@@ -778,8 +778,10 @@ public:
 	bool GetAllAsleep() { return m_allAsleep; }
 	IPhysicsConstraintGroup* GetConstraintGroup() { return m_ragdoll.pGroup; }
 	ragdoll_t* GetRagdoll(void) { return &m_ragdoll; }
+	virtual bool IsRagdoll() const;
 
-	unsigned char GetRenderFX() { return m_nRenderFX; }
+
+	unsigned char GetRenderFX() const { return m_nRenderFX; }
 	void SetRenderFX(unsigned char nRenderFX) { m_nRenderFX = nRenderFX; }
 public:
 	// Networking related methods
@@ -1851,7 +1853,7 @@ public:
 	bool Initialize(const char* pScriptName, unsigned int nVehicleType);
 
 	void Teleport(matrix3x4_t& relativeTransform);
-	bool VPhysicsUpdate(IPhysicsObject* pPhysics);
+	void VPhysicsUpdate(IPhysicsObject* pPhysics);
 	bool Think();
 	void PlaceWheelDust(int wheelIndex, bool ignoreSpeed = false);
 

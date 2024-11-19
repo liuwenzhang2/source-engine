@@ -781,7 +781,7 @@ void CRagdollProp::Teleport( const Vector *newPosition, const QAngle *newAngles,
 
 void CRagdollProp::VPhysicsUpdate( IPhysicsObject *pPhysics )
 {
-	GetEngineObject()->VPhysicsUpdate(pPhysics);
+	//GetEngineObject()->VPhysicsUpdate(pPhysics);
 
 	// Don't scream after you've come to rest
 	if (GetEngineObject()->GetAllAsleep() )

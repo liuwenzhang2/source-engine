@@ -336,7 +336,7 @@ void CReplayRagdollRecorder::Record()
 
 	FOR_EACH_LL( m_lstRagdollsToRecord, i )
 	{
-		Assert( m_lstRagdollsToRecord[ i ]->m_pEntity->IsRagdoll() );
+		Assert( m_lstRagdollsToRecord[ i ]->m_pEntity->GetEngineObject()->IsRagdoll() );
 		m_lstRagdollsToRecord[ i ]->Record();
 	}
 }

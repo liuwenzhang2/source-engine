@@ -294,7 +294,7 @@ void CWeaponPortalBase::DoAnimationEvents( IStudioHdr *pStudioHdr )
 
 void CWeaponPortalBase::GetRenderBounds( Vector& theMins, Vector& theMaxs )
 {
-	if ( IsRagdoll() )
+	if (GetEngineObject()->IsRagdoll() )
 	{
 		GetEngineObject()->GetRagdollBounds( theMins, theMaxs );
 	}

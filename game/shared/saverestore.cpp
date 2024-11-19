@@ -854,17 +854,31 @@ int	CSave::WriteRootFields(const char* pname, IHandleEntity* pHandleEntity, data
 #endif
 
 	IEngineObject* pEngineObject = GetEngineObject(pHandleEntity->GetRefEHandle().GetEntryIndex());
-	datamap_t* pEngineObjectDataMap = pEngineObject->GetDataDescMap();
-	for (int i = 0; i < pEngineObjectDataMap->dataNumFields; i++) {
-		pTest = &pEngineObjectDataMap->dataDesc[i];
-		void* pOutputData = ((char*)pEngineObject + pTest->fieldOffset[TD_OFFSET_NORMAL]);
+	datamap_t* pDataMaps[100];
+	int nDataMapCount = 0;
+	datamap_t* pDataMap = pEngineObject->GetDataDescMap();
+	while (pDataMap) {
+		pDataMaps[nDataMapCount] = pDataMap;
+		if (nDataMapCount++ >= 100) {
+			Error("too much level");
+		}
+		pDataMap = pDataMap->baseMap;
+	}
+	if (nDataMapCount > 0) {
+		for (int i = nDataMapCount - 1; i >= 0; i--) {
+			datamap_t* pCurMap = pDataMaps[i];
+			for (int i = 0; i < pCurMap->dataNumFields; i++) {
+				pTest = &pCurMap->dataDesc[i];
+				void* pOutputData = ((char*)pEngineObject + pTest->fieldOffset[TD_OFFSET_NORMAL]);
 
-		if (!ShouldSaveField(pOutputData, pTest))
-			continue;
+				if (!ShouldSaveField(pOutputData, pTest))
+					continue;
 
-		if (!WriteField(pname, pOutputData, pRootMap, pTest))
-			break;
-		count++;
+				if (!WriteField(pname, pOutputData, pRootMap, pTest))
+					break;
+				count++;
+			}
+		}
 	}
 
 
@@ -1868,10 +1882,23 @@ int CRestore::ReadRootFields(const char* pname, IHandleEntity* pHandleEntity, da
 	lastName = symName;
 
 	IEngineObject* pEngineObject = GetEngineObject(pHandleEntity->GetRefEHandle().GetEntryIndex());
-	datamap_t* pEngineObjectDataMap = pEngineObject->GetDataDescMap();
-
-	// Clear out base data
-	EmptyFields(pEngineObject, pEngineObjectDataMap->dataDesc, pEngineObjectDataMap->dataNumFields);
+	datamap_t* pDataMaps[100];
+	int nDataMapCount = 0;
+	datamap_t* pDataMap = pEngineObject->GetDataDescMap();
+	while (pDataMap) {
+		pDataMaps[nDataMapCount] = pDataMap;
+		if (nDataMapCount++ >= 100) {
+			Error("too much level");
+		}
+		pDataMap = pDataMap->baseMap;
+	}
+	if (nDataMapCount > 0) {
+		for (int i = nDataMapCount - 1; i >= 0; i--) {
+			datamap_t* pCurMap = pDataMaps[i];
+			// Clear out base data
+			EmptyFields(pEngineObject, pCurMap->dataDesc, pCurMap->dataNumFields);
+		}
+	}
 	EmptyFields(pHandleEntity, pFields, fieldCount);
 
 	// Skip over the struct name
@@ -1886,7 +1913,16 @@ int CRestore::ReadRootFields(const char* pname, IHandleEntity* pHandleEntity, da
 
 		const char* pFieldName = m_pData->StringFromSymbol(header.symbol);
 		typedescription_t* pField = NULL;
-		pField = FindField(pFieldName, pEngineObjectDataMap->dataDesc, pEngineObjectDataMap->dataNumFields, &searchCookie);
+		if (nDataMapCount > 0) {
+			for (int i = nDataMapCount - 1; i >= 0; i--) {
+				datamap_t* pCurMap = pDataMaps[i];
+				// Clear out base data
+				pField = FindField(pFieldName, pCurMap->dataDesc, pCurMap->dataNumFields, &searchCookie);
+				if (pField) {
+					break;
+				}
+			}
+		}
 		if (pField) {
 			if ( ShouldReadField(pField)) {
 				ReadField(header, ((char*)pEngineObject + pField->fieldOffset[TD_OFFSET_NORMAL]), pRootMap, pField);

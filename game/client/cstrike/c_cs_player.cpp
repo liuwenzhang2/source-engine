@@ -944,7 +944,7 @@ int C_CSPlayer::GetCurrentAssaultSuitPrice()
 
 const QAngle& C_CSPlayer::GetRenderAngles()
 {
-	if ( IsRagdoll() )
+	if (GetEngineObject()->IsRagdoll() )
 	{
 		return vec3_angle;
 	}
@@ -1848,7 +1848,7 @@ bool C_CSPlayer::ShouldDraw( void )
 
 	if( IsLocalPlayer() )
 	{
-		if ( IsRagdoll() )
+		if (GetEngineObject()->IsRagdoll() )
 			return true;
 	}
 

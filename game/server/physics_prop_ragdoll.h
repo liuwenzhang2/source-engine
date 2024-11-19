@@ -66,7 +66,7 @@ public:
 	void SetDebrisThink();
 	void ClearFlagsThink( void );
 
-	virtual bool	IsRagdoll() { return true; }
+	//virtual bool	IsRagdoll() { return true; }
 
 	// Damage passing
 	virtual void	SetDamageEntity( CBaseEntity *pEntity );

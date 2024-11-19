@@ -89,7 +89,7 @@ C_HL1MP_Player::~C_HL1MP_Player()
 
 const QAngle& C_HL1MP_Player::GetRenderAngles()
 {
-	if ( IsRagdoll() )
+	if (GetEngineObject()->IsRagdoll() )
 	{
 		return vec3_angle;
 	}
@@ -553,10 +553,10 @@ bool C_HL1MP_Player::ShouldDraw( void )
     if ( !IsAlive() )
         return false;
 
-    if ( IsLocalPlayer() && IsRagdoll() )
+    if ( IsLocalPlayer() && GetEngineObject()->IsRagdoll() )
         return true;
 
-    if ( IsRagdoll() )
+    if (GetEngineObject()->IsRagdoll() )
         return false;
 
     return BaseClass::ShouldDraw();

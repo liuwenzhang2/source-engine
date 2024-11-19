@@ -452,13 +452,14 @@ public:
 	virtual void GetAngleOverrideFromCurrentState(char* pOut, int size) = 0;
 	virtual void RagdollBone(bool* boneSimulated, CBoneAccessor& pBoneToWorld) = 0;
 	virtual void UpdateNetworkDataFromVPhysics(int index) = 0;
-	virtual bool VPhysicsUpdate(IPhysicsObject* pPhysics) = 0;
+	virtual void VPhysicsUpdate(IPhysicsObject* pPhysics) = 0;
 	virtual bool GetAllAsleep() = 0;
 	virtual IPhysicsConstraintGroup* GetConstraintGroup() = 0;
 	virtual ragdoll_t* GetRagdoll(void) = 0;
 	virtual void ClearRagdoll() = 0;
+	virtual bool IsRagdoll() const = 0;
 
-	virtual unsigned char GetRenderFX() = 0;
+	virtual unsigned char GetRenderFX() const = 0;
 	virtual void SetRenderFX(unsigned char nRenderFX) = 0;
 };
 
@@ -552,7 +553,7 @@ public:
 	virtual bool Initialize(const char* pScriptName, unsigned int nVehicleType) = 0;
 
 	virtual void Teleport(matrix3x4_t& relativeTransform) = 0;
-	virtual bool VPhysicsUpdate(IPhysicsObject* pPhysics) = 0;
+	//virtual bool VPhysicsUpdate(IPhysicsObject* pPhysics) = 0;
 	virtual bool Think() = 0;
 	virtual void PlaceWheelDust(int wheelIndex, bool ignoreSpeed = false) = 0;
 

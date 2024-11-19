@@ -98,7 +98,6 @@ public:
 	virtual CBaseEntity* CreateServerRagdoll(int forceBone, const CTakeDamageInfo& info, int collisionGroup, bool bUseLRURetirement = false);
 	virtual void ClampRagdollForce( const Vector &vecForceIn, Vector *vecForceOut ) { *vecForceOut = vecForceIn; } // Base class does nothing.
 	//virtual bool BecomeRagdollOnClient( const Vector &force );
-	virtual bool IsRagdoll();
 	virtual bool CanBecomeRagdoll( void ); //Check if this entity will ragdoll when dead.
 	virtual void FixupBurningServerRagdoll(CBaseEntity* pRagdoll) {}
 	virtual	void GetSkeleton( IStudioHdr *pStudioHdr, Vector pos[], Quaternion q[], int boneMask );

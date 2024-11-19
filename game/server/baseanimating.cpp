@@ -725,10 +725,7 @@ CBaseEntity* CBaseAnimating::CreateServerRagdoll(int forceBone, const CTakeDamag
 //	return false;
 //}
 
-bool CBaseAnimating::IsRagdoll()
-{
-	return (GetEngineObject()->GetRenderFX() == kRenderFxRagdoll) ? true : false;
-}
+
 
 bool CBaseAnimating::CanBecomeRagdoll( void ) 
 {

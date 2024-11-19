@@ -5044,8 +5044,37 @@ void C_EngineObjectInternal::GetRagdollBounds(Vector& theMins, Vector& theMaxs)
 	theMaxs = m_maxs;
 }
 
+void C_EngineObjectInternal::RagdollMoved(void)
+{
+	SetAbsOrigin(GetRagdollOrigin());
+	SetAbsAngles(vec3_angle);
+
+	Vector mins, maxs;
+	GetRagdollBounds(mins, maxs);
+	SetCollisionBounds(mins, maxs);
+
+	// If the ragdoll moves, its render-to-texture shadow is dirty
+	InvalidatePhysicsRecursive(ANIMATION_CHANGED);
+}
+
 void C_EngineObjectInternal::VPhysicsUpdate(IPhysicsObject* pPhysics)
 {
+	bool bIsRagdoll = false;
+	for (int i = 0; i < m_ragdoll.listCount; i++)
+	{
+		if (m_ragdoll.list[0].pObject == pPhysics)
+		{
+			bIsRagdoll = true;
+			break;
+		}
+	}
+	if (!bIsRagdoll) {
+		m_pOuter->VPhysicsUpdate(pPhysics);
+		return;
+	}
+	if (pPhysics == VPhysicsGetObject()) {
+		m_pOuter->VPhysicsUpdate(pPhysics);
+	}
 	if (m_lastUpdate == gpGlobals->curtime)
 		return;
 	m_lastUpdate = gpGlobals->curtime;
@@ -5071,7 +5100,7 @@ void C_EngineObjectInternal::VPhysicsUpdate(IPhysicsObject* pPhysics)
 			RagdollSolveSeparation(m_ragdoll, pEntity);
 		}
 	}
-
+	RagdollMoved();
 	// See if we should go to sleep...
 	CheckSettleStationaryRagdoll();
 }
@@ -5311,6 +5340,22 @@ void C_EngineObjectInternal::ClearRagdoll()
 #endif
 	}
 	m_builtRagdoll = false;
+}
+
+//-----------------------------------------------------------------------------
+// returns true if we're currently being ragdolled
+//-----------------------------------------------------------------------------
+bool C_EngineObjectInternal::IsRagdoll() const
+{
+	return RagdollBoneCount() && this->GetRenderFX() == kRenderFxRagdoll;
+}
+
+//-----------------------------------------------------------------------------
+// returns true if we're currently being ragdolled
+//-----------------------------------------------------------------------------
+bool C_EngineObjectInternal::IsAboutToRagdoll() const
+{
+	return this->GetRenderFX() == kRenderFxRagdoll;
 }
 
 //void C_EngineObjectInternal::SaveRagdollInfo(int numbones, const matrix3x4_t& cameraTransform, CBoneAccessor& pBoneToWorld)

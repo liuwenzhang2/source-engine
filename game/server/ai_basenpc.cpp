@@ -619,7 +619,7 @@ void CAI_BaseNPC::Event_Killed( const CTakeDamageInfo &info )
 	// Adrian - Only set this if we are going to become a ragdoll. We still want to 
 	// select SCHED_DIE or do something special when this NPC dies and we wont 
 	// catch the change of state if we set this to whatever the ideal state is.
-	if ( CanBecomeRagdoll() || IsRagdoll() )
+	if ( CanBecomeRagdoll() || GetEngineObject()->IsRagdoll() )
 		 SetState( NPC_STATE_DEAD );
 
 	// If the remove-no-ragdoll flag is set in the damage type, we're being

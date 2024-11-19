@@ -4105,7 +4105,7 @@ void CTriggerVPhysicsMotion::StartTouch( CBaseEntity *pOther )
 	}
 #endif
 
-	if ( pOther->GetBaseAnimating() && pOther->GetBaseAnimating()->IsRagdoll() )
+	if ( pOther->GetBaseAnimating() && pOther->GetBaseAnimating()->GetEngineObject()->IsRagdoll() )
 	{
 		CRagdollBoogie::IncrementSuppressionCount( pOther );
 	}
@@ -4141,7 +4141,7 @@ void CTriggerVPhysicsMotion::EndTouch( CBaseEntity *pOther )
 	}
 #endif //!_XBOX
 
-	if ( pOther->GetBaseAnimating() && pOther->GetBaseAnimating()->IsRagdoll() )
+	if ( pOther->GetBaseAnimating() && pOther->GetBaseAnimating()->GetEngineObject()->IsRagdoll() )
 	{
 		CRagdollBoogie::DecrementSuppressionCount( pOther );
 	}

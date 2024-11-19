@@ -2852,7 +2852,7 @@ void C_BasePlayer::BuildFirstPersonMeathookTransformations( IStudioHdr *hdr, Vec
 	// If we're in first-person view rendering the main view and using the viewmodel, we shouldn't have even got here!
 	// If we're in first-person view rendering the main view(s), meathook and headless.
 	// If we're in first-person view rendering shadowbuffers/reflections, don't do anything special either (we could do meathook but with a head?)
-	if ( IsAboutToRagdoll() )
+	if ( GetEngineObject()->IsAboutToRagdoll() )
 	{
 		// We're re-animating specifically to set up the ragdoll.
 		// Meathook can push the player through the floor, which makes the ragdoll fall through the world, which is no good.

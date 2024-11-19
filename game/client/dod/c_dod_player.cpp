@@ -751,7 +751,7 @@ const IEngineObjectClient* C_DODPlayer::GetRepresentativeRagdoll() const
 
 const QAngle& C_DODPlayer::GetRenderAngles()
 {
-	if ( IsRagdoll() )
+	if (GetEngineObject()->IsRagdoll() )
 	{
 		return vec3_angle;
 	}
@@ -983,7 +983,7 @@ bool C_DODPlayer::ShouldDraw( void )
 
 	if( IsLocalPlayer() )
 	{
-		if ( IsRagdoll() )
+		if (GetEngineObject()->IsRagdoll() )
 			return true;
 	}
 

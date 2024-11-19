@@ -260,9 +260,7 @@ public:
 	virtual bool					TestCollision( const Ray_t &ray, unsigned int fContentsMask, trace_t& tr );
 	virtual bool					TestHitboxes( const Ray_t &ray, unsigned int fContentsMask, trace_t& tr );
 
-	// returns true if we're currently being ragdolled
-	bool							IsRagdoll() const;
-	bool							IsAboutToRagdoll() const;
+
 	virtual C_BaseEntity			*BecomeRagdollOnClient();
 
 
@@ -371,7 +369,6 @@ public:
 
 	int								FindTransitionSequence( int iCurrentSequence, int iGoalSequence, int *piDir );
 
-	void							RagdollMoved( void );
 
 	virtual void					GetToolRecordingState( KeyValues *msg );
 	virtual void					CleanupToolRecordingState( KeyValues *msg );

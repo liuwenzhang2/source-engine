@@ -1299,7 +1299,7 @@ bool TransferPhysicsObject( CBaseEntity *pFrom, CBaseEntity *pTo, bool wakeUp )
 	// transfer to the new owner
 	pTo->GetEngineObject()->VPhysicsSetObject( pVPhysics );
 	pVPhysics->SetGameData( (void *)pTo );
-	pTo->VPhysicsUpdate( pVPhysics );
+	pTo->GetEngineObject()->VPhysicsUpdate( pVPhysics );
 	
 	// may have been temporarily disabled by the old object
 	pVPhysics->EnableMotion( true );

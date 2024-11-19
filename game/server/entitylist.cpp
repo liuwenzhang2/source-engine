@@ -1003,8 +1003,8 @@ void CEngineObjectInternal::ParseMapData(IEntityMapData* mapData)
 	{
 		do
 		{
-			if (!KeyValue(keyName, value)) {
-				if (!m_pOuter->KeyValue(keyName, value)) {
+			if (!m_pOuter->KeyValue(keyName, value)) {
+				if (!KeyValue(keyName, value)) {
 					Msg("Entity %s has unparsed key: %s!\n", GetClassname(), keyName);
 				}
 			}
@@ -5050,10 +5050,26 @@ void CEngineObjectInternal::ClearRagdoll() {
 	}
 }
 
-bool CEngineObjectInternal::VPhysicsUpdate(IPhysicsObject* pPhysics)
+void CEngineObjectInternal::VPhysicsUpdate(IPhysicsObject* pPhysics)
 {
+	bool bIsRagdoll = false;
+	for (int i = 0; i < m_ragdoll.listCount; i++)
+	{
+		if (m_ragdoll.list[0].pObject == pPhysics)
+		{
+			bIsRagdoll = true;
+			break;
+		}
+	}
+	if (!bIsRagdoll) {
+		m_pOuter->VPhysicsUpdate(pPhysics);
+		return;
+	}
+	if (pPhysics == VPhysicsGetObject()) {
+		m_pOuter->VPhysicsUpdate(pPhysics);
+	}
 	if (m_lastUpdateTickCount == (unsigned int)gpGlobals->tickcount)
-		return false;
+		return;
 
 	m_lastUpdateTickCount = gpGlobals->tickcount;
 	//NetworkStateChanged();
@@ -5133,7 +5149,7 @@ bool CEngineObjectInternal::VPhysicsUpdate(IPhysicsObject* pPhysics)
 
 	PhysicsTouchTriggers();
 
-	return true;
+	return;
 }
 
 void CEngineObjectInternal::InitRagdoll(const Vector& forceVector, int forceBone, const Vector& forcePos, matrix3x4_t* pPrevBones, matrix3x4_t* pBoneToWorld, float dt, int collisionGroup, bool activateRagdoll, bool bWakeRagdoll)
@@ -5287,6 +5303,16 @@ void CEngineObjectInternal::RagdollBone(bool* boneSimulated, CBoneAccessor& pBon
 			boneSimulated[m_ragdoll.boneIndex[i]] = true;
 		}
 	}
+}
+
+bool CEngineObjectInternal::IsRagdoll() const
+{
+	if (GetFlags() & FL_TRANSRAGDOLL)
+		return true;
+	if (RagdollBoneCount()) {
+		return true;
+	}
+	return false;
 }
 
 void CEnginePlayerInternal::VPhysicsDestroyObject()
@@ -8699,11 +8725,11 @@ bool CEngineVehicleInternal::Think()
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-bool CEngineVehicleInternal::VPhysicsUpdate(IPhysicsObject* pPhysics)
+void CEngineVehicleInternal::VPhysicsUpdate(IPhysicsObject* pPhysics)
 {
 	// must be a wheel
-	if (pPhysics == m_pOuter->VPhysicsGetObject())
-		return true;
+	//if (pPhysics == VPhysicsGetObject())
+	//	return true;
 
 	// This is here so we can make the pose parameters of the wheels
 	// reflect their current physics state
@@ -8718,11 +8744,11 @@ bool CEngineVehicleInternal::VPhysicsUpdate(IPhysicsObject* pPhysics)
 			VectorITransform(m_wheelPosition[i], m_pOuter->GetEngineObject()->EntityToWorldTransform(), tmp);
 			SetPoseParameter(m_poseParameters[VEH_FL_WHEEL_HEIGHT + i], (m_wheelBaseHeight[i] - tmp.z) / m_wheelTotalHeight[i]);
 			SetPoseParameter(m_poseParameters[VEH_FL_WHEEL_SPIN + i], -m_wheelRotation[i].z);
-			return false;
+			return;
 		}
 	}
 
-	return false;
+	BaseClass::VPhysicsUpdate(pPhysics);
 }
 
 

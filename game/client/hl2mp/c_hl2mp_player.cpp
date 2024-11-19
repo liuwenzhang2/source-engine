@@ -455,7 +455,7 @@ ShadowType_t C_HL2MP_Player::ShadowCastType( void )
 
 const QAngle& C_HL2MP_Player::GetRenderAngles()
 {
-	if ( IsRagdoll() )
+	if (GetEngineObject()->IsRagdoll() )
 	{
 		return vec3_angle;
 	}
@@ -474,10 +474,10 @@ bool C_HL2MP_Player::ShouldDraw( void )
 //	if( GetTeamNumber() == TEAM_SPECTATOR )
 //		return false;
 
-	if( IsLocalPlayer() && IsRagdoll() )
+	if( IsLocalPlayer() && GetEngineObject()->IsRagdoll() )
 		return true;
 	
-	if ( IsRagdoll() )
+	if (GetEngineObject()->IsRagdoll() )
 		return false;
 
 	return BaseClass::ShouldDraw();

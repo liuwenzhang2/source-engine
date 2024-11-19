@@ -514,7 +514,7 @@ void C_EntityDissolve::ClientThink( void )
 	C_BaseAnimating *pAnimating = GetEngineObject()->GetMoveParent() ? GetEngineObject()->GetMoveParent()->GetOuter()->GetBaseAnimating() : NULL;
 	if (!pAnimating)
 		return;
-	bIsRagdoll = pAnimating->IsRagdoll();
+	bIsRagdoll = pAnimating->GetEngineObject()->IsRagdoll();
 #endif
 
 	// NOTE: IsRagdoll means *client-side* ragdoll. We shouldn't be trying to fight

@@ -795,7 +795,7 @@ void C_Portal_Player::FixTeleportationRoll( void )
 
 const QAngle& C_Portal_Player::GetRenderAngles()
 {
-	if ( IsRagdoll() )
+	if (GetEngineObject()->IsRagdoll() )
 	{
 		return vec3_angle;
 	}
@@ -961,10 +961,10 @@ bool C_Portal_Player::ShouldDraw( void )
 	//	if( GetTeamNumber() == TEAM_SPECTATOR )
 	//		return false;
 
-	if( IsLocalPlayer() && IsRagdoll() )
+	if( IsLocalPlayer() && GetEngineObject()->IsRagdoll() )
 		return true;
 
-	if ( IsRagdoll() )
+	if (GetEngineObject()->IsRagdoll() )
 		return false;
 
 	return true;
