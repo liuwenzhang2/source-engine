@@ -46,6 +46,7 @@ public:
 	// Datamap based writing
 	//
 
+	int				WriteEntityInfo(entitytable_t* pEntityInfo);
 	int				WriteEntity(IHandleEntity* pHandleEntity);
 	int				WriteAll(const void* pLeafObject, datamap_t* pLeafMap) { return DoWriteAll(pLeafObject, pLeafMap, pLeafMap); }
 
@@ -220,6 +221,7 @@ public:
 	// Datamap based reading
 	//
 
+	int				ReadEntityInfo(entitytable_t* pEntityInfo);
 	int				ReadEntity(IHandleEntity* pHandleEntity);
 	int				ReadAll(void* pLeafObject, datamap_t* pLeafMap) { return DoReadAll(pLeafObject, pLeafMap, pLeafMap); }
 

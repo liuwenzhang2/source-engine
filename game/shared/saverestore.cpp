@@ -48,20 +48,6 @@
 #include "tier0/memdbgon.h"
 
 
-BEGIN_SIMPLE_DATADESC(entitytable_t)
-	DEFINE_FIELD(id, FIELD_INTEGER),
-	DEFINE_FIELD(edictindex, FIELD_INTEGER),
-	DEFINE_FIELD(saveentityindex, FIELD_INTEGER),
-//	DEFINE_FIELD( restoreentityindex, FIELD_INTEGER ),
-	//				hEnt		(not saved, this is the fixup)
-	DEFINE_FIELD(location, FIELD_INTEGER),
-	DEFINE_FIELD(size, FIELD_INTEGER),
-	DEFINE_FIELD(flags, FIELD_INTEGER),
-	DEFINE_FIELD(classname, FIELD_STRING),
-	DEFINE_FIELD(globalname, FIELD_STRING),
-	DEFINE_FIELD(landmarkModelSpace, FIELD_VECTOR),
-	DEFINE_FIELD(modelname, FIELD_STRING),
-END_DATADESC()
 
 
 

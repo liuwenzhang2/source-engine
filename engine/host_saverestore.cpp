@@ -1032,6 +1032,10 @@ int CSave::WriteFields(const char* pname, const void* pBaseData, datamap_t * pRo
 	return 1;
 }
 
+int CSave::WriteEntityInfo(entitytable_t* pEntityInfo) {
+	return WriteFields("ETABLE", pEntityInfo, NULL, entitytable_t::m_DataMap.dataDesc, entitytable_t::m_DataMap.dataNumFields);
+}
+
 int	CSave::WriteEntity(IHandleEntity* pHandleEntity) {
 
 	datamap_t* pDataMaps[100];
@@ -2078,6 +2082,11 @@ int	CRestore::ReadInt(void)
 	BufferReadBytes((char*)&tmp, sizeof(int));
 
 	return tmp;
+}
+
+int CRestore::ReadEntityInfo(entitytable_t* pEntityInfo)
+{
+	return ReadFields("ETABLE", pEntityInfo, NULL, entitytable_t::m_DataMap.dataDesc, entitytable_t::m_DataMap.dataNumFields);
 }
 
 int CRestore::ReadEntity(IHandleEntity* pHandleEntity) {

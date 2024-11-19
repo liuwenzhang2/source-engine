@@ -2248,7 +2248,7 @@ void CClientEntityList<T>::WriteSaveHeaders(ISave* pSave)
 	pSave->WriteInt(&nEntities);
 
 	for (int i = 0; i < pSaveData->NumEntities(); i++)
-		pSave->WriteFields("ETABLE", pSaveData->GetEntityInfo(i), NULL, entitytable_t::m_DataMap.dataDesc, entitytable_t::m_DataMap.dataNumFields);
+		pSave->WriteEntityInfo(pSaveData->GetEntityInfo(i));
 }
 
 template<class T>
@@ -2321,7 +2321,7 @@ void CClientEntityList<T>::ReadRestoreHeaders(IRestore* pRestore)
 			int aaa = 0;
 		}
 		entitytable_t* pEntityTable = pSaveData->GetEntityInfo(i);
-		pRestore->ReadFields("ETABLE", pEntityTable, NULL, entitytable_t::m_DataMap.dataDesc, entitytable_t::m_DataMap.dataNumFields);
+		pRestore->ReadEntityInfo(pEntityTable);
 		pEntityTable = pSaveData->GetEntityInfo(i);
 	}
 }
