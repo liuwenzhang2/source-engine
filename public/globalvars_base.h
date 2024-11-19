@@ -73,7 +73,7 @@ public:
 	int				network_protocol;
 
 	// current saverestore data
-	CSaveRestoreData *pSaveData;
+	//CSaveRestoreData *pSaveData;
 
 private:
 	// Set to true in client code.

@@ -3546,10 +3546,10 @@ CSaveRestoreData* SaveInit(int size, bool bServer)
 	//---------------------------------
 
 	if (bServer) {
-		g_ServerGlobalVariables.pSaveData = pSaveData;
+		//g_ServerGlobalVariables.pSaveData = pSaveData;
 	}
 	else {
-		g_ClientGlobalVariables.pSaveData = pSaveData;
+		//g_ClientGlobalVariables.pSaveData = pSaveData;
 	}
 
 	return pSaveData;
@@ -4328,7 +4328,8 @@ bool CSaveRestore::SaveGameState( bool bTransition, CSaveRestoreData **ppReturnS
 	// Build the adjacent map list (after entity table build by game in presave)
 	if ( bTransition )
 	{
-		serverEntitylist->BuildAdjacentMapList();
+		CSaveServer saveHelper(pSaveData);
+		serverEntitylist->BuildAdjacentMapList(&saveHelper);
 	}
 	else
 	{
@@ -4470,7 +4471,7 @@ void CSaveRestore::Finish( CSaveRestoreData *save )
 	SaveFreeMemory( save );
 
 
-	g_ServerGlobalVariables.pSaveData = NULL;
+	//g_ServerGlobalVariables.pSaveData = NULL;
 }
 
 BEGIN_SIMPLE_DATADESC( musicsave_t )
@@ -5248,7 +5249,7 @@ CSaveRestoreData *CSaveRestore::LoadSaveData( const char *level )
 	pSaveData->levelInfo.fUseLandmark = true;
 	pSaveData->levelInfo.time = 0;
 	VectorCopy( vec3_origin, pSaveData->levelInfo.vecLandmarkOffset );
-	g_ServerGlobalVariables.pSaveData = (CSaveRestoreData*)pSaveData;
+	//g_ServerGlobalVariables.pSaveData = (CSaveRestoreData*)pSaveData;
 
 	return pSaveData;
 }
@@ -5548,9 +5549,10 @@ void CSaveRestore::LoadAdjacentEnts( const char *pOldLevel, const char *pLandmar
 	Vector			landmarkOrigin;
 
 	memset( &currentLevelData, 0, sizeof(CSaveRestoreData) );
-	g_ServerGlobalVariables.pSaveData = &currentLevelData;
+	//g_ServerGlobalVariables.pSaveData = &currentLevelData;
 	// Build the adjacent map list
-	serverEntitylist->BuildAdjacentMapList();
+	CSaveServer saveHelper(&currentLevelData);
+	serverEntitylist->BuildAdjacentMapList(&saveHelper);
 	bool foundprevious = false;
 
 	for ( i = 0; i < currentLevelData.levelInfo.connectionCount; i++ )
@@ -5602,7 +5604,7 @@ void CSaveRestore::LoadAdjacentEnts( const char *pOldLevel, const char *pLandmar
 			}
 			
 			if ( flags )
-				movedCount = serverEntitylist->CreateEntityTransitionList( pSaveData, flags );
+				movedCount = serverEntitylist->CreateEntityTransitionList(&restoreHelper, flags );
 
 			// If ents were moved, rewrite entity table to save file
 			if ( movedCount )
@@ -5613,7 +5615,7 @@ void CSaveRestore::LoadAdjacentEnts( const char *pOldLevel, const char *pLandmar
 			Finish( pSaveData );
 		}
 	}
-	g_ServerGlobalVariables.pSaveData = NULL;
+	//g_ServerGlobalVariables.pSaveData = NULL;
 	if ( !foundprevious )
 	{
 		// Host_Error( "Level transition ERROR\nCan't find connection to %s from %s\n", pOldLevel, sv.GetMapName() );

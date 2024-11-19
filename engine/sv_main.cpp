@@ -1769,9 +1769,10 @@ void CGameServer::FinishRestore()
 	if ( !m_bLoadgame )
 		return;
 
-	g_ServerGlobalVariables.pSaveData = &currentLevelData;
+	//g_ServerGlobalVariables.pSaveData = &currentLevelData;
 	// Build the adjacent map list
-	serverEntitylist->BuildAdjacentMapList();
+	CSaveServer saveHelper(&currentLevelData);
+	serverEntitylist->BuildAdjacentMapList(&saveHelper);
 
 	if ( !saverestore->IsXSave() )
 	{
@@ -1796,7 +1797,7 @@ void CGameServer::FinishRestore()
 
 	saverestore->OnFinishedClientRestore();
 
-	g_ServerGlobalVariables.pSaveData = NULL;
+	//g_ServerGlobalVariables.pSaveData = NULL;
 
 	// Reset
 	m_bLoadgame = false;

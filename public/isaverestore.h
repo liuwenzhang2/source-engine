@@ -209,6 +209,8 @@ public:
 	//---------------------------------
 	// Back door to support somewhat awkward ownership of game save/restore data
 	virtual CGameSaveRestoreInfo *GetGameSaveRestoreInfo() = 0;
+	virtual int				EntityIndex(const IHandleEntity* pEntity) = 0;
+	virtual int				EntityFlagsSet(int entityIndex, int flags) = 0;
 
 protected:
 	virtual ~ISave() {};
@@ -299,7 +301,7 @@ public:
 	virtual int		ReadMatrix3x4Worldspace( matrix3x4_t *pValue, int nElems = 1, int nBytesAvailable = 0 ) = 0;
 
 	//---------------------------------
-
+	virtual void	SetGlobalMode(int global) = 0;
 	virtual bool	GetPrecacheMode( void ) = 0;
 
 	//---------------------------------

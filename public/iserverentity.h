@@ -682,9 +682,9 @@ public:
 	virtual void PostRestore() = 0;
 
 	// Returns the number of entities moved across the transition
-	virtual int				CreateEntityTransitionList(CSaveRestoreData*, int) = 0;
+	virtual int				CreateEntityTransitionList(IRestore* pRestore, int) = 0;
 	// Build the list of maps adjacent to the current map
-	virtual void			BuildAdjacentMapList(void) = 0;
+	virtual void			BuildAdjacentMapList(ISave* pSave) = 0;
 };
 
 extern IServerEntityList* serverEntitylist;

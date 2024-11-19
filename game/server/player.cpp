@@ -5190,7 +5190,7 @@ int CBasePlayer::Restore( IRestore &restore )
 	if ( !status )
 		return 0;
 
-	CSaveRestoreData *pSaveData = gpGlobals->pSaveData;
+	CGameSaveRestoreInfo* pSaveData = restore.GetGameSaveRestoreInfo();
 	// landmark isn't present.
 	if ( !pSaveData->levelInfo.fUseLandmark )
 	{

@@ -2020,6 +2020,22 @@ inline int CEngineVehicleInternal::BoostTimeLeft() const
 //}
 
 //-----------------------------------------------------------------------------
+// An interface passed into the OnSave method of all entities
+//-----------------------------------------------------------------------------
+abstract_class IEntitySaveUtils
+{
+public:
+	// Adds a level transition save dependency
+	virtual void AddLevelTransitionSaveDependency(CBaseEntity * pEntity1, CBaseEntity * pEntity2) = 0;
+
+	// Gets the # of dependencies for a particular entity
+	virtual int GetEntityDependencyCount(CBaseEntity* pEntity) = 0;
+
+	// Gets all dependencies for a particular entity
+	virtual int GetEntityDependencies(CBaseEntity* pEntity, int nCount, CBaseEntity** ppEntList) = 0;
+};
+
+//-----------------------------------------------------------------------------
 // Utilities entities can use when saving
 //-----------------------------------------------------------------------------
 class CEntitySaveUtils : public IEntitySaveUtils
@@ -2060,8 +2076,8 @@ public:
 	virtual void Restore(IRestore* pRestore, bool createPlayers);
 	virtual void PostRestore();
 
-	virtual int	CreateEntityTransitionList(CSaveRestoreData*, int) OVERRIDE;
-	virtual void BuildAdjacentMapList(void) OVERRIDE;
+	virtual int	CreateEntityTransitionList(IRestore* pRestore, int) OVERRIDE;
+	virtual void BuildAdjacentMapList(ISave* pSave) OVERRIDE;
 
 	void ReserveSlot(int index);
 	int AllocateFreeSlot(bool bNetworkable = true, int index = -1);
@@ -2175,9 +2191,9 @@ protected:
 	// different classes with the same global name
 	T* FindGlobalEntity(string_t classname, string_t globalname);
 
-	int RestoreGlobalEntity(T* pEntity, CSaveRestoreData* pSaveData, entitytable_t* pEntInfo);
-	void CreateEntitiesInTransitionList(CSaveRestoreData* pSaveData, int levelMask);
-	int CreateEntityTransitionListInternal(CSaveRestoreData* pSaveData, int levelMask);
+	int RestoreGlobalEntity(T* pEntity, IRestore* pRestore, entitytable_t* pEntInfo);
+	void CreateEntitiesInTransitionList(IRestore* pRestore, int levelMask);
+	int CreateEntityTransitionListInternal(IRestore* pRestore, int levelMask);
 
 	int AddLandmarkToList(levellist_t* pLevelList, int listCount, const char* pMapName, const char* pLandmarkName, T* pentLandmark);
 	// Builds the list of entities to save when moving across a transition
@@ -2594,14 +2610,14 @@ int CGlobalEntityList<T>::RestoreEntity(T* pEntity, IRestore* pRestore, entityta
 
 //---------------------------------
 template<class T>
-int CGlobalEntityList<T>::RestoreGlobalEntity(T* pEntity, CSaveRestoreData* pSaveData, entitytable_t* pEntInfo)
+int CGlobalEntityList<T>::RestoreGlobalEntity(T* pEntity, IRestore* pRestore, entitytable_t* pEntInfo)
 {
 	Vector oldOffset;
 	EHANDLE hEntitySafeHandle;
 	hEntitySafeHandle = pEntity;
-
+	CGameSaveRestoreInfo* pSaveData = pRestore->GetGameSaveRestoreInfo();
 	oldOffset.Init();
-	CRestoreServer restoreHelper(pSaveData);
+	//CRestoreServer restoreHelper(pSaveData);
 
 	string_t globalName = pEntInfo->globalname, className = pEntInfo->classname;
 
@@ -2624,7 +2640,7 @@ int CGlobalEntityList<T>::RestoreGlobalEntity(T* pEntity, CSaveRestoreData* pSav
 	{
 		//				Msg( "Overlay %s with %s\n", pNewEntity->GetClassname(), STRING(tmpEnt->classname) );
 				// Tell the restore code we're overlaying a global entity from another level
-		restoreHelper.SetGlobalMode(1);	// Don't overwrite global fields
+		pRestore->SetGlobalMode(1);	// Don't overwrite global fields
 
 		pSaveData->modelSpaceOffset = pEntInfo->landmarkModelSpace - g_ServerGameDLL.ModelSpaceLandmark(pNewEntity->GetEngineObject()->GetModelIndex());
 
@@ -2645,7 +2661,7 @@ int CGlobalEntityList<T>::RestoreGlobalEntity(T* pEntity, CSaveRestoreData* pSav
 		return 0;
 	}
 
-	if (!DoRestoreEntity(pEntity, &restoreHelper))
+	if (!DoRestoreEntity(pEntity, pRestore))
 	{
 		pEntity = NULL;
 	}
@@ -2683,10 +2699,11 @@ void CGlobalEntityList<T>::PostRestore()
 // Creates all entities that lie in the transition list
 //------------------------------------------------------------------------------
 template<class T>
-void CGlobalEntityList<T>::CreateEntitiesInTransitionList(CSaveRestoreData* pSaveData, int levelMask)
+void CGlobalEntityList<T>::CreateEntitiesInTransitionList(IRestore* pRestore, int levelMask)
 {
 	T* pent;
 	int i;
+	CGameSaveRestoreInfo* pSaveData = pRestore->GetGameSaveRestoreInfo();
 	for (i = 0; i < pSaveData->NumEntities(); i++)
 	{
 		entitytable_t* pEntInfo = pSaveData->GetEntityInfo(i);
@@ -2730,14 +2747,14 @@ void CGlobalEntityList<T>::CreateEntitiesInTransitionList(CSaveRestoreData* pSav
 
 //-----------------------------------------------------------------------------
 template<class T>
-int CGlobalEntityList<T>::CreateEntityTransitionListInternal(CSaveRestoreData* pSaveData, int levelMask)
+int CGlobalEntityList<T>::CreateEntityTransitionListInternal(IRestore* pRestore, int levelMask)
 {
 	T* pent;
 	entitytable_t* pEntInfo;
 
 	// Create entity list
-	CreateEntitiesInTransitionList(pSaveData, levelMask);
-
+	CreateEntitiesInTransitionList(pRestore, levelMask);
+	CGameSaveRestoreInfo* pSaveData = pRestore->GetGameSaveRestoreInfo();
 	// Now spawn entities
 	CUtlVector<int> checkList;
 
@@ -2748,7 +2765,7 @@ int CGlobalEntityList<T>::CreateEntityTransitionListInternal(CSaveRestoreData* p
 		pEntInfo = pSaveData->GetEntityInfo(i);
 		pent = (T*)GetServerEntityFromHandle(pEntInfo->hEnt);
 		//		pSaveData->currentIndex = i;
-		pSaveData->Seek(pEntInfo->location);
+		pRestore->SetReadPos(pEntInfo->location);
 
 		// clear this out - it must be set on a per-entity basis
 		pSaveData->modelSpaceOffset.Init();
@@ -2762,7 +2779,7 @@ int CGlobalEntityList<T>::CreateEntityTransitionListInternal(CSaveRestoreData* p
 				// -------------------------------------------------------------------------
 				// Pass the "global" flag to the DLL to indicate this entity should only override
 				// a matching entity, not be spawned
-				if (RestoreGlobalEntity(pent, pSaveData, pEntInfo) > 0)
+				if (RestoreGlobalEntity(pent, pRestore, pEntInfo) > 0)
 				{
 					movedCount++;
 					pEntInfo->restoreentityindex = ((T*)GetServerEntityFromHandle(pEntInfo->hEnt))->entindex();
@@ -2777,8 +2794,8 @@ int CGlobalEntityList<T>::CreateEntityTransitionListInternal(CSaveRestoreData* p
 			else
 			{
 				DevMsg(2, "Transferring %s (%d)\n", STRING(pEntInfo->classname), pent->entindex());
-				CRestoreServer restoreHelper(pSaveData);
-				if (RestoreEntity(pent, &restoreHelper, pEntInfo) < 0)
+				//CRestoreServer restoreHelper(pSaveData);
+				if (RestoreEntity(pent, pRestore, pEntInfo) < 0)
 				{
 					UTIL_RemoveImmediate(pent);
 				}
@@ -2826,17 +2843,17 @@ int CGlobalEntityList<T>::CreateEntityTransitionListInternal(CSaveRestoreData* p
 }
 
 template<class T>
-int	CGlobalEntityList<T>::CreateEntityTransitionList(CSaveRestoreData* s, int a)
+int	CGlobalEntityList<T>::CreateEntityTransitionList(IRestore* pRestore, int a)
 {
-	CRestoreServer restoreHelper(s);
+	//CRestoreServer restoreHelper(s);
 	// save off file base
-	int base = restoreHelper.GetReadPos();
+	int base = pRestore->GetReadPos();
 
-	int movedCount = CreateEntityTransitionListInternal(s, a);
+	int movedCount = CreateEntityTransitionListInternal(pRestore, a);
 	if (movedCount)
 	{
-		engine->CallBlockHandlerRestore(GetPhysSaveRestoreBlockHandler(), base, &restoreHelper, false);
-		engine->CallBlockHandlerRestore(GetAISaveRestoreBlockHandler(), base, &restoreHelper, false);
+		engine->CallBlockHandlerRestore(GetPhysSaveRestoreBlockHandler(), base, pRestore, false);
+		engine->CallBlockHandlerRestore(GetAISaveRestoreBlockHandler(), base, pRestore, false);
 	}
 
 	GetPhysSaveRestoreBlockHandler()->PostRestore();
@@ -3227,10 +3244,10 @@ int CGlobalEntityList<T>::AddDependentEntities(int nCount, T** ppEntList, int* p
 // Purpose: Called during a transition, to build a map adjacency list
 //-----------------------------------------------------------------------------
 template<class T>
-void CGlobalEntityList<T>::BuildAdjacentMapList(void)
+void CGlobalEntityList<T>::BuildAdjacentMapList(ISave* pSave)
 {
 	// retrieve the pointer to the save data
-	CSaveRestoreData* pSaveData = gpGlobals->pSaveData;
+	CGameSaveRestoreInfo* pSaveData = pSave->GetGameSaveRestoreInfo();
 	if (!pSaveData) {
 		return;
 	}
@@ -3242,7 +3259,7 @@ void CGlobalEntityList<T>::BuildAdjacentMapList(void)
 		return;
 	}
 
-	CSaveServer saveHelper(pSaveData);
+	//CSaveServer saveHelper(pSaveData);
 
 	// For each level change, find nearby entities and save them
 	int	i;
@@ -3263,9 +3280,9 @@ void CGlobalEntityList<T>::BuildAdjacentMapList(void)
 		for (j = 0; j < iEntityCount; j++)
 		{
 			// Mark entity table with 1<<i
-			int index = saveHelper.EntityIndex(pEntList[j]);
+			int index = pSave->EntityIndex(pEntList[j]);
 			// Flag it with the level number
-			saveHelper.EntityFlagsSet(index, entityFlags[j] | (1 << i));
+			pSave->EntityFlagsSet(index, entityFlags[j] | (1 << i));
 		}
 	}
 }
