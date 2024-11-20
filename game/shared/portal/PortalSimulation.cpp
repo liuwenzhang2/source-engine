@@ -305,6 +305,7 @@ void CPortalSimulator::UpdateOnRemove(void)
 	}
 #endif
 	BaseClass::UpdateOnRemove();
+	m_bActivated = false;
 }
 
 CPortalSimulator::~CPortalSimulator( void )
