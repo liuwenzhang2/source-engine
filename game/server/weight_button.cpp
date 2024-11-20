@@ -74,7 +74,7 @@ bool CWeightButton::CreateVPhysics()
 void CWeightButton::TriggerThink( void )
 {
 	vphysics_objectstress_t vpobj_StressOut;
-	IPhysicsObject* pMyPhysics = VPhysicsGetObject();
+	IPhysicsObject* pMyPhysics = GetEngineObject()->VPhysicsGetObject();
 
 	if ( !pMyPhysics )
 	{

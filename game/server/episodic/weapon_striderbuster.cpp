@@ -330,11 +330,11 @@ bool CWeaponStriderBuster::CreateConstraintToObject( CBaseEntity *pObject )
 	if ( pObject == NULL )
 		return false;
 
-	IPhysicsObject *pPhysObject = pObject->VPhysicsGetObject();
+	IPhysicsObject *pPhysObject = pObject->GetEngineObject()->VPhysicsGetObject();
 	if ( pPhysObject == NULL )
 		return false;
 
-	IPhysicsObject *pMyPhysObject = VPhysicsGetObject();
+	IPhysicsObject *pMyPhysObject = GetEngineObject()->VPhysicsGetObject();
 	if ( pPhysObject == NULL )
 		return false;
 
@@ -584,7 +584,7 @@ void CWeaponStriderBuster::VPhysicsCollision( int index, gamevcollisionevent_t *
 	}
 
 	// Don't attach if we're being held by the player
-	if ( VPhysicsGetObject()->GetGameFlags() & FVPHYSICS_PLAYER_HELD )
+	if (GetEngineObject()->VPhysicsGetObject()->GetGameFlags() & FVPHYSICS_PLAYER_HELD )
 	{
 		BaseClass::VPhysicsCollision( index, pEvent );
 		return;
@@ -726,7 +726,7 @@ int CWeaponStriderBuster::OnTakeDamage( const CTakeDamageInfo &info )
 
 	if ( pAttacker && ( pAttacker->Classify() == CLASS_COMBINE || pAttacker->Classify() == CLASS_COMBINE_HUNTER ) )
 	{
-		if ( VPhysicsGetObject() && !VPhysicsGetObject()->IsMoveable() )
+		if (GetEngineObject()->VPhysicsGetObject() && !GetEngineObject()->VPhysicsGetObject()->IsMoveable() )
 		{
 			return 0;
 		}
@@ -758,7 +758,7 @@ int CWeaponStriderBuster::OnTakeDamage( const CTakeDamageInfo &info )
 					// Amplify some lateral force.
 					Vector vecForce = info.GetDamageForce();
 					vecForce.z = 0.0f;
-					VPhysicsGetObject()->ApplyForceCenter( vecForce * 5.0f );
+					GetEngineObject()->VPhysicsGetObject()->ApplyForceCenter( vecForce * 5.0f );
 
 					SetContextThink( NULL, gpGlobals->curtime, s_pBusterPingThinkContext );
 
@@ -945,8 +945,8 @@ void CWeaponStriderBuster::BusterFlyThink()
 	// If we're nosediving, forget about magnetism.
 	if ( m_bNoseDiving )
 	{
-		if ( VPhysicsGetObject() )
-			VPhysicsGetObject()->ApplyForceCenter( Vector( 0, 0, striderbuster_dive_force.GetFloat() ) );
+		if (GetEngineObject()->VPhysicsGetObject() )
+			GetEngineObject()->VPhysicsGetObject()->ApplyForceCenter( Vector( 0, 0, striderbuster_dive_force.GetFloat() ) );
 		GetEngineObject()->SetNextThink(gpGlobals->curtime + 0.01f);
 		return;
 	}
@@ -955,7 +955,7 @@ void CWeaponStriderBuster::BusterFlyThink()
 	const float magradius = 38.0 * sk_striderbuster_magnet_multiplier.GetFloat(); // radius of strider hull times multiplier
 	if (magradius > 0 &&
 		GetEngineObject()->GetMoveType() == MOVETYPE_VPHYSICS &&
-		VPhysicsGetObject()
+		GetEngineObject()->VPhysicsGetObject()
 		)
 	{
 		// find the nearest enemy.
@@ -1014,13 +1014,13 @@ void CWeaponStriderBuster::BusterFlyThink()
 			switch (falloff) 
 			{
 			case 1:
-				VPhysicsGetObject()->ApplyForceCenter( toTarget * (magnitude / nearestDistSq) ); // dividing through by distance squared normalizes toTarget and gives a linear falloff
+				GetEngineObject()->VPhysicsGetObject()->ApplyForceCenter( toTarget * (magnitude / nearestDistSq) ); // dividing through by distance squared normalizes toTarget and gives a linear falloff
 				break;
 			case 2:
-				VPhysicsGetObject()->ApplyForceCenter( toTarget * (magnitude / (nearestDistSq * sqrtf(nearestDistSq))) ); // dividing through by distance cubed normalizes toTarget and gives a quadratic falloff
+				GetEngineObject()->VPhysicsGetObject()->ApplyForceCenter( toTarget * (magnitude / (nearestDistSq * sqrtf(nearestDistSq))) ); // dividing through by distance cubed normalizes toTarget and gives a quadratic falloff
 				break;
 			case 3:
-				VPhysicsGetObject()->ApplyForceCenter( toTarget * (magnitude / (nearestDistSq * nearestDistSq)) ); // dividing through by distance fourth normalizes toTarget and gives a cubic falloff
+				GetEngineObject()->VPhysicsGetObject()->ApplyForceCenter( toTarget * (magnitude / (nearestDistSq * nearestDistSq)) ); // dividing through by distance fourth normalizes toTarget and gives a cubic falloff
 				break;
 			case 4:
 				{
@@ -1035,12 +1035,12 @@ void CWeaponStriderBuster::BusterFlyThink()
 
 					toTarget -= GetEngineObject()->GetAbsOrigin();
 					toTarget.NormalizeInPlace();
-					VPhysicsGetObject()->ApplyForceCenter( toTarget * magnitude );
+					GetEngineObject()->VPhysicsGetObject()->ApplyForceCenter( toTarget * magnitude );
 
 				}
 				break;
 			default: // arbitrary powers
-				VPhysicsGetObject()->ApplyForceCenter( toTarget * (magnitude * powf(nearestDistSq,(falloff+1.0f)/2)) );  // square root for distance instead of squared, add one to normalize toTarget 
+				GetEngineObject()->VPhysicsGetObject()->ApplyForceCenter( toTarget * (magnitude * powf(nearestDistSq,(falloff+1.0f)/2)) );  // square root for distance instead of squared, add one to normalize toTarget 
 				break;
 			}
 		}
@@ -1120,7 +1120,7 @@ void CWeaponStriderBuster::OnFlechetteAttach( Vector &vecFlechetteVelocity )
 		vecForce *= 1000;
 		vecForce.z = -5000;
 
-		VPhysicsGetObject()->ApplyForceCenter( vecForce );
+		GetEngineObject()->VPhysicsGetObject()->ApplyForceCenter( vecForce );
 	}
 
 	if ( !GetEngineObject()->GetMoveParent() || !GetEngineObject()->GetMoveParent()->ClassMatches( g_iszVehicle ) )

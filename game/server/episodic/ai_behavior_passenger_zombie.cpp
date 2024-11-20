@@ -428,7 +428,7 @@ void CAI_PassengerBehaviorZombie::StartDismount( void )
 	GetOuter()->GetEngineObject()->SetAbsAngles( vecAngles );
 
 	// HACK: Will this work?
-	IPhysicsObject *pPhysObj = GetOuter()->VPhysicsGetObject();
+	IPhysicsObject *pPhysObj = GetOuter()->GetEngineObject()->VPhysicsGetObject();
 	if ( pPhysObj != NULL )
 	{
 		pPhysObj->EnableCollisions( true );

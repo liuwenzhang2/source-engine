@@ -229,9 +229,9 @@ void CBounceBomb::OnRestore()
 		UpdateLight( true, m_LastSpriteColor.r(), m_LastSpriteColor.g(), m_LastSpriteColor.b(), m_LastSpriteColor.a() );
 	}
 
-	if( VPhysicsGetObject() )
+	if(GetEngineObject()->VPhysicsGetObject() )
 	{
-		VPhysicsGetObject()->Wake();
+		GetEngineObject()->VPhysicsGetObject()->Wake();
 	}
 }
 	
@@ -273,8 +273,8 @@ void CBounceBomb::SetMineState( int iState )
 			controller.SoundChangeVolume( m_pWarnSound, 0.0, 0.2 );
 
 			// Unhook
-			unsigned int flags = VPhysicsGetObject()->GetCallbackFlags();
-			VPhysicsGetObject()->SetCallbackFlags( flags | CALLBACK_GLOBAL_TOUCH_STATIC );
+			unsigned int flags = GetEngineObject()->VPhysicsGetObject()->GetCallbackFlags();
+			GetEngineObject()->VPhysicsGetObject()->SetCallbackFlags( flags | CALLBACK_GLOBAL_TOUCH_STATIC );
 			OpenHooks();
 			physenv->DestroyConstraint( m_pConstraint );
 			m_pConstraint = NULL;
@@ -317,8 +317,8 @@ void CBounceBomb::SetMineState( int iState )
 			controller.SoundChangeVolume( m_pWarnSound, 0.0, 0.2 );
 
 			SetTouch( &CBounceBomb::ExplodeTouch );
-			unsigned int flags = VPhysicsGetObject()->GetCallbackFlags();
-			VPhysicsGetObject()->SetCallbackFlags( flags | CALLBACK_GLOBAL_TOUCH_STATIC );
+			unsigned int flags = GetEngineObject()->VPhysicsGetObject()->GetCallbackFlags();
+			GetEngineObject()->VPhysicsGetObject()->SetCallbackFlags( flags | CALLBACK_GLOBAL_TOUCH_STATIC );
 
 			Vector vecNudge;
 
@@ -327,14 +327,14 @@ void CBounceBomb::SetMineState( int iState )
 			vecNudge.z = 1.5;
 			vecNudge *= 350;
 
-			VPhysicsGetObject()->Wake();
-			VPhysicsGetObject()->ApplyForceCenter( vecNudge );
+			GetEngineObject()->VPhysicsGetObject()->Wake();
+			GetEngineObject()->VPhysicsGetObject()->ApplyForceCenter( vecNudge );
 
 			float x, y;
 			x = 10 + random->RandomFloat( 0, 20 );
 			y = 10 + random->RandomFloat( 0, 20 );
 
-			VPhysicsGetObject()->ApplyTorqueCenter( AngularImpulse( x, y, 0 ) );
+			GetEngineObject()->VPhysicsGetObject()->ApplyTorqueCenter( AngularImpulse( x, y, 0 ) );
 
 			// Since we just nudged the mine, ignore collisions with the world until
 			// the mine is in the air. We only want to explode if the player tries to 
@@ -363,8 +363,8 @@ void CBounceBomb::SetMineState( int iState )
 			GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.5 );
 
 			SetTouch( &CBounceBomb::ExplodeTouch );
-			unsigned int flags = VPhysicsGetObject()->GetCallbackFlags();
-			VPhysicsGetObject()->SetCallbackFlags( flags | CALLBACK_GLOBAL_TOUCH_STATIC );
+			unsigned int flags = GetEngineObject()->VPhysicsGetObject()->GetCallbackFlags();
+			GetEngineObject()->VPhysicsGetObject()->SetCallbackFlags( flags | CALLBACK_GLOBAL_TOUCH_STATIC );
 		}
 		break;
 
@@ -398,8 +398,8 @@ void CBounceBomb::Flip( const Vector &vecForce, const AngularImpulse &torque )
 	params.m_pflSoundDuration = NULL;
 	params.m_bWarnOnDirectWaveReference = true;
 	g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
-	VPhysicsGetObject()->ApplyForceCenter( vecForce );
-	VPhysicsGetObject()->ApplyTorqueCenter( torque );
+	GetEngineObject()->VPhysicsGetObject()->ApplyForceCenter( vecForce );
+	GetEngineObject()->VPhysicsGetObject()->ApplyTorqueCenter( torque );
 	m_iFlipAttempts++;
 }
 
@@ -448,13 +448,13 @@ bool CBounceBomb::IsValidLocation()
 	{
 		// Build a force vector to push us away from the inhibitor.
 		// Start by pushing upwards.
-		Vector vecForce = Vector( 0, 0, VPhysicsGetObject()->GetMass() * 200.0f );
+		Vector vecForce = Vector( 0, 0, GetEngineObject()->VPhysicsGetObject()->GetMass() * 200.0f );
 
 		// Now add some force in the direction that takes us away from the inhibitor.
 		Vector vecDir = GetEngineObject()->GetAbsOrigin() - pAvoidObject->GetEngineObject()->GetAbsOrigin();
 		vecDir.z = 0.0f;
 		VectorNormalize( vecDir );
-		vecForce += vecDir * VPhysicsGetObject()->GetMass() * flAvoidForce;
+		vecForce += vecDir * GetEngineObject()->VPhysicsGetObject()->GetMass() * flAvoidForce;
 
 		Flip( vecForce, AngularImpulse( 100, 0, 0 ) );
 
@@ -473,7 +473,7 @@ void CBounceBomb::BounceThink()
 	GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.1 );
 	StudioFrameAdvance();
 
-	IPhysicsObject *pPhysicsObject = VPhysicsGetObject();
+	IPhysicsObject *pPhysicsObject = GetEngineObject()->VPhysicsGetObject();
 	
 	if ( pPhysicsObject != NULL )
 	{
@@ -485,7 +485,7 @@ void CBounceBomb::BounceThink()
 
 		float height;
 
-		if( tr.m_pEnt && ((CBaseEntity*)tr.m_pEnt)->VPhysicsGetObject() )
+		if( tr.m_pEnt && ((CBaseEntity*)tr.m_pEnt)->GetEngineObject()->VPhysicsGetObject() )
 		{
 			// Physics object resting on me. Jump as hard as allowed to try to knock it away.
 			height = MINE_MAX_JUMP_HEIGHT;
@@ -543,7 +543,7 @@ void CBounceBomb::CavernBounceThink()
 	GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.1 );
 	StudioFrameAdvance();
 
-	IPhysicsObject *pPhysicsObject = VPhysicsGetObject();
+	IPhysicsObject *pPhysicsObject = GetEngineObject()->VPhysicsGetObject();
 
 	if ( pPhysicsObject != NULL )
 	{
@@ -555,7 +555,7 @@ void CBounceBomb::CavernBounceThink()
 
 		float height;
 
-		if( tr.m_pEnt && ((CBaseEntity*)tr.m_pEnt)->VPhysicsGetObject() )
+		if( tr.m_pEnt && ((CBaseEntity*)tr.m_pEnt)->GetEngineObject()->VPhysicsGetObject() )
 		{
 			// Physics object resting on me. Jump as hard as allowed to try to knock it away.
 			height = MINE_MAX_JUMP_HEIGHT;
@@ -631,25 +631,25 @@ void CBounceBomb::SettleThink()
 	}
 
 	// Not being carried.
-	if( !VPhysicsGetObject() )
+	if( !GetEngineObject()->VPhysicsGetObject() )
 	{
 		// Probably was just dropped. Get physics going.
 		CreateVPhysics();
 
-		if( !VPhysicsGetObject() )
+		if( !GetEngineObject()->VPhysicsGetObject() )
 		{
 			Msg("**** Can't create vphysics for combine_mine!\n" );
 			UTIL_Remove( this );
 			return;
 		}
 
-		VPhysicsGetObject()->Wake();
+		GetEngineObject()->VPhysicsGetObject()->Wake();
 		return;
 	}
 
 	if( !m_bDisarmed )
 	{
-		if( VPhysicsGetObject()->IsAsleep() && !(VPhysicsGetObject()->GetGameFlags() & FVPHYSICS_PLAYER_HELD) )
+		if(GetEngineObject()->VPhysicsGetObject()->IsAsleep() && !(GetEngineObject()->VPhysicsGetObject()->GetGameFlags() & FVPHYSICS_PLAYER_HELD) )
 		{
 			// If i'm not resting on the world, jump randomly.
 			trace_t tr;
@@ -658,7 +658,7 @@ void CBounceBomb::SettleThink()
 			bool bHop = false;
 			if( tr.m_pEnt )
 			{
-				IPhysicsObject *pPhysics = ((CBaseEntity*)tr.m_pEnt)->VPhysicsGetObject();
+				IPhysicsObject *pPhysics = ((CBaseEntity*)tr.m_pEnt)->GetEngineObject()->VPhysicsGetObject();
 
 				if( pPhysics && pPhysics->GetMass() <= 1000 )
 				{
@@ -708,8 +708,8 @@ void CBounceBomb::SettleThink()
 			ballsocket.constraint.Defaults();
 			ballsocket.constraint.forceLimit = lbs2kg(1000);
 			ballsocket.constraint.torqueLimit = lbs2kg(1000);
-			ballsocket.InitWithCurrentObjectState( g_PhysWorldObject, VPhysicsGetObject(), GetEngineObject()->GetAbsOrigin() );
-			m_pConstraint = physenv->CreateBallsocketConstraint( g_PhysWorldObject, VPhysicsGetObject(), NULL, ballsocket );
+			ballsocket.InitWithCurrentObjectState( g_PhysWorldObject, GetEngineObject()->VPhysicsGetObject(), GetEngineObject()->GetAbsOrigin() );
+			m_pConstraint = physenv->CreateBallsocketConstraint( g_PhysWorldObject, GetEngineObject()->VPhysicsGetObject(), NULL, ballsocket );
 			CloseHooks();
 
 			SetMineState( MINE_STATE_ARMED );
@@ -721,7 +721,7 @@ void CBounceBomb::SettleThink()
 //---------------------------------------------------------
 int CBounceBomb::OnTakeDamage( const CTakeDamageInfo &info )
 {
-	if( m_pConstraint || !VPhysicsGetObject())
+	if( m_pConstraint || !GetEngineObject()->VPhysicsGetObject())
 	{
 		return false;
 	}
@@ -1073,7 +1073,7 @@ void CBounceBomb::ExplodeTouch( CBaseEntity *pOther )
 		{
 			Vector vecVelocity;
 
-			VPhysicsGetObject()->GetVelocity( &vecVelocity, NULL );
+			GetEngineObject()->VPhysicsGetObject()->GetVelocity( &vecVelocity, NULL );
 
 			if( vecVelocity == vec3_origin )
 			{
@@ -1146,12 +1146,12 @@ void CBounceBomb::OpenHooks( bool bSilent )
 		g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 	}
 
-	if( VPhysicsGetObject() )
+	if(GetEngineObject()->VPhysicsGetObject() )
 	{
 		// It's possible to not have a valid physics object here, since this function doubles as an initialization function.
-		PhysClearGameFlags( VPhysicsGetObject(), FVPHYSICS_CONSTRAINT_STATIC );
+		PhysClearGameFlags(GetEngineObject()->VPhysicsGetObject(), FVPHYSICS_CONSTRAINT_STATIC );
 
-		VPhysicsGetObject()->EnableMotion( true );
+		GetEngineObject()->VPhysicsGetObject()->EnableMotion( true );
 	}
 
 	GetEngineObject()->SetPoseParameter( m_iAllHooks, BOUNCEBOMB_HOOK_RANGE );
@@ -1179,10 +1179,10 @@ void CBounceBomb::CloseHooks()
 		g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 	}
 
-	if( VPhysicsGetObject() )
+	if(GetEngineObject()->VPhysicsGetObject() )
 	{
 		// It's possible to not have a valid physics object here, since this function doubles as an initialization function.
-		PhysSetGameFlags( VPhysicsGetObject(), FVPHYSICS_CONSTRAINT_STATIC );
+		PhysSetGameFlags(GetEngineObject()->VPhysicsGetObject(), FVPHYSICS_CONSTRAINT_STATIC );
 	}
 
 	// Only lock silently the first time we call this.
@@ -1190,7 +1190,7 @@ void CBounceBomb::CloseHooks()
 
 	GetEngineObject()->SetPoseParameter( m_iAllHooks, 0 );
 
-	VPhysicsGetObject()->EnableMotion( false );
+	GetEngineObject()->VPhysicsGetObject()->EnableMotion( false );
 
 	// Once I lock down, forget how many tries it took.
 	m_iFlipAttempts = 0;
@@ -1280,7 +1280,7 @@ void CBounceBomb::OnPhysGunPickup( CBasePlayer *pPhysGunUser, PhysGunPickup_t re
 			m_flTimeGrabbed = gpGlobals->curtime;
 			m_bHeldByPhysgun = true;
 
-			VPhysicsGetObject()->EnableMotion( true );
+			GetEngineObject()->VPhysicsGetObject()->EnableMotion( true );
 
 			// Try to scatter NPCs without panicking them. Make a move away sound up around their 
 			// ear level.

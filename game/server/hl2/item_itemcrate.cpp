@@ -264,7 +264,7 @@ void CItem_ItemCrate::OnPhysGunPickup( CBasePlayer *pPhysGunUser, PhysGunPickup_
 		Vector vForce = Pickup_PhysGunLaunchVelocity( this, vForward, PHYSGUN_FORCE_PUNTED );
 		AngularImpulse angular = AngularImpulse( 0, 0, 0 );
 
-		IPhysicsObject *pPhysics = VPhysicsGetObject();
+		IPhysicsObject *pPhysics = GetEngineObject()->VPhysicsGetObject();
 
 		if ( pPhysics )
 		{

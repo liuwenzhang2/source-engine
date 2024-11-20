@@ -337,10 +337,10 @@ public:
 
 	bool PassesFilterImpl( CBaseEntity *pCaller, CBaseEntity *pEntity )
 	{
-		if ( pEntity->VPhysicsGetObject() == NULL )
+		if ( pEntity->GetEngineObject()->VPhysicsGetObject() == NULL )
 			return false;
 
-		return ( pEntity->VPhysicsGetObject()->GetMass() > m_fFilterMass );
+		return ( pEntity->GetEngineObject()->VPhysicsGetObject()->GetMass() > m_fFilterMass );
 	}
 };
 

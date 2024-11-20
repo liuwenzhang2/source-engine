@@ -593,7 +593,7 @@ bool CPhysBox::CanBePickedUpByPhyscannon()
 	if (GetEngineObject()->HasSpawnFlags( SF_PHYSBOX_NEVER_PICK_UP ) )
 		return false;
 
-	IPhysicsObject *pPhysicsObject = VPhysicsGetObject();
+	IPhysicsObject *pPhysicsObject = GetEngineObject()->VPhysicsGetObject();
 	if ( !pPhysicsObject )
 		return false;
 		
@@ -614,10 +614,10 @@ int CPhysBox::DrawDebugTextOverlays(void)
 
 	if (m_debugOverlays & OVERLAY_TEXT_BIT) 
 	{
-		if (VPhysicsGetObject())
+		if (GetEngineObject()->VPhysicsGetObject())
 		{
 			char tempstr[512];
-			Q_snprintf(tempstr, sizeof(tempstr),"Mass: %.2f kg / %.2f lb (%s)", VPhysicsGetObject()->GetMass(), kg2lbs(VPhysicsGetObject()->GetMass()), GetMassEquivalent(VPhysicsGetObject()->GetMass()));
+			Q_snprintf(tempstr, sizeof(tempstr),"Mass: %.2f kg / %.2f lb (%s)", GetEngineObject()->VPhysicsGetObject()->GetMass(), kg2lbs(GetEngineObject()->VPhysicsGetObject()->GetMass()), GetMassEquivalent(GetEngineObject()->VPhysicsGetObject()->GetMass()));
 			EntityText( text_offset, tempstr, 0);
 			text_offset++;
 		}
@@ -633,7 +633,7 @@ int CPhysBox::DrawDebugTextOverlays(void)
 //-----------------------------------------------------------------------------
 void CPhysBox::InputWake( inputdata_t &inputdata )
 {
-	VPhysicsGetObject()->Wake();
+	GetEngineObject()->VPhysicsGetObject()->Wake();
 }
 
 //-----------------------------------------------------------------------------
@@ -642,7 +642,7 @@ void CPhysBox::InputWake( inputdata_t &inputdata )
 //-----------------------------------------------------------------------------
 void CPhysBox::InputSleep( inputdata_t &inputdata )
 {
-	VPhysicsGetObject()->Sleep();
+	GetEngineObject()->VPhysicsGetObject()->Sleep();
 }
 
 //-----------------------------------------------------------------------------
@@ -658,7 +658,7 @@ void CPhysBox::InputEnableMotion( inputdata_t &inputdata )
 //-----------------------------------------------------------------------------
 void CPhysBox::EnableMotion( void )
 {
-	IPhysicsObject *pPhysicsObject = VPhysicsGetObject();
+	IPhysicsObject *pPhysicsObject = GetEngineObject()->VPhysicsGetObject();
 	if ( pPhysicsObject != NULL )
 	{
 		pPhysicsObject->EnableMotion( true );
@@ -676,7 +676,7 @@ void CPhysBox::EnableMotion( void )
 //-----------------------------------------------------------------------------
 void CPhysBox::InputDisableMotion( inputdata_t &inputdata )
 {
-	IPhysicsObject *pPhysicsObject = VPhysicsGetObject();
+	IPhysicsObject *pPhysicsObject = GetEngineObject()->VPhysicsGetObject();
 	if ( pPhysicsObject != NULL )
 	{
 		pPhysicsObject->EnableMotion( false );
@@ -686,7 +686,7 @@ void CPhysBox::InputDisableMotion( inputdata_t &inputdata )
 // Turn off floating simulation (and cost)
 void CPhysBox::InputDisableFloating( inputdata_t &inputdata )
 {
-	PhysEnableFloating( VPhysicsGetObject(), false );
+	PhysEnableFloating(GetEngineObject()->VPhysicsGetObject(), false );
 }
 
 //-----------------------------------------------------------------------------
@@ -705,7 +705,7 @@ void CPhysBox::InputForceDrop( inputdata_t &inputdata )
 //-----------------------------------------------------------------------------
 void CPhysBox::Move( const Vector &direction )
 {
-	VPhysicsGetObject()->ApplyForceCenter( direction );
+	GetEngineObject()->VPhysicsGetObject()->ApplyForceCenter( direction );
 }
 
 // Update the visible representation of the physic system's representation of this object
@@ -735,7 +735,7 @@ void CPhysBox::OnPhysGunPickup( CBasePlayer *pPhysGunUser, PhysGunPickup_t reaso
 		m_OnPhysGunPunt.FireOutput( pPhysGunUser, this );
 	}
 
-	IPhysicsObject *pPhysicsObject = VPhysicsGetObject();
+	IPhysicsObject *pPhysicsObject = GetEngineObject()->VPhysicsGetObject();
 	if ( pPhysicsObject && !pPhysicsObject->IsMoveable() )
 	{
 		if ( !GetEngineObject()->HasSpawnFlags( SF_PHYSBOX_ENABLE_ON_PHYSCANNON ) )
@@ -822,7 +822,7 @@ int CPhysBox::OnTakeDamage( const CTakeDamageInfo &info )
 		float flForce = info.GetDamageForce().Length();
 		if ( flForce >= m_flForceToEnableMotion )
 		{
-			IPhysicsObject *pPhysicsObject = VPhysicsGetObject();
+			IPhysicsObject *pPhysicsObject = GetEngineObject()->VPhysicsGetObject();
 			if ( pPhysicsObject )
 			{
 				EnableMotion();
@@ -943,7 +943,7 @@ void CPhysExplosion::Explode( CBaseEntity *pActivator, CBaseEntity *pCaller )
 	while ((pEntity = FindEntity( pEntity, pActivator, pCaller )) != NULL)
 	{
 		// UNDONE: Ask the object if it should get force if it's not MOVETYPE_VPHYSICS?
-		if ( pEntity->m_takedamage != DAMAGE_NO && (pEntity->GetEngineObject()->GetMoveType() == MOVETYPE_VPHYSICS || (pEntity->VPhysicsGetObject() /*&& !pEntity->IsPlayer()*/)) )
+		if ( pEntity->m_takedamage != DAMAGE_NO && (pEntity->GetEngineObject()->GetMoveType() == MOVETYPE_VPHYSICS || (pEntity->GetEngineObject()->VPhysicsGetObject() /*&& !pEntity->IsPlayer()*/)) )
 		{
 			vecOrigin = GetEngineObject()->GetAbsOrigin();
 			
@@ -1192,7 +1192,7 @@ void CPhysImpact::InputImpact( inputdata_t &inputdata )
 		}
 		CBaseEntity	*pEnt = (CBaseEntity*)trace.m_pEnt;
 	
-		IPhysicsObject *pPhysics = pEnt->VPhysicsGetObject();
+		IPhysicsObject *pPhysics = pEnt->GetEngineObject()->VPhysicsGetObject();
 		//If the entity is valid, hit it
 		if ( ( pEnt != NULL  ) && ( pPhysics != NULL ) )
 		{
@@ -1288,7 +1288,7 @@ LINK_ENTITY_TO_CLASS( simple_physics_prop, CSimplePhysicsProp );
 // recreating works, but is more expensive and won't inherit properties (velocity, constraints, etc)
 bool TransferPhysicsObject( CBaseEntity *pFrom, CBaseEntity *pTo, bool wakeUp )
 {
-	IPhysicsObject *pVPhysics = pFrom->VPhysicsGetObject();
+	IPhysicsObject *pVPhysics = pFrom->GetEngineObject()->VPhysicsGetObject();
 	if ( !pVPhysics || pVPhysics->IsStatic() )
 		return false;
 
@@ -1438,7 +1438,7 @@ void CPhysConvert::InputConvertTarget( inputdata_t &inputdata )
 			// Override the mass if specified
 			if ( m_flMassOverride > 0 )
 			{
-				IPhysicsObject *pPhysObj = pPhys->VPhysicsGetObject();
+				IPhysicsObject *pPhysObj = pPhys->GetEngineObject()->VPhysicsGetObject();
 				if ( pPhysObj )
 				{
 					pPhysObj->SetMass( m_flMassOverride );
@@ -1579,12 +1579,12 @@ void CPhysMagnet::Spawn( void )
 	// Wake it up if not asleep
 	if ( !GetEngineObject()->HasSpawnFlags(SF_MAGNET_ASLEEP) )
 	{
-		VPhysicsGetObject()->Wake();
+		GetEngineObject()->VPhysicsGetObject()->Wake();
 	}
 
 	if (GetEngineObject()->HasSpawnFlags(SF_MAGNET_MOTIONDISABLED) )
 	{
-		VPhysicsGetObject()->EnableMotion( false );
+		GetEngineObject()->VPhysicsGetObject()->EnableMotion( false );
 	}
 
 	m_bActive = true;
@@ -1675,7 +1675,7 @@ void CPhysMagnet::VPhysicsCollision( int index, gamevcollisionevent_t *pEvent )
 			return;
 	}
 
-	IPhysicsObject *pPhysics = pOther->VPhysicsGetObject();
+	IPhysicsObject *pPhysics = pOther->GetEngineObject()->VPhysicsGetObject();
 	if ( pPhysics && pOther->GetEngineObject()->GetMoveType() == MOVETYPE_VPHYSICS && pPhysics->IsMoveable() )
 	{
 		// Make sure we haven't already got this sucker on the magnet
@@ -1690,7 +1690,7 @@ void CPhysMagnet::VPhysicsCollision( int index, gamevcollisionevent_t *pEvent )
 		pOther->SetShadowCastDistance( 2048 );
 
 		// Create a constraint between the magnet and this sucker
-		IPhysicsObject *pMagnetPhysObject = VPhysicsGetObject();
+		IPhysicsObject *pMagnetPhysObject = GetEngineObject()->VPhysicsGetObject();
 		Assert( pMagnetPhysObject );
 
 		magnetted_objects_t newEntityOnMagnet;
@@ -1769,7 +1769,7 @@ void CPhysMagnet::DoMagnetSuck( CBaseEntity *pOther )
 		if ( !pEntity || pEntity == pOther )
 			continue;
 
-		IPhysicsObject *pPhys = pEntity->VPhysicsGetObject();
+		IPhysicsObject *pPhys = pEntity->GetEngineObject()->VPhysicsGetObject();
 		if ( pPhys && pEntity->GetEngineObject()->GetMoveType() == MOVETYPE_VPHYSICS && pPhys->GetMass() < 5000 )
 		{
 			// Do we have line of sight to it?
@@ -1840,7 +1840,7 @@ void CPhysMagnet::ConstraintBroken( IPhysicsConstraint *pConstraint )
 	{
 		if ( m_MagnettedEntities[i].hEntity.Get() != NULL && m_MagnettedEntities[i].pConstraint == pConstraint )
 		{
-			IPhysicsObject *pPhysObject = m_MagnettedEntities[i].hEntity->VPhysicsGetObject();
+			IPhysicsObject *pPhysObject = m_MagnettedEntities[i].hEntity->GetEngineObject()->VPhysicsGetObject();
 
 			if( pPhysObject != NULL )
 			{
@@ -2015,7 +2015,7 @@ void CPointPush::PushEntity( CBaseEntity *pTarget )
 
 	case MOVETYPE_VPHYSICS:
 		{
-			IPhysicsObject *pPhys = pTarget->VPhysicsGetObject();
+			IPhysicsObject *pPhys = pTarget->GetEngineObject()->VPhysicsGetObject();
 			if ( pPhys )
 			{
 				// UNDONE: Assume the velocity is for a 100kg object, scale with mass

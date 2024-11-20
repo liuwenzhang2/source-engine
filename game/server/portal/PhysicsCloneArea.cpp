@@ -193,7 +193,7 @@ void CPhysicsCloneArea::CloneNearbyEntities( void )
 
 		if ( pEntity  && (pEntity != this) )
 		{
-			IPhysicsObject *pPhysicsObject = pEntity->VPhysicsGetObject();
+			IPhysicsObject *pPhysicsObject = pEntity->GetEngineObject()->VPhysicsGetObject();
 
 			if( pPhysicsObject )
 			{

@@ -26,7 +26,7 @@ void CBaseHL1CombatWeapon::Precache()
 bool CBaseHL1CombatWeapon::CreateVPhysics( void )
 {
 	GetEngineObject()->VPhysicsInitNormal( SOLID_BBOX, GetEngineObject()->GetSolidFlags() | FSOLID_TRIGGER, false );
-	IPhysicsObject *pPhysObj = VPhysicsGetObject();
+	IPhysicsObject *pPhysObj = GetEngineObject()->VPhysicsGetObject();
         if ( pPhysObj )
 	{
 		pPhysObj->SetMass( 30 );
@@ -84,7 +84,7 @@ void CBaseHL1CombatWeapon::FallThink ( void )
 	GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.1f );
 
 	bool shouldMaterialize = false;
-	IPhysicsObject *pPhysics = VPhysicsGetObject();
+	IPhysicsObject *pPhysics = GetEngineObject()->VPhysicsGetObject();
 	if ( pPhysics )
 	{
 		shouldMaterialize = pPhysics->IsAsleep();

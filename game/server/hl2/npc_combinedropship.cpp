@@ -505,7 +505,7 @@ void CCombineDropshipContainer::CreateCorpse()
 	// Break into chunks
 	Vector angVelocity;
 	QAngleToAngularImpulse( GetLocalAngularVelocity(), angVelocity );
-	PropBreakableCreateAll(GetEngineObject()->GetModelIndex(), VPhysicsGetObject(), GetEngineObject()->GetAbsOrigin(), GetEngineObject()->GetAbsAngles(), GetEngineObject()->GetAbsVelocity(), angVelocity, 1.0, 250, COLLISION_GROUP_NPC, this );
+	PropBreakableCreateAll(GetEngineObject()->GetModelIndex(), GetEngineObject()->VPhysicsGetObject(), GetEngineObject()->GetAbsOrigin(), GetEngineObject()->GetAbsAngles(), GetEngineObject()->GetAbsVelocity(), angVelocity, 1.0, 250, COLLISION_GROUP_NPC, this );
 
 	// Create flaming gibs
 	int iChunks = random->RandomInt( 4, 6 );
@@ -884,7 +884,7 @@ void CNPC_CombineDropship::Spawn( void )
 			m_hContainer->SetOwnerEntity(this);
 			m_hContainer->Spawn();
 
-			IPhysicsObject *pPhysicsObject = m_hContainer->VPhysicsGetObject();
+			IPhysicsObject *pPhysicsObject = m_hContainer->GetEngineObject()->VPhysicsGetObject();
 			if ( pPhysicsObject )
 			{
 				pPhysicsObject->SetShadow( 1e4, 1e4, false, false );
@@ -939,7 +939,7 @@ void CNPC_CombineDropship::Spawn( void )
 
 			m_iContainerMoveType = m_hContainer->GetEngineObject()->GetMoveType();
 
-			IPhysicsObject *pPhysicsObject = m_hContainer->VPhysicsGetObject();
+			IPhysicsObject *pPhysicsObject = m_hContainer->GetEngineObject()->VPhysicsGetObject();
 			if ( pPhysicsObject )
 			{
 				pPhysicsObject->SetShadow( 1e4, 1e4, false, false );
@@ -1754,7 +1754,7 @@ void CNPC_CombineDropship::InputDropAPC( inputdata_t &inputdata )
 	m_hContainer->GetEngineObject()->SetMoveType( (MoveType_t)m_iContainerMoveType );
 
 	// If the container has a physics object, remove it's shadow
-	IPhysicsObject *pPhysicsObject = m_hContainer->VPhysicsGetObject();
+	IPhysicsObject *pPhysicsObject = m_hContainer->GetEngineObject()->VPhysicsGetObject();
 	if ( pPhysicsObject )
 	{
 		pPhysicsObject->RemoveShadowController();
@@ -1795,7 +1795,7 @@ void CNPC_CombineDropship::DropSoldierContainer( )
 	}
 
 	// If the container has a physics object, remove it's shadow
-	IPhysicsObject *pPhysicsObject = m_hContainer->VPhysicsGetObject();
+	IPhysicsObject *pPhysicsObject = m_hContainer->GetEngineObject()->VPhysicsGetObject();
 	if ( pPhysicsObject )
 	{
 		pPhysicsObject->RemoveShadowController();
@@ -2236,7 +2236,7 @@ void CNPC_CombineDropship::PrescheduleThink( void )
 						m_hContainer->GetEngineObject()->SetAbsVelocity( vecAbsVelocity );
 
 						// If the container has a physics object, remove it's shadow
-						IPhysicsObject *pPhysicsObject = m_hContainer->VPhysicsGetObject();
+						IPhysicsObject *pPhysicsObject = m_hContainer->GetEngineObject()->VPhysicsGetObject();
 						if ( pPhysicsObject )
 						{
 							pPhysicsObject->RemoveShadowController();
@@ -2313,7 +2313,7 @@ void CNPC_CombineDropship::PrescheduleThink( void )
 						}
 
 						// If the container has a physics object, move it to shadow
-						IPhysicsObject *pPhysicsObject = m_hContainer->VPhysicsGetObject();
+						IPhysicsObject *pPhysicsObject = m_hContainer->GetEngineObject()->VPhysicsGetObject();
 						if ( pPhysicsObject )
 						{
 							pPhysicsObject->EnableMotion( true );

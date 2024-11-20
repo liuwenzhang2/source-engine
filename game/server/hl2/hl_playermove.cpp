@@ -116,7 +116,7 @@ void CHLPlayerMove::FinishMove( CBasePlayer *player, CUserCmd *ucmd, CMoveData *
 		if ( pVehicle )
 		{
 			pVehicle->FinishMove( player, ucmd, move );
-			IPhysicsObject *obj = player->GetVehicleEntity()->VPhysicsGetObject();
+			IPhysicsObject *obj = player->GetVehicleEntity()->GetEngineObject()->VPhysicsGetObject();
 			if ( obj )
 			{
 				Vector newPos;

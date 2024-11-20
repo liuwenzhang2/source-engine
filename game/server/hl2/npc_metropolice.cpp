@@ -2811,7 +2811,7 @@ void CNPC_MetroPolice::OnAnimEventDeployManhack( animevent_t *pEvent )
 	Vector forward, right;
 	GetVectors( &forward, &right, NULL );
 
-	IPhysicsObject *pPhysObj = m_hManhack->VPhysicsGetObject();
+	IPhysicsObject *pPhysObj = m_hManhack->GetEngineObject()->VPhysicsGetObject();
 
 	if ( pPhysObj )
 	{

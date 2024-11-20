@@ -1630,16 +1630,16 @@ bool CProtoSniper::FindDecoyObject( void )
 
 		if( FClassnameIs( pCurrent, "func_breakable" ) || FClassnameIs( pCurrent, "prop_physics" ) || FClassnameIs( pCurrent, "func_physbox" ) )
 		{
-			if( !pCurrent->VPhysicsGetObject() )
+			if( !pCurrent->GetEngineObject()->VPhysicsGetObject() )
 				continue;
 
-			if( pCurrent->VPhysicsGetObject()->GetMass() > SNIPER_DECOY_MAX_MASS ) 
+			if( pCurrent->GetEngineObject()->VPhysicsGetObject()->GetMass() > SNIPER_DECOY_MAX_MASS )
 			{
 				// Skip this very heavy object. Probably a car or dumpster.
 				continue;
 			}
 
-			if( pCurrent->VPhysicsGetObject()->GetGameFlags() & FVPHYSICS_PLAYER_HELD )
+			if( pCurrent->GetEngineObject()->VPhysicsGetObject()->GetGameFlags() & FVPHYSICS_PLAYER_HELD )
 			{
 				// Ah! If the player is holding something, try to shoot it!
 				if( FVisible( pCurrent ) )
@@ -3262,9 +3262,9 @@ void CSniperBullet::BulletThink( void )
 		{
 			// Bullet stops when it hits an NPC, or when it has penetrated enough times.
 			
-			if( tr.m_pEnt && ((CBaseEntity*)tr.m_pEnt)->VPhysicsGetObject() )
+			if( tr.m_pEnt && ((CBaseEntity*)tr.m_pEnt)->GetEngineObject()->VPhysicsGetObject() )
 			{
-				if(((CBaseEntity*)tr.m_pEnt)->VPhysicsGetObject()->GetGameFlags() & FVPHYSICS_PLAYER_HELD )
+				if(((CBaseEntity*)tr.m_pEnt)->GetEngineObject()->VPhysicsGetObject()->GetGameFlags() & FVPHYSICS_PLAYER_HELD )
 				{
 					Pickup_ForcePlayerToDropThisObject((CBaseEntity*)tr.m_pEnt);
 				}

@@ -227,7 +227,7 @@ void CEnvEntityMaker::SpawnEntity( Vector vecAlternateOrigin, QAngle vecAlternat
 			vecShootDir *= m_flPostSpawnSpeed;
 
 			// Apply it to the entity
-			IPhysicsObject *pPhysicsObject = pEntity->VPhysicsGetObject();
+			IPhysicsObject *pPhysicsObject = pEntity->GetEngineObject()->VPhysicsGetObject();
 			if ( pPhysicsObject )
 			{
 				pPhysicsObject->AddVelocity(&vecShootDir, NULL);

@@ -368,7 +368,7 @@ void CGrenadeFrag::DelayThink()
 
 void CGrenadeFrag::SetVelocity( const Vector &velocity, const AngularImpulse &angVelocity )
 {
-	IPhysicsObject *pPhysicsObject = VPhysicsGetObject();
+	IPhysicsObject *pPhysicsObject = GetEngineObject()->VPhysicsGetObject();
 	if ( pPhysicsObject )
 	{
 		pPhysicsObject->AddVelocity( &velocity, &angVelocity );

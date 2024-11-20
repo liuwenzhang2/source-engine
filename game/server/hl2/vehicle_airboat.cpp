@@ -414,7 +414,7 @@ void CPropAirboat::Spawn( void )
 	GetEngineObject()->SetPoseParameter( "Steer_Shock", 0.0f );
 
 	// Get the physics object so we can adjust the buoyancy.
-	IPhysicsObject *pPhysAirboat = VPhysicsGetObject();
+	IPhysicsObject *pPhysAirboat = GetEngineObject()->VPhysicsGetObject();
 	if ( pPhysAirboat )
 	{
 		pPhysAirboat->SetBuoyancyRatio( 0.0f );
@@ -437,7 +437,7 @@ void CPropAirboat::CreateAntiFlipConstraint()
 
 	// Put the ragdoll constraint in the space of the airboat.
 	SetIdentityMatrix( ragdoll.constraintToAttached );
-	BuildObjectRelativeXform( g_PhysWorldObject, VPhysicsGetObject(), ragdoll.constraintToReference );
+	BuildObjectRelativeXform( g_PhysWorldObject, GetEngineObject()->VPhysicsGetObject(), ragdoll.constraintToReference );
 
 	ragdoll.axes[0].minRotation = -100;
 	ragdoll.axes[0].maxRotation = 100;
@@ -446,7 +446,7 @@ void CPropAirboat::CreateAntiFlipConstraint()
 	ragdoll.axes[2].minRotation = -180;
 	ragdoll.axes[2].maxRotation = 180;
 
-	m_pAntiFlipConstraint = physenv->CreateRagdollConstraint( g_PhysWorldObject, VPhysicsGetObject(), NULL, ragdoll );
+	m_pAntiFlipConstraint = physenv->CreateRagdollConstraint( g_PhysWorldObject, GetEngineObject()->VPhysicsGetObject(), NULL, ragdoll );
 
 	//NDebugOverlay::Cross3DOriented( ragdoll.constraintToReference, 128, 255, true, 100 );
 }
@@ -593,7 +593,7 @@ void CPropAirboat::InputExitVehicle( inputdata_t &inputdata )
 //-----------------------------------------------------------------------------
 void CPropAirboat::InputWake( inputdata_t &inputdata )
 {
-	VPhysicsGetObject()->Wake();
+	GetEngineObject()->VPhysicsGetObject()->Wake();
 }
 
 
@@ -638,7 +638,7 @@ void CPropAirboat::OnRestore()
 {
 	BaseClass::OnRestore();
 
-	IPhysicsObject *pPhysAirboat = VPhysicsGetObject();
+	IPhysicsObject *pPhysAirboat = GetEngineObject()->VPhysicsGetObject();
 	if ( pPhysAirboat )
 	{
 		pPhysAirboat->SetBuoyancyRatio( 0.0f );

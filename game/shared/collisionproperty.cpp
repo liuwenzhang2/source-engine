@@ -965,7 +965,7 @@ float CCollisionProperty::ComputeSupportMap( const Vector &vecDirection ) const
 void CCollisionProperty::ComputeVPhysicsSurroundingBox( Vector *pVecWorldMins, Vector *pVecWorldMaxs )
 {
 	bool bSetBounds = false;
-	IPhysicsObject *pPhysicsObject = GetOuter()->GetOuter()->VPhysicsGetObject();
+	IPhysicsObject *pPhysicsObject = GetOuter()->GetOuter()->GetEngineObject()->VPhysicsGetObject();
 	if ( pPhysicsObject )
 	{
 		if ( pPhysicsObject->GetCollide() )
@@ -1110,7 +1110,7 @@ void CCollisionProperty::ComputeSurroundingBox( Vector *pVecWorldMins, Vector *p
 			if ( ( GetSolid() == SOLID_VPHYSICS ) && ( GetOuter()->GetOuter()->GetEngineObject()->GetMoveType() == MOVETYPE_VPHYSICS))
 			{
 				// UNDONE: This may not be necessary any more.
-				IPhysicsObject *pPhysics = GetOuter()->GetOuter()->VPhysicsGetObject();
+				IPhysicsObject *pPhysics = GetOuter()->GetOuter()->GetEngineObject()->VPhysicsGetObject();
 				bUseVPhysics = pPhysics && pPhysics->IsAsleep();
 			}
 			ComputeCollisionSurroundingBox( bUseVPhysics, pVecWorldMins, pVecWorldMaxs );
@@ -1243,7 +1243,7 @@ bool CCollisionProperty::DoesVPhysicsInvalidateSurroundingBox( ) const
 		return true;
 
 	case USE_OBB_COLLISION_BOUNDS:
-		return (GetSolid() == SOLID_VPHYSICS) && (m_pOuter->GetOuter()->GetEngineObject()->GetMoveType() == MOVETYPE_VPHYSICS) && m_pOuter->GetOuter()->VPhysicsGetObject();
+		return (GetSolid() == SOLID_VPHYSICS) && (m_pOuter->GetOuter()->GetEngineObject()->GetMoveType() == MOVETYPE_VPHYSICS) && m_pOuter->GetOuter()->GetEngineObject()->VPhysicsGetObject();
 
 	// In the case of game code, we don't really know, so we have to assume it does
 	case USE_GAME_CODE:

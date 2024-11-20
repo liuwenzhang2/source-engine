@@ -1110,7 +1110,7 @@ void PropBreakableCreateAll( int modelindex, IPhysicsObject *pPhysics, const bre
 				// If this piece is supposed to be motion disabled, disable it
 				if ( list[i].isMotionDisabled )
 				{
-					IPhysicsObject *pPhysicsObject = pBreakable->VPhysicsGetObject();
+					IPhysicsObject *pPhysicsObject = pBreakable->GetEngineObject()->VPhysicsGetObject();
 					if ( pPhysicsObject != NULL )
 					{
 						pPhysicsObject->EnableMotion( false );
@@ -1192,11 +1192,11 @@ void PropBreakableCreateAll( int modelindex, IPhysicsObject *pPhysics, const bre
 					AlignBoxes( &matrix, vecObbSize, vecBreakableObbSize );
 					MatrixAngles( matrix, vecAngles );
 
-					if ( pBreakable->VPhysicsGetObject() )
+					if ( pBreakable->GetEngineObject()->VPhysicsGetObject() )
 					{
 						Vector pos;
-						pBreakable->VPhysicsGetObject()->GetPosition( &pos, NULL );
-						pBreakable->VPhysicsGetObject()->SetPosition( pos, vecAngles, true );
+						pBreakable->GetEngineObject()->VPhysicsGetObject()->GetPosition( &pos, NULL );
+						pBreakable->GetEngineObject()->VPhysicsGetObject()->SetPosition( pos, vecAngles, true );
 					}
 
 					pBreakable->GetEngineObject()->SetAbsAngles( vecAngles );
@@ -1511,7 +1511,7 @@ CBaseEntity *CreateGibsFromList( CUtlVector<breakmodel_t> &list, int modelindex,
 				// If this piece is supposed to be motion disabled, disable it
 				if ( list[i].isMotionDisabled )
 				{
-					IPhysicsObject *pPhysicsObject = pBreakable->VPhysicsGetObject();
+					IPhysicsObject *pPhysicsObject = pBreakable->GetEngineObject()->VPhysicsGetObject();
 					if ( pPhysicsObject != NULL )
 					{
 						pPhysicsObject->EnableMotion( false );
@@ -1599,11 +1599,11 @@ CBaseEntity *CreateGibsFromList( CUtlVector<breakmodel_t> &list, int modelindex,
 					AlignBoxes( &matrix, vecObbSize, vecBreakableObbSize );
 					MatrixAngles( matrix, vecAngles );
 
-					if ( pBreakable->VPhysicsGetObject() )
+					if ( pBreakable->GetEngineObject()->VPhysicsGetObject() )
 					{
 						Vector pos;
-						pBreakable->VPhysicsGetObject()->GetPosition( &pos, NULL );
-						pBreakable->VPhysicsGetObject()->SetPosition( pos, vecAngles, true );
+						pBreakable->GetEngineObject()->VPhysicsGetObject()->GetPosition( &pos, NULL );
+						pBreakable->GetEngineObject()->VPhysicsGetObject()->SetPosition( pos, vecAngles, true );
 					}
 
 					pBreakable->GetEngineObject()->SetAbsAngles( vecAngles );

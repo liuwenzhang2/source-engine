@@ -268,7 +268,7 @@ void CAntlionGrub::CreateNugget( void )
 	pNugget->GetEngineObject()->SetAbsAngles( RandomAngle( 0, 360 ) );
 	DispatchSpawn( pNugget );
 
-	IPhysicsObject *pPhys = pNugget->VPhysicsGetObject();
+	IPhysicsObject *pPhys = pNugget->GetEngineObject()->VPhysicsGetObject();
 	if ( pPhys )
 	{
 		Vector vecForward;
@@ -672,7 +672,7 @@ void CAntlionGrub::FlinchThink( void )
 void CAntlionGrub::GrubTouch( CBaseEntity *pOther )
 {
 	// We can be squished by the player, Vort, or flying heavy things.
-	IPhysicsObject *pPhysOther = pOther->VPhysicsGetObject(); // bool bThrown = ( pTarget->VPhysicsGetObject()->GetGameFlags() & FVPHYSICS_WAS_THROWN ) != 0;
+	IPhysicsObject *pPhysOther = pOther->GetEngineObject()->VPhysicsGetObject(); // bool bThrown = ( pTarget->VPhysicsGetObject()->GetGameFlags() & FVPHYSICS_WAS_THROWN ) != 0;
 	if ( pOther->IsPlayer() || FClassnameIs(pOther,"npc_vortigaunt") || ( pPhysOther && (pPhysOther->GetGameFlags() & FVPHYSICS_WAS_THROWN )) )
 	{
 		m_OnAgitated.FireOutput( pOther, pOther );

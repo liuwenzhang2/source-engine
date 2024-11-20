@@ -443,7 +443,7 @@ void CWeaponFrag::ThrowGrenade( CBasePlayer *pPlayer )
 		{
 			pPlayer->GetVelocity( &vecThrow, NULL );
 
-			IPhysicsObject *pPhysicsObject = pGrenade->VPhysicsGetObject();
+			IPhysicsObject *pPhysicsObject = pGrenade->GetEngineObject()->VPhysicsGetObject();
 			if ( pPhysicsObject )
 			{
 				pPhysicsObject->SetVelocity( &vecThrow, NULL );

@@ -690,7 +690,7 @@ void CBaseCombatWeapon::Drop( const Vector &vecVelocity )
 		GetEngineObject()->RemoveSpawnFlags( SF_WEAPON_NO_PLAYER_PICKUP );
 	}
 
-	IPhysicsObject *pObj = VPhysicsGetObject();
+	IPhysicsObject *pObj = GetEngineObject()->VPhysicsGetObject();
 	if ( pObj != NULL )
 	{
 		AngularImpulse	angImp( 200, 200, 200 );

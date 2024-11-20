@@ -383,7 +383,7 @@ void CNPC_CraneDriver::StartTask( const Task_t *pTask )
 					continue;
 
 				// Get the VPhysics object
-				IPhysicsObject *pPhysics = pList[i]->VPhysicsGetObject();
+				IPhysicsObject *pPhysics = pList[i]->GetEngineObject()->VPhysicsGetObject();
 				if ( pPhysics && pList[i]->GetEngineObject()->GetMoveType() == MOVETYPE_VPHYSICS )
 				{
 					float flMass = pPhysics->GetMass();
@@ -456,7 +456,7 @@ void CNPC_CraneDriver::RunTask( const Task_t *pTask )
 			AngularImpulse angVel;
 			Vector vecVelocity;
 			CBaseEntity *pMagnet = m_hCrane->GetMagnet();
-			IPhysicsObject *pVehiclePhysics = pMagnet->VPhysicsGetObject();
+			IPhysicsObject *pVehiclePhysics = pMagnet->GetEngineObject()->VPhysicsGetObject();
 			pVehiclePhysics->GetVelocity( &vecVelocity, &angVel );
 			float flVelocity = 100;
 			float flDistance = 90;

@@ -174,7 +174,7 @@ void CRagdollProp::OnSave( IEntitySaveUtils *pUtils )
 void CRagdollProp::OnRestore()
 {
 	BaseClass::OnRestore();
-	VPhysicsUpdate( VPhysicsGetObject() );
+	VPhysicsUpdate(GetEngineObject()->VPhysicsGetObject() );
 }
 
 
@@ -366,7 +366,7 @@ void CRagdollProp::OnPhysGunDrop( CBasePlayer *pPhysGunUser, PhysGunDrop_t Reaso
 		}
 	}
 
-	PhysSetGameFlags( VPhysicsGetObject(), FVPHYSICS_WAS_THROWN );
+	PhysSetGameFlags(GetEngineObject()->VPhysicsGetObject(), FVPHYSICS_WAS_THROWN );
 	m_bFirstCollisionAfterLaunch = true;
 }
 
@@ -396,7 +396,7 @@ void CRagdollProp::VPhysicsCollision( int index, gamevcollisionevent_t *pEvent )
 		return;
 
 	// Don't take physics damage from whoever's holding him with the physcannon.
-	if ( VPhysicsGetObject() && (VPhysicsGetObject()->GetGameFlags() & FVPHYSICS_PLAYER_HELD) )
+	if (GetEngineObject()->VPhysicsGetObject() && (GetEngineObject()->VPhysicsGetObject()->GetGameFlags() & FVPHYSICS_PLAYER_HELD) )
 	{
 		if ( pHitEntity && (pHitEntity == HasPhysicsAttacker( FLT_MAX )) )
 			return;
@@ -482,7 +482,7 @@ bool CRagdollProp::HasPhysgunInteraction( const char *pszKeyName, const char *ps
 //-----------------------------------------------------------------------------
 void CRagdollProp::HandleFirstCollisionInteractions( int index, gamevcollisionevent_t *pEvent )
 {
-	IPhysicsObject *pObj = VPhysicsGetObject();
+	IPhysicsObject *pObj = GetEngineObject()->VPhysicsGetObject();
 	if ( !pObj)
 		return;
 
@@ -499,8 +499,8 @@ void CRagdollProp::HandleFirstCollisionInteractions( int index, gamevcollisionev
 		Vector vecPosition;
 		Vector vecVelocity;
 
-		VPhysicsGetObject()->GetVelocity( &vecVelocity, NULL );
-		VPhysicsGetObject()->GetPosition( &vecPosition, NULL );
+		GetEngineObject()->VPhysicsGetObject()->GetVelocity( &vecVelocity, NULL );
+		GetEngineObject()->VPhysicsGetObject()->GetPosition( &vecPosition, NULL );
 
 		info.SetDamageForce( vecVelocity );
 		info.SetDamagePosition( vecPosition );
@@ -511,7 +511,7 @@ void CRagdollProp::HandleFirstCollisionInteractions( int index, gamevcollisionev
 
 	if( HasPhysgunInteraction( "onfirstimpact", "paintsplat" ) )
 	{
-		IPhysicsObject *pObj = VPhysicsGetObject();
+		IPhysicsObject *pObj = GetEngineObject()->VPhysicsGetObject();
  
 		Vector vecPos;
 		pObj->GetPosition( &vecPos, NULL );
@@ -538,7 +538,7 @@ void CRagdollProp::HandleFirstCollisionInteractions( int index, gamevcollisionev
 	bool bAlienBloodSplat = HasPhysgunInteraction( "onfirstimpact", "alienbloodsplat" );
 	if( bAlienBloodSplat || HasPhysgunInteraction( "onfirstimpact", "bloodsplat" ) )
 	{
-		IPhysicsObject *pObj = VPhysicsGetObject();
+		IPhysicsObject *pObj = GetEngineObject()->VPhysicsGetObject();
  
 		Vector vecPos;
 		pObj->GetPosition( &vecPos, NULL );
@@ -556,7 +556,7 @@ void CRagdollProp::HandleFirstCollisionInteractions( int index, gamevcollisionev
 //-----------------------------------------------------------------------------
 void CRagdollProp::ClearFlagsThink( void )
 {
-	PhysClearGameFlags( VPhysicsGetObject(), FVPHYSICS_WAS_THROWN );
+	PhysClearGameFlags(GetEngineObject()->VPhysicsGetObject(), FVPHYSICS_WAS_THROWN );
 	m_bFirstCollisionAfterLaunch = false;
 	SetThink( NULL );
 }

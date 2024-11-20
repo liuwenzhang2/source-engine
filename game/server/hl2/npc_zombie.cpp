@@ -590,7 +590,7 @@ void CZombie::SetZombieModel( void )
 	// NPCs can change size
 	if ( lastHull != GetHullType() )
 	{
-		if ( VPhysicsGetObject() )
+		if (GetEngineObject()->VPhysicsGetObject() )
 		{
 			SetupVPhysicsHull();
 		}
@@ -970,7 +970,7 @@ bool CZombie::IsSquashed( const CTakeDamageInfo &info )
 
 	if( info.GetDamageType() & DMG_CRUSH )
 	{
-		IPhysicsObject *pCrusher = info.GetInflictor()->VPhysicsGetObject();
+		IPhysicsObject *pCrusher = info.GetInflictor()->GetEngineObject()->VPhysicsGetObject();
 		if( pCrusher && pCrusher->GetMass() >= ZOMBIE_SQUASH_MASS && info.GetInflictor()->WorldSpaceCenter().z > EyePosition().z )
 		{
 			// This heuristic detects when a zombie has been squashed from above by a heavy

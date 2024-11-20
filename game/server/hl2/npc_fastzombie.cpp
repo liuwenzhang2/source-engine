@@ -782,7 +782,7 @@ void CFastZombie::SetZombieModel( void )
 	// NPCs can change size
 	if ( lastHull != GetHullType() )
 	{
-		if ( VPhysicsGetObject() )
+		if (GetEngineObject()->VPhysicsGetObject() )
 		{
 			SetupVPhysicsHull();
 		}
@@ -1945,7 +1945,7 @@ void CFastZombie::Event_Killed( const CTakeDamageInfo &info )
 	// Become a server-side ragdoll and create a constraint at the hand
 	if ( m_PassengerBehavior.GetPassengerState() == PASSENGER_STATE_INSIDE )
 	{
-		IPhysicsObject *pVehiclePhys = m_PassengerBehavior.GetTargetVehicle()->GetServerVehicle()->GetVehicleEnt()->VPhysicsGetObject();
+		IPhysicsObject *pVehiclePhys = m_PassengerBehavior.GetTargetVehicle()->GetServerVehicle()->GetVehicleEnt()->GetEngineObject()->VPhysicsGetObject();
 		CBaseAnimating *pVehicleAnimating = m_PassengerBehavior.GetTargetVehicle()->GetServerVehicle()->GetVehicleEnt()->GetBaseAnimating();
 		int nRightHandBone = 31;//GetBaseAnimating()->LookupBone( "ValveBiped.Bip01_R_Finger2" );
 		Vector vecRightHandPos;

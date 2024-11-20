@@ -234,7 +234,7 @@ CPhysicsShadowClone *CPhysicsShadowClone::CreateShadowClone( IPhysicsEnvironment
 	//if( pClonedEntity->IsPlayer() )
 	//	return NULL;
 
-	IPhysicsObject *pPhysics = pClonedEntity->VPhysicsGetObject();
+	IPhysicsObject *pPhysics = pClonedEntity->GetEngineObject()->VPhysicsGetObject();
 
 	if( pPhysics == NULL )
 		return NULL;

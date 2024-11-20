@@ -253,7 +253,7 @@ void CBlobElement::ModifyVelocityForSurface( float flInterval, float flSpeed )
 
 		if( tr.m_pEnt != NULL && !((CBaseEntity*)tr.m_pEnt)->IsWorld() )
 		{
-			IPhysicsObject *pPhysics = ((CBaseEntity*)tr.m_pEnt)->VPhysicsGetObject();
+			IPhysicsObject *pPhysics = ((CBaseEntity*)tr.m_pEnt)->GetEngineObject()->VPhysicsGetObject();
 
 			if( pPhysics != NULL )
 			{

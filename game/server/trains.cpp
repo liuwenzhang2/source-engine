@@ -1637,7 +1637,7 @@ static CBaseEntity *FindPhysicsBlockerForHierarchy( CBaseEntity *pParentEntity )
 	float maxForce = 0;
 	for ( int i = 0; i < list.Count(); i++ )
 	{
-		IPhysicsObject *pPhysics = list[i]->GetOuter()->VPhysicsGetObject();
+		IPhysicsObject *pPhysics = list[i]->GetOuter()->GetEngineObject()->VPhysicsGetObject();
 		if ( pPhysics )
 		{
 			IPhysicsFrictionSnapshot *pSnapshot = pPhysics->CreateFrictionSnapshot();

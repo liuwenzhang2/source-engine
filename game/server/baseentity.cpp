@@ -644,7 +644,7 @@ void CBaseEntity::DrawAbsBoxOverlay()
 	int red = 0;
 	int green = 200;
 
-	if ( VPhysicsGetObject() && VPhysicsGetObject()->IsAsleep() )
+	if (GetEngineObject()->VPhysicsGetObject() && GetEngineObject()->VPhysicsGetObject()->IsAsleep() )
 	{
 		red = 90;
 		green = 120;
@@ -809,18 +809,18 @@ void CBaseEntity::DrawDebugGeometryOverlays(void)
 	if ( m_debugOverlays & (OVERLAY_BBOX_BIT|OVERLAY_PIVOT_BIT) )
 	{
 		// draw mass center
-		if ( VPhysicsGetObject() )
+		if (GetEngineObject()->VPhysicsGetObject() )
 		{
-			Vector massCenter = VPhysicsGetObject()->GetMassCenterLocalSpace();
+			Vector massCenter = GetEngineObject()->VPhysicsGetObject()->GetMassCenterLocalSpace();
 			Vector worldPos;
-			VPhysicsGetObject()->LocalToWorld( &worldPos, massCenter );
+			GetEngineObject()->VPhysicsGetObject()->LocalToWorld( &worldPos, massCenter );
 			NDebugOverlay::Cross3D( worldPos, 12, 255, 0, 0, false, 0 );
-			DebugDrawContactPoints(VPhysicsGetObject());
+			DebugDrawContactPoints(GetEngineObject()->VPhysicsGetObject());
 			if (GetEngineObject()->GetMoveType() != MOVETYPE_VPHYSICS )
 			{
 				Vector pos;
 				QAngle angles;
-				VPhysicsGetObject()->GetPosition( &pos, &angles );
+				GetEngineObject()->VPhysicsGetObject()->GetPosition( &pos, &angles );
 				float dist = (pos - GetEngineObject()->GetAbsOrigin()).Length();
 
 				Vector axis;
@@ -829,7 +829,7 @@ void CBaseEntity::DrawDebugGeometryOverlays(void)
 				if ( dist > 2 || fabsf(deltaAngle) > 2 )
 				{
 					Vector mins, maxs;
-					physcollision->CollideGetAABB( &mins, &maxs, VPhysicsGetObject()->GetCollide(), vec3_origin, vec3_angle );
+					physcollision->CollideGetAABB( &mins, &maxs, GetEngineObject()->VPhysicsGetObject()->GetCollide(), vec3_origin, vec3_angle );
 					NDebugOverlay::BoxAngles( pos, mins, maxs, angles, 255, 255, 0, 16, 0 );
 				}
 			}
@@ -1349,8 +1349,8 @@ int CBaseEntity::VPhysicsTakeDamage( const CTakeDamageInfo &info )
 	if ( bNoPhysicsForceDamage || info.GetDamageType() == DMG_GENERIC )
 		return 1;
 
-	Assert(VPhysicsGetObject() != NULL);
-	if ( VPhysicsGetObject() )
+	Assert(GetEngineObject()->VPhysicsGetObject() != NULL);
+	if (GetEngineObject()->VPhysicsGetObject() )
 	{
 		Vector force = info.GetDamageForce();
 		Vector offset = info.GetDamagePosition();
@@ -1371,17 +1371,17 @@ int CBaseEntity::VPhysicsTakeDamage( const CTakeDamageInfo &info )
 		}
 #endif
 
-		unsigned short gameFlags = VPhysicsGetObject()->GetGameFlags();
+		unsigned short gameFlags = GetEngineObject()->VPhysicsGetObject()->GetGameFlags();
 		if ( gameFlags & FVPHYSICS_PLAYER_HELD )
 		{
 			// if the player is holding the object, use it's real mass (player holding reduced the mass)
 			CBasePlayer *pPlayer = UTIL_GetLocalPlayer();
 			if ( pPlayer )
 			{
-				float mass = pPlayer->GetHeldObjectMass( VPhysicsGetObject() );
+				float mass = pPlayer->GetHeldObjectMass(GetEngineObject()->VPhysicsGetObject() );
 				if ( mass != 0.0f )
 				{
-					float ratio = VPhysicsGetObject()->GetMass() / mass;
+					float ratio = GetEngineObject()->VPhysicsGetObject()->GetMass() / mass;
 					force *= ratio;
 				}
 			}
@@ -1400,7 +1400,7 @@ int CBaseEntity::VPhysicsTakeDamage( const CTakeDamageInfo &info )
 			}
 
 		}
-		VPhysicsGetObject()->ApplyForceOffset( force, offset );
+		GetEngineObject()->VPhysicsGetObject()->ApplyForceOffset( force, offset );
 	}
 
 	return 1;
@@ -1877,7 +1877,7 @@ static void ComputePushStartMatrix( matrix3x4_t &start, CBaseEntity *pEntity, co
 #define DEBUG_PUSH_MESSAGES 0
 static void CheckPushedEntity( CBaseEntity *pEntity, pushblock_t &params )
 {
-	IPhysicsObject *pPhysics = pEntity->VPhysicsGetObject();
+	IPhysicsObject *pPhysics = pEntity->GetEngineObject()->VPhysicsGetObject();
 	if ( !pPhysics )
 		return;
 	// somehow we've got a static or motion disabled physics object in hierarchy!
@@ -2100,7 +2100,7 @@ void CBaseEntity::VPhysicsUpdatePusher( IPhysicsObject *pPhysics )
 				{
 					CBaseEntity *pBlocked = NULL;
 					IPhysicsObject *pOther;
-					if ( params.pBlockedEntity->VPhysicsGetObject()->GetContactPoint( NULL, &pOther ) )
+					if ( params.pBlockedEntity->GetEngineObject()->VPhysicsGetObject()->GetContactPoint( NULL, &pOther ) )
 					{
 						pBlocked = static_cast<CBaseEntity *>(pOther->GetGameData());
 					}
@@ -2118,7 +2118,7 @@ void CBaseEntity::VPhysicsUpdatePusher( IPhysicsObject *pPhysics )
 
 							pEntity->GetEngineObject()->SetAbsOrigin( pEntity->GetEngineObject()->GetAbsOrigin() - pList->pushVec[i] );
 						}
-						CBaseEntity *pPhysicsBlocker = FindPhysicsBlocker( VPhysicsGetObject(), *pList, pList->pushVec[0] );
+						CBaseEntity *pPhysicsBlocker = FindPhysicsBlocker(GetEngineObject()->VPhysicsGetObject(), *pList, pList->pushVec[0] );
 						if ( pPhysicsBlocker )
 						{
 							pBlocked = pPhysicsBlocker;
@@ -2287,7 +2287,7 @@ void CBaseEntity::UpdatePhysicsShadowToCurrentPosition( float deltaTime )
 {
 	if (GetEngineObject()->GetMoveType() != MOVETYPE_VPHYSICS )
 	{
-		IPhysicsObject *pPhys = VPhysicsGetObject();
+		IPhysicsObject *pPhys = GetEngineObject()->VPhysicsGetObject();
 		if ( pPhys )
 		{
 			pPhys->UpdateShadow(GetEngineObject()->GetAbsOrigin(), GetEngineObject()->GetAbsAngles(), false, deltaTime );
@@ -3569,9 +3569,9 @@ void CBaseEntity::InputClearParent( inputdata_t &inputdata )
 //------------------------------------------------------------------------------
 void CBaseEntity::GetVelocity(Vector *vVelocity, AngularImpulse *vAngVelocity)
 {
-	if (GetEngineObject()->GetMoveType()==MOVETYPE_VPHYSICS && VPhysicsGetObject())
+	if (GetEngineObject()->GetMoveType()==MOVETYPE_VPHYSICS && GetEngineObject()->VPhysicsGetObject())
 	{
-		VPhysicsGetObject()->GetVelocity(vVelocity,vAngVelocity);
+		GetEngineObject()->VPhysicsGetObject()->GetVelocity(vVelocity,vAngVelocity);
 	}
 	else
 	{
@@ -3788,7 +3788,7 @@ static void TeleportEntity( CBaseEntity *pSourceEntity, TeleportListEntry_t &ent
 		// My parent is teleporting, just update my position & physics
 		pTeleport->GetEngineObject()->CalcAbsolutePosition();
 	}
-	IPhysicsObject *pPhys = pTeleport->VPhysicsGetObject();
+	IPhysicsObject *pPhys = pTeleport->GetEngineObject()->VPhysicsGetObject();
 	bool rotatePhysics = false;
 
 	// handle physics objects / shadows
@@ -5160,7 +5160,7 @@ bool CBaseEntity::IsFloating()
 	if ( !GetEngineObject()->IsEFlagSet(EFL_TOUCHING_FLUID) )
 		return false;
 
-	IPhysicsObject *pObject = VPhysicsGetObject();
+	IPhysicsObject *pObject = GetEngineObject()->VPhysicsGetObject();
 	if ( !pObject )
 		return false;
 
@@ -6431,9 +6431,9 @@ void CBaseEntity::SUB_PerformFadeOut( void )
 
 bool CBaseEntity::SUB_AllowedToFade( void )
 {
-	if( VPhysicsGetObject() )
+	if(GetEngineObject()->VPhysicsGetObject() )
 	{
-		if( VPhysicsGetObject()->GetGameFlags() & FVPHYSICS_PLAYER_HELD || GetEngineObject()->GetEFlags() & EFL_IS_BEING_LIFTED_BY_BARNACLE )
+		if(GetEngineObject()->VPhysicsGetObject()->GetGameFlags() & FVPHYSICS_PLAYER_HELD || GetEngineObject()->GetEFlags() & EFL_IS_BEING_LIFTED_BY_BARNACLE )
 			return false;
 	}
 

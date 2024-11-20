@@ -228,7 +228,7 @@ public:
 		CBaseEntity *pEntity = EntityFromEntityHandle( pServerEntity );
 		if ( pEntity )
 		{
-			IPhysicsObject *pPhys = pEntity->VPhysicsGetObject();
+			IPhysicsObject *pPhys = pEntity->GetEngineObject()->VPhysicsGetObject();
 			if ( pPhys )
 			{
 				// Ignore physics objects

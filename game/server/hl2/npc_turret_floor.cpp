@@ -519,7 +519,7 @@ void CNPC_FloorTurret::OnPhysGunPickup( CBasePlayer *pPhysGunUser, PhysGunPickup
 	// Drop our mass a lot so that we can be moved easily with +USE
 	if ( reason != PUNTED_BY_CANNON )
 	{
-		Assert( VPhysicsGetObject() );
+		Assert(GetEngineObject()->VPhysicsGetObject() );
 
 		m_bCarriedByPlayer = true;
 		m_OnPhysGunPickup.FireOutput( this, this );
@@ -570,7 +570,7 @@ void CNPC_FloorTurret::OnPhysGunDrop( CBasePlayer *pPhysGunUser, PhysGunDrop_t R
 	}
 
 	// Restore our mass to the original value
-	Assert( VPhysicsGetObject() );
+	Assert(GetEngineObject()->VPhysicsGetObject() );
 }
 
 //-----------------------------------------------------------------------------
@@ -2103,10 +2103,10 @@ int CNPC_FloorTurret::DrawDebugTextOverlays( void )
 
 	if (m_debugOverlays & OVERLAY_TEXT_BIT) 
 	{
-		if (VPhysicsGetObject())
+		if (GetEngineObject()->VPhysicsGetObject())
 		{
 			char tempstr[512];
-			Q_snprintf(tempstr, sizeof(tempstr),"Mass: %.2f kg / %.2f lb (%s)", VPhysicsGetObject()->GetMass(), kg2lbs(VPhysicsGetObject()->GetMass()), GetMassEquivalent(VPhysicsGetObject()->GetMass()));
+			Q_snprintf(tempstr, sizeof(tempstr),"Mass: %.2f kg / %.2f lb (%s)", GetEngineObject()->VPhysicsGetObject()->GetMass(), kg2lbs(GetEngineObject()->VPhysicsGetObject()->GetMass()), GetMassEquivalent(GetEngineObject()->VPhysicsGetObject()->GetMass()));
 			EntityText( text_offset, tempstr, 0);
 			text_offset++;
 		}
@@ -2177,7 +2177,7 @@ void CNPC_FloorTurret::BreakThink( void )
 
 	// no damage/damage force? set a burst of 100 for some movement
 	params.defBurstScale = 100;
-	PropBreakableCreateAll(GetEngineObject()->GetModelIndex(), VPhysicsGetObject(), params, this, -1, true );
+	PropBreakableCreateAll(GetEngineObject()->GetModelIndex(), GetEngineObject()->VPhysicsGetObject(), params, this, -1, true );
 
 	// Throw out some small chunks too obscure the explosion even more
 	CPVSFilter filter( vecOrigin );
@@ -2344,7 +2344,7 @@ void CTurretTipController::Activate( void )
 		return;
 	}
 
-	IPhysicsObject *pPhys = m_pParentTurret->VPhysicsGetObject();
+	IPhysicsObject *pPhys = m_pParentTurret->GetEngineObject()->VPhysicsGetObject();
 
 	if ( pPhys == NULL )
 	{

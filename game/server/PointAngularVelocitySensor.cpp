@@ -183,7 +183,7 @@ float CPointAngularVelocitySensor::SampleAngularVelocity(CBaseEntity *pEntity)
 {
 	if (pEntity->GetEngineObject()->GetMoveType() == MOVETYPE_VPHYSICS)
 	{
-		IPhysicsObject *pPhys = pEntity->VPhysicsGetObject();
+		IPhysicsObject *pPhys = pEntity->GetEngineObject()->VPhysicsGetObject();
 		if (pPhys != NULL)
 		{
 			Vector vecVelocity;
@@ -502,7 +502,7 @@ void CPointVelocitySensor::SampleVelocity( void )
 
 	if ( m_hTargetEntity->GetEngineObject()->GetMoveType() == MOVETYPE_VPHYSICS )
 	{
-		IPhysicsObject *pPhys = m_hTargetEntity->VPhysicsGetObject();
+		IPhysicsObject *pPhys = m_hTargetEntity->GetEngineObject()->VPhysicsGetObject();
 		if ( pPhys != NULL )
 		{
 			pPhys->GetVelocity( &vecVelocity, NULL );

@@ -221,7 +221,7 @@ void CTriggerPortalCleanser::Touch( CBaseEntity *pOther )
 		AngularImpulse vOldAng;
 		pBaseAnimating->GetVelocity( &vOldVel, &vOldAng );
 
-		IPhysicsObject* pOldPhys = pBaseAnimating->VPhysicsGetObject();
+		IPhysicsObject* pOldPhys = pBaseAnimating->GetEngineObject()->VPhysicsGetObject();
 
 		if ( pOldPhys && ( pOldPhys->GetGameFlags() & FVPHYSICS_PLAYER_HELD ) )
 		{
@@ -248,7 +248,7 @@ void CTriggerPortalCleanser::Touch( CBaseEntity *pOther )
 			pBaseAnimating->GetEngineObject()->AddSolidFlags( FSOLID_NOT_SOLID );
 			pBaseAnimating->GetEngineObject()->AddEffects( EF_NODRAW );
 
-			IPhysicsObject* pPhys = pDisolvingObj->VPhysicsGetObject();
+			IPhysicsObject* pPhys = pDisolvingObj->GetEngineObject()->VPhysicsGetObject();
 			if ( pPhys )
 			{
 				pPhys->EnableGravity( false );

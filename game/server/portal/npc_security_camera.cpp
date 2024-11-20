@@ -385,7 +385,7 @@ void CNPC_SecurityCamera::NotifySystemEvent(CBaseEntity *pNotify, notify_system_
 
 int CNPC_SecurityCamera::ObjectCaps( void )
 {
-	IPhysicsObject *pPhysics = VPhysicsGetObject();
+	IPhysicsObject *pPhysics = GetEngineObject()->VPhysicsGetObject();
 	if ( !pPhysics || !pPhysics->IsMotionEnabled() )
 		return BaseClass::ObjectCaps();
 
@@ -1044,7 +1044,7 @@ void CNPC_SecurityCamera::InputRagdoll( inputdata_t &inputdata )
 	EyeOff();
 
 	// Make it move
-	IPhysicsObject *pPhysics = VPhysicsGetObject();
+	IPhysicsObject *pPhysics = GetEngineObject()->VPhysicsGetObject();
 	if ( !pPhysics || pPhysics->IsMotionEnabled() )
 		return;
 

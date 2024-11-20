@@ -228,7 +228,7 @@ public:
 
 void CCSRagdoll::ImpactTrace(trace_t* pTrace, int iDamageType, const char* pCustomImpactName)
 {
-	IPhysicsObject* pPhysicsObject = VPhysicsGetObject();
+	IPhysicsObject* pPhysicsObject = GetEngineObject()->VPhysicsGetObject();
 
 	if (!pPhysicsObject)
 		return;
@@ -3112,7 +3112,7 @@ bool CCSPlayer::CSWeaponDrop( CBaseCombatWeapon *pWeapon, bool bDropShield, bool
 
 			//Have to teleport the physics object as well
 
-			IPhysicsObject *pWeaponPhys = pWeapon->VPhysicsGetObject();
+			IPhysicsObject *pWeaponPhys = pWeapon->GetEngineObject()->VPhysicsGetObject();
 
 			if( pWeaponPhys )
 			{
@@ -5353,7 +5353,7 @@ CCSPlayerStateInfo* CCSPlayer::State_LookupInfo( CSPlayerState state )
 
 void CCSPlayer::PhysObjectSleep()
 {
-	IPhysicsObject *pObj = VPhysicsGetObject();
+	IPhysicsObject *pObj = GetEngineObject()->VPhysicsGetObject();
 	if ( pObj )
 		pObj->Sleep();
 }
@@ -5361,7 +5361,7 @@ void CCSPlayer::PhysObjectSleep()
 
 void CCSPlayer::PhysObjectWake()
 {
-	IPhysicsObject *pObj = VPhysicsGetObject();
+	IPhysicsObject *pObj = GetEngineObject()->VPhysicsGetObject();
 	if ( pObj )
 		pObj->Wake();
 }

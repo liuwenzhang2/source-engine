@@ -321,7 +321,7 @@ void CNPC_Bullseye::OnRestore( void )
 {
 	if (GetEngineObject()->GetSpawnFlags() & SF_BULLSEYE_VPHYSICSSHADOW)
 	{
-		IPhysicsObject *pObject = VPhysicsGetObject();
+		IPhysicsObject *pObject = GetEngineObject()->VPhysicsGetObject();
 
 		if ( pObject == NULL )
 		{

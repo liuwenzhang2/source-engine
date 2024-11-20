@@ -48,7 +48,7 @@ IterationRetval_t CRagdollEnumerator::EnumElement( IHandleEntity *pHandleEntity 
 	if ( pModel == NULL || WasRagdollCreatedOnCurrentTick( pEnt ) )
 		return ITERATION_CONTINUE;
 
-	IPhysicsObject *pPhysicsObject = pModel->VPhysicsGetObject();
+	IPhysicsObject *pPhysicsObject = pModel->GetEngineObject()->VPhysicsGetObject();
 	if ( pPhysicsObject == NULL )
 		return ITERATION_CONTINUE;
 

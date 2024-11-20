@@ -486,9 +486,9 @@ void CNPC_Barney::SUB_StartLVFadeOut( float delay, bool notSolid )
 
 void CNPC_Barney::SUB_LVFadeOut( void  )
 {
-	if( VPhysicsGetObject() )
+	if(GetEngineObject()->VPhysicsGetObject() )
 	{
-		if( VPhysicsGetObject()->GetGameFlags() & FVPHYSICS_PLAYER_HELD || GetEngineObject()->GetEFlags() & EFL_IS_BEING_LIFTED_BY_BARNACLE )
+		if(GetEngineObject()->VPhysicsGetObject()->GetGameFlags() & FVPHYSICS_PLAYER_HELD || GetEngineObject()->GetEFlags() & EFL_IS_BEING_LIFTED_BY_BARNACLE )
 		{
 			// Try again in a few seconds.
 			GetEngineObject()->SetNextThink( gpGlobals->curtime + 5 );

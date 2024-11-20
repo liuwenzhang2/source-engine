@@ -162,7 +162,7 @@ public:
 			return;
 
 		// Make sure this object is being held by the player
-		if ( pOther->VPhysicsGetObject() == NULL || (pOther->VPhysicsGetObject()->GetGameFlags() & FVPHYSICS_PLAYER_HELD) == false )
+		if ( pOther->GetEngineObject()->VPhysicsGetObject() == NULL || (pOther->GetEngineObject()->VPhysicsGetObject()->GetGameFlags() & FVPHYSICS_PLAYER_HELD) == false )
 			return;
 
 		if ( StriderBuster_NumFlechettesAttached( pOther ) > 0 )
@@ -1269,7 +1269,7 @@ static void KillBlockingEnemyNPCs( CBasePlayer *pPlayer, CBaseEntity *pVehicleEn
 			if ( index < 0 )
 			{
 				vphysicsupdateai_t *pUpdate = NULL;
-				if ( pNPC->VPhysicsGetObject() && pNPC->VPhysicsGetObject()->GetShadowController() && pNPC->GetEngineObject()->GetMoveType() == MOVETYPE_STEP )
+				if ( pNPC->GetEngineObject()->VPhysicsGetObject() && pNPC->GetEngineObject()->VPhysicsGetObject()->GetShadowController() && pNPC->GetEngineObject()->GetMoveType() == MOVETYPE_STEP )
 				{
 					if ( pNPC->GetEngineObject()->HasDataObjectType(VPHYSICSUPDATEAI) )
 					{
@@ -1294,8 +1294,8 @@ static void KillBlockingEnemyNPCs( CBasePlayer *pPlayer, CBaseEntity *pVehicleEn
 					// this allows the car to push the NPC
 					pUpdate->stopUpdateTime = gpGlobals->curtime + 1.0f;
 					float maxAngular;
-					pNPC->VPhysicsGetObject()->GetShadowController()->GetMaxSpeed( &pUpdate->savedShadowControllerMaxSpeed, &maxAngular );
-					pNPC->VPhysicsGetObject()->GetShadowController()->MaxSpeed( 1.0f, maxAngular );
+					pNPC->GetEngineObject()->VPhysicsGetObject()->GetShadowController()->GetMaxSpeed( &pUpdate->savedShadowControllerMaxSpeed, &maxAngular );
+					pNPC->GetEngineObject()->VPhysicsGetObject()->GetShadowController()->MaxSpeed( 1.0f, maxAngular );
 				}
 			}
 			else
@@ -1312,7 +1312,7 @@ static void KillBlockingEnemyNPCs( CBasePlayer *pPlayer, CBaseEntity *pVehicleEn
 		for ( int i = npcList.Count(); --i >= 0; )
 		{
 			Vector damageForce;
-			npcList[i]->VPhysicsGetObject()->GetVelocity( &damageForce, NULL );
+			npcList[i]->GetEngineObject()->VPhysicsGetObject()->GetVelocity( &damageForce, NULL );
 			Vector vel;
 			pVehiclePhysics->GetVelocityAtPoint( contactList[i], &vel );
 			damageForce -= vel;
@@ -1320,7 +1320,7 @@ static void KillBlockingEnemyNPCs( CBasePlayer *pPlayer, CBaseEntity *pVehicleEn
 			VectorNormalize(normal);
 			SimpleCollisionResponse( damageForce, normal, 1.0, &damageForce );
 			damageForce += (normal * 300.0f);
-			damageForce *= npcList[i]->VPhysicsGetObject()->GetMass();
+			damageForce *= npcList[i]->GetEngineObject()->VPhysicsGetObject()->GetMass();
 			float len = damageForce.Length();
 			damageForce.z += len*phys_upimpactforcescale.GetFloat();
 			Vector vehicleForce = -damageForce;
@@ -1328,7 +1328,7 @@ static void KillBlockingEnemyNPCs( CBasePlayer *pPlayer, CBaseEntity *pVehicleEn
 			CTakeDamageInfo dmgInfo( pVehicleEntity, pVehicleEntity, damageForce, contactList[i], 200.0f, DMG_CRUSH|DMG_VEHICLE );
 			npcList[i]->TakeDamage( dmgInfo );
 			pVehiclePhysics->ApplyForceOffset( vehicleForce, contactList[i] );
-			PhysCollisionSound( pVehicleEntity, npcList[i]->VPhysicsGetObject(), CHAN_BODY, pVehiclePhysics->GetMaterialIndex(), npcList[i]->VPhysicsGetObject()->GetMaterialIndex(), gpGlobals->frametime, 200.0f );
+			PhysCollisionSound( pVehicleEntity, npcList[i]->GetEngineObject()->VPhysicsGetObject(), CHAN_BODY, pVehiclePhysics->GetMaterialIndex(), npcList[i]->GetEngineObject()->VPhysicsGetObject()->GetMaterialIndex(), gpGlobals->frametime, 200.0f );
 		}
 	}
 }
@@ -1357,10 +1357,10 @@ void CPropJeepEpisodic::DriveVehicle( float flFrameTime, CUserCmd *ucmd, int iBu
 		//Msg("Push V: %.2f, %.2f, %.2f\n", ucmd->forwardmove, carState->engineRPM, carState->speed );
 		CBasePlayer *pPlayer = ToBasePlayer(GetDriver());
 
-		if ( pPlayer && VPhysicsGetObject() )
+		if ( pPlayer && GetEngineObject()->VPhysicsGetObject() )
 		{
-			KillBlockingEnemyNPCs( pPlayer, this, VPhysicsGetObject() );
-			SolveBlockingProps( this, VPhysicsGetObject() );
+			KillBlockingEnemyNPCs( pPlayer, this, GetEngineObject()->VPhysicsGetObject() );
+			SolveBlockingProps( this, GetEngineObject()->VPhysicsGetObject() );
 		}
 	}
 	BaseClass::DriveVehicle(flFrameTime, ucmd, iButtonsDown, iButtonsReleased);

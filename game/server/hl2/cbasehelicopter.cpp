@@ -467,7 +467,7 @@ bool CBaseHelicopter::DoWashPush( washentity_t *pWash, const Vector &vecWashOrig
 		int i = m_hEntitiesPushedByWash.AddToTail( Wash );
 		pWash = &m_hEntitiesPushedByWash[i];
 		
-		pPhysObject = pEntity->VPhysicsGetObject();
+		pPhysObject = pEntity->GetEngineObject()->VPhysicsGetObject();
 		if ( !pPhysObject )
 			return true;
 	}
@@ -480,7 +480,7 @@ bool CBaseHelicopter::DoWashPush( washentity_t *pWash, const Vector &vecWashOrig
 			return true;
 		}
 
-		pPhysObject = pEntity->VPhysicsGetObject();
+		pPhysObject = pEntity->GetEngineObject()->VPhysicsGetObject();
 		if ( !pPhysObject )
 			return false;
 	}
@@ -502,7 +502,7 @@ bool CBaseHelicopter::DoWashPush( washentity_t *pWash, const Vector &vecWashOrig
 		NDebugOverlay::Cross3D( pEntity->GetEngineObject()->GetAbsOrigin(), -Vector(4,4,4), Vector(4,4,4), 255, 0, 0, true, 0.1f );
 		NDebugOverlay::Line( pEntity->GetEngineObject()->GetAbsOrigin(), pEntity->GetEngineObject()->GetAbsOrigin() + vecForce, 255, 255, 0, true, 0.1f );
 
-		IPhysicsObject *pPhysObject = pEntity->VPhysicsGetObject();
+		IPhysicsObject *pPhysObject = pEntity->GetEngineObject()->VPhysicsGetObject();
 		Msg("Pushed %s (index %d) (mass %f) with force %f (min %.2f max %.2f) at time %.2f\n", 
 			pEntity->GetClassname(), pEntity->entindex(), pPhysObject->GetMass(), flWashAmount, 
 			BASECHOPPER_WASH_PUSH_MIN * flMass, BASECHOPPER_WASH_PUSH_MAX * flMass, gpGlobals->curtime );
@@ -565,7 +565,7 @@ void CBaseHelicopter::DoRotorPhysicsPush( const Vector &vecRotorOrigin, float fl
 		if ( pEntity->GetEngineObject()->IsEFlagSet( EFL_NO_ROTORWASH_PUSH ))
 			continue;
 
-		if ( pShooter || pEntity->GetEngineObject()->GetMoveType() == MOVETYPE_VPHYSICS || (pEntity->VPhysicsGetObject() && !pEntity->IsPlayer()) )
+		if ( pShooter || pEntity->GetEngineObject()->GetMoveType() == MOVETYPE_VPHYSICS || (pEntity->GetEngineObject()->VPhysicsGetObject() && !pEntity->IsPlayer()) )
 		{
 			// Make sure it's not already in our wash
 			bool bAlreadyPushing = false;
@@ -588,7 +588,7 @@ void CBaseHelicopter::DoRotorPhysicsPush( const Vector &vecRotorOrigin, float fl
 			else
 			{
 				// Don't try to push anything too big
-				IPhysicsObject *pPhysObject = pEntity->VPhysicsGetObject();
+				IPhysicsObject *pPhysObject = pEntity->GetEngineObject()->VPhysicsGetObject();
 				if ( pPhysObject )
 				{
 					flMass = pPhysObject->GetMass();

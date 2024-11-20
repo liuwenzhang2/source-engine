@@ -1059,7 +1059,7 @@ void CAntlionTemplateMaker::DoBlockedEffects( CBaseEntity *pBlocker, Vector vOri
 	// If the object blocking the hole is a physics object, wobble it a bit.
 	if( pBlocker )
 	{
-		IPhysicsObject *pPhysObj = pBlocker->VPhysicsGetObject();
+		IPhysicsObject *pPhysObj = pBlocker->GetEngineObject()->VPhysicsGetObject();
 
 		if( pPhysObj && pPhysObj->IsAsleep() )
 		{

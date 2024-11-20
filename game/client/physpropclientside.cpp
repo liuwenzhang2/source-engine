@@ -270,7 +270,7 @@ bool C_PhysPropClientside::Initialize()
 	{
 		GetEngineObject()->VPhysicsInitNormal( SOLID_VPHYSICS, 0, m_spawnflags & SF_PHYSPROP_START_ASLEEP, &tmpSolid );
 	
-		if ( !VPhysicsGetObject())
+		if ( !GetEngineObject()->VPhysicsGetObject())
 		{
 			// failed to create a physics object
 		DevMsg(" C_PhysPropClientside::Initialize: VPhysicsInitNormal() failed for %s.\n", STRING(GetEngineObject()->GetModelName()) );
@@ -279,12 +279,12 @@ bool C_PhysPropClientside::Initialize()
 	}
 
 	// We want touch calls when we hit the world
-	unsigned int flags = VPhysicsGetObject()->GetCallbackFlags();
-	VPhysicsGetObject()->SetCallbackFlags( flags | CALLBACK_GLOBAL_TOUCH_STATIC );
+	unsigned int flags = GetEngineObject()->VPhysicsGetObject()->GetCallbackFlags();
+	GetEngineObject()->VPhysicsGetObject()->SetCallbackFlags( flags | CALLBACK_GLOBAL_TOUCH_STATIC );
 
 	if ( m_spawnflags & SF_PHYSPROP_MOTIONDISABLED )
 	{
-		VPhysicsGetObject()->EnableMotion( false );
+		GetEngineObject()->VPhysicsGetObject()->EnableMotion( false );
 	}
 		
 	Spawn(); // loads breakable & prop data
@@ -292,7 +292,7 @@ bool C_PhysPropClientside::Initialize()
 	if ( m_iPhysicsMode == PHYSICS_MULTIPLAYER_AUTODETECT )
 	{
 		m_iPhysicsMode = GetAutoMultiplayerPhysicsMode( 
-			GetEngineObject()->OBBSize(), VPhysicsGetObject()->GetMass() );
+			GetEngineObject()->OBBSize(), GetEngineObject()->VPhysicsGetObject()->GetMass() );
 	}
 
 	if 	( m_spawnflags & SF_PHYSPROP_FORCE_SERVER_SIDE )
@@ -392,9 +392,9 @@ void C_PhysPropClientside::OnTakeDamage( int iDamage ) // very simple version
 
 float C_PhysPropClientside::GetMass()
 {
-	if ( VPhysicsGetObject() )
+	if (GetEngineObject()->VPhysicsGetObject() )
 	{
-		return VPhysicsGetObject()->GetMass();
+		return GetEngineObject()->VPhysicsGetObject()->GetMass();
 	}
 
 	return 0.0f;
@@ -402,9 +402,9 @@ float C_PhysPropClientside::GetMass()
 
 bool C_PhysPropClientside::IsAsleep()
 {
-	if ( VPhysicsGetObject() )
+	if (GetEngineObject()->VPhysicsGetObject() )
 	{
-		return VPhysicsGetObject()->IsAsleep();
+		return GetEngineObject()->VPhysicsGetObject()->IsAsleep();
 	}
 
 	return true;
@@ -450,7 +450,7 @@ void C_PhysPropClientside::Break()
 {
 	m_takedamage = DAMAGE_NO;
 	
-	IPhysicsObject *pPhysics = VPhysicsGetObject();
+	IPhysicsObject *pPhysics = GetEngineObject()->VPhysicsGetObject();
 
 	Vector velocity;
 	AngularImpulse angVelocity;
@@ -529,7 +529,7 @@ void C_PhysPropClientside::Clone( Vector &velocity )
 		pEntity->GetEngineObject()->SetCollisionGroup( COLLISION_GROUP_NONE );
 	}
 	
-	IPhysicsObject *pPhysicsObject = pEntity->VPhysicsGetObject();
+	IPhysicsObject *pPhysicsObject = pEntity->GetEngineObject()->VPhysicsGetObject();
 
 	if( pPhysicsObject )
 	{
@@ -549,7 +549,7 @@ void C_PhysPropClientside::Clone( Vector &velocity )
 void C_PhysPropClientside::ImpactTrace( trace_t *pTrace, int iDamageType, const char *pCustomImpactName )
 {
 	VPROF( "C_PhysPropClientside::ImpactTrace" );
-	IPhysicsObject *pPhysicsObject = VPhysicsGetObject();
+	IPhysicsObject *pPhysicsObject = GetEngineObject()->VPhysicsGetObject();
 
 	if( !pPhysicsObject )
 		return;
@@ -796,7 +796,7 @@ CBaseEntity *BreakModelCreateSingle( CBaseEntity *pOwner, breakmodel_t *pModel, 
 	}
 
 
-	IPhysicsObject *pPhysicsObject = pEntity->VPhysicsGetObject();
+	IPhysicsObject *pPhysicsObject = pEntity->GetEngineObject()->VPhysicsGetObject();
 
 	if( pPhysicsObject )
 	{
@@ -1021,7 +1021,7 @@ void C_FuncPhysicsRespawnZone::RespawnProps( void )
 					pEntity->GetEngineObject()->SetAbsOrigin( m_PropList[i].vecOrigin );
 					pEntity->GetEngineObject()->SetAbsAngles( m_PropList[i].vecAngles );
 
-					IPhysicsObject *pPhys = pEntity->VPhysicsGetObject();
+					IPhysicsObject *pPhys = pEntity->GetEngineObject()->VPhysicsGetObject();
 					if ( pPhys )
 					{
 						pPhys->SetPosition( pEntity->GetEngineObject()->GetAbsOrigin(), pEntity->GetEngineObject()->GetAbsAngles(), true );

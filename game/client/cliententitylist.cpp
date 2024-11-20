@@ -3536,7 +3536,7 @@ void C_EngineObjectInternal::CollisionRulesChanged()
 {
 	// ivp maintains state based on recent return values from the collision filter, so anything
 	// that can change the state that a collision filter will return (like m_Solid) needs to call RecheckCollisionFilter.
-	if (m_pOuter->VPhysicsGetObject())
+	if (VPhysicsGetObject())
 	{
 		extern bool PhysIsInCallback();
 		if (PhysIsInCallback())

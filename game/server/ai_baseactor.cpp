@@ -1687,7 +1687,7 @@ void CAI_BaseActor::MaintainLookTargets( float flInterval )
 			CBaseEntity *pVehicle = pBCC->GetVehicleEntity();
 			if ( pVehicle )
 			{
-				IPhysicsObject *pObj = pVehicle->VPhysicsGetObject();
+				IPhysicsObject *pObj = pVehicle->GetEngineObject()->VPhysicsGetObject();
 				if ( pObj )
 				{
 					Vector vecVelocity;

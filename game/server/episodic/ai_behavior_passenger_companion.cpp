@@ -220,7 +220,7 @@ void CAI_PassengerBehaviorCompanion::GatherVehicleCollisionConditions( const Vec
 				if ( tr.m_pEnt )
 				{
 					// If it's physical and moveable, then ignore it because we'll probably smash or move it
-					IPhysicsObject *pObject = ((CBaseEntity*)tr.m_pEnt)->VPhysicsGetObject();
+					IPhysicsObject *pObject = ((CBaseEntity*)tr.m_pEnt)->GetEngineObject()->VPhysicsGetObject();
 					if ( pObject && pObject->IsMoveable() )
 					{
 						bWarnCollision = false;

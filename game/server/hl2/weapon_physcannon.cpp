@@ -382,7 +382,7 @@ IPhysicsObject *GetRagdollChildAtPosition( CBaseEntity *pTarget, const Vector &p
 	// Make this our base now
 	pTarget->GetEngineObject()->VPhysicsSwapObject( pBestChild );
 
-	return pTarget->VPhysicsGetObject();
+	return pTarget->GetEngineObject()->VPhysicsGetObject();
 }
 
 //-----------------------------------------------------------------------------
@@ -592,7 +592,7 @@ void CGrabController::SetTargetPosition( const Vector &target, const QAngle &tar
 	CBaseEntity *pAttached = GetAttached();
 	if ( pAttached )
 	{
-		IPhysicsObject *pObj = pAttached->VPhysicsGetObject();
+		IPhysicsObject *pObj = pAttached->GetEngineObject()->VPhysicsGetObject();
 		
 		if ( pObj != NULL )
 		{
@@ -618,7 +618,7 @@ float CGrabController::ComputeError()
 	if ( pAttached )
 	{
 		Vector pos;
-		IPhysicsObject *pObj = pAttached->VPhysicsGetObject();
+		IPhysicsObject *pObj = pAttached->GetEngineObject()->VPhysicsGetObject();
 		
 		if ( pObj )
 		{	
@@ -723,7 +723,7 @@ void CGrabController::AttachEntity( CBasePlayer *pPlayer, CBaseEntity *pEntity, 
 	// play the impact sound of the object hitting the player
 	// used as feedback to let the player know he picked up the object
 	int hitMaterial = pPhys->GetMaterialIndex();
-	int playerMaterial = pPlayer->VPhysicsGetObject() ? pPlayer->VPhysicsGetObject()->GetMaterialIndex() : hitMaterial;
+	int playerMaterial = pPlayer->GetEngineObject()->VPhysicsGetObject() ? pPlayer->GetEngineObject()->VPhysicsGetObject()->GetMaterialIndex() : hitMaterial;
 	PhysicsImpactSound( pPlayer, pPhys, CHAN_STATIC, hitMaterial, playerMaterial, 1.0, 64 );
 	Vector position;
 	QAngle angles;
@@ -1042,7 +1042,7 @@ void CPlayerPickupController::Init( CBasePlayer *pPlayer, CBaseEntity *pObject )
 	m_grabController.SetIgnorePitch( true );
 	m_grabController.SetAngleAlignment( DOT_30DEGREE );
 	m_pPlayer = pPlayer;
-	IPhysicsObject *pPhysics = pObject->VPhysicsGetObject();
+	IPhysicsObject *pPhysics = pObject->GetEngineObject()->VPhysicsGetObject();
 	
 	Pickup_OnPhysGunPickup( pObject, m_pPlayer, PICKED_UP_BY_PLAYER );
 	
@@ -1066,7 +1066,7 @@ void CPlayerPickupController::Shutdown( bool bThrown )
 	CBaseEntity *pObject = m_grabController.GetAttached();
 
 	bool bClearVelocity = false;
-	if ( !bThrown && pObject && pObject->VPhysicsGetObject() && pObject->VPhysicsGetObject()->GetContactPoint(NULL,NULL) )
+	if ( !bThrown && pObject && pObject->GetEngineObject()->VPhysicsGetObject() && pObject->GetEngineObject()->VPhysicsGetObject()->GetContactPoint(NULL,NULL) )
 	{
 		bClearVelocity = true;
 	}
@@ -1123,7 +1123,7 @@ void CPlayerPickupController::Use( CBaseEntity *pActivator, CBaseEntity *pCaller
 		}
 		
 		//Adrian: Oops, our object became motion disabled, let go!
-		IPhysicsObject *pPhys = pAttached->VPhysicsGetObject();
+		IPhysicsObject *pPhys = pAttached->GetEngineObject()->VPhysicsGetObject();
 		if ( pPhys && pPhys->IsMoveable() == false )
 		{
 			Shutdown();
@@ -1177,7 +1177,7 @@ bool CPlayerPickupController::IsHoldingEntity( CBaseEntity *pEnt )
 void PlayerPickupObject( CBasePlayer *pPlayer, CBaseEntity *pObject )
 {
 	//Don't pick up if we don't have a phys object.
-	if ( pObject->VPhysicsGetObject() == NULL )
+	if ( pObject->GetEngineObject()->VPhysicsGetObject() == NULL )
 		 return;
 
 	CPlayerPickupController *pController = (CPlayerPickupController *)CBaseEntity::Create( "player_pickup", pObject->GetEngineObject()->GetAbsOrigin(), vec3_angle, pPlayer );
@@ -1793,9 +1793,9 @@ void CWeaponPhysCannon::Physgun_OnPhysGunPickup( CBaseEntity *pEntity, CBasePlay
 	}
 
 	float mass = 0.0f;
-	if( pEntity->VPhysicsGetObject() )
+	if( pEntity->GetEngineObject()->VPhysicsGetObject() )
 	{
-		mass = pEntity->VPhysicsGetObject()->GetMass();
+		mass = pEntity->GetEngineObject()->VPhysicsGetObject()->GetMass();
 	}
 
 	if( reason == PUNTED_BY_CANNON )
@@ -1894,7 +1894,7 @@ void CWeaponPhysCannon::PuntVPhysics( CBaseEntity *pEntity, const Vector &vecFor
 				const float otherObjectFactor = 1.0f - hitObjectFactor;
   				// Must be light enough
 				float ratio = pList[i]->GetMass() / totalMass;
-				if ( pList[i] == pEntity->VPhysicsGetObject() )
+				if ( pList[i] == pEntity->GetEngineObject()->VPhysicsGetObject() )
 				{
 					ratio += hitObjectFactor;
 					ratio = MIN(ratio,1.0f);
@@ -1946,7 +1946,7 @@ void CWeaponPhysCannon::ApplyVelocityBasedForce( CBaseEntity *pEntity, const Vec
 	AngularImpulse aVel = Pickup_PhysGunLaunchAngularImpulse( pEntity, reason );
 		
 	// Get the physics object (MUST have one)
-	IPhysicsObject *pPhysicsObject = pEntity->VPhysicsGetObject();
+	IPhysicsObject *pPhysicsObject = pEntity->GetEngineObject()->VPhysicsGetObject();
 	if ( pPhysicsObject == NULL )
 	{
 		Assert( 0 );
@@ -2394,7 +2394,7 @@ bool CWeaponPhysCannon::AttachObject( CBaseEntity *pObject, const Vector &vPosit
 		}
 	}
 
-	IPhysicsObject *pPhysics = pObject->VPhysicsGetObject();
+	IPhysicsObject *pPhysics = pObject->GetEngineObject()->VPhysicsGetObject();
 
 	// Must be valid
 	if ( !pPhysics )
@@ -2596,7 +2596,7 @@ CWeaponPhysCannon::FindObjectResult_t CWeaponPhysCannon::FindObject( void )
 		return OBJECT_NOT_FOUND;
 
 	// FIXME: This needs to be run through the CanPickupObject logic
-	IPhysicsObject *pObj = pEntity->VPhysicsGetObject();
+	IPhysicsObject *pObj = pEntity->GetEngineObject()->VPhysicsGetObject();
 	if ( !pObj )
 		return OBJECT_NOT_FOUND;
 
@@ -2635,7 +2635,7 @@ CBaseEntity *CWeaponPhysCannon::MegaPhysCannonFindObjectInCone( const Vector &ve
 	int count = UTIL_EntitiesInBox( list, 1024, mins, maxs, 0 );
 	for( int i = 0 ; i < count ; i++ )
 	{
-		if ( !list[ i ]->VPhysicsGetObject() )
+		if ( !list[ i ]->GetEngineObject()->VPhysicsGetObject() )
 			continue;
 
 		bool bIsCombineBall = FClassnameIs( list[ i ], "prop_combine_ball" );
@@ -2702,7 +2702,7 @@ CBaseEntity *CWeaponPhysCannon::FindObjectInCone( const Vector &vecOrigin, const
 	int count = UTIL_EntitiesInBox( list, 256, mins, maxs, 0 );
 	for( int i = 0 ; i < count ; i++ )
 	{
-		if ( !list[ i ]->VPhysicsGetObject() )
+		if ( !list[ i ]->GetEngineObject()->VPhysicsGetObject() )
 			continue;
 
 		// Closer than other objects
@@ -2733,13 +2733,13 @@ CBaseEntity *CWeaponPhysCannon::FindObjectInCone( const Vector &vecOrigin, const
 bool CGrabController::UpdateObject( CBasePlayer *pPlayer, float flError )
 {
  	CBaseEntity *pEntity = GetAttached();
-	if (!pEntity || ComputeError() > flError || (pPlayer->GetEngineObject()->GetGroundEntity() ? pPlayer->GetEngineObject()->GetGroundEntity()->GetOuter() : NULL) == pEntity || !pEntity->VPhysicsGetObject())
+	if (!pEntity || ComputeError() > flError || (pPlayer->GetEngineObject()->GetGroundEntity() ? pPlayer->GetEngineObject()->GetGroundEntity()->GetOuter() : NULL) == pEntity || !pEntity->GetEngineObject()->VPhysicsGetObject())
 	{
 		return false;
 	}
 
 	//Adrian: Oops, our object became motion disabled, let go!
-	IPhysicsObject *pPhys = pEntity->VPhysicsGetObject();
+	IPhysicsObject *pPhys = pEntity->GetEngineObject()->VPhysicsGetObject();
 	if ( pPhys && pPhys->IsMoveable() == false )
 	{
 		return false;
@@ -4482,7 +4482,7 @@ void CWeaponPhysCannon::PurgeThrownObjects()
 			}
 			else
 			{
-				IPhysicsObject *pObject = m_ThrownEntities[i].hEntity->VPhysicsGetObject();
+				IPhysicsObject *pObject = m_ThrownEntities[i].hEntity->GetEngineObject()->VPhysicsGetObject();
 
 				if( pObject && pObject->IsAsleep() )
 				{

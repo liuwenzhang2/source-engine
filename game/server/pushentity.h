@@ -144,7 +144,7 @@ public:
 			return false;
 
 		if ( pTestEntity->GetEngineObject()->GetMoveType() == MOVETYPE_VPHYSICS &&
-			pTestEntity->VPhysicsGetObject() && pTestEntity->VPhysicsGetObject()->IsMoveable() )
+			pTestEntity->GetEngineObject()->VPhysicsGetObject() && pTestEntity->GetEngineObject()->VPhysicsGetObject()->IsMoveable() )
 			return false;
 
 		return BaseClass::ShouldHitEntity( pHandleEntity, contentsMask );

@@ -612,7 +612,7 @@ void CBreakableSurface::Die( CBaseEntity *pBreaker, const Vector &vAttackDir )
 		return;
 
 	// Play a break sound
-	PhysBreakSound( this, VPhysicsGetObject(), GetEngineObject()->GetAbsOrigin() );
+	PhysBreakSound( this, GetEngineObject()->VPhysicsGetObject(), GetEngineObject()->GetAbsOrigin() );
 
 	m_bIsBroken = true;
 	m_iHealth = 0.0f;

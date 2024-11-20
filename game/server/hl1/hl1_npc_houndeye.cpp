@@ -469,9 +469,9 @@ void CNPC_Houndeye::SonicAttack ( void )
 
 					if ( (pEntity->GetEngineObject()->GetAbsOrigin() - GetEngineObject()->GetAbsOrigin()).Length2D() <= HOUNDEYE_MAX_ATTACK_RADIUS )
 					{
-						if ( pEntity->GetEngineObject()->GetMoveType() == MOVETYPE_VPHYSICS || (pEntity->VPhysicsGetObject() && !pEntity->IsPlayer()) )
+						if ( pEntity->GetEngineObject()->GetMoveType() == MOVETYPE_VPHYSICS || (pEntity->GetEngineObject()->VPhysicsGetObject() && !pEntity->IsPlayer()) )
 						{
-							IPhysicsObject *pPhysObject = pEntity->VPhysicsGetObject();
+							IPhysicsObject *pPhysObject = pEntity->GetEngineObject()->VPhysicsGetObject();
 
 							if ( pPhysObject )
 							{

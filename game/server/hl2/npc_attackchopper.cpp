@@ -3728,13 +3728,13 @@ void Chopper_BecomeChunks( CBaseEntity *pChopper )
 	pTailChunk->m_hMaster = pBodyChunk;
 
 	// Constrain all the pieces together loosely
-	IPhysicsObject *pBodyObject = pBodyChunk->VPhysicsGetObject();
+	IPhysicsObject *pBodyObject = pBodyChunk->GetEngineObject()->VPhysicsGetObject();
 	Assert( pBodyObject );
 
-	IPhysicsObject *pCockpitObject = pCockpitChunk->VPhysicsGetObject();
+	IPhysicsObject *pCockpitObject = pCockpitChunk->GetEngineObject()->VPhysicsGetObject();
 	Assert( pCockpitObject );
 
-	IPhysicsObject *pTailObject = pTailChunk->VPhysicsGetObject();
+	IPhysicsObject *pTailObject = pTailChunk->GetEngineObject()->VPhysicsGetObject();
 	Assert( pTailObject );
 
 	IPhysicsConstraintGroup *pGroup = NULL;
@@ -5618,8 +5618,8 @@ void CGrenadeHelicopter::OnPhysGunDrop( CBasePlayer *pPhysGunUser, PhysGunDrop_t
 	if ( reason == LAUNCHED_BY_CANNON )
 	{
 		// Enable world touches.
-		unsigned int flags = VPhysicsGetObject()->GetCallbackFlags();
-		VPhysicsGetObject()->SetCallbackFlags( flags | CALLBACK_GLOBAL_TOUCH_STATIC );
+		unsigned int flags = GetEngineObject()->VPhysicsGetObject()->GetCallbackFlags();
+		GetEngineObject()->VPhysicsGetObject()->SetCallbackFlags( flags | CALLBACK_GLOBAL_TOUCH_STATIC );
 
 		// Explode on contact
 		SetTouch( &CGrenadeHelicopter::ExplodeConcussion );

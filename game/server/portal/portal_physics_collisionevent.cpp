@@ -326,7 +326,7 @@ static void ModifyWeight_PreCollision( vcollisionevent_t *pEvent )
 			//HACKHACK: last minute problem knocking over turrets with energy balls, up the mass of the ball by a lot
 			if( FClassnameIs( pUnshadowedEntities[i], "npc_portal_turret_floor" ) )
 			{
-				pUnshadowedObjects[j]->SetMass( pUnshadowedEntities[i]->VPhysicsGetObject()->GetMass() );
+				pUnshadowedObjects[j]->SetMass( pUnshadowedEntities[i]->GetEngineObject()->VPhysicsGetObject()->GetMass() );
 			}
 		}
 	}

@@ -1429,10 +1429,10 @@ Vector CBaseCombatCharacter::CalcDamageForceVector( const CTakeDamageInfo &info 
 				if ( pForce->GetEngineObject()->GetMoveType() == MOVETYPE_VPHYSICS )
 				{
 					// killed by a physics object
-					IPhysicsObject *pPhysics = VPhysicsGetObject();
+					IPhysicsObject *pPhysics = GetEngineObject()->VPhysicsGetObject();
 					if ( !pPhysics )
 					{
-						pPhysics = pForce->VPhysicsGetObject();
+						pPhysics = pForce->GetEngineObject()->VPhysicsGetObject();
 					}
 					pPhysics->GetVelocity( &forceVector, NULL );
 					forceScale = pPhysics->GetMass();
@@ -1620,9 +1620,9 @@ void CBaseCombatCharacter::Event_Killed( const CTakeDamageInfo &info )
 	CBaseCombatWeapon *pDroppedWeapon = m_hActiveWeapon.Get();
 
 	// Drop any weapon that I own
-	if ( VPhysicsGetObject() )
+	if (GetEngineObject()->VPhysicsGetObject() )
 	{
-		Vector weaponForce = forceVector * VPhysicsGetObject()->GetInvMass();
+		Vector weaponForce = forceVector * GetEngineObject()->VPhysicsGetObject()->GetInvMass();
 		Weapon_Drop( m_hActiveWeapon, NULL, &weaponForce );
 	}
 	else
@@ -1890,7 +1890,7 @@ void CBaseCombatCharacter::Weapon_DropAll( bool bDisallowWeaponPickup )
 		{
 			pWeapon->GetEngineObject()->RemoveSolidFlags( FSOLID_TRIGGER );
 			
-			IPhysicsObject *pObj = pWeapon->VPhysicsGetObject();
+			IPhysicsObject *pObj = pWeapon->GetEngineObject()->VPhysicsGetObject();
 			
 			if ( pObj != NULL )
 			{	
@@ -2449,7 +2449,7 @@ int CBaseCombatCharacter::OnTakeDamage( const CTakeDamageInfo &info )
 		retVal = OnTakeDamage_Alive( info );
 		if ( m_iHealth <= 0 )
 		{
-			IPhysicsObject *pPhysics = VPhysicsGetObject();
+			IPhysicsObject *pPhysics = GetEngineObject()->VPhysicsGetObject();
 			if ( pPhysics )
 			{
 				pPhysics->EnableCollisions( false );

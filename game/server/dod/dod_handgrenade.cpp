@@ -29,7 +29,7 @@ CDODHandGrenade* CDODHandGrenade::Create(
 	if( !pGrenade )
 		return NULL;
 
-	IPhysicsObject *pPhysicsObject = pGrenade->VPhysicsGetObject();
+	IPhysicsObject *pPhysicsObject = pGrenade->GetEngineObject()->VPhysicsGetObject();
 	if ( pPhysicsObject )
 	{
 		pPhysicsObject->AddVelocity( &velocity, &angVelocity );

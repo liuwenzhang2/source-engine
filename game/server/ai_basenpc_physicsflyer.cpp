@@ -36,9 +36,9 @@ END_DATADESC()
 void CAI_BasePhysicsFlyingBot::GetVelocity(Vector *vVelocity, AngularImpulse *vAngVelocity)
 {
 	Assert(GetEngineObject()->GetMoveType() == MOVETYPE_VPHYSICS );
-	if ( VPhysicsGetObject() )
+	if (GetEngineObject()->VPhysicsGetObject() )
 	{
-		VPhysicsGetObject()->GetVelocity( vVelocity, vAngVelocity );
+		GetEngineObject()->VPhysicsGetObject()->GetVelocity( vVelocity, vAngVelocity );
 	}
 	else
 	{
@@ -338,7 +338,7 @@ IMotionEvent::simresult_e CAI_BasePhysicsFlyingBot::Simulate( IPhysicsMotionCont
 {
 	static int count;
 
-	IPhysicsObject *pPhysicsObject = VPhysicsGetObject();
+	IPhysicsObject *pPhysicsObject = GetEngineObject()->VPhysicsGetObject();
 	// Assert( pPhysicsObject );
 	if (!pPhysicsObject) 
 		return SIM_NOTHING;

@@ -59,11 +59,11 @@ void CDODSmokeGrenade::Think_Emit( void )
 	// if we're stationary and have not yet created smoke, do so now
 	Vector vel;
 	AngularImpulse a;
-	VPhysicsGetObject()->GetVelocity( &vel, &a );
+	GetEngineObject()->VPhysicsGetObject()->GetVelocity( &vel, &a );
 
 	if ( vel.Length() < 15.0 && !m_bInitialSmoke )
 	{
-		VPhysicsGetObject()->EnableMotion( false );
+		GetEngineObject()->VPhysicsGetObject()->EnableMotion( false );
 
 		// Smoke Cloud
 		DispatchParticleEffect( "smokegrenade", GetEngineObject()->GetAbsOrigin(), vec3_angle );

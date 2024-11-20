@@ -2681,9 +2681,9 @@ int CNPC_Antlion::OnTakeDamage_Alive( const CTakeDamageInfo &info )
 	{
 		if( newInfo.GetDamageType() & DMG_CRUSH )
 		{
-			if( newInfo.GetInflictor() && newInfo.GetInflictor()->VPhysicsGetObject() )
+			if( newInfo.GetInflictor() && newInfo.GetInflictor()->GetEngineObject()->VPhysicsGetObject() )
 			{
-				float flMass = newInfo.GetInflictor()->VPhysicsGetObject()->GetMass();
+				float flMass = newInfo.GetInflictor()->GetEngineObject()->VPhysicsGetObject()->GetMass();
 
 				if( flMass > 250.0f && newInfo.GetDamage() < GetHealth() )
 				{
@@ -3238,7 +3238,7 @@ void CNPC_Antlion::ClearBurrowPoint( const Vector &origin )
 			continue;
 		}
 
-		if ( pEntity->m_takedamage != DAMAGE_NO && pEntity->Classify() != CLASS_PLAYER && pEntity->VPhysicsGetObject() )
+		if ( pEntity->m_takedamage != DAMAGE_NO && pEntity->Classify() != CLASS_PLAYER && pEntity->GetEngineObject()->VPhysicsGetObject() )
 		{
 			vecSpot	 = pEntity->BodyTarget( origin );
 			vecForce = ( vecSpot - origin ) + Vector( 0, 0, 16 );
@@ -3251,8 +3251,8 @@ void CNPC_Antlion::ClearBurrowPoint( const Vector &origin )
 
 			if ( flDist <= 128.0f )
 			{
-				pEntity->VPhysicsGetObject()->Wake();
-				pEntity->VPhysicsGetObject()->ApplyForceOffset( vecForce * 250.0f, vecCenter );
+				pEntity->GetEngineObject()->VPhysicsGetObject()->Wake();
+				pEntity->GetEngineObject()->VPhysicsGetObject()->ApplyForceOffset( vecForce * 250.0f, vecCenter );
 			}
 		}
 	}
@@ -3316,7 +3316,7 @@ bool CNPC_Antlion::ValidBurrowPoint( const Vector &point )
 		CBaseEntity *pEntity = (CBaseEntity*)tr.m_pEnt;
 
 		//If it's a physics object, attempt to knock is away, unless it's a car
-		if ( ( pEntity ) && ( pEntity->VPhysicsGetObject() ) && ( pEntity->GetServerVehicle() == NULL ) )
+		if ( ( pEntity ) && ( pEntity->GetEngineObject()->VPhysicsGetObject() ) && ( pEntity->GetServerVehicle() == NULL ) )
 		{
 			ClearBurrowPoint( point );
 		}

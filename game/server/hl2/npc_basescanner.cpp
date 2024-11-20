@@ -441,7 +441,7 @@ void CNPC_BaseScanner::TakeDamageFromPhyscannon( CBasePlayer *pPlayer )
 
 	// Convert velocity into damage.
 	Vector vel;
-	VPhysicsGetObject()->GetVelocity( &vel, NULL );
+	GetEngineObject()->VPhysicsGetObject()->GetVelocity( &vel, NULL );
 	float flSpeed = vel.Length();
 
 	float flFactor = flSpeed / SCANNER_SMASH_SPEED;
@@ -496,7 +496,7 @@ void CNPC_BaseScanner::TakeDamageFromPhysicsImpact( int index, gamevcollisioneve
 //-----------------------------------------------------------------------------
 bool CNPC_BaseScanner::IsHeldByPhyscannon( )
 {
-	return VPhysicsGetObject() && (VPhysicsGetObject()->GetGameFlags() & FVPHYSICS_PLAYER_HELD);
+	return GetEngineObject()->VPhysicsGetObject() && (GetEngineObject()->VPhysicsGetObject()->GetGameFlags() & FVPHYSICS_PLAYER_HELD);
 }
 
 //------------------------------------------------------------------------------
@@ -910,13 +910,13 @@ void CNPC_BaseScanner::StartSmokeTrail( void )
 void CNPC_BaseScanner::BlendPhyscannonLaunchSpeed()
 {
 	// Blend out desired velocity when launched by the physcannon
-	if (!VPhysicsGetObject())
+	if (!GetEngineObject()->VPhysicsGetObject())
 		return;
 
 	if ( HasPhysicsAttacker( SCANNER_SMASH_TIME ) && !IsHeldByPhyscannon( ) )
 	{
 		Vector vecCurrentVelocity;
-		VPhysicsGetObject()->GetVelocity( &vecCurrentVelocity, NULL );
+		GetEngineObject()->VPhysicsGetObject()->GetVelocity( &vecCurrentVelocity, NULL );
 		float flLerpFactor = (gpGlobals->curtime - m_flLastPhysicsInfluenceTime) / SCANNER_SMASH_TIME;
 		flLerpFactor = clamp( flLerpFactor, 0.0f, 1.0f );
 		flLerpFactor = SimpleSplineRemapVal( flLerpFactor, 0.0f, 1.0f, 0.0f, 1.0f );
@@ -947,7 +947,7 @@ void CNPC_BaseScanner::MoveExecute_Alive(float flInterval)
 		noiseScale *= 4;
 	}
 
-	IPhysicsObject *pPhysics = VPhysicsGetObject();
+	IPhysicsObject *pPhysics = GetEngineObject()->VPhysicsGetObject();
 
 	if ( pPhysics && pPhysics->IsAsleep() )
 	{
@@ -1297,7 +1297,7 @@ void CNPC_BaseScanner::MoveToTarget( float flInterval, const Vector &vecMoveTarg
 void CNPC_BaseScanner::DiveBombSoundThink()
 {
 	Vector vecPosition, vecVelocity;
-	IPhysicsObject *pPhysicsObject = VPhysicsGetObject();
+	IPhysicsObject *pPhysicsObject = GetEngineObject()->VPhysicsGetObject();
 
 	if ( pPhysicsObject == NULL )
 		return;
@@ -1348,14 +1348,14 @@ void CNPC_BaseScanner::MoveToDivebomb(float flInterval)
 
 	// Spin out of control.
 	Vector forward;
-	VPhysicsGetObject()->LocalToWorldVector( &forward, Vector( 1.0, 0.0, 0.0 ) );
+	GetEngineObject()->VPhysicsGetObject()->LocalToWorldVector( &forward, Vector( 1.0, 0.0, 0.0 ) );
 	AngularImpulse torque = forward * m_flDiveBombRollForce;
-	VPhysicsGetObject()->ApplyTorqueCenter( torque );
+	GetEngineObject()->VPhysicsGetObject()->ApplyTorqueCenter( torque );
 
 	// BUGBUG: why Y axis and not Z?
 	Vector up;
-	VPhysicsGetObject()->LocalToWorldVector( &up, Vector( 0.0, 1.0, 0.0 ) );
-	VPhysicsGetObject()->ApplyForceCenter( up * 2000 );
+	GetEngineObject()->VPhysicsGetObject()->LocalToWorldVector( &up, Vector( 0.0, 1.0, 0.0 ) );
+	GetEngineObject()->VPhysicsGetObject()->ApplyForceCenter( up * 2000 );
 }
 
 //-----------------------------------------------------------------------------

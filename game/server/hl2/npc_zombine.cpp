@@ -454,7 +454,7 @@ void CNPC_Zombine::DropGrenade( Vector vDir )
 	QAngle angles;
 	GetAttachment( "grenade_attachment", vGunPos, angles );
 
-	IPhysicsObject *pPhysObj = m_hGrenade->VPhysicsGetObject();
+	IPhysicsObject *pPhysObj = m_hGrenade->GetEngineObject()->VPhysicsGetObject();
 
 	if ( pPhysObj == NULL )
 	{
@@ -542,7 +542,7 @@ void CNPC_Zombine::HandleAnimEvent( animevent_t *pEvent )
 		if ( pGrenade )
 		{
 			// Move physobject to shadow
-			IPhysicsObject *pPhysicsObject = pGrenade->VPhysicsGetObject();
+			IPhysicsObject *pPhysicsObject = pGrenade->GetEngineObject()->VPhysicsGetObject();
 
 			if ( pPhysicsObject )
 			{

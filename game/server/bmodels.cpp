@@ -126,7 +126,7 @@ void CFuncWallToggle::Spawn( void )
 
 void CFuncWallToggle::TurnOff( void )
 {
-	IPhysicsObject *pPhys = VPhysicsGetObject();
+	IPhysicsObject *pPhys = GetEngineObject()->VPhysicsGetObject();
 	if ( pPhys )
 	{
 		pPhys->EnableCollisions( false );
@@ -138,7 +138,7 @@ void CFuncWallToggle::TurnOff( void )
 
 void CFuncWallToggle::TurnOn( void )
 {
-	IPhysicsObject *pPhys = VPhysicsGetObject();
+	IPhysicsObject *pPhys = GetEngineObject()->VPhysicsGetObject();
 	if ( pPhys )
 	{
 		pPhys->EnableCollisions( true );
@@ -234,7 +234,7 @@ bool CFuncVehicleClip::CreateVPhysics( void )
 
 void CFuncVehicleClip::InputEnable( inputdata_t &data )
 {
-	IPhysicsObject *pPhys = VPhysicsGetObject();
+	IPhysicsObject *pPhys = GetEngineObject()->VPhysicsGetObject();
 	if ( pPhys )
 	{
 		pPhys->EnableCollisions( true );
@@ -244,7 +244,7 @@ void CFuncVehicleClip::InputEnable( inputdata_t &data )
 
 void CFuncVehicleClip::InputDisable( inputdata_t &data )
 {
-	IPhysicsObject *pPhys = VPhysicsGetObject();
+	IPhysicsObject *pPhys = GetEngineObject()->VPhysicsGetObject();
 	if ( pPhys )
 	{
 		pPhys->EnableCollisions( false );
@@ -1466,7 +1466,7 @@ void CFuncVPhysicsClip::Spawn( void )
 	SetModel( STRING(GetEngineObject()->GetModelName() ) );
 	GetEngineObject()->AddEffects( EF_NODRAW );
 	CreateVPhysics();
-	VPhysicsGetObject()->EnableCollisions( !m_bDisabled );
+	GetEngineObject()->VPhysicsGetObject()->EnableCollisions( !m_bDisabled );
 }
 
 
@@ -1494,7 +1494,7 @@ bool CFuncVPhysicsClip::EntityPassesFilter( CBaseEntity *pOther )
 	if ( pFilter )
 		return pFilter->PassesFilter( this, pOther );
 
-	if ( pOther->GetEngineObject()->GetMoveType() == MOVETYPE_VPHYSICS && pOther->VPhysicsGetObject()->IsMoveable() )
+	if ( pOther->GetEngineObject()->GetMoveType() == MOVETYPE_VPHYSICS && pOther->GetEngineObject()->VPhysicsGetObject()->IsMoveable() )
 		return true;
 	
 	return false;
@@ -1508,12 +1508,12 @@ bool CFuncVPhysicsClip::ForceVPhysicsCollide( CBaseEntity *pEntity )
 
 void CFuncVPhysicsClip::InputEnable( inputdata_t &inputdata )
 {
-	VPhysicsGetObject()->EnableCollisions(true);
+	GetEngineObject()->VPhysicsGetObject()->EnableCollisions(true);
 	m_bDisabled = false;
 }
 
 void CFuncVPhysicsClip::InputDisable( inputdata_t &inputdata )
 {
-	VPhysicsGetObject()->EnableCollisions(false);
+	GetEngineObject()->VPhysicsGetObject()->EnableCollisions(false);
 	m_bDisabled = true;
 }

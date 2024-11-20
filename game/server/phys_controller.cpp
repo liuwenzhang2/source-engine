@@ -264,7 +264,7 @@ void CPhysForce::ActivateForce( void )
 	IPhysicsObject *pPhys = NULL;
 	if ( m_attachedObject )
 	{
-		pPhys = m_attachedObject->VPhysicsGetObject();
+		pPhys = m_attachedObject->GetEngineObject()->VPhysicsGetObject();
 	}
 	
 	if ( !pPhys )
@@ -295,7 +295,7 @@ void CPhysForce::ForceOff( void )
 	IPhysicsObject *pPhys = NULL;
 	if ( m_attachedObject )
 	{
-		pPhys = m_attachedObject->VPhysicsGetObject();
+		pPhys = m_attachedObject->GetEngineObject()->VPhysicsGetObject();
 		if ( pPhys )
 		{
 			pPhys->Wake();
@@ -693,7 +693,7 @@ CPhysMotor::~CPhysMotor()
 {
 	if ( m_attachedObject && m_pHinge )
 	{
-		IPhysicsObject *pPhys = m_attachedObject->VPhysicsGetObject();
+		IPhysicsObject *pPhys = m_attachedObject->GetEngineObject()->VPhysicsGetObject();
 		if ( pPhys )
 		{
 			PhysClearGameFlags(pPhys, FVPHYSICS_NO_PLAYER_PICKUP);
@@ -732,7 +732,7 @@ void CPhysMotor::TurnOn( void )
 	if ( !pAttached )
 		return;
 
-	IPhysicsObject *pPhys = pAttached->VPhysicsGetObject();
+	IPhysicsObject *pPhys = pAttached->GetEngineObject()->VPhysicsGetObject();
 	if ( pPhys )
 	{
 		m_pController->WakeObjects();
@@ -755,7 +755,7 @@ void CPhysMotor::Activate( void )
 		if ( pAttach && pAttach->GetEngineObject()->GetMoveType() == MOVETYPE_VPHYSICS )
 		{
 			m_attachedObject = pAttach;
-			IPhysicsObject *pPhys = m_attachedObject->VPhysicsGetObject();
+			IPhysicsObject *pPhys = m_attachedObject->GetEngineObject()->VPhysicsGetObject();
 			CalculateAcceleration();
 			matrix3x4_t matrix;
 			pPhys->GetPositionMatrix( &matrix );
@@ -769,7 +769,7 @@ void CPhysMotor::Activate( void )
 
 	if ( m_attachedObject )
 	{
-		IPhysicsObject *pPhys = m_attachedObject->VPhysicsGetObject();
+		IPhysicsObject *pPhys = m_attachedObject->GetEngineObject()->VPhysicsGetObject();
 
 		// create a hinge constraint for this object?
 		if (GetEngineObject()->GetSpawnFlags() & SF_MOTOR_HINGE)
@@ -802,7 +802,7 @@ void CPhysMotor::Activate( void )
 		if ( !m_pController )
 		{
 			m_pController = physenv->CreateMotionController( &m_motor );
-			m_pController->AttachObject( m_attachedObject->VPhysicsGetObject(), false );
+			m_pController->AttachObject( m_attachedObject->GetEngineObject()->VPhysicsGetObject(), false );
 
 			if (GetEngineObject()->GetSpawnFlags() & SF_MOTOR_START_ON)
 			{
@@ -949,7 +949,7 @@ void CKeepUpright::Activate()
 		IPhysicsObject *pPhys;
 		if ( m_attachedObject )
 		{
-			pPhys = m_attachedObject->VPhysicsGetObject();
+			pPhys = m_attachedObject->GetEngineObject()->VPhysicsGetObject();
 		}
 		else
 		{

@@ -837,7 +837,7 @@ bool CProp_Portal::ShouldTeleportTouchingEntity( CBaseEntity *pOther )
 	//Vector ptOtherOrigin = pOther->GetAbsOrigin();
 	Vector ptOtherCenter = pOther->WorldSpaceCenter();
 
-	IPhysicsObject *pOtherPhysObject = pOther->VPhysicsGetObject();
+	IPhysicsObject *pOtherPhysObject = pOther->GetEngineObject()->VPhysicsGetObject();
 
 	Vector vOtherVelocity;
 	//grab current velocity
@@ -964,7 +964,7 @@ void CProp_Portal::TeleportTouchingEntity( CBaseEntity *pOther )
 
 	//grab current velocity
 	{
-		IPhysicsObject *pOtherPhysObject = pOther->VPhysicsGetObject();
+		IPhysicsObject *pOtherPhysObject = pOther->GetEngineObject()->VPhysicsGetObject();
 		if( pOther->GetEngineObject()->GetMoveType() == MOVETYPE_VPHYSICS )
 		{
 			if( pOtherPhysObject && (pOtherPhysObject->GetShadowController() == NULL) )
@@ -972,9 +972,9 @@ void CProp_Portal::TeleportTouchingEntity( CBaseEntity *pOther )
 			else
 				pOther->GetVelocity( &vOtherVelocity );
 		}
-		else if ( bPlayer && pOther->VPhysicsGetObject() )
+		else if ( bPlayer && pOther->GetEngineObject()->VPhysicsGetObject() )
 		{
-			pOther->VPhysicsGetObject()->GetVelocity( &vOtherVelocity, NULL );
+			pOther->GetEngineObject()->VPhysicsGetObject()->GetVelocity( &vOtherVelocity, NULL );
 
 			if ( vOtherVelocity == vec3_origin )
 			{
@@ -1218,7 +1218,7 @@ void CProp_Portal::TeleportTouchingEntity( CBaseEntity *pOther )
 		}
 	}
 
-	IPhysicsObject *pPhys = pOther->VPhysicsGetObject();
+	IPhysicsObject *pPhys = pOther->GetEngineObject()->VPhysicsGetObject();
 	if( (pPhys != NULL) && (pPhys->GetGameFlags() & FVPHYSICS_PLAYER_HELD) )
 	{
 		CPortal_Player *pHoldingPlayer = (CPortal_Player *)GetPlayerHoldingEntity( pOther );
@@ -1664,7 +1664,7 @@ void CProp_Portal::WakeNearbyEntities( void )
 
 				if ( pEntity->GetEngineObject()->GetMoveType() == MOVETYPE_VPHYSICS )
 				{
-					IPhysicsObject *pPhysicsObject = pEntity->VPhysicsGetObject();
+					IPhysicsObject *pPhysicsObject = pEntity->GetEngineObject()->VPhysicsGetObject();
 
 					if ( pPhysicsObject && pPhysicsObject->IsMoveable() )
 					{
@@ -2386,7 +2386,7 @@ void CProp_Portal::TakeOwnershipOfEntity(CBaseEntity* pEntity)
 
 	pEntity->GetEngineObject()->CollisionRulesChanged(); //absolutely necessary in single-environment mode, possibly expendable in multi-environment moder
 	//pEntity->SetGroundEntity( NULL );
-	IPhysicsObject* pObject = pEntity->VPhysicsGetObject();
+	IPhysicsObject* pObject = pEntity->GetEngineObject()->VPhysicsGetObject();
 	if (pObject)
 	{
 		pObject->Wake();
@@ -2537,7 +2537,7 @@ void RecheckEntityCollision(CBaseEntity* pEntity)
 
 	pEntity->GetEngineObject()->CollisionRulesChanged(); //absolutely necessary in single-environment mode, possibly expendable in multi-environment mode
 	//pEntity->SetGroundEntity( NULL );
-	IPhysicsObject* pObject = pEntity->VPhysicsGetObject();
+	IPhysicsObject* pObject = pEntity->GetEngineObject()->VPhysicsGetObject();
 	if (pObject)
 	{
 		pObject->Wake();
@@ -3134,7 +3134,7 @@ void CProp_Portal::PrePhysFrame(void)
 						continue;
 
 					Assert((pEntity != NULL) && (pEntity->GetEngineObject()->IsMarkedForDeletion() == false));
-					IPhysicsObject* pPhysObject = pEntity->VPhysicsGetObject();
+					IPhysicsObject* pPhysObject = pEntity->GetEngineObject()->VPhysicsGetObject();
 					if ((pPhysObject == NULL) || pPhysObject->IsAsleep())
 						continue;
 

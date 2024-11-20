@@ -146,7 +146,7 @@ void CDODBaseGrenade::DetonateThink( void )
 	Vector foo;
 	AngularImpulse a;	
 		
-	VPhysicsGetObject()->GetVelocity( &foo, &a );
+	GetEngineObject()->VPhysicsGetObject()->GetVelocity( &foo, &a );
 
 	if( gpGlobals->curtime > m_flDetonateTime )
 	{
@@ -512,11 +512,11 @@ const float DOD_GRENADE_WINDOW_BREAK_DAMPING_AMOUNT = 0.5f;
 void CDODBaseGrenade::VPhysicsCollision( int index, gamevcollisionevent_t *pEvent )
 {
 	CBreakable *pBreakable = dynamic_cast<CBreakable*>( pEvent->pEntities[!index] );
-	if ( pBreakable && pBreakable->GetMaterialType() == matGlass && VPhysicsGetObject() )
+	if ( pBreakable && pBreakable->GetMaterialType() == matGlass && GetEngineObject()->VPhysicsGetObject() )
 	{
 		// don't stop, go through this entity after breaking it
 		Vector dampedVelocity = DOD_GRENADE_WINDOW_BREAK_DAMPING_AMOUNT * pEvent->preVelocity[index];
-		VPhysicsGetObject()->SetVelocity( &dampedVelocity, &pEvent->preAngularVelocity[index] );
+		GetEngineObject()->VPhysicsGetObject()->SetVelocity( &dampedVelocity, &pEvent->preAngularVelocity[index] );
 	}	
 	else
 		BaseClass::VPhysicsCollision( index, pEvent );

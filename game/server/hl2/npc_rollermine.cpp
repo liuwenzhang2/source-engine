@@ -829,7 +829,7 @@ void CNPC_RollerMine::RunAI()
 	if( m_bTurnedOn )
 	{
 		// Scare combine if hacked by Alyx.
-		IPhysicsObject *pPhysicsObject = VPhysicsGetObject();
+		IPhysicsObject *pPhysicsObject = GetEngineObject()->VPhysicsGetObject();
 
 		Vector vecVelocity;
 
@@ -1112,7 +1112,7 @@ void CNPC_RollerMine::StartTask( const Task_t *pTask )
 	case TASK_WALK_PATH:
 	case TASK_RUN_PATH:
 		{
-			IPhysicsObject *pPhysicsObject = VPhysicsGetObject();
+			IPhysicsObject *pPhysicsObject = GetEngineObject()->VPhysicsGetObject();
 
 			if ( pPhysicsObject == NULL )
 			{
@@ -1128,7 +1128,7 @@ void CNPC_RollerMine::StartTask( const Task_t *pTask )
 	case TASK_ROLLERMINE_CHARGE_ENEMY:
 	case TASK_ROLLERMINE_RETURN_TO_PLAYER:
 		{
-			IPhysicsObject *pPhysicsObject = VPhysicsGetObject();
+			IPhysicsObject *pPhysicsObject = GetEngineObject()->VPhysicsGetObject();
 			
 			if ( pPhysicsObject == NULL )
 			{
@@ -1179,7 +1179,7 @@ void CNPC_RollerMine::StartTask( const Task_t *pTask )
 
 	case TASK_ROLLERMINE_NUDGE_TOWARDS_NODES:
 		{
-			IPhysicsObject *pPhysicsObject = VPhysicsGetObject();
+			IPhysicsObject *pPhysicsObject = GetEngineObject()->VPhysicsGetObject();
 
 			if( pPhysicsObject )
 			{
@@ -1327,7 +1327,7 @@ void CNPC_RollerMine::RunTask( const Task_t *pTask )
 			float flDot;
 			Vector vecVelocity;
 
-			IPhysicsObject *pPhysicsObject = VPhysicsGetObject();
+			IPhysicsObject *pPhysicsObject = GetEngineObject()->VPhysicsGetObject();
 			
 			if ( pPhysicsObject == NULL )
 			{
@@ -1446,7 +1446,7 @@ void CNPC_RollerMine::RunTask( const Task_t *pTask )
 
 			// Figure out whether to continue the charge.
 			// (Have I overrun the target?)			
-			IPhysicsObject *pPhysicsObject = VPhysicsGetObject();
+			IPhysicsObject *pPhysicsObject = GetEngineObject()->VPhysicsGetObject();
 
 			if ( pPhysicsObject == NULL )
 			{
@@ -1583,7 +1583,7 @@ void CNPC_RollerMine::RunTask( const Task_t *pTask )
 
 			float flDot;
 
-			IPhysicsObject *pPhysicsObject = VPhysicsGetObject();
+			IPhysicsObject *pPhysicsObject = GetEngineObject()->VPhysicsGetObject();
 			if ( pPhysicsObject == NULL )
 			{
 				TaskFail("Roller lost internal physics object?");
@@ -2012,7 +2012,7 @@ void CNPC_RollerMine::ShockTouch( CBaseEntity *pOther )
 	if( disp != D_HT && disp != D_FR)
 		return;
 
-	IPhysicsObject *pPhysics = VPhysicsGetObject();
+	IPhysicsObject *pPhysics = GetEngineObject()->VPhysicsGetObject();
 
 	// Calculate a collision force
 	Vector impulse = WorldSpaceCenter() - pOther->WorldSpaceCenter();
@@ -2069,7 +2069,7 @@ void CNPC_RollerMine::ShockTouch( CBaseEntity *pOther )
 			Vector vecDamageForce = pOther->WorldSpaceCenter() - WorldSpaceCenter();
 			VectorNormalize( vecDamageForce );
 
-			IPhysicsObject *pPhysics = pOther->VPhysicsGetObject();
+			IPhysicsObject *pPhysics = pOther->GetEngineObject()->VPhysicsGetObject();
 
 			if( pPhysics )
 			{
@@ -2134,7 +2134,7 @@ void CNPC_RollerMine::VPhysicsCollision( int index, gamevcollisionevent_t *pEven
 //-----------------------------------------------------------------------------
 void CNPC_RollerMine::StickToVehicle( CBaseEntity *pOther )
 {
-	IPhysicsObject *pOtherPhysics = pOther->VPhysicsGetObject();
+	IPhysicsObject *pOtherPhysics = pOther->GetEngineObject()->VPhysicsGetObject();
 	if ( !pOtherPhysics )
 		return;
 
@@ -2150,7 +2150,7 @@ void CNPC_RollerMine::StickToVehicle( CBaseEntity *pOther )
 	// Stick to it and slow it down.
 	m_hVehicleStuckTo = pOther;
 
-	IPhysicsObject *pPhysics = VPhysicsGetObject();
+	IPhysicsObject *pPhysics = GetEngineObject()->VPhysicsGetObject();
 
 	// Constrain us to the vehicle
 	constraint_fixedparams_t fixed;
@@ -2348,7 +2348,7 @@ void CNPC_RollerMine::InputJoltVehicle( inputdata_t &inputdata )
 	// Randomly apply a little vertical lift, to get the wheels off the ground
 	impulse.z = RandomFloat( 0.5, 1.0 );
 	VectorNormalize( impulse );
-	IPhysicsObject *pVehiclePhysics = GetVehicleStuckTo()->VPhysicsGetObject();
+	IPhysicsObject *pVehiclePhysics = GetVehicleStuckTo()->GetEngineObject()->VPhysicsGetObject();
 	Vector vecForce = impulse * ImpulseScale( pVehiclePhysics->GetMass(), RandomFloat(150,250) );
 	pVehiclePhysics->ApplyForceOffset( vecForce, GetEngineObject()->GetAbsOrigin() );
 
@@ -2505,7 +2505,7 @@ void CNPC_RollerMine::OnPhysGunDrop( CBasePlayer *pPhysGunUser, PhysGunDrop_t Re
 			//m_bIsPrimed = true;
 			SetTouch( &CNPC_RollerMine::SpikeTouch );
 			// enable world/prop touch too
-			VPhysicsGetObject()->SetCallbackFlags( VPhysicsGetObject()->GetCallbackFlags() | CALLBACK_GLOBAL_TOUCH|CALLBACK_GLOBAL_TOUCH_STATIC );
+			GetEngineObject()->VPhysicsGetObject()->SetCallbackFlags(GetEngineObject()->VPhysicsGetObject()->GetCallbackFlags() | CALLBACK_GLOBAL_TOUCH|CALLBACK_GLOBAL_TOUCH_STATIC );
 		}
 		const char* soundname = "NPC_RollerMine.Tossed";
 		CPASAttenuationFilter filter(this, soundname);
@@ -2534,7 +2534,7 @@ int CNPC_RollerMine::OnTakeDamage( const CTakeDamageInfo &info )
 		{
 			AngularImpulse	angVel;
 			angVel.Random( -400.0f, 400.0f );
-			VPhysicsGetObject()->AddVelocity( NULL, &angVel );
+			GetEngineObject()->VPhysicsGetObject()->AddVelocity( NULL, &angVel );
 			m_RollerController.m_vecAngular *= 0.8f;
 
 			VPhysicsTakeDamage( info );
@@ -2571,7 +2571,7 @@ void CNPC_RollerMine::Hop( float height )
 
 	if (GetEngineObject()->GetMoveType() == MOVETYPE_VPHYSICS )
 	{
-		IPhysicsObject *pPhysObj = VPhysicsGetObject();
+		IPhysicsObject *pPhysObj = GetEngineObject()->VPhysicsGetObject();
 		pPhysObj->ApplyForceCenter( Vector(0,0,1) * height * pPhysObj->GetMass() );
 		
 		AngularImpulse	angVel;
@@ -2650,7 +2650,7 @@ const float MAX_ROLLING_SPEED = 720;
 //-----------------------------------------------------------------------------
 float CNPC_RollerMine::RollingSpeed()
 {
-	IPhysicsObject *pPhysics = VPhysicsGetObject();
+	IPhysicsObject *pPhysics = GetEngineObject()->VPhysicsGetObject();
 	if ( !m_hVehicleStuckTo && !m_bHeld && pPhysics && !pPhysics->IsAsleep() )
 	{
 		AngularImpulse angVel;

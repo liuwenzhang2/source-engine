@@ -133,7 +133,7 @@ public:
 
 void CDODRagdoll::ImpactTrace(trace_t* pTrace, int iDamageType, const char* pCustomImpactName)
 {
-	IPhysicsObject* pPhysicsObject = VPhysicsGetObject();
+	IPhysicsObject* pPhysicsObject = GetEngineObject()->VPhysicsGetObject();
 
 	if (!pPhysicsObject)
 		return;
@@ -1716,7 +1716,7 @@ bool CDODPlayer::DODWeaponDrop( CBaseCombatWeapon *pWeapon, bool bThrowForward )
 			
 			//Have to teleport the physics object as well
 
-			IPhysicsObject *pWeaponPhys = pWeapon->VPhysicsGetObject();
+			IPhysicsObject *pWeaponPhys = pWeapon->GetEngineObject()->VPhysicsGetObject();
 
 			if( pWeaponPhys )
 			{
@@ -2570,14 +2570,14 @@ CDODPlayerStateInfo* CDODPlayer::State_LookupInfo( DODPlayerState state )
 
 void CDODPlayer::PhysObjectSleep()
 {
-	IPhysicsObject *pObj = VPhysicsGetObject();
+	IPhysicsObject *pObj = GetEngineObject()->VPhysicsGetObject();
 	if ( pObj )
 		pObj->Sleep();
 }
 
 void CDODPlayer::PhysObjectWake()
 {
-	IPhysicsObject *pObj = VPhysicsGetObject();
+	IPhysicsObject *pObj = GetEngineObject()->VPhysicsGetObject();
 	if ( pObj )
 		pObj->Wake();
 }

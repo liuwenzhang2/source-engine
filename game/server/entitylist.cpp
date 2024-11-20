@@ -1540,11 +1540,11 @@ void CEngineObjectInternal::SetParent(IEngineObjectServer* pParentEntity, int iA
 	//UTIL_SetOrigin(this->m_pOuter, localOrigin);
 	this->SetLocalOrigin(localOrigin);
 
-	if (m_pOuter->VPhysicsGetObject())
+	if (VPhysicsGetObject())
 	{
-		if (m_pOuter->VPhysicsGetObject()->IsStatic())
+		if (VPhysicsGetObject()->IsStatic())
 		{
-			if (m_pOuter->VPhysicsGetObject()->IsAttachedToConstraint(false))
+			if (VPhysicsGetObject()->IsAttachedToConstraint(false))
 			{
 				Warning("SetParent on static object, all constraints attached to %s (%s)will now be broken!\n", m_pOuter->GetDebugName(), m_pOuter->GetClassname());
 			}
@@ -2957,7 +2957,7 @@ void CEngineObjectInternal::SetGroundEntity(IEngineObjectServer* ground)
 	if (ground && m_pOuter->IsPlayer() && ground->GetMoveType() == MOVETYPE_VPHYSICS)
 	{
 		CBasePlayer* pPlayer = static_cast<CBasePlayer*>(this->m_pOuter);
-		IPhysicsObject* pPhysGround = ground->GetOuter()->VPhysicsGetObject();
+		IPhysicsObject* pPhysGround = ground->VPhysicsGetObject();
 		if (pPhysGround && pPlayer)
 		{
 			if (pPhysGround->GetGameFlags() & FVPHYSICS_PLAYER_HELD)
@@ -3065,7 +3065,7 @@ void CEngineObjectInternal::CollisionRulesChanged()
 {
 	// ivp maintains state based on recent return values from the collision filter, so anything
 	// that can change the state that a collision filter will return (like m_Solid) needs to call RecheckCollisionFilter.
-	if (m_pOuter->VPhysicsGetObject())
+	if (VPhysicsGetObject())
 	{
 		extern bool PhysIsInCallback();
 		if (PhysIsInCallback())
@@ -3821,13 +3821,13 @@ void CEngineObjectInternal::SetMoveType(MoveType_t val, MoveCollide_t moveCollid
 
 	if (m_MoveType == MOVETYPE_VPHYSICS && val != m_MoveType)
 	{
-		if (m_pOuter->VPhysicsGetObject() && val != MOVETYPE_NONE)
+		if (VPhysicsGetObject() && val != MOVETYPE_NONE)
 		{
 			// What am I supposed to do with the physics object if
 			// you're changing away from MOVETYPE_VPHYSICS without making the object 
 			// shadow?  This isn't likely to work, assert.
 			// You probably meant to call VPhysicsInitShadow() instead of VPhysicsInitNormal()!
-			Assert(m_pOuter->VPhysicsGetObject()->GetShadowController());
+			Assert(VPhysicsGetObject()->GetShadowController());
 		}
 	}
 #endif
@@ -5006,8 +5006,8 @@ bool CEngineObjectInternal::VPhysicsInitSetup()
 
 IPhysicsObject* CEngineObjectInternal::GetGroundVPhysics()
 {
-	CBaseEntity* pGroundEntity = GetGroundEntity() ? GetGroundEntity()->GetOuter() : NULL;
-	;	if (pGroundEntity && pGroundEntity->GetEngineObject()->GetMoveType() == MOVETYPE_VPHYSICS)
+	CEngineObjectInternal* pGroundEntity = GetGroundEntity() ? GetGroundEntity() : NULL;
+	;	if (pGroundEntity && pGroundEntity->GetMoveType() == MOVETYPE_VPHYSICS)
 	{
 		IPhysicsObject* pPhysGround = pGroundEntity->VPhysicsGetObject();
 		if (pPhysGround && pPhysGround->IsMoveable())
@@ -5476,6 +5476,20 @@ CEnginePortalInternal::CEnginePortalInternal()
 
 CEnginePortalInternal::~CEnginePortalInternal(){
 	
+}
+
+IPhysicsObject* CEnginePortalInternal::VPhysicsGetObject(void) const
+{
+	if (GetWorldBrushesPhysicsObject() != NULL)
+		return GetWorldBrushesPhysicsObject();
+	else if (GetWallBrushesPhysicsObject() != NULL)
+		return GetWallBrushesPhysicsObject();
+	else if (GetWallTubePhysicsObject() != NULL)
+		return GetWallTubePhysicsObject();
+	else if (GetRemoteWallBrushesPhysicsObject() != NULL)
+		return GetRemoteWallBrushesPhysicsObject();
+	else
+		return NULL;
 }
 
 int CEnginePortalInternal::VPhysicsGetObjectList(IPhysicsObject** pList, int listMax)
@@ -7402,7 +7416,7 @@ void CEngineShadowCloneInternal::FullSync(bool bAllowAssumedSync)
 {
 	Assert(IsMarkedForDeletion() == false);
 
-	CBaseEntity* pClonedEntity = m_hClonedEntity.Get();
+	IEngineObjectServer* pClonedEntity = m_hClonedEntity.Get() ? m_hClonedEntity.Get()->GetEngineObject() : NULL;
 
 	if (pClonedEntity == NULL)
 	{
@@ -7423,7 +7437,7 @@ void CEngineShadowCloneInternal::FullSync(bool bAllowAssumedSync)
 	if (bAllowAssumedSync)
 	{
 		IPhysicsObject* pSourceObjects[1024];
-		int iObjectCount = pClonedEntity->GetEngineObject()->VPhysicsGetObjectList(pSourceObjects, 1024);
+		int iObjectCount = pClonedEntity->VPhysicsGetObjectList(pSourceObjects, 1024);
 
 		//scan for really big differences that would definitely require a full sync
 		bBigChanges = (iObjectCount != m_CloneLinks.Count());
@@ -7515,7 +7529,7 @@ void CEngineShadowCloneInternal::FullSync(bool bAllowAssumedSync)
 
 	if (bBigChanges)
 	{
-		MoveType_t sourceMoveType = pClonedEntity->GetEngineObject()->GetMoveType();
+		MoveType_t sourceMoveType = pClonedEntity->GetMoveType();
 
 
 		IPhysicsObject* pPhysObject = pClonedEntity->VPhysicsGetObject();
@@ -7534,7 +7548,7 @@ void CEngineShadowCloneInternal::FullSync(bool bAllowAssumedSync)
 			SetMoveType(MOVETYPE_NONE); //to kill an assert
 			//#endif
 						//PUSH should be used sparingly, you can't stand on a MOVETYPE_PUSH object :/
-			SetMoveType(MOVETYPE_VPHYSICS, pClonedEntity->GetEngineObject()->GetMoveCollide()); //either an unclonable movetype, or a shadow/held object
+			SetMoveType(MOVETYPE_VPHYSICS, pClonedEntity->GetMoveCollide()); //either an unclonable movetype, or a shadow/held object
 		}
 		/*else if(sourceMoveType == MOVETYPE_STEP)
 		{
@@ -7544,7 +7558,7 @@ void CEngineShadowCloneInternal::FullSync(bool bAllowAssumedSync)
 		else
 		{
 			//if( m_bShadowTransformIsIdentity )
-			SetMoveType(sourceMoveType, pClonedEntity->GetEngineObject()->GetMoveCollide());
+			SetMoveType(sourceMoveType, pClonedEntity->GetMoveCollide());
 			//else
 			//{
 			//	GetEngineObject()->SetMoveType( MOVETYPE_NONE ); //to kill an assert
@@ -7552,19 +7566,19 @@ void CEngineShadowCloneInternal::FullSync(bool bAllowAssumedSync)
 			//}
 		}
 
-		SolidType_t sourceSolidType = pClonedEntity->GetEngineObject()->GetSolid();
+		SolidType_t sourceSolidType = pClonedEntity->GetSolid();
 		if (sourceSolidType == SOLID_BBOX)
 			SetSolid(SOLID_VPHYSICS);
 		else
 			SetSolid(sourceSolidType);
 		//SetSolid( SOLID_VPHYSICS );
 
-		SetElasticity(pClonedEntity->GetEngineObject()->GetElasticity());
-		SetFriction(pClonedEntity->GetEngineObject()->GetFriction());
+		SetElasticity(pClonedEntity->GetElasticity());
+		SetFriction(pClonedEntity->GetFriction());
 
 
 
-		int iSolidFlags = pClonedEntity->GetEngineObject()->GetSolidFlags() | FSOLID_CUSTOMRAYTEST;
+		int iSolidFlags = pClonedEntity->GetSolidFlags() | FSOLID_CUSTOMRAYTEST;
 		if (m_bShadowTransformIsIdentity)
 			iSolidFlags |= FSOLID_CUSTOMBOXTEST; //need this at least for the player or they get stuck in themselves
 		else
@@ -7578,17 +7592,17 @@ void CEngineShadowCloneInternal::FullSync(bool bAllowAssumedSync)
 
 
 
-		SetEffects(pClonedEntity->GetEngineObject()->GetEffects() | (EF_NODRAW | EF_NOSHADOW | EF_NORECEIVESHADOW));
+		SetEffects(pClonedEntity->GetEffects() | (EF_NODRAW | EF_NOSHADOW | EF_NORECEIVESHADOW));
 
-		SetCollisionGroup(pClonedEntity->GetEngineObject()->GetCollisionGroup());
+		SetCollisionGroup(pClonedEntity->GetCollisionGroup());
 
-		SetModelIndex(pClonedEntity->GetEngineObject()->GetModelIndex());
-		SetModelName(pClonedEntity->GetEngineObject()->GetModelName());
+		SetModelIndex(pClonedEntity->GetModelIndex());
+		SetModelName(pClonedEntity->GetModelName());
 
-		if (modelinfo->GetModelType(pClonedEntity->GetEngineObject()->GetModel()) == mod_studio)
-			m_pOuter->SetModel(STRING(pClonedEntity->GetEngineObject()->GetModelName()));
+		if (modelinfo->GetModelType(pClonedEntity->GetModel()) == mod_studio)
+			m_pOuter->SetModel(STRING(pClonedEntity->GetModelName()));
 
-		m_pOuter->SetSize(pClonedEntity->GetEngineObject()->OBBMins(), pClonedEntity->GetEngineObject()->OBBMaxs());
+		m_pOuter->SetSize(pClonedEntity->OBBMins(), pClonedEntity->OBBMaxs());
 	}
 
 	FullSyncClonedPhysicsObjects(bBigChanges);
@@ -7850,7 +7864,7 @@ static void PartialSyncPhysicsObject(IPhysicsObject* pSource, IPhysicsObject* pD
 
 void CEngineShadowCloneInternal::FullSyncClonedPhysicsObjects(bool bTeleport)
 {
-	CBaseEntity* pClonedEntity = m_hClonedEntity.Get();
+	IEngineObjectServer* pClonedEntity = m_hClonedEntity.Get() ? m_hClonedEntity.Get()->GetEngineObject() : NULL;
 	if (pClonedEntity == NULL)
 	{
 		VPhysicsDestroyObject();
@@ -7864,7 +7878,7 @@ void CEngineShadowCloneInternal::FullSyncClonedPhysicsObjects(bool bTeleport)
 		pTransform = &m_matrixShadowTransform;
 
 	IPhysicsObject* (pSourceObjects[1024]);
-	int iObjectCount = pClonedEntity->GetEngineObject()->VPhysicsGetObjectList(pSourceObjects, 1024);
+	int iObjectCount = pClonedEntity->VPhysicsGetObjectList(pSourceObjects, 1024);
 
 	//easy out if nothing has changed
 	if (iObjectCount == m_CloneLinks.Count())
@@ -7963,7 +7977,7 @@ void CEngineShadowCloneInternal::FullSyncClonedPhysicsObjects(bool bTeleport)
 
 	VPhysicsSetObject(NULL);
 
-	IPhysicsObject* pSource = m_hClonedEntity->VPhysicsGetObject();
+	IPhysicsObject* pSource = pClonedEntity->VPhysicsGetObject();
 
 	for (i = m_CloneLinks.Count(); --i >= 0; )
 	{
@@ -8365,11 +8379,11 @@ bool CEngineVehicleInternal::Initialize(const char* pVehicleScript, unsigned int
 	// Ok, turn on the simulation now
 	// FIXME: Disabling collisions here is necessary because we seem to be
 	// getting a one-frame collision between the old + new collision models
-	if (m_pOuter->VPhysicsGetObject())
+	if (VPhysicsGetObject())
 	{
-		m_pOuter->VPhysicsGetObject()->EnableCollisions(false);
+		VPhysicsGetObject()->EnableCollisions(false);
 	}
-	m_pOuter->GetEngineObject()->VPhysicsDestroyObject();
+	VPhysicsDestroyObject();
 
 	// Create the vphysics model + teleport it into position
 	solid_t solid;
@@ -8539,7 +8553,7 @@ void CEngineVehicleInternal::Teleport(matrix3x4_t& relativeTransform)
 	// Wake the vehicle back up after a teleport
 	//if (GetOuterServerVehicle() && GetOuterServerVehicle()->GetFourWheelVehicle())
 	//{
-		IPhysicsObject* pObj = m_pOuter->VPhysicsGetObject();
+		IPhysicsObject* pObj = VPhysicsGetObject();
 		if (pObj)
 		{
 			pObj->Wake();
@@ -8574,7 +8588,7 @@ void CEngineVehicleInternal::DrawDebugGeometryOverlays()
 	}
 
 	// Render vehicle data.
-	IPhysicsObject* pBody = m_pOuter->VPhysicsGetObject();
+	IPhysicsObject* pBody = VPhysicsGetObject();
 	if (pBody)
 	{
 		const vehicleparams_t vehicleParams = m_pVehicle->GetVehicleParams();
@@ -8730,7 +8744,7 @@ bool CEngineVehicleInternal::Think()
 
 	// UNDONE: Use skid info from the physics system?
 	// Only check wheels if we're not being carried by a dropship
-	if (m_pOuter->VPhysicsGetObject() && !m_pOuter->VPhysicsGetObject()->GetShadowController())
+	if (VPhysicsGetObject() && !VPhysicsGetObject()->GetShadowController())
 	{
 		const float skidFactor = 0.15f;
 		const float minSpeed = DEFAULT_SKID_THRESHOLD / skidFactor;
@@ -9431,7 +9445,7 @@ int CEngineVehicleInternal::VPhysicsGetObjectList(IPhysicsObject** pList, int li
 {
 	int count = 0;
 	// add the body
-	count = AddPhysToList(pList, listMax, count, m_pOuter->VPhysicsGetObject());
+	count = AddPhysToList(pList, listMax, count, VPhysicsGetObject());
 	for (int i = 0; i < 4; i++)
 	{
 		count = AddPhysToList(pList, listMax, count, m_pWheels[i]);

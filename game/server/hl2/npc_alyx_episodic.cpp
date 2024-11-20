@@ -1667,9 +1667,9 @@ void CNPC_Alyx::BuildScheduleTestBits()
 	// case where her relationship with the enemy changes while she's running a SCHED_SCENE_GENERIC. 
 	// Since we don't run ChooseEnemy() when we're running a schedule that doesn't interrupt on COND_NEW_ENEMY,
 	// we also do not re-evaluate and flush enemies we don't hate anymore. (sjb 6/9/2005)
-	if( IsCurSchedule(SCHED_SCENE_GENERIC) && GetEnemy() && GetEnemy()->VPhysicsGetObject() )
+	if( IsCurSchedule(SCHED_SCENE_GENERIC) && GetEnemy() && GetEnemy()->GetEngineObject()->VPhysicsGetObject() )
 	{
-		if( GetEnemy()->VPhysicsGetObject()->GetGameFlags() & FVPHYSICS_PLAYER_HELD )
+		if( GetEnemy()->GetEngineObject()->VPhysicsGetObject()->GetGameFlags() & FVPHYSICS_PLAYER_HELD )
 		{
 			SetCustomInterruptCondition( COND_NEW_ENEMY );
 		}
@@ -2523,7 +2523,7 @@ bool CNPC_Alyx::IsValidInteractTarget( CBaseEntity *pTarget )
 
 	IPhysicsObject *pPhysics;
 
-	pPhysics = pTarget->VPhysicsGetObject();
+	pPhysics = pTarget->GetEngineObject()->VPhysicsGetObject();
 	if( pPhysics )
 	{
 		if( !(pPhysics->GetGameFlags() & FVPHYSICS_PLAYER_HELD) )

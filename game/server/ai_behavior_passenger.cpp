@@ -188,7 +188,7 @@ void CAI_PassengerBehavior::AddPhysicsPush( float force )
 
 	Vector vecDir;
 
-	IPhysicsObject *pObject = GetOuter()->VPhysicsGetObject();
+	IPhysicsObject *pObject = GetOuter()->GetEngineObject()->VPhysicsGetObject();
 	Vector vecVelocity;
 	pObject->GetVelocity( &vecVelocity, NULL );
 	GetOuter()->GetVectors( NULL, NULL, &vecDir );
@@ -196,7 +196,7 @@ void CAI_PassengerBehavior::AddPhysicsPush( float force )
 
 	Vector vecForce = vecDir * force;
 
-	m_hVehicle->VPhysicsGetObject()->ApplyForceOffset( vecForce, GetOuter()->GetEngineObject()->GetAbsOrigin() );
+	m_hVehicle->GetEngineObject()->VPhysicsGetObject()->ApplyForceOffset( vecForce, GetOuter()->GetEngineObject()->GetAbsOrigin() );
 }
 
 //-----------------------------------------------------------------------------
@@ -291,7 +291,7 @@ void CAI_PassengerBehavior::FinishExitVehicle( void )
 	GetOuter()->GetMotor()->SetYawLocked( false );
 
 	// Re-enable the physical collisions for this NPC
-	IPhysicsObject *pPhysObj = GetOuter()->VPhysicsGetObject();
+	IPhysicsObject *pPhysObj = GetOuter()->GetEngineObject()->VPhysicsGetObject();
 	if ( pPhysObj != NULL )
 	{
 		pPhysObj->EnableCollisions( true );
@@ -879,7 +879,7 @@ void CAI_PassengerBehavior::AttachToVehicle( void )
 	GetOuter()->GetEngineObject()->SetCollisionGroup( COLLISION_GROUP_IN_VEHICLE );
 
 	// Turn off physical interactions while we're in the vehicle
-	IPhysicsObject *pPhysObj = GetOuter()->VPhysicsGetObject();
+	IPhysicsObject *pPhysObj = GetOuter()->GetEngineObject()->VPhysicsGetObject();
 	if ( pPhysObj != NULL )
 	{
 		pPhysObj->EnableCollisions( false );

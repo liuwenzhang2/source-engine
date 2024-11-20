@@ -279,13 +279,13 @@ bool HateThisStriderBuster( CBaseEntity *pTarget )
 	if ( StriderBuster_WasKnockedOffStrider(pTarget) )
 		return false;
 
-	if ( pTarget->VPhysicsGetObject() )
+	if ( pTarget->GetEngineObject()->VPhysicsGetObject() )
 	{
 		if ( hunter_hate_held_striderbusters.GetBool() || 
 			hunter_hate_thrown_striderbusters.GetBool() ||
 			hunter_hate_attached_striderbusters.GetBool() )
 		{
-			if ( ( pTarget->VPhysicsGetObject()->GetGameFlags() & ( FVPHYSICS_PLAYER_HELD | FVPHYSICS_WAS_THROWN ) ) )
+			if ( ( pTarget->GetEngineObject()->VPhysicsGetObject()->GetGameFlags() & ( FVPHYSICS_PLAYER_HELD | FVPHYSICS_WAS_THROWN ) ) )
 			{
 				return true;
 			}
@@ -2018,7 +2018,7 @@ void CNPC_Hunter::PostNPCInit()
 {
 	BaseClass::PostNPCInit();
 
-	IPhysicsObject *pPhysObject = VPhysicsGetObject();
+	IPhysicsObject *pPhysObject = GetEngineObject()->VPhysicsGetObject();
 	Assert( pPhysObject );
 	if ( pPhysObject )
 	{
@@ -2663,7 +2663,7 @@ void CNPC_Hunter::BuildScheduleTestBits()
 //-----------------------------------------------------------------------------
 static bool IsMovablePhysicsObject( CBaseEntity *pEntity )
 {
-	return pEntity && pEntity->GetEngineObject()->GetMoveType() == MOVETYPE_VPHYSICS && pEntity->VPhysicsGetObject() && pEntity->VPhysicsGetObject()->IsMoveable();
+	return pEntity && pEntity->GetEngineObject()->GetMoveType() == MOVETYPE_VPHYSICS && pEntity->GetEngineObject()->VPhysicsGetObject() && pEntity->GetEngineObject()->VPhysicsGetObject()->IsMoveable();
 }
 
 
@@ -3366,7 +3366,7 @@ void CNPC_Hunter::TaskFindDodgeActivity()
 		trace_t tr;
 		HunterTraceHull_SkipPhysics(GetEngineObject()->GetAbsOrigin(), GetEngineObject()->GetAbsOrigin() + vecDelta, 
 			testHullMins, GetHullMaxs(), MASK_NPCSOLID, this, GetEngineObject()->GetCollisionGroup(), 
-			&tr, VPhysicsGetObject()->GetMass() * 0.5f );
+			&tr, GetEngineObject()->VPhysicsGetObject()->GetMass() * 0.5f );
 
 		// TODO: dodge anyway if we'll make it a certain percentage of the way through the dodge?
 		if ( tr.fraction == 1.0f )
@@ -4012,7 +4012,7 @@ void CNPC_Hunter::ChargeLookAhead( void )
 	Vector vecTestPos = GetAbsOrigin() + ( vecForward * m_flGroundSpeed * 0.75 );
 	Vector testHullMins = GetHullMins();
 	testHullMins.z += (StepHeight() * 2);
-	HunterTraceHull_SkipPhysics( GetAbsOrigin(), vecTestPos, testHullMins, GetHullMaxs(), MASK_SHOT_HULL, this, COLLISION_GROUP_NONE, &tr, VPhysicsGetObject()->GetMass() * 0.5 );
+	HunterTraceHull_SkipPhysics( GetAbsOrigin(), vecTestPos, testHullMins, GetHullMaxs(), MASK_SHOT_HULL, this, COLLISION_GROUP_NONE, &tr, GetEngineObject()->VPhysicsGetObject()->GetMass() * 0.5 );
 
 	//NDebugOverlay::Box( tr.startpos, testHullMins, GetHullMaxs(), 0, 255, 0, true, 0.1f );
 	//NDebugOverlay::Box( vecTestPos, testHullMins, GetHullMaxs(), 255, 0, 0, true, 0.1f );
@@ -4056,7 +4056,7 @@ float CNPC_Hunter::ChargeSteer()
 	testHullMins.z += (StepHeight() * 2);
 
 	// Probe
-	HunterTraceHull_SkipPhysics(GetEngineObject()->GetAbsOrigin(), testPos, testHullMins, GetHullMaxs(), MASK_NPCSOLID, this, COLLISION_GROUP_NONE, &tr, VPhysicsGetObject()->GetMass() * 0.5f );
+	HunterTraceHull_SkipPhysics(GetEngineObject()->GetAbsOrigin(), testPos, testHullMins, GetHullMaxs(), MASK_NPCSOLID, this, COLLISION_GROUP_NONE, &tr, GetEngineObject()->VPhysicsGetObject()->GetMass() * 0.5f );
 
 	// Debug info
 	if ( g_debug_hunter_charge.GetInt() == 1 )
@@ -4080,7 +4080,7 @@ float CNPC_Hunter::ChargeSteer()
 
 	// Probe out
 	testPos = GetEngineObject()->GetAbsOrigin() + ( forward * testLength );
-	HunterTraceHull_SkipPhysics(GetEngineObject()->GetAbsOrigin(), testPos, testHullMins, GetHullMaxs(), MASK_NPCSOLID, this, COLLISION_GROUP_NONE, &tr, VPhysicsGetObject()->GetMass() * 0.5f );
+	HunterTraceHull_SkipPhysics(GetEngineObject()->GetAbsOrigin(), testPos, testHullMins, GetHullMaxs(), MASK_NPCSOLID, this, COLLISION_GROUP_NONE, &tr, GetEngineObject()->VPhysicsGetObject()->GetMass() * 0.5f );
 
 	// Debug
 	if ( g_debug_hunter_charge.GetInt() == 1 )
@@ -4231,7 +4231,7 @@ bool CNPC_Hunter::HandleChargeImpact( Vector vecImpact, CBaseEntity *pEntity )
 	// If it's a vphysics object that's too heavy, crash into it too.
 	if ( pEntity->GetEngineObject()->GetMoveType() == MOVETYPE_VPHYSICS )
 	{
-		IPhysicsObject *pPhysics = pEntity->VPhysicsGetObject();
+		IPhysicsObject *pPhysics = pEntity->GetEngineObject()->VPhysicsGetObject();
 		if ( pPhysics )
 		{
 			// If the object is being held by the player, knock it out of his hands
@@ -4245,7 +4245,7 @@ bool CNPC_Hunter::HandleChargeImpact( Vector vecImpact, CBaseEntity *pEntity )
 				return true;
 
 			float entMass = PhysGetEntityMass( pEntity ) ;
-			float minMass = VPhysicsGetObject()->GetMass() * 0.5f;
+			float minMass = GetEngineObject()->VPhysicsGetObject()->GetMass() * 0.5f;
 			if ( entMass < minMass )
 			{
 				if ( entMass < minMass * 0.666f || pEntity->GetEngineObject()->BoundingRadius() < GetHullHeight() )
@@ -4722,9 +4722,9 @@ bool CNPC_Hunter::IsValidEnemy( CBaseEntity *pTarget )
 			return false;
 		}
 
-		if ( pTarget->VPhysicsGetObject() )
+		if ( pTarget->GetEngineObject()->VPhysicsGetObject() )
 		{
-			if ( ( pTarget->VPhysicsGetObject()->GetGameFlags() & FVPHYSICS_PLAYER_HELD ) &&
+			if ( ( pTarget->GetEngineObject()->VPhysicsGetObject()->GetGameFlags() & FVPHYSICS_PLAYER_HELD ) &&
 				hunter_hate_held_striderbusters.GetBool() )
 			{
 				if ( gpGlobals->curtime - StriderBuster_GetPickupTime( pTarget ) > hunter_hate_held_striderbusters_delay.GetFloat())
@@ -4741,7 +4741,7 @@ bool CNPC_Hunter::IsValidEnemy( CBaseEntity *pTarget )
 				return false;
 			}
 
-			bool bThrown = ( pTarget->VPhysicsGetObject()->GetGameFlags() & FVPHYSICS_WAS_THROWN ) != 0;
+			bool bThrown = ( pTarget->GetEngineObject()->VPhysicsGetObject()->GetGameFlags() & FVPHYSICS_WAS_THROWN ) != 0;
 			bool bAttached = StriderBuster_IsAttachedStriderBuster( pTarget );
 
 			if ( ( bThrown && !bAttached ) && hunter_hate_thrown_striderbusters.GetBool() )
@@ -5268,7 +5268,7 @@ CBaseEntity *CNPC_Hunter::MeleeAttack( float flDist, int iDamage, QAngle &qaView
 			if ( IsMovablePhysicsObject( pHurt ) )
 			{
 				// If it's a vphysics object that's too heavy, crash into it too.
-				IPhysicsObject *pPhysics = pHurt->VPhysicsGetObject();
+				IPhysicsObject *pPhysics = pHurt->GetEngineObject()->VPhysicsGetObject();
 				if ( pPhysics )
 				{
 					// If the object is being held by the player, break it or make them drop it.
@@ -5724,9 +5724,9 @@ void CNPC_Hunter::JostleVehicleThink()
 
 	float flForceScale = RemapValClamped( flSpeed, hunter_jostle_car_min_speed.GetFloat(), hunter_jostle_car_max_speed.GetFloat(), 50.0f, 150.0f );
 
-	vecForce *= ( flForceScale * pInflictor->VPhysicsGetObject()->GetMass() );
+	vecForce *= ( flForceScale * pInflictor->GetEngineObject()->VPhysicsGetObject()->GetMass() );
 
-	pInflictor->VPhysicsGetObject()->ApplyForceOffset( vecForce, WorldSpaceCenter() );
+	pInflictor->GetEngineObject()->VPhysicsGetObject()->ApplyForceOffset( vecForce, WorldSpaceCenter() );
 }
 
 
@@ -5741,7 +5741,7 @@ int CNPC_Hunter::OnTakeDamage( const CTakeDamageInfo &info )
 		// Don't take damage from physics objects that weren't thrown by the player.
 		CBaseEntity *pInflictor = info.GetInflictor();
 
-		IPhysicsObject *pObj = pInflictor->VPhysicsGetObject();
+		IPhysicsObject *pObj = pInflictor->GetEngineObject()->VPhysicsGetObject();
 		//Assert( pObj );
 
 		if ( !pObj || !pInflictor->HasPhysicsAttacker( 4.0 ) )
@@ -6101,7 +6101,7 @@ bool CNPC_Hunter::ShouldProbeCollideAgainstEntity( CBaseEntity *pEntity )
 
 	if ( pEntity->GetEngineObject()->GetMoveType() == MOVETYPE_VPHYSICS )
 	{
-		IPhysicsObject *pPhysObj = pEntity->VPhysicsGetObject();
+		IPhysicsObject *pPhysObj = pEntity->GetEngineObject()->VPhysicsGetObject();
 
 		if( pPhysObj && pPhysObj->GetMass() <= 500.0f )
 		{
@@ -6328,7 +6328,7 @@ bool CNPC_Hunter::ShouldSeekTarget( CBaseEntity *pTargetEntity, bool bStriderBus
 	{
 		bool bSeek = false;
 
-		if ( pTargetEntity->VPhysicsGetObject() && ( pTargetEntity->VPhysicsGetObject()->GetGameFlags() & FVPHYSICS_PLAYER_HELD ) )
+		if ( pTargetEntity->GetEngineObject()->VPhysicsGetObject() && ( pTargetEntity->GetEngineObject()->VPhysicsGetObject()->GetGameFlags() & FVPHYSICS_PLAYER_HELD ) )
 		{
 			bSeek = true;
 		}

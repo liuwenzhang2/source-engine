@@ -306,10 +306,10 @@ bool CNPC_BaseZombie::FindNearestPhysicsObject( int iMaxMass )
 		{
 			CBaseEntity *pEntity = gEntList.GetBaseEntity( pHandleEntity->GetRefEHandle() );
 			if ( pEntity && 
-				 pEntity->VPhysicsGetObject() && 
-				 pEntity->VPhysicsGetObject()->GetMass() <= m_iMaxMass && 
-				 pEntity->VPhysicsGetObject()->IsAsleep() && 
-				 pEntity->VPhysicsGetObject()->IsMoveable() )
+				 pEntity->GetEngineObject()->VPhysicsGetObject() &&
+				 pEntity->GetEngineObject()->VPhysicsGetObject()->GetMass() <= m_iMaxMass &&
+				 pEntity->GetEngineObject()->VPhysicsGetObject()->IsAsleep() &&
+				 pEntity->GetEngineObject()->VPhysicsGetObject()->IsMoveable() )
 			{
 				return CFlaggedEntitiesEnum::EnumElement( pHandleEntity );
 			}
@@ -329,7 +329,7 @@ bool CNPC_BaseZombie::FindNearestPhysicsObject( int iMaxMass )
 
 	for( i = 0 ; i < count ; i++ )
 	{
-		pPhysObj = pList[ i ]->VPhysicsGetObject();
+		pPhysObj = pList[ i ]->GetEngineObject()->VPhysicsGetObject();
 
 		Assert( !( !pPhysObj || pPhysObj->GetMass() > iMaxMass || !pPhysObj->IsAsleep() ) );
 
@@ -1560,7 +1560,7 @@ void CNPC_BaseZombie::HandleAnimEvent( animevent_t *pEvent )
 				return;
 			}
 			
-			IPhysicsObject *pPhysObj = pPhysicsEntity->VPhysicsGetObject();
+			IPhysicsObject *pPhysObj = pPhysicsEntity->GetEngineObject()->VPhysicsGetObject();
 
 			if( !pPhysObj )
 			{
@@ -1882,8 +1882,8 @@ int	CNPC_BaseZombie::SelectFailSchedule( int failedSchedule, int failedTask, AI_
 	if ( CanSwatPhysicsObjects() )
 	{
 		if ( !m_fIsTorso && IsPathTaskFailure( taskFailCode ) && 
-			 m_hObstructor != NULL && m_hObstructor->VPhysicsGetObject() && 
-			 m_hObstructor->VPhysicsGetObject()->GetMass() < 100 )
+			 m_hObstructor != NULL && m_hObstructor->GetEngineObject()->VPhysicsGetObject() &&
+			 m_hObstructor->GetEngineObject()->VPhysicsGetObject()->GetMass() < 100 )
 		{
 			m_hPhysicsEnt = m_hObstructor;
 			m_hObstructor = NULL;

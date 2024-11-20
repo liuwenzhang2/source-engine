@@ -608,7 +608,7 @@ bool PlayerLocomotion::IsClimbPossible( INextBot *me, const CBaseEntity *obstacl
 			// always allow climbing over movable obstacles
 			if ( obstacle && !const_cast< CBaseEntity * >( obstacle )->IsWorld() )
 			{
-				IPhysicsObject *physics = obstacle->VPhysicsGetObject();
+				IPhysicsObject *physics = obstacle->GetEngineObject()->VPhysicsGetObject();
 				if ( physics && physics->IsMoveable() )
 				{
 					// movable physics object - climb over it

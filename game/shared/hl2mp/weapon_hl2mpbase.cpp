@@ -260,7 +260,7 @@ void CWeaponHL2MPBase::FallInit( void )
 				IPhysicsObject *pReferenceObject, *pAttachedObject;
 				
 				pReferenceObject = g_PhysWorldObject;
-				pAttachedObject = VPhysicsGetObject();
+				pAttachedObject = GetEngineObject()->VPhysicsGetObject();
 
 				if ( pReferenceObject && pAttachedObject )
 				{

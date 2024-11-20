@@ -350,8 +350,8 @@ void CNPC_Barnacle::Activate( void )
 	}
 	else if ( GetEnemy() && IsEnemyAPlayer() && !m_pConstraint )
 	{
-		IPhysicsObject *pPlayerPhys = GetEnemy()->VPhysicsGetObject();
-		IPhysicsObject *pTonguePhys = m_hTongueTip->VPhysicsGetObject();
+		IPhysicsObject *pPlayerPhys = GetEnemy()->GetEngineObject()->VPhysicsGetObject();
+		IPhysicsObject *pTonguePhys = m_hTongueTip->GetEngineObject()->VPhysicsGetObject();
 
 		constraint_fixedparams_t fixed;
 		fixed.Defaults();
@@ -938,7 +938,7 @@ void CNPC_Barnacle::PullEnemyTorwardsMouth( bool bAdjustEnemyOrigin )
 				desiredVelocity.y = vToCenter.y * distToMove;
 				desiredVelocity.z = 0;
 #if 0			// here is a physical force-based way (too noisy!):
-				IPhysicsObject *pTonguePhys = m_hTongueTip->VPhysicsGetObject();
+				IPhysicsObject *pTonguePhys = m_hTongueTip->GetEngineObject()->VPhysicsGetObject();
 				pTonguePhys->ApplyForceCenter(desiredVelocity);
 #else
 				vecNewPos = playerOrigin + desiredVelocity;
@@ -988,8 +988,8 @@ void CNPC_Barnacle::UpdatePlayerConstraint( void )
 	if ( m_hTongueTip )
 	{
 		// Create the new constraint for the standing/ducking player physics object.
-		IPhysicsObject *pPlayerPhys = pPlayer->VPhysicsGetObject();
-		IPhysicsObject *pTonguePhys = m_hTongueTip->VPhysicsGetObject();
+		IPhysicsObject *pPlayerPhys = pPlayer->GetEngineObject()->VPhysicsGetObject();
+		IPhysicsObject *pTonguePhys = m_hTongueTip->GetEngineObject()->VPhysicsGetObject();
 		
 		constraint_fixedparams_t fixed;
 		fixed.Defaults();
@@ -1363,7 +1363,7 @@ CRagdollProp *CNPC_Barnacle::AttachRagdollToTongue( CBaseAnimating *pAnimating )
 	//NDebugOverlay::Box( vecBonePos, -Vector(5,5,5), Vector(5,5,5), 255,255,255, 0, 10.0 );
 
 	// Create the ragdoll attached to tongue
-	IPhysicsObject *pTonguePhysObject = m_hTongueTip->VPhysicsGetObject();
+	IPhysicsObject *pTonguePhysObject = m_hTongueTip->GetEngineObject()->VPhysicsGetObject();
 	CRagdollProp *pRagdoll = CreateServerRagdollAttached( pAnimating, vec3_origin, -1, COLLISION_GROUP_NONE, pTonguePhysObject, m_hTongueTip, 0, vecBonePos, m_iGrabbedBoneIndex, vec3_origin );
 	if ( pRagdoll )
 	{
@@ -1496,8 +1496,8 @@ void CNPC_Barnacle::AttachTongueToTarget( CBaseEntity *pTouchEnt, Vector vecGrab
 	if ( IsEnemyAPlayer() || IsEnemyAPhysicsObject() )
 	{
 		// The player (and phys objects) doesn't ragdoll, so just grab him and pull him up manually
-		IPhysicsObject *pPlayerPhys = pTouchEnt->VPhysicsGetObject();
-		IPhysicsObject *pTonguePhys = m_hTongueTip->VPhysicsGetObject();
+		IPhysicsObject *pPlayerPhys = pTouchEnt->GetEngineObject()->VPhysicsGetObject();
+		IPhysicsObject *pTonguePhys = m_hTongueTip->GetEngineObject()->VPhysicsGetObject();
 
 		Vector vecGrabPos;
 		if ( pTouchEnt->IsPlayer() )
@@ -1607,7 +1607,7 @@ void CNPC_Barnacle::SpitPrey()
 {
 	if ( GetEnemy() )
 	{
-		IPhysicsObject *pObject = GetEnemy()->VPhysicsGetObject();
+		IPhysicsObject *pObject = GetEnemy()->GetEngineObject()->VPhysicsGetObject();
 		if (pObject)
 		{
 			Vector vecPosition, force;
@@ -1645,7 +1645,7 @@ void CNPC_Barnacle::BitePrey( void )
 				// Stop the ragdoll moving and start to pull the sucker up into our mouth
 				m_bSwallowingPrey = true;
 				m_bSwallowingBomb = true;
-				IPhysicsObject *pTonguePhys = m_hTongueTip->VPhysicsGetObject();
+				IPhysicsObject *pTonguePhys = m_hTongueTip->GetEngineObject()->VPhysicsGetObject();
 
 				// Stop the tongue's spring getting in the way of swallowing
 				m_hTongueTip->m_pSpring->SetSpringConstant( 0 );
@@ -1786,10 +1786,10 @@ void CNPC_Barnacle::BitePrey( void )
 
 	// Stop the ragdoll moving and start to pull the sucker up into our mouth
 	m_bSwallowingPrey = true;
-	IPhysicsObject *pTonguePhys = m_hTongueTip->VPhysicsGetObject();
+	IPhysicsObject *pTonguePhys = m_hTongueTip->GetEngineObject()->VPhysicsGetObject();
 
 	// Make it nonsolid to the world so we can pull it through the roof
-	PhysDisableEntityCollisions( m_hRagdoll->VPhysicsGetObject(), g_PhysWorldObject );
+	PhysDisableEntityCollisions( m_hRagdoll->GetEngineObject()->VPhysicsGetObject(), g_PhysWorldObject );
 
 	// Stop the tongue's spring getting in the way of swallowing
 	m_hTongueTip->m_pSpring->SetSpringConstant( 0 );
@@ -2009,7 +2009,7 @@ void CNPC_Barnacle::LostPrey( bool bRemoveRagdoll )
 	if ( m_hTongueTip )
 	{
 		// Remove our tongue's shadow object, in case we just finished swallowing something
-		IPhysicsObject *pPhysicsObject = m_hTongueTip->VPhysicsGetObject();
+		IPhysicsObject *pPhysicsObject = m_hTongueTip->GetEngineObject()->VPhysicsGetObject();
 		if ( pPhysicsObject && pPhysicsObject->GetShadowController() )
 		{
 			Vector vecCenter = WorldSpaceCenter();
@@ -2244,7 +2244,7 @@ void CNPC_Barnacle::WaitTillDead ( void )
 	else
 	{
 		// Wait for settling...
-		IPhysicsObject *pTipObject = m_hTongueTip->VPhysicsGetObject();
+		IPhysicsObject *pTipObject = m_hTongueTip->GetEngineObject()->VPhysicsGetObject();
 		
 		Vector vecVelocity;
 		AngularImpulse angVel;
@@ -2585,7 +2585,7 @@ CBaseEntity *CNPC_Barnacle::TongueTouchEnt ( float *pflLength )
 		// Deal with physics objects
 		if ( pTest->GetEngineObject()->GetMoveType() == MOVETYPE_VPHYSICS )
 		{
-			IPhysicsObject *pObject = pTest->VPhysicsGetObject();
+			IPhysicsObject *pObject = pTest->GetEngineObject()->VPhysicsGetObject();
 			if ( pObject && pObject->GetMass() <= BARNACLE_TONGUE_MAX_LIFT_MASS )
 			{
 				// If this is an item, make sure it's near the tongue before lifting it.
@@ -2721,8 +2721,8 @@ void CBarnacleTongueTip::VPhysicsUpdate( IPhysicsObject *pPhysics )
 //-----------------------------------------------------------------------------
 bool CBarnacleTongueTip::CreateSpring( CBaseAnimating *pTongueRoot )
 {
-	IPhysicsObject *pPhysObject = VPhysicsGetObject();
-	IPhysicsObject *pRootPhysObject = pTongueRoot->VPhysicsGetObject();
+	IPhysicsObject *pPhysObject = GetEngineObject()->VPhysicsGetObject();
+	IPhysicsObject *pRootPhysObject = pTongueRoot->GetEngineObject()->VPhysicsGetObject();
 	Assert( pRootPhysObject );
 	Assert( pPhysObject );
 
@@ -2763,7 +2763,7 @@ CBarnacleTongueTip *CBarnacleTongueTip::CreateTongueTip( CNPC_Barnacle *pBarnacl
 	pTip->m_hBarnacle = pBarnacle;
 
 	// Don't collide with the world
-	IPhysicsObject *pTipPhys = pTip->VPhysicsGetObject();
+	IPhysicsObject *pTipPhys = pTip->GetEngineObject()->VPhysicsGetObject();
 
 	// turn off all floating / fluid simulation
 	pTipPhys->SetCallbackFlags( pTipPhys->GetCallbackFlags() & (~CALLBACK_DO_FLUID_SIMULATION) );

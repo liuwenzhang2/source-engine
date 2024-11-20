@@ -907,7 +907,7 @@ void CPropAPC::CreateCorpse( )
 			vecVelocity.z += 100.0f;
 			AngularImpulse angImpulse = RandomAngularImpulse( -500, 500 );
 			
-			IPhysicsObject *pObj = pGib->VPhysicsGetObject();
+			IPhysicsObject *pObj = pGib->GetEngineObject()->VPhysicsGetObject();
 			if ( pObj != NULL )
 			{
 				pObj->AddVelocity( &vecVelocity, &angImpulse );

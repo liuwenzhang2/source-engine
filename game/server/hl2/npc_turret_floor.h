@@ -105,7 +105,7 @@ public:
 
 	// Do we have a physics attacker?
 	CBasePlayer *HasPhysicsAttacker( float dt );
-	bool IsHeldByPhyscannon( )	{ return VPhysicsGetObject() && (VPhysicsGetObject()->GetGameFlags() & FVPHYSICS_PLAYER_HELD); }
+	bool IsHeldByPhyscannon( )	{ return GetEngineObject()->VPhysicsGetObject() && (GetEngineObject()->VPhysicsGetObject()->GetGameFlags() & FVPHYSICS_PLAYER_HELD); }
 
 	// Use functions
 	void	ToggleUse( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value );

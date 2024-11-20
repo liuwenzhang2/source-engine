@@ -72,7 +72,7 @@ float CGravityVortexController::GetConsumedMass( void ) const
 void CGravityVortexController::ConsumeEntity( CBaseEntity *pEnt )
 {
 	// Get our base physics object
-	IPhysicsObject *pPhysObject = pEnt->VPhysicsGetObject();
+	IPhysicsObject *pPhysObject = pEnt->GetEngineObject()->VPhysicsGetObject();
 	if ( pPhysObject == NULL )
 		return;
 
@@ -126,7 +126,7 @@ void CGravityVortexController::PullPlayersInRange( void )
 	if ( dist > m_flRadius )
 		return;
 
-	float mass = pPlayer->VPhysicsGetObject()->GetMass();
+	float mass = pPlayer->GetEngineObject()->VPhysicsGetObject()->GetMass();
 	float playerForce = m_flStrength * 0.05f;
 
 	// Find the pull force
@@ -175,7 +175,7 @@ bool CGravityVortexController::KillNPCInRange( CBaseEntity *pVictim, IPhysicsObj
 		pVictim->TakeDamage( ragdollInfo );
 
 		// Return the pointer to the ragdoll
-		*pPhysObj = pRagdoll->VPhysicsGetObject();
+		*pPhysObj = pRagdoll->GetEngineObject()->VPhysicsGetObject();
 		return true;
 	}
 
@@ -195,7 +195,7 @@ void CGravityVortexController::CreateDenseBall( void )
 	pBall->GetEngineObject()->SetAbsOrigin(GetEngineObject()->GetAbsOrigin() );
 	pBall->Spawn();
 
-	IPhysicsObject *pObj = pBall->VPhysicsGetObject();
+	IPhysicsObject *pObj = pBall->GetEngineObject()->VPhysicsGetObject();
 	if ( pObj != NULL )
 	{
 		pObj->SetMass( GetConsumedMass() );
@@ -231,7 +231,7 @@ void CGravityVortexController::PullThink( void )
 		if ( KillNPCInRange( pEnts[i], &pPhysObject ) == false )
 		{	
 			// If we didn't have a valid victim, see if we can just get the vphysics object
-			pPhysObject = pEnts[i]->VPhysicsGetObject();
+			pPhysObject = pEnts[i]->GetEngineObject()->VPhysicsGetObject();
 			if ( pPhysObject == NULL )
 				continue;
 		}
@@ -275,7 +275,7 @@ void CGravityVortexController::PullThink( void )
 		// Find the pull force
 		vecForce *= ( 1.0f - ( dist2D / m_flRadius ) ) * m_flStrength * mass;
 		
-		if ( pEnts[i]->VPhysicsGetObject() )
+		if ( pEnts[i]->GetEngineObject()->VPhysicsGetObject() )
 		{
 			// Pull the object in
 			pEnts[i]->VPhysicsTakeDamage( CTakeDamageInfo( this, this, vecForce, GetEngineObject()->GetAbsOrigin(), m_flStrength, DMG_BLAST ) );
@@ -527,7 +527,7 @@ void CGrenadeHopwire::CombatThink( void )
 //-----------------------------------------------------------------------------
 void CGrenadeHopwire::SetVelocity( const Vector &velocity, const AngularImpulse &angVelocity )
 {
-	IPhysicsObject *pPhysicsObject = VPhysicsGetObject();
+	IPhysicsObject *pPhysicsObject = GetEngineObject()->VPhysicsGetObject();
 	
 	if ( pPhysicsObject != NULL )
 	{

@@ -316,7 +316,7 @@ void PerformObstaclePushaway( CBaseCombatCharacter *pPushingEntity )
 				continue;
 		}
 
-		IPhysicsObject *pObj = props[i]->VPhysicsGetObject();
+		IPhysicsObject *pObj = props[i]->GetEngineObject()->VPhysicsGetObject();
 
 		if ( pObj )
 		{		

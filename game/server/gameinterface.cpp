@@ -573,14 +573,14 @@ void DrawAllDebugOverlays( void )
 		for ( ;pInfo; pInfo = pInfo->m_pNext )
 		{
 			CBaseEntity *ent = (CBaseEntity *)pInfo->m_pEntity;
-			if (!ent->VPhysicsGetObject())
+			if (!ent->GetEngineObject()->VPhysicsGetObject())
 				continue;
 
 			char tempstr[512];
 			Q_snprintf(tempstr, sizeof(tempstr),"%s: Mass: %.2f kg / %.2f lb (%s)", 
-				STRING( ent->GetEngineObject()->GetModelName() ), ent->VPhysicsGetObject()->GetMass(),
-				kg2lbs(ent->VPhysicsGetObject()->GetMass()), 
-				GetMassEquivalent(ent->VPhysicsGetObject()->GetMass()));
+				STRING( ent->GetEngineObject()->GetModelName() ), ent->GetEngineObject()->VPhysicsGetObject()->GetMass(),
+				kg2lbs(ent->GetEngineObject()->VPhysicsGetObject()->GetMass()),
+				GetMassEquivalent(ent->GetEngineObject()->VPhysicsGetObject()->GetMass()));
 			ent->EntityText(0, tempstr, 0);
 		}
 	}

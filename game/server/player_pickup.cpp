@@ -17,7 +17,7 @@ void Pickup_ForcePlayerToDropThisObject( CBaseEntity *pTarget )
 	if ( pTarget == NULL )
 		return;
 
-	IPhysicsObject *pPhysics = pTarget->VPhysicsGetObject();
+	IPhysicsObject *pPhysics = pTarget->GetEngineObject()->VPhysicsGetObject();
 	
 	if ( pPhysics == NULL )
 		return;
@@ -131,7 +131,7 @@ Vector Pickup_PhysGunLaunchVelocity( CBaseEntity *pObject, const Vector &vecForw
 	}
 
 	// Shouldn't ever get here with a non-vphysics object.
-	IPhysicsObject *pPhysicsObject = pObject->VPhysicsGetObject();
+	IPhysicsObject *pPhysicsObject = pObject->GetEngineObject()->VPhysicsGetObject();
 	if ( pPhysicsObject == NULL )
 	{
 		Assert( 0 );

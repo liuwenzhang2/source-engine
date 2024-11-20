@@ -1610,23 +1610,6 @@ bool CPSCollisionEntity::ShouldCollide( int collisionGroup, int contentsMask ) c
 #endif // CLIENT_DLL
 }
 
-IPhysicsObject * CPSCollisionEntity::VPhysicsGetObject( void ) const
-{
-	if(GetEnginePortal()->GetWorldBrushesPhysicsObject() != NULL)
-		return GetEnginePortal()->GetWorldBrushesPhysicsObject();
-	else if(GetEnginePortal()->GetWallBrushesPhysicsObject() != NULL )
-		return GetEnginePortal()->GetWallBrushesPhysicsObject();
-	else if(GetEnginePortal()->GetWallTubePhysicsObject() != NULL )
-		return GetEnginePortal()->GetWallTubePhysicsObject();
-	else if(GetEnginePortal()->GetRemoteWallBrushesPhysicsObject() != NULL )
-		return GetEnginePortal()->GetRemoteWallBrushesPhysicsObject();
-	else
-		return NULL;
-}
-
-
-
-
 
 #ifdef GAME_DLL
 bool CPortalSimulator::IsPortalSimulatorCollisionEntity( const CBaseEntity *pEntity )

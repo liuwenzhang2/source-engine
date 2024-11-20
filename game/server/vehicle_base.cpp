@@ -253,7 +253,7 @@ void CPropVehicle::VPhysicsUpdate( IPhysicsObject *pPhysics )
 		return;
 
 	Vector	velocity;
-	VPhysicsGetObject()->GetVelocity( &velocity, NULL );
+	GetEngineObject()->VPhysicsGetObject()->GetVelocity( &velocity, NULL );
 
 	//Update our smoothed velocity
 	m_vecSmoothedVelocity = m_vecSmoothedVelocity * SMOOTHING_FACTOR + velocity * ( 1 - SMOOTHING_FACTOR );

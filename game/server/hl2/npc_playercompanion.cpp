@@ -1434,7 +1434,7 @@ void CNPC_PlayerCompanion::HandleAnimEvent( animevent_t *pEvent )
 		vecToss[2] += 64.0f;
 
 		// Throw it
-		IPhysicsObject *pObj = m_hFlare->VPhysicsGetObject();
+		IPhysicsObject *pObj = m_hFlare->GetEngineObject()->VPhysicsGetObject();
 		pObj->ApplyForceCenter( vecToss );
 
 		// Forget about the flare at this point
@@ -1507,7 +1507,7 @@ void CNPC_PlayerCompanion::Touch( CBaseEntity *pOther )
 	BaseClass::Touch( pOther );
 
 	// Did the player touch me?
-	if ( pOther->IsPlayer() || ( pOther->VPhysicsGetObject() && (pOther->VPhysicsGetObject()->GetGameFlags() & FVPHYSICS_PLAYER_HELD ) ) )
+	if ( pOther->IsPlayer() || ( pOther->GetEngineObject()->VPhysicsGetObject() && (pOther->GetEngineObject()->VPhysicsGetObject()->GetGameFlags() & FVPHYSICS_PLAYER_HELD ) ) )
 	{
 		// Ignore if pissed at player
 		if ( m_afMemory & bits_MEMORY_PROVOKED )
@@ -3673,7 +3673,7 @@ bool CNPC_PlayerCompanion::IsNavigationUrgent( void )
 		CBaseEntity *pBlocker = GetNavigator()->GetBlockingEntity();
 		if ( pBlocker && !pBlocker->IsPlayer() )
 		{
-			IPhysicsObject *pPhysObject = pBlocker->VPhysicsGetObject();
+			IPhysicsObject *pPhysObject = pBlocker->GetEngineObject()->VPhysicsGetObject();
 			if ( pPhysObject && !pPhysObject->IsAsleep() )
 				return false;
 			if ( pBlocker->IsNPC() )

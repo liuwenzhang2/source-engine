@@ -69,13 +69,13 @@ bool C_Gib::InitializeGib( const char *pszModelName, Vector vecOrigin, Vector ve
 	
 	GetEngineObject()->VPhysicsInitNormal( SOLID_VPHYSICS, 0, false, &tmpSolid );
 	
-	if (VPhysicsGetObject())
+	if (GetEngineObject()->VPhysicsGetObject())
 	{
-		float flForce = VPhysicsGetObject()->GetMass();
+		float flForce = GetEngineObject()->VPhysicsGetObject()->GetMass();
 		vecForceDir *= flForce;	
 
-		VPhysicsGetObject()->ApplyForceOffset( vecForceDir, GetEngineObject()->GetAbsOrigin() );
-		VPhysicsGetObject()->SetCallbackFlags(VPhysicsGetObject()->GetCallbackFlags() | CALLBACK_GLOBAL_TOUCH | CALLBACK_GLOBAL_TOUCH_STATIC );
+		GetEngineObject()->VPhysicsGetObject()->ApplyForceOffset( vecForceDir, GetEngineObject()->GetAbsOrigin() );
+		GetEngineObject()->VPhysicsGetObject()->SetCallbackFlags(GetEngineObject()->VPhysicsGetObject()->GetCallbackFlags() | CALLBACK_GLOBAL_TOUCH | CALLBACK_GLOBAL_TOUCH_STATIC );
 	}
 	else
 	{

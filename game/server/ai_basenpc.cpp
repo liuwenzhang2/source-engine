@@ -4535,14 +4535,14 @@ void CAI_BaseNPC::CheckOnGround( void )
 					else
 					{
 						if ( trace.startsolid && ((CBaseEntity*)trace.m_pEnt)->GetEngineObject()->GetMoveType() == MOVETYPE_VPHYSICS &&
-							((CBaseEntity*)trace.m_pEnt)->VPhysicsGetObject() && ((CBaseEntity*)trace.m_pEnt)->VPhysicsGetObject()->GetMass() < VPHYSICS_LARGE_OBJECT_MASS )
+							((CBaseEntity*)trace.m_pEnt)->GetEngineObject()->VPhysicsGetObject() && ((CBaseEntity*)trace.m_pEnt)->GetEngineObject()->VPhysicsGetObject()->GetMass() < VPHYSICS_LARGE_OBJECT_MASS )
 						{
 							// stuck inside a small physics object?  
 							m_CheckOnGroundTimer.Set(0.1f);
 							NPCPhysics_CreateSolver( this, (CBaseEntity*)trace.m_pEnt, true, 0.25f );
-							if ( VPhysicsGetObject() )
+							if (GetEngineObject()->VPhysicsGetObject() )
 							{
-								VPhysicsGetObject()->RecheckContactPoints();
+								GetEngineObject()->VPhysicsGetObject()->RecheckContactPoints();
 							}
 						}
 						// Check to see if someone changed the ground on us...
@@ -6563,14 +6563,14 @@ void CAI_BaseNPC::SetupVPhysicsHull()
 	if (GetEngineObject()->GetMoveType() == MOVETYPE_VPHYSICS || GetEngineObject()->GetMoveType() == MOVETYPE_NONE )
 		return;
 
-	if ( VPhysicsGetObject() )
+	if (GetEngineObject()->VPhysicsGetObject() )
 	{
 		// Disable collisions to get 
-		VPhysicsGetObject()->EnableCollisions(false);
+		GetEngineObject()->VPhysicsGetObject()->EnableCollisions(false);
 		GetEngineObject()->VPhysicsDestroyObject();
 	}
 	GetEngineObject()->VPhysicsInitShadow( true, false );
-	IPhysicsObject *pPhysObj = VPhysicsGetObject();
+	IPhysicsObject *pPhysObj = GetEngineObject()->VPhysicsGetObject();
 	if ( pPhysObj )
 	{
 		float mass = GetEngineObject()->GetModelPtr()->Studio_GetMass();
@@ -6602,9 +6602,9 @@ void CAI_BaseNPC::CheckPhysicsContacts()
 		return;
 
 	m_bCheckContacts = false;
-	if (GetEngineObject()->GetMoveType() == MOVETYPE_STEP && VPhysicsGetObject())
+	if (GetEngineObject()->GetMoveType() == MOVETYPE_STEP && GetEngineObject()->VPhysicsGetObject())
 	{
-		IPhysicsObject *pPhysics = VPhysicsGetObject();
+		IPhysicsObject *pPhysics = GetEngineObject()->VPhysicsGetObject();
 		IPhysicsFrictionSnapshot *pSnapshot = pPhysics->CreateFrictionSnapshot();
 		CBaseEntity* pGroundEntity = GetEngineObject()->GetGroundEntity() ? GetEngineObject()->GetGroundEntity()->GetOuter() : NULL;
 		float heightCheck = GetEngineObject()->GetAbsOrigin().z + GetHullMaxs().z;
@@ -6698,7 +6698,7 @@ void CAI_BaseNPC::SetHullSizeNormal( bool force )
 		UTIL_SetSize( this, vecMins, vecMaxs );
 
 		m_fIsUsingSmallHull = false;
-		if ( VPhysicsGetObject() )
+		if (GetEngineObject()->VPhysicsGetObject() )
 		{
 			SetupVPhysicsHull();
 		}
@@ -6717,7 +6717,7 @@ bool CAI_BaseNPC::SetHullSizeSmall( bool force )
 	{
 		UTIL_SetSize(this, NAI_Hull::SmallMins(GetHullType()),NAI_Hull::SmallMaxs(GetHullType()));
 		m_fIsUsingSmallHull = true;
-		if ( VPhysicsGetObject() )
+		if (GetEngineObject()->VPhysicsGetObject() )
 		{
 			SetupVPhysicsHull();
 		}
@@ -6743,7 +6743,7 @@ bool CAI_BaseNPC::IsNavHullValid() const
 	else if (GetEngineObject()->GetSolid() == SOLID_VPHYSICS )
 	{
 		Assert( VPhysicsGetObject() );
-		const CPhysCollide *pPhysCollide = VPhysicsGetObject()->GetCollide();
+		const CPhysCollide *pPhysCollide = GetEngineObject()->VPhysicsGetObject()->GetCollide();
 		physcollision->CollideGetAABB( &vecMins, &vecMaxs, pPhysCollide, GetEngineObject()->GetAbsOrigin(), GetEngineObject()->GetAbsAngles() );
 		vecMins -= GetEngineObject()->GetAbsOrigin();
 		vecMaxs -= GetEngineObject()->GetAbsOrigin();
@@ -6932,7 +6932,7 @@ void CAI_BaseNPC::NPCInit ( void )
 
 bool CAI_BaseNPC::CreateVPhysics()
 {
-	if ( IsAlive() && !VPhysicsGetObject() )
+	if ( IsAlive() && !GetEngineObject()->VPhysicsGetObject() )
 	{
 		SetupVPhysicsHull();
 	}
@@ -9289,10 +9289,10 @@ int CAI_BaseNPC::DrawDebugTextOverlays(void)
 			text_offset++;
 		}
 
-		if ( VPhysicsGetObject() )
+		if (GetEngineObject()->VPhysicsGetObject() )
 		{
 			vphysics_objectstress_t stressOut;
-			CalculateObjectStress( VPhysicsGetObject(), this, &stressOut );
+			CalculateObjectStress(GetEngineObject()->VPhysicsGetObject(), this, &stressOut );
 			Q_snprintf(tempstr, sizeof(tempstr),"Stress: %.2f", stressOut.receivedStress );
 			EntityText(text_offset, tempstr, 0);
 			text_offset++;
@@ -10419,7 +10419,7 @@ CBaseEntity *CAI_BaseNPC::DropItem ( const char *pszItemName, Vector vecPos, QAn
 			return NULL;
 		}
 
-		IPhysicsObject *pPhys = pItem->VPhysicsGetObject();
+		IPhysicsObject *pPhys = pItem->GetEngineObject()->VPhysicsGetObject();
 
 		if ( pPhys )
 		{
@@ -12787,7 +12787,7 @@ void CAI_BaseNPC::Break( CBaseEntity *pBreaker )
 
 	Vector velocity;
 	AngularImpulse angVelocity;
-	IPhysicsObject *pPhysics = VPhysicsGetObject();
+	IPhysicsObject *pPhysics = GetEngineObject()->VPhysicsGetObject();
 	Vector origin;
 	QAngle angles;
 	GetEngineObject()->AddSolidFlags( FSOLID_NOT_SOLID );
@@ -14129,7 +14129,7 @@ bool CAI_BaseNPC::ShouldProbeCollideAgainstEntity( CBaseEntity *pEntity )
 	{
 		if ( ai_test_moveprobe_ignoresmall.GetBool() && IsNavigationUrgent() )
 		{
-			IPhysicsObject *pPhysics = pEntity->VPhysicsGetObject();
+			IPhysicsObject *pPhysics = pEntity->GetEngineObject()->VPhysicsGetObject();
 
 			if ( pPhysics->IsMoveable() && pPhysics->GetMass() < 40.0 )
 				return false;

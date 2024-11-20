@@ -811,7 +811,7 @@ CON_COMMAND( hammer_update_safe_entities, "Updates entities in the map that can 
 		if ( pEnt->GetEngineObject()->GetMoveParent() || pEnt->GetEngineObject()->FirstMoveChild() )
 			continue;
 
-		IPhysicsObject *pPhysics = pEnt->VPhysicsGetObject();
+		IPhysicsObject *pPhysics = pEnt->GetEngineObject()->VPhysicsGetObject();
 		if ( !pPhysics )
 			continue;
 		// If we are affected by any constraints, we're not safe to update

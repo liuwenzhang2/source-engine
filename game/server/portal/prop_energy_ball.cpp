@@ -274,7 +274,7 @@ void CPropEnergyBall::NotifySystemEvent(CBaseEntity *pNotify, notify_system_even
 			m_vLastKnownDirection = pEnteredPortal->MatrixThisToLinked().ApplyRotation(m_vLastKnownDirection);
 			m_vLastKnownDirection.NormalizeInPlace();
 
-			IPhysicsObject *pPhysObject = VPhysicsGetObject();
+			IPhysicsObject *pPhysObject = GetEngineObject()->VPhysicsGetObject();
 			if( pPhysObject )
 			{
 				Vector vNewVelocity = m_vLastKnownDirection * GetSpeed();
@@ -318,7 +318,7 @@ void CPropEnergyBall::Think()
 	}
 
 	// Force our movement to be at desired speed
-	IPhysicsObject* pMyObject = VPhysicsGetObject();
+	IPhysicsObject* pMyObject = GetEngineObject()->VPhysicsGetObject();
 	if ( pMyObject )
 	{
 		// get our current speed
@@ -517,7 +517,7 @@ void CEnergyBallLauncher::SpawnBall()
 	pBall->m_fMinLifeAfterPortal = m_fMinBallLifeAfterPortal;
 
 	// Additional setup of the physics object for energy ball uses
-	IPhysicsObject *pBallObj = pBall->VPhysicsGetObject();
+	IPhysicsObject *pBallObj = pBall->GetEngineObject()->VPhysicsGetObject();
 
 	if ( pBallObj )
 	{
@@ -610,7 +610,7 @@ static void fire_energy_ball_f( void )
 		pBall->m_fMinLifeAfterPortal = 5.0f;
 
 		// Additional setup of the physics object for energy ball uses
-		IPhysicsObject *pBallObj = pBall->VPhysicsGetObject();
+		IPhysicsObject *pBallObj = pBall->GetEngineObject()->VPhysicsGetObject();
 
 		if ( pBallObj )
 		{

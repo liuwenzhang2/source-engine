@@ -345,7 +345,7 @@ int CNPC_BaseTurret::OnTakeDamage( const CTakeDamageInfo &info )
 		retVal = OnTakeDamage_Alive( info );
 		if ( m_iHealth <= 0 )
 		{
-			IPhysicsObject *pPhysics = VPhysicsGetObject();
+			IPhysicsObject *pPhysics = GetEngineObject()->VPhysicsGetObject();
 			if ( pPhysics )
 			{
 				pPhysics->EnableCollisions( false );

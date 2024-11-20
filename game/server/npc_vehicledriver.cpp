@@ -749,7 +749,7 @@ bool CNPC_VehicleDriver::OverridePathMove( float flInterval )
 	// Get our current speed, and check it against the length of the spline to know how far to advance our marker
 	AngularImpulse angVel;
 	Vector vecVelocity;
-	IPhysicsObject *pVehiclePhysics = m_hVehicleEntity->VPhysicsGetObject();
+	IPhysicsObject *pVehiclePhysics = m_hVehicleEntity->GetEngineObject()->VPhysicsGetObject();
 
 	if( !pVehiclePhysics )
 	{
@@ -852,7 +852,7 @@ void CNPC_VehicleDriver::DriveVehicle( void )
 {
 	AngularImpulse angVel;
 	Vector vecVelocity;
-	IPhysicsObject *pVehiclePhysics = m_hVehicleEntity->VPhysicsGetObject();
+	IPhysicsObject *pVehiclePhysics = m_hVehicleEntity->GetEngineObject()->VPhysicsGetObject();
 	if ( !pVehiclePhysics )
 		return;
 	pVehiclePhysics->GetVelocity( &vecVelocity, &angVel );

@@ -1108,7 +1108,7 @@ public:
 
 void CHL2MPRagdoll::ImpactTrace(trace_t* pTrace, int iDamageType, const char* pCustomImpactName)
 {
-	IPhysicsObject* pPhysicsObject = VPhysicsGetObject();
+	IPhysicsObject* pPhysicsObject = GetEngineObject()->VPhysicsGetObject();
 
 	if (!pPhysicsObject)
 		return;

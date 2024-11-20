@@ -139,10 +139,10 @@ bool CAI_BaseHumanoid::OnMoveBlocked( AIMoveResult_t *pResult )
 			 pBlocker != (GetEngineObject()->GetGroundEntity()? GetEngineObject()->GetGroundEntity()->GetOuter():NULL) &&
 			 !pBlocker->IsNavIgnored() &&
 			 !dynamic_cast<CBasePropDoor *>(pBlocker) &&
-			 pBlocker->VPhysicsGetObject() && 
-			 pBlocker->VPhysicsGetObject()->IsMoveable() && 
-			 ( pBlocker->VPhysicsGetObject()->GetMass() <= 35.0 + massBonus + 0.1 || 
-			   ( pBlocker->VPhysicsGetObject()->GetMass() <= 50.0 + massBonus + 0.1 && IsSmall( pBlocker ) ) ) )
+			 pBlocker->GetEngineObject()->VPhysicsGetObject() &&
+			 pBlocker->GetEngineObject()->VPhysicsGetObject()->IsMoveable() &&
+			 ( pBlocker->GetEngineObject()->VPhysicsGetObject()->GetMass() <= 35.0 + massBonus + 0.1 ||
+			   ( pBlocker->GetEngineObject()->VPhysicsGetObject()->GetMass() <= 50.0 + massBonus + 0.1 && IsSmall( pBlocker ) ) ) )
 		{
 			DbgNavMsg1( this, "Setting ignore on object %s", pBlocker->GetDebugName() );
 			pBlocker->SetNavIgnore( 2.5 );

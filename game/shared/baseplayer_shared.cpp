@@ -73,7 +73,7 @@
 				return false;
 
 			// Only impact on physics objects
-			if ( !pEntity->VPhysicsGetObject() )
+			if ( !pEntity->GetEngineObject()->VPhysicsGetObject() )
 				return false;
 
 #if defined( CSTRIKE_DLL )
@@ -1310,7 +1310,7 @@ void CBasePlayer::PlayerUse ( void )
 
 		if ( entity )
 		{
-			IPhysicsObject *pObj = entity->VPhysicsGetObject();
+			IPhysicsObject *pObj = entity->GetEngineObject()->VPhysicsGetObject();
 
 			if ( pObj )
 			{

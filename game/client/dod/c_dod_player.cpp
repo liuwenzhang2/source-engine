@@ -359,7 +359,7 @@ void C_DODRagdoll::Interp_Copy( C_BaseAnimatingOverlay *pSourceEntity )
 
 void C_DODRagdoll::ImpactTrace( trace_t *pTrace, int iDamageType, const char *pCustomImpactName )
 {
-	IPhysicsObject *pPhysicsObject = VPhysicsGetObject();
+	IPhysicsObject *pPhysicsObject = GetEngineObject()->VPhysicsGetObject();
 
 	if( !pPhysicsObject )
 		return;
@@ -1408,7 +1408,7 @@ void C_DODPlayer::PopHelmet( Vector vecDir, Vector vecForceOrigin, int iModel )
 		return;
 	}
 
-	IPhysicsObject *pPhysicsObject = pEntity->VPhysicsGetObject();
+	IPhysicsObject *pPhysicsObject = pEntity->GetEngineObject()->VPhysicsGetObject();
 
 	if( pPhysicsObject )
 	{

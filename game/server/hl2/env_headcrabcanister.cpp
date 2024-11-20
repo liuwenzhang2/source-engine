@@ -612,7 +612,7 @@ void CEnvHeadcrabCanister::TestForCollisionsAgainstEntities( const Vector &vecEn
 		Vector vecForceDir = m_Shared.m_vecDirection;
 
 		// Check for a physics object and apply force!
-		IPhysicsObject *pPhysObject = pEntity->VPhysicsGetObject();
+		IPhysicsObject *pPhysObject = pEntity->GetEngineObject()->VPhysicsGetObject();
 		if ( pPhysObject )
 		{
 			float flMass = PhysGetEntityMass( pEntity );
@@ -667,7 +667,7 @@ void CEnvHeadcrabCanister::TestForCollisionsAgainstWorld( const Vector &vecEndPo
 		
 		// Check for a physics object and apply force!
 		Vector vecForceDir = vecSegment;
-		IPhysicsObject *pPhysObject = pEntity->VPhysicsGetObject();
+		IPhysicsObject *pPhysObject = pEntity->GetEngineObject()->VPhysicsGetObject();
 		if ( pPhysObject )
 		{
 			// Send it flying!!!

@@ -1741,7 +1741,7 @@ void CBasePlayer::Event_Killed( const CTakeDamageInfo &info )
 	GetEngineObject()->AddSolidFlags( FSOLID_NOT_SOLID );
 	// force contact points to get flushed if no longer valid
 	// UNDONE: Always do this on RecheckCollisionFilter() ?
-	IPhysicsObject *pObject = VPhysicsGetObject();
+	IPhysicsObject *pObject = GetEngineObject()->VPhysicsGetObject();
 	if ( pObject )
 	{
 		pObject->RecheckContactPoints();
@@ -4659,7 +4659,7 @@ void CBasePlayer::Touch( CBaseEntity *pOther )
 	if ( pOther->GetEngineObject()->GetMoveType() != MOVETYPE_VPHYSICS || pOther->GetEngineObject()->GetSolid() != SOLID_VPHYSICS || (pOther->GetEngineObject()->GetSolidFlags() & FSOLID_TRIGGER) )
 		return;
 
-	IPhysicsObject *pPhys = pOther->VPhysicsGetObject();
+	IPhysicsObject *pPhys = pOther->GetEngineObject()->VPhysicsGetObject();
 	if ( !pPhys || !pPhys->IsMoveable() )
 		return;
 
@@ -4714,13 +4714,13 @@ void CBasePlayer::PostThinkVPhysics( void )
 	{
 		if ( g_pMoveData->m_outStepHeight > 4.0f )
 		{
-			VPhysicsGetObject()->SetPosition(GetEngineObject()->GetAbsOrigin(), vec3_angle, true );
+			GetEngineObject()->VPhysicsGetObject()->SetPosition(GetEngineObject()->GetAbsOrigin(), vec3_angle, true );
 		}
 		else
 		{
 			// don't ever teleport into solid
 			Vector position, end;
-			VPhysicsGetObject()->GetPosition( &position, NULL );
+			GetEngineObject()->VPhysicsGetObject()->GetPosition( &position, NULL );
 			end = position;
 			end.z += g_pMoveData->m_outStepHeight;
 			trace_t trace;
@@ -5553,9 +5553,9 @@ void CBasePlayer::LeaveVehicle( const Vector &vecExitPoint, const QAngle &vecExi
 	GetEngineObject()->SetMoveType( MOVETYPE_WALK );
 	GetEngineObject()->SetCollisionGroup( COLLISION_GROUP_PLAYER );
 
-	if ( VPhysicsGetObject() )
+	if (GetEngineObject()->VPhysicsGetObject() )
 	{
-		VPhysicsGetObject()->SetPosition( vNewPos, vec3_angle, true );
+		GetEngineObject()->VPhysicsGetObject()->SetPosition( vNewPos, vec3_angle, true );
 	}
 
 	m_hVehicle = NULL;

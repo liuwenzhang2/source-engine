@@ -223,8 +223,8 @@ bool CPhysicsNPCSolver::CheckTouching()
 	if ( !pPhysicsEnt )
 		return false;
 
-	IPhysicsObject *pPhysics = pPhysicsEnt->VPhysicsGetObject();
-	IPhysicsObject *pNPCPhysics = pNPC->VPhysicsGetObject();
+	IPhysicsObject *pPhysics = pPhysicsEnt->GetEngineObject()->VPhysicsGetObject();
+	IPhysicsObject *pNPCPhysics = pNPC->GetEngineObject()->VPhysicsGetObject();
 	if ( !pNPCPhysics || !pPhysics )
 		return false;
 
@@ -277,7 +277,7 @@ void CPhysicsNPCSolver::Think()
 	}
 	if ( m_allowIntersection )
 	{
-		IPhysicsObject *pObject = m_hEntity->VPhysicsGetObject();
+		IPhysicsObject *pObject = m_hEntity->GetEngineObject()->VPhysicsGetObject();
 		if ( !pObject )
 		{
 			UTIL_Remove(this);
@@ -429,9 +429,9 @@ void CPhysicsEntitySolver::Spawn()
 	PhysDisableEntityCollisions( m_hMovingEntity, m_hPhysicsBlocker );
 	m_savedCollisionGroup = m_hPhysicsBlocker->GetEngineObject()->GetCollisionGroup();
 	m_hPhysicsBlocker->GetEngineObject()->SetCollisionGroup( COLLISION_GROUP_DEBRIS );
-	if ( m_hPhysicsBlocker->VPhysicsGetObject() )
+	if ( m_hPhysicsBlocker->GetEngineObject()->VPhysicsGetObject() )
 	{
-		m_hPhysicsBlocker->VPhysicsGetObject()->RecheckContactPoints();
+		m_hPhysicsBlocker->GetEngineObject()->VPhysicsGetObject()->RecheckContactPoints();
 	}
 }
 

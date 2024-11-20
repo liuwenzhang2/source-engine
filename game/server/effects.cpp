@@ -792,7 +792,7 @@ CGib *CEnvShooter::CreateGib ( void )
 	// if a mass override is set, apply it to the gib
 	if (m_flMassOverride != 0)
 	{
-		IPhysicsObject *pPhys = pGib->VPhysicsGetObject();
+		IPhysicsObject *pPhys = pGib->GetEngineObject()->VPhysicsGetObject();
 		if (pPhys)
 		{
 			pPhys->SetMass( m_flMassOverride );

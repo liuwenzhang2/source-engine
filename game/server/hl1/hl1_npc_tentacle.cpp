@@ -966,7 +966,7 @@ bool CNPC_Tentacle::CreateVPhysics( void )
 {
 	BaseClass::CreateVPhysics();
 
-	IPhysicsObject *pPhysics = VPhysicsGetObject();
+	IPhysicsObject *pPhysics = GetEngineObject()->VPhysicsGetObject();
 	if( pPhysics )
 	{
 		unsigned short flags = pPhysics->GetCallbackFlags();

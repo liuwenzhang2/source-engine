@@ -679,7 +679,7 @@ Vector NextBotGroundLocomotion::ResolveCollision( const Vector &from, const Vect
 				// only ignore physics props that are not doors
 				if ( dynamic_cast< CPhysicsProp * >( trace.m_pEnt ) != NULL && dynamic_cast< CBasePropDoor * >( trace.m_pEnt ) == NULL )
 				{
-					IPhysicsObject *physics = ((CBaseEntity*)trace.m_pEnt)->VPhysicsGetObject();
+					IPhysicsObject *physics = ((CBaseEntity*)trace.m_pEnt)->GetEngineObject()->VPhysicsGetObject();
 					if ( physics && physics->IsMoveable() )
 					{
 						// we've intersected a (likely moving) physics prop - ignore it for awhile so we can move out of it

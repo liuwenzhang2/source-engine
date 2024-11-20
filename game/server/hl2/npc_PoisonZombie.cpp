@@ -528,7 +528,7 @@ void CNPC_PoisonZombie::SetZombieModel( void )
 	// NPCs can change size
 	if ( lastHull != GetHullType() )
 	{
-		if ( VPhysicsGetObject() )
+		if (GetEngineObject()->VPhysicsGetObject() )
 		{
 			SetupVPhysicsHull();
 		}

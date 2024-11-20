@@ -831,7 +831,7 @@ void CRagdollLRURetirement::Update( float frametime ) // EPISODIC VERSION
 		if ( pRagdoll )
 		{
 			m_iRagdollCount++;
-			IPhysicsObject *pObject = pRagdoll->VPhysicsGetObject();
+			IPhysicsObject *pObject = pRagdoll->GetEngineObject()->VPhysicsGetObject();
 			if (pObject && !pObject->IsAsleep())
 			{
 				m_iSimulatedRagdollCount++;
@@ -881,7 +881,7 @@ void CRagdollLRURetirement::Update( float frametime ) // EPISODIC VERSION
 			CBaseAnimating *pRagdoll = m_LRU[i].Get();
 
 			next = m_LRU.Next(i);
-			IPhysicsObject *pObject = pRagdoll->VPhysicsGetObject();
+			IPhysicsObject *pObject = pRagdoll->GetEngineObject()->VPhysicsGetObject();
 			if ( pRagdoll && (pRagdoll->GetEffectEntity() || ( pObject && !pObject->IsAsleep()) ) )
 				continue;
 
@@ -922,7 +922,7 @@ void CRagdollLRURetirement::Update( float frametime ) // EPISODIC VERSION
 			CBaseAnimating *pRagdoll = m_LRU[i].Get();
 
 			//Just ignore it until we're done burning/dissolving.
-			IPhysicsObject *pObject = pRagdoll->VPhysicsGetObject();
+			IPhysicsObject *pObject = pRagdoll->GetEngineObject()->VPhysicsGetObject();
 			if ( pRagdoll && (pRagdoll->GetEffectEntity() || ( pObject && !pObject->IsAsleep()) ) )
 				continue;
 
@@ -966,7 +966,7 @@ void CRagdollLRURetirement::Update( float frametime ) // Non-episodic version
 		if ( pRagdoll )
 		{
 			m_iRagdollCount++;
-			IPhysicsObject *pObject = pRagdoll->VPhysicsGetObject();
+			IPhysicsObject *pObject = pRagdoll->GetEngineObject()->VPhysicsGetObject();
 			if (pObject && !pObject->IsAsleep())
 			{
 				m_iSimulatedRagdollCount++;

@@ -301,7 +301,7 @@ void C_CSRagdoll::Interp_Copy( C_BaseAnimatingOverlay *pSourceEntity )
 
 void C_CSRagdoll::ImpactTrace( trace_t *pTrace, int iDamageType, const char *pCustomImpactName )
 {
-	IPhysicsObject *pPhysicsObject = VPhysicsGetObject();
+	IPhysicsObject *pPhysicsObject = GetEngineObject()->VPhysicsGetObject();
 
 	if( !pPhysicsObject )
 		return;

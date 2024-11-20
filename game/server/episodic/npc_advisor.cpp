@@ -531,7 +531,7 @@ void CNPC_Advisor::StartLevitatingObjects()
 
 		//NDebugOverlay::Box( pEnt->GetEngineObject()->GetAbsOrigin(), pEnt->GetEngineObject()->OBBMins(), pEnt->GetEngineObject()->OBBMaxs(), 0, 255, 0, 1, 0.1 );
 
-		IPhysicsObject *pPhys = pEnt->VPhysicsGetObject();
+		IPhysicsObject *pPhys = pEnt->GetEngineObject()->VPhysicsGetObject();
 		if ( pPhys && pPhys->IsMoveable() )
 		{
 			m_pLevitateController->AttachObject( pPhys, false );
@@ -546,7 +546,7 @@ bool CNPC_Advisor::CanLevitateEntity( CBaseEntity *pEntity, int minMass, int max
 	if (!pEntity || pEntity->IsNPC()) 
 		return false;
 
-	IPhysicsObject *pPhys = pEntity->VPhysicsGetObject();
+	IPhysicsObject *pPhys = pEntity->GetEngineObject()->VPhysicsGetObject();
 	if (!pPhys)
 		return false;
 
@@ -573,7 +573,7 @@ CBaseEntity *CNPC_Advisor::ThrowObjectPrepare()
 
 		if (pThrowable)
 		{
-			IPhysicsObject *pPhys = pThrowable->VPhysicsGetObject();
+			IPhysicsObject *pPhys = pThrowable->GetEngineObject()->VPhysicsGetObject();
 			if ( !pPhys )
 			{
 				// reject!
@@ -597,7 +597,7 @@ CBaseEntity *CNPC_Advisor::ThrowObjectPrepare()
 
 	if (pThrowable)
 	{
-		Assert( pThrowable->VPhysicsGetObject() );
+		Assert( pThrowable->GetEngineObject()->VPhysicsGetObject() );
 
 		// play the sound, attach the light, fire the trigger
 		EmitSound( "NPC_Advisor.ObjectChargeUp" );
@@ -879,7 +879,7 @@ void CNPC_Advisor::RunTask( const Task_t *pTask )
 				if (pThrowable)
 				{
 					// don't let the player take it from me
-					IPhysicsObject *pPhys = pThrowable->VPhysicsGetObject();
+					IPhysicsObject *pPhys = pThrowable->GetEngineObject()->VPhysicsGetObject();
 					if ( pPhys )
 					{
 						// no pickup!
@@ -933,7 +933,7 @@ void CNPC_Advisor::RunTask( const Task_t *pTask )
 				for (int ii = m_hvStagedEnts.Count() - 1 ; ii >=0 ; --ii)
 				{
 
-					IPhysicsObject *pPhys = m_hvStagedEnts[ii]->VPhysicsGetObject();
+					IPhysicsObject *pPhys = m_hvStagedEnts[ii]->GetEngineObject()->VPhysicsGetObject();
 					if ( pPhys )
 					{  
 						pPhys->SetGameFlags(pPhys->GetGameFlags() & (~FVPHYSICS_NO_PLAYER_PICKUP) );
@@ -980,7 +980,7 @@ void CNPC_Advisor::RunTask( const Task_t *pTask )
 			// if it's time to throw something, throw it and go on to the next one. 
 			if (gpGlobals->curtime > m_flThrowPhysicsTime)
 			{
-				IPhysicsObject *pPhys = pThrowable->VPhysicsGetObject();
+				IPhysicsObject *pPhys = pThrowable->GetEngineObject()->VPhysicsGetObject();
 				Assert(pPhys);
 
 				pPhys->SetGameFlags(pPhys->GetGameFlags() & (~FVPHYSICS_NO_PLAYER_PICKUP) );
@@ -1220,7 +1220,7 @@ CBaseEntity *CNPC_Advisor::PickThrowable( bool bRequireInView )
 //-----------------------------------------------------------------------------
 void CNPC_Advisor::HurlObjectAtPlayer( CBaseEntity *pEnt, const Vector &leadVel )
 {
-	IPhysicsObject *pPhys = pEnt->VPhysicsGetObject();
+	IPhysicsObject *pPhys = pEnt->GetEngineObject()->VPhysicsGetObject();
 
 	//
 	// Lead the target accurately. This encourages hiding behind cover
@@ -1289,7 +1289,7 @@ void CNPC_Advisor::PreHurlClearTheWay( CBaseEntity *pThrowable, const Vector &to
 			 !m_hvStagedEnts.HasElement( obstruction )   && // and I'm not staging it
 			 !DidThrow( obstruction ) )						// and I didn't just throw it
 		{
-            IPhysicsObject *pPhys = obstruction->VPhysicsGetObject();
+            IPhysicsObject *pPhys = obstruction->GetEngineObject()->VPhysicsGetObject();
 			Assert(pPhys); 
 
 			// this is an object we want to push out of the way. Compute a vector perpendicular
@@ -1437,7 +1437,7 @@ void CNPC_Advisor::AddToThrownObjects(CBaseEntity *pEnt)
 //-----------------------------------------------------------------------------
 void CNPC_Advisor::PullObjectToStaging( CBaseEntity *pEnt, const Vector &stagingPos )
 {
-	IPhysicsObject *pPhys = pEnt->VPhysicsGetObject();
+	IPhysicsObject *pPhys = pEnt->GetEngineObject()->VPhysicsGetObject();
 	Assert(pPhys);
 
 	Vector curPos = pEnt->GetEngineObject()->WorldSpaceCenter();
@@ -1530,7 +1530,7 @@ int CNPC_Advisor::SelectSchedule()
 Vector CNPC_Advisor::GetThrowFromPos( CBaseEntity *pEnt )
 {
 	Assert(pEnt);
-	Assert(pEnt->VPhysicsGetObject());
+	Assert(pEnt->GetEngineObject()->VPhysicsGetObject());
 
 	float effecRadius = pEnt->GetEngineObject()->BoundingRadius(); // radius of object (important for kickout)
 	float howFarInFront = advisor_throw_stage_distance.GetFloat() + effecRadius * 1.43f;// clamp(lenToPlayer - posDist + effecRadius,effecRadius*2,90.f + effecRadius);
@@ -1752,7 +1752,7 @@ void CNPC_Advisor::InputWrenchImmediate( inputdata_t &inputdata )
 		if (!m_physicsObjects.HasElement(pEnt) )
 		{
 			// add to levitation
-			IPhysicsObject *pPhys = pEnt->VPhysicsGetObject();
+			IPhysicsObject *pPhys = pEnt->GetEngineObject()->VPhysicsGetObject();
 			if ( pPhys )
 			{
 				// if the object isn't moveable, make it so.

@@ -1521,7 +1521,7 @@ void CAI_ActBusyBehavior::ComputeAndSetRenderBounds()
 	if ( GetOuter()->ComputeHitboxSurroundingBox( &mins, &maxs ) )
 	{
 		UTIL_SetSize( GetOuter(), mins - GetAbsOrigin(), maxs - GetAbsOrigin());
-		if ( GetOuter()->VPhysicsGetObject() )
+		if ( GetOuter()->GetEngineObject()->VPhysicsGetObject() )
 		{
 			GetOuter()->SetupVPhysicsHull();
 		}

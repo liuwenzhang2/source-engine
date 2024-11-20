@@ -446,7 +446,7 @@ CBaseEntity	*CHL1_Player::GiveNamedItem( const char *pszName, int iSubType )
 //-----------------------------------------------------------------------------
 void CHL1_Player::StartPullingObject( CBaseEntity *pObject )
 {
-	if ( pObject->VPhysicsGetObject() == NULL || VPhysicsGetObject() == NULL )
+	if ( pObject->GetEngineObject()->VPhysicsGetObject() == NULL || GetEngineObject()->VPhysicsGetObject() == NULL )
 	{
 		 return;
 	}
@@ -468,8 +468,8 @@ void CHL1_Player::StartPullingObject( CBaseEntity *pObject )
 	ballsocket.constraint.Defaults();
 	ballsocket.constraint.forceLimit = lbs2kg(1000);
 	ballsocket.constraint.torqueLimit = lbs2kg(1000);
-	ballsocket.InitWithCurrentObjectState( VPhysicsGetObject(), pObject->VPhysicsGetObject(), WorldSpaceCenter() );
-	m_pPullConstraint = physenv->CreateBallsocketConstraint( VPhysicsGetObject(), pObject->VPhysicsGetObject(), NULL, ballsocket );
+	ballsocket.InitWithCurrentObjectState(GetEngineObject()->VPhysicsGetObject(), pObject->GetEngineObject()->VPhysicsGetObject(), WorldSpaceCenter() );
+	m_pPullConstraint = physenv->CreateBallsocketConstraint(GetEngineObject()->VPhysicsGetObject(), pObject->GetEngineObject()->VPhysicsGetObject(), NULL, ballsocket );
 
 	m_hPullObject.Set(pObject);
 	m_bIsPullingObject = true;
@@ -498,7 +498,7 @@ void CHL1_Player::UpdatePullingObject()
 
 	CBaseEntity *pObject= m_hPullObject.Get();
 
-	if( !pObject || !pObject->VPhysicsGetObject() )
+	if( !pObject || !pObject->GetEngineObject()->VPhysicsGetObject() )
 	{
 		// Object broke or otherwise vanished.
 		StopPullingObject();
@@ -518,7 +518,7 @@ void CHL1_Player::UpdatePullingObject()
 	Vector objectPos;
 	QAngle angle;
 
-	pObject->VPhysicsGetObject()->GetPosition( &objectPos, &angle );
+	pObject->GetEngineObject()->VPhysicsGetObject()->GetPosition( &objectPos, &angle );
 
 	if( !FInViewCone(objectPos) )
 	{
@@ -1529,7 +1529,7 @@ void CGrabController::SetTargetPosition( const Vector &target, const QAngle &tar
 	CBaseEntity *pAttached = GetAttached();
 	if ( pAttached )
 	{
-		IPhysicsObject *pObj = pAttached->VPhysicsGetObject();
+		IPhysicsObject *pObj = pAttached->GetEngineObject()->VPhysicsGetObject();
 		
 		if ( pObj != NULL )
 		{
@@ -1551,7 +1551,7 @@ float CGrabController::ComputeError()
 	if ( pAttached )
 	{
 		Vector pos;
-		IPhysicsObject *pObj = pAttached->VPhysicsGetObject();
+		IPhysicsObject *pObj = pAttached->GetEngineObject()->VPhysicsGetObject();
 		if ( pObj )
 		{
 			pObj->GetShadowPosition( &pos, NULL );
@@ -1654,7 +1654,7 @@ void CGrabController::AttachEntity( CBasePlayer *pPlayer, CBaseEntity *pEntity, 
 {
 	// play the impact sound of the object hitting the player
 	// used as feedback to let the player know he picked up the object
-	PhysicsImpactSound( pPlayer, pPhys, CHAN_STATIC, pPhys->GetMaterialIndex(), pPlayer->VPhysicsGetObject()->GetMaterialIndex(), 1.0, 64 );
+	PhysicsImpactSound( pPlayer, pPhys, CHAN_STATIC, pPhys->GetMaterialIndex(), pPlayer->GetEngineObject()->VPhysicsGetObject()->GetMaterialIndex(), 1.0, 64 );
 	Vector position;
 	QAngle angles;
 	pPhys->GetPosition( &position, &angles );
@@ -1844,13 +1844,13 @@ float CGrabController::GetSavedMass( IPhysicsObject *pObject )
 bool CGrabController::UpdateObject( CBasePlayer *pPlayer, float flError )
 {
 	CBaseEntity *pEntity = GetAttached();
-	if (!pEntity || ComputeError() > flError || (pPlayer->GetEngineObject()->GetGroundEntity() ? pPlayer->GetEngineObject()->GetGroundEntity()->GetOuter() : NULL) == pEntity || !pEntity->VPhysicsGetObject())
+	if (!pEntity || ComputeError() > flError || (pPlayer->GetEngineObject()->GetGroundEntity() ? pPlayer->GetEngineObject()->GetGroundEntity()->GetOuter() : NULL) == pEntity || !pEntity->GetEngineObject()->VPhysicsGetObject())
 	{
 		return false;
 	}
 
 	//Adrian: Oops, our object became motion disabled, let go!
-	IPhysicsObject *pPhys = pEntity->VPhysicsGetObject();
+	IPhysicsObject *pPhys = pEntity->GetEngineObject()->VPhysicsGetObject();
 	if ( pPhys && pPhys->IsMoveable() == false )
 	{
 		return false;
@@ -2008,7 +2008,7 @@ void CPlayerPickupController::Init( CBasePlayer *pPlayer, CBaseEntity *pObject )
 	m_grabController.SetIgnorePitch( true );
 	m_grabController.SetAngleAlignment( DOT_30DEGREE );
 	m_pPlayer = pPlayer;
-	IPhysicsObject *pPhysics = pObject->VPhysicsGetObject();
+	IPhysicsObject *pPhysics = pObject->GetEngineObject()->VPhysicsGetObject();
 	Pickup_OnPhysGunPickup( pObject, m_pPlayer );
 	m_grabController.AttachEntity( pPlayer, pObject, pPhysics );
 	
@@ -2061,7 +2061,7 @@ void CPlayerPickupController::Use( CBaseEntity *pActivator, CBaseEntity *pCaller
 		}
 		
 		//Adrian: Oops, our object became motion disabled, let go!
-		IPhysicsObject *pPhys = pAttached->VPhysicsGetObject();
+		IPhysicsObject *pPhys = pAttached->GetEngineObject()->VPhysicsGetObject();
 		if ( pPhys && pPhys->IsMoveable() == false )
 		{
 			Shutdown();
@@ -2070,7 +2070,7 @@ void CPlayerPickupController::Use( CBaseEntity *pActivator, CBaseEntity *pCaller
 
 #if STRESS_TEST
 		vphysics_objectstress_t stress;
-		CalculateObjectStress( pAttached->VPhysicsGetObject(), pAttached, &stress );
+		CalculateObjectStress( pAttached->GetEngineObject()->VPhysicsGetObject(), pAttached, &stress );
 		if ( stress.exertedStress > 250 )
 		{
 			Shutdown();
@@ -2084,13 +2084,13 @@ void CPlayerPickupController::Use( CBaseEntity *pActivator, CBaseEntity *pCaller
 			Vector vecLaunch;
 			m_pPlayer->EyeVectors( &vecLaunch );
 			// JAY: Scale this with mass because some small objects really go flying
-			float massFactor = clamp( pAttached->VPhysicsGetObject()->GetMass(), 0.5, 15 );
+			float massFactor = clamp( pAttached->GetEngineObject()->VPhysicsGetObject()->GetMass(), 0.5, 15 );
 			massFactor = RemapVal( massFactor, 0.5, 15, 0.5, 4 );
 			vecLaunch *= player_throwforce.GetFloat() * massFactor;
 
-			pAttached->VPhysicsGetObject()->ApplyForceCenter( vecLaunch );
+			pAttached->GetEngineObject()->VPhysicsGetObject()->ApplyForceCenter( vecLaunch );
 			AngularImpulse aVel = RandomAngularImpulse( -10, 10 ) * massFactor;
-			pAttached->VPhysicsGetObject()->ApplyTorqueCenter( aVel );
+			pAttached->GetEngineObject()->VPhysicsGetObject()->ApplyTorqueCenter( aVel );
 			return;
 		}
 

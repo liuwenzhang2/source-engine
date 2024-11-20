@@ -532,8 +532,8 @@ int CCollisionEvent::ShouldCollide_2( IPhysicsObject *pObj0, IPhysicsObject *pOb
 		if ( g_EntityCollisionHash->IsObjectPairInHash( pParent0, pParent1 ) )
 			return 0;
 
-		IPhysicsObject *p0 = pParent0->VPhysicsGetObject();
-		IPhysicsObject *p1 = pParent1->VPhysicsGetObject();
+		IPhysicsObject *p0 = pParent0->GetEngineObject()->VPhysicsGetObject();
+		IPhysicsObject *p1 = pParent1->GetEngineObject()->VPhysicsGetObject();
 		if ( p0 && p1 )
 		{
 			if ( g_EntityCollisionHash->IsObjectPairInHash( p0, p1 ) )
@@ -848,12 +848,12 @@ void CCollisionEvent::UpdatePenetrateEvents( void )
 		{
 			if ( pEntity0 && pEntity1 )
 			{
-				IPhysicsObject *pObj0 = pEntity0->VPhysicsGetObject();
+				IPhysicsObject *pObj0 = pEntity0->GetEngineObject()->VPhysicsGetObject();
 				if ( pObj0 )
 				{
 					PhysForceEntityToSleep( pEntity0, pObj0 );
 				}
-				IPhysicsObject *pObj1 = pEntity1->VPhysicsGetObject();
+				IPhysicsObject *pObj1 = pEntity1->GetEngineObject()->VPhysicsGetObject();
 				if ( pObj1 )
 				{
 					PhysForceEntityToSleep( pEntity1, pObj1 );
@@ -899,8 +899,8 @@ void CCollisionEvent::UpdatePenetrateEvents( void )
 			{
 				if ( pEntity0 && pEntity1 )
 				{
-					IPhysicsObject *pObj0 = pEntity0->VPhysicsGetObject();
-					IPhysicsObject *pObj1 = pEntity1->VPhysicsGetObject();
+					IPhysicsObject *pObj0 = pEntity0->GetEngineObject()->VPhysicsGetObject();
+					IPhysicsObject *pObj1 = pEntity1->GetEngineObject()->VPhysicsGetObject();
 					if ( pObj0 && pObj1 )
 					{
 						m_penetrateEvents[i].collisionState = COLLSTATE_ENABLED;
@@ -1504,7 +1504,7 @@ static void MarkVPhysicsDebug( CBaseEntity *pEntity )
 {
 	if ( pEntity )
 	{
-		IPhysicsObject *pPhysics = pEntity->VPhysicsGetObject();
+		IPhysicsObject *pPhysics = pEntity->GetEngineObject()->VPhysicsGetObject();
 		if ( pPhysics )
 		{
 			unsigned short callbacks = pPhysics->GetCallbackFlags();
@@ -1623,7 +1623,7 @@ CON_COMMAND( physics_budget, "Times the cost of each active object" )
 		{
 			for ( int j = 0; j < i; j++ )
 			{
-				PhysForceEntityToSleep( ents[j], ents[j]->VPhysicsGetObject() );
+				PhysForceEntityToSleep( ents[j], ents[j]->GetEngineObject()->VPhysicsGetObject() );
 			}
 			float start = engine->Time();
 			physenv->Simulate( gpGlobals->interval_per_tick );
@@ -1745,7 +1745,7 @@ void PhysFrame( float deltaTime )
 			continue;
 		}
 
-		IPhysicsObject *pPhysics = pEntity->VPhysicsGetObject();
+		IPhysicsObject *pPhysics = pEntity->GetEngineObject()->VPhysicsGetObject();
 		// apply updates
 		if ( pPhysics && !pPhysics->IsAsleep() )
 		{
@@ -2176,7 +2176,7 @@ void CCollisionEvent::UpdateDamageEvents( void )
 			if ( pCombat )
 			{
 				vphysics_objectstress_t stressOut;
-				event.info.AddDamage( pCombat->CalculatePhysicsStressDamage( &stressOut, pCombat->VPhysicsGetObject() ) );
+				event.info.AddDamage( pCombat->CalculatePhysicsStressDamage( &stressOut, pCombat->GetEngineObject()->VPhysicsGetObject() ) );
 			}
 		}
 #endif
@@ -2313,7 +2313,7 @@ void CCollisionEvent::AddDamageEvent( CBaseEntity *pEntity, const CTakeDamageInf
 
 	if ( event.bRestoreVelocity )
 	{
-		float otherMass = pEntity->VPhysicsGetObject()->GetMass();
+		float otherMass = pEntity->GetEngineObject()->VPhysicsGetObject()->GetMass();
 		int inflictorIndex = FindDamageInflictor(pInflictorPhysics);
 		if ( inflictorIndex >= 0 )
 		{
@@ -2767,7 +2767,7 @@ void PhysCallbackDamage( CBaseEntity *pEntity, const CTakeDamageInfo &info )
 	if ( PhysIsInCallback() )
 	{
 		CBaseEntity *pInflictor = info.GetInflictor();
-		IPhysicsObject *pInflictorPhysics = (pInflictor) ? pInflictor->VPhysicsGetObject() : NULL;
+		IPhysicsObject *pInflictorPhysics = (pInflictor) ? pInflictor->GetEngineObject()->VPhysicsGetObject() : NULL;
 		g_Collisions.AddDamageEvent( pEntity, info, pInflictorPhysics, false, vec3_origin, vec3_origin );
 		if ( pEntity && info.GetInflictor() )
 		{
@@ -2824,7 +2824,7 @@ IPhysicsObject *FindPhysicsObjectByName( const char *pName, CBaseEntity *pErrorE
 		pEntity = gEntList.FindEntityByName( pEntity, pName );
 		if ( !pEntity )
 			break;
-		if ( pEntity->VPhysicsGetObject() )
+		if ( pEntity->GetEngineObject()->VPhysicsGetObject() )
 		{
 			if ( pBestObject )
 			{
@@ -2838,7 +2838,7 @@ IPhysicsObject *FindPhysicsObjectByName( const char *pName, CBaseEntity *pErrorE
 				break;
 
 			}
-			pBestObject = pEntity->VPhysicsGetObject();
+			pBestObject = pEntity->GetEngineObject()->VPhysicsGetObject();
 		}
 	}
 	return pBestObject;

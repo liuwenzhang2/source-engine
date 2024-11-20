@@ -1065,7 +1065,7 @@ void CBaseHeadcrab::GatherConditions( void )
 			{
 				SetCondition( COND_HEADCRAB_ILLEGAL_GROUNDENT );
 			}
-			else if( ground->VPhysicsGetObject() && (ground->VPhysicsGetObject()->GetGameFlags() & FVPHYSICS_PLAYER_HELD) )
+			else if( ground->GetEngineObject()->VPhysicsGetObject() && (ground->GetEngineObject()->VPhysicsGetObject()->GetGameFlags() & FVPHYSICS_PLAYER_HELD) )
 			{
 				SetCondition( COND_HEADCRAB_ILLEGAL_GROUNDENT );
 			}
@@ -1466,9 +1466,9 @@ void CBaseHeadcrab::StartTask( const Task_t *pTask )
 				// If jumping off of a physics object that the player is holding, create a 
 				// solver to prevent the headcrab from colliding with that object for a 
 				// short time.
-				if( ground && ground->VPhysicsGetObject() )
+				if( ground && ground->GetEngineObject()->VPhysicsGetObject() )
 				{
-					if( ground->VPhysicsGetObject()->GetGameFlags() & FVPHYSICS_PLAYER_HELD )
+					if( ground->GetEngineObject()->VPhysicsGetObject()->GetGameFlags() & FVPHYSICS_PLAYER_HELD )
 					{
 						NPCPhysics_CreateSolver( this, ground, true, 0.5 );
 					}
@@ -2191,7 +2191,7 @@ void CBaseHeadcrab::ClearBurrowPoint( const Vector &origin )
 	//Iterate on all entities in the vicinity.
 	for ( CEntitySphereQuery sphere( origin, 128 ); ( pEntity = sphere.GetCurrentEntity() ) != NULL; sphere.NextEntity() )
 	{
-		if ( pEntity->m_takedamage != DAMAGE_NO && pEntity->Classify() != CLASS_PLAYER && pEntity->VPhysicsGetObject() )
+		if ( pEntity->m_takedamage != DAMAGE_NO && pEntity->Classify() != CLASS_PLAYER && pEntity->GetEngineObject()->VPhysicsGetObject() )
 		{
 			vecSpot	 = pEntity->BodyTarget( origin );
 			vecForce = ( vecSpot - origin ) + Vector( 0, 0, 16 );
@@ -2204,8 +2204,8 @@ void CBaseHeadcrab::ClearBurrowPoint( const Vector &origin )
 
 			if ( flDist <= 128.0f )
 			{
-				pEntity->VPhysicsGetObject()->Wake();
-				pEntity->VPhysicsGetObject()->ApplyForceOffset( vecForce * 250.0f, vecCenter );
+				pEntity->GetEngineObject()->VPhysicsGetObject()->Wake();
+				pEntity->GetEngineObject()->VPhysicsGetObject()->ApplyForceOffset( vecForce * 250.0f, vecCenter );
 			}
 		}
 	}
@@ -2230,7 +2230,7 @@ bool CBaseHeadcrab::ValidBurrowPoint( const Vector &point )
 		CBaseEntity *pEntity = (CBaseEntity*)tr.m_pEnt;
 
 		//If it's a physics object, attempt to knock is away, unless it's a car
-		if ( ( pEntity ) && ( pEntity->VPhysicsGetObject() ) && ( pEntity->GetServerVehicle() == NULL ) )
+		if ( ( pEntity ) && ( pEntity->GetEngineObject()->VPhysicsGetObject() ) && ( pEntity->GetServerVehicle() == NULL ) )
 		{
 			ClearBurrowPoint( point );
 		}

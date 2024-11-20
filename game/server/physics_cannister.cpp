@@ -93,7 +93,7 @@ void CPhysicsCannister::Spawn( void )
 	m_active = false;
 
 	CreateVPhysics();
-	if ( !VPhysicsGetObject() )
+	if ( !GetEngineObject()->VPhysicsGetObject() )
 	{
 		// must have a physics object or code will crash later
 		UTIL_Remove(this);
@@ -222,9 +222,9 @@ void CPhysicsCannister::CannisterActivate( CBaseEntity *pActivator, const Vector
 
 	Vector thrustDirection = CalcLocalThrust( thrustOffset );
 	m_onActivate.FireOutput( pActivator, this, 0 );
-	m_thruster.CalcThrust( m_thrustOrigin, thrustDirection, VPhysicsGetObject() );
+	m_thruster.CalcThrust( m_thrustOrigin, thrustDirection, GetEngineObject()->VPhysicsGetObject() );
 	m_pController = physenv->CreateMotionController( &m_thruster );
-	IPhysicsObject *pPhys = VPhysicsGetObject();
+	IPhysicsObject *pPhys = GetEngineObject()->VPhysicsGetObject();
 	m_pController->AttachObject( pPhys, true );
 	// Make sure the object is simulated
 	pPhys->Wake();
@@ -316,7 +316,7 @@ void CPhysicsCannister::InputExplode(inputdata_t &data)
 //-----------------------------------------------------------------------------
 void CPhysicsCannister::InputWake( inputdata_t &data )
 {
-	IPhysicsObject *pPhys = VPhysicsGetObject();
+	IPhysicsObject *pPhys = GetEngineObject()->VPhysicsGetObject();
 	if ( pPhys != NULL )
 	{
 		pPhys->Wake();
@@ -332,7 +332,7 @@ void CPhysicsCannister::Deactivate(void)
 	if ( !m_pController )
 		return;
 
-	m_pController->DetachObject( VPhysicsGetObject() );
+	m_pController->DetachObject(GetEngineObject()->VPhysicsGetObject() );
 	physenv->DestroyMotionController( m_pController );
 	m_pController = NULL;
 	GetEngineObject()->SetNextThink( TICK_NEVER_THINK );
@@ -360,7 +360,7 @@ void CPhysicsCannister::Explode( CBaseEntity *pAttacker )
 
 	Vector velocity;
 	AngularImpulse angVelocity;
-	IPhysicsObject *pPhysics = VPhysicsGetObject();
+	IPhysicsObject *pPhysics = GetEngineObject()->VPhysicsGetObject();
 
 	pPhysics->GetVelocity( &velocity, &angVelocity );
 	PropBreakableCreateAll(GetEngineObject()->GetModelIndex(), pPhysics, GetEngineObject()->GetAbsOrigin(), GetEngineObject()->GetAbsAngles(), velocity, angVelocity, 1.0, 20, COLLISION_GROUP_DEBRIS );

@@ -299,7 +299,7 @@ public:
 		Assert(pEntity);
 		Assert(pTmpPhysics);
 		m_pEntity = pEntity;
-		m_pPhysics = m_pEntity->VPhysicsGetObject();
+		m_pPhysics = m_pEntity->GetEngineObject()->VPhysicsGetObject();
 		if ( m_pPhysics )
 		{
 			m_pEntity->GetEngineObject()->VPhysicsSwapObject( pTmpPhysics );
@@ -372,7 +372,7 @@ bool CBoneFollower::TestCollision( const Ray_t &ray, unsigned int mask, trace_t&
 void CBoneFollower::UpdateFollower( const Vector &position, const QAngle &orientation, float flInterval )
 {
 	// UNDONE: Shadow update needs timing info?
-	VPhysicsGetObject()->UpdateShadow( position, orientation, false, flInterval );
+	GetEngineObject()->VPhysicsGetObject()->UpdateShadow( position, orientation, false, flInterval );
 }
 
 void CBoneFollower::SetTraceData( int physicsBone, int hitGroup )

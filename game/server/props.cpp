@@ -474,8 +474,8 @@ void CBreakableProp::HandleFirstCollisionInteractions( int index, gamevcollision
 		Vector vecPosition;
 		Vector vecVelocity;
 
-		VPhysicsGetObject()->GetVelocity( &vecVelocity, NULL );
-		VPhysicsGetObject()->GetPosition( &vecPosition, NULL );
+		GetEngineObject()->VPhysicsGetObject()->GetVelocity( &vecVelocity, NULL );
+		GetEngineObject()->VPhysicsGetObject()->GetPosition( &vecPosition, NULL );
 
 		info.SetDamageForce( vecVelocity );
 		info.SetDamagePosition( vecPosition );
@@ -486,7 +486,7 @@ void CBreakableProp::HandleFirstCollisionInteractions( int index, gamevcollision
 	
 	if( HasInteraction( PROPINTER_PHYSGUN_FIRST_PAINT ) )
 	{
-		IPhysicsObject *pObj = VPhysicsGetObject();
+		IPhysicsObject *pObj = GetEngineObject()->VPhysicsGetObject();
  
 		Vector vecPos;
 		pObj->GetPosition( &vecPos, NULL );
@@ -597,7 +597,7 @@ void CPhysicsProp::HandleAnyCollisionInteractions( int index, gamevcollisioneven
 		else if ( pHitEntity->MyNPCPointer() )
 		{
 			CAI_BaseNPC *pNPC = pHitEntity->MyNPCPointer();
-			IPhysicsObject *pObj = VPhysicsGetObject();
+			IPhysicsObject *pObj = GetEngineObject()->VPhysicsGetObject();
 
 			// do not impale NPCs if the impaler is friendly
 			CBasePlayer *pAttacker = HasPhysicsAttacker( 25.0f );
@@ -642,7 +642,7 @@ void CPhysicsProp::HandleAnyCollisionInteractions( int index, gamevcollisioneven
 
 void CBreakableProp::StickAtPosition( const Vector &stickPosition, const Vector &savePosition, const QAngle &saveAngles )
 {
-	if ( !VPhysicsGetObject()->IsMotionEnabled() )
+	if ( !GetEngineObject()->VPhysicsGetObject()->IsMotionEnabled() )
 		return;
 
 	const char* soundname = "Metal.SawbladeStick";
@@ -657,7 +657,7 @@ void CBreakableProp::StickAtPosition( const Vector &stickPosition, const Vector 
 	Teleport( &stickPosition, NULL, NULL );
 	SetEnableMotionPosition( savePosition, saveAngles );  // this uses hierarchy, so it must be set after teleport
 
-	VPhysicsGetObject()->EnableMotion( false );
+	GetEngineObject()->VPhysicsGetObject()->EnableMotion( false );
 	GetEngineObject()->AddSpawnFlags( SF_PHYSPROP_ENABLE_ON_PHYSCANNON );
 	GetEngineObject()->SetCollisionGroup( COLLISION_GROUP_DEBRIS );
 }
@@ -677,7 +677,7 @@ void CBreakableProp::HandleInteractionStick( int index, gamevcollisionevent_t *p
 	{
 		Vector position;
 		QAngle angles;
-		VPhysicsGetObject()->GetPosition( &position, &angles );
+		GetEngineObject()->VPhysicsGetObject()->GetPosition( &position, &angles );
 
 		Vector vecNormal;
 		pEvent->pInternalData->GetSurfaceNormal( vecNormal );
@@ -1177,7 +1177,7 @@ int CBreakableProp::OnTakeDamage( const CTakeDamageInfo &inputInfo )
 //-----------------------------------------------------------------------------
 void CBreakableProp::Event_Killed( const CTakeDamageInfo &info )
 {
-	IPhysicsObject *pPhysics = VPhysicsGetObject();
+	IPhysicsObject *pPhysics = GetEngineObject()->VPhysicsGetObject();
 	if ( pPhysics && !pPhysics->IsMoveable() )
 	{
 		pPhysics->EnableMotion( true );
@@ -1610,7 +1610,7 @@ void CBreakableProp::Precache()
 // derive their positions and velocities
 IPhysicsObject *CBreakableProp::GetRootPhysicsObjectForBreak()
 {
-	return VPhysicsGetObject();
+	return GetEngineObject()->VPhysicsGetObject();
 }
 
 void CBreakableProp::Break( CBaseEntity *pBreaker, const CTakeDamageInfo &info )
@@ -1682,7 +1682,7 @@ void CBreakableProp::Break( CBaseEntity *pBreaker, const CTakeDamageInfo &info )
 		angles = GetEngineObject()->GetAbsAngles();
 	}
 
-	PhysBreakSound( this, VPhysicsGetObject(), GetEngineObject()->GetAbsOrigin() );
+	PhysBreakSound( this, GetEngineObject()->VPhysicsGetObject(), GetEngineObject()->GetAbsOrigin() );
 
 	bool bExploded = false;
 
@@ -2125,7 +2125,7 @@ IPhysicsObject *CDynamicProp::GetRootPhysicsObjectForBreak()
 		CBaseEntity *pFollowerEntity = pFollower->hFollower;
 		if ( pFollowerEntity )
 		{
-			return pFollowerEntity->VPhysicsGetObject();
+			return pFollowerEntity->GetEngineObject()->VPhysicsGetObject();
 		}
 	}
 
@@ -2637,7 +2637,7 @@ bool CPhysicsProp::CreateVPhysics()
 	// fix up any noncompliant blades.
 	if( HasInteraction( PROPINTER_PHYSGUN_LAUNCH_SPIN_Z ) )
 	{
-		if( !(VPhysicsGetObject()->GetGameFlags() & FVPHYSICS_DMG_SLICE) )
+		if( !(GetEngineObject()->VPhysicsGetObject()->GetGameFlags() & FVPHYSICS_DMG_SLICE) )
 		{
 			PhysSetGameFlags( pPhysicsObject, FVPHYSICS_DMG_SLICE );
 
@@ -2673,7 +2673,7 @@ bool CPhysicsProp::CanBePickedUpByPhyscannon( void )
 	if (GetEngineObject()->HasSpawnFlags( SF_PHYSPROP_PREVENT_PICKUP ) )
 		return false;
 
-	IPhysicsObject *pPhysicsObject = VPhysicsGetObject();
+	IPhysicsObject *pPhysicsObject = GetEngineObject()->VPhysicsGetObject();
 	if ( pPhysicsObject && pPhysicsObject->IsMoveable() == false )
 	{
 		if (GetEngineObject()->HasSpawnFlags( SF_PHYSPROP_ENABLE_ON_PHYSCANNON ) == false )
@@ -2696,7 +2696,7 @@ bool CPhysicsProp::OverridePropdata( void )
 //-----------------------------------------------------------------------------
 void CPhysicsProp::InputWake( inputdata_t &inputdata )
 {
-	IPhysicsObject *pPhysicsObject = VPhysicsGetObject();
+	IPhysicsObject *pPhysicsObject = GetEngineObject()->VPhysicsGetObject();
 	if ( pPhysicsObject != NULL )
 	{
 		pPhysicsObject->Wake();
@@ -2708,7 +2708,7 @@ void CPhysicsProp::InputWake( inputdata_t &inputdata )
 //-----------------------------------------------------------------------------
 void CPhysicsProp::InputSleep( inputdata_t &inputdata )
 {
-	IPhysicsObject *pPhysicsObject = VPhysicsGetObject();
+	IPhysicsObject *pPhysicsObject = GetEngineObject()->VPhysicsGetObject();
 	if ( pPhysicsObject != NULL )
 	{
 		pPhysicsObject->Sleep();
@@ -2728,7 +2728,7 @@ void CPhysicsProp::InputEnableMotion( inputdata_t &inputdata )
 //-----------------------------------------------------------------------------
 void CPhysicsProp::InputDisableMotion( inputdata_t &inputdata )
 {
-	IPhysicsObject *pPhysicsObject = VPhysicsGetObject();
+	IPhysicsObject *pPhysicsObject = GetEngineObject()->VPhysicsGetObject();
 	if ( pPhysicsObject != NULL )
 	{
 		pPhysicsObject->EnableMotion( false );
@@ -2738,7 +2738,7 @@ void CPhysicsProp::InputDisableMotion( inputdata_t &inputdata )
 // Turn off floating simulation (and cost)
 void CPhysicsProp::InputDisableFloating( inputdata_t &inputdata )
 {
-	PhysEnableFloating( VPhysicsGetObject(), false );
+	PhysEnableFloating(GetEngineObject()->VPhysicsGetObject(), false );
 }
 
 //-----------------------------------------------------------------------------
@@ -2746,7 +2746,7 @@ void CPhysicsProp::InputDisableFloating( inputdata_t &inputdata )
 //-----------------------------------------------------------------------------
 void CPhysicsProp::EnableMotion( void )
 {
-	IPhysicsObject *pPhysicsObject = VPhysicsGetObject();
+	IPhysicsObject *pPhysicsObject = GetEngineObject()->VPhysicsGetObject();
 	if ( pPhysicsObject )
 	{
 		Vector pos;
@@ -2774,7 +2774,7 @@ void CPhysicsProp::OnPhysGunPickup( CBasePlayer *pPhysGunUser, PhysGunPickup_t r
 {
 	BaseClass::OnPhysGunPickup( pPhysGunUser, reason );
 
-	IPhysicsObject *pPhysicsObject = VPhysicsGetObject();
+	IPhysicsObject *pPhysicsObject = GetEngineObject()->VPhysicsGetObject();
 	if ( pPhysicsObject && !pPhysicsObject->IsMoveable() )
 	{
 		if ( !GetEngineObject()->HasSpawnFlags( SF_PHYSPROP_ENABLE_ON_PHYSCANNON ) )
@@ -2820,14 +2820,14 @@ void CPhysicsProp::OnPhysGunDrop( CBasePlayer *pPhysGunUser, PhysGunDrop_t Reaso
 		if ( HasInteraction( PROPINTER_PHYSGUN_LAUNCH_SPIN_Z ) )
 		{
 			AngularImpulse angVel( 0, 0, 5000.0 );
-			VPhysicsGetObject()->AddVelocity( NULL, &angVel );
+			GetEngineObject()->VPhysicsGetObject()->AddVelocity( NULL, &angVel );
 			
 			// no angular drag on this object anymore
 			float angDrag = 0.0f;
-			VPhysicsGetObject()->SetDragCoefficient( NULL, &angDrag );
+			GetEngineObject()->VPhysicsGetObject()->SetDragCoefficient( NULL, &angDrag );
 		}
 
-		PhysSetGameFlags( VPhysicsGetObject(), FVPHYSICS_WAS_THROWN );
+		PhysSetGameFlags(GetEngineObject()->VPhysicsGetObject(), FVPHYSICS_WAS_THROWN );
 		m_bFirstCollisionAfterLaunch = true;
 	}
 	else if ( Reason == THROWN_BY_PLAYER )
@@ -2987,9 +2987,9 @@ void CPhysicsProp::VPhysicsUpdate( IPhysicsObject *pPhysics )
 void CPhysicsProp::ClearFlagsThink( void )
 {
 	// collision may have destroyed the physics object, recheck
-	if ( VPhysicsGetObject() )
+	if (GetEngineObject()->VPhysicsGetObject() )
 	{
-		PhysClearGameFlags( VPhysicsGetObject(), FVPHYSICS_WAS_THROWN );
+		PhysClearGameFlags(GetEngineObject()->VPhysicsGetObject(), FVPHYSICS_WAS_THROWN );
 	}
 	SetContextThink( NULL, 0, "PROP_CLEARFLAGS" );
 }
@@ -3141,9 +3141,9 @@ int CPhysicsProp::OnTakeDamage( const CTakeDamageInfo &info )
 			// Burning! scare things in my path if I'm moving.
 			Vector vel;
 
-			if( VPhysicsGetObject() )
+			if(GetEngineObject()->VPhysicsGetObject() )
 			{
-				VPhysicsGetObject()->GetVelocity( &vel, NULL );
+				GetEngineObject()->VPhysicsGetObject()->GetVelocity( &vel, NULL );
 
 				int dangerRadius = 256; // generous radius to begin with
 
@@ -3191,7 +3191,7 @@ int CPhysicsProp::OnTakeDamage( const CTakeDamageInfo &info )
 		
 		// The damage that enables motion may have been enough damage to kill me if I'm breakable
 		// in which case my physics object is gone.
-		if ( VPhysicsGetObject() != NULL )
+		if (GetEngineObject()->VPhysicsGetObject() != NULL )
 		{
 			EnableMotion(); 
 			VPhysicsTakeDamage( info );
@@ -3207,19 +3207,19 @@ int CPhysicsProp::OnTakeDamage( const CTakeDamageInfo &info )
 //-----------------------------------------------------------------------------
 void CPhysicsProp::GetMassCenter( Vector *pMassCenter )
 {
-	if ( !VPhysicsGetObject() )
+	if ( !GetEngineObject()->VPhysicsGetObject() )
 	{
 		pMassCenter->Init();
 		return;
 	}
 
-	Vector vecLocal = VPhysicsGetObject()->GetMassCenterLocalSpace();
+	Vector vecLocal = GetEngineObject()->VPhysicsGetObject()->GetMassCenterLocalSpace();
 	VectorTransform( vecLocal, GetEngineObject()->EntityToWorldTransform(), *pMassCenter );
 }
 
 float CPhysicsProp::GetMass() const
 {
-	return VPhysicsGetObject() ? VPhysicsGetObject()->GetMass() : 1.0f;
+	return GetEngineObject()->VPhysicsGetObject() ? GetEngineObject()->VPhysicsGetObject()->GetMass() : 1.0f;
 }
 
 	
@@ -3233,22 +3233,22 @@ int CPhysicsProp::DrawDebugTextOverlays(void)
 
 	if (m_debugOverlays & OVERLAY_TEXT_BIT) 
 	{
-		if (VPhysicsGetObject())
+		if (GetEngineObject()->VPhysicsGetObject())
 		{
 			char tempstr[512];
-			Q_snprintf(tempstr, sizeof(tempstr),"Mass: %.2f kg / %.2f lb (%s)", VPhysicsGetObject()->GetMass(), kg2lbs(VPhysicsGetObject()->GetMass()), GetMassEquivalent(VPhysicsGetObject()->GetMass()));
+			Q_snprintf(tempstr, sizeof(tempstr),"Mass: %.2f kg / %.2f lb (%s)", GetEngineObject()->VPhysicsGetObject()->GetMass(), kg2lbs(GetEngineObject()->VPhysicsGetObject()->GetMass()), GetMassEquivalent(GetEngineObject()->VPhysicsGetObject()->GetMass()));
 			EntityText( text_offset, tempstr, 0);
 			text_offset++;
 
 			{
 				vphysics_objectstress_t stressOut;
-				float stress = CalculateObjectStress( VPhysicsGetObject(), this, &stressOut );
+				float stress = CalculateObjectStress(GetEngineObject()->VPhysicsGetObject(), this, &stressOut );
 				Q_snprintf(tempstr, sizeof(tempstr),"Stress: %.2f (%.2f / %.2f)", stress, stressOut.exertedStress, stressOut.receivedStress );
 				EntityText( text_offset, tempstr, 0);
 				text_offset++;
 			}
 
-			if ( !VPhysicsGetObject()->IsMoveable() )
+			if ( !GetEngineObject()->VPhysicsGetObject()->IsMoveable() )
 			{
 				Q_snprintf(tempstr, sizeof(tempstr),"Motion Disabled" );
 				EntityText( text_offset, tempstr, 0);
@@ -3808,10 +3808,10 @@ void CBasePropDoor::CalcDoorSounds()
 				strSoundClose = AllocPooledString( pkvSkinData->GetString( "close" ) );
 				strSoundMoving = AllocPooledString( pkvSkinData->GetString( "move" ) );
 				const char *pSurfaceprop = pkvSkinData->GetString( "surfaceprop" );
-				if ( pSurfaceprop && VPhysicsGetObject() )
+				if ( pSurfaceprop && GetEngineObject()->VPhysicsGetObject() )
 				{
 					bFoundSkin = true;
-					VPhysicsGetObject()->SetMaterialIndex( physprops->GetSurfaceIndex( pSurfaceprop ) );
+					GetEngineObject()->VPhysicsGetObject()->SetMaterialIndex( physprops->GetSurfaceIndex( pSurfaceprop ) );
 				}
 			}
 
@@ -3844,10 +3844,10 @@ void CBasePropDoor::CalcDoorSounds()
 	}
 	modelKeyValues->deleteThis();
 	modelKeyValues = NULL;
-	if ( !bFoundSkin && VPhysicsGetObject() )
+	if ( !bFoundSkin && GetEngineObject()->VPhysicsGetObject() )
 	{
 		Warning( "%s has Door model (%s) with no door_options! Verify that SKIN is valid, and has a corresponding options block in the model QC file\n", GetDebugName(), modelinfo->GetModelName(GetEngineObject()->GetModel() ) );
-		VPhysicsGetObject()->SetMaterialIndex( physprops->GetSurfaceIndex("wood") );
+		GetEngineObject()->VPhysicsGetObject()->SetMaterialIndex( physprops->GetSurfaceIndex("wood") );
 	}
 
 	// Any sound data members that are already filled out were specified as level designer overrides,
@@ -4635,7 +4635,7 @@ bool CBasePropDoor::NPCOpenDoor( CAI_BaseNPC *pNPC )
 
 bool CBasePropDoor::TestCollision( const Ray_t &ray, unsigned int mask, trace_t& trace )
 {
-	if ( !VPhysicsGetObject() )
+	if ( !GetEngineObject()->VPhysicsGetObject() )
 		return false;
 
 	IStudioHdr *pStudioHdr = GetEngineObject()->GetModelPtr( );
@@ -4645,11 +4645,11 @@ bool CBasePropDoor::TestCollision( const Ray_t &ray, unsigned int mask, trace_t&
 	if ( !( pStudioHdr->contents() & mask ) )
 		return false;
 
-	physcollision->TraceBox( ray, VPhysicsGetObject()->GetCollide(), GetEngineObject()->GetAbsOrigin(), GetEngineObject()->GetAbsAngles(), &trace );
+	physcollision->TraceBox( ray, GetEngineObject()->VPhysicsGetObject()->GetCollide(), GetEngineObject()->GetAbsOrigin(), GetEngineObject()->GetAbsAngles(), &trace );
 
 	if ( trace.DidHit() )
 	{
-		trace.surface.surfaceProps = VPhysicsGetObject()->GetMaterialIndex();
+		trace.surface.surfaceProps = GetEngineObject()->VPhysicsGetObject()->GetMaterialIndex();
 		return true;
 	}
 
@@ -4698,7 +4698,7 @@ public:
 			// If objects are small enough and can move, close on them
 			if ( pEntity->GetEngineObject()->GetMoveType() == MOVETYPE_VPHYSICS )
 			{
-				IPhysicsObject *pPhysics = pEntity->VPhysicsGetObject();
+				IPhysicsObject *pPhysics = pEntity->GetEngineObject()->VPhysicsGetObject();
 				Assert(pPhysics);
 				
 				// Must either be squashable or very light
@@ -5564,7 +5564,7 @@ public:
 
 	virtual bool IsAsleep()
 	{
-		return VPhysicsGetObject()->IsAsleep();
+		return GetEngineObject()->VPhysicsGetObject()->IsAsleep();
 	}
 
 	CNetworkVar( int, m_iPhysicsMode );	// One of the PHYSICS_MULTIPLAYER_ defines.	
@@ -5578,7 +5578,7 @@ public:
 	{
 		BaseClass::Activate();
 		GetEngineObject()->SetCollisionGroup( COLLISION_GROUP_PUSHAWAY );
-		m_fMass = VPhysicsGetObject()->GetMass();
+		m_fMass = GetEngineObject()->VPhysicsGetObject()->GetMass();
 	}
 };
 
@@ -5659,10 +5659,10 @@ class CPhysicsPropMultiplayer : public CPhysicsProp, public IMultiplayerPhysics
 		// use auto detect based on size & mass
 		if ( m_iPhysicsMode == PHYSICS_MULTIPLAYER_AUTODETECT )
 		{
-			if ( VPhysicsGetObject() )
+			if (GetEngineObject()->VPhysicsGetObject() )
 			{
 				m_iPhysicsMode = GetAutoMultiplayerPhysicsMode( 
-					GetEngineObject()->OBBSize(), VPhysicsGetObject()->GetMass() );
+					GetEngineObject()->OBBSize(), GetEngineObject()->VPhysicsGetObject()->GetMass() );
 			}
 			else
 			{
@@ -5702,8 +5702,8 @@ class CPhysicsPropMultiplayer : public CPhysicsProp, public IMultiplayerPhysics
 			GetEngineObject()->SetCollisionGroup( COLLISION_GROUP_DEBRIS );
 		}
 
-		if(VPhysicsGetObject())
-			m_fMass = VPhysicsGetObject()->GetMass();
+		if(GetEngineObject()->VPhysicsGetObject())
+			m_fMass = GetEngineObject()->VPhysicsGetObject()->GetMass();
 
 		// VPhysicsGetObject() is NULL on the client, which prevents the client from finding a decent
 		// AABB surrounding the collision bounds.  If we've got a VPhysicsGetObject()->GetCollide(), we'll
@@ -5713,7 +5713,7 @@ class CPhysicsPropMultiplayer : public CPhysicsProp, public IMultiplayerPhysics
 		m_usingCustomCollisionBounds = false;
 		if ( (GetEngineObject()->GetSolid() == SOLID_VPHYSICS ) && (GetEngineObject()->GetMoveType() == MOVETYPE_VPHYSICS ) )
 		{
-			IPhysicsObject *pPhysics = VPhysicsGetObject();
+			IPhysicsObject *pPhysics = GetEngineObject()->VPhysicsGetObject();
 			if ( pPhysics && pPhysics->GetCollide() )
 			{
 				physcollision->CollideGetAABB( &m_collisionMins.GetForModify(), &m_collisionMaxs.GetForModify(), pPhysics->GetCollide(), vec3_origin, vec3_angle );
@@ -5820,7 +5820,7 @@ void CPhysicsPropRespawnable::Spawn( void )
 
 void CPhysicsPropRespawnable::Event_Killed( const CTakeDamageInfo &info )
 {
-	IPhysicsObject *pPhysics = VPhysicsGetObject();
+	IPhysicsObject *pPhysics = GetEngineObject()->VPhysicsGetObject();
 	if ( pPhysics && !pPhysics->IsMoveable() )
 	{
 		pPhysics->EnableMotion( true );
@@ -6044,7 +6044,7 @@ bool UTIL_CreateScaledPhysObject( CBaseAnimating *pInstance, float flScale )
 	// FIXME: This needs to work for ragdolls!
 
 	// Get our object
-	IPhysicsObject *pObject = pInstance->VPhysicsGetObject();
+	IPhysicsObject *pObject = pInstance->GetEngineObject()->VPhysicsGetObject();
 	if ( pObject == NULL )
 	{
 		AssertMsg( 0, "UTIL_CreateScaledPhysObject: Failed to scale physics for object-- It has no physics." );

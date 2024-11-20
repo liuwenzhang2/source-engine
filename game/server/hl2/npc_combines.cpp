@@ -311,7 +311,7 @@ void CNPC_CombineS::Event_Killed( const CTakeDamageInfo &info )
 
 				if ( pItem )
 				{
-					IPhysicsObject *pObj = pItem->VPhysicsGetObject();
+					IPhysicsObject *pObj = pItem->GetEngineObject()->VPhysicsGetObject();
 
 					if ( pObj )
 					{

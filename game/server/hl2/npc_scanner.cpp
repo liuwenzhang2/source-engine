@@ -935,7 +935,7 @@ void CNPC_CScanner::DeployMine()
 
 			ScannerEmitSound( "DeployMine" );
 
-			IPhysicsObject *pPhysObj = child->GetOuter()->VPhysicsGetObject();
+			IPhysicsObject *pPhysObj = child->GetOuter()->GetEngineObject()->VPhysicsGetObject();
 			if( pPhysObj )
 			{
 				// Make sure the mine's awake

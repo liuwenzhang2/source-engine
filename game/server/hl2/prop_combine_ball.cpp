@@ -91,7 +91,7 @@ CBaseEntity *CreateCombineBall( const Vector &origin, const Vector &velocity, fl
 	g_pSoundEmitterSystem->EmitSound(filter, pBall->entindex(), params);
 	//g_pSoundEmitterSystem->EmitSound(pBall, "NPC_CombineBall.Launch" );//pBall->
 
-	PhysSetGameFlags( pBall->VPhysicsGetObject(), FVPHYSICS_WAS_THROWN );
+	PhysSetGameFlags( pBall->GetEngineObject()->VPhysicsGetObject(), FVPHYSICS_WAS_THROWN );
 
 	pBall->StartWhizSoundThink();
 
@@ -392,7 +392,7 @@ void CPropCombineBall::Spawn( void )
 	CreateVPhysics();
 
 	Vector vecAbsVelocity = GetEngineObject()->GetAbsVelocity();
-	VPhysicsGetObject()->SetVelocity( &vecAbsVelocity, NULL );
+	GetEngineObject()->VPhysicsGetObject()->SetVelocity( &vecAbsVelocity, NULL );
 
 	m_nState = STATE_NOT_THROWN;
 	m_flLastBounceTime = -1.0f;
@@ -459,12 +459,12 @@ void CPropCombineBall::CaptureBySpawner( )
 
 	// Slow down the ball
 	Vector vecVelocity;
-	VPhysicsGetObject()->GetVelocity( &vecVelocity, NULL );
+	GetEngineObject()->VPhysicsGetObject()->GetVelocity( &vecVelocity, NULL );
 	float flSpeed = VectorNormalize( vecVelocity );
 	if ( flSpeed > 25.0f )
 	{
 		vecVelocity *= flSpeed * 0.4f;
-		VPhysicsGetObject()->SetVelocity( &vecVelocity, NULL );
+		GetEngineObject()->VPhysicsGetObject()->SetVelocity( &vecVelocity, NULL );
 
 		// Slow it down until we can set its velocity ok
 		SetContextThink( &CPropCombineBall::CaptureBySpawner, gpGlobals->curtime + 0.01f,	s_pCaptureContext );
@@ -497,7 +497,7 @@ void CPropCombineBall::ReplaceInSpawner( float flSpeed )
 	VectorSubtract( vecTarget, GetEngineObject()->GetAbsOrigin(), vecVelocity );
 	VectorNormalize( vecVelocity );
 	vecVelocity *= flSpeed; 
-	VPhysicsGetObject()->SetVelocity( &vecVelocity, NULL );
+	GetEngineObject()->VPhysicsGetObject()->SetVelocity( &vecVelocity, NULL );
 	
 	// Set our desired speed to the spawner's speed. This will be
 	// our speed on our first bounce in the field.
@@ -537,7 +537,7 @@ void CPropCombineBall::ClearLifetime( void )
 //-----------------------------------------------------------------------------
 void CPropCombineBall::SetMass( float mass )
 {
-	IPhysicsObject *pObj = VPhysicsGetObject();
+	IPhysicsObject *pObj = GetEngineObject()->VPhysicsGetObject();
 
 	if ( pObj != NULL )
 	{
@@ -702,7 +702,7 @@ void CPropCombineBall::StartWhizSoundThink( void )
 void CPropCombineBall::WhizSoundThink()
 {
 	Vector vecPosition, vecVelocity;
-	IPhysicsObject *pPhysicsObject = VPhysicsGetObject();
+	IPhysicsObject *pPhysicsObject = GetEngineObject()->VPhysicsGetObject();
 	
 	if ( pPhysicsObject == NULL )
 	{
@@ -769,8 +769,8 @@ void CPropCombineBall::SetBallAsLaunched( void )
 	m_bLaunched = true;
 	SetState( STATE_THROWN );
 
-	VPhysicsGetObject()->SetMass( 750.0f );
-	VPhysicsGetObject()->SetInertia( Vector( 1e30, 1e30, 1e30 ) );
+	GetEngineObject()->VPhysicsGetObject()->SetMass( 750.0f );
+	GetEngineObject()->VPhysicsGetObject()->SetInertia( Vector( 1e30, 1e30, 1e30 ) );
 
 	StopLoopingSounds();
 	const char* soundname = "NPC_CombineBall.Launch";
@@ -845,8 +845,8 @@ void CPropCombineBall::OnPhysGunPickup( CBasePlayer *pPhysGunUser, PhysGunPickup
 		// Don't collide with anything we may have to pull the ball through
 		GetEngineObject()->SetCollisionGroup( COLLISION_GROUP_DEBRIS );
 
-		VPhysicsGetObject()->SetMass( 20.0f );
-		VPhysicsGetObject()->SetInertia( Vector( 100, 100, 100 ) );
+		GetEngineObject()->VPhysicsGetObject()->SetMass( 20.0f );
+		GetEngineObject()->VPhysicsGetObject()->SetInertia( Vector( 100, 100, 100 ) );
 
 		// Make it not explode
 		ClearLifetime( );
@@ -866,7 +866,7 @@ void CPropCombineBall::OnPhysGunPickup( CBasePlayer *pPhysGunUser, PhysGunPickup
 	else
 	{
 		Vector vecVelocity;
-		VPhysicsGetObject()->GetVelocity( &vecVelocity, NULL );
+		GetEngineObject()->VPhysicsGetObject()->GetVelocity( &vecVelocity, NULL );
 
 		SetSpeed( vecVelocity.Length() );
 
@@ -888,10 +888,10 @@ void CPropCombineBall::SetPlayerLaunched( CBasePlayer *pOwner )
 	SetOwnerEntity( pOwner );
 	SetWeaponLaunched( false );
 	
-	if( VPhysicsGetObject() )
+	if(GetEngineObject()->VPhysicsGetObject() )
 	{
-		PhysClearGameFlags( VPhysicsGetObject(), FVPHYSICS_NO_NPC_IMPACT_DMG );
-		PhysSetGameFlags( VPhysicsGetObject(), FVPHYSICS_DMG_DISSOLVE | FVPHYSICS_HEAVY_OBJECT );
+		PhysClearGameFlags(GetEngineObject()->VPhysicsGetObject(), FVPHYSICS_NO_NPC_IMPACT_DMG );
+		PhysSetGameFlags(GetEngineObject()->VPhysicsGetObject(), FVPHYSICS_DMG_DISSOLVE | FVPHYSICS_HEAVY_OBJECT );
 	}
 }
 
@@ -941,13 +941,13 @@ void CPropCombineBall::OnPhysGunDrop( CBasePlayer *pPhysGunUser, PhysGunDrop_t R
 
 		vecForward *= GetSpeed();
 
-		VPhysicsGetObject()->SetVelocity( &vecForward, &vec3_origin );
+		GetEngineObject()->VPhysicsGetObject()->SetVelocity( &vecForward, &vec3_origin );
 	}
 	else
 	{
 		// This will have the consequence of making it so that the
 		// ball is launched directly down the crosshair even if the player is moving.
-		VPhysicsGetObject()->SetVelocity( &vec3_origin, &vec3_origin );
+		GetEngineObject()->VPhysicsGetObject()->SetVelocity( &vec3_origin, &vec3_origin );
 	}
 
 	SetBallAsLaunched();
@@ -1649,7 +1649,7 @@ void CPropCombineBall::VPhysicsCollision( int index, gamevcollisionevent_t *pEve
 			PhysCallbackRemove( this );
 
 			// disable dissolve damage so we don't kill off the player when he's the one we hit
-			PhysClearGameFlags( VPhysicsGetObject(), FVPHYSICS_DMG_DISSOLVE );
+			PhysClearGameFlags(GetEngineObject()->VPhysicsGetObject(), FVPHYSICS_DMG_DISSOLVE );
 			return;
 		}
 	}
@@ -2037,7 +2037,7 @@ void CFuncCombineBallSpawner::GrabBallTouch( CBaseEntity *pOther )
 	Assert( pBall );
 
 	// Don't grab AR2 alt-fire
-	if ( pBall->WasWeaponLaunched() || !pBall->VPhysicsGetObject() )
+	if ( pBall->WasWeaponLaunched() || !pBall->GetEngineObject()->VPhysicsGetObject() )
 		return;
 
 	// Don't grab balls that are already in the field..

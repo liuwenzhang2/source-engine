@@ -901,9 +901,9 @@ ConVar cl_autohelp(
 
 			if (tr.fraction == 1.0)
 			{
-				if ((blockingEntity != NULL) && (blockingEntity->VPhysicsGetObject() != NULL))
+				if ((blockingEntity != NULL) && (blockingEntity->GetEngineObject()->VPhysicsGetObject() != NULL))
 				{
-					int nMaterialIndex = blockingEntity->VPhysicsGetObject()->GetMaterialIndex();
+					int nMaterialIndex = blockingEntity->GetEngineObject()->VPhysicsGetObject()->GetMaterialIndex();
 
 					float flDensity;
 					float flThickness;

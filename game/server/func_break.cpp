@@ -657,7 +657,7 @@ void CBreakable::InputSetHealth( inputdata_t &inputdata )
 //-----------------------------------------------------------------------------
 void CBreakable::InputSetMass( inputdata_t &inputdata )
 {
-	IPhysicsObject * vPhys = VPhysicsGetObject();
+	IPhysicsObject * vPhys = GetEngineObject()->VPhysicsGetObject();
 	if ( vPhys )
 	{
 		float toMass = inputdata.value.Float();
@@ -1259,7 +1259,7 @@ void CPushable::Spawn( void )
 
 #ifdef HL1_DLL
 	// Force HL1 Pushables to stay axially aligned.
-	VPhysicsGetObject()->SetInertia( Vector( 3.f, 3.f, 3.f ) );
+	GetEngineObject()->VPhysicsGetObject()->SetInertia( Vector( 3.f, 3.f, 3.f ) );
 #endif//HL1_DLL
 }
 
@@ -1267,7 +1267,7 @@ void CPushable::Spawn( void )
 bool CPushable::CreateVPhysics( void )
 {
 	GetEngineObject()->VPhysicsInitNormal( SOLID_VPHYSICS, 0, false );
-	IPhysicsObject *pPhysObj = VPhysicsGetObject();
+	IPhysicsObject *pPhysObj = GetEngineObject()->VPhysicsGetObject();
 	if ( pPhysObj )
 	{
 		pPhysObj->SetMass( 30 );

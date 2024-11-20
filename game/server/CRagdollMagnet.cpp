@@ -142,7 +142,7 @@ Vector CRagdollMagnet::GetForceVector( CBaseEntity *pNPC )
 	{
 		IPhysicsObject *pPhysObject;
 
-		pPhysObject = pNPC->VPhysicsGetObject();
+		pPhysObject = pNPC->GetEngineObject()->VPhysicsGetObject();
 
 		if( pPhysObject )
 		{

@@ -296,7 +296,7 @@ void C_ClientRagdoll::ImpactTrace( trace_t *pTrace, int iDamageType, const char 
 {
 	VPROF( "C_ClientRagdoll::ImpactTrace" );
 
-	IPhysicsObject *pPhysicsObject = VPhysicsGetObject();
+	IPhysicsObject *pPhysicsObject = GetEngineObject()->VPhysicsGetObject();
 
 	if( !pPhysicsObject )
 		return;
@@ -418,7 +418,7 @@ void C_ClientRagdoll::HandleAnimatedFriction( void )
 			 pRagdollT->list[i].pConstraint->SetAngularMotor( 0, m_iCurrentFriction );
 	}
 
-	IPhysicsObject *pPhysicsObject = VPhysicsGetObject();
+	IPhysicsObject *pPhysicsObject = GetEngineObject()->VPhysicsGetObject();
 
 	if ( pPhysicsObject )
 	{
@@ -2631,11 +2631,11 @@ void C_BaseAnimating::DoInternalDrawModel( ClientModelRenderInfo_t *pInfo, DrawM
 				matrix3x4_t matrix;
 				AngleMatrix(GetEngineObject()->GetAbsAngles(), GetEngineObject()->GetAbsOrigin(), matrix );
 				engine->DebugDrawPhysCollide( pCollide->solids[0], NULL, matrix, debugColor );
-				if ( VPhysicsGetObject() )
+				if (GetEngineObject()->VPhysicsGetObject() )
 				{
 					static color32 debugColorPhys = {255,0,0,0};
 					matrix3x4_t matrix;
-					VPhysicsGetObject()->GetPositionMatrix( &matrix );
+					GetEngineObject()->VPhysicsGetObject()->GetPositionMatrix( &matrix );
 					engine->DebugDrawPhysCollide( pCollide->solids[0], NULL, matrix, debugColorPhys );
 				}
 			}

@@ -184,7 +184,7 @@ void CItem::Spawn( void )
 		IPhysicsObject *pReferenceObject, *pAttachedObject;
 
 		pReferenceObject = g_PhysWorldObject;
-		pAttachedObject = VPhysicsGetObject();
+		pAttachedObject = GetEngineObject()->VPhysicsGetObject();
 
 		if ( pReferenceObject && pAttachedObject )
 		{
@@ -286,7 +286,7 @@ void CItem::FallThink ( void )
 
 #if defined( HL2MP )
 	bool shouldMaterialize = false;
-	IPhysicsObject *pPhysics = VPhysicsGetObject();
+	IPhysicsObject *pPhysics = GetEngineObject()->VPhysicsGetObject();
 	if ( pPhysics )
 	{
 		shouldMaterialize = pPhysics->IsAsleep();
@@ -350,7 +350,7 @@ bool UTIL_ItemCanBeTouchedByPlayer( CBaseEntity *pItem, CBasePlayer *pPlayer )
 
 	// Get our test positions
 	Vector vecStartPos;
-	IPhysicsObject *pPhysObj = pItem->VPhysicsGetObject();
+	IPhysicsObject *pPhysObj = pItem->GetEngineObject()->VPhysicsGetObject();
 	if ( pPhysObj != NULL )
 	{
 		// Use the physics hull's center

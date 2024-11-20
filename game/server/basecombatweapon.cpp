@@ -497,7 +497,7 @@ void CBaseCombatWeapon::FallInit( void )
 			IPhysicsObject *pReferenceObject, *pAttachedObject;
 			
 			pReferenceObject = g_PhysWorldObject;
-			pAttachedObject = VPhysicsGetObject();
+			pAttachedObject = GetEngineObject()->VPhysicsGetObject();
 
 			if ( pReferenceObject && pAttachedObject )
 			{
@@ -534,7 +534,7 @@ void CBaseCombatWeapon::FallThink ( void )
 	GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.1f );
 
 	bool shouldMaterialize = false;
-	IPhysicsObject *pPhysics = VPhysicsGetObject();
+	IPhysicsObject *pPhysics = GetEngineObject()->VPhysicsGetObject();
 	if ( pPhysics )
 	{
 		shouldMaterialize = pPhysics->IsAsleep();

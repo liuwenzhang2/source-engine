@@ -259,7 +259,7 @@ public:
 				CBaseEntity *pEnt = m_PhysicsObjects[i];
 				if ( pEnt )
 				{
-					IPhysicsObject *pPhysicsObject = pEnt->VPhysicsGetObject();
+					IPhysicsObject *pPhysicsObject = pEnt->GetEngineObject()->VPhysicsGetObject();
 					if ( pPhysicsObject )
 					{
 						float flAngImpulse = 300000;

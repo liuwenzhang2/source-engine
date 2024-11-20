@@ -230,7 +230,7 @@ void CEnvShake::ApplyShake( ShakeCommand_t command )
 					//
 					if ( ( list[i]->GetEngineObject()->GetMoveType() == MOVETYPE_VPHYSICS ) )
 					{
-						IPhysicsObject *pPhys = list[i]->VPhysicsGetObject();
+						IPhysicsObject *pPhys = list[i]->GetEngineObject()->VPhysicsGetObject();
 						if ( pPhys && pPhys->IsMoveable() )
 						{
 							m_pShakeController->AttachObject( pPhys, false );

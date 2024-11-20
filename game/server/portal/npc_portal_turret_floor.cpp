@@ -587,7 +587,7 @@ void CNPC_Portal_FloorTurret::Shoot( const Vector &vecSrc, const Vector &vecDirT
 	{
 		m_pMotionController->Suspend( 2.0f );
 
-		IPhysicsObject *pTurretPhys = VPhysicsGetObject();
+		IPhysicsObject *pTurretPhys = GetEngineObject()->VPhysicsGetObject();
 		Vector vVelocityImpulse = info.m_vecDirShooting * -35.0f;
 		pTurretPhys->AddVelocity( &vVelocityImpulse, &vVelocityImpulse );
 	}
@@ -1127,7 +1127,7 @@ void CNPC_Portal_FloorTurret::TippedThink( void )
 
 	StudioFrameAdvance();
 	// If we're not on side anymore, stop thrashing
-	if ( !OnSide() && VPhysicsGetObject()->GetContactPoint( NULL, NULL ) )
+	if ( !OnSide() && GetEngineObject()->VPhysicsGetObject()->GetContactPoint( NULL, NULL ) )
 	{
 		ReturnToLife();
 		return;
@@ -1266,7 +1266,7 @@ void CNPC_Portal_FloorTurret::HeldThink( void )
 
 	StudioFrameAdvance();
 
-	IPhysicsObject *pTurretPhys = VPhysicsGetObject();
+	IPhysicsObject *pTurretPhys = GetEngineObject()->VPhysicsGetObject();
 
 	// If we're not held anymore, stop thrashing
 	if ( !(pTurretPhys->GetGameFlags() & FVPHYSICS_PLAYER_HELD) )
@@ -1312,7 +1312,7 @@ void CNPC_Portal_FloorTurret::InactiveThink( void )
 	GetEngineObject()->SetNextThink( gpGlobals->curtime + 1.0f );
 
 	// Wake up if we're not on our side
-	if ( !OnSide() && VPhysicsGetObject()->GetContactPoint( NULL, NULL ) && m_bEnabled )
+	if ( !OnSide() && GetEngineObject()->VPhysicsGetObject()->GetContactPoint( NULL, NULL ) && m_bEnabled )
 	{
 		// Never return to life!
 		GetEngineObject()->SetCollisionGroup( COLLISION_GROUP_NONE );
@@ -1320,7 +1320,7 @@ void CNPC_Portal_FloorTurret::InactiveThink( void )
 	}
 	else
 	{
-		IPhysicsObject *pTurretPhys = VPhysicsGetObject();
+		IPhysicsObject *pTurretPhys = GetEngineObject()->VPhysicsGetObject();
 
 		if ( !(pTurretPhys->GetGameFlags() & FVPHYSICS_PLAYER_HELD) && pTurretPhys->IsAsleep() )
 			GetEngineObject()->SetCollisionGroup( COLLISION_GROUP_DEBRIS_TRIGGER );
@@ -1413,7 +1413,7 @@ void CNPC_Portal_FloorTurret::StartTouch( CBaseEntity *pOther )
 {
 	BaseClass::StartTouch( pOther );
 
-	IPhysicsObject *pOtherPhys = pOther->VPhysicsGetObject();
+	IPhysicsObject *pOtherPhys = pOther->GetEngineObject()->VPhysicsGetObject();
 
 	if ( !pOtherPhys )
 		return;
@@ -1425,7 +1425,7 @@ void CNPC_Portal_FloorTurret::StartTouch( CBaseEntity *pOther )
 	{
 		m_pMotionController->Suspend( 2.0f );
 
-		IPhysicsObject *pTurretPhys = VPhysicsGetObject();
+		IPhysicsObject *pTurretPhys = GetEngineObject()->VPhysicsGetObject();
 
 		if ( !pOther->IsPlayer() && pOther->GetEngineObject()->GetMoveType() == MOVETYPE_VPHYSICS && !(pTurretPhys && ((pTurretPhys->GetGameFlags() & FVPHYSICS_PLAYER_HELD) != 0)) )
 		{

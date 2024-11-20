@@ -3721,7 +3721,7 @@ void	CNPC_Citizen::TossHealthKit(CBaseCombatCharacter *pThrowAt, const Vector &o
 		DispatchSpawn( pHealthKit );
 
 		{
-			IPhysicsObject *pPhysicsObject = pHealthKit->VPhysicsGetObject();
+			IPhysicsObject *pPhysicsObject = pHealthKit->GetEngineObject()->VPhysicsGetObject();
 			Assert( pPhysicsObject );
 			if ( pPhysicsObject )
 			{

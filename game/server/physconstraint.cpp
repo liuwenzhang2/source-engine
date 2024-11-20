@@ -171,7 +171,7 @@ void PhysTeleportConstrainedEntity( CBaseEntity *pTeleportSource, IPhysicsObject
 	if ( pFixup->GetEngineObject()->GetMoveType() != MOVETYPE_VPHYSICS )
 		return;
 
-	if ( !pFixup->VPhysicsGetObject() || !pFixup->VPhysicsGetObject()->IsMoveable() )
+	if ( !pFixup->GetEngineObject()->VPhysicsGetObject() || !pFixup->GetEngineObject()->VPhysicsGetObject()->IsMoveable() )
 		return;
 
 	QAngle oldAngles = prevAngles;
@@ -511,7 +511,7 @@ void FindPhysicsAnchor( string_t name, hl_constraint_info_t &info, int index, CB
 			if ( !bWroteAttachment )
 			{
 				info.anchorPosition[index] = pAnchor->localOrigin;
-				info.pObjects[index] = pAnchor->hEntity->VPhysicsGetObject();
+				info.pObjects[index] = pAnchor->hEntity->GetEngineObject()->VPhysicsGetObject();
 			}
 		}
 		else

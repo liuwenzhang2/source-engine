@@ -649,9 +649,9 @@ void CPropCrane::RecalculateCraneTip( void )
 	m_hCraneTip->GetEngineObject()->SetAbsOrigin( vecOrigin );
 
 	// NOTE: We need to do this because we're not using Physics...
-	if ( m_hCraneTip->VPhysicsGetObject() )
+	if ( m_hCraneTip->GetEngineObject()->VPhysicsGetObject() )
 	{
-		m_hCraneTip->VPhysicsGetObject()->UpdateShadow( vecOrigin, vec3_angle, true, TICK_INTERVAL * 2.0f );
+		m_hCraneTip->GetEngineObject()->VPhysicsGetObject()->UpdateShadow( vecOrigin, vec3_angle, true, TICK_INTERVAL * 2.0f );
 	}
 }
 
@@ -1060,8 +1060,8 @@ void CCraneTip::Precache( void )
 //-----------------------------------------------------------------------------
 bool CCraneTip::CreateConstraint( CBaseAnimating *pCraneMagnet, IPhysicsConstraintGroup *pGroup )
 {
-	IPhysicsObject *pPhysObject = VPhysicsGetObject();
-	IPhysicsObject *pCraneMagnetPhysObject = pCraneMagnet->VPhysicsGetObject();
+	IPhysicsObject *pPhysObject = GetEngineObject()->VPhysicsGetObject();
+	IPhysicsObject *pCraneMagnetPhysObject = pCraneMagnet->GetEngineObject()->VPhysicsGetObject();
 	if ( !pCraneMagnetPhysObject )
 	{
 		Msg(" Error: Tried to create a crane_tip with a crane magnet that has no physics model.\n" );

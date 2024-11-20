@@ -522,7 +522,7 @@ void CHL2MPRules::ManageObjectRelocation( void )
 					if ( flDistanceFromSpawn > WEAPON_MAX_DISTANCE_FROM_SPAWN )
 					{
 						bool shouldReset = false;
-						IPhysicsObject *pPhysics = pEntity->VPhysicsGetObject();
+						IPhysicsObject *pPhysics = pEntity->GetEngineObject()->VPhysicsGetObject();
 
 						if ( pPhysics )
 						{
@@ -547,7 +547,7 @@ void CHL2MPRules::ManageObjectRelocation( void )
 							g_pSoundEmitterSystem->EmitSound(filter, pEntity->entindex(), params);
 							//g_pSoundEmitterSystem->EmitSound(pEntity, "AlyxEmp.Charge" );//pEntity->
 
-							IPhysicsObject *pPhys = pEntity->VPhysicsGetObject();
+							IPhysicsObject *pPhys = pEntity->GetEngineObject()->VPhysicsGetObject();
 
 							if ( pPhys )
 							{

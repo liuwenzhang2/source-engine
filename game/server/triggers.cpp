@@ -182,9 +182,9 @@ void CBaseTrigger::Spawn()
 //------------------------------------------------------------------------------
 void CBaseTrigger::UpdateOnRemove( void )
 {
-	if ( VPhysicsGetObject())
+	if (GetEngineObject()->VPhysicsGetObject())
 	{
-		VPhysicsGetObject()->RemoveTrigger();
+		GetEngineObject()->VPhysicsGetObject()->RemoveTrigger();
 	}
 
 	BaseClass::UpdateOnRemove();
@@ -197,9 +197,9 @@ void CBaseTrigger::Enable( void )
 {
 	m_bDisabled = false;
 
-	if ( VPhysicsGetObject())
+	if (GetEngineObject()->VPhysicsGetObject())
 	{
-		VPhysicsGetObject()->EnableCollisions( true );
+		GetEngineObject()->VPhysicsGetObject()->EnableCollisions( true );
 	}
 
 	if (!GetEngineObject()->IsSolidFlagSet( FSOLID_TRIGGER ))
@@ -245,9 +245,9 @@ void CBaseTrigger::Disable( void )
 { 
 	m_bDisabled = true;
 
-	if ( VPhysicsGetObject())
+	if (GetEngineObject()->VPhysicsGetObject())
 	{
-		VPhysicsGetObject()->EnableCollisions( false );
+		GetEngineObject()->VPhysicsGetObject()->EnableCollisions( false );
 	}
 
 	if (GetEngineObject()->IsSolidFlagSet(FSOLID_TRIGGER))
@@ -1720,7 +1720,7 @@ void CTriggerPush::Touch( CBaseEntity *pOther )
 
 	case MOVETYPE_VPHYSICS:
 		{
-			IPhysicsObject *pPhys = pOther->VPhysicsGetObject();
+			IPhysicsObject *pPhys = pOther->GetEngineObject()->VPhysicsGetObject();
 			if ( pPhys )
 			{
 				// UNDONE: Assume the velocity is for a 100kg object, scale with mass
@@ -3348,7 +3348,7 @@ void CTriggerWind::StartTouch(CBaseEntity *pOther)
 	if ( pOther->IsPlayer() )
 		return;
 
-	IPhysicsObject *pPhys = pOther->VPhysicsGetObject();
+	IPhysicsObject *pPhys = pOther->GetEngineObject()->VPhysicsGetObject();
 	if ( pPhys)
 	{
 		m_pWindController->AttachObject( pPhys, false );
@@ -3366,7 +3366,7 @@ void CTriggerWind::EndTouch(CBaseEntity *pOther)
 	if ( pOther->IsPlayer() )
 		return;
 
-	IPhysicsObject *pPhys = pOther->VPhysicsGetObject();
+	IPhysicsObject *pPhys = pOther->GetEngineObject()->VPhysicsGetObject();
 	if ( pPhys && m_pWindController )
 	{
 		m_pWindController->DetachObject( pPhys );
@@ -3572,12 +3572,12 @@ void CTriggerImpact::InputImpact( inputdata_t &inputdata )
 void CTriggerImpact::StartTouch(CBaseEntity *pOther)
 {
 	//If the entity is valid and has physics, hit it
-	if ( ( pOther != NULL  ) && ( pOther->VPhysicsGetObject() != NULL ) )
+	if ( ( pOther != NULL  ) && ( pOther->GetEngineObject()->VPhysicsGetObject() != NULL ) )
 	{
 		Vector vDir;
 		AngleVectors(GetEngineObject()->GetLocalAngles(),&vDir );
 		vDir += RandomVector(-m_flNoise,m_flNoise);
-		pOther->VPhysicsGetObject()->ApplyForceCenter( m_flMagnitude * vDir );
+		pOther->GetEngineObject()->VPhysicsGetObject()->ApplyForceCenter( m_flMagnitude * vDir );
 	}
 
 	// If the player, so a view kick
@@ -3774,9 +3774,9 @@ bool CBaseVPhysicsTrigger::CreateVPhysics()
 //------------------------------------------------------------------------------
 void CBaseVPhysicsTrigger::UpdateOnRemove()
 {
-	if ( VPhysicsGetObject())
+	if (GetEngineObject()->VPhysicsGetObject())
 	{
-		VPhysicsGetObject()->RemoveTrigger();
+		GetEngineObject()->VPhysicsGetObject()->RemoveTrigger();
 	}
 
 	BaseClass::UpdateOnRemove();
@@ -3819,9 +3819,9 @@ void CBaseVPhysicsTrigger::InputEnable( inputdata_t &inputdata )
 	if ( m_bDisabled )
 	{
 		m_bDisabled = false;
-		if ( VPhysicsGetObject())
+		if (GetEngineObject()->VPhysicsGetObject())
 		{
-			VPhysicsGetObject()->EnableCollisions( true );
+			GetEngineObject()->VPhysicsGetObject()->EnableCollisions( true );
 		}
 	}
 }
@@ -3834,9 +3834,9 @@ void CBaseVPhysicsTrigger::InputDisable( inputdata_t &inputdata )
 	if ( !m_bDisabled )
 	{
 		m_bDisabled = true;
-		if ( VPhysicsGetObject())
+		if (GetEngineObject()->VPhysicsGetObject())
 		{
-			VPhysicsGetObject()->EnableCollisions( false );
+			GetEngineObject()->VPhysicsGetObject()->EnableCollisions( false );
 		}
 	}
 }

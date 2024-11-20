@@ -846,9 +846,9 @@ void CBaseEntity::PhysicsToss( void )
 	PhysicsPushEntity( move, &trace );
 
 #if !defined( CLIENT_DLL )
-	if ( VPhysicsGetObject() )
+	if (GetEngineObject()->VPhysicsGetObject() )
 	{
-		VPhysicsGetObject()->UpdateShadow(GetEngineObject()->GetAbsOrigin(), vec3_angle, true, gpGlobals->frametime );
+		GetEngineObject()->VPhysicsGetObject()->UpdateShadow(GetEngineObject()->GetAbsOrigin(), vec3_angle, true, gpGlobals->frametime );
 	}
 #endif
 
@@ -901,11 +901,11 @@ void CBaseEntity::PhysicsRigidChild( void )
 	GetEngineObject()->PhysicsTouchTriggers( &vecPrevOrigin );
 
 	// We have to do this regardless owing to hierarchy
-	if ( VPhysicsGetObject() )
+	if (GetEngineObject()->VPhysicsGetObject() )
 	{
 		int solidType = GetEngineObject()->GetSolid();
 		bool bAxisAligned = ( solidType == SOLID_BBOX || solidType == SOLID_NONE ) ? true : false;
-		VPhysicsGetObject()->UpdateShadow(GetEngineObject()->GetAbsOrigin(), bAxisAligned ? vec3_angle : GetEngineObject()->GetAbsAngles(), true, gpGlobals->frametime );
+		GetEngineObject()->VPhysicsGetObject()->UpdateShadow(GetEngineObject()->GetAbsOrigin(), bAxisAligned ? vec3_angle : GetEngineObject()->GetAbsAngles(), true, gpGlobals->frametime );
 	}
 #endif
 

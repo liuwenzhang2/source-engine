@@ -187,7 +187,7 @@ public:
 
 		// UNDONE: This should really filter to just the pushing entities
 		if ( pTestEntity->GetEngineObject()->GetMoveType() == MOVETYPE_VPHYSICS &&
-			pTestEntity->VPhysicsGetObject() && pTestEntity->VPhysicsGetObject()->IsMoveable() )
+			pTestEntity->GetEngineObject()->VPhysicsGetObject() && pTestEntity->GetEngineObject()->VPhysicsGetObject()->IsMoveable() )
 			return false;
 
 		return BaseClass::ShouldHitEntity( pHandleEntity, contentsMask );
@@ -1322,14 +1322,14 @@ void CBaseEntity::PerformPush( float movetime )
 		// the physics system thinks the entity is awake. That will happen if the
 		// shadow gets updated, but the push code above doesn't update unless the
 		// move is successful or non-zero. So we must make sure it's awake
-		if ( VPhysicsGetObject() )
+		if (GetEngineObject()->VPhysicsGetObject() )
 		{
-			VPhysicsGetObject()->Wake();
+			GetEngineObject()->VPhysicsGetObject()->Wake();
 		}
 	}
 
 	// move done is handled by physics if it has any
-	if ( VPhysicsGetObject() )
+	if (GetEngineObject()->VPhysicsGetObject() )
 	{
 		// store the list of moved entities for later
 		// if you actually did an unblocked push that moved entities, and you're using physics (which may block later)
@@ -1625,16 +1625,16 @@ void CBaseEntity::PhysicsStep()
 		else
 		{
 			float maxAngular;
-			VPhysicsGetObject()->GetShadowController()->GetMaxSpeed( NULL, &maxAngular );
-			VPhysicsGetObject()->GetShadowController()->MaxSpeed( pUpdate->savedShadowControllerMaxSpeed, maxAngular );
+			GetEngineObject()->VPhysicsGetObject()->GetShadowController()->GetMaxSpeed( NULL, &maxAngular );
+			GetEngineObject()->VPhysicsGetObject()->GetShadowController()->MaxSpeed( pUpdate->savedShadowControllerMaxSpeed, maxAngular );
 			GetEngineObject()->DestroyDataObject(VPHYSICSUPDATEAI);
 		}
 	}
 
-	if ( updateFromVPhysics && VPhysicsGetObject() && !GetEngineObject()->GetMoveParent() )
+	if ( updateFromVPhysics && GetEngineObject()->VPhysicsGetObject() && !GetEngineObject()->GetMoveParent() )
 	{
 		Vector position;
-		VPhysicsGetObject()->GetShadowPosition( &position, NULL );
+		GetEngineObject()->VPhysicsGetObject()->GetShadowPosition( &position, NULL );
 		float delta = (GetEngineObject()->GetAbsOrigin() - position).LengthSqr();
 		// for now, use a tolerance of 1 inch for these tests
 		if ( delta < 1 )
@@ -1673,11 +1673,11 @@ void CBaseEntity::PhysicsStep()
 
 	PhysicsCheckWaterTransition();
 
-	if ( VPhysicsGetObject() )
+	if (GetEngineObject()->VPhysicsGetObject() )
 	{
 		if ( !VectorCompare( oldOrigin, GetEngineObject()->GetAbsOrigin() ) )
 		{
-			VPhysicsGetObject()->UpdateShadow(GetEngineObject()->GetAbsOrigin(), vec3_angle, (GetEngineObject()->GetFlags() & FL_FLY) ? true : false, dt );
+			GetEngineObject()->VPhysicsGetObject()->UpdateShadow(GetEngineObject()->GetAbsOrigin(), vec3_angle, (GetEngineObject()->GetFlags() & FL_FLY) ? true : false, dt );
 		}
 	}
 	PhysicsRelinkChildren(dt);

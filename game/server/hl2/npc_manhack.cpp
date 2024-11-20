@@ -411,10 +411,10 @@ void CNPC_Manhack::Event_Killed( const CTakeDamageInfo &info )
 
 void CNPC_Manhack::HitPhysicsObject( CBaseEntity *pOther )
 {
-	IPhysicsObject *pOtherPhysics = pOther->VPhysicsGetObject();
+	IPhysicsObject *pOtherPhysics = pOther->GetEngineObject()->VPhysicsGetObject();
 	Vector pos, posOther;
 	// Put the force on the line between the manhack origin and hit object origin
-	VPhysicsGetObject()->GetPosition( &pos, NULL );
+	GetEngineObject()->VPhysicsGetObject()->GetPosition( &pos, NULL );
 	pOtherPhysics->GetPosition( &posOther, NULL );
 	Vector dir = posOther - pos;
 	VectorNormalize(dir);
@@ -447,7 +447,7 @@ void CNPC_Manhack::TakeDamageFromPhyscannon( CBasePlayer *pPlayer )
 
 	// Convert velocity into damage.
 	Vector vel;
-	VPhysicsGetObject()->GetVelocity( &vel, NULL );
+	GetEngineObject()->VPhysicsGetObject()->GetVelocity( &vel, NULL );
 	float flSpeed = vel.Length();
 
 	float flFactor = flSpeed / MANHACK_SMASH_SPEED;
@@ -729,7 +729,7 @@ int	CNPC_Manhack::OnTakeDamage_Alive( const CTakeDamageInfo &info )
 		int i;
 		for( i = 0 ; i < count ; i++ )
 		{
-			pPhysObj = pList[ i ]->VPhysicsGetObject();
+			pPhysObj = pList[ i ]->GetEngineObject()->VPhysicsGetObject();
 
 			if( !pPhysObj || pPhysObj->GetMass() > 200 )
 			{
@@ -1433,9 +1433,9 @@ void CNPC_Manhack::ComputeSliceBounceVelocity( CBaseEntity *pHitEntity, trace_t 
 	vecDir[2] = 0.0f;
 	
 	// Knock it away from us
-	if ( VPhysicsGetObject() != NULL )
+	if (GetEngineObject()->VPhysicsGetObject() != NULL )
 	{
-		VPhysicsGetObject()->ApplyForceOffset( vecDir * 4, GetEngineObject()->GetAbsOrigin() );
+		GetEngineObject()->VPhysicsGetObject()->ApplyForceOffset( vecDir * 4, GetEngineObject()->GetAbsOrigin() );
 	}
 
 	// Also set our velocity
@@ -1448,7 +1448,7 @@ void CNPC_Manhack::ComputeSliceBounceVelocity( CBaseEntity *pHitEntity, trace_t 
 //-----------------------------------------------------------------------------
 bool CNPC_Manhack::IsHeldByPhyscannon( )
 {
-	return VPhysicsGetObject() && (VPhysicsGetObject()->GetGameFlags() & FVPHYSICS_PLAYER_HELD);
+	return GetEngineObject()->VPhysicsGetObject() && (GetEngineObject()->VPhysicsGetObject()->GetGameFlags() & FVPHYSICS_PLAYER_HELD);
 }
 
 	
@@ -1584,7 +1584,7 @@ void CNPC_Manhack::Slice( CBaseEntity *pHitEntity, float flInterval, trace_t &tr
 //-----------------------------------------------------------------------------
 void CNPC_Manhack::Bump( CBaseEntity *pHitEntity, float flInterval, trace_t &tr )
 {
-	if ( !VPhysicsGetObject() )
+	if ( !GetEngineObject()->VPhysicsGetObject() )
 		return;
 
 	// Surpressing this behavior
@@ -1621,7 +1621,7 @@ void CNPC_Manhack::Bump( CBaseEntity *pHitEntity, float flInterval, trace_t &tr 
 		}
 
 		Vector myUp;
-		VPhysicsGetObject()->LocalToWorldVector( &myUp, Vector( 0.0, 0.0, 1.0 ) );
+		GetEngineObject()->VPhysicsGetObject()->LocalToWorldVector( &myUp, Vector( 0.0, 0.0, 1.0 ) );
 
 		// plane must be something that could hit the blades
 		if (fabs( DotProduct( myUp, tr.plane.normal ) ) < 0.25 )
@@ -1645,13 +1645,13 @@ void CNPC_Manhack::Bump( CBaseEntity *pHitEntity, float flInterval, trace_t &tr 
 			// add some spin, but only if we're not already going fast..
 			Vector vecVelocity;
 			AngularImpulse vecAngVelocity;
-			VPhysicsGetObject()->GetVelocity( &vecVelocity, &vecAngVelocity );
+			GetEngineObject()->VPhysicsGetObject()->GetVelocity( &vecVelocity, &vecAngVelocity );
 			float flDot = DotProduct( myUp, vecAngVelocity );
 			if ( fabs(flDot) < 100 )
 			{
 				//AngularImpulse torque = myUp * (1000 - flDot * 10);
 				AngularImpulse torque = myUp * (1000 - flDot * 2);
-				VPhysicsGetObject()->ApplyTorqueCenter( torque );
+				GetEngineObject()->VPhysicsGetObject()->ApplyTorqueCenter( torque );
 			}
 			
 			if (!(GetEngineObject()->GetSpawnFlags() & SF_NPC_GAG))
@@ -1738,7 +1738,7 @@ void CNPC_Manhack::CheckCollisions(float flInterval)
 	// Trace forward to see if I hit anything. But trace forward along the
 	// owner's view direction if you're being carried.
 	Vector vecTraceDir, vecCheckPos;
-	VPhysicsGetObject()->GetVelocity( &vecTraceDir, NULL );
+	GetEngineObject()->VPhysicsGetObject()->GetVelocity( &vecTraceDir, NULL );
 	vecTraceDir *= flInterval;
 	if ( IsHeldByPhyscannon() )
 	{
@@ -1906,7 +1906,7 @@ void CNPC_Manhack::MoveExecute_Alive(float flInterval)
 	Vector	vCurrentVelocity = GetCurrentVelocity();
 
 	// FIXME: move this
-	VPhysicsGetObject()->Wake();
+	GetEngineObject()->VPhysicsGetObject()->Wake();
 
 	if( m_fEnginePowerScale < GetMaxEnginePower() && gpGlobals->curtime > m_flWaterSuspendTime )
 	{
@@ -1999,10 +1999,10 @@ void CNPC_Manhack::MoveExecute_Alive(float flInterval)
 	CheckCollisions(flInterval);
 
 	// Blend out desired velocity when launched by the physcannon
-	if ( HasPhysicsAttacker( MANHACK_SMASH_TIME ) && (!IsHeldByPhyscannon()) && VPhysicsGetObject() )
+	if ( HasPhysicsAttacker( MANHACK_SMASH_TIME ) && (!IsHeldByPhyscannon()) && GetEngineObject()->VPhysicsGetObject() )
 	{
 		Vector vecCurrentVelocity;
-		VPhysicsGetObject()->GetVelocity( &vecCurrentVelocity, NULL );
+		GetEngineObject()->VPhysicsGetObject()->GetVelocity( &vecCurrentVelocity, NULL );
 		float flLerpFactor = (gpGlobals->curtime - m_flLastPhysicsInfluenceTime) / MANHACK_SMASH_TIME;
 		flLerpFactor = clamp( flLerpFactor, 0.0f, 1.0f );
 		flLerpFactor = SimpleSplineRemapVal( flLerpFactor, 0.0f, 1.0f, 0.0f, 1.0f );

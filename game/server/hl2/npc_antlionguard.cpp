@@ -883,7 +883,7 @@ void CNPC_AntlionGuard::Activate( void )
 			continue;
 
 		// Ensure it's mass is within range
-		IPhysicsObject *pPhysObj = pObject->VPhysicsGetObject();
+		IPhysicsObject *pPhysObj = pObject->GetEngineObject()->VPhysicsGetObject();
 		if( ( pPhysObj == NULL ) || ( pPhysObj->GetMass() > ANTLIONGUARD_MAX_OBJECT_MASS ) || ( pPhysObj->GetMass() < ANTLIONGUARD_MIN_OBJECT_MASS ) )
 			continue;
 
@@ -1289,7 +1289,7 @@ int CNPC_AntlionGuard::MeleeAttack1Conditions( float flDot, float flDist )
 		return COND_CAN_MELEE_ATTACK1;
 
 	trace_t	tr;
-	TraceHull_SkipPhysics( WorldSpaceCenter(), GetEnemy()->WorldSpaceCenter(), Vector(-10,-10,-10), Vector(10,10,10), MASK_SHOT_HULL, this, COLLISION_GROUP_NONE, &tr, VPhysicsGetObject()->GetMass() * 0.5 );
+	TraceHull_SkipPhysics( WorldSpaceCenter(), GetEnemy()->WorldSpaceCenter(), Vector(-10,-10,-10), Vector(10,10,10), MASK_SHOT_HULL, this, COLLISION_GROUP_NONE, &tr, GetEngineObject()->VPhysicsGetObject()->GetMass() * 0.5 );
 
 	// If we hit anything, go for it
 	if ( tr.fraction < 1.0f )
@@ -1756,7 +1756,7 @@ void CNPC_AntlionGuard::HandleAnimEvent( animevent_t *pEvent )
 		if ( pEnemy != NULL )
 		{
 			//Setup the throw velocity
-			IPhysicsObject *physObj = m_hPhysicsTarget->VPhysicsGetObject();
+			IPhysicsObject *physObj = m_hPhysicsTarget->GetEngineObject()->VPhysicsGetObject();
 			Vector vecShoveVel = ( pEnemy->GetEngineObject()->GetAbsOrigin() - m_hPhysicsTarget->WorldSpaceCenter() );
 			float flTargetDist = VectorNormalize( vecShoveVel );
 
@@ -2275,7 +2275,7 @@ int CNPC_AntlionGuard::OnTakeDamage_Alive( const CTakeDamageInfo &info )
 		// Don't take damage from physics objects that weren't thrown by the player.
 		CBaseEntity *pInflictor = dInfo.GetInflictor();
 
-		IPhysicsObject *pObj = pInflictor->VPhysicsGetObject();
+		IPhysicsObject *pObj = pInflictor->GetEngineObject()->VPhysicsGetObject();
 		if ( !pObj || !( pObj->GetGameFlags() & FVPHYSICS_WAS_THROWN ) )
 		{
 			return 0;
@@ -2768,7 +2768,7 @@ public:
 			// don't test small moveable physics objects (unless it's an NPC)
 			if ( !pEntity->IsNPC() && pEntity->GetEngineObject()->GetMoveType() == MOVETYPE_VPHYSICS )
 			{
-				IPhysicsObject *pPhysics = pEntity->VPhysicsGetObject();
+				IPhysicsObject *pPhysics = pEntity->GetEngineObject()->VPhysicsGetObject();
 				Assert(pPhysics);
 				if ( pPhysics->IsMoveable() && pPhysics->GetMass() < m_minMass )
 					return false;
@@ -2847,7 +2847,7 @@ void CNPC_AntlionGuard::ChargeLookAhead( void )
 	Vector vecTestPos = GetEngineObject()->GetAbsOrigin() + ( vecForward * GetEngineObject()->GetGroundSpeed() * 0.75 );
 	Vector testHullMins = GetHullMins();
 	testHullMins.z += (StepHeight() * 2);
-	TraceHull_SkipPhysics(GetEngineObject()->GetAbsOrigin(), vecTestPos, testHullMins, GetHullMaxs(), MASK_SHOT_HULL, this, COLLISION_GROUP_NONE, &tr, VPhysicsGetObject()->GetMass() * 0.5 );
+	TraceHull_SkipPhysics(GetEngineObject()->GetAbsOrigin(), vecTestPos, testHullMins, GetHullMaxs(), MASK_SHOT_HULL, this, COLLISION_GROUP_NONE, &tr, GetEngineObject()->VPhysicsGetObject()->GetMass() * 0.5 );
 
 	//NDebugOverlay::Box( tr.startpos, testHullMins, GetHullMaxs(), 0, 255, 0, true, 0.1f );
 	//NDebugOverlay::Box( vecTestPos, testHullMins, GetHullMaxs(), 255, 0, 0, true, 0.1f );
@@ -2927,7 +2927,7 @@ bool CNPC_AntlionGuard::HandleChargeImpact( Vector vecImpact, CBaseEntity *pEnti
 	// If it's a vphysics object that's too heavy, crash into it too.
 	if ( pEntity->GetEngineObject()->GetMoveType() == MOVETYPE_VPHYSICS )
 	{
-		IPhysicsObject *pPhysics = pEntity->VPhysicsGetObject();
+		IPhysicsObject *pPhysics = pEntity->GetEngineObject()->VPhysicsGetObject();
 		if ( pPhysics )
 		{
 			// If the object is being held by the player, knock it out of his hands
@@ -2937,7 +2937,7 @@ bool CNPC_AntlionGuard::HandleChargeImpact( Vector vecImpact, CBaseEntity *pEnti
 				return false;
 			}
 
-			if ( (!pPhysics->IsMoveable() || pPhysics->GetMass() > VPhysicsGetObject()->GetMass() * 0.5f ) )
+			if ( (!pPhysics->IsMoveable() || pPhysics->GetMass() > GetEngineObject()->VPhysicsGetObject()->GetMass() * 0.5f ) )
 				return true;
 		}
 	}
@@ -3004,7 +3004,7 @@ float CNPC_AntlionGuard::ChargeSteer( void )
 	testHullMins.z += (StepHeight() * 2);
 
 	//Probe
-	TraceHull_SkipPhysics(GetEngineObject()->GetAbsOrigin(), testPos, testHullMins, GetHullMaxs(), MASK_SOLID_BRUSHONLY, this, COLLISION_GROUP_NONE, &tr, VPhysicsGetObject()->GetMass() * 0.5f );
+	TraceHull_SkipPhysics(GetEngineObject()->GetAbsOrigin(), testPos, testHullMins, GetHullMaxs(), MASK_SOLID_BRUSHONLY, this, COLLISION_GROUP_NONE, &tr, GetEngineObject()->VPhysicsGetObject()->GetMass() * 0.5f );
 
 	//Debug info
 	if ( g_debug_antlionguard.GetInt() == 1 )
@@ -3030,7 +3030,7 @@ float CNPC_AntlionGuard::ChargeSteer( void )
 	testPos = GetEngineObject()->GetAbsOrigin() + ( forward * testLength );
 
 	// Probe
-	TraceHull_SkipPhysics(GetEngineObject()->GetAbsOrigin(), testPos, testHullMins, GetHullMaxs(), MASK_SOLID_BRUSHONLY, this, COLLISION_GROUP_NONE, &tr, VPhysicsGetObject()->GetMass() * 0.5f );
+	TraceHull_SkipPhysics(GetEngineObject()->GetAbsOrigin(), testPos, testHullMins, GetHullMaxs(), MASK_SOLID_BRUSHONLY, this, COLLISION_GROUP_NONE, &tr, GetEngineObject()->VPhysicsGetObject()->GetMass() * 0.5f );
 
 	//Debug
 	if ( g_debug_antlionguard.GetInt() == 1 )
@@ -3699,7 +3699,7 @@ bool CNPC_AntlionGuard::ShouldProbeCollideAgainstEntity( CBaseEntity *pEntity )
 
 	if ( pEntity->GetEngineObject()->GetMoveType() == MOVETYPE_VPHYSICS )
 	{
-		IPhysicsObject *pPhysObj = pEntity->VPhysicsGetObject();
+		IPhysicsObject *pPhysObj = pEntity->GetEngineObject()->VPhysicsGetObject();
 
 		if( pPhysObj && pPhysObj->GetMass() <= ANTLIONGUARD_MAX_OBJECT_MASS )
 		{
@@ -3937,7 +3937,7 @@ Vector CNPC_AntlionGuard::GetPhysicsHitPosition( CBaseEntity *pObject, CBaseEnti
 	vecToTarget.z = 0;
 
 	// Get the distance we want to be from the object when we hit it
-	IPhysicsObject *pPhys = pObject->VPhysicsGetObject();
+	IPhysicsObject *pPhys = pObject->GetEngineObject()->VPhysicsGetObject();
 	Vector extent = physcollision->CollideGetExtent( pPhys->GetCollide(), pObject->GetEngineObject()->GetAbsOrigin(), pObject->GetEngineObject()->GetAbsAngles(), -vecToTarget );
 	float flDist = ( extent - pObject->WorldSpaceCenter() ).Length() + GetEngineObject()->BoundingRadius() + 32.0f;
 	
@@ -4121,7 +4121,7 @@ CBaseEntity *CNPC_AntlionGuard::FindPhysicsObjectTarget( const PhysicsObjectCrit
 		if ( pObject->GetEngineObject()->BoundingRadius() < 6.0f )
 			continue;
 
-		IPhysicsObject *pPhysObj = pObject->VPhysicsGetObject();
+		IPhysicsObject *pPhysObj = pObject->GetEngineObject()->VPhysicsGetObject();
 		if ( pPhysObj == NULL )
 			continue;
 
@@ -4284,7 +4284,7 @@ void CNPC_AntlionGuard::ImpactShock( const Vector &origin, float radius, float m
 			continue;
 
 		// UNDONE: Ask the object if it should get force if it's not MOVETYPE_VPHYSICS?
-		if ( pEntity->GetEngineObject()->GetMoveType() == MOVETYPE_VPHYSICS || ( pEntity->VPhysicsGetObject() && pEntity->IsPlayer() == false ) )
+		if ( pEntity->GetEngineObject()->GetMoveType() == MOVETYPE_VPHYSICS || ( pEntity->GetEngineObject()->VPhysicsGetObject() && pEntity->IsPlayer() == false ) )
 		{
 			vecSpot = pEntity->BodyTarget(GetEngineObject()->GetAbsOrigin() );
 			
@@ -4652,7 +4652,7 @@ bool CNPC_AntlionGuard::IsHeavyDamage( const CTakeDamageInfo &info )
 	// Struck by large object
 	if ( info.GetDamageType() & DMG_CRUSH )
 	{
-		IPhysicsObject *pPhysObject = info.GetInflictor()->VPhysicsGetObject();
+		IPhysicsObject *pPhysObject = info.GetInflictor()->GetEngineObject()->VPhysicsGetObject();
 
 		if ( ( pPhysObject != NULL ) && ( pPhysObject->GetGameFlags() & FVPHYSICS_WAS_THROWN ) )
 		{

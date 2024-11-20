@@ -411,7 +411,6 @@ public:
 
 	// Purpose: My physics object has been updated, react or extract data
 	virtual void					VPhysicsUpdate( IPhysicsObject *pPhysics );
-	virtual IPhysicsObject			*VPhysicsGetObject( void ) const { return GetEngineObject()->VPhysicsGetObject(); }
 	virtual bool					VPhysicsIsFlesh( void );
 
 // IClientEntity implementation.

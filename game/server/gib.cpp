@@ -239,7 +239,7 @@ void CGib::InitGib( CBaseEntity *pVictim, float fMinVelocity, float fMaxVelocity
 		// Attempt to be physical if we can
 		if (GetEngineObject()->VPhysicsInitNormal( SOLID_BBOX, 0, false ) )
 		{
-			IPhysicsObject *pObj = VPhysicsGetObject();
+			IPhysicsObject *pObj = GetEngineObject()->VPhysicsGetObject();
 
 			if ( pObj != NULL )
 			{
@@ -394,9 +394,9 @@ void CGib::WaitTillLand ( void )
 
 bool CGib::SUB_AllowedToFade( void )
 {
-	if( VPhysicsGetObject() )
+	if(GetEngineObject()->VPhysicsGetObject() )
 	{
-		if( VPhysicsGetObject()->GetGameFlags() & FVPHYSICS_PLAYER_HELD || GetEngineObject()->GetEFlags() & EFL_IS_BEING_LIFTED_BY_BARNACLE )
+		if(GetEngineObject()->VPhysicsGetObject()->GetGameFlags() & FVPHYSICS_PLAYER_HELD || GetEngineObject()->GetEFlags() & EFL_IS_BEING_LIFTED_BY_BARNACLE )
 			return false;
 	}
 
@@ -503,7 +503,7 @@ void CGib::BounceGibTouch ( CBaseEntity *pOther )
 	Vector	vecSpot;
 	trace_t	tr;
 	
-	IPhysicsObject *pPhysics = VPhysicsGetObject();
+	IPhysicsObject *pPhysics = GetEngineObject()->VPhysicsGetObject();
 
 	if ( pPhysics )
 		 return;

@@ -1126,7 +1126,7 @@ void CTempEnts::PhysicsProp( int modelindex, int skin, const Vector& pos, const 
 		return;
 	}
 
-	IPhysicsObject *pPhysicsObject = pEntity->VPhysicsGetObject();
+	IPhysicsObject *pPhysicsObject = pEntity->GetEngineObject()->VPhysicsGetObject();
 
 	if( pPhysicsObject )
 	{

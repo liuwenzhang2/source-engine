@@ -2189,7 +2189,7 @@ void CNPC_Strider::InputDisableCollisionWith( inputdata_t &inputdata )
 
 	for (int idx = m_BoneFollowerManager.GetNumBoneFollowers() - 1 ; idx >= 0 ; --idx) // stop when the function starts returning null (idx is no longer good)
 	{
-		IPhysicsObject *pFollowPhys = GetBoneFollowerByIndex(idx)->VPhysicsGetObject();
+		IPhysicsObject *pFollowPhys = GetBoneFollowerByIndex(idx)->GetEngineObject()->VPhysicsGetObject();
 		Assert(pFollowPhys);
 		PhysDisableEntityCollisions( pIgnorePhys, pFollowPhys );
 	}
@@ -2216,7 +2216,7 @@ void CNPC_Strider::InputEnableCollisionWith( inputdata_t &inputdata )
 		IPhysicsObject *pFollowPhys = pFol->VPhysicsGetObject();
 		Assert(pFollowPhys);
 		*/
-		IPhysicsObject *pFollowPhys = GetBoneFollowerByIndex(idx)->VPhysicsGetObject();
+		IPhysicsObject *pFollowPhys = GetBoneFollowerByIndex(idx)->GetEngineObject()->VPhysicsGetObject();
 		PhysEnableEntityCollisions( pIgnorePhys, pFollowPhys );
 	}
 } 
@@ -4400,7 +4400,7 @@ void CNPC_Strider::StompHit( int followerBoneIndex )
 	const char *pBoneNames[] = {"left skewer", "right skewer" };
 	int nameIndex = followerBoneIndex == STRIDER_LEFT_LEG_FOLLOWER_INDEX ? 0 : 1;
 	Vector localHit = GetAttachmentPositionInSpaceOfBone( pStudioHdr, pBoneNames[nameIndex], bone->boneIndex );
-	IPhysicsObject *pLegPhys = bone->hFollower->VPhysicsGetObject();
+	IPhysicsObject *pLegPhys = bone->hFollower->GetEngineObject()->VPhysicsGetObject();
 
 	// now transform into the worldspace of the current position of the leg's physics
 	matrix3x4_t legToWorld;

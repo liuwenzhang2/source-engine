@@ -980,7 +980,7 @@ void CWeaponCSBase::Drop(const Vector &vecVelocity)
 
 	SetTouch(&CWeaponCSBase::DefaultTouch);
 
-	IPhysicsObject *pObj = VPhysicsGetObject();
+	IPhysicsObject *pObj = GetEngineObject()->VPhysicsGetObject();
 	if ( pObj != NULL )
 	{
 		AngularImpulse	angImp( 200, 200, 200 );

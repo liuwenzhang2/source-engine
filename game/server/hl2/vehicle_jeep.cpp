@@ -1019,7 +1019,7 @@ void CPropJeep::FireChargedCannon( void )
 	}
 
 	//Rock the car
-	IPhysicsObject *pObj = VPhysicsGetObject();
+	IPhysicsObject *pObj = GetEngineObject()->VPhysicsGetObject();
 
 	if ( pObj != NULL )
 	{

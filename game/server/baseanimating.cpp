@@ -173,7 +173,7 @@ void CBaseAnimating::Activate()
 	BaseClass::Activate();
 
 	// Scaled physics objects (re)create their physics here
-	if ( GetEngineObject()->GetModelScale() != 1.0f && VPhysicsGetObject() )
+	if ( GetEngineObject()->GetModelScale() != 1.0f && GetEngineObject()->VPhysicsGetObject() )
 	{	
 		// sanity check to make sure 'm_flModelScale' is in sync with the 
 		Assert(GetEngineObject()->GetModelScale() > 0.0f );
@@ -489,7 +489,7 @@ const char *CBaseAnimating::GetSequenceActivityName( int iSequence )
 
 static void SyncAnimatingWithPhysics(CBaseAnimating* pAnimating)
 {
-	IPhysicsObject* pPhysics = pAnimating->VPhysicsGetObject();
+	IPhysicsObject* pPhysics = pAnimating->GetEngineObject()->VPhysicsGetObject();
 	if (pPhysics)
 	{
 		Vector pos;
@@ -2037,7 +2037,7 @@ bool CBaseAnimating::TestCollision( const Ray_t &ray, unsigned int fContentsMask
 	// Return a special case for scaled physics objects
 	if (GetEngineObject()->GetModelScale() != 1.0f )
 	{
-		IPhysicsObject *pPhysObject = VPhysicsGetObject();
+		IPhysicsObject *pPhysObject = GetEngineObject()->VPhysicsGetObject();
 		Vector vecPosition;
 		QAngle vecAngles;
 		pPhysObject->GetPosition( &vecPosition, &vecAngles );

@@ -1192,7 +1192,7 @@ float VerifyPortalPlacement( const CProp_Portal *pIgnorePortal, Vector &vOrigin,
 	Vector vVelocityCheck;
 	AngularImpulse vAngularImpulseCheck;
 
-	IPhysicsObject *pPhysicsObject = ((CBaseEntity*)tr.m_pEnt)->VPhysicsGetObject();
+	IPhysicsObject *pPhysicsObject = ((CBaseEntity*)tr.m_pEnt)->GetEngineObject()->VPhysicsGetObject();
 
 	if ( pPhysicsObject )
 	{

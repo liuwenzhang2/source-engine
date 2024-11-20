@@ -1686,6 +1686,7 @@ public:
 
 	CEnginePortalInternal();
 	~CEnginePortalInternal();
+	virtual IPhysicsObject* VPhysicsGetObject(void) const;
 	virtual int		VPhysicsGetObjectList(IPhysicsObject** pList, int listMax);
 	void	VPhysicsDestroyObject(void);
 	void				MoveTo(const Vector& ptCenter, const QAngle& angles);

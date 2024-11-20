@@ -496,7 +496,7 @@ void CNPC_Dog::PrescheduleThink( void )
 
 	if ( m_hPhysicsEnt )
 	{
-		IPhysicsObject *pPhysObj = m_hPhysicsEnt->VPhysicsGetObject();
+		IPhysicsObject *pPhysObj = m_hPhysicsEnt->GetEngineObject()->VPhysicsGetObject();
 
 		if ( pPhysObj && pPhysObj->GetGameFlags() & FVPHYSICS_PLAYER_HELD )
 		{
@@ -565,7 +565,7 @@ void CNPC_Dog::PullObject( bool bMantain )
 		return;
 	}
 
-	IPhysicsObject *pPhysObj = m_hPhysicsEnt->VPhysicsGetObject();
+	IPhysicsObject *pPhysObj = m_hPhysicsEnt->GetEngineObject()->VPhysicsGetObject();
 
 	if ( pPhysObj == NULL )
 	{
@@ -655,7 +655,7 @@ void CNPC_Dog::CleanCatchAndThrow( bool bClearTimers )
 	{
 		if ( m_bHasObject == true )
 		{
-			IPhysicsObject *pPhysObj = m_hPhysicsEnt->VPhysicsGetObject();
+			IPhysicsObject *pPhysObj = m_hPhysicsEnt->GetEngineObject()->VPhysicsGetObject();
 
 			m_hPhysicsEnt->GetEngineObject()->SetParent( NULL );
 			m_hPhysicsEnt->SetOwnerEntity( NULL );
@@ -798,7 +798,7 @@ void CNPC_Dog::ThrowObject( const char *pAttachmentName )
 	{
 		m_bHasObject = false;
 
-		IPhysicsObject *pPhysObj = m_hPhysicsEnt->VPhysicsGetObject();
+		IPhysicsObject *pPhysObj = m_hPhysicsEnt->GetEngineObject()->VPhysicsGetObject();
 
 		if ( pPhysObj )
 		{
@@ -935,7 +935,7 @@ void CNPC_Dog::PickupOrCatchObject( const char *pAttachmentName )
 			 iAttachment = m_iPhysGunAttachment;
 		
 		// Move physobject to shadow
-		IPhysicsObject *pPhysicsObject = m_hPhysicsEnt->VPhysicsGetObject();
+		IPhysicsObject *pPhysicsObject = m_hPhysicsEnt->GetEngineObject()->VPhysicsGetObject();
 		if ( pPhysicsObject )
 		{
 			pPhysicsObject->SetShadow( 1e4, 1e4, false, false );
@@ -1109,7 +1109,7 @@ bool CNPC_Dog::FindPhysicsObject( const char *pPickupName, CBaseEntity *pIgnore 
 		if ( m_hUnreachableObjects.Find( pEnt ) != -1 )
 			 continue;
 
-		pPhysObj = pEnt->VPhysicsGetObject();
+		pPhysObj = pEnt->GetEngineObject()->VPhysicsGetObject();
 
 		if( pPhysObj == NULL )
 			continue;
@@ -1226,7 +1226,7 @@ void CNPC_Dog::RunTask( const Task_t *pTask )
 				return;
 			}
 	
-			IPhysicsObject *pPhysicsObject = m_hPhysicsEnt->VPhysicsGetObject();
+			IPhysicsObject *pPhysicsObject = m_hPhysicsEnt->GetEngineObject()->VPhysicsGetObject();
 			
 			Vector vecGoalPos;
 			Vector vecDir;
@@ -1319,7 +1319,7 @@ void CNPC_Dog::RunTask( const Task_t *pTask )
 
 			if ( m_hPhysicsEnt != NULL )
 			{
-				IPhysicsObject *pPhysObj = m_hPhysicsEnt->VPhysicsGetObject();
+				IPhysicsObject *pPhysObj = m_hPhysicsEnt->GetEngineObject()->VPhysicsGetObject();
 					
 				if ( !pPhysObj )
 				{
@@ -1404,7 +1404,7 @@ void CNPC_Dog::RunTask( const Task_t *pTask )
 					flDistanceToPlayer = (pPlayer->GetEngineObject()->GetAbsOrigin() - m_hPhysicsEnt->WorldSpaceCenter()).Length();
 				}
 			
-				IPhysicsObject *pPhysObj = m_hPhysicsEnt->VPhysicsGetObject();
+				IPhysicsObject *pPhysObj = m_hPhysicsEnt->GetEngineObject()->VPhysicsGetObject();
 				if ( !pPhysObj )
 				{
 					Warning( "npc_dog:  TASK_DOG_WAIT_FOR_OBJECT with m_hPhysicsEnt->VPhysicsGetObject == NULL\n" );
@@ -1558,7 +1558,7 @@ void CNPC_Dog::StartTask( const Task_t *pTask )
 				 return;
 			}
 
-			IPhysicsObject *pPhysicsObject = m_hPhysicsEnt->VPhysicsGetObject();
+			IPhysicsObject *pPhysicsObject = m_hPhysicsEnt->GetEngineObject()->VPhysicsGetObject();
 			
 			Vector vecGoalPos;
 			Vector vecDir;

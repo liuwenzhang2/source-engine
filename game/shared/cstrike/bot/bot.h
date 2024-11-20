@@ -224,8 +224,8 @@ public:
 	virtual void BuildUserCmd( CUserCmd& cmd, const QAngle& viewangles, float forwardmove, float sidemove, float upmove, int buttons, byte impulse );
 	virtual void SetModel( const char *modelName );
 
-	int Save( CSave &save )	const						{ return 0; }
-	int Restore( CRestore &restore ) const	{ return 0; }
+	//int Save( CSave &save )	const						{ return 0; }
+	//int Restore( CRestore &restore ) const	{ return 0; }
 	//virtual void Think( void ) { }
 
 	const BotProfile *GetProfile( void ) const		{ return m_profile; }	///< return our personality profile

@@ -167,7 +167,7 @@ AIMotorMoveResult_t CAI_Motor::MoveGroundStep( const Vector &newPos, CBaseEntity
 		if ( moveTrace.flStepUpDistance > 0.1f )
 		{
 			float height = clamp( moveTrace.flStepUpDistance, 0.f, StepHeight() );
-			IPhysicsObject *pPhysicsObject = GetOuter()->VPhysicsGetObject();
+			IPhysicsObject *pPhysicsObject = GetOuter()->GetEngineObject()->VPhysicsGetObject();
 			if ( pPhysicsObject )
 			{
 				IPhysicsShadowController *pShadow = pPhysicsObject->GetShadowController();
