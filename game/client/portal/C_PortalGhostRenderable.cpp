@@ -212,18 +212,18 @@ bool C_PortalGhostRenderable::GetAttachment( int number, matrix3x4_t &matrix )
 	return false;
 }
 
-bool C_PortalGhostRenderable::GetAttachment( int number, Vector &origin )
-{
-	if( m_pGhostedRenderable == NULL )
-		return false;
-
-	if( m_pGhostedRenderable->GetAttachment( number, origin ) )
-	{
-		origin = m_matGhostTransform * origin;
-		return true;
-	}
-	return false;
-}
+//bool C_PortalGhostRenderable::GetAttachment( int number, Vector &origin )
+//{
+//	if( m_pGhostedRenderable == NULL )
+//		return false;
+//
+//	if( m_pGhostedRenderable->GetAttachment( number, origin ) )
+//	{
+//		origin = m_matGhostTransform * origin;
+//		return true;
+//	}
+//	return false;
+//}
 
 bool C_PortalGhostRenderable::GetAttachmentVelocity( int number, Vector &originVel, Quaternion &angleVel )
 {

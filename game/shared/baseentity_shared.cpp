@@ -898,7 +898,7 @@ bool CBaseEntity::IsBSPModel() const
 }
 
 
-void CBaseEntity::OnPositionChenged() {
+void CBaseEntity::OnPositionChanged() {
 	// NOTE: This will also mark shadow projection + client leaf dirty
 	GetEngineObject()->MarkPartitionHandleDirty();
 }

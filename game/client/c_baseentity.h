@@ -314,6 +314,7 @@ public:
 	virtual bool					TestCollision( const Ray_t &ray, unsigned int fContentsMask, trace_t& tr );
 	virtual bool					TestHitboxes( const Ray_t &ray, unsigned int fContentsMask, trace_t& tr );
 	virtual void GetBonePosition(int iBone, Vector& origin, QAngle& angles) {}
+	virtual void InvalidateBoneCache() {}
 	// To mimic server call convention
 	C_BaseEntity					*GetOwnerEntity( void ) const;
 	void							SetOwnerEntity( C_BaseEntity *pOwner );
@@ -459,7 +460,7 @@ public:
 	// Attachments
 	virtual int						LookupAttachment( const char *pAttachmentName ) { return -1; }
 	virtual bool					GetAttachment( int number, matrix3x4_t &matrix );
-	virtual bool					GetAttachment( int number, Vector &origin );
+	//virtual bool					GetAttachment( int number, Vector &origin );
 	virtual	bool					GetAttachment( int number, Vector &origin, QAngle &angles );
 	virtual bool					GetAttachmentVelocity( int number, Vector &originVel, Quaternion &angleVel );
 
@@ -871,7 +872,7 @@ public:
 	void				SetEyeAngleOffset( const QAngle & qa );
 #endif
 
-	void					OnPositionChenged();
+	void					OnPositionChanged();
 	void					OnAnglesChanged();
 	void					OnAnimationChanged();
 	void					AddWatcherToEntity(CBaseEntity* pWatcher, int watcherType);

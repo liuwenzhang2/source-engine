@@ -11,7 +11,6 @@
 #include "entityoutput.h"
 #include "physics.h"
 #include "explode.h"
-#include "vphysics_interface.h"
 #include "collisionutils.h"
 #include "steamjet.h"
 #include "eventqueue.h"

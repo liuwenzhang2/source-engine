@@ -72,7 +72,7 @@ public:
 	// Attachments
 	virtual	bool GetAttachment( int number, Vector &origin, QAngle &angles );
 	virtual bool GetAttachment( int number, matrix3x4_t &matrix );
-	virtual bool GetAttachment( int number, Vector &origin );
+	//virtual bool GetAttachment( int number, Vector &origin );
 	virtual bool GetAttachmentVelocity( int number, Vector &originVel, Quaternion &angleVel );
 
 	// Rendering clip plane, should be 4 floats, return value of NULL indicates a disabled render clip plane

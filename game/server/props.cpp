@@ -14,7 +14,6 @@
 #include "locksounds.h"
 #include "filters.h"
 #include "physics.h"
-#include "vphysics_interface.h"
 #include "entityoutput.h"
 #include "vcollide_parse.h"
 #include "studio.h"

@@ -1932,7 +1932,7 @@ private:
 	//int		LookupPoseParameter(const char* szName);
 	//float	GetPoseParameter(int iParameter);
 	//float	SetPoseParameter(int iParameter, float flValue);
-	bool	GetAttachment(const char* szName, Vector& origin, QAngle& angles);
+	//bool	GetAttachment(const char* szName, Vector& origin, QAngle& angles);
 
 	void InitializePoseParameters();
 	bool ParseVehicleScript(const char* pScriptName, solid_t& solid, vehicleparams_t& vehicle);

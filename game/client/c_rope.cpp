@@ -1140,7 +1140,8 @@ int C_RopeKeyframe::GetRopesIntersectingAABB( C_RopeKeyframe **pRopes, int nMaxR
 		C_RopeKeyframe *pRope = g_Ropes[i];
 	
 		Vector v1, v2;
-		if ( pRope->GetEndPointPos( 0, v1 ) && pRope->GetEndPointPos( 1, v2 ) )
+		QAngle dummy;
+		if ( pRope->GetEndPointPos( 0, v1, dummy) && pRope->GetEndPointPos( 1, v2, dummy) )
 		{
 			if ( IsBoxIntersectingRay( v1, v2-v1, vAbsMin, vAbsMax, 0.1f ) )
 			{
@@ -1494,23 +1495,23 @@ bool C_RopeKeyframe::GetAttachment( int number, matrix3x4_t &matrix )
 	return true;
 }
 
-bool C_RopeKeyframe::GetAttachment( int number, Vector &origin )
-{
-	int nNodes = m_RopePhysics.NumNodes();
-	if ( (number != ROPE_ATTACHMENT_START_POINT && number != ROPE_ATTACHMENT_END_POINT) || nNodes < 2 )
-		return false;
-
-	// Now setup the orientation based on the last segment.
-	if ( number == ROPE_ATTACHMENT_START_POINT )
-	{
-		origin = m_RopePhysics.GetNode( 0 )->m_vPredicted;
-	}
-	else
-	{
-		origin = m_RopePhysics.GetNode( nNodes-1 )->m_vPredicted;
-	}
-	return true;
-}
+//bool C_RopeKeyframe::GetAttachment( int number, Vector &origin )
+//{
+//	int nNodes = m_RopePhysics.NumNodes();
+//	if ( (number != ROPE_ATTACHMENT_START_POINT && number != ROPE_ATTACHMENT_END_POINT) || nNodes < 2 )
+//		return false;
+//
+//	// Now setup the orientation based on the last segment.
+//	if ( number == ROPE_ATTACHMENT_START_POINT )
+//	{
+//		origin = m_RopePhysics.GetNode( 0 )->m_vPredicted;
+//	}
+//	else
+//	{
+//		origin = m_RopePhysics.GetNode( nNodes-1 )->m_vPredicted;
+//	}
+//	return true;
+//}
 
 bool C_RopeKeyframe::GetAttachmentVelocity( int number, Vector &originVel, Quaternion &angleVel )
 {
@@ -1569,7 +1570,8 @@ inline bool C_RopeKeyframe::DidEndPointMove( int iPt )
 	bool bOld = m_bPrevEndPointPos[iPt];
 	Vector vOld = m_vPrevEndPointPos[iPt];
 
-	m_bPrevEndPointPos[iPt] = GetEndPointPos( iPt, m_vPrevEndPointPos[iPt] );
+	QAngle dummy;
+	m_bPrevEndPointPos[iPt] = GetEndPointPos( iPt, m_vPrevEndPointPos[iPt], dummy);
 	
 	// If it wasn't and isn't attached to anything, don't register a change.
 	if( !bOld && !m_bPrevEndPointPos[iPt] )
@@ -1857,12 +1859,13 @@ bool C_RopeKeyframe::InitRopePhysics()
 	}
 
 	// Must have both entities to work.
-	m_bPrevEndPointPos[0] = GetEndPointPos( 0, m_vPrevEndPointPos[0] );
+	QAngle dummy;
+	m_bPrevEndPointPos[0] = GetEndPointPos( 0, m_vPrevEndPointPos[0], dummy);
 	if( !m_bPrevEndPointPos[0] )
 		return false;
 
 	// They're allowed to not have an end attachment point so the rope can dangle.
-	m_bPrevEndPointPos[1] = GetEndPointPos( 1, m_vPrevEndPointPos[1] );
+	m_bPrevEndPointPos[1] = GetEndPointPos( 1, m_vPrevEndPointPos[1], dummy);
 	if( !m_bPrevEndPointPos[1] )
 		m_vPrevEndPointPos[1] = m_vPrevEndPointPos[0];
 
@@ -1901,7 +1904,7 @@ bool C_RopeKeyframe::InitRopePhysics()
 }
 
 
-bool C_RopeKeyframe::CalculateEndPointAttachment( C_BaseEntity *pEnt, int iAttachment, Vector &vPos, QAngle *pAngles )
+bool C_RopeKeyframe::CalculateEndPointAttachment( C_BaseEntity *pEnt, int iAttachment, Vector &vPos, QAngle& pAngles )
 {
 	VPROF_BUDGET( "C_RopeKeyframe::CalculateEndPointAttachment", VPROF_BUDGETGROUP_ROPES );
 
@@ -1918,47 +1921,48 @@ bool C_RopeKeyframe::CalculateEndPointAttachment( C_BaseEntity *pEnt, int iAttac
 				return false;
 
 			int iAttachment = pModel->LookupAttachment( "buff_attach" );
-			if ( pAngles )
-				return pModel->GetAttachment( iAttachment, vPos, *pAngles );
-			return pModel->GetAttachment( iAttachment, vPos );
+			//if ( pAngles )
+			//	return pModel->GetAttachment( iAttachment, vPos, *pAngles );
+			return pModel->GetAttachment( iAttachment, vPos, pAngles);
 		}
 	}
 
 	if( iAttachment > 0 )
 	{
 		bool bOk;
-		if ( pAngles )
-		{
-			bOk = pEnt->GetAttachment( iAttachment, vPos, *pAngles );
-		}
-		else
-		{
-			bOk = pEnt->GetAttachment( iAttachment, vPos );
-		}
+		//if ( pAngles )
+		//{
+		//	bOk = pEnt->GetAttachment( iAttachment, vPos, *pAngles );
+		//}
+		//else
+		//{
+			bOk = pEnt->GetAttachment( iAttachment, vPos, pAngles);
+		//}
 		if ( bOk )
 			return true;
 	}
 
 	vPos = pEnt->WorldSpaceCenter( );
-	if ( pAngles )
-	{
-		*pAngles = pEnt->GetEngineObject()->GetAbsAngles();
-	}
+	//if ( pAngles )
+	//{
+		pAngles = pEnt->GetEngineObject()->GetAbsAngles();
+	//}
 	return true;
 }
 
-bool C_RopeKeyframe::GetEndPointPos( int iPt, Vector &vPos )
+bool C_RopeKeyframe::GetEndPointPos( int iPt, Vector &vPos, QAngle& vAngle)
 {
 	// By caching the results here, we avoid doing this a bunch of times per frame.
 	if ( m_bEndPointAttachmentPositionsDirty )
 	{
-		CalculateEndPointAttachment( m_hStartPoint, m_iStartAttachment, m_vCachedEndPointAttachmentPos[0], NULL );
-		CalculateEndPointAttachment( m_hEndPoint, m_iEndAttachment, m_vCachedEndPointAttachmentPos[1], NULL );
+		CalculateEndPointAttachment( m_hStartPoint, m_iStartAttachment, m_vCachedEndPointAttachmentPos[0], m_vCachedEndPointAttachmentAngle[0]);
+		CalculateEndPointAttachment( m_hEndPoint, m_iEndAttachment, m_vCachedEndPointAttachmentPos[1], m_vCachedEndPointAttachmentAngle[1]);
 		m_bEndPointAttachmentPositionsDirty = false;
 	}
 
 	Assert( iPt == 0 || iPt == 1 );
 	vPos = m_vCachedEndPointAttachmentPos[iPt];
+	vAngle = m_vCachedEndPointAttachmentAngle[iPt];
 	return true;
 }
 
@@ -1986,8 +1990,8 @@ bool C_RopeKeyframe::GetEndPointAttachment( int iPt, Vector &vPos, QAngle &angle
 	// By caching the results here, we avoid doing this a bunch of times per frame.
 	if ( m_bEndPointAttachmentPositionsDirty || m_bEndPointAttachmentAnglesDirty )
 	{
-		CalculateEndPointAttachment( m_hStartPoint, m_iStartAttachment, m_vCachedEndPointAttachmentPos[0], &m_vCachedEndPointAttachmentAngle[0] );
-		CalculateEndPointAttachment( m_hEndPoint, m_iEndAttachment, m_vCachedEndPointAttachmentPos[1], &m_vCachedEndPointAttachmentAngle[1] );
+		CalculateEndPointAttachment( m_hStartPoint, m_iStartAttachment, m_vCachedEndPointAttachmentPos[0], m_vCachedEndPointAttachmentAngle[0] );
+		CalculateEndPointAttachment( m_hEndPoint, m_iEndAttachment, m_vCachedEndPointAttachmentPos[1], m_vCachedEndPointAttachmentAngle[1] );
 		m_bEndPointAttachmentPositionsDirty = false;
 		m_bEndPointAttachmentAnglesDirty = false;
 	}

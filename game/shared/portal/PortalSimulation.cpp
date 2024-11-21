@@ -8,7 +8,6 @@
 
 #include "cbase.h"
 #include "PortalSimulation.h"
-#include "vphysics_interface.h"
 #include "physics.h"
 #include "portal_shareddefs.h"
 #include "StaticCollisionPolyhedronCache.h"

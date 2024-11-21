@@ -234,11 +234,11 @@ public:
 	virtual bool					GetSoundSpatialization( SpatializationInfo_t& info );
 
 	// Attachments.
-	bool							GetAttachment( const char *szName, Vector &absOrigin );
+	//bool							GetAttachment( const char *szName, Vector &absOrigin );
 	bool							GetAttachment( const char *szName, Vector &absOrigin, QAngle &absAngles );
 
 	// Inherited from C_BaseEntity
-	virtual bool					GetAttachment( int number, Vector &origin );
+	//virtual bool					GetAttachment( int number, Vector &origin );
 	virtual bool					GetAttachment( int number, Vector &origin, QAngle &angles );
 	virtual bool					GetAttachment( int number, matrix3x4_t &matrix );
 	virtual bool					GetAttachmentVelocity( int number, Vector &originVel, Quaternion &angleVel );

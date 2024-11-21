@@ -103,7 +103,7 @@ public:
 	void ShakeRope( const Vector &vCenter, float flRadius, float flMagnitude );
 
 	// Get the attachment position of one of the endpoints.
-	bool			GetEndPointPos( int iPt, Vector &vPos );
+	bool			GetEndPointPos( int iPt, Vector &vPos, QAngle& vAngle);
 
 	// Get the rope material data.
 	IMaterial		*GetSolidMaterial( void );
@@ -133,7 +133,7 @@ public:
 	// Specify ROPE_ATTACHMENT_START_POINT or ROPE_ATTACHMENT_END_POINT for the attachment.
 	virtual	bool	GetAttachment( int number, Vector &origin, QAngle &angles );
 	virtual bool	GetAttachment( int number, matrix3x4_t &matrix );
-	virtual bool	GetAttachment( int number, Vector &origin );
+	//virtual bool	GetAttachment( int number, Vector &origin );
 	virtual bool	GetAttachmentVelocity( int number, Vector &originVel, Quaternion &angleVel );
 
 private:
@@ -158,7 +158,7 @@ private:
 	void			CalcLightValues();
 
 	void			ReceiveMessage( int classID, bf_read &msg );
-	bool			CalculateEndPointAttachment( C_BaseEntity *pEnt, int iAttachment, Vector &vPos, QAngle *pAngles );
+	bool			CalculateEndPointAttachment( C_BaseEntity *pEnt, int iAttachment, Vector &vPos, QAngle& pAngles );
 
 
 private:

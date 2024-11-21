@@ -1598,28 +1598,28 @@ bool C_BaseAnimating::GetAttachment( int number, matrix3x4_t& matrix )
 // Purpose: Get attachment point by index (position only)
 // Input  : number - which point
 //-----------------------------------------------------------------------------
-bool C_BaseAnimating::GetAttachment( int number, Vector &origin )
-{
-	// Note: this could be more efficient, but we want the matrix3x4_t version of GetAttachment to be the origin of
-	// attachment generation, so a derived class that wants to fudge attachments only 
-	// has to reimplement that version. This also makes it work like the server in that regard.
-	matrix3x4_t attachmentToWorld;
-	if ( !GetAttachment( number, attachmentToWorld ) )
-	{
-		// Set this to the model origin/angles so that we don't have stack fungus in origin and angles.
-		origin = GetEngineObject()->GetAbsOrigin();
-		return false;
-	}
+//bool C_BaseAnimating::GetAttachment( int number, Vector &origin )
+//{
+//	// Note: this could be more efficient, but we want the matrix3x4_t version of GetAttachment to be the origin of
+//	// attachment generation, so a derived class that wants to fudge attachments only 
+//	// has to reimplement that version. This also makes it work like the server in that regard.
+//	matrix3x4_t attachmentToWorld;
+//	if ( !GetAttachment( number, attachmentToWorld ) )
+//	{
+//		// Set this to the model origin/angles so that we don't have stack fungus in origin and angles.
+//		origin = GetEngineObject()->GetAbsOrigin();
+//		return false;
+//	}
+//
+//	MatrixPosition( attachmentToWorld, origin );
+//	return true;
+//}
 
-	MatrixPosition( attachmentToWorld, origin );
-	return true;
-}
 
-
-bool C_BaseAnimating::GetAttachment( const char *szName, Vector &absOrigin )
-{
-	return GetAttachment( LookupAttachment( szName ), absOrigin );
-}
+//bool C_BaseAnimating::GetAttachment( const char *szName, Vector &absOrigin )
+//{
+//	return GetAttachment( LookupAttachment( szName ), absOrigin );
+//}
 
 
 

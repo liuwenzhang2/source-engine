@@ -12,7 +12,6 @@
 #pragma once
 #endif
 
-#include "vphysics_interface.h"
 
 class ISaveRestoreBlockHandler;
 class IPhysicsObject;

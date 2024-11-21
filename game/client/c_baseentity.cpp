@@ -1271,11 +1271,11 @@ bool C_BaseEntity::GetAttachment( int number, Vector &origin, QAngle &angles )
 	return true;
 }
 
-bool C_BaseEntity::GetAttachment( int number, Vector &origin )
-{
-	origin = GetEngineObject()->GetAbsOrigin();
-	return true;
-}
+//bool C_BaseEntity::GetAttachment( int number, Vector &origin )
+//{
+//	origin = GetEngineObject()->GetAbsOrigin();
+//	return true;
+//}
 
 bool C_BaseEntity::GetAttachment( int number, matrix3x4_t &matrix )
 {

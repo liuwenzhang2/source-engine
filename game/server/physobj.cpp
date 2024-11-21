@@ -7,7 +7,6 @@
 
 #include "cbase.h"
 #include "player.h"
-#include "vphysics_interface.h"
 #include "physics.h"
 #include "vcollide_parse.h"
 #include "entitylist.h"

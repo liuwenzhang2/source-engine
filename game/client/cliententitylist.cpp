@@ -2866,7 +2866,7 @@ void C_EngineObjectInternal::InvalidatePhysicsRecursive(int nChangeFlags)
 //#ifndef CLIENT_DLL
 //		GetEngineObject()->MarkPVSInformationDirty();
 //#endif
-		m_pOuter->OnPositionChenged();
+		m_pOuter->OnPositionChanged();
 	}
 
 	// NOTE: This has to be done after velocity + position are changed

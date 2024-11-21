@@ -2329,7 +2329,7 @@ void CEngineObjectInternal::InvalidatePhysicsRecursive(int nChangeFlags)
 //#ifndef CLIENT_DLL
 		MarkPVSInformationDirty();
 //#endif
-		m_pOuter->OnPositionChenged();
+		m_pOuter->OnPositionChanged();
 	}
 
 	// NOTE: This has to be done after velocity + position are changed
@@ -8191,10 +8191,10 @@ CEngineVehicleInternal::~CEngineVehicleInternal()
 //	return m_pOuter->GetEngineObject()->SetPoseParameter(iParameter, flValue);
 //}
 
-inline bool CEngineVehicleInternal::GetAttachment(const char* szName, Vector& origin, QAngle& angles)
-{
-	return ((CBaseAnimating*)m_pOuter)->GetAttachment(szName, origin, angles);
-}
+//inline bool CEngineVehicleInternal::GetAttachment(const char* szName, Vector& origin, QAngle& angles)
+//{
+//	return m_pOuter->GetAttachment(szName, origin, angles);
+//}
 
 //-----------------------------------------------------------------------------
 // Methods related to spawn
@@ -8221,7 +8221,7 @@ void CEngineVehicleInternal::InitializePoseParameters()
 	SetPoseParameter(m_poseParameters[VEH_FR_WHEEL_HEIGHT], 0);
 	SetPoseParameter(m_poseParameters[VEH_RL_WHEEL_HEIGHT], 0);
 	SetPoseParameter(m_poseParameters[VEH_RR_WHEEL_HEIGHT], 0);
-	((CBaseAnimating*)m_pOuter)->InvalidateBoneCache();
+	m_pOuter->InvalidateBoneCache();
 }
 
 //-----------------------------------------------------------------------------
@@ -8262,8 +8262,8 @@ void CEngineVehicleInternal::CalcWheelData(vehicleparams_t& vehicle)
 	SetPoseParameter(m_poseParameters[VEH_FR_WHEEL_HEIGHT], 0);
 	SetPoseParameter(m_poseParameters[VEH_RL_WHEEL_HEIGHT], 0);
 	SetPoseParameter(m_poseParameters[VEH_RR_WHEEL_HEIGHT], 0);
-	((CBaseAnimating*)m_pOuter)->InvalidateBoneCache();
-	if (GetAttachment("wheel_fl", left, dummy) && GetAttachment("wheel_fr", right, dummy))
+	m_pOuter->InvalidateBoneCache();
+	if (m_pOuter->GetAttachment("wheel_fl", left, dummy) && m_pOuter->GetAttachment("wheel_fr", right, dummy))
 	{
 		VectorITransform(left, m_pOuter->GetEngineObject()->EntityToWorldTransform(), left);
 		VectorITransform(right, m_pOuter->GetEngineObject()->EntityToWorldTransform(), right);
@@ -8275,7 +8275,7 @@ void CEngineVehicleInternal::CalcWheelData(vehicleparams_t& vehicle)
 		m_wheelBaseHeight[1] = right.z;
 	}
 
-	if (GetAttachment("wheel_rl", left, dummy) && GetAttachment("wheel_rr", right, dummy))
+	if (m_pOuter->GetAttachment("wheel_rl", left, dummy) && m_pOuter->GetAttachment("wheel_rr", right, dummy))
 	{
 		VectorITransform(left, m_pOuter->GetEngineObject()->EntityToWorldTransform(), left);
 		VectorITransform(right, m_pOuter->GetEngineObject()->EntityToWorldTransform(), right);
@@ -8290,8 +8290,8 @@ void CEngineVehicleInternal::CalcWheelData(vehicleparams_t& vehicle)
 	SetPoseParameter(m_poseParameters[VEH_FR_WHEEL_HEIGHT], 1);
 	SetPoseParameter(m_poseParameters[VEH_RL_WHEEL_HEIGHT], 1);
 	SetPoseParameter(m_poseParameters[VEH_RR_WHEEL_HEIGHT], 1);
-	((CBaseAnimating*)m_pOuter)->InvalidateBoneCache();
-	if (GetAttachment("wheel_fl", left, dummy) && GetAttachment("wheel_fr", right, dummy))
+	m_pOuter->InvalidateBoneCache();
+	if (m_pOuter->GetAttachment("wheel_fl", left, dummy) && m_pOuter->GetAttachment("wheel_fr", right, dummy))
 	{
 		VectorITransform(left, m_pOuter->GetEngineObject()->EntityToWorldTransform(), left);
 		VectorITransform(right, m_pOuter->GetEngineObject()->EntityToWorldTransform(), right);
@@ -8301,7 +8301,7 @@ void CEngineVehicleInternal::CalcWheelData(vehicleparams_t& vehicle)
 		vehicle.axles[0].wheels.springAdditionalLength = m_wheelTotalHeight[0];
 	}
 
-	if (GetAttachment("wheel_rl", left, dummy) && GetAttachment("wheel_rr", right, dummy))
+	if (m_pOuter->GetAttachment("wheel_rl", left, dummy) && m_pOuter->GetAttachment("wheel_rr", right, dummy))
 	{
 		VectorITransform(left, m_pOuter->GetEngineObject()->EntityToWorldTransform(), left);
 		VectorITransform(right, m_pOuter->GetEngineObject()->EntityToWorldTransform(), right);
@@ -8323,10 +8323,10 @@ void CEngineVehicleInternal::CalcWheelData(vehicleparams_t& vehicle)
 	SetPoseParameter(m_poseParameters[VEH_FR_WHEEL_HEIGHT], 0);
 	SetPoseParameter(m_poseParameters[VEH_RL_WHEEL_HEIGHT], 0);
 	SetPoseParameter(m_poseParameters[VEH_RR_WHEEL_HEIGHT], 0);
-	((CBaseAnimating*)m_pOuter)->InvalidateBoneCache();
+	m_pOuter->InvalidateBoneCache();
 
 	// Get raytrace offsets if they exist.
-	if (GetAttachment("raytrace_fl", left, dummy) && GetAttachment("raytrace_fr", right, dummy))
+	if (m_pOuter->GetAttachment("raytrace_fl", left, dummy) && m_pOuter->GetAttachment("raytrace_fr", right, dummy))
 	{
 		VectorITransform(left, m_pOuter->GetEngineObject()->EntityToWorldTransform(), left);
 		VectorITransform(right, m_pOuter->GetEngineObject()->EntityToWorldTransform(), right);
@@ -8335,7 +8335,7 @@ void CEngineVehicleInternal::CalcWheelData(vehicleparams_t& vehicle)
 		vehicle.axles[0].raytraceOffset = right - center;
 	}
 
-	if (GetAttachment("raytrace_rl", left, dummy) && GetAttachment("raytrace_rr", right, dummy))
+	if (m_pOuter->GetAttachment("raytrace_rl", left, dummy) && m_pOuter->GetAttachment("raytrace_rr", right, dummy))
 	{
 		VectorITransform(left, m_pOuter->GetEngineObject()->EntityToWorldTransform(), left);
 		VectorITransform(right, m_pOuter->GetEngineObject()->EntityToWorldTransform(), right);
@@ -8844,7 +8844,7 @@ void CEngineVehicleInternal::GetVehicleViewPosition(const char* pViewAttachment,
 	matrix3x4_t vehicleEyePosToWorld;
 	Vector vehicleEyeOrigin;
 	QAngle vehicleEyeAngles;
-	GetAttachment(pViewAttachment, vehicleEyeOrigin, vehicleEyeAngles);
+	m_pOuter->GetAttachment(pViewAttachment, vehicleEyeOrigin, vehicleEyeAngles);
 	AngleMatrix(vehicleEyeAngles, vehicleEyePosToWorld);
 
 #ifdef HL2_DLL

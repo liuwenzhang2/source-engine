@@ -12,12 +12,11 @@
 #pragma once
 #endif
 
-#include "vphysics_interface.h"
 #include "baseentity.h"
 #include "baseanimating.h"
 
 class CPhysicsShadowClone;
-
+class IPhysicsEnvironment;
 
 
 struct CPhysicsShadowCloneLL
