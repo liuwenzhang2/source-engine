@@ -2020,6 +2020,93 @@ inline int CEngineVehicleInternal::BoostTimeLeft() const
 //	m_pOuterServerVehicle = pServerVehicle;
 //}
 
+class CEngineRopeInternal : public CEngineObjectInternal, public IEngineRopeServer {
+public:
+	DECLARE_DATADESC();
+	DECLARE_CLASS(CEngineRopeInternal, CEngineObjectInternal);
+	DECLARE_SERVERCLASS();
+	CEngineRopeInternal();
+	~CEngineRopeInternal();
+
+	CBaseEntity* GetStartPoint() { return m_hStartPoint; }
+	CBaseEntity* GetEndPoint() { return m_hEndPoint.Get(); }
+	int				GetEndAttachment() { return m_iStartAttachment; };
+
+	void			SetStartPoint(CBaseEntity* pStartPoint, int attachment = 0);
+	void			SetEndPoint(CBaseEntity* pEndPoint, int attachment = 0);
+
+	int GetRopeFlags() { return m_RopeFlags; }
+	void SetRopeFlags(int RopeFlags) {
+		m_RopeFlags = RopeFlags;
+	}
+	void SetWidth(float Width) { m_Width = Width; }
+	int GetSegments() { return m_nSegments; }
+	void SetSegments(int nSegments) { m_nSegments = nSegments; }
+	int GetLockedPoints() { return m_fLockedPoints; }
+	void SetLockedPoints(int LockedPoints) { m_fLockedPoints = LockedPoints; }
+	void SetRopeLength(int RopeLength) { m_RopeLength = RopeLength; }
+
+	bool		SetupHangDistance(float flHangDist);
+	void		ActivateStartDirectionConstraints(bool bEnable);
+	void		ActivateEndDirectionConstraints(bool bEnable);
+
+	int GetRopeMaterialModelIndex() { return m_iRopeMaterialModelIndex; }
+	void SetRopeMaterialModelIndex(int RopeMaterialModelIndex) { m_iRopeMaterialModelIndex = RopeMaterialModelIndex; }
+	void			EndpointsChanged();
+	// Once-off length recalculation
+	void			RecalculateLength(void);
+	// These work just like the client-side versions.
+	bool			GetEndPointPos2(CBaseEntity* pEnt, int iAttachment, Vector& v);
+	bool			GetEndPointPos(int iPt, Vector& v);
+	void			UpdateBBox(bool bForceRelink);
+	// This is normally called by Activate but if you create the rope at runtime,
+		// you must call it after you have setup its variables.
+	void			Init();
+	void			NotifyPositionChanged();
+	// Unless this is called during initialization, the caller should have done
+	// PrecacheModel on whatever material they specify in here.
+	const char*		GetMaterialName() { return m_strRopeMaterialModel.ToCStr(); }
+	void			SetMaterial(const char* pName);
+	void			SetScrollSpeed(float flScrollSpeed) { m_flScrollSpeed = flScrollSpeed; }
+	void			DetachPoint(int iPoint);
+	// By default, ropes don't collide with the world. Call this to enable it.
+	void			EnableCollision();
+	// Toggle wind.
+	void			EnableWind(bool bEnable);
+	void			SetConstrainBetweenEndpoints(bool bConstrainBetweenEndpoints) { m_bConstrainBetweenEndpoints = m_bConstrainBetweenEndpoints; }
+private:
+	void			SetAttachmentPoint(CBaseHandle& hOutEnt, short& iOutAttachment, CBaseEntity* pEnt, int iAttachment);
+
+
+
+	CNetworkVar(int, m_RopeFlags);		// Combination of ROPE_ defines in rope_shared.h
+	CNetworkVar(int, m_Slack);
+	CNetworkVar(float, m_Width);
+	CNetworkVar(float, m_TextureScale);
+	CNetworkVar(int, m_nSegments);		// Number of segments.
+	CNetworkVar(bool, m_bConstrainBetweenEndpoints);
+	CNetworkVar(int, m_iRopeMaterialModelIndex);	// Index of sprite model with the rope's material.
+	string_t m_strRopeMaterialModel;
+
+	// Number of subdivisions in between segments.
+	CNetworkVar(int, m_Subdiv);
+
+	//EHANDLE		m_hNextLink;
+
+	CNetworkVar(int, m_RopeLength);	// Rope length at startup, used to calculate tension.
+
+	CNetworkVar(int, m_fLockedPoints);
+	CNetworkVar(float, m_flScrollSpeed);
+
+	CNetworkHandle(CBaseEntity, m_hStartPoint);		// StartPoint/EndPoint are entities
+	CNetworkHandle(CBaseEntity, m_hEndPoint);
+	CNetworkVar(short, m_iStartAttachment);	// StartAttachment/EndAttachment are attachment points.
+	CNetworkVar(short, m_iEndAttachment);
+	// Used to detect changes.
+	bool		m_bStartPointValid;
+	bool		m_bEndPointValid;
+};
+
 //-----------------------------------------------------------------------------
 // An interface passed into the OnSave method of all entities
 //-----------------------------------------------------------------------------
@@ -3345,6 +3432,9 @@ inline CBaseEntity* CGlobalEntityList<T>::CreateEntityByName(const char* classNa
 		break;
 	case ENGINEOBJECT_VEHICLE:
 		m_EngineObjectArray[iForceEdictIndex] = new CEngineVehicleInternal();
+		break;
+	case ENGINEOBJECT_ROPE:
+		m_EngineObjectArray[iForceEdictIndex] = new CEngineRopeInternal();
 		break;
 	default:
 		Error("GetEngineObjectType error!\n");

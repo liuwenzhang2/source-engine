@@ -779,7 +779,7 @@ void CNPC_SecurityCamera::ActiveThink( void )
 	{
 		if ( m_hRopes[ iRope ] )
 		{
-			m_hRopes[ iRope ]->EndpointsChanged();
+			m_hRopes[ iRope ]->GetEngineRope()->EndpointsChanged();
 		}
 	}
 }
@@ -953,11 +953,11 @@ void CNPC_SecurityCamera::RopesOn( void )
 			m_hRopes[ iRope ] = CRopeKeyframe::Create( this, this, iStartIndex, iEndIndex );
 			if ( m_hRopes[ iRope ] )
 			{
-				m_hRopes[ iRope ]->m_Width = 0.7;
-				m_hRopes[ iRope ]->m_nSegments = ROPE_MAX_SEGMENTS;
-				m_hRopes[ iRope ]->EnableWind( false );
-				m_hRopes[ iRope ]->SetupHangDistance( 9.0f );
-				m_hRopes[ iRope ]->m_bConstrainBetweenEndpoints = true;
+				m_hRopes[ iRope ]->GetEngineRope()->SetWidth(0.7);
+				m_hRopes[ iRope ]->GetEngineRope()->SetSegments(ROPE_MAX_SEGMENTS);
+				m_hRopes[ iRope ]->GetEngineRope()->EnableWind( false );
+				m_hRopes[ iRope ]->GetEngineRope()->SetupHangDistance( 9.0f );
+				m_hRopes[ iRope ]->GetEngineRope()->SetConstrainBetweenEndpoints(true);
 			}
 		}
 	}

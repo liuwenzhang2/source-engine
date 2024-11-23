@@ -573,6 +573,57 @@ public:
 
 };
 
+class IEngineRopeClient {
+public:
+	// Use this when rope length and slack change to recompute the spring length.
+	virtual void			RecomputeSprings() = 0;
+	virtual void			UpdateBBox() = 0;
+	virtual void			CalcLightValues() = 0;
+	virtual void			ShakeRope(const Vector& vCenter, float flRadius, float flMagnitude) = 0;
+	virtual bool			AnyPointsMoved() = 0;
+	virtual bool			InitRopePhysics() = 0;
+	virtual void			ConstrainNodesBetweenEndpoints(void) = 0;
+	virtual bool			DetectRestingState(bool& bApplyWind) = 0;
+	// Specify ROPE_ATTACHMENT_START_POINT or ROPE_ATTACHMENT_END_POINT for the attachment.
+	virtual	bool			GetAttachment(int number, Vector& origin, QAngle& angles) = 0;
+	virtual bool			GetAttachment(int number, matrix3x4_t& matrix) = 0;
+	// Hook the physics. Pass in your own implementation of CSimplePhysics::IHelper. The
+// default implementation is returned so you can call through to it if you want.
+	//virtual CSimplePhysics::IHelper* HookPhysics(CSimplePhysics::IHelper* pHook) = 0;
+	// Get the attachment position of one of the endpoints.
+	virtual bool			GetEndPointPos(int iPt, Vector& vPos, QAngle& vAngle) = 0;
+	virtual bool			CalculateEndPointAttachment(C_BaseEntity* pEnt, int iAttachment, Vector& vPos, QAngle& pAngles) = 0;
+	virtual void			SetRopeFlags(int flags) = 0;
+	virtual int				GetRopeFlags() const = 0;
+	virtual int				GetSlack() = 0;
+	// Set the slack.
+	virtual void			SetSlack(int slack) = 0;
+	virtual void			SetupHangDistance(float flHangDist) = 0;
+	// Change which entities the rope is connected to.
+	virtual void			SetStartEntity(C_BaseEntity* pEnt) = 0;
+	virtual void			SetEndEntity(C_BaseEntity* pEnt) = 0;
+
+	virtual C_BaseEntity*	GetStartEntity() const = 0;
+	virtual C_BaseEntity*	GetEndEntity() const = 0;
+	// Get the rope material data.
+	virtual IMaterial*		GetSolidMaterial(void) = 0;
+	virtual IMaterial*		GetBackMaterial(void) = 0;
+
+	virtual int& GetLockedPoints() = 0;
+	virtual void SetStartAttachment(short iStartAttachment) = 0;
+	virtual void SetEndAttachment(short iEndAttachment) = 0;
+	virtual void SetWidth(float fWidth) = 0;
+	virtual void SetSegments(int nSegments) = 0;
+	virtual int& GetRopeFlags() = 0;
+	virtual void FinishInit(const char* pMaterialName) = 0;
+	virtual void SetRopeLength(int RopeLength) = 0;
+	virtual void SetTextureScale(float TextureScale) = 0;
+	virtual float GetTextureScale() = 0;
+	virtual void AddToRenderCache() = 0;
+	virtual void RopeThink() = 0;
+	virtual Vector& GetImpulse() = 0;
+};
+
 //-----------------------------------------------------------------------------
 // Purpose: All client entities must implement this interface.
 //-----------------------------------------------------------------------------

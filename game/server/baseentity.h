@@ -1228,6 +1228,8 @@ public:
 	virtual const IEngineShadowCloneServer* GetEngineShadowClone() const;
 	virtual IEngineVehicleServer* GetEngineVehicle();
 	virtual const IEngineVehicleServer* GetEngineVehicle() const;
+	virtual IEngineRopeServer* GetEngineRope();
+	virtual const IEngineRopeServer* GetEngineRope() const;
 	// NOTE: Setting the abs velocity in either space will cause a recomputation
 	// in the other space, so setting the abs velocity will also set the local vel
 	void			ApplyLocalVelocityImpulse( const Vector &vecImpulse );

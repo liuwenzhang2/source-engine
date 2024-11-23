@@ -614,6 +614,34 @@ public:
 
 };
 
+class IEngineRopeServer {
+public:
+	virtual void SetStartPoint(CBaseEntity* pStartPoint, int attachment = 0) = 0;
+	virtual void SetEndPoint(CBaseEntity* pEndPoint, int attachment = 0) = 0;
+	virtual CBaseEntity* GetStartPoint() = 0;
+	virtual CBaseEntity* GetEndPoint() = 0;
+	virtual int GetRopeFlags() = 0;
+	virtual void SetRopeFlags(int RopeFlags) = 0;
+	virtual void SetWidth(float Width) = 0;
+	virtual int GetSegments() = 0;
+	virtual void SetSegments(int nSegments) = 0;
+	virtual int GetLockedPoints() = 0;
+	virtual void SetLockedPoints(int LockedPoints) = 0;
+	virtual void SetRopeLength(int RopeLength) = 0;
+	virtual const char* GetMaterialName() = 0;
+	virtual void SetMaterial(const char* pName) = 0;
+	virtual int GetRopeMaterialModelIndex() = 0;
+	virtual void SetRopeMaterialModelIndex(int RopeMaterialModelIndex) = 0;
+	virtual void EndpointsChanged() = 0;
+	virtual void Init() = 0;
+	virtual void NotifyPositionChanged() = 0;
+	virtual void SetScrollSpeed(float flScrollSpeed) = 0;
+	virtual void DetachPoint(int iPoint) = 0;
+	virtual bool SetupHangDistance(float flHangDist) = 0;
+	virtual void EnableWind(bool bEnable) = 0;
+	virtual void SetConstrainBetweenEndpoints(bool bConstrainBetweenEndpoints) = 0;
+};
+
 // This class is how the engine talks to entities in the game DLL.
 // CBaseEntity implements this interface.
 class IServerEntity	: public IServerUnknown

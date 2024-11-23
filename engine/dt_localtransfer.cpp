@@ -491,7 +491,7 @@ void LocalTransfer_TransferEntity(
 	unsigned short propIndices[MAX_CHANGE_OFFSETS*3];
 	SendTable* pSendTable = pServerNetworkable->GetSendTable();
 	RecvTable* pRecvTable = pClientNetworkable->GetRecvTable();
-
+	
 	// This code tries to only copy fields expressly marked as "changed" (by having the field offsets added to the changeoffsets vectors)
 	if (pServerNetworkable->GetNumStateChangedOffsets() > 0 &&
 		 !bNewlyCreated &&

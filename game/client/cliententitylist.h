@@ -29,6 +29,8 @@
 #include "physics_saverestore.h"
 #include "mouthinfo.h"
 #include "ragdoll_shared.h"
+#include "rope_physics.h"
+#include "rope_shared.h"
 
 //class C_Beam;
 //class C_BaseViewModel;
@@ -676,7 +678,7 @@ public:
 	// This event is triggered during the simulation phase if an entity's data has changed. It is 
 // better to hook this instead of PostDataUpdate() because in PostDataUpdate(), server entity origins
 // are incorrect and attachment points can't be used.
-	void OnDataChanged(DataUpdateType_t type);
+	virtual void OnDataChanged(DataUpdateType_t type);
 
 	// Call this in OnDataChanged if you don't chain it down!
 	void MarkMessageReceived();
@@ -1905,6 +1907,155 @@ public:
 
 };
 
+class C_EngineRopeInternal : public C_EngineObjectInternal, public IEngineRopeClient {
+public:
+	DECLARE_CLASS(C_EngineRopeInternal, C_EngineObjectInternal);
+	DECLARE_CLIENTCLASS();
+	C_EngineRopeInternal();
+	~C_EngineRopeInternal();
+	virtual void	OnDataChanged(DataUpdateType_t updateType);
+	// Use this when rope length and slack change to recompute the spring length.
+	void			RecomputeSprings();
+	void			UpdateBBox();
+	void			CalcLightValues();
+	void			ShakeRope(const Vector& vCenter, float flRadius, float flMagnitude);
+	bool			AnyPointsMoved();
+	bool			InitRopePhysics();
+	void			ConstrainNodesBetweenEndpoints(void);
+	bool			DetectRestingState(bool& bApplyWind);
+	// Specify ROPE_ATTACHMENT_START_POINT or ROPE_ATTACHMENT_END_POINT for the attachment.
+	virtual	bool	GetAttachment(int number, Vector& origin, QAngle& angles);
+	virtual bool	GetAttachment(int number, matrix3x4_t& matrix);
+	// Hook the physics. Pass in your own implementation of CSimplePhysics::IHelper. The
+// default implementation is returned so you can call through to it if you want.
+	//CSimplePhysics::IHelper* HookPhysics(CSimplePhysics::IHelper* pHook);
+	// Get the attachment position of one of the endpoints.
+	bool			GetEndPointPos(int iPt, Vector& vPos, QAngle& vAngle);
+	bool			CalculateEndPointAttachment(C_BaseEntity* pEnt, int iAttachment, Vector& vPos, QAngle& pAngles);
+	void SetRopeFlags(int flags);
+	int GetRopeFlags() const;
+	int				GetSlack() { return m_Slack; }
+	// Set the slack.
+	void SetSlack(int slack);
+	void SetupHangDistance(float flHangDist);
+	// Change which entities the rope is connected to.
+	void SetStartEntity(C_BaseEntity* pEnt);
+	void SetEndEntity(C_BaseEntity* pEnt);
+
+	C_BaseEntity* GetStartEntity() const;
+	C_BaseEntity* GetEndEntity() const;
+	// Get the rope material data.
+	IMaterial* GetSolidMaterial(void);
+	IMaterial* GetBackMaterial(void);
+	// Client-only right now. This could be moved to the server if there was a good reason.
+	void			SetColorMod(const Vector& vColorMod);
+	Vector* GetRopeSubdivVectors(int* nSubdivs);
+	float			GetTextureScale() {return m_TextureScale;}
+	int				GetTextureHeight() { return m_TextureHeight; }
+	float			GetCurScroll() { return m_flCurScroll; }
+	float			GetWidth() { return m_Width; }
+	void			SetWidth(float fWidth) { m_Width = fWidth; }
+	CRopePhysics<ROPE_MAX_SEGMENTS>& GetRopePhysics() { return m_RopePhysics; }
+	Vector*			GetLightValues() { return m_LightValues; }
+	Vector&			GetColorMod() { return m_vColorMod; }
+	int				GetRopeLength() { return m_RopeLength; }
+	int&			GetLockedPoints() { return m_fLockedPoints; }
+	void			SetStartAttachment(short iStartAttachment) { m_iStartAttachment = iStartAttachment; }
+	void			SetEndAttachment(short iEndAttachment) { m_iEndAttachment = iEndAttachment; }
+	void			SetSegments(int	nSegments) { m_nSegments = nSegments; }
+	int&			GetRopeFlags() { return m_RopeFlags; }
+	void			FinishInit(const char* pMaterialName);
+	void			SetRopeLength(int RopeLength) { m_RopeLength = RopeLength; }
+	void			SetTextureScale(float TextureScale) { m_TextureScale = TextureScale; }
+	void			AddToRenderCache();
+	void			RopeThink();
+	Vector&			GetImpulse() { return m_flImpulse; }
+private:
+	void			RunRopeSimulation(float flSeconds);
+	Vector			ConstrainNode(const Vector& vNormal, const Vector& vNodePosition, const Vector& vMidpiont, float fNormalLength);
+	bool			DidEndPointMove(int iPt);
+	bool			GetEndPointAttachment(int iPt, Vector& vPos, QAngle& angle);
+
+	class CPhysicsDelegate : public CSimplePhysics::IHelper
+	{
+	public:
+		virtual void	GetNodeForces(CSimplePhysics::CNode* pNodes, int iNode, Vector* pAccel);
+		virtual void	ApplyConstraints(CSimplePhysics::CNode* pNodes, int nNodes);
+
+		C_EngineRopeInternal* m_pKeyframe;
+	};
+
+	friend class CPhysicsDelegate;
+
+	CRopePhysics<ROPE_MAX_SEGMENTS>	m_RopePhysics;
+	CPhysicsDelegate	m_PhysicsDelegate;
+	int				m_RopeLength;		// Length of the rope, used for tension.
+	int				m_Slack;			// Extra length the rope is given.
+	int				m_nSegments;		// Number of segments.
+	// Instantaneous force
+	Vector			m_flImpulse;
+	IMaterial* m_pMaterial;
+	IMaterial* m_pBackMaterial;			// Optional translucent background material for the rope to help reduce aliasing.
+	int				m_TextureHeight;	// Texture height, for texture scale calculations.
+	// Track which links touched something last frame. Used to prevent wind from gusting on them.
+	CBitVec<ROPE_MAX_SEGMENTS>		m_LinksTouchingSomething;
+	int								m_nLinksTouchingSomething;
+	// In network table, can't bit-compress
+	bool			m_bConstrainBetweenEndpoints;	// Simulated segment points won't stretch beyond the endpoints
+	Vector			m_vCachedEndPointAttachmentPos[2];
+	QAngle			m_vCachedEndPointAttachmentAngle[2];
+	int								m_iForcePointMoveCounter;
+	int								m_fPrevLockedPoints;	// Which points are locked down.
+	int				m_fLockedPoints;	// Which points are locked down.
+	bool			m_bNewDataThisFrame : 1;			// Set to true in OnDataChanged so that we simulate that frame
+	int				m_RopeFlags;			// Combo of ROPE_ flags.
+	Vector			m_flPreviousImpulse;
+	bool			m_bPhysicsInitted : 1;				// It waits until all required entities are 
+	// Used to control resting state.
+	bool			m_bPrevEndPointPos[2];
+	Vector			m_vPrevEndPointPos[2];
+	float			m_flTimeToNextGust;			// When will the next wind gust be?
+	Vector			m_LightValues[ROPE_MAX_SEGMENTS]; // light info when the rope is created.
+	bool			m_bEndPointAttachmentPositionsDirty : 1;
+	bool			m_bEndPointAttachmentAnglesDirty : 1;
+	EHANDLE			m_hStartPoint;		// StartPoint/EndPoint are entities
+	EHANDLE			m_hEndPoint;
+	short			m_iStartAttachment;	// StartAttachment/EndAttachment are attachment points.
+	short			m_iEndAttachment;
+	bool							m_bApplyWind;
+	// Simulated wind gusts.
+	float			m_flCurrentGustTimer;
+	float			m_flCurrentGustLifetime;	// How long will the current gust last?
+	Vector			m_vWindDir;					// What direction does the current gust go in?
+	float			m_flCurScroll;		// for scrolling texture.
+	float			m_flScrollSpeed;
+	int				m_iRopeMaterialModelIndex;	// Index of sprite model with the rope's material.
+	unsigned char	m_Subdiv;			// Number of subdivions in between segments.
+	float			m_TextureScale;		// pixels per inch
+	float				m_Width;
+	Vector			m_vColorMod;				// Color modulation on all verts?
+};
+
+//=============================================================================
+//
+// Rope Manager
+//
+abstract_class IRopeManager
+{
+public:
+	virtual						~IRopeManager() {}
+	virtual void				ResetRenderCache(void) = 0;
+	virtual void				AddToRenderCache(C_EngineRopeInternal* pRope) = 0;
+	virtual void				DrawRenderCache(bool bShadowDepth) = 0;
+	virtual void				OnRenderStart(void) = 0;
+	virtual void				SetHolidayLightMode(bool bHoliday) = 0;
+	virtual bool				IsHolidayLightMode(void) = 0;
+	virtual int					GetHolidayLightStyle(void) = 0;
+};
+
+IRopeManager* RopeManager();
+void Rope_ResetCounters();
+
 // Use this to iterate over *all* (even dormant) the C_BaseEntities in the client entity list.
 //class C_AllBaseEntityIterator
 //{
@@ -2467,6 +2618,9 @@ inline C_BaseEntity* CClientEntityList<T>::CreateEntityByName(const char* classN
 		break;
 	case ENGINEOBJECT_VEHICLE:
 		m_EngineObjectArray[iForceEdictIndex] = new C_EngineVehicleInternal();
+		break;
+	case ENGINEOBJECT_ROPE:
+		m_EngineObjectArray[iForceEdictIndex] = new C_EngineRopeInternal();
 		break;
 	default:
 		Error("GetEngineObjectType error!\n");

@@ -531,6 +531,16 @@ const IEnginePortalClient* C_BaseEntity::GetEnginePortal() const
 	return dynamic_cast<const IEnginePortalClient*>(GetEngineObject());
 }
 
+IEngineRopeClient* C_BaseEntity::GetEngineRope()
+{
+	return dynamic_cast<IEngineRopeClient*>(GetEngineObject());
+}
+
+const IEngineRopeClient* C_BaseEntity::GetEngineRope() const
+{
+	return dynamic_cast<const IEngineRopeClient*>(GetEngineObject());
+}
+
 void C_BaseEntity::Clear( void )
 {
 	m_bDormant = true;

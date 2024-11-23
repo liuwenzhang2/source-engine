@@ -541,6 +541,16 @@ const IEngineVehicleServer* CBaseEntity::GetEngineVehicle() const
 	return dynamic_cast<const IEngineVehicleServer*>(GetEngineObject());
 }
 
+IEngineRopeServer* CBaseEntity::GetEngineRope()
+{
+	return dynamic_cast<IEngineRopeServer*>(GetEngineObject());
+}
+
+const IEngineRopeServer* CBaseEntity::GetEngineRope() const
+{
+	return dynamic_cast<const IEngineRopeServer*>(GetEngineObject());
+}
+
 void CBaseEntity::Release() {
 	//GetEngineObject()->PhysicsRemoveTouchedList();
 	//CBaseEntity::PhysicsRemoveGroundList(this);

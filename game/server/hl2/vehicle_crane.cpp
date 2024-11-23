@@ -206,11 +206,11 @@ void CPropCrane::Activate( void )
 	m_hRope = CRopeKeyframe::Create( this, m_hCraneMagnet, 1, iIndex );
 	if ( m_hRope )
 	{
-		m_hRope->m_Width = 3;
-		m_hRope->m_nSegments = ROPE_MAX_SEGMENTS / 2;
-		m_hRope->EnableWind( false );
-		m_hRope->SetupHangDistance( 0 );
-		m_hRope->m_RopeLength = (m_hCraneMagnet->GetEngineObject()->GetAbsOrigin() - m_hCraneTip->GetEngineObject()->GetAbsOrigin()).Length() * 1.1;
+		m_hRope->GetEngineRope()->SetWidth(3);
+		m_hRope->GetEngineRope()->SetSegments(ROPE_MAX_SEGMENTS / 2);
+		m_hRope->GetEngineRope()->EnableWind( false );
+		m_hRope->GetEngineRope()->SetupHangDistance( 0 );
+		m_hRope->GetEngineRope()->SetRopeLength((m_hCraneMagnet->GetEngineObject()->GetAbsOrigin() - m_hCraneTip->GetEngineObject()->GetAbsOrigin()).Length() * 1.1);
 	}
 
 	// Start with the magnet off
