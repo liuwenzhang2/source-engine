@@ -2107,6 +2107,11 @@ private:
 	bool		m_bEndPointValid;
 };
 
+class CEngineGhostInternal : public CEngineObjectInternal, public IEngineGhostServer {
+public:
+
+};
+
 //-----------------------------------------------------------------------------
 // An interface passed into the OnSave method of all entities
 //-----------------------------------------------------------------------------
@@ -3435,6 +3440,9 @@ inline CBaseEntity* CGlobalEntityList<T>::CreateEntityByName(const char* classNa
 		break;
 	case ENGINEOBJECT_ROPE:
 		m_EngineObjectArray[iForceEdictIndex] = new CEngineRopeInternal();
+		break;
+	case ENGINEOBJECT_GHOST:
+		m_EngineObjectArray[iForceEdictIndex] = new CEngineGhostInternal();
 		break;
 	default:
 		Error("GetEngineObjectType error!\n");

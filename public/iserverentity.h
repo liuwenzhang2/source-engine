@@ -642,6 +642,11 @@ public:
 	virtual void SetConstrainBetweenEndpoints(bool bConstrainBetweenEndpoints) = 0;
 };
 
+class IEngineGhostServer {
+public:
+
+};
+
 // This class is how the engine talks to entities in the game DLL.
 // CBaseEntity implements this interface.
 class IServerEntity	: public IServerUnknown

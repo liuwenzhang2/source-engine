@@ -624,6 +624,25 @@ public:
 	virtual Vector& GetImpulse() = 0;
 };
 
+class IEngineGhostClient {
+public:
+	virtual void SetMatGhostTransform(const VMatrix& matGhostTransform) = 0;
+	virtual void SetGhostedSource(C_BaseEntity* pGhostedSource) = 0;
+	virtual C_BaseEntity* GetGhostedSource() = 0;
+	virtual void PerFrameUpdate(void) = 0;
+	virtual bool GetSourceIsBaseAnimating() = 0;
+	virtual Vector const& GetRenderOrigin(void) = 0;
+	virtual QAngle const& GetRenderAngles(void) = 0;
+	virtual bool	SetupBones(matrix3x4_t* pBoneToWorldOut, int nMaxBones, int boneMask, float currentTime) = 0;
+	virtual void	GetRenderBounds(Vector& mins, Vector& maxs) = 0;
+	virtual void	GetRenderBoundsWorldspace(Vector& mins, Vector& maxs) = 0;
+	virtual void	GetShadowRenderBounds(Vector& mins, Vector& maxs, ShadowType_t shadowType) = 0;
+	virtual const matrix3x4_t& RenderableToWorldTransform() = 0;
+	virtual	bool GetAttachment(int number, Vector& origin, QAngle& angles) = 0;
+	virtual bool GetAttachment(int number, matrix3x4_t& matrix) = 0;
+	virtual bool GetAttachmentVelocity(int number, Vector& originVel, Quaternion& angleVel) = 0;
+};
+
 //-----------------------------------------------------------------------------
 // Purpose: All client entities must implement this interface.
 //-----------------------------------------------------------------------------

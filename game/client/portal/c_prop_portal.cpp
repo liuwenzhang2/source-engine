@@ -253,7 +253,7 @@ void C_Prop_Portal::ClientThink( void )
 void C_Prop_Portal::Simulate()
 {
 	BaseClass::Simulate();
-
+	
 	//clear list of ghosted entities from last frame, and clear the clipping planes we put on them
 	for( int i = m_hGhostingEntities.Count(); --i >= 0; )
 	{
@@ -389,7 +389,7 @@ void C_Prop_Portal::Simulate()
 			int j;
 			for( j = m_GhostRenderables.Count(); --j >= 0; )
 			{
-				if( pRenderable == m_GhostRenderables[j]->m_pGhostedRenderable )
+				if( pRenderable == m_GhostRenderables[j]->GetEngineGhost()->GetGhostedSource())
 				{
 					bStillInUse[j] = true;
 					m_GhostRenderables[j]->PerFrameUpdate();
@@ -440,15 +440,16 @@ void C_Prop_Portal::Simulate()
 		//remove unused ghosts
 		for ( int i = m_GhostRenderables.Count(); --i >= 0; )
 		{
-			if ( bStillInUse[i] )
+			C_PortalGhostRenderable* pGhost = m_GhostRenderables[i];
+			if (bStillInUse[i]) {
 				continue;
+			}
 
 			// HACK - I just copied the CClientTools::OnEntityDeleted code here,
 			// since the ghosts aren't really entities - they don't have an entindex,
 			// they're not in the entitylist, and they get created during Simulate(),
 			// which isn't valid for real entities, since it changes the simulate list
 			// -jd
-			C_PortalGhostRenderable *pGhost = m_GhostRenderables[i];
 			if ( ToolsEnabled() )
 			{
 				HTOOLHANDLE handle = pGhost ? pGhost->GetToolHandle() : (HTOOLHANDLE)0;
@@ -845,7 +846,7 @@ void C_Prop_Portal::UpdateGhostRenderables( void )
 	//lastly, update all ghost renderables
 	for( int i = m_GhostRenderables.Count(); --i >= 0; )
 	{
-		m_GhostRenderables[i]->m_matGhostTransform = MatrixThisToLinked();
+		m_GhostRenderables[i]->GetEngineGhost()->SetMatGhostTransform(MatrixThisToLinked());
 	}
 }
 

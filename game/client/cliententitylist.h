@@ -2056,6 +2056,44 @@ public:
 IRopeManager* RopeManager();
 void Rope_ResetCounters();
 
+class C_EngineGhostInternal : public C_EngineObjectInternal, public IEngineGhostClient {
+public:
+	void SetMatGhostTransform(const VMatrix& matGhostTransform) {
+		m_matGhostTransform = matGhostTransform;
+	}
+
+	void SetGhostedSource(C_BaseEntity* pGhostedSource) {
+		m_pGhostedSource = pGhostedSource;
+		m_bSourceIsBaseAnimating = (dynamic_cast<C_BaseAnimating*>(m_pGhostedSource) != NULL);
+	}
+
+	C_BaseEntity* GetGhostedSource() { return m_pGhostedSource; }
+	bool GetSourceIsBaseAnimating() { return m_bSourceIsBaseAnimating; }
+	void PerFrameUpdate(void);
+	virtual Vector const& GetRenderOrigin(void);
+	virtual QAngle const& GetRenderAngles(void);
+	virtual bool	SetupBones(matrix3x4_t* pBoneToWorldOut, int nMaxBones, int boneMask, float currentTime);
+	// Returns the bounds relative to the origin (render bounds)
+	virtual void	GetRenderBounds(Vector& mins, Vector& maxs);
+	// returns the bounds as an AABB in worldspace
+	virtual void	GetRenderBoundsWorldspace(Vector& mins, Vector& maxs);
+	virtual void	GetShadowRenderBounds(Vector& mins, Vector& maxs, ShadowType_t shadowType);
+	virtual const matrix3x4_t& RenderableToWorldTransform();
+	virtual	bool GetAttachment(int number, Vector& origin, QAngle& angles);
+	virtual bool GetAttachment(int number, matrix3x4_t& matrix);
+	virtual bool GetAttachmentVelocity(int number, Vector& originVel, Quaternion& angleVel);
+private:
+	C_BaseEntity* m_pGhostedSource; //the renderable we're transforming and re-rendering
+	bool m_bSourceIsBaseAnimating;
+	VMatrix m_matGhostTransform;
+	struct
+	{
+		Vector vRenderOrigin;
+		QAngle qRenderAngle;
+		matrix3x4_t matRenderableToWorldTransform;
+	} m_ReferencedReturns; //when returning a reference, it has to actually exist somewhere
+};
+
 // Use this to iterate over *all* (even dormant) the C_BaseEntities in the client entity list.
 //class C_AllBaseEntityIterator
 //{
@@ -2621,6 +2659,9 @@ inline C_BaseEntity* CClientEntityList<T>::CreateEntityByName(const char* classN
 		break;
 	case ENGINEOBJECT_ROPE:
 		m_EngineObjectArray[iForceEdictIndex] = new C_EngineRopeInternal();
+		break;
+	case ENGINEOBJECT_GHOST:
+		m_EngineObjectArray[iForceEdictIndex] = new C_EngineGhostInternal();
 		break;
 	default:
 		Error("GetEngineObjectType error!\n");

@@ -9362,6 +9362,180 @@ void C_EngineRopeInternal::CPhysicsDelegate::ApplyConstraints(CSimplePhysics::CN
 }
 
 
+void C_EngineGhostInternal::PerFrameUpdate(void)
+{
+	if (m_pGhostedSource)
+	{
+		SetModelName(m_pGhostedSource->GetEngineObject()->GetModelName());
+		SetModelIndex(m_pGhostedSource->GetEngineObject()->GetModelIndex());
+		SetEffects(m_pGhostedSource->GetEngineObject()->GetEffects() | EF_NOINTERP);
+		SetAnimTime(m_pGhostedSource->GetEngineObject()->GetAnimTime());
+
+		if (m_bSourceIsBaseAnimating)
+		{
+			C_BaseAnimating* pSource = (C_BaseAnimating*)m_pGhostedSource;
+			SetCycle(pSource->GetEngineObject()->GetCycle());
+			SetSequence(pSource->GetEngineObject()->GetSequence());
+			SetBody(pSource->GetEngineObject()->GetBody());
+			SetSkin(pSource->GetEngineObject()->GetSkin());
+		}
+	}
+
+
+	// Set position and angles relative to the object it's ghosting
+	Vector ptNewOrigin = m_matGhostTransform * m_pGhostedSource->GetEngineObject()->GetAbsOrigin();
+	QAngle qNewAngles = TransformAnglesToWorldSpace(m_pGhostedSource->GetEngineObject()->GetAbsAngles(), m_matGhostTransform.As3x4());
+
+	SetAbsOrigin(ptNewOrigin);
+	SetAbsAngles(qNewAngles);
+
+	AddEffects(EF_NOINTERP);
+}
+
+Vector const& C_EngineGhostInternal::GetRenderOrigin(void)
+{
+	if (m_pGhostedSource == NULL)
+		return m_ReferencedReturns.vRenderOrigin;
+
+	m_ReferencedReturns.vRenderOrigin = m_matGhostTransform * m_pGhostedSource->GetRenderOrigin();
+	return m_ReferencedReturns.vRenderOrigin;
+}
+
+QAngle const& C_EngineGhostInternal::GetRenderAngles(void)
+{
+	if (m_pGhostedSource == NULL)
+		return m_ReferencedReturns.qRenderAngle;
+
+	m_ReferencedReturns.qRenderAngle = TransformAnglesToWorldSpace(m_pGhostedSource->GetRenderAngles(), m_matGhostTransform.As3x4());
+	return m_ReferencedReturns.qRenderAngle;
+}
+
+bool C_EngineGhostInternal::SetupBones(matrix3x4_t* pBoneToWorldOut, int nMaxBones, int boneMask, float currentTime)
+{
+	if (m_pGhostedSource == NULL)
+		return false;
+
+	int nModelIndex = 0;
+	CBaseCombatWeapon* pParent = dynamic_cast<CBaseCombatWeapon*>(m_pGhostedSource);
+	if (pParent)
+	{
+		nModelIndex = pParent->GetEngineObject()->GetModelIndex();
+		pParent->GetEngineObject()->SetModelIndex(pParent->GetWorldModelIndex());
+	}
+
+	if (m_pGhostedSource->SetupBones(pBoneToWorldOut, nMaxBones, boneMask, currentTime))
+	{
+		if (pBoneToWorldOut)
+		{
+			for (int i = 0; i != nMaxBones; ++i) //FIXME: nMaxBones is most definitely greater than the actual number of bone transforms actually used, find the subset somehow
+			{
+				pBoneToWorldOut[i] = (m_matGhostTransform * pBoneToWorldOut[i]).As3x4();
+			}
+		}
+		return true;
+	}
+
+	if (pParent)
+	{
+		pParent->GetEngineObject()->SetModelIndex(nModelIndex);
+	}
+
+	return false;
+}
+
+void C_EngineGhostInternal::GetRenderBounds(Vector& mins, Vector& maxs)
+{
+	if (m_pGhostedSource == NULL)
+	{
+		mins = maxs = vec3_origin;
+		return;
+	}
+
+	m_pGhostedSource->GetRenderBounds(mins, maxs);
+}
+
+void C_EngineGhostInternal::GetRenderBoundsWorldspace(Vector& mins, Vector& maxs)
+{
+	if (m_pGhostedSource == NULL)
+	{
+		mins = maxs = vec3_origin;
+		return;
+	}
+
+	m_pGhostedSource->GetRenderBoundsWorldspace(mins, maxs);
+	TransformAABB(m_matGhostTransform.As3x4(), mins, maxs, mins, maxs);
+}
+
+void C_EngineGhostInternal::GetShadowRenderBounds(Vector& mins, Vector& maxs, ShadowType_t shadowType)
+{
+	m_pGhostedSource->GetShadowRenderBounds(mins, maxs, shadowType);
+	TransformAABB(m_matGhostTransform.As3x4(), mins, maxs, mins, maxs);
+}
+
+const matrix3x4_t& C_EngineGhostInternal::RenderableToWorldTransform()
+{
+	if (m_pGhostedSource == NULL)
+		return m_ReferencedReturns.matRenderableToWorldTransform;
+
+	ConcatTransforms(m_matGhostTransform.As3x4(), m_pGhostedSource->RenderableToWorldTransform(), m_ReferencedReturns.matRenderableToWorldTransform);
+	return m_ReferencedReturns.matRenderableToWorldTransform;
+}
+
+bool C_EngineGhostInternal::GetAttachment(int number, Vector& origin, QAngle& angles)
+{
+	if (m_pGhostedSource == NULL)
+		return false;
+
+	if (m_pGhostedSource->GetAttachment(number, origin, angles))
+	{
+		origin = m_matGhostTransform * origin;
+		angles = TransformAnglesToWorldSpace(angles, m_matGhostTransform.As3x4());
+		return true;
+	}
+	return false;
+}
+
+bool C_EngineGhostInternal::GetAttachment(int number, matrix3x4_t& matrix)
+{
+	if (m_pGhostedSource == NULL)
+		return false;
+
+	if (m_pGhostedSource->GetAttachment(number, matrix))
+	{
+		ConcatTransforms(m_matGhostTransform.As3x4(), matrix, matrix);
+		return true;
+	}
+	return false;
+}
+
+//bool C_PortalGhostRenderable::GetAttachment( int number, Vector &origin )
+//{
+//	if( m_pGhostedSource == NULL )
+//		return false;
+//
+//	if( m_pGhostedSource->GetAttachment( number, origin ) )
+//	{
+//		origin = m_matGhostTransform * origin;
+//		return true;
+//	}
+//	return false;
+//}
+
+bool C_EngineGhostInternal::GetAttachmentVelocity(int number, Vector& originVel, Quaternion& angleVel)
+{
+	if (m_pGhostedSource == NULL)
+		return false;
+
+	Vector ghostVel;
+	if (m_pGhostedSource->GetAttachmentVelocity(number, ghostVel, angleVel))
+	{
+		Vector3DMultiply(m_matGhostTransform, ghostVel, originVel);
+		Vector3DMultiply(m_matGhostTransform, *(Vector*)(&angleVel), *(Vector*)(&angleVel));
+		return true;
+	}
+	return false;
+}
+
 bool PVSNotifierMap_LessFunc( IClientUnknown* const &a, IClientUnknown* const &b )
 {
 	return a < b;

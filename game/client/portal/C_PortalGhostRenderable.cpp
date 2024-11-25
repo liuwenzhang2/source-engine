@@ -19,7 +19,6 @@ C_PortalGhostRenderable::C_PortalGhostRenderable( )
 
 C_PortalGhostRenderable::~C_PortalGhostRenderable( void )
 {
-	m_pGhostedRenderable = NULL;
 	g_pClientLeafSystem->RemoveRenderable( RenderHandle() );
 	//cl_entitylist->RemoveEntity( GetIClientUnknown()->GetRefEHandle() );
 
@@ -27,46 +26,24 @@ C_PortalGhostRenderable::~C_PortalGhostRenderable( void )
 }
 
 void C_PortalGhostRenderable::Init(C_Prop_Portal* pOwningPortal, C_BaseEntity* pGhostSource, RenderGroup_t sourceRenderGroup, const VMatrix& matGhostTransform, float* pSharedRenderClipPlane, bool bLocalPlayer) {
-	m_pGhostedRenderable = pGhostSource,
-	m_matGhostTransform = matGhostTransform,
+	GetEngineGhost()->SetGhostedSource(pGhostSource);
+	GetEngineGhost()->SetMatGhostTransform(matGhostTransform),
 	m_pSharedRenderClipPlane = pSharedRenderClipPlane,
 	m_bLocalPlayer = bLocalPlayer,
 	m_pOwningPortal = pOwningPortal;
-
-	m_bSourceIsBaseAnimating = (dynamic_cast<C_BaseAnimating*>(pGhostSource) != NULL);
 
 	//cl_entitylist->AddNonNetworkableEntity(this);//GetIClientUnknown()
 	g_pClientLeafSystem->AddRenderable(this, sourceRenderGroup);
 }
 
+void C_PortalGhostRenderable::UpdateOnRemove(void)
+{
+	GetEngineGhost()->SetGhostedSource(NULL);
+}
+
 void C_PortalGhostRenderable::PerFrameUpdate( void )
 {
-	if( m_pGhostedRenderable )
-	{
-		GetEngineObject()->SetModelName( m_pGhostedRenderable->GetEngineObject()->GetModelName() );
-		GetEngineObject()->SetModelIndex( m_pGhostedRenderable->GetEngineObject()->GetModelIndex() );
-		GetEngineObject()->SetEffects( m_pGhostedRenderable->GetEngineObject()->GetEffects() | EF_NOINTERP );
-		GetEngineObject()->SetAnimTime( m_pGhostedRenderable->GetEngineObject()->GetAnimTime());
-
-		if( m_bSourceIsBaseAnimating )
-		{
-			C_BaseAnimating *pSource = (C_BaseAnimating *)m_pGhostedRenderable;
-			GetEngineObject()->SetCycle( pSource->GetEngineObject()->GetCycle() );
-			GetEngineObject()->SetSequence( pSource->GetEngineObject()->GetSequence() );
-			GetEngineObject()->SetBody( pSource->GetEngineObject()->GetBody());
-			GetEngineObject()->SetSkin( pSource->GetEngineObject()->GetSkin());
-		}
-	}
-
-
-	// Set position and angles relative to the object it's ghosting
-	Vector ptNewOrigin = m_matGhostTransform * m_pGhostedRenderable->GetEngineObject()->GetAbsOrigin();
-	QAngle qNewAngles = TransformAnglesToWorldSpace( m_pGhostedRenderable->GetEngineObject()->GetAbsAngles(), m_matGhostTransform.As3x4() );
-
-	GetEngineObject()->SetAbsOrigin( ptNewOrigin );
-	GetEngineObject()->SetAbsAngles( qNewAngles );
-
-	GetEngineObject()->AddEffects( EF_NOINTERP );
+	GetEngineGhost()->PerFrameUpdate();
 
 	RemoveFromInterpolationList();
 
@@ -75,98 +52,48 @@ void C_PortalGhostRenderable::PerFrameUpdate( void )
 
 Vector const& C_PortalGhostRenderable::GetRenderOrigin( void )
 {
-	if( m_pGhostedRenderable == NULL )
-		return m_ReferencedReturns.vRenderOrigin;
-
-	m_ReferencedReturns.vRenderOrigin = m_matGhostTransform * m_pGhostedRenderable->GetRenderOrigin();
-	return m_ReferencedReturns.vRenderOrigin;
+	return GetEngineGhost()->GetRenderOrigin();
 }
 
 QAngle const& C_PortalGhostRenderable::GetRenderAngles( void )
 {
-	if( m_pGhostedRenderable == NULL )
-		return m_ReferencedReturns.qRenderAngle;
-
-	m_ReferencedReturns.qRenderAngle = TransformAnglesToWorldSpace( m_pGhostedRenderable->GetRenderAngles(), m_matGhostTransform.As3x4() );
-	return m_ReferencedReturns.qRenderAngle;
+	return GetEngineGhost()->GetRenderAngles();
 }
 
 bool C_PortalGhostRenderable::SetupBones( matrix3x4_t *pBoneToWorldOut, int nMaxBones, int boneMask, float currentTime )
 {
-	if( m_pGhostedRenderable == NULL )
-		return false;
-	
-	int nModelIndex = 0;
-	CBaseCombatWeapon *pParent = dynamic_cast<CBaseCombatWeapon*>( m_pGhostedRenderable );
-	if ( pParent )
-	{
-		nModelIndex = pParent->GetEngineObject()->GetModelIndex();
-		pParent->GetEngineObject()->SetModelIndex( pParent->GetWorldModelIndex() );
-	}
-
-	if( m_pGhostedRenderable->SetupBones( pBoneToWorldOut, nMaxBones, boneMask, currentTime ) )
-	{
-		if( pBoneToWorldOut )
-		{
-			for( int i = 0; i != nMaxBones; ++i ) //FIXME: nMaxBones is most definitely greater than the actual number of bone transforms actually used, find the subset somehow
-			{
-				pBoneToWorldOut[i] = (m_matGhostTransform * pBoneToWorldOut[i]).As3x4();
-			}
-		}
-		return true;
-	}
-	
-	if ( pParent )
-	{
-		pParent->GetEngineObject()->SetModelIndex( nModelIndex );
-	}
-
-	return false;
+	return GetEngineGhost()->SetupBones(pBoneToWorldOut, nMaxBones, boneMask, currentTime);
 }
 
 void C_PortalGhostRenderable::GetRenderBounds( Vector& mins, Vector& maxs )
 {
-	if( m_pGhostedRenderable == NULL )
-	{
-		mins = maxs = vec3_origin;
-		return;
-	}
-
-	m_pGhostedRenderable->GetRenderBounds( mins, maxs );
+	GetEngineGhost()->GetRenderBounds(mins, maxs);
 }
 
 void C_PortalGhostRenderable::GetRenderBoundsWorldspace( Vector& mins, Vector& maxs )
 {
-	if( m_pGhostedRenderable == NULL )
-	{
-		mins = maxs = vec3_origin;
-		return;
-	}
-
-	m_pGhostedRenderable->GetRenderBoundsWorldspace( mins, maxs );
-	TransformAABB( m_matGhostTransform.As3x4(), mins, maxs, mins, maxs );
+	GetEngineGhost()->GetRenderBoundsWorldspace(mins, maxs);
 }
 
 void C_PortalGhostRenderable::GetShadowRenderBounds( Vector &mins, Vector &maxs, ShadowType_t shadowType )
 {
-	m_pGhostedRenderable->GetShadowRenderBounds( mins, maxs, shadowType );
-	TransformAABB( m_matGhostTransform.As3x4(), mins, maxs, mins, maxs );
+	GetEngineGhost()->GetShadowRenderBounds(mins, maxs, shadowType);
 }
 
 /*bool C_PortalGhostRenderable::GetShadowCastDistance( float *pDist, ShadowType_t shadowType ) const
 {
-	if( m_pGhostedRenderable == NULL )
+	if( m_pGhostedSource == NULL )
 		return false;
 
-	return m_pGhostedRenderable->GetShadowCastDistance( pDist, shadowType );
+	return m_pGhostedSource->GetShadowCastDistance( pDist, shadowType );
 }
 
 bool C_PortalGhostRenderable::GetShadowCastDirection( Vector *pDirection, ShadowType_t shadowType ) const
 {
-	if( m_pGhostedRenderable == NULL )
+	if( m_pGhostedSource == NULL )
 		return false;
 
-	if( m_pGhostedRenderable->GetShadowCastDirection( pDirection, shadowType ) )
+	if( m_pGhostedSource->GetShadowCastDirection( pDirection, shadowType ) )
 	{
 		if( pDirection )
 			*pDirection = m_matGhostTransform.ApplyRotation( *pDirection );
@@ -178,46 +105,25 @@ bool C_PortalGhostRenderable::GetShadowCastDirection( Vector *pDirection, Shadow
 
 const matrix3x4_t & C_PortalGhostRenderable::RenderableToWorldTransform()
 {
-	if( m_pGhostedRenderable == NULL )
-		return m_ReferencedReturns.matRenderableToWorldTransform;
-
-	ConcatTransforms( m_matGhostTransform.As3x4(), m_pGhostedRenderable->RenderableToWorldTransform(), m_ReferencedReturns.matRenderableToWorldTransform );
-	return m_ReferencedReturns.matRenderableToWorldTransform;
+	return GetEngineGhost()->RenderableToWorldTransform();
 }
 
 bool C_PortalGhostRenderable::GetAttachment( int number, Vector &origin, QAngle &angles )
 {
-	if( m_pGhostedRenderable == NULL )
-		return false;
-
-	if( m_pGhostedRenderable->GetAttachment( number, origin, angles ) )
-	{
-		origin = m_matGhostTransform * origin;
-		angles = TransformAnglesToWorldSpace( angles, m_matGhostTransform.As3x4() );
-		return true;
-	}
-	return false;
+	return GetEngineGhost()->GetAttachment(number, origin, angles);
 }
 
 bool C_PortalGhostRenderable::GetAttachment( int number, matrix3x4_t &matrix )
 {
-	if( m_pGhostedRenderable == NULL )
-		return false;
-
-	if( m_pGhostedRenderable->GetAttachment( number, matrix ) )
-	{
-		ConcatTransforms( m_matGhostTransform.As3x4(), matrix, matrix );
-		return true;
-	}
-	return false;
+	return GetEngineGhost()->GetAttachment(number, matrix);
 }
 
 //bool C_PortalGhostRenderable::GetAttachment( int number, Vector &origin )
 //{
-//	if( m_pGhostedRenderable == NULL )
+//	if( m_pGhostedSource == NULL )
 //		return false;
 //
-//	if( m_pGhostedRenderable->GetAttachment( number, origin ) )
+//	if( m_pGhostedSource->GetAttachment( number, origin ) )
 //	{
 //		origin = m_matGhostTransform * origin;
 //		return true;
@@ -227,23 +133,13 @@ bool C_PortalGhostRenderable::GetAttachment( int number, matrix3x4_t &matrix )
 
 bool C_PortalGhostRenderable::GetAttachmentVelocity( int number, Vector &originVel, Quaternion &angleVel )
 {
-	if( m_pGhostedRenderable == NULL )
-		return false;
-
-	Vector ghostVel;
-	if( m_pGhostedRenderable->GetAttachmentVelocity( number, ghostVel, angleVel ) )
-	{
-		Vector3DMultiply( m_matGhostTransform, ghostVel, originVel );
-		Vector3DMultiply( m_matGhostTransform, *(Vector*)( &angleVel ), *(Vector*)( &angleVel ) );
-		return true;
-	}
-	return false;
+	return GetEngineGhost()->GetAttachmentVelocity(number, originVel, angleVel);
 }
 
 
 int C_PortalGhostRenderable::DrawModel( int flags )
 {
-	if( m_bSourceIsBaseAnimating )
+	if( GetEngineGhost()->GetSourceIsBaseAnimating() )
 	{
 		if( m_bLocalPlayer )
 		{
@@ -276,8 +172,8 @@ int C_PortalGhostRenderable::DrawModel( int flags )
 			mode = ( flags & STUDIO_TRANSPARENCY ) ? DBM_DRAW_TRANSLUCENT_ONLY : DBM_DRAW_OPAQUE_ONLY;
 		}
 
-		render->DrawBrushModelEx( m_pGhostedRenderable, 
-								(model_t *)m_pGhostedRenderable->GetModel(), 
+		render->DrawBrushModelEx(GetEngineGhost()->GetGhostedSource(),
+								(model_t *)GetEngineGhost()->GetGhostedSource()->GetModel(),
 								GetRenderOrigin(), 
 								GetRenderAngles(), 
 								mode );
@@ -290,8 +186,8 @@ int C_PortalGhostRenderable::DrawModel( int flags )
 
 ModelInstanceHandle_t C_PortalGhostRenderable::GetModelInstance()
 {
-	if ( m_pGhostedRenderable )
-		return m_pGhostedRenderable->GetModelInstance();
+	if (GetEngineGhost()->GetGhostedSource())
+		return GetEngineGhost()->GetGhostedSource()->GetModelInstance();
 
 	return BaseClass::GetModelInstance();
 }
@@ -301,76 +197,76 @@ ModelInstanceHandle_t C_PortalGhostRenderable::GetModelInstance()
 
 bool C_PortalGhostRenderable::IsTransparent( void )
 {
-	if( m_pGhostedRenderable == NULL )
+	if(GetEngineGhost()->GetGhostedSource() == NULL )
 		return false;
 
-	return m_pGhostedRenderable->IsTransparent();
+	return GetEngineGhost()->GetGhostedSource()->IsTransparent();
 }
 
 bool C_PortalGhostRenderable::UsesPowerOfTwoFrameBufferTexture()
 {
-	if( m_pGhostedRenderable == NULL )
+	if(GetEngineGhost()->GetGhostedSource() == NULL )
 		return false;
 
-	return m_pGhostedRenderable->UsesPowerOfTwoFrameBufferTexture();
+	return GetEngineGhost()->GetGhostedSource()->UsesPowerOfTwoFrameBufferTexture();
 }
 
 /*const model_t* C_PortalGhostRenderable::GetModel( ) const
 {
-	if( m_pGhostedRenderable == NULL )
+	if( m_pGhostedSource == NULL )
 		return NULL;
 
-	return m_pGhostedRenderable->GetModel();
+	return m_pGhostedSource->GetModel();
 }
 
 int C_PortalGhostRenderable::GetBody()
 {
-	if( m_pGhostedRenderable == NULL )
+	if( m_pGhostedSource == NULL )
 		return 0;
 
-	return m_pGhostedRenderable->GetBody();
+	return m_pGhostedSource->GetBody();
 }*/
 
 void C_PortalGhostRenderable::GetColorModulation( float* color )
 {
-	if( m_pGhostedRenderable == NULL )
+	if(GetEngineGhost()->GetGhostedSource() == NULL )
 		return;
 
-	return m_pGhostedRenderable->GetColorModulation( color );
+	return GetEngineGhost()->GetGhostedSource()->GetColorModulation( color );
 }
 
 /*ShadowType_t C_PortalGhostRenderable::ShadowCastType()
 {
-	if( m_pGhostedRenderable == NULL )
+	if( m_pGhostedSource == NULL )
 		return SHADOWS_NONE;
 
-	return m_pGhostedRenderable->ShadowCastType();
+	return m_pGhostedSource->ShadowCastType();
 }*/
 
 int C_PortalGhostRenderable::LookupAttachment( const char *pAttachmentName )
 {
-	if( m_pGhostedRenderable == NULL )
+	if(GetEngineGhost()->GetGhostedSource() == NULL )
 		return -1;
 
 
-	return m_pGhostedRenderable->LookupAttachment( pAttachmentName );
+	return GetEngineGhost()->GetGhostedSource()->LookupAttachment( pAttachmentName );
 }
 
 /*int C_PortalGhostRenderable::GetSkin()
 {
-	if( m_pGhostedRenderable == NULL )
+	if( m_pGhostedSource == NULL )
 		return -1;
 
 
-	return m_pGhostedRenderable->GetSkin();
+	return m_pGhostedSource->GetSkin();
 }
 
 bool C_PortalGhostRenderable::IsTwoPass( void )
 {
-	if( m_pGhostedRenderable == NULL )
+	if( m_pGhostedSource == NULL )
 		return false;
 
-	return m_pGhostedRenderable->IsTwoPass();
+	return m_pGhostedSource->IsTwoPass();
 }*/
 
 

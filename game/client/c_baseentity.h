@@ -848,6 +848,8 @@ public:
 	virtual const IEnginePortalClient* GetEnginePortal() const;
 	virtual IEngineRopeClient* GetEngineRope();
 	virtual const IEngineRopeClient* GetEngineRope() const;
+	virtual IEngineGhostClient* GetEngineGhost();
+	virtual const IEngineGhostClient* GetEngineGhost() const;
 	void				ApplyLocalVelocityImpulse( const Vector &vecImpulse );
 	void				ApplyAbsVelocityImpulse( const Vector &vecImpulse );
 	void				ApplyLocalAngularVelocityImpulse( const AngularImpulse &angImpulse );

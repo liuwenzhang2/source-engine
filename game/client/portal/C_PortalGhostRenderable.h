@@ -20,26 +20,19 @@ class C_Prop_Portal;
 class C_PortalGhostRenderable : public C_BaseAnimating//IClientRenderable, public IClientUnknown
 {
 public:
-	C_BaseEntity *m_pGhostedRenderable; //the renderable we're transforming and re-rendering
+	static int GetEngineObjectTypeStatic() { return ENGINEOBJECT_GHOST; }
 	
-	VMatrix m_matGhostTransform;
 	float *m_pSharedRenderClipPlane; //shared by all portal ghost renderables within the same portal
 	bool m_bLocalPlayer; //special draw rules for the local player
-	bool m_bSourceIsBaseAnimating;
 	C_Prop_Portal *m_pOwningPortal;
 
-	struct
-	{
-		Vector vRenderOrigin;
-		QAngle qRenderAngle;
-		matrix3x4_t matRenderableToWorldTransform;
-	} m_ReferencedReturns; //when returning a reference, it has to actually exist somewhere
+
 
 	C_PortalGhostRenderable( );
 	virtual ~C_PortalGhostRenderable( void );
 
 	void Init(C_Prop_Portal* pOwningPortal, C_BaseEntity* pGhostSource, RenderGroup_t sourceRenderGroup, const VMatrix& matGhostTransform, float* pSharedRenderClipPlane, bool bLocalPlayer);
-
+	void UpdateOnRemove(void);
 	void PerFrameUpdate( void ); //called once per frame for misc updating
 
 	// Data accessors
