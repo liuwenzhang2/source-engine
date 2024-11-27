@@ -205,8 +205,7 @@ C_CHostage::C_CHostage()
 	m_flLastBodyYaw = 0;
 	m_createdLowViolenceRagdoll = false;
 	
-	// TODO: Get IK working on the steep slopes CS has, then enable it on characters.
-	m_EntClientFlags |= ENTCLIENTFLAG_DONTUSEIK;
+	
 
 	m_PlayerAnimState = CreateHostageAnimState( this, this, LEGANIM_8WAY, false );
 	
@@ -230,6 +229,8 @@ bool C_CHostage::Init(int entnum, int iSerialNum) {
 	bool bRet = BaseClass::Init(entnum, iSerialNum);
 	// set the model so the PlayerAnimState uses the Hostage activities/sequences
 	GetEngineObject()->SetModelName(MAKE_STRING("models/Characters/Hostage_01.mdl"));
+	// TODO: Get IK working on the steep slopes CS has, then enable it on characters.
+	GetEngineObject()->GetEntClientFlags() |= ENTCLIENTFLAG_DONTUSEIK;
 	return bRet;
 }
 

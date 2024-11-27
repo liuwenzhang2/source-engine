@@ -122,7 +122,7 @@ bool CBoneFollowerManager::CreatePhysicsFollower( CBaseAnimating *pParentEntity,
 			follow.boneIndex = boneIndex;
 		}
 
-		pParentEntity->GetBoneTransform( follow.boneIndex, boneToWorld );
+		pParentEntity->GetEngineObject()->GetBoneTransform( follow.boneIndex, boneToWorld );
 		MatrixAngles( boneToWorld, boneAngles, bonePosition );
 
 		follow.hFollower = CBoneFollower::Create( pParentEntity, STRING(pParentEntity->GetEngineObject()->GetModelName()), *pSolid, bonePosition, boneAngles );
@@ -153,7 +153,7 @@ void CBoneFollowerManager::UpdateBoneFollowers( CBaseAnimating *pParentEntity )
 			if ( !m_physBones[i].hFollower )
 				continue;
 
-			pParentEntity->GetBoneTransform( m_physBones[i].boneIndex, boneToWorld );
+			pParentEntity->GetEngineObject()->GetBoneTransform( m_physBones[i].boneIndex, boneToWorld );
 			MatrixAngles( boneToWorld, boneAngles, bonePosition );
 			m_physBones[i].hFollower->UpdateFollower( bonePosition, boneAngles, 0.1 );
 		}

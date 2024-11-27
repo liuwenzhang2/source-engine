@@ -40,7 +40,7 @@ public:
 	bool				IsBreatherActive( void ) { return m_HL2Local.m_bitsActiveDevices & bits_SUIT_DEVICE_BREATHER; }
 
 	virtual int			DrawModel( int flags );
-	virtual	void		BuildTransformations( IStudioHdr *hdr, Vector *pos, Quaternion q[], const matrix3x4_t& cameraTransform, int boneMask, CBoneBitList &boneComputed );
+	virtual	void		AfterBuildTransformations( IStudioHdr *hdr, Vector *pos, Quaternion q[], const matrix3x4_t& cameraTransform, int boneMask, CBoneBitList &boneComputed );
 
 	LadderMove_t		*GetLadderMove() { return &m_HL2Local.m_LadderMove; }
 	virtual void		ExitLadder();

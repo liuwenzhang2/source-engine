@@ -260,20 +260,9 @@ public:
 	//virtual void SetRefEHandle( const CBaseHandle &handle );
 	//virtual const CBaseHandle& GetRefEHandle() const;
 
-	void					SetToolHandle( HTOOLHANDLE handle );
-	HTOOLHANDLE				GetToolHandle() const;
-
-	void					EnableInToolView( bool bEnable );
-	bool					IsEnabledInToolView() const;
-
-	void					SetToolRecording( bool recording );
-	bool					IsToolRecording() const;
-	bool					HasRecordedThisFrame() const;
 	virtual void			RecordToolMessage();
 
-	// used to exclude entities from being recorded in the SFM tools
-	void					DontRecordInTools();
-	bool					ShouldRecordInTools() const;
+	
 
 	virtual void					Release();
 	virtual ICollideable*			GetCollideable()		{ return GetEngineObject()->GetCollideable(); }
@@ -313,8 +302,6 @@ public:
 public:
 	virtual bool					TestCollision( const Ray_t &ray, unsigned int fContentsMask, trace_t& tr );
 	virtual bool					TestHitboxes( const Ray_t &ray, unsigned int fContentsMask, trace_t& tr );
-	virtual void GetBonePosition(int iBone, Vector& origin, QAngle& angles) {}
-	virtual void InvalidateBoneCache() {}
 	// To mimic server call convention
 	C_BaseEntity					*GetOwnerEntity( void ) const;
 	void							SetOwnerEntity( C_BaseEntity *pOwner );
@@ -325,7 +312,11 @@ public:
 	// This function returns a value that scales all damage done by this entity.
 	// Use CDamageModifier to hook in damage modifiers on a guy.
 	virtual float					GetAttackDamageScale( void );
-
+	virtual void ApplyBoneMatrixTransform(matrix3x4_t& transform) {}
+	virtual	void StandardBlendingRules(IStudioHdr* pStudioHdr, Vector pos[], Quaternion q[], float currentTime, int boneMask) {}
+	virtual void UpdateIKLocks(float currentTime) {}
+	virtual void CalculateIKLocks(float currentTime) {}
+	void							SetupBones_AttachmentHelper(IStudioHdr* pStudioHdr) {}
 // IClientNetworkable implementation.
 public:
 	virtual void					NotifyShouldTransmit( ShouldTransmitState_t state );
@@ -935,6 +926,9 @@ public:
 
 	// Only meant to be called from subclasses
 	void DestroyModelInstance();
+
+	virtual void BeforeBuildTransformations(IStudioHdr* pStudioHdr, Vector* pos, Quaternion q[], const matrix3x4_t& cameraTransform, int boneMask, CBoneBitList& boneComputed) {}
+	virtual void AfterBuildTransformations(IStudioHdr* pStudioHdr, Vector* pos, Quaternion q[], const matrix3x4_t& cameraTransform, int boneMask, CBoneBitList& boneComputed) {}
 protected:
 	
 
@@ -1013,11 +1007,9 @@ public:
 	
 	unsigned char					m_nRenderFXBlend;
 
-	// Entity flags that are only for the client (ENTCLIENTFLAG_ defines).
-	unsigned short					m_EntClientFlags;
+
 
 	CNetworkColor32( m_clrRender );
-	CBoneAccessor					m_BoneAccessor;
 
 private:
 	
@@ -1120,14 +1112,7 @@ protected:
 	//CBaseHandle m_RefEHandle;	// Reference ehandle. Used to generate ehandles off this entity.
 
 private:
-	// Set by tools if this entity should route "info" to various tools listening to HTOOLENTITIES
-#ifndef NO_TOOLFRAMEWORK
-	bool							m_bEnabledInToolView;
-	bool							m_bToolRecording;
-	HTOOLHANDLE						m_ToolHandle;
-	int								m_nLastRecordedFrame;
-	bool							m_bRecordInTools; // should this entity be recorded in the tools (we exclude some things like models for menus)
-#endif
+
 
 protected:
 
@@ -1166,8 +1151,7 @@ private:
 	// Check which entities want to be drawn and add them to the leaf system.
 	//static void	AddVisibleEntities();
 
-	// For entities marked for recording, post bone messages to IToolSystems
-	static void ToolRecordEntities();
+	
 
 	// Computes the base velocity
 	void UpdateBaseVelocity( void );
@@ -1549,57 +1533,7 @@ inline bool C_BaseEntity::IsNoInterpolationFrame()
 	return m_ubOldInterpolationFrame != m_ubInterpolationFrame;
 }
 
-//-----------------------------------------------------------------------------
-// Purpose: 
-// Input  : handle - 
-// Output : inline void
-//-----------------------------------------------------------------------------
-inline void C_BaseEntity::SetToolHandle( HTOOLHANDLE handle )
-{
-#ifndef NO_TOOLFRAMEWORK
-	m_ToolHandle = handle;
-#endif
-}
 
-//-----------------------------------------------------------------------------
-// Purpose: 
-// Input  :  - 
-// Output : inline HTOOLHANDLE
-//-----------------------------------------------------------------------------
-inline HTOOLHANDLE C_BaseEntity::GetToolHandle() const
-{
-#ifndef NO_TOOLFRAMEWORK
-	return m_ToolHandle;
-#else
-	return (HTOOLHANDLE)0;
-#endif
-}
-
-//-----------------------------------------------------------------------------
-// 
-//-----------------------------------------------------------------------------
-inline bool C_BaseEntity::IsEnabledInToolView() const
-{
-#ifndef NO_TOOLFRAMEWORK
-	return m_bEnabledInToolView;
-#else
-	return false;
-#endif
-}
-
-//-----------------------------------------------------------------------------
-// Purpose: 
-// Input  :  - 
-// Output : inline bool
-//-----------------------------------------------------------------------------
-inline bool C_BaseEntity::ShouldRecordInTools() const
-{
-#ifndef NO_TOOLFRAMEWORK
-	return m_bRecordInTools;
-#else
-	return true;
-#endif
-}
 
 //C_BaseEntity *CreateEntityByName( const char *className );
 

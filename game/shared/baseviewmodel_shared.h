@@ -43,6 +43,10 @@ public:
 							CBaseViewModel( void );
 							~CBaseViewModel( void );
 
+#ifdef CLIENT_DLL
+	bool Init(int entnum, int iSerialNum);
+#endif // CLIENT_DLL
+
 
 	bool IsViewable(void) { return false; }
 

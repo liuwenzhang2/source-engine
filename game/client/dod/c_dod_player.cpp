@@ -757,7 +757,7 @@ const QAngle& C_DODPlayer::GetRenderAngles()
 	}
 	else
 	{
-		return m_PlayerAnimState->GetRenderAngles();
+		return BaseClass::GetRenderAngles();
 	}
 }
 
@@ -2347,10 +2347,10 @@ void C_DODPlayer::UpdateColdBreath( void )
 //-----------------------------------------------------------------------------
 void C_DODPlayer::CalculateIKLocks( float currentTime )
 {
-	if (!m_pIk) 
+	if (!GetEngineObject()->GetIk())
 		return;
 
-	int targetCount = m_pIk->m_target.Count();
+	int targetCount = GetEngineObject()->GetIk()->m_target.Count();
 	if ( targetCount == 0 )
 		return;
 
@@ -2364,7 +2364,7 @@ void C_DODPlayer::CalculateIKLocks( float currentTime )
 	for (int i = 0; i < targetCount; i++)
 	{
 		trace_t trace;
-		CIKTarget *pTarget = &m_pIk->m_target[i];
+		CIKTarget *pTarget = &GetEngineObject()->GetIk()->m_target[i];
 
 		if (!pTarget->IsActive())
 			continue;

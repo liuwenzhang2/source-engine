@@ -24,9 +24,6 @@ END_RECV_TABLE()
 //-----------------------------------------------------------------------------
 C_NextBotCombatCharacter::C_NextBotCombatCharacter()
 {
-	// Left4Dead have surfaces too steep for IK to work properly
-	m_EntClientFlags |= ENTCLIENTFLAG_DONTUSEIK;
-
 	m_shadowType = SHADOWS_SIMPLE;
 	m_forcedShadowType = SHADOWS_NONE;
 	m_bForceShadowType = false;
@@ -34,6 +31,13 @@ C_NextBotCombatCharacter::C_NextBotCombatCharacter()
 	TheClientNextBots().Register( this );
 }
 
+bool C_NextBotCombatCharacter::Init(int entnum, int iSerialNum)
+{
+	bool bRet = BaseClass::Init(entnum, iSerialNum);
+	// Left4Dead have surfaces too steep for IK to work properly
+	GetEngineObject()->GetEntClientFlags() |= ENTCLIENTFLAG_DONTUSEIK;
+	return bRet;
+}
 
 //-----------------------------------------------------------------------------
 C_NextBotCombatCharacter::~C_NextBotCombatCharacter()

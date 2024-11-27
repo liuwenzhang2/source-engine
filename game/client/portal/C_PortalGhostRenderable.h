@@ -44,7 +44,7 @@ public:
 	// currentTime parameter will affect interpolation
 	// nMaxBones specifies how many matrices pBoneToWorldOut can hold. (Should be greater than or
 	// equal to IStudioHdr::numbones. Use MAXSTUDIOBONES to be safe.)
-	virtual bool	SetupBones( matrix3x4_t *pBoneToWorldOut, int nMaxBones, int boneMask, float currentTime );
+	//virtual bool	SetupBones( matrix3x4_t *pBoneToWorldOut, int nMaxBones, int boneMask, float currentTime );
 
 	// Returns the bounds relative to the origin (render bounds)
 	virtual void	GetRenderBounds( Vector& mins, Vector& maxs );

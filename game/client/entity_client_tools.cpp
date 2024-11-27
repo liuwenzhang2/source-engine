@@ -130,7 +130,7 @@ private:
 		{
 			if ( pEntity )
 			{
-				m_hEntity->SetToolHandle( m_Handle );
+				m_hEntity->GetEngineObject()->SetToolHandle( m_Handle );
 			}
 		}
 
@@ -345,7 +345,7 @@ HTOOLHANDLE CClientTools::AttachToEntity( EntitySearchResult entityToAttach )
 	if ( !ent )
 		return (HTOOLHANDLE)0;
 
-	HTOOLHANDLE curHandle = ent->GetToolHandle();
+	HTOOLHANDLE curHandle = ent->GetEngineObject()->GetToolHandle();
 	if ( curHandle != 0 )
 		return curHandle; // Already attaached
 
@@ -364,8 +364,8 @@ void CClientTools::DetachFromEntity( EntitySearchResult entityToDetach )
 	if ( !ent )
 		return;
 
-	HTOOLHANDLE handle = ent->GetToolHandle();
-	ent->SetToolHandle( (HTOOLHANDLE)0 );
+	HTOOLHANDLE handle = ent->GetEngineObject()->GetToolHandle();
+	ent->GetEngineObject()->SetToolHandle( (HTOOLHANDLE)0 );
 
 	if ( handle == (HTOOLHANDLE)0 ) 
 	{
@@ -452,7 +452,7 @@ void CClientTools::SetEnabled( HTOOLHANDLE handle, bool enabled )
 	if ( ent == NULL ||	ent->entindex() == 0 )
 		return; // Don't disable/enable the "world"
 
-	ent->EnableInToolView( enabled );
+	ent->GetEngineObject()->EnableInToolView( enabled );
 }
 
 
@@ -468,7 +468,7 @@ void CClientTools::SetRecording( HTOOLHANDLE handle, bool recording )
 	HToolEntry_t &entry = m_Handles[ idx ];
 	if ( entry.m_hEntity )
 	{
-		entry.m_hEntity->SetToolRecording( recording );
+		entry.m_hEntity->GetEngineObject()->SetToolRecording( recording );
 	}
 }
 
@@ -479,7 +479,7 @@ bool CClientTools::ShouldRecord( HTOOLHANDLE handle )
 		return false;
 
 	HToolEntry_t &entry = m_Handles[ idx ];
-	return entry.m_hEntity && entry.m_hEntity->ShouldRecordInTools();
+	return entry.m_hEntity && entry.m_hEntity->GetEngineObject()->ShouldRecordInTools();
 }
 
 
@@ -550,7 +550,7 @@ bool CClientTools::IsValidHandle( HTOOLHANDLE handle )
 
 void CClientTools::OnEntityDeleted( CBaseEntity *pEntity )
 {
-	HTOOLHANDLE handle = pEntity ? pEntity->GetToolHandle() : (HTOOLHANDLE)0;
+	HTOOLHANDLE handle = pEntity ? pEntity->GetEngineObject()->GetToolHandle() : (HTOOLHANDLE)0;
 	if ( handle == (HTOOLHANDLE)0 )
 		return;
 
@@ -584,7 +584,7 @@ HTOOLHANDLE CClientTools::GetToolHandleForEntityByIndex( int entindex )
 	if ( !ent )
 		return (HTOOLHANDLE)0;
 
-	return ent->GetToolHandle();
+	return ent->GetEngineObject()->GetToolHandle();
 }
 
 EntitySearchResult CClientTools::GetLocalPlayer()

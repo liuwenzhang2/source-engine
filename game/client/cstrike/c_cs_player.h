@@ -72,7 +72,7 @@ public:
 	int ArmorValue() const;
 	bool HasHelmet() const;
 	int GetCurrentAssaultSuitPrice();
-
+	virtual int					DrawModel(int flags);
 	virtual const QAngle& EyeAngles();
 	virtual const QAngle& GetRenderAngles();
 	virtual void CalcObserverView( Vector& eyeOrigin, QAngle& eyeAngles, float& fov );
@@ -111,7 +111,8 @@ public:
 	CUtlVector< C_BaseParticleEntity* > m_SmokeGrenades;
 
 	virtual bool ShouldDraw( void );
-	virtual void BuildTransformations( IStudioHdr *pStudioHdr, Vector *pos, Quaternion q[], const matrix3x4_t& cameraTransform, int boneMask, CBoneBitList &boneComputed );
+	virtual void BeforeBuildTransformations(IStudioHdr* pStudioHdr, Vector* pos, Quaternion q[], const matrix3x4_t& cameraTransform, int boneMask, CBoneBitList& boneComputed);
+	virtual void AfterBuildTransformations( IStudioHdr *pStudioHdr, Vector *pos, Quaternion q[], const matrix3x4_t& cameraTransform, int boneMask, CBoneBitList &boneComputed );
 
 	virtual C_BaseEntity* BecomeRagdollOnClient();
 	virtual const IEngineObjectClient* GetRepresentativeRagdoll() const;

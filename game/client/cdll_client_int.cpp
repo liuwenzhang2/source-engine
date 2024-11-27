@@ -503,101 +503,7 @@ public:
 };
 static CHLVoiceStatusHelper g_VoiceStatusHelper;
 
-//-----------------------------------------------------------------------------
-// Code to display which entities are having their bones setup each frame.
-//-----------------------------------------------------------------------------
 
-ConVar cl_ShowBoneSetupEnts( "cl_ShowBoneSetupEnts", "0", 0, "Show which entities are having their bones setup each frame." );
-
-class CBoneSetupEnt
-{
-public:
-	char m_ModelName[128];
-	int m_Index;
-	int m_Count;
-};
-
-bool BoneSetupCompare( const CBoneSetupEnt &a, const CBoneSetupEnt &b )
-{
-	return a.m_Index < b.m_Index;
-}
-
-CUtlRBTree<CBoneSetupEnt> g_BoneSetupEnts( BoneSetupCompare );
-
-
-void TrackBoneSetupEnt( C_BaseAnimating *pEnt )
-{
-#ifdef _DEBUG
-	if ( IsRetail() )
-		return;
-		
-	if ( !cl_ShowBoneSetupEnts.GetInt() )
-		return;
-
-	CBoneSetupEnt ent;
-	ent.m_Index = pEnt->entindex();
-	unsigned short i = g_BoneSetupEnts.Find( ent );
-	if ( i == g_BoneSetupEnts.InvalidIndex() )
-	{
-		Q_strncpy( ent.m_ModelName, modelinfo->GetModelName( pEnt->GetModel() ), sizeof( ent.m_ModelName ) );
-		ent.m_Count = 1;
-		g_BoneSetupEnts.Insert( ent );
-	}
-	else
-	{
-		g_BoneSetupEnts[i].m_Count++;
-	}
-#endif
-}
-
-void DisplayBoneSetupEnts()
-{
-#ifdef _DEBUG
-	if ( IsRetail() )
-		return;
-	
-	if ( !cl_ShowBoneSetupEnts.GetInt() )
-		return;
-
-	unsigned short i;
-	int nElements = 0;
-	for ( i=g_BoneSetupEnts.FirstInorder(); i != g_BoneSetupEnts.LastInorder(); i=g_BoneSetupEnts.NextInorder( i ) )
-		++nElements;
-		
-	engine->Con_NPrintf( 0, "%d bone setup ents (name/count/entindex) ------------", nElements );
-
-	con_nprint_s printInfo;
-	printInfo.time_to_live = -1;
-	printInfo.fixed_width_font = true;
-	printInfo.color[0] = printInfo.color[1] = printInfo.color[2] = 1;
-	
-	printInfo.index = 2;
-	for ( i=g_BoneSetupEnts.FirstInorder(); i != g_BoneSetupEnts.LastInorder(); i=g_BoneSetupEnts.NextInorder( i ) )
-	{
-		CBoneSetupEnt *pEnt = &g_BoneSetupEnts[i];
-		
-		if ( pEnt->m_Count >= 3 )
-		{
-			printInfo.color[0] = 1;
-			printInfo.color[1] = printInfo.color[2] = 0;
-		}
-		else if ( pEnt->m_Count == 2 )
-		{
-			printInfo.color[0] = (float)200 / 255;
-			printInfo.color[1] = (float)220 / 255;
-			printInfo.color[2] = 0;
-		}
-		else
-		{
-			printInfo.color[0] = printInfo.color[0] = printInfo.color[0] = 1;
-		}
-		engine->Con_NXPrintf( &printInfo, "%25s / %3d / %3d", pEnt->m_ModelName, pEnt->m_Count, pEnt->m_Index );
-		printInfo.index++;
-	}
-
-	g_BoneSetupEnts.RemoveAll();
-#endif
-}
 
 //-----------------------------------------------------------------------------
 // Purpose: engine to client .dll interface
@@ -1224,7 +1130,7 @@ int CHLClient::Init( CreateInterfaceFn appSystemFactory, CreateInterfaceFn physi
 
 	//ClientWorldFactoryInit();
 
-	C_BaseAnimating::InitBoneSetupThreadPool();
+	ClientEntityList().InitBoneSetupThreadPool();
 
 #if defined( WIN32 ) && !defined( _X360 )
 	// NVNT connect haptics sytem
@@ -1337,7 +1243,7 @@ void CHLClient::Shutdown( void )
 	g_pSixenseInput = NULL;
 #endif
 
-	C_BaseAnimating::ShutdownBoneSetupThreadPool();
+	ClientEntityList().ShutdownBoneSetupThreadPool();
 	//ClientWorldFactoryShutdown();
 
 	engine->RemoveBlockHandler( GetViewEffectsRestoreBlockHandler() );
@@ -2289,14 +2195,14 @@ void OnRenderStart()
 		// vprof node for this bloc of math
 		VPROF( "OnRenderStart: dirty bone caches");
 		// Invalidate any bone information.
-		C_BaseAnimating::InvalidateBoneCaches();
+		ClientEntityList().InvalidateBoneCaches();
 
 		C_EngineObjectInternal::SetAbsQueriesValid( true );
 		C_EngineObjectInternal::EnableAbsRecomputations( true );
 
 		// Enable access to all model bones except view models.
 		// This is necessary for aim-ent computation to occur properly
-		C_BaseAnimating::PushAllowBoneAccess( true, false, "OnRenderStart->CViewRender::SetUpView" ); // pops in CViewRender::SetUpView
+		ClientEntityList().PushAllowBoneAccess(true, false, "OnRenderStart->CViewRender::SetUpView"); // pops in CViewRender::SetUpView
 
 		// FIXME: This needs to be done before the player moves; it forces
 		// aiments the player may be attached to to forcibly update their position
@@ -2336,7 +2242,7 @@ void OnRenderStart()
 	SimulateEntities();
 	PhysicsSimulate();
 
-	C_BaseAnimating::ThreadedBoneSetup();
+	ClientEntityList().ThreadedBoneSetup();
 
 	{
 		VPROF_("Client TempEnts", 0, VPROF_BUDGETGROUP_CLIENT_SIM, false, BUDGETFLAG_CLIENT);
@@ -2370,7 +2276,7 @@ void OnRenderStart()
 	// For entities marked for recording, post bone messages to IToolSystems
 	if ( ToolsEnabled() )
 	{
-		C_BaseEntity::ToolRecordEntities();
+		ClientEntityList().ToolRecordEntities();
 	}
 
 #if defined( REPLAY_ENABLED )
@@ -2383,11 +2289,11 @@ void OnRenderStart()
 	//C_BaseEntity::AddVisibleEntities();
 }
 
-
+void DisplayBoneSetupEnts();
 void OnRenderEnd()
 {
 	// Disallow access to bones (access is enabled in CViewRender::SetUpView).
-	C_BaseAnimating::PopBoneAccess( "CViewRender::SetUpView->OnRenderEnd" );
+	ClientEntityList().PopBoneAccess("CViewRender::SetUpView->OnRenderEnd");
 
 	UpdatePVSNotifiers();
 

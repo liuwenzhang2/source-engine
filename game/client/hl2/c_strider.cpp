@@ -123,17 +123,17 @@ public:
 	{
 		// NOTE: All strider IK is solved on the server, enable this to do it client-side
 		//BaseClass::CalculateIKLocks( currentTime );
-		if ( m_pIk && m_pIk->m_target.Count() )
+		if (GetEngineObject()->GetIk() && GetEngineObject()->GetIk()->m_target.Count())
 		{
 			Assert(m_pIk->m_target.Count() > STOMP_IK_SLOT);
 			// HACKHACK: Hardcoded 11???  Not a cleaner way to do this
-			CIKTarget &target = m_pIk->m_target[STOMP_IK_SLOT];
+			CIKTarget &target = GetEngineObject()->GetIk()->m_target[STOMP_IK_SLOT];
 			target.SetPos( m_vecHitPos );
 			// target.latched.pos = m_vecHitPos;
 
 			for ( int i = 0; i < NUM_STRIDER_IK_TARGETS; i++ )
 			{
-				CIKTarget &target = m_pIk->m_target[i];
+				CIKTarget &target = GetEngineObject()->GetIk()->m_target[i];
 				target.SetPos( m_vecIKTarget[i] );
 #if 0
 				debugoverlay->AddBoxOverlay( m_vecIKTarget[i], Vector( -2, -2, -2 ), Vector( 2, 2, 2), QAngle( 0, 0, 0 ), (int)255*m_pIk->m_target[i].est.latched, 0, 0, 0, 0 );

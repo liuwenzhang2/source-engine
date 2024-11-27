@@ -1450,7 +1450,7 @@ void CAI_BaseActor::MaintainLookTargets( float flInterval )
 	MaintainTurnActivity( );
 	DoBodyLean( );
 	UpdateBodyControl( );
-	InvalidateBoneCache();
+	GetEngineObject()->InvalidateBoneCache();
 
 	// cached versions of the current eye position
 	Vector vEyePosition = EyePosition( );

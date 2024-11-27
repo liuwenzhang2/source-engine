@@ -95,7 +95,7 @@ const QAngle& C_HL1MP_Player::GetRenderAngles()
 	}
 	else
 	{
-		return m_PlayerAnimState->GetRenderAngles();
+		return BaseClass::GetRenderAngles();
 	}
 }
 

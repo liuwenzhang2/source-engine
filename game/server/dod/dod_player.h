@@ -135,7 +135,7 @@ public:
 
 	// This passes the event to the client's and server's CPlayerAnimState.
 	void			DoAnimationEvent( PlayerAnimEvent_t event, int nData = 0 );
-	void			SetupBones( matrix3x4_t *pBoneToWorld, int boneMask );
+	//void			SetupBones( matrix3x4_t *pBoneToWorld, int boneMask );
 
 	virtual void	Precache();
 	void			PrecachePlayerModel( const char *szPlayerModel );

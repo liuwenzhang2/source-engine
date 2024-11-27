@@ -2595,7 +2595,7 @@ void C_BasePlayer::ForceSetupBonesAtTimeFakeInterpolation( matrix3x4_t *pBonesOu
 	Vector origin = GetEngineObject()->GetLocalOrigin();
 
 	// blow the cached prev bones
-	InvalidateBoneCache();
+	GetEngineObject()->InvalidateBoneCache();
 	// reset root position to flTime
 	Interpolate( gpGlobals->curtime + curtimeOffset );
 
@@ -2871,15 +2871,15 @@ void C_BasePlayer::BuildFirstPersonMeathookTransformations( IStudioHdr *hdr, Vec
 		return;
 	}
 
-	m_BoneAccessor.SetWritableBones( BONE_USED_BY_ANYTHING );
+	GetEngineObject()->SetWritableBones( BONE_USED_BY_ANYTHING );
 
-	int iHead = LookupBone( pchHeadBoneName );
+	int iHead = GetEngineObject()->LookupBone( pchHeadBoneName );
 	if ( iHead == -1 )
 	{
 		return;
 	}
 
-	matrix3x4_t &mHeadTransform = GetBoneForWrite( iHead );
+	matrix3x4_t &mHeadTransform = GetEngineObject()->GetBoneForWrite( iHead );
 
 	// "up" on the head bone is along the negative Y axis - not sure why.
 	//Vector vHeadTransformUp ( -mHeadTransform[0][1], -mHeadTransform[1][1], -mHeadTransform[2][1] );
@@ -2925,7 +2925,7 @@ void C_BasePlayer::BuildFirstPersonMeathookTransformations( IStudioHdr *hdr, Vec
 		{
 			continue;
 		}
-		matrix3x4_t& bone = GetBoneForWrite( i );
+		matrix3x4_t& bone = GetEngineObject()->GetBoneForWrite( i );
 		Vector vBonePos;
 		MatrixGetTranslation ( bone, vBonePos );
 		vBonePos += vDeltaToAdd;
@@ -2939,18 +2939,18 @@ void C_BasePlayer::BuildFirstPersonMeathookTransformations( IStudioHdr *hdr, Vec
 	// TODO: right now we nuke the hats by shrinking them to nothing,
 	// but it feels like we should do something more sensible.
 	// For example, for one sniper taunt he takes his hat off and waves it - would be nice to see it then.
-	int iHelm = LookupBone( "prp_helmet" );
+	int iHelm = GetEngineObject()->LookupBone( "prp_helmet" );
 	if ( iHelm != -1 )
 	{
 		// Scale the helmet.
-		matrix3x4_t  &transformhelmet = GetBoneForWrite( iHelm );
+		matrix3x4_t  &transformhelmet = GetEngineObject()->GetBoneForWrite( iHelm );
 		MatrixScaleByZero( transformhelmet );
 	}
 
-	iHelm = LookupBone( "prp_hat" );
+	iHelm = GetEngineObject()->LookupBone( "prp_hat" );
 	if ( iHelm != -1 )
 	{
-		matrix3x4_t  &transformhelmet = GetBoneForWrite( iHelm );
+		matrix3x4_t  &transformhelmet = GetEngineObject()->GetBoneForWrite( iHelm );
 		MatrixScaleByZero( transformhelmet );
 	}
 }

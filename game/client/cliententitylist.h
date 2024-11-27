@@ -31,6 +31,11 @@
 #include "ragdoll_shared.h"
 #include "rope_physics.h"
 #include "rope_shared.h"
+#include "bone_setup.h"
+#include "jigglebones.h"
+#include "tier0/vprof.h"
+#include "vstdlib/jobthread.h"
+#include "bone_merge_cache.h"
 
 //class C_Beam;
 //class C_BaseViewModel;
@@ -137,7 +142,8 @@ public:
 	void operator delete(void* pMem);
 	void operator delete(void* pMem, int nBlockUse, const char* pFileName, int nLine) { operator delete(pMem); }
 
-	C_EngineObjectInternal() :
+	C_EngineObjectInternal(IClientEntityList* pClientEntityList) 
+		:m_pClientEntityList(pClientEntityList),
 		m_iv_vecOrigin("C_BaseEntity::m_iv_vecOrigin", &m_vecOrigin, LATCH_SIMULATION_VAR),
 		m_iv_angRotation("C_BaseEntity::m_iv_angRotation", &m_angRotation, LATCH_SIMULATION_VAR),
 		m_iv_vecVelocity("C_BaseEntity::m_iv_vecVelocity", &m_vecVelocity, LATCH_SIMULATION_VAR), 
@@ -238,7 +244,25 @@ public:
 		//m_pRagdollInfo = NULL;
 		m_flLastBoneChangeTime = -FLT_MAX;
 		m_nRenderFX = 0;
+		m_flBlendWeightCurrent = 0.0f;
+		m_nOverlaySequence = -1;
+		//m_pRagdoll		= NULL;
+		m_hitboxBoneCacheHandle = 0;
 
+
+
+		//AddBaseAnimatingInterpolatedVars();
+
+		m_iMostRecentModelBoneCounter = 0xFFFFFFFF;
+		m_iMostRecentBoneSetupRequest = pClientEntityList->GetPreviousBoneCounter() - 1;
+		m_flLastBoneSetupTime = -FLT_MAX;
+
+
+		m_pJiggleBones = NULL;
+		m_pBoneMergeCache = NULL;
+		m_pIk = NULL;
+		m_EntClientFlags = 0;
+		m_ragdollListCount = 0;
 	}
 
 	virtual ~C_EngineObjectInternal()
@@ -250,6 +274,13 @@ public:
 		ClearRagdoll();
 		//delete m_pRagdollInfo;
 		VPhysicsDestroyObject();
+		int i = m_pClientEntityList->GetPreviousBoneSetups().Find(this);
+		if (i != -1)
+			m_pClientEntityList->GetPreviousBoneSetups().FastRemove(i);
+		delete m_pIk;
+		delete m_pBoneMergeCache;
+		Studio_DestroyBoneCache(m_hitboxBoneCacheHandle);
+		delete m_pJiggleBones;
 	}
 
 	static bool s_bAbsQueriesValid;
@@ -511,7 +542,13 @@ public:
 		m_bReceivedSequence = false;
 		m_elementCount = 0;
 		m_nRenderFX = 0;
-
+#ifndef NO_TOOLFRAMEWORK
+		m_bEnabledInToolView = true;
+		m_bToolRecording = false;
+		m_ToolHandle = 0;
+		m_nLastRecordedFrame = -1;
+		m_bRecordInTools = true;
+#endif
 	}
 
 	// Invalidates the abs state of all children
@@ -669,6 +706,7 @@ public:
 	void StopFollowingEntity();	// will also change to MOVETYPE_NONE
 	bool IsFollowingEntity();
 	IEngineObjectClient* GetFollowedEntity();
+	IEngineObjectClient* FindFollowedEntity();
 
 	// save out interpolated values
 	void PreDataUpdate(DataUpdateType_t updateType);
@@ -911,6 +949,57 @@ public:
 	const QAngle& GetRagAngles(int index) { return m_ragAngles[index]; }
 	unsigned char GetRenderFX() const{ return m_nRenderFX; }
 	void SetRenderFX(unsigned char nRenderFX) { m_nRenderFX = nRenderFX; }
+
+	void					SetToolHandle(HTOOLHANDLE handle);
+	HTOOLHANDLE				GetToolHandle() const;
+
+	void					EnableInToolView(bool bEnable);
+	bool					IsEnabledInToolView() const;
+
+	void					SetToolRecording(bool recording);
+	bool					IsToolRecording() const;
+	bool					HasRecordedThisFrame() const;
+
+	// used to exclude entities from being recorded in the SFM tools
+	void					DontRecordInTools();
+	bool					ShouldRecordInTools() const;
+
+	CIKContext* GetIk() { return m_pIk; }
+	void DestroyIk() {
+		delete m_pIk;
+		m_pIk = NULL;
+	}
+	virtual void BuildTransformations(IStudioHdr* pStudioHdr, Vector* pos, Quaternion q[], const matrix3x4_t& cameraTransform, int boneMask, CBoneBitList& boneComputed);
+
+	// model specific
+	virtual bool SetupBones(matrix3x4_t* pBoneToWorldOut, int nMaxBones, int boneMask, float currentTime);
+	// Wrappers for CBoneAccessor.
+	const matrix3x4_t& GetBone(int iBone) const;
+	matrix3x4_t& GetBoneForWrite(int iBone);
+	// Call this if SetupBones() has already been called this frame but you need to move the
+// entity and rerender.
+	void							InvalidateBoneCache();
+	bool							IsBoneCacheValid() const;	// Returns true if the bone cache is considered good for this frame.
+	void							GetCachedBoneMatrix(int boneIndex, matrix3x4_t& out);
+	CBoneCache*						GetBoneCache(IStudioHdr* pStudioHdr);
+	bool							GetRootBone(matrix3x4_t& rootBone);
+	int		LookupBone(const char* szName);
+	void	GetBonePosition(int iBone, Vector& origin, QAngle& angles);
+	void	GetBoneTransform(int iBone, matrix3x4_t& pBoneToWorld);
+	int GetReadableBones() { return m_BoneAccessor.GetReadableBones(); }
+	void SetReadableBones(int flags) { m_BoneAccessor.SetReadableBones(flags); }
+
+	int GetWritableBones() { return m_BoneAccessor.GetWritableBones(); }
+	void SetWritableBones(int flags) { m_BoneAccessor.SetWritableBones(flags); }
+
+	unsigned short& GetEntClientFlags() { return m_EntClientFlags; }
+	const CUtlVector< matrix3x4_t >& GetCachedBoneData() { return m_CachedBoneData; }
+	CBoneMergeCache* GetBoneMergeCache() { return m_pBoneMergeCache; }
+	int GetAccumulatedBoneMask() { return m_iAccumulatedBoneMask; }
+	void SetLastRecordedFrame(int nLastRecordedFrame) { m_nLastRecordedFrame = nLastRecordedFrame; }
+	float GetBlendWeightCurrent() { return m_flBlendWeightCurrent; }
+	void SetBlendWeightCurrent(float flBlendWeightCurrent) { m_flBlendWeightCurrent = flBlendWeightCurrent; }
+	int	GetOverlaySequence() { return m_nOverlaySequence; }
 private:
 	void LockStudioHdr();
 	void UnlockStudioHdr();
@@ -919,8 +1008,14 @@ private:
 	bool			VPhysicsInitSetup();
 	void			CheckSettleStationaryRagdoll();
 	void			PhysForceRagdollToSleep();
+	// View models say yes to this.
+	bool			IsBoneAccessAllowed() const;
+	// This method should return true if the bones have changed + SetupBones needs to be called
+	virtual float LastBoneChangedTime();
+
 protected:
 
+	IClientEntityList* const m_pClientEntityList;
 	friend class C_BaseEntity;
 	CThreadFastMutex m_CalcAbsolutePositionMutex;
 	CThreadFastMutex m_CalcAbsoluteVelocityMutex;
@@ -1114,16 +1209,47 @@ protected:
 	int								m_nRestoreSequence;
 
 	// Incoming from network
+	int			m_RagdollBoneCount;
 	Vector		m_ragPos[RAGDOLL_MAX_ELEMENTS];
 	QAngle		m_ragAngles[RAGDOLL_MAX_ELEMENTS];
 	CInterpolatedVarArray< Vector, RAGDOLL_MAX_ELEMENTS >	m_iv_ragPos;
 	CInterpolatedVarArray< QAngle, RAGDOLL_MAX_ELEMENTS >	m_iv_ragAngles;
 	int			m_elementCount;
+	int			m_ragdollListCount;
 	int			m_boneIndex[RAGDOLL_MAX_ELEMENTS];
-	float m_flLastBoneChangeTime;
+	int			m_nOverlaySequence;
+	float		m_flBlendWeightCurrent;
+	float		m_flLastBoneChangeTime;
 
 	// Render information
 	unsigned char					m_nRenderFX;
+	int								m_iPrevBoneMask;
+	// Set by tools if this entity should route "info" to various tools listening to HTOOLENTITIES
+#ifndef NO_TOOLFRAMEWORK
+	bool							m_bEnabledInToolView;
+	bool							m_bToolRecording;
+	HTOOLHANDLE						m_ToolHandle;
+	int								m_nLastRecordedFrame;
+	bool							m_bRecordInTools; // should this entity be recorded in the tools (we exclude some things like models for menus)
+#endif
+
+	// Is bone cache valid
+	// bone transformation matrix
+	unsigned long					m_iMostRecentModelBoneCounter;
+	unsigned long					m_iMostRecentBoneSetupRequest;
+	int								m_iAccumulatedBoneMask;
+
+	CThreadFastMutex				m_BoneSetupLock;
+	CUtlVector< matrix3x4_t >		m_CachedBoneData; // never access this directly. Use m_BoneAccessor.
+	memhandle_t						m_hitboxBoneCacheHandle;
+	float							m_flLastBoneSetupTime;
+	CBoneAccessor					m_BoneAccessor;
+	CIKContext*						m_pIk = NULL;
+	// Entity flags that are only for the client (ENTCLIENTFLAG_ defines).
+	unsigned short					m_EntClientFlags;
+	CBoneMergeCache*				m_pBoneMergeCache = NULL;	// This caches the strcmp lookups that it has to do
+	CJiggleBones*					m_pJiggleBones = NULL;
+
 };
 
 //-----------------------------------------------------------------------------
@@ -1814,19 +1940,89 @@ inline const Vector& C_EngineObjectInternal::WorldAlignSize() const
 	return OBBSize();
 }
 
+//-----------------------------------------------------------------------------
+// Purpose: 
+// Input  : handle - 
+// Output : inline void
+//-----------------------------------------------------------------------------
+inline void C_EngineObjectInternal::SetToolHandle(HTOOLHANDLE handle)
+{
+#ifndef NO_TOOLFRAMEWORK
+	m_ToolHandle = handle;
+#endif
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: 
+// Input  :  - 
+// Output : inline HTOOLHANDLE
+//-----------------------------------------------------------------------------
+inline HTOOLHANDLE C_EngineObjectInternal::GetToolHandle() const
+{
+#ifndef NO_TOOLFRAMEWORK
+	return m_ToolHandle;
+#else
+	return (HTOOLHANDLE)0;
+#endif
+}
+
+//-----------------------------------------------------------------------------
+// 
+//-----------------------------------------------------------------------------
+inline bool C_EngineObjectInternal::IsEnabledInToolView() const
+{
+#ifndef NO_TOOLFRAMEWORK
+	return m_bEnabledInToolView;
+#else
+	return false;
+#endif
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: 
+// Input  :  - 
+// Output : inline bool
+//-----------------------------------------------------------------------------
+inline bool C_EngineObjectInternal::ShouldRecordInTools() const
+{
+#ifndef NO_TOOLFRAMEWORK
+	return m_bRecordInTools;
+#else
+	return true;
+#endif
+}
+
+inline const matrix3x4_t& C_EngineObjectInternal::GetBone(int iBone) const
+{
+	return m_BoneAccessor.GetBone(iBone);
+}
+
+inline matrix3x4_t& C_EngineObjectInternal::GetBoneForWrite(int iBone)
+{
+	return m_BoneAccessor.GetBoneForWrite(iBone);
+}
+
 class C_EngineWorldInternal : public C_EngineObjectInternal {
 public:
-
+	C_EngineWorldInternal(IClientEntityList* pClientEntityList) 
+	:C_EngineObjectInternal(pClientEntityList)
+	{
+		
+	}
 };
 
 class C_EnginePlayerInternal : public C_EngineObjectInternal {
 public:
-
+	C_EnginePlayerInternal(IClientEntityList* pClientEntityList) 
+	:C_EngineObjectInternal(pClientEntityList)
+	{
+	
+	}
 };
 
 class C_EnginePortalInternal : public C_EngineObjectInternal, public IEnginePortalClient {
 public:
-	C_EnginePortalInternal();
+	C_EnginePortalInternal(IClientEntityList* pClientEntityList);
 	~C_EnginePortalInternal();
 	void	VPhysicsDestroyObject(void);
 	void				MoveTo(const Vector& ptCenter, const QAngle& angles);
@@ -1899,19 +2095,27 @@ static int s_iPortalSimulatorGUID = 0; //used in standalone function that have n
 
 class C_EngineShadowCloneInternal : public C_EngineObjectInternal {
 public:
-
+	C_EngineShadowCloneInternal(IClientEntityList* pClientEntityList) 
+	:C_EngineObjectInternal(pClientEntityList)
+	{
+	
+	}
 };
 
 class C_EngineVehicleInternal : public C_EngineObjectInternal, public IEngineVehicleClient {
 public:
-
+	C_EngineVehicleInternal(IClientEntityList* pClientEntityList) 
+	:C_EngineObjectInternal(pClientEntityList)
+	{
+	
+	}
 };
 
 class C_EngineRopeInternal : public C_EngineObjectInternal, public IEngineRopeClient {
 public:
 	DECLARE_CLASS(C_EngineRopeInternal, C_EngineObjectInternal);
 	DECLARE_CLIENTCLASS();
-	C_EngineRopeInternal();
+	C_EngineRopeInternal(IClientEntityList* pClientEntityList);
 	~C_EngineRopeInternal();
 	virtual void	OnDataChanged(DataUpdateType_t updateType);
 	// Use this when rope length and slack change to recompute the spring length.
@@ -2058,6 +2262,12 @@ void Rope_ResetCounters();
 
 class C_EngineGhostInternal : public C_EngineObjectInternal, public IEngineGhostClient {
 public:
+	C_EngineGhostInternal(IClientEntityList* pClientEntityList) 
+	:C_EngineObjectInternal(pClientEntityList)
+	{
+
+	}
+
 	void SetMatGhostTransform(const VMatrix& matGhostTransform) {
 		m_matGhostTransform = matGhostTransform;
 	}
@@ -2235,12 +2445,34 @@ public:
 	void* GetDataObject(int type, const T* instance);
 	void* CreateDataObject(int type, T* instance);
 	void DestroyDataObject(int type, T* instance);
+	void PushAllowBoneAccess(bool bAllowForNormalModels, bool bAllowForViewModels, char const* tagPush);
+	void PopBoneAccess(char const* tagPop);
+	bool GetAllowBoneAccessForNormalModels() { return g_BoneAcessBase.bAllowBoneAccessForNormalModels; }
+	bool GetAllowBoneAccessForViewModels() { return g_BoneAcessBase.bAllowBoneAccessForViewModels; }
+	virtual void	AddToRecordList(CBaseHandle add);
+	virtual void	RemoveFromRecordList(CBaseHandle remove);
 
+	virtual int		CountRecord();
+	IClientRenderable* GetRecord(int index);
+	// For entities marked for recording, post bone messages to IToolSystems
+	void ToolRecordEntities();
+	bool GetInThreadedBoneSetup() { return g_bInThreadedBoneSetup; }
+	unsigned long GetModelBoneCounter() { return g_iModelBoneCounter; }
+	bool GetDoThreadedBoneSetup() { return g_bDoThreadedBoneSetup; }
+	unsigned long GetPreviousBoneCounter() { return g_iPreviousBoneCounter; }
+	CUtlVector<IEngineObjectClient*>& GetPreviousBoneSetups() { return g_PreviousBoneSetups; }
+	void						SetupBonesOnBaseAnimating(IEngineObjectClient*& pBaseAnimating);
+	void						PreThreadedBoneSetup();
+	void						PostThreadedBoneSetup();
+	void						ThreadedBoneSetup();
+	void						InitBoneSetupThreadPool();
+	void						ShutdownBoneSetupThreadPool();
+	// Invalidate bone caches so all SetupBones() calls force bone transforms to be regenerated.
+	void						InvalidateBoneCaches();
 private:
 	void AddPVSNotifier(IClientUnknown* pUnknown);
 	void RemovePVSNotifier(IClientUnknown* pUnknown);
 	void AddRestoredEntity(T* pEntity);
-
 public:
 	static bool				sm_bDisableTouchFuncs;	// Disables PhysicsTouch and PhysicsStartTouch function calls
 private:
@@ -2275,6 +2507,34 @@ private:
 	CUtlLinkedList<CPVSNotifyInfo,unsigned short> m_PVSNotifyInfos;
 	CUtlMap<IClientUnknown*,unsigned short,unsigned short> m_PVSNotifierMap;	// Maps IClientUnknowns to indices into m_PVSNotifyInfos.
 	CUtlVector<CBaseHandle> m_RestoredEntities;
+
+	// Causes an assert to happen if bones or attachments are used while this is false.
+	struct BoneAccess
+	{
+		BoneAccess()
+		{
+			bAllowBoneAccessForNormalModels = false;
+			bAllowBoneAccessForViewModels = false;
+			tag = NULL;
+		}
+
+		bool bAllowBoneAccessForNormalModels;
+		bool bAllowBoneAccessForViewModels;
+		char const* tag;
+	};
+
+	CUtlVector< BoneAccess >		g_BoneAccessStack;
+	BoneAccess g_BoneAcessBase;
+
+	CUtlVector< CBaseHandle > m_Recording;
+	bool g_bInThreadedBoneSetup;
+	bool g_bDoThreadedBoneSetup;
+	//-----------------------------------------------------------------------------
+// Incremented each frame in InvalidateModelBones. Models compare this value to what it
+// was last time they setup their bones to determine if they need to re-setup their bones.
+	unsigned long	g_iModelBoneCounter = 0;
+	CUtlVector<IEngineObjectClient*> g_PreviousBoneSetups;
+	unsigned long	g_iPreviousBoneCounter = (unsigned)-1;
 
 };
 
@@ -2640,28 +2900,28 @@ inline C_BaseEntity* CClientEntityList<T>::CreateEntityByName(const char* classN
 	}
 	switch (pFactory->GetEngineObjectType()) {
 	case ENGINEOBJECT_BASE:
-		m_EngineObjectArray[iForceEdictIndex] = new C_EngineObjectInternal();
+		m_EngineObjectArray[iForceEdictIndex] = new C_EngineObjectInternal(this);
 		break;
 	case ENGINEOBJECT_WORLD:
-		m_EngineObjectArray[iForceEdictIndex] = new C_EngineWorldInternal();
+		m_EngineObjectArray[iForceEdictIndex] = new C_EngineWorldInternal(this);
 		break;
 	case ENGINEOBJECT_PLAYER:
-		m_EngineObjectArray[iForceEdictIndex] = new C_EnginePlayerInternal();
+		m_EngineObjectArray[iForceEdictIndex] = new C_EnginePlayerInternal(this);
 		break;
 	case ENGINEOBJECT_PORTAL:
-		m_EngineObjectArray[iForceEdictIndex] = new C_EnginePortalInternal();
+		m_EngineObjectArray[iForceEdictIndex] = new C_EnginePortalInternal(this);
 		break;
 	case ENGINEOBJECT_SHADOWCLONE:
-		m_EngineObjectArray[iForceEdictIndex] = new C_EngineShadowCloneInternal();
+		m_EngineObjectArray[iForceEdictIndex] = new C_EngineShadowCloneInternal(this);
 		break;
 	case ENGINEOBJECT_VEHICLE:
-		m_EngineObjectArray[iForceEdictIndex] = new C_EngineVehicleInternal();
+		m_EngineObjectArray[iForceEdictIndex] = new C_EngineVehicleInternal(this);
 		break;
 	case ENGINEOBJECT_ROPE:
-		m_EngineObjectArray[iForceEdictIndex] = new C_EngineRopeInternal();
+		m_EngineObjectArray[iForceEdictIndex] = new C_EngineRopeInternal(this);
 		break;
 	case ENGINEOBJECT_GHOST:
-		m_EngineObjectArray[iForceEdictIndex] = new C_EngineGhostInternal();
+		m_EngineObjectArray[iForceEdictIndex] = new C_EngineGhostInternal(this);
 		break;
 	default:
 		Error("GetEngineObjectType error!\n");
@@ -2775,6 +3035,12 @@ void CClientEntityList<T>::Release(void)
 	m_iMaxServerEnts = 0;
 	m_iNumClientNonNetworkable = 0;
 	m_iMaxUsedServerIndex = -1;
+	g_iPreviousBoneCounter = (unsigned)-1;
+	if (g_PreviousBoneSetups.Count() != 0)
+	{
+		Msg("%d entities in bone setup array. Should have been cleaned up by now\n", g_PreviousBoneSetups.Count());
+		g_PreviousBoneSetups.RemoveAll();
+	}
 }
 
 template<class T>
@@ -3078,13 +3344,6 @@ template<class T>
 void CClientEntityList<T>::OnRemoveEntity(T* pEnt, CBaseHandle handle)
 {
 	int entnum = handle.GetEntryIndex();
-
-	m_EngineObjectArray[entnum]->PhysicsRemoveTouchedList();
-	m_EngineObjectArray[entnum]->PhysicsRemoveGroundList();
-	m_EngineObjectArray[entnum]->DestroyAllDataObjects();
-	delete m_EngineObjectArray[entnum];
-	m_EngineObjectArray[entnum] = NULL;
-
 	//EntityCacheInfo_t* pCache = &m_EntityCacheInfo[entnum];
 
 	if (entnum >= 0 && entnum < MAX_EDICTS)
@@ -3121,6 +3380,11 @@ void CClientEntityList<T>::OnRemoveEntity(T* pEnt, CBaseHandle handle)
 		}
 	}
 
+	m_EngineObjectArray[entnum]->PhysicsRemoveTouchedList();
+	m_EngineObjectArray[entnum]->PhysicsRemoveGroundList();
+	m_EngineObjectArray[entnum]->DestroyAllDataObjects();
+	delete m_EngineObjectArray[entnum];
+	m_EngineObjectArray[entnum] = NULL;
 	//if (pCache->m_BaseEntitiesIndex != m_BaseEntities.InvalidIndex())
 	//	m_BaseEntities.Remove(pCache->m_BaseEntitiesIndex);
 
@@ -3200,6 +3464,163 @@ void* CClientEntityList<T>::CreateDataObject(int type, T* instance) {
 template<class T>
 void CClientEntityList<T>::DestroyDataObject(int type, T* instance) {
 	BaseClass::DestroyDataObject(type, instance);
+}
+
+template<class T>
+void CClientEntityList<T>::PushAllowBoneAccess(bool bAllowForNormalModels, bool bAllowForViewModels, char const* tagPush)
+{
+	BoneAccess save = g_BoneAcessBase;
+	g_BoneAccessStack.AddToTail(save);
+
+	Assert(g_BoneAccessStack.Count() < 32); // Most likely we are leaking "PushAllowBoneAccess" calls if PopBoneAccess is never called. Consider using AutoAllowBoneAccess.
+	g_BoneAcessBase.bAllowBoneAccessForNormalModels = bAllowForNormalModels;
+	g_BoneAcessBase.bAllowBoneAccessForViewModels = bAllowForViewModels;
+	g_BoneAcessBase.tag = tagPush;
+}
+
+template<class T>
+void CClientEntityList<T>::PopBoneAccess(char const* tagPop)
+{
+	// Validate that pop matches the push
+	Assert((g_BoneAcessBase.tag == tagPop) || (g_BoneAcessBase.tag && g_BoneAcessBase.tag != (char const*)1 && tagPop && tagPop != (char const*)1 && !strcmp(g_BoneAcessBase.tag, tagPop)));
+	int lastIndex = g_BoneAccessStack.Count() - 1;
+	if (lastIndex < 0)
+	{
+		Assert(!"C_BaseAnimating::PopBoneAccess:  Stack is empty!!!");
+		return;
+	}
+	g_BoneAcessBase = g_BoneAccessStack[lastIndex];
+	g_BoneAccessStack.Remove(lastIndex);
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: Add entity to list
+// Input  : add - 
+// Output : int
+//-----------------------------------------------------------------------------
+template<class T>
+void CClientEntityList<T>::AddToRecordList(ClientEntityHandle_t add)
+{
+	// This is a hack to remap slot to index
+	if (m_Recording.Find(add) != m_Recording.InvalidIndex())
+	{
+		return;
+	}
+
+	// Add to general list
+	m_Recording.AddToTail(add);
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: 
+// Input  : remove - 
+//-----------------------------------------------------------------------------
+template<class T>
+void CClientEntityList<T>::RemoveFromRecordList(ClientEntityHandle_t remove)
+{
+	m_Recording.FindAndRemove(remove);
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: 
+// Input  : slot - 
+// Output : IClientRenderable
+//-----------------------------------------------------------------------------
+template<class T>
+IClientRenderable* CClientEntityList<T>::GetRecord(int index)
+{
+	return GetClientRenderableFromHandle(m_Recording[index]);
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: 
+// Output : int
+//-----------------------------------------------------------------------------
+template<class T>
+int CClientEntityList<T>::CountRecord()
+{
+	return m_Recording.Count();
+}
+
+template<class T>
+void CClientEntityList<T>::ToolRecordEntities()
+{
+	VPROF_BUDGET("C_BaseEntity::ToolRecordEnties", VPROF_BUDGETGROUP_TOOLS);
+
+	if (!ToolsEnabled() || !clienttools->IsInRecordingMode())
+		return;
+
+	// Let non-dormant client created predictables get added, too
+	int c = CountRecord();
+	for (int i = 0; i < c; i++)
+	{
+		IClientRenderable* pRenderable = GetRecord(i);
+		if (!pRenderable)
+			continue;
+
+		pRenderable->RecordToolMessage();
+	}
+}
+
+template<class T>
+void CClientEntityList<T>::InitBoneSetupThreadPool()
+{
+}
+
+template<class T>
+void CClientEntityList<T>::ShutdownBoneSetupThreadPool()
+{
+}
+
+extern ConVar cl_threaded_bone_setup;
+
+//-----------------------------------------------------------------------------
+// Purpose: Do the default sequence blending rules as done in HL1
+//-----------------------------------------------------------------------------
+
+template<class T>
+void CClientEntityList<T>::SetupBonesOnBaseAnimating(IEngineObjectClient*& pBaseAnimating)
+{
+	if (!pBaseAnimating->GetMoveParent())
+		pBaseAnimating->GetOuter()->SetupBones(NULL, -1, -1, gpGlobals->curtime);
+}
+
+template<class T>
+void CClientEntityList<T>::PreThreadedBoneSetup()
+{
+	mdlcache->BeginLock();
+}
+
+template<class T>
+void CClientEntityList<T>::PostThreadedBoneSetup()
+{
+	mdlcache->EndLock();
+}
+
+template<class T>
+void CClientEntityList<T>::ThreadedBoneSetup()
+{
+	g_bDoThreadedBoneSetup = cl_threaded_bone_setup.GetBool();
+	if (g_bDoThreadedBoneSetup)
+	{
+		int nCount = g_PreviousBoneSetups.Count();
+		if (nCount > 1)
+		{
+			g_bInThreadedBoneSetup = true;
+
+			ParallelProcess("C_BaseAnimating::ThreadedBoneSetup", g_PreviousBoneSetups.Base(), nCount, this, &CClientEntityList<T>::SetupBonesOnBaseAnimating, &CClientEntityList<T>::PreThreadedBoneSetup, &CClientEntityList<T>::PostThreadedBoneSetup);
+
+			g_bInThreadedBoneSetup = false;
+		}
+	}
+	g_iPreviousBoneCounter++;
+	g_PreviousBoneSetups.RemoveAll();
+}
+
+template<class T>
+void CClientEntityList<T>::InvalidateBoneCaches()
+{
+	g_iModelBoneCounter++;
 }
 
 //-----------------------------------------------------------------------------

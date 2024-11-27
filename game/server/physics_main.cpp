@@ -1528,7 +1528,7 @@ void CBaseEntity::StepSimulationThink( float dt )
 		// do any local processing that's needed
 		if (GetBaseAnimating() != NULL)
 		{
-			GetBaseAnimating()->UpdateStepOrigin();
+			GetBaseAnimating()->GetEngineObject()->UpdateStepOrigin();
 		}
 
 		// Latch new values to see if external code modifies our position/orientation

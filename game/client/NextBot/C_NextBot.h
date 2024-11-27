@@ -40,6 +40,7 @@ public:
 	virtual ~C_NextBotCombatCharacter();
 
 public:	
+	bool Init(int entnum, int iSerialNum);
 	virtual void Spawn( void );
 	virtual void UpdateClientSideAnimation( void );
 	virtual ShadowType_t ShadowCastType( void );

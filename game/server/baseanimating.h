@@ -102,8 +102,6 @@ public:
 	virtual void FixupBurningServerRagdoll(CBaseEntity* pRagdoll) {}
 	virtual	void GetSkeleton( IStudioHdr *pStudioHdr, Vector pos[], Quaternion q[], int boneMask );
 
-	virtual void GetBoneTransform( int iBone, matrix3x4_t &pBoneToWorld );
-	virtual void SetupBones( matrix3x4_t *pBoneToWorld, int boneMask );
 	virtual void CalculateIKLocks( float currentTime );
 	virtual void Teleport( const Vector *newPosition, const QAngle *newAngles, const Vector *newVelocity );
 
@@ -125,12 +123,7 @@ protected:
 
 public:
 
-	int  LookupBone( const char *szName );
-	void GetBonePosition( const char *szName, Vector &origin, QAngle &angles );
-	void GetBonePosition( int iBone, Vector &origin, QAngle &angles );
-	int	GetPhysicsBone( int boneIndex );
 
-	int GetNumBones ( void );
 
 	int  FindTransitionSequence( int iCurrentSequence, int iGoalSequence, int *piDir );
 	bool GotoSequence( int iCurrentSequence, float flCurrentCycle, float flCurrentRate,  int iGoalSequence, int &iNextSequence, float &flCycle, int &iDir );
@@ -204,18 +197,13 @@ public:
 	void ReportMissingActivity( int iActivity );
 	virtual bool TestCollision( const Ray_t &ray, unsigned int fContentsMask, trace_t& tr );
 	virtual bool TestHitboxes( const Ray_t &ray, unsigned int fContentsMask, trace_t& tr );
-	class CBoneCache *GetBoneCache( void );
-	void InvalidateBoneCache();
-	void InvalidateBoneCacheIfOlderThan( float deltaTime );
+	
 	virtual int DrawDebugTextOverlays( void );
 	
 	// See note in code re: bandwidth usage!!!
 	void				DrawServerHitboxes( float duration = 0.0f, bool monocolor = false );
-	void				DrawRawSkeleton( matrix3x4_t boneToWorld[], int boneMask, bool noDepthTest = true, float duration = 0.0f, bool monocolor = false );
 	
-	// also calculate IK on server? (always done on client)
-	void EnableServerIK();
-	void DisableServerIK();
+	
 
 	// for ragdoll vs. car
 	int GetHitboxesFrontside( int *boxList, int boxMax, const Vector &normal, float dist );
@@ -228,23 +216,8 @@ public:
 
 	void InputBecomeRagdoll(inputdata_t& inputdata);
 
-
-
-
-
-
-
-	void BuildMatricesWithBoneMerge( const IStudioHdr *pStudioHdr, const QAngle& angles, 
-		const Vector& origin, const Vector pos[MAXSTUDIOBONES],
-		const Quaternion q[MAXSTUDIOBONES], matrix3x4_t bonetoworld[MAXSTUDIOBONES],
-		CBaseAnimating *pParent, CBoneCache *pParentCache );
-
-
-	int		GetBoneCacheFlags( void ) { return m_fBoneCacheFlags; }
-	inline void	SetBoneCacheFlags( unsigned short fFlag ) { m_fBoneCacheFlags |= fFlag; }
-	inline void	ClearBoneCacheFlags( unsigned short fFlag ) { m_fBoneCacheFlags &= ~fFlag; }
-
 	bool PrefetchSequence( int iSequence );
+	bool CanSkipAnimation(void);
 
 private:
 
@@ -253,7 +226,6 @@ private:
 
 	void InputSetModelScale( inputdata_t &inputdata );
 
-	bool CanSkipAnimation( void );
 	void OnResetSequence(int nSequence);
 public:
 
@@ -267,8 +239,7 @@ public:
 
 
 
-  	CIKContext			*m_pIk;
-	int					m_iIKCounter;
+  	
 
 public:
 	//Vector	GetStepOrigin( void ) const;
@@ -285,15 +256,13 @@ private:
 
 
 
-	memhandle_t		m_boneCacheHandle;
-	unsigned short	m_fBoneCacheFlags;		// Used for bone cache state on model
+	
 
 protected:
 
 
 private:
 
-	CThreadFastMutex	m_BoneSetupMutex;
 
 // FIXME: necessary so that cyclers can hack m_bSequenceFinished
 friend class CFlexCycler;

@@ -102,7 +102,7 @@ void __MsgFunc_EntityPortalled(bf_read &msg)
 
 	Vector vecOldInterpolatedPos;
 	QAngle qaOldInterpolatedRot;
-	if ( pEntity->IsToolRecording() )
+	if ( pEntity->GetEngineObject()->IsToolRecording() )
 	{
 		vecOldInterpolatedPos = pEntity->GetEngineObject()->GetOriginInterpolator().GetCurrent();
 		qaOldInterpolatedRot = pEntity->GetEngineObject()->GetRotationInterpolator().GetCurrent();
@@ -141,7 +141,7 @@ void __MsgFunc_EntityPortalled(bf_read &msg)
 	if( bIsPlayer )
 		((C_Portal_Player *)pEntity)->PlayerPortalled( pPortal );
 
-	if ( pEntity->IsToolRecording() )
+	if ( pEntity->GetEngineObject()->IsToolRecording() )
 	{
 		static EntityTeleportedRecordingState_t state;
 
@@ -155,7 +155,7 @@ void __MsgFunc_EntityPortalled(bf_read &msg)
 
 		// Post a message back to all IToolSystems
 		Assert( (int)pEntity->GetToolHandle() != 0 );
-		ToolFramework_PostToolMessage( pEntity->GetToolHandle(), msg );
+		ToolFramework_PostToolMessage( pEntity->GetEngineObject()->GetToolHandle(), msg );
 
 		msg->deleteThis();
 	}
@@ -452,7 +452,7 @@ void C_Prop_Portal::Simulate()
 			// -jd
 			if ( ToolsEnabled() )
 			{
-				HTOOLHANDLE handle = pGhost ? pGhost->GetToolHandle() : (HTOOLHANDLE)0;
+				HTOOLHANDLE handle = pGhost ? pGhost->GetEngineObject()->GetToolHandle() : (HTOOLHANDLE)0;
 				if ( handle != (HTOOLHANDLE)0 )
 				{
 					if ( clienttools->IsInRecordingMode() )

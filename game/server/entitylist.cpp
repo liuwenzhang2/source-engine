@@ -45,6 +45,7 @@
 #include "in_buttons.h"
 #include "rope_shared.h"
 #include "rope_helpers.h"
+#include "bone_setup.h"
 
 #ifdef HL2_DLL
 #include "npc_playercompanion.h"
@@ -110,6 +111,7 @@ ConVar xbox_throttlebias("xbox_throttlebias", "100", FCVAR_ARCHIVE);
 ConVar xbox_throttlespoof("xbox_throttlespoof", "200", FCVAR_ARCHIVE);
 ConVar xbox_autothrottle("xbox_autothrottle", "1", FCVAR_ARCHIVE);
 ConVar xbox_steering_deadzone("xbox_steering_deadzone", "0.0");
+ConVar ai_setupbones_debug("ai_setupbones_debug", "0", 0, "Shows that bones that are setup every think");
 
 //-----------------------------------------------------------------------------
 // Portal-specific hack designed to eliminate re-entrancy in touch functions
@@ -326,6 +328,32 @@ class CThinkContextsSaveDataOps : public CDefSaveRestoreOps
 CThinkContextsSaveDataOps g_ThinkContextsSaveDataOps;
 ISaveRestoreOps* thinkcontextFuncs = &g_ThinkContextsSaveDataOps;
 
+class CIKSaveRestoreOps : public CClassPtrSaveRestoreOps
+{
+	// save data type interface
+	void Save(const SaveRestoreFieldInfo_t& fieldInfo, ISave* pSave)
+	{
+		Assert(fieldInfo.pTypeDesc->fieldSize == 1);
+		CIKContext** pIK = (CIKContext**)fieldInfo.pField;
+		bool bHasIK = (*pIK) != 0;
+		pSave->WriteBool(&bHasIK);
+	}
+
+	void Restore(const SaveRestoreFieldInfo_t& fieldInfo, IRestore* pRestore)
+	{
+		Assert(fieldInfo.pTypeDesc->fieldSize == 1);
+		CIKContext** pIK = (CIKContext**)fieldInfo.pField;
+
+		bool bHasIK;
+		pRestore->ReadBool(&bHasIK);
+		*pIK = (bHasIK) ? new CIKContext : NULL;
+	}
+};
+
+
+
+static CIKSaveRestoreOps s_IKSaveRestoreOp;
+
 BEGIN_SIMPLE_DATADESC(thinkfunc_t)
 	DEFINE_FIELD(m_iszContext, FIELD_STRING),
 	// DEFINE_FIELD( m_pfnThink,		FIELD_FUNCTION ),		// Manually written
@@ -436,6 +464,10 @@ BEGIN_DATADESC_NO_BASE(CEngineObjectInternal)
 	DEFINE_RAGDOLL_ELEMENT(22),
 	DEFINE_RAGDOLL_ELEMENT(23),
 	DEFINE_KEYFIELD(m_nRenderFX, FIELD_CHARACTER, "renderfx"),
+	DEFINE_FIELD(m_nOverlaySequence, FIELD_INTEGER),
+	DEFINE_CUSTOM_FIELD(m_pIk, &s_IKSaveRestoreOp),
+	DEFINE_FIELD(m_iIKCounter, FIELD_INTEGER),
+	DEFINE_FIELD(m_fBoneCacheFlags, FIELD_SHORT),
 
 END_DATADESC()
 
@@ -684,9 +716,11 @@ BEGIN_SEND_TABLE_NOBASE(CEngineObjectInternal, DT_EngineObject)
 	SendPropArray3(SENDINFO_ARRAY3(m_flEncodedController), SendPropFloat(SENDINFO_ARRAY(m_flEncodedController), 11, SPROP_ROUNDDOWN, 0.0f, 1.0f)),
 	SendPropInt(SENDINFO(m_bClientSideFrameReset), 1, SPROP_UNSIGNED),
 	SendPropDataTable("serveranimdata", 0, &REFERENCE_SEND_TABLE(DT_ServerAnimationData), SendProxy_ClientSideAnimationE),
+	SendPropInt(SENDINFO_NAME(m_ragdoll.listCount, m_ragdollListCount), 32, SPROP_UNSIGNED),
 	SendPropArray(SendPropQAngles(SENDINFO_ARRAY(m_ragAngles), 13, 0), m_ragAngles),
 	SendPropArray(SendPropVector(SENDINFO_ARRAY(m_ragPos), -1, SPROP_COORD), m_ragPos),
 	SendPropInt(SENDINFO(m_nRenderFX), 8, SPROP_UNSIGNED),
+	SendPropInt(SENDINFO(m_nOverlaySequence), 11),
 
 END_SEND_TABLE()
 
@@ -1350,6 +1384,7 @@ void CEngineObjectInternal::OnRestore()
 		// JAY: Reset collision relationships
 		RagdollSetupCollisions(m_ragdoll, modelinfo->GetVCollide(GetModelIndex()), GetModelIndex());
 	}
+	m_flEstIkFloor = GetLocalOrigin().z;
 	m_pOuter->OnRestore();
 	m_pOuter->NetworkStateChanged();
 }
@@ -4337,6 +4372,11 @@ void CEngineObjectInternal::SetModelPointer(const model_t* pModel)
 	if (m_pModel != pModel)
 	{
 		m_pModel = pModel;
+		if (m_boneCacheHandle)
+		{
+			Studio_DestroyBoneCache(m_boneCacheHandle);
+			m_boneCacheHandle = 0;
+		}
 		m_pOuter->OnNewModel();
 	}
 }
@@ -5345,6 +5385,486 @@ bool CEngineObjectInternal::IsRagdoll() const
 	return false;
 }
 
+//-----------------------------------------------------------------------------
+// Purpose: build matrices first from the parent, then from the passed in arrays if the bone doesn't exist on the parent
+//-----------------------------------------------------------------------------
+
+void CEngineObjectInternal::BuildMatricesWithBoneMerge(
+	const IStudioHdr* pStudioHdr,
+	const QAngle& angles,
+	const Vector& origin,
+	const Vector pos[MAXSTUDIOBONES],
+	const Quaternion q[MAXSTUDIOBONES],
+	matrix3x4_t bonetoworld[MAXSTUDIOBONES],
+	CBaseAnimating* pParent,
+	CBoneCache* pParentCache
+)
+{
+	IStudioHdr* fhdr = pParent->GetEngineObject()->GetModelPtr();
+	mstudiobone_t* pbones = pStudioHdr->pBone(0);
+
+	matrix3x4_t rotationmatrix; // model to world transformation
+	AngleMatrix(angles, origin, rotationmatrix);
+
+	for (int i = 0; i < pStudioHdr->numbones(); i++)
+	{
+		// Now find the bone in the parent entity.
+		bool merged = false;
+		int parentBoneIndex = fhdr->Studio_BoneIndexByName(pbones[i].pszName());
+		if (parentBoneIndex >= 0)
+		{
+			matrix3x4_t* pMat = pParentCache->GetCachedBone(parentBoneIndex);
+			if (pMat)
+			{
+				MatrixCopy(*pMat, bonetoworld[i]);
+				merged = true;
+			}
+		}
+
+		if (!merged)
+		{
+			// If we get down here, then the bone wasn't merged.
+			matrix3x4_t bonematrix;
+			QuaternionMatrix(q[i], pos[i], bonematrix);
+
+			if (pbones[i].parent == -1)
+			{
+				ConcatTransforms(rotationmatrix, bonematrix, bonetoworld[i]);
+			}
+			else
+			{
+				ConcatTransforms(bonetoworld[pbones[i].parent], bonematrix, bonetoworld[i]);
+			}
+		}
+	}
+}
+
+void CEngineObjectInternal::DrawRawSkeleton(matrix3x4_t boneToWorld[], int boneMask, bool noDepthTest, float duration, bool monocolor)
+{
+	IStudioHdr* pStudioHdr = GetModelPtr();
+	if (!pStudioHdr)
+		return;
+
+	int i;
+	int r = 255;
+	int g = 255;
+	int b = monocolor ? 255 : 0;
+
+
+	for (i = 0; i < pStudioHdr->numbones(); i++)
+	{
+		if (pStudioHdr->pBone(i)->flags & boneMask)
+		{
+			Vector p1;
+			MatrixPosition(boneToWorld[i], p1);
+			if (pStudioHdr->pBone(i)->parent != -1)
+			{
+				Vector p2;
+				MatrixPosition(boneToWorld[pStudioHdr->pBone(i)->parent], p2);
+				NDebugOverlay::Line(p1, p2, r, g, b, noDepthTest, duration);
+			}
+		}
+	}
+}
+
+void CEngineObjectInternal::SetupBones(matrix3x4_t* pBoneToWorld, int boneMask)
+{
+	// no ragdoll, fall through to base class 
+	if (RagdollBoneCount())
+	{
+		// Not really ideal, but it'll work for now
+		UpdateModelScale();
+
+		MDLCACHE_CRITICAL_SECTION();
+		IStudioHdr* pStudioHdr = GetModelPtr();
+		bool sim[MAXSTUDIOBONES];
+		memset(sim, 0, pStudioHdr->numbones());
+
+		int i;
+
+		CBoneAccessor boneaccessor(pBoneToWorld);
+		RagdollBone(sim, boneaccessor);
+
+		mstudiobone_t* pbones = pStudioHdr->pBone(0);
+		for (i = 0; i < pStudioHdr->numbones(); i++)
+		{
+			if (sim[i])
+				continue;
+
+			if (!(pStudioHdr->boneFlags(i) & boneMask))
+				continue;
+
+			matrix3x4_t matBoneLocal;
+			AngleMatrix(pbones[i].rot, pbones[i].pos, matBoneLocal);
+			ConcatTransforms(pBoneToWorld[pbones[i].parent], matBoneLocal, pBoneToWorld[i]);
+		}
+	}
+	else {
+
+		AUTO_LOCK(m_BoneSetupMutex);
+
+		VPROF_BUDGET("CBaseAnimating::SetupBones", VPROF_BUDGETGROUP_SERVER_ANIM);
+
+		MDLCACHE_CRITICAL_SECTION();
+
+		Assert(GetModelPtr());
+
+		IStudioHdr* pStudioHdr = GetModelPtr();
+
+		if (!pStudioHdr)
+		{
+			Assert(!"CBaseAnimating::GetSkeleton() without a model");
+			return;
+		}
+
+		Assert(!IsEFlagSet(EFL_SETTING_UP_BONES));
+
+		AddEFlags(EFL_SETTING_UP_BONES);
+
+		Vector pos[MAXSTUDIOBONES];
+		Quaternion q[MAXSTUDIOBONES];
+
+		// adjust hit boxes based on IK driven offset
+		Vector adjOrigin = GetAbsOrigin() + Vector(0, 0, m_flEstIkOffset);
+
+		if (m_pOuter->CanSkipAnimation())
+		{
+			IBoneSetup boneSetup(pStudioHdr, boneMask, GetPoseParameterArray());
+			boneSetup.InitPose(pos, q);
+			// Msg( "%.03f : %s:%s not in pvs\n", gpGlobals->curtime, GetClassname(), GetEntityName().ToCStr() );
+		}
+		else
+		{
+			if (m_pIk)
+			{
+				// FIXME: pass this into Studio_BuildMatrices to skip transforms
+				CBoneBitList boneComputed;
+				m_iIKCounter++;
+				m_pIk->Init(pStudioHdr, GetAbsAngles(), adjOrigin, gpGlobals->curtime, m_iIKCounter, boneMask);
+				m_pOuter->GetSkeleton(pStudioHdr, pos, q, boneMask);
+
+				m_pIk->UpdateTargets(pos, q, pBoneToWorld, boneComputed);
+				m_pOuter->CalculateIKLocks(gpGlobals->curtime);
+				m_pIk->SolveDependencies(pos, q, pBoneToWorld, boneComputed);
+			}
+			else
+			{
+				// Msg( "%.03f : %s:%s\n", gpGlobals->curtime, GetClassname(), GetEntityName().ToCStr() );
+				m_pOuter->GetSkeleton(pStudioHdr, pos, q, boneMask);
+			}
+		}
+
+		CBaseAnimating* pParent = GetMoveParent() ? dynamic_cast<CBaseAnimating*>(GetMoveParent()->GetOuter()) : NULL;
+		if (pParent)
+		{
+			// We're doing bone merging, so do special stuff here.
+			CBoneCache* pParentCache = pParent->GetEngineObject()->GetBoneCache();
+			if (pParentCache)
+			{
+				BuildMatricesWithBoneMerge(
+					pStudioHdr,
+					GetAbsAngles(),
+					adjOrigin,
+					pos,
+					q,
+					pBoneToWorld,
+					pParent,
+					pParentCache);
+
+				RemoveEFlags(EFL_SETTING_UP_BONES);
+				if (ai_setupbones_debug.GetBool())
+				{
+					DrawRawSkeleton(pBoneToWorld, boneMask, true, 0.11);
+				}
+				return;
+			}
+		}
+
+		pStudioHdr->Studio_BuildMatrices(
+			GetAbsAngles(),
+			adjOrigin,
+			pos,
+			q,
+			-1,
+			GetModelScale(), // Scaling
+			pBoneToWorld,
+			boneMask);
+
+		if (ai_setupbones_debug.GetBool())
+		{
+			// Msg("%s:%s:%s (%x)\n", GetClassname(), GetDebugName(), STRING(GetModelName()), boneMask );
+			DrawRawSkeleton(pBoneToWorld, boneMask, true, 0.11);
+		}
+		RemoveEFlags(EFL_SETTING_UP_BONES);
+	}
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: return the index to the shared bone cache
+// Output :
+//-----------------------------------------------------------------------------
+CBoneCache* CEngineObjectInternal::GetBoneCache(void)
+{
+	IStudioHdr* pStudioHdr = GetModelPtr();
+	Assert(pStudioHdr);
+
+	CBoneCache* pcache = Studio_GetBoneCache(m_boneCacheHandle);
+	int boneMask = BONE_USED_BY_HITBOX | BONE_USED_BY_ATTACHMENT;
+
+	// TF queries these bones to position weapons when players are killed
+#if defined( TF_DLL )
+	boneMask |= BONE_USED_BY_BONE_MERGE;
+#endif
+	if (pcache)
+	{
+		if (pcache->IsValid(gpGlobals->curtime) && (pcache->m_boneMask & boneMask) == boneMask && pcache->m_timeValid <= gpGlobals->curtime)
+		{
+			// Msg("%s:%s:%s (%x:%x:%8.4f) cache\n", GetClassname(), GetDebugName(), STRING(GetModelName()), boneMask, pcache->m_boneMask, pcache->m_timeValid );
+			// in memory and still valid, use it!
+			return pcache;
+		}
+		// in memory, but missing some of the bone masks
+		if ((pcache->m_boneMask & boneMask) != boneMask)
+		{
+			Studio_DestroyBoneCache(m_boneCacheHandle);
+			m_boneCacheHandle = 0;
+			pcache = NULL;
+		}
+	}
+
+	matrix3x4_t bonetoworld[MAXSTUDIOBONES];
+	SetupBones(bonetoworld, boneMask);
+
+	if (pcache)
+	{
+		// still in memory but out of date, refresh the bones.
+		pcache->UpdateBones(bonetoworld, pStudioHdr->numbones(), gpGlobals->curtime);
+	}
+	else
+	{
+		bonecacheparams_t params;
+		params.pStudioHdr = pStudioHdr;
+		params.pBoneToWorld = bonetoworld;
+		params.curtime = gpGlobals->curtime;
+		params.boneMask = boneMask;
+
+		m_boneCacheHandle = Studio_CreateBoneCache(params);
+		pcache = Studio_GetBoneCache(m_boneCacheHandle);
+	}
+	Assert(pcache);
+	return pcache;
+}
+
+
+void CEngineObjectInternal::InvalidateBoneCache(void)
+{
+	Studio_InvalidateBoneCache(m_boneCacheHandle);
+}
+
+void CEngineObjectInternal::InvalidateBoneCacheIfOlderThan(float deltaTime)
+{
+	CBoneCache* pcache = Studio_GetBoneCache(m_boneCacheHandle);
+	if (!pcache || !pcache->IsValid(gpGlobals->curtime, deltaTime))
+	{
+		InvalidateBoneCache();
+	}
+}
+
+//=========================================================
+//=========================================================
+
+void CEngineObjectInternal::GetBoneTransform(int iBone, matrix3x4_t& pBoneToWorld)
+{
+	IStudioHdr* pStudioHdr = GetModelPtr();
+
+	if (!pStudioHdr)
+	{
+		Assert(!"CBaseAnimating::GetBoneTransform: model missing");
+		return;
+	}
+
+	if (iBone < 0 || iBone >= pStudioHdr->numbones())
+	{
+		Assert(!"CBaseAnimating::GetBoneTransform: invalid bone index");
+		return;
+	}
+
+	CBoneCache* pcache = GetBoneCache();
+
+	matrix3x4_t* pmatrix = pcache->GetCachedBone(iBone);
+
+	if (!pmatrix)
+	{
+		MatrixCopy(EntityToWorldTransform(), pBoneToWorld);
+		return;
+	}
+
+	Assert(pmatrix);
+
+	// FIXME
+	MatrixCopy(*pmatrix, pBoneToWorld);
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: Returns index number of a given named bone
+// Input  : name of a bone
+// Output :	Bone index number or -1 if bone not found
+//-----------------------------------------------------------------------------
+int CEngineObjectInternal::LookupBone(const char* szName)
+{
+	const IStudioHdr* pStudioHdr = GetModelPtr();
+	Assert(pStudioHdr);
+	if (!pStudioHdr)
+		return -1;
+	return pStudioHdr->Studio_BoneIndexByName(szName);
+}
+
+
+//=========================================================
+//=========================================================
+void CEngineObjectInternal::GetBonePosition(int iBone, Vector& origin, QAngle& angles)
+{
+	IStudioHdr* pStudioHdr = GetModelPtr();
+	if (!pStudioHdr)
+	{
+		Assert(!"CBaseAnimating::GetBonePosition: model missing");
+		return;
+	}
+
+	if (iBone < 0 || iBone >= pStudioHdr->numbones())
+	{
+		Assert(!"CBaseAnimating::GetBonePosition: invalid bone index");
+		return;
+	}
+
+	matrix3x4_t bonetoworld;
+	GetBoneTransform(iBone, bonetoworld);
+
+	MatrixAngles(bonetoworld, angles, origin);
+}
+
+int CEngineObjectInternal::GetPhysicsBone(int boneIndex)
+{
+	IStudioHdr* pStudioHdr = GetModelPtr();
+	if (pStudioHdr)
+	{
+		if (boneIndex >= 0 && boneIndex < pStudioHdr->numbones())
+			return pStudioHdr->pBone(boneIndex)->physicsbone;
+	}
+	return 0;
+}
+
+//=========================================================
+//=========================================================
+int CEngineObjectInternal::GetNumBones(void)
+{
+	IStudioHdr* pStudioHdr = GetModelPtr();
+	if (pStudioHdr)
+	{
+		return pStudioHdr->numbones();
+	}
+	else
+	{
+		Assert(!"CBaseAnimating::GetNumBones: model missing");
+		return 0;
+	}
+}
+
+void CEngineObjectInternal::EnableServerIK()
+{
+	if (!m_pIk)
+	{
+		m_pIk = new CIKContext;
+		m_iIKCounter = 0;
+	}
+}
+
+void CEngineObjectInternal::DisableServerIK()
+{
+	delete m_pIk;
+	m_pIk = NULL;
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: Receives the clients IK floor position
+//-----------------------------------------------------------------------------
+
+void CEngineObjectInternal::SetIKGroundContactInfo(float minHeight, float maxHeight)
+{
+	m_flIKGroundContactTime = gpGlobals->curtime;
+	m_flIKGroundMinHeight = minHeight;
+	m_flIKGroundMaxHeight = maxHeight;
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: Initializes IK floor position
+//-----------------------------------------------------------------------------
+
+void CEngineObjectInternal::InitStepHeightAdjust(void)
+{
+	m_flIKGroundContactTime = 0;
+	m_flIKGroundMinHeight = 0;
+	m_flIKGroundMaxHeight = 0;
+
+	// FIXME: not safe to call GetAbsOrigin here. Hierarchy might not be set up!
+	m_flEstIkFloor = GetAbsOrigin().z;
+	m_flEstIkOffset = 0;
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: Interpolates client IK floor position and drops entity down so that the feet will reach
+//-----------------------------------------------------------------------------
+
+ConVar npc_height_adjust("npc_height_adjust", "1", FCVAR_ARCHIVE, "Enable test mode for ik height adjustment");
+
+void CEngineObjectInternal::UpdateStepOrigin()
+{
+	if (!npc_height_adjust.GetBool())
+	{
+		m_flEstIkOffset = 0;
+		m_flEstIkFloor = GetLocalOrigin().z;
+		return;
+	}
+
+	/*
+	if (m_debugOverlays & OVERLAY_NPC_SELECTED_BIT)
+	{
+		Msg("%x : %x\n", GetMoveParent(), GetGroundEntity() );
+	}
+	*/
+
+	if (m_flIKGroundContactTime > 0.2 && m_flIKGroundContactTime > gpGlobals->curtime - 0.2)
+	{
+		if ((GetFlags() & (FL_FLY | FL_SWIM)) == 0 && GetMoveParent() == NULL && GetGroundEntity() != NULL && !GetGroundEntity()->GetOuter()->IsMoving())
+		{
+			Vector toAbs = GetAbsOrigin() - GetLocalOrigin();
+			if (toAbs.z == 0.0)
+			{
+				CAI_BaseNPC* pNPC = m_pOuter->MyNPCPointer();
+				// FIXME:  There needs to be a default step height somewhere
+				float height = 18.0f;
+				if (pNPC)
+				{
+					height = pNPC->StepHeight();
+				}
+
+				// debounce floor location
+				m_flEstIkFloor = m_flEstIkFloor * 0.2 + m_flIKGroundMinHeight * 0.8;
+
+				// don't let heigth difference between min and max exceed step height
+				float bias = clamp((m_flIKGroundMaxHeight - m_flIKGroundMinHeight) - height, 0.f, height);
+				// save off reasonable offset
+				m_flEstIkOffset = clamp(m_flEstIkFloor - GetAbsOrigin().z, -height + bias, 0.0f);
+				return;
+			}
+		}
+	}
+
+	// don't use floor offset, decay the value
+	m_flEstIkOffset *= 0.5;
+	m_flEstIkFloor = GetLocalOrigin().z;
+}
+
 void CEnginePlayerInternal::VPhysicsDestroyObject()
 {
 	// Since CBasePlayer aliases its pointer to the physics object, tell CBaseEntity to 
@@ -5755,7 +6275,7 @@ bool CEnginePortalInternal::EntityHitBoxExtentIsInPortalHole(IEngineObjectServer
 	{
 		mstudiobbox_t* pbox = set->pHitbox(i);
 
-		pBaseAnimating->GetOuter()->GetBonePosition(pbox->bone, position, angles);
+		pBaseAnimating->GetBonePosition(pbox->bone, position, angles);
 
 		// Build a rotation matrix from orientation
 		matrix3x4_t fRotateMatrix;
@@ -8223,7 +8743,7 @@ void CEngineVehicleInternal::InitializePoseParameters()
 	SetPoseParameter(m_poseParameters[VEH_FR_WHEEL_HEIGHT], 0);
 	SetPoseParameter(m_poseParameters[VEH_RL_WHEEL_HEIGHT], 0);
 	SetPoseParameter(m_poseParameters[VEH_RR_WHEEL_HEIGHT], 0);
-	m_pOuter->InvalidateBoneCache();
+	InvalidateBoneCache();
 }
 
 //-----------------------------------------------------------------------------
@@ -8264,7 +8784,7 @@ void CEngineVehicleInternal::CalcWheelData(vehicleparams_t& vehicle)
 	SetPoseParameter(m_poseParameters[VEH_FR_WHEEL_HEIGHT], 0);
 	SetPoseParameter(m_poseParameters[VEH_RL_WHEEL_HEIGHT], 0);
 	SetPoseParameter(m_poseParameters[VEH_RR_WHEEL_HEIGHT], 0);
-	m_pOuter->InvalidateBoneCache();
+	InvalidateBoneCache();
 	if (m_pOuter->GetAttachment("wheel_fl", left, dummy) && m_pOuter->GetAttachment("wheel_fr", right, dummy))
 	{
 		VectorITransform(left, m_pOuter->GetEngineObject()->EntityToWorldTransform(), left);
@@ -8292,7 +8812,7 @@ void CEngineVehicleInternal::CalcWheelData(vehicleparams_t& vehicle)
 	SetPoseParameter(m_poseParameters[VEH_FR_WHEEL_HEIGHT], 1);
 	SetPoseParameter(m_poseParameters[VEH_RL_WHEEL_HEIGHT], 1);
 	SetPoseParameter(m_poseParameters[VEH_RR_WHEEL_HEIGHT], 1);
-	m_pOuter->InvalidateBoneCache();
+	InvalidateBoneCache();
 	if (m_pOuter->GetAttachment("wheel_fl", left, dummy) && m_pOuter->GetAttachment("wheel_fr", right, dummy))
 	{
 		VectorITransform(left, m_pOuter->GetEngineObject()->EntityToWorldTransform(), left);
@@ -8325,7 +8845,7 @@ void CEngineVehicleInternal::CalcWheelData(vehicleparams_t& vehicle)
 	SetPoseParameter(m_poseParameters[VEH_FR_WHEEL_HEIGHT], 0);
 	SetPoseParameter(m_poseParameters[VEH_RL_WHEEL_HEIGHT], 0);
 	SetPoseParameter(m_poseParameters[VEH_RR_WHEEL_HEIGHT], 0);
-	m_pOuter->InvalidateBoneCache();
+	InvalidateBoneCache();
 
 	// Get raytrace offsets if they exist.
 	if (m_pOuter->GetAttachment("raytrace_fl", left, dummy) && m_pOuter->GetAttachment("raytrace_fr", right, dummy))

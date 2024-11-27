@@ -178,7 +178,7 @@ public:
 	virtual void Update( float eyeYaw, float eyePitch );
 	virtual void Release( void );
 
-	const QAngle &GetRenderAngles();
+	//const QAngle &GetRenderAngles();
 
 	virtual Activity TranslateActivity( Activity actDesired );
 
@@ -284,7 +284,7 @@ protected:
 
 	CBasePlayer	*m_pPlayer;
 
-	QAngle				m_angRender;
+	//QAngle				m_angRender;
 
 	// Pose parameters.
 	bool						m_bPoseParameterInit;

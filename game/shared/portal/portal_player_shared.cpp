@@ -496,7 +496,7 @@ CPlayerAnimState::CPlayerAnimState( CPortal_Player *outer )
 //-----------------------------------------------------------------------------
 void CPlayerAnimState::Update()
 {
-	m_angRender = GetOuter()->GetLocalAngles();
+	//m_angRender = GetOuter()->GetLocalAngles();
 
 	ComputePoseParam_BodyYaw();
 	ComputePoseParam_BodyPitch( GetOuter()->GetModelPtr() );
@@ -663,7 +663,7 @@ void CPlayerAnimState::ComputePoseParam_BodyPitch( IStudioHdr *pStudioHdr )
 
 	QAngle absangles = GetOuter()->GetAbsAngles();
 	absangles.x = 0.0f;
-	m_angRender = absangles;
+	//m_angRender = absangles;
 
 	// See if we have a blender for pitch
 	GetOuter()->SetPoseParameter( pStudioHdr, "aim_pitch", -flPitch );
@@ -723,7 +723,7 @@ void CPlayerAnimState::ComputePoseParam_BodyLookYaw( void )
 {
 	QAngle absangles = GetOuter()->GetAbsAngles();
 	absangles.y = AngleNormalize( absangles.y );
-	m_angRender = absangles;
+	//m_angRender = absangles;
 
 	// See if we even have a blender for pitch
 	int upper_body_yaw = GetOuter()->LookupPoseParameter( "aim_yaw" );
@@ -846,7 +846,7 @@ void CPlayerAnimState::ComputePoseParam_BodyLookYaw( void )
 	// Rotate entire body into position
 	absangles = GetOuter()->GetAbsAngles();
 	absangles.y = m_flCurrentFeetYaw;
-	m_angRender = absangles;
+	//m_angRender = absangles;
 
 	GetOuter()->SetPoseParameter( upper_body_yaw, clamp( m_flCurrentTorsoYaw, -60.0f, 60.0f ) );
 
@@ -896,10 +896,10 @@ Activity CPlayerAnimState::BodyYawTranslateActivity( Activity activity )
 	return activity;
 }
 
-const QAngle& CPlayerAnimState::GetRenderAngles()
-{
-	return m_angRender;
-}
+//const QAngle& CPlayerAnimState::GetRenderAngles()
+//{
+//	return m_angRender;
+//}
 
 //-----------------------------------------------------------------------------
 //
@@ -910,7 +910,7 @@ void CPlayerAnimState::Teleport( Vector *pOldOrigin, QAngle *pOldAngles )
 	absangles.x = 0.0f;
 	m_angRender = absangles;
 
-	m_flCurrentFeetYaw = m_flGoalFeetYaw = m_flLastYaw = m_angRender.y;
+	//m_flCurrentFeetYaw = m_flGoalFeetYaw = m_flLastYaw = m_angRender.y;
 	m_flLastTurnTime = 0.0f;
 	m_nTurningInPlace = TURN_NONE;
 }

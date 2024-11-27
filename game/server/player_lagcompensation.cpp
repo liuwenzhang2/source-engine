@@ -708,7 +708,7 @@ void CLagCompensationManager::BacktrackPlayer( CBasePlayer *pPlayer, float flTar
 		return; // we didn't change anything
 
 	if ( sv_lagflushbonecache.GetBool() )
-		pPlayer->InvalidateBoneCache();
+		pPlayer->GetEngineObject()->InvalidateBoneCache();
 
 	/*char text[256]; Q_snprintf( text, sizeof(text), "time %.2f", flTargetTime );
 	pPlayer->DrawServerHitboxes( 10 );

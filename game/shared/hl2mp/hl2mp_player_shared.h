@@ -50,7 +50,7 @@ public:
 
 	void				Update();
 
-	const QAngle&		GetRenderAngles();
+	//const QAngle&		GetRenderAngles();
 				
 	void				GetPoseParameters( IStudioHdr *pStudioHdr, float poseParameter[MAXSTUDIOPOSEPARAM] );
 
@@ -89,7 +89,7 @@ private:
 	// One of the above enums
 	int					m_nTurningInPlace;
 
-	QAngle				m_angRender;
+	//QAngle				m_angRender;
 
 	float				m_flTurnCorrectionTime;
 };

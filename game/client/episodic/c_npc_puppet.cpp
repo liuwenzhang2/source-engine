@@ -21,7 +21,7 @@ public:
 
 	virtual void	ClientThink( void );
 	virtual void	OnDataChanged( DataUpdateType_t updateType );
-	virtual void	BuildTransformations( IStudioHdr *pStudioHdr, Vector *pos, Quaternion q[], const matrix3x4_t& cameraTransform, int boneMask, CBoneBitList &boneComputed );
+	virtual void	BeforeBuildTransformations( IStudioHdr *pStudioHdr, Vector *pos, Quaternion q[], const matrix3x4_t& cameraTransform, int boneMask, CBoneBitList &boneComputed );
 	virtual	void	AccumulateLayers( IBoneSetup &boneSetup, Vector pos[], Quaternion q[], float currentTime );
 
 	EHANDLE		m_hAnimationTarget;
@@ -51,7 +51,7 @@ void C_NPC_Puppet::OnDataChanged( DataUpdateType_t updateType )
 //-----------------------------------------------------------------------------
 // Purpose: We need to slam our position!
 //-----------------------------------------------------------------------------
-void C_NPC_Puppet::BuildTransformations( IStudioHdr *pStudioHdr, Vector *pos, Quaternion q[], const matrix3x4_t& cameraTransform, int boneMask, CBoneBitList &boneComputed )
+void C_NPC_Puppet::BeforeBuildTransformations( IStudioHdr *pStudioHdr, Vector *pos, Quaternion q[], const matrix3x4_t& cameraTransform, int boneMask, CBoneBitList &boneComputed )
 {
 	if ( m_hAnimationTarget && m_nTargetAttachment != -1 )
 	{
@@ -61,14 +61,14 @@ void C_NPC_Puppet::BuildTransformations( IStudioHdr *pStudioHdr, Vector *pos, Qu
 			matrix3x4_t matTarget;
 			pTarget->GetAttachment( m_nTargetAttachment, matTarget );
 
-			MatrixCopy( matTarget, GetBoneForWrite( 0 ) );
+			MatrixCopy( matTarget, GetEngineObject()->GetBoneForWrite( 0 ) );
 			boneComputed.ClearAll(); // FIXME: Why is this calculated already?
 			boneComputed.MarkBone( 0 );
 		}
 	}
 
 	// Call the baseclass
-	BaseClass::BuildTransformations( pStudioHdr, pos, q, cameraTransform, boneMask, boneComputed );
+	//BaseClass::BuildTransformations( pStudioHdr, pos, q, cameraTransform, boneMask, boneComputed );
 }
 
 //-----------------------------------------------------------------------------

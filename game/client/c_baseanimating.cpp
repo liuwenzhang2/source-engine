@@ -64,7 +64,6 @@
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
-static ConVar cl_SetupAllBones( "cl_SetupAllBones", "0" );
 ConVar r_sequence_debug( "r_sequence_debug", "" );
 
 // If an NPC is moving faster than this, he should play the running footstep sound
@@ -492,15 +491,6 @@ void C_ClientRagdoll::ClientThink( void )
 	FadeOut();
 }
 
-//-----------------------------------------------------------------------------
-// Purpose: clear out any face/eye values stored in the material system
-//-----------------------------------------------------------------------------
-float C_ClientRagdoll::LastBoneChangedTime()
-{
-	// When did this last change?
-	return GetEngineObject()->RagdollBoneCount() ? GetEngineObject()->GetLastVPhysicsUpdateTime() : -FLT_MAX;
-}
-
 
 //-----------------------------------------------------------------------------
 // Purpose: clear out any face/eye values stored in the material system
@@ -554,25 +544,15 @@ void C_ClientRagdoll::Release( void )
 	BaseClass::Release();
 }
 
-//-----------------------------------------------------------------------------
-// Incremented each frame in InvalidateModelBones. Models compare this value to what it
-// was last time they setup their bones to determine if they need to re-setup their bones.
-static unsigned long	g_iModelBoneCounter = 0;
-CUtlVector<C_BaseAnimating *> g_PreviousBoneSetups;
-static unsigned long	g_iPreviousBoneCounter = (unsigned)-1;
 
-class C_BaseAnimatingGameSystem : public CAutoGameSystem
-{
-	void LevelShutdownPostEntity()
-	{
-		g_iPreviousBoneCounter = (unsigned)-1;
-		if ( g_PreviousBoneSetups.Count() != 0 )
-		{
-			Msg( "%d entities in bone setup array. Should have been cleaned up by now\n", g_PreviousBoneSetups.Count() );
-			g_PreviousBoneSetups.RemoveAll();
-		}
-	}
-} g_BaseAnimatingGameSystem;
+
+//class C_BaseAnimatingGameSystem : public CAutoGameSystem
+//{
+//	void LevelShutdownPostEntity()
+//	{
+//
+//	}
+//} g_BaseAnimatingGameSystem;
 
 
 //-----------------------------------------------------------------------------
@@ -581,49 +561,17 @@ class C_BaseAnimatingGameSystem : public CAutoGameSystem
 C_BaseAnimating::C_BaseAnimating()
 {
 	m_ClientSideAnimationListHandle = INVALID_CLIENTSIDEANIMATION_LIST_HANDLE;
-
-
-	//m_pRagdoll		= NULL;
-	m_hitboxBoneCacheHandle = 0;
-
-
-
-	//AddBaseAnimatingInterpolatedVars();
-
-	m_iMostRecentModelBoneCounter = 0xFFFFFFFF;
-	m_iMostRecentBoneSetupRequest = g_iPreviousBoneCounter - 1;
-	m_flLastBoneSetupTime = -FLT_MAX;
-
-	
-	m_pJiggleBones = NULL;
-	m_pBoneMergeCache = NULL;
-
-
 	m_nEventSequence = -1;
-
-	m_pIk = NULL;
-
-
-
 	m_nPrevResetEventsParity = -1;
-
-
-
 	m_iEyeAttachment = 0;
 #ifdef _XBOX
 	m_iAccumulatedBoneMask = 0;
 #endif
-
-
-
 	m_boneIndexAttached = -1;
-
 	m_pAttachedTo = NULL;
-
 	//m_bDynamicModelAllowed = false;
 	//m_bDynamicModelPending = false;
 	//m_bResetSequenceInfoOnLoad = false;
-
 
 }
 
@@ -642,16 +590,8 @@ void C_BaseAnimating::UpdateOnRemove(void)
 //-----------------------------------------------------------------------------
 C_BaseAnimating::~C_BaseAnimating()
 {
-	int i = g_PreviousBoneSetups.Find( this );
-	if ( i != -1 )
-		g_PreviousBoneSetups.FastRemove( i );
-
 	TermRopes();
 	//Assert(!m_pRagdoll);
-	delete m_pIk;
-	delete m_pBoneMergeCache;
-	Studio_DestroyBoneCache( m_hitboxBoneCacheHandle );
-	delete m_pJiggleBones;
 
 	// Kill off anything bone attached to us.
 	DestroyBoneAttachments();
@@ -668,8 +608,6 @@ bool C_BaseAnimating::UsesPowerOfTwoFrameBufferTexture( void )
 {
 	return modelinfo->IsUsingFBTexture( GetModel(), GetSkin(), GetBody(), GetClientRenderable() );
 }
-
-
 
 
 //-----------------------------------------------------------------------------
@@ -743,12 +681,6 @@ IStudioHdr *C_BaseAnimating::OnNewModel()
 	// remove transition animations playback
 	m_SequenceTransitioner.RemoveAll();
 
-	if (m_pJiggleBones)
-	{
-		delete m_pJiggleBones;
-		m_pJiggleBones = NULL;
-	}
-
 	//if ( m_bDynamicModelPending )
 	//{
 	//	modelinfo->UnregisterModelLoadCallback( -1, this );
@@ -788,35 +720,6 @@ IStudioHdr *C_BaseAnimating::OnNewModel()
 	IStudioHdr *hdr = GetEngineObject()->GetModelPtr();
 	if (hdr == NULL)
 		return NULL;
-
-	InvalidateBoneCache();
-	if ( m_pBoneMergeCache )
-	{
-		delete m_pBoneMergeCache;
-		m_pBoneMergeCache = NULL;
-		// recreated in BuildTransformations
-	}
-
-	Studio_DestroyBoneCache( m_hitboxBoneCacheHandle );
-	m_hitboxBoneCacheHandle = 0;
-
-	// Make sure m_CachedBones has space.
-	if ( m_CachedBoneData.Count() != hdr->numbones() )
-	{
-		m_CachedBoneData.SetSize( hdr->numbones() );
-		for ( int i=0; i < hdr->numbones(); i++ )
-		{
-			SetIdentityMatrix( m_CachedBoneData[i] );
-		}
-	}
-	m_BoneAccessor.Init( this, m_CachedBoneData.Base() ); // Always call this in case the IStudioHdr has changed.
-
-	// Free any IK data
-	if (m_pIk)
-	{
-		delete m_pIk;
-		m_pIk = NULL;
-	}
 
 	// Don't reallocate unless a different size. 
 	if ( m_Attachments.Count() != hdr->GetNumAttachments() )
@@ -879,46 +782,7 @@ IStudioHdr *C_BaseAnimating::OnNewModel()
 	return hdr;
 }
 
-//-----------------------------------------------------------------------------
-// Purpose: Returns index number of a given named bone
-// Input  : name of a bone
-// Output :	Bone index number or -1 if bone not found
-//-----------------------------------------------------------------------------
-int C_BaseAnimating::LookupBone( const char *szName )
-{
-	Assert(GetEngineObject()->GetModelPtr() );
 
-	return  GetEngineObject()->GetModelPtr()->Studio_BoneIndexByName( szName );
-}
-
-//=========================================================
-//=========================================================
-void C_BaseAnimating::GetBonePosition ( int iBone, Vector &origin, QAngle &angles )
-{
-	matrix3x4_t bonetoworld;
-	GetBoneTransform( iBone, bonetoworld );
-	
-	MatrixAngles( bonetoworld, angles, origin );
-}
-
-void C_BaseAnimating::GetBoneTransform( int iBone, matrix3x4_t &pBoneToWorld )
-{
-	Assert(GetEngineObject()->GetModelPtr() && iBone >= 0 && iBone < GetEngineObject()->GetModelPtr()->numbones() );
-	CBoneCache *pcache = GetBoneCache( NULL );
-
-	matrix3x4_t *pmatrix = pcache->GetCachedBone( iBone );
-
-	if ( !pmatrix )
-	{
-		MatrixCopy(GetEngineObject()->EntityToWorldTransform(), pBoneToWorld );
-		return;
-	}
-
-	Assert( pmatrix );
-	
-	// FIXME
-	MatrixCopy( *pmatrix, pBoneToWorld );
-}
 //=============================================================================
 // HPE_BEGIN:
 // [menglish] Finds the bone associated with the given hitbox
@@ -1068,154 +932,6 @@ float C_BaseAnimating::ClampCycle( float flCycle, bool isLooping )
 }
 
 
-void C_BaseAnimating::GetCachedBoneMatrix( int boneIndex, matrix3x4_t &out )
-{
-	MatrixCopy( GetBone( boneIndex ), out );
-}
-
-
-//-----------------------------------------------------------------------------
-// Purpose:	move position and rotation transforms into global matrices
-//-----------------------------------------------------------------------------
-void C_BaseAnimating::BuildTransformations( IStudioHdr *hdr, Vector *pos, Quaternion *q, const matrix3x4_t &cameraTransform, int boneMask, CBoneBitList &boneComputed )
-{
-	VPROF_BUDGET( "C_BaseAnimating::BuildTransformations", VPROF_BUDGETGROUP_CLIENT_ANIMATION );
-
-	if ( !hdr )
-		return;
-
-	matrix3x4_t bonematrix;
-	bool boneSimulated[MAXSTUDIOBONES];
-
-	// no bones have been simulated
-	memset( boneSimulated, 0, sizeof(boneSimulated) );
-	mstudiobone_t *pbones = hdr->pBone( 0 );
-
-	if (GetEngineObject()->RagdollBoneCount())
-	{
-		// simulate bones and update flags
-		int oldWritableBones = m_BoneAccessor.GetWritableBones();
-		int oldReadableBones = m_BoneAccessor.GetReadableBones();
-		m_BoneAccessor.SetWritableBones( BONE_USED_BY_ANYTHING );
-		m_BoneAccessor.SetReadableBones( BONE_USED_BY_ANYTHING );
-		
-#if defined( REPLAY_ENABLED )
-		// If we're playing back a demo, override the ragdoll bones with cached version if available - otherwise, simulate.
-		if ( ( !engine->IsPlayingDemo() && !engine->IsPlayingTimeDemo() ) ||
-			 !CReplayRagdollCache::Instance().IsInitialized() ||
-			 !CReplayRagdollCache::Instance().GetFrame( this, engine->GetDemoPlaybackTick(), boneSimulated, &m_BoneAccessor ) )
-#endif
-		{
-			GetEngineObject()->RagdollBone( this, pbones, hdr->numbones(), boneSimulated, m_BoneAccessor );
-		}
-		
-		m_BoneAccessor.SetWritableBones( oldWritableBones );
-		m_BoneAccessor.SetReadableBones( oldReadableBones );
-	}
-
-	// For EF_BONEMERGE entities, copy the bone matrices for any bones that have matching names.
-	bool boneMerge = GetEngineObject()->IsEffectActive(EF_BONEMERGE);
-	if ( boneMerge || m_pBoneMergeCache )
-	{
-		if ( boneMerge )
-		{
-			if ( !m_pBoneMergeCache )
-			{
-				m_pBoneMergeCache = new CBoneMergeCache;
-				m_pBoneMergeCache->Init( this );
-			}
-			m_pBoneMergeCache->MergeMatchingBones( boneMask );
-		}
-		else
-		{
-			delete m_pBoneMergeCache;
-			m_pBoneMergeCache = NULL;
-		}
-	}
-
-	for (int i = 0; i < hdr->numbones(); i++) 
-	{
-		// Only update bones reference by the bone mask.
-		if ( !( hdr->boneFlags( i ) & boneMask ) )
-		{
-			continue;
-		}
-
-		if ( m_pBoneMergeCache && m_pBoneMergeCache->IsBoneMerged( i ) )
-			continue;
-
-		// animate all non-simulated bones
-		if ( boneSimulated[i] || hdr->CalcProceduralBone( i, &m_BoneAccessor ))
-		{
-			continue;
-		}
-		// skip bones that the IK has already setup
-		else if (boneComputed.IsBoneMarked( i ))
-		{
-			// dummy operation, just used to verify in debug that this should have happened
-			GetBoneForWrite( i );
-		}
-		else
-		{
-			QuaternionMatrix( q[i], pos[i], bonematrix );
-
-			Assert( fabs( pos[i].x ) < 100000 );
-			Assert( fabs( pos[i].y ) < 100000 );
-			Assert( fabs( pos[i].z ) < 100000 );
-
-			if ( (hdr->boneFlags( i ) & BONE_ALWAYS_PROCEDURAL) && 
-				 (hdr->pBone( i )->proctype & STUDIO_PROC_JIGGLE) )
-			{
-				//
-				// Physics-based "jiggle" bone
-				// Bone is assumed to be along the Z axis
-				// Pitch around X, yaw around Y
-				//
-
-				// compute desired bone orientation
-				matrix3x4_t goalMX;
-
-				if (pbones[i].parent == -1) 
-				{
-					ConcatTransforms( cameraTransform, bonematrix, goalMX );
-				} 
-				else 
-				{
-					ConcatTransforms( GetBone( pbones[i].parent ), bonematrix, goalMX );
-				}
-
-				// get jiggle properties from QC data
-				mstudiojigglebone_t *jiggleInfo = (mstudiojigglebone_t *)pbones[i].pProcedure( );
-
-				if (!m_pJiggleBones)
-				{
-					m_pJiggleBones = new CJiggleBones;
-				}
-
-				// do jiggle physics
-				m_pJiggleBones->BuildJiggleTransformations( i, gpGlobals->realtime, jiggleInfo, goalMX, GetBoneForWrite( i ) );
-
-			}
-			else if (hdr->boneParent(i) == -1) 
-			{
-				ConcatTransforms( cameraTransform, bonematrix, GetBoneForWrite( i ) );
-			} 
-			else 
-			{
-				ConcatTransforms( GetBone( hdr->boneParent(i) ), bonematrix, GetBoneForWrite( i ) );
-			}
-		}
-
-		if (hdr->boneParent(i) == -1) 
-		{
-			// Apply client-side effects to the transformation matrix
-			ApplyBoneMatrixTransform( GetBoneForWrite( i ) );
-		}
-	}
-	
-	
-}
-
 //-----------------------------------------------------------------------------
 // Purpose: Special effects
 // Input  : transform - 
@@ -1343,7 +1059,7 @@ void C_BaseAnimating::MaintainSequenceTransitions( IBoneSetup &boneSetup, float 
 		}
 #endif
 
-		boneSetup.AccumulatePose( pos, q, blend->m_nSequence, flCycle, blend->m_flWeight, gpGlobals->curtime, m_pIk );
+		boneSetup.AccumulatePose( pos, q, blend->m_nSequence, flCycle, blend->m_flWeight, gpGlobals->curtime, GetEngineObject()->GetIk() );
 	}
 }
 
@@ -1433,7 +1149,7 @@ void C_BaseAnimating::StandardBlendingRules( IStudioHdr *hdr, Vector pos[], Quat
 
 	IBoneSetup boneSetup( hdr, boneMask, poseparam );
 	boneSetup.InitPose( pos, q );
-	boneSetup.AccumulatePose( pos, q, GetEngineObject()->GetSequence(), fCycle, 1.0, currentTime, m_pIk );
+	boneSetup.AccumulatePose( pos, q, GetEngineObject()->GetSequence(), fCycle, 1.0, currentTime, GetEngineObject()->GetIk());
 
 	// debugoverlay->AddTextOverlay( GetAbsOrigin() + Vector( 0, 0, 64 ), 0, 0, "%30s %6.2f : %6.2f", hdr->pSeqdesc( GetSequence() )->pszLabel( ), fCycle, 1.0 );
 
@@ -1515,13 +1231,13 @@ void C_BaseAnimating::SetupBones_AttachmentHelper( IStudioHdr *hdr )
 		int iBone = hdr->GetAttachmentBone( i );
 		if ( (pattachment.flags & ATTACHMENT_FLAG_WORLD_ALIGN) == 0 )
 		{
-			ConcatTransforms( GetBone( iBone ), pattachment.local, world ); 
+			ConcatTransforms( GetEngineObject()->GetBone( iBone ), pattachment.local, world ); 
 		}
 		else
 		{
 			Vector vecLocalBonePos, vecWorldBonePos;
 			MatrixGetColumn( pattachment.local, 3, vecLocalBonePos );
-			VectorTransform( vecLocalBonePos, GetBone( iBone ), vecWorldBonePos );
+			VectorTransform( vecLocalBonePos, GetEngineObject()->GetBone( iBone ), vecWorldBonePos );
 
 			SetIdentityMatrix( world );
 			MatrixSetColumn( vecWorldBonePos, 3, world );
@@ -1680,19 +1396,7 @@ bool C_BaseAnimating::GetAttachmentLocal( int iAttachment, Vector &origin )
 	return false;
 }
 
-//-----------------------------------------------------------------------------
-// Purpose: 
-//-----------------------------------------------------------------------------
-bool C_BaseAnimating::GetRootBone( matrix3x4_t &rootBone )
-{
-	//Assert( !IsDynamicModelLoading() );
 
-	if (GetEngineObject()->IsEffectActive( EF_BONEMERGE ) && GetEngineObject()->GetMoveParent() && m_pBoneMergeCache )
-		return m_pBoneMergeCache->GetRootBone( rootBone );
-
-	GetBoneTransform( 0, rootBone );
-	return true;
-}
 
 //-----------------------------------------------------------------------------
 // Purpose: Move sound location to center of body
@@ -1706,7 +1410,7 @@ bool C_BaseAnimating::GetSoundSpatialization( SpatializationInfo_t& info )
 	}
 
 	// move sound origin to center if npc has IK
-	if ( info.pOrigin && IsNPC() && m_pIk)
+	if ( info.pOrigin && IsNPC() && GetEngineObject()->GetIk())
 	{
 		*info.pOrigin = GetEngineObject()->GetAbsOrigin();
 
@@ -1730,56 +1434,6 @@ bool C_BaseAnimating::IsViewModel() const
 bool C_BaseAnimating::IsMenuModel() const
 {
 	return false;
-}
-
-// UNDONE: Seems kind of silly to have this when we also have the cached bones in C_BaseAnimating
-CBoneCache *C_BaseAnimating::GetBoneCache( IStudioHdr *pStudioHdr )
-{
-	int boneMask = BONE_USED_BY_HITBOX;
-	CBoneCache *pcache = Studio_GetBoneCache( m_hitboxBoneCacheHandle );
-	if ( pcache )
-	{
-		if ( pcache->IsValid( gpGlobals->curtime, 0.0 ) )
-		{
-			// in memory and still valid, use it!
-			return pcache;
-		}
-		// in memory, but not the same bone set, destroy & rebuild
-		if ( (pcache->m_boneMask & boneMask) != boneMask )
-		{
-			Studio_DestroyBoneCache( m_hitboxBoneCacheHandle );
-			m_hitboxBoneCacheHandle = 0;
-			pcache = NULL;
-		}
-	}
-
-	if ( !pStudioHdr ) 
-		pStudioHdr = GetEngineObject()->GetModelPtr( );
-	Assert(pStudioHdr);
-
-	C_BaseAnimating::PushAllowBoneAccess( true, false, "GetBoneCache" );
-	SetupBones( NULL, -1, boneMask, gpGlobals->curtime );
-	C_BaseAnimating::PopBoneAccess( "GetBoneCache" );
-
-	if ( pcache )
-	{
-		// still in memory but out of date, refresh the bones.
-		pcache->UpdateBones( m_CachedBoneData.Base(), pStudioHdr->numbones(), gpGlobals->curtime );
-	}
-	else
-	{
-		bonecacheparams_t params;
-		params.pStudioHdr = pStudioHdr;
-		// HACKHACK: We need the pointer to all bones here
-		params.pBoneToWorld = m_CachedBoneData.Base();
-		params.curtime = gpGlobals->curtime;
-		params.boneMask = boneMask;
-
-		m_hitboxBoneCacheHandle = Studio_CreateBoneCache( params );
-		pcache = Studio_GetBoneCache( m_hitboxBoneCacheHandle );
-	}
-	Assert(pcache);
-	return pcache;
 }
 
 
@@ -1822,16 +1476,16 @@ void drawLine(const Vector& origin, const Vector& dest, int r, int g, int b, boo
 
 void C_BaseAnimating::UpdateIKLocks( float currentTime )
 {
-	if (!m_pIk) 
+	if (!GetEngineObject()->GetIk()) 
 		return;
 
-	int targetCount = m_pIk->m_target.Count();
+	int targetCount = GetEngineObject()->GetIk()->m_target.Count();
 	if ( targetCount == 0 )
 		return;
 
 	for (int i = 0; i < targetCount; i++)
 	{
-		CIKTarget *pTarget = &m_pIk->m_target[i];
+		CIKTarget *pTarget = &GetEngineObject()->GetIk()->m_target[i];
 
 		if (!pTarget->IsActive())
 			continue;
@@ -1853,10 +1507,10 @@ void C_BaseAnimating::UpdateIKLocks( float currentTime )
 
 void C_BaseAnimating::CalculateIKLocks( float currentTime )
 {
-	if (!m_pIk) 
+	if (!GetEngineObject()->GetIk())
 		return;
 
-	int targetCount = m_pIk->m_target.Count();
+	int targetCount = GetEngineObject()->GetIk()->m_target.Count();
 	if ( targetCount == 0 )
 		return;
 
@@ -1881,7 +1535,7 @@ void C_BaseAnimating::CalculateIKLocks( float currentTime )
 	for (int i = 0; i < targetCount; i++)
 	{
 		trace_t trace;
-		CIKTarget *pTarget = &m_pIk->m_target[i];
+		CIKTarget *pTarget = &GetEngineObject()->GetIk()->m_target[i];
 
 		if (!pTarget->IsActive())
 			continue;
@@ -2094,406 +1748,31 @@ void C_BaseAnimating::CalculateIKLocks( float currentTime )
 
 
 
-#ifdef DEBUG_BONE_SETUP_THREADING
-ConVar cl_warn_thread_contested_bone_setup("cl_warn_thread_contested_bone_setup", "0" );
-#endif
-ConVar cl_threaded_bone_setup("cl_threaded_bone_setup", "0", 0, "Enable parallel processing of C_BaseAnimating::SetupBones()" );
-
-//-----------------------------------------------------------------------------
-// Purpose: Do the default sequence blending rules as done in HL1
-//-----------------------------------------------------------------------------
-
-static void SetupBonesOnBaseAnimating( C_BaseAnimating *&pBaseAnimating )
-{
-	if ( !pBaseAnimating->GetEngineObject()->GetMoveParent() )
-		pBaseAnimating->SetupBones( NULL, -1, -1, gpGlobals->curtime );
-}
-
-static void PreThreadedBoneSetup()
-{
-	mdlcache->BeginLock();
-}
-
-static void PostThreadedBoneSetup()
-{
-	mdlcache->EndLock();
-}
-
-static bool g_bInThreadedBoneSetup;
-static bool g_bDoThreadedBoneSetup;
-
-void C_BaseAnimating::InitBoneSetupThreadPool()
-{
-}				 
-
-void C_BaseAnimating::ShutdownBoneSetupThreadPool()
-{
-}
-
-void C_BaseAnimating::ThreadedBoneSetup()
-{
-	g_bDoThreadedBoneSetup = cl_threaded_bone_setup.GetBool();
-	if ( g_bDoThreadedBoneSetup )
-	{
-		int nCount = g_PreviousBoneSetups.Count();
-		if ( nCount > 1 )
-		{
-			g_bInThreadedBoneSetup = true;
-
-			ParallelProcess( "C_BaseAnimating::ThreadedBoneSetup", g_PreviousBoneSetups.Base(), nCount, &SetupBonesOnBaseAnimating, &PreThreadedBoneSetup, &PostThreadedBoneSetup );
-
-			g_bInThreadedBoneSetup = false;
-		}
-	}
-	g_iPreviousBoneCounter++;
-	g_PreviousBoneSetups.RemoveAll();
-}
-
-bool C_BaseAnimating::SetupBones( matrix3x4_t *pBoneToWorldOut, int nMaxBones, int boneMask, float currentTime )
-{
-	VPROF_BUDGET( "C_BaseAnimating::SetupBones", VPROF_BUDGETGROUP_CLIENT_ANIMATION );
-
-	//=============================================================================
-	// HPE_BEGIN:
-	// [pfreese] Added the check for pBoneToWorldOut != NULL in this debug warning
-	// code. SetupBones is called in the CSS anytime an attachment wants its
-	// parent's transform, hence this warning is hit extremely frequently.
-	// I'm not actually sure if this is the right "fix" for this, as the bones are
-	// actually accessed as part of the setup process, but since I'm not clear on the
-	// purpose of this dev warning, I'm including this comment block.
-	//=============================================================================
-
-	if ( pBoneToWorldOut != NULL && !IsBoneAccessAllowed() )
-	{
-		static float lastWarning = 0.0f;
-
-		// Prevent spammage!!!
-		if ( gpGlobals->realtime >= lastWarning + 1.0f )
-		{
-			DevMsgRT( "*** ERROR: Bone access not allowed (entity %i:%s)\n", entindex(), GetClassname() );
-			lastWarning = gpGlobals->realtime;
-		}
-	}
-
-	//boneMask = BONE_USED_BY_ANYTHING; // HACK HACK - this is a temp fix until we have accessors for bones to find out where problems are.
-	
-	if (GetEngineObject()->GetSequence() == -1 )
-		 return false;
-
-	if ( boneMask == -1 )
-	{
-		boneMask = m_iPrevBoneMask;
-	}
-
-	// We should get rid of this someday when we have solutions for the odd cases where a bone doesn't
-	// get setup and its transform is asked for later.
-	if ( cl_SetupAllBones.GetInt() )
-	{
-		boneMask |= BONE_USED_BY_ANYTHING;
-	}
-
-	// Set up all bones if recording, too
-	if ( IsToolRecording() )
-	{
-		boneMask |= BONE_USED_BY_ANYTHING;
-	}
-
-	if ( g_bInThreadedBoneSetup )
-	{
-		if ( !m_BoneSetupLock.TryLock() )
-		{
-			return false;
-		}
-	}
-
-#ifdef DEBUG_BONE_SETUP_THREADING
-	if ( cl_warn_thread_contested_bone_setup.GetBool() )
-	{
-		if ( !m_BoneSetupLock.TryLock() )
-		{
-			Msg( "Contested bone setup in frame %d!\n", gpGlobals->framecount );
-		}
-		else
-		{
-			m_BoneSetupLock.Unlock();
-		}
-	}
-#endif
-
-	AUTO_LOCK( m_BoneSetupLock );
-
-	if ( g_bInThreadedBoneSetup )
-	{
-		m_BoneSetupLock.Unlock();
-	}
-
-	if ( m_iMostRecentModelBoneCounter != g_iModelBoneCounter )
-	{
-		// Clear out which bones we've touched this frame if this is 
-		// the first time we've seen this object this frame.
-		if ( LastBoneChangedTime() >= m_flLastBoneSetupTime )
-		{
-			m_BoneAccessor.SetReadableBones( 0 );
-			m_BoneAccessor.SetWritableBones( 0 );
-			m_flLastBoneSetupTime = currentTime;
-		}
-		m_iPrevBoneMask = m_iAccumulatedBoneMask;
-		m_iAccumulatedBoneMask = 0;
-
-#ifdef STUDIO_ENABLE_PERF_COUNTERS
-		IStudioHdr *hdr = GetEngineObject()->GetModelPtr();
-		if (hdr)
-		{
-			hdr->ClearPerfCounters();
-		}
-#endif
-	}
-
-	int nBoneCount = m_CachedBoneData.Count();
-	if ( g_bDoThreadedBoneSetup && !g_bInThreadedBoneSetup && ( nBoneCount >= 16 ) && !GetEngineObject()->GetMoveParent() && m_iMostRecentBoneSetupRequest != g_iPreviousBoneCounter )
-	{
-		m_iMostRecentBoneSetupRequest = g_iPreviousBoneCounter;
-		Assert( g_PreviousBoneSetups.Find( this ) == -1 );
-		g_PreviousBoneSetups.AddToTail( this );
-	}
-
-	// Keep track of everthing asked for over the entire frame
-	m_iAccumulatedBoneMask |= boneMask;
-
-	// Make sure that we know that we've already calculated some bone stuff this time around.
-	m_iMostRecentModelBoneCounter = g_iModelBoneCounter;
-
-	// Have we cached off all bones meeting the flag set?
-	if( ( m_BoneAccessor.GetReadableBones() & boneMask ) != boneMask )
-	{
-		MDLCACHE_CRITICAL_SECTION();
-
-		IStudioHdr *hdr = GetEngineObject()->GetModelPtr();
-		if ( !hdr || !hdr->SequencesAvailable() )
-			return false;
-
-		// Setup our transform based on render angles and origin.
-		matrix3x4_t parentTransform;
-		AngleMatrix( GetRenderAngles(), GetRenderOrigin(), parentTransform );
-
-		// Load the boneMask with the total of what was asked for last frame.
-		boneMask |= m_iPrevBoneMask;
-
-		// Allow access to the bones we're setting up so we don't get asserts in here.
-		int oldReadableBones = m_BoneAccessor.GetReadableBones();
-		m_BoneAccessor.SetWritableBones( m_BoneAccessor.GetReadableBones() | boneMask );
-		m_BoneAccessor.SetReadableBones( m_BoneAccessor.GetWritableBones() );
-
-		if (hdr->flags() & STUDIOHDR_FLAGS_STATIC_PROP)
-		{
-			MatrixCopy(	parentTransform, GetBoneForWrite( 0 ) );
-		}
-		else
-		{
-			TrackBoneSetupEnt( this );
-			
-			// This is necessary because it's possible that CalculateIKLocks will trigger our move children
-			// to call GetAbsOrigin(), and they'll use our OLD bone transforms to get their attachments
-			// since we're right in the middle of setting up our new transforms. 
-			//
-			// Setting this flag forces move children to keep their abs transform invalidated.
-			GetEngineObject()->AddFlag( EFL_SETTING_UP_BONES );
-
-			// NOTE: For model scaling, we need to opt out of IK because it will mark the bones as already being calculated
-			if ( !GetEngineObject()->IsModelScaled() )
-			{
-				// only allocate an ik block if the npc can use it
-				if ( !m_pIk && hdr->numikchains() > 0 && !(m_EntClientFlags & ENTCLIENTFLAG_DONTUSEIK) )
-				{
-					m_pIk = new CIKContext;
-				}
-			}
-			else
-			{
-				// Reset the IK
-				if ( m_pIk )
-				{
-					delete m_pIk;
-					m_pIk = NULL;
-				}
-			}
-
-			Vector		pos[MAXSTUDIOBONES];
-			Quaternion	q[MAXSTUDIOBONES];
-#if defined(FP_EXCEPTIONS_ENABLED) || defined(DBGFLAG_ASSERT)
-			// Having these uninitialized means that some bugs are very hard
-			// to reproduce. A memset of 0xFF is a simple way of getting NaNs.
-			memset( pos, 0xFF, sizeof(pos) );
-			memset( q, 0xFF, sizeof(q) );
-#endif
-
-			int bonesMaskNeedRecalc = boneMask | oldReadableBones; // Hack to always recalc bones, to fix the arm jitter in the new CS player anims until Ken makes the real fix
-
-			if ( m_pIk )
-			{
-				if (Teleported() || IsNoInterpolationFrame())
-					m_pIk->ClearTargets();
-
-				m_pIk->Init( hdr, GetRenderAngles(), GetRenderOrigin(), currentTime, gpGlobals->framecount, bonesMaskNeedRecalc );
-			}
-
-			// Let pose debugger know that we are blending
-			g_pPoseDebugger->StartBlending( this, hdr );
-
-			StandardBlendingRules( hdr, pos, q, currentTime, bonesMaskNeedRecalc );
-
-			CBoneBitList boneComputed;
-			// don't calculate IK on ragdolls
-			if ( m_pIk && !GetEngineObject()->IsRagdoll() )
-			{
-				UpdateIKLocks( currentTime );
-
-				m_pIk->UpdateTargets( pos, q, m_BoneAccessor.GetBoneArrayForWrite(), boneComputed );
-
-				CalculateIKLocks( currentTime );
-				m_pIk->SolveDependencies( pos, q, m_BoneAccessor.GetBoneArrayForWrite(), boneComputed );
-			}
-
-			BuildTransformations( hdr, pos, q, parentTransform, bonesMaskNeedRecalc, boneComputed );
-			
-			GetEngineObject()->RemoveFlag( EFL_SETTING_UP_BONES );
-			GetEngineObject()->ControlMouth( hdr );
-		}
-		
-		if( !( oldReadableBones & BONE_USED_BY_ATTACHMENT ) && ( boneMask & BONE_USED_BY_ATTACHMENT ) )
-		{
-			SetupBones_AttachmentHelper( hdr );
-		}
-	}
-	
-	// Do they want to get at the bone transforms? If it's just making sure an aiment has 
-	// its bones setup, it doesn't need the transforms yet.
-	if ( pBoneToWorldOut )
-	{
-		if ( nMaxBones >= m_CachedBoneData.Count() )
-		{
-			memcpy( pBoneToWorldOut, m_CachedBoneData.Base(), sizeof( matrix3x4_t ) * m_CachedBoneData.Count() );
-		}
-		else
-		{
-			Warning( "SetupBones: invalid bone array size (%d - needs %d)\n", nMaxBones, m_CachedBoneData.Count() );
-			return false;
-		}
-	}
-
-	return true;
-}
-
-
-C_BaseAnimating* C_BaseAnimating::FindFollowedEntity()
-{
-	IEngineObjectClient *follow = GetEngineObject()->GetFollowedEntity();
-
-	if ( !follow )
-		return NULL;
-
-	if ( follow->GetOuter()->IsDormant())
-		return NULL;
-
-	if ( !follow->GetOuter()->GetModel())
-	{
-		Warning( "mod_studio: MOVETYPE_FOLLOW with no model.\n" );
-		return NULL;
-	}
-
-	if ( modelinfo->GetModelType( follow->GetOuter()->GetModel()) != mod_studio)
-	{
-		Warning( "Attached %s (mod_studio) to %s (%d)\n", 
-			modelinfo->GetModelName( GetModel() ), 
-			modelinfo->GetModelName( follow->GetOuter()->GetModel()),
-			modelinfo->GetModelType( follow->GetOuter()->GetModel()));
-		return NULL;
-	}
-
-	return assert_cast< C_BaseAnimating* >( follow->GetOuter() );
-}
-
-
-
-void C_BaseAnimating::InvalidateBoneCache()
-{
-	m_iMostRecentModelBoneCounter = g_iModelBoneCounter - 1;
-	m_flLastBoneSetupTime = -FLT_MAX; 
-}
-
-
-bool C_BaseAnimating::IsBoneCacheValid() const
-{
-	return m_iMostRecentModelBoneCounter == g_iModelBoneCounter;
-}
-
-
-// Causes an assert to happen if bones or attachments are used while this is false.
-struct BoneAccess
-{
-	BoneAccess()
-	{
-		bAllowBoneAccessForNormalModels = false;
-		bAllowBoneAccessForViewModels = false;
-		tag = NULL;
-	}
-
-	bool bAllowBoneAccessForNormalModels;
-	bool bAllowBoneAccessForViewModels;
-	char const *tag;
-};
-
-static CUtlVector< BoneAccess >		g_BoneAccessStack;
-static BoneAccess g_BoneAcessBase;
-
-bool C_BaseAnimating::IsBoneAccessAllowed() const
-{
-	if ( IsViewModel() )
-		return g_BoneAcessBase.bAllowBoneAccessForViewModels;
-	else
-		return g_BoneAcessBase.bAllowBoneAccessForNormalModels;
-}
-
-// (static function)
-void C_BaseAnimating::PushAllowBoneAccess( bool bAllowForNormalModels, bool bAllowForViewModels, char const *tagPush )
-{
-	BoneAccess save = g_BoneAcessBase;
-	g_BoneAccessStack.AddToTail( save );
-
-	Assert( g_BoneAccessStack.Count() < 32 ); // Most likely we are leaking "PushAllowBoneAccess" calls if PopBoneAccess is never called. Consider using AutoAllowBoneAccess.
-	g_BoneAcessBase.bAllowBoneAccessForNormalModels = bAllowForNormalModels;
-	g_BoneAcessBase.bAllowBoneAccessForViewModels = bAllowForViewModels;
-	g_BoneAcessBase.tag = tagPush;
-}
-
-void C_BaseAnimating::PopBoneAccess( char const *tagPop )
-{
-	// Validate that pop matches the push
-	Assert( ( g_BoneAcessBase.tag == tagPop ) || ( g_BoneAcessBase.tag && g_BoneAcessBase.tag != ( char const * ) 1 && tagPop && tagPop != ( char const * ) 1 && !strcmp( g_BoneAcessBase.tag, tagPop ) ) );
-	int lastIndex = g_BoneAccessStack.Count() - 1;
-	if ( lastIndex < 0 )
-	{
-		Assert( !"C_BaseAnimating::PopBoneAccess:  Stack is empty!!!" );
-		return;
-	}
-	g_BoneAcessBase = g_BoneAccessStack[lastIndex ];
-	g_BoneAccessStack.Remove( lastIndex );
-}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 C_BaseAnimating::AutoAllowBoneAccess::AutoAllowBoneAccess( bool bAllowForNormalModels, bool bAllowForViewModels )
 {
-	C_BaseAnimating::PushAllowBoneAccess( bAllowForNormalModels, bAllowForViewModels, ( char const * ) 1 );
+	ClientEntityList().PushAllowBoneAccess(bAllowForNormalModels, bAllowForViewModels, (char const*)1);
 }
 
 C_BaseAnimating::AutoAllowBoneAccess::~AutoAllowBoneAccess( )
 {
-	C_BaseAnimating::PopBoneAccess( ( char const * ) 1 );
-}
-
-// (static function)
-void C_BaseAnimating::InvalidateBoneCaches()
-{
-	g_iModelBoneCounter++;
+	ClientEntityList().PopBoneAccess( ( char const * ) 1 );
 }
 
 bool C_BaseAnimating::ShouldDraw()
@@ -2555,7 +1834,7 @@ int C_BaseAnimating::DrawModel( int flags )
 		else
 		{
 			// this doesn't draw unless master entity is visible and it's a studio model!!!
-			C_BaseAnimating *follow = FindFollowedEntity();
+			C_BaseAnimating *follow = (C_BaseAnimating*)GetEngineObject()->FindFollowedEntity()->GetOuter();
 			if ( follow )
 			{
 				// recompute master entity bone structure
@@ -2599,7 +1878,7 @@ bool C_BaseAnimating::HitboxToWorldTransforms( matrix3x4_t *pHitboxToWorld[MAXST
 	if ( !set->numhitboxes )
 		return false;
 
-	CBoneCache *pCache = GetBoneCache( pStudioHdr );
+	CBoneCache *pCache = GetEngineObject()->GetBoneCache( pStudioHdr );
 	pCache->ReadCachedBonePointers( pHitboxToWorld, pStudioHdr->numbones() );
 	return true;
 }
@@ -3645,12 +2924,10 @@ bool C_BaseAnimating::IsSelfAnimating()
 void C_BaseAnimating::ResetLatched( void )
 {
 	// Reset the IK
-	if ( m_pIk )
+	if (GetEngineObject()->GetIk())
 	{
-		delete m_pIk;
-		m_pIk = NULL;
+		GetEngineObject()->DestroyIk();
 	}
-
 	BaseClass::ResetLatched();
 }
 
@@ -3867,7 +3144,7 @@ void C_BaseAnimating::OnPreDataChanged( DataUpdateType_t updateType )
 void C_BaseAnimating::ForceSetupBonesAtTime( matrix3x4_t *pBonesOut, float flTime )
 {
 	// blow the cached prev bones
-	InvalidateBoneCache();
+	GetEngineObject()->InvalidateBoneCache();
 
 	// reset root position to flTime
 	Interpolate( flTime );
@@ -3891,7 +3168,7 @@ void C_BaseAnimating::GetRagdollInitBoneArrays( matrix3x4_t *pDeltaBones0, matri
 	}
 	else
 	{
-		memcpy( pCurrentBones, m_CachedBoneData.Base(), sizeof( matrix3x4_t ) * m_CachedBoneData.Count() );
+		memcpy( pCurrentBones, GetEngineObject()->GetCachedBoneData().Base(), sizeof(matrix3x4_t) * GetEngineObject()->GetCachedBoneData().Count());
 	}
 }
 
@@ -4091,7 +3368,7 @@ bool C_BaseAnimating::TestHitboxes( const Ray_t &ray, unsigned int fContentsMask
 	// This *has* to be true for the existing code to function correctly.
 	Assert( ray.m_StartOffset == vec3_origin );
 
-	CBoneCache *pCache = GetBoneCache( pStudioHdr );
+	CBoneCache *pCache = GetEngineObject()->GetBoneCache( pStudioHdr );
 	matrix3x4_t *hitboxbones[MAXSTUDIOBONES];
 	pCache->ReadCachedBonePointers( hitboxbones, pStudioHdr->numbones() );
 
@@ -4508,7 +3785,7 @@ void C_BaseAnimating::DrawClientHitboxes( float duration /*= 0.0f*/, bool monoco
 	{
 		mstudiobbox_t *pbox = set->pHitbox( i );
 
-		GetBonePosition( pbox->bone, position, angles );
+		GetEngineObject()->GetBonePosition( pbox->bone, position, angles );
 
 		if ( !monocolor )
 		{
@@ -4601,7 +3878,7 @@ void C_BaseAnimating::GetAimEntOrigin( IClientEntity *pAttachedTo, Vector *pAbsO
 	}
 	else
 	{
-		if ( !m_pBoneMergeCache || !m_pBoneMergeCache->GetAimEntOrigin( pAbsOrigin, pAbsAngles ) )
+		if ( !GetEngineObject()->GetBoneMergeCache() || !GetEngineObject()->GetBoneMergeCache()->GetAimEntOrigin(pAbsOrigin, pAbsAngles))
 			BaseClass::GetAimEntOrigin( pAttachedTo, pAbsOrigin, pAbsAngles );
 	}
 }
@@ -4679,7 +3956,7 @@ bool C_BaseAnimating::ComputeHitboxSurroundingBox( Vector *pVecWorldMins, Vector
 	if ( !set || !set->numhitboxes )
 		return false;
 
-	CBoneCache *pCache = GetBoneCache( pStudioHdr );
+	CBoneCache *pCache = GetEngineObject()->GetBoneCache( pStudioHdr );
 	matrix3x4_t *hitboxbones[MAXSTUDIOBONES];
 	pCache->ReadCachedBonePointers( hitboxbones, pStudioHdr->numbones() );
 
@@ -4717,7 +3994,7 @@ bool C_BaseAnimating::ComputeEntitySpaceHitboxSurroundingBox( Vector *pVecWorldM
 	if ( !set || !set->numhitboxes )
 		return false;
 
-	CBoneCache *pCache = GetBoneCache( pStudioHdr );
+	CBoneCache *pCache = GetEngineObject()->GetBoneCache( pStudioHdr );
 	matrix3x4_t *hitboxbones[MAXSTUDIOBONES];
 	pCache->ReadCachedBonePointers( hitboxbones, pStudioHdr->numbones() );
 
@@ -5083,20 +4360,20 @@ void C_BaseAnimating::UpdateBoneAttachments( void )
 //	Assert( IsFollowingEntity() );
 //	Assert( m_boneIndexAttached >= 0 );
 
-	C_BaseAnimating *follow = FindFollowedEntity();
+	IEngineObjectClient *follow = GetEngineObject()->FindFollowedEntity();
 	if ( follow && (m_boneIndexAttached >= 0) )
 	{
 		matrix3x4_t boneToWorld, localSpace;
 		follow->GetCachedBoneMatrix( m_boneIndexAttached, boneToWorld );
 		AngleMatrix( m_boneAngles, m_bonePosition, localSpace );
-		ConcatTransforms( boneToWorld, localSpace, GetBoneForWrite( 0 ) );
+		ConcatTransforms( boneToWorld, localSpace, GetEngineObject()->GetBoneForWrite( 0 ) );
 
 		Vector absOrigin;
-		MatrixGetColumn( GetBone( 0 ), 3, absOrigin );
+		MatrixGetColumn(GetEngineObject()->GetBone( 0 ), 3, absOrigin );
 		GetEngineObject()->SetAbsOrigin( absOrigin );
 
 		QAngle absAngle;
-		MatrixAngles( GetBone( 0 ), absAngle );
+		MatrixAngles(GetEngineObject()->GetBone( 0 ), absAngle );
 		GetEngineObject()->SetAbsAngles( absAngle);
 	}
 }
@@ -5123,8 +4400,8 @@ void C_BaseAnimating::AttachEntityToBone( C_BaseAnimating* attachTarget, int bon
 		m_boneAngles = boneAngles;
 	}
 
-	m_BoneAccessor.SetReadableBones( BONE_USED_BY_ANYTHING );
-	m_BoneAccessor.SetWritableBones( BONE_USED_BY_ANYTHING );
+	GetEngineObject()->SetReadableBones( BONE_USED_BY_ANYTHING );
+	GetEngineObject()->SetWritableBones( BONE_USED_BY_ANYTHING );
 
 	attachTarget->AddBoneAttachment( this );
 

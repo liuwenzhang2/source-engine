@@ -5294,12 +5294,12 @@ void MaybeInvalidateLocalPlayerAnimation()
 	{
 		// We sometimes need different animation for the main view versus the shadow rendering,
 		// so we need to reset the cache to ensure this actually happens.
-		pPlayer->InvalidateBoneCache();
+		pPlayer->GetEngineObject()->InvalidateBoneCache();
 
 		C_BaseCombatWeapon *pWeapon = pPlayer->GetActiveWeapon();
 		if ( pWeapon != NULL )
 		{
-			pWeapon->InvalidateBoneCache();
+			pWeapon->GetEngineObject()->InvalidateBoneCache();
 		}
 
 #if defined USES_ECON_ITEMS

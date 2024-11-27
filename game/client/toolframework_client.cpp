@@ -210,7 +210,7 @@ CRecordEffectOwner::CRecordEffectOwner( C_BaseEntity *pEntity, bool bIsViewModel
 	{
 		KeyValues *msg = new KeyValues( "EffectsOwner" );
 		msg->SetInt( "viewModel", bIsViewModel );
-		ToolFramework_PostToolMessage( pEntity ? pEntity->GetToolHandle() : HTOOLHANDLE_INVALID, msg );
+		ToolFramework_PostToolMessage( pEntity ? pEntity->GetEngineObject()->GetToolHandle() : HTOOLHANDLE_INVALID, msg );
 		msg->deleteThis();
 	}
 }
@@ -258,7 +258,7 @@ void ToolFramework_RecordMaterialParams( IMaterial *pMaterial )
 		return;
 
 	C_BaseEntity *pEnt = view->GetCurrentlyDrawingEntity();
-	if ( !pEnt || !pEnt->IsToolRecording() )
+	if ( !pEnt || !pEnt->GetEngineObject()->IsToolRecording() )
 		return;
 
 	KeyValues *msg = new KeyValues( "material_proxy_state" );
@@ -350,7 +350,7 @@ void ToolFramework_RecordMaterialParams( IMaterial *pMaterial )
 	}
 
 	Assert( pEnt->GetToolHandle() );
-	ToolFramework_PostToolMessage( pEnt->GetToolHandle(), msg );
+	ToolFramework_PostToolMessage( pEnt->GetEngineObject()->GetToolHandle(), msg );
 
 	msg->deleteThis();
 }

@@ -2702,7 +2702,6 @@ void CBaseEntity::OnRestore()
 		GetEngineObject()->AddEffects( EF_NODRAW );
 		GetEngineObject()->RemoveFlag( FL_DISSOLVING | FL_ONFIRE );
 	}
-	m_flEstIkFloor = GetEngineObject()->GetLocalOrigin().z;
 }
 
 
@@ -6018,7 +6017,7 @@ bool CBaseEntity::AddStepDiscontinuity( float flTime, const Vector &vecOrigin, c
 Vector CBaseEntity::GetStepOrigin(void) const
 {
 	Vector tmp = GetEngineObject()->GetLocalOrigin();
-	tmp.z += m_flEstIkOffset;
+	tmp.z += GetEngineObject()->GetEstIkOffset();
 	return tmp;
 }
 
@@ -6032,86 +6031,12 @@ QAngle CBaseEntity::GetStepAngles(void) const
 	return GetEngineObject()->GetLocalAngles();
 }
 
-//-----------------------------------------------------------------------------
-// Purpose: Receives the clients IK floor position
-//-----------------------------------------------------------------------------
-
-void CBaseEntity::SetIKGroundContactInfo(float minHeight, float maxHeight)
-{
-	m_flIKGroundContactTime = gpGlobals->curtime;
-	m_flIKGroundMinHeight = minHeight;
-	m_flIKGroundMaxHeight = maxHeight;
-}
-
-//-----------------------------------------------------------------------------
-// Purpose: Initializes IK floor position
-//-----------------------------------------------------------------------------
-
-void CBaseEntity::InitStepHeightAdjust(void)
-{
-	m_flIKGroundContactTime = 0;
-	m_flIKGroundMinHeight = 0;
-	m_flIKGroundMaxHeight = 0;
-
-	// FIXME: not safe to call GetAbsOrigin here. Hierarchy might not be set up!
-	m_flEstIkFloor = GetEngineObject()->GetAbsOrigin().z;
-	m_flEstIkOffset = 0;
-}
 
 
-//-----------------------------------------------------------------------------
-// Purpose: Interpolates client IK floor position and drops entity down so that the feet will reach
-//-----------------------------------------------------------------------------
 
-ConVar npc_height_adjust("npc_height_adjust", "1", FCVAR_ARCHIVE, "Enable test mode for ik height adjustment");
 
-void CBaseEntity::UpdateStepOrigin()
-{
-	if (!npc_height_adjust.GetBool())
-	{
-		m_flEstIkOffset = 0;
-		m_flEstIkFloor = GetEngineObject()->GetLocalOrigin().z;
-		return;
-	}
 
-	/*
-	if (m_debugOverlays & OVERLAY_NPC_SELECTED_BIT)
-	{
-		Msg("%x : %x\n", GetMoveParent(), GetGroundEntity() );
-	}
-	*/
 
-	if (m_flIKGroundContactTime > 0.2 && m_flIKGroundContactTime > gpGlobals->curtime - 0.2)
-	{
-		if ((GetEngineObject()->GetFlags() & (FL_FLY | FL_SWIM)) == 0 && GetEngineObject()->GetMoveParent() == NULL && GetEngineObject()->GetGroundEntity() != NULL && !GetEngineObject()->GetGroundEntity()->GetOuter()->IsMoving())
-		{
-			Vector toAbs = GetEngineObject()->GetAbsOrigin() - GetEngineObject()->GetLocalOrigin();
-			if (toAbs.z == 0.0)
-			{
-				CAI_BaseNPC* pNPC = MyNPCPointer();
-				// FIXME:  There needs to be a default step height somewhere
-				float height = 18.0f;
-				if (pNPC)
-				{
-					height = pNPC->StepHeight();
-				}
-
-				// debounce floor location
-				m_flEstIkFloor = m_flEstIkFloor * 0.2 + m_flIKGroundMinHeight * 0.8;
-
-				// don't let heigth difference between min and max exceed step height
-				float bias = clamp((m_flIKGroundMaxHeight - m_flIKGroundMinHeight) - height, 0.f, height);
-				// save off reasonable offset
-				m_flEstIkOffset = clamp(m_flEstIkFloor - GetEngineObject()->GetAbsOrigin().z, -height + bias, 0.0f);
-				return;
-			}
-		}
-	}
-
-	// don't use floor offset, decay the value
-	m_flEstIkOffset *= 0.5;
-	m_flEstIkFloor = GetEngineObject()->GetLocalOrigin().z;
-}
 
 //-----------------------------------------------------------------------------
 // Relative lighting entity

@@ -52,7 +52,6 @@ IMPLEMENT_SERVERCLASS_ST(CRagdollProp, DT_Ragdoll)
 
 	//SendPropEHandle(SENDINFO( m_hUnragdoll ) ),
 	SendPropFloat(SENDINFO(m_flBlendWeight), 8, SPROP_ROUNDDOWN, 0.0f, 1.0f ),
-	SendPropInt(SENDINFO(m_nOverlaySequence), 11),
 END_SEND_TABLE()
 
 
@@ -77,7 +76,7 @@ BEGIN_DATADESC(CRagdollProp)
 	DEFINE_FIELD( m_bFirstCollisionAfterLaunch, FIELD_BOOLEAN ),
 
 	DEFINE_FIELD( m_flBlendWeight, FIELD_FLOAT ),
-	DEFINE_FIELD( m_nOverlaySequence, FIELD_INTEGER ),
+	//DEFINE_FIELD( m_nOverlaySequence, FIELD_INTEGER ),
 
 	// Physics Influence
 	DEFINE_FIELD( m_hPhysicsAttacker, FIELD_EHANDLE ),
@@ -129,7 +128,7 @@ void CRagdollProp::Spawn( void )
 	}
 
 	matrix3x4_t pBoneToWorld[MAXSTUDIOBONES];
-	BaseClass::SetupBones( pBoneToWorld, BONE_USED_BY_ANYTHING ); // FIXME: shouldn't this be a subset of the bones
+	GetEngineObject()->SetupBones( pBoneToWorld, BONE_USED_BY_ANYTHING ); // FIXME: shouldn't this be a subset of the bones
 	// this is useless info after the initial conditions are set
 	GetEngineObject()->SetAbsAngles( vec3_angle );
 	int collisionGroup = (GetEngineObject()->GetSpawnFlags() & SF_RAGDOLLPROP_DEBRIS) ? COLLISION_GROUP_DEBRIS : COLLISION_GROUP_NONE;
@@ -141,7 +140,7 @@ void CRagdollProp::Spawn( void )
 		SetContextThink(&CRagdollProp::SetDebrisThink, gpGlobals->curtime + 5, s_pDebrisContext);
 	}
 	m_flBlendWeight = 0.0f;
-	m_nOverlaySequence = -1;
+	GetEngineObject()->SetOverlaySequence(- 1);
 
 	// Unless specified, do not allow this to be dissolved
 	if (GetEngineObject()->HasSpawnFlags( SF_RAGDOLLPROP_ALLOW_DISSOLVE ) == false )
@@ -586,11 +585,11 @@ void CRagdollProp::SetOverlaySequence( Activity activity )
 	int seq = GetEngineObject()->SelectWeightedSequence( activity );
 	if ( seq < 0 )
 	{
-		m_nOverlaySequence = -1;
+		GetEngineObject()->SetOverlaySequence(- 1);
 	}
 	else
 	{
-		m_nOverlaySequence = seq;
+		GetEngineObject()->SetOverlaySequence(seq);
 	}
 }
 
@@ -646,43 +645,6 @@ void CRagdollProp::TraceAttack( const CTakeDamageInfo &info, const Vector &dir, 
 		GetEngineObject()->VPhysicsSwapObject(GetEngineObject()->GetElement(ptr->physicsbone));
 	}
 	BaseClass::TraceAttack( info, dir, ptr, pAccumulator );
-}
-
-void CRagdollProp::SetupBones( matrix3x4_t *pBoneToWorld, int boneMask )
-{
-	// no ragdoll, fall through to base class 
-	if ( !GetEngineObject()->RagdollBoneCount())
-	{
-		BaseClass::SetupBones( pBoneToWorld, boneMask );
-		return;
-	}
-
-	// Not really ideal, but it'll work for now
-	GetEngineObject()->UpdateModelScale();
-
-	MDLCACHE_CRITICAL_SECTION();
-	IStudioHdr *pStudioHdr = GetEngineObject()->GetModelPtr( );
-	bool sim[MAXSTUDIOBONES];
-	memset( sim, 0, pStudioHdr->numbones() );
-
-	int i;
-
-	CBoneAccessor boneaccessor( pBoneToWorld );
-	GetEngineObject()->RagdollBone(sim, boneaccessor);
-
-	mstudiobone_t *pbones = pStudioHdr->pBone( 0 );
-	for ( i = 0; i < pStudioHdr->numbones(); i++ )
-	{
-		if ( sim[i] )
-			continue;
-		
-		if ( !(pStudioHdr->boneFlags(i) & boneMask) )
-			continue;
-
-		matrix3x4_t matBoneLocal;
-		AngleMatrix( pbones[i].rot, pbones[i].pos, matBoneLocal );
-		ConcatTransforms( pBoneToWorld[pbones[i].parent], matBoneLocal, pBoneToWorld[i]);
-	}
 }
 
 bool CRagdollProp::TestCollision( const Ray_t &ray, unsigned int mask, trace_t& trace )
@@ -981,7 +943,7 @@ CBaseAnimating *CreateServerRagdollSubmodel( CBaseAnimating *pOwner, const char 
 
 	// let bone merging do the work of copying everything over for us
 	pRagdoll->GetEngineObject()->SetParent( pOwner?pOwner->GetEngineObject():NULL );
-	pRagdoll->SetupBones( pBoneToWorld, BONE_USED_BY_ANYTHING );
+	pRagdoll->GetEngineObject()->SetupBones( pBoneToWorld, BONE_USED_BY_ANYTHING );
 	// HACKHACK: don't want this parent anymore
 	pRagdoll->GetEngineObject()->SetParent( NULL );
 
@@ -1138,7 +1100,7 @@ CRagdollProp *CreateServerRagdollAttached( CBaseAnimating *pAnimating, const Vec
 
 	pRagdoll->InitRagdollAnimation();
 	matrix3x4_t pBoneToWorld[MAXSTUDIOBONES];
-	pAnimating->SetupBones( pBoneToWorld, BONE_USED_BY_ANYTHING );
+	pAnimating->GetEngineObject()->SetupBones( pBoneToWorld, BONE_USED_BY_ANYTHING );
 	pRagdoll->InitRagdollAttached( pAttached, vecForce, forceBone, pBoneToWorld, pBoneToWorld, 0.1, collisionGroup, pParentEntity, boneAttach, boneOrigin, parentBoneAttach, originAttached );
 	
 	return pRagdoll;

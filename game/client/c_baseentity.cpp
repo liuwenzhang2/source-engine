@@ -76,76 +76,9 @@ static CUtlLinkedList<C_BaseEntity*, unsigned short> g_TeleportList;
 
 
 
-abstract_class IRecordingList
-{
-public:
-	virtual ~IRecordingList() {};
-	virtual void	AddToList( ClientEntityHandle_t add ) = 0;
-	virtual void	RemoveFromList( ClientEntityHandle_t remove ) = 0;
 
-	virtual int		Count() = 0;
-	virtual IClientRenderable *Get( int index ) = 0;
-};
 
-class CRecordingList : public IRecordingList
-{
-public:
-	virtual void	AddToList( ClientEntityHandle_t add );
-	virtual void	RemoveFromList( ClientEntityHandle_t remove );
 
-	virtual int		Count();
-	IClientRenderable *Get( int index );
-private:
-	CUtlVector< ClientEntityHandle_t > m_Recording;
-};
-
-static CRecordingList g_RecordingList;
-IRecordingList *recordinglist = &g_RecordingList;
-
-//-----------------------------------------------------------------------------
-// Purpose: Add entity to list
-// Input  : add - 
-// Output : int
-//-----------------------------------------------------------------------------
-void CRecordingList::AddToList( ClientEntityHandle_t add )
-{
-	// This is a hack to remap slot to index
-	if ( m_Recording.Find( add ) != m_Recording.InvalidIndex() )
-	{
-		return;
-	}
-
-	// Add to general list
-	m_Recording.AddToTail( add );
-}
-
-//-----------------------------------------------------------------------------
-// Purpose: 
-// Input  : remove - 
-//-----------------------------------------------------------------------------
-void CRecordingList::RemoveFromList( ClientEntityHandle_t remove )
-{
-	m_Recording.FindAndRemove( remove );
-}
-
-//-----------------------------------------------------------------------------
-// Purpose: 
-// Input  : slot - 
-// Output : IClientRenderable
-//-----------------------------------------------------------------------------
-IClientRenderable *CRecordingList::Get( int index )
-{
-	return cl_entitylist->GetClientRenderableFromHandle( m_Recording[ index ] );
-}
-
-//-----------------------------------------------------------------------------
-// Purpose: 
-// Output : int
-//-----------------------------------------------------------------------------
-int CRecordingList::Count()
-{
-	return m_Recording.Count();
-}
 
 // Should these be somewhere else?
 #define PITCH 0
@@ -160,7 +93,7 @@ void RecvProxy_ToolRecording( const CRecvProxyData *pData, void *pStruct, void *
 		return;
 
 	CBaseEntity *pEnt = (CBaseEntity *)pStruct;
-	pEnt->SetToolRecording( pData->m_Value.m_Int != 0 );
+	pEnt->GetEngineObject()->SetToolRecording( pData->m_Value.m_Int != 0 );
 }
 
 // Expose it to the engine.
@@ -455,7 +388,6 @@ void C_BaseEntity::SetTextureFrameIndex( int iIndex )
 //-----------------------------------------------------------------------------
 C_BaseEntity::C_BaseEntity()
 {
-	m_EntClientFlags = 0;
 	m_bEnableRenderingClipPlane = false;
 
 	m_nRenderFXBlend = 255;
@@ -486,13 +418,7 @@ C_BaseEntity::C_BaseEntity()
 	m_InterpolationListEntry = 0xFFFF;
 	m_TeleportListEntry = 0xFFFF;
 
-#ifndef NO_TOOLFRAMEWORK
-	m_bEnabledInToolView = true;
-	m_bToolRecording = false;
-	m_ToolHandle = 0;
-	m_nLastRecordedFrame = -1;
-	m_bRecordInTools = true;
-#endif
+
 
 #ifdef TF_CLIENT_DLL
 	m_bValidatedOwner = false;
@@ -899,7 +825,7 @@ void C_BaseEntity::UpdateVisibility()
 	}
 #endif
 
-	if ( ShouldDraw() && !IsDormant() && ( !ToolsEnabled() || IsEnabledInToolView() ) )
+	if ( ShouldDraw() && !IsDormant() && ( !ToolsEnabled() || GetEngineObject()->IsEnabledInToolView() ) )
 	{
 		// add/update leafsystem
 		AddToLeafSystem();
@@ -1197,9 +1123,9 @@ void C_BaseEntity::GetRenderBoundsWorldspace( Vector& mins, Vector& maxs )
 
 void C_BaseEntity::GetShadowRenderBounds( Vector &mins, Vector &maxs, ShadowType_t shadowType )
 {
-	m_EntClientFlags |= ENTCLIENTFLAG_GETTINGSHADOWRENDERBOUNDS;
+	GetEngineObject()->GetEntClientFlags() |= ENTCLIENTFLAG_GETTINGSHADOWRENDERBOUNDS;
 	GetRenderBounds( mins, maxs );
-	m_EntClientFlags &= ~ENTCLIENTFLAG_GETTINGSHADOWRENDERBOUNDS;
+	GetEngineObject()->GetEntClientFlags() &= ~ENTCLIENTFLAG_GETTINGSHADOWRENDERBOUNDS;
 }
 
 bool C_BaseEntity::IsTwoPass( void )
@@ -1470,7 +1396,7 @@ bool C_BaseEntity::OnInternalDrawModel(ClientModelRenderInfo_t* pInfo)
 //-----------------------------------------------------------------------------
 bool C_BaseEntity::SetupBones( matrix3x4_t *pBoneToWorldOut, int nMaxBones, int boneMask, float currentTime )
 {
-	return true;
+	return GetEngineObject()->SetupBones(pBoneToWorldOut, nMaxBones, boneMask, currentTime);
 }
 
 //-----------------------------------------------------------------------------
@@ -4086,43 +4012,8 @@ C_AI_BaseNPC *C_BaseEntity::MyNPCPointer( void )
 	return NULL;
 }
 
-//-----------------------------------------------------------------------------
-// Purpose: 
-// Input  : recording - 
-// Output : inline void
-//-----------------------------------------------------------------------------
-void C_BaseEntity::EnableInToolView( bool bEnable )
-{
-#ifndef NO_TOOLFRAMEWORK
-	m_bEnabledInToolView = bEnable;
-	UpdateVisibility();
-#endif
-}
 
-void C_BaseEntity::SetToolRecording( bool recording )
-{
-#ifndef NO_TOOLFRAMEWORK
-	m_bToolRecording = recording;
-	if ( m_bToolRecording )
-	{
-		recordinglist->AddToList( GetClientHandle() );
-	}
-	else
-	{
-        recordinglist->RemoveFromList( GetClientHandle() );
-	}
-#endif
-}
 
-bool C_BaseEntity::HasRecordedThisFrame() const
-{
-#ifndef NO_TOOLFRAMEWORK
-	Assert( m_nLastRecordedFrame <= gpGlobals->framecount );
-	return m_nLastRecordedFrame == gpGlobals->framecount;
-#else
-	return false;
-#endif
-}
 
 void C_BaseEntity::GetToolRecordingState( KeyValues *msg )
 {
@@ -4170,11 +4061,11 @@ void C_BaseEntity::CleanupToolRecordingState( KeyValues *msg )
 
 void C_BaseEntity::RecordToolMessage()
 {
-	Assert( IsToolRecording() );
-	if ( !IsToolRecording() )
+	Assert( GetEngineObject()->IsToolRecording() );
+	if ( !GetEngineObject()->IsToolRecording() )
 		return;
 
-	if ( HasRecordedThisFrame() )
+	if (GetEngineObject()->HasRecordedThisFrame() )
 		return;
 
 	KeyValues *msg = new KeyValues( "entity_state" );
@@ -4182,33 +4073,15 @@ void C_BaseEntity::RecordToolMessage()
 	// Post a message back to all IToolSystems
 	GetToolRecordingState( msg );
 	Assert( (int)GetToolHandle() != 0 );
-	ToolFramework_PostToolMessage( GetToolHandle(), msg );
+	ToolFramework_PostToolMessage(GetEngineObject()->GetToolHandle(), msg );
 	CleanupToolRecordingState( msg );
 
 	msg->deleteThis();
 
-	m_nLastRecordedFrame = gpGlobals->framecount;
+	GetEngineObject()->SetLastRecordedFrame(gpGlobals->framecount);
 }
 
-// (static function)
-void C_BaseEntity::ToolRecordEntities()
-{
-	VPROF_BUDGET( "C_BaseEntity::ToolRecordEnties", VPROF_BUDGETGROUP_TOOLS );
 
-	if ( !ToolsEnabled() || !clienttools->IsInRecordingMode() )
-		return;
-
-	// Let non-dormant client created predictables get added, too
-	int c = recordinglist->Count();
-	for ( int i = 0 ; i < c ; i++ )
-	{
-		IClientRenderable *pRenderable = recordinglist->Get( i );
-		if ( !pRenderable )
-			continue;
-
-		pRenderable->RecordToolMessage();
-	}
-}
 
 
 void C_BaseEntity::AddToInterpolationList()
@@ -4311,13 +4184,6 @@ void C_BaseEntity::CheckCLInterpChanged()
 			pEnt->GetEngineObject()->Interp_UpdateInterpolationAmounts();
 		}
 	}
-}
-
-void C_BaseEntity::DontRecordInTools()
-{
-#ifndef NO_TOOLFRAMEWORK
-	m_bRecordInTools = false;
-#endif
 }
 
 //-----------------------------------------------------------------------------

@@ -33,31 +33,7 @@
 
 extern ConVar ai_sequence_debug;
 
-class CIKSaveRestoreOps : public CClassPtrSaveRestoreOps
-{
-	// save data type interface
-	void Save( const SaveRestoreFieldInfo_t &fieldInfo, ISave *pSave )
-	{
-		Assert( fieldInfo.pTypeDesc->fieldSize == 1 );
-		CIKContext **pIK = (CIKContext **)fieldInfo.pField;
-		bool bHasIK = (*pIK) != 0;
-		pSave->WriteBool( &bHasIK );
-	}
 
-	void Restore( const SaveRestoreFieldInfo_t &fieldInfo, IRestore *pRestore )
-	{
-		Assert( fieldInfo.pTypeDesc->fieldSize == 1 );
-		CIKContext **pIK = (CIKContext **)fieldInfo.pField;
-
-		bool bHasIK;
-		pRestore->ReadBool( &bHasIK );
-		*pIK = (bHasIK) ? new CIKContext : NULL;
-	}
-};
-
-
-
-static CIKSaveRestoreOps s_IKSaveRestoreOp;
 
 
 BEGIN_DATADESC( CBaseAnimating )
@@ -87,8 +63,8 @@ BEGIN_DATADESC( CBaseAnimating )
 //	DEFINE_FIELD( m_pStudioHdr, IStudioHdr ),
 //	DEFINE_FIELD( m_StudioHdrInitLock, CThreadFastMutex ),
 //	DEFINE_FIELD( m_BoneSetupMutex, CThreadFastMutex ),
-	DEFINE_CUSTOM_FIELD( m_pIk, &s_IKSaveRestoreOp ),
-	DEFINE_FIELD( m_iIKCounter, FIELD_INTEGER ),
+	//DEFINE_CUSTOM_FIELD( m_pIk, &s_IKSaveRestoreOp ),
+	//DEFINE_FIELD( m_iIKCounter, FIELD_INTEGER ),
 	//DEFINE_FIELD( m_bClientSideAnimation, FIELD_BOOLEAN ),
 	//DEFINE_FIELD( m_bClientSideFrameReset, FIELD_BOOLEAN ),
 	//DEFINE_FIELD( m_nNewSequenceParity, FIELD_INTEGER ),
@@ -111,7 +87,7 @@ BEGIN_DATADESC( CBaseAnimating )
 	//DEFINE_KEYFIELD( m_flModelScale, FIELD_FLOAT, "modelscale" ),
 	DEFINE_INPUTFUNC( FIELD_VECTOR, "SetModelScale", InputSetModelScale ),
 
-	DEFINE_FIELD( m_fBoneCacheFlags, FIELD_SHORT ),
+	//DEFINE_FIELD( m_fBoneCacheFlags, FIELD_SHORT ),
 
 END_DATADESC()
 
@@ -127,16 +103,14 @@ CBaseAnimating::CBaseAnimating()
 
 
 	//m_bResetSequenceInfoOnLoad = false;
-	m_pIk = NULL;
-	m_iIKCounter = 0;
+	
 
 	//InitStepHeightAdjust();
 
 	// initialize anim clock
 	m_flPrevAnimTime = gpGlobals->curtime;
 
-	m_boneCacheHandle = 0;
-	m_fBoneCacheFlags = 0;
+	
 }
 
 void CBaseAnimating::PostConstructor(const char* szClassname, int iForceEdictIndex) {
@@ -151,8 +125,7 @@ void CBaseAnimating::UpdateOnRemove(void) {
 
 CBaseAnimating::~CBaseAnimating()
 {
-	Studio_DestroyBoneCache( m_boneCacheHandle );
-	delete m_pIk;
+
 }
 
 void CBaseAnimating::Precache()
@@ -222,7 +195,7 @@ void CBaseAnimating::OnRestore()
 void CBaseAnimating::Spawn()
 {
 	BaseClass::Spawn();
-	InitStepHeightAdjust();
+	GetEngineObject()->InitStepHeightAdjust();
 }
 
 
@@ -287,17 +260,10 @@ void CBaseAnimating::StudioFrameAdvanceInternal( IStudioHdr *pStudioHdr, float f
 	// Msg("%s : %s : %5.1f\n", GetClassname(), GetSequenceName( GetSequence() ), GetCycle() );
 	GetEngineObject()->InvalidatePhysicsRecursive( ANIMATION_CHANGED );
 
-	InvalidateBoneCacheIfOlderThan( 0 );
+	GetEngineObject()->InvalidateBoneCacheIfOlderThan( 0 );
 }
 
-void CBaseAnimating::InvalidateBoneCacheIfOlderThan( float deltaTime )
-{
-	CBoneCache *pcache = Studio_GetBoneCache( m_boneCacheHandle );
-	if ( !pcache || !pcache->IsValid( gpGlobals->curtime, deltaTime ) )
-	{
-		InvalidateBoneCache();
-	}
-}
+
 
 //-----------------------------------------------------------------------------
 // Purpose: 
@@ -545,8 +511,8 @@ CBaseEntity* CBaseAnimating::CreateServerRagdoll(int forceBone, const CTakeDamag
 	pRagdoll->SetSourceClassName(this->GetClassname());
 
 	// NPC_STATE_DEAD npc's will have their COND_IN_PVS cleared, so this needs to force SetupBones to happen
-	unsigned short fPrevFlags = this->GetBoneCacheFlags();
-	this->SetBoneCacheFlags(BCF_NO_ANIMATION_SKIP);
+	unsigned short fPrevFlags = this->GetEngineObject()->GetBoneCacheFlags();
+	this->GetEngineObject()->SetBoneCacheFlags(BCF_NO_ANIMATION_SKIP);
 
 	// UNDONE: Extract velocity from bones via animation (like we do on the client)
 	// UNDONE: For now, just move each bone by the total entity velocity if set.
@@ -564,16 +530,16 @@ CBaseEntity* CBaseAnimating::CreateServerRagdoll(int forceBone, const CTakeDamag
 	float fPreviousCycle = clamp(this->GetEngineObject()->GetCycle() - (dt * (1 / fSequenceDuration)), 0.f, 1.f);
 	float fCurCycle = this->GetEngineObject()->GetCycle();
 	// Get current bones positions
-	this->SetupBones(pBoneToWorldNext, BONE_USED_BY_ANYTHING);
+	this->GetEngineObject()->SetupBones(pBoneToWorldNext, BONE_USED_BY_ANYTHING);
 	// Get previous bones positions
 	this->GetEngineObject()->SetCycle(fPreviousCycle);
-	this->SetupBones(pBoneToWorld, BONE_USED_BY_ANYTHING);
+	this->GetEngineObject()->SetupBones(pBoneToWorld, BONE_USED_BY_ANYTHING);
 	// Restore current cycle
 	this->GetEngineObject()->SetCycle(fCurCycle);
 
 	// Reset previous bone flags
-	this->ClearBoneCacheFlags(BCF_NO_ANIMATION_SKIP);
-	this->SetBoneCacheFlags(fPrevFlags);
+	this->GetEngineObject()->ClearBoneCacheFlags(BCF_NO_ANIMATION_SKIP);
+	this->GetEngineObject()->SetBoneCacheFlags(fPrevFlags);
 
 	Vector vel = this->GetEngineObject()->GetAbsVelocity();
 	if ((vel.Length() == 0) && (dt > 0))
@@ -641,7 +607,7 @@ CBaseEntity* CBaseAnimating::CreateServerRagdoll(int forceBone, const CTakeDamag
 		ragdoll_t* pRagInfo = pRagdoll->GetEngineObject()->GetRagdoll();
 		for (int i = 0; i < count; i++)
 		{
-			int physBone = this->GetPhysicsBone(this->GetHitboxBone(boxList[i]));
+			int physBone = this->GetEngineObject()->GetPhysicsBone(this->GetHitboxBone(boxList[i]));
 			IPhysicsObject* pPhysics = pRagInfo->list[physBone].pObject;
 			pPhysics->ApplyForceCenter(info.GetDamageForce() * pPhysics->GetMass() * massScale);
 		}
@@ -1092,80 +1058,6 @@ float CBaseAnimating::EdgeLimitPoseParameter( int iParameter, float flValue, flo
 }
 
 
-//-----------------------------------------------------------------------------
-// Purpose: Returns index number of a given named bone
-// Input  : name of a bone
-// Output :	Bone index number or -1 if bone not found
-//-----------------------------------------------------------------------------
-int CBaseAnimating::LookupBone( const char *szName )
-{
-	const IStudioHdr *pStudioHdr = GetEngineObject()->GetModelPtr();
-	Assert( pStudioHdr );
-	if ( !pStudioHdr )
-		return -1;
-	return pStudioHdr->Studio_BoneIndexByName( szName );
-}
-
-
-//=========================================================
-//=========================================================
-void CBaseAnimating::GetBonePosition ( int iBone, Vector &origin, QAngle &angles )
-{
-	IStudioHdr *pStudioHdr = GetEngineObject()->GetModelPtr( );
-	if (!pStudioHdr)
-	{
-		Assert(!"CBaseAnimating::GetBonePosition: model missing");
-		return;
-	}
-
-	if (iBone < 0 || iBone >= pStudioHdr->numbones())
-	{
-		Assert(!"CBaseAnimating::GetBonePosition: invalid bone index");
-		return;
-	}
-
-	matrix3x4_t bonetoworld;
-	GetBoneTransform( iBone, bonetoworld );
-	
-	MatrixAngles( bonetoworld, angles, origin );
-}
-
-
-
-//=========================================================
-//=========================================================
-
-void CBaseAnimating::GetBoneTransform( int iBone, matrix3x4_t &pBoneToWorld )
-{
-	IStudioHdr *pStudioHdr = GetEngineObject()->GetModelPtr( );
-
-	if (!pStudioHdr)
-	{
-		Assert(!"CBaseAnimating::GetBoneTransform: model missing");
-		return;
-	}
-
-	if (iBone < 0 || iBone >= pStudioHdr->numbones())
-	{
-		Assert(!"CBaseAnimating::GetBoneTransform: invalid bone index");
-		return;
-	}
-
-	CBoneCache *pcache = GetBoneCache( );
-
-	matrix3x4_t *pmatrix = pcache->GetCachedBone( iBone );
-
-	if ( !pmatrix )
-	{
-		MatrixCopy(GetEngineObject()->EntityToWorldTransform(), pBoneToWorld );
-		return;
-	}
-
-	Assert( pmatrix );
-	
-	// FIXME
-	MatrixCopy( *pmatrix, pBoneToWorld );
-}
 
 class CTraceFilterSkipNPCs : public CTraceFilterSimple
 {
@@ -1199,17 +1091,17 @@ public:
 
 void CBaseAnimating::CalculateIKLocks( float currentTime )
 {
-	if ( m_pIk )
+	if (GetEngineObject()->GetIk() )
 	{
 		Ray_t ray;
 		CTraceFilterSkipNPCs traceFilter( this, GetEngineObject()->GetCollisionGroup() );
 		Vector up;
 		GetVectors( NULL, NULL, &up );
 		// FIXME: check number of slots?
-		for (int i = 0; i < m_pIk->m_target.Count(); i++)
+		for (int i = 0; i < GetEngineObject()->GetIk()->m_target.Count(); i++)
 		{
 			trace_t trace;
-			CIKTarget *pTarget = &m_pIk->m_target[i];
+			CIKTarget *pTarget = &GetEngineObject()->GetIk()->m_target[i];
 
 			if (!pTarget->IsActive())
 				continue;
@@ -1286,70 +1178,17 @@ void CBaseAnimating::CalculateIKLocks( float currentTime )
 void CBaseAnimating::Teleport( const Vector *newPosition, const QAngle *newAngles, const Vector *newVelocity )
 {
 	BaseClass::Teleport( newPosition, newAngles, newVelocity );
-	if (m_pIk)
+	if (GetEngineObject()->GetIk())
 	{
-		m_pIk->ClearTargets( );
+		GetEngineObject()->GetIk()->ClearTargets( );
 	}
-	InitStepHeightAdjust();
+	GetEngineObject()->InitStepHeightAdjust();
 }
 
 
-//-----------------------------------------------------------------------------
-// Purpose: build matrices first from the parent, then from the passed in arrays if the bone doesn't exist on the parent
-//-----------------------------------------------------------------------------
 
-void CBaseAnimating::BuildMatricesWithBoneMerge( 
-	const IStudioHdr *pStudioHdr,
-	const QAngle& angles, 
-	const Vector& origin, 
-	const Vector pos[MAXSTUDIOBONES],
-	const Quaternion q[MAXSTUDIOBONES],
-	matrix3x4_t bonetoworld[MAXSTUDIOBONES],
-	CBaseAnimating *pParent,
-	CBoneCache *pParentCache
-	)
-{
-	IStudioHdr *fhdr = pParent->GetEngineObject()->GetModelPtr();
-	mstudiobone_t *pbones = pStudioHdr->pBone( 0 );
-
-	matrix3x4_t rotationmatrix; // model to world transformation
-	AngleMatrix( angles, origin, rotationmatrix);
-
-	for ( int i=0; i < pStudioHdr->numbones(); i++ )
-	{
-		// Now find the bone in the parent entity.
-		bool merged = false;
-		int parentBoneIndex = fhdr->Studio_BoneIndexByName( pbones[i].pszName() );
-		if ( parentBoneIndex >= 0 )
-		{
-			matrix3x4_t *pMat = pParentCache->GetCachedBone( parentBoneIndex );
-			if ( pMat )
-			{
-				MatrixCopy( *pMat, bonetoworld[ i ] );
-				merged = true;
-			}
-		}
-
-		if ( !merged )
-		{
-			// If we get down here, then the bone wasn't merged.
-			matrix3x4_t bonematrix;
-			QuaternionMatrix( q[i], pos[i], bonematrix );
-
-			if (pbones[i].parent == -1) 
-			{
-				ConcatTransforms (rotationmatrix, bonematrix, bonetoworld[i]);
-			} 
-			else 
-			{
-				ConcatTransforms (bonetoworld[pbones[i].parent], bonematrix, bonetoworld[i]);
-			}
-		}
-	}
-}
 
 ConVar sv_pvsskipanimation( "sv_pvsskipanimation", "1", FCVAR_ARCHIVE, "Skips SetupBones when npc's are outside the PVS" );
-ConVar ai_setupbones_debug( "ai_setupbones_debug", "0", 0, "Shows that bones that are setup every think" );
 
 
 
@@ -1360,7 +1199,7 @@ inline bool CBaseAnimating::CanSkipAnimation( void )
 		return false;
 		
 	CAI_BaseNPC *pNPC = MyNPCPointer();
-	if ( pNPC && !pNPC->HasCondition( COND_IN_PVS ) && ( m_fBoneCacheFlags & (BCF_NO_ANIMATION_SKIP | BCF_IS_IN_SPAWN) ) == false )
+	if ( pNPC && !pNPC->HasCondition( COND_IN_PVS ) && (GetEngineObject()->GetBoneCacheFlags() & (BCF_NO_ANIMATION_SKIP | BCF_IS_IN_SPAWN)) == false)
 	{
 		// If we have a player as a child, then we better setup our bones. If we don't,
 		// the PVS will be screwy. 
@@ -1373,120 +1212,9 @@ inline bool CBaseAnimating::CanSkipAnimation( void )
 }
 
 
-void CBaseAnimating::SetupBones( matrix3x4_t *pBoneToWorld, int boneMask )
-{
-	AUTO_LOCK( m_BoneSetupMutex );
-	
-	VPROF_BUDGET( "CBaseAnimating::SetupBones", VPROF_BUDGETGROUP_SERVER_ANIM );
-	
-	MDLCACHE_CRITICAL_SECTION();
 
-	Assert(GetEngineObject()->GetModelPtr() );
 
-	IStudioHdr *pStudioHdr = GetEngineObject()->GetModelPtr( );
 
-	if(!pStudioHdr)
-	{
-		Assert(!"CBaseAnimating::GetSkeleton() without a model");
-		return;
-	}
-
-	Assert( !GetEngineObject()->IsEFlagSet( EFL_SETTING_UP_BONES ) );
-
-	GetEngineObject()->AddEFlags( EFL_SETTING_UP_BONES );
-
-	Vector pos[MAXSTUDIOBONES];
-	Quaternion q[MAXSTUDIOBONES];
-
-	// adjust hit boxes based on IK driven offset
-	Vector adjOrigin = GetEngineObject()->GetAbsOrigin() + Vector( 0, 0, m_flEstIkOffset );
-
-	if ( CanSkipAnimation() )
-	{
-		IBoneSetup boneSetup( pStudioHdr, boneMask, GetEngineObject()->GetPoseParameterArray() );
-		boneSetup.InitPose( pos, q );
-		// Msg( "%.03f : %s:%s not in pvs\n", gpGlobals->curtime, GetClassname(), GetEntityName().ToCStr() );
-	}
-	else 
-	{
-		if ( m_pIk )
-		{
-			// FIXME: pass this into Studio_BuildMatrices to skip transforms
-			CBoneBitList boneComputed;
-			m_iIKCounter++;
-			m_pIk->Init( pStudioHdr, GetEngineObject()->GetAbsAngles(), adjOrigin, gpGlobals->curtime, m_iIKCounter, boneMask );
-			GetSkeleton( pStudioHdr, pos, q, boneMask );
-
-			m_pIk->UpdateTargets( pos, q, pBoneToWorld, boneComputed );
-			CalculateIKLocks( gpGlobals->curtime );
-			m_pIk->SolveDependencies( pos, q, pBoneToWorld, boneComputed );
-		}
-		else
-		{
-			// Msg( "%.03f : %s:%s\n", gpGlobals->curtime, GetClassname(), GetEntityName().ToCStr() );
-			GetSkeleton( pStudioHdr, pos, q, boneMask );
-		}
-	}
-	
-	CBaseAnimating* pParent = GetEngineObject()->GetMoveParent() ? dynamic_cast<CBaseAnimating*>(GetEngineObject()->GetMoveParent()->GetOuter()) : NULL;
-	if ( pParent )
-	{
-		// We're doing bone merging, so do special stuff here.
-		CBoneCache *pParentCache = pParent->GetBoneCache();
-		if ( pParentCache )
-		{
-			BuildMatricesWithBoneMerge( 
-				pStudioHdr, 
-				GetEngineObject()->GetAbsAngles(),
-				adjOrigin, 
-				pos, 
-				q, 
-				pBoneToWorld, 
-				pParent,
-				pParentCache );
-			
-			GetEngineObject()->RemoveEFlags( EFL_SETTING_UP_BONES );
-			if (ai_setupbones_debug.GetBool())
-			{
-				DrawRawSkeleton( pBoneToWorld, boneMask, true, 0.11 );
-			}
-			return;
-		}
-	}
-
-	pStudioHdr->Studio_BuildMatrices(
-		GetEngineObject()->GetAbsAngles(),
-		adjOrigin, 
-		pos, 
-		q, 
-		-1,
-		GetEngineObject()->GetModelScale(), // Scaling
-		pBoneToWorld,
-		boneMask );
-
-	if (ai_setupbones_debug.GetBool())
-	{
-		// Msg("%s:%s:%s (%x)\n", GetClassname(), GetDebugName(), STRING(GetModelName()), boneMask );
-		DrawRawSkeleton( pBoneToWorld, boneMask, true, 0.11 );
-	}
-	GetEngineObject()->RemoveEFlags( EFL_SETTING_UP_BONES );
-}
-
-//=========================================================
-//=========================================================
-int CBaseAnimating::GetNumBones ( void )
-{
-	IStudioHdr *pStudioHdr = GetEngineObject()->GetModelPtr( );
-	if(pStudioHdr)
-	{
-		return pStudioHdr->numbones();
-	}
-	else
-	{
-		Assert(!"CBaseAnimating::GetNumBones: model missing");
-		return 0;
-	}
-}
 
 
 //=========================================================
@@ -1562,7 +1290,7 @@ bool CBaseAnimating::GetAttachment( int iAttachment, matrix3x4_t &attachmentToWo
 	int iBone = pStudioHdr->GetAttachmentBone( iAttachment-1 );
 
 	matrix3x4_t bonetoworld;
-	GetBoneTransform( iBone, bonetoworld );
+	GetEngineObject()->GetBoneTransform( iBone, bonetoworld );
 	if ( (pattachment.flags & ATTACHMENT_FLAG_WORLD_ALIGN) == 0 )
 	{
 		ConcatTransforms( bonetoworld, pattachment.local, attachmentToWorld ); 
@@ -1675,7 +1403,7 @@ void CBaseAnimating::GetEyeballs( Vector &origin, QAngle &angles )
 			{
 				mstudioeyeball_t *pEyeball = pModel->pEyeball( iEyeball );
 				matrix3x4_t bonetoworld;
-				GetBoneTransform( pEyeball->bone, bonetoworld );
+				GetEngineObject()->GetBoneTransform( pEyeball->bone, bonetoworld );
 				VectorTransform( pEyeball->org, bonetoworld,  origin );
 				MatrixAngles( bonetoworld, angles ); // ???
 			}
@@ -1954,11 +1682,7 @@ void CBaseAnimating::SetModel( const char *szModelName )
 		}
 	}
 
-	if ( m_boneCacheHandle )
-	{
-		Studio_DestroyBoneCache( m_boneCacheHandle );
-		m_boneCacheHandle = 0;
-	}
+
 
 	UTIL_SetModel( this, szModelName );
 
@@ -1970,67 +1694,7 @@ void CBaseAnimating::SetModel( const char *szModelName )
 
 
 
-//-----------------------------------------------------------------------------
-// Purpose: return the index to the shared bone cache
-// Output :
-//-----------------------------------------------------------------------------
-CBoneCache *CBaseAnimating::GetBoneCache( void )
-{
-	IStudioHdr *pStudioHdr = GetEngineObject()->GetModelPtr( );
-	Assert(pStudioHdr);
 
-	CBoneCache *pcache = Studio_GetBoneCache( m_boneCacheHandle );
-	int boneMask = BONE_USED_BY_HITBOX | BONE_USED_BY_ATTACHMENT;
-
-	// TF queries these bones to position weapons when players are killed
-#if defined( TF_DLL )
-	boneMask |= BONE_USED_BY_BONE_MERGE;
-#endif
-	if ( pcache )
-	{
-		if ( pcache->IsValid( gpGlobals->curtime ) && (pcache->m_boneMask & boneMask) == boneMask && pcache->m_timeValid <= gpGlobals->curtime)
-		{
-			// Msg("%s:%s:%s (%x:%x:%8.4f) cache\n", GetClassname(), GetDebugName(), STRING(GetModelName()), boneMask, pcache->m_boneMask, pcache->m_timeValid );
-			// in memory and still valid, use it!
-			return pcache;
-		}
-		// in memory, but missing some of the bone masks
-		if ( (pcache->m_boneMask & boneMask) != boneMask )
-		{
-			Studio_DestroyBoneCache( m_boneCacheHandle );
-			m_boneCacheHandle = 0;
-			pcache = NULL;
-		}
-	}
-
-	matrix3x4_t bonetoworld[MAXSTUDIOBONES];
-	SetupBones( bonetoworld, boneMask );
-
-	if ( pcache )
-	{
-		// still in memory but out of date, refresh the bones.
-		pcache->UpdateBones( bonetoworld, pStudioHdr->numbones(), gpGlobals->curtime );
-	}
-	else
-	{
-		bonecacheparams_t params;
-		params.pStudioHdr = pStudioHdr;
-		params.pBoneToWorld = bonetoworld;
-		params.curtime = gpGlobals->curtime;
-		params.boneMask = boneMask;
-
-		m_boneCacheHandle = Studio_CreateBoneCache( params );
-		pcache = Studio_GetBoneCache( m_boneCacheHandle );
-	}
-	Assert(pcache);
-	return pcache;
-}
-
-
-void CBaseAnimating::InvalidateBoneCache( void )
-{
-	Studio_InvalidateBoneCache( m_boneCacheHandle );
-}
 
 bool CBaseAnimating::TestCollision( const Ray_t &ray, unsigned int fContentsMask, trace_t& tr )
 {
@@ -2073,7 +1737,7 @@ bool CBaseAnimating::TestHitboxes( const Ray_t &ray, unsigned int fContentsMask,
 	if ( !set || !set->numhitboxes )
 		return false;
 
-	CBoneCache *pcache = GetBoneCache( );
+	CBoneCache *pcache = GetEngineObject()->GetBoneCache( );
 
 	matrix3x4_t *hitboxbones[MAXSTUDIOBONES];
 	pcache->ReadCachedBonePointers( hitboxbones, pStudioHdr->numbones() );
@@ -2177,9 +1841,9 @@ void CBaseAnimating::GetSkeleton( IStudioHdr *pStudioHdr, Vector pos[], Quaterni
 	IBoneSetup boneSetup( pStudioHdr, boneMask, GetEngineObject()->GetPoseParameterArray() );
 	boneSetup.InitPose( pos, q );
 
-	boneSetup.AccumulatePose( pos, q, GetEngineObject()->GetSequence(), GetEngineObject()->GetCycle(), 1.0, gpGlobals->curtime, m_pIk );
+	boneSetup.AccumulatePose( pos, q, GetEngineObject()->GetSequence(), GetEngineObject()->GetCycle(), 1.0, gpGlobals->curtime, GetEngineObject()->GetIk() );
 
-	if ( m_pIk )
+	if (GetEngineObject()->GetIk() )
 	{
 		CIKContext auto_ik;
 		auto_ik.Init( pStudioHdr, GetEngineObject()->GetAbsAngles(), GetEngineObject()->GetAbsOrigin(), gpGlobals->curtime, 0, boneMask );
@@ -2373,7 +2037,7 @@ void CBaseAnimating::DrawServerHitboxes( float duration /*= 0.0f*/, bool monocol
 	{
 		mstudiobbox_t *pbox = set->pHitbox( i );
 
-		GetBonePosition( pbox->bone, position, angles );
+		GetEngineObject()->GetBonePosition( pbox->bone, position, angles );
 
 		if ( !monocolor )
 		{
@@ -2389,33 +2053,7 @@ void CBaseAnimating::DrawServerHitboxes( float duration /*= 0.0f*/, bool monocol
 }
 
 
-void CBaseAnimating::DrawRawSkeleton( matrix3x4_t boneToWorld[], int boneMask, bool noDepthTest, float duration, bool monocolor )
-{
-	IStudioHdr *pStudioHdr = GetEngineObject()->GetModelPtr();
-	if ( !pStudioHdr )
-		return;
 
-	int i;
-	int r = 255;
-	int g = 255;
-	int b = monocolor ? 255 : 0;
-	
-
-	for (i = 0; i < pStudioHdr->numbones(); i++)
-	{
-		if (pStudioHdr->pBone( i )->flags & boneMask)
-		{
-			Vector p1;
-			MatrixPosition( boneToWorld[i], p1 );
-			if ( pStudioHdr->pBone( i )->parent != -1 )
-			{
-				Vector p2;
-				MatrixPosition( boneToWorld[pStudioHdr->pBone( i )->parent], p2 );
-                NDebugOverlay::Line( p1, p2, r, g, b, noDepthTest, duration );
-			}
-		}
-	}
-}
 
 
 int CBaseAnimating::GetHitboxBone( int hitboxIndex )
@@ -2451,7 +2089,7 @@ bool CBaseAnimating::ComputeHitboxSurroundingBox( Vector *pVecWorldMins, Vector 
 	if ( !set || !set->numhitboxes )
 		return false;
 
-	CBoneCache *pCache = GetBoneCache();
+	CBoneCache *pCache = GetEngineObject()->GetBoneCache();
 
 	// Compute a box in world space that surrounds this entity
 	pVecWorldMins->Init( FLT_MAX, FLT_MAX, FLT_MAX );
@@ -2491,7 +2129,7 @@ bool CBaseAnimating::ComputeEntitySpaceHitboxSurroundingBox( Vector *pVecWorldMi
 	if ( !set || !set->numhitboxes )
 		return false;
 
-	CBoneCache *pCache = GetBoneCache();
+	CBoneCache *pCache = GetEngineObject()->GetBoneCache();
 	matrix3x4_t *hitboxbones[MAXSTUDIOBONES];
 	pCache->ReadCachedBonePointers( hitboxbones, pStudioHdr->numbones() );
 
@@ -2516,16 +2154,7 @@ bool CBaseAnimating::ComputeEntitySpaceHitboxSurroundingBox( Vector *pVecWorldMi
 }
 
 
-int CBaseAnimating::GetPhysicsBone( int boneIndex )
-{
-	IStudioHdr *pStudioHdr = GetEngineObject()->GetModelPtr();
-	if ( pStudioHdr )
-	{
-		if ( boneIndex >= 0 && boneIndex < pStudioHdr->numbones() )
-			return pStudioHdr->pBone( boneIndex )->physicsbone;
-	}
-	return 0;
-}
+
 
 bool CBaseAnimating::LookupHitbox( const char *szName, int& outSet, int& outBox )
 {
@@ -2587,7 +2216,7 @@ int CBaseAnimating::GetHitboxesFrontside( int *boxList, int boxMax, const Vector
 			{
 				mstudiobbox_t *pbox = set->pHitbox( b );
 
-				GetBoneTransform( pbox->bone, matrix );
+				GetEngineObject()->GetBoneTransform( pbox->bone, matrix );
 				Vector center = (pbox->bbmax + pbox->bbmin) * 0.5;
 				Vector centerWs;
 				VectorTransform( center, matrix, centerWs );
@@ -2606,20 +2235,7 @@ int CBaseAnimating::GetHitboxesFrontside( int *boxList, int boxMax, const Vector
 	return count;
 }
 
-void CBaseAnimating::EnableServerIK()
-{
-	if (!m_pIk)
-	{
-		m_pIk = new CIKContext;
-		m_iIKCounter = 0;
-	}
-}
 
-void CBaseAnimating::DisableServerIK()
-{
-	delete m_pIk;
-	m_pIk = NULL;
-}
 
 Activity CBaseAnimating::GetSequenceActivity( int iSequence )
 {

@@ -26,6 +26,7 @@
 #include "vphysics/player_controller.h"
 #include "ragdoll_shared.h"
 #include "iservervehicle.h"
+#include "bone_setup.h"
 
 //class CBaseEntity;
 // We can only ever move 512 entities across a transition
@@ -210,7 +211,10 @@ public:
 		m_allAsleep = false;
 		m_lastUpdateTickCount = -1;
 		m_anglesOverrideString = NULL_STRING;
-
+		m_pIk = NULL;
+		m_iIKCounter = 0;
+		m_boneCacheHandle = 0;
+		m_fBoneCacheFlags = 0;
 	}
 
 	virtual ~CEngineObjectInternal()
@@ -219,6 +223,8 @@ public:
 		UnlockStudioHdr();
 		ClearRagdoll();
 		VPhysicsDestroyObject();
+		Studio_DestroyBoneCache(m_boneCacheHandle);
+		delete m_pIk;
 	}
 
 	static bool s_bAbsQueriesValid;
@@ -784,6 +790,30 @@ public:
 
 	unsigned char GetRenderFX() const { return m_nRenderFX; }
 	void SetRenderFX(unsigned char nRenderFX) { m_nRenderFX = nRenderFX; }
+
+	void SetOverlaySequence(int nOverlaySequence) { m_nOverlaySequence = nOverlaySequence; }
+	virtual void SetupBones(matrix3x4_t* pBoneToWorld, int boneMask);
+	void				DrawRawSkeleton(matrix3x4_t boneToWorld[], int boneMask, bool noDepthTest = true, float duration = 0.0f, bool monocolor = false);
+	virtual void GetBoneTransform(int iBone, matrix3x4_t& pBoneToWorld);
+	int  LookupBone(const char* szName);
+	void GetBonePosition(int iBone, Vector& origin, QAngle& angles);
+	int	GetPhysicsBone(int boneIndex);
+
+	int GetNumBones(void);
+	CBoneCache* GetBoneCache(void);
+	void InvalidateBoneCache();
+	void InvalidateBoneCacheIfOlderThan(float deltaTime);
+	int		GetBoneCacheFlags(void) { return m_fBoneCacheFlags; }
+	inline void	SetBoneCacheFlags(unsigned short fFlag) { m_fBoneCacheFlags |= fFlag; }
+	inline void	ClearBoneCacheFlags(unsigned short fFlag) { m_fBoneCacheFlags &= ~fFlag; }
+	// also calculate IK on server? (always done on client)
+	void EnableServerIK();
+	void DisableServerIK();
+	CIKContext* GetIk() { return m_pIk; }
+	void SetIKGroundContactInfo(float minHeight, float maxHeight);
+	void InitStepHeightAdjust(void);
+	void UpdateStepOrigin(void);
+	float GetEstIkOffset() const { return m_flEstIkOffset; }
 public:
 	// Networking related methods
 	void NetworkStateChanged();
@@ -798,7 +828,10 @@ private:
 	// called by all vphysics inits
 	bool			VPhysicsInitSetup();
 	void CalcRagdollSize(void);
-
+	void BuildMatricesWithBoneMerge(const IStudioHdr* pStudioHdr, const QAngle& angles,
+		const Vector& origin, const Vector pos[MAXSTUDIOBONES],
+		const Quaternion q[MAXSTUDIOBONES], matrix3x4_t bonetoworld[MAXSTUDIOBONES],
+		CBaseAnimating* pParent, CBoneCache* pParentCache);
 private:
 
 	friend class CBaseEntity;
@@ -929,6 +962,20 @@ private:
 
 	// was pev->renderfx
 	CNetworkVar(unsigned char, m_nRenderFX);
+	CNetworkVar(int, m_nOverlaySequence);
+
+	CThreadFastMutex	m_BoneSetupMutex;
+
+	float				m_flIKGroundContactTime;
+	float				m_flIKGroundMinHeight;
+	float				m_flIKGroundMaxHeight;
+
+	float				m_flEstIkFloor; // debounced
+	float				m_flEstIkOffset;
+	CIKContext*			m_pIk;
+	int					m_iIKCounter;
+	memhandle_t		m_boneCacheHandle;
+	unsigned short	m_fBoneCacheFlags;		// Used for bone cache state on model
 };
 
 inline PVSInfo_t* CEngineObjectInternal::GetPVSInfo()

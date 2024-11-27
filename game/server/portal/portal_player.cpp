@@ -935,71 +935,71 @@ void CPortal_Player::DoAnimationEvent( PlayerAnimEvent_t event, int nData )
 // Purpose: Override setup bones so that is uses the render angles from
 //			the Portal animation state to setup the hitboxes.
 //-----------------------------------------------------------------------------
-void CPortal_Player::SetupBones( matrix3x4_t *pBoneToWorld, int boneMask )
-{
-	VPROF_BUDGET( "CBaseAnimating::SetupBones", VPROF_BUDGETGROUP_SERVER_ANIM );
-
-	// Set the mdl cache semaphore.
-	MDLCACHE_CRITICAL_SECTION();
-
-	// Get the studio header.
-	Assert(GetEngineObject()->GetModelPtr() );
-	IStudioHdr *pStudioHdr = GetEngineObject()->GetModelPtr( );
-
-	Vector pos[MAXSTUDIOBONES];
-	Quaternion q[MAXSTUDIOBONES];
-
-	// Adjust hit boxes based on IK driven offset.
-	Vector adjOrigin = GetEngineObject()->GetAbsOrigin() + Vector( 0, 0, m_flEstIkOffset );
-
-	// FIXME: pass this into Studio_BuildMatrices to skip transforms
-	CBoneBitList boneComputed;
-	if ( m_pIk )
-	{
-		m_iIKCounter++;
-		m_pIk->Init( pStudioHdr, GetEngineObject()->GetAbsAngles(), adjOrigin, gpGlobals->curtime, m_iIKCounter, boneMask );
-		GetSkeleton( pStudioHdr, pos, q, boneMask );
-
-		m_pIk->UpdateTargets( pos, q, pBoneToWorld, boneComputed );
-		CalculateIKLocks( gpGlobals->curtime );
-		m_pIk->SolveDependencies( pos, q, pBoneToWorld, boneComputed );
-	}
-	else
-	{
-		GetSkeleton( pStudioHdr, pos, q, boneMask );
-	}
-
-	CBaseAnimating *pParent = dynamic_cast< CBaseAnimating* >(GetEngineObject()->GetMoveParent()? GetEngineObject()->GetMoveParent()->GetOuter() : NULL);
-	if ( pParent )
-	{
-		// We're doing bone merging, so do special stuff here.
-		CBoneCache *pParentCache = pParent->GetBoneCache();
-		if ( pParentCache )
-		{
-			BuildMatricesWithBoneMerge( 
-				pStudioHdr, 
-				m_PlayerAnimState->GetRenderAngles(),
-				adjOrigin, 
-				pos, 
-				q, 
-				pBoneToWorld, 
-				pParent, 
-				pParentCache );
-
-			return;
-		}
-	}
-
-	pStudioHdr->Studio_BuildMatrices(
-		m_PlayerAnimState->GetRenderAngles(),
-		adjOrigin, 
-		pos, 
-		q, 
-		-1,
-		GetEngineObject()->GetModelScale(), // Scaling
-		pBoneToWorld,
-		boneMask );
-}
+//void CPortal_Player::SetupBones( matrix3x4_t *pBoneToWorld, int boneMask )
+//{
+//	VPROF_BUDGET( "CBaseAnimating::SetupBones", VPROF_BUDGETGROUP_SERVER_ANIM );
+//
+//	// Set the mdl cache semaphore.
+//	MDLCACHE_CRITICAL_SECTION();
+//
+//	// Get the studio header.
+//	Assert(GetEngineObject()->GetModelPtr() );
+//	IStudioHdr *pStudioHdr = GetEngineObject()->GetModelPtr( );
+//
+//	Vector pos[MAXSTUDIOBONES];
+//	Quaternion q[MAXSTUDIOBONES];
+//
+//	// Adjust hit boxes based on IK driven offset.
+//	Vector adjOrigin = GetEngineObject()->GetAbsOrigin() + Vector( 0, 0, m_flEstIkOffset );
+//
+//	// FIXME: pass this into Studio_BuildMatrices to skip transforms
+//	CBoneBitList boneComputed;
+//	if ( m_pIk )
+//	{
+//		m_iIKCounter++;
+//		m_pIk->Init( pStudioHdr, GetEngineObject()->GetAbsAngles(), adjOrigin, gpGlobals->curtime, m_iIKCounter, boneMask );
+//		GetSkeleton( pStudioHdr, pos, q, boneMask );
+//
+//		m_pIk->UpdateTargets( pos, q, pBoneToWorld, boneComputed );
+//		CalculateIKLocks( gpGlobals->curtime );
+//		m_pIk->SolveDependencies( pos, q, pBoneToWorld, boneComputed );
+//	}
+//	else
+//	{
+//		GetSkeleton( pStudioHdr, pos, q, boneMask );
+//	}
+//
+//	CBaseAnimating *pParent = dynamic_cast< CBaseAnimating* >(GetEngineObject()->GetMoveParent()? GetEngineObject()->GetMoveParent()->GetOuter() : NULL);
+//	if ( pParent )
+//	{
+//		// We're doing bone merging, so do special stuff here.
+//		CBoneCache *pParentCache = pParent->GetBoneCache();
+//		if ( pParentCache )
+//		{
+//			BuildMatricesWithBoneMerge( 
+//				pStudioHdr, 
+//				GetRenderAngles(),
+//				adjOrigin, 
+//				pos, 
+//				q, 
+//				pBoneToWorld, 
+//				pParent, 
+//				pParentCache );
+//
+//			return;
+//		}
+//	}
+//
+//	pStudioHdr->Studio_BuildMatrices(
+//		GetRenderAngles(),
+//		adjOrigin, 
+//		pos, 
+//		q, 
+//		-1,
+//		GetEngineObject()->GetModelScale(), // Scaling
+//		pBoneToWorld,
+//		boneMask );
+//}
 
 
 // Set the activity based on an event or current state

@@ -12,7 +12,7 @@
 void GetRagdollCurSequenceWithDeathPose( C_BaseAnimating *entity, matrix3x4_t *curBones, float flTime, int activity, int frame )
 {
 	// blow the cached prev bones
-	entity->InvalidateBoneCache();
+	entity->GetEngineObject()->InvalidateBoneCache();
 
 	Vector vPrevOrigin = entity->GetEngineObject()->GetAbsOrigin();
 
@@ -42,7 +42,7 @@ void GetRagdollCurSequenceWithDeathPose( C_BaseAnimating *entity, matrix3x4_t *c
 		entity->GetEngineObject()->SetAbsOrigin( vNewOrigin );
 
 		// blow the cached prev bones
-		entity->InvalidateBoneCache();
+		entity->GetEngineObject()->InvalidateBoneCache();
 
 		entity->GetEngineObject()->SetSequence( iTempSequence );
 		entity->GetEngineObject()->SetCycle( flTempCycle );
@@ -56,7 +56,7 @@ void GetRagdollCurSequenceWithDeathPose( C_BaseAnimating *entity, matrix3x4_t *c
 		entity->SetupBones( curBones, MAXSTUDIOBONES, BONE_USED_BY_ANYTHING, flTime );
 
 		// blow the cached prev bones
-		entity->InvalidateBoneCache();
+		entity->GetEngineObject()->InvalidateBoneCache();
 
 		entity->SetupBones( NULL, -1, BONE_USED_BY_ANYTHING, flTime );
 	}

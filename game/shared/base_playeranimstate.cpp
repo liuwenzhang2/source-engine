@@ -74,7 +74,7 @@ CBasePlayerAnimState::CBasePlayerAnimState()
 	m_flCurrentFeetYaw = 0.0f;
 	m_flLastYaw = 0.0f;
 	m_flLastTurnTime = 0.0f;
-	m_angRender.Init();
+	//m_angRender.Init();
 	m_vLastMovePose.Init();
 	m_iCurrent8WayIdleSequence = -1;
 	m_iCurrent8WayCrouchIdleSequence = -1;
@@ -862,8 +862,8 @@ void CBasePlayerAnimState::ComputePoseParam_BodyYaw()
 	float flCurrentTorsoYaw = AngleNormalize( m_flEyeYaw - m_flCurrentFeetYaw );
 
 	// Rotate entire body into position
-	m_angRender[YAW] = m_flCurrentFeetYaw;
-	m_angRender[PITCH] = m_angRender[ROLL] = 0;
+	//m_angRender[YAW] = m_flCurrentFeetYaw;
+	//m_angRender[PITCH] = m_angRender[ROLL] = 0;
 		
 	SetOuterBodyYaw( flCurrentTorsoYaw );
 	g_flLastBodyYaw = flCurrentTorsoYaw;
@@ -910,10 +910,10 @@ Activity CBasePlayerAnimState::BodyYawTranslateActivity( Activity activity )
 	return activity;
 }
 
-const QAngle& CBasePlayerAnimState::GetRenderAngles()
-{
-	return m_angRender;
-}
+//const QAngle& CBasePlayerAnimState::GetRenderAngles()
+//{
+//	return m_angRender;
+//}
 
 
 void CBasePlayerAnimState::GetOuterAbsVelocity( Vector& vel ) const
@@ -1036,12 +1036,12 @@ void CBasePlayerAnimState::DebugShowAnimState( int iStartLine )
 	if ( m_AnimConfig.m_LegAnimType == LEGANIM_8WAY )
 	{
 		AnimStatePrintf( iLine++, "ent yaw: %.2f, body_yaw: %.2f, move_yaw: %.2f, gait_yaw: %.2f, body_pitch: %.2f", 
-			m_angRender[YAW], g_flLastBodyYaw, m_flLastMoveYaw, m_flGaitYaw, g_flLastBodyPitch );
+			m_flCurrentFeetYaw, g_flLastBodyYaw, m_flLastMoveYaw, m_flGaitYaw, g_flLastBodyPitch );
 	}
 	else
 	{
 		AnimStatePrintf( iLine++, "ent yaw: %.2f, body_yaw: %.2f, body_pitch: %.2f, move_x: %.2f, move_y: %.2f", 
-			m_angRender[YAW], g_flLastBodyYaw, g_flLastBodyPitch, m_vLastMovePose.x, m_vLastMovePose.y );
+			m_flCurrentFeetYaw, g_flLastBodyYaw, g_flLastBodyPitch, m_vLastMovePose.x, m_vLastMovePose.y );
 	}
 
 	// Draw a red triangle on the ground for the eye yaw.
@@ -1055,7 +1055,7 @@ void CBasePlayerAnimState::DebugShowAnimState( int iStartLine )
 	debugoverlay->AddTriangleOverlay( vBasePos+vRight*flBaseSize/2, vBasePos-vRight*flBaseSize/2, vBasePos+vForward*flHeight, 255, 0, 0, 255, false, 0.01 );
 
 	// Draw a blue triangle on the ground for the body yaw.
-	angles[YAW] = m_angRender[YAW];
+	angles[YAW] = m_flCurrentFeetYaw;
 	AngleVectors( angles, &vForward, &vRight, &vUp );
 	debugoverlay->AddTriangleOverlay( vBasePos+vRight*flBaseSize/2, vBasePos-vRight*flBaseSize/2, vBasePos+vForward*flHeight, 0, 0, 255, 255, false, 0.01 );
 

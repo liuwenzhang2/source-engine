@@ -1854,21 +1854,7 @@ bool CBaseEntity::IsSimulatingOnAlternateTicks()
 	return sv_alternateticks.GetBool();
 }
 
-#ifdef CLIENT_DLL
-//-----------------------------------------------------------------------------
-// Purpose: 
-// Input  :  - 
-// Output : Returns true on success, false on failure.
-//-----------------------------------------------------------------------------
-bool CBaseEntity::IsToolRecording() const
-{
-#ifndef NO_TOOLFRAMEWORK
-	return m_bToolRecording;
-#else
-	return false;
-#endif
-}
-#endif
+
 
 #if !defined( CLIENT_DLL )
 

@@ -650,7 +650,7 @@ void CParticleProperty::UpdateControlPoint( ParticleEffectList_t *pEffect, int i
 				if ( pAnimating )
 				{
 					matrix3x4_t rootBone;
-					if ( pAnimating->GetRootBone( rootBone ) )
+					if ( pAnimating->GetEngineObject()->GetRootBone( rootBone ) )
 					{
 						MatrixVectors( rootBone, &vecForward, &vecRight, &vecUp );
 						MatrixPosition( rootBone, vecOrigin );

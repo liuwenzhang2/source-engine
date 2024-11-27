@@ -138,7 +138,7 @@ public:
 	inline void ForceJumpThisFrame( void ) { ForceButtons( IN_JUMP ); }
 
 	void DoAnimationEvent( PlayerAnimEvent_t event, int nData );
-	void SetupBones( matrix3x4_t *pBoneToWorld, int boneMask );
+	//void SetupBones( matrix3x4_t *pBoneToWorld, int boneMask );
 
 	// physics interactions
 	virtual void PickupObject(CBaseEntity *pObject, bool bLimitMassAndSize );

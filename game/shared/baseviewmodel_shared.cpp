@@ -41,7 +41,6 @@ CBaseViewModel::CBaseViewModel()
 #if defined( CLIENT_DLL )
 	// NOTE: We do this here because the color is never transmitted for the view model.
 	m_nOldAnimationParity = 0;
-	m_EntClientFlags |= ENTCLIENTFLAG_ALWAYS_INTERPOLATE;
 #endif
 	SetRenderColor( 255, 255, 255, 255 );
 
@@ -54,6 +53,16 @@ CBaseViewModel::CBaseViewModel()
 
 	m_nAnimationParity	= 0;
 }
+
+#ifdef CLIENT_DLL
+bool CBaseViewModel::Init(int entnum, int iSerialNum)
+{
+	bool bRet = BaseClass::Init(entnum, iSerialNum);
+	GetEngineObject()->GetEntClientFlags() |= ENTCLIENTFLAG_ALWAYS_INTERPOLATE;
+	return bRet;
+}
+#endif // CLIENT_DLL
+
 
 //-----------------------------------------------------------------------------
 // Purpose: 

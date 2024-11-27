@@ -323,7 +323,6 @@ C_Portal_Player::C_Portal_Player()
 
 	m_angEyeAngles.Init();
 
-	m_EntClientFlags |= ENTCLIENTFLAG_DONTUSEIK;
 	m_blinkTimer.Invalidate();
 
 	m_CCDeathHandle = INVALID_CLIENT_CCHANDLE;
@@ -332,6 +331,7 @@ C_Portal_Player::C_Portal_Player()
 bool C_Portal_Player::Init(int entnum, int iSerialNum) {
 	bool ret = BaseClass::Init(entnum, iSerialNum);
 	GetEngineObject()->AddVar(&m_iv_angEyeAngles);//&m_angEyeAngles, , LATCH_SIMULATION_VAR
+	GetEngineObject()->GetEntClientFlags() |= ENTCLIENTFLAG_DONTUSEIK;
 	return ret;
 }
 
@@ -801,7 +801,7 @@ const QAngle& C_Portal_Player::GetRenderAngles()
 	}
 	else
 	{
-		return m_PlayerAnimState->GetRenderAngles();
+		return BaseClass::GetRenderAngles();
 	}
 }
 
@@ -1585,7 +1585,7 @@ void C_Portal_Player::CalcPortalView( Vector &eyeOrigin, QAngle &eyeAngles )
 
 		//DevMsg( 2, "transforming portal view to   <%f %f %f> <%f %f %f>\n", eyeOrigin.x, eyeOrigin.y, eyeOrigin.z, eyeAngles.x, eyeAngles.y, eyeAngles.z );
 
-		if ( IsToolRecording() )
+		if (GetEngineObject()->IsToolRecording() )
 		{
 			static EntityTeleportedRecordingState_t state;
 
@@ -1599,7 +1599,7 @@ void C_Portal_Player::CalcPortalView( Vector &eyeOrigin, QAngle &eyeAngles )
 
 			// Post a message back to all IToolSystems
 			Assert( (int)GetToolHandle() != 0 );
-			ToolFramework_PostToolMessage( GetToolHandle(), msg );
+			ToolFramework_PostToolMessage(GetEngineObject()->GetToolHandle(), msg );
 
 			msg->deleteThis();
 		}

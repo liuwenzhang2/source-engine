@@ -2331,7 +2331,7 @@ void CCSPlayer::TraceAttack( const CTakeDamageInfo &info, const Vector &vecDir, 
 //=============================================================================
 		 
 		matrix3x4_t boneTransformToWorld, boneTransformToObject;
-		GetBoneTransform(GetHitboxBone(ptr->hitbox), boneTransformToWorld);
+		GetEngineObject()->GetBoneTransform(GetHitboxBone(ptr->hitbox), boneTransformToWorld);
 		MatrixInvert(boneTransformToWorld, boneTransformToObject);
 		VectorTransform(ptr->endpos, boneTransformToObject, m_vLastHitLocationObjectSpace);
 		 
@@ -3061,7 +3061,7 @@ bool CCSPlayer::CSWeaponDrop( CBaseCombatWeapon *pWeapon, bool bDropShield, bool
 			// Assume bone zero is the root
 			for ( iWeaponBoneIndex = 0; iWeaponBoneIndex < hdr->numbones(); ++iWeaponBoneIndex )
 			{
-				iBIndex = LookupBone( hdr->pBone( iWeaponBoneIndex )->pszName() );
+				iBIndex = GetEngineObject()->LookupBone( hdr->pBone( iWeaponBoneIndex )->pszName() );
 				// Found one!
 				if ( iBIndex != -1 )
 				{
@@ -3074,12 +3074,12 @@ bool CCSPlayer::CSWeaponDrop( CBaseCombatWeapon *pWeapon, bool bDropShield, bool
 
 			if ( iBIndex == -1 )
 			{
-				iBIndex = LookupBone( "ValveBiped.Bip01_R_Hand" );
+				iBIndex = GetEngineObject()->LookupBone( "ValveBiped.Bip01_R_Hand" );
 			}
 		}
 		else
 		{
-			iBIndex = LookupBone( "ValveBiped.Bip01_R_Hand" );
+			iBIndex = GetEngineObject()->LookupBone( "ValveBiped.Bip01_R_Hand" );
 		}
 
 		if ( iBIndex != -1)
@@ -3089,16 +3089,16 @@ bool CCSPlayer::CSWeaponDrop( CBaseCombatWeapon *pWeapon, bool bDropShield, bool
 			matrix3x4_t transform;
 
 			// Get the transform for the weapon bonetoworldspace in the NPC
-			GetBoneTransform( iBIndex, transform );
+			GetEngineObject()->GetBoneTransform( iBIndex, transform );
 
 			// find offset of root bone from origin in local space
 			// Make sure we're detached from hierarchy before doing this!!!
 			pWeapon->GetEngineObject()->StopFollowingEntity();
 			pWeapon->GetEngineObject()->SetAbsOrigin( Vector( 0, 0, 0 ) );
 			pWeapon->GetEngineObject()->SetAbsAngles( QAngle( 0, 0, 0 ) );
-			pWeapon->InvalidateBoneCache();
+			pWeapon->GetEngineObject()->InvalidateBoneCache();
 			matrix3x4_t rootLocal;
-			pWeapon->GetBoneTransform( iWeaponBoneIndex, rootLocal );
+			pWeapon->GetEngineObject()->GetBoneTransform( iWeaponBoneIndex, rootLocal );
 
 			// invert it
 			matrix3x4_t rootInvLocal;

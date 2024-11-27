@@ -65,7 +65,6 @@ IMPLEMENT_CLIENTCLASS_DT(C_ServerRagdoll, DT_Ragdoll, CRagdollProp)
 
 	//RecvPropEHandle(RECVINFO(m_hUnragdoll)),
 	RecvPropFloat(RECVINFO(m_flBlendWeight)),
-	RecvPropInt(RECVINFO(m_nOverlaySequence)),
 END_RECV_TABLE()
 
 
@@ -73,8 +72,6 @@ C_ServerRagdoll::C_ServerRagdoll( void )
 
 {
 	m_flBlendWeight = 0.0f;
-	m_flBlendWeightCurrent = 0.0f;
-	m_nOverlaySequence = -1;
 	m_flFadeScale = 1;
 }
 
@@ -87,11 +84,6 @@ bool C_ServerRagdoll::Init(int entnum, int iSerialNum) {
 void C_ServerRagdoll::PostDataUpdate( DataUpdateType_t updateType )
 {
 	BaseClass::PostDataUpdate( updateType );
-}
-
-float C_ServerRagdoll::LastBoneChangedTime()
-{
-	return GetEngineObject()->GetLastBoneChangeTime();
 }
 
 int C_ServerRagdoll::InternalDrawModel( int flags )
@@ -174,93 +166,16 @@ void C_ServerRagdoll::AddEntity( void )
 	BaseClass::AddEntity();
 
 	// Move blend weight toward target over 0.2 seconds
-	m_flBlendWeightCurrent = Approach( m_flBlendWeight, m_flBlendWeightCurrent, gpGlobals->frametime * 5.0f );
+	GetEngineObject()->SetBlendWeightCurrent(Approach( m_flBlendWeight, GetEngineObject()->GetBlendWeightCurrent(), gpGlobals->frametime * 5.0f));
 }
 
 void C_ServerRagdoll::AccumulateLayers( IBoneSetup &boneSetup, Vector pos[], Quaternion q[], float currentTime )
 {
 	BaseClass::AccumulateLayers( boneSetup, pos, q, currentTime );
 
-	if ( m_nOverlaySequence >= 0 && m_nOverlaySequence < boneSetup.GetStudioHdr()->GetNumSeq() )
+	if (GetEngineObject()->GetOverlaySequence() >= 0 && GetEngineObject()->GetOverlaySequence() < boneSetup.GetStudioHdr()->GetNumSeq())
 	{
-		boneSetup.AccumulatePose( pos, q, m_nOverlaySequence, GetEngineObject()->GetCycle(), m_flBlendWeightCurrent, currentTime, m_pIk );
-	}
-}
-
-void C_ServerRagdoll::BuildTransformations( IStudioHdr *hdr, Vector *pos, Quaternion q[], const matrix3x4_t &cameraTransform, int boneMask, CBoneBitList &boneComputed )
-{
-	if ( !hdr )
-		return;
-	matrix3x4_t bonematrix;
-	bool boneSimulated[MAXSTUDIOBONES];
-
-	// no bones have been simulated
-	memset( boneSimulated, 0, sizeof(boneSimulated) );
-	mstudiobone_t *pbones = hdr->pBone( 0 );
-
-	mstudioseqdesc_t *pSeqDesc = NULL;
-	if ( m_nOverlaySequence >= 0 && m_nOverlaySequence < hdr->GetNumSeq() )
-	{
-		pSeqDesc = &hdr->pSeqdesc( m_nOverlaySequence );
-	}
-
-	int i;
-	for ( i = 0; i < GetEngineObject()->GetElementCount(); i++ )
-	{
-		int index = GetEngineObject()->GetBoneIndex(i);
-		if ( index >= 0 )
-		{
-			if ( hdr->boneFlags(index) & boneMask )
-			{
-				boneSimulated[index] = true;
-				matrix3x4_t &matrix = GetBoneForWrite( index );
-
-				if ( m_flBlendWeightCurrent != 0.0f && pSeqDesc && 
-					 // FIXME: this bone access is illegal
-					 pSeqDesc->weight( index ) != 0.0f )
-				{
-					// Use the animated bone position instead
-					boneSimulated[index] = false;
-				}
-				else
-				{	
-					AngleMatrix(GetEngineObject()->GetRagAngles(i), GetEngineObject()->GetRagPos(i), matrix );
-				}
-			}
-		}
-	}
-
-	for ( i = 0; i < hdr->numbones(); i++ ) 
-	{
-		if ( !( hdr->boneFlags( i ) & boneMask ) )
-			continue;
-
-		// BUGBUG: Merge this code with the code in c_baseanimating somehow!!!
-		// animate all non-simulated bones
-		if ( boneSimulated[i] || 
-			hdr->CalcProceduralBone( i, &m_BoneAccessor ) )
-		{
-			continue;
-		}
-		else
-		{
-			QuaternionMatrix( q[i], pos[i], bonematrix );
-
-			if (pbones[i].parent == -1) 
-			{
-				ConcatTransforms( cameraTransform, bonematrix, GetBoneForWrite( i ) );
-			} 
-			else 
-			{
-				ConcatTransforms( GetBone( pbones[i].parent ), bonematrix, GetBoneForWrite( i ) );
-			}
-		}
-
-		if ( pbones[i].parent == -1 ) 
-		{
-			// Apply client-side effects to the transformation matrix
-		//	ApplyBoneMatrixTransform( GetBoneForWrite( i ) );
-		}
+		boneSetup.AccumulatePose( pos, q, GetEngineObject()->GetOverlaySequence(), GetEngineObject()->GetCycle(), GetEngineObject()->GetBlendWeightCurrent(), currentTime, GetEngineObject()->GetIk());
 	}
 }
 
@@ -336,7 +251,7 @@ public:
 		return BaseClass::SetupBones( pBoneToWorldOut, nMaxBones, boneMask, currentTime );
 	}
 
-	virtual void BuildTransformations( IStudioHdr *hdr, Vector *pos, Quaternion q[], const matrix3x4_t& cameraTransform, int boneMask, CBoneBitList &boneComputed )
+	virtual void BeforeBuildTransformations( IStudioHdr *hdr, Vector *pos, Quaternion q[], const matrix3x4_t& cameraTransform, int boneMask, CBoneBitList &boneComputed )
 	{
 		VPROF_BUDGET( "C_ServerRagdollAttached::SetupBones", VPROF_BUDGETGROUP_CLIENT_ANIMATION );
 
@@ -346,10 +261,9 @@ public:
 		float frac = RemapVal( gpGlobals->curtime, m_parentTime, m_parentTime+ATTACH_INTERP_TIME, 0, 1 );
 		frac = clamp( frac, 0.f, 1.f );
 		// interpolate offset over some time
-		Vector offset = m_vecOffset * (1-frac);
+		offset = m_vecOffset * (1-frac);
 
 		C_BaseAnimating *parent = GetEngineObject()->GetMoveParent()?GetEngineObject()->GetMoveParent()->GetOuter()->GetBaseAnimating():NULL;
-		Vector worldOrigin;
 		worldOrigin.Init();
 
 
@@ -359,35 +273,49 @@ public:
 			parent->SetupBones( NULL, -1, BONE_USED_BY_ANYTHING, gpGlobals->curtime );
 
 			matrix3x4_t boneToWorld;
-			parent->GetCachedBoneMatrix( m_boneIndexAttached, boneToWorld );
+			parent->GetEngineObject()->GetCachedBoneMatrix( m_boneIndexAttached, boneToWorld );
 			VectorTransform( m_attachmentPointBoneSpace, boneToWorld, worldOrigin );
 		}
-		BaseClass::BuildTransformations( hdr, pos, q, cameraTransform, boneMask, boneComputed );
+		//BaseClass::BuildTransformations( hdr, pos, q, cameraTransform, boneMask, boneComputed );
 
-		if ( parent )
+
+	}
+
+	virtual void AfterBuildTransformations(IStudioHdr* hdr, Vector* pos, Quaternion q[], const matrix3x4_t& cameraTransform, int boneMask, CBoneBitList& boneComputed)
+	{
+		VPROF_BUDGET("C_ServerRagdollAttached::SetupBones", VPROF_BUDGETGROUP_CLIENT_ANIMATION);
+
+		if (!hdr)
+			return;
+
+		
+		//BaseClass::BuildTransformations(hdr, pos, q, cameraTransform, boneMask, boneComputed);
+		C_BaseAnimating* parent = GetEngineObject()->GetMoveParent() ? GetEngineObject()->GetMoveParent()->GetOuter()->GetBaseAnimating() : NULL;
+		if (parent)
 		{
 			int index = GetEngineObject()->GetBoneIndex(m_ragdollAttachedObjectIndex);
-			const matrix3x4_t &matrix = GetBone( index );
+			const matrix3x4_t& matrix = GetEngineObject()->GetBone(index);
 			Vector ragOrigin;
-			VectorTransform( m_attachmentPointRagdollSpace, matrix, ragOrigin );
+			VectorTransform(m_attachmentPointRagdollSpace, matrix, ragOrigin);
 			offset = worldOrigin - ragOrigin;
 			// fixes culling
-			GetEngineObject()->SetAbsOrigin( worldOrigin );
+			GetEngineObject()->SetAbsOrigin(worldOrigin);
 			m_vecOffset = offset;
 		}
 
-		for ( int i = 0; i < hdr->numbones(); i++ )
+		for (int i = 0; i < hdr->numbones(); i++)
 		{
-			if ( !( hdr->boneFlags( i ) & boneMask ) )
+			if (!(hdr->boneFlags(i) & boneMask))
 				continue;
 
 			Vector pos;
-			matrix3x4_t &matrix = GetBoneForWrite( i );
-			MatrixGetColumn( matrix, 3, pos );
+			matrix3x4_t& matrix = GetEngineObject()->GetBoneForWrite(i);
+			MatrixGetColumn(matrix, 3, pos);
 			pos += offset;
-			MatrixSetColumn( pos, 3, matrix );
+			MatrixSetColumn(pos, 3, matrix);
 		}
 	}
+
 	void OnDataChanged( DataUpdateType_t updateType );
 	virtual float LastBoneChangedTime() { return FLT_MAX; }
 
@@ -398,6 +326,9 @@ public:
 	int			m_boneIndexAttached;
 	float		m_parentTime;
 	bool		m_bHasParent;
+	Vector offset;
+	Vector worldOrigin;
+
 private:
 	C_ServerRagdollAttached( const C_ServerRagdollAttached & );
 };

@@ -2861,7 +2861,7 @@ void CAI_BaseNPC::PostMovement()
 {
 	AI_PROFILE_SCOPE( CAI_BaseNPC_PostMovement );
 
-	InvalidateBoneCache();
+	GetEngineObject()->InvalidateBoneCache();
 
 	if (GetEngineObject()->GetModelPtr() && GetEngineObject()->GetModelPtr()->SequencesAvailable() )
 	{
@@ -11922,7 +11922,7 @@ bool CAI_BaseNPC::CineCleanup()
 			// reset position
 			Vector new_origin;
 			QAngle new_angle;
-			GetBonePosition( 0, new_origin, new_angle );
+			GetEngineObject()->GetBonePosition( 0, new_origin, new_angle );
 
 			// Figure out how far they have moved
 			// We can't really solve this problem because we can't query the movement of the origin relative

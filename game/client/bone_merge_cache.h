@@ -13,6 +13,7 @@
 
 class C_BaseAnimating;
 class IStudioHdr;
+class IEngineObjectClient;
 
 
 #include "mathlib/vector.h"
@@ -24,7 +25,7 @@ public:
 
 	CBoneMergeCache();
 	
-	void Init( C_BaseAnimating *pOwner );
+	void Init( IEngineObjectClient *pOwner );
 
 	// This copies the transform from all bones in the followed entity that have 
 	// names that match our bones.
@@ -48,11 +49,11 @@ private:
 	void UpdateCache();
 
 	// This is the entity that we're keeping the cache updated for.
-	C_BaseAnimating *m_pOwner;
+	IEngineObjectClient *m_pOwner;
 
 	// All the cache data is based off these. When they change, the cache data is regenerated.
 	// These are either all valid pointers or all NULL.
-	C_BaseAnimating *m_pFollow;
+	IEngineObjectClient *m_pFollow;
 	IStudioHdr		*m_pFollowHdr;
 	const IStudioHdr	*m_pFollowRenderHdr;
 	IStudioHdr		*m_pOwnerHdr;

@@ -15,6 +15,7 @@
 
 
 class C_BaseAnimating;
+class IEngineObjectClient;
 
 
 class CBoneAccessor : public IBoneAccessor
@@ -26,7 +27,7 @@ public:
 	
 	// Initialize.
 #if defined( CLIENT_DLL )
-	void Init( const C_BaseAnimating *pAnimating, matrix3x4_t *pBones );
+	void Init( const IEngineObjectClient *pAnimating, matrix3x4_t *pBones );
 #endif
 	
 	int GetReadableBones();
@@ -49,7 +50,7 @@ private:
 #endif
 
 	// Only used in the client DLL for debug verification.
-	const C_BaseAnimating *m_pAnimating;
+	const IEngineObjectClient *m_pAnimating;
 
 	matrix3x4_t *m_pBones;
 
@@ -72,7 +73,7 @@ inline CBoneAccessor::CBoneAccessor( matrix3x4_t *pBones )
 }
 
 #if defined( CLIENT_DLL )
-	inline void CBoneAccessor::Init( const C_BaseAnimating *pAnimating, matrix3x4_t *pBones )
+	inline void CBoneAccessor::Init( const IEngineObjectClient *pAnimating, matrix3x4_t *pBones )
 	{
 		m_pAnimating = pAnimating;
 		m_pBones = pBones;

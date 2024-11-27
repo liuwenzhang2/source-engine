@@ -452,8 +452,6 @@ public:
 	virtual bool			TestCollision( const Ray_t& ray, unsigned int mask, trace_t& trace );
 	virtual	bool			TestHitboxes( const Ray_t &ray, unsigned int fContentsMask, trace_t& tr );
 	virtual void			ComputeWorldSpaceSurroundingBox( Vector *pWorldMins, Vector *pWorldMaxs );
-	virtual void			GetBonePosition(int iBone, Vector& origin, QAngle& angles) {}
-	virtual void			InvalidateBoneCache() {}
 	virtual bool			GetAttachment(const char* szName, Vector& absOrigin, QAngle& absAngles) { return false; }
 public:
 
@@ -704,7 +702,7 @@ public:
 	{
 		return STRING( GetEngineObject()->GetClassname());
 	}
-
+	
 	// Debug Overlays
 	void		 EntityText( int text_offset, const char *text, float flDuration, int r = 255, int g = 255, int b = 255, int a = 255 );
 	const char	*GetDebugName(void); // do not make this virtual -- designed to handle NULL this
@@ -1371,7 +1369,9 @@ public:
 	virtual void Deflected( CBaseEntity *pDeflectedBy, Vector &vecDir ) {}
 
 //	void Relink() {}
-
+	virtual bool CanSkipAnimation(void) { return true; }
+	virtual	void GetSkeleton(IStudioHdr* pStudioHdr, Vector pos[], Quaternion q[], int boneMask) {}
+	virtual void CalculateIKLocks(float currentTime) {}
 public:
 
 	// VPHYSICS Integration -----------------------------------------------
@@ -1562,9 +1562,6 @@ public:
 	static void PrecacheModelComponents( int nModelIndex );
 	static void PrecacheSoundHelper( const char *pName );
 
-	void InitStepHeightAdjust(void);
-	void SetIKGroundContactInfo(float minHeight, float maxHeight);
-	void UpdateStepOrigin(void);
 
 	virtual void SetLightingOriginRelative(CBaseEntity* pLightingOriginRelative);
 	void SetLightingOriginRelative(string_t strLightingOriginRelative);
@@ -1636,12 +1633,7 @@ private:
 	int				m_nPushEnumCount;
 
 
-	float				m_flIKGroundContactTime;
-	float				m_flIKGroundMinHeight;
-	float				m_flIKGroundMaxHeight;
 
-	float				m_flEstIkFloor; // debounced
-	float				m_flEstIkOffset;
 
 	//Adrian
 	CNetworkVar( unsigned char, m_iTextureFrameIndex );

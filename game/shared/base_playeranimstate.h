@@ -93,7 +93,7 @@ public:
 
 	// The client uses this to figure out what angles to render the entity with (since as the guy turns,
 	// it will change his body_yaw pose parameter before changing his rendered angle).
-	virtual const QAngle& GetRenderAngles();
+	//virtual const QAngle& GetRenderAngles();
 
 
 // Overrideables.
@@ -217,7 +217,7 @@ protected:
 	// One of the above enums
 	int					m_nTurningInPlace;
 
-	QAngle				m_angRender;
+	//QAngle				m_angRender;
 
 private:
 

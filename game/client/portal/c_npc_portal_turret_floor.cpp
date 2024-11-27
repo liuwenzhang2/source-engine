@@ -103,7 +103,7 @@ void C_NPC_Portal_FloorTurret::LaserOff( void )
 
 void C_NPC_Portal_FloorTurret::LaserOn( void )
 {
-	if ( !IsBoneAccessAllowed() )
+	if ( !GetEngineObject()->IsBoneAccessAllowed() )
 	{
 		LaserOff();
 		return;

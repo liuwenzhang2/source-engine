@@ -476,11 +476,11 @@ void CCSBot::ComputePartPositions( CCSPlayer *player )
 
 			// gut
 			box = set->pHitbox( gutBox );
-			player->GetBonePosition( box->bone, info->m_gutPos, angles );	
+			player->GetEngineObject()->GetBonePosition( box->bone, info->m_gutPos, angles );
 
 			// head
 			box = set->pHitbox( headBox );
-			player->GetBonePosition( box->bone, info->m_headPos, angles );
+			player->GetEngineObject()->GetBonePosition( box->bone, info->m_headPos, angles );
 
 			Vector forward, right;
 			AngleVectors( angles, &forward, &right, NULL );
@@ -496,11 +496,11 @@ void CCSBot::ComputePartPositions( CCSPlayer *player )
 
 			// left side
 			box = set->pHitbox( leftElbowBox );
-			player->GetBonePosition( box->bone, info->m_leftSidePos, angles );	
+			player->GetEngineObject()->GetBonePosition( box->bone, info->m_leftSidePos, angles );
 
 			// right side
 			box = set->pHitbox( rightElbowBox );
-			player->GetBonePosition( box->bone, info->m_rightSidePos, angles );	
+			player->GetEngineObject()->GetBonePosition( box->bone, info->m_rightSidePos, angles );
 
 			return;
 		}

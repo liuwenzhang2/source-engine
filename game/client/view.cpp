@@ -788,8 +788,8 @@ void CViewRender::SetUpViews()
 	partition->SuppressLists( PARTITION_ALL_CLIENT_EDICTS, true );
 
 	// Enable access to all model bones
-	C_BaseAnimating::PopBoneAccess( "OnRenderStart->CViewRender::SetUpView" ); // pops the (true, false) bone access set in OnRenderStart
-	C_BaseAnimating::PushAllowBoneAccess( true, true, "CViewRender::SetUpView->OnRenderEnd" ); // pop is in OnRenderEnd()
+	ClientEntityList().PopBoneAccess("OnRenderStart->CViewRender::SetUpView"); // pops the (true, false) bone access set in OnRenderStart
+	ClientEntityList().PushAllowBoneAccess( true, true, "CViewRender::SetUpView->OnRenderEnd" ); // pop is in OnRenderEnd()
 
 	// Compute the world->main camera transform
     // This is only done for the main "middle-eye" view, not for the various other views.

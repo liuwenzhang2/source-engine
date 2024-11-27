@@ -60,10 +60,10 @@ QAngle const& C_PortalGhostRenderable::GetRenderAngles( void )
 	return GetEngineGhost()->GetRenderAngles();
 }
 
-bool C_PortalGhostRenderable::SetupBones( matrix3x4_t *pBoneToWorldOut, int nMaxBones, int boneMask, float currentTime )
-{
-	return GetEngineGhost()->SetupBones(pBoneToWorldOut, nMaxBones, boneMask, currentTime);
-}
+//bool C_PortalGhostRenderable::SetupBones( matrix3x4_t *pBoneToWorldOut, int nMaxBones, int boneMask, float currentTime )
+//{
+//	return GetEngineGhost()->SetupBones(pBoneToWorldOut, nMaxBones, boneMask, currentTime);
+//}
 
 void C_PortalGhostRenderable::GetRenderBounds( Vector& mins, Vector& maxs )
 {

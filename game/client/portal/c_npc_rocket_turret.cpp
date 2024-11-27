@@ -105,7 +105,7 @@ void C_NPC_RocketTurret::LaserOff( void )
 
 void C_NPC_RocketTurret::LaserOn( void )
 {
-	if ( !IsBoneAccessAllowed() )
+	if ( !GetEngineObject()->IsBoneAccessAllowed() )
 	{
 		LaserOff();
 		return;

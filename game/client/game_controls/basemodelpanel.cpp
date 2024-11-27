@@ -415,7 +415,7 @@ void CModelPanel::SetupModel( void )
 	// setup the handle
 	m_hModel = pEnt;
 
-	pEnt->DontRecordInTools();
+	pEnt->GetEngineObject()->DontRecordInTools();
 	pEnt->GetEngineObject()->AddEffects( EF_NODRAW ); // don't let the renderer draw the model normally
 
 	if ( m_pModelInfo->m_nSkin >= 0 )
@@ -477,7 +477,7 @@ void CModelPanel::SetupModel( void )
 				continue;
 			}
 
-			pTemp->DontRecordInTools();
+			pTemp->GetEngineObject()->DontRecordInTools();
 			pTemp->GetEngineObject()->AddEffects( EF_NODRAW ); // don't let the renderer draw the model normally
 			pTemp->GetEngineObject()->FollowEntity(m_hModel.Get() ? m_hModel->GetEngineObject() : NULL); // attach to parent model
 

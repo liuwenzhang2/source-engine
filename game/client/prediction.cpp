@@ -1784,7 +1784,7 @@ void CPrediction::_Update( bool received_new_world_update, bool validframe,
 	// This is cheesy, but if we have entities that are parented to attachments on other entities, then 
 	// it'll wind up needing to get a bone transform.
 	{
-		C_BaseAnimating::InvalidateBoneCaches();
+		ClientEntityList().InvalidateBoneCaches();
 		C_BaseAnimating::AutoAllowBoneAccess boneaccess( true, true );
 
 		// Remove any purely client predicted entities that were left "dangling" because the 

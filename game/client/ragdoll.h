@@ -93,10 +93,8 @@ public:
 	void GetRenderBounds(Vector& theMins, Vector& theMaxs);
 	virtual void AddEntity(void);
 	virtual void AccumulateLayers(IBoneSetup& boneSetup, Vector pos[], Quaternion q[], float currentTime);
-	virtual void BuildTransformations(IStudioHdr* pStudioHdr, Vector* pos, Quaternion q[], const matrix3x4_t& cameraTransform, int boneMask, CBoneBitList& boneComputed);
 	IPhysicsObject* GetElement(int elementNum);
 	virtual void UpdateOnRemove();
-	virtual float LastBoneChangedTime();
 
 
 
@@ -110,8 +108,6 @@ private:
 	typedef CHandle<C_BaseAnimating> CBaseAnimatingHandle;
 	//CNetworkVar( CBaseAnimatingHandle, m_hUnragdoll );
 	CNetworkVar(float, m_flBlendWeight);
-	float m_flBlendWeightCurrent;
-	CNetworkVar(int, m_nOverlaySequence);
 };
 
 #endif // RAGDOLL_H

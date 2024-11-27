@@ -1987,7 +1987,7 @@ void CBaseCombatCharacter::Weapon_Drop( CBaseCombatWeapon *pWeapon, const Vector
 			// Assume bone zero is the root
 			for ( iWeaponBoneIndex = 0; iWeaponBoneIndex < hdr->numbones(); ++iWeaponBoneIndex )
 			{
-				iBIndex = LookupBone( hdr->pBone( iWeaponBoneIndex )->pszName() );
+				iBIndex = GetEngineObject()->LookupBone( hdr->pBone( iWeaponBoneIndex )->pszName() );
 				// Found one!
 				if ( iBIndex != -1 )
 				{
@@ -1997,12 +1997,12 @@ void CBaseCombatCharacter::Weapon_Drop( CBaseCombatWeapon *pWeapon, const Vector
 
 			if ( iBIndex == -1 )
 			{
-				iBIndex = LookupBone( "ValveBiped.Weapon_bone" );
+				iBIndex = GetEngineObject()->LookupBone( "ValveBiped.Weapon_bone" );
 			}
 		}
 		else
 		{
-			iBIndex = LookupBone( "ValveBiped.Weapon_bone" );
+			iBIndex = GetEngineObject()->LookupBone( "ValveBiped.Weapon_bone" );
 		}
 
 		if ( iBIndex != -1)  
@@ -2012,16 +2012,16 @@ void CBaseCombatCharacter::Weapon_Drop( CBaseCombatWeapon *pWeapon, const Vector
 			matrix3x4_t transform;
 
 			// Get the transform for the weapon bonetoworldspace in the NPC
-			GetBoneTransform( iBIndex, transform );
+			GetEngineObject()->GetBoneTransform( iBIndex, transform );
 
 			// find offset of root bone from origin in local space
 			// Make sure we're detached from hierarchy before doing this!!!
 			pWeapon->GetEngineObject()->StopFollowingEntity();
 			pWeapon->GetEngineObject()->SetAbsOrigin( Vector( 0, 0, 0 ) );
 			pWeapon->GetEngineObject()->SetAbsAngles( QAngle( 0, 0, 0 ) );
-			pWeapon->InvalidateBoneCache();
+			pWeapon->GetEngineObject()->InvalidateBoneCache();
 			matrix3x4_t rootLocal;
-			pWeapon->GetBoneTransform( iWeaponBoneIndex, rootLocal );
+			pWeapon->GetEngineObject()->GetBoneTransform( iWeaponBoneIndex, rootLocal );
 
 			// invert it
 			matrix3x4_t rootInvLocal;

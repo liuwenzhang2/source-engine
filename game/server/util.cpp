@@ -1789,10 +1789,10 @@ int DispatchSpawn( CBaseEntity *pEntity )
 		else
 		{
 			// Don't allow the PVS check to skip animation setup during spawning
-			pAnimating->SetBoneCacheFlags( BCF_IS_IN_SPAWN );
+			pAnimating->GetEngineObject()->SetBoneCacheFlags( BCF_IS_IN_SPAWN );
 			pEntity->Spawn();
 			if ( pEntSafe != NULL )
-				pAnimating->ClearBoneCacheFlags( BCF_IS_IN_SPAWN );
+				pAnimating->GetEngineObject()->ClearBoneCacheFlags( BCF_IS_IN_SPAWN );
 		}
 		mdlcache->SetAsyncLoad( MDLCACHE_ANIMBLOCK, bAsyncAnims );
 

@@ -387,7 +387,7 @@ bool CBaseServerVehicle::NPC_GetPassengerSeatPositionLocal( CBaseCombatCharacter
 
 	Vector vecPos;
 	QAngle vecAngles;
-	this->InvalidateBoneCache(); // NOTE: We're moving with velocity, so we're almost always out of date
+	this->GetEngineObject()->InvalidateBoneCache(); // NOTE: We're moving with velocity, so we're almost always out of date
 	this->GetAttachmentLocal( nSeatAttachment, vecPos, vecAngles );
 
 	if ( vecResultPos != NULL )
@@ -893,7 +893,7 @@ bool CBaseServerVehicle::GetLocalAttachmentAtTime( int nQuerySequence, int nAtta
 	// Setup the model for the query
 	this->GetEngineObject()->SetSequence( nQuerySequence );
 	this->GetEngineObject()->SetCycle( flCyclePoint );
-	this->InvalidateBoneCache();
+	this->GetEngineObject()->InvalidateBoneCache();
 
 	// Query for the point
 	Vector vecOrigin;
@@ -913,7 +913,7 @@ bool CBaseServerVehicle::GetLocalAttachmentAtTime( int nQuerySequence, int nAtta
 	// Restore the model after the query
 	this->GetEngineObject()->SetSequence( nOldSequence );
 	this->GetEngineObject()->SetCycle( flOldCycle );
-	this->InvalidateBoneCache();
+	this->GetEngineObject()->InvalidateBoneCache();
 
 	return true;
 }
@@ -1063,7 +1063,7 @@ void CBaseServerVehicle::HandlePassengerEntry( CBaseCombatCharacter *pPassenger,
 				this->GetEngineObject()->SetAnimTime(gpGlobals->curtime);
 				this->GetEngineObject()->ResetSequence( iEntryAnim );
 				this->GetEngineObject()->ResetClientsideFrame();
-				this->InvalidateBoneCache();	// This is necessary because we need to query attachment points this frame for blending!
+				this->GetEngineObject()->InvalidateBoneCache();	// This is necessary because we need to query attachment points this frame for blending!
 				GetDrivableVehicle()->SetVehicleEntryAnim( true );
 
 				pPlayer->GetInVehicle( this, VEHICLE_ROLE_DRIVER );
@@ -1203,7 +1203,7 @@ int CBaseServerVehicle::GetEntryAnimForPoint( const Vector &vecEyePoint )
 
 		Vector vecPosition;
 		QAngle vecAngles;
-		this->GetBonePosition( pbox->bone, vecPosition, vecAngles );
+		this->GetEngineObject()->GetBonePosition( pbox->bone, vecPosition, vecAngles );
 
 		// Build a rotation matrix from orientation
 		matrix3x4_t fRotateMatrix;

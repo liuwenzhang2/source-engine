@@ -450,7 +450,7 @@ void CBaseAnimatingOverlay::GetSkeleton( IStudioHdr *pStudioHdr, Vector pos[], Q
 	IBoneSetup boneSetup( pStudioHdr, boneMask, GetEngineObject()->GetPoseParameterArray() );
 	boneSetup.InitPose( pos, q );
 
-	boneSetup.AccumulatePose( pos, q, GetEngineObject()->GetSequence(), GetEngineObject()->GetCycle(), 1.0, gpGlobals->curtime, m_pIk );
+	boneSetup.AccumulatePose( pos, q, GetEngineObject()->GetSequence(), GetEngineObject()->GetCycle(), 1.0, gpGlobals->curtime, GetEngineObject()->GetIk() );
 
 	// sort the layers
 	int layer[MAX_OVERLAYS] = {};
@@ -473,11 +473,11 @@ void CBaseAnimatingOverlay::GetSkeleton( IStudioHdr *pStudioHdr, Vector pos[], Q
 		{
 			CAnimationLayer &pLayer = m_AnimOverlay[layer[i]];
 			// UNDONE: Is it correct to use overlay weight for IK too?
-			boneSetup.AccumulatePose( pos, q, pLayer.m_nSequence, pLayer.m_flCycle, pLayer.m_flWeight, gpGlobals->curtime, m_pIk );
+			boneSetup.AccumulatePose( pos, q, pLayer.m_nSequence, pLayer.m_flCycle, pLayer.m_flWeight, gpGlobals->curtime, GetEngineObject()->GetIk() );
 		}
 	}
 
-	if ( m_pIk )
+	if (GetEngineObject()->GetIk() )
 	{
 		CIKContext auto_ik;
 		auto_ik.Init( pStudioHdr, GetEngineObject()->GetAbsAngles(), GetEngineObject()->GetAbsOrigin(), gpGlobals->curtime, 0, boneMask );

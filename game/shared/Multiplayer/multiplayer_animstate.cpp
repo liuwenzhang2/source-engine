@@ -60,7 +60,7 @@ CMultiPlayerAnimState::CMultiPlayerAnimState( CBasePlayer *pPlayer, MultiPlayerM
 	m_DebugAnimData.Init();
 
 	m_pPlayer = NULL;
-	m_angRender.Init();
+	//m_angRender.Init();
 
 	m_bCurrentFeetYawInitialized = false;
 	m_flLastAnimationStateClearTime = 0.0f;
@@ -1707,7 +1707,7 @@ void CMultiPlayerAnimState::ComputePoseParam_AimYaw( IStudioHdr *pStudioHdr )
 	}
 
 	// Rotate the body into position.
-	m_angRender[YAW] = m_flCurrentFeetYaw;
+	//m_angRender[YAW] = m_flCurrentFeetYaw;
 
 	// Find the aim(torso) yaw base on the eye and feet yaws.
 	float flAimYaw = m_flEyeYaw - m_flCurrentFeetYaw;
@@ -1770,10 +1770,10 @@ void CMultiPlayerAnimState::ConvergeYawAngles( float flGoalYaw, float flYawRate,
 // Input  :  - 
 // Output : const QAngle&
 //-----------------------------------------------------------------------------
-const QAngle& CMultiPlayerAnimState::GetRenderAngles()
-{
-	return m_angRender;
-}
+//const QAngle& CMultiPlayerAnimState::GetRenderAngles()
+//{
+//	return m_angRender;
+//}
 
 //-----------------------------------------------------------------------------
 // Purpose: 
@@ -1905,7 +1905,7 @@ void CMultiPlayerAnimState::DebugShowAnimStateForPlayer( bool bIsServer )
 	Anim_StatePrintf( iLine++, "Time: %.2f, Speed: %.2f, MaxSpeed: %.2f", gpGlobals->curtime, vecVelocity.Length2D(), GetCurrentMaxGroundSpeed() );
 
 	// Write out the 9-way blend data.
-	Anim_StatePrintf( iLine++, "EntityYaw: %.2f, AimYaw: %.2f, AimPitch: %.2f, MoveX: %.2f, MoveY: %.2f", m_angRender[YAW], m_DebugAnimData.m_flAimYaw, m_DebugAnimData.m_flAimPitch, m_DebugAnimData.m_vecMoveYaw.x, m_DebugAnimData.m_vecMoveYaw.y );
+	Anim_StatePrintf( iLine++, "EntityYaw: %.2f, AimYaw: %.2f, AimPitch: %.2f, MoveX: %.2f, MoveY: %.2f", m_flCurrentFeetYaw, m_DebugAnimData.m_flAimYaw, m_DebugAnimData.m_flAimPitch, m_DebugAnimData.m_vecMoveYaw.x, m_DebugAnimData.m_vecMoveYaw.y );
 
 //	Anim_StateLog( "--------------------------------------------\n\n" );
 	Anim_StatePrintf( iLine++, "--------------------------------------------\n\n" );
@@ -2026,7 +2026,7 @@ void CMultiPlayerAnimState::DebugShowAnimState( int iStartLine )
 	debugoverlay->AddTriangleOverlay( vBasePos+vRight*flBaseSize/2, vBasePos-vRight*flBaseSize/2, vBasePos+vForward*flHeight, 255, 0, 0, 255, false, 0.01 );
 
 	// Draw a blue triangle on the ground for the body yaw.
-	angles[YAW] = m_angRender[YAW];
+	angles[YAW] = m_flCurrentFeetYaw;
 	AngleVectors( angles, &vForward, &vRight, &vUp );
 	debugoverlay->AddTriangleOverlay( vBasePos+vRight*flBaseSize/2, vBasePos-vRight*flBaseSize/2, vBasePos+vForward*flHeight, 0, 0, 255, 255, false, 0.01 );	
 }

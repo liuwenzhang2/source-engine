@@ -32,6 +32,10 @@ class CBoneAccessor;
 struct PS_SD_Static_World_StaticProps_ClippedProp_t;
 struct PS_InternalData_t;
 struct PS_SD_Static_SurfaceProperties_t;
+class CBoneCache;
+class CIKContext;
+typedef unsigned int HTOOLHANDLE;
+class CBoneMergeCache;
 
 class VarMapEntry_t
 {
@@ -397,6 +401,7 @@ public:
 	virtual void StopFollowingEntity() = 0;	// will also change to MOVETYPE_NONE
 	virtual bool IsFollowingEntity() = 0;
 	virtual IEngineObjectClient* GetFollowedEntity() = 0;
+	virtual IEngineObjectClient* FindFollowedEntity() = 0;
 	virtual void PreDataUpdate(DataUpdateType_t updateType) = 0;
 	virtual void PostDataUpdate(DataUpdateType_t updateType) = 0;
 	// This is called once per frame before any data is read in from the server.
@@ -521,6 +526,42 @@ public:
 	virtual const QAngle& GetRagAngles(int index) = 0;
 	virtual unsigned char GetRenderFX() const = 0;
 	virtual void SetRenderFX(unsigned char nRenderFX) = 0;
+	virtual void SetToolHandle(HTOOLHANDLE handle) = 0;
+	virtual HTOOLHANDLE GetToolHandle() const = 0;
+	virtual void EnableInToolView(bool bEnable) = 0;
+	virtual bool IsEnabledInToolView() const = 0;
+	virtual void SetToolRecording(bool recording) = 0;
+	virtual bool IsToolRecording() const = 0;
+	virtual bool HasRecordedThisFrame() const = 0;
+	// used to exclude entities from being recorded in the SFM tools
+	virtual void DontRecordInTools() = 0;
+	virtual bool ShouldRecordInTools() const = 0;
+	virtual CIKContext* GetIk() = 0;
+	virtual void DestroyIk() = 0;
+	virtual bool SetupBones(matrix3x4_t* pBoneToWorldOut, int nMaxBones, int boneMask, float currentTime) = 0;
+	virtual const matrix3x4_t& GetBone(int iBone) const = 0;
+	virtual matrix3x4_t& GetBoneForWrite(int iBone) = 0;
+	virtual void InvalidateBoneCache() = 0;
+	virtual bool IsBoneCacheValid() const = 0;	// Returns true if the bone cache is considered good for this frame.
+	virtual void GetCachedBoneMatrix(int boneIndex, matrix3x4_t& out) = 0;
+	virtual CBoneCache* GetBoneCache(IStudioHdr* pStudioHdr) = 0;
+	virtual int LookupBone(const char* szName) = 0;
+	virtual void GetBonePosition(int iBone, Vector& origin, QAngle& angles) = 0;
+	virtual void GetBoneTransform(int iBone, matrix3x4_t& pBoneToWorld) = 0;
+	virtual int GetReadableBones() = 0;
+	virtual void SetReadableBones(int flags) = 0;
+	virtual int GetWritableBones() = 0;
+	virtual void SetWritableBones(int flags) = 0;
+	virtual bool GetRootBone(matrix3x4_t& rootBone) = 0;
+	virtual unsigned short& GetEntClientFlags() = 0;
+	virtual const CUtlVector< matrix3x4_t >& GetCachedBoneData() = 0;
+	virtual CBoneMergeCache* GetBoneMergeCache() = 0;
+	virtual int GetAccumulatedBoneMask() = 0;
+	virtual void SetLastRecordedFrame(int nLastRecordedFrame) = 0;
+	virtual float GetBlendWeightCurrent() = 0;
+	virtual void SetBlendWeightCurrent(float flBlendWeightCurrent) = 0;
+	virtual int	GetOverlaySequence() = 0;
+	virtual bool IsBoneAccessAllowed() const = 0;
 };
 
 class IEnginePortalClient {
@@ -713,6 +754,10 @@ public:
 	// Sizes entity list to specified size
 	virtual void				SetMaxEntities(int maxents) = 0;
 	virtual int					GetMaxEntities() = 0;
+
+	virtual unsigned long GetPreviousBoneCounter() = 0;
+	virtual CUtlVector<IEngineObjectClient*>& GetPreviousBoneSetups() = 0;
+	virtual unsigned long GetModelBoneCounter() = 0;
 };
 
 extern IClientEntityList* entitylist;

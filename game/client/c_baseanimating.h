@@ -126,11 +126,10 @@ public:
 
 	// base model functionality
 	float		  ClampCycle( float cycle, bool isLooping );
-	virtual void BuildTransformations( IStudioHdr *pStudioHdr, Vector *pos, Quaternion q[], const matrix3x4_t& cameraTransform, int boneMask, CBoneBitList &boneComputed );
+
 	virtual void ApplyBoneMatrixTransform( matrix3x4_t& transform );
 
-	// model specific
-	virtual bool SetupBones( matrix3x4_t *pBoneToWorldOut, int nMaxBones, int boneMask, float currentTime );
+	
 	virtual void UpdateIKLocks( float currentTime );
 	virtual void CalculateIKLocks( float currentTime );
 	virtual bool ShouldDraw();
@@ -172,13 +171,6 @@ public:
 	int		LookupAttachment( const char *pAttachmentName );
 	int		LookupRandomAttachment( const char *pAttachmentNameSubstring );
 
-
-
-
-
-	int		LookupBone( const char *szName );
-	void	GetBonePosition( int iBone, Vector &origin, QAngle &angles );
-	void	GetBoneTransform( int iBone, matrix3x4_t &pBoneToWorld );
 
 	//=============================================================================
 	// HPE_BEGIN:
@@ -248,7 +240,6 @@ public:
 	bool							GetAttachmentLocal( int iAttachment, Vector &origin, QAngle &angles );
 	bool                            GetAttachmentLocal( int iAttachment, Vector &origin );
 
-	bool							GetRootBone( matrix3x4_t &rootBone );
 
 	// Should this object cast render-to-texture shadows?
 	virtual ShadowType_t			ShadowCastType();
@@ -297,7 +288,6 @@ public:
 	int GetBodygroupCount( int iGroup );
 	int GetNumBodyGroups( void );
 
-	class CBoneCache				*GetBoneCache( IStudioHdr *pStudioHdr );
 	void							SetHitboxSet( int setnum );
 	void							SetHitboxSetByName( const char *setname );
 	int								GetHitboxSet( void );
@@ -305,7 +295,6 @@ public:
 	int								GetHitboxSetCount( void );
 	void							DrawClientHitboxes( float duration = 0.0f, bool monocolor = false );
 
-	C_BaseAnimating*				FindFollowedEntity();
 
 	//virtual bool					IsActivityFinished( void ) { return m_bSequenceFinished; }
 
@@ -318,15 +307,9 @@ public:
 	// adjusted attachment origin.
 	virtual void					UncorrectViewModelAttachment( Vector &vOrigin ) {}
 
-	// Call this if SetupBones() has already been called this frame but you need to move the
-	// entity and rerender.
-	void							InvalidateBoneCache();
-	bool							IsBoneCacheValid() const;	// Returns true if the bone cache is considered good for this frame.
-	void							GetCachedBoneMatrix( int boneIndex, matrix3x4_t &out );
 
-	// Wrappers for CBoneAccessor.
-	const matrix3x4_t&				GetBone( int iBone ) const;
-	matrix3x4_t&					GetBoneForWrite( int iBone );
+
+
 
 	// Used for debugging. Will produce asserts if someone tries to setup bones or
 	// attachments before it's allowed.
@@ -337,14 +320,10 @@ public:
 		AutoAllowBoneAccess( bool bAllowForNormalModels, bool bAllowForViewModels );
 		~AutoAllowBoneAccess( void );
 	};
-	static void						PushAllowBoneAccess( bool bAllowForNormalModels, bool bAllowForViewModels, char const *tagPush );
-	static void						PopBoneAccess( char const *tagPop );
-	static void						ThreadedBoneSetup();
-	static void						InitBoneSetupThreadPool();
-	static void						ShutdownBoneSetupThreadPool();
 
-	// Invalidate bone caches so all SetupBones() calls force bone transforms to be regenerated.
-	static void						InvalidateBoneCaches();
+	
+
+	
 
 	// Purpose: My physics object has been updated, react or extract data
 	virtual void					VPhysicsUpdate( IPhysicsObject *pPhysics );
@@ -383,8 +362,7 @@ protected:
 	// use TransformViewModelAttachmentToWorld.
 	virtual void					FormatViewModelAttachment( int nAttachment, matrix3x4_t &attachmentToWorld ) {}
 
-	// View models say yes to this.
-	bool							IsBoneAccessAllowed() const;
+	
 
 	// Models used in a ModelPanel say yes to this
 	virtual bool					IsMenuModel() const;
@@ -395,8 +373,6 @@ protected:
 	virtual bool					CalcAttachments();
 
 private:
-	// This method should return true if the bones have changed + SetupBones needs to be called
-	virtual float					LastBoneChangedTime() { return FLT_MAX; }
 
 	CBoneList*						RecordBones( IStudioHdr *hdr, matrix3x4_t *pBoneState );
 
@@ -414,7 +390,6 @@ public:
 	CSequenceTransitioner			m_SequenceTransitioner;
 
 protected:
-	CIKContext						*m_pIk;
 
 	int								m_iEyeAttachment;
 
@@ -423,14 +398,7 @@ protected:
 
 
 
-	// Is bone cache valid
-	// bone transformation matrix
-	unsigned long					m_iMostRecentModelBoneCounter;
-	unsigned long					m_iMostRecentBoneSetupRequest;
-	int								m_iPrevBoneMask;
-	int								m_iAccumulatedBoneMask;
-
-	CThreadFastMutex				m_BoneSetupLock;
+	
 
 	ClientSideAnimationListHandle_t	m_ClientSideAnimationListHandle;
 
@@ -484,13 +452,9 @@ protected:
 
 private:
 
-	CBoneMergeCache					*m_pBoneMergeCache;	// This caches the strcmp lookups that it has to do
 														// when merg
 	
-	CUtlVector< matrix3x4_t >		m_CachedBoneData; // never access this directly. Use m_BoneAccessor.
-	memhandle_t						m_hitboxBoneCacheHandle;
-	float							m_flLastBoneSetupTime;
-	CJiggleBones					*m_pJiggleBones;
+
 
 	// Calculated attachment points
 	CUtlVector<CAttachmentData>		m_Attachments;
@@ -555,7 +519,6 @@ public:
 	virtual void SUB_Remove( void );
 
 	void	FadeOut( void );
-	virtual float LastBoneChangedTime();
 
 	bool m_bFadeOut;
 	bool m_bImportant;
@@ -582,15 +545,7 @@ private:
 
 
 
-inline const matrix3x4_t& C_BaseAnimating::GetBone( int iBone ) const
-{
-	return m_BoneAccessor.GetBone( iBone );
-}
 
-inline matrix3x4_t& C_BaseAnimating::GetBoneForWrite( int iBone )
-{
-	return m_BoneAccessor.GetBoneForWrite( iBone );
-}
 
 
 

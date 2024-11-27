@@ -991,8 +991,8 @@ void CDODPlayerAnimState::ComputePoseParam_MoveYaw( IStudioHdr *pStudioHdr )
 		m_flLastTurnTime = gpGlobals->curtime;
 
 		// Rotate entire body into position.
-		m_angRender[YAW] = m_flCurrentFeetYaw;
-		m_angRender[PITCH] = m_angRender[ROLL] = 0;
+		//m_angRender[YAW] = m_flCurrentFeetYaw;
+		//m_angRender[PITCH] = m_angRender[ROLL] = 0;
 
 		SetOuterBodyYaw( m_flCurrentFeetYaw );
 		g_flLastBodyYaw = m_flCurrentFeetYaw;
@@ -1238,7 +1238,7 @@ void CDODPlayerAnimState::ComputePoseParam_AimYaw( IStudioHdr *pStudioHdr )
 	}
 
 	// Rotate the body into position.
-	m_angRender[YAW] = m_flCurrentFeetYaw;
+	//m_angRender[YAW] = m_flCurrentFeetYaw;
 
 	// Find the aim(torso) yaw base on the eye and feet yaws.
 	float flAimYaw = m_flEyeYaw - m_flCurrentFeetYaw;
@@ -1376,7 +1376,7 @@ void CDODPlayerAnimState::DebugShowAnimStateForPlayer( bool bIsServer )
 	Anim_StatePrintf( iLine++, "Time: %.2f, Speed: %.2f, MaxSpeed: %.2f", gpGlobals->curtime, vecVelocity.Length2D(), GetCurrentMaxGroundSpeed() );
 
 	// Write out the 9-way blend data.
-	Anim_StatePrintf( iLine++, "EntityYaw: %.2f, AimYaw: %.2f, AimPitch: %.2f, MoveX: %.2f, MoveY: %.2f Body: %.2f", m_angRender[YAW], m_flLastAimYaw, m_flLastAimPitch, m_vecLastMoveYaw.x, m_vecLastMoveYaw.y, m_flLastBodyHeight );
+	Anim_StatePrintf( iLine++, "EntityYaw: %.2f, AimYaw: %.2f, AimPitch: %.2f, MoveX: %.2f, MoveY: %.2f Body: %.2f", m_flCurrentFeetYaw, m_flLastAimYaw, m_flLastAimPitch, m_vecLastMoveYaw.x, m_vecLastMoveYaw.y, m_flLastBodyHeight );
 
 //	Anim_StateLog( "--------------------------------------------\n\n" );
 	Anim_StatePrintf( iLine++, "--------------------------------------------\n\n" );

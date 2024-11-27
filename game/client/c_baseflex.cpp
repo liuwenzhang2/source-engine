@@ -847,19 +847,19 @@ void C_BaseFlex::AddVisemesForSentence( Emphasized_Phoneme *classes, float empha
 			bool bCrossfade = true;
 			if ((hdr->flags() & STUDIOHDR_FLAGS_FORCE_PHONEME_CROSSFADE) == 0)
 			{
-				if (m_iAccumulatedBoneMask & BONE_USED_BY_VERTEX_LOD0)
+				if (GetEngineObject()->GetAccumulatedBoneMask() & BONE_USED_BY_VERTEX_LOD0)
 				{
 					bCrossfade = (g_CV_PhonemeSnap.GetInt() > 0);
 				}
-				else if (m_iAccumulatedBoneMask & BONE_USED_BY_VERTEX_LOD1)
+				else if (GetEngineObject()->GetAccumulatedBoneMask() & BONE_USED_BY_VERTEX_LOD1)
 				{
 					bCrossfade = (g_CV_PhonemeSnap.GetInt() > 1);
 				}
-				else if (m_iAccumulatedBoneMask & BONE_USED_BY_VERTEX_LOD2)
+				else if (GetEngineObject()->GetAccumulatedBoneMask() & BONE_USED_BY_VERTEX_LOD2)
 				{
 					bCrossfade = (g_CV_PhonemeSnap.GetInt() > 2);
 				}
-				else if (m_iAccumulatedBoneMask & BONE_USED_BY_VERTEX_LOD3)
+				else if (GetEngineObject()->GetAccumulatedBoneMask() & BONE_USED_BY_VERTEX_LOD3)
 				{
 					bCrossfade = (g_CV_PhonemeSnap.GetInt() > 3);
 				}
@@ -1165,7 +1165,7 @@ void C_BaseFlex::SetupWeights( const matrix3x4_t *pBoneToWorld, int nFlexWeightC
 // Purpose: Use the local bone positions to set flex control weights
 //          via boneflexdrivers specified in the model
 //-----------------------------------------------------------------------------
-void C_BaseFlex::BuildTransformations( IStudioHdr *pStudioHdr, Vector *pos, Quaternion q[], const matrix3x4_t& cameraTransform, int boneMask, CBoneBitList &boneComputed )
+void C_BaseFlex::BeforeBuildTransformations( IStudioHdr *pStudioHdr, Vector *pos, Quaternion q[], const matrix3x4_t& cameraTransform, int boneMask, CBoneBitList &boneComputed )
 {
 	const int nBoneFlexDriverCount = pStudioHdr->BoneFlexDriverCount();
 
@@ -1184,7 +1184,7 @@ void C_BaseFlex::BuildTransformations( IStudioHdr *pStudioHdr, Vector *pos, Quat
 		}
 	}
 
-	BaseClass::BuildTransformations( pStudioHdr, pos, q, cameraTransform, boneMask, boneComputed );
+	//BaseClass::BuildTransformations( pStudioHdr, pos, q, cameraTransform, boneMask, boneComputed );
 }
 
 

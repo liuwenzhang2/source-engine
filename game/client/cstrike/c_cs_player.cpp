@@ -950,7 +950,7 @@ const QAngle& C_CSPlayer::GetRenderAngles()
 	}
 	else
 	{
-		return m_PlayerAnimState->GetRenderAngles();
+		return BaseClass::GetRenderAngles();
 	}
 }
 
@@ -1825,6 +1825,11 @@ void C_CSPlayer::ProcessMuzzleFlashEvent()
 	}
 }
 
+int C_CSPlayer::DrawModel(int flags)
+{
+	return BaseClass::DrawModel(flags);
+}
+
 const QAngle& C_CSPlayer::EyeAngles()
 {
 	if ( IsLocalPlayer() && !g_nKillCamMode )
@@ -1926,7 +1931,7 @@ void ApplyDifferenceTransformToChildren(
 	{
 		if ( IsBoneChildOf( pHdr, i, iParentBone ) )
 		{
-			matrix3x4_t &mCur = pModel->GetBoneForWrite( i );
+			matrix3x4_t &mCur = pModel->GetEngineObject()->GetBoneForWrite( i );
 			matrix3x4_t mNew;
 			ConcatTransforms( mToDest, mCur, mNew );
 			mCur = mNew;
@@ -1972,11 +1977,15 @@ void GetCorrectionMatrices(
 	ConcatTransforms( mInvAlignedElbow, mOriginalElbow, mElbowCorrection );
 }
 
+void C_CSPlayer::BeforeBuildTransformations(IStudioHdr* pStudioHdr, Vector* pos, Quaternion q[], const matrix3x4_t& cameraTransform, int boneMask, CBoneBitList& boneComputed)
+{
+	int aaa = 0;
+}
 
-void C_CSPlayer::BuildTransformations( IStudioHdr *pHdr, Vector *pos, Quaternion q[], const matrix3x4_t& cameraTransform, int boneMask, CBoneBitList &boneComputed )
+void C_CSPlayer::AfterBuildTransformations( IStudioHdr *pHdr, Vector *pos, Quaternion q[], const matrix3x4_t& cameraTransform, int boneMask, CBoneBitList &boneComputed )
 {
 	// First, setup our model's transformations like normal.
-	BaseClass::BuildTransformations( pHdr, pos, q, cameraTransform, boneMask, boneComputed );
+	//BaseClass::BuildTransformations( pHdr, pos, q, cameraTransform, boneMask, boneComputed );
 
 	if ( IsLocalPlayer() && !C_BasePlayer::ShouldDrawLocalPlayer() )
 		return;
@@ -2003,7 +2012,7 @@ void C_CSPlayer::BuildTransformations( IStudioHdr *pHdr, Vector *pos, Quaternion
 			int iHand = iMyBone;
 			int iElbow = pHdr->pBone( iHand )->parent;
 			int iShoulder = pHdr->pBone( iElbow )->parent;
-			matrix3x4_t *pBones = &GetBoneForWrite( 0 );
+			matrix3x4_t *pBones = &GetEngineObject()->GetBoneForWrite( 0 );
 
 			// Store off the original hand position.
 			matrix3x4_t mSource = pBones[iHand];
@@ -2018,7 +2027,7 @@ void C_CSPlayer::BuildTransformations( IStudioHdr *pHdr, Vector *pos, Quaternion
 
 			// Do the IK solution.
 			Vector vHandTarget;
-			MatrixPosition( pWeapon->GetBone( iWeaponBone ), vHandTarget );
+			MatrixPosition( pWeapon->GetEngineObject()->GetBone( iWeaponBone ), vHandTarget );
 			Studio_SolveIK( iShoulder, iElbow, iHand, vHandTarget, pBones );
 
 
@@ -2030,7 +2039,7 @@ void C_CSPlayer::BuildTransformations( IStudioHdr *pHdr, Vector *pos, Quaternion
 
 
 			// Now apply the transformation on the hand to the fingers.
-			matrix3x4_t &mDest = GetBoneForWrite( iHand );
+			matrix3x4_t &mDest = GetEngineObject()->GetBoneForWrite( iHand );
 			ApplyDifferenceTransformToChildren( this, mSource, mDest, iHand );
 		}
 	}

@@ -1027,10 +1027,10 @@ void PropBreakableCreateAll( int modelindex, IPhysicsObject *pPhysics, const bre
 			{
 				if ( list[i].placementIsBone )
 				{
-					int boneIndex = pOwnerAnim->LookupBone( list[i].placementName );
+					int boneIndex = pOwnerAnim->GetEngineObject()->LookupBone( list[i].placementName );
 					if ( boneIndex >= 0 )
 					{
-						pOwnerAnim->GetBonePosition( boneIndex, position, angles );
+						pOwnerAnim->GetEngineObject()->GetBonePosition( boneIndex, position, angles );
 						AngleMatrix( angles, position, matrix );
 					}
 				}
@@ -1414,10 +1414,10 @@ CBaseEntity *CreateGibsFromList( CUtlVector<breakmodel_t> &list, int modelindex,
 			{
 				if ( list[i].placementIsBone )
 				{
-					int boneIndex = pOwnerAnim->LookupBone( list[i].placementName );
+					int boneIndex = pOwnerAnim->GetEngineObject()->LookupBone( list[i].placementName );
 					if ( boneIndex >= 0 )
 					{
-						pOwnerAnim->GetBonePosition( boneIndex, position, angles );
+						pOwnerAnim->GetEngineObject()->GetBonePosition( boneIndex, position, angles );
 						AngleMatrix( angles, position, matrix );
 					}
 				}

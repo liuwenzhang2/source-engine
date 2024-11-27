@@ -52,7 +52,6 @@ C_HL2MP_Player::C_HL2MP_Player() : m_PlayerAnimState( this ), m_iv_angEyeAngles(
 
 	m_angEyeAngles.Init();
 
-	m_EntClientFlags |= ENTCLIENTFLAG_DONTUSEIK;
 	m_blinkTimer.Invalidate();
 
 	m_pFlashlightBeam = NULL;
@@ -61,6 +60,7 @@ C_HL2MP_Player::C_HL2MP_Player() : m_PlayerAnimState( this ), m_iv_angEyeAngles(
 bool C_HL2MP_Player::Init(int entnum, int iSerialNum) {
 	bool ret = BaseClass::Init(entnum, iSerialNum);
 	GetEngineObject()->AddVar(&m_iv_angEyeAngles);//&m_angEyeAngles, , LATCH_SIMULATION_VAR
+	GetEngineObject()->GetEntClientFlags() |= ENTCLIENTFLAG_DONTUSEIK;
 	return ret;
 }
 
@@ -461,7 +461,7 @@ const QAngle& C_HL2MP_Player::GetRenderAngles()
 	}
 	else
 	{
-		return m_PlayerAnimState.GetRenderAngles();
+		return BaseClass::GetRenderAngles();
 	}
 }
 
