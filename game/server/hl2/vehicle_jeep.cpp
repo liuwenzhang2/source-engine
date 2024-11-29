@@ -424,7 +424,7 @@ void CPropJeep::AimGunAt( Vector *endPos, float flInterval )
 	GetEngineObject()->SetPoseParameter( JEEP_GUN_YAW, -m_aimYaw);
 	GetEngineObject()->SetPoseParameter( JEEP_GUN_PITCH, -m_aimPitch );
 
-	InvalidateBoneCache();
+	GetEngineObject()->InvalidateBoneCache();
 
 	// read back to avoid drift when hitting limits
 	// as long as the velocity is less than the delta between the limit and 180, this is fine.

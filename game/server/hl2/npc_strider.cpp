@@ -487,7 +487,7 @@ void CNPC_Strider::Spawn()
 	m_miniGunDirectAmmo = GetAmmoDef()->Index("StriderMinigunDirect");
 	m_pMinigun->Init();
 
-	EnableServerIK();
+	GetEngineObject()->EnableServerIK();
 	
 	SetModel( STRING(GetEngineObject()->GetModelName() ) );
 
@@ -529,7 +529,7 @@ void CNPC_Strider::Spawn()
 	CapabilitiesAdd( bits_CAP_MOVE_FLY | bits_CAP_INNATE_RANGE_ATTACK2 | bits_CAP_INNATE_MELEE_ATTACK1 | bits_CAP_INNATE_MELEE_ATTACK2 | bits_CAP_SQUAD );
 
 	// Don't allow us to skip animation setup because our attachments are critical to us!
-	SetBoneCacheFlags( BCF_NO_ANIMATION_SKIP );
+	GetEngineObject()->SetBoneCacheFlags( BCF_NO_ANIMATION_SKIP );
 
 	// find the ground, move up to strider stand height
 	Vector mins(-16,-16,-16), maxs(16,16,16);
@@ -680,7 +680,7 @@ void CNPC_Strider::Activate()
 
 	const char *pszBodyTargetBone = "combine_strider.neck_bone";
 
-	m_BodyTargetBone = LookupBone( pszBodyTargetBone );
+	m_BodyTargetBone = GetEngineObject()->LookupBone( pszBodyTargetBone );
 
 	if ( m_BodyTargetBone == -1 )
 	{
@@ -701,7 +701,7 @@ void CNPC_Strider::Activate()
 		DispatchSpawn( pStrider );
 
 		pStrider->SetActivity( ACT_DIERAGDOLL );
-		pStrider->InvalidateBoneCache();
+		pStrider->GetEngineObject()->InvalidateBoneCache();
 		gm_zCannonDist = pStrider->CannonPosition().z - pStrider->GetEngineObject()->GetAbsOrigin().z;
 
 		// Currently just using the gun for the vertical component!
@@ -844,15 +844,15 @@ const Vector &CNPC_Strider::GetViewOffset()
 void CNPC_Strider::CalculateIKLocks( float currentTime )
 {
 	BaseClass::CalculateIKLocks( currentTime );
-	if ( m_pIk && m_pIk->m_target.Count() )
+	if (GetEngineObject()->GetIk() && GetEngineObject()->GetIk()->m_target.Count())
 	{
 		Assert(m_pIk->m_target.Count() > STOMP_IK_SLOT);
 		// HACKHACK: Hardcoded 11???  Not a cleaner way to do this
-		CIKTarget &target = m_pIk->m_target[STOMP_IK_SLOT];
+		CIKTarget &target = GetEngineObject()->GetIk()->m_target[STOMP_IK_SLOT];
 		target.SetPos( m_vecHitPos.Get() );
 		for ( int i = 0; i < NUM_STRIDER_IK_TARGETS; i++ )
 		{
-			target = m_pIk->m_target[i];
+			target = GetEngineObject()->GetIk()->m_target[i];
 
 			if (!target.IsActive())
 				continue;
@@ -2400,7 +2400,7 @@ Vector CNPC_Strider::BodyTarget( const Vector &posSrc, bool bNoisy )
 	{
 		Vector position;
 		QAngle angles;
-		GetBonePosition( m_BodyTargetBone, position, angles );
+		GetEngineObject()->GetBonePosition( m_BodyTargetBone, position, angles );
 		return position;
 	}
 	return BaseClass::BodyTarget( posSrc, bNoisy );
@@ -5364,7 +5364,7 @@ void CStriderMinigun::Think( IStriderMinigunHost *pHost, float dt )
 
 	if ( pTargetEnt )
 	{
-		pHost->GetEntity()->InvalidateBoneCache();
+		pHost->GetEntity()->GetEngineObject()->InvalidateBoneCache();
 		AimAtTarget( pHost, pTargetEnt );
 	}
 

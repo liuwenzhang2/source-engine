@@ -2058,7 +2058,7 @@ void CNPC_Hunter::Activate()
 		pHunter->Spawn();
 
 		pHunter->SetActivity( ACT_WALK );
-		pHunter->InvalidateBoneCache();
+		pHunter->GetEngineObject()->InvalidateBoneCache();
 
 		// Currently just using the gun for the vertical component!
 		Vector defEyePos;

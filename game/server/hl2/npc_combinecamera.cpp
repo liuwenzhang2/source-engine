@@ -375,7 +375,7 @@ void CNPC_CombineCamera::Spawn()
 	GetEngineObject()->SetNextThink( gpGlobals->curtime + random->RandomFloat(0.1f, 0.3f) );
 
 	// Don't allow us to skip animation setup because our attachments are critical to us!
-	SetBoneCacheFlags( BCF_NO_ANIMATION_SKIP );
+	GetEngineObject()->SetBoneCacheFlags( BCF_NO_ANIMATION_SKIP );
 }
 
 
@@ -528,7 +528,7 @@ bool CNPC_CombineCamera::UpdateFacing()
 	}
 
 	// You're going to make decisions based on this info.  So bump the bone cache after you calculate everything
-	InvalidateBoneCache();
+	GetEngineObject()->InvalidateBoneCache();
 
 	return bMoved;
 }

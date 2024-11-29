@@ -1072,12 +1072,12 @@ static CDODViewVectors g_DODViewVectors(
 
 		if ( !bInitializedBones )
 		{
-			iRHandIndex = player->LookupBone( "ValveBiped.Bip01_R_Hand" );
-			iLHandIndex = player->LookupBone( "ValveBiped.Bip01_L_Hand" );
-			iHeadIndex = player->LookupBone( "ValveBiped.Bip01_Head1" ); 
-			iChestIndex = player->LookupBone( "ValveBiped.Bip01_Spine2" );
-			iRFootIndex = player->LookupBone( "ValveBiped.Bip01_R_Foot" );
-			iLFootIndex = player->LookupBone( "ValveBiped.Bip01_L_Foot" );
+			iRHandIndex = player->GetEngineObject()->LookupBone( "ValveBiped.Bip01_R_Hand" );
+			iLHandIndex = player->GetEngineObject()->LookupBone( "ValveBiped.Bip01_L_Hand" );
+			iHeadIndex = player->GetEngineObject()->LookupBone( "ValveBiped.Bip01_Head1" );
+			iChestIndex = player->GetEngineObject()->LookupBone( "ValveBiped.Bip01_Spine2" );
+			iRFootIndex = player->GetEngineObject()->LookupBone( "ValveBiped.Bip01_R_Foot" );
+			iLFootIndex = player->GetEngineObject()->LookupBone( "ValveBiped.Bip01_L_Foot" );
 
 			Assert( iRHandIndex != -1 );
 			Assert( iLHandIndex != -1 );
@@ -1099,22 +1099,22 @@ static CDODViewVectors g_DODViewVectors(
 		QAngle dummyAngle;
 
 		Vector vecRHand;
-		player->GetBonePosition( iRHandIndex, vecRHand, dummyAngle );
+		player->GetEngineObject()->GetBonePosition( iRHandIndex, vecRHand, dummyAngle );
 
 		Vector vecLHand;
-		player->GetBonePosition( iLHandIndex, vecLHand, dummyAngle );
+		player->GetEngineObject()->GetBonePosition( iLHandIndex, vecLHand, dummyAngle );
 
 		Vector vecHead;
-		player->GetBonePosition( iHeadIndex, vecHead, dummyAngle );
+		player->GetEngineObject()->GetBonePosition( iHeadIndex, vecHead, dummyAngle );
 
 		Vector vecChest;
-		player->GetBonePosition( iChestIndex, vecChest, dummyAngle );
+		player->GetEngineObject()->GetBonePosition( iChestIndex, vecChest, dummyAngle );
 
 		Vector vecRFoot;
-		player->GetBonePosition( iRFootIndex, vecRFoot, dummyAngle );
+		player->GetEngineObject()->GetBonePosition( iRFootIndex, vecRFoot, dummyAngle );
 
 		Vector vecLFoot;
-		player->GetBonePosition( iLFootIndex, vecLFoot, dummyAngle );
+		player->GetEngineObject()->GetBonePosition( iLFootIndex, vecLFoot, dummyAngle );
 
 		// right hand
 		float damageAdjustment = GetExplosionDamageAdjustment(vecSrc, vecRHand, player, pIgnoreEntity );

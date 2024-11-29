@@ -540,11 +540,11 @@ Vector CNPC_Vortigaunt::BodyTarget( const Vector &posSrc, bool bNoisy )
 	Vector low = WorldSpaceCenter() - ( WorldSpaceCenter() - GetEngineObject()->GetAbsOrigin() ) * .25;
 
 	Vector high;
-	int iBone = LookupBone( "ValveBiped.neck1" );
+	int iBone = GetEngineObject()->LookupBone( "ValveBiped.neck1" );
 	if (iBone >= 0)
 	{
 		QAngle angHigh;
-		GetBonePosition( iBone, high, angHigh );
+		GetEngineObject()->GetBonePosition( iBone, high, angHigh );
 	}
 	else
 	{

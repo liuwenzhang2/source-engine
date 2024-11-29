@@ -1654,7 +1654,7 @@ void CNPC_BaseZombie::HandleAnimEvent( animevent_t *pEvent )
 		char		token[128];
 		pString = nexttoken( token, pString, ' ' );
 
-		int boneIndex = GetInteractionPartner()->LookupBone( token );
+		int boneIndex = GetInteractionPartner()->GetEngineObject()->LookupBone( token );
 
 		if ( boneIndex == -1 )
 		{
@@ -1677,7 +1677,7 @@ void CNPC_BaseZombie::HandleAnimEvent( animevent_t *pEvent )
 		int iCrabAttachment = LookupAttachment( "headcrab" );
 		int iSpeed = atoi( token );
 
-		GetInteractionPartner()->GetBonePosition( boneIndex, vecBonePosition, angles );
+		GetInteractionPartner()->GetEngineObject()->GetBonePosition( boneIndex, vecBonePosition, angles );
 		GetAttachment( iCrabAttachment, vecHeadCrabPosition );
 
 		Vector vVelocity = vecHeadCrabPosition - vecBonePosition;
@@ -2569,9 +2569,9 @@ void CNPC_BaseZombie::SetHeadcrabSpawnLocation( int iCrabAttachment, CBaseAnimat
 	// find offset of root bone from origin 
 	pCrab->GetEngineObject()->SetAbsOrigin( Vector( 0, 0, 0 ) );
 	pCrab->GetEngineObject()->SetAbsAngles( QAngle( 0, 0, 0 ) );
-	pCrab->InvalidateBoneCache();
+	pCrab->GetEngineObject()->InvalidateBoneCache();
 	matrix3x4_t rootLocal;
-	pCrab->GetBoneTransform( 0, rootLocal );
+	pCrab->GetEngineObject()->GetBoneTransform( 0, rootLocal );
 
 	// invert it
 	matrix3x4_t rootInvLocal;
@@ -2591,7 +2591,7 @@ void CNPC_BaseZombie::SetHeadcrabSpawnLocation( int iCrabAttachment, CBaseAnimat
 	vecAngles.z = 0;
 
 	pCrab->GetEngineObject()->SetAbsAngles( vecAngles );
-	pCrab->InvalidateBoneCache();
+	pCrab->GetEngineObject()->InvalidateBoneCache();
 }
 
 

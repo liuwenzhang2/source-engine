@@ -1002,7 +1002,7 @@ void CPropAirboat::AimGunAt( const Vector &aimPos, float flInterval )
 	GetEngineObject()->SetPoseParameter( AIRBOAT_GUN_YAW, m_aimYaw);
 	GetEngineObject()->SetPoseParameter( AIRBOAT_GUN_PITCH, m_aimPitch );
 
-	InvalidateBoneCache();
+	GetEngineObject()->InvalidateBoneCache();
 
 	// read back to avoid drift when hitting limits
 	// as long as the velocity is less than the delta between the limit and 180, this is fine.

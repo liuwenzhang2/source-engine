@@ -312,11 +312,11 @@ public:
 	// This function returns a value that scales all damage done by this entity.
 	// Use CDamageModifier to hook in damage modifiers on a guy.
 	virtual float					GetAttackDamageScale( void );
-	virtual void ApplyBoneMatrixTransform(matrix3x4_t& transform) {}
-	virtual	void StandardBlendingRules(IStudioHdr* pStudioHdr, Vector pos[], Quaternion q[], float currentTime, int boneMask) {}
-	virtual void UpdateIKLocks(float currentTime) {}
-	virtual void CalculateIKLocks(float currentTime) {}
-	void							SetupBones_AttachmentHelper(IStudioHdr* pStudioHdr) {}
+	virtual void					ApplyBoneMatrixTransform(matrix3x4_t& transform) {}
+	virtual	void					StandardBlendingRules(IStudioHdr* pStudioHdr, Vector pos[], Quaternion q[], float currentTime, int boneMask) {}
+	virtual void					UpdateIKLocks(float currentTime) {}
+	virtual void					CalculateIKLocks(float currentTime) {}
+	virtual void					SetupBones_AttachmentHelper(IStudioHdr* pStudioHdr) {}
 // IClientNetworkable implementation.
 public:
 	virtual void					NotifyShouldTransmit( ShouldTransmitState_t state );

@@ -1396,7 +1396,7 @@ bool C_BaseEntity::OnInternalDrawModel(ClientModelRenderInfo_t* pInfo)
 //-----------------------------------------------------------------------------
 bool C_BaseEntity::SetupBones( matrix3x4_t *pBoneToWorldOut, int nMaxBones, int boneMask, float currentTime )
 {
-	return GetEngineObject()->SetupBones(pBoneToWorldOut, nMaxBones, boneMask, currentTime);
+	return true;
 }
 
 //-----------------------------------------------------------------------------

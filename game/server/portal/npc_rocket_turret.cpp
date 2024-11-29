@@ -936,7 +936,7 @@ void CNPC_RocketTurret::SyncPoseToAimAngles ( void )
 	// get the 'forward face' of the turret to match up with the look direction. If the model and it's pose parameters change, this will be wrong.
 	GetEngineObject()->SetPoseParameter( m_iPoseYaw, AngleNormalize( -localAngles.y - 90 ) );
 
-	InvalidateBoneCache();
+	GetEngineObject()->InvalidateBoneCache();
 }
 
 //-----------------------------------------------------------------------------

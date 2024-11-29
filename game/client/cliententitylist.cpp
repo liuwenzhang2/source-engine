@@ -35,6 +35,7 @@
 #include "bone_setup.h"
 #include "posedebugger.h"
 #include "jigglebones.h"
+#include "con_nprint.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
@@ -1225,6 +1226,21 @@ void C_EngineObjectInternal::PostDataUpdate(DataUpdateType_t updateType)
 		}
 	}
 
+	if (m_ragdollListCount && !m_elementCount) {
+		vcollide_t* pCollide = modelinfo->GetVCollide(GetModelIndex());
+		if (!pCollide)
+		{
+			const char* pszName = modelinfo->GetModelName(modelinfo->GetModel(GetModelIndex()));
+			Msg("*** ERROR: C_ServerRagdoll::InitModel: %s missing vcollide data ***\n", (pszName) ? pszName : "<null>");
+			m_elementCount = 0;
+		}
+		else
+		{
+			m_elementCount = RagdollExtractBoneIndices(m_boneIndex, GetModelPtr(), pCollide);
+		}
+		m_iv_ragPos.SetMaxCount(m_elementCount);
+		m_iv_ragAngles.SetMaxCount(m_elementCount);
+	}
 	m_iv_ragPos.NoteChanged(gpGlobals->curtime, true);
 	m_iv_ragAngles.NoteChanged(gpGlobals->curtime, true);
 	// this is the local client time at which this update becomes stale
@@ -4491,22 +4507,7 @@ void C_EngineObjectInternal::SetModelPointer(const model_t* pModel)
 		m_pOuter->DestroyModelInstance();
 		m_pModel = pModel;
 		if (GetModelPtr()) {
-			if (!m_elementCount)
-			{
-				vcollide_t* pCollide = modelinfo->GetVCollide(GetModelIndex());
-				if (!pCollide)
-				{
-					const char* pszName = modelinfo->GetModelName(modelinfo->GetModel(GetModelIndex()));
-					Msg("*** ERROR: C_ServerRagdoll::InitModel: %s missing vcollide data ***\n", (pszName) ? pszName : "<null>");
-					m_elementCount = 0;
-				}
-				else
-				{
-					m_elementCount = RagdollExtractBoneIndices(m_boneIndex, GetModelPtr(), pCollide);
-				}
-				m_iv_ragPos.SetMaxCount(m_elementCount);
-				m_iv_ragAngles.SetMaxCount(m_elementCount);
-			}
+			
 
 			InvalidateBoneCache();
 
@@ -6506,6 +6507,9 @@ bool C_EngineObjectInternal::SetupBones(matrix3x4_t* pBoneToWorldOut, int nMaxBo
 
 void C_EngineObjectInternal::InvalidateBoneCache()
 {
+	if (!GetModelPtr()) {
+		return;
+	}
 	m_iMostRecentModelBoneCounter = m_pClientEntityList->GetModelBoneCounter() - 1;
 	m_flLastBoneSetupTime = -FLT_MAX;
 }
@@ -6601,6 +6605,9 @@ int C_EngineObjectInternal::LookupBone(const char* szName)
 //=========================================================
 void C_EngineObjectInternal::GetBonePosition(int iBone, Vector& origin, QAngle& angles)
 {
+	if (!GetModelPtr()) {
+		return;
+	}
 	matrix3x4_t bonetoworld;
 	GetBoneTransform(iBone, bonetoworld);
 
@@ -6609,6 +6616,9 @@ void C_EngineObjectInternal::GetBonePosition(int iBone, Vector& origin, QAngle& 
 
 void C_EngineObjectInternal::GetBoneTransform(int iBone, matrix3x4_t& pBoneToWorld)
 {
+	if (!GetModelPtr()) {
+		return;
+	}
 	Assert(GetModelPtr() && iBone >= 0 && iBone < GetModelPtr()->numbones());
 	CBoneCache* pcache = GetBoneCache(NULL);
 

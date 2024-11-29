@@ -129,7 +129,7 @@ public:
 
 	virtual void ApplyBoneMatrixTransform( matrix3x4_t& transform );
 
-	
+	virtual bool SetupBones(matrix3x4_t* pBoneToWorldOut, int nMaxBones, int boneMask, float currentTime);
 	virtual void UpdateIKLocks( float currentTime );
 	virtual void CalculateIKLocks( float currentTime );
 	virtual bool ShouldDraw();

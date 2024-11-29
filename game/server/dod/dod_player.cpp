@@ -1653,7 +1653,7 @@ bool CDODPlayer::DODWeaponDrop( CBaseCombatWeapon *pWeapon, bool bThrowForward )
 			// Assume bone zero is the root
 			for ( iWeaponBoneIndex = 0; iWeaponBoneIndex < hdr->numbones(); ++iWeaponBoneIndex )
 			{
-				iBIndex = LookupBone( hdr->pBone( iWeaponBoneIndex )->pszName() );
+				iBIndex = GetEngineObject()->LookupBone( hdr->pBone( iWeaponBoneIndex )->pszName() );
 				// Found one!
 				if ( iBIndex != -1 )
 				{
@@ -1666,12 +1666,12 @@ bool CDODPlayer::DODWeaponDrop( CBaseCombatWeapon *pWeapon, bool bThrowForward )
 
 			if ( iBIndex == -1 )
 			{
-				iBIndex = LookupBone( "ValveBiped.Bip01_R_Hand" );
+				iBIndex = GetEngineObject()->LookupBone( "ValveBiped.Bip01_R_Hand" );
 			}
 		}
 		else
 		{
-			iBIndex = LookupBone( "ValveBiped.Bip01_R_Hand" );
+			iBIndex = GetEngineObject()->LookupBone( "ValveBiped.Bip01_R_Hand" );
 		}
 
 		if ( iBIndex != -1)  
@@ -1681,7 +1681,7 @@ bool CDODPlayer::DODWeaponDrop( CBaseCombatWeapon *pWeapon, bool bThrowForward )
 			matrix3x4_t transform;
 
 			// Get the transform for the weapon bonetoworldspace in the NPC
-			GetBoneTransform( iBIndex, transform );
+			GetEngineObject()->GetBoneTransform( iBIndex, transform );
 
 			// find offset of root bone from origin in local space
 			// Make sure we're detached from hierarchy before doing this!!!
@@ -1690,7 +1690,7 @@ bool CDODPlayer::DODWeaponDrop( CBaseCombatWeapon *pWeapon, bool bThrowForward )
 			pWeapon->GetEngineObject()->SetAbsAngles( QAngle( 0, 0, 0 ) );
 			pWeapon->GetEngineObject()->InvalidateBoneCache();
 			matrix3x4_t rootLocal;
-			pWeapon->GetBoneTransform( iWeaponBoneIndex, rootLocal );
+			pWeapon->GetEngineObject()->GetBoneTransform( iWeaponBoneIndex, rootLocal );
 
 			// invert it
 			matrix3x4_t rootInvLocal;

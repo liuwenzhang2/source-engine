@@ -62,7 +62,7 @@ void CPlayerMove::StartCommand( CBasePlayer *player, CUserCmd *cmd )
 			CBaseAnimating *pAnimating = pEntity->GetBaseAnimating();
 			if (pAnimating)
 			{
-				pAnimating->SetIKGroundContactInfo( cmd->entitygroundcontact[i].minheight, cmd->entitygroundcontact[i].maxheight );
+				pAnimating->GetEngineObject()->SetIKGroundContactInfo( cmd->entitygroundcontact[i].minheight, cmd->entitygroundcontact[i].maxheight );
 			}
 		}
 	}

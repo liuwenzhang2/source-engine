@@ -775,7 +775,7 @@ void CFuncTank::Spawn( void )
 			{
 				pAnim->GetEngineObject()->SetPoseParameter( STRING( m_iszYawPoseParam ), 0 );
 				pAnim->GetEngineObject()->SetPoseParameter( STRING( m_iszPitchPoseParam ), 0 );
-				pAnim->InvalidateBoneCache();
+				pAnim->GetEngineObject()->InvalidateBoneCache();
 			}
 
 			m_nBarrelAttachment = pAnim->LookupAttachment( STRING(m_iszBarrelAttachment) );
@@ -896,7 +896,7 @@ void CFuncTank::Activate( void )
 			{
 				pAnim->GetEngineObject()->SetPoseParameter( STRING( m_iszYawPoseParam ), 0 );
 				pAnim->GetEngineObject()->SetPoseParameter( STRING( m_iszPitchPoseParam ), 0 );
-				pAnim->InvalidateBoneCache();
+				pAnim->GetEngineObject()->InvalidateBoneCache();
 			}
 
 			m_nBarrelAttachment = pAnim->LookupAttachment( STRING(m_iszBarrelAttachment) );

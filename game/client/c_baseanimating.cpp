@@ -1471,6 +1471,14 @@ void drawLine(const Vector& origin, const Vector& dest, int r, int g, int b, boo
 */
 
 //-----------------------------------------------------------------------------
+// Purpose: Setup the bones for drawing
+//-----------------------------------------------------------------------------
+bool C_BaseAnimating::SetupBones(matrix3x4_t* pBoneToWorldOut, int nMaxBones, int boneMask, float currentTime)
+{
+	return GetEngineObject()->SetupBones(pBoneToWorldOut, nMaxBones, boneMask, currentTime);
+}
+
+//-----------------------------------------------------------------------------
 // Purpose: update latched IK contacts if they're in a moving reference frame.
 //-----------------------------------------------------------------------------
 

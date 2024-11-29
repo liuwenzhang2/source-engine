@@ -584,7 +584,7 @@ bool CNPC_SecurityCamera::UpdateFacing( void )
 		iPose = GetEngineObject()->LookupPoseParameter( SECURITY_CAMERA_BC_YAW );
 		GetEngineObject()->SetPoseParameter( iPose, m_vecCurrentAngles.y );
 
-		InvalidateBoneCache();
+		GetEngineObject()->InvalidateBoneCache();
 	}
 	else
 	{

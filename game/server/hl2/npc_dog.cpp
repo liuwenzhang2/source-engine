@@ -807,7 +807,7 @@ void CNPC_Dog::ThrowObject( const char *pAttachmentName )
 
 			AngularImpulse angVelocity = RandomAngularImpulse( -250 , -250 ) / pPhysObj->GetMass();
 
-			InvalidateBoneCache();
+			GetEngineObject()->InvalidateBoneCache();
 
 			int iAttachment = LookupAttachment( pAttachmentName );
 
@@ -927,7 +927,7 @@ void CNPC_Dog::PickupOrCatchObject( const char *pAttachmentName )
 {
 	if ( m_hPhysicsEnt )
 	{
-		InvalidateBoneCache();
+		GetEngineObject()->InvalidateBoneCache();
 
 		int iAttachment = LookupAttachment( pAttachmentName );
 

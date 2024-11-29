@@ -347,7 +347,7 @@ void CNPC_FloorTurret::Spawn( void )
 	SetUse( &CNPC_FloorTurret::ToggleUse );
 
 	// Don't allow us to skip animation setup because our attachments are critical to us!
-	SetBoneCacheFlags( BCF_NO_ANIMATION_SKIP );
+	GetEngineObject()->SetBoneCacheFlags( BCF_NO_ANIMATION_SKIP );
 
 	CreateVPhysics();
 
@@ -723,7 +723,7 @@ bool CNPC_FloorTurret::UpdateFacing( void )
 	}
 
 	// You're going to make decisions based on this info.  So bump the bone cache after you calculate everything
-	InvalidateBoneCache();
+	GetEngineObject()->InvalidateBoneCache();
 
 	return bMoved;
 }
