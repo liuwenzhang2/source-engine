@@ -148,7 +148,7 @@ void CBoneCache::ReadCachedBones( matrix3x4_t *pBoneToWorld )
 	}
 }
 
-void CBoneCache::ReadCachedBonePointers( matrix3x4_t **bones, int numbones )
+void CBoneCache::ReadCachedBonePointers(const matrix3x4_t **bones, int numbones )
 {
 	memset( bones, 0, sizeof(matrix3x4_t *) * numbones );
 	matrix3x4_t *pBones = BoneArray();
@@ -2144,7 +2144,7 @@ static ConVar aim_constraint( "aim_constraint", "1", FCVAR_REPLICATED, "Toggle <
 //-----------------------------------------------------------------------------
 // Purpose:
 //-----------------------------------------------------------------------------
-static int ClipRayToHitbox( const Ray_t &ray, mstudiobbox_t *pbox, matrix3x4_t& matrix, trace_t &tr )
+static int ClipRayToHitbox( const Ray_t &ray,const mstudiobbox_t *pbox, const matrix3x4_t& matrix, trace_t &tr )
 {
 	const float flProjEpsilon = 0.01f;
 	// scale by current t so hits shorten the ray and increase the likelihood of early outs
@@ -2254,7 +2254,7 @@ static int ClipRayToHitbox( const Ray_t &ray, mstudiobbox_t *pbox, matrix3x4_t& 
 // Purpose:
 //-----------------------------------------------------------------------------
 bool SweepBoxToStudio( IPhysicsSurfaceProps *pProps, const Ray_t& ray, IStudioHdr *pStudioHdr, mstudiohitboxset_t *set, 
-				   matrix3x4_t **hitboxbones, int fContentsMask, trace_t &tr )
+				   const matrix3x4_t **hitboxbones, int fContentsMask, trace_t &tr )
 {
 	tr.fraction = 1.0;
 	tr.startsolid = false;
@@ -2312,7 +2312,7 @@ bool SweepBoxToStudio( IPhysicsSurfaceProps *pProps, const Ray_t& ray, IStudioHd
 // Purpose:
 //-----------------------------------------------------------------------------
 bool TraceToStudio( IPhysicsSurfaceProps *pProps, const Ray_t& ray, IStudioHdr *pStudioHdr, mstudiohitboxset_t *set, 
-				   matrix3x4_t **hitboxbones, int fContentsMask, const Vector &vecOrigin, float flScale, trace_t &tr )
+				   const matrix3x4_t **hitboxbones, int fContentsMask, const Vector &vecOrigin, float flScale, trace_t &tr )
 {
 	if ( !ray.m_IsRay )
 	{
@@ -2337,7 +2337,7 @@ bool TraceToStudio( IPhysicsSurfaceProps *pProps, const Ray_t& ray, IStudioHdr *
 			continue;
 		
 		// columns are axes of the bones in world space, translation is in world space
-		matrix3x4_t& matrix = *hitboxbones[pbox->bone];
+		const matrix3x4_t& matrix = *hitboxbones[pbox->bone];
 		
 		// Because we're sending in a matrix with scale data, and because the matrix inversion in the hitbox
 		// code does not handle that case, we pre-scale the bones and ray down here and do our collision checks
@@ -2403,7 +2403,7 @@ bool TraceToStudio( IPhysicsSurfaceProps *pProps, const Ray_t& ray, IStudioHdr *
 		tr.surface.surfaceProps = pProps->GetSurfaceIndex( pBone->pszSurfaceProp() );
 
 		Assert( tr.physicsbone >= 0 );
-		matrix3x4_t& matrix = *hitboxbones[pbox->bone];
+		const matrix3x4_t& matrix = *hitboxbones[pbox->bone];
 		if ( hitside >= 3 )
 		{
 			hitside -= 3;

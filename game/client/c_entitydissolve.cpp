@@ -372,7 +372,7 @@ void C_EntityDissolve::ComputeRenderInfo( mstudiobbox_t *pHitBox, const matrix3x
 //-----------------------------------------------------------------------------
 // Sparks!
 //-----------------------------------------------------------------------------
-void C_EntityDissolve::DoSparks( mstudiohitboxset_t *set, matrix3x4_t *hitboxbones[MAXSTUDIOBONES] )
+void C_EntityDissolve::DoSparks( mstudiohitboxset_t *set, const matrix3x4_t *hitboxbones[MAXSTUDIOBONES] )
 {
 	if ( m_flNextSparkTime > gpGlobals->curtime )
 		return;
@@ -597,7 +597,7 @@ int C_EntityDissolve::DrawModel( int flags )
 	if ( pAnimating == NULL )
 		return 0;
 
-	matrix3x4_t	*hitboxbones[MAXSTUDIOBONES];
+	const matrix3x4_t	*hitboxbones[MAXSTUDIOBONES];
 	if ( pAnimating->HitboxToWorldTransforms( hitboxbones ) == false )
 		return 0;
 

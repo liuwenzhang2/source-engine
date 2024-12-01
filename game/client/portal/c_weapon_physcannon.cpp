@@ -219,7 +219,7 @@ int C_WeaponPhysCannon::DrawModel( int flags )
 		if (!pAnimating)
 			return 0;
 
-		matrix3x4_t	*hitboxbones[MAXSTUDIOBONES];
+		const matrix3x4_t	*hitboxbones[MAXSTUDIOBONES];
 		if ( !pAnimating->HitboxToWorldTransforms( hitboxbones ) )
 			return 0;
 

@@ -985,7 +985,8 @@ public:
 	bool							GetRootBone(matrix3x4_t& rootBone);
 	int		LookupBone(const char* szName);
 	void	GetBonePosition(int iBone, Vector& origin, QAngle& angles);
-	void	GetBoneTransform(int iBone, matrix3x4_t& pBoneToWorld);
+	virtual void GetBoneTransform(int iBone, matrix3x4_t& pBoneToWorld);
+	virtual void GetBoneTransforms(const matrix3x4_t* hitboxbones[MAXSTUDIOBONES]);
 	int GetReadableBones() { return m_BoneAccessor.GetReadableBones(); }
 	void SetReadableBones(int flags) { m_BoneAccessor.SetReadableBones(flags); }
 

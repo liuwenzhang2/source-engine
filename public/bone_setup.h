@@ -235,7 +235,7 @@ public:
 	void			UpdateBones( const matrix3x4_t *pBoneToWorld, int numbones, float curtime );
 	matrix3x4_t		*GetCachedBone( int studioIndex );
 	void			ReadCachedBones( matrix3x4_t *pBoneToWorld );
-	void			ReadCachedBonePointers( matrix3x4_t **bones, int numbones );
+	void			ReadCachedBonePointers(const matrix3x4_t **bones, int numbones );
 
 	bool			IsValid( float curtime, float dt = 0.1f );
 
@@ -261,6 +261,6 @@ void Studio_DestroyBoneCache( memhandle_t cacheHandle );
 void Studio_InvalidateBoneCache( memhandle_t cacheHandle );
 
 // Given a ray, trace for an intersection with this studiomodel.  Get the array of bones from StudioSetupHitboxBones
-bool TraceToStudio( class IPhysicsSurfaceProps *pProps, const Ray_t& ray, IStudioHdr *pStudioHdr, mstudiohitboxset_t *set, matrix3x4_t **hitboxbones, int fContentsMask, const Vector &vecOrigin, float flScale, trace_t &trace );
+bool TraceToStudio( class IPhysicsSurfaceProps *pProps, const Ray_t& ray, IStudioHdr *pStudioHdr, mstudiohitboxset_t *set, const matrix3x4_t **hitboxbones, int fContentsMask, const Vector &vecOrigin, float flScale, trace_t &trace );
 
 #endif // BONE_SETUP_H

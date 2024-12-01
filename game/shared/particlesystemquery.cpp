@@ -216,7 +216,7 @@ void CParticleSystemQuery::GetRandomPointsOnControllingObjectHitBox(
 		if ( pAnimating )
 		{
 			
-			matrix3x4_t	*hitboxbones[MAXSTUDIOBONES];
+			const matrix3x4_t	*hitboxbones[MAXSTUDIOBONES];
 			
 			if ( pAnimating->HitboxToWorldTransforms( hitboxbones ) )
 			{
@@ -408,7 +408,7 @@ int CParticleSystemQuery::GetControllingObjectHitBoxInfo(
 		C_BaseAnimating *pAnimating = pMoveParent->GetBaseAnimating();
 		if ( pAnimating )
 		{
-			matrix3x4_t	*hitboxbones[MAXSTUDIOBONES];
+			const matrix3x4_t	*hitboxbones[MAXSTUDIOBONES];
 			
 			if ( pAnimating->HitboxToWorldTransforms( hitboxbones ) )
 			{
@@ -496,7 +496,7 @@ bool CParticleSystemQuery::IsPointInControllingObjectHitBox(
 			bSuccess = true;
 		else if ( pAnimating && bInBBox )
 		{
-			matrix3x4_t	*hitboxbones[MAXSTUDIOBONES];
+			const matrix3x4_t	*hitboxbones[MAXSTUDIOBONES];
 			if ( pAnimating->HitboxToWorldTransforms( hitboxbones ) )
 			{
 

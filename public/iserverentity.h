@@ -17,6 +17,7 @@
 #include "platform.h"
 #include "isaverestore.h"
 #include "vcollide_parse.h"
+#include "studio.h"
 
 struct Ray_t;
 class ServerClass;
@@ -42,7 +43,6 @@ class CUserCmd;
 struct vehicleparams_t;
 struct vehicle_controlparams_t;
 struct vehicle_operatingparams_t;
-class CBoneCache;
 class CIKContext;
 
 struct servertouchlink_t
@@ -469,12 +469,12 @@ public:
 	virtual void SetupBones(matrix3x4_t* pBoneToWorld, int boneMask) = 0;
 	virtual void DrawRawSkeleton(matrix3x4_t boneToWorld[], int boneMask, bool noDepthTest = true, float duration = 0.0f, bool monocolor = false) = 0;
 	virtual void GetBoneTransform(int iBone, matrix3x4_t& pBoneToWorld) = 0;
+	virtual void GetBoneTransforms(const matrix3x4_t* hitboxbones[MAXSTUDIOBONES]) = 0;
 	virtual int  LookupBone(const char* szName) = 0;
 	virtual void GetBonePosition(int iBone, Vector& origin, QAngle& angles) = 0;
 	virtual int	GetPhysicsBone(int boneIndex) = 0;
 
 	virtual int GetNumBones(void) = 0;
-	virtual CBoneCache* GetBoneCache(void) = 0;
 	virtual void InvalidateBoneCache() = 0;
 	virtual void InvalidateBoneCacheIfOlderThan(float deltaTime) = 0;
 	virtual int GetBoneCacheFlags(void) = 0;

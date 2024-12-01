@@ -6636,6 +6636,21 @@ void C_EngineObjectInternal::GetBoneTransform(int iBone, matrix3x4_t& pBoneToWor
 	MatrixCopy(*pmatrix, pBoneToWorld);
 }
 
+void C_EngineObjectInternal::GetBoneTransforms(const matrix3x4_t* hitboxbones[MAXSTUDIOBONES])
+{
+	IStudioHdr* pStudioHdr = GetModelPtr();
+
+	if (!pStudioHdr)
+	{
+		Assert(!"CBaseAnimating::GetBoneTransform: model missing");
+		return;
+	}
+
+	CBoneCache* pcache = GetBoneCache(NULL);
+
+	pcache->ReadCachedBonePointers(hitboxbones, pStudioHdr->numbones());
+}
+
 C_EnginePortalInternal::C_EnginePortalInternal(IClientEntityList* pClientEntityList)
 :C_EngineObjectInternal(pClientEntityList), m_DataAccess(m_InternalData)
 {

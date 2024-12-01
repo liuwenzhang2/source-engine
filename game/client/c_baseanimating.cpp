@@ -1868,7 +1868,7 @@ int C_BaseAnimating::DrawModel( int flags )
 //-----------------------------------------------------------------------------
 // Gets the hitbox-to-world transforms, returns false if there was a problem
 //-----------------------------------------------------------------------------
-bool C_BaseAnimating::HitboxToWorldTransforms( matrix3x4_t *pHitboxToWorld[MAXSTUDIOBONES] )
+bool C_BaseAnimating::HitboxToWorldTransforms(const matrix3x4_t *pHitboxToWorld[MAXSTUDIOBONES] )
 {
 	MDLCACHE_CRITICAL_SECTION();
 
@@ -1886,8 +1886,7 @@ bool C_BaseAnimating::HitboxToWorldTransforms( matrix3x4_t *pHitboxToWorld[MAXST
 	if ( !set->numhitboxes )
 		return false;
 
-	CBoneCache *pCache = GetEngineObject()->GetBoneCache( pStudioHdr );
-	pCache->ReadCachedBonePointers( pHitboxToWorld, pStudioHdr->numbones() );
+	GetEngineObject()->GetBoneTransforms(pHitboxToWorld);
 	return true;
 }
 
@@ -3376,9 +3375,8 @@ bool C_BaseAnimating::TestHitboxes( const Ray_t &ray, unsigned int fContentsMask
 	// This *has* to be true for the existing code to function correctly.
 	Assert( ray.m_StartOffset == vec3_origin );
 
-	CBoneCache *pCache = GetEngineObject()->GetBoneCache( pStudioHdr );
-	matrix3x4_t *hitboxbones[MAXSTUDIOBONES];
-	pCache->ReadCachedBonePointers( hitboxbones, pStudioHdr->numbones() );
+	const matrix3x4_t *hitboxbones[MAXSTUDIOBONES];
+	GetEngineObject()->GetBoneTransforms(hitboxbones);
 
 	if ( TraceToStudio( physprops, ray, pStudioHdr, set, hitboxbones, fContentsMask, GetRenderOrigin(), GetEngineObject()->GetModelScale(), tr ) )
 	{
@@ -3964,9 +3962,8 @@ bool C_BaseAnimating::ComputeHitboxSurroundingBox( Vector *pVecWorldMins, Vector
 	if ( !set || !set->numhitboxes )
 		return false;
 
-	CBoneCache *pCache = GetEngineObject()->GetBoneCache( pStudioHdr );
-	matrix3x4_t *hitboxbones[MAXSTUDIOBONES];
-	pCache->ReadCachedBonePointers( hitboxbones, pStudioHdr->numbones() );
+	const matrix3x4_t *hitboxbones[MAXSTUDIOBONES];
+	GetEngineObject()->GetBoneTransforms(hitboxbones);
 
 	// Compute a box in world space that surrounds this entity
 	pVecWorldMins->Init( FLT_MAX, FLT_MAX, FLT_MAX );
@@ -4002,9 +3999,8 @@ bool C_BaseAnimating::ComputeEntitySpaceHitboxSurroundingBox( Vector *pVecWorldM
 	if ( !set || !set->numhitboxes )
 		return false;
 
-	CBoneCache *pCache = GetEngineObject()->GetBoneCache( pStudioHdr );
-	matrix3x4_t *hitboxbones[MAXSTUDIOBONES];
-	pCache->ReadCachedBonePointers( hitboxbones, pStudioHdr->numbones() );
+	const matrix3x4_t *hitboxbones[MAXSTUDIOBONES];
+	GetEngineObject()->GetBoneTransforms(hitboxbones);
 
 	// Compute a box in world space that surrounds this entity
 	pVecWorldMins->Init( FLT_MAX, FLT_MAX, FLT_MAX );

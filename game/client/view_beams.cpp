@@ -239,7 +239,7 @@ bool ComputeBeamEntPosition( C_BaseEntity *pEnt, int nAttachment, bool bInterpre
 				mstudiohitboxset_t *set = pStudioHdr->pHitboxSet( pAnimating->GetHitboxSet() );
 				if ( set && (set->numhitboxes >= nAttachment) && (nAttachment > 0) )
 				{
-					matrix3x4_t	*hitboxbones[MAXSTUDIOBONES];
+					const matrix3x4_t	*hitboxbones[MAXSTUDIOBONES];
 					if ( pAnimating->HitboxToWorldTransforms( hitboxbones ) )
 					{
 						mstudiobbox_t *pHitbox = set->pHitbox( nAttachment - 1 );

@@ -32,7 +32,6 @@ class CBoneAccessor;
 struct PS_SD_Static_World_StaticProps_ClippedProp_t;
 struct PS_InternalData_t;
 struct PS_SD_Static_SurfaceProperties_t;
-class CBoneCache;
 class CIKContext;
 typedef unsigned int HTOOLHANDLE;
 class CBoneMergeCache;
@@ -544,10 +543,10 @@ public:
 	virtual void InvalidateBoneCache() = 0;
 	virtual bool IsBoneCacheValid() const = 0;	// Returns true if the bone cache is considered good for this frame.
 	virtual void GetCachedBoneMatrix(int boneIndex, matrix3x4_t& out) = 0;
-	virtual CBoneCache* GetBoneCache(IStudioHdr* pStudioHdr) = 0;
 	virtual int LookupBone(const char* szName) = 0;
 	virtual void GetBonePosition(int iBone, Vector& origin, QAngle& angles) = 0;
 	virtual void GetBoneTransform(int iBone, matrix3x4_t& pBoneToWorld) = 0;
+	virtual void GetBoneTransforms(const matrix3x4_t* hitboxbones[MAXSTUDIOBONES]) = 0;
 	virtual int GetReadableBones() = 0;
 	virtual void SetReadableBones(int flags) = 0;
 	virtual int GetWritableBones() = 0;

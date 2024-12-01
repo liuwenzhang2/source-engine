@@ -68,7 +68,7 @@ protected:
 								Vector *pVecAbsOrigin, Vector *pXVec, Vector *pYVec );
 	void BuildTeslaEffect( mstudiobbox_t *pHitBox, const matrix3x4_t &hitboxToWorld, bool bRandom, float flYawOffset );
 
-	void DoSparks( mstudiohitboxset_t *set, matrix3x4_t *hitboxbones[MAXSTUDIOBONES] );
+	void DoSparks( mstudiohitboxset_t *set, const matrix3x4_t *hitboxbones[MAXSTUDIOBONES] );
 
 private:
 

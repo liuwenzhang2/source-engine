@@ -5396,11 +5396,11 @@ void CEngineObjectInternal::BuildMatricesWithBoneMerge(
 	const Vector pos[MAXSTUDIOBONES],
 	const Quaternion q[MAXSTUDIOBONES],
 	matrix3x4_t bonetoworld[MAXSTUDIOBONES],
-	CBaseAnimating* pParent,
+	CEngineObjectInternal* pParent,
 	CBoneCache* pParentCache
 )
 {
-	IStudioHdr* fhdr = pParent->GetEngineObject()->GetModelPtr();
+	IStudioHdr* fhdr = pParent->GetModelPtr();
 	mstudiobone_t* pbones = pStudioHdr->pBone(0);
 
 	matrix3x4_t rotationmatrix; // model to world transformation
@@ -5554,11 +5554,11 @@ void CEngineObjectInternal::SetupBones(matrix3x4_t* pBoneToWorld, int boneMask)
 			}
 		}
 
-		CBaseAnimating* pParent = GetMoveParent() ? dynamic_cast<CBaseAnimating*>(GetMoveParent()->GetOuter()) : NULL;
+		CEngineObjectInternal* pParent = GetMoveParent();
 		if (pParent)
 		{
 			// We're doing bone merging, so do special stuff here.
-			CBoneCache* pParentCache = pParent->GetEngineObject()->GetBoneCache();
+			CBoneCache* pParentCache = pParent->GetBoneCache();
 			if (pParentCache)
 			{
 				BuildMatricesWithBoneMerge(
@@ -5703,6 +5703,21 @@ void CEngineObjectInternal::GetBoneTransform(int iBone, matrix3x4_t& pBoneToWorl
 
 	// FIXME
 	MatrixCopy(*pmatrix, pBoneToWorld);
+}
+
+void CEngineObjectInternal::GetBoneTransforms(const matrix3x4_t* hitboxbones[MAXSTUDIOBONES])
+{
+	IStudioHdr* pStudioHdr = GetModelPtr();
+
+	if (!pStudioHdr)
+	{
+		Assert(!"CBaseAnimating::GetBoneTransform: model missing");
+		return;
+	}
+
+	CBoneCache* pcache = GetBoneCache();
+
+	pcache->ReadCachedBonePointers(hitboxbones, pStudioHdr->numbones());
 }
 
 //-----------------------------------------------------------------------------

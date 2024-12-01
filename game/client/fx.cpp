@@ -1269,7 +1269,7 @@ void FX_BuildTeslaHitbox( const CEffectData &data )
 	if (!set) {
 		return;
 	}
-	matrix3x4_t	*hitboxbones[MAXSTUDIOBONES];
+	const matrix3x4_t	*hitboxbones[MAXSTUDIOBONES];
 	if ( !pAnimating->HitboxToWorldTransforms( hitboxbones ) )
 		return;
 

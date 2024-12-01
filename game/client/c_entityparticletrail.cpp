@@ -166,7 +166,7 @@ void C_EntityParticleTrail::Update( float fTimeDelta )
 	float tempDelta = fTimeDelta;
 	IStudioHdr *pStudioHdr = NULL;
 	mstudiohitboxset_t *set;
-	matrix3x4_t	*hitboxbones[MAXSTUDIOBONES];
+	const matrix3x4_t	*hitboxbones[MAXSTUDIOBONES];
 
 	IEngineObjectClient *pMoveParent = GetEngineObject()->GetMoveParent();
 	if ( !pMoveParent )
