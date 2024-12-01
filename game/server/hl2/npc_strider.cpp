@@ -846,7 +846,7 @@ void CNPC_Strider::CalculateIKLocks( float currentTime )
 	BaseClass::CalculateIKLocks( currentTime );
 	if (GetEngineObject()->GetIk() && GetEngineObject()->GetIk()->m_target.Count())
 	{
-		Assert(GetEngineObject()->GetIK()->m_target.Count() > STOMP_IK_SLOT);
+		Assert(GetEngineObject()->GetIk()->m_target.Count() > STOMP_IK_SLOT);
 		// HACKHACK: Hardcoded 11???  Not a cleaner way to do this
 		CIKTarget &target = GetEngineObject()->GetIk()->m_target[STOMP_IK_SLOT];
 		target.SetPos( m_vecHitPos.Get() );
