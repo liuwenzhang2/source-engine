@@ -4072,7 +4072,7 @@ void C_BaseEntity::RecordToolMessage()
 
 	// Post a message back to all IToolSystems
 	GetToolRecordingState( msg );
-	Assert( (int)GetToolHandle() != 0 );
+	Assert( (int)GetEngineObject()->GetToolHandle() != 0 );
 	ToolFramework_PostToolMessage(GetEngineObject()->GetToolHandle(), msg );
 	CleanupToolRecordingState( msg );
 

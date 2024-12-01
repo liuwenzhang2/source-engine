@@ -349,7 +349,7 @@ void ToolFramework_RecordMaterialParams( IMaterial *pMaterial )
 		}
 	}
 
-	Assert( pEnt->GetToolHandle() );
+	Assert( pEnt->GetEngineObject()->GetToolHandle() );
 	ToolFramework_PostToolMessage( pEnt->GetEngineObject()->GetToolHandle(), msg );
 
 	msg->deleteThis();
