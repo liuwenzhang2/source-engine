@@ -11,7 +11,6 @@
 #endif
 
 
-class C_BaseAnimating;
 class IStudioHdr;
 class IEngineObjectClient;
 
