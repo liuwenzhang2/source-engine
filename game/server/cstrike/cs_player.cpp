@@ -2331,7 +2331,7 @@ void CCSPlayer::TraceAttack( const CTakeDamageInfo &info, const Vector &vecDir, 
 //=============================================================================
 		 
 		matrix3x4_t boneTransformToWorld, boneTransformToObject;
-		GetEngineObject()->GetBoneTransform(GetHitboxBone(ptr->hitbox), boneTransformToWorld);
+		GetEngineObject()->GetHitboxBoneTransform(GetHitboxBone(ptr->hitbox), boneTransformToWorld);
 		MatrixInvert(boneTransformToWorld, boneTransformToObject);
 		VectorTransform(ptr->endpos, boneTransformToObject, m_vLastHitLocationObjectSpace);
 		 
@@ -3089,7 +3089,7 @@ bool CCSPlayer::CSWeaponDrop( CBaseCombatWeapon *pWeapon, bool bDropShield, bool
 			matrix3x4_t transform;
 
 			// Get the transform for the weapon bonetoworldspace in the NPC
-			GetEngineObject()->GetBoneTransform( iBIndex, transform );
+			GetEngineObject()->GetHitboxBoneTransform( iBIndex, transform );
 
 			// find offset of root bone from origin in local space
 			// Make sure we're detached from hierarchy before doing this!!!
@@ -3098,7 +3098,7 @@ bool CCSPlayer::CSWeaponDrop( CBaseCombatWeapon *pWeapon, bool bDropShield, bool
 			pWeapon->GetEngineObject()->SetAbsAngles( QAngle( 0, 0, 0 ) );
 			pWeapon->GetEngineObject()->InvalidateBoneCache();
 			matrix3x4_t rootLocal;
-			pWeapon->GetEngineObject()->GetBoneTransform( iWeaponBoneIndex, rootLocal );
+			pWeapon->GetEngineObject()->GetHitboxBoneTransform( iWeaponBoneIndex, rootLocal );
 
 			// invert it
 			matrix3x4_t rootInvLocal;

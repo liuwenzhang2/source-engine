@@ -1203,7 +1203,7 @@ int CBaseServerVehicle::GetEntryAnimForPoint( const Vector &vecEyePoint )
 
 		Vector vecPosition;
 		QAngle vecAngles;
-		this->GetEngineObject()->GetBonePosition( pbox->bone, vecPosition, vecAngles );
+		this->GetEngineObject()->GetHitboxBonePosition( pbox->bone, vecPosition, vecAngles );
 
 		// Build a rotation matrix from orientation
 		matrix3x4_t fRotateMatrix;

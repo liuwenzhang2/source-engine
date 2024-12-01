@@ -14,8 +14,8 @@
 #include "studio.h"
 
 
-class C_BaseAnimating;
 class IEngineObjectClient;
+class IEngineObjectServer;
 
 
 class CBoneAccessor : public IBoneAccessor
@@ -29,6 +29,10 @@ public:
 #if defined( CLIENT_DLL )
 	void Init( const IEngineObjectClient *pAnimating, matrix3x4_t *pBones );
 #endif
+#ifdef GAME_DLL
+	void Init(const IEngineObjectServer* pAnimating, matrix3x4_t* pBones);
+#endif // GAME_DLL
+
 	
 	int GetReadableBones();
 	void SetReadableBones( int flags );
@@ -49,8 +53,13 @@ private:
 	void SanityCheckBone( int iBone, bool bReadable ) const;
 #endif
 
+#if defined( CLIENT_DLL ) 
 	// Only used in the client DLL for debug verification.
 	const IEngineObjectClient *m_pAnimating;
+#endif
+#ifdef GAME_DLL
+	const IEngineObjectServer* m_pAnimating;
+#endif // GAME_DLL
 
 	matrix3x4_t *m_pBones;
 
@@ -61,14 +70,18 @@ private:
 
 inline CBoneAccessor::CBoneAccessor()
 {
+#if defined( CLIENT_DLL ) || defined( GAME_DLL )
 	m_pAnimating = NULL;
+#endif
 	m_pBones = NULL;
 	m_ReadableBones = m_WritableBones = 0;
 }
 
 inline CBoneAccessor::CBoneAccessor( matrix3x4_t *pBones )
 {
+#if defined( CLIENT_DLL ) || defined( GAME_DLL )
 	m_pAnimating = NULL;
+#endif
 	m_pBones = pBones;
 }
 
@@ -79,6 +92,15 @@ inline CBoneAccessor::CBoneAccessor( matrix3x4_t *pBones )
 		m_pBones = pBones;
 	}
 #endif
+
+#ifdef GAME_DLL
+	inline void CBoneAccessor::Init(const IEngineObjectServer* pAnimating, matrix3x4_t* pBones)
+	{
+		m_pAnimating = pAnimating;
+		m_pBones = pBones;
+	}
+#endif // GAME_DLL
+
 
 inline int CBoneAccessor::GetReadableBones()
 {

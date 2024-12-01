@@ -544,7 +544,7 @@ Vector CNPC_Vortigaunt::BodyTarget( const Vector &posSrc, bool bNoisy )
 	if (iBone >= 0)
 	{
 		QAngle angHigh;
-		GetEngineObject()->GetBonePosition( iBone, high, angHigh );
+		GetEngineObject()->GetHitboxBonePosition( iBone, high, angHigh );
 	}
 	else
 	{

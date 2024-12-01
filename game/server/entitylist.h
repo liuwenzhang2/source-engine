@@ -213,7 +213,6 @@ public:
 		m_anglesOverrideString = NULL_STRING;
 		m_pIk = NULL;
 		m_iIKCounter = 0;
-		m_boneCacheHandle = 0;
 		m_fBoneCacheFlags = 0;
 	}
 
@@ -223,7 +222,6 @@ public:
 		UnlockStudioHdr();
 		ClearRagdoll();
 		VPhysicsDestroyObject();
-		Studio_DestroyBoneCache(m_boneCacheHandle);
 		delete m_pIk;
 	}
 
@@ -792,16 +790,17 @@ public:
 	void SetRenderFX(unsigned char nRenderFX) { m_nRenderFX = nRenderFX; }
 
 	void SetOverlaySequence(int nOverlaySequence) { m_nOverlaySequence = nOverlaySequence; }
-	virtual void SetupBones(matrix3x4_t* pBoneToWorld, int boneMask);
-	void				DrawRawSkeleton(matrix3x4_t boneToWorld[], int boneMask, bool noDepthTest = true, float duration = 0.0f, bool monocolor = false);
-	virtual void GetBoneTransform(int iBone, matrix3x4_t& pBoneToWorld);
-	virtual void GetBoneTransforms(const matrix3x4_t* hitboxbones[MAXSTUDIOBONES]);
+	const matrix3x4_t& GetBone(int iBone) const;
+	matrix3x4_t& GetBoneForWrite(int iBone);
+	virtual void SetupBones(matrix3x4_t* pBoneToWorldOut, int nMaxBones, int boneMask, float currentTime);
+	void DrawRawSkeleton(matrix3x4_t boneToWorld[], int boneMask, bool noDepthTest = true, float duration = 0.0f, bool monocolor = false);
+	virtual void GetHitboxBoneTransform(int iBone, matrix3x4_t& pBoneToWorld);
+	virtual void GetHitboxBoneTransforms(const matrix3x4_t* hitboxbones[MAXSTUDIOBONES]);
+	virtual void GetHitboxBonePosition(int iBone, Vector& origin, QAngle& angles);
 	int  LookupBone(const char* szName);
-	void GetBonePosition(int iBone, Vector& origin, QAngle& angles);
 	int	GetPhysicsBone(int boneIndex);
 
-	int GetNumBones(void);
-	CBoneCache* GetBoneCache(void);
+	void GetBoneCache(void);
 	void InvalidateBoneCache();
 	void InvalidateBoneCacheIfOlderThan(float deltaTime);
 	int		GetBoneCacheFlags(void) { return m_fBoneCacheFlags; }
@@ -829,10 +828,7 @@ private:
 	// called by all vphysics inits
 	bool			VPhysicsInitSetup();
 	void CalcRagdollSize(void);
-	void BuildMatricesWithBoneMerge(const IStudioHdr* pStudioHdr, const QAngle& angles,
-		const Vector& origin, const Vector pos[MAXSTUDIOBONES],
-		const Quaternion q[MAXSTUDIOBONES], matrix3x4_t bonetoworld[MAXSTUDIOBONES],
-		CEngineObjectInternal* pParent, CBoneCache* pParentCache);
+	
 private:
 
 	friend class CBaseEntity;
@@ -975,7 +971,9 @@ private:
 	float				m_flEstIkOffset;
 	CIKContext*			m_pIk;
 	int					m_iIKCounter;
-	memhandle_t		m_boneCacheHandle;
+	CUtlVector< matrix3x4_t >		m_CachedBoneData;
+	CBoneAccessor		m_BoneAccessor;
+	float				m_flLastBoneSetupTime;
 	unsigned short	m_fBoneCacheFlags;		// Used for bone cache state on model
 };
 
@@ -1701,6 +1699,16 @@ inline const Vector& CEngineObjectInternal::WorldAlignSize() const
 	Assert(!IsBoundsDefinedInEntitySpace());
 	Assert(GetCollisionAngles() == vec3_angle);
 	return OBBSize();
+}
+
+inline const matrix3x4_t& CEngineObjectInternal::GetBone(int iBone) const
+{
+	return m_BoneAccessor.GetBone(iBone);
+}
+
+inline matrix3x4_t& CEngineObjectInternal::GetBoneForWrite(int iBone)
+{
+	return m_BoneAccessor.GetBoneForWrite(iBone);
 }
 
 class CEngineWorldInternal : public CEngineObjectInternal, public IEngineWorldServer {

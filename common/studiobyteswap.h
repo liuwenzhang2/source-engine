@@ -1045,18 +1045,6 @@ public:
 		IBoneAccessor* bonetoworld
 	);
 
-	void Studio_BuildMatrices(
-		const QAngle& angles,
-		const Vector& origin,
-		const Vector pos[],
-		const Quaternion q[],
-		int iBone,
-		float flScale,
-		matrix3x4_t bonetoworld[MAXSTUDIOBONES],
-		int boneMask
-	);
-
-
 	// Get a bone->bone relative transform
 	void Studio_CalcBoneToBoneTransform(int inputBoneIndex, int outputBoneIndex, matrix3x4_t& matrixOut);
 

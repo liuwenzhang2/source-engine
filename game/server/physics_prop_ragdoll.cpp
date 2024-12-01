@@ -128,7 +128,7 @@ void CRagdollProp::Spawn( void )
 	}
 
 	matrix3x4_t pBoneToWorld[MAXSTUDIOBONES];
-	GetEngineObject()->SetupBones( pBoneToWorld, BONE_USED_BY_ANYTHING ); // FIXME: shouldn't this be a subset of the bones
+	GetEngineObject()->SetupBones( pBoneToWorld, MAXSTUDIOBONES, BONE_USED_BY_ANYTHING, gpGlobals->curtime); // FIXME: shouldn't this be a subset of the bones
 	// this is useless info after the initial conditions are set
 	GetEngineObject()->SetAbsAngles( vec3_angle );
 	int collisionGroup = (GetEngineObject()->GetSpawnFlags() & SF_RAGDOLLPROP_DEBRIS) ? COLLISION_GROUP_DEBRIS : COLLISION_GROUP_NONE;
@@ -943,7 +943,7 @@ CBaseAnimating *CreateServerRagdollSubmodel( CBaseAnimating *pOwner, const char 
 
 	// let bone merging do the work of copying everything over for us
 	pRagdoll->GetEngineObject()->SetParent( pOwner?pOwner->GetEngineObject():NULL );
-	pRagdoll->GetEngineObject()->SetupBones( pBoneToWorld, BONE_USED_BY_ANYTHING );
+	pRagdoll->GetEngineObject()->SetupBones( pBoneToWorld, MAXSTUDIOBONES, BONE_USED_BY_ANYTHING, gpGlobals->curtime);
 	// HACKHACK: don't want this parent anymore
 	pRagdoll->GetEngineObject()->SetParent( NULL );
 
@@ -1100,7 +1100,7 @@ CRagdollProp *CreateServerRagdollAttached( CBaseAnimating *pAnimating, const Vec
 
 	pRagdoll->InitRagdollAnimation();
 	matrix3x4_t pBoneToWorld[MAXSTUDIOBONES];
-	pAnimating->GetEngineObject()->SetupBones( pBoneToWorld, BONE_USED_BY_ANYTHING );
+	pAnimating->GetEngineObject()->SetupBones( pBoneToWorld, MAXSTUDIOBONES, BONE_USED_BY_ANYTHING, gpGlobals->curtime);
 	pRagdoll->InitRagdollAttached( pAttached, vecForce, forceBone, pBoneToWorld, pBoneToWorld, 0.1, collisionGroup, pParentEntity, boneAttach, boneOrigin, parentBoneAttach, originAttached );
 	
 	return pRagdoll;

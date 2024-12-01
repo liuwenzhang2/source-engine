@@ -11922,7 +11922,7 @@ bool CAI_BaseNPC::CineCleanup()
 			// reset position
 			Vector new_origin;
 			QAngle new_angle;
-			GetEngineObject()->GetBonePosition( 0, new_origin, new_angle );
+			GetEngineObject()->GetHitboxBonePosition( 0, new_origin, new_angle );
 
 			// Figure out how far they have moved
 			// We can't really solve this problem because we can't query the movement of the origin relative

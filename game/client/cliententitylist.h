@@ -36,6 +36,7 @@
 #include "tier0/vprof.h"
 #include "vstdlib/jobthread.h"
 #include "bone_merge_cache.h"
+#include "toolframework_client.h"
 
 //class C_Beam;
 //class C_BaseViewModel;
@@ -984,9 +985,9 @@ public:
 	CBoneCache*						GetBoneCache(IStudioHdr* pStudioHdr);
 	bool							GetRootBone(matrix3x4_t& rootBone);
 	int		LookupBone(const char* szName);
-	void	GetBonePosition(int iBone, Vector& origin, QAngle& angles);
-	virtual void GetBoneTransform(int iBone, matrix3x4_t& pBoneToWorld);
-	virtual void GetBoneTransforms(const matrix3x4_t* hitboxbones[MAXSTUDIOBONES]);
+	virtual void GetHitboxBoneTransform(int iBone, matrix3x4_t& pBoneToWorld);
+	virtual void GetHitboxBoneTransforms(const matrix3x4_t* hitboxbones[MAXSTUDIOBONES]);
+	virtual void GetHitboxBonePosition(int iBone, Vector& origin, QAngle& angles);
 	int GetReadableBones() { return m_BoneAccessor.GetReadableBones(); }
 	void SetReadableBones(int flags) { m_BoneAccessor.SetReadableBones(flags); }
 

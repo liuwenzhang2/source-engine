@@ -4372,10 +4372,20 @@ void CEngineObjectInternal::SetModelPointer(const model_t* pModel)
 	if (m_pModel != pModel)
 	{
 		m_pModel = pModel;
-		if (m_boneCacheHandle)
-		{
-			Studio_DestroyBoneCache(m_boneCacheHandle);
-			m_boneCacheHandle = 0;
+		if (GetModelPtr()) {
+			// Make sure m_CachedBones has space.
+			if (m_CachedBoneData.Count() != GetModelPtr()->numbones())
+			{
+				m_CachedBoneData.SetSize(GetModelPtr()->numbones());
+				for (int i = 0; i < GetModelPtr()->numbones(); i++)
+				{
+					SetIdentityMatrix(m_CachedBoneData[i]);
+				}
+			}
+			m_BoneAccessor.Init(this, m_CachedBoneData.Base()); // Always call this in case the IStudioHdr has changed.
+			m_BoneAccessor.SetReadableBones(0);
+			m_BoneAccessor.SetWritableBones(0);
+			m_flLastBoneSetupTime = 0;
 		}
 		m_pOuter->OnNewModel();
 	}
@@ -5303,6 +5313,14 @@ void CEngineObjectInternal::InitRagdoll(const Vector& forceVector, int forceBone
 	VPhysicsSetObject(m_ragdoll.list[0].pObject);
 
 	CalcRagdollSize();
+
+	for (int i = 0; i < GetModelPtr()->numbones(); i++)
+	{
+		SetIdentityMatrix(m_CachedBoneData[i]);
+	}
+	m_BoneAccessor.SetReadableBones(0);
+	m_BoneAccessor.SetWritableBones(0);
+	m_flLastBoneSetupTime = 0;
 }
 
 void CEngineObjectInternal::CalcRagdollSize(void)
@@ -5385,60 +5403,6 @@ bool CEngineObjectInternal::IsRagdoll() const
 	return false;
 }
 
-//-----------------------------------------------------------------------------
-// Purpose: build matrices first from the parent, then from the passed in arrays if the bone doesn't exist on the parent
-//-----------------------------------------------------------------------------
-
-void CEngineObjectInternal::BuildMatricesWithBoneMerge(
-	const IStudioHdr* pStudioHdr,
-	const QAngle& angles,
-	const Vector& origin,
-	const Vector pos[MAXSTUDIOBONES],
-	const Quaternion q[MAXSTUDIOBONES],
-	matrix3x4_t bonetoworld[MAXSTUDIOBONES],
-	CEngineObjectInternal* pParent,
-	CBoneCache* pParentCache
-)
-{
-	IStudioHdr* fhdr = pParent->GetModelPtr();
-	mstudiobone_t* pbones = pStudioHdr->pBone(0);
-
-	matrix3x4_t rotationmatrix; // model to world transformation
-	AngleMatrix(angles, origin, rotationmatrix);
-
-	for (int i = 0; i < pStudioHdr->numbones(); i++)
-	{
-		// Now find the bone in the parent entity.
-		bool merged = false;
-		int parentBoneIndex = fhdr->Studio_BoneIndexByName(pbones[i].pszName());
-		if (parentBoneIndex >= 0)
-		{
-			matrix3x4_t* pMat = pParentCache->GetCachedBone(parentBoneIndex);
-			if (pMat)
-			{
-				MatrixCopy(*pMat, bonetoworld[i]);
-				merged = true;
-			}
-		}
-
-		if (!merged)
-		{
-			// If we get down here, then the bone wasn't merged.
-			matrix3x4_t bonematrix;
-			QuaternionMatrix(q[i], pos[i], bonematrix);
-
-			if (pbones[i].parent == -1)
-			{
-				ConcatTransforms(rotationmatrix, bonematrix, bonetoworld[i]);
-			}
-			else
-			{
-				ConcatTransforms(bonetoworld[pbones[i].parent], bonematrix, bonetoworld[i]);
-			}
-		}
-	}
-}
-
 void CEngineObjectInternal::DrawRawSkeleton(matrix3x4_t boneToWorld[], int boneMask, bool noDepthTest, float duration, bool monocolor)
 {
 	IStudioHdr* pStudioHdr = GetModelPtr();
@@ -5467,23 +5431,40 @@ void CEngineObjectInternal::DrawRawSkeleton(matrix3x4_t boneToWorld[], int boneM
 	}
 }
 
-void CEngineObjectInternal::SetupBones(matrix3x4_t* pBoneToWorld, int boneMask)
+void CEngineObjectInternal::SetupBones(matrix3x4_t* pBoneToWorldOut, int nMaxBones, int boneMask, float currentTime)
 {
+	AUTO_LOCK(m_BoneSetupMutex);
+
+	VPROF_BUDGET("CBaseAnimating::SetupBones", VPROF_BUDGETGROUP_SERVER_ANIM);
+
+	MDLCACHE_CRITICAL_SECTION();
+
+	Assert(GetModelPtr());
+
+	IStudioHdr* pStudioHdr = GetModelPtr();
+
+	if (!pStudioHdr)
+	{
+		Assert(!"CBaseAnimating::GetSkeleton() without a model");
+		return;
+	}
+
+	Assert(!IsEFlagSet(EFL_SETTING_UP_BONES));
+
+	AddEFlags(EFL_SETTING_UP_BONES);
+
 	// no ragdoll, fall through to base class 
 	if (RagdollBoneCount())
 	{
 		// Not really ideal, but it'll work for now
 		UpdateModelScale();
 
-		MDLCACHE_CRITICAL_SECTION();
-		IStudioHdr* pStudioHdr = GetModelPtr();
 		bool sim[MAXSTUDIOBONES];
 		memset(sim, 0, pStudioHdr->numbones());
 
 		int i;
 
-		CBoneAccessor boneaccessor(pBoneToWorld);
-		RagdollBone(sim, boneaccessor);
+		RagdollBone(sim, m_BoneAccessor);
 
 		mstudiobone_t* pbones = pStudioHdr->pBone(0);
 		for (i = 0; i < pStudioHdr->numbones(); i++)
@@ -5496,30 +5477,10 @@ void CEngineObjectInternal::SetupBones(matrix3x4_t* pBoneToWorld, int boneMask)
 
 			matrix3x4_t matBoneLocal;
 			AngleMatrix(pbones[i].rot, pbones[i].pos, matBoneLocal);
-			ConcatTransforms(pBoneToWorld[pbones[i].parent], matBoneLocal, pBoneToWorld[i]);
+			ConcatTransforms(GetBone(pbones[i].parent), matBoneLocal, GetBoneForWrite(i));
 		}
 	}
 	else {
-
-		AUTO_LOCK(m_BoneSetupMutex);
-
-		VPROF_BUDGET("CBaseAnimating::SetupBones", VPROF_BUDGETGROUP_SERVER_ANIM);
-
-		MDLCACHE_CRITICAL_SECTION();
-
-		Assert(GetModelPtr());
-
-		IStudioHdr* pStudioHdr = GetModelPtr();
-
-		if (!pStudioHdr)
-		{
-			Assert(!"CBaseAnimating::GetSkeleton() without a model");
-			return;
-		}
-
-		Assert(!IsEFlagSet(EFL_SETTING_UP_BONES));
-
-		AddEFlags(EFL_SETTING_UP_BONES);
 
 		Vector pos[MAXSTUDIOBONES];
 		Quaternion q[MAXSTUDIOBONES];
@@ -5543,9 +5504,9 @@ void CEngineObjectInternal::SetupBones(matrix3x4_t* pBoneToWorld, int boneMask)
 				m_pIk->Init(pStudioHdr, GetAbsAngles(), adjOrigin, gpGlobals->curtime, m_iIKCounter, boneMask);
 				m_pOuter->GetSkeleton(pStudioHdr, pos, q, boneMask);
 
-				m_pIk->UpdateTargets(pos, q, pBoneToWorld, boneComputed);
+				m_pIk->UpdateTargets(pos, q, m_BoneAccessor.GetBoneArrayForWrite(), boneComputed);
 				m_pOuter->CalculateIKLocks(gpGlobals->curtime);
-				m_pIk->SolveDependencies(pos, q, pBoneToWorld, boneComputed);
+				m_pIk->SolveDependencies(pos, q, m_BoneAccessor.GetBoneArrayForWrite(), boneComputed);
 			}
 			else
 			{
@@ -5557,45 +5518,115 @@ void CEngineObjectInternal::SetupBones(matrix3x4_t* pBoneToWorld, int boneMask)
 		CEngineObjectInternal* pParent = GetMoveParent();
 		if (pParent)
 		{
-			// We're doing bone merging, so do special stuff here.
-			CBoneCache* pParentCache = pParent->GetBoneCache();
-			if (pParentCache)
-			{
-				BuildMatricesWithBoneMerge(
-					pStudioHdr,
-					GetAbsAngles(),
-					adjOrigin,
-					pos,
-					q,
-					pBoneToWorld,
-					pParent,
-					pParentCache);
+			IStudioHdr* fhdr = pParent->GetModelPtr();
+			mstudiobone_t* pbones = pStudioHdr->pBone(0);
 
-				RemoveEFlags(EFL_SETTING_UP_BONES);
-				if (ai_setupbones_debug.GetBool())
+			matrix3x4_t rotationmatrix; // model to world transformation
+			AngleMatrix(GetAbsAngles(), adjOrigin, rotationmatrix);
+
+			for (int i = 0; i < pStudioHdr->numbones(); i++)
+			{
+				// Now find the bone in the parent entity.
+				bool merged = false;
+				int parentBoneIndex = fhdr->Studio_BoneIndexByName(pbones[i].pszName());
+				if (parentBoneIndex >= 0)
 				{
-					DrawRawSkeleton(pBoneToWorld, boneMask, true, 0.11);
+					const matrix3x4_t pMat = pParent->GetBone(parentBoneIndex);
+					//if (pMat)
+					{
+						MatrixCopy(pMat, GetBoneForWrite(i));
+						merged = true;
+					}
 				}
-				return;
+
+				if (!merged)
+				{
+					// If we get down here, then the bone wasn't merged.
+					matrix3x4_t bonematrix;
+					QuaternionMatrix(q[i], pos[i], bonematrix);
+
+					if (pbones[i].parent == -1)
+					{
+						ConcatTransforms(rotationmatrix, bonematrix, GetBoneForWrite(i));
+					}
+					else
+					{
+						ConcatTransforms(GetBone(pbones[i].parent), bonematrix, GetBoneForWrite(i));
+					}
+				}
 			}
 		}
+		else {
 
-		pStudioHdr->Studio_BuildMatrices(
-			GetAbsAngles(),
-			adjOrigin,
-			pos,
-			q,
-			-1,
-			GetModelScale(), // Scaling
-			pBoneToWorld,
-			boneMask);
+			int i, j;
+			int					chain[MAXSTUDIOBONES] = {};
+			int					chainlength = pStudioHdr->numbones();
+			for (i = 0; i < pStudioHdr->numbones(); i++)
+			{
+				chain[chainlength - i - 1] = i;
+			}
 
-		if (ai_setupbones_debug.GetBool())
-		{
-			// Msg("%s:%s:%s (%x)\n", GetClassname(), GetDebugName(), STRING(GetModelName()), boneMask );
-			DrawRawSkeleton(pBoneToWorld, boneMask, true, 0.11);
+			matrix3x4_t bonematrix;
+			matrix3x4_t rotationmatrix; // model to world transformation
+			AngleMatrix(GetAbsAngles(), adjOrigin, rotationmatrix);
+
+			// Account for a change in scale
+			if (GetModelScale() < 1.0f - FLT_EPSILON || GetModelScale() > 1.0f + FLT_EPSILON)
+			{
+				Vector vecOffset;
+				MatrixGetColumn(rotationmatrix, 3, vecOffset);
+				vecOffset -= adjOrigin;
+				vecOffset *= GetModelScale();
+				vecOffset += adjOrigin;
+				MatrixSetColumn(vecOffset, 3, rotationmatrix);
+
+				// Scale it uniformly
+				VectorScale(rotationmatrix[0], GetModelScale(), rotationmatrix[0]);
+				VectorScale(rotationmatrix[1], GetModelScale(), rotationmatrix[1]);
+				VectorScale(rotationmatrix[2], GetModelScale(), rotationmatrix[2]);
+			}
+
+			for (j = chainlength - 1; j >= 0; j--)
+			{
+				i = chain[j];
+				if (pStudioHdr->boneFlags(i) & boneMask)
+				{
+					QuaternionMatrix(q[i], pos[i], bonematrix);
+
+					if (pStudioHdr->boneParent(i) == -1)
+					{
+						ConcatTransforms(rotationmatrix, bonematrix, GetBoneForWrite(i));
+					}
+					else
+					{
+						ConcatTransforms(GetBone(pStudioHdr->boneParent(i)), bonematrix, GetBoneForWrite(i));
+					}
+				}
+			}
 		}
-		RemoveEFlags(EFL_SETTING_UP_BONES);
+	}
+
+	if (ai_setupbones_debug.GetBool())
+	{
+		// Msg("%s:%s:%s (%x)\n", GetClassname(), GetDebugName(), STRING(GetModelName()), boneMask );
+		DrawRawSkeleton(m_BoneAccessor.GetBoneArrayForWrite(), boneMask, true, 0.11);
+	}
+	RemoveEFlags(EFL_SETTING_UP_BONES);
+	m_BoneAccessor.SetReadableBones(boneMask);
+	m_flLastBoneSetupTime = currentTime;
+		// Do they want to get at the bone transforms? If it's just making sure an aiment has 
+	// its bones setup, it doesn't need the transforms yet.
+	if (pBoneToWorldOut)
+	{
+		if (nMaxBones >= m_CachedBoneData.Count())
+		{
+			memcpy(pBoneToWorldOut, m_CachedBoneData.Base(), sizeof(matrix3x4_t) * m_CachedBoneData.Count());
+		}
+		else
+		{
+			Warning("SetupBones: invalid bone array size (%d - needs %d)\n", nMaxBones, m_CachedBoneData.Count());
+			return;
+		}
 	}
 }
 
@@ -5603,68 +5634,66 @@ void CEngineObjectInternal::SetupBones(matrix3x4_t* pBoneToWorld, int boneMask)
 // Purpose: return the index to the shared bone cache
 // Output :
 //-----------------------------------------------------------------------------
-CBoneCache* CEngineObjectInternal::GetBoneCache(void)
+void CEngineObjectInternal::GetBoneCache(void)
 {
 	IStudioHdr* pStudioHdr = GetModelPtr();
 	Assert(pStudioHdr);
 
-	CBoneCache* pcache = Studio_GetBoneCache(m_boneCacheHandle);
+	//CBoneCache* pcache = Studio_GetBoneCache(m_boneCacheHandle);
 	int boneMask = BONE_USED_BY_HITBOX | BONE_USED_BY_ATTACHMENT;
 
 	// TF queries these bones to position weapons when players are killed
 #if defined( TF_DLL )
 	boneMask |= BONE_USED_BY_BONE_MERGE;
 #endif
-	if (pcache)
-	{
-		if (pcache->IsValid(gpGlobals->curtime) && (pcache->m_boneMask & boneMask) == boneMask && pcache->m_timeValid <= gpGlobals->curtime)
+	//if (pcache)
+	//{
+		if (gpGlobals->curtime <= m_flLastBoneSetupTime && (m_BoneAccessor.GetReadableBones() & boneMask) == boneMask)
 		{
 			// Msg("%s:%s:%s (%x:%x:%8.4f) cache\n", GetClassname(), GetDebugName(), STRING(GetModelName()), boneMask, pcache->m_boneMask, pcache->m_timeValid );
 			// in memory and still valid, use it!
-			return pcache;
+			return;
 		}
 		// in memory, but missing some of the bone masks
-		if ((pcache->m_boneMask & boneMask) != boneMask)
-		{
-			Studio_DestroyBoneCache(m_boneCacheHandle);
-			m_boneCacheHandle = 0;
-			pcache = NULL;
-		}
-	}
+		//if ((pcache->m_boneMask & boneMask) != boneMask)
+		//{
+			//Studio_DestroyBoneCache(m_boneCacheHandle);
+			//m_boneCacheHandle = 0;
+			//pcache = NULL;
+		//}
+	//}
 
-	matrix3x4_t bonetoworld[MAXSTUDIOBONES];
-	SetupBones(bonetoworld, boneMask);
+	SetupBones(NULL, -1, boneMask, gpGlobals->curtime);
 
-	if (pcache)
-	{
+	//if (pcache)
+	//{
 		// still in memory but out of date, refresh the bones.
-		pcache->UpdateBones(bonetoworld, pStudioHdr->numbones(), gpGlobals->curtime);
-	}
-	else
-	{
-		bonecacheparams_t params;
-		params.pStudioHdr = pStudioHdr;
-		params.pBoneToWorld = bonetoworld;
-		params.curtime = gpGlobals->curtime;
-		params.boneMask = boneMask;
+	//	pcache->UpdateBones(bonetoworld, pStudioHdr->numbones(), gpGlobals->curtime);
+	//}
+	//else
+	//{
+	//	bonecacheparams_t params;
+	//	params.pStudioHdr = pStudioHdr;
+	//	params.pBoneToWorld = bonetoworld;
+	//	params.curtime = gpGlobals->curtime;
+	//	params.boneMask = boneMask;
 
-		m_boneCacheHandle = Studio_CreateBoneCache(params);
-		pcache = Studio_GetBoneCache(m_boneCacheHandle);
-	}
-	Assert(pcache);
-	return pcache;
+	//	m_boneCacheHandle = Studio_CreateBoneCache(params);
+	//	pcache = Studio_GetBoneCache(m_boneCacheHandle);
+	//}
+	//Assert(pcache);
+	//return pcache;
 }
 
 
 void CEngineObjectInternal::InvalidateBoneCache(void)
 {
-	Studio_InvalidateBoneCache(m_boneCacheHandle);
+	m_BoneAccessor.SetReadableBones(0);
 }
 
 void CEngineObjectInternal::InvalidateBoneCacheIfOlderThan(float deltaTime)
 {
-	CBoneCache* pcache = Studio_GetBoneCache(m_boneCacheHandle);
-	if (!pcache || !pcache->IsValid(gpGlobals->curtime, deltaTime))
+	if (gpGlobals->curtime - m_flLastBoneSetupTime <=  deltaTime)
 	{
 		InvalidateBoneCache();
 	}
@@ -5673,51 +5702,55 @@ void CEngineObjectInternal::InvalidateBoneCacheIfOlderThan(float deltaTime)
 //=========================================================
 //=========================================================
 
-void CEngineObjectInternal::GetBoneTransform(int iBone, matrix3x4_t& pBoneToWorld)
+void CEngineObjectInternal::GetHitboxBoneTransform(int iBone, matrix3x4_t& pBoneToWorld)
 {
 	IStudioHdr* pStudioHdr = GetModelPtr();
 
 	if (!pStudioHdr)
 	{
-		Assert(!"CBaseAnimating::GetBoneTransform: model missing");
+		Assert(!"CBaseAnimating::GetHitboxBoneTransform: model missing");
 		return;
 	}
 
 	if (iBone < 0 || iBone >= pStudioHdr->numbones())
 	{
-		Assert(!"CBaseAnimating::GetBoneTransform: invalid bone index");
+		Assert(!"CBaseAnimating::GetHitboxBoneTransform: invalid bone index");
 		return;
 	}
 
-	CBoneCache* pcache = GetBoneCache();
+	GetBoneCache();
 
-	matrix3x4_t* pmatrix = pcache->GetCachedBone(iBone);
+	const matrix3x4_t pmatrix = GetBone(iBone);
 
-	if (!pmatrix)
-	{
-		MatrixCopy(EntityToWorldTransform(), pBoneToWorld);
-		return;
-	}
+	//if (!pmatrix)
+	//{
+	//	MatrixCopy(EntityToWorldTransform(), pBoneToWorld);
+	//	return;
+	//}
 
-	Assert(pmatrix);
+	//Assert(pmatrix);
 
 	// FIXME
-	MatrixCopy(*pmatrix, pBoneToWorld);
+	MatrixCopy(pmatrix, pBoneToWorld);
 }
 
-void CEngineObjectInternal::GetBoneTransforms(const matrix3x4_t* hitboxbones[MAXSTUDIOBONES])
+void CEngineObjectInternal::GetHitboxBoneTransforms(const matrix3x4_t* hitboxbones[MAXSTUDIOBONES])
 {
 	IStudioHdr* pStudioHdr = GetModelPtr();
 
 	if (!pStudioHdr)
 	{
-		Assert(!"CBaseAnimating::GetBoneTransform: model missing");
+		Assert(!"CBaseAnimating::GetHitboxBoneTransform: model missing");
 		return;
 	}
 
-	CBoneCache* pcache = GetBoneCache();
+	GetBoneCache();
 
-	pcache->ReadCachedBonePointers(hitboxbones, pStudioHdr->numbones());
+	memset(hitboxbones, 0, sizeof(matrix3x4_t*) * MAXSTUDIOBONES);
+	for (int i = 0; i < MAXSTUDIOBONES; i++)
+	{
+		hitboxbones[i] = &m_BoneAccessor.GetBone(i);
+	}
 }
 
 //-----------------------------------------------------------------------------
@@ -5737,23 +5770,23 @@ int CEngineObjectInternal::LookupBone(const char* szName)
 
 //=========================================================
 //=========================================================
-void CEngineObjectInternal::GetBonePosition(int iBone, Vector& origin, QAngle& angles)
+void CEngineObjectInternal::GetHitboxBonePosition(int iBone, Vector& origin, QAngle& angles)
 {
 	IStudioHdr* pStudioHdr = GetModelPtr();
 	if (!pStudioHdr)
 	{
-		Assert(!"CBaseAnimating::GetBonePosition: model missing");
+		Assert(!"CBaseAnimating::GetHitboxBonePosition: model missing");
 		return;
 	}
 
 	if (iBone < 0 || iBone >= pStudioHdr->numbones())
 	{
-		Assert(!"CBaseAnimating::GetBonePosition: invalid bone index");
+		Assert(!"CBaseAnimating::GetHitboxBonePosition: invalid bone index");
 		return;
 	}
 
 	matrix3x4_t bonetoworld;
-	GetBoneTransform(iBone, bonetoworld);
+	GetHitboxBoneTransform(iBone, bonetoworld);
 
 	MatrixAngles(bonetoworld, angles, origin);
 }
@@ -5767,22 +5800,6 @@ int CEngineObjectInternal::GetPhysicsBone(int boneIndex)
 			return pStudioHdr->pBone(boneIndex)->physicsbone;
 	}
 	return 0;
-}
-
-//=========================================================
-//=========================================================
-int CEngineObjectInternal::GetNumBones(void)
-{
-	IStudioHdr* pStudioHdr = GetModelPtr();
-	if (pStudioHdr)
-	{
-		return pStudioHdr->numbones();
-	}
-	else
-	{
-		Assert(!"CBaseAnimating::GetNumBones: model missing");
-		return 0;
-	}
 }
 
 void CEngineObjectInternal::EnableServerIK()
@@ -6290,7 +6307,7 @@ bool CEnginePortalInternal::EntityHitBoxExtentIsInPortalHole(IEngineObjectServer
 	{
 		mstudiobbox_t* pbox = set->pHitbox(i);
 
-		pBaseAnimating->GetBonePosition(pbox->bone, position, angles);
+		pBaseAnimating->GetHitboxBonePosition(pbox->bone, position, angles);
 
 		// Build a rotation matrix from orientation
 		matrix3x4_t fRotateMatrix;

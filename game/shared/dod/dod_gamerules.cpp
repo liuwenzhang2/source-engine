@@ -1099,22 +1099,22 @@ static CDODViewVectors g_DODViewVectors(
 		QAngle dummyAngle;
 
 		Vector vecRHand;
-		player->GetEngineObject()->GetBonePosition( iRHandIndex, vecRHand, dummyAngle );
+		player->GetEngineObject()->GetHitboxBonePosition( iRHandIndex, vecRHand, dummyAngle );
 
 		Vector vecLHand;
-		player->GetEngineObject()->GetBonePosition( iLHandIndex, vecLHand, dummyAngle );
+		player->GetEngineObject()->GetHitboxBonePosition( iLHandIndex, vecLHand, dummyAngle );
 
 		Vector vecHead;
-		player->GetEngineObject()->GetBonePosition( iHeadIndex, vecHead, dummyAngle );
+		player->GetEngineObject()->GetHitboxBonePosition( iHeadIndex, vecHead, dummyAngle );
 
 		Vector vecChest;
-		player->GetEngineObject()->GetBonePosition( iChestIndex, vecChest, dummyAngle );
+		player->GetEngineObject()->GetHitboxBonePosition( iChestIndex, vecChest, dummyAngle );
 
 		Vector vecRFoot;
-		player->GetEngineObject()->GetBonePosition( iRFootIndex, vecRFoot, dummyAngle );
+		player->GetEngineObject()->GetHitboxBonePosition( iRFootIndex, vecRFoot, dummyAngle );
 
 		Vector vecLFoot;
-		player->GetEngineObject()->GetBonePosition( iLFootIndex, vecLFoot, dummyAngle );
+		player->GetEngineObject()->GetHitboxBonePosition( iLFootIndex, vecLFoot, dummyAngle );
 
 		// right hand
 		float damageAdjustment = GetExplosionDamageAdjustment(vecSrc, vecRHand, player, pIgnoreEntity );

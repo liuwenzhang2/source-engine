@@ -4148,7 +4148,7 @@ bool CNPC_Antlion::CorpseGib( const CTakeDamageInfo &info )
 
 		Vector vecOrigin;
 		QAngle angBone;
-		GetEngineObject()->GetBonePosition( s_nBodyBone, vecOrigin, angBone );
+		GetEngineObject()->GetHitboxBonePosition( s_nBodyBone, vecOrigin, angBone );
 
 		DispatchParticleEffect( "AntlionGib", vecOrigin, QAngle( 0, 0, 0 ) );
 	}
@@ -4448,7 +4448,7 @@ Vector CNPC_Antlion::BodyTarget( const Vector &posSrc, bool bNoisy /*= true*/ )
 	// Get the exact position in our center of mass (thorax)
 	Vector vecResult;
 	QAngle vecAngle;
-	GetEngineObject()->GetBonePosition( m_nBodyBone, vecResult, vecAngle );
+	GetEngineObject()->GetHitboxBonePosition( m_nBodyBone, vecResult, vecAngle );
 	
 	if ( bNoisy )
 		return vecResult + RandomVector( -8, 8 );

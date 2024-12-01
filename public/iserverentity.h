@@ -466,15 +466,14 @@ public:
 	virtual void SetRenderFX(unsigned char nRenderFX) = 0;
 	virtual void SetOverlaySequence(int nOverlaySequence) = 0;
 
-	virtual void SetupBones(matrix3x4_t* pBoneToWorld, int boneMask) = 0;
+	virtual void SetupBones(matrix3x4_t* pBoneToWorldOut, int nMaxBones, int boneMask, float currentTime) = 0;
 	virtual void DrawRawSkeleton(matrix3x4_t boneToWorld[], int boneMask, bool noDepthTest = true, float duration = 0.0f, bool monocolor = false) = 0;
-	virtual void GetBoneTransform(int iBone, matrix3x4_t& pBoneToWorld) = 0;
-	virtual void GetBoneTransforms(const matrix3x4_t* hitboxbones[MAXSTUDIOBONES]) = 0;
+	virtual void GetHitboxBoneTransform(int iBone, matrix3x4_t& pBoneToWorld) = 0;
+	virtual void GetHitboxBoneTransforms(const matrix3x4_t* hitboxbones[MAXSTUDIOBONES]) = 0;
+	virtual void GetHitboxBonePosition(int iBone, Vector& origin, QAngle& angles) = 0;
 	virtual int  LookupBone(const char* szName) = 0;
-	virtual void GetBonePosition(int iBone, Vector& origin, QAngle& angles) = 0;
 	virtual int	GetPhysicsBone(int boneIndex) = 0;
 
-	virtual int GetNumBones(void) = 0;
 	virtual void InvalidateBoneCache() = 0;
 	virtual void InvalidateBoneCacheIfOlderThan(float deltaTime) = 0;
 	virtual int GetBoneCacheFlags(void) = 0;

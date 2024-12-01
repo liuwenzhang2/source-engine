@@ -4544,6 +4544,9 @@ void C_EngineObjectInternal::SetModelPointer(const model_t* pModel)
 				}
 			}
 			m_BoneAccessor.Init(this, m_CachedBoneData.Base()); // Always call this in case the IStudioHdr has changed.
+			m_BoneAccessor.SetReadableBones(0);
+			m_BoneAccessor.SetWritableBones(0);
+			m_flLastBoneSetupTime = 0;
 		}
 
 		m_pOuter->OnNewModel();
@@ -6056,8 +6059,7 @@ void C_EngineObjectInternal::BuildTransformations(IStudioHdr* hdr, Vector* pos, 
 		return;
 
 	if (m_ragdollListCount) {
-		if (!hdr)
-			return;
+		
 		matrix3x4_t bonematrix;
 		bool boneSimulated[MAXSTUDIOBONES];
 
@@ -6585,7 +6587,7 @@ bool C_EngineObjectInternal::GetRootBone(matrix3x4_t& rootBone)
 	if (IsEffectActive(EF_BONEMERGE) && GetMoveParent() && m_pBoneMergeCache)
 		return m_pBoneMergeCache->GetRootBone(rootBone);
 
-	GetBoneTransform(0, rootBone);
+	GetHitboxBoneTransform(0, rootBone);
 	return true;
 }
 
@@ -6603,18 +6605,18 @@ int C_EngineObjectInternal::LookupBone(const char* szName)
 
 //=========================================================
 //=========================================================
-void C_EngineObjectInternal::GetBonePosition(int iBone, Vector& origin, QAngle& angles)
+void C_EngineObjectInternal::GetHitboxBonePosition(int iBone, Vector& origin, QAngle& angles)
 {
 	if (!GetModelPtr()) {
 		return;
 	}
 	matrix3x4_t bonetoworld;
-	GetBoneTransform(iBone, bonetoworld);
+	GetHitboxBoneTransform(iBone, bonetoworld);
 
 	MatrixAngles(bonetoworld, angles, origin);
 }
 
-void C_EngineObjectInternal::GetBoneTransform(int iBone, matrix3x4_t& pBoneToWorld)
+void C_EngineObjectInternal::GetHitboxBoneTransform(int iBone, matrix3x4_t& pBoneToWorld)
 {
 	if (!GetModelPtr()) {
 		return;
@@ -6636,13 +6638,13 @@ void C_EngineObjectInternal::GetBoneTransform(int iBone, matrix3x4_t& pBoneToWor
 	MatrixCopy(*pmatrix, pBoneToWorld);
 }
 
-void C_EngineObjectInternal::GetBoneTransforms(const matrix3x4_t* hitboxbones[MAXSTUDIOBONES])
+void C_EngineObjectInternal::GetHitboxBoneTransforms(const matrix3x4_t* hitboxbones[MAXSTUDIOBONES])
 {
 	IStudioHdr* pStudioHdr = GetModelPtr();
 
 	if (!pStudioHdr)
 	{
-		Assert(!"CBaseAnimating::GetBoneTransform: model missing");
+		Assert(!"CBaseAnimating::GetHitboxBoneTransform: model missing");
 		return;
 	}
 
@@ -6880,7 +6882,7 @@ bool C_EnginePortalInternal::EntityHitBoxExtentIsInPortalHole(IEngineObjectClien
 	{
 		mstudiobbox_t* pbox = set->pHitbox(i);
 
-		pBaseAnimating->GetBonePosition(pbox->bone, position, angles);
+		pBaseAnimating->GetHitboxBonePosition(pbox->bone, position, angles);
 
 		// Build a rotation matrix from orientation
 		matrix3x4_t fRotateMatrix;

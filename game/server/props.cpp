@@ -618,7 +618,7 @@ void CPhysicsProp::HandleAnyCollisionInteractions( int index, gamevcollisioneven
 				Vector vecBonePos;
 				QAngle vecBoneAngles;
 				iBone = pNPC->GetHitboxBone( tr.hitbox );
-				pNPC->GetEngineObject()->GetBonePosition( iBone, vecBonePos, vecBoneAngles );
+				pNPC->GetEngineObject()->GetHitboxBonePosition( iBone, vecBonePos, vecBoneAngles );
 
 				Teleport( &vecBonePos, NULL, NULL );
 				vecImpalePos = vecBonePos;

@@ -1886,7 +1886,7 @@ bool C_BaseAnimating::HitboxToWorldTransforms(const matrix3x4_t *pHitboxToWorld[
 	if ( !set->numhitboxes )
 		return false;
 
-	GetEngineObject()->GetBoneTransforms(pHitboxToWorld);
+	GetEngineObject()->GetHitboxBoneTransforms(pHitboxToWorld);
 	return true;
 }
 
@@ -3376,7 +3376,7 @@ bool C_BaseAnimating::TestHitboxes( const Ray_t &ray, unsigned int fContentsMask
 	Assert( ray.m_StartOffset == vec3_origin );
 
 	const matrix3x4_t *hitboxbones[MAXSTUDIOBONES];
-	GetEngineObject()->GetBoneTransforms(hitboxbones);
+	GetEngineObject()->GetHitboxBoneTransforms(hitboxbones);
 
 	if ( TraceToStudio( physprops, ray, pStudioHdr, set, hitboxbones, fContentsMask, GetRenderOrigin(), GetEngineObject()->GetModelScale(), tr ) )
 	{
@@ -3791,7 +3791,7 @@ void C_BaseAnimating::DrawClientHitboxes( float duration /*= 0.0f*/, bool monoco
 	{
 		mstudiobbox_t *pbox = set->pHitbox( i );
 
-		GetEngineObject()->GetBonePosition( pbox->bone, position, angles );
+		GetEngineObject()->GetHitboxBonePosition( pbox->bone, position, angles );
 
 		if ( !monocolor )
 		{
@@ -3963,7 +3963,7 @@ bool C_BaseAnimating::ComputeHitboxSurroundingBox( Vector *pVecWorldMins, Vector
 		return false;
 
 	const matrix3x4_t *hitboxbones[MAXSTUDIOBONES];
-	GetEngineObject()->GetBoneTransforms(hitboxbones);
+	GetEngineObject()->GetHitboxBoneTransforms(hitboxbones);
 
 	// Compute a box in world space that surrounds this entity
 	pVecWorldMins->Init( FLT_MAX, FLT_MAX, FLT_MAX );
@@ -4000,7 +4000,7 @@ bool C_BaseAnimating::ComputeEntitySpaceHitboxSurroundingBox( Vector *pVecWorldM
 		return false;
 
 	const matrix3x4_t *hitboxbones[MAXSTUDIOBONES];
-	GetEngineObject()->GetBoneTransforms(hitboxbones);
+	GetEngineObject()->GetHitboxBoneTransforms(hitboxbones);
 
 	// Compute a box in world space that surrounds this entity
 	pVecWorldMins->Init( FLT_MAX, FLT_MAX, FLT_MAX );

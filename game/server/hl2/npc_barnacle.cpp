@@ -728,7 +728,7 @@ bool CNPC_Barnacle::WaitForRagdollToSettle( float flBiteZOffset )
 
 	Vector vecCheckPos;
 	QAngle vecBoneAngles;
-	m_hRagdoll->GetEngineObject()->GetBonePosition( m_iGrabbedBoneIndex, vecCheckPos, vecBoneAngles );
+	m_hRagdoll->GetEngineObject()->GetHitboxBonePosition( m_iGrabbedBoneIndex, vecCheckPos, vecBoneAngles );
 
 	// Stop sucking while we wait for the ragdoll to settle
 	SetActivity( ACT_IDLE );
@@ -1140,13 +1140,13 @@ void CNPC_Barnacle::LiftRagdoll( float flBiteZOffset )
 
 			// Get the current bone matrix
 			matrix3x4_t pBoneToWorld[MAXSTUDIOBONES];
-			pAnimating->GetEngineObject()->SetupBones( pBoneToWorld, BONE_USED_BY_ANYTHING );
+			pAnimating->GetEngineObject()->SetupBones( pBoneToWorld,-1, BONE_USED_BY_ANYTHING, gpGlobals->curtime);
 
 			// Apply the forces to the ragdoll
 			RagdollApplyAnimationAsVelocity( *(m_hRagdoll->GetEngineObject()->GetRagdoll()), m_pRagdollBones, pBoneToWorld, 0.2 );
 
 			// Store off the current bone matrix for next time
-			pAnimating->GetEngineObject()->SetupBones( m_pRagdollBones, BONE_USED_BY_ANYTHING );
+			pAnimating->GetEngineObject()->SetupBones( m_pRagdollBones,-1, BONE_USED_BY_ANYTHING, gpGlobals->curtime);
 		}
 	}
 }
@@ -1353,7 +1353,7 @@ CRagdollProp *CNPC_Barnacle::AttachRagdollToTongue( CBaseAnimating *pAnimating )
 	// Move the tip to the bone
 	Vector vecBonePos;
 	QAngle vecBoneAngles;
-	pAnimating->GetEngineObject()->GetBonePosition( m_iGrabbedBoneIndex, vecBonePos, vecBoneAngles );
+	pAnimating->GetEngineObject()->GetHitboxBonePosition( m_iGrabbedBoneIndex, vecBonePos, vecBoneAngles );
 
 	if ( m_hTongueTip )
 	{
@@ -1596,7 +1596,7 @@ You can use this stanza to try to counterplace the constraint on the player's he
 	UpdateTongue();
 
 	// Store off the current bone matrix so we have it next frame
-	pAnimating->GetEngineObject()->SetupBones( m_pRagdollBones, BONE_USED_BY_ANYTHING );
+	pAnimating->GetEngineObject()->SetupBones( m_pRagdollBones,-1, BONE_USED_BY_ANYTHING, gpGlobals->curtime);
 }
 
 

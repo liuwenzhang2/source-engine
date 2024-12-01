@@ -544,9 +544,9 @@ public:
 	virtual bool IsBoneCacheValid() const = 0;	// Returns true if the bone cache is considered good for this frame.
 	virtual void GetCachedBoneMatrix(int boneIndex, matrix3x4_t& out) = 0;
 	virtual int LookupBone(const char* szName) = 0;
-	virtual void GetBonePosition(int iBone, Vector& origin, QAngle& angles) = 0;
-	virtual void GetBoneTransform(int iBone, matrix3x4_t& pBoneToWorld) = 0;
-	virtual void GetBoneTransforms(const matrix3x4_t* hitboxbones[MAXSTUDIOBONES]) = 0;
+	virtual void GetHitboxBoneTransform(int iBone, matrix3x4_t& pBoneToWorld) = 0;
+	virtual void GetHitboxBoneTransforms(const matrix3x4_t* hitboxbones[MAXSTUDIOBONES]) = 0;
+	virtual void GetHitboxBonePosition(int iBone, Vector& origin, QAngle& angles) = 0;
 	virtual int GetReadableBones() = 0;
 	virtual void SetReadableBones(int flags) = 0;
 	virtual int GetWritableBones() = 0;

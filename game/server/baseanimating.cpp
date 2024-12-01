@@ -530,10 +530,10 @@ CBaseEntity* CBaseAnimating::CreateServerRagdoll(int forceBone, const CTakeDamag
 	float fPreviousCycle = clamp(this->GetEngineObject()->GetCycle() - (dt * (1 / fSequenceDuration)), 0.f, 1.f);
 	float fCurCycle = this->GetEngineObject()->GetCycle();
 	// Get current bones positions
-	this->GetEngineObject()->SetupBones(pBoneToWorldNext, BONE_USED_BY_ANYTHING);
+	this->GetEngineObject()->SetupBones(pBoneToWorldNext, MAXSTUDIOBONES, BONE_USED_BY_ANYTHING, gpGlobals->curtime);
 	// Get previous bones positions
 	this->GetEngineObject()->SetCycle(fPreviousCycle);
-	this->GetEngineObject()->SetupBones(pBoneToWorld, BONE_USED_BY_ANYTHING);
+	this->GetEngineObject()->SetupBones(pBoneToWorld, MAXSTUDIOBONES, BONE_USED_BY_ANYTHING, gpGlobals->curtime);
 	// Restore current cycle
 	this->GetEngineObject()->SetCycle(fCurCycle);
 
@@ -1290,7 +1290,7 @@ bool CBaseAnimating::GetAttachment( int iAttachment, matrix3x4_t &attachmentToWo
 	int iBone = pStudioHdr->GetAttachmentBone( iAttachment-1 );
 
 	matrix3x4_t bonetoworld;
-	GetEngineObject()->GetBoneTransform( iBone, bonetoworld );
+	GetEngineObject()->GetHitboxBoneTransform( iBone, bonetoworld );
 	if ( (pattachment.flags & ATTACHMENT_FLAG_WORLD_ALIGN) == 0 )
 	{
 		ConcatTransforms( bonetoworld, pattachment.local, attachmentToWorld ); 
@@ -1403,7 +1403,7 @@ void CBaseAnimating::GetEyeballs( Vector &origin, QAngle &angles )
 			{
 				mstudioeyeball_t *pEyeball = pModel->pEyeball( iEyeball );
 				matrix3x4_t bonetoworld;
-				GetEngineObject()->GetBoneTransform( pEyeball->bone, bonetoworld );
+				GetEngineObject()->GetHitboxBoneTransform( pEyeball->bone, bonetoworld );
 				VectorTransform( pEyeball->org, bonetoworld,  origin );
 				MatrixAngles( bonetoworld, angles ); // ???
 			}
@@ -1729,7 +1729,7 @@ bool CBaseAnimating::TestHitboxes( const Ray_t &ray, unsigned int fContentsMask,
 	IStudioHdr *pStudioHdr = GetEngineObject()->GetModelPtr( );
 	if (!pStudioHdr)
 	{
-		Assert(!"CBaseAnimating::GetBonePosition: model missing");
+		Assert(!"CBaseAnimating::GetHitboxBonePosition: model missing");
 		return false;
 	}
 
@@ -1738,7 +1738,7 @@ bool CBaseAnimating::TestHitboxes( const Ray_t &ray, unsigned int fContentsMask,
 		return false;
 
 	const matrix3x4_t *hitboxbones[MAXSTUDIOBONES];
-	GetEngineObject()->GetBoneTransforms(hitboxbones);
+	GetEngineObject()->GetHitboxBoneTransforms(hitboxbones);
 
 	if ( TraceToStudio( physprops, ray, pStudioHdr, set, hitboxbones, fContentsMask, GetEngineObject()->GetAbsOrigin(), GetEngineObject()->GetModelScale(), tr ) )
 	{
@@ -2035,7 +2035,7 @@ void CBaseAnimating::DrawServerHitboxes( float duration /*= 0.0f*/, bool monocol
 	{
 		mstudiobbox_t *pbox = set->pHitbox( i );
 
-		GetEngineObject()->GetBonePosition( pbox->bone, position, angles );
+		GetEngineObject()->GetHitboxBonePosition( pbox->bone, position, angles );
 
 		if ( !monocolor )
 		{
@@ -2088,7 +2088,7 @@ bool CBaseAnimating::ComputeHitboxSurroundingBox( Vector *pVecWorldMins, Vector 
 		return false;
 
 	const matrix3x4_t* hitboxbones[MAXSTUDIOBONES];
-	GetEngineObject()->GetBoneTransforms(hitboxbones);
+	GetEngineObject()->GetHitboxBoneTransforms(hitboxbones);
 
 	// Compute a box in world space that surrounds this entity
 	pVecWorldMins->Init( FLT_MAX, FLT_MAX, FLT_MAX );
@@ -2129,7 +2129,7 @@ bool CBaseAnimating::ComputeEntitySpaceHitboxSurroundingBox( Vector *pVecWorldMi
 		return false;
 
 	const matrix3x4_t *hitboxbones[MAXSTUDIOBONES];
-	GetEngineObject()->GetBoneTransforms(hitboxbones);
+	GetEngineObject()->GetHitboxBoneTransforms(hitboxbones);
 
 	// Compute a box in world space that surrounds this entity
 	pVecWorldMins->Init( FLT_MAX, FLT_MAX, FLT_MAX );
@@ -2214,7 +2214,7 @@ int CBaseAnimating::GetHitboxesFrontside( int *boxList, int boxMax, const Vector
 			{
 				mstudiobbox_t *pbox = set->pHitbox( b );
 
-				GetEngineObject()->GetBoneTransform( pbox->bone, matrix );
+				GetEngineObject()->GetHitboxBoneTransform( pbox->bone, matrix );
 				Vector center = (pbox->bbmax + pbox->bbmin) * 0.5;
 				Vector centerWs;
 				VectorTransform( center, matrix, centerWs );

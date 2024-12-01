@@ -1058,7 +1058,7 @@ void CCSBot::DebugDisplay( void ) const
 		{
 			mstudiobbox_t *pbox = set->pHitbox( i );
 
-			const_cast< CCSBot *>( this )->GetEngineObject()->GetBonePosition( pbox->bone, position, angles );
+			const_cast< CCSBot *>( this )->GetEngineObject()->GetHitboxBonePosition( pbox->bone, position, angles );
 		
 			AngleVectors( angles, &forward, &right, &up );
 

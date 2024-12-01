@@ -125,7 +125,7 @@ public:
 		//BaseClass::CalculateIKLocks( currentTime );
 		if (GetEngineObject()->GetIk() && GetEngineObject()->GetIk()->m_target.Count())
 		{
-			Assert(m_pIk->m_target.Count() > STOMP_IK_SLOT);
+			Assert(GetEngineObject()->GetIk()->m_target.Count() > STOMP_IK_SLOT);
 			// HACKHACK: Hardcoded 11???  Not a cleaner way to do this
 			CIKTarget &target = GetEngineObject()->GetIk()->m_target[STOMP_IK_SLOT];
 			target.SetPos( m_vecHitPos );
@@ -136,7 +136,7 @@ public:
 				CIKTarget &target = GetEngineObject()->GetIk()->m_target[i];
 				target.SetPos( m_vecIKTarget[i] );
 #if 0
-				debugoverlay->AddBoxOverlay( m_vecIKTarget[i], Vector( -2, -2, -2 ), Vector( 2, 2, 2), QAngle( 0, 0, 0 ), (int)255*m_pIk->m_target[i].est.latched, 0, 0, 0, 0 );
+				debugoverlay->AddBoxOverlay( m_vecIKTarget[i], Vector( -2, -2, -2 ), Vector( 2, 2, 2), QAngle( 0, 0, 0 ), (int)255* GetEngineObject()->GetIk()->m_target[i].est.latched, 0, 0, 0, 0);
 #endif
 			}
 		}

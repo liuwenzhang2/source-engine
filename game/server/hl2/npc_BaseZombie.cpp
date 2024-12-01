@@ -1677,7 +1677,7 @@ void CNPC_BaseZombie::HandleAnimEvent( animevent_t *pEvent )
 		int iCrabAttachment = LookupAttachment( "headcrab" );
 		int iSpeed = atoi( token );
 
-		GetInteractionPartner()->GetEngineObject()->GetBonePosition( boneIndex, vecBonePosition, angles );
+		GetInteractionPartner()->GetEngineObject()->GetHitboxBonePosition( boneIndex, vecBonePosition, angles );
 		GetAttachment( iCrabAttachment, vecHeadCrabPosition );
 
 		Vector vVelocity = vecHeadCrabPosition - vecBonePosition;
@@ -2571,7 +2571,7 @@ void CNPC_BaseZombie::SetHeadcrabSpawnLocation( int iCrabAttachment, CBaseAnimat
 	pCrab->GetEngineObject()->SetAbsAngles( QAngle( 0, 0, 0 ) );
 	pCrab->GetEngineObject()->InvalidateBoneCache();
 	matrix3x4_t rootLocal;
-	pCrab->GetEngineObject()->GetBoneTransform( 0, rootLocal );
+	pCrab->GetEngineObject()->GetHitboxBoneTransform( 0, rootLocal );
 
 	// invert it
 	matrix3x4_t rootInvLocal;
