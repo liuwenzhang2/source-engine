@@ -5516,7 +5516,7 @@ void CEngineObjectInternal::SetupBones(matrix3x4_t* pBoneToWorldOut, int nMaxBon
 		}
 
 		CEngineObjectInternal* pParent = GetMoveParent();
-		if (pParent)
+		if (pParent && pParent->GetModelPtr())
 		{
 			IStudioHdr* fhdr = pParent->GetModelPtr();
 			mstudiobone_t* pbones = pStudioHdr->pBone(0);
