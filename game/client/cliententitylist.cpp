@@ -6620,7 +6620,7 @@ void C_EngineObjectInternal::GetHitboxBoneTransform(int iBone, matrix3x4_t& pBon
 	//	return;
 	//}
 
-	Assert(pmatrix);
+	//Assert(pmatrix);
 
 	// FIXME
 	MatrixCopy(pmatrix, pBoneToWorld);
