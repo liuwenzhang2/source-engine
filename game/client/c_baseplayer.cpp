@@ -1830,25 +1830,25 @@ void C_BasePlayer::ThirdPersonSwitch( bool bThirdperson )
 	UpdateVisibility();
 
 	// Update the visibility of anything bone attached to us.
-	if ( IsLocalPlayer() )
-	{
-		bool bShouldDrawLocalPlayer = ShouldDrawLocalPlayer();
-		for ( int i=0; i<GetNumBoneAttachments(); ++i )
-		{
-			C_BaseAnimating* pBoneAttachment = GetBoneAttachment( i );
-			if ( pBoneAttachment )
-			{
-				if ( bShouldDrawLocalPlayer )
-				{
-					pBoneAttachment->GetEngineObject()->RemoveEffects( EF_NODRAW );
-				}
-				else
-				{
-					pBoneAttachment->GetEngineObject()->AddEffects( EF_NODRAW );
-				}
-			}
-		}
-	}
+	//if ( IsLocalPlayer() )
+	//{
+	//	bool bShouldDrawLocalPlayer = ShouldDrawLocalPlayer();
+	//	for ( int i=0; i<GetNumBoneAttachments(); ++i )
+	//	{
+	//		C_BaseAnimating* pBoneAttachment = GetBoneAttachment( i );
+	//		if ( pBoneAttachment )
+	//		{
+	//			if ( bShouldDrawLocalPlayer )
+	//			{
+	//				pBoneAttachment->GetEngineObject()->RemoveEffects( EF_NODRAW );
+	//			}
+	//			else
+	//			{
+	//				pBoneAttachment->GetEngineObject()->AddEffects( EF_NODRAW );
+	//			}
+	//		}
+	//	}
+	//}
 }
 
 
