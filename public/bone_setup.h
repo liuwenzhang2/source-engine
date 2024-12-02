@@ -203,64 +203,64 @@ private:
 };
 
 
-FORWARD_DECLARE_HANDLE( memhandle_t );
-struct bonecacheparams_t
-{
-	IStudioHdr		*pStudioHdr;
-	matrix3x4_t		*pBoneToWorld;
-	float			curtime;
-	int				boneMask;
-};
-
-class CBoneCache
-{
-public:
-
-	// you must implement these static functions for the ResourceManager
-	// -----------------------------------------------------------
-	static CBoneCache *CreateResource( const bonecacheparams_t &params );
-	static unsigned int EstimatedSize( const bonecacheparams_t &params );
-	// -----------------------------------------------------------
-	// member functions that must be present for the ResourceManager
-	void			DestroyResource();
-	CBoneCache		*GetData() { return this; }
-	unsigned int	Size() { return m_size; }
-	// -----------------------------------------------------------
-
-					CBoneCache();
-
-	// was constructor, but placement new is messy wrt memdebug - so cast & init instead
-	void			Init( const bonecacheparams_t &params, unsigned int size, short *pStudioToCached, short *pCachedToStudio, int cachedBoneCount );
-	
-	void			UpdateBones( const matrix3x4_t *pBoneToWorld, int numbones, float curtime );
-	matrix3x4_t		*GetCachedBone( int studioIndex );
-	void			ReadCachedBones( matrix3x4_t *pBoneToWorld );
-	void			ReadCachedBonePointers(const matrix3x4_t **bones, int numbones );
-
-	bool			IsValid( float curtime, float dt = 0.1f );
-
-public:
-	float			m_timeValid;
-	int				m_boneMask;
-
-private:
-	matrix3x4_t		*BoneArray();
-	short			*StudioToCached();
-	short			*CachedToStudio();
-
-	unsigned int	m_size;
-	unsigned short	m_cachedBoneCount;
-	unsigned short	m_matrixOffset;
-	unsigned short	m_cachedToStudioOffset;
-	unsigned short	m_boneOutOffset;
-};
-
-CBoneCache *Studio_GetBoneCache( memhandle_t cacheHandle );
-memhandle_t Studio_CreateBoneCache( bonecacheparams_t &params );
-void Studio_DestroyBoneCache( memhandle_t cacheHandle );
-void Studio_InvalidateBoneCache( memhandle_t cacheHandle );
-
-// Given a ray, trace for an intersection with this studiomodel.  Get the array of bones from StudioSetupHitboxBones
+//FORWARD_DECLARE_HANDLE( memhandle_t );
+//struct bonecacheparams_t
+//{
+//	IStudioHdr		*pStudioHdr;
+//	matrix3x4_t		*pBoneToWorld;
+//	float			curtime;
+//	int				boneMask;
+//};
+//
+//class CBoneCache
+//{
+//public:
+//
+//	// you must implement these static functions for the ResourceManager
+//	// -----------------------------------------------------------
+//	static CBoneCache *CreateResource( const bonecacheparams_t &params );
+//	static unsigned int EstimatedSize( const bonecacheparams_t &params );
+//	// -----------------------------------------------------------
+//	// member functions that must be present for the ResourceManager
+//	void			DestroyResource();
+//	CBoneCache		*GetData() { return this; }
+//	unsigned int	Size() { return m_size; }
+//	// -----------------------------------------------------------
+//
+//					CBoneCache();
+//
+//	// was constructor, but placement new is messy wrt memdebug - so cast & init instead
+//	void			Init( const bonecacheparams_t &params, unsigned int size, short *pStudioToCached, short *pCachedToStudio, int cachedBoneCount );
+//	
+//	void			UpdateBones( const matrix3x4_t *pBoneToWorld, int numbones, float curtime );
+//	matrix3x4_t		*GetCachedBone( int studioIndex );
+//	void			ReadCachedBones( matrix3x4_t *pBoneToWorld );
+//	void			ReadCachedBonePointers(const matrix3x4_t **bones, int numbones );
+//
+//	bool			IsValid( float curtime, float dt = 0.1f );
+//
+//public:
+//	float			m_timeValid;
+//	int				m_boneMask;
+//
+//private:
+//	matrix3x4_t		*BoneArray();
+//	short			*StudioToCached();
+//	short			*CachedToStudio();
+//
+//	unsigned int	m_size;
+//	unsigned short	m_cachedBoneCount;
+//	unsigned short	m_matrixOffset;
+//	unsigned short	m_cachedToStudioOffset;
+//	unsigned short	m_boneOutOffset;
+//};
+//
+//CBoneCache *Studio_GetBoneCache( memhandle_t cacheHandle );
+//memhandle_t Studio_CreateBoneCache( bonecacheparams_t &params );
+//void Studio_DestroyBoneCache( memhandle_t cacheHandle );
+//void Studio_InvalidateBoneCache( memhandle_t cacheHandle );
+//
+//// Given a ray, trace for an intersection with this studiomodel.  Get the array of bones from StudioSetupHitboxBones
 bool TraceToStudio( class IPhysicsSurfaceProps *pProps, const Ray_t& ray, IStudioHdr *pStudioHdr, mstudiohitboxset_t *set, const matrix3x4_t **hitboxbones, int fContentsMask, const Vector &vecOrigin, float flScale, trace_t &trace );
 
 #endif // BONE_SETUP_H

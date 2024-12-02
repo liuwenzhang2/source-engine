@@ -248,7 +248,7 @@ public:
 		m_flBlendWeightCurrent = 0.0f;
 		m_nOverlaySequence = -1;
 		//m_pRagdoll		= NULL;
-		m_hitboxBoneCacheHandle = 0;
+		//m_hitboxBoneCacheHandle = 0;
 
 
 
@@ -280,7 +280,7 @@ public:
 			m_pClientEntityList->GetPreviousBoneSetups().FastRemove(i);
 		delete m_pIk;
 		delete m_pBoneMergeCache;
-		Studio_DestroyBoneCache(m_hitboxBoneCacheHandle);
+		//Studio_DestroyBoneCache(m_hitboxBoneCacheHandle);
 		delete m_pJiggleBones;
 	}
 
@@ -965,39 +965,36 @@ public:
 	void					DontRecordInTools();
 	bool					ShouldRecordInTools() const;
 
+	int LookupBone(const char* szName);
+	int GetBoneCount() { return m_CachedBoneData.Count(); }
+	// Wrappers for CBoneAccessor.
+	const matrix3x4_t& GetBone(int iBone) const;
+	const matrix3x4_t* GetBoneArray() const;
+	matrix3x4_t& GetBoneForWrite(int iBone);
+	int GetReadableBones() { return m_BoneAccessor.GetReadableBones(); }
+	void SetReadableBones(int flags) { m_BoneAccessor.SetReadableBones(flags); }
+	int GetWritableBones() { return m_BoneAccessor.GetWritableBones(); }
+	void SetWritableBones(int flags) { m_BoneAccessor.SetWritableBones(flags); }
+	int GetAccumulatedBoneMask() { return m_iAccumulatedBoneMask; }
 	CIKContext* GetIk() { return m_pIk; }
 	void DestroyIk() {
 		delete m_pIk;
 		m_pIk = NULL;
 	}
-	virtual void BuildTransformations(IStudioHdr* pStudioHdr, Vector* pos, Quaternion q[], const matrix3x4_t& cameraTransform, int boneMask, CBoneBitList& boneComputed);
-
 	// model specific
 	virtual bool SetupBones(matrix3x4_t* pBoneToWorldOut, int nMaxBones, int boneMask, float currentTime);
-	// Wrappers for CBoneAccessor.
-	const matrix3x4_t& GetBone(int iBone) const;
-	matrix3x4_t& GetBoneForWrite(int iBone);
+	virtual void BuildTransformations(IStudioHdr* pStudioHdr, Vector* pos, Quaternion q[], const matrix3x4_t& cameraTransform, int boneMask, CBoneBitList& boneComputed);
 	// Call this if SetupBones() has already been called this frame but you need to move the
 // entity and rerender.
-	void							InvalidateBoneCache();
-	bool							IsBoneCacheValid() const;	// Returns true if the bone cache is considered good for this frame.
-	void							GetCachedBoneMatrix(int boneIndex, matrix3x4_t& out);
-	CBoneCache*						GetBoneCache(IStudioHdr* pStudioHdr);
-	bool							GetRootBone(matrix3x4_t& rootBone);
-	int		LookupBone(const char* szName);
-	virtual void GetHitboxBoneTransform(int iBone, matrix3x4_t& pBoneToWorld);
-	virtual void GetHitboxBoneTransforms(const matrix3x4_t* hitboxbones[MAXSTUDIOBONES]);
-	virtual void GetHitboxBonePosition(int iBone, Vector& origin, QAngle& angles);
-	int GetReadableBones() { return m_BoneAccessor.GetReadableBones(); }
-	void SetReadableBones(int flags) { m_BoneAccessor.SetReadableBones(flags); }
-
-	int GetWritableBones() { return m_BoneAccessor.GetWritableBones(); }
-	void SetWritableBones(int flags) { m_BoneAccessor.SetWritableBones(flags); }
+	void GetHitboxBoneTransform(int iBone, matrix3x4_t& pBoneToWorld);
+	void GetHitboxBoneTransforms(const matrix3x4_t* hitboxbones[MAXSTUDIOBONES]);
+	void GetHitboxBonePosition(int iBone, Vector& origin, QAngle& angles);
+	void GetBoneCache(IStudioHdr* pStudioHdr);
+	bool GetRootBone(matrix3x4_t& rootBone);
+	bool GetAimEntOrigin(Vector* pAbsOrigin, QAngle* pAbsAngles);
+	void InvalidateBoneCache();
 
 	unsigned short& GetEntClientFlags() { return m_EntClientFlags; }
-	const CUtlVector< matrix3x4_t >& GetCachedBoneData() { return m_CachedBoneData; }
-	CBoneMergeCache* GetBoneMergeCache() { return m_pBoneMergeCache; }
-	int GetAccumulatedBoneMask() { return m_iAccumulatedBoneMask; }
 	void SetLastRecordedFrame(int nLastRecordedFrame) { m_nLastRecordedFrame = nLastRecordedFrame; }
 	float GetBlendWeightCurrent() { return m_flBlendWeightCurrent; }
 	void SetBlendWeightCurrent(float flBlendWeightCurrent) { m_flBlendWeightCurrent = flBlendWeightCurrent; }
@@ -1243,7 +1240,7 @@ protected:
 
 	CThreadFastMutex				m_BoneSetupLock;
 	CUtlVector< matrix3x4_t >		m_CachedBoneData; // never access this directly. Use m_BoneAccessor.
-	memhandle_t						m_hitboxBoneCacheHandle;
+	//memhandle_t						m_hitboxBoneCacheHandle;
 	float							m_flLastBoneSetupTime;
 	CBoneAccessor					m_BoneAccessor;
 	CIKContext*						m_pIk = NULL;
@@ -1999,9 +1996,22 @@ inline const matrix3x4_t& C_EngineObjectInternal::GetBone(int iBone) const
 	return m_BoneAccessor.GetBone(iBone);
 }
 
+inline const matrix3x4_t* C_EngineObjectInternal::GetBoneArray() const
+{
+	return m_BoneAccessor.GetBoneArrayForWrite();
+}
+
 inline matrix3x4_t& C_EngineObjectInternal::GetBoneForWrite(int iBone)
 {
 	return m_BoneAccessor.GetBoneForWrite(iBone);
+}
+
+inline bool C_EngineObjectInternal::GetAimEntOrigin(Vector* pAbsOrigin, QAngle* pAbsAngles)
+{
+	if (!m_pBoneMergeCache) {
+		return false;
+	}
+	return m_pBoneMergeCache->GetAimEntOrigin(pAbsOrigin, pAbsAngles);
 }
 
 class C_EngineWorldInternal : public C_EngineObjectInternal {

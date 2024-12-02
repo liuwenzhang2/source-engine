@@ -5531,7 +5531,7 @@ void CEngineObjectInternal::SetupBones(matrix3x4_t* pBoneToWorldOut, int nMaxBon
 				int parentBoneIndex = fhdr->Studio_BoneIndexByName(pbones[i].pszName());
 				if (parentBoneIndex >= 0)
 				{
-					const matrix3x4_t pMat = pParent->GetBone(parentBoneIndex);
+					const matrix3x4_t& pMat = pParent->GetBone(parentBoneIndex);
 					//if (pMat)
 					{
 						MatrixCopy(pMat, GetBoneForWrite(i));
@@ -5720,7 +5720,7 @@ void CEngineObjectInternal::GetHitboxBoneTransform(int iBone, matrix3x4_t& pBone
 
 	GetBoneCache();
 
-	const matrix3x4_t pmatrix = GetBone(iBone);
+	const matrix3x4_t& pmatrix = GetBone(iBone);
 
 	//if (!pmatrix)
 	//{

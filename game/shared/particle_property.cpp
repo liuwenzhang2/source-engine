@@ -586,7 +586,7 @@ void CParticleProperty::UpdateControlPoint( ParticleEffectList_t *pEffect, int i
 				}
 
 				bUsingHeadOrigin = true;
-				const matrix3x4_t headBone = pAnimating->GetBone( iBone );
+				const matrix3x4_t& headBone = pAnimating->GetBone( iBone );
 				MatrixVectors( headBone, &vecForward, &vecRight, &vecUp );
 				MatrixPosition( headBone, vecOrigin );
 

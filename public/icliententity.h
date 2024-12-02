@@ -34,7 +34,6 @@ struct PS_InternalData_t;
 struct PS_SD_Static_SurfaceProperties_t;
 class CIKContext;
 typedef unsigned int HTOOLHANDLE;
-class CBoneMergeCache;
 
 class VarMapEntry_t
 {
@@ -535,32 +534,31 @@ public:
 	// used to exclude entities from being recorded in the SFM tools
 	virtual void DontRecordInTools() = 0;
 	virtual bool ShouldRecordInTools() const = 0;
-	virtual CIKContext* GetIk() = 0;
-	virtual void DestroyIk() = 0;
-	virtual bool SetupBones(matrix3x4_t* pBoneToWorldOut, int nMaxBones, int boneMask, float currentTime) = 0;
-	virtual const matrix3x4_t& GetBone(int iBone) const = 0;
-	virtual matrix3x4_t& GetBoneForWrite(int iBone) = 0;
-	virtual void InvalidateBoneCache() = 0;
-	virtual bool IsBoneCacheValid() const = 0;	// Returns true if the bone cache is considered good for this frame.
-	virtual void GetCachedBoneMatrix(int boneIndex, matrix3x4_t& out) = 0;
 	virtual int LookupBone(const char* szName) = 0;
-	virtual void GetHitboxBoneTransform(int iBone, matrix3x4_t& pBoneToWorld) = 0;
-	virtual void GetHitboxBoneTransforms(const matrix3x4_t* hitboxbones[MAXSTUDIOBONES]) = 0;
-	virtual void GetHitboxBonePosition(int iBone, Vector& origin, QAngle& angles) = 0;
+	virtual bool IsBoneAccessAllowed() const = 0;
+	virtual int GetBoneCount() = 0;
+	virtual const matrix3x4_t& GetBone(int iBone) const = 0;
+	virtual const matrix3x4_t* GetBoneArray() const = 0;
+	virtual matrix3x4_t& GetBoneForWrite(int iBone) = 0;
 	virtual int GetReadableBones() = 0;
 	virtual void SetReadableBones(int flags) = 0;
 	virtual int GetWritableBones() = 0;
 	virtual void SetWritableBones(int flags) = 0;
-	virtual bool GetRootBone(matrix3x4_t& rootBone) = 0;
-	virtual unsigned short& GetEntClientFlags() = 0;
-	virtual const CUtlVector< matrix3x4_t >& GetCachedBoneData() = 0;
-	virtual CBoneMergeCache* GetBoneMergeCache() = 0;
 	virtual int GetAccumulatedBoneMask() = 0;
+	virtual CIKContext* GetIk() = 0;
+	virtual void DestroyIk() = 0;
+	virtual bool SetupBones(matrix3x4_t* pBoneToWorldOut, int nMaxBones, int boneMask, float currentTime) = 0;
+	virtual void GetHitboxBoneTransform(int iBone, matrix3x4_t& pBoneToWorld) = 0;
+	virtual void GetHitboxBoneTransforms(const matrix3x4_t* hitboxbones[MAXSTUDIOBONES]) = 0;
+	virtual void GetHitboxBonePosition(int iBone, Vector& origin, QAngle& angles) = 0;
+	virtual bool GetRootBone(matrix3x4_t& rootBone) = 0;
+	virtual bool GetAimEntOrigin(Vector* pAbsOrigin, QAngle* pAbsAngles) = 0;
+	virtual void InvalidateBoneCache() = 0;
+	virtual unsigned short& GetEntClientFlags() = 0;
 	virtual void SetLastRecordedFrame(int nLastRecordedFrame) = 0;
 	virtual float GetBlendWeightCurrent() = 0;
 	virtual void SetBlendWeightCurrent(float flBlendWeightCurrent) = 0;
 	virtual int	GetOverlaySequence() = 0;
-	virtual bool IsBoneAccessAllowed() const = 0;
 };
 
 class IEnginePortalClient {

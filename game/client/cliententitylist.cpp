@@ -4531,8 +4531,8 @@ void C_EngineObjectInternal::SetModelPointer(const model_t* pModel)
 				m_pIk = NULL;
 			}
 
-			Studio_DestroyBoneCache(m_hitboxBoneCacheHandle);
-			m_hitboxBoneCacheHandle = 0;
+			//Studio_DestroyBoneCache(m_hitboxBoneCacheHandle);
+			//m_hitboxBoneCacheHandle = 0;
 
 			// Make sure m_CachedBones has space.
 			if (m_CachedBoneData.Count() != GetModelPtr()->numbones())
@@ -6356,7 +6356,6 @@ bool C_EngineObjectInternal::SetupBones(matrix3x4_t* pBoneToWorldOut, int nMaxBo
 		{
 			m_BoneAccessor.SetReadableBones(0);
 			m_BoneAccessor.SetWritableBones(0);
-			m_flLastBoneSetupTime = currentTime;
 		}
 		m_iPrevBoneMask = m_iAccumulatedBoneMask;
 		m_iAccumulatedBoneMask = 0;
@@ -6369,6 +6368,8 @@ bool C_EngineObjectInternal::SetupBones(matrix3x4_t* pBoneToWorldOut, int nMaxBo
 		}
 #endif
 	}
+	// Make sure that we know that we've already calculated some bone stuff this time around.
+	m_iMostRecentModelBoneCounter = ClientEntityList().GetModelBoneCounter();
 
 	int nBoneCount = m_CachedBoneData.Count();
 	if (ClientEntityList().GetDoThreadedBoneSetup() && !ClientEntityList().GetInThreadedBoneSetup() && (nBoneCount >= 16) && !GetMoveParent() && m_iMostRecentBoneSetupRequest != ClientEntityList().GetPreviousBoneCounter())
@@ -6378,14 +6379,8 @@ bool C_EngineObjectInternal::SetupBones(matrix3x4_t* pBoneToWorldOut, int nMaxBo
 		ClientEntityList().GetPreviousBoneSetups().AddToTail(this);
 	}
 
-	// Keep track of everthing asked for over the entire frame
-	m_iAccumulatedBoneMask |= boneMask;
-
-	// Make sure that we know that we've already calculated some bone stuff this time around.
-	m_iMostRecentModelBoneCounter = ClientEntityList().GetModelBoneCounter();
-
 	// Have we cached off all bones meeting the flag set?
-	if ((m_BoneAccessor.GetReadableBones() & boneMask) != boneMask)
+	if ((m_BoneAccessor.GetReadableBones() & boneMask) != boneMask || m_flLastBoneSetupTime < currentTime)
 	{
 		MDLCACHE_CRITICAL_SECTION();
 
@@ -6399,11 +6394,14 @@ bool C_EngineObjectInternal::SetupBones(matrix3x4_t* pBoneToWorldOut, int nMaxBo
 
 		// Load the boneMask with the total of what was asked for last frame.
 		boneMask |= m_iPrevBoneMask;
+		// Keep track of everthing asked for over the entire frame
+		m_iAccumulatedBoneMask |= boneMask;
 
 		// Allow access to the bones we're setting up so we don't get asserts in here.
 		int oldReadableBones = m_BoneAccessor.GetReadableBones();
 		m_BoneAccessor.SetWritableBones(m_BoneAccessor.GetReadableBones() | boneMask);
 		m_BoneAccessor.SetReadableBones(m_BoneAccessor.GetWritableBones());
+		m_flLastBoneSetupTime = currentTime;
 
 		if (hdr->flags() & STUDIOHDR_FLAGS_STATIC_PROP)
 		{
@@ -6513,40 +6511,30 @@ void C_EngineObjectInternal::InvalidateBoneCache()
 		return;
 	}
 	m_iMostRecentModelBoneCounter = m_pClientEntityList->GetModelBoneCounter() - 1;
+	m_BoneAccessor.SetReadableBones(0);
 	m_flLastBoneSetupTime = -FLT_MAX;
 }
 
-
-bool C_EngineObjectInternal::IsBoneCacheValid() const
-{
-	return m_iMostRecentModelBoneCounter == m_pClientEntityList->GetModelBoneCounter();
-}
-
-void C_EngineObjectInternal::GetCachedBoneMatrix(int boneIndex, matrix3x4_t& out)
-{
-	MatrixCopy(GetBone(boneIndex), out);
-}
-
 // UNDONE: Seems kind of silly to have this when we also have the cached bones in C_BaseAnimating
-CBoneCache* C_EngineObjectInternal::GetBoneCache(IStudioHdr* pStudioHdr)
+void C_EngineObjectInternal::GetBoneCache(IStudioHdr* pStudioHdr)
 {
 	int boneMask = BONE_USED_BY_HITBOX;
-	CBoneCache* pcache = Studio_GetBoneCache(m_hitboxBoneCacheHandle);
-	if (pcache)
-	{
-		if (pcache->IsValid(gpGlobals->curtime, 0.0))
+	//CBoneCache* pcache = Studio_GetBoneCache(m_hitboxBoneCacheHandle);
+	//if (pcache)
+	//{
+		if (gpGlobals->curtime <= m_flLastBoneSetupTime && (m_BoneAccessor.GetReadableBones() & boneMask) == boneMask)
 		{
 			// in memory and still valid, use it!
-			return pcache;
+			return;
 		}
 		// in memory, but not the same bone set, destroy & rebuild
-		if ((pcache->m_boneMask & boneMask) != boneMask)
-		{
-			Studio_DestroyBoneCache(m_hitboxBoneCacheHandle);
-			m_hitboxBoneCacheHandle = 0;
-			pcache = NULL;
-		}
-	}
+		//if ((pcache->m_boneMask & boneMask) != boneMask)
+		//{
+		//	Studio_DestroyBoneCache(m_hitboxBoneCacheHandle);
+		//	m_hitboxBoneCacheHandle = 0;
+		//	pcache = NULL;
+		//}
+	//}
 
 	if (!pStudioHdr)
 		pStudioHdr = GetModelPtr();
@@ -6556,25 +6544,25 @@ CBoneCache* C_EngineObjectInternal::GetBoneCache(IStudioHdr* pStudioHdr)
 	SetupBones(NULL, -1, boneMask, gpGlobals->curtime);
 	ClientEntityList().PopBoneAccess("GetBoneCache");
 
-	if (pcache)
-	{
+	//if (pcache)
+	//{
 		// still in memory but out of date, refresh the bones.
-		pcache->UpdateBones(m_CachedBoneData.Base(), pStudioHdr->numbones(), gpGlobals->curtime);
-	}
-	else
-	{
-		bonecacheparams_t params;
-		params.pStudioHdr = pStudioHdr;
+	//	pcache->UpdateBones(m_CachedBoneData.Base(), pStudioHdr->numbones(), gpGlobals->curtime);
+	//}
+	//else
+	//{
+		//bonecacheparams_t params;
+		//params.pStudioHdr = pStudioHdr;
 		// HACKHACK: We need the pointer to all bones here
-		params.pBoneToWorld = m_CachedBoneData.Base();
-		params.curtime = gpGlobals->curtime;
-		params.boneMask = boneMask;
+		//params.pBoneToWorld = m_CachedBoneData.Base();
+		//params.curtime = gpGlobals->curtime;
+		//params.boneMask = boneMask;
 
-		m_hitboxBoneCacheHandle = Studio_CreateBoneCache(params);
-		pcache = Studio_GetBoneCache(m_hitboxBoneCacheHandle);
-	}
-	Assert(pcache);
-	return pcache;
+		//m_hitboxBoneCacheHandle = Studio_CreateBoneCache(params);
+		//pcache = Studio_GetBoneCache(m_hitboxBoneCacheHandle);
+	//}
+	//Assert(pcache);
+	//return pcache;
 }
 
 //-----------------------------------------------------------------------------
@@ -6622,20 +6610,20 @@ void C_EngineObjectInternal::GetHitboxBoneTransform(int iBone, matrix3x4_t& pBon
 		return;
 	}
 	Assert(GetModelPtr() && iBone >= 0 && iBone < GetModelPtr()->numbones());
-	CBoneCache* pcache = GetBoneCache(NULL);
+	GetBoneCache(NULL);
 
-	matrix3x4_t* pmatrix = pcache->GetCachedBone(iBone);
+	const matrix3x4_t& pmatrix = GetBone(iBone);
 
-	if (!pmatrix)
-	{
-		MatrixCopy(EntityToWorldTransform(), pBoneToWorld);
-		return;
-	}
+	//if (!pmatrix)
+	//{
+	//	MatrixCopy(EntityToWorldTransform(), pBoneToWorld);
+	//	return;
+	//}
 
 	Assert(pmatrix);
 
 	// FIXME
-	MatrixCopy(*pmatrix, pBoneToWorld);
+	MatrixCopy(pmatrix, pBoneToWorld);
 }
 
 void C_EngineObjectInternal::GetHitboxBoneTransforms(const matrix3x4_t* hitboxbones[MAXSTUDIOBONES])
@@ -6648,9 +6636,13 @@ void C_EngineObjectInternal::GetHitboxBoneTransforms(const matrix3x4_t* hitboxbo
 		return;
 	}
 
-	CBoneCache* pcache = GetBoneCache(NULL);
+	GetBoneCache(NULL);
 
-	pcache->ReadCachedBonePointers(hitboxbones, pStudioHdr->numbones());
+	memset(hitboxbones, 0, sizeof(matrix3x4_t*) * MAXSTUDIOBONES);
+	for (int i = 0; i < MAXSTUDIOBONES; i++)
+	{
+		hitboxbones[i] = &m_BoneAccessor.GetBone(i);
+	}
 }
 
 C_EnginePortalInternal::C_EnginePortalInternal(IClientEntityList* pClientEntityList)

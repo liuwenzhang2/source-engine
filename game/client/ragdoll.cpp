@@ -272,8 +272,7 @@ public:
 			Assert( parent != this );
 			parent->SetupBones( NULL, -1, BONE_USED_BY_ANYTHING, gpGlobals->curtime );
 
-			matrix3x4_t boneToWorld;
-			parent->GetEngineObject()->GetCachedBoneMatrix( m_boneIndexAttached, boneToWorld );
+			const matrix3x4_t& boneToWorld = parent->GetEngineObject()->GetBone( m_boneIndexAttached );
 			VectorTransform( m_attachmentPointBoneSpace, boneToWorld, worldOrigin );
 		}
 		//BaseClass::BuildTransformations( hdr, pos, q, cameraTransform, boneMask, boneComputed );

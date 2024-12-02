@@ -3175,7 +3175,7 @@ void C_BaseAnimating::GetRagdollInitBoneArrays( matrix3x4_t *pDeltaBones0, matri
 	}
 	else
 	{
-		memcpy( pCurrentBones, GetEngineObject()->GetCachedBoneData().Base(), sizeof(matrix3x4_t) * GetEngineObject()->GetCachedBoneData().Count());
+		memcpy( pCurrentBones, GetEngineObject()->GetBoneArray(), sizeof(matrix3x4_t) * GetEngineObject()->GetBoneCount());
 	}
 }
 
@@ -3884,7 +3884,7 @@ void C_BaseAnimating::GetAimEntOrigin( IClientEntity *pAttachedTo, Vector *pAbsO
 	}
 	else
 	{
-		if ( !GetEngineObject()->GetBoneMergeCache() || !GetEngineObject()->GetBoneMergeCache()->GetAimEntOrigin(pAbsOrigin, pAbsAngles))
+		if (!GetEngineObject()->GetAimEntOrigin(pAbsOrigin, pAbsAngles))
 			BaseClass::GetAimEntOrigin( pAttachedTo, pAbsOrigin, pAbsAngles );
 	}
 }
@@ -4367,8 +4367,8 @@ void C_BaseAnimating::UpdateBoneAttachments( void )
 	IEngineObjectClient *follow = GetEngineObject()->FindFollowedEntity();
 	if ( follow && (m_boneIndexAttached >= 0) )
 	{
-		matrix3x4_t boneToWorld, localSpace;
-		follow->GetCachedBoneMatrix( m_boneIndexAttached, boneToWorld );
+		matrix3x4_t localSpace;
+		const matrix3x4_t& boneToWorld = follow->GetBone(m_boneIndexAttached);
 		AngleMatrix( m_boneAngles, m_bonePosition, localSpace );
 		ConcatTransforms( boneToWorld, localSpace, GetEngineObject()->GetBoneForWrite( 0 ) );
 
