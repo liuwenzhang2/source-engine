@@ -100,7 +100,7 @@ void CNPC_MissileDefense::GetGunAim( Vector *vecAim )
 	Vector vecPos;
 	QAngle vecAng;
 
-	GetAttachment( MD_AP_LGUN, vecPos, vecAng );
+	GetEngineObject()->GetAttachment( MD_AP_LGUN, vecPos, vecAng );
 
 	vecAng.x = GetEngineObject()->GetLocalAngles().x + GetEngineObject()->GetBoneController( MD_BC_PITCH );
 	vecAng.z = 0;
@@ -195,7 +195,7 @@ void CNPC_MissileDefense::FireCannons( void )
 	Vector vecGun;
 	QAngle vecAng;
 	
-	GetAttachment( MD_AP_LGUN, vecGun, vecAng );
+	GetEngineObject()->GetAttachment( MD_AP_LGUN, vecGun, vecAng );
 
 	Vector vecTarget;
 	EnemyShootPosition(GetEnemy(),&vecTarget);
@@ -215,7 +215,7 @@ void CNPC_MissileDefense::FireCannons( void )
 	vecDir.y += random->RandomFloat( -NOISE, NOISE );
 	vecDir.z += random->RandomFloat( -NOISE, NOISE );
 
-	GetAttachment( MD_AP_RGUN, vecGun, vecAng );
+	GetEngineObject()->GetAttachment( MD_AP_RGUN, vecGun, vecAng );
 	vecStart = vecGun + vecDir * 110;
 	vecEnd = vecGun + vecDir * 4096;
 	UTIL_Tracer( vecStart, vecEnd, 0, TRACER_DONT_USE_ATTACHMENT, 3000 + random->RandomFloat( 0, 2000 ) );
@@ -449,7 +449,7 @@ void CNPC_MissileDefense::AimGun( void )
 	// Get gun attachment points
 	Vector vBasePos;
 	QAngle vBaseAng;
-	GetAttachment( MD_AP_LGUN, vBasePos, vBaseAng );
+	GetEngineObject()->GetAttachment( MD_AP_LGUN, vBasePos, vBaseAng );
 
 	Vector vTargetPos;
 	EnemyShootPosition(GetEnemy(),&vTargetPos);

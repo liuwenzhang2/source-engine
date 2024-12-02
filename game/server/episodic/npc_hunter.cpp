@@ -564,7 +564,7 @@ void CHunterFlechette::SetupGlobalModelData()
 	if ( s_nHunterFlechetteImpact == -2 )
 	{
 		s_nHunterFlechetteImpact = LookupSequence( "impact" );
-		s_nFlechetteFuseAttach = LookupAttachment( "attach_fuse" );
+		s_nFlechetteFuseAttach = GetEngineObject()->LookupAttachment( "attach_fuse" );
 	}
 }
 
@@ -1883,12 +1883,12 @@ void CNPC_Hunter::SetupGlobalModelData()
 	gm_nBodyYawPoseParam = GetEngineObject()->LookupPoseParameter( "body_yaw" );
 	gm_nBodyPitchPoseParam = GetEngineObject()->LookupPoseParameter( "body_pitch" );
 
-	gm_nTopGunAttachment = LookupAttachment( "top_eye" );
-	gm_nBottomGunAttachment = LookupAttachment( "bottom_eye" );
-	gm_nStaggerYawPoseParam = LookupAttachment( "stagger_yaw" );
+	gm_nTopGunAttachment = GetEngineObject()->LookupAttachment( "top_eye" );
+	gm_nBottomGunAttachment = GetEngineObject()->LookupAttachment( "bottom_eye" );
+	gm_nStaggerYawPoseParam = GetEngineObject()->LookupAttachment( "stagger_yaw" );
 	
-	gm_nHeadCenterAttachment = LookupAttachment( "head_center" );
-	gm_nHeadBottomAttachment = LookupAttachment( "head_radius_measure" );
+	gm_nHeadCenterAttachment = GetEngineObject()->LookupAttachment( "head_center" );
+	gm_nHeadBottomAttachment = GetEngineObject()->LookupAttachment( "head_radius_measure" );
 
 	// Measure the radius of the head.	
 	Vector vecHeadCenter;
@@ -2096,7 +2096,7 @@ Vector CNPC_Hunter::BodyTarget( const Vector &posSrc, bool bNoisy /*= true*/ )
 { 
 	Vector vecResult;
 	QAngle vecAngle;
-	GetAttachment( gm_nHeadCenterAttachment, vecResult, vecAngle );
+	GetEngineObject()->GetAttachment( gm_nHeadCenterAttachment, vecResult, vecAngle );
 
 	if ( bNoisy )
 	{
@@ -4432,7 +4432,7 @@ void CNPC_Hunter::HandleAnimEvent( animevent_t *pEvent )
 		if ( pEvent->options )
 		{
 			QAngle angDir;
-			if ( GetAttachment( pEvent->options, vecOrigin, angDir ) )
+			if (GetEngineObject()->GetAttachment( pEvent->options, vecOrigin, angDir ) )
 			{
 				bGotAttachment = true;
 				AngleVectors( angDir, &vecDir, NULL, NULL );
@@ -5338,7 +5338,7 @@ bool CNPC_Hunter::TestShootPosition(const Vector &vecShootPos, const Vector &tar
 Vector CNPC_Hunter::Weapon_ShootPosition( )
 {
 	matrix3x4_t gunMatrix;
-	GetAttachment( gm_nTopGunAttachment, gunMatrix );
+	GetEngineObject()->GetAttachment( gm_nTopGunAttachment, gunMatrix );
 
 	Vector vecShootPos;
 	MatrixGetColumn( gunMatrix, 3, vecShootPos );
@@ -5359,7 +5359,7 @@ void CNPC_Hunter::MakeTracer( const Vector &vecTracerSrc, const trace_t &tr, int
 
 	flTracerDist = VectorNormalize( vecDir );
 
-	int nAttachment = LookupAttachment( "MiniGun" );
+	int nAttachment = GetEngineObject()->LookupAttachment( "MiniGun" );
 
 	UTIL_Tracer( vecTracerSrc, tr.endpos, nAttachment, TRACER_FLAG_USEATTACHMENT, 5000, true, "HunterTracer" );
 }
@@ -5603,7 +5603,7 @@ void CNPC_Hunter::BleedThink()
 	// Spurt blood from random points on the hunter's head.
 	Vector vecOrigin;
 	QAngle angDir;
-	GetAttachment( gm_nHeadCenterAttachment, vecOrigin, angDir );
+	GetEngineObject()->GetAttachment( gm_nHeadCenterAttachment, vecOrigin, angDir );
 	
 	Vector vecDir = RandomVector( -1, 1 );
 	VectorNormalize( vecDir );
@@ -6383,12 +6383,12 @@ bool CNPC_Hunter::ShootFlechette( CBaseEntity *pTargetEntity, bool bSingleShot )
 
 	if ( m_bTopMuzzle )
 	{
-		GetAttachment( gm_nTopGunAttachment, vecSrc, angMuzzle );
+		GetEngineObject()->GetAttachment( gm_nTopGunAttachment, vecSrc, angMuzzle );
 		DoMuzzleFlash( gm_nTopGunAttachment );
 	}
 	else
 	{
-		GetAttachment( gm_nBottomGunAttachment, vecSrc, angMuzzle );
+		GetEngineObject()->GetAttachment( gm_nBottomGunAttachment, vecSrc, angMuzzle );
 		DoMuzzleFlash( gm_nBottomGunAttachment );
 	}
 

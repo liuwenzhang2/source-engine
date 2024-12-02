@@ -1117,7 +1117,7 @@ void C_BaseFlex::OnThreadedDrawSetup()
 	{
 		return;
 	}
-	CalcAttachments();
+	GetEngineObject()->CalcAttachments();
 }
 
 

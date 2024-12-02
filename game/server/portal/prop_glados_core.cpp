@@ -134,7 +134,7 @@ void CPropGladosCore::Spawn( void )
 	GetEngineObject()->SetCycle( 1.0f );
 
 	DisableAutoFade();
-	m_iEyeballAttachment = LookupAttachment( "eyeball" );
+	m_iEyeballAttachment = GetEngineObject()->LookupAttachment( "eyeball" );
 
 	SetContextThink( &CPropGladosCore::AnimateThink, gpGlobals->curtime + 0.1f, s_pAnimateThinkContext );
 }

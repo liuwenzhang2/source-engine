@@ -705,7 +705,7 @@ void CNPC_Nihilanth::NextActivity( )
 			Vector vOrigin;
 			QAngle vAngle;
 
-			GetAttachment( 2, vOrigin, vAngle );
+			GetEngineObject()->GetAttachment( 2, vOrigin, vAngle );
 
 			te->DynamicLight( filterlight, 0.0, &vOrigin, 255, 192, 64, 0, 256, 20, 0 );
 		}
@@ -916,7 +916,7 @@ void CNPC_Nihilanth::ShootBalls( void )
 				Vector vecSrc, vecDir;
 				CNihilanthHVR *pEntity = NULL;
 
-				GetAttachment( 3, vecHand, vecAngle );
+				GetEngineObject()->GetAttachment( 3, vecHand, vecAngle );
 				vecSrc = vecHand + GetEngineObject()->GetAbsVelocity() * (m_flShootTime - gpGlobals->curtime);
 				vecDir = m_posTarget - GetEngineObject()->GetAbsOrigin();
 				VectorNormalize( vecDir );
@@ -932,7 +932,7 @@ void CNPC_Nihilanth::ShootBalls( void )
 				pEntity->GetEngineObject()->SetAbsVelocity( vecDir * 200.0 );
 				pEntity->ZapInit( GetEnemy() );
 				
-				GetAttachment( 4, vecHand, vecAngle );
+				GetEngineObject()->GetAttachment( 4, vecHand, vecAngle );
 				vecSrc = vecHand + GetEngineObject()->GetAbsVelocity() * (m_flShootTime - gpGlobals->curtime);
 				vecDir = m_posTarget - GetEngineObject()->GetAbsOrigin();
 				VectorNormalize( vecDir );
@@ -1090,7 +1090,7 @@ void CNPC_Nihilanth::DyingThink( void )
 		break;
 	}
 
-	GetAttachment( iAttachment, vecSrc, vecAngles );
+	GetEngineObject()->GetAttachment( iAttachment, vecSrc, vecAngles );
 
 	trace_t tr;
 
@@ -1110,7 +1110,7 @@ void CNPC_Nihilanth::DyingThink( void )
 	pBeam->SetScrollRate( 1.0 );
 	pBeam->LiveForTime( 0.5 );
 	
-	GetAttachment( 2, vecSrc, vecAngles ); 
+	GetEngineObject()->GetAttachment( 2, vecSrc, vecAngles );
 	CNihilanthHVR *pEntity = (CNihilanthHVR *)gEntList.CreateEntityByName( "nihilanth_energy_ball" );
 	
 	pEntity->GetEngineObject()->SetAbsOrigin( vecSrc );
@@ -1143,13 +1143,13 @@ void CNPC_Nihilanth::HandleAnimEvent( animevent_t *pEvent )
 			
 			g_pSoundEmitterSystem->EmitSound( filter, entindex(), "Nihilanth.BallAttack" );
 
-			GetAttachment( 2, vOrigin, vAngle);
+			GetEngineObject()->GetAttachment( 2, vOrigin, vAngle);
 			
 			CBroadcastRecipientFilter filterlight;
 
 			te->DynamicLight( filterlight, 0.0, &vOrigin, 128, 128, 255, 0, 256, 1.0f, 128 );
 
-			GetAttachment( 3, vOrigin, vAngle);
+			GetEngineObject()->GetAttachment( 3, vOrigin, vAngle);
 			te->DynamicLight( filterlight, 0.0, &vOrigin, 128, 128, 255, 0, 256, 1.0f, 128 );
 		
 			m_flShootTime = gpGlobals->curtime;
@@ -1175,7 +1175,7 @@ void CNPC_Nihilanth::HandleAnimEvent( animevent_t *pEvent )
 				Vector vecSrc;
 				QAngle vecAngles;
 
-				GetAttachment( 2, vecSrc, vecAngles ); 
+				GetEngineObject()->GetAttachment( 2, vecSrc, vecAngles );
 
 				CNihilanthHVR *pEntity = (CNihilanthHVR *)gEntList.CreateEntityByName( "nihilanth_energy_ball" );
 				
@@ -1202,13 +1202,13 @@ void CNPC_Nihilanth::HandleAnimEvent( animevent_t *pEvent )
 
 				Msg( "nihilanth can't target %s\n", szText );
 
-				GetAttachment( 2, vOrigin, vAngle);
+				GetEngineObject()->GetAttachment( 2, vOrigin, vAngle);
 			
 				CBroadcastRecipientFilter filterlight;
 
 				te->DynamicLight( filterlight, 0.0, &vOrigin, 128, 128, 255, 0, 256, 1.0f, 128 );
 
-				GetAttachment( 3, vOrigin, vAngle);
+				GetEngineObject()->GetAttachment( 3, vOrigin, vAngle);
 				te->DynamicLight( filterlight, 0.0, &vOrigin, 128, 128, 255, 0, 256, 1.0f, 128 );
 
 				m_flShootTime = gpGlobals->curtime;
@@ -1238,7 +1238,7 @@ void CNPC_Nihilanth::HandleAnimEvent( animevent_t *pEvent )
 		{
 			Vector vecSrc;
 			QAngle vecAngles;
-			GetAttachment( 3, vecSrc, vecAngles ); 
+			GetEngineObject()->GetAttachment( 3, vecSrc, vecAngles );
 						
 			CNihilanthHVR *pEntity = (CNihilanthHVR *)gEntList.CreateEntityByName( "nihilanth_energy_ball" );
 

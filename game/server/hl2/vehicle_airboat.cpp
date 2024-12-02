@@ -474,9 +474,9 @@ void CPropAirboat::Activate()
 {
 	BaseClass::Activate();
 
-	m_nGunRefAttachment = LookupAttachment( "gun" );
-	m_nGunBarrelAttachment = LookupAttachment( "muzzle" );
-	m_nSplashAttachment = LookupAttachment( "splash_pt" );
+	m_nGunRefAttachment = GetEngineObject()->LookupAttachment( "gun" );
+	m_nGunBarrelAttachment = GetEngineObject()->LookupAttachment( "muzzle" );
+	m_nSplashAttachment = GetEngineObject()->LookupAttachment( "splash_pt" );
 
 	CreateSounds();
 
@@ -963,7 +963,7 @@ void CPropAirboat::VPhysicsFriction( IPhysicsObject *pObject, float energy, int 
 void CPropAirboat::AimGunAt( const Vector &aimPos, float flInterval )
 {
 	matrix3x4_t gunMatrix;
-	GetAttachment( m_nGunRefAttachment, gunMatrix );
+	GetEngineObject()->GetAttachment( m_nGunRefAttachment, gunMatrix );
 
 	// transform the target position into gun space
 	Vector localTargetPosition;

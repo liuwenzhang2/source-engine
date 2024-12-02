@@ -62,12 +62,6 @@ public:
 	// Returns the transform from RenderOrigin/RenderAngles to world
 	virtual const matrix3x4_t &RenderableToWorldTransform();
 
-	// Attachments
-	virtual	bool GetAttachment( int number, Vector &origin, QAngle &angles );
-	virtual bool GetAttachment( int number, matrix3x4_t &matrix );
-	//virtual bool GetAttachment( int number, Vector &origin );
-	virtual bool GetAttachmentVelocity( int number, Vector &originVel, Quaternion &angleVel );
-
 	// Rendering clip plane, should be 4 floats, return value of NULL indicates a disabled render clip plane
 	virtual float *GetRenderClipPlane( void ) { return m_pSharedRenderClipPlane; };
 
@@ -104,7 +98,7 @@ public:
 	//virtual ShadowType_t			ShadowCastType();
 	//virtual void					CreateModelInstance() { NULL; };
 	//virtual ModelInstanceHandle_t	GetModelInstance() { return m_pGhostedRenderable->GetModelInstance(); }; //TODO: find out if sharing an instance causes bugs
-	virtual int						LookupAttachment( const char *pAttachmentName );
+	//virtual int						LookupAttachment( const char *pAttachmentName );
 	//virtual int						GetSkin();
 	//virtual bool					IsTwoPass( void );
 	//virtual void					OnThreadedDrawSetup() { NULL; };

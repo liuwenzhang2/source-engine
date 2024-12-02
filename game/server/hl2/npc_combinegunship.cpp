@@ -507,12 +507,12 @@ void CNPC_CombineGunship::CreateBellyBlastEnergyCore( void )
 
 	m_hEnergyCore = pCore;
 
-	int iAttachment = LookupAttachment( "BellyGun" );
+	int iAttachment = GetEngineObject()->LookupAttachment( "BellyGun" );
 
 	Vector vOrigin;
 	QAngle vAngle;
 
-	GetAttachment( iAttachment, vOrigin, vAngle );
+	GetEngineObject()->GetAttachment( iAttachment, vOrigin, vAngle );
 
 	pCore->GetEngineObject()->SetAbsOrigin( vOrigin );
 	pCore->GetEngineObject()->SetAbsAngles( vAngle );
@@ -1445,7 +1445,7 @@ void CNPC_CombineGunship::MoveHead( void )
 			Vector vecTargetOffset;
 			QAngle vGunAngles;
 
-			GetAttachment( "muzzle", vGunPosition, vGunAngles );
+			GetEngineObject()->GetAttachment( "muzzle", vGunPosition, vGunAngles );
 
 			vTargetPos = GetEnemyTarget();
 
@@ -1796,7 +1796,7 @@ void CNPC_CombineGunship::DoMuzzleFlash( void )
 	
 	CEffectData data;
 
-	data.m_nAttachmentIndex = LookupAttachment( "muzzle" );
+	data.m_nAttachmentIndex = GetEngineObject()->LookupAttachment( "muzzle" );
 	data.m_nEntIndex = entindex();
 	DispatchEffect( "GunshipMuzzleFlash", data );
 }

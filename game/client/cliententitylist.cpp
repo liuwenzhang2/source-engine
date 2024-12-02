@@ -4547,6 +4547,25 @@ void C_EngineObjectInternal::SetModelPointer(const model_t* pModel)
 			m_BoneAccessor.SetReadableBones(0);
 			m_BoneAccessor.SetWritableBones(0);
 			m_flLastBoneSetupTime = 0;
+
+			// Don't reallocate unless a different size. 
+			if (m_Attachments.Count() != GetModelPtr()->GetNumAttachments())
+			{
+				m_Attachments.SetSize(GetModelPtr()->GetNumAttachments());
+
+				// This is to make sure we don't use the attachment before its been set up
+				for (int i = 0; i < m_Attachments.Count(); i++)
+				{
+					m_Attachments[i].m_bAnglesComputed = false;
+					m_Attachments[i].m_nLastFramecount = 0;
+#ifdef _DEBUG
+					m_Attachments[i].m_AttachmentToWorld.Invalidate();
+					m_Attachments[i].m_angRotation.Init(VEC_T_NAN, VEC_T_NAN, VEC_T_NAN);
+					m_Attachments[i].m_vOriginVelocity.Init(VEC_T_NAN, VEC_T_NAN, VEC_T_NAN);
+#endif
+				}
+
+			}
 		}
 
 		m_pOuter->OnNewModel();
@@ -6483,7 +6502,7 @@ bool C_EngineObjectInternal::SetupBones(matrix3x4_t* pBoneToWorldOut, int nMaxBo
 
 		if (!(oldReadableBones & BONE_USED_BY_ATTACHMENT) && (boneMask & BONE_USED_BY_ATTACHMENT))
 		{
-			m_pOuter->SetupBones_AttachmentHelper(hdr);
+			SetupBones_AttachmentHelper(hdr);
 		}
 	}
 
@@ -6642,6 +6661,174 @@ void C_EngineObjectInternal::GetHitboxBoneTransforms(const matrix3x4_t* hitboxbo
 	for (int i = 0; i < MAXSTUDIOBONES; i++)
 	{
 		hitboxbones[i] = &m_BoneAccessor.GetBone(i);
+	}
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: Get the index of the attachment point with the specified name
+//-----------------------------------------------------------------------------
+int C_EngineObjectInternal::LookupAttachment(const char* pAttachmentName)
+{
+	IStudioHdr* hdr = GetModelPtr();
+	if (!hdr)
+	{
+		return -1;
+	}
+
+	// NOTE: Currently, the network uses 0 to mean "no attachment" 
+	// thus the client must add one to the index of the attachment
+	// UNDONE: Make the server do this too to be consistent.
+	return hdr->Studio_FindAttachment(pAttachmentName) + 1;
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: Put a value into an attachment point by index
+// Input  : number - which point
+// Output : float * - the attachment point
+//-----------------------------------------------------------------------------
+bool C_EngineObjectInternal::PutAttachment(int number, const matrix3x4_t& attachmentToWorld)
+{
+	if (number < 1 || number > m_Attachments.Count())
+		return false;
+
+	CAttachmentData* pAtt = &m_Attachments[number - 1];
+	if (gpGlobals->frametime > 0 && pAtt->m_nLastFramecount > 0 && pAtt->m_nLastFramecount == gpGlobals->framecount - 1)
+	{
+		Vector vecPreviousOrigin, vecOrigin;
+		MatrixPosition(pAtt->m_AttachmentToWorld, vecPreviousOrigin);
+		MatrixPosition(attachmentToWorld, vecOrigin);
+		pAtt->m_vOriginVelocity = (vecOrigin - vecPreviousOrigin) / gpGlobals->frametime;
+	}
+	else
+	{
+		pAtt->m_vOriginVelocity.Init();
+	}
+	pAtt->m_nLastFramecount = gpGlobals->framecount;
+	pAtt->m_bAnglesComputed = false;
+	pAtt->m_AttachmentToWorld = attachmentToWorld;
+
+#ifdef _DEBUG
+	pAtt->m_angRotation.Init(VEC_T_NAN, VEC_T_NAN, VEC_T_NAN);
+#endif
+
+	return true;
+}
+
+bool C_EngineObjectInternal::GetAttachment(int number, matrix3x4_t& matrix)
+{
+	if (!GetModelPtr()) {
+		MatrixCopy(EntityToWorldTransform(), matrix);
+		return true;
+	}
+	else {
+
+		if (number < 1 || number > m_Attachments.Count())
+			return false;
+
+		if (!CalcAttachments())
+			return false;
+
+		matrix = m_Attachments[number - 1].m_AttachmentToWorld;
+		return true;
+	}
+}
+
+bool C_EngineObjectInternal::GetAttachmentVelocity(int number, Vector& originVel, Quaternion& angleVel)
+{
+	if (!GetModelPtr()) {
+		originVel = GetAbsVelocity();
+		angleVel.Init();
+		return true;
+	}
+	else {
+		if (number < 1 || number > m_Attachments.Count())
+		{
+			return false;
+		}
+
+		if (!CalcAttachments())
+			return false;
+
+		originVel = m_Attachments[number - 1].m_vOriginVelocity;
+		angleVel.Init();
+
+		return true;
+	}
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: Get attachment point by index
+// Input  : number - which point
+// Output : float * - the attachment point
+//-----------------------------------------------------------------------------
+bool C_EngineObjectInternal::GetAttachment(int number, Vector& origin, QAngle& angles)
+{
+	if (!GetModelPtr()) {
+		origin = GetAbsOrigin();
+		angles = GetAbsAngles();
+		return true;
+	}
+	else {
+		// Note: this could be more efficient, but we want the matrix3x4_t version of GetAttachment to be the origin of
+		// attachment generation, so a derived class that wants to fudge attachments only 
+		// has to reimplement that version. This also makes it work like the server in that regard.
+		if (number < 1 || number > m_Attachments.Count() || !CalcAttachments())
+		{
+			// Set this to the model origin/angles so that we don't have stack fungus in origin and angles.
+			origin = GetAbsOrigin();
+			angles = GetAbsAngles();
+			return false;
+		}
+
+		CAttachmentData* pData = &m_Attachments[number - 1];
+		if (!pData->m_bAnglesComputed)
+		{
+			MatrixAngles(pData->m_AttachmentToWorld, pData->m_angRotation);
+			pData->m_bAnglesComputed = true;
+		}
+		angles = pData->m_angRotation;
+		MatrixPosition(pData->m_AttachmentToWorld, origin);
+		return true;
+	}
+}
+
+bool C_EngineObjectInternal::CalcAttachments()
+{
+	VPROF("C_BaseAnimating::CalcAttachments");
+
+
+	// Make sure m_CachedBones is valid.
+	return SetupBones(NULL, -1, BONE_USED_BY_ATTACHMENT, gpGlobals->curtime);
+}
+
+void C_EngineObjectInternal::SetupBones_AttachmentHelper(IStudioHdr* hdr)
+{
+	if (!hdr || !hdr->GetNumAttachments())
+		return;
+
+	// calculate attachment points
+	matrix3x4_t world;
+	for (int i = 0; i < hdr->GetNumAttachments(); i++)
+	{
+		const mstudioattachment_t& pattachment = hdr->pAttachment(i);
+		int iBone = hdr->GetAttachmentBone(i);
+		if ((pattachment.flags & ATTACHMENT_FLAG_WORLD_ALIGN) == 0)
+		{
+			ConcatTransforms(GetBone(iBone), pattachment.local, world);
+		}
+		else
+		{
+			Vector vecLocalBonePos, vecWorldBonePos;
+			MatrixGetColumn(pattachment.local, 3, vecLocalBonePos);
+			VectorTransform(vecLocalBonePos, GetBone(iBone), vecWorldBonePos);
+
+			SetIdentityMatrix(world);
+			MatrixSetColumn(vecWorldBonePos, 3, world);
+		}
+
+		// FIXME: this shouldn't be here, it should client side on-demand only and hooked into the bone cache!!
+		m_pOuter->FormatViewModelAttachment(i, world);
+		PutAttachment(i + 1, world);
 	}
 }
 
@@ -10334,6 +10521,15 @@ const matrix3x4_t& C_EngineGhostInternal::RenderableToWorldTransform()
 
 	ConcatTransforms(m_matGhostTransform.As3x4(), m_pGhostedSource->RenderableToWorldTransform(), m_ReferencedReturns.matRenderableToWorldTransform);
 	return m_ReferencedReturns.matRenderableToWorldTransform;
+}
+
+int C_EngineGhostInternal::LookupAttachment(const char* pAttachmentName)
+{
+	if (m_pGhostedSource == NULL)
+		return -1;
+
+
+	return m_pGhostedSource->LookupAttachment(pAttachmentName);
 }
 
 bool C_EngineGhostInternal::GetAttachment(int number, Vector& origin, QAngle& angles)

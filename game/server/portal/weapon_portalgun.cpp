@@ -580,7 +580,7 @@ float CWeaponPortalgun::FirePortal( bool bPortal2, Vector *pVector /*= 0*/, bool
 		// This portalgun is not held by the player-- Fire using the muzzle attachment
 		Vector vecShootOrigin;
 		QAngle angShootDir;
-		GetAttachment( LookupAttachment( "muzzle" ), vecShootOrigin, angShootDir );
+		GetEngineObject()->GetAttachment(GetEngineObject()->LookupAttachment( "muzzle" ), vecShootOrigin, angShootDir );
 		vEye = vecShootOrigin;
 		vTracerOrigin = vecShootOrigin;
 		AngleVectors( angShootDir, &vDirection, NULL, NULL );

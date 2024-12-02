@@ -452,7 +452,7 @@ public:
 	virtual bool			TestCollision( const Ray_t& ray, unsigned int mask, trace_t& trace );
 	virtual	bool			TestHitboxes( const Ray_t &ray, unsigned int fContentsMask, trace_t& tr );
 	virtual void			ComputeWorldSpaceSurroundingBox( Vector *pWorldMins, Vector *pWorldMaxs );
-	virtual bool			GetAttachment(const char* szName, Vector& absOrigin, QAngle& absAngles) { return false; }
+	
 public:
 
 	CEntityNetworkProperty *NetworkProp();

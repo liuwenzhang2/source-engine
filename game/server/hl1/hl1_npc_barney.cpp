@@ -455,7 +455,7 @@ void CNPC_Barney::Event_Killed( const CTakeDamageInfo &info )
 
 		SetBodygroup( 1, BARNEY_BODY_GUNGONE);
 
-		GetAttachment( "0", vecGunPos, angGunAngles );
+		GetEngineObject()->GetAttachment( "0", vecGunPos, angGunAngles );
 		
 		angGunAngles.y += 180;
 		pGun = DropItem( "weapon_glock", vecGunPos, angGunAngles );

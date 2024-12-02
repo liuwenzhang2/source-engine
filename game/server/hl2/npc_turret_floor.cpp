@@ -312,8 +312,8 @@ void CNPC_FloorTurret::Spawn( void )
 
 	m_iAmmoType = GetAmmoDef()->Index( "PISTOL" );
 
-	m_iMuzzleAttachment = LookupAttachment( "eyes" );
-	m_iEyeAttachment = LookupAttachment( "light" );
+	m_iMuzzleAttachment = GetEngineObject()->LookupAttachment( "eyes" );
+	m_iEyeAttachment = GetEngineObject()->LookupAttachment( "light" );
 
 	// FIXME: Do we ever need m_bAutoStart? (Sawyer)
 	GetEngineObject()->AddSpawnFlags(SF_FLOOR_TURRET_AUTOACTIVATE);
@@ -1678,8 +1678,8 @@ void CNPC_FloorTurret::SetEyeState( eyeState_t state )
 
 		m_hLaser->EntsInit( this, this );
 		m_hLaser->GetEngineObject()->FollowEntity( this->GetEngineObject());
-		m_hLaser->SetStartAttachment( LookupAttachment( "laser_start" ) );
-		m_hLaser->SetEndAttachment( LookupAttachment( "laser_end" ) );
+		m_hLaser->SetStartAttachment(GetEngineObject()->LookupAttachment( "laser_start" ) );
+		m_hLaser->SetEndAttachment(GetEngineObject()->LookupAttachment( "laser_end" ) );
 		m_hLaser->SetNoise( 0 );
 		m_hLaser->SetColor( 255, 0, 0 );
 		m_hLaser->SetScrollRate( 0 );
@@ -2120,7 +2120,7 @@ void CNPC_FloorTurret::UpdateMuzzleMatrix()
 	if ( gpGlobals->tickcount != m_muzzleToWorldTick )
 	{
 		m_muzzleToWorldTick = gpGlobals->tickcount;
-		GetAttachment( m_iMuzzleAttachment, m_muzzleToWorld );
+		GetEngineObject()->GetAttachment( m_iMuzzleAttachment, m_muzzleToWorld );
 	}
 }
 

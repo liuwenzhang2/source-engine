@@ -2148,8 +2148,8 @@ void CWeaponRPG::StartLaserEffects( void )
 
 		m_hLaserBeam->EntsInit( pBeamEnt, pBeamEnt );
 
-		int	startAttachment = LookupAttachment( "laser" );
-		int endAttachment	= LookupAttachment( "laser_end" );
+		int	startAttachment = GetEngineObject()->LookupAttachment( "laser" );
+		int endAttachment	= GetEngineObject()->LookupAttachment( "laser_end" );
 
 		m_hLaserBeam->GetEngineObject()->FollowEntity( pBeamEnt->GetEngineObject());
 		m_hLaserBeam->SetStartAttachment( startAttachment );
@@ -2187,7 +2187,7 @@ void CWeaponRPG::StartLaserEffects( void )
 		m_hLaserMuzzleSprite->m_bDrawInPortalRender = false;
 #endif
 
-		m_hLaserMuzzleSprite->SetAttachment( pOwner->GetViewModel(), LookupAttachment( "laser" ) );
+		m_hLaserMuzzleSprite->SetAttachment( pOwner->GetViewModel(), GetEngineObject()->LookupAttachment( "laser" ) );
 		m_hLaserMuzzleSprite->SetTransparency( kRenderTransAdd, 255, 255, 255, 255, kRenderFxNoDissipation );
 		m_hLaserMuzzleSprite->SetBrightness( 255, 0.5f );
 		m_hLaserMuzzleSprite->SetScale( 0.25f, 0.5f );

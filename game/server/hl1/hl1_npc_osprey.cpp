@@ -559,8 +559,8 @@ void CNPC_Osprey::DyingThink( void )
 
 		if( rand < 4 )
 		{
-			int iAttach = LookupAttachment( rand % 2 ? "left" : "right" );
-			GetAttachment( iAttach, pos, dummy );
+			int iAttach = GetEngineObject()->LookupAttachment( rand % 2 ? "left" : "right" );
+			GetEngineObject()->GetAttachment( iAttach, pos, dummy );
 		}
 		else
 		{

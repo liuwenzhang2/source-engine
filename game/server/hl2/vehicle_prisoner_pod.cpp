@@ -302,8 +302,8 @@ Vector CPropVehiclePrisonerPod::BodyTarget( const Vector &posSrc, bool bNoisy )
 	Vector	shotPos;
 	matrix3x4_t	matrix;
 
-	int eyeAttachmentIndex = LookupAttachment("vehicle_driver_eyes");
-	GetAttachment( eyeAttachmentIndex, matrix );
+	int eyeAttachmentIndex = GetEngineObject()->LookupAttachment("vehicle_driver_eyes");
+	GetEngineObject()->GetAttachment( eyeAttachmentIndex, matrix );
 	MatrixGetColumn( matrix, 3, shotPos );
 
 	if ( bNoisy )
@@ -721,7 +721,7 @@ void CPrisonerPodServerVehicle::GetVehicleViewPosition( int nRole, Vector *pAbsO
 	matrix3x4_t vehicleEyePosToWorld;
 	Vector vehicleEyeOrigin;
 	QAngle vehicleEyeAngles;
-	GetPod()->GetAttachment( "vehicle_driver_eyes", vehicleEyeOrigin, vehicleEyeAngles );
+	GetPod()->GetEngineObject()->GetAttachment( "vehicle_driver_eyes", vehicleEyeOrigin, vehicleEyeAngles );
 	AngleMatrix( vehicleEyeAngles, vehicleEyePosToWorld );
 
 	// Compute the relative rotation between the unperterbed eye attachment + the eye angles

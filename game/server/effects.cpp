@@ -1910,7 +1910,7 @@ void CEnvMuzzleFlash::Spawn()
 	if ( (m_iszParentAttachment != NULL_STRING) && GetEngineObject()->GetMoveParent() && GetEngineObject()->GetMoveParent()->GetOuter()->GetBaseAnimating())
 	{
 		CBaseAnimating *pAnim = GetEngineObject()->GetMoveParent()->GetOuter()->GetBaseAnimating();
-		int nParentAttachment = pAnim->LookupAttachment( STRING(m_iszParentAttachment) );
+		int nParentAttachment = pAnim->GetEngineObject()->LookupAttachment( STRING(m_iszParentAttachment) );
 		if ( nParentAttachment > 0 )
 		{
 			GetEngineObject()->SetParent(GetEngineObject()->GetMoveParent(), nParentAttachment);

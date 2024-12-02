@@ -2506,7 +2506,7 @@ void CNPC_Manhack::StartEye( void )
 	if ( m_pEyeGlow == NULL )
 	{
 		m_pEyeGlow = CSprite::SpriteCreate( MANHACK_GLOW_SPRITE, GetEngineObject()->GetLocalOrigin(), false );
-		m_pEyeGlow->SetAttachment( this, LookupAttachment( "Eye" ) );
+		m_pEyeGlow->SetAttachment( this, GetEngineObject()->LookupAttachment( "Eye" ) );
 		
 		if( m_bHackedByAlyx )
 		{
@@ -2528,7 +2528,7 @@ void CNPC_Manhack::StartEye( void )
 	if ( m_pLightGlow == NULL )
 	{
 		m_pLightGlow = CSprite::SpriteCreate( MANHACK_GLOW_SPRITE, GetEngineObject()->GetLocalOrigin(), false );
-		m_pLightGlow->SetAttachment( this, LookupAttachment( "Light" ) );
+		m_pLightGlow->SetAttachment( this, GetEngineObject()->LookupAttachment( "Light" ) );
 
 		if( m_bHackedByAlyx )
 		{

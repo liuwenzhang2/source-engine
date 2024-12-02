@@ -147,7 +147,7 @@ void CPropTelescopicArm::Spawn( void )
 		 GetEngineObject()->SetPlaybackRate(random->RandomFloat( 0.0f, 1.0f ));
 	}
 
-	m_iFrontMarkerAttachment = LookupAttachment( "Front_marker" );
+	m_iFrontMarkerAttachment = GetEngineObject()->LookupAttachment( "Front_marker" );
 
 	CPoseController *pPoseController;
 

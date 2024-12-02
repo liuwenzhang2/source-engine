@@ -3142,12 +3142,12 @@ void CWeaponPhysCannon::DoEffectIdle( void )
 			
 			if ( pBeamEnt )
 			{
-				int iAttachment = pBeamEnt->LookupAttachment( "muzzle" );
+				int iAttachment = pBeamEnt->GetEngineObject()->LookupAttachment( "muzzle" );
 
 				Vector vOrigin;
 				QAngle vAngle;
 
-				pBeamEnt->GetAttachment( iAttachment, vOrigin, vAngle );
+				pBeamEnt->GetEngineObject()->GetAttachment( iAttachment, vOrigin, vAngle );
 
 				pCore->GetEngineObject()->SetAbsOrigin( vOrigin );
 				pCore->GetEngineObject()->SetAbsAngles( vAngle );
@@ -3220,12 +3220,12 @@ void CWeaponPhysCannon::DoEffectIdle( void )
 
 			if ( random->RandomInt( 0, 1 ) )
 			{
-				startAttachment = LookupAttachment( "fork1t" );
+				startAttachment = GetEngineObject()->LookupAttachment( "fork1t" );
 				sprite = 0;
 			}
 			else
 			{
-				startAttachment = LookupAttachment( "fork2t" );
+				startAttachment = GetEngineObject()->LookupAttachment( "fork2t" );
 				sprite = 1;
 			}
 
@@ -3767,7 +3767,7 @@ void CWeaponPhysCannon::StartEffects( void )
 			bIsMegaCannon ? MEGACANNON_BEAM_SPRITE : PHYSCANNON_BEAM_SPRITE, 1.0f );
 		m_hBeams[i]->EntsInit( pBeamEnt, pBeamEnt );
 
-		int	startAttachment = LookupAttachment( beamAttachNames[i] );
+		int	startAttachment = GetEngineObject()->LookupAttachment( beamAttachNames[i] );
 		int endAttachment	= 1;
 
 		m_hBeams[i]->GetEngineObject()->FollowEntity( pBeamEnt->GetEngineObject());
@@ -3805,7 +3805,7 @@ void CWeaponPhysCannon::StartEffects( void )
 
 		m_hGlowSprites[i]->SetAsTemporary();
 
-		m_hGlowSprites[i]->SetAttachment( pOwner->GetViewModel(), LookupAttachment( attachNames[i] ) );
+		m_hGlowSprites[i]->SetAttachment( pOwner->GetViewModel(), GetEngineObject()->LookupAttachment( attachNames[i] ) );
 		
 		if ( bIsMegaCannon )
 		{
@@ -3836,7 +3836,7 @@ void CWeaponPhysCannon::StartEffects( void )
 				GetEngineObject()->GetAbsOrigin(), false );
 
 			m_hEndSprites[i]->SetAsTemporary();
-			m_hEndSprites[i]->SetAttachment( pOwner->GetViewModel(), LookupAttachment( attachNames[i] ) );
+			m_hEndSprites[i]->SetAttachment( pOwner->GetViewModel(), GetEngineObject()->LookupAttachment( attachNames[i] ) );
 			m_hEndSprites[i]->SetTransparency( kRenderTransAdd, 255, 255, 255, 255, kRenderFxNoDissipation );
 			m_hEndSprites[i]->SetBrightness( 255, 0.2f );
 			m_hEndSprites[i]->SetScale( 0.25f * flScaleFactor, 0.2f );

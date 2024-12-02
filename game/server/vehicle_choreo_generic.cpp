@@ -389,7 +389,7 @@ Vector CPropVehicleChoreoGeneric::BodyTarget( const Vector &posSrc, bool bNoisy 
 {
 	Vector	shotPos;
 
-	int eyeAttachmentIndex = LookupAttachment("vehicle_driver_eyes");
+	int eyeAttachmentIndex = GetEngineObject()->LookupAttachment("vehicle_driver_eyes");
 	GetAttachment( eyeAttachmentIndex, shotPos );
 
 	if ( bNoisy )
@@ -865,7 +865,7 @@ void CChoreoGenericServerVehicle::GetVehicleViewPosition( int nRole, Vector *pAb
 	matrix3x4_t vehicleEyePosToWorld;
 	Vector vehicleEyeOrigin;
 	QAngle vehicleEyeAngles;
-	GetVehicle()->GetAttachment( "vehicle_driver_eyes", vehicleEyeOrigin, vehicleEyeAngles );
+	GetVehicle()->GetEngineObject()->GetAttachment( "vehicle_driver_eyes", vehicleEyeOrigin, vehicleEyeAngles );
 	AngleMatrix( vehicleEyeAngles, vehicleEyePosToWorld );
 
 	// Compute the relative rotation between the unperterbed eye attachment + the eye angles

@@ -141,7 +141,7 @@ void CGenericActor::Spawn()
 	CapabilitiesAdd( bits_CAP_MOVE_GROUND | bits_CAP_OPEN_DOORS );
 	
 	// remove head turn if no eyes or forward attachment
-	if (LookupAttachment( "eyes" ) > 0 && LookupAttachment( "forward" ) > 0) 
+	if (GetEngineObject()->LookupAttachment( "eyes" ) > 0 && GetEngineObject()->LookupAttachment( "forward" ) > 0)
 	{
 		CapabilitiesAdd(  bits_CAP_TURN_HEAD | bits_CAP_ANIMATEDFACE );
 	}

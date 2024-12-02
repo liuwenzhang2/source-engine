@@ -803,7 +803,7 @@ float CAI_BaseActor::HeadTargetValidity(const Vector &lookTargetPos)
 {
 	Vector vFacing = BodyDirection3D();
 
-	int iForward = LookupAttachment( "forward" );
+	int iForward = GetEngineObject()->LookupAttachment( "forward" );
 	if ( iForward > 0 )
 	{
 		Vector tmp1;
@@ -924,9 +924,9 @@ void CAI_BaseActor::UpdateHeadControl( const Vector &vHeadTarget, float flHeadIn
 	QAngle angBias;
 	QAngle vTargetAngles;
 
-	int iEyes = LookupAttachment( "eyes" );
-	int iChest = LookupAttachment( "chest" );
-	int iForward = LookupAttachment( "forward" );
+	int iEyes = GetEngineObject()->LookupAttachment( "eyes" );
+	int iChest = GetEngineObject()->LookupAttachment( "chest" );
+	int iForward = GetEngineObject()->LookupAttachment( "forward" );
 
 	matrix3x4_t eyesToWorld;
 	matrix3x4_t forwardToWorld, worldToForward;
@@ -940,16 +940,16 @@ void CAI_BaseActor::UpdateHeadControl( const Vector &vHeadTarget, float flHeadIn
 		return;
 	}
 
-	GetAttachment( iEyes, eyesToWorld );
+	GetEngineObject()->GetAttachment( iEyes, eyesToWorld );
 
-	GetAttachment( iForward, forwardToWorld );
+	GetEngineObject()->GetAttachment( iForward, forwardToWorld );
 	MatrixInvert( forwardToWorld, worldToForward );
 
 	// Lookup chest attachment to do compounded range limit checks
 	if (iChest > 0)
 	{
 		matrix3x4_t chestToWorld, worldToChest;
-		GetAttachment( iChest, chestToWorld );
+		GetEngineObject()->GetAttachment( iChest, chestToWorld );
 		MatrixInvert( chestToWorld, worldToChest );
 		matrix3x4_t tmpM;
 		ConcatTransforms( worldToChest, eyesToWorld, tmpM );
@@ -1538,7 +1538,7 @@ void CAI_BaseActor::MaintainLookTargets( float flInterval )
 
 		if (active[i]->IsThis( this ))
 		{
-			int iForward = LookupAttachment( "forward" );
+			int iForward = GetEngineObject()->LookupAttachment( "forward" );
 			if ( iForward > 0)
 			{
 				Vector tmp1;

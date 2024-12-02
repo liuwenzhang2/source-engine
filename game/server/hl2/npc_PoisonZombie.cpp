@@ -622,7 +622,7 @@ int CNPC_PoisonZombie::RangeAttack2Conditions( float flDot, float flDist )
 //-----------------------------------------------------------------------------
 Vector CNPC_PoisonZombie::HeadTarget( const Vector &posSrc )
 {
-	int iCrabAttachment = LookupAttachment( "headcrab1" );
+	int iCrabAttachment = GetEngineObject()->LookupAttachment( "headcrab1" );
 	Assert( iCrabAttachment > 0 );
 
 	Vector vecPosition;
@@ -810,7 +810,7 @@ void CNPC_PoisonZombie::EvacuateNest( bool bExplosion, float flDamage, CBaseEnti
 				break;
 			}
 
-			GetAttachment( szAttachment, vecPosition, vecAngles );
+			GetEngineObject()->GetAttachment( szAttachment, vecPosition, vecAngles );
 
 			// Now slam the angles because the attachment point will have pitch and roll, which we can't use.
 			vecAngles = QAngle( 0, random->RandomFloat( 0, 360 ), 0 );

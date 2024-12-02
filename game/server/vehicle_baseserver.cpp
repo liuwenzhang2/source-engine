@@ -354,7 +354,7 @@ bool CBaseServerVehicle::NPC_GetPassengerSeatPosition( CBaseCombatCharacter *pPa
 
 	Vector vecPos;
 	QAngle vecAngles;
-	this->GetAttachment( nSeatAttachment, vecPos, vecAngles );
+	this->GetEngineObject()->GetAttachment( nSeatAttachment, vecPos, vecAngles );
 
 	if ( vecResultPos != NULL )
 	{
@@ -510,7 +510,7 @@ void CBaseServerVehicle::GetPassengerSeatPoint( int nRole, Vector *pPoint, QAngl
 	{
 		char pAttachmentName[32];
 		Q_snprintf( pAttachmentName, sizeof( pAttachmentName ), "vehicle_feet_passenger%d", nRole );
-		int nFeetAttachmentIndex = this->LookupAttachment(pAttachmentName);
+		int nFeetAttachmentIndex = this->GetEngineObject()->LookupAttachment(pAttachmentName);
 		int nIdleSequence = this->GetEngineObject()->SelectWeightedSequence( ACT_IDLE );
 		if ( nFeetAttachmentIndex > 0 && nIdleSequence != -1 )
 		{
@@ -590,7 +590,7 @@ bool CBaseServerVehicle::GetPassengerExitPoint( int nRole, Vector *pExitPoint, Q
 	{
 		Vector vehicleExitOrigin;
 		QAngle vehicleExitAngles;
-		if (this->GetAttachment( "vehicle_driver_exit", vehicleExitOrigin, vehicleExitAngles ) )
+		if (this->GetEngineObject()->GetAttachment( "vehicle_driver_exit", vehicleExitOrigin, vehicleExitAngles ) )
 		{
 			// Make sure it's clear
 			trace_t tr;
@@ -697,7 +697,7 @@ void CBaseServerVehicle::ParseNPCPassengerSeat( KeyValues *pSetKeyValues, CPasse
 
 	// Get our attachment name
 	const char *lpszAttachmentName = pSetKeyValues->GetString( "target_attachment" );
-	int nAttachmentID = this->LookupAttachment( lpszAttachmentName );
+	int nAttachmentID = this->GetEngineObject()->LookupAttachment( lpszAttachmentName );
 	pSeat->m_nAttachmentID = nAttachmentID;
 	pSeat->m_strSeatName = AllocPooledString( lpszAttachmentName );
 
@@ -947,7 +947,7 @@ void CBaseServerVehicle::CacheEntryExitPoints( void )
 	//if ( pAnimating == NULL )
 	//	return;
 
-	int nAttachment = this->LookupAttachment( "vehicle_driver_eyes" );
+	int nAttachment = this->GetEngineObject()->LookupAttachment( "vehicle_driver_eyes" );
 	
 	// For each exit animation, determine where the end point is and cache it
 	for ( int i = 0; i < m_ExitAnimations.Count(); i++ )
@@ -1302,7 +1302,7 @@ int CBaseServerVehicle::GetExitAnimToUse( Vector &vecEyeExitEndpoint, bool &bAll
 		// Get the position we think we're going to end up at
 		if ( m_bUseLegacyExitChecks )
 		{
-			this->GetAttachment( m_ExitAnimations[i].szAnimName, vehicleExitOrigin, vehicleExitAngles );
+			this->GetEngineObject()->GetAttachment( m_ExitAnimations[i].szAnimName, vehicleExitOrigin, vehicleExitAngles );
 		}
 		else
 		{
@@ -1458,7 +1458,7 @@ void CBaseServerVehicle::HandleEntryExitFinish( bool bExitAnimOn, bool bResetAni
 			}
 			else
 			{
-				this->GetAttachment( "vehicle_driver_eyes", vecEyes, vecEyeAng );
+				this->GetEngineObject()->GetAttachment( "vehicle_driver_eyes", vecEyes, vecEyeAng );
 			}
 
 			if ( g_debug_vehicleexit.GetBool() )
@@ -2504,7 +2504,7 @@ int CBaseServerVehicle::FindSeatIndexByName( int nRoleIndex, string_t strSeatNam
 		return -1;
 
 	// Get the index of the named attachment in the model
-	int nAttachmentID = pAnimating->LookupAttachment( STRING( strSeatName ) );
+	int nAttachmentID = pAnimating->GetEngineObject()->LookupAttachment( STRING( strSeatName ) );
 
 	// Look through the roles for this seat attachment ID
 	for ( int i = 0; i < m_PassengerRoles[nRoleIndex].m_PassengerSeats.Count(); i++ )

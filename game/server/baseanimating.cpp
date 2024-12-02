@@ -383,8 +383,6 @@ int CBaseAnimating::LookupSequence( const char *label )
 	return GetEngineObject()->GetModelPtr()->LookupSequence( label, SharedRandomSelect);
 }
 
-
-
 //-----------------------------------------------------------------------------
 // Purpose:
 // Input  :
@@ -405,14 +403,6 @@ KeyValues *CBaseAnimating::GetSequenceKeyValues( int iSequence )
 	}
 	return NULL;
 }
-
-
-
-
-
-
-
-
 
 //-----------------------------------------------------------------------------
 // Purpose: 
@@ -723,13 +713,6 @@ bool CBaseAnimating::IsValidSequence( int iSequence )
 	return true;
 }
 
-
-
-
-
-
-
-
 float CBaseAnimating::GetLastVisibleCycle( IStudioHdr *pStudioHdr, int iSequence )
 {
 	if ( !pStudioHdr )
@@ -747,9 +730,6 @@ float CBaseAnimating::GetLastVisibleCycle( IStudioHdr *pStudioHdr, int iSequence
 		return 1.0;
 	}
 }
-
-
-
 
 float CBaseAnimating::GetIdealSpeed( ) const
 {
@@ -941,7 +921,7 @@ void CBaseAnimating::HandleAnimEvent( animevent_t *pEvent )
 					hDustTrail->m_Opacity = 0.5f;  
 					hDustTrail->SetLifetime(flDuration);  // Lifetime of the spawner, in seconds
 					hDustTrail->m_StopEmitTime = gpGlobals->curtime + flDuration;
-					hDustTrail->GetEngineObject()->SetParent( this->GetEngineObject(), LookupAttachment( szAttachment ) );
+					hDustTrail->GetEngineObject()->SetParent( this->GetEngineObject(), GetEngineObject()->LookupAttachment( szAttachment ) );
 					hDustTrail->GetEngineObject()->SetLocalOrigin( vec3_origin );
 				}
 			}
@@ -968,10 +948,6 @@ void CBaseAnimating::HandleAnimEvent( animevent_t *pEvent )
 }
 
 // SetPoseParamater()
-
-
-
-
 
 //=========================================================
 //=========================================================
@@ -1211,116 +1187,18 @@ inline bool CBaseAnimating::CanSkipAnimation( void )
 	}
 }
 
-
-
-
-
-
-
 //=========================================================
 //=========================================================
-
-//-----------------------------------------------------------------------------
-// Purpose: Returns index number of a given named attachment
-// Input  : name of attachment
-// Output :	attachment index number or -1 if attachment not found
-//-----------------------------------------------------------------------------
-int CBaseAnimating::LookupAttachment( const char *szName )
-{
-	IStudioHdr *pStudioHdr = GetEngineObject()->GetModelPtr( );
-	if (!pStudioHdr)
-	{
-		Assert(!"CBaseAnimating::LookupAttachment: model missing");
-		return 0;
-	}
-
-	// The +1 is to make attachment indices be 1-based (namely 0 == invalid or unused attachment)
-	return pStudioHdr->Studio_FindAttachment( szName ) + 1;
-}
-
 
 //-----------------------------------------------------------------------------
 // Purpose: Returns the world location and world angles of an attachment
 // Input  : attachment name
 // Output :	location and angles
 //-----------------------------------------------------------------------------
-bool CBaseAnimating::GetAttachment( const char *szName, Vector &absOrigin, QAngle &absAngles )
-{																
-	return GetAttachment( LookupAttachment( szName ), absOrigin, absAngles );
-}
-
-//-----------------------------------------------------------------------------
-// Purpose: Returns the world location and world angles of an attachment
-// Input  : attachment index
-// Output :	location and angles
-//-----------------------------------------------------------------------------
-bool CBaseAnimating::GetAttachment ( int iAttachment, Vector &absOrigin, QAngle &absAngles )
-{
-	matrix3x4_t attachmentToWorld;
-
-	bool bRet = GetAttachment( iAttachment, attachmentToWorld );
-	MatrixAngles( attachmentToWorld, absAngles, absOrigin );
-	return bRet;
-}
-
-
-//-----------------------------------------------------------------------------
-// Purpose: Returns the world location and world angles of an attachment
-// Input  : attachment index
-// Output :	location and angles
-//-----------------------------------------------------------------------------
-bool CBaseAnimating::GetAttachment( int iAttachment, matrix3x4_t &attachmentToWorld )
-{
-	IStudioHdr *pStudioHdr = GetEngineObject()->GetModelPtr( );
-	if (!pStudioHdr)
-	{
-		MatrixCopy(GetEngineObject()->EntityToWorldTransform(), attachmentToWorld);
-		AssertOnce(!"CBaseAnimating::GetAttachment: model missing");
-		return false;
-	}
-
-	if (iAttachment < 1 || iAttachment > pStudioHdr->GetNumAttachments())
-	{
-		MatrixCopy(GetEngineObject()->EntityToWorldTransform(), attachmentToWorld);
-//		Assert(!"CBaseAnimating::GetAttachment: invalid attachment index");
-		return false;
-	}
-
-	const mstudioattachment_t &pattachment = pStudioHdr->pAttachment( iAttachment-1 );
-	int iBone = pStudioHdr->GetAttachmentBone( iAttachment-1 );
-
-	matrix3x4_t bonetoworld;
-	GetEngineObject()->GetHitboxBoneTransform( iBone, bonetoworld );
-	if ( (pattachment.flags & ATTACHMENT_FLAG_WORLD_ALIGN) == 0 )
-	{
-		ConcatTransforms( bonetoworld, pattachment.local, attachmentToWorld ); 
-	}
-	else
-	{
-		Vector vecLocalBonePos, vecWorldBonePos;
-		MatrixGetColumn( pattachment.local, 3, vecLocalBonePos );
-		VectorTransform( vecLocalBonePos, bonetoworld, vecWorldBonePos );
-
-		SetIdentityMatrix( attachmentToWorld );
-		MatrixSetColumn( vecWorldBonePos, 3, attachmentToWorld );
-	}
-
-	return true;
-}
-
-// gets the bone for an attachment
-int CBaseAnimating::GetAttachmentBone( int iAttachment )
-{
-	IStudioHdr *pStudioHdr = GetEngineObject()->GetModelPtr( );
-	if (!pStudioHdr || iAttachment < 1 || iAttachment > pStudioHdr->GetNumAttachments() )
-	{
-		AssertOnce(pStudioHdr && "CBaseAnimating::GetAttachment: model missing");
-		return 0;
-	}
-
-	return pStudioHdr->GetAttachmentBone( iAttachment-1 );
-}
-
+//bool CBaseAnimating::GetAttachment( const char *szName, Vector &absOrigin, QAngle &absAngles )
+//{																
+//	return GetEngineObject()->GetAttachment( GetEngineObject()->LookupAttachment( szName ), absOrigin, absAngles );
+//}
 
 //-----------------------------------------------------------------------------
 // Purpose: Returns the world location of an attachment
@@ -1329,14 +1207,14 @@ int CBaseAnimating::GetAttachmentBone( int iAttachment )
 //-----------------------------------------------------------------------------
 bool CBaseAnimating::GetAttachment( const char *szName, Vector &absOrigin, Vector *forward, Vector *right, Vector *up )
 {																
-	return GetAttachment( LookupAttachment( szName ), absOrigin, forward, right, up );
+	return GetAttachment(GetEngineObject()->LookupAttachment( szName ), absOrigin, forward, right, up );
 }
 
 bool CBaseAnimating::GetAttachment( int iAttachment, Vector &absOrigin, Vector *forward, Vector *right, Vector *up )
 {
 	matrix3x4_t attachmentToWorld;
 
-	bool bRet = GetAttachment( iAttachment, attachmentToWorld );
+	bool bRet = GetEngineObject()->GetAttachment( iAttachment, attachmentToWorld );
 	MatrixPosition( attachmentToWorld, absOrigin );
 	if (forward)
 	{
@@ -1359,7 +1237,7 @@ bool CBaseAnimating::GetAttachment( int iAttachment, Vector &absOrigin, Vector *
 //-----------------------------------------------------------------------------
 bool CBaseAnimating::GetAttachmentLocal( const char *szName, Vector &origin, QAngle &angles )
 {
-	return GetAttachmentLocal( LookupAttachment( szName ), origin, angles );
+	return GetAttachmentLocal(GetEngineObject()->LookupAttachment( szName ), origin, angles );
 }
 
 bool CBaseAnimating::GetAttachmentLocal( int iAttachment, Vector &origin, QAngle &angles )
@@ -1374,7 +1252,7 @@ bool CBaseAnimating::GetAttachmentLocal( int iAttachment, Vector &origin, QAngle
 bool CBaseAnimating::GetAttachmentLocal( int iAttachment, matrix3x4_t &attachmentToLocal )
 {
 	matrix3x4_t attachmentToWorld;
-	bool bRet = GetAttachment(iAttachment, attachmentToWorld);
+	bool bRet = GetEngineObject()->GetAttachment(iAttachment, attachmentToWorld);
 	matrix3x4_t worldToEntity;
 	MatrixInvert(GetEngineObject()->EntityToWorldTransform(), worldToEntity );
 	ConcatTransforms( worldToEntity, attachmentToWorld, attachmentToLocal ); 
@@ -1692,10 +1570,6 @@ void CBaseAnimating::SetModel( const char *szModelName )
 	PopulatePoseParameters();
 }
 
-
-
-
-
 bool CBaseAnimating::TestCollision( const Ray_t &ray, unsigned int fContentsMask, trace_t& tr )
 {
 	// Return a special case for scaled physics objects
@@ -1920,7 +1794,7 @@ void CBaseAnimating::GetInputDispatchEffectPosition( const char *sInputString, V
 	int iAttachment;
 	if (GetEngineObject()->GetModelPtr() && sscanf( sInputString, "%d", &iAttachment ) )
 	{
-		if ( !GetAttachment( iAttachment, pOrigin, pAngles ) )
+		if ( !GetEngineObject()->GetAttachment( iAttachment, pOrigin, pAngles ) )
 		{
 			Msg( "ERROR: Mapmaker tried to spawn DispatchEffect %s, but %s has no attachment %d\n", 
 				sInputString, STRING(GetEngineObject()->GetModelName()), iAttachment );

@@ -197,7 +197,7 @@ void CWeaponSMG1::Operator_ForceNPCFire( CBaseCombatCharacter *pOperator, bool b
 
 	Vector vecShootOrigin, vecShootDir;
 	QAngle	angShootDir;
-	GetAttachment( LookupAttachment( "muzzle" ), vecShootOrigin, angShootDir );
+	GetEngineObject()->GetAttachment(GetEngineObject()->LookupAttachment( "muzzle" ), vecShootOrigin, angShootDir );
 	AngleVectors( angShootDir, &vecShootDir );
 	FireNPCPrimaryAttack( pOperator, vecShootOrigin, vecShootDir );
 }
@@ -215,7 +215,7 @@ void CWeaponSMG1::Operator_HandleAnimEvent( animevent_t *pEvent, CBaseCombatChar
 			QAngle angDiscard;
 
 			// Support old style attachment point firing
-			if ((pEvent->options == NULL) || (pEvent->options[0] == '\0') || (!pOperator->GetAttachment(pEvent->options, vecShootOrigin, angDiscard)))
+			if ((pEvent->options == NULL) || (pEvent->options[0] == '\0') || (!pOperator->GetEngineObject()->GetAttachment(pEvent->options, vecShootOrigin, angDiscard)))
 			{
 				vecShootOrigin = pOperator->Weapon_ShootPosition();
 			}

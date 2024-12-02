@@ -721,24 +721,7 @@ IStudioHdr *C_BaseAnimating::OnNewModel()
 	if (hdr == NULL)
 		return NULL;
 
-	// Don't reallocate unless a different size. 
-	if ( m_Attachments.Count() != hdr->GetNumAttachments() )
-	{
-		m_Attachments.SetSize( hdr->GetNumAttachments() );
 
-		// This is to make sure we don't use the attachment before its been set up
-		for ( int i=0; i < m_Attachments.Count(); i++ )
-		{
-			m_Attachments[i].m_bAnglesComputed = false;
-			m_Attachments[i].m_nLastFramecount = 0;
-#ifdef _DEBUG
-			m_Attachments[i].m_AttachmentToWorld.Invalidate();
-			m_Attachments[i].m_angRotation.Init( VEC_T_NAN, VEC_T_NAN, VEC_T_NAN );
-			m_Attachments[i].m_vOriginVelocity.Init( VEC_T_NAN, VEC_T_NAN, VEC_T_NAN );
-#endif
-		}
-
-	}
 
 
 
@@ -1184,131 +1167,6 @@ void C_BaseAnimating::StandardBlendingRules( IStudioHdr *hdr, Vector pos[], Quat
 }
 
 
-//-----------------------------------------------------------------------------
-// Purpose: Put a value into an attachment point by index
-// Input  : number - which point
-// Output : float * - the attachment point
-//-----------------------------------------------------------------------------
-bool C_BaseAnimating::PutAttachment( int number, const matrix3x4_t &attachmentToWorld )
-{
-	if ( number < 1 || number > m_Attachments.Count() )
-		return false;
-
-	CAttachmentData *pAtt = &m_Attachments[number-1];
-	if ( gpGlobals->frametime > 0 && pAtt->m_nLastFramecount > 0 && pAtt->m_nLastFramecount == gpGlobals->framecount - 1 )
-	{
-		Vector vecPreviousOrigin, vecOrigin;
-		MatrixPosition( pAtt->m_AttachmentToWorld, vecPreviousOrigin );
-		MatrixPosition( attachmentToWorld, vecOrigin );
-		pAtt->m_vOriginVelocity = (vecOrigin - vecPreviousOrigin) / gpGlobals->frametime;
-	}
-	else
-	{
-		pAtt->m_vOriginVelocity.Init();
-	}
-	pAtt->m_nLastFramecount = gpGlobals->framecount;
-	pAtt->m_bAnglesComputed = false;
-	pAtt->m_AttachmentToWorld = attachmentToWorld;
-
-#ifdef _DEBUG
-	pAtt->m_angRotation.Init( VEC_T_NAN, VEC_T_NAN, VEC_T_NAN );
-#endif
-
-	return true;
-}
-
-
-void C_BaseAnimating::SetupBones_AttachmentHelper( IStudioHdr *hdr )
-{
-	if ( !hdr || !hdr->GetNumAttachments() )
-		return;
-
-	// calculate attachment points
-	matrix3x4_t world;
-	for (int i = 0; i < hdr->GetNumAttachments(); i++)
-	{
-		const mstudioattachment_t &pattachment = hdr->pAttachment( i );
-		int iBone = hdr->GetAttachmentBone( i );
-		if ( (pattachment.flags & ATTACHMENT_FLAG_WORLD_ALIGN) == 0 )
-		{
-			ConcatTransforms( GetEngineObject()->GetBone( iBone ), pattachment.local, world ); 
-		}
-		else
-		{
-			Vector vecLocalBonePos, vecWorldBonePos;
-			MatrixGetColumn( pattachment.local, 3, vecLocalBonePos );
-			VectorTransform( vecLocalBonePos, GetEngineObject()->GetBone( iBone ), vecWorldBonePos );
-
-			SetIdentityMatrix( world );
-			MatrixSetColumn( vecWorldBonePos, 3, world );
-		}
-
-		// FIXME: this shouldn't be here, it should client side on-demand only and hooked into the bone cache!!
-		FormatViewModelAttachment( i, world );
-		PutAttachment( i + 1, world );
-	}
-}
-
-bool C_BaseAnimating::CalcAttachments()
-{
-	VPROF( "C_BaseAnimating::CalcAttachments" );
-
-
-	// Make sure m_CachedBones is valid.
-	return SetupBones( NULL, -1, BONE_USED_BY_ATTACHMENT, gpGlobals->curtime );
-}
-
-//-----------------------------------------------------------------------------
-// Purpose: Returns the world location and world angles of an attachment
-// Input  : attachment name
-// Output :	location and angles
-//-----------------------------------------------------------------------------
-bool C_BaseAnimating::GetAttachment( const char *szName, Vector &absOrigin, QAngle &absAngles )
-{																
-	return GetAttachment( LookupAttachment( szName ), absOrigin, absAngles );
-}
-
-//-----------------------------------------------------------------------------
-// Purpose: Get attachment point by index
-// Input  : number - which point
-// Output : float * - the attachment point
-//-----------------------------------------------------------------------------
-bool C_BaseAnimating::GetAttachment( int number, Vector &origin, QAngle &angles )
-{
-	// Note: this could be more efficient, but we want the matrix3x4_t version of GetAttachment to be the origin of
-	// attachment generation, so a derived class that wants to fudge attachments only 
-	// has to reimplement that version. This also makes it work like the server in that regard.
-	if ( number < 1 || number > m_Attachments.Count() || !CalcAttachments() )
-	{
-		// Set this to the model origin/angles so that we don't have stack fungus in origin and angles.
-		origin = GetEngineObject()->GetAbsOrigin();
-		angles = GetEngineObject()->GetAbsAngles();
-		return false;
-	}
-
-	CAttachmentData *pData = &m_Attachments[number-1];
-	if ( !pData->m_bAnglesComputed )
-	{
-		MatrixAngles( pData->m_AttachmentToWorld, pData->m_angRotation );
-		pData->m_bAnglesComputed = true;
-	}
-	angles = pData->m_angRotation;
-	MatrixPosition( pData->m_AttachmentToWorld, origin );
-	return true;
-}
-
-bool C_BaseAnimating::GetAttachment( int number, matrix3x4_t& matrix )
-{
-	if ( number < 1 || number > m_Attachments.Count() )
-		return false;
-
-	if ( !CalcAttachments() )
-		return false;
-
-	matrix = m_Attachments[number-1].m_AttachmentToWorld;
-	return true;
-}
-
 
 //-----------------------------------------------------------------------------
 // Purpose: Get attachment point by index (position only)
@@ -1339,21 +1197,7 @@ bool C_BaseAnimating::GetAttachment( int number, matrix3x4_t& matrix )
 
 
 
-bool C_BaseAnimating::GetAttachmentVelocity( int number, Vector &originVel, Quaternion &angleVel )
-{
-	if ( number < 1 || number > m_Attachments.Count() )
-	{
-		return false;
-	}
 
-	if ( !CalcAttachments() )
-		return false;
-
-	originVel = m_Attachments[number-1].m_vOriginVelocity;
-	angleVel.Init();
-
-	return true;
-}
 
 
 //-----------------------------------------------------------------------------
@@ -2022,7 +1866,7 @@ void C_BaseAnimating::ProcessMuzzleFlashEvent()
 	if ( muzzleflash_light.GetBool() )
 	{
 		//FIXME: We should really use a named attachment for this
-		if ( m_Attachments.Count() > 0 )
+		if (GetEngineObject()->GetAttachmentCount() > 0 )
 		{
 			Vector vAttachment;
 			QAngle dummyAngles;
@@ -2446,7 +2290,7 @@ void C_BaseAnimating::FireEvent( const Vector& origin, const QAngle& angles, int
 		{
 			CLocalPlayerFilter filter;
 
-			if ( m_Attachments.Count() > 0)
+			if (GetEngineObject()->GetAttachmentCount() > 0)
 			{
 				GetAttachment( 1, attachOrigin, attachAngles );
 				g_pSoundEmitterSystem->EmitSound( filter, GetSoundSourceIndex(), options, &attachOrigin );
@@ -2557,7 +2401,7 @@ void C_BaseAnimating::FireEvent( const Vector& origin, const QAngle& angles, int
 
 	// Eject brass
 	case CL_EVENT_EJECTBRASS1:
-		if ( m_Attachments.Count() > 0 )
+		if (GetEngineObject()->GetAttachmentCount() > 0 )
 		{
 			if ( MainViewOrigin().DistToSqr(GetEngineObject()->GetAbsOrigin() ) < (256 * 256) )
 			{
@@ -2710,7 +2554,7 @@ void C_BaseAnimating::FireObsoleteEvent( const Vector& origin, const QAngle& ang
 				iParam = atoi(token);
 			}
 
-			if ( iAttachment != -1 && m_Attachments.Count() >= iAttachment )
+			if ( iAttachment != -1 && GetEngineObject()->GetAttachmentCount() >= iAttachment )
 			{
 				GetAttachment( iAttachment, attachOrigin, attachAngles );
 
@@ -2786,7 +2630,7 @@ void C_BaseAnimating::FireObsoleteEvent( const Vector& origin, const QAngle& ang
 				break;
 			}
 
-			if ( iAttachment != -1 && m_Attachments.Count() > iAttachment )
+			if ( iAttachment != -1 && GetEngineObject()->GetAttachmentCount() > iAttachment )
 			{
 				GetAttachment( iAttachment+1, attachOrigin, attachAngles );
 
@@ -2857,7 +2701,7 @@ void C_BaseAnimating::FireObsoleteEvent( const Vector& origin, const QAngle& ang
 				break;
 			}
 
-			if ( iAttachment != -1 && m_Attachments.Count() > iAttachment )
+			if ( iAttachment != -1 && GetEngineObject()->GetAttachmentCount() > iAttachment )
 			{
 				GetAttachment( iAttachment+1, attachOrigin, attachAngles );
 				int entId = render->GetViewEntity();
@@ -2882,7 +2726,7 @@ void C_BaseAnimating::FireObsoleteEvent( const Vector& origin, const QAngle& ang
 		{
 			CLocalPlayerFilter filter;
 
-			if ( m_Attachments.Count() > 0)
+			if (GetEngineObject()->GetAttachmentCount() > 0)
 			{
 				GetAttachment( 1, attachOrigin, attachAngles );
 				g_pSoundEmitterSystem->EmitSound( filter, GetSoundSourceIndex(), options, &attachOrigin );
@@ -3227,22 +3071,7 @@ void C_BaseAnimating::AddEntity( void )
 	BaseClass::AddEntity();
 }
 
-//-----------------------------------------------------------------------------
-// Purpose: Get the index of the attachment point with the specified name
-//-----------------------------------------------------------------------------
-int C_BaseAnimating::LookupAttachment( const char *pAttachmentName )
-{
-	IStudioHdr *hdr = GetEngineObject()->GetModelPtr();
-	if ( !hdr )
-	{
-		return -1;
-	}
 
-	// NOTE: Currently, the network uses 0 to mean "no attachment" 
-	// thus the client must add one to the index of the attachment
-	// UNDONE: Make the server do this too to be consistent.
-	return hdr->Studio_FindAttachment( pAttachmentName ) + 1;
-}
 
 //-----------------------------------------------------------------------------
 // Purpose: Get a random index of an attachment point with the specified substring in its name

@@ -258,7 +258,7 @@ void CEnvEffectsScript::TrailEffectEvent( CEffectScriptElement *pEffect )
 			}
 			pEffect->m_pTrail->SetLifeTime( pEffect->m_flFadeTime );
 			pEffect->m_pTrail->TurnOn();
-			pEffect->m_pTrail->SetAttachment( this, LookupAttachment( pEffect->m_szAttachment ) );
+			pEffect->m_pTrail->SetAttachment( this, GetEngineObject()->LookupAttachment( pEffect->m_szAttachment ) );
 
 			pEffect->Activate();
 		}
@@ -277,7 +277,7 @@ void CEnvEffectsScript::SpriteEffectEvent( CEffectScriptElement *pEffect )
 			pEffect->m_pSprite->SetTransparency( pEffect->m_iRenderType, pEffect->m_iR, pEffect->m_iG, pEffect->m_iB, pEffect->m_iA, kRenderFxNone );
 			pEffect->m_pSprite->SetScale( pEffect->m_flScale );
 			pEffect->m_pSprite->TurnOn();
-			pEffect->m_pSprite->SetAttachment( this, LookupAttachment( pEffect->m_szAttachment ) );
+			pEffect->m_pSprite->SetAttachment( this, GetEngineObject()->LookupAttachment( pEffect->m_szAttachment ) );
 
 			pEffect->Activate();
 		}

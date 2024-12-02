@@ -2779,8 +2779,8 @@ void CNPC_MetroPolice::OnAnimEventStartDeployManhack( void )
 	Vector	vecOrigin;
 	QAngle	vecAngles;
 
-	int handAttachment = LookupAttachment( "LHand" );
-	GetAttachment( handAttachment, vecOrigin, vecAngles );
+	int handAttachment = GetEngineObject()->LookupAttachment( "LHand" );
+	GetEngineObject()->GetAttachment( handAttachment, vecOrigin, vecAngles );
 
 	pManhack->GetEngineObject()->SetLocalOrigin( vecOrigin );
 	pManhack->GetEngineObject()->SetLocalAngles( vecAngles );

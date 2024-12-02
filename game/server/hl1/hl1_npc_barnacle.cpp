@@ -166,7 +166,7 @@ void CNPC_Barnacle::InitTonguePosition( void )
 	Vector origin;
 	QAngle angle;
 
-	GetAttachment( "TongueEnd", origin, angle );
+	GetEngineObject()->GetAttachment( "TongueEnd", origin, angle );
 
 	m_flTongueAdj = origin.z - GetEngineObject()->GetAbsOrigin().z;
 }

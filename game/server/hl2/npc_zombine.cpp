@@ -452,7 +452,7 @@ void CNPC_Zombine::DropGrenade( Vector vDir )
 
 	Vector vGunPos;
 	QAngle angles;
-	GetAttachment( "grenade_attachment", vGunPos, angles );
+	GetEngineObject()->GetAttachment( "grenade_attachment", vGunPos, angles );
 
 	IPhysicsObject *pPhysObj = m_hGrenade->GetEngineObject()->VPhysicsGetObject();
 
@@ -535,7 +535,7 @@ void CNPC_Zombine::HandleAnimEvent( animevent_t *pEvent )
 	{
 		Vector vecStart;
 		QAngle angles;
-		GetAttachment( "grenade_attachment", vecStart, angles );
+		GetEngineObject()->GetAttachment( "grenade_attachment", vecStart, angles );
 
 		CBaseGrenade *pGrenade = Fraggrenade_Create( vecStart, vec3_angle, vec3_origin, AngularImpulse( 0, 0, 0 ), this, 3.5f, true );
 
@@ -548,7 +548,7 @@ void CNPC_Zombine::HandleAnimEvent( animevent_t *pEvent )
 			{
 				pGrenade->GetEngineObject()->VPhysicsDestroyObject();
 
-				int iAttachment = LookupAttachment( "grenade_attachment");
+				int iAttachment = GetEngineObject()->LookupAttachment( "grenade_attachment");
 
 				pGrenade->GetEngineObject()->SetMoveType( MOVETYPE_NONE );
 				pGrenade->GetEngineObject()->SetSolid( SOLID_NONE );

@@ -526,7 +526,7 @@ bool CNPC_CeilingTurret::UpdateFacing( void )
 	bool  bMoved = false;
 	matrix3x4_t localToWorld;
 	
-	GetAttachment( LookupAttachment( "eyes" ), localToWorld );
+	GetEngineObject()->GetAttachment(GetEngineObject()->LookupAttachment( "eyes" ), localToWorld );
 
 	Vector vecGoalDir;
 	AngleVectors( m_vecGoalAngles, &vecGoalDir );
@@ -539,7 +539,7 @@ bool CNPC_CeilingTurret::UpdateFacing( void )
 		Vector	vecMuzzle, vecMuzzleDir;
 		QAngle	vecMuzzleAng;
 
-		GetAttachment( "eyes", vecMuzzle, vecMuzzleAng );
+		GetEngineObject()->GetAttachment( "eyes", vecMuzzle, vecMuzzleAng );
 		AngleVectors( vecMuzzleAng, &vecMuzzleDir );
 
 		NDebugOverlay::Cross3D( vecMuzzle, -Vector(2,2,2), Vector(2,2,2), 255, 255, 0, false, 0.05 );
@@ -687,7 +687,7 @@ void CNPC_CeilingTurret::ActiveThink( void )
 	Vector vecMuzzle, vecMuzzleDir;
 	QAngle vecMuzzleAng;
 	
-	GetAttachment( "eyes", vecMuzzle, vecMuzzleAng );
+	GetEngineObject()->GetAttachment( "eyes", vecMuzzle, vecMuzzleAng );
 	AngleVectors( vecMuzzleAng, &vecMuzzleDir );
 	
 	if ( m_flShotTime < gpGlobals->curtime )

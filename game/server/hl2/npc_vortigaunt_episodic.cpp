@@ -1152,8 +1152,8 @@ void CNPC_Vortigaunt::Spawn( void )
 
 	m_bStopLoopingSounds	= false;
 
-	m_iLeftHandAttachment = LookupAttachment( VORTIGAUNT_LEFT_CLAW );
-	m_iRightHandAttachment = LookupAttachment( VORTIGAUNT_RIGHT_CLAW );
+	m_iLeftHandAttachment = GetEngineObject()->LookupAttachment( VORTIGAUNT_LEFT_CLAW );
+	m_iRightHandAttachment = GetEngineObject()->LookupAttachment( VORTIGAUNT_RIGHT_CLAW );
 
 	NPCInit();
 
@@ -1762,7 +1762,7 @@ void CNPC_Vortigaunt::MaintainHealSchedule( void )
 				// Create a charge token
 				Vector vecHandPos;
 				QAngle vecHandAngles;
-				GetAttachment( m_iRightHandAttachment, vecHandPos, vecHandAngles );
+				GetEngineObject()->GetAttachment( m_iRightHandAttachment, vecHandPos, vecHandAngles );
 				CVortigauntChargeToken::CreateChargeToken( vecHandPos, this, m_hHealTarget );
 				m_flNextHealTokenTime = gpGlobals->curtime + random->RandomFloat( 0.5f, 1.0f );
 				m_nNumTokensToSpawn--;
@@ -2394,7 +2394,7 @@ bool CNPC_Vortigaunt::HealGestureHasLOS( void )
 	// Find our left hand as the starting point
 	Vector vecHandPos;
 	QAngle vecHandAngle;
-	GetAttachment( m_iRightHandAttachment, vecHandPos, vecHandAngle );
+	GetEngineObject()->GetAttachment( m_iRightHandAttachment, vecHandPos, vecHandAngle );
 
 	// Trace to our target, skipping ourselves and the target
 	trace_t tr;

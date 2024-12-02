@@ -1210,12 +1210,12 @@ bool C_BaseEntity::GetSoundSpatialization( SpatializationInfo_t& info )
 // Input  : number - which point
 // Output : float * - the attachment point
 //-----------------------------------------------------------------------------
-bool C_BaseEntity::GetAttachment( int number, Vector &origin, QAngle &angles )
-{
-	origin = GetEngineObject()->GetAbsOrigin();
-	angles = GetEngineObject()->GetAbsAngles();
-	return true;
-}
+//bool C_BaseEntity::GetAttachment( int number, Vector &origin, QAngle &angles )
+//{
+//	origin = GetEngineObject()->GetAbsOrigin();
+//	angles = GetEngineObject()->GetAbsAngles();
+//	return true;
+//}
 
 //bool C_BaseEntity::GetAttachment( int number, Vector &origin )
 //{
@@ -1223,18 +1223,18 @@ bool C_BaseEntity::GetAttachment( int number, Vector &origin, QAngle &angles )
 //	return true;
 //}
 
-bool C_BaseEntity::GetAttachment( int number, matrix3x4_t &matrix )
-{
-	MatrixCopy(GetEngineObject()->EntityToWorldTransform(), matrix );
-	return true;
-}
+//bool C_BaseEntity::GetAttachment( int number, matrix3x4_t &matrix )
+//{
+//	MatrixCopy(GetEngineObject()->EntityToWorldTransform(), matrix );
+//	return true;
+//}
 
-bool C_BaseEntity::GetAttachmentVelocity( int number, Vector &originVel, Quaternion &angleVel )
-{
-	originVel = GetEngineObject()->GetAbsVelocity();
-	angleVel.Init();
-	return true;
-}
+//bool C_BaseEntity::GetAttachmentVelocity( int number, Vector &originVel, Quaternion &angleVel )
+//{
+//	originVel = GetEngineObject()->GetAbsVelocity();
+//	angleVel.Init();
+//	return true;
+//}
 
 
 //-----------------------------------------------------------------------------

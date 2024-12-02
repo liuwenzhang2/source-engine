@@ -1097,7 +1097,7 @@ void CNPC_AttackHelicopter::Spawn( void )
 	m_flInputDropBombTime = gpGlobals->curtime;
 	SetActivity( ACT_IDLE );
 
-	int nBombAttachment = LookupAttachment("bomb");
+	int nBombAttachment = GetEngineObject()->LookupAttachment("bomb");
 	m_hSensor = static_cast<CBombDropSensor*>(gEntList.CreateEntityByName( "npc_helicoptersensor" ));
 	m_hSensor->Spawn();
 	m_hSensor->GetEngineObject()->SetParent( this->GetEngineObject(), nBombAttachment);
@@ -1135,7 +1135,7 @@ void CNPC_AttackHelicopter::Startup()
 			// See if there's an attachment for this smoke trail
 			char buf[32];
 			Q_snprintf( buf, 32, "Light_Red%d", i );
-			int nAttachment = LookupAttachment( buf );
+			int nAttachment = GetEngineObject()->LookupAttachment( buf );
 			if ( nAttachment == 0 )
 			{
 				m_hLights[i] = NULL;
@@ -1319,10 +1319,10 @@ void CNPC_AttackHelicopter::UpdateOnRemove()
 void CNPC_AttackHelicopter::Activate( void )
 {
 	BaseClass::Activate();
-	m_nGunBaseAttachment = LookupAttachment("gun");
-	m_nGunTipAttachment = LookupAttachment("muzzle");
-	m_nBombAttachment = LookupAttachment("bomb");
-	m_nSpotlightAttachment = LookupAttachment("spotlight");
+	m_nGunBaseAttachment = GetEngineObject()->LookupAttachment("gun");
+	m_nGunTipAttachment = GetEngineObject()->LookupAttachment("muzzle");
+	m_nBombAttachment = GetEngineObject()->LookupAttachment("bomb");
+	m_nSpotlightAttachment = GetEngineObject()->LookupAttachment("spotlight");
 
 	if (GetEngineObject()->HasSpawnFlags( SF_HELICOPTER_LONG_SHADOW ) )
 	{
@@ -2029,7 +2029,7 @@ void CNPC_AttackHelicopter::DoMuzzleFlash( void )
 	
 	CEffectData data;
 
-	data.m_nAttachmentIndex = LookupAttachment( "muzzle" );
+	data.m_nAttachmentIndex = GetEngineObject()->LookupAttachment( "muzzle" );
 	data.m_nEntIndex = entindex();
 	DispatchEffect( "ChopperMuzzleFlash", data );
 }
@@ -3305,7 +3305,7 @@ void CNPC_AttackHelicopter::AddSmokeTrail( const Vector &vecPos )
 		return;
 
 	// See if there's an attachment for this smoke trail
-	int nAttachment = LookupAttachment( UTIL_VarArgs( "damage%d", m_nSmokeTrailCount ) );
+	int nAttachment = GetEngineObject()->LookupAttachment( UTIL_VarArgs( "damage%d", m_nSmokeTrailCount ) );
 
 	if ( nAttachment == 0 )
 		return;
@@ -3683,12 +3683,12 @@ void Chopper_BecomeChunks( CBaseEntity *pChopper )
 		// to do some attachment point math to get the proper angles to use for computing the relative
 		// positions of the gibs. The attachment points called DAMAGE0 is properly oriented and attached
 		// to the chopper body so we can use its angles.
-		int iAttach = pAttackHelicopter->LookupAttachment( "damage0" );
+		int iAttach = pAttackHelicopter->GetEngineObject()->LookupAttachment( "damage0" );
 		Vector vecAttachPos;
 
 		if( iAttach > -1 )
 		{
-			pAttackHelicopter->GetAttachment(iAttach, vecAttachPos, vecChunkAngles );
+			pAttackHelicopter->GetEngineObject()->GetAttachment(iAttach, vecAttachPos, vecChunkAngles );
 			AngleVectors( vecChunkAngles, &vecForward, NULL, &vecUp );
 		}
 	}

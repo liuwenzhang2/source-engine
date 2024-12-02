@@ -351,24 +351,24 @@ void CPropPortalStatsDisplay::SpawnControlPanels()
 	for ( nPanel = 0; true; ++nPanel )
 	{
 		Q_snprintf( buf, sizeof( buf ), pAttachmentNameLL, nPanel );
-		int nLLAttachmentIndex = pEntityToSpawnOn->LookupAttachment(buf);
+		int nLLAttachmentIndex = pEntityToSpawnOn->GetEngineObject()->LookupAttachment(buf);
 		if (nLLAttachmentIndex <= 0)
 		{
 			// Try and use my panels then
 			pEntityToSpawnOn = this;
 			Q_snprintf( buf, sizeof( buf ), pOrgLL, nPanel );
-			nLLAttachmentIndex = pEntityToSpawnOn->LookupAttachment(buf);
+			nLLAttachmentIndex = pEntityToSpawnOn->GetEngineObject()->LookupAttachment(buf);
 			if (nLLAttachmentIndex <= 0)
 				return;
 		}
 
 		Q_snprintf( buf, sizeof( buf ), pAttachmentNameUR, nPanel );
-		int nURAttachmentIndex = pEntityToSpawnOn->LookupAttachment(buf);
+		int nURAttachmentIndex = pEntityToSpawnOn->GetEngineObject()->LookupAttachment(buf);
 		if (nURAttachmentIndex <= 0)
 		{
 			// Try and use my panels then
 			Q_snprintf( buf, sizeof( buf ), pOrgUR, nPanel );
-			nURAttachmentIndex = pEntityToSpawnOn->LookupAttachment(buf);
+			nURAttachmentIndex = pEntityToSpawnOn->GetEngineObject()->LookupAttachment(buf);
 			if (nURAttachmentIndex <= 0)
 				return;
 		}
@@ -385,14 +385,14 @@ void CPropPortalStatsDisplay::SpawnControlPanels()
 
 		// Compute the screen size from the attachment points...
 		matrix3x4_t	panelToWorld;
-		pEntityToSpawnOn->GetAttachment( nLLAttachmentIndex, panelToWorld );
+		pEntityToSpawnOn->GetEngineObject()->GetAttachment( nLLAttachmentIndex, panelToWorld );
 
 		matrix3x4_t	worldToPanel;
 		MatrixInvert( panelToWorld, worldToPanel );
 
 		// Now get the lower right position + transform into panel space
 		Vector lr, lrlocal;
-		pEntityToSpawnOn->GetAttachment( nURAttachmentIndex, panelToWorld );
+		pEntityToSpawnOn->GetEngineObject()->GetAttachment( nURAttachmentIndex, panelToWorld );
 		MatrixGetColumn( panelToWorld, 3, lr );
 		VectorTransform( lr, worldToPanel, lrlocal );
 
@@ -430,24 +430,24 @@ void CPropPortalStatsDisplay::RestoreControlPanels( void )
 	for ( nPanel = 0; true; ++nPanel )
 	{
 		Q_snprintf( buf, sizeof( buf ), pAttachmentNameLL, nPanel );
-		int nLLAttachmentIndex = pEntityToSpawnOn->LookupAttachment(buf);
+		int nLLAttachmentIndex = pEntityToSpawnOn->GetEngineObject()->LookupAttachment(buf);
 		if (nLLAttachmentIndex <= 0)
 		{
 			// Try and use my panels then
 			pEntityToSpawnOn = this;
 			Q_snprintf( buf, sizeof( buf ), pOrgLL, nPanel );
-			nLLAttachmentIndex = pEntityToSpawnOn->LookupAttachment(buf);
+			nLLAttachmentIndex = pEntityToSpawnOn->GetEngineObject()->LookupAttachment(buf);
 			if (nLLAttachmentIndex <= 0)
 				return;
 		}
 
 		Q_snprintf( buf, sizeof( buf ), pAttachmentNameUR, nPanel );
-		int nURAttachmentIndex = pEntityToSpawnOn->LookupAttachment(buf);
+		int nURAttachmentIndex = pEntityToSpawnOn->GetEngineObject()->LookupAttachment(buf);
 		if (nURAttachmentIndex <= 0)
 		{
 			// Try and use my panels then
 			Q_snprintf( buf, sizeof( buf ), pOrgUR, nPanel );
-			nURAttachmentIndex = pEntityToSpawnOn->LookupAttachment(buf);
+			nURAttachmentIndex = pEntityToSpawnOn->GetEngineObject()->LookupAttachment(buf);
 			if (nURAttachmentIndex <= 0)
 				return;
 		}

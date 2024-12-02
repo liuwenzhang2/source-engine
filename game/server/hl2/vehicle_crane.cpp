@@ -202,7 +202,7 @@ void CPropCrane::Activate( void )
 	m_pConstraintGroup->Activate();
 
 	// Make a rope to connect 'em
-	int iIndex = m_hCraneMagnet->LookupAttachment("magnetcable_a");
+	int iIndex = m_hCraneMagnet->GetEngineObject()->LookupAttachment("magnetcable_a");
 	m_hRope = CRopeKeyframe::Create( this, m_hCraneMagnet, 1, iIndex );
 	if ( m_hRope )
 	{
@@ -298,8 +298,8 @@ Vector CPropCrane::BodyTarget( const Vector &posSrc, bool bNoisy )
 	Vector	shotPos;
 	matrix3x4_t	matrix;
 
-	int eyeAttachmentIndex = LookupAttachment("vehicle_driver_eyes");
-	GetAttachment( eyeAttachmentIndex, matrix );
+	int eyeAttachmentIndex = GetEngineObject()->LookupAttachment("vehicle_driver_eyes");
+	GetEngineObject()->GetAttachment( eyeAttachmentIndex, matrix );
 	MatrixGetColumn( matrix, 3, shotPos );
 
 	if ( bNoisy )
@@ -407,7 +407,7 @@ void CPropCrane::DrawDebugGeometryOverlays(void)
 	if ( m_debugOverlays & OVERLAY_BBOX_BIT )
 	{
 		Vector vecPoint = m_hCraneMagnet->GetEngineObject()->GetAbsOrigin();
-		int iIndex = m_hCraneMagnet->LookupAttachment("magnetcable_a");
+		int iIndex = m_hCraneMagnet->GetEngineObject()->LookupAttachment("magnetcable_a");
 		if ( iIndex >= 0 )
 		{
 			m_hCraneMagnet->GetAttachment( iIndex, vecPoint );
@@ -792,7 +792,7 @@ const Vector &CPropCrane::GetCraneTipPosition( void )
 //-----------------------------------------------------------------------------
 void CPropCrane::GetCraneTipPosition( Vector *vecOrigin, QAngle *vecAngles )
 {
-	GetAttachment( "cable_tip", *vecOrigin, *vecAngles );
+	GetEngineObject()->GetAttachment( "cable_tip", *vecOrigin, *vecAngles );
 }
 
 //-----------------------------------------------------------------------------
@@ -929,7 +929,7 @@ void CCraneServerVehicle::GetVehicleViewPosition( int nRole, Vector *pAbsOrigin,
 	matrix3x4_t vehicleEyePosToWorld;
 	Vector vehicleEyeOrigin;
 	QAngle vehicleEyeAngles;
-	GetCrane()->GetAttachment( "vehicle_driver_eyes", vehicleEyeOrigin, vehicleEyeAngles );
+	GetCrane()->GetEngineObject()->GetAttachment( "vehicle_driver_eyes", vehicleEyeOrigin, vehicleEyeAngles );
 	AngleMatrix( vehicleEyeAngles, vehicleEyePosToWorld );
 
 	// Compute the relative rotation between the unperterbed eye attachment + the eye angles
@@ -1071,7 +1071,7 @@ bool CCraneTip::CreateConstraint( CBaseAnimating *pCraneMagnet, IPhysicsConstrai
 
 	// Check to see if it's got an attachment point to connect to
 	Vector vecPoint = pCraneMagnet->GetEngineObject()->GetAbsOrigin();
-	int iIndex = pCraneMagnet->LookupAttachment("magnetcable_a");
+	int iIndex = pCraneMagnet->GetEngineObject()->LookupAttachment("magnetcable_a");
 	if ( iIndex >= 0 )
 	{
 		pCraneMagnet->GetAttachment( iIndex, vecPoint );

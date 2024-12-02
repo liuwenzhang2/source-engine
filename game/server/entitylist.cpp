@@ -1837,7 +1837,7 @@ const matrix3x4_t& CEngineObjectInternal::GetParentToWorldTransform(matrix3x4_t&
 		MDLCACHE_CRITICAL_SECTION();
 
 		CBaseAnimating* pAnimating = pMoveParent->m_pOuter->GetBaseAnimating();
-		if (pAnimating && pAnimating->GetAttachment(m_iParentAttachment, tempMatrix))
+		if (pAnimating && pAnimating->GetEngineObject()->GetAttachment(m_iParentAttachment, tempMatrix))
 		{
 			return tempMatrix;
 		}
@@ -5897,6 +5897,95 @@ void CEngineObjectInternal::UpdateStepOrigin()
 	m_flEstIkFloor = GetLocalOrigin().z;
 }
 
+// gets the bone for an attachment
+int CEngineObjectInternal::GetAttachmentBone( int iAttachment )
+{
+	IStudioHdr *pStudioHdr = GetModelPtr( );
+	if (!pStudioHdr || iAttachment < 1 || iAttachment > pStudioHdr->GetNumAttachments() )
+	{
+		AssertOnce(pStudioHdr && "CBaseAnimating::GetAttachment: model missing");
+		return 0;
+	}
+
+	return pStudioHdr->GetAttachmentBone( iAttachment-1 );
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: Returns index number of a given named attachment
+// Input  : name of attachment
+// Output :	attachment index number or -1 if attachment not found
+//-----------------------------------------------------------------------------
+int CEngineObjectInternal::LookupAttachment(const char* szName)
+{
+	IStudioHdr* pStudioHdr = GetModelPtr();
+	if (!pStudioHdr)
+	{
+		Assert(!"CBaseAnimating::LookupAttachment: model missing");
+		return 0;
+	}
+
+	// The +1 is to make attachment indices be 1-based (namely 0 == invalid or unused attachment)
+	return pStudioHdr->Studio_FindAttachment(szName) + 1;
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: Returns the world location and world angles of an attachment
+// Input  : attachment index
+// Output :	location and angles
+//-----------------------------------------------------------------------------
+bool CEngineObjectInternal::GetAttachment(int iAttachment, matrix3x4_t& attachmentToWorld)
+{
+	IStudioHdr* pStudioHdr = GetModelPtr();
+	if (!pStudioHdr)
+	{
+		MatrixCopy(EntityToWorldTransform(), attachmentToWorld);
+		AssertOnce(!"CBaseAnimating::GetAttachment: model missing");
+		return false;
+	}
+
+	if (iAttachment < 1 || iAttachment > pStudioHdr->GetNumAttachments())
+	{
+		MatrixCopy(EntityToWorldTransform(), attachmentToWorld);
+		//		Assert(!"CBaseAnimating::GetAttachment: invalid attachment index");
+		return false;
+	}
+
+	const mstudioattachment_t& pattachment = pStudioHdr->pAttachment(iAttachment - 1);
+	int iBone = pStudioHdr->GetAttachmentBone(iAttachment - 1);
+
+	matrix3x4_t bonetoworld;
+	GetHitboxBoneTransform(iBone, bonetoworld);
+	if ((pattachment.flags & ATTACHMENT_FLAG_WORLD_ALIGN) == 0)
+	{
+		ConcatTransforms(bonetoworld, pattachment.local, attachmentToWorld);
+	}
+	else
+	{
+		Vector vecLocalBonePos, vecWorldBonePos;
+		MatrixGetColumn(pattachment.local, 3, vecLocalBonePos);
+		VectorTransform(vecLocalBonePos, bonetoworld, vecWorldBonePos);
+
+		SetIdentityMatrix(attachmentToWorld);
+		MatrixSetColumn(vecWorldBonePos, 3, attachmentToWorld);
+	}
+
+	return true;
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: Returns the world location and world angles of an attachment
+// Input  : attachment index
+// Output :	location and angles
+//-----------------------------------------------------------------------------
+bool CEngineObjectInternal::GetAttachment(int iAttachment, Vector& absOrigin, QAngle& absAngles)
+{
+	matrix3x4_t attachmentToWorld;
+
+	bool bRet = GetAttachment(iAttachment, attachmentToWorld);
+	MatrixAngles(attachmentToWorld, absAngles, absOrigin);
+	return bRet;
+}
+
 void CEnginePlayerInternal::VPhysicsDestroyObject()
 {
 	// Since CBasePlayer aliases its pointer to the physics object, tell CBaseEntity to 
@@ -8731,18 +8820,18 @@ CEngineVehicleInternal::~CEngineVehicleInternal()
 //-----------------------------------------------------------------------------
 //inline int CEngineVehicleInternal::LookupPoseParameter(const char* szName)
 //{
-//	return m_pOuter->GetEngineObject()->LookupPoseParameter(szName);
+//	return LookupPoseParameter(szName);
 //}
 //
 //inline float CEngineVehicleInternal::GetPoseParameter(int iParameter)
 //{
-//	return m_pOuter->GetEngineObject()->GetPoseParameter(iParameter);
+//	return GetPoseParameter(iParameter);
 //}
 //
 //inline float CEngineVehicleInternal::SetPoseParameter(int iParameter, float flValue)
 //{
 //	Assert(IsFinite(flValue));
-//	return m_pOuter->GetEngineObject()->SetPoseParameter(iParameter, flValue);
+//	return SetPoseParameter(iParameter, flValue);
 //}
 
 //inline bool CEngineVehicleInternal::GetAttachment(const char* szName, Vector& origin, QAngle& angles)
@@ -8789,7 +8878,7 @@ bool CEngineVehicleInternal::ParseVehicleScript(const char* pScriptName, solid_t
 	m_debugRadius = vehicle.axles[0].wheels.radius;
 	CalcWheelData(vehicle);
 
-	PhysModelParseSolid(solid, m_pOuter, m_pOuter->GetEngineObject()->GetModelIndex());
+	PhysModelParseSolid(solid, m_pOuter, GetModelIndex());
 
 	// Allow the script to shift the center of mass
 	if (vehicle.body.massCenterOverride != vec3_origin)
@@ -8817,10 +8906,10 @@ void CEngineVehicleInternal::CalcWheelData(vehicleparams_t& vehicle)
 	SetPoseParameter(m_poseParameters[VEH_RL_WHEEL_HEIGHT], 0);
 	SetPoseParameter(m_poseParameters[VEH_RR_WHEEL_HEIGHT], 0);
 	InvalidateBoneCache();
-	if (m_pOuter->GetAttachment("wheel_fl", left, dummy) && m_pOuter->GetAttachment("wheel_fr", right, dummy))
+	if (GetAttachment("wheel_fl", left, dummy) && GetAttachment("wheel_fr", right, dummy))
 	{
-		VectorITransform(left, m_pOuter->GetEngineObject()->EntityToWorldTransform(), left);
-		VectorITransform(right, m_pOuter->GetEngineObject()->EntityToWorldTransform(), right);
+		VectorITransform(left, EntityToWorldTransform(), left);
+		VectorITransform(right, EntityToWorldTransform(), right);
 		Vector center = (left + right) * 0.5;
 		vehicle.axles[0].offset = center;
 		vehicle.axles[0].wheelOffset = right - center;
@@ -8829,10 +8918,10 @@ void CEngineVehicleInternal::CalcWheelData(vehicleparams_t& vehicle)
 		m_wheelBaseHeight[1] = right.z;
 	}
 
-	if (m_pOuter->GetAttachment("wheel_rl", left, dummy) && m_pOuter->GetAttachment("wheel_rr", right, dummy))
+	if (GetAttachment("wheel_rl", left, dummy) && GetAttachment("wheel_rr", right, dummy))
 	{
-		VectorITransform(left, m_pOuter->GetEngineObject()->EntityToWorldTransform(), left);
-		VectorITransform(right, m_pOuter->GetEngineObject()->EntityToWorldTransform(), right);
+		VectorITransform(left, EntityToWorldTransform(), left);
+		VectorITransform(right, EntityToWorldTransform(), right);
 		Vector center = (left + right) * 0.5;
 		vehicle.axles[1].offset = center;
 		vehicle.axles[1].wheelOffset = right - center;
@@ -8845,20 +8934,20 @@ void CEngineVehicleInternal::CalcWheelData(vehicleparams_t& vehicle)
 	SetPoseParameter(m_poseParameters[VEH_RL_WHEEL_HEIGHT], 1);
 	SetPoseParameter(m_poseParameters[VEH_RR_WHEEL_HEIGHT], 1);
 	InvalidateBoneCache();
-	if (m_pOuter->GetAttachment("wheel_fl", left, dummy) && m_pOuter->GetAttachment("wheel_fr", right, dummy))
+	if (GetAttachment("wheel_fl", left, dummy) && GetAttachment("wheel_fr", right, dummy))
 	{
-		VectorITransform(left, m_pOuter->GetEngineObject()->EntityToWorldTransform(), left);
-		VectorITransform(right, m_pOuter->GetEngineObject()->EntityToWorldTransform(), right);
+		VectorITransform(left, EntityToWorldTransform(), left);
+		VectorITransform(right, EntityToWorldTransform(), right);
 		// Cache the height range of the wheels in body space
 		m_wheelTotalHeight[0] = m_wheelBaseHeight[0] - left.z;
 		m_wheelTotalHeight[1] = m_wheelBaseHeight[1] - right.z;
 		vehicle.axles[0].wheels.springAdditionalLength = m_wheelTotalHeight[0];
 	}
 
-	if (m_pOuter->GetAttachment("wheel_rl", left, dummy) && m_pOuter->GetAttachment("wheel_rr", right, dummy))
+	if (GetAttachment("wheel_rl", left, dummy) && GetAttachment("wheel_rr", right, dummy))
 	{
-		VectorITransform(left, m_pOuter->GetEngineObject()->EntityToWorldTransform(), left);
-		VectorITransform(right, m_pOuter->GetEngineObject()->EntityToWorldTransform(), right);
+		VectorITransform(left, EntityToWorldTransform(), left);
+		VectorITransform(right, EntityToWorldTransform(), right);
 		// Cache the height range of the wheels in body space
 		m_wheelTotalHeight[2] = m_wheelBaseHeight[0] - left.z;
 		m_wheelTotalHeight[3] = m_wheelBaseHeight[1] - right.z;
@@ -8868,7 +8957,7 @@ void CEngineVehicleInternal::CalcWheelData(vehicleparams_t& vehicle)
 	{
 		if (m_wheelTotalHeight[i] == 0.0f)
 		{
-			DevWarning("Vehicle %s has invalid wheel attachment for %s - no movement\n", STRING(m_pOuter->GetEngineObject()->GetModelName()), pWheelAttachments[i]);
+			DevWarning("Vehicle %s has invalid wheel attachment for %s - no movement\n", STRING(GetModelName()), pWheelAttachments[i]);
 			m_wheelTotalHeight[i] = 1.0f;
 		}
 	}
@@ -8880,19 +8969,19 @@ void CEngineVehicleInternal::CalcWheelData(vehicleparams_t& vehicle)
 	InvalidateBoneCache();
 
 	// Get raytrace offsets if they exist.
-	if (m_pOuter->GetAttachment("raytrace_fl", left, dummy) && m_pOuter->GetAttachment("raytrace_fr", right, dummy))
+	if (GetAttachment("raytrace_fl", left, dummy) && GetAttachment("raytrace_fr", right, dummy))
 	{
-		VectorITransform(left, m_pOuter->GetEngineObject()->EntityToWorldTransform(), left);
-		VectorITransform(right, m_pOuter->GetEngineObject()->EntityToWorldTransform(), right);
+		VectorITransform(left, EntityToWorldTransform(), left);
+		VectorITransform(right, EntityToWorldTransform(), right);
 		Vector center = (left + right) * 0.5;
 		vehicle.axles[0].raytraceCenterOffset = center;
 		vehicle.axles[0].raytraceOffset = right - center;
 	}
 
-	if (m_pOuter->GetAttachment("raytrace_rl", left, dummy) && m_pOuter->GetAttachment("raytrace_rr", right, dummy))
+	if (GetAttachment("raytrace_rl", left, dummy) && GetAttachment("raytrace_rr", right, dummy))
 	{
-		VectorITransform(left, m_pOuter->GetEngineObject()->EntityToWorldTransform(), left);
-		VectorITransform(right, m_pOuter->GetEngineObject()->EntityToWorldTransform(), right);
+		VectorITransform(left, EntityToWorldTransform(), left);
+		VectorITransform(right, EntityToWorldTransform(), right);
 		Vector center = (left + right) * 0.5;
 		vehicle.axles[1].raytraceCenterOffset = center;
 		vehicle.axles[1].raytraceOffset = right - center;
@@ -8957,7 +9046,7 @@ bool CEngineVehicleInternal::Initialize(const char* pVehicleScript, unsigned int
 
 	m_flMaxSpeed = vehicle.engine.maxSpeed;
 
-	IPhysicsObject* pBody = m_pOuter->GetEngineObject()->VPhysicsInitNormal(SOLID_VPHYSICS, 0, false, &solid);
+	IPhysicsObject* pBody = VPhysicsInitNormal(SOLID_VPHYSICS, 0, false, &solid);
 	PhysSetGameFlags(pBody, FVPHYSICS_NO_SELF_COLLISIONS | FVPHYSICS_MULTIOBJECT_ENTITY);
 	m_pVehicle = physenv->CreateVehicleController(pBody, vehicle, nVehicleType, physgametrace);
 	m_wheelCount = m_pVehicle->GetWheelCount();
@@ -9379,7 +9468,7 @@ void CEngineVehicleInternal::VPhysicsUpdate(IPhysicsObject* pPhysics)
 			pPhysics->GetPosition(&m_wheelPosition[i], &m_wheelRotation[i]);
 
 			// transform the wheel into body space
-			VectorITransform(m_wheelPosition[i], m_pOuter->GetEngineObject()->EntityToWorldTransform(), tmp);
+			VectorITransform(m_wheelPosition[i], EntityToWorldTransform(), tmp);
 			SetPoseParameter(m_poseParameters[VEH_FL_WHEEL_HEIGHT + i], (m_wheelBaseHeight[i] - tmp.z) / m_wheelTotalHeight[i]);
 			SetPoseParameter(m_poseParameters[VEH_FL_WHEEL_SPIN + i], -m_wheelRotation[i].z);
 			return;
@@ -9398,7 +9487,7 @@ void CEngineVehicleInternal::GetVehicleViewPosition(const char* pViewAttachment,
 	matrix3x4_t vehicleEyePosToWorld;
 	Vector vehicleEyeOrigin;
 	QAngle vehicleEyeAngles;
-	m_pOuter->GetAttachment(pViewAttachment, vehicleEyeOrigin, vehicleEyeAngles);
+	GetAttachment(pViewAttachment, vehicleEyeOrigin, vehicleEyeAngles);
 	AngleMatrix(vehicleEyeAngles, vehicleEyePosToWorld);
 
 #ifdef HL2_DLL

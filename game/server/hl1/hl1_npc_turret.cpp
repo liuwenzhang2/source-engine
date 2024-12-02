@@ -1480,7 +1480,7 @@ void CNPC_Sentry::Event_Killed( const CTakeDamageInfo &info )
 
 	Vector vecSrc;
 	QAngle vecAng;
-	GetAttachment( 2, vecSrc, vecAng );
+	GetEngineObject()->GetAttachment( 2, vecSrc, vecAng );
 	
 	te->Smoke( filter, 0.0, &vecSrc,
 		g_sModelIndexSmoke,

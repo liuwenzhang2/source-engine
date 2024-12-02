@@ -727,7 +727,7 @@ void CCannonServerVehicle::GetVehicleViewPosition( int nRole, Vector *pAbsOrigin
 	matrix3x4_t vehicleEyePosToWorld;
 	Vector vehicleEyeOrigin;
 	QAngle vehicleEyeAngles;
-	GetCannon()->GetAttachment( "vehicle_driver_eyes", vehicleEyeOrigin, vehicleEyeAngles );
+	GetCannon()->GetEngineObject()->GetAttachment( "vehicle_driver_eyes", vehicleEyeOrigin, vehicleEyeAngles );
 	AngleMatrix( vehicleEyeAngles, vehicleEyePosToWorld );
 
 	// Compute the relative rotation between the unperterbed eye attachment + the eye angles

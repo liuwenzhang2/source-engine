@@ -65,15 +65,7 @@ struct RagdollInfo_t
 };
 
 
-class CAttachmentData
-{
-public:
-	matrix3x4_t	m_AttachmentToWorld;
-	QAngle	m_angRotation;
-	Vector	m_vOriginVelocity;
-	int		m_nLastFramecount : 31;
-	int		m_bAnglesComputed : 1;
-};
+
 
 
 typedef unsigned int			ClientSideAnimationListHandle_t;
@@ -168,7 +160,6 @@ public:
 	//virtual void ChildLayerBlend( Vector pos[], Quaternion q[], float currentTime, int boneMask );
 
 	// Attachments
-	int		LookupAttachment( const char *pAttachmentName );
 	int		LookupRandomAttachment( const char *pAttachmentNameSubstring );
 
 
@@ -227,13 +218,10 @@ public:
 
 	// Attachments.
 	//bool							GetAttachment( const char *szName, Vector &absOrigin );
-	bool							GetAttachment( const char *szName, Vector &absOrigin, QAngle &absAngles );
 
 	// Inherited from C_BaseEntity
 	//virtual bool					GetAttachment( int number, Vector &origin );
-	virtual bool					GetAttachment( int number, Vector &origin, QAngle &angles );
-	virtual bool					GetAttachment( int number, matrix3x4_t &matrix );
-	virtual bool					GetAttachmentVelocity( int number, Vector &originVel, Quaternion &angleVel );
+
 	
 	// Returns the attachment in local space
 	bool							GetAttachmentLocal( int iAttachment, matrix3x4_t &attachmentToLocal );
@@ -357,10 +345,7 @@ public:
 	void							TermRopes();
 
 protected:
-	// View models scale their attachment positions to account for FOV. To get the unmodified
-	// attachment position (like if you're rendering something else during the view model's DrawModel call),
-	// use TransformViewModelAttachmentToWorld.
-	virtual void					FormatViewModelAttachment( int nAttachment, matrix3x4_t &attachmentToWorld ) {}
+	
 
 	
 
@@ -370,13 +355,11 @@ protected:
 	// Allow studio models to tell C_BaseEntity what their m_nBody value is
 	//virtual int						GetStudioBody( void ) { return m_nBody; }
 
-	virtual bool					CalcAttachments();
 
 private:
 
 	CBoneList*						RecordBones( IStudioHdr *hdr, matrix3x4_t *pBoneState );
 
-	bool							PutAttachment( int number, const matrix3x4_t &attachmentToWorld );
 
 	void							DelayedInitModelEffects( void );
 
@@ -456,10 +439,8 @@ private:
 	
 
 
-	// Calculated attachment points
-	CUtlVector<CAttachmentData>		m_Attachments;
+	
 
-	void							SetupBones_AttachmentHelper( IStudioHdr *pStudioHdr );
 
 
 

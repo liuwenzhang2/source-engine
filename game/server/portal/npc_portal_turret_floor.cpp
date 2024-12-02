@@ -264,10 +264,10 @@ void CNPC_Portal_FloorTurret::Spawn( void )
 { 
 	BaseClass::Spawn();
 
-	m_iBarrelAttachments[ 0 ] = LookupAttachment( "LFT_Gun1_Muzzle" );
-	m_iBarrelAttachments[ 1 ] = LookupAttachment( "RT_Gun1_Muzzle" );
-	m_iBarrelAttachments[ 2 ] = LookupAttachment( "LFT_Gun2_Muzzle" );
-	m_iBarrelAttachments[ 3 ] = LookupAttachment( "RT_Gun2_Muzzle" );
+	m_iBarrelAttachments[ 0 ] = GetEngineObject()->LookupAttachment( "LFT_Gun1_Muzzle" );
+	m_iBarrelAttachments[ 1 ] = GetEngineObject()->LookupAttachment( "RT_Gun1_Muzzle" );
+	m_iBarrelAttachments[ 2 ] = GetEngineObject()->LookupAttachment( "LFT_Gun2_Muzzle" );
+	m_iBarrelAttachments[ 3 ] = GetEngineObject()->LookupAttachment( "RT_Gun2_Muzzle" );
 
 	m_fSearchSpeed = RandomFloat( 1.0f, 1.4f );
 	m_fMovingTargetThreashold = 20.0f;
@@ -304,10 +304,10 @@ void CNPC_Portal_FloorTurret::Activate( void )
 
 	m_iLastState = TURRET_AUTO_SEARCHING;
 
-	m_iBarrelAttachments[ 0 ] = LookupAttachment( "LFT_Gun1_Muzzle" );
-	m_iBarrelAttachments[ 1 ] = LookupAttachment( "RT_Gun1_Muzzle" );
-	m_iBarrelAttachments[ 2 ] = LookupAttachment( "LFT_Gun2_Muzzle" );
-	m_iBarrelAttachments[ 3 ] = LookupAttachment( "RT_Gun2_Muzzle" );
+	m_iBarrelAttachments[ 0 ] = GetEngineObject()->LookupAttachment( "LFT_Gun1_Muzzle" );
+	m_iBarrelAttachments[ 1 ] = GetEngineObject()->LookupAttachment( "RT_Gun1_Muzzle" );
+	m_iBarrelAttachments[ 2 ] = GetEngineObject()->LookupAttachment( "LFT_Gun2_Muzzle" );
+	m_iBarrelAttachments[ 3 ] = GetEngineObject()->LookupAttachment( "RT_Gun2_Muzzle" );
 }
 
 void CNPC_Portal_FloorTurret::UpdateOnRemove( void )
@@ -539,7 +539,7 @@ void CNPC_Portal_FloorTurret::Shoot( const Vector &vecSrc, const Vector &vecDirT
 
 	// Shoot out of the left barrel if there's nothing solid between the turret's center and the muzzle
 	trace_t tr;
-	GetAttachment( m_iBarrelAttachments[ iBarrelIndex ], info.m_vecSrc, angBarrelDir );
+	GetEngineObject()->GetAttachment( m_iBarrelAttachments[ iBarrelIndex ], info.m_vecSrc, angBarrelDir );
 	Vector vecCenter = GetEngineObject()->GetAbsOrigin();
 	UTIL_TraceLine( vecCenter, info.m_vecSrc, MASK_SHOT, this, COLLISION_GROUP_NONE, &tr );
 	if ( !tr.m_pEnt || !((CBaseEntity*)tr.m_pEnt)->IsWorld() )
@@ -548,7 +548,7 @@ void CNPC_Portal_FloorTurret::Shoot( const Vector &vecSrc, const Vector &vecDirT
 	}
 
 	// Shoot out of the right barrel if there's nothing solid between the turret's center and the muzzle
-	GetAttachment( m_iBarrelAttachments[ iBarrelIndex + 1 ], info.m_vecSrc, angBarrelDir );
+	GetEngineObject()->GetAttachment( m_iBarrelAttachments[ iBarrelIndex + 1 ], info.m_vecSrc, angBarrelDir );
 	vecCenter = GetEngineObject()->GetAbsOrigin();
 	UTIL_TraceLine( vecCenter, info.m_vecSrc, MASK_SHOT, this, COLLISION_GROUP_NONE, &tr );
 	if ( !tr.m_pEnt || !((CBaseEntity*)tr.m_pEnt)->IsWorld() )
@@ -1518,8 +1518,8 @@ void CNPC_Portal_FloorTurret::RopesOn( void )
 		{
 			CFmtStr str;
 
-			int iStartIndex = LookupAttachment( str.sprintf( "Wire%i_start", iRope + 1 ) );
-			int iEndIndex = LookupAttachment( str.sprintf( "Wire%i_end", iRope + 1 ) );
+			int iStartIndex = GetEngineObject()->LookupAttachment( str.sprintf( "Wire%i_start", iRope + 1 ) );
+			int iEndIndex = GetEngineObject()->LookupAttachment( str.sprintf( "Wire%i_end", iRope + 1 ) );
 
 			m_hRopes[ iRope ] = CRopeKeyframe::Create( this, this, iStartIndex, iEndIndex );
 			if ( m_hRopes[ iRope ] )

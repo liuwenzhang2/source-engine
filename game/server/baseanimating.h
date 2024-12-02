@@ -132,13 +132,9 @@ public:
 	
 	void GetEyeballs( Vector &origin, QAngle &angles ); // ?? remove ??
 
-	int LookupAttachment( const char *szName );
 
 	// These return the attachment in world space
-	bool GetAttachment( const char *szName, Vector &absOrigin, QAngle &absAngles );
-	bool GetAttachment( int iAttachment, Vector &absOrigin, QAngle &absAngles );
-	int GetAttachmentBone( int iAttachment );
-	virtual bool GetAttachment( int iAttachment, matrix3x4_t &attachmentToWorld );
+	//bool GetAttachment( const char *szName, Vector &absOrigin, QAngle &absAngles );
 
 	// These return the attachment in the space of the entity
 	bool GetAttachmentLocal( const char *szName, Vector &origin, QAngle &angles );

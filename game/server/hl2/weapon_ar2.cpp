@@ -331,7 +331,7 @@ void CWeaponAR2::FireNPCPrimaryAttack( CBaseCombatCharacter *pOperator, bool bUs
 	if ( bUseWeaponAngles )
 	{
 		QAngle	angShootDir;
-		GetAttachment( LookupAttachment( "muzzle" ), vecShootOrigin, angShootDir );
+		GetEngineObject()->GetAttachment(GetEngineObject()->LookupAttachment( "muzzle" ), vecShootOrigin, angShootDir );
 		AngleVectors( angShootDir, &vecShootDir );
 	}
 	else 
@@ -373,7 +373,7 @@ void CWeaponAR2::FireNPCSecondaryAttack( CBaseCombatCharacter *pOperator, bool b
 	if ( bUseWeaponAngles )
 	{
 		QAngle	angShootDir;
-		GetAttachment( LookupAttachment( "muzzle" ), vecSrc, angShootDir );
+		GetEngineObject()->GetAttachment(GetEngineObject()->LookupAttachment( "muzzle" ), vecSrc, angShootDir );
 		AngleVectors( angShootDir, &vecAiming );
 	}
 	else 

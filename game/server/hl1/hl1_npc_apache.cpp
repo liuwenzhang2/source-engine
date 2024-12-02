@@ -461,7 +461,7 @@ bool CNPC_Apache::FireGun( )
 		
 	Vector posGun;
 	QAngle angGun;
-	GetAttachment( 1, posGun, angGun );
+	GetEngineObject()->GetAttachment( 1, posGun, angGun );
 
 	Vector vecTarget = (m_vecTargetPosition - posGun);
 
@@ -499,7 +499,7 @@ bool CNPC_Apache::FireGun( )
 
 	Vector posBarrel;
 	QAngle angBarrel;
-	GetAttachment( 0, posBarrel, angBarrel );
+	GetEngineObject()->GetAttachment( 0, posBarrel, angBarrel );
 
 	Vector forward;
 	AngleVectors( angBarrel + m_angGun, &forward );

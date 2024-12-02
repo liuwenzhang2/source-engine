@@ -4254,7 +4254,7 @@ void CSquadInsignia::Spawn()
 
 	if ( pOwner )
 	{
-		int attachment = pOwner->LookupAttachment( "eyes" );
+		int attachment = pOwner->GetEngineObject()->LookupAttachment( "eyes" );
 		if ( attachment )
 		{
 			GetEngineObject()->SetAbsAngles( GetOwnerEntity()->GetEngineObject()->GetAbsAngles() );

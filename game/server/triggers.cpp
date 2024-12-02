@@ -2534,7 +2534,7 @@ void CTriggerCamera::Enable( void )
 			}
 			else
 			{
-				m_iAttachmentIndex = m_hTarget->GetBaseAnimating()->LookupAttachment( STRING(m_iszTargetAttachment) );
+				m_iAttachmentIndex = m_hTarget->GetBaseAnimating()->GetEngineObject()->LookupAttachment( STRING(m_iszTargetAttachment) );
 				if ( m_iAttachmentIndex <= 0 )
 				{
 					Warning("%s could not find attachment %s on target %s.\n", GetClassname(), STRING(m_iszTargetAttachment), STRING(m_hTarget->GetEntityName()) );

@@ -1927,7 +1927,7 @@ void CNPC_RollerMine::ShockTarget( CBaseEntity *pOther )
 
 		if ( pAnimating && pAnimating->GetEngineObject()->GetModel() )
 		{
-			startAttach = pAnimating->LookupAttachment("beam_damage" );
+			startAttach = pAnimating->GetEngineObject()->LookupAttachment("beam_damage" );
 			pBeam->SetStartAttachment( startAttach );
 		}
 

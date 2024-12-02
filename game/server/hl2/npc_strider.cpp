@@ -570,7 +570,7 @@ void CNPC_Strider::SetupGlobalModelData()
 	gm_BodyHeightPoseParam = GetEngineObject()->LookupPoseParameter( "body_height" );
 	gm_YawControl = GetEngineObject()->LookupPoseParameter( "yaw" );
 	gm_PitchControl = GetEngineObject()->LookupPoseParameter( "pitch" );
-	gm_CannonAttachment = LookupAttachment( "BigGun" );
+	gm_CannonAttachment = GetEngineObject()->LookupAttachment( "BigGun" );
 
 	// BMCD: Get the conservative boxes from sequences
 	Vector mins, maxs;
@@ -690,7 +690,7 @@ void CNPC_Strider::Activate()
 	gm_BodyHeightPoseParam = GetEngineObject()->LookupPoseParameter( "body_height" );
 	gm_YawControl = GetEngineObject()->LookupPoseParameter( "yaw" );
 	gm_PitchControl = GetEngineObject()->LookupPoseParameter( "pitch" );
-	gm_CannonAttachment = LookupAttachment( "BigGun" );
+	gm_CannonAttachment = GetEngineObject()->LookupAttachment( "BigGun" );
 
 	if ( gm_zCannonDist == 0 )
 	{
@@ -3867,7 +3867,7 @@ void CNPC_Strider::DoMuzzleFlash( void )
 	
 	CEffectData data;
 
-	data.m_nAttachmentIndex = LookupAttachment( "MiniGun" );
+	data.m_nAttachmentIndex = GetEngineObject()->LookupAttachment( "MiniGun" );
 	data.m_nEntIndex = entindex();
 	DispatchEffect( "StriderMuzzleFlash", data );
 }
@@ -3881,7 +3881,7 @@ void CNPC_Strider::ShootMinigun( const Vector *pTarget, float aimError, const Ve
 		Vector muzzlePos;
 		QAngle muzzleAng;
 
-		GetAttachment( "minigun", muzzlePos, muzzleAng );
+		GetEngineObject()->GetAttachment( "minigun", muzzlePos, muzzleAng );
 		
 		Vector vecShootDir = *pTarget - muzzlePos;
 		VectorNormalize( vecShootDir );
@@ -4073,7 +4073,7 @@ bool CNPC_Strider::AimCannonAt( CBaseEntity *pEntity, float flInterval )
 		return true;
 
 	matrix3x4_t gunMatrix;
-	GetAttachment( gm_CannonAttachment, gunMatrix );
+	GetEngineObject()->GetAttachment( gm_CannonAttachment, gunMatrix );
 
 	// transform the enemy into gun space
 	m_vecHitPos = pEntity->GetEngineObject()->GetAbsOrigin();
@@ -4301,7 +4301,7 @@ Vector CNPC_Strider::LeftFootHit( float eventtime )
 	Vector footPosition;
 	QAngle angles;
 
-	GetAttachment( "left foot", footPosition, angles );
+	GetEngineObject()->GetAttachment( "left foot", footPosition, angles );
 
 	if ( hl2_episodic.GetBool() )
 	{
@@ -4972,8 +4972,8 @@ void CStriderMinigun::AimAtPoint( IStriderMinigunHost *pHost, const Vector &vecP
 	matrix3x4_t gunMatrix;
 	CAI_BaseNPC *pOwner = pHost->GetEntity();
 
-	int mingunAttachment = pOwner->LookupAttachment( "minigunbase" );
-	pOwner->GetAttachment( mingunAttachment, gunMatrix );
+	int mingunAttachment = pOwner->GetEngineObject()->LookupAttachment( "minigunbase" );
+	pOwner->GetEngineObject()->GetAttachment( mingunAttachment, gunMatrix );
 
 	Vector forward, pos;
 	MatrixGetColumn( gunMatrix, 0, forward );

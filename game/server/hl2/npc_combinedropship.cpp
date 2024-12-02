@@ -698,7 +698,7 @@ void CCombineDropshipContainer::AddSmokeTrail( const Vector &vecPos )
 	// See if there's an attachment for this smoke trail
 	char buf[32];
 	Q_snprintf( buf, 32, "damage%d", m_nSmokeTrailCount );
-	int nAttachment = LookupAttachment( buf );
+	int nAttachment = GetEngineObject()->LookupAttachment( buf );
 
 	++m_nSmokeTrailCount;
 
@@ -895,12 +895,12 @@ void CNPC_CombineDropship::Spawn( void )
 			m_hContainer->GetEngineObject()->SetGroundEntity( NULL );
 
 			// Cache off container's attachment points
-			m_iAttachmentTroopDeploy = m_hContainer->LookupAttachment( "deploy_landpoint" );
-			m_iAttachmentDeployStart = m_hContainer->LookupAttachment( "Deploy_Start" );
-			m_iMuzzleAttachment = m_hContainer->LookupAttachment( "muzzle" );
-			m_iMachineGunBaseAttachment = m_hContainer->LookupAttachment( "gun_base" );
+			m_iAttachmentTroopDeploy = m_hContainer->GetEngineObject()->LookupAttachment( "deploy_landpoint" );
+			m_iAttachmentDeployStart = m_hContainer->GetEngineObject()->LookupAttachment( "Deploy_Start" );
+			m_iMuzzleAttachment = m_hContainer->GetEngineObject()->LookupAttachment( "muzzle" );
+			m_iMachineGunBaseAttachment = m_hContainer->GetEngineObject()->LookupAttachment( "gun_base" );
 			// NOTE: gun_ref must have the same position as gun_base, but rotates with the gun
-			m_iMachineGunRefAttachment = m_hContainer->LookupAttachment( "gun_ref" );
+			m_iMachineGunRefAttachment = m_hContainer->GetEngineObject()->LookupAttachment( "gun_ref" );
 
 			m_poseWeapon_Pitch = m_hContainer->GetEngineObject()->LookupPoseParameter( "weapon_pitch" );
 			m_poseWeapon_Yaw = m_hContainer->GetEngineObject()->LookupPoseParameter( "weapon_yaw" );
@@ -2401,7 +2401,7 @@ void CNPC_CombineDropship::SpawnTroop( void )
 	// Scare NPCs away from our deploy endpoint to keep them away
 	Vector vecDeployEndPoint;
 	QAngle vecDeployEndAngles;
-	m_hContainer->GetAttachment( m_iAttachmentTroopDeploy, vecDeployEndPoint, vecDeployEndAngles );
+	m_hContainer->GetEngineObject()->GetAttachment( m_iAttachmentTroopDeploy, vecDeployEndPoint, vecDeployEndAngles );
 	vecDeployEndPoint = GetDropoffFinishPosition( vecDeployEndPoint, NULL, vecNPCMins, vecNPCMaxs );
 	CSoundEnt::InsertSound( SOUND_DANGER, vecDeployEndPoint, 120.0f, 2.0f, this );
 
@@ -2428,7 +2428,7 @@ void CNPC_CombineDropship::SpawnTroop( void )
 	// Get the spawn point inside the container
 	Vector vecSpawnOrigin;
 	QAngle vecSpawnAngles;
-	m_hContainer->GetAttachment( m_iAttachmentDeployStart, vecSpawnOrigin, vecSpawnAngles );
+	m_hContainer->GetEngineObject()->GetAttachment( m_iAttachmentDeployStart, vecSpawnOrigin, vecSpawnAngles );
 
 	// Spawn the templated NPC
 	CBaseEntity *pEntity = NULL;
@@ -2809,10 +2809,10 @@ void CNPC_CombineDropship::UpdateContainerGunFacing( Vector &vecMuzzle, Vector &
 	Vector vecBarrelPos, vecWorldBarrelPos;
 	QAngle worldBarrelAngle, vecAngles;
 	matrix3x4_t matRefToWorld;
-	m_hContainer->GetAttachment( m_iMuzzleAttachment, vecMuzzle, vecAngles );
+	m_hContainer->GetEngineObject()->GetAttachment( m_iMuzzleAttachment, vecMuzzle, vecAngles );
 	vecWorldBarrelPos = vecMuzzle;
 	worldBarrelAngle = vecAngles;
-	m_hContainer->GetAttachment( m_iMachineGunRefAttachment, matRefToWorld );
+	m_hContainer->GetEngineObject()->GetAttachment( m_iMachineGunRefAttachment, matRefToWorld );
 	VectorITransform( vecWorldBarrelPos, matRefToWorld, vecBarrelPos );
 
 	EntityMatrix parentMatrix;

@@ -196,17 +196,17 @@ void CPropAPC::Activate()
 {
 	BaseClass::Activate();
 
-	m_nRocketAttachment = LookupAttachment( "cannon_muzzle" );
-	m_nMachineGunMuzzleAttachment = LookupAttachment( "muzzle" );
-	m_nMachineGunBaseAttachment = LookupAttachment( "gun_base" );
+	m_nRocketAttachment = GetEngineObject()->LookupAttachment( "cannon_muzzle" );
+	m_nMachineGunMuzzleAttachment = GetEngineObject()->LookupAttachment( "muzzle" );
+	m_nMachineGunBaseAttachment = GetEngineObject()->LookupAttachment( "gun_base" );
 
 	// NOTE: gun_ref must have the same position as gun_base, but rotates with the gun
-	int nMachineGunRefAttachment = LookupAttachment( "gun_def" );
+	int nMachineGunRefAttachment = GetEngineObject()->LookupAttachment( "gun_def" );
 
 	Vector vecWorldBarrelPos;
 	matrix3x4_t matRefToWorld;
 	GetAttachment( m_nMachineGunMuzzleAttachment, vecWorldBarrelPos );
-	GetAttachment( nMachineGunRefAttachment, matRefToWorld );
+	GetEngineObject()->GetAttachment( nMachineGunRefAttachment, matRefToWorld );
 	VectorITransform( vecWorldBarrelPos, matRefToWorld, m_vecBarrelPos );
 }
 
@@ -306,7 +306,7 @@ void CPropAPC::AddSmokeTrail( const Vector &vecPos )
 	// See if there's an attachment for this smoke trail
 	char buf[32];
 	Q_snprintf( buf, 32, "damage%d", m_nSmokeTrailCount );
-	int nAttachment = LookupAttachment( buf );
+	int nAttachment = GetEngineObject()->LookupAttachment( buf );
 
 	++m_nSmokeTrailCount;
 

@@ -174,7 +174,7 @@ void CWeaponGarand::PrimaryAttack( void )
 #ifndef CLIENT_DLL
 		CEffectData data;
 		data.m_nHitBox = EJECTBRASS_GARANDCLIP;
-		GetPlayerOwner()->GetAttachment( 2, data.m_vOrigin, data.m_vAngles  );
+		GetPlayerOwner()->GetEngineObject()->GetAttachment( 2, data.m_vOrigin, data.m_vAngles  );
 	
 		// shoot it up in the air
 		data.m_vAngles.x = -90;

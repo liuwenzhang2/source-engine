@@ -163,7 +163,7 @@ void C_VGuiScreen::GetAimEntOrigin( IClientEntity *pAttachedTo, Vector *pOrigin,
 		
 		if ( IsAttachedToViewModel() )
 		{
-			FormatViewModelAttachment( *pOrigin, true );
+			::FormatViewModelAttachment( *pOrigin, true );
 		}
 	}
 	else

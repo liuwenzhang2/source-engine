@@ -266,7 +266,7 @@ void DispatchParticleEffect( const char *pszParticleName, ParticleAttachment_t i
 	if ( pEntity && pEntity->GetBaseAnimating() )
 	{
 		// Find the attachment point index
-		iAttachment = pEntity->GetBaseAnimating()->LookupAttachment( pszAttachmentName );
+		iAttachment = pEntity->GetBaseAnimating()->GetEngineObject()->LookupAttachment( pszAttachmentName );
 		if ( iAttachment <= 0 )
 		{
 			Warning("Model '%s' doesn't have attachment '%s' to attach particle system '%s' to.\n", STRING(pEntity->GetBaseAnimating()->GetEngineObject()->GetModelName()), pszAttachmentName, pszParticleName );
@@ -329,7 +329,7 @@ void DispatchParticleEffect( const char *pszParticleName, ParticleAttachment_t i
 	if ( pEntity && pEntity->GetBaseAnimating() )
 	{
 		// Find the attachment point index
-		iAttachment = pEntity->GetBaseAnimating()->LookupAttachment( pszAttachmentName );
+		iAttachment = pEntity->GetBaseAnimating()->GetEngineObject()->LookupAttachment( pszAttachmentName );
 		if ( iAttachment <= 0 )
 		{
 			Warning("Model '%s' doesn't have attachment '%s' to attach particle system '%s' to.\n", STRING(pEntity->GetBaseAnimating()->GetEngineObject()->GetModelName()), pszAttachmentName, pszParticleName );

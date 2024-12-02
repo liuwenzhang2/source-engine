@@ -98,7 +98,7 @@ void CGrenadeTrail::FollowEntity( CBaseEntity *pEntity, const char *pAttachmentN
 	// For attachments
 	if ( pAttachmentName && pEntity && pEntity->GetBaseAnimating() )
 	{
-		m_nAttachment = pEntity->GetBaseAnimating()->LookupAttachment( pAttachmentName );
+		m_nAttachment = pEntity->GetBaseAnimating()->GetEngineObject()->LookupAttachment( pAttachmentName );
 	}
 	else
 	{

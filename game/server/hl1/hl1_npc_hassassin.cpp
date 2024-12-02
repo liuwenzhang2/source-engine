@@ -296,7 +296,7 @@ int CNPC_HAssassin::RangeAttack2Conditions ( float flDot, float flDist )
 		Vector vTossPos;
 		QAngle vAngles;
 
-		GetAttachment( "grenadehand", vTossPos, vAngles );
+		GetEngineObject()->GetAttachment( "grenadehand", vTossPos, vAngles );
 
 		Vector vecToss = VecCheckThrow( this, vTossPos, GetEnemy()->WorldSpaceCenter(), flDist, 0.5 ); // use dist as speed to get there in 1 second
 
@@ -536,7 +536,7 @@ void CNPC_HAssassin::HandleAnimEvent( animevent_t *pEvent )
 			Vector vTossPos;
 			QAngle vAngles;
 
-			GetAttachment( "grenadehand", vTossPos, vAngles );
+			GetEngineObject()->GetAttachment( "grenadehand", vTossPos, vAngles );
 
 			CHandGrenade *pGrenade = (CHandGrenade*)Create( "grenade_hand", vTossPos, vec3_angle );
 			if ( pGrenade )
@@ -579,7 +579,7 @@ void CNPC_HAssassin::Shoot ( void )
 		return;
 	}
 
-	GetAttachment( "guntip", vecShootOrigin, vAngles );
+	GetEngineObject()->GetAttachment( "guntip", vecShootOrigin, vAngles );
 	
 	Vector vecShootDir = GetShootEnemyDir( vecShootOrigin );
 

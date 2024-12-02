@@ -3525,7 +3525,7 @@ void CBaseEntity::SetParentAttachment( const char *szInputName, const char *szAt
 	}
 
 	// Lookup the attachment
-	int iAttachment = pAnimating->LookupAttachment( szAttachment );
+	int iAttachment = pAnimating->GetEngineObject()->LookupAttachment( szAttachment );
 	if ( iAttachment <= 0 )
 	{
 		Warning("ERROR: Tried to %s for entity %s (%s), but it has no attachment named %s.\n", szInputName, GetClassname(), GetDebugName(), szAttachment );

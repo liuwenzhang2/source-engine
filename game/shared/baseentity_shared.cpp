@@ -1564,7 +1564,7 @@ void CBaseEntity::ComputeTracerStartPosition( const Vector &vecShotSrc, Vector *
 				Vector vecMuzzle;
 				QAngle vecMuzzleAngles;
 
-				if ( pWeapon->GetAttachment( 1, vecMuzzle, vecMuzzleAngles ) )
+				if ( pWeapon->GetEngineObject()->GetAttachment( 1, vecMuzzle, vecMuzzleAngles ) )
 				{
 					*pVecTracerStart = vecMuzzle;
 				}

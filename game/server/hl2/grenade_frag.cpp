@@ -167,7 +167,7 @@ void CGrenadeFrag::CreateEffects( void )
 	if( !m_pMainGlow )
 		m_pMainGlow = CSprite::SpriteCreate( "sprites/redglow1.vmt", GetEngineObject()->GetLocalOrigin(), false );
 
-	int nAttachment = LookupAttachment( "fuse" );
+	int nAttachment = GetEngineObject()->LookupAttachment( "fuse" );
 
 	if ( m_pMainGlow != NULL )
 	{

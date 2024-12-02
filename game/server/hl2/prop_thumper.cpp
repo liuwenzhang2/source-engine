@@ -120,7 +120,7 @@ void CPropThumper::Spawn( void )
 		GetEngineObject()->SetPlaybackRate(random->RandomFloat( 0.0f, 1.0f));
 	}
 
-	m_iHammerAttachment = LookupAttachment( "hammer" );
+	m_iHammerAttachment = GetEngineObject()->LookupAttachment( "hammer" );
 	
 	CAntlionRepellant *pRepellant = (CAntlionRepellant*)gEntList.CreateEntityByName( "point_antlion_repellant" );
 

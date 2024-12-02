@@ -696,7 +696,7 @@ void CPropJeepEpisodic::CreateCargoTrigger( void )
 	if ( m_hCargoTrigger != NULL )
 		return;
 
-	int nAttachment = LookupAttachment( "cargo" );
+	int nAttachment = GetEngineObject()->LookupAttachment( "cargo" );
 	if ( nAttachment )
 	{
 		Vector vecAttachOrigin;
@@ -1003,7 +1003,7 @@ void CPropJeepEpisodic::UpdateCargoEntry( void )
 	}
 
 	// Get our target point
-	int nAttachment = LookupAttachment( "cargo" );
+	int nAttachment = GetEngineObject()->LookupAttachment( "cargo" );
 	Vector vecTarget, vecOut;
 	QAngle vecAngles;
 	GetAttachmentLocal( nAttachment, vecTarget, vecAngles );
@@ -1388,7 +1388,7 @@ void CPropJeepEpisodic::CreateHazardLights( void )
 			if ( m_hHazardLights[i] )
 			{
 				m_hHazardLights[i]->SetTransparency( kRenderWorldGlow, 255, 220, 40, 255, kRenderFxNoDissipation );
-				m_hHazardLights[i]->SetAttachment( this, LookupAttachment( s_szAttach[i] ) );
+				m_hHazardLights[i]->SetAttachment( this, GetEngineObject()->LookupAttachment( s_szAttach[i] ) );
 				m_hHazardLights[i]->SetGlowProxySize( 2.0f );
 				m_hHazardLights[i]->TurnOff();
 				if ( i < 2 )
@@ -1474,14 +1474,14 @@ void CPropJeepEpisodic::SpawnRadarPanel()
 	Assert( pEntityToSpawnOn );
 
 	// Lookup the attachment point...
-	int nLLAttachmentIndex = pEntityToSpawnOn->LookupAttachment(pOrgLL);
+	int nLLAttachmentIndex = pEntityToSpawnOn->GetEngineObject()->LookupAttachment(pOrgLL);
 
 	if (nLLAttachmentIndex <= 0)
 	{
 		return;
 	}
 
-	int nURAttachmentIndex = pEntityToSpawnOn->LookupAttachment(pOrgUR);
+	int nURAttachmentIndex = pEntityToSpawnOn->GetEngineObject()->LookupAttachment(pOrgUR);
 	if (nURAttachmentIndex <= 0)
 	{
 		return;
@@ -1492,14 +1492,14 @@ void CPropJeepEpisodic::SpawnRadarPanel()
 
 	// Compute the screen size from the attachment points...
 	matrix3x4_t	panelToWorld;
-	pEntityToSpawnOn->GetAttachment( nLLAttachmentIndex, panelToWorld );
+	pEntityToSpawnOn->GetEngineObject()->GetAttachment( nLLAttachmentIndex, panelToWorld );
 
 	matrix3x4_t	worldToPanel;
 	MatrixInvert( panelToWorld, worldToPanel );
 
 	// Now get the lower right position + transform into panel space
 	Vector lr, lrlocal;
-	pEntityToSpawnOn->GetAttachment( nURAttachmentIndex, panelToWorld );
+	pEntityToSpawnOn->GetEngineObject()->GetAttachment( nURAttachmentIndex, panelToWorld );
 	MatrixGetColumn( panelToWorld, 3, lr );
 	VectorTransform( lr, worldToPanel, lrlocal );
 

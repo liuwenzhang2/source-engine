@@ -480,7 +480,7 @@ bool CNPC_CombineCamera::UpdateFacing()
 	bool  bMoved = false;
 	matrix3x4_t localToWorld;
 	
-	GetAttachment(LookupAttachment("eyes"), localToWorld);
+	GetEngineObject()->GetAttachment(GetEngineObject()->LookupAttachment("eyes"), localToWorld);
 
 	Vector vecGoalDir;
 	AngleVectors(m_vecGoalAngles, &vecGoalDir );

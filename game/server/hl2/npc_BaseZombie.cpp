@@ -1674,7 +1674,7 @@ void CNPC_BaseZombie::HandleAnimEvent( animevent_t *pEvent )
 		QAngle angles;
 		Vector vecHeadCrabPosition;
 
-		int iCrabAttachment = LookupAttachment( "headcrab" );
+		int iCrabAttachment = GetEngineObject()->LookupAttachment( "headcrab" );
 		int iSpeed = atoi( token );
 
 		GetInteractionPartner()->GetEngineObject()->GetHitboxBonePosition( boneIndex, vecBonePosition, angles );
@@ -2434,7 +2434,7 @@ void CNPC_BaseZombie::ReleaseHeadcrab( const Vector &vecOrigin, const Vector &ve
 			CBaseAnimating *pAnimatingGib = dynamic_cast<CBaseAnimating*>(pGib);
 
 			// don't collide with this thing ever
-			int iCrabAttachment = LookupAttachment( "headcrab" );
+			int iCrabAttachment = GetEngineObject()->LookupAttachment( "headcrab" );
 			if (iCrabAttachment > 0 && pAnimatingGib )
 			{
 				SetHeadcrabSpawnLocation( iCrabAttachment, pAnimatingGib );
@@ -2497,7 +2497,7 @@ void CNPC_BaseZombie::ReleaseHeadcrab( const Vector &vecOrigin, const Vector &ve
 
 		// FIXME: npc's with multiple headcrabs will need some way to query different attachments.
 		// NOTE: this has till after spawn is called so that the model is set up
-		int iCrabAttachment = LookupAttachment( "headcrab" );
+		int iCrabAttachment = GetEngineObject()->LookupAttachment( "headcrab" );
 		if (iCrabAttachment > 0)
 		{
 			SetHeadcrabSpawnLocation( iCrabAttachment, pCrab );
@@ -2564,7 +2564,7 @@ void CNPC_BaseZombie::SetHeadcrabSpawnLocation( int iCrabAttachment, CBaseAnimat
 
 	// get world location of intended headcrab root bone
 	matrix3x4_t attachmentToWorld;
-	GetAttachment( iCrabAttachment, attachmentToWorld );
+	GetEngineObject()->GetAttachment( iCrabAttachment, attachmentToWorld );
 
 	// find offset of root bone from origin 
 	pCrab->GetEngineObject()->SetAbsOrigin( Vector( 0, 0, 0 ) );
@@ -2692,7 +2692,7 @@ Vector CNPC_BaseZombie::BodyTarget( const Vector &posSrc, bool bNoisy )
 //-----------------------------------------------------------------------------
 Vector CNPC_BaseZombie::HeadTarget( const Vector &posSrc )
 {
-	int iCrabAttachment = LookupAttachment( "headcrab" );
+	int iCrabAttachment = GetEngineObject()->LookupAttachment( "headcrab" );
 	Assert( iCrabAttachment > 0 );
 
 	Vector vecPosition;

@@ -707,8 +707,8 @@ void CEnvHeadcrabCanister::HeadcrabCanisterSpawnHeadcrabThink()
 
 	--m_nHeadcrabCount;
 
-	int nHeadCrabAttachment = LookupAttachment( "headcrab" );
-	if ( GetAttachment( nHeadCrabAttachment, vecSpawnPosition, vecSpawnAngles ) )
+	int nHeadCrabAttachment = GetEngineObject()->LookupAttachment( "headcrab" );
+	if (GetEngineObject()->GetAttachment( nHeadCrabAttachment, vecSpawnPosition, vecSpawnAngles ) )
 	{
 		CBaseEntity *pEnt = gEntList.CreateEntityByName( s_pHeadcrabClass[m_nHeadcrabType] );
 		CBaseHeadcrab *pHeadCrab = assert_cast<CBaseHeadcrab*>(pEnt);
@@ -858,7 +858,7 @@ void CEnvHeadcrabCanister::Landed( void )
 	// to hide problems with the edge of the follow trail
 	if (m_hTrail)
 	{
-		m_hTrail->SetAttachment( this, LookupAttachment("trail") );
+		m_hTrail->SetAttachment( this, GetEngineObject()->LookupAttachment("trail") );
 	}
 
 	// Start smoke, unless we don't want it

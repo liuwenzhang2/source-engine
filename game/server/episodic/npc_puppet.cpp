@@ -80,7 +80,7 @@ void CNPC_Puppet::Spawn( void )
 		CBaseAnimating *pAnimating = pTarget->GetBaseAnimating();
 		if ( pAnimating )
 		{
-			m_nTargetAttachment = pAnimating->LookupAttachment( STRING( m_sAnimAttachmentName ) );
+			m_nTargetAttachment = pAnimating->GetEngineObject()->LookupAttachment( STRING( m_sAnimAttachmentName ) );
 		}
 	}
 
@@ -111,7 +111,7 @@ void CNPC_Puppet::InputSetAnimationTarget( inputdata_t &inputdata )
 	if ( pAnimating )
 	{
 		// Cache off our target attachment
-		m_nTargetAttachment = pAnimating->LookupAttachment( STRING( m_sAnimAttachmentName ) );
+		m_nTargetAttachment = pAnimating->GetEngineObject()->LookupAttachment( STRING( m_sAnimAttachmentName ) );
 	}
 
 	// Stuff us at the owner's core for visibility reasons

@@ -752,7 +752,7 @@ void CNPC_AntlionGuard::CreateGlow( CSprite **pSprite, const char *pAttachName )
 	(*pSprite)->SetTransparency( kRenderWorldGlow, 156, 169, 121, 164, kRenderFxNoDissipation );
 	(*pSprite)->SetScale( 1.0f );
 	(*pSprite)->SetGlowProxySize( 16.0f );
-	int nAttachment = LookupAttachment( pAttachName );
+	int nAttachment = GetEngineObject()->LookupAttachment( pAttachName );
 	(*pSprite)->GetEngineObject()->SetParent( this->GetEngineObject(), nAttachment);
 	(*pSprite)->GetEngineObject()->SetLocalOrigin( vec3_origin );
 

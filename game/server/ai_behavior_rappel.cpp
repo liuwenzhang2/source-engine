@@ -381,7 +381,7 @@ void CAI_RappelBehavior::CreateZipline()
 #if 1
 	if( !m_hLine )
 	{
-		int attachment = GetOuter()->LookupAttachment( "zipline" );
+		int attachment = GetOuter()->GetEngineObject()->LookupAttachment( "zipline" );
 
 		if( attachment > 0 )
 		{

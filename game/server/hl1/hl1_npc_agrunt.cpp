@@ -316,7 +316,7 @@ void CNPC_AlienGrunt::HandleAnimEvent( animevent_t *pEvent )
 			}
 
 		//	SetBlending( 0, angDir.x );
-			GetAttachment( "0", vecArmPos, angArmDir );
+			GetEngineObject()->GetAttachment( "0", vecArmPos, angArmDir );
 
 			vecArmPos = vecArmPos + vecDirToEnemy * 32;
 		
@@ -397,7 +397,7 @@ void CNPC_AlienGrunt::HandleAnimEvent( animevent_t *pEvent )
 
 				Vector vecArmPos;
 				QAngle angArmAng;
-				GetAttachment( 0, vecArmPos, angArmAng );
+				GetEngineObject()->GetAttachment( 0, vecArmPos, angArmAng );
 				SpawnBlood(vecArmPos, g_vecAttackDir, pHurt->BloodColor(), 25);// a little surface blood.
 			}
 			else
@@ -436,7 +436,7 @@ void CNPC_AlienGrunt::HandleAnimEvent( animevent_t *pEvent )
 
 				Vector vecArmPos;
 				QAngle angArmAng;
-				GetAttachment( 0, vecArmPos, angArmAng );
+				GetEngineObject()->GetAttachment( 0, vecArmPos, angArmAng );
 				SpawnBlood(vecArmPos, g_vecAttackDir, pHurt->BloodColor(), 25);// a little surface blood.
 			}
 			else
@@ -635,7 +635,7 @@ int CNPC_AlienGrunt::RangeAttack1Conditions ( float flDot, float flDist )
 		
 		// verify that a shot fired from the gun will hit the enemy before the world.
 		// !!!LATER - we may wish to do something different for projectile weapons as opposed to instant-hit
-		GetAttachment( "0", vecArmPos, angArmDir );
+		GetEngineObject()->GetAttachment( "0", vecArmPos, angArmDir );
 		UTIL_TraceLine( vecArmPos, GetEnemy()->BodyTarget( vecArmPos ), MASK_SOLID, this, COLLISION_GROUP_NONE, &tr);
 		
 		if ( tr.fraction == 1.0 || tr.m_pEnt == GetEnemy() )

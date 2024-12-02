@@ -108,16 +108,6 @@ const matrix3x4_t & C_PortalGhostRenderable::RenderableToWorldTransform()
 	return GetEngineGhost()->RenderableToWorldTransform();
 }
 
-bool C_PortalGhostRenderable::GetAttachment( int number, Vector &origin, QAngle &angles )
-{
-	return GetEngineGhost()->GetAttachment(number, origin, angles);
-}
-
-bool C_PortalGhostRenderable::GetAttachment( int number, matrix3x4_t &matrix )
-{
-	return GetEngineGhost()->GetAttachment(number, matrix);
-}
-
 //bool C_PortalGhostRenderable::GetAttachment( int number, Vector &origin )
 //{
 //	if( m_pGhostedSource == NULL )
@@ -130,12 +120,6 @@ bool C_PortalGhostRenderable::GetAttachment( int number, matrix3x4_t &matrix )
 //	}
 //	return false;
 //}
-
-bool C_PortalGhostRenderable::GetAttachmentVelocity( int number, Vector &originVel, Quaternion &angleVel )
-{
-	return GetEngineGhost()->GetAttachmentVelocity(number, originVel, angleVel);
-}
-
 
 int C_PortalGhostRenderable::DrawModel( int flags )
 {
@@ -242,15 +226,6 @@ void C_PortalGhostRenderable::GetColorModulation( float* color )
 
 	return m_pGhostedSource->ShadowCastType();
 }*/
-
-int C_PortalGhostRenderable::LookupAttachment( const char *pAttachmentName )
-{
-	if(GetEngineGhost()->GetGhostedSource() == NULL )
-		return -1;
-
-
-	return GetEngineGhost()->GetGhostedSource()->LookupAttachment( pAttachmentName );
-}
 
 /*int C_PortalGhostRenderable::GetSkin()
 {

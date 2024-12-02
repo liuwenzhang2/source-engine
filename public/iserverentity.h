@@ -487,6 +487,11 @@ public:
 	virtual void InitStepHeightAdjust(void) = 0;
 	virtual void UpdateStepOrigin(void) = 0;
 	virtual float GetEstIkOffset() const = 0;
+	virtual int GetAttachmentBone(int iAttachment) = 0;
+	virtual int LookupAttachment(const char* szName) = 0;
+	virtual bool GetAttachment(int iAttachment, matrix3x4_t& attachmentToWorld) = 0;
+	virtual bool GetAttachment(int iAttachment, Vector& absOrigin, QAngle& absAngles) = 0;
+	virtual bool GetAttachment(const char* szName, Vector& absOrigin, QAngle& absAngles) = 0;
 };
 
 class IEngineWorldServer{

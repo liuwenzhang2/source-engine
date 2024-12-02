@@ -397,7 +397,7 @@ void CNPC_Controller::HandleAnimEvent( animevent_t *pEvent )
 			Vector vecStart;
 			QAngle angleGun;
 			
-			GetAttachment( 0, vecStart, angleGun );
+			GetEngineObject()->GetAttachment( 0, vecStart, angleGun );
 
 			// BUGBUG - attach to attachment point!
 
@@ -417,7 +417,7 @@ void CNPC_Controller::HandleAnimEvent( animevent_t *pEvent )
 			Vector vecStart;
 			QAngle angleGun;
 			
-			GetAttachment( 1, vecStart, angleGun );
+			GetEngineObject()->GetAttachment( 1, vecStart, angleGun );
 
 			CBroadcastRecipientFilter filter;
 			te->DynamicLight( filter, 0.0, &vecStart, 255, 192, 64, 0, 1 /*radius*/, 0.1, 32 );
@@ -644,7 +644,7 @@ void CNPC_Controller::RunTask ( const Task_t *pTask )
 		Vector vecHand;
 		QAngle vecAngle;
 		
-		GetAttachment( 2, vecHand, vecAngle );
+		GetEngineObject()->GetAttachment( 2, vecHand, vecAngle );
 	
 		while (m_flShootTime < m_flShootEnd && m_flShootTime < gpGlobals->curtime)
 		{
@@ -877,11 +877,11 @@ void CNPC_Controller::RunAI( void )
 
 		m_pBall[i]->SetBrightness( m_iBallCurrent[i] );
 
-		GetAttachment( i + 2, vecStart, angleGun );
+		GetEngineObject()->GetAttachment( i + 2, vecStart, angleGun );
 		m_pBall[i]->GetEngineObject()->SetAbsOrigin( vecStart );
 
 		CBroadcastRecipientFilter filter;
-		GetAttachment( i + 3, vecStart, angleGun );
+		GetEngineObject()->GetAttachment( i + 3, vecStart, angleGun );
 		te->DynamicLight( filter, 0.0, &vecStart, 255, 192, 64, 0/*exponent*/, m_iBallCurrent[i] / 8 /*radius*/, 0.5, 0 );
 	}
 }

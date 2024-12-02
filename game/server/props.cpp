@@ -1489,7 +1489,7 @@ void CBreakableProp::CreateFlare( float flLifetime )
 	CBaseEntity *pFlare = ::CreateFlare(GetEngineObject()->GetAbsOrigin(), GetEngineObject()->GetAbsAngles(), this, flLifetime );
 	if ( pFlare )
 	{
-		int iAttachment = LookupAttachment( "fuse" );
+		int iAttachment = GetEngineObject()->LookupAttachment( "fuse" );
 
 		Vector vOrigin;
 		GetAttachment( iAttachment, vOrigin );

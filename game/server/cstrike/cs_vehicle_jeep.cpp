@@ -431,8 +431,8 @@ Vector CPropJeep::BodyTarget( const Vector &posSrc, bool bNoisy )
 	Vector	shotPos;
 	matrix3x4_t	matrix;
 
-	int eyeAttachmentIndex = LookupAttachment("vehicle_driver_eyes");
-	GetAttachment( eyeAttachmentIndex, matrix );
+	int eyeAttachmentIndex = GetEngineObject()->LookupAttachment("vehicle_driver_eyes");
+	GetEngineObject()->GetAttachment( eyeAttachmentIndex, matrix );
 	MatrixGetColumn( matrix, 3, shotPos );
 
 	if ( bNoisy )
@@ -467,7 +467,7 @@ void CPropJeep::AimGunAt( Vector *endPos, float flInterval )
 	}
 
 	matrix3x4_t gunMatrix;
-	GetAttachment( LookupAttachment("gun_ref"), gunMatrix );
+	GetEngineObject()->GetAttachment(GetEngineObject()->LookupAttachment("gun_ref"), gunMatrix );
 
 	// transform the enemy into gun space
 	Vector localEnemyPosition;
@@ -518,7 +518,7 @@ void CPropJeep::AimGunAt( Vector *endPos, float flInterval )
 	Vector	vecMuzzle, vecMuzzleDir;
 	QAngle	vecMuzzleAng;
 
-	GetAttachment( "Muzzle", vecMuzzle, vecMuzzleAng );
+	GetEngineObject()->GetAttachment( "Muzzle", vecMuzzle, vecMuzzleAng );
 	AngleVectors( vecMuzzleAng, &vecMuzzleDir );
 
 	trace_t	tr;
@@ -616,10 +616,10 @@ bool CPropJeep::CheckWater( void )
 	}
 
 	// Check the body and the BONNET.
-	int iEngine = LookupAttachment( "vehicle_engine" );
+	int iEngine = GetEngineObject()->LookupAttachment( "vehicle_engine" );
 	Vector vecEnginePoint;
 	QAngle vecEngineAngles;
-	GetAttachment( iEngine, vecEnginePoint, vecEngineAngles );
+	GetEngineObject()->GetAttachment( iEngine, vecEnginePoint, vecEngineAngles );
 
 	m_WaterData.m_bBodyInWater = ( UTIL_PointContents( vecEnginePoint ) & MASK_WATER ) ? true : false;
 	if ( m_WaterData.m_bBodyInWater )
@@ -666,8 +666,8 @@ void CPropJeep::CheckWaterLevel( void )
 		QAngle vecAttachAngles;
 		
 		// Check eyes. (vehicle_driver_eyes point)
-		int iAttachment = LookupAttachment( "vehicle_driver_eyes" );
-		GetAttachment( iAttachment, vecAttachPoint, vecAttachAngles );
+		int iAttachment = GetEngineObject()->LookupAttachment( "vehicle_driver_eyes" );
+		GetEngineObject()->GetAttachment( iAttachment, vecAttachPoint, vecAttachAngles );
 
 		// Add the jeep's Z view offset
 		Vector vecUp;
@@ -690,8 +690,8 @@ void CPropJeep::CheckWaterLevel( void )
 		}
 
 		// Check feet. (vehicle_feet_passenger0 point)
-		iAttachment = LookupAttachment( "vehicle_feet_passenger0" );
-		GetAttachment( iAttachment, vecAttachPoint, vecAttachAngles );
+		iAttachment = GetEngineObject()->LookupAttachment( "vehicle_feet_passenger0" );
+		GetEngineObject()->GetAttachment( iAttachment, vecAttachPoint, vecAttachAngles );
 		bool bFeet = ( UTIL_PointContents( vecAttachPoint ) & MASK_WATER ) ? true : false;
 		if ( bFeet )
 		{
@@ -1125,7 +1125,7 @@ void CPropJeep::GetCannonAim( Vector *resultDir )
 	Vector	muzzleOrigin;
 	QAngle	muzzleAngles;
 
-	GetAttachment( LookupAttachment("gun_ref"), muzzleOrigin, muzzleAngles );
+	GetEngineObject()->GetAttachment(GetEngineObject()->LookupAttachment("gun_ref"), muzzleOrigin, muzzleAngles );
 
 	AngleVectors( muzzleAngles, resultDir );
 }
@@ -1384,7 +1384,7 @@ void CPropJeep::ProcessMovement( CBasePlayer *pPlayer, CMoveData *pMoveData )
 void CPropJeep::CreateDangerSounds( void )
 {
 	QAngle dummy;
-	GetAttachment( "Muzzle", m_vecGunOrigin, dummy );
+	GetEngineObject()->GetAttachment( "Muzzle", m_vecGunOrigin, dummy );
 
 	if ( m_flDangerSoundTime > gpGlobals->curtime )
 		return;

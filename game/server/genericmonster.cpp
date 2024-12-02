@@ -78,8 +78,8 @@ void CGenericNPC::TempGunEffect( void )
 	Vector vecDir, vecShot;
 	Vector vecMuzzle, vecButt;
 
-	GetAttachment( 2, vecMuzzle, vecAngle );
-	GetAttachment( 3, vecButt, vecAngle );
+	GetEngineObject()->GetAttachment( 2, vecMuzzle, vecAngle );
+	GetEngineObject()->GetAttachment( 3, vecButt, vecAngle );
 
 	vecDir = vecMuzzle - vecButt;
 	VectorNormalize( vecDir );

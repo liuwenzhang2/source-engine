@@ -476,11 +476,11 @@ void CDODBombTarget::State_Think_ARMED( void )
 	float flTimeLeft = m_flExplodeTime - gpGlobals->curtime;
 	GetEngineObject()->SetCycle( clamp( 1.0 - ( flTimeLeft / flTimerLength ), 0.0, 1.0 ) );
 
-	static int iAttachment = LookupAttachment( "wick" );//ed awesome
+	static int iAttachment = GetEngineObject()->LookupAttachment( "wick" );//ed awesome
 
 	Vector pos;
 	QAngle ang;
-	GetAttachment( iAttachment, pos, ang );
+	GetEngineObject()->GetAttachment( iAttachment, pos, ang );
 
 	Vector forward;
 	AngleVectors( ang, &forward );

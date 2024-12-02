@@ -193,7 +193,7 @@ void CTripmineGrenade::MakeBeam( void )
 	m_pBeam->SetScrollRate( 25.6 );
 	m_pBeam->SetBrightness( 64 );
 	
-	int beamAttach = LookupAttachment("beam_attach");
+	int beamAttach = GetEngineObject()->LookupAttachment("beam_attach");
 	m_pBeam->SetEndAttachment( beamAttach );
 }
 

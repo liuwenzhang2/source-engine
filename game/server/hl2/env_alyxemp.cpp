@@ -106,7 +106,7 @@ void CAlyxEmpEffect::ActivateAutomatic( CBaseEntity *pAlyx, CBaseEntity *pTarget
 {
 	Assert( pAlyx->GetBaseAnimating() != NULL );
 
-	GetEngineObject()->SetParent( pAlyx->GetEngineObject(), pAlyx->GetBaseAnimating()->LookupAttachment("LeftHand"));
+	GetEngineObject()->SetParent( pAlyx->GetEngineObject(), pAlyx->GetBaseAnimating()->GetEngineObject()->LookupAttachment("LeftHand"));
 	GetEngineObject()->SetLocalOrigin( vec3_origin );
 
 	m_iState = ALYXEMP_STATE_OFF;

@@ -947,8 +947,8 @@ void CNPC_SecurityCamera::RopesOn( void )
 		{
 			CFmtStr str;
 
-			int iStartIndex = LookupAttachment( str.sprintf( "Wire%i_A", iRope + 1 ) );
-			int iEndIndex = LookupAttachment( str.sprintf( "Wire%i_B", iRope + 1 ) );
+			int iStartIndex = GetEngineObject()->LookupAttachment( str.sprintf( "Wire%i_A", iRope + 1 ) );
+			int iEndIndex = GetEngineObject()->LookupAttachment( str.sprintf( "Wire%i_B", iRope + 1 ) );
 
 			m_hRopes[ iRope ] = CRopeKeyframe::Create( this, this, iStartIndex, iEndIndex );
 			if ( m_hRopes[ iRope ] )
@@ -986,7 +986,7 @@ void CNPC_SecurityCamera::EyeOn( void )
 			return;
 
 		m_hEyeGlow->SetTransparency( kRenderWorldGlow, 255, 0, 0, 128, kRenderFxNoDissipation );
-		m_hEyeGlow->SetAttachment( this, LookupAttachment( "light" ) );
+		m_hEyeGlow->SetAttachment( this, GetEngineObject()->LookupAttachment( "light" ) );
 		m_hEyeGlow->SetScale( 0.3f, 1.0f );
 	}
 }

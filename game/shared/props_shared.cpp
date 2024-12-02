@@ -1039,7 +1039,7 @@ void PropBreakableCreateAll( int modelindex, IPhysicsObject *pPhysics, const bre
 					int attachmentIndex = studioHdr->Studio_FindAttachment( list[i].placementName ) + 1;
 					if ( attachmentIndex > 0 )
 					{
-						pOwnerAnim->GetAttachment( attachmentIndex, matrix );
+						pOwnerAnim->GetEngineObject()->GetAttachment( attachmentIndex, matrix );
 						MatrixAngles( matrix, angles );
 					}
 				}
@@ -1426,7 +1426,7 @@ CBaseEntity *CreateGibsFromList( CUtlVector<breakmodel_t> &list, int modelindex,
 					int attachmentIndex = studioHdr->Studio_FindAttachment( list[i].placementName ) + 1;
 					if ( attachmentIndex > 0 )
 					{
-						pOwnerAnim->GetAttachment( attachmentIndex, matrix );
+						pOwnerAnim->GetEngineObject()->GetAttachment( attachmentIndex, matrix );
 						MatrixAngles( matrix, angles );
 					}
 				}

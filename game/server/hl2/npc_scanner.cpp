@@ -314,7 +314,7 @@ void CNPC_CScanner::Activate()
 	// Have to do this here because sprites do not go across level transitions
 	m_pEyeFlash = CSprite::SpriteCreate( "sprites/blueflare1.vmt", GetEngineObject()->GetLocalOrigin(), FALSE );
 	m_pEyeFlash->SetTransparency( kRenderGlow, 255, 255, 255, 0, kRenderFxNoDissipation );
-	m_pEyeFlash->SetAttachment( this, LookupAttachment( SCANNER_ATTACHMENT_LIGHT ) );
+	m_pEyeFlash->SetAttachment( this, GetEngineObject()->LookupAttachment( SCANNER_ATTACHMENT_LIGHT ) );
 	m_pEyeFlash->SetBrightness( 0 );
 	m_pEyeFlash->SetScale( 1.4 );
 }
@@ -1002,11 +1002,11 @@ void CNPC_CScanner::InputEquipMine(inputdata_t &inputdata)
 		QAngle	angles;
 		int		attachment;
 
-		attachment = LookupAttachment( "claw" );
+		attachment = GetEngineObject()->LookupAttachment( "claw" );
 
 		if( attachment > -1 )
 		{
-			GetAttachment( attachment, vecOrigin, angles );
+			GetEngineObject()->GetAttachment( attachment, vecOrigin, angles );
 			
 			pEnt->GetEngineObject()->SetAbsOrigin( vecOrigin );
 			pEnt->GetEngineObject()->SetAbsAngles( angles );
@@ -1614,7 +1614,7 @@ void CNPC_CScanner::SpotlightCreate(void)
 	m_hSpotlight->EntsInit( this, m_hSpotlightTarget );
 	m_hSpotlight->SetHDRColorScale( 0.75f );	// Scale this back a bit on HDR maps
 	// attach to light
-	m_hSpotlight->SetStartAttachment( LookupAttachment( SCANNER_ATTACHMENT_LIGHT ) );
+	m_hSpotlight->SetStartAttachment(GetEngineObject()->LookupAttachment( SCANNER_ATTACHMENT_LIGHT ) );
 
 	m_vSpotlightAngVelocity = vec3_origin;
 }

@@ -216,7 +216,7 @@ void SetupParentsForSpawnList( int nEntities, HierarchicalSpawn_t *pSpawnList )
 				CBaseAnimating* pAnim = pParent->GetBaseAnimating();
 				if (pAnim)
 				{
-					iAttachment = pAnim->LookupAttachment(pAttachmentName);
+					iAttachment = pAnim->GetEngineObject()->LookupAttachment(pAttachmentName);
 				}
 				pEntity->GetEngineObject()->SetParent(pParent->GetEngineObject(), iAttachment);
 				// setparent in the spawn pass instead - so the model will have been set & loaded

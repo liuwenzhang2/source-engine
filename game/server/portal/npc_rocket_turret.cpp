@@ -376,8 +376,8 @@ void CNPC_RocketTurret::Spawn( void )
 	SetModel( ROCKET_TURRET_MODEL_NAME );
 	GetEngineObject()->SetSolid( SOLID_VPHYSICS );
 
-	m_iMuzzleAttachment = LookupAttachment ( "barrel" );
-	m_iLightAttachment = LookupAttachment ( "eye" );
+	m_iMuzzleAttachment = GetEngineObject()->LookupAttachment ( "barrel" );
+	m_iLightAttachment = GetEngineObject()->LookupAttachment ( "eye" );
 
 	m_iPosePitch = GetEngineObject()->LookupPoseParameter( "aim_pitch" );
 	m_iPoseYaw   = GetEngineObject()->LookupPoseParameter( "aim_yaw" );
@@ -863,7 +863,7 @@ void CNPC_RocketTurret::UpdateMuzzleMatrix()
 	if ( gpGlobals->tickcount != m_muzzleToWorldTick )
 	{
 		m_muzzleToWorldTick = gpGlobals->tickcount;
-		GetAttachment( m_iMuzzleAttachment, m_muzzleToWorld );
+		GetEngineObject()->GetAttachment( m_iMuzzleAttachment, m_muzzleToWorld );
 	}
 }
 

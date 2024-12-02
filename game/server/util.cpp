@@ -1882,7 +1882,7 @@ void EntityMatrix::InitFromEntity( CBaseEntity *pEntity, int iAttachment )
 		{
 			Vector vOrigin;
 			QAngle vAngles;
-			if ( pAnimating->GetAttachment( iAttachment, vOrigin, vAngles ) )
+			if ( pAnimating->GetEngineObject()->GetAttachment( iAttachment, vOrigin, vAngles ) )
 			{
 				((VMatrix *)this)->SetupMatrixOrgAngles( vOrigin, vAngles );
 				return;

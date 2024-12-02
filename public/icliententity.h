@@ -559,6 +559,14 @@ public:
 	virtual float GetBlendWeightCurrent() = 0;
 	virtual void SetBlendWeightCurrent(float flBlendWeightCurrent) = 0;
 	virtual int	GetOverlaySequence() = 0;
+	virtual int	LookupAttachment(const char* pAttachmentName) = 0;
+	virtual int GetAttachmentCount() = 0;
+	virtual bool PutAttachment(int number, const matrix3x4_t& attachmentToWorld) = 0;
+	virtual bool GetAttachment(int number, Vector& origin, QAngle& angles) = 0;
+	virtual bool GetAttachment(int number, matrix3x4_t& matrix) = 0;
+	virtual bool GetAttachmentVelocity(int number, Vector& originVel, Quaternion& angleVel) = 0;
+	virtual bool CalcAttachments() = 0;
+
 };
 
 class IEnginePortalClient {
@@ -623,8 +631,6 @@ public:
 	virtual void			ConstrainNodesBetweenEndpoints(void) = 0;
 	virtual bool			DetectRestingState(bool& bApplyWind) = 0;
 	// Specify ROPE_ATTACHMENT_START_POINT or ROPE_ATTACHMENT_END_POINT for the attachment.
-	virtual	bool			GetAttachment(int number, Vector& origin, QAngle& angles) = 0;
-	virtual bool			GetAttachment(int number, matrix3x4_t& matrix) = 0;
 	// Hook the physics. Pass in your own implementation of CSimplePhysics::IHelper. The
 // default implementation is returned so you can call through to it if you want.
 	//virtual CSimplePhysics::IHelper* HookPhysics(CSimplePhysics::IHelper* pHook) = 0;
@@ -676,9 +682,6 @@ public:
 	virtual void	GetRenderBoundsWorldspace(Vector& mins, Vector& maxs) = 0;
 	virtual void	GetShadowRenderBounds(Vector& mins, Vector& maxs, ShadowType_t shadowType) = 0;
 	virtual const matrix3x4_t& RenderableToWorldTransform() = 0;
-	virtual	bool GetAttachment(int number, Vector& origin, QAngle& angles) = 0;
-	virtual bool GetAttachment(int number, matrix3x4_t& matrix) = 0;
-	virtual bool GetAttachmentVelocity(int number, Vector& originVel, Quaternion& angleVel) = 0;
 };
 
 //-----------------------------------------------------------------------------

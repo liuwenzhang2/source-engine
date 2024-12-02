@@ -316,7 +316,10 @@ public:
 	virtual	void					StandardBlendingRules(IStudioHdr* pStudioHdr, Vector pos[], Quaternion q[], float currentTime, int boneMask) {}
 	virtual void					UpdateIKLocks(float currentTime) {}
 	virtual void					CalculateIKLocks(float currentTime) {}
-	virtual void					SetupBones_AttachmentHelper(IStudioHdr* pStudioHdr) {}
+	// View models scale their attachment positions to account for FOV. To get the unmodified
+	// attachment position (like if you're rendering something else during the view model's DrawModel call),
+	// use TransformViewModelAttachmentToWorld.
+	virtual void					FormatViewModelAttachment(int nAttachment, matrix3x4_t& attachmentToWorld) {}
 // IClientNetworkable implementation.
 public:
 	virtual void					NotifyShouldTransmit( ShouldTransmitState_t state );
@@ -449,11 +452,28 @@ public:
 	virtual bool					GetSoundSpatialization( SpatializationInfo_t& info );
 
 	// Attachments
-	virtual int						LookupAttachment( const char *pAttachmentName ) { return -1; }
-	virtual bool					GetAttachment( int number, matrix3x4_t &matrix );
+	virtual int						LookupAttachment( const char *pAttachmentName ) 
+	{ 
+		return GetEngineObject()->LookupAttachment(pAttachmentName);
+	}
+	virtual bool					GetAttachment(int number, matrix3x4_t& matrix) {
+		return GetEngineObject()->GetAttachment(number, matrix);
+	}
 	//virtual bool					GetAttachment( int number, Vector &origin );
-	virtual	bool					GetAttachment( int number, Vector &origin, QAngle &angles );
-	virtual bool					GetAttachmentVelocity( int number, Vector &originVel, Quaternion &angleVel );
+	virtual	bool					GetAttachment(int number, Vector& origin, QAngle& angles) {
+		return GetEngineObject()->GetAttachment(number, origin, angles);
+	}
+	virtual bool					GetAttachmentVelocity(int number, Vector& originVel, Quaternion& angleVel) {
+		return GetEngineObject()->GetAttachmentVelocity(number, originVel, angleVel);
+	}
+//-----------------------------------------------------------------------------
+// Purpose: Returns the world location and world angles of an attachment
+// Input  : attachment name
+// Output :	location and angles
+//-----------------------------------------------------------------------------
+	bool							GetAttachment(const char* szName, Vector& absOrigin, QAngle& absAngles) {
+		return GetAttachment(LookupAttachment(szName), absOrigin, absAngles);
+	}
 
 	// Team handling
 	virtual C_Team					*GetTeam( void );

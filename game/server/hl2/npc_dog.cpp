@@ -476,7 +476,7 @@ void CNPC_Dog::Spawn( void )
 
 	NPCInit();
 
-	m_iPhysGunAttachment = LookupAttachment( DOG_PHYSGUN_ATTACHMENT_NAME );
+	m_iPhysGunAttachment = GetEngineObject()->LookupAttachment( DOG_PHYSGUN_ATTACHMENT_NAME );
 
 	m_bDoCatchThrowBehavior = false;
 	m_bDoWaitforObjectBehavior = false;
@@ -662,7 +662,7 @@ void CNPC_Dog::CleanCatchAndThrow( bool bClearTimers )
 
 			Vector vGunPos;
 			QAngle angGunAngles;
-			GetAttachment( m_iPhysGunAttachment, vGunPos, angGunAngles );
+			GetEngineObject()->GetAttachment( m_iPhysGunAttachment, vGunPos, angGunAngles );
 
 			if ( pPhysObj )
 			{
@@ -809,12 +809,12 @@ void CNPC_Dog::ThrowObject( const char *pAttachmentName )
 
 			GetEngineObject()->InvalidateBoneCache();
 
-			int iAttachment = LookupAttachment( pAttachmentName );
+			int iAttachment = GetEngineObject()->LookupAttachment( pAttachmentName );
 
 			if ( iAttachment == 0 )
 				 iAttachment = m_iPhysGunAttachment;
 			
-			GetAttachment( iAttachment, vGunPos, angGunAngles );
+			GetEngineObject()->GetAttachment( iAttachment, vGunPos, angGunAngles );
 
 			pPhysObj->Wake();
 
@@ -929,7 +929,7 @@ void CNPC_Dog::PickupOrCatchObject( const char *pAttachmentName )
 	{
 		GetEngineObject()->InvalidateBoneCache();
 
-		int iAttachment = LookupAttachment( pAttachmentName );
+		int iAttachment = GetEngineObject()->LookupAttachment( pAttachmentName );
 
 		if ( iAttachment == 0 )
 			 iAttachment = m_iPhysGunAttachment;
@@ -1038,7 +1038,7 @@ void CNPC_Dog::CreateSprites( void )
 
 		m_hGlowSprites[i] = CSprite::SpriteCreate( "sprites/glow04_noz.vmt", GetEngineObject()->GetAbsOrigin(), false );
 
-		m_hGlowSprites[i]->SetAttachment( this, LookupAttachment( attachNames[i] ) );
+		m_hGlowSprites[i]->SetAttachment( this, GetEngineObject()->LookupAttachment( attachNames[i] ) );
 		m_hGlowSprites[i]->SetTransparency( kRenderGlow, 255, 128, 0, 64, kRenderFxNoDissipation );
 		m_hGlowSprites[i]->SetBrightness( 255, 0.2f );
 		m_hGlowSprites[i]->SetScale( 0.55f, 0.2f );
@@ -1071,7 +1071,7 @@ void CNPC_Dog::CreateBeams( void )
 		m_hBeams[i] = CBeam::BeamCreate( "sprites/physcannon_bluelight2.vmt", 5.0 );
 
 		m_hBeams[i]->EntsInit( m_hPhysicsEnt, this );
-		m_hBeams[i]->SetEndAttachment( LookupAttachment( attachNames[i] ) );
+		m_hBeams[i]->SetEndAttachment(GetEngineObject()->LookupAttachment( attachNames[i] ) );
 		m_hBeams[i]->SetBrightness( 255 );
 		m_hBeams[i]->SetColor( 255, 255, 255 );
 		m_hBeams[i]->SetNoise( 5.5 );

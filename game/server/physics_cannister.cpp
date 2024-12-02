@@ -132,7 +132,7 @@ Vector CPhysicsCannister::CalcLocalThrust( const Vector &offset )
 	matrix3x4_t nozzleMatrix;
 	Vector thrustDirection;
 
-	GetAttachment( LookupAttachment("nozzle"), nozzleMatrix );
+	GetEngineObject()->GetAttachment(GetEngineObject()->LookupAttachment("nozzle"), nozzleMatrix );
 	MatrixGetColumn( nozzleMatrix, 2, thrustDirection );
 	MatrixGetColumn( nozzleMatrix, 3, m_thrustOrigin );
 	thrustDirection = -5*thrustDirection + offset;

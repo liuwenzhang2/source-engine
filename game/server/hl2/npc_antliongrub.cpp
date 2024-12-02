@@ -170,7 +170,7 @@ void CAntlionGrub::CreateGlow( void )
 	m_hGlowSprite->SetTransparency( kRenderWorldGlow, 156, 169, 121, 164, kRenderFxNoDissipation );
 	m_hGlowSprite->SetScale( 0.5f );
 	m_hGlowSprite->SetGlowProxySize( 16.0f );
-	int nAttachment = LookupAttachment( "glow" );
+	int nAttachment = GetEngineObject()->LookupAttachment( "glow" );
 	m_hGlowSprite->GetEngineObject()->SetParent( this->GetEngineObject(), nAttachment );
 	m_hGlowSprite->GetEngineObject()->SetLocalOrigin( vec3_origin );
 	
@@ -258,7 +258,7 @@ void CAntlionGrub::CreateNugget( void )
 
 	Vector vecOrigin;
 	Vector vecForward;
-	GetAttachment( LookupAttachment( "glow" ), vecOrigin, &vecForward );
+	GetAttachment(GetEngineObject()->LookupAttachment( "glow" ), vecOrigin, &vecForward );
 
 	// Find out what size to make this nugget!
 	int nDenomination = GetNuggetDenomination();

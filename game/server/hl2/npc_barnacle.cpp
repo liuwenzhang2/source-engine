@@ -328,7 +328,7 @@ void CNPC_Barnacle::DropTongue( void )
 
 	m_hTongueRoot = CBarnacleTongueTip::CreateTongueRoot( m_vecRoot, QAngle(90,0,0) );
 	m_hTongueTip = CBarnacleTongueTip::CreateTongueTip( this, m_hTongueRoot, m_vecTip, QAngle(0,0,0) );
-	m_nSpitAttachment = LookupAttachment( "StrikeHeadAttach" );
+	m_nSpitAttachment = GetEngineObject()->LookupAttachment( "StrikeHeadAttach" );
 	Assert( m_hTongueRoot && m_hTongueTip );
 
 	GetEngineObject()->RemoveSpawnFlags( SF_BARNACLE_AMBUSH );

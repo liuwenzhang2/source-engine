@@ -118,6 +118,16 @@ enum
 	NUM_BONECTRLS = 4
 };
 
+class CAttachmentData
+{
+public:
+	matrix3x4_t	m_AttachmentToWorld;
+	QAngle	m_angRotation;
+	Vector	m_vOriginVelocity;
+	int		m_nLastFramecount : 31;
+	int		m_bAnglesComputed : 1;
+};
+
 class C_EngineObjectInternal : public IEngineObjectClient, public IClientNetworkable {
 public:
 	DECLARE_CLASS_NOBASE(C_EngineObjectInternal);
@@ -999,6 +1009,15 @@ public:
 	float GetBlendWeightCurrent() { return m_flBlendWeightCurrent; }
 	void SetBlendWeightCurrent(float flBlendWeightCurrent) { m_flBlendWeightCurrent = flBlendWeightCurrent; }
 	int	GetOverlaySequence() { return m_nOverlaySequence; }
+
+	int		LookupAttachment(const char* pAttachmentName);
+	int		GetAttachmentCount() { return m_Attachments.Count(); }
+	bool PutAttachment(int number, const matrix3x4_t& attachmentToWorld);
+	bool GetAttachment(int number, Vector& origin, QAngle& angles);
+	bool GetAttachment(int number, matrix3x4_t& matrix);
+	bool GetAttachmentVelocity(int number, Vector& originVel, Quaternion& angleVel);
+	virtual bool					CalcAttachments();
+
 private:
 	void LockStudioHdr();
 	void UnlockStudioHdr();
@@ -1011,6 +1030,7 @@ private:
 	bool			IsBoneAccessAllowed() const;
 	// This method should return true if the bones have changed + SetupBones needs to be called
 	virtual float LastBoneChangedTime();
+	void							SetupBones_AttachmentHelper(IStudioHdr* pStudioHdr);
 
 protected:
 
@@ -1249,6 +1269,8 @@ protected:
 	CBoneMergeCache*				m_pBoneMergeCache = NULL;	// This caches the strcmp lookups that it has to do
 	CJiggleBones*					m_pJiggleBones = NULL;
 
+	// Calculated attachment points
+	CUtlVector<CAttachmentData>		m_Attachments;
 };
 
 //-----------------------------------------------------------------------------
@@ -2301,6 +2323,7 @@ public:
 	virtual void	GetRenderBoundsWorldspace(Vector& mins, Vector& maxs);
 	virtual void	GetShadowRenderBounds(Vector& mins, Vector& maxs, ShadowType_t shadowType);
 	virtual const matrix3x4_t& RenderableToWorldTransform();
+	virtual int	LookupAttachment(const char* pAttachmentName);
 	virtual	bool GetAttachment(int number, Vector& origin, QAngle& angles);
 	virtual bool GetAttachment(int number, matrix3x4_t& matrix);
 	virtual bool GetAttachmentVelocity(int number, Vector& originVel, Quaternion& angleVel);

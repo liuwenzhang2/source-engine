@@ -758,7 +758,7 @@ void CFuncTank::Spawn( void )
 		CBaseAnimating *pAnim = GetEngineObject()->GetMoveParent()->GetOuter()->GetBaseAnimating();
 		if ( m_iszBaseAttachment != NULL_STRING )
 		{
-			int nAttachment = pAnim->LookupAttachment( STRING( m_iszBaseAttachment ) );
+			int nAttachment = pAnim->GetEngineObject()->LookupAttachment( STRING( m_iszBaseAttachment ) );
 			if ( nAttachment != 0 )
 			{
 				GetEngineObject()->SetParent( pAnim->GetEngineObject(), nAttachment);
@@ -778,11 +778,11 @@ void CFuncTank::Spawn( void )
 				pAnim->GetEngineObject()->InvalidateBoneCache();
 			}
 
-			m_nBarrelAttachment = pAnim->LookupAttachment( STRING(m_iszBarrelAttachment) );
+			m_nBarrelAttachment = pAnim->GetEngineObject()->LookupAttachment( STRING(m_iszBarrelAttachment) );
 
 			Vector vecWorldBarrelPos;
 			QAngle worldBarrelAngle;
-			pAnim->GetAttachment( m_nBarrelAttachment, vecWorldBarrelPos, worldBarrelAngle );
+			pAnim->GetEngineObject()->GetAttachment( m_nBarrelAttachment, vecWorldBarrelPos, worldBarrelAngle );
 			VectorITransform( vecWorldBarrelPos, GetEngineObject()->EntityToWorldTransform( ), m_barrelPos );
 		}
 
@@ -879,7 +879,7 @@ void CFuncTank::Activate( void )
 		CBaseAnimating *pAnim = GetEngineObject()->GetMoveParent()->GetOuter()->GetBaseAnimating();
 		if ( m_iszBaseAttachment != NULL_STRING )
 		{
-			int nAttachment = pAnim->LookupAttachment( STRING( m_iszBaseAttachment ) );
+			int nAttachment = pAnim->GetEngineObject()->LookupAttachment( STRING( m_iszBaseAttachment ) );
 			if ( nAttachment != 0 )
 			{
 				GetEngineObject()->SetParent( pAnim->GetEngineObject(), nAttachment);
@@ -899,11 +899,11 @@ void CFuncTank::Activate( void )
 				pAnim->GetEngineObject()->InvalidateBoneCache();
 			}
 
-			m_nBarrelAttachment = pAnim->LookupAttachment( STRING(m_iszBarrelAttachment) );
+			m_nBarrelAttachment = pAnim->GetEngineObject()->LookupAttachment( STRING(m_iszBarrelAttachment) );
 
 			Vector vecWorldBarrelPos;
 			QAngle worldBarrelAngle;
-			pAnim->GetAttachment( m_nBarrelAttachment, vecWorldBarrelPos, worldBarrelAngle );
+			pAnim->GetEngineObject()->GetAttachment( m_nBarrelAttachment, vecWorldBarrelPos, worldBarrelAngle );
 			VectorITransform( vecWorldBarrelPos, GetEngineObject()->EntityToWorldTransform( ), m_barrelPos );
 		}
 
@@ -931,7 +931,7 @@ void CFuncTank::Activate( void )
 		if (GetEngineObject()->GetMoveParent() && GetEngineObject()->GetMoveParent()->GetOuter()->GetBaseAnimating())
 		{
 			CBaseAnimating *pAnim = GetEngineObject()->GetMoveParent()->GetOuter()->GetBaseAnimating();
-			m_nBarrelAttachment = pAnim->LookupAttachment( STRING(m_iszBarrelAttachment) );
+			m_nBarrelAttachment = pAnim->GetEngineObject()->LookupAttachment( STRING(m_iszBarrelAttachment) );
 		}
 	}
 }
@@ -1004,7 +1004,7 @@ Vector CFuncTank::WorldBarrelPosition( void )
 	Vector vecOrigin;
 	QAngle vecAngles;
 	CBaseAnimating *pAnim = GetEngineObject()->GetMoveParent()->GetOuter()->GetBaseAnimating();
-	pAnim->GetAttachment( m_nBarrelAttachment, vecOrigin, vecAngles );
+	pAnim->GetEngineObject()->GetAttachment( m_nBarrelAttachment, vecOrigin, vecAngles );
 	return vecOrigin;
 }
 
@@ -2919,7 +2919,7 @@ void CFuncTankAirboatGun::Activate()
 		m_hAirboatGunModel = dynamic_cast<CBaseAnimating*>( gEntList.FindEntityByName( NULL, m_iszAirboatGunModel ) );
 		if ( m_hAirboatGunModel )
 		{
-			m_nGunBarrelAttachment = m_hAirboatGunModel->LookupAttachment( "muzzle" );
+			m_nGunBarrelAttachment = m_hAirboatGunModel->GetEngineObject()->LookupAttachment( "muzzle" );
 		}
 	}
 }

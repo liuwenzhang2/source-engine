@@ -814,6 +814,16 @@ public:
 	void InitStepHeightAdjust(void);
 	void UpdateStepOrigin(void);
 	float GetEstIkOffset() const { return m_flEstIkOffset; }
+
+	int GetAttachmentBone( int iAttachment );
+	int LookupAttachment(const char* szName);
+	virtual bool GetAttachment(int iAttachment, matrix3x4_t& attachmentToWorld);
+	bool GetAttachment(int iAttachment, Vector& absOrigin, QAngle& absAngles);
+	bool GetAttachment(const char* szName, Vector& absOrigin, QAngle& absAngles)
+	{
+		return GetAttachment(LookupAttachment(szName), absOrigin, absAngles);
+	}
+
 public:
 	// Networking related methods
 	void NetworkStateChanged();

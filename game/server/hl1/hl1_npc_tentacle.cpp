@@ -845,7 +845,7 @@ void CNPC_Tentacle::HandleAnimEvent( animevent_t *pEvent )
 		{
 			Vector vecSrc;
 			QAngle angAngles;
-			GetAttachment( "0", vecSrc, angAngles );
+			GetEngineObject()->GetAttachment( "0", vecSrc, angAngles );
 
 			// Vector vecSrc = GetAbsOrigin() + m_flTapRadius * Vector( cos( GetAbsAngles().y * (3.14192653 / 180.0) ), sin( GetAbsAngles().y * (M_PI / 180.0) ), 0.0 );
 

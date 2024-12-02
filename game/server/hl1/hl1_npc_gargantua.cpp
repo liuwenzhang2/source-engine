@@ -734,7 +734,7 @@ void CNPC_Gargantua::FlameCreate( void )
 		{
 			int attach = i%2;
 			// attachment is 0 based in GetAttachment
-			GetAttachment( attach+1, posGun, angleGun );
+			GetEngineObject()->GetAttachment( attach+1, posGun, angleGun );
 
 			Vector vecEnd = ( vForward * GARG_FLAME_LENGTH) + posGun;
 			//UTIL_TraceLine( posGun, vecEnd, dont_ignore_monsters, edict(), &trace );
@@ -802,7 +802,7 @@ void CNPC_Gargantua::FlameUpdate( void )
 
 			AngleVectors( vecAim, &vForward );
 
-			GetAttachment( i + 2, vecStart, angleGun );
+			GetEngineObject()->GetAttachment( i + 2, vecStart, angleGun );
 			Vector vecEnd = vecStart + ( vForward * GARG_FLAME_LENGTH); //  - offset[i] * gpGlobals->v_right;
 			
 			UTIL_TraceLine ( vecStart, vecEnd, MASK_SOLID, this, COLLISION_GROUP_NONE, &trace);
@@ -820,7 +820,7 @@ void CNPC_Gargantua::FlameUpdate( void )
 			FlameDamage( vecStart, trace.endpos, this, this, sk_gargantua_dmg_fire.GetFloat(), CLASS_ALIEN_MONSTER, DMG_BURN );
 
 			CBroadcastRecipientFilter filter;
-			GetAttachment(i + 2, vecStart, angleGun);
+			GetEngineObject()->GetAttachment(i + 2, vecStart, angleGun);
 			te->DynamicLight( filter, 0.0, &vecStart, 255, 0, 0, 0, 48, 0.2, 150 );
 		}
 	}

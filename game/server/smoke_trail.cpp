@@ -161,7 +161,7 @@ void SmokeTrail::FollowEntity( CBaseEntity *pEntity, const char *pAttachmentName
 	// For attachments
 	if ( pAttachmentName && pEntity && pEntity->GetBaseAnimating() )
 	{
-		m_nAttachment = pEntity->GetBaseAnimating()->LookupAttachment( pAttachmentName );
+		m_nAttachment = pEntity->GetBaseAnimating()->GetEngineObject()->LookupAttachment( pAttachmentName );
 	}
 	else
 	{
@@ -285,7 +285,7 @@ void RocketTrail::FollowEntity( CBaseEntity *pEntity, const char *pAttachmentNam
 	// For attachments
 	if ( pAttachmentName && pEntity && pEntity->GetBaseAnimating() )
 	{
-		m_nAttachment = pEntity->GetBaseAnimating()->LookupAttachment( pAttachmentName );
+		m_nAttachment = pEntity->GetBaseAnimating()->GetEngineObject()->LookupAttachment( pAttachmentName );
 	}
 	else
 	{
@@ -489,7 +489,7 @@ void CFireTrail::FollowEntity( CBaseEntity *pEntity, const char *pAttachmentName
 	// For attachments
 	if ( pAttachmentName && pEntity && pEntity->GetBaseAnimating() )
 	{
-		m_nAttachment = pEntity->GetBaseAnimating()->LookupAttachment( pAttachmentName );
+		m_nAttachment = pEntity->GetBaseAnimating()->GetEngineObject()->LookupAttachment( pAttachmentName );
 	}
 	else
 	{

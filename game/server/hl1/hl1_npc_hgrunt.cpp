@@ -628,7 +628,7 @@ int CNPC_HGrunt::RangeAttack1Conditions ( float flDot, float flDist )
 		Vector vecSrc;
 		QAngle angAngles;
 
-		GetAttachment( "0", vecSrc, angAngles );
+		GetEngineObject()->GetAttachment( "0", vecSrc, angAngles );
 
 		//NDebugOverlay::Line( GetAbsOrigin() + GetViewOffset(), GetEnemy()->BodyTarget(GetAbsOrigin() + GetViewOffset()), 255, 0, 0, false, 0.1 );
 		// verify that a bullet fired from the gun will hit the enemy before the world.
@@ -733,7 +733,7 @@ int CNPC_HGrunt::GetGrenadeConditions( float flDot, float flDist  )
 	{
 		Vector vGunPos;
 		QAngle angGunAngles;
-		GetAttachment( "0", vGunPos, angGunAngles );
+		GetEngineObject()->GetAttachment( "0", vGunPos, angGunAngles );
 
 
 		Vector vecToss = VecCheckToss( this, vGunPos, vecTarget, -1, 0.5, false );
@@ -759,7 +759,7 @@ int CNPC_HGrunt::GetGrenadeConditions( float flDot, float flDist  )
 	{
 		Vector vGunPos;
 		QAngle angGunAngles;
-		GetAttachment( "0", vGunPos, angGunAngles );
+		GetEngineObject()->GetAttachment( "0", vGunPos, angGunAngles );
 		
 		Vector vecToss = VecCheckThrow( this, vGunPos, vecTarget, sk_hgrunt_gspeed.GetFloat(), 0.5 );
 
@@ -1031,7 +1031,7 @@ void CNPC_HGrunt::Event_Killed( const CTakeDamageInfo &info )
 	Vector	vecGunPos;
 	QAngle	vecGunAngles;
 
-	GetAttachment( "0", vecGunPos, vecGunAngles );
+	GetEngineObject()->GetAttachment( "0", vecGunPos, vecGunAngles );
 
 	// switch to body group with no gun.
 	SetBodygroup( GUN_GROUP, GUN_NONE );
@@ -1104,7 +1104,7 @@ void CNPC_HGrunt::HandleAnimEvent( animevent_t *pEvent )
 			Vector vecSrc;
 			QAngle angAngles;
 
-			GetAttachment( "0", vecSrc, angAngles );
+			GetEngineObject()->GetAttachment( "0", vecSrc, angAngles );
 		
 			CGrenadeMP5 * m_pMyGrenade = (CGrenadeMP5*)Create( "grenade_mp5", vecSrc, angAngles, this );
 			m_pMyGrenade->GetEngineObject()->SetAbsVelocity( m_vecTossVelocity );
