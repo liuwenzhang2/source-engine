@@ -558,7 +558,7 @@ void C_EntityDissolve::ClientThink( void )
 
 		partition->Remove( PARTITION_CLIENT_SOLID_EDICTS | PARTITION_CLIENT_RESPONSIVE_EDICTS | PARTITION_CLIENT_NON_STATIC_EDICTS, GetEngineObject()->GetPartitionHandle() );
 
-		RemoveFromLeafSystem();
+		GetEngineObject()->RemoveFromLeafSystem();
 
 		//FIXME: Ick!
 		//Adrian: I'll assume we don't need the ragdoll either so I'll remove that too.
@@ -601,7 +601,7 @@ int C_EntityDissolve::DrawModel( int flags )
 	if ( pAnimating->HitboxToWorldTransforms( hitboxbones ) == false )
 		return 0;
 
-	IStudioHdr *pStudioHdr = modelinfo->GetStudiomodel( pAnimating->GetModel() );
+	IStudioHdr *pStudioHdr = modelinfo->GetStudiomodel( pAnimating->GetEngineObject()->GetModel() );
 	if ( pStudioHdr == NULL )
 		return false;
 

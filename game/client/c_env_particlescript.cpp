@@ -125,7 +125,7 @@ void C_EnvParticleScript::OnDataChanged( DataUpdateType_t updateType )
 void C_EnvParticleScript::CreateParticle( const char *pAttachmentName, const char *pSpriteName )
 {
 	// Find the attachment
-	int nAttachment = LookupAttachment( pAttachmentName );
+	int nAttachment = GetEngineObject()->LookupAttachment( pAttachmentName );
 	if ( nAttachment <= 0 )
 		return;
 
@@ -165,7 +165,7 @@ void C_EnvParticleScript::CreateParticle( const char *pAttachmentName, const cha
 	// Place the particle on the attachment specified
 	pParticle->m_nAttachment = nAttachment;
 	QAngle vecAngles;
-	GetAttachment( nAttachment, pParticle->m_Pos, vecAngles );
+	GetEngineObject()->GetAttachment( nAttachment, pParticle->m_Pos, vecAngles );
 
 	if ( m_flSequenceScale != 1.0f )
 	{
@@ -177,7 +177,7 @@ void C_EnvParticleScript::CreateParticle( const char *pAttachmentName, const cha
 
 void C_EnvParticleScript::DestroyAllParticles( const char *pAttachmentName )
 {
-	int nAttachment = LookupAttachment( pAttachmentName );
+	int nAttachment = GetEngineObject()->LookupAttachment( pAttachmentName );
 	if ( nAttachment <= 0 )
 		return;
 
@@ -284,7 +284,7 @@ void C_EnvParticleScript::SimulateParticles( CParticleSimulateIterator *pIterato
 		{
 			// Move the particle to the attachment point
 			QAngle vecAngles;
-			GetAttachment( pParticle->m_nAttachment, pParticle->m_Pos, vecAngles );
+			GetEngineObject()->GetAttachment( pParticle->m_nAttachment, pParticle->m_Pos, vecAngles );
 
 			if ( m_flSequenceScale != 1.0f )
 			{

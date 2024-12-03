@@ -4607,10 +4607,9 @@ void CSaveRestore::ReapplyDecal( bool adjacent, RestoreLookupTable *table, decal
 					int entityToHit = hit->GetRefEHandle().GetEntryIndex();// NUM_FOR_EDICT(hit);
 					if ( entityToHit >= 0 )
 					{
-						IClientEntity *clientEntity = entitylist->GetClientEntity( entityToHit );
+						IEngineObjectClient *clientEntity = entitylist->GetEngineObject( entityToHit );
 						if ( !clientEntity )
 							return;
-						IEngineObjectClient* pEngineObject = entitylist->GetEngineObject(entityToHit);
 						
 						bool found = false;
 						int decalIndex = Draw_DecalIndexFromName( entry->name, &found );
@@ -4627,8 +4626,8 @@ void CSaveRestore::ReapplyDecal( bool adjacent, RestoreLookupTable *table, decal
 							decalIndex, 
 							entityToHit, 
 							clientEntity->GetModel(), 
-							pEngineObject->GetAbsOrigin(),
-							pEngineObject->GetAbsAngles(),
+							clientEntity->GetAbsOrigin(),
+							clientEntity->GetAbsAngles(),
 							entry->position, 0, flags );
 					}
 				}
@@ -4647,7 +4646,7 @@ void CSaveRestore::ReapplyDecal( bool adjacent, RestoreLookupTable *table, decal
 			QAngle vecAngle( 0.0f, 0.0f, 0.0f );
 
 			const model_t *pModel = NULL;
-			IClientEntity *clientEntity = entitylist->GetClientEntity( entityToHit );
+			IEngineObjectClient *clientEntity = entitylist->GetEngineObject( entityToHit );
 			if ( clientEntity )
 			{
 				pModel = clientEntity->GetModel();

@@ -59,7 +59,7 @@ void C_NPC_Puppet::BeforeBuildTransformations( IStudioHdr *pStudioHdr, Vector *p
 		if ( pTarget )
 		{
 			matrix3x4_t matTarget;
-			pTarget->GetAttachment( m_nTargetAttachment, matTarget );
+			pTarget->GetEngineObject()->GetAttachment( m_nTargetAttachment, matTarget );
 
 			MatrixCopy( matTarget, GetEngineObject()->GetBoneForWrite( 0 ) );
 			boneComputed.ClearAll(); // FIXME: Why is this calculated already?

@@ -178,9 +178,9 @@ void CHeadIconManager::DrawHeadIcons()
 		Vector vOrigin; 
 		QAngle vAngle;
 
-		int iHeadAttach = pPlayer->LookupAttachment( "head" );
+		int iHeadAttach = pPlayer->GetEngineObject()->LookupAttachment( "head" );
 			
-		pPlayer->GetAttachment( iHeadAttach, vOrigin, vAngle );
+		pPlayer->GetEngineObject()->GetAttachment( iHeadAttach, vOrigin, vAngle );
 
 		vOrigin.z += cl_headiconoffset.GetFloat();
 

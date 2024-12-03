@@ -59,7 +59,7 @@ void C_PortalBlast::Init( bool bIsPortal2, PortalPlacedByType ePlacedBy, const V
 	//ClientEntityList().AddNonNetworkableEntity( this );
 	ClientThinkList()->SetNextClientThink( GetClientHandle(), CLIENT_THINK_ALWAYS );
 
-	AddToLeafSystem( RENDER_GROUP_OPAQUE_ENTITY );
+	GetEngineObject()->AddToLeafSystem( RENDER_GROUP_OPAQUE_ENTITY );
 
 	SetThink( &C_PortalBlast::ClientThink );
 	SetNextClientThink( CLIENT_THINK_ALWAYS );

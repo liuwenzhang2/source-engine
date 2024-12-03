@@ -217,16 +217,16 @@ void CWeaponMG42::Spawn( void )
 			if ( !vm )
 				return;
 
-			vm->GetAttachment( 1, vFront, angles );
-			vm->GetAttachment( 2, vBack, angles );
+			vm->GetEngineObject()->GetAttachment( 1, vFront, angles );
+			vm->GetEngineObject()->GetAttachment( 2, vBack, angles );
 
 			bViewModel = true;
 		}
 		else
 		{
 			// could be dropped, or held by another player
-			GetAttachment( 1, vFront, angles );
-			GetAttachment( 2, vBack, angles );
+			GetEngineObject()->GetAttachment( 1, vFront, angles );
+			GetEngineObject()->GetAttachment( 2, vBack, angles );
 		}
 
 		// Get a position somewhere on the barrel

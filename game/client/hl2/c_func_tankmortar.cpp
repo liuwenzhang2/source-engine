@@ -54,7 +54,7 @@ void C_MortarShell::OnDataChanged( DataUpdateType_t updateType )
 	if ( updateType == DATA_UPDATE_CREATED )
 	{
 		m_flStarttime = gpGlobals->curtime;
-		AddToLeafSystem( RENDER_GROUP_TRANSLUCENT_ENTITY );
+		GetEngineObject()->AddToLeafSystem( RENDER_GROUP_TRANSLUCENT_ENTITY );
 
 		m_pEmitter = CSimpleEmitter::Create( "C_EntityDissolve" );
 		m_pEmitter->SetSortOrigin(GetEngineObject()->GetAbsOrigin() );

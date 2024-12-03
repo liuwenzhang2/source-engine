@@ -50,10 +50,10 @@ int C_Corpse::DrawModel( int flags )
 
 		drawn = modelrender->DrawModel( 
 			flags, 
-			this,
+			this->GetEngineObject(),
 			MODEL_INSTANCE_INVALID,
 			m_nReferencePlayer, 
-			GetModel(),
+			GetEngineObject()->GetModel(),
 			GetEngineObject()->GetAbsOrigin(),
 			GetEngineObject()->GetAbsAngles(),
 			GetEngineObject()->GetSkin(),

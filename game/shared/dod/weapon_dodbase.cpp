@@ -1327,7 +1327,7 @@ void CWeaponDODBase::Smack()
 			CEffectData data;
 			data.m_nHitBox = atoi( options );
 			data.m_hEntity = GetPlayerOwner() ? GetPlayerOwner() : NULL;
-			pViewModel->GetAttachment( 2, data.m_vOrigin, data.m_vAngles );
+			pViewModel->GetEngineObject()->GetAttachment( 2, data.m_vOrigin, data.m_vAngles );
 
 			DispatchEffect( "DOD_EjectBrass", data );
 			return true;
@@ -1384,7 +1384,7 @@ void CWeaponDODBase::Smack()
 
 	bool CWeaponDODBase::ShouldDraw( void )
 	{
-		if ( GetModel() == NULL )
+		if (GetEngineObject()->GetModel() == NULL )
 		{
 			// XXX(johns): Removed, doesn't seem to be the proper spot for this warning given that weapons can call
 			//             ShouldDraw before their properties are filled.

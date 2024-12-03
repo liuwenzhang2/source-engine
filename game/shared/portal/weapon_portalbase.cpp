@@ -298,7 +298,7 @@ void CWeaponPortalBase::GetRenderBounds( Vector& theMins, Vector& theMaxs )
 	{
 		GetEngineObject()->GetRagdollBounds( theMins, theMaxs );
 	}
-	else if ( GetModel() )
+	else if (GetEngineObject()->GetModel() )
 	{
 		IStudioHdr *pStudioHdr = NULL;
 

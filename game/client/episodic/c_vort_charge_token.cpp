@@ -144,7 +144,7 @@ void C_NPC_Vortigaunt::ReceiveMessage( int classID, bf_read &msg )
 			// Get our attachment position
 			Vector vecStart;
 			QAngle vecAngles;
-			GetAttachment( nAttachment, vecStart, vecAngles );
+			GetEngineObject()->GetAttachment( nAttachment, vecStart, vecAngles );
 
 			// Get the final position we'll strike
 			Vector vecEndPos;

@@ -89,7 +89,7 @@ bool IsReflectiveGlassInView( const CViewSetup& view, cplane_t &plane )
 		if ( R_CullBox( vecMins, vecMaxs, frustum ) )
 			continue;
 
-		const model_t *pModel = pReflectiveGlass->GetModel();
+		const model_t *pModel = pReflectiveGlass->GetEngineObject()->GetModel();
 		const matrix3x4_t& mat = pReflectiveGlass->GetEngineObject()->EntityToWorldTransform();
 
 		int nCount = modelinfo->GetBrushModelPlaneCount( pModel );

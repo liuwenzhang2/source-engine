@@ -1443,7 +1443,7 @@ void C_BasePlayer::CalcChaseCamView(Vector& eyeOrigin, QAngle& eyeAngles, float&
 	// If our target isn't visible, we're at a camera point of some kind.
 	// Instead of letting the player rotate around an invisible point, treat
 	// the point as a fixed camera.
-	if ( !target->GetBaseAnimating() && !target->GetModel() )
+	if ( !target->GetBaseAnimating() && !target->GetEngineObject()->GetModel() )
 	{
 		CalcRoamingView( eyeOrigin, eyeAngles, fov );
 		return;
@@ -2603,7 +2603,7 @@ void C_BasePlayer::ForceSetupBonesAtTimeFakeInterpolation( matrix3x4_t *pBonesOu
 	GetEngineObject()->SetCycle(fmod( 10 + cycle + GetEngineObject()->GetPlaybackRate() * curtimeOffset, 1.0f ));
 	GetEngineObject()->SetLocalOrigin( origin + curtimeOffset * GetEngineObject()->GetLocalVelocity() );
 	// Setup bone state to extrapolate physics velocity
-	SetupBones( pBonesOut, MAXSTUDIOBONES, BONE_USED_BY_ANYTHING, gpGlobals->curtime + curtimeOffset );
+	GetEngineObject()->SetupBones( pBonesOut, MAXSTUDIOBONES, BONE_USED_BY_ANYTHING, gpGlobals->curtime + curtimeOffset );
 
 	GetEngineObject()->SetCycle(cycle);
 	GetEngineObject()->SetLocalOrigin( origin );
@@ -2625,7 +2625,7 @@ void C_BasePlayer::GetRagdollInitBoneArrays( matrix3x4_t *pDeltaBones0, matrix3x
 	}
 	else
 	{
-		SetupBones( pCurrentBones, MAXSTUDIOBONES, BONE_USED_BY_ANYTHING, gpGlobals->curtime );
+		GetEngineObject()->SetupBones( pCurrentBones, MAXSTUDIOBONES, BONE_USED_BY_ANYTHING, gpGlobals->curtime );
 	}
 }
 

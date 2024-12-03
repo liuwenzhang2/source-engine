@@ -1403,7 +1403,7 @@ void CL_TakeSnapshotAndSwap()
 
 		char base[MAX_OSPATH];
 		char filename[MAX_OSPATH];
-		IClientEntity *world = entitylist->GetClientEntity( 0 );
+		IEngineObjectClient *world = entitylist->GetEngineObject( 0 );
 
 		g_pFileSystem->CreateDirHierarchy( "screenshots", "DEFAULT_WRITE_PATH" );
 

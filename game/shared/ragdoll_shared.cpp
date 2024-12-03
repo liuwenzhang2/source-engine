@@ -1132,7 +1132,7 @@ C_EntityFlame *FireEffect( C_BaseAnimating *pTarget, C_BaseEntity *pServerFire, 
 
 	if ( pFire != NULL )
 	{
-		pFire->RemoveFromLeafSystem();
+		pFire->GetEngineObject()->RemoveFromLeafSystem();
 		
 		pTarget->GetEngineObject()->AddFlag( FL_ONFIRE );
 		pFire->GetEngineObject()->SetParent( pTarget->GetEngineObject());

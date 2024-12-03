@@ -2665,27 +2665,27 @@ void CClientShadowMgr::BuildFlashlight( ClientShadowHandle_t handle )
 	C_BaseEntity *pChild = shadow.m_hTargetEntity->GetEngineObject()->FirstMoveChild()?shadow.m_hTargetEntity->GetEngineObject()->FirstMoveChild()->GetOuter():NULL;
 	while( pChild )
 	{
-		int modelType = modelinfo->GetModelType( pChild->GetModel() );
+		int modelType = modelinfo->GetModelType( pChild->GetEngineObject()->GetModel() );
 		if (modelType == mod_brush)
 		{
-			AddShadowToReceiver( handle, pChild, SHADOW_RECEIVER_BRUSH_MODEL );
+			AddShadowToReceiver( handle, pChild->GetEngineObject(), SHADOW_RECEIVER_BRUSH_MODEL );
 		}
 		else if ( modelType == mod_studio )
 		{
-			AddShadowToReceiver( handle, pChild, SHADOW_RECEIVER_STUDIO_MODEL );
+			AddShadowToReceiver( handle, pChild->GetEngineObject(), SHADOW_RECEIVER_STUDIO_MODEL );
 		}
 
 		pChild = pChild->GetEngineObject()->NextMovePeer()? pChild->GetEngineObject()->NextMovePeer()->GetOuter():NULL;
 	}
 
-	int modelType = modelinfo->GetModelType( shadow.m_hTargetEntity->GetModel() );
+	int modelType = modelinfo->GetModelType( shadow.m_hTargetEntity->GetEngineObject()->GetModel() );
 	if (modelType == mod_brush)
 	{
-		AddShadowToReceiver( handle, shadow.m_hTargetEntity, SHADOW_RECEIVER_BRUSH_MODEL );
+		AddShadowToReceiver( handle, shadow.m_hTargetEntity->GetEngineObject(), SHADOW_RECEIVER_BRUSH_MODEL );
 	}
 	else if ( modelType == mod_studio )
 	{
-		AddShadowToReceiver( handle, shadow.m_hTargetEntity, SHADOW_RECEIVER_STUDIO_MODEL );
+		AddShadowToReceiver( handle, shadow.m_hTargetEntity->GetEngineObject(), SHADOW_RECEIVER_STUDIO_MODEL );
 	}
 }
 
@@ -3986,7 +3986,7 @@ void CClientShadowMgr::ComputeShadowDepthTextures( const CViewSetup &viewSetup )
 //-----------------------------------------------------------------------------
 static void SetupBonesOnBaseAnimating( C_BaseAnimating *&pBaseAnimating )
 {
-	pBaseAnimating->SetupBones( NULL, -1, -1, gpGlobals->curtime );
+	pBaseAnimating->GetEngineObject()->SetupBones( NULL, -1, -1, gpGlobals->curtime );
 }
 
 

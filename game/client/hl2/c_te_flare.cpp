@@ -267,7 +267,7 @@ void C_Flare::Update( float timeDelta )
 		{
 			if ( m_iAttachment == -1 )
 			{
-				m_iAttachment =  LookupAttachment( "fuse" );
+				m_iAttachment = GetEngineObject()->LookupAttachment( "fuse" );
 			}
 
 			if ( m_iAttachment != -1 )
@@ -275,7 +275,7 @@ void C_Flare::Update( float timeDelta )
 				Vector effect_origin;
 				QAngle effect_angles;
 				
-				GetAttachment( m_iAttachment, effect_origin, effect_angles );
+				GetEngineObject()->GetAttachment( m_iAttachment, effect_origin, effect_angles );
 
 				//Raise the light a little bit away from the flare so it lights it up better.
 				dl->origin	= effect_origin + Vector( 0, 0, 4 );

@@ -200,7 +200,7 @@ void C_PropVehiclePrisonerPod::GetVehicleViewPosition( int nRole, Vector *pAbsOr
 //-----------------------------------------------------------------------------
 void C_PropVehiclePrisonerPod::UpdateViewAngles( C_BasePlayer *pLocalPlayer, CUserCmd *pCmd )
 {
-	int eyeAttachmentIndex = LookupAttachment( "vehicle_driver_eyes" );
+	int eyeAttachmentIndex = GetEngineObject()->LookupAttachment( "vehicle_driver_eyes" );
 	Vector vehicleEyeOrigin;
 	QAngle vehicleEyeAngles;
 	GetAttachmentLocal( eyeAttachmentIndex, vehicleEyeOrigin, vehicleEyeAngles );

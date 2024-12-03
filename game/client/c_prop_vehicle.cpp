@@ -191,7 +191,7 @@ ShadowType_t C_PropVehicleDriveable::ShadowCastType()
 void C_PropVehicleDriveable::ClientThink( void )
 {
 	// The vehicle is always dirty owing to pose parameters while it's being driven.
-	g_pClientShadowMgr->MarkRenderToTextureShadowDirty( GetShadowHandle() );
+	g_pClientShadowMgr->MarkRenderToTextureShadowDirty(GetEngineObject()->GetShadowHandle() );
 }
 
 
@@ -362,7 +362,7 @@ void C_PropVehicleDriveable::DrawHudElements( )
 void C_PropVehicleDriveable::RestrictView( float *pYawBounds, float *pPitchBounds,
 										   float *pRollBounds, QAngle &vecViewAngles )
 {
-	int eyeAttachmentIndex = LookupAttachment( "vehicle_driver_eyes" );
+	int eyeAttachmentIndex = GetEngineObject()->LookupAttachment( "vehicle_driver_eyes" );
 	Vector vehicleEyeOrigin;
 	QAngle vehicleEyeAngles;
 	GetAttachmentLocal( eyeAttachmentIndex, vehicleEyeOrigin, vehicleEyeAngles );

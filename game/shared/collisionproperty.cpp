@@ -1225,7 +1225,7 @@ void CCollisionProperty::MarkSurroundingBoundsDirty()
 	MarkPartitionHandleDirty();
 
 #ifdef CLIENT_DLL
-	g_pClientShadowMgr->MarkRenderToTextureShadowDirty( GetOuter()->GetOuter()->GetShadowHandle());
+	g_pClientShadowMgr->MarkRenderToTextureShadowDirty( GetOuter()->GetShadowHandle());
 #else
 	GetOuter()->MarkPVSInformationDirty();
 #endif
@@ -1371,8 +1371,8 @@ void CCollisionProperty::MarkPartitionHandleDirty()
 	}
 
 #ifdef CLIENT_DLL
-	GetOuter()->GetOuter()->MarkRenderHandleDirty();
-	g_pClientShadowMgr->AddToDirtyShadowList( GetOuter()->GetOuter() );
+	GetOuter()->MarkRenderHandleDirty();
+	g_pClientShadowMgr->AddToDirtyShadowList( GetOuter() );
 #endif
 }
 

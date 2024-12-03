@@ -53,7 +53,7 @@ Vector GetTracerOrigin( const CEffectData &data )
 			if ( pViewModel )
 			{
 				// Get the viewmodel and use it instead
-				pRenderable = pViewModel;
+				pRenderable = pViewModel->GetEngineObject();
 			}
 		}
 

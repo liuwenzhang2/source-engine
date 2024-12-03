@@ -107,7 +107,7 @@ void C_NextBotCombatCharacter::UpdateShadowLOD( void )
 
 	if ( oldShadowType != m_shadowType )
 	{
-		DestroyShadow();
+		GetEngineObject()->DestroyShadow();
 	}
 }
 

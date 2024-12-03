@@ -159,7 +159,6 @@ IMPLEMENT_SERVERCLASS_ST_NOBASE( CBaseEntity, DT_BaseEntity )
 
 	// FIXME: Collapse into another flag field?
 
-	SendPropBool( SENDINFO( m_bAlternateSorting )),
 
 #ifdef TF_DLL
 	SendPropArray3( SENDINFO_ARRAY3(m_nModelIndexOverrides), SendPropInt( SENDINFO_ARRAY(m_nModelIndexOverrides), SP_MODEL_INDEX_BITS, 0 ) ),
@@ -221,7 +220,6 @@ CBaseEntity::CBaseEntity()
 	m_vecBaseVelocity.GetForModify().Init();
 #endif
 
-	m_bAlternateSorting = false;
 //	GetEngineObject()->Init(this);
 //#ifdef _DEBUG
 //	((Vector)GetEngineObject()->GetLocalVelocity()).Init();
@@ -1581,7 +1579,7 @@ BEGIN_DATADESC_NO_BASE( CBaseEntity )
 	DEFINE_KEYFIELD( m_iTextureFrameIndex, FIELD_CHARACTER, "texframeindex" ),
 	//DEFINE_FIELD( m_bSimulatedEveryTick, FIELD_BOOLEAN ),
 	//DEFINE_FIELD( m_bAnimatedEveryTick, FIELD_BOOLEAN ),
-	DEFINE_FIELD( m_bAlternateSorting, FIELD_BOOLEAN ),
+	//DEFINE_FIELD( m_bAlternateSorting, FIELD_BOOLEAN ),
 	//DEFINE_KEYFIELD( m_spawnflags, FIELD_INTEGER, "spawnflags" ),
 	DEFINE_FIELD( m_nTransmitStateOwnedCounter, FIELD_CHARACTER ),
 	//DEFINE_CUSTOM_FIELD_INVALID( m_angAbsRotation, engineObjectFuncs),
@@ -3331,7 +3329,7 @@ void CBaseEntity::InputAlpha( inputdata_t &inputdata )
 //-----------------------------------------------------------------------------
 void CBaseEntity::InputAlternativeSorting( inputdata_t &inputdata )
 {
-	m_bAlternateSorting = inputdata.value.Bool();
+	GetEngineObject()->SetAlternateSorting(inputdata.value.Bool());
 }
 
 

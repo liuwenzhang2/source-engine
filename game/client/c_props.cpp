@@ -75,9 +75,9 @@ void C_DynamicProp::GetRenderBounds( Vector& theMins, Vector& theMaxs )
 {
 	if ( m_bUseHitboxesForRenderBox )
 	{
-		if ( GetModel() )
+		if (GetEngineObject()->GetModel() )
 		{
-			IStudioHdr *pStudioHdr = modelinfo->GetStudiomodel( GetModel() );
+			IStudioHdr *pStudioHdr = modelinfo->GetStudiomodel(GetEngineObject()->GetModel() );
 			if ( !pStudioHdr || GetEngineObject()->GetSequence() == -1 )
 			{
 				theMins = vec3_origin;

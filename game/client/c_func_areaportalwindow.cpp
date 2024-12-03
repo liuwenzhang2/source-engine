@@ -81,11 +81,11 @@ int C_FuncAreaPortalWindow::DrawModel( int flags )
 	if ( !m_bReadyToDraw )
 		return 0;
 
-	if( !GetModel() )
+	if( !GetEngineObject()->GetModel() )
 		return 0;
 
 	// Make sure we're a brush model.
-	int modelType = modelinfo->GetModelType( GetModel() );
+	int modelType = modelinfo->GetModelType(GetEngineObject()->GetModel() );
 	if( modelType != mod_brush )
 		return 0;
 
@@ -100,7 +100,7 @@ int C_FuncAreaPortalWindow::DrawModel( int flags )
 
 	render->DrawBrushModelEx( 
 		this, 
-		(model_t *)GetModel(), 
+		(model_t *)GetEngineObject()->GetModel(),
 		GetEngineObject()->GetAbsOrigin(),
 		GetEngineObject()->GetAbsAngles(),
 		mode );

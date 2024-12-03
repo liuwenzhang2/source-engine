@@ -88,7 +88,7 @@ void StudioStats_FindClosestEntity( CClientRenderablesList *pClientRenderablesLi
 
 	if ( iStudioStatMode == RSTUDIOSTATMODE_VIEWMODEL )
 	{
-		g_pStudioStatsEntity = pPlayer->GetViewModel();
+		g_pStudioStatsEntity = pPlayer->GetViewModel()->GetEngineObject();
 		return;
 	}
 	if ( iStudioStatMode == RSTUDIOSTATMODE_VIEWMODEL_ATTACHMENT )
@@ -96,7 +96,7 @@ void StudioStats_FindClosestEntity( CClientRenderablesList *pClientRenderablesLi
 		C_BaseEntity *pVM = pPlayer->GetViewModel();
 		if ( pVM )
 		{
-			g_pStudioStatsEntity = pVM->GetEngineObject()->FirstMoveChild()? pVM->GetEngineObject()->FirstMoveChild()->GetOuter():NULL;
+			g_pStudioStatsEntity = pVM->GetEngineObject()->FirstMoveChild() ? pVM->GetEngineObject()->FirstMoveChild() : NULL;
 		}
 		return;
 	}

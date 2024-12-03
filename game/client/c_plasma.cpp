@@ -269,7 +269,7 @@ void C_Plasma::AddFlames( void )
 			m_entFlames[i].SetBrightness( 255.0f * alpha );
 		}
 
-		m_entFlames[i].AddToLeafSystem();
+		m_entFlames[i].GetEngineObject()->AddToLeafSystem();
 	}
 }
 
@@ -359,10 +359,10 @@ void C_Plasma::Start( void )
 	
 	m_flGlowScale				= m_flStartScale;
 
-	m_entGlow.AddToLeafSystem( RENDER_GROUP_TRANSLUCENT_ENTITY );
+	m_entGlow.GetEngineObject()->AddToLeafSystem( RENDER_GROUP_TRANSLUCENT_ENTITY );
 
 	for( i=0; i < NUM_CHILD_FLAMES; i++ )
-		m_entFlames[i].AddToLeafSystem( RENDER_GROUP_TRANSLUCENT_ENTITY );
+		m_entFlames[i].GetEngineObject()->AddToLeafSystem( RENDER_GROUP_TRANSLUCENT_ENTITY );
 }
 
 //-----------------------------------------------------------------------------
@@ -377,7 +377,7 @@ void C_Plasma::UpdateAnimation( void )
 	{
 		m_entFlames[i].m_flFrame += m_entFlames[i].m_flSpriteFramerate * frametime;
 
-		numFrames = modelinfo->GetModelFrameCount( m_entFlames[i].GetModel() );
+		numFrames = modelinfo->GetModelFrameCount( m_entFlames[i].GetEngineObject()->GetModel() );
 
 		if ( m_entFlames[i].m_flFrame >= numFrames )
 		{
@@ -467,7 +467,7 @@ void C_Plasma::Update( void )
 				int index = decalsystem->GetDecalIndexForName( "PlasmaGlowFade" );
 				if ( index >= 0 )
 				{
-					effects->DecalShoot( index, 0, ent->GetModel(), ent->GetEngineObject()->GetAbsOrigin(), ent->GetEngineObject()->GetAbsAngles(), GetEngineObject()->GetAbsOrigin(), 0, 0 );
+					effects->DecalShoot( index, 0, ent->GetEngineObject()->GetModel(), ent->GetEngineObject()->GetAbsOrigin(), ent->GetEngineObject()->GetAbsAngles(), GetEngineObject()->GetAbsOrigin(), 0, 0 );
 				}
 			}
 		}

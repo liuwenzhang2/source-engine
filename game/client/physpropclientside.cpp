@@ -223,7 +223,7 @@ void C_PhysPropClientside::UpdateOnRemove(void)
 int C_PhysPropClientside::ParsePropData( void )
 {
 	KeyValues *modelKeyValues = new KeyValues("");
-	if ( !modelKeyValues->LoadFromBuffer( modelinfo->GetModelName( GetModel() ), modelinfo->GetModelKeyValueText( GetModel() ) ) )
+	if ( !modelKeyValues->LoadFromBuffer( modelinfo->GetModelName(GetEngineObject()->GetModel() ), modelinfo->GetModelKeyValueText(GetEngineObject()->GetModel() ) ) )
 	{
 		modelKeyValues->deleteThis();
 		return PARSE_FAILED_NO_DATA;
@@ -249,7 +249,7 @@ bool C_PhysPropClientside::Initialize()
 		return false;
 	}
 
-	const model_t *mod = GetModel();
+	const model_t *mod = GetEngineObject()->GetModel();
 	if ( mod )
 	{
 		Vector mins, maxs;
@@ -334,7 +334,7 @@ bool C_PhysPropClientside::Initialize()
 	SetBlocksLOS( false ); // this should be a small object
 
 	// Set up shadows; do it here so that objects can change shadowcasting state
-	CreateShadow();
+	GetEngineObject()->CreateShadow();
 
 	UpdateVisibility();
 
@@ -865,7 +865,7 @@ bool C_FuncPhysicsRespawnZone::Initialize( void )
 	GetEngineObject()->AddSolidFlags( FSOLID_TRIGGER );
 	GetEngineObject()->SetMoveType( MOVETYPE_NONE );
 
-	const model_t *mod = GetModel();
+	const model_t *mod = GetEngineObject()->GetModel();
 	if ( mod )
 	{
 		Vector mins, maxs;

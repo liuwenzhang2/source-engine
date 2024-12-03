@@ -28,7 +28,7 @@ void C_ParticleTrail::GetAimEntOrigin( IClientEntity *pAttachedTo, Vector *pAbsO
 
 	if ( pEnt && (m_nAttachment > 0) )
 	{
-		pEnt->GetAttachment( m_nAttachment, *pAbsOrigin, *pAbsAngles );
+		pEnt->GetEngineObject()->GetAttachment( m_nAttachment, *pAbsOrigin, *pAbsAngles );
 		return;
 	}
 

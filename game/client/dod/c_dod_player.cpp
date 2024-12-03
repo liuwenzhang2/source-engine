@@ -430,7 +430,7 @@ void C_DODRagdoll::CreateLowViolenceRagdoll()
 		if ( pPlayer && !pPlayer->IsDormant() )
 		{
 			// move my current model instance to the ragdoll's so decals are preserved.
-			pPlayer->SnatchModelInstance( this );
+			pPlayer->GetEngineObject()->SnatchModelInstance( this->GetEngineObject());
 
 			GetEngineObject()->SetAbsAngles( pPlayer->GetRenderAngles() );
 			GetEngineObject()->SetNetworkAngles( pPlayer->GetRenderAngles() );
@@ -453,7 +453,7 @@ void C_DODRagdoll::CreateDODRagdoll()
 	if ( pPlayer && !pPlayer->IsDormant() )
 	{
 		// move my current model instance to the ragdoll's so decals are preserved.
-		pPlayer->SnatchModelInstance( this );
+		pPlayer->GetEngineObject()->SnatchModelInstance( this->GetEngineObject());
 
 		//VarMapping_t *varMap = GetEngineObject()->GetVarMapping();
 
@@ -493,7 +493,7 @@ void C_DODRagdoll::CreateDODRagdoll()
 			GetEngineObject()->Interp_Reset();
 		}		
 
-		GetEngineObject()->SetBody(pPlayer->GetBody());
+		GetEngineObject()->SetBody(pPlayer->GetEngineObject()->GetBody());
 	}
 	else
 	{
@@ -534,7 +534,7 @@ void C_DODRagdoll::CreateDODRagdoll()
 	}
 	else
 	{
-		ClientLeafSystem()->SetRenderGroup( GetRenderHandle(), RENDER_GROUP_TRANSLUCENT_ENTITY );
+		ClientLeafSystem()->SetRenderGroup(GetEngineObject()->GetRenderHandle(), RENDER_GROUP_TRANSLUCENT_ENTITY );
 	}		
 
 	// Fade out the ragdoll in a while
@@ -1038,7 +1038,7 @@ void C_DODPlayer::FireEvent( const Vector& origin, const QAngle& angles, int eve
 		Vector vecOrigin;
 		QAngle angAngles;
 
-		if( pWeapon->GetAttachment( iAttachment, vecOrigin, angAngles ) )
+		if( pWeapon->GetEngineObject()->GetAttachment( iAttachment, vecOrigin, angAngles ) )
 		{
 			int shellType = atoi(options);
 
@@ -1393,8 +1393,8 @@ void C_DODPlayer::PopHelmet( Vector vecDir, Vector vecForceOrigin, int iModel )
 
 	{
 		C_BaseAnimating::AutoAllowBoneAccess boneaccess( true, false );
-		int iAttachment = LookupAttachment( "head" );
-		GetAttachment( iAttachment, vecHead, angHeadAngles );	//attachment 1 is the head attachment
+		int iAttachment = GetEngineObject()->LookupAttachment( "head" );
+		GetEngineObject()->GetAttachment( iAttachment, vecHead, angHeadAngles );	//attachment 1 is the head attachment
 	}
 
 	pEntity->GetEngineObject()->SetModelName(MAKE_STRING(modelinfo->GetModelName(model)) );
@@ -1725,7 +1725,7 @@ void C_DODPlayer::ProcessMuzzleFlashEvent()
 	const static int iEjectBrassAttachment = 2;
 
 	// If we have an attachment, then stick a light on it.
-	if ( cl_muzzleflash_dlight_3rd.GetBool() && pWeapon->GetAttachment( iMuzzleFlashAttachment, vecOrigin, angAngles ) )
+	if ( cl_muzzleflash_dlight_3rd.GetBool() && pWeapon->GetEngineObject()->GetAttachment( iMuzzleFlashAttachment, vecOrigin, angAngles ) )
 	{
 		// Muzzleflash light
 		dlight_t *el = effects->CL_AllocDlight( LIGHT_INDEX_MUZZLEFLASH );
@@ -1797,7 +1797,7 @@ void C_DODPlayer::ProcessMuzzleFlashEvent()
 	if( pWeapon->ShouldAutoEjectBrass() )
 	{
 		// shell eject
-		if( pWeapon->GetAttachment( iEjectBrassAttachment, vecOrigin, angAngles ) )
+		if( pWeapon->GetEngineObject()->GetAttachment( iEjectBrassAttachment, vecOrigin, angAngles ) )
 		{
 			int shellType = pWeapon->GetEjectBrassShellType();
 
@@ -1839,11 +1839,11 @@ void C_DODPlayer::Simulate( void )
 			Vector vForward;
 			AngleVectors( eyeAngles, &vForward );
 
-			int iAttachment = LookupAttachment( "anim_attachment_RH" );
+			int iAttachment = GetEngineObject()->LookupAttachment( "anim_attachment_RH" );
 
 			Vector vecOrigin;
 			QAngle dummy;
-			GetAttachment( iAttachment, vecOrigin, dummy );
+			GetEngineObject()->GetAttachment( iAttachment, vecOrigin, dummy );
 
 			trace_t tr;
 			UTIL_TraceLine( vecOrigin, vecOrigin + (vForward * 200), MASK_SHOT, this, COLLISION_GROUP_NONE, &tr );
@@ -2270,7 +2270,7 @@ bool C_DODPlayer::CreateColdBreathEmitter( void )
 		Assert( m_hColdBreathMaterial != INVALID_MATERIAL_HANDLE );
 
 		// Cache off the head attachment for setting up cold breath.
-		m_iHeadAttach = LookupAttachment( "head" );		
+		m_iHeadAttach = GetEngineObject()->LookupAttachment( "head" );
 	}
 
 	return true;
@@ -2391,13 +2391,13 @@ void C_DODPlayer::CalculateIKLocks( float currentTime )
 					if (!pAnim)
 						continue;
 
-					int iAttachment = pAnim->LookupAttachment( pTarget->offset.pAttachmentName );
+					int iAttachment = pAnim->GetEngineObject()->LookupAttachment( pTarget->offset.pAttachmentName );
 					if (iAttachment <= 0)
 						continue;
 
 					Vector origin;
 					QAngle angles;
-					pAnim->GetAttachment( iAttachment, origin, angles );
+					pAnim->GetEngineObject()->GetAttachment( iAttachment, origin, angles );
 
 					// debugoverlay->AddBoxOverlay( origin, Vector( -1, -1, -1 ), Vector( 1, 1, 1 ), QAngle( 0, 0, 0 ), 255, 0, 0, 0, 0 );
 
@@ -2437,7 +2437,7 @@ void C_DODPlayer::EmitColdBreathParticles( void )
 	// of allies (see dod_headiconmanager.cpp).
 	Vector vecOrigin; 
 	QAngle vecAngle;
-	GetAttachment( m_iHeadAttach, vecOrigin, vecAngle );
+	GetEngineObject()->GetAttachment( m_iHeadAttach, vecOrigin, vecAngle );
 	Vector vecForward, vecRight, vecUp;
 	AngleVectors( vecAngle, &vecUp, &vecForward, &vecRight );
 

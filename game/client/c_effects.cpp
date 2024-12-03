@@ -1420,7 +1420,7 @@ void C_Embers::SpawnEmber( void )
 {
 	Vector	offset, mins, maxs;
 	
-	modelinfo->GetModelBounds( GetModel(), mins, maxs );
+	modelinfo->GetModelBounds(GetEngineObject()->GetModel(), mins, maxs );
 
 	//Setup our spawn position
 	offset[0] = random->RandomFloat( mins[0], maxs[0] );
@@ -1511,7 +1511,7 @@ Vector Color32ToVector( const color32 &color )
 
 int	C_QuadraticBeam::DrawModel( int )
 {
-	Draw_SetSpriteTexture( GetModel(), 0, GetRenderMode() );
+	Draw_SetSpriteTexture(GetEngineObject()->GetModel(), 0, GetRenderMode() );
 	Vector color = Color32ToVector( GetRenderColor() );
 	DrawBeamQuadratic( GetRenderOrigin(), m_controlPosition, m_targetPosition, m_flWidth, color, gpGlobals->curtime*m_scrollRate );
 	return 1;

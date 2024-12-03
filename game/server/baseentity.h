@@ -1638,7 +1638,6 @@ private:
 	//Adrian
 	CNetworkVar( unsigned char, m_iTextureFrameIndex );
 	
-	CNetworkVar( bool, m_bAlternateSorting );
 
 	// User outputs. Fired when the "FireInputX" input is triggered.
 	COutputEvent m_OnUser1;

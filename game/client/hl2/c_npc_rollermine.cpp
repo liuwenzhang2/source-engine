@@ -162,10 +162,10 @@ int C_RollerMine::DrawModel( int flags )
 			Vector attachOrigin;
 			QAngle attachAngles;
 			
-			GetAttachment( beamInfo.m_nEndAttachment, attachOrigin, attachAngles );
+			GetEngineObject()->GetAttachment( beamInfo.m_nEndAttachment, attachOrigin, attachAngles );
 			DrawHalo( pMaterial, attachOrigin, random->RandomFloat( 1.0f*scale, 1.5f*scale ), color );
 			
-			GetAttachment( beamInfo.m_nStartAttachment, attachOrigin, attachAngles );
+			GetEngineObject()->GetAttachment( beamInfo.m_nStartAttachment, attachOrigin, attachAngles );
 			DrawHalo( pMaterial, attachOrigin, random->RandomFloat( 1.0f*scale, 1.5f*scale ), color );
 		}
 	}

@@ -80,7 +80,7 @@ public:
 
 		if ( index >= 0 )
 		{
-			effects->DecalShoot( index, pOther->entindex(), pOther->GetModel(), pOther->GetEngineObject()->GetAbsOrigin(), pOther->GetEngineObject()->GetAbsAngles(), GetEngineObject()->GetAbsOrigin(), 0, 0 );
+			effects->DecalShoot( index, pOther->entindex(), pOther->GetEngineObject()->GetModel(), pOther->GetEngineObject()->GetAbsOrigin(), pOther->GetEngineObject()->GetAbsAngles(), GetEngineObject()->GetAbsOrigin(), 0, 0 );
 		}
 
 

@@ -166,7 +166,7 @@ void C_Hairball::Init()
 	//ClientEntityList().AddNonNetworkableEntity( this );
 	ClientThinkList()->SetNextClientThink( GetClientHandle(), CLIENT_THINK_ALWAYS );
 	
-	AddToLeafSystem( RENDER_GROUP_OPAQUE_ENTITY );
+	GetEngineObject()->AddToLeafSystem( RENDER_GROUP_OPAQUE_ENTITY );
 
 	m_pMaterial = materials->FindMaterial( "cable/cable", TEXTURE_GROUP_OTHER );
 	m_flSitStillTime = 5;

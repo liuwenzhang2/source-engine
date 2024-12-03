@@ -96,7 +96,7 @@ int CParticleProperty::GetParticleAttachment( C_BaseEntity *pEntity, const char 
 		return INVALID_PARTICLE_ATTACHMENT;
 
 	// Find the attachment point index
-	int iAttachment = pEntity->GetBaseAnimating()->LookupAttachment( pszAttachmentName );
+	int iAttachment = pEntity->GetBaseAnimating()->GetEngineObject()->LookupAttachment( pszAttachmentName );
 	if ( iAttachment == INVALID_PARTICLE_ATTACHMENT )
 	{
 		Warning("Model '%s' doesn't have attachment '%s' to attach particle system '%s' to.\n", STRING(pEntity->GetBaseAnimating()->GetEngineObject()->GetModelName()), pszAttachmentName, pszParticleName );
@@ -610,13 +610,13 @@ void CParticleProperty::UpdateControlPoint( ParticleEffectList_t *pEffect, int i
 				{
 					matrix3x4_t attachmentToWorld;
 
-					if ( !pAnimating->GetAttachment( pPoint->iAttachmentPoint, attachmentToWorld ) )
+					if ( !pAnimating->GetEngineObject()->GetAttachment( pPoint->iAttachmentPoint, attachmentToWorld ) )
 					{
 						// try C_BaseAnimating if attach point is not on the weapon
-						if ( !pAnimating->C_BaseAnimating::GetAttachment( pPoint->iAttachmentPoint, attachmentToWorld ) )
+						if ( !pAnimating->C_BaseAnimating::GetEngineObject()->GetAttachment( pPoint->iAttachmentPoint, attachmentToWorld ) )
 						{
 							Warning( "Cannot update control point %d for effect '%s'.\n", pPoint->iAttachmentPoint, pEffect->pParticleEffect->GetEffectName() );
-							attachmentToWorld = pAnimating->RenderableToWorldTransform();
+							attachmentToWorld = pAnimating->GetEngineObject()->RenderableToWorldTransform();
 						}
 					}
 

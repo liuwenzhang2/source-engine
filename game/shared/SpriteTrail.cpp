@@ -431,7 +431,7 @@ int CSpriteTrail::DrawModel( int flags )
 	if ( !IsVisible() || ( m_bReadyToDraw == false ) )
 		return 0;
 
-	CEngineSprite *pSprite = Draw_SetSpriteTexture( GetModel(), m_flFrame, GetRenderMode() );
+	CEngineSprite *pSprite = Draw_SetSpriteTexture(GetEngineObject()->GetModel(), m_flFrame, GetRenderMode() );
 	if ( pSprite == NULL )
 		return 0;
 
@@ -545,7 +545,7 @@ const Vector &CSpriteTrail::GetRenderOrigin( void )
 		if ( ent )
 		{
 			QAngle dummyAngles;
-			ent->GetAttachment( m_nAttachment, vOrigin, dummyAngles );
+			ent->GetEngineObject()->GetAttachment( m_nAttachment, vOrigin, dummyAngles );
 		}
 	}
 

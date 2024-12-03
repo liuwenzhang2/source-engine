@@ -257,10 +257,10 @@ void C_PropAirboat::DrawHudElements( )
 		x = screenWidth/2;
 		y = screenHeight/2;
 
-		int eyeAttachmentIndex = LookupAttachment( "vehicle_driver_eyes" );
+		int eyeAttachmentIndex = GetEngineObject()->LookupAttachment( "vehicle_driver_eyes" );
 		Vector vehicleEyeOrigin;
 		QAngle vehicleEyeAngles;
-		GetAttachment( eyeAttachmentIndex, vehicleEyeOrigin, vehicleEyeAngles );
+		GetEngineObject()->GetAttachment( eyeAttachmentIndex, vehicleEyeOrigin, vehicleEyeAngles );
 
 		// Only worry about yaw.
 		vehicleEyeAngles.x = vehicleEyeAngles.z = 0.0f;
@@ -327,7 +327,7 @@ void C_PropAirboat::UpdateViewAngles( C_BasePlayer *pLocalPlayer, CUserCmd *pCmd
 		if ( m_flViewAngleDeltaTime > r_AirboatViewBlendToTime.GetFloat() )
 		{
 			// Blend the view angles.
-			int eyeAttachmentIndex = LookupAttachment( "vehicle_driver_eyes" );
+			int eyeAttachmentIndex = GetEngineObject()->LookupAttachment( "vehicle_driver_eyes" );
 			Vector vehicleEyeOrigin;
 			QAngle vehicleEyeAngles;
 			GetAttachmentLocal( eyeAttachmentIndex, vehicleEyeOrigin, vehicleEyeAngles );
@@ -478,10 +478,10 @@ void C_PropAirboat::DampenUpMotion( Vector &vecVehicleEyePos, QAngle &vecVehicle
 //-----------------------------------------------------------------------------
 void C_PropAirboat::OnEnteredVehicle( C_BasePlayer *pPlayer )
 {
-	int eyeAttachmentIndex = LookupAttachment( "vehicle_driver_eyes" );
+	int eyeAttachmentIndex = GetEngineObject()->LookupAttachment( "vehicle_driver_eyes" );
 	Vector vehicleEyeOrigin;
 	QAngle vehicleEyeAngles;
-	GetAttachment( eyeAttachmentIndex, vehicleEyeOrigin, vehicleEyeAngles );
+	GetEngineObject()->GetAttachment( eyeAttachmentIndex, vehicleEyeOrigin, vehicleEyeAngles );
 
 	m_vecLastEyeTarget = vehicleEyeOrigin;
 	m_vecLastEyePos = vehicleEyeOrigin;
@@ -521,11 +521,11 @@ void C_PropAirboat::UpdateHeadlight()
 
 		// The headlight is emitted from an attachment point so that it can move
 		// as we turn the handlebars.
-		int nHeadlightIndex = LookupAttachment( "vehicle_headlight" );
+		int nHeadlightIndex = GetEngineObject()->LookupAttachment( "vehicle_headlight" );
 
 		Vector vecLightPos;
 		QAngle angLightDir;
-		GetAttachment(nHeadlightIndex, vecLightPos, angLightDir);
+		GetEngineObject()->GetAttachment(nHeadlightIndex, vecLightPos, angLightDir);
 
 		Vector vecLightDir, vecLightRight, vecLightUp;
 		AngleVectors( angLightDir, &vecLightDir, &vecLightRight, &vecLightUp );
@@ -789,11 +789,11 @@ int C_PropAirboat::DrawWake( void )
 
 	//FIXME: This lookup should be cached off
 	// Get all attachments
-	GetAttachment( LookupAttachment( "raytrace_fl" ), vecPontoonFrontLeft, fooAngles );
-	GetAttachment( LookupAttachment( "raytrace_fr" ), vecPontoonFrontRight, fooAngles );
-	GetAttachment( LookupAttachment( "raytrace_rl" ), vecPontoonRearLeft, fooAngles );
-	GetAttachment( LookupAttachment( "raytrace_rr" ), vecPontoonRearRight, fooAngles );
-	GetAttachment( LookupAttachment( "splash_pt" ), vecSplashPoint, fooAngles );
+	GetEngineObject()->GetAttachment(GetEngineObject()->LookupAttachment( "raytrace_fl" ), vecPontoonFrontLeft, fooAngles );
+	GetEngineObject()->GetAttachment(GetEngineObject()->LookupAttachment( "raytrace_fr" ), vecPontoonFrontRight, fooAngles );
+	GetEngineObject()->GetAttachment(GetEngineObject()->LookupAttachment( "raytrace_rl" ), vecPontoonRearLeft, fooAngles );
+	GetEngineObject()->GetAttachment(GetEngineObject()->LookupAttachment( "raytrace_rr" ), vecPontoonRearRight, fooAngles );
+	GetEngineObject()->GetAttachment(GetEngineObject()->LookupAttachment( "splash_pt" ), vecSplashPoint, fooAngles );
 
 	// Find the direction of the pontoons
 	Vector vecLeftWakeDir = ( vecPontoonRearLeft - vecPontoonFrontLeft );

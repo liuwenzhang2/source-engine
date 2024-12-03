@@ -62,14 +62,14 @@ ConVar r_visualizeproplightcaching( "r_visualizeproplightcaching", "0" );
 //-----------------------------------------------------------------------------
 bool C_PhysicsProp::OnInternalDrawModel( ClientModelRenderInfo_t *pInfo )
 {
-	CreateModelInstance();
+	GetEngineObject()->CreateModelInstance();
 
 	if ( r_PhysPropStaticLighting.GetBool() && m_bAwakeLastTime != m_bAwake )
 	{
 		if ( m_bAwakeLastTime && !m_bAwake )
 		{
 			// transition to sleep, bake lighting now, once
-			if ( !modelrender->RecomputeStaticLighting( GetModelInstance() ) )
+			if ( !modelrender->RecomputeStaticLighting(GetEngineObject()->GetModelInstance() ) )
 			{
 				// not valid for drawing
 				return false;

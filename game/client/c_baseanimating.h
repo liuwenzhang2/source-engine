@@ -121,7 +121,6 @@ public:
 
 	virtual void ApplyBoneMatrixTransform( matrix3x4_t& transform );
 
-	virtual bool SetupBones(matrix3x4_t* pBoneToWorldOut, int nMaxBones, int boneMask, float currentTime);
 	virtual void UpdateIKLocks( float currentTime );
 	virtual void CalculateIKLocks( float currentTime );
 	virtual bool ShouldDraw();
@@ -247,8 +246,8 @@ public:
 	virtual void					GetRagdollInitBoneArrays( matrix3x4_t *pDeltaBones0, matrix3x4_t *pDeltaBones1, matrix3x4_t *pCurrentBones, float boneDt );
 
 	// For shadows rendering the correct body + sequence...
-	virtual int GetBody()			{ return GetEngineObject()->GetBody(); }
-	virtual int GetSkin()			{ return GetEngineObject()->GetSkin(); }
+	//virtual int GetBody()			{ return GetEngineObject()->GetBody(); }
+	//virtual int GetSkin()			{ return GetEngineObject()->GetSkin(); }
 
 	void							GetBlendedLinearVelocity( Vector *pVec );
 	int								LookupSequence ( const char *label );

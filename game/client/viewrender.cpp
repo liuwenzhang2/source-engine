@@ -3824,7 +3824,7 @@ ConVar r_drawopaquesbucket_stats( "r_drawopaquesbucket_stats", "0", FCVAR_CHEAT,
 
 static void SetupBonesOnBaseAnimating( C_BaseAnimating *&pBaseAnimating )
 {
-	pBaseAnimating->SetupBones( NULL, -1, -1, gpGlobals->curtime );
+	pBaseAnimating->GetEngineObject()->SetupBones( NULL, -1, -1, gpGlobals->curtime );
 }
 
 

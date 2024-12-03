@@ -59,16 +59,12 @@ public:
 	//virtual bool	GetShadowCastDistance( float *pDist, ShadowType_t shadowType ) const;
 	//virtual bool	GetShadowCastDirection( Vector *pDirection, ShadowType_t shadowType ) const;
 
-	// Returns the transform from RenderOrigin/RenderAngles to world
-	virtual const matrix3x4_t &RenderableToWorldTransform();
-
 	// Rendering clip plane, should be 4 floats, return value of NULL indicates a disabled render clip plane
 	virtual float *GetRenderClipPlane( void ) { return m_pSharedRenderClipPlane; };
 
 	virtual int	DrawModel( int flags );
 
-	// Get the model instance of the ghosted model so that decals will properly draw across portals
-	virtual ModelInstanceHandle_t GetModelInstance();
+	
 
 
 

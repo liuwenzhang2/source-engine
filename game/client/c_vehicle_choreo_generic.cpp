@@ -222,7 +222,7 @@ void C_PropVehicleChoreoGeneric::GetVehicleViewPosition( int nRole, Vector *pAbs
 //-----------------------------------------------------------------------------
 void C_PropVehicleChoreoGeneric::UpdateViewAngles( C_BasePlayer *pLocalPlayer, CUserCmd *pCmd )
 {
-	int eyeAttachmentIndex = LookupAttachment( "vehicle_driver_eyes" );
+	int eyeAttachmentIndex = GetEngineObject()->LookupAttachment( "vehicle_driver_eyes" );
 	Vector vehicleEyeOrigin;
 	QAngle vehicleEyeAngles;
 	GetAttachmentLocal( eyeAttachmentIndex, vehicleEyeOrigin, vehicleEyeAngles );

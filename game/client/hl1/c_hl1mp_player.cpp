@@ -286,7 +286,7 @@ C_HL1MPRagdoll::~C_HL1MPRagdoll()
 
 	if ( m_hPlayer )
 	{
-		m_hPlayer->CreateModelInstance();
+		m_hPlayer->GetEngineObject()->CreateModelInstance();
 	}
 }
 
@@ -415,7 +415,7 @@ void C_HL1MPRagdoll::CreateHL1MPRagdoll( void )
 	if ( pPlayer && !pPlayer->IsDormant() )
 	{
 		// move my current model instance to the ragdoll's so decals are preserved.
-		pPlayer->SnatchModelInstance( this );
+		pPlayer->GetEngineObject()->SnatchModelInstance( this->GetEngineObject());
 
 		//VarMapping_t *varMap = GetEngineObject()->GetVarMapping();
 
@@ -538,12 +538,12 @@ void C_HL1MPRagdoll::SetupWeights( const matrix3x4_t *pBoneToWorld, int nFlexWei
 	if ( m_iEyeAttachment > 0 )
 	{
 		matrix3x4_t attToWorld;
-		if (GetAttachment( m_iEyeAttachment, attToWorld ))
+		if (GetEngineObject()->GetAttachment( m_iEyeAttachment, attToWorld ))
 		{
 			Vector local, tmp;
 			local.Init( 1000.0f, 0.0f, 0.0f );
 			VectorTransform( local, attToWorld, tmp );
-			modelrender->SetViewTarget(GetEngineObject()->GetModelPtr(), GetBody(), tmp );
+			modelrender->SetViewTarget(GetEngineObject()->GetModelPtr(), GetEngineObject()->GetBody(), tmp );
 		}
 	}
 }

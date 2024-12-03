@@ -198,7 +198,7 @@ void C_SmokeTrail::GetAimEntOrigin( IClientEntity *pAttachedTo, Vector *pAbsOrig
 	C_BaseEntity *pEnt = pAttachedTo->GetBaseEntity();
 	if (pEnt && (m_nAttachment > 0))
 	{
-		pEnt->GetAttachment( m_nAttachment, *pAbsOrigin, *pAbsAngles );
+		pEnt->GetEngineObject()->GetAttachment( m_nAttachment, *pAbsOrigin, *pAbsAngles );
 	}
 	else
 	{
@@ -577,7 +577,7 @@ void C_RocketTrail::GetAimEntOrigin( IClientEntity *pAttachedTo, Vector *pAbsOri
 	C_BaseEntity *pEnt = pAttachedTo->GetBaseEntity();
 	if (pEnt && (m_nAttachment > 0))
 	{
-		pEnt->GetAttachment( m_nAttachment, *pAbsOrigin, *pAbsAngles );
+		pEnt->GetEngineObject()->GetAttachment( m_nAttachment, *pAbsOrigin, *pAbsAngles );
 	}
 	else
 	{
@@ -1395,7 +1395,7 @@ void C_SporeTrail::GetAimEntOrigin( IClientEntity *pAttachedTo, Vector *pAbsOrig
 {
 	C_BaseEntity *pEnt = pAttachedTo->GetBaseEntity();
 	
-	pEnt->GetAttachment( 1, *pAbsOrigin, *pAbsAngles );
+	pEnt->GetEngineObject()->GetAttachment( 1, *pAbsOrigin, *pAbsAngles );
 
 	matrix3x4_t	matrix;
 

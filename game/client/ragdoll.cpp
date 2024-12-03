@@ -137,12 +137,12 @@ void C_ServerRagdoll::SetupWeights( const matrix3x4_t *pBoneToWorld, int nFlexWe
 	if ( m_iEyeAttachment > 0 )
 	{
 		matrix3x4_t attToWorld;
-		if (GetAttachment( m_iEyeAttachment, attToWorld ))
+		if (GetEngineObject()->GetAttachment( m_iEyeAttachment, attToWorld ))
 		{
 			Vector local, tmp;
 			local.Init( 1000.0f, 0.0f, 0.0f );
 			VectorTransform( local, attToWorld, tmp );
-			modelrender->SetViewTarget(GetEngineObject()->GetModelPtr(), GetBody(), tmp );
+			modelrender->SetViewTarget(GetEngineObject()->GetModelPtr(), GetEngineObject()->GetBody(), tmp );
 		}
 	}
 }
@@ -248,7 +248,7 @@ public:
 				boneMask |= GetHighestBit( boneFlags );
 			}
 		}
-		return BaseClass::SetupBones( pBoneToWorldOut, nMaxBones, boneMask, currentTime );
+		return GetEngineObject()->SetupBones( pBoneToWorldOut, nMaxBones, boneMask, currentTime );
 	}
 
 	virtual void BeforeBuildTransformations( IStudioHdr *hdr, Vector *pos, Quaternion q[], const matrix3x4_t& cameraTransform, int boneMask, CBoneBitList &boneComputed )
@@ -270,7 +270,7 @@ public:
 		if ( parent )
 		{
 			Assert( parent != this );
-			parent->SetupBones( NULL, -1, BONE_USED_BY_ANYTHING, gpGlobals->curtime );
+			parent->GetEngineObject()->SetupBones( NULL, -1, BONE_USED_BY_ANYTHING, gpGlobals->curtime );
 
 			const matrix3x4_t& boneToWorld = parent->GetEngineObject()->GetBone( m_boneIndexAttached );
 			VectorTransform( m_attachmentPointBoneSpace, boneToWorld, worldOrigin );

@@ -113,7 +113,7 @@ void C_NPC_RocketTurret::LaserOn( void )
 
 	Vector vecMuzzle;
 	QAngle angMuzzleDir;
-	GetAttachment( ROCKET_TURRET_LASER_ATTACHMENT, vecMuzzle, angMuzzleDir );
+	GetEngineObject()->GetAttachment( ROCKET_TURRET_LASER_ATTACHMENT, vecMuzzle, angMuzzleDir );
 
 	QAngle angAimDir = m_vecCurrentAngles;
 	Vector vecAimDir;

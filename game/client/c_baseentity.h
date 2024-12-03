@@ -265,9 +265,10 @@ public:
 	
 
 	virtual void					Release();
+	virtual IClientUnknown*			GetIClientUnknown()		{ return this; }
 	virtual ICollideable*			GetCollideable()		{ return GetEngineObject()->GetCollideable(); }
 	virtual IClientNetworkable*		GetClientNetworkable()	{ return this; }
-	virtual IClientRenderable*		GetClientRenderable()	{ return this; }
+	virtual IClientRenderable*		GetClientRenderable()	{ return GetEngineObject(); }
 	virtual IClientEntity*			GetIClientEntity()		{ return this; }
 	virtual C_BaseEntity*			GetBaseEntity()			{ return this; }
 	virtual IClientThinkable*		GetClientThinkable()	{ return this; }
@@ -279,7 +280,6 @@ public:
 	virtual const Vector&			GetRenderOrigin( void );
 	virtual const QAngle&			GetRenderAngles( void );
 	virtual Vector					GetObserverCamOrigin( void ) { return GetRenderOrigin(); }	// Return the origin for player observers tracking this target
-	virtual const matrix3x4_t &		RenderableToWorldTransform();
 	virtual bool					IsTwoPass( void );
 	virtual bool					UsesPowerOfTwoFrameBufferTexture();
 	virtual bool					UsesFullFrameBufferTexture();
@@ -288,7 +288,6 @@ public:
 	virtual bool OnPostInternalDrawModel(ClientModelRenderInfo_t* pInfo);
 	virtual void					ComputeFxBlend( void );
 	virtual int						GetFxBlend( void );
-	virtual bool					LODTest() { return true; }   // NOTE: UNUSED
 	virtual void					GetRenderBounds( Vector& mins, Vector& maxs );
 	virtual IPVSNotify*				GetPVSNotifyInterface();
 	virtual void					GetRenderBoundsWorldspace( Vector& absMins, Vector& absMaxs );
@@ -410,7 +409,6 @@ public:
 
 // IClientEntity implementation.
 public:
-	virtual bool					SetupBones( matrix3x4_t *pBoneToWorldOut, int nMaxBones, int boneMask, float currentTime );
 	virtual void					SetupWeights( const matrix3x4_t *pBoneToWorld, int nFlexWeightCount, float *pFlexWeights, float *pFlexDelayedWeights );
 	virtual bool					UsesFlexDelayedWeights() { return false; }
 	//virtual void					DoAnimationEvents( void );
@@ -451,18 +449,6 @@ public:
 	// Return false to indicate sound is not audible
 	virtual bool					GetSoundSpatialization( SpatializationInfo_t& info );
 
-	// Attachments
-	virtual int						LookupAttachment( const char *pAttachmentName ) 
-	{ 
-		return GetEngineObject()->LookupAttachment(pAttachmentName);
-	}
-	virtual bool					GetAttachment(int number, matrix3x4_t& matrix) {
-		return GetEngineObject()->GetAttachment(number, matrix);
-	}
-	//virtual bool					GetAttachment( int number, Vector &origin );
-	virtual	bool					GetAttachment(int number, Vector& origin, QAngle& angles) {
-		return GetEngineObject()->GetAttachment(number, origin, angles);
-	}
 	virtual bool					GetAttachmentVelocity(int number, Vector& originVel, Quaternion& angleVel) {
 		return GetEngineObject()->GetAttachmentVelocity(number, originVel, angleVel);
 	}
@@ -472,7 +458,7 @@ public:
 // Output :	location and angles
 //-----------------------------------------------------------------------------
 	bool							GetAttachment(const char* szName, Vector& absOrigin, QAngle& absAngles) {
-		return GetAttachment(LookupAttachment(szName), absOrigin, absAngles);
+		return GetEngineObject()->GetAttachment(GetEngineObject()->LookupAttachment(szName), absOrigin, absAngles);
 	}
 
 	// Team handling
@@ -583,7 +569,7 @@ public:
 	virtual CollideType_t			GetCollideType( void );
 
 	virtual bool					ShouldDraw();
-	inline	bool					IsVisible() const { return m_hRender != INVALID_CLIENT_RENDER_HANDLE; }
+	inline	bool					IsVisible() const { return GetEngineObject()->GetRenderHandle() != INVALID_CLIENT_RENDER_HANDLE; }
 			void					UpdateVisibility();
 	
 	// Returns true if the entity changes its position every frame on the server but it doesn't
@@ -644,18 +630,9 @@ public:
 	// Should this object receive shadows?
 	virtual bool					ShouldReceiveProjectedTextures( int flags );
 
-	// Shadow-related methods
-	virtual bool IsShadowDirty( );
-	virtual void MarkShadowDirty( bool bDirty );
-	virtual IClientRenderable *GetShadowParent();
-	virtual IClientRenderable *FirstShadowChild();
-	virtual IClientRenderable *NextShadowPeer();
+	
 
-	// Sets up a render handle so the leaf system will draw this entity.
-	void							AddToLeafSystem();
-	void							AddToLeafSystem( RenderGroup_t group );
-	// remove entity form leaf system again
-	void							RemoveFromLeafSystem();	
+
 
 	// A method to apply a decal to an entity
 	virtual void					AddDecal( const Vector& rayStart, const Vector& rayEnd,
@@ -793,11 +770,7 @@ public:
 	void					ResolveFlyCollisionSlide( trace_t &trace, Vector &vecVelocity );
 	void					ResolveFlyCollisionCustom( trace_t &trace, Vector &vecVelocity );
 
-	// Creates the shadow (if it doesn't already exist) based on shadow cast type
-	void					CreateShadow();
 
-	// Destroys the shadow; causes its type to be recomputed if the entity doesn't go away immediately.
-	void					DestroyShadow();
 
 public:
 
@@ -895,7 +868,6 @@ public:
 	void					NotifyPositionChanged();
 	void					NotifyVPhysicsStateChanged(IPhysicsObject* pPhysics, bool bAwake);
 
-	ClientRenderHandle_t	GetRenderHandle() const;
 
 	void				SetRemovalFlag( bool bRemove );
 
@@ -903,8 +875,8 @@ public:
 	virtual void OnRemoveEffects(int nEffects) {}
 
 	// For shadows rendering the correct body + sequence...
-	virtual int GetBody() { return 0; }
-	virtual int GetSkin() { return 0; }
+	//virtual int GetBody() { return 0; }
+	//virtual int GetSkin() { return 0; }
 
 	// Stubs on client
 	void	NetworkStateManualMode( bool activate )		{ }
@@ -931,21 +903,13 @@ public:
 	}
 #endif
 
-	const model_t* GetModel() const { return GetEngineObject()->GetModel(); }
-	// Gets the model instance + shadow handle
-	virtual ModelInstanceHandle_t GetModelInstance() { return m_ModelInstance; }
-	void SetModelInstance( ModelInstanceHandle_t hInstance) { m_ModelInstance = hInstance; }
-	bool SnatchModelInstance( C_BaseEntity * pToEntity );
-	virtual ClientShadowHandle_t GetShadowHandle() const	{ return m_ShadowHandle; }
-	virtual ClientRenderHandle_t&	RenderHandle();
+	
 
-	void CreateModelInstance();
 
 	// Sets the origin + angles to match the last position received
 	void MoveToLastReceivedPosition( bool force = false );
 
-	// Only meant to be called from subclasses
-	void DestroyModelInstance();
+	
 
 	virtual void BeforeBuildTransformations(IStudioHdr* pStudioHdr, Vector* pos, Quaternion q[], const matrix3x4_t& cameraTransform, int boneMask, CBoneBitList& boneComputed) {}
 	virtual void AfterBuildTransformations(IStudioHdr* pStudioHdr, Vector* pos, Quaternion q[], const matrix3x4_t& cameraTransform, int boneMask, CBoneBitList& boneComputed) {}
@@ -1049,9 +1013,7 @@ private:
 	unsigned char 					m_nOldRenderMode;
 
 public:
-	// Used to store the state we were added to the BSP as, so it can
-	// reinsert the entity if the state changes.
-	ClientRenderHandle_t			m_hRender;	// link into spatial partition
+	
 
 	// Interpolation says don't draw yet
 	bool							m_bReadyToDraw;
@@ -1114,9 +1076,6 @@ public:
 
 
 	virtual bool					AddRagdollToFadeQueue( void ) { return true; }
-
-	// Dirty bits
-	void							MarkRenderHandleDirty();
 
 	// used by SourceTV since move-parents may be missing when child spawns.
 	void							HierarchyUpdateMoveParent();
@@ -1231,11 +1190,9 @@ private:
 	// Base velocity
 	Vector							m_vecBaseVelocity;
 
-	// Model instance data..
-	ModelInstanceHandle_t			m_ModelInstance;
+	
 
-	// Shadow data
-	ClientShadowHandle_t			m_ShadowHandle;
+	
 
 
 
@@ -1276,7 +1233,6 @@ private:
 	float							m_fadeMinDist;
 	float							m_fadeMaxDist;
 	float							m_flFadeScale;
-	CNetworkVar( bool, m_bAlternateSorting );
 
 	//Adrian
 	unsigned char					m_iTextureFrameIndex;
@@ -1478,15 +1434,7 @@ inline void C_BaseEntity::SetRenderColorA( byte a )
 	SetRenderColor( GetRenderColor().r, GetRenderColor().g, GetRenderColor().b, a );
 }
 
-inline ClientRenderHandle_t C_BaseEntity::GetRenderHandle() const 
-{ 
-	return m_hRender; 
-}
 
-inline ClientRenderHandle_t& C_BaseEntity::RenderHandle()
-{
-	return m_hRender;
-}
 
 #ifdef SIXENSE
 

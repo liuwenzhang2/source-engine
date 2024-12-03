@@ -38,7 +38,7 @@ public:
 
 			color[0] = color[1] = color[2] = random->RandomFloat( 0.1f, 0.2f );
 
-			GetAttachment( 1, vecOrigin, vecAngles );
+			GetEngineObject()->GetAttachment( 1, vecOrigin, vecAngles );
 
 			Vector	vForward;
 			AngleVectors( vecAngles, &vForward );
@@ -70,7 +70,7 @@ public:
 			Vector	vecOrigin;
 			QAngle	vecAngles;
 
-			GetAttachment( 1, vecOrigin, vecAngles );
+			GetEngineObject()->GetAttachment( 1, vecOrigin, vecAngles );
 
 			Vector	vForward;
 			AngleVectors( vecAngles, &vForward );

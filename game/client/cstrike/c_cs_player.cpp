@@ -271,7 +271,7 @@ void C_CSRagdoll::GetRagdollInitBoneArrays( matrix3x4_t *pDeltaBones0, matrix3x4
 	// otherwise use the death pose to set up the ragdoll
 	ForceSetupBonesAtTime( pDeltaBones0, gpGlobals->curtime - boneDt );
 	GetRagdollCurSequenceWithDeathPose( this, pDeltaBones1, gpGlobals->curtime, m_iDeathPose, m_iDeathFrame );
-	SetupBones( pCurrentBones, MAXSTUDIOBONES, BONE_USED_BY_ANYTHING, gpGlobals->curtime );
+	GetEngineObject()->SetupBones( pCurrentBones, MAXSTUDIOBONES, BONE_USED_BY_ANYTHING, gpGlobals->curtime );
 }
 
 void C_CSRagdoll::Interp_Copy( C_BaseAnimatingOverlay *pSourceEntity )
@@ -393,7 +393,7 @@ void C_CSRagdoll::CreateLowViolenceRagdoll( void )
 		if ( !pPlayer->IsDormant() )
 		{
 			// move my current model instance to the ragdoll's so decals are preserved.
-			pPlayer->SnatchModelInstance( this );
+			pPlayer->GetEngineObject()->SnatchModelInstance( this->GetEngineObject());
 		}
 
 		GetEngineObject()->SetAbsAngles( pPlayer->GetRenderAngles() );
@@ -422,7 +422,7 @@ void C_CSRagdoll::CreateCSRagdoll()
 	if ( pPlayer && !pPlayer->IsDormant() )
 	{
 		// move my current model instance to the ragdoll's so decals are preserved.
-		pPlayer->SnatchModelInstance( this );
+		pPlayer->GetEngineObject()->SnatchModelInstance( this->GetEngineObject());
 
 		//VarMapping_t *varMap = GetEngineObject()->GetVarMapping();
 
@@ -514,8 +514,8 @@ void C_CSRagdoll::CreateCSRagdoll()
 	else
 	{
 		m_flRagdollSinkStart = gpGlobals->curtime;
-		DestroyShadow();
-		ClientLeafSystem()->SetRenderGroup( GetRenderHandle(), RENDER_GROUP_TRANSLUCENT_ENTITY );
+		GetEngineObject()->DestroyShadow();
+		ClientLeafSystem()->SetRenderGroup(GetEngineObject()->GetRenderHandle(), RENDER_GROUP_TRANSLUCENT_ENTITY );
 	}
 	m_bInitialized = true;
 }
@@ -1063,7 +1063,7 @@ void C_CSPlayer::CreateAddonModel( int i )
 	// Create the model entity.
 	CAddonInfo *pAddonInfo = &g_AddonInfo[i];
 
-	int iAttachment = LookupAttachment( pAddonInfo->m_pAttachmentName );
+	int iAttachment = GetEngineObject()->LookupAttachment( pAddonInfo->m_pAttachmentName );
 	if ( iAttachment <= 0 )
 		return;
 
@@ -1772,11 +1772,11 @@ void C_CSPlayer::ProcessMuzzleFlashEvent()
 	Vector vector;
 	QAngle angles;
 
-	int iAttachment = LookupAttachment( "muzzle_flash" );
+	int iAttachment = GetEngineObject()->LookupAttachment( "muzzle_flash" );
 
 	if ( iAttachment >= 0 )
 	{
-		bool bFoundAttachment = GetAttachment( iAttachment, vector, angles );
+		bool bFoundAttachment = GetEngineObject()->GetAttachment( iAttachment, vector, angles );
 		// If we have an attachment, then stick a light on it.
 		if ( bFoundAttachment )
 		{
@@ -2001,7 +2001,7 @@ void C_CSPlayer::AfterBuildTransformations( IStudioHdr *pHdr, Vector *pos, Quate
 		return;
 
 	// Have the weapon setup its bones.
-	pWeapon->SetupBones( NULL, 0, BONE_USED_BY_ANYTHING, gpGlobals->curtime );
+	pWeapon->GetEngineObject()->SetupBones( NULL, 0, BONE_USED_BY_ANYTHING, gpGlobals->curtime );
 
 	int iWeaponBone = 0;
 	if ( FindWeaponAttachmentBone( pWeapon, iWeaponBone ) )
@@ -2233,14 +2233,14 @@ void C_CSPlayer::Simulate( void )
 			Vector vForward;
 			AngleVectors( eyeAngles, &vForward );
 
-			int iAttachment = LookupAttachment( "muzzle_flash" );
+			int iAttachment = GetEngineObject()->LookupAttachment( "muzzle_flash" );
 
 			if ( iAttachment < 0 )
 				return;
 
 			Vector vecOrigin;
 			QAngle dummy;
-			GetAttachment( iAttachment, vecOrigin, dummy );
+			GetEngineObject()->GetAttachment( iAttachment, vecOrigin, dummy );
 
 			trace_t tr;
 			UTIL_TraceLine( vecOrigin, vecOrigin + (vForward * 200), MASK_SHOT, this, COLLISION_GROUP_NONE, &tr );

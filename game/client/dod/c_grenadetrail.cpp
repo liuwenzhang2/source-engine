@@ -129,7 +129,7 @@ void C_GrenadeTrail::GetAimEntOrigin( IClientEntity *pAttachedTo, Vector *pAbsOr
 	C_BaseEntity *pEnt = pAttachedTo->GetBaseEntity();
 	if (pEnt && (m_nAttachment > 0))
 	{
-		pEnt->GetAttachment( m_nAttachment, *pAbsOrigin, *pAbsAngles );
+		pEnt->GetEngineObject()->GetAttachment( m_nAttachment, *pAbsOrigin, *pAbsAngles );
 	}
 	else
 	{

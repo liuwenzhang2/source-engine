@@ -3056,11 +3056,11 @@ void CWeaponPhysCannon::StartEffects( void )
 		// Different for different views
 		if ( ShouldDrawUsingViewModel() )
 		{
-			m_Parameters[i].SetAttachment( LookupAttachment( attachNamesGlow[i-PHYSCANNON_GLOW1] ) );
+			m_Parameters[i].SetAttachment(GetEngineObject()->LookupAttachment( attachNamesGlow[i-PHYSCANNON_GLOW1] ) );
 		}
 		else
 		{
-			m_Parameters[i].SetAttachment( LookupAttachment( attachNamesGlowThirdPerson[i-PHYSCANNON_GLOW1] ) );
+			m_Parameters[i].SetAttachment(GetEngineObject()->LookupAttachment( attachNamesGlowThirdPerson[i-PHYSCANNON_GLOW1] ) );
 		}
 		m_Parameters[i].SetColor( Vector( 255, 128, 0 ) );
 		
@@ -3090,7 +3090,7 @@ void CWeaponPhysCannon::StartEffects( void )
 
 		m_Parameters[i].GetScale().SetAbsolute( 0.05f * SPRITE_SCALE );
 		m_Parameters[i].GetAlpha().SetAbsolute( 255.0f );
-		m_Parameters[i].SetAttachment( LookupAttachment( attachNamesEndCap[i-PHYSCANNON_ENDCAP1] ) );
+		m_Parameters[i].SetAttachment(GetEngineObject()->LookupAttachment( attachNamesEndCap[i-PHYSCANNON_ENDCAP1] ) );
 		m_Parameters[i].SetVisible( false );
 		
 		if ( m_Parameters[i].SetMaterial( PHYSCANNON_ENDCAP_SPRITE ) == false )
@@ -3203,8 +3203,8 @@ void CWeaponPhysCannon::DoEffectHolding( void )
 		CBaseEntity *pBeamEnt = pOwner->GetViewModel();
 
 		// Setup the beams
-		m_Beams[0].Init( LookupAttachment( "fork1t" ), 1, pBeamEnt, true );
-		m_Beams[1].Init( LookupAttachment( "fork2t" ), 1, pBeamEnt, true );
+		m_Beams[0].Init(GetEngineObject()->LookupAttachment( "fork1t" ), 1, pBeamEnt, true );
+		m_Beams[1].Init(GetEngineObject()->LookupAttachment( "fork2t" ), 1, pBeamEnt, true );
 
 		// Set them visible
 		m_Beams[0].SetVisible();
@@ -3235,9 +3235,9 @@ void CWeaponPhysCannon::DoEffectHolding( void )
 		}
 
 		// Setup the beams
-		m_Beams[0].Init( LookupAttachment( "fork1t" ), 1, this, false );
-		m_Beams[1].Init( LookupAttachment( "fork2t" ), 1, this, false );
-		m_Beams[2].Init( LookupAttachment( "fork3t" ), 1, this, false );
+		m_Beams[0].Init(GetEngineObject()->LookupAttachment( "fork1t" ), 1, this, false );
+		m_Beams[1].Init(GetEngineObject()->LookupAttachment( "fork2t" ), 1, this, false );
+		m_Beams[2].Init(GetEngineObject()->LookupAttachment( "fork3t" ), 1, this, false );
 
 		// Set them visible
 		m_Beams[0].SetVisible();
@@ -3441,13 +3441,13 @@ void CWeaponPhysCannon::GetEffectParameters( EffectType_t effectID, color32 &col
 		
 		if ( pOwner != NULL )
 		{
-			pOwner->GetViewModel()->GetAttachment( attachment, vecAttachment, angles );
+			pOwner->GetViewModel()->GetEngineObject()->GetAttachment( attachment, vecAttachment, angles );
 			::FormatViewModelAttachment( vecAttachment, true );
 		}
 	}
 	else
 	{
-		GetAttachment( attachment, vecAttachment, angles );
+		GetEngineObject()->GetAttachment( attachment, vecAttachment, angles );
 	}
 }
 
@@ -3628,7 +3628,7 @@ void CallbackPhyscannonImpact( const CEffectData &data )
 	if ( pWeapon == NULL )
 		return;
 
-	pWeapon->GetAttachment( 1, vecAttachment, vecAngles );
+	pWeapon->GetEngineObject()->GetAttachment( 1, vecAttachment, vecAngles );
 
 	Vector	dir = ( data.m_vOrigin - vecAttachment );
 	VectorNormalize( dir );

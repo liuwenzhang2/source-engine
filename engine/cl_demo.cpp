@@ -351,7 +351,7 @@ void CDemoRecorder::WriteBSPDecals()
 
 		bool found = false;
 
-		IClientEntity *clientEntity = entitylist->GetClientEntity( entry->entityIndex );
+		IEngineObjectClient *clientEntity = entitylist->GetEngineObject( entry->entityIndex );
 
 		if ( !clientEntity )
 			continue;

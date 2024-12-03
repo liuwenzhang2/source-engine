@@ -492,6 +492,7 @@ public:
 	virtual bool GetAttachment(int iAttachment, matrix3x4_t& attachmentToWorld) = 0;
 	virtual bool GetAttachment(int iAttachment, Vector& absOrigin, QAngle& absAngles) = 0;
 	virtual bool GetAttachment(const char* szName, Vector& absOrigin, QAngle& absAngles) = 0;
+	virtual void SetAlternateSorting(bool bAlternateSorting) = 0;
 };
 
 class IEngineWorldServer{

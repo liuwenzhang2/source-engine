@@ -218,7 +218,7 @@ IStudioHdr *C_BaseFlex::OnNewModel()
 
 		m_iv_flexWeight.SetMaxCount( hdr->numflexcontrollers() );
 
-		m_iMouthAttachment = LookupAttachment( "mouth" );
+		m_iMouthAttachment = GetEngineObject()->LookupAttachment( "mouth" );
 
 		LinkToGlobalFlexControllers( hdr );
 	}
@@ -294,7 +294,7 @@ bool C_BaseFlex::GetSoundSpatialization( SpatializationInfo_t& info )
 			
 			C_BaseAnimating::AutoAllowBoneAccess boneaccess( true, false );
 
-			if (GetAttachment( m_iMouthAttachment, origin, angles ))
+			if (GetEngineObject()->GetAttachment( m_iMouthAttachment, origin, angles ))
 			{
 				if (info.pOrigin)
 				{
@@ -578,7 +578,7 @@ Vector C_BaseFlex::SetViewTarget( IStudioHdr *pStudioHdr )
 	if (m_iEyeAttachment > 0)
 	{
 		matrix3x4_t attToWorld;
-		if (!GetAttachment( m_iEyeAttachment, attToWorld ))
+		if (!GetEngineObject()->GetAttachment( m_iEyeAttachment, attToWorld ))
 		{
 			return Vector( 0, 0, 0);
 		}
@@ -644,7 +644,7 @@ Vector C_BaseFlex::SetViewTarget( IStudioHdr *pStudioHdr )
 		VectorTransform( local, attToWorld, tmp );
 	}
 
-	modelrender->SetViewTarget(GetEngineObject()->GetModelPtr(), GetBody(), tmp );
+	modelrender->SetViewTarget(GetEngineObject()->GetModelPtr(), GetEngineObject()->GetBody(), tmp );
 
 	/*
 	debugoverlay->AddTextOverlay( GetAbsOrigin() + Vector( 0, 0, 64 ), 0, 0, "%.2f %.2f %.2f  : %.2f %.2f %.2f", 

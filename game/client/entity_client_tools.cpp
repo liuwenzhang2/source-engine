@@ -229,7 +229,7 @@ void CClientTools::AddClientRenderable( IClientRenderable *pRenderable, int rend
 
 	//cl_entitylist->AddNonNetworkableEntity( (C_BaseEntity*)pRenderable->GetIClientUnknown() );
 
-	ClientRenderHandle_t handle = pRenderable->RenderHandle();
+	ClientRenderHandle_t handle = pRenderable->GetRenderHandle();
 	if ( INVALID_CLIENT_RENDER_HANDLE == handle )
 	{
 		// create new renderer handle
@@ -238,15 +238,15 @@ void CClientTools::AddClientRenderable( IClientRenderable *pRenderable, int rend
 	else
 	{
 		// handle already exists, just update group & origin
-		ClientLeafSystem()->SetRenderGroup( pRenderable->RenderHandle(), (RenderGroup_t)renderGroup );
-		ClientLeafSystem()->RenderableChanged( pRenderable->RenderHandle() );
+		ClientLeafSystem()->SetRenderGroup( pRenderable->GetRenderHandle(), (RenderGroup_t)renderGroup );
+		ClientLeafSystem()->RenderableChanged( pRenderable->GetRenderHandle() );
 	}
 
 }
 
 void CClientTools::RemoveClientRenderable( IClientRenderable *pRenderable )
 {
-	ClientRenderHandle_t handle = pRenderable->RenderHandle();
+	ClientRenderHandle_t handle = pRenderable->GetRenderHandle();
 	if( handle != INVALID_CLIENT_RENDER_HANDLE )
 	{
 		ClientLeafSystem()->RemoveRenderable( handle );
@@ -256,17 +256,17 @@ void CClientTools::RemoveClientRenderable( IClientRenderable *pRenderable )
 
 void CClientTools::MarkClientRenderableDirty( IClientRenderable *pRenderable )
 {
-	ClientRenderHandle_t handle = pRenderable->RenderHandle();
+	ClientRenderHandle_t handle = pRenderable->GetRenderHandle();
 	if ( INVALID_CLIENT_RENDER_HANDLE != handle )
 	{
 		// handle already exists, just update group & origin
-		ClientLeafSystem()->RenderableChanged( pRenderable->RenderHandle() );
+		ClientLeafSystem()->RenderableChanged( pRenderable->GetRenderHandle() );
 	}
 }
 
 void CClientTools::SetRenderGroup( IClientRenderable *pRenderable, int renderGroup )
 {
-	ClientRenderHandle_t handle = pRenderable->RenderHandle();
+	ClientRenderHandle_t handle = pRenderable->GetRenderHandle();
 	if ( INVALID_CLIENT_RENDER_HANDLE == handle )
 	{
 		// create new renderer handle
@@ -275,8 +275,8 @@ void CClientTools::SetRenderGroup( IClientRenderable *pRenderable, int renderGro
 	else
 	{
 		// handle already exists, just update group & origin
-		ClientLeafSystem()->SetRenderGroup( pRenderable->RenderHandle(), (RenderGroup_t)renderGroup );
-		ClientLeafSystem()->RenderableChanged( pRenderable->RenderHandle() );
+		ClientLeafSystem()->SetRenderGroup( pRenderable->GetRenderHandle(), (RenderGroup_t)renderGroup );
+		ClientLeafSystem()->RenderableChanged( pRenderable->GetRenderHandle() );
 	}
 }
 

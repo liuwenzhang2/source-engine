@@ -311,7 +311,7 @@ void CWeaponElite::WeaponIdle()
 
 	int CWeaponElite::GetMuzzleAttachment( void )
 	{
-		return LookupAttachment( FiringLeft() ? "muzzle_flash_l" : "muzzle_flash_r" );	
+		return GetEngineObject()->LookupAttachment( FiringLeft() ? "muzzle_flash_l" : "muzzle_flash_r" );
 	}
 
 #endif

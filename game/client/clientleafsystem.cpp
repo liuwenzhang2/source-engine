@@ -350,7 +350,7 @@ void DefaultRenderBoundsWorldspace( IClientRenderable *pRenderable, Vector &absM
 		if ( pParent )
 		{
 			// Get the parent's abs space world bounds.
-			CalcRenderableWorldSpaceAABB_Fast( pParent->GetOuter(), absMins, absMaxs);
+			CalcRenderableWorldSpaceAABB_Fast( pParent, absMins, absMaxs);
 
 			// Add the maximum of our local render bounds. This is making the assumption that we can be at any
 			// point and at any angle within the parent's world space bounds.
@@ -410,7 +410,7 @@ void CalcRenderableWorldSpaceAABB_Fast( IClientRenderable *pRenderable, Vector &
 		Assert( pParent );
 
 		// Get the parent's abs space world bounds.
-		CalcRenderableWorldSpaceAABB_Fast( pParent->GetOuter(), absMin, absMax);
+		CalcRenderableWorldSpaceAABB_Fast( pParent, absMin, absMax);
 
 		// Add the maximum of our local render bounds. This is making the assumption that we can be at any
 		// point and at any angle within the parent's world space bounds.
@@ -603,7 +603,7 @@ void CClientLeafSystem::PreRender()
 void CClientLeafSystem::NewRenderable( IClientRenderable* pRenderable, RenderGroup_t type, int flags )
 {
 	Assert( pRenderable );
-	Assert( pRenderable->RenderHandle() == INVALID_CLIENT_RENDER_HANDLE );
+	Assert( pRenderable->GetRenderHandle() == INVALID_CLIENT_RENDER_HANDLE );
 
 	ClientRenderHandle_t handle = m_Renderables.AddToTail();
 	RenderableInfo_t &info = m_Renderables[handle];
@@ -635,7 +635,7 @@ void CClientLeafSystem::NewRenderable( IClientRenderable* pRenderable, RenderGro
 		AddToViewModelList( handle );
 	}
 
-	pRenderable->RenderHandle() = handle;
+	pRenderable->SetRenderHandle(handle);
 }
 
 void CClientLeafSystem::CreateRenderableHandle( IClientRenderable* pRenderable, bool bIsStaticProp )
@@ -716,7 +716,7 @@ void CClientLeafSystem::AddRenderable( IClientRenderable* pRenderable, RenderGro
 	}
 
 	NewRenderable( pRenderable, group, flags );
-	ClientRenderHandle_t handle = pRenderable->RenderHandle();
+	ClientRenderHandle_t handle = pRenderable->GetRenderHandle();
 	m_DirtyRenderables.AddToTail( handle );
 }
 
@@ -728,8 +728,8 @@ void CClientLeafSystem::RemoveRenderable( ClientRenderHandle_t handle )
 
 	// Reset the render handle in the entity.
 	IClientRenderable *pRenderable = m_Renderables[handle].m_pRenderable;
-	Assert( handle == pRenderable->RenderHandle() );
-	pRenderable->RenderHandle() = INVALID_CLIENT_RENDER_HANDLE;
+	Assert( handle == pRenderable->GetRenderHandle() );
+	pRenderable->SetRenderHandle(INVALID_CLIENT_RENDER_HANDLE);
 
 	// Reemove the renderable from the dirty list
 	if ( m_Renderables[handle].m_Flags & RENDER_FLAGS_HASCHANGED )
@@ -841,7 +841,7 @@ bool CClientLeafSystem::GetRenderableLeaf(ClientRenderHandle_t handle, int* pOut
 
 bool CClientLeafSystem::IsRenderableInPVS( IClientRenderable *pRenderable )
 {
-	ClientRenderHandle_t handle = pRenderable->RenderHandle();
+	ClientRenderHandle_t handle = pRenderable->GetRenderHandle();
 	int leaves[128];
 	int nLeaves = GetRenderableLeaves( handle, leaves );
 	if ( nLeaves == -1 )

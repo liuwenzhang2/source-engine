@@ -271,7 +271,7 @@ int	C_GunshipFX::DrawModel( int )
 	if ( ent )
 	{
 		QAngle angles;
-		ent->GetAttachment( m_attachment, m_worldPosition, angles );
+		ent->GetEngineObject()->GetAttachment( m_attachment, m_worldPosition, angles );
 	}
 
 	Vector test;
@@ -399,7 +399,7 @@ public:
 				Vector	pos;
 				msg.ReadBitVec3Coord( pos );
 				m_cannonFX.SetRenderOrigin( pos );
-				m_cannonFX.EffectInit( entindex(), LookupAttachment( "BellyGun" ) );
+				m_cannonFX.EffectInit( entindex(), GetEngineObject()->LookupAttachment( "BellyGun" ) );
 				m_cannonFX.LimitTime( GUNSHIPFX_BIG_SHOT_TIME );
 			}
 			break;

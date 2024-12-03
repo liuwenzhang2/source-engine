@@ -158,7 +158,7 @@ int C_LocalTempEntity::DrawStudioModel( int flags )
 	VPROF_BUDGET( "C_LocalTempEntity::DrawStudioModel", VPROF_BUDGETGROUP_MODEL_RENDERING );
 	int drawn = 0;
 
-	if ( !GetModel() || modelinfo->GetModelType( GetModel() ) != mod_studio )
+	if ( !GetEngineObject()->GetModel() || modelinfo->GetModelType(GetEngineObject()->GetModel() ) != mod_studio )
 		return drawn;
 	
 	// Make sure m_pstudiohdr is valid for drawing
@@ -174,10 +174,10 @@ int C_LocalTempEntity::DrawStudioModel( int flags )
 	{
 		drawn = modelrender->DrawModel( 
 			flags, 
-			this,
+			this->GetEngineObject(),
 			MODEL_INSTANCE_INVALID,
 			entindex(),
-			GetModel(),
+			GetEngineObject()->GetModel(),
 			GetEngineObject()->GetAbsOrigin(),
 			GetEngineObject()->GetAbsAngles(),
 			GetEngineObject()->GetSkin(),
@@ -195,7 +195,7 @@ int	C_LocalTempEntity::DrawModel( int flags )
 {
 	int drawn = 0;
 
-	if ( !GetModel() )
+	if ( !GetEngineObject()->GetModel() )
 	{
 		return drawn;
 	}
@@ -217,12 +217,12 @@ int	C_LocalTempEntity::DrawModel( int flags )
 		}
 	}
 
-	switch ( modelinfo->GetModelType( GetModel() ) )
+	switch ( modelinfo->GetModelType(GetEngineObject()->GetModel() ) )
 	{
 	case mod_sprite:
 		drawn = DrawSprite( 
 			this,
-			GetModel(), 
+			GetEngineObject()->GetModel(),
 			GetEngineObject()->GetAbsOrigin(),
 			GetEngineObject()->GetAbsAngles(),
 			m_flFrame,  // sprite frame to render
@@ -798,7 +798,7 @@ void CTempEnts::FizzEffect( C_BaseEntity *pent, int modelIndex, int density, int
 	Vector			origin;
 	Vector			mins, maxs;
 
-	if ( !pent->GetModel() || !modelIndex ) 
+	if ( !pent->GetEngineObject()->GetModel() || !modelIndex )
 		return;
 
 	model = modelinfo->GetModel( modelIndex );
@@ -808,7 +808,7 @@ void CTempEnts::FizzEffect( C_BaseEntity *pent, int modelIndex, int density, int
 	count = density + 1;
 	density = count * 3 + 6;
 
-	modelinfo->GetModelBounds( pent->GetModel(), mins, maxs );
+	modelinfo->GetModelBounds( pent->GetEngineObject()->GetModel(), mins, maxs );
 
 	maxHeight = maxs[2] - mins[2];
 	width = maxs[0] - mins[0];
@@ -965,10 +965,10 @@ int BreakModelDrawHelper( C_LocalTempEntity *entity, int flags )
 {
 	ModelRenderInfo_t sInfo;
 	sInfo.flags = flags;
-	sInfo.pRenderable = entity;
+	sInfo.pRenderable = entity->GetEngineObject();
 	sInfo.instance = MODEL_INSTANCE_INVALID;
 	sInfo.entity_index = entity->entindex();
-	sInfo.pModel = entity->GetModel();
+	sInfo.pModel = entity->GetEngineObject()->GetModel();
 	sInfo.origin = entity->GetRenderOrigin();
 	sInfo.angles = entity->GetRenderAngles();
 	sInfo.skin = entity->GetEngineObject()->GetSkin();
@@ -1445,7 +1445,7 @@ void CTempEnts::AttachTentToPlayer( int client, int modelIndex, float zoffset, f
 	pTemp->flags |= FTENT_PLYRATTACHMENT | FTENT_PERSIST;
 
 	// is the model a sprite?
-	if ( modelinfo->GetModelType( pTemp->GetModel() ) == mod_sprite )
+	if ( modelinfo->GetModelType( pTemp->GetEngineObject()->GetModel() ) == mod_sprite )
 	{
 		frameCount = modelinfo->GetModelFrameCount( pModel );
 		pTemp->m_flFrameMax = frameCount - 1;
@@ -1991,7 +1991,7 @@ C_LocalTempEntity *CTempEnts::TempEntAlloc( const Vector& org, const model_t *mo
 	pTemp->GetEngineObject()->SetAbsOrigin( org );
 
 	pTemp->m_RenderGroup = RENDER_GROUP_OTHER;
-	pTemp->AddToLeafSystem( pTemp->m_RenderGroup );
+	pTemp->GetEngineObject()->AddToLeafSystem( pTemp->m_RenderGroup );
 
 	if ( CommandLine()->CheckParm( "-tools" ) != NULL )
 	{
@@ -2032,7 +2032,7 @@ void CTempEnts::TempEntFree( int index )
 		m_TempEnts.Remove( index );
 
 		// Cleanup its data.
-		pTemp->RemoveFromLeafSystem();
+		pTemp->GetEngineObject()->RemoveFromLeafSystem();
 
 		// Remove the tempent from the ClientEntityList before removing it from the pool.
 		//if ( ( pTemp->flags & FTENT_CLIENTSIDEPARTICLES ) )
@@ -2118,7 +2118,7 @@ C_LocalTempEntity *CTempEnts::TempEntAllocHigh( const Vector& org, const model_t
 	pTemp->GetEngineObject()->SetLocalOrigin( org );
 
 	pTemp->m_RenderGroup = RENDER_GROUP_OTHER;
-	pTemp->AddToLeafSystem( pTemp->m_RenderGroup );
+	pTemp->GetEngineObject()->AddToLeafSystem( pTemp->m_RenderGroup );
 
 	if ( CommandLine()->CheckParm( "-tools" ) != NULL )
 	{
@@ -2286,10 +2286,10 @@ int CTempEnts::AddVisibleTempEntity( C_LocalTempEntity *pEntity )
 	Vector mins, maxs;
 	Vector model_mins, model_maxs;
 
-	if ( !pEntity->GetModel() )
+	if ( !pEntity->GetEngineObject()->GetModel() )
 		return 0;
 
-	modelinfo->GetModelBounds( pEntity->GetModel(), model_mins, model_maxs );
+	modelinfo->GetModelBounds( pEntity->GetEngineObject()->GetModel(), model_mins, model_maxs );
 
 	for (i=0 ; i<3 ; i++)
 	{
@@ -2309,11 +2309,11 @@ int CTempEnts::AddVisibleTempEntity( C_LocalTempEntity *pEntity )
 		// Add to list
 		if( pEntity->m_RenderGroup == RENDER_GROUP_OTHER )
 		{
-			pEntity->AddToLeafSystem();
+			pEntity->GetEngineObject()->AddToLeafSystem();
 		}
 		else
 		{
-			pEntity->AddToLeafSystem( pEntity->m_RenderGroup );
+			pEntity->GetEngineObject()->AddToLeafSystem( pEntity->m_RenderGroup );
 		}
 
 		return 1;
@@ -2949,7 +2949,7 @@ void CTempEnts::MuzzleFlash_Shotgun_NPC(C_BaseEntity* hEntity, int attachmentInd
 
 	// Setup the origin.
 	Vector	origin;
-	IClientRenderable *pRenderable = hEntity;//ClientEntityList().GetClientRenderableFromHandle( 
+	IClientRenderable *pRenderable = hEntity->GetEngineObject();//ClientEntityList().GetClientRenderableFromHandle( 
 	if ( !pRenderable )
 		return;
 

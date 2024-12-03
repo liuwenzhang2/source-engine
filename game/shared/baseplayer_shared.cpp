@@ -433,11 +433,11 @@ void CBasePlayer::CacheVehicleView( void )
 			C_BaseAnimating *pVehicleAnimating = dynamic_cast<C_BaseAnimating *>( pVehicle );
 			if( pVehicleAnimating )
 			{
-				int eyeAttachmentIndex = pVehicleAnimating->LookupAttachment( "vehicle_driver_eyes" );
+				int eyeAttachmentIndex = pVehicleAnimating->GetEngineObject()->LookupAttachment( "vehicle_driver_eyes" );
 
 				Vector vehicleEyeOrigin;
 				QAngle vehicleEyeAngles;
-				pVehicleAnimating->GetAttachment( eyeAttachmentIndex, vehicleEyeOrigin, vehicleEyeAngles );
+				pVehicleAnimating->GetEngineObject()->GetAttachment( eyeAttachmentIndex, vehicleEyeOrigin, vehicleEyeAngles );
 
 				g_ClientVirtualReality.OverrideTorsoTransform( vehicleEyeOrigin, vehicleEyeAngles );
 			}

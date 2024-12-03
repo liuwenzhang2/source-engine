@@ -74,11 +74,11 @@ void C_PropJeep::Simulate( void )
 		Vector vVector;
 		Vector vecForward, vecRight, vecUp;
 
-		int iAttachment = LookupAttachment( "headlight" );
+		int iAttachment = GetEngineObject()->LookupAttachment( "headlight" );
 
 		if ( iAttachment != INVALID_PARTICLE_ATTACHMENT )
 		{
-			GetAttachment( iAttachment, vVector, vAngle );
+			GetEngineObject()->GetAttachment( iAttachment, vVector, vAngle );
 			AngleVectors( vAngle, &vecForward, &vecRight, &vecUp );
 		
 			m_pHeadlight->UpdateLight( vVector, vecForward, vecRight, vecUp, JEEP_HEADLIGHT_DISTANCE );
@@ -114,7 +114,7 @@ void C_PropJeep::UpdateViewAngles( C_BasePlayer *pLocalPlayer, CUserCmd *pCmd )
 		if ( m_flViewAngleDeltaTime > r_JeepViewBlendToTime.GetFloat() )
 		{
 			// Blend the view angles.
-			int eyeAttachmentIndex = LookupAttachment( "vehicle_driver_eyes" );
+			int eyeAttachmentIndex = GetEngineObject()->LookupAttachment( "vehicle_driver_eyes" );
 			Vector vehicleEyeOrigin;
 			QAngle vehicleEyeAngles;
 			GetAttachmentLocal( eyeAttachmentIndex, vehicleEyeOrigin, vehicleEyeAngles );
@@ -262,10 +262,10 @@ void C_PropJeep::DampenUpMotion( Vector &vecVehicleEyePos, QAngle &vecVehicleEye
 //-----------------------------------------------------------------------------
 void C_PropJeep::OnEnteredVehicle( C_BasePlayer *pPlayer )
 {
-	int eyeAttachmentIndex = LookupAttachment( "vehicle_driver_eyes" );
+	int eyeAttachmentIndex = GetEngineObject()->LookupAttachment( "vehicle_driver_eyes" );
 	Vector vehicleEyeOrigin;
 	QAngle vehicleEyeAngles;
-	GetAttachment( eyeAttachmentIndex, vehicleEyeOrigin, vehicleEyeAngles );
+	GetEngineObject()->GetAttachment( eyeAttachmentIndex, vehicleEyeOrigin, vehicleEyeAngles );
 
 	m_vecLastEyeTarget = vehicleEyeOrigin;
 	m_vecLastEyePos = vehicleEyeOrigin;

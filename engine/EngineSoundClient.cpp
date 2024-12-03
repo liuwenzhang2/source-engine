@@ -227,7 +227,7 @@ void CEngineSoundClient::EmitSoundInternal( IRecipientFilter& filter, int iEntIn
 		if (!pOrigin)
 		{
 			// Try to use the origin of the entity
-			IClientEntity *pEnt = entitylist->GetClientEntity( iEntIndex );
+			IEngineObjectClient *pEnt = entitylist->GetEngineObject( iEntIndex );
 			// don't update position if we stop this sound
 			if (pEnt && !(iFlags & SND_STOP) )
 			{

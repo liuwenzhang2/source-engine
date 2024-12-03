@@ -375,8 +375,8 @@ bool C_BaseCombatWeapon::GetShootPosition( Vector &vOrigin, QAngle &vAngles )
 		C_BaseViewModel *vm = player ? player->GetViewModel( 0 ) : NULL;
 		if ( vm )
 		{
-			int iAttachment = vm->LookupAttachment( "muzzle" );
-			if ( vm->GetAttachment( iAttachment, vOrigin, vDummy ) )
+			int iAttachment = vm->GetEngineObject()->LookupAttachment( "muzzle" );
+			if ( vm->GetEngineObject()->GetAttachment( iAttachment, vOrigin, vDummy ) )
 			{
 				return true;
 			}
@@ -385,8 +385,8 @@ bool C_BaseCombatWeapon::GetShootPosition( Vector &vOrigin, QAngle &vAngles )
 	else
 	{
 		// Thirdperson
-		int iAttachment = LookupAttachment( "muzzle" );
-		if ( GetAttachment( iAttachment, vOrigin, vDummy ) )
+		int iAttachment = GetEngineObject()->LookupAttachment( "muzzle" );
+		if (GetEngineObject()->GetAttachment( iAttachment, vOrigin, vDummy ) )
 		{
 			return true;
 		}

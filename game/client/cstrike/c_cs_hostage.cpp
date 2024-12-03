@@ -93,7 +93,7 @@ void C_LowViolenceHostageDeathModel::Interp_Copy( VarMapping_t *pDest, CBaseEnti
 //-----------------------------------------------------------------------------
 bool C_LowViolenceHostageDeathModel::SetupLowViolenceModel( C_CHostage *pHostage )
 {
-	const model_t *model = pHostage->GetModel();
+	const model_t *model = pHostage->GetEngineObject()->GetModel();
 	const char *pModelName = modelinfo->GetModelName( model );
 	if ( InitializeAsClientEntity( pModelName, RENDER_GROUP_OPAQUE_ENTITY ) == false )
 	{
@@ -121,7 +121,7 @@ bool C_LowViolenceHostageDeathModel::SetupLowViolenceModel( C_CHostage *pHostage
 		GetEngineObject()->SetAbsVelocity( pHostage->GetEngineObject()->GetAbsVelocity() );
 
 		// move my current model instance to the ragdoll's so decals are preserved.
-		pHostage->SnatchModelInstance( this );
+		pHostage->GetEngineObject()->SnatchModelInstance( this->GetEngineObject());
 
 		GetEngineObject()->SetAbsAngles( pHostage->GetRenderAngles() );
 		GetEngineObject()->SetNetworkAngles( pHostage->GetRenderAngles() );
@@ -297,8 +297,8 @@ C_BaseEntity* C_CHostage::BecomeRagdollOnClient()
  */
 void C_CHostage::Initialize( )
 {
-	m_eyeAttachment = LookupAttachment( "eyes" );
-	m_chestAttachment = LookupAttachment( "chest" );
+	m_eyeAttachment = GetEngineObject()->LookupAttachment( "eyes" );
+	m_chestAttachment = GetEngineObject()->LookupAttachment( "chest" );
 
 	m_headYawPoseParam = GetEngineObject()->LookupPoseParameter( "head_yaw" );
 	GetEngineObject()->GetPoseParameterRange( m_headYawPoseParam, m_headYawMin, m_headYawMax );
@@ -312,7 +312,7 @@ void C_CHostage::Initialize( )
 	Vector pos;
 	QAngle angles;
 
-	if (!GetAttachment( m_eyeAttachment, pos, angles ))
+	if (!GetEngineObject()->GetAttachment( m_eyeAttachment, pos, angles ))
 	{
 		m_vecViewOffset = Vector( 0, 0, 50.0f );
 	}
@@ -322,7 +322,7 @@ void C_CHostage::Initialize( )
 	}
 
 
-	if (!GetAttachment( m_chestAttachment, pos, angles ))
+	if (!GetEngineObject()->GetAttachment( m_chestAttachment, pos, angles ))
 	{
 		m_lookAt = Vector( 0, 0, 0 );
 	}

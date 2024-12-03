@@ -298,7 +298,7 @@ void FX_FireBullets(
 			if ( pViewModel )
 			{
 				iEntIndex = pViewModel->entindex();
-				pViewModel->GetAttachment( iAttachment, vecStart, angAttachment );
+				pViewModel->GetEngineObject()->GetAttachment( iAttachment, vecStart, angAttachment );
 			}
 		}
 		else if ( pLocalPlayer &&
@@ -312,7 +312,7 @@ void FX_FireBullets(
 			if ( pViewModel )
 			{
 				iEntIndex = pViewModel->entindex();
-				pViewModel->GetAttachment( iAttachment, vecStart, angAttachment );
+				pViewModel->GetEngineObject()->GetAttachment( iAttachment, vecStart, angAttachment );
 			}
 		}
 		else if ( !pPlayer->IsDormant() )
@@ -331,7 +331,7 @@ void FX_FireBullets(
 					pWeapon->GetEngineObject()->SetModelIndex( nWorldModelIndex );
 				}
 
-				pWeapon->GetAttachment( iAttachment, vecStart, angAttachment );
+				pWeapon->GetEngineObject()->GetAttachment( iAttachment, vecStart, angAttachment );
 
 				if ( bInToolRecordingMode && nModelIndex != nWorldModelIndex )
 				{

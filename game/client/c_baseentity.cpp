@@ -144,7 +144,6 @@ BEGIN_RECV_TABLE_NOBASE(C_BaseEntity, DT_BaseEntity)
 //#endif
 
 
-	RecvPropBool	( RECVINFO( m_bAlternateSorting ) ),
 
 #ifdef TF_CLIENT_DLL
 	RecvPropArray3( RECVINFO_ARRAY(m_nModelIndexOverrides),	RecvPropInt( RECVINFO(m_nModelIndexOverrides[0]) ) ),
@@ -481,9 +480,7 @@ void C_BaseEntity::Clear( void )
 {
 	m_bDormant = true;
 	//m_RefEHandle.Term();
-	m_ModelInstance = MODEL_INSTANCE_INVALID;
-	m_ShadowHandle = CLIENTSHADOW_INVALID_HANDLE;
-	m_hRender = INVALID_CLIENT_RENDER_HANDLE;
+
 	m_hThink = INVALID_THINK_HANDLE;
 	m_AimEntsListHandle = INVALID_AIMENTS_LIST_HANDLE;
 
@@ -616,7 +613,7 @@ bool C_BaseEntity::InitializeAsClientEntityByIndex( int iIndex, RenderGroup_t re
 	Assert( GetClientHandle() != ClientEntityList().InvalidHandle() );
 
 	// Add the client entity to the renderable "leaf system." (Renderable)
-	AddToLeafSystem( renderGroup );
+	GetEngineObject()->AddToLeafSystem( renderGroup );
 
 	// Add the client entity to the spatial partition. (Collidable)
 	//GetEngineObject()->CreatePartitionHandle();
@@ -666,10 +663,10 @@ void C_BaseEntity::Term()
 	}
 
 	// Clean up the model instance
-	DestroyModelInstance();
+	GetEngineObject()->DestroyModelInstance();
 
 	// Clean up drawing
-	RemoveFromLeafSystem();
+	GetEngineObject()->RemoveFromLeafSystem();
 
 	RemoveFromAimEntsList();
 }
@@ -709,29 +706,9 @@ void C_BaseEntity::Release()
 }
 
 
-//-----------------------------------------------------------------------------
-// Only meant to be called from subclasses.
-// Returns true if instance valid, false otherwise
-//-----------------------------------------------------------------------------
-void C_BaseEntity::CreateModelInstance()
-{
-	if ( m_ModelInstance == MODEL_INSTANCE_INVALID )
-	{
-		m_ModelInstance = modelrender->CreateInstance( this );
-	}
-}
 
-//-----------------------------------------------------------------------------
-// Purpose: 
-//-----------------------------------------------------------------------------
-void C_BaseEntity::DestroyModelInstance()
-{
-	if (m_ModelInstance != MODEL_INSTANCE_INVALID)
-	{
-		modelrender->DestroyInstance( m_ModelInstance );
-		m_ModelInstance = MODEL_INSTANCE_INVALID;
-	}
-}
+
+
 
 void C_BaseEntity::SetRemovalFlag( bool bRemove ) 
 { 
@@ -807,7 +784,7 @@ void C_BaseEntity::UpdateVisibility()
 			}
 			else
 			{
-				RemoveFromLeafSystem();
+				GetEngineObject()->RemoveFromLeafSystem();
 				return;
 			}
 		}
@@ -828,12 +805,12 @@ void C_BaseEntity::UpdateVisibility()
 	if ( ShouldDraw() && !IsDormant() && ( !ToolsEnabled() || GetEngineObject()->IsEnabledInToolView() ) )
 	{
 		// add/update leafsystem
-		AddToLeafSystem();
+		GetEngineObject()->AddToLeafSystem();
 	}
 	else
 	{
 		// remove from leaf system
-		RemoveFromLeafSystem();
+		GetEngineObject()->RemoveFromLeafSystem();
 	}
 }
 
@@ -853,7 +830,7 @@ bool C_BaseEntity::ShouldDraw()
 	if ( m_nRenderMode == kRenderNone )
 		return false;
 
-	return (GetModel() != 0) && !GetEngineObject()->IsEffectActive(EF_NODRAW) && (entindex() != 0);
+	return (GetEngineObject()->GetModel() != 0) && !GetEngineObject()->IsEffectActive(EF_NODRAW) && (entindex() != 0);
 }
 
 bool C_BaseEntity::TestCollision( const Ray_t& ray, unsigned int mask, trace_t& trace )
@@ -914,7 +891,7 @@ ShadowType_t C_BaseEntity::ShadowCastType()
 	if (GetEngineObject()->IsEffectActive(EF_NODRAW | EF_NOSHADOW))
 		return SHADOWS_NONE;
 
-	int modelType = modelinfo->GetModelType(GetModel());
+	int modelType = modelinfo->GetModelType(GetEngineObject()->GetModel());
 	return (modelType == mod_studio) ? SHADOWS_RENDER_TO_TEXTURE : SHADOWS_NONE;
 }
 
@@ -985,50 +962,14 @@ bool C_BaseEntity::ShouldReceiveProjectedTextures( int flags )
 	if (GetEngineObject()->IsEffectActive( EF_NORECEIVESHADOW ) )
 		 return false;
 
-	if (modelinfo->GetModelType(GetModel()) == mod_studio)
+	if (modelinfo->GetModelType(GetEngineObject()->GetModel()) == mod_studio)
 		return false;
 
 	return true;
 }
 
 
-//-----------------------------------------------------------------------------
-// Shadow-related methods
-//-----------------------------------------------------------------------------
-bool C_BaseEntity::IsShadowDirty( )
-{
-	return GetEngineObject()->IsEFlagSet( EFL_DIRTY_SHADOWUPDATE );
-}
 
-void C_BaseEntity::MarkShadowDirty( bool bDirty )
-{
-	if ( bDirty )
-	{
-		GetEngineObject()->AddEFlags( EFL_DIRTY_SHADOWUPDATE );
-	}
-	else
-	{
-		GetEngineObject()->RemoveEFlags( EFL_DIRTY_SHADOWUPDATE );
-	}
-}
-
-IClientRenderable *C_BaseEntity::GetShadowParent()
-{
-	IEngineObjectClient *pParent = GetEngineObject()->GetMoveParent();
-	return pParent ? pParent->GetOuter()->GetClientRenderable() : NULL;
-}
-
-IClientRenderable *C_BaseEntity::FirstShadowChild()
-{
-	IEngineObjectClient *pChild = GetEngineObject()->FirstMoveChild();
-	return pChild ? pChild->GetOuter()->GetClientRenderable() : NULL;
-}
-
-IClientRenderable *C_BaseEntity::NextShadowPeer()
-{
-	IEngineObjectClient *pPeer = GetEngineObject()->NextMovePeer();
-	return pPeer ? pPeer->GetOuter()->GetClientRenderable() : NULL;
-}
 
 	
 //-----------------------------------------------------------------------------
@@ -1064,10 +1005,7 @@ const QAngle& C_BaseEntity::GetRenderAngles( void )
 	return GetEngineObject()->GetAbsAngles();
 }
 
-const matrix3x4_t &C_BaseEntity::RenderableToWorldTransform()
-{
-	return GetEngineObject()->EntityToWorldTransform();
-}
+
 
 IPVSNotify* C_BaseEntity::GetPVSNotifyInterface()
 {
@@ -1081,10 +1019,10 @@ IPVSNotify* C_BaseEntity::GetPVSNotifyInterface()
 //-----------------------------------------------------------------------------
 void C_BaseEntity::GetRenderBounds( Vector& theMins, Vector& theMaxs )
 {
-	int nModelType = modelinfo->GetModelType(GetModel());
+	int nModelType = modelinfo->GetModelType(GetEngineObject()->GetModel());
 	if (nModelType == mod_studio || nModelType == mod_brush)
 	{
-		modelinfo->GetModelRenderBounds( GetModel(), theMins, theMaxs );
+		modelinfo->GetModelRenderBounds(GetEngineObject()->GetModel(), theMins, theMaxs );
 	}
 	else
 	{
@@ -1117,7 +1055,7 @@ void C_BaseEntity::GetRenderBounds( Vector& theMins, Vector& theMaxs )
 
 void C_BaseEntity::GetRenderBoundsWorldspace( Vector& mins, Vector& maxs )
 {
-	DefaultRenderBoundsWorldspace( this, mins, maxs );
+	DefaultRenderBoundsWorldspace( this->GetEngineObject(), mins, maxs );
 }
 
 
@@ -1130,7 +1068,7 @@ void C_BaseEntity::GetShadowRenderBounds( Vector &mins, Vector &maxs, ShadowType
 
 bool C_BaseEntity::IsTwoPass( void )
 {
-	return modelinfo->IsTranslucentTwoPass( GetModel() );
+	return modelinfo->IsTranslucentTwoPass(GetEngineObject()->GetModel() );
 }
 
 bool C_BaseEntity::UsesPowerOfTwoFrameBufferTexture()
@@ -1173,7 +1111,7 @@ bool C_BaseEntity::GetSoundSpatialization( SpatializationInfo_t& info )
 	}
 
 	// pModel might be NULL, but modelinfo can handle that
-	const model_t *pModel = GetModel();
+	const model_t *pModel = GetEngineObject()->GetModel();
 	
 	if ( info.pflRadius )
 	{
@@ -1271,7 +1209,7 @@ int C_BaseEntity::DrawBrushModel( bool bDrawingTranslucency, int nFlags, bool bT
 
 	if ( DepthMode != DEPTH_MODE_NORMAL )
 	{
-		render->DrawBrushModelShadowDepth( this, (model_t *)GetModel(), GetEngineObject()->GetAbsOrigin(), GetEngineObject()->GetAbsAngles(), DepthMode );
+		render->DrawBrushModelShadowDepth( this, (model_t *)GetEngineObject()->GetModel(), GetEngineObject()->GetAbsOrigin(), GetEngineObject()->GetAbsAngles(), DepthMode );
 	}
 	else
 	{
@@ -1280,7 +1218,7 @@ int C_BaseEntity::DrawBrushModel( bool bDrawingTranslucency, int nFlags, bool bT
 		{
 			mode = bDrawingTranslucency ? DBM_DRAW_TRANSLUCENT_ONLY : DBM_DRAW_OPAQUE_ONLY;
 		}
-		render->DrawBrushModelEx( this, (model_t *)GetModel(), GetEngineObject()->GetAbsOrigin(), GetEngineObject()->GetAbsAngles(), mode);
+		render->DrawBrushModelEx( this, (model_t *)GetEngineObject()->GetModel(), GetEngineObject()->GetAbsOrigin(), GetEngineObject()->GetAbsAngles(), mode);
 	}
 
 	return 1;
@@ -1296,12 +1234,12 @@ int C_BaseEntity::DrawModel( int flags )
 		return 0;
 
 	int drawn = 0;
-	if ( !GetModel())
+	if ( !GetEngineObject()->GetModel())
 	{
 		return drawn;
 	}
 
-	int modelType = modelinfo->GetModelType(GetModel());
+	int modelType = modelinfo->GetModelType(GetEngineObject()->GetModel());
 	switch ( modelType )
 	{
 	case mod_brush:
@@ -1310,7 +1248,7 @@ int C_BaseEntity::DrawModel( int flags )
 	case mod_studio:
 		// All studio models must be derived from C_BaseAnimating.  Issue warning.
 		Warning( "ERROR:  Can't draw studio model %s because %s is not derived from C_BaseAnimating\n",
-			modelinfo->GetModelName(GetModel()), GetClientClass()->m_pNetworkName ? GetClientClass()->m_pNetworkName : "unknown" );
+			modelinfo->GetModelName(GetEngineObject()->GetModel()), GetClientClass()->m_pNetworkName ? GetClientClass()->m_pNetworkName : "unknown" );
 		break;
 	case mod_sprite:
 		//drawn = DrawSprite();
@@ -1391,13 +1329,6 @@ bool C_BaseEntity::OnInternalDrawModel(ClientModelRenderInfo_t* pInfo)
 	return true;
 }
 
-//-----------------------------------------------------------------------------
-// Purpose: Setup the bones for drawing
-//-----------------------------------------------------------------------------
-bool C_BaseEntity::SetupBones( matrix3x4_t *pBoneToWorldOut, int nMaxBones, int boneMask, float currentTime )
-{
-	return true;
-}
 
 //-----------------------------------------------------------------------------
 // Purpose: Setup vertex weights for drawing
@@ -1513,12 +1444,6 @@ void C_BaseEntity::PreDataUpdate( DataUpdateType_t updateType )
 #endif
 
 	m_nOldRenderMode = m_nRenderMode;
-
-	if ( m_hRender != INVALID_CLIENT_RENDER_HANDLE )
-	{
-		ClientLeafSystem()->EnableAlternateSorting( m_hRender, m_bAlternateSorting );
-	}
-
 	m_ubOldInterpolationFrame = m_ubInterpolationFrame;
 }
 
@@ -1881,9 +1806,9 @@ bool C_BaseEntity::Teleported( void )
 //-----------------------------------------------------------------------------
 bool C_BaseEntity::IsSubModel( void )
 {
-	if (GetModel() &&
-		modelinfo->GetModelType(GetModel()) == mod_brush &&
-		modelinfo->GetModelName(GetModel())[0] == '*' )
+	if (GetEngineObject()->GetModel() &&
+		modelinfo->GetModelType(GetEngineObject()->GetModel()) == mod_brush &&
+		modelinfo->GetModelName(GetEngineObject()->GetModel())[0] == '*' )
 	{
 		return true;
 	}
@@ -1935,7 +1860,7 @@ bool C_BaseEntity::ShouldInterpolate()
 	if ( render->GetViewEntity() == entindex())
 		return true;
 
-	if (entindex() == 0 || !GetModel() )
+	if (entindex() == 0 || !GetEngineObject()->GetModel() )
 		return false;
 
 	// always interpolate if visible
@@ -2192,7 +2117,7 @@ void C_BaseEntity::OnDataChanged( DataUpdateType_t type )
 	CheckInitPredictable( "OnDataChanged" );
 
 	// Set up shadows; do it here so that objects can change shadowcasting state
-	CreateShadow();
+	GetEngineObject()->CreateShadow();
 
 	if ( type == DATA_UPDATE_CREATED )
 	{
@@ -2421,15 +2346,15 @@ void C_BaseEntity::ComputeFxBlend( void )
 	m_nFXComputeFrame = gpGlobals->framecount;
 
 	// Update the render group
-	if ( GetRenderHandle() != INVALID_CLIENT_RENDER_HANDLE )
+	if (GetEngineObject()->GetRenderHandle() != INVALID_CLIENT_RENDER_HANDLE )
 	{
-		ClientLeafSystem()->SetRenderGroup( GetRenderHandle(), GetRenderGroup() );
+		ClientLeafSystem()->SetRenderGroup(GetEngineObject()->GetRenderHandle(), GetRenderGroup() );
 	}
 
 	// Tell our shadow
-	if ( m_ShadowHandle != CLIENTSHADOW_INVALID_HANDLE )
+	if (GetEngineObject()->GetShadowHandle() != CLIENTSHADOW_INVALID_HANDLE )
 	{
-		g_pClientShadowMgr->SetFalloffBias( m_ShadowHandle, (255 - m_nRenderFXBlend) );
+		g_pClientShadowMgr->SetFalloffBias(GetEngineObject()->GetShadowHandle(), (255 - m_nRenderFXBlend));
 	}
 }
 
@@ -2459,14 +2384,14 @@ void C_BaseEntity::GetColorModulation( float* color )
 //-----------------------------------------------------------------------------
 CollideType_t C_BaseEntity::GetCollideType( void )
 {
-	if ( !GetEngineObject()->GetModelIndex() || !GetModel())
+	if ( !GetEngineObject()->GetModelIndex() || !GetEngineObject()->GetModel())
 		return ENTITY_SHOULD_NOT_COLLIDE;
 
 	if ( !GetEngineObject()->IsSolid() )
 		return ENTITY_SHOULD_NOT_COLLIDE;
 
 	// If the model is a bsp or studio (i.e. it can collide with the player
-	if ( ( modelinfo->GetModelType(GetModel()) != mod_brush ) && ( modelinfo->GetModelType(GetModel()) != mod_studio ) )
+	if ( ( modelinfo->GetModelType(GetEngineObject()->GetModel()) != mod_brush ) && ( modelinfo->GetModelType(GetEngineObject()->GetModel()) != mod_studio ) )
 		return ENTITY_SHOULD_NOT_COLLIDE;
 
 	// Don't get stuck on point sized entities ( world doesn't count )
@@ -2485,7 +2410,7 @@ CollideType_t C_BaseEntity::GetCollideType( void )
 //-----------------------------------------------------------------------------
 bool C_BaseEntity::IsBrushModel() const
 {
-	int modelType = modelinfo->GetModelType(GetModel());
+	int modelType = modelinfo->GetModelType(GetEngineObject()->GetModel());
 	return (modelType == mod_brush);
 }
 
@@ -2513,7 +2438,7 @@ void C_BaseEntity::AddStudioDecal( const Ray_t& ray, int hitbox, int decalIndex,
 		return;
 
 	// Found the point, now lets apply the decals
-	CreateModelInstance();
+	GetEngineObject()->CreateModelInstance();
 
 	// FIXME: Pass in decal up?
 	Vector up(0, 0, 1);
@@ -2526,11 +2451,11 @@ void C_BaseEntity::AddStudioDecal( const Ray_t& ray, int hitbox, int decalIndex,
 		VectorSubtract( tr.endpos, tr.plane.normal, temp );
 		Ray_t betterRay;
 		betterRay.Init( tr.endpos, temp );
-		modelrender->AddDecal( m_ModelInstance, betterRay, up, decalIndex, GetBody(), true, maxLODToDecal );
+		modelrender->AddDecal(GetEngineObject()->GetModelInstance(), betterRay, up, decalIndex, GetEngineObject()->GetBody(), true, maxLODToDecal);
 	}
 	else
 	{
-		modelrender->AddDecal( m_ModelInstance, ray, up, decalIndex, GetBody(), false, maxLODToDecal );
+		modelrender->AddDecal(GetEngineObject()->GetModelInstance(), ray, up, decalIndex, GetEngineObject()->GetBody(), false, maxLODToDecal);
 	}
 }
 
@@ -2555,7 +2480,7 @@ void C_BaseEntity::AddColoredStudioDecal( const Ray_t& ray, int hitbox, int deca
 		return;
 
 	// Found the point, now lets apply the decals
-	CreateModelInstance();
+	GetEngineObject()->CreateModelInstance();
 
 	// FIXME: Pass in decal up?
 	Vector up(0, 0, 1);
@@ -2568,11 +2493,11 @@ void C_BaseEntity::AddColoredStudioDecal( const Ray_t& ray, int hitbox, int deca
 		VectorSubtract( tr.endpos, tr.plane.normal, temp );
 		Ray_t betterRay;
 		betterRay.Init( tr.endpos, temp );
-		modelrender->AddColoredDecal( m_ModelInstance, betterRay, up, decalIndex, GetBody(), cColor, true, maxLODToDecal );
+		modelrender->AddColoredDecal(GetEngineObject()->GetModelInstance(), betterRay, up, decalIndex, GetEngineObject()->GetBody(), cColor, true, maxLODToDecal);
 	}
 	else
 	{
-		modelrender->AddColoredDecal( m_ModelInstance, ray, up, decalIndex, GetBody(), cColor, false, maxLODToDecal );
+		modelrender->AddColoredDecal(GetEngineObject()->GetModelInstance(), ray, up, decalIndex, GetEngineObject()->GetBody(), cColor, false, maxLODToDecal);
 	}
 }
 
@@ -2591,7 +2516,7 @@ void C_BaseEntity::AddBrushModelDecal( const Ray_t& ray, const Vector& decalCent
 	}
 
 	effects->DecalShoot( decalIndex, entindex(),
-		GetModel(), GetEngineObject()->GetAbsOrigin(), GetEngineObject()->GetAbsAngles(), decalCenter, 0, 0 );
+		GetEngineObject()->GetModel(), GetEngineObject()->GetAbsOrigin(), GetEngineObject()->GetAbsAngles(), decalCenter, 0, 0 );
 }
 
 
@@ -2608,7 +2533,7 @@ void C_BaseEntity::AddDecal( const Vector& rayStart, const Vector& rayEnd,
 	// Bloat a little bit so we get the intersection
 	ray.m_Delta *= 1.1f;
 
-	int modelType = modelinfo->GetModelType(GetModel());
+	int modelType = modelinfo->GetModelType(GetEngineObject()->GetModel());
 	switch ( modelType )
 	{
 	case mod_studio:
@@ -2637,7 +2562,7 @@ void C_BaseEntity::AddColoredDecal( const Vector& rayStart, const Vector& rayEnd
 	// Bloat a little bit so we get the intersection
 	ray.m_Delta *= 1.1f;
 
-	int modelType = modelinfo->GetModelType(GetModel());
+	int modelType = modelinfo->GetModelType(GetEngineObject()->GetModel());
 	if ( doTrace )
 	{
 		enginetrace->ClipRayToEntity( ray, MASK_SHOT, this, &tr );
@@ -2665,7 +2590,7 @@ void C_BaseEntity::AddColoredDecal( const Vector& rayStart, const Vector& rayEnd
 	case mod_brush:
 		{
 			color32 cColor32 = { (uint8)cColor.r(), (uint8)cColor.g(), (uint8)cColor.b(), (uint8)cColor.a() };
-			effects->DecalColorShoot( decalIndex, entindex(), GetModel(), GetEngineObject()->GetAbsOrigin(), GetEngineObject()->GetAbsAngles(), decalCenter, 0, 0, cColor32 );
+			effects->DecalColorShoot( decalIndex, entindex(), GetEngineObject()->GetModel(), GetEngineObject()->GetAbsOrigin(), GetEngineObject()->GetAbsAngles(), decalCenter, 0, 0, cColor32 );
 		}
 		break;
 
@@ -2682,30 +2607,14 @@ void C_BaseEntity::AddColoredDecal( const Vector& rayStart, const Vector& rayEnd
 void C_BaseEntity::RemoveAllDecals( void )
 {
 	// For now, we only handle removing decals from studiomodels
-	if ( modelinfo->GetModelType(GetModel()) == mod_studio )
+	if ( modelinfo->GetModelType(GetEngineObject()->GetModel()) == mod_studio )
 	{
-		CreateModelInstance();
-		modelrender->RemoveAllDecals( m_ModelInstance );
+		GetEngineObject()->CreateModelInstance();
+		modelrender->RemoveAllDecals(GetEngineObject()->GetModelInstance() );
 	}
 }
 
-bool C_BaseEntity::SnatchModelInstance( C_BaseEntity *pToEntity )
-{
-	if ( !modelrender->ChangeInstance(  GetModelInstance(), pToEntity ) )
-		return false;  // engine could move modle handle
 
-	// remove old handle from toentity if any
-	if ( pToEntity->GetModelInstance() != MODEL_INSTANCE_INVALID )
-		 pToEntity->DestroyModelInstance();
-
-	// move the handle to other entity
-	pToEntity->SetModelInstance(  GetModelInstance() );
-
-	// delete own reference
-	SetModelInstance( MODEL_INSTANCE_INVALID );
-
-	return true;
-}
 
 #include "tier0/memdbgoff.h"
 
@@ -2811,80 +2720,7 @@ void C_BaseEntity::SetNextClientThink( float nextThinkTime )
 	ClientThinkList()->SetNextClientThink( GetClientHandle(), nextThinkTime );
 }
 
-void C_BaseEntity::AddToLeafSystem()
-{
-	AddToLeafSystem( GetRenderGroup() );
-}
 
-void C_BaseEntity::AddToLeafSystem( RenderGroup_t group )
-{
-	if( m_hRender == INVALID_CLIENT_RENDER_HANDLE )
-	{
-		// create new renderer handle
-		ClientLeafSystem()->AddRenderable( this, group );
-		ClientLeafSystem()->EnableAlternateSorting( m_hRender, m_bAlternateSorting );
-	}
-	else
-	{
-		// handle already exists, just update group & origin
-		ClientLeafSystem()->SetRenderGroup( m_hRender, group );
-		ClientLeafSystem()->RenderableChanged( m_hRender );
-	}
-}
-
-
-//-----------------------------------------------------------------------------
-// Creates the shadow (if it doesn't already exist) based on shadow cast type
-//-----------------------------------------------------------------------------
-void C_BaseEntity::CreateShadow()
-{
-	ShadowType_t shadowType = ShadowCastType();
-	if (shadowType == SHADOWS_NONE)
-	{
-		DestroyShadow();
-	}
-	else
-	{
-		if (m_ShadowHandle == CLIENTSHADOW_INVALID_HANDLE)
-		{
-			int flags = SHADOW_FLAGS_SHADOW;
-			if (shadowType != SHADOWS_SIMPLE)
-				flags |= SHADOW_FLAGS_USE_RENDER_TO_TEXTURE;
-			if (shadowType == SHADOWS_RENDER_TO_TEXTURE_DYNAMIC)
-				flags |= SHADOW_FLAGS_ANIMATING_SOURCE;
-			m_ShadowHandle = g_pClientShadowMgr->CreateShadow(GetClientHandle(), flags);
-		}
-	}
-}
-
-//-----------------------------------------------------------------------------
-// Removes the shadow
-//-----------------------------------------------------------------------------
-void C_BaseEntity::DestroyShadow()
-{
-	// NOTE: This will actually cause the shadow type to be recomputed
-	// if the entity doesn't immediately go away
-	if (m_ShadowHandle != CLIENTSHADOW_INVALID_HANDLE)
-	{
-		g_pClientShadowMgr->DestroyShadow(m_ShadowHandle);
-		m_ShadowHandle = CLIENTSHADOW_INVALID_HANDLE;
-	}
-}
-
-
-//-----------------------------------------------------------------------------
-// Removes the entity from the leaf system
-//-----------------------------------------------------------------------------
-void C_BaseEntity::RemoveFromLeafSystem()
-{
-	// Detach from the leaf lists.
-	if( m_hRender != INVALID_CLIENT_RENDER_HANDLE )
-	{
-		ClientLeafSystem()->RemoveRenderable( m_hRender );
-		m_hRender = INVALID_CLIENT_RENDER_HANDLE;
-	}
-	DestroyShadow();
-}
 
 
 //-----------------------------------------------------------------------------
@@ -3049,25 +2885,6 @@ void C_BaseEntity::CalcAbsoluteAngularVelocity()
 	m_vecAbsAngVelocity += pMoveParent->GetAbsAngularVelocity();
 }
 */
-
-
-
-
-
-
-//-----------------------------------------------------------------------------
-// Mark shadow as dirty 
-//-----------------------------------------------------------------------------
-void C_BaseEntity::MarkRenderHandleDirty( )
-{
-	// Invalidate render leaf too
-	ClientRenderHandle_t handle = GetRenderHandle();
-	if ( handle != INVALID_CLIENT_RENDER_HANDLE )
-	{
-		ClientLeafSystem()->RenderableChanged( handle );
-	}
-}
-
 
 //-----------------------------------------------------------------------------
 // Purpose: 
@@ -3725,7 +3542,7 @@ void C_BaseEntity::DrawBBoxVisualizations( void )
 //-----------------------------------------------------------------------------
 bool C_BaseEntity::IsTransparent(void)
 {
-	bool modelIsTransparent = modelinfo->IsTranslucent(GetModel());
+	bool modelIsTransparent = modelinfo->IsTranslucent(GetEngineObject()->GetModel());
 	return modelIsTransparent || (m_nRenderMode != kRenderNormal);
 }
 
@@ -3760,9 +3577,9 @@ RenderGroup_t C_BaseEntity::GetRenderGroup()
 
 	// When an entity has a material proxy, we have to recompute
 	// translucency here because the proxy may have changed it.
-	if (modelinfo->ModelHasMaterialProxy( GetModel() ))
+	if (modelinfo->ModelHasMaterialProxy(GetEngineObject()->GetModel() ))
 	{
-		modelinfo->RecomputeTranslucency( const_cast<model_t*>(GetModel()), GetSkin(), GetBody(), GetClientRenderable() );
+		modelinfo->RecomputeTranslucency( const_cast<model_t*>(GetEngineObject()->GetModel()), GetEngineObject()->GetSkin(), GetEngineObject()->GetBody(), GetClientRenderable() );
 	}
 
 	// NOTE: Bypassing the GetFXBlend protection logic because we want this to
@@ -3779,7 +3596,7 @@ RenderGroup_t C_BaseEntity::GetRenderGroup()
 		return RENDER_GROUP_OPAQUE_ENTITY;
 
 		// Figure out its RenderGroup.
-	int modelType = modelinfo->GetModelType(GetModel());
+	int modelType = modelinfo->GetModelType(GetEngineObject()->GetModel());
 	RenderGroup_t renderGroup = (modelType == mod_brush) ? RENDER_GROUP_OPAQUE_BRUSH : RENDER_GROUP_OPAQUE_ENTITY;
 	if ( ( nFXBlend != 255 ) || IsTransparent() )
 	{
@@ -3794,7 +3611,7 @@ RenderGroup_t C_BaseEntity::GetRenderGroup()
 	}
 
 	if ( ( renderGroup == RENDER_GROUP_TRANSLUCENT_ENTITY ) &&
-		 ( modelinfo->IsTranslucentTwoPass(GetModel()) ) )
+		 ( modelinfo->IsTranslucentTwoPass(GetEngineObject()->GetModel()) ) )
 	{
 		renderGroup = RENDER_GROUP_TWOPASS;
 	}
@@ -3830,7 +3647,7 @@ void C_BaseEntity::OnPostRestoreData()
 	// If our model index has changed, then make sure it's reflected in our model pointer.
 	// (Mostly superseded by new modelindex delta check in RestoreData, but I'm leaving it
 	// because it might be band-aiding any other missed calls to SetModelByIndex --henryg)
-	if ( GetModel() != modelinfo->GetModel(GetEngineObject()->GetModelIndex() ) )
+	if (GetEngineObject()->GetModel() != modelinfo->GetModel(GetEngineObject()->GetModelIndex() ) )
 	{
 		MDLCACHE_CRITICAL_SECTION();
 		SetModelByIndex(GetEngineObject()->GetModelIndex() );
@@ -4027,7 +3844,7 @@ void C_BaseEntity::GetToolRecordingState( KeyValues *msg )
 
 	static BaseEntityRecordingState_t state;
 	state.m_flTime = gpGlobals->curtime;
-	state.m_pModelName = modelinfo->GetModelName( GetModel() );
+	state.m_pModelName = modelinfo->GetModelName(GetEngineObject()->GetModel() );
 	state.m_nOwner = pOwner ? pOwner->entindex() : -1;
 	state.m_nEffects = GetEngineObject()->GetEffects();
 	state.m_bVisible = ShouldDraw() && !IsDormant();

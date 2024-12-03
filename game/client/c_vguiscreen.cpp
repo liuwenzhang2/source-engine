@@ -158,7 +158,7 @@ void C_VGuiScreen::GetAimEntOrigin( IClientEntity *pAttachedTo, Vector *pOrigin,
 	{
 		{
 			C_BaseAnimating::AutoAllowBoneAccess boneaccess( true, true );
-			pEnt->GetAttachment( m_nAttachmentIndex, *pOrigin, *pAngles );
+			pEnt->GetEngineObject()->GetAttachment( m_nAttachmentIndex, *pOrigin, *pAngles );
 		}
 		
 		if ( IsAttachedToViewModel() )

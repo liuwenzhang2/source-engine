@@ -128,7 +128,7 @@ public:
 	int		m_bAnglesComputed : 1;
 };
 
-class C_EngineObjectInternal : public IEngineObjectClient, public IClientNetworkable {
+class C_EngineObjectInternal : public IEngineObjectClient {
 public:
 	DECLARE_CLASS_NOBASE(C_EngineObjectInternal);
 	DECLARE_PREDICTABLE();
@@ -144,7 +144,9 @@ public:
 	bool IsDormant(void) { return m_pOuter->IsDormant(); }
 	void ReceiveMessage(int classID, bf_read& msg) { m_pOuter->ReceiveMessage(classID, msg); }
 	void SetDestroyedOnRecreateEntities(void) { m_pOuter->SetDestroyedOnRecreateEntities(); }
-
+	// This just picks one of the routes to IClientUnknown.
+	virtual IClientUnknown* GetIClientUnknown() { return m_pOuter; }
+	virtual bool LODTest() { return true; }   // NOTE: UNUSED
 	// memory handling, uses calloc so members are zero'd out on instantiation
 	void* operator new(size_t stAllocateBlock);
 	void* operator new[](size_t stAllocateBlock);
@@ -153,11 +155,11 @@ public:
 	void operator delete(void* pMem);
 	void operator delete(void* pMem, int nBlockUse, const char* pFileName, int nLine) { operator delete(pMem); }
 
-	C_EngineObjectInternal(IClientEntityList* pClientEntityList) 
+	C_EngineObjectInternal(IClientEntityList* pClientEntityList)
 		:m_pClientEntityList(pClientEntityList),
 		m_iv_vecOrigin("C_BaseEntity::m_iv_vecOrigin", &m_vecOrigin, LATCH_SIMULATION_VAR),
 		m_iv_angRotation("C_BaseEntity::m_iv_angRotation", &m_angRotation, LATCH_SIMULATION_VAR),
-		m_iv_vecVelocity("C_BaseEntity::m_iv_vecVelocity", &m_vecVelocity, LATCH_SIMULATION_VAR), 
+		m_iv_vecVelocity("C_BaseEntity::m_iv_vecVelocity", &m_vecVelocity, LATCH_SIMULATION_VAR),
 		m_iv_flCycle("C_BaseAnimating::m_iv_flCycle", &m_flCycle, LATCH_ANIMATION_VAR),
 		m_iv_flPoseParameter("C_BaseAnimating::m_iv_flPoseParameter", m_flPoseParameter, LATCH_ANIMATION_VAR),
 		m_iv_flEncodedController("C_BaseAnimating::m_iv_flEncodedController", m_flEncodedController, LATCH_ANIMATION_VAR),
@@ -274,6 +276,9 @@ public:
 		m_pIk = NULL;
 		m_EntClientFlags = 0;
 		m_ragdollListCount = 0;
+		m_ModelInstance = MODEL_INSTANCE_INVALID;
+		m_ShadowHandle = CLIENTSHADOW_INVALID_HANDLE;
+		m_hRender = INVALID_CLIENT_RENDER_HANDLE;
 	}
 
 	virtual ~C_EngineObjectInternal()
@@ -560,11 +565,17 @@ public:
 		m_nLastRecordedFrame = -1;
 		m_bRecordInTools = true;
 #endif
+		m_ModelInstance = MODEL_INSTANCE_INVALID;
+		m_ShadowHandle = CLIENTSHADOW_INVALID_HANDLE;
+		m_hRender = INVALID_CLIENT_RENDER_HANDLE;
 	}
 
+	virtual void OnPositionChanged();
+	virtual void OnAnglesChanged();
+	virtual void OnAnimationChanged();
 	// Invalidates the abs state of all children
 	void InvalidatePhysicsRecursive(int nChangeFlags);
-
+	
 	// HACKHACK:Get the trace_t from the last physics touch call (replaces the even-hackier global trace vars)
 	const trace_t& GetTouchTrace(void);
 	// FIXME: Should be private, but I can't make em private just yet
@@ -758,7 +769,7 @@ public:
 	void UseClientSideAnimation();
 	bool IsUsingClientSideAnimation() { return m_bClientSideAnimation; }
 
-	Vector GetVecForce(){
+	Vector GetVecForce() {
 		return 	m_vecForce;
 	}
 	void SetVecForce(Vector vecForce) {
@@ -770,14 +781,14 @@ public:
 	void SetForceBone(int nForceBone) {
 		m_nForceBone = nForceBone;
 	}
-	int GetBody() { 
-		return m_nBody; 
+	int GetBody() {
+		return m_nBody;
 	}
 	void SetBody(int nBody) {
 		m_nBody = nBody;
 	}
-	int GetSkin() { 
-		return m_nSkin; 
+	int GetSkin() {
+		return m_nSkin;
 	}
 	void SetSkin(int nSkin) {
 		m_nSkin = nSkin;
@@ -810,7 +821,7 @@ public:
 	virtual void SetSequence(int nSequence);
 	inline void ResetSequence(int nSequence);
 	void ResetSequenceInfo(void);
-	int GetNewSequenceParity(){
+	int GetNewSequenceParity() {
 		return m_nNewSequenceParity;
 	}
 	int GetPrevNewSequenceParity() {
@@ -958,7 +969,7 @@ public:
 	int GetBoneIndex(int index) { return m_boneIndex[index]; }
 	const Vector& GetRagPos(int index) { return m_ragPos[index]; }
 	const QAngle& GetRagAngles(int index) { return m_ragAngles[index]; }
-	unsigned char GetRenderFX() const{ return m_nRenderFX; }
+	unsigned char GetRenderFX() const { return m_nRenderFX; }
 	void SetRenderFX(unsigned char nRenderFX) { m_nRenderFX = nRenderFX; }
 
 	void					SetToolHandle(HTOOLHANDLE handle);
@@ -1017,7 +1028,76 @@ public:
 	bool GetAttachment(int number, matrix3x4_t& matrix);
 	bool GetAttachmentVelocity(int number, Vector& originVel, Quaternion& angleVel);
 	virtual bool					CalcAttachments();
+	virtual ClientShadowHandle_t GetShadowHandle() const { return m_ShadowHandle; }
+	virtual void SetRenderHandle(ClientRenderHandle_t hRenderHandle) { m_hRender = hRenderHandle; }
+	virtual const ClientRenderHandle_t& GetRenderHandle() const;
+	// Shadow-related methods
+	virtual bool IsShadowDirty();
+	virtual void MarkShadowDirty(bool bDirty);
+	virtual IClientRenderable* GetShadowParent();
+	virtual IClientRenderable* FirstShadowChild();
+	virtual IClientRenderable* NextShadowPeer();
+	void CreateModelInstance();
+	// Gets the model instance + shadow handle
+	virtual ModelInstanceHandle_t GetModelInstance() { return m_ModelInstance; }
+	void SetModelInstance(ModelInstanceHandle_t hInstance) { m_ModelInstance = hInstance; }
+	bool SnatchModelInstance(IEngineObjectClient* pToEntity);
+	// Only meant to be called from subclasses
+	void DestroyModelInstance();
+	virtual const matrix3x4_t& RenderableToWorldTransform();
+	virtual IPVSNotify* GetPVSNotifyInterface() { return m_pOuter->GetPVSNotifyInterface(); }
+	virtual void RecordToolMessage() { return m_pOuter->RecordToolMessage(); }
+	virtual void OnThreadedDrawSetup() { m_pOuter->OnThreadedDrawSetup(); }
+	virtual bool ShouldDraw() { return m_pOuter->ShouldDraw(); }
+	virtual bool IsTransparent(void) { return m_pOuter->IsTransparent(); }
+	virtual bool UsesPowerOfTwoFrameBufferTexture() { return m_pOuter->UsesPowerOfTwoFrameBufferTexture(); }
+	virtual bool UsesFullFrameBufferTexture() { return m_pOuter->UsesFullFrameBufferTexture(); }
+	// Is this a two-pass renderable?
+	virtual bool IsTwoPass(void) { return m_pOuter->IsTwoPass(); }
+	virtual bool IgnoresZBuffer(void) const { return m_pOuter->IgnoresZBuffer(); }
+	// Determine alpha and blend amount for transparent objects based on render state info
+	virtual void ComputeFxBlend() { m_pOuter->ComputeFxBlend(); }
+	virtual int	GetFxBlend(void) { return m_pOuter->GetFxBlend(); }
+	virtual void GetColorModulation(float* color) { m_pOuter->GetColorModulation(color); }
+	virtual bool UsesFlexDelayedWeights() { return m_pOuter->UsesFlexDelayedWeights(); }
+	virtual void SetupWeights(const matrix3x4_t* pBoneToWorld, int nFlexWeightCount, float* pFlexWeights, float* pFlexDelayedWeights) {
+		m_pOuter->SetupWeights(pBoneToWorld, nFlexWeightCount, pFlexWeights, pFlexDelayedWeights);
+	}
+	virtual Vector const& GetRenderOrigin(void) { return m_pOuter->GetRenderOrigin(); }
+	virtual QAngle const& GetRenderAngles(void) { return m_pOuter->GetRenderAngles(); }
+	// Returns the bounds relative to the origin (render bounds)
+	virtual void GetRenderBounds(Vector& mins, Vector& maxs) { return m_pOuter->GetRenderBounds(mins, maxs); }
+	// returns the bounds as an AABB in worldspace
+	virtual void GetRenderBoundsWorldspace(Vector& mins, Vector& maxs) { return m_pOuter->GetRenderBoundsWorldspace(mins, maxs); }
+	// These normally call through to GetRenderAngles/GetRenderBounds, but some entities custom implement them.
+	virtual void GetShadowRenderBounds(Vector& mins, Vector& maxs, ShadowType_t shadowType) { return m_pOuter->GetShadowRenderBounds(mins, maxs, shadowType); }
+	// Rendering clip plane, should be 4 floats, return value of NULL indicates a disabled render clip plane
+	virtual float* GetRenderClipPlane(void) { return m_pOuter->GetRenderClipPlane(); }
+	virtual int	DrawModel(int flags) { return m_pOuter->DrawModel(flags); }
+	virtual ShadowType_t ShadowCastType() { return m_pOuter->ShadowCastType(); }
+	// Should this object be able to have shadows cast onto it?
+	virtual bool ShouldReceiveProjectedTextures(int flags) { return m_pOuter->ShouldReceiveProjectedTextures(flags); }
 
+	// These methods return true if we want a per-renderable shadow cast direction + distance
+	virtual bool GetShadowCastDistance(float* pDist, ShadowType_t shadowType) const { 
+		return m_pOuter->GetShadowCastDistance(pDist, shadowType); 
+	}
+	virtual bool GetShadowCastDirection(Vector* pDirection, ShadowType_t shadowType) const {
+		return m_pOuter->GetShadowCastDirection(pDirection, shadowType);
+	}
+	// Creates the shadow (if it doesn't already exist) based on shadow cast type
+	void					CreateShadow();
+
+	// Destroys the shadow; causes its type to be recomputed if the entity doesn't go away immediately.
+	void					DestroyShadow();
+	// Dirty bits
+	void					MarkRenderHandleDirty();
+
+	// Sets up a render handle so the leaf system will draw this entity.
+	void					AddToLeafSystem();
+	void					AddToLeafSystem(RenderGroup_t group);
+	// remove entity form leaf system again
+	void					RemoveFromLeafSystem();
 private:
 	void LockStudioHdr();
 	void UnlockStudioHdr();
@@ -1030,7 +1110,8 @@ private:
 	bool			IsBoneAccessAllowed() const;
 	// This method should return true if the bones have changed + SetupBones needs to be called
 	virtual float LastBoneChangedTime();
-	void							SetupBones_AttachmentHelper(IStudioHdr* pStudioHdr);
+	void			SetupBones_AttachmentHelper(IStudioHdr* pStudioHdr);
+
 
 protected:
 
@@ -1271,6 +1352,16 @@ protected:
 
 	// Calculated attachment points
 	CUtlVector<CAttachmentData>		m_Attachments;
+
+	// Shadow data
+	ClientShadowHandle_t			m_ShadowHandle;
+	// Used to store the state we were added to the BSP as, so it can
+	// reinsert the entity if the state changes.
+	ClientRenderHandle_t			m_hRender;	// link into spatial partition
+	// Model instance data..
+	ModelInstanceHandle_t			m_ModelInstance;
+	bool							m_bAlternateSorting;
+
 };
 
 //-----------------------------------------------------------------------------
@@ -2036,6 +2127,11 @@ inline bool C_EngineObjectInternal::GetAimEntOrigin(Vector* pAbsOrigin, QAngle* 
 	return m_pBoneMergeCache->GetAimEntOrigin(pAbsOrigin, pAbsAngles);
 }
 
+inline const ClientRenderHandle_t& C_EngineObjectInternal::GetRenderHandle() const
+{
+	return m_hRender;
+}
+
 class C_EngineWorldInternal : public C_EngineObjectInternal {
 public:
 	C_EngineWorldInternal(IClientEntityList* pClientEntityList) 
@@ -2296,6 +2392,8 @@ void Rope_ResetCounters();
 
 class C_EngineGhostInternal : public C_EngineObjectInternal, public IEngineGhostClient {
 public:
+	DECLARE_CLASS(C_EngineGhostInternal, C_EngineObjectInternal);
+
 	C_EngineGhostInternal(IClientEntityList* pClientEntityList) 
 	:C_EngineObjectInternal(pClientEntityList)
 	{
@@ -2327,6 +2425,8 @@ public:
 	virtual	bool GetAttachment(int number, Vector& origin, QAngle& angles);
 	virtual bool GetAttachment(int number, matrix3x4_t& matrix);
 	virtual bool GetAttachmentVelocity(int number, Vector& originVel, Quaternion& angleVel);
+	// Get the model instance of the ghosted model so that decals will properly draw across portals
+	virtual ModelInstanceHandle_t GetModelInstance();
 private:
 	C_BaseEntity* m_pGhostedSource; //the renderable we're transforming and re-rendering
 	bool m_bSourceIsBaseAnimating;
@@ -3344,13 +3444,13 @@ void CClientEntityList<T>::OnAddEntity(T* pEnt, CBaseHandle handle)
 
 	IClientUnknown* pUnknown = pEnt;//(IClientUnknown*)
 
-	// If this thing wants PVS notifications, hook it up.
-	AddPVSNotifier(pUnknown);
-
 	// Store it in a special list for fast iteration if it's a C_BaseEntity.
 	C_BaseEntity* pBaseEntity = pUnknown->GetBaseEntity();
 	//m_EngineObjectArray[entnum] = new C_EngineObjectInternal();
 	m_EngineObjectArray[entnum]->Init(pBaseEntity);
+
+	// If this thing wants PVS notifications, hook it up.
+	AddPVSNotifier(pUnknown);
 
 //	if (pBaseEntity)
 //	{
@@ -3372,7 +3472,7 @@ void CClientEntityList<T>::OnAddEntity(T* pEnt, CBaseHandle handle)
 	//	pCache->m_BaseEntitiesIndex = m_BaseEntities.InvalidIndex();
 	//}
 
-
+	BaseClass::OnAddEntity(pEnt, handle);
 }
 
 template<class T>
@@ -3424,6 +3524,7 @@ void CClientEntityList<T>::OnRemoveEntity(T* pEnt, CBaseHandle handle)
 	//	m_BaseEntities.Remove(pCache->m_BaseEntitiesIndex);
 
 	//pCache->m_BaseEntitiesIndex = m_BaseEntities.InvalidIndex();
+	BaseClass::OnRemoveEntity(pEnt, handle);
 }
 
 
@@ -3617,7 +3718,7 @@ template<class T>
 void CClientEntityList<T>::SetupBonesOnBaseAnimating(IEngineObjectClient*& pBaseAnimating)
 {
 	if (!pBaseAnimating->GetMoveParent())
-		pBaseAnimating->GetOuter()->SetupBones(NULL, -1, -1, gpGlobals->curtime);
+		pBaseAnimating->GetOuter()->GetEngineObject()->SetupBones(NULL, -1, -1, gpGlobals->curtime);
 }
 
 template<class T>

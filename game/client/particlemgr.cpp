@@ -1272,7 +1272,7 @@ void CParticleMgr::AddEffect( CNewParticleEffect *pEffect )
 #endif
 	if ( pEffect->IsValid() && pEffect->m_pDef->IsViewModelEffect() )
 	{
-		ClientLeafSystem()->SetRenderGroup( pEffect->RenderHandle(), RENDER_GROUP_VIEW_MODEL_TRANSLUCENT );
+		ClientLeafSystem()->SetRenderGroup( pEffect->GetRenderHandle(), RENDER_GROUP_VIEW_MODEL_TRANSLUCENT );
 	}
 }
 

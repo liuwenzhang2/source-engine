@@ -629,6 +629,7 @@ BEGIN_RECV_TABLE_NOBASE(C_EngineObjectInternal, DT_EngineObject)
 	RecvPropArray(RecvPropVector(RECVINFO(m_ragPos[0])), m_ragPos),
 	RecvPropInt(RECVINFO(m_nRenderFX)),
 	RecvPropInt(RECVINFO(m_nOverlaySequence)),
+	RecvPropBool(RECVINFO(m_bAlternateSorting)),
 
 END_RECV_TABLE()
 
@@ -1057,6 +1058,10 @@ void C_EngineObjectInternal::PreDataUpdate(DataUpdateType_t updateType)
 		m_flOldPoseParameters[i] = m_flPoseParameter[i];
 	}
 
+	if (GetRenderHandle() != INVALID_CLIENT_RENDER_HANDLE)
+	{
+		ClientLeafSystem()->EnableAlternateSorting(GetRenderHandle(), m_bAlternateSorting);
+	}
 	m_pOuter->PreDataUpdate(updateType);
 }
 
@@ -2130,7 +2135,7 @@ const matrix3x4_t& C_EngineObjectInternal::GetParentToWorldTransform(matrix3x4_t
 	{
 		Vector vOrigin;
 		QAngle vAngles;
-		if (pMoveParent->m_pOuter->GetAttachment(GetParentAttachment(), vOrigin, vAngles))
+		if (pMoveParent->GetAttachment(GetParentAttachment(), vOrigin, vAngles))
 		{
 			AngleMatrix(vAngles, vOrigin, tempMatrix);
 			return tempMatrix;
@@ -2942,6 +2947,25 @@ void C_EngineObjectInternal::DestroyAllDataObjects(void)
 	}
 }
 
+void C_EngineObjectInternal::OnPositionChanged()
+{
+	m_pOuter->OnPositionChanged();
+}
+
+void C_EngineObjectInternal::OnAnglesChanged()
+{
+	MarkRenderHandleDirty();
+	g_pClientShadowMgr->AddToDirtyShadowList(this);
+	g_pClientShadowMgr->MarkRenderToTextureShadowDirty(GetShadowHandle());
+	m_pOuter->OnAnglesChanged();
+}
+
+void C_EngineObjectInternal::OnAnimationChanged()
+{
+	g_pClientShadowMgr->MarkRenderToTextureShadowDirty(GetShadowHandle());
+	m_pOuter->OnAnimationChanged();
+}
+
 //-----------------------------------------------------------------------------
 // Invalidates the abs state of all children
 //-----------------------------------------------------------------------------
@@ -2974,7 +2998,7 @@ void C_EngineObjectInternal::InvalidatePhysicsRecursive(int nChangeFlags)
 //#ifndef CLIENT_DLL
 //		GetEngineObject()->MarkPVSInformationDirty();
 //#endif
-		m_pOuter->OnPositionChanged();
+		OnPositionChanged();
 	}
 
 	// NOTE: This has to be done after velocity + position are changed
@@ -2982,7 +3006,7 @@ void C_EngineObjectInternal::InvalidatePhysicsRecursive(int nChangeFlags)
 	if (nChangeFlags & ANGLES_CHANGED)
 	{
 		nDirtyFlags |= EFL_DIRTY_ABSTRANSFORM;
-		m_pOuter->OnAnglesChanged();
+		OnAnglesChanged();
 
 		// This is going to be used for all children: children
 		// have position + velocity changed
@@ -2995,7 +3019,7 @@ void C_EngineObjectInternal::InvalidatePhysicsRecursive(int nChangeFlags)
 	bool bOnlyDueToAttachment = false;
 	if (nChangeFlags & ANIMATION_CHANGED)
 	{
-		m_pOuter->OnAnimationChanged();
+		OnAnimationChanged();
 
 		// Only set this flag if the only thing that changed us was the animation.
 		// If position or something else changed us, then we must tell all children.
@@ -4315,18 +4339,18 @@ IEngineObjectClient* C_EngineObjectInternal::FindFollowedEntity()
 	if (follow->GetOuter()->IsDormant())
 		return NULL;
 
-	if (!follow->GetOuter()->GetModel())
+	if (!follow->GetModel())
 	{
 		Warning("mod_studio: MOVETYPE_FOLLOW with no model.\n");
 		return NULL;
 	}
 
-	if (modelinfo->GetModelType(follow->GetOuter()->GetModel()) != mod_studio)
+	if (modelinfo->GetModelType(follow->GetModel()) != mod_studio)
 	{
 		Warning("Attached %s (mod_studio) to %s (%d)\n",
 			modelinfo->GetModelName(GetModel()),
-			modelinfo->GetModelName(follow->GetOuter()->GetModel()),
-			modelinfo->GetModelType(follow->GetOuter()->GetModel()));
+			modelinfo->GetModelName(follow->GetModel()),
+			modelinfo->GetModelType(follow->GetModel()));
 		return NULL;
 	}
 
@@ -4504,7 +4528,7 @@ void C_EngineObjectInternal::SetModelPointer(const model_t* pModel)
 {
 	if (m_pModel != pModel)
 	{
-		m_pOuter->DestroyModelInstance();
+		DestroyModelInstance();
 		m_pModel = pModel;
 		if (GetModelPtr()) {
 			
@@ -5168,7 +5192,7 @@ IPhysicsObject* C_EngineObjectInternal::GetElement(int elementNum)
 void C_EngineObjectInternal::BuildRagdollBounds(C_BaseEntity* ent)
 {
 	Vector mins, maxs, size;
-	modelinfo->GetModelBounds(ent->GetModel(), mins, maxs);
+	modelinfo->GetModelBounds(ent->GetEngineObject()->GetModel(), mins, maxs);
 	size = (maxs - mins) * 0.5;
 	m_radius = size.Length();
 
@@ -5469,8 +5493,8 @@ bool C_EngineObjectInternal::InitAsClientRagdoll(const matrix3x4_t* pDeltaBones0
 	// version which only updates when physics state changes
 	// NOTE: We have to do this after m_pRagdoll is assigned above
 	// because that's what ShadowCastType uses to figure out which type of shadow to use.
-	m_pOuter->DestroyShadow();
-	m_pOuter->CreateShadow();
+	DestroyShadow();
+	CreateShadow();
 
 	// Cache off ragdoll bone positions/quaternions
 	//if (m_bStoreRagdollInfo && m_ragdoll.listCount)
@@ -5767,7 +5791,7 @@ C_BaseEntity* C_EngineObjectInternal::CreateRagdollCopy()
 	}
 
 	// move my current model instance to the ragdoll's so decals are preserved.
-	m_pOuter->SnatchModelInstance(pRagdoll);
+	SnatchModelInstance(pRagdoll->GetEngineObject());
 
 	// We need to take these from the entity
 	pRagdoll->GetEngineObject()->SetAbsOrigin(GetAbsOrigin());
@@ -6830,6 +6854,177 @@ void C_EngineObjectInternal::SetupBones_AttachmentHelper(IStudioHdr* hdr)
 		m_pOuter->FormatViewModelAttachment(i, world);
 		PutAttachment(i + 1, world);
 	}
+}
+
+//-----------------------------------------------------------------------------
+// Shadow-related methods
+//-----------------------------------------------------------------------------
+bool C_EngineObjectInternal::IsShadowDirty()
+{
+	return IsEFlagSet(EFL_DIRTY_SHADOWUPDATE);
+}
+
+void C_EngineObjectInternal::MarkShadowDirty(bool bDirty)
+{
+	if (bDirty)
+	{
+		AddEFlags(EFL_DIRTY_SHADOWUPDATE);
+	}
+	else
+	{
+		RemoveEFlags(EFL_DIRTY_SHADOWUPDATE);
+	}
+}
+
+IClientRenderable* C_EngineObjectInternal::GetShadowParent()
+{
+	IEngineObjectClient* pParent = GetMoveParent();
+	return pParent ? pParent->GetOuter()->GetClientRenderable() : NULL;
+}
+
+IClientRenderable* C_EngineObjectInternal::FirstShadowChild()
+{
+	IEngineObjectClient* pChild = FirstMoveChild();
+	return pChild ? pChild->GetOuter()->GetClientRenderable() : NULL;
+}
+
+IClientRenderable* C_EngineObjectInternal::NextShadowPeer()
+{
+	IEngineObjectClient* pPeer = NextMovePeer();
+	return pPeer ? pPeer->GetOuter()->GetClientRenderable() : NULL;
+}
+
+//-----------------------------------------------------------------------------
+// Only meant to be called from subclasses.
+// Returns true if instance valid, false otherwise
+//-----------------------------------------------------------------------------
+void C_EngineObjectInternal::CreateModelInstance()
+{
+	if (m_ModelInstance == MODEL_INSTANCE_INVALID)
+	{
+		m_ModelInstance = modelrender->CreateInstance(this);
+	}
+}
+
+bool C_EngineObjectInternal::SnatchModelInstance(IEngineObjectClient* pToEntity)
+{
+	if (!modelrender->ChangeInstance(GetModelInstance(), pToEntity))
+		return false;  // engine could move modle handle
+
+	// remove old handle from toentity if any
+	if (pToEntity->GetModelInstance() != MODEL_INSTANCE_INVALID)
+		pToEntity->DestroyModelInstance();
+
+	// move the handle to other entity
+	pToEntity->SetModelInstance(GetModelInstance());
+
+	// delete own reference
+	SetModelInstance(MODEL_INSTANCE_INVALID);
+
+	return true;
+}
+
+const matrix3x4_t& C_EngineObjectInternal::RenderableToWorldTransform()
+{
+	return EntityToWorldTransform();
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
+void C_EngineObjectInternal::DestroyModelInstance()
+{
+	if (m_ModelInstance != MODEL_INSTANCE_INVALID)
+	{
+		modelrender->DestroyInstance(m_ModelInstance);
+		m_ModelInstance = MODEL_INSTANCE_INVALID;
+	}
+}
+
+//-----------------------------------------------------------------------------
+// Creates the shadow (if it doesn't already exist) based on shadow cast type
+//-----------------------------------------------------------------------------
+void C_EngineObjectInternal::CreateShadow()
+{
+	ShadowType_t shadowType = ShadowCastType();
+	if (shadowType == SHADOWS_NONE)
+	{
+		DestroyShadow();
+	}
+	else
+	{
+		if (GetShadowHandle() == CLIENTSHADOW_INVALID_HANDLE)
+		{
+			int flags = SHADOW_FLAGS_SHADOW;
+			if (shadowType != SHADOWS_SIMPLE)
+				flags |= SHADOW_FLAGS_USE_RENDER_TO_TEXTURE;
+			if (shadowType == SHADOWS_RENDER_TO_TEXTURE_DYNAMIC)
+				flags |= SHADOW_FLAGS_ANIMATING_SOURCE;
+			m_ShadowHandle = g_pClientShadowMgr->CreateShadow(m_pOuter->GetRefEHandle(), flags);
+		}
+	}
+}
+
+//-----------------------------------------------------------------------------
+// Removes the shadow
+//-----------------------------------------------------------------------------
+void C_EngineObjectInternal::DestroyShadow()
+{
+	// NOTE: This will actually cause the shadow type to be recomputed
+	// if the entity doesn't immediately go away
+	if (GetShadowHandle() != CLIENTSHADOW_INVALID_HANDLE)
+	{
+		g_pClientShadowMgr->DestroyShadow(GetShadowHandle());
+		m_ShadowHandle = CLIENTSHADOW_INVALID_HANDLE;
+	}
+}
+
+void C_EngineObjectInternal::AddToLeafSystem()
+{
+	AddToLeafSystem(m_pOuter->GetRenderGroup());
+}
+
+void C_EngineObjectInternal::AddToLeafSystem(RenderGroup_t group)
+{
+	if (GetRenderHandle() == INVALID_CLIENT_RENDER_HANDLE)
+	{
+		// create new renderer handle
+		ClientLeafSystem()->AddRenderable(this, group);
+		ClientLeafSystem()->EnableAlternateSorting(GetRenderHandle(), m_bAlternateSorting);
+	}
+	else
+	{
+		// handle already exists, just update group & origin
+		ClientLeafSystem()->SetRenderGroup(GetRenderHandle(), group);
+		ClientLeafSystem()->RenderableChanged(GetRenderHandle());
+	}
+}
+
+//-----------------------------------------------------------------------------
+// Mark shadow as dirty 
+//-----------------------------------------------------------------------------
+void C_EngineObjectInternal::MarkRenderHandleDirty()
+{
+	// Invalidate render leaf too
+	ClientRenderHandle_t handle = GetRenderHandle();
+	if (handle != INVALID_CLIENT_RENDER_HANDLE)
+	{
+		ClientLeafSystem()->RenderableChanged(handle);
+	}
+}
+
+//-----------------------------------------------------------------------------
+// Removes the entity from the leaf system
+//-----------------------------------------------------------------------------
+void C_EngineObjectInternal::RemoveFromLeafSystem()
+{
+	// Detach from the leaf lists.
+	if (GetRenderHandle() != INVALID_CLIENT_RENDER_HANDLE)
+	{
+		ClientLeafSystem()->RemoveRenderable(GetRenderHandle());
+		m_hRender = INVALID_CLIENT_RENDER_HANDLE;
+	}
+	DestroyShadow();
 }
 
 C_EnginePortalInternal::C_EnginePortalInternal(IClientEntityList* pClientEntityList)
@@ -9841,10 +10036,10 @@ bool C_EngineRopeInternal::CalculateEndPointAttachment(C_BaseEntity* pEnt, int i
 			if (!pModel)
 				return false;
 
-			int iAttachment = pModel->LookupAttachment("buff_attach");
+			int iAttachment = pModel->GetEngineObject()->LookupAttachment("buff_attach");
 			//if ( pAngles )
 			//	return pModel->GetAttachment( iAttachment, vPos, *pAngles );
-			return pModel->GetAttachment(iAttachment, vPos, pAngles);
+			return pModel->GetEngineObject()->GetAttachment(iAttachment, vPos, pAngles);
 		}
 	}
 
@@ -9857,7 +10052,7 @@ bool C_EngineRopeInternal::CalculateEndPointAttachment(C_BaseEntity* pEnt, int i
 		//}
 		//else
 		//{
-		bOk = pEnt->GetAttachment(iAttachment, vPos, pAngles);
+		bOk = pEnt->GetEngineObject()->GetAttachment(iAttachment, vPos, pAngles);
 		//}
 		if (bOk)
 			return true;
@@ -10092,10 +10287,10 @@ void C_EngineRopeInternal::SetupHangDistance(float flHangDist)
 
 	// Calculate starting conditions so we can force it to hang down N inches.
 	Vector v1 = pEnt1->GetEngineObject()->GetAbsOrigin();
-	pEnt1->GetAttachment(m_iStartAttachment, v1, dummyAngles);
+	pEnt1->GetEngineObject()->GetAttachment(m_iStartAttachment, v1, dummyAngles);
 
 	Vector v2 = pEnt2->GetEngineObject()->GetAbsOrigin();
-	pEnt2->GetAttachment(m_iEndAttachment, v2, dummyAngles);
+	pEnt2->GetEngineObject()->GetAttachment(m_iEndAttachment, v2, dummyAngles);
 
 	float flSlack, flLen;
 	CalcRopeStartingConditions(v1, v2, ROPE_MAX_SEGMENTS, flHangDist, &flLen, &flSlack);
@@ -10465,7 +10660,7 @@ bool C_EngineGhostInternal::SetupBones(matrix3x4_t* pBoneToWorldOut, int nMaxBon
 		pParent->GetEngineObject()->SetModelIndex(pParent->GetWorldModelIndex());
 	}
 
-	if (m_pGhostedSource->SetupBones(pBoneToWorldOut, nMaxBones, boneMask, currentTime))
+	if (m_pGhostedSource->GetEngineObject()->SetupBones(pBoneToWorldOut, nMaxBones, boneMask, currentTime))
 	{
 		if (pBoneToWorldOut)
 		{
@@ -10519,7 +10714,7 @@ const matrix3x4_t& C_EngineGhostInternal::RenderableToWorldTransform()
 	if (m_pGhostedSource == NULL)
 		return m_ReferencedReturns.matRenderableToWorldTransform;
 
-	ConcatTransforms(m_matGhostTransform.As3x4(), m_pGhostedSource->RenderableToWorldTransform(), m_ReferencedReturns.matRenderableToWorldTransform);
+	ConcatTransforms(m_matGhostTransform.As3x4(), m_pGhostedSource->GetEngineObject()->RenderableToWorldTransform(), m_ReferencedReturns.matRenderableToWorldTransform);
 	return m_ReferencedReturns.matRenderableToWorldTransform;
 }
 
@@ -10529,7 +10724,7 @@ int C_EngineGhostInternal::LookupAttachment(const char* pAttachmentName)
 		return -1;
 
 
-	return m_pGhostedSource->LookupAttachment(pAttachmentName);
+	return m_pGhostedSource->GetEngineObject()->LookupAttachment(pAttachmentName);
 }
 
 bool C_EngineGhostInternal::GetAttachment(int number, Vector& origin, QAngle& angles)
@@ -10537,7 +10732,7 @@ bool C_EngineGhostInternal::GetAttachment(int number, Vector& origin, QAngle& an
 	if (m_pGhostedSource == NULL)
 		return false;
 
-	if (m_pGhostedSource->GetAttachment(number, origin, angles))
+	if (m_pGhostedSource->GetEngineObject()->GetAttachment(number, origin, angles))
 	{
 		origin = m_matGhostTransform * origin;
 		angles = TransformAnglesToWorldSpace(angles, m_matGhostTransform.As3x4());
@@ -10551,7 +10746,7 @@ bool C_EngineGhostInternal::GetAttachment(int number, matrix3x4_t& matrix)
 	if (m_pGhostedSource == NULL)
 		return false;
 
-	if (m_pGhostedSource->GetAttachment(number, matrix))
+	if (m_pGhostedSource->GetEngineObject()->GetAttachment(number, matrix))
 	{
 		ConcatTransforms(m_matGhostTransform.As3x4(), matrix, matrix);
 		return true;
@@ -10585,6 +10780,14 @@ bool C_EngineGhostInternal::GetAttachmentVelocity(int number, Vector& originVel,
 		return true;
 	}
 	return false;
+}
+
+ModelInstanceHandle_t C_EngineGhostInternal::GetModelInstance()
+{
+	if (GetGhostedSource())
+		return GetGhostedSource()->GetEngineObject()->GetModelInstance();
+
+	return BaseClass::GetModelInstance();
 }
 
 bool PVSNotifierMap_LessFunc( IClientUnknown* const &a, IClientUnknown* const &b )

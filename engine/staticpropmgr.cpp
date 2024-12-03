@@ -203,7 +203,8 @@ public:
 	virtual bool			UsesPowerOfTwoFrameBufferTexture();
 	virtual bool			UsesFullFrameBufferTexture();
 	virtual ClientShadowHandle_t	GetShadowHandle() const { return CLIENTSHADOW_INVALID_HANDLE; }
-	virtual ClientRenderHandle_t&	RenderHandle();
+	virtual const ClientRenderHandle_t&	GetRenderHandle() const;
+	virtual void					SetRenderHandle(ClientRenderHandle_t hRenderHandle);
 	virtual void	RecordToolMessage() {}
 
 	// These normally call through to GetRenderAngles/GetRenderBounds, but some entities custom implement them.
@@ -256,9 +257,7 @@ public:
 	int FirstLeaf() const;
 	LightCacheHandle_t GetLightCacheHandle() const;
 	void SetModelInstance( ModelInstanceHandle_t handle );
-	void SetRenderHandle( ClientRenderHandle_t handle );
 	void CleanUpRenderHandle( );
-	ClientRenderHandle_t GetRenderHandle() const;
 	void SetAlpha( unsigned char alpha );
 
 	// Create VPhysics representation
@@ -728,16 +727,6 @@ inline void CStaticProp::SetModelInstance( ModelInstanceHandle_t handle )
 	m_ModelInstance = handle;
 }
 
-inline void CStaticProp::SetRenderHandle( ClientRenderHandle_t handle )
-{
-	m_RenderHandle = handle;
-}
-
-inline ClientRenderHandle_t CStaticProp::GetRenderHandle() const
-{
-	return m_RenderHandle;
-}
-
 void CStaticProp::CleanUpRenderHandle( )
 {
 	if ( m_RenderHandle != INVALID_CLIENT_RENDER_HANDLE )
@@ -861,9 +850,14 @@ bool CStaticProp::UsesFullFrameBufferTexture( void )
 	return false;
 }
 
-ClientRenderHandle_t& CStaticProp::RenderHandle()
+const ClientRenderHandle_t&	CStaticProp::GetRenderHandle() const
 {
 	return m_RenderHandle;
+}
+
+void CStaticProp::SetRenderHandle(ClientRenderHandle_t hRenderHandle)
+{
+	m_RenderHandle = hRenderHandle;
 }
 
 IPVSNotify* CStaticProp::GetPVSNotifyInterface()
@@ -1525,7 +1519,7 @@ void CStaticPropMgr::LevelInitClient()
 		if ( !prop->ShouldDraw() )
 			continue;
 
-		ClientRenderHandle_t handle = m_StaticProps[i]->RenderHandle();
+		ClientRenderHandle_t handle = m_StaticProps[i]->GetRenderHandle();
 		if ( prop->LeafCount() > 0 )
 		{
 			// Add the prop to all the leaves it lies in

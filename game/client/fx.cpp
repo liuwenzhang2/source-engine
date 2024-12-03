@@ -132,7 +132,7 @@ bool FX_GetAttachmentTransform(C_BaseEntity* hEntity, int attachmentIndex, Vecto
 	}
 
 	// Get the actual entity
-	IClientRenderable *pRenderable = hEntity;//ClientEntityList().GetClientRenderableFromHandle( 
+	IClientRenderable *pRenderable = hEntity->GetEngineObject();//ClientEntityList().GetClientRenderableFromHandle( 
 	if ( pRenderable )
 	{
 		Vector attachOrigin;
@@ -644,7 +644,7 @@ public:
 		// PMaterialHandle hMaterial = GetPMaterial( "particle/particle_smokegrenade" );
 
 		Vector vecOrigin = m_vSortOrigin;
-		IClientRenderable *pRenderable = m_hEntity;//ClientEntityList().GetClientRenderableFromHandle(
+		IClientRenderable* pRenderable = m_hEntity->GetEngineObject();//ClientEntityList().GetClientRenderableFromHandle(
 		if ( pRenderable && m_nAttachmentIndex )
 		{
 			QAngle tmp;
@@ -1261,7 +1261,7 @@ void FX_BuildTeslaHitbox( const CEffectData &data )
 	if (!pAnimating)
 		return;
 
-	IStudioHdr *pStudioHdr = modelinfo->GetStudiomodel( pAnimating->GetModel() );
+	IStudioHdr *pStudioHdr = modelinfo->GetStudiomodel( pAnimating->GetEngineObject()->GetModel() );
 	if (!pStudioHdr)
 		return;
 

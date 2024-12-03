@@ -19,10 +19,10 @@ C_PortalGhostRenderable::C_PortalGhostRenderable( )
 
 C_PortalGhostRenderable::~C_PortalGhostRenderable( void )
 {
-	g_pClientLeafSystem->RemoveRenderable( RenderHandle() );
+	g_pClientLeafSystem->RemoveRenderable(GetEngineObject()->GetRenderHandle() );
 	//cl_entitylist->RemoveEntity( GetIClientUnknown()->GetRefEHandle() );
 
-	DestroyModelInstance();
+	GetEngineObject()->DestroyModelInstance();
 }
 
 void C_PortalGhostRenderable::Init(C_Prop_Portal* pOwningPortal, C_BaseEntity* pGhostSource, RenderGroup_t sourceRenderGroup, const VMatrix& matGhostTransform, float* pSharedRenderClipPlane, bool bLocalPlayer) {
@@ -33,7 +33,7 @@ void C_PortalGhostRenderable::Init(C_Prop_Portal* pOwningPortal, C_BaseEntity* p
 	m_pOwningPortal = pOwningPortal;
 
 	//cl_entitylist->AddNonNetworkableEntity(this);//GetIClientUnknown()
-	g_pClientLeafSystem->AddRenderable(this, sourceRenderGroup);
+	g_pClientLeafSystem->AddRenderable(this->GetEngineObject(), sourceRenderGroup);
 }
 
 void C_PortalGhostRenderable::UpdateOnRemove(void)
@@ -47,7 +47,7 @@ void C_PortalGhostRenderable::PerFrameUpdate( void )
 
 	RemoveFromInterpolationList();
 
-	g_pClientLeafSystem->RenderableChanged( RenderHandle() );
+	g_pClientLeafSystem->RenderableChanged(GetEngineObject()->GetRenderHandle() );
 }
 
 Vector const& C_PortalGhostRenderable::GetRenderOrigin( void )
@@ -103,11 +103,6 @@ bool C_PortalGhostRenderable::GetShadowCastDirection( Vector *pDirection, Shadow
 	return false;
 }*/
 
-const matrix3x4_t & C_PortalGhostRenderable::RenderableToWorldTransform()
-{
-	return GetEngineGhost()->RenderableToWorldTransform();
-}
-
 //bool C_PortalGhostRenderable::GetAttachment( int number, Vector &origin )
 //{
 //	if( m_pGhostedSource == NULL )
@@ -157,7 +152,7 @@ int C_PortalGhostRenderable::DrawModel( int flags )
 		}
 
 		render->DrawBrushModelEx(GetEngineGhost()->GetGhostedSource(),
-								(model_t *)GetEngineGhost()->GetGhostedSource()->GetModel(),
+								(model_t *)GetEngineGhost()->GetGhostedSource()->GetEngineObject()->GetModel(),
 								GetRenderOrigin(), 
 								GetRenderAngles(), 
 								mode );
@@ -167,16 +162,6 @@ int C_PortalGhostRenderable::DrawModel( int flags )
 
 	return 0;
 }
-
-ModelInstanceHandle_t C_PortalGhostRenderable::GetModelInstance()
-{
-	if (GetEngineGhost()->GetGhostedSource())
-		return GetEngineGhost()->GetGhostedSource()->GetModelInstance();
-
-	return BaseClass::GetModelInstance();
-}
-
-
 
 
 bool C_PortalGhostRenderable::IsTransparent( void )

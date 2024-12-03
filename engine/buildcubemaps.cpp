@@ -365,7 +365,7 @@ CON_COMMAND( envmap, "" )
 		return;
 
 	char	base[ 256 ];
-	IClientEntity *world = entitylist->GetClientEntity( 0 );
+	IEngineObjectClient *world = entitylist->GetEngineObject( 0 );
 
 	if( world && world->GetModel() )
 	{
@@ -985,7 +985,7 @@ void R_BuildCubemapSamples( int numIterations )
 		}
 		UpdateMaterialSystemConfig();
 
-		IClientEntity *world = entitylist->GetClientEntity( 0 );
+		IEngineObjectClient *world = entitylist->GetEngineObject( 0 );
 
 		if( !world || !world->GetModel() )
 		{

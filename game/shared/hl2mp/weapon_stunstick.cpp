@@ -514,7 +514,7 @@ bool UTIL_GetWeaponAttachment( C_BaseCombatWeapon *pWeapon, int attachmentID, Ve
 	// This is already correct in third-person
 	if ( pWeapon && pWeapon->ShouldDrawUsingViewModel() == false )
 	{
-		return pWeapon->GetAttachment( attachmentID, absOrigin, absAngles );
+		return pWeapon->GetEngineObject()->GetAttachment( attachmentID, absOrigin, absAngles );
 	}
 
 	// Otherwise we need to translate the attachment to the viewmodel's version and reformat it
@@ -522,7 +522,7 @@ bool UTIL_GetWeaponAttachment( C_BaseCombatWeapon *pWeapon, int attachmentID, Ve
 	
 	if ( pOwner != NULL )
 	{
-		int ret = pOwner->GetViewModel()->GetAttachment( attachmentID, absOrigin, absAngles );
+		int ret = pOwner->GetViewModel()->GetEngineObject()->GetAttachment( attachmentID, absOrigin, absAngles );
 		FormatViewModelAttachment( absOrigin, true );
 
 		return ret;
@@ -559,12 +559,12 @@ void C_WeaponStunStick::SetupAttachmentPoints( void )
 		// Lookup and store all connections
 		for ( int i = 0; i < NUM_BEAM_ATTACHMENTS; i++ )
 		{
-			m_BeamAttachments[i].IDs[0] = LookupAttachment( szBeamAttachNamesTop[i] );
-			m_BeamAttachments[i].IDs[1] = LookupAttachment( szBeamAttachNamesBottom[i] );
+			m_BeamAttachments[i].IDs[0] = GetEngineObject()->LookupAttachment( szBeamAttachNamesTop[i] );
+			m_BeamAttachments[i].IDs[1] = GetEngineObject()->LookupAttachment( szBeamAttachNamesBottom[i] );
 		}
 
 		// Setup the center beam point
-		m_BeamCenterAttachment = LookupAttachment( BEAM_ATTACH_CORE_NAME );
+		m_BeamCenterAttachment = GetEngineObject()->LookupAttachment( BEAM_ATTACH_CORE_NAME );
 	}
 	else
 	{
@@ -754,7 +754,7 @@ void C_WeaponStunStick::DrawThirdPersonEffects( void )
 			Vector	vecOrigin;
 			QAngle	vecAngles;
 
-			GetAttachment( 1, vecOrigin, vecAngles );
+			GetEngineObject()->GetAttachment( 1, vecOrigin, vecAngles );
 
 			Vector	vForward;
 			AngleVectors( vecAngles, &vForward );

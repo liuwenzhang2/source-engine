@@ -910,20 +910,10 @@ void CBaseEntity::OnAnglesChanged() {
 		// render-to-texture shadow, shadow projection, and client leaf dirty
 		GetEngineObject()->MarkSurroundingBoundsDirty();
 	}
-	else
-	{
-#ifdef CLIENT_DLL
-		MarkRenderHandleDirty();
-		g_pClientShadowMgr->AddToDirtyShadowList(this);
-		g_pClientShadowMgr->MarkRenderToTextureShadowDirty(GetShadowHandle());
-#endif
-	}
 }
 
 void CBaseEntity::OnAnimationChanged() {
-#ifdef CLIENT_DLL
-	g_pClientShadowMgr->MarkRenderToTextureShadowDirty(GetShadowHandle());
-#endif
+
 }
 
 

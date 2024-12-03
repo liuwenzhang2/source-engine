@@ -259,7 +259,7 @@ void C_ClientRagdoll::OnRestore( void )
 	GetEngineObject()->VPhysicsSetObject( NULL );
 	GetEngineObject()->VPhysicsSetObject( pRagdollT->list[0].pObject );
 
-	SetupBones( NULL, -1, BONE_USED_BY_ANYTHING, gpGlobals->curtime );
+	GetEngineObject()->SetupBones( NULL, -1, BONE_USED_BY_ANYTHING, gpGlobals->curtime );
 
 	pRagdollT->list[0].parentIndex = -1;
 	pRagdollT->list[0].originParentSpace.Init();
@@ -271,11 +271,11 @@ void C_ClientRagdoll::OnRestore( void )
 
 	// UNDONE: The shadow & leaf system cleanup should probably be in C_BaseEntity::OnRestore()
 	// this must be recomputed because the model was NULL when this was set up
-	RemoveFromLeafSystem();
-	AddToLeafSystem( RENDER_GROUP_OPAQUE_ENTITY );
+	GetEngineObject()->RemoveFromLeafSystem();
+	GetEngineObject()->AddToLeafSystem( RENDER_GROUP_OPAQUE_ENTITY );
 
-	DestroyShadow();
- 	CreateShadow();
+	GetEngineObject()->DestroyShadow();
+	GetEngineObject()->CreateShadow();
 
 	SetNextClientThink( CLIENT_THINK_ALWAYS );
 	
@@ -432,11 +432,11 @@ void C_ClientRagdoll::OnPVSStatusChanged( bool bInPVS )
 {
 	if ( bInPVS )
 	{
-		CreateShadow();
+		GetEngineObject()->CreateShadow();
 	}
 	else
 	{
-		DestroyShadow();
+		GetEngineObject()->DestroyShadow();
 	}
 }
 
@@ -513,12 +513,12 @@ void C_ClientRagdoll::SetupWeights( const matrix3x4_t *pBoneToWorld, int nFlexWe
 	if ( m_iEyeAttachment > 0 )
 	{
 		matrix3x4_t attToWorld;
-		if ( GetAttachment( m_iEyeAttachment, attToWorld ) )
+		if (GetEngineObject()->GetAttachment( m_iEyeAttachment, attToWorld ) )
 		{
 			Vector local, tmp;
 			local.Init( 1000.0f, 0.0f, 0.0f );
 			VectorTransform( local, attToWorld, tmp );
-			modelrender->SetViewTarget(GetEngineObject()->GetModelPtr(), GetBody(), tmp );
+			modelrender->SetViewTarget(GetEngineObject()->GetModelPtr(), GetEngineObject()->GetBody(), tmp );
 		}
 	}
 }
@@ -539,7 +539,7 @@ void C_ClientRagdoll::Release( void )
 	//ClientEntityList().RemoveEntity( this );
 
 	partition->Remove( PARTITION_CLIENT_SOLID_EDICTS | PARTITION_CLIENT_RESPONSIVE_EDICTS | PARTITION_CLIENT_NON_STATIC_EDICTS, GetEngineObject()->GetPartitionHandle() );
-	RemoveFromLeafSystem();
+	GetEngineObject()->RemoveFromLeafSystem();
 
 	BaseClass::Release();
 }
@@ -606,7 +606,7 @@ C_BaseAnimating::~C_BaseAnimating()
 
 bool C_BaseAnimating::UsesPowerOfTwoFrameBufferTexture( void )
 {
-	return modelinfo->IsUsingFBTexture( GetModel(), GetSkin(), GetBody(), GetClientRenderable() );
+	return modelinfo->IsUsingFBTexture(GetEngineObject()->GetModel(), GetEngineObject()->GetSkin(), GetEngineObject()->GetBody(), GetClientRenderable() );
 }
 
 
@@ -689,7 +689,7 @@ IStudioHdr *C_BaseAnimating::OnNewModel()
 
 	//m_AutoRefModelIndex.Clear();
 
-	if ( !GetModel() || modelinfo->GetModelType( GetModel() ) != mod_studio )
+	if ( !GetEngineObject()->GetModel() || modelinfo->GetModelType(GetEngineObject()->GetModel() ) != mod_studio )
 		return NULL;
 
 	// Reference (and thus start loading) dynamic model
@@ -728,7 +728,7 @@ IStudioHdr *C_BaseAnimating::OnNewModel()
 	InitModelEffects();
 
 	// lookup generic eye attachment, if exists
-	m_iEyeAttachment = LookupAttachment( "eyes" );
+	m_iEyeAttachment = GetEngineObject()->LookupAttachment( "eyes" );
 
 	// If we didn't have a model before, then we might need to go in the interpolation list now.
 	if ( ShouldInterpolate() )
@@ -807,7 +807,7 @@ void C_BaseAnimating::DelayedInitModelEffects( void )
 
 	// Parse the keyvalues and see if they want to make ropes on this model.
 	KeyValues * modelKeyValues = new KeyValues("");
-	if ( modelKeyValues->LoadFromBuffer( modelinfo->GetModelName( GetModel() ), modelinfo->GetModelKeyValueText( GetModel() ) ) )
+	if ( modelKeyValues->LoadFromBuffer( modelinfo->GetModelName(GetEngineObject()->GetModel() ), modelinfo->GetModelKeyValueText(GetEngineObject()->GetModel() ) ) )
 	{
 		// Do we have a cables section?
 		KeyValues *pkvAllCables = modelKeyValues->FindKey("Cables");
@@ -847,7 +847,7 @@ void C_BaseAnimating::DelayedInitModelEffects( void )
 					// See if we can find any attachment points matching the name
 					if ( pszAttachment[0] != '0' && iAttachment == 0 )
 					{
-						iAttachment = LookupAttachment( pszAttachment );
+						iAttachment = GetEngineObject()->LookupAttachment( pszAttachment );
 						if ( iAttachment <= 0 )
 						{
 							Warning("Failed to find attachment point specified for particle effect in model '%s' keyvalues section. Trying to spawn effect '%s' on attachment named '%s'\n", GetEngineObject()->GetModelName(), pszParticleEffect, pszAttachment );
@@ -1206,7 +1206,7 @@ void C_BaseAnimating::StandardBlendingRules( IStudioHdr *hdr, Vector pos[], Quat
 bool C_BaseAnimating::GetAttachmentLocal( int iAttachment, matrix3x4_t &attachmentToLocal )
 {
 	matrix3x4_t attachmentToWorld;
-	if (!GetAttachment(iAttachment, attachmentToWorld))
+	if (!GetEngineObject()->GetAttachment(iAttachment, attachmentToWorld))
 		return false;
 
 	matrix3x4_t worldToEntity;
@@ -1260,7 +1260,7 @@ bool C_BaseAnimating::GetSoundSpatialization( SpatializationInfo_t& info )
 
 		Vector mins, maxs, center;
 
-		modelinfo->GetModelBounds( GetModel(), mins, maxs );
+		modelinfo->GetModelBounds(GetEngineObject()->GetModel(), mins, maxs );
 		VectorAdd( mins, maxs, center );
 		VectorScale( center, 0.5f, center );
 
@@ -1313,14 +1313,6 @@ void drawLine(const Vector& origin, const Vector& dest, int r, int g, int b, boo
 	debugoverlay->AddLineOverlay( origin, dest, r, g, b, noDepthTest, duration );
 }
 */
-
-//-----------------------------------------------------------------------------
-// Purpose: Setup the bones for drawing
-//-----------------------------------------------------------------------------
-bool C_BaseAnimating::SetupBones(matrix3x4_t* pBoneToWorldOut, int nMaxBones, int boneMask, float currentTime)
-{
-	return GetEngineObject()->SetupBones(pBoneToWorldOut, nMaxBones, boneMask, currentTime);
-}
 
 //-----------------------------------------------------------------------------
 // Purpose: update latched IK contacts if they're in a moving reference frame.
@@ -1550,13 +1542,13 @@ void C_BaseAnimating::CalculateIKLocks( float currentTime )
 					if (!pAnim)
 						continue;
 
-					int iAttachment = pAnim->LookupAttachment( pTarget->offset.pAttachmentName );
+					int iAttachment = pAnim->GetEngineObject()->LookupAttachment( pTarget->offset.pAttachmentName );
 					if (iAttachment <= 0)
 						continue;
 
 					Vector origin;
 					QAngle angles;
-					pAnim->GetAttachment( iAttachment, origin, angles );
+					pAnim->GetEngineObject()->GetAttachment( iAttachment, origin, angles );
 
 					// debugoverlay->AddBoxOverlay( origin, Vector( -1, -1, -1 ), Vector( 1, 1, 1 ), QAngle( 0, 0, 0 ), 255, 0, 0, 0, 0 );
 
@@ -1677,7 +1669,7 @@ int C_BaseAnimating::DrawModel( int flags )
 		}
 
 		// Necessary for lighting blending
-		CreateModelInstance();
+		GetEngineObject()->CreateModelInstance();
 
 		if ( !GetEngineObject()->IsFollowingEntity() )
 		{
@@ -1716,7 +1708,7 @@ bool C_BaseAnimating::HitboxToWorldTransforms(const matrix3x4_t *pHitboxToWorld[
 {
 	MDLCACHE_CRITICAL_SECTION();
 
-	if ( !GetModel() )
+	if ( !GetEngineObject()->GetModel() )
 		return false;
 
 	IStudioHdr *pStudioHdr = GetEngineObject()->GetModelPtr();
@@ -1782,12 +1774,12 @@ int C_BaseAnimating::InternalDrawModel( int flags )
 {
 	VPROF( "C_BaseAnimating::InternalDrawModel" );
 
-	if ( !GetModel() )
+	if ( !GetEngineObject()->GetModel() )
 		return 0;
 
 	// This should never happen, but if the server class hierarchy has bmodel entities derived from CBaseAnimating or does a
 	//  SetModel with the wrong type of model, this could occur.
-	if ( modelinfo->GetModelType( GetModel() ) != mod_studio )
+	if ( modelinfo->GetModelType(GetEngineObject()->GetModel() ) != mod_studio )
 	{
 		return BaseClass::DrawModel( flags );
 	}
@@ -1809,14 +1801,14 @@ int C_BaseAnimating::InternalDrawModel( int flags )
 	pInfo = &info;
 
 	pInfo->flags = flags;
-	pInfo->pRenderable = this;
-	pInfo->instance = GetModelInstance();
+	pInfo->pRenderable = this->GetEngineObject();
+	pInfo->instance = GetEngineObject()->GetModelInstance();
 	pInfo->entity_index = entindex();
-	pInfo->pModel = GetModel();
+	pInfo->pModel = GetEngineObject()->GetModel();
 	pInfo->origin = GetRenderOrigin();
 	pInfo->angles = GetRenderAngles();
-	pInfo->skin = GetSkin();
-	pInfo->body = GetBody();
+	pInfo->skin = GetEngineObject()->GetSkin();
+	pInfo->body = GetEngineObject()->GetBody();
 	pInfo->hitboxset = GetEngineObject()->GetHitboxSet();
 
 	if ( !OnInternalDrawModel( pInfo ) )
@@ -1870,7 +1862,7 @@ void C_BaseAnimating::ProcessMuzzleFlashEvent()
 		{
 			Vector vAttachment;
 			QAngle dummyAngles;
-			GetAttachment( 1, vAttachment, dummyAngles );
+			GetEngineObject()->GetAttachment( 1, vAttachment, dummyAngles );
 
 			// Make an elight
 			dlight_t *el = effects->CL_AllocElight( LIGHT_INDEX_MUZZLEFLASH + entindex());
@@ -2138,7 +2130,7 @@ bool C_BaseAnimating::DispatchMuzzleEffect( const char *options, bool isFirstPer
 	// Find the attachment name
 	if ( token ) 
 	{
-		attachmentIndex = LookupAttachment( token );
+		attachmentIndex = GetEngineObject()->LookupAttachment( token );
 
 		// Found an invalid attachment
 		if ( attachmentIndex <= 0 )
@@ -2176,11 +2168,11 @@ void MaterialFootstepSound( C_BaseAnimating *pEnt, bool bLeftFoot, float flVolum
 	// are using this code.
 	if( bLeftFoot )
 	{
-		attachment = pEnt->LookupAttachment( "LeftFoot" );
+		attachment = pEnt->GetEngineObject()->LookupAttachment( "LeftFoot" );
 	}
 	else
 	{
-		attachment = pEnt->LookupAttachment( "RightFoot" );
+		attachment = pEnt->GetEngineObject()->LookupAttachment( "RightFoot" );
 	}
 
 	if( attachment == -1 )
@@ -2189,7 +2181,7 @@ void MaterialFootstepSound( C_BaseAnimating *pEnt, bool bLeftFoot, float flVolum
 		return;
 	}
 
-	pEnt->GetAttachment( attachment, traceStart, angles );
+	pEnt->GetEngineObject()->GetAttachment( attachment, traceStart, angles );
 
 	UTIL_TraceLine( traceStart, traceStart - Vector( 0, 0, 48.0f), MASK_SHOT_HULL, pEnt, COLLISION_GROUP_NONE, &tr );
 	if( tr.fraction < 1.0 && tr.m_pEnt )
@@ -2272,7 +2264,7 @@ void C_BaseAnimating::FireEvent( const Vector& origin, const QAngle& angles, int
 				// See if we can find any attachment points matching the name
 				if ( token[0] != '0' && iAttachment == 0 )
 				{
-					iAttachment = LookupAttachment( token );
+					iAttachment = GetEngineObject()->LookupAttachment( token );
 					if ( iAttachment <= 0 )
 					{
 						Warning( "Failed to find attachment point specified for particle effect anim event. Trying to spawn effect '%s' on attachment named '%s'\n", szParticleEffect, token );
@@ -2292,7 +2284,7 @@ void C_BaseAnimating::FireEvent( const Vector& origin, const QAngle& angles, int
 
 			if (GetEngineObject()->GetAttachmentCount() > 0)
 			{
-				GetAttachment( 1, attachOrigin, attachAngles );
+				GetEngineObject()->GetAttachment( 1, attachOrigin, attachAngles );
 				g_pSoundEmitterSystem->EmitSound( filter, GetSoundSourceIndex(), options, &attachOrigin );
 			}
 			else
@@ -2408,7 +2400,7 @@ void C_BaseAnimating::FireEvent( const Vector& origin, const QAngle& angles, int
 				Vector attachOrigin;
 				QAngle attachAngles; 
 				
-				if( GetAttachment( 2, attachOrigin, attachAngles ) )
+				if(GetEngineObject()->GetAttachment( 2, attachOrigin, attachAngles ) )
 				{
 					tempents->EjectBrass( attachOrigin, attachAngles, GetEngineObject()->GetAbsAngles(), atoi( options ) );
 				}
@@ -2556,7 +2548,7 @@ void C_BaseAnimating::FireObsoleteEvent( const Vector& origin, const QAngle& ang
 
 			if ( iAttachment != -1 && GetEngineObject()->GetAttachmentCount() >= iAttachment )
 			{
-				GetAttachment( iAttachment, attachOrigin, attachAngles );
+				GetEngineObject()->GetAttachment( iAttachment, attachOrigin, attachAngles );
 
 				// Fill out the generic data
 				CEffectData data;
@@ -2632,7 +2624,7 @@ void C_BaseAnimating::FireObsoleteEvent( const Vector& origin, const QAngle& ang
 
 			if ( iAttachment != -1 && GetEngineObject()->GetAttachmentCount() > iAttachment )
 			{
-				GetAttachment( iAttachment+1, attachOrigin, attachAngles );
+				GetEngineObject()->GetAttachment( iAttachment+1, attachOrigin, attachAngles );
 
 				// Fill out the generic data
 				CEffectData data;
@@ -2703,7 +2695,7 @@ void C_BaseAnimating::FireObsoleteEvent( const Vector& origin, const QAngle& ang
 
 			if ( iAttachment != -1 && GetEngineObject()->GetAttachmentCount() > iAttachment )
 			{
-				GetAttachment( iAttachment+1, attachOrigin, attachAngles );
+				GetEngineObject()->GetAttachment( iAttachment+1, attachOrigin, attachAngles );
 				int entId = render->GetViewEntity();
 				C_BaseEntity* hEntity = ClientEntityList().GetBaseEntity( entId );
 				tempents->MuzzleFlash( attachOrigin, attachAngles, atoi( options ), hEntity, bFirstPerson );
@@ -2715,7 +2707,7 @@ void C_BaseAnimating::FireObsoleteEvent( const Vector& origin, const QAngle& ang
 	case CL_EVENT_SPARK0:
 		{
 			Vector vecForward;
-			GetAttachment( 1, attachOrigin, attachAngles );
+			GetEngineObject()->GetAttachment( 1, attachOrigin, attachAngles );
 			AngleVectors( attachAngles, &vecForward );
 			g_pEffects->Sparks( attachOrigin, atoi( options ), 1, &vecForward );
 		}
@@ -2728,7 +2720,7 @@ void C_BaseAnimating::FireObsoleteEvent( const Vector& origin, const QAngle& ang
 
 			if (GetEngineObject()->GetAttachmentCount() > 0)
 			{
-				GetAttachment( 1, attachOrigin, attachAngles );
+				GetEngineObject()->GetAttachment( 1, attachOrigin, attachAngles );
 				g_pSoundEmitterSystem->EmitSound( filter, GetSoundSourceIndex(), options, &attachOrigin );
 			}
 			else
@@ -2855,7 +2847,7 @@ void C_BaseAnimating::GetRenderBounds( Vector& theMins, Vector& theMaxs )
 	{
 		GetEngineObject()->GetRagdollBounds( theMins, theMaxs );
 	}
-	else if ( GetModel() )
+	else if (GetEngineObject()->GetModel() )
 	{
 		IStudioHdr *pStudioHdr = GetEngineObject()->GetModelPtr();
 		if ( !pStudioHdr|| !pStudioHdr->SequencesAvailable() || GetEngineObject()->GetSequence() == -1 )
@@ -3001,7 +2993,7 @@ void C_BaseAnimating::ForceSetupBonesAtTime( matrix3x4_t *pBonesOut, float flTim
 	Interpolate( flTime );
 
 	// Setup bone state at the given time
-	SetupBones( pBonesOut, MAXSTUDIOBONES, BONE_USED_BY_ANYTHING, flTime );
+	GetEngineObject()->SetupBones( pBonesOut, MAXSTUDIOBONES, BONE_USED_BY_ANYTHING, flTime );
 }
 
 void C_BaseAnimating::GetRagdollInitBoneArrays( matrix3x4_t *pDeltaBones0, matrix3x4_t *pDeltaBones1, matrix3x4_t *pCurrentBones, float boneDt )
@@ -3474,7 +3466,7 @@ void C_BaseAnimating::SetBodygroup( int iGroup, int iValue )
 	// SetBodygroup is not supported on pending dynamic models. Wait for it to load!
 	// XXX TODO we could buffer up the group and value if we really needed to. -henryg
 	Assert(GetEngineObject()->GetModelPtr() );
-	int nBody = GetBody();
+	int nBody = GetEngineObject()->GetBody();
 	GetEngineObject()->GetModelPtr()->SetBodygroup(nBody, iGroup, iValue);
 	GetEngineObject()->SetBody(nBody);//aaa need check
 }
@@ -3482,7 +3474,7 @@ void C_BaseAnimating::SetBodygroup( int iGroup, int iValue )
 int C_BaseAnimating::GetBodygroup( int iGroup )
 {
 	//Assert( IsDynamicModelLoading() || GetModelPtr() );
-	return GetEngineObject()->GetModelPtr()->GetBodygroup( GetBody(), iGroup);//IsDynamicModelLoading() ? 0 : 
+	return GetEngineObject()->GetModelPtr()->GetBodygroup(GetEngineObject()->GetBody(), iGroup);//IsDynamicModelLoading() ? 0 : 
 }
 
 const char *C_BaseAnimating::GetBodygroupName( int iGroup )
@@ -3764,7 +3756,7 @@ KeyValues *C_BaseAnimating::GetSequenceKeyValues( int iSequence )
 	if (szText)
 	{
 		KeyValues *seqKeyValues = new KeyValues("");
-		if ( seqKeyValues->LoadFromBuffer( modelinfo->GetModelName( GetModel() ), szText ) )
+		if ( seqKeyValues->LoadFromBuffer( modelinfo->GetModelName(GetEngineObject()->GetModel() ), szText ) )
 		{
 			return seqKeyValues;
 		}
@@ -4091,17 +4083,17 @@ void C_BaseAnimating::GetToolRecordingState( KeyValues *msg )
 	matrix3x4_t *pBones = (matrix3x4_t*)_alloca( ( hdr ? hdr->numbones() : 1 ) * sizeof(matrix3x4_t) );
 	if ( hdr )
 	{
-		SetupBones( pBones, hdr->numbones(), BONE_USED_BY_ANYTHING, gpGlobals->curtime );
+		GetEngineObject()->SetupBones( pBones, hdr->numbones(), BONE_USED_BY_ANYTHING, gpGlobals->curtime );
 	}
 	else
 	{
-		SetupBones( NULL, -1, BONE_USED_BY_ANYTHING, gpGlobals->curtime );
+		GetEngineObject()->SetupBones( NULL, -1, BONE_USED_BY_ANYTHING, gpGlobals->curtime );
 	}
 
 	BaseClass::GetToolRecordingState( msg );
 
 	static BaseAnimatingRecordingState_t state;
-	state.m_nSkin = GetSkin();
+	state.m_nSkin = GetEngineObject()->GetSkin();
 	state.m_nBody = GetEngineObject()->GetBody();
 	state.m_nSequence = GetEngineObject()->GetSequence();
 	state.m_pBoneList = NULL;

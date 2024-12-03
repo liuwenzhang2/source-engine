@@ -142,7 +142,7 @@
 
 IClientRenderable *CEffectData::GetRenderable() const
 {
-	return m_hEntity;//ClientEntityList().GetClientRenderableFromHandle( 
+	return m_hEntity->GetEngineObject();//ClientEntityList().GetClientRenderableFromHandle( 
 }
 
 C_BaseEntity *CEffectData::GetEntity() const

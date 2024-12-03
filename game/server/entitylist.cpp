@@ -468,7 +468,7 @@ BEGIN_DATADESC_NO_BASE(CEngineObjectInternal)
 	DEFINE_CUSTOM_FIELD(m_pIk, &s_IKSaveRestoreOp),
 	DEFINE_FIELD(m_iIKCounter, FIELD_INTEGER),
 	DEFINE_FIELD(m_fBoneCacheFlags, FIELD_SHORT),
-
+	DEFINE_FIELD(m_bAlternateSorting, FIELD_BOOLEAN),
 END_DATADESC()
 
 void SendProxy_Origin(const SendProp* pProp, const void* pStruct, const void* pData, DVariant* pOut, int iElement, int objectID)
@@ -721,6 +721,7 @@ BEGIN_SEND_TABLE_NOBASE(CEngineObjectInternal, DT_EngineObject)
 	SendPropArray(SendPropVector(SENDINFO_ARRAY(m_ragPos), -1, SPROP_COORD), m_ragPos),
 	SendPropInt(SENDINFO(m_nRenderFX), 8, SPROP_UNSIGNED),
 	SendPropInt(SENDINFO(m_nOverlaySequence), 11),
+	SendPropBool(SENDINFO(m_bAlternateSorting)),
 
 END_SEND_TABLE()
 
@@ -2334,6 +2335,21 @@ void CEngineObjectInternal::DestroyAllDataObjects(void)
 	}
 }
 
+void CEngineObjectInternal::OnPositionChanged()
+{
+	m_pOuter->OnPositionChanged();
+}
+
+void CEngineObjectInternal::OnAnglesChanged()
+{
+	m_pOuter->OnAnglesChanged();
+}
+
+void CEngineObjectInternal::OnAnimationChanged()
+{
+	m_pOuter->OnAnimationChanged();
+}
+
 //-----------------------------------------------------------------------------
 // Invalidates the abs state of all children
 //-----------------------------------------------------------------------------
@@ -2366,7 +2382,7 @@ void CEngineObjectInternal::InvalidatePhysicsRecursive(int nChangeFlags)
 //#ifndef CLIENT_DLL
 		MarkPVSInformationDirty();
 //#endif
-		m_pOuter->OnPositionChanged();
+		OnPositionChanged();
 	}
 
 	// NOTE: This has to be done after velocity + position are changed
@@ -2374,7 +2390,7 @@ void CEngineObjectInternal::InvalidatePhysicsRecursive(int nChangeFlags)
 	if (nChangeFlags & ANGLES_CHANGED)
 	{
 		nDirtyFlags |= EFL_DIRTY_ABSTRANSFORM;
-		m_pOuter->OnAnglesChanged();
+		OnAnglesChanged();
 
 		// This is going to be used for all children: children
 		// have position + velocity changed
@@ -2387,7 +2403,7 @@ void CEngineObjectInternal::InvalidatePhysicsRecursive(int nChangeFlags)
 	bool bOnlyDueToAttachment = false;
 	if (nChangeFlags & ANIMATION_CHANGED)
 	{
-		m_pOuter->OnAnimationChanged();
+		OnAnimationChanged();
 
 		// Only set this flag if the only thing that changed us was the animation.
 		// If position or something else changed us, then we must tell all children.

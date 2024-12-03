@@ -206,7 +206,7 @@ void C_PortalRagdoll::CreatePortalRagdoll()
 	if ( pPlayer && !pPlayer->IsDormant() )
 	{
 		// Move my current model instance to the ragdoll's so decals are preserved.
-		pPlayer->SnatchModelInstance( this );
+		pPlayer->GetEngineObject()->SnatchModelInstance( this->GetEngineObject());
 
 		//VarMapping_t *varMap = GetEngineObject()->GetVarMapping();
 
@@ -228,7 +228,7 @@ void C_PortalRagdoll::CreatePortalRagdoll()
 
 		GetEngineObject()->Interp_Reset();
 
-		GetEngineObject()->SetBody(pPlayer->GetBody());
+		GetEngineObject()->SetBody(pPlayer->GetEngineObject()->GetBody());
 		GetEngineObject()->SetModelIndex(GetEngineObject()->GetModelIndex() );
 		// Make us a ragdoll..
 		GetEngineObject()->SetRenderFX(kRenderFxRagdoll);
@@ -924,7 +924,7 @@ void C_Portal_Player::AddEntity( void )
 	{
 		if (GetEngineObject()->IsEffectActive( EF_DIMLIGHT ) )
 		{
-			int iAttachment = LookupAttachment( "anim_attachment_RH" );
+			int iAttachment = GetEngineObject()->LookupAttachment( "anim_attachment_RH" );
 
 			if ( iAttachment < 0 )
 				return;
@@ -932,7 +932,7 @@ void C_Portal_Player::AddEntity( void )
 			Vector vecOrigin;
 			QAngle eyeAngles = m_angEyeAngles;
 
-			GetAttachment( iAttachment, vecOrigin, eyeAngles );
+			GetEngineObject()->GetAttachment( iAttachment, vecOrigin, eyeAngles );
 
 			Vector vForward;
 			AngleVectors( eyeAngles, &vForward );

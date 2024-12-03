@@ -111,11 +111,11 @@ void C_NPC_Portal_FloorTurret::LaserOn( void )
 
 	Vector vecMuzzle;
 	QAngle angMuzzleDir;
-	GetAttachment( FLOOR_TURRET_PORTAL_LASER_ATTACHMENT, vecMuzzle, angMuzzleDir );
+	GetEngineObject()->GetAttachment( FLOOR_TURRET_PORTAL_LASER_ATTACHMENT, vecMuzzle, angMuzzleDir );
 
 	Vector vecEye;
 	QAngle angEyeDir;
-	GetAttachment( FLOOR_TURRET_PORTAL_EYE_ATTACHMENT, vecEye, angEyeDir );
+	GetEngineObject()->GetAttachment( FLOOR_TURRET_PORTAL_EYE_ATTACHMENT, vecEye, angEyeDir );
 
 	Vector vecMuzzleDir;
 	AngleVectors( angEyeDir, &vecMuzzleDir );

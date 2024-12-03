@@ -442,7 +442,7 @@ int	C_StriderFX::DrawModel( int )
 	if ( ent )
 	{
 		QAngle angles;
-		ent->GetAttachment( m_attachment, m_worldPosition, angles );
+		ent->GetEngineObject()->GetAttachment( m_attachment, m_worldPosition, angles );
 	}
 
 	// This forces time to drive from the main clock instead of being integrated per-draw below
@@ -660,7 +660,7 @@ void C_Strider::ReceiveMessage( int classID, bf_read &msg )
 			Vector	pos;
 			msg.ReadBitVec3Coord( pos );
 			m_cannonFX.SetRenderOrigin( pos );
-			m_cannonFX.EffectInit( entindex(), LookupAttachment( "BigGun" ) );
+			m_cannonFX.EffectInit( entindex(), GetEngineObject()->LookupAttachment( "BigGun" ) );
 			m_cannonFX.LimitTime( STRIDERFX_BIG_SHOT_TIME );
 		}
 		break;
@@ -742,7 +742,7 @@ void C_Strider::ClientThink()
 #endif
 
 	// True argument because the origin may have stayed the same, but the size is expected to always change
-	g_pClientShadowMgr->AddToDirtyShadowList( this, true );
+	g_pClientShadowMgr->AddToDirtyShadowList( this->GetEngineObject(), true );
 }
 
 

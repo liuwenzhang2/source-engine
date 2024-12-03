@@ -1895,14 +1895,14 @@ void CWeaponRPG::GetWeaponAttachment( int attachmentId, Vector &outVector, Vecto
 		
 		if ( pOwner != NULL )
 		{
-			pOwner->GetViewModel()->GetAttachment( attachmentId, outVector, angles );
+			pOwner->GetViewModel()->GetEngineObject()->GetAttachment( attachmentId, outVector, angles );
 			::FormatViewModelAttachment( outVector, true );
 		}
 	}
 	else
 	{
 		// We offset the IDs to make them correct for our world model
-		BaseClass::GetAttachment( attachmentId, outVector, angles );
+		GetEngineObject()->GetAttachment( attachmentId, outVector, angles );
 	}
 
 	// Supply the direction, if requested

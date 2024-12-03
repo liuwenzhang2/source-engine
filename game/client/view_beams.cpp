@@ -225,7 +225,7 @@ bool ComputeBeamEntPosition( C_BaseEntity *pEnt, int nAttachment, bool bInterpre
 	if ( !bInterpretAttachmentIndexAsHitboxIndex )
 	{
 		QAngle angles;
-		if ( pEnt->GetAttachment( nAttachment, pt, angles ) )
+		if ( pEnt->GetEngineObject()->GetAttachment( nAttachment, pt, angles ) )
 			return true;
 	}
 	else
@@ -233,7 +233,7 @@ bool ComputeBeamEntPosition( C_BaseEntity *pEnt, int nAttachment, bool bInterpre
 		C_BaseAnimating *pAnimating = pEnt->GetBaseAnimating();
 		if ( pAnimating )
 		{
-			IStudioHdr *pStudioHdr = modelinfo->GetStudiomodel( pAnimating->GetModel() );
+			IStudioHdr *pStudioHdr = modelinfo->GetStudiomodel( pAnimating->GetEngineObject()->GetModel() );
 			if (pStudioHdr)
 			{
 				mstudiohitboxset_t *set = pStudioHdr->pHitboxSet( pAnimating->GetHitboxSet() );
@@ -892,8 +892,8 @@ Beam_t *CViewRenderBeams::CreateBeamEnts( BeamInfo_t &beamInfo )
 {
 	// Don't start temporary beams out of the PVS
 	if ( beamInfo.m_flLife != 0 && 
-		 ( !beamInfo.m_pStartEnt || beamInfo.m_pStartEnt->GetModel() == NULL || 
-		   !beamInfo.m_pEndEnt || beamInfo.m_pEndEnt->GetModel() == NULL) )
+		 ( !beamInfo.m_pStartEnt || beamInfo.m_pStartEnt->GetEngineObject()->GetModel() == NULL ||
+		   !beamInfo.m_pEndEnt || beamInfo.m_pEndEnt->GetEngineObject()->GetModel() == NULL) )
 	{
 		return NULL;
 	}
@@ -1005,10 +1005,10 @@ Beam_t *CViewRenderBeams::CreateBeamEntPoint( BeamInfo_t &beamInfo )
 {
 	if ( beamInfo.m_flLife != 0 )
 	{
-		if ( beamInfo.m_pStartEnt && beamInfo.m_pStartEnt->GetModel() == NULL )
+		if ( beamInfo.m_pStartEnt && beamInfo.m_pStartEnt->GetEngineObject()->GetModel() == NULL )
 			return NULL;
 
-		if ( beamInfo.m_pEndEnt && beamInfo.m_pEndEnt->GetModel() == NULL )
+		if ( beamInfo.m_pEndEnt && beamInfo.m_pEndEnt->GetEngineObject()->GetModel() == NULL )
 			return NULL;
 	}
 
@@ -1390,8 +1390,8 @@ Beam_t *CViewRenderBeams::CreateBeamRing( BeamInfo_t &beamInfo )
 {
 	// Don't start temporary beams out of the PVS
 	if ( beamInfo.m_flLife != 0 && 
-		 ( !beamInfo.m_pStartEnt || beamInfo.m_pStartEnt->GetModel() == NULL || 
-		   !beamInfo.m_pEndEnt || beamInfo.m_pEndEnt->GetModel() == NULL ) )
+		 ( !beamInfo.m_pStartEnt || beamInfo.m_pStartEnt->GetEngineObject()->GetModel() == NULL ||
+		   !beamInfo.m_pEndEnt || beamInfo.m_pEndEnt->GetEngineObject()->GetModel() == NULL ) )
 	{
 		return NULL;
 	}

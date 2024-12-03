@@ -664,7 +664,7 @@ void CSprite::GetRenderBounds( Vector &vecMins, Vector &vecMaxs )
 	// If our scale is normalized we need to convert that to actual world units
 	if ( m_bWorldSpaceScale == false )
 	{
-		CEngineSprite *psprite = (CEngineSprite *) modelinfo->GetModelExtraData( GetModel() );
+		CEngineSprite *psprite = (CEngineSprite *) modelinfo->GetModelExtraData(GetEngineObject()->GetModel() );
 		if ( psprite )
 		{
 			float flSize = MAX( psprite->GetWidth(), psprite->GetHeight() );
@@ -774,7 +774,7 @@ int CSprite::DrawModel( int flags )
 	}
 
 	//Must be a sprite
-	if ( modelinfo->GetModelType( GetModel() ) != mod_sprite )
+	if ( modelinfo->GetModelType(GetEngineObject()->GetModel() ) != mod_sprite )
 	{
 		Assert( 0 );
 		return 0;
@@ -783,7 +783,7 @@ int CSprite::DrawModel( int flags )
 	float renderscale = GetRenderScale();
 	if ( m_bWorldSpaceScale )
 	{
-		CEngineSprite *psprite = ( CEngineSprite * )modelinfo->GetModelExtraData( GetModel() );
+		CEngineSprite *psprite = ( CEngineSprite * )modelinfo->GetModelExtraData(GetEngineObject()->GetModel() );
 		float flMinSize = MIN( psprite->GetWidth(), psprite->GetHeight() );
 		renderscale /= flMinSize;
 	}
@@ -791,7 +791,7 @@ int CSprite::DrawModel( int flags )
 	//Draw it
 	int drawn = DrawSprite( 
 		this,
-		GetModel(), 
+		GetEngineObject()->GetModel(),
 		GetEngineObject()->GetAbsOrigin(),
 		GetEngineObject()->GetAbsAngles(),
 		m_flFrame,				// sprite frame to render
@@ -822,7 +822,7 @@ const Vector& CSprite::GetRenderOrigin()
 		if ( ent )
 		{
 			QAngle dummyAngles;
-			ent->GetAttachment( m_nAttachment, vOrigin, dummyAngles );
+			ent->GetEngineObject()->GetAttachment( m_nAttachment, vOrigin, dummyAngles );
 		}
 	}
 

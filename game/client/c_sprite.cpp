@@ -400,7 +400,7 @@ int C_SpriteRenderer::DrawSprite(
 					return 0;
 			}
 			QAngle temp;
-			ent->GetAttachment( attachmentindex, effect_origin, temp );
+			ent->GetEngineObject()->GetAttachment( attachmentindex, effect_origin, temp );
 		}
 	}
 
@@ -471,7 +471,7 @@ void CSprite::GetToolRecordingState( KeyValues *msg )
 			// override position if we're driven by an attachment
 			QAngle temp;
 			pState->m_vecRenderOrigin = GetEngineObject()->GetAbsOrigin();
-			ent->GetAttachment( m_nAttachment, pState->m_vecRenderOrigin, temp );
+			ent->GetEngineObject()->GetAttachment( m_nAttachment, pState->m_vecRenderOrigin, temp );
 
 			// override viewmodel if we're driven by an attachment
 			bool bViewModel = dynamic_cast< C_BaseViewModel* >( ent ) != NULL;
@@ -482,7 +482,7 @@ void CSprite::GetToolRecordingState( KeyValues *msg )
 	float renderscale = GetRenderScale();
 	if ( m_bWorldSpaceScale )
 	{
-		CEngineSprite *psprite = ( CEngineSprite * )modelinfo->GetModelExtraData( GetModel() );
+		CEngineSprite *psprite = ( CEngineSprite * )modelinfo->GetModelExtraData(GetEngineObject()->GetModel() );
 		float flMinSize = MIN( psprite->GetWidth(), psprite->GetHeight() );
 		renderscale /= flMinSize;
 	}

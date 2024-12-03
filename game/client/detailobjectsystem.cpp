@@ -167,7 +167,8 @@ public:
 	virtual bool				LODTest() { return true; }
 
 	virtual ClientShadowHandle_t	GetShadowHandle() const;
-	virtual ClientRenderHandle_t&	RenderHandle();
+	virtual const ClientRenderHandle_t&	GetRenderHandle() const;
+	virtual void					SetRenderHandle(ClientRenderHandle_t hRenderHandle);
 	virtual void				GetShadowRenderBounds( Vector &mins, Vector &maxs, ShadowType_t shadowType );
 	virtual bool IsShadowDirty( )			     { return false; }
 	virtual void MarkShadowDirty( bool bDirty )  {}
@@ -638,10 +639,15 @@ ClientShadowHandle_t CDetailModel::GetShadowHandle() const
 	return CLIENTSHADOW_INVALID_HANDLE;
 }
 
-ClientRenderHandle_t& CDetailModel::RenderHandle()
+const ClientRenderHandle_t&	CDetailModel::GetRenderHandle() const
+{
+	return *((ClientRenderHandle_t*)NULL);
+}
+
+void CDetailModel::SetRenderHandle(ClientRenderHandle_t hRenderHandle)
 {
 	AssertMsg( 0, "CDetailModel has no render handle" );
-	return *((ClientRenderHandle_t*)NULL);
+	//return *((ClientRenderHandle_t*)NULL);
 }	
 
 

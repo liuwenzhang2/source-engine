@@ -214,6 +214,7 @@ public:
 		m_pIk = NULL;
 		m_iIKCounter = 0;
 		m_fBoneCacheFlags = 0;
+		m_bAlternateSorting = false;
 	}
 
 	virtual ~CEngineObjectInternal()
@@ -448,6 +449,9 @@ public:
 	void DestroyDataObject(int type);
 	void DestroyAllDataObjects(void);
 
+	virtual void OnPositionChanged();
+	virtual void OnAnglesChanged();
+	virtual void OnAnimationChanged();
 	// Invalidates the abs state of all children
 	void InvalidatePhysicsRecursive(int nChangeFlags);
 
@@ -823,7 +827,7 @@ public:
 	{
 		return GetAttachment(LookupAttachment(szName), absOrigin, absAngles);
 	}
-
+	void SetAlternateSorting(bool bAlternateSorting) { m_bAlternateSorting = bAlternateSorting; }
 public:
 	// Networking related methods
 	void NetworkStateChanged();
@@ -985,6 +989,9 @@ private:
 	CBoneAccessor		m_BoneAccessor;
 	float				m_flLastBoneSetupTime;
 	unsigned short	m_fBoneCacheFlags;		// Used for bone cache state on model
+
+	CNetworkVar(bool, m_bAlternateSorting);
+
 };
 
 inline PVSInfo_t* CEngineObjectInternal::GetPVSInfo()
@@ -4492,6 +4499,8 @@ void CGlobalEntityList<T>::OnRemoveEntity(T* pEnt, CBaseHandle handle)
 	}
 
 	m_iNumEnts--;
+
+	BaseClass::OnRemoveEntity(pEnt, handle);
 }
 
 template<class T>

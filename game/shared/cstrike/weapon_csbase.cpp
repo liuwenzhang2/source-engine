@@ -1366,7 +1366,7 @@ void CWeaponCSBase::DefaultTouch(CBaseEntity *pOther)
 
 	int CWeaponCSBase::GetMuzzleAttachment( void )
 	{
-		return LookupAttachment( "muzzle_flash" );
+		return GetEngineObject()->LookupAttachment( "muzzle_flash" );
 	}
 
 #else

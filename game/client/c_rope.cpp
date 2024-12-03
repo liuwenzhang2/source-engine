@@ -123,8 +123,8 @@ C_RopeKeyframe* C_RopeKeyframe::CreateFromKeyValues( C_BaseAnimating *pEnt, KeyV
 	C_RopeKeyframe *pRope = C_RopeKeyframe::Create( 
 		pEnt,
 		pEnt,
-		pEnt->LookupAttachment( pValues->GetString( "StartAttachment" ) ),
-		pEnt->LookupAttachment( pValues->GetString( "EndAttachment" ) ),
+		pEnt->GetEngineObject()->LookupAttachment( pValues->GetString( "StartAttachment" ) ),
+		pEnt->GetEngineObject()->LookupAttachment( pValues->GetString( "EndAttachment" ) ),
 		pValues->GetFloat( "Width", 0.5 ),
 		pValues->GetString( "Material" ),
 		pValues->GetInt( "NumSegments" ),

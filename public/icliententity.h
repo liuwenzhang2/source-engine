@@ -18,6 +18,7 @@
 #include "client_class.h"
 #include "isaverestore.h"
 #include "vcollide_parse.h"
+#include "engine/IClientLeafSystem.h"
 
 struct Ray_t;
 class CGameTrace;
@@ -91,7 +92,7 @@ struct clientthinkfunc_t
 
 class IClientEntity;
 
-class IEngineObjectClient : public IEngineObject {
+class IEngineObjectClient : public IEngineObject, public IClientNetworkable, public IClientRenderable {
 public:
 
 	virtual datamap_t* GetPredDescMap(void) = 0;
@@ -566,7 +567,15 @@ public:
 	virtual bool GetAttachment(int number, matrix3x4_t& matrix) = 0;
 	virtual bool GetAttachmentVelocity(int number, Vector& originVel, Quaternion& angleVel) = 0;
 	virtual bool CalcAttachments() = 0;
-
+	virtual void SetModelInstance(ModelInstanceHandle_t hInstance) = 0;
+	virtual bool SnatchModelInstance(IEngineObjectClient* pToEntity) = 0;
+	// Only meant to be called from subclasses
+	virtual void DestroyModelInstance() = 0;
+	virtual void CreateShadow() = 0;
+	virtual void DestroyShadow() = 0;
+	virtual void AddToLeafSystem() = 0;
+	virtual void AddToLeafSystem(RenderGroup_t group) = 0;
+	virtual void RemoveFromLeafSystem() = 0;
 };
 
 class IEnginePortalClient {
@@ -687,7 +696,7 @@ public:
 //-----------------------------------------------------------------------------
 // Purpose: All client entities must implement this interface.
 //-----------------------------------------------------------------------------
-abstract_class IClientEntity : public IClientUnknown, public IClientRenderable, public IClientNetworkable, public IClientThinkable
+abstract_class IClientEntity : public IClientUnknown, public IClientNetworkable, public IClientThinkable
 {
 public:
 	// Delete yourself.
@@ -708,8 +717,7 @@ public:
 	}
 	virtual ClientClass* GetClientClass() = 0;
 	virtual void* GetDataTableBasePtr() { return this; }
-	// This just picks one of the routes to IClientUnknown.
-	virtual IClientUnknown* GetIClientUnknown() { return this; }
+	
 };
 
 //-----------------------------------------------------------------------------

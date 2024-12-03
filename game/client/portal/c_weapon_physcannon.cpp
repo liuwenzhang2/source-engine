@@ -57,7 +57,7 @@ bool C_WeaponPhysCannon::SetupEmitter( void )
 {
 	if ( !m_pLocalEmitter.IsValid() )
 	{
-		m_pLocalEmitter = CLocalSpaceEmitter::Create( "physpowerup", this, LookupAttachment( "core" ) );
+		m_pLocalEmitter = CLocalSpaceEmitter::Create( "physpowerup", this, GetEngineObject()->LookupAttachment( "core" ) );
 
 		if ( m_pLocalEmitter.IsValid() == false )
 			return false;
@@ -223,7 +223,7 @@ int C_WeaponPhysCannon::DrawModel( int flags )
 		if ( !pAnimating->HitboxToWorldTransforms( hitboxbones ) )
 			return 0;
 
-		IStudioHdr *pStudioHdr = modelinfo->GetStudiomodel( pAnimating->GetModel() );
+		IStudioHdr *pStudioHdr = modelinfo->GetStudiomodel( pAnimating->GetEngineObject()->GetModel() );
 		if (!pStudioHdr)
 			return false;
 
@@ -295,11 +295,11 @@ int C_WeaponPhysCannon::DrawModel( int flags )
 		}
 	}
 
-	int		attachment = LookupAttachment( "core" );
+	int		attachment = GetEngineObject()->LookupAttachment( "core" );
 	Vector	coreOrigin;
 	QAngle	coreAngles;
 
-	GetAttachment( attachment, coreOrigin, coreAngles );
+	GetEngineObject()->GetAttachment( attachment, coreOrigin, coreAngles );
 
 	SimpleParticle *sParticle;
 
