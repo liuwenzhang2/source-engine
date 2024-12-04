@@ -1026,7 +1026,7 @@ bool CServerGameDLL::GameInit( void )
 	engine->ResetGlobalState();
 	engine->ServerCommand( "exec game.cfg\n" );
 	engine->ServerExecute( );
-	CGlobalEntityList<CBaseEntity>::sm_bAccurateTriggerBboxChecks = true;
+	gEntList.SetAccurateTriggerBboxChecks(true);
 
 	IGameEvent *event = gameeventmanager->CreateEvent( "game_init" );
 	if ( event )

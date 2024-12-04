@@ -239,9 +239,6 @@ public:
 
 	virtual void					AfterInit();
 
-	// Called in the destructor to shutdown everything.
-	void							Term();
-
 	// memory handling, uses calloc so members are zero'd out on instantiation
     void							*operator new( size_t stAllocateBlock );
 	void							*operator new[]( size_t stAllocateBlock );
@@ -710,8 +707,6 @@ public:
 	static int						PrecacheModel( const char *name ); 
 	//static bool						PrecacheSound( const char *name );
 	//static void						PrefetchSound( const char *name );
-	void							Remove( ); // UTIL_Remove( this );
-
 public:
 
 	

@@ -20,6 +20,7 @@ class C_Prop_Portal;
 class C_PortalGhostRenderable : public C_BaseAnimating//IClientRenderable, public IClientUnknown
 {
 public:
+	DECLARE_CLASS(C_PortalGhostRenderable, C_BaseAnimating);
 	static int GetEngineObjectTypeStatic() { return ENGINEOBJECT_GHOST; }
 	
 	float *m_pSharedRenderClipPlane; //shared by all portal ghost renderables within the same portal

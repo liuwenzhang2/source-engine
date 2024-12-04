@@ -299,19 +299,7 @@ public:
 		delete m_pJiggleBones;
 	}
 
-	static bool s_bAbsQueriesValid;
-	static void	SetAbsQueriesValid(bool bValid);
-	static bool IsAbsQueriesValid(void);
-	static bool s_bAbsRecomputationEnabled;
-	// Enable/disable abs recomputations on a stack.
-	static void PushEnableAbsRecomputations(bool bEnable);
-	static void PopEnableAbsRecomputations();
-
-	// This requires the abs recomputation stack to be empty and just sets the global state. 
-	// It should only be used at the scope of the frame loop.
-	static void EnableAbsRecomputations(bool bEnable);
-
-	static bool IsAbsRecomputationsEnabled(void);
+	
 
 	void Init(C_BaseEntity* pOuter) {
 		m_pOuter = pOuter;
@@ -2582,20 +2570,20 @@ public:
 	void DestroyDataObject(int type, T* instance);
 	void PushAllowBoneAccess(bool bAllowForNormalModels, bool bAllowForViewModels, char const* tagPush);
 	void PopBoneAccess(char const* tagPop);
-	bool GetAllowBoneAccessForNormalModels() { return g_BoneAcessBase.bAllowBoneAccessForNormalModels; }
-	bool GetAllowBoneAccessForViewModels() { return g_BoneAcessBase.bAllowBoneAccessForViewModels; }
-	virtual void	AddToRecordList(CBaseHandle add);
-	virtual void	RemoveFromRecordList(CBaseHandle remove);
+	bool GetAllowBoneAccessForNormalModels() { return m_BoneAcessBase.bAllowBoneAccessForNormalModels; }
+	bool GetAllowBoneAccessForViewModels() { return m_BoneAcessBase.bAllowBoneAccessForViewModels; }
+	void AddToRecordList(CBaseHandle add);
+	void RemoveFromRecordList(CBaseHandle remove);
 
 	virtual int		CountRecord();
 	IClientRenderable* GetRecord(int index);
 	// For entities marked for recording, post bone messages to IToolSystems
 	void ToolRecordEntities();
-	bool GetInThreadedBoneSetup() { return g_bInThreadedBoneSetup; }
-	unsigned long GetModelBoneCounter() { return g_iModelBoneCounter; }
-	bool GetDoThreadedBoneSetup() { return g_bDoThreadedBoneSetup; }
-	unsigned long GetPreviousBoneCounter() { return g_iPreviousBoneCounter; }
-	CUtlVector<IEngineObjectClient*>& GetPreviousBoneSetups() { return g_PreviousBoneSetups; }
+	bool GetInThreadedBoneSetup() { return m_bInThreadedBoneSetup; }
+	unsigned long GetModelBoneCounter() { return m_iModelBoneCounter; }
+	bool GetDoThreadedBoneSetup() { return m_bDoThreadedBoneSetup; }
+	unsigned long GetPreviousBoneCounter() { return m_iPreviousBoneCounter; }
+	CUtlVector<IEngineObjectClient*>& GetPreviousBoneSetups() { return m_PreviousBoneSetups; }
 	void						SetupBonesOnBaseAnimating(IEngineObjectClient*& pBaseAnimating);
 	void						PreThreadedBoneSetup();
 	void						PostThreadedBoneSetup();
@@ -2604,12 +2592,21 @@ public:
 	void						ShutdownBoneSetupThreadPool();
 	// Invalidate bone caches so all SetupBones() calls force bone transforms to be regenerated.
 	void						InvalidateBoneCaches();
+
+	void SetAbsQueriesValid(bool bValid);
+	bool IsAbsQueriesValid(void);
+	// Enable/disable abs recomputations on a stack.
+	void PushEnableAbsRecomputations(bool bEnable);
+	void PopEnableAbsRecomputations();
+	// This requires the abs recomputation stack to be empty and just sets the global state. 
+	// It should only be used at the scope of the frame loop.
+	void EnableAbsRecomputations(bool bEnable);
+	bool IsAbsRecomputationsEnabled(void);
+	bool IsDisableTouchFuncs() { return m_bDisableTouchFuncs; }
 private:
 	void AddPVSNotifier(IClientUnknown* pUnknown);
 	void RemovePVSNotifier(IClientUnknown* pUnknown);
 	void AddRestoredEntity(T* pEntity);
-public:
-	static bool				sm_bDisableTouchFuncs;	// Disables PhysicsTouch and PhysicsStartTouch function calls
 private:
 	// Cached info for networked entities.
 //struct EntityCacheInfo_t
@@ -2658,18 +2655,24 @@ private:
 		char const* tag;
 	};
 
-	CUtlVector< BoneAccess >		g_BoneAccessStack;
-	BoneAccess g_BoneAcessBase;
+	CUtlVector< BoneAccess > m_BoneAccessStack;
+	BoneAccess m_BoneAcessBase;
 
 	CUtlVector< CBaseHandle > m_Recording;
-	bool g_bInThreadedBoneSetup;
-	bool g_bDoThreadedBoneSetup;
+	bool m_bInThreadedBoneSetup;
+	bool m_bDoThreadedBoneSetup;
 	//-----------------------------------------------------------------------------
 // Incremented each frame in InvalidateModelBones. Models compare this value to what it
 // was last time they setup their bones to determine if they need to re-setup their bones.
-	unsigned long	g_iModelBoneCounter = 0;
-	CUtlVector<IEngineObjectClient*> g_PreviousBoneSetups;
-	unsigned long	g_iPreviousBoneCounter = (unsigned)-1;
+	unsigned long	m_iModelBoneCounter = 0;
+	CUtlVector<IEngineObjectClient*> m_PreviousBoneSetups;
+	unsigned long	m_iPreviousBoneCounter = (unsigned)-1;
+
+	bool m_bAbsQueriesValid = true;
+	bool m_bAbsRecomputationEnabled = true;
+	bool m_bAbsRecomputationStack[8];
+	unsigned short m_iAbsRecomputationStackPos = 0;
+	bool m_bDisableTouchFuncs = false;	// Disables PhysicsTouch and PhysicsStartTouch function calls
 
 };
 
@@ -3170,11 +3173,11 @@ void CClientEntityList<T>::Release(void)
 	m_iMaxServerEnts = 0;
 	m_iNumClientNonNetworkable = 0;
 	m_iMaxUsedServerIndex = -1;
-	g_iPreviousBoneCounter = (unsigned)-1;
-	if (g_PreviousBoneSetups.Count() != 0)
+	m_iPreviousBoneCounter = (unsigned)-1;
+	if (m_PreviousBoneSetups.Count() != 0)
 	{
-		Msg("%d entities in bone setup array. Should have been cleaned up by now\n", g_PreviousBoneSetups.Count());
-		g_PreviousBoneSetups.RemoveAll();
+		Msg("%d entities in bone setup array. Should have been cleaned up by now\n", m_PreviousBoneSetups.Count());
+		m_PreviousBoneSetups.RemoveAll();
 	}
 }
 
@@ -3605,28 +3608,28 @@ void CClientEntityList<T>::DestroyDataObject(int type, T* instance) {
 template<class T>
 void CClientEntityList<T>::PushAllowBoneAccess(bool bAllowForNormalModels, bool bAllowForViewModels, char const* tagPush)
 {
-	BoneAccess save = g_BoneAcessBase;
-	g_BoneAccessStack.AddToTail(save);
+	BoneAccess save = m_BoneAcessBase;
+	m_BoneAccessStack.AddToTail(save);
 
-	Assert(g_BoneAccessStack.Count() < 32); // Most likely we are leaking "PushAllowBoneAccess" calls if PopBoneAccess is never called. Consider using AutoAllowBoneAccess.
-	g_BoneAcessBase.bAllowBoneAccessForNormalModels = bAllowForNormalModels;
-	g_BoneAcessBase.bAllowBoneAccessForViewModels = bAllowForViewModels;
-	g_BoneAcessBase.tag = tagPush;
+	Assert(m_BoneAccessStack.Count() < 32); // Most likely we are leaking "PushAllowBoneAccess" calls if PopBoneAccess is never called. Consider using AutoAllowBoneAccess.
+	m_BoneAcessBase.bAllowBoneAccessForNormalModels = bAllowForNormalModels;
+	m_BoneAcessBase.bAllowBoneAccessForViewModels = bAllowForViewModels;
+	m_BoneAcessBase.tag = tagPush;
 }
 
 template<class T>
 void CClientEntityList<T>::PopBoneAccess(char const* tagPop)
 {
 	// Validate that pop matches the push
-	Assert((g_BoneAcessBase.tag == tagPop) || (g_BoneAcessBase.tag && g_BoneAcessBase.tag != (char const*)1 && tagPop && tagPop != (char const*)1 && !strcmp(g_BoneAcessBase.tag, tagPop)));
-	int lastIndex = g_BoneAccessStack.Count() - 1;
+	Assert((m_BoneAcessBase.tag == tagPop) || (m_BoneAcessBase.tag && m_BoneAcessBase.tag != (char const*)1 && tagPop && tagPop != (char const*)1 && !strcmp(m_BoneAcessBase.tag, tagPop)));
+	int lastIndex = m_BoneAccessStack.Count() - 1;
 	if (lastIndex < 0)
 	{
 		Assert(!"C_BaseAnimating::PopBoneAccess:  Stack is empty!!!");
 		return;
 	}
-	g_BoneAcessBase = g_BoneAccessStack[lastIndex];
-	g_BoneAccessStack.Remove(lastIndex);
+	m_BoneAcessBase = m_BoneAccessStack[lastIndex];
+	m_BoneAccessStack.Remove(lastIndex);
 }
 
 //-----------------------------------------------------------------------------
@@ -3736,27 +3739,109 @@ void CClientEntityList<T>::PostThreadedBoneSetup()
 template<class T>
 void CClientEntityList<T>::ThreadedBoneSetup()
 {
-	g_bDoThreadedBoneSetup = cl_threaded_bone_setup.GetBool();
-	if (g_bDoThreadedBoneSetup)
+	m_bDoThreadedBoneSetup = cl_threaded_bone_setup.GetBool();
+	if (m_bDoThreadedBoneSetup)
 	{
-		int nCount = g_PreviousBoneSetups.Count();
+		int nCount = m_PreviousBoneSetups.Count();
 		if (nCount > 1)
 		{
-			g_bInThreadedBoneSetup = true;
+			m_bInThreadedBoneSetup = true;
 
-			ParallelProcess("C_BaseAnimating::ThreadedBoneSetup", g_PreviousBoneSetups.Base(), nCount, this, &CClientEntityList<T>::SetupBonesOnBaseAnimating, &CClientEntityList<T>::PreThreadedBoneSetup, &CClientEntityList<T>::PostThreadedBoneSetup);
+			ParallelProcess("C_BaseAnimating::ThreadedBoneSetup", m_PreviousBoneSetups.Base(), nCount, this, &CClientEntityList<T>::SetupBonesOnBaseAnimating, &CClientEntityList<T>::PreThreadedBoneSetup, &CClientEntityList<T>::PostThreadedBoneSetup);
 
-			g_bInThreadedBoneSetup = false;
+			m_bInThreadedBoneSetup = false;
 		}
 	}
-	g_iPreviousBoneCounter++;
-	g_PreviousBoneSetups.RemoveAll();
+	m_iPreviousBoneCounter++;
+	m_PreviousBoneSetups.RemoveAll();
 }
 
 template<class T>
 void CClientEntityList<T>::InvalidateBoneCaches()
 {
-	g_iModelBoneCounter++;
+	m_iModelBoneCounter++;
+}
+
+
+//-----------------------------------------------------------------------------
+// Global methods related to when abs data is correct
+//-----------------------------------------------------------------------------
+template<class T>
+void CClientEntityList<T>::SetAbsQueriesValid(bool bValid)
+{
+	// @MULTICORE: Always allow in worker threads, assume higher level code is handling correctly
+	if (!ThreadInMainThread())
+		return;
+
+	if (!bValid)
+	{
+		m_bAbsQueriesValid = false;
+	}
+	else
+	{
+		m_bAbsQueriesValid = true;
+	}
+}
+
+template<class T>
+bool CClientEntityList<T>::IsAbsQueriesValid(void)
+{
+	if (!ThreadInMainThread())
+		return true;
+	return m_bAbsQueriesValid;
+}
+
+template<class T>
+void CClientEntityList<T>::EnableAbsRecomputations(bool bEnable)
+{
+	if (!ThreadInMainThread())
+		return;
+	// This should only be called at the frame level. Use PushEnableAbsRecomputations
+	// if you're blocking out a section of code.
+	Assert(m_iAbsRecomputationStackPos == 0);
+
+	m_bAbsRecomputationEnabled = bEnable;
+}
+
+template<class T>
+bool CClientEntityList<T>::IsAbsRecomputationsEnabled()
+{
+	if (!ThreadInMainThread())
+		return true;
+	return m_bAbsRecomputationEnabled;
+}
+
+template<class T>
+void CClientEntityList<T>::PushEnableAbsRecomputations(bool bEnable)
+{
+	if (!ThreadInMainThread())
+		return;
+	if (m_iAbsRecomputationStackPos < ARRAYSIZE(m_bAbsRecomputationStack))
+	{
+		m_bAbsRecomputationStack[m_iAbsRecomputationStackPos] = m_bAbsRecomputationEnabled;
+		++m_iAbsRecomputationStackPos;
+		m_bAbsRecomputationEnabled = bEnable;
+	}
+	else
+	{
+		Assert(false);
+	}
+}
+
+template<class T>
+void CClientEntityList<T>::PopEnableAbsRecomputations()
+{
+	if (!ThreadInMainThread())
+		return;
+	if (m_iAbsRecomputationStackPos > 0)
+	{
+		--m_iAbsRecomputationStackPos;
+		m_bAbsRecomputationEnabled = m_bAbsRecomputationStack[m_iAbsRecomputationStackPos];
+	}
+	else
+	{
+		Assert(false);
+	}
 }
 
 //-----------------------------------------------------------------------------

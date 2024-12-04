@@ -16,9 +16,7 @@
 
 	void DebugCheckEHandleAccess( void *pEnt )
 	{
-		extern bool g_bDisableEhandleAccess;
-
-		if ( g_bDisableEhandleAccess )
+		if ( gEntList.IsDisableEhandleAccess() )
 		{
 			Msg( "Access of EHANDLE/CHandle for class %s:%p in destructor!\n",
 				STRING(((CBaseEntity*)pEnt)->GetEngineObject()->GetClassname() ), pEnt );

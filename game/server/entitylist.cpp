@@ -86,16 +86,10 @@ ConVar debug_touchlinks("debug_touchlinks", "0", 0, "Spew touch link activity");
 #if !defined( CLIENT_DLL )
 static ConVar sv_thinktimecheck("sv_thinktimecheck", "0", 0, "Check for thinktimes all on same timestamp.");
 #endif
-template<>
-bool CGlobalEntityList<CBaseEntity>::sm_bDisableTouchFuncs = false;	// Disables PhysicsTouch and PhysicsStartTouch function calls
-template<>
-bool CGlobalEntityList<CBaseEntity>::sm_bAccurateTriggerBboxChecks = true;	// set to false for legacy behavior in ep1
+
 bool g_bTestMoveTypeStepSimulation = true;
 ConVar sv_teststepsimulation("sv_teststepsimulation", "1", 0);
 ConVar step_spline("step_spline", "0");
-
-// When this is false, throw an assert in debug when GetAbsAnything is called. Used when hierachy is incomplete/invalid.
-bool CEngineObjectInternal::s_bAbsQueriesValid = true;
 
 static ConVar sv_portal_collision_sim_bounds_x("sv_portal_collision_sim_bounds_x", "200", FCVAR_REPLICATED, "Size of box used to grab collision geometry around placed portals. These should be at the default size or larger only!");
 static ConVar sv_portal_collision_sim_bounds_y("sv_portal_collision_sim_bounds_y", "200", FCVAR_REPLICATED, "Size of box used to grab collision geometry around placed portals. These should be at the default size or larger only!");
@@ -2079,7 +2073,7 @@ const Vector& CEngineObjectInternal::GetLocalVelocity() const
 
 const Vector& CEngineObjectInternal::GetAbsVelocity()
 {
-	Assert(CEngineObjectInternal::IsAbsQueriesValid());
+	Assert(gEntList.IsAbsQueriesValid());
 
 	if (IsEFlagSet(EFL_DIRTY_ABSVELOCITY))
 	{
@@ -2090,7 +2084,7 @@ const Vector& CEngineObjectInternal::GetAbsVelocity()
 
 const Vector& CEngineObjectInternal::GetAbsVelocity() const
 {
-	Assert(CEngineObjectInternal::IsAbsQueriesValid());
+	Assert(gEntList.IsAbsQueriesValid());
 
 	if (IsEFlagSet(EFL_DIRTY_ABSVELOCITY))
 	{
@@ -2115,7 +2109,7 @@ const QAngle& CEngineObjectInternal::GetLocalAngles(void) const
 
 const Vector& CEngineObjectInternal::GetAbsOrigin(void)
 {
-	Assert(CEngineObjectInternal::IsAbsQueriesValid());
+	Assert(gEntList.IsAbsQueriesValid());
 
 	if (IsEFlagSet(EFL_DIRTY_ABSTRANSFORM))
 	{
@@ -2126,7 +2120,7 @@ const Vector& CEngineObjectInternal::GetAbsOrigin(void)
 
 const Vector& CEngineObjectInternal::GetAbsOrigin(void) const
 {
-	Assert(CEngineObjectInternal::IsAbsQueriesValid());
+	Assert(gEntList.IsAbsQueriesValid());
 
 	if (IsEFlagSet(EFL_DIRTY_ABSTRANSFORM))
 	{
@@ -2137,7 +2131,7 @@ const Vector& CEngineObjectInternal::GetAbsOrigin(void) const
 
 const QAngle& CEngineObjectInternal::GetAbsAngles(void)
 {
-	Assert(CEngineObjectInternal::IsAbsQueriesValid());
+	Assert(gEntList.IsAbsQueriesValid());
 
 	if (IsEFlagSet(EFL_DIRTY_ABSTRANSFORM))
 	{
@@ -2210,7 +2204,7 @@ void CEngineObjectInternal::ResetRgflCoordinateFrame() {
 //-----------------------------------------------------------------------------
 matrix3x4_t& CEngineObjectInternal::EntityToWorldTransform()
 {
-	Assert(CEngineObjectInternal::IsAbsQueriesValid());
+	Assert(gEntList.IsAbsQueriesValid());
 
 	if (IsEFlagSet(EFL_DIRTY_ABSTRANSFORM))
 	{
@@ -2221,7 +2215,7 @@ matrix3x4_t& CEngineObjectInternal::EntityToWorldTransform()
 
 const matrix3x4_t& CEngineObjectInternal::EntityToWorldTransform() const
 {
-	Assert(CEngineObjectInternal::IsAbsQueriesValid());
+	Assert(gEntList.IsAbsQueriesValid());
 
 	if (IsEFlagSet(EFL_DIRTY_ABSTRANSFORM))
 	{
@@ -2499,11 +2493,11 @@ void CEngineObjectInternal::PhysicsTouchTriggers(const Vector* pPrevAbsOrigin)
 		SetCheckUntouch(true);
 		if (isSolidCheckTriggers)
 		{
-			engine->SolidMoved(this->m_pOuter, &m_Collision, pPrevAbsOrigin, CGlobalEntityList<CBaseEntity>::sm_bAccurateTriggerBboxChecks);
+			engine->SolidMoved(this->m_pOuter, &m_Collision, pPrevAbsOrigin, gEntList.IsAccurateTriggerBboxChecks());
 		}
 		if (isTriggerCheckSolids)
 		{
-			engine->TriggerMoved(this->m_pOuter, CGlobalEntityList<CBaseEntity>::sm_bAccurateTriggerBboxChecks);
+			engine->TriggerMoved(this->m_pOuter, gEntList.IsAccurateTriggerBboxChecks());
 		}
 	}
 }
@@ -2596,7 +2590,7 @@ servertouchlink_t* CEngineObjectInternal::PhysicsMarkEntityAsTouched(IEngineObje
 				// update stamp
 				link->touchStamp = GetTouchStamp();
 
-				if (!CGlobalEntityList<CBaseEntity>::sm_bDisableTouchFuncs)
+				if (!gEntList.IsDisableTouchFuncs())
 				{
 					PhysicsTouch(other);
 				}
@@ -2637,7 +2631,7 @@ servertouchlink_t* CEngineObjectInternal::PhysicsMarkEntityAsTouched(IEngineObje
 	if (bShouldTouch && !other->IsSolidFlagSet(FSOLID_TRIGGER))
 	{
 		link->flags |= FTOUCHLINK_START_TOUCH;
-		if (!CGlobalEntityList<CBaseEntity>::sm_bDisableTouchFuncs)
+		if (!gEntList.IsDisableTouchFuncs())
 		{
 			PhysicsStartTouch(other);
 		}
@@ -10768,12 +10762,6 @@ CBaseEntityClassList::CBaseEntityClassList()
 CBaseEntityClassList::~CBaseEntityClassList()
 {
 }
-
-
-// removes the entity from the global list
-// only called from with the CBaseEntity destructor
-bool g_fInCleanupDelete;
-
 
 //-----------------------------------------------------------------------------
 // NOTIFY LIST

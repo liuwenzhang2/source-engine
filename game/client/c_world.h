@@ -27,7 +27,7 @@ public:
 	
 	// Override the factory create/delete functions since the world is a singleton.
 	virtual bool Init( int entnum, int iSerialNum );
-	virtual void Release();
+	virtual void UpdateOnRemove();
 
 	virtual void Precache();
 	virtual void Spawn();

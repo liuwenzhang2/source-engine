@@ -42,7 +42,7 @@ public:
 	void	OnDataChanged(DataUpdateType_t updateType);
 	bool	ShouldDraw();
 	void	ClientThink( void );
-	void	Release( void );
+	void	UpdateOnRemove( void );
 
 	unsigned char	m_Flags;
 	unsigned char	m_LightStyle;
@@ -105,7 +105,7 @@ bool C_DynamicLight::ShouldDraw()
 //------------------------------------------------------------------------------
 // Purpose : Disable drawing of this light when entity perishes
 //------------------------------------------------------------------------------
-void C_DynamicLight::Release()
+void C_DynamicLight::UpdateOnRemove()
 {
 	if (m_pDynamicLight)
 	{
@@ -119,7 +119,7 @@ void C_DynamicLight::Release()
 		m_pSpotlightEnd = 0;
 	}
 
-	BaseClass::Release();
+	BaseClass::UpdateOnRemove();
 }
 
 
@@ -191,9 +191,9 @@ void C_DynamicLight::ClientThink(void)
 		VectorMA(GetEngineObject()->GetAbsOrigin(), m_Radius, forward, end );
 
 		trace_t		pm;
-		C_EngineObjectInternal::PushEnableAbsRecomputations( false );	 // HACK don't recompute positions while doing RayTrace
+		ClientEntityList().PushEnableAbsRecomputations( false );	 // HACK don't recompute positions while doing RayTrace
 		UTIL_TraceLine(GetEngineObject()->GetAbsOrigin(), end, MASK_NPCWORLDSTATIC, NULL, COLLISION_GROUP_NONE, &pm );
-		C_EngineObjectInternal::PopEnableAbsRecomputations();
+		ClientEntityList().PopEnableAbsRecomputations();
 		VectorCopy( pm.endpos, m_pSpotlightEnd->origin );
 		
 		if (pm.fraction == 1.0f)

@@ -1104,7 +1104,7 @@ void CPlayerPickupController::Shutdown( bool bThrown )
 
 		m_pPlayer->m_Local.m_iHideHUD &= ~HIDEHUD_WEAPONSELECTION;
 	}
-	Remove();
+	Release();
 }
 
 

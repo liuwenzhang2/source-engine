@@ -134,7 +134,7 @@ void CDODBaseGrenade::DetonateThink( void )
 {
 	if (!IsInWorld())
 	{
-		Remove( );
+		Release( );
 		return;
 	}
 

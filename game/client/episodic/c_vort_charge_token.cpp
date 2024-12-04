@@ -239,6 +239,7 @@ void C_VortigauntChargeToken::UpdateOnRemove( void )
 	{
 		m_pDLight->die = gpGlobals->curtime;
 	}
+	BaseClass::UpdateOnRemove();
 }
 
 //-----------------------------------------------------------------------------
@@ -353,6 +354,7 @@ void C_VortigauntEffectDispel::UpdateOnRemove( void )
 	{
 		m_pDLight->die = gpGlobals->curtime;
 	}
+	BaseClass::UpdateOnRemove();
 }
 
 //-----------------------------------------------------------------------------

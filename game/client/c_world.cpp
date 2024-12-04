@@ -82,7 +82,7 @@ bool C_World::Init( int entnum, int iSerialNum )
 	return BaseClass::Init( entnum, iSerialNum );
 }
 
-void C_World::Release()
+void C_World::UpdateOnRemove()
 {
 	if (m_bActivityInitedByMe) {
 		mdlcache->ActivityList_Free();
@@ -90,7 +90,7 @@ void C_World::Release()
 		m_bActivityInitedByMe = false;
 	}
 	//Term();
-	BaseClass::Release();
+	BaseClass::UpdateOnRemove();
 }
 
 void C_World::PreDataUpdate( DataUpdateType_t updateType )

@@ -439,7 +439,7 @@ void CSprite::AnimateUntilDead( void )
 {
 	if ( gpGlobals->curtime > m_flDieTime )
 	{
-		Remove( );
+		Release( );
 	}
 	else
 	{
@@ -475,7 +475,7 @@ void CSprite::ExpandThink( void )
 	if ( sub > m_clrRender->a )
 	{
 		SetRenderColorA( 0 );
-		Remove( );
+		Release( );
 	}
 	else
 	{

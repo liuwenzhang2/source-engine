@@ -1488,8 +1488,8 @@ int CHLClient::IN_KeyEvent( int eventcode, ButtonCode_t keynum, const char *pszC
 
 void CHLClient::ExtraMouseSample( float frametime, bool active )
 {
-	Assert(C_EngineObjectInternal::IsAbsRecomputationsEnabled() );
-	Assert(C_EngineObjectInternal::IsAbsQueriesValid() );
+	Assert(ClientEntityList().IsAbsRecomputationsEnabled());
+	Assert(ClientEntityList().IsAbsQueriesValid() );
 
 	C_BaseAnimating::AutoAllowBoneAccess boneaccess( true, false ); 
 
@@ -1515,8 +1515,8 @@ void CHLClient::IN_SetSampleTime( float frametime )
 void CHLClient::CreateMove ( int sequence_number, float input_sample_frametime, bool active )
 {
 
-	Assert(C_EngineObjectInternal::IsAbsRecomputationsEnabled() );
-	Assert(C_EngineObjectInternal::IsAbsQueriesValid() );
+	Assert(ClientEntityList().IsAbsRecomputationsEnabled() );
+	Assert(ClientEntityList().IsAbsQueriesValid() );
 
 	C_BaseAnimating::AutoAllowBoneAccess boneaccess( true, false ); 
 
@@ -1753,7 +1753,7 @@ void CHLClient::LevelShutdown( void )
 	g_bLevelInitialized = false;
 
 	// Disable abs recomputations when everything is shutting down
-	C_EngineObjectInternal::EnableAbsRecomputations( false );
+	ClientEntityList().EnableAbsRecomputations( false );
 
 	// Level shutdown sequence.
 	// First do the pre-entity shutdown of all systems
@@ -2181,7 +2181,7 @@ void OnRenderStart()
 #endif
 
 	partition->SuppressLists( PARTITION_ALL_CLIENT_EDICTS, true );
-	C_EngineObjectInternal::SetAbsQueriesValid( false );
+	ClientEntityList().SetAbsQueriesValid( false );
 
 	Rope_ResetCounters();
 
@@ -2197,8 +2197,8 @@ void OnRenderStart()
 		// Invalidate any bone information.
 		ClientEntityList().InvalidateBoneCaches();
 
-		C_EngineObjectInternal::SetAbsQueriesValid( true );
-		C_EngineObjectInternal::EnableAbsRecomputations( true );
+		ClientEntityList().SetAbsQueriesValid( true );
+		ClientEntityList().EnableAbsRecomputations( true );
 
 		// Enable access to all model bones except view models.
 		// This is necessary for aim-ent computation to occur properly
@@ -2333,8 +2333,8 @@ void CHLClient::FrameStageNotify( ClientFrameStage_t curStage )
 		{
 			VPROF( "CHLClient::FrameStageNotify FRAME_NET_UPDATE_START" );
 			// disabled all recomputations while we update entities
-			C_EngineObjectInternal::EnableAbsRecomputations( false );
-			C_EngineObjectInternal::SetAbsQueriesValid( false );
+			ClientEntityList().EnableAbsRecomputations( false );
+			ClientEntityList().SetAbsQueriesValid( false );
 			Interpolation_SetLastPacketTimeStamp( engine->GetLastTimeStamp() );
 			partition->SuppressLists( PARTITION_ALL_CLIENT_EDICTS, true );
 
@@ -2346,8 +2346,8 @@ void CHLClient::FrameStageNotify( ClientFrameStage_t curStage )
 			ProcessCacheUsedMaterials();
 
 			// reenable abs recomputation since now all entities have been updated
-			C_EngineObjectInternal::EnableAbsRecomputations( true );
-			C_EngineObjectInternal::SetAbsQueriesValid( true );
+			ClientEntityList().EnableAbsRecomputations( true );
+			ClientEntityList().SetAbsQueriesValid( true );
 			partition->SuppressLists( PARTITION_ALL_CLIENT_EDICTS, false );
 
 			PREDICTION_ENDTRACKVALUE();

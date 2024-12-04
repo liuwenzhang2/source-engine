@@ -623,55 +623,6 @@ bool C_BaseEntity::InitializeAsClientEntityByIndex( int iIndex, RenderGroup_t re
 	return true;
 }
 
-
-void C_BaseEntity::Term()
-{
-#if !defined( NO_ENTITY_PREDICTION )
-	// Remove from the predictables list
-	if ( GetPredictable() /*|| IsClientCreated()*/)
-	{
-		predictables->RemoveFromPredictablesList( GetClientHandle() );
-	}
-
-	// If it's play simulated, remove from simulation list if the player still exists...
-	//if ( IsPlayerSimulated() && C_BasePlayer::GetLocalPlayer() )
-	//{
-	//	C_BasePlayer::GetLocalPlayer()->RemoveFromPlayerSimulationList( this );
-	//}
-#endif
-
-	if ( GetClientHandle() != INVALID_CLIENTENTITY_HANDLE )
-	{
-		if ( GetThinkHandle() != INVALID_THINK_HANDLE )
-		{
-			ClientThinkList()->RemoveThinkable( GetClientHandle() );
-		}
-
-		// Remove from the client entity list.
-		//ClientEntityList().RemoveEntity( this );
-
-		//m_RefEHandle = INVALID_CLIENTENTITY_HANDLE;
-	}
-	
-	// Are we in the partition?
-	//GetEngineObject()->DestroyPartitionHandle();
-
-	// If Client side only entity index will be -1
-	if ( entindex() != -1 )
-	{
-		beams->KillDeadBeams( this );
-	}
-
-	// Clean up the model instance
-	GetEngineObject()->DestroyModelInstance();
-
-	// Clean up drawing
-	GetEngineObject()->RemoveFromLeafSystem();
-
-	RemoveFromAimEntsList();
-}
-
-
 //void C_BaseEntity::SetRefEHandle( const CBaseHandle &handle )
 //{
 //	m_RefEHandle = handle;
@@ -688,27 +639,8 @@ void C_BaseEntity::Term()
 //-----------------------------------------------------------------------------
 void C_BaseEntity::Release()
 {
-	{
-		C_BaseAnimating::AutoAllowBoneAccess boneaccess( true, true );
-		GetEngineObject()->UnlinkFromHierarchy();
-	}
-
-	// Note that this must be called from here, not the destructor, because otherwise the
-	//  vtable is hosed and the derived classes function is not going to get called!!!
-	if (GetEngineObject()->IsIntermediateDataAllocated() )
-	{
-		GetEngineObject()->DestroyIntermediateData();
-	}
-
-	UpdateOnRemove();
-
-	//delete this;
+	DestroyEntity(this);
 }
-
-
-
-
-
 
 void C_BaseEntity::SetRemovalFlag( bool bRemove ) 
 { 
@@ -2970,26 +2902,6 @@ int C_BaseEntity::PrecacheModel( const char *name )
 
 //-----------------------------------------------------------------------------
 // Purpose: 
-// Input  : *obj - 
-//-----------------------------------------------------------------------------
-void C_BaseEntity::Remove( )
-{
-	// Nothing for now, if it's a predicted entity, could flag as "delete" or dormant
-	if ( GetPredictable() /*|| IsClientCreated()*/)
-	{
-		// Make it solid
-		GetEngineObject()->AddSolidFlags( FSOLID_NOT_SOLID );
-		GetEngineObject()->SetMoveType( MOVETYPE_NONE );
-
-		GetEngineObject()->AddEFlags( EFL_KILLME );	// Make sure to ignore further calls into here or UTIL_Remove.
-	}
-
-	Release();
-}
-
-
-//-----------------------------------------------------------------------------
-// Purpose: 
 // Output : Returns true on success, false on failure.
 //-----------------------------------------------------------------------------
 //bool C_BaseEntity::GetPredictionEligible( void ) const
@@ -3292,18 +3204,77 @@ void C_BaseEntity::ChangeTeam( int iTeamNum )
 //-----------------------------------------------------------------------------
 void C_BaseEntity::UpdateOnRemove( void )
 {
+	// Nothing for now, if it's a predicted entity, could flag as "delete" or dormant
+	if (GetPredictable() /*|| IsClientCreated()*/)
+	{
+		// Make it solid
+		GetEngineObject()->AddSolidFlags(FSOLID_NOT_SOLID);
+		GetEngineObject()->SetMoveType(MOVETYPE_NONE);
+
+		GetEngineObject()->AddEFlags(EFL_KILLME);	// Make sure to ignore further calls into here or UTIL_Remove.
+	}
+#if !defined( NO_ENTITY_PREDICTION )
+	// Remove from the predictables list
+	if (GetPredictable() /*|| IsClientCreated()*/)
+	{
+		predictables->RemoveFromPredictablesList(GetClientHandle());
+	}
+	// Note that this must be called from here, not the destructor, because otherwise the
+//  vtable is hosed and the derived classes function is not going to get called!!!
+	if (GetEngineObject()->IsIntermediateDataAllocated())
+	{
+		GetEngineObject()->DestroyIntermediateData();
+	}
+	// If it's play simulated, remove from simulation list if the player still exists...
+	//if ( IsPlayerSimulated() && C_BasePlayer::GetLocalPlayer() )
+	//{
+	//	C_BasePlayer::GetLocalPlayer()->RemoveFromPlayerSimulationList( this );
+	//}
+#endif
+	{
+		Assert(!GetEngineObject()->GetMoveParent());
+		C_BaseAnimating::AutoAllowBoneAccess boneaccess(true, true);
+		GetEngineObject()->UnlinkFromHierarchy();
+		//GetEngineObject()->UnlinkFromHierarchy();
+		GetEngineObject()->SetGroundEntity(NULL);
+	}
 	GetEngineObject()->VPhysicsDestroyObject();
 
-	Assert( !GetEngineObject()->GetMoveParent() );
-	GetEngineObject()->UnlinkFromHierarchy();
-	GetEngineObject()->SetGroundEntity( NULL );
-
-	Term();
 //#if !defined( NO_ENTITY_PREDICTION )
 //	delete m_pPredictionContext;
 //#endif
 	RemoveFromInterpolationList();
 	RemoveFromTeleportList();
+
+	if (GetClientHandle() != INVALID_CLIENTENTITY_HANDLE)
+	{
+		if (GetThinkHandle() != INVALID_THINK_HANDLE)
+		{
+			ClientThinkList()->RemoveThinkable(GetClientHandle());
+		}
+
+		// Remove from the client entity list.
+		//ClientEntityList().RemoveEntity( this );
+
+		//m_RefEHandle = INVALID_CLIENTENTITY_HANDLE;
+	}
+
+	// Are we in the partition?
+	//GetEngineObject()->DestroyPartitionHandle();
+
+	// If Client side only entity index will be -1
+	if (entindex() != -1)
+	{
+		beams->KillDeadBeams(this);
+	}
+
+	// Clean up the model instance
+	GetEngineObject()->DestroyModelInstance();
+
+	// Clean up drawing
+	GetEngineObject()->RemoveFromLeafSystem();
+
+	RemoveFromAimEntsList();
 }
 
 //-----------------------------------------------------------------------------
@@ -3402,7 +3373,7 @@ void C_BaseEntity::SUB_Remove( void )
 		DevWarning( 2, "SUB_Remove called on entity with health > 0\n");
 	}
 
-	Remove( );
+	Release( );
 }
 
 CBaseEntity *FindEntityInFrontOfLocalPlayer()

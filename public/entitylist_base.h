@@ -1194,9 +1194,6 @@ public:
 		{
 			Error("not created by IEntityFactory!");
 		}
-#ifdef CLIENT_DLL
-		((C_BaseEntity*)pEntityProxy)->Remove();
-#endif // CLIENT_DLL
 		if (!pEntityProxy->bUpdateOnRemoved) {
 			pEntityProxy->UpdateOnRemove();
 		}

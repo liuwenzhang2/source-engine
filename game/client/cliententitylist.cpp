@@ -88,13 +88,6 @@ ConVar debug_touchlinks("debug_touchlinks", "0", 0, "Spew touch link activity");
 #define DebugTouchlinks() false
 #endif
 
-template<>
-bool CClientEntityList<C_BaseEntity>::sm_bDisableTouchFuncs = false;	// Disables PhysicsTouch and PhysicsStartTouch function calls
-bool C_EngineObjectInternal::s_bAbsQueriesValid = true;
-bool C_EngineObjectInternal::s_bAbsRecomputationEnabled = true;
-static bool g_bAbsRecomputationStack[8];
-static unsigned short g_iAbsRecomputationStackPos = 0;
-
 static ConVar sv_portal_collision_sim_bounds_x("sv_portal_collision_sim_bounds_x", "200", FCVAR_REPLICATED, "Size of box used to grab collision geometry around placed portals. These should be at the default size or larger only!");
 static ConVar sv_portal_collision_sim_bounds_y("sv_portal_collision_sim_bounds_y", "200", FCVAR_REPLICATED, "Size of box used to grab collision geometry around placed portals. These should be at the default size or larger only!");
 static ConVar sv_portal_collision_sim_bounds_z("sv_portal_collision_sim_bounds_z", "252", FCVAR_REPLICATED, "Size of box used to grab collision geometry around placed portals. These should be at the default size or larger only!");
@@ -641,81 +634,6 @@ int	C_EngineObjectInternal::entindex() const {
 
 RecvTable* C_EngineObjectInternal::GetRecvTable() {
 	return GetClientClass()->m_pRecvTable;
-}
-
-//-----------------------------------------------------------------------------
-// Global methods related to when abs data is correct
-//-----------------------------------------------------------------------------
-void C_EngineObjectInternal::SetAbsQueriesValid(bool bValid)
-{
-	// @MULTICORE: Always allow in worker threads, assume higher level code is handling correctly
-	if (!ThreadInMainThread())
-		return;
-
-	if (!bValid)
-	{
-		s_bAbsQueriesValid = false;
-	}
-	else
-	{
-		s_bAbsQueriesValid = true;
-	}
-}
-
-bool C_EngineObjectInternal::IsAbsQueriesValid(void)
-{
-	if (!ThreadInMainThread())
-		return true;
-	return s_bAbsQueriesValid;
-}
-
-void C_EngineObjectInternal::EnableAbsRecomputations(bool bEnable)
-{
-	if (!ThreadInMainThread())
-		return;
-	// This should only be called at the frame level. Use PushEnableAbsRecomputations
-	// if you're blocking out a section of code.
-	Assert(g_iAbsRecomputationStackPos == 0);
-
-	s_bAbsRecomputationEnabled = bEnable;
-}
-
-bool C_EngineObjectInternal::IsAbsRecomputationsEnabled()
-{
-	if (!ThreadInMainThread())
-		return true;
-	return s_bAbsRecomputationEnabled;
-}
-
-void C_EngineObjectInternal::PushEnableAbsRecomputations(bool bEnable)
-{
-	if (!ThreadInMainThread())
-		return;
-	if (g_iAbsRecomputationStackPos < ARRAYSIZE(g_bAbsRecomputationStack))
-	{
-		g_bAbsRecomputationStack[g_iAbsRecomputationStackPos] = s_bAbsRecomputationEnabled;
-		++g_iAbsRecomputationStackPos;
-		s_bAbsRecomputationEnabled = bEnable;
-	}
-	else
-	{
-		Assert(false);
-	}
-}
-
-void C_EngineObjectInternal::PopEnableAbsRecomputations()
-{
-	if (!ThreadInMainThread())
-		return;
-	if (g_iAbsRecomputationStackPos > 0)
-	{
-		--g_iAbsRecomputationStackPos;
-		s_bAbsRecomputationEnabled = g_bAbsRecomputationStack[g_iAbsRecomputationStackPos];
-	}
-	else
-	{
-		Assert(false);
-	}
 }
 
 #include "tier0/memdbgoff.h"
@@ -2062,14 +1980,14 @@ void C_EngineObjectInternal::SetLocalAnglesDim(int iDim, vec_t flValue)
 
 const Vector& C_EngineObjectInternal::GetAbsVelocity()
 {
-	Assert(C_EngineObjectInternal::s_bAbsQueriesValid);
+	Assert(ClientEntityList().IsAbsQueriesValid());
 	const_cast<C_EngineObjectInternal*>(this)->CalcAbsoluteVelocity();
 	return m_vecAbsVelocity;
 }
 
 const Vector& C_EngineObjectInternal::GetAbsVelocity() const
 {
-	Assert(C_EngineObjectInternal::s_bAbsQueriesValid);
+	Assert(ClientEntityList().IsAbsQueriesValid());
 	const_cast<C_EngineObjectInternal*>(this)->CalcAbsoluteVelocity();
 	return m_vecAbsVelocity;
 }
@@ -2108,14 +2026,14 @@ void C_EngineObjectInternal::ResetRgflCoordinateFrame() {
 //-----------------------------------------------------------------------------
 matrix3x4_t& C_EngineObjectInternal::EntityToWorldTransform()
 {
-	Assert(C_EngineObjectInternal::s_bAbsQueriesValid);
+	Assert(ClientEntityList().IsAbsQueriesValid());
 	CalcAbsolutePosition();
 	return m_rgflCoordinateFrame;
 }
 
 const matrix3x4_t& C_EngineObjectInternal::EntityToWorldTransform() const
 {
-	Assert(C_EngineObjectInternal::s_bAbsQueriesValid);
+	Assert(ClientEntityList().IsAbsQueriesValid());
 	const_cast<C_EngineObjectInternal*>(this)->CalcAbsolutePosition();
 	return m_rgflCoordinateFrame;
 }
@@ -2157,7 +2075,7 @@ void C_EngineObjectInternal::CalcAbsolutePosition()
 	// fact that we're in an indeterminant state and abs queries (which
 	// shouldn't be happening at all; I have assertions for those), will
 	// just have to accept stale data.
-	if (!s_bAbsRecomputationEnabled)
+	if (!ClientEntityList().IsAbsRecomputationsEnabled())
 		return;
 
 	// FIXME: Recompute absbox!!!
@@ -3181,7 +3099,7 @@ clienttouchlink_t* C_EngineObjectInternal::PhysicsMarkEntityAsTouched(IEngineObj
 				// update stamp
 				link->touchStamp = GetTouchStamp();
 
-				if (!CClientEntityList<C_BaseEntity>::sm_bDisableTouchFuncs)
+				if (!ClientEntityList().IsDisableTouchFuncs())
 				{
 					PhysicsTouch(other);
 				}
@@ -3222,7 +3140,7 @@ clienttouchlink_t* C_EngineObjectInternal::PhysicsMarkEntityAsTouched(IEngineObj
 	if (bShouldTouch && !other->IsSolidFlagSet(FSOLID_TRIGGER))
 	{
 		link->flags |= FTOUCHLINK_START_TOUCH;
-		if (!CClientEntityList<C_BaseEntity>::sm_bDisableTouchFuncs)
+		if (!ClientEntityList().IsDisableTouchFuncs())
 		{
 			PhysicsStartTouch(other);
 		}

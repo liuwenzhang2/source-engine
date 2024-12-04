@@ -2507,9 +2507,9 @@ void C_CSPlayer::CalcFreezeCamView( Vector& eyeOrigin, QAngle& eyeAngles, float&
 
 	// Now trace out from the target, so that we're put in front of any walls
 	trace_t trace;
-	C_EngineObjectInternal::PushEnableAbsRecomputations( false ); // HACK don't recompute positions while doing RayTrace
+	ClientEntityList().PushEnableAbsRecomputations( false ); // HACK don't recompute positions while doing RayTrace
 	UTIL_TraceHull( vLookAt, vTargetPos, WALL_MIN, WALL_MAX, MASK_SOLID, pTarget, COLLISION_GROUP_NONE, &trace );
-	C_EngineObjectInternal::PopEnableAbsRecomputations();
+	ClientEntityList().PopEnableAbsRecomputations();
 	if ( trace.fraction < 1.0 )
 	{
 		// The camera's going to be really close to the target. So we don't end up
@@ -2518,9 +2518,9 @@ void C_CSPlayer::CalcFreezeCamView( Vector& eyeOrigin, QAngle& eyeAngles, float&
 
 		// To stop all close in views looking up at character's chins, move the view up.
 		vTargetPos.z += fabs(vLookAt.z - vTargetPos.z) * 0.85;
-		C_EngineObjectInternal::PushEnableAbsRecomputations( false ); // HACK don't recompute positions while doing RayTrace
+		ClientEntityList().PushEnableAbsRecomputations( false ); // HACK don't recompute positions while doing RayTrace
 		UTIL_TraceHull( vLookAt, vTargetPos, WALL_MIN, WALL_MAX, MASK_SOLID, pTarget, COLLISION_GROUP_NONE, &trace );
-		C_EngineObjectInternal::PopEnableAbsRecomputations();
+		ClientEntityList().PopEnableAbsRecomputations();
 		vTargetPos = trace.endpos;
 	}
 

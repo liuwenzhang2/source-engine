@@ -324,6 +324,7 @@ bool C_ParticleSmokeGrenade::Init(int entnum, int iSerialNum)
 void C_ParticleSmokeGrenade::UpdateOnRemove(void) {
 	ClientEntityList().DestroyEntity(m_pSmokeTrail);
 	m_pSmokeTrail = NULL;
+	BaseClass::UpdateOnRemove();
 }
 
 C_ParticleSmokeGrenade::~C_ParticleSmokeGrenade()

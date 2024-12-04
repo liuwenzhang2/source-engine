@@ -125,7 +125,7 @@ END_NETWORK_TABLE()
 	{
 		if (!IsInWorld())
 		{
-			Remove( );
+			Release( );
 			return;
 		}
 

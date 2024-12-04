@@ -331,11 +331,6 @@ void CBaseEntity::SetScaledPhysics( IPhysicsObject *pNewObject )
 	}
 }
 
-extern bool g_bDisableEhandleAccess;
-
-// For code error checking
-extern bool g_bReceivedChainedUpdateOnRemove;
-
 //-----------------------------------------------------------------------------
 // Purpose: Called just prior to object destruction
 //  Entities that need to unlink themselves from other entities should do the unlinking
@@ -364,7 +359,7 @@ void CBaseEntity::UpdateOnRemove(void)
 {
 	//Msg("%p ===== %s \n", this, GetClassName());
 
-	g_bReceivedChainedUpdateOnRemove = true;
+	gEntList.SetReceivedChainedUpdateOnRemove(true);
 
 	// Virtual call to shut down any looping sounds.
 	StopLoopingSounds();
@@ -439,9 +434,9 @@ void CBaseEntity::UpdateOnRemove(void)
 
 	// Need to remove references to this entity before EHANDLES go null
 	{
-		g_bDisableEhandleAccess = false;
+		gEntList.SetDisableEhandleAccess(false);
 		GetEngineObject()->SetGroundEntity(NULL); // remove us from the ground entity if we are on it
-		g_bDisableEhandleAccess = true;
+		gEntList.SetDisableEhandleAccess(true);
 
 		// Remove this entity from the ent list (NOTE:  This Makes EHANDLES go NULL)
 		//gEntList.RemoveEntity( this );
@@ -466,7 +461,7 @@ CBaseEntity::~CBaseEntity( )
 	//  another entity.
 	// That kind of operation should only occur in UpdateOnRemove calls
 	// Deletion should only occur via UTIL_Remove(Immediate) calls, not via naked delete calls
-	Assert( g_bDisableEhandleAccess );
+	Assert( gEntList.IsDisableEhandleAccess() );
 
 	//GetEngineObject()->VPhysicsDestroyObject();
 
@@ -552,7 +547,7 @@ const IEngineRopeServer* CBaseEntity::GetEngineRope() const
 void CBaseEntity::Release() {
 	//GetEngineObject()->PhysicsRemoveTouchedList();
 	//CBaseEntity::PhysicsRemoveGroundList(this);
-	UTIL_RemoveImmediate(this);
+	UTIL_Remove(this);
 }
 
 void CBaseEntity::ClearModelIndexOverrides( void )
@@ -2687,9 +2682,9 @@ void CBaseEntity::OnRestore()
 	// disable touch functions while we recreate the touch links between entities
 	// NOTE: We don't do this on transitions, because we'd miss the OnStartTouch call!
 #if !defined(HL2_DLL) || ( defined(HL2_DLL) && defined(HL2_EPISODIC) )
-	CGlobalEntityList<CBaseEntity>::sm_bDisableTouchFuncs = ( gpGlobals->eLoadType != MapLoad_Transition );
+	gEntList.SetDisableTouchFuncs( gpGlobals->eLoadType != MapLoad_Transition );
 	GetEngineObject()->PhysicsTouchTriggers();
-	CGlobalEntityList<CBaseEntity>::sm_bDisableTouchFuncs = false;
+	gEntList.SetDisableTouchFuncs(false);
 #endif // HL2_EPISODIC
 
 	//Adrian: If I'm restoring with these fields it means I've become a client side ragdoll.
@@ -4287,14 +4282,6 @@ void CBaseEntity::PrecacheModelComponents( int nModelIndex )
 //
 //	return idx;
 //}
-
-//-----------------------------------------------------------------------------
-// Purpose: 
-//-----------------------------------------------------------------------------
-void CBaseEntity::Remove( )
-{
-	UTIL_Remove( this );
-}
 
 //   Entity degugging console commands
 extern CBaseEntity *FindPickerEntity( CBasePlayer *pPlayer );

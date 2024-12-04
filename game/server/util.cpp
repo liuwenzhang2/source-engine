@@ -336,10 +336,6 @@ realcheck:
 	return true;
 }
 
-
-
-bool g_bDisableEhandleAccess = false;
-bool g_bReceivedChainedUpdateOnRemove = false;
 //-----------------------------------------------------------------------------
 // Purpose: Sets the entity up for deletion.  Entity will not actually be deleted
 //			until the next frame, so there can be no pointer errors.
@@ -382,10 +378,10 @@ void UTIL_Remove( CBaseEntity *oldObj )
 			CProp_Portal::Pre_UTIL_Remove(pBaseEnt);
 		}
 #endif
-		g_bReceivedChainedUpdateOnRemove = false;
+		gEntList.SetReceivedChainedUpdateOnRemove(false);
 		pBaseEnt->UpdateOnRemove();
 
-		Assert(g_bReceivedChainedUpdateOnRemove);
+		Assert(gEntList.IsReceivedChainedUpdateOnRemove());
 
 		// clear oldObj targetname / other flags now
 		pBaseEnt->SetName("");
@@ -437,15 +433,15 @@ void UTIL_RemoveImmediate( CBaseEntity *oldObj )
 
 	oldObj->GetEngineObject()->AddEFlags( EFL_KILLME );	// Make sure to ignore further calls into here or UTIL_Remove.
 
-	g_bReceivedChainedUpdateOnRemove = false;
+	gEntList.SetReceivedChainedUpdateOnRemove(false);
 	oldObj->UpdateOnRemove();
-	Assert( g_bReceivedChainedUpdateOnRemove );
+	Assert( gEntList.IsReceivedChainedUpdateOnRemove() );
 
 	// Entities shouldn't reference other entities in their destructors
 	//  that type of code should only occur in an UpdateOnRemove call
-	g_bDisableEhandleAccess = true;
+	gEntList.SetDisableEhandleAccess(true);
 	DestroyEntity(oldObj);
-	g_bDisableEhandleAccess = false;
+	gEntList.SetDisableEhandleAccess(false);
 
 #ifdef PORTAL
 	if (bNetworkable && nEntIndex != -1) {
@@ -1818,7 +1814,7 @@ int DispatchSpawn( CBaseEntity *pEntity )
 				// Already dead? delete
 				if (engine->GlobalEntity_GetState(globalIndex) == GLOBAL_DEAD )
 				{
-					pEntity->Remove();
+					pEntity->Release();
 					return -1;
 				}
 				else if ( !FStrEq(STRING(gpGlobals->mapname), engine->GlobalEntity_GetMap(globalIndex)) )

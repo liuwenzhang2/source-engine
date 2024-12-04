@@ -261,9 +261,9 @@ void C_ReplayCamera::CalcChaseCamView( Vector& eyeOrigin, QAngle& eyeAngles, flo
 
 	// clip against walls
   	trace_t trace;
-	C_EngineObjectInternal::PushEnableAbsRecomputations( false ); // HACK don't recompute positions while doing RayTrace
+	ClientEntityList().PushEnableAbsRecomputations( false ); // HACK don't recompute positions while doing RayTrace
 	UTIL_TraceHull( targetOrigin1, cameraOrigin, WALL_MIN, WALL_MAX, MASK_SOLID, target1, COLLISION_GROUP_NONE, &trace );
-	C_EngineObjectInternal::PopEnableAbsRecomputations();
+	ClientEntityList().PopEnableAbsRecomputations();
 
   	float dist = VectorLength( trace.endpos -  targetOrigin1 );
 

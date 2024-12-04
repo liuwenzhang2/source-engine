@@ -52,7 +52,6 @@ enum
 
 extern IVEngineServer* engine;
 //extern CUtlVector<IServerNetworkable*> g_DeleteList;
-extern bool g_fInCleanupDelete;
 extern void PhysOnCleanupDeleteList();
 extern CServerGameDLL g_ServerGameDLL;
 extern bool TestEntityTriggerIntersection_Accurate(IEngineObjectServer* pTrigger, IEngineObjectServer* pEntity);
@@ -224,20 +223,6 @@ public:
 		ClearRagdoll();
 		VPhysicsDestroyObject();
 		delete m_pIk;
-	}
-
-	static bool s_bAbsQueriesValid;
-
-	// Call this when hierarchy is not completely set up (such as during Restore) to throw asserts
-	// when people call GetAbsAnything. 
-	static inline void SetAbsQueriesValid(bool bValid)
-	{
-		s_bAbsQueriesValid = bValid;
-	}
-
-	static inline bool IsAbsQueriesValid()
-	{
-		return s_bAbsQueriesValid;
 	}
 
 	void Init(CBaseEntity* pOuter) {
@@ -2249,8 +2234,8 @@ public:
 	int AllocateFreeSlot(bool bNetworkable = true, int index = -1);
 	CBaseEntity* CreateEntityByName(const char* className, int iForceEdictIndex = -1, int iSerialNum = -1);
 	void				DestroyEntity(IHandleEntity* pEntity);
-	IEngineObjectServer*		GetEngineObject(int entnum);
-	IServerNetworkable* GetServerNetworkable( CBaseHandle hEnt ) const;
+	IEngineObjectServer* GetEngineObject(int entnum);
+	IServerNetworkable* GetServerNetworkable(CBaseHandle hEnt) const;
 	IServerNetworkable* GetServerNetworkable(int entnum) const;
 	IServerNetworkable* GetServerNetworkableFromHandle(CBaseHandle hEnt) const;
 	IServerUnknown* GetServerUnknownFromHandle(CBaseHandle hEnt) const;
@@ -2258,76 +2243,76 @@ public:
 	IServerEntity* GetServerEntityFromHandle(CBaseHandle hEnt) const;
 	short		GetNetworkSerialNumber(int iEntity) const;
 	//CBaseNetworkable* GetBaseNetworkable( CBaseHandle hEnt ) const;
-	CBaseEntity* GetBaseEntity( CBaseHandle hEnt ) const;
+	CBaseEntity* GetBaseEntity(CBaseHandle hEnt) const;
 	CBaseEntity* GetBaseEntity(int entnum) const;
 	//edict_t* GetEdict( CBaseHandle hEnt ) const;
-	
-	int NumberOfEntities( void );
-	int NumberOfEdicts( void );
+
+	int NumberOfEntities(void);
+	int NumberOfEdicts(void);
 	int NumberOfReservedEdicts(void);
-	int IndexOfHighestEdict( void );
+	int IndexOfHighestEdict(void);
 
 	// mark an entity as deleted
-	void AddToDeleteList( T *ent );
+	void AddToDeleteList(T* ent);
 	// call this before and after each frame to delete all of the marked entities.
-	void CleanupDeleteList( void );
-	int ResetDeleteList( void );
+	void CleanupDeleteList(void);
+	int ResetDeleteList(void);
 
 	// frees all entities in the game
-	void Clear( void );
+	void Clear(void);
 
 	// Returns true while in the Clear() call.
-	bool	IsClearingEntities()	{return m_bClearingEntities;}
+	bool	IsClearingEntities() { return m_bClearingEntities; }
 
-	void ReportEntityFlagsChanged( CBaseEntity *pEntity, unsigned int flagsOld, unsigned int flagsNow );
-	
+	void ReportEntityFlagsChanged(CBaseEntity* pEntity, unsigned int flagsOld, unsigned int flagsNow);
+
 	// iteration functions
 
 	// returns the next entity after pCurrentEnt;  if pCurrentEnt is NULL, return the first entity
-	CBaseEntity *NextEnt( CBaseEntity *pCurrentEnt );
-	CBaseEntity *FirstEnt() { return NextEnt(NULL); }
+	CBaseEntity* NextEnt(CBaseEntity* pCurrentEnt);
+	CBaseEntity* FirstEnt() { return NextEnt(NULL); }
 
 	// returns the next entity of the specified class, using RTTI
 	template< class U >
-	U *NextEntByClass( U *start )
+	U* NextEntByClass(U* start)
 	{
-		for ( CBaseEntity *x = NextEnt( start ); x; x = NextEnt( x ) )
+		for (CBaseEntity* x = NextEnt(start); x; x = NextEnt(x))
 		{
-			start = dynamic_cast<U*>( x );
-			if ( start )
+			start = dynamic_cast<U*>(x);
+			if (start)
 				return start;
 		}
 		return NULL;
 	}
 
 	// search functions
-	bool		 IsEntityPtr( void *pTest );
-	CBaseEntity *FindEntityByClassname( CBaseEntity *pStartEntity, const char *szName );
-	CBaseEntity *FindEntityByName( CBaseEntity *pStartEntity, const char *szName, CBaseEntity *pSearchingEntity = NULL, CBaseEntity *pActivator = NULL, CBaseEntity *pCaller = NULL, IEntityFindFilter *pFilter = NULL );
-	CBaseEntity *FindEntityByName( CBaseEntity *pStartEntity, string_t iszName, CBaseEntity *pSearchingEntity = NULL, CBaseEntity *pActivator = NULL, CBaseEntity *pCaller = NULL, IEntityFindFilter *pFilter = NULL )
+	bool		 IsEntityPtr(void* pTest);
+	CBaseEntity* FindEntityByClassname(CBaseEntity* pStartEntity, const char* szName);
+	CBaseEntity* FindEntityByName(CBaseEntity* pStartEntity, const char* szName, CBaseEntity* pSearchingEntity = NULL, CBaseEntity* pActivator = NULL, CBaseEntity* pCaller = NULL, IEntityFindFilter* pFilter = NULL);
+	CBaseEntity* FindEntityByName(CBaseEntity* pStartEntity, string_t iszName, CBaseEntity* pSearchingEntity = NULL, CBaseEntity* pActivator = NULL, CBaseEntity* pCaller = NULL, IEntityFindFilter* pFilter = NULL)
 	{
-		return FindEntityByName( pStartEntity, STRING(iszName), pSearchingEntity, pActivator, pCaller, pFilter );
+		return FindEntityByName(pStartEntity, STRING(iszName), pSearchingEntity, pActivator, pCaller, pFilter);
 	}
-	CBaseEntity *FindEntityInSphere( CBaseEntity *pStartEntity, const Vector &vecCenter, float flRadius );
-	CBaseEntity *FindEntityByTarget( CBaseEntity *pStartEntity, const char *szName );
-	CBaseEntity *FindEntityByModel( CBaseEntity *pStartEntity, const char *szModelName );
+	CBaseEntity* FindEntityInSphere(CBaseEntity* pStartEntity, const Vector& vecCenter, float flRadius);
+	CBaseEntity* FindEntityByTarget(CBaseEntity* pStartEntity, const char* szName);
+	CBaseEntity* FindEntityByModel(CBaseEntity* pStartEntity, const char* szModelName);
 
-	CBaseEntity *FindEntityByNameNearest( const char *szName, const Vector &vecSrc, float flRadius, CBaseEntity *pSearchingEntity = NULL, CBaseEntity *pActivator = NULL, CBaseEntity *pCaller = NULL );
-	CBaseEntity *FindEntityByNameWithin( CBaseEntity *pStartEntity, const char *szName, const Vector &vecSrc, float flRadius, CBaseEntity *pSearchingEntity = NULL, CBaseEntity *pActivator = NULL, CBaseEntity *pCaller = NULL );
-	CBaseEntity *FindEntityByClassnameNearest( const char *szName, const Vector &vecSrc, float flRadius );
-	CBaseEntity *FindEntityByClassnameWithin( CBaseEntity *pStartEntity , const char *szName, const Vector &vecSrc, float flRadius );
-	CBaseEntity *FindEntityByClassnameWithin( CBaseEntity *pStartEntity , const char *szName, const Vector &vecMins, const Vector &vecMaxs );
+	CBaseEntity* FindEntityByNameNearest(const char* szName, const Vector& vecSrc, float flRadius, CBaseEntity* pSearchingEntity = NULL, CBaseEntity* pActivator = NULL, CBaseEntity* pCaller = NULL);
+	CBaseEntity* FindEntityByNameWithin(CBaseEntity* pStartEntity, const char* szName, const Vector& vecSrc, float flRadius, CBaseEntity* pSearchingEntity = NULL, CBaseEntity* pActivator = NULL, CBaseEntity* pCaller = NULL);
+	CBaseEntity* FindEntityByClassnameNearest(const char* szName, const Vector& vecSrc, float flRadius);
+	CBaseEntity* FindEntityByClassnameWithin(CBaseEntity* pStartEntity, const char* szName, const Vector& vecSrc, float flRadius);
+	CBaseEntity* FindEntityByClassnameWithin(CBaseEntity* pStartEntity, const char* szName, const Vector& vecMins, const Vector& vecMaxs);
 
-	CBaseEntity *FindEntityGeneric( CBaseEntity *pStartEntity, const char *szName, CBaseEntity *pSearchingEntity = NULL, CBaseEntity *pActivator = NULL, CBaseEntity *pCaller = NULL );
-	CBaseEntity *FindEntityGenericWithin( CBaseEntity *pStartEntity, const char *szName, const Vector &vecSrc, float flRadius, CBaseEntity *pSearchingEntity = NULL, CBaseEntity *pActivator = NULL, CBaseEntity *pCaller = NULL );
-	CBaseEntity *FindEntityGenericNearest( const char *szName, const Vector &vecSrc, float flRadius, CBaseEntity *pSearchingEntity = NULL, CBaseEntity *pActivator = NULL, CBaseEntity *pCaller = NULL );
-	
-	CBaseEntity *FindEntityNearestFacing( const Vector &origin, const Vector &facing, float threshold);
-	CBaseEntity *FindEntityClassNearestFacing( const Vector &origin, const Vector &facing, float threshold, char *classname);
-	CBaseEntity *FindEntityByNetname( CBaseEntity *pStartEntity, const char *szModelName );
+	CBaseEntity* FindEntityGeneric(CBaseEntity* pStartEntity, const char* szName, CBaseEntity* pSearchingEntity = NULL, CBaseEntity* pActivator = NULL, CBaseEntity* pCaller = NULL);
+	CBaseEntity* FindEntityGenericWithin(CBaseEntity* pStartEntity, const char* szName, const Vector& vecSrc, float flRadius, CBaseEntity* pSearchingEntity = NULL, CBaseEntity* pActivator = NULL, CBaseEntity* pCaller = NULL);
+	CBaseEntity* FindEntityGenericNearest(const char* szName, const Vector& vecSrc, float flRadius, CBaseEntity* pSearchingEntity = NULL, CBaseEntity* pActivator = NULL, CBaseEntity* pCaller = NULL);
 
-	CBaseEntity *FindEntityProcedural( const char *szName, CBaseEntity *pSearchingEntity = NULL, CBaseEntity *pActivator = NULL, CBaseEntity *pCaller = NULL );
-	
+	CBaseEntity* FindEntityNearestFacing(const Vector& origin, const Vector& facing, float threshold);
+	CBaseEntity* FindEntityClassNearestFacing(const Vector& origin, const Vector& facing, float threshold, char* classname);
+	CBaseEntity* FindEntityByNetname(CBaseEntity* pStartEntity, const char* szModelName);
+
+	CBaseEntity* FindEntityProcedural(const char* szName, CBaseEntity* pSearchingEntity = NULL, CBaseEntity* pActivator = NULL, CBaseEntity* pCaller = NULL);
+
 	CGlobalEntityList();
 
 	void AddDataAccessor(int type, IEntityDataInstantiator<T>* instantiator);
@@ -2338,8 +2323,22 @@ public:
 	IEntitySaveUtils* GetEntitySaveUtils() { return &m_EntitySaveUtils; }
 	T* FindLandmark(const char* pLandmarkName);
 	int InTransitionVolume(T* pEntity, const char* pVolumeName);
-	bool IsEntityInTransition(T* pEntity,const char* pLandmarkName);
+	bool IsEntityInTransition(T* pEntity, const char* pLandmarkName);
 	void OnChangeLevel(const char* pNewMapName, const char* pNewLandmarkName);
+
+	// Call this when hierarchy is not completely set up (such as during Restore) to throw asserts
+// when people call GetAbsAnything. 
+	void SetAbsQueriesValid(bool bValid) { m_bAbsQueriesValid = bValid; }
+	bool IsAbsQueriesValid() { return m_bAbsQueriesValid; }
+	bool IsAccurateTriggerBboxChecks() { return m_bAccurateTriggerBboxChecks; }
+	void SetAccurateTriggerBboxChecks(bool bAccurateTriggerBboxChecks) { m_bAccurateTriggerBboxChecks = bAccurateTriggerBboxChecks; }
+	bool IsDisableTouchFuncs() { return m_bDisableTouchFuncs; }
+	void SetDisableTouchFuncs(bool bDisableTouchFuncs) { m_bDisableTouchFuncs = bDisableTouchFuncs; }
+	bool IsDisableEhandleAccess() { return m_bDisableEhandleAccess; }
+	void SetDisableEhandleAccess(bool bDisableEhandleAccess) { m_bDisableEhandleAccess = bDisableEhandleAccess; }
+	bool IsReceivedChainedUpdateOnRemove() { return m_bReceivedChainedUpdateOnRemove; }
+	void SetReceivedChainedUpdateOnRemove(bool bReceivedChainedUpdateOnRemove) { m_bReceivedChainedUpdateOnRemove = bReceivedChainedUpdateOnRemove; }
+
 protected:
 	virtual void AfterCreated(IHandleEntity* pEntity);
 	virtual void BeforeDestroy(IHandleEntity* pEntity);
@@ -2377,10 +2376,6 @@ protected:
 	// Figures out save flags for the entity
 	int ComputeEntitySaveFlags(T* pEntity);
 
-public:
-	static bool				sm_bAccurateTriggerBboxChecks;	// SOLID_BBOX entities do a fully accurate trigger vs bbox check when this is set
-public:
-	static bool				sm_bDisableTouchFuncs;	// Disables PhysicsTouch and PhysicsStartTouch function calls
 private:
 	int m_iHighestEnt; // the topmost used array index
 	int m_iNumEnts;
@@ -2389,6 +2384,11 @@ private:
 	int m_iNumReservedEdicts;
 
 	bool m_bClearingEntities;
+	// removes the entity from the global list
+// only called from with the CBaseEntity destructor
+	bool m_bDisableEhandleAccess = false;
+	bool m_bReceivedChainedUpdateOnRemove = false;
+	bool m_fInCleanupDelete;
 	CUtlVector<T*> m_DeleteList;
 	CEngineObjectInternal* m_EngineObjectArray[NUM_ENT_ENTRIES];
 
@@ -2399,7 +2399,11 @@ private:
 	char st_szNextSpot[cchMapNameMost];
 
 	// Used to show debug for only the transition volume we're currently in
-	int g_iDebuggingTransition = 0;
+	int m_iDebuggingTransition = 0;
+	// When this is false, throw an assert in debug when GetAbsAnything is called. Used when hierachy is incomplete/invalid.
+	bool m_bAbsQueriesValid = true;
+	bool m_bAccurateTriggerBboxChecks = true;	// SOLID_BBOX entities do a fully accurate trigger vs bbox check when this is set // set to false for legacy behavior in ep1
+	bool m_bDisableTouchFuncs = false;	// Disables PhysicsTouch and PhysicsStartTouch function calls
 };
 
 extern CGlobalEntityList<CBaseEntity> gEntList;
@@ -3149,7 +3153,7 @@ bool CGlobalEntityList<T>::IsEntityInTransition(T* pEntity, const char* pLandmar
 template<class T>
 int CGlobalEntityList<T>::ComputeEntitySaveFlags(T* pEntity)
 {
-	if (g_iDebuggingTransition == DEBUG_TRANSITIONS_VERBOSE)
+	if (m_iDebuggingTransition == DEBUG_TRANSITIONS_VERBOSE)
 	{
 		Msg("Trying %s (%s): ", pEntity->GetClassname(), pEntity->GetDebugName());
 	}
@@ -3157,7 +3161,7 @@ int CGlobalEntityList<T>::ComputeEntitySaveFlags(T* pEntity)
 	int caps = pEntity->ObjectCaps();
 	if (caps & FCAP_DONT_SAVE)
 	{
-		if (g_iDebuggingTransition == DEBUG_TRANSITIONS_VERBOSE)
+		if (m_iDebuggingTransition == DEBUG_TRANSITIONS_VERBOSE)
 		{
 			Msg("IGNORED due to being marked \"Don't save\".\n");
 		}
@@ -3175,7 +3179,7 @@ int CGlobalEntityList<T>::ComputeEntitySaveFlags(T* pEntity)
 		flags |= FENTTABLE_GLOBAL;
 	}
 
-	if (g_iDebuggingTransition == DEBUG_TRANSITIONS_VERBOSE && !flags)
+	if (m_iDebuggingTransition == DEBUG_TRANSITIONS_VERBOSE && !flags)
 	{
 		Msg("IGNORED, no across_transition flag & no globalname\n");
 	}
@@ -3194,9 +3198,9 @@ int CGlobalEntityList<T>::AddEntityToTransitionList(T* pEntity, int flags, int n
 	++nCount;
 
 	// If we're debugging, make it visible
-	if (g_iDebuggingTransition)
+	if (m_iDebuggingTransition)
 	{
-		if (g_iDebuggingTransition == DEBUG_TRANSITIONS_VERBOSE)
+		if (m_iDebuggingTransition == DEBUG_TRANSITIONS_VERBOSE)
 		{
 			// In verbose mode we've already printed out what the entity is
 			Msg("ADDED.\n");
@@ -3227,14 +3231,14 @@ int CGlobalEntityList<T>::BuildEntityTransitionList(T* pLandmarkEntity, const ch
 	// Only show debug for the transition to the level we're going to
 	if (g_debug_transitions.GetInt() && pLandmarkEntity->NameMatches(st_szNextSpot))
 	{
-		g_iDebuggingTransition = g_debug_transitions.GetInt();
+		m_iDebuggingTransition = g_debug_transitions.GetInt();
 
 		// Show us where the landmark entity is
 		pLandmarkEntity->m_debugOverlays |= (OVERLAY_PIVOT_BIT | OVERLAY_BBOX_BIT | OVERLAY_NAME_BIT);
 	}
 	else
 	{
-		g_iDebuggingTransition = 0;
+		m_iDebuggingTransition = 0;
 	}
 
 	// Follow the linked list of entities in the PVS of the transition landmark
@@ -3248,7 +3252,7 @@ int CGlobalEntityList<T>::BuildEntityTransitionList(T* pLandmarkEntity, const ch
 		// Check to make sure the entity isn't screened out by a trigger_transition
 		if (!InTransitionVolume(pEntity, pLandmarkName))
 		{
-			if (g_iDebuggingTransition == DEBUG_TRANSITIONS_VERBOSE)
+			if (m_iDebuggingTransition == DEBUG_TRANSITIONS_VERBOSE)
 			{
 				Msg("IGNORED, outside transition volume.\n");
 			}
@@ -3304,7 +3308,7 @@ int CGlobalEntityList<T>::BuildLandmarkList(levellist_t* pLevelList, int maxList
 template<class T>
 void CGlobalEntityList<T>::OnChangeLevel(const char* pNewMapName, const char* pNewLandmarkName) 
 {
-	g_iDebuggingTransition = 0;
+	m_iDebuggingTransition = 0;
 	st_szNextSpot[0] = 0;	// Init landmark to NULL
 	Q_strncpy(st_szNextSpot, pNewLandmarkName, sizeof(st_szNextSpot));
 	// This object will get removed in the call to engine->ChangeLevel, copy the params into "safe" memory
@@ -3635,24 +3639,23 @@ void CGlobalEntityList<T>::AddToDeleteList(T* ent)
 	}
 }
 
-extern bool g_bDisableEhandleAccess;
 // call this before and after each frame to delete all of the marked entities.
 template<class T>
 void CGlobalEntityList<T>::CleanupDeleteList(void)
 {
 	VPROF("CGlobalEntityList::CleanupDeleteList");
-	g_fInCleanupDelete = true;
+	m_fInCleanupDelete = true;
 	// clean up the vphysics delete list as well
 	PhysOnCleanupDeleteList();
-	g_bDisableEhandleAccess = true;
+	m_bDisableEhandleAccess = true;
 	for (int i = 0; i < m_DeleteList.Count(); i++)
 	{
 		DestroyEntity(m_DeleteList[i]);// ->Release();
 	}
-	g_bDisableEhandleAccess = false;
+	m_bDisableEhandleAccess = false;
 	m_DeleteList.RemoveAll();
 	
-	g_fInCleanupDelete = false;
+	m_fInCleanupDelete = false;
 }
 
 template<class T>
@@ -4468,7 +4471,7 @@ template<class T>
 void CGlobalEntityList<T>::OnRemoveEntity(T* pEnt, CBaseHandle handle)
 {
 #ifdef DEBUG
-	if (!g_fInCleanupDelete)
+	if (!m_fInCleanupDelete)
 	{
 		int i;
 		for (i = 0; i < m_DeleteList.Count(); i++)

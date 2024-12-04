@@ -1216,7 +1216,7 @@ void CPrediction::RestoreOriginalEntityState( void )
 	VPROF( "CPrediction::RestoreOriginalEntityState" );
 	PREDICTION_TRACKVALUECHANGESCOPE( "restore" );
 
-	Assert(C_EngineObjectInternal::IsAbsRecomputationsEnabled() );
+	Assert(ClientEntityList().IsAbsRecomputationsEnabled() );
 
 	// Transfer intermediate data from other predictables
 	int pc = predictables->GetPredictableCount();
@@ -1589,8 +1589,8 @@ bool CPrediction::PerformPrediction( bool received_new_world_update, C_BasePlaye
 	VPROF( "CPrediction::PerformPrediction" );
 
 	// This makes sure , tahe we are allwoed to sample the world when it may not be ready to be sampled
-	Assert(C_EngineObjectInternal::IsAbsQueriesValid() );
-	Assert(C_EngineObjectInternal::IsAbsRecomputationsEnabled() );
+	Assert(ClientEntityList().IsAbsQueriesValid() );
+	Assert(ClientEntityList().IsAbsRecomputationsEnabled() );
 
 	m_bInPrediction = true;
 
@@ -1805,7 +1805,7 @@ void CPrediction::_Update( bool received_new_world_update, bool validframe,
 	localPlayer->GetEngineObject()->SetLocalAngles( viewangles );
 
 	// This allows us to sample the world when it may not be ready to be sampled
-	Assert( C_EngineObjectInternal::IsAbsQueriesValid() );
+	Assert(ClientEntityList().IsAbsQueriesValid() );
 	
 	// FIXME: What about hierarchy here?!?
 	SetIdealPitch( localPlayer, localPlayer->GetEngineObject()->GetLocalOrigin(), localPlayer->GetEngineObject()->GetLocalAngles(), localPlayer->m_vecViewOffset );

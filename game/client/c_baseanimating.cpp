@@ -523,29 +523,6 @@ void C_ClientRagdoll::SetupWeights( const matrix3x4_t *pBoneToWorld, int nFlexWe
 	}
 }
 
-void C_ClientRagdoll::Release( void )
-{
-	C_BaseEntity *pChild = GetEffectEntity();
-
-	if ( pChild && pChild->GetEngineObject()->IsMarkedForDeletion() == false )
-	{
-		DestroyEntity(pChild);// ->Release();
-	}
-
-	if ( GetThinkHandle() != INVALID_THINK_HANDLE )
-	{
-		ClientThinkList()->RemoveThinkable( GetClientHandle() );
-	}
-	//ClientEntityList().RemoveEntity( this );
-
-	partition->Remove( PARTITION_CLIENT_SOLID_EDICTS | PARTITION_CLIENT_RESPONSIVE_EDICTS | PARTITION_CLIENT_NON_STATIC_EDICTS, GetEngineObject()->GetPartitionHandle() );
-	GetEngineObject()->RemoveFromLeafSystem();
-
-	BaseClass::Release();
-}
-
-
-
 //class C_BaseAnimatingGameSystem : public CAutoGameSystem
 //{
 //	void LevelShutdownPostEntity()
@@ -582,8 +559,24 @@ bool C_BaseAnimating::Init(int entnum, int iSerialNum) {
 
 void C_BaseAnimating::UpdateOnRemove(void)
 {
-	BaseClass::UpdateOnRemove();
+	C_BaseEntity* pChild = GetEffectEntity();
+
+	if (pChild && pChild->GetEngineObject()->IsMarkedForDeletion() == false)
+	{
+		DestroyEntity(pChild);// ->Release();
+	}
+
+	if (GetThinkHandle() != INVALID_THINK_HANDLE)
+	{
+		ClientThinkList()->RemoveThinkable(GetClientHandle());
+	}
+	//ClientEntityList().RemoveEntity( this );
+
+	partition->Remove(PARTITION_CLIENT_SOLID_EDICTS | PARTITION_CLIENT_RESPONSIVE_EDICTS | PARTITION_CLIENT_NON_STATIC_EDICTS, GetEngineObject()->GetPartitionHandle());
+	GetEngineObject()->RemoveFromLeafSystem();
 	RemoveFromClientSideAnimationList();
+
+	BaseClass::UpdateOnRemove();
 }
 //-----------------------------------------------------------------------------
 // Purpose: cleanup
@@ -1363,7 +1356,7 @@ void C_BaseAnimating::CalculateIKLocks( float currentTime )
 	// partition that early in the rendering loop. So we allow access right here for that special case.
 	SpatialPartitionListMask_t curSuppressed = partition->GetSuppressedLists();
 	partition->SuppressLists( PARTITION_ALL_CLIENT_EDICTS, false );
-	C_EngineObjectInternal::PushEnableAbsRecomputations( false );
+	ClientEntityList().PushEnableAbsRecomputations( false );
 
 	Ray_t ray;
 	CTraceFilterSkipNPCsAndPlayers traceFilter( this, GetEngineObject()->GetCollisionGroup() );
@@ -1581,7 +1574,7 @@ void C_BaseAnimating::CalculateIKLocks( float currentTime )
 	}
 #endif
 
-	C_EngineObjectInternal::PopEnableAbsRecomputations();
+	ClientEntityList().PopEnableAbsRecomputations();
 	partition->SuppressLists( curSuppressed, true );
 }
 
@@ -3642,11 +3635,6 @@ int C_BaseAnimating::LookupSequence( const char *label )
 {
 	Assert(GetEngineObject()->GetModelPtr() );
 	return GetEngineObject()->GetModelPtr()->LookupSequence( label, SharedRandomSelect);
-}
-
-void C_BaseAnimating::Release()
-{
-	BaseClass::Release();
 }
 
 void C_BaseAnimating::Clear( void )

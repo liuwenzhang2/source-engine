@@ -697,7 +697,7 @@ void CProp_Portal::RemovePortalMicAndSpeaker()
 					CEnvMicrophone* pRemotePortalMic = dynamic_cast<CEnvMicrophone*>(pRemotePortal->m_hMicrophone.Get());
 					if ( pRemotePortalMic )
 					{
-						pRemotePortalMic->Remove();
+						pRemotePortalMic->Release();
 					}
 				}
 			}

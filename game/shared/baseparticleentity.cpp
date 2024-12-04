@@ -74,7 +74,7 @@ void CBaseParticleEntity::Activate()
 
 void CBaseParticleEntity::Think()
 {
-	Remove( );
+	Release( );
 }
 
 

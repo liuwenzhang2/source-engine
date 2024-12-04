@@ -39,10 +39,11 @@ public:
 		return SimpleSplineRemapVal( ( dt / m_flScaleTime ), 0.0f, 1.0f, m_flStartRadius, m_flRadius );
 	}
 
-	virtual void Release( void )
+	virtual void UpdateOnRemove( void )
 	{
 		// Remove us from the list of targets
 		RemoveFleshProxy( this );
+		BaseClass::UpdateOnRemove();
 	}
 
 	virtual void OnDataChanged( DataUpdateType_t updateType )

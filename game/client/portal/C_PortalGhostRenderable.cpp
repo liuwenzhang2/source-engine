@@ -39,6 +39,7 @@ void C_PortalGhostRenderable::Init(C_Prop_Portal* pOwningPortal, C_BaseEntity* p
 void C_PortalGhostRenderable::UpdateOnRemove(void)
 {
 	GetEngineGhost()->SetGhostedSource(NULL);
+	BaseClass::UpdateOnRemove();
 }
 
 void C_PortalGhostRenderable::PerFrameUpdate( void )

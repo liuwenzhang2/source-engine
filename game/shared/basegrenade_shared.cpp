@@ -341,7 +341,7 @@ void CBaseGrenade::DangerSoundThink( void )
 {
 	if (!IsInWorld())
 	{
-		Remove( );
+		Release( );
 		return;
 	}
 
@@ -463,7 +463,7 @@ void CBaseGrenade ::TumbleThink( void )
 {
 	if (!IsInWorld())
 	{
-		Remove( );
+		Release( );
 		return;
 	}
 
