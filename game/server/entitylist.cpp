@@ -1293,7 +1293,6 @@ int CEngineObjectInternal::Restore(IRestore& restore)
 	RemoveEFlags(EFL_DIRTY_SPATIAL_PARTITION);
 	MarkSurroundingBoundsDirty();
 
-	m_pModel = modelinfo->GetModel(GetModelIndex());
 	if (m_pOuter->IsNetworkable() && entindex() != -1 && GetModelIndex() != 0 && GetModelName() != NULL_STRING && restore.GetPrecacheMode())
 	{
 		engine->PrecacheModel(STRING(GetModelName()));
@@ -3065,7 +3064,7 @@ void CEngineObjectInternal::SetModelIndex(int index)
 	//	index = -1;
 	//}
 		// delete exiting studio model container
-	if (index != m_nModelIndex)
+	if (!m_pModel || index != m_nModelIndex)
 	{
 		/*if ( m_bDynamicModelPending )
 		{
