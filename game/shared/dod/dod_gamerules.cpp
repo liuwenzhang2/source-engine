@@ -1091,7 +1091,7 @@ static CDODViewVectors g_DODViewVectors(
 
 #ifdef _DEBUG
 		// verify that these bone indeces don't change
-		int checkBoneIndex = player->LookupBone( "ValveBiped.Bip01_R_Hand" );
+		int checkBoneIndex = player->GetEngineObject()->LookupBone( "ValveBiped.Bip01_R_Hand" );
 		Assert( checkBoneIndex == iRHandIndex );
 #endif
 		

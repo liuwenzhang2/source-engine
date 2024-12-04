@@ -1598,7 +1598,7 @@ void C_Portal_Player::CalcPortalView( Vector &eyeOrigin, QAngle &eyeAngles )
 			MatrixInvert( matThisToLinked.As3x4(), state.m_teleportMatrix );
 
 			// Post a message back to all IToolSystems
-			Assert( (int)GetToolHandle() != 0 );
+			Assert( (int)GetEngineObject()->GetToolHandle() != 0 );
 			ToolFramework_PostToolMessage(GetEngineObject()->GetToolHandle(), msg );
 
 			msg->deleteThis();

@@ -75,8 +75,8 @@ BEGIN_DATADESC( CBaseHelicopter )
 	DEFINE_THINKFUNC( RotorWashThink ),
 	DEFINE_THINKFUNC( CallDyingThink ),
 	DEFINE_THINKFUNC( DelayedKillThink ),
-	DEFINE_ENTITYFUNC( CrashTouch ),
-	DEFINE_ENTITYFUNC( FlyTouch ),
+	DEFINE_TOUCHFUNC( CrashTouch ),
+	DEFINE_TOUCHFUNC( FlyTouch ),
 
 	DEFINE_SOUNDPATCH( m_pRotorSound ),
 	DEFINE_SOUNDPATCH( m_pRotorBlast ),

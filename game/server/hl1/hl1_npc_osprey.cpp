@@ -168,7 +168,7 @@ BEGIN_DATADESC( CNPC_Osprey )
 	DEFINE_THINKFUNC( FindAllThink ),
 	DEFINE_THINKFUNC( DeployThink ),
 
-	DEFINE_ENTITYFUNC( CrashTouch ),
+	DEFINE_TOUCHFUNC( CrashTouch ),
 	
 /*	DEFINE_FUNCTION ( HoverThink ),
 	DEFINE_FUNCTION ( DyingThink ),
@@ -652,8 +652,8 @@ BEGIN_DATADESC( CBaseHelicopter )
 
 	DEFINE_THINKFUNC( HelicopterThink ),
 	DEFINE_THINKFUNC( CallDyingThink ),
-	DEFINE_ENTITYFUNC( CrashTouch ),
-	DEFINE_ENTITYFUNC( FlyTouch ),
+	DEFINE_TOUCHFUNC( CrashTouch ),
+	DEFINE_TOUCHFUNC( FlyTouch ),
 
 	DEFINE_SOUNDPATCH( m_pRotorSound ),
 

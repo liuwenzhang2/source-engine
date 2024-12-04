@@ -3101,8 +3101,8 @@ BEGIN_DATADESC( CVortigauntChargeToken )
 	DEFINE_FIELD( m_flLifetime, FIELD_TIME ),
 	DEFINE_FIELD( m_bFadeOut, FIELD_BOOLEAN ),
 	
-	DEFINE_ENTITYFUNC( SeekThink ),
-	DEFINE_ENTITYFUNC( SeekTouch ),
+	DEFINE_THINKFUNC( SeekThink ),
+	DEFINE_TOUCHFUNC( SeekTouch ),
 END_DATADESC()
 
 IMPLEMENT_SERVERCLASS_ST( CVortigauntChargeToken, DT_VortigauntChargeToken )

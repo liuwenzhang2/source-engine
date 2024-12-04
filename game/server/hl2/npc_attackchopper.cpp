@@ -778,7 +778,7 @@ LINK_ENTITY_TO_CLASS( npc_helicopter, CNPC_AttackHelicopter );
 
 BEGIN_DATADESC( CNPC_AttackHelicopter )
 
-	DEFINE_ENTITYFUNC( FlyTouch ),
+	DEFINE_TOUCHFUNC( FlyTouch ),
 
 	DEFINE_EMBEDDED( m_Spotlight ),
 #ifdef HL2_EPISODIC
@@ -5022,7 +5022,7 @@ BEGIN_DATADESC( CGrenadeHelicopter )
 	DEFINE_THINKFUNC( AnimateThink ),
 	DEFINE_THINKFUNC( RampSoundThink ),
 	DEFINE_THINKFUNC( WarningBlinkerThink ),
-	DEFINE_ENTITYFUNC( ExplodeConcussion ),
+	DEFINE_TOUCHFUNC( ExplodeConcussion ),
 
 END_DATADESC()
 

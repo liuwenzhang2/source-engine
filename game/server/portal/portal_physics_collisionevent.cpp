@@ -65,7 +65,7 @@ int CPortal_CollisionEvent::ShouldCollide( IPhysicsObject *pObj0, IPhysicsObject
 			if( (pSimulators[i] != NULL) && CPhysicsShadowClone::IsShadowClone( pEntities[i] ) )
 			{
 				CPhysicsShadowClone *pClone = (CPhysicsShadowClone *)pEntities[i];
-				CBaseEntity *pSource = pClone->GetClonedEntity();
+				CBaseEntity *pSource = pClone->GetEngineShadowClone()->GetClonedEntity();
 
 				CProp_Portal *pSourceSimulator = CProp_Portal::GetSimulatorThatOwnsEntity( pSource );
 				Assert( (pSimulators[i]->m_EntFlags[pClone->entindex()] & PSEF_IS_IN_PORTAL_HOLE) == (pSourceSimulator->m_EntFlags[pSource->entindex()] & PSEF_IS_IN_PORTAL_HOLE) );

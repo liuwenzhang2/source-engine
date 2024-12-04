@@ -3496,7 +3496,7 @@ int __cdecl ThinkRebalanceCompare( const AIRebalanceInfo_t *pLeft, const AIRebal
 
 inline bool CAI_BaseNPC::CanThinkRebalance()
 {
-	if (GetEngineObject()->GetPfnThink() != (BASEPTR)&CAI_BaseNPC::CallNPCThink )
+	if (GetEngineObject()->GetPfnThink() != (THINKPTR)&CAI_BaseNPC::CallNPCThink )
 	{
 		return false;
 	}
@@ -4653,7 +4653,7 @@ void CAI_BaseNPC::GatherConditions( void )
 		bool bForcedGather = m_bForceConditionsGather;
 		m_bForceConditionsGather = false;
 
-		if (GetEngineObject()->GetPfnThink() != (BASEPTR)&CAI_BaseNPC::CallNPCThink )
+		if (GetEngineObject()->GetPfnThink() != (THINKPTR)&CAI_BaseNPC::CallNPCThink )
 		{
 			if ( UTIL_FindClientInPVS( this ) != NULL )
 				SetCondition( COND_IN_PVS );

@@ -439,7 +439,7 @@ BEGIN_DATADESC( CSatchelCharge )
 	DEFINE_FIELD( m_vLastPosition, FIELD_POSITION_VECTOR ),
 
 	// Function Pointers
-	DEFINE_ENTITYFUNC( SatchelTouch ),
+	DEFINE_TOUCHFUNC( SatchelTouch ),
 	DEFINE_THINKFUNC( SatchelThink ),
 	DEFINE_USEFUNC( SatchelUse ),
 END_DATADESC()

@@ -160,7 +160,7 @@ void CPointHurt::InputToggle( inputdata_t &data )
 {
 	m_pActivator = data.pActivator;
 
-	if (GetEngineObject()->GetPfnThink() == (void (CBaseEntity::*)()) & CPointHurt::HurtThink)
+	if (GetEngineObject()->GetPfnThink() == (THINKPTR) & CPointHurt::HurtThink)
 	{
 		SetThink( NULL );
 	}

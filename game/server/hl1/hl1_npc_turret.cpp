@@ -1376,7 +1376,7 @@ private:
 };
 
 BEGIN_DATADESC( CNPC_Sentry )
-	DEFINE_ENTITYFUNC( SentryTouch ),
+	DEFINE_TOUCHFUNC( SentryTouch ),
 	DEFINE_FIELD( m_bStartedDeploy, FIELD_BOOLEAN ),
 END_DATADESC()
 

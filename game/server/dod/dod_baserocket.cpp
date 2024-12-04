@@ -68,7 +68,7 @@ void CDODBaseRocket::Spawn( void )
 
 	GetEngineObject()->SetSolid( SOLID_BBOX );
 
-	Assert( GetModel() );	//derived classes must have set model
+	Assert(GetEngineObject()->GetModel() );	//derived classes must have set model
 
 	UTIL_SetSize( this, -Vector(2,2,2), Vector(2,2,2) );
 

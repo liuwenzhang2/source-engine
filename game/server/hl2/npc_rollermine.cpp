@@ -409,10 +409,10 @@ BEGIN_DATADESC( CNPC_RollerMine )
 	DEFINE_INPUTFUNC( FIELD_VOID, "PowerDown", InputPowerdown ),
 
 	// Function Pointers
-	DEFINE_ENTITYFUNC( SpikeTouch ),
-	DEFINE_ENTITYFUNC( ShockTouch ),
-	DEFINE_ENTITYFUNC( CloseTouch ),
-	DEFINE_ENTITYFUNC( EmbedTouch ),
+	DEFINE_TOUCHFUNC( SpikeTouch ),
+	DEFINE_TOUCHFUNC( ShockTouch ),
+	DEFINE_TOUCHFUNC( CloseTouch ),
+	DEFINE_TOUCHFUNC( EmbedTouch ),
 	DEFINE_THINKFUNC( Explode ),
 	DEFINE_THINKFUNC( PreDetonate ),
 

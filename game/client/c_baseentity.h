@@ -113,7 +113,6 @@ struct serialentity_t;
 
 typedef CHandle<C_BaseEntity> EHANDLE; // The client's version of EHANDLE.
 
-typedef void (C_BaseEntity::*ENTITYFUNCPTR)(C_BaseEntity *pOther );
 
 // For entity creation on the client
 typedef C_BaseEntity* (*DISPATCHFUNCTION)( void );
@@ -894,7 +893,7 @@ public:
 #ifdef _DEBUG
 	void FunctionCheck( void *pFunction, const char *name );
 
-	ENTITYFUNCPTR TouchSet( ENTITYFUNCPTR func, char *name ) 
+	CTOUCHPTR TouchSet(CTOUCHPTR func, char *name )
 	{ 
 		//COMPILE_TIME_ASSERT( sizeof(func) == 4 );
 		m_pfnTouch = func; 
@@ -1307,14 +1306,14 @@ inline bool FClassnameIs( C_BaseEntity *pEntity, const char *szClassname )
 	return !strcmp( pEntity->GetClassname(), szClassname ) ? true : false; 
 }
 
-#define SetThink( a ) GetEngineObject()->ThinkSet( static_cast <void (CBaseEntity::*)(void)> (a), 0, NULL )
-#define SetContextThink( a, b, context ) GetEngineObject()->ThinkSet( static_cast <void (CBaseEntity::*)(void)> (a), (b), context )
+#define SetThink( a ) GetEngineObject()->ThinkSet( (CTHINKPTR)a, 0, NULL )
+#define SetContextThink( a, b, context ) GetEngineObject()->ThinkSet( (CTHINKPTR)a, (b), context )
 
 #ifdef _DEBUG
-#define SetTouch( a ) TouchSet( static_cast <void (C_BaseEntity::*)(C_BaseEntity *)> (a), #a )
+#define SetTouch( a ) TouchSet( (CTOUCHPTR)a, #a )
 
 #else
-#define SetTouch( a ) m_pfnTouch = static_cast <void (C_BaseEntity::*)(C_BaseEntity *)> (a)
+#define SetTouch( a ) m_pfnTouch = (CTOUCHPTR)a
 
 #endif
 

@@ -35,7 +35,7 @@ BEGIN_DATADESC( CGrenadeSpit )
 	DEFINE_FIELD( m_bPlaySound, FIELD_BOOLEAN ),
 
 	// Function pointers
-	DEFINE_ENTITYFUNC( GrenadeSpitTouch ),
+	DEFINE_TOUCHFUNC( GrenadeSpitTouch ),
 
 END_DATADESC()
 

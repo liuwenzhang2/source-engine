@@ -795,7 +795,7 @@ BEGIN_DATADESC( CBreakableProp )
 	DEFINE_THINKFUNC( BreakThink ),
 	DEFINE_THINKFUNC( AnimateThink ),
 	DEFINE_THINKFUNC( RampToDefaultFadeScale ),
-	DEFINE_ENTITYFUNC( BreakablePropTouch ),
+	DEFINE_TOUCHFUNC( BreakablePropTouch ),
 
 	// Physics Influence
 	DEFINE_FIELD( m_hPhysicsAttacker, FIELD_EHANDLE ),
@@ -1005,7 +1005,7 @@ void CBreakableProp::BreakablePropTouch( CBaseEntity *pOther )
 
 		m_hBreaker = pOther;
 
-		if (GetEngineObject()->GetPfnThink() != (void (CBaseEntity::*)())&CBreakableProp::BreakThink )
+		if (GetEngineObject()->GetPfnThink() != (THINKPTR)&CBreakableProp::BreakThink )
 		{
 			SetThink( &CBreakableProp::BreakThink );
 			//SetTouch( NULL );

@@ -23,6 +23,7 @@
 
 
 class IMoveHelper;
+class C_BaseEntity;
 
 //-----------------------------------------------------------------------------
 // Purpose: Engine interface into client side prediction system
@@ -70,7 +71,7 @@ abstract_class IPredictableList
 {
 public:
 	// Get predictables by index
-	virtual CBaseEntity * GetPredictable(int slot) = 0;
+	virtual C_BaseEntity * GetPredictable(int slot) = 0;
 	// Get count of predictables
 	virtual int		GetPredictableCount(void) = 0;
 	virtual void	AddToPredictableList(CBaseHandle add) = 0;

@@ -29,7 +29,7 @@ BEGIN_DATADESC( CItemDefuser )
 
 	//Functions
 	DEFINE_THINKFUNC( ActivateThink ),
-	DEFINE_ENTITYFUNC( DefuserTouch ),
+	DEFINE_TOUCHFUNC( DefuserTouch ),
 
 END_DATADESC()
 

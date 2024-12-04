@@ -38,8 +38,8 @@ BEGIN_DATADESC( CGib )
 //  DEFINE_FIELD( m_bForceRemove, FIELD_BOOLEAN ),
 
 	// Function pointers
-	DEFINE_ENTITYFUNC( BounceGibTouch ),
-	DEFINE_ENTITYFUNC( StickyGibTouch ),
+	DEFINE_TOUCHFUNC( BounceGibTouch ),
+	DEFINE_TOUCHFUNC( StickyGibTouch ),
 	DEFINE_THINKFUNC( WaitTillLand ),
 	DEFINE_THINKFUNC( DieThink ),
 

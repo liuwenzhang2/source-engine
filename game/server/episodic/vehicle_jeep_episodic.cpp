@@ -275,7 +275,7 @@ LINK_ENTITY_TO_CLASS( trigger_vehicle_cargo, CVehicleCargoTrigger );
 BEGIN_DATADESC( CVehicleCargoTrigger )
 	DEFINE_FIELD( m_flIgnoreDuration, FIELD_TIME ),
 	DEFINE_FIELD( m_hIgnoreEntity, FIELD_EHANDLE ),
-	DEFINE_ENTITYFUNC( CargoTouch ),
+	DEFINE_TOUCHFUNC( CargoTouch ),
 END_DATADESC();
 
 //

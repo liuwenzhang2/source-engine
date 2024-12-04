@@ -23,7 +23,7 @@ BEGIN_DATADESC( CGrenadeSpit )
 
 	// Function pointers
 	DEFINE_THINKFUNC( SpitThink ),
-	DEFINE_ENTITYFUNC( GrenadeSpitTouch ),
+	DEFINE_TOUCHFUNC( GrenadeSpitTouch ),
 
 	//DEFINE_FIELD( m_nSquidSpitSprite, FIELD_INTEGER ),
 

@@ -43,9 +43,9 @@ BEGIN_DATADESC( CBaseGrenade )
 
 	// Function Pointers
 	DEFINE_THINKFUNC( Smoke ),
-	DEFINE_ENTITYFUNC( BounceTouch ),
-	DEFINE_ENTITYFUNC( SlideTouch ),
-	DEFINE_ENTITYFUNC( ExplodeTouch ),
+	DEFINE_TOUCHFUNC( BounceTouch ),
+	DEFINE_TOUCHFUNC( SlideTouch ),
+	DEFINE_TOUCHFUNC( ExplodeTouch ),
 	DEFINE_USEFUNC( DetonateUse ),
 	DEFINE_THINKFUNC( DangerSoundThink ),
 	DEFINE_THINKFUNC( PreDetonate ),

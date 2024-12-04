@@ -65,7 +65,7 @@ LINK_ENTITY_TO_CLASS( monster_ichthyosaur, CNPC_Ichthyosaur );
 BEGIN_DATADESC( CNPC_Ichthyosaur )
 
 	// Function Pointers
-	DEFINE_ENTITYFUNC( BiteTouch ),
+	DEFINE_TOUCHFUNC( BiteTouch ),
 
 	DEFINE_FIELD( m_SaveVelocity, FIELD_VECTOR ),
 	DEFINE_FIELD( m_idealDist, FIELD_FLOAT ),

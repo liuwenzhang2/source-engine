@@ -417,7 +417,7 @@ END_SEND_TABLE()
 
 BEGIN_DATADESC( CNPC_CombineGunship )
 
-	DEFINE_ENTITYFUNC( FlyTouch ),
+	DEFINE_TOUCHFUNC( FlyTouch ),
 
 	DEFINE_FIELD( m_flNextGroundAttack,FIELD_TIME ),
 	DEFINE_FIELD( m_bIsGroundAttacking,FIELD_BOOLEAN ),

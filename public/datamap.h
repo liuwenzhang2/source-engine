@@ -16,17 +16,9 @@
 #endif
 
 #include "tier1/utlvector.h"
-
+#include "ihandleentity.h"
 #include "tier0/memdbgon.h"
 
-// SINGLE_INHERITANCE restricts the size of CBaseEntity pointers-to-member-functions to 4 bytes
-#ifdef CBaseEntity
-#undef CBaseEntity
-class SINGLE_INHERITANCE CBaseEntity;
-#define CBaseEntity	C_BaseEntity
-#else
-class SINGLE_INHERITANCE CBaseEntity;
-#endif
 struct inputdata_t;
 
 #define INVALID_TIME (FLT_MAX * -1.0) // Special value not rebased on save/load
@@ -254,13 +246,7 @@ class ISaveRestoreOps;
 //
 // Function prototype for all input handlers.
 //
-#ifdef CBaseEntity
-#undef CBaseEntity
-typedef void (CBaseEntity::*inputfunc_t)(inputdata_t &data);
-#define CBaseEntity	C_BaseEntity
-#else
-typedef void (CBaseEntity::* inputfunc_t)(inputdata_t& data);
-#endif
+typedef void (IHandleEntity::* inputfunc_t)(inputdata_t& data);
 
 class datamap_t;
 class typedescription_t;

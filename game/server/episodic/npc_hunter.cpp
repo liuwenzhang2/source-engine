@@ -381,7 +381,7 @@ BEGIN_DATADESC( CHunterFlechette )
 	DEFINE_THINKFUNC( DopplerThink ),
 	DEFINE_THINKFUNC( SeekThink ),
 	
-	DEFINE_ENTITYFUNC( FlechetteTouch ),
+	DEFINE_TOUCHFUNC( FlechetteTouch ),
 
 	DEFINE_FIELD( m_vecShootPosition, FIELD_POSITION_VECTOR ),
 	DEFINE_FIELD( m_hSeekTarget, FIELD_EHANDLE ),

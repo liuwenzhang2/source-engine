@@ -38,7 +38,7 @@ BEGIN_DATADESC( CGrenadePathfollower )
 	DEFINE_THINKFUNC( AimThink ),
 
 	// Function pointers
-	DEFINE_ENTITYFUNC( GrenadeTouch ),
+	DEFINE_TOUCHFUNC( GrenadeTouch ),
 
 END_DATADESC()
 

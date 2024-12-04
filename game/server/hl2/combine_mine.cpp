@@ -60,7 +60,7 @@ char *pszMineStateNames[] =
 
 BEGIN_DATADESC( CBounceBomb )
 	DEFINE_THINKFUNC( ExplodeThink ),
-	DEFINE_ENTITYFUNC( ExplodeTouch ),
+	DEFINE_TOUCHFUNC( ExplodeTouch ),
 	DEFINE_THINKFUNC( SearchThink ),
 	DEFINE_THINKFUNC( BounceThink ),
 	DEFINE_THINKFUNC( SettleThink ),

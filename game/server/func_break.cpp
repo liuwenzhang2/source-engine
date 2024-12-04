@@ -161,7 +161,7 @@ BEGIN_DATADESC( CBreakable )
 	DEFINE_INPUTFUNC( FIELD_FLOAT, "SetMass", InputSetMass ),
 
 	// Function Pointers
-	DEFINE_ENTITYFUNC( BreakTouch ),
+	DEFINE_TOUCHFUNC( BreakTouch ),
 	DEFINE_THINKFUNC( Die ),
 
 	// Outputs

@@ -563,12 +563,12 @@ public:
 	void SetElasticity(float flElasticity);
 	float GetElasticity(void) const;
 
-	BASEPTR GetPfnThink();
-	void SetPfnThink(BASEPTR pfnThink);
+	THINKPTR GetPfnThink();
+	void SetPfnThink(THINKPTR pfnThink);
 	int GetIndexForThinkContext(const char* pszContext);
 	// Think functions with contexts
 	int RegisterThinkContext(const char* szContext);
-	BASEPTR	ThinkSet(BASEPTR func, float flNextThinkTime = 0, const char* szContext = NULL);
+	THINKPTR ThinkSet(THINKPTR func, float flNextThinkTime = 0, const char* szContext = NULL);
 	void SetNextThink(float nextThinkTime, const char* szContext = NULL);
 	float GetNextThink(const char* szContext = NULL);
 	int GetNextThinkTick(const char* szContext = NULL);
@@ -584,8 +584,8 @@ public:
 	int	GetNextThinkTick(int nContextIndex) const;
 	void CheckHasThinkFunction(bool isThinkingHint = false);
 	bool PhysicsRunThink(thinkmethods_t thinkMethod = THINK_FIRE_ALL_FUNCTIONS);
-	bool PhysicsRunSpecificThink(int nContextIndex, BASEPTR thinkFunc);
-	void PhysicsDispatchThink(BASEPTR thinkFunc);
+	bool PhysicsRunSpecificThink(int nContextIndex, THINKPTR thinkFunc);
+	void PhysicsDispatchThink(THINKPTR thinkFunc);
 	// Move type / move collide
 	MoveType_t GetMoveType() const;
 	MoveCollide_t GetMoveCollide() const;
@@ -907,7 +907,7 @@ private:
 	CNetworkVarForDerived(float, m_flFriction);
 	CNetworkVar(float, m_flElasticity);
 	// Think function handling
-	BASEPTR						m_pfnThink;
+	THINKPTR						m_pfnThink;
 	// was pev->nextthink
 	CNetworkVarForDerived(int, m_nNextThinkTick);
 	int							m_nLastThinkTick;
@@ -1572,11 +1572,11 @@ inline float CEngineObjectInternal::GetElasticity(void)	const
 	return m_flElasticity;
 }
 
-inline BASEPTR CEngineObjectInternal::GetPfnThink()
+inline THINKPTR CEngineObjectInternal::GetPfnThink()
 {
 	return m_pfnThink;
 }
-inline void CEngineObjectInternal::SetPfnThink(BASEPTR pfnThink)
+inline void CEngineObjectInternal::SetPfnThink(THINKPTR pfnThink)
 {
 	m_pfnThink = pfnThink;
 }

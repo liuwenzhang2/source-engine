@@ -35,7 +35,7 @@ LINK_ENTITY_TO_CLASS( npc_concussiongrenade, CBaseGrenadeConcussion );
 BEGIN_DATADESC( CBaseGrenadeConcussion )
 
 	DEFINE_THINKFUNC( FallThink ),
-	DEFINE_ENTITYFUNC( ExplodeConcussion ),
+	DEFINE_TOUCHFUNC( ExplodeConcussion ),
 
 END_DATADESC()
 

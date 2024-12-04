@@ -358,12 +358,12 @@ BEGIN_DATADESC( CFastZombie )
 	DEFINE_FIELD( m_flTimeUpdateSound, FIELD_TIME ),
 
 	// Function Pointers
-	DEFINE_ENTITYFUNC( LeapAttackTouch ),
-	DEFINE_ENTITYFUNC( ClimbTouch ),
+	DEFINE_TOUCHFUNC( LeapAttackTouch ),
+	DEFINE_TOUCHFUNC( ClimbTouch ),
 	DEFINE_SOUNDPATCH( m_pLayer2 ),
 
 #ifdef HL2_EPISODIC
-	DEFINE_ENTITYFUNC( VehicleLeapAttackTouch ),
+	DEFINE_TOUCHFUNC( VehicleLeapAttackTouch ),
 	DEFINE_INPUTFUNC( FIELD_STRING, "AttachToVehicle", InputAttachToVehicle ),
 #endif	// HL2_EPISODIC
 

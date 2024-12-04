@@ -107,7 +107,7 @@ BEGIN_DATADESC( CRpgRocket )
 	//DEFINE_FIELD( m_iTrail,			FIELD_INTEGER ),
 
 	// Function Pointers
-	DEFINE_ENTITYFUNC( RocketTouch ),
+	DEFINE_TOUCHFUNC( RocketTouch ),
 	DEFINE_THINKFUNC( IgniteThink ),
 	DEFINE_THINKFUNC( SeekThink ),
 END_DATADESC()

@@ -1195,7 +1195,7 @@ int C_BaseEntity::DrawBrushModel( bool bDrawingTranslucency, int nFlags, bool bT
 {
 	VPROF_BUDGET( "C_BaseEntity::DrawBrushModel", VPROF_BUDGETGROUP_BRUSHMODEL_RENDERING );
 	// Identity brushes are drawn in view->DrawWorld as an optimization
-	Assert ( modelinfo->GetModelType(GetModel()) == mod_brush );
+	Assert ( modelinfo->GetModelType(GetEngineObject()->GetModel()) == mod_brush );
 
 	ERenderDepthMode DepthMode = DEPTH_MODE_NORMAL;
 	if ( ( nFlags & STUDIO_SSAODEPTHTEXTURE ) != 0 )

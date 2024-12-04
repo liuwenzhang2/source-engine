@@ -684,13 +684,13 @@ public:
 	void SetFriction(float flFriction);
 	float GetElasticity(void) const;
 
-	CBASEPTR GetPfnThink();
-	void SetPfnThink(CBASEPTR pfnThink);
+	CTHINKPTR GetPfnThink();
+	void SetPfnThink(CTHINKPTR pfnThink);
 	// Think contexts
 	int GetIndexForThinkContext(const char* pszContext);
 	// Think functions with contexts
 	int RegisterThinkContext(const char* szContext);
-	CBASEPTR ThinkSet(CBASEPTR func, float flNextThinkTime = 0, const char* szContext = NULL);
+	CTHINKPTR ThinkSet(CTHINKPTR func, float flNextThinkTime = 0, const char* szContext = NULL);
 	void SetNextThink(float nextThinkTime, const char* szContext = NULL);
 	float GetNextThink(const char* szContext = NULL);
 	int GetNextThinkTick(const char* szContext = NULL);
@@ -706,8 +706,8 @@ public:
 	int	GetNextThinkTick(int nContextIndex) const;
 	void CheckHasThinkFunction(bool isThinkingHint = false);
 	bool PhysicsRunThink(thinkmethods_t thinkMethod = THINK_FIRE_ALL_FUNCTIONS);
-	bool PhysicsRunSpecificThink(int nContextIndex, CBASEPTR thinkFunc);
-	void PhysicsDispatchThink(CBASEPTR thinkFunc);
+	bool PhysicsRunSpecificThink(int nContextIndex, CTHINKPTR thinkFunc);
+	void PhysicsDispatchThink(CTHINKPTR thinkFunc);
 
 	MoveType_t GetMoveType(void) const;
 	MoveCollide_t GetMoveCollide(void) const;
@@ -1190,7 +1190,7 @@ protected:
 	// Physics state
 	float							m_flElasticity;
 	// interface function pointers
-	CBASEPTR						m_pfnThink;
+	CTHINKPTR						m_pfnThink;
 	int								m_nNextThinkTick;
 	int								m_nLastThinkTick;
 	CUtlVector< clientthinkfunc_t >		m_aThinkFunctions;
@@ -1848,11 +1848,11 @@ inline float C_EngineObjectInternal::GetElasticity(void)	const
 	return m_flElasticity;
 }
 
-inline CBASEPTR C_EngineObjectInternal::GetPfnThink()
+inline CTHINKPTR C_EngineObjectInternal::GetPfnThink()
 {
 	return m_pfnThink;
 }
-inline void C_EngineObjectInternal::SetPfnThink(CBASEPTR pfnThink)
+inline void C_EngineObjectInternal::SetPfnThink(CTHINKPTR pfnThink)
 {
 	m_pfnThink = pfnThink;
 }

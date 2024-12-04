@@ -44,7 +44,7 @@ BEGIN_DATADESC( CGrenadeAR2 )
 	DEFINE_FIELD( m_fDangerRadius, FIELD_FLOAT ),
 
 	// Function pointers
-	DEFINE_ENTITYFUNC( GrenadeAR2Touch ),
+	DEFINE_TOUCHFUNC( GrenadeAR2Touch ),
 	DEFINE_THINKFUNC( GrenadeAR2Think ),
 
 END_DATADESC()

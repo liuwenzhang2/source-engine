@@ -1050,7 +1050,7 @@ BEGIN_DATADESC( CNPC_ControllerHeadBall )
 
 	DEFINE_THINKFUNC( HuntThink ),
 	DEFINE_THINKFUNC( KillThink ),
-	DEFINE_ENTITYFUNC( BounceTouch ),
+	DEFINE_TOUCHFUNC( BounceTouch ),
 
 	DEFINE_FIELD( m_pSprite, FIELD_CLASSPTR ),
 
@@ -1215,7 +1215,7 @@ LINK_ENTITY_TO_CLASS( controller_energy_ball, CNPC_ControllerZapBall );
 BEGIN_DATADESC( CNPC_ControllerZapBall )
 
 	DEFINE_THINKFUNC( AnimateThink ),
-	DEFINE_ENTITYFUNC( ExplodeTouch ),
+	DEFINE_TOUCHFUNC( ExplodeTouch ),
 
 	DEFINE_FIELD( m_hOwner, FIELD_EHANDLE ),
 	DEFINE_FIELD( m_flSpawnTime, FIELD_TIME ),

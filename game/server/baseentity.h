@@ -246,12 +246,9 @@ enum notify_system_event_t
 
 //-----------------------------------------------------------------------------
 
-typedef void (CBaseEntity::*ENTITYFUNCPTR)(CBaseEntity *pOther );
-typedef void (CBaseEntity::*USEPTR)( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value );
 
-#define DEFINE_THINKFUNC( function ) DEFINE_FUNCTION_RAW( function, BASEPTR )
-#define DEFINE_ENTITYFUNC( function ) DEFINE_FUNCTION_RAW( function, ENTITYFUNCPTR )
-#define DEFINE_USEFUNC( function ) DEFINE_FUNCTION_RAW( function, USEPTR )
+
+
 
 // Things that toggle (buttons/triggers/doors) need this
 enum TOGGLE_STATE
@@ -1095,7 +1092,7 @@ public:
 
 	void FunctionCheck( void *pFunction, const char *name );
 
-	ENTITYFUNCPTR TouchSet( ENTITYFUNCPTR func, char *name ) 
+	TOUCHPTR TouchSet(TOUCHPTR func, char *name )
 	{ 
 #ifdef _DEBUG
 #ifdef PLATFORM_64BITS
@@ -1137,7 +1134,7 @@ public:
 		FunctionCheck( *(reinterpret_cast<void **>(&m_pfnUse)), name ); 
 		return func;
 	}
-	ENTITYFUNCPTR	BlockedSet( ENTITYFUNCPTR func, char *name ) 
+	TOUCHPTR	BlockedSet(TOUCHPTR func, char *name )
 	{ 
 #ifdef _DEBUG
 #ifdef PLATFORM_64BITS
@@ -1741,24 +1738,32 @@ public:
 EXTERN_SEND_TABLE(DT_BaseEntity);
 
 
-
 // Ugly technique to override base member functions
 // Normally it's illegal to cast a pointer to a member function of a derived class to a pointer to a 
 // member function of a base class.  static_cast is a sleezy way around that problem.
 
+#define SetThink( a ) GetEngineObject()->ThinkSet( (THINKPTR)a, 0, NULL )
+#define SetContextThink( a, b, context ) GetEngineObject()->ThinkSet( (THINKPTR)a, (b), context )
 #ifdef _DEBUG
 
-#define SetTouch( a ) TouchSet( static_cast <void (CBaseEntity::*)(CBaseEntity *)> (a), #a )
-#define SetUse( a ) UseSet( static_cast <void (CBaseEntity::*)(	CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value )> (a), #a )
-#define SetBlocked( a ) BlockedSet( static_cast <void (CBaseEntity::*)(CBaseEntity *)> (a), #a )
-
+#define SetTouch( a ) TouchSet( (TOUCHPTR)a, #a )
+#define SetUse( a ) UseSet( (USEPTR)a, #a )
+#define SetBlocked( a ) BlockedSet( (TOUCHPTR)a, #a )
+#define SetMoveDone( a ) \
+	do \
+	{ \
+		m_pfnMoveDone = (THINKPTR)a; \
+		FunctionCheck( (void *)*((int *)((char *)this + ( offsetof(CBaseEntity,m_pfnMoveDone)))), "BaseMoveFunc" ); \
+	} while ( 0 )
 #else
 
-#define SetTouch( a ) m_pfnTouch = static_cast <void (CBaseEntity::*)(CBaseEntity *)> (a)
-#define SetUse( a ) m_pfnUse = static_cast <void (CBaseEntity::*)( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value )> (a)
-#define SetBlocked( a ) m_pfnBlocked = static_cast <void (CBaseEntity::*)(CBaseEntity *)> (a)
-
+#define SetTouch( a ) m_pfnTouch = (TOUCHPTR)a
+#define SetUse( a ) m_pfnUse = (USEPTR)a
+#define SetBlocked( a ) m_pfnBlocked = (TOUCHPTR)a
+#define SetMoveDone( a ) \
+		(void)(m_pfnMoveDone = (THINKPTR)a)
 #endif
+
 
 // handling entity/edict transforms
 //inline CBaseEntity *GetContainingEntity( edict_t *pent )
@@ -2183,24 +2188,7 @@ inline void CBaseEntity::FireBullets( int cShots, const Vector &vecSrc,
 	FireBullets( info );
 }
 
-// Ugly technique to override base member functions
-// Normally it's illegal to cast a pointer to a member function of a derived class to a pointer to a 
-// member function of a base class.  static_cast is a sleezy way around that problem.
 
-#define SetThink( a ) GetEngineObject()->ThinkSet( static_cast <void (CBaseEntity::*)(void)> (a), 0, NULL )
-#define SetContextThink( a, b, context ) GetEngineObject()->ThinkSet( static_cast <void (CBaseEntity::*)(void)> (a), (b), context )
-
-#ifdef _DEBUG
-#define SetMoveDone( a ) \
-	do \
-	{ \
-		m_pfnMoveDone = static_cast <void (CBaseEntity::*)(void)> (a); \
-		FunctionCheck( (void *)*((int *)((char *)this + ( offsetof(CBaseEntity,m_pfnMoveDone)))), "BaseMoveFunc" ); \
-	} while ( 0 )
-#else
-#define SetMoveDone( a ) \
-		(void)(m_pfnMoveDone = static_cast <void (CBaseEntity::*)(void)> (a))
-#endif
 
 
 inline bool FClassnameIs(CBaseEntity *pEntity, const char *szClassname)

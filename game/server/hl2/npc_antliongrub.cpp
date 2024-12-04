@@ -145,9 +145,9 @@ BEGIN_DATADESC( CAntlionGrub )
 	DEFINE_OUTPUT( m_OnDeathByPlayer, "OnDeathByPlayer" ),
 
 	// Functions
-	DEFINE_ENTITYFUNC( GrubTouch ),
-	DEFINE_ENTITYFUNC( IdleThink ),
-	DEFINE_ENTITYFUNC( FlinchThink ),
+	DEFINE_TOUCHFUNC( GrubTouch ),
+	DEFINE_THINKFUNC( IdleThink ),
+	DEFINE_THINKFUNC( FlinchThink ),
 
 	DEFINE_INPUTFUNC( FIELD_VOID, "Squash", InputSquash ),
 

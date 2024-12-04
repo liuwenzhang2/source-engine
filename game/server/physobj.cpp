@@ -388,7 +388,7 @@ BEGIN_DATADESC( CPhysBox )
 	DEFINE_INPUTFUNC( FIELD_VOID, "DisableFloating", InputDisableFloating ),
 
 	// Function pointers
-	DEFINE_ENTITYFUNC( BreakTouch ),
+	DEFINE_TOUCHFUNC( BreakTouch ),
 
 	// Outputs
 	DEFINE_OUTPUT( m_OnDamaged, "OnDamaged" ),

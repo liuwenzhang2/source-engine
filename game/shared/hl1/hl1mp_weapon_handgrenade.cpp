@@ -43,7 +43,7 @@ extern ConVar sk_plr_dmg_grenade;
 LINK_ENTITY_TO_CLASS( grenade_hand, CHandGrenade );
 
 BEGIN_DATADESC( CHandGrenade )
-	DEFINE_ENTITYFUNC( BounceTouch ),
+	DEFINE_TOUCHFUNC( BounceTouch ),
 END_DATADESC()
 
 

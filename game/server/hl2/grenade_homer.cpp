@@ -60,7 +60,7 @@ BEGIN_DATADESC( CGrenadeHomer )
 
 	// Function pointers
 	DEFINE_THINKFUNC( AimThink ),
-	DEFINE_ENTITYFUNC( GrenadeHomerTouch ),
+	DEFINE_TOUCHFUNC( GrenadeHomerTouch ),
 
 END_DATADESC()
 

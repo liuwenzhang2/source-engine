@@ -11,7 +11,7 @@
 
 BEGIN_DATADESC( CAmmoBox )
 	DEFINE_THINKFUNC( FlyThink ),
-	DEFINE_ENTITYFUNC( BoxTouch ),
+	DEFINE_TOUCHFUNC( BoxTouch ),
 END_DATADESC();
 
 LINK_ENTITY_TO_CLASS( dod_ammo_box, CAmmoBox );

@@ -1774,7 +1774,7 @@ BEGIN_DATADESC( CFuncCombineBallSpawner )
 	DEFINE_OUTPUT( m_OnFirstBallReinserted, "OnFirstBallReinserted" ),
 
 	DEFINE_THINKFUNC( BallThink ),
-	DEFINE_ENTITYFUNC( GrabBallTouch ),
+	DEFINE_TOUCHFUNC( GrabBallTouch ),
 
 END_DATADESC()
 

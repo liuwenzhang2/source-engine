@@ -28,7 +28,7 @@ BEGIN_DATADESC( CGrenadeMP5 )
 //	float				 m_fSpawnTime;
 
 	// Function pointers
-	DEFINE_ENTITYFUNC( GrenadeMP5Touch ),
+	DEFINE_TOUCHFUNC( GrenadeMP5Touch ),
 
 	DEFINE_FIELD( m_fSpawnTime, FIELD_TIME ),
 END_DATADESC()

@@ -23,7 +23,7 @@ public:
 };
 
 // An IHandleEntity-derived class can go into an entity list and use ehandles.
-class IHandleEntity
+class SINGLE_INHERITANCE IHandleEntity
 {
 public:
 	virtual ~IHandleEntity() {}

@@ -252,7 +252,7 @@ BEGIN_DATADESC( CNPC_Antlion )
 	DEFINE_OUTPUT( m_OnUnBurrowed, "OnUnBurrowed" ),
 
 	// Function Pointers
-	DEFINE_ENTITYFUNC( Touch ),
+	DEFINE_TOUCHFUNC( Touch ),
 	DEFINE_USEFUNC( BurrowUse ),
 	DEFINE_THINKFUNC( ZapThink ),
 

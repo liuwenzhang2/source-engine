@@ -150,7 +150,7 @@ void CAI_NetworkManager::RebuildThink( void )
 
 void CAI_NetworkManager::RebuildNetworkGraph( void )
 {
-	if (GetEngineObject()->GetPfnThink() != (void (CBaseEntity::*)())&CAI_NetworkManager::RebuildThink)
+	if (GetEngineObject()->GetPfnThink() != (THINKPTR)&CAI_NetworkManager::RebuildThink)
 	{
 		UTIL_CenterPrintAll( "Doing partial rebuild of Node Graph...\n" );
 		SetThink(&CAI_NetworkManager::RebuildThink);

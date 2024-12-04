@@ -87,7 +87,7 @@ CBasePlayer *BotPutInServer( bool bFrozen, int iTeam )
 	// Allocate a CBasePlayer for the bot, and call spawn
 	//ClientPutInServer( pEdict, botname );
 	CHL1MP_Player *pPlayer = ((CHL1MP_Player *)CBaseEntity::Instance( pEdict ));
-	pPlayer->ClearFlags();
+	pPlayer->GetEngineObject()->ClearFlags();
 	pPlayer->GetEngineObject()->AddFlag( FL_CLIENT | FL_FAKECLIENT );
 
 	if ( bFrozen )
@@ -221,11 +221,11 @@ void Bot_Think( CHL1MP_Player *pBot )
 	byte  impulse = 0;
 	float frametime = gpGlobals->frametime;
 
-	vecViewAngles = pBot->GetLocalAngles();
+	vecViewAngles = pBot->GetEngineObject()->GetLocalAngles();
 
 
 	// Create some random values
-	if ( pBot->IsAlive() && (pBot->GetSolid() == SOLID_BBOX) )
+	if ( pBot->IsAlive() && (pBot->GetEngineObject()->GetSolid() == SOLID_BBOX) )
 	{
 		trace_t trace;
 
@@ -262,14 +262,14 @@ void Bot_Think( CHL1MP_Player *pBot )
 				angledelta = -angledelta;
 			}
 
-			angle = pBot->GetLocalAngles();
+			angle = pBot->GetEngineObject()->GetLocalAngles();
 
 			Vector vecSrc;
 			while ( --maxtries >= 0 )
 			{
 				AngleVectors( angle, &forward );
 
-				vecSrc = pBot->GetLocalOrigin() + Vector( 0, 0, 36 );
+				vecSrc = pBot->GetEngineObject()->GetLocalOrigin() + Vector( 0, 0, 36 );
 
 				vecEnd = vecSrc + forward * 10;
 
@@ -324,7 +324,7 @@ void Bot_Think( CHL1MP_Player *pBot )
 				}
 			}
 
-			pBot->SetLocalAngles( angle );
+			pBot->GetEngineObject()->SetLocalAngles( angle );
 			vecViewAngles = angle;
 		}
 
@@ -422,10 +422,10 @@ void Bot_Think( CHL1MP_Player *pBot )
 
 		botdata->lastAngles[ 2 ] = 0;
 
-		pBot->SetLocalAngles( botdata->lastAngles );
+		pBot->GetEngineObject()->SetLocalAngles( botdata->lastAngles );
 	}
 
-	RunPlayerMove( pBot, pBot->GetLocalAngles(), forwardmove, sidemove, upmove, buttons, impulse, frametime );
+	RunPlayerMove( pBot, pBot->GetEngineObject()->GetLocalAngles(), forwardmove, sidemove, upmove, buttons, impulse, frametime );
 }
 
 #endif

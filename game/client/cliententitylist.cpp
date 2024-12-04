@@ -3770,7 +3770,7 @@ int C_EngineObjectInternal::RegisterThinkContext(const char* szContext)
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-CBASEPTR C_EngineObjectInternal::ThinkSet(CBASEPTR func, float thinkTime, const char* szContext)
+CTHINKPTR C_EngineObjectInternal::ThinkSet(CTHINKPTR func, float thinkTime, const char* szContext)
 {
 #if !defined( CLIENT_DLL )
 #ifdef _DEBUG
@@ -4109,7 +4109,7 @@ bool C_EngineObjectInternal::PhysicsRunThink(thinkmethods_t thinkMethod)
 	// Don't fire the base if we're avoiding it
 	if (thinkMethod != THINK_FIRE_ALL_BUT_BASE)
 	{
-		bAlive = PhysicsRunSpecificThink(-1, &CBaseEntity::Think);
+		bAlive = PhysicsRunSpecificThink(-1, (CTHINKPTR) & C_BaseEntity::Think);
 		if (!bAlive)
 			return false;
 	}
@@ -4143,7 +4143,7 @@ bool C_EngineObjectInternal::PhysicsRunThink(thinkmethods_t thinkMethod)
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-bool C_EngineObjectInternal::PhysicsRunSpecificThink(int nContextIndex, CBASEPTR thinkFunc)
+bool C_EngineObjectInternal::PhysicsRunSpecificThink(int nContextIndex, CTHINKPTR thinkFunc)
 {
 	int thinktick = GetNextThinkTick(nContextIndex);
 
@@ -4180,7 +4180,7 @@ bool C_EngineObjectInternal::PhysicsRunSpecificThink(int nContextIndex, CBASEPTR
 //			to run it's game code.
 //			All other entity thinking is done during worldspawn's think
 //-----------------------------------------------------------------------------
-void C_EngineObjectInternal::PhysicsDispatchThink(CBASEPTR thinkFunc)
+void C_EngineObjectInternal::PhysicsDispatchThink(CTHINKPTR thinkFunc)
 {
 	float thinkLimit = think_limit.GetFloat();
 	float startTime = 0.0;

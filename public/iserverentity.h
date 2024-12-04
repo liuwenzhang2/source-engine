@@ -64,14 +64,27 @@ struct servergroundlink_t
 	servergroundlink_t* prevLink;
 };
 
-typedef void (CBaseEntity::* BASEPTR)(void);
+typedef enum
+{
+	USE_OFF = 0,
+	USE_ON = 1,
+	USE_SET = 2,
+	USE_TOGGLE = 3
+} USE_TYPE;
+
+typedef void (IHandleEntity::* THINKPTR)(void);
+typedef void (IHandleEntity::* TOUCHPTR)(CBaseEntity* pOther);
+typedef void (IHandleEntity::* USEPTR)(CBaseEntity* pActivator, CBaseEntity* pCaller, USE_TYPE useType, float value);
+#define DEFINE_THINKFUNC( function ) DEFINE_FUNCTION_RAW( function, THINKPTR )
+#define DEFINE_TOUCHFUNC( function ) DEFINE_FUNCTION_RAW( function, TOUCHPTR )
+#define DEFINE_USEFUNC( function ) DEFINE_FUNCTION_RAW( function, USEPTR )
 
 //-----------------------------------------------------------------------------
 // Purpose: think contexts
 //-----------------------------------------------------------------------------
 struct thinkfunc_t
 {
-	BASEPTR		m_pfnThink;
+	THINKPTR	m_pfnThink;
 	string_t	m_iszContext;
 	int			m_nNextThinkTick;
 	int			m_nLastThinkTick;
@@ -327,11 +340,11 @@ public:
 	virtual void SetElasticity(float flElasticity) = 0;
 	virtual float GetElasticity(void) const = 0;
 
-	virtual BASEPTR GetPfnThink() = 0;
-	virtual void SetPfnThink(BASEPTR pfnThink) = 0;
+	virtual THINKPTR GetPfnThink() = 0;
+	virtual void SetPfnThink(THINKPTR pfnThink) = 0;
 	virtual int GetIndexForThinkContext(const char* pszContext) = 0;
 	virtual int RegisterThinkContext(const char* szContext) = 0;
-	virtual BASEPTR	ThinkSet(BASEPTR func, float flNextThinkTime = 0, const char* szContext = NULL) = 0;
+	virtual THINKPTR ThinkSet(THINKPTR func, float flNextThinkTime = 0, const char* szContext = NULL) = 0;
 	virtual void SetNextThink(float nextThinkTime, const char* szContext = NULL) = 0;
 	virtual float GetNextThink(const char* szContext = NULL) = 0;
 	virtual int GetNextThinkTick(const char* szContext = NULL) = 0;
@@ -341,7 +354,7 @@ public:
 	virtual bool WillThink() = 0;
 	virtual int GetFirstThinkTick() = 0;	// get first tick thinking on any context
 	virtual bool PhysicsRunThink(thinkmethods_t thinkMethod = THINK_FIRE_ALL_FUNCTIONS) = 0;
-	virtual bool PhysicsRunSpecificThink(int nContextIndex, BASEPTR thinkFunc) = 0;
+	virtual bool PhysicsRunSpecificThink(int nContextIndex, THINKPTR thinkFunc) = 0;
 	virtual void CheckHasThinkFunction(bool isThinkingHint = false) = 0;
 
 	virtual MoveType_t GetMoveType() const = 0;

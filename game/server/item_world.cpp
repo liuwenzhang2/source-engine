@@ -94,7 +94,7 @@ BEGIN_DATADESC( CItem )
 	DEFINE_PHYSPTR( m_pConstraint ),
 
 	// Function Pointers
-	DEFINE_ENTITYFUNC( ItemTouch ),
+	DEFINE_TOUCHFUNC( ItemTouch ),
 	DEFINE_THINKFUNC( Materialize ),
 	DEFINE_THINKFUNC( ComeToRest ),
 

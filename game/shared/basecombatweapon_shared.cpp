@@ -2643,7 +2643,7 @@ BEGIN_DATADESC( CBaseCombatWeapon )
 //	DEFINE_FIELD( m_bJustRestored, FIELD_BOOLEAN ),
 
 	// Function pointers
-	DEFINE_ENTITYFUNC( DefaultTouch ),
+	DEFINE_TOUCHFUNC( DefaultTouch ),
 	DEFINE_THINKFUNC( FallThink ),
 	DEFINE_THINKFUNC( Materialize ),
 	DEFINE_THINKFUNC( AttemptToMaterialize ),

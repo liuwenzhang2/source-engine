@@ -50,7 +50,7 @@ BEGIN_DATADESC( CNPC_Headcrab )
 	// m_nGibCount - don't save
 
 	// Function Pointers
-	DEFINE_ENTITYFUNC( LeapTouch ),
+	DEFINE_TOUCHFUNC( LeapTouch ),
 	DEFINE_FIELD( m_vecJumpVel, FIELD_VECTOR ),
 
 END_DATADESC()

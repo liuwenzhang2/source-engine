@@ -29,6 +29,7 @@ typedef short HSOUNDSCRIPTHANDLE;
 #define SOUNDEMITTER_INVALID_HANDLE	(HSOUNDSCRIPTHANDLE)-1
 
 class IFileList;
+class CBaseEntity;
 
 //-----------------------------------------------------------------------------
 // Purpose: 

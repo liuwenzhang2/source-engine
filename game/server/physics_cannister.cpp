@@ -66,7 +66,7 @@ BEGIN_DATADESC( CPhysicsCannister )
 	DEFINE_INPUTFUNC( FIELD_VOID, "Wake", InputWake ),
 
 	DEFINE_THINKFUNC( BeginShutdownThink ),
-	DEFINE_ENTITYFUNC( ExplodeTouch ),
+	DEFINE_TOUCHFUNC( ExplodeTouch ),
 
 END_DATADESC()
 

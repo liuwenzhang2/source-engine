@@ -185,7 +185,7 @@ BEGIN_DATADESC( CWeaponStriderBuster )
 	DEFINE_OUTPUT( m_OnShatter, "OnShatter" ),
 	DEFINE_OUTPUT( m_OnShotDown, "OnShotDown" ),
 		
-	DEFINE_ENTITYFUNC( BusterTouch ),
+	DEFINE_TOUCHFUNC( BusterTouch ),
 	DEFINE_THINKFUNC( BusterFlyThink ),
 	DEFINE_THINKFUNC( BusterDetachThink ),
 	DEFINE_THINKFUNC( BusterPingThink ),

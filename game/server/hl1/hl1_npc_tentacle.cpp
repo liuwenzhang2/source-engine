@@ -240,7 +240,7 @@ BEGIN_DATADESC( CNPC_Tentacle )
 
 	DEFINE_THINKFUNC( Start ),
 	DEFINE_THINKFUNC( Cycle ),
-	DEFINE_ENTITYFUNC( HitTouch ),
+	DEFINE_TOUCHFUNC( HitTouch ),
 END_DATADESC()
 
 Class_T CNPC_Tentacle::Classify ( void ) 

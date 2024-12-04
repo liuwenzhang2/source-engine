@@ -181,7 +181,7 @@ BEGIN_DATADESC( CBreakableSurface )
 
 	// Function Pointers
 	DEFINE_THINKFUNC( BreakThink ),
-	DEFINE_ENTITYFUNC( SurfaceTouch ),
+	DEFINE_TOUCHFUNC( SurfaceTouch ),
 
 	DEFINE_INPUTFUNC( FIELD_VECTOR,	"Shatter", InputShatter ),
 

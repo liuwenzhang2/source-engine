@@ -110,7 +110,7 @@ BEGIN_DATADESC( CGrenadeBeam )
 	DEFINE_ARRAY( m_pBeam,			FIELD_CLASSPTR, GRENADEBEAM_MAXBEAMS ),
 
 	// Function pointers
-	DEFINE_ENTITYFUNC( GrenadeBeamTouch ),
+	DEFINE_TOUCHFUNC( GrenadeBeamTouch ),
 	DEFINE_THINKFUNC( KillBeam ),
 
 END_DATADESC()

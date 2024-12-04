@@ -73,7 +73,7 @@ BEGIN_DATADESC( CGrenadeBugBait )
 	DEFINE_FIELD( m_pSporeTrail, FIELD_CLASSPTR ),
 
 	// Function Pointers
-	DEFINE_ENTITYFUNC( BugBaitTouch ),
+	DEFINE_TOUCHFUNC( BugBaitTouch ),
 	DEFINE_THINKFUNC( ThinkBecomeSolid ),
 
 END_DATADESC()

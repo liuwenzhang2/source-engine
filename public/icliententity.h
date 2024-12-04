@@ -77,14 +77,15 @@ struct clientgroundlink_t
 	clientgroundlink_t* prevLink;
 };
 
-typedef void (C_BaseEntity::* CBASEPTR)(void);
+typedef void (IHandleEntity::* CTHINKPTR)(void);
+typedef void (IHandleEntity::* CTOUCHPTR)(C_BaseEntity* pOther);
 
 //-----------------------------------------------------------------------------
 // Purpose: think contexts
 //-----------------------------------------------------------------------------
 struct clientthinkfunc_t
 {
-	CBASEPTR	m_pfnThink;
+	CTHINKPTR	m_pfnThink;
 	string_t	m_iszContext;
 	int			m_nNextThinkTick;
 	int			m_nLastThinkTick;
@@ -370,11 +371,11 @@ public:
 	virtual void SetFriction(float flFriction) = 0;
 	virtual float GetElasticity(void) const = 0;
 
-	virtual CBASEPTR GetPfnThink() = 0;
-	virtual void SetPfnThink(CBASEPTR pfnThink) = 0;
+	virtual CTHINKPTR GetPfnThink() = 0;
+	virtual void SetPfnThink(CTHINKPTR pfnThink) = 0;
 	virtual int GetIndexForThinkContext(const char* pszContext) = 0;
 	virtual int RegisterThinkContext(const char* szContext) = 0;
-	virtual CBASEPTR ThinkSet(CBASEPTR func, float flNextThinkTime = 0, const char* szContext = NULL) = 0;
+	virtual CTHINKPTR ThinkSet(CTHINKPTR func, float flNextThinkTime = 0, const char* szContext = NULL) = 0;
 	virtual void SetNextThink(float nextThinkTime, const char* szContext = NULL) = 0;
 	virtual float GetNextThink(const char* szContext = NULL) = 0;
 	virtual int GetNextThinkTick(const char* szContext = NULL) = 0;
@@ -384,7 +385,7 @@ public:
 	virtual bool WillThink() = 0;
 	virtual int GetFirstThinkTick() = 0;	// get first tick thinking on any context
 	virtual bool PhysicsRunThink(thinkmethods_t thinkMethod = THINK_FIRE_ALL_FUNCTIONS) = 0;
-	virtual bool PhysicsRunSpecificThink(int nContextIndex, CBASEPTR thinkFunc) = 0;
+	virtual bool PhysicsRunSpecificThink(int nContextIndex, CTHINKPTR thinkFunc) = 0;
 
 	virtual MoveType_t GetMoveType(void) const = 0;
 	virtual MoveCollide_t GetMoveCollide(void) const = 0;

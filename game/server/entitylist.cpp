@@ -262,7 +262,7 @@ class CThinkContextsSaveDataOps : public CDefSaveRestoreOps
 #ifdef WIN32
 			void** ppV = (void**)&((*pUtlVector)[i].m_pfnThink);
 #else
-			BASEPTR* ppV = &((*pUtlVector)[i].m_pfnThink);
+			THINKPTR* ppV = &((*pUtlVector)[i].m_pfnThink);
 #endif
 			bool bHasFunc = (*ppV != NULL);
 			pSave->WriteBool(&bHasFunc, 1);
@@ -295,7 +295,7 @@ class CThinkContextsSaveDataOps : public CDefSaveRestoreOps
 #ifdef WIN32
 			void** ppV = (void**)&((*pUtlVector)[i].m_pfnThink);
 #else
-			BASEPTR* ppV = &((*pUtlVector)[i].m_pfnThink);
+			THINKPTR* ppV = &((*pUtlVector)[i].m_pfnThink);
 			Q_memset((void*)ppV, 0x0, sizeof(inputfunc_t));
 #endif
 			if (bHasFunc)
@@ -320,7 +320,7 @@ class CThinkContextsSaveDataOps : public CDefSaveRestoreOps
 
 	virtual void MakeEmpty(const SaveRestoreFieldInfo_t& fieldInfo)
 	{
-		BASEPTR pFunc = *((BASEPTR*)fieldInfo.pField);
+		THINKPTR pFunc = *((THINKPTR*)fieldInfo.pField);
 		pFunc = NULL;
 	}
 };
@@ -3242,7 +3242,7 @@ int CEngineObjectInternal::RegisterThinkContext(const char* szContext)
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-BASEPTR	CEngineObjectInternal::ThinkSet(BASEPTR func, float thinkTime, const char* szContext)
+THINKPTR CEngineObjectInternal::ThinkSet(THINKPTR func, float thinkTime, const char* szContext)
 {
 #if !defined( CLIENT_DLL )
 #ifdef _DEBUG
@@ -3584,7 +3584,7 @@ bool CEngineObjectInternal::PhysicsRunThink(thinkmethods_t thinkMethod)
 	// Don't fire the base if we're avoiding it
 	if (thinkMethod != THINK_FIRE_ALL_BUT_BASE)
 	{
-		bAlive = PhysicsRunSpecificThink(-1, &CBaseEntity::Think);
+		bAlive = PhysicsRunSpecificThink(-1, (THINKPTR) & CBaseEntity::Think);
 		if (!bAlive)
 			return false;
 	}
@@ -3759,7 +3759,7 @@ static CThinkSyncTester g_ThinkChecker;
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-bool CEngineObjectInternal::PhysicsRunSpecificThink(int nContextIndex, BASEPTR thinkFunc)
+bool CEngineObjectInternal::PhysicsRunSpecificThink(int nContextIndex, THINKPTR thinkFunc)
 {
 	int thinktick = GetNextThinkTick(nContextIndex);
 
@@ -3796,7 +3796,7 @@ bool CEngineObjectInternal::PhysicsRunSpecificThink(int nContextIndex, BASEPTR t
 //			to run it's game code.
 //			All other entity thinking is done during worldspawn's think
 //-----------------------------------------------------------------------------
-void CEngineObjectInternal::PhysicsDispatchThink(BASEPTR thinkFunc)
+void CEngineObjectInternal::PhysicsDispatchThink(THINKPTR thinkFunc)
 {
 	VPROF_ENTER_SCOPE((!vprof_scope_entity_thinks.GetBool()) ?
 		"CBaseEntity::PhysicsDispatchThink" :

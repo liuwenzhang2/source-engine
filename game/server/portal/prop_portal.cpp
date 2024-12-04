@@ -1297,8 +1297,8 @@ void CProp_Portal::TeleportTouchingEntity( CBaseEntity *pOther )
 		Vector ptTestCenter = pOther->WorldSpaceCenter();
 
 		float fNewDist, fOldDist;
-		fNewDist = RemotePortalDataAccess.Placement.PortalPlane.normal.Dot( ptTestCenter ) - RemotePortalDataAccess.Placement.PortalPlane.dist;
-		fOldDist = LocalPortalDataAccess.Placement.PortalPlane.normal.Dot( ptOtherCenter ) - LocalPortalDataAccess.Placement.PortalPlane.dist;
+		fNewDist = GetLinkedPortal()->GetPortalPlane().normal.Dot( ptTestCenter ) - GetLinkedPortal()->GetPortalPlane().dist;
+		fOldDist = GetPortalPlane().normal.Dot(ptOtherCenter) - GetPortalPlane().dist;
 		AssertMsg( fNewDist >= 0.0f, "Entity portalled behind the destination portal." );
 	}
 #endif
@@ -2440,7 +2440,7 @@ void CProp_Portal::TakePhysicsOwnership(CBaseEntity* pEntity)
 			int iDebugIndex;
 			for (iDebugIndex = m_ShadowClones.FromLinkedPortal.Count(); --iDebugIndex >= 0; )
 			{
-				if (m_ShadowClones.FromLinkedPortal[iDebugIndex]->GetClonedEntity() == pEntity)
+				if (m_ShadowClones.FromLinkedPortal[iDebugIndex]->GetEngineShadowClone()->GetClonedEntity() == pEntity)
 					break;
 			}
 			AssertMsg(iDebugIndex < 0, "Trying to own an entity, when a clone from the linked portal already exists");
@@ -2449,7 +2449,7 @@ void CProp_Portal::TakePhysicsOwnership(CBaseEntity* pEntity)
 			{
 				for (iDebugIndex = GetLinkedPortal()->m_ShadowClones.FromLinkedPortal.Count(); --iDebugIndex >= 0; )
 				{
-					if (GetLinkedPortal()->m_ShadowClones.FromLinkedPortal[iDebugIndex]->GetClonedEntity() == pEntity)
+					if (GetLinkedPortal()->m_ShadowClones.FromLinkedPortal[iDebugIndex]->GetEngineShadowClone()->GetClonedEntity() == pEntity)
 						break;
 				}
 				AssertMsg(iDebugIndex < 0, "Trying to own an entity, when we're already exporting a clone to the linked portal");
@@ -2467,7 +2467,7 @@ void CProp_Portal::TakePhysicsOwnership(CBaseEntity* pEntity)
 
 			DBG_CODE(
 				for (int i = GetLinkedPortal()->m_ShadowClones.FromLinkedPortal.Count(); --i >= 0; )
-					AssertMsg(GetLinkedPortal()->m_ShadowClones.FromLinkedPortal[i]->GetClonedEntity() != pEntity, "Already cloning to linked portal.");
+					AssertMsg(GetLinkedPortal()->m_ShadowClones.FromLinkedPortal[i]->GetEngineShadowClone()->GetClonedEntity() != pEntity, "Already cloning to linked portal.");
 					);
 
 			CPhysicsShadowClone* pClone = CPhysicsShadowClone::CreateShadowClone(GetLinkedPortal()->GetPhysicsEnvironment(), hEnt, "CPortalSimulator::TakePhysicsOwnership(): To Linked Portal", &pCollisionEntity->GetEnginePortal()->MatrixThisToLinked().As3x4());
@@ -2738,7 +2738,7 @@ void CProp_Portal::ReleasePhysicsOwnership(CBaseEntity* pEntity, bool bContinueP
 			int iDebugIndex;
 			for (iDebugIndex = m_ShadowClones.FromLinkedPortal.Count(); --iDebugIndex >= 0; )
 			{
-				if (m_ShadowClones.FromLinkedPortal[iDebugIndex]->GetClonedEntity() == pEntity)
+				if (m_ShadowClones.FromLinkedPortal[iDebugIndex]->GetEngineShadowClone()->GetClonedEntity() == pEntity)
 					break;
 			}
 			AssertMsg(iDebugIndex < 0, "Trying to release an entity, when a clone from the linked portal already exists.");
@@ -3084,7 +3084,7 @@ void CProp_Portal::Post_UTIL_Remove(CBaseEntity* pEntity)
 #ifdef _DEBUG
 	for (int i = CPhysicsShadowClone::g_ShadowCloneList.Count(); --i >= 0; )
 	{
-		Assert(CPhysicsShadowClone::g_ShadowCloneList[i]->GetClonedEntity() != pEntity); //shouldn't be any clones of this object anymore
+		Assert(CPhysicsShadowClone::g_ShadowCloneList[i]->GetEngineShadowClone()->GetClonedEntity() != pEntity); //shouldn't be any clones of this object anymore
 	}
 #endif
 }

@@ -221,7 +221,7 @@ BEGIN_DATADESC( CBaseHeadcrab )
 	// Function Pointers
 	DEFINE_THINKFUNC( EliminateRollAndPitch ),
 	DEFINE_THINKFUNC( ThrowThink ),
-	DEFINE_ENTITYFUNC( LeapTouch ),
+	DEFINE_TOUCHFUNC( LeapTouch ),
 
 END_DATADESC()
 
@@ -3148,7 +3148,7 @@ BEGIN_DATADESC( CBlackHeadcrab )
 	DEFINE_FIELD( m_flPanicStopTime, FIELD_TIME ),
 	DEFINE_FIELD( m_flNextHopTime, FIELD_TIME ),
 
-	DEFINE_ENTITYFUNC( EjectTouch ),
+	DEFINE_TOUCHFUNC( EjectTouch ),
 
 END_DATADESC()
 
