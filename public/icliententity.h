@@ -577,6 +577,9 @@ public:
 	virtual void AddToLeafSystem() = 0;
 	virtual void AddToLeafSystem(RenderGroup_t group) = 0;
 	virtual void RemoveFromLeafSystem() = 0;
+
+	virtual void AddToAimEntsList() = 0;
+	virtual void RemoveFromAimEntsList() = 0;
 };
 
 class IEnginePortalClient {

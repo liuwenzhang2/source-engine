@@ -1341,8 +1341,9 @@ void CHLClient::HudUpdate( bool bActive )
 	gHUD.UpdateHud( bActive );
 
 	{
-		C_BaseAnimating::AutoAllowBoneAccess boneaccess( true, false ); 
+		ClientEntityList().PushAllowBoneAccess(true, false, (char const*)1);
 		IGameSystem::UpdateAllSystems( frametime );
+		ClientEntityList().PopBoneAccess((char const*)1);
 	}
 
 	// run vgui animations
@@ -1491,10 +1492,11 @@ void CHLClient::ExtraMouseSample( float frametime, bool active )
 	Assert(ClientEntityList().IsAbsRecomputationsEnabled());
 	Assert(ClientEntityList().IsAbsQueriesValid() );
 
-	C_BaseAnimating::AutoAllowBoneAccess boneaccess( true, false ); 
+	ClientEntityList().PushAllowBoneAccess(true, false, (char const*)1);
 
 	MDLCACHE_CRITICAL_SECTION();
 	input->ExtraMouseSample( frametime, active );
+	ClientEntityList().PopBoneAccess((char const*)1);
 }
 
 void CHLClient::IN_SetSampleTime( float frametime )
@@ -1518,10 +1520,11 @@ void CHLClient::CreateMove ( int sequence_number, float input_sample_frametime, 
 	Assert(ClientEntityList().IsAbsRecomputationsEnabled() );
 	Assert(ClientEntityList().IsAbsQueriesValid() );
 
-	C_BaseAnimating::AutoAllowBoneAccess boneaccess( true, false ); 
+	ClientEntityList().PushAllowBoneAccess(true, false, (char const*)1);
 
 	MDLCACHE_CRITICAL_SECTION();
 	input->CreateMove( sequence_number, input_sample_frametime, active );
+	ClientEntityList().PopBoneAccess((char const*)1);
 }
 
 //-----------------------------------------------------------------------------
@@ -2206,7 +2209,7 @@ void OnRenderStart()
 
 		// FIXME: This needs to be done before the player moves; it forces
 		// aiments the player may be attached to to forcibly update their position
-		C_BaseEntity::MarkAimEntsDirty();
+		ClientEntityList().MarkAimEntsDirty();
 	}
 
 	// Make sure the camera simulation happens before OnRenderStart, where it's used.
@@ -2271,7 +2274,7 @@ void OnRenderStart()
 
 	// Now that the view model's position is setup and aiments are marked dirty, update
 	// their positions so they're in the leaf system correctly.
-	C_BaseEntity::CalcAimEntPositions();
+	ClientEntityList().CalcAimEntPositions();
 
 	// For entities marked for recording, post bone messages to IToolSystems
 	if ( ToolsEnabled() )

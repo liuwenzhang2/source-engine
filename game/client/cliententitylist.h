@@ -128,6 +128,10 @@ public:
 	int		m_bAnglesComputed : 1;
 };
 
+typedef unsigned int			AimEntsListHandle_t;
+
+#define		INVALID_AIMENTS_LIST_HANDLE		(AimEntsListHandle_t)~0
+
 class C_EngineObjectInternal : public IEngineObjectClient {
 public:
 	DECLARE_CLASS_NOBASE(C_EngineObjectInternal);
@@ -279,6 +283,8 @@ public:
 		m_ModelInstance = MODEL_INSTANCE_INVALID;
 		m_ShadowHandle = CLIENTSHADOW_INVALID_HANDLE;
 		m_hRender = INVALID_CLIENT_RENDER_HANDLE;
+		m_AimEntsListHandle = INVALID_AIMENTS_LIST_HANDLE;
+
 	}
 
 	virtual ~C_EngineObjectInternal()
@@ -556,6 +562,8 @@ public:
 		m_ModelInstance = MODEL_INSTANCE_INVALID;
 		m_ShadowHandle = CLIENTSHADOW_INVALID_HANDLE;
 		m_hRender = INVALID_CLIENT_RENDER_HANDLE;
+		m_AimEntsListHandle = INVALID_AIMENTS_LIST_HANDLE;
+
 	}
 
 	virtual void OnPositionChanged();
@@ -1086,6 +1094,9 @@ public:
 	void					AddToLeafSystem(RenderGroup_t group);
 	// remove entity form leaf system again
 	void					RemoveFromLeafSystem();
+
+	void					AddToAimEntsList();
+	void					RemoveFromAimEntsList();
 private:
 	void LockStudioHdr();
 	void UnlockStudioHdr();
@@ -1349,6 +1360,7 @@ protected:
 	// Model instance data..
 	ModelInstanceHandle_t			m_ModelInstance;
 	bool							m_bAlternateSorting;
+	AimEntsListHandle_t				m_AimEntsListHandle;
 
 };
 
@@ -2603,6 +2615,9 @@ public:
 	void EnableAbsRecomputations(bool bEnable);
 	bool IsAbsRecomputationsEnabled(void);
 	bool IsDisableTouchFuncs() { return m_bDisableTouchFuncs; }
+	// Moves all aiments into their correct position for the frame
+	void	MarkAimEntsDirty();
+	void CalcAimEntPositions();
 private:
 	void AddPVSNotifier(IClientUnknown* pUnknown);
 	void RemovePVSNotifier(IClientUnknown* pUnknown);
@@ -2673,6 +2688,7 @@ private:
 	bool m_bAbsRecomputationStack[8];
 	unsigned short m_iAbsRecomputationStackPos = 0;
 	bool m_bDisableTouchFuncs = false;	// Disables PhysicsTouch and PhysicsStartTouch function calls
+	CUtlVector< C_EngineObjectInternal* >	m_AimEntsList;
 
 };
 
@@ -3841,6 +3857,60 @@ void CClientEntityList<T>::PopEnableAbsRecomputations()
 	else
 	{
 		Assert(false);
+	}
+}
+
+//-----------------------------------------------------------------------------
+// Moves all aiments
+//-----------------------------------------------------------------------------
+template<class T>
+void CClientEntityList<T>::MarkAimEntsDirty()
+{
+	// FIXME: With the dirty bits hooked into cycle + sequence, it's unclear
+	// that this is even necessary any more (provided aiments are always accessing
+	// joints or attachments of the move parent).
+	//
+	// NOTE: This is a tricky algorithm. This list does not actually contain
+	// all aim-ents in its list. It actually contains all hierarchical children,
+	// of which aim-ents are a part. We can tell if something is an aiment if it has
+	// the EF_BONEMERGE effect flag set.
+	// 
+	// We will first iterate over all aiments and clear their DIRTY_ABSTRANSFORM flag, 
+	// which is necessary to cause them to recompute their aim-ent origin 
+	// the next time CalcAbsPosition is called. Because CalcAbsPosition calls MoveToAimEnt
+	// and MoveToAimEnt calls SetAbsOrigin/SetAbsAngles, that is how CalcAbsPosition
+	// will cause the aim-ent's (and all its children's) dirty state to be correctly updated.
+	//
+	// Then we will iterate over the loop a second time and call CalcAbsPosition on them,
+	int i;
+	int c = m_AimEntsList.Count();
+	for (i = 0; i < c; ++i)
+	{
+		C_EngineObjectInternal* pEnt = m_AimEntsList[i];
+		Assert(pEnt && pEnt->GetMoveParent());
+		if (pEnt->IsEffectActive(EF_BONEMERGE | EF_PARENT_ANIMATES))
+		{
+			pEnt->AddEFlags(EFL_DIRTY_ABSTRANSFORM);
+		}
+	}
+}
+
+
+template<class T>
+void CClientEntityList<T>::CalcAimEntPositions()
+{
+	VPROF("CalcAimEntPositions");
+	int i;
+	int c = m_AimEntsList.Count();
+	for (i = 0; i < c; ++i)
+	{
+		C_EngineObjectInternal* pEnt = m_AimEntsList[i];
+		Assert(pEnt);
+		Assert(pEnt->GetMoveParent());
+		if (pEnt->IsEffectActive(EF_BONEMERGE))
+		{
+			pEnt->CalcAbsolutePosition();
+		}
 	}
 }
 

@@ -64,9 +64,7 @@ class CDmgAccumulator;
 
 struct CSoundParameters;
 
-typedef unsigned int			AimEntsListHandle_t;
 
-#define		INVALID_AIMENTS_LIST_HANDLE		(AimEntsListHandle_t)~0
 
 extern void RecvProxy_IntToColor32( const CRecvProxyData *pData, void *pStruct, void *pOut );
 //extern void RecvProxy_LocalVelocity( const CRecvProxyData *pData, void *pStruct, void *pOut );
@@ -505,9 +503,7 @@ public:
 	//static void RemoveRecipientsIfNotCloseCaptioning( C_RecipientFilter& filter );
 	//static void EmitCloseCaption( IRecipientFilter& filter, int entindex, char const *token, CUtlVector< Vector >& soundorigins, float duration, bool warnifmissing = false );
 
-	// Moves all aiments into their correct position for the frame
-	static void	MarkAimEntsDirty();
-	static void CalcAimEntPositions();
+	
 
 	//static bool IsPrecacheAllowed();
 	//static void SetAllowPrecache( bool allow );
@@ -595,8 +591,7 @@ public:
 	// Deal with EF_* flags
 	virtual void					CreateLightEffects( void );
 
-	void							AddToAimEntsList();
-	void							RemoveFromAimEntsList();
+
 
 	// Reset internal fields
 	virtual void					Clear( void );
@@ -1254,7 +1249,6 @@ private:
 	static bool						s_bInterpolate;
 	
 
-	AimEntsListHandle_t				m_AimEntsListHandle;
 
 	
 public:

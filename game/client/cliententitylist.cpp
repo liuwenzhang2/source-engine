@@ -1513,7 +1513,7 @@ void C_EngineObjectInternal::UnlinkChild(IEngineObjectClient* pChild)
 	((C_EngineObjectInternal*)pChild)->SetNextMovePeer( NULL);
 	((C_EngineObjectInternal*)pChild)->SetMovePrevPeer( NULL);
 	((C_EngineObjectInternal*)pChild)->SetMoveParent( NULL);
-	pChild->GetOuter()->RemoveFromAimEntsList();
+	pChild->RemoveFromAimEntsList();
 
 	Interp_HierarchyUpdateInterpolationAmounts();
 }
@@ -1542,7 +1542,7 @@ void C_EngineObjectInternal::LinkChild(IEngineObjectClient* pChild)
 	}
 	this->SetFirstMoveChild( pChild);
 	((C_EngineObjectInternal*)pChild)->SetMoveParent( this);
-	pChild->GetOuter()->AddToAimEntsList();
+	pChild->AddToAimEntsList();
 
 	Interp_HierarchyUpdateInterpolationAmounts();
 }
@@ -6943,6 +6943,49 @@ void C_EngineObjectInternal::RemoveFromLeafSystem()
 		m_hRender = INVALID_CLIENT_RENDER_HANDLE;
 	}
 	DestroyShadow();
+}
+
+void C_EngineObjectInternal::AddToAimEntsList()
+{
+	// Already in list
+	if (m_AimEntsListHandle != INVALID_AIMENTS_LIST_HANDLE)
+		return;
+
+	m_AimEntsListHandle = ClientEntityList().m_AimEntsList.AddToTail(this);
+}
+
+void C_EngineObjectInternal::RemoveFromAimEntsList()
+{
+	// Not in list yet
+	if (INVALID_AIMENTS_LIST_HANDLE == m_AimEntsListHandle)
+	{
+		return;
+	}
+
+	unsigned int c = ClientEntityList().m_AimEntsList.Count();
+
+	Assert(m_AimEntsListHandle < c);
+
+	unsigned int last = c - 1;
+
+	if (last == m_AimEntsListHandle)
+	{
+		// Just wipe the final entry
+		ClientEntityList().m_AimEntsList.FastRemove(last);
+	}
+	else
+	{
+		C_EngineObjectInternal* lastEntity = ClientEntityList().m_AimEntsList[last];
+		// Remove the last entry
+		ClientEntityList().m_AimEntsList.FastRemove(last);
+
+		// And update it's handle to point to this slot.
+		lastEntity->m_AimEntsListHandle = m_AimEntsListHandle;
+		ClientEntityList().m_AimEntsList[m_AimEntsListHandle] = lastEntity;
+	}
+
+	// Invalidate our handle no matter what.
+	m_AimEntsListHandle = INVALID_AIMENTS_LIST_HANDLE;
 }
 
 C_EnginePortalInternal::C_EnginePortalInternal(IClientEntityList* pClientEntityList)

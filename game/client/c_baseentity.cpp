@@ -482,7 +482,6 @@ void C_BaseEntity::Clear( void )
 	//m_RefEHandle.Term();
 
 	m_hThink = INVALID_THINK_HANDLE;
-	m_AimEntsListHandle = INVALID_AIMENTS_LIST_HANDLE;
 
 	//index = -1;
 	if (entindex() >= 0) {
@@ -1384,104 +1383,12 @@ void C_BaseEntity::PreDataUpdate( DataUpdateType_t updateType )
 
 
 
-CUtlVector< C_BaseEntity * >	g_AimEntsList;
 
 
-//-----------------------------------------------------------------------------
-// Moves all aiments
-//-----------------------------------------------------------------------------
-void C_BaseEntity::MarkAimEntsDirty()
-{
-	// FIXME: With the dirty bits hooked into cycle + sequence, it's unclear
-	// that this is even necessary any more (provided aiments are always accessing
-	// joints or attachments of the move parent).
-	//
-	// NOTE: This is a tricky algorithm. This list does not actually contain
-	// all aim-ents in its list. It actually contains all hierarchical children,
-	// of which aim-ents are a part. We can tell if something is an aiment if it has
-	// the EF_BONEMERGE effect flag set.
-	// 
-	// We will first iterate over all aiments and clear their DIRTY_ABSTRANSFORM flag, 
-	// which is necessary to cause them to recompute their aim-ent origin 
-	// the next time CalcAbsPosition is called. Because CalcAbsPosition calls MoveToAimEnt
-	// and MoveToAimEnt calls SetAbsOrigin/SetAbsAngles, that is how CalcAbsPosition
-	// will cause the aim-ent's (and all its children's) dirty state to be correctly updated.
-	//
-	// Then we will iterate over the loop a second time and call CalcAbsPosition on them,
-	int i;
-	int c = g_AimEntsList.Count();
-	for ( i = 0; i < c; ++i )
-	{
-		C_BaseEntity *pEnt = g_AimEntsList[ i ];
-		Assert( pEnt && pEnt->GetEngineObject()->GetMoveParent() );
-		if ( pEnt->GetEngineObject()->IsEffectActive(EF_BONEMERGE | EF_PARENT_ANIMATES) )
-		{
-			pEnt->GetEngineObject()->AddEFlags( EFL_DIRTY_ABSTRANSFORM );
-		}
-	}
-}
 
 
-void C_BaseEntity::CalcAimEntPositions()
-{
-	VPROF("CalcAimEntPositions");
-	int i;
-	int c = g_AimEntsList.Count();
-	for ( i = 0; i < c; ++i )
-	{
-		C_BaseEntity *pEnt = g_AimEntsList[ i ];
-		Assert( pEnt );
-		Assert( pEnt->GetEngineObject()->GetMoveParent() );
-		if ( pEnt->GetEngineObject()->IsEffectActive(EF_BONEMERGE) )
-		{
-			pEnt->GetEngineObject()->CalcAbsolutePosition( );
-		}
-	}
-}
 
 
-void C_BaseEntity::AddToAimEntsList()
-{
-	// Already in list
-	if ( m_AimEntsListHandle != INVALID_AIMENTS_LIST_HANDLE )
-		return;
-
-	m_AimEntsListHandle = g_AimEntsList.AddToTail( this );
-}
-
-void C_BaseEntity::RemoveFromAimEntsList()
-{
-	// Not in list yet
-	if ( INVALID_AIMENTS_LIST_HANDLE == m_AimEntsListHandle )
-	{
-		return;
-	}
-
-	unsigned int c = g_AimEntsList.Count();
-
-	Assert( m_AimEntsListHandle < c );
-
-	unsigned int last = c - 1;
-
-	if ( last == m_AimEntsListHandle )
-	{
-		// Just wipe the final entry
-		g_AimEntsList.FastRemove( last );
-	}
-	else
-	{
-		C_BaseEntity *lastEntity = g_AimEntsList[ last ];
-		// Remove the last entry
-		g_AimEntsList.FastRemove( last );
-
-		// And update it's handle to point to this slot.
-		lastEntity->m_AimEntsListHandle = m_AimEntsListHandle;
-		g_AimEntsList[ m_AimEntsListHandle ] = lastEntity;
-	}
-
-	// Invalidate our handle no matter what.
-	m_AimEntsListHandle = INVALID_AIMENTS_LIST_HANDLE;
-}
 
 //-----------------------------------------------------------------------------
 // Update move-parent if needed. For SourceTV.
@@ -3274,7 +3181,7 @@ void C_BaseEntity::UpdateOnRemove( void )
 	// Clean up drawing
 	GetEngineObject()->RemoveFromLeafSystem();
 
-	RemoveFromAimEntsList();
+	GetEngineObject()->RemoveFromAimEntsList();
 }
 
 //-----------------------------------------------------------------------------
@@ -3612,7 +3519,7 @@ void C_BaseEntity::OnPostRestoreData()
 {
 	if (GetEngineObject()->GetMoveParent() )
 	{
-		AddToAimEntsList();
+		GetEngineObject()->AddToAimEntsList();
 	}
 
 	// If our model index has changed, then make sure it's reflected in our model pointer.
