@@ -388,6 +388,7 @@ void CWeaponCSBase::PostConstructor(const char* szClassname, int iForceEdictInde
 {
 	BaseClass::PostConstructor(szClassname, iForceEdictIndex);
 	GetEngineObject()->AddSolidFlags(FSOLID_TRIGGER); // Nothing collides with these but it gets touches.
+	GetEngineObject()->UseClientSideAnimation();
 }
 
 bool CWeaponCSBase::KeyValue( const char *szKeyName, const char *szValue )

@@ -867,7 +867,7 @@ private:
 	CNetworkVar(unsigned char, m_iParentAttachment); // 0 if we're relative to the parent's absorigin and absangles.
 
 	// was pev->flags
-	CNetworkVarForDerived(int, m_fFlags);
+	CNetworkVar(int, m_fFlags);
 	int		m_iEFlags;	// entity flags EFL_*
 	// FIXME: Make this private! Still too many references to do so...
 	CNetworkVar(int, m_spawnflags);
@@ -889,12 +889,12 @@ private:
 	// was pev->gravity;
 	float			m_flGravity;  // rename to m_flGravityScale;
 	// was pev->friction
-	CNetworkVarForDerived(float, m_flFriction);
+	CNetworkVar(float, m_flFriction);
 	CNetworkVar(float, m_flElasticity);
 	// Think function handling
 	THINKPTR						m_pfnThink;
 	// was pev->nextthink
-	CNetworkVarForDerived(int, m_nNextThinkTick);
+	CNetworkVar(int, m_nNextThinkTick);
 	int							m_nLastThinkTick;
 	CUtlVector< thinkfunc_t >	m_aThinkFunctions;
 #ifdef _DEBUG
