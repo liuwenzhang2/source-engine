@@ -2835,7 +2835,7 @@ int CGlobalEntityList<T>::RestoreGlobalEntity(T* pEntity, IRestore* pRestore, en
 	{
 		pEntity = NULL;
 	}
-
+	pRestore->SetGlobalMode(0);
 	// Is this an overriding global entity (coming over the transition)
 	pSaveData->modelSpaceOffset.Init();
 	if (pEntity)

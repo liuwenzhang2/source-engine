@@ -1253,7 +1253,7 @@ int CEngineObjectInternal::Restore(IRestore& restore)
 {
 	// This is essential to getting the spatial partition info correct
 	DestroyPartitionHandle();
-
+	
 	// loops through the data description list, restoring each data desc block in order
 	int status = restore.ReadEntity(this->m_pOuter);;
 
@@ -1286,7 +1286,7 @@ int CEngineObjectInternal::Restore(IRestore& restore)
 	// (We don't want to use the saved version of this flag)
 	RemoveEFlags(EFL_DIRTY_SPATIAL_PARTITION);
 	MarkSurroundingBoundsDirty();
-
+	
 	if (m_pOuter->IsNetworkable() && entindex() != -1 && GetModelIndex() != 0 && GetModelName() != NULL_STRING && restore.GetPrecacheMode())
 	{
 		engine->PrecacheModel(STRING(GetModelName()));

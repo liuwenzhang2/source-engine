@@ -1480,6 +1480,7 @@ CPolyhedron *ClipLinkedGeometry( GeneratePolyhedronFromPlanes_UnorderedPolygonLL
 			//			If the line is on-plane. Skip the bridge line making, but set links to the new polygon as if we'd just created the bridge
 			//		3. Once we follow a line back to the point where we started, we should be all done.
 
+			int loopCheck = 0;
 			do
 			{
 				if( pWorkPolygon->bMissingASide )
@@ -1687,7 +1688,7 @@ CPolyhedron *ClipLinkedGeometry( GeneratePolyhedronFromPlanes_UnorderedPolygonLL
 
 					Assert_DumpPolyhedron( pWorkPolygon != pLastWorkPolygon );
 				}
-			} while( pWorkPoint != pStartPoint );
+			} while (pWorkPoint != pStartPoint && loopCheck++ < 10000);
 		}
 
 #ifdef _DEBUG
