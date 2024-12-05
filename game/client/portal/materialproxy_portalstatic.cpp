@@ -116,7 +116,7 @@ void CPortalStaticPortalProxy::OnBind( void *pBind )
 		return;
 
 	IClientRenderable *pRenderable = (IClientRenderable*)( pBind );
-	C_Prop_Portal *pPortal = (C_Prop_Portal *)pRenderable;
+	C_Prop_Portal *pPortal = (C_Prop_Portal *)pRenderable->GetIClientUnknown();
 
 	float flStaticAmount = ComputeStaticAmount( pPortal );
 	m_StaticOutput->SetFloatValue( flStaticAmount );
@@ -137,7 +137,7 @@ void CPortalOpenAmountProxy::OnBind( void *pBind )
 		return;
 
 	IClientRenderable *pRenderable = (IClientRenderable*)( pBind );
-	C_Prop_Portal *pPortal = (C_Prop_Portal *)pRenderable;
+	C_Prop_Portal *pPortal = (C_Prop_Portal *)pRenderable->GetIClientUnknown();
 
 	m_StaticOutput->SetFloatValue( pPortal->m_fOpenAmount );
 }

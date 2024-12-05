@@ -19,9 +19,7 @@ C_PortalGhostRenderable::C_PortalGhostRenderable( )
 
 C_PortalGhostRenderable::~C_PortalGhostRenderable( void )
 {
-	g_pClientLeafSystem->RemoveRenderable(GetEngineObject()->GetRenderHandle() );
 	//cl_entitylist->RemoveEntity( GetIClientUnknown()->GetRefEHandle() );
-
 	GetEngineObject()->DestroyModelInstance();
 }
 
@@ -38,6 +36,7 @@ void C_PortalGhostRenderable::Init(C_Prop_Portal* pOwningPortal, C_BaseEntity* p
 
 void C_PortalGhostRenderable::UpdateOnRemove(void)
 {
+	g_pClientLeafSystem->RemoveRenderable(GetEngineObject()->GetRenderHandle());
 	GetEngineGhost()->SetGhostedSource(NULL);
 	BaseClass::UpdateOnRemove();
 }

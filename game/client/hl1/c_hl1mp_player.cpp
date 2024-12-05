@@ -377,9 +377,9 @@ void C_HL1MP_Player::CalcView( Vector &eyeOrigin, QAngle &eyeAngles, float &zNea
 		Vector WALL_MAX( WALL_OFFSET, WALL_OFFSET, WALL_OFFSET );
 
 		trace_t trace; // clip against world
-		C_EngineObjectInternal::PushEnableAbsRecomputations( false ); // HACK don't recompute positions while doing RayTrace
+		ClientEntityList().PushEnableAbsRecomputations( false ); // HACK don't recompute positions while doing RayTrace
 		UTIL_TraceHull( origin, eyeOrigin, WALL_MIN, WALL_MAX, MASK_SOLID_BRUSHONLY, this, COLLISION_GROUP_NONE, &trace );
-		C_EngineObjectInternal::PopEnableAbsRecomputations();
+		ClientEntityList().PopEnableAbsRecomputations();
 
 		if (trace.fraction < 1.0)
 		{

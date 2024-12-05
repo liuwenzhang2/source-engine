@@ -4701,7 +4701,7 @@ public:
 				Assert(pPhysics);
 				
 				// Must either be squashable or very light
-				if ( pPhysics->IsMoveable() && pPhysics->GetMass() < 32 )
+				if (pPhysics && pPhysics->IsMoveable() && pPhysics->GetMass() < 32)
 					return false;
 			}
 		}

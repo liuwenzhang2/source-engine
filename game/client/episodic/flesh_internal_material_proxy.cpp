@@ -183,7 +183,7 @@ void CFleshInteriorMaterialProxy::OnBind( C_BaseEntity *pEnt )
 		if ( i < g_FleshProxyTargets.Count() )
 		{
 			// Setup the target
-			if (C_EngineObjectInternal::IsAbsQueriesValid() == false )
+			if (ClientEntityList().IsAbsQueriesValid() == false)
 				continue;
 
 			Vector vecAbsOrigin = g_FleshProxyTargets[i]->GetEngineObject()->GetAbsOrigin();
