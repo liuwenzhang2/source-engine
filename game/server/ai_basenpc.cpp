@@ -8280,7 +8280,7 @@ void CAI_BaseNPC::HandleAnimEvent( animevent_t *pEvent )
 			SetIdealActivity( ACT_IDLE );
 			Forget( bits_MEMORY_TURNING );
 			GetEngineObject()->SetBoneController( 0, GetEngineObject()->GetLocalAngles().y );
-			IncrementInterpolationFrame();
+			GetEngineObject()->IncrementInterpolationFrame();
 			break;
 		}
 
@@ -11907,7 +11907,7 @@ bool CAI_BaseNPC::CineCleanup()
 		if ( CanBecomeRagdoll() == false )
 		{
 			StopAnimation();
-			IncrementInterpolationFrame(); // Don't interpolate either, assume the corpse is positioned in its final resting place
+			GetEngineObject()->IncrementInterpolationFrame(); // Don't interpolate either, assume the corpse is positioned in its final resting place
 		}
 
 		GetEngineObject()->SetMoveType( MOVETYPE_NONE );
@@ -11981,7 +11981,7 @@ bool CAI_BaseNPC::CineCleanup()
 				// Call teleport to notify
 				Teleport( &origin, NULL, NULL );
 				GetEngineObject()->SetLocalOrigin( origin );
-				IncrementInterpolationFrame();
+				GetEngineObject()->IncrementInterpolationFrame();
 			}
 
 			if ( m_iHealth <= 0 )

@@ -722,7 +722,7 @@ void CPortal_Player::PlayerDeathThink(void)
 
 	StopAnimation();
 
-	IncrementInterpolationFrame();
+	GetEngineObject()->IncrementInterpolationFrame();
 	GetEngineObject()->SetPlaybackRate(0.0);
 
 	int fAnyButtonDown = (m_nButtons & ~IN_SCORE);
@@ -1247,7 +1247,7 @@ void CPortal_Player::VPhysicsShadowUpdate( IPhysicsObject *pPhysics )
 
 				if ( !GetEngineObject()->IsRideablePhysics(pPhysGround) )
 				{
-					if ( !(m_afPhysicsFlags & PFLAG_VPHYSICS_MOTIONCONTROLLER ) && IsSimulatingOnAlternateTicks() )
+					if ( !(m_afPhysicsFlags & PFLAG_VPHYSICS_MOTIONCONTROLLER ) && gEntList.IsSimulatingOnAlternateTicks() )
 					{
 						newVelocity *= 0.5f;
 					}

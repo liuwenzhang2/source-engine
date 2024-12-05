@@ -949,7 +949,7 @@ void CFuncTrain::Next( void )
 	//Check for teleport
 	if ( m_hCurrentTarget->GetEngineObject()->HasSpawnFlags( SF_CORNER_TELEPORT ) )
 	{
-		IncrementInterpolationFrame();
+		GetEngineObject()->IncrementInterpolationFrame();
 
 		// This is supposed to place the center of the func_train at the target's origin.
 		// FIXME: This is totally busted! It's using the wrong space for the computation...

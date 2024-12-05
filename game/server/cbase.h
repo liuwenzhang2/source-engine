@@ -153,4 +153,6 @@ class CSound;
 #include "ndebugoverlay.h"
 #include "recipientfilter.h"
 
+inline IServerEntityList* EntityList() { return &gEntList; }
+
 #endif // CBASE_H

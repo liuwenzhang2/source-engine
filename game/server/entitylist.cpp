@@ -106,6 +106,8 @@ ConVar xbox_throttlespoof("xbox_throttlespoof", "200", FCVAR_ARCHIVE);
 ConVar xbox_autothrottle("xbox_autothrottle", "1", FCVAR_ARCHIVE);
 ConVar xbox_steering_deadzone("xbox_steering_deadzone", "0.0");
 ConVar ai_setupbones_debug("ai_setupbones_debug", "0", 0, "Shows that bones that are setup every think");
+ConVar	sv_alternateticks("sv_alternateticks", (IsX360()) ? "1" : "0", FCVAR_SPONLY, "If set, server only simulates entities on even numbered ticks.\n");
+
 
 //-----------------------------------------------------------------------------
 // Portal-specific hack designed to eliminate re-entrancy in touch functions
@@ -716,6 +718,7 @@ BEGIN_SEND_TABLE_NOBASE(CEngineObjectInternal, DT_EngineObject)
 	SendPropInt(SENDINFO(m_nRenderFX), 8, SPROP_UNSIGNED),
 	SendPropInt(SENDINFO(m_nOverlaySequence), 11),
 	SendPropBool(SENDINFO(m_bAlternateSorting)),
+	SendPropInt(SENDINFO(m_ubInterpolationFrame), NOINTERP_PARITY_MAX_BITS, SPROP_UNSIGNED),
 
 END_SEND_TABLE()
 
@@ -5993,6 +5996,12 @@ bool CEngineObjectInternal::GetAttachment(int iAttachment, Vector& absOrigin, QA
 	bool bRet = GetAttachment(iAttachment, attachmentToWorld);
 	MatrixAngles(attachmentToWorld, absAngles, absOrigin);
 	return bRet;
+}
+
+//------------------------------------------------------------------------------
+void CEngineObjectInternal::IncrementInterpolationFrame()
+{
+	m_ubInterpolationFrame = (m_ubInterpolationFrame + 1) % NOINTERP_PARITY_MAX;
 }
 
 void CEnginePlayerInternal::VPhysicsDestroyObject()

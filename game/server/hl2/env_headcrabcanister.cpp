@@ -832,7 +832,7 @@ void CEnvHeadcrabCanister::SetLanded( void )
 	GetEngineObject()->SetSolid( SOLID_VPHYSICS );
 	GetEngineObject()->VPhysicsInitStatic();
 	
-	IncrementInterpolationFrame();
+	GetEngineObject()->IncrementInterpolationFrame();
 	m_bLanded = true;
 }
 
@@ -931,7 +931,7 @@ void CEnvHeadcrabCanister::Detonate( )
 		GetEngineObject()->SetAbsOrigin( m_vecImpactPosition );
 		SetModel( ENV_HEADCRABCANISTER_BROKEN_MODEL );
 		GetEngineObject()->SetMoveType( MOVETYPE_NONE );
-		IncrementInterpolationFrame();
+		GetEngineObject()->IncrementInterpolationFrame();
 		m_bLanded = true;
 		
 		// Become invisible so our trail can finish up

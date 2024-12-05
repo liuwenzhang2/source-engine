@@ -2164,7 +2164,7 @@ void CBasePlayer::PlayerDeathThink(void)
 	
 	StopAnimation();
 
-	IncrementInterpolationFrame();
+	GetEngineObject()->IncrementInterpolationFrame();
 	GetEngineObject()->SetPlaybackRate(0.0);
 	
 	int fAnyButtonDown = (m_nButtons & ~IN_SCORE);
@@ -3338,7 +3338,7 @@ void CBasePlayer::PhysicsSimulate( void )
 
 	// If we're running multiple ticks this frame, don't peel off all of the commands, spread them out over
 	// the server ticks.  Use blocks of two in alternate ticks
-	int commandLimit = CBaseEntity::IsSimulatingOnAlternateTicks() ? 2 : 1;
+	int commandLimit = gEntList.IsSimulatingOnAlternateTicks() ? 2 : 1;
 	int commandsToRun = vecAvailCommands.Count();
 	if ( gpGlobals->simTicksThisFrame >= commandLimit && vecAvailCommands.Count() > commandLimit )
 	{
@@ -4942,7 +4942,7 @@ void CBasePlayer::Spawn( void )
 	int effects = GetEngineObject()->GetEffects() & EF_NOSHADOW;
 	GetEngineObject()->SetEffects( effects );
 
-	IncrementInterpolationFrame();
+	GetEngineObject()->IncrementInterpolationFrame();
 
 	// Initialize the fog and postprocess controllers.
 	InitFogController();
@@ -8240,7 +8240,7 @@ void CBasePlayer::VPhysicsShadowUpdate( IPhysicsObject *pPhysics )
 
 				if ( !GetEngineObject()->IsRideablePhysics(pPhysGround) )
 				{
-					if ( !(m_afPhysicsFlags & PFLAG_VPHYSICS_MOTIONCONTROLLER ) && IsSimulatingOnAlternateTicks() )
+					if ( !(m_afPhysicsFlags & PFLAG_VPHYSICS_MOTIONCONTROLLER ) && gEntList.IsSimulatingOnAlternateTicks() )
 					{
 						newVelocity *= 0.5f;
 					}

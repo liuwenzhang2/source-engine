@@ -728,7 +728,7 @@ void CAI_ScriptedSequence::StartScript( void )
 			m_bIsTeleportingDueToMoveTo = false;
 			pTarget->GetMotor()->SetIdealYaw(GetEngineObject()->GetLocalAngles().y );
 			pTarget->SetLocalAngularVelocity( vec3_angle );
-			pTarget->IncrementInterpolationFrame();
+			pTarget->GetEngineObject()->IncrementInterpolationFrame();
 			QAngle angles = pTarget->GetEngineObject()->GetLocalAngles();
 			angles.y = GetEngineObject()->GetLocalAngles().y;
 			pTarget->GetEngineObject()->SetLocalAngles( angles );
@@ -839,7 +839,7 @@ bool CAI_ScriptedSequence::StartSequence( CAI_BaseNPC *pTarget, string_t iszSeq,
 		// Show it
 		pTarget->GetEngineObject()->RemoveEffects( EF_NODRAW );
 		// Don't blend...
-		pTarget->IncrementInterpolationFrame();
+		pTarget->GetEngineObject()->IncrementInterpolationFrame();
 	}
 	//DevMsg( 2, "%s (%s): started \"%s\":INT:%s\n", STRING( pTarget->m_iName ), pTarget->GetClassname(), STRING( iszSeq), (m_spawnflags & SF_SCRIPT_NOINTERRUPT) ? "No" : "Yes" );
 

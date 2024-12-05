@@ -35,6 +35,7 @@ struct PS_InternalData_t;
 struct PS_SD_Static_SurfaceProperties_t;
 class CIKContext;
 typedef unsigned int HTOOLHANDLE;
+class CUserCmd;
 
 class VarMapEntry_t
 {
@@ -548,7 +549,6 @@ public:
 	virtual void SetWritableBones(int flags) = 0;
 	virtual int GetAccumulatedBoneMask() = 0;
 	virtual CIKContext* GetIk() = 0;
-	virtual void DestroyIk() = 0;
 	virtual bool SetupBones(matrix3x4_t* pBoneToWorldOut, int nMaxBones, int boneMask, float currentTime) = 0;
 	virtual void GetHitboxBoneTransform(int iBone, matrix3x4_t& pBoneToWorld) = 0;
 	virtual void GetHitboxBoneTransforms(const matrix3x4_t* hitboxbones[MAXSTUDIOBONES]) = 0;
@@ -577,10 +577,18 @@ public:
 	virtual void AddToLeafSystem() = 0;
 	virtual void AddToLeafSystem(RenderGroup_t group) = 0;
 	virtual void RemoveFromLeafSystem() = 0;
-
 	virtual void AddToAimEntsList() = 0;
 	virtual void RemoveFromAimEntsList() = 0;
 	virtual void ForceClientSideAnimationOn() = 0;
+	virtual void AddToInterpolationList() = 0;
+	virtual void RemoveFromInterpolationList() = 0;
+	virtual void AddToTeleportList() = 0;
+	virtual void RemoveFromTeleportList() = 0;
+	virtual bool Teleported(void) = 0;
+	virtual bool IsNoInterpolationFrame() = 0;
+	virtual void MoveToLastReceivedPosition(bool force = false) = 0;
+	virtual void ResetLatched() = 0;
+	virtual bool IsReadyToDraw() = 0;
 };
 
 class IEnginePortalClient {
@@ -771,6 +779,12 @@ public:
 	virtual unsigned long GetPreviousBoneCounter() = 0;
 	virtual CUtlVector<IEngineObjectClient*>& GetPreviousBoneSetups() = 0;
 	virtual unsigned long GetModelBoneCounter() = 0;
+
+	virtual int GetPredictionRandomSeed(void) = 0;
+	virtual void SetPredictionRandomSeed(const CUserCmd* cmd) = 0;
+	virtual IEngineObject* GetPredictionPlayer(void) = 0;
+	virtual void SetPredictionPlayer(IEngineObject* player) = 0;
+	virtual bool IsSimulatingOnAlternateTicks() = 0;
 };
 
 extern IClientEntityList* entitylist;

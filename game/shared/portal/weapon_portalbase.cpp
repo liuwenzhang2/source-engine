@@ -165,7 +165,7 @@ void CWeaponPortalBase::OnDataChanged( DataUpdateType_t type )
 
 int CWeaponPortalBase::DrawModel( int flags )
 {
-	if ( !m_bReadyToDraw )
+	if ( !GetEngineObject()->IsReadyToDraw() )
 		return 0;
 
 	if ( GetOwner() && (GetOwner() == C_BasePlayer::GetLocalPlayer()) && !g_pPortalRender->IsRenderingPortal() && !C_BasePlayer::ShouldDrawLocalPlayer() )

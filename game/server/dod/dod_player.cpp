@@ -2732,7 +2732,7 @@ void CDODPlayer::State_PreThink_DEATH_ANIM()
 
 					StopAnimation();
 
-					IncrementInterpolationFrame();
+					GetEngineObject()->IncrementInterpolationFrame();
 
 					if (GetEngineObject()->GetMoveType() != MOVETYPE_NONE && (GetEngineObject()->GetFlags() & FL_ONGROUND) )
 						GetEngineObject()->SetMoveType( MOVETYPE_NONE );
@@ -2750,7 +2750,7 @@ void CDODPlayer::State_PreThink_DEATH_ANIM()
 
 				StopAnimation();
 
-				IncrementInterpolationFrame();
+				GetEngineObject()->IncrementInterpolationFrame();
 
 				if (GetEngineObject()->GetMoveType() != MOVETYPE_NONE && (GetEngineObject()->GetFlags() & FL_ONGROUND) )
 					GetEngineObject()->SetMoveType( MOVETYPE_NONE );
@@ -2767,7 +2767,7 @@ void CDODPlayer::State_PreThink_DEATH_ANIM()
 
 			StopAnimation();
 
-			IncrementInterpolationFrame();
+			GetEngineObject()->IncrementInterpolationFrame();
 
 			if (GetEngineObject()->GetMoveType() != MOVETYPE_NONE && (GetEngineObject()->GetFlags() & FL_ONGROUND) )
 				GetEngineObject()->SetMoveType( MOVETYPE_NONE );

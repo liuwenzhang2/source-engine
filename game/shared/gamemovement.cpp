@@ -420,7 +420,7 @@ static CDiffManager g_DiffMgr;
 void DiffPrint( bool bServer, int nCommandNumber, char const *fmt, ... )
 {
 	// Only track stuff for local player
-	CBasePlayer *pPlayer = CBaseEntity::GetPredictionPlayer();
+	CBasePlayer *pPlayer = EntityList()->GetPredictionPlayer();
 	if ( pPlayer && pPlayer->entindex() != 1 )
 	{
 		return;
@@ -454,7 +454,7 @@ void _CheckV( int tick, char const *ctx, const Vector &vel )
 static void StartCommand( bool bServer, int nCommandNumber )
 {
 	// Only track stuff for local player
-	CBasePlayer *pPlayer = CBaseEntity::GetPredictionPlayer();
+	CBasePlayer *pPlayer = EntityList()->GetPredictionPlayer();
 	if ( pPlayer && pPlayer->entindex() != 1 )
 	{
 		return;
@@ -469,7 +469,7 @@ static void StartCommand( bool bServer, int nCommandNumber )
 static void Validate( bool bServer, int nCommandNumber )
 {
 	// Only track stuff for local player
-	CBasePlayer *pPlayer = CBaseEntity::GetPredictionPlayer();
+	CBasePlayer *pPlayer = EntityList()->GetPredictionPlayer();
 	if ( pPlayer && pPlayer->entindex() != 1 )
 	{
 		return;
@@ -4117,10 +4117,10 @@ void CGameMovement::FinishUnDuck( void )
 #ifdef STAGING_ONLY
 	if ( debug_latch_reset_onduck.GetBool() )
 	{
-		player->ResetLatched();
+		player->GetEngineObject()->ResetLatched();
 	}
 #else
-	player->ResetLatched();
+	player->GetEngineObject()->ResetLatched();
 #endif
 #endif // CLIENT_DLL
 
@@ -4222,10 +4222,10 @@ void CGameMovement::FinishDuck( void )
 #ifdef STAGING_ONLY
 		if ( debug_latch_reset_onduck.GetBool() )
 		{
-			player->ResetLatched();
+			player->GetEngineObject()->ResetLatched();
 		}
 #else
-		player->ResetLatched();
+		player->GetEngineObject()->ResetLatched();
 #endif
 #endif // CLIENT_DLL
 	}

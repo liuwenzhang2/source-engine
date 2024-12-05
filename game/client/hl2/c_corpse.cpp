@@ -38,7 +38,7 @@ int C_Corpse::DrawModel( int flags )
 		return drawn;
 	}
 
-	if ( !m_bReadyToDraw )
+	if ( !GetEngineObject()->IsReadyToDraw() )
 		return 0;
 
 	// get copy of player

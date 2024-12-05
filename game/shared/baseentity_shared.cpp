@@ -671,23 +671,6 @@ bool CBaseEntity::ShouldCollide( int collisionGroup, int contentsMask ) const
 	return true;
 }
 
-
-//-----------------------------------------------------------------------------
-// Purpose: 
-// Input  : seed - 
-//-----------------------------------------------------------------------------
-void CBaseEntity::SetPredictionRandomSeed( const CUserCmd *cmd )
-{
-	if ( !cmd )
-	{
-		m_nPredictionRandomSeed = -1;
-		return;
-	}
-
-	m_nPredictionRandomSeed = ( cmd->random_seed );
-}
-
-
 //------------------------------------------------------------------------------
 // Purpose : Base implimentation for entity handling decals
 //------------------------------------------------------------------------------
@@ -1039,7 +1022,7 @@ void CBaseEntity::FireBullets( const FireBulletsInfo_t &info )
 	int iSeed = 0;
 	if ( IsPlayer() )
 	{
-		iSeed = CBaseEntity::GetPredictionRandomSeed() & 255;
+		iSeed = EntityList()->GetPredictionRandomSeed() & 255;
 	}
 
 #if defined( HL2MP ) && defined( GAME_DLL )
@@ -1828,21 +1811,8 @@ void CBaseEntity::SetWaterType( int nType )
 		m_nWaterType |= 2;
 }
 
-ConVar	sv_alternateticks( "sv_alternateticks", ( IsX360() ) ? "1" : "0", FCVAR_SPONLY, "If set, server only simulates entities on even numbered ticks.\n" );
 
-//-----------------------------------------------------------------------------
-// Purpose: 
-// Output : Returns true on success, false on failure.
-//-----------------------------------------------------------------------------
-bool CBaseEntity::IsSimulatingOnAlternateTicks()
-{
-	if ( gpGlobals->maxClients != 1 )
-	{
-		return false;
-	}
 
-	return sv_alternateticks.GetBool();
-}
 
 
 

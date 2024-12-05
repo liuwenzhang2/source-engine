@@ -54,7 +54,7 @@ void cc_cl_interp_all_changed(IConVar* pConVar, const char* pOldString, float fl
 		{
 			if (pEnt->ShouldInterpolate())
 			{
-				pEnt->AddToInterpolationList();
+				pEnt->GetEngineObject()->AddToInterpolationList();
 			}
 		}
 	}
@@ -178,6 +178,10 @@ static ConVar cl_SetupAllBones("cl_SetupAllBones", "0");
 ConVar cl_warn_thread_contested_bone_setup("cl_warn_thread_contested_bone_setup", "0");
 #endif
 ConVar cl_threaded_bone_setup("cl_threaded_bone_setup", "0", 0, "Enable parallel processing of C_BaseAnimating::SetupBones()");
+ConVar	sv_alternateticks("sv_alternateticks", (IsX360()) ? "1" : "0", FCVAR_SPONLY, "If set, server only simulates entities on even numbered ticks.\n");
+// Defined in engine
+ConVar  cl_interpolate("cl_interpolate", "1.0f", FCVAR_USERINFO | FCVAR_DEVELOPMENTONLY);
+ConVar  cl_extrapolate("cl_extrapolate", "1", FCVAR_CHEAT, "Enable/disable extrapolation if interpolation history runs out.");
 
 //-----------------------------------------------------------------------------
 // Portal-specific hack designed to eliminate re-entrancy in touch functions
@@ -623,6 +627,7 @@ BEGIN_RECV_TABLE_NOBASE(C_EngineObjectInternal, DT_EngineObject)
 	RecvPropInt(RECVINFO(m_nRenderFX)),
 	RecvPropInt(RECVINFO(m_nOverlaySequence)),
 	RecvPropBool(RECVINFO(m_bAlternateSorting)),
+	RecvPropInt(RECVINFO(m_ubInterpolationFrame)),
 
 END_RECV_TABLE()
 
@@ -980,12 +985,15 @@ void C_EngineObjectInternal::PreDataUpdate(DataUpdateType_t updateType)
 	{
 		ClientLeafSystem()->EnableAlternateSorting(GetRenderHandle(), m_bAlternateSorting);
 	}
+	m_ubOldInterpolationFrame = m_ubInterpolationFrame;
 	m_pOuter->PreDataUpdate(updateType);
 }
 
 void C_EngineObjectInternal::OnPreDataChanged(DataUpdateType_t type)
 {
 	m_bLastClientSideFrameReset = m_bClientSideFrameReset;
+	m_hOldMoveParent = GetNetworkMoveParent();
+	m_iOldParentAttachment = GetParentAttachment();
 	m_pOuter->OnPreDataChanged(type);
 }
 
@@ -1011,11 +1019,11 @@ void C_EngineObjectInternal::PostDataUpdate(DataUpdateType_t updateType)
 	// NOTE: This *has* to happen first. Otherwise, Origin + angles may be wrong 
 	if (m_nRenderFX == kRenderFxRagdoll && updateType == DATA_UPDATE_CREATED)
 	{
-		m_pOuter->MoveToLastReceivedPosition(true);
+		MoveToLastReceivedPosition(true);
 	}
 	else
 	{
-		m_pOuter->MoveToLastReceivedPosition(false);
+		MoveToLastReceivedPosition(false);
 	}
 
 
@@ -1077,7 +1085,7 @@ void C_EngineObjectInternal::PostDataUpdate(DataUpdateType_t updateType)
 		// Construct a random value for this instance
 		m_flProxyRandomValue = random->RandomFloat(0, 1);
 
-		m_pOuter->ResetLatched();
+		ResetLatched();
 
 		m_nCreationTick = gpGlobals->tickcount;
 	}
@@ -1168,6 +1176,19 @@ void C_EngineObjectInternal::PostDataUpdate(DataUpdateType_t updateType)
 	m_iv_ragAngles.NoteChanged(gpGlobals->curtime, true);
 	// this is the local client time at which this update becomes stale
 	m_flLastBoneChangeTime = gpGlobals->curtime + m_pOuter->GetInterpolationAmount(m_iv_ragPos.GetType());
+	// if we changed parents, recalculate visibility
+	if (m_hOldMoveParent != GetNetworkMoveParent())
+	{
+		m_pOuter->UpdateVisibility();
+	}
+	// Add the entity to the nointerp list.
+//	if ( !IsClientCreated() )
+//	{
+	if (Teleported() || IsNoInterpolationFrame())
+	{
+		AddToTeleportList();
+	}
+	//	}
 	m_pOuter->PostDataUpdate(updateType);
 }
 
@@ -1215,7 +1236,7 @@ void C_EngineObjectInternal::OnDataChanged(DataUpdateType_t type)
 
 	if ((type == DATA_UPDATE_CREATED) || modelchanged)
 	{
-		m_pOuter->ResetLatched();
+		ResetLatched();
 		// if you have this pose parameter, activate HL1-style lipsync/wave envelope tracking
 		if (LookupPoseParameter(LIPSYNC_POSEPARAM_NAME) != -1)
 		{
@@ -1671,7 +1692,7 @@ void C_EngineObjectInternal::OnStoreLastNetworkedValue()
 		savePos = GetLocalOrigin();
 		saveAng = GetLocalAngles();
 
-		m_pOuter->MoveToLastReceivedPosition(true);
+		MoveToLastReceivedPosition(true);
 	}
 
 	int c = m_VarMap.m_Entries.Count();
@@ -1729,7 +1750,7 @@ void C_EngineObjectInternal::OnLatchInterpolatedVariables(int flags)
 
 	if (m_pOuter->ShouldInterpolate())
 	{
-		m_pOuter->AddToInterpolationList();
+		AddToInterpolationList();
 	}
 }
 
@@ -1740,10 +1761,10 @@ int C_EngineObjectInternal::BaseInterpolatePart1(float& currentTime, Vector& old
 
 
 	// These get moved to the parent position automatically
-	if (IsFollowingEntity() || !m_pOuter->IsInterpolationEnabled())
+	if (IsFollowingEntity() || !ClientEntityList().IsInterpolationEnabled())
 	{
 		// Assume current origin ( no interpolation )
-		m_pOuter->MoveToLastReceivedPosition();
+		MoveToLastReceivedPosition();
 		return INTERPOLATE_STOP;
 	}
 
@@ -6411,7 +6432,7 @@ bool C_EngineObjectInternal::SetupBones(matrix3x4_t* pBoneToWorldOut, int nMaxBo
 
 			if (m_pIk)
 			{
-				if (m_pOuter->Teleported() || m_pOuter->IsNoInterpolationFrame())
+				if (Teleported() || IsNoInterpolationFrame())
 					m_pIk->ClearTargets();
 
 				m_pIk->Init(hdr, m_pOuter->GetRenderAngles(), m_pOuter->GetRenderOrigin(), currentTime, gpGlobals->framecount, bonesMaskNeedRecalc);
@@ -7053,6 +7074,83 @@ void C_EngineObjectInternal::ForceClientSideAnimationOn()
 {
 	UseClientSideAnimation();
 	AddToClientSideAnimationList();
+}
+
+void C_EngineObjectInternal::AddToInterpolationList()
+{
+	if (m_InterpolationListEntry == 0xFFFF)
+		m_InterpolationListEntry = ClientEntityList().m_InterpolationList.AddToTail(this);
+}
+
+
+void C_EngineObjectInternal::RemoveFromInterpolationList()
+{
+	if (m_InterpolationListEntry != 0xFFFF)
+	{
+		ClientEntityList().m_InterpolationList.Remove(m_InterpolationListEntry);
+		m_InterpolationListEntry = 0xFFFF;
+	}
+}
+
+
+void C_EngineObjectInternal::AddToTeleportList()
+{
+	if (m_TeleportListEntry == 0xFFFF)
+		m_TeleportListEntry = ClientEntityList().m_TeleportList.AddToTail(this);
+}
+
+
+void C_EngineObjectInternal::RemoveFromTeleportList()
+{
+	if (m_TeleportListEntry != 0xFFFF)
+	{
+		ClientEntityList().m_TeleportList.Remove(m_TeleportListEntry);
+		m_TeleportListEntry = 0xFFFF;
+	}
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: Determine whether entity was teleported ( so we can disable interpolation )
+// Input  : *ent - 
+// Output : bool
+//-----------------------------------------------------------------------------
+bool C_EngineObjectInternal::Teleported(void)
+{
+	// Disable interpolation when hierarchy changes
+	if (m_hOldMoveParent != GetNetworkMoveParent() || m_iOldParentAttachment != GetParentAttachment())
+	{
+		return true;
+	}
+
+	return false;
+}
+
+void C_EngineObjectInternal::MoveToLastReceivedPosition(bool force)
+{
+	if (force || (GetRenderFX() != kRenderFxRagdoll))
+	{
+		SetLocalOrigin(GetNetworkOrigin());
+		SetLocalAngles(GetNetworkAngles());
+	}
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: Called by networking code when an entity is new to the PVS or comes down with the EF_NOINTERP flag set.
+//  The position history data is flushed out right after this call, so we need to store off the current data
+//  in the latched fields so we try to interpolate
+// Input  : *ent - 
+//			full_reset - 
+//-----------------------------------------------------------------------------
+void C_EngineObjectInternal::ResetLatched()
+{
+	//	if ( IsClientCreated() )
+	//		return;
+		// Reset the IK
+	if (GetIk())
+	{
+		DestroyIk();
+	}
+	Interp_Reset();
 }
 
 C_EnginePortalInternal::C_EnginePortalInternal(IClientEntityList* pClientEntityList)

@@ -813,6 +813,8 @@ public:
 		return GetAttachment(LookupAttachment(szName), absOrigin, absAngles);
 	}
 	void SetAlternateSorting(bool bAlternateSorting) { m_bAlternateSorting = bAlternateSorting; }
+	void IncrementInterpolationFrame(); // Call this to cause a discontinuity (teleport)
+
 public:
 	// Networking related methods
 	void NetworkStateChanged();
@@ -976,6 +978,7 @@ private:
 	unsigned short	m_fBoneCacheFlags;		// Used for bone cache state on model
 
 	CNetworkVar(bool, m_bAlternateSorting);
+	CNetworkVar(int, m_ubInterpolationFrame);
 
 };
 
@@ -2339,6 +2342,13 @@ public:
 	bool IsReceivedChainedUpdateOnRemove() { return m_bReceivedChainedUpdateOnRemove; }
 	void SetReceivedChainedUpdateOnRemove(bool bReceivedChainedUpdateOnRemove) { m_bReceivedChainedUpdateOnRemove = bReceivedChainedUpdateOnRemove; }
 
+	int GetPredictionRandomSeed(void);
+	void SetPredictionRandomSeed(const CUserCmd* cmd);
+	IEngineObject* GetPredictionPlayer(void);
+	void SetPredictionPlayer(IEngineObject* player);
+
+	bool IsSimulatingOnAlternateTicks();
+
 protected:
 	virtual void AfterCreated(IHandleEntity* pEntity);
 	virtual void BeforeDestroy(IHandleEntity* pEntity);
@@ -2404,6 +2414,12 @@ private:
 	bool m_bAbsQueriesValid = true;
 	bool m_bAccurateTriggerBboxChecks = true;	// SOLID_BBOX entities do a fully accurate trigger vs bbox check when this is set // set to false for legacy behavior in ep1
 	bool m_bDisableTouchFuncs = false;	// Disables PhysicsTouch and PhysicsStartTouch function calls
+
+	// This is a random seed used by the networking code to allow client - side prediction code
+//  randon number generators to spit out the same random numbers on both sides for a particular
+//  usercmd input.
+	int	m_nPredictionRandomSeed = -1;
+	IEngineObject* m_pPredictionPlayer = NULL;
 };
 
 extern CGlobalEntityList<CBaseEntity> gEntList;
@@ -4531,6 +4547,55 @@ void CGlobalEntityList<T>::DestroyDataObject(int type, T* instance) {
 	BaseClass::DestroyDataObject(type, instance);
 }
 
+//-----------------------------------------------------------------------------
+// Purpose: 
+// Input  : seed - 
+//-----------------------------------------------------------------------------
+template<class T>
+void CGlobalEntityList<T>::SetPredictionRandomSeed(const CUserCmd* cmd)
+{
+	if (!cmd)
+	{
+		m_nPredictionRandomSeed = -1;
+		return;
+	}
+
+	m_nPredictionRandomSeed = (cmd->random_seed);
+}
+
+template<class T>
+int CGlobalEntityList<T>::GetPredictionRandomSeed(void)
+{
+	return m_nPredictionRandomSeed;
+}
+
+template<class T>
+IEngineObject* CGlobalEntityList<T>::GetPredictionPlayer(void)
+{
+	return m_pPredictionPlayer;
+}
+
+template<class T>
+void CGlobalEntityList<T>::SetPredictionPlayer(IEngineObject* player)
+{
+	m_pPredictionPlayer = player;
+}
+
+extern ConVar	sv_alternateticks;
+//-----------------------------------------------------------------------------
+// Purpose: 
+// Output : Returns true on success, false on failure.
+//-----------------------------------------------------------------------------
+template<class T>
+bool CGlobalEntityList<T>::IsSimulatingOnAlternateTicks()
+{
+	if (gpGlobals->maxClients != 1)
+	{
+		return false;
+	}
+
+	return sv_alternateticks.GetBool();
+}
 
 template<class T>
 inline T* CHandle<T>::Get() const

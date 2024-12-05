@@ -704,7 +704,7 @@ IStudioHdr *C_BaseAnimating::OnNewModel()
 
 	// If we didn't have a model before, then we might need to go in the interpolation list now.
 	if ( ShouldInterpolate() )
-		AddToInterpolationList();
+		GetEngineObject()->AddToInterpolationList();
 
 	// objects with attachment points need to be queryable even if they're not solid
 	if ( hdr->GetNumAttachments() != 0 )
@@ -983,7 +983,7 @@ void C_BaseAnimating::MaintainSequenceTransitions( IBoneSetup &boneSetup, float 
 		boneSetup.GetStudioHdr(),
 		GetEngineObject()->GetSequence(),
 		GetEngineObject()->GetNewSequenceParity() != GetEngineObject()->GetPrevNewSequenceParity(),
-		!IsNoInterpolationFrame()
+		!GetEngineObject()->IsNoInterpolationFrame()
 		);
 
 	GetEngineObject()->SetPrevNewSequenceParity( GetEngineObject()->GetNewSequenceParity());
@@ -1605,7 +1605,7 @@ ConVar r_drawothermodels( "r_drawothermodels", "1", FCVAR_CHEAT, "0=Off, 1=Norma
 int C_BaseAnimating::DrawModel( int flags )
 {
 	VPROF_BUDGET( "C_BaseAnimating::DrawModel", VPROF_BUDGETGROUP_MODEL_RENDERING );
-	if ( !m_bReadyToDraw )
+	if ( !GetEngineObject()->IsReadyToDraw() )
 		return 0;
 
 	int drawn = 0;
@@ -2730,23 +2730,6 @@ bool C_BaseAnimating::IsSelfAnimating()
 }
 
 //-----------------------------------------------------------------------------
-// Purpose: Called by networking code when an entity is new to the PVS or comes down with the EF_NOINTERP flag set.
-//  The position history data is flushed out right after this call, so we need to store off the current data
-//  in the latched fields so we try to interpolate
-// Input  : *ent - 
-//			full_reset - 
-//-----------------------------------------------------------------------------
-void C_BaseAnimating::ResetLatched( void )
-{
-	// Reset the IK
-	if (GetEngineObject()->GetIk())
-	{
-		GetEngineObject()->DestroyIk();
-	}
-	BaseClass::ResetLatched();
-}
-
-//-----------------------------------------------------------------------------
 // Purpose: 
 // Output : Returns true on success, false on failure.
 //-----------------------------------------------------------------------------
@@ -2772,7 +2755,7 @@ bool C_BaseAnimating::Interpolate( float flCurrentTime )
 	if ( retVal == INTERPOLATE_STOP )
 	{
 		if ( bNoMoreChanges )
-			RemoveFromInterpolationList();
+			GetEngineObject()->RemoveFromInterpolationList();
 		return true;
 	}
 
@@ -2782,7 +2765,7 @@ bool C_BaseAnimating::Interpolate( float flCurrentTime )
 		nChangeFlags |= ANIMATION_CHANGED;
 
 	if ( bNoMoreChanges )
-		RemoveFromInterpolationList();
+		GetEngineObject()->RemoveFromInterpolationList();
 	
 	GetEngineObject()->BaseInterpolatePart2( oldOrigin, oldAngles, oldVel, nChangeFlags );
 	return true;
@@ -2991,7 +2974,7 @@ void C_BaseAnimating::GetRagdollInitBoneArrays( matrix3x4_t *pDeltaBones0, matri
 
 C_BaseEntity *C_BaseAnimating::BecomeRagdollOnClient()
 {
-	MoveToLastReceivedPosition( true );
+	GetEngineObject()->MoveToLastReceivedPosition( true );
 	GetEngineObject()->GetAbsOrigin();
 	C_BaseEntity *pRagdoll = GetEngineObject()->CreateRagdollCopy();
 
@@ -3027,9 +3010,9 @@ void C_BaseAnimating::OnDataChanged( DataUpdateType_t updateType )
 void C_BaseAnimating::AddEntity( void )
 {
 	// Server says don't interpolate this frame, so set previous info to new info.
-	if ( IsNoInterpolationFrame() )
+	if (GetEngineObject()->IsNoInterpolationFrame() )
 	{
-		ResetLatched();
+		GetEngineObject()->ResetLatched();
 	}
 
 	BaseClass::AddEntity();
@@ -3061,7 +3044,7 @@ void C_BaseAnimating::ClientSideAnimationChanged()
 		GetEngineObject()->GetModelPtr(),
 		GetEngineObject()->GetSequence(),
 		GetEngineObject()->GetNewSequenceParity() != GetEngineObject()->GetPrevNewSequenceParity(),
-		!IsNoInterpolationFrame()
+		!GetEngineObject()->IsNoInterpolationFrame()
 		);
 }
 
@@ -3103,9 +3086,9 @@ void C_BaseAnimating::Simulate()
 		DoAnimationEvents(GetEngineObject()->GetModelPtr() );
 	}
 	BaseClass::Simulate();
-	if ( IsNoInterpolationFrame() )
+	if (GetEngineObject()->IsNoInterpolationFrame() )
 	{
-		ResetLatched();
+		GetEngineObject()->ResetLatched();
 	}
 }
 

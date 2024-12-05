@@ -1274,7 +1274,7 @@ void CBaseHeadcrab::JumpFromCanister()
 	StudioFrameAdvanceManual( 0.0 );
 	GetEngineObject()->SetParent( NULL );
 	GetEngineObject()->RemoveFlag( FL_FLY );
-	IncrementInterpolationFrame();
+	GetEngineObject()->IncrementInterpolationFrame();
 
 	GetMotor()->SetIdealYaw( headCrabAngles.y );
 	

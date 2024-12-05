@@ -506,6 +506,7 @@ public:
 	virtual bool GetAttachment(int iAttachment, Vector& absOrigin, QAngle& absAngles) = 0;
 	virtual bool GetAttachment(const char* szName, Vector& absOrigin, QAngle& absAngles) = 0;
 	virtual void SetAlternateSorting(bool bAlternateSorting) = 0;
+	virtual void IncrementInterpolationFrame() = 0;
 };
 
 class IEngineWorldServer{
@@ -762,6 +763,12 @@ public:
 	virtual int				CreateEntityTransitionList(IRestore* pRestore, int) = 0;
 	// Build the list of maps adjacent to the current map
 	virtual void			BuildAdjacentMapList(ISave* pSave) = 0;
+
+	virtual int GetPredictionRandomSeed(void) = 0;
+	virtual void SetPredictionRandomSeed(const CUserCmd* cmd) = 0;
+	virtual IEngineObject* GetPredictionPlayer(void) = 0;
+	virtual void SetPredictionPlayer(IEngineObject* player) = 0;
+	virtual bool IsSimulatingOnAlternateTicks() = 0;
 };
 
 extern IServerEntityList* serverEntitylist;

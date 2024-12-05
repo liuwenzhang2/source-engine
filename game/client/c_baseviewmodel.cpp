@@ -280,7 +280,7 @@ bool C_BaseViewModel::ShouldDraw()
 //-----------------------------------------------------------------------------
 int C_BaseViewModel::DrawModel( int flags )
 {
-	if ( !m_bReadyToDraw )
+	if ( !GetEngineObject()->IsReadyToDraw() )
 		return 0;
 
 	if ( flags & STUDIO_RENDER )
@@ -468,9 +468,9 @@ void C_BaseViewModel::PostDataUpdate( DataUpdateType_t updateType )
 void C_BaseViewModel::AddEntity( void )
 {
 	// Server says don't interpolate this frame, so set previous info to new info.
-	if ( IsNoInterpolationFrame() )
+	if (GetEngineObject()->IsNoInterpolationFrame() )
 	{
-		ResetLatched();
+		GetEngineObject()->ResetLatched();
 	}
 }
 

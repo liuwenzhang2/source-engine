@@ -830,7 +830,7 @@ void C_Portal_Player::DoAnimationEvent( PlayerAnimEvent_t event, int nData )
 //-----------------------------------------------------------------------------
 int C_Portal_Player::DrawModel( int flags )
 {
-	if ( !m_bReadyToDraw )
+	if ( !GetEngineObject()->IsReadyToDraw() )
 		return 0;
 
 	if( IsLocalPlayer() )
@@ -1171,8 +1171,8 @@ void C_Portal_Player::PostDataUpdate( DataUpdateType_t updateType )
 
 	if ( m_iSpawnInterpCounter != m_iSpawnInterpCounterCache )
 	{
-		MoveToLastReceivedPosition( true );
-		ResetLatched();
+		GetEngineObject()->MoveToLastReceivedPosition( true );
+		GetEngineObject()->ResetLatched();
 		m_iSpawnInterpCounterCache = m_iSpawnInterpCounter;
 	}
 

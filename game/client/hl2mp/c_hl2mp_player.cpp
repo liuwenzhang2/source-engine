@@ -272,7 +272,7 @@ void C_HL2MP_Player::ClientThink( void )
 //-----------------------------------------------------------------------------
 int C_HL2MP_Player::DrawModel( int flags )
 {
-	if ( !m_bReadyToDraw )
+	if ( !GetEngineObject()->IsReadyToDraw() )
 		return 0;
 
     return BaseClass::DrawModel(flags);
@@ -512,8 +512,8 @@ void C_HL2MP_Player::PostDataUpdate( DataUpdateType_t updateType )
 {
 	if ( m_iSpawnInterpCounter != m_iSpawnInterpCounterCache )
 	{
-		MoveToLastReceivedPosition( true );
-		ResetLatched();
+		GetEngineObject()->MoveToLastReceivedPosition( true );
+		GetEngineObject()->ResetLatched();
 		m_iSpawnInterpCounterCache = m_iSpawnInterpCounter;
 	}
 

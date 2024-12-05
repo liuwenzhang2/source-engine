@@ -217,7 +217,7 @@ int C_WeaponPhysCannon::DrawModel( int flags )
 	if ( gpGlobals->frametime == 0 )
 		return BaseClass::DrawModel( flags );
 
-	if ( !m_bReadyToDraw )
+	if ( !GetEngineObject()->IsReadyToDraw() )
 		return 0;
 
 	m_bWasUpgraded = true;
@@ -228,7 +228,7 @@ int C_WeaponPhysCannon::DrawModel( int flags )
 		// Add the power-up particles
 
 		// See if we should draw
-		if ( m_bReadyToDraw == false )
+		if (GetEngineObject()->IsReadyToDraw() == false)
 			return 0;
 
 		C_BaseAnimating *pAnimating = GetBaseAnimating();

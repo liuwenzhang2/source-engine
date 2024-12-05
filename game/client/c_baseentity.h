@@ -510,7 +510,6 @@ public:
 
 	//static bool m_bAllowPrecache;
 
-	static bool IsSimulatingOnAlternateTicks();
 
 	// C_BaseEntity local functions
 public:
@@ -575,17 +574,12 @@ public:
 	virtual IStudioHdr* OnNewModel();
 	virtual void					OnNewParticleEffect(const char* pszParticleName, CNewParticleEffect* pNewParticleEffect);
 
-
-
-	virtual void					ResetLatched();
-
 	float							GetInterpolationAmount(int flags);
 
 	// Interpolate the position for rendering
 	virtual bool					Interpolate(float currentTime);
 
-	// Did the object move so far that it shouldn't interpolate?
-	bool							Teleported(void);
+
 	// Is this a submodel of the world ( *1 etc. in name ) ( brush models only )
 	virtual bool					IsSubModel(void);
 	// Deal with EF_* flags
@@ -892,23 +886,8 @@ public:
 	}
 #endif
 
-
-
-
-	// Sets the origin + angles to match the last position received
-	void MoveToLastReceivedPosition(bool force = false);
-
-
-
 	virtual void BeforeBuildTransformations(IStudioHdr* pStudioHdr, Vector* pos, Quaternion q[], const matrix3x4_t& cameraTransform, int boneMask, CBoneBitList& boneComputed) {}
 	virtual void AfterBuildTransformations(IStudioHdr* pStudioHdr, Vector* pos, Quaternion q[], const matrix3x4_t& cameraTransform, int boneMask, CBoneBitList& boneComputed) {}
-protected:
-
-
-	// Interpolate entity
-	static void ProcessTeleportList();
-	static void ProcessInterpolatedList();
-	static void CheckInterpolatedVarParanoidMeasurement();
 
 public:
 	// overrideable rules if an entity should interpolate
@@ -930,10 +909,7 @@ protected:
 
 public:
 	// Accessors for above
-	static int						GetPredictionRandomSeed(void);
-	static void						SetPredictionRandomSeed(const CUserCmd* cmd);
-	static C_BasePlayer* GetPredictionPlayer(void);
-	static void						SetPredictionPlayer(C_BasePlayer* player);
+
 	static void						CheckCLInterpChanged();
 
 	static C_BaseEntity* Instance(int iEnt);
@@ -993,8 +969,7 @@ public:
 	
 	float							m_flCreateTime;
 
-	byte							m_ubInterpolationFrame;
-	byte							m_ubOldInterpolationFrame;
+
 
 private:
 
@@ -1003,20 +978,6 @@ private:
 
 public:
 	
-
-	// Interpolation says don't draw yet
-	bool							m_bReadyToDraw;
-
-	// Should we be interpolating?
-	static bool						IsInterpolationEnabled();
-
-	// Should we interpolate this tick?  (Used to be EF_NOINTERP)
-	bool							IsNoInterpolationFrame();
-
-
-
-
-
 #ifdef TF_CLIENT_DLL
 	int								m_nModelIndexOverrides[MAX_VISION_MODES];
 #endif
@@ -1112,9 +1073,7 @@ public:
 private:
 	friend void OnRenderStart();
 
-	// Figure out the smoothly interpolated origin for all server entities. Happens right before
-	// letting all entities simulate.
-	static void InterpolateServerEntities();
+	
 	
 	// Check which entities want to be drawn and add them to the leaf system.
 	//static void	AddVisibleEntities();
@@ -1191,7 +1150,6 @@ private:
 private:
 
 
-	unsigned char					m_iOldParentAttachment;
 
 	unsigned char					m_nWaterLevel;
 	unsigned char					m_nWaterType;
@@ -1201,7 +1159,6 @@ private:
 	// Prediction system
 	bool							m_bPredictable;
 
-	IEngineObjectClient* m_hOldMoveParent = NULL;
 
 
 	//IEngineObjectClient* m_EngineObject;
@@ -1240,34 +1197,12 @@ private:
 	EHANDLE							m_hOwnerEntity;
 	EHANDLE							m_hEffectEntity;
 	
-	// This is a random seed used by the networking code to allow client - side prediction code
-	//  randon number generators to spit out the same random numbers on both sides for a particular
-	//  usercmd input.
-	static int						m_nPredictionRandomSeed;
-	static C_BasePlayer				*m_pPredictionPlayer;
-
-	static bool						s_bInterpolate;
-	
-
-
-	
 public:
 	float							m_fRenderingClipPlane[4]; //world space clip plane when drawing
 	bool							m_bEnableRenderingClipPlane; //true to use the custom clip plane when drawing
 	float *							GetRenderClipPlane( void ); // Rendering clip plane, should be 4 floats, return value of NULL indicates a disabled render clip plane
 
 public:
-
-	void AddToInterpolationList();
-protected:
-	void RemoveFromInterpolationList();
-	unsigned short m_InterpolationListEntry;	// Entry into g_InterpolationList (or g_InterpolationList.InvalidIndex if not in the list).
-	
-	void AddToTeleportList();
-	void RemoveFromTeleportList();
-	unsigned short m_TeleportListEntry;
-
-
 
 #ifdef TF_CLIENT_DLL
 	// TF prevents drawing of any entity attached to players that aren't items in the inventory of the player.
@@ -1472,22 +1407,6 @@ inline Vector	C_BaseEntity::EarPosition( void ) const			// position of ears
 }
 
 
-
-//-----------------------------------------------------------------------------
-// Should we be interpolating?
-//-----------------------------------------------------------------------------
-inline bool	C_BaseEntity::IsInterpolationEnabled()
-{
-	return s_bInterpolate;
-}
-
-//-----------------------------------------------------------------------------
-// Should we be interpolating during this frame? (was EF_NOINTERP)
-//-----------------------------------------------------------------------------
-inline bool C_BaseEntity::IsNoInterpolationFrame()
-{
-	return m_ubOldInterpolationFrame != m_ubInterpolationFrame;
-}
 
 
 

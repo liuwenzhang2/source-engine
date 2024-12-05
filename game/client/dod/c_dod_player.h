@@ -106,7 +106,7 @@ public:
 	virtual const QAngle& EyeAngles();
 	virtual const Vector& GetRenderOrigin();  // return ragdoll origin if dead
 
-	bool dod_IsInterpolationEnabled( void ) { return IsInterpolationEnabled(); }
+	bool dod_IsInterpolationEnabled( void ) { return ClientEntityList().IsInterpolationEnabled(); }
 
 	void CreateViewAngleAnimations( void );
 

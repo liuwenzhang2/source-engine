@@ -590,7 +590,7 @@ void C_EntityDissolve::ClientThink( void )
 int C_EntityDissolve::DrawModel( int flags )
 {
 	// See if we should draw
-	if ( gpGlobals->frametime == 0 || m_bReadyToDraw == false )
+	if ( gpGlobals->frametime == 0 || GetEngineObject()->IsReadyToDraw() == false)
 		return 0;
 
 	C_BaseAnimating *pAnimating = GetEngineObject()->GetMoveParent() ? GetEngineObject()->GetMoveParent()->GetOuter()->GetBaseAnimating() : NULL;

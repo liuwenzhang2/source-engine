@@ -1338,7 +1338,7 @@ void CServerGameDLL::GameFrame( bool simulating )
 	if (IsRestoring())
 		return;
 
-	if ( CBaseEntity::IsSimulatingOnAlternateTicks() )
+	if ( gEntList.IsSimulatingOnAlternateTicks() )
 	{
 		// only run simulation on even numbered ticks
 		if ( gpGlobals->tickcount & 1 )

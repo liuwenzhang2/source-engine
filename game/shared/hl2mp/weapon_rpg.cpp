@@ -628,7 +628,7 @@ void CMissile::SeekThink( void )
 	Vector vecLaserDotPosition;
 	ComputeActualDotPosition( pLaserDot, &targetPos, &flHomingSpeed );
 
-	if ( IsSimulatingOnAlternateTicks() )
+	if ( EntityList()->IsSimulatingOnAlternateTicks() )
 		flHomingSpeed *= 2;
 
 	Vector	vTargetDir;

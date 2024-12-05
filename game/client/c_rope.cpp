@@ -184,7 +184,7 @@ int C_RopeKeyframe::DrawModel( int flags )
 	if( !GetEngineRope()->InitRopePhysics() )
 		return 0;
 
-	if ( !m_bReadyToDraw )
+	if ( !GetEngineObject()->IsReadyToDraw() )
 		return 0;
 
 	// Resize the rope

@@ -97,21 +97,6 @@ inline CBaseEntity	*CBaseEntity::GetEffectEntity() const
 	return m_hEffectEntity.Get();
 }
 
-inline int CBaseEntity::GetPredictionRandomSeed( void )
-{
-	return m_nPredictionRandomSeed;
-}
-
-inline CBasePlayer *CBaseEntity::GetPredictionPlayer( void )
-{
-	return m_pPredictionPlayer;
-}
-
-inline void CBaseEntity::SetPredictionPlayer( CBasePlayer *player )
-{
-	m_pPredictionPlayer = player;
-}
-
 // Shared EntityMessage between game and client .dlls
 #define BASEENTITY_MSG_REMOVE_DECALS	1
 

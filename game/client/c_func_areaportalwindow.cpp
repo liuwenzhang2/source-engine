@@ -78,7 +78,7 @@ bool C_FuncAreaPortalWindow::IsTransparent()
 
 int C_FuncAreaPortalWindow::DrawModel( int flags )
 {
-	if ( !m_bReadyToDraw )
+	if ( !GetEngineObject()->IsReadyToDraw() )
 		return 0;
 
 	if( !GetEngineObject()->GetModel() )

@@ -2191,7 +2191,7 @@ void OnRenderStart()
 	// Interpolate server entities and move aiments.
 	{
 		PREDICTION_TRACKVALUECHANGESCOPE( "interpolation" );
-		C_BaseEntity::InterpolateServerEntities();
+		ClientEntityList().InterpolateServerEntities();
 	}
 
 	{

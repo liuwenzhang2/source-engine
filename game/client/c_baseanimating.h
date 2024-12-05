@@ -190,7 +190,6 @@ public:
 	virtual void					AddEntity( void );
 
 	virtual bool					IsSelfAnimating();
-	virtual void					ResetLatched();
 
 	// implements these so ragdolls can handle frustum culling & leaf visibility
 	virtual void					GetRenderBounds( Vector& theMins, Vector& theMaxs );

@@ -830,7 +830,7 @@ void CNPC_FlockingFlyer::Event_Killed( const CTakeDamageInfo &info )
 	m_lifeState = LIFE_DEAD;
 
 	GetEngineObject()->SetPlaybackRate(0);
-	IncrementInterpolationFrame();
+	GetEngineObject()->IncrementInterpolationFrame();
 
 	UTIL_SetSize( this, Vector(0,0,0), Vector(0,0,0) );
 	GetEngineObject()->SetMoveType( MOVETYPE_FLYGRAVITY );

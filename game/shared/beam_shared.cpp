@@ -971,7 +971,7 @@ extern ConVar r_drawviewmodel;
 
 int CBeam::DrawModel( int flags )
 {
-	if ( !m_bReadyToDraw )
+	if ( !GetEngineObject()->IsReadyToDraw() )
 		return 0;
 
 	if (GetEngineObject()->IsMarkedForDeletion() )
@@ -1078,7 +1078,7 @@ void CBeam::AddEntity( void )
 		GetEngineObject()->SetCollisionBounds( mins, maxs );
 	}
 
-	MoveToLastReceivedPosition();
+	GetEngineObject()->MoveToLastReceivedPosition();
 }
 
 //-----------------------------------------------------------------------------

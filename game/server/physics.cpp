@@ -381,7 +381,7 @@ void CPhysicsHook::FrameUpdatePostEntityThink( )
 
 	// update the physics simulation, not we don't use gpGlobals->frametime, since that can be 30 msec or 15 msec
 	// depending on whether IsSimulatingOnAlternateTicks is true or not
-	if ( CBaseEntity::IsSimulatingOnAlternateTicks() )
+	if ( gEntList.IsSimulatingOnAlternateTicks() )
 	{
 		m_isFinalTick = false;
 

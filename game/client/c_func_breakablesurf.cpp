@@ -511,7 +511,7 @@ bool C_BreakableSurface::IsTransparent( void )
 //------------------------------------------------------------------------------
 int C_BreakableSurface::DrawModel( int flags )
 {
-	if ( !m_bReadyToDraw )
+	if ( !GetEngineObject()->IsReadyToDraw() )
 		return 0;
 
 	// If I'm not broken draw normally

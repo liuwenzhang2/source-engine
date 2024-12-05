@@ -156,7 +156,7 @@ void CWeaponP228::PrimaryAttack( void )
 		pPlayer->EyeAngles() + 2.0f * pPlayer->GetPunchAngle(),
 		GetWeaponID(),
 		Primary_Mode,
-		CBaseEntity::GetPredictionRandomSeed() & 255,
+		EntityList()->GetPredictionRandomSeed() & 255,
 		GetInaccuracy(),
 		GetSpread());
 	

@@ -829,9 +829,7 @@ public:
 	float		m_flPrevAnimTime;
 
 
-	void IncrementInterpolationFrame(); // Call this to cause a discontinuity (teleport)
 
-	CNetworkVar( int, m_ubInterpolationFrame );
 
 
 //#if !defined( NO_ENTITY_PREDICTION )
@@ -1360,7 +1358,6 @@ public:
 
 	//static bool m_bAllowPrecache;
 
-	static bool IsSimulatingOnAlternateTicks();
 
 	virtual bool IsDeflectable() { return false; }
 	virtual void Deflected( CBaseEntity *pDeflectedBy, Vector &vecDir ) {}
@@ -1694,20 +1691,13 @@ public:
 
 private:
 
-	// This is a random seed used by the networking code to allow client - side prediction code
-	//  randon number generators to spit out the same random numbers on both sides for a particular
-	//  usercmd input.
-	static int						m_nPredictionRandomSeed;
-	static CBasePlayer				*m_pPredictionPlayer;
+
 
 	
 	
 public:
 	// Accessors for above
-	static int						GetPredictionRandomSeed( void );
-	static void						SetPredictionRandomSeed( const CUserCmd *cmd );
-	static CBasePlayer				*GetPredictionPlayer( void );
-	static void						SetPredictionPlayer( CBasePlayer *player );
+
 
 
 	// For debugging shared code

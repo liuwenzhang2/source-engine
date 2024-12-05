@@ -1540,7 +1540,7 @@ void CBaseEntity::StepSimulationThink( float dt )
 		step->m_Next.nTickCount = GetEngineObject()->GetNextThinkTick();
 
 		// Hack:  Add a tick if we are simulating every other tick
-		if ( CBaseEntity::IsSimulatingOnAlternateTicks() )
+		if ( gEntList.IsSimulatingOnAlternateTicks() )
 		{
 			++step->m_Next.nTickCount;
 		}

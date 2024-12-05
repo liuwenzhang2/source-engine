@@ -1337,8 +1337,8 @@ void C_DODPlayer::PostDataUpdate( DataUpdateType_t updateType )
 // Called every time the player respawns
 void C_DODPlayer::LocalPlayerRespawn( void )
 {
-	MoveToLastReceivedPosition( true );
-	ResetLatched();
+	GetEngineObject()->MoveToLastReceivedPosition( true );
+	GetEngineObject()->ResetLatched();
 
 	ResetToneMapping(1.0);
 

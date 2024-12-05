@@ -37,6 +37,7 @@
 #include "vstdlib/jobthread.h"
 #include "bone_merge_cache.h"
 #include "toolframework_client.h"
+#include "inetchannelinfo.h"
 
 //class C_Beam;
 //class C_BaseViewModel;
@@ -129,14 +130,12 @@ public:
 };
 
 typedef unsigned int			AimEntsListHandle_t;
-
 #define		INVALID_AIMENTS_LIST_HANDLE		(AimEntsListHandle_t)~0
-
 typedef unsigned int			ClientSideAnimationListHandle_t;
-
 #define		INVALID_CLIENTSIDEANIMATION_LIST_HANDLE	(ClientSideAnimationListHandle_t)~0
 
 class C_EngineObjectInternal : public IEngineObjectClient {
+	template<class T> friend class CClientEntityList;
 public:
 	DECLARE_CLASS_NOBASE(C_EngineObjectInternal);
 	DECLARE_PREDICTABLE();
@@ -289,7 +288,10 @@ public:
 		m_hRender = INVALID_CLIENT_RENDER_HANDLE;
 		m_AimEntsListHandle = INVALID_AIMENTS_LIST_HANDLE;
 		m_ClientSideAnimationListHandle = INVALID_CLIENTSIDEANIMATION_LIST_HANDLE;
-
+		m_InterpolationListEntry = 0xFFFF;
+		m_TeleportListEntry = 0xFFFF;
+		// Assume drawing everything
+		m_bReadyToDraw = true;
 	}
 
 	virtual ~C_EngineObjectInternal()
@@ -570,7 +572,10 @@ public:
 		m_hRender = INVALID_CLIENT_RENDER_HANDLE;
 		m_AimEntsListHandle = INVALID_AIMENTS_LIST_HANDLE;
 		m_ClientSideAnimationListHandle = INVALID_CLIENTSIDEANIMATION_LIST_HANDLE;
-
+		m_InterpolationListEntry = 0xFFFF;
+		m_TeleportListEntry = 0xFFFF;
+		// Assume drawing everything
+		m_bReadyToDraw = true;
 	}
 
 	virtual void OnPositionChanged();
@@ -1111,6 +1116,24 @@ public:
 	// This can be used to force client side animation to be on. Only use if you know what you're doing!
 	// Normally, the server entity should set this.
 	void					ForceClientSideAnimationOn();
+
+	void AddToInterpolationList();
+	void RemoveFromInterpolationList();
+
+	void AddToTeleportList();
+	void RemoveFromTeleportList();
+
+	// Did the object move so far that it shouldn't interpolate?
+	bool Teleported(void);
+
+	// Should we interpolate this tick?  (Used to be EF_NOINTERP)
+	bool IsNoInterpolationFrame();
+
+	// Sets the origin + angles to match the last position received
+	void MoveToLastReceivedPosition(bool force = false);
+
+	virtual void ResetLatched();
+	bool IsReadyToDraw() { return m_bReadyToDraw; }
 private:
 	void LockStudioHdr();
 	void UnlockStudioHdr();
@@ -1125,7 +1148,7 @@ private:
 	virtual float LastBoneChangedTime();
 	void			SetupBones_AttachmentHelper(IStudioHdr* pStudioHdr);
 	void			ClientSideAnimationChanged();
-	
+
 
 protected:
 
@@ -1148,6 +1171,7 @@ protected:
 
 	// Hierarchy
 	C_EngineObjectInternal* m_pMoveParent = NULL;
+	IEngineObjectClient*	m_hOldMoveParent = NULL;
 	C_EngineObjectInternal* m_pMoveChild = NULL;
 	C_EngineObjectInternal* m_pMovePeer = NULL;
 	C_EngineObjectInternal* m_pMovePrevPeer = NULL;
@@ -1176,6 +1200,7 @@ protected:
 	// The moveparent received from networking data
 	CHandle<C_BaseEntity>			m_hNetworkMoveParent = NULL;
 	unsigned char					m_iParentAttachment; // 0 if we're relative to the parent's absorigin and absangles.
+	unsigned char					m_iOldParentAttachment;
 
 	// Behavior flags
 	int								m_fFlags;
@@ -1213,8 +1238,8 @@ protected:
 	unsigned char					m_MoveType;
 	unsigned char					m_MoveCollide;
 
-	bool					m_bSimulatedEveryTick;
-	bool					m_bAnimatedEveryTick;
+	bool							m_bSimulatedEveryTick;
+	bool							m_bAnimatedEveryTick;
 
 	// Time animation sequence or frame was last changed
 	float							m_flAnimTime;
@@ -1377,7 +1402,13 @@ protected:
 	bool							m_bAlternateSorting;
 	AimEntsListHandle_t				m_AimEntsListHandle;
 	ClientSideAnimationListHandle_t	m_ClientSideAnimationListHandle;
+	unsigned short					m_InterpolationListEntry;	// Entry into g_InterpolationList (or g_InterpolationList.InvalidIndex if not in the list).
+	unsigned short					m_TeleportListEntry;
 
+	byte							m_ubInterpolationFrame;
+	byte							m_ubOldInterpolationFrame;
+	// Interpolation says don't draw yet
+	bool							m_bReadyToDraw;
 };
 
 //-----------------------------------------------------------------------------
@@ -2148,6 +2179,14 @@ inline const ClientRenderHandle_t& C_EngineObjectInternal::GetRenderHandle() con
 	return m_hRender;
 }
 
+//-----------------------------------------------------------------------------
+// Should we be interpolating during this frame? (was EF_NOINTERP)
+//-----------------------------------------------------------------------------
+inline bool C_EngineObjectInternal::IsNoInterpolationFrame()
+{
+	return m_ubOldInterpolationFrame != m_ubInterpolationFrame;
+}
+
 class C_EngineWorldInternal : public C_EngineObjectInternal {
 public:
 	C_EngineWorldInternal(IClientEntityList* pClientEntityList) 
@@ -2645,6 +2684,23 @@ public:
 
 	// Update client side animations
 	void UpdateClientSideAnimations();
+
+	int GetPredictionRandomSeed(void);
+	void SetPredictionRandomSeed(const CUserCmd* cmd);
+	IEngineObject* GetPredictionPlayer(void);
+	void SetPredictionPlayer(IEngineObject* player);
+
+	// Should we be interpolating?
+	bool IsInterpolationEnabled();
+	// Figure out the smoothly interpolated origin for all server entities. Happens right before
+	// letting all entities simulate.
+	void InterpolateServerEntities();
+	bool IsSimulatingOnAlternateTicks();
+
+	// Interpolate entity
+	void ProcessTeleportList();
+	void ProcessInterpolatedList();
+	void CheckInterpolatedVarParanoidMeasurement();
 private:
 	void AddPVSNotifier(IClientUnknown* pUnknown);
 	void RemovePVSNotifier(IClientUnknown* pUnknown);
@@ -2718,6 +2774,18 @@ private:
 	CUtlVector< C_EngineObjectInternal* >	m_AimEntsList;
 	CUtlVector< clientanimating_t >	m_ClientSideAnimationList;
 
+	// This is a random seed used by the networking code to allow client - side prediction code
+//  randon number generators to spit out the same random numbers on both sides for a particular
+//  usercmd input.
+	int								m_nPredictionRandomSeed = -1;
+	IEngineObject*					m_pPredictionPlayer = NULL;
+
+	bool							m_bInterpolate = true;
+	bool							m_bWasSkipping = (bool)-1;
+	bool							m_bWasThreaded = (bool)-1;
+	// All the entities that want Interpolate() called on them.
+	CUtlLinkedList<C_EngineObjectInternal*, unsigned short> m_InterpolationList;
+	CUtlLinkedList<C_EngineObjectInternal*, unsigned short> m_TeleportList;
 };
 
 template<class T>
@@ -3954,6 +4022,200 @@ void CClientEntityList<T>::UpdateClientSideAnimations()
 			continue;
 		Assert(anim.pAnimating);
 		anim.pAnimating->GetOuter()->UpdateClientSideAnimation();
+	}
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: 
+// Input  : seed - 
+//-----------------------------------------------------------------------------
+template<class T>
+void CClientEntityList<T>::SetPredictionRandomSeed(const CUserCmd* cmd)
+{
+	if (!cmd)
+	{
+		m_nPredictionRandomSeed = -1;
+		return;
+	}
+
+	m_nPredictionRandomSeed = (cmd->random_seed);
+}
+
+template<class T>
+int CClientEntityList<T>::GetPredictionRandomSeed(void)
+{
+	return m_nPredictionRandomSeed;
+}
+
+template<class T>
+IEngineObject* CClientEntityList<T>::GetPredictionPlayer(void)
+{
+	return m_pPredictionPlayer;
+}
+
+template<class T>
+void CClientEntityList<T>::SetPredictionPlayer(IEngineObject* player)
+{
+	m_pPredictionPlayer = player;
+}
+
+//-----------------------------------------------------------------------------
+// Should we be interpolating?
+//-----------------------------------------------------------------------------
+template<class T>
+bool	CClientEntityList<T>::IsInterpolationEnabled()
+{
+	return m_bInterpolate;
+}
+
+extern ConVar	sv_alternateticks;
+//-----------------------------------------------------------------------------
+// Purpose: 
+// Output : Returns true on success, false on failure.
+//-----------------------------------------------------------------------------
+template<class T>
+bool CClientEntityList<T>::IsSimulatingOnAlternateTicks()
+{
+	if (gpGlobals->maxClients != 1)
+	{
+		return false;
+	}
+
+	return sv_alternateticks.GetBool();
+}
+
+extern ConVar  cl_interpolate;
+extern ConVar  cl_extrapolate;
+
+template<class T>
+void CClientEntityList<T>::InterpolateServerEntities()
+{
+	VPROF_BUDGET("C_BaseEntity::InterpolateServerEntities", VPROF_BUDGETGROUP_INTERPOLATION);
+
+	m_bInterpolate = cl_interpolate.GetBool();
+
+	// Don't interpolate during timedemo playback
+	if (engine->IsPlayingTimeDemo() || engine->IsPaused())
+	{
+		m_bInterpolate = false;
+	}
+
+	if (!engine->IsPlayingDemo())
+	{
+		// Don't interpolate, either, if we are timing out
+		INetChannelInfo* nci = engine->GetNetChannelInfo();
+		if (nci && nci->GetTimeSinceLastReceived() > 0.5f)
+		{
+			m_bInterpolate = false;
+		}
+	}
+
+	if (IsSimulatingOnAlternateTicks() != m_bWasSkipping || IsEngineThreaded() != m_bWasThreaded)
+	{
+		m_bWasSkipping = IsSimulatingOnAlternateTicks();
+		m_bWasThreaded = IsEngineThreaded();
+
+		C_BaseEntityIterator iterator;
+		C_BaseEntity* pEnt;
+		while ((pEnt = iterator.Next()) != NULL)
+		{
+			pEnt->GetEngineObject()->Interp_UpdateInterpolationAmounts();
+		}
+	}
+
+	// Enable extrapolation?
+	CInterpolationContext context;
+	context.SetLastTimeStamp(engine->GetLastTimeStamp());
+	if (cl_extrapolate.GetBool() && !engine->IsPaused())
+	{
+		context.EnableExtrapolation(true);
+	}
+
+	// Smoothly interpolate position for server entities.
+	ProcessTeleportList();
+	ProcessInterpolatedList();
+}
+
+template<class T>
+void CClientEntityList<T>::ProcessTeleportList()
+{
+	int iNext;
+	for (int iCur = m_TeleportList.Head(); iCur != m_TeleportList.InvalidIndex(); iCur = iNext)
+	{
+		iNext = m_TeleportList.Next(iCur);
+		C_EngineObjectInternal* pCur = m_TeleportList[iCur];
+
+		bool teleport = pCur->Teleported();
+		bool ef_nointerp = pCur->IsNoInterpolationFrame();
+
+		if (teleport || ef_nointerp)
+		{
+			// Undo the teleport flag..
+			pCur->m_hOldMoveParent = pCur->GetNetworkMoveParent();
+			pCur->m_iOldParentAttachment = pCur->GetParentAttachment();
+			// Zero out all but last update.
+			pCur->MoveToLastReceivedPosition(true);
+			pCur->ResetLatched();
+		}
+		else
+		{
+			// Get it out of the list as soon as we can.
+			pCur->RemoveFromTeleportList();
+		}
+	}
+}
+
+template<class T>
+void CClientEntityList<T>::CheckInterpolatedVarParanoidMeasurement()
+{
+	// What we're doing here is to check all the entities that were not in the interpolation
+	// list and make sure that there's no entity that should be in the list that isn't.
+
+#ifdef INTERPOLATEDVAR_PARANOID_MEASUREMENT
+	int iHighest = ClientEntityList().GetHighestEntityIndex();
+	for (int i = 0; i <= iHighest; i++)
+	{
+		C_BaseEntity* pEnt = ClientEntityList().GetBaseEntity(i);
+		if (!pEnt || pEnt->m_InterpolationListEntry != 0xFFFF || !pEnt->ShouldInterpolate())
+			continue;
+
+		// Player angles always generates this error when the console is up.
+		if (pEnt->entindex() == 1 && engine->Con_IsVisible())
+			continue;
+
+		// View models tend to screw up this test unnecesarily because they modify origin,
+		// angles, and 
+		if (dynamic_cast<C_BaseViewModel*>(pEnt))
+			continue;
+
+		g_bRestoreInterpolatedVarValues = true;
+		g_nInterpolatedVarsChanged = 0;
+		pEnt->Interpolate(gpGlobals->curtime);
+		g_bRestoreInterpolatedVarValues = false;
+
+		if (g_nInterpolatedVarsChanged > 0)
+		{
+			static int iWarningCount = 0;
+			Warning("(%d): An entity (%d) should have been in g_InterpolationList.\n", iWarningCount++, pEnt->entindex());
+			break;
+		}
+	}
+#endif
+}
+
+template<class T>
+void CClientEntityList<T>::ProcessInterpolatedList()
+{
+	CheckInterpolatedVarParanoidMeasurement();
+
+	// Interpolate the minimal set of entities that need it.
+	int iNext;
+	for (int iCur = m_InterpolationList.Head(); iCur != m_InterpolationList.InvalidIndex(); iCur = iNext)
+	{
+		iNext = m_InterpolationList.Next(iCur);
+		C_EngineObjectInternal* pCur = m_InterpolationList[iCur];
+
+		pCur->m_bReadyToDraw = pCur->GetOuter()->Interpolate(gpGlobals->curtime);
 	}
 }
 

@@ -477,7 +477,7 @@ bool C_BaseCombatWeapon::ShouldDrawPickup( void )
 int C_BaseCombatWeapon::DrawModel( int flags )
 {
 	VPROF_BUDGET( "C_BaseCombatWeapon::DrawModel", VPROF_BUDGETGROUP_MODEL_RENDERING );
-	if ( !m_bReadyToDraw )
+	if ( !GetEngineObject()->IsReadyToDraw() )
 		return 0;
 
 	if ( !IsVisible() )

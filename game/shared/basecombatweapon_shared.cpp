@@ -1880,7 +1880,7 @@ void CBaseCombatWeapon::WeaponSound( WeaponSound_t sound_type, float soundtime /
 		if ( GetOwner() && GetOwner()->IsPlayer() )
 		{
 			CSingleUserRecipientFilter filter( ToBasePlayer( GetOwner() ) );
-			if ( IsPredicted() && CBaseEntity::GetPredictionPlayer() )
+			if ( IsPredicted() && EntityList()->GetPredictionPlayer() )
 			{
 				filter.UsePredictionRules();
 			}
@@ -1893,7 +1893,7 @@ void CBaseCombatWeapon::WeaponSound( WeaponSound_t sound_type, float soundtime /
 		if ( GetOwner() )
 		{
 			CPASAttenuationFilter filter( GetOwner(), params.soundlevel );
-			if ( IsPredicted() && CBaseEntity::GetPredictionPlayer() )
+			if ( IsPredicted() && EntityList()->GetPredictionPlayer() )
 			{
 				filter.UsePredictionRules();
 			}
@@ -1910,7 +1910,7 @@ void CBaseCombatWeapon::WeaponSound( WeaponSound_t sound_type, float soundtime /
 		else
 		{
 			CPASAttenuationFilter filter( this, params.soundlevel );
-			if ( IsPredicted() && CBaseEntity::GetPredictionPlayer() )
+			if ( IsPredicted() && EntityList()->GetPredictionPlayer() )
 			{
 				filter.UsePredictionRules();
 			}

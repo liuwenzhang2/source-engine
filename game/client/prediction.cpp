@@ -843,8 +843,8 @@ void CPrediction::StartCommand( C_BasePlayer *player, CUserCmd *cmd )
 	//CPredictableId::ResetInstanceCounters();
 
 	player->m_pCurrentCommand = cmd;
-	C_BaseEntity::SetPredictionRandomSeed( cmd );
-	C_BaseEntity::SetPredictionPlayer( player );
+	ClientEntityList().SetPredictionRandomSeed( cmd );
+	ClientEntityList().SetPredictionPlayer( player->GetEngineObject() );
 #endif
 }
 
@@ -858,8 +858,8 @@ void CPrediction::FinishCommand( C_BasePlayer *player )
 	VPROF( "CPrediction::FinishCommand" );
 
 	player->m_pCurrentCommand = NULL;
-	C_BaseEntity::SetPredictionRandomSeed( NULL );
-	C_BaseEntity::SetPredictionPlayer( NULL );
+	ClientEntityList().SetPredictionRandomSeed( NULL );
+	ClientEntityList().SetPredictionPlayer( NULL );
 #endif
 }
 
@@ -1559,7 +1559,7 @@ int CPrediction::ComputeFirstCommandToExecute( bool received_new_world_update, i
 					C_BaseEntity *entity = predictables->GetPredictable( i );
 					if ( entity )
 					{
-						entity->ResetLatched();
+						entity->GetEngineObject()->ResetLatched();
 					}
 				}
 
@@ -1599,7 +1599,7 @@ bool CPrediction::PerformPrediction( bool received_new_world_update, C_BasePlaye
 
 	while ( entity && entity->entindex() > 0)
 	{
-		entity->MoveToLastReceivedPosition();
+		entity->GetEngineObject()->MoveToLastReceivedPosition();
 		// undo changes for moveparents too
 		entity = entity->GetEngineObject()->GetMoveParent()?entity->GetEngineObject()->GetMoveParent()->GetOuter():NULL;
 	}

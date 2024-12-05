@@ -951,7 +951,7 @@ void CNPC_VehicleDriver::CheckForTeleport( void )
 	// Does it have the teleport flag set?
 	if ( pTrack->GetEngineObject()->HasSpawnFlags( SF_PATH_TELEPORT ) )
 	{
-		IncrementInterpolationFrame();
+		GetEngineObject()->IncrementInterpolationFrame();
 
 		// Teleport the vehicle to the pathcorner
 		Vector vecMins, vecMaxs;

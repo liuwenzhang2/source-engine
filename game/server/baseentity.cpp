@@ -84,15 +84,8 @@ int CBaseEntity::m_nDebugPlayer = -1;		// Player doing the selection
 bool CBaseEntity::m_bDebugPause = false;		// Whether entity i/o is paused.
 int CBaseEntity::m_nDebugSteps = 1;				// Number of entity outputs to fire before pausing again.
 
-
-int CBaseEntity::m_nPredictionRandomSeed = -1;
-CBasePlayer *CBaseEntity::m_pPredictionPlayer = NULL;
-
 // Used to make sure nobody calls UpdateTransmitState directly.
 int g_nInsideDispatchUpdateTransmitState = 0;
-
-
-
 
 ConVar sv_netvisdist( "sv_netvisdist", "10000", FCVAR_CHEAT | FCVAR_DEVELOPMENTONLY, "Test networking visibility distance" );
 ConVar ai_sequence_debug("ai_sequence_debug", "0");
@@ -142,7 +135,6 @@ void* CEntityNetworkProperty::GetDataTableBasePtr() {
 
 // This table encodes the CBaseEntity data.
 IMPLEMENT_SERVERCLASS_ST_NOBASE( CBaseEntity, DT_BaseEntity )
-	SendPropInt		(SENDINFO( m_ubInterpolationFrame ), NOINTERP_PARITY_MAX_BITS, SPROP_UNSIGNED ),
 	SendPropInt		(SENDINFO(m_nRenderMode),	8, SPROP_UNSIGNED ),
 	SendPropInt		(SENDINFO(m_clrRender),	32, SPROP_UNSIGNED),
 	SendPropInt		(SENDINFO(m_iTeamNum),		TEAMNUM_NUM_BITS, 0),
@@ -3781,7 +3773,7 @@ static void TeleportEntity( CBaseEntity *pSourceEntity, TeleportListEntry_t &ent
 
 		if ( newPosition )
 		{
-			pTeleport->IncrementInterpolationFrame();
+			pTeleport->GetEngineObject()->IncrementInterpolationFrame();
 			UTIL_SetOrigin( pTeleport, *newPosition );
 		}
 	}
@@ -6392,11 +6384,7 @@ void CBaseEntity::SUB_FadeOut( void  )
 	}
 }
 
-//------------------------------------------------------------------------------
-void CBaseEntity::IncrementInterpolationFrame()
-{
-	m_ubInterpolationFrame = (m_ubInterpolationFrame + 1) % NOINTERP_PARITY_MAX;
-}
+
 
 //------------------------------------------------------------------------------
 

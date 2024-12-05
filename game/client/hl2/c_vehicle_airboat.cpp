@@ -924,7 +924,7 @@ int C_PropAirboat::DrawModel( int flags )
 	if ( BaseClass::DrawModel( flags ) == false )
 		return 0;
 	
-	if ( !m_bReadyToDraw )
+	if ( !GetEngineObject()->IsReadyToDraw() )
 		return 0;
 
 	return DrawWake();

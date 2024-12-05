@@ -2066,7 +2066,7 @@ void CBaseAnimating::CopyAnimationDataFrom( CBaseAnimating *pSource )
 	this->GetEngineObject()->SetModelIndex( pSource->GetEngineObject()->GetModelIndex() );
 	this->GetEngineObject()->SetCycle( pSource->GetEngineObject()->GetCycle() );
 	this->GetEngineObject()->SetEffects( pSource->GetEngineObject()->GetEffects() );
-	this->IncrementInterpolationFrame();
+	this->GetEngineObject()->IncrementInterpolationFrame();
 	this->GetEngineObject()->SetSequence( pSource->GetEngineObject()->GetSequence() );
 	this->GetEngineObject()->SetAnimTime(pSource->GetEngineObject()->GetAnimTime());
 	this->GetEngineObject()->SetBody( pSource->GetEngineObject()->GetBody());

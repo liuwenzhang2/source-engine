@@ -1584,7 +1584,7 @@ void CPSCollisionEntity::Spawn( void )
 	GetEngineObject()->AddFlag( FL_WORLDBRUSH );
 	GetEngineObject()->AddEffects( EF_NODRAW | EF_NOSHADOW | EF_NORECEIVESHADOW );
 #ifdef GAME_DLL
-	IncrementInterpolationFrame();
+	GetEngineObject()->IncrementInterpolationFrame();
 #endif // GAME_DLL
 }
 

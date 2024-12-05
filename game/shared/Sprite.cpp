@@ -751,7 +751,7 @@ int CSprite::DrawModel( int flags )
 {
 	VPROF_BUDGET( "CSprite::DrawModel", VPROF_BUDGETGROUP_PARTICLE_RENDERING );
 	//See if we should draw
-	if ( !IsVisible() || ( m_bReadyToDraw == false ) )
+	if ( !IsVisible() || (GetEngineObject()->IsReadyToDraw() == false))
 		return 0;
 
 #ifdef PORTAL

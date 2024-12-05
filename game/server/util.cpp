@@ -160,7 +160,7 @@ int UTIL_PrecacheDecal( const char *name, bool preload )
 //-----------------------------------------------------------------------------
 float UTIL_GetSimulationInterval()
 {
-	if ( CBaseEntity::IsSimulatingOnAlternateTicks() )
+	if ( gEntList.IsSimulatingOnAlternateTicks() )
 		return ( TICK_INTERVAL * 2.0 );
 	return TICK_INTERVAL;
 }

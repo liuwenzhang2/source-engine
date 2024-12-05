@@ -50,11 +50,11 @@
 #if !defined( MAKEXVCD )
 bool IsInPrediction()
 {
-	return CBaseEntity::GetPredictionPlayer() != NULL;
+	return EntityList()->GetPredictionPlayer() != NULL;
 }
 
 int SharedRandomSelect(int iMinVal, int iMaxVal) {
-	if (CBaseEntity::GetPredictionPlayer() != NULL)
+	if (EntityList()->GetPredictionPlayer() != NULL)
 	{
 		return SharedRandomInt("SelectWeightedSequence", iMinVal, iMaxVal);
 	}

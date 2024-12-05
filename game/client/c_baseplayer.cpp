@@ -806,7 +806,7 @@ void C_BasePlayer::PostDataUpdate( DataUpdateType_t updateType )
 		}
 	}
 
-	bool bForceEFNoInterp = IsNoInterpolationFrame();
+	bool bForceEFNoInterp = GetEngineObject()->IsNoInterpolationFrame();
 
 	if ( IsLocalPlayer() )
 	{
@@ -818,7 +818,7 @@ void C_BasePlayer::PostDataUpdate( DataUpdateType_t updateType )
 
 		// estimate velocity for non local players
 		float flTimeDelta = GetEngineObject()->GetSimulationTime() - GetEngineObject()->GetOldSimulationTime();
-		if ( flTimeDelta > 0  &&  !( IsNoInterpolationFrame() || bForceEFNoInterp ) )
+		if ( flTimeDelta > 0  &&  !(GetEngineObject()->IsNoInterpolationFrame() || bForceEFNoInterp ) )
 		{
 			Vector newVelo = (GetEngineObject()->GetNetworkOrigin() - GetEngineObject()->GetOldOrigin()  ) / flTimeDelta;
 			GetEngineObject()->SetAbsVelocity( newVelo);
@@ -901,7 +901,7 @@ void C_BasePlayer::PostDataUpdate( DataUpdateType_t updateType )
 	//  server if we receive a packet from the server
 	if ( engine->IsPaused() || bForceEFNoInterp )
 	{
-		ResetLatched();
+		GetEngineObject()->ResetLatched();
 	}
 }
 
@@ -1270,9 +1270,9 @@ void C_BasePlayer::AddEntity( void )
 	}
 
 	// Server says don't interpolate this frame, so set previous info to new info.
-	if ( IsNoInterpolationFrame() || Teleported() )
+	if (GetEngineObject()->IsNoInterpolationFrame() || GetEngineObject()->Teleported() )
 	{
-		ResetLatched();
+		GetEngineObject()->ResetLatched();
 	}
 
 	// Add in lighting effects
@@ -2115,9 +2115,9 @@ void C_BasePlayer::Simulate()
 	}
 
 	BaseClass::Simulate();
-	if ( IsNoInterpolationFrame() || Teleported() )
+	if (GetEngineObject()->IsNoInterpolationFrame() || GetEngineObject()->Teleported() )
 	{
-		ResetLatched();
+		GetEngineObject()->ResetLatched();
 	}
 }
 
@@ -2580,7 +2580,7 @@ void C_BasePlayer::NotePredictionError( const Vector &vDelta )
 	// remember when last error happened
 	m_flPredictionErrorTime = gpGlobals->curtime;
  
-	ResetLatched(); 
+	GetEngineObject()->ResetLatched();
 #endif
 }
 

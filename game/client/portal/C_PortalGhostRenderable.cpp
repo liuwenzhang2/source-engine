@@ -45,7 +45,7 @@ void C_PortalGhostRenderable::PerFrameUpdate( void )
 {
 	GetEngineGhost()->PerFrameUpdate();
 
-	RemoveFromInterpolationList();
+	GetEngineObject()->RemoveFromInterpolationList();
 
 	g_pClientLeafSystem->RenderableChanged(GetEngineObject()->GetRenderHandle() );
 }

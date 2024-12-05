@@ -297,7 +297,7 @@ void CBaseCombatCharacter::CorpseFade( void )
 	GetEngineObject()->SetMoveType( MOVETYPE_NONE );
 	SetLocalAngularVelocity( vec3_angle );
 	GetEngineObject()->SetAnimTime(gpGlobals->curtime);
-	IncrementInterpolationFrame();
+	GetEngineObject()->IncrementInterpolationFrame();
 	SUB_StartFadeOut();
 }
 

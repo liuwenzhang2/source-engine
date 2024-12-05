@@ -46,8 +46,8 @@ void CPlayerMove::StartCommand( CBasePlayer *player, CUserCmd *cmd )
 //#endif
 
 	player->m_pCurrentCommand = cmd;
-	CBaseEntity::SetPredictionRandomSeed( cmd );
-	CBaseEntity::SetPredictionPlayer( player );
+	gEntList.SetPredictionRandomSeed( cmd );
+	gEntList.SetPredictionPlayer( player->GetEngineObject() );
 	
 #if defined (HL2_DLL)
 	// pull out backchannel data and move this out
@@ -79,8 +79,8 @@ void CPlayerMove::FinishCommand( CBasePlayer *player )
 	VPROF( "CPlayerMove::FinishCommand" );
 
 	player->m_pCurrentCommand = NULL;
-	CBaseEntity::SetPredictionRandomSeed( NULL );
-	CBaseEntity::SetPredictionPlayer( NULL );
+	gEntList.SetPredictionRandomSeed( NULL );
+	gEntList.SetPredictionPlayer( NULL );
 }
 
 //-----------------------------------------------------------------------------

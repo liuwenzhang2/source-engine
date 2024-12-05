@@ -428,7 +428,7 @@ int CSpriteTrail::DrawModel( int flags )
 		return 1;
 
 	//See if we should draw
-	if ( !IsVisible() || ( m_bReadyToDraw == false ) )
+	if ( !IsVisible() || (GetEngineObject()->IsReadyToDraw() == false))
 		return 0;
 
 	CEngineSprite *pSprite = Draw_SetSpriteTexture(GetEngineObject()->GetModel(), m_flFrame, GetRenderMode() );

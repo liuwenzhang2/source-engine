@@ -51,41 +51,15 @@
 	bool g_bRestoreInterpolatedVarValues = false;
 #endif
 
-
-static bool g_bWasSkipping = (bool)-1;
-static bool g_bWasThreaded =(bool)-1;
 static int  g_nThreadModeTicks = 0;
 
-
-static ConVar  cl_extrapolate( "cl_extrapolate", "1", FCVAR_CHEAT, "Enable/disable extrapolation if interpolation history runs out." );
 static ConVar  cl_interp_npcs( "cl_interp_npcs", "0.0", FCVAR_USERINFO, "Interpolate NPC positions starting this many seconds in past (or cl_interp, if greater)" );  
 ConVar  r_drawmodeldecals( "r_drawmodeldecals", "1" );
 extern ConVar	cl_showerror;
-int C_BaseEntity::m_nPredictionRandomSeed = -1;
-C_BasePlayer *C_BaseEntity::m_pPredictionPlayer = NULL;
-bool C_BaseEntity::s_bInterpolate = true;
-
-
 static ConVar  r_drawrenderboxes( "r_drawrenderboxes", "0", FCVAR_CHEAT );  
-
-
-
-// All the entities that want Interpolate() called on them.
-static CUtlLinkedList<C_BaseEntity*, unsigned short> g_InterpolationList;
-static CUtlLinkedList<C_BaseEntity*, unsigned short> g_TeleportList;
-
-
-
-
-
-
 
 // Should these be somewhere else?
 #define PITCH 0
-
-
-
-
 
 void RecvProxy_ToolRecording( const CRecvProxyData *pData, void *pStruct, void *pOut )
 {
@@ -111,12 +85,6 @@ IMPLEMENT_CLIENTCLASS(C_BaseEntity, DT_BaseEntity, CBaseEntity);
 //	((C_BaseEntity*)pStruct)->SetSolidFlags( pData->m_Value.m_Int );
 //}
 
-
-
-
-
-
-
 //#ifndef NO_ENTITY_PREDICTION
 //BEGIN_RECV_TABLE_NOBASE( C_BaseEntity, DT_PredictableId )
 //	RecvPropPredictableId( RECVINFO( m_PredictableID ) ),
@@ -127,7 +95,6 @@ IMPLEMENT_CLIENTCLASS(C_BaseEntity, DT_BaseEntity, CBaseEntity);
 
 BEGIN_RECV_TABLE_NOBASE(C_BaseEntity, DT_BaseEntity)
 
-	RecvPropInt( RECVINFO( m_ubInterpolationFrame ) ),
 	RecvPropInt(RECVINFO(m_nRenderMode)),
 	RecvPropInt(RECVINFO(m_clrRender)),
 	RecvPropInt(RECVINFO(m_iTeamNum)),
@@ -381,7 +348,6 @@ void C_BaseEntity::SetTextureFrameIndex( int iIndex )
 }
 
 
-
 //-----------------------------------------------------------------------------
 // Functions.
 //-----------------------------------------------------------------------------
@@ -402,22 +368,12 @@ C_BaseEntity::C_BaseEntity()
 #endif
 
 	m_nSimulationTick = -1;
-
-	// Assume drawing everything
-	m_bReadyToDraw = true;
-
 	m_fBBoxVisFlags = 0;
 //#if !defined( NO_ENTITY_PREDICTION )
 //	m_pPredictionContext = NULL;
 //#endif
 	//NOTE: not virtual! we are in the constructor!
 	C_BaseEntity::Clear();
-
-
-	m_InterpolationListEntry = 0xFFFF;
-	m_TeleportListEntry = 0xFFFF;
-
-
 
 #ifdef TF_CLIENT_DLL
 	m_bValidatedOwner = false;
@@ -898,10 +854,6 @@ bool C_BaseEntity::ShouldReceiveProjectedTextures( int flags )
 
 	return true;
 }
-
-
-
-
 	
 //-----------------------------------------------------------------------------
 // Purpose: Returns index into entities list for this entity
@@ -1161,7 +1113,7 @@ int C_BaseEntity::DrawBrushModel( bool bDrawingTranslucency, int nFlags, bool bT
 //-----------------------------------------------------------------------------
 int C_BaseEntity::DrawModel( int flags )
 {
-	if ( !m_bReadyToDraw )
+	if ( !GetEngineObject()->IsReadyToDraw() )
 		return 0;
 
 	int drawn = 0;
@@ -1375,20 +1327,7 @@ void C_BaseEntity::PreDataUpdate( DataUpdateType_t updateType )
 #endif
 
 	m_nOldRenderMode = m_nRenderMode;
-	m_ubOldInterpolationFrame = m_ubInterpolationFrame;
 }
-
-
-
-
-
-
-
-
-
-
-
-
 
 //-----------------------------------------------------------------------------
 // Update move-parent if needed. For SourceTV.
@@ -1400,9 +1339,6 @@ void C_BaseEntity::HierarchyUpdateMoveParent()
 
 	GetEngineObject()->HierarchySetParent(GetEngineObject()->GetNetworkMoveParent());
 }
-
-
-
 
 
 //-----------------------------------------------------------------------------
@@ -1480,18 +1416,6 @@ void C_BaseEntity::PostDataUpdate( DataUpdateType_t updateType )
 
 	UpdatePartitionListEntry();
 	
-	// Add the entity to the nointerp list.
-//	if ( !IsClientCreated() )
-//	{
-		if ( Teleported() || IsNoInterpolationFrame() )
-			AddToTeleportList();
-//	}
-
-	// if we changed parents, recalculate visibility
-	if ( m_hOldMoveParent != GetEngineObject()->GetNetworkMoveParent())
-	{
-		UpdateVisibility();
-	}
 }
 
 //-----------------------------------------------------------------------------
@@ -1572,9 +1496,6 @@ bool C_BaseEntity::SetModel( const char *pModelName )
 	}
 }
 
-
-
-
 //-----------------------------------------------------------------------------
 // Purpose: Default interpolation for entities
 // Output : true means entity should be drawn, false means probably not
@@ -1593,7 +1514,7 @@ bool C_BaseEntity::Interpolate( float currentTime )
 	// If all the Interpolate() calls returned that their values aren't going to
 	// change anymore, then get us out of the interpolation list.
 	if ( bNoMoreChanges )
-		RemoveFromInterpolationList();
+		GetEngineObject()->RemoveFromInterpolationList();
 
 	if ( retVal == INTERPOLATE_STOP )
 		return true;
@@ -1621,22 +1542,6 @@ void C_BaseEntity::OnNewParticleEffect( const char *pszParticleName, CNewParticl
 // Above this velocity and we'll assume a warp/teleport
 #define MAX_INTERPOLATE_VELOCITY 4000.0f
 #define MAX_INTERPOLATE_VELOCITY_PLAYER 1250.0f
-
-//-----------------------------------------------------------------------------
-// Purpose: Determine whether entity was teleported ( so we can disable interpolation )
-// Input  : *ent - 
-// Output : bool
-//-----------------------------------------------------------------------------
-bool C_BaseEntity::Teleported( void )
-{
-	// Disable interpolation when hierarchy changes
-	if (m_hOldMoveParent != GetEngineObject()->GetNetworkMoveParent() || m_iOldParentAttachment != GetEngineObject()->GetParentAttachment())
-	{
-		return true;
-	}
-
-	return false;
-}
 
 
 //-----------------------------------------------------------------------------
@@ -1685,15 +1590,6 @@ void C_BaseEntity::CreateLightEffects( void )
 	}
 }
 
-void C_BaseEntity::MoveToLastReceivedPosition( bool force )
-{
-	if ( force || (GetEngineObject()->GetRenderFX() != kRenderFxRagdoll ) )
-	{
-		GetEngineObject()->SetLocalOrigin( GetEngineObject()->GetNetworkOrigin() );
-		GetEngineObject()->SetLocalAngles(GetEngineObject()->GetNetworkAngles() );
-	}
-}
-
 bool C_BaseEntity::ShouldInterpolate()
 {
 	if ( render->GetViewEntity() == entindex())
@@ -1719,90 +1615,6 @@ bool C_BaseEntity::ShouldInterpolate()
 	// don't interpolate
 	return false;
 }
-
-
-void C_BaseEntity::ProcessTeleportList()
-{
-	int iNext;
-	for ( int iCur=g_TeleportList.Head(); iCur != g_TeleportList.InvalidIndex(); iCur=iNext )
-	{
-		iNext = g_TeleportList.Next( iCur );
-		C_BaseEntity *pCur = g_TeleportList[iCur];
-
-		bool teleport = pCur->Teleported();
-		bool ef_nointerp = pCur->IsNoInterpolationFrame();
-	
-		if ( teleport || ef_nointerp )
-		{
-			// Undo the teleport flag..
-			pCur->m_hOldMoveParent = pCur->GetEngineObject()->GetNetworkMoveParent();
-			pCur->m_iOldParentAttachment = pCur->GetEngineObject()->GetParentAttachment();
-			// Zero out all but last update.
-			pCur->MoveToLastReceivedPosition( true );
-			pCur->ResetLatched();
-		}
-		else
-		{
-			// Get it out of the list as soon as we can.
-			pCur->RemoveFromTeleportList();
-		}
-	}
-}
-
-
-void C_BaseEntity::CheckInterpolatedVarParanoidMeasurement()
-{
-	// What we're doing here is to check all the entities that were not in the interpolation
-	// list and make sure that there's no entity that should be in the list that isn't.
-	
-#ifdef INTERPOLATEDVAR_PARANOID_MEASUREMENT
-	int iHighest = ClientEntityList().GetHighestEntityIndex();
-	for ( int i=0; i <= iHighest; i++ )
-	{
-		C_BaseEntity *pEnt = ClientEntityList().GetBaseEntity( i );
-		if ( !pEnt || pEnt->m_InterpolationListEntry != 0xFFFF || !pEnt->ShouldInterpolate() )
-			continue;
-		
-		// Player angles always generates this error when the console is up.
-		if ( pEnt->entindex() == 1 && engine->Con_IsVisible() )
-			continue;
-			
-		// View models tend to screw up this test unnecesarily because they modify origin,
-		// angles, and 
-		if ( dynamic_cast<C_BaseViewModel*>( pEnt ) )
-			continue;
-
-		g_bRestoreInterpolatedVarValues = true;
-		g_nInterpolatedVarsChanged = 0;
-		pEnt->Interpolate( gpGlobals->curtime );
-		g_bRestoreInterpolatedVarValues = false;
-		
-		if ( g_nInterpolatedVarsChanged > 0 )
-		{
-			static int iWarningCount = 0;
-			Warning( "(%d): An entity (%d) should have been in g_InterpolationList.\n", iWarningCount++, pEnt->entindex() );
-			break;
-		}
-	}
-#endif
-}
-
-
-void C_BaseEntity::ProcessInterpolatedList()
-{
-	CheckInterpolatedVarParanoidMeasurement();
-
-	// Interpolate the minimal set of entities that need it.
-	int iNext;
-	for ( int iCur=g_InterpolationList.Head(); iCur != g_InterpolationList.InvalidIndex(); iCur=iNext )
-	{
-		iNext = g_InterpolationList.Next( iCur );
-		C_BaseEntity *pCur = g_InterpolationList[iCur];
-		
-		pCur->m_bReadyToDraw = pCur->Interpolate( gpGlobals->curtime );
-	}
-}
-
 
 //-----------------------------------------------------------------------------
 // Purpose: Add entity to visibile entities list
@@ -1856,59 +1668,6 @@ void C_BaseEntity::Simulate()
 	AddEntity();	// Legacy support. Once-per-frame stuff should go in Simulate().
 }
 
-// Defined in engine
-static ConVar cl_interpolate( "cl_interpolate", "1.0f", FCVAR_USERINFO | FCVAR_DEVELOPMENTONLY );
-
-// (static function)
-void C_BaseEntity::InterpolateServerEntities()
-{
-	VPROF_BUDGET( "C_BaseEntity::InterpolateServerEntities", VPROF_BUDGETGROUP_INTERPOLATION );
-
-	s_bInterpolate = cl_interpolate.GetBool();
-
-	// Don't interpolate during timedemo playback
-	if ( engine->IsPlayingTimeDemo() || engine->IsPaused() )
-	{										 
-		s_bInterpolate = false;
-	}
-
-	if ( !engine->IsPlayingDemo() )
-	{
-		// Don't interpolate, either, if we are timing out
-		INetChannelInfo *nci = engine->GetNetChannelInfo();
-		if ( nci && nci->GetTimeSinceLastReceived() > 0.5f )
-		{
-			s_bInterpolate = false;
-		}
-	}
-
-	if ( IsSimulatingOnAlternateTicks() != g_bWasSkipping || IsEngineThreaded() != g_bWasThreaded )
-	{
-		g_bWasSkipping = IsSimulatingOnAlternateTicks();
-		g_bWasThreaded = IsEngineThreaded();
-
-		C_BaseEntityIterator iterator;
-		C_BaseEntity *pEnt;
-		while ( (pEnt = iterator.Next()) != NULL )
-		{
-			pEnt->GetEngineObject()->Interp_UpdateInterpolationAmounts();
-		}
-	}
-
-	// Enable extrapolation?
-	CInterpolationContext context;
-	context.SetLastTimeStamp( engine->GetLastTimeStamp() );
-	if ( cl_extrapolate.GetBool() && !engine->IsPaused() )
-	{
-		context.EnableExtrapolation( true );
-	}
-
-	// Smoothly interpolate position for server entities.
-	ProcessTeleportList();
-	ProcessInterpolatedList();
-}
-
-
 // (static function)
 //void C_BaseEntity::AddVisibleEntities()
 //{
@@ -1946,8 +1705,7 @@ void C_BaseEntity::InterpolateServerEntities()
 //-----------------------------------------------------------------------------
 void C_BaseEntity::OnPreDataChanged( DataUpdateType_t type )
 {
-	m_hOldMoveParent = GetEngineObject()->GetNetworkMoveParent();
-	m_iOldParentAttachment = GetEngineObject()->GetParentAttachment();
+
 }
 
 void C_BaseEntity::OnDataChanged( DataUpdateType_t type )
@@ -2560,8 +2318,6 @@ void C_BaseEntity::SetNextClientThink( float nextThinkTime )
 }
 
 
-
-
 //-----------------------------------------------------------------------------
 // Purpose: Flags this entity as being inside or outside of this client's PVS
 //			on the server.
@@ -2641,8 +2397,6 @@ void C_BaseEntity::SetAbsAngularVelocity( const QAngle &vecAbsAngVelocity )
 */
 
 
-
-
 void C_BaseEntity::SetLocalAngularVelocity( const QAngle &vecAngVelocity )
 {
 	if (m_vecAngVelocity != vecAngVelocity)
@@ -2651,9 +2405,6 @@ void C_BaseEntity::SetLocalAngularVelocity( const QAngle &vecAngVelocity )
 		m_vecAngVelocity = vecAngVelocity;
 	}
 }
-
-
-
 
 //-----------------------------------------------------------------------------
 // Sets the local position from a transform
@@ -3150,8 +2901,8 @@ void C_BaseEntity::UpdateOnRemove( void )
 //#if !defined( NO_ENTITY_PREDICTION )
 //	delete m_pPredictionContext;
 //#endif
-	RemoveFromInterpolationList();
-	RemoveFromTeleportList();
+	GetEngineObject()->RemoveFromInterpolationList();
+	GetEngineObject()->RemoveFromTeleportList();
 
 	if (GetClientHandle() != INVALID_CLIENTENTITY_HANDLE)
 	{
@@ -3533,16 +3284,6 @@ void C_BaseEntity::OnPostRestoreData()
 }
 
 
-
-
-void C_BaseEntity::ResetLatched()
-{
-//	if ( IsClientCreated() )
-//		return;
-
-	GetEngineObject()->Interp_Reset();
-}
-
 //-----------------------------------------------------------------------------
 // Purpose: Fixme, this needs a better solution
 // Input  : flags - 
@@ -3576,7 +3317,7 @@ float C_BaseEntity::GetInterpolationAmount( int flags )
 {
 	// If single player server is "skipping ticks" everything needs to interpolate for a bit longer
 	int serverTickMultiple = 1;
-	if ( IsSimulatingOnAlternateTicks() )
+	if ( ClientEntityList().IsSimulatingOnAlternateTicks() )
 	{
 		serverTickMultiple = 2;
 	}
@@ -3731,14 +3472,14 @@ void C_BaseEntity::GetToolRecordingState( KeyValues *msg )
 	state.m_vecRenderAngles = GetRenderAngles();
 
 	// use EF_NOINTERP if the owner or a hierarchical parent has NO_INTERP
-	if ( pOwner && pOwner->IsNoInterpolationFrame() )
+	if ( pOwner && pOwner->GetEngineObject()->IsNoInterpolationFrame() )
 	{
 		state.m_nEffects |= EF_NOINTERP;
 	}
 	IEngineObjectClient *pParent = GetEngineObject()->GetMoveParent();
 	while ( pParent )
 	{
-		if ( pParent->GetOuter()->IsNoInterpolationFrame() )
+		if ( pParent->GetOuter()->GetEngineObject()->IsNoInterpolationFrame() )
 		{
 			state.m_nEffects |= EF_NOINTERP;
 			break;
@@ -3774,42 +3515,6 @@ void C_BaseEntity::RecordToolMessage()
 	msg->deleteThis();
 
 	GetEngineObject()->SetLastRecordedFrame(gpGlobals->framecount);
-}
-
-
-
-
-void C_BaseEntity::AddToInterpolationList()
-{
-	if ( m_InterpolationListEntry == 0xFFFF )
-		m_InterpolationListEntry = g_InterpolationList.AddToTail( this );
-}
-
-
-void C_BaseEntity::RemoveFromInterpolationList()
-{
-	if ( m_InterpolationListEntry != 0xFFFF )
-	{
-		g_InterpolationList.Remove( m_InterpolationListEntry );
-		m_InterpolationListEntry = 0xFFFF;
-	}
-}
-
-				
-void C_BaseEntity::AddToTeleportList()
-{
-	if ( m_TeleportListEntry == 0xFFFF )
-		m_TeleportListEntry = g_TeleportList.AddToTail( this );
-}
-
-
-void C_BaseEntity::RemoveFromTeleportList()
-{
-	if ( m_TeleportListEntry != 0xFFFF )
-	{
-		g_TeleportList.Remove( m_TeleportListEntry );
-		m_TeleportListEntry = 0xFFFF;
-	}
 }
 
 #ifdef TF_CLIENT_DLL
