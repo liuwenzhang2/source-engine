@@ -580,6 +580,7 @@ public:
 
 	virtual void AddToAimEntsList() = 0;
 	virtual void RemoveFromAimEntsList() = 0;
+	virtual void ForceClientSideAnimationOn() = 0;
 };
 
 class IEnginePortalClient {

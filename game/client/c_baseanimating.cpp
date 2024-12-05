@@ -91,24 +91,9 @@ bool C_AnimationLayer::IsActive( void )
 	return (m_nOrder != C_BaseAnimatingOverlay::MAX_OVERLAYS);
 }
 
-
-
-
 //-----------------------------------------------------------------------------
 // Base Animating
 //-----------------------------------------------------------------------------
-
-struct clientanimating_t
-{
-	C_BaseAnimating *pAnimating;
-	unsigned int	flags;
-	clientanimating_t(C_BaseAnimating *_pAnim, unsigned int _flags ) : pAnimating(_pAnim), flags(_flags) {}
-};
-
-const unsigned int FCLIENTANIM_SEQUENCE_CYCLE = 0x00000001;
-
-static CUtlVector< clientanimating_t >	g_ClientSideAnimationList;
-
 
 IMPLEMENT_CLIENTCLASS_DT(C_BaseAnimating, DT_BaseAnimating, CBaseAnimating)
 
@@ -537,7 +522,6 @@ void C_ClientRagdoll::SetupWeights( const matrix3x4_t *pBoneToWorld, int nFlexWe
 //-----------------------------------------------------------------------------
 C_BaseAnimating::C_BaseAnimating()
 {
-	m_ClientSideAnimationListHandle = INVALID_CLIENTSIDEANIMATION_LIST_HANDLE;
 	m_nEventSequence = -1;
 	m_nPrevResetEventsParity = -1;
 	m_iEyeAttachment = 0;
@@ -574,7 +558,6 @@ void C_BaseAnimating::UpdateOnRemove(void)
 
 	partition->Remove(PARTITION_CLIENT_SOLID_EDICTS | PARTITION_CLIENT_RESPONSIVE_EDICTS | PARTITION_CLIENT_NON_STATIC_EDICTS, GetEngineObject()->GetPartitionHandle());
 	GetEngineObject()->RemoveFromLeafSystem();
-	RemoveFromClientSideAnimationList();
 
 	BaseClass::UpdateOnRemove();
 }
@@ -713,10 +696,6 @@ IStudioHdr *C_BaseAnimating::OnNewModel()
 	IStudioHdr *hdr = GetEngineObject()->GetModelPtr();
 	if (hdr == NULL)
 		return NULL;
-
-
-
-
 
 	InitModelEffects();
 
@@ -3078,15 +3057,6 @@ int C_BaseAnimating::LookupRandomAttachment( const char *pAttachmentNameSubstrin
 
 void C_BaseAnimating::ClientSideAnimationChanged()
 {
-	if ( !GetEngineObject()->IsUsingClientSideAnimation() || m_ClientSideAnimationListHandle == INVALID_CLIENTSIDEANIMATION_LIST_HANDLE )
-		return;
-
-	MDLCACHE_CRITICAL_SECTION();
-	
-	clientanimating_t &anim = g_ClientSideAnimationList.Element(m_ClientSideAnimationListHandle);
-	Assert(anim.pAnimating == this);
-	anim.flags = ComputeClientSideAnimationFlags();
-
 	m_SequenceTransitioner.CheckForSequenceChange( 
 		GetEngineObject()->GetModelPtr(),
 		GetEngineObject()->GetSequence(),
@@ -3930,78 +3900,6 @@ void DevMsgRT( char const* pMsg, ... )
 		}
 		// DevMsg( pMsg, argptr );
 		va_end( argptr );
-	}
-}
-
-
-void C_BaseAnimating::ForceClientSideAnimationOn()
-{
-	GetEngineObject()->UseClientSideAnimation();
-	AddToClientSideAnimationList();
-}
-
-
-void C_BaseAnimating::AddToClientSideAnimationList()
-{
-	// Already in list
-	if ( m_ClientSideAnimationListHandle != INVALID_CLIENTSIDEANIMATION_LIST_HANDLE )
-		return;
-
-	clientanimating_t list( this, 0 );
-	m_ClientSideAnimationListHandle = g_ClientSideAnimationList.AddToTail( list );
-	ClientSideAnimationChanged();
-
-	GetEngineObject()->UpdateRelevantInterpolatedVars();
-}
-
-void C_BaseAnimating::RemoveFromClientSideAnimationList()
-{
-	// Not in list yet
-	if ( INVALID_CLIENTSIDEANIMATION_LIST_HANDLE == m_ClientSideAnimationListHandle )
-		return;
-
-	unsigned int c = g_ClientSideAnimationList.Count();
-
-	Assert( m_ClientSideAnimationListHandle < c );
-
-	unsigned int last = c - 1;
-
-	if ( last == m_ClientSideAnimationListHandle )
-	{
-		// Just wipe the final entry
-		g_ClientSideAnimationList.FastRemove( last );
-	}
-	else
-	{
-		clientanimating_t lastEntry = g_ClientSideAnimationList[ last ];
-		// Remove the last entry
-		g_ClientSideAnimationList.FastRemove( last );
-
-		// And update it's handle to point to this slot.
-		lastEntry.pAnimating->m_ClientSideAnimationListHandle = m_ClientSideAnimationListHandle;
-		g_ClientSideAnimationList[ m_ClientSideAnimationListHandle ] = lastEntry;
-	}
-
-	// Invalidate our handle no matter what.
-	m_ClientSideAnimationListHandle = INVALID_CLIENTSIDEANIMATION_LIST_HANDLE;
-
-	GetEngineObject()->UpdateRelevantInterpolatedVars();
-}
-
-
-// static method
-void C_BaseAnimating::UpdateClientSideAnimations()
-{
-	VPROF_BUDGET( "UpdateClientSideAnimations", VPROF_BUDGETGROUP_CLIENT_ANIMATION );
-
-	int c = g_ClientSideAnimationList.Count();
-	for ( int i = 0; i < c ; ++i )
-	{
-		clientanimating_t &anim = g_ClientSideAnimationList.Element(i);
-		if ( !(anim.flags & FCLIENTANIM_SEQUENCE_CYCLE) )
-			continue;
-		Assert( anim.pAnimating );
-		anim.pAnimating->UpdateClientSideAnimation();
 	}
 }
 

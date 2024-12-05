@@ -420,7 +420,7 @@ void C_DODRagdoll::CreateLowViolenceRagdoll()
 		Q_snprintf( str, sizeof( str ), "death%d", iDeathAnim );
 
 		GetEngineObject()->SetSequence( LookupSequence( str ) );
-		ForceClientSideAnimationOn();
+		GetEngineObject()->ForceClientSideAnimationOn();
 
 		//GetEngineObject()->SetNetworkOrigin( m_vecRagdollOrigin );
 		//GetEngineObject()->SetAbsOrigin( m_vecRagdollOrigin );

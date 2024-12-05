@@ -2224,7 +2224,7 @@ void OnRenderStart()
 	RopeManager()->OnRenderStart();
 	
 	// This will place all entities in the correct position in world space and in the KD-tree
-	C_BaseAnimating::UpdateClientSideAnimations();
+	ClientEntityList().UpdateClientSideAnimations();
 
 	partition->SuppressLists( PARTITION_ALL_CLIENT_EDICTS, false );
 

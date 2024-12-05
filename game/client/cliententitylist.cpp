@@ -1087,14 +1087,14 @@ void C_EngineObjectInternal::PostDataUpdate(DataUpdateType_t updateType)
 	if (IsUsingClientSideAnimation())
 	{
 		SetCycle(m_flOldCycle);
-		m_pOuter->AddToClientSideAnimationList();
+		AddToClientSideAnimationList();
 	}
 	else
 	{
 		if (m_pOuter->IsViewModel()) {
 			SetCycle(m_flOldCycle);
 		}
-		m_pOuter->RemoveFromClientSideAnimationList();
+		RemoveFromClientSideAnimationList();
 	}
 
 	bool bBoneControllersChanged = false;
@@ -1131,7 +1131,7 @@ void C_EngineObjectInternal::PostDataUpdate(DataUpdateType_t updateType)
 	{
 		if (IsUsingClientSideAnimation())
 		{
-			m_pOuter->ClientSideAnimationChanged();
+			ClientSideAnimationChanged();
 		}
 	}
 
@@ -4548,7 +4548,7 @@ void C_EngineObjectInternal::SetSequence(int nSequence)
 		InvalidatePhysicsRecursive(ANIMATION_CHANGED);
 		if (IsUsingClientSideAnimation())
 		{
-			m_pOuter->ClientSideAnimationChanged();
+			ClientSideAnimationChanged();
 		}
 	}
 }
@@ -6986,6 +6986,73 @@ void C_EngineObjectInternal::RemoveFromAimEntsList()
 
 	// Invalidate our handle no matter what.
 	m_AimEntsListHandle = INVALID_AIMENTS_LIST_HANDLE;
+}
+
+void C_EngineObjectInternal::AddToClientSideAnimationList()
+{
+	// Already in list
+	if (m_ClientSideAnimationListHandle != INVALID_CLIENTSIDEANIMATION_LIST_HANDLE)
+		return;
+
+	clientanimating_t list(this, 0);
+	m_ClientSideAnimationListHandle = ClientEntityList().m_ClientSideAnimationList.AddToTail(list);
+	ClientSideAnimationChanged();
+
+	UpdateRelevantInterpolatedVars();
+}
+
+void C_EngineObjectInternal::RemoveFromClientSideAnimationList()
+{
+	// Not in list yet
+	if (INVALID_CLIENTSIDEANIMATION_LIST_HANDLE == m_ClientSideAnimationListHandle)
+		return;
+
+	unsigned int c = ClientEntityList().m_ClientSideAnimationList.Count();
+
+	Assert(m_ClientSideAnimationListHandle < c);
+
+	unsigned int last = c - 1;
+
+	if (last == m_ClientSideAnimationListHandle)
+	{
+		// Just wipe the final entry
+		ClientEntityList().m_ClientSideAnimationList.FastRemove(last);
+	}
+	else
+	{
+		clientanimating_t lastEntry = ClientEntityList().m_ClientSideAnimationList[last];
+		// Remove the last entry
+		ClientEntityList().m_ClientSideAnimationList.FastRemove(last);
+
+		// And update it's handle to point to this slot.
+		lastEntry.pAnimating->m_ClientSideAnimationListHandle = m_ClientSideAnimationListHandle;
+		ClientEntityList().m_ClientSideAnimationList[m_ClientSideAnimationListHandle] = lastEntry;
+	}
+
+	// Invalidate our handle no matter what.
+	m_ClientSideAnimationListHandle = INVALID_CLIENTSIDEANIMATION_LIST_HANDLE;
+
+	UpdateRelevantInterpolatedVars();
+}
+
+void C_EngineObjectInternal::ClientSideAnimationChanged()
+{
+	if (!IsUsingClientSideAnimation() || m_ClientSideAnimationListHandle == INVALID_CLIENTSIDEANIMATION_LIST_HANDLE)
+		return;
+
+	MDLCACHE_CRITICAL_SECTION();
+
+	clientanimating_t& anim = ClientEntityList().m_ClientSideAnimationList.Element(m_ClientSideAnimationListHandle);
+	Assert(anim.pAnimating == this);
+	anim.flags = m_pOuter->ComputeClientSideAnimationFlags();
+
+	m_pOuter->ClientSideAnimationChanged();
+}
+
+void C_EngineObjectInternal::ForceClientSideAnimationOn()
+{
+	UseClientSideAnimation();
+	AddToClientSideAnimationList();
 }
 
 C_EnginePortalInternal::C_EnginePortalInternal(IClientEntityList* pClientEntityList)

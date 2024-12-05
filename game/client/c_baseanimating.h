@@ -65,14 +65,6 @@ struct RagdollInfo_t
 };
 
 
-
-
-
-typedef unsigned int			ClientSideAnimationListHandle_t;
-
-#define		INVALID_CLIENTSIDEANIMATION_LIST_HANDLE	(ClientSideAnimationListHandle_t)~0
-
-
 class C_BaseAnimating : public C_BaseEntity//, private IModelLoadCallback
 {
 public:
@@ -197,13 +189,6 @@ public:
 	virtual void					OnDataChanged( DataUpdateType_t updateType );
 	virtual void					AddEntity( void );
 
-	// This can be used to force client side animation to be on. Only use if you know what you're doing!
-	// Normally, the server entity should set this.
-	void							ForceClientSideAnimationOn();
-	
-	void							AddToClientSideAnimationList();
-	void							RemoveFromClientSideAnimationList();
-
 	virtual bool					IsSelfAnimating();
 	virtual void					ResetLatched();
 
@@ -319,8 +304,7 @@ public:
 	// This is called to do the actual muzzle flash effect.
 	virtual void ProcessMuzzleFlashEvent();
 	
-	// Update client side animations
-	static void UpdateClientSideAnimations();
+	
 
 	// Load the model's keyvalues section and create effects listed inside it
 	void InitModelEffects( void );
@@ -381,7 +365,6 @@ protected:
 
 	
 
-	ClientSideAnimationListHandle_t	m_ClientSideAnimationListHandle;
 
 
 

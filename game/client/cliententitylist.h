@@ -132,6 +132,10 @@ typedef unsigned int			AimEntsListHandle_t;
 
 #define		INVALID_AIMENTS_LIST_HANDLE		(AimEntsListHandle_t)~0
 
+typedef unsigned int			ClientSideAnimationListHandle_t;
+
+#define		INVALID_CLIENTSIDEANIMATION_LIST_HANDLE	(ClientSideAnimationListHandle_t)~0
+
 class C_EngineObjectInternal : public IEngineObjectClient {
 public:
 	DECLARE_CLASS_NOBASE(C_EngineObjectInternal);
@@ -284,11 +288,13 @@ public:
 		m_ShadowHandle = CLIENTSHADOW_INVALID_HANDLE;
 		m_hRender = INVALID_CLIENT_RENDER_HANDLE;
 		m_AimEntsListHandle = INVALID_AIMENTS_LIST_HANDLE;
+		m_ClientSideAnimationListHandle = INVALID_CLIENTSIDEANIMATION_LIST_HANDLE;
 
 	}
 
 	virtual ~C_EngineObjectInternal()
 	{
+		RemoveFromClientSideAnimationList();
 		ClearDataChangedEvent(m_DataChangeEventRef);
 		// Are we in the partition?
 		DestroyPartitionHandle();
@@ -563,6 +569,7 @@ public:
 		m_ShadowHandle = CLIENTSHADOW_INVALID_HANDLE;
 		m_hRender = INVALID_CLIENT_RENDER_HANDLE;
 		m_AimEntsListHandle = INVALID_AIMENTS_LIST_HANDLE;
+		m_ClientSideAnimationListHandle = INVALID_CLIENTSIDEANIMATION_LIST_HANDLE;
 
 	}
 
@@ -1097,6 +1104,13 @@ public:
 
 	void					AddToAimEntsList();
 	void					RemoveFromAimEntsList();
+
+	void					AddToClientSideAnimationList();
+	void					RemoveFromClientSideAnimationList();
+
+	// This can be used to force client side animation to be on. Only use if you know what you're doing!
+	// Normally, the server entity should set this.
+	void					ForceClientSideAnimationOn();
 private:
 	void LockStudioHdr();
 	void UnlockStudioHdr();
@@ -1110,7 +1124,8 @@ private:
 	// This method should return true if the bones have changed + SetupBones needs to be called
 	virtual float LastBoneChangedTime();
 	void			SetupBones_AttachmentHelper(IStudioHdr* pStudioHdr);
-
+	void			ClientSideAnimationChanged();
+	
 
 protected:
 
@@ -1361,6 +1376,7 @@ protected:
 	ModelInstanceHandle_t			m_ModelInstance;
 	bool							m_bAlternateSorting;
 	AimEntsListHandle_t				m_AimEntsListHandle;
+	ClientSideAnimationListHandle_t	m_ClientSideAnimationListHandle;
 
 };
 
@@ -2465,6 +2481,14 @@ private:
 	CBaseHandle m_CurBaseEntity;
 };
 
+struct clientanimating_t
+{
+	C_EngineObjectInternal* pAnimating;
+	unsigned int	flags;
+	clientanimating_t(C_EngineObjectInternal* _pAnim, unsigned int _flags) : pAnimating(_pAnim), flags(_flags) {}
+};
+
+
 //
 // This is the IClientEntityList implemenation. It serves two functions:
 //
@@ -2616,8 +2640,11 @@ public:
 	bool IsAbsRecomputationsEnabled(void);
 	bool IsDisableTouchFuncs() { return m_bDisableTouchFuncs; }
 	// Moves all aiments into their correct position for the frame
-	void	MarkAimEntsDirty();
+	void MarkAimEntsDirty();
 	void CalcAimEntPositions();
+
+	// Update client side animations
+	void UpdateClientSideAnimations();
 private:
 	void AddPVSNotifier(IClientUnknown* pUnknown);
 	void RemovePVSNotifier(IClientUnknown* pUnknown);
@@ -2689,6 +2716,7 @@ private:
 	unsigned short m_iAbsRecomputationStackPos = 0;
 	bool m_bDisableTouchFuncs = false;	// Disables PhysicsTouch and PhysicsStartTouch function calls
 	CUtlVector< C_EngineObjectInternal* >	m_AimEntsList;
+	CUtlVector< clientanimating_t >	m_ClientSideAnimationList;
 
 };
 
@@ -3895,7 +3923,6 @@ void CClientEntityList<T>::MarkAimEntsDirty()
 	}
 }
 
-
 template<class T>
 void CClientEntityList<T>::CalcAimEntPositions()
 {
@@ -3911,6 +3938,22 @@ void CClientEntityList<T>::CalcAimEntPositions()
 		{
 			pEnt->CalcAbsolutePosition();
 		}
+	}
+}
+
+template<class T>
+void CClientEntityList<T>::UpdateClientSideAnimations()
+{
+	VPROF_BUDGET("UpdateClientSideAnimations", VPROF_BUDGETGROUP_CLIENT_ANIMATION);
+
+	int c = m_ClientSideAnimationList.Count();
+	for (int i = 0; i < c; ++i)
+	{
+		clientanimating_t& anim = m_ClientSideAnimationList.Element(i);
+		if (!(anim.flags & FCLIENTANIM_SEQUENCE_CYCLE))
+			continue;
+		Assert(anim.pAnimating);
+		anim.pAnimating->GetOuter()->UpdateClientSideAnimation();
 	}
 }
 

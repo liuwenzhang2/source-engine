@@ -112,7 +112,7 @@ bool C_LowViolenceHostageDeathModel::SetupLowViolenceModel( C_CHostage *pHostage
 	SetNextClientThink( CLIENT_THINK_ALWAYS );
 
 	GetEngineObject()->SetSequence( LookupSequence( "death1" ) );
-	ForceClientSideAnimationOn();
+	GetEngineObject()->ForceClientSideAnimationOn();
 
 	if ( pHostage && !pHostage->IsDormant() )
 	{

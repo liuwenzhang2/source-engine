@@ -662,5 +662,7 @@ enum vehicle_pose_params
 
 };
 
+const unsigned int FCLIENTANIM_SEQUENCE_CYCLE = 0x00000001;
+
 #endif
 
