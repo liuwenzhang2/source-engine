@@ -3058,7 +3058,7 @@ void C_BaseAnimating::UpdateClientSideAnimation()
 	// Update client side animation
 	if (GetEngineObject()->IsUsingClientSideAnimation())
 	{
-		Assert( m_ClientSideAnimationListHandle != INVALID_CLIENTSIDEANIMATION_LIST_HANDLE );
+		//Assert( m_ClientSideAnimationListHandle != INVALID_CLIENTSIDEANIMATION_LIST_HANDLE );
 		if (GetEngineObject()->GetSequence() != -1 )
 		{
 			// latch old values
@@ -3069,7 +3069,7 @@ void C_BaseAnimating::UpdateClientSideAnimation()
 	}
 	else
 	{
-		Assert( m_ClientSideAnimationListHandle == INVALID_CLIENTSIDEANIMATION_LIST_HANDLE );
+		//Assert( m_ClientSideAnimationListHandle == INVALID_CLIENTSIDEANIMATION_LIST_HANDLE );
 	}
 }
 

@@ -4021,6 +4021,14 @@ void CClientEntityList<T>::UpdateClientSideAnimations()
 		if (!(anim.flags & FCLIENTANIM_SEQUENCE_CYCLE))
 			continue;
 		Assert(anim.pAnimating);
+		if (anim.pAnimating->IsUsingClientSideAnimation())
+		{
+			Assert(anim.pAnimating->m_ClientSideAnimationListHandle != INVALID_CLIENTSIDEANIMATION_LIST_HANDLE );
+		}
+		else
+		{
+			Assert(anim.pAnimating->m_ClientSideAnimationListHandle == INVALID_CLIENTSIDEANIMATION_LIST_HANDLE );
+		}
 		anim.pAnimating->GetOuter()->UpdateClientSideAnimation();
 	}
 }

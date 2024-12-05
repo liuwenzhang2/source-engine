@@ -2145,7 +2145,7 @@ const QAngle& CEngineObjectInternal::GetAbsAngles(void)
 
 const QAngle& CEngineObjectInternal::GetAbsAngles(void) const
 {
-	Assert(CEngineObjectInternal::IsAbsQueriesValid());
+	Assert(gEntList.IsAbsQueriesValid());
 
 	if (IsEFlagSet(EFL_DIRTY_ABSTRANSFORM))
 	{
