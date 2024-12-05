@@ -5,7 +5,8 @@
 // $NoKeywords: $
 //=============================================================================//
 
-#include "cbase.h"
+//#include "cbase.h"
+#include "const.h"
 #include "usercmd.h"
 #include "bitbuf.h"
 #include "checksum_md5.h"

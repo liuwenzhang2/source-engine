@@ -69,7 +69,6 @@
 #include "util.h"
 //#include "predictable_entity.h"
 //#include "predictableid.h"
-#include "ehandle.h"
 #include "sendproxy.h"
 #include "variant_t.h"
 #include "takedamageinfo.h"
@@ -152,7 +151,7 @@ class CSound;
 #include "physics.h"
 #include "ndebugoverlay.h"
 #include "recipientfilter.h"
-
+#include "gamemovement.h"
 inline IServerEntityList* EntityList() { return &gEntList; }
 
 #endif // CBASE_H

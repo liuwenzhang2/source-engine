@@ -27,6 +27,7 @@
 #include "ragdoll_shared.h"
 #include "iservervehicle.h"
 #include "bone_setup.h"
+#include "usercmd.h"
 
 //class CBaseEntity;
 // We can only ever move 512 entities across a transition

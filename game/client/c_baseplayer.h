@@ -16,6 +16,7 @@
 #include "c_basecombatcharacter.h"
 #include "PlayerState.h"
 #include "usercmd.h"
+#include "imovehelper.h"
 #include "shareddefs.h"
 #include "timedevent.h"
 #include "smartptr.h"

@@ -38,6 +38,7 @@
 #include "bone_merge_cache.h"
 #include "toolframework_client.h"
 #include "inetchannelinfo.h"
+#include "usercmd.h"
 
 //class C_Beam;
 //class C_BaseViewModel;
