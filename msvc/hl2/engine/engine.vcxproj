@@ -420,6 +420,7 @@
     <ClCompile Include="..\..\..\public\sentence.cpp" />
     <ClCompile Include="..\..\..\public\studio.cpp" />
     <ClCompile Include="..\..\..\public\tier0\memoverride.cpp" />
+    <ClCompile Include="..\..\..\public\usercmd.cpp" />
     <ClCompile Include="..\..\..\public\vallocator.cpp" />
     <ClCompile Include="..\..\..\public\vgui_controls\vgui_controls.cpp" />
     <ClCompile Include="..\..\..\public\XUnzip.cpp" />

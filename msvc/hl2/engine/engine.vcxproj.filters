@@ -833,5 +833,8 @@
     <ClCompile Include="..\..\..\engine\sv_ents_write.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\public\usercmd.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

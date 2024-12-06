@@ -681,7 +681,6 @@
     <ClCompile Include="..\..\..\game\shared\takedamageinfo.cpp" />
     <ClCompile Include="..\..\..\game\shared\teamplay_gamerules.cpp" />
     <ClCompile Include="..\..\..\game\shared\test_ehandle.cpp" />
-    <ClCompile Include="..\..\..\game\shared\usercmd.cpp" />
     <ClCompile Include="..\..\..\game\shared\usermessages.cpp" />
     <ClCompile Include="..\..\..\game\shared\util_shared.cpp" />
     <ClCompile Include="..\..\..\game\shared\vehicle_viewblend_shared.cpp" />
@@ -713,6 +712,7 @@
     <ClCompile Include="..\..\..\public\stringregistry.cpp" />
     <ClCompile Include="..\..\..\public\studio.cpp" />
     <ClCompile Include="..\..\..\public\tier0\memoverride.cpp" />
+    <ClCompile Include="..\..\..\public\usercmd.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
