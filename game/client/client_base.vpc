@@ -311,7 +311,7 @@ $Project
 		$File	"dummyproxy.cpp"
 		$File	"$SRCDIR\game\shared\effect_dispatch_data.cpp"
 		$File	"EffectsClient.cpp"
-		$File	"$SRCDIR\game\shared\ehandle.cpp"
+		$File	"$SRCDIR\public\ehandle.cpp"
 		$File	"$SRCDIR\public\entitylist_base.cpp"
 		$File	"entityoriginmaterialproxy.cpp"
 		$File	"$SRCDIR\game\shared\EntityParticleTrail_Shared.cpp"

@@ -293,7 +293,7 @@ $Project
 		$File	"effects.cpp"
 		$File	"effects.h"
 		$File	"EffectsServer.cpp"
-		$File	"$SRCDIR\game\shared\ehandle.cpp"
+		$File	"$SRCDIR\public\ehandle.cpp"
 		$File	"$SRCDIR\public\eiface.h"
 		$File	"enginecallback.h"
 		$File	"entityapi.h"
