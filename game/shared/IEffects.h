@@ -12,6 +12,7 @@
 #pragma once
 #endif
 
+#include "shake.h"
 #include "basetypes.h"
 #include "mathlib/vector.h"
 #include "interface.h"
@@ -20,7 +21,6 @@
 //-----------------------------------------------------------------------------
 // Forward declarations
 //-----------------------------------------------------------------------------
-enum ShakeCommand_t;
 class Vector;
 class CGameTrace;
 typedef CGameTrace trace_t;
