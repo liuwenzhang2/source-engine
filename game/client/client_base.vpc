@@ -417,7 +417,7 @@ $Project
 		$File	"proxyplayer.cpp"
 		$File	"proxypupil.cpp"
 		$File	"ragdoll.cpp"
-		$File	"$SRCDIR\game\shared\ragdoll_shared.cpp"
+		$File	"$SRCDIR\public\ragdoll_shared.cpp"
 		$File	"recvproxy.cpp"
 		$File	"basepresence.cpp"			[$WIN32||$POSIX]
 		$File	"basepresence_xbox.cpp"		[$X360]
@@ -1170,7 +1170,7 @@ $Project
 		$File	"$SRCDIR\game\shared\predictable_entity.h"
 		$File	"$SRCDIR\game\shared\predictableid.h"
 		$File	"$SRCDIR\game\shared\predictioncopy.h"
-		$File	"$SRCDIR\game\shared\ragdoll_shared.h"
+		$File	"$SRCDIR\public\ragdoll_shared.h"
 		$File	"$SRCDIR\game\shared\rope_helpers.h"
 		$File	"$SRCDIR\game\shared\saverestore.h"
 		$File	"$SRCDIR\game\shared\saverestore_bitstring.h"

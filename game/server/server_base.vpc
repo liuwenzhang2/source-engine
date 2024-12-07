@@ -540,7 +540,7 @@ $Project
 		$File	"$SRCDIR\game\shared\props_shared.cpp"
 		$File   "$SRCDIR\game\shared\querycache.cpp"
 		$File	"ragdoll_manager.cpp"
-		$File	"$SRCDIR\game\shared\ragdoll_shared.cpp"
+		$File	"$SRCDIR\public\ragdoll_shared.cpp"
 		$File	"RagdollBoogie.cpp"
 		$File	"RagdollBoogie.h"
 		$File	"recipientfilter.cpp"
