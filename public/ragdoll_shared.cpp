@@ -14,7 +14,7 @@
 #include "engine/ivdebugoverlay.h"
 #include "physics_shared.h"
 #include "globalvars_base.h"
-#include "engine\ivmodelinfo.h"
+#include "engine/ivmodelinfo.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
