@@ -11,7 +11,7 @@
 #endif
 
 #include "ehandle.h"
-#include "SoundEmitterSystem\isoundemittersystembase.h"
+#include "SoundEmitterSystem/isoundemittersystembase.h"
 
 class IPhysics;
 class IPhysicsEnvironment;
