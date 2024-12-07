@@ -15,6 +15,7 @@
 #include "lerp_functions.h"
 #include "animationlayer.h"
 #include "convar.h"
+#include "globalvars_base.h"
 
 
 #include "tier0/memdbgon.h"
@@ -46,6 +47,7 @@
 // this global keeps the last known server packet tick (to avoid calling engine->GetLastTimestamp() all the time)
 extern float g_flLastPacketTimestamp;
 extern int addVarCount;
+extern CGlobalVarsBase* gpGlobals;
 
 inline void Interpolation_SetLastPacketTimeStamp( float timestamp)
 {
