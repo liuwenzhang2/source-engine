@@ -2667,7 +2667,7 @@ void CGlobalEntityList<T>::Restore(IRestore* pRestore, bool createPlayers)
 				if (createPlayers)//ed && 
 				{
 					// create the player
-					pent = gEntList.CreateEntityByName(STRING(pEntInfo->classname), pEntInfo->edictindex);
+					pent = CreateEntityByName(STRING(pEntInfo->classname), pEntInfo->edictindex);
 				}
 				else
 					pent = NULL;
@@ -2936,7 +2936,7 @@ void CGlobalEntityList<T>::CreateEntitiesInTransitionList(IRestore* pRestore, in
 					Assert(0);
 				}
 
-				pent = gEntList.CreateEntityByName(STRING(pEntInfo->classname), pEntInfo->edictindex);
+				pent = CreateEntityByName(STRING(pEntInfo->classname), pEntInfo->edictindex);
 			}
 		}
 		else if (active)
