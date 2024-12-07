@@ -5,7 +5,7 @@
 // $NoKeywords: $
 //=============================================================================//
 #include "cbase.h"
-#include "entitylist.h"
+//#include "entitylist.h"
 #include "entityoutput.h"
 #include "player.h"
 #include "eventqueue.h"

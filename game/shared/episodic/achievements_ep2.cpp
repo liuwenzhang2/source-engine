@@ -11,7 +11,7 @@
 
 #include "achievementmgr.h"
 #include "baseachievement.h"
-#include "iservervehicle.h"
+#include "game/server/iservervehicle.h"
 #include "npc_antlion.h"
 #include "npc_hunter.h"
 

@@ -17,10 +17,16 @@
 #include "engine/IEngineTrace.h"
 #include "engine/IStaticPropMgr.h"
 #include "shared_classnames.h"
+#include "shareddefs.h"
 
 #ifdef CLIENT_DLL
 #include "cdll_client_int.h"
 #endif
+#ifdef GAME_DLL
+#include "KeyValues.h"
+#include "enginecallback.h"
+#endif // GAME_DLL
+
 
 #ifdef PORTAL
 #include "portal_util_shared.h"
@@ -600,5 +606,20 @@ bool				UTIL_IsHolidayActive( /*EHoliday*/ int eHoliday );
 // holidays overlapping, the list order will act as priority.
 const char		   *UTIL_GetActiveHolidayString();
 
+// Manages ragdolls fading for the low violence versions
+class CRagdollLowViolenceManager
+{
+public:
+	CRagdollLowViolenceManager() { m_bLowViolence = false; }
+	// Turn the low violence ragdoll stuff off if we're in the HL2 Citadel maps because
+	// the player has the super gravity gun and fading ragdolls will break things.
+	void SetLowViolence(const char* pMapName);
+	bool IsLowViolence(void) { return m_bLowViolence; }
+
+private:
+	bool m_bLowViolence;
+};
+
+extern CRagdollLowViolenceManager g_RagdollLVManager;
 
 #endif // UTIL_SHARED_H

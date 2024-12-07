@@ -12,9 +12,9 @@
 #pragma once
 #endif
 
-#include "IVehicle.h"
+#include "game/shared/IVehicle.h"
 #include "vphysics/vehicles.h"
-#include "vehicle_sounds.h"
+#include "game/server/vehicle_sounds.h"
 
 class CBaseEntity;
 class CBasePlayer;

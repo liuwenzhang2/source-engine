@@ -7,7 +7,7 @@
 
 #include "cbase.h"
 #include "rope.h"
-#include "entitylist.h"
+//#include "entitylist.h"
 #include "rope_shared.h"
 #include "sendproxy.h"
 #include "rope_helpers.h"

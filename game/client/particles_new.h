@@ -18,6 +18,7 @@
 #include "smartptr.h"
 #include "particles_simple.h"
 #include "tier1/utlobjectreference.h"
+#include "ehandle.h"
 
 
 //-----------------------------------------------------------------------------

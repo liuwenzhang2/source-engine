@@ -21,7 +21,7 @@
 #include "vphysics/constraints.h"
 #include "studio.h"
 #include "bone_setup.h"
-#include "iservervehicle.h"
+#include "game/server/iservervehicle.h"
 #include "collisionutils.h"
 #include "combine_mine.h"
 #include "explode.h"

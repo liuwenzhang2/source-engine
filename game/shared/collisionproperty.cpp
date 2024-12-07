@@ -5,31 +5,39 @@
 // $NoKeywords: $
 //=============================================================================//
 
-#include "cbase.h"
+//#include "cbase.h"
 #include "collisionproperty.h"
 #include "igamesystem.h"
 #include "utlvector.h"
 #include "tier0/threadtools.h"
 #include "tier0/tslist.h"
-
+#include "worldsize.h"
+#include "sharedInterface.h"
 #ifdef CLIENT_DLL
 
 #include "c_baseentity.h"
 #include "c_baseanimating.h"
 #include "recvproxy.h"
+#include "cliententitylist.h"
 
-#else
+#endif
+#ifdef GAME_DLL
 
 #include "baseentity.h"
 #include "baseanimating.h"
 #include "sendproxy.h"
 #include "hierarchy.h"
+#include "entitylist.h"   
+
 #endif
 
 //#include "predictable_entity.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
+
+extern ISpatialPartition* partition;
+extern IPhysicsCollision* physcollision;
 
 //-----------------------------------------------------------------------------
 // KD tree query callbacks

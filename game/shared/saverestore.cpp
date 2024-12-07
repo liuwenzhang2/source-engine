@@ -27,8 +27,7 @@
 
 #if !defined( CLIENT_DLL )
 
-#include "globalstate.h"
-#include "entitylist.h"
+//#include "entitylist.h"
 #include "gameinterface.h"
 #else
 

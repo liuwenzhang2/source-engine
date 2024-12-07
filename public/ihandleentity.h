@@ -16,10 +16,15 @@ class CBaseHandle;
 class IEntityFactory;
 class IEntityList;
 class datamap_t;
+struct string_t;
 
 class IEngineObject {
 public:
 	virtual datamap_t* GetDataDescMap(void) = 0;
+	virtual int GetModelIndex(void) const = 0;
+	virtual string_t GetModelName(void) const = 0;
+	virtual bool IsMarkedForDeletion(void) = 0;
+	virtual void CollisionRulesChanged() = 0;
 };
 
 // An IHandleEntity-derived class can go into an entity list and use ehandles.
@@ -32,6 +37,8 @@ public:
 	virtual const CBaseHandle& GetRefEHandle() const = 0;
 	virtual IEntityFactory* GetEntityFactory() { return NULL; }
 	virtual IEntityList* GetEntityList() { return NULL; }
+	virtual IEngineObject* GetEngineObject() { return NULL; }
+	virtual const IEngineObject* GetEngineObject() const { return NULL; }
 	virtual bool Init(int entnum, int iSerialNum) { return true; }
 	virtual void AfterInit() {};
 };

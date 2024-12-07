@@ -6,14 +6,12 @@
 //=============================================================================//
 
 #include "cbase.h"
-#include "saverestore.h"
-#include "globalstate.h"
 #include <stdarg.h>
 #include "shake.h"
 #include "decals.h"
 #include "player.h"
 #include "gamerules.h"
-#include "entitylist.h"
+//#include "entitylist.h"
 #include "bspfile.h"
 #include "mathlib/mathlib.h"
 #include "IEffects.h"
@@ -24,7 +22,7 @@
 #include "saverestoretypes.h"
 #include "checksum_crc.h"
 #include "hierarchy.h"
-#include "iservervehicle.h"
+#include "game/server/iservervehicle.h"
 #include "te_effect_dispatch.h"
 #include "utldict.h"
 #include "collisionutils.h"
@@ -36,6 +34,7 @@
 #include "datacache/imdlcache.h"
 #include "util.h"
 #include "cdll_int.h"
+#include "filesystem.h"
 
 #ifdef PORTAL
 #include "PortalSimulation.h"

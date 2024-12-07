@@ -13,7 +13,7 @@
 #if !defined( CLIENT_DLL )
 
 #include "soundent.h"
-#include "entitylist.h"
+//#include "entitylist.h"
 #include "gamestats.h"
 
 #endif

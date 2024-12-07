@@ -7,7 +7,6 @@
 //=============================================================================//
 #include "cbase.h"
 #include "basetypes.h"
-#include "saverestore.h"
 #include "saverestore_utlvector.h"
 #include "saverestore_utlsymbol.h"
 #include "globalstate.h"

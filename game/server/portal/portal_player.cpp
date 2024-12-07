@@ -6,7 +6,6 @@
 
 #include "cbase.h"
 #include "portal_player.h"
-#include "globalstate.h"
 #include "trains.h"
 #include "game.h"
 #include "portal_player_shared.h"

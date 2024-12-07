@@ -10,7 +10,7 @@
 #include "coordsize.h"
 
 #ifdef CLIENT_DLL
-#include "cliententitylist.h"
+//#include "cliententitylist.h"
 #endif
 
 #include "qlimits.h"

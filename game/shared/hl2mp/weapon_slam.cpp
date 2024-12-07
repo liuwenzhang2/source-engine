@@ -16,7 +16,7 @@
 	#include "hl2mp_player.h"
 	#include "grenade_tripmine.h"
 	#include "grenade_satchel.h"
-	#include "entitylist.h"
+	//#include "entitylist.h"
 	#include "eventqueue.h"
 #endif
 

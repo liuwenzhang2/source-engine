@@ -15,6 +15,7 @@
 #include "studio.h"
 #include "datacache/idatacache.h"
 #include "tier0/threadtools.h"
+#include "ai_activity.h"
 //#include <entitylist.h>
 
 

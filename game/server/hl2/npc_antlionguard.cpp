@@ -22,7 +22,7 @@
 #include "npc_rollermine.h"
 #include "ai_blended_movement.h"
 #include "physics_prop_ragdoll.h"
-#include "iservervehicle.h"
+#include "game/server/iservervehicle.h"
 #include "player_pickup.h"
 #include "props.h"
 #include "antlion_dust.h"

@@ -18,6 +18,7 @@
 #include "engine/ishadowmgr.h"
 #include "ivrenderview.h"
 #include "toolframework/itoolentity.h"
+#include "ehandle.h"
 
 //-----------------------------------------------------------------------------
 // Forward decls

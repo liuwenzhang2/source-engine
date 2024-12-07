@@ -21,6 +21,7 @@
 #include "bitmap/imageformat.h"
 #include "ispatialpartition.h"
 #include "materialsystem/MaterialSystemUtil.h"
+#include "util_shared.h"
 
 class Vector;
 class QAngle;

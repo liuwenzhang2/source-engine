@@ -11,7 +11,7 @@
 #include "decals.h"
 #include "shake.h"
 #include "smoke_trail.h"
-#include "entitylist.h"
+//#include "entitylist.h"
 #include "vstdlib/random.h"
 #include "engine/IEngineSound.h"
 

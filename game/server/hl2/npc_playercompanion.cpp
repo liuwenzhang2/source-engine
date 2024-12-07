@@ -11,7 +11,6 @@
 #include "combine_mine.h"
 #include "fire.h"
 #include "func_tank.h"
-#include "globalstate.h"
 #include "npcevent.h"
 #include "props.h"
 #include "BasePropDoor.h"

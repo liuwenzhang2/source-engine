@@ -22,10 +22,11 @@
 #include "cdll_util.h"
 #include "entitylist_base.h"
 #include "utlmap.h"
+#include "client_class.h"
+#include "collisionproperty.h"
 #include "c_baseentity.h"
 #include "gamestringpool.h"
 #include "saverestoretypes.h"
-#include "saverestore.h"
 #include "physics_saverestore.h"
 #include "mouthinfo.h"
 #include "ragdoll_shared.h"
@@ -39,6 +40,7 @@
 #include "toolframework_client.h"
 #include "inetchannelinfo.h"
 #include "usercmd.h"
+#include "engine\ivdebugoverlay.h"
 
 //class C_Beam;
 //class C_BaseViewModel;
@@ -1149,6 +1151,7 @@ private:
 	virtual float LastBoneChangedTime();
 	void			SetupBones_AttachmentHelper(IStudioHdr* pStudioHdr);
 	void			ClientSideAnimationChanged();
+	void RagdollSolveSeparation(ragdoll_t& ragdoll, IHandleEntity* pEntity);
 
 
 protected:
@@ -2528,6 +2531,7 @@ struct clientanimating_t
 	clientanimating_t(C_EngineObjectInternal* _pAnim, unsigned int _flags) : pAnimating(_pAnim), flags(_flags) {}
 };
 
+extern bool ShouldRemoveThisRagdoll(C_BaseEntity* pRagdoll);
 
 //
 // This is the IClientEntityList implemenation. It serves two functions:
@@ -2702,10 +2706,18 @@ public:
 	void ProcessTeleportList();
 	void ProcessInterpolatedList();
 	void CheckInterpolatedVarParanoidMeasurement();
+
+	// Move it to the top of the LRU
+	void MoveToTopOfLRU(C_BaseEntity* pRagdoll, bool bImportant = false);
+	void SetMaxRagdollCount(int iMaxCount) { m_iMaxRagdolls = iMaxCount; }
+	int CountRagdolls(bool bOnlySimulatingRagdolls) { return bOnlySimulatingRagdolls ? m_iSimulatedRagdollCount : m_iRagdollCount; }
+	// Methods of IGameSystem
+	virtual void UpdateRagdolls(float frametime);
 private:
 	void AddPVSNotifier(IClientUnknown* pUnknown);
 	void RemovePVSNotifier(IClientUnknown* pUnknown);
 	void AddRestoredEntity(T* pEntity);
+
 private:
 	// Cached info for networked entities.
 //struct EntityCacheInfo_t
@@ -2787,6 +2799,13 @@ private:
 	// All the entities that want Interpolate() called on them.
 	CUtlLinkedList<C_EngineObjectInternal*, unsigned short> m_InterpolationList;
 	CUtlLinkedList<C_EngineObjectInternal*, unsigned short> m_TeleportList;
+
+	CUtlLinkedList< EHANDLE > m_LRU;
+	CUtlLinkedList< EHANDLE > m_LRUImportantRagdolls;
+
+	int m_iMaxRagdolls;
+	int m_iSimulatedRagdollCount;
+	int m_iRagdollCount;
 };
 
 template<class T>
@@ -3240,6 +3259,9 @@ CClientEntityList<T>::CClientEntityList(void) :
 	{
 		m_EngineObjectArray[i] = NULL;
 	}
+	m_iMaxRagdolls = -1;
+	m_LRUImportantRagdolls.RemoveAll();
+	m_LRU.RemoveAll();
 	Release();
 }
 
@@ -4227,6 +4249,278 @@ void CClientEntityList<T>::ProcessInterpolatedList()
 		pCur->m_bReadyToDraw = pCur->GetOuter()->Interpolate(gpGlobals->curtime);
 	}
 }
+
+extern ConVar g_ragdoll_important_maxcount;
+//-----------------------------------------------------------------------------
+// Move it to the top of the LRU
+//-----------------------------------------------------------------------------
+template<class T>
+void CClientEntityList<T>::MoveToTopOfLRU(C_BaseEntity* pRagdoll, bool bImportant)
+{
+	if (bImportant)
+	{
+		m_LRUImportantRagdolls.AddToTail(pRagdoll);
+
+		if (m_LRUImportantRagdolls.Count() > g_ragdoll_important_maxcount.GetInt())
+		{
+			int iIndex = m_LRUImportantRagdolls.Head();
+
+			C_BaseEntity* pRagdoll = m_LRUImportantRagdolls[iIndex].Get();
+
+			if (pRagdoll)
+			{
+#ifdef CLIENT_DLL
+				pRagdoll->SUB_Remove();
+#else
+				pRagdoll->SUB_StartFadeOut(0);
+#endif
+				m_LRUImportantRagdolls.Remove(iIndex);
+			}
+
+		}
+		return;
+	}
+	for (int i = m_LRU.Head(); i < m_LRU.InvalidIndex(); i = m_LRU.Next(i))
+	{
+		if (m_LRU[i].Get() == pRagdoll)
+		{
+			m_LRU.Remove(i);
+			break;
+		}
+	}
+
+	m_LRU.AddToTail(pRagdoll);
+}
+
+extern ConVar g_ragdoll_maxcount;
+extern ConVar g_debug_ragdoll_removal;
+//-----------------------------------------------------------------------------
+// Cull stale ragdolls. There is an ifdef here: one version for episodic, 
+// one for everything else.
+//-----------------------------------------------------------------------------
+#if HL2_EPISODIC
+template<class T>
+void CClientEntityList<T>::UpdateRagdolls(float frametime) // EPISODIC VERSION
+{
+	VPROF("CRagdollLRURetirement::Update");
+	// Compress out dead items
+	int i, next;
+
+	int iMaxRagdollCount = m_iMaxRagdolls;
+
+	if (iMaxRagdollCount == -1)
+	{
+		iMaxRagdollCount = g_ragdoll_maxcount.GetInt();
+	}
+
+	// fade them all for the low violence version
+	if (g_RagdollLVManager.IsLowViolence())
+	{
+		iMaxRagdollCount = 0;
+	}
+	m_iRagdollCount = 0;
+	m_iSimulatedRagdollCount = 0;
+
+	// First, find ragdolls that are good candidates for deletion because they are not
+	// visible at all, or are in a culled visibility box
+	for (i = m_LRU.Head(); i < m_LRU.InvalidIndex(); i = next)
+	{
+		next = m_LRU.Next(i);
+		C_BaseEntity* pRagdoll = m_LRU[i].Get();
+		if (pRagdoll)
+		{
+			m_iRagdollCount++;
+			IPhysicsObject* pObject = pRagdoll->GetEngineObject()->VPhysicsGetObject();
+			if (pObject && !pObject->IsAsleep())
+			{
+				m_iSimulatedRagdollCount++;
+			}
+			if (m_LRU.Count() > iMaxRagdollCount)
+			{
+				//Found one, we're done.
+				if (ShouldRemoveThisRagdoll(m_LRU[i]) == true)
+				{
+#ifdef CLIENT_DLL
+					m_LRU[i]->SUB_Remove();
+#else
+					m_LRU[i]->SUB_StartFadeOut(0);
+#endif
+
+					m_LRU.Remove(i);
+					return;
+				}
+			}
+		}
+		else
+		{
+			m_LRU.Remove(i);
+		}
+	}
+
+	//////////////////////////////
+	///   EPISODIC ALGORITHM   ///
+	//////////////////////////////
+	// If we get here, it means we couldn't find a suitable ragdoll to remove,
+	// so just remove the furthest one.
+	int furthestOne = m_LRU.Head();
+	float furthestDistSq = 0;
+#ifdef CLIENT_DLL
+	C_BasePlayer* pPlayer = C_BasePlayer::GetLocalPlayer();
+#else
+	CBasePlayer* pPlayer = UTIL_GetLocalPlayer();
+#endif
+
+	if (pPlayer && m_LRU.Count() > iMaxRagdollCount) // find the furthest one algorithm
+	{
+		Vector PlayerOrigin = pPlayer->GetEngineObject()->GetAbsOrigin();
+		// const CBasePlayer *pPlayer = UTIL_GetLocalPlayer();
+
+		for (i = m_LRU.Head(); i < m_LRU.InvalidIndex(); i = next)
+		{
+			C_BaseEntity* pRagdoll = m_LRU[i].Get();
+
+			next = m_LRU.Next(i);
+			IPhysicsObject* pObject = pRagdoll->GetEngineObject()->VPhysicsGetObject();
+			if (pRagdoll && (pRagdoll->GetEffectEntity() || (pObject && !pObject->IsAsleep())))
+				continue;
+
+			if (pRagdoll)
+			{
+				// float distToPlayer = (pPlayer->GetAbsOrigin() - pRagdoll->GetAbsOrigin()).LengthSqr();
+				float distToPlayer = (PlayerOrigin - pRagdoll->GetEngineObject()->GetAbsOrigin()).LengthSqr();
+
+				if (distToPlayer > furthestDistSq)
+				{
+					furthestOne = i;
+					furthestDistSq = distToPlayer;
+				}
+			}
+			else // delete bad rags first.
+			{
+				furthestOne = i;
+				break;
+			}
+		}
+
+#ifdef CLIENT_DLL
+		m_LRU[furthestOne]->SUB_Remove();
+#else
+		m_LRU[furthestOne]->SUB_StartFadeOut(0);
+#endif
+
+	}
+	else // fall back on old-style pick the oldest one algorithm
+	{
+		for (i = m_LRU.Head(); i < m_LRU.InvalidIndex(); i = next)
+		{
+			if (m_LRU.Count() <= iMaxRagdollCount)
+				break;
+
+			next = m_LRU.Next(i);
+
+			C_BaseEntity* pRagdoll = m_LRU[i].Get();
+
+			//Just ignore it until we're done burning/dissolving.
+			IPhysicsObject* pObject = pRagdoll->GetEngineObject()->VPhysicsGetObject();
+			if (pRagdoll && (pRagdoll->GetEffectEntity() || (pObject && !pObject->IsAsleep())))
+				continue;
+
+#ifdef CLIENT_DLL
+			m_LRU[i]->SUB_Remove();
+#else
+			m_LRU[i]->SUB_StartFadeOut(0);
+#endif
+			m_LRU.Remove(i);
+		}
+	}
+}
+
+#else
+template<class T>
+void CClientEntityList<T>::UpdateRagdolls(float frametime) // Non-episodic version
+{
+	VPROF("CRagdollLRURetirement::Update");
+	// Compress out dead items
+	int i, next;
+
+	int iMaxRagdollCount = m_iMaxRagdolls;
+
+	if (iMaxRagdollCount == -1)
+	{
+		iMaxRagdollCount = g_ragdoll_maxcount.GetInt();
+	}
+
+	// fade them all for the low violence version
+	if (g_RagdollLVManager.IsLowViolence())
+	{
+		iMaxRagdollCount = 0;
+	}
+	m_iRagdollCount = 0;
+	m_iSimulatedRagdollCount = 0;
+
+	for (i = m_LRU.Head(); i < m_LRU.InvalidIndex(); i = next)
+	{
+		next = m_LRU.Next(i);
+		C_BaseEntity* pRagdoll = m_LRU[i].Get();
+		if (pRagdoll)
+		{
+			m_iRagdollCount++;
+			IPhysicsObject* pObject = pRagdoll->GetEngineObject()->VPhysicsGetObject();
+			if (pObject && !pObject->IsAsleep())
+			{
+				m_iSimulatedRagdollCount++;
+			}
+			if (m_LRU.Count() > iMaxRagdollCount)
+			{
+				//Found one, we're done.
+				if (ShouldRemoveThisRagdoll(m_LRU[i]) == true)
+				{
+#ifdef CLIENT_DLL
+					m_LRU[i]->SUB_Remove();
+#else
+					m_LRU[i]->SUB_StartFadeOut(0);
+#endif
+
+					m_LRU.Remove(i);
+					return;
+				}
+			}
+		}
+		else
+		{
+			m_LRU.Remove(i);
+		}
+	}
+
+
+	//////////////////////////////
+	///   ORIGINAL ALGORITHM   ///
+	//////////////////////////////
+	// not episodic -- this is the original mechanism
+
+	for (i = m_LRU.Head(); i < m_LRU.InvalidIndex(); i = next)
+	{
+		if (m_LRU.Count() <= iMaxRagdollCount)
+			break;
+
+		next = m_LRU.Next(i);
+
+		C_BaseEntity* pRagdoll = m_LRU[i].Get();
+
+		//Just ignore it until we're done burning/dissolving.
+		if (pRagdoll && pRagdoll->GetEffectEntity())
+			continue;
+
+#ifdef CLIENT_DLL
+		m_LRU[i]->SUB_Remove();
+#else
+		m_LRU[i]->SUB_StartFadeOut(0);
+#endif
+		m_LRU.Remove(i);
+	}
+}
+
+#endif // HL2_EPISODIC
 
 //-----------------------------------------------------------------------------
 // Returns the client entity list

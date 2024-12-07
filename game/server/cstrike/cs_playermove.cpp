@@ -10,7 +10,7 @@
 #include "igamemovement.h"
 #include "in_buttons.h"
 #include "ipredictionsystem.h"
-#include "iservervehicle.h"
+#include "game/server/iservervehicle.h"
 #include "cs_player.h"
 
 

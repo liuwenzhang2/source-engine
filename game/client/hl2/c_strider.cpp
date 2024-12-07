@@ -22,7 +22,7 @@
 #include "materialsystem/imaterialvar.h"
 #include "simple_keys.h"
 #include "fx_envelope.h"
-#include "iclientvehicle.h"
+#include "game/client/iclientvehicle.h"
 #include "engine/ivdebugoverlay.h"
 #include "particles_localspace.h"
 #include "dlight.h"

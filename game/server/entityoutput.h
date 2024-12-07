@@ -13,9 +13,12 @@
 #pragma once
 #endif
 
+#include "variant_t.h"
+//#include "baseentity.h"
 
-#include "baseentity.h"
-
+class CBaseEntity;
+class ISave;
+class IRestore;
 
 #define EVENT_FIRE_ALWAYS	-1
 

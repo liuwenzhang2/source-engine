@@ -7,7 +7,7 @@
 #include "cbase.h"
 
 #include "modelentities.h"
-#include "iservervehicle.h"
+#include "game/server/iservervehicle.h"
 #include "movevars_shared.h"
 
 #include "ai_moveprobe.h"

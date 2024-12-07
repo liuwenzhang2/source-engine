@@ -17,7 +17,7 @@
 #include "gamerules.h"
 #include "game.h"
 #include "items.h"
-#include "entitylist.h"
+//#include "entitylist.h"
 #include "in_buttons.h"
 #include <ctype.h>
 #include "voice_gamemgr.h"

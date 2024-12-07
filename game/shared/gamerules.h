@@ -25,7 +25,7 @@
 	
 	#include "baseentity.h"
 	#include "recipientfilter.h"
-
+	#include "globals.h"
 #endif
 
 #include "igamesystem.h"

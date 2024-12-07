@@ -84,6 +84,7 @@ typedef struct
 
 class CHudTexture;
 class Color;
+class CBaseViewModel;
 
 namespace vgui2
 {

@@ -9,7 +9,7 @@
 #include <stdio.h>
 #include "dod_headiconmanager.h"
 #include "c_playerresource.h"
-#include "cliententitylist.h"
+//#include "cliententitylist.h"
 #include "c_baseplayer.h"
 #include "materialsystem/imesh.h"
 #include "view.h"

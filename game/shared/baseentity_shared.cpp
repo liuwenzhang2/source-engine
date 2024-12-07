@@ -27,7 +27,7 @@
 #else
 	#include "te_effect_dispatch.h"
 	#include "soundent.h"
-	#include "iservervehicle.h"
+	#include "game/server/iservervehicle.h"
 	#include "player_pickup.h"
 	#include "waterbullet.h"
 	#include "func_break.h"

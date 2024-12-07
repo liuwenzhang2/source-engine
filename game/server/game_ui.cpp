@@ -7,7 +7,7 @@
 //=============================================================================//
 
 #include "cbase.h"
-#include "entitylist.h"
+//#include "entitylist.h"
 #include "util.h"
 #include "physics.h"
 #include "entityoutput.h"

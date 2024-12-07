@@ -5,7 +5,7 @@
 //=============================================================================//
 
 #include "cbase.h"
-#include "entitylist.h"
+//#include "entitylist.h"
 #include "mapentities_shared.h"
 #include "soundent.h"
 #include "TemplateEntities.h"

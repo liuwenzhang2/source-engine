@@ -6,7 +6,7 @@
 #include "cbase.h"
 #include "const.h"
 #include "toolframework/itoolentity.h"
-#include "entitylist.h"
+//#include "entitylist.h"
 #include "toolframework/itoolsystem.h"
 #include "KeyValues.h"
 #include "icliententity.h"

@@ -15,7 +15,7 @@
 #include <vgui/ISurface.h>
 #include <vgui/IScheme.h>
 #include "hud.h"
-#include "iclientvehicle.h"
+#include "game/client/iclientvehicle.h"
 #include "in_buttons.h"
 #include "con_nprint.h"
 #include "hud_pdump.h"

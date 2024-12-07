@@ -113,7 +113,7 @@ void CRagdollManager::UpdateCurrentMaxRagDollCount()
 		m_iCurrentMaxRagdollCount = m_iMaxRagdollCount;
 	}
 
-	s_RagdollLRU.SetMaxRagdollCount( m_iCurrentMaxRagdollCount );
+	gEntList.SetMaxRagdollCount( m_iCurrentMaxRagdollCount );
 }
 
 //-----------------------------------------------------------------------------

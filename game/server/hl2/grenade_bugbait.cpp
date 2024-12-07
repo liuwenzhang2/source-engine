@@ -11,7 +11,7 @@
 #include "soundent.h"
 #include "engine/IEngineSound.h"
 #include "npc_bullseye.h"
-#include "entitylist.h"
+//#include "entitylist.h"
 #include "antlion_maker.h"
 #include "eventqueue.h"
 

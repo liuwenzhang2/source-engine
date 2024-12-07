@@ -7,7 +7,6 @@
 #include "model_types.h"
 #include "vcollide.h"
 #include "vcollide_parse.h"
-#include "solidsetdefaults.h"
 #include "bone_setup.h"
 #include "engine/ivmodelinfo.h"
 #include "physics.h"

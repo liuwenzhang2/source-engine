@@ -7,7 +7,7 @@
 #include "cbase.h"
 #include <stdarg.h>
 #include "baseflex.h"
-#include "entitylist.h"
+//#include "entitylist.h"
 #include "choreoevent.h"
 #include "choreoactor.h"
 #include "choreochannel.h"

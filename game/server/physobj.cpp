@@ -9,7 +9,7 @@
 #include "player.h"
 #include "physics.h"
 #include "vcollide_parse.h"
-#include "entitylist.h"
+//#include "entitylist.h"
 #include "physobj.h"
 #include "hierarchy.h"
 #include "game.h"

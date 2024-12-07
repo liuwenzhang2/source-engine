@@ -9,7 +9,6 @@
 #include "weapon_alyxgun.h"
 #include "npcevent.h"
 #include "ai_basenpc.h"
-#include "globalstate.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"

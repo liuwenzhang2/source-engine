@@ -12,7 +12,7 @@
 #include "decals.h"
 #include "func_break.h"
 #include "EntityFlame.h"
-#include "entitylist.h"
+//#include "entitylist.h"
 #include "basecombatweapon.h"
 #include "model_types.h"
 #include "player.h"

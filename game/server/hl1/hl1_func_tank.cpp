@@ -23,7 +23,7 @@
 #include "physics_cannister.h"
 
 #include "player.h"
-#include "entitylist.h"
+//#include "entitylist.h"
 
 
 #define SF_TANK_ACTIVE			0x0001

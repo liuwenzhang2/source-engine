@@ -29,7 +29,6 @@
 #include "isaverestore.h"
 #include "datacache/imdlcache.h"
 #include "eventlist.h"
-#include "saverestore.h"
 #include "physics_saverestore.h"
 #include "vphysics/constraints.h"
 #include "ragdoll_shared.h"
@@ -266,7 +265,7 @@ void C_ClientRagdoll::OnRestore( void )
 	
 	if ( m_bFadeOut == true )
 	{
-		s_RagdollLRU.MoveToTopOfLRU( this, m_bImportant );
+		ClientEntityList().MoveToTopOfLRU( this, m_bImportant );
 	}
 
 	NoteRagdollCreationTick( this );

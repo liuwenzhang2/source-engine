@@ -9,7 +9,6 @@
 #include "entityoutput.h"
 #include "eventqueue.h"
 #include "mathlib/mathlib.h"
-#include "globalstate.h"
 #include "ndebugoverlay.h"
 #include "saverestore_utlvector.h"
 #include "vstdlib/random.h"

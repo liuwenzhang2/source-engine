@@ -12,7 +12,7 @@
 #include "client.h"
 #include "player_command.h"
 #include "movehelper_server.h"
-#include "iservervehicle.h"
+#include "game/server/iservervehicle.h"
 #include "tier0/vprof.h"
 
 // memdbgon must be the last include file in a .cpp file!!!

@@ -24,7 +24,6 @@
 #include "ai_basenpc.h"
 #include "player_pickup.h"
 #include "physics_prop_ragdoll.h"
-#include "globalstate.h"
 #include "props.h"
 #include "movevars_shared.h"
 #include "basehlcombatweapon.h"

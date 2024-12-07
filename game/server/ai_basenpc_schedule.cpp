@@ -11,7 +11,7 @@
 #include "animation.h"
 #include "scripted.h"
 #include "soundent.h"
-#include "entitylist.h"
+//#include "entitylist.h"
 #include "basecombatweapon.h"
 #include "bitstring.h"
 #include "ai_task.h"

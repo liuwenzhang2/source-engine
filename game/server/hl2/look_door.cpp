@@ -8,7 +8,7 @@
 
 #include "cbase.h"
 #include "basecombatcharacter.h"
-#include "entitylist.h"
+//#include "entitylist.h"
 #include "func_movelinear.h"
 
 // memdbgon must be the last include file in a .cpp file!!!

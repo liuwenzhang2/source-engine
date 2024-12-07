@@ -12,10 +12,10 @@
 #endif
 
 #include "vphysics/vehicles.h"
-#include "iservervehicle.h"
+#include "game/server/iservervehicle.h"
 #include "fourwheelvehiclephysics.h"
 #include "props.h"
-#include "vehicle_sounds.h"
+#include "game/server/vehicle_sounds.h"
 #include "phys_controller.h"
 #include "entityblocker.h"
 #include "vehicle_baseserver.h"

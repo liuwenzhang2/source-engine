@@ -19,7 +19,7 @@
 #include "gamerules.h"
 #include "game.h"
 #include <ctype.h>
-#include "entitylist.h"
+//#include "entitylist.h"
 #include "vstdlib/random.h"
 #include "engine/IEngineSound.h"
 #include "ndebugoverlay.h"

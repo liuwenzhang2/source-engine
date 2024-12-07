@@ -23,7 +23,6 @@
 #include "soundent.h"
 #include "props.h"
 #include "IEffects.h"
-#include "globalstate.h"
 #include "weapon_physcannon.h"
 #include "info_darknessmode_lightsource.h"
 #include "sceneentity.h"

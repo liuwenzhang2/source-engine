@@ -20,7 +20,7 @@
 	#include "gamerules.h"
 	#include "game.h"
 	#include "items.h"
-	#include "entitylist.h"
+	//#include "entitylist.h"
 	#include "mapentities.h"
 	#include "in_buttons.h"
 	#include <ctype.h>

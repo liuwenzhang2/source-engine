@@ -17,7 +17,7 @@
 #include "c_te_legacytempents.h"
 #include "cl_mat_stub.h"
 #include "tier0/vprof.h"
-#include "iclientvehicle.h"
+#include "game/client/iclientvehicle.h"
 #include "engine/IEngineTrace.h"
 #include "mathlib/vmatrix.h"
 #include "rendertexture.h"

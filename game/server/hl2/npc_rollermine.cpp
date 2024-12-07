@@ -25,7 +25,7 @@
 #include "ai_squad.h"
 #include "ai_senses.h"
 #include "beam_shared.h"
-#include "iservervehicle.h"
+#include "game/server/iservervehicle.h"
 #include "SoundEmitterSystem/isoundemittersystembase.h"
 #include "physics_saverestore.h"
 #include "vphysics/constraints.h"

@@ -152,6 +152,7 @@ class CSound;
 #include "ndebugoverlay.h"
 #include "recipientfilter.h"
 #include "gamemovement.h"
-inline IServerEntityList* EntityList() { return &gEntList; }
+
+inline IServerEntityList* EntityList() { return &ServerEntityList(); }
 
 #endif // CBASE_H

@@ -15,19 +15,22 @@
 
 #include "entitylist_base.h"
 #include "baseentity.h"
+#include "server_class.h"
+#include "collisionproperty.h"
 #include "collisionutils.h"
 #include "datacache/imdlcache.h"
 #include "tier0/vprof.h"
 #include "vphysics/object_hash.h"
-#include "saverestore.h"
 #include "saverestoretypes.h"
 #include "gameinterface.h"
-#include "globalstate.h"
 #include "vphysics/player_controller.h"
 #include "ragdoll_shared.h"
-#include "iservervehicle.h"
+#include "game/server/iservervehicle.h"
 #include "bone_setup.h"
 #include "usercmd.h"
+#include "gamestringpool.h"
+#include "util.h"
+#include "debugoverlay_shared.h"
 
 //class CBaseEntity;
 // We can only ever move 512 entities across a transition
@@ -830,7 +833,8 @@ private:
 	// called by all vphysics inits
 	bool			VPhysicsInitSetup();
 	void CalcRagdollSize(void);
-	
+	void RagdollSolveSeparation(ragdoll_t& ragdoll, IHandleEntity* pEntity);
+
 private:
 
 	friend class CBaseEntity;
@@ -2209,6 +2213,8 @@ private:
 	IPhysicsObjectPairHash* m_pLevelAdjacencyDependencyHash;
 };
 
+extern bool ShouldRemoveThisRagdoll(CBaseEntity* pRagdoll);
+
 //-----------------------------------------------------------------------------
 // Purpose: a global list of all the entities in the game.  All iteration through
 //			entities is done through this object.
@@ -2350,6 +2356,11 @@ public:
 
 	bool IsSimulatingOnAlternateTicks();
 
+	// Move it to the top of the LRU
+	void MoveToTopOfLRU(CBaseEntity* pRagdoll, bool bImportant = false);
+	void SetMaxRagdollCount(int iMaxCount) { m_iMaxRagdolls = iMaxCount; }
+	int CountRagdolls(bool bOnlySimulatingRagdolls) { return bOnlySimulatingRagdolls ? m_iSimulatedRagdollCount : m_iRagdollCount; }
+	virtual void UpdateRagdolls(float frametime);
 protected:
 	virtual void AfterCreated(IHandleEntity* pEntity);
 	virtual void BeforeDestroy(IHandleEntity* pEntity);
@@ -2421,9 +2432,14 @@ private:
 //  usercmd input.
 	int	m_nPredictionRandomSeed = -1;
 	IEngineObject* m_pPredictionPlayer = NULL;
-};
 
-extern CGlobalEntityList<CBaseEntity> gEntList;
+	CUtlLinkedList< EHANDLE > m_LRU;
+	CUtlLinkedList< EHANDLE > m_LRUImportantRagdolls;
+
+	int m_iMaxRagdolls;
+	int m_iSimulatedRagdollCount;
+	int m_iRagdollCount;
+};
 
 template<class T>
 inline const char* CGlobalEntityList<T>::GetBlockName()
@@ -2651,7 +2667,7 @@ void CGlobalEntityList<T>::Restore(IRestore* pRestore, bool createPlayers)
 				if (createPlayers)//ed && 
 				{
 					// create the player
-					pent = CBasePlayer::CreatePlayer(STRING(pEntInfo->classname), pEntInfo->edictindex);
+					pent = gEntList.CreateEntityByName(STRING(pEntInfo->classname), pEntInfo->edictindex);
 				}
 				else
 					pent = NULL;
@@ -2920,7 +2936,7 @@ void CGlobalEntityList<T>::CreateEntitiesInTransitionList(IRestore* pRestore, in
 					Assert(0);
 				}
 
-				pent = CBasePlayer::CreatePlayer(STRING(pEntInfo->classname), pEntInfo->edictindex);
+				pent = gEntList.CreateEntityByName(STRING(pEntInfo->classname), pEntInfo->edictindex);
 			}
 		}
 		else if (active)
@@ -3644,6 +3660,9 @@ CGlobalEntityList<T>::CGlobalEntityList()
 	{
 		m_EngineObjectArray[i] = NULL;
 	}
+	m_iMaxRagdolls = -1;
+	m_LRUImportantRagdolls.RemoveAll();
+	m_LRU.RemoveAll();
 }
 
 // mark an entity as deleted
@@ -4596,6 +4615,285 @@ bool CGlobalEntityList<T>::IsSimulatingOnAlternateTicks()
 	}
 
 	return sv_alternateticks.GetBool();
+}
+
+extern ConVar g_ragdoll_important_maxcount;
+//-----------------------------------------------------------------------------
+// Move it to the top of the LRU
+//-----------------------------------------------------------------------------
+template<class T>
+void CGlobalEntityList<T>::MoveToTopOfLRU(CBaseEntity* pRagdoll, bool bImportant)
+{
+	if (bImportant)
+	{
+		m_LRUImportantRagdolls.AddToTail(pRagdoll);
+
+		if (m_LRUImportantRagdolls.Count() > g_ragdoll_important_maxcount.GetInt())
+		{
+			int iIndex = m_LRUImportantRagdolls.Head();
+
+			CBaseEntity* pRagdoll = m_LRUImportantRagdolls[iIndex].Get();
+
+			if (pRagdoll)
+			{
+#ifdef CLIENT_DLL
+				pRagdoll->SUB_Remove();
+#else
+				pRagdoll->SUB_StartFadeOut(0);
+#endif
+				m_LRUImportantRagdolls.Remove(iIndex);
+			}
+
+		}
+		return;
+	}
+	for (int i = m_LRU.Head(); i < m_LRU.InvalidIndex(); i = m_LRU.Next(i))
+	{
+		if (m_LRU[i].Get() == pRagdoll)
+		{
+			m_LRU.Remove(i);
+			break;
+		}
+	}
+
+	m_LRU.AddToTail(pRagdoll);
+}
+
+extern ConVar g_ragdoll_maxcount;
+extern ConVar g_debug_ragdoll_removal;
+//-----------------------------------------------------------------------------
+// Cull stale ragdolls. There is an ifdef here: one version for episodic, 
+// one for everything else.
+//-----------------------------------------------------------------------------
+#if HL2_EPISODIC
+template<class T>
+void CGlobalEntityList<T>::UpdateRagdolls(float frametime) // EPISODIC VERSION
+{
+	VPROF("CRagdollLRURetirement::Update");
+	// Compress out dead items
+	int i, next;
+
+	int iMaxRagdollCount = m_iMaxRagdolls;
+
+	if (iMaxRagdollCount == -1)
+	{
+		iMaxRagdollCount = g_ragdoll_maxcount.GetInt();
+	}
+
+	// fade them all for the low violence version
+	if (g_RagdollLVManager.IsLowViolence())
+	{
+		iMaxRagdollCount = 0;
+	}
+	m_iRagdollCount = 0;
+	m_iSimulatedRagdollCount = 0;
+
+	// First, find ragdolls that are good candidates for deletion because they are not
+	// visible at all, or are in a culled visibility box
+	for (i = m_LRU.Head(); i < m_LRU.InvalidIndex(); i = next)
+	{
+		next = m_LRU.Next(i);
+		CBaseEntity* pRagdoll = m_LRU[i].Get();
+		if (pRagdoll)
+		{
+			m_iRagdollCount++;
+			IPhysicsObject* pObject = pRagdoll->GetEngineObject()->VPhysicsGetObject();
+			if (pObject && !pObject->IsAsleep())
+			{
+				m_iSimulatedRagdollCount++;
+			}
+			if (m_LRU.Count() > iMaxRagdollCount)
+			{
+				//Found one, we're done.
+				if (ShouldRemoveThisRagdoll(m_LRU[i]) == true)
+				{
+#ifdef CLIENT_DLL
+					m_LRU[i]->SUB_Remove();
+#else
+					m_LRU[i]->SUB_StartFadeOut(0);
+#endif
+
+					m_LRU.Remove(i);
+					return;
+				}
+			}
+		}
+		else
+		{
+			m_LRU.Remove(i);
+		}
+	}
+
+	//////////////////////////////
+	///   EPISODIC ALGORITHM   ///
+	//////////////////////////////
+	// If we get here, it means we couldn't find a suitable ragdoll to remove,
+	// so just remove the furthest one.
+	int furthestOne = m_LRU.Head();
+	float furthestDistSq = 0;
+#ifdef CLIENT_DLL
+	C_BasePlayer* pPlayer = C_BasePlayer::GetLocalPlayer();
+#else
+	CBasePlayer* pPlayer = UTIL_GetLocalPlayer();
+#endif
+
+	if (pPlayer && m_LRU.Count() > iMaxRagdollCount) // find the furthest one algorithm
+	{
+		Vector PlayerOrigin = pPlayer->GetEngineObject()->GetAbsOrigin();
+		// const CBasePlayer *pPlayer = UTIL_GetLocalPlayer();
+
+		for (i = m_LRU.Head(); i < m_LRU.InvalidIndex(); i = next)
+		{
+			CBaseEntity* pRagdoll = m_LRU[i].Get();
+
+			next = m_LRU.Next(i);
+			IPhysicsObject* pObject = pRagdoll->GetEngineObject()->VPhysicsGetObject();
+			if (pRagdoll && (pRagdoll->GetEffectEntity() || (pObject && !pObject->IsAsleep())))
+				continue;
+
+			if (pRagdoll)
+			{
+				// float distToPlayer = (pPlayer->GetAbsOrigin() - pRagdoll->GetAbsOrigin()).LengthSqr();
+				float distToPlayer = (PlayerOrigin - pRagdoll->GetEngineObject()->GetAbsOrigin()).LengthSqr();
+
+				if (distToPlayer > furthestDistSq)
+				{
+					furthestOne = i;
+					furthestDistSq = distToPlayer;
+				}
+			}
+			else // delete bad rags first.
+			{
+				furthestOne = i;
+				break;
+			}
+		}
+
+#ifdef CLIENT_DLL
+		m_LRU[furthestOne]->SUB_Remove();
+#else
+		m_LRU[furthestOne]->SUB_StartFadeOut(0);
+#endif
+
+	}
+	else // fall back on old-style pick the oldest one algorithm
+	{
+		for (i = m_LRU.Head(); i < m_LRU.InvalidIndex(); i = next)
+		{
+			if (m_LRU.Count() <= iMaxRagdollCount)
+				break;
+
+			next = m_LRU.Next(i);
+
+			CBaseEntity* pRagdoll = m_LRU[i].Get();
+
+			//Just ignore it until we're done burning/dissolving.
+			IPhysicsObject* pObject = pRagdoll->GetEngineObject()->VPhysicsGetObject();
+			if (pRagdoll && (pRagdoll->GetEffectEntity() || (pObject && !pObject->IsAsleep())))
+				continue;
+
+#ifdef CLIENT_DLL
+			m_LRU[i]->SUB_Remove();
+#else
+			m_LRU[i]->SUB_StartFadeOut(0);
+#endif
+			m_LRU.Remove(i);
+		}
+	}
+}
+
+#else
+template<class T>
+void CGlobalEntityList<T>::UpdateRagdolls(float frametime) // Non-episodic version
+{
+	VPROF("CRagdollLRURetirement::Update");
+	// Compress out dead items
+	int i, next;
+
+	int iMaxRagdollCount = m_iMaxRagdolls;
+
+	if (iMaxRagdollCount == -1)
+	{
+		iMaxRagdollCount = g_ragdoll_maxcount.GetInt();
+	}
+
+	// fade them all for the low violence version
+	if (g_RagdollLVManager.IsLowViolence())
+	{
+		iMaxRagdollCount = 0;
+	}
+	m_iRagdollCount = 0;
+	m_iSimulatedRagdollCount = 0;
+
+	for (i = m_LRU.Head(); i < m_LRU.InvalidIndex(); i = next)
+	{
+		next = m_LRU.Next(i);
+		CBaseEntity* pRagdoll = m_LRU[i].Get();
+		if (pRagdoll)
+		{
+			m_iRagdollCount++;
+			IPhysicsObject* pObject = pRagdoll->GetEngineObject()->VPhysicsGetObject();
+			if (pObject && !pObject->IsAsleep())
+			{
+				m_iSimulatedRagdollCount++;
+			}
+			if (m_LRU.Count() > iMaxRagdollCount)
+			{
+				//Found one, we're done.
+				if (ShouldRemoveThisRagdoll(m_LRU[i]) == true)
+				{
+#ifdef CLIENT_DLL
+					m_LRU[i]->SUB_Remove();
+#else
+					m_LRU[i]->SUB_StartFadeOut(0);
+#endif
+
+					m_LRU.Remove(i);
+					return;
+				}
+			}
+		}
+		else
+		{
+			m_LRU.Remove(i);
+		}
+	}
+
+
+	//////////////////////////////
+	///   ORIGINAL ALGORITHM   ///
+	//////////////////////////////
+	// not episodic -- this is the original mechanism
+
+	for (i = m_LRU.Head(); i < m_LRU.InvalidIndex(); i = next)
+	{
+		if (m_LRU.Count() <= iMaxRagdollCount)
+			break;
+
+		next = m_LRU.Next(i);
+
+		CBaseEntity* pRagdoll = m_LRU[i].Get();
+
+		//Just ignore it until we're done burning/dissolving.
+		if (pRagdoll && pRagdoll->GetEffectEntity())
+			continue;
+
+#ifdef CLIENT_DLL
+		m_LRU[i]->SUB_Remove();
+#else
+		m_LRU[i]->SUB_StartFadeOut(0);
+#endif
+		m_LRU.Remove(i);
+	}
+}
+
+#endif // HL2_EPISODIC
+
+extern CGlobalEntityList<CBaseEntity> gEntList;
+
+inline CGlobalEntityList<CBaseEntity>& ServerEntityList()
+{
+	return gEntList;
 }
 
 template<class T>

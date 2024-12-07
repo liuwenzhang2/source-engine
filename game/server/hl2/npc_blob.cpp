@@ -11,7 +11,7 @@
 #include "soundent.h"
 #include "game.h"
 #include "npcevent.h"
-#include "entitylist.h"
+//#include "entitylist.h"
 #include "activitylist.h"
 #include "ai_basenpc.h"
 #include "engine/IEngineSound.h"

@@ -13,6 +13,8 @@
 
 
 #include "ehandle.h"
+#include "datamap.h"
+#include "string_t.h"
 #include "mathlib/vmatrix.h"
 
 class CBaseEntity;

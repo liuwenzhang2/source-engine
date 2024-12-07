@@ -7,7 +7,6 @@
 #include "cbase.h"
 #include "soundent.h"
 #include "npcevent.h"
-#include "globalstate.h"
 #include "ai_squad.h"
 #include "ai_tacticalservices.h"
 #include "npc_manhack.h"
@@ -16,7 +15,7 @@
 #include "basegrenade_shared.h"
 #include "ai_route.h"
 #include "hl2_player.h"
-#include "iservervehicle.h"
+#include "game/server/iservervehicle.h"
 #include "items.h"
 #include "hl2_gamerules.h"
 

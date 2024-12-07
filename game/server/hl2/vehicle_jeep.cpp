@@ -24,7 +24,6 @@
 #include "ai_basenpc.h"
 #include "ai_hint.h"
 #include "npc_crow.h"
-#include "globalstate.h"
 #include "vehicle_jeep.h"
 #include "eventqueue.h"
 #include "rumble_shared.h"

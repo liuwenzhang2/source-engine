@@ -18,8 +18,8 @@
 #include "engine/IEngineSound.h"
 
 #include "player.h"
-#include "entitylist.h"
-#include "iservervehicle.h"
+//#include "entitylist.h"
+#include "game/server/iservervehicle.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"

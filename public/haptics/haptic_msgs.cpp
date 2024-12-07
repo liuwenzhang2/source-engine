@@ -8,7 +8,7 @@
 	#include "c_basecombatweapon.h"
 	#include "c_baseplayer.h"
 	#include "hud_macros.h"
-	#include "iclientvehicle.h"
+	#include "game/client/iclientvehicle.h"
 	#include "c_prop_vehicle.h"
 	#include "prediction.h"
 	#include "activitylist.h"

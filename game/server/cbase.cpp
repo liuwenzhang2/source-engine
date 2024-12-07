@@ -74,7 +74,7 @@ OUTPUTS:
 
 
 #include "cbase.h"
-#include "entitylist.h"
+//#include "entitylist.h"
 #include "mapentities_shared.h"
 #include "isaverestore.h"
 #include "eventqueue.h"

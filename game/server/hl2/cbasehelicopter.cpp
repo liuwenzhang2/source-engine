@@ -13,7 +13,7 @@
 #include "ai_task.h"
 #include "ai_senses.h"
 #include "ai_memory.h"
-#include "entitylist.h"
+//#include "entitylist.h"
 #include "soundenvelope.h"
 #include "gamerules.h"
 #include "grenade_homer.h"

@@ -1071,9 +1071,6 @@
     <ClCompile Include="..\..\..\game\shared\effect_dispatch_data.cpp">
       <Filter>源文件\Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\game\shared\ehandle.cpp">
-      <Filter>源文件\Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\game\shared\EntityParticleTrail_Shared.cpp">
       <Filter>源文件\Source Files</Filter>
     </ClCompile>
@@ -1168,9 +1165,6 @@
       <Filter>源文件\Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\game\shared\props_shared.cpp">
-      <Filter>源文件\Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\game\shared\ragdoll_shared.cpp">
       <Filter>源文件\Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\game\shared\rope_helpers.cpp">
@@ -1732,6 +1726,12 @@
       <Filter>源文件\Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\public\usercmd.cpp">
+      <Filter>源文件\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\public\ragdoll_shared.cpp">
+      <Filter>源文件\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\public\ehandle.cpp">
       <Filter>源文件\Source Files</Filter>
     </ClCompile>
   </ItemGroup>

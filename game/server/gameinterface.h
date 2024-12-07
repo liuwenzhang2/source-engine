@@ -12,9 +12,9 @@
 #pragma once
 #endif
 
+#include "eiface.h"
 #include "mapentities.h"
 #include "vphysics/object_hash.h"
-#include "saverestore.h"
 #include "saverestoretypes.h"
 
 class IReplayFactory;

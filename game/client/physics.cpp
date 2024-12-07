@@ -9,7 +9,6 @@
 #include "vcollide_parse.h"
 #include "filesystem.h"
 #include "engine/IStaticPropMgr.h"
-#include "solidsetdefaults.h"
 #include "engine/IEngineSound.h"
 #include "vphysics_sound.h"
 #include "movevars_shared.h"
@@ -185,7 +184,7 @@ void PhysicsLevelInit( void )
 
 	g_PhysWorldObject = PhysCreateWorld_Shared( GetClientWorldEntity(), modelinfo->GetVCollide(1), g_PhysDefaultObjectParams );
 
-	staticpropmgr->CreateVPhysicsRepresentations( physenv, &g_SolidSetup, NULL );
+	staticpropmgr->CreateVPhysicsRepresentations( physenv, g_pSolidSetup, NULL );
 }
 
 void PhysicsReset()
@@ -539,12 +538,12 @@ void CCollisionEvent::UpdateTouchEvents( void )
 		const touchevent_t &event = m_touchEvents[i];
 		if ( event.touchType == TOUCH_START )
 		{
-			DispatchStartTouch( event.pEntity0, event.pEntity1, event.endPoint, event.normal );
+			DispatchStartTouch((C_BaseEntity*)event.pEntity0, (C_BaseEntity*)event.pEntity1, event.endPoint, event.normal );
 		}
 		else
 		{
 			// TOUCH_END
-			DispatchEndTouch( event.pEntity0, event.pEntity1 );
+			DispatchEndTouch((C_BaseEntity*)event.pEntity0, (C_BaseEntity*)event.pEntity1 );
 		}
 	}
 
@@ -969,7 +968,7 @@ IPhysicsObject *GetWorldPhysObject ( void )
 	return g_PhysWorldObject;
 }
 
-void PhysFrictionSound( CBaseEntity *pEntity, IPhysicsObject *pObject, const char *pSoundName, HSOUNDSCRIPTHANDLE& handle, float flVolume )
+void PhysFrictionSound( IHandleEntity *pEntity, IPhysicsObject *pObject, const char *pSoundName, HSOUNDSCRIPTHANDLE& handle, float flVolume )
 {
 	if ( !pEntity )
 		return;
@@ -979,7 +978,7 @@ void PhysFrictionSound( CBaseEntity *pEntity, IPhysicsObject *pObject, const cha
 	flVolume = clamp( flVolume, 0.0f, 1.0f );
 	if ( flVolume > (1.0f/128.0f) )
 	{
-		friction_t *pFriction = g_Collisions.FindFriction( pEntity );
+		friction_t *pFriction = g_Collisions.FindFriction((CBaseEntity*)pEntity );
 		if ( !pFriction )
 			return;
 
@@ -994,8 +993,8 @@ void PhysFrictionSound( CBaseEntity *pEntity, IPhysicsObject *pObject, const cha
 				return;
 
 			pFriction->pObject = pEntity;
-			CPASAttenuationFilter filter( pEntity, params.soundlevel );
-			int entindex = pEntity->entindex();
+			CPASAttenuationFilter filter((CBaseEntity*)pEntity, params.soundlevel );
+			int entindex = ((CBaseEntity*)pEntity)->entindex();
 
 			// clientside created entites doesn't have a valid entindex, let 'world' play the sound for them
 			if ( entindex < 0 )
@@ -1017,9 +1016,9 @@ void PhysFrictionSound( CBaseEntity *pEntity, IPhysicsObject *pObject, const cha
 	}
 }
 
-void PhysCleanupFrictionSounds( CBaseEntity *pEntity )
+void PhysCleanupFrictionSounds( IHandleEntity *pEntity )
 {
-	friction_t *pFriction = g_Collisions.FindFriction( pEntity );
+	friction_t *pFriction = g_Collisions.FindFriction((CBaseEntity*)pEntity );
 	if ( pFriction && pFriction->patch )
 	{
 		g_Collisions.ShutdownFriction( *pFriction );

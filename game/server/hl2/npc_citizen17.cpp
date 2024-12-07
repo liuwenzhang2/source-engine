@@ -9,7 +9,6 @@
 #include "npc_citizen17.h"
 
 #include "ammodef.h"
-#include "globalstate.h"
 #include "soundent.h"
 #include "BasePropDoor.h"
 #include "weapon_rpg.h"

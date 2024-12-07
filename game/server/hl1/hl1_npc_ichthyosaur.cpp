@@ -19,7 +19,7 @@
 #include "game.h"
 #include "npcevent.h"
 #include "player.h"
-#include "entitylist.h"
+//#include "entitylist.h"
 #include "soundenvelope.h"
 #include "shake.h"
 #include "ndebugoverlay.h"

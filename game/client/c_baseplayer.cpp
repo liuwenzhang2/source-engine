@@ -20,7 +20,7 @@
 #include "c_soundscape.h"
 #include "usercmd.h"
 #include "c_playerresource.h"
-#include "iclientvehicle.h"
+#include "game/client/iclientvehicle.h"
 #include "view_shared.h"
 #include "movevars_shared.h"
 #include "prediction.h"

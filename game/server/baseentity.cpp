@@ -6,8 +6,7 @@
 
 #include "cbase.h"
 #include "baseentity.h"
-#include "entitylist.h"
-#include "globalstate.h"
+//#include "entitylist.h"
 #include "isaverestore.h"
 #include "client.h"
 #include "decals.h"
@@ -45,7 +44,7 @@
 #include "game.h"
 #include "tier0/vprof.h"
 #include "ai_basenpc.h"
-#include "iservervehicle.h"
+#include "game/server/iservervehicle.h"
 #include "eventlist.h"
 #include "scriptevent.h"
 #include "SoundEmitterSystem/isoundemittersystembase.h"

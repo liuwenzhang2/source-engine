@@ -19,7 +19,6 @@
 	#include "teamplay_gamerules.h"
 	#include "hl2_player.h"
 	#include "voice_gamemgr.h"
-	#include "globalstate.h"
 	#include "ai_basenpc.h"
 	#include "weapon_physcannon.h"
 #endif

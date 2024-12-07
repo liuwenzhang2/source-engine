@@ -15,6 +15,11 @@
 #include "basehandle.h"
 #include "utllinkedlist.h"
 #include "ihandleentity.h"
+#include "tier1\utlhash.h"
+#include "mathlib\mathlib.h"
+#include "mathlib\vmatrix.h"
+#include "mathlib\polyhedron.h"
+#include "cmodel.h"
 
 #ifdef CLIENT_DLL
 class C_BaseEntity;
@@ -22,7 +27,7 @@ class C_BaseEntity;
 #ifdef GAME_DLL
 class CBaseEntity;
 #endif // GAME_DLL
-
+class CPhysCollide;
 
 template<class T>
 class CEntInfo

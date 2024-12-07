@@ -14,7 +14,7 @@
 #include "vgui/ILocalize.h"
 #include "mapoverview.h"
 #include "hud_radar.h"
-#include "iclientvehicle.h"
+#include "game/client/iclientvehicle.h"
 
 #define RADAR_DOT_NORMAL		0
 #define RADAR_IGNORE_Z			(1<<6)	//always draw this item as if it was at the same Z as the player

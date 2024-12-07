@@ -24,7 +24,7 @@
 #include "npcevent.h"
 #include "igamesystem.h"
 #include "collisionutils.h"
-#include "iservervehicle.h"
+#include "game/server/iservervehicle.h"
 #include "func_break.h"
 
 #ifdef HL2MP

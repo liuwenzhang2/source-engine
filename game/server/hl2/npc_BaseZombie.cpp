@@ -33,7 +33,7 @@
 #include "hl2_shareddefs.h"
 #include "npcevent.h"
 #include "activitylist.h"
-#include "entitylist.h"
+//#include "entitylist.h"
 #include "gib.h"
 #include "soundenvelope.h"
 #include "ndebugoverlay.h"

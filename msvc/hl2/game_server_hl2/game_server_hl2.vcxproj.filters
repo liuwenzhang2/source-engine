@@ -357,9 +357,6 @@
     <ClCompile Include="..\..\..\game\server\EffectsServer.cpp">
       <Filter>源文件\Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\game\shared\ehandle.cpp">
-      <Filter>源文件\Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\game\server\entityblocker.cpp">
       <Filter>源文件\Source Files</Filter>
     </ClCompile>
@@ -781,9 +778,6 @@
       <Filter>源文件\Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\game\server\ragdoll_manager.cpp">
-      <Filter>源文件\Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\game\shared\ragdoll_shared.cpp">
       <Filter>源文件\Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\game\server\RagdollBoogie.cpp">
@@ -1702,6 +1696,12 @@
       <Filter>源文件\Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\public\usercmd.cpp">
+      <Filter>源文件\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\public\ragdoll_shared.cpp">
+      <Filter>源文件\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\public\ehandle.cpp">
       <Filter>源文件\Source Files</Filter>
     </ClCompile>
   </ItemGroup>

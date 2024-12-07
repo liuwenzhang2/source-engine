@@ -21,7 +21,6 @@
 #include "bone_setup.h"
 #include "ai_basenpc.h"
 #include "ai_hint.h"
-#include "globalstate.h"
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 

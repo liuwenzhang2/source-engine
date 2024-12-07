@@ -7,7 +7,7 @@
 #include "cbase.h"
 #include "ai_basenpc.h"
 #include "player.h"
-#include "entitylist.h"
+//#include "entitylist.h"
 #include "ai_network.h"
 #include "ai_node.h"
 #include "ai_link.h"

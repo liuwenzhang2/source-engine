@@ -23,7 +23,6 @@
 	#include "ai_basenpc.h"
 	#include "player_pickup.h"
 	#include "physics_prop_ragdoll.h"
-	#include "globalstate.h"
 	#include "props.h"
 	#include "te_effect_dispatch.h"
 	#include "util.h"

@@ -11,6 +11,8 @@
 #pragma once
 #endif
 
+class CBasePlayer;
+class CUserCmd;
 //-----------------------------------------------------------------------------
 // Game systems are singleton objects in the client + server codebase responsible for
 // various tasks

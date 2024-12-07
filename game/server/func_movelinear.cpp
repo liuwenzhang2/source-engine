@@ -7,7 +7,7 @@
 
 #include "cbase.h"
 #include "func_movelinear.h"
-#include "entitylist.h"
+//#include "entitylist.h"
 #include "locksounds.h"
 #include "ndebugoverlay.h"
 #include "engine/IEngineSound.h"

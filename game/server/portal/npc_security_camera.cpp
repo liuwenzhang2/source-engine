@@ -21,7 +21,7 @@
 #include "rope.h"
 #include "rope_shared.h"
 #include "basehlcombatweapon_shared.h"
-#include "iservervehicle.h"
+#include "game/server/iservervehicle.h"
 #include "physics_prop_ragdoll.h"
 #include "portal_util_shared.h"
 #include "prop_portal.h"

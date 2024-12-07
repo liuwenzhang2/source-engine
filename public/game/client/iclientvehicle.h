@@ -11,7 +11,7 @@
 #pragma once
 #endif
 
-#include "IVehicle.h"
+#include "game/shared/IVehicle.h"
 
 class C_BasePlayer;
 class Vector;

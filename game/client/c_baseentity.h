@@ -31,7 +31,6 @@
 #include "shareddefs.h"
 #include "networkvar.h"
 #include "interpolatedvar.h"
-#include "collisionproperty.h"
 #include "particle_property.h"
 #include "toolframework/itoolentity.h"
 #include "tier0/threadtools.h"

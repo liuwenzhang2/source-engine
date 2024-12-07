@@ -14,7 +14,7 @@
 #endif
 
 #include "baseentity.h"
-#include "entitylist.h"
+//#include "entitylist.h"
 
 //-----------------------------------------------------------------------------
 // Purpose: Used to request a value, or a set of values, from a set of entities.

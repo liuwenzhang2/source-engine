@@ -16,11 +16,11 @@
 //#include "entitylist.h"
 #include "entityoutput.h"
 #include "networkvar.h"
-#include "collisionproperty.h"
 #include "ServerNetworkProperty.h"
 #include "shareddefs.h"
 #include "engine/ivmodelinfo.h"
 #include "SoundEmitterSystem/isoundemittersystembase.h"
+#include "takedamageinfo.h"
 
 class CDamageModifier;
 class CDmgAccumulator;
@@ -35,6 +35,7 @@ class IStudioHdr;
 template<class T>
 class CGlobalEntityList;
 class CServerGameDLL;
+class ITraceFilter;
 
 // Matching the high level concept is significantly better than other criteria
 // FIXME:  Could do this in the script file by making it required and bumping up weighting there instead...
@@ -327,7 +328,7 @@ enum PhysGunForce_t
 };
 
 extern Vector Pickup_DefaultPhysGunLaunchVelocity(const Vector& vecForward, float flMass);
-
+extern CGlobalVars* gpGlobals;
 struct TimedOverlay_t;
 
 /* =========  CBaseEntity  ======== 

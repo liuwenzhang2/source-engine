@@ -10,7 +10,7 @@
 #include "voice_status.h"
 #include "radio_status.h"
 #include "c_playerresource.h"
-#include "cliententitylist.h"
+//#include "cliententitylist.h"
 #include "c_baseplayer.h"
 #include "materialsystem/imesh.h"
 #include "view.h"

@@ -10,7 +10,7 @@
 #include "cbase.h"
 #include "decals.h"
 #include "fire.h"
-#include "entitylist.h"
+//#include "entitylist.h"
 #include "basecombatcharacter.h"
 #include "ndebugoverlay.h"
 #include "engine/IEngineSound.h"

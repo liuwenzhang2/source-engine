@@ -14,7 +14,7 @@
 #include "cdll_util.h"
 #include "kbutton.h"
 #include "usercmd.h"
-#include "iclientvehicle.h"
+#include "game/client/iclientvehicle.h"
 #include "input.h"
 #include "iviewrender.h"
 #include "convar.h"

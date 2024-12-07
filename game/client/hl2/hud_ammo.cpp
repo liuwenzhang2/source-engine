@@ -10,7 +10,7 @@
 #include "hud_macros.h"
 #include "hud_numericdisplay.h"
 #include "iclientmode.h"
-#include "iclientvehicle.h"
+#include "game/client/iclientvehicle.h"
 #include <vgui_controls/AnimationController.h>
 #include <vgui/ILocalize.h>
 #include <vgui/ISurface.h>

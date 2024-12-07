@@ -10,7 +10,7 @@
 
 #include "cbase.h"
 #include "coordsize.h"
-#include "entitylist.h"
+//#include "entitylist.h"
 #include "vcollide_parse.h"
 #include "soundenvelope.h"
 #include "game.h"
@@ -25,10 +25,9 @@
 #include "physics_fx.h"
 #include "vphysics_sound.h"
 #include "vphysics/vehicles.h"
-#include "vehicle_sounds.h"
+#include "game/server/vehicle_sounds.h"
 #include "movevars_shared.h"
 #include "physics_saverestore.h"
-#include "solidsetdefaults.h"
 #include "tier0/vprof.h"
 #include "engine/IStaticPropMgr.h"
 #include "physics_prop_ragdoll.h"
@@ -420,7 +419,7 @@ bool PhysIsFinalTick()
 
 IPhysicsObject *PhysCreateWorld( CBaseEntity *pWorld )
 {
-	staticpropmgr->CreateVPhysicsRepresentations( physenv, &g_SolidSetup, pWorld );
+	staticpropmgr->CreateVPhysicsRepresentations( physenv, g_pSolidSetup, pWorld );
 	return PhysCreateWorld_Shared( pWorld, modelinfo->GetVCollide(1), g_PhysDefaultObjectParams );
 }
 
@@ -2129,12 +2128,12 @@ void CCollisionEvent::UpdateTouchEvents( void )
 		const touchevent_t &event = m_touchEvents[i];
 		if ( event.touchType == TOUCH_START )
 		{
-			DispatchStartTouch( event.pEntity0, event.pEntity1, event.endPoint, event.normal );
+			DispatchStartTouch( (CBaseEntity*)event.pEntity0, (CBaseEntity*)event.pEntity1, event.endPoint, event.normal );
 		}
 		else
 		{
 			// TOUCH_END
-			DispatchEndTouch( event.pEntity0, event.pEntity1 );
+			DispatchEndTouch((CBaseEntity*)event.pEntity0, (CBaseEntity*)event.pEntity1 );
 		}
 	}
 	m_touchEvents.RemoveAll();
@@ -2688,7 +2687,7 @@ void PhysCollisionDust( gamevcollisionevent_t *pEvent, surfacedata_t *phit )
 	g_pEffects->Dust( vecPos, vecVel, 8.0f, pEvent->collisionSpeed );
 }
 
-void PhysFrictionSound( CBaseEntity *pEntity, IPhysicsObject *pObject, const char *pSoundName, HSOUNDSCRIPTHANDLE& handle, float flVolume )
+void PhysFrictionSound( IHandleEntity *pEntity, IPhysicsObject *pObject, const char *pSoundName, HSOUNDSCRIPTHANDLE& handle, float flVolume )
 {
 	if ( !pEntity )
 		return;
@@ -2698,7 +2697,7 @@ void PhysFrictionSound( CBaseEntity *pEntity, IPhysicsObject *pObject, const cha
 	flVolume = clamp( flVolume, 0.0f, 1.0f );
 	if ( flVolume > (1.0f/128.0f) )
 	{
-		friction_t *pFriction = g_Collisions.FindFriction( pEntity );
+		friction_t *pFriction = g_Collisions.FindFriction((CBaseEntity*)pEntity );
 		if ( !pFriction )
 			return;
 
@@ -2713,9 +2712,9 @@ void PhysFrictionSound( CBaseEntity *pEntity, IPhysicsObject *pObject, const cha
 				return;
 
 			pFriction->pObject = pEntity;
-			CPASAttenuationFilter filter( pEntity, params.soundlevel );
+			CPASAttenuationFilter filter((CBaseEntity*)pEntity, params.soundlevel );
 			pFriction->patch = CSoundEnvelopeController::GetController().SoundCreate( 
-				filter, pEntity->entindex(), CHAN_BODY, pSoundName, params.soundlevel );
+				filter, ((CBaseEntity*)pEntity)->entindex(), CHAN_BODY, pSoundName, params.soundlevel );
 			CSoundEnvelopeController::GetController().Play( pFriction->patch, params.volume * flVolume, params.pitch );
 		}
 		else
@@ -2730,9 +2729,9 @@ void PhysFrictionSound( CBaseEntity *pEntity, IPhysicsObject *pObject, const cha
 	}
 }
 
-void PhysCleanupFrictionSounds( CBaseEntity *pEntity )
+void PhysCleanupFrictionSounds( IHandleEntity *pEntity )
 {
-	friction_t *pFriction = g_Collisions.FindFriction( pEntity );
+	friction_t *pFriction = g_Collisions.FindFriction( (CBaseEntity*)pEntity );
 	if ( pFriction && pFriction->patch )
 	{
 		g_Collisions.ShutdownFriction( *pFriction );

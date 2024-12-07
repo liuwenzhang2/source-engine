@@ -17,7 +17,7 @@
 #include "datacache/imdlcache.h"
 
 #if !defined( CLIENT_DLL )
-#include "entitylist.h"
+//#include "entitylist.h"
 #endif
 
 // memdbgon must be the last include file in a .cpp file!!!

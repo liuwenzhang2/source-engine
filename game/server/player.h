@@ -87,6 +87,7 @@ class CFuncLadder;
 class CNavArea;
 class CHintSystem;
 class CAI_Expresser;
+struct impactdamagetable_t;
 
 #if defined USES_ECON_ITEMS
 class CEconWearable;

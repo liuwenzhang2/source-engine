@@ -620,7 +620,7 @@ CBaseEntity* CBaseAnimating::CreateServerRagdoll(int forceBone, const CTakeDamag
 	else if (bUseLRURetirement)
 	{
 		pRagdoll->GetEngineObject()->AddSpawnFlags(SF_RAGDOLLPROP_USE_LRU_RETIREMENT);
-		s_RagdollLRU.MoveToTopOfLRU(pRagdoll);
+		gEntList.MoveToTopOfLRU(pRagdoll);
 	}
 
 	// Tracker 22598:  If we don't set the OBB mins/maxs to something valid here, then the client will have a zero sized hull

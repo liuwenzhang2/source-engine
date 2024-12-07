@@ -11,7 +11,6 @@
 #include "ai_moveprobe.h"
 #include "ai_squad.h"
 #include "beam_shared.h"
-#include "globalstate.h"
 #include "soundent.h"
 #include "npc_citizen17.h"
 #include "gib.h"

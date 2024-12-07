@@ -7,7 +7,7 @@
 #include "cbase.h"
 #include "hud.h"		
 #include "c_physicsprop.h"		
-#include "iclientvehicle.h"
+#include "game/client/iclientvehicle.h"
 #include <vgui_controls/Controls.h>
 #include <Color.h>
 #include "vehicle_viewblend_shared.h"

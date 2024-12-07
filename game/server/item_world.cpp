@@ -10,7 +10,7 @@
 #include "items.h"
 #include "gamerules.h"
 #include "engine/IEngineSound.h"
-#include "iservervehicle.h"
+#include "game/server/iservervehicle.h"
 #include "physics_saverestore.h"
 #include "world.h"
 

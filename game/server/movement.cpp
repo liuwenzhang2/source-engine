@@ -6,7 +6,7 @@
 //=============================================================================//
 
 #include "cbase.h"
-#include "entitylist.h"
+//#include "entitylist.h"
 #include "entityoutput.h"
 #include "keyframe/keyframe.h" // BUG: this needs to move if keyframe is a standard thing
 

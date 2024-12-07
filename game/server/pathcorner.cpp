@@ -6,7 +6,7 @@
 
 #include "cbase.h"
 #include "trains.h"
-#include "entitylist.h"
+//#include "entitylist.h"
 #include "ndebugoverlay.h"
 
 // memdbgon must be the last include file in a .cpp file!!!

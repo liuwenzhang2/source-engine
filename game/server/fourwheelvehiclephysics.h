@@ -15,7 +15,7 @@
 #include "vphysics/vehicles.h"
 #include "vcollide_parse.h"
 #include "datamap.h"
-#include "vehicle_sounds.h"
+#include "game/server/vehicle_sounds.h"
 
 
 class CBaseAnimating;

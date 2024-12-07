@@ -182,6 +182,17 @@ ConVar	sv_alternateticks("sv_alternateticks", (IsX360()) ? "1" : "0", FCVAR_SPON
 // Defined in engine
 ConVar  cl_interpolate("cl_interpolate", "1.0f", FCVAR_USERINFO | FCVAR_DEVELOPMENTONLY);
 ConVar  cl_extrapolate("cl_extrapolate", "1", FCVAR_CHEAT, "Enable/disable extrapolation if interpolation history runs out.");
+ConVar g_ragdoll_important_maxcount("g_ragdoll_important_maxcount", "2", FCVAR_REPLICATED);
+//-----------------------------------------------------------------------------
+// LRU
+//-----------------------------------------------------------------------------
+#ifdef _XBOX
+// xbox defaults to 4 ragdolls max
+ConVar g_ragdoll_maxcount("g_ragdoll_maxcount", "4", FCVAR_REPLICATED);
+#else
+ConVar g_ragdoll_maxcount("g_ragdoll_maxcount", "8", FCVAR_REPLICATED);
+#endif
+ConVar g_debug_ragdoll_removal("g_debug_ragdoll_removal", "0", FCVAR_REPLICATED | FCVAR_CHEAT);
 
 //-----------------------------------------------------------------------------
 // Portal-specific hack designed to eliminate re-entrancy in touch functions
@@ -5232,6 +5243,87 @@ void C_EngineObjectInternal::RagdollMoved(void)
 	InvalidatePhysicsRecursive(ANIMATION_CHANGED);
 }
 
+void C_EngineObjectInternal::RagdollSolveSeparation(ragdoll_t& ragdoll, IHandleEntity* pEntity)
+{
+	byte needsFix[256];
+	int fixCount = 0;
+	Assert(ragdoll.listCount <= ARRAYSIZE(needsFix));
+	for (int i = 0; i < ragdoll.listCount; i++)
+	{
+		needsFix[i] = 0;
+		const ragdollelement_t& element = ragdoll.list[i];
+		if (element.pConstraint && element.parentIndex >= 0)
+		{
+			Vector start, target;
+			element.pObject->GetPosition(&start, NULL);
+			ragdoll.list[element.parentIndex].pObject->LocalToWorld(&target, element.originParentSpace);
+			if (needsFix[element.parentIndex])
+			{
+				needsFix[i] = 1;
+				++fixCount;
+				continue;
+			}
+			Vector dir = target - start;
+			if (dir.LengthSqr() > 1.0f)
+			{
+				// this fixes a bug in ep2 with antlion grubs, but causes problems in TF2 - revisit, but disable for TF now
+#if !defined(TF_CLIENT_DLL)
+				// heuristic: guess that anything separated and small mass ratio is in some state that's 
+				// keeping the solver from fixing it
+				float mass = element.pObject->GetMass();
+				float massParent = ragdoll.list[element.parentIndex].pObject->GetMass();
+
+				if (mass * 2.0f < massParent)
+				{
+					// if this is <0.5 mass of parent and still separated it's attached to something heavy or 
+					// in a bad state
+					needsFix[i] = 1;
+					++fixCount;
+					continue;
+				}
+#endif
+
+				if (PhysHasContactWithOtherInDirection(element.pObject, dir))
+				{
+					Ray_t ray;
+					trace_t tr;
+					ray.Init(target, start);
+					UTIL_TraceRay(ray, MASK_SOLID, pEntity, COLLISION_GROUP_NONE, &tr);
+					if (tr.DidHit())
+					{
+						needsFix[i] = 1;
+						++fixCount;
+					}
+				}
+			}
+		}
+	}
+
+	if (fixCount)
+	{
+		for (int i = 0; i < ragdoll.listCount; i++)
+		{
+			if (!needsFix[i])
+				continue;
+
+			const ragdollelement_t& element = ragdoll.list[i];
+			Vector target, velocity;
+			ragdoll.list[element.parentIndex].pObject->LocalToWorld(&target, element.originParentSpace);
+			ragdoll.list[element.parentIndex].pObject->GetVelocityAtPoint(target, &velocity);
+			matrix3x4_t xform;
+			element.pObject->GetPositionMatrix(&xform);
+			MatrixSetColumn(target, 3, xform);
+			element.pObject->SetPositionMatrix(xform, true);
+			element.pObject->SetVelocity(&velocity, &vec3_origin);
+		}
+		DevMsg(2, "TICK:%5d:Ragdoll separation count: %d\n", gpGlobals->tickcount, fixCount);
+	}
+	else
+	{
+		ragdoll.pGroup->ClearErrorState();
+	}
+}
+
 void C_EngineObjectInternal::VPhysicsUpdate(IPhysicsObject* pPhysics)
 {
 	bool bIsRagdoll = false;
@@ -5697,8 +5789,6 @@ bool C_EngineObjectInternal::IsAboutToRagdoll() const
 //	}
 //}
 
-C_EntityDissolve* DissolveEffect(C_BaseEntity* pTarget, float flTime);
-C_EntityFlame* FireEffect(C_BaseAnimating* pTarget, C_BaseEntity* pServerFire, float* flScaleEnd, float* flTimeStart, float* flTimeEnd);
 bool NPC_IsImportantNPC(C_BaseEntity* pAnimating)
 {
 	C_AI_BaseNPC* pBaseNPC = dynamic_cast <C_AI_BaseNPC*> (pAnimating);
@@ -5743,7 +5833,7 @@ C_BaseEntity* C_EngineObjectInternal::CreateRagdollCopy()
 	if (m_pOuter->AddRagdollToFadeQueue() == true)
 	{
 		pRagdoll->m_bImportant = NPC_IsImportantNPC(this->m_pOuter);
-		s_RagdollLRU.MoveToTopOfLRU(pRagdoll, pRagdoll->m_bImportant);
+		ClientEntityList().MoveToTopOfLRU(pRagdoll, pRagdoll->m_bImportant);
 		pRagdoll->m_bFadeOut = true;
 	}
 
@@ -5770,6 +5860,51 @@ C_BaseEntity* C_EngineObjectInternal::CreateRagdollCopy()
 	return pRagdoll;
 }
 
+C_EntityFlame* FireEffect(C_BaseAnimating* pTarget, C_BaseEntity* pServerFire, float* flScaleEnd, float* flTimeStart, float* flTimeEnd)
+{
+	C_EntityFlame* pFire = (C_EntityFlame*)cl_entitylist->CreateEntityByName("C_EntityFlame");
+
+	if (pFire->InitializeAsClientEntity(NULL, RENDER_GROUP_TRANSLUCENT_ENTITY) == false)
+	{
+		DestroyEntity(pFire);// ->Release();
+		return NULL;
+	}
+
+	if (pFire != NULL)
+	{
+		pFire->GetEngineObject()->RemoveFromLeafSystem();
+
+		pTarget->GetEngineObject()->AddFlag(FL_ONFIRE);
+		pFire->GetEngineObject()->SetParent(pTarget->GetEngineObject());
+		pFire->m_hEntAttached = (C_BaseEntity*)pTarget;
+
+		pFire->OnDataChanged(DATA_UPDATE_CREATED);
+		pFire->GetEngineObject()->SetAbsOrigin(pTarget->GetEngineObject()->GetAbsOrigin());
+
+#ifdef HL2_EPISODIC
+		if (pServerFire)
+		{
+			if (pServerFire->GetEngineObject()->IsEffectActive(EF_DIMLIGHT))
+			{
+				pFire->GetEngineObject()->AddEffects(EF_DIMLIGHT);
+			}
+			if (pServerFire->GetEngineObject()->IsEffectActive(EF_BRIGHTLIGHT))
+			{
+				pFire->GetEngineObject()->AddEffects(EF_BRIGHTLIGHT);
+			}
+		}
+#endif
+
+		//Play a sound
+		CPASAttenuationFilter filter(pTarget);
+		g_pSoundEmitterSystem->EmitSound(filter, pTarget->GetSoundSourceIndex(), "General.BurningFlesh");//pTarget->
+
+		pFire->SetNextClientThink(gpGlobals->curtime + 7.0f);
+	}
+
+	return pFire;
+}
+
 void C_EngineObjectInternal::IgniteRagdoll(C_BaseEntity* pSource)
 {
 	C_BaseEntity* pChild = pSource->GetEffectEntity();
@@ -5786,7 +5921,47 @@ void C_EngineObjectInternal::IgniteRagdoll(C_BaseEntity* pSource)
 	}
 }
 
+#define DEFAULT_FADE_START 2.0f
+#define DEFAULT_MODEL_FADE_START 1.9f
+#define DEFAULT_MODEL_FADE_LENGTH 0.1f
+#define DEFAULT_FADEIN_LENGTH 1.0f
 
+C_EntityDissolve* DissolveEffect(C_BaseEntity* pTarget, float flTime)
+{
+	C_EntityDissolve* pDissolve = (C_EntityDissolve*)cl_entitylist->CreateEntityByName("C_EntityDissolve");
+
+	if (pDissolve->InitializeAsClientEntity("sprites/blueglow1.vmt", RENDER_GROUP_TRANSLUCENT_ENTITY) == false)
+	{
+		DestroyEntity(pDissolve);// ->Release();
+		return NULL;
+	}
+
+	if (pDissolve != NULL)
+	{
+		pTarget->GetEngineObject()->AddFlag(FL_DISSOLVING);
+		pDissolve->GetEngineObject()->SetParent(pTarget->GetEngineObject());
+		pDissolve->OnDataChanged(DATA_UPDATE_CREATED);
+		pDissolve->GetEngineObject()->SetAbsOrigin(pTarget->GetEngineObject()->GetAbsOrigin());
+
+		pDissolve->m_flStartTime = flTime;
+		pDissolve->m_flFadeOutStart = DEFAULT_FADE_START;
+		pDissolve->m_flFadeOutModelStart = DEFAULT_MODEL_FADE_START;
+		pDissolve->m_flFadeOutModelLength = DEFAULT_MODEL_FADE_LENGTH;
+		pDissolve->m_flFadeInLength = DEFAULT_FADEIN_LENGTH;
+
+		pDissolve->m_nDissolveType = 0;
+		pDissolve->m_flNextSparkTime = 0.0f;
+		pDissolve->m_flFadeOutLength = 0.0f;
+		pDissolve->m_flFadeInStart = 0.0f;
+
+		// Let this entity know it needs to delete itself when it's done
+		pDissolve->SetServerLinkState(false);
+		pTarget->SetEffectEntity(pDissolve);
+	}
+
+	return pDissolve;
+
+}
 
 void C_EngineObjectInternal::TransferDissolveFrom(C_BaseEntity* pSource)
 {
@@ -10946,6 +11121,74 @@ bool PVSNotifierMap_LessFunc( IClientUnknown* const &a, IClientUnknown* const &b
 //	return pRet;
 //}
 
+bool ShouldRemoveThisRagdoll(C_BaseEntity* pRagdoll)
+{
+	if (g_RagdollLVManager.IsLowViolence())
+	{
+		return true;
+	}
+
+#ifdef CLIENT_DLL
+
+	/* we no longer ignore enemies just because they are on fire -- a ragdoll in front of me
+	   is always a higher priority for retention than a flaming zombie behind me. At the
+	   time I put this in, the ragdolls do clean up their own effects if culled via SUB_Remove().
+	   If you're encountering trouble with ragdolls leaving effects behind, try renabling the code below.
+	/////////////////////
+	//Just ignore it until we're done burning/dissolving.
+	if ( pRagdoll->GetEffectEntity() )
+		return false;
+	*/
+
+	Vector vMins, vMaxs;
+
+	Vector origin = pRagdoll->GetEngineObject()->GetRagdollOrigin();
+	pRagdoll->GetEngineObject()->GetRagdollBounds(vMins, vMaxs);
+
+	if (engine->IsBoxInViewCluster(vMins + origin, vMaxs + origin) == false)
+	{
+		if (g_debug_ragdoll_removal.GetBool())
+		{
+			debugoverlay->AddBoxOverlay(origin, vMins, vMaxs, QAngle(0, 0, 0), 0, 255, 0, 16, 5);
+			debugoverlay->AddLineOverlay(origin, origin + Vector(0, 0, 64), 0, 255, 0, true, 5);
+		}
+
+		return true;
+	}
+	else if (engine->CullBox(vMins + origin, vMaxs + origin) == true)
+	{
+		if (g_debug_ragdoll_removal.GetBool())
+		{
+			debugoverlay->AddBoxOverlay(origin, vMins, vMaxs, QAngle(0, 0, 0), 0, 0, 255, 16, 5);
+			debugoverlay->AddLineOverlay(origin, origin + Vector(0, 0, 64), 0, 0, 255, true, 5);
+		}
+
+		return true;
+	}
+
+#else
+	CBasePlayer* pPlayer = UTIL_GetLocalPlayer();
+
+	if (!UTIL_FindClientInPVS(pRagdoll))
+	{
+		if (g_debug_ragdoll_removal.GetBool())
+			NDebugOverlay::Line(pRagdoll->GetEngineObject()->GetAbsOrigin(), pRagdoll->GetEngineObject()->GetAbsOrigin() + Vector(0, 0, 64), 0, 255, 0, true, 5);
+
+		return true;
+	}
+	else if (pPlayer && !pPlayer->FInViewCone(pRagdoll))
+	{
+		if (g_debug_ragdoll_removal.GetBool())
+			NDebugOverlay::Line(pRagdoll->GetEngineObject()->GetAbsOrigin(), pRagdoll->GetEngineObject()->GetAbsOrigin() + Vector(0, 0, 64), 0, 0, 255, true, 5);
+
+		return true;
+	}
+
+#endif
+
+	return false;
+}
+
 
 // -------------------------------------------------------------------------------------------------- //
 // C_BaseEntityIterator
@@ -10981,3 +11224,41 @@ C_BaseEntity* C_BaseEntityIterator::Next()
 
 	return NULL;
 }
+
+// One hook to rule them all...
+// Since most of the little list managers in here only need one or two of the game
+// system callbacks, this hook is a game system that passes them the appropriate callbacks
+class CEntityListSystem : public CAutoGameSystemPerFrame
+{
+public:
+	CEntityListSystem(char const* name) : CAutoGameSystemPerFrame(name)
+	{
+
+	}
+	void LevelInitPreEntity()
+	{
+
+	}
+	void LevelShutdownPreEntity()
+	{
+
+	}
+	void LevelShutdownPostEntity()
+	{
+
+	}
+
+	void Update(float frametime) 
+	{
+		ClientEntityList().UpdateRagdolls(frametime);
+	}
+
+	void FrameUpdatePostEntityThink()
+	{
+		//This is pretty hacky, it's only called on the server so it just calls the update method.
+		ClientEntityList().UpdateRagdolls(0);
+	}
+
+};
+
+static CEntityListSystem g_EntityListSystem("CEntityListSystem");

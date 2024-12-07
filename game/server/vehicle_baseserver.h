@@ -10,7 +10,7 @@
 #pragma once
 #endif
 
-#include "vehicle_sounds.h"
+#include "game/server/vehicle_sounds.h"
 #include "entityblocker.h"
 
 class CSoundPatch;

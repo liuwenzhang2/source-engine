@@ -4,24 +4,24 @@
 //
 //=============================================================================//
 
-#include "cbase.h"
+//#include "cbase.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
 #if defined( GAME_DLL )
 	
-	#include "entitylist.h"
+	//#include "entitylist.h"
 
 
-	void DebugCheckEHandleAccess( void *pEnt )
-	{
-		if ( gEntList.IsDisableEhandleAccess() )
-		{
-			Msg( "Access of EHANDLE/CHandle for class %s:%p in destructor!\n",
-				STRING(((CBaseEntity*)pEnt)->GetEngineObject()->GetClassname() ), pEnt );
-		}
-	}
+	//void DebugCheckEHandleAccess( void *pEnt )
+	//{
+	//	if ( gEntList.IsDisableEhandleAccess() )
+	//	{
+	//		Msg( "Access of EHANDLE/CHandle for class %s:%p in destructor!\n",
+	//			STRING(((CBaseEntity*)pEnt)->GetEngineObject()->GetClassname() ), pEnt );
+	//	}
+	//}
 
 #else
 	

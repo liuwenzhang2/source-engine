@@ -15,7 +15,7 @@
 
 #if defined( CLIENT_DLL )
 
-	#include "iclientvehicle.h"
+	#include "game/client/iclientvehicle.h"
 	#include "prediction.h"
 	#include "c_basedoor.h"
 	#include "c_world.h"
@@ -26,7 +26,7 @@
 
 #else
 
-	#include "iservervehicle.h"
+	#include "game/server/iservervehicle.h"
 	#include "trains.h"
 	#include "world.h"
 	#include "doors.h"

@@ -6,7 +6,6 @@
 
 #include "cbase.h"
 #include "beam_shared.h"
-#include "globalstate.h"
 #include "npcevent.h"
 #include "Sprite.h"
 #include "IEffects.h"

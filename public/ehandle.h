@@ -11,13 +11,13 @@
 #pragma once
 #endif
 
-#if defined( _DEBUG ) && defined( GAME_DLL )
-#include "tier0/dbg.h"
-#include "cbase.h"
-#endif
+//#if defined( _DEBUG ) && defined( GAME_DLL )
+//#include "tier0/dbg.h"
+//#include "cbase.h"
+//#endif
 
 
-#include "const.h"
+//#include "const.h"
 #include "basehandle.h"
 #include "networkvar.h"
 //#include "entitylist_base.h"

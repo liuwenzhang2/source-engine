@@ -15,7 +15,7 @@
 #include "gamerules.h"
 #include "game.h"
 #include <ctype.h>
-#include "entitylist.h"
+//#include "entitylist.h"
 #include "vstdlib/random.h"
 #include "engine/IEngineSound.h"
 #include "ndebugoverlay.h"
@@ -29,7 +29,6 @@
 #define SF_SPEAKER_EVERYWHERE		2
 
 extern ISaveRestoreOps *responseSystemSaveRestoreOps;
-#include "saverestore.h"
 
 LINK_ENTITY_TO_CLASS( env_speaker, CSpeaker );
 

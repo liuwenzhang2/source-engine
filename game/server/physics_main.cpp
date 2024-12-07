@@ -13,7 +13,7 @@
 #include "ai_basenpc.h"
 #include "gamerules.h"
 #include "mempool.h"
-#include "entitylist.h"
+//#include "entitylist.h"
 #include "engine/IEngineSound.h"
 #include "datacache/imdlcache.h"
 #include "ispatialpartition.h"

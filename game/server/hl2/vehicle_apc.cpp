@@ -11,7 +11,6 @@
 #include "engine/IEngineSound.h"
 #include "weapon_rpg.h"
 #include "in_buttons.h"
-#include "globalstate.h"
 #include "soundent.h"
 #include "ai_basenpc.h"
 #include "ndebugoverlay.h"

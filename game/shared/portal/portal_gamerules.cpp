@@ -19,7 +19,6 @@
 	#include "gamerules.h"
 	#include "teamplay_gamerules.h"
 	#include "portal_player.h"
-	#include "globalstate.h"
 	#include "ai_basenpc.h"
 	#include "portal/weapon_physcannon.h"
 	#include "props.h"		// For props flags used in making the portal weight box

@@ -11,6 +11,8 @@
 #pragma once
 #endif
 
+#include "ehandle.h"
+
 // PlayerUse defines
 #define	PLAYER_USE_RADIUS	80.f
 #define CONE_45_DEGREES		0.707f

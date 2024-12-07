@@ -13,8 +13,11 @@
 
 #include "irecipientfilter.h"
 #include "const.h"
-#include "player.h"
+//#include "player.h"
 #include "bitvec.h"
+
+class CBaseEntity;
+class CBasePlayer;
 
 //-----------------------------------------------------------------------------
 // Purpose: A generic filter for determining whom to send message/sounds etc. to and

@@ -27,7 +27,6 @@ END_NETWORK_TABLE()
 
 #if !defined( CLIENT_DLL )
 
-#include "globalstate.h"
 
 //---------------------------------------------------------
 // Save/Restore

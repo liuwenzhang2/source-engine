@@ -5,7 +5,7 @@
 //=============================================================================//
 
 #include "cbase.h"
-#include "entitylist.h"
+//#include "entitylist.h"
 #include "ai_basenpc.h"
 #include "npc_citizen17.h"
 

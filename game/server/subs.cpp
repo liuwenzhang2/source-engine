@@ -8,7 +8,7 @@
 
 #include "cbase.h"
 #include "doors.h"
-#include "entitylist.h"
+//#include "entitylist.h"
 #include "globals.h"
 
 // memdbgon must be the last include file in a .cpp file!!!

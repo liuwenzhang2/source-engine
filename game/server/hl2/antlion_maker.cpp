@@ -10,7 +10,7 @@
 #include "saverestore_utlvector.h"
 #include "mapentities.h"
 #include "decals.h"
-#include "iservervehicle.h"
+#include "game/server/iservervehicle.h"
 #include "antlion_dust.h"
 #include "smoke_trail.h"
 

@@ -292,7 +292,7 @@ void CRagdollProp::OnPhysGunPickup( CBasePlayer *pPhysGunUser, PhysGunPickup_t r
 
 	if (GetEngineObject()->HasSpawnFlags( SF_RAGDOLLPROP_USE_LRU_RETIREMENT ) )
 	{
-		s_RagdollLRU.MoveToTopOfLRU( this );
+		gEntList.MoveToTopOfLRU( this );
 	}
 
 	if ( !GetEngineObject()->HasSpawnFlags( SF_PHYSPROP_ENABLE_ON_PHYSCANNON ) )
@@ -323,7 +323,7 @@ void CRagdollProp::OnPhysGunDrop( CBasePlayer *pPhysGunUser, PhysGunDrop_t Reaso
 
 	if (GetEngineObject()->HasSpawnFlags( SF_RAGDOLLPROP_USE_LRU_RETIREMENT ) )
 	{
-		s_RagdollLRU.MoveToTopOfLRU( this );
+		gEntList.MoveToTopOfLRU( this );
 	}
 
 	// Make sure it's interactive debris for at most 5 seconds

@@ -27,7 +27,6 @@
 #include "datacache/imdlcache.h"
 #include "eventqueue.h"
 #include "gib.h"
-#include "globalstate.h"
 #include "hierarchy.h"
 #include "movevars_shared.h"
 #include "npcevent.h"

@@ -523,7 +523,6 @@
     <ClCompile Include="..\..\..\game\shared\debugoverlay_shared.cpp" />
     <ClCompile Include="..\..\..\game\shared\decals.cpp" />
     <ClCompile Include="..\..\..\game\shared\effect_dispatch_data.cpp" />
-    <ClCompile Include="..\..\..\game\shared\ehandle.cpp" />
     <ClCompile Include="..\..\..\game\shared\EntityParticleTrail_Shared.cpp" />
     <ClCompile Include="..\..\..\game\shared\env_detail_controller.cpp" />
     <ClCompile Include="..\..\..\game\shared\env_wind_shared.cpp" />
@@ -577,7 +576,6 @@
     <ClCompile Include="..\..\..\game\shared\predictableid.cpp" />
     <ClCompile Include="..\..\..\game\shared\props_shared.cpp" />
     <ClCompile Include="..\..\..\game\shared\querycache.cpp" />
-    <ClCompile Include="..\..\..\game\shared\ragdoll_shared.cpp" />
     <ClCompile Include="..\..\..\game\shared\rope_helpers.cpp" />
     <ClCompile Include="..\..\..\game\shared\saverestore.cpp" />
     <ClCompile Include="..\..\..\game\shared\SceneCache.cpp" />
@@ -607,6 +605,7 @@
     <ClCompile Include="..\..\..\public\dt_utlvector_common.cpp" />
     <ClCompile Include="..\..\..\public\dt_utlvector_send.cpp" />
     <ClCompile Include="..\..\..\public\editor_sendcommand.cpp" />
+    <ClCompile Include="..\..\..\public\ehandle.cpp" />
     <ClCompile Include="..\..\..\public\entitylist_base.cpp" />
     <ClCompile Include="..\..\..\public\filesystem_helpers.cpp" />
     <ClCompile Include="..\..\..\public\haptics\haptic_msgs.cpp" />
@@ -615,6 +614,7 @@
     <ClCompile Include="..\..\..\public\keyframe\keyframe.cpp" />
     <ClCompile Include="..\..\..\public\map_utils.cpp" />
     <ClCompile Include="..\..\..\public\networkvar.cpp" />
+    <ClCompile Include="..\..\..\public\ragdoll_shared.cpp" />
     <ClCompile Include="..\..\..\public\registry.cpp" />
     <ClCompile Include="..\..\..\public\rope_physics.cpp" />
     <ClCompile Include="..\..\..\public\scratchpad3d.cpp" />

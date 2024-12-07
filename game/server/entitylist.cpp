@@ -24,7 +24,6 @@
 #include "mapentities.h"
 #include "client.h"
 #include "ai_initutils.h"
-#include "globalstate.h"
 #include "datacache/imdlcache.h"
 #include "positionwatcher.h"
 #include "mapentities_shared.h"
@@ -107,7 +106,17 @@ ConVar xbox_autothrottle("xbox_autothrottle", "1", FCVAR_ARCHIVE);
 ConVar xbox_steering_deadzone("xbox_steering_deadzone", "0.0");
 ConVar ai_setupbones_debug("ai_setupbones_debug", "0", 0, "Shows that bones that are setup every think");
 ConVar	sv_alternateticks("sv_alternateticks", (IsX360()) ? "1" : "0", FCVAR_SPONLY, "If set, server only simulates entities on even numbered ticks.\n");
-
+ConVar g_ragdoll_important_maxcount("g_ragdoll_important_maxcount", "2", FCVAR_REPLICATED);
+//-----------------------------------------------------------------------------
+// LRU
+//-----------------------------------------------------------------------------
+#ifdef _XBOX
+// xbox defaults to 4 ragdolls max
+ConVar g_ragdoll_maxcount("g_ragdoll_maxcount", "4", FCVAR_REPLICATED);
+#else
+ConVar g_ragdoll_maxcount("g_ragdoll_maxcount", "8", FCVAR_REPLICATED);
+#endif
+ConVar g_debug_ragdoll_removal("g_debug_ragdoll_removal", "0", FCVAR_REPLICATED | FCVAR_CHEAT);
 
 //-----------------------------------------------------------------------------
 // Portal-specific hack designed to eliminate re-entrancy in touch functions
@@ -5139,6 +5148,87 @@ void CEngineObjectInternal::ClearRagdoll() {
 		VPhysicsSetObject(NULL);
 
 		RagdollDestroy(m_ragdoll);
+	}
+}
+
+void CEngineObjectInternal::RagdollSolveSeparation(ragdoll_t& ragdoll, IHandleEntity* pEntity)
+{
+	byte needsFix[256];
+	int fixCount = 0;
+	Assert(ragdoll.listCount <= ARRAYSIZE(needsFix));
+	for (int i = 0; i < ragdoll.listCount; i++)
+	{
+		needsFix[i] = 0;
+		const ragdollelement_t& element = ragdoll.list[i];
+		if (element.pConstraint && element.parentIndex >= 0)
+		{
+			Vector start, target;
+			element.pObject->GetPosition(&start, NULL);
+			ragdoll.list[element.parentIndex].pObject->LocalToWorld(&target, element.originParentSpace);
+			if (needsFix[element.parentIndex])
+			{
+				needsFix[i] = 1;
+				++fixCount;
+				continue;
+			}
+			Vector dir = target - start;
+			if (dir.LengthSqr() > 1.0f)
+			{
+				// this fixes a bug in ep2 with antlion grubs, but causes problems in TF2 - revisit, but disable for TF now
+#if !defined(TF_CLIENT_DLL)
+				// heuristic: guess that anything separated and small mass ratio is in some state that's 
+				// keeping the solver from fixing it
+				float mass = element.pObject->GetMass();
+				float massParent = ragdoll.list[element.parentIndex].pObject->GetMass();
+
+				if (mass * 2.0f < massParent)
+				{
+					// if this is <0.5 mass of parent and still separated it's attached to something heavy or 
+					// in a bad state
+					needsFix[i] = 1;
+					++fixCount;
+					continue;
+				}
+#endif
+
+				if (PhysHasContactWithOtherInDirection(element.pObject, dir))
+				{
+					Ray_t ray;
+					trace_t tr;
+					ray.Init(target, start);
+					UTIL_TraceRay(ray, MASK_SOLID, pEntity, COLLISION_GROUP_NONE, &tr);
+					if (tr.DidHit())
+					{
+						needsFix[i] = 1;
+						++fixCount;
+					}
+				}
+			}
+		}
+	}
+
+	if (fixCount)
+	{
+		for (int i = 0; i < ragdoll.listCount; i++)
+		{
+			if (!needsFix[i])
+				continue;
+
+			const ragdollelement_t& element = ragdoll.list[i];
+			Vector target, velocity;
+			ragdoll.list[element.parentIndex].pObject->LocalToWorld(&target, element.originParentSpace);
+			ragdoll.list[element.parentIndex].pObject->GetVelocityAtPoint(target, &velocity);
+			matrix3x4_t xform;
+			element.pObject->GetPositionMatrix(&xform);
+			MatrixSetColumn(target, 3, xform);
+			element.pObject->SetPositionMatrix(xform, true);
+			element.pObject->SetVelocity(&velocity, &vec3_origin);
+		}
+		DevMsg(2, "TICK:%5d:Ragdoll separation count: %d\n", gpGlobals->tickcount, fixCount);
+	}
+	else
+	{
+		ragdoll.pGroup->ClearErrorState();
 	}
 }
 
@@ -10522,6 +10612,74 @@ bool TestEntityTriggerIntersection_Accurate(IEngineObjectServer* pTrigger, IEngi
 	return false;
 }
 
+bool ShouldRemoveThisRagdoll(CBaseEntity* pRagdoll)
+{
+	if (g_RagdollLVManager.IsLowViolence())
+	{
+		return true;
+	}
+
+#ifdef CLIENT_DLL
+
+	/* we no longer ignore enemies just because they are on fire -- a ragdoll in front of me
+	   is always a higher priority for retention than a flaming zombie behind me. At the
+	   time I put this in, the ragdolls do clean up their own effects if culled via SUB_Remove().
+	   If you're encountering trouble with ragdolls leaving effects behind, try renabling the code below.
+	/////////////////////
+	//Just ignore it until we're done burning/dissolving.
+	if ( pRagdoll->GetEffectEntity() )
+		return false;
+	*/
+
+	Vector vMins, vMaxs;
+
+	Vector origin = pRagdoll->GetEngineObject()->GetRagdollOrigin();
+	pRagdoll->GetEngineObject()->GetRagdollBounds(vMins, vMaxs);
+
+	if (engine->IsBoxInViewCluster(vMins + origin, vMaxs + origin) == false)
+	{
+		if (g_debug_ragdoll_removal.GetBool())
+		{
+			debugoverlay->AddBoxOverlay(origin, vMins, vMaxs, QAngle(0, 0, 0), 0, 255, 0, 16, 5);
+			debugoverlay->AddLineOverlay(origin, origin + Vector(0, 0, 64), 0, 255, 0, true, 5);
+		}
+
+		return true;
+	}
+	else if (engine->CullBox(vMins + origin, vMaxs + origin) == true)
+	{
+		if (g_debug_ragdoll_removal.GetBool())
+		{
+			debugoverlay->AddBoxOverlay(origin, vMins, vMaxs, QAngle(0, 0, 0), 0, 0, 255, 16, 5);
+			debugoverlay->AddLineOverlay(origin, origin + Vector(0, 0, 64), 0, 0, 255, true, 5);
+		}
+
+		return true;
+	}
+
+#else
+	CBasePlayer* pPlayer = UTIL_GetLocalPlayer();
+
+	if (!UTIL_FindClientInPVS(pRagdoll))
+	{
+		if (g_debug_ragdoll_removal.GetBool())
+			NDebugOverlay::Line(pRagdoll->GetEngineObject()->GetAbsOrigin(), pRagdoll->GetEngineObject()->GetAbsOrigin() + Vector(0, 0, 64), 0, 255, 0, true, 5);
+
+		return true;
+	}
+	else if (pPlayer && !pPlayer->FInViewCone(pRagdoll))
+	{
+		if (g_debug_ragdoll_removal.GetBool())
+			NDebugOverlay::Line(pRagdoll->GetEngineObject()->GetAbsOrigin(), pRagdoll->GetEngineObject()->GetAbsOrigin() + Vector(0, 0, 64), 0, 0, 255, true, 5);
+
+		return true;
+	}
+
+#endif
+
+	return false;
+}
+
 // Called by CEntityListSystem
 void CAimTargetManager::LevelInitPreEntity()
 {
@@ -11028,8 +11186,15 @@ public:
 		}
 	}
 
+	void Update(float frametime)
+	{
+		gEntList.UpdateRagdolls(frametime);
+	}
+
 	void FrameUpdatePostEntityThink()
 	{
+		//This is pretty hacky, it's only called on the server so it just calls the update method.
+		gEntList.UpdateRagdolls(0);
 		g_TouchManager.FrameUpdatePostEntityThink();
 
 		if (m_bRespawnAllEntities)

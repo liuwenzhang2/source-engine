@@ -11,10 +11,19 @@
 #pragma once
 #endif
 
+#include "datamap.h"
 #include "networkvar.h"
 #include "engine/ICollideable.h"
 #include "mathlib/vector.h"
 #include "ispatialpartition.h"
+#ifdef CLIENT_DLL
+#include "dt_recv.h"
+#include "shared_classnames.h"
+#endif // CLIENT_DLL
+#ifdef GAME_DLL
+#include "dt_send.h"
+#endif // GAME_DLL
+
 
 #ifdef CLIENT_DLL
 #define CEngineObjectInternal C_EngineObjectInternal

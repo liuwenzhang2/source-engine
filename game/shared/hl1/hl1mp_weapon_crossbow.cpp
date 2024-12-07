@@ -21,7 +21,7 @@
 #ifdef CLIENT_DLL
 #else
 #include "soundent.h"
-#include "entitylist.h"
+//#include "entitylist.h"
 #include "game.h"
 #endif
 #include "vstdlib/random.h"
