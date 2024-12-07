@@ -153,7 +153,7 @@ bool C_BaseViewModel::Interpolate( float currentTime )
 
 	// Hack to extrapolate cycle counter for view model
 	float elapsed_time = currentTime - GetEngineObject()->GetAnimTime();
-	C_BasePlayer *pPlayer = C_BasePlayer::GetLocalPlayer();
+	C_BasePlayer *pPlayer = (C_BasePlayer*)ClientEntityList().GetLocalPlayer();
 
 	// Predicted viewmodels have fixed up interval
 	if ( GetPredictable() /*|| IsClientCreated()*/)
@@ -300,7 +300,7 @@ int C_BaseViewModel::DrawModel( int flags )
 		render->SetColorModulation(	color );
 	}
 		
-	//C_BasePlayer *pPlayer = C_BasePlayer::GetLocalPlayer();
+	//C_BasePlayer *pPlayer = (C_BasePlayer*)ClientEntityList().GetLocalPlayer();
 	C_BaseCombatWeapon *pWeapon = GetOwningWeapon();
 	int ret;
 	// If the local player's overriding the viewmodel rendering, let him do it
@@ -365,7 +365,7 @@ int C_BaseViewModel::InternalDrawModel( int flags )
 //int C_BaseViewModel::GetFxBlend( void )
 //{
 	// See if the local player wants to override the viewmodel's rendering
-	//C_BasePlayer *pPlayer = C_BasePlayer::GetLocalPlayer();
+	//C_BasePlayer *pPlayer = (C_BasePlayer*)ClientEntityList().GetLocalPlayer();
 	//if ( pPlayer && pPlayer->IsOverridingViewmodel() )
 	//{
 	//	pPlayer->ComputeFxBlend();
@@ -389,7 +389,7 @@ int C_BaseViewModel::InternalDrawModel( int flags )
 //bool C_BaseViewModel::IsTransparent( void )
 //{
 	// See if the local player wants to override the viewmodel's rendering
-	//C_BasePlayer *pPlayer = C_BasePlayer::GetLocalPlayer();
+	//C_BasePlayer *pPlayer = (C_BasePlayer*)ClientEntityList().GetLocalPlayer();
 	//if ( pPlayer && pPlayer->IsOverridingViewmodel() )
 	//{
 	//	return pPlayer->ViewModel_IsTransparent();
@@ -408,7 +408,7 @@ int C_BaseViewModel::InternalDrawModel( int flags )
 //bool C_BaseViewModel::UsesPowerOfTwoFrameBufferTexture( void )
 //{
 	// See if the local player wants to override the viewmodel's rendering
-	//C_BasePlayer *pPlayer = C_BasePlayer::GetLocalPlayer();
+	//C_BasePlayer *pPlayer = (C_BasePlayer*)ClientEntityList().GetLocalPlayer();
 	//if ( pPlayer && pPlayer->IsOverridingViewmodel() )
 	//{
 	//	return pPlayer->ViewModel_IsUsingFBTexture();
@@ -428,7 +428,7 @@ int C_BaseViewModel::InternalDrawModel( int flags )
 //-----------------------------------------------------------------------------
 void C_BaseViewModel::UpdateAnimationParity( void )
 {
-	C_BasePlayer *pPlayer = C_BasePlayer::GetLocalPlayer();
+	C_BasePlayer *pPlayer = (C_BasePlayer*)ClientEntityList().GetLocalPlayer();
 	
 	// If we're predicting, then we don't use animation parity because we change the animations on the clientside
 	// while predicting. When not predicting, only the server changes the animations, so a parity mismatch

@@ -156,7 +156,7 @@ void CFlashlightEffect::UpdateLightNew(const Vector &vecPos, const Vector &vecFo
 	FlashlightState_t state;
 
 	// We will lock some of the flashlight params if player is on a ladder, to prevent oscillations due to the trace-rays
-	bool bPlayerOnLadder = ( C_BasePlayer::GetLocalPlayer()->GetEngineObject()->GetMoveType() == MOVETYPE_LADDER );
+	bool bPlayerOnLadder = ( ClientEntityList().GetLocalPlayer()->GetEngineObject()->GetMoveType() == MOVETYPE_LADDER );
 
 	const float flEpsilon = 0.1f;			// Offset flashlight position along vecUp
 	const float flDistCutoff = 128.0f;
@@ -266,7 +266,7 @@ void CFlashlightEffect::UpdateLightNew(const Vector &vecPos, const Vector &vecFo
 	bool bFlicker = false;
 
 #ifdef HL2_EPISODIC
-	C_BaseHLPlayer *pPlayer = (C_BaseHLPlayer *)C_BasePlayer::GetLocalPlayer();
+	C_BaseHLPlayer *pPlayer = (C_BaseHLPlayer *)ClientEntityList().GetLocalPlayer();
 	if ( pPlayer )
 	{
 		float flBatteryPower = ( pPlayer->m_HL2Local.m_flFlashBattery >= 0.0f ) ? ( pPlayer->m_HL2Local.m_flFlashBattery ) : pPlayer->m_HL2Local.m_flSuitPower;

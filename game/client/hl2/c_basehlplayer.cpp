@@ -43,7 +43,7 @@ END_PREDICTION_DATA()
 //-----------------------------------------------------------------------------
 void CC_DropPrimary( void )
 {
-	C_BasePlayer *pPlayer = (C_BasePlayer *) C_BasePlayer::GetLocalPlayer();
+	C_BasePlayer *pPlayer = (C_BasePlayer *)ClientEntityList().GetLocalPlayer();
 	
 	if ( pPlayer == NULL )
 		return;

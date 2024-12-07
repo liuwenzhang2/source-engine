@@ -409,7 +409,7 @@ void ClientModeShared::Shutdown()
 bool ClientModeShared::CreateMove( float flInputSampleTime, CUserCmd *cmd )
 {
 	// Let the player override the view.
-	C_BasePlayer *pPlayer = C_BasePlayer::GetLocalPlayer();
+	C_BasePlayer *pPlayer = (C_BasePlayer*)ClientEntityList().GetLocalPlayer();
 	if(!pPlayer)
 		return true;
 
@@ -426,7 +426,7 @@ void ClientModeShared::OverrideView( CViewSetup *pSetup )
 	QAngle camAngles;
 
 	// Let the player override the view.
-	C_BasePlayer *pPlayer = C_BasePlayer::GetLocalPlayer();
+	C_BasePlayer *pPlayer = (C_BasePlayer*)ClientEntityList().GetLocalPlayer();
 	if(!pPlayer)
 		return;
 
@@ -657,7 +657,7 @@ int	ClientModeShared::KeyInput( int down, ButtonCode_t keynum, const char *pszCu
 	}
 #endif
 
-	C_BasePlayer *pPlayer = C_BasePlayer::GetLocalPlayer();
+	C_BasePlayer *pPlayer = (C_BasePlayer*)ClientEntityList().GetLocalPlayer();
 
 	// if ingame spectator mode, let spectator input intercept key event here
 	if( pPlayer &&

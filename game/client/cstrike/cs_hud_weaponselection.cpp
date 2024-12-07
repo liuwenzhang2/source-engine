@@ -174,7 +174,7 @@ bool CHudWeaponSelection::IsHudMenuPreventingWeaponSelection()
 //-----------------------------------------------------------------------------
 bool CHudWeaponSelection::ShouldDraw()
 {
-	C_BasePlayer *pPlayer = C_BasePlayer::GetLocalPlayer();
+	C_BasePlayer *pPlayer = (C_BasePlayer*)ClientEntityList().GetLocalPlayer();
 	if ( !pPlayer )
 	{
 		if ( IsInSelectionMode() )
@@ -209,7 +209,7 @@ void CHudWeaponSelection::Paint()
 	if (!ShouldDraw())
 		return;
 
-	C_BasePlayer *pPlayer = C_BasePlayer::GetLocalPlayer();
+	C_BasePlayer *pPlayer = (C_BasePlayer*)ClientEntityList().GetLocalPlayer();
 	if ( !pPlayer )
 		return;
 
@@ -441,7 +441,7 @@ void CHudWeaponSelection::HideSelection( void )
 //-----------------------------------------------------------------------------
 C_BaseCombatWeapon *CHudWeaponSelection::FindNextWeaponInWeaponSelection(int iCurrentSlot, int iCurrentPosition)
 {
-	C_BasePlayer *pPlayer = C_BasePlayer::GetLocalPlayer();
+	C_BasePlayer *pPlayer = (C_BasePlayer*)ClientEntityList().GetLocalPlayer();
 	if ( !pPlayer )
 		return NULL;
 
@@ -482,7 +482,7 @@ C_BaseCombatWeapon *CHudWeaponSelection::FindNextWeaponInWeaponSelection(int iCu
 //-----------------------------------------------------------------------------
 C_BaseCombatWeapon *CHudWeaponSelection::FindPrevWeaponInWeaponSelection(int iCurrentSlot, int iCurrentPosition)
 {
-	C_BasePlayer *pPlayer = C_BasePlayer::GetLocalPlayer();
+	C_BasePlayer *pPlayer = (C_BasePlayer*)ClientEntityList().GetLocalPlayer();
 	if ( !pPlayer )
 		return NULL;
 
@@ -524,7 +524,7 @@ C_BaseCombatWeapon *CHudWeaponSelection::FindPrevWeaponInWeaponSelection(int iCu
 void CHudWeaponSelection::CycleToNextWeapon( void )
 {
 	// Get the local player.
-	C_BasePlayer *pPlayer = C_BasePlayer::GetLocalPlayer();
+	C_BasePlayer *pPlayer = (C_BasePlayer*)ClientEntityList().GetLocalPlayer();
 	if ( !pPlayer )
 		return;
 
@@ -589,7 +589,7 @@ void CHudWeaponSelection::CycleToNextWeapon( void )
 void CHudWeaponSelection::CycleToPrevWeapon( void )
 {
 	// Get the local player.
-	C_BasePlayer *pPlayer = C_BasePlayer::GetLocalPlayer();
+	C_BasePlayer *pPlayer = (C_BasePlayer*)ClientEntityList().GetLocalPlayer();
 	if ( !pPlayer )
 		return;
 
@@ -657,7 +657,7 @@ void CHudWeaponSelection::CycleToPrevWeapon( void )
 void CHudWeaponSelection::SwitchToLastWeapon( void )
 {
 	// Get the player's last weapon
-	C_BasePlayer *player = C_BasePlayer::GetLocalPlayer();
+	C_BasePlayer *player = (C_BasePlayer*)ClientEntityList().GetLocalPlayer();
 	if ( !player )
 		return;
 
@@ -703,7 +703,7 @@ void CHudWeaponSelection::SwitchToLastWeapon( void )
 //-----------------------------------------------------------------------------
 C_BaseCombatWeapon *CHudWeaponSelection::GetWeaponInSlot( int iSlot, int iSlotPos )
 {
-	C_BasePlayer *player = C_BasePlayer::GetLocalPlayer();
+	C_BasePlayer *player = (C_BasePlayer*)ClientEntityList().GetLocalPlayer();
 	if ( !player )
 		return NULL;
 
@@ -736,7 +736,7 @@ void CHudWeaponSelection::SelectWeapon( void )
 		return;
 	}
 
-	C_BasePlayer *player = C_BasePlayer::GetLocalPlayer();
+	C_BasePlayer *player = (C_BasePlayer*)ClientEntityList().GetLocalPlayer();
 	if ( !player )
 		return;
 
@@ -789,7 +789,7 @@ void CHudWeaponSelection::SelectWeapon( void )
 //-----------------------------------------------------------------------------
 void CHudWeaponSelection::CancelWeaponSelection()
 {
-	C_BasePlayer *player = C_BasePlayer::GetLocalPlayer();
+	C_BasePlayer *player = (C_BasePlayer*)ClientEntityList().GetLocalPlayer();
 	if ( !player )
 		return;
 
@@ -818,7 +818,7 @@ void CHudWeaponSelection::SelectWeaponSlot( int iSlot )
 	--iSlot;
 
 	// Get the local player.
-	C_BasePlayer *pPlayer = C_BasePlayer::GetLocalPlayer();
+	C_BasePlayer *pPlayer = (C_BasePlayer*)ClientEntityList().GetLocalPlayer();
 	if ( !pPlayer )
 		return;
 

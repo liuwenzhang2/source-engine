@@ -250,7 +250,7 @@ void CPrediction::CheckError( int commands_acknowledged )
 	if ( !cl_predict->GetInt() )
 		return;
 
-	player = C_BasePlayer::GetLocalPlayer();
+	player = (C_BasePlayer*)ClientEntityList().GetLocalPlayer();
 	if ( !player )
 		return;
 	
@@ -417,7 +417,7 @@ void CPrediction::PreEntityPacketReceived ( int commands_acknowledged, int curre
 		return;
 	}
 
-	C_BasePlayer *current = C_BasePlayer::GetLocalPlayer();
+	C_BasePlayer *current = (C_BasePlayer*)ClientEntityList().GetLocalPlayer();
 	// No local player object?
 	if ( !current )
 		return;
@@ -453,7 +453,7 @@ void CPrediction::PostEntityPacketReceived( void )
 	if ( !cl_predict->GetInt() )
 		return;
 
-	C_BasePlayer *current = C_BasePlayer::GetLocalPlayer();
+	C_BasePlayer *current = (C_BasePlayer*)ClientEntityList().GetLocalPlayer();
 	// No local player object?
 	if ( !current )
 		return;
@@ -544,7 +544,7 @@ void CPrediction::PostNetworkDataReceived( int commands_acknowledged )
 
 	bool entityDumped = false;
 
-	C_BasePlayer *current = C_BasePlayer::GetLocalPlayer();
+	C_BasePlayer *current = (C_BasePlayer*)ClientEntityList().GetLocalPlayer();
 	// No local player object?
 	if ( !current )
 		return;
@@ -1413,7 +1413,7 @@ void CPrediction::ShiftIntermediateDataForward( int slots_to_remove, int number_
 	VPROF( "CPrediction::ShiftIntermediateDataForward" );
 	PREDICTION_TRACKVALUECHANGESCOPE( "shift" );
 
-	C_BasePlayer *current = C_BasePlayer::GetLocalPlayer();
+	C_BasePlayer *current = (C_BasePlayer*)ClientEntityList().GetLocalPlayer();
 	// No local player object?
 	if ( !current )
 		return;
@@ -1449,7 +1449,7 @@ void CPrediction::RestoreEntityToPredictedFrame( int predicted_frame )
 	VPROF( "CPrediction::RestoreEntityToPredictedFrame" );
 	PREDICTION_TRACKVALUECHANGESCOPE( "restoretopred" );
 
-	C_BasePlayer *current = C_BasePlayer::GetLocalPlayer();
+	C_BasePlayer *current = (C_BasePlayer*)ClientEntityList().GetLocalPlayer();
 	// No local player object?
 	if ( !current )
 		return;
@@ -1544,7 +1544,7 @@ int CPrediction::ComputeFirstCommandToExecute( bool received_new_world_update, i
 		{
 			if ( m_bPreviousAckHadErrors )
 			{
-				C_BasePlayer *pLocalPlayer = C_BasePlayer::GetLocalPlayer();
+				C_BasePlayer *pLocalPlayer = (C_BasePlayer*)ClientEntityList().GetLocalPlayer();
 				
 				// If an entity gets a prediction error, then we want to clear out its interpolated variables
 				// so we don't mix different samples at the same timestamps. We subtract 1 tick interval here because
@@ -1757,7 +1757,7 @@ void CPrediction::_Update( bool received_new_world_update, bool validframe,
 						 int incoming_acknowledged, int outgoing_command )
 {
 #if !defined( NO_ENTITY_PREDICTION )
-	C_BasePlayer *localPlayer = C_BasePlayer::GetLocalPlayer();
+	C_BasePlayer *localPlayer = (C_BasePlayer*)ClientEntityList().GetLocalPlayer();
 	if ( !localPlayer )
 		return;
 
@@ -1833,7 +1833,7 @@ bool CPrediction::IsFirstTimePredicted( void ) const
 //-----------------------------------------------------------------------------
 void CPrediction::GetViewOrigin( Vector& org )
 {
-	C_BasePlayer *player = C_BasePlayer::GetLocalPlayer();
+	C_BasePlayer *player = (C_BasePlayer*)ClientEntityList().GetLocalPlayer();
 	if ( !player )
 	{
 		org.Init();
@@ -1850,7 +1850,7 @@ void CPrediction::GetViewOrigin( Vector& org )
 //-----------------------------------------------------------------------------
 void CPrediction::SetViewOrigin( Vector& org )
 {
-	C_BasePlayer *player = C_BasePlayer::GetLocalPlayer();
+	C_BasePlayer *player = (C_BasePlayer*)ClientEntityList().GetLocalPlayer();
 	if ( !player )
 		return;
 
@@ -1866,7 +1866,7 @@ void CPrediction::SetViewOrigin( Vector& org )
 //-----------------------------------------------------------------------------
 void CPrediction::GetViewAngles( QAngle& ang )
 {
-	C_BasePlayer *player = C_BasePlayer::GetLocalPlayer();
+	C_BasePlayer *player = (C_BasePlayer*)ClientEntityList().GetLocalPlayer();
 	if ( !player )
 	{
 		ang.Init();
@@ -1883,7 +1883,7 @@ void CPrediction::GetViewAngles( QAngle& ang )
 //-----------------------------------------------------------------------------
 void CPrediction::SetViewAngles( QAngle& ang )
 {
-	C_BasePlayer *player = C_BasePlayer::GetLocalPlayer();
+	C_BasePlayer *player = (C_BasePlayer*)ClientEntityList().GetLocalPlayer();
 	if ( !player )
 		return;
 
@@ -1897,7 +1897,7 @@ void CPrediction::SetViewAngles( QAngle& ang )
 //-----------------------------------------------------------------------------
 void CPrediction::GetLocalViewAngles( QAngle& ang )
 {
-	C_BasePlayer *player = C_BasePlayer::GetLocalPlayer();
+	C_BasePlayer *player = (C_BasePlayer*)ClientEntityList().GetLocalPlayer();
 	if ( !player )
 	{
 		ang.Init();
@@ -1914,7 +1914,7 @@ void CPrediction::GetLocalViewAngles( QAngle& ang )
 //-----------------------------------------------------------------------------
 void CPrediction::SetLocalViewAngles( QAngle& ang )
 {
-	C_BasePlayer *player = C_BasePlayer::GetLocalPlayer();
+	C_BasePlayer *player = (C_BasePlayer*)ClientEntityList().GetLocalPlayer();
 	if ( !player )
 		return;
 

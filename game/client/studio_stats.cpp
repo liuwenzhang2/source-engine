@@ -80,7 +80,7 @@ void StudioStats_FindClosestEntity( CClientRenderablesList *pClientRenderablesLi
 	if ( r_studio_stats.GetBool() == false )
 		return;
 
-	C_BasePlayer *pPlayer = C_BasePlayer::GetLocalPlayer();
+	C_BasePlayer *pPlayer = (C_BasePlayer*)ClientEntityList().GetLocalPlayer();
 	if ( !pPlayer )
 		return;
 
@@ -115,7 +115,7 @@ void StudioStats_FindClosestEntity( CClientRenderablesList *pClientRenderablesLi
 	{
 		C_BaseEntity *pEntity = g_pStudioStatsEntity->GetIClientUnknown()->GetBaseEntity();
 
-		if ( pEntity && ( pEntity != C_BasePlayer::GetLocalPlayer() ) )
+		if ( pEntity && ( pEntity != (C_BasePlayer*)ClientEntityList().GetLocalPlayer() ) )
 		{
 			switch ( iStudioStatMode )
 			{

@@ -109,7 +109,7 @@ void CHudAmmo::OnThink()
 	hudlcd->SetGlobalStat( "(weapon_print_name)", wpn ? wpn->GetPrintName() : " " );
 	hudlcd->SetGlobalStat( "(weapon_name)", wpn ? wpn->GetName() : " " );
 
-	C_BasePlayer *player = C_BasePlayer::GetLocalPlayer();
+	C_BasePlayer *player = (C_BasePlayer*)ClientEntityList().GetLocalPlayer();
 	if (!wpn || !player || !wpn->UsesPrimaryAmmo())
 	{
 		hudlcd->SetGlobalStat( "(ammo_primary)", "n/a" );

@@ -185,7 +185,7 @@ void C_ScriptIntro::PostDataUpdate( DataUpdateType_t updateType )
 	}
 	else if ( m_IntroData.m_Passes.Count() == 2 )
 	{
-		C_BasePlayer *player = C_BasePlayer::GetLocalPlayer();
+		C_BasePlayer *player = (C_BasePlayer*)ClientEntityList().GetLocalPlayer();
 		if ( !player )
 			return;
 

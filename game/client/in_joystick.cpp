@@ -241,7 +241,7 @@ float AutoAimDampening( float x, int axis, float dist )
 	if( joy_autoaimdampen.GetFloat() > 0.0f && fabs(x) < joy_autoaimdampenrange.GetFloat() )
 	{
 		// Get the HL2 player
-		C_BaseHLPlayer *pLocalPlayer = (C_BaseHLPlayer *)C_BasePlayer::GetLocalPlayer();
+		C_BaseHLPlayer *pLocalPlayer = (C_BaseHLPlayer *)ClientEntityList().GetLocalPlayer();
 
 		if( pLocalPlayer )
 		{
@@ -814,7 +814,7 @@ void CInput::JoyStickMove( float frametime, CUserCmd *cmd )
 	float   aspeed = frametime * gHUD.GetFOVSensitivityAdjust();
 
 	// apply forward and side control
-	C_BasePlayer *pLocalPlayer = C_BasePlayer::GetLocalPlayer();
+	C_BasePlayer *pLocalPlayer = (C_BasePlayer*)ClientEntityList().GetLocalPlayer();
 	
 	int iResponseCurve = 0;
 	if ( pLocalPlayer && pLocalPlayer->IsInAVehicle() )

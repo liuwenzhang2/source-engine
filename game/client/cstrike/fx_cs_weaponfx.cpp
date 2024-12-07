@@ -15,7 +15,7 @@
 //-----------------------------------------------------------------------------
 void CStrike_EjectBrass( int shell, const CEffectData &data )
 {
-	C_BasePlayer *pPlayer = C_BasePlayer::GetLocalPlayer();
+	C_BasePlayer *pPlayer = (C_BasePlayer*)ClientEntityList().GetLocalPlayer();
 
 	if( !pPlayer )
 		return;

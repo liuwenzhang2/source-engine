@@ -283,7 +283,7 @@ void CFPSPanel::Paint()
 		QAngle angles = MainViewAngles();
 		if ( nShowPosMode == 2 )
 		{
-			C_BasePlayer *pPlayer = C_BasePlayer::GetLocalPlayer();
+			C_BasePlayer *pPlayer = (C_BasePlayer*)ClientEntityList().GetLocalPlayer();
 			if ( pPlayer )
 			{
 				vecOrigin = pPlayer->GetEngineObject()->GetAbsOrigin();
@@ -304,7 +304,7 @@ void CFPSPanel::Paint()
 		i++;
 
 		Vector vel( 0, 0, 0 );
-		C_BasePlayer *player = C_BasePlayer::GetLocalPlayer();
+		C_BasePlayer *player = (C_BasePlayer*)ClientEntityList().GetLocalPlayer();
 		if ( player )
 		{
 			vel = player->GetEngineObject()->GetLocalVelocity();

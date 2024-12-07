@@ -333,7 +333,7 @@ void CHudDODDamageIndicator::MsgFunc_Damage( bf_read &msg )
 	Vector vecFrom;
 	msg.ReadBitVec3Coord( vecFrom );
 
-	C_BasePlayer *pPlayer = C_BasePlayer::GetLocalPlayer();
+	C_BasePlayer *pPlayer = (C_BasePlayer*)ClientEntityList().GetLocalPlayer();
 	if ( !pPlayer )
 		return;
 

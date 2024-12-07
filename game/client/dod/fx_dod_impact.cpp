@@ -160,7 +160,7 @@ void ImpactCallback( const CEffectData &data )
 	if ( Impact( vecOrigin, vecStart, iMaterial, iDamageType, iHitbox, pEntity, tr ) )
 	{
 		float flScale = 0.75f;
-		C_BasePlayer *pPlayer = C_BasePlayer::GetLocalPlayer();
+		C_BasePlayer *pPlayer = (C_BasePlayer*)ClientEntityList().GetLocalPlayer();
 
 		if ( pPlayer )
 		{

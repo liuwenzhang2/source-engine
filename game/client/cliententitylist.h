@@ -2713,6 +2713,9 @@ public:
 	int CountRagdolls(bool bOnlySimulatingRagdolls) { return bOnlySimulatingRagdolls ? m_iSimulatedRagdollCount : m_iRagdollCount; }
 	// Methods of IGameSystem
 	virtual void UpdateRagdolls(float frametime);
+
+	C_BaseEntity* GetLocalPlayer(void);
+	void SetLocalPlayer(C_BaseEntity* pBasePlayer);
 private:
 	void AddPVSNotifier(IClientUnknown* pUnknown);
 	void RemovePVSNotifier(IClientUnknown* pUnknown);
@@ -2806,6 +2809,8 @@ private:
 	int m_iMaxRagdolls;
 	int m_iSimulatedRagdollCount;
 	int m_iRagdollCount;
+
+	C_BaseEntity* m_pLocalPlayer = NULL;
 };
 
 template<class T>
@@ -4365,9 +4370,9 @@ void CClientEntityList<T>::UpdateRagdolls(float frametime) // EPISODIC VERSION
 	int furthestOne = m_LRU.Head();
 	float furthestDistSq = 0;
 #ifdef CLIENT_DLL
-	C_BasePlayer* pPlayer = C_BasePlayer::GetLocalPlayer();
+	C_BaseEntity* pPlayer = GetLocalPlayer();
 #else
-	CBasePlayer* pPlayer = UTIL_GetLocalPlayer();
+	CBaseEntity* pPlayer = UTIL_GetLocalPlayer();
 #endif
 
 	if (pPlayer && m_LRU.Count() > iMaxRagdollCount) // find the furthest one algorithm
@@ -4521,6 +4526,23 @@ void CClientEntityList<T>::UpdateRagdolls(float frametime) // Non-episodic versi
 }
 
 #endif // HL2_EPISODIC
+
+//-----------------------------------------------------------------------------
+// Purpose: Gets a pointer to the local player, if it exists yet.
+// Output : C_BasePlayer
+//-----------------------------------------------------------------------------
+template<class T>
+C_BaseEntity* CClientEntityList<T>::GetLocalPlayer(void)
+{
+	return m_pLocalPlayer;
+}
+
+template<class T>
+void CClientEntityList<T>::SetLocalPlayer(C_BaseEntity* pBasePlayer)
+{
+	m_pLocalPlayer = pBasePlayer;
+}
+
 
 //-----------------------------------------------------------------------------
 // Returns the client entity list

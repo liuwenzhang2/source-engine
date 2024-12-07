@@ -544,7 +544,7 @@ void CModelPanel::Paint()
 {
 	BaseClass::Paint();
 
-	C_BasePlayer *pLocalPlayer = C_BasePlayer::GetLocalPlayer();
+	C_BasePlayer *pLocalPlayer = (C_BasePlayer*)ClientEntityList().GetLocalPlayer();
 
 	if ( !pLocalPlayer || !m_pModelInfo )
 		return;

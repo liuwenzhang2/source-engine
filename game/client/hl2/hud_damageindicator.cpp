@@ -337,7 +337,7 @@ void CHudDamageIndicator::MsgFunc_Damage( bf_read &msg )
 	vecFrom.y = msg.ReadFloat();
 	vecFrom.z = msg.ReadFloat();
 
-	C_BasePlayer *pPlayer = C_BasePlayer::GetLocalPlayer();
+	C_BasePlayer *pPlayer = (C_BasePlayer*)ClientEntityList().GetLocalPlayer();
 	if ( !pPlayer )
 		return;
 

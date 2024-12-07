@@ -1404,7 +1404,7 @@ void C_BaseEntity::PostDataUpdate( DataUpdateType_t updateType )
 	// It's possible that a new entity will need to be forceably added to the 
 	//   player simulation list.  If so, do this here
 //#if !defined( NO_ENTITY_PREDICTION )
-//	C_BasePlayer *local = C_BasePlayer::GetLocalPlayer();
+//	C_BasePlayer *local = (C_BasePlayer*)ClientEntityList().GetLocalPlayer();
 //	if ( IsPlayerSimulated() &&
 //		( NULL != local ) && 
 //		( local == m_hOwnerEntity ) )
@@ -1429,7 +1429,7 @@ void C_BaseEntity::CheckInitPredictable( const char *context )
 	if ( !cl_predict->GetInt() )
 		return;
 
-	C_BasePlayer *player = C_BasePlayer::GetLocalPlayer();
+	C_BasePlayer *player = (C_BasePlayer*)ClientEntityList().GetLocalPlayer();
 
 	if ( !player )
 		return;
@@ -2663,7 +2663,7 @@ CON_COMMAND( cl_sizeof, "Determines the size of the specified client class." )
 CON_COMMAND_F( dlight_debug, "Creates a dlight in front of the player", FCVAR_CHEAT )
 {
 	dlight_t *el = effects->CL_AllocDlight( 1 );
-	C_BasePlayer *player = C_BasePlayer::GetLocalPlayer();
+	C_BasePlayer *player = (C_BasePlayer*)ClientEntityList().GetLocalPlayer();
 	if ( !player )
 		return;
 	Vector start = player->EyePosition();
@@ -2884,9 +2884,9 @@ void C_BaseEntity::UpdateOnRemove( void )
 		GetEngineObject()->DestroyIntermediateData();
 	}
 	// If it's play simulated, remove from simulation list if the player still exists...
-	//if ( IsPlayerSimulated() && C_BasePlayer::GetLocalPlayer() )
+	//if ( IsPlayerSimulated() && (C_BasePlayer*)ClientEntityList().GetLocalPlayer() )
 	//{
-	//	C_BasePlayer::GetLocalPlayer()->RemoveFromPlayerSimulationList( this );
+	//	(C_BasePlayer*)ClientEntityList().GetLocalPlayer()->RemoveFromPlayerSimulationList( this );
 	//}
 #endif
 	{
@@ -3036,7 +3036,7 @@ void C_BaseEntity::SUB_Remove( void )
 
 CBaseEntity *FindEntityInFrontOfLocalPlayer()
 {
-	C_BasePlayer *pPlayer = C_BasePlayer::GetLocalPlayer();
+	C_BasePlayer *pPlayer = (C_BasePlayer*)ClientEntityList().GetLocalPlayer();
 	if ( pPlayer )
 	{
 		// Get the entity under my crosshair

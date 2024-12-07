@@ -1784,7 +1784,7 @@ int C_EngineObjectInternal::BaseInterpolatePart1(float& currentTime, Vector& old
 
 	if (m_pOuter->GetPredictable() /*|| IsClientCreated()*/)
 	{
-		C_BasePlayer* localplayer = C_BasePlayer::GetLocalPlayer();
+		C_BasePlayer* localplayer = (C_BasePlayer*)ClientEntityList().GetLocalPlayer();
 		if (localplayer && currentTime == gpGlobals->curtime)
 		{
 			currentTime = localplayer->GetFinalPredictedTime();
@@ -2707,7 +2707,7 @@ int C_EngineObjectInternal::RestoreData(const char* context, int slot, int type)
 //-----------------------------------------------------------------------------
 void C_EngineObjectInternal::EstimateAbsVelocity(Vector& vel)
 {
-	if (this->m_pOuter == C_BasePlayer::GetLocalPlayer())
+	if (this->m_pOuter == (C_BasePlayer*)ClientEntityList().GetLocalPlayer())
 	{
 		// This is interpolated and networked
 		vel = GetAbsVelocity();

@@ -113,7 +113,7 @@ void CHudHealth::VidInit()
 void CHudHealth::OnThink()
 {
 	int newHealth = 0;
-	C_BasePlayer *local = C_BasePlayer::GetLocalPlayer();
+	C_BasePlayer *local = (C_BasePlayer*)ClientEntityList().GetLocalPlayer();
 	if ( local )
 	{
 		// Never below zero

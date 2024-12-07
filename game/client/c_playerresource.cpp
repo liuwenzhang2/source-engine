@@ -194,7 +194,7 @@ int C_PlayerResource::GetFrags(int index )
 
 bool C_PlayerResource::IsLocalPlayer(int index)
 {
-	C_BasePlayer *pPlayer =	C_BasePlayer::GetLocalPlayer();
+	C_BasePlayer *pPlayer = (C_BasePlayer*)ClientEntityList().GetLocalPlayer();
 
 	if ( !pPlayer )
 		return false;

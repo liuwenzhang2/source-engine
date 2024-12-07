@@ -163,7 +163,7 @@ void CWeaponHL2MPBase::OnDataChanged( DataUpdateType_t type )
 
 bool CWeaponHL2MPBase::ShouldPredict()
 {
-	if ( GetOwner() && GetOwner() == C_BasePlayer::GetLocalPlayer() )
+	if ( GetOwner() && GetOwner() == (C_BasePlayer*)ClientEntityList().GetLocalPlayer() )
 		return true;
 
 	return BaseClass::ShouldPredict();

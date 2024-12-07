@@ -192,7 +192,7 @@ void CCSFreezePanel::FireGameEvent( IGameEvent * event )
 		// see if the local player died
 		int iPlayerIndexVictim = engine->GetPlayerForUserID( event->GetInt( "userid" ) );
 		int iPlayerIndexKiller = engine->GetPlayerForUserID( event->GetInt( "attacker" ) );
-		C_BasePlayer *pLocalPlayer = C_BasePlayer::GetLocalPlayer();
+		C_BasePlayer *pLocalPlayer = (C_BasePlayer*)ClientEntityList().GetLocalPlayer();
 		CCSPlayer* pKiller =  ToCSPlayer(ClientEntityList().GetBaseEntity(iPlayerIndexKiller));
 
 		if ( pLocalPlayer && iPlayerIndexVictim == pLocalPlayer->entindex() )

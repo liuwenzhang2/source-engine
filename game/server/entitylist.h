@@ -1472,19 +1472,6 @@ inline int CEngineObjectInternal::GetEffects(void) const
 inline void CEngineObjectInternal::RemoveEffects(int nEffects)
 {
 	m_pOuter->OnRemoveEffects(nEffects);
-#if !defined( CLIENT_DLL )
-#ifdef HL2_EPISODIC
-	if (nEffects & (EF_BRIGHTLIGHT | EF_DIMLIGHT))
-	{
-		// Hack for now, to avoid player emitting radius with his flashlight
-		if (!m_pOuter->IsPlayer())
-		{
-			RemoveEntityFromDarknessCheck(this->m_pOuter);
-		}
-	}
-#endif // HL2_EPISODIC
-#endif // !CLIENT_DLL
-
 	m_fEffects &= ~nEffects;
 	if (nEffects & EF_NODRAW)
 	{
@@ -1499,19 +1486,7 @@ inline void CEngineObjectInternal::RemoveEffects(int nEffects)
 
 inline void CEngineObjectInternal::ClearEffects(void)
 {
-#if !defined( CLIENT_DLL )
-#ifdef HL2_EPISODIC
-	if (m_fEffects & (EF_BRIGHTLIGHT | EF_DIMLIGHT))
-	{
-		// Hack for now, to avoid player emitting radius with his flashlight
-		if (!m_pOuter->IsPlayer())
-		{
-			RemoveEntityFromDarknessCheck(this->m_pOuter);
-		}
-	}
-#endif // HL2_EPISODIC
-#endif // !CLIENT_DLL
-
+	m_pOuter->OnRemoveEffects(m_fEffects);
 	m_fEffects = 0;
 #ifndef CLIENT_DLL
 	m_pOuter->DispatchUpdateTransmitState();
@@ -4732,9 +4707,9 @@ void CGlobalEntityList<T>::UpdateRagdolls(float frametime) // EPISODIC VERSION
 	int furthestOne = m_LRU.Head();
 	float furthestDistSq = 0;
 #ifdef CLIENT_DLL
-	C_BasePlayer* pPlayer = C_BasePlayer::GetLocalPlayer();
+	C_BasePlayer* pPlayer = (C_BasePlayer*)ClientEntityList().GetLocalPlayer();
 #else
-	CBasePlayer* pPlayer = UTIL_GetLocalPlayer();
+	CBaseEntity* pPlayer = (CBaseEntity*)UTIL_GetLocalPlayer();
 #endif
 
 	if (pPlayer && m_LRU.Count() > iMaxRagdollCount) // find the furthest one algorithm

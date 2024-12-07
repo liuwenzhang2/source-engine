@@ -141,7 +141,7 @@ void CDoDHudAmmo::ApplySchemeSettings( vgui::IScheme *pScheme )
 void CDoDHudAmmo::OnThink()
 {
 	C_BaseCombatWeapon *wpn = GetActiveWeapon();
-	C_BasePlayer *player = C_BasePlayer::GetLocalPlayer();
+	C_BasePlayer *player = (C_BasePlayer*)ClientEntityList().GetLocalPlayer();
 
 	hudlcd->SetGlobalStat( "(weapon_print_name)", wpn ? wpn->GetPrintName() : " " );
 	hudlcd->SetGlobalStat( "(weapon_name)", wpn ? wpn->GetName() : " " );

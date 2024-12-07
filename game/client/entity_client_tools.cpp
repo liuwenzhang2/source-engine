@@ -589,13 +589,13 @@ HTOOLHANDLE CClientTools::GetToolHandleForEntityByIndex( int entindex )
 
 EntitySearchResult CClientTools::GetLocalPlayer()
 {
-	C_BasePlayer *p = C_BasePlayer::GetLocalPlayer();
+	C_BasePlayer *p = (C_BasePlayer*)ClientEntityList().GetLocalPlayer();
 	return reinterpret_cast< EntitySearchResult >( p );
 }
 
 bool CClientTools::GetLocalPlayerEyePosition( Vector& org, QAngle& ang, float &fov )
 {
-	C_BasePlayer *pl = C_BasePlayer::GetLocalPlayer();
+	C_BasePlayer *pl = (C_BasePlayer*)ClientEntityList().GetLocalPlayer();
 	if ( pl == NULL )
 		return false;
 

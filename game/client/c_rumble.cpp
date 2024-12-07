@@ -795,7 +795,7 @@ void RumbleEffect( unsigned char effectIndex, unsigned char rumbleData, unsigned
 //---------------------------------------------------------
 void UpdateRumbleEffects()
 {
-	C_BasePlayer *localPlayer = C_BasePlayer::GetLocalPlayer();
+	C_BasePlayer *localPlayer = (C_BasePlayer*)ClientEntityList().GetLocalPlayer();
 	if( !localPlayer || !localPlayer->IsAlive() )
 	{
 		StopAllRumbleEffects();
@@ -809,7 +809,7 @@ void UpdateRumbleEffects()
 //---------------------------------------------------------
 void UpdateScreenShakeRumble( float shake, float balance )
 {
-	C_BasePlayer *localPlayer = C_BasePlayer::GetLocalPlayer();
+	C_BasePlayer *localPlayer = (C_BasePlayer*)ClientEntityList().GetLocalPlayer();
 	if( !localPlayer || !localPlayer->IsAlive() )
 	{
 		return;

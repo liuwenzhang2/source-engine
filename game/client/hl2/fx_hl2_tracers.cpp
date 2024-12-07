@@ -259,7 +259,7 @@ void FX_AR2Tracer( Vector& start, Vector& end, int velocity, bool makeWhiz )
 //-----------------------------------------------------------------------------
 void AR2TracerCallback( const CEffectData &data )
 {
-	C_BasePlayer *player = C_BasePlayer::GetLocalPlayer();
+	C_BasePlayer *player = (C_BasePlayer*)ClientEntityList().GetLocalPlayer();
 	
 	if ( player == NULL )
 		return;

@@ -103,7 +103,7 @@ void C_HL1MP_Player::UpdateClientSideAnimation()
 {
 	// Update the animation data. It does the local check here so this works when using
 	// a third-person camera (and we don't have valid player angles).
-	if ( this == C_BasePlayer::GetLocalPlayer() )
+	if ( this == (C_BasePlayer*)ClientEntityList().GetLocalPlayer() )
 		m_PlayerAnimState->Update( EyeAngles()[YAW], m_angEyeAngles[PITCH] );
 	else
 		m_PlayerAnimState->Update( m_angEyeAngles[YAW], m_angEyeAngles[PITCH] );
@@ -122,7 +122,7 @@ void C_HL1MP_Player::ProcessMuzzleFlashEvent()
 {
 #if 0
 	// Reenable when the weapons have muzzle flash attachments in the right spot.
-	if ( this != C_BasePlayer::GetLocalPlayer() )
+	if ( this != (C_BasePlayer*)ClientEntityList().GetLocalPlayer() )
 	{
 		Vector vAttachment;
 		QAngle dummyAngles;
@@ -214,7 +214,7 @@ void C_HL1MP_Player::PreThink( void )
 
 	QAngle vTempAngles = GetEngineObject()->GetLocalAngles();
 
-	if ( GetLocalPlayer() == this )
+	if ((C_BasePlayer*)ClientEntityList().GetLocalPlayer() == this )
 	{
 		vTempAngles[PITCH] = EyeAngles()[PITCH];
 	}
@@ -421,7 +421,7 @@ void C_HL1MPRagdoll::CreateHL1MPRagdoll( void )
 
 		// Copy all the interpolated vars from the player entity.
 		// The entity uses the interpolated history to get bone velocity.
-		bool bRemotePlayer = (pPlayer != C_BasePlayer::GetLocalPlayer());			
+		bool bRemotePlayer = (pPlayer != (C_BasePlayer*)ClientEntityList().GetLocalPlayer());			
 		if ( bRemotePlayer )
 		{
 			Interp_Copy( pPlayer );

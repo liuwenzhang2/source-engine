@@ -82,7 +82,7 @@ void CHudPoisonDamageIndicator::Reset( void )
 //-----------------------------------------------------------------------------
 bool CHudPoisonDamageIndicator::ShouldDraw( void )
 {
-	C_BasePlayer *pPlayer = C_BasePlayer::GetLocalPlayer();
+	C_BasePlayer *pPlayer = (C_BasePlayer*)ClientEntityList().GetLocalPlayer();
 	if ( !pPlayer )
 		return false;
 
@@ -96,7 +96,7 @@ bool CHudPoisonDamageIndicator::ShouldDraw( void )
 //-----------------------------------------------------------------------------
 void CHudPoisonDamageIndicator::OnThink()
 {
-	C_BasePlayer *pPlayer = C_BasePlayer::GetLocalPlayer();
+	C_BasePlayer *pPlayer = (C_BasePlayer*)ClientEntityList().GetLocalPlayer();
 	if ( !pPlayer )
 		return;
 

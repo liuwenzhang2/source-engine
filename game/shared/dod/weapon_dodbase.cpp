@@ -535,7 +535,7 @@ bool CWeaponDODBase::Deploy()
 		// We need to do this before the C_BaseAnimating code starts to drive
 		// clientside animation sequences on this model, which will be using bad sequences for the world model.
 		int iDesiredModelIndex = 0;
-		C_BasePlayer *localplayer = C_BasePlayer::GetLocalPlayer();
+		C_BasePlayer *localplayer = (C_BasePlayer*)ClientEntityList().GetLocalPlayer();
 		if ( localplayer && localplayer == GetOwner() && !C_BasePlayer::ShouldDrawLocalPlayer() )		// FIXME: use localplayer->ShouldDrawThisPlayer() instead.
 		{
 			iDesiredModelIndex = m_iViewModelIndex;
@@ -607,7 +607,7 @@ bool CWeaponDODBase::Deploy()
 
 	bool CWeaponDODBase::ShouldPredict()
 	{
-		if ( GetOwner() && GetOwner() == C_BasePlayer::GetLocalPlayer() )
+		if ( GetOwner() && GetOwner() == (C_BasePlayer*)ClientEntityList().GetLocalPlayer() )
 			return true;
 
 		return BaseClass::ShouldPredict();
@@ -1286,7 +1286,7 @@ void CWeaponDODBase::Smack()
 		{
 			if ( ShouldDrawMuzzleFlash() )
 			{
-				Assert( GetOwnerEntity() == C_BasePlayer::GetLocalPlayer() );
+				Assert( GetOwnerEntity() == (C_BasePlayer*)ClientEntityList().GetLocalPlayer() );
 
 				const char *pszMuzzleFlashEffect;
 
@@ -1339,7 +1339,7 @@ void CWeaponDODBase::Smack()
 	bool CWeaponDODBase::ShouldAutoEjectBrass( void )
 	{
 		// Don't eject brass if further than N units from the local player
-		C_BasePlayer *pLocalPlayer = C_BasePlayer::GetLocalPlayer();
+		C_BasePlayer *pLocalPlayer = (C_BasePlayer*)ClientEntityList().GetLocalPlayer();
 		if ( !pLocalPlayer )
 			return true;
 

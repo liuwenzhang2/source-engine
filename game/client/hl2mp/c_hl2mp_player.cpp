@@ -143,7 +143,7 @@ void C_HL2MP_Player::TraceAttack( const CTakeDamageInfo &info, const Vector &vec
 
 C_HL2MP_Player* C_HL2MP_Player::GetLocalHL2MPPlayer()
 {
-	return (C_HL2MP_Player*)C_BasePlayer::GetLocalPlayer();
+	return (C_HL2MP_Player*)ClientEntityList().GetLocalPlayer();
 }
 
 void C_HL2MP_Player::Initialize( void )
@@ -311,7 +311,7 @@ void C_HL2MP_Player::PreThink( void )
 {
 	QAngle vTempAngles = GetEngineObject()->GetLocalAngles();
 
-	if ( GetLocalPlayer() == this )
+	if ((C_BasePlayer*)ClientEntityList().GetLocalPlayer() == this )
 	{
 		vTempAngles[PITCH] = EyeAngles()[PITCH];
 	}
@@ -369,7 +369,7 @@ void C_HL2MP_Player::AddEntity( void )
 	// Zero out model pitch, blending takes care of all of it.
 	GetEngineObject()->SetLocalAnglesDim( X_INDEX, 0 );
 
-	if( this != C_BasePlayer::GetLocalPlayer() )
+	if( this != (C_BasePlayer*)ClientEntityList().GetLocalPlayer() )
 	{
 		if (GetEngineObject()->IsEffectActive( EF_DIMLIGHT ) )
 		{
@@ -853,7 +853,7 @@ void C_HL2MPRagdoll::CreateHL2MPRagdoll( void )
 
 		// Copy all the interpolated vars from the player entity.
 		// The entity uses the interpolated history to get bone velocity.
-		bool bRemotePlayer = (pPlayer != C_BasePlayer::GetLocalPlayer());			
+		bool bRemotePlayer = (pPlayer != (C_BasePlayer*)ClientEntityList().GetLocalPlayer());			
 		if ( bRemotePlayer )
 		{
 			Interp_Copy( pPlayer );

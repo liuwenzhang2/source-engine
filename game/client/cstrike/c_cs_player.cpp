@@ -428,7 +428,7 @@ void C_CSRagdoll::CreateCSRagdoll()
 
 		// Copy all the interpolated vars from the player entity.
 		// The entity uses the interpolated history to get bone velocity.
-		bool bRemotePlayer = (pPlayer != C_BasePlayer::GetLocalPlayer());
+		bool bRemotePlayer = (pPlayer != (C_BasePlayer*)ClientEntityList().GetLocalPlayer());
 		if ( bRemotePlayer )
 		{
 			Interp_Copy( pPlayer );
@@ -619,7 +619,7 @@ void RecvProxy_FlashTime( const CRecvProxyData *pData, void *pStruct, void *pOut
 {
 	C_CSPlayer *pPlayerData = (C_CSPlayer *) pStruct;
 
-	if( pPlayerData != C_BasePlayer::GetLocalPlayer() )
+	if( pPlayerData != (C_BasePlayer*)ClientEntityList().GetLocalPlayer() )
 		return;
 
 	if ( (pPlayerData->m_flFlashDuration != pData->m_Value.m_Float) && pData->m_Value.m_Float > 0 )
@@ -869,7 +869,7 @@ bool C_CSPlayer::IsVIP() const
 
 C_CSPlayer* C_CSPlayer::GetLocalCSPlayer()
 {
-	return (C_CSPlayer*)C_BasePlayer::GetLocalPlayer();
+	return (C_CSPlayer*)ClientEntityList().GetLocalPlayer();
 }
 
 
@@ -1156,7 +1156,7 @@ void C_CSPlayer::UpdateAddonModels()
 		iCurAddonBits = 0;
 
 	// If the local player is observing this entity in first-person mode, get rid of its addons.
-	C_BasePlayer *pPlayer = C_BasePlayer::GetLocalPlayer();
+	C_BasePlayer *pPlayer = (C_BasePlayer*)ClientEntityList().GetLocalPlayer();
 	if ( pPlayer && pPlayer->GetObserverMode() == OBS_MODE_IN_EYE && pPlayer->GetObserverTarget() == this )
 		iCurAddonBits = 0;
 
@@ -1430,7 +1430,7 @@ int	C_CSPlayer::GetMaxHealth() const
 //-----------------------------------------------------------------------------
 C_CSPlayer* GetLocalOrInEyeCSPlayer( void )
 {
-	C_CSPlayer *player = C_CSPlayer::GetLocalCSPlayer();
+	C_CSPlayer *player = (C_CSPlayer*)ClientEntityList().GetLocalPlayer();
 
 	if( player && player->GetObserverMode() == OBS_MODE_IN_EYE )
 	{
@@ -1732,7 +1732,7 @@ void C_CSPlayer::UpdateClientSideAnimation()
 
 	// Update the animation data. It does the local check here so this works when using
 	// a third-person camera (and we don't have valid player angles).
-	if ( this == C_CSPlayer::GetLocalCSPlayer() )
+	if ( this == (C_CSPlayer*)ClientEntityList().GetLocalPlayer() )
 		m_PlayerAnimState->Update( EyeAngles()[YAW], m_angEyeAngles[PITCH] );
 	else
 		m_PlayerAnimState->Update( m_angEyeAngles[YAW], m_angEyeAngles[PITCH] );
@@ -1749,7 +1749,7 @@ float g_flMuzzleFlashScale=1;
 
 void C_CSPlayer::ProcessMuzzleFlashEvent()
 {
-	CBasePlayer *pLocalPlayer = C_BasePlayer::GetLocalPlayer();
+	CBasePlayer *pLocalPlayer = (C_BasePlayer*)ClientEntityList().GetLocalPlayer();
 
 	// Reenable when the weapons have muzzle flash attachments in the right spot.
 	if ( this == pLocalPlayer )
@@ -2070,7 +2070,7 @@ const IEngineObjectClient* C_CSPlayer::GetRepresentativeRagdoll() const
 void C_CSPlayer::PlayReloadEffect()
 {
 	// Only play the effect for other players.
-	if ( this == C_CSPlayer::GetLocalCSPlayer() )
+	if ( this == (C_CSPlayer*)ClientEntityList().GetLocalPlayer() )
 	{
 		Assert( false ); // We shouldn't have been sent this message.
 		return;
@@ -2225,7 +2225,7 @@ const Vector& C_CSPlayer::GetRenderOrigin( void )
 
 void C_CSPlayer::Simulate( void )
 {
-	if( this != C_BasePlayer::GetLocalPlayer() )
+	if( this != (C_BasePlayer*)ClientEntityList().GetLocalPlayer() )
 	{
 		if (GetEngineObject()->IsEffectActive( EF_DIMLIGHT ) )
 		{
@@ -2315,7 +2315,7 @@ void C_CSPlayer::ReleaseFlashlight( void )
 
 bool C_CSPlayer::HasC4( void )
 {
-	if( this == C_CSPlayer::GetLocalPlayer() )
+	if( this == (C_CSPlayer*)ClientEntityList().GetLocalPlayer() )
 	{
 		return Weapon_OwnsThisType( "weapon_c4" );
 	}

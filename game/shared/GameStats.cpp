@@ -796,7 +796,7 @@ void CBaseGameStats_Driver::UpdatePerfStats( void )
 			// will be based on the first player
 			IGameResources *gr = GameResources();
 			int ping = 0;
-			C_BasePlayer *pPlayer =	C_BasePlayer::GetLocalPlayer(); // GetLocalPlayer( FirstValidSplitScreenSlot() );
+			C_BasePlayer *pPlayer =	(C_BasePlayer*)ClientEntityList().GetLocalPlayer(); // GetLocalPlayer( FirstValidSplitScreenSlot() );
 			if ( pPlayer && gr )
 			{
 				ping = gr->GetPing( pPlayer->entindex() );

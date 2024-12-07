@@ -177,7 +177,7 @@ bool CHUDQuickInfo::ShouldDraw( void )
 	if ( !m_icon_c || !m_icon_rb || !m_icon_rbe || !m_icon_lb || !m_icon_lbe )
 		return false;
 
-	C_BasePlayer *player = C_BasePlayer::GetLocalPlayer();
+	C_BasePlayer *player = (C_BasePlayer*)ClientEntityList().GetLocalPlayer();
 	if ( player == NULL )
 		return false;
 
@@ -194,7 +194,7 @@ void CHUDQuickInfo::OnThink()
 {
 	BaseClass::OnThink();
 
-	C_BasePlayer *player = C_BasePlayer::GetLocalPlayer();
+	C_BasePlayer *player = (C_BasePlayer*)ClientEntityList().GetLocalPlayer();
 	if ( player == NULL )
 		return;
 
@@ -239,7 +239,7 @@ void CHUDQuickInfo::OnThink()
 
 void CHUDQuickInfo::Paint()
 {
-	C_BasePlayer *player = C_BasePlayer::GetLocalPlayer();
+	C_BasePlayer *player = (C_BasePlayer*)ClientEntityList().GetLocalPlayer();
 	if ( player == NULL )
 		return;
 

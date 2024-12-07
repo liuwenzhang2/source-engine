@@ -140,7 +140,7 @@ void CTargetID::Paint()
 	if ( iEntIndex )
 	{
 		C_BasePlayer *pPlayer = static_cast<C_BasePlayer*>(cl_entitylist->GetEnt( iEntIndex ));
-		C_BasePlayer *pLocalPlayer = C_BasePlayer::GetLocalPlayer();
+		C_BasePlayer *pLocalPlayer = (C_BasePlayer*)ClientEntityList().GetLocalPlayer();
 
 		const char *printFormatString = NULL;
 		wchar_t wszPlayerName[ MAX_PLAYER_NAME_LENGTH ];

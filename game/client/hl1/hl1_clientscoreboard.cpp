@@ -644,7 +644,7 @@ void CHL1MPClientScoreBoardDialog::UpdatePlayerInfo()
 	int selectedRow = -1;
 	int i;
 
-	CBasePlayer *pPlayer = C_BasePlayer::GetLocalPlayer();
+	CBasePlayer *pPlayer = (C_BasePlayer*)ClientEntityList().GetLocalPlayer();
 
 	if ( !pPlayer || !g_PR )
 		return;

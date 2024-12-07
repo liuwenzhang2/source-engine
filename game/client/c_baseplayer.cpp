@@ -85,7 +85,6 @@ extern ConVar default_fov;
 extern ConVar sensitivity;
 #endif
 
-static C_BasePlayer *s_pLocalPlayer = NULL;
 
 static ConVar	cl_customsounds ( "cl_customsounds", "1", 0, "Enable customized player sound playback" );
 static ConVar	spec_track		( "spec_track", "0", 0, "Tracks an entity in spec mode" );
@@ -444,9 +443,9 @@ bool C_BasePlayer::Init(int entnum, int iSerialNum) {
 C_BasePlayer::~C_BasePlayer()
 {
 	DeactivateVguiScreen( m_pCurrentVguiScreen.Get() );
-	if ( this == s_pLocalPlayer )
+	if ( this == ClientEntityList().GetLocalPlayer() )
 	{
-		s_pLocalPlayer = NULL;
+		ClientEntityList().SetLocalPlayer(NULL);
 	}
 
 	delete m_pFlashlight;
@@ -796,8 +795,8 @@ void C_BasePlayer::PostDataUpdate( DataUpdateType_t updateType )
 
 		if ( iLocalPlayerIndex == entindex())
 		{
-			Assert( s_pLocalPlayer == NULL );
-			s_pLocalPlayer = this;
+			Assert( ClientEntityList().GetLocalPlayer() == NULL);
+			ClientEntityList().SetLocalPlayer(this);
 
 			// Reset our sound mixed in case we were in a freeze cam when we
 			// changed level, which would cause the snd_soundmixer to be left modified.
@@ -1812,15 +1811,6 @@ C_BaseAnimating* C_BasePlayer::GetRenderedWeaponModel()
 }
 
 //-----------------------------------------------------------------------------
-// Purpose: Gets a pointer to the local player, if it exists yet.
-// Output : C_BasePlayer
-//-----------------------------------------------------------------------------
-C_BasePlayer *C_BasePlayer::GetLocalPlayer( void )
-{
-	return s_pLocalPlayer;
-}
-
-//-----------------------------------------------------------------------------
 // Purpose: 
 // Input  : bThirdperson - 
 //-----------------------------------------------------------------------------
@@ -1858,7 +1848,7 @@ void C_BasePlayer::ThirdPersonSwitch( bool bThirdperson )
 //-----------------------------------------------------------------------------
 /*static*/ bool C_BasePlayer::LocalPlayerInFirstPersonView()
 {
-	C_BasePlayer *pLocalPlayer = C_BasePlayer::GetLocalPlayer();
+	C_BasePlayer *pLocalPlayer = (C_BasePlayer*)ClientEntityList().GetLocalPlayer();
 	if ( pLocalPlayer == NULL )
 	{
 		return false;
@@ -1899,7 +1889,7 @@ bool C_BasePlayer::InFirstPersonView()
 	{
 		return LocalPlayerInFirstPersonView();
 	}
-	C_BasePlayer *pLocalPlayer = C_BasePlayer::GetLocalPlayer();
+	C_BasePlayer *pLocalPlayer = (C_BasePlayer*)ClientEntityList().GetLocalPlayer();
 	if ( pLocalPlayer == NULL )
 	{
 		return false;
@@ -1945,7 +1935,7 @@ bool C_BasePlayer::ShouldDrawThisPlayer()
 //-----------------------------------------------------------------------------
 bool C_BasePlayer::IsLocalPlayer( void ) const
 {
-	return ( GetLocalPlayer() == this );
+	return ((C_BasePlayer*)ClientEntityList().GetLocalPlayer() == this );
 }
 
 int	C_BasePlayer::GetUserID( void )
@@ -2098,7 +2088,7 @@ void C_BasePlayer::GetToolRecordingState( KeyValues *msg )
 void C_BasePlayer::Simulate()
 {
 	//Frame updates
-	if ( this == C_BasePlayer::GetLocalPlayer() )
+	if ( this == (C_BasePlayer*)ClientEntityList().GetLocalPlayer() )
 	{
 		//Update the flashlight
 		Flashlight();
@@ -2152,7 +2142,7 @@ C_BaseCombatWeapon	*C_BasePlayer::GetActiveWeapon( void ) const
 	const C_BasePlayer *fromPlayer = this;
 
 	// if localplayer is in InEye spectator mode, return weapon on chased player
-	if ( (fromPlayer == GetLocalPlayer()) && ( GetObserverMode() == OBS_MODE_IN_EYE) )
+	if ( (fromPlayer == (C_BasePlayer*)ClientEntityList().GetLocalPlayer()) && ( GetObserverMode() == OBS_MODE_IN_EYE) )
 	{
 		C_BaseEntity *target =  GetObserverTarget();
 
@@ -2671,7 +2661,7 @@ IMaterial *C_BasePlayer::GetHeadLabelMaterial( void )
 
 bool IsInFreezeCam( void )
 {
-	C_BasePlayer *pPlayer = C_BasePlayer::GetLocalPlayer();
+	C_BasePlayer *pPlayer = (C_BasePlayer*)ClientEntityList().GetLocalPlayer();
 	if ( pPlayer && pPlayer->GetObserverMode() == OBS_MODE_FREEZECAM )
 		return true;
 
@@ -2959,7 +2949,7 @@ void C_BasePlayer::BuildFirstPersonMeathookTransformations( IStudioHdr *hdr, Vec
 
 void CC_DumpClientSoundscapeData( const CCommand& args )
 {
-	C_BasePlayer *pPlayer = C_BasePlayer::GetLocalPlayer();
+	C_BasePlayer *pPlayer = (C_BasePlayer*)ClientEntityList().GetLocalPlayer();
 	if ( !pPlayer )
 		return;
 

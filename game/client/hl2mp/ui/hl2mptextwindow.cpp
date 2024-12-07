@@ -145,13 +145,13 @@ CHL2MPSpectatorGUI::CHL2MPSpectatorGUI(IViewPort *pViewPort) : CSpectatorGUI(pVi
 
 bool CHL2MPSpectatorGUI::NeedsUpdate( void )
 {
-	if ( !C_BasePlayer::GetLocalPlayer() )
+	if ( !(C_BasePlayer*)ClientEntityList().GetLocalPlayer() )
 		return false;
 
-	if ( m_nLastSpecMode != C_BasePlayer::GetLocalPlayer()->GetObserverMode() )
+	if ( m_nLastSpecMode != ((C_BasePlayer*)ClientEntityList().GetLocalPlayer())->GetObserverMode() )
 		return true;
 
-	if ( m_nLastSpecTarget != C_BasePlayer::GetLocalPlayer()->GetObserverTarget() )
+	if ( m_nLastSpecTarget != ((C_BasePlayer*)ClientEntityList().GetLocalPlayer())->GetObserverTarget() )
 		return true;
 
 	return BaseClass::NeedsUpdate();
@@ -162,7 +162,7 @@ void CHL2MPSpectatorGUI::Update()
 {
 	BaseClass::Update();
 
-	C_BasePlayer *pLocalPlayer = C_BasePlayer::GetLocalPlayer();
+	C_BasePlayer *pLocalPlayer = (C_BasePlayer*)ClientEntityList().GetLocalPlayer();
 
 	if( pLocalPlayer )
 	{

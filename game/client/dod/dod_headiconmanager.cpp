@@ -165,8 +165,8 @@ void CHeadIconManager::DrawHeadIcons()
 		if ( GetClientVoiceMgr()->IsPlayerSpeaking( i+1 ) )
 			continue;
 
-		if ( C_BasePlayer::GetLocalPlayer()->GetObserverMode() == OBS_MODE_IN_EYE &&
-			 C_BasePlayer::GetLocalPlayer()->GetObserverTarget() == pPlayer )
+		if ( ((C_BasePlayer*)ClientEntityList().GetLocalPlayer())->GetObserverMode() == OBS_MODE_IN_EYE &&
+			 ((C_BasePlayer*)ClientEntityList().GetLocalPlayer())->GetObserverTarget() == pPlayer )
 			continue;
 
 		IMaterial *pMaterial = pPlayer->GetHeadIconMaterial();

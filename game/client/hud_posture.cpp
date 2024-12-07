@@ -127,7 +127,7 @@ void CHudPosture::Reset( void )
 
 void CHudPosture::OnTick( void )
 {
-	C_BasePlayer *pPlayer = C_BasePlayer::GetLocalPlayer();
+	C_BasePlayer *pPlayer = (C_BasePlayer*)ClientEntityList().GetLocalPlayer();
 	if (!pPlayer)
 		return;
 
@@ -172,7 +172,7 @@ void CHudPosture::OnTick( void )
 //-----------------------------------------------------------------------------
 void CHudPosture::Paint()
 {
-	C_BasePlayer *pPlayer = C_BasePlayer::GetLocalPlayer();
+	C_BasePlayer *pPlayer = (C_BasePlayer*)ClientEntityList().GetLocalPlayer();
 	if ( !pPlayer )
 		return;
 

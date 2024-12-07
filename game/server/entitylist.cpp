@@ -3171,20 +3171,7 @@ void CEngineObjectInternal::SetEffects(int nEffects)
 {
 	if (nEffects != m_fEffects)
 	{
-#ifdef HL2_EPISODIC
-		// Hack for now, to avoid player emitting radius with his flashlight
-		if (!m_pOuter->IsPlayer())
-		{
-			if ((nEffects & (EF_BRIGHTLIGHT | EF_DIMLIGHT)) && !(m_fEffects & (EF_BRIGHTLIGHT | EF_DIMLIGHT)))
-			{
-				AddEntityToDarknessCheck(this->m_pOuter);
-			}
-			else if (!(nEffects & (EF_BRIGHTLIGHT | EF_DIMLIGHT)) && (m_fEffects & (EF_BRIGHTLIGHT | EF_DIMLIGHT)))
-			{
-				RemoveEntityFromDarknessCheck(this->m_pOuter);
-			}
-		}
-#endif // HL2_EPISODIC
+		m_pOuter->OnSetEffects(nEffects);
 		m_fEffects = nEffects;
 		m_pOuter->DispatchUpdateTransmitState();
 	}
@@ -3193,16 +3180,6 @@ void CEngineObjectInternal::SetEffects(int nEffects)
 void CEngineObjectInternal::AddEffects(int nEffects)
 {
 	m_pOuter->OnAddEffects(nEffects);
-#ifdef HL2_EPISODIC
-	if ((nEffects & (EF_BRIGHTLIGHT | EF_DIMLIGHT)) && !(m_fEffects & (EF_BRIGHTLIGHT | EF_DIMLIGHT)))
-	{
-		// Hack for now, to avoid player emitting radius with his flashlight
-		if (!m_pOuter->IsPlayer())
-		{
-			AddEntityToDarknessCheck(this->m_pOuter);
-		}
-	}
-#endif // HL2_EPISODIC
 	m_fEffects |= nEffects;
 	if (nEffects & EF_NODRAW)
 	{

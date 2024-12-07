@@ -381,7 +381,7 @@ void C_VGuiScreen::ClientThink( void )
 	if (!pPanel)
 		return;
 	
-	C_BasePlayer *pLocalPlayer = C_BasePlayer::GetLocalPlayer();
+	C_BasePlayer *pLocalPlayer = (C_BasePlayer*)ClientEntityList().GetLocalPlayer();
 	if (!pLocalPlayer)
 		return;
 
@@ -569,7 +569,7 @@ int	C_VGuiScreen::DrawModel( int flags )
 		return 0;
 	
 	// Don't bother drawing stuff not visible to me...
-	C_BasePlayer *pLocalPlayer = C_BasePlayer::GetLocalPlayer();
+	C_BasePlayer *pLocalPlayer = (C_BasePlayer*)ClientEntityList().GetLocalPlayer();
 	if (!pLocalPlayer || !IsVisibleToTeam(pLocalPlayer->GetTeamNumber()) )
 		return 0;
 
@@ -686,7 +686,7 @@ C_BaseEntity *FindNearbyVguiScreen( const Vector &viewPosition, const QAngle &vi
 		return NULL;
 	}
 
-	C_BasePlayer *pLocalPlayer = C_BasePlayer::GetLocalPlayer();
+	C_BasePlayer *pLocalPlayer = (C_BasePlayer*)ClientEntityList().GetLocalPlayer();
 
 	Assert( pLocalPlayer );
 

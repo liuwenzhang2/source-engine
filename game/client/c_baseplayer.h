@@ -222,7 +222,6 @@ public:
 	virtual void				ThirdPersonSwitch( bool bThirdperson );
 	static bool					LocalPlayerInFirstPersonView();
 	static bool					ShouldDrawLocalPlayer();
-	static C_BasePlayer			*GetLocalPlayer( void );
 	int							GetUserID( void );
 	virtual bool				CanSetSoundMixer( void );
 	virtual int					GetVisionFilterFlags( bool bWeaponsCheck = false ) { return 0x00; }

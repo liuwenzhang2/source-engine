@@ -125,7 +125,7 @@ public:
 
 	virtual bool ShouldReceiveProjectedTextures( int flags )
 	{
-		return ( this != C_BasePlayer::GetLocalPlayer() );
+		return ( this != (C_BasePlayer*)ClientEntityList().GetLocalPlayer() );
 	}
 
 	bool IsNemesisOfLocalPlayer();

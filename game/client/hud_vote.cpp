@@ -608,7 +608,7 @@ void CVoteSetupDialog::OnItemSelected( vgui::Panel *panel )
 					if ( !pPlayer )
 						continue;
 
-					C_BasePlayer *pLocalPlayer = C_BasePlayer::GetLocalPlayer();
+					C_BasePlayer *pLocalPlayer = (C_BasePlayer*)ClientEntityList().GetLocalPlayer();
 					if ( !pLocalPlayer )
 						continue;
 
@@ -967,7 +967,7 @@ void CHudVote::MsgFunc_CallVoteFailed( bf_read &msg )
 	if ( ShouldDraw() )
 		return;
 
-	C_BasePlayer *pLocalPlayer = C_BasePlayer::GetLocalPlayer();
+	C_BasePlayer *pLocalPlayer = (C_BasePlayer*)ClientEntityList().GetLocalPlayer();
 	if ( !pLocalPlayer )
 		return;
 
@@ -1116,7 +1116,7 @@ void CHudVote::MsgFunc_VoteFailed( bf_read &msg )
 		gameeventmanager->FireEventClientSide( event );
 	}
 
-	C_BasePlayer *pLocalPlayer = C_BasePlayer::GetLocalPlayer();
+	C_BasePlayer *pLocalPlayer = (C_BasePlayer*)ClientEntityList().GetLocalPlayer();
 	if ( !pLocalPlayer )
 		return;
 
@@ -1140,7 +1140,7 @@ void CHudVote::MsgFunc_VoteStart( bf_read &msg )
 	if ( IsPlayingDemo() )
 		return;
 
-	C_BasePlayer *pLocalPlayer = C_BasePlayer::GetLocalPlayer();
+	C_BasePlayer *pLocalPlayer = (C_BasePlayer*)ClientEntityList().GetLocalPlayer();
 	if ( !pLocalPlayer )
 		return;
 
@@ -1417,7 +1417,7 @@ void CHudVote::MsgFunc_VotePass( bf_read &msg )
 		gameeventmanager->FireEventClientSide( event );
 	}
 
-	C_BasePlayer *pLocalPlayer = C_BasePlayer::GetLocalPlayer();
+	C_BasePlayer *pLocalPlayer = (C_BasePlayer*)ClientEntityList().GetLocalPlayer();
 	if ( !pLocalPlayer )
 		return;
 
@@ -1446,7 +1446,7 @@ void CHudVote::MsgFunc_VoteSetup( bf_read &msg )
 	m_pVotePassed->SetVisible( false );
 	m_pCallVoteFailed->SetVisible( false );
 
-	C_BasePlayer *pLocalPlayer = C_BasePlayer::GetLocalPlayer();
+	C_BasePlayer *pLocalPlayer = (C_BasePlayer*)ClientEntityList().GetLocalPlayer();
 	if ( !pLocalPlayer )
 		return;
 
@@ -1548,7 +1548,7 @@ void CHudVote::MsgFunc_VoteSetup( bf_read &msg )
 //-----------------------------------------------------------------------------
 void CHudVote::PropagateOptionParameters( void )
 {
-	C_BasePlayer *pLocalPlayer = C_BasePlayer::GetLocalPlayer();
+	C_BasePlayer *pLocalPlayer = (C_BasePlayer*)ClientEntityList().GetLocalPlayer();
 	if ( !pLocalPlayer )
 		return;
 
@@ -1570,7 +1570,7 @@ void CHudVote::FireGameEvent( IGameEvent *event )
 	if ( !eventName )
 		return;
 
-	C_BasePlayer *pLocalPlayer = C_BasePlayer::GetLocalPlayer();
+	C_BasePlayer *pLocalPlayer = (C_BasePlayer*)ClientEntityList().GetLocalPlayer();
 	if ( !pLocalPlayer )
 		return;
 
@@ -1700,7 +1700,7 @@ void CHudVote::OnThink()
 		{
 			m_pVoteActive->SetVisible( true );
 
-			C_BasePlayer *pLocalPlayer = C_BasePlayer::GetLocalPlayer();
+			C_BasePlayer *pLocalPlayer = (C_BasePlayer*)ClientEntityList().GetLocalPlayer();
 			if ( pLocalPlayer )
 			{
 				const char* soundname = "Vote.Created";

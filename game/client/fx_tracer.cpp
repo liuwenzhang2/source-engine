@@ -73,7 +73,7 @@ Vector GetTracerOrigin( const CEffectData &data )
 //-----------------------------------------------------------------------------
 void TracerCallback( const CEffectData &data )
 {
-	C_BasePlayer *player = C_BasePlayer::GetLocalPlayer();
+	C_BasePlayer *player = (C_BasePlayer*)ClientEntityList().GetLocalPlayer();
 	if ( !player )
 		return;
 
@@ -116,7 +116,7 @@ DECLARE_CLIENT_EFFECT( "Tracer", TracerCallback );
 //-----------------------------------------------------------------------------
 void ParticleTracerCallback( const CEffectData &data )
 {
-	C_BasePlayer *player = C_BasePlayer::GetLocalPlayer();
+	C_BasePlayer *player = (C_BasePlayer*)ClientEntityList().GetLocalPlayer();
 	if ( !player )
 		return;
 

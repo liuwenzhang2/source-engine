@@ -1915,7 +1915,7 @@ CON_COMMAND_F(sv_findsoundname, "Find sound names which reference the specified 
 #else
 void Playgamesound_f(const CCommand& args)
 {
-	CBasePlayer* pPlayer = C_BasePlayer::GetLocalPlayer();
+	CBasePlayer* pPlayer = (C_BasePlayer*)ClientEntityList().GetLocalPlayer();
 	if (pPlayer)
 	{
 		if (args.ArgC() > 2)

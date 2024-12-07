@@ -181,7 +181,7 @@ void C_Team::ClientThink()
 //-----------------------------------------------------------------------------
 C_Team *GetLocalTeam( void )
 {
-	C_BasePlayer *player = C_BasePlayer::GetLocalPlayer();
+	C_BasePlayer *player = (C_BasePlayer*)ClientEntityList().GetLocalPlayer();
 
 	if ( !player )
 		return NULL;

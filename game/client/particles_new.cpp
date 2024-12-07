@@ -555,7 +555,7 @@ int CNewParticleEffect::DrawModel( int flags )
 						return 0;
 
 					// If we're spectating in-eyes of the camera object, we don't see it
-					C_BasePlayer *pPlayer = C_BasePlayer::GetLocalPlayer();
+					C_BasePlayer *pPlayer = (C_BasePlayer*)ClientEntityList().GetLocalPlayer();
 					if ( pPlayer == pCameraObject )
 					{
 						C_BaseEntity *pObTarget = pPlayer->GetObserverTarget();

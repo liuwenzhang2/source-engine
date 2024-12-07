@@ -613,8 +613,9 @@ public:
 
 public:
 
-	virtual void OnAddEffects(int nEffects) {}
-	virtual void OnRemoveEffects(int nEffects) {}
+	virtual void OnAddEffects(int nEffects);
+	virtual void OnRemoveEffects(int nEffects);
+	virtual void OnSetEffects(int nEffects);
 	// makes the entity inactive
 	void		MakeDormant( void );
 	int			IsDormant( void );

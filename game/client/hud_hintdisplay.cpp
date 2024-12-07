@@ -317,7 +317,7 @@ void CHudHintDisplay::LocalizeAndDisplay( const char *pszHudTxtMsg, const char *
 		SetVisible( true );
 		g_pClientMode->GetViewportAnimationController()->StartAnimationSequence( "HintMessageShow" ); 
 
-		C_BasePlayer *pLocalPlayer = C_BasePlayer::GetLocalPlayer();
+		C_BasePlayer *pLocalPlayer = (C_BasePlayer*)ClientEntityList().GetLocalPlayer();
 		if ( pLocalPlayer )
 		{
 #ifndef HL2MP

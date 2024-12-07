@@ -2517,7 +2517,53 @@ bool CBaseEntity::PassesDamageFilter( const CTakeDamageInfo &info )
 }
 
 
+void CBaseEntity::OnAddEffects(int nEffects) 
+{
+#ifdef HL2_EPISODIC
+	if ((nEffects & (EF_BRIGHTLIGHT | EF_DIMLIGHT)) && !(GetEngineObject()->GetEffects() & (EF_BRIGHTLIGHT | EF_DIMLIGHT)))
+	{
+		// Hack for now, to avoid player emitting radius with his flashlight
+		if (!IsPlayer())
+		{
+			AddEntityToDarknessCheck(this);
+		}
+	}
+#endif // HL2_EPISODIC
+}
 
+void CBaseEntity::OnRemoveEffects(int nEffects) 
+{
+#if !defined( CLIENT_DLL )
+#ifdef HL2_EPISODIC
+	if (nEffects & (EF_BRIGHTLIGHT | EF_DIMLIGHT))
+	{
+		// Hack for now, to avoid player emitting radius with his flashlight
+		if (!IsPlayer())
+		{
+			RemoveEntityFromDarknessCheck(this);
+		}
+	}
+#endif // HL2_EPISODIC
+#endif // !CLIENT_DLL
+}
+
+void CBaseEntity::OnSetEffects(int nEffects) 
+{
+#ifdef HL2_EPISODIC
+	// Hack for now, to avoid player emitting radius with his flashlight
+	if (!IsPlayer())
+	{
+		if ((nEffects & (EF_BRIGHTLIGHT | EF_DIMLIGHT)) && !(GetEngineObject()->GetEffects() & (EF_BRIGHTLIGHT | EF_DIMLIGHT)))
+		{
+			AddEntityToDarknessCheck(this);
+		}
+		else if (!(nEffects & (EF_BRIGHTLIGHT | EF_DIMLIGHT)) && (GetEngineObject()->GetEffects() & (EF_BRIGHTLIGHT | EF_DIMLIGHT)))
+		{
+			RemoveEntityFromDarknessCheck(this);
+		}
+	}
+#endif // HL2_EPISODIC
+}
 
 
 void CBaseEntity::MakeDormant( void )

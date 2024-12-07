@@ -85,9 +85,9 @@ void C_NextBotCombatCharacter::UpdateShadowLOD( void )
 				Vector delta = GetAbsOrigin() - C_BasePlayer::GetLocalPlayer(hh)->GetAbsOrigin();
 #else
 		{
-			if ( C_BasePlayer::GetLocalPlayer() )
+			if ( (C_BasePlayer*)ClientEntityList().GetLocalPlayer() )
 			{
-				Vector delta = GetEngineObject()->GetAbsOrigin() - C_BasePlayer::GetLocalPlayer()->GetEngineObject()->GetAbsOrigin();
+				Vector delta = GetEngineObject()->GetAbsOrigin() - ClientEntityList().GetLocalPlayer()->GetEngineObject()->GetAbsOrigin();
 #endif
 				if ( delta.IsLengthLessThan( NextBotShadowDist.GetFloat() ) )
 				{
@@ -208,7 +208,7 @@ bool C_NextBotManager::SetupInFrustumData( void )
 	{
 		ACTIVE_SPLITSCREEN_PLAYER_GUARD( iSlot );
 		// Get the active local player.
-		C_BasePlayer *pPlayer = C_BasePlayer::GetLocalPlayer();
+		C_BasePlayer *pPlayer = (C_BasePlayer*)ClientEntityList().GetLocalPlayer();
 		if ( !pPlayer )
 			continue;
 

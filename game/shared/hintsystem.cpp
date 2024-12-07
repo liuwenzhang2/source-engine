@@ -307,7 +307,7 @@ void CHintSystem::SetHintPlayed( int iHintID )
 void HintClear( void )
 {
 #ifdef CLIENT_DLL
-	C_BasePlayer *pPlayer = C_BasePlayer::GetLocalPlayer();
+	C_BasePlayer *pPlayer = (C_BasePlayer*)ClientEntityList().GetLocalPlayer();
 #else
 	CBasePlayer* pPlayer = UTIL_GetCommandClient();
 #endif

@@ -184,7 +184,7 @@ void SetBuyData( const ConVar &buyVar, const char *filename )
 
 void MsgFunc_KillCam(bf_read &msg) 
 {
-	C_CSPlayer *pPlayer = ToCSPlayer( C_BasePlayer::GetLocalPlayer() );
+	C_CSPlayer *pPlayer = ToCSPlayer((C_BasePlayer*)ClientEntityList().GetLocalPlayer() );
 
 	if ( !pPlayer )
 		return;
@@ -349,7 +349,7 @@ void ClientModeCSNormal::Update()
 /*
 void ClientModeCSNormal::UpdateSpectatorMode( void )
 {
-	C_BasePlayer *pPlayer = C_BasePlayer::GetLocalPlayer();
+	C_BasePlayer *pPlayer = (C_BasePlayer*)ClientEntityList().GetLocalPlayer();
 
 	if ( !pPlayer )
 		return;
@@ -451,7 +451,7 @@ int ClientModeCSNormal::GetDeathMessageStartHeight( void )
 void ClientModeCSNormal::FireGameEvent( IGameEvent *event )
 {
 	CBaseHudChat *pHudChat = (CBaseHudChat *)GET_HUDELEMENT( CHudChat );
-	C_BasePlayer *pLocalPlayer = C_BasePlayer::GetLocalPlayer();
+	C_BasePlayer *pLocalPlayer = (C_BasePlayer*)ClientEntityList().GetLocalPlayer();
 	CLocalPlayerFilter filter;
 	
 	if ( !pLocalPlayer || !pHudChat )
@@ -632,7 +632,7 @@ void ClientModeCSNormal::FireGameEvent( IGameEvent *event )
 			csPlayer->ClearSoundEvents();
 		}
 
-		if ( pPlayer == C_BasePlayer::GetLocalPlayer() )
+		if ( pPlayer == (C_BasePlayer*)ClientEntityList().GetLocalPlayer() )
 		{
 			// we just died, hide any buy panels
 			gViewPortInterface->ShowPanel( PANEL_BUY, false );
@@ -779,7 +779,7 @@ void UpdateClassImageEntity(
 	const char *pModelName,
 	int x, int y, int width, int height )
 {
-	C_BasePlayer *pLocalPlayer = C_BasePlayer::GetLocalPlayer();
+	C_BasePlayer *pLocalPlayer = (C_BasePlayer*)ClientEntityList().GetLocalPlayer();
 	
 	if ( !pLocalPlayer )
 		return;

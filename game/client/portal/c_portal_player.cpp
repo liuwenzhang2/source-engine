@@ -920,7 +920,7 @@ void C_Portal_Player::AddEntity( void )
 	// Zero out model pitch, blending takes care of all of it.
 	GetEngineObject()->SetLocalAnglesDim( X_INDEX, 0 );
 
-	if( this != C_BasePlayer::GetLocalPlayer() )
+	if( this != (C_BasePlayer*)ClientEntityList().GetLocalPlayer() )
 	{
 		if (GetEngineObject()->IsEffectActive( EF_DIMLIGHT ) )
 		{

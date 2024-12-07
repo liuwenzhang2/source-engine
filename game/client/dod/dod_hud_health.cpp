@@ -146,7 +146,7 @@ void CHudHealth::OnThink()
 bool CHudHealth::ShouldDraw( void )
 {
 	// No local player yet?
-	C_BasePlayer *pPlayer = C_BasePlayer::GetLocalPlayer();
+	C_BasePlayer *pPlayer = (C_BasePlayer*)ClientEntityList().GetLocalPlayer();
 	if ( !pPlayer )
 		return false;
 

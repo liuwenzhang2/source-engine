@@ -645,7 +645,7 @@ void CTeamRoundTimer::SendTimeWarning( int nWarning )
 	// don't play sounds if the level designer has turned them off or if it's during the WaitingForPlayers time
 	if ( !m_bTimerPaused && m_bAutoCountdown && !TeamplayRoundBasedRules()->IsInWaitingForPlayers() )
 	{
-		C_BasePlayer *pPlayer = C_BasePlayer::GetLocalPlayer();
+		C_BasePlayer *pPlayer = (C_BasePlayer*)ClientEntityList().GetLocalPlayer();
 		if ( pPlayer )
 		{
 			if ( ObjectiveResource() )

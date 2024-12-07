@@ -1850,7 +1850,7 @@ void CBaseHudChat::FireGameEvent( IGameEvent *event )
 
 	if ( Q_strcmp( "hltv_chat", eventname ) == 0 )
 	{
-		C_BasePlayer *player = C_BasePlayer::GetLocalPlayer();
+		C_BasePlayer *player = (C_BasePlayer*)ClientEntityList().GetLocalPlayer();
 
 		if ( !player )
 			return;

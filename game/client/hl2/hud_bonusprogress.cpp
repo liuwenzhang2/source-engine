@@ -86,7 +86,7 @@ void CHudBonusProgress::Reset()
 {
 	m_iBonusProgress = INIT_BONUS_PROGRESS;
 
-	C_BasePlayer *local = C_BasePlayer::GetLocalPlayer();
+	C_BasePlayer *local = (C_BasePlayer*)ClientEntityList().GetLocalPlayer();
 	if ( local )
 		m_iLastChallenge = local->GetBonusChallenge();
 
@@ -119,7 +119,7 @@ void CHudBonusProgress::OnThink()
 	int newBonusProgress = 0;
 	int iBonusChallenge = 0;
 
-	C_BasePlayer *local = C_BasePlayer::GetLocalPlayer();
+	C_BasePlayer *local = (C_BasePlayer*)ClientEntityList().GetLocalPlayer();
 	if ( !local )
 	{
 		// Not ready to init!

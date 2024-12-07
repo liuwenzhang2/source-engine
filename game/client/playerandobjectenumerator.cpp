@@ -21,7 +21,7 @@ CPlayerAndObjectEnumerator::CPlayerAndObjectEnumerator( float radius )
 {
 	m_flRadiusSquared		= radius * radius;
 	m_Objects.RemoveAll();
-	m_pLocal = C_BasePlayer::GetLocalPlayer();
+	m_pLocal = (C_BasePlayer*)ClientEntityList().GetLocalPlayer();
 }
 
 int	CPlayerAndObjectEnumerator::GetObjectCount()

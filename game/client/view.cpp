@@ -421,7 +421,7 @@ void CViewRender::DriftPitch (void)
 {
 	float		delta, move;
 
-	C_BasePlayer *player = C_BasePlayer::GetLocalPlayer();
+	C_BasePlayer *player = (C_BasePlayer*)ClientEntityList().GetLocalPlayer();
 	if ( !player )
 		return;
 
@@ -519,7 +519,7 @@ void CViewRender::OnRenderStart()
     SetUpViews();
 
 	// Adjust mouse sensitivity based upon the current FOV
-	C_BasePlayer *player = C_BasePlayer::GetLocalPlayer();
+	C_BasePlayer *player = (C_BasePlayer*)ClientEntityList().GetLocalPlayer();
 	if ( player )
 	{
 		default_fov.SetValue( player->m_iDefaultFOV );
@@ -620,7 +620,7 @@ float CViewRender::GetZFar()
 		// Use the far Z from the map's parameters.
 		farZ = r_mapextents.GetFloat() * 1.73205080757f;
 		
-		C_BasePlayer *pPlayer = C_BasePlayer::GetLocalPlayer();
+		C_BasePlayer *pPlayer = (C_BasePlayer*)ClientEntityList().GetLocalPlayer();
 		if( pPlayer && pPlayer->GetFogParams() )
 		{
 			if ( pPlayer->GetFogParams()->farz > 0 )
@@ -667,7 +667,7 @@ void CViewRender::SetUpViews()
 	// Enable spatial partition access to edicts
 	partition->SuppressLists( PARTITION_ALL_CLIENT_EDICTS, false );
 
-	C_BasePlayer *pPlayer = C_BasePlayer::GetLocalPlayer();
+	C_BasePlayer *pPlayer = (C_BasePlayer*)ClientEntityList().GetLocalPlayer();
 
 	// You in-view weapon aim.
 	bool bCalcViewModelView = false;
@@ -1077,7 +1077,7 @@ void CViewRender::Render( vrect_t *rect )
 	// Assume normal vis
 	m_bForceNoVis			= false;
 	
-	C_BasePlayer *pPlayer = C_BasePlayer::GetLocalPlayer();
+	C_BasePlayer *pPlayer = (C_BasePlayer*)ClientEntityList().GetLocalPlayer();
 
 
     // Set for console commands, etc.
@@ -1325,7 +1325,7 @@ static void GetPos( const CCommand &args, Vector &vecOrigin, QAngle &angles )
 	angles = MainViewAngles();
 	if ( args.ArgC() == 2 && atoi( args[1] ) == 2 )
 	{
-		C_BasePlayer *pPlayer = C_BasePlayer::GetLocalPlayer();
+		C_BasePlayer *pPlayer = (C_BasePlayer*)ClientEntityList().GetLocalPlayer();
 		if ( pPlayer )
 		{
 			vecOrigin = pPlayer->GetEngineObject()->GetAbsOrigin();

@@ -283,7 +283,7 @@ float C_BaseTeamObjectiveResource::GetCPCapPercentage( int index )
 //-----------------------------------------------------------------------------
 int C_BaseTeamObjectiveResource::GetNumControlPointsOwned( void )
 {
-	C_BasePlayer *pPlayer = C_BasePlayer::GetLocalPlayer();
+	C_BasePlayer *pPlayer = (C_BasePlayer*)ClientEntityList().GetLocalPlayer();
 	if ( !pPlayer )
 		return 0;
 
@@ -404,7 +404,7 @@ void C_BaseTeamObjectiveResource::ClientThink()
 						if ( !m_bWarnedOnFinalCap[i] )
 						{
 							// If this the local player's team, warn him
-							C_BasePlayer *pPlayer = C_BasePlayer::GetLocalPlayer();
+							C_BasePlayer *pPlayer = (C_BasePlayer*)ClientEntityList().GetLocalPlayer();
 							if ( pPlayer )
 							{
 								if ( m_iCappingTeam[i] != TEAM_UNASSIGNED && 

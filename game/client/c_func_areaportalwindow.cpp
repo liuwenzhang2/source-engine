@@ -130,7 +130,7 @@ float C_FuncAreaPortalWindow::GetDistanceBlend()
 {
 	// Get the viewer's distance to us.
 	float flDist = GetEngineObject()->CalcDistanceFromPoint( CurrentViewOrigin() );
-	C_BasePlayer *local = C_BasePlayer::GetLocalPlayer();
+	C_BasePlayer *local = (C_BasePlayer*)ClientEntityList().GetLocalPlayer();
 	if ( local )
 	{
 		flDist *= local->GetFOVDistanceAdjustFactor();

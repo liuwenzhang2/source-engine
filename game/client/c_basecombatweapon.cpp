@@ -25,7 +25,7 @@
 //-----------------------------------------------------------------------------
 C_BaseCombatWeapon *GetActiveWeapon( void )
 {
-	C_BasePlayer *player = C_BasePlayer::GetLocalPlayer();
+	C_BasePlayer *player = (C_BasePlayer*)ClientEntityList().GetLocalPlayer();
 
 	if ( !player )
 		return NULL;
@@ -96,7 +96,7 @@ void C_BaseCombatWeapon::OnRestore()
 
 	// if the player is holding this weapon, 
 	// mark it as just restored so it won't show as a new pickup
-	if (GetOwner() == C_BasePlayer::GetLocalPlayer())
+	if (GetOwner() == (C_BasePlayer*)ClientEntityList().GetLocalPlayer())
 	{
 		m_bJustRestored = true;
 	}
@@ -131,7 +131,7 @@ void C_BaseCombatWeapon::OnDataChanged( DataUpdateType_t updateType )
 	// If it's being carried by the *local* player, on the first update,
 	// find the registered weapon for this ID
 
-	C_BasePlayer *pPlayer = C_BasePlayer::GetLocalPlayer();
+	C_BasePlayer *pPlayer = (C_BasePlayer*)ClientEntityList().GetLocalPlayer();
 	C_BaseCombatCharacter *pOwner = GetOwner();
 
 	// check if weapon is carried by local player
@@ -233,7 +233,7 @@ void C_BaseCombatWeapon::Redraw()
 //-----------------------------------------------------------------------------
 void C_BaseCombatWeapon::DrawCrosshair()
 {
-	C_BasePlayer *player = C_BasePlayer::GetLocalPlayer();
+	C_BasePlayer *player = (C_BasePlayer*)ClientEntityList().GetLocalPlayer();
 	if ( !player )
 		return;
 
@@ -321,7 +321,7 @@ bool C_BaseCombatWeapon::IsCarriedByLocalPlayer( void )
 	if ( !GetOwner() )
 		return false;
 
-	return ( GetOwner() == C_BasePlayer::GetLocalPlayer() );
+	return ( GetOwner() == (C_BasePlayer*)ClientEntityList().GetLocalPlayer() );
 }
 
 
@@ -354,7 +354,7 @@ bool C_BaseCombatWeapon::GetShootPosition( Vector &vOrigin, QAngle &vAngles )
 	C_BaseCombatCharacter *pEnt = ToBaseCombatCharacter( GetOwner() );
 	if ( pEnt )
 	{
-		if ( pEnt == C_BasePlayer::GetLocalPlayer() )
+		if ( pEnt == (C_BasePlayer*)ClientEntityList().GetLocalPlayer() )
 		{
 			vAngles = pEnt->EyeAngles();
 		}
@@ -420,7 +420,7 @@ bool C_BaseCombatWeapon::ShouldDraw( void )
 
 	bool bIsActive = ( m_iState == WEAPON_IS_ACTIVE );
 
-	C_BasePlayer *pLocalPlayer = C_BasePlayer::GetLocalPlayer();
+	C_BasePlayer *pLocalPlayer = (C_BasePlayer*)ClientEntityList().GetLocalPlayer();
 
 	 // carried by local player?
 	if ( pOwner == pLocalPlayer )
@@ -484,7 +484,7 @@ int C_BaseCombatWeapon::DrawModel( int flags )
 		return 0;
 
 	// check if local player chases owner of this weapon in first person
-	C_BasePlayer *localplayer = C_BasePlayer::GetLocalPlayer();
+	C_BasePlayer *localplayer = (C_BasePlayer*)ClientEntityList().GetLocalPlayer();
 
 	if ( localplayer && localplayer->IsObserver() && GetOwner() )
 	{
@@ -509,7 +509,7 @@ int C_BaseCombatWeapon::DrawModel( int flags )
 //-----------------------------------------------------------------------------
 int C_BaseCombatWeapon::CalcOverrideModelIndex() 
 { 
-	C_BasePlayer *localplayer = C_BasePlayer::GetLocalPlayer();
+	C_BasePlayer *localplayer = (C_BasePlayer*)ClientEntityList().GetLocalPlayer();
 	if ( localplayer && 
 		localplayer == GetOwner() &&
 		ShouldDrawLocalPlayerViewModel() )

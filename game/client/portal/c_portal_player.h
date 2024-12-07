@@ -40,12 +40,12 @@ public:
 
 	static inline C_Portal_Player* GetLocalPortalPlayer()
 	{
-		return (C_Portal_Player*)C_BasePlayer::GetLocalPlayer();
+		return (C_Portal_Player*)ClientEntityList().GetLocalPlayer();
 	}
 
 	static inline C_Portal_Player* GetLocalPlayer()
 	{
-		return (C_Portal_Player*)C_BasePlayer::GetLocalPlayer();
+		return (C_Portal_Player*)ClientEntityList().GetLocalPlayer();
 	}
 
 	virtual const QAngle& GetRenderAngles();
@@ -218,7 +218,7 @@ inline C_Portal_Player *ToPortalPlayer( CBaseEntity *pEntity )
 
 inline C_Portal_Player *GetPortalPlayer( void )
 {
-	return static_cast<C_Portal_Player*>( C_BasePlayer::GetLocalPlayer() );
+	return static_cast<C_Portal_Player*>( (C_BasePlayer*)ClientEntityList().GetLocalPlayer() );
 }
 
 #endif //Portal_PLAYER_H

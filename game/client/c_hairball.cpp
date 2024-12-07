@@ -176,7 +176,7 @@ void C_Hairball::Init()
 void C_Hairball::ClientThink()
 {
 	// Do some AI-type stuff.. move the entity around.
-	//C_BasePlayer *pPlayer = C_BasePlayer::GetLocalPlayer();
+	//C_BasePlayer *pPlayer = (C_BasePlayer*)ClientEntityList().GetLocalPlayer();
 	//m_vecAngles = SetAbsAngles( pPlayer->GetAbsAngles() ); // copy player angles.
 
 	Assert( !GetEngineObject()->GetMoveParent() );
@@ -335,7 +335,7 @@ void CreateHairballCallback()
 		pHairball->Init();
 		
 		// Put it a short distance in front of the player.
-		C_BasePlayer *pPlayer = C_BasePlayer::GetLocalPlayer();
+		C_BasePlayer *pPlayer = (C_BasePlayer*)ClientEntityList().GetLocalPlayer();
 		
 		if ( !pPlayer )
 			return;

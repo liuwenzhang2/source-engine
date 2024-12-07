@@ -118,7 +118,7 @@ void RecvProxy_StunTime( const CRecvProxyData *pData, void *pStruct, void *pOut 
 {
 	C_DODPlayer *pPlayerData = (C_DODPlayer *) pStruct;
 
-	if( pPlayerData != C_BasePlayer::GetLocalPlayer() )
+	if( pPlayerData != (C_BasePlayer*)ClientEntityList().GetLocalPlayer() )
 		return;
 
 	if ( (pPlayerData->m_flStunDuration != pData->m_Value.m_Float) && pData->m_Value.m_Float > 0 )
@@ -521,7 +521,7 @@ void C_DODRagdoll::CreateDODRagdoll()
 		matrix3x4_t currentBones[MAXSTUDIOBONES];
 		const float boneDt = 0.05f;
 
-		if ( pPlayer && pPlayer == C_BasePlayer::GetLocalPlayer() )
+		if ( pPlayer && pPlayer == (C_BasePlayer*)ClientEntityList().GetLocalPlayer() )
 		{
 			pPlayer->GetRagdollInitBoneArrays( boneDelta0, boneDelta1, currentBones, boneDt );
 		}
@@ -732,7 +732,7 @@ C_DODPlayer::~C_DODPlayer()
 
 C_DODPlayer* C_DODPlayer::GetLocalDODPlayer()
 {
-	return ToDODPlayer( C_BasePlayer::GetLocalPlayer() );
+	return ToDODPlayer(ClientEntityList().GetLocalPlayer() );
 }
 
 const IEngineObjectClient* C_DODPlayer::GetRepresentativeRagdoll() const
@@ -1026,7 +1026,7 @@ void C_DODPlayer::FireEvent( const Vector& origin, const QAngle& angles, int eve
 {
 	if( event == 7002 )
 	{
-		if( this == C_BasePlayer::GetLocalPlayer() )
+		if( this == (C_BasePlayer*)ClientEntityList().GetLocalPlayer() )
 			return;
 
 		CWeaponDODBase *pWeapon = GetActiveDODWeapon();
@@ -1691,7 +1691,7 @@ ConVar cl_muzzleflash_dlight_3rd( "cl_muzzleflash_dlight_3rd", "1" );
 
 void C_DODPlayer::ProcessMuzzleFlashEvent()
 {
-	CBasePlayer *pLocalPlayer = C_BasePlayer::GetLocalPlayer();
+	CBasePlayer *pLocalPlayer = (C_BasePlayer*)ClientEntityList().GetLocalPlayer();
 
 	bool bInToolRecordingMode = ToolsEnabled() && clienttools->IsInRecordingMode();
 
@@ -1831,7 +1831,7 @@ void C_DODPlayer::NotifyShouldTransmit( ShouldTransmitState_t state )
 
 void C_DODPlayer::Simulate( void )
 {
-	if( this != C_BasePlayer::GetLocalPlayer() )
+	if( this != (C_BasePlayer*)ClientEntityList().GetLocalPlayer() )
 	{
 		if (GetEngineObject()->IsEffectActive( EF_DIMLIGHT ) )
 		{

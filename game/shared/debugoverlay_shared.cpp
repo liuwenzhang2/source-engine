@@ -20,7 +20,7 @@
 CBasePlayer *GetLocalPlayer( void )
 {
 #if defined( CLIENT_DLL)
-	return C_BasePlayer::GetLocalPlayer();
+	return (C_BasePlayer*)ClientEntityList().GetLocalPlayer();
 #else
 	return UTIL_GetListenServerHost();
 #endif

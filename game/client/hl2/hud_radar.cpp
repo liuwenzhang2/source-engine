@@ -270,7 +270,7 @@ void CHudRadar::Paint()
 
 	// Now go through the list of radar targets and represent them on the radar screen
 	// by drawing their icons on top of the background.
-	C_BasePlayer *pLocalPlayer = C_BasePlayer::GetLocalPlayer();
+	C_BasePlayer *pLocalPlayer = (C_BasePlayer*)ClientEntityList().GetLocalPlayer();
 
 	for( int i = 0 ; i < m_iNumRadarContacts ; i++ )
 	{

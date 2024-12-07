@@ -66,7 +66,7 @@ void CAM_ToThirdPerson(void)
 	input->CAM_ToThirdPerson();
 
 	// Let the local player know
-	C_BasePlayer *localPlayer = C_BasePlayer::GetLocalPlayer();
+	C_BasePlayer *localPlayer = (C_BasePlayer*)ClientEntityList().GetLocalPlayer();
 	if ( localPlayer )
 	{
 		localPlayer->ThirdPersonSwitch( true );
@@ -98,7 +98,7 @@ CAM_ToFirstPerson
 */
 void CAM_ToFirstPerson(void) 
 { 
-	C_BasePlayer *localPlayer = C_BasePlayer::GetLocalPlayer();
+	C_BasePlayer *localPlayer = (C_BasePlayer*)ClientEntityList().GetLocalPlayer();
 	if ( localPlayer && !localPlayer->CanUseFirstPersonCommand() )
 		return;
 
@@ -551,7 +551,7 @@ void CInput::CAM_Think( void )
 			desiredCamAngles = viewangles;
 		}
 
-		g_ThirdPersonManager.PositionCamera( C_BasePlayer::GetLocalPlayer(), desiredCamAngles );
+		g_ThirdPersonManager.PositionCamera( (C_BasePlayer*)ClientEntityList().GetLocalPlayer(), desiredCamAngles );
     }
 
 	if ( cam_showangles.GetInt() )
@@ -636,13 +636,13 @@ void CInput::CAM_CameraThirdThink( void )
 		vecCamOffset[DIST] += ( m_pCameraThirdData->m_flDist - vecCamOffset[DIST] ) / flLag;
 	}
 
-	C_BasePlayer* pLocalPlayer = C_BasePlayer::GetLocalPlayer();
+	C_BasePlayer* pLocalPlayer = (C_BasePlayer*)ClientEntityList().GetLocalPlayer();
 
 	if ( pLocalPlayer )
 	{
 		QAngle desiredCamAngles = QAngle( vecCamOffset[ PITCH ], vecCamOffset[ YAW ], vecCamOffset[DIST] );
 	
-		g_ThirdPersonManager.PositionCamera( C_BasePlayer::GetLocalPlayer(), desiredCamAngles );
+		g_ThirdPersonManager.PositionCamera( (C_BasePlayer*)ClientEntityList().GetLocalPlayer(), desiredCamAngles );
 		
 	//	vecCamOffset = g_ThirdPersonManager.GetCameraOffsetAngles();
 	}
@@ -702,7 +702,7 @@ void CInput::CAM_ToFirstPerson(void)
 	cam_command.SetValue( 0 );
 
 	// Let the local player know
-	C_BasePlayer *localPlayer = C_BasePlayer::GetLocalPlayer();
+	C_BasePlayer *localPlayer = (C_BasePlayer*)ClientEntityList().GetLocalPlayer();
 	if ( localPlayer )
 	{
 		localPlayer->ThirdPersonSwitch( false );

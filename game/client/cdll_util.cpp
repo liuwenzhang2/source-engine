@@ -74,7 +74,7 @@ bool IsPlayerIndex( int index )
 
 int GetLocalPlayerIndex( void )
 {
-	C_BasePlayer * player = C_BasePlayer::GetLocalPlayer();
+	C_BasePlayer * player = (C_BasePlayer*)ClientEntityList().GetLocalPlayer();
 
 	if ( player )
 		return player->entindex();
@@ -84,7 +84,7 @@ int GetLocalPlayerIndex( void )
 
 int GetLocalPlayerVisionFilterFlags( bool bWeaponsCheck /*= false */ )
 {
-	C_BasePlayer * player = C_BasePlayer::GetLocalPlayer();
+	C_BasePlayer * player = (C_BasePlayer*)ClientEntityList().GetLocalPlayer();
 
 	if ( player )
 		return player->GetVisionFilterFlags( bWeaponsCheck );
@@ -116,7 +116,7 @@ bool IsLocalPlayerUsingVisionFilterFlags( int nFlags, bool bWeaponsCheck /* = fa
 
 bool IsLocalPlayerSpectator( void )
 {
-	C_BasePlayer * player = C_BasePlayer::GetLocalPlayer();
+	C_BasePlayer * player = (C_BasePlayer*)ClientEntityList().GetLocalPlayer();
 
 	if ( player )
 		return player->IsObserver();
@@ -126,7 +126,7 @@ bool IsLocalPlayerSpectator( void )
 
 int GetSpectatorMode( void )
 {
-	C_BasePlayer * player = C_BasePlayer::GetLocalPlayer();
+	C_BasePlayer * player = (C_BasePlayer*)ClientEntityList().GetLocalPlayer();
 
 	if ( player )
 		return player->GetObserverMode();
@@ -136,7 +136,7 @@ int GetSpectatorMode( void )
 
 int GetSpectatorTarget( void )
 {
-	C_BasePlayer * player = C_BasePlayer::GetLocalPlayer();
+	C_BasePlayer * player = (C_BasePlayer*)ClientEntityList().GetLocalPlayer();
 
 	if ( player )
 	{
@@ -155,7 +155,7 @@ int GetSpectatorTarget( void )
 
 int GetLocalPlayerTeam( void ) 
 { 
-	C_BasePlayer *pPlayer = C_BasePlayer::GetLocalPlayer();
+	C_BasePlayer *pPlayer = (C_BasePlayer*)ClientEntityList().GetLocalPlayer();
 	
 	if ( pPlayer )
 		return pPlayer->GetTeamNumber(); 
@@ -1077,7 +1077,7 @@ static unsigned char ComputeDistanceFade( C_BaseEntity *pEntity, float flMinDist
 	flMaxDist *= flMaxDist;
 
 	float flCurrentDistanceSq = CurrentViewOrigin().DistToSqr( pEntity->WorldSpaceCenter() );
-	C_BasePlayer *pLocal = C_BasePlayer::GetLocalPlayer();
+	C_BasePlayer *pLocal = (C_BasePlayer*)ClientEntityList().GetLocalPlayer();
 	if ( pLocal )
 	{
 		float flDistFactor = pLocal->GetFOVDistanceAdjustFactor();

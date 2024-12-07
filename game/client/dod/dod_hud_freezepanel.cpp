@@ -37,7 +37,7 @@ ConVar cl_dod_freezecam( "cl_dod_freezecam", "1", FCVAR_ARCHIVE, "Client option 
 bool IsTakingAFreezecamScreenshot( void )
 {
 	// Don't draw in freezecam, or when the game's not running
-	C_BasePlayer *pPlayer = C_BasePlayer::GetLocalPlayer();
+	C_BasePlayer *pPlayer = (C_BasePlayer*)ClientEntityList().GetLocalPlayer();
 	bool bInFreezeCam = ( pPlayer && pPlayer->GetObserverMode() == OBS_MODE_FREEZECAM );
 
 	if ( bInFreezeCam == true && engine->IsTakingScreenshot() )
@@ -565,7 +565,7 @@ int	CDODFreezePanel::HudElementKeyInput( int down, ButtonCode_t keynum, const ch
 			}
 
 			// Get the local player.
-			C_BasePlayer *pPlayer = C_BasePlayer::GetLocalPlayer();
+			C_BasePlayer *pPlayer = (C_BasePlayer*)ClientEntityList().GetLocalPlayer();
 			if ( pPlayer )
 			{
 				//Do effects

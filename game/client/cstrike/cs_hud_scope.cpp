@@ -104,7 +104,7 @@ void CHudScope::ApplySchemeSettings( vgui::IScheme *scheme )
 //-----------------------------------------------------------------------------
 void CHudScope::Paint( void )
 {
-	C_CSPlayer *pPlayer = dynamic_cast<C_CSPlayer *>(C_BasePlayer::GetLocalPlayer());
+	C_CSPlayer *pPlayer = dynamic_cast<C_CSPlayer *>((C_BasePlayer*)ClientEntityList().GetLocalPlayer());
 	
 	if ( pPlayer == NULL )
 		return;

@@ -311,7 +311,7 @@ void CLCD::Update( void )
 	if ( !m_lcd ) 
 		return ;
 
-	C_BasePlayer *player = C_BasePlayer::GetLocalPlayer();
+	C_BasePlayer *player = (C_BasePlayer*)ClientEntityList().GetLocalPlayer();
 	bool hasplayer = player ? true : false;
 
 	bool changed = hasplayer != m_bHadPlayer;
@@ -491,7 +491,7 @@ void CLCD::ShowItems_R( CLCDPage *page, unsigned int dwCurTime, CUtlVector< CLCD
 						break;
 					case AGGTYPE_PERTEAM:
 						{
-							C_BasePlayer *local = C_BasePlayer::GetLocalPlayer();
+							C_BasePlayer *local = (C_BasePlayer*)ClientEntityList().GetLocalPlayer();
 
 							if ( local )
 							{
@@ -1172,7 +1172,7 @@ void CDescribeData::DumpDescription( datamap_t *pMap )
 
 void CLCD::DumpPlayer()
 {
-	C_BasePlayer *player = C_BasePlayer::GetLocalPlayer();
+	C_BasePlayer *player = (C_BasePlayer*)ClientEntityList().GetLocalPlayer();
 	if ( !player )
 		return;
 
@@ -1265,7 +1265,7 @@ void CLCD::LookupToken( char const *in, CUtlString& value )
 {
 	value = "";
 
-	C_BasePlayer *player = C_BasePlayer::GetLocalPlayer();
+	C_BasePlayer *player = (C_BasePlayer*)ClientEntityList().GetLocalPlayer();
 	if ( !player )
 	{
 		return;

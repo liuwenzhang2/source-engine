@@ -1446,7 +1446,7 @@ static void GetFogColorTransition( fogparams_t *pFogParams, float *pColorPrimary
 //-----------------------------------------------------------------------------
 static void GetFogColor( fogparams_t *pFogParams, float *pColor )
 {
-	C_BasePlayer *pbp = C_BasePlayer::GetLocalPlayer();
+	C_BasePlayer *pbp = (C_BasePlayer*)ClientEntityList().GetLocalPlayer();
 	if ( !pbp || !pFogParams )
 		return;
 
@@ -1637,7 +1637,7 @@ static float GetFogMaxDensity( fogparams_t *pFogParams )
 //-----------------------------------------------------------------------------
 static void GetSkyboxFogColor( float *pColor )
 {			   
-	C_BasePlayer *pbp = C_BasePlayer::GetLocalPlayer();
+	C_BasePlayer *pbp = (C_BasePlayer*)ClientEntityList().GetLocalPlayer();
 	if( !pbp )
 	{
 		return;
@@ -1685,7 +1685,7 @@ static void GetSkyboxFogColor( float *pColor )
 
 static float GetSkyboxFogStart( void )
 {
-	C_BasePlayer *pbp = C_BasePlayer::GetLocalPlayer();
+	C_BasePlayer *pbp = (C_BasePlayer*)ClientEntityList().GetLocalPlayer();
 	if( !pbp )
 	{
 		return 0.0f;
@@ -1711,7 +1711,7 @@ static float GetSkyboxFogStart( void )
 
 static float GetSkyboxFogEnd( void )
 {
-	C_BasePlayer *pbp = C_BasePlayer::GetLocalPlayer();
+	C_BasePlayer *pbp = (C_BasePlayer*)ClientEntityList().GetLocalPlayer();
 	if( !pbp )
 	{
 		return 0.0f;
@@ -1738,7 +1738,7 @@ static float GetSkyboxFogEnd( void )
 
 static float GetSkyboxFogMaxDensity()
 {
-	C_BasePlayer *pbp = C_BasePlayer::GetLocalPlayer();
+	C_BasePlayer *pbp = (C_BasePlayer*)ClientEntityList().GetLocalPlayer();
 	if ( !pbp )
 		return 1.0f;
 
@@ -2067,7 +2067,7 @@ void CViewRender::RenderView( const CViewSetup &view, int nClearFlags, int whatT
 				PIXEVENT( pRenderContext, "DoEnginePostProcessing" );
 
 				bool bFlashlightIsOn = false;
-				C_BasePlayer *pLocal = C_BasePlayer::GetLocalPlayer();
+				C_BasePlayer *pLocal = (C_BasePlayer*)ClientEntityList().GetLocalPlayer();
 				if ( pLocal )
 				{
 					bFlashlightIsOn = pLocal->GetEngineObject()->IsEffectActive( EF_DIMLIGHT );
@@ -2300,7 +2300,7 @@ void CViewRender::RenderView( const CViewSetup &view, int nClearFlags, int whatT
 		if ( UseVR() )
 		{
 			// figure out if we really want to draw the HUD based on freeze cam
-			C_BasePlayer *pPlayer = C_BasePlayer::GetLocalPlayer();
+			C_BasePlayer *pPlayer = (C_BasePlayer*)ClientEntityList().GetLocalPlayer();
 			bool bInFreezeCam = ( pPlayer && pPlayer->GetObserverMode() == OBS_MODE_FREEZECAM );
 
 			// draw the HUD after the view model so its "I'm closer" depth queues work right.
@@ -3113,7 +3113,7 @@ void CViewRender::DrawMonitors( const CViewSetup &cameraView )
 	int width = pCameraTarget->GetActualWidth();
 	int height = pCameraTarget->GetActualHeight();
 
-	C_BasePlayer *player = C_BasePlayer::GetLocalPlayer();
+	C_BasePlayer *player = (C_BasePlayer*)ClientEntityList().GetLocalPlayer();
 	
 	int cameraNum;
 	for ( cameraNum = 0; pCameraEnt != NULL; pCameraEnt = pCameraEnt->m_pNext )
@@ -3301,7 +3301,7 @@ void CRendering3dView::UpdateRenderablesOpacity()
 {
 	// Compute the prop opacity based on the view position and fov zoom scale
 	float flFactor = 1.0f;
-	C_BasePlayer *pLocal = C_BasePlayer::GetLocalPlayer();
+	C_BasePlayer *pLocal = (C_BasePlayer*)ClientEntityList().GetLocalPlayer();
 	if ( pLocal )
 	{
 		flFactor = pLocal->GetFOVDistanceAdjustFactor();
@@ -4541,7 +4541,7 @@ void CRendering3dView::EnableWorldFog( void )
 	CMatRenderContextPtr pRenderContext( materials );
 
 	fogparams_t *pFogParams = NULL;
-	C_BasePlayer *pbp = C_BasePlayer::GetLocalPlayer();
+	C_BasePlayer *pbp = (C_BasePlayer*)ClientEntityList().GetLocalPlayer();
 	if ( pbp )
 	{
 		pFogParams = pbp->GetFogParams();
@@ -4610,7 +4610,7 @@ SkyboxVisibility_t CSkyboxView::ComputeSkyboxVisibility()
 //-----------------------------------------------------------------------------
 bool CSkyboxView::GetSkyboxFogEnable()
 {
-	C_BasePlayer *pbp = C_BasePlayer::GetLocalPlayer();
+	C_BasePlayer *pbp = (C_BasePlayer*)ClientEntityList().GetLocalPlayer();
 	if( !pbp )
 	{
 		return false;
@@ -4640,7 +4640,7 @@ bool CSkyboxView::GetSkyboxFogEnable()
 //-----------------------------------------------------------------------------
 void CSkyboxView::Enable3dSkyboxFog( void )
 {
-	C_BasePlayer *pbp = C_BasePlayer::GetLocalPlayer();
+	C_BasePlayer *pbp = (C_BasePlayer*)ClientEntityList().GetLocalPlayer();
 	if( !pbp )
 	{
 		return;
@@ -4683,7 +4683,7 @@ sky3dparams_t *CSkyboxView::PreRender3dSkyboxWorld( SkyboxVisibility_t nSkyboxVi
 	if ( !r_3dsky.GetInt() )
 		return NULL;
 
-	C_BasePlayer *pbp = C_BasePlayer::GetLocalPlayer();
+	C_BasePlayer *pbp = (C_BasePlayer*)ClientEntityList().GetLocalPlayer();
 
 	// No local player object yet...
 	if ( !pbp )
@@ -5289,7 +5289,7 @@ void CBaseWorldView::DrawSetup( float waterHeight, int nSetupFlags, float waterZ
 
 void MaybeInvalidateLocalPlayerAnimation()
 {
-	C_BasePlayer *pPlayer = C_BasePlayer::GetLocalPlayer();
+	C_BasePlayer *pPlayer = (C_BasePlayer*)ClientEntityList().GetLocalPlayer();
 	if ( ( pPlayer != NULL ) && pPlayer->InFirstPersonView() )
 	{
 		// We sometimes need different animation for the main view versus the shadow rendering,
