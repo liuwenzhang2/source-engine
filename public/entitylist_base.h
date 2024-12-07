@@ -15,10 +15,10 @@
 #include "basehandle.h"
 #include "utllinkedlist.h"
 #include "ihandleentity.h"
-#include "tier1\utlhash.h"
-#include "mathlib\mathlib.h"
-#include "mathlib\vmatrix.h"
-#include "mathlib\polyhedron.h"
+#include "tier1/utlhash.h"
+#include "mathlib/mathlib.h"
+#include "mathlib/vmatrix.h"
+#include "mathlib/polyhedron.h"
 #include "cmodel.h"
 
 #ifdef CLIENT_DLL
