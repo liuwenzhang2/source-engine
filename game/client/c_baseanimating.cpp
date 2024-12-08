@@ -2969,26 +2969,236 @@ void C_BaseAnimating::GetRagdollInitBoneArrays( matrix3x4_t *pDeltaBones0, matri
 	}
 }
 
+bool NPC_IsImportantNPC(C_BaseEntity* pAnimating)
+{
+	C_AI_BaseNPC* pBaseNPC = dynamic_cast <C_AI_BaseNPC*> (pAnimating);
 
+	if (pBaseNPC == NULL)
+		return false;
+
+	return pBaseNPC->ImportantRagdoll();
+}
 
 C_BaseEntity *C_BaseAnimating::BecomeRagdollOnClient()
 {
 	GetEngineObject()->MoveToLastReceivedPosition( true );
 	GetEngineObject()->GetAbsOrigin();
-	C_BaseEntity *pRagdoll = GetEngineObject()->CreateRagdollCopy();
 
+	C_ClientRagdoll *pRagdoll = CreateRagdollCopy();
+	if (!pRagdoll)
+	{
+		return NULL;
+	}
+
+	TermRopes();
+	const model_t* model = GetEngineObject()->GetModel();
+	const char* pModelName = modelinfo->GetModelName(model);
+
+	if (pRagdoll->InitializeAsClientEntity(pModelName, RENDER_GROUP_OPAQUE_ENTITY) == false)
+	{
+		cl_entitylist->DestroyEntity(pRagdoll);// ->Release();
+		return NULL;
+	}
+
+	// move my current model instance to the ragdoll's so decals are preserved.
+	GetEngineObject()->SnatchModelInstance(pRagdoll->GetEngineObject());
+
+	// We need to take these from the entity
+	pRagdoll->GetEngineObject()->SetAbsOrigin(GetEngineObject()->GetAbsOrigin());
+	pRagdoll->GetEngineObject()->SetAbsAngles(GetEngineObject()->GetAbsAngles());
+
+	pRagdoll->IgniteRagdoll(this);
+	pRagdoll->TransferDissolveFrom(this);
+	pRagdoll->InitModelEffects();
+
+	if (GetEngineObject()->IsEffectActive(EF_NOSHADOW))
+	{
+		pRagdoll->GetEngineObject()->AddEffects(EF_NOSHADOW);
+	}
+	pRagdoll->GetEngineObject()->SetRenderFX(kRenderFxRagdoll);
+	pRagdoll->SetRenderMode(GetRenderMode());
+	pRagdoll->SetRenderColor(GetRenderColor().r, GetRenderColor().g, GetRenderColor().b, GetRenderColor().a);
+
+	pRagdoll->GetEngineObject()->SetBody(GetEngineObject()->GetBody());
+	pRagdoll->GetEngineObject()->SetSkin(GetEngineObject()->GetSkin());
+	pRagdoll->GetEngineObject()->SetVecForce(GetEngineObject()->GetVecForce());
+	pRagdoll->GetEngineObject()->SetForceBone(GetEngineObject()->GetForceBone());
+	pRagdoll->SetNextClientThink(CLIENT_THINK_ALWAYS);
+
+	pRagdoll->GetEngineObject()->SetModelName(AllocPooledString(pModelName));
+	pRagdoll->GetEngineObject()->SetModelScale(GetEngineObject()->GetModelScale());
 	matrix3x4_t boneDelta0[MAXSTUDIOBONES];
 	matrix3x4_t boneDelta1[MAXSTUDIOBONES];
 	matrix3x4_t currentBones[MAXSTUDIOBONES];
 	const float boneDt = 0.1f;
 	GetRagdollInitBoneArrays( boneDelta0, boneDelta1, currentBones, boneDt );
 	pRagdoll->GetEngineObject()->InitAsClientRagdoll( boneDelta0, boneDelta1, currentBones, boneDt );
+	if (AddRagdollToFadeQueue() == true)
+	{
+		pRagdoll->m_bImportant = NPC_IsImportantNPC(this);
+		ClientEntityList().MoveToTopOfLRU(pRagdoll, pRagdoll->m_bImportant);
+		pRagdoll->m_bFadeOut = true;
+	}
+
+	GetEngineObject()->AddEffects(EF_NODRAW);
+	GetEngineObject()->SetBuiltRagdoll(true);
+	return pRagdoll;
+}
+
+C_ClientRagdoll* C_BaseAnimating::CreateRagdollCopy()
+{
+	//Adrian: We now create a separate entity that becomes this entity's ragdoll.
+	//That way the server side version of this entity can go away. 
+	//Plus we can hook save/restore code to these ragdolls so they don't fall on restore anymore.
+	C_ClientRagdoll* pRagdoll = (C_ClientRagdoll*)cl_entitylist->CreateEntityByName("C_ClientRagdoll");//false
 	return pRagdoll;
 }
 
 
+C_EntityFlame* FireEffect(C_BaseAnimating* pTarget, C_BaseEntity* pServerFire, float* flScaleEnd, float* flTimeStart, float* flTimeEnd)
+{
+	C_EntityFlame* pFire = (C_EntityFlame*)cl_entitylist->CreateEntityByName("C_EntityFlame");
 
+	if (pFire->InitializeAsClientEntity(NULL, RENDER_GROUP_TRANSLUCENT_ENTITY) == false)
+	{
+		cl_entitylist->DestroyEntity(pFire);// ->Release();
+		return NULL;
+	}
 
+	if (pFire != NULL)
+	{
+		pFire->GetEngineObject()->RemoveFromLeafSystem();
+
+		pTarget->GetEngineObject()->AddFlag(FL_ONFIRE);
+		pFire->GetEngineObject()->SetParent(pTarget->GetEngineObject());
+		pFire->m_hEntAttached = (C_BaseEntity*)pTarget;
+
+		pFire->OnDataChanged(DATA_UPDATE_CREATED);
+		pFire->GetEngineObject()->SetAbsOrigin(pTarget->GetEngineObject()->GetAbsOrigin());
+
+#ifdef HL2_EPISODIC
+		if (pServerFire)
+		{
+			if (pServerFire->GetEngineObject()->IsEffectActive(EF_DIMLIGHT))
+			{
+				pFire->GetEngineObject()->AddEffects(EF_DIMLIGHT);
+			}
+			if (pServerFire->GetEngineObject()->IsEffectActive(EF_BRIGHTLIGHT))
+			{
+				pFire->GetEngineObject()->AddEffects(EF_BRIGHTLIGHT);
+			}
+		}
+#endif
+
+		//Play a sound
+		CPASAttenuationFilter filter(pTarget);
+		g_pSoundEmitterSystem->EmitSound(filter, pTarget->GetSoundSourceIndex(), "General.BurningFlesh");//pTarget->
+
+		pFire->SetNextClientThink(gpGlobals->curtime + 7.0f);
+	}
+
+	return pFire;
+}
+
+void C_BaseAnimating::IgniteRagdoll(C_BaseEntity* pSource)
+{
+	C_BaseEntity* pChild = pSource->GetEffectEntity();
+
+	if (pChild)
+	{
+		C_EntityFlame* pFireChild = dynamic_cast<C_EntityFlame*>(pChild);
+		C_ClientRagdoll* pRagdoll = dynamic_cast<C_ClientRagdoll*> (this);
+
+		if (pFireChild)
+		{
+			pRagdoll->SetEffectEntity(FireEffect(pRagdoll, pFireChild, NULL, NULL, NULL));
+		}
+	}
+}
+
+#define DEFAULT_FADE_START 2.0f
+#define DEFAULT_MODEL_FADE_START 1.9f
+#define DEFAULT_MODEL_FADE_LENGTH 0.1f
+#define DEFAULT_FADEIN_LENGTH 1.0f
+
+C_EntityDissolve* DissolveEffect(C_BaseEntity* pTarget, float flTime)
+{
+	C_EntityDissolve* pDissolve = (C_EntityDissolve*)cl_entitylist->CreateEntityByName("C_EntityDissolve");
+
+	if (pDissolve->InitializeAsClientEntity("sprites/blueglow1.vmt", RENDER_GROUP_TRANSLUCENT_ENTITY) == false)
+	{
+		cl_entitylist->DestroyEntity(pDissolve);// ->Release();
+		return NULL;
+	}
+
+	if (pDissolve != NULL)
+	{
+		pTarget->GetEngineObject()->AddFlag(FL_DISSOLVING);
+		pDissolve->GetEngineObject()->SetParent(pTarget->GetEngineObject());
+		pDissolve->OnDataChanged(DATA_UPDATE_CREATED);
+		pDissolve->GetEngineObject()->SetAbsOrigin(pTarget->GetEngineObject()->GetAbsOrigin());
+
+		pDissolve->m_flStartTime = flTime;
+		pDissolve->m_flFadeOutStart = DEFAULT_FADE_START;
+		pDissolve->m_flFadeOutModelStart = DEFAULT_MODEL_FADE_START;
+		pDissolve->m_flFadeOutModelLength = DEFAULT_MODEL_FADE_LENGTH;
+		pDissolve->m_flFadeInLength = DEFAULT_FADEIN_LENGTH;
+
+		pDissolve->m_nDissolveType = 0;
+		pDissolve->m_flNextSparkTime = 0.0f;
+		pDissolve->m_flFadeOutLength = 0.0f;
+		pDissolve->m_flFadeInStart = 0.0f;
+
+		// Let this entity know it needs to delete itself when it's done
+		pDissolve->SetServerLinkState(false);
+		pTarget->SetEffectEntity(pDissolve);
+	}
+
+	return pDissolve;
+
+}
+
+void C_BaseAnimating::TransferDissolveFrom(C_BaseEntity* pSource)
+{
+	C_BaseEntity* pChild = pSource->GetEffectEntity();
+
+	if (pChild)
+	{
+		C_EntityDissolve* pDissolveChild = dynamic_cast<C_EntityDissolve*>(pChild);
+
+		if (pDissolveChild)
+		{
+			C_ClientRagdoll* pRagdoll = dynamic_cast<C_ClientRagdoll*> (this);
+
+			if (pRagdoll)
+			{
+				pRagdoll->m_flEffectTime = pDissolveChild->m_flStartTime;
+
+				C_EntityDissolve* pDissolve = DissolveEffect(pRagdoll, pRagdoll->m_flEffectTime);
+
+				if (pDissolve)
+				{
+					pDissolve->SetRenderMode(pDissolveChild->GetRenderMode());
+					pDissolve->GetEngineObject()->SetRenderFX(pDissolveChild->GetEngineObject()->GetRenderFX());
+					pDissolve->SetRenderColor(255, 255, 255, 255);
+					pDissolveChild->SetRenderColorA(0);
+
+					pDissolve->m_vDissolverOrigin = pDissolveChild->m_vDissolverOrigin;
+					pDissolve->m_nDissolveType = pDissolveChild->m_nDissolveType;
+
+					if (pDissolve->m_nDissolveType == ENTITY_DISSOLVE_CORE)
+					{
+						pDissolve->m_nMagnitude = pDissolveChild->m_nMagnitude;
+						pDissolve->m_flFadeOutStart = CORE_DISSOLVE_FADE_START;
+						pDissolve->m_flFadeOutModelStart = CORE_DISSOLVE_MODEL_FADE_START;
+						pDissolve->m_flFadeOutModelLength = CORE_DISSOLVE_MODEL_FADE_LENGTH;
+						pDissolve->m_flFadeInLength = CORE_DISSOLVE_FADEIN_LENGTH;
+					}
+				}
+			}
+		}
+	}
+}
 
 //-----------------------------------------------------------------------------
 // Purpose: 

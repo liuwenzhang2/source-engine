@@ -42,7 +42,7 @@ public:
 	virtual void OnDataChanged( DataUpdateType_t type );
 	virtual void PostDataUpdate( DataUpdateType_t updateType );
     virtual void ClientThink( void );
-	virtual C_BaseAnimating *BecomeRagdollOnClient();    
+	//virtual C_BaseAnimating *BecomeRagdollOnClient();    
     //QAngle GetAnimEyeAngles( void ) { return m_angEyeAngles; }
 	const QAngle& EyeAngles( void )
 	{

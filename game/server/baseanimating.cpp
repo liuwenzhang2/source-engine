@@ -631,7 +631,9 @@ CBaseEntity* CBaseAnimating::CreateServerRagdoll(int forceBone, const CTakeDamag
 	mins = this->GetEngineObject()->OBBMins();
 	maxs = this->GetEngineObject()->OBBMaxs();
 	pRagdoll->GetEngineObject()->SetCollisionBounds(mins, maxs);
+
 	GetEngineObject()->AddFlag(FL_TRANSRAGDOLL);
+	//GetEngineObject()->SetRenderFX(kRenderFxRagdoll);//test client ragdoll
 	return pRagdoll;
 }
 

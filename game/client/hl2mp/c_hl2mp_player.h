@@ -45,7 +45,7 @@ public:
 
 	// Should this object cast shadows?
 	virtual ShadowType_t		ShadowCastType( void );
-	virtual C_BaseAnimating *BecomeRagdollOnClient();
+	//virtual C_BaseAnimating *BecomeRagdollOnClient();
 	virtual const QAngle& GetRenderAngles();
 	virtual bool ShouldDraw( void );
 	virtual void OnDataChanged( DataUpdateType_t type );

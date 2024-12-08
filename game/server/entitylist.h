@@ -3796,7 +3796,7 @@ IEngineObjectServer* CGlobalEntityList<T>::GetEngineObjectFromHandle(CBaseHandle
 	if (handle.GetEntryIndex() < 0 || handle.GetEntryIndex() >= NUM_ENT_ENTRIES) {
 		return NULL;
 	}
-	const CEntInfo<T>* pInfo = &m_EntPtrArray[handle.GetEntryIndex()];
+	const CEntInfo<T>* pInfo = &BaseClass::m_EntPtrArray[handle.GetEntryIndex()];
 	if (pInfo->m_SerialNumber == handle.GetSerialNumber())
 		return m_EngineObjectArray[handle.GetEntryIndex()];
 	else

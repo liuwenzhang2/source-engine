@@ -114,7 +114,7 @@ public:
 	virtual void BeforeBuildTransformations(IStudioHdr* pStudioHdr, Vector* pos, Quaternion q[], const matrix3x4_t& cameraTransform, int boneMask, CBoneBitList& boneComputed);
 	virtual void AfterBuildTransformations( IStudioHdr *pStudioHdr, Vector *pos, Quaternion q[], const matrix3x4_t& cameraTransform, int boneMask, CBoneBitList &boneComputed );
 
-	virtual C_BaseEntity* BecomeRagdollOnClient();
+	//virtual C_BaseEntity* BecomeRagdollOnClient();
 	virtual const IEngineObjectClient* GetRepresentativeRagdoll() const;
 
 	void ImpactTrace( trace_t *pTrace, int iDamageType, const char *pCustomImpactName );

@@ -49,7 +49,7 @@ class CJiggleBones;
 class IBoneSetup;
 FORWARD_DECLARE_HANDLE( memhandle_t );
 typedef unsigned short MDLHandle_t;
-
+class C_ClientRagdoll;
 extern ConVar vcollide_wireframe;
 
 
@@ -220,8 +220,10 @@ public:
 	virtual bool					TestCollision( const Ray_t &ray, unsigned int fContentsMask, trace_t& tr );
 	virtual bool					TestHitboxes( const Ray_t &ray, unsigned int fContentsMask, trace_t& tr );
 
-
-	virtual C_BaseEntity			*BecomeRagdollOnClient();
+	virtual C_ClientRagdoll*		CreateRagdollCopy();
+	void							IgniteRagdoll(C_BaseEntity* pSource);
+	void							TransferDissolveFrom(C_BaseEntity* pSource);
+	virtual C_BaseEntity*			BecomeRagdollOnClient();
 
 
 	virtual void					Clear( void );

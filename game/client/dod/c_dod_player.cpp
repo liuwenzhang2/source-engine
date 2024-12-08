@@ -1017,10 +1017,10 @@ CWeaponDODBase* C_DODPlayer::GetActiveDODWeapon() const
 	return dynamic_cast< CWeaponDODBase* >( pWpn );
 }
 
-C_BaseAnimating * C_DODPlayer::BecomeRagdollOnClient()
-{
-	return NULL;
-}
+//C_BaseAnimating * C_DODPlayer::BecomeRagdollOnClient()
+//{
+//	return NULL;
+//}
 
 void C_DODPlayer::FireEvent( const Vector& origin, const QAngle& angles, int event, const char *options )
 {

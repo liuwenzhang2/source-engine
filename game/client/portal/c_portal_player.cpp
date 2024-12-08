@@ -1294,12 +1294,12 @@ void C_Portal_Player::ItemPostFrame( void )
 	BaseClass::ItemPostFrame();
 }
 
-C_BaseEntity *C_Portal_Player::BecomeRagdollOnClient()
-{
-	// Let the C_CSRagdoll entity do this.
-	// m_builtRagdoll = true;
-	return NULL;
-}
+//C_BaseEntity *C_Portal_Player::BecomeRagdollOnClient()
+//{
+//	// Let the C_CSRagdoll entity do this.
+//	// m_builtRagdoll = true;
+//	return NULL;
+//}
 
 void C_Portal_Player::UpdatePortalEyeInterpolation( void )
 {

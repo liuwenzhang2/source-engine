@@ -975,11 +975,9 @@ public:
 	// returns true if we're currently being ragdolled
 	bool							IsRagdoll() const;
 	bool							IsAboutToRagdoll() const;
-	C_BaseEntity* CreateRagdollCopy();
-	void							IgniteRagdoll(C_BaseEntity* pSource);
-	void							TransferDissolveFrom(C_BaseEntity* pSource);
 	bool InitAsClientRagdoll(const matrix3x4_t* pDeltaBones0, const matrix3x4_t* pDeltaBones1, const matrix3x4_t* pCurrentBonePosition, float boneDt, bool bFixedConstraints = false);
 	//virtual void SaveRagdollInfo(int numbones, const matrix3x4_t& cameraTransform, CBoneAccessor& pBoneToWorld);
+	void							SetBuiltRagdoll(bool builtRagdoll) { m_builtRagdoll = builtRagdoll; }
 	void							ClearRagdoll();
 	//void							CreateUnragdollInfo(C_BaseEntity* pRagdoll);
 	//virtual bool					RetrieveRagdollInfo(Vector* pos, Quaternion* q);
@@ -3398,7 +3396,7 @@ IEngineObjectClient* CClientEntityList<T>::GetEngineObjectFromHandle(CBaseHandle
 	if (handle.GetEntryIndex() < 0 || handle.GetEntryIndex() >= NUM_ENT_ENTRIES) {
 		return NULL;
 	}
-	const CEntInfo<T>* pInfo = &m_EntPtrArray[handle.GetEntryIndex()];
+	const CEntInfo<T>* pInfo = &BaseClass::m_EntPtrArray[handle.GetEntryIndex()];
 	if (pInfo->m_SerialNumber == handle.GetSerialNumber())
 		return m_EngineObjectArray[handle.GetEntryIndex()];
 	else

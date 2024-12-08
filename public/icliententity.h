@@ -510,12 +510,10 @@ public:
 	virtual void ResetRagdollSleepAfterTime(void) = 0;
 	virtual float GetLastVPhysicsUpdateTime() const = 0;
 	//virtual void UnragdollBlend(IStudioHdr* hdr, Vector pos[], Quaternion q[], float currentTime) = 0;
-	virtual void IgniteRagdoll(C_BaseEntity* pSource) = 0;
-	virtual void TransferDissolveFrom(C_BaseEntity* pSource) = 0;
-	virtual C_BaseEntity* CreateRagdollCopy() = 0;
 	virtual bool InitAsClientRagdoll(const matrix3x4_t* pDeltaBones0, const matrix3x4_t* pDeltaBones1, const matrix3x4_t* pCurrentBonePosition, float boneDt, bool bFixedConstraints = false) = 0;
 	virtual bool IsRagdoll() const = 0;
 	virtual bool IsAboutToRagdoll() const = 0;
+	virtual void SetBuiltRagdoll(bool builtRagdoll) = 0;
 	virtual void Simulate() = 0;
 	//virtual void CreateUnragdollInfo(C_BaseEntity* pRagdoll) = 0;
 	virtual IPhysicsConstraintGroup* GetConstraintGroup() = 0;

@@ -2046,10 +2046,10 @@ void C_CSPlayer::AfterBuildTransformations( IStudioHdr *pHdr, Vector *pos, Quate
 }
 
 
-C_BaseEntity* C_CSPlayer::BecomeRagdollOnClient()
-{
-	return NULL;
-}
+//C_BaseEntity* C_CSPlayer::BecomeRagdollOnClient()
+//{
+//	return NULL;
+//}
 
 
 const IEngineObjectClient* C_CSPlayer::GetRepresentativeRagdoll() const

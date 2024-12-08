@@ -65,7 +65,7 @@ public:
 
 	// Should this object cast shadows?
 	virtual ShadowType_t	ShadowCastType( void );
-	virtual C_BaseEntity* BecomeRagdollOnClient();
+	//virtual C_BaseEntity* BecomeRagdollOnClient();
 	virtual bool			ShouldDraw( void );
 	virtual const QAngle&	EyeAngles();
 	virtual void			OnPreDataChanged( DataUpdateType_t type );

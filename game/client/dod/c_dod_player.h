@@ -64,7 +64,7 @@ public:
 
 	bool ShouldDraw( void );
 
-	virtual C_BaseAnimating * BecomeRagdollOnClient();
+	//virtual C_BaseAnimating * BecomeRagdollOnClient();
 	virtual const IEngineObjectClient* GetRepresentativeRagdoll() const;
 
 	virtual void ReceiveMessage( int classID, bf_read &msg );

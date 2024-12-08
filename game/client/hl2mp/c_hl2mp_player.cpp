@@ -684,12 +684,12 @@ void C_HL2MP_Player::ItemPostFrame( void )
 	BaseClass::ItemPostFrame();
 }
 
-C_BaseAnimating *C_HL2MP_Player::BecomeRagdollOnClient()
-{
-	// Let the C_CSRagdoll entity do this.
-	// m_builtRagdoll = true;
-	return NULL;
-}
+//C_BaseAnimating *C_HL2MP_Player::BecomeRagdollOnClient()
+//{
+//	// Let the C_CSRagdoll entity do this.
+//	// m_builtRagdoll = true;
+//	return NULL;
+//}
 
 void C_HL2MP_Player::CalcView( Vector &eyeOrigin, QAngle &eyeAngles, float &zNear, float &zFar, float &fov )
 {

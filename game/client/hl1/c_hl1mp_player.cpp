@@ -201,11 +201,11 @@ void C_HL1MP_Player::OnDataChanged( DataUpdateType_t type )
 	UpdateVisibility();
 }
 
-C_BaseAnimating *C_HL1MP_Player::BecomeRagdollOnClient()
-{
-    // Handled elsewhere
-    return NULL;
-}
+//C_BaseAnimating *C_HL1MP_Player::BecomeRagdollOnClient()
+//{
+//    // Handled elsewhere
+//    return NULL;
+//}
 
 void C_HL1MP_Player::PreThink( void )
 {
