@@ -733,27 +733,6 @@ END_SEND_TABLE()
 
 IMPLEMENT_SERVERCLASS(CEngineObjectInternal, DT_EngineObject)
 
-void CEngineObjectNetworkProperty::Init(CEngineObjectInternal* pEntity) {
-	CServerNetworkProperty::Init();
-	m_pOuter = pEntity;
-}
-
-int CEngineObjectNetworkProperty::entindex() const {
-	return m_pOuter->GetOuter()->entindex();
-}
-
-SendTable* CEngineObjectNetworkProperty::GetSendTable() {
-	return m_pOuter->GetServerClass()->m_pTable;
-}
-
-ServerClass* CEngineObjectNetworkProperty::GetServerClass() {
-	return m_pOuter->GetServerClass();
-}
-
-void* CEngineObjectNetworkProperty::GetDataTableBasePtr() {
-	return m_pOuter;
-}
-
 #include "tier0/memdbgoff.h"
 //-----------------------------------------------------------------------------
 // CBaseEntity new/delete
@@ -6196,8 +6175,8 @@ void CEnginePlayerInternal::SetVCollisionState(const Vector& vecAbsOrigin, const
 	}
 }
 
-CEnginePortalInternal::CEnginePortalInternal() 
-: m_DataAccess(m_InternalData)
+CEnginePortalInternal::CEnginePortalInternal(IServerEntityList* pServerEntityList, int iForceEdictIndex, int iSerialNum)
+: CEngineObjectInternal(pServerEntityList, iForceEdictIndex, iSerialNum), m_DataAccess(m_InternalData)
 {
 
 }
@@ -8841,50 +8820,51 @@ BEGIN_DATADESC(CEngineVehicleInternal)
 
 	// This has to be handled by the containing class owing to 'owner' issues
 //	DEFINE_PHYSPTR( m_pVehicle ),
-	DEFINE_PHYSPTR(m_pVehicle),
+DEFINE_PHYSPTR(m_pVehicle),
 
-	DEFINE_FIELD(m_nSpeed, FIELD_INTEGER),
-	DEFINE_FIELD(m_nLastSpeed, FIELD_INTEGER),
-	DEFINE_FIELD(m_nRPM, FIELD_INTEGER),
-	DEFINE_FIELD(m_fLastBoost, FIELD_FLOAT),
-	DEFINE_FIELD(m_nBoostTimeLeft, FIELD_INTEGER),
-	DEFINE_FIELD(m_nHasBoost, FIELD_INTEGER),
+DEFINE_FIELD(m_nSpeed, FIELD_INTEGER),
+DEFINE_FIELD(m_nLastSpeed, FIELD_INTEGER),
+DEFINE_FIELD(m_nRPM, FIELD_INTEGER),
+DEFINE_FIELD(m_fLastBoost, FIELD_FLOAT),
+DEFINE_FIELD(m_nBoostTimeLeft, FIELD_INTEGER),
+DEFINE_FIELD(m_nHasBoost, FIELD_INTEGER),
 
-	DEFINE_FIELD(m_maxThrottle, FIELD_FLOAT),
-	DEFINE_FIELD(m_flMaxRevThrottle, FIELD_FLOAT),
-	DEFINE_FIELD(m_flMaxSpeed, FIELD_FLOAT),
-	DEFINE_FIELD(m_actionSpeed, FIELD_FLOAT),
+DEFINE_FIELD(m_maxThrottle, FIELD_FLOAT),
+DEFINE_FIELD(m_flMaxRevThrottle, FIELD_FLOAT),
+DEFINE_FIELD(m_flMaxSpeed, FIELD_FLOAT),
+DEFINE_FIELD(m_actionSpeed, FIELD_FLOAT),
 
-	// This has to be handled by the containing class owing to 'owner' issues
-	//	DEFINE_PHYSPTR_ARRAY( m_pWheels ),
-	DEFINE_PHYSPTR_ARRAY(m_pWheels),
+// This has to be handled by the containing class owing to 'owner' issues
+//	DEFINE_PHYSPTR_ARRAY( m_pWheels ),
+DEFINE_PHYSPTR_ARRAY(m_pWheels),
 
-	DEFINE_FIELD(m_wheelCount, FIELD_INTEGER),
+DEFINE_FIELD(m_wheelCount, FIELD_INTEGER),
 
-	DEFINE_ARRAY(m_wheelPosition, FIELD_VECTOR, 4),
-	DEFINE_ARRAY(m_wheelRotation, FIELD_VECTOR, 4),
-	DEFINE_ARRAY(m_wheelBaseHeight, FIELD_FLOAT, 4),
-	DEFINE_ARRAY(m_wheelTotalHeight, FIELD_FLOAT, 4),
-	DEFINE_ARRAY(m_poseParameters, FIELD_INTEGER, 12),
-	DEFINE_FIELD(m_actionValue, FIELD_FLOAT),
-	DEFINE_KEYFIELD(m_actionScale, FIELD_FLOAT, "actionScale"),
-	DEFINE_FIELD(m_debugRadius, FIELD_FLOAT),
-	DEFINE_FIELD(m_throttleRate, FIELD_FLOAT),
-	DEFINE_FIELD(m_throttleStartTime, FIELD_FLOAT),
-	DEFINE_FIELD(m_throttleActiveTime, FIELD_FLOAT),
-	DEFINE_FIELD(m_turboTimer, FIELD_FLOAT),
+DEFINE_ARRAY(m_wheelPosition, FIELD_VECTOR, 4),
+DEFINE_ARRAY(m_wheelRotation, FIELD_VECTOR, 4),
+DEFINE_ARRAY(m_wheelBaseHeight, FIELD_FLOAT, 4),
+DEFINE_ARRAY(m_wheelTotalHeight, FIELD_FLOAT, 4),
+DEFINE_ARRAY(m_poseParameters, FIELD_INTEGER, 12),
+DEFINE_FIELD(m_actionValue, FIELD_FLOAT),
+DEFINE_KEYFIELD(m_actionScale, FIELD_FLOAT, "actionScale"),
+DEFINE_FIELD(m_debugRadius, FIELD_FLOAT),
+DEFINE_FIELD(m_throttleRate, FIELD_FLOAT),
+DEFINE_FIELD(m_throttleStartTime, FIELD_FLOAT),
+DEFINE_FIELD(m_throttleActiveTime, FIELD_FLOAT),
+DEFINE_FIELD(m_turboTimer, FIELD_FLOAT),
 
-	DEFINE_FIELD(m_flVehicleVolume, FIELD_FLOAT),
-	DEFINE_FIELD(m_bIsOn, FIELD_BOOLEAN),
-	DEFINE_FIELD(m_bLastThrottle, FIELD_BOOLEAN),
-	DEFINE_FIELD(m_bLastBoost, FIELD_BOOLEAN),
-	DEFINE_FIELD(m_bLastSkid, FIELD_BOOLEAN),
+DEFINE_FIELD(m_flVehicleVolume, FIELD_FLOAT),
+DEFINE_FIELD(m_bIsOn, FIELD_BOOLEAN),
+DEFINE_FIELD(m_bLastThrottle, FIELD_BOOLEAN),
+DEFINE_FIELD(m_bLastBoost, FIELD_BOOLEAN),
+DEFINE_FIELD(m_bLastSkid, FIELD_BOOLEAN),
 END_DATADESC()
 
 //-----------------------------------------------------------------------------
 // Constructor
 //-----------------------------------------------------------------------------
-CEngineVehicleInternal::CEngineVehicleInternal()
+CEngineVehicleInternal::CEngineVehicleInternal(IServerEntityList* pServerEntityList, int iForceEdictIndex, int iSerialNum)
+:CEngineObjectInternal(pServerEntityList, iForceEdictIndex, iSerialNum)
 {
 	m_flVehicleVolume = 0.5;
 	//m_pOuter = NULL;
@@ -10182,49 +10162,51 @@ int CEngineVehicleInternal::VPhysicsGetObjectList(IPhysicsObject** pList, int li
 }
 
 BEGIN_SEND_TABLE(CEngineRopeInternal, DT_EngineRope)
-	SendPropEHandle(SENDINFO(m_hStartPoint)),
-	SendPropEHandle(SENDINFO(m_hEndPoint)),
-	SendPropInt(SENDINFO(m_iStartAttachment), 5, 0),
-	SendPropInt(SENDINFO(m_iEndAttachment), 5, 0),
+SendPropEHandle(SENDINFO(m_hStartPoint)),
+SendPropEHandle(SENDINFO(m_hEndPoint)),
+SendPropInt(SENDINFO(m_iStartAttachment), 5, 0),
+SendPropInt(SENDINFO(m_iEndAttachment), 5, 0),
 
-	SendPropInt(SENDINFO(m_Slack), 12),
-	SendPropInt(SENDINFO(m_RopeLength), 15),
-	SendPropInt(SENDINFO(m_fLockedPoints), 4, SPROP_UNSIGNED),
-	SendPropInt(SENDINFO(m_RopeFlags), ROPE_NUMFLAGS, SPROP_UNSIGNED),
-	SendPropInt(SENDINFO(m_nSegments), 4, SPROP_UNSIGNED),
-	SendPropBool(SENDINFO(m_bConstrainBetweenEndpoints)),
-	SendPropInt(SENDINFO(m_iRopeMaterialModelIndex), 16, SPROP_UNSIGNED),
-	SendPropInt(SENDINFO(m_Subdiv), 4, SPROP_UNSIGNED),
+SendPropInt(SENDINFO(m_Slack), 12),
+SendPropInt(SENDINFO(m_RopeLength), 15),
+SendPropInt(SENDINFO(m_fLockedPoints), 4, SPROP_UNSIGNED),
+SendPropInt(SENDINFO(m_RopeFlags), ROPE_NUMFLAGS, SPROP_UNSIGNED),
+SendPropInt(SENDINFO(m_nSegments), 4, SPROP_UNSIGNED),
+SendPropBool(SENDINFO(m_bConstrainBetweenEndpoints)),
+SendPropInt(SENDINFO(m_iRopeMaterialModelIndex), 16, SPROP_UNSIGNED),
+SendPropInt(SENDINFO(m_Subdiv), 4, SPROP_UNSIGNED),
 
-	SendPropFloat(SENDINFO(m_TextureScale), 10, 0, 0.1f, 10.0f),
-	SendPropFloat(SENDINFO(m_Width), 0, SPROP_NOSCALE),
-	SendPropFloat(SENDINFO(m_flScrollSpeed), 0, SPROP_NOSCALE),
+SendPropFloat(SENDINFO(m_TextureScale), 10, 0, 0.1f, 10.0f),
+SendPropFloat(SENDINFO(m_Width), 0, SPROP_NOSCALE),
+SendPropFloat(SENDINFO(m_flScrollSpeed), 0, SPROP_NOSCALE),
 END_SEND_TABLE()
 
 BEGIN_DATADESC(CEngineRopeInternal)
-	DEFINE_FIELD(m_RopeFlags, FIELD_INTEGER),
-	DEFINE_KEYFIELD(m_Slack, FIELD_INTEGER, "Slack"),
-	DEFINE_KEYFIELD(m_Width, FIELD_FLOAT, "Width"),
-	DEFINE_KEYFIELD(m_TextureScale, FIELD_FLOAT, "TextureScale"),
-	DEFINE_FIELD(m_nSegments, FIELD_INTEGER),
-	DEFINE_FIELD(m_bConstrainBetweenEndpoints, FIELD_BOOLEAN),
-	DEFINE_FIELD(m_strRopeMaterialModel, FIELD_STRING),
-	DEFINE_FIELD(m_iRopeMaterialModelIndex, FIELD_MODELINDEX),
-	DEFINE_KEYFIELD(m_Subdiv, FIELD_INTEGER, "Subdiv"),
-	DEFINE_FIELD(m_RopeLength, FIELD_INTEGER),
-	DEFINE_FIELD(m_fLockedPoints, FIELD_INTEGER),
-	DEFINE_KEYFIELD(m_flScrollSpeed, FIELD_FLOAT, "ScrollSpeed"),
-	DEFINE_FIELD(m_hStartPoint, FIELD_EHANDLE),
-	DEFINE_FIELD(m_hEndPoint, FIELD_EHANDLE),
-	DEFINE_FIELD(m_iStartAttachment, FIELD_SHORT),
-	DEFINE_FIELD(m_iEndAttachment, FIELD_SHORT),
-	DEFINE_FIELD(m_bStartPointValid, FIELD_BOOLEAN),
-	DEFINE_FIELD(m_bEndPointValid, FIELD_BOOLEAN),
+DEFINE_FIELD(m_RopeFlags, FIELD_INTEGER),
+DEFINE_KEYFIELD(m_Slack, FIELD_INTEGER, "Slack"),
+DEFINE_KEYFIELD(m_Width, FIELD_FLOAT, "Width"),
+DEFINE_KEYFIELD(m_TextureScale, FIELD_FLOAT, "TextureScale"),
+DEFINE_FIELD(m_nSegments, FIELD_INTEGER),
+DEFINE_FIELD(m_bConstrainBetweenEndpoints, FIELD_BOOLEAN),
+DEFINE_FIELD(m_strRopeMaterialModel, FIELD_STRING),
+DEFINE_FIELD(m_iRopeMaterialModelIndex, FIELD_MODELINDEX),
+DEFINE_KEYFIELD(m_Subdiv, FIELD_INTEGER, "Subdiv"),
+DEFINE_FIELD(m_RopeLength, FIELD_INTEGER),
+DEFINE_FIELD(m_fLockedPoints, FIELD_INTEGER),
+DEFINE_KEYFIELD(m_flScrollSpeed, FIELD_FLOAT, "ScrollSpeed"),
+DEFINE_FIELD(m_hStartPoint, FIELD_EHANDLE),
+DEFINE_FIELD(m_hEndPoint, FIELD_EHANDLE),
+DEFINE_FIELD(m_iStartAttachment, FIELD_SHORT),
+DEFINE_FIELD(m_iEndAttachment, FIELD_SHORT),
+DEFINE_FIELD(m_bStartPointValid, FIELD_BOOLEAN),
+DEFINE_FIELD(m_bEndPointValid, FIELD_BOOLEAN),
 END_DATADESC()
 
 IMPLEMENT_SERVERCLASS(CEngineRopeInternal, DT_EngineRope)
 
-CEngineRopeInternal::CEngineRopeInternal() {
+CEngineRopeInternal::CEngineRopeInternal(IServerEntityList* pServerEntityList, int iForceEdictIndex, int iSerialNum)
+:CEngineObjectInternal(pServerEntityList, iForceEdictIndex, iSerialNum)
+{
 	m_iStartAttachment = m_iEndAttachment = 0;
 
 	m_Slack = 0;

@@ -726,6 +726,7 @@ public:
 	virtual int IndexOfHighestEdict(void) = 0;
 
 	virtual IEngineObjectServer* GetEngineObject(int entnum) = 0;
+	virtual IEngineObjectServer* GetEngineObjectFromHandle(CBaseHandle handle) = 0;
 	// Get IServerNetworkable interface for specified entity
 	virtual IServerNetworkable* GetServerNetworkable(int entnum) const = 0;
 	virtual IServerNetworkable* GetServerNetworkableFromHandle(CBaseHandle hEnt) const = 0;

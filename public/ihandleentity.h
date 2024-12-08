@@ -21,6 +21,8 @@ struct string_t;
 class IEngineObject {
 public:
 	virtual datamap_t* GetDataDescMap(void) = 0;
+	virtual const CBaseHandle& GetRefEHandle() const = 0;
+	virtual int entindex() const = 0;
 	virtual int GetModelIndex(void) const = 0;
 	virtual string_t GetModelName(void) const = 0;
 	virtual bool IsMarkedForDeletion(void) = 0;

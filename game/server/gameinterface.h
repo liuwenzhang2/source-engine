@@ -18,6 +18,7 @@
 #include "saverestoretypes.h"
 
 class IReplayFactory;
+class CBasePlayer;
 
 extern INetworkStringTable *g_pStringTableInfoPanel;
 extern INetworkStringTable *g_pStringTableServerMapCycle;

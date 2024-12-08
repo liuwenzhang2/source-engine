@@ -146,8 +146,21 @@ public:
 	DECLARE_DATADESC();
 	DECLARE_CLIENTCLASS();
 
-	int	entindex() const;
-	RecvTable* GetRecvTable();
+	const CBaseHandle& GetRefEHandle() const {
+		return m_RefEHandle;
+	}
+
+	int entindex() const {
+		CBaseHandle Handle = this->GetRefEHandle();
+		if (Handle == INVALID_ENTITY_HANDLE) {
+			return -1;
+		}
+		else {
+			return Handle.GetEntryIndex();
+		}
+	};
+
+	RecvTable* GetRecvTable() { return GetClientClass()->m_pRecvTable; }
 	//ClientClass* GetClientClass() { return NULL; }
 	void* GetDataTableBasePtr() { return this; }
 	void NotifyShouldTransmit(ShouldTransmitState_t state) { m_pOuter->NotifyShouldTransmit(state); }
@@ -165,8 +178,8 @@ public:
 	void operator delete(void* pMem);
 	void operator delete(void* pMem, int nBlockUse, const char* pFileName, int nLine) { operator delete(pMem); }
 
-	C_EngineObjectInternal(IClientEntityList* pClientEntityList)
-		:m_pClientEntityList(pClientEntityList),
+	C_EngineObjectInternal(IClientEntityList* pClientEntityList, int iForceEdictIndex, int iSerialNum)
+		:m_pClientEntityList(pClientEntityList), m_RefEHandle(iForceEdictIndex, iSerialNum),
 		m_iv_vecOrigin("C_BaseEntity::m_iv_vecOrigin", &m_vecOrigin, LATCH_SIMULATION_VAR),
 		m_iv_angRotation("C_BaseEntity::m_iv_angRotation", &m_angRotation, LATCH_SIMULATION_VAR),
 		m_iv_vecVelocity("C_BaseEntity::m_iv_vecVelocity", &m_vecVelocity, LATCH_SIMULATION_VAR),
@@ -314,6 +327,7 @@ public:
 		delete m_pBoneMergeCache;
 		//Studio_DestroyBoneCache(m_hitboxBoneCacheHandle);
 		delete m_pJiggleBones;
+		m_pOuter = NULL;
 	}
 
 	
@@ -1156,7 +1170,8 @@ private:
 
 protected:
 
-	IClientEntityList* const m_pClientEntityList;
+	IClientEntityList* const m_pClientEntityList = NULL;
+	const CBaseHandle m_RefEHandle;
 	friend class C_BaseEntity;
 	CThreadFastMutex m_CalcAbsolutePositionMutex;
 	CThreadFastMutex m_CalcAbsoluteVelocityMutex;
@@ -1928,9 +1943,7 @@ inline void C_EngineObjectInternal::SetSimulatedEveryTick(bool sim)
 	if (m_bSimulatedEveryTick != sim)
 	{
 		m_bSimulatedEveryTick = sim;
-#ifdef CLIENT_DLL
 		Interp_UpdateInterpolationAmounts();
-#endif
 	}
 }
 
@@ -1944,9 +1957,7 @@ inline void C_EngineObjectInternal::SetAnimatedEveryTick(bool anim)
 	if (m_bAnimatedEveryTick != anim)
 	{
 		m_bAnimatedEveryTick = anim;
-#ifdef CLIENT_DLL
 		Interp_UpdateInterpolationAmounts();
-#endif
 	}
 }
 
@@ -2193,8 +2204,9 @@ inline bool C_EngineObjectInternal::IsNoInterpolationFrame()
 
 class C_EngineWorldInternal : public C_EngineObjectInternal {
 public:
-	C_EngineWorldInternal(IClientEntityList* pClientEntityList) 
-	:C_EngineObjectInternal(pClientEntityList)
+	DECLARE_CLASS(C_EngineWorldInternal, C_EngineObjectInternal);
+	C_EngineWorldInternal(IClientEntityList* pClientEntityList, int iForceEdictIndex, int iSerialNum)
+	:C_EngineObjectInternal(pClientEntityList, iForceEdictIndex, iSerialNum)
 	{
 		
 	}
@@ -2202,8 +2214,9 @@ public:
 
 class C_EnginePlayerInternal : public C_EngineObjectInternal {
 public:
-	C_EnginePlayerInternal(IClientEntityList* pClientEntityList) 
-	:C_EngineObjectInternal(pClientEntityList)
+	DECLARE_CLASS(C_EnginePlayerInternal, C_EngineObjectInternal);
+	C_EnginePlayerInternal(IClientEntityList* pClientEntityList, int iForceEdictIndex, int iSerialNum)
+	:C_EngineObjectInternal(pClientEntityList, iForceEdictIndex, iSerialNum)
 	{
 	
 	}
@@ -2211,7 +2224,8 @@ public:
 
 class C_EnginePortalInternal : public C_EngineObjectInternal, public IEnginePortalClient {
 public:
-	C_EnginePortalInternal(IClientEntityList* pClientEntityList);
+	DECLARE_CLASS(C_EnginePortalInternal, C_EngineObjectInternal);
+	C_EnginePortalInternal(IClientEntityList* pClientEntityList, int iForceEdictIndex, int iSerialNum);
 	~C_EnginePortalInternal();
 	void	VPhysicsDestroyObject(void);
 	void				MoveTo(const Vector& ptCenter, const QAngle& angles);
@@ -2284,8 +2298,9 @@ static int s_iPortalSimulatorGUID = 0; //used in standalone function that have n
 
 class C_EngineShadowCloneInternal : public C_EngineObjectInternal {
 public:
-	C_EngineShadowCloneInternal(IClientEntityList* pClientEntityList) 
-	:C_EngineObjectInternal(pClientEntityList)
+	DECLARE_CLASS(C_EngineShadowCloneInternal, C_EngineObjectInternal);
+	C_EngineShadowCloneInternal(IClientEntityList* pClientEntityList, int iForceEdictIndex, int iSerialNum)
+	:C_EngineObjectInternal(pClientEntityList, iForceEdictIndex, iSerialNum)
 	{
 	
 	}
@@ -2293,8 +2308,9 @@ public:
 
 class C_EngineVehicleInternal : public C_EngineObjectInternal, public IEngineVehicleClient {
 public:
-	C_EngineVehicleInternal(IClientEntityList* pClientEntityList) 
-	:C_EngineObjectInternal(pClientEntityList)
+	DECLARE_CLASS(C_EngineVehicleInternal, C_EngineObjectInternal);
+	C_EngineVehicleInternal(IClientEntityList* pClientEntityList, int iForceEdictIndex, int iSerialNum)
+	:C_EngineObjectInternal(pClientEntityList, iForceEdictIndex, iSerialNum)
 	{
 	
 	}
@@ -2304,7 +2320,7 @@ class C_EngineRopeInternal : public C_EngineObjectInternal, public IEngineRopeCl
 public:
 	DECLARE_CLASS(C_EngineRopeInternal, C_EngineObjectInternal);
 	DECLARE_CLIENTCLASS();
-	C_EngineRopeInternal(IClientEntityList* pClientEntityList);
+	C_EngineRopeInternal(IClientEntityList* pClientEntityList, int iForceEdictIndex, int iSerialNum);
 	~C_EngineRopeInternal();
 	virtual void	OnDataChanged(DataUpdateType_t updateType);
 	// Use this when rope length and slack change to recompute the spring length.
@@ -2452,9 +2468,8 @@ void Rope_ResetCounters();
 class C_EngineGhostInternal : public C_EngineObjectInternal, public IEngineGhostClient {
 public:
 	DECLARE_CLASS(C_EngineGhostInternal, C_EngineObjectInternal);
-
-	C_EngineGhostInternal(IClientEntityList* pClientEntityList) 
-	:C_EngineObjectInternal(pClientEntityList)
+	C_EngineGhostInternal(IClientEntityList* pClientEntityList, int iForceEdictIndex, int iSerialNum)
+	:C_EngineObjectInternal(pClientEntityList, iForceEdictIndex, iSerialNum)
 	{
 
 	}
@@ -2538,10 +2553,10 @@ extern bool ShouldRemoveThisRagdoll(C_BaseEntity* pRagdoll);
 //
 // 1. It converts server entity indices into IClientNetworkables for the engine.
 //
-// 2. It provides a place to store IClientUnknowns and gives out ClientEntityHandle_t's
+// 2. It provides a place to store IClientUnknowns and gives out CBaseHandle's
 //    so they can be indexed and retreived. For example, this is how static props are referenced
 //    by the spatial partition manager - it doesn't know what is being inserted, so it's 
-//	  given ClientEntityHandle_t's, and the handlers for spatial partition callbacks can
+//	  given CBaseHandle's, and the handlers for spatial partition callbacks can
 //    use the client entity list to look them up and check for supported interfaces.
 //
 template<class T>// = IHandleEntity
@@ -2576,14 +2591,15 @@ public:
 	virtual void				DestroyEntity(IHandleEntity* pEntity);
 
 	virtual IEngineObjectClient* GetEngineObject(int entnum);
+	virtual IEngineObjectClient* GetEngineObjectFromHandle(CBaseHandle handle);
 	virtual IClientNetworkable*	GetClientNetworkable( int entnum );
 	virtual IClientEntity*		GetClientEntity( int entnum );
 
 	virtual int					NumberOfEntities( bool bIncludeNonNetworkable = false );
 
-	virtual T*					GetClientUnknownFromHandle( ClientEntityHandle_t hEnt );
-	virtual IClientNetworkable*	GetClientNetworkableFromHandle( ClientEntityHandle_t hEnt );
-	virtual IClientEntity*		GetClientEntityFromHandle( ClientEntityHandle_t hEnt );
+	virtual T*					GetClientUnknownFromHandle( CBaseHandle hEnt );
+	virtual IClientNetworkable*	GetClientNetworkableFromHandle( CBaseHandle hEnt );
+	virtual IClientEntity*		GetClientEntityFromHandle( CBaseHandle hEnt );
 
 	virtual int					GetHighestEntityIndex( void );
 
@@ -2612,17 +2628,17 @@ public:
 	C_BaseEntity*			GetBaseEntity( int entnum );
 	ICollideable*			GetCollideable( int entnum );
 
-	IClientRenderable*		GetClientRenderableFromHandle( ClientEntityHandle_t hEnt );
-	C_BaseEntity*			GetBaseEntityFromHandle( ClientEntityHandle_t hEnt );
-	ICollideable*			GetCollideableFromHandle( ClientEntityHandle_t hEnt );
-	IClientThinkable*		GetClientThinkableFromHandle( ClientEntityHandle_t hEnt );
+	IClientRenderable*		GetClientRenderableFromHandle( CBaseHandle hEnt );
+	C_BaseEntity*			GetBaseEntityFromHandle( CBaseHandle hEnt );
+	ICollideable*			GetCollideableFromHandle( CBaseHandle hEnt );
+	IClientThinkable*		GetClientThinkableFromHandle( CBaseHandle hEnt );
 
-	// Convenience methods to convert between entindex + ClientEntityHandle_t
-	ClientEntityHandle_t	EntIndexToHandle( int entnum );
-	int						HandleToEntIndex( ClientEntityHandle_t handle );
+	// Convenience methods to convert between entindex + CBaseHandle
+	CBaseHandle	EntIndexToHandle( int entnum );
+	int						HandleToEntIndex( CBaseHandle handle );
 
 	// Is a handle valid?
-	bool					IsHandleValid( ClientEntityHandle_t handle ) const;
+	bool					IsHandleValid( CBaseHandle handle ) const;
 
 	// For backwards compatibility...
 	C_BaseEntity*			GetEnt( int entnum ) { return GetBaseEntity( entnum ); }
@@ -2833,7 +2849,7 @@ void CClientEntityList<T>::PreSave(CSaveRestoreData* pSaveData)
 		C_BaseAnimating::AutoAllowBoneAccess boneaccess(true, true);
 
 		int last = GetHighestEntityIndex();
-		ClientEntityHandle_t iter = BaseClass::FirstHandle();
+		CBaseHandle iter = BaseClass::FirstHandle();
 
 		for (int e = 0; e <= last; e++)
 		{
@@ -2865,11 +2881,7 @@ void CClientEntityList<T>::SaveEntityOnTable(T* pEntity, CSaveRestoreData* pSave
 {
 	entitytable_t* pEntInfo = pSaveData->GetEntityInfo(iSlot);
 	pEntInfo->id = iSlot;
-#if !defined( CLIENT_DLL )
-	pEntInfo->edictindex = pEntity->RequiredEdictIndex();
-#else
 	pEntInfo->edictindex = -1;
-#endif
 	pEntInfo->modelname = pEntity->GetEngineObject()->GetModelName();
 	pEntInfo->restoreentityindex = -1;
 	pEntInfo->saveentityindex = pEntity ? pEntity->entindex() : -1;
@@ -2912,8 +2924,7 @@ bool CClientEntityList<T>::SaveInitEntities(CSaveRestoreData* pSaveData)
 		SaveEntityOnTable(pEnt, pSaveData, i);
 	}
 
-#if defined( CLIENT_DLL )
-	ClientEntityHandle_t iter = BaseClass::FirstHandle();
+	CBaseHandle iter = BaseClass::FirstHandle();
 
 	while (iter != BaseClass::InvalidHandle())
 	{
@@ -2926,7 +2937,6 @@ bool CClientEntityList<T>::SaveInitEntities(CSaveRestoreData* pSaveData)
 
 		iter = BaseClass::NextHandle(iter);
 	}
-#endif
 
 	//pSaveData->BuildEntityHash();
 
@@ -2993,17 +3003,6 @@ bool CClientEntityList<T>::DoRestoreEntity(T* pEntity, IRestore* pRestore)
 	pRestore->GetGameSaveRestoreInfo()->SetCurrentEntityContext(pEntity);
 	pEntity->Restore(*pRestore);
 	pRestore->GetGameSaveRestoreInfo()->SetCurrentEntityContext(NULL);
-
-#if !defined( CLIENT_DLL )
-	if (pEntity->ObjectCaps() & FCAP_MUST_SPAWN)
-	{
-		pEntity->Spawn();
-	}
-	else
-	{
-		pEntity->Precache();
-	}
-#endif
 
 	// Above calls may have resulted in self destruction
 	return (hEntity != NULL);
@@ -3175,28 +3174,28 @@ inline C_BaseEntity* CClientEntityList<T>::CreateEntityByName(const char* classN
 	}
 	switch (pFactory->GetEngineObjectType()) {
 	case ENGINEOBJECT_BASE:
-		m_EngineObjectArray[iForceEdictIndex] = new C_EngineObjectInternal(this);
+		m_EngineObjectArray[iForceEdictIndex] = new C_EngineObjectInternal(this, iForceEdictIndex, iSerialNum);
 		break;
 	case ENGINEOBJECT_WORLD:
-		m_EngineObjectArray[iForceEdictIndex] = new C_EngineWorldInternal(this);
+		m_EngineObjectArray[iForceEdictIndex] = new C_EngineWorldInternal(this, iForceEdictIndex, iSerialNum);
 		break;
 	case ENGINEOBJECT_PLAYER:
-		m_EngineObjectArray[iForceEdictIndex] = new C_EnginePlayerInternal(this);
+		m_EngineObjectArray[iForceEdictIndex] = new C_EnginePlayerInternal(this, iForceEdictIndex, iSerialNum);
 		break;
 	case ENGINEOBJECT_PORTAL:
-		m_EngineObjectArray[iForceEdictIndex] = new C_EnginePortalInternal(this);
+		m_EngineObjectArray[iForceEdictIndex] = new C_EnginePortalInternal(this, iForceEdictIndex, iSerialNum);
 		break;
 	case ENGINEOBJECT_SHADOWCLONE:
-		m_EngineObjectArray[iForceEdictIndex] = new C_EngineShadowCloneInternal(this);
+		m_EngineObjectArray[iForceEdictIndex] = new C_EngineShadowCloneInternal(this, iForceEdictIndex, iSerialNum);
 		break;
 	case ENGINEOBJECT_VEHICLE:
-		m_EngineObjectArray[iForceEdictIndex] = new C_EngineVehicleInternal(this);
+		m_EngineObjectArray[iForceEdictIndex] = new C_EngineVehicleInternal(this, iForceEdictIndex, iSerialNum);
 		break;
 	case ENGINEOBJECT_ROPE:
-		m_EngineObjectArray[iForceEdictIndex] = new C_EngineRopeInternal(this);
+		m_EngineObjectArray[iForceEdictIndex] = new C_EngineRopeInternal(this, iForceEdictIndex, iSerialNum);
 		break;
 	case ENGINEOBJECT_GHOST:
-		m_EngineObjectArray[iForceEdictIndex] = new C_EngineGhostInternal(this);
+		m_EngineObjectArray[iForceEdictIndex] = new C_EngineGhostInternal(this, iForceEdictIndex, iSerialNum);
 		break;
 	default:
 		Error("GetEngineObjectType error!\n");
@@ -3213,7 +3212,7 @@ inline void	CClientEntityList<T>::DestroyEntity(IHandleEntity* pEntity) {
 // Inline methods
 //-----------------------------------------------------------------------------
 template<class T>
-inline bool	CClientEntityList<T>::IsHandleValid( ClientEntityHandle_t handle ) const
+inline bool	CClientEntityList<T>::IsHandleValid( CBaseHandle handle ) const
 {
 	return BaseClass::LookupEntity(handle) != NULL;
 }
@@ -3225,7 +3224,7 @@ inline T* CClientEntityList<T>::GetListedEntity( int entnum )
 }
 
 template<class T>
-inline T* CClientEntityList<T>::GetClientUnknownFromHandle( ClientEntityHandle_t hEnt )
+inline T* CClientEntityList<T>::GetClientUnknownFromHandle( CBaseHandle hEnt )
 {
 	return BaseClass::LookupEntity( hEnt );
 }
@@ -3238,10 +3237,10 @@ inline CUtlLinkedList<CPVSNotifyInfo,unsigned short>& CClientEntityList<T>::GetP
 
 
 //-----------------------------------------------------------------------------
-// Convenience methods to convert between entindex + ClientEntityHandle_t
+// Convenience methods to convert between entindex + CBaseHandle
 //-----------------------------------------------------------------------------
 template<class T>
-inline ClientEntityHandle_t CClientEntityList<T>::EntIndexToHandle( int entnum )
+inline CBaseHandle CClientEntityList<T>::EntIndexToHandle( int entnum )
 {
 	if ( entnum < -1 )
 		return INVALID_EHANDLE_INDEX;
@@ -3286,7 +3285,7 @@ template<class T>
 void CClientEntityList<T>::Release(void)
 {
 	// Free all the entities.
-	ClientEntityHandle_t iter = BaseClass::FirstHandle();
+	CBaseHandle iter = BaseClass::FirstHandle();
 	while (iter != BaseClass::InvalidHandle())
 	{
 		// Try to call release on anything we can.
@@ -3330,6 +3329,18 @@ inline IEngineObjectClient* CClientEntityList<T>::GetEngineObject(int entnum) {
 }
 
 template<class T>
+IEngineObjectClient* CClientEntityList<T>::GetEngineObjectFromHandle(CBaseHandle handle) {
+	if (handle.GetEntryIndex() < 0 || handle.GetEntryIndex() >= NUM_ENT_ENTRIES) {
+		return NULL;
+	}
+	const CEntInfo<T>* pInfo = &m_EntPtrArray[handle.GetEntryIndex()];
+	if (pInfo->m_SerialNumber == handle.GetSerialNumber())
+		return m_EngineObjectArray[handle.GetEntryIndex()];
+	else
+		return NULL;
+}
+
+template<class T>
 IClientNetworkable* CClientEntityList<T>::GetClientNetworkable(int entnum)
 {
 	Assert(entnum >= 0);
@@ -3368,10 +3379,10 @@ int CClientEntityList<T>::GetMaxEntities(void)
 
 
 //-----------------------------------------------------------------------------
-// Convenience methods to convert between entindex + ClientEntityHandle_t
+// Convenience methods to convert between entindex + CBaseHandle
 //-----------------------------------------------------------------------------
 template<class T>
-int CClientEntityList<T>::HandleToEntIndex(ClientEntityHandle_t handle)
+int CClientEntityList<T>::HandleToEntIndex(CBaseHandle handle)
 {
 	if (handle == INVALID_EHANDLE_INDEX)
 		return -1;
@@ -3432,42 +3443,42 @@ ICollideable* CClientEntityList<T>::GetCollideable(int entnum)
 }
 
 template<class T>
-IClientNetworkable* CClientEntityList<T>::GetClientNetworkableFromHandle(ClientEntityHandle_t hEnt)
+IClientNetworkable* CClientEntityList<T>::GetClientNetworkableFromHandle(CBaseHandle hEnt)
 {
 	T* pEnt = GetClientUnknownFromHandle(hEnt);
 	return pEnt ? pEnt->GetClientNetworkable() : 0;
 }
 
 template<class T>
-IClientEntity* CClientEntityList<T>::GetClientEntityFromHandle(ClientEntityHandle_t hEnt)
+IClientEntity* CClientEntityList<T>::GetClientEntityFromHandle(CBaseHandle hEnt)
 {
 	T* pEnt = GetClientUnknownFromHandle(hEnt);
 	return pEnt ? pEnt->GetIClientEntity() : 0;
 }
 
 template<class T>
-IClientRenderable* CClientEntityList<T>::GetClientRenderableFromHandle(ClientEntityHandle_t hEnt)
+IClientRenderable* CClientEntityList<T>::GetClientRenderableFromHandle(CBaseHandle hEnt)
 {
 	T* pEnt = GetClientUnknownFromHandle(hEnt);
 	return pEnt ? pEnt->GetClientRenderable() : 0;
 }
 
 template<class T>
-C_BaseEntity* CClientEntityList<T>::GetBaseEntityFromHandle(ClientEntityHandle_t hEnt)
+C_BaseEntity* CClientEntityList<T>::GetBaseEntityFromHandle(CBaseHandle hEnt)
 {
 	T* pEnt = GetClientUnknownFromHandle(hEnt);
 	return pEnt ? pEnt->GetBaseEntity() : 0;
 }
 
 template<class T>
-ICollideable* CClientEntityList<T>::GetCollideableFromHandle(ClientEntityHandle_t hEnt)
+ICollideable* CClientEntityList<T>::GetCollideableFromHandle(CBaseHandle hEnt)
 {
 	T* pEnt = GetClientUnknownFromHandle(hEnt);
 	return pEnt ? pEnt->GetCollideable() : 0;
 }
 
 template<class T>
-IClientThinkable* CClientEntityList<T>::GetClientThinkableFromHandle(ClientEntityHandle_t hEnt)
+IClientThinkable* CClientEntityList<T>::GetClientThinkableFromHandle(CBaseHandle hEnt)
 {
 	T* pEnt = GetClientUnknownFromHandle(hEnt);
 	return pEnt ? pEnt->GetClientThinkable() : 0;
@@ -3778,7 +3789,7 @@ void CClientEntityList<T>::PopBoneAccess(char const* tagPop)
 // Output : int
 //-----------------------------------------------------------------------------
 template<class T>
-void CClientEntityList<T>::AddToRecordList(ClientEntityHandle_t add)
+void CClientEntityList<T>::AddToRecordList(CBaseHandle add)
 {
 	// This is a hack to remap slot to index
 	if (m_Recording.Find(add) != m_Recording.InvalidIndex())
@@ -3795,7 +3806,7 @@ void CClientEntityList<T>::AddToRecordList(ClientEntityHandle_t add)
 // Input  : remove - 
 //-----------------------------------------------------------------------------
 template<class T>
-void CClientEntityList<T>::RemoveFromRecordList(ClientEntityHandle_t remove)
+void CClientEntityList<T>::RemoveFromRecordList(CBaseHandle remove)
 {
 	m_Recording.FindAndRemove(remove);
 }
@@ -4274,11 +4285,7 @@ void CClientEntityList<T>::MoveToTopOfLRU(C_BaseEntity* pRagdoll, bool bImportan
 
 			if (pRagdoll)
 			{
-#ifdef CLIENT_DLL
 				pRagdoll->SUB_Remove();
-#else
-				pRagdoll->SUB_StartFadeOut(0);
-#endif
 				m_LRUImportantRagdolls.Remove(iIndex);
 			}
 
@@ -4345,12 +4352,7 @@ void CClientEntityList<T>::UpdateRagdolls(float frametime) // EPISODIC VERSION
 				//Found one, we're done.
 				if (ShouldRemoveThisRagdoll(m_LRU[i]) == true)
 				{
-#ifdef CLIENT_DLL
 					m_LRU[i]->SUB_Remove();
-#else
-					m_LRU[i]->SUB_StartFadeOut(0);
-#endif
-
 					m_LRU.Remove(i);
 					return;
 				}
@@ -4369,11 +4371,7 @@ void CClientEntityList<T>::UpdateRagdolls(float frametime) // EPISODIC VERSION
 	// so just remove the furthest one.
 	int furthestOne = m_LRU.Head();
 	float furthestDistSq = 0;
-#ifdef CLIENT_DLL
 	C_BaseEntity* pPlayer = GetLocalPlayer();
-#else
-	CBaseEntity* pPlayer = UTIL_GetLocalPlayer();
-#endif
 
 	if (pPlayer && m_LRU.Count() > iMaxRagdollCount) // find the furthest one algorithm
 	{
@@ -4407,11 +4405,7 @@ void CClientEntityList<T>::UpdateRagdolls(float frametime) // EPISODIC VERSION
 			}
 		}
 
-#ifdef CLIENT_DLL
 		m_LRU[furthestOne]->SUB_Remove();
-#else
-		m_LRU[furthestOne]->SUB_StartFadeOut(0);
-#endif
 
 	}
 	else // fall back on old-style pick the oldest one algorithm
@@ -4430,11 +4424,7 @@ void CClientEntityList<T>::UpdateRagdolls(float frametime) // EPISODIC VERSION
 			if (pRagdoll && (pRagdoll->GetEffectEntity() || (pObject && !pObject->IsAsleep())))
 				continue;
 
-#ifdef CLIENT_DLL
 			m_LRU[i]->SUB_Remove();
-#else
-			m_LRU[i]->SUB_StartFadeOut(0);
-#endif
 			m_LRU.Remove(i);
 		}
 	}
@@ -4480,12 +4470,7 @@ void CClientEntityList<T>::UpdateRagdolls(float frametime) // Non-episodic versi
 				//Found one, we're done.
 				if (ShouldRemoveThisRagdoll(m_LRU[i]) == true)
 				{
-#ifdef CLIENT_DLL
 					m_LRU[i]->SUB_Remove();
-#else
-					m_LRU[i]->SUB_StartFadeOut(0);
-#endif
-
 					m_LRU.Remove(i);
 					return;
 				}
@@ -4516,11 +4501,7 @@ void CClientEntityList<T>::UpdateRagdolls(float frametime) // Non-episodic versi
 		if (pRagdoll && pRagdoll->GetEffectEntity())
 			continue;
 
-#ifdef CLIENT_DLL
 		m_LRU[i]->SUB_Remove();
-#else
-		m_LRU[i]->SUB_StartFadeOut(0);
-#endif
 		m_LRU.Remove(i);
 	}
 }

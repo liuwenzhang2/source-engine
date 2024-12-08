@@ -644,14 +644,6 @@ END_RECV_TABLE()
 
 IMPLEMENT_CLIENTCLASS_NO_FACTORY(C_EngineObjectInternal, DT_EngineObject, CEngineObjectInternal);
 
-int	C_EngineObjectInternal::entindex() const {
-	return m_pOuter->entindex();
-}
-
-RecvTable* C_EngineObjectInternal::GetRecvTable() {
-	return GetClientClass()->m_pRecvTable;
-}
-
 #include "tier0/memdbgoff.h"
 
 //-----------------------------------------------------------------------------
@@ -7328,8 +7320,8 @@ void C_EngineObjectInternal::ResetLatched()
 	Interp_Reset();
 }
 
-C_EnginePortalInternal::C_EnginePortalInternal(IClientEntityList* pClientEntityList)
-:C_EngineObjectInternal(pClientEntityList), m_DataAccess(m_InternalData)
+C_EnginePortalInternal::C_EnginePortalInternal(IClientEntityList* pClientEntityList, int iForceEdictIndex, int iSerialNum)
+:C_EngineObjectInternal(pClientEntityList, iForceEdictIndex, iSerialNum), m_DataAccess(m_InternalData)
 {
 
 }
@@ -10085,8 +10077,8 @@ IMPLEMENT_CLIENTCLASS_NO_FACTORY(C_EngineRopeInternal, DT_EngineRope, CEngineRop
 //	return &m_PhysicsDelegate;
 //}
 
-C_EngineRopeInternal::C_EngineRopeInternal(IClientEntityList* pClientEntityList)
-:C_EngineObjectInternal(pClientEntityList)
+C_EngineRopeInternal::C_EngineRopeInternal(IClientEntityList* pClientEntityList, int iForceEdictIndex, int iSerialNum)
+:C_EngineObjectInternal(pClientEntityList, iForceEdictIndex, iSerialNum)
 {
 	m_bEndPointAttachmentPositionsDirty = true;
 	m_bEndPointAttachmentAnglesDirty = true;

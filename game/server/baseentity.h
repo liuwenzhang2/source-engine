@@ -364,15 +364,19 @@ struct rotatingpushmove_t;
 
 class CEntityNetworkProperty : public CServerNetworkProperty {
 public:
-	void Init(CBaseEntity* pEntity);
+	CEntityNetworkProperty(CBaseEntity* pEntity) 
+		:m_pOuter(pEntity)
+	{
+		CServerNetworkProperty::Init();
+	}
 
-	int			entindex() const;
+	int entindex() const;
 	SendTable* GetSendTable();
 	ServerClass* GetServerClass();
 	void* GetDataTableBasePtr();
 
 private:
-	CBaseEntity* m_pOuter = NULL;;
+	CBaseEntity* const m_pOuter = NULL;;
 };
 
 //#define CREATE_PREDICTED_ENTITY( className )	\
@@ -1725,6 +1729,22 @@ public:
 
 };
 
+inline int CEntityNetworkProperty::entindex() const {
+	return m_pOuter->entindex();
+}
+
+inline SendTable* CEntityNetworkProperty::GetSendTable() {
+	return m_pOuter->GetServerClass()->m_pTable;
+}
+
+inline ServerClass* CEntityNetworkProperty::GetServerClass() {
+	return m_pOuter->GetServerClass();
+}
+
+inline void* CEntityNetworkProperty::GetDataTableBasePtr() {
+	return m_pOuter;
+}
+
 // Send tables exposed in this module.
 EXTERN_SEND_TABLE(DT_BaseEntity);
 
@@ -2178,8 +2198,6 @@ inline void CBaseEntity::FireBullets( int cShots, const Vector &vecSrc,
 
 	FireBullets( info );
 }
-
-
 
 
 inline bool FClassnameIs(CBaseEntity *pEntity, const char *szClassname)

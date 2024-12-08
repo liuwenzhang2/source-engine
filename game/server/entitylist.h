@@ -137,15 +137,19 @@ class CEngineObjectInternal;
 
 class CEngineObjectNetworkProperty : public CServerNetworkProperty {
 public:
-	void Init(CEngineObjectInternal* pEntity);
+	CEngineObjectNetworkProperty(CEngineObjectInternal* pEntity) 
+	:m_pOuter(pEntity)
+	{
+		CServerNetworkProperty::Init();
+	}
 
-	int			entindex() const;
+	int entindex() const;
 	SendTable* GetSendTable();
 	ServerClass* GetServerClass();
 	void* GetDataTableBasePtr();
 
 private:
-	CEngineObjectInternal* m_pOuter = NULL;;
+	CEngineObjectInternal* const m_pOuter = NULL;;
 };
 
 class CEngineObjectInternal : public IEngineObjectServer {
@@ -157,14 +161,30 @@ public:
 
 	DECLARE_SERVERCLASS();
 
+	const CBaseHandle& GetRefEHandle() const {
+		return m_RefEHandle;
+	}
+
+	int entindex() const {
+		CBaseHandle Handle = this->GetRefEHandle();
+		if (Handle == INVALID_ENTITY_HANDLE) {
+			return -1;
+		}
+		else {
+			return Handle.GetEntryIndex();
+		}
+	};
+
 	void* operator new(size_t stAllocateBlock);
 	void* operator new(size_t stAllocateBlock, int nBlockUse, const char* pFileName, int nLine);
 	void operator delete(void* pMem);
 	void operator delete(void* pMem, int nBlockUse, const char* pFileName, int nLine) { operator delete(pMem); }
 
-	CEngineObjectInternal() {
+	CEngineObjectInternal(IServerEntityList* pServerEntityList, int iForceEdictIndex, int iSerialNum)
+	:m_pServerEntityList(pServerEntityList), m_RefEHandle(iForceEdictIndex, iSerialNum), m_Network(this)
+	{
 		SetIdentityMatrix(m_rgflCoordinateFrame);
-		m_Network.Init(this);
+		//m_Network.Init(this);
 		m_Collision.Init(this);
 		testNetwork = 9999;
 		m_vecOrigin = Vector(0, 0, 0);
@@ -227,6 +247,7 @@ public:
 		ClearRagdoll();
 		VPhysicsDestroyObject();
 		delete m_pIk;
+		m_pOuter = NULL;
 	}
 
 	void Init(CBaseEntity* pOuter) {
@@ -247,10 +268,6 @@ public:
 
 	CBaseEntity* GetOuter() {
 		return m_pOuter;
-	}
-
-	int	entindex() const {
-		return m_Network.entindex();
 	}
 
 	// Verifies that the data description is valid in debug builds.
@@ -840,6 +857,8 @@ private:
 	friend class CBaseEntity;
 	friend class CCollisionProperty;
 
+	IServerEntityList* const m_pServerEntityList = NULL;
+	const CBaseHandle m_RefEHandle;
 	CNetworkVector(m_vecOrigin);
 	CNetworkQAngle(m_angRotation);
 	CNetworkVector(m_vecVelocity);
@@ -986,6 +1005,22 @@ private:
 	CNetworkVar(int, m_ubInterpolationFrame);
 
 };
+
+inline int CEngineObjectNetworkProperty::entindex() const {
+	return m_pOuter->entindex();
+}
+
+inline SendTable* CEngineObjectNetworkProperty::GetSendTable() {
+	return m_pOuter->GetServerClass()->m_pTable;
+}
+
+inline ServerClass* CEngineObjectNetworkProperty::GetServerClass() {
+	return m_pOuter->GetServerClass();
+}
+
+inline void* CEngineObjectNetworkProperty::GetDataTableBasePtr() {
+	return m_pOuter;
+}
 
 inline PVSInfo_t* CEngineObjectInternal::GetPVSInfo()
 {
@@ -1475,12 +1510,8 @@ inline void CEngineObjectInternal::RemoveEffects(int nEffects)
 	m_fEffects &= ~nEffects;
 	if (nEffects & EF_NODRAW)
 	{
-#ifndef CLIENT_DLL
 		MarkPVSInformationDirty();//NetworkProp()->
 		m_pOuter->DispatchUpdateTransmitState();
-#else
-		UpdateVisibility();
-#endif
 	}
 }
 
@@ -1488,11 +1519,7 @@ inline void CEngineObjectInternal::ClearEffects(void)
 {
 	m_pOuter->OnRemoveEffects(m_fEffects);
 	m_fEffects = 0;
-#ifndef CLIENT_DLL
 	m_pOuter->DispatchUpdateTransmitState();
-#else
-	UpdateVisibility();
-#endif
 }
 
 inline bool CEngineObjectInternal::IsEffectActive(int nEffects) const
@@ -1698,11 +1725,30 @@ inline matrix3x4_t& CEngineObjectInternal::GetBoneForWrite(int iBone)
 
 class CEngineWorldInternal : public CEngineObjectInternal, public IEngineWorldServer {
 public:
+	DECLARE_CLASS(CEngineWorldInternal, CEngineObjectInternal);
+	CEngineWorldInternal(IServerEntityList* pServerEntityList, int iForceEdictIndex, int iSerialNum)
+		:CEngineObjectInternal(pServerEntityList, iForceEdictIndex, iSerialNum)
+	{
 
+	}
+
+	~CEngineWorldInternal() {
+
+	}
 };
 
 class CEnginePlayerInternal : public CEngineObjectInternal, public IEnginePlayerServer {
 public:
+	DECLARE_CLASS(CEnginePlayerInternal, CEngineObjectInternal);
+	CEnginePlayerInternal(IServerEntityList* pServerEntityList, int iForceEdictIndex, int iSerialNum)
+		:CEngineObjectInternal(pServerEntityList, iForceEdictIndex, iSerialNum)
+	{
+
+	}
+
+	~CEnginePlayerInternal() {
+
+	}
 	virtual void			VPhysicsDestroyObject();
 	// Player Physics Shadow
 	void					SetupVPhysicsShadow(const Vector& vecAbsOrigin, const Vector& vecAbsVelocity, CPhysCollide* pStandModel, const char* pStandHullName, CPhysCollide* pCrouchModel, const char* pCrouchHullName);
@@ -1724,8 +1770,8 @@ private:
 
 class CEnginePortalInternal : public CEngineObjectInternal, public IEnginePortalServer {
 public:
-
-	CEnginePortalInternal();
+	DECLARE_CLASS(CEnginePortalInternal, CEngineObjectInternal);
+	CEnginePortalInternal(IServerEntityList* pServerEntityList, int iForceEdictIndex, int iSerialNum);
 	~CEnginePortalInternal();
 	virtual IPhysicsObject* VPhysicsGetObject(void) const;
 	virtual int		VPhysicsGetObjectList(IPhysicsObject** pList, int listMax);
@@ -1807,7 +1853,10 @@ struct PhysicsObjectCloneLink_t
 
 class CEngineShadowCloneInternal : public CEngineObjectInternal, public IEngineShadowCloneServer {
 public:
-	CEngineShadowCloneInternal() {
+	DECLARE_CLASS(CEngineShadowCloneInternal, CEngineObjectInternal);
+	CEngineShadowCloneInternal(IServerEntityList* pServerEntityList, int iForceEdictIndex, int iSerialNum)
+	:CEngineObjectInternal(pServerEntityList, iForceEdictIndex, iSerialNum)
+	{
 		m_matrixShadowTransform.Identity();
 		m_matrixShadowTransform_Inverse.Identity();
 		m_bShadowTransformIsIdentity = true;
@@ -1886,7 +1935,7 @@ class CEngineVehicleInternal : public CEngineObjectInternal, public IEngineVehic
 public:
 	DECLARE_DATADESC();
 	DECLARE_CLASS(CEngineVehicleInternal, CEngineObjectInternal);
-	CEngineVehicleInternal();
+	CEngineVehicleInternal(IServerEntityList* pServerEntityList, int iForceEdictIndex, int iSerialNum);
 	~CEngineVehicleInternal();
 
 	// Call Precache + Spawn from the containing entity's Precache + Spawn methods
@@ -2066,7 +2115,7 @@ public:
 	DECLARE_DATADESC();
 	DECLARE_CLASS(CEngineRopeInternal, CEngineObjectInternal);
 	DECLARE_SERVERCLASS();
-	CEngineRopeInternal();
+	CEngineRopeInternal(IServerEntityList* pServerEntityList, int iForceEdictIndex, int iSerialNum);
 	~CEngineRopeInternal();
 
 	CBaseEntity* GetStartPoint() { return m_hStartPoint; }
@@ -2150,7 +2199,16 @@ private:
 
 class CEngineGhostInternal : public CEngineObjectInternal, public IEngineGhostServer {
 public:
+	DECLARE_CLASS(CEngineGhostInternal, CEngineObjectInternal);
+	CEngineGhostInternal(IServerEntityList* pServerEntityList, int iForceEdictIndex, int iSerialNum)
+		:CEngineObjectInternal(pServerEntityList, iForceEdictIndex, iSerialNum)
+	{
+		
+	}
 
+	~CEngineGhostInternal() {
+		
+	}
 };
 
 //-----------------------------------------------------------------------------
@@ -2220,6 +2278,7 @@ public:
 	CBaseEntity* CreateEntityByName(const char* className, int iForceEdictIndex = -1, int iSerialNum = -1);
 	void				DestroyEntity(IHandleEntity* pEntity);
 	IEngineObjectServer* GetEngineObject(int entnum);
+	IEngineObjectServer* GetEngineObjectFromHandle(CBaseHandle handle);
 	IServerNetworkable* GetServerNetworkable(CBaseHandle hEnt) const;
 	IServerNetworkable* GetServerNetworkable(int entnum) const;
 	IServerNetworkable* GetServerNetworkableFromHandle(CBaseHandle hEnt) const;
@@ -2442,11 +2501,7 @@ void CGlobalEntityList<T>::SaveEntityOnTable(T* pEntity, CSaveRestoreData* pSave
 {
 	entitytable_t* pEntInfo = pSaveData->GetEntityInfo(iSlot);
 	pEntInfo->id = iSlot;
-#if !defined( CLIENT_DLL )
 	pEntInfo->edictindex = pEntity->RequiredEdictIndex();
-#else
-	pEntInfo->edictindex = -1;
-#endif
 	pEntInfo->modelname = pEntity->GetEngineObject()->GetModelName();
 	pEntInfo->restoreentityindex = -1;
 	pEntInfo->saveentityindex = pEntity && pEntity->IsNetworkable() ? pEntity->entindex() : -1;
@@ -2506,12 +2561,12 @@ void CGlobalEntityList<T>::Save(ISave* pSave)
 		if (pEnt && !(pEnt->ObjectCaps() & FCAP_DONT_SAVE))
 		{
 			MDLCACHE_CRITICAL_SECTION();
-#if !defined( CLIENT_DLL )
+
 			AssertMsg(pEnt->entindex() == -1 || (pEnt->GetEngineObject()->GetClassname() != NULL_STRING &&
 				(STRING(pEnt->GetEngineObject()->GetClassname())[0] != 0) &&
 				FStrEq(STRING(pEnt->GetEngineObject()->GetClassname()), pEnt->GetClassname())),
 				"Saving entity with invalid classname");
-#endif
+
 
 			pSaveData->SetCurrentEntityContext(pEnt);
 			pEnt->Save(*pSave);
@@ -2521,7 +2576,6 @@ void CGlobalEntityList<T>::Save(ISave* pSave)
 
 			pEntInfo->classname = pEnt->GetEngineObject()->GetClassname();	// Remember entity class for respawn
 
-#if !defined( CLIENT_DLL )
 			pEntInfo->globalname = pEnt->GetEngineObject()->GetGlobalname(); // remember global name
 			pEntInfo->landmarkModelSpace = g_ServerGameDLL.ModelSpaceLandmark(pEnt->GetEngineObject()->GetModelIndex());
 			int nEntIndex = pEnt->IsNetworkable() ? pEnt->entindex() : -1;
@@ -2530,7 +2584,7 @@ void CGlobalEntityList<T>::Save(ISave* pSave)
 			{
 				pEntInfo->flags |= FENTTABLE_PLAYER;
 			}
-#endif
+
 		}
 	}
 }
@@ -2738,7 +2792,6 @@ bool CGlobalEntityList<T>::DoRestoreEntity(T* pEntity, IRestore* pRestore)
 	pEntity->Restore(*pRestore);
 	pRestore->GetGameSaveRestoreInfo()->SetCurrentEntityContext(NULL);
 
-#if !defined( CLIENT_DLL )
 	if (pEntity->ObjectCaps() & FCAP_MUST_SPAWN)
 	{
 		pEntity->Spawn();
@@ -2747,7 +2800,6 @@ bool CGlobalEntityList<T>::DoRestoreEntity(T* pEntity, IRestore* pRestore)
 	{
 		pEntity->Precache();
 	}
-#endif
 
 	// Above calls may have resulted in self destruction
 	return (hEntity != NULL);
@@ -2759,7 +2811,6 @@ int CGlobalEntityList<T>::RestoreEntity(T* pEntity, IRestore* pRestore, entityta
 	if (!DoRestoreEntity(pEntity, pRestore))
 		return 0;
 
-#if !defined( CLIENT_DLL )		
 	if (pEntity->GetEngineObject()->GetGlobalname() != NULL_STRING)
 	{
 		int globalIndex = engine->GlobalEntity_GetIndex(pEntity->GetEngineObject()->GetGlobalname());
@@ -2781,7 +2832,6 @@ int CGlobalEntityList<T>::RestoreEntity(T* pEntity, IRestore* pRestore, entityta
 			engine->GlobalEntity_Add(pEntity->GetEngineObject()->GetGlobalname(), gpGlobals->mapname, GLOBAL_ON);
 		}
 	}
-#endif
 
 	return 0;
 }
@@ -3506,28 +3556,28 @@ inline CBaseEntity* CGlobalEntityList<T>::CreateEntityByName(const char* classNa
 	}
 	switch (pFactory->GetEngineObjectType()) {
 	case ENGINEOBJECT_BASE:
-		m_EngineObjectArray[iForceEdictIndex] = new CEngineObjectInternal();
+		m_EngineObjectArray[iForceEdictIndex] = new CEngineObjectInternal(this, iForceEdictIndex, iSerialNum);
 		break;
 	case ENGINEOBJECT_WORLD:
-		m_EngineObjectArray[iForceEdictIndex] = new CEngineWorldInternal();
+		m_EngineObjectArray[iForceEdictIndex] = new CEngineWorldInternal(this, iForceEdictIndex, iSerialNum);
 		break;
 	case ENGINEOBJECT_PLAYER:
-		m_EngineObjectArray[iForceEdictIndex] = new CEnginePlayerInternal();
+		m_EngineObjectArray[iForceEdictIndex] = new CEnginePlayerInternal(this, iForceEdictIndex, iSerialNum);
 		break;
 	case ENGINEOBJECT_PORTAL:
-		m_EngineObjectArray[iForceEdictIndex] = new CEnginePortalInternal();
+		m_EngineObjectArray[iForceEdictIndex] = new CEnginePortalInternal(this, iForceEdictIndex, iSerialNum);
 		break;
 	case ENGINEOBJECT_SHADOWCLONE:
-		m_EngineObjectArray[iForceEdictIndex] = new CEngineShadowCloneInternal();
+		m_EngineObjectArray[iForceEdictIndex] = new CEngineShadowCloneInternal(this, iForceEdictIndex, iSerialNum);
 		break;
 	case ENGINEOBJECT_VEHICLE:
-		m_EngineObjectArray[iForceEdictIndex] = new CEngineVehicleInternal();
+		m_EngineObjectArray[iForceEdictIndex] = new CEngineVehicleInternal(this, iForceEdictIndex, iSerialNum);
 		break;
 	case ENGINEOBJECT_ROPE:
-		m_EngineObjectArray[iForceEdictIndex] = new CEngineRopeInternal();
+		m_EngineObjectArray[iForceEdictIndex] = new CEngineRopeInternal(this, iForceEdictIndex, iSerialNum);
 		break;
 	case ENGINEOBJECT_GHOST:
-		m_EngineObjectArray[iForceEdictIndex] = new CEngineGhostInternal();
+		m_EngineObjectArray[iForceEdictIndex] = new CEngineGhostInternal(this, iForceEdictIndex, iSerialNum);
 		break;
 	default:
 		Error("GetEngineObjectType error!\n");
@@ -3556,6 +3606,18 @@ inline IEngineObjectServer* CGlobalEntityList<T>::GetEngineObject(int entnum) {
 		return NULL;
 	}
 	return m_EngineObjectArray[entnum];
+}
+
+template<class T>
+IEngineObjectServer* CGlobalEntityList<T>::GetEngineObjectFromHandle(CBaseHandle handle) {
+	if (handle.GetEntryIndex() < 0 || handle.GetEntryIndex() >= NUM_ENT_ENTRIES) {
+		return NULL;
+	}
+	const CEntInfo<T>* pInfo = &m_EntPtrArray[handle.GetEntryIndex()];
+	if (pInfo->m_SerialNumber == handle.GetSerialNumber())
+		return m_EngineObjectArray[handle.GetEntryIndex()];
+	else
+		return NULL;
 }
 
 template<class T>
@@ -4611,11 +4673,7 @@ void CGlobalEntityList<T>::MoveToTopOfLRU(CBaseEntity* pRagdoll, bool bImportant
 
 			if (pRagdoll)
 			{
-#ifdef CLIENT_DLL
-				pRagdoll->SUB_Remove();
-#else
 				pRagdoll->SUB_StartFadeOut(0);
-#endif
 				m_LRUImportantRagdolls.Remove(iIndex);
 			}
 
@@ -4682,12 +4740,7 @@ void CGlobalEntityList<T>::UpdateRagdolls(float frametime) // EPISODIC VERSION
 				//Found one, we're done.
 				if (ShouldRemoveThisRagdoll(m_LRU[i]) == true)
 				{
-#ifdef CLIENT_DLL
-					m_LRU[i]->SUB_Remove();
-#else
 					m_LRU[i]->SUB_StartFadeOut(0);
-#endif
-
 					m_LRU.Remove(i);
 					return;
 				}
@@ -4706,11 +4759,8 @@ void CGlobalEntityList<T>::UpdateRagdolls(float frametime) // EPISODIC VERSION
 	// so just remove the furthest one.
 	int furthestOne = m_LRU.Head();
 	float furthestDistSq = 0;
-#ifdef CLIENT_DLL
-	C_BasePlayer* pPlayer = (C_BasePlayer*)ClientEntityList().GetLocalPlayer();
-#else
+
 	CBaseEntity* pPlayer = (CBaseEntity*)UTIL_GetLocalPlayer();
-#endif
 
 	if (pPlayer && m_LRU.Count() > iMaxRagdollCount) // find the furthest one algorithm
 	{
@@ -4744,11 +4794,7 @@ void CGlobalEntityList<T>::UpdateRagdolls(float frametime) // EPISODIC VERSION
 			}
 		}
 
-#ifdef CLIENT_DLL
-		m_LRU[furthestOne]->SUB_Remove();
-#else
 		m_LRU[furthestOne]->SUB_StartFadeOut(0);
-#endif
 
 	}
 	else // fall back on old-style pick the oldest one algorithm
@@ -4767,11 +4813,7 @@ void CGlobalEntityList<T>::UpdateRagdolls(float frametime) // EPISODIC VERSION
 			if (pRagdoll && (pRagdoll->GetEffectEntity() || (pObject && !pObject->IsAsleep())))
 				continue;
 
-#ifdef CLIENT_DLL
-			m_LRU[i]->SUB_Remove();
-#else
 			m_LRU[i]->SUB_StartFadeOut(0);
-#endif
 			m_LRU.Remove(i);
 		}
 	}
@@ -4817,12 +4859,7 @@ void CGlobalEntityList<T>::UpdateRagdolls(float frametime) // Non-episodic versi
 				//Found one, we're done.
 				if (ShouldRemoveThisRagdoll(m_LRU[i]) == true)
 				{
-#ifdef CLIENT_DLL
-					m_LRU[i]->SUB_Remove();
-#else
 					m_LRU[i]->SUB_StartFadeOut(0);
-#endif
-
 					m_LRU.Remove(i);
 					return;
 				}
@@ -4853,11 +4890,7 @@ void CGlobalEntityList<T>::UpdateRagdolls(float frametime) // Non-episodic versi
 		if (pRagdoll && pRagdoll->GetEffectEntity())
 			continue;
 
-#ifdef CLIENT_DLL
-		m_LRU[i]->SUB_Remove();
-#else
 		m_LRU[i]->SUB_StartFadeOut(0);
-#endif
 		m_LRU.Remove(i);
 	}
 }

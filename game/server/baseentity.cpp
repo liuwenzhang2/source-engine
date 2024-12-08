@@ -89,27 +89,6 @@ int g_nInsideDispatchUpdateTransmitState = 0;
 ConVar sv_netvisdist( "sv_netvisdist", "10000", FCVAR_CHEAT | FCVAR_DEVELOPMENTONLY, "Test networking visibility distance" );
 ConVar ai_sequence_debug("ai_sequence_debug", "0");
 
-void CEntityNetworkProperty::Init(CBaseEntity* pEntity) {
-	CServerNetworkProperty::Init();
-	m_pOuter = pEntity;
-}
-
-int CEntityNetworkProperty::entindex() const {
-	return m_pOuter->entindex();
-}
-
-SendTable* CEntityNetworkProperty::GetSendTable() {
-	return m_pOuter->GetServerClass()->m_pTable;
-}
-
-ServerClass* CEntityNetworkProperty::GetServerClass() {
-	return m_pOuter->GetServerClass();
-}
-
-void* CEntityNetworkProperty::GetDataTableBasePtr() {
-	return m_pOuter;
-}
-
 //#if !defined( NO_ENTITY_PREDICTION )
 //BEGIN_SEND_TABLE_NOBASE( CBaseEntity, DT_PredictableId )
 //	SendPropPredictableId( SENDINFO( m_PredictableID ) ),
@@ -133,16 +112,16 @@ void* CEntityNetworkProperty::GetDataTableBasePtr() {
 
 
 // This table encodes the CBaseEntity data.
-IMPLEMENT_SERVERCLASS_ST_NOBASE( CBaseEntity, DT_BaseEntity )
-	SendPropInt		(SENDINFO(m_nRenderMode),	8, SPROP_UNSIGNED ),
-	SendPropInt		(SENDINFO(m_clrRender),	32, SPROP_UNSIGNED),
-	SendPropInt		(SENDINFO(m_iTeamNum),		TEAMNUM_NUM_BITS, 0),
-	SendPropFloat	(SENDINFO(m_flShadowCastDistance), 12, SPROP_UNSIGNED ),
-	SendPropEHandle (SENDINFO(m_hOwnerEntity)),
-	SendPropEHandle (SENDINFO(m_hEffectEntity)),
+IMPLEMENT_SERVERCLASS_ST_NOBASE(CBaseEntity, DT_BaseEntity)
+SendPropInt(SENDINFO(m_nRenderMode), 8, SPROP_UNSIGNED),
+SendPropInt(SENDINFO(m_clrRender), 32, SPROP_UNSIGNED),
+SendPropInt(SENDINFO(m_iTeamNum), TEAMNUM_NUM_BITS, 0),
+SendPropFloat(SENDINFO(m_flShadowCastDistance), 12, SPROP_UNSIGNED),
+SendPropEHandle(SENDINFO(m_hOwnerEntity)),
+SendPropEHandle(SENDINFO(m_hEffectEntity)),
 
 
-	SendPropInt		( SENDINFO( m_iTextureFrameIndex ),		8, SPROP_UNSIGNED ),
+SendPropInt(SENDINFO(m_iTextureFrameIndex), 8, SPROP_UNSIGNED),
 
 //#if !defined( NO_ENTITY_PREDICTION )
 //	SendPropDataTable( "predictable_id", 0, &REFERENCE_SEND_TABLE( DT_PredictableId ), SendProxy_SendPredictableId ),
@@ -152,7 +131,7 @@ IMPLEMENT_SERVERCLASS_ST_NOBASE( CBaseEntity, DT_BaseEntity )
 
 
 #ifdef TF_DLL
-	SendPropArray3( SENDINFO_ARRAY3(m_nModelIndexOverrides), SendPropInt( SENDINFO_ARRAY(m_nModelIndexOverrides), SP_MODEL_INDEX_BITS, 0 ) ),
+	SendPropArray3(SENDINFO_ARRAY3(m_nModelIndexOverrides), SendPropInt(SENDINFO_ARRAY(m_nModelIndexOverrides), SP_MODEL_INDEX_BITS, 0)),
 #endif
 	SendPropEHandle(SENDINFO(m_hLightingOrigin)),
 	SendPropEHandle(SENDINFO(m_hLightingOriginRelative)),
@@ -160,45 +139,46 @@ IMPLEMENT_SERVERCLASS_ST_NOBASE( CBaseEntity, DT_BaseEntity )
 	SendPropFloat(SENDINFO(m_fadeMinDist), 0, SPROP_NOSCALE),
 	SendPropFloat(SENDINFO(m_fadeMaxDist), 0, SPROP_NOSCALE),
 	SendPropFloat(SENDINFO(m_flFadeScale), 0, SPROP_NOSCALE),
-END_SEND_TABLE()
+	END_SEND_TABLE()
 
 
-// dynamic models
-//class CBaseEntityModelLoadProxy
-//{
-//protected:
-//	class Handler : public IModelLoadCallback
-//	{
-//	public:
-//		explicit Handler( CBaseEntity *pEntity ) : m_pEntity(pEntity) { }
-//		virtual void OnModelLoadComplete( const model_t *pModel );
-//		CBaseEntity* m_pEntity;
-//	};
-//	Handler* m_pHandler;
-//
-//public:
-//	explicit CBaseEntityModelLoadProxy( CBaseEntity *pEntity ) : m_pHandler( new Handler( pEntity ) ) { }
-//	~CBaseEntityModelLoadProxy() { delete m_pHandler; }
-//	void Register( int nModelIndex ) const { modelinfo->RegisterModelLoadCallback( nModelIndex, m_pHandler ); }
-//	operator CBaseEntity * () const { return m_pHandler->m_pEntity; }
-//
-//private:
-//	CBaseEntityModelLoadProxy( const CBaseEntityModelLoadProxy& );
-//	CBaseEntityModelLoadProxy& operator=( const CBaseEntityModelLoadProxy& );
-//};
+	// dynamic models
+	//class CBaseEntityModelLoadProxy
+	//{
+	//protected:
+	//	class Handler : public IModelLoadCallback
+	//	{
+	//	public:
+	//		explicit Handler( CBaseEntity *pEntity ) : m_pEntity(pEntity) { }
+	//		virtual void OnModelLoadComplete( const model_t *pModel );
+	//		CBaseEntity* m_pEntity;
+	//	};
+	//	Handler* m_pHandler;
+	//
+	//public:
+	//	explicit CBaseEntityModelLoadProxy( CBaseEntity *pEntity ) : m_pHandler( new Handler( pEntity ) ) { }
+	//	~CBaseEntityModelLoadProxy() { delete m_pHandler; }
+	//	void Register( int nModelIndex ) const { modelinfo->RegisterModelLoadCallback( nModelIndex, m_pHandler ); }
+	//	operator CBaseEntity * () const { return m_pHandler->m_pEntity; }
+	//
+	//private:
+	//	CBaseEntityModelLoadProxy( const CBaseEntityModelLoadProxy& );
+	//	CBaseEntityModelLoadProxy& operator=( const CBaseEntityModelLoadProxy& );
+	//};
 
-//static CUtlHashtable< CBaseEntityModelLoadProxy, empty_t, PointerHashFunctor, PointerEqualFunctor, CBaseEntity * > sg_DynamicLoadHandlers;
+	//static CUtlHashtable< CBaseEntityModelLoadProxy, empty_t, PointerHashFunctor, PointerEqualFunctor, CBaseEntity * > sg_DynamicLoadHandlers;
 
-//void CBaseEntityModelLoadProxy::Handler::OnModelLoadComplete( const model_t *pModel )
-//{
-//	m_pEntity->OnModelLoadComplete( pModel );
-//	sg_DynamicLoadHandlers.Remove( m_pEntity ); // NOTE: destroys *this!
-//}
+	//void CBaseEntityModelLoadProxy::Handler::OnModelLoadComplete( const model_t *pModel )
+	//{
+	//	m_pEntity->OnModelLoadComplete( pModel );
+	//	sg_DynamicLoadHandlers.Remove( m_pEntity ); // NOTE: destroys *this!
+	//}
 
 
 
 
 CBaseEntity::CBaseEntity()
+:m_Network(this)
 {
 	COMPILE_TIME_ASSERT( MOVETYPE_LAST < (1 << MOVETYPE_MAX_BITS) );
 	COMPILE_TIME_ASSERT( MOVECOLLIDE_COUNT < (1 << MOVECOLLIDE_MAX_BITS) );
@@ -216,7 +196,7 @@ CBaseEntity::CBaseEntity()
 //	((Vector)GetEngineObject()->GetLocalVelocity()).Init();
 //	GetEngineObject()->GetAbsVelocity().Init();
 //#endif
-	NetworkProp()->Init( this );
+	//NetworkProp()->Init( this );
 
 	// clear debug overlays
 	m_debugOverlays  = 0;

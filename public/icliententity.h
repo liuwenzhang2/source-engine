@@ -757,6 +757,7 @@ public:
 
 	// Get IClientNetworkable interface for specified entity
 	virtual IEngineObjectClient* GetEngineObject(int entnum) = 0;
+	virtual IEngineObjectClient* GetEngineObjectFromHandle(CBaseHandle handle) = 0;
 	virtual IClientNetworkable* GetClientNetworkable(int entnum) = 0;
 	virtual IClientNetworkable* GetClientNetworkableFromHandle(CBaseHandle hEnt) = 0;
 	virtual IClientUnknown* GetClientUnknownFromHandle(CBaseHandle hEnt) = 0;

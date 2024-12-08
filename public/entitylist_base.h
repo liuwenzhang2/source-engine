@@ -515,7 +515,7 @@ protected:
 	void* CreateDataObject(int type, T* instance);
 	void DestroyDataObject(int type, T* instance);
 
-private:
+protected:
 	//CBaseHandle AddEntityAtSlot( T *pEnt, int iSlot, int iForcedSerialNum );
 	//void RemoveEntityAtSlot( int iSlot );
 	int GetEntInfoIndex( const CEntInfo<T> *pEntInfo ) const;
