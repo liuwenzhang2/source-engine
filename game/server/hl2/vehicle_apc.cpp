@@ -217,7 +217,7 @@ void CPropAPC::UpdateOnRemove( void )
 {
 	if ( m_hLaserDot )
 	{
-		UTIL_Remove( m_hLaserDot );
+		gEntList.DestroyEntity( m_hLaserDot );
 		m_hLaserDot = NULL;
 	}
 	BaseClass::UpdateOnRemove();
@@ -926,7 +926,7 @@ void CPropAPC::CreateCorpse( )
 
 	GetEngineObject()->AddSolidFlags( FSOLID_NOT_SOLID );
 	GetEngineObject()->AddEffects( EF_NODRAW );
-	UTIL_Remove( this );
+	gEntList.DestroyEntity( this );
 }
 
 

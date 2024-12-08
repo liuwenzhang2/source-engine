@@ -306,7 +306,7 @@ void CBaseEntity::SetScaledPhysics( IPhysicsObject *pNewObject )
 // Purpose: Called just prior to object destruction
 //  Entities that need to unlink themselves from other entities should do the unlinking
 //  here rather than in their destructor.  The reason why is that when the global entity list
-//  is told to Clear(), it first takes a pass through all active entities and calls UTIL_Remove
+//  is told to Clear(), it first takes a pass through all active entities and calls gEntList.DestroyEntity
 //  on each such entity.  Then it calls the delete function on each deleted entity in the list.
 // In the old code, the objects were simply destroyed in order and there was no guarantee that the
 //  destructor of one object would not try to access another object that might already have been
@@ -386,7 +386,7 @@ void CBaseEntity::UpdateOnRemove(void)
 		DevMsg(2, "Warning: Deleting orphaned children of %s\n", GetClassname());
 		for (int i = childrenList.Count() - 1; i >= 0; --i)
 		{
-			UTIL_Remove(childrenList[i]->GetOuter());
+			gEntList.DestroyEntity(childrenList[i]->GetOuter());
 		}
 	}
 
@@ -410,7 +410,7 @@ void CBaseEntity::UpdateOnRemove(void)
 		gEntList.SetDisableEhandleAccess(true);
 
 		// Remove this entity from the ent list (NOTE:  This Makes EHANDLES go NULL)
-		//gEntList.RemoveEntity( this );
+		//gEntList.DestroyEntity( this );
 	}
 }
 
@@ -431,7 +431,7 @@ CBaseEntity::~CBaseEntity( )
 	// EHANDLE accessors will check, in debug, for access to entities during destruction of
 	//  another entity.
 	// That kind of operation should only occur in UpdateOnRemove calls
-	// Deletion should only occur via UTIL_Remove(Immediate) calls, not via naked delete calls
+	// Deletion should only occur via gEntList.DestroyEntity(Immediate) calls, not via naked delete calls
 	Assert( gEntList.IsDisableEhandleAccess() );
 
 	//GetEngineObject()->VPhysicsDestroyObject();
@@ -518,7 +518,7 @@ const IEngineRopeServer* CBaseEntity::GetEngineRope() const
 void CBaseEntity::Release() {
 	//GetEngineObject()->PhysicsRemoveTouchedList();
 	//CBaseEntity::PhysicsRemoveGroundList(this);
-	UTIL_Remove(this);
+	gEntList.DestroyEntity(this);
 }
 
 void CBaseEntity::ClearModelIndexOverrides( void )
@@ -1390,7 +1390,7 @@ void CBaseEntity::Event_Killed( const CTakeDamageInfo &info )
 
 	m_takedamage = DAMAGE_NO;
 	m_lifeState = LIFE_DEAD;
-	UTIL_Remove( this );
+	gEntList.DestroyEntity( this );
 }
 
 //-----------------------------------------------------------------------------
@@ -3476,7 +3476,7 @@ void CBaseEntity::InputKill( inputdata_t &inputdata )
 		SetOwnerEntity( NULL );
 	}
 
-	UTIL_Remove( this );
+	gEntList.DestroyEntity( this );
 }
 
 void CBaseEntity::InputKillHierarchy( inputdata_t &inputdata )
@@ -3496,7 +3496,7 @@ void CBaseEntity::InputKillHierarchy( inputdata_t &inputdata )
 		SetOwnerEntity( NULL );
 	}
 
-	UTIL_Remove( this );
+	gEntList.DestroyEntity( this );
 }
 
 //------------------------------------------------------------------------------
@@ -4420,7 +4420,7 @@ void CC_Ent_Remove( const CCommand& args )
 	if ( pEntity )
 	{
 		Msg( "Removed %s(%s)\n", STRING(pEntity->GetEngineObject()->GetClassname()), pEntity->GetDebugName() );
-		UTIL_Remove( pEntity );
+		gEntList.DestroyEntity( pEntity );
 	}
 }
 static ConCommand ent_remove("ent_remove", CC_Ent_Remove, "Removes the given entity(s)\n\tArguments:   	{entity_name} / {class_name} / no argument picks what player is looking at ", FCVAR_CHEAT);
@@ -4444,7 +4444,7 @@ void CC_Ent_RemoveAll( const CCommand& args )
 				  (ent->GetEngineObject()->GetClassname() != NULL_STRING	&& FStrEq(args[1], STRING(ent->GetEngineObject()->GetClassname()))) ||
 				  (ent->GetClassname()!=NULL && FStrEq(args[1], ent->GetClassname())))
 			{
-				UTIL_Remove( ent );
+				gEntList.DestroyEntity( ent );
 				iCount++;
 			}
 		}
@@ -6401,7 +6401,7 @@ void CBaseEntity::SUB_FadeOut( void  )
 
 	if ( m_clrRender->a == 0 )
 	{
-		UTIL_Remove(this);
+		gEntList.DestroyEntity(this);
 	}
 	else
 	{

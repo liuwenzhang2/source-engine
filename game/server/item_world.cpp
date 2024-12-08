@@ -82,7 +82,7 @@ void CWorldItem::Spawn( void )
 		pEntity->GetEngineObject()->AddSpawnFlags(GetEngineObject()->GetSpawnFlags() );
 	}
 
-	UTIL_RemoveImmediate( this );
+	gEntList.DestroyEntityImmediate( this );
 }
 
 
@@ -136,7 +136,7 @@ bool CItem::CreateItemVPhysicsObject( void )
 		if (UTIL_DropToFloor(this, MASK_SOLID) == 0)
 		{
 			Warning( "Item %s fell out of level at %f,%f,%f\n", GetClassname(), GetEngineObject()->GetAbsOrigin().x, GetEngineObject()->GetAbsOrigin().y, GetEngineObject()->GetAbsOrigin().z);
-			UTIL_Remove( this );
+			gEntList.DestroyEntity( this );
 			return false;
 		}
 	}
@@ -151,7 +151,7 @@ void CItem::Spawn( void )
 {
 	if ( g_pGameRules->IsAllowedToSpawn( this ) == false )
 	{
-		UTIL_Remove( this );
+		gEntList.DestroyEntity( this );
 		return;
 	}
 
@@ -445,7 +445,7 @@ void CItem::ItemTouch( CBaseEntity *pOther )
 		}
 		else
 		{
-			UTIL_Remove( this );
+			gEntList.DestroyEntity( this );
 
 #ifdef HL2MP
 			HL2MPRules()->RemoveLevelDesignerPlacedObject( this );
@@ -454,7 +454,7 @@ void CItem::ItemTouch( CBaseEntity *pOther )
 	}
 	else if (gEvilImpulse101)
 	{
-		UTIL_Remove( this );
+		gEntList.DestroyEntity( this );
 	}
 }
 

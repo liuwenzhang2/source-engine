@@ -680,7 +680,7 @@ class CEventQueueSaveLoadProxy : public CLogicalEntity
 
 		// Now remove myself, because the CEventQueue_SaveRestoreBlockHandler
 		// will handle future saves.
-		UTIL_Remove( this );
+		gEntList.DestroyEntity( this );
 
 		return iReturn;
 	}

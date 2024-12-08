@@ -628,7 +628,7 @@ void CProtoSniper::LaserOff( void )
 {
 	if( m_pBeam )
 	{
-		UTIL_Remove( m_pBeam);
+		gEntList.DestroyEntity( m_pBeam);
 		m_pBeam = NULL;
 	}
 
@@ -1367,7 +1367,7 @@ void CProtoSniper::Event_Killed( const CTakeDamageInfo &info )
 	params.m_bWarnOnDirectWaveReference = true;
 	g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 
-	UTIL_Remove( this );
+	gEntList.DestroyEntity( this );
 }
 
 //---------------------------------------------------------

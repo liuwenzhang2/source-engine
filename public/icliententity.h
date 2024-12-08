@@ -762,8 +762,8 @@ public:
 	virtual void			Restore(IRestore* pRestore, bool createPlayers) = 0;
 	virtual void			PostRestore() = 0;
 
-	virtual IClientEntity* CreateEntityByName(const char* className, int iForceEdictIndex = -1, int iSerialNum = -1) = 0;
-	virtual void				DestroyEntity(IHandleEntity* pEntity) = 0;
+	virtual IClientEntity*	CreateEntityByName(const char* className, int iForceEdictIndex = -1, int iSerialNum = -1) = 0;
+	virtual void			DestroyEntity(IHandleEntity* pEntity) = 0;
 
 	// Get IClientNetworkable interface for specified entity
 	virtual IEngineObjectClient* GetEngineObject(int entnum) = 0;

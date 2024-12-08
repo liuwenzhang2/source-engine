@@ -321,7 +321,7 @@ void CDODBaseGrenade::Use( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TY
 		
 		//Remove the one we picked up
 		SetThink( NULL );
-		UTIL_Remove( this );
+		gEntList.DestroyEntity( this );
 	}
 }
 

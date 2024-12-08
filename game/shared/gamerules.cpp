@@ -77,7 +77,7 @@ CGameRulesProxy::CGameRulesProxy()
 	if ( s_pGameRulesProxy )
 	{
 #ifndef CLIENT_DLL
-		UTIL_Remove( s_pGameRulesProxy );
+		gEntList.DestroyEntity( s_pGameRulesProxy );
 #endif
 		s_pGameRulesProxy = NULL;
 	}

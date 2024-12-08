@@ -250,8 +250,8 @@ void CSquidSpit::Touch ( CBaseEntity *pOther )
 		pOther->TakeDamage( info );
 	}
 
-	UTIL_Remove( m_hSprite );
-	UTIL_Remove( this );
+	gEntList.DestroyEntity( m_hSprite );
+	gEntList.DestroyEntity( this );
 }
 
 

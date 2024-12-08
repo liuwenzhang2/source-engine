@@ -219,10 +219,10 @@ void CGrenadeSpit::Detonate(void)
 
 	if ( m_hSpitEffect )
 	{
-		UTIL_Remove( m_hSpitEffect );
+		gEntList.DestroyEntity( m_hSpitEffect );
 	}
 
-	UTIL_Remove( this );
+	gEntList.DestroyEntity( this );
 }
 
 void CGrenadeSpit::InitHissSound( void )

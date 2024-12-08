@@ -106,12 +106,12 @@ void CAI_Relationship::Spawn()
 	if (m_iszSubject == NULL_STRING)
 	{
 		DevWarning("ai_relationship '%s' with no subject specified, removing.\n", GetDebugName());
-		UTIL_Remove(this);
+		gEntList.DestroyEntity(this);
 	}
 	else if (m_target == NULL_STRING)
 	{
 		DevWarning("ai_relationship '%s' with no target specified, removing.\n", GetDebugName());
-		UTIL_Remove(this);
+		gEntList.DestroyEntity(this);
 	}
 }
 

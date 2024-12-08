@@ -225,14 +225,7 @@ inline int UTIL_EntitiesInSphere( CBaseEntity **pList, int listMax, const Vector
 	return UTIL_EntitiesInSphere( center, radius, &sphereEnum );
 }
 
-// marks the entity for deletion so it will get removed next frame
-//void UTIL_Remove( IServerNetworkable *oldObj );
-void UTIL_Remove( CBaseEntity *oldObj );
 
-// deletes an entity, without any delay.  Only use this when sure no pointers rely on this entity.
-void UTIL_DisableRemoveImmediate();
-void UTIL_EnableRemoveImmediate();
-void UTIL_RemoveImmediate( CBaseEntity *oldObj );
 
 // make this a fixed size so it just sits on the stack
 #define MAX_SPHERE_QUERY	512

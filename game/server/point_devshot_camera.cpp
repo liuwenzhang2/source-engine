@@ -81,7 +81,7 @@ void CPointDevShotCamera::Spawn( void )
 	// Remove this entity immediately if we're not making devshots
 	if ( !CommandLine()->FindParm("-makedevshots") )
 	{
-		UTIL_Remove( this );
+		gEntList.DestroyEntity( this );
 		return;
 	}
 

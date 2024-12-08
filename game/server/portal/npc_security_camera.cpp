@@ -970,7 +970,7 @@ void CNPC_SecurityCamera::RopesOff( void )
 		// Remove rope if it's alive
 		if ( m_hRopes[ iRope ] )
 		{
-			UTIL_Remove( m_hRopes[ iRope ] );
+			gEntList.DestroyEntity( m_hRopes[ iRope ] );
 			m_hRopes[ iRope ] = NULL;
 		}
 	}
@@ -995,7 +995,7 @@ void CNPC_SecurityCamera::EyeOff( void )
 {
 	if ( m_hEyeGlow != NULL )
 	{
-		UTIL_Remove( m_hEyeGlow );
+		gEntList.DestroyEntity( m_hEyeGlow );
 		m_hEyeGlow = NULL;
 	}
 }

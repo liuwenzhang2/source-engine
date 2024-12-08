@@ -678,7 +678,7 @@ public:
 		{
 			if ( m_hSpawnedEntities[i] )
 			{
-				UTIL_Remove( m_hSpawnedEntities[i] );
+				gEntList.DestroyEntity( m_hSpawnedEntities[i] );
 			}
 		}
 		m_hSpawnedEntities.Purge();
@@ -688,7 +688,7 @@ public:
 		CBaseEntity *pSemaphore = gEntList.FindEntityByName( NULL, COMMENTARY_SPAWNED_SEMAPHORE );
 		if ( pSemaphore )
 		{
-			UTIL_Remove( pSemaphore );
+			gEntList.DestroyEntity( pSemaphore );
 		}
 
 		// Remove our global convar callback
@@ -1363,13 +1363,13 @@ void CPointCommentaryNode::CleanupPostCommentary( void )
 	{
 		pPlayer->SetViewEntity( NULL );
 	}
-	UTIL_Remove( m_hViewTargetAngles );
+	gEntList.DestroyEntity( m_hViewTargetAngles );
 
 	if ( m_hViewPositionMover && pPlayer->GetViewEntity() == m_hViewPositionMover )
 	{
 		pPlayer->SetViewEntity( NULL );
 	}
-	UTIL_Remove( m_hViewPositionMover );
+	gEntList.DestroyEntity( m_hViewPositionMover );
 
 	m_bActive = false;
 	GetEngineObject()->SetPlaybackRate(1.0);

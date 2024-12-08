@@ -78,7 +78,7 @@ void CLookDoorThinker::LookThink(void)
 	}
 	else
 	{
-		UTIL_Remove(this);
+		gEntList.DestroyEntity(this);
 	}
 }
 

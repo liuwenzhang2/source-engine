@@ -244,7 +244,7 @@ CEntityDissolve *CEntityDissolve::Create( CBaseEntity *pTarget, const char *pMat
 				*pRagdollCreated = true;
 			}
 
-			UTIL_Remove( pTarget );
+			gEntList.DestroyEntity( pTarget );
 			pTarget = pRagdoll;
 		}
 	}
@@ -323,7 +323,7 @@ void CEntityDissolve::DissolveThink( void )
 	
 	if ( pTarget == NULL )
 	{
-		UTIL_Remove( this );
+		gEntList.DestroyEntity( this );
 		return;
 	}
 
@@ -356,10 +356,10 @@ void CEntityDissolve::DissolveThink( void )
 
 		if ( pTarget != pPlayer )
 		{
-			UTIL_Remove( pTarget );
+			gEntList.DestroyEntity( pTarget );
 		}
 		
-		UTIL_Remove( this );
+		gEntList.DestroyEntity( this );
 		
 		return;
 	}

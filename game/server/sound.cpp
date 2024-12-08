@@ -254,7 +254,7 @@ void CAmbientGeneric::Spawn( void )
 	if ( !m_iszSound || strlen( szSoundFile ) < 1 )
 	{
 		Warning( "Empty %s (%s) at %.2f, %.2f, %.2f\n", GetClassname(), GetDebugName(), GetEngineObject()->GetAbsOrigin().x, GetEngineObject()->GetAbsOrigin().y, GetEngineObject()->GetAbsOrigin().z );
-		UTIL_Remove(this);
+		gEntList.DestroyEntity(this);
 		return;
 	}
 
@@ -484,7 +484,7 @@ void CAmbientGeneric::Activate( void )
 			{
 				if ( V_strcmp( STRING( GetEntityName() ), "radio_sound" ) == 0 )
 				{
-					UTIL_Remove( this );
+					gEntList.DestroyEntity( this );
 					return;
 				}
 			}

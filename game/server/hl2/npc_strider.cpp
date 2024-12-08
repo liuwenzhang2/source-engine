@@ -715,7 +715,7 @@ void CNPC_Strider::Activate()
 
 		pStrider->GetAttachment( "minigun", position );
 		VectorITransform( position, pStrider->GetEngineObject()->EntityToWorldTransform(), gm_vLocalRelativePositionMinigun );
-		UTIL_Remove( pStrider );
+		gEntList.DestroyEntity( pStrider );
 	}
 }
 
@@ -1770,7 +1770,7 @@ void CNPC_Strider::RunTask( const Task_t *pTask )
 				FixupBurningServerRagdoll(pRagdoll);
 				PhysSetEntityGameFlags(pRagdoll, FVPHYSICS_NO_SELF_COLLISIONS);
 				TaskComplete();
-				UTIL_Remove(this);
+				gEntList.DestroyEntity(this);
 			}
 		}
 		break;
@@ -3487,7 +3487,7 @@ bool CNPC_Strider::BecomeRagdoll( const CTakeDamageInfo &info, const Vector &for
 		}
 	}
 	
-	UTIL_Remove(this);
+	gEntList.DestroyEntity(this);
 
 	return true; 
 }
@@ -3775,7 +3775,7 @@ void CNPC_Strider::SetTargetPath()
 		// Don't try anymore. It just hurts the AI.
 		m_strTrackName = MAKE_STRING( STRIDER_NO_TRACK_NAME );
 
-		UTIL_Remove( this );
+		gEntList.DestroyEntity( this );
 		return;
 	}
 
@@ -4458,7 +4458,7 @@ void CNPC_Strider::StompHit( int followerBoneIndex )
 
 		m_hRagdoll = pRagdoll;
 		m_ragdollTime = gpGlobals->curtime + 10;
-		UTIL_Remove( pNPC );
+		gEntList.DestroyEntity( pNPC );
 	}
 }
 
@@ -4560,7 +4560,7 @@ void AdjustStriderNodePosition( CAI_Network *pNetwork, CAI_Node *pNode )
 		{
 			pStrider->TranslateNavGoal( NULL, pNode->AccessOrigin() );
 			if ( bCreated )
-				UTIL_Remove( pStrider );
+				gEntList.DestroyEntity( pStrider );
 		}
 	}
 }
@@ -5510,7 +5510,7 @@ void CSparkTrail::SparkThink()
 
 	if( m_iHealth-- < 1 )
 	{
-		UTIL_Remove( this );
+		gEntList.DestroyEntity( this );
 	}
 }
 

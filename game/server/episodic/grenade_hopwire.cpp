@@ -94,7 +94,7 @@ void CGravityVortexController::ConsumeEntity( CBaseEntity *pEnt )
 	}
 
 	// Destroy the entity
-	UTIL_Remove( pEnt );
+	gEntList.DestroyEntity( pEnt );
 }
 
 //-----------------------------------------------------------------------------

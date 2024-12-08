@@ -470,7 +470,7 @@ void KillTargets( const char *pKillTargetName )
 	pentKillTarget = gEntList.FindEntityByName( NULL, pKillTargetName );
 	while ( pentKillTarget )
 	{
-		UTIL_Remove( pentKillTarget );
+		gEntList.DestroyEntity( pentKillTarget );
 
 		DevMsg( 2, "killing %s\n", STRING( pentKillTarget->GetEngineObject()->GetClassname() ) );
 		pentKillTarget = gEntList.FindEntityByName( pentKillTarget, pKillTargetName );
@@ -489,7 +489,7 @@ void ConsoleKillTarget( CBasePlayer *pPlayer, const char *name )
 		CBaseEntity *pEntity = FindPickerEntity( pPlayer );
 		if ( pEntity )
 		{
-			UTIL_Remove( pEntity );
+			gEntList.DestroyEntity( pEntity );
 			Msg( "killing %s\n", pEntity->GetDebugName() );
 			return;
 		}
@@ -1506,7 +1506,7 @@ void ClientCommand( CBasePlayer *pPlayer, const CCommand &args )
 				while ( ent )
 				{
 					CBaseEntity *next = gEntList.FindEntityByClassname( ent, "te_tester" );
-					UTIL_Remove( ent );
+					gEntList.DestroyEntity( ent );
 					ent = next;
 				}
 			}

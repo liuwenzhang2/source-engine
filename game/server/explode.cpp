@@ -69,7 +69,7 @@ void CShower::Think( void )
 	if ( m_flSpeed > 0 )
 		GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.1f );
 	else
-		UTIL_Remove( this );
+		gEntList.DestroyEntity( this );
 	GetEngineObject()->SetGroundEntity( NULL );
 }
 
@@ -374,7 +374,7 @@ void CEnvExplosion::Smoke( void )
 {
 	if ( !(GetEngineObject()->GetSpawnFlags() & SF_ENVEXPLOSION_REPEATABLE))
 	{
-		UTIL_Remove( this );
+		gEntList.DestroyEntity( this );
 	}
 }
 

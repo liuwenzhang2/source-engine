@@ -98,17 +98,17 @@ void CPropTelescopicArm::UpdateOnRemove( void )
 
 	pPoseController = static_cast<CPoseController*>( m_hRotXPoseController.Get() );
 	if ( pPoseController )
-		UTIL_Remove( pPoseController );
+		gEntList.DestroyEntity( pPoseController );
 	m_hRotXPoseController = 0;
 
 	pPoseController = static_cast<CPoseController*>( m_hRotYPoseController.Get() );
 	if ( pPoseController )
-		UTIL_Remove( pPoseController );
+		gEntList.DestroyEntity( pPoseController );
 	m_hRotYPoseController = 0;
 
 	pPoseController = static_cast<CPoseController*>( m_hTelescopicPoseController.Get() );
 	if ( pPoseController )
-		UTIL_Remove( pPoseController );
+		gEntList.DestroyEntity( pPoseController );
 	m_hTelescopicPoseController = 0;
 }
 

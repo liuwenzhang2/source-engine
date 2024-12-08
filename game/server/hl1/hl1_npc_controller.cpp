@@ -324,12 +324,12 @@ void CNPC_Controller::Event_Killed( const CTakeDamageInfo &info )
 		//remove the balls 
 		if (m_pBall[0])
 		{
-			UTIL_Remove( m_pBall[0] );
+			gEntList.DestroyEntity( m_pBall[0] );
 			m_pBall[0] = NULL;
 		}
 		if (m_pBall[1])
 		{
-			UTIL_Remove( m_pBall[1] );
+			gEntList.DestroyEntity( m_pBall[1] );
 			m_pBall[1] = NULL;
 		}
 	}
@@ -1201,8 +1201,8 @@ void CNPC_ControllerHeadBall::BounceTouch( CBaseEntity *pOther )
 
 void CNPC_ControllerHeadBall::KillThink( void )
 {
-	UTIL_Remove( m_pSprite );
-	UTIL_Remove( this );
+	gEntList.DestroyEntity( m_pSprite );
+	gEntList.DestroyEntity( this );
 }
 
 
@@ -1308,6 +1308,6 @@ void CNPC_ControllerZapBall::ExplodeTouch( CBaseEntity *pOther )
 
 void CNPC_ControllerZapBall::Kill( void )
 {
-	UTIL_Remove( m_pSprite );
-	UTIL_Remove( this );
+	gEntList.DestroyEntity( m_pSprite );
+	gEntList.DestroyEntity( this );
 }

@@ -211,7 +211,7 @@ int CWeaponCrowbar::WeaponMeleeAttack1Condition( float flDot, float flDist )
 void CWeaponCrowbar::Drop( const Vector &vecVelocity )
 {
 #ifndef CLIENT_DLL
-	UTIL_Remove( this );
+	gEntList.DestroyEntity( this );
 #endif
 }
 

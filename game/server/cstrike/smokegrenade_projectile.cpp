@@ -156,7 +156,7 @@ void CSmokeGrenadeProjectile::Think_Fade()
 void CSmokeGrenadeProjectile::Think_Remove()
 {
 	if ( m_hSmokeEffect.Get() )
-		UTIL_Remove( m_hSmokeEffect );
+		gEntList.DestroyEntity( m_hSmokeEffect );
 
 	TheBots->RemoveGrenade( this );
 

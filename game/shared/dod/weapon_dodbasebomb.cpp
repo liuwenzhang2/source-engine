@@ -274,7 +274,7 @@ void CDODBaseBombWeapon::CompletePlant( void )
 
 		// destroy the bomb weapon
 		pPlayer->Weapon_Drop( this, NULL, NULL );
-		UTIL_Remove(this);
+		gEntList.DestroyEntity(this);
 
 		pPlayer->ResetProgressBar();
 

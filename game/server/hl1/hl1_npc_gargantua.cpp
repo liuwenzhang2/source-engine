@@ -254,7 +254,7 @@ void CStomp::Think( void )
 		if ( m_flScale <= 0 )
 		{
 			// Life has run out
-			UTIL_Remove(this);
+			gEntList.DestroyEntity(this);
 			CPASAttenuationFilter filter( this );
 			g_pSoundEmitterSystem->StopSound( entindex(), CHAN_STATIC, "Garg.Stomp" );
 		}
@@ -922,7 +922,7 @@ void CNPC_Gargantua::FlameDestroy( void )
 	{
 		if ( m_pFlame[i] )
 		{
-			UTIL_Remove( m_pFlame[i] );
+			gEntList.DestroyEntity( m_pFlame[i] );
 			m_pFlame[i] = NULL;
 		}
 	}
@@ -1013,7 +1013,7 @@ void CNPC_Gargantua::DeathEffect( void )
 void CNPC_Gargantua::Event_Killed( const CTakeDamageInfo &info )
 {
 	EyeOff();
-	UTIL_Remove( m_pEyeGlow );
+	gEntList.DestroyEntity( m_pEyeGlow );
 	m_pEyeGlow = NULL;
 	BaseClass::Event_Killed( info );
 	m_takedamage = DAMAGE_NO;

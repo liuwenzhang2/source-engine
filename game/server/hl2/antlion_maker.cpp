@@ -566,7 +566,7 @@ void CAntlionTemplateMaker::DestroyProxyTarget( void )
 {
 	if ( m_hProxyTarget )
 	{
-		UTIL_Remove( m_hProxyTarget );
+		gEntList.DestroyEntity( m_hProxyTarget );
 	}
 }
 

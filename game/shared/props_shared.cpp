@@ -867,7 +867,7 @@ void CGameGibManager::AddGibToLRU( CBaseAnimating *pEntity )
 		i = m_LRU.Head();
 
 		//TODO: Make this fade out instead of pop.
-		UTIL_Remove( m_LRU[i] );
+		gEntList.DestroyEntity( m_LRU[i] );
 		m_LRU.Remove(i);
 	}
 	

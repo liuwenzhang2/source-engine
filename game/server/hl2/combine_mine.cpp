@@ -639,7 +639,7 @@ void CBounceBomb::SettleThink()
 		if( !GetEngineObject()->VPhysicsGetObject() )
 		{
 			Msg("**** Can't create vphysics for combine_mine!\n" );
-			UTIL_Remove( this );
+			gEntList.DestroyEntity( this );
 			return;
 		}
 
@@ -741,7 +741,7 @@ void CBounceBomb::UpdateLight( bool bTurnOn, unsigned int r, unsigned int g, uns
 		// Throw the old sprite away
 		if( m_hSprite )
 		{
-			UTIL_Remove( m_hSprite );
+			gEntList.DestroyEntity( m_hSprite );
 			m_hSprite.Set( NULL );
 		}
 
@@ -773,7 +773,7 @@ void CBounceBomb::UpdateLight( bool bTurnOn, unsigned int r, unsigned int g, uns
 	{
 		if( m_hSprite )
 		{
-			UTIL_Remove( m_hSprite );
+			gEntList.DestroyEntity( m_hSprite );
 			m_hSprite.Set( NULL );
 		}
 	}
@@ -1126,7 +1126,7 @@ void CBounceBomb::ExplodeThink()
 	{
 		ExplosionCreate(GetEngineObject()->GetAbsOrigin(), GetEngineObject()->GetAbsAngles(), (pThrower) ? pThrower : this, BOUNCEBOMB_EXPLODE_DAMAGE, BOUNCEBOMB_EXPLODE_RADIUS, true);
 	}
-	UTIL_Remove( this );
+	gEntList.DestroyEntity( this );
 }
 
 //---------------------------------------------------------

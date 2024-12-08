@@ -523,7 +523,7 @@ void CNPC_Alyx::InputGiveEMP( inputdata_t &inputdata )
 	{
 		if (m_hEmpTool)
 		{
-			UTIL_Remove( m_hEmpTool );
+			gEntList.DestroyEntity( m_hEmpTool );
 		}
 	}
 }
@@ -967,7 +967,7 @@ void CNPC_Alyx::Event_Killed( const CTakeDamageInfo &info )
 	// Destroy our EMP tool since it won't follow us onto the ragdoll anyway
 	if ( m_hEmpTool != NULL )
 	{
-		UTIL_Remove( m_hEmpTool	);
+		gEntList.DestroyEntity( m_hEmpTool	);
 	}
 
 	BaseClass::Event_Killed( info );

@@ -100,7 +100,7 @@ void Test_SpawnRandomEntities( const CCommand &args )
 
 		// Remove any old entity in this slot.
 		if ( g_StressEntities[iSlot].Get() )
-			UTIL_RemoveImmediate( g_StressEntities[iSlot] );
+			gEntList.DestroyEntityImmediate( g_StressEntities[iSlot] );
 
 		// Create a new one in this slot.
 		int iType = RandomInt( 0, g_StressEntityRegs.Count() - 1 );
@@ -140,7 +140,7 @@ void Test_RemoveAllRandomEntities()
 	for ( int i=0; i < g_StressEntities.Count(); i++ )
 	{
 		if ( g_StressEntities[i].Get() )
-			UTIL_Remove( g_StressEntities[i] );
+			gEntList.DestroyEntity( g_StressEntities[i] );
 	}
 }
 

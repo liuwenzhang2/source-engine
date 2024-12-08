@@ -268,7 +268,7 @@ void CEntityFlame::FlameThink( void )
 		CAI_BaseNPC *pNPC = m_hEntAttached->MyNPCPointer();
 		if ( pNPC && !pNPC->IsAlive() )
 		{
-			UTIL_Remove( this );
+			gEntList.DestroyEntity( this );
 			// Notify the NPC that it's no longer burning!
 			pNPC->Extinguish();
 			return;
@@ -294,7 +294,7 @@ void CEntityFlame::FlameThink( void )
 	}
 	else
 	{
-		UTIL_Remove( this );
+		gEntList.DestroyEntity( this );
 		return;
 	}
 

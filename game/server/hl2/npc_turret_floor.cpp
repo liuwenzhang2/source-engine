@@ -199,19 +199,19 @@ void CNPC_FloorTurret::UpdateOnRemove( void )
 {
 	if ( m_pMotionController != NULL )
 	{
-		UTIL_Remove( m_pMotionController );
+		gEntList.DestroyEntity( m_pMotionController );
 		m_pMotionController = NULL;
 	}
 
 	if ( m_hLaser != NULL )
 	{
-		UTIL_Remove( m_hLaser );
+		gEntList.DestroyEntity( m_hLaser );
 		m_hLaser = NULL;
 	}
 
 	if ( m_hEyeGlow != NULL )
 	{
-		UTIL_Remove( m_hEyeGlow );
+		gEntList.DestroyEntity( m_hEyeGlow );
 		m_hEyeGlow = NULL;
 	}
 
@@ -1616,7 +1616,7 @@ bool CNPC_FloorTurret::PreThink( turretState_e state )
 			else
 			{
 				// Take away the laser
-				UTIL_Remove( m_hLaser );
+				gEntList.DestroyEntity( m_hLaser );
 				m_hLaser = NULL;
 
 				// Become inactive
@@ -2189,7 +2189,7 @@ void CNPC_FloorTurret::BreakThink( void )
 	}
 
 	// We're done!
-	UTIL_Remove( this );
+	gEntList.DestroyEntity( this );
 }
 
 //-----------------------------------------------------------------------------
@@ -2205,7 +2205,7 @@ void CNPC_FloorTurret::SelfDestructThink( void )
 	{
 		SetThink( &CNPC_FloorTurret::BreakThink );
 		GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.1f );
-		UTIL_Remove( m_hFizzleEffect );
+		gEntList.DestroyEntity( m_hFizzleEffect );
 		m_hFizzleEffect = NULL;
 		return;
 	}
@@ -2340,7 +2340,7 @@ void CTurretTipController::Activate( void )
 
 	if ( m_pParentTurret == NULL )
 	{
-		UTIL_Remove(this);
+		gEntList.DestroyEntity(this);
 		return;
 	}
 
@@ -2348,7 +2348,7 @@ void CTurretTipController::Activate( void )
 
 	if ( pPhys == NULL )
 	{
-		UTIL_Remove(this);
+		gEntList.DestroyEntity(this);
 		return;
 	}
 

@@ -946,7 +946,7 @@ void CCSPlayer::Spawn()
 
 	if ( m_hRagdoll )
 	{
-		UTIL_Remove( m_hRagdoll );
+		gEntList.DestroyEntity( m_hRagdoll );
 	}
 
 	m_hRagdoll = NULL;
@@ -5694,7 +5694,7 @@ void CCSPlayer::Weapon_Equip( CBaseCombatWeapon *pWeapon )
 			if( Weapon_OwnsThisType( pCSWeapon->GetClassname() ) )
 			{
 				Weapon_EquipAmmoOnly( pWeapon );
-				UTIL_Remove( pCSWeapon );
+				gEntList.DestroyEntity( pCSWeapon );
 				return;
 			}
 		}
@@ -5742,7 +5742,7 @@ bool CCSPlayer::BumpWeapon( CBaseCombatWeapon *pBaseWeapon )
 		extern int gEvilImpulse101;
 		if ( gEvilImpulse101 )
 		{
-			UTIL_Remove( pWeapon );
+			gEntList.DestroyEntity( pWeapon );
 		}
 		return false;
 	}
@@ -5764,7 +5764,7 @@ bool CCSPlayer::BumpWeapon( CBaseCombatWeapon *pBaseWeapon )
 		if ( pWeapon->UsesClipsForAmmo1() && pWeapon->HasPrimaryAmmo() )
 			return false;
 
-		UTIL_Remove( pWeapon );
+		gEntList.DestroyEntity( pWeapon );
 		return false;
 	}
 	*/

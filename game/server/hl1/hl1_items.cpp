@@ -39,7 +39,7 @@ void CHL1Item::Activate( void )
 	if ( UTIL_DropToFloor( this, MASK_SOLID ) == 0 )
 	{
 		Warning( "Item %s fell out of level at %f,%f,%f\n", GetClassname(), GetEngineObject()->GetAbsOrigin().x, GetEngineObject()->GetAbsOrigin().y, GetEngineObject()->GetAbsOrigin().z);
-		UTIL_Remove( this );
+		gEntList.DestroyEntity( this );
 		return;
 	}
 }

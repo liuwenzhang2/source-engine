@@ -39,7 +39,7 @@ public:
 		{
 			if ( g_pGameRules->ItemShouldRespawn( this ) == GR_ITEM_RESPAWN_NO )
 			{
-				UTIL_Remove( this );
+				gEntList.DestroyEntity( this );
 			}
 			return true;
 		}
@@ -77,7 +77,7 @@ public:
 		{
 			if ( g_pGameRules->ItemShouldRespawn( this ) == GR_ITEM_RESPAWN_NO )
 			{
-				UTIL_Remove( this );	
+				gEntList.DestroyEntity( this );	
 			}
 			return true;
 		}
@@ -115,7 +115,7 @@ public:
 		{
 			if ( g_pGameRules->ItemShouldRespawn( this ) == GR_ITEM_RESPAWN_NO )
 			{
-				UTIL_Remove( this );
+				gEntList.DestroyEntity( this );
 			}
 			return true;
 		}
@@ -153,7 +153,7 @@ public:
 		{
 			if ( g_pGameRules->ItemShouldRespawn( this ) == GR_ITEM_RESPAWN_NO )
 			{
-				UTIL_Remove( this );
+				gEntList.DestroyEntity( this );
 			}
 			return true;
 		}
@@ -193,7 +193,7 @@ public:
 		{
 			if ( g_pGameRules->ItemShouldRespawn( this ) == GR_ITEM_RESPAWN_NO )
 			{
-				UTIL_Remove( this );
+				gEntList.DestroyEntity( this );
 			}
 			return true;
 		}
@@ -233,7 +233,7 @@ public:
 		{
 			if ( g_pGameRules->ItemShouldRespawn( this ) == GR_ITEM_RESPAWN_NO )
 			{
-				UTIL_Remove( this );
+				gEntList.DestroyEntity( this );
 			}
 			return true;
 		}
@@ -271,7 +271,7 @@ public:
 		{
 			if ( g_pGameRules->ItemShouldRespawn( this ) == GR_ITEM_RESPAWN_NO )
 			{
-				UTIL_Remove( this );
+				gEntList.DestroyEntity( this );
 			}
 			return true;
 		}
@@ -311,7 +311,7 @@ public:
 		{
 			if ( g_pGameRules->ItemShouldRespawn( this ) == GR_ITEM_RESPAWN_NO )
 			{
-				UTIL_Remove( this );
+				gEntList.DestroyEntity( this );
 			}
 			return true;
 		}
@@ -361,7 +361,7 @@ public:
 		{
 			if ( g_pGameRules->ItemShouldRespawn( this ) == GR_ITEM_RESPAWN_NO )
 			{
-				UTIL_Remove( this );
+				gEntList.DestroyEntity( this );
 			}
 			return true;
 		}
@@ -399,7 +399,7 @@ public:
 		{
 			if ( g_pGameRules->ItemShouldRespawn( this ) == GR_ITEM_RESPAWN_NO )
 			{
-				UTIL_Remove( this );
+				gEntList.DestroyEntity( this );
 			}
 			return true;
 		}

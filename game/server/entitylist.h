@@ -31,6 +31,7 @@
 #include "gamestringpool.h"
 #include "util.h"
 #include "debugoverlay_shared.h"
+#include "physics.h"
 
 //class CBaseEntity;
 // We can only ever move 512 entities across a transition
@@ -2287,7 +2288,13 @@ public:
 	void ReserveSlot(int index);
 	int AllocateFreeSlot(bool bNetworkable = true, int index = -1);
 	CBaseEntity* CreateEntityByName(const char* className, int iForceEdictIndex = -1, int iSerialNum = -1);
-	void				DestroyEntity(IHandleEntity* pEntity);
+	// marks the entity for deletion so it will get removed next frame
+	void DestroyEntity(IHandleEntity* oldObj);
+
+	// deletes an entity, without any delay.  Only use this when sure no pointers rely on this entity.
+	void DisableDestroyImmediate();
+	void EnableDestroyImmediate();
+	void DestroyEntityImmediate(IHandleEntity* oldObj);
 	IEngineObjectServer* GetEngineObject(int entnum);
 	IEngineObjectServer* GetEngineObjectFromHandle(CBaseHandle handle);
 	IServerNetworkable* GetServerNetworkable(CBaseHandle hEnt) const;
@@ -2307,8 +2314,6 @@ public:
 	int NumberOfReservedEdicts(void);
 	int IndexOfHighestEdict(void);
 
-	// mark an entity as deleted
-	void AddToDeleteList(T* ent);
 	// call this before and after each frame to delete all of the marked entities.
 	void CleanupDeleteList(void);
 	int ResetDeleteList(void);
@@ -2443,6 +2448,8 @@ protected:
 	// Figures out save flags for the entity
 	int ComputeEntitySaveFlags(T* pEntity);
 
+	// mark an entity as deleted
+	void AddToDeleteList(T* ent);
 private:
 	CEntityFactoryDictionary m_EntityFactoryDictionary;
 	int m_iHighestEnt; // the topmost used array index
@@ -2485,6 +2492,7 @@ private:
 	int m_iMaxRagdolls;
 	int m_iSimulatedRagdollCount;
 	int m_iRagdollCount;
+	int m_DestroyImmediateSemaphore = 0;
 };
 
 template<class T>
@@ -2743,7 +2751,7 @@ void CGlobalEntityList<T>::Restore(IRestore* pRestore, bool createPlayers)
 				{
 					pEntInfo->hEnt = NULL;
 					pEntInfo->restoreentityindex = -1;
-					UTIL_RemoveImmediate(pent);
+					DestroyEntityImmediate(pent);
 				}
 				else
 				{
@@ -2808,7 +2816,7 @@ void CGlobalEntityList<T>::Restore(IRestore* pRestore, bool createPlayers)
 				{
 					pEntInfo->hEnt = NULL;
 					pEntInfo->restoreentityindex = -1;
-					UTIL_RemoveImmediate(pent);
+					DestroyEntityImmediate(pent);
 				}
 				else
 				{
@@ -2938,7 +2946,7 @@ int CGlobalEntityList<T>::RestoreGlobalEntity(T* pEntity, IRestore* pRestore, en
 
 		pSaveData->modelSpaceOffset = pEntInfo->landmarkModelSpace - g_ServerGameDLL.ModelSpaceLandmark(pNewEntity->GetEngineObject()->GetModelIndex());
 
-		UTIL_Remove(pEntity);
+		DestroyEntity(pEntity);
 		pEntity = pNewEntity;// we're going to restore this data OVER the old entity
 		pEntInfo->hEnt = pEntity;
 		// HACKHACK: Do we need system-wide support for removing non-global spawn allocated resources?
@@ -3081,7 +3089,7 @@ int CGlobalEntityList<T>::CreateEntityTransitionListInternal(IRestore* pRestore,
 				}
 				else
 				{
-					UTIL_RemoveImmediate((T*)GetServerEntityFromHandle(pEntInfo->hEnt));
+					DestroyEntityImmediate((T*)GetServerEntityFromHandle(pEntInfo->hEnt));
 				}
 				// -------------------------------------------------------------------------
 			}
@@ -3091,7 +3099,7 @@ int CGlobalEntityList<T>::CreateEntityTransitionListInternal(IRestore* pRestore,
 				//CRestoreServer restoreHelper(pSaveData);
 				if (RestoreEntity(pent, pRestore, pEntInfo) < 0)
 				{
-					UTIL_RemoveImmediate(pent);
+					DestroyEntityImmediate(pent);
 				}
 				else
 				{
@@ -3100,7 +3108,7 @@ int CGlobalEntityList<T>::CreateEntityTransitionListInternal(IRestore* pRestore,
 				}
 			}
 
-			// Remove any entities that were removed using UTIL_Remove() as a result of the above calls to UTIL_RemoveImmediate()
+			// Remove any entities that were removed using RemoveEntity() as a result of the above calls to UTIL_RemoveImmediate()
 			CleanupDeleteList();
 		}
 	}
@@ -3120,8 +3128,8 @@ int CGlobalEntityList<T>::CreateEntityTransitionListInternal(IRestore* pRestore,
 		{
 			// this can happen during normal processing - PVS is just a guess, some map areas won't exist in the new map
 			DevMsg(2, "Suppressing %s\n", STRING(pEntInfo->classname));
-			UTIL_RemoveImmediate(pent);
-			// Remove any entities that were removed using UTIL_Remove() as a result of the above calls to UTIL_RemoveImmediate()
+			DestroyEntityImmediate(pent);
+			// Remove any entities that were removed using RemoveEntity() as a result of the above calls to UTIL_RemoveImmediate()
 			CleanupDeleteList();
 		}
 		else
@@ -3651,9 +3659,118 @@ inline CBaseEntity* CGlobalEntityList<T>::CreateEntityByName(const char* classNa
 	return (CBaseEntity*)m_EntityFactoryDictionary.Create(this, className, iForceEdictIndex, iSerialNum, this);
 }
 
+//-----------------------------------------------------------------------------
+// Purpose: Sets the entity up for deletion.  Entity will not actually be deleted
+//			until the next frame, so there can be no pointer errors.
+// Input  : *oldObj - object to delete
+//-----------------------------------------------------------------------------
 template<class T>
-inline void	CGlobalEntityList<T>::DestroyEntity(IHandleEntity* pEntity) {
+void CGlobalEntityList<T>::DestroyEntity(IHandleEntity* oldObj)
+{
+	CBaseEntity* pEntity = dynamic_cast<CBaseEntity*>(oldObj);
+	//CServerNetworkProperty* pProp = static_cast<CServerNetworkProperty*>(oldObj);
+	if (!pEntity || pEntity->GetEngineObject()->IsMarkedForDeletion())
+		return;
+
+	if (PhysIsInCallback())
+	{
+		// This assert means that someone is deleting an entity inside a callback.  That isn't supported so
+		// this code will defer the deletion of that object until the end of the current physics simulation frame
+		// Since this is hidden from the calling code it's preferred to call PhysCallbackRemove() directly from the caller
+		// in case the deferred delete will have unwanted results (like continuing to receive callbacks).  That will make it 
+		// obvious why the unwanted results are happening so the caller can handle them appropriately. (some callbacks can be masked 
+		// or the calling entity can be flagged to filter them in most cases)
+		Assert(0);
+		PhysCallbackRemove(pEntity);
+		return;
+	}
+
+	// mark it for deletion	
+	pEntity->GetEngineObject()->MarkForDeletion();
+
+	bool bNetworkable = pEntity->IsNetworkable();
+	int nEntIndex = bNetworkable ? pEntity->entindex() : -1;
+	if (bNetworkable && nEntIndex != -1) {
+		for (int i = m_entityListeners.Count() - 1; i >= 0; i--)
+		{
+			m_entityListeners[i]->PreEntityRemove(pEntity);
+		}
+	}
+	SetReceivedChainedUpdateOnRemove(false);
+	pEntity->UpdateOnRemove();
+
+	Assert(IsReceivedChainedUpdateOnRemove());
+
+	// clear oldObj targetname / other flags now
+	pEntity->SetName("");
+
+	if (bNetworkable && nEntIndex != -1) {
+		for (int i = m_entityListeners.Count() - 1; i >= 0; i--)
+		{
+			m_entityListeners[i]->PostEntityRemove(nEntIndex);
+		}
+	}
+	AddToDeleteList(pEntity);
+}
+
+template<class T>
+void CGlobalEntityList<T>::DisableDestroyImmediate()
+{
+	m_DestroyImmediateSemaphore++;
+}
+
+template<class T>
+void CGlobalEntityList<T>::EnableDestroyImmediate()
+{
+	m_DestroyImmediateSemaphore--;
+	Assert(m_DestroyImmediateSemaphore >= 0);
+}
+//-----------------------------------------------------------------------------
+// Purpose: deletes an entity, without any delay.  WARNING! Only use this when sure
+//			no pointers rely on this entity.
+// Input  : *oldObj - the entity to delete
+//-----------------------------------------------------------------------------
+template<class T>
+void CGlobalEntityList<T>::DestroyEntityImmediate(IHandleEntity* oldObj)
+{
+	CBaseEntity* pEntity = dynamic_cast<CBaseEntity*>(oldObj);
+	// valid pointer or already removed?
+	if (!pEntity || pEntity->GetEngineObject()->IsEFlagSet(EFL_KILLME))
+		return;
+
+	if (m_DestroyImmediateSemaphore)
+	{
+		DestroyEntity(pEntity);
+		return;
+	}
+
+	bool bNetworkable = pEntity->IsNetworkable();
+	int nEntIndex = bNetworkable ? pEntity->entindex() : -1;
+	if (bNetworkable && nEntIndex != -1) {
+		for (int i = m_entityListeners.Count() - 1; i >= 0; i--)
+		{
+			m_entityListeners[i]->PreEntityRemove(pEntity);
+		}
+	}
+
+	pEntity->GetEngineObject()->AddEFlags(EFL_KILLME);	// Make sure to ignore further calls into here or RemoveEntity.
+
+	SetReceivedChainedUpdateOnRemove(false);
+	pEntity->UpdateOnRemove();
+	Assert(IsReceivedChainedUpdateOnRemove());
+
+	// Entities shouldn't reference other entities in their destructors
+	//  that type of code should only occur in an UpdateOnRemove call
+	SetDisableEhandleAccess(true);
 	m_EntityFactoryDictionary.Destroy(pEntity);
+	SetDisableEhandleAccess(false);
+
+	if (bNetworkable && nEntIndex != -1) {
+		for (int i = m_entityListeners.Count() - 1; i >= 0; i--)
+		{
+			m_entityListeners[i]->PostEntityRemove(nEntIndex);
+		}
+	}
 }
 
 //template<class T>
@@ -3789,7 +3906,7 @@ void CGlobalEntityList<T>::CleanupDeleteList(void)
 	m_bDisableEhandleAccess = true;
 	for (int i = 0; i < m_DeleteList.Count(); i++)
 	{
-		DestroyEntity(m_DeleteList[i]);// ->Release();
+		m_EntityFactoryDictionary.Destroy(m_DeleteList[i]);// ->Release();
 	}
 	m_bDisableEhandleAccess = false;
 	m_DeleteList.RemoveAll();
@@ -3820,7 +3937,7 @@ void CGlobalEntityList<T>::Clear(void)
 		{
 			MDLCACHE_CRITICAL_SECTION();
 			// Force UpdateOnRemove to be called
-			UTIL_Remove(ent);
+			DestroyEntity(ent);
 		}
 		hCur = BaseClass::NextHandle(hCur);
 	}
@@ -4990,7 +5107,7 @@ inline T* CHandle<T>::Get() const
 template <class ENT_TYPE>
 inline bool FindEntityByName( const char *pszName, ENT_TYPE **ppResult)
 {
-	CBaseEntity *pBaseEntity = gEntList.FindEntityByName( NULL, pszName );
+	CBaseEntity *pBaseEntity = FindEntityByName( NULL, pszName );
 	
 	if ( pBaseEntity )
 		*ppResult = dynamic_cast<ENT_TYPE *>( pBaseEntity );
@@ -5003,14 +5120,14 @@ inline bool FindEntityByName( const char *pszName, ENT_TYPE **ppResult)
 template <>
 inline bool FindEntityByName<CBaseEntity>( const char *pszName, CBaseEntity **ppResult)
 {
-	*ppResult = gEntList.FindEntityByName( NULL, pszName );
+	*ppResult = FindEntityByName( NULL, pszName );
 	return ( *ppResult != NULL );
 }
 
 template <>
 inline bool FindEntityByName<CAI_BaseNPC>( const char *pszName, CAI_BaseNPC **ppResult)
 {
-	CBaseEntity *pBaseEntity = gEntList.FindEntityByName( NULL, pszName );
+	CBaseEntity *pBaseEntity = FindEntityByName( NULL, pszName );
 	
 	if ( pBaseEntity )
 		*ppResult = pBaseEntity->MyNPCPointer();

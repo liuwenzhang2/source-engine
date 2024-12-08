@@ -2325,7 +2325,7 @@ void CAI_NetworkBuilder::Build( CAI_Network *pNetwork )
 	EndBuild();
 
 	if ( pHelper )
-		UTIL_Remove( pHelper );
+		gEntList.DestroyEntity( pHelper );
 }
 
 //------------------------------------------------------------------------------

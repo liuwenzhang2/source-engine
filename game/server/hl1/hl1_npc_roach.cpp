@@ -463,7 +463,7 @@ void CNPC_Roach::Event_Killed( const CTakeDamageInfo &info )
 	
 	CSoundEnt::InsertSound ( SOUND_WORLD, GetEngineObject()->GetAbsOrigin(), 128, 1 );
 
-	UTIL_Remove( this );
+	gEntList.DestroyEntity( this );
 }
 
 int CNPC_Roach::GetSoundInterests ( void) 

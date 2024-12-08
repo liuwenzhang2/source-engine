@@ -521,7 +521,7 @@ void CBasePlayer::DestroyViewModels( void )
 		if ( !vm )
 			continue;
 
-		UTIL_Remove( vm );
+		gEntList.DestroyEntity( vm );
 		m_hViewModel.Set( i, NULL );
 	}
 }
@@ -5637,7 +5637,7 @@ void CSprayCan::Think( void )
 	}
 	
 	// Just painted last custom frame.
-	UTIL_Remove( this );
+	gEntList.DestroyEntity( this );
 }
 
 class	CBloodSplat : public CPointEntity
@@ -5674,7 +5674,7 @@ void CBloodSplat::Think( void )
 
 		UTIL_BloodDecalTrace( &tr, BLOOD_COLOR_RED );
 	}
-	UTIL_Remove( this );
+	gEntList.DestroyEntity( this );
 }
 
 //==============================================
@@ -6315,7 +6315,7 @@ void CBasePlayer::CheatImpulseCommands( int iImpulse )
 		pEntity = FindEntityForward( this, true );
 		if ( pEntity )
 		{
-			UTIL_Remove( pEntity );
+			gEntList.DestroyEntity( pEntity );
 //			if ( pEntity->m_takedamage )
 //				pEntity->SetThink(SUB_Remove);
 		}
@@ -6594,7 +6594,7 @@ bool CBasePlayer::BumpWeapon( CBaseCombatWeapon *pWeapon )
 	{
 		if ( gEvilImpulse101 )
 		{
-			UTIL_Remove( pWeapon );
+			gEntList.DestroyEntity( pWeapon );
 		}
 		return false;
 	}
@@ -6624,7 +6624,7 @@ bool CBasePlayer::BumpWeapon( CBaseCombatWeapon *pWeapon )
 			if ( pWeapon->HasPrimaryAmmo() )
 				return false;
 
-			UTIL_Remove( pWeapon );
+			gEntList.DestroyEntity( pWeapon );
 			return true;
 		}
 		else
@@ -7432,7 +7432,7 @@ void CBasePlayer::RemoveWearable( CEconWearable *pItem )
 		if ( pWearable == pItem )
 		{
 			pItem->UnEquip( this );
-			UTIL_Remove( pWearable );
+			gEntList.DestroyEntity( pWearable );
 			m_hMyWearables.Remove( i );
 			break;
 		}

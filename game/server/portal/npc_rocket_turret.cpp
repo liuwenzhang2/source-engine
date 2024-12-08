@@ -756,7 +756,7 @@ void CNPC_RocketTurret::FiringThink( void )
 
 void CNPC_RocketTurret::FireRocket ( void )
 {
-	UTIL_Remove( m_hCurRocket );
+	gEntList.DestroyEntity( m_hCurRocket );
 
 	CRocket_Turret_Projectile *pRocket = (CRocket_Turret_Projectile *) CBaseEntity::Create( "rocket_turret_projectile", EyePosition(), m_vecCurrentAngles, this );
 
@@ -1285,7 +1285,7 @@ void CRocket_Turret_Projectile::MissileTouch( CBaseEntity *pOther )
 		VectorAngles( vBounceVel, vBounceAngles );
 		GetEngineObject()->SetAbsAngles ( vBounceAngles );
 		SetLocalAngularVelocity ( QAngle ( 180, 90, 45 ) );
-		UTIL_Remove ( m_hRocketTrail );
+		gEntList.DestroyEntity ( m_hRocketTrail );
 
 		GetEngineObject()->SetSolid ( SOLID_NONE );
 
@@ -1335,7 +1335,7 @@ void CRocket_Turret_Projectile::NotifySystemEvent(CBaseEntity *pNotify, notify_s
 		SetOwnerEntity( NULL );
 
 		// Restart smoke trail
-		UTIL_Remove( m_hRocketTrail );
+		gEntList.DestroyEntity( m_hRocketTrail );
 		m_hRocketTrail = NULL; // This shouldn't leak cause the pointer has been handed to the delete list
 		CreateSmokeTrail();
 	}

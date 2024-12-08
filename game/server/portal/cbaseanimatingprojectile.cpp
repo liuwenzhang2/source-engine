@@ -79,5 +79,5 @@ void CBaseAnimatingProjectile::Touch( CBaseEntity *pOther )
 	GuessDamageForce( &info, (tr.endpos - tr.startpos), tr.endpos );
 	pOther->TakeDamage( info );
 	
-	UTIL_Remove( this );
+	gEntList.DestroyEntity( this );
 }

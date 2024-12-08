@@ -307,7 +307,7 @@ void CNPC_Scientist::SUB_LVFadeOut( void  )
 
 	if ( m_clrRender->a == 0 )
 	{
-		UTIL_Remove(this);
+		gEntList.DestroyEntity(this);
 	}
 	else
 	{

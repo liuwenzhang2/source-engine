@@ -20,7 +20,6 @@ C_PortalGhostRenderable::C_PortalGhostRenderable( )
 C_PortalGhostRenderable::~C_PortalGhostRenderable( void )
 {
 	//cl_entitylist->RemoveEntity( GetIClientUnknown()->GetRefEHandle() );
-	GetEngineObject()->DestroyModelInstance();
 }
 
 void C_PortalGhostRenderable::Init(C_Prop_Portal* pOwningPortal, C_BaseEntity* pGhostSource, RenderGroup_t sourceRenderGroup, const VMatrix& matGhostTransform, float* pSharedRenderClipPlane, bool bLocalPlayer) {
@@ -38,6 +37,7 @@ void C_PortalGhostRenderable::UpdateOnRemove(void)
 {
 	g_pClientLeafSystem->RemoveRenderable(GetEngineObject()->GetRenderHandle());
 	GetEngineGhost()->SetGhostedSource(NULL);
+	GetEngineObject()->DestroyModelInstance();
 	BaseClass::UpdateOnRemove();
 }
 

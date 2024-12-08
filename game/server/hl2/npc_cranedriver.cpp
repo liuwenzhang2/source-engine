@@ -158,7 +158,7 @@ void CNPC_CraneDriver::Activate( void )
 	if ( !m_hCrane )
 	{
 		Warning( "npc_cranedriver %s couldn't find his crane named %s.\n", STRING(GetEntityName()), STRING(m_iszVehicleName) );
-		UTIL_Remove( this );
+		gEntList.DestroyEntity( this );
 		return;
 	}
 }

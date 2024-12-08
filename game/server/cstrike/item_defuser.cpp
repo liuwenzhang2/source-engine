@@ -98,7 +98,7 @@ void CItemDefuser::DefuserTouch( CBaseEntity *pOther )
 				g_pSoundEmitterSystem->EmitSound( filter, entindex(), "BaseCombatCharacter.ItemPickup2" );
 			}
 
-			UTIL_Remove( this );
+			gEntList.DestroyEntity( this );
 			return;
 		}	
 	}

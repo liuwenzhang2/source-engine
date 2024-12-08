@@ -490,7 +490,7 @@ void CWeaponStunStick::Drop( const Vector &vecVelocity )
 	SetStunState( false );
 
 #ifndef CLIENT_DLL
-	UTIL_Remove( this );
+	gEntList.DestroyEntity( this );
 #endif
 
 }

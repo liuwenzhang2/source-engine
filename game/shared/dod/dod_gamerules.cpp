@@ -223,7 +223,7 @@ static CDODViewVectors g_DODViewVectors(
 		// remove all ents in m_SpawnedEntities
 		for ( int i = 0; i < m_hSpawnedEntities.Count(); i++ )
 		{
-			UTIL_Remove( m_hSpawnedEntities[i] );
+			gEntList.DestroyEntity( m_hSpawnedEntities[i] );
 		}
 
 		// delete the items from our list
@@ -2610,7 +2610,7 @@ const CDODViewVectors *CDODGameRules::GetDODViewVectors() const
 		if ( bFoundTimer == false )
 		{
 			// No masters are active that require the round timer, destroy it
-			UTIL_Remove( m_pRoundTimer.Get() );
+			gEntList.DestroyEntity( m_pRoundTimer.Get() );
 			m_pRoundTimer = NULL;
 		}
 
@@ -3068,7 +3068,7 @@ const CDODViewVectors *CDODGameRules::GetDODViewVectors() const
 				{
 					Msg( "Removed Entity: %s\n", pCur->GetClassname() );
 				}
-				UTIL_Remove( pCur );
+				gEntList.DestroyEntity( pCur );
 			}
 			
 			pCur = gEntList.NextEnt( pCur );

@@ -1913,7 +1913,7 @@ void CNPC_HGruntRepel::RepelUse ( CBaseEntity *pActivator, CBaseEntity *pCaller,
 	pBeam->SetThink( &CBaseEntity::SUB_Remove );
 	GetEngineObject()->SetNextThink( gpGlobals->curtime + -4096.0 * tr.fraction / pGrunt->GetEngineObject()->GetAbsVelocity().z + 0.5 );
 
-	UTIL_Remove( this );
+	gEntList.DestroyEntity( this );
 }
 
 

@@ -211,7 +211,7 @@ bool CTeamControlPointMaster::FindControlPoints( void )
 			else
 			{
 				Warning( "!!!!\nMultiple control points with the same index, duplicates ignored\n!!!!\n" );
-				UTIL_Remove( pPoint );
+				gEntList.DestroyEntity( pPoint );
 			}
 		}
 

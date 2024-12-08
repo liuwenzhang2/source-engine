@@ -127,7 +127,7 @@ void CDODSmokeGrenade::Think_Remove()
 	GetEngineObject()->SetSolid( SOLID_NONE );
 	GetEngineObject()->SetMoveType( MOVETYPE_NONE );
 
-	UTIL_Remove( this );
+	gEntList.DestroyEntity( this );
 }
 
 

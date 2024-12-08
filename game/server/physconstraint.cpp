@@ -101,7 +101,7 @@ public:
 		if (GetEngineObject()->GetMoveParent() )
 		{
 			g_AnchorList.AddToList( this, m_massScale );
-			UTIL_Remove( this );
+			gEntList.DestroyEntity( this );
 		}
 	}
 	DECLARE_DATADESC();
@@ -616,7 +616,7 @@ void CPhysConstraint::Activate( void )
 	{
 		if ( !ActivateConstraint() )
 		{
-			UTIL_Remove(this);
+			gEntList.DestroyEntity(this);
 		}
 	}
 }

@@ -189,10 +189,10 @@ void CAI_Spotlight::SpotlightDestroy(void)
 {
 	if ( m_hSpotlight )
 	{
-		UTIL_Remove(m_hSpotlight);
+		gEntList.DestroyEntity(m_hSpotlight);
 		m_hSpotlight = NULL;
 		
-		UTIL_Remove(m_hSpotlightTarget);
+		gEntList.DestroyEntity(m_hSpotlightTarget);
 		m_hSpotlightTarget = NULL;
 	}
 }

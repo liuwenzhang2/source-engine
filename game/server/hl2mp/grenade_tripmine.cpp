@@ -146,7 +146,7 @@ void CTripmineGrenade::KillBeam( void )
 {
 	if ( m_pBeam )
 	{
-		UTIL_Remove( m_pBeam );
+		gEntList.DestroyEntity( m_pBeam );
 		m_pBeam = NULL;
 	}
 }
@@ -293,6 +293,6 @@ void CTripmineGrenade::DelayDeathThink( void )
 	ExplosionCreate(GetEngineObject()->GetAbsOrigin() + m_vecDir * 8, GetEngineObject()->GetAbsAngles(), m_hOwner, GetDamage(), GetDamageRadius(),
 		SF_ENVEXPLOSION_NOSPARKS | SF_ENVEXPLOSION_NODLIGHTS | SF_ENVEXPLOSION_NOSMOKE, 0.0f, this);
 
-	UTIL_Remove( this );
+	gEntList.DestroyEntity( this );
 }
 

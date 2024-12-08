@@ -2539,7 +2539,7 @@ void CNPC_CombineGunship::SelfDestruct( void )
 
 		if ( m_hRagdoll )
 		{
-			UTIL_Remove( m_hRagdoll );
+			gEntList.DestroyEntity( m_hRagdoll );
 		}
 	}
 	else
@@ -2559,7 +2559,7 @@ void CNPC_CombineGunship::SelfDestruct( void )
 		}
 	}
 
-	UTIL_Remove( this );
+	gEntList.DestroyEntity( this );
 
 	// Record this so a nearby citizen can respond.
 	if ( GetCitizenResponse() )

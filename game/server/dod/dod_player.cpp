@@ -640,7 +640,7 @@ CRagdollProp* CDODPlayer::CreateRagdollProp()
 	{
 		// MATTTODO: put ragdolls in a queue to disappear
 		// for now remove the old one ..
-		UTIL_Remove( pRagdoll );
+		gEntList.DestroyEntity( pRagdoll );
 		pRagdoll = NULL;
 	}
 
@@ -672,7 +672,7 @@ void CDODPlayer::DestroyRagdoll( void )
 	
 	if( pRagdoll )
 	{
-		UTIL_Remove( pRagdoll );
+		gEntList.DestroyEntity( pRagdoll );
 	}
 }
 
@@ -1805,7 +1805,7 @@ bool CDODPlayer::BumpWeapon( CBaseCombatWeapon *pBaseWeapon )
 		extern int gEvilImpulse101;
 		if ( gEvilImpulse101 )
 		{
-			UTIL_Remove( pWeapon );
+			gEntList.DestroyEntity( pWeapon );
 		}
 		return false;
 	}
@@ -1842,7 +1842,7 @@ bool CDODPlayer::BumpWeapon( CBaseCombatWeapon *pBaseWeapon )
 			if ( pWeapon->HasPrimaryAmmo() )
 				return false;
 
-			UTIL_Remove( pWeapon );
+			gEntList.DestroyEntity( pWeapon );
 			return true;
 		}
 		else
@@ -1954,7 +1954,7 @@ bool CDODPlayer::HandleCommand_JoinClass( int iClass )
 			{
 				if ( !pWeapon->GetOwner() )
 				{	
-					UTIL_Remove( m_hLastDroppedWeapon.Get() );
+					gEntList.DestroyEntity( m_hLastDroppedWeapon.Get() );
 				}
 			}
 
@@ -1962,7 +1962,7 @@ bool CDODPlayer::HandleCommand_JoinClass( int iClass )
 			CAmmoBox *pAmmo = dynamic_cast<CAmmoBox *>( m_hLastDroppedAmmoBox.Get() );
 			if ( pAmmo )
 			{
-				UTIL_Remove( pAmmo );
+				gEntList.DestroyEntity( pAmmo );
 			}
 		}
 	}

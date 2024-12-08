@@ -1070,7 +1070,7 @@ void CFire::DestroyEffect()
 	{
 		//disable the graphics and remove the entity
 		pEffect->Enable( false );
-		UTIL_Remove( pEffect );
+		gEntList.DestroyEntity( pEffect );
 	}
 }
 //-----------------------------------------------------------------------------
@@ -1213,7 +1213,7 @@ bool CFire::GoOut()
 	GetEngineObject()->SetNextThink( TICK_NEVER_THINK );
 	if (GetEngineObject()->GetSpawnFlags() & SF_FIRE_DIE_PERMANENT)
 	{
-		UTIL_Remove( this );
+		gEntList.DestroyEntity( this );
 		return true;
 	}
 	SetToOutSize();

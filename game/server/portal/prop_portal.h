@@ -146,8 +146,6 @@ public:
 	int				GetMoveableOwnedEntities(CBaseEntity** pEntsOut, int iEntOutLimit); //gets owned entities that aren't either world or static props. Excludes fake portal ents such as physics clones
 
 	static CProp_Portal* GetSimulatorThatOwnsEntity(const CBaseEntity* pEntity); //fairly cheap to call
-	static void			Pre_UTIL_Remove(CBaseEntity* pEntity);
-	static void			Post_UTIL_Remove(CBaseEntity* pEntity);
 
 	//these three really should be made internal and the public interface changed to a "watch this entity" setup
 	void				TakeOwnershipOfEntity(CBaseEntity* pEntity); //general ownership, not necessarily physics ownership

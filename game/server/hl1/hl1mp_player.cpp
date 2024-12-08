@@ -180,7 +180,7 @@ void CHL1MP_Player::UpdateOnRemove( void )
 {
     if ( m_hRagdoll )
     {
-        UTIL_RemoveImmediate( m_hRagdoll );
+		gEntList.DestroyEntityImmediate( m_hRagdoll );
         m_hRagdoll = NULL;
     }
 
@@ -428,7 +428,7 @@ bool CHL1MP_Player::BumpWeapon( CBaseCombatWeapon *pWeapon )
         
 		if ( gEvilImpulse101 )
 		{
-			UTIL_Remove( pWeapon );
+			gEntList.DestroyEntity( pWeapon );
 		}
 		return false;
 	}
@@ -454,7 +454,7 @@ bool CHL1MP_Player::BumpWeapon( CBaseCombatWeapon *pWeapon )
 		 {
 			 pWeapon->CheckRespawn();
 
-			 UTIL_Remove( pWeapon );
+			 gEntList.DestroyEntity( pWeapon );
 
              if ( sv_debugweaponpickup.GetBool() )
                  Msg("sv_debugweaponpickup: Picking up weapon\n");
@@ -640,7 +640,7 @@ CRagdollProp* CHL1MP_Player::CreateRagdollProp()
 {
     if ( m_hRagdoll )
     {
-        UTIL_RemoveImmediate( m_hRagdoll );
+		gEntList.DestroyEntityImmediate( m_hRagdoll );
         m_hRagdoll = NULL;
     }
 

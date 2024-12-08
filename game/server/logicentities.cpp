@@ -911,7 +911,7 @@ void CEnvGlobal::Spawn( void )
 {
 	if ( !m_globalstate )
 	{
-		UTIL_Remove( this );
+		gEntList.DestroyEntity( this );
 		return;
 	}
 

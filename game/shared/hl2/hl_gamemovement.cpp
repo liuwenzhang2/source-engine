@@ -175,7 +175,7 @@ void CHL2GameMovement::StartForcedMove( bool mounting, float transit_speed, cons
 		// FIXME:  Play a deny sound?
 		if ( lm->m_hReservedSpot )
 		{
-			UTIL_Remove( lm->m_hReservedSpot );
+			gEntList.DestroyEntity( lm->m_hReservedSpot );
 			lm->m_hReservedSpot = NULL;
 		}
 		return;
@@ -241,7 +241,7 @@ bool CHL2GameMovement::ContinueForcedMove()
 		// Remove "reservation entity"
 		if ( lm->m_hReservedSpot )
 		{
-			UTIL_Remove( lm->m_hReservedSpot );
+			gEntList.DestroyEntity( lm->m_hReservedSpot );
 			lm->m_hReservedSpot = NULL;
 		}
 #endif

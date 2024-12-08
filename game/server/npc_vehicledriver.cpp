@@ -158,7 +158,7 @@ void CNPC_VehicleDriver::Activate( void )
 	if ( m_iszVehicleName == NULL_STRING )
 	{
 		Warning( "npc_vehicledriver %s has no vehicle to drive.\n", STRING(GetEntityName()) );
-		UTIL_Remove( this );
+		gEntList.DestroyEntity( this );
 		return;
 	}
 
@@ -166,7 +166,7 @@ void CNPC_VehicleDriver::Activate( void )
 	if ( !m_hVehicleEntity )
 	{
 		Warning( "npc_vehicledriver %s couldn't find his vehicle named %s.\n", STRING(GetEntityName()), STRING(m_iszVehicleName) );
-		UTIL_Remove( this );
+		gEntList.DestroyEntity( this );
 		return;
 	}
 
@@ -175,7 +175,7 @@ void CNPC_VehicleDriver::Activate( void )
 	if ( !m_pVehicleInterface->NPC_CanDrive() )
 	{
 		Warning( "npc_vehicledriver %s doesn't know how to drive vehicle %s.\n", STRING(GetEntityName()), STRING(m_hVehicleEntity->GetEntityName()) );
-		UTIL_Remove( this );
+		gEntList.DestroyEntity( this );
 		return;
 	}
 
@@ -221,7 +221,7 @@ void CNPC_VehicleDriver::PrescheduleThink( void )
 	if ( !m_hVehicleEntity )
 	{
 		m_pVehicleInterface = NULL;
-		UTIL_Remove( this );
+		gEntList.DestroyEntity( this );
 		return;
 	}
 

@@ -763,7 +763,7 @@ void CHunterFlechette::FlechetteTouch( CBaseEntity *pOther )
 			SetThink( NULL );
 			SetContextThink( NULL, 0, s_szHunterFlechetteBubbles );
 
-			UTIL_Remove( this );
+			gEntList.DestroyEntity( this );
 		}
 	}
 	else
@@ -788,7 +788,7 @@ void CHunterFlechette::FlechetteTouch( CBaseEntity *pOther )
 				UTIL_ImpactTrace( &tr, DMG_BULLET );
 			}
 
-			UTIL_Remove( this );
+			gEntList.DestroyEntity( this );
 		}
 	}
 }
@@ -2067,7 +2067,7 @@ void CNPC_Hunter::Activate()
 		Vector position;
 		pHunter->GetAttachment( gm_nTopGunAttachment, position );
 		VectorITransform( position, pHunter->GetEngineObject()->EntityToWorldTransform(), gm_vecLocalRelativePositionMinigun );
-		UTIL_Remove( pHunter );
+		gEntList.DestroyEntity( pHunter );
 	}
 }
 
@@ -2541,7 +2541,7 @@ void CNPC_Hunter::KillCurrentSiegeTarget()
 	{
 		GetEnemies()->ClearMemory( m_hCurrentSiegeTarget );
 
-		UTIL_Remove( m_hCurrentSiegeTarget );
+		gEntList.DestroyEntity( m_hCurrentSiegeTarget );
 		m_hCurrentSiegeTarget.Set( NULL );
 	}
 }

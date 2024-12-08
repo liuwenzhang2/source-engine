@@ -188,7 +188,7 @@ void CProp_Portal::UpdateOnRemove( void )
 
 	if( m_pAttachedCloningArea )
 	{
-		UTIL_Remove( m_pAttachedCloningArea );
+		gEntList.DestroyEntity( m_pAttachedCloningArea );
 		m_pAttachedCloningArea = NULL;
 	}
 	
@@ -675,7 +675,7 @@ void CProp_Portal::RemovePortalMicAndSpeaker()
 		{
 			inputdata_t in;
 			pMicrophone->InputDisable( in );
-			UTIL_Remove( pMicrophone );
+			gEntList.DestroyEntity( pMicrophone );
 		}
 		m_hMicrophone = 0;
 	}
@@ -703,7 +703,7 @@ void CProp_Portal::RemovePortalMicAndSpeaker()
 			}
 			inputdata_t in;
 			pSpeaker->InputTurnOff( in );
-			UTIL_Remove( pSpeaker );
+			gEntList.DestroyEntity( pSpeaker );
 		}
 		m_hSpeaker = 0;
 	}
@@ -2990,23 +2990,68 @@ void CProp_Portal::ClearLinkedEntities(void)
 	}
 }
 
+//Move all entities back to the main environment for removal, and make sure the main environment is in control during the gEntList.DestroyEntity process
+struct UTIL_Remove_PhysicsStack_t
+{
+	IPhysicsEnvironment* pPhysicsEnvironment;
+	CEntityList* pShadowList;
+};
+static CUtlVector<UTIL_Remove_PhysicsStack_t> s_UTIL_Remove_PhysicsStack;
+
 class CPortal_AutoGameSys_EntityListener : public CAutoGameSystem, public IEntityListener<CBaseEntity>
 {
 public:
 	virtual void LevelInitPreEntity(void)
 	{
-		
-	}
-
-	virtual void LevelShutdownPreEntity(void)
-	{
-		
+		gEntList.AddListenerEntity(this);
 	}
 
 	virtual bool Init(void)
 	{
-		gEntList.AddListenerEntity(this);
 		return true;
+	}
+
+	void LevelShutdownPostEntity()
+	{
+		gEntList.RemoveListenerEntity(this);
+	}
+
+	virtual void PreEntityRemove(CBaseEntity* pEntity)
+	{
+		//make sure entities are in the primary physics environment for the portal mod, this code should be safe even if the entity is in neither extra environment
+		if (!pEntity->IsNetworkable() || pEntity->entindex() == -1) {
+			return;
+		}
+		int index = s_UTIL_Remove_PhysicsStack.AddToTail();
+		s_UTIL_Remove_PhysicsStack[index].pPhysicsEnvironment = physenv;
+		s_UTIL_Remove_PhysicsStack[index].pShadowList = g_pShadowEntities;
+		int iEntIndex = pEntity->entindex();
+
+		//NDebugOverlay::EntityBounds( pEntity, 0, 0, 0, 50, 5.0f );
+
+		if ((CPhysicsShadowClone::IsShadowClone(pEntity) == false) &&
+			(CPortalSimulator::IsPortalSimulatorCollisionEntity(pEntity) == false))
+		{
+			CProp_Portal* pOwningSimulator = CProp_Portal::GetSimulatorThatOwnsEntity(pEntity);
+			if (pOwningSimulator)
+			{
+				pOwningSimulator->ReleasePhysicsOwnership(pEntity, false);
+				pOwningSimulator->ReleaseOwnershipOfEntity(pEntity);
+			}
+
+			//might be cloned from main to a few environments
+			for (int i = CProp_Portal_Shared::AllPortals.Count(); --i >= 0; )
+				CProp_Portal_Shared::AllPortals[i]->StopCloningEntity(pEntity);
+		}
+
+		for (int i = CProp_Portal_Shared::AllPortals.Count(); --i >= 0; )
+		{
+			CProp_Portal_Shared::AllPortals[i]->m_EntFlags[iEntIndex] = 0;
+		}
+
+
+		physenv = physenv_main;
+		g_pShadowEntities = g_pShadowEntities_Main;
 	}
 
 	//virtual void OnEntityCreated( CBaseEntity *pEntity ) {}
@@ -3024,70 +3069,25 @@ public:
 		}
 		Assert(CProp_Portal::GetSimulatorThatOwnsEntity(pEntity) == NULL);
 	}
-};
-static CPortal_AutoGameSys_EntityListener s_CPortal_AGS_EL_Singleton;
 
-//Move all entities back to the main environment for removal, and make sure the main environment is in control during the UTIL_Remove process
-struct UTIL_Remove_PhysicsStack_t
-{
-	IPhysicsEnvironment* pPhysicsEnvironment;
-	CEntityList* pShadowList;
-};
-static CUtlVector<UTIL_Remove_PhysicsStack_t> s_UTIL_Remove_PhysicsStack;
-
-void CProp_Portal::Pre_UTIL_Remove(CBaseEntity* pEntity)
-{
-	if (!pEntity->IsNetworkable() || pEntity->entindex() == -1) {
-		return;
-	}
-	int index = s_UTIL_Remove_PhysicsStack.AddToTail();
-	s_UTIL_Remove_PhysicsStack[index].pPhysicsEnvironment = physenv;
-	s_UTIL_Remove_PhysicsStack[index].pShadowList = g_pShadowEntities;
-	int iEntIndex = pEntity->entindex();
-
-	//NDebugOverlay::EntityBounds( pEntity, 0, 0, 0, 50, 5.0f );
-
-	if ((CPhysicsShadowClone::IsShadowClone(pEntity) == false) &&
-		(CPortalSimulator::IsPortalSimulatorCollisionEntity(pEntity) == false))
+	virtual void PostEntityRemove(int entnum)
 	{
-		CProp_Portal* pOwningSimulator = CProp_Portal::GetSimulatorThatOwnsEntity(pEntity);
-		if (pOwningSimulator)
-		{
-			pOwningSimulator->ReleasePhysicsOwnership(pEntity, false);
-			pOwningSimulator->ReleaseOwnershipOfEntity(pEntity);
-		}
-
-		//might be cloned from main to a few environments
-		for (int i = CProp_Portal_Shared::AllPortals.Count(); --i >= 0; )
-			CProp_Portal_Shared::AllPortals[i]->StopCloningEntity(pEntity);
-	}
-
-	for (int i = CProp_Portal_Shared::AllPortals.Count(); --i >= 0; )
-	{
-		CProp_Portal_Shared::AllPortals[i]->m_EntFlags[iEntIndex] = 0;
-	}
-
-
-	physenv = physenv_main;
-	g_pShadowEntities = g_pShadowEntities_Main;
-}
-
-void CProp_Portal::Post_UTIL_Remove(CBaseEntity* pEntity)
-{
-	int index = s_UTIL_Remove_PhysicsStack.Count() - 1;
-	Assert(index >= 0);
-	UTIL_Remove_PhysicsStack_t& PhysicsStackEntry = s_UTIL_Remove_PhysicsStack[index];
-	physenv = PhysicsStackEntry.pPhysicsEnvironment;
-	g_pShadowEntities = PhysicsStackEntry.pShadowList;
-	s_UTIL_Remove_PhysicsStack.FastRemove(index);
+		int index = s_UTIL_Remove_PhysicsStack.Count() - 1;
+		Assert(index >= 0);
+		UTIL_Remove_PhysicsStack_t& PhysicsStackEntry = s_UTIL_Remove_PhysicsStack[index];
+		physenv = PhysicsStackEntry.pPhysicsEnvironment;
+		g_pShadowEntities = PhysicsStackEntry.pShadowList;
+		s_UTIL_Remove_PhysicsStack.FastRemove(index);
 
 #ifdef _DEBUG
-	for (int i = CPhysicsShadowClone::g_ShadowCloneList.Count(); --i >= 0; )
-	{
-		Assert(CPhysicsShadowClone::g_ShadowCloneList[i]->GetEngineShadowClone()->GetClonedEntity() != pEntity); //shouldn't be any clones of this object anymore
-	}
+		for (int i = CPhysicsShadowClone::g_ShadowCloneList.Count(); --i >= 0; )
+		{
+			Assert(CPhysicsShadowClone::g_ShadowCloneList[i]->GetEngineShadowClone()->GetClonedEntity() != pEntity); //shouldn't be any clones of this object anymore
+		}
 #endif
-}
+	}
+};
+static CPortal_AutoGameSys_EntityListener s_CPortal_AGS_EL_Singleton;
 
 void UpdateShadowClonesPortalSimulationFlags(const CBaseEntity* pSourceEntity, unsigned int iFlags, int iSourceFlags)
 {

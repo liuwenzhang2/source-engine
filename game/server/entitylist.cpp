@@ -9098,7 +9098,7 @@ bool CEngineVehicleInternal::Initialize(const char* pVehicleScript, unsigned int
 	vehicleparams_t vehicle;
 	if (!ParseVehicleScript(pVehicleScript, solid, vehicle))
 	{
-		UTIL_Remove(m_pOuter);
+		gEntList.DestroyEntity(m_pOuter);
 		return false;
 	}
 
@@ -11175,7 +11175,7 @@ public:
 				}
 				if (!pEnt->GetEngineObject()->IsEFlagSet(EFL_KEEP_ON_RECREATE_ENTITIES))
 				{
-					UTIL_Remove(pEnt);
+					gEntList.DestroyEntity(pEnt);
 				}
 				pEnt = pNextEnt;
 			}

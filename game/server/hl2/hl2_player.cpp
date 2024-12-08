@@ -2689,7 +2689,7 @@ bool CHL2_Player::Weapon_CanUse( CBaseCombatWeapon *pWeapon )
 	if ( pWeapon->ClassMatches( "weapon_stunstick" ) )
 	{
 		if ( ApplyBattery( 0.5 ) )
-			UTIL_Remove( pWeapon );
+			gEntList.DestroyEntity( pWeapon );
 		return false;
 	}
 #endif
@@ -2737,7 +2737,7 @@ bool CHL2_Player::BumpWeapon( CBaseCombatWeapon *pWeapon )
 	{
 		if ( gEvilImpulse101 )
 		{
-			UTIL_Remove( pWeapon );
+			gEntList.DestroyEntity( pWeapon );
 		}
 		return false;
 	}
@@ -2756,7 +2756,7 @@ bool CHL2_Player::BumpWeapon( CBaseCombatWeapon *pWeapon )
 		if ( pWeapon->UsesClipsForAmmo1() && pWeapon->HasPrimaryAmmo() )
 			return false;
 
-		UTIL_Remove( pWeapon );
+		gEntList.DestroyEntity( pWeapon );
 		return false;
 	}
 	// -------------------------

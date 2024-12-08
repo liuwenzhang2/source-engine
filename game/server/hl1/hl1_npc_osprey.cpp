@@ -361,7 +361,7 @@ void CNPC_Osprey::FindAllThink( void )
 	if (m_iUnits == 0)
 	{
 		Msg( "osprey error: no grunts to resupply\n");
-		UTIL_Remove( this );
+		gEntList.DestroyEntity( this );
 		return;
 	}
 
@@ -1287,7 +1287,7 @@ void CBaseHelicopter::CrashTouch( CBaseEntity *pOther )
 			te->Explosion( filter, MIN( 0.99, i * 0.2 ),	&pos, g_sModelIndexFireball,	10, 15, TE_EXPLFLAG_NONE, 100, 0 );
 		}
 
-		UTIL_Remove( this );
+		gEntList.DestroyEntity( this );
 	}
 }
 

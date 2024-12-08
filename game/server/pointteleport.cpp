@@ -99,7 +99,7 @@ void CPointTeleport::Activate( void )
 		else
 		{
 			Warning("ERROR: (%s) target '%s' not found. Deleting.\n", GetDebugName(), STRING(m_target));
-			UTIL_Remove( this );
+			gEntList.DestroyEntity( this );
 			return;
 		}
 	}

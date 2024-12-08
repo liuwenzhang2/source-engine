@@ -198,7 +198,7 @@ void CCrossbowBolt::BoltTouch( CBaseEntity *pOther )
 
         if ( !g_pGameRules->IsMultiplayer() || !m_bExplode )
 		{
-			UTIL_Remove( this );
+			gEntList.DestroyEntity( this );
 		}
 	}
 	else

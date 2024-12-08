@@ -935,7 +935,7 @@ void CWeapon_SLAM::WeaponIdle( void )
 			{
 #ifndef CLIENT_DLL
 				pOwner->Weapon_Drop( this );
-				UTIL_Remove(this);
+				gEntList.DestroyEntity(this);
 #endif
 			}
 		}
@@ -943,7 +943,7 @@ void CWeapon_SLAM::WeaponIdle( void )
 		{
 #ifndef CLIENT_DLL
 			pOwner->Weapon_Drop( this );
-			UTIL_Remove(this);
+			gEntList.DestroyEntity(this);
 #endif
 		}
 

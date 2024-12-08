@@ -1940,7 +1940,7 @@ void Physics_RunThinkFunctions( bool simulating )
 	}
 	else
 	{
-		UTIL_DisableRemoveImmediate();
+		gEntList.DisableDestroyImmediate();
 		int listMax = SimThink_ListCount();
 		listMax = MAX(listMax,1);
 		CBaseEntity **list = (CBaseEntity **)stackalloc( sizeof(CBaseEntity *) * listMax );
@@ -1961,7 +1961,7 @@ void Physics_RunThinkFunctions( bool simulating )
 		}
 
 		stackfree( list );
-		UTIL_EnableRemoveImmediate();
+		gEntList.EnableDestroyImmediate();
 	}
 
 	gpGlobals->curtime = starttime;

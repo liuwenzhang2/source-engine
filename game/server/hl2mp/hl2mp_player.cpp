@@ -124,7 +124,7 @@ void CHL2MP_Player::UpdateOnRemove( void )
 {
 	if ( m_hRagdoll )
 	{
-		UTIL_RemoveImmediate( m_hRagdoll );
+		gEntList.DestroyEntityImmediate( m_hRagdoll );
 		m_hRagdoll = NULL;
 	}
 
@@ -853,7 +853,7 @@ bool CHL2MP_Player::BumpWeapon( CBaseCombatWeapon *pWeapon )
 	{
 		if ( gEvilImpulse101 )
 		{
-			UTIL_Remove( pWeapon );
+			gEntList.DestroyEntity( pWeapon );
 		}
 		return false;
 	}
@@ -873,7 +873,7 @@ bool CHL2MP_Player::BumpWeapon( CBaseCombatWeapon *pWeapon )
 		 {
 			 pWeapon->CheckRespawn();
 
-			 UTIL_Remove( pWeapon );
+			 gEntList.DestroyEntity( pWeapon );
 			 return true;
 		 }
 		 else
@@ -1156,7 +1156,7 @@ CRagdollProp* CHL2MP_Player::CreateRagdollProp()
 {
 	if ( m_hRagdoll )
 	{
-		UTIL_RemoveImmediate( m_hRagdoll );
+		gEntList.DestroyEntityImmediate( m_hRagdoll );
 		m_hRagdoll = NULL;
 	}
 

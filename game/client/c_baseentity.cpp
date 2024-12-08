@@ -2869,7 +2869,7 @@ void C_BaseEntity::UpdateOnRemove( void )
 		GetEngineObject()->AddSolidFlags(FSOLID_NOT_SOLID);
 		GetEngineObject()->SetMoveType(MOVETYPE_NONE);
 
-		GetEngineObject()->AddEFlags(EFL_KILLME);	// Make sure to ignore further calls into here or UTIL_Remove.
+		GetEngineObject()->AddEFlags(EFL_KILLME);	// Make sure to ignore further calls into here or gEntList.DestroyEntity.
 	}
 #if !defined( NO_ENTITY_PREDICTION )
 	// Remove from the predictables list

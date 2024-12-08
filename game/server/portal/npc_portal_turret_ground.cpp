@@ -88,7 +88,7 @@ void CNPC_Portal_GroundTurret::Spawn( void )
 	if( !GetEngineObject()->GetMoveParent() )
 	{
 		DevMsg("ERROR! npc_ground_turret with no parent!\n");
-		UTIL_Remove(this);
+		gEntList.DestroyEntity(this);
 		return;
 	}
 

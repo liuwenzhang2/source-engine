@@ -34,7 +34,7 @@ public:
 // Null Entity, remove on startup
 void CNullEntity::Spawn( void )
 {
-	UTIL_Remove( this );
+	gEntList.DestroyEntity( this );
 }
 LINK_ENTITY_TO_CLASS(info_null,CNullEntity);
 
@@ -82,7 +82,7 @@ void CBaseEntity::SUB_Remove( void )
 		DevWarning( 2, "SUB_Remove called on entity with health > 0\n");
 	}
 
-	UTIL_Remove( this );
+	gEntList.DestroyEntity( this );
 }
 
 

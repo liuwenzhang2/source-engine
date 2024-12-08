@@ -201,7 +201,7 @@ void CGrenadeBugBait::BugBaitTouch( CBaseEntity *pOther )
 	g_AntlionMakerManager.BroadcastFightGoal(GetEngineObject()->GetAbsOrigin() );
 
 	//Go away
-	UTIL_Remove( this );
+	gEntList.DestroyEntity( this );
 }
 
 //-----------------------------------------------------------------------------

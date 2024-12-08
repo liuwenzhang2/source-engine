@@ -4696,7 +4696,7 @@ void CInstancedSceneEntity::DoThink( float frametime )
 
 	if ( !m_pScene || !m_bIsPlayingBack || ( m_bHadOwner && m_hOwner == NULL ) )
 	{
-		UTIL_Remove( this );
+		gEntList.DestroyEntity( this );
 		return;
 	}
 
@@ -4724,7 +4724,7 @@ void CInstancedSceneEntity::DoThink( float frametime )
 	{
 		OnSceneFinished( false, false );
 
-		UTIL_Remove( this );
+		gEntList.DestroyEntity( this );
 	}
 }
 
@@ -4825,7 +4825,7 @@ void CInstancedSceneEntity::OnRestore()
 	if ( m_bHadOwner && !m_hOwner )
 	{
 		// probably just came back from a level transition
-		UTIL_Remove( this );
+		gEntList.DestroyEntity( this );
 		return;
 	}
 	// reset background state
@@ -5015,7 +5015,7 @@ void CSceneManager::RemoveScenesInvolvingActor( CBaseFlex *pActor )
 					}
 
 					LocalScene_Printf( "%s : removed for '%s'\n", STRING( pInstancedScene->m_iszSceneFile ), pActor ? pActor->GetDebugName() : "NULL" );
-					UTIL_Remove( pInstancedScene );
+					gEntList.DestroyEntity( pInstancedScene );
 				}
 			}
 		}
@@ -5530,7 +5530,7 @@ void CSceneListManager::ShutdownList( void )
 		}
 	}
 
-	UTIL_Remove( this );
+	gEntList.DestroyEntity( this );
 }
 
 //-----------------------------------------------------------------------------
@@ -5542,7 +5542,7 @@ void CSceneListManager::RemoveScene( int iIndex )
 	if ( pScene )
 	{
 		// Remove the scene
-		UTIL_Remove( pScene );
+		gEntList.DestroyEntity( pScene );
 		return;
 	}
 

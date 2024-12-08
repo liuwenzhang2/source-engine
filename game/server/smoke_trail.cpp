@@ -144,7 +144,7 @@ SmokeTrail* SmokeTrail::CreateSmokeTrail()
 		}
 		else
 		{
-			UTIL_Remove(pEnt);
+			gEntList.DestroyEntity(pEnt);
 		}
 	}
 
@@ -268,7 +268,7 @@ RocketTrail* RocketTrail::CreateRocketTrail()
 		}
 		else
 		{
-			UTIL_Remove( pEnt );
+			gEntList.DestroyEntity( pEnt );
 		}
 	}
 
@@ -354,7 +354,7 @@ SporeTrail* SporeTrail::CreateSporeTrail()
 		}
 		else
 		{
-			UTIL_Remove( pEnt );
+			gEntList.DestroyEntity( pEnt );
 		}
 	}
 
@@ -433,7 +433,7 @@ SporeExplosion *SporeExplosion::CreateSporeExplosion()
 		}
 		else
 		{
-			UTIL_Remove( pEnt );
+			gEntList.DestroyEntity( pEnt );
 		}
 	}
 
@@ -517,7 +517,7 @@ CFireTrail *CFireTrail::CreateFireTrail( void )
 		}
 		else
 		{
-			UTIL_Remove( pEnt );
+			gEntList.DestroyEntity( pEnt );
 		}
 	}
 
@@ -638,7 +638,7 @@ DustTrail* DustTrail::CreateDustTrail()
 		}
 		else
 		{
-			UTIL_Remove(pEnt);
+			gEntList.DestroyEntity(pEnt);
 		}
 	}
 

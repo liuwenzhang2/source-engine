@@ -250,7 +250,7 @@ void CSoundEnt::OnRestore()
 	if ( g_pSoundEnt )
 	{
 		Assert( g_pSoundEnt != this );
-		UTIL_Remove( g_pSoundEnt );
+		gEntList.DestroyEntity( g_pSoundEnt );
 	}
 	g_pSoundEnt = this;
 }

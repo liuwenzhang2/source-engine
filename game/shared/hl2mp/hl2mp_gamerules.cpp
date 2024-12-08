@@ -1088,13 +1088,13 @@ void CHL2MPRules::CleanUpMap()
 		{
 			if ( !pWeapon->GetPlayerOwner() )
 			{
-				UTIL_Remove( pCur );
+				gEntList.DestroyEntity( pCur );
 			}
 		}
 		// remove entities that has to be restored on roundrestart (breakables etc)
 		else if ( !FindInList( s_PreserveEnts, pCur->GetClassname() ) )
 		{
-			UTIL_Remove( pCur );
+			gEntList.DestroyEntity( pCur );
 		}
 
 		pCur = gEntList.NextEnt( pCur );

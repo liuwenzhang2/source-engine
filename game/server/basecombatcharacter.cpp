@@ -694,7 +694,7 @@ bool CBaseCombatCharacter::HandleInteraction( int interactionType, void *data, C
 	if ( interactionType == g_interactionBarnacleVictimReleased )
 	{
 		// For now, throw away the NPC and leave the ragdoll.
-		UTIL_Remove( this );
+		gEntList.DestroyEntity( this );
 		return true;
 	}
 #endif // HL2_DLL
@@ -841,7 +841,7 @@ void CBaseCombatCharacter::UpdateOnRemove( void )
 	{
 		if (m_hMyWeapons[i]) 
 		{
-			UTIL_Remove( m_hMyWeapons[i] );
+			gEntList.DestroyEntity( m_hMyWeapons[i] );
 		}
 	}
 
@@ -2073,7 +2073,7 @@ void CBaseCombatCharacter::Weapon_Drop( CBaseCombatWeapon *pWeapon, const Vector
 	if (GetEngineObject()->HasSpawnFlags( SF_NPC_NO_WEAPON_DROP ) )
 	{
 		// Don't drop weapons when the super physgun is happening.
-		UTIL_Remove( pWeapon );
+		gEntList.DestroyEntity( pWeapon );
 	}
 
 }

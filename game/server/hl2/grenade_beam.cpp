@@ -202,14 +202,14 @@ void CGrenadeBeam::KillBeam(void)
 	SetThink(NULL);
 	SetTouch(NULL);
 	m_hBeamChaser->SetThink(NULL);
-	UTIL_Remove(m_hBeamChaser);
-	UTIL_Remove(this);
+	gEntList.DestroyEntity(m_hBeamChaser);
+	gEntList.DestroyEntity(this);
 
 	for (int i=0;i<GRENADEBEAM_MAXBEAMS;i++)
 	{
 		if (m_pBeam[i])
 		{
-			UTIL_Remove(m_pBeam[i]);
+			gEntList.DestroyEntity(m_pBeam[i]);
 		}
 	}
 }

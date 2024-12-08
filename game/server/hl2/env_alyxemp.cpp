@@ -275,7 +275,7 @@ void CAlyxEmpEffect::Stop( float flDuration )
 
 	if ( m_hBeam != NULL )
 	{
-		UTIL_Remove( m_hBeam );
+		gEntList.DestroyEntity( m_hBeam );
 		m_hBeam = NULL;
 	}
 

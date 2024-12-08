@@ -89,7 +89,7 @@ void CRopeAnchor::FallThink()
 //---------------------------------------------------------
 void CRopeAnchor::RemoveThink()
 {
-	UTIL_Remove( m_hRope );	
+	gEntList.DestroyEntity( m_hRope );
 	SetThink( &CRopeAnchor::SUB_Remove );
 	GetEngineObject()->SetNextThink( gpGlobals->curtime );
 }
@@ -365,7 +365,7 @@ void CAI_RappelBehavior::CutZipline()
 {
 	if( m_hLine )
 	{
-		UTIL_Remove( m_hLine );
+		gEntList.DestroyEntity( m_hLine );
 	}
 
 	CBaseEntity *pAnchor = gEntList.CreateEntityByName( "rope_anchor" );

@@ -311,7 +311,7 @@ void CAI_DynamicLink::InitDynamicLinks(void)
 			// Go on to the next dynamic link
 			pDynamicLink = pDynamicLink->m_pNextDynamicLink;
 
-			UTIL_RemoveImmediate( pBadDynamicLink );
+			gEntList.DestroyEntityImmediate( pBadDynamicLink );
 		}
 
 	}
@@ -369,7 +369,7 @@ void CAI_DynamicLink::PurgeDynamicLinks(void)
 			}
 #endif
 			// Safe to remove it here as this happens only after I leave this function
-			UTIL_Remove(pDynamicLink);
+			gEntList.DestroyEntity(pDynamicLink);
 		}
 
 		// Go on to the next dynamic link

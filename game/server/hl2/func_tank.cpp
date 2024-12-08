@@ -2714,7 +2714,7 @@ void CFuncTankLaser::Activate( void )
 
 	if ( !GetLaser() )
 	{
-		UTIL_Remove(this);
+		gEntList.DestroyEntity(this);
 		Warning( "Laser tank with no env_laser!\n" );
 	}
 	else
@@ -3187,7 +3187,7 @@ void CFuncTankAPCRocket::UpdateOnRemove( void )
 {
 	if ( m_hLaserDot )
 	{
-		UTIL_Remove( m_hLaserDot );
+		gEntList.DestroyEntity( m_hLaserDot );
 		m_hLaserDot = NULL;
 	}
 	BaseClass::UpdateOnRemove();
@@ -3225,7 +3225,7 @@ void CFuncTankAPCRocket::FireDying( const Vector &barrelEnd )
 	m_fireRate = random->RandomFloat( DEATH_VOLLEY_MIN_FIRE_RATE, DEATH_VOLLEY_MAX_FIRE_RATE ); 
 	if ( --m_nBulletCount <= 0 )
 	{
-		UTIL_Remove( this );
+		gEntList.DestroyEntity( this );
 	}
 }
 
@@ -3847,13 +3847,13 @@ void CMortarShell::FadeThink( void )
 
 	if ( gpGlobals->curtime > ( m_flFadeTime + MORTAR_FADE_LENGTH ) )
 	{
-		UTIL_Remove( m_pBeamEffect[0] );
-		UTIL_Remove( m_pBeamEffect[1] );
-		UTIL_Remove( m_pBeamEffect[2] );
-		UTIL_Remove( m_pBeamEffect[3] );
+		gEntList.DestroyEntity( m_pBeamEffect[0] );
+		gEntList.DestroyEntity( m_pBeamEffect[1] );
+		gEntList.DestroyEntity( m_pBeamEffect[2] );
+		gEntList.DestroyEntity( m_pBeamEffect[3] );
 
 		SetThink(NULL);
-		UTIL_Remove( this );
+		gEntList.DestroyEntity( this );
 	}
 }
 
@@ -4254,7 +4254,7 @@ void CFuncTankCombineCannon::DestroyBeam()
 {
 	if( m_hBeam )
 	{
-		UTIL_Remove( m_hBeam );
+		gEntList.DestroyEntity( m_hBeam );
 		m_hBeam.Set(NULL);
 	}
 }

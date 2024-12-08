@@ -136,7 +136,7 @@ void CBaseCombatWeapon::Activate( void )
 
 	if ( g_pGameRules->IsAllowedToSpawn( this ) == false )
 	{
-		UTIL_Remove( this );
+		gEntList.DestroyEntity( this );
 		return;
 	}
 #endif
@@ -713,7 +713,7 @@ void CBaseCombatWeapon::Drop( const Vector &vecVelocity )
 	{
 		if ( g_pGameRules->IsAllowedToSpawn( this ) == false )
 		{
-			UTIL_Remove( this );
+			gEntList.DestroyEntity( this );
 			return;
 		}
 	}

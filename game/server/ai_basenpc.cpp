@@ -408,7 +408,7 @@ bool CAI_BaseNPC::Event_Gibbed( const CTakeDamageInfo &info )
 	if ( gibbed )
 	{
 		// don't remove players!
-		UTIL_Remove( this );
+		gEntList.DestroyEntity( this );
 		SetThink( NULL ); //We're going away, so don't think anymore.
 	}
 	else
@@ -911,7 +911,7 @@ int CAI_BaseNPC::OnTakeDamage_Dying( const CTakeDamageInfo &info )
 
 			if (m_iHealth < -500)
 			{
-				UTIL_Remove(this);
+				gEntList.DestroyEntity(this);
 			}
 		}
 	}
@@ -966,7 +966,7 @@ int CAI_BaseNPC::OnTakeDamage_Dead( const CTakeDamageInfo &info )
 
 			if (m_iHealth < -500)
 			{
-				UTIL_Remove(this);
+				gEntList.DestroyEntity(this);
 			}
 		}
 	}
@@ -6776,7 +6776,7 @@ void CAI_BaseNPC::NPCInit ( void )
 {
 	if (!g_pGameRules->FAllowNPCs())
 	{
-		UTIL_Remove( this );
+		gEntList.DestroyEntity( this );
 		return;
 	}
 
@@ -7231,7 +7231,7 @@ void CAI_BaseNPC::AddRelationship( const char *pszRelationship, CBaseEntity *pAc
 				if (pEntity)
 				{
 					AddClassRelationship( pEntity->Classify(), disposition, priority );
-					UTIL_RemoveImmediate(pEntity);
+					gEntList.DestroyEntityImmediate(pEntity);
 				}
 				else
 				{
@@ -8486,7 +8486,7 @@ void CAI_BaseNPC::HandleAnimEvent( animevent_t *pEvent )
 				if ( m_iDesiredWeaponState == DESIREDWEAPONSTATE_CHANGING_DESTROY )
 				{
 					// Get rid of it!
-					UTIL_Remove( pWeapon );
+					gEntList.DestroyEntity( pWeapon );
 				}
 
 				if ( m_iDesiredWeaponState != DESIREDWEAPONSTATE_IGNORE )
@@ -10414,7 +10414,7 @@ CBaseEntity *CAI_BaseNPC::DropItem ( const char *pszItemName, Vector vecPos, QAn
 	{
 		if ( g_pGameRules->IsAllowedToSpawn( pItem ) == false )
 		{
-			UTIL_Remove( pItem );
+			gEntList.DestroyEntity( pItem );
 			return NULL;
 		}
 
@@ -10926,7 +10926,7 @@ void CAI_BaseNPC::Precache( void )
 	if (!LoadedSchedules())
 	{
 		DevMsg("ERROR: Rejecting spawn of %s as error in NPC's schedules.\n",GetDebugName());
-		UTIL_Remove(this);
+		gEntList.DestroyEntity(this);
 		return;
 	}
 
@@ -12014,7 +12014,7 @@ bool CAI_BaseNPC::CineCleanup()
 
 	if ( bDestroyCine )
 	{
-		UTIL_Remove( pOldCine );
+		gEntList.DestroyEntity( pOldCine );
 	}
 
 	return true;
@@ -12818,7 +12818,7 @@ void CAI_BaseNPC::Break( CBaseEntity *pBreaker )
 	params.defBurstScale = 100;//pDamageInfo ? 0 : 100;
 	PropBreakableCreateAll(GetEngineObject()->GetModelIndex(), pPhysics, params, this, -1, false );
 
-	UTIL_Remove(this);
+	gEntList.DestroyEntity(this);
 }
 
 

@@ -40,7 +40,7 @@ void CWeaponCitizenPackage::ItemPostFrame( void )
 void CWeaponCitizenPackage::Drop( const Vector &vecVelocity )
 {
 	BaseClass::Drop( vecVelocity );
-	UTIL_Remove( this );
+	gEntList.DestroyEntity( this );
 }
 
 

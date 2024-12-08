@@ -328,121 +328,6 @@ realcheck:
 	return true;
 }
 
-//-----------------------------------------------------------------------------
-// Purpose: Sets the entity up for deletion.  Entity will not actually be deleted
-//			until the next frame, so there can be no pointer errors.
-// Input  : *oldObj - object to delete
-//-----------------------------------------------------------------------------
-//void UTIL_Remove( IServerNetworkable *oldObj )
-//{
-//	
-//}
-
-void UTIL_Remove( CBaseEntity *oldObj )
-{
-	//CServerNetworkProperty* pProp = static_cast<CServerNetworkProperty*>(oldObj);
-	if (!oldObj || oldObj->GetEngineObject()->IsMarkedForDeletion())
-		return;
-
-	if (PhysIsInCallback())
-	{
-		// This assert means that someone is deleting an entity inside a callback.  That isn't supported so
-		// this code will defer the deletion of that object until the end of the current physics simulation frame
-		// Since this is hidden from the calling code it's preferred to call PhysCallbackRemove() directly from the caller
-		// in case the deferred delete will have unwanted results (like continuing to receive callbacks).  That will make it 
-		// obvious why the unwanted results are happening so the caller can handle them appropriately. (some callbacks can be masked 
-		// or the calling entity can be flagged to filter them in most cases)
-		Assert(0);
-		PhysCallbackRemove(oldObj);
-		return;
-	}
-
-	// mark it for deletion	
-	oldObj->GetEngineObject()->MarkForDeletion();
-
-	CBaseEntity* pBaseEnt = oldObj->GetBaseEntity();
-	if (pBaseEnt)
-	{
-#ifdef PORTAL //make sure entities are in the primary physics environment for the portal mod, this code should be safe even if the entity is in neither extra environment
-		bool bNetworkable = pBaseEnt->IsNetworkable();
-		int nEntIndex = bNetworkable ? oldObj->entindex() : -1;
-		if (bNetworkable && nEntIndex != -1) {
-			CProp_Portal::Pre_UTIL_Remove(pBaseEnt);
-		}
-#endif
-		gEntList.SetReceivedChainedUpdateOnRemove(false);
-		pBaseEnt->UpdateOnRemove();
-
-		Assert(gEntList.IsReceivedChainedUpdateOnRemove());
-
-		// clear oldObj targetname / other flags now
-		pBaseEnt->SetName("");
-
-#ifdef PORTAL
-		if (bNetworkable && nEntIndex != -1) {
-			CProp_Portal::Post_UTIL_Remove(pBaseEnt);
-		}
-#endif
-
-		gEntList.AddToDeleteList(pBaseEnt);
-}
-}
-
-static int s_RemoveImmediateSemaphore = 0;
-void UTIL_DisableRemoveImmediate()
-{
-	s_RemoveImmediateSemaphore++;
-}
-void UTIL_EnableRemoveImmediate()
-{
-	s_RemoveImmediateSemaphore--;
-	Assert(s_RemoveImmediateSemaphore>=0);
-}
-//-----------------------------------------------------------------------------
-// Purpose: deletes an entity, without any delay.  WARNING! Only use this when sure
-//			no pointers rely on this entity.
-// Input  : *oldObj - the entity to delete
-//-----------------------------------------------------------------------------
-void UTIL_RemoveImmediate( CBaseEntity *oldObj )
-{
-	// valid pointer or already removed?
-	if ( !oldObj || oldObj->GetEngineObject()->IsEFlagSet(EFL_KILLME) )
-		return;
-
-	if ( s_RemoveImmediateSemaphore )
-	{
-		UTIL_Remove(oldObj);
-		return;
-	}
-
-#ifdef PORTAL //make sure entities are in the primary physics environment for the portal mod, this code should be safe even if the entity is in neither extra environment
-	bool bNetworkable = oldObj->IsNetworkable();
-	int nEntIndex = bNetworkable ? oldObj->entindex() : -1;
-	if (bNetworkable && nEntIndex != -1) {
-		CProp_Portal::Pre_UTIL_Remove(oldObj);
-	}
-#endif
-
-	oldObj->GetEngineObject()->AddEFlags( EFL_KILLME );	// Make sure to ignore further calls into here or UTIL_Remove.
-
-	gEntList.SetReceivedChainedUpdateOnRemove(false);
-	oldObj->UpdateOnRemove();
-	Assert( gEntList.IsReceivedChainedUpdateOnRemove() );
-
-	// Entities shouldn't reference other entities in their destructors
-	//  that type of code should only occur in an UpdateOnRemove call
-	gEntList.SetDisableEhandleAccess(true);
-	gEntList.DestroyEntity(oldObj);
-	gEntList.SetDisableEhandleAccess(false);
-
-#ifdef PORTAL
-	if (bNetworkable && nEntIndex != -1) {
-		CProp_Portal::Post_UTIL_Remove(oldObj);
-	}
-#endif
-}
-
-
 // returns a CBaseEntity pointer to a player by index.  Only returns if the player is spawned and connected
 // otherwise returns NULL
 // Index is 1 based
@@ -1660,7 +1545,7 @@ void UTIL_PrecacheOther( const char *szClassname, const char *modelName )
 	if (pEntity)
 		pEntity->Precache( );
 
-	UTIL_RemoveImmediate( pEntity );
+	gEntList.DestroyEntityImmediate( pEntity );
 }
 
 //=========================================================

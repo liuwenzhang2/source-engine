@@ -453,7 +453,7 @@ LINK_ENTITY_TO_CLASS( monster_satchel, CSatchelCharge );
 void CSatchelCharge::Deactivate( void )
 {
 	GetEngineObject()->AddSolidFlags( FSOLID_NOT_SOLID );
-	UTIL_Remove( this );
+	gEntList.DestroyEntity( this );
 }
 
 
@@ -546,7 +546,7 @@ void CSatchelCharge::SatchelThink( void )
 
 	if (!IsInWorld())
 	{
-		UTIL_Remove( this );
+		gEntList.DestroyEntity( this );
 		return;
 	}
 

@@ -719,7 +719,7 @@ void CNPC_AntlionGuard::DestroyGlows( void )
 {
 	if ( m_hCaveGlow[0] )
 	{
-		UTIL_Remove( m_hCaveGlow[0] );
+		gEntList.DestroyEntity( m_hCaveGlow[0] );
 
 		// reset it to NULL in case there is a double death cleanup for some reason.
 		m_hCaveGlow[0] = NULL;
@@ -727,7 +727,7 @@ void CNPC_AntlionGuard::DestroyGlows( void )
 
 	if ( m_hCaveGlow[1] )
 	{
-		UTIL_Remove( m_hCaveGlow[1] );
+		gEntList.DestroyEntity( m_hCaveGlow[1] );
 
 		// reset it to NULL in case there is a double death cleanup for some reason.
 		m_hCaveGlow[1] = NULL;
@@ -4579,7 +4579,7 @@ bool CNPC_AntlionGuard::CanBecomeRagdoll( void )
 //		pRagdoll->GetEngineObject()->SetCollisionGroup( COLLISION_GROUP_DEBRIS );
 //		
 //		// Get rid of our old body
-//		UTIL_Remove(this);
+//		gEntList.DestroyEntity(this);
 //
 //		return true;
 //	}

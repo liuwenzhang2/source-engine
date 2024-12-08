@@ -753,7 +753,7 @@ void CNPC_Citizen::FixupMattWeapon()
 	if ( pWeapon && pWeapon->ClassMatches( "weapon_crowbar" ) && NameMatches( "matt" ) )
 	{
 		Weapon_Drop( pWeapon );
-		UTIL_Remove( pWeapon );
+		gEntList.DestroyEntity( pWeapon );
 		pWeapon = (CBaseCombatWeapon *)gEntList.CreateEntityByName( "weapon_crowbar" );
 		pWeapon->SetName( "matt_weapon" );
 		DispatchSpawn( pWeapon );
@@ -1945,7 +1945,7 @@ void CNPC_Citizen::PickupItem( CBaseEntity *pItem )
 		if ( TakeHealth( sk_healthkit.GetFloat(), DMG_GENERIC ) )
 		{
 			RemoveAllDecals();
-			UTIL_Remove( pItem );
+			gEntList.DestroyEntity( pItem );
 		}
 	}
 	else if( FClassnameIs( pItem, "item_healthvial" ) )
@@ -1953,7 +1953,7 @@ void CNPC_Citizen::PickupItem( CBaseEntity *pItem )
 		if ( TakeHealth( sk_healthvial.GetFloat(), DMG_GENERIC ) )
 		{
 			RemoveAllDecals();
-			UTIL_Remove( pItem );
+			gEntList.DestroyEntity( pItem );
 		}
 	}
 	else
@@ -4113,7 +4113,7 @@ void CCitizenResponseSystem::Spawn()
 	if ( g_pCitizenResponseSystem )
 	{
 		Warning("Multiple citizen response systems in level.\n");
-		UTIL_Remove( this );
+		gEntList.DestroyEntity( this );
 		return;
 	}
 	g_pCitizenResponseSystem = this;
@@ -4235,7 +4235,7 @@ void CNPC_Citizen::RemoveInsignia()
 
 			if( pInsignia )
 			{
-				UTIL_Remove( pInsignia );
+				gEntList.DestroyEntity( pInsignia );
 				return;
 			}
 		}

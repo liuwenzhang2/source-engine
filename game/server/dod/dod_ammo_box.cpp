@@ -98,13 +98,13 @@ void CAmmoBox::BoxTouch( CBaseEntity *pOther )
 	{
 		//don't give ammo, just give him his drop again
 		pPlayer->ReturnGenericAmmo();	
-		UTIL_Remove(this);
+		gEntList.DestroyEntity(this);
 	}
 	else
 	{
 		//See if they can use some ammo, if so, remove the box
 		if( pPlayer->GiveGenericAmmo() )
-			UTIL_Remove(this);
+			gEntList.DestroyEntity(this);
 	}	
 }
 
@@ -128,13 +128,13 @@ bool CAmmoBox::MyTouch( CBasePlayer *pBasePlayer )
 	{
 		//don't give ammo, just give him his drop again
 		pPlayer->ReturnGenericAmmo();	
-		UTIL_Remove(this);
+		gEntList.DestroyEntity(this);
 	}
 	else
 	{
 		//See if they can use some ammo, if so, remove the box
 		if( pPlayer->GiveGenericAmmo() )
-			UTIL_Remove(this);
+			gEntList.DestroyEntity(this);
 	}
 
 	return true;

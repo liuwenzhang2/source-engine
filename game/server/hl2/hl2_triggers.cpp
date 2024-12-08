@@ -354,7 +354,7 @@ void CTriggerWeaponStrip::StartTouch(CBaseEntity *pOther)
 				continue;
 
 			pCharacter->Weapon_Drop( pWeapon );
-			UTIL_Remove( pWeapon );
+			gEntList.DestroyEntity( pWeapon );
 		}
 		return;
 	}
@@ -366,7 +366,7 @@ void CTriggerWeaponStrip::StartTouch(CBaseEntity *pOther)
 		if ( pBugbait )
 		{
 			pCharacter->Weapon_Drop( pBugbait );
-			UTIL_Remove( pBugbait );
+			gEntList.DestroyEntity( pBugbait );
 		}
 
 		pCharacter->Weapon_DropAll( true );
@@ -573,7 +573,7 @@ void CWateryDeathLeech::LeechThink( void )
 
 		if ( m_clrRender->a == 0 )
 		{
-			UTIL_Remove(this);
+			gEntList.DestroyEntity(this);
 		}
 		else if ( m_clrRender->a == 255 )
 		{

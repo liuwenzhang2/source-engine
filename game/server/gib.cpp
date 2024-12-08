@@ -336,7 +336,7 @@ void CGib::WaitTillLand ( void )
 {
 	if (!IsInWorld())
 	{
-		UTIL_Remove( this );
+		gEntList.DestroyEntity( this );
 		return;
 	}
 
@@ -435,7 +435,7 @@ void CGib::DieThink ( void )
 
 	if ( g_pGameRules->IsMultiplayer() )
 	{
-		UTIL_Remove( this );
+		gEntList.DestroyEntity( this );
 	}
 	else
 	{

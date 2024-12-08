@@ -721,7 +721,7 @@ void CPhysMotor::Spawn( void )
 		m_motor.m_speed = 0;
 		GetEngineObject()->SetNextThink( TICK_NEVER_THINK );
 
-		UTIL_Remove(this);
+		gEntList.DestroyEntity(this);
 	}
 }
 
@@ -958,7 +958,7 @@ void CKeepUpright::Activate()
 
 		if ( !pPhys )
 		{
-			UTIL_Remove(this);
+			gEntList.DestroyEntity(this);
 			return;
 		}
 		// HACKHACK: Due to changes in the vehicle simulator the keepupright controller used in coast_01 is unstable

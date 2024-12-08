@@ -806,7 +806,7 @@ void CRagdollProp::FadeOutThink(void)
 		CBasePlayer *pPlayer = UTIL_GetLocalPlayer();
 		CTakeDamageInfo info( pPlayer, pPlayer, 10000.0, DMG_GENERIC );
 		TakeDamage( info );
-		UTIL_Remove( this );
+		gEntList.DestroyEntity( this );
 	}
 }
 

@@ -382,7 +382,7 @@ void CWeaponStriderBuster::UpdateOnRemove( void )
 
 	if ( m_hParticleEffect )
 	{
-		UTIL_Remove( m_hParticleEffect );
+		gEntList.DestroyEntity( m_hParticleEffect );
 	}
 
 	BaseClass::UpdateOnRemove();

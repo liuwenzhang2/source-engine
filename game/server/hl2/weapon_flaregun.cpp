@@ -332,7 +332,7 @@ void CFlare::FlareThink( void )
 		//Burned out
 		if ( m_flTimeBurnOut < gpGlobals->curtime )
 		{
-			UTIL_Remove( this );
+			gEntList.DestroyEntity( this );
 			return;
 		}
 	}

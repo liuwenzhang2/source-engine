@@ -37,7 +37,7 @@ void UTIL_PrecacheOtherGrenade( const char *szClassname )
 		pGrenade->Precache( );
 	}
 
-	UTIL_Remove( pEntity );
+	gEntList.DestroyEntity( pEntity );
 }
 
 //-----------------------------------------------------------------------------

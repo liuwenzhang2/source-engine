@@ -129,7 +129,7 @@ void CGrenadeSpit::SpitThink( void )
 	if (m_fSpitDeathTime != 0 &&
 		m_fSpitDeathTime < gpGlobals->curtime)
 	{
-		UTIL_Remove( this );
+		gEntList.DestroyEntity( this );
 	}
 	GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.1f );
 }
@@ -166,7 +166,7 @@ void CGrenadeSpit::Detonate(void)
 		g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 	}
 
-	UTIL_Remove( this );
+	gEntList.DestroyEntity( this );
 }
 
 //-----------------------------------------------------------------------------

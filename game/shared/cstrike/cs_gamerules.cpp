@@ -4580,13 +4580,13 @@ ConVar cl_autohelp(
 
                 if ( pWeapon->ShouldRemoveOnRoundRestart() )
 				{
-					UTIL_Remove( pCur );
+					gEntList.DestroyEntity( pCur );
 				}
 			}
 			// remove entities that has to be restored on roundrestart (breakables etc)
 			else if ( !CS_FindInList( s_PreserveEnts, pCur->GetClassname() ) )
 			{
-				UTIL_Remove( pCur );
+				gEntList.DestroyEntity( pCur );
 			}
 			
 			pCur = gEntList.NextEnt( pCur );

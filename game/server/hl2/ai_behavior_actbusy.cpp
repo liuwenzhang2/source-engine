@@ -2760,14 +2760,14 @@ void CAI_ActBusyQueueGoal::InputActivate( inputdata_t &inputdata )
 			if ( !pEntity )
 			{
 				Warning( "Unable to find ai_goal_actbusy_queue %s's node %d: %s\n", STRING(GetEntityName()), i, STRING(m_iszNodes[i]) );
-				UTIL_Remove( this );
+				gEntList.DestroyEntity( this );
 				return;
 			}
 			m_hNodes[i] = dynamic_cast<CAI_Hint*>(pEntity);
 			if ( !m_hNodes[i] )
 			{
 				Warning( "ai_goal_actbusy_queue %s's node %d: '%s' is not an ai_hint.\n", STRING(GetEntityName()), i, STRING(m_iszNodes[i]) );
-				UTIL_Remove( this );
+				gEntList.DestroyEntity( this );
 				return;
 			}
 
@@ -2787,7 +2787,7 @@ void CAI_ActBusyQueueGoal::InputActivate( inputdata_t &inputdata )
 		if ( !m_hExitNode )
 		{
 			Warning( "Unable to find ai_goal_actbusy_queue %s's exit node: %s\n", STRING(GetEntityName()), STRING(m_iszExitNode) );
-			UTIL_Remove( this );
+			gEntList.DestroyEntity( this );
 			return;
 		}
 

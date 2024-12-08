@@ -729,7 +729,12 @@ public:
 	virtual void ReserveSlot(int index) = 0;
 	virtual int AllocateFreeSlot(bool bNetworkable = true, int index = -1) = 0;
 	virtual IServerEntity* CreateEntityByName(const char* className, int iForceEdictIndex = -1, int iSerialNum = -1) = 0;
+	// marks the entity for deletion so it will get removed next frame
 	virtual void DestroyEntity(IHandleEntity* pEntity) = 0;
+	// deletes an entity, without any delay.  Only use this when sure no pointers rely on this entity.
+	virtual void DisableDestroyImmediate() = 0;
+	virtual void EnableDestroyImmediate() = 0;
+	virtual void DestroyEntityImmediate(IHandleEntity* pEntity) = 0;
 	//virtual edict_t* GetEdict(CBaseHandle hEnt) const = 0;
 	virtual int NumberOfEdicts(void) = 0;
 	virtual int NumberOfReservedEdicts(void) = 0;

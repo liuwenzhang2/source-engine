@@ -106,7 +106,7 @@ void CPathTrack::Link( void  )
 			//FIXME: Why were we removing this?  If it was already connected to, we weren't updating the other linked
 			//		 end, causing problems with walking through bogus memory links!  -- jdw
 
-			//UTIL_Remove(this);
+			//gEntList.DestroyEntity(this);
 			//return;
 		}
 		else if ( pTarget )

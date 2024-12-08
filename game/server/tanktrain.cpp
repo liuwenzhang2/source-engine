@@ -34,7 +34,7 @@ void UTIL_RemoveHierarchy( CBaseEntity *pDead )
 			UTIL_RemoveHierarchy( pEntity );
 		}
 	}
-	UTIL_Remove( pDead );
+	gEntList.DestroyEntity( pDead );
 }
 
 class CFuncTankTrain : public CFuncTrackTrain
@@ -478,7 +478,7 @@ void CTankTrainAI::Think( void )
 		SoundShutdown();
 		if ( pTrain )
 			UTIL_RemoveHierarchy( pTrain );
-		UTIL_Remove( this );
+		gEntList.DestroyEntity( this );
 		return;
 	}
 

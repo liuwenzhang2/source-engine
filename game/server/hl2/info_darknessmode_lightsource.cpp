@@ -424,7 +424,7 @@ void RemoveEntityFromDarknessCheck( CBaseEntity *pEntity )
 
 		if ( dynamic_cast<CInfoDarknessLightSource*>(pPrevChild->GetOuter()) )
 		{
-			UTIL_Remove( pPrevChild->GetOuter() );
+			gEntList.DestroyEntity( pPrevChild->GetOuter() );
 		}
 	}
 }

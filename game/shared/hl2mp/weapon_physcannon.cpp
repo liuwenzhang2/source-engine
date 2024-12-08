@@ -833,7 +833,7 @@ void CPlayerPickupController::Shutdown( bool bThrown )
 
 		m_pPlayer->m_Local.m_iHideHUD &= ~HIDEHUD_WEAPONSELECTION;
 	}
-	gEntList.DestroyEntity(this);// Remove();
+	gEntList.DestroyEntityImmediate(this);// Remove();
 
 #endif
 	
@@ -1532,7 +1532,7 @@ void CWeaponPhysCannon::Drop( const Vector &vecVelocity )
 	ForceDrop();
 
 #ifndef CLIENT_DLL
-	UTIL_Remove( this );
+	gEntList.DestroyEntity( this );
 #endif
 }
 

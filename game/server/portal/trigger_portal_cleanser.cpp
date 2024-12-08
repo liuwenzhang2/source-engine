@@ -264,7 +264,7 @@ void CTriggerPortalCleanser::Touch( CBaseEntity *pOther )
 			}
 
 			pBaseAnimating->GetEngineObject()->AddFlag( FL_DISSOLVING );
-			UTIL_Remove( pBaseAnimating );
+			gEntList.DestroyEntity( pBaseAnimating );
 		}
 		
 		CBaseAnimating *pDisolvingAnimating = dynamic_cast<CBaseAnimating*>( pDisolvingObj );

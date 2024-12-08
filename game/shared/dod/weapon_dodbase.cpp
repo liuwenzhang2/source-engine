@@ -769,7 +769,7 @@ bool CWeaponDODBase::Deploy()
 
 	void CWeaponDODBase::Die( void )
 	{
-		UTIL_Remove( this );
+		gEntList.DestroyEntity( this );
 	}
 
 #endif

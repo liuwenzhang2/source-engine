@@ -54,7 +54,7 @@ void CCycler::GenericCyclerSpawn(char *szModel, Vector vecMin, Vector vecMax)
 	if (!szModel || !*szModel)
 	{
 		Warning( "cycler at %.0f %.0f %0.f missing modelname\n", GetEngineObject()->GetAbsOrigin().x, GetEngineObject()->GetAbsOrigin().y, GetEngineObject()->GetAbsOrigin().z );
-		UTIL_Remove( this );
+		gEntList.DestroyEntity( this );
 		return;
 	}
 
@@ -386,7 +386,7 @@ void CWreckage::Think( void )
 	{
 		if (m_flDieTime < gpGlobals->curtime)
 		{
-			UTIL_Remove( this );
+			gEntList.DestroyEntity( this );
 			return;
 		}
 		else if (random->RandomFloat( 0, m_flDieTime - m_flStartTime ) > m_flDieTime - gpGlobals->curtime)
@@ -443,7 +443,7 @@ void CBlendingCycler::Spawn( void )
 	// Remove if it's not blending
 	if (m_iLowerBound == 0 && m_iUpperBound == 0)
 	{
-		UTIL_Remove( this );
+		gEntList.DestroyEntity( this );
 		return;
 	}
 

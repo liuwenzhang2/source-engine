@@ -170,7 +170,7 @@ void CBoneFollowerManager::DestroyBoneFollowers( void )
 		if ( !m_physBones[i].hFollower )
 			continue;
 
-		UTIL_Remove( m_physBones[i].hFollower );
+		gEntList.DestroyEntity( m_physBones[i].hFollower );
 		m_physBones[i].hFollower = NULL;
 	}
 

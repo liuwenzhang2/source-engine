@@ -144,7 +144,7 @@ void CGrenadeMP5::Detonate(void)
 			Create( "spark_shower", GetEngineObject()->GetAbsOrigin(), angles, NULL );
 	}
 
-	UTIL_Remove( this );
+	gEntList.DestroyEntity( this );
 }
 
 //-----------------------------------------------------------------------------

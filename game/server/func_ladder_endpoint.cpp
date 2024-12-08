@@ -61,8 +61,8 @@ bool CFuncLadderEndPoint::Validate()
 	}
 
 	// Delete both endpoints
-	UTIL_Remove( other );
-	UTIL_Remove( this );
+	gEntList.DestroyEntity( other );
+	gEntList.DestroyEntity( this );
 
 	return true;
 }

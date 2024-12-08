@@ -2284,7 +2284,7 @@ void C_DODPlayer::DestroyColdBreathEmitter( void )
 #if 0
 	if ( m_hColdBreathEmitter.IsValid() )
 	{
-		UTIL_Remove( m_hColdBreathEmitter );
+		1UTIL_Remove( m_hColdBreathEmitter );
 	}
 #endif
 }

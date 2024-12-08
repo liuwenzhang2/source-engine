@@ -516,7 +516,7 @@ void CCombineDropshipContainer::CreateCorpse()
 
 	GetEngineObject()->AddSolidFlags( FSOLID_NOT_SOLID );
 	GetEngineObject()->AddEffects( EF_NODRAW );
-	UTIL_Remove( this );
+	gEntList.DestroyEntity( this );
 }
 
 
@@ -836,7 +836,7 @@ CNPC_CombineDropship::~CNPC_CombineDropship(void)
 {
 	if ( m_hContainer )
 	{
-		UTIL_Remove( m_hContainer );		// get rid of container
+		gEntList.DestroyEntity( m_hContainer );		// get rid of container
 	}
 }
 
@@ -1084,7 +1084,7 @@ void CNPC_CombineDropship::Precache( void )
 					if ( pEntity != NULL )
 					{
 						pEntity->Precache();
-						UTIL_RemoveImmediate( pEntity );
+						gEntList.DestroyEntityImmediate( pEntity );
 					}
 				}
 				else

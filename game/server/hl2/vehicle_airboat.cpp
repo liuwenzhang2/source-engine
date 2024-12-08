@@ -461,7 +461,7 @@ void CPropAirboat::UpdateOnRemove()
 
 	if ( m_hAvoidSphere )
 	{
-		UTIL_Remove( m_hAvoidSphere );
+		gEntList.DestroyEntity( m_hAvoidSphere );
 		m_hAvoidSphere = NULL;
 	}
 }
@@ -519,7 +519,7 @@ void CPropAirboat::DestroyPlayerBlocker()
 {
 	if ( m_hPlayerBlocker != NULL )
 	{
-		UTIL_Remove( m_hPlayerBlocker );
+		gEntList.DestroyEntity( m_hPlayerBlocker );
 	}
 
 	m_hPlayerBlocker = NULL;

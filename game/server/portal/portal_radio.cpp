@@ -549,7 +549,7 @@ CPortal_Dinosaur *CSpawnDinosaurHack::SpawnDinosaur( radiolocs& loc )
 				vSpawnPos = pOldDinosaur->GetEngineObject()->GetAbsOrigin();
 				vSpawnAng = pOldDinosaur->GetEngineObject()->GetAbsAngles();
 
-				UTIL_Remove( pOldDinosaur );
+				gEntList.DestroyEntity( pOldDinosaur );
 
 #if defined ( RADIO_DEBUG_SERVER )
 				Msg( "Found Dinosaur exiting in level, replacing with %f, %f %f and %f %f %f.\n", XYZ(vSpawnPos), XYZ(vSpawnAng) );

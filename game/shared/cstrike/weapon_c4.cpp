@@ -309,7 +309,7 @@ END_PREDICTION_DATA()
 	{
 		if (!IsInWorld())
 		{
-			UTIL_Remove( this );
+			gEntList.DestroyEntity( this );
 			return;
 		}
 
@@ -1118,7 +1118,7 @@ void CC4::PrimaryAttack()
 
 			// No more c4!
 			pPlayer->Weapon_Drop( this, NULL, NULL );
-			UTIL_Remove( this );
+			gEntList.DestroyEntity( this );
 #endif
 
 			//don't allow the planting to start over again next frame.

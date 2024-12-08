@@ -2295,7 +2295,7 @@ void CFlexCycler::GenericCyclerSpawn(char *szModel, Vector vecMin, Vector vecMax
 	if (!szModel || !*szModel)
 	{
 		Warning( "cycler at %.0f %.0f %0.f missing modelname\n", GetEngineObject()->GetAbsOrigin().x, GetEngineObject()->GetAbsOrigin().y, GetEngineObject()->GetAbsOrigin().z );
-		UTIL_Remove( this );
+		gEntList.DestroyEntity( this );
 		return;
 	}
 

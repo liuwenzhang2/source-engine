@@ -93,7 +93,7 @@ void CTempEntTester::Spawn( void )
 	if ( !m_pCurrent )
 	{
 		DevMsg("Couldn't find temp entity '%s'\n", m_szClass );
-		UTIL_Remove( this );
+		gEntList.DestroyEntity( this );
 		return;
 	}
 
@@ -109,7 +109,7 @@ void CTempEntTester::Think( void )
 	// Should never happen
 	if ( !m_pCurrent )
 	{
-		UTIL_Remove( this );
+		gEntList.DestroyEntity( this );
 		return;
 	}
 
@@ -119,7 +119,7 @@ void CTempEntTester::Think( void )
 	// Time to destroy?
 	if ( gpGlobals->curtime >= m_fLifeTime )
 	{
-		UTIL_Remove( this );
+		gEntList.DestroyEntity( this );
 		return;
 	}
 }

@@ -158,7 +158,7 @@ void PointCameraSetupVisibility( CBaseEntity *pPlayer, int area, unsigned char *
 		CBaseEntity *pTargetEnt = g_InfoCameraLinkList[i]->m_hTargetEntity;
 		if ( !pTargetEnt )
 		{
-			UTIL_Remove( g_InfoCameraLinkList[i] );
+			gEntList.DestroyEntity( g_InfoCameraLinkList[i] );
 			continue;
 		}
 

@@ -119,7 +119,7 @@ void CLogicAuto::Think(void)
 
 		if (GetEngineObject()->GetSpawnFlags() & SF_AUTO_FIREONCE)
 		{
-			UTIL_Remove(this);
+			gEntList.DestroyEntity(this);
 		}
 	}
 }

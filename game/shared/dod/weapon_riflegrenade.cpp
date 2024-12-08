@@ -120,7 +120,7 @@ bool CWeaponBaseRifleGrenade::Holster( CBaseCombatWeapon *pSwitchingTo )
 	if( pPlayer && pPlayer->GetAmmoCount(m_iPrimaryAmmoType) <= 0 && m_iClip1 <= 0 )
 	{
 		pPlayer->Weapon_Drop( this, NULL, NULL );
-		UTIL_Remove(this);
+		gEntList.DestroyEntity(this);
 		return true;	
 	}
 #endif
@@ -136,7 +136,7 @@ void CWeaponBaseRifleGrenade::WeaponIdle( void )
 	if (pPlayer->GetAmmoCount(m_iPrimaryAmmoType) <= 0 && m_iClip1 <= 0)
 	{
 		pPlayer->Weapon_Drop( this, NULL, NULL );
-		UTIL_Remove(this);
+		gEntList.DestroyEntity(this);
 		return;
 	}
 #endif

@@ -3888,13 +3888,13 @@ void CWeaponPhysCannon::DestroyEffects( void )
 	//Turn off main glow
 	if ( m_hCenterSprite != NULL )
 	{
-		UTIL_Remove( m_hCenterSprite );
+		gEntList.DestroyEntity( m_hCenterSprite );
 		m_hCenterSprite = NULL;
 	}
 
 	if ( m_hBlastSprite != NULL )
 	{
-		UTIL_Remove( m_hBlastSprite );
+		gEntList.DestroyEntity( m_hBlastSprite );
 		m_hBlastSprite = NULL;
 	}
 
@@ -3903,7 +3903,7 @@ void CWeaponPhysCannon::DestroyEffects( void )
 	{
 		if ( m_hBeams[i] != NULL )
 		{
-			UTIL_Remove( m_hBeams[i] );
+			gEntList.DestroyEntity( m_hBeams[i] );
 			m_hBeams[i] = NULL;
 		}
 	}
@@ -3913,7 +3913,7 @@ void CWeaponPhysCannon::DestroyEffects( void )
 	{
 		if ( m_hGlowSprites[i] != NULL )
 		{
-			UTIL_Remove( m_hGlowSprites[i] );
+			gEntList.DestroyEntity( m_hGlowSprites[i] );
 			m_hGlowSprites[i] = NULL;
 		}
 	}
@@ -3922,7 +3922,7 @@ void CWeaponPhysCannon::DestroyEffects( void )
 	{
 		if ( m_hEndSprites[i] != NULL )
 		{
-			UTIL_Remove( m_hEndSprites[i] );
+			gEntList.DestroyEntity( m_hEndSprites[i] );
 			m_hEndSprites[i] = NULL;
 		}
 	}

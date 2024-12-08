@@ -396,7 +396,7 @@ void CNPC_Vortigaunt::HandleAnimEvent( animevent_t *pEvent )
 					pNew->GetEngineObject()->AddSpawnFlags( 1 );
 					WackBeam( -1, pNew );
 					WackBeam( 1, pNew );
-					UTIL_Remove( m_hDead );
+					gEntList.DestroyEntity( m_hDead );
 					break;
 				}
 			}
@@ -704,7 +704,7 @@ void CNPC_Vortigaunt::ClearBeams( )
 	{
 		if (m_pBeam[i])
 		{
-			UTIL_Remove( m_pBeam[i] );
+			gEntList.DestroyEntity( m_pBeam[i] );
 			m_pBeam[i] = NULL;
 		}
 	}

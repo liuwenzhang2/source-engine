@@ -1296,13 +1296,13 @@ void CNPC_AttackHelicopter::UpdateOnRemove()
 {
 	BaseClass::UpdateOnRemove();
 	StopLoopingSounds();
-	UTIL_Remove(m_hSensor);
+	gEntList.DestroyEntity(m_hSensor);
 	DestroySmokeTrails();
 	for ( int i = 0; i < MAX_HELICOPTER_LIGHTS; ++i )
 	{
 		if ( m_hLights[i] )
 		{
-			UTIL_Remove( m_hLights[i] );
+			gEntList.DestroyEntity( m_hLights[i] );
 			m_hLights[i] = NULL;
 		}
 	}
@@ -3361,7 +3361,7 @@ void CNPC_AttackHelicopter::DestroySmokeTrails()
 {
 	for ( int i = m_nSmokeTrailCount; --i >= 0; )
 	{
-		UTIL_Remove( m_hSmokeTrail[i] );
+		gEntList.DestroyEntity( m_hSmokeTrail[i] );
 		m_hSmokeTrail[i] = NULL;
 	}
 }
@@ -5300,7 +5300,7 @@ void CGrenadeHelicopter::StopWarningBlinker()
 {
 	if( m_hWarningSprite.Get() )
 	{
-		UTIL_Remove( m_hWarningSprite.Get() );
+		gEntList.DestroyEntity( m_hWarningSprite.Get() );
 		m_hWarningSprite.Set( NULL );
 	}
 }
@@ -5463,7 +5463,7 @@ void CGrenadeHelicopter::DoExplosion( const Vector &vecOrigin, const Vector &vec
 		DispatchEffect( "HelicopterMegaBomb", data );
 	}
 
-	UTIL_Remove( this );
+	gEntList.DestroyEntity( this );
 }
 
 
@@ -5568,7 +5568,7 @@ void CGrenadeHelicopter::OnPhysGunPickup(CBasePlayer *pPhysGunUser, PhysGunPicku
 		{
 			if( m_hWarningSprite.Get() != NULL )
 			{
-				UTIL_Remove( m_hWarningSprite );
+				gEntList.DestroyEntity( m_hWarningSprite );
 				m_hWarningSprite.Set(NULL);
 			}
 

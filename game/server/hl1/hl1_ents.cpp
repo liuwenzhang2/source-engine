@@ -82,7 +82,7 @@ void CAutoTrigger::Think( void )
 		m_OnTrigger.FireOutput(NULL, this);
 
 		if (GetEngineObject()->GetSpawnFlags() & SF_AUTO_FIREONCE)
-			UTIL_Remove( this );
+			gEntList.DestroyEntity( this );
 	}
 }
 
@@ -180,7 +180,7 @@ void CTriggerRelay::RefireThink( void )
 
 	if( gpGlobals->curtime > m_flTimeRefireDone )
 	{
-		UTIL_Remove( this );
+		gEntList.DestroyEntity( this );
 	}
 	else
 	{
@@ -194,7 +194,7 @@ void CTriggerRelay::Use( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE
 	
 	if (GetEngineObject()->GetSpawnFlags() & SF_RELAY_FIREONCE)
 	{
-		UTIL_Remove( this );
+		gEntList.DestroyEntity( this );
 	}
 
 	else if( m_flRefireDuration != -1 && m_flTimeRefireDone == -1 )
@@ -1464,7 +1464,7 @@ void CHL1Gib::WaitTillLand ( void )
 {
 	if ( !IsInWorld() )
 	{
-		UTIL_Remove( this );
+		gEntList.DestroyEntity( this );
 		return;
 	}
 
@@ -1632,7 +1632,7 @@ void CTriggerEndSection::Spawn( void )
 {
 	if ( gpGlobals->deathmatch )
 	{
-		UTIL_Remove( this );
+		gEntList.DestroyEntity( this );
 		return;
 	}
 }
@@ -1649,5 +1649,5 @@ void CTriggerEndSection::InputEndSection( inputdata_t &data )
 		 engine->ClientCommand ( pPlayer->entindex(), "toggleconsole;disconnect\n");
 	}
 
-	UTIL_Remove( this );
+	gEntList.DestroyEntity( this );
 }

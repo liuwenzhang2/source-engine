@@ -625,7 +625,7 @@ void CTriggerRemove::Touch( CBaseEntity *pOther )
 	if (!PassesTriggerFilters(pOther))
 		return;
 
-	UTIL_Remove( pOther );
+	gEntList.DestroyEntity( pOther );
 }
 
 
@@ -1705,7 +1705,7 @@ void CTriggerPush::Touch( CBaseEntity *pOther )
 		{
 			pOther->GetEngineObject()->SetGroundEntity( NULL );
 		}
-		UTIL_Remove( this );
+		gEntList.DestroyEntity( this );
 		return;
 	}
 
@@ -1932,7 +1932,7 @@ void CTriggerToggleSave::Spawn( void )
 {
 	if ( g_pGameRules->IsDeathmatch() )
 	{
-		UTIL_Remove( this );
+		gEntList.DestroyEntity( this );
 		return;
 	}
 
@@ -1996,7 +1996,7 @@ void CTriggerSave::Spawn( void )
 
 	if ( g_pGameRules->IsDeathmatch() )
 	{
-		UTIL_Remove( this );
+		gEntList.DestroyEntity( this );
 		return;
 	}
 
@@ -2034,7 +2034,7 @@ void CTriggerSave::Touch( CBaseEntity *pOther )
 	{
 		engine->ClearSaveDir();
 	}
-	UTIL_Remove( this );
+	gEntList.DestroyEntity( this );
 
 	if ( m_fDangerousTimer != 0.0f )
 	{
@@ -2946,7 +2946,7 @@ void CTriggerCDAudio::PlayTrack( void )
 	PlayCDTrack( (int)m_iHealth );
 	
 	SetTouch( NULL );
-	UTIL_Remove( this );
+	gEntList.DestroyEntity( this );
 }
 
 

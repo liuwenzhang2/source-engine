@@ -199,7 +199,7 @@ void CDODBaseRocket::Explode( void )
 		UTIL_DecalTrace( newTrace, "Scorch" );
 
 	g_pSoundEmitterSystem->StopSound(this, "Weapon_Bazooka.Shoot" );
-	UTIL_Remove( this );
+	gEntList.DestroyEntity( this );
 }
 
 //-----------------------------------------------------------------------------
@@ -223,7 +223,7 @@ void CDODBaseRocket::RocketTouch( CBaseEntity *pOther )
 
 	if( tr.surface.flags & SURF_SKY )
 	{
-		UTIL_Remove( this );
+		gEntList.DestroyEntity( this );
 		return;
 	}
 

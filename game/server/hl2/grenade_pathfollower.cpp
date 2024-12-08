@@ -95,10 +95,10 @@ void CGrenadePathfollower::GrenadeTouch( CBaseEntity *pOther )
 	{
 		if(m_hRocketTrail)
 		{
-			UTIL_Remove(m_hRocketTrail);
+			gEntList.DestroyEntity(m_hRocketTrail);
 			m_hRocketTrail = NULL;
 		}
-		UTIL_Remove( this );
+		gEntList.DestroyEntity( this );
 	}
 	Detonate();
 }
@@ -116,7 +116,7 @@ void CGrenadePathfollower::Detonate(void)
 
 	if(m_hRocketTrail)
 	{
-		UTIL_Remove(m_hRocketTrail);
+		gEntList.DestroyEntity(m_hRocketTrail);
 		m_hRocketTrail = NULL;
 	}
 
@@ -144,7 +144,7 @@ void CGrenadePathfollower::Detonate(void)
 	RadiusDamage ( CTakeDamageInfo( this, GetThrower(), m_flDamage, DMG_BLAST ), GetEngineObject()->GetAbsOrigin(),  m_DmgRadius, CLASS_NONE, NULL );
 	CPASAttenuationFilter filter2( this, "GrenadePathfollower.StopSounds" );
 	g_pSoundEmitterSystem->EmitSound( filter2, entindex(), "GrenadePathfollower.StopSounds" );
-	UTIL_Remove( this );
+	gEntList.DestroyEntity( this );
 }
 
 //------------------------------------------------------------------------------

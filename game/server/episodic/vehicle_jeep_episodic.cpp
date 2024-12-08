@@ -406,12 +406,12 @@ void CPropJeepEpisodic::UpdateOnRemove( void )
 	{
 		if ( m_hWheelDust[i] != NULL )
 		{
-			UTIL_Remove( m_hWheelDust[i] );
+			gEntList.DestroyEntity( m_hWheelDust[i] );
 		}
 
 		if ( m_hWheelWater[i] != NULL )
 		{
-			UTIL_Remove( m_hWheelWater[i] );
+			gEntList.DestroyEntity( m_hWheelWater[i] );
 		}
 	}
 
@@ -1422,7 +1422,7 @@ void CPropJeepEpisodic::DestroyHazardLights( void )
 	{
 		if ( m_hHazardLights[i] != NULL )
 		{
-			UTIL_Remove( m_hHazardLights[i] );
+			gEntList.DestroyEntity( m_hHazardLights[i] );
 		}
 	}
 
@@ -1753,7 +1753,7 @@ void CPropJeepEpisodic::InputDestroyLinkController( inputdata_t &data )
 		if( pLinkController != NULL )
 		{
 			pLinkController->ModifyNodeLinks(false);
-			UTIL_Remove( pLinkController );
+			gEntList.DestroyEntity( pLinkController );
 			m_hLinkControllerFront.Set(NULL);
 		}
 	}
@@ -1764,7 +1764,7 @@ void CPropJeepEpisodic::InputDestroyLinkController( inputdata_t &data )
 		if( pLinkController != NULL )
 		{
 			pLinkController->ModifyNodeLinks(false);
-			UTIL_Remove( pLinkController );
+			gEntList.DestroyEntity( pLinkController );
 			m_hLinkControllerRear.Set(NULL);
 		}
 	}

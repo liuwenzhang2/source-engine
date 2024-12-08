@@ -575,7 +575,7 @@ void CPropCombineBall::InputKill( inputdata_t &inputdata )
 		SetOwnerEntity( NULL );
 	}
 
-	UTIL_Remove( this );
+	gEntList.DestroyEntity( this );
 
 	NotifySpawnerOfRemoval();
 }
@@ -600,7 +600,7 @@ void CPropCombineBall::InputSocketed( inputdata_t &inputdata )
 		pPlayer->CombineBallSocketed( this );
 	}
 
-	UTIL_Remove( this );
+	gEntList.DestroyEntity( this );
 
 	NotifySpawnerOfRemoval();
 }
@@ -612,7 +612,7 @@ void CPropCombineBall::UpdateOnRemove()
 {
 	if ( m_pGlowTrail != NULL )
 	{
-		UTIL_Remove( m_pGlowTrail );
+		gEntList.DestroyEntity( m_pGlowTrail );
 		m_pGlowTrail = NULL;
 	}
 
@@ -667,7 +667,7 @@ void CPropCombineBall::DieThink()
 		GetSpawner()->RespawnBall( 0.1 );
 	}
 
-	UTIL_Remove( this );
+	gEntList.DestroyEntity( this );
 }
 
 
@@ -1849,7 +1849,7 @@ void CFuncCombineBallSpawner::Spawn()
 	if ( m_flRadius <= 0.0f && m_bShooter == false )
 	{
 		Warning("Zero dimension func_combine_ball_spawner! Removing...\n");
-		UTIL_Remove( this );
+		gEntList.DestroyEntity( this );
 		return;
 	}
 

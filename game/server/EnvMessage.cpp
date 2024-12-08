@@ -129,7 +129,7 @@ void CMessage::InputShowMessage( inputdata_t &inputdata )
 
 	if (GetEngineObject()->GetSpawnFlags() & SF_MESSAGE_ONCE )
 	{
-		UTIL_Remove( this );
+		gEntList.DestroyEntity( this );
 	}
 
 	m_OnShowMessage.FireOutput( inputdata.pActivator, this );

@@ -402,7 +402,7 @@ void NWCEdit::CreateAILink( CBasePlayer* pPlayer )
 			pAILink->m_LinkInfo &= ~bits_LINK_OFF;
 
 			CAI_DynamicLink* pDynamicLink = CAI_DynamicLink::GetDynamicLink(pAILink->m_iSrcID, pAILink->m_iDestID);
-			UTIL_Remove(pDynamicLink);
+			gEntList.DestroyEntity(pDynamicLink);
 		}
 	}
 }

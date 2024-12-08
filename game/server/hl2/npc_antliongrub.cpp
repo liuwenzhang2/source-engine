@@ -466,7 +466,7 @@ void CAntlionGrub::AttachToSurface( void )
 	{
 		// A grub was left hanging in the air, it must not be near any valid surfaces!
 		Warning("Antlion grub stranded in space at (%.02f, %.02f, %.02f) : REMOVED\n", GetEngineObject()->GetAbsOrigin().x, GetEngineObject()->GetAbsOrigin().y, GetEngineObject()->GetAbsOrigin().z );
-		UTIL_Remove( this );
+		gEntList.DestroyEntity( this );
 		return;
 	}
 
@@ -960,7 +960,7 @@ bool CGrubNugget::MyTouch( CBasePlayer *pPlayer )
 	CPASAttenuationFilter filter( pPlayer, "GrubNugget.Touch" );
 	g_pSoundEmitterSystem->EmitSound( filter, pPlayer->entindex(), "GrubNugget.Touch" );
 
-	UTIL_Remove( this );	
+	gEntList.DestroyEntity( this );	
 
 	return true;
 }

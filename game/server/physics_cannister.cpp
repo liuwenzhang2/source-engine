@@ -95,7 +95,7 @@ void CPhysicsCannister::Spawn( void )
 	if ( !GetEngineObject()->VPhysicsGetObject() )
 	{
 		// must have a physics object or code will crash later
-		UTIL_Remove(this);
+		gEntList.DestroyEntity(this);
 	}
 }
 
@@ -364,7 +364,7 @@ void CPhysicsCannister::Explode( CBaseEntity *pAttacker )
 	pPhysics->GetVelocity( &velocity, &angVelocity );
 	PropBreakableCreateAll(GetEngineObject()->GetModelIndex(), pPhysics, GetEngineObject()->GetAbsOrigin(), GetEngineObject()->GetAbsAngles(), velocity, angVelocity, 1.0, 20, COLLISION_GROUP_DEBRIS );
 	ExplosionCreate(GetEngineObject()->GetAbsOrigin(), GetEngineObject()->GetAbsAngles(), pAttacker, m_damage, 0, true );
-	UTIL_Remove( this );
+	gEntList.DestroyEntity( this );
 }
 
 //-----------------------------------------------------------------------------

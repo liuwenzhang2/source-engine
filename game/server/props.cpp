@@ -180,7 +180,7 @@ void CBaseProp::Spawn( void )
 	if (!szModel || !*szModel)
 	{
 		Warning( "prop at %.0f %.0f %0.f missing modelname\n", GetEngineObject()->GetAbsOrigin().x, GetEngineObject()->GetAbsOrigin().y, GetEngineObject()->GetAbsOrigin().z );
-		UTIL_Remove( this );
+		gEntList.DestroyEntity( this );
 		return;
 	}
 
@@ -195,7 +195,7 @@ void CBaseProp::Spawn( void )
 		if ( iResult == PARSE_FAILED_BAD_DATA )
 		{
 			DevWarning( "%s at %.0f %.0f %0.f uses model %s, which has an invalid prop_data type. DELETED.\n", GetClassname(), GetEngineObject()->GetAbsOrigin().x, GetEngineObject()->GetAbsOrigin().y, GetEngineObject()->GetAbsOrigin().z, szModel );
-			UTIL_Remove( this );
+			gEntList.DestroyEntity( this );
 			return;
 		}
 		else if ( iResult == PARSE_FAILED_NO_DATA )
@@ -204,7 +204,7 @@ void CBaseProp::Spawn( void )
 			if ( FClassnameIs( this, "prop_physics" ) )
 			{
 				DevWarning( "%s at %.0f %.0f %0.f uses model %s, which has no propdata which means it must be used on a prop_static. DELETED.\n", GetClassname(), GetEngineObject()->GetAbsOrigin().x, GetEngineObject()->GetAbsOrigin().y, GetEngineObject()->GetAbsOrigin().z, szModel );
-				UTIL_Remove( this );
+				gEntList.DestroyEntity( this );
 				return;
 			}
 		}
@@ -214,7 +214,7 @@ void CBaseProp::Spawn( void )
 			if ( !dynamic_cast<CPhysicsProp*>(this) )
 			{
 				DevWarning( "%s at %.0f %.0f %0.f uses model %s, which has propdata which means that it be used on a prop_physics. DELETED.\n", GetClassname(), GetEngineObject()->GetAbsOrigin().x, GetEngineObject()->GetAbsOrigin().y, GetEngineObject()->GetAbsOrigin().z, szModel );
-				UTIL_Remove( this );
+				gEntList.DestroyEntity( this );
 				return;
 			}
 		}
@@ -422,7 +422,7 @@ void CBreakableProp::ClearEnableMotionPosition()
 	if ( pFixup )
 	{
 		pFixup->GetEngineObject()->UnlinkFromParent();
-		UTIL_Remove( pFixup );
+		gEntList.DestroyEntity( pFixup );
 	}
 }
 
@@ -631,7 +631,7 @@ void CPhysicsProp::HandleAnyCollisionInteractions( int index, gamevcollisioneven
 			{
 				Vector vecVelocity = pEvent->preVelocity[index] * pObj->GetMass();
 				PhysCallbackImpulse( pObj, vecVelocity, vec3_origin );
-				UTIL_Remove( pNPC );
+				gEntList.DestroyEntity( pNPC );
 				GetEngineObject()->AddSpawnFlags( SF_PHYSPROP_HAS_ATTACHED_RAGDOLLS );
 			}
 		}
@@ -1756,7 +1756,7 @@ void CBreakableProp::Break( CBaseEntity *pBreaker, const CTakeDamageInfo &info )
 		MessageEnd();
 
 #ifndef HL2MP
-		UTIL_Remove( this );
+		gEntList.DestroyEntity( this );
 #endif
 		return;
 	}
@@ -1822,7 +1822,7 @@ void CBreakableProp::Break( CBaseEntity *pBreaker, const CTakeDamageInfo &info )
 	}
 
 #ifndef HL2MP
-	UTIL_Remove( this );
+	gEntList.DestroyEntity( this );
 #endif
 }
 
@@ -3402,7 +3402,7 @@ CBaseEntity *BreakModelCreateSingle( CBaseEntity *pOwner, breakmodel_t *pModel, 
 		else
 		{
 			// failed to create a physics object
-			UTIL_Remove( pEntity );
+			gEntList.DestroyEntity( pEntity );
 			return NULL;
 		}
 	}
@@ -4858,7 +4858,7 @@ CPropDoorRotating::~CPropDoorRotating( void )
 	// Remove our door blocker entity
 	if ( m_hDoorBlocker != NULL )
 	{
-		UTIL_Remove( m_hDoorBlocker );
+		gEntList.DestroyEntity( m_hDoorBlocker );
 	}
 }
 
@@ -5018,7 +5018,7 @@ void CPropDoorRotating::OnDoorClosed( void )
 	if ( m_hDoorBlocker != NULL )
 	{
 		// Destroy the blocker that was preventing NPCs from getting in our way.
-		UTIL_Remove( m_hDoorBlocker );
+		gEntList.DestroyEntity( m_hDoorBlocker );
 		
 		if ( g_debug_doors.GetBool() )
 		{
@@ -5317,7 +5317,7 @@ void CPropDoorRotating::BeginOpening(CBaseEntity *pOpenAwayFrom)
 
 	if ( m_hDoorBlocker != NULL )
 	{
-		UTIL_Remove( m_hDoorBlocker );
+		gEntList.DestroyEntity( m_hDoorBlocker );
 	}
 
 	// Create a blocking entity to keep random entities out of our movement path
@@ -5665,7 +5665,7 @@ class CPhysicsPropMultiplayer : public CPhysicsProp, public IMultiplayerPhysics
 			}
 			else
 			{
-				UTIL_Remove( this );
+				gEntList.DestroyEntity( this );
 				return;
 			}
 		}
@@ -5686,7 +5686,7 @@ class CPhysicsPropMultiplayer : public CPhysicsProp, public IMultiplayerPhysics
 			else
 			{
 				// don't spawn clientside props on server
-				UTIL_Remove( this );
+				gEntList.DestroyEntity( this );
 				return;
 			}
 			
@@ -5840,7 +5840,7 @@ void CPhysicsPropRespawnable::Event_Killed( const CTakeDamageInfo &info )
 
 	if ( IsOnFire() || IsDissolving() )
 	{
-		UTIL_Remove( GetEffectEntity() );
+		gEntList.DestroyEntity( GetEffectEntity() );
 	}
 
 	Teleport( &m_vOriginalSpawnOrigin, &m_vOriginalSpawnAngles, NULL );

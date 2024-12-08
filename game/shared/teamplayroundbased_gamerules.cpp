@@ -752,7 +752,7 @@ void CTeamplayRoundBasedRules::SetInWaitingForPlayers( bool bWaitingForPlayers  
 
 		if ( m_hWaitingForPlayersTimer )
 		{
-			UTIL_Remove( m_hWaitingForPlayersTimer );
+			gEntList.DestroyEntity( m_hWaitingForPlayersTimer );
 		}
 
 		RestoreActiveTimer();
@@ -1808,7 +1808,7 @@ void CTeamplayRoundBasedRules::State_Enter_STALEMATE( void )
 
 	if ( m_hStalemateTimer )
 	{
-		UTIL_Remove( m_hStalemateTimer );
+		gEntList.DestroyEntity( m_hStalemateTimer );
 		m_hStalemateTimer = NULL;
 	}
 
@@ -1851,7 +1851,7 @@ void CTeamplayRoundBasedRules::State_Leave_STALEMATE( void )
 
 	if ( m_hStalemateTimer )
 	{
-		UTIL_Remove( m_hStalemateTimer );
+		gEntList.DestroyEntity( m_hStalemateTimer );
 	}
 
 	if ( IsInArenaMode() == false )
@@ -2512,7 +2512,7 @@ void CTeamplayRoundBasedRules::HandleTimeLimitChange( void )
 	{
 		if ( m_hTimeLimitTimer )
 		{
-			UTIL_Remove( m_hTimeLimitTimer );
+			gEntList.DestroyEntity( m_hTimeLimitTimer );
 			m_hTimeLimitTimer = NULL;
 		}
 	}
@@ -2668,7 +2668,7 @@ void CTeamplayRoundBasedRules::CleanUpMap()
 			{
 				Msg( "Removed Entity: %s\n", pCur->GetClassname() );
 			}
-			UTIL_Remove( pCur );
+			gEntList.DestroyEntity( pCur );
 		}
 
 		pCur = gEntList.NextEnt( pCur );

@@ -184,7 +184,7 @@ void CNPC_Hornet::DieTouch ( CBaseEntity *pOther )
 
 	GetEngineObject()->AddSolidFlags( FSOLID_NOT_SOLID );// intangible
 
-	UTIL_Remove( this );
+	gEntList.DestroyEntity( this );
 	SetTouch( NULL );
 }
 

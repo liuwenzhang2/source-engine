@@ -292,18 +292,18 @@ bool CServerTools::DestroyEntityByHammerId( int iHammerID )
 	if ( !pEntity )
 		return false;
 
-	UTIL_Remove( pEntity );
+	gEntList.DestroyEntity( pEntity );
 	return true;
 }
 
 void CServerTools::RemoveEntity( CBaseEntity *pEntity )
 {
-	UTIL_Remove( pEntity );
+	gEntList.DestroyEntity( pEntity );
 }
 
 void CServerTools::RemoveEntityImmediate( CBaseEntity *pEntity )
 {
-	UTIL_RemoveImmediate( pEntity );
+	gEntList.DestroyEntityImmediate( pEntity );
 }
 
 CBaseEntity *CServerTools::GetBaseEntityByEntIndex( int iEntIndex )

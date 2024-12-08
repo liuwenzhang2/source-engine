@@ -1160,8 +1160,8 @@ void CNPC_Stalker::KillAttackBeam(void)
 	g_pSoundEmitterSystem->StopSound(m_pBeam->entindex(), "NPC_Stalker.BurnWall" );
 	g_pSoundEmitterSystem->StopSound(m_pBeam->entindex(), "NPC_Stalker.BurnFlesh" );
 
-	UTIL_Remove( m_pLightGlow );
-	UTIL_Remove( m_pBeam);
+	gEntList.DestroyEntity( m_pLightGlow );
+	gEntList.DestroyEntity( m_pBeam);
 	m_pBeam = NULL;
 	m_bPlayingHitWall = false;
 	m_bPlayingHitFlesh = false;

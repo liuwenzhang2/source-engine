@@ -758,7 +758,7 @@ void CPropVehicleDriveable::Think()
 			m_hKeepUpright->AcceptInput( "TurnOff", this, this, emptyVariant, USE_TOGGLE );
 			m_flTurnOffKeepUpright = 0;
 
-			UTIL_Remove( m_hKeepUpright );
+			gEntList.DestroyEntity( m_hKeepUpright );
 		}
 	}
 }

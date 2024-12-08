@@ -413,7 +413,7 @@ void CGameTeamSet::InputTrigger( inputdata_t &inputdata )
 
 	if ( RemoveOnFire() )
 	{
-		UTIL_Remove( this );
+		gEntList.DestroyEntity( this );
 	}
 }
 */
@@ -562,7 +562,7 @@ void CGamePlayerHurt::Use( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TY
 
 	if ( RemoveOnFire() )
 	{
-		UTIL_Remove( this );
+		gEntList.DestroyEntity( this );
 	}
 }
 */
@@ -730,7 +730,7 @@ void CGamePlayerTeam::Use( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TY
 	
 	if ( RemoveOnFire() )
 	{
-		UTIL_Remove( this );
+		gEntList.DestroyEntity( this );
 	}
 }
 

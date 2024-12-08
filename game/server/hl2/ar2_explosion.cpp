@@ -44,7 +44,7 @@ AR2Explosion* AR2Explosion::CreateAR2Explosion(const Vector &pos)
 		}
 		else
 		{
-			UTIL_Remove(pEnt);
+			gEntList.DestroyEntity(pEnt);
 		}
 	}
 

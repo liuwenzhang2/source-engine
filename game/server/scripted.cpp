@@ -560,7 +560,7 @@ CAI_BaseNPC *CAI_ScriptedSequence::FindScriptEntity( )
 			Warning( "Code forced %s(%s), to be the target of scripted sequence %s, but it can't play it.\n", 
 						pEntity->GetClassname(), pEntity->GetDebugName(), GetDebugName() );
 			pEntity = NULL;
-			UTIL_Remove( this );
+			gEntList.DestroyEntity( this );
 			return NULL;
 		}
 		else
@@ -2081,7 +2081,7 @@ void CAI_ScriptedSentence::FindThink( void )
 		m_OnEndSentence.FireOutput(NULL, this, length + m_flRepeat);
 
 		if (GetEngineObject()->GetSpawnFlags() & SF_SENTENCE_ONCE)
-			UTIL_Remove( this );
+			gEntList.DestroyEntity( this );
 		
 		float delay = m_flDelay + length + 0.1;
 		if ( delay < 0 )

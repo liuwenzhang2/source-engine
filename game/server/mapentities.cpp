@@ -75,7 +75,7 @@ void FreeContainingEntity( int ed )
 			//CBaseEntity::PhysicsRemoveTouchedList( ent );
 			//CBaseEntity::PhysicsRemoveGroundList( ent );
 			//UTIL_RemoveImmediate( ent );
-			gEntList.DestroyEntity(ent);// ->Release();
+			gEntList.DestroyEntityImmediate(ent);// ->Release();
 		}
 	}
 }
@@ -370,7 +370,7 @@ void MapEntity_ParseAllEntities(const char *pMapData, IMapEntityFilter *pFilter,
 			Templates_Add(pEntity, pCurMapData, (pMapData - pCurMapData) + 2);
 
 			// Remove the template entity so that it does not show up in FindEntityXXX searches.
-			UTIL_Remove(pEntity);
+			gEntList.DestroyEntity(pEntity);
 			gEntList.CleanupDeleteList();
 			continue;
 		}
@@ -451,7 +451,7 @@ void MapEntity_ParseAllEntities(const char *pMapData, IMapEntityFilter *pFilter,
 		// First, tell the Point template to Spawn
 		if ( DispatchSpawn(pPointTemplate) < 0 )
 		{
-			UTIL_Remove(pPointTemplate);
+			gEntList.DestroyEntity(pPointTemplate);
 			gEntList.CleanupDeleteList();
 			continue;
 		}
@@ -474,7 +474,7 @@ void MapEntity_ParseAllEntities(const char *pMapData, IMapEntityFilter *pFilter,
 					if ( pPointTemplate->ShouldRemoveTemplateEntities() )
 					{
 						// Remove the template entity so that it does not show up in FindEntityXXX searches.
-						UTIL_Remove(pEntity);
+						gEntList.DestroyEntity(pEntity);
 						gEntList.CleanupDeleteList();
 
 						// Remove the entity from the spawn list
@@ -542,7 +542,7 @@ void MapEntity_PrecacheEntity( const char *pEntData, int &nStringSize )
 	{
 		pEntity->GetEngineObject()->ParseMapData(&entData);
 		pEntity->Precache();
-		UTIL_RemoveImmediate( pEntity );
+		gEntList.DestroyEntityImmediate( pEntity );
 	}
 }
 

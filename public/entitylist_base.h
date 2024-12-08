@@ -201,9 +201,11 @@ template< class T >
 class IEntityListener
 {
 public:
+	virtual void PreEntityRemove(T* pEntity) {};
 	virtual void OnEntityCreated(T* pEntity) {};
 	virtual void OnEntitySpawned(T* pEntity) {};
 	virtual void OnEntityDeleted(T* pEntity) {};
+	virtual void PostEntityRemove(int entnum) {};
 };
 
 //-----------------------------------------------------------------------------

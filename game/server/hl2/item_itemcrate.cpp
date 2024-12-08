@@ -113,7 +113,7 @@ void CItem_ItemCrate::Spawn( void )
 { 
 	if ( g_pGameRules->IsAllowedToSpawn( this ) == false )
 	{
-		UTIL_Remove( this );
+		gEntList.DestroyEntity( this );
 		return;
 	}
 
@@ -123,7 +123,7 @@ void CItem_ItemCrate::Spawn( void )
 	if ( NULL_STRING == m_strItemClass )
 	{
 		Warning( "CItem_ItemCrate(%i):  CRATE_SPECIFIC_ITEM with NULL ItemClass string (deleted)!!!\n", entindex() );
-		UTIL_Remove( this );
+		gEntList.DestroyEntity( this );
 		return;
 	}
 
@@ -140,7 +140,7 @@ void CItem_ItemCrate::Spawn( void )
 //-----------------------------------------------------------------------------
 void CItem_ItemCrate::InputKill( inputdata_t &data )
 {
-	UTIL_Remove( this );
+	gEntList.DestroyEntity( this );
 }
 
 

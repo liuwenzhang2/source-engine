@@ -58,11 +58,11 @@ void CDebugHistory::Spawn()
 	BaseClass::Spawn();
 
 #ifdef DISABLE_DEBUG_HISTORY
-	UTIL_Remove( this );
+	gEntList.DestroyEntity( this );
 #else
 	if ( g_pGameRules && g_pGameRules->IsMultiplayer() )
 	{
-		UTIL_Remove( this );
+		gEntList.DestroyEntity( this );
 	}
 	else
 	{

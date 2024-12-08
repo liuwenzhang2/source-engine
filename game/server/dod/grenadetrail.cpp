@@ -81,7 +81,7 @@ CGrenadeTrail* CGrenadeTrail::CreateGrenadeTrail()
 		}
 		else
 		{
-			UTIL_Remove(pEnt);
+			gEntList.DestroyEntity(pEnt);
 		}
 	}
 

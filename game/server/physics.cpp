@@ -1998,7 +1998,7 @@ void CCollisionEvent::UpdateRemoveObjects()
 	Assert(!PhysIsInCallback());
 	for ( int i = 0 ; i < m_removeObjects.Count(); i++ )
 	{
-		UTIL_Remove(m_removeObjects[i]);
+		gEntList.DestroyEntity(m_removeObjects[i]);
 	}
 	m_removeObjects.RemoveAll();
 }
@@ -2787,7 +2787,7 @@ void PhysCallbackRemove(CBaseEntity *pRemove)
 	}
 	else
 	{
-		UTIL_Remove(pRemove);
+		gEntList.DestroyEntity(pRemove);
 	}
 }
 

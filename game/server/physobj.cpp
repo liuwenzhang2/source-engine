@@ -308,7 +308,7 @@ void CPhysicsSpring::Activate( void )
 		if ( (!pStart || !pEnd) || (pStart == pEnd) )
 		{
 			DevMsg("ERROR: Can't init spring %s from \"%s\" to \"%s\"\n", GetDebugName(), STRING(m_nameAttachStart), STRING(m_nameAttachEnd) );
-			UTIL_Remove( this );
+			gEntList.DestroyEntity( this );
 			return;
 		}
 
@@ -1449,7 +1449,7 @@ void CPhysConvert::InputConvertTarget( inputdata_t &inputdata )
 			pEntity->GetEngineObject()->TransferChildren(pPhys->GetEngineObject());
 			pEntity->GetEngineObject()->AddSolidFlags( FSOLID_NOT_SOLID );
 			pEntity->GetEngineObject()->AddEffects( EF_NODRAW );
-			UTIL_Remove( pEntity );
+			gEntList.DestroyEntity( pEntity );
 		}
 	}
 }
@@ -1649,7 +1649,7 @@ void CPhysMagnet::VPhysicsCollision( int index, gamevcollisionevent_t *pEvent )
 			else if ( pEvent->pObjects[ otherIndex ]->IsMoveable() )
 			{
 				// Otherwise, we're screwed, so just remove it
-				UTIL_Remove( pOther );
+				gEntList.DestroyEntity( pOther );
 			}
 			else
 			{
@@ -1915,7 +1915,7 @@ public:
 			masscenteroverride_t params;
 			params.SnapToPoint( m_target, GetEngineObject()->GetAbsOrigin() );
 			PhysSetMassCenterOverride( params );
-			UTIL_Remove( this );
+			gEntList.DestroyEntity( this );
 		}
 	}
 };

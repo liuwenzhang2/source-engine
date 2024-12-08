@@ -245,7 +245,7 @@ void CC_AI_Hull( const CCommand &args )
 
 	if ( bSpawned )
 	{
-		UTIL_Remove( pEnt );
+		gEntList.DestroyEntity( pEnt );
 	}
 
 	g_pAINetworkManager->GetEditOps()->DrawHull( eHull );

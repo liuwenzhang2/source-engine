@@ -195,7 +195,7 @@ void CItem_DynamicResupply::Spawn( void )
 { 
 	if ( g_pGameRules->IsAllowedToSpawn( this ) == false )
 	{
-		UTIL_Remove( this );
+		gEntList.DestroyEntity( this );
 		return;
 	}
 
@@ -286,7 +286,7 @@ void CItem_DynamicResupply::CheckPVSThink( void )
 //-----------------------------------------------------------------------------
 void CItem_DynamicResupply::InputKill( inputdata_t &data )
 {
-	UTIL_Remove( this );
+	gEntList.DestroyEntity( this );
 }
 
 //-----------------------------------------------------------------------------
@@ -615,7 +615,7 @@ void CItem_DynamicResupply::SpawnDynamicItem( CBasePlayer *pPlayer )
 	}
 
 	SetThink( NULL );
-	UTIL_Remove( this );
+	gEntList.DestroyEntity( this );
 }
 
 //-----------------------------------------------------------------------------

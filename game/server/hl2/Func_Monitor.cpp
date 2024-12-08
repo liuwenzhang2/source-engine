@@ -71,7 +71,7 @@ void CFuncMonitor::ReleaseCameraLink()
 {
 	if ( m_hInfoCameraLink )
 	{
-		UTIL_Remove( m_hInfoCameraLink );
+		gEntList.DestroyEntity( m_hInfoCameraLink );
 		m_hInfoCameraLink = NULL;
 
 		// Keep the target up-to-date for save/load

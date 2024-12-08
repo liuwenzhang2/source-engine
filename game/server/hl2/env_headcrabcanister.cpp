@@ -317,12 +317,12 @@ void CEnvHeadcrabCanister::UpdateOnRemove()
 	g_pSoundEmitterSystem->StopSound(this, "HeadcrabCanister.AfterLanding" );
 	if ( m_hTrail )
 	{
-		UTIL_Remove( m_hTrail );
+		gEntList.DestroyEntity( m_hTrail );
 		m_hTrail = NULL;
 	}
 	if ( m_hSmokeTrail )
 	{
-		UTIL_Remove( m_hSmokeTrail );
+		gEntList.DestroyEntity( m_hSmokeTrail );
 		m_hSmokeTrail = NULL;
 	}
 }
@@ -540,7 +540,7 @@ void CEnvHeadcrabCanister::InputStopSmoke( inputdata_t &inputdata )
 {
 	if ( m_hSmokeTrail != NULL )
 	{
-		UTIL_Remove( m_hSmokeTrail );
+		gEntList.DestroyEntity( m_hSmokeTrail );
 		m_hSmokeTrail = NULL;
 	}
 }
@@ -1116,7 +1116,7 @@ void CEnvHeadcrabCanister::HeadcrabCanisterSkyboxRestartThink( void )
 {
 	if ( m_hTrail )
 	{
-		UTIL_Remove( m_hTrail );
+		gEntList.DestroyEntity( m_hTrail );
 		m_hTrail = NULL;
 	}
 

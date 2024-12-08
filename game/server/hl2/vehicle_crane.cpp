@@ -168,7 +168,7 @@ void CPropCrane::Activate( void )
 	if ( m_iszMagnetName == NULL_STRING )
 	{
 		Warning( "prop_vehicle_crane %s has no magnet entity specified!\n", STRING(GetEntityName()) );
-		UTIL_Remove( this );
+		gEntList.DestroyEntity( this );
 		return;
 	}
 
@@ -176,7 +176,7 @@ void CPropCrane::Activate( void )
 	if ( !m_hCraneMagnet )
 	{
 		Warning( "prop_vehicle_crane %s failed to find magnet %s.\n", STRING(GetEntityName()), STRING(m_iszMagnetName) );
-		UTIL_Remove( this );
+		gEntList.DestroyEntity( this );
 		return;
 	}
 
@@ -196,7 +196,7 @@ void CPropCrane::Activate( void )
 	m_hCraneTip = CCraneTip::Create( m_hCraneMagnet, m_pConstraintGroup, vecOrigin, vecAngles );
 	if ( !m_hCraneTip )
 	{
-		UTIL_Remove( this );
+		gEntList.DestroyEntity( this );
 		return;
 	}
 	m_pConstraintGroup->Activate();

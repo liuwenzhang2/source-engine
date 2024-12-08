@@ -399,7 +399,7 @@ void CNPC_CScanner::Event_Killed( const CTakeDamageInfo &info )
 	SpotlightDestroy();
 
 	// Remove sprite
-	UTIL_Remove(m_pEyeFlash);
+	gEntList.DestroyEntity(m_pEyeFlash);
 	m_pEyeFlash = NULL;
 
 	// If I have an enemy and I'm up high, do a dive bomb (unless dissolved)
@@ -1541,10 +1541,10 @@ void CNPC_CScanner::SpotlightDestroy(void)
 {
 	if ( m_hSpotlight )
 	{
-		UTIL_Remove(m_hSpotlight);
+		gEntList.DestroyEntity(m_hSpotlight);
 		m_hSpotlight = NULL;
 		
-		UTIL_Remove(m_hSpotlightTarget);
+		gEntList.DestroyEntity(m_hSpotlightTarget);
 		m_hSpotlightTarget = NULL;
 	}
 }

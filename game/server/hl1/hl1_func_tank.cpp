@@ -614,7 +614,7 @@ void CFuncTank::Activate( void )
 	if (( !m_hControlVolume ) && (GetEngineObject()->GetSpawnFlags() & SF_TANK_CANCONTROL))
 	{
 		Msg( "ERROR: Couldn't find control volume for player-controllable func_tank %s.\n", STRING(GetEntityName()) );
-		UTIL_Remove( this );
+		gEntList.DestroyEntity( this );
 	}
 }
 
@@ -1374,7 +1374,7 @@ void CFuncTankLaser::Activate( void )
 
 	if ( !GetLaser() )
 	{
-		UTIL_Remove(this);
+		gEntList.DestroyEntity(this);
 		Warning( "Laser tank with no env_laser!\n" );
 	}
 	else
@@ -1675,7 +1675,7 @@ void CFuncTankPhysCannister::Activate( void )
 	if ( !m_hBarrelVolume )
 	{
 		Msg("ERROR: Couldn't find barrel volume for func_tankphyscannister %s.\n", STRING(GetEntityName()) );
-		UTIL_Remove( this );
+		gEntList.DestroyEntity( this );
 	}
 }
 

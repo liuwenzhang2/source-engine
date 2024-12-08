@@ -998,7 +998,7 @@ void CTestEffect::Think( void )
 	{
 		for (i = 0; i < m_iBeam; i++)
 		{
-			UTIL_Remove( m_pBeam[i] );
+			gEntList.DestroyEntity( m_pBeam[i] );
 		}
 		m_flStartTime = gpGlobals->curtime;
 		m_iBeam = 0;

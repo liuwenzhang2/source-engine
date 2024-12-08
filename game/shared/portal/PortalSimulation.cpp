@@ -299,7 +299,7 @@ void CPortalSimulator::UpdateOnRemove(void)
 	{
 		BeforeCollisionEntityDestroy();
 		pCollisionEntity->m_pOwningSimulator = NULL;
-		UTIL_Remove(pCollisionEntity);
+		gEntList.DestroyEntity(pCollisionEntity);
 		pCollisionEntity = NULL;
 	}
 #endif

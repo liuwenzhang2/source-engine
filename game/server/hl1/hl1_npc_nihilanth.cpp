@@ -1049,7 +1049,7 @@ void CNPC_Nihilanth::DyingThink( void )
 		}
 		else
 		{
-			UTIL_Remove( m_pBall );
+			gEntList.DestroyEntity( m_pBall );
 			m_pBall = NULL;
 		}
 	}
@@ -1342,8 +1342,8 @@ void CNihilanthHVR::HoverThink( void  )
 	}
 	else
 	{
-		UTIL_Remove( GetSprite() );
-		UTIL_Remove( this );
+		gEntList.DestroyEntity( GetSprite() );
+		gEntList.DestroyEntity( this );
 	}
 }
 
@@ -1468,8 +1468,8 @@ void CNihilanthHVR::ZapThink( void  )
 	if ( GetEnemy() == NULL || GetEngineObject()->GetAbsOrigin().x < -4096 || GetEngineObject()->GetAbsOrigin().x > 4096 || GetEngineObject()->GetAbsOrigin().y < -4096 || GetEngineObject()->GetAbsOrigin().y > 4096 || GetEngineObject()->GetAbsOrigin().z < -4096 || GetEngineObject()->GetAbsOrigin().z > 4096)
 	{
 		SetTouch( NULL );
-		UTIL_Remove( GetSprite() );
-		UTIL_Remove( this );
+		gEntList.DestroyEntity( GetSprite() );
+		gEntList.DestroyEntity( this );
 		return;
 	}
 
@@ -1530,8 +1530,8 @@ void CNihilanthHVR::ZapTouch( CBaseEntity *pOther )
 	GetEngineObject()->SetAbsVelocity(GetEngineObject()->GetAbsVelocity() * 0 );
 
 	SetTouch( NULL );
-	UTIL_Remove( GetSprite() );
-	UTIL_Remove( this );
+	gEntList.DestroyEntity( GetSprite() );
+	gEntList.DestroyEntity( this );
 	GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.2 );
 }
 
@@ -1564,9 +1564,9 @@ void CNihilanthHVR::DissipateThink( void  )
 
 	if ( m_flBallScale > 5.0)
 	{
-		UTIL_Remove( this );
-		UTIL_Remove( GetSprite() );
-		UTIL_Remove( GetBeam() );
+		gEntList.DestroyEntity( this );
+		gEntList.DestroyEntity( GetSprite() );
+		gEntList.DestroyEntity( GetBeam() );
 	}
 
 	pSprite->SetBrightness( pSprite->GetBrightness() - 7, 0 );
@@ -1580,9 +1580,9 @@ void CNihilanthHVR::DissipateThink( void  )
 	}
 	else
 	{
-		UTIL_Remove( this );
-		UTIL_Remove( GetSprite() );
-		UTIL_Remove( GetBeam() );
+		gEntList.DestroyEntity( this );
+		gEntList.DestroyEntity( GetSprite() );
+		gEntList.DestroyEntity( GetBeam() );
 	}
 
 /*	MESSAGE_BEGIN( MSG_BROADCAST, SVC_TEMPENTITY );
@@ -1661,16 +1661,16 @@ void CNihilanthHVR::TeleportThink( void  )
 	if ( GetEnemy() == NULL || !GetEnemy()->IsAlive() || GetEngineObject()->GetAbsOrigin().x < -4096 || GetEngineObject()->GetAbsOrigin().x > 4096 || GetEngineObject()->GetAbsOrigin().y < -4096 || GetEngineObject()->GetAbsOrigin().y > 4096 || GetEngineObject()->GetAbsOrigin().z < -4096 || GetEngineObject()->GetAbsOrigin().z > 4096)
 	{
 		g_pSoundEmitterSystem->StopSound( entindex(), "NihilanthHVR.TeleAttack" );
-		UTIL_Remove( this );
-		UTIL_Remove( GetSprite() );
+		gEntList.DestroyEntity( this );
+		gEntList.DestroyEntity( GetSprite() );
 		return;
 	}
 
 	if (( GetEnemy()->WorldSpaceCenter() - GetEngineObject()->GetAbsOrigin() ).Length() < 128)
 	{
 		g_pSoundEmitterSystem->StopSound( entindex(), "NihilanthHVR.TeleAttack" );
-		UTIL_Remove( this );
-		UTIL_Remove( GetSprite() );
+		gEntList.DestroyEntity( this );
+		gEntList.DestroyEntity( GetSprite() );
 
 		if ( GetTarget() != NULL)
 		{
@@ -1715,8 +1715,8 @@ void CNihilanthHVR::TeleportTouch( CBaseEntity *pOther )
 
 	SetTouch( NULL );
 	g_pSoundEmitterSystem->StopSound( entindex(), "NihilanthHVR.TeleAttack" );
-	UTIL_Remove( this );
-	UTIL_Remove( GetSprite() );
+	gEntList.DestroyEntity( this );
+	gEntList.DestroyEntity( GetSprite() );
 }
 
 void CNihilanthHVR::GreenBallInit( )
@@ -1740,6 +1740,6 @@ void CNihilanthHVR::GreenBallInit( )
 void CNihilanthHVR::RemoveTouch( CBaseEntity *pOther )
 {
 	g_pSoundEmitterSystem->StopSound( entindex(), "NihilanthHVR.TeleAttack" );
-	UTIL_Remove( this );
-	UTIL_Remove( GetSprite() );
+	gEntList.DestroyEntity( this );
+	gEntList.DestroyEntity( GetSprite() );
 }

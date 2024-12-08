@@ -114,7 +114,7 @@ void CEnvEntityMaker::Activate( void )
 	if ( m_iszTemplate == NULL_STRING )
 	{
 		Warning( "env_entity_maker %s has no template entity!\n", GetEntityName().ToCStr() );
-		UTIL_Remove( this );
+		gEntList.DestroyEntity( this );
 		return;
 	}
 

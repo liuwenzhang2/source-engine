@@ -145,12 +145,12 @@ void CGameWeaponManager::Spawn()
 	if ( !pEntity )
 	{
 		DevMsg("%s removed itself!\n", GetDebugName() );
-		UTIL_Remove(this);
+		gEntList.DestroyEntity(this);
 	}
 	else
 	{
 		m_bExpectingWeapon = ( dynamic_cast<CBaseCombatWeapon *>(pEntity) != NULL );
-		UTIL_Remove(pEntity);
+		gEntList.DestroyEntity(pEntity);
 	}
 }
 
@@ -267,7 +267,7 @@ void CGameWeaponManager::Think()
 		if( fRemovedOne )
 		{
 			pCandidate->GetEngineObject()->AddEffects( EF_NODRAW );
-			UTIL_Remove( pCandidate );
+			gEntList.DestroyEntity( pCandidate );
 
 			DevMsg( 2, "Surplus %s removed\n", pszWeaponName);
 			surplus--;

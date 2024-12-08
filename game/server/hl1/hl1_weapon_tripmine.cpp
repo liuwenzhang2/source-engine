@@ -476,7 +476,7 @@ void CTripmineGrenade::KillBeam( void )
 {
 	if ( m_hBeam )
 	{
-		UTIL_Remove( m_hBeam );
+		gEntList.DestroyEntity( m_hBeam );
 		m_hBeam = NULL;
 	}
 }

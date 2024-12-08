@@ -46,7 +46,7 @@ void CTeamSpawnPoint::Activate( void )
 	else
 	{
 		Warning( "info_player_teamspawn with invalid team number: %d\n", GetTeamNumber() );
-		UTIL_Remove( this );
+		gEntList.DestroyEntity( this );
 	}
 }
 
@@ -128,6 +128,6 @@ void CTeamVehicleSpawnPoint::Activate( void )
 	else
 	{
 		Warning( "info_vehicle_groundspawn with invalid team number: %d\n", GetTeamNumber() );
-		UTIL_Remove( this );
+		gEntList.DestroyEntity( this );
 	}
 }

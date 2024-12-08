@@ -2210,13 +2210,13 @@ void CNPC_Vortigaunt::ClearHandGlow( void )
 {
 	if ( m_hHandEffect[0] != NULL )
 	{
-		UTIL_Remove( m_hHandEffect[0] );
+		gEntList.DestroyEntity( m_hHandEffect[0] );
 		m_hHandEffect[0] = NULL;
 	}
 	
 	if ( m_hHandEffect[1] != NULL )
 	{
-		UTIL_Remove( m_hHandEffect[1] );
+		gEntList.DestroyEntity( m_hHandEffect[1] );
 		m_hHandEffect[1] = NULL;
 	}
 	

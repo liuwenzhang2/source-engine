@@ -48,11 +48,11 @@ LINK_ENTITY_TO_CLASS( npc_satchel, CSatchelCharge );
 void CSatchelCharge::Deactivate( void )
 {
 	GetEngineObject()->AddSolidFlags( FSOLID_NOT_SOLID );
-	UTIL_Remove( this );
+	gEntList.DestroyEntity( this );
 
 	if ( m_hGlowSprite != NULL )
 	{
-		UTIL_Remove( m_hGlowSprite );
+		gEntList.DestroyEntity( m_hGlowSprite );
 		m_hGlowSprite = NULL;
 	}
 }
@@ -120,7 +120,7 @@ void CSatchelCharge::InputExplode( inputdata_t &inputdata )
 	ExplosionCreate(GetEngineObject()->GetAbsOrigin() + Vector( 0, 0, 16 ), GetEngineObject()->GetAbsAngles(), GetThrower(), GetDamage(), GetDamageRadius(),
 		SF_ENVEXPLOSION_NOSPARKS | SF_ENVEXPLOSION_NODLIGHTS | SF_ENVEXPLOSION_NOSMOKE, 0.0f, this);
 
-	UTIL_Remove( this );
+	gEntList.DestroyEntity( this );
 }
 
 
@@ -170,7 +170,7 @@ void CSatchelCharge::SatchelThink( void )
 
 	if (!IsInWorld())
 	{
-		UTIL_Remove( this );
+		gEntList.DestroyEntity( this );
 		return;
 	}
 
@@ -210,7 +210,7 @@ CSatchelCharge::~CSatchelCharge(void)
 {
 	if ( m_hGlowSprite != NULL )
 	{
-		UTIL_Remove( m_hGlowSprite );
+		gEntList.DestroyEntity( m_hGlowSprite );
 		m_hGlowSprite = NULL;
 	}
 }

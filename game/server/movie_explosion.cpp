@@ -34,7 +34,7 @@ MovieExplosion* MovieExplosion::CreateMovieExplosion(const Vector &pos)
 		}
 		else
 		{
-			UTIL_Remove(pEnt);
+			gEntList.DestroyEntity(pEnt);
 		}
 	}
 

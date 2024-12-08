@@ -1541,7 +1541,7 @@ void CNPC_Portal_FloorTurret::RopesOff( void )
 		// Remove rope if it's alive
 		if ( m_hRopes[ iRope ] )
 		{
-			 UTIL_Remove( m_hRopes[ iRope ] );
+			 gEntList.DestroyEntity( m_hRopes[ iRope ] );
 			 m_hRopes[ iRope ] = NULL;
 		}
 	}

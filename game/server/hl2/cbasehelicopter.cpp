@@ -1123,7 +1123,7 @@ void CBaseHelicopter::StopRotorWash( void )
 {
 	if ( m_hRotorWash )
 	{
-		UTIL_Remove( m_hRotorWash );
+		gEntList.DestroyEntity( m_hRotorWash );
 		m_hRotorWash = NULL;
 	}
 }
@@ -1141,7 +1141,7 @@ void CBaseHelicopter::DelayedKillThink( )
 		SetOwnerEntity( NULL );
 	}
 
-	UTIL_Remove( this );
+	gEntList.DestroyEntity( this );
 }
 
 

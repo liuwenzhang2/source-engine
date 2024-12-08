@@ -397,8 +397,8 @@ void CPointSpotlight::SpotlightDestroy(void)
 	{
 		m_OnOff.FireOutput( this, this );
 
-		UTIL_Remove(m_hSpotlight);
-		UTIL_Remove(m_hSpotlightTarget);
+		gEntList.DestroyEntity(m_hSpotlight);
+		gEntList.DestroyEntity(m_hSpotlightTarget);
 	}
 }
 

@@ -314,7 +314,7 @@ void CFlashbangProjectile::Detonate()
 		}
 	}
 
-	UTIL_Remove( this );
+	gEntList.DestroyEntity( this );
 }
 
 //TODO: Let physics handle the sound!

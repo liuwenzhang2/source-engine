@@ -503,7 +503,7 @@ void CBaseNPCMaker::ChildPostSpawn( CAI_BaseNPC *pChild )
 			{
 				// Set to non-solid so this loop doesn't keep finding it
 				((CBaseEntity*)tr.m_pEnt)->GetEngineObject()->AddSolidFlags( FSOLID_NOT_SOLID );
-				UTIL_RemoveImmediate((CBaseEntity*)tr.m_pEnt );
+				gEntList.DestroyEntityImmediate((CBaseEntity*)tr.m_pEnt );
 				continue;
 			}
 		}
@@ -601,7 +601,7 @@ void CTemplateNPCMaker::Precache()
 		if (!m_iszTemplateName)
 		{
 			Warning( "npc_template_maker %s has no template NPC!\n", STRING(GetEntityName()) );
-			UTIL_Remove( this );
+			gEntList.DestroyEntity( this );
 			return;
 		}
 		else
@@ -610,7 +610,7 @@ void CTemplateNPCMaker::Precache()
 			if ( m_iszTemplateData == NULL_STRING )
 			{
 				DevWarning( "npc_template_maker %s: template NPC %s not found!\n", STRING(GetEntityName()), STRING(m_iszTemplateName) );
-				UTIL_Remove( this );
+				gEntList.DestroyEntity( this );
 				return;
 			}
 		}
@@ -627,7 +627,7 @@ void CTemplateNPCMaker::Precache()
 		if ( pEntity != NULL )
 		{
 			PrecacheTemplateEntity( pEntity );
-			UTIL_RemoveImmediate( pEntity );
+			gEntList.DestroyEntityImmediate( pEntity );
 		}
 	}
 }
@@ -993,7 +993,7 @@ void CTemplateNPCMaker::MakeNPCInRadius( void )
 	if ( !PlaceNPCInRadius( pent ) )
 	{
 		// Failed to place the NPC. Abort
-		UTIL_RemoveImmediate( pent );
+		gEntList.DestroyEntityImmediate( pent );
 		return;
 	}
 

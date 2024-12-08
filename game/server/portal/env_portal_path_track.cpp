@@ -129,7 +129,7 @@ void CEnvPortalPathTrack::ShutDownTrackFX()
 {
 	if ( m_pBeam )
 	{
-		UTIL_Remove( m_pBeam );
+		gEntList.DestroyEntity( m_pBeam );
 		m_pBeam = NULL;
 	}
 }

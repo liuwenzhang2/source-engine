@@ -1001,7 +1001,7 @@ void CNPC_Dog::ClearBeams( void )
 	{
 		if ( m_hBeams[i] != NULL )
 		{
-			UTIL_Remove( m_hBeams[i] );
+			gEntList.DestroyEntity( m_hBeams[i] );
 			m_hBeams[i] = NULL;
 		}
 	}
@@ -1014,7 +1014,7 @@ void CNPC_Dog::ClearSprites( void )
 	{
 		if ( m_hGlowSprites[i] != NULL )
 		{
-			UTIL_Remove( m_hGlowSprites[i] );
+			gEntList.DestroyEntity( m_hGlowSprites[i] );
 			m_hGlowSprites[i] = NULL;
 		}
 	}

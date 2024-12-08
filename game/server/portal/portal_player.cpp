@@ -281,7 +281,7 @@ CPortal_Player::~CPortal_Player( void )
 	CPortalRagdoll *pRagdoll = dynamic_cast<CPortalRagdoll*>( m_hRagdoll.Get() );	
 	if( pRagdoll )
 	{
-		UTIL_Remove( pRagdoll );
+		gEntList.DestroyEntity( pRagdoll );
 	}
 }
 
@@ -1056,7 +1056,7 @@ bool CPortal_Player::BumpWeapon( CBaseCombatWeapon *pWeapon )
 	{
 		if ( gEvilImpulse101 )
 		{
-			UTIL_Remove( pWeapon );
+			gEntList.DestroyEntity( pWeapon );
 		}
 		return false;
 	}
@@ -1084,7 +1084,7 @@ bool CPortal_Player::BumpWeapon( CBaseCombatWeapon *pWeapon )
 			if ( pPickupPortalgun->CanFirePortal2() )
 				pPortalGun->SetCanFirePortal2();
 
-			UTIL_Remove( pWeapon );
+			gEntList.DestroyEntity( pWeapon );
 			return true;
 		}
 
@@ -1093,7 +1093,7 @@ bool CPortal_Player::BumpWeapon( CBaseCombatWeapon *pWeapon )
 		{
 			pWeapon->CheckRespawn();
 
-			UTIL_Remove( pWeapon );
+			gEntList.DestroyEntity( pWeapon );
 			return true;
 		}
 		else
@@ -1646,7 +1646,7 @@ CRagdollProp* CPortal_Player::CreateRagdollProp()
 {
 	if ( m_hRagdoll )
 	{
-		UTIL_RemoveImmediate( m_hRagdoll );
+		gEntList.DestroyEntityImmediate( m_hRagdoll );
 		m_hRagdoll = NULL;
 	}
 
@@ -1665,7 +1665,7 @@ CRagdollProp* CPortal_Player::CreateRagdollProp()
 	CPortalRagdoll *pRagdoll = dynamic_cast<CPortalRagdoll*>( m_hRagdoll.Get() );
 	if( pRagdoll )
 	{
-		UTIL_Remove( pRagdoll );
+		gEntList.DestroyEntity( pRagdoll );
 		pRagdoll = NULL;
 	}
 	Assert( pRagdoll == NULL );

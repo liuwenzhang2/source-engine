@@ -654,7 +654,7 @@ CWeaponRPG::~CWeaponRPG()
 #ifndef CLIENT_DLL
 	if ( m_hLaserDot != NULL )
 	{
-		UTIL_Remove( m_hLaserDot );
+		gEntList.DestroyEntity( m_hLaserDot );
 		m_hLaserDot = NULL;
 	}
 #endif
@@ -721,7 +721,7 @@ void CWeaponRPG::Drop( const Vector &vecVelocity )
 #ifndef CLIENT_DLL
 	if ( m_hLaserDot != NULL )
 	{
-		UTIL_Remove( m_hLaserDot );
+		gEntList.DestroyEntity( m_hLaserDot );
 		m_hLaserDot = NULL;
 	}
 #endif
@@ -986,7 +986,7 @@ bool CWeaponRPG::Holster( CBaseCombatWeapon *pSwitchingTo )
 	if ( m_hLaserDot != NULL )
 	{
 		m_hLaserDot->TurnOff();
-		UTIL_Remove( m_hLaserDot );
+		gEntList.DestroyEntity( m_hLaserDot );
 		m_hLaserDot = NULL;
 	}
 #endif

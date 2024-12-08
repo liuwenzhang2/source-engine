@@ -396,7 +396,7 @@ void CMissile::Explode( void )
 	}
 
 	g_pSoundEmitterSystem->StopSound(this, "Missile.Ignite" );
-	UTIL_Remove( this );
+	gEntList.DestroyEntity( this );
 }
 
 //-----------------------------------------------------------------------------
@@ -1456,18 +1456,18 @@ CWeaponRPG::~CWeaponRPG()
 {
 	if ( m_hLaserDot != NULL )
 	{
-		UTIL_Remove( m_hLaserDot );
+		gEntList.DestroyEntity( m_hLaserDot );
 		m_hLaserDot = NULL;
 	}
 
 	if ( m_hLaserMuzzleSprite )
 	{
-		UTIL_Remove( m_hLaserMuzzleSprite );
+		gEntList.DestroyEntity( m_hLaserMuzzleSprite );
 	}
 
 	if ( m_hLaserBeam )
 	{
-		UTIL_Remove( m_hLaserBeam );
+		gEntList.DestroyEntity( m_hLaserBeam );
 	}
 }
 
@@ -1903,7 +1903,7 @@ void CWeaponRPG::StopGuiding( void )
 	if ( m_hLaserDot != NULL )
 	{
 		m_hLaserDot->TurnOff();
-		UTIL_Remove( m_hLaserDot );
+		gEntList.DestroyEntity( m_hLaserDot );
 		m_hLaserDot = NULL;
 	}
 }

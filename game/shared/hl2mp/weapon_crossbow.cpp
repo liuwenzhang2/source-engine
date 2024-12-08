@@ -113,7 +113,7 @@ CCrossbowBolt::~CCrossbowBolt( void )
 {
 	if ( m_pGlowSprite )
 	{
-		UTIL_Remove( m_pGlowSprite );
+		gEntList.DestroyEntity( m_pGlowSprite );
 	}
 }
 
@@ -274,7 +274,7 @@ void CCrossbowBolt::BoltTouch( CBaseEntity *pOther )
 		SetTouch( NULL );
 		SetThink( NULL );
 
-		UTIL_Remove( this );
+		gEntList.DestroyEntity( this );
 	}
 	else
 	{
@@ -365,7 +365,7 @@ void CCrossbowBolt::BoltTouch( CBaseEntity *pOther )
 				UTIL_ImpactTrace( &tr, DMG_BULLET );
 			}
 
-			UTIL_Remove( this );
+			gEntList.DestroyEntity( this );
 		}
 	}
 

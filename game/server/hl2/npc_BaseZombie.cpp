@@ -2442,7 +2442,7 @@ void CNPC_BaseZombie::ReleaseHeadcrab( const Vector &vecOrigin, const Vector &ve
 
 			if( !HeadcrabFits(pAnimatingGib) )
 			{
-				UTIL_Remove(pGib);
+				gEntList.DestroyEntity(pGib);
 				return;
 			}
 
@@ -2511,7 +2511,7 @@ void CNPC_BaseZombie::ReleaseHeadcrab( const Vector &vecOrigin, const Vector &ve
 
 		if( !HeadcrabFits(pCrab) )
 		{
-			UTIL_Remove(pCrab);
+			gEntList.DestroyEntity(pCrab);
 			return;
 		}
 

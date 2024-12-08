@@ -281,7 +281,7 @@ void CGrenadeHomer::StopRocketTrail()
 		if(m_hRocketTrail[i])
 		{
 			m_hRocketTrail[i]->SetEmit(false);
-			UTIL_Remove( m_hRocketTrail[i] );
+			gEntList.DestroyEntity( m_hRocketTrail[i] );
 			m_hRocketTrail[i] = NULL;
 		}
 	}	
@@ -366,7 +366,7 @@ void CGrenadeHomer::GrenadeHomerTouch( CBaseEntity *pOther )
 	if (tr.surface.flags & SURF_SKY)
 	{
 		StopRocketTrail();
-		UTIL_Remove( this );
+		gEntList.DestroyEntity( this );
 	}
 	else
 	{
@@ -459,7 +459,7 @@ void CGrenadeHomer::Detonate(void)
 	RadiusDamage ( CTakeDamageInfo( this, GetOwnerEntity(), m_flDamage, DMG_BLAST ), GetEngineObject()->GetAbsOrigin(), m_DmgRadius, CLASS_NONE, NULL );
 	CPASAttenuationFilter filter2( this, "GrenadeHomer.StopSounds" );
 	g_pSoundEmitterSystem->EmitSound( filter2, entindex(), "GrenadeHomer.StopSounds" );
-	UTIL_Remove( this );
+	gEntList.DestroyEntity( this );
 }
 
 //-----------------------------------------------------------------------------
