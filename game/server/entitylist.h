@@ -3691,9 +3691,9 @@ void CGlobalEntityList<T>::DestroyEntity(IHandleEntity* oldObj)
 	bool bNetworkable = pEntity->IsNetworkable();
 	int nEntIndex = bNetworkable ? pEntity->entindex() : -1;
 	if (bNetworkable && nEntIndex != -1) {
-		for (int i = m_entityListeners.Count() - 1; i >= 0; i--)
+		for (int i = BaseClass::m_entityListeners.Count() - 1; i >= 0; i--)
 		{
-			m_entityListeners[i]->PreEntityRemove(pEntity);
+			BaseClass::m_entityListeners[i]->PreEntityRemove(pEntity);
 		}
 	}
 	SetReceivedChainedUpdateOnRemove(false);
@@ -3705,9 +3705,9 @@ void CGlobalEntityList<T>::DestroyEntity(IHandleEntity* oldObj)
 	pEntity->SetName("");
 
 	if (bNetworkable && nEntIndex != -1) {
-		for (int i = m_entityListeners.Count() - 1; i >= 0; i--)
+		for (int i = BaseClass::m_entityListeners.Count() - 1; i >= 0; i--)
 		{
-			m_entityListeners[i]->PostEntityRemove(nEntIndex);
+			BaseClass::m_entityListeners[i]->PostEntityRemove(nEntIndex);
 		}
 	}
 	AddToDeleteList(pEntity);
@@ -3747,9 +3747,9 @@ void CGlobalEntityList<T>::DestroyEntityImmediate(IHandleEntity* oldObj)
 	bool bNetworkable = pEntity->IsNetworkable();
 	int nEntIndex = bNetworkable ? pEntity->entindex() : -1;
 	if (bNetworkable && nEntIndex != -1) {
-		for (int i = m_entityListeners.Count() - 1; i >= 0; i--)
+		for (int i = BaseClass::m_entityListeners.Count() - 1; i >= 0; i--)
 		{
-			m_entityListeners[i]->PreEntityRemove(pEntity);
+			BaseClass::m_entityListeners[i]->PreEntityRemove(pEntity);
 		}
 	}
 
@@ -3766,9 +3766,9 @@ void CGlobalEntityList<T>::DestroyEntityImmediate(IHandleEntity* oldObj)
 	SetDisableEhandleAccess(false);
 
 	if (bNetworkable && nEntIndex != -1) {
-		for (int i = m_entityListeners.Count() - 1; i >= 0; i--)
+		for (int i = BaseClass::m_entityListeners.Count() - 1; i >= 0; i--)
 		{
-			m_entityListeners[i]->PostEntityRemove(nEntIndex);
+			BaseClass::m_entityListeners[i]->PostEntityRemove(nEntIndex);
 		}
 	}
 }
