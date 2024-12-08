@@ -2571,6 +2571,16 @@ public:
 								CClientEntityList( void );
 	virtual 					~CClientEntityList( void );
 
+	virtual void InstallEntityFactory(IEntityFactory* pFactory);
+	virtual void UninstallEntityFactory(IEntityFactory* pFactory);
+	virtual bool CanCreateEntityClass(const char* pClassName);
+	virtual const char* GetMapClassName(const char* pClassName);
+	virtual const char* GetDllClassName(const char* pClassName);
+	virtual size_t		GetEntitySize(const char* pClassName);
+	virtual const char* GetCannonicalName(const char* pClassName);
+	virtual void ReportEntitySizes();
+	virtual void DumpEntityFactories();
+
 	void						Release();		// clears everything and releases entities
 
 	virtual const char*			GetBlockName();
@@ -2738,6 +2748,7 @@ private:
 	void AddRestoredEntity(T* pEntity);
 
 private:
+	CEntityFactoryDictionary m_EntityFactoryDictionary;
 	// Cached info for networked entities.
 //struct EntityCacheInfo_t
 //{
@@ -2828,6 +2839,60 @@ private:
 
 	C_BaseEntity* m_pLocalPlayer = NULL;
 };
+
+template<class T>
+void CClientEntityList<T>::InstallEntityFactory(IEntityFactory* pFactory)
+{
+	m_EntityFactoryDictionary.InstallFactory(pFactory);
+}
+
+template<class T>
+void CClientEntityList<T>::UninstallEntityFactory(IEntityFactory* pFactory)
+{
+	m_EntityFactoryDictionary.UninstallFactory(pFactory);
+}
+
+template<class T>
+bool CClientEntityList<T>::CanCreateEntityClass(const char* pClassName)
+{
+	return m_EntityFactoryDictionary.FindFactory(pClassName) != NULL;
+}
+
+template<class T>
+const char* CClientEntityList<T>::GetMapClassName(const char* pClassName)
+{
+	return m_EntityFactoryDictionary.GetMapClassName(pClassName);
+}
+
+template<class T>
+const char* CClientEntityList<T>::GetDllClassName(const char* pClassName)
+{
+	return m_EntityFactoryDictionary.GetDllClassName(pClassName);
+}
+
+template<class T>
+size_t		CClientEntityList<T>::GetEntitySize(const char* pClassName)
+{
+	return m_EntityFactoryDictionary.GetEntitySize(pClassName);
+}
+
+template<class T>
+const char* CClientEntityList<T>::GetCannonicalName(const char* pClassName)
+{
+	return m_EntityFactoryDictionary.GetCannonicalName(pClassName);
+}
+
+template<class T>
+void CClientEntityList<T>::ReportEntitySizes()
+{
+	m_EntityFactoryDictionary.ReportEntitySizes();
+}
+
+template<class T>
+void CClientEntityList<T>::DumpEntityFactories()
+{
+	m_EntityFactoryDictionary.DumpEntityFactories();
+}
 
 template<class T>
 const char* CClientEntityList<T>::GetBlockName()
@@ -3166,7 +3231,7 @@ inline C_BaseEntity* CClientEntityList<T>::CreateEntityByName(const char* classN
 	if (m_EngineObjectArray[iForceEdictIndex]) {
 		Error("slot not free!");
 	}
-	IEntityFactory* pFactory = EntityFactoryDictionary()->FindFactory(className);
+	IEntityFactory* pFactory = m_EntityFactoryDictionary.FindFactory(className);
 	if (!pFactory)
 	{
 		Warning("Attempted to create unknown entity type %s!\n", className);
@@ -3200,12 +3265,12 @@ inline C_BaseEntity* CClientEntityList<T>::CreateEntityByName(const char* classN
 	default:
 		Error("GetEngineObjectType error!\n");
 	}
-	return (C_BaseEntity*)EntityFactoryDictionary()->Create(this, className, iForceEdictIndex, iSerialNum, this);
+	return (C_BaseEntity*)m_EntityFactoryDictionary.Create(this, className, iForceEdictIndex, iSerialNum, this);
 }
 
 template<class T>
 inline void	CClientEntityList<T>::DestroyEntity(IHandleEntity* pEntity) {
-	EntityFactoryDictionary()->Destroy(pEntity);
+	m_EntityFactoryDictionary.Destroy(pEntity);
 }
 
 //-----------------------------------------------------------------------------

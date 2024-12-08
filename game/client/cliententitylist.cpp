@@ -5807,7 +5807,7 @@ C_BaseEntity* C_EngineObjectInternal::CreateRagdollCopy()
 
 	if (pRagdoll->InitializeAsClientEntity(pModelName, RENDER_GROUP_OPAQUE_ENTITY) == false)
 	{
-		DestroyEntity(pRagdoll);// ->Release();
+		cl_entitylist->DestroyEntity(pRagdoll);// ->Release();
 		return NULL;
 	}
 
@@ -5858,7 +5858,7 @@ C_EntityFlame* FireEffect(C_BaseAnimating* pTarget, C_BaseEntity* pServerFire, f
 
 	if (pFire->InitializeAsClientEntity(NULL, RENDER_GROUP_TRANSLUCENT_ENTITY) == false)
 	{
-		DestroyEntity(pFire);// ->Release();
+		cl_entitylist->DestroyEntity(pFire);// ->Release();
 		return NULL;
 	}
 
@@ -5924,7 +5924,7 @@ C_EntityDissolve* DissolveEffect(C_BaseEntity* pTarget, float flTime)
 
 	if (pDissolve->InitializeAsClientEntity("sprites/blueglow1.vmt", RENDER_GROUP_TRANSLUCENT_ENTITY) == false)
 	{
-		DestroyEntity(pDissolve);// ->Release();
+		cl_entitylist->DestroyEntity(pDissolve);// ->Release();
 		return NULL;
 	}
 

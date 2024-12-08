@@ -75,7 +75,7 @@ void FreeContainingEntity( int ed )
 			//CBaseEntity::PhysicsRemoveTouchedList( ent );
 			//CBaseEntity::PhysicsRemoveGroundList( ent );
 			//UTIL_RemoveImmediate( ent );
-			DestroyEntity(ent);// ->Release();
+			gEntList.DestroyEntity(ent);// ->Release();
 		}
 	}
 }

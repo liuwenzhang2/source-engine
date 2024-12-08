@@ -230,7 +230,7 @@ void CPortalRender::LevelShutdownPreEntity()
 	int nCount = m_RecordedPortals.Count();
 	for ( int i = 0; i < nCount; ++i )
 	{
-		DestroyEntity( (IHandleEntity*)m_RecordedPortals[i].m_pActivePortal);
+		cl_entitylist->DestroyEntity( (IHandleEntity*)m_RecordedPortals[i].m_pActivePortal);
 	}
 	m_RecordedPortals.RemoveAll();
 }
@@ -1088,7 +1088,7 @@ void CPortalRender::HandlePortalPlaybackMessage( KeyValues *pKeyValues )
 		if ( j == nFoundCount )
 		{
 			RemovePortal( m_RecordedPortals[i].m_pActivePortal );
-			DestroyEntity((IHandleEntity*)m_RecordedPortals[i].m_pActivePortal);
+			cl_entitylist->DestroyEntity((IHandleEntity*)m_RecordedPortals[i].m_pActivePortal);
 			m_RecordedPortals.FastRemove(i);
 		}
 	}

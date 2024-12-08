@@ -272,7 +272,7 @@ void CModelPanel::DeleteVCDData( void )
 	{
 		m_hScene->StopClientOnlyScene();
 
-		DestroyEntity(m_hScene);// ->Remove();
+		cl_entitylist->DestroyEntity(m_hScene);// ->Remove();
 		m_hScene = NULL;
 	}
 }
@@ -295,7 +295,7 @@ void CModelPanel::SetupVCD( void )
 	if ( pEnt->InitializeAsClientEntity( "", RENDER_GROUP_OTHER ) == false )
 	{
 		// we failed to initialize this entity so just return gracefully
-		DestroyEntity(pEnt);// ->Remove();
+		cl_entitylist->DestroyEntity(pEnt);// ->Remove();
 		return;
 	}
 
@@ -324,7 +324,7 @@ void CModelPanel::DeleteModelData( void )
 {
 	if ( m_hModel.Get() )
 	{
-		DestroyEntity(m_hModel);// ->Remove();
+		cl_entitylist->DestroyEntity(m_hModel);// ->Remove();
 		m_hModel = NULL;
 		m_flFrameDistance = 0;
 	}
@@ -333,7 +333,7 @@ void CModelPanel::DeleteModelData( void )
 	{
 		if ( m_AttachedModels[i].Get() )
 		{
-			DestroyEntity(m_AttachedModels[i]);// ->Remove();
+			cl_entitylist->DestroyEntity(m_AttachedModels[i]);// ->Remove();
 		}
 		m_AttachedModels.Remove( i );
 	}
@@ -408,7 +408,7 @@ void CModelPanel::SetupModel( void )
 	if ( pEnt->InitializeAsClientEntity( pszModelName, RENDER_GROUP_OPAQUE_ENTITY ) == false )
 	{
 		// we failed to initialize this entity so just return gracefully
-		DestroyEntity(pEnt);// ->Remove();
+		cl_entitylist->DestroyEntity(pEnt);// ->Remove();
 		return;
 	}
 	
@@ -473,7 +473,7 @@ void CModelPanel::SetupModel( void )
 			if ( pTemp->InitializeAsClientEntity( pInfo->m_pszModelName, RENDER_GROUP_OPAQUE_ENTITY ) == false )
 			{	
 				// we failed to initialize this model so just skip it
-				DestroyEntity(pTemp);// ->Remove();
+				cl_entitylist->DestroyEntity(pTemp);// ->Remove();
 				continue;
 			}
 

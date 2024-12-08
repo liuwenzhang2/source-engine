@@ -69,7 +69,7 @@ C_NPC_RocketTurret::~C_NPC_RocketTurret( void )
 {
 	LaserOff();
 	if (m_pBeam)
-		DestroyEntity(m_pBeam);// ->Remove();
+		cl_entitylist->DestroyEntity(m_pBeam);// ->Remove();
 }
 
 

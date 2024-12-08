@@ -61,7 +61,7 @@ C_NPC_Portal_FloorTurret::~C_NPC_Portal_FloorTurret( void )
 {
 	LaserOff();
 	if (m_pBeam)
-		DestroyEntity(m_pBeam);// ->Remove();
+		cl_entitylist->DestroyEntity(m_pBeam);// ->Remove();
 }
 
 

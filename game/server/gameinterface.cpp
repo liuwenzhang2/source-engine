@@ -1559,6 +1559,10 @@ ServerClass* CServerGameDLL::GetAllServerClasses()
 	return g_pServerClassHead;
 }
 
+IEntityFactory* CServerGameDLL::GetAllEntityFactories(void)
+{
+	return g_pEntityFactoryHead;
+}
 
 const char *CServerGameDLL::GetGameDescription( void )
 {

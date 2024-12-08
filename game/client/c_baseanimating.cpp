@@ -456,7 +456,7 @@ void C_ClientRagdoll::ClientThink( void )
 	if ( m_bReleaseRagdoll == true )
 	{
 		//DestroyBoneAttachments();
-		DestroyEntity(this);// Release();
+		cl_entitylist->DestroyEntity(this);// Release();
 		return;
 	}
 
@@ -546,7 +546,7 @@ void C_BaseAnimating::UpdateOnRemove(void)
 
 	if (pChild && pChild->GetEngineObject()->IsMarkedForDeletion() == false)
 	{
-		DestroyEntity(pChild);// ->Release();
+		cl_entitylist->DestroyEntity(pChild);// ->Release();
 	}
 
 	if (GetThinkHandle() != INVALID_THINK_HANDLE)
@@ -862,7 +862,7 @@ void C_BaseAnimating::DelayedInitModelEffects( void )
 void C_BaseAnimating::TermRopes()
 {
 	FOR_EACH_LL(m_Ropes, i)
-		DestroyEntity(m_Ropes[i]);// ->Release();
+		cl_entitylist->DestroyEntity(m_Ropes[i]);// ->Release();
 
 	m_Ropes.Purge();
 }

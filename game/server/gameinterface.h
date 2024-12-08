@@ -94,6 +94,7 @@ public:
 	virtual void			PreClientUpdate( bool simulating ) OVERRIDE; // called after all GameFrame() calls, before sending data to clients
 
 	virtual ServerClass*	GetAllServerClasses( void ) OVERRIDE;
+	virtual IEntityFactory* GetAllEntityFactories(void) OVERRIDE;
 	virtual const char     *GetGameDescription( void ) OVERRIDE;
 	virtual void			CreateNetworkStringTables( void ) OVERRIDE;
 	

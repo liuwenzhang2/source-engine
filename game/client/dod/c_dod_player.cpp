@@ -1404,7 +1404,7 @@ void C_DODPlayer::PopHelmet( Vector vecDir, Vector vecForceOrigin, int iModel )
 
 	if ( !pEntity->Initialize() )
 	{
-		DestroyEntity(pEntity);// ->Release();
+		cl_entitylist->DestroyEntity(pEntity);// ->Release();
 		return;
 	}
 
@@ -1426,7 +1426,7 @@ void C_DODPlayer::PopHelmet( Vector vecDir, Vector vecForceOrigin, int iModel )
 	else
 	{
 		// failed to create a physics object
-		DestroyEntity(pEntity);// ->Release();
+		cl_entitylist->DestroyEntity(pEntity);// ->Release();
 		return;
 	}
 

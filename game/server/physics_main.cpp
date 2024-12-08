@@ -1836,7 +1836,7 @@ void Physics_SimulateEntity( CBaseEntity *pEntity )
 {
 	VPROF( ( !vprof_scope_entity_gamephys.GetBool() ) ? 
 			"Physics_SimulateEntity" : 
-			EntityFactoryDictionary()->GetCannonicalName( pEntity->GetClassname() ) );
+			gEntList.GetCannonicalName( pEntity->GetClassname() ) );
 
 	if (pEntity->IsNetworkable() && pEntity->entindex()!=-1 )
 	{

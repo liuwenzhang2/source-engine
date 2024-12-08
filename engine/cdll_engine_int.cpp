@@ -1858,6 +1858,12 @@ void ClientDLL_Init( void )
 			}
 			g_pClientGameSaveRestoreBlockSet->AddBlockHandler(entitylist);
 
+			IEntityFactory* pEntityFactory = g_ClientDLL->GetAllEntityFactories();
+			while (pEntityFactory) {
+				entitylist->InstallEntityFactory(pEntityFactory);
+				pEntityFactory = pEntityFactory->m_pNext;
+			}
+
 			centerprint = ( ICenterPrint * )g_ClientFactory( VCENTERPRINT_INTERFACE_VERSION, NULL );
 			if ( !centerprint )
 			{
@@ -1976,7 +1982,11 @@ void ClientDLL_Shutdown( void )
 	vgui::ivgui()->RunFrame();
 
 	g_pClientSidePrediction->Shutdown();
-
+	IEntityFactory* pEntityFactory = g_ClientDLL->GetAllEntityFactories();
+	while (pEntityFactory) {
+		entitylist->UninstallEntityFactory(pEntityFactory);
+		pEntityFactory = pEntityFactory->m_pNext;
+	}
 	g_pClientGameSaveRestoreBlockSet->RemoveBlockHandler(entitylist);
 	entitylist = NULL;
 	g_pClientSidePrediction = NULL;

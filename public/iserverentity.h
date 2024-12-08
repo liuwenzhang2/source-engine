@@ -716,6 +716,16 @@ public:
 abstract_class IServerEntityList : public IEntityList, public ISaveRestoreBlockHandler
 {
 public:
+	virtual void InstallEntityFactory(IEntityFactory* pFactory) = 0;
+	virtual void UninstallEntityFactory(IEntityFactory* pFactory) = 0;
+	virtual bool CanCreateEntityClass(const char* pClassName) = 0;
+	virtual const char* GetMapClassName(const char* pClassName) = 0;
+	virtual const char* GetDllClassName(const char* pClassName) = 0;
+	virtual size_t		GetEntitySize(const char* pClassName) = 0;
+	virtual const char* GetCannonicalName(const char* pClassName) = 0;
+	virtual void ReportEntitySizes() = 0;
+	virtual void DumpEntityFactories() = 0;
+
 	virtual void ReserveSlot(int index) = 0;
 	virtual int AllocateFreeSlot(bool bNetworkable = true, int index = -1) = 0;
 	virtual IServerEntity* CreateEntityByName(const char* className, int iForceEdictIndex = -1, int iSerialNum = -1) = 0;

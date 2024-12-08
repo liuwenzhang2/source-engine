@@ -564,7 +564,7 @@ void C_EntityDissolve::ClientThink( void )
 		//Adrian: I'll assume we don't need the ragdoll either so I'll remove that too.
 		if ( m_bLinkedToServerEnt == false )
 		{
-			DestroyEntity(this);//Release();
+			cl_entitylist->DestroyEntity(this);//Release();
 
 			C_ClientRagdoll *pRagdoll = dynamic_cast <C_ClientRagdoll *> ( pEnt );
 
@@ -575,7 +575,7 @@ void C_EntityDissolve::ClientThink( void )
 #ifdef TF_CLIENT_DLL
 			else
 			{
-				DestroyEntity(pEnt);// ->Release();
+				cl_entitylist->DestroyEntity(pEnt);// ->Release();
 			}
 #endif
 		}

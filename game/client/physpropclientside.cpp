@@ -189,12 +189,12 @@ void C_PhysPropClientside::DestroyAll()
 	while (s_PhysPropList.Count() > 0 )
 	{
 		C_PhysPropClientside *p = s_PhysPropList[0];
-		DestroyEntity(p);// ->Release();
+		cl_entitylist->DestroyEntity(p);// ->Release();
 	}
 	while (s_RespawnZoneList.Count() > 0)
 	{
 		C_FuncPhysicsRespawnZone *p = s_RespawnZoneList[0];
-		DestroyEntity(p);// ->Release();
+		cl_entitylist->DestroyEntity(p);// ->Release();
 	}
 }
 
@@ -423,7 +423,7 @@ void C_PhysPropClientside::ClientThink( void )
 
 	if ( m_fDeathTime <= gpGlobals->curtime )
 	{
-		DestroyEntity(this);//Release(); // Die
+		cl_entitylist->DestroyEntity(this);//Release(); // Die
 		return;
 	}
 
@@ -488,7 +488,7 @@ void C_PhysPropClientside::Break()
 	// spwan break chunks
 	PropBreakableCreateAll(GetEngineObject()->GetModelIndex(), pPhysics, params, this, -1, false );
 
-	DestroyEntity(this);// Release(); // destroy object
+	cl_entitylist->DestroyEntity(this);// Release(); // destroy object
 }
 
 void C_PhysPropClientside::Clone( Vector &velocity )
@@ -515,7 +515,7 @@ void C_PhysPropClientside::Clone( Vector &velocity )
 
 	if ( !pEntity->Initialize() )
 	{
-		DestroyEntity(pEntity);// ->Release();
+		cl_entitylist->DestroyEntity(pEntity);// ->Release();
 		return;
 	}
 
@@ -542,7 +542,7 @@ void C_PhysPropClientside::Clone( Vector &velocity )
 	else
 	{
 		// failed to create a physics object
-		DestroyEntity(pEntity);// ->Release();
+		cl_entitylist->DestroyEntity(pEntity);// ->Release();
 	}
 }
 
@@ -634,7 +634,7 @@ const char *C_PhysPropClientside::ParseEntity( const char *pEntData )
 			pEntity->GetEngineObject()->ParseMapData(&entData);
 			
 			if (!pEntity->Initialize())
-				DestroyEntity(pEntity);//->Release();
+				cl_entitylist->DestroyEntity(pEntity);//->Release();
 		
 			return entData.CurrentBufferPosition();
 		}
@@ -650,7 +650,7 @@ const char *C_PhysPropClientside::ParseEntity( const char *pEntData )
 			pEntity->GetEngineObject()->ParseMapData(&entData);
 
 			if (!pEntity->Initialize())
-				DestroyEntity(pEntity);// ->Release();
+				cl_entitylist->DestroyEntity(pEntity);// ->Release();
 
 			return entData.CurrentBufferPosition();
 		}
@@ -754,7 +754,7 @@ CBaseEntity *BreakModelCreateSingle( CBaseEntity *pOwner, breakmodel_t *pModel, 
 
 	if ( !pEntity->Initialize() )
 	{
-		DestroyEntity(pEntity);// ->Release();
+		cl_entitylist->DestroyEntity(pEntity);// ->Release();
 		return NULL;
 	}
 
@@ -809,7 +809,7 @@ CBaseEntity *BreakModelCreateSingle( CBaseEntity *pOwner, breakmodel_t *pModel, 
 	else
 	{
 		// failed to create a physics object
-		DestroyEntity(pEntity);// ->Release();
+		cl_entitylist->DestroyEntity(pEntity);// ->Release();
 		return NULL;
 	}
 
@@ -995,7 +995,7 @@ void C_FuncPhysicsRespawnZone::RespawnProps( void )
 
 				if ( !pEntity->Initialize() )
 				{
-					DestroyEntity(pEntity);// ->Release();
+					cl_entitylist->DestroyEntity(pEntity);// ->Release();
 				}
 				else
 				{

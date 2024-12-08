@@ -97,14 +97,14 @@ bool C_LowViolenceHostageDeathModel::SetupLowViolenceModel( C_CHostage *pHostage
 	const char *pModelName = modelinfo->GetModelName( model );
 	if ( InitializeAsClientEntity( pModelName, RENDER_GROUP_OPAQUE_ENTITY ) == false )
 	{
-		DestroyEntity(this);// Release();
+		cl_entitylist->DestroyEntity(this);// Release();
 		return false;
 	}
 
 	// Play the low-violence death anim
 	if ( LookupSequence( "death1" ) == -1 )
 	{
-		DestroyEntity(this); //Release();
+		cl_entitylist->DestroyEntity(this); //Release();
 		return false;
 	}
 
@@ -159,7 +159,7 @@ void C_LowViolenceHostageDeathModel::ClientThink( void )
 
 	if ( iAlpha == 0 )
 	{
-		DestroyEntity(this);//Release();
+		cl_entitylist->DestroyEntity(this);//Release();
 	}
 }
 

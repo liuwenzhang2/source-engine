@@ -166,7 +166,7 @@ bool C_BaseTempEntity::Init( int entnum, int iSerialNum )
 
 void C_BaseTempEntity::Release()
 {
-	DestroyEntity(this);
+	cl_entitylist->DestroyEntity(this);
 }
 
 

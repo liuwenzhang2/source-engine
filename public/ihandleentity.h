@@ -62,6 +62,7 @@ public:
 	virtual size_t GetEntitySize() = 0;
 	virtual int RequiredEdictIndex() = 0;
 	virtual bool IsNetworkable() = 0;
+	IEntityFactory* m_pNext = NULL;
 };
 
 // This is the glue that hooks .MAP entity class names to our CPP classes
@@ -69,6 +70,7 @@ abstract_class IEntityFactoryDictionary
 {
 public:
 	virtual void InstallFactory(IEntityFactory * pFactory) = 0;
+	virtual void UninstallFactory(IEntityFactory* pFactory) = 0;
 	virtual IHandleEntity* Create(IEntityList* pEntityList, const char* pClassName , int iForceEdictIndex, int iSerialNum, IEntityCallBack* pCallBack) = 0;
 	virtual void Destroy(IHandleEntity* pEntity) = 0;
 	virtual IEntityFactory* FindFactory(const char* pClassName) = 0;
@@ -79,9 +81,8 @@ public:
 	virtual bool IsNetworkable(const char* pClassName) = 0;
 	virtual const char* GetCannonicalName(const char* pClassName) = 0;
 	virtual void ReportEntitySizes() = 0;
+	virtual void DumpEntityFactories() = 0;
 };
-
-IEntityFactoryDictionary* EntityFactoryDictionary();
 
 abstract_class IEntityList
 {

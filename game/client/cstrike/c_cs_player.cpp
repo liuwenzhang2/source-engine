@@ -566,7 +566,7 @@ void C_CSRagdoll::OnDataChanged( DataUpdateType_t type )
 		// until the first render. 
 		if ( engine->IsPlayingDemo() && m_bCreatedWhilePlaybackSkipping )
 		{
-			DestroyEntity(this);//Release();
+			cl_entitylist->DestroyEntity(this);//Release();
 			return;
 		}
 
@@ -1076,7 +1076,7 @@ void C_CSPlayer::CreateAddonModel( int i )
 		if ( !weaponInfo )
 		{
 			Warning( "C_CSPlayer::CreateAddonModel: Unable to get weapon info.\n" );
-			DestroyEntity(pEnt);// ->Release();
+			cl_entitylist->DestroyEntity(pEnt);// ->Release();
 			return;
 		}
 		if ( weaponInfo->m_szAddonModel[0] == 0 )
@@ -1118,7 +1118,7 @@ void C_CSPlayer::CreateAddonModel( int i )
 		}
 		else
 		{
-			DestroyEntity(pEnt);// ->Release();
+			cl_entitylist->DestroyEntity(pEnt);// ->Release();
 			Warning( "C_CSPlayer::CreateAddonModel: Unable to get weapon info for %s.\n", pAddonInfo->m_pWeaponClassName );
 			return;
 		}
@@ -1188,7 +1188,7 @@ void C_CSPlayer::UpdateAddonModels()
 		if ( !( iCurAddonBits & addonBit ) || (rebuildPistol2Addon && addonBit == ADDON_PISTOL2) )
 		{
 			if (pModel->m_hEnt.Get())
-				DestroyEntity(pModel->m_hEnt);// ->Release();
+				cl_entitylist->DestroyEntity(pModel->m_hEnt);// ->Release();
 
 			m_AddonModels.Remove( i );
 		}

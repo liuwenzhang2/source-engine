@@ -914,6 +914,12 @@ void SV_InitGameDLL( void )
 
 	COM_TimestampedLog( "serverGameDLL->DLLInit" );
 
+	IEntityFactory* pEntityFactory = serverGameDLL->GetAllEntityFactories();
+	while (pEntityFactory) {
+		serverEntitylist->InstallEntityFactory(pEntityFactory);
+		pEntityFactory = pEntityFactory->m_pNext;
+	}
+
 #if !defined(SWDS)
 	g_pServerGameSaveRestoreBlockSet->AddBlockHandler(serverGameDLL);
 	g_pServerGameSaveRestoreBlockSet->AddBlockHandler(serverEntitylist);
@@ -985,6 +991,12 @@ void SV_ShutdownGameDLL( void )
 	if ( g_pReplay )
 	{
 		g_pReplay->SV_Shutdown();
+	}
+
+	IEntityFactory* pEntityFactory = serverGameDLL->GetAllEntityFactories();
+	while (pEntityFactory) {
+		serverEntitylist->UninstallEntityFactory(pEntityFactory);
+		pEntityFactory = pEntityFactory->m_pNext;
 	}
 
 	// Delete any extra SendTable copies we've attached to the game DLL's classes, if any.

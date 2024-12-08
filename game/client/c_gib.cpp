@@ -57,7 +57,7 @@ bool C_Gib::InitializeGib( const char *pszModelName, Vector vecOrigin, Vector ve
 {
 	if ( InitializeAsClientEntity( pszModelName, RENDER_GROUP_OPAQUE_ENTITY ) == false )
 	{
-		DestroyEntity(this);//Release();
+		cl_entitylist->DestroyEntity(this);//Release();
 		return false;
 	}
 
@@ -80,7 +80,7 @@ bool C_Gib::InitializeGib( const char *pszModelName, Vector vecOrigin, Vector ve
 	else
 	{
 		// failed to create a physics object
-		DestroyEntity(this);//Release();
+		cl_entitylist->DestroyEntity(this);//Release();
 		return false;
 	}
 
@@ -102,7 +102,7 @@ void C_Gib::ClientThink( void )
 #ifdef HL2_CLIENT_DLL
 		s_AntlionGibManager.RemoveGib( this );
 #endif
-		DestroyEntity(this);//Release();
+		cl_entitylist->DestroyEntity(this);//Release();
 		return;
 	}
 

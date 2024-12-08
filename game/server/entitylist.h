@@ -2258,6 +2258,17 @@ class CGlobalEntityList : public CBaseEntityList<T>, public IServerEntityList, p
 	friend class CEngineObjectInternal;
 	typedef CBaseEntityList<T> BaseClass;
 public:
+
+	virtual void InstallEntityFactory(IEntityFactory* pFactory);
+	virtual void UninstallEntityFactory(IEntityFactory* pFactory);
+	virtual bool CanCreateEntityClass(const char* pClassName);
+	virtual const char* GetMapClassName(const char* pClassName);
+	virtual const char* GetDllClassName(const char* pClassName);
+	virtual size_t		GetEntitySize(const char* pClassName);
+	virtual const char* GetCannonicalName(const char* pClassName);
+	virtual void ReportEntitySizes();
+	virtual void DumpEntityFactories();
+
 	virtual const char* GetBlockName();
 
 	virtual void PreSave(CSaveRestoreData* pSaveData);
@@ -2433,6 +2444,7 @@ protected:
 	int ComputeEntitySaveFlags(T* pEntity);
 
 private:
+	CEntityFactoryDictionary m_EntityFactoryDictionary;
 	int m_iHighestEnt; // the topmost used array index
 	int m_iNumEnts;
 	int m_iHighestEdicts;
@@ -2474,6 +2486,60 @@ private:
 	int m_iSimulatedRagdollCount;
 	int m_iRagdollCount;
 };
+
+template<class T>
+void CGlobalEntityList<T>::InstallEntityFactory(IEntityFactory* pFactory)
+{
+	m_EntityFactoryDictionary.InstallFactory(pFactory);
+}
+
+template<class T>
+void CGlobalEntityList<T>::UninstallEntityFactory(IEntityFactory* pFactory)
+{
+	m_EntityFactoryDictionary.UninstallFactory(pFactory);
+}
+
+template<class T>
+bool CGlobalEntityList<T>::CanCreateEntityClass(const char* pClassName)
+{
+	return m_EntityFactoryDictionary.FindFactory(pClassName) != NULL;
+}
+
+template<class T>
+const char* CGlobalEntityList<T>::GetMapClassName(const char* pClassName)
+{
+	return m_EntityFactoryDictionary.GetMapClassName(pClassName);
+}
+
+template<class T>
+const char* CGlobalEntityList<T>::GetDllClassName(const char* pClassName)
+{
+	return m_EntityFactoryDictionary.GetDllClassName(pClassName);
+}
+
+template<class T>
+size_t		CGlobalEntityList<T>::GetEntitySize(const char* pClassName)
+{
+	return m_EntityFactoryDictionary.GetEntitySize(pClassName);
+}
+
+template<class T>
+const char* CGlobalEntityList<T>::GetCannonicalName(const char* pClassName)
+{
+	return m_EntityFactoryDictionary.GetCannonicalName(pClassName);
+}
+
+template<class T>
+void CGlobalEntityList<T>::ReportEntitySizes()
+{
+	m_EntityFactoryDictionary.ReportEntitySizes();
+}
+
+template<class T>
+void CGlobalEntityList<T>::DumpEntityFactories()
+{
+	m_EntityFactoryDictionary.DumpEntityFactories();
+}
 
 template<class T>
 inline const char* CGlobalEntityList<T>::GetBlockName()
@@ -3540,15 +3606,15 @@ inline int CGlobalEntityList<T>::AllocateFreeSlot(bool bNetworkable, int index) 
 
 template<class T>
 inline CBaseEntity* CGlobalEntityList<T>::CreateEntityByName(const char* className, int iForceEdictIndex, int iSerialNum) {
-	if (EntityFactoryDictionary()->RequiredEdictIndex(className) != -1) {
-		iForceEdictIndex = EntityFactoryDictionary()->RequiredEdictIndex(className);
+	if (m_EntityFactoryDictionary.RequiredEdictIndex(className) != -1) {
+		iForceEdictIndex = m_EntityFactoryDictionary.RequiredEdictIndex(className);
 	}
-	iForceEdictIndex = BaseClass::AllocateFreeSlot(EntityFactoryDictionary()->IsNetworkable(className), iForceEdictIndex);
+	iForceEdictIndex = BaseClass::AllocateFreeSlot(m_EntityFactoryDictionary.IsNetworkable(className), iForceEdictIndex);
 	iSerialNum = BaseClass::GetNetworkSerialNumber(iForceEdictIndex);
 	if (m_EngineObjectArray[iForceEdictIndex]) {
 		Error("slot not free!");
 	}
-	IEntityFactory* pFactory = EntityFactoryDictionary()->FindFactory(className);
+	IEntityFactory* pFactory = m_EntityFactoryDictionary.FindFactory(className);
 	if (!pFactory)
 	{
 		Warning("Attempted to create unknown entity type %s!\n", className);
@@ -3582,12 +3648,12 @@ inline CBaseEntity* CGlobalEntityList<T>::CreateEntityByName(const char* classNa
 	default:
 		Error("GetEngineObjectType error!\n");
 	}
-	return (CBaseEntity*)EntityFactoryDictionary()->Create(this, className, iForceEdictIndex, iSerialNum, this);
+	return (CBaseEntity*)m_EntityFactoryDictionary.Create(this, className, iForceEdictIndex, iSerialNum, this);
 }
 
 template<class T>
 inline void	CGlobalEntityList<T>::DestroyEntity(IHandleEntity* pEntity) {
-	EntityFactoryDictionary()->Destroy(pEntity);
+	m_EntityFactoryDictionary.Destroy(pEntity);
 }
 
 //template<class T>

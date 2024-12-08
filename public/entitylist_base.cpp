@@ -11,39 +11,7 @@
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
-//-----------------------------------------------------------------------------
-// Entity creation factory
-//-----------------------------------------------------------------------------
-class CEntityFactoryDictionary : public IEntityFactoryDictionary
-{
-public:
-	CEntityFactoryDictionary();
-
-	virtual void InstallFactory(IEntityFactory* pFactory);
-	virtual IHandleEntity* Create(IEntityList* pEntityList, const char* pClassName, int iForceEdictIndex, int iSerialNum, IEntityCallBack* pCallBack);
-	virtual void Destroy(IHandleEntity* pEntity);
-	virtual const char* GetMapClassName(const char* pClassName);
-	virtual const char* GetDllClassName(const char* pClassName);
-	virtual size_t		GetEntitySize(const char* pClassName);
-	virtual int RequiredEdictIndex(const char* pClassName);
-	virtual bool IsNetworkable(const char* pClassName);
-	virtual const char* GetCannonicalName(const char* pClassName);
-	void ReportEntitySizes();
-
-private:
-	IEntityFactory* FindFactory(const char* pClassName);
-public:
-	CUtlDict< IEntityFactory*, unsigned short > m_Factories;
-};
-
-//-----------------------------------------------------------------------------
-// Singleton accessor
-//-----------------------------------------------------------------------------
-IEntityFactoryDictionary* EntityFactoryDictionary()
-{
-	static CEntityFactoryDictionary s_EntityFactory;
-	return &s_EntityFactory;
-}
+IEntityFactory* g_pEntityFactoryHead;
 
 //-----------------------------------------------------------------------------
 // Constructor
@@ -121,6 +89,15 @@ void CEntityFactoryDictionary::InstallFactory(IEntityFactory* pFactory)
 	}
 }
 
+void CEntityFactoryDictionary::UninstallFactory(IEntityFactory* pFactory)
+{
+	if (pFactory->GetMapClassName() && pFactory->GetMapClassName()[0]) {
+		m_Factories.Remove(pFactory->GetMapClassName());
+	}
+	if (pFactory->GetDllClassName() && pFactory->GetDllClassName()[0]) {
+		m_Factories.Remove(pFactory->GetDllClassName());
+	}
+}
 
 //-----------------------------------------------------------------------------
 // Instantiate something using a factory
@@ -220,5 +197,13 @@ void CEntityFactoryDictionary::ReportEntitySizes()
 	for (int i = m_Factories.First(); i != m_Factories.InvalidIndex(); i = m_Factories.Next(i))
 	{
 		Msg(" %s: %d", m_Factories.GetElementName(i), m_Factories[i]->GetEntitySize());
+	}
+}
+
+void CEntityFactoryDictionary::DumpEntityFactories()
+{
+	for (int i = m_Factories.First(); i != m_Factories.InvalidIndex(); i = m_Factories.Next(i))
+	{
+		Msg("%s\n", m_Factories.GetElementName(i));
 	}
 }

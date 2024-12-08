@@ -3761,7 +3761,7 @@ void CEngineObjectInternal::PhysicsDispatchThink(THINKPTR thinkFunc)
 {
 	VPROF_ENTER_SCOPE((!vprof_scope_entity_thinks.GetBool()) ?
 		"CBaseEntity::PhysicsDispatchThink" :
-		EntityFactoryDictionary()->GetCannonicalName(GetClassname()));
+		gEntList.GetCannonicalName(GetClassname()));
 
 	float thinkLimit = think_limit.GetFloat();
 

@@ -93,7 +93,7 @@ void C_PortalBlast::ClientThink( void )
 	if ( m_fCreationTime == 0.0f && m_fDeathTime == 0.0f )
 	{
 		// Die!
-		DestroyEntity(this);// Remove();
+		cl_entitylist->DestroyEntity(this);// Remove();
 		return;
 	}
 

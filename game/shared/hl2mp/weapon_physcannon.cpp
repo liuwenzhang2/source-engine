@@ -833,7 +833,7 @@ void CPlayerPickupController::Shutdown( bool bThrown )
 
 		m_pPlayer->m_Local.m_iHideHUD &= ~HIDEHUD_WEAPONSELECTION;
 	}
-	DestroyEntity(this);// Remove();
+	gEntList.DestroyEntity(this);// Remove();
 
 #endif
 	

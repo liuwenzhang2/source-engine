@@ -1140,7 +1140,7 @@ public:
 	{
 		if ( r_RainHack.GetInt() && g_pPrecipHackEnt )
 		{
-			DestroyEntity(g_pPrecipHackEnt);// ->Release();
+			cl_entitylist->DestroyEntity(g_pPrecipHackEnt);// ->Release();
 		}
 		m_bLevelInitted = false;
 	}
@@ -2217,7 +2217,7 @@ void SnowFallManagerDestroy( void )
 {
 	if ( s_pSnowFallMgr )
 	{
-		DestroyEntity(s_pSnowFallMgr);
+		cl_entitylist->DestroyEntity(s_pSnowFallMgr);
 		s_pSnowFallMgr = NULL;
 	}
 }

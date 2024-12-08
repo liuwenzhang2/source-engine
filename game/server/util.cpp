@@ -71,14 +71,7 @@ void DumpEntityFactories_f()
 	if ( !UTIL_IsCommandIssuedByServerAdmin() )
 		return;
 
-	//CEntityFactoryDictionary *dict = ( CEntityFactoryDictionary * )EntityFactoryDictionary();
-	//if ( dict )
-	//{
-	//	for ( int i = dict->m_Factories.First(); i != dict->m_Factories.InvalidIndex(); i = dict->m_Factories.Next( i ) )
-	//	{
-	//		Warning( "%s\n", dict->m_Factories.GetElementName( i ) );
-	//	}
-	//}
+	gEntList.DumpEntityFactories();
 }
 
 static ConCommand dumpentityfactories( "dumpentityfactories", DumpEntityFactories_f, "Lists all entity factory names.", FCVAR_GAMEDLL );
@@ -92,7 +85,7 @@ CON_COMMAND( dump_entity_sizes, "Print sizeof(entclass)" )
 	if ( !UTIL_IsCommandIssuedByServerAdmin() )
 		return;
 
-	EntityFactoryDictionary()->ReportEntitySizes();
+	gEntList.ReportEntitySizes();
 }
 
 //-----------------------------------------------------------------------------
@@ -439,7 +432,7 @@ void UTIL_RemoveImmediate( CBaseEntity *oldObj )
 	// Entities shouldn't reference other entities in their destructors
 	//  that type of code should only occur in an UpdateOnRemove call
 	gEntList.SetDisableEhandleAccess(true);
-	DestroyEntity(oldObj);
+	gEntList.DestroyEntity(oldObj);
 	gEntList.SetDisableEhandleAccess(false);
 
 #ifdef PORTAL
@@ -1766,10 +1759,7 @@ int DispatchSpawn( CBaseEntity *pEntity )
 		//pEntity->SetAbsMaxs( pEntity->GetOrigin() + Vector(1,1,1) );
 
 #if defined(TRACK_ENTITY_MEMORY) && defined(USE_MEM_DEBUG)
-		const char *pszClassname = NULL;
-		int iClassname = ((CEntityFactoryDictionary*)EntityFactoryDictionary())->m_Factories.Find( pEntity->GetClassname() );
-		if ( iClassname != ((CEntityFactoryDictionary*)EntityFactoryDictionary())->m_Factories.InvalidIndex() )
-			pszClassname = ((CEntityFactoryDictionary*)EntityFactoryDictionary())->m_Factories.GetElementName( iClassname );
+		const char *pszClassname = gEntList.GetCannonicalName(pEntity->GetClassname());
 		if ( pszClassname )
 		{
 			MemAlloc_PushAllocDbgInfo( pszClassname, __LINE__ );

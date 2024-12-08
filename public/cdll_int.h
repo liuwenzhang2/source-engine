@@ -631,6 +631,8 @@ public:
 	// Request a pointer to the list of client datatable classes
 	virtual ClientClass		*GetAllClasses( void ) = 0;
 
+	virtual IEntityFactory* GetAllEntityFactories( void ) = 0;
+
 	// Called once per level to re-initialize any hud element drawing stuff
 	virtual int				HudVidInit( void ) = 0;
 	// Called by the engine when gathering user input

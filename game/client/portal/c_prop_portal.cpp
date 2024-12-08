@@ -196,7 +196,7 @@ C_Prop_Portal::~C_Prop_Portal( void )
 
 	for( int i = m_GhostRenderables.Count(); --i >= 0; )
 	{
-		DestroyEntity((IHandleEntity*)m_GhostRenderables[i]);
+		cl_entitylist->DestroyEntity((IHandleEntity*)m_GhostRenderables[i]);
 	}
 	m_GhostRenderables.RemoveAll();
 }
@@ -270,7 +270,7 @@ void C_Prop_Portal::Simulate()
 		//remove all ghost renderables
 		for( int i = m_GhostRenderables.Count(); --i >= 0; )
 		{
-			DestroyEntity((IHandleEntity*)m_GhostRenderables[i]);
+			cl_entitylist->DestroyEntity((IHandleEntity*)m_GhostRenderables[i]);
 		}
 		
 		m_GhostRenderables.RemoveAll();
@@ -467,7 +467,7 @@ void C_Prop_Portal::Simulate()
 				}
 			}
 
-			DestroyEntity( pGhost);
+			cl_entitylist->DestroyEntity( pGhost);
 			m_GhostRenderables.FastRemove( i );
 		}
 	}

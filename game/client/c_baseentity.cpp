@@ -594,7 +594,7 @@ bool C_BaseEntity::InitializeAsClientEntityByIndex( int iIndex, RenderGroup_t re
 //-----------------------------------------------------------------------------
 void C_BaseEntity::Release()
 {
-	DestroyEntity(this);
+	cl_entitylist->DestroyEntity(this);
 }
 
 void C_BaseEntity::SetRemovalFlag( bool bRemove ) 
@@ -2606,7 +2606,7 @@ const char *C_BaseEntity::GetClassname( void )
 #ifndef NO_ENTITY_PREDICTION
 	if ( GetPredDescMap() )
 	{
-		const char *mapname =  GetEntityMapClassName( GetPredDescMap()->dataClassName );
+		const char *mapname =  ClientEntityList().GetMapClassName( GetPredDescMap()->dataClassName );
 		if ( mapname && mapname[ 0 ] ) 
 		{
 			Q_strncpy( outstr, mapname, sizeof( outstr ) );
@@ -2654,7 +2654,7 @@ CON_COMMAND( cl_sizeof, "Determines the size of the specified client class." )
 		return;
 	}
 
-	int size = GetEntitySize( args[ 1 ] );
+	int size = ClientEntityList().GetEntitySize( args[ 1 ] );
 
 	Msg( "%s is %i bytes\n", args[ 1 ], size );
 }

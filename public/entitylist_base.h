@@ -1057,10 +1057,36 @@ extern CBaseEntityList<C_BaseEntity>* g_pEntityList;
 extern CBaseEntityList<CBaseEntity>* g_pEntityList;
 #endif // GAME_DLL
 
-inline bool CanCreateEntityClass(const char* pszClassname)
+//-----------------------------------------------------------------------------
+// Entity creation factory
+//-----------------------------------------------------------------------------
+class CEntityFactoryDictionary : public IEntityFactoryDictionary
 {
-	return (EntityFactoryDictionary() != NULL && EntityFactoryDictionary()->FindFactory(pszClassname) != NULL);
-}
+public:
+	CEntityFactoryDictionary();
+
+	virtual void InstallFactory(IEntityFactory* pFactory);
+	virtual void UninstallFactory(IEntityFactory* pFactory);
+	virtual IHandleEntity* Create(IEntityList* pEntityList, const char* pClassName, int iForceEdictIndex, int iSerialNum, IEntityCallBack* pCallBack);
+	virtual void Destroy(IHandleEntity* pEntity);
+	virtual const char* GetMapClassName(const char* pClassName);
+	virtual const char* GetDllClassName(const char* pClassName);
+	virtual size_t		GetEntitySize(const char* pClassName);
+	virtual int RequiredEdictIndex(const char* pClassName);
+	virtual bool IsNetworkable(const char* pClassName);
+	virtual const char* GetCannonicalName(const char* pClassName);
+	void ReportEntitySizes();
+	void DumpEntityFactories();
+
+	IEntityFactory* FindFactory(const char* pClassName);
+public:
+	CUtlDict< IEntityFactory*, unsigned short > m_Factories;
+};
+
+//inline bool CanCreateEntityClass(const char* pszClassname)
+//{
+//	return (EntityFactoryDictionary() != NULL && EntityFactoryDictionary()->FindFactory(pszClassname) != NULL);
+//}
 
 //#ifdef CLIENT_DLL
 //inline C_BaseEntity* CreateEntityByName2(const char* className, int iForceEdictIndex = -1, int iSerialNum = -1)
@@ -1075,24 +1101,24 @@ inline bool CanCreateEntityClass(const char* pszClassname)
 //}
 //#endif // GAME_DLL
 
-inline const char* GetEntityMapClassName(const char* className)
-{
-	return EntityFactoryDictionary()->GetMapClassName(className);
-}
+//inline const char* GetEntityMapClassName(const char* className)
+//{
+//	return EntityFactoryDictionary()->GetMapClassName(className);
+//}
 
-inline const char* GetEntityDllClassName(const char* className)
-{
-	return EntityFactoryDictionary()->GetDllClassName(className);
-}
+//inline const char* GetEntityDllClassName(const char* className)
+//{
+//	return EntityFactoryDictionary()->GetDllClassName(className);
+//}
 
-inline size_t GetEntitySize(const char* className)
-{
-	return EntityFactoryDictionary()->GetEntitySize(className);
-}
+//inline size_t GetEntitySize(const char* className)
+//{
+//	return EntityFactoryDictionary()->GetEntitySize(className);
+//}
 
-inline void DestroyEntity(IHandleEntity* pEntity) {
-	EntityFactoryDictionary()->Destroy(pEntity);
-}
+//inline void DestroyEntity(IHandleEntity* pEntity) {
+//	EntityFactoryDictionary()->Destroy(pEntity);
+//}
 
 
 #include "tier0/memdbgon.h"
@@ -1115,6 +1141,8 @@ inline void DestroyEntity(IHandleEntity* pEntity) {
 //#define CREATE_UNSAVED_ENTITY( newClass, className ) _CreateEntityTemplate( (newClass*)NULL, className, -1, -1 )
 
 #include "tier0/memdbgoff.h"
+
+extern IEntityFactory* g_pEntityFactoryHead;
 
 template <class T>
 class CEntityFactory : public IEntityFactory
@@ -1170,7 +1198,37 @@ public:
 		}
 		m_pMapClassName = pMapClassName;
 		m_pDllClassName = pDllClassName;
-		EntityFactoryDictionary()->InstallFactory(this);
+		//EntityFactoryDictionary()->InstallFactory(this);
+		if (!g_pEntityFactoryHead)
+		{
+			g_pEntityFactoryHead = this;
+			m_pNext = NULL;
+		}
+		else
+		{
+			IEntityFactory* p1 = g_pEntityFactoryHead;
+			IEntityFactory* p2 = p1->m_pNext;
+
+			// use _stricmp because Q_stricmp isn't hooked up properly yet
+			if (_stricmp(p1->GetDllClassName(), m_pDllClassName) > 0)
+			{
+				m_pNext = g_pEntityFactoryHead;
+				g_pEntityFactoryHead = this;
+				p1 = NULL;
+			}
+
+			while (p1)
+			{
+				if (p2 == NULL || _stricmp(p2->GetDllClassName(), m_pDllClassName) > 0)
+				{
+					m_pNext = p2;
+					p1->m_pNext = this;
+					break;
+				}
+				p1 = p2;
+				p2 = p2->m_pNext;
+			}
+		}
 	}
 
 	IHandleEntity* Create(IEntityList* pEntityList, int iForceEdictIndex, int iSerialNum, IEntityCallBack* pCallBack)
@@ -1194,6 +1252,9 @@ public:
 
 	void Destroy(IHandleEntity* pEntity)
 	{
+		if (pEntity->GetEntityFactory() != this) {
+			Error("not created by Me!");
+		}
 		CEntityProxy* pEntityProxy = (CEntityProxy*)pEntity;
 		if (!pEntityProxy)
 		{

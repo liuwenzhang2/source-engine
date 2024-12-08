@@ -484,7 +484,7 @@ void UTIL_PrecacheOther( const char *szClassname )
 	}
 
 	// Bye bye
-	DestroyEntity(pEntity);// ->Release();
+	cl_entitylist->DestroyEntity(pEntity);// ->Release();
 }
 
 static csurface_t	g_NullSurface = { "**empty**", 0 };

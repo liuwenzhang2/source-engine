@@ -537,6 +537,7 @@ public:
 	virtual void					LevelShutdown( void );
 
 	virtual ClientClass				*GetAllClasses( void );
+	virtual IEntityFactory*			GetAllEntityFactories(void);
 
 	virtual int						HudVidInit( void );
 	virtual void					HudProcessInput( bool bActive );
@@ -1406,6 +1407,11 @@ bool CHLClient::ShouldDrawDropdownConsole()
 ClientClass *CHLClient::GetAllClasses( void )
 {
 	return g_pClientClassHead;
+}
+
+IEntityFactory* CHLClient::GetAllEntityFactories(void)
+{
+	return g_pEntityFactoryHead;
 }
 
 //-----------------------------------------------------------------------------

@@ -115,7 +115,7 @@ void C_HL1Gib::ClientThink( void )
 
 	if ( m_clrRender->a == 5 )
 	{
-		DestroyEntity(this);//Release();
+		cl_entitylist->DestroyEntity(this);//Release();
 		return;
 	}
 

@@ -334,7 +334,7 @@ void CPrediction::ShutdownPredictables( void )
 		// Otherwise, release client created entities
 		else
 		{
-			DestroyEntity(ent);// ->Release();
+			cl_entitylist->DestroyEntity(ent);// ->Release();
 			release_count++;
 		}
 	}

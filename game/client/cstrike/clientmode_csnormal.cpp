@@ -473,7 +473,7 @@ void ClientModeCSNormal::FireGameEvent( IGameEvent *event )
 			// double-check that the EHANDLE is still valid
 			if ( g_HostageRagdolls[i] )
 			{
-				DestroyEntity(g_HostageRagdolls[i]);// ->Release();
+				cl_entitylist->DestroyEntity(g_HostageRagdolls[i]);// ->Release();
 			}
 		}
 		g_HostageRagdolls.RemoveAll();
@@ -738,14 +738,14 @@ void RemoveClassImageEntity()
 	C_BaseAnimating *pEnt = g_ClassImagePlayer;
 	if ( pEnt )
 	{
-		DestroyEntity(pEnt);// ->Remove();
+		cl_entitylist->DestroyEntity(pEnt);// ->Remove();
 		g_ClassImagePlayer = NULL;
 	}
 
 	pEnt = g_ClassImageWeapon;
 	if ( pEnt )
 	{
-		DestroyEntity(pEnt);// ->Remove();
+		cl_entitylist->DestroyEntity(pEnt);// ->Remove();
 		g_ClassImageWeapon = NULL;
 	}
 }
@@ -818,7 +818,7 @@ void UpdateClassImageEntity(
 	if ( recreatePlayer )
 	{
 		if (pPlayerModel)
-			DestroyEntity(pPlayerModel);// ->Remove();
+			cl_entitylist->DestroyEntity(pPlayerModel);// ->Remove();
 
 		pPlayerModel = (C_BaseAnimatingOverlay*)cl_entitylist->CreateEntityByName( "C_BaseAnimatingOverlay" );
 		pPlayerModel->InitializeAsClientEntity( pModelName, RENDER_GROUP_OPAQUE_ENTITY );
@@ -842,7 +842,7 @@ void UpdateClassImageEntity(
 	if ( recreatePlayer || ShouldRecreateClassImageEntity( pWeaponModel, pWeaponName ) )
 	{
 		if (pWeaponModel)
-			DestroyEntity(pWeaponModel);// ->Remove();
+			cl_entitylist->DestroyEntity(pWeaponModel);// ->Remove();
 
 		pWeaponModel = (C_BaseAnimating*)cl_entitylist->CreateEntityByName( "C_BaseAnimating" );
 		pWeaponModel->InitializeAsClientEntity( pWeaponName, RENDER_GROUP_OPAQUE_ENTITY );
