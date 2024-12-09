@@ -1121,7 +1121,7 @@ int CHLClient::Init( CreateInterfaceFn appSystemFactory, CreateInterfaceFn physi
 		GetClientVoiceMgr()->Init( &g_VoiceStatusHelper, parent );
 	}
 
-	if ( !PhysicsDLLInit( physicsFactory ) )
+	if ( !ClientEntityList().Init() )
 		return false;
 
 	//engine->AddBlockHandler( GetEntitySaveRestoreBlockHandler() );
@@ -1244,6 +1244,7 @@ void CHLClient::Shutdown( void )
 #endif
 
 	ClientEntityList().ShutdownBoneSetupThreadPool();
+	ClientEntityList().Shutdown();
 	//ClientWorldFactoryShutdown();
 
 	engine->RemoveBlockHandler( GetViewEffectsRestoreBlockHandler() );
@@ -1371,7 +1372,7 @@ void CHLClient::HudUpdate( bool bActive )
 void CHLClient::HudReset( void )
 {
 	gHUD.VidInit();
-	PhysicsReset();
+	ClientEntityList().PhysicsReset();
 }
 
 //-----------------------------------------------------------------------------
@@ -1673,6 +1674,7 @@ void CHLClient::LevelInitPreEntity( char const* pMapName )
 	tempents->LevelInit();
 	ResetToneMapping(1.0);
 
+	ClientEntityList().LevelInitPreEntity();
 	IGameSystem::LevelInitPreEntityAllSystems(pMapName);
 
 #ifdef USES_ECON_ITEMS
@@ -1726,6 +1728,7 @@ void CHLClient::LevelInitPreEntity( char const* pMapName )
 void CHLClient::LevelInitPostEntity( )
 {
 	IGameSystem::LevelInitPostEntityAllSystems();
+	ClientEntityList().LevelInitPostEntity();
 	C_PhysPropClientside::RecreateAll();
 	internalCenterPrint->Clear();
 }
@@ -1765,6 +1768,7 @@ void CHLClient::LevelShutdown( void )
 
 	// Level shutdown sequence.
 	// First do the pre-entity shutdown of all systems
+	ClientEntityList().LevelShutdownPreEntity();
 	IGameSystem::LevelShutdownPreEntityAllSystems();
 
 	C_PhysPropClientside::DestroyAll();
@@ -1787,6 +1791,7 @@ void CHLClient::LevelShutdown( void )
 
 	// Now do the post-entity shutdown of all systems
 	IGameSystem::LevelShutdownPostEntityAllSystems();
+	ClientEntityList().LevelShutdownPostEntity();
 
 	view->LevelShutdown();
 	beams->ClearBeams();
@@ -2248,7 +2253,7 @@ void OnRenderStart()
 
 	// Simulate all the entities.
 	SimulateEntities();
-	PhysicsSimulate();
+	ClientEntityList().PhysicsSimulate();
 
 	ClientEntityList().ThreadedBoneSetup();
 

@@ -2911,7 +2911,7 @@ void C_BaseAnimating::GetRagdollInitBoneArrays( matrix3x4_t *pDeltaBones0, matri
 {
 	ForceSetupBonesAtTime( pDeltaBones0, gpGlobals->curtime - boneDt );
 	ForceSetupBonesAtTime( pDeltaBones1, gpGlobals->curtime );
-	float ragdollCreateTime = PhysGetSyncCreateTime();
+	float ragdollCreateTime = ClientEntityList().PhysGetSyncCreateTime();
 	if ( ragdollCreateTime != gpGlobals->curtime )
 	{
 		// The next simulation frame begins before the end of this frame

@@ -329,7 +329,7 @@ C_DODRagdoll::C_DODRagdoll()
 
 C_DODRagdoll::~C_DODRagdoll()
 {
-	PhysCleanupFrictionSounds( this );
+	ClientEntityList().PhysCleanupFrictionSounds( this );
 }
 
 void C_DODRagdoll::Interp_Copy( C_BaseAnimatingOverlay *pSourceEntity )

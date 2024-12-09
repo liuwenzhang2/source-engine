@@ -923,12 +923,12 @@ void CPhysHinge::Spawn( void )
 		if ( m_nameAttach1 == NULL_STRING )
 		{
 			params.SnapToAxis( m_nameAttach2, m_hinge.worldPosition, m_hinge.worldAxisDirection );
-			PhysSetMassCenterOverride( params );
+			gEntList.PhysSetMassCenterOverride( params );
 		}
 		else if ( m_nameAttach2 == NULL_STRING )
 		{
 			params.SnapToAxis( m_nameAttach1, m_hinge.worldPosition, m_hinge.worldAxisDirection );
-			PhysSetMassCenterOverride( params );
+			gEntList.PhysSetMassCenterOverride( params );
 		}
 		else
 		{

@@ -209,7 +209,7 @@ void C_PhysPropClientside::UpdateOnRemove(void)
 	{
 		m_pRespawnZone->PropDestroyed(this);
 	}
-	PhysCleanupFrictionSounds(this);
+	ClientEntityList().PhysCleanupFrictionSounds(this);
 	GetEngineObject()->VPhysicsDestroyObject();
 	s_PhysPropList.FindAndRemove(this);
 

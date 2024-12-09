@@ -11,6 +11,12 @@
 #pragma once
 #endif
 
+#ifdef CLIENT_DLL
+#include "c_recipientfilter.h"
+#endif // CLIENT_DLL
+#ifdef GAME_DLL
+#include "recipientfilter.h"
+#endif // GAME_DLL
 #include "SoundEmitterSystem/isoundemittersystembase.h"
 
 namespace physicssound
@@ -37,7 +43,7 @@ namespace physicssound
 		void RemoveAll() { elements.RemoveAll(); }
 	};
 
-	void PlayImpactSounds( soundlist_t &list )
+	inline void PlayImpactSounds( soundlist_t &list )
 	{
 		for ( int i = list.Count()-1; i >= 0; --i )
 		{
@@ -79,7 +85,7 @@ namespace physicssound
 		}
 		list.RemoveAll();
 	}
-	void AddImpactSound( soundlist_t &list, void *pGameData, int entityIndex, int soundChannel, IPhysicsObject *pObject, int surfaceProps, int surfacePropsHit, float volume, float impactSpeed )
+	inline void AddImpactSound( soundlist_t &list, void *pGameData, int entityIndex, int soundChannel, IPhysicsObject *pObject, int surfaceProps, int surfacePropsHit, float volume, float impactSpeed )
 	{
 		impactSpeed += 1e-4;
 		for ( int i = list.Count()-1; i >= 0; --i )
@@ -123,7 +129,7 @@ namespace physicssound
 		int				surfacePropsBreak;
 	};
 
-	void AddBreakSound( CUtlVector<breaksound_t> &list, const Vector &origin, unsigned short surfaceProps )
+	inline void AddBreakSound( CUtlVector<breaksound_t> &list, const Vector &origin, unsigned short surfaceProps )
 	{
 		const surfacedata_t *psurf = physprops->GetSurfaceData( surfaceProps );
 		if ( !psurf->sounds.breakSound )
@@ -146,7 +152,7 @@ namespace physicssound
 
 	}
 
-	void PlayBreakSounds( CUtlVector<breaksound_t> &list )
+	inline void PlayBreakSounds( CUtlVector<breaksound_t> &list )
 	{
 		for ( int i = list.Count()-1; i >= 0; --i )
 		{

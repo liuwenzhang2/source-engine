@@ -2608,7 +2608,7 @@ void C_BasePlayer::GetRagdollInitBoneArrays( matrix3x4_t *pDeltaBones0, matrix3x
 	}
 	ForceSetupBonesAtTimeFakeInterpolation( pDeltaBones0, -boneDt );
 	ForceSetupBonesAtTimeFakeInterpolation( pDeltaBones1, 0 );
-	float ragdollCreateTime = PhysGetSyncCreateTime();
+	float ragdollCreateTime = ClientEntityList().PhysGetSyncCreateTime();
 	if ( ragdollCreateTime != gpGlobals->curtime )
 	{
 		ForceSetupBonesAtTimeFakeInterpolation( pCurrentBones, ragdollCreateTime - gpGlobals->curtime );

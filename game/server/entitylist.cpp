@@ -117,6 +117,7 @@ ConVar g_ragdoll_maxcount("g_ragdoll_maxcount", "4", FCVAR_REPLICATED);
 ConVar g_ragdoll_maxcount("g_ragdoll_maxcount", "8", FCVAR_REPLICATED);
 #endif
 ConVar g_debug_ragdoll_removal("g_debug_ragdoll_removal", "0", FCVAR_REPLICATED | FCVAR_CHEAT);
+ConVar sv_fullsyncclones("sv_fullsyncclones", "1", FCVAR_CHEAT);
 
 //-----------------------------------------------------------------------------
 // Portal-specific hack designed to eliminate re-entrancy in touch functions
@@ -3104,8 +3105,7 @@ void CEngineObjectInternal::CollisionRulesChanged()
 	// that can change the state that a collision filter will return (like m_Solid) needs to call RecheckCollisionFilter.
 	if (VPhysicsGetObject())
 	{
-		extern bool PhysIsInCallback();
-		if (PhysIsInCallback())
+		if (gEntList.PhysIsInCallback())
 		{
 			Warning("Changing collision rules within a callback is likely to cause crashes!\n");
 			Assert(0);
@@ -5465,6 +5465,11 @@ void CEngineObjectInternal::ActiveRagdoll()
 {
 	//RagdollActivate(*GetEngineObject()->GetRagdoll(), modelinfo->GetVCollide(GetEngineObject()->GetModelIndex()), GetEngineObject()->GetModelIndex());
 	RagdollActivate(m_ragdoll, modelinfo->GetVCollide(GetModelIndex()), GetModelIndex());
+}
+
+void CEngineObjectInternal::ApplyAnimationAsVelocityToRagdoll(const matrix3x4_t* pPrevBones, const matrix3x4_t* pCurrentBones, float dt)
+{
+	RagdollApplyAnimationAsVelocity(m_ragdoll, pPrevBones, pCurrentBones, dt);
 }
 
 void CEngineObjectInternal::DrawRawSkeleton(matrix3x4_t boneToWorld[], int boneMask, bool noDepthTest, float duration, bool monocolor)

@@ -149,7 +149,7 @@ void C_AI_BaseNPC::GetRagdollInitBoneArrays( matrix3x4_t *pDeltaBones0, matrix3x
 {
 	ForceSetupBonesAtTime( pDeltaBones0, gpGlobals->curtime - boneDt );
 	GetRagdollCurSequenceWithDeathPose( this, pDeltaBones1, gpGlobals->curtime, m_iDeathPose, m_iDeathFrame );
-	float ragdollCreateTime = PhysGetSyncCreateTime();
+	float ragdollCreateTime = ClientEntityList().PhysGetSyncCreateTime();
 	if ( ragdollCreateTime != gpGlobals->curtime )
 	{
 		// The next simulation frame begins before the end of this frame

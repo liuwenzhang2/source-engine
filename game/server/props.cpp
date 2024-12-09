@@ -1681,7 +1681,7 @@ void CBreakableProp::Break( CBaseEntity *pBreaker, const CTakeDamageInfo &info )
 		angles = GetEngineObject()->GetAbsAngles();
 	}
 
-	PhysBreakSound( this, GetEngineObject()->VPhysicsGetObject(), GetEngineObject()->GetAbsOrigin() );
+	gEntList.PhysBreakSound( this, GetEngineObject()->VPhysicsGetObject(), GetEngineObject()->GetAbsOrigin() );
 
 	bool bExploded = false;
 
@@ -2606,7 +2606,7 @@ bool CPhysicsProp::CreateVPhysics()
 			tmpSolid.params.inertia = 0.5;
 	}
 
-	PhysGetMassCenterOverride( this, modelinfo->GetVCollide(GetEngineObject()->GetModelIndex() ), tmpSolid );
+	gEntList.PhysGetMassCenterOverride( this, modelinfo->GetVCollide(GetEngineObject()->GetModelIndex() ), tmpSolid );
 	if (GetEngineObject()->HasSpawnFlags(SF_PHYSPROP_NO_COLLISIONS) )
 	{
 		tmpSolid.params.enableCollisions = false;
@@ -5828,7 +5828,7 @@ void CPhysicsPropRespawnable::Event_Killed( const CTakeDamageInfo &info )
 
 	Break( info.GetInflictor(), info );
 
-	PhysCleanupFrictionSounds( this );
+	gEntList.PhysCleanupFrictionSounds( this );
 
 	GetEngineObject()->VPhysicsDestroyObject();
 

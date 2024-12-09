@@ -515,7 +515,7 @@ bool CPhysBox::CreateVPhysics()
 	}
 
 	vcollide_t *pVCollide = modelinfo->GetVCollide(GetEngineObject()->GetModelIndex() );
-	PhysGetMassCenterOverride( this, pVCollide, tmpSolid );
+	gEntList.PhysGetMassCenterOverride( this, pVCollide, tmpSolid );
 	PhysSolidOverride( tmpSolid, m_iszOverrideScript );
 	if ( tmpSolid.params.rotdamping < 1.0f && ShouldDampRotation(pVCollide->solids[0]) )
 	{
@@ -1914,7 +1914,7 @@ public:
 		{
 			masscenteroverride_t params;
 			params.SnapToPoint( m_target, GetEngineObject()->GetAbsOrigin() );
-			PhysSetMassCenterOverride( params );
+			gEntList.PhysSetMassCenterOverride( params );
 			gEntList.DestroyEntity( this );
 		}
 	}

@@ -505,7 +505,7 @@ void CGrabController::AttachEntity( CBasePlayer *pPlayer, CBaseEntity *pEntity, 
 	// play the impact sound of the object hitting the player
 	// used as feedback to let the player know he picked up the object
 #ifndef CLIENT_DLL
-	PhysicsImpactSound( pPlayer, pPhys, CHAN_STATIC, pPhys->GetMaterialIndex(), pPlayer->GetEngineObject()->VPhysicsGetObject()->GetMaterialIndex(), 1.0, 64 );
+	gEntList.PhysicsImpactSound( pPlayer, pPhys, CHAN_STATIC, pPhys->GetMaterialIndex(), pPlayer->GetEngineObject()->VPhysicsGetObject()->GetMaterialIndex(), 1.0, 64 );
 #endif
 	Vector position;
 	QAngle angles;

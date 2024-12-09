@@ -844,7 +844,7 @@ bool CServerGameDLL::DLLInit( CreateInterfaceFn appSystemFactory,
 	IGameSystem::Add( GameStringSystem() );
 
 	// Physics must occur before the sound envelope manager
-	IGameSystem::Add( PhysicsGameSystem() );
+	//IGameSystem::Add( PhysicsGameSystem() );
 	
 	// Used to service deferred navigation queries for NPCs
 	IGameSystem::Add( (IGameSystem *) PostFrameNavigationSystem() );
@@ -903,6 +903,10 @@ bool CServerGameDLL::DLLInit( CreateInterfaceFn appSystemFactory,
 	g_pClosecaption = cvar->FindVar("closecaption");
 	Assert(g_pClosecaption);
 
+	if (!gEntList.Init()) {
+		return false;
+	}
+
 	gEntList.AddDataAccessor(TOUCHLINK, new CEntityDataInstantiator<CBaseEntity, servertouchlink_t >);
 	gEntList.AddDataAccessor(GROUNDLINK, new CEntityDataInstantiator<CBaseEntity, servergroundlink_t >);
 	gEntList.AddDataAccessor(STEPSIMULATION, new CEntityDataInstantiator<CBaseEntity, StepSimulationData >);
@@ -930,7 +934,7 @@ void CServerGameDLL::DLLShutdown( void )
 	gEntList.RemoveDataAccessor(PHYSICSPUSHLIST);
 	gEntList.RemoveDataAccessor(VPHYSICSUPDATEAI);
 	gEntList.RemoveDataAccessor(VPHYSICSWATCHER);
-
+	gEntList.Shutdown();
 	// Due to dependencies, these are not autogamesystems
 	ModelSoundsCacheShutdown();
 
@@ -1260,6 +1264,7 @@ void CServerGameDLL::ServerActivate( IServerEntity *pEdictList, int edictCount, 
 	}
 
 	IGameSystem::LevelInitPostEntityAllSystems();
+	gEntList.LevelInitPostEntity();
 	// No more precaching after PostEntityAllSystems!!!
 	engine->SetAllowPrecache( false );//CBaseEntity::
 
@@ -1382,7 +1387,7 @@ void CServerGameDLL::GameFrame( bool simulating )
 	g_pServerBenchmark->UpdateBenchmark();
 
 	Physics_RunThinkFunctions( simulating );
-	
+	gEntList.FrameUpdatePostEntityThink();
 	IGameSystem::FrameUpdatePostEntityThinkAllSystems();
 
 	// UNDONE: Make these systems IGameSystems and move these calls into FrameUpdatePostEntityThink()
@@ -1444,6 +1449,7 @@ void CServerGameDLL::PreClientUpdate( bool simulating )
 	DrawAllDebugOverlays();
 //#endif
 	
+	gEntList.PreClientUpdate();
 	IGameSystem::PreClientUpdateAllSystems();
 
 #ifdef _DEBUG
@@ -1519,6 +1525,7 @@ void CServerGameDLL::LevelShutdown( void )
 	g_pServerBenchmark->EndBenchmark();
 
 	MDLCACHE_CRITICAL_SECTION();
+	gEntList.LevelShutdownPreEntity();
 	IGameSystem::LevelShutdownPreEntityAllSystems();
 	engine->GlobalEntity_EnableStateUpdates(false);
 
@@ -1531,6 +1538,7 @@ void CServerGameDLL::LevelShutdown( void )
 	InvalidateQueryCache();
 
 	IGameSystem::LevelShutdownPostEntityAllSystems();
+	gEntList.LevelShutdownPostEntity();
 	engine->GlobalEntity_EnableStateUpdates(true);
 
 	// In case we quit out during initial load

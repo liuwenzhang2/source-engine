@@ -3643,8 +3643,7 @@ void C_EngineObjectInternal::CollisionRulesChanged()
 	// that can change the state that a collision filter will return (like m_Solid) needs to call RecheckCollisionFilter.
 	if (VPhysicsGetObject())
 	{
-		extern bool PhysIsInCallback();
-		if (PhysIsInCallback())
+		if (ClientEntityList().PhysIsInCallback())
 		{
 			Warning("Changing collision rules within a callback is likely to cause crashes!\n");
 			Assert(0);

@@ -33,6 +33,21 @@
 #include "debugoverlay_shared.h"
 #include "physics.h"
 #include "bone_accessor.h"
+#include "init_factory.h"
+#include "vphysics/performance.h"
+#include "physics_collisionevent.h"
+#include "movevars_shared.h"
+#include "physics_saverestore.h"
+#include "vphysics_sound.h"
+#include "engine/IEngineSound.h"
+#include "coordsize.h"
+#ifdef PORTAL
+#include "portal_physics_collisionevent.h"
+#include "physicsshadowclone.h"
+//#include "PortalSimulation.h"
+#include "prop_portal.h"
+//void PortalPhysFrame(float deltaTime); //small wrapper for PhysFrame that simulates all 3 environments at once
+#endif
 
 //class CBaseEntity;
 // We can only ever move 512 entities across a transition
@@ -796,6 +811,7 @@ public:
 	ragdoll_t* GetRagdoll(void) { return &m_ragdoll; }
 	virtual bool IsRagdoll() const;
 	void ActiveRagdoll();
+	void ApplyAnimationAsVelocityToRagdoll(const matrix3x4_t* pPrevBones, const matrix3x4_t* pCurrentBones, float dt);
 
 	unsigned char GetRenderFX() const { return m_nRenderFX; }
 	void SetRenderFX(unsigned char nRenderFX) { m_nRenderFX = nRenderFX; }
@@ -2250,6 +2266,28 @@ private:
 extern bool ShouldRemoveThisRagdoll(CBaseEntity* pRagdoll);
 
 //-----------------------------------------------------------------------------
+// Purpose: Simple object for storing a list of objects
+//-----------------------------------------------------------------------------
+struct entitem_t
+{
+	EHANDLE hEnt;
+	struct entitem_t* pNext;
+
+	// uses pool memory
+	static void* operator new(size_t stAllocateBlock);
+	static void* operator new(size_t stAllocateBlock, int nBlockUse, const char* pFileName, int nLine);
+	static void operator delete(void* pMem);
+	static void operator delete(void* pMem, int nBlockUse, const char* pFileName, int nLine) { operator delete(pMem); }
+};
+
+struct vehiclescript_t
+{
+	string_t scriptName;
+	vehicleparams_t params;
+	vehiclesounds_t sounds;
+};
+
+//-----------------------------------------------------------------------------
 // Purpose: a global list of all the entities in the game.  All iteration through
 //			entities is done through this object.
 //-----------------------------------------------------------------------------
@@ -2259,6 +2297,20 @@ class CGlobalEntityList : public CBaseEntityList<T>, public IServerEntityList, p
 	friend class CEngineObjectInternal;
 	typedef CBaseEntityList<T> BaseClass;
 public:
+
+	virtual bool Init();
+	virtual void Shutdown();
+
+	// Level init, shutdown
+	virtual void LevelInitPreEntity();
+	virtual void LevelInitPostEntity();
+
+	// The level is shutdown in two parts
+	virtual void LevelShutdownPreEntity();
+
+	virtual void LevelShutdownPostEntity();
+
+	virtual void FrameUpdatePostEntityThink();
 
 	virtual void InstallEntityFactory(IEntityFactory* pFactory);
 	virtual void UninstallEntityFactory(IEntityFactory* pFactory);
@@ -2411,6 +2463,135 @@ public:
 	void SetMaxRagdollCount(int iMaxCount) { m_iMaxRagdolls = iMaxCount; }
 	int CountRagdolls(bool bOnlySimulatingRagdolls) { return bOnlySimulatingRagdolls ? m_iSimulatedRagdollCount : m_iRagdollCount; }
 	virtual void UpdateRagdolls(float frametime);
+
+	bool FindOrAddVehicleScript(const char* pScriptName, vehicleparams_t* pVehicle, vehiclesounds_t* pSounds);
+	void FlushVehicleScripts()
+	{
+		m_vehicleScripts.RemoveAll();
+	}
+
+	bool ShouldSimulate()
+	{
+		return (physenv && !m_bPaused) ? true : false;
+	}
+
+	// returns true when processing a callback - so we can defer things that can't be done inside a callback
+	bool PhysIsInCallback()
+	{
+		if ((physenv && physenv->IsInSimulation()) || g_Collisions.IsInCallback())
+			return true;
+
+		return false;
+	}
+
+	bool PhysIsPaused(){
+		return m_bPaused;
+	}
+	bool PhysIsFinalTick() {
+		return m_isFinalTick;
+	}
+
+	virtual void PreClientUpdate();
+
+#ifdef PORTAL
+	void PortalPhysFrame(float deltaTime);
+#endif // PORTAL
+	void PhysFrame(float deltaTime);
+
+	//-----------------------------------------------------------------------------
+// External interface to collision sounds
+//-----------------------------------------------------------------------------
+
+	void PhysicsImpactSound(CBaseEntity* pEntity, IPhysicsObject* pPhysObject, int channel, int surfaceProps, int surfacePropsHit, float volume, float impactSpeed)
+	{
+		physicssound::AddImpactSound(m_impactSounds, pEntity, pEntity->entindex(), channel, pPhysObject, surfaceProps, surfacePropsHit, volume, impactSpeed);
+	}
+
+	void PhysCollisionSound(CBaseEntity* pEntity, IPhysicsObject* pPhysObject, int channel, int surfaceProps, int surfacePropsHit, float deltaTime, float speed)
+	{
+		if (deltaTime < 0.05f || speed < 70.0f)
+			return;
+
+		float volume = speed * speed * (1.0f / (320.0f * 320.0f));	// max volume at 320 in/s
+		if (volume > 1.0f)
+			volume = 1.0f;
+
+		PhysicsImpactSound(pEntity, pPhysObject, channel, surfaceProps, surfacePropsHit, volume, speed);
+	}
+
+	void PhysBreakSound(CBaseEntity* pEntity, IPhysicsObject* pPhysObject, Vector vecOrigin)
+	{
+		if (!pPhysObject)
+			return;
+
+		physicssound::AddBreakSound(m_breakSounds, vecOrigin, pPhysObject->GetMaterialIndex());
+	}
+
+	void PhysCleanupFrictionSounds(IHandleEntity* pEntity)
+	{
+		friction_t* pFriction = g_Collisions.FindFriction((CBaseEntity*)pEntity);
+		if (pFriction && pFriction->patch)
+		{
+			g_Collisions.ShutdownFriction(*pFriction);
+		}
+	}
+
+	void PhysSetMassCenterOverride(masscenteroverride_t & override)
+	{
+		if (override.entityName != NULL_STRING)
+		{
+			m_massCenterOverrides.AddToTail(override);
+		}
+	}
+
+	// NOTE: This will remove the entry from the list as well
+	int PhysGetMassCenterOverrideIndex(string_t name)
+	{
+		if (name != NULL_STRING && m_massCenterOverrides.Count())
+		{
+			for (int i = 0; i < m_massCenterOverrides.Count(); i++)
+			{
+				if (m_massCenterOverrides[i].entityName == name)
+				{
+					return i;
+				}
+			}
+		}
+		return -1;
+	}
+
+	void PhysGetMassCenterOverride(CBaseEntity* pEntity, vcollide_t* pCollide, solid_t& solidOut)
+	{
+		int index = PhysGetMassCenterOverrideIndex(pEntity->GetEntityName());
+
+		if (index >= 0)
+		{
+			masscenteroverride_t & override = m_massCenterOverrides[index];
+			Vector massCenterWS = override.center;
+			switch (override.alignType)
+			{
+			case masscenteroverride_t::ALIGN_POINT:
+				VectorITransform(massCenterWS, pEntity->GetEngineObject()->EntityToWorldTransform(), solidOut.massCenterOverride);
+				break;
+			case masscenteroverride_t::ALIGN_AXIS:
+			{
+				Vector massCenterLocal, defaultMassCenterWS;
+				physcollision->CollideGetMassCenter(pCollide->solids[solidOut.index], &massCenterLocal);
+				VectorTransform(massCenterLocal, pEntity->GetEngineObject()->EntityToWorldTransform(), defaultMassCenterWS);
+				massCenterWS += override.axis *
+					(DotProduct(defaultMassCenterWS, override.axis) - DotProduct(override.axis, override.center));
+				VectorITransform(massCenterWS, pEntity->GetEngineObject()->EntityToWorldTransform(), solidOut.massCenterOverride);
+			}
+			break;
+			}
+			m_massCenterOverrides.FastRemove(index);
+
+			if (solidOut.massCenterOverride.Length() > DIST_EPSILON)
+			{
+				solidOut.params.massCenterOverride = &solidOut.massCenterOverride;
+			}
+		}
+	}
 protected:
 	virtual void AfterCreated(IHandleEntity* pEntity);
 	virtual void BeforeDestroy(IHandleEntity* pEntity);
@@ -2493,7 +2674,314 @@ private:
 	int m_iSimulatedRagdollCount;
 	int m_iRagdollCount;
 	int m_DestroyImmediateSemaphore = 0;
+
+	bool		m_isFinalTick;
+	float		m_impactSoundTime;
+	CUtlVector<vehiclescript_t>			m_vehicleScripts;
+	bool		m_bPaused;
+	// local variables
+	float g_PhysAverageSimTime;
+	physicssound::soundlist_t m_impactSounds;
+	CUtlVector<physicssound::breaksound_t> m_breakSounds;
+	CUtlVector<masscenteroverride_t>	m_massCenterOverrides;
+
 };
+
+template<class T>
+bool CGlobalEntityList<T>::Init()
+{
+	factorylist_t factories;
+
+	// Get the list of interface factories to extract the physics DLL's factory
+	FactoryList_Retrieve(factories);
+
+	if (!factories.physicsFactory)
+		return false;
+
+	if ((physics = (IPhysics*)factories.physicsFactory(VPHYSICS_INTERFACE_VERSION, NULL)) == NULL ||
+		(physcollision = (IPhysicsCollision*)factories.physicsFactory(VPHYSICS_COLLISION_INTERFACE_VERSION, NULL)) == NULL ||
+		(physprops = (IPhysicsSurfaceProps*)factories.physicsFactory(VPHYSICS_SURFACEPROPS_INTERFACE_VERSION, NULL)) == NULL
+		)
+		return false;
+
+	PhysParseSurfaceData(physprops, filesystem);
+
+	m_isFinalTick = true;
+	m_impactSoundTime = 0;
+	m_vehicleScripts.EnsureCapacity(4);
+}
+
+template<class T>
+void CGlobalEntityList<T>::Shutdown()
+{
+	
+}
+
+// defined in phys_constraint
+extern IPhysicsConstraintEvent* g_pConstraintEvents;
+extern void PrecachePhysicsSounds(void);
+inline IPhysicsObject* PhysCreateWorld(CBaseEntity* pWorld)
+{
+	staticpropmgr->CreateVPhysicsRepresentations(physenv, g_pSolidSetup, pWorld);
+	return PhysCreateWorld_Shared(pWorld, modelinfo->GetVCollide(1), g_PhysDefaultObjectParams);
+}
+// Level init, shutdown
+template<class T>
+void CGlobalEntityList<T>::LevelInitPreEntity()
+{
+	physenv = physics->CreateEnvironment();
+	physics_performanceparams_t params;
+	params.Defaults();
+	params.maxCollisionsPerObjectPerTimestep = 10;
+	physenv->SetPerformanceSettings(&params);
+
+#ifdef PORTAL
+	physenv_main = physenv;
+#endif
+	{
+		g_EntityCollisionHash = physics->CreateObjectPairHash();
+	}
+	factorylist_t factories;
+	FactoryList_Retrieve(factories);
+	physenv->SetDebugOverlay(factories.engineFactory);
+	physenv->EnableDeleteQueue(true);
+
+	IPhysicsCollisionSolver* const g_pCollisionSolver = &g_Collisions;
+	IPhysicsCollisionEvent* const g_pCollisionEventHandler = &g_Collisions;
+	IPhysicsObjectEvent* const g_pObjectEventHandler = &g_Collisions;
+
+	physenv->SetCollisionSolver(&g_Collisions);
+	physenv->SetCollisionEventHandler(&g_Collisions);
+	physenv->SetConstraintEventHandler(g_pConstraintEvents);
+	physenv->EnableConstraintNotify(true); // callback when an object gets deleted that is attached to a constraint
+
+	physenv->SetObjectEventHandler(&g_Collisions);
+
+	physenv->SetSimulationTimestep(gpGlobals->interval_per_tick); // 15 ms per tick
+	// HL Game gravity, not real-world gravity
+	physenv->SetGravity(Vector(0, 0, -GetCurrentGravity()));
+	g_PhysAverageSimTime = 0;
+
+	g_PhysWorldObject = PhysCreateWorld(GetBaseEntity(0));
+
+	g_pShadowEntities = new CEntityList;
+#ifdef PORTAL
+	g_pShadowEntities_Main = g_pShadowEntities;
+#endif
+
+	PrecachePhysicsSounds();
+
+	m_bPaused = true;
+}
+
+template<class T>
+void CGlobalEntityList<T>::LevelInitPostEntity()
+{
+	m_bPaused = false;
+}
+
+// The level is shutdown in two parts
+template<class T>
+void CGlobalEntityList<T>::LevelShutdownPreEntity()
+{
+	if (!physenv)
+		return;
+	physenv->SetQuickDelete(true);
+}
+
+template<class T>
+void CGlobalEntityList<T>::LevelShutdownPostEntity()
+{
+	if (!physenv)
+		return;
+
+	g_pPhysSaveRestoreManager->ForgetAllModels();
+
+	g_Collisions.LevelShutdown();
+
+	physics->DestroyEnvironment(physenv);
+	physenv = NULL;
+
+	physics->DestroyObjectPairHash(g_EntityCollisionHash);
+	g_EntityCollisionHash = NULL;
+
+	physics->DestroyAllCollisionSets();
+
+	g_PhysWorldObject = NULL;
+
+	delete g_pShadowEntities;
+	g_pShadowEntities = NULL;
+	m_impactSounds.RemoveAll();
+	m_breakSounds.RemoveAll();
+	m_massCenterOverrides.Purge();
+	FlushVehicleScripts();
+}
+
+#ifdef PORTAL
+extern ConVar sv_fullsyncclones;
+template<class T>
+void CGlobalEntityList<T>::PortalPhysFrame(float deltaTime) //small wrapper for PhysFrame that simulates all environments at once
+{
+	CProp_Portal::PrePhysFrame();
+
+	if (sv_fullsyncclones.GetBool())
+		CPhysicsShadowClone::FullSyncAllClones();
+
+	g_Collisions.BufferTouchEvents(true);
+
+	PhysFrame(deltaTime);
+
+	g_Collisions.PortalPostSimulationFrame();
+
+	g_Collisions.BufferTouchEvents(false);
+	g_Collisions.FrameUpdate();
+
+	CProp_Portal::PostPhysFrame();
+}
+#endif
+
+#ifdef PORTAL
+extern CPortal_CollisionEvent g_Collisions;
+#else
+extern CCollisionEvent g_Collisions;
+#endif
+extern ConVar phys_speeds;
+// Advance physics by time (in seconds)
+template<class T>
+void CGlobalEntityList<T>::PhysFrame(float deltaTime)
+{
+	static int lastObjectCount = 0;
+	entitem_t* pItem;
+
+	if (!ShouldSimulate())
+		return;
+
+	// Trap interrupts and clock changes
+	if (deltaTime > 1.0f || deltaTime < 0.0f)
+	{
+		deltaTime = 0;
+		Msg("Reset physics clock\n");
+	}
+	else if (deltaTime > 0.1f)	// limit incoming time to 100ms
+	{
+		deltaTime = 0.1f;
+	}
+	float simRealTime = 0;
+
+	deltaTime *= phys_timescale.GetFloat();
+	// !!!HACKHACK -- hard limit scaled time to avoid spending too much time in here
+	// Limit to 100 ms
+	if (deltaTime > 0.100f)
+		deltaTime = 0.100f;
+
+	bool bProfile = phys_speeds.GetBool();
+
+	if (bProfile)
+	{
+		simRealTime = engine->Time();
+	}
+
+#ifdef _DEBUG
+	physenv->DebugCheckContacts();
+#endif
+
+#ifndef PORTAL //instead of wrapping 1 simulation with this, portal needs to wrap 3
+	g_Collisions.BufferTouchEvents(true);
+#endif
+
+	physenv->Simulate(deltaTime);
+
+	int activeCount = physenv->GetActiveObjectCount();
+	IPhysicsObject** pActiveList = NULL;
+	if (activeCount)
+	{
+		pActiveList = (IPhysicsObject**)stackalloc(sizeof(IPhysicsObject*) * activeCount);
+		physenv->GetActiveObjects(pActiveList);
+
+		for (int i = 0; i < activeCount; i++)
+		{
+			CBaseEntity* pEntity = reinterpret_cast<CBaseEntity*>(pActiveList[i]->GetGameData());
+			if (pEntity)
+			{
+				if (pEntity->GetEngineObject()->DoesVPhysicsInvalidateSurroundingBox())
+				{
+					pEntity->GetEngineObject()->MarkSurroundingBoundsDirty();
+				}
+				pEntity->GetEngineObject()->VPhysicsUpdate(pActiveList[i]);
+			}
+		}
+		stackfree(pActiveList);
+	}
+
+	for (pItem = g_pShadowEntities->m_pItemList; pItem; pItem = pItem->pNext)
+	{
+		CBaseEntity* pEntity = pItem->hEnt.Get();
+		if (!pEntity)
+		{
+			Msg("Dangling pointer to physics entity!!!\n");
+			continue;
+		}
+
+		IPhysicsObject* pPhysics = pEntity->GetEngineObject()->VPhysicsGetObject();
+		// apply updates
+		if (pPhysics && !pPhysics->IsAsleep())
+		{
+			pEntity->VPhysicsShadowUpdate(pPhysics);
+		}
+	}
+
+	if (bProfile)
+	{
+		simRealTime = engine->Time() - simRealTime;
+
+		if (simRealTime < 0)
+			simRealTime = 0;
+		g_PhysAverageSimTime *= 0.8;
+		g_PhysAverageSimTime += (simRealTime * 0.2);
+		if (lastObjectCount != 0 || activeCount != 0)
+		{
+			Msg("Physics: %3d objects, %4.1fms / AVG: %4.1fms\n", activeCount, simRealTime * 1000, g_PhysAverageSimTime * 1000);
+		}
+
+		lastObjectCount = activeCount;
+	}
+
+#ifndef PORTAL //instead of wrapping 1 simulation with this, portal needs to wrap 3
+	g_Collisions.BufferTouchEvents(false);
+	g_Collisions.FrameUpdate();
+#endif
+}
+
+template<class T>
+void CGlobalEntityList<T>::FrameUpdatePostEntityThink()
+{
+	VPROF_BUDGET("CPhysicsHook::FrameUpdatePostEntityThink", VPROF_BUDGETGROUP_PHYSICS);
+
+	// Tracker 24846:  If game is paused, don't simulate vphysics
+	float interval = (gpGlobals->frametime > 0.0f) ? TICK_INTERVAL : 0.0f;
+
+	// update the physics simulation, not we don't use gpGlobals->frametime, since that can be 30 msec or 15 msec
+	// depending on whether IsSimulatingOnAlternateTicks is true or not
+	if (IsSimulatingOnAlternateTicks())
+	{
+		m_isFinalTick = false;
+
+#ifdef PORTAL //slight detour if we're the portal mod
+		PortalPhysFrame(interval);
+#else
+		PhysFrame(interval);
+#endif
+
+	}
+	m_isFinalTick = true;
+
+#ifdef PORTAL //slight detour if we're the portal mod
+	PortalPhysFrame(interval);
+#else
+	PhysFrame(interval);
+#endif
+
+}
 
 template<class T>
 void CGlobalEntityList<T>::InstallEntityFactory(IEntityFactory* pFactory)
@@ -5080,6 +5568,87 @@ void CGlobalEntityList<T>::UpdateRagdolls(float frametime) // Non-episodic versi
 
 #endif // HL2_EPISODIC
 
+template<class T>
+bool CGlobalEntityList<T>::FindOrAddVehicleScript(const char* pScriptName, vehicleparams_t* pVehicle, vehiclesounds_t* pSounds)
+{
+	bool bLoadedSounds = false;
+	int index = -1;
+	for (int i = 0; i < m_vehicleScripts.Count(); i++)
+	{
+		if (!Q_stricmp(m_vehicleScripts[i].scriptName.ToCStr(), pScriptName))
+		{
+			index = i;
+			bLoadedSounds = true;
+			break;
+		}
+	}
+
+	if (index < 0)
+	{
+		byte* pFile = UTIL_LoadFileForMe(pScriptName, NULL);
+		if (pFile)
+		{
+			// new script, parse it and write to the table
+			index = m_vehicleScripts.AddToTail();
+			m_vehicleScripts[index].scriptName = AllocPooledString(pScriptName);
+			m_vehicleScripts[index].sounds.Init();
+
+			IVPhysicsKeyParser* pParse = physcollision->VPhysicsKeyParserCreate((char*)pFile);
+			while (!pParse->Finished())
+			{
+				const char* pBlock = pParse->GetCurrentBlockName();
+				if (!strcmpi(pBlock, "vehicle"))
+				{
+					pParse->ParseVehicle(&m_vehicleScripts[index].params, NULL);
+				}
+				else if (!Q_stricmp(pBlock, "vehicle_sounds"))
+				{
+					bLoadedSounds = true;
+					CVehicleSoundsParser soundParser;
+					pParse->ParseCustom(&m_vehicleScripts[index].sounds, &soundParser);
+				}
+				else
+				{
+					pParse->SkipBlock();
+				}
+			}
+			physcollision->VPhysicsKeyParserDestroy(pParse);
+			UTIL_FreeFile(pFile);
+		}
+	}
+
+	if (index >= 0)
+	{
+		if (pVehicle)
+		{
+			*pVehicle = m_vehicleScripts[index].params;
+		}
+		if (pSounds)
+		{
+			// We must pass back valid data here!
+			if (bLoadedSounds == false)
+				return false;
+
+			*pSounds = m_vehicleScripts[index].sounds;
+		}
+		return true;
+	}
+
+	return false;
+}
+
+template<class T>
+void CGlobalEntityList<T>::PreClientUpdate()
+{
+	m_impactSoundTime += gpGlobals->frametime;
+	if (m_impactSoundTime > 0.05f)
+	{
+		physicssound::PlayImpactSounds(m_impactSounds);
+		m_impactSoundTime = 0.0f;
+		physicssound::PlayBreakSounds(m_breakSounds);
+	}
+}
+
 extern CGlobalEntityList<CBaseEntity> gEntList;
 
 inline CGlobalEntityList<CBaseEntity>& ServerEntityList()
@@ -5137,20 +5706,7 @@ inline bool FindEntityByName<CAI_BaseNPC>( const char *pszName, CAI_BaseNPC **pp
 	return ( *ppResult != NULL );
 }
 #endif
-//-----------------------------------------------------------------------------
-// Purpose: Simple object for storing a list of objects
-//-----------------------------------------------------------------------------
-struct entitem_t
-{
-	EHANDLE hEnt;
-	struct entitem_t *pNext;
 
-	// uses pool memory
-	static void* operator new( size_t stAllocateBlock );
-	static void *operator new( size_t stAllocateBlock, int nBlockUse, const char *pFileName, int nLine );
-	static void operator delete( void *pMem );
-	static void operator delete( void *pMem, int nBlockUse, const char *pFileName, int nLine ) { operator delete( pMem ); }
-};
 
 class CEntityList
 {

@@ -1023,7 +1023,7 @@ void CPropCombineBall::DoExplosion( )
 	if (GetEngineObject()->GetMoveType() == MOVETYPE_NONE )
 		return;
 
-	if ( PhysIsInCallback() )
+	if (gEntList.PhysIsInCallback() )
 	{
 		g_PostSimulationQueue.QueueCall( this, &CPropCombineBall::DoExplosion );
 		return;

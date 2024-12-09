@@ -38,9 +38,9 @@ extern IPhysicsGameTrace	*physgametrace;
 class IPhysicsCollisionSolver;
 class IPhysicsCollisionEvent;
 class IPhysicsObjectEvent;
-extern IPhysicsCollisionSolver * const g_pCollisionSolver;
-extern IPhysicsCollisionEvent * const g_pCollisionEventHandler;
-extern IPhysicsObjectEvent * const g_pObjectEventHandler;
+//extern IPhysicsCollisionSolver * const g_pCollisionSolver;
+//extern IPhysicsCollisionEvent * const g_pCollisionEventHandler;
+//extern IPhysicsObjectEvent * const g_pObjectEventHandler;
 
 // HACKHACK: We treat anything >= 500kg as a special "large mass" that does more impact damage
 // and has special recovery on crushing/killing other objects
@@ -97,16 +97,16 @@ bool PhysHasShadow( CBaseEntity *pEntity );
 
 void PhysEnableFloating( IPhysicsObject *pObject, bool bEnable );
 
-void PhysCollisionSound( CBaseEntity *pEntity, IPhysicsObject *pPhysObject, int channel, int surfaceProps, int surfacePropsHit, float deltaTime, float speed );
+//void PhysCollisionSound( CBaseEntity *pEntity, IPhysicsObject *pPhysObject, int channel, int surfaceProps, int surfacePropsHit, float deltaTime, float speed );
 void PhysCollisionScreenShake( gamevcollisionevent_t *pEvent, int index );
 void PhysCollisionDust( gamevcollisionevent_t *pEvent, surfacedata_t *phit );
 #if HL2_EPISODIC
 void PhysCollisionWarpEffect( gamevcollisionevent_t *pEvent, surfacedata_t *phit );
 #endif
-void PhysBreakSound( CBaseEntity *pEntity, IPhysicsObject *pPhysObject, Vector vecOrigin );
+//void PhysBreakSound( CBaseEntity *pEntity, IPhysicsObject *pPhysObject, Vector vecOrigin );
 
 // plays the impact sound for a particular material
-void PhysicsImpactSound( CBaseEntity *pEntity, IPhysicsObject *pPhysObject, int channel, int surfaceProps, int surfacePropsHit, float volume, float impactSpeed );
+//void PhysicsImpactSound( CBaseEntity *pEntity, IPhysicsObject *pPhysObject, int channel, int surfaceProps, int surfacePropsHit, float volume, float impactSpeed );
 
 void PhysCallbackDamage( CBaseEntity *pEntity, const CTakeDamageInfo &info );
 void PhysCallbackDamage( CBaseEntity *pEntity, const CTakeDamageInfo &info, gamevcollisionevent_t &event, int hurtIndex );
@@ -130,10 +130,6 @@ void PhysTeleportConstrainedEntity( CBaseEntity *pTeleportSource, IPhysicsObject
 
 void PhysGetListOfPenetratingEntities( CBaseEntity *pSearch, CUtlVector<CBaseEntity *> &list );
 bool PhysShouldCollide( IPhysicsObject *pObj0, IPhysicsObject *pObj1 );
-
-// returns true when processing a callback - so we can defer things that can't be done inside a callback
-bool PhysIsInCallback();
-bool PhysIsFinalTick();
 
 bool PhysGetTriggerEvent( triggerevent_t *pEvent, CBaseEntity *pTrigger );
 // note: pErrorEntity is used to report errors (object not found, more than one found).  It can be NULL
@@ -179,9 +175,9 @@ struct masscenteroverride_t
 	string_t	entityName;
 };
 
-void PhysSetMassCenterOverride( masscenteroverride_t &override );
+//void PhysSetMassCenterOverride( masscenteroverride_t &override );
 // NOTE: this removes the entry from the table as well as retrieving it
-void PhysGetMassCenterOverride( CBaseEntity *pEntity, vcollide_t *pCollide, solid_t &solidOut );
+//void PhysGetMassCenterOverride( CBaseEntity *pEntity, vcollide_t *pCollide, solid_t &solidOut );
 float PhysGetEntityMass( CBaseEntity *pEntity );
 void PhysSetEntityGameFlags( CBaseEntity *pEntity, unsigned short flags );
 

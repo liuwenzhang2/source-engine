@@ -263,7 +263,7 @@ C_CSRagdoll::C_CSRagdoll()
 
 C_CSRagdoll::~C_CSRagdoll()
 {
-	PhysCleanupFrictionSounds( this );
+	ClientEntityList().PhysCleanupFrictionSounds( this );
 }
 
 void C_CSRagdoll::GetRagdollInitBoneArrays( matrix3x4_t *pDeltaBones0, matrix3x4_t *pDeltaBones1, matrix3x4_t *pCurrentBones, float boneDt )

@@ -50,33 +50,21 @@
 #include "physicsshadowclone.h"
 #include "PortalSimulation.h"
 #include "prop_portal.h"
-void PortalPhysFrame( float deltaTime ); //small wrapper for PhysFrame that simulates all 3 environments at once
 #endif
-
-void PrecachePhysicsSounds( void );
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
 ConVar phys_speeds( "phys_speeds", "0" );
 
-// defined in phys_constraint
-extern IPhysicsConstraintEvent *g_pConstraintEvents;
-
-
 CEntityList *g_pShadowEntities = NULL;
 #ifdef PORTAL
 CEntityList *g_pShadowEntities_Main = NULL;
 #endif
 
-// local variables
-static float g_PhysAverageSimTime;
+
 CCallQueue g_PostSimulationQueue;
 
-
-// local routines
-static IPhysicsObject *PhysCreateWorld( CBaseEntity *pWorld );
-static void PhysFrame( float deltaTime );
 static bool IsDebris( int collisionGroup );
 
 void TimescaleChanged( IConVar *var, const char *pOldString, float flOldValue )
@@ -98,94 +86,6 @@ ConVar phys_dontprintint( "phys_dontprintint", "1", FCVAR_NONE, "Don't print int
 #else
 	CCollisionEvent g_Collisions;
 #endif
-
-
-IPhysicsCollisionSolver * const g_pCollisionSolver = &g_Collisions;
-IPhysicsCollisionEvent * const g_pCollisionEventHandler = &g_Collisions;
-IPhysicsObjectEvent * const g_pObjectEventHandler = &g_Collisions;
-
-
-struct vehiclescript_t
-{
-	string_t scriptName;
-	vehicleparams_t params;
-	vehiclesounds_t sounds;
-};
-
-class CPhysicsHook : public CBaseGameSystemPerFrame
-{
-public:
-	virtual const char *Name() { return "CPhysicsHook"; }
-
-	virtual bool Init();
-	virtual void LevelInitPreEntity();
-	virtual void LevelInitPostEntity();
-	virtual void LevelShutdownPreEntity();
-	virtual void LevelShutdownPostEntity();
-	virtual void FrameUpdatePostEntityThink();
-	virtual void PreClientUpdate();
-
-	bool FindOrAddVehicleScript( const char *pScriptName, vehicleparams_t *pVehicle, vehiclesounds_t *pSounds );
-	void FlushVehicleScripts()
-	{
-		m_vehicleScripts.RemoveAll();
-	}
-
-	bool ShouldSimulate()
-	{
-		return (physenv && !m_bPaused) ? true : false;
-	}
-
-	physicssound::soundlist_t m_impactSounds;
-	CUtlVector<physicssound::breaksound_t> m_breakSounds;
-
-	CUtlVector<masscenteroverride_t>	m_massCenterOverrides;
-	CUtlVector<vehiclescript_t>			m_vehicleScripts;
-
-	float		m_impactSoundTime;
-	bool		m_bPaused;
-	bool		m_isFinalTick;
-};
-
-
-CPhysicsHook	g_PhysicsHook;
-
-//-----------------------------------------------------------------------------
-// Singleton access
-//-----------------------------------------------------------------------------
-IGameSystem* PhysicsGameSystem()
-{
-	return &g_PhysicsHook;
-}
-
-
-//-----------------------------------------------------------------------------
-// Purpose: The physics hook callback implementations
-//-----------------------------------------------------------------------------
-bool CPhysicsHook::Init( void )
-{
-	factorylist_t factories;
-	
-	// Get the list of interface factories to extract the physics DLL's factory
-	FactoryList_Retrieve( factories );
-
-	if ( !factories.physicsFactory )
-		return false;
-
-	if ((physics = (IPhysics *)factories.physicsFactory( VPHYSICS_INTERFACE_VERSION, NULL )) == NULL ||
-		(physcollision = (IPhysicsCollision *)factories.physicsFactory( VPHYSICS_COLLISION_INTERFACE_VERSION, NULL )) == NULL ||
-		(physprops = (IPhysicsSurfaceProps *)factories.physicsFactory( VPHYSICS_SURFACEPROPS_INTERFACE_VERSION, NULL )) == NULL
-		)
-		return false;
-
-	PhysParseSurfaceData( physprops, filesystem );
-
-	m_isFinalTick = true;
-	m_impactSoundTime = 0;
-	m_vehicleScripts.EnsureCapacity(4);
-	return true;
-}
-
 
 // a little debug wrapper to help fix bugs when entity pointers get trashed
 #if 0
@@ -216,213 +116,6 @@ const char *PhysCheck( IPhysicsObject *pPhys )
 	return "unknown";
 }
 #endif
-
-void CPhysicsHook::LevelInitPreEntity() 
-{
-	physenv = physics->CreateEnvironment();
-	physics_performanceparams_t params;
-	params.Defaults();
-	params.maxCollisionsPerObjectPerTimestep = 10;
-	physenv->SetPerformanceSettings( &params );
-
-#ifdef PORTAL
-	physenv_main = physenv;
-#endif
-	{
-	g_EntityCollisionHash = physics->CreateObjectPairHash();
-	}
-	factorylist_t factories;
-	FactoryList_Retrieve( factories );
-	physenv->SetDebugOverlay( factories.engineFactory );
-	physenv->EnableDeleteQueue( true );
-
-	physenv->SetCollisionSolver( &g_Collisions );
-	physenv->SetCollisionEventHandler( &g_Collisions );
-	physenv->SetConstraintEventHandler( g_pConstraintEvents );
-	physenv->EnableConstraintNotify( true ); // callback when an object gets deleted that is attached to a constraint
-
-	physenv->SetObjectEventHandler( &g_Collisions );
-
-	physenv->SetSimulationTimestep( gpGlobals->interval_per_tick ); // 15 ms per tick
-	// HL Game gravity, not real-world gravity
-	physenv->SetGravity( Vector( 0, 0, -GetCurrentGravity() ) );
-	g_PhysAverageSimTime = 0;
-
-	g_PhysWorldObject = PhysCreateWorld( GetWorldEntity() );
-
-	g_pShadowEntities = new CEntityList;
-#ifdef PORTAL
-	g_pShadowEntities_Main  = g_pShadowEntities;
-#endif
-
-	PrecachePhysicsSounds();
-
-	m_bPaused = true;
-}
-
-
-
-void CPhysicsHook::LevelInitPostEntity() 
-{
-	m_bPaused = false;
-}
-
-void CPhysicsHook::LevelShutdownPreEntity() 
-{
-	if ( !physenv )
-		return;
-	physenv->SetQuickDelete( true );
-}
-
-void CPhysicsHook::LevelShutdownPostEntity() 
-{
-	if ( !physenv )
-		return;
-
-	g_pPhysSaveRestoreManager->ForgetAllModels();
-
-	g_Collisions.LevelShutdown();
-
-	physics->DestroyEnvironment( physenv );
-	physenv = NULL;
-
-	physics->DestroyObjectPairHash( g_EntityCollisionHash );
-	g_EntityCollisionHash = NULL;
-
-	physics->DestroyAllCollisionSets();
-
-	g_PhysWorldObject = NULL;
-
-	delete g_pShadowEntities;
-	g_pShadowEntities = NULL;
-	m_impactSounds.RemoveAll();
-	m_breakSounds.RemoveAll();
-	m_massCenterOverrides.Purge();
-	FlushVehicleScripts();
-}
-
-
-bool CPhysicsHook::FindOrAddVehicleScript( const char *pScriptName, vehicleparams_t *pVehicle, vehiclesounds_t *pSounds )
-{
-	bool bLoadedSounds = false;
-	int index = -1;
-	for ( int i = 0; i < m_vehicleScripts.Count(); i++ )
-	{
-		if ( !Q_stricmp(m_vehicleScripts[i].scriptName.ToCStr(), pScriptName) )
-		{
-			index = i;
-			bLoadedSounds = true;
-			break;
-		}
-	}
-
-	if ( index < 0 )
-	{
-		byte *pFile = UTIL_LoadFileForMe( pScriptName, NULL );
-		if ( pFile )
-		{
-			// new script, parse it and write to the table
-			index = m_vehicleScripts.AddToTail();
-			m_vehicleScripts[index].scriptName = AllocPooledString(pScriptName);
-			m_vehicleScripts[index].sounds.Init();
-
-			IVPhysicsKeyParser *pParse = physcollision->VPhysicsKeyParserCreate( (char *)pFile );
-			while ( !pParse->Finished() )
-			{
-				const char *pBlock = pParse->GetCurrentBlockName();
-				if ( !strcmpi( pBlock, "vehicle" ) )
-				{
-					pParse->ParseVehicle( &m_vehicleScripts[index].params, NULL );
-				}
-				else if ( !Q_stricmp( pBlock, "vehicle_sounds" ) )
-				{
-					bLoadedSounds = true;
-					CVehicleSoundsParser soundParser;
-					pParse->ParseCustom( &m_vehicleScripts[index].sounds, &soundParser );
-				}
-				else
-				{
-					pParse->SkipBlock();
-				}
-			}
-			physcollision->VPhysicsKeyParserDestroy( pParse );
-			UTIL_FreeFile( pFile );
-		}
-	}
-
-	if ( index >= 0 )
-	{
-		if ( pVehicle )
-		{
-			*pVehicle = m_vehicleScripts[index].params;
-		}
-		if ( pSounds )
-		{
-			// We must pass back valid data here!
-			if ( bLoadedSounds == false )
-				return false;
-
-			*pSounds = m_vehicleScripts[index].sounds;
-		}
-		return true;
-	}
-
-	return false;
-}
-
-// called after entities think
-void CPhysicsHook::FrameUpdatePostEntityThink( ) 
-{
-	VPROF_BUDGET( "CPhysicsHook::FrameUpdatePostEntityThink", VPROF_BUDGETGROUP_PHYSICS );
-
-	// Tracker 24846:  If game is paused, don't simulate vphysics
-	float interval = ( gpGlobals->frametime > 0.0f ) ? TICK_INTERVAL : 0.0f;
-
-	// update the physics simulation, not we don't use gpGlobals->frametime, since that can be 30 msec or 15 msec
-	// depending on whether IsSimulatingOnAlternateTicks is true or not
-	if ( gEntList.IsSimulatingOnAlternateTicks() )
-	{
-		m_isFinalTick = false;
-
-#ifdef PORTAL //slight detour if we're the portal mod
-		PortalPhysFrame( interval );
-#else
-		PhysFrame( interval );
-#endif
-
-	}
-	m_isFinalTick = true;
-
-#ifdef PORTAL //slight detour if we're the portal mod
-	PortalPhysFrame( interval );
-#else
-	PhysFrame( interval );
-#endif
-
-}
-
-void CPhysicsHook::PreClientUpdate()
-{
-	m_impactSoundTime += gpGlobals->frametime;
-	if ( m_impactSoundTime > 0.05f )
-	{
-		physicssound::PlayImpactSounds( m_impactSounds );
-		m_impactSoundTime = 0.0f;
-		physicssound::PlayBreakSounds( m_breakSounds );
-	}
-}
-
-bool PhysIsFinalTick()
-{
-	return g_PhysicsHook.m_isFinalTick;
-}
-
-IPhysicsObject *PhysCreateWorld( CBaseEntity *pWorld )
-{
-	staticpropmgr->CreateVPhysicsRepresentations( physenv, g_pSolidSetup, pWorld );
-	return PhysCreateWorld_Shared( pWorld, modelinfo->GetVCollide(1), g_PhysDefaultObjectParams );
-}
-
 
 // vehicle wheels can only collide with things that can't get stuck in them during game physics
 // because they aren't in the game physics world at present
@@ -763,15 +456,6 @@ bool PhysShouldCollide( IPhysicsObject *pObj0, IPhysicsObject *pObj1 )
 	return g_Collisions.ShouldCollide( pObj0, pObj1, pGameData0, pGameData1 ) ? true : false;
 }
 
-bool PhysIsInCallback()
-{
-	if ( (physenv && physenv->IsInSimulation()) || g_Collisions.IsInCallback() )
-		return true;
-
-	return false;
-}
-
-
 static void ReportPenetration( CBaseEntity *pEntity, float duration )
 {
 	if ( pEntity->GetEngineObject()->GetMoveType() == MOVETYPE_VPHYSICS )
@@ -976,7 +660,7 @@ int CCollisionEvent::ShouldSolvePenetration( IPhysicsObject *pObj0, IPhysicsObje
 
 	// this can get called as entities are being constructed on the other side of a game load or level transition
 	// Some entities may not be fully constructed, so don't call into their code until the level is running
-	if ( g_PhysicsHook.m_bPaused )
+	if ( gEntList.PhysIsPaused())
 		return true;
 
 	// solve it yourself here and return 0, or have the default implementation do it
@@ -1169,63 +853,6 @@ void PhysSolidOverride( solid_t &solid, string_t overrideScript )
 
 		// parser destroys this data
 		solid.params.enableCollisions = collisions;
-	}
-}
-
-void PhysSetMassCenterOverride( masscenteroverride_t &override )
-{
-	if ( override.entityName != NULL_STRING )
-	{
-		g_PhysicsHook.m_massCenterOverrides.AddToTail( override );
-	}
-}
-
-// NOTE: This will remove the entry from the list as well
-int PhysGetMassCenterOverrideIndex( string_t name )
-{
-	if ( name != NULL_STRING && g_PhysicsHook.m_massCenterOverrides.Count() )
-	{
-		for ( int i = 0; i < g_PhysicsHook.m_massCenterOverrides.Count(); i++ )
-		{
-			if ( g_PhysicsHook.m_massCenterOverrides[i].entityName == name )
-			{
-				return i;
-			}
-		}
-	}
-	return -1;
-}
-
-void PhysGetMassCenterOverride( CBaseEntity *pEntity, vcollide_t *pCollide, solid_t &solidOut )
-{
-	int index = PhysGetMassCenterOverrideIndex( pEntity->GetEntityName() );
-
-	if ( index >= 0 )
-	{
-		masscenteroverride_t &override = g_PhysicsHook.m_massCenterOverrides[index];
-		Vector massCenterWS = override.center;
-		switch ( override.alignType )
-		{
-		case masscenteroverride_t::ALIGN_POINT:
-			VectorITransform( massCenterWS, pEntity->GetEngineObject()->EntityToWorldTransform(), solidOut.massCenterOverride );
-			break;
-		case masscenteroverride_t::ALIGN_AXIS:
-			{
-				Vector massCenterLocal, defaultMassCenterWS;
-				physcollision->CollideGetMassCenter( pCollide->solids[solidOut.index], &massCenterLocal );
-				VectorTransform( massCenterLocal, pEntity->GetEngineObject()->EntityToWorldTransform(), defaultMassCenterWS );
-				massCenterWS += override.axis * 
-					( DotProduct(defaultMassCenterWS,override.axis) - DotProduct( override.axis, override.center ) );
-				VectorITransform( massCenterWS, pEntity->GetEngineObject()->EntityToWorldTransform(), solidOut.massCenterOverride );
-			}
-			break;
-		}
-		g_PhysicsHook.m_massCenterOverrides.FastRemove( index );
-
-		if ( solidOut.massCenterOverride.Length() > DIST_EPSILON )
-		{
-			solidOut.params.massCenterOverride = &solidOut.massCenterOverride;
-		}
 	}
 }
 
@@ -1646,135 +1273,6 @@ CON_COMMAND( physics_budget, "Times the cost of each active object" )
 
 }
 
-
-#ifdef PORTAL
-ConVar sv_fullsyncclones("sv_fullsyncclones", "1", FCVAR_CHEAT );
-void PortalPhysFrame( float deltaTime ) //small wrapper for PhysFrame that simulates all environments at once
-{
-	CProp_Portal::PrePhysFrame();
-
-	if( sv_fullsyncclones.GetBool() )
-		CPhysicsShadowClone::FullSyncAllClones();
-
-	g_Collisions.BufferTouchEvents( true );
-
-	PhysFrame( deltaTime );
-
-	g_Collisions.PortalPostSimulationFrame();
-
-	g_Collisions.BufferTouchEvents( false );
-	g_Collisions.FrameUpdate();
-
-	CProp_Portal::PostPhysFrame();
-}
-#endif
-
-// Advance physics by time (in seconds)
-void PhysFrame( float deltaTime )
-{
-	static int lastObjectCount = 0;
-	entitem_t *pItem;
-
-	if ( !g_PhysicsHook.ShouldSimulate() )
-		return;
-
-	// Trap interrupts and clock changes
-	if ( deltaTime > 1.0f || deltaTime < 0.0f )
-	{
-		deltaTime = 0;
-		Msg( "Reset physics clock\n" );
-	}
-	else if ( deltaTime > 0.1f )	// limit incoming time to 100ms
-	{
-		deltaTime = 0.1f;
-	}
-	float simRealTime = 0;
-
-	deltaTime *= phys_timescale.GetFloat();
-	// !!!HACKHACK -- hard limit scaled time to avoid spending too much time in here
-	// Limit to 100 ms
-	if ( deltaTime > 0.100f )
-		deltaTime = 0.100f;
-
-	bool bProfile = phys_speeds.GetBool();
-
-	if ( bProfile )
-	{
-		simRealTime = engine->Time();
-	}
-
-#ifdef _DEBUG
-	physenv->DebugCheckContacts();
-#endif
-
-#ifndef PORTAL //instead of wrapping 1 simulation with this, portal needs to wrap 3
-	g_Collisions.BufferTouchEvents( true );
-#endif
-
-	physenv->Simulate( deltaTime );
-
-	int activeCount = physenv->GetActiveObjectCount();
-	IPhysicsObject **pActiveList = NULL;
-	if ( activeCount )
-	{
-		pActiveList = (IPhysicsObject **)stackalloc( sizeof(IPhysicsObject *)*activeCount );
-		physenv->GetActiveObjects( pActiveList );
-
-		for ( int i = 0; i < activeCount; i++ )
-		{
-			CBaseEntity *pEntity = reinterpret_cast<CBaseEntity *>(pActiveList[i]->GetGameData());
-			if ( pEntity )
-			{
-				if ( pEntity->GetEngineObject()->DoesVPhysicsInvalidateSurroundingBox() )
-				{
-					pEntity->GetEngineObject()->MarkSurroundingBoundsDirty();
-				}
-				pEntity->GetEngineObject()->VPhysicsUpdate( pActiveList[i] );
-			}
-		}
-		stackfree( pActiveList );
-	}
-
-	for ( pItem = g_pShadowEntities->m_pItemList; pItem; pItem = pItem->pNext )
-	{
-		CBaseEntity *pEntity = pItem->hEnt.Get();
-		if ( !pEntity )
-		{
-			Msg( "Dangling pointer to physics entity!!!\n" );
-			continue;
-		}
-
-		IPhysicsObject *pPhysics = pEntity->GetEngineObject()->VPhysicsGetObject();
-		// apply updates
-		if ( pPhysics && !pPhysics->IsAsleep() )
-		{
-			pEntity->VPhysicsShadowUpdate( pPhysics );
-		}
-	}
-
-	if ( bProfile )
-	{
-		simRealTime = engine->Time() - simRealTime;
-
-		if ( simRealTime < 0 )
-			simRealTime = 0;
-		g_PhysAverageSimTime *= 0.8;
-		g_PhysAverageSimTime += (simRealTime * 0.2);
-		if ( lastObjectCount != 0 || activeCount != 0 )
-		{
-			Msg( "Physics: %3d objects, %4.1fms / AVG: %4.1fms\n", activeCount, simRealTime * 1000, g_PhysAverageSimTime * 1000 );
-		}
-
-		lastObjectCount = activeCount;
-	}
-
-#ifndef PORTAL //instead of wrapping 1 simulation with this, portal needs to wrap 3
-	g_Collisions.BufferTouchEvents( false );
-	g_Collisions.FrameUpdate();
-#endif
-}
-
-
 void PhysAddShadow( CBaseEntity *pEntity )
 {
 	g_pShadowEntities->AddEntity( pEntity );
@@ -1995,7 +1493,7 @@ void CCollisionEvent::ShutdownFriction( friction_t &friction )
 
 void CCollisionEvent::UpdateRemoveObjects()
 {
-	Assert(!PhysIsInCallback());
+	Assert(!gEntList.PhysIsInCallback());
 	for ( int i = 0 ; i < m_removeObjects.Count(); i++ )
 	{
 		gEntList.DestroyEntity(m_removeObjects[i]);
@@ -2572,34 +2070,7 @@ bool PhysGetTriggerEvent( triggerevent_t *pEvent, CBaseEntity *pTriggerEntity )
 //-----------------------------------------------------------------------------
 
 
-//-----------------------------------------------------------------------------
-// External interface to collision sounds
-//-----------------------------------------------------------------------------
 
-void PhysicsImpactSound( CBaseEntity *pEntity, IPhysicsObject *pPhysObject, int channel, int surfaceProps, int surfacePropsHit, float volume, float impactSpeed )
-{
-	physicssound::AddImpactSound( g_PhysicsHook.m_impactSounds, pEntity, pEntity->entindex(), channel, pPhysObject, surfaceProps, surfacePropsHit, volume, impactSpeed );
-}
-
-void PhysCollisionSound( CBaseEntity *pEntity, IPhysicsObject *pPhysObject, int channel, int surfaceProps, int surfacePropsHit, float deltaTime, float speed )
-{
-	if ( deltaTime < 0.05f || speed < 70.0f )
-		return;
-
-	float volume = speed * speed * (1.0f/(320.0f*320.0f));	// max volume at 320 in/s
-	if ( volume > 1.0f )
-		volume = 1.0f;
-
-	PhysicsImpactSound( pEntity, pPhysObject, channel, surfaceProps, surfacePropsHit, volume, speed );
-}
-
-void PhysBreakSound( CBaseEntity *pEntity, IPhysicsObject *pPhysObject, Vector vecOrigin )
-{
-	if ( !pPhysObject)
-		return;
-
-	physicssound::AddBreakSound( g_PhysicsHook.m_breakSounds, vecOrigin, pPhysObject->GetMaterialIndex() );
-}
 
 ConVar collision_shake_amp("collision_shake_amp", "0.2");
 ConVar collision_shake_freq("collision_shake_freq", "0.5");
@@ -2729,16 +2200,6 @@ void PhysFrictionSound( IHandleEntity *pEntity, IPhysicsObject *pObject, const c
 	}
 }
 
-void PhysCleanupFrictionSounds( IHandleEntity *pEntity )
-{
-	friction_t *pFriction = g_Collisions.FindFriction( (CBaseEntity*)pEntity );
-	if ( pFriction && pFriction->patch )
-	{
-		g_Collisions.ShutdownFriction( *pFriction );
-	}
-}
-
-
 //-----------------------------------------------------------------------------
 // Applies force impulses at a later time
 //-----------------------------------------------------------------------------
@@ -2763,7 +2224,7 @@ void PhysCallbackDamage( CBaseEntity *pEntity, const CTakeDamageInfo &info, game
 
 void PhysCallbackDamage( CBaseEntity *pEntity, const CTakeDamageInfo &info )
 {
-	if ( PhysIsInCallback() )
+	if (gEntList.PhysIsInCallback() )
 	{
 		CBaseEntity *pInflictor = info.GetInflictor();
 		IPhysicsObject *pInflictorPhysics = (pInflictor) ? pInflictor->GetEngineObject()->VPhysicsGetObject() : NULL;
@@ -2781,7 +2242,7 @@ void PhysCallbackDamage( CBaseEntity *pEntity, const CTakeDamageInfo &info )
 
 void PhysCallbackRemove(CBaseEntity *pRemove)
 {
-	if ( PhysIsInCallback() )
+	if (gEntList.PhysIsInCallback() )
 	{
 		g_Collisions.AddRemoveObject(pRemove);
 	}
@@ -2803,12 +2264,12 @@ void PhysSetEntityGameFlags( CBaseEntity *pEntity, unsigned short flags )
 
 bool PhysFindOrAddVehicleScript( const char *pScriptName, vehicleparams_t *pParams, vehiclesounds_t *pSounds )
 {
-	return g_PhysicsHook.FindOrAddVehicleScript(pScriptName, pParams, pSounds);
+	return gEntList.FindOrAddVehicleScript(pScriptName, pParams, pSounds);
 }
 
 void PhysFlushVehicleScripts()
 {
-	g_PhysicsHook.FlushVehicleScripts();
+	gEntList.FlushVehicleScripts();
 }
 
 IPhysicsObject *FindPhysicsObjectByName( const char *pName, CBaseEntity *pErrorEntity )

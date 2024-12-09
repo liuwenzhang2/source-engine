@@ -98,7 +98,6 @@ struct fluidevent_t
 
 void PhysFrictionSound( IHandleEntity *pEntity, IPhysicsObject *pObject, float energy, int surfaceProps, int surfacePropsHit );
 void PhysFrictionSound( IHandleEntity *pEntity, IPhysicsObject *pObject, const char *pSoundName, HSOUNDSCRIPTHANDLE& handle, float flVolume );
-void PhysCleanupFrictionSounds( IHandleEntity *pEntity );
 void PhysFrictionEffect( Vector &vecPos, Vector vecVel, float energy, int surfaceProps, int surfacePropsHit );
 
 // Convenience routine
@@ -175,7 +174,6 @@ bool PhysHasContactWithOtherInDirection( IPhysicsObject *pPhysics, const Vector 
 //-----------------------------------------------------------------------------
 // Singleton access
 //-----------------------------------------------------------------------------
-IGameSystem* PhysicsGameSystem();
 extern IVPhysicsKeyHandler* g_pSolidSetup;
 
 

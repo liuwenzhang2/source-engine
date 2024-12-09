@@ -769,7 +769,7 @@ C_HL2MPRagdoll::C_HL2MPRagdoll()
 
 C_HL2MPRagdoll::~C_HL2MPRagdoll()
 {
-	PhysCleanupFrictionSounds( this );
+	ClientEntityList().PhysCleanupFrictionSounds( this );
 
 	if ( m_hPlayer )
 	{

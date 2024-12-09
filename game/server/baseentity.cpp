@@ -421,7 +421,7 @@ CBaseEntity::~CBaseEntity( )
 {
 	// FIXME: This can't be called from UpdateOnRemove! There's at least one
 	// case where friction sounds are added between the call to UpdateOnRemove + ~CBaseEntity
-	PhysCleanupFrictionSounds( this );
+	gEntList.PhysCleanupFrictionSounds( this );
 
 	//Assert( !IsDynamicModelIndex( m_nModelIndex ) );
 	//Verify( !sg_DynamicLoadHandlers.Remove( this ) );
@@ -1257,7 +1257,7 @@ void CBaseEntity::TakeDamage( const CTakeDamageInfo &inputInfo )
 		return;
 	}
 
-	if ( PhysIsInCallback() )
+	if (gEntList.PhysIsInCallback() )
 	{
 		PhysCallbackDamage( this, inputInfo );
 	}
@@ -2024,7 +2024,7 @@ void CBaseEntity::VPhysicsUpdatePusher( IPhysicsObject *pPhysics )
 		return;
 
 	// only reconcile pushers on the final vphysics tick
-	if ( !PhysIsFinalTick() )
+	if ( !gEntList.PhysIsFinalTick() )
 		return;
 
 	Vector origin;
@@ -2224,11 +2224,11 @@ void CBaseEntity::VPhysicsCollision( int index, gamevcollisionevent_t *pEvent )
 
 	if ( pHitEntity == this )
 	{
-		PhysCollisionSound( this, pEvent->pObjects[index], CHAN_BODY, pEvent->surfaceProps[index], pEvent->surfaceProps[otherIndex], pEvent->deltaCollisionTime, pEvent->collisionSpeed );
+		gEntList.PhysCollisionSound( this, pEvent->pObjects[index], CHAN_BODY, pEvent->surfaceProps[index], pEvent->surfaceProps[otherIndex], pEvent->deltaCollisionTime, pEvent->collisionSpeed );
 	}
 	else
 	{
-		PhysCollisionSound( this, pEvent->pObjects[index], CHAN_STATIC, pEvent->surfaceProps[index], pEvent->surfaceProps[otherIndex], pEvent->deltaCollisionTime, pEvent->collisionSpeed );
+		gEntList.PhysCollisionSound( this, pEvent->pObjects[index], CHAN_STATIC, pEvent->surfaceProps[index], pEvent->surfaceProps[otherIndex], pEvent->deltaCollisionTime, pEvent->collisionSpeed );
 	}
 	PhysCollisionScreenShake( pEvent, index );
 
@@ -2251,10 +2251,6 @@ void CBaseEntity::VPhysicsFriction( IPhysicsObject *pObject, float energy, int s
 {
 	PhysFrictionSound( this, pObject, energy, surfaceProps, surfacePropsHit );
 }
-
-
-
-
 
 // Tells the physics shadow to update it's target to the current position
 void CBaseEntity::UpdatePhysicsShadowToCurrentPosition( float deltaTime )

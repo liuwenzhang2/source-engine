@@ -1577,7 +1577,7 @@ void CNPC_BaseZombie::HandleAnimEvent( animevent_t *pEvent )
 			params.m_pflSoundDuration = NULL;
 			params.m_bWarnOnDirectWaveReference = true;
 			g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
-			PhysicsImpactSound( pEnemy, pPhysObj, CHAN_BODY, pPhysObj->GetMaterialIndex(), physprops->GetSurfaceIndex("flesh"), 0.5, 800 );
+			gEntList.PhysicsImpactSound( pEnemy, pPhysObj, CHAN_BODY, pPhysObj->GetMaterialIndex(), physprops->GetSurfaceIndex("flesh"), 0.5, 800 );
 
 			Vector physicsCenter = pPhysicsEntity->WorldSpaceCenter();
 			v = pEnemy->WorldSpaceCenter() - physicsCenter;

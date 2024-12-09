@@ -475,6 +475,7 @@ public:
 	virtual void ClearRagdoll() = 0;
 	virtual bool IsRagdoll() const = 0;
 	virtual void ActiveRagdoll() = 0;
+	virtual void ApplyAnimationAsVelocityToRagdoll(const matrix3x4_t* pPrevBones, const matrix3x4_t* pCurrentBones, float dt) = 0;
 
 	virtual unsigned char GetRenderFX() const = 0;
 	virtual void SetRenderFX(unsigned char nRenderFX) = 0;

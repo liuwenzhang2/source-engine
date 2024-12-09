@@ -3049,7 +3049,9 @@ public:
 			CProp_Portal_Shared::AllPortals[i]->m_EntFlags[iEntIndex] = 0;
 		}
 
-
+		if (physenv != physenv_main) {
+			int aaa = 0;
+		}
 		physenv = physenv_main;
 		g_pShadowEntities = g_pShadowEntities_Main;
 	}

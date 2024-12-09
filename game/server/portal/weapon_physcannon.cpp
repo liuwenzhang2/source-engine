@@ -774,7 +774,7 @@ void CGrabController::AttachEntity( CBasePlayer *pPlayer, CBaseEntity *pEntity, 
 	{
 		int hitMaterial = pPhys->GetMaterialIndex();
 		int playerMaterial = pPlayer->GetEngineObject()->VPhysicsGetObject() ? pPlayer->GetEngineObject()->VPhysicsGetObject()->GetMaterialIndex() : hitMaterial;
-		PhysicsImpactSound( pPlayer, pPhys, CHAN_STATIC, hitMaterial, playerMaterial, 1.0, 64 );
+		gEntList.PhysicsImpactSound( pPlayer, pPhys, CHAN_STATIC, hitMaterial, playerMaterial, 1.0, 64 );
 	}
 	Vector position;
 	QAngle angles;
@@ -944,7 +944,7 @@ static void ClampPhysicsVelocity( IPhysicsObject *pPhys, float linearLimit, floa
 
 void CGrabController::DetachEntity( bool bClearVelocity )
 {
-	Assert(!PhysIsInCallback());
+	Assert(!gEntList.PhysIsInCallback());
 	CBaseEntity *pEntity = GetAttached();
 	if ( pEntity )
 	{
