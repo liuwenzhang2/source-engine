@@ -24,7 +24,7 @@
 #include "saverestoretypes.h"
 #include "gameinterface.h"
 #include "vphysics/player_controller.h"
-#include "ragdoll_shared.h"
+//#include "ragdoll_shared.h"
 #include "game/server/iservervehicle.h"
 #include "bone_setup.h"
 #include "usercmd.h"
@@ -32,6 +32,7 @@
 #include "util.h"
 #include "debugoverlay_shared.h"
 #include "physics.h"
+#include "bone_accessor.h"
 
 //class CBaseEntity;
 // We can only ever move 512 entities across a transition
@@ -784,7 +785,6 @@ public:
 	void							ClearRagdoll();
 	virtual void VPhysicsUpdate(IPhysicsObject* pPhysics);
 	void InitRagdoll(const Vector& forceVector, int forceBone, const Vector& forcePos, matrix3x4_t* pPrevBones, matrix3x4_t* pBoneToWorld, float dt, int collisionGroup, bool activateRagdoll, bool bWakeRagdoll = true);
-
 	virtual int RagdollBoneCount() const { return m_ragdoll.listCount; }
 	virtual IPhysicsObject* GetElement(int elementNum);
 	void RecheckCollisionFilter(void);
@@ -795,7 +795,7 @@ public:
 	IPhysicsConstraintGroup* GetConstraintGroup() { return m_ragdoll.pGroup; }
 	ragdoll_t* GetRagdoll(void) { return &m_ragdoll; }
 	virtual bool IsRagdoll() const;
-
+	void ActiveRagdoll();
 
 	unsigned char GetRenderFX() const { return m_nRenderFX; }
 	void SetRenderFX(unsigned char nRenderFX) { m_nRenderFX = nRenderFX; }

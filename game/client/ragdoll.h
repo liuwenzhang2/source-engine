@@ -14,7 +14,7 @@
 #pragma once
 #endif
 
-#include "ragdoll_shared.h"
+//#include "ragdoll_shared.h"
 #include "c_baseanimating.h"
 
 #define RAGDOLL_VISUALIZE	0

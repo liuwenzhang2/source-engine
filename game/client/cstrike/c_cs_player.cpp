@@ -37,7 +37,7 @@
 #include "c_team.h"
 
 #include "history_resource.h"
-#include "ragdoll_shared.h"
+//#include "ragdoll_shared.h"
 #include "collisionutils.h"
 
 // NVNT - haptics system for spectating
@@ -509,6 +509,7 @@ void C_CSRagdoll::CreateCSRagdoll()
 		}
 
 		GetEngineObject()->InitAsClientRagdoll( boneDelta0, boneDelta1, currentBones, boneDt );
+		NoteRagdollCreationTick(this);
 		m_flRagdollSinkStart = -1;
 	}
 	else

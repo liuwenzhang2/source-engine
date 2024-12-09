@@ -8,7 +8,7 @@
 #include "cbase.h"
 #include "baseentity.h"
 #include "sendproxy.h"
-#include "ragdoll_shared.h"
+//#include "ragdoll_shared.h"
 #include "ai_basenpc.h"
 
 // memdbgon must be the last include file in a .cpp file!!!

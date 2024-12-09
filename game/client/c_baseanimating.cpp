@@ -31,7 +31,7 @@
 #include "eventlist.h"
 #include "physics_saverestore.h"
 #include "vphysics/constraints.h"
-#include "ragdoll_shared.h"
+//#include "ragdoll_shared.h"
 #include "view.h"
 #include "c_ai_basenpc.h"
 #include "c_entitydissolve.h"
@@ -200,30 +200,13 @@ void C_ClientRagdoll::OnSave( void )
 
 void C_ClientRagdoll::OnRestore( void )
 {
-	IStudioHdr *hdr = GetEngineObject()->GetModelPtr();
-
-	if ( hdr == NULL )
-	{
-		const char *pModelName = STRING(GetEngineObject()->GetModelName() );
-		SetModel( pModelName );
-
-		hdr = GetEngineObject()->GetModelPtr();
-
-		if ( hdr == NULL )
-			return;
-	}
-	
-	if ( !GetEngineObject()->RagdollBoneCount())
-		 return;
-
-	ragdoll_t *pRagdollT = GetEngineObject()->GetRagdoll();
-
-	if ( pRagdollT == NULL || pRagdollT->list[0].pObject == NULL )
+	ragdoll_t* pRagdollT = GetEngineObject()->GetRagdoll();
+	if (pRagdollT == NULL || pRagdollT->list[0].pObject == NULL)
 	{
 		m_bReleaseRagdoll = true;
 		//m_pRagdoll = NULL;
 		Error("Attempted to restore a ragdoll without physobjects!");
-		Assert( !"Attempted to restore a ragdoll without physobjects!" );
+		Assert(!"Attempted to restore a ragdoll without physobjects!");
 		return;
 	}
 
@@ -240,39 +223,13 @@ void C_ClientRagdoll::OnRestore( void )
 		SetEffectEntity( pNewFireChild );
 	}
 
-	GetEngineObject()->VPhysicsSetObject( NULL );
-	GetEngineObject()->VPhysicsSetObject( pRagdollT->list[0].pObject );
-
-	GetEngineObject()->SetupBones( NULL, -1, BONE_USED_BY_ANYTHING, gpGlobals->curtime );
-
-	pRagdollT->list[0].parentIndex = -1;
-	pRagdollT->list[0].originParentSpace.Init();
-
-	RagdollActivate( *pRagdollT, modelinfo->GetVCollide(GetEngineObject()->GetModelIndex() ), GetEngineObject()->GetModelIndex(), true );
-	RagdollSetupAnimatedFriction( physenv, pRagdollT, GetEngineObject()->GetModelIndex() );
-
-	GetEngineObject()->BuildRagdollBounds( this );
-
-	// UNDONE: The shadow & leaf system cleanup should probably be in C_BaseEntity::OnRestore()
-	// this must be recomputed because the model was NULL when this was set up
-	GetEngineObject()->RemoveFromLeafSystem();
-	GetEngineObject()->AddToLeafSystem( RENDER_GROUP_OPAQUE_ENTITY );
-
-	GetEngineObject()->DestroyShadow();
-	GetEngineObject()->CreateShadow();
-
 	SetNextClientThink( CLIENT_THINK_ALWAYS );
-	
 	if ( m_bFadeOut == true )
 	{
 		ClientEntityList().MoveToTopOfLRU( this, m_bImportant );
 	}
-
-	NoteRagdollCreationTick( this );
-	
+	NoteRagdollCreationTick(this);
 	BaseClass::OnRestore();
-
-	GetEngineObject()->RagdollMoved();
 }
 
 void C_ClientRagdoll::ImpactTrace( trace_t *pTrace, int iDamageType, const char *pCustomImpactName )
@@ -3033,6 +2990,7 @@ C_BaseEntity *C_BaseAnimating::BecomeRagdollOnClient()
 	const float boneDt = 0.1f;
 	GetRagdollInitBoneArrays( boneDelta0, boneDelta1, currentBones, boneDt );
 	pRagdoll->GetEngineObject()->InitAsClientRagdoll( boneDelta0, boneDelta1, currentBones, boneDt );
+	NoteRagdollCreationTick(this);
 	if (AddRagdollToFadeQueue() == true)
 	{
 		pRagdoll->m_bImportant = NPC_IsImportantNPC(this);

@@ -4,7 +4,7 @@
 //
 //=============================================================================//
 #include "cbase.h"
-#include "ragdoll_shared.h"
+//#include "ragdoll_shared.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"

@@ -241,6 +241,7 @@ void C_PortalRagdoll::CreatePortalRagdoll()
 		pPlayer->GetRagdollInitBoneArrays( boneDelta0, boneDelta1, currentBones, boneDt );
 
 		GetEngineObject()->InitAsClientRagdoll( boneDelta0, boneDelta1, currentBones, boneDt );
+		NoteRagdollCreationTick(this);
 	}
 }
 

@@ -45,7 +45,7 @@
 #include "rope_shared.h"
 #include "rope_helpers.h"
 #include "bone_setup.h"
-
+#include "ragdoll_shared.h"
 #ifdef HL2_DLL
 #include "npc_playercompanion.h"
 #endif // HL2_DLL
@@ -5459,6 +5459,12 @@ bool CEngineObjectInternal::IsRagdoll() const
 		return true;
 	}
 	return false;
+}
+
+void CEngineObjectInternal::ActiveRagdoll()
+{
+	//RagdollActivate(*GetEngineObject()->GetRagdoll(), modelinfo->GetVCollide(GetEngineObject()->GetModelIndex()), GetEngineObject()->GetModelIndex());
+	RagdollActivate(m_ragdoll, modelinfo->GetVCollide(GetModelIndex()), GetModelIndex());
 }
 
 void CEngineObjectInternal::DrawRawSkeleton(matrix3x4_t boneToWorld[], int boneMask, bool noDepthTest, float duration, bool monocolor)

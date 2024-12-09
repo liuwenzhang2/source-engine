@@ -531,6 +531,7 @@ void C_DODRagdoll::CreateDODRagdoll()
 		}
 
 		GetEngineObject()->InitAsClientRagdoll( boneDelta0, boneDelta1, currentBones, boneDt );
+		NoteRagdollCreationTick(this);
 	}
 	else
 	{

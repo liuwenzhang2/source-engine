@@ -18,7 +18,7 @@
 #include "props.h"
 #include "RagdollBoogie.h"
 #include "AI_Criteria.h"
-#include "ragdoll_shared.h"
+//#include "ragdoll_shared.h"
 #include "hierarchy.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
@@ -1068,7 +1068,7 @@ void CRagdollPropAttached::InitRagdollAttached(
 	GetEngineObject()->SetParent( pFollow->GetEngineObject() );
 	SetOwnerEntity( pFollow );
 
-	RagdollActivate(*GetEngineObject()->GetRagdoll(), modelinfo->GetVCollide(GetEngineObject()->GetModelIndex() ), GetEngineObject()->GetModelIndex() );
+	GetEngineObject()->ActiveRagdoll();
 
 	// add a bunch of dampening to the ragdoll
 	for ( int i = 0; i < GetEngineObject()->RagdollBoneCount(); i++ )

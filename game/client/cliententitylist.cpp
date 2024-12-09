@@ -34,6 +34,7 @@
 #include "jigglebones.h"
 #include "con_nprint.h"
 #include "view.h"
+#include "ragdoll_shared.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
@@ -925,8 +926,40 @@ void C_EngineObjectInternal::OnSave()
 //-----------------------------------------------------------------------------
 void C_EngineObjectInternal::OnRestore()
 {
-	InvalidatePhysicsRecursive(POSITION_CHANGED | ANGLES_CHANGED | VELOCITY_CHANGED);
+	IStudioHdr* hdr = GetModelPtr();
 
+	if (hdr == NULL)
+	{
+		const char* pModelName = STRING(GetModelName());
+		int nModelIndex = modelinfo->GetModelIndex(pModelName);
+		SetModelIndex(nModelIndex);
+		hdr = GetModelPtr();
+	}
+
+	if (hdr && RagdollBoneCount()) {
+		VPhysicsSetObject(NULL);
+		VPhysicsSetObject(m_ragdoll.list[0].pObject);
+
+		SetupBones(NULL, -1, BONE_USED_BY_ANYTHING, gpGlobals->curtime);
+
+		m_ragdoll.list[0].parentIndex = -1;
+		m_ragdoll.list[0].originParentSpace.Init();
+
+		RagdollActivate(m_ragdoll, modelinfo->GetVCollide(GetModelIndex()), GetModelIndex(), true);
+		RagdollSetupAnimatedFriction(physenv, &m_ragdoll, GetModelIndex());
+
+		BuildRagdollBounds();
+
+		// UNDONE: The shadow & leaf system cleanup should probably be in C_BaseEntity::OnRestore()
+		// this must be recomputed because the model was NULL when this was set up
+		RemoveFromLeafSystem();
+		AddToLeafSystem(RENDER_GROUP_OPAQUE_ENTITY);
+
+		DestroyShadow();
+		CreateShadow();
+		RagdollMoved();
+	}
+	InvalidatePhysicsRecursive(POSITION_CHANGED | ANGLES_CHANGED | VELOCITY_CHANGED);
 	m_pOuter->OnRestore();
 }
 
@@ -5129,10 +5162,10 @@ IPhysicsObject* C_EngineObjectInternal::GetElement(int elementNum)
 	return m_ragdoll.list[elementNum].pObject;
 }
 
-void C_EngineObjectInternal::BuildRagdollBounds(C_BaseEntity* ent)
+void C_EngineObjectInternal::BuildRagdollBounds()
 {
 	Vector mins, maxs, size;
-	modelinfo->GetModelBounds(ent->GetEngineObject()->GetModel(), mins, maxs);
+	modelinfo->GetModelBounds(GetModel(), mins, maxs);
 	size = (maxs - mins) * 0.5;
 	m_radius = size.Length();
 
@@ -5140,9 +5173,7 @@ void C_EngineObjectInternal::BuildRagdollBounds(C_BaseEntity* ent)
 	m_maxs.Init(m_radius, m_radius, m_radius);
 }
 
-void C_EngineObjectInternal::Init(
-	C_BaseEntity* ent,
-	IStudioHdr* pstudiohdr,
+void C_EngineObjectInternal::InitRagdoll(
 	const Vector& forceVector,
 	int forceBone,
 	const matrix3x4_t* pDeltaBones0,
@@ -5152,10 +5183,10 @@ void C_EngineObjectInternal::Init(
 	bool bFixedConstraints)
 {
 	ragdollparams_t params;
-	params.pGameData = static_cast<void*>(ent);
-	params.modelIndex = ent->GetEngineObject()->GetModelIndex();
+	params.pGameData = m_pOuter;
+	params.modelIndex = GetModelIndex();
 	params.pCollide = modelinfo->GetVCollide(params.modelIndex);
-	params.pStudioHdr = pstudiohdr;
+	params.pStudioHdr = GetModelPtr();
 	params.forceVector = forceVector;
 	params.forceBoneIndex = forceBone;
 	params.forcePosition.Init();
@@ -5164,34 +5195,34 @@ void C_EngineObjectInternal::Init(
 	params.allowStretch = false;
 	params.fixedConstraints = bFixedConstraints;
 	RagdollCreate(m_ragdoll, params, physenv);
-	ent->GetEngineObject()->VPhysicsSetObject(NULL);
-	ent->GetEngineObject()->VPhysicsSetObject(m_ragdoll.list[0].pObject);
+	VPhysicsSetObject(NULL);
+	VPhysicsSetObject(m_ragdoll.list[0].pObject);
 	// Mark the ragdoll as debris.
-	ent->GetEngineObject()->SetCollisionGroup(COLLISION_GROUP_DEBRIS);
+	SetCollisionGroup(COLLISION_GROUP_DEBRIS);
 
 	RagdollApplyAnimationAsVelocity(m_ragdoll, pDeltaBones0, pDeltaBones1, dt);
-	RagdollActivate(m_ragdoll, params.pCollide, ent->GetEngineObject()->GetModelIndex());
+	RagdollActivate(m_ragdoll, params.pCollide, GetModelIndex());
 
 	// It's moving now...
 	m_flLastOriginChangeTime = gpGlobals->curtime;
 
 	// So traces hit it.
-	ent->GetEngineObject()->AddEFlags(EFL_USE_PARTITION_WHEN_NOT_SOLID);
+	AddEFlags(EFL_USE_PARTITION_WHEN_NOT_SOLID);
 
 	if (!m_ragdoll.listCount)
 		return;
 
-	BuildRagdollBounds(ent);
+	BuildRagdollBounds();
 
 	for (int i = 0; i < m_ragdoll.listCount; i++)
 	{
-		g_pPhysSaveRestoreManager->AssociateModel(m_ragdoll.list[i].pObject, ent->GetEngineObject()->GetModelIndex());
+		g_pPhysSaveRestoreManager->AssociateModel(m_ragdoll.list[i].pObject, GetModelIndex());
 	}
 
 #if RAGDOLL_VISUALIZE
-	memcpy(m_savedBone1, &pDeltaBones0[0], sizeof(matrix3x4_t) * pstudiohdr->numbones());
-	memcpy(m_savedBone2, &pDeltaBones1[0], sizeof(matrix3x4_t) * pstudiohdr->numbones());
-	memcpy(m_savedBone3, &pCurrentBonePosition[0], sizeof(matrix3x4_t) * pstudiohdr->numbones());
+	memcpy(m_savedBone1, &pDeltaBones0[0], sizeof(matrix3x4_t) * GetModelPtr()->numbones());
+	memcpy(m_savedBone2, &pDeltaBones1[0], sizeof(matrix3x4_t) * GetModelPtr()->numbones());
+	memcpy(m_savedBone3, &pCurrentBonePosition[0], sizeof(matrix3x4_t) * GetModelPtr()->numbones());
 #endif
 }
 
@@ -5508,7 +5539,7 @@ bool C_EngineObjectInternal::InitAsClientRagdoll(const matrix3x4_t* pDeltaBones0
 	// HACKHACK: force time to last interpolation position
 	SetPlaybackRate(1);
 
-	Init(m_pOuter, hdr, GetVecForce(), GetForceBone(), pDeltaBones0, pDeltaBones1, pCurrentBonePosition, boneDt, bFixedConstraints);
+	InitRagdoll(GetVecForce(), GetForceBone(), pDeltaBones0, pDeltaBones1, pCurrentBonePosition, boneDt, bFixedConstraints);
 
 	// Cause the entity to recompute its shadow	type and make a
 	// version which only updates when physics state changes
@@ -5535,9 +5566,6 @@ bool C_EngineObjectInternal::InitAsClientRagdoll(const matrix3x4_t* pDeltaBones0
 	m_nPrevSequence = GetSequence();
 	SetPlaybackRate(0);
 	m_pOuter->UpdatePartitionListEntry();
-
-	NoteRagdollCreationTick(this->m_pOuter);
-
 	m_pOuter->UpdateVisibility();
 
 #if defined( REPLAY_ENABLED )

@@ -70,7 +70,7 @@
 #ifdef _WIN32
 #include "ienginevgui.h"
 #endif
-#include "ragdoll_shared.h"
+//#include "ragdoll_shared.h"
 #include "toolframework/iserverenginetools.h"
 #include "sceneentity.h"
 #include "appframework/IAppSystemGroup.h"

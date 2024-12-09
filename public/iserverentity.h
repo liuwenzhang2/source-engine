@@ -474,6 +474,7 @@ public:
 	virtual ragdoll_t* GetRagdoll(void) = 0;
 	virtual void ClearRagdoll() = 0;
 	virtual bool IsRagdoll() const = 0;
+	virtual void ActiveRagdoll() = 0;
 
 	virtual unsigned char GetRenderFX() const = 0;
 	virtual void SetRenderFX(unsigned char nRenderFX) = 0;

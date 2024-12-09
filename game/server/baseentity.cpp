@@ -62,7 +62,7 @@
 #include "utlhashtable.h"
 #include "EntityFlame.h"
 #include "EntityDissolve.h"
-#include "ragdoll_shared.h"
+//#include "ragdoll_shared.h"
 
 #if defined( TF_DLL )
 #include "tf_gamerules.h"

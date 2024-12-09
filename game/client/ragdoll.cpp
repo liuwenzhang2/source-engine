@@ -7,7 +7,7 @@
 
 #include "cbase.h"
 #include "mathlib/vmatrix.h"
-#include "ragdoll_shared.h"
+//#include "ragdoll_shared.h"
 #include "ragdoll.h"
 #include "bone_setup.h"
 #include "materialsystem/imesh.h"

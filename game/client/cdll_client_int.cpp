@@ -73,7 +73,7 @@
 #include "imessagechars.h"
 #include "game/client/IGameClientExports.h"
 #include "client_factorylist.h"
-#include "ragdoll_shared.h"
+//#include "ragdoll_shared.h"
 #include "rendertexture.h"
 #include "view_scene.h"
 #include "iclientmode.h"

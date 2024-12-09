@@ -506,7 +506,6 @@ public:
 	virtual void VPhysicsUpdate(IPhysicsObject* pObject) = 0;
 	virtual bool TransformVectorToWorld(int boneIndex, const Vector* vTemp, Vector* vOut) = 0;
 	virtual ragdoll_t* GetRagdoll(void) = 0;
-	virtual void BuildRagdollBounds(C_BaseEntity* ent) = 0;
 	virtual void ResetRagdollSleepAfterTime(void) = 0;
 	virtual float GetLastVPhysicsUpdateTime() const = 0;
 	//virtual void UnragdollBlend(IStudioHdr* hdr, Vector pos[], Quaternion q[], float currentTime) = 0;

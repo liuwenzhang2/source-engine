@@ -29,7 +29,7 @@
 #include "saverestoretypes.h"
 #include "physics_saverestore.h"
 #include "mouthinfo.h"
-#include "ragdoll_shared.h"
+//#include "ragdoll_shared.h"
 #include "rope_physics.h"
 #include "rope_shared.h"
 #include "bone_setup.h"
@@ -930,9 +930,7 @@ public:
 	// FIXME: Do we want this?
 	const Vector& WorldAlignSize() const;
 
-	void Init(
-		C_BaseEntity* ent,
-		IStudioHdr* pstudiohdr,
+	void InitRagdoll(
 		const Vector& forceVector,
 		int forceBone,
 		const matrix3x4_t* pDeltaBones0,
@@ -944,7 +942,7 @@ public:
 	virtual void RagdollBone(C_BaseEntity* ent, mstudiobone_t* pbones, int boneCount, bool* boneSimulated, CBoneAccessor& pBoneToWorld);
 	virtual const Vector& GetRagdollOrigin();
 	virtual void GetRagdollBounds(Vector& theMins, Vector& theMaxs);
-	void	BuildRagdollBounds(C_BaseEntity* ent);
+	void	BuildRagdollBounds();
 
 	virtual IPhysicsObject* GetElement(int elementNum);
 	virtual IPhysicsConstraintGroup* GetConstraintGroup() { return m_ragdoll.pGroup; }

@@ -489,6 +489,7 @@ void C_HL1MPRagdoll::CreateHL1MPRagdoll( void )
 	}
 
 	GetEngineObject()->InitAsClientRagdoll( boneDelta0, boneDelta1, currentBones, boneDt );
+	NoteRagdollCreationTick(this);
 }
 
 
