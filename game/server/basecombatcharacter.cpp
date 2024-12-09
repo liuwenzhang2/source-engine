@@ -1585,6 +1585,8 @@ bool CBaseCombatCharacter::BecomeRagdoll( const CTakeDamageInfo &info, const Vec
 	}
 #endif //HL2_DLL
 
+	if (CanBecomeServerRagdoll() == false)
+		return false;
 	CBaseEntity* pRagdoll = CreateServerRagdoll(GetEngineObject()->GetForceBone(), newinfo, COLLISION_GROUP_INTERACTIVE_DEBRIS, true);
 	FixupBurningServerRagdoll(pRagdoll);
 	PhysSetEntityGameFlags(pRagdoll, FVPHYSICS_NO_SELF_COLLISIONS);

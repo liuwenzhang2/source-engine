@@ -928,7 +928,7 @@ void C_EngineObjectInternal::OnRestore()
 {
 	IStudioHdr* hdr = GetModelPtr();
 
-	if (hdr == NULL)
+	if (hdr == NULL && STRING(GetModelName()) && STRING(GetModelName())[0])
 	{
 		const char* pModelName = STRING(GetModelName());
 		int nModelIndex = modelinfo->GetModelIndex(pModelName);
