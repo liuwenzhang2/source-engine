@@ -2304,6 +2304,7 @@ typedef void (*EntityCallbackFunction) (CBaseEntity* pEntity);
 extern void PostSimulation_ImpulseEvent(IPhysicsObject* pObject, const Vector& centerForce, const AngularImpulse& centerTorque);
 extern void PostSimulation_SetVelocityEvent(IPhysicsObject* pPhysicsObject, const Vector& vecVelocity);
 extern const objectparams_t g_PhysDefaultObjectParams;
+extern void PhysForceClearVelocity(IPhysicsObject* pPhys);
 
 //-----------------------------------------------------------------------------
 // Purpose: a global list of all the entities in the game.  All iteration through

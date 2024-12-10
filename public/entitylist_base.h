@@ -323,6 +323,22 @@ private:
 	CUtlHash< HashEntry >	m_HashTable;
 };
 
+// These are the types of data that hang off of CBaseEntities and the flag bits used to mark their presence
+enum
+{
+	GROUNDLINK = 0,
+	TOUCHLINK,
+	STEPSIMULATION,
+	MODELSCALE,
+	POSITIONWATCHER,
+	PHYSICSPUSHLIST,
+	VPHYSICSUPDATEAI,
+	VPHYSICSWATCHER,
+
+	// Must be last and <= 32
+	NUM_DATAOBJECT_TYPES,
+};
+
 //-----------------------------------------------------------------------------
 // Purpose: System for hanging objects off of CBaseEntity, etc.
 //  Externalized data objects ( see sharreddefs.h for enum )

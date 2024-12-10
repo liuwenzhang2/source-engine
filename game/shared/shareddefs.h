@@ -629,22 +629,6 @@ const int FX_BLOODSPRAY_ALL		= 0xFF;
 //-----------------------------------------------------------------------------
 #define MAX_SCREEN_OVERLAYS		10
 
-// These are the types of data that hang off of CBaseEntities and the flag bits used to mark their presence
-enum
-{
-	GROUNDLINK = 0,
-	TOUCHLINK,
-	STEPSIMULATION,
-	MODELSCALE,
-	POSITIONWATCHER,
-	PHYSICSPUSHLIST,
-	VPHYSICSUPDATEAI,
-	VPHYSICSWATCHER,
-
-	// Must be last and <= 32
-	NUM_DATAOBJECT_TYPES,
-};
-
 //-----------------------------------------------------------------------------
 // Bullet firing information
 //-----------------------------------------------------------------------------
