@@ -2646,6 +2646,8 @@ private:
 	bool						m_bBufferTouchEvents;
 };
 
+extern ConVar cl_phys_timescale;
+
 //
 // This is the IClientEntityList implemenation. It serves two functions:
 //
@@ -3554,7 +3556,6 @@ CClientEntityList<T>::~CClientEntityList(void)
 	Release();
 }
 
-extern ConVar cl_phys_timescale;
 template<class T>
 bool CClientEntityList<T>::Init()
 {
