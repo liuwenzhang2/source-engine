@@ -1247,7 +1247,7 @@ public:
 		((IHandleEntity*)newEnt)->AfterInit();
 #endif
 #ifdef GAME_DLL
-		((CBaseEntity*)newEnt)->PostConstructor(m_pMapClassName, iForceEdictIndex);
+		((IHandleEntity*)newEnt)->PostConstructor(m_pMapClassName, iForceEdictIndex);
 #endif // GAME_DLL
 		return newEnt;
 	}

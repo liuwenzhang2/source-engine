@@ -41,6 +41,7 @@ public:
 	virtual IEntityList* GetEntityList() { return NULL; }
 	virtual IEngineObject* GetEngineObject() { return NULL; }
 	virtual const IEngineObject* GetEngineObject() const { return NULL; }
+	virtual void PostConstructor(const char* szClassname, int iForceEdictIndex) {}
 	virtual bool Init(int entnum, int iSerialNum) { return true; }
 	virtual void AfterInit() {};
 };
