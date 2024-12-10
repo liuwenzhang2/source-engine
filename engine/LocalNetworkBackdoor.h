@@ -98,7 +98,7 @@ private:
 		bool	m_bDormant;
 		int		m_iSerialNumber;
 		//void	*m_pDataPointer;
-		IEngineObjectClient *m_pEngineObjectClient;
+		CBaseHandle m_hEngineObjectClient;
 	};
 	
 	CCachedEntState 	m_CachedEntState[MAX_EDICTS];
