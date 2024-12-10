@@ -58,9 +58,9 @@
 ConVar phys_speeds( "phys_speeds", "0" );
 
 CEntityList *g_pShadowEntities = NULL;
-#ifdef PORTAL
-CEntityList *g_pShadowEntities_Main = NULL;
-#endif
+//#ifdef PORTAL
+//CEntityList *g_pShadowEntities_Main = NULL;
+//#endif
 
 
 CCallQueue g_PostSimulationQueue;

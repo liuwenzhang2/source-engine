@@ -2991,12 +2991,12 @@ void CProp_Portal::ClearLinkedEntities(void)
 }
 
 //Move all entities back to the main environment for removal, and make sure the main environment is in control during the gEntList.DestroyEntity process
-struct UTIL_Remove_PhysicsStack_t
-{
-	IPhysicsEnvironment* pPhysicsEnvironment;
-	CEntityList* pShadowList;
-};
-static CUtlVector<UTIL_Remove_PhysicsStack_t> s_UTIL_Remove_PhysicsStack;
+//struct UTIL_Remove_PhysicsStack_t
+//{
+//	IPhysicsEnvironment* pPhysicsEnvironment;
+//	CEntityList* pShadowList;
+//};
+//static CUtlVector<UTIL_Remove_PhysicsStack_t> s_UTIL_Remove_PhysicsStack;
 
 class CPortal_AutoGameSys_EntityListener : public CAutoGameSystem, public IEntityListener<CBaseEntity>
 {
@@ -3022,10 +3022,10 @@ public:
 		if (!pEntity->IsNetworkable() || pEntity->entindex() == -1) {
 			return;
 		}
-		int index = s_UTIL_Remove_PhysicsStack.AddToTail();
-		s_UTIL_Remove_PhysicsStack[index].pPhysicsEnvironment = physenv;
-		s_UTIL_Remove_PhysicsStack[index].pShadowList = g_pShadowEntities;
-		int iEntIndex = pEntity->entindex();
+		//int index = s_UTIL_Remove_PhysicsStack.AddToTail();
+		//s_UTIL_Remove_PhysicsStack[index].pPhysicsEnvironment = physenv;
+		//s_UTIL_Remove_PhysicsStack[index].pShadowList = g_pShadowEntities;
+		//int iEntIndex = pEntity->entindex();
 
 		//NDebugOverlay::EntityBounds( pEntity, 0, 0, 0, 50, 5.0f );
 
@@ -3046,14 +3046,14 @@ public:
 
 		for (int i = CProp_Portal_Shared::AllPortals.Count(); --i >= 0; )
 		{
-			CProp_Portal_Shared::AllPortals[i]->m_EntFlags[iEntIndex] = 0;
+			CProp_Portal_Shared::AllPortals[i]->m_EntFlags[pEntity->entindex()] = 0;
 		}
 
-		if (physenv != physenv_main) {
-			int aaa = 0;
-		}
-		physenv = physenv_main;
-		g_pShadowEntities = g_pShadowEntities_Main;
+		//if (physenv != physenv_main) {
+		//	int aaa = 0;
+		//}
+		//physenv = physenv_main;
+		//g_pShadowEntities = g_pShadowEntities_Main;
 	}
 
 	//virtual void OnEntityCreated( CBaseEntity *pEntity ) {}
@@ -3074,19 +3074,19 @@ public:
 
 	virtual void PostEntityRemove(int entnum)
 	{
-		int index = s_UTIL_Remove_PhysicsStack.Count() - 1;
-		Assert(index >= 0);
-		UTIL_Remove_PhysicsStack_t& PhysicsStackEntry = s_UTIL_Remove_PhysicsStack[index];
-		physenv = PhysicsStackEntry.pPhysicsEnvironment;
-		g_pShadowEntities = PhysicsStackEntry.pShadowList;
-		s_UTIL_Remove_PhysicsStack.FastRemove(index);
+		//int index = s_UTIL_Remove_PhysicsStack.Count() - 1;
+		//Assert(index >= 0);
+		//UTIL_Remove_PhysicsStack_t& PhysicsStackEntry = s_UTIL_Remove_PhysicsStack[index];
+		//physenv = PhysicsStackEntry.pPhysicsEnvironment;
+		//g_pShadowEntities = PhysicsStackEntry.pShadowList;
+		//s_UTIL_Remove_PhysicsStack.FastRemove(index);
 
-#ifdef _DEBUG
-		for (int i = CPhysicsShadowClone::g_ShadowCloneList.Count(); --i >= 0; )
-		{
-			Assert(CPhysicsShadowClone::g_ShadowCloneList[i]->GetEngineShadowClone()->GetClonedEntity() != pEntity); //shouldn't be any clones of this object anymore
-		}
-#endif
+//#ifdef _DEBUG
+//		for (int i = CPhysicsShadowClone::g_ShadowCloneList.Count(); --i >= 0; )
+//		{
+//			Assert(CPhysicsShadowClone::g_ShadowCloneList[i]->GetEngineShadowClone()->GetClonedEntity() != pEntity); //shouldn't be any clones of this object anymore
+//		}
+//#endif
 	}
 };
 static CPortal_AutoGameSys_EntityListener s_CPortal_AGS_EL_Singleton;

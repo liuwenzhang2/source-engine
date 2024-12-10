@@ -88,9 +88,9 @@ struct triggerevent_t
 void PhysSolidOverride( solid_t &solid, string_t overrideScript );
 
 extern CEntityList *g_pShadowEntities;
-#ifdef PORTAL
-extern CEntityList *g_pShadowEntities_Main;
-#endif
+//#ifdef PORTAL
+//extern CEntityList *g_pShadowEntities_Main;
+//#endif
 void PhysAddShadow( CBaseEntity *pEntity );
 void PhysRemoveShadow( CBaseEntity *pEntity );
 bool PhysHasShadow( CBaseEntity *pEntity );

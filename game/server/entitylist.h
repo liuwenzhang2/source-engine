@@ -42,6 +42,7 @@
 #include "engine/IEngineSound.h"
 #include "coordsize.h"
 #include "soundenvelope.h"
+#include "datacache/idatacache.h"
 #ifdef PORTAL
 #include "portal_physics_collisionevent.h"
 #include "physicsshadowclone.h"
@@ -2656,7 +2657,7 @@ public:
 
 	void PhysCallbackDamage(CBaseEntity* pEntity, const CTakeDamageInfo& info)
 	{
-		if (gEntList.PhysIsInCallback())
+		if (PhysIsInCallback())
 		{
 			CBaseEntity* pInflictor = info.GetInflictor();
 			IPhysicsObject* pInflictorPhysics = (pInflictor) ? pInflictor->GetEngineObject()->VPhysicsGetObject() : NULL;
@@ -2674,13 +2675,13 @@ public:
 
 	void PhysCallbackRemove(CBaseEntity* pRemove)
 	{
-		if (gEntList.PhysIsInCallback())
+		if (PhysIsInCallback())
 		{
 			m_Collisions.AddRemoveObject(pRemove);
 		}
 		else
 		{
-			gEntList.DestroyEntity(pRemove);
+			DestroyEntity(pRemove);
 		}
 	}
 
@@ -2974,9 +2975,9 @@ void CGlobalEntityList<T>::LevelInitPreEntity()
 	params.maxCollisionsPerObjectPerTimestep = 10;
 	physenv->SetPerformanceSettings(&params);
 
-#ifdef PORTAL
-	physenv_main = physenv;
-#endif
+//#ifdef PORTAL
+//	physenv_main = physenv;
+//#endif
 	{
 		g_EntityCollisionHash = physics->CreateObjectPairHash();
 	}
@@ -3004,9 +3005,9 @@ void CGlobalEntityList<T>::LevelInitPreEntity()
 	g_PhysWorldObject = PhysCreateWorld(GetBaseEntity(0));
 
 	g_pShadowEntities = new CEntityList;
-#ifdef PORTAL
-	g_pShadowEntities_Main = g_pShadowEntities;
-#endif
+//#ifdef PORTAL
+//	g_pShadowEntities_Main = g_pShadowEntities;
+//#endif
 
 	PrecachePhysicsSounds();
 

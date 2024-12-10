@@ -6660,9 +6660,9 @@ IPhysicsEnvironment* CEnginePortalInternal::GetPhysicsEnvironment()
 void CEnginePortalInternal::CreatePhysicsEnvironment()
 {
 	pPhysicsEnvironment = physenv;
-#ifdef PORTAL
-	pPhysicsEnvironment = physenv_main;
-#endif
+//#ifdef PORTAL
+//	pPhysicsEnvironment = physenv_main;
+//#endif
 }
 
 void CEnginePortalInternal::ClearPhysicsEnvironment()

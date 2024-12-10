@@ -40,9 +40,9 @@ IPhysics			*physics = NULL;
 IPhysicsObject		*g_PhysWorldObject = NULL;
 IPhysicsCollision	*physcollision = NULL;
 IPhysicsEnvironment	*physenv = NULL;
-#ifdef PORTAL
-IPhysicsEnvironment	*physenv_main = NULL;
-#endif
+//#ifdef PORTAL
+//IPhysicsEnvironment	*physenv_main = NULL;
+//#endif
 IPhysicsSurfaceProps *physprops = NULL;
 // UNDONE: This hash holds both entity & IPhysicsObject pointer pairs
 // UNDONE: Split into separate hashes?
