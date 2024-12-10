@@ -126,7 +126,7 @@ CEnvShake::~CEnvShake( void )
 {
 	if ( m_pShakeController )
 	{
-		physenv->DestroyMotionController( m_pShakeController );
+		EntityList()->PhysGetEnv()->DestroyMotionController( m_pShakeController );
 	}
 }
 
@@ -194,7 +194,7 @@ void CEnvShake::ApplyShake( ShakeCommand_t command )
 	{
 		if ( !m_pShakeController )
 		{
-			m_pShakeController = physenv->CreateMotionController( &m_shakeCallback );
+			m_pShakeController = EntityList()->PhysGetEnv()->CreateMotionController( &m_shakeCallback );
 		}
 		// do physics shake
 		switch( command )

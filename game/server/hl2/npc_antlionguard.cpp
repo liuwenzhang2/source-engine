@@ -3347,7 +3347,7 @@ void CNPC_AntlionGuard::SummonAntlions( void )
 		}
 
 		// Ensure it's dirt or sand
-		const surfacedata_t *pdata = physprops->GetSurfaceData( tr.surface.surfaceProps );
+		const surfacedata_t *pdata = EntityList()->PhysGetProps()->GetSurfaceData( tr.surface.surfaceProps );
 		if ( ( pdata->game.material != CHAR_TEX_DIRT ) && ( pdata->game.material != CHAR_TEX_SAND ) )
 		{
 			if ( g_debug_antlionguard.GetInt() == 2 )
@@ -3938,7 +3938,7 @@ Vector CNPC_AntlionGuard::GetPhysicsHitPosition( CBaseEntity *pObject, CBaseEnti
 
 	// Get the distance we want to be from the object when we hit it
 	IPhysicsObject *pPhys = pObject->GetEngineObject()->VPhysicsGetObject();
-	Vector extent = physcollision->CollideGetExtent( pPhys->GetCollide(), pObject->GetEngineObject()->GetAbsOrigin(), pObject->GetEngineObject()->GetAbsAngles(), -vecToTarget );
+	Vector extent = EntityList()->PhysGetCollision()->CollideGetExtent( pPhys->GetCollide(), pObject->GetEngineObject()->GetAbsOrigin(), pObject->GetEngineObject()->GetAbsAngles(), -vecToTarget );
 	float flDist = ( extent - pObject->WorldSpaceCenter() ).Length() + GetEngineObject()->BoundingRadius() + 32.0f;
 	
 	if ( vecTrajectory != NULL )

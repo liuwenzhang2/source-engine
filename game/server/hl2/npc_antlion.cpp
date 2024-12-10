@@ -3637,7 +3637,7 @@ void CNPC_Antlion::CreateDust( bool placeDecal )
 
 	if ( tr.fraction < 1.0f )
 	{
-		const surfacedata_t *pdata = physprops->GetSurfaceData( tr.surface.surfaceProps );
+		const surfacedata_t *pdata = EntityList()->PhysGetProps()->GetSurfaceData( tr.surface.surfaceProps );
 
 		if ( hl2_episodic.GetBool() == true || ( pdata->game.material == CHAR_TEX_CONCRETE ) || 
 			 ( pdata->game.material == CHAR_TEX_DIRT ) ||

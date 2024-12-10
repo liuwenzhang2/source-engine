@@ -119,7 +119,7 @@ CBaseCombatWeapon::~CBaseCombatWeapon( void )
 	//Remove our constraint, if we have one
 	if ( m_pConstraint != NULL )
 	{
-		physenv->DestroyConstraint( m_pConstraint );
+		EntityList()->PhysGetEnv()->DestroyConstraint( m_pConstraint );
 		m_pConstraint = NULL;
 	}
 	OnBaseCombatWeaponDestroyed( this );
@@ -984,7 +984,7 @@ void CBaseCombatWeapon::Equip( CBaseCombatCharacter *pOwner )
 	if ( m_pConstraint != NULL )
 	{
 		GetEngineObject()->RemoveSpawnFlags( SF_WEAPON_START_CONSTRAINED );
-		physenv->DestroyConstraint( m_pConstraint );
+		EntityList()->PhysGetEnv()->DestroyConstraint( m_pConstraint );
 		m_pConstraint = NULL;
 	}
 #endif

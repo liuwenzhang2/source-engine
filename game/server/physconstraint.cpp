@@ -141,57 +141,12 @@ void CPhysConstraintSystem::Spawn()
 	constraint_groupparams_t group;
 	group.Defaults();
 	group.additionalIterations = m_additionalIterations;
-	m_pMachine = physenv->CreateConstraintGroup( group );
+	m_pMachine = EntityList()->PhysGetEnv()->CreateConstraintGroup( group );
 }
 
 LINK_ENTITY_TO_CLASS( phys_constraintsystem, CPhysConstraintSystem );
 
-void PhysTeleportConstrainedEntity( CBaseEntity *pTeleportSource, IPhysicsObject *pObject0, IPhysicsObject *pObject1, const Vector &prevPosition, const QAngle &prevAngles, bool physicsRotate )
-{
-	// teleport the other object
-	CBaseEntity *pEntity0 = static_cast<CBaseEntity *> (pObject0->GetGameData());
-	CBaseEntity *pEntity1 = static_cast<CBaseEntity *> (pObject1->GetGameData());
-	if ( !pEntity0 || !pEntity1 )
-		return;
 
-	// figure out which entity needs to be fixed up (the one that isn't pTeleportSource)
-	CBaseEntity *pFixup = pEntity1;
-	// teleport the other object
-	if ( pTeleportSource != pEntity0 )
-	{
-		if ( pTeleportSource != pEntity1 )
-		{
-			Msg("Bogus teleport notification!!\n");
-			return;
-		}
-		pFixup = pEntity0;
-	}
-
-	// constraint doesn't move this entity
-	if ( pFixup->GetEngineObject()->GetMoveType() != MOVETYPE_VPHYSICS )
-		return;
-
-	if ( !pFixup->GetEngineObject()->VPhysicsGetObject() || !pFixup->GetEngineObject()->VPhysicsGetObject()->IsMoveable() )
-		return;
-
-	QAngle oldAngles = prevAngles;
-
-	if ( !physicsRotate )
-	{
-		oldAngles = pTeleportSource->GetEngineObject()->GetAbsAngles();
-	}
-
-	matrix3x4_t startCoord, startInv, endCoord, xform;
-	AngleMatrix( oldAngles, prevPosition, startCoord );
-	MatrixInvert( startCoord, startInv );
-	ConcatTransforms( pTeleportSource->GetEngineObject()->EntityToWorldTransform(), startInv, xform );
-	QAngle fixupAngles;
-	Vector fixupPos;
-
-	ConcatTransforms( xform, pFixup->GetEngineObject()->EntityToWorldTransform(), endCoord );
-	MatrixAngles( endCoord, fixupAngles, fixupPos );
-	pFixup->Teleport( &fixupPos, &fixupAngles, NULL );
-}
 
 static void DrawPhysicsBounds( IPhysicsObject *pObject, int r, int g, int b, int a )
 {
@@ -200,7 +155,7 @@ static void DrawPhysicsBounds( IPhysicsObject *pObject, int r, int g, int b, int
 	QAngle angles;
 	pObject->GetPosition( &pos, &angles );
 	Vector mins, maxs;
-	physcollision->CollideGetAABB( &mins, &maxs, pCollide, vec3_origin, vec3_angle );
+	EntityList()->PhysGetCollision()->CollideGetAABB( &mins, &maxs, pCollide, vec3_origin, vec3_angle );
 	// don't fight the z-buffer
 	mins -= Vector(1,1,1);
 	maxs += Vector(1,1,1);
@@ -279,16 +234,16 @@ void CPhysConstraint::OnBreak( void )
 		Vector refPos = origin, attachPos = origin;
 
 		IPhysicsObject *pRef = m_pConstraint->GetReferenceObject();
-		if ( pRef && (pRef != g_PhysWorldObject) )
+		if ( pRef && (pRef != EntityList()->PhysGetWorldObject()) )
 		{
 			pRef->GetPosition( &refPos, NULL );
 			attachPos = refPos;
 		}
 		IPhysicsObject *pAttach = m_pConstraint->GetAttachedObject();
-		if ( pAttach && (pAttach != g_PhysWorldObject) )
+		if ( pAttach && (pAttach != EntityList()->PhysGetWorldObject()) )
 		{
 			pAttach->GetPosition( &attachPos, NULL );
-			if ( !pRef || (pRef == g_PhysWorldObject) )
+			if ( !pRef || (pRef == EntityList()->PhysGetWorldObject()) )
 			{
 				refPos = attachPos;
 			}
@@ -426,7 +381,7 @@ void CPhysConstraint::UpdateOnRemove(void)
 
 CPhysConstraint::~CPhysConstraint()
 {
-	physenv->DestroyConstraint( m_pConstraint );
+	EntityList()->PhysGetEnv()->DestroyConstraint( m_pConstraint );
 }
 
 void CPhysConstraint::Precache( void )
@@ -582,7 +537,7 @@ void CPhysConstraint::GetConstraintObjects( hl_constraint_info_t &info )
 			return;
 #endif	// HL2_EPISODIC
 		}
-		info.pObjects[0] = g_PhysWorldObject;
+		info.pObjects[0] = EntityList()->PhysGetWorldObject();
 		info.massScale[0] = info.massScale[1] = 1.0f; // no mass scale on world constraint
 	}
 	else if ( info.pObjects[0] && !info.pObjects[1] )
@@ -596,7 +551,7 @@ void CPhysConstraint::GetConstraintObjects( hl_constraint_info_t &info )
 #endif	// HL2_EPISODIC
 		}
 		info.pObjects[1] = info.pObjects[0];
-		info.pObjects[0] = g_PhysWorldObject;		// Try to make the world object consistently object0 for ease of implementation
+		info.pObjects[0] = EntityList()->PhysGetWorldObject();		// Try to make the world object consistently object0 for ease of implementation
 		info.massScale[0] = info.massScale[1] = 1.0f; // no mass scale on world constraint
 		info.swapped = true;
 	}
@@ -701,7 +656,7 @@ void CPhysConstraint::NotifySystemEvent( CBaseEntity *pNotify, notify_system_eve
 
 	m_teleportTick = gpGlobals->tickcount;
 
-	PhysTeleportConstrainedEntity( pNotify, m_pConstraint->GetReferenceObject(), m_pConstraint->GetAttachedObject(), params.pTeleport->prevOrigin, params.pTeleport->prevAngles, params.pTeleport->physicsRotate );
+	gEntList.PhysTeleportConstrainedEntity( pNotify, m_pConstraint->GetReferenceObject(), m_pConstraint->GetAttachedObject(), params.pTeleport->prevOrigin, params.pTeleport->prevAngles, params.pTeleport->physicsRotate );
 }
 
 class CPhysHinge : public CPhysConstraint, public IVPhysicsWatcher
@@ -735,7 +690,7 @@ public:
 			GetEngineObject()->RemoveSpawnFlags( SF_CONSTRAINT_ASSUME_WORLD_GEOMETRY );
 		}
 
-		return physenv->CreateHingeConstraint( info.pObjects[0], info.pObjects[1], pGroup, m_hinge );
+		return EntityList()->PhysGetEnv()->CreateHingeConstraint( info.pObjects[0], info.pObjects[1], pGroup, m_hinge );
 	}
 
 	void DrawDebugGeometryOverlays()
@@ -992,7 +947,7 @@ static int GetUnitAxisIndex( const Vector &axis )
 
 bool CPhysHinge::IsWorldHinge( const hl_constraint_info_t &info, int *pAxisOut )
 {
-	if (GetEngineObject()->HasSpawnFlags( SF_CONSTRAINT_ASSUME_WORLD_GEOMETRY ) && info.pObjects[0] == g_PhysWorldObject )
+	if (GetEngineObject()->HasSpawnFlags( SF_CONSTRAINT_ASSUME_WORLD_GEOMETRY ) && info.pObjects[0] == EntityList()->PhysGetWorldObject())
 	{
 		Vector localHinge;
 		info.pObjects[1]->WorldToLocalVector( &localHinge, m_hinge.worldAxisDirection );
@@ -1049,7 +1004,7 @@ public:
 		GetBreakParams( ballsocket.constraint, info );
 		ballsocket.constraint.torqueLimit = 0;
 
-		return physenv->CreateBallsocketConstraint( info.pObjects[0], info.pObjects[1], pGroup, ballsocket );
+		return EntityList()->PhysGetEnv()->CreateBallsocketConstraint( info.pObjects[0], info.pObjects[1], pGroup, ballsocket );
 	}
 };
 
@@ -1246,7 +1201,7 @@ IPhysicsConstraint *CPhysSlideConstraint::CreateConstraint( IPhysicsConstraintGr
 		sliding.limitMax -= limit;
 	}
 
-	return physenv->CreateSlidingConstraint( info.pObjects[0], info.pObjects[1], pGroup, sliding );
+	return EntityList()->PhysGetEnv()->CreateSlidingConstraint( info.pObjects[0], info.pObjects[1], pGroup, sliding );
 }
 
 
@@ -1314,12 +1269,12 @@ IPhysicsConstraint *CPhysFixed::CreateConstraint( IPhysicsConstraintGroup *pGrou
 	GetBreakParams( fixed.constraint, info );
 
 	// constraining to the world means object 1 is fixed
-	if ( info.pObjects[0] == g_PhysWorldObject )
+	if ( info.pObjects[0] == EntityList()->PhysGetWorldObject())
 	{
 		PhysSetGameFlags( info.pObjects[1], FVPHYSICS_CONSTRAINT_STATIC );
 	}
 
-	return physenv->CreateFixedConstraint( info.pObjects[0], info.pObjects[1], pGroup, fixed );
+	return EntityList()->PhysGetEnv()->CreateFixedConstraint( info.pObjects[0], info.pObjects[1], pGroup, fixed );
 }
 
 
@@ -1421,7 +1376,7 @@ IPhysicsConstraint *CPhysPulley::CreateConstraint( IPhysicsConstraintGroup *pGro
 		pulley.isRigid = true;
 	}
 
-	return physenv->CreatePulleyConstraint( info.pObjects[0], info.pObjects[1], pGroup, pulley );
+	return EntityList()->PhysGetEnv()->CreatePulleyConstraint( info.pObjects[0], info.pObjects[1], pGroup, pulley );
 }
 
 //-----------------------------------------------------------------------------
@@ -1519,7 +1474,7 @@ IPhysicsConstraint *CPhysLength::CreateConstraint( IPhysicsConstraintGroup *pGro
 	}
 	GetBreakParams( length.constraint, info );
 
-	return physenv->CreateLengthConstraint( info.pObjects[0], info.pObjects[1], pGroup, length );
+	return EntityList()->PhysGetEnv()->CreateLengthConstraint( info.pObjects[0], info.pObjects[1], pGroup, length );
 }
 
 //-----------------------------------------------------------------------------
@@ -1601,7 +1556,7 @@ IPhysicsConstraint *CRagdollConstraint::CreateConstraint( IPhysicsConstraintGrou
 	{
 		ragdoll.isActive = false;
 	}
-	return physenv->CreateRagdollConstraint( info.pObjects[0], info.pObjects[1], pGroup, ragdoll );
+	return EntityList()->PhysGetEnv()->CreateRagdollConstraint( info.pObjects[0], info.pObjects[1], pGroup, ragdoll );
 }
 
 

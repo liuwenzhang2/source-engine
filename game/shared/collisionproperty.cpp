@@ -37,7 +37,7 @@
 #include "tier0/memdbgon.h"
 
 extern ISpatialPartition* partition;
-extern IPhysicsCollision* physcollision;
+//extern IPhysicsCollision* physcollision;
 
 //-----------------------------------------------------------------------------
 // KD tree query callbacks
@@ -978,7 +978,7 @@ void CCollisionProperty::ComputeVPhysicsSurroundingBox( Vector *pVecWorldMins, V
 	{
 		if ( pPhysicsObject->GetCollide() )
 		{
-			physcollision->CollideGetAABB( pVecWorldMins, pVecWorldMaxs, 
+			EntityList()->PhysGetCollision()->CollideGetAABB( pVecWorldMins, pVecWorldMaxs,
 				pPhysicsObject->GetCollide(), GetCollisionOrigin(), GetCollisionAngles() );
 			bSetBounds = true;
 		}

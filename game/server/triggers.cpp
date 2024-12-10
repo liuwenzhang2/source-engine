@@ -3305,7 +3305,7 @@ bool CTriggerWind::CreateVPhysics()
 {
 	BaseClass::CreateVPhysics();
 
-	m_pWindController = physenv->CreateMotionController( &m_WindCallback );
+	m_pWindController = EntityList()->PhysGetEnv()->CreateMotionController( &m_WindCallback );
 	return true;
 }
 
@@ -3316,7 +3316,7 @@ void CTriggerWind::UpdateOnRemove()
 {
 	if ( m_pWindController )
 	{
-		physenv->DestroyMotionController( m_pWindController );
+		EntityList()->PhysGetEnv()->DestroyMotionController( m_pWindController );
 		m_pWindController = NULL;
 	}
 
@@ -4032,7 +4032,7 @@ float CTriggerVPhysicsMotion::LinearLimit()
 //------------------------------------------------------------------------------
 bool CTriggerVPhysicsMotion::CreateVPhysics()
 {
-	m_pController = physenv->CreateMotionController( this );
+	m_pController = EntityList()->PhysGetEnv()->CreateMotionController( this );
 	BaseClass::CreateVPhysics();
 
 	return true;
@@ -4046,7 +4046,7 @@ void CTriggerVPhysicsMotion::UpdateOnRemove()
 {
 	if ( m_pController )
 	{
-		physenv->DestroyMotionController( m_pController );
+		EntityList()->PhysGetEnv()->DestroyMotionController( m_pController );
 		m_pController = NULL;
 	}
 

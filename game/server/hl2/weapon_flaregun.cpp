@@ -434,7 +434,7 @@ void CFlare::FlareTouch( CBaseEntity *pOther )
 		//Only do this on the first bounce
 		if ( m_nBounces == 0 )
 		{
-			const surfacedata_t *pdata = physprops->GetSurfaceData( tr.surface.surfaceProps );	
+			const surfacedata_t *pdata = EntityList()->PhysGetProps()->GetSurfaceData( tr.surface.surfaceProps );
 
 			if ( pdata != NULL )
 			{

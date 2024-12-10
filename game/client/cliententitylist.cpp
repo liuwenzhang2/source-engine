@@ -35,7 +35,7 @@
 #include "con_nprint.h"
 #include "view.h"
 #include "ragdoll_shared.h"
-
+#include "physics_shared.h"
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
@@ -946,7 +946,7 @@ void C_EngineObjectInternal::OnRestore()
 		m_ragdoll.list[0].originParentSpace.Init();
 
 		RagdollActivate(m_ragdoll, modelinfo->GetVCollide(GetModelIndex()), GetModelIndex(), true);
-		RagdollSetupAnimatedFriction(physenv, &m_ragdoll, GetModelIndex());
+		RagdollSetupAnimatedFriction(ClientEntityList().PhysGetEnv(), &m_ragdoll, GetModelIndex());
 
 		BuildRagdollBounds();
 
@@ -5193,7 +5193,7 @@ void C_EngineObjectInternal::InitRagdoll(
 	params.jointFrictionScale = 1.0;
 	params.allowStretch = false;
 	params.fixedConstraints = bFixedConstraints;
-	RagdollCreate(m_ragdoll, params, physenv);
+	RagdollCreate(m_ragdoll, params, ClientEntityList().PhysGetEnv());
 	VPhysicsSetObject(NULL);
 	VPhysicsSetObject(m_ragdoll.list[0].pObject);
 	// Mark the ragdoll as debris.
@@ -7275,7 +7275,7 @@ bool C_EnginePortalInternal::EntityIsInPortalHole(IEngineObjectClient* pEntity) 
 
 			for (int i = 0; i != pVCollide->solidCount; ++i)
 			{
-				physcollision->TraceCollide(ptEntityPosition, ptEntityPosition, pVCollide->solids[i], qEntityAngles, m_InternalData.Placement.pHoleShapeCollideable, vec3_origin, vec3_angle, &Trace);
+				ClientEntityList().PhysGetCollision()->TraceCollide(ptEntityPosition, ptEntityPosition, pVCollide->solids[i], qEntityAngles, m_InternalData.Placement.pHoleShapeCollideable, vec3_origin, vec3_angle, &Trace);
 
 				if (Trace.startsolid)
 					return true;
@@ -7289,7 +7289,7 @@ bool C_EnginePortalInternal::EntityIsInPortalHole(IEngineObjectClient* pEntity) 
 			ptCenter = (vMins + vMaxs) * 0.5f;
 			vMins -= ptCenter;
 			vMaxs -= ptCenter;
-			physcollision->TraceBox(ptCenter, ptCenter, vMins, vMaxs, m_InternalData.Placement.pHoleShapeCollideable, vec3_origin, vec3_angle, &Trace);
+			ClientEntityList().PhysGetCollision()->TraceBox(ptCenter, ptCenter, vMins, vMaxs, m_InternalData.Placement.pHoleShapeCollideable, vec3_origin, vec3_angle, &Trace);
 
 			return Trace.startsolid;
 		}
@@ -7298,7 +7298,7 @@ bool C_EnginePortalInternal::EntityIsInPortalHole(IEngineObjectClient* pEntity) 
 
 	case SOLID_BBOX:
 	{
-		physcollision->TraceBox(pEntity->GetAbsOrigin(), pEntity->GetAbsOrigin(),
+		ClientEntityList().PhysGetCollision()->TraceBox(pEntity->GetAbsOrigin(), pEntity->GetAbsOrigin(),
 			pEntity->OBBMins(), pEntity->OBBMaxs(),
 			m_InternalData.Placement.pHoleShapeCollideable, vec3_origin, vec3_angle, &Trace);
 
@@ -7396,7 +7396,7 @@ bool C_EnginePortalInternal::EntityHitBoxExtentIsInPortalHole(IEngineObjectClien
 	vMaxExtent -= ptCenter;
 
 	trace_t Trace;
-	physcollision->TraceBox(ptCenter, ptCenter, vMinExtent, vMaxExtent, m_InternalData.Placement.pHoleShapeCollideable, vec3_origin, vec3_angle, &Trace);
+	ClientEntityList().PhysGetCollision()->TraceBox(ptCenter, ptCenter, vMinExtent, vMaxExtent, m_InternalData.Placement.pHoleShapeCollideable, vec3_origin, vec3_angle, &Trace);
 
 	if (Trace.startsolid)
 		return true;
@@ -7407,7 +7407,7 @@ bool C_EnginePortalInternal::EntityHitBoxExtentIsInPortalHole(IEngineObjectClien
 bool C_EnginePortalInternal::RayIsInPortalHole(const Ray_t& ray) const //traces a ray against the same detector for EntityIsInPortalHole(), bias is towards false positives
 {
 	trace_t Trace;
-	physcollision->TraceBox(ray, m_InternalData.Placement.pHoleShapeCollideable, vec3_origin, vec3_angle, &Trace);
+	ClientEntityList().PhysGetCollision()->TraceBox(ray, m_InternalData.Placement.pHoleShapeCollideable, vec3_origin, vec3_angle, &Trace);
 	return Trace.DidHit();
 }
 
@@ -7415,7 +7415,7 @@ bool C_EnginePortalInternal::TraceWorldBrushes(const Ray_t& ray, trace_t* pTrace
 {
 	if (m_DataAccess.Simulation.Static.World.Brushes.pCollideable && sv_portal_trace_vs_world.GetBool())
 	{
-		physcollision->TraceBox(ray, m_DataAccess.Simulation.Static.World.Brushes.pCollideable, vec3_origin, vec3_angle, pTrace);
+		ClientEntityList().PhysGetCollision()->TraceBox(ray, m_DataAccess.Simulation.Static.World.Brushes.pCollideable, vec3_origin, vec3_angle, pTrace);
 		return true;
 	}
 	return false;
@@ -7425,7 +7425,7 @@ bool C_EnginePortalInternal::TraceWallTube(const Ray_t& ray, trace_t* pTrace) co
 {
 	if (m_DataAccess.Simulation.Static.Wall.Local.Tube.pCollideable && sv_portal_trace_vs_holywall.GetBool())
 	{
-		physcollision->TraceBox(ray, m_DataAccess.Simulation.Static.Wall.Local.Tube.pCollideable, vec3_origin, vec3_angle, pTrace);
+		ClientEntityList().PhysGetCollision()->TraceBox(ray, m_DataAccess.Simulation.Static.Wall.Local.Tube.pCollideable, vec3_origin, vec3_angle, pTrace);
 		return true;
 	}
 	return false;
@@ -7435,7 +7435,7 @@ bool C_EnginePortalInternal::TraceWallBrushes(const Ray_t& ray, trace_t* pTrace)
 {
 	if (m_DataAccess.Simulation.Static.Wall.Local.Brushes.pCollideable && sv_portal_trace_vs_holywall.GetBool())
 	{
-		physcollision->TraceBox(ray, m_DataAccess.Simulation.Static.Wall.Local.Brushes.pCollideable, vec3_origin, vec3_angle, pTrace);
+		ClientEntityList().PhysGetCollision()->TraceBox(ray, m_DataAccess.Simulation.Static.Wall.Local.Brushes.pCollideable, vec3_origin, vec3_angle, pTrace);
 		return true;
 	}
 	return false;
@@ -7446,7 +7446,7 @@ bool C_EnginePortalInternal::TraceTransformedWorldBrushes(IEnginePortalClient* p
 	C_EnginePortalInternal* pRemotePortalInternal = dynamic_cast<C_EnginePortalInternal*>(pRemoteCollisionEntity);
 	if (pRemotePortalInternal->m_DataAccess.Simulation.Static.World.Brushes.pCollideable && sv_portal_trace_vs_world.GetBool())
 	{
-		physcollision->TraceBox(ray, pRemotePortalInternal->m_DataAccess.Simulation.Static.World.Brushes.pCollideable, m_DataAccess.Placement.ptaap_LinkedToThis.ptOriginTransform, m_DataAccess.Placement.ptaap_LinkedToThis.qAngleTransform, pTrace);
+		ClientEntityList().PhysGetCollision()->TraceBox(ray, pRemotePortalInternal->m_DataAccess.Simulation.Static.World.Brushes.pCollideable, m_DataAccess.Placement.ptaap_LinkedToThis.ptOriginTransform, m_DataAccess.Placement.ptaap_LinkedToThis.qAngleTransform, pTrace);
 		return true;
 	}
 	return false;
@@ -7546,7 +7546,7 @@ IPhysicsEnvironment* C_EnginePortalInternal::GetPhysicsEnvironment()
 
 void C_EnginePortalInternal::CreatePhysicsEnvironment()
 {
-	pPhysicsEnvironment = physenv;
+	pPhysicsEnvironment = ClientEntityList().PhysGetEnv();
 //#ifdef PORTAL
 //	pPhysicsEnvironment = physenv_main;
 //#endif
@@ -7884,11 +7884,11 @@ void CStaticCollisionPolyhedronCache::Update(void)
 					for (int i = 0; i != pCollide->solidCount; ++i)
 					{
 						CPhysConvex* ConvexesArray[1024];
-						int iConvexes = physcollision->GetConvexesUsedInCollideable(pCollide->solids[i], ConvexesArray, 1024);
+						int iConvexes = ClientEntityList().PhysGetCollision()->GetConvexesUsedInCollideable(pCollide->solids[i], ConvexesArray, 1024);
 
 						for (int j = 0; j != iConvexes; ++j)
 						{
-							CPolyhedron* pTempPolyhedron = physcollision->PolyhedronFromConvex(ConvexesArray[j], true);
+							CPolyhedron* pTempPolyhedron = ClientEntityList().PhysGetCollision()->PolyhedronFromConvex(ConvexesArray[j], true);
 							if (pTempPolyhedron)
 							{
 								for (int iPointCounter = 0; iPointCounter != pTempPolyhedron->iVertexCount; ++iPointCounter)
@@ -7945,11 +7945,11 @@ void CStaticCollisionPolyhedronCache::Update(void)
 								m_StaticPropPolyhedrons.AddToTail(pWorkSpacePolyhedron);
 
 #ifdef _DEBUG
-								CPhysConvex* pConvex = physcollision->ConvexFromConvexPolyhedron(*pTempPolyhedron);
+								CPhysConvex* pConvex = ClientEntityList().PhysGetCollision()->ConvexFromConvexPolyhedron(*pTempPolyhedron);
 								AssertMsg(pConvex != NULL, "Conversion from Convex to Polyhedron was unreversable");
 								if (pConvex)
 								{
-									physcollision->ConvexFree(pConvex);
+									ClientEntityList().PhysGetCollision()->ConvexFree(pConvex);
 								}
 #endif
 
@@ -8225,7 +8225,7 @@ void C_EnginePortalInternal::CreatePolyhedrons(void)
 						IStudioHdr* pStudioHdr = modelinfo->GetStudiomodel(pModel);
 						Assert(pStudioHdr != NULL);
 						NewEntry.iTraceContents = pStudioHdr->contents();
-						NewEntry.iTraceSurfaceProps = physprops->GetSurfaceIndex(pStudioHdr->pszSurfaceProp());
+						NewEntry.iTraceSurfaceProps = EntityList()->PhysGetProps()->GetSurfaceIndex(pStudioHdr->pszSurfaceProp());
 					}
 					else
 					{
@@ -8527,7 +8527,7 @@ static CPhysCollide* ConvertPolyhedronsToCollideable(CPolyhedron** pPolyhedrons,
 	STARTDEBUGTIMER(convexTimer);
 	for (int i = 0; i != iPolyhedronCount; ++i)
 	{
-		pConvexes[iConvexCount] = physcollision->ConvexFromConvexPolyhedron(*pPolyhedrons[i]);
+		pConvexes[iConvexCount] = ClientEntityList().PhysGetCollision()->ConvexFromConvexPolyhedron(*pPolyhedrons[i]);
 
 		Assert(pConvexes[iConvexCount] != NULL);
 
@@ -8543,7 +8543,7 @@ static CPhysCollide* ConvertPolyhedronsToCollideable(CPolyhedron** pPolyhedrons,
 	{
 		CREATEDEBUGTIMER(collideTimer);
 		STARTDEBUGTIMER(collideTimer);
-		pReturn = physcollision->ConvertConvexToCollide(pConvexes, iConvexCount);
+		pReturn = ClientEntityList().PhysGetCollision()->ConvertConvexToCollide(pConvexes, iConvexCount);
 		STOPDEBUGTIMER(collideTimer);
 		DEBUGTIMERONLY(DevMsg(2, "[PSDT:%d] %sCollideable Generation:%fms\n", s_iPortalSimulatorGUID, TABSPACING, collideTimer.GetDuration().GetMillisecondsF()); );
 	}
@@ -8653,19 +8653,19 @@ void C_EnginePortalInternal::ClearLocalCollision(void)
 {
 	if (m_InternalData.Simulation.Static.Wall.Local.Brushes.pCollideable)
 	{
-		physcollision->DestroyCollide(m_InternalData.Simulation.Static.Wall.Local.Brushes.pCollideable);
+		ClientEntityList().PhysGetCollision()->DestroyCollide(m_InternalData.Simulation.Static.Wall.Local.Brushes.pCollideable);
 		m_InternalData.Simulation.Static.Wall.Local.Brushes.pCollideable = NULL;
 	}
 
 	if (m_InternalData.Simulation.Static.Wall.Local.Tube.pCollideable)
 	{
-		physcollision->DestroyCollide(m_InternalData.Simulation.Static.Wall.Local.Tube.pCollideable);
+		ClientEntityList().PhysGetCollision()->DestroyCollide(m_InternalData.Simulation.Static.Wall.Local.Tube.pCollideable);
 		m_InternalData.Simulation.Static.Wall.Local.Tube.pCollideable = NULL;
 	}
 
 	if (m_InternalData.Simulation.Static.World.Brushes.pCollideable)
 	{
-		physcollision->DestroyCollide(m_InternalData.Simulation.Static.World.Brushes.pCollideable);
+		ClientEntityList().PhysGetCollision()->DestroyCollide(m_InternalData.Simulation.Static.World.Brushes.pCollideable);
 		m_InternalData.Simulation.Static.World.Brushes.pCollideable = NULL;
 	}
 
@@ -8677,7 +8677,7 @@ void C_EnginePortalInternal::ClearLocalCollision(void)
 			PS_SD_Static_World_StaticProps_ClippedProp_t& Representation = m_InternalData.Simulation.Static.World.StaticProps.ClippedRepresentations[i];
 			if (Representation.pCollide)
 			{
-				physcollision->DestroyCollide(Representation.pCollide);
+				ClientEntityList().PhysGetCollision()->DestroyCollide(Representation.pCollide);
 				Representation.pCollide = NULL;
 			}
 		}
@@ -8687,8 +8687,8 @@ void C_EnginePortalInternal::ClearLocalCollision(void)
 
 void C_EnginePortalInternal::CreateLocalPhysics(void)
 {
-	//int iDefaultSurfaceIndex = physprops->GetSurfaceIndex( "default" );
-	objectparams_t params = g_PhysDefaultObjectParams;
+	//int iDefaultSurfaceIndex = EntityList()->PhysGetProps()->GetSurfaceIndex( "default" );
+	objectparams_t params = ClientEntityList().PhysGetDefaultObjectParams();
 
 	// Any non-moving object can point to world safely-- Make sure we dont use 'params' for something other than that beyond this point.
 	//if( m_InternalData.Simulation.pCollisionEntity )
@@ -8763,8 +8763,8 @@ void C_EnginePortalInternal::CreateLocalPhysics(void)
 void C_EnginePortalInternal::CreateLinkedPhysics(IEnginePortalClient* pRemoteCollisionEntity)
 {
 	C_EnginePortalInternal* pRemotePortalInternal = dynamic_cast<C_EnginePortalInternal*>(pRemoteCollisionEntity);
-	//int iDefaultSurfaceIndex = physprops->GetSurfaceIndex( "default" );
-	objectparams_t params = g_PhysDefaultObjectParams;
+	//int iDefaultSurfaceIndex = EntityList()->PhysGetProps()->GetSurfaceIndex( "default" );
+	objectparams_t params = ClientEntityList().PhysGetDefaultObjectParams();
 
 	//if( pCollisionEntity )
 	params.pGameData = this->m_pOuter;
@@ -8860,7 +8860,7 @@ void C_EnginePortalInternal::CreateHoleShapeCollideable()
 	//update hole shape - used to detect if an entity is within the portal hole bounds
 	{
 		if (m_InternalData.Placement.pHoleShapeCollideable)
-			physcollision->DestroyCollide(m_InternalData.Placement.pHoleShapeCollideable);
+			ClientEntityList().PhysGetCollision()->DestroyCollide(m_InternalData.Placement.pHoleShapeCollideable);
 
 		float fHolePlanes[6 * 4];
 
@@ -8901,17 +8901,17 @@ void C_EnginePortalInternal::CreateHoleShapeCollideable()
 
 		CPolyhedron* pPolyhedron = GeneratePolyhedronFromPlanes(fHolePlanes, 6, PORTAL_POLYHEDRON_CUT_EPSILON, true);
 		Assert(pPolyhedron != NULL);
-		CPhysConvex* pConvex = physcollision->ConvexFromConvexPolyhedron(*pPolyhedron);
+		CPhysConvex* pConvex = ClientEntityList().PhysGetCollision()->ConvexFromConvexPolyhedron(*pPolyhedron);
 		pPolyhedron->Release();
 		Assert(pConvex != NULL);
-		m_InternalData.Placement.pHoleShapeCollideable = physcollision->ConvertConvexToCollide(&pConvex, 1);
+		m_InternalData.Placement.pHoleShapeCollideable = ClientEntityList().PhysGetCollision()->ConvertConvexToCollide(&pConvex, 1);
 	}
 }
 
 void C_EnginePortalInternal::ClearHoleShapeCollideable()
 {
 	if (m_InternalData.Placement.pHoleShapeCollideable) {
-		physcollision->DestroyCollide(m_InternalData.Placement.pHoleShapeCollideable);
+		ClientEntityList().PhysGetCollision()->DestroyCollide(m_InternalData.Placement.pHoleShapeCollideable);
 		m_InternalData.Placement.pHoleShapeCollideable = NULL;
 	}
 }

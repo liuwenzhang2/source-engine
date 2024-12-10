@@ -25,7 +25,7 @@
 
 static Vector g_AntlionDustColor( 0.3f, 0.25f, 0.2f );
 
-extern IPhysicsSurfaceProps *physprops;
+//extern IPhysicsSurfaceProps *physprops;
 
 class CAntlionDustEmitter : public CSimpleEmitter
 {

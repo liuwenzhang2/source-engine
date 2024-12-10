@@ -162,7 +162,7 @@ CPhysForce::~CPhysForce()
 {
 	if ( m_pController )
 	{
-		physenv->DestroyMotionController( m_pController );
+		EntityList()->PhysGetEnv()->DestroyMotionController( m_pController );
 	}
 }
 
@@ -276,7 +276,7 @@ void CPhysForce::ActivateForce( void )
 	SetupForces( pPhys, linear, angular );
 
 	m_integrator.SetConstantForce( linear, angular );
-	m_pController = physenv->CreateMotionController( &m_integrator );
+	m_pController = EntityList()->PhysGetEnv()->CreateMotionController( &m_integrator );
 	m_pController->AttachObject( pPhys, true );
 	// Make sure the object is simulated
 	pPhys->Wake();
@@ -288,7 +288,7 @@ void CPhysForce::ForceOff( void )
 	if ( !m_pController )
 		return;
 
-	physenv->DestroyMotionController( m_pController );
+	EntityList()->PhysGetEnv()->DestroyMotionController( m_pController );
 	m_pController = NULL;
 	SetThink( NULL );
 	GetEngineObject()->SetNextThink( TICK_NEVER_THINK );
@@ -700,8 +700,8 @@ CPhysMotor::~CPhysMotor()
 		}
 	}
 
-	physenv->DestroyConstraint( m_pHinge );
-	physenv->DestroyMotionController( m_pController );
+	EntityList()->PhysGetEnv()->DestroyConstraint( m_pHinge );
+	EntityList()->PhysGetEnv()->DestroyMotionController( m_pController );
 }
 
 
@@ -782,7 +782,7 @@ void CPhysMotor::Activate( void )
 				hingeParams.worldAxisDirection = m_motor.m_axis;
 				hingeParams.worldPosition = GetEngineObject()->GetLocalOrigin();
 
-				m_pHinge = physenv->CreateHingeConstraint( g_PhysWorldObject, pPhys, NULL, hingeParams );
+				m_pHinge = EntityList()->PhysGetEnv()->CreateHingeConstraint(EntityList()->PhysGetWorldObject(), pPhys, NULL, hingeParams );
 				m_pHinge->SetGameData( (void *)this );
 				// can't grab this object
 				PhysSetGameFlags(pPhys, FVPHYSICS_NO_PLAYER_PICKUP);
@@ -790,7 +790,7 @@ void CPhysMotor::Activate( void )
 
 			if (GetEngineObject()->GetSpawnFlags() & SF_MOTOR_NOCOLLIDE)
 			{
-				PhysDisableEntityCollisions( g_PhysWorldObject, pPhys );
+				PhysDisableEntityCollisions(EntityList()->PhysGetWorldObject(), pPhys );
 			}
 		}
 		else
@@ -801,7 +801,7 @@ void CPhysMotor::Activate( void )
 		// NOTE: On restore, this path isn't run because m_pController will not be NULL
 		if ( !m_pController )
 		{
-			m_pController = physenv->CreateMotionController( &m_motor );
+			m_pController = EntityList()->PhysGetEnv()->CreateMotionController( &m_motor );
 			m_pController->AttachObject( m_attachedObject->GetEngineObject()->VPhysicsGetObject(), false );
 
 			if (GetEngineObject()->GetSpawnFlags() & SF_MOTOR_START_ON)
@@ -915,7 +915,7 @@ CKeepUpright::~CKeepUpright()
 {
 	if ( m_pController )
 	{
-		physenv->DestroyMotionController( m_pController );
+		EntityList()->PhysGetEnv()->DestroyMotionController( m_pController );
 		m_pController = NULL;
 	}
 }
@@ -976,7 +976,7 @@ void CKeepUpright::Activate()
 		}
 #endif
 
-		m_pController = physenv->CreateMotionController( (IMotionEvent *)this );
+		m_pController = EntityList()->PhysGetEnv()->CreateMotionController( (IMotionEvent *)this );
 		m_pController->AttachObject( pPhys, false );
 	}
 	else

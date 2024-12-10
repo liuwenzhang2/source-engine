@@ -183,7 +183,7 @@ void CItem::Spawn( void )
 		//Constrain the weapon in place
 		IPhysicsObject *pReferenceObject, *pAttachedObject;
 
-		pReferenceObject = g_PhysWorldObject;
+		pReferenceObject = EntityList()->PhysGetWorldObject();
 		pAttachedObject = GetEngineObject()->VPhysicsGetObject();
 
 		if ( pReferenceObject && pAttachedObject )
@@ -195,7 +195,7 @@ void CItem::Spawn( void )
 			fixed.constraint.forceLimit	= lbs2kg( 10000 );
 			fixed.constraint.torqueLimit = lbs2kg( 10000 );
 
-			m_pConstraint = physenv->CreateFixedConstraint( pReferenceObject, pAttachedObject, NULL, fixed );
+			m_pConstraint = EntityList()->PhysGetEnv()->CreateFixedConstraint( pReferenceObject, pAttachedObject, NULL, fixed );
 
 			m_pConstraint->SetGameData( (void *) this );
 		}
@@ -545,7 +545,7 @@ void CItem::OnPhysGunPickup( CBasePlayer *pPhysGunUser, PhysGunPickup_t reason )
 
 		if( m_pConstraint != NULL )
 		{
-			physenv->DestroyConstraint( m_pConstraint );
+			EntityList()->PhysGetEnv()->DestroyConstraint( m_pConstraint );
 			m_pConstraint = NULL;
 		}
 	}

@@ -96,7 +96,7 @@ void C_EntityDissolve::UpdateOnRemove( void )
 {
 	if ( m_pController )
 	{
-		physenv->DestroyMotionController( m_pController );
+		EntityList()->PhysGetEnv()->DestroyMotionController( m_pController );
 		m_pController = NULL;
 	}
 
@@ -525,7 +525,7 @@ void C_EntityDissolve::ClientThink( void )
 		int nCount = pEnt->GetEngineObject()->VPhysicsGetObjectList( ppList, ARRAYSIZE(ppList) );
 		if ( nCount > 0 )
 		{
-			m_pController = physenv->CreateMotionController( this );
+			m_pController = EntityList()->PhysGetEnv()->CreateMotionController( this );
 			for ( int i = 0; i < nCount; ++i )
 			{
 				m_pController->AttachObject( ppList[i], true );

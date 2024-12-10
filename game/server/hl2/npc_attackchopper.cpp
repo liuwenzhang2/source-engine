@@ -2518,7 +2518,7 @@ bool CNPC_AttackHelicopter::IsValidZapTarget( CBaseEntity *pTarget )
 	for ( int i = 0; i < count; i++ )
 	{
 		int material = pList[i]->GetMaterialIndex();
-		const surfacedata_t *pSurfaceData = physprops->GetSurfaceData( material );
+		const surfacedata_t *pSurfaceData = EntityList()->PhysGetProps()->GetSurfaceData( material );
 
 		// Is flesh or metal? Go for it!
 		if ( pSurfaceData->game.material == CHAR_TEX_METAL || 
@@ -3745,13 +3745,13 @@ void Chopper_BecomeChunks( CBaseEntity *pChopper )
 	fixed.InitWithCurrentObjectState( pBodyObject, pTailObject );
 	fixed.constraint.Defaults();
 
-	pBodyChunk->m_pTailConstraint = physenv->CreateFixedConstraint( pBodyObject, pTailObject, pGroup, fixed );
+	pBodyChunk->m_pTailConstraint = EntityList()->PhysGetEnv()->CreateFixedConstraint( pBodyObject, pTailObject, pGroup, fixed );
 
 	fixed.Defaults();
 	fixed.InitWithCurrentObjectState( pBodyObject, pCockpitObject );
 	fixed.constraint.Defaults();
 
-	pBodyChunk->m_pCockpitConstraint = physenv->CreateFixedConstraint( pBodyObject, pCockpitObject, pGroup, fixed );
+	pBodyChunk->m_pCockpitConstraint = EntityList()->PhysGetEnv()->CreateFixedConstraint( pBodyObject, pCockpitObject, pGroup, fixed );
 }
 
 //-----------------------------------------------------------------------------
@@ -6095,13 +6095,13 @@ void CHelicopterChunk::CollisionCallback( CHelicopterChunk *pCaller )
 		// Break our other constraints
 		if ( m_pTailConstraint )
 		{
-			physenv->DestroyConstraint( m_pTailConstraint );
+			EntityList()->PhysGetEnv()->DestroyConstraint( m_pTailConstraint );
 			m_pTailConstraint = NULL;
 		}
 		
 		if ( m_pCockpitConstraint )
 		{
-			physenv->DestroyConstraint( m_pCockpitConstraint );
+			EntityList()->PhysGetEnv()->DestroyConstraint( m_pCockpitConstraint );
 			m_pCockpitConstraint = NULL;
 		}
 		

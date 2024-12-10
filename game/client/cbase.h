@@ -57,6 +57,5 @@
 #include "worldsize.h"
 #include "engine/ivmodelinfo.h"
 #include "gamemovement.h"
-inline IClientEntityList* EntityList() { return &ClientEntityList(); }
 
 #endif // CBASE_H

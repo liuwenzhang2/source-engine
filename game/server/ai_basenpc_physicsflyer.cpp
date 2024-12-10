@@ -287,7 +287,7 @@ CAI_BasePhysicsFlyingBot::CAI_BasePhysicsFlyingBot()
 //-----------------------------------------------------------------------------
 CAI_BasePhysicsFlyingBot::~CAI_BasePhysicsFlyingBot( void )
 {
-	physenv->DestroyMotionController( m_pMotionController );
+	EntityList()->PhysGetEnv()->DestroyMotionController( m_pMotionController );
 }
 
 
@@ -301,7 +301,7 @@ bool CAI_BasePhysicsFlyingBot::CreateVPhysics( void )
 	// Create the object in the physics system
 	IPhysicsObject *pPhysicsObject = GetEngineObject()->VPhysicsInitNormal( SOLID_BBOX, FSOLID_NOT_STANDABLE, false );
 
-	m_pMotionController = physenv->CreateMotionController( this );
+	m_pMotionController = EntityList()->PhysGetEnv()->CreateMotionController( this );
 	m_pMotionController->AttachObject( pPhysicsObject, true );
 	return true;
 }

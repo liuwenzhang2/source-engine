@@ -155,10 +155,10 @@ CProp_Portal::CProp_Portal( void )
 
 	CPolyhedron *pPolyhedron = GeneratePolyhedronFromPlanes( fPlanes, 6, 0.00001f, true );
 	Assert( pPolyhedron != NULL );
-	CPhysConvex *pConvex = physcollision->ConvexFromConvexPolyhedron( *pPolyhedron );
+	CPhysConvex *pConvex = EntityList()->PhysGetCollision()->ConvexFromConvexPolyhedron( *pPolyhedron );
 	pPolyhedron->Release();
 	Assert( pConvex != NULL );
-	m_pCollisionShape = physcollision->ConvertConvexToCollide( &pConvex, 1 );
+	m_pCollisionShape = EntityList()->PhysGetCollision()->ConvertConvexToCollide( &pConvex, 1 );
 
 	CProp_Portal_Shared::AllPortals.AddToTail( this );
 }
@@ -312,7 +312,7 @@ void PortalSimulatorDumps_DumpCollideToGlView( CPhysCollide *pCollide, const Vec
 
 bool CProp_Portal::TestCollision( const Ray_t &ray, unsigned int fContentsMask, trace_t& tr )
 {
-	physcollision->TraceBox( ray, MASK_ALL, NULL, m_pCollisionShape, GetEngineObject()->GetAbsOrigin(), GetEngineObject()->GetAbsAngles(), &tr );
+	EntityList()->PhysGetCollision()->TraceBox( ray, MASK_ALL, NULL, m_pCollisionShape, GetEngineObject()->GetAbsOrigin(), GetEngineObject()->GetAbsAngles(), &tr );
 	return tr.DidHit();
 }
 
@@ -1710,13 +1710,13 @@ void CProp_Portal::WakeNearbyEntities( void )
 //
 //		if( m_hPortalSimulator->m_DataAccess.Simulation.Static.Wall.Local.Brushes.pCollideable )
 //		{
-//			physcollision->TraceBox( ray, m_hPortalSimulator->m_DataAccess.Simulation.Static.Wall.Local.Brushes.pCollideable, vec3_origin, vec3_angle, &ShortestTrace );
+//			EntityList()->PhysGetCollision()->TraceBox( ray, m_hPortalSimulator->m_DataAccess.Simulation.Static.Wall.Local.Brushes.pCollideable, vec3_origin, vec3_angle, &ShortestTrace );
 //		}
 //
 //		/*if( pEnvironment->LocalCollide.pWorldCollide )
 //		{
 //			trace_t TempTrace;
-//			physcollision->TraceBox( ray, pEnvironment->LocalCollide.pWorldCollide, vec3_origin, vec3_angle, &TempTrace );
+//			EntityList()->PhysGetCollision()->TraceBox( ray, pEnvironment->LocalCollide.pWorldCollide, vec3_origin, vec3_angle, &TempTrace );
 //			if( TempTrace.fraction < ShortestTrace.fraction )
 //				ShortestTrace = TempTrace;
 //		}
@@ -1724,7 +1724,7 @@ void CProp_Portal::WakeNearbyEntities( void )
 //		if( pEnvironment->LocalCollide.pWallShellCollide )
 //		{
 //			trace_t TempTrace;
-//			physcollision->TraceBox( ray, pEnvironment->LocalCollide.pWallShellCollide, vec3_origin, vec3_angle, &TempTrace );
+//			EntityList()->PhysGetCollision()->TraceBox( ray, pEnvironment->LocalCollide.pWallShellCollide, vec3_origin, vec3_angle, &TempTrace );
 //			if( TempTrace.fraction < ShortestTrace.fraction )
 //				ShortestTrace = TempTrace;
 //		}
@@ -1732,7 +1732,7 @@ void CProp_Portal::WakeNearbyEntities( void )
 //		if( pEnvironment->LocalCollide.pRemoteWorldWallCollide )
 //		{
 //			trace_t TempTrace;
-//			physcollision->TraceBox( ray, pEnvironment->LocalCollide.pRemoteWorldWallCollide, vec3_origin, vec3_angle, &TempTrace );
+//			EntityList()->PhysGetCollision()->TraceBox( ray, pEnvironment->LocalCollide.pRemoteWorldWallCollide, vec3_origin, vec3_angle, &TempTrace );
 //			if( TempTrace.fraction < ShortestTrace.fraction )
 //				ShortestTrace = TempTrace;
 //		}

@@ -803,7 +803,7 @@ void CBaseEntity::DrawDebugGeometryOverlays(void)
 				if ( dist > 2 || fabsf(deltaAngle) > 2 )
 				{
 					Vector mins, maxs;
-					physcollision->CollideGetAABB( &mins, &maxs, GetEngineObject()->VPhysicsGetObject()->GetCollide(), vec3_origin, vec3_angle );
+					EntityList()->PhysGetCollision()->CollideGetAABB( &mins, &maxs, GetEngineObject()->VPhysicsGetObject()->GetCollide(), vec3_origin, vec3_angle );
 					NDebugOverlay::BoxAngles( pos, mins, maxs, angles, 255, 255, 0, 16, 0 );
 				}
 			}
@@ -2217,8 +2217,8 @@ void CBaseEntity::VPhysicsCollision( int index, gamevcollisionevent_t *pEvent )
 		return;
 
 	// don't make noise for hidden/invisible/sky materials
-	surfacedata_t *phit = physprops->GetSurfaceData( pEvent->surfaceProps[otherIndex] );
-	const surfacedata_t *pprops = physprops->GetSurfaceData( pEvent->surfaceProps[index] );
+	surfacedata_t *phit = EntityList()->PhysGetProps()->GetSurfaceData( pEvent->surfaceProps[otherIndex] );
+	const surfacedata_t *pprops = EntityList()->PhysGetProps()->GetSurfaceData( pEvent->surfaceProps[index] );
 	if ( phit->game.material == 'X' || pprops->game.material == 'X' )
 		return;
 
@@ -2249,7 +2249,7 @@ void CBaseEntity::VPhysicsCollision( int index, gamevcollisionevent_t *pEvent )
 
 void CBaseEntity::VPhysicsFriction( IPhysicsObject *pObject, float energy, int surfaceProps, int surfacePropsHit )
 {
-	PhysFrictionSound( this, pObject, energy, surfaceProps, surfacePropsHit );
+	gEntList.PhysFrictionSound( this, pObject, energy, surfaceProps, surfacePropsHit );
 }
 
 // Tells the physics shadow to update it's target to the current position
@@ -2276,7 +2276,7 @@ bool CBaseEntity::VPhysicsIsFlesh( void )
 	for ( int i = 0; i < count; i++ )
 	{
 		int material = pList[i]->GetMaterialIndex();
-		const surfacedata_t *pSurfaceData = physprops->GetSurfaceData( material );
+		const surfacedata_t *pSurfaceData = EntityList()->PhysGetProps()->GetSurfaceData( material );
 		// Is flesh ?, don't allow pickup
 		if ( pSurfaceData->game.material == CHAR_TEX_ANTLION || pSurfaceData->game.material == CHAR_TEX_FLESH || pSurfaceData->game.material == CHAR_TEX_BLOODYFLESH || pSurfaceData->game.material == CHAR_TEX_ALIENFLESH )
 			return true;
@@ -5177,7 +5177,7 @@ bool CBaseEntity::IsFloating()
 	float flThickness;
 	float flFriction;
 	float flElasticity;
-	physprops->GetPhysicsProperties( nMaterialIndex, &flDensity,
+	EntityList()->PhysGetProps()->GetPhysicsProperties( nMaterialIndex, &flDensity,
 		&flThickness, &flFriction, &flElasticity );
 
 	// FIXME: This really only works for water at the moment..

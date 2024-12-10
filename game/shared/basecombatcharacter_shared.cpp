@@ -727,6 +727,6 @@ surfacedata_t * CBaseCombatCharacter::GetGroundSurface( void ) const
 	if ( trace.fraction == 1.0f )
 		return NULL;	// no ground
 
-	return physprops->GetSurfaceData( trace.surface.surfaceProps );
+	return EntityList()->PhysGetProps()->GetSurfaceData( trace.surface.surfaceProps );
 }
 */

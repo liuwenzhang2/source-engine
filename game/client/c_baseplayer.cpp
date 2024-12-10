@@ -701,7 +701,7 @@ surfacedata_t* C_BasePlayer::GetGroundSurface()
 	if ( trace.fraction == 1.0f )
 		return NULL;	// no ground
 	
-	return physprops->GetSurfaceData( trace.surface.surfaceProps );
+	return EntityList()->PhysGetProps()->GetSurfaceData( trace.surface.surfaceProps );
 }
 
 void C_BasePlayer::FireGameEvent( IGameEvent *event )

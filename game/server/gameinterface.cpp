@@ -596,52 +596,6 @@ EXPOSE_SINGLE_INTERFACE_GLOBALVAR(CServerGameDLL, IServerGameDLL, INTERFACEVERSI
 COMPILE_TIME_ASSERT( INTERFACEVERSION_SERVERGAMEDLL_INT == 10 );
 
 //-----------------------------------------------------------------------------
-// Call these in pre-save + post save
-//-----------------------------------------------------------------------------
-void CEntitySaveUtils::PreSave()
-{
-	Assert(!m_pLevelAdjacencyDependencyHash);
-	MEM_ALLOC_CREDIT();
-	m_pLevelAdjacencyDependencyHash = physics->CreateObjectPairHash();
-}
-
-void CEntitySaveUtils::PostSave()
-{
-	physics->DestroyObjectPairHash(m_pLevelAdjacencyDependencyHash);
-	m_pLevelAdjacencyDependencyHash = NULL;
-}
-
-
-//-----------------------------------------------------------------------------
-// Gets the # of dependencies for a particular entity
-//-----------------------------------------------------------------------------
-int CEntitySaveUtils::GetEntityDependencyCount(CBaseEntity* pEntity)
-{
-	return m_pLevelAdjacencyDependencyHash->GetPairCountForObject(pEntity);
-}
-
-
-//-----------------------------------------------------------------------------
-// Gets all dependencies for a particular entity
-//-----------------------------------------------------------------------------
-int CEntitySaveUtils::GetEntityDependencies(CBaseEntity* pEntity, int nCount, CBaseEntity** ppEntList)
-{
-	return m_pLevelAdjacencyDependencyHash->GetPairListForObject(pEntity, nCount, (void**)ppEntList);
-}
-
-
-//-----------------------------------------------------------------------------
-// Methods of IEntitySaveUtils
-//-----------------------------------------------------------------------------
-void CEntitySaveUtils::AddLevelTransitionSaveDependency(CBaseEntity* pEntity1, CBaseEntity* pEntity2)
-{
-	if (pEntity1 != pEntity2)
-	{
-		m_pLevelAdjacencyDependencyHash->AddObjectPair(pEntity1, pEntity2);
-	}
-}
-
-//-----------------------------------------------------------------------------
 // Implementation of the block handler for save/restore of entities
 //-----------------------------------------------------------------------------
 const char* CServerGameDLL::GetBlockName()

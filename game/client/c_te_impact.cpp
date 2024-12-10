@@ -13,7 +13,7 @@
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
-extern IPhysicsSurfaceProps *physprops;
+//extern IPhysicsSurfaceProps *physprops;
 
 class C_TEImpact : public C_BaseTempEntity
 {

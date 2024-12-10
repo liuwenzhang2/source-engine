@@ -2307,7 +2307,7 @@ CTurretTipController::~CTurretTipController()
 {
 	if ( m_pController )
 	{
-		physenv->DestroyMotionController( m_pController );
+		EntityList()->PhysGetEnv()->DestroyMotionController( m_pController );
 		m_pController = NULL;
 	}
 }
@@ -2355,7 +2355,7 @@ void CTurretTipController::Activate( void )
 	//Setup the motion controller
 	if ( !m_pController )
 	{
-		m_pController = physenv->CreateMotionController( (IMotionEvent *)this );
+		m_pController = EntityList()->PhysGetEnv()->CreateMotionController( (IMotionEvent *)this );
 		m_pController->AttachObject( pPhys, true );
 	}
 	else

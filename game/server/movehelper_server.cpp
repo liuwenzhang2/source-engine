@@ -31,7 +31,7 @@
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
-extern IPhysicsCollision *physcollision;
+//extern IPhysicsCollision *physcollision;
 
 
 //-----------------------------------------------------------------------------
@@ -63,7 +63,6 @@ public:
 	virtual void	StartSound( const Vector& origin, const char *soundname ); 
 
 	virtual void	PlaybackEventFull( int flags, int clientindex, unsigned short eventindex, float delay, Vector& origin, Vector& angles, float fparam1, float fparam2, int iparam1, int iparam2, int bparam1, int bparam2 );
-	virtual IPhysicsSurfaceProps *GetSurfaceProps( void );
 
 	void			SetHost( CBasePlayer *host );
 
@@ -322,12 +321,6 @@ void CMoveHelperServer::StartSound( const Vector& origin, int channel, char cons
 void CMoveHelperServer::PlaybackEventFull( int flags, int clientindex, unsigned short eventindex, float delay, Vector& origin, Vector& angles, float fparam1, float fparam2, int iparam1, int iparam2, int bparam1, int bparam2 )
 {
 	// FIXME, Redo with new event system parameter stuff
-}
-
-IPhysicsSurfaceProps *CMoveHelperServer::GetSurfaceProps( void )
-{
-	extern IPhysicsSurfaceProps *physprops;
-	return physprops;
 }
 
 //-----------------------------------------------------------------------------

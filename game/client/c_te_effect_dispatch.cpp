@@ -98,7 +98,7 @@ static void RecordEffect( const char *pEffectName, const CEffectData &data )
 	{
 		KeyValues *msg = new KeyValues( "TempEntity" );
 
-		const char *pSurfacePropName = physprops->GetPropName( data.m_nSurfaceProp );
+		const char *pSurfacePropName = EntityList()->PhysGetProps()->GetPropName( data.m_nSurfaceProp );
 
 		char pName[1024];
 		Q_snprintf( pName, sizeof(pName), "TE_DispatchEffect %s %s", pEffectName, pSurfacePropName );
@@ -205,7 +205,7 @@ void TE_DispatchEffect( IRecipientFilter& filter, float delay, KeyValues *pKeyVa
 	data.m_flMagnitude = pKeyValues->GetFloat( "magnitude" );
 	data.m_flRadius = pKeyValues->GetFloat( "radius" );
 	const char *pSurfaceProp = pKeyValues->GetString( "surfaceprop" );
-	data.m_nSurfaceProp = physprops->GetSurfaceIndex( pSurfaceProp );
+	data.m_nSurfaceProp = EntityList()->PhysGetProps()->GetSurfaceIndex( pSurfaceProp );
 	data.m_nDamageType = pKeyValues->GetInt( "damagetype" );
 	data.m_nHitBox = pKeyValues->GetInt( "hitbox" );
 	data.m_nColor = pKeyValues->GetInt( "color" );

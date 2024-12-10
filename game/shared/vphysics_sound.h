@@ -19,6 +19,13 @@
 #endif // GAME_DLL
 #include "SoundEmitterSystem/isoundemittersystembase.h"
 
+#ifdef CLIENT_DLL
+extern IClientEntityList* EntityList();
+#endif // CLIENT_DLL
+#ifdef GAME_DLL
+extern IServerEntityList* EntityList();
+#endif // GAME_DLL
+
 namespace physicssound
 {
 	struct impactsound_t
@@ -48,10 +55,10 @@ namespace physicssound
 		for ( int i = list.Count()-1; i >= 0; --i )
 		{
 			impactsound_t &sound = list.GetElement(i);
-			const surfacedata_t *psurf = physprops->GetSurfaceData( sound.surfaceProps );
+			const surfacedata_t *psurf = EntityList()->PhysGetProps()->GetSurfaceData( sound.surfaceProps );
 			if ( psurf->sounds.impactHard )
 			{
-				const surfacedata_t *pHit = physprops->GetSurfaceData( sound.surfacePropsHit );
+				const surfacedata_t *pHit = EntityList()->PhysGetProps()->GetSurfaceData( sound.surfacePropsHit );
 				unsigned short soundName = psurf->sounds.impactHard;
 				if ( pHit && psurf->sounds.impactSoft )
 				{
@@ -61,7 +68,7 @@ namespace physicssound
 						soundName = psurf->sounds.impactSoft;
 					}
 				}
-				const char *pSound = physprops->GetString( soundName );
+				const char *pSound = EntityList()->PhysGetProps()->GetString( soundName );
 
 				CSoundParameters params;
 				if ( !g_pSoundEmitterSystem->GetParametersForSound( pSound, params, NULL ) )//CBaseEntity::
@@ -131,7 +138,7 @@ namespace physicssound
 
 	inline void AddBreakSound( CUtlVector<breaksound_t> &list, const Vector &origin, unsigned short surfaceProps )
 	{
-		const surfacedata_t *psurf = physprops->GetSurfaceData( surfaceProps );
+		const surfacedata_t *psurf = EntityList()->PhysGetProps()->GetSurfaceData( surfaceProps );
 		if ( !psurf->sounds.breakSound )
 			return;
 
@@ -158,8 +165,8 @@ namespace physicssound
 		{
 			breaksound_t &sound = list.Element(i);
 
-			const surfacedata_t *psurf = physprops->GetSurfaceData( sound.surfacePropsBreak );
-			const char *pSound = physprops->GetString( psurf->sounds.breakSound );
+			const surfacedata_t *psurf = EntityList()->PhysGetProps()->GetSurfaceData( sound.surfacePropsBreak );
+			const char *pSound = EntityList()->PhysGetProps()->GetString( psurf->sounds.breakSound );
 			CSoundParameters params;
 			if ( !g_pSoundEmitterSystem->GetParametersForSound( pSound, params, NULL ) )//CBaseEntity::
 				return;

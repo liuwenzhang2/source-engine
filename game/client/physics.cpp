@@ -22,6 +22,7 @@
 #include "fx_water.h"
 #include "positionwatcher.h"
 #include "vphysics/constraints.h"
+#include "physics_shared.h"
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
@@ -66,7 +67,7 @@ int CCollisionEvent::ShouldCollide_2( IPhysicsObject *pObj0, IPhysicsObject *pOb
 		if ( (gameFlags0 | gameFlags1) & FVPHYSICS_NO_SELF_COLLISIONS )
 			return 0;
 
-		IPhysicsCollisionSet *pSet = physics->FindCollisionSet( pEntity0->GetEngineObject()->GetModelIndex() );
+		IPhysicsCollisionSet *pSet = ClientEntityList().Physics()->FindCollisionSet(pEntity0->GetEngineObject()->GetModelIndex());
 		if ( pSet )
 			return pSet->ShouldCollide( pObj0->GetGameIndex(), pObj1->GetGameIndex() );
 
@@ -90,10 +91,10 @@ int CCollisionEvent::ShouldCollide_2( IPhysicsObject *pObj0, IPhysicsObject *pOb
 	if ( !(pObj0->GetContents() & pEntity1->PhysicsSolidMaskForEntity()) || !(pObj1->GetContents() & pEntity0->PhysicsSolidMaskForEntity()) )
 		return 0;
 
-	if ( g_EntityCollisionHash->IsObjectPairInHash( pGameData0, pGameData1 ) )
+	if ( ClientEntityList().PhysGetEntityCollisionHash()->IsObjectPairInHash(pGameData0, pGameData1))
 		return 0;
 
-	if ( g_EntityCollisionHash->IsObjectPairInHash( pObj0, pObj1 ) )
+	if (ClientEntityList().PhysGetEntityCollisionHash()->IsObjectPairInHash( pObj0, pObj1 ) )
 		return 0;
 
 #if 0
@@ -370,7 +371,7 @@ void CCollisionEvent::Friction( IPhysicsObject *pObject, float energy, int surfa
 			}
 		}
 
-		PhysFrictionSound( pEntity, pObject, energy, surfaceProps, surfacePropsHit );
+		ClientEntityList().PhysFrictionSound( pEntity, pObject, energy, surfaceProps, surfacePropsHit );
 	}
 
 	PhysFrictionEffect( vecPos, vecVel, energy, surfaceProps, surfacePropsHit );
@@ -481,10 +482,10 @@ void PhysicsSplash( IPhysicsFluidController *pFluid, IPhysicsObject *pObject, CB
 	
 	// Get object extents in basis
 	Vector tanPts[2], binPts[2];
-	tanPts[0] = physcollision->CollideGetExtent( pObject->GetCollide(), pEntity->GetEngineObject()->GetAbsOrigin(), pEntity->GetEngineObject()->GetAbsAngles(), -tangent );
-	tanPts[1] = physcollision->CollideGetExtent( pObject->GetCollide(), pEntity->GetEngineObject()->GetAbsOrigin(), pEntity->GetEngineObject()->GetAbsAngles(), tangent );
-	binPts[0] = physcollision->CollideGetExtent( pObject->GetCollide(), pEntity->GetEngineObject()->GetAbsOrigin(), pEntity->GetEngineObject()->GetAbsAngles(), -binormal );
-	binPts[1] = physcollision->CollideGetExtent( pObject->GetCollide(), pEntity->GetEngineObject()->GetAbsOrigin(), pEntity->GetEngineObject()->GetAbsAngles(), binormal );
+	tanPts[0] = EntityList()->PhysGetCollision()->CollideGetExtent( pObject->GetCollide(), pEntity->GetEngineObject()->GetAbsOrigin(), pEntity->GetEngineObject()->GetAbsAngles(), -tangent );
+	tanPts[1] = EntityList()->PhysGetCollision()->CollideGetExtent( pObject->GetCollide(), pEntity->GetEngineObject()->GetAbsOrigin(), pEntity->GetEngineObject()->GetAbsAngles(), tangent );
+	binPts[0] = EntityList()->PhysGetCollision()->CollideGetExtent( pObject->GetCollide(), pEntity->GetEngineObject()->GetAbsOrigin(), pEntity->GetEngineObject()->GetAbsAngles(), -binormal );
+	binPts[1] = EntityList()->PhysGetCollision()->CollideGetExtent( pObject->GetCollide(), pEntity->GetEngineObject()->GetAbsOrigin(), pEntity->GetEngineObject()->GetAbsAngles(), binormal );
 
 	// now compute the centered bbox
 	float mins[2], maxs[2], center[2], extents[2];
@@ -605,7 +606,7 @@ float CCollisionEvent::DeltaTimeSinceLastFluid( CBaseEntity *pEntity )
 {
 	for ( int i = m_fluidEvents.Count()-1; i >= 0; --i )
 	{
-		if ( m_fluidEvents[i].hEntity.Get() == pEntity )
+		if ( ClientEntityList().GetBaseEntityFromHandle(m_fluidEvents[i].hEntity) == pEntity )
 		{
 			return gpGlobals->curtime - m_fluidEvents[i].impactTime;
 		}
@@ -650,11 +651,6 @@ void CCollisionEvent::FluidEndTouch( IPhysicsObject *pObject, IPhysicsFluidContr
 {
 	CallbackContext callback(this);
 	//FIXME: Do nothing for now
-}
-
-IPhysicsObject *GetWorldPhysObject ( void )
-{
-	return g_PhysWorldObject;
 }
 
 

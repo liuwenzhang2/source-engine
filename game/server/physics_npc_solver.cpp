@@ -9,7 +9,7 @@
 #include "vphysics/friction.h"
 #include "ai_basenpc.h"
 #include "movevars_shared.h"
-
+#include "physics_shared.h"
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
@@ -133,7 +133,7 @@ void CPhysicsNPCSolver::BecomePenetrationSolver()
 		IPhysicsObject *pList[VPHYSICS_MAX_OBJECT_LIST_COUNT];
 		int listCount = pEntity->GetEngineObject()->VPhysicsGetObjectList( pList, ARRAYSIZE(pList) );
 		PhysDisableEntityCollisions( m_hNPC, pEntity );
-		m_pController = physenv->CreateMotionController( this );
+		m_pController = EntityList()->PhysGetEnv()->CreateMotionController( this );
 		for ( int i = 0; i < listCount; i++ )
 		{
 			m_pController->AttachObject( pList[i], false );
@@ -160,7 +160,7 @@ void CPhysicsNPCSolver::UpdateOnRemove()
 {
 	if ( m_allowIntersection )
 	{
-		physenv->DestroyMotionController( m_pController );
+		EntityList()->PhysGetEnv()->DestroyMotionController( m_pController );
 		m_pController = NULL;
 		PhysEnableEntityCollisions( m_hNPC, m_hEntity );
 	}
@@ -442,7 +442,7 @@ void CPhysicsEntitySolver::Think()
 
 void CPhysicsEntitySolver::UpdateOnRemove()
 {
-	//physenv->DestroyMotionController( m_pController );
+	//EntityList()->PhysGetEnv()->DestroyMotionController( m_pController );
 	//m_pController = NULL;
 	CBaseEntity *pEntity = m_hMovingEntity.Get();
 	CBaseEntity *pPhysics = m_hPhysicsBlocker.Get();

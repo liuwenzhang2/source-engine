@@ -170,7 +170,7 @@ bool C_BasePropDoor::TestCollision( const Ray_t &ray, unsigned int mask, trace_t
 	if (!pStudioHdr)
 		return false;
 
-	physcollision->TraceBox( ray, GetEngineObject()->VPhysicsGetObject()->GetCollide(), GetEngineObject()->GetAbsOrigin(), GetEngineObject()->GetAbsAngles(), &trace );
+	EntityList()->PhysGetCollision()->TraceBox( ray, GetEngineObject()->VPhysicsGetObject()->GetCollide(), GetEngineObject()->GetAbsOrigin(), GetEngineObject()->GetAbsAngles(), &trace );
 
 	if ( trace.DidHit() )
 	{

@@ -23,7 +23,7 @@
 #include "collisionutils.h"
 #include "decals.h"
 #include "bone_setup.h"
-
+#include "physics_shared.h"
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
@@ -149,7 +149,7 @@ CPhysicsSpring::~CPhysicsSpring( void )
 {
 	if ( m_pSpring )
 	{
-		physenv->DestroySpring( m_pSpring );
+		EntityList()->PhysGetEnv()->DestroySpring( m_pSpring );
 	}
 }
 
@@ -264,13 +264,13 @@ void CPhysicsSpring::GetSpringObjectConnections( string_t nameStart, string_t na
 	// Assume the world for missing objects
 	if ( !pStartObject )
 	{
-		pStartObject = g_PhysWorldObject;
+		pStartObject = EntityList()->PhysGetWorldObject();
 	}
 	else if ( !pEndObject )
 	{
 		// try to sort so that the world is always the start object
 		pEndObject = pStartObject;
-		pStartObject = g_PhysWorldObject;
+		pStartObject = EntityList()->PhysGetWorldObject();
 	}
 	else
 	{
@@ -330,7 +330,7 @@ void CPhysicsSpring::Activate( void )
 		spring.endPosition = m_end;
 		spring.useLocalPositions = false;
 		spring.onlyStretch = GetEngineObject()->HasSpawnFlags( SF_SPRING_ONLYSTRETCH );
-		m_pSpring = physenv->CreateSpring( pStart, pEnd, &spring );
+		m_pSpring = EntityList()->PhysGetEnv()->CreateSpring( pStart, pEnd, &spring );
 	}
 }
 
@@ -352,7 +352,7 @@ void CPhysicsSpring::NotifySystemEvent( CBaseEntity *pNotify, notify_system_even
 		return;
 
 	m_teleportTick = gpGlobals->tickcount;
-	PhysTeleportConstrainedEntity( pNotify, m_pSpring->GetStartObject(), m_pSpring->GetEndObject(), params.pTeleport->prevOrigin, params.pTeleport->prevAngles, params.pTeleport->physicsRotate );
+	gEntList.PhysTeleportConstrainedEntity( pNotify, m_pSpring->GetStartObject(), m_pSpring->GetEndObject(), params.pTeleport->prevOrigin, params.pTeleport->prevAngles, params.pTeleport->physicsRotate );
 }
 
 
@@ -479,7 +479,7 @@ void CPhysBox::Spawn( void )
 static bool ShouldDampRotation( const CPhysCollide *pCollide )
 {
 	Vector mins, maxs;
-	physcollision->CollideGetAABB( &mins, &maxs, pCollide, vec3_origin, vec3_angle );
+	EntityList()->PhysGetCollision()->CollideGetAABB( &mins, &maxs, pCollide, vec3_origin, vec3_angle );
 	Vector size = maxs-mins;
 	int largest = 0;
 	float largeSize = size[0];
@@ -1661,7 +1661,7 @@ void CPhysMagnet::VPhysicsCollision( int index, gamevcollisionevent_t *pEvent )
 	}
 
 	// Make sure it's made of metal
-	const surfacedata_t *phit = physprops->GetSurfaceData( pEvent->surfaceProps[otherIndex] );
+	const surfacedata_t *phit = EntityList()->PhysGetProps()->GetSurfaceData( pEvent->surfaceProps[otherIndex] );
 	char cTexType = phit->game.material;
 	if ( cTexType != CHAR_TEX_METAL && cTexType != CHAR_TEX_COMPUTER )
 	{
@@ -1710,8 +1710,8 @@ void CPhysMagnet::VPhysicsCollision( int index, gamevcollisionevent_t *pEvent )
 			pMagnetPhysObject->WorldToLocal( &ballsocket.constraintPosition[0], vecCollisionPoint );
 			pPhysics->WorldToLocal( &ballsocket.constraintPosition[1], vecCollisionPoint );
 
-			//newEntityOnMagnet.pConstraint = physenv->CreateBallsocketConstraint( pMagnetPhysObject, pPhysics, m_pConstraintGroup, ballsocket );
-			newEntityOnMagnet.pConstraint = physenv->CreateBallsocketConstraint( pMagnetPhysObject, pPhysics, NULL, ballsocket );
+			//newEntityOnMagnet.pConstraint = EntityList()->PhysGetEnv()->CreateBallsocketConstraint( pMagnetPhysObject, pPhysics, m_pConstraintGroup, ballsocket );
+			newEntityOnMagnet.pConstraint = EntityList()->PhysGetEnv()->CreateBallsocketConstraint( pMagnetPhysObject, pPhysics, NULL, ballsocket );
 		}
 		else
 		{
@@ -1723,8 +1723,8 @@ void CPhysMagnet::VPhysicsCollision( int index, gamevcollisionevent_t *pEvent )
 			fixed.constraint.torqueLimit = lbs2kg(m_torqueLimit);
 
 			// FIXME: Use the magnet's constraint group.
-			//newEntityOnMagnet.pConstraint = physenv->CreateFixedConstraint( pMagnetPhysObject, pPhysics, m_pConstraintGroup, fixed );
-			newEntityOnMagnet.pConstraint = physenv->CreateFixedConstraint( pMagnetPhysObject, pPhysics, NULL, fixed );
+			//newEntityOnMagnet.pConstraint = EntityList()->PhysGetEnv()->CreateFixedConstraint( pMagnetPhysObject, pPhysics, m_pConstraintGroup, fixed );
+			newEntityOnMagnet.pConstraint = EntityList()->PhysGetEnv()->CreateFixedConstraint( pMagnetPhysObject, pPhysics, NULL, fixed );
 		}
 
 		newEntityOnMagnet.pConstraint->SetGameData( (void *) this );
@@ -1853,7 +1853,7 @@ void CPhysMagnet::ConstraintBroken( IPhysicsConstraint *pConstraint )
 
 	m_OnMagnetDetach.FireOutput( this, this );
 
-	physenv->DestroyConstraint( pConstraint  );
+	EntityList()->PhysGetEnv()->DestroyConstraint( pConstraint  );
 }
 
 //-----------------------------------------------------------------------------
@@ -1871,7 +1871,7 @@ void CPhysMagnet::DetachAll( void )
 			m_MagnettedEntities[i].hEntity->SetShadowCastDistance( 0, 2.0f );
 		}
 
-		physenv->DestroyConstraint( m_MagnettedEntities[i].pConstraint  );
+		EntityList()->PhysGetEnv()->DestroyConstraint( m_MagnettedEntities[i].pConstraint  );
 	}
 
 	m_MagnettedEntities.Purge();

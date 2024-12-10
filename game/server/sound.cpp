@@ -1455,7 +1455,7 @@ int UTIL_EmitGroupnameSuit(CBaseEntity *entity, const char *groupname)
 
 char TEXTURETYPE_Find( trace_t *ptr )
 {
-	const surfacedata_t *psurfaceData = physprops->GetSurfaceData( ptr->surface.surfaceProps );
+	const surfacedata_t *psurfaceData = EntityList()->PhysGetProps()->GetSurfaceData( ptr->surface.surfaceProps );
 
 	return psurfaceData->game.material;
 }

@@ -276,7 +276,7 @@ void CBounceBomb::SetMineState( int iState )
 			unsigned int flags = GetEngineObject()->VPhysicsGetObject()->GetCallbackFlags();
 			GetEngineObject()->VPhysicsGetObject()->SetCallbackFlags( flags | CALLBACK_GLOBAL_TOUCH_STATIC );
 			OpenHooks();
-			physenv->DestroyConstraint( m_pConstraint );
+			EntityList()->PhysGetEnv()->DestroyConstraint( m_pConstraint );
 			m_pConstraint = NULL;
 
 			UpdateLight( true, 0, 0, 255, 190 );
@@ -306,7 +306,7 @@ void CBounceBomb::SetMineState( int iState )
 
 			if( m_pConstraint )
 			{
-				physenv->DestroyConstraint( m_pConstraint );
+				EntityList()->PhysGetEnv()->DestroyConstraint( m_pConstraint );
 				m_pConstraint = NULL;
 			}
 
@@ -708,8 +708,8 @@ void CBounceBomb::SettleThink()
 			ballsocket.constraint.Defaults();
 			ballsocket.constraint.forceLimit = lbs2kg(1000);
 			ballsocket.constraint.torqueLimit = lbs2kg(1000);
-			ballsocket.InitWithCurrentObjectState( g_PhysWorldObject, GetEngineObject()->VPhysicsGetObject(), GetEngineObject()->GetAbsOrigin() );
-			m_pConstraint = physenv->CreateBallsocketConstraint( g_PhysWorldObject, GetEngineObject()->VPhysicsGetObject(), NULL, ballsocket );
+			ballsocket.InitWithCurrentObjectState(EntityList()->PhysGetWorldObject(), GetEngineObject()->VPhysicsGetObject(), GetEngineObject()->GetAbsOrigin() );
+			m_pConstraint = EntityList()->PhysGetEnv()->CreateBallsocketConstraint(EntityList()->PhysGetWorldObject(), GetEngineObject()->VPhysicsGetObject(), NULL, ballsocket );
 			CloseHooks();
 
 			SetMineState( MINE_STATE_ARMED );
@@ -1209,7 +1209,7 @@ void CBounceBomb::InputDisarm( inputdata_t &inputdata )
 	{
 		if( m_pConstraint )
 		{
-			physenv->DestroyConstraint( m_pConstraint );
+			EntityList()->PhysGetEnv()->DestroyConstraint( m_pConstraint );
 			m_pConstraint = NULL;
 		}
 

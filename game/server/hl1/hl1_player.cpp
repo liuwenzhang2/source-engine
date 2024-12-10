@@ -26,6 +26,7 @@
 #include "predicted_viewmodel.h"
 #include "physics_saverestore.h"
 #include "gamestats.h"
+#include "physics_shared.h"
 
 #define DMG_FREEZE		DMG_VEHICLE
 #define DMG_SLOWFREEZE	DMG_DISSOLVE
@@ -469,7 +470,7 @@ void CHL1_Player::StartPullingObject( CBaseEntity *pObject )
 	ballsocket.constraint.forceLimit = lbs2kg(1000);
 	ballsocket.constraint.torqueLimit = lbs2kg(1000);
 	ballsocket.InitWithCurrentObjectState(GetEngineObject()->VPhysicsGetObject(), pObject->GetEngineObject()->VPhysicsGetObject(), WorldSpaceCenter() );
-	m_pPullConstraint = physenv->CreateBallsocketConstraint(GetEngineObject()->VPhysicsGetObject(), pObject->GetEngineObject()->VPhysicsGetObject(), NULL, ballsocket );
+	m_pPullConstraint = EntityList()->PhysGetEnv()->CreateBallsocketConstraint(GetEngineObject()->VPhysicsGetObject(), pObject->GetEngineObject()->VPhysicsGetObject(), NULL, ballsocket );
 
 	m_hPullObject.Set(pObject);
 	m_bIsPullingObject = true;
@@ -481,7 +482,7 @@ void CHL1_Player::StopPullingObject()
 {
 	if( m_pPullConstraint )
 	{
-		physenv->DestroyConstraint( m_pPullConstraint );
+		EntityList()->PhysGetEnv()->DestroyConstraint( m_pPullConstraint );
 	}
 
 	m_hPullObject.Set(NULL);
@@ -1321,7 +1322,7 @@ static QAngle AlignAngles( const QAngle &angles, float cosineAlignAngle )
 
 static void TraceCollideAgainstBBox( const CPhysCollide *pCollide, const Vector &start, const Vector &end, const QAngle &angles, const Vector &boxOrigin, const Vector &mins, const Vector &maxs, trace_t *ptr )
 {
-	physcollision->TraceBox( boxOrigin, boxOrigin + (start-end), mins, maxs, pCollide, start, angles, ptr );
+	EntityList()->PhysGetCollision()->TraceBox( boxOrigin, boxOrigin + (start-end), mins, maxs, pCollide, start, angles, ptr );
 
 	if ( ptr->DidHit() )
 	{
@@ -1666,7 +1667,7 @@ void CGrabController::AttachEntity( CBasePlayer *pPlayer, CBaseEntity *pEntity, 
 	// Carried entities can never block LOS
 	m_bCarriedEntityBlocksLOS = pEntity->BlocksLOS();
 	pEntity->SetBlocksLOS( false );
-	m_controller = physenv->CreateMotionController( this );
+	m_controller = EntityList()->PhysGetEnv()->CreateMotionController( this );
 	m_controller->AttachObject( pPhys, true );
 	// Don't do this, it's causing trouble with constraint solvers.
 	//m_controller->SetPriority( IPhysicsMotionController::HIGH_PRIORITY );
@@ -1772,7 +1773,7 @@ void CGrabController::DetachEntity()
 	}
 
 	m_attachedEntity = NULL;
-	physenv->DestroyMotionController( m_controller );
+	EntityList()->PhysGetEnv()->DestroyMotionController( m_controller );
 	m_controller = NULL;
 }
 
@@ -1863,7 +1864,7 @@ bool CGrabController::UpdateObject( CBasePlayer *pPlayer, float flError )
 	AngleVectors( playerAngles, &forward, &right, &up );
 	
 	// Now clamp a sphere of object radius at end to the player's bbox
-	Vector radial = physcollision->CollideGetExtent( pPhys->GetCollide(), vec3_origin, pEntity->GetEngineObject()->GetAbsAngles(), -forward );
+	Vector radial = EntityList()->PhysGetCollision()->CollideGetExtent( pPhys->GetCollide(), vec3_origin, pEntity->GetEngineObject()->GetAbsAngles(), -forward );
 	Vector player2d = pPlayer->GetEngineObject()->OBBMaxs();
 	float playerRadius = player2d.Length2D();
 	float radius = playerRadius + fabs(DotProduct( forward, radial ));

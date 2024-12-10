@@ -127,7 +127,7 @@ CNPC_Barnacle::~CNPC_Barnacle( void )
 	// Destroy the ragdoll->tongue tip constraint
   	if ( m_pConstraint )
   	{
-  		physenv->DestroyConstraint( m_pConstraint );
+		EntityList()->PhysGetEnv()->DestroyConstraint( m_pConstraint );
   		m_pConstraint = NULL;
   	}
 }
@@ -357,7 +357,7 @@ void CNPC_Barnacle::Activate( void )
 		fixed.Defaults();
 		fixed.InitWithCurrentObjectState( pTonguePhys, pPlayerPhys );
 		fixed.constraint.Defaults();
-		m_pConstraint = physenv->CreateFixedConstraint( pTonguePhys, pPlayerPhys, NULL, fixed );
+		m_pConstraint = EntityList()->PhysGetEnv()->CreateFixedConstraint( pTonguePhys, pPlayerPhys, NULL, fixed );
 	}
 }
 
@@ -982,7 +982,7 @@ void CNPC_Barnacle::UpdatePlayerConstraint( void )
 	}
 
 	// Destroy the current constraint.
-	physenv->DestroyConstraint( m_pConstraint );
+	EntityList()->PhysGetEnv()->DestroyConstraint( m_pConstraint );
 	m_pConstraint = NULL;
 
 	if ( m_hTongueTip )
@@ -996,7 +996,7 @@ void CNPC_Barnacle::UpdatePlayerConstraint( void )
 		fixed.InitWithCurrentObjectState( pTonguePhys, pPlayerPhys );
 		fixed.constraint.Defaults();
 
-		m_pConstraint = physenv->CreateFixedConstraint( pTonguePhys, pPlayerPhys, NULL, fixed );
+		m_pConstraint = EntityList()->PhysGetEnv()->CreateFixedConstraint( pTonguePhys, pPlayerPhys, NULL, fixed );
 	}
 
 	// Save state for the next check.
@@ -1513,7 +1513,7 @@ void CNPC_Barnacle::AttachTongueToTarget( CBaseEntity *pTouchEnt, Vector vecGrab
 		{
 			VectorSubtract( m_vecTip, pTouchEnt->GetEngineObject()->GetAbsOrigin(), vecGrabPos	);
 			VectorNormalize( vecGrabPos );
-			vecGrabPos = physcollision->CollideGetExtent( pPlayerPhys->GetCollide(), pTouchEnt->GetEngineObject()->GetAbsOrigin(), pTouchEnt->GetEngineObject()->GetAbsAngles(), vecGrabPos );
+			vecGrabPos = EntityList()->PhysGetCollision()->CollideGetExtent( pPlayerPhys->GetCollide(), pTouchEnt->GetEngineObject()->GetAbsOrigin(), pTouchEnt->GetEngineObject()->GetAbsAngles(), vecGrabPos );
 #if BARNACLE_USE_TONGUE_OFFSET
 			m_vecTipDrawOffset.GetForModify().Zero();
 #endif
@@ -1545,7 +1545,7 @@ You can use this stanza to try to counterplace the constraint on the player's he
 		}
 		*/
 		
-		m_pConstraint = physenv->CreateFixedConstraint( pTonguePhys, pPlayerPhys, NULL, fixed );
+		m_pConstraint = EntityList()->PhysGetEnv()->CreateFixedConstraint( pTonguePhys, pPlayerPhys, NULL, fixed );
 
 		// Increase the tongue's spring constant while lifting 
 		m_hTongueTip->m_pSpring->SetSpringConstant( BARNACLE_TONGUE_SPRING_CONSTANT_LIFTING );
@@ -1789,7 +1789,7 @@ void CNPC_Barnacle::BitePrey( void )
 	IPhysicsObject *pTonguePhys = m_hTongueTip->GetEngineObject()->VPhysicsGetObject();
 
 	// Make it nonsolid to the world so we can pull it through the roof
-	PhysDisableEntityCollisions( m_hRagdoll->GetEngineObject()->VPhysicsGetObject(), g_PhysWorldObject );
+	PhysDisableEntityCollisions( m_hRagdoll->GetEngineObject()->VPhysicsGetObject(), EntityList()->PhysGetWorldObject());
 
 	// Stop the tongue's spring getting in the way of swallowing
 	m_hTongueTip->m_pSpring->SetSpringConstant( 0 );
@@ -1914,7 +1914,7 @@ void CNPC_Barnacle::RemoveRagdoll( bool bDestroyRagdoll )
 	// Destroy the tongue tip constraint
   	if ( m_pConstraint )
   	{
-  		physenv->DestroyConstraint( m_pConstraint );
+		EntityList()->PhysGetEnv()->DestroyConstraint( m_pConstraint );
   		m_pConstraint = NULL;
   	}
 
@@ -2129,7 +2129,7 @@ void CNPC_Barnacle::Event_Killed( const CTakeDamageInfo &info )
 		// Destroy the ragdoll->tongue tip constraint
   		if ( m_pConstraint )
   		{
-  			physenv->DestroyConstraint( m_pConstraint );
+			EntityList()->PhysGetEnv()->DestroyConstraint( m_pConstraint );
   			m_pConstraint = NULL;
   		}
 		LostPrey( true );
@@ -2695,7 +2695,7 @@ void CBarnacleTongueTip::UpdateOnRemove( )
 {
 	if ( m_pSpring )
 	{
-		physenv->DestroySpring( m_pSpring );
+		EntityList()->PhysGetEnv()->DestroySpring( m_pSpring );
 		m_pSpring = NULL;
 	}
 	BaseClass::UpdateOnRemove();
@@ -2740,7 +2740,7 @@ bool CBarnacleTongueTip::CreateSpring( CBaseAnimating *pTongueRoot )
 	spring.startPosition = GetEngineObject()->GetAbsOrigin();
 	spring.endPosition = pTongueRoot->GetEngineObject()->GetAbsOrigin();
 	spring.useLocalPositions = false;
-	m_pSpring = physenv->CreateSpring( pPhysObject, pRootPhysObject, &spring );
+	m_pSpring = EntityList()->PhysGetEnv()->CreateSpring( pPhysObject, pRootPhysObject, &spring );
 
 	return true;
 }

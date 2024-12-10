@@ -139,7 +139,7 @@ void CBaseGrenade::Explode( trace_t *pTrace, int bitsDamageType )
 	if ( pTrace->fraction != 1.0 )
 	{
 		Vector vecNormal = pTrace->plane.normal;
-		surfacedata_t *pdata = physprops->GetSurfaceData( pTrace->surface.surfaceProps );	
+		surfacedata_t *pdata = EntityList()->PhysGetProps()->GetSurfaceData( pTrace->surface.surfaceProps );
 		CPASFilter filter( vecAbsOrigin );
 
 		te->Explosion( filter, -1.0, // don't apply cl_interp delay

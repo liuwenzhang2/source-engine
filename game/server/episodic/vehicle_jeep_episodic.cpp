@@ -1207,7 +1207,7 @@ static void SolveBlockingProps( CPropJeepEpisodic *pVehicleEntity, IPhysicsObjec
 				Vector point, pointLocal;
 				pSnapshot->GetContactPoint(point);
 				VectorITransform( point, pVehicleEntity->GetEngineObject()->EntityToWorldTransform(), pointLocal );
-				Vector bottomPoint = physcollision->CollideGetExtent( pVehiclePhysics->GetCollide(), vec3_origin, vec3_angle, Vector(0,0,-1) );
+				Vector bottomPoint = EntityList()->PhysGetCollision()->CollideGetExtent( pVehiclePhysics->GetCollide(), vec3_origin, vec3_angle, Vector(0,0,-1) );
 				// make sure it's under the bottom of the car
 				float bottomPlane = DotProduct(bottomPoint,vehicleUp)+8;	// 8 inches above bottom
 				if ( DotProduct( pointLocal, vehicleUp ) <= bottomPlane )

@@ -910,7 +910,7 @@ ConVar cl_autohelp(
 					float flFriction;
 					float flElasticity;
 
-					physprops->GetPhysicsProperties( nMaterialIndex, &flDensity,
+					EntityList()->PhysGetProps()->GetPhysicsProperties( nMaterialIndex, &flDensity,
 						&flThickness, &flFriction, &flElasticity );
 
 					const float DENSITY_ABSORB_ALL_DAMAGE = 3000.0;

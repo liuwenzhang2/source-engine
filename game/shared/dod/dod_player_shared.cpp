@@ -344,7 +344,7 @@ void CDODPlayer::FireBullets( const FireBulletsInfo_t &info )
 #endif
 
 		// Get surface where the bullet entered ( if it had different surfaces on enter and exit )
-		surfacedata_t *pSurfaceData = physprops->GetSurfaceData( tr.surface.surfaceProps );
+		surfacedata_t *pSurfaceData = EntityList()->PhysGetProps()->GetSurfaceData( tr.surface.surfaceProps );
 		Assert( pSurfaceData );
 		
 		float flMaterialMod = GetDensityFromMaterial(pSurfaceData);
@@ -1044,7 +1044,7 @@ void CDODPlayer::UpdateStepSound( surfacedata_t *psurface, const Vector &vecOrig
 	// find out what we're stepping in or on...
 	if ( fLadder )
 	{
-		psurface = physprops->GetSurfaceData( physprops->GetSurfaceIndex( "ladder" ) );
+		psurface = EntityList()->PhysGetProps()->GetSurfaceData(EntityList()->PhysGetProps()->GetSurfaceIndex( "ladder" ) );
 		flVol = 1.0;
 		m_flStepSoundTime = 350;
 	}
@@ -1062,13 +1062,13 @@ void CDODPlayer::UpdateStepSound( surfacedata_t *psurface, const Vector &vecOrig
 		{
 			iSkipStep = 0;
 		}
-		psurface = physprops->GetSurfaceData( physprops->GetSurfaceIndex( "wade" ) );
+		psurface = EntityList()->PhysGetProps()->GetSurfaceData(EntityList()->PhysGetProps()->GetSurfaceIndex( "wade" ) );
 		flVol = 0.65;
 		m_flStepSoundTime = 600;
 	}
 	else if ( enginetrace->GetPointContents( feet ) & MASK_WATER )
 	{
-		psurface = physprops->GetSurfaceData( physprops->GetSurfaceIndex( "water" ) );
+		psurface = EntityList()->PhysGetProps()->GetSurfaceData(EntityList()->PhysGetProps()->GetSurfaceIndex( "water" ) );
 		flVol = bWalking ? 0.2 : 0.5;
 		m_flStepSoundTime = bWalking ? 400 : 300;		
 	}
@@ -1196,8 +1196,7 @@ void CDODPlayer::PlayStepSound( Vector &vecOrigin, surfacedata_t *psurface, floa
 	if ( !stepSoundName )
 		return;
 
-	IPhysicsSurfaceProps *physprops = MoveHelper( )->GetSurfaceProps();
-	const char *pSoundName = physprops->GetString( stepSoundName );
+	const char *pSoundName = EntityList()->PhysGetProps()->GetString( stepSoundName );
 	CSoundParameters params;
 
 	// we don't always know the model, so go by team

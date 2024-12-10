@@ -264,7 +264,7 @@ void CNavLadder::SetDir( NavDirType dir )
 
 	if (result.fraction != 1.0f)
 	{
-		bool climbableSurface = physprops->GetSurfaceData( result.surface.surfaceProps )->game.climbable != 0;
+		bool climbableSurface = EntityList()->PhysGetProps()->GetSurfaceData( result.surface.surfaceProps )->game.climbable != 0;
 		if ( !climbableSurface )
 		{
 			climbableSurface = (result.contents & CONTENTS_LADDER) != 0;

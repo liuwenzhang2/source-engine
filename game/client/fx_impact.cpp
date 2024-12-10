@@ -379,7 +379,7 @@ void PlayImpactSound( CBaseEntity *pEntity, trace_t &tr, Vector &vecServerOrigin
 	{
 		nServerSurfaceProp = tr.surface.surfaceProps;
 	}
-	pdata = physprops->GetSurfaceData( nServerSurfaceProp );
+	pdata = EntityList()->PhysGetProps()->GetSurfaceData( nServerSurfaceProp );
 	if ( tr.fraction < 1.0 )
 	{
 		vecOrigin = tr.endpos;
@@ -392,7 +392,7 @@ void PlayImpactSound( CBaseEntity *pEntity, trace_t &tr, Vector &vecServerOrigin
 	// Now play the esound
 	if ( pdata->sounds.bulletImpact )
 	{
-		const char *pbulletImpactSoundName = physprops->GetString( pdata->sounds.bulletImpact );
+		const char *pbulletImpactSoundName = EntityList()->PhysGetProps()->GetString( pdata->sounds.bulletImpact );
 		
 		if ( g_pImpactSoundRouteFn )
 		{
@@ -443,7 +443,7 @@ C_BaseEntity *ParseImpactData( const CEffectData &data, Vector *vecOrigin, Vecto
 	VectorNormalize( *vecShotDir );
 
 	// Get the material from the surfaceprop
-	surfacedata_t *psurfaceData = physprops->GetSurfaceData( data.m_nSurfaceProp );
+	surfacedata_t *psurfaceData = EntityList()->PhysGetProps()->GetSurfaceData( data.m_nSurfaceProp );
 	iMaterial = psurfaceData->game.material;
 
 	return pEntity;

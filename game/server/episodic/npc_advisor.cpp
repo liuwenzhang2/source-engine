@@ -477,7 +477,7 @@ void CNPC_Advisor::UpdateOnRemove()
 {
 	if ( m_pLevitateController )
 	{
-		physenv->DestroyMotionController( m_pLevitateController );
+		EntityList()->PhysGetEnv()->DestroyMotionController( m_pLevitateController );
 	}
 	
 	BaseClass::UpdateOnRemove();
@@ -517,7 +517,7 @@ void CNPC_Advisor::StartLevitatingObjects()
 {
 	if ( !m_pLevitateController )
 	{
-		m_pLevitateController = physenv->CreateMotionController( &m_levitateCallback );
+		m_pLevitateController = EntityList()->PhysGetEnv()->CreateMotionController( &m_levitateCallback );
 	}
 
 	m_pLevitateController->ClearObjects();

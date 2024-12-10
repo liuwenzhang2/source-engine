@@ -15,11 +15,18 @@
 #include "physics_shared.h"
 #include "globalvars_base.h"
 #include "engine/ivmodelinfo.h"
+#ifdef CLIENT_DLL
+#include "cliententitylist.h"
+#endif // CLIENT_DLL
+#ifdef GAME_DLL
+#include "entitylist.h"
+#endif // GAME_DLL
+
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
-extern CGlobalVarsBase* gpGlobals;
+//extern CGlobalVarsBase* gpGlobals;
 #ifdef CLIENT_DLL
 extern IVModelInfoClient* modelinfo;
 #endif // CLIENT_DLL
@@ -111,7 +118,7 @@ void RagdollSetupAnimatedFriction( IPhysicsEnvironment *pPhysEnv, ragdoll_t *rag
 
 	if ( pCollide )
 	{
-		IVPhysicsKeyParser *pParse = physcollision->VPhysicsKeyParserCreate( pCollide->pKeyValues );
+		IVPhysicsKeyParser *pParse = EntityList()->PhysGetCollision()->VPhysicsKeyParserCreate( pCollide->pKeyValues );
 
 		while ( !pParse->Finished() )
 		{
@@ -128,7 +135,7 @@ void RagdollSetupAnimatedFriction( IPhysicsEnvironment *pPhysEnv, ragdoll_t *rag
 			}
 		}
 
-		physcollision->VPhysicsKeyParserDestroy( pParse );
+		EntityList()->PhysGetCollision()->VPhysicsKeyParserDestroy( pParse );
 	}
 }
 
@@ -149,10 +156,10 @@ static void RagdollAddSolid( IPhysicsEnvironment *pPhysEnv, ragdoll_t &ragdoll, 
 
 			solid.params.rotInertiaLimit = 0.1;
 			solid.params.pGameData = params.pGameData;
-			int surfaceData = physprops->GetSurfaceIndex( solid.surfaceprop );
+			int surfaceData = EntityList()->PhysGetProps()->GetSurfaceIndex( solid.surfaceprop );
 
 			if ( surfaceData < 0 )
-				surfaceData = physprops->GetSurfaceIndex( "default" );
+				surfaceData = EntityList()->PhysGetProps()->GetSurfaceIndex( "default" );
 
 			solid.params.pName = params.pStudioHdr->pszName();
 			ragdoll.list[ragdoll.listCount].pObject = pPhysEnv->CreatePolyObject( params.pCollide->solids[solid.index], surfaceData, vec3_origin, vec3_angle, &solid.params );
@@ -234,7 +241,7 @@ static void RagdollCreateObjects( IPhysicsEnvironment *pPhysEnv, ragdoll_t &ragd
 	group.Defaults();
 	ragdoll.pGroup = pPhysEnv->CreateConstraintGroup( group );
  
-	IVPhysicsKeyParser *pParse = physcollision->VPhysicsKeyParserCreate( params.pCollide->pKeyValues );
+	IVPhysicsKeyParser *pParse = EntityList()->PhysGetCollision()->VPhysicsKeyParserCreate( params.pCollide->pKeyValues );
 	while ( !pParse->Finished() )
 	{
 		const char *pBlock = pParse->GetCurrentBlockName();
@@ -253,7 +260,7 @@ static void RagdollCreateObjects( IPhysicsEnvironment *pPhysEnv, ragdoll_t &ragd
 		}
 		else if ( !strcmpi( pBlock, "collisionrules" ) )
 		{
-			IPhysicsCollisionSet *pSet = physics->FindOrCreateCollisionSet( params.modelIndex, ragdoll.listCount );
+			IPhysicsCollisionSet *pSet = EntityList()->Physics()->FindOrCreateCollisionSet( params.modelIndex, ragdoll.listCount );
 			CRagdollCollisionRules rules(pSet);
 			pParse->ParseCustom( (void *)&rules, &rules );
 		}
@@ -267,7 +274,7 @@ static void RagdollCreateObjects( IPhysicsEnvironment *pPhysEnv, ragdoll_t &ragd
 			pParse->SkipBlock();
 		}
 	}
-	physcollision->VPhysicsKeyParserDestroy( pParse );
+	EntityList()->PhysGetCollision()->VPhysicsKeyParserDestroy( pParse );
 }
 
 void RagdollSetupCollisions( ragdoll_t &ragdoll, vcollide_t *pCollide, int modelIndex )
@@ -276,22 +283,22 @@ void RagdollSetupCollisions( ragdoll_t &ragdoll, vcollide_t *pCollide, int model
 	if (!pCollide)
 		return;
 
-	IPhysicsCollisionSet *pSet = physics->FindCollisionSet( modelIndex );
+	IPhysicsCollisionSet *pSet = EntityList()->Physics()->FindCollisionSet( modelIndex );
 	if ( !pSet )
 	{
-		pSet = physics->FindOrCreateCollisionSet( modelIndex, ragdoll.listCount );
+		pSet = EntityList()->Physics()->FindOrCreateCollisionSet( modelIndex, ragdoll.listCount );
 		if ( !pSet )
 			return;
 
 		bool bFoundRules = false;
 
-		IVPhysicsKeyParser *pParse = physcollision->VPhysicsKeyParserCreate( pCollide->pKeyValues );
+		IVPhysicsKeyParser *pParse = EntityList()->PhysGetCollision()->VPhysicsKeyParserCreate( pCollide->pKeyValues );
 		while ( !pParse->Finished() )
 		{
 			const char *pBlock = pParse->GetCurrentBlockName();
 			if ( !strcmpi( pBlock, "collisionrules" ) )
 			{
-				IPhysicsCollisionSet *pSet = physics->FindOrCreateCollisionSet( modelIndex, ragdoll.listCount );
+				IPhysicsCollisionSet *pSet = EntityList()->Physics()->FindOrCreateCollisionSet( modelIndex, ragdoll.listCount );
 				CRagdollCollisionRules rules(pSet);
 				pParse->ParseCustom( (void *)&rules, &rules );
 				bFoundRules = true;
@@ -301,7 +308,7 @@ void RagdollSetupCollisions( ragdoll_t &ragdoll, vcollide_t *pCollide, int model
 				pParse->SkipBlock();
 			}
 		}
-		physcollision->VPhysicsKeyParserDestroy( pParse );
+		EntityList()->PhysGetCollision()->VPhysicsKeyParserDestroy( pParse );
 
 		if ( !bFoundRules )
 		{
@@ -467,7 +474,7 @@ void RagdollDestroy( ragdoll_t &ragdoll )
 	int i;
 	for ( i = 0; i < ragdoll.listCount; i++ )
 	{
-		physenv->DestroyConstraint( ragdoll.list[i].pConstraint );
+		EntityList()->PhysGetEnv()->DestroyConstraint(ragdoll.list[i].pConstraint);
 		ragdoll.list[i].pConstraint = NULL;
 	}
 	for ( i = 0; i < ragdoll.listCount; i++ )
@@ -479,11 +486,11 @@ void RagdollDestroy( ragdoll_t &ragdoll )
 		if ( ragdoll.list[i].pObject )
 		{
 			ragdoll.list[i].pObject->SetGameData(NULL);
-			physenv->DestroyObject( ragdoll.list[i].pObject );
+			EntityList()->PhysGetEnv()->DestroyObject( ragdoll.list[i].pObject );
 		}
 		ragdoll.list[i].pObject = NULL;
 	}
-	physenv->DestroyConstraintGroup( ragdoll.pGroup );
+	EntityList()->PhysGetEnv()->DestroyConstraintGroup( ragdoll.pGroup );
 	ragdoll.pGroup = NULL;
 	ragdoll.listCount = 0;
 }
@@ -494,7 +501,7 @@ int RagdollExtractBoneIndices( int *boneIndexOut, IStudioHdr *pStudioHdr, vcolli
 {
 	int elementCount = 0;
 
-	IVPhysicsKeyParser *pParse = physcollision->VPhysicsKeyParserCreate( pCollide->pKeyValues );
+	IVPhysicsKeyParser *pParse = EntityList()->PhysGetCollision()->VPhysicsKeyParserCreate( pCollide->pKeyValues );
 	while ( !pParse->Finished() )
 	{
 		const char *pBlock = pParse->GetCurrentBlockName();
@@ -513,7 +520,7 @@ int RagdollExtractBoneIndices( int *boneIndexOut, IStudioHdr *pStudioHdr, vcolli
 			pParse->SkipBlock();
 		}
 	}
-	physcollision->VPhysicsKeyParserDestroy( pParse );
+	EntityList()->PhysGetCollision()->VPhysicsKeyParserDestroy( pParse );
 
 	return elementCount;
 }
@@ -555,7 +562,7 @@ void RagdollComputeExactBbox( const ragdoll_t &ragdoll, const Vector &origin, Ve
 		QAngle objectAng;
 		IPhysicsObject *pObject = ragdoll.list[i].pObject;
 		pObject->GetPosition( &objectOrg, &objectAng );
-		physcollision->CollideGetAABB( &mins, &maxs, pObject->GetCollide(), objectOrg, objectAng );
+		EntityList()->PhysGetCollision()->CollideGetAABB( &mins, &maxs, pObject->GetCollide(), objectOrg, objectAng );
 		for ( int j = 0; j < 3; j++ )
 		{
 			if ( mins[j] < outMins[j] )

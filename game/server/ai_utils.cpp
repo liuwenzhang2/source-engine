@@ -533,7 +533,7 @@ CTraceFilterNav::CTraceFilterNav( CAI_BaseNPC *pProber, bool bIgnoreTransientEnt
 	m_bIgnoreTransientEntities(bIgnoreTransientEntities),
 	m_bAllowPlayerAvoid(bAllowPlayerAvoid)
 {
-	m_bCheckCollisionTable = g_EntityCollisionHash->IsObjectInHash( pProber );
+	m_bCheckCollisionTable = EntityList()->PhysGetEntityCollisionHash()->IsObjectInHash( pProber );
 }
 
 //-----------------------------------------------------------------------------
@@ -569,7 +569,7 @@ bool CTraceFilterNav::ShouldHitEntity( IHandleEntity *pHandleEntity, int content
 
 	if ( m_bCheckCollisionTable )
 	{
-		if ( g_EntityCollisionHash->IsObjectPairInHash( m_pProber, pEntity ) )
+		if (EntityList()->PhysGetEntityCollisionHash()->IsObjectPairInHash( m_pProber, pEntity ) )
 			return false;
 	}
 

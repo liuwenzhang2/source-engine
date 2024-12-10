@@ -2126,11 +2126,11 @@ void CNPC_Strider::InputFlickRagdoll( inputdata_t &inputdata )
 
 		if ( !pPhysics0 )
 		{
-			pPhysics0 = g_PhysWorldObject;
+			pPhysics0 = EntityList()->PhysGetWorldObject();
 		}
 		if ( !pPhysics1 )
 		{
-			pPhysics1 = g_PhysWorldObject;
+			pPhysics1 = EntityList()->PhysGetWorldObject();
 		}
 
 		if ( pPhysics0 != pPhysics1 )

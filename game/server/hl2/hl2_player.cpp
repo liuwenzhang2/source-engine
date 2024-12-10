@@ -3588,7 +3588,7 @@ bool CHL2_Player::TestHitboxes( const Ray_t &ray, unsigned int fContentsMask, tr
 			mstudiobone_t *pBone = pStudioHdr->pBone(pbox->bone);
 			tr.surface.name = "**studio**";
 			tr.surface.flags = SURF_HITBOX;
-			tr.surface.surfaceProps = physprops->GetSurfaceIndex( pBone->pszSurfaceProp() );
+			tr.surface.surfaceProps = EntityList()->PhysGetProps()->GetSurfaceIndex( pBone->pszSurfaceProp() );
 		}
 		
 		return true;
@@ -3644,7 +3644,7 @@ surfacedata_t *CHL2_Player::GetLadderSurface( const Vector &origin )
 	{
 		const char *pSurfaceprops = FuncLadder_GetSurfaceprops(pLadder);
 		// get ladder material from func_ladder
-		return physprops->GetSurfaceData( physprops->GetSurfaceIndex( pSurfaceprops ) );
+		return EntityList()->PhysGetProps()->GetSurfaceData(EntityList()->PhysGetProps()->GetSurfaceIndex( pSurfaceprops ) );
 
 	}
 	return BaseClass::GetLadderSurface(origin);

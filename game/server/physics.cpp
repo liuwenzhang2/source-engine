@@ -52,6 +52,7 @@
 #include "prop_portal.h"
 #endif
 
+#include "physics_shared.h"
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
@@ -69,9 +70,9 @@ static bool IsDebris( int collisionGroup );
 
 void TimescaleChanged( IConVar *var, const char *pOldString, float flOldValue )
 {
-	if ( physenv )
+	if ( gEntList.PhysGetEnv() )
 	{
-		physenv->ResetSimulationClock();
+		gEntList.PhysGetEnv()->ResetSimulationClock();
 	}
 }
 
@@ -168,7 +169,7 @@ int CCollisionEvent::ShouldCollide_2( IPhysicsObject *pObj0, IPhysicsObject *pOb
 		if ( (gameFlags0 | gameFlags1) & FVPHYSICS_NO_SELF_COLLISIONS )
 			return 0;
 
-		IPhysicsCollisionSet *pSet = physics->FindCollisionSet( pEntity0->GetEngineObject()->GetModelIndex() );
+		IPhysicsCollisionSet *pSet = gEntList.Physics()->FindCollisionSet( pEntity0->GetEngineObject()->GetModelIndex() );
 		if ( pSet )
 			return pSet->ShouldCollide( pObj0->GetGameIndex(), pObj1->GetGameIndex() );
 
@@ -217,14 +218,14 @@ int CCollisionEvent::ShouldCollide_2( IPhysicsObject *pObj0, IPhysicsObject *pOb
 		if ( pParent0 == pParent1 )
 			return 0;
 
-		if ( g_EntityCollisionHash->IsObjectPairInHash( pParent0, pParent1 ) )
+		if (gEntList.PhysGetEntityCollisionHash()->IsObjectPairInHash( pParent0, pParent1 ) )
 			return 0;
 
 		IPhysicsObject *p0 = pParent0->GetEngineObject()->VPhysicsGetObject();
 		IPhysicsObject *p1 = pParent1->GetEngineObject()->VPhysicsGetObject();
 		if ( p0 && p1 )
 		{
-			if ( g_EntityCollisionHash->IsObjectPairInHash( p0, p1 ) )
+			if (gEntList.PhysGetEntityCollisionHash()->IsObjectPairInHash( p0, p1 ) )
 				return 0;
 		}
 	}
@@ -305,10 +306,10 @@ int CCollisionEvent::ShouldCollide_2( IPhysicsObject *pObj0, IPhysicsObject *pOb
 	if ( !(pObj0->GetContents() & pEntity1->PhysicsSolidMaskForEntity()) || !(pObj1->GetContents() & pEntity0->PhysicsSolidMaskForEntity()) )
 		return 0;
 
-	if ( g_EntityCollisionHash->IsObjectPairInHash( pGameData0, pGameData1 ) )
+	if (gEntList.PhysGetEntityCollisionHash()->IsObjectPairInHash( pGameData0, pGameData1 ) )
 		return 0;
 
-	if ( g_EntityCollisionHash->IsObjectPairInHash( pObj0, pObj1 ) )
+	if (gEntList.PhysGetEntityCollisionHash()->IsObjectPairInHash( pObj0, pObj1 ) )
 		return 0;
 
 	return 1;
@@ -523,12 +524,12 @@ void CCollisionEvent::UpdatePenetrateEvents( void )
 				IPhysicsObject *pObj0 = pEntity0->GetEngineObject()->VPhysicsGetObject();
 				if ( pObj0 )
 				{
-					PhysForceEntityToSleep( pEntity0, pObj0 );
+					gEntList.PhysForceEntityToSleep( pEntity0, pObj0 );
 				}
 				IPhysicsObject *pObj1 = pEntity1->GetEngineObject()->VPhysicsGetObject();
 				if ( pObj1 )
 				{
-					PhysForceEntityToSleep( pEntity1, pObj1 );
+					gEntList.PhysForceEntityToSleep( pEntity1, pObj1 );
 				}
 				m_penetrateEvents[i].collisionState = COLLSTATE_DISABLED;
 				continue;
@@ -698,8 +699,8 @@ int CCollisionEvent::ShouldSolvePenetration( IPhysicsObject *pObj0, IPhysicsObje
 		const char *pName2 = STRING(pEntity1->GetEngineObject()->GetModelName());
 		if ( pEntity0 == pEntity1 )
 		{
-			int index0 = physcollision->CollideIndex( pObj0->GetCollide() );
-			int index1 = physcollision->CollideIndex( pObj1->GetCollide() );
+			int index0 = gEntList.PhysGetCollision()->CollideIndex( pObj0->GetCollide() );
+			int index1 = gEntList.PhysGetCollision()->CollideIndex( pObj1->GetCollide() );
 			DevMsg(1, "***Inter-penetration on %s (%d & %d) (%.0f, %.0f)\n", pName1?pName1:"(null)", index0, index1, gpGlobals->curtime, eventTime );
 		}
 		else
@@ -761,7 +762,7 @@ void CCollisionEvent::FluidStartTouch( IPhysicsObject *pObject, IPhysicsFluidCon
 	VectorNormalize( unitVel );
 	
 	// normal points out of the surface, we want the direction that points in
-	float dragScale = pFluid->GetDensity() * physenv->GetSimulationTimestep();
+	float dragScale = pFluid->GetDensity() * gEntList.PhysGetEnv()->GetSimulationTimestep();
 	normal = -normal;
 	float linearScale = 0.5f * DotProduct( unitVel, normal ) * pObject->CalculateLinearDrag( normal ) * dragScale;
 	linearScale = clamp( linearScale, 0.0f, 1.0f );
@@ -835,10 +836,10 @@ void PhysSolidOverride( solid_t &solid, string_t overrideScript )
 		Q_strncat( pTmpString, "}", sizeof(pTmpString), COPY_ALL_CHARACTERS );
 
 		// parse that sucker
-		IVPhysicsKeyParser *pParse = physcollision->VPhysicsKeyParserCreate( pTmpString );
+		IVPhysicsKeyParser *pParse = gEntList.PhysGetCollision()->VPhysicsKeyParserCreate( pTmpString );
 		CSkipKeys tmp;
 		pParse->ParseSolid( &solid, &tmp );
-		physcollision->VPhysicsKeyParserDestroy( pParse );
+		gEntList.PhysGetCollision()->VPhysicsKeyParserDestroy( pParse );
 
 		// parser destroys this data
 		solid.params.enableCollisions = collisions;
@@ -857,29 +858,6 @@ float PhysGetEntityMass( CBaseEntity *pEntity )
 
 	return otherMass;
 }
-
-
-typedef void (*EntityCallbackFunction) ( CBaseEntity *pEntity );
-
-void IterateActivePhysicsEntities( EntityCallbackFunction func )
-{
-	int activeCount = physenv->GetActiveObjectCount();
-	IPhysicsObject **pActiveList = NULL;
-	if ( activeCount )
-	{
-		pActiveList = (IPhysicsObject **)stackalloc( sizeof(IPhysicsObject *)*activeCount );
-		physenv->GetActiveObjects( pActiveList );
-		for ( int i = 0; i < activeCount; i++ )
-		{
-			CBaseEntity *pEntity = reinterpret_cast<CBaseEntity *>(pActiveList[i]->GetGameData());
-			if ( pEntity )
-			{
-				func( pEntity );
-			}
-		}
-	}
-}
-
 
 static void CallbackHighlight( CBaseEntity *pEntity )
 {
@@ -901,7 +879,7 @@ CON_COMMAND(physics_highlight_active, "Turns on the absbox for all active physic
 	if ( !UTIL_IsCommandIssuedByServerAdmin() )
 		return;
 
-	IterateActivePhysicsEntities( CallbackHighlight );
+	gEntList.IterateActivePhysicsEntities( CallbackHighlight );
 }
 
 CON_COMMAND(physics_report_active, "Lists all active physics objects")
@@ -909,7 +887,7 @@ CON_COMMAND(physics_report_active, "Lists all active physics objects")
 	if ( !UTIL_IsCommandIssuedByServerAdmin() )
 		return;
 
-	IterateActivePhysicsEntities( CallbackReport );
+	gEntList.IterateActivePhysicsEntities( CallbackReport );
 }
 
 CON_COMMAND_F(surfaceprop, "Reports the surface properties at the cursor", FCVAR_CHEAT )
@@ -946,7 +924,7 @@ CON_COMMAND_F(surfaceprop, "Reports the surface properties at the cursor", FCVAR
 		Vector vecVelocity = tr.startpos - tr.endpos;
 		int length = vecVelocity.Length();
 
-		Msg("Hit surface \"%s\" (entity %s, model \"%s\" %s), texture \"%s\"\n", physprops->GetPropName( tr.surface.surfaceProps ), ((CBaseEntity*)tr.m_pEnt)->GetClassname(), pModelName, modelStuff.Access(), tr.surface.name);
+		Msg("Hit surface \"%s\" (entity %s, model \"%s\" %s), texture \"%s\"\n", EntityList()->PhysGetProps()->GetPropName( tr.surface.surfaceProps ), ((CBaseEntity*)tr.m_pEnt)->GetClassname(), pModelName, modelStuff.Access(), tr.surface.name);
 		Msg("Distance to surface: %d\n", length );
 	}
 }
@@ -1305,23 +1283,7 @@ void CCollisionEvent::PostCollision( vcollisionevent_t *pEvent )
 	}
 }
 
-void PhysForceEntityToSleep( CBaseEntity *pEntity, IPhysicsObject *pObject )
-{
-	// UNDONE: Check to see if the object is touching the player first?
-	// Might get the player stuck?
-	if ( !pObject || !pObject->IsMoveable() )
-		return;
 
-	DevMsg(2, "Putting entity to sleep: %s\n", pEntity->GetClassname() );
-	MEM_ALLOC_CREDIT();
-	IPhysicsObject *pList[VPHYSICS_MAX_OBJECT_LIST_COUNT];
-	int physCount = pEntity->GetEngineObject()->VPhysicsGetObjectList( pList, ARRAYSIZE(pList) );
-	for ( int i = 0; i < physCount; i++ )
-	{
-		PhysForceClearVelocity( pList[i] );
-		pList[i]->Sleep();
-	}
-}
 
 void CCollisionEvent::Friction( IPhysicsObject *pObject, float energy, int surfaceProps, int surfacePropsHit, IPhysicsCollisionData *pData )
 {
@@ -1448,7 +1410,7 @@ float CCollisionEvent::DeltaTimeSinceLastFluid( CBaseEntity *pEntity )
 {
 	for ( int i = m_fluidEvents.Count()-1; i >= 0; --i )
 	{
-		if ( m_fluidEvents[i].hEntity.Get() == pEntity )
+		if (gEntList.GetBaseEntity(m_fluidEvents[i].hEntity) == pEntity )
 		{
 			return gpGlobals->curtime - m_fluidEvents[i].impactTime;
 		}
@@ -1710,7 +1672,7 @@ void CCollisionEvent::AddDamageEvent( CBaseEntity *pEntity, const CTakeDamageInf
 //-----------------------------------------------------------------------------
 // Impulse events
 //-----------------------------------------------------------------------------
-static void PostSimulation_ImpulseEvent( IPhysicsObject *pObject, const Vector &centerForce, const AngularImpulse &centerTorque )
+void PostSimulation_ImpulseEvent( IPhysicsObject *pObject, const Vector &centerForce, const AngularImpulse &centerTorque )
 {
 	pObject->ApplyForceCenter( centerForce );
 	pObject->ApplyTorqueCenter( centerTorque );
@@ -2031,20 +1993,9 @@ void PhysCollisionDust( gamevcollisionevent_t *pEvent, surfacedata_t *phit )
 
 
 
-//-----------------------------------------------------------------------------
-// Applies force impulses at a later time
-//-----------------------------------------------------------------------------
-void PhysCallbackImpulse( IPhysicsObject *pPhysicsObject, const Vector &vecCenterForce, const AngularImpulse &vecCenterTorque )
-{
-	Assert( physenv->IsInSimulation() );
-	g_PostSimulationQueue.QueueCall( PostSimulation_ImpulseEvent, pPhysicsObject, RefToVal(vecCenterForce), RefToVal(vecCenterTorque) );
-}
 
-void PhysCallbackSetVelocity( IPhysicsObject *pPhysicsObject, const Vector &vecVelocity )
-{
-	Assert( physenv->IsInSimulation() );
-	g_PostSimulationQueue.QueueCall( PostSimulation_SetVelocityEvent, pPhysicsObject, RefToVal(vecVelocity) );
-}
+
+
 
 
 
@@ -2104,17 +2055,17 @@ IPhysicsObject *FindPhysicsObjectByName( const char *pName, CBaseEntity *pErrorE
 
 void CC_AirDensity( const CCommand &args )
 {
-	if ( !physenv )
+	if ( !gEntList.PhysGetEnv())
 		return;
 
 	if ( args.ArgC() < 2 )
 	{
-		Msg( "air_density <value>\nCurrent air density is %.2f\n", physenv->GetAirDensity() );
+		Msg( "air_density <value>\nCurrent air density is %.2f\n", gEntList.PhysGetEnv()->GetAirDensity() );
 	}
 	else
 	{
 		float density = atof( args[1] );
-		physenv->SetAirDensity( density );
+		gEntList.PhysGetEnv()->SetAirDensity( density );
 	}
 }
 static ConCommand air_density("air_density", CC_AirDensity, "Changes the density of air for drag computations.", FCVAR_CHEAT);
@@ -2167,7 +2118,7 @@ void DumpCollideToGlView( CPhysCollide *pCollide, const Vector &origin, const QA
 
 	printf("Writing %s...\n", pFilename );
 	Vector *outVerts;
-	int vertCount = physcollision->CreateDebugMesh( pCollide, &outVerts );
+	int vertCount = gEntList.PhysGetCollision()->CreateDebugMesh( pCollide, &outVerts );
 	FileHandle_t fp = filesystem->Open( pFilename, "ab" );
 	int triCount = vertCount / 3;
 	int vert = 0;
@@ -2188,7 +2139,7 @@ void DumpCollideToGlView( CPhysCollide *pCollide, const Vector &origin, const QA
 		vert++;
 	}
 	filesystem->Close( fp );
-	physcollision->DestroyDebugMesh( vertCount, outVerts );
+	gEntList.PhysGetCollision()->DestroyDebugMesh( vertCount, outVerts );
 }
 #endif
 

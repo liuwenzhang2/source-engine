@@ -55,7 +55,7 @@ void CHL1BaseGrenade::Explode( trace_t *pTrace, int bitsDamageType )
 	if ( pTrace->fraction != 1.0 )
 	{
 		Vector vecNormal = pTrace->plane.normal;
-		const surfacedata_t *pdata = physprops->GetSurfaceData( pTrace->surface.surfaceProps );	
+		const surfacedata_t *pdata = EntityList()->PhysGetProps()->GetSurfaceData( pTrace->surface.surfaceProps );
 		CPASFilter filter( vecAbsOrigin );
 		te->Explosion( filter, 0.0, 
 			&vecAbsOrigin,

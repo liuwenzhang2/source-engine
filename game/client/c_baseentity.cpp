@@ -613,7 +613,7 @@ bool C_BaseEntity::VPhysicsIsFlesh( void )
 	for ( int i = 0; i < count; i++ )
 	{
 		int material = pList[i]->GetMaterialIndex();
-		const surfacedata_t *pSurfaceData = physprops->GetSurfaceData( material );
+		const surfacedata_t *pSurfaceData = EntityList()->PhysGetProps()->GetSurfaceData( material );
 		// Is flesh ?, don't allow pickup
 		if ( pSurfaceData->game.material == CHAR_TEX_ANTLION || pSurfaceData->game.material == CHAR_TEX_FLESH || pSurfaceData->game.material == CHAR_TEX_BLOODYFLESH || pSurfaceData->game.material == CHAR_TEX_ALIENFLESH )
 			return true;

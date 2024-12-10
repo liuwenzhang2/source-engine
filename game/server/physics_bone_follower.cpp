@@ -10,7 +10,7 @@
 #include "physics_bone_follower.h"
 #include "vcollide_parse.h"
 #include "saverestore_utlvector.h"
-
+#include "physics_shared.h"
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
@@ -256,7 +256,7 @@ bool CBoneFollower::Init( CBaseEntity *pOwner, const char *pModelName, solid_t &
 	// we can't use the default model bounds because each entity is only one bone of the model
 	// so compute the OBB of the physics model and use that.
 	Vector mins, maxs;
-	physcollision->CollideGetAABB( &mins, &maxs, pPhysics->GetCollide(), vec3_origin, vec3_angle );
+	EntityList()->PhysGetCollision()->CollideGetAABB( &mins, &maxs, pPhysics->GetCollide(), vec3_origin, vec3_angle );
 	GetEngineObject()->SetCollisionBounds( mins, maxs );
 
 	pPhysics->SetCallbackFlags( pPhysics->GetCallbackFlags() | CALLBACK_GLOBAL_TOUCH );
@@ -357,7 +357,7 @@ bool CBoneFollower::TestCollision( const Ray_t &ray, unsigned int mask, trace_t&
 
 	UTIL_ClearTrace( trace );
 
-	physcollision->TraceBox( ray, pCollide->solids[m_solidIndex], GetEngineObject()->GetAbsOrigin(), GetEngineObject()->GetAbsAngles(), &trace );
+	EntityList()->PhysGetCollision()->TraceBox( ray, pCollide->solids[m_solidIndex], GetEngineObject()->GetAbsOrigin(), GetEngineObject()->GetAbsAngles(), &trace );
 
 	if ( trace.fraction >= 1 )
 		return false;
@@ -462,7 +462,7 @@ LINK_ENTITY_TO_CLASS( phys_bone_follower, CBoneFollower );
 // create a manager and a list of followers directly from a ragdoll
 void CreateBoneFollowersFromRagdoll( CBaseAnimating *pEntity, CBoneFollowerManager *pManager, vcollide_t *pCollide )
 {
-	IVPhysicsKeyParser *pParse = physcollision->VPhysicsKeyParserCreate( pCollide->pKeyValues );
+	IVPhysicsKeyParser *pParse = EntityList()->PhysGetCollision()->VPhysicsKeyParserCreate( pCollide->pKeyValues );
 	while ( !pParse->Finished() )
 	{
 		const char *pBlock = pParse->GetCurrentBlockName();

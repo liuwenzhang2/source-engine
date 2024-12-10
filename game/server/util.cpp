@@ -2992,7 +2992,7 @@ static ConCommand voxeltree_sphere( "voxeltree_sphere", CC_VoxelTreeSphere, "Vie
 #define NUM_COLLISION_TESTS 2500
 void CC_CollisionTest( const CCommand &args )
 {
-	if ( !physenv )
+	if ( !EntityList()->PhysGetEnv())
 		return;
 
 	Msg( "Testing collision system\n" );

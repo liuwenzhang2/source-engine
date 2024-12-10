@@ -461,7 +461,7 @@ void CCSPlayer::FireBullet(
 #endif
 
 		/************* MATERIAL DETECTION ***********/
-		surfacedata_t *pSurfaceData = physprops->GetSurfaceData( tr.surface.surfaceProps );
+		surfacedata_t *pSurfaceData = EntityList()->PhysGetProps()->GetSurfaceData( tr.surface.surfaceProps );
 		int iEnterMaterial = pSurfaceData->game.material;
 
 		GetMaterialParameters( iEnterMaterial, flPenetrationModifier, flDamageModifier );
@@ -616,7 +616,7 @@ void CCSPlayer::FireBullet(
 		}
 
 		// get material at exit point
-		pSurfaceData = physprops->GetSurfaceData( exitTr.surface.surfaceProps );
+		pSurfaceData = EntityList()->PhysGetProps()->GetSurfaceData( exitTr.surface.surfaceProps );
 		int iExitMaterial = pSurfaceData->game.material;
 
 		hitGrate = hitGrate && ( exitTr.contents & CONTENTS_GRATE );
@@ -930,12 +930,12 @@ surfacedata_t * CCSPlayer::GetFootstepSurface( const Vector &origin, const char 
 		{
 			if ( control->GetEngineObject()->IsPointInBounds( origin ) )
 			{
-				return physprops->GetSurfaceData( physprops->GetSurfaceIndex( control->m_destination ) );
+				return EntityList()->PhysGetProps()->GetSurfaceData(EntityList()->PhysGetProps()->GetSurfaceIndex( control->m_destination ) );
 			}
 		}
 	}
 
-	return physprops->GetSurfaceData( physprops->GetSurfaceIndex( surfaceName ) );
+	return EntityList()->PhysGetProps()->GetSurfaceData(EntityList()->PhysGetProps()->GetSurfaceIndex( surfaceName ) );
 }
 
 #endif

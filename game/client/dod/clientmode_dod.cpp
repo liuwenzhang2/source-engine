@@ -223,7 +223,7 @@ void ClientModeDODNormal::FireGameEvent( IGameEvent * event)
 		// recreate all client side physics props
 		// check for physenv, because we sometimes crash on changelevel
 		// if we get this message before fully connecting
-		if ( physenv )
+		if (EntityList()->PhysGetEnv())
 		{
             C_PhysPropClientside::RecreateAll();
 		}

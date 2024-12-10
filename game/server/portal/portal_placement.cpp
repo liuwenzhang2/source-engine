@@ -60,7 +60,7 @@ bool IsNoPortalMaterial( const csurface_t &surface )
 	if ( surface.flags & SURF_NOPORTAL )
 		return true;
 
-	const surfacedata_t *pdata = physprops->GetSurfaceData( surface.surfaceProps );
+	const surfacedata_t *pdata = EntityList()->PhysGetProps()->GetSurfaceData( surface.surfaceProps );
 	if ( pdata->game.material == CHAR_TEX_GLASS )
 		return true;
 

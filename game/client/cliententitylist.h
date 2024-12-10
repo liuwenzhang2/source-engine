@@ -2647,6 +2647,7 @@ private:
 };
 
 extern ConVar cl_phys_timescale;
+extern const objectparams_t g_PhysDefaultObjectParams;
 
 //
 // This is the IClientEntityList implemenation. It serves two functions:
@@ -2855,15 +2856,76 @@ public:
 	C_BaseEntity* GetLocalPlayer(void);
 	void SetLocalPlayer(C_BaseEntity* pBasePlayer);
 
+	IPhysics* Physics() {
+		return physics;
+	}
+
+	IPhysicsEnvironment* PhysGetEnv() {
+		return m_pPhysenv;
+	}
+
+	IPhysicsSurfaceProps* PhysGetProps() {
+		return m_pPhysprops;
+	}
+
+	IPhysicsCollision* PhysGetCollision() {
+		return m_pPhyscollision;
+	}
+
+	IPhysicsObjectPairHash* PhysGetEntityCollisionHash() {
+		return m_EntityCollisionHash;
+	}
+
+	const objectparams_t& PhysGetDefaultObjectParams() {
+		return g_PhysDefaultObjectParams;
+	}
+
+	IPhysicsObject* PhysGetWorldObject() {
+		return m_PhysWorldObject;
+	}
+
 	void PhysicsReset()
 	{
-		if (!physenv)
+		if (!m_pPhysenv)
 			return;
 
-		physenv->ResetSimulationClock();
+		m_pPhysenv->ResetSimulationClock();
 	}
+
 	void AddImpactSound(void* pGameData, IPhysicsObject* pObject, int surfaceProps, int surfacePropsHit, float volume, float speed);
 	void PhysicsSimulate();
+
+	void PhysFrictionSound(IHandleEntity* pEntity, IPhysicsObject* pObject, float energy, int surfaceProps, int surfacePropsHit)
+	{
+		if (!pEntity || energy < 75.0f || surfaceProps < 0)
+			return;
+
+		// don't make noise for hidden/invisible/sky materials
+		surfacedata_t* phit = EntityList()->PhysGetProps()->GetSurfaceData(surfacePropsHit);
+		surfacedata_t* psurf = EntityList()->PhysGetProps()->GetSurfaceData(surfaceProps);
+
+		if (phit->game.material == 'X' || psurf->game.material == 'X')
+			return;
+
+		// rescale the incoming energy
+		energy *= ENERGY_VOLUME_SCALE;
+
+		// volume of scrape is proportional to square of energy (steeper rolloff at low energies)
+		float volume = energy * energy;
+
+		unsigned short soundName = psurf->sounds.scrapeRough;
+		short* soundHandle = &psurf->soundhandles.scrapeRough;
+
+		if (psurf->sounds.scrapeSmooth && phit->audio.roughnessFactor < psurf->audio.roughThreshold)
+		{
+			soundName = psurf->sounds.scrapeSmooth;
+			soundHandle = &psurf->soundhandles.scrapeRough;
+		}
+
+		const char* pSoundName = EntityList()->PhysGetProps()->GetString(soundName);
+
+		PhysFrictionSound(pEntity, pObject, pSoundName, *soundHandle, volume);
+	}
 
 	void PhysFrictionSound(IHandleEntity* pEntity, IPhysicsObject* pObject, const char* pSoundName, HSOUNDSCRIPTHANDLE& handle, float flVolume)
 	{
@@ -2924,12 +2986,12 @@ public:
 
 	float PhysGetNextSimTime()
 	{
-		return physenv->GetSimulationTime() + gpGlobals->frametime * cl_phys_timescale.GetFloat();
+		return m_pPhysenv->GetSimulationTime() + gpGlobals->frametime * cl_phys_timescale.GetFloat();
 	}
 
 	float PhysGetSyncCreateTime()
 	{
-		float nextTime = physenv->GetNextFrameTime();
+		float nextTime = m_pPhysenv->GetNextFrameTime();
 		float simTime = PhysGetNextSimTime();
 		if (nextTime < simTime)
 		{
@@ -2947,20 +3009,15 @@ private:
 	void AddRestoredEntity(T* pEntity);
 	bool PhysIsInCallback()
 	{
-		if ((physenv && physenv->IsInSimulation()) || m_Collisions.IsInCallback())
+		if ((m_pPhysenv && m_pPhysenv->IsInSimulation()) || m_Collisions.IsInCallback())
 			return true;
 
 		return false;
 	}
 	
 private:
-	//IPhysics* physics = NULL;
-	//IPhysicsSurfaceProps* physprops = NULL;
-	//IPhysicsCollision* physcollision = NULL;
 
 	CEntityFactoryDictionary m_EntityFactoryDictionary;
-	physicssound::soundlist_t m_impactSounds;
-	CCollisionEvent m_Collisions;
 
 	// Cached info for networked entities.
 //struct EntityCacheInfo_t
@@ -3051,6 +3108,15 @@ private:
 	int m_iRagdollCount;
 
 	C_BaseEntity* m_pLocalPlayer = NULL;
+
+	IPhysics* physics;
+	IPhysicsEnvironment* m_pPhysenv = NULL;
+	IPhysicsSurfaceProps* m_pPhysprops = NULL;
+	IPhysicsCollision* m_pPhyscollision = NULL;
+	IPhysicsObjectPairHash* m_EntityCollisionHash = NULL;
+	IPhysicsObject* m_PhysWorldObject = NULL;
+	physicssound::soundlist_t m_impactSounds;
+	CCollisionEvent m_Collisions;
 };
 
 template<class T>
@@ -3568,8 +3634,8 @@ bool CClientEntityList<T>::Init()
 		return false;
 
 	if ((physics = (IPhysics*)factories.physicsFactory(VPHYSICS_INTERFACE_VERSION, NULL)) == NULL ||
-		(physprops = (IPhysicsSurfaceProps*)factories.physicsFactory(VPHYSICS_SURFACEPROPS_INTERFACE_VERSION, NULL)) == NULL ||
-		(physcollision = (IPhysicsCollision*)factories.physicsFactory(VPHYSICS_COLLISION_INTERFACE_VERSION, NULL)) == NULL)
+		(m_pPhysprops = (IPhysicsSurfaceProps*)factories.physicsFactory(VPHYSICS_SURFACEPROPS_INTERFACE_VERSION, NULL)) == NULL ||
+		(m_pPhyscollision = (IPhysicsCollision*)factories.physicsFactory(VPHYSICS_COLLISION_INTERFACE_VERSION, NULL)) == NULL)
 	{
 		return false;
 	}
@@ -3579,7 +3645,7 @@ bool CClientEntityList<T>::Init()
 		// Reduce timescale to save perf on 360
 		cl_phys_timescale.SetValue(0.9f);
 	}
-	PhysParseSurfaceData(physprops, filesystem);
+	PhysParseSurfaceData(m_pPhysprops, filesystem);
 	return true;
 }
 
@@ -3598,62 +3664,65 @@ void CClientEntityList<T>::LevelInitPreEntity()
 	PrecachePhysicsSounds();
 }
 
+extern IVPhysicsKeyHandler* g_pSolidSetup;
+extern IPhysicsObject* PhysCreateWorld_Shared(IHandleEntity* pWorld, vcollide_t* pWorldCollide, const objectparams_t& defaultParams);
+
 #define DEFAULT_XBOX_CLIENT_VPHYSICS_TICK	0.025		// 25ms ticks on xbox ragdolls
 template<class T>
 void CClientEntityList<T>::LevelInitPostEntity()
 {
-	physenv = physics->CreateEnvironment();
-	assert(physenv);
+	m_pPhysenv = physics->CreateEnvironment();
+	assert(m_pPhysenv);
 //#ifdef PORTAL
 //	physenv_main = physenv;
 //#endif
 	{
 		MEM_ALLOC_CREDIT();
-		g_EntityCollisionHash = physics->CreateObjectPairHash();
+		m_EntityCollisionHash = physics->CreateObjectPairHash();
 	}
 
 	// TODO: need to get the right factory function here
 	//physenv->SetDebugOverlay( appSystemFactory );
-	physenv->SetGravity(Vector(0, 0, -GetCurrentGravity()));
+	m_pPhysenv->SetGravity(Vector(0, 0, -GetCurrentGravity()));
 	// 15 ms per tick
 	// NOTE: Always run client physics at this rate - helps keep ragdolls stable
-	physenv->SetSimulationTimestep(IsXbox() ? DEFAULT_XBOX_CLIENT_VPHYSICS_TICK : DEFAULT_TICK_INTERVAL);
-	physenv->SetCollisionEventHandler(&m_Collisions);
-	physenv->SetCollisionSolver(&m_Collisions);
+	m_pPhysenv->SetSimulationTimestep(IsXbox() ? DEFAULT_XBOX_CLIENT_VPHYSICS_TICK : DEFAULT_TICK_INTERVAL);
+	m_pPhysenv->SetCollisionEventHandler(&m_Collisions);
+	m_pPhysenv->SetCollisionSolver(&m_Collisions);
 
-	g_PhysWorldObject = PhysCreateWorld_Shared(GetBaseEntity(0), modelinfo->GetVCollide(1), g_PhysDefaultObjectParams);
+	m_PhysWorldObject = PhysCreateWorld_Shared(GetBaseEntity(0), modelinfo->GetVCollide(1), g_PhysDefaultObjectParams);
 
-	staticpropmgr->CreateVPhysicsRepresentations(physenv, g_pSolidSetup, NULL);
+	staticpropmgr->CreateVPhysicsRepresentations(m_pPhysenv, g_pSolidSetup, NULL);
 }
 
 // The level is shutdown in two parts
 template<class T>
 void CClientEntityList<T>::LevelShutdownPreEntity()
 {
-	if (physenv)
+	if (m_pPhysenv)
 	{
 		// we may have deleted multiple objects including the world by now, so 
 		// don't try to wake them up
-		physenv->SetQuickDelete(true);
+		m_pPhysenv->SetQuickDelete(true);
 	}
 }
 
 template<class T>
 void CClientEntityList<T>::LevelShutdownPostEntity()
 {
-	if (physenv)
+	if (m_pPhysenv)
 	{
 		// environment destroys all objects
 		// entities are gone, so this is safe now
-		physics->DestroyEnvironment(physenv);
+		physics->DestroyEnvironment(m_pPhysenv);
 	}
-	physics->DestroyObjectPairHash(g_EntityCollisionHash);
-	g_EntityCollisionHash = NULL;
+	physics->DestroyObjectPairHash(m_EntityCollisionHash);
+	m_EntityCollisionHash = NULL;
 
 	physics->DestroyAllCollisionSets();
 
-	physenv = NULL;
-	g_PhysWorldObject = NULL;
+	m_pPhysenv = NULL;
+	m_PhysWorldObject = NULL;
 }
 
 //-----------------------------------------------------------------------------
@@ -4914,22 +4983,22 @@ void CClientEntityList<T>::PhysicsSimulate()
 	VPROF_BUDGET("CPhysicsSystem::PhysicsSimulate", VPROF_BUDGETGROUP_PHYSICS);
 	float frametime = gpGlobals->frametime;
 
-	if (physenv)
+	if (m_pPhysenv)
 	{
-		tmZone(TELEMETRY_LEVEL0, TMZF_NONE, "%s %d", __FUNCTION__, physenv->GetActiveObjectCount());
+		tmZone(TELEMETRY_LEVEL0, TMZF_NONE, "%s %d", __FUNCTION__, m_pPhysenv->GetActiveObjectCount());
 
 		m_Collisions.BufferTouchEvents(true);
 #ifdef _DEBUG
-		physenv->DebugCheckContacts();
+		m_pPhysenv->DebugCheckContacts();
 #endif
-		physenv->Simulate(frametime * cl_phys_timescale.GetFloat());
+		m_pPhysenv->Simulate(frametime * cl_phys_timescale.GetFloat());
 
-		int activeCount = physenv->GetActiveObjectCount();
+		int activeCount = m_pPhysenv->GetActiveObjectCount();
 		IPhysicsObject** pActiveList = NULL;
 		if (activeCount)
 		{
 			pActiveList = (IPhysicsObject**)stackalloc(sizeof(IPhysicsObject*) * activeCount);
-			physenv->GetActiveObjects(pActiveList);
+			m_pPhysenv->GetActiveObjects(pActiveList);
 
 			for (int i = 0; i < activeCount; i++)
 			{
@@ -4961,6 +5030,8 @@ inline CClientEntityList<C_BaseEntity>& ClientEntityList()
 {
 	return *cl_entitylist;
 }
+
+inline IClientEntityList* EntityList() { return &ClientEntityList(); }
 
 template<class T>
 inline T* CHandle<T>::Get() const

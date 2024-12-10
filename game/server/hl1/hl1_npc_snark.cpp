@@ -343,7 +343,7 @@ void CSnark::ResolveFlyCollisionCustom( trace_t &trace, Vector &vecVelocity )
 {
 	// Get the impact surface's friction.
 	float flSurfaceFriction;
-	physprops->GetPhysicsProperties( trace.surface.surfaceProps, NULL, NULL, &flSurfaceFriction, NULL );
+	EntityList()->PhysGetProps()->GetPhysicsProperties( trace.surface.surfaceProps, NULL, NULL, &flSurfaceFriction, NULL );
 
 	Vector vecAbsVelocity = GetEngineObject()->GetAbsVelocity();
 

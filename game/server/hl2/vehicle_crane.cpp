@@ -186,7 +186,7 @@ void CPropCrane::Activate( void )
 	// Create our constraint group
 	constraint_groupparams_t group;
 	group.Defaults();
-	m_pConstraintGroup = physenv->CreateConstraintGroup( group );
+	m_pConstraintGroup = EntityList()->PhysGetEnv()->CreateConstraintGroup( group );
 	m_hCraneMagnet->SetConstraintGroup( m_pConstraintGroup );
 
 	// Create our crane tip
@@ -1083,7 +1083,7 @@ bool CCraneTip::CreateConstraint( CBaseAnimating *pCraneMagnet, IPhysicsConstrai
 	length.Defaults();
 	length.InitWorldspace( pPhysObject, pCraneMagnetPhysObject, GetAbsOrigin(), vecPoint );
 	length.constraint.Defaults();
-	m_pConstraint = physenv->CreateLengthConstraint( pPhysObject, pCraneMagnetPhysObject, pGroup, length );
+	m_pConstraint = EntityList()->PhysGetEnv()->CreateLengthConstraint( pPhysObject, pCraneMagnetPhysObject, pGroup, length );
 	*/
 
 	springparams_t spring;
@@ -1095,7 +1095,7 @@ bool CCraneTip::CreateConstraint( CBaseAnimating *pCraneMagnet, IPhysicsConstrai
 	spring.endPosition = vecPoint;
 	spring.useLocalPositions = false;
 	spring.onlyStretch = true;
-	m_pSpring = physenv->CreateSpring( pPhysObject, pCraneMagnetPhysObject, &spring );
+	m_pSpring = EntityList()->PhysGetEnv()->CreateSpring( pPhysObject, pCraneMagnetPhysObject, &spring );
 
 	return true;
 }

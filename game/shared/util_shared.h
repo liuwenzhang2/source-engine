@@ -606,6 +606,34 @@ bool				UTIL_IsHolidayActive( /*EHoliday*/ int eHoliday );
 // holidays overlapping, the list order will act as priority.
 const char		   *UTIL_GetActiveHolidayString();
 
+// Convenience routine
+// ORs gameFlags with the physics object's current game flags
+inline unsigned short PhysSetGameFlags(IPhysicsObject* pPhys, unsigned short gameFlags)
+{
+	unsigned short flags = pPhys->GetGameFlags();
+	flags |= gameFlags;
+	pPhys->SetGameFlags(flags);
+
+	return flags;
+}
+// mask off gameFlags
+inline unsigned short PhysClearGameFlags(IPhysicsObject* pPhys, unsigned short gameFlags)
+{
+	unsigned short flags = pPhys->GetGameFlags();
+	flags &= ~gameFlags;
+	pPhys->SetGameFlags(flags);
+
+	return flags;
+}
+
+void PhysDisableObjectCollisions(IPhysicsObject* pObject0, IPhysicsObject* pObject1);
+void PhysDisableEntityCollisions(IPhysicsObject* pObject0, IPhysicsObject* pObject1);
+void PhysDisableEntityCollisions(IHandleEntity* pEntity0, IHandleEntity* pEntity1);
+void PhysEnableObjectCollisions(IPhysicsObject* pObject0, IPhysicsObject* pObject1);
+void PhysEnableEntityCollisions(IPhysicsObject* pObject0, IPhysicsObject* pObject1);
+void PhysEnableEntityCollisions(IHandleEntity* pEntity0, IHandleEntity* pEntity1);
+bool PhysEntityCollisionsAreDisabled(IHandleEntity* pEntity0, IHandleEntity* pEntity1);
+
 // Manages ragdolls fading for the low violence versions
 class CRagdollLowViolenceManager
 {

@@ -17,7 +17,7 @@
 #pragma once
 #endif
 
-#include "physics_shared.h"
+//#include "physics_shared.h"
 
 class CBaseEntity;
 class IPhysicsMaterial;
@@ -112,10 +112,10 @@ void PhysCollisionWarpEffect( gamevcollisionevent_t *pEvent, surfacedata_t *phit
 //void PhysCallbackDamage( CBaseEntity *pEntity, const CTakeDamageInfo &info, gamevcollisionevent_t &event, int hurtIndex );
 
 // Applies force impulses at a later time
-void PhysCallbackImpulse( IPhysicsObject *pPhysicsObject, const Vector &vecCenterForce, const AngularImpulse &vecCenterTorque );
+//void PhysCallbackImpulse( IPhysicsObject *pPhysicsObject, const Vector &vecCenterForce, const AngularImpulse &vecCenterTorque );
 
 // Sets the velocity at a later time
-void PhysCallbackSetVelocity( IPhysicsObject *pPhysicsObject, const Vector &vecVelocity );
+//void PhysCallbackSetVelocity( IPhysicsObject *pPhysicsObject, const Vector &vecVelocity );
 
 // queue up a delete on this object
 //void PhysCallbackRemove(CBaseEntity *pRemove);
@@ -123,10 +123,10 @@ void PhysCallbackSetVelocity( IPhysicsObject *pPhysicsObject, const Vector &vecV
 //bool PhysGetDamageInflictorVelocityStartOfFrame( IPhysicsObject *pInflictor, Vector &velocity, AngularImpulse &angVelocity );
 
 // force a physics entity to sleep immediately
-void PhysForceEntityToSleep( CBaseEntity *pEntity, IPhysicsObject *pObject );
+//void PhysForceEntityToSleep( CBaseEntity *pEntity, IPhysicsObject *pObject );
 
 // teleport an entity to it's position relative to an object it's constrained to
-void PhysTeleportConstrainedEntity( CBaseEntity *pTeleportSource, IPhysicsObject *pObject0, IPhysicsObject *pObject1, const Vector &prevPosition, const QAngle &prevAngles, bool physicsRotate );
+//void PhysTeleportConstrainedEntity( CBaseEntity *pTeleportSource, IPhysicsObject *pObject0, IPhysicsObject *pObject1, const Vector &prevPosition, const QAngle &prevAngles, bool physicsRotate );
 
 //void PhysGetListOfPenetratingEntities( CBaseEntity *pSearch, CUtlVector<CBaseEntity *> &list );
 //bool PhysShouldCollide( IPhysicsObject *pObj0, IPhysicsObject *pObj1 );

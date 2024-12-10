@@ -1283,7 +1283,7 @@ void CBaseEntity::FireBullets( const FireBulletsInfo_t &info )
 		if ( tr.m_pEnt != NULL )
 		{
 #ifdef GAME_DLL
-			surfacedata_t *psurf = physprops->GetSurfaceData( tr.surface.surfaceProps );
+			surfacedata_t *psurf = EntityList()->PhysGetProps()->GetSurfaceData( tr.surface.surfaceProps );
 			if ( ( psurf != NULL ) && ( psurf->game.material == CHAR_TEX_GLASS ) && (((CBaseEntity*)tr.m_pEnt)->ClassMatches( "func_breakable" ) ) )
 			{
 				// Query the func_breakable for whether it wants to allow for bullet penetration

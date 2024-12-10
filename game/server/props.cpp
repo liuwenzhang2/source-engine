@@ -40,7 +40,7 @@
 #include "physics_collisionevent.h"
 #include "gamestats.h"
 #include "vehicle_base.h"
-
+#include "physics_shared.h"
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
@@ -630,7 +630,7 @@ void CPhysicsProp::HandleAnyCollisionInteractions( int index, gamevcollisioneven
 			if ( pRagdoll )
 			{
 				Vector vecVelocity = pEvent->preVelocity[index] * pObj->GetMass();
-				PhysCallbackImpulse( pObj, vecVelocity, vec3_origin );
+				gEntList.PhysCallbackImpulse( pObj, vecVelocity, vec3_origin );
 				gEntList.DestroyEntity( pNPC );
 				GetEngineObject()->AddSpawnFlags( SF_PHYSPROP_HAS_ATTACHED_RAGDOLLS );
 			}
@@ -692,7 +692,7 @@ void CBreakableProp::HandleInteractionStick( int index, gamevcollisionevent_t *p
 		if( flDot > 0.3 )
 		{
 			// Finally, inhibit sticking in metal, grates, sky, or anything else that doesn't make a sound.
-			const surfacedata_t *psurf = physprops->GetSurfaceData( pEvent->surfaceProps[!index] );
+			const surfacedata_t *psurf = EntityList()->PhysGetProps()->GetSurfaceData( pEvent->surfaceProps[!index] );
 
 			if (psurf->game.material != CHAR_TEX_METAL && psurf->game.material != CHAR_TEX_GRATE && psurf->game.material != 'X' )
 			{
@@ -3026,7 +3026,7 @@ void CPhysicsProp::ComputeEnablingImpulse( int index, gamevcollisionevent_t *pEv
 	AngularImpulse vecTorque;
 	pEvent->pObjects[index]->CalculateForceOffset( vecContactVelocity, vecContactPoint, &vecForce, &vecTorque );
 
-	PhysCallbackImpulse( pEvent->pObjects[index], vecForce, vecTorque );
+	gEntList.PhysCallbackImpulse( pEvent->pObjects[index], vecForce, vecTorque );
 }
 
 
@@ -3810,7 +3810,7 @@ void CBasePropDoor::CalcDoorSounds()
 				if ( pSurfaceprop && GetEngineObject()->VPhysicsGetObject() )
 				{
 					bFoundSkin = true;
-					GetEngineObject()->VPhysicsGetObject()->SetMaterialIndex( physprops->GetSurfaceIndex( pSurfaceprop ) );
+					GetEngineObject()->VPhysicsGetObject()->SetMaterialIndex(EntityList()->PhysGetProps()->GetSurfaceIndex( pSurfaceprop ) );
 				}
 			}
 
@@ -3846,7 +3846,7 @@ void CBasePropDoor::CalcDoorSounds()
 	if ( !bFoundSkin && GetEngineObject()->VPhysicsGetObject() )
 	{
 		Warning( "%s has Door model (%s) with no door_options! Verify that SKIN is valid, and has a corresponding options block in the model QC file\n", GetDebugName(), modelinfo->GetModelName(GetEngineObject()->GetModel() ) );
-		GetEngineObject()->VPhysicsGetObject()->SetMaterialIndex( physprops->GetSurfaceIndex("wood") );
+		GetEngineObject()->VPhysicsGetObject()->SetMaterialIndex(EntityList()->PhysGetProps()->GetSurfaceIndex("wood") );
 	}
 
 	// Any sound data members that are already filled out were specified as level designer overrides,
@@ -4644,7 +4644,7 @@ bool CBasePropDoor::TestCollision( const Ray_t &ray, unsigned int mask, trace_t&
 	if ( !( pStudioHdr->contents() & mask ) )
 		return false;
 
-	physcollision->TraceBox( ray, GetEngineObject()->VPhysicsGetObject()->GetCollide(), GetEngineObject()->GetAbsOrigin(), GetEngineObject()->GetAbsAngles(), &trace );
+	EntityList()->PhysGetCollision()->TraceBox( ray, GetEngineObject()->VPhysicsGetObject()->GetCollide(), GetEngineObject()->GetAbsOrigin(), GetEngineObject()->GetAbsAngles(), &trace );
 
 	if ( trace.DidHit() )
 	{
@@ -5519,9 +5519,9 @@ public:
 	{
 		GetEngineObject()->SetSolid( SOLID_BBOX );
 		GetEngineObject()->SetCollisionBounds( -Vector(12,12,12), Vector(12,12,12) );
-		objectparams_t params = g_PhysDefaultObjectParams;
+		objectparams_t params = EntityList()->PhysGetDefaultObjectParams();
 		params.pGameData = static_cast<void *>(this);
-		IPhysicsObject *pPhysicsObject = physenv->CreateSphereObject( 12, 0, GetEngineObject()->GetAbsOrigin(), GetEngineObject()->GetAbsAngles(), &params, false );
+		IPhysicsObject *pPhysicsObject = EntityList()->PhysGetEnv()->CreateSphereObject( 12, 0, GetEngineObject()->GetAbsOrigin(), GetEngineObject()->GetAbsAngles(), &params, false );
 		if ( pPhysicsObject )
 		{
 			GetEngineObject()->VPhysicsSetObject( pPhysicsObject );
@@ -5715,7 +5715,7 @@ class CPhysicsPropMultiplayer : public CPhysicsProp, public IMultiplayerPhysics
 			IPhysicsObject *pPhysics = GetEngineObject()->VPhysicsGetObject();
 			if ( pPhysics && pPhysics->GetCollide() )
 			{
-				physcollision->CollideGetAABB( &m_collisionMins.GetForModify(), &m_collisionMaxs.GetForModify(), pPhysics->GetCollide(), vec3_origin, vec3_angle );
+				EntityList()->PhysGetCollision()->CollideGetAABB( &m_collisionMins.GetForModify(), &m_collisionMaxs.GetForModify(), pPhysics->GetCollide(), vec3_origin, vec3_angle );
 				GetEngineObject()->SetSurroundingBoundsType( USE_GAME_CODE );
 				m_usingCustomCollisionBounds = true;
 			}
@@ -6063,7 +6063,7 @@ bool UTIL_CreateScaledPhysObject( CBaseAnimating *pInstance, float flScale )
 	if ( flScale != 1.0f )
 	{
 		// Create a query to get more information from the collision object
-		ICollisionQuery *pQuery = physcollision->CreateQueryModel( pCollide->solids[0] );	// FIXME: This should iterate over all solids!
+		ICollisionQuery *pQuery = EntityList()->PhysGetCollision()->CreateQueryModel( pCollide->solids[0] );	// FIXME: This should iterate over all solids!
 		if ( pQuery == NULL )
 			return false;
 
@@ -6094,17 +6094,17 @@ bool UTIL_CreateScaledPhysObject( CBaseAnimating *pInstance, float flScale )
 			}
 
 			// Convert it back to a convex
-			pConvexes[i] = physcollision->ConvexFromVerts( ppVerts, nNumVerts );
+			pConvexes[i] = EntityList()->PhysGetCollision()->ConvexFromVerts( ppVerts, nNumVerts );
 			Assert( pConvexes[i] != NULL );
 			if ( pConvexes[i] == NULL )
 				return false;
 		}
 
 		// Clean up
-		physcollision->DestroyQueryModel( pQuery );
+		EntityList()->PhysGetCollision()->DestroyQueryModel( pQuery );
 
 		// Create a collision model from all the convexes
-		pNewCollide = physcollision->ConvertConvexToCollide( pConvexes, nNumConvex );
+		pNewCollide = EntityList()->PhysGetCollision()->ConvertConvexToCollide( pConvexes, nNumConvex );
 		if ( pNewCollide == NULL )
 			return false;
 	}
@@ -6128,24 +6128,24 @@ bool UTIL_CreateScaledPhysObject( CBaseAnimating *pInstance, float flScale )
 
 	// Scale our mass up as well
 	tmpSolid.params.mass *= flScale;
-	tmpSolid.params.volume = physcollision->CollideVolume( pNewCollide );
+	tmpSolid.params.volume = EntityList()->PhysGetCollision()->CollideVolume( pNewCollide );
 
 	// Get our surface prop info
 	int surfaceProp = -1;
 	if ( tmpSolid.surfaceprop[0] )
 	{
-		surfaceProp = physprops->GetSurfaceIndex( tmpSolid.surfaceprop );
+		surfaceProp = EntityList()->PhysGetProps()->GetSurfaceIndex( tmpSolid.surfaceprop );
 	}
 
 	// Now put it all back (phew!)
 	IPhysicsObject *pNewObject = NULL;
 	if ( bWasStatic )
 	{
-		pNewObject = physenv->CreatePolyObjectStatic( pNewCollide, surfaceProp, pInstance->GetEngineObject()->GetAbsOrigin(), pInstance->GetEngineObject()->GetAbsAngles(), &tmpSolid.params );
+		pNewObject = EntityList()->PhysGetEnv()->CreatePolyObjectStatic( pNewCollide, surfaceProp, pInstance->GetEngineObject()->GetAbsOrigin(), pInstance->GetEngineObject()->GetAbsAngles(), &tmpSolid.params );
 	}
 	else
 	{
-		pNewObject = physenv->CreatePolyObject( pNewCollide, surfaceProp, pInstance->GetEngineObject()->GetAbsOrigin(), pInstance->GetEngineObject()->GetAbsAngles(), &tmpSolid.params );
+		pNewObject = EntityList()->PhysGetEnv()->CreatePolyObject( pNewCollide, surfaceProp, pInstance->GetEngineObject()->GetAbsOrigin(), pInstance->GetEngineObject()->GetAbsAngles(), &tmpSolid.params );
 	}
 	Assert( pNewObject );
 

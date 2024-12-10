@@ -867,7 +867,7 @@ bool CAntlionTemplateMaker::ValidateSpawnPosition( Vector &vOrigin, CBaseEntity 
 		if ( tr.contents & ( CONTENTS_WATER ) )
 			 return false;
 
-		const surfacedata_t *psurf = physprops->GetSurfaceData( tr.surface.surfaceProps );
+		const surfacedata_t *psurf = EntityList()->PhysGetProps()->GetSurfaceData( tr.surface.surfaceProps );
 
 		if ( psurf )
 		{
@@ -914,7 +914,7 @@ bool CAntlionTemplateMaker::ValidateSpawnPosition( Vector &vOrigin, CBaseEntity 
 
 					if ( trVerify.fraction != 1.0f )
 					{
-						const surfacedata_t *psurf = physprops->GetSurfaceData( trVerify.surface.surfaceProps );
+						const surfacedata_t *psurf = EntityList()->PhysGetProps()->GetSurfaceData( trVerify.surface.surfaceProps );
 
 						if ( psurf )
 						{

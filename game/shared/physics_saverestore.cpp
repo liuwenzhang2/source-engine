@@ -15,7 +15,7 @@
 #include "saverestoretypes.h"
 #include "gamestringpool.h"
 #include "datacache/imdlcache.h"
-
+#include "physics_shared.h"
 #if !defined( CLIENT_DLL )
 //#include "entitylist.h"
 #endif
@@ -148,7 +148,7 @@ public:
 
 	virtual void Save( ISave *pSave ) 
 	{
-		m_blockHeader.pWorldObject = g_PhysWorldObject;
+		m_blockHeader.pWorldObject = EntityList()->PhysGetWorldObject();
 		m_blockHeader.nSaved = m_QueuedSaves.Count();
 
 		while ( m_QueuedSaves.Count() )
@@ -204,11 +204,11 @@ public:
 #endif
 
 		// UNDONE: This never runs!!!!
-		if ( physenv )
+		if (EntityList()->PhysGetEnv())
 		{
 			physprerestoreparams_t params;
 			params.recreatedObjectCount = 0;
-			physenv->PreRestore( params );
+			EntityList()->PhysGetEnv()->PreRestore( params );
 		}
 	}
 	
@@ -229,13 +229,13 @@ public:
 	{
 		if ( m_fDoLoad )
 		{
-			if ( physenv )
+			if (EntityList()->PhysGetEnv())
 			{
 				physprerestoreparams_t params;
 				params.recreatedObjectCount = 1;
-				params.recreatedObjectList[0].pNewObject = g_PhysWorldObject;
+				params.recreatedObjectList[0].pNewObject = EntityList()->PhysGetWorldObject();
 				params.recreatedObjectList[0].pOldObject = m_blockHeader.pWorldObject;
-				physenv->PreRestore( params );
+				EntityList()->PhysGetEnv()->PreRestore( params );
 			}
 
 			PhysObjectHeader_t header;
@@ -398,8 +398,8 @@ public:
 	
 	virtual void PostRestore() 
 	{
-		if ( physenv )
-			physenv->PostRestore();
+		if (EntityList()->PhysGetEnv())
+			EntityList()->PhysGetEnv()->PostRestore();
 
 		unsigned short i = m_QueuedRestores.FirstInorder();
 		while ( i != m_QueuedRestores.InvalidIndex() )
@@ -447,7 +447,7 @@ public:
 			if ( pPhysObj )
 			{
 				item.header.modelName = GetModelName( pPhysObj );
-				item.header.iCollide = physcollision->CollideIndex( pPhysObj->GetCollide() );
+				item.header.iCollide = EntityList()->PhysGetCollision()->CollideIndex( pPhysObj->GetCollide() );
 				if ( item.header.modelName == NULL_STRING )
 				{
 					BBox_t *pBBox = GetBBox( pPhysObj );
@@ -499,12 +499,12 @@ public:
 	
 	void SavePhysicsObject( ISave *pSave, CBaseEntity *pOwner, void *pObject, PhysInterfaceId_t type )
 	{
-		if ( physenv )
+		if (EntityList()->PhysGetEnv())
 		{
 			if ( !pObject )
 				return;
 			physsaveparams_t params = { pSave, pObject, type };
-			physenv->Save( params );
+			EntityList()->PhysGetEnv()->Save( params );
 		}
 	}
 	
@@ -512,10 +512,10 @@ public:
 	
 	void RestorePhysicsObject( IRestore *pRestore, const PhysObjectHeader_t &header, void **ppObject, const CPhysCollide *pCollide = NULL )
 	{
-		if ( physenv )
+		if (EntityList()->PhysGetEnv())
 		{
-			physrestoreparams_t params = { pRestore, ppObject, header.type, header.hEntity.Get(), STRING(header.modelName), pCollide, physenv, physgametrace };
-			physenv->Restore( params );
+			physrestoreparams_t params = { pRestore, ppObject, header.type, header.hEntity.Get(), STRING(header.modelName), pCollide, EntityList()->PhysGetEnv(), physgametrace };
+			EntityList()->PhysGetEnv()->Restore( params );
 		}
 	}
 #if !defined( CLIENT_DLL )	

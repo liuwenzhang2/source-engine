@@ -643,7 +643,7 @@ float CalculateObjectStress( IPhysicsObject *pObject, CBaseEntity *pInputOwnerEn
 
 	// sum is kg in / s
 	Vector gravVector;
-	physenv->GetGravity( &gravVector );
+	EntityList()->PhysGetEnv()->GetGravity( &gravVector );
 	float gravity = gravVector.Length();
 	if ( pInputOwnerEntity->GetEngineObject()->GetMoveType() != MOVETYPE_VPHYSICS && pObject->IsMoveable() )
 	{
@@ -671,7 +671,7 @@ float CalculateObjectStress( IPhysicsObject *pObject, CBaseEntity *pInputOwnerEn
 		// Peek into the controller for this object.  Look at the input velocity and make sure it's all
 		// accounted for in the computed stress.  If not, redistribute external to internal as it's 
 		// probably being reflected in a way we can't measure here.
-		float inputLen = lastVel.Length() * (1.0f / physenv->GetSimulationTimestep()) * objMass;
+		float inputLen = lastVel.Length() * (1.0f / EntityList()->PhysGetEnv()->GetSimulationTimestep()) * objMass;
 		if ( inputLen > 0.0f )
 		{
 			float internalLen = internalForce.Length();

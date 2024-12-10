@@ -1582,7 +1582,7 @@ bool CBaseAnimating::TestCollision( const Ray_t &ray, unsigned int fContentsMask
 		QAngle vecAngles;
 		pPhysObject->GetPosition( &vecPosition, &vecAngles );
 		const CPhysCollide *pScaledCollide = pPhysObject->GetCollide();
-		physcollision->TraceBox( ray, pScaledCollide, vecPosition, vecAngles, &tr );
+		EntityList()->PhysGetCollision()->TraceBox( ray, pScaledCollide, vecPosition, vecAngles, &tr );
 		
 		return tr.DidHit();
 	}
@@ -1616,13 +1616,13 @@ bool CBaseAnimating::TestHitboxes( const Ray_t &ray, unsigned int fContentsMask,
 	const matrix3x4_t *hitboxbones[MAXSTUDIOBONES];
 	GetEngineObject()->GetHitboxBoneTransforms(hitboxbones);
 
-	if ( TraceToStudio( physprops, ray, pStudioHdr, set, hitboxbones, fContentsMask, GetEngineObject()->GetAbsOrigin(), GetEngineObject()->GetModelScale(), tr ) )
+	if ( TraceToStudio(EntityList()->PhysGetProps(), ray, pStudioHdr, set, hitboxbones, fContentsMask, GetEngineObject()->GetAbsOrigin(), GetEngineObject()->GetModelScale(), tr ) )
 	{
 		mstudiobbox_t *pbox = set->pHitbox( tr.hitbox );
 		mstudiobone_t *pBone = pStudioHdr->pBone(pbox->bone);
 		tr.surface.name = "**studio**";
 		tr.surface.flags = SURF_HITBOX;
-		tr.surface.surfaceProps = physprops->GetSurfaceIndex( pBone->pszSurfaceProp() );
+		tr.surface.surfaceProps = EntityList()->PhysGetProps()->GetSurfaceIndex( pBone->pszSurfaceProp() );
 	}
 	return true;
 }

@@ -362,7 +362,7 @@ bool CNPC_BaseZombie::FindNearestPhysicsObject( int iMaxMass )
 		vcollide_t *pCollide = modelinfo->GetVCollide( pList[i]->GetEngineObject()->GetModelIndex() );
 		
 		Vector objMins, objMaxs;
-		physcollision->CollideGetAABB( &objMins, &objMaxs, pCollide->solids[0], pList[i]->GetEngineObject()->GetAbsOrigin(), pList[i]->GetEngineObject()->GetAbsAngles() );
+		EntityList()->PhysGetCollision()->CollideGetAABB( &objMins, &objMaxs, pCollide->solids[0], pList[i]->GetEngineObject()->GetAbsOrigin(), pList[i]->GetEngineObject()->GetAbsAngles() );
 
 		if ( objMaxs.z < vecZombieKnees.z )
 			continue;
@@ -1438,10 +1438,10 @@ void CNPC_BaseZombie::PoundSound()
 
 	if( tr.fraction < 1.0 && tr.m_pEnt )
 	{
-		const surfacedata_t *psurf = physprops->GetSurfaceData( tr.surface.surfaceProps );
+		const surfacedata_t *psurf = EntityList()->PhysGetProps()->GetSurfaceData( tr.surface.surfaceProps );
 		if( psurf )
 		{
-			const char* soundname = physprops->GetString(psurf->sounds.impactHard);
+			const char* soundname = EntityList()->PhysGetProps()->GetString(psurf->sounds.impactHard);
 			CPASAttenuationFilter filter(this, soundname);
 
 			EmitSound_t params;
@@ -1577,7 +1577,7 @@ void CNPC_BaseZombie::HandleAnimEvent( animevent_t *pEvent )
 			params.m_pflSoundDuration = NULL;
 			params.m_bWarnOnDirectWaveReference = true;
 			g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
-			gEntList.PhysicsImpactSound( pEnemy, pPhysObj, CHAN_BODY, pPhysObj->GetMaterialIndex(), physprops->GetSurfaceIndex("flesh"), 0.5, 800 );
+			gEntList.PhysicsImpactSound( pEnemy, pPhysObj, CHAN_BODY, pPhysObj->GetMaterialIndex(), EntityList()->PhysGetProps()->GetSurfaceIndex("flesh"), 0.5, 800 );
 
 			Vector physicsCenter = pPhysicsEntity->WorldSpaceCenter();
 			v = pEnemy->WorldSpaceCenter() - physicsCenter;

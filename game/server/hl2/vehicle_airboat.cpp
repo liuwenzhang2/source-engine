@@ -437,7 +437,7 @@ void CPropAirboat::CreateAntiFlipConstraint()
 
 	// Put the ragdoll constraint in the space of the airboat.
 	SetIdentityMatrix( ragdoll.constraintToAttached );
-	BuildObjectRelativeXform( g_PhysWorldObject, GetEngineObject()->VPhysicsGetObject(), ragdoll.constraintToReference );
+	BuildObjectRelativeXform(EntityList()->PhysGetWorldObject(), GetEngineObject()->VPhysicsGetObject(), ragdoll.constraintToReference );
 
 	ragdoll.axes[0].minRotation = -100;
 	ragdoll.axes[0].maxRotation = 100;
@@ -446,7 +446,7 @@ void CPropAirboat::CreateAntiFlipConstraint()
 	ragdoll.axes[2].minRotation = -180;
 	ragdoll.axes[2].maxRotation = 180;
 
-	m_pAntiFlipConstraint = physenv->CreateRagdollConstraint( g_PhysWorldObject, GetEngineObject()->VPhysicsGetObject(), NULL, ragdoll );
+	m_pAntiFlipConstraint = EntityList()->PhysGetEnv()->CreateRagdollConstraint(EntityList()->PhysGetWorldObject(), GetEngineObject()->VPhysicsGetObject(), NULL, ragdoll );
 
 	//NDebugOverlay::Cross3DOriented( ragdoll.constraintToReference, 128, 255, true, 100 );
 }
@@ -939,16 +939,16 @@ int CPropAirboat::OnTakeDamage( const CTakeDamageInfo &info )
 void CPropAirboat::VPhysicsFriction( IPhysicsObject *pObject, float energy, int surfaceProps, int surfacePropsHit )
 {
 	// don't make noise for hidden/invisible/sky materials
-	const surfacedata_t *phit = physprops->GetSurfaceData( surfacePropsHit );
-	const surfacedata_t *pprops = physprops->GetSurfaceData( surfaceProps );
+	const surfacedata_t *phit = EntityList()->PhysGetProps()->GetSurfaceData( surfacePropsHit );
+	const surfacedata_t *pprops = EntityList()->PhysGetProps()->GetSurfaceData( surfaceProps );
 	if ( phit->game.material == 'X' || pprops->game.material == 'X' )
 		return;
 
 	// FIXME: Make different scraping sounds here
 	float flVolume = 0.3f;
 
-	surfacedata_t *psurf = physprops->GetSurfaceData( surfaceProps );
-	const char *pSoundName = physprops->GetString( psurf->sounds.scrapeRough );
+	surfacedata_t *psurf = EntityList()->PhysGetProps()->GetSurfaceData( surfaceProps );
+	const char *pSoundName = EntityList()->PhysGetProps()->GetString( psurf->sounds.scrapeRough );
 
 	gEntList.PhysFrictionSound( this, pObject, pSoundName, psurf->soundhandles.scrapeRough, flVolume );
 }

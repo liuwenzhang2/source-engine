@@ -259,7 +259,7 @@ void CWeaponHL2MPBase::FallInit( void )
 				//Constrain the weapon in place
 				IPhysicsObject *pReferenceObject, *pAttachedObject;
 				
-				pReferenceObject = g_PhysWorldObject;
+				pReferenceObject = EntityList()->PhysGetWorldObject();
 				pAttachedObject = GetEngineObject()->VPhysicsGetObject();
 
 				if ( pReferenceObject && pAttachedObject )
@@ -273,7 +273,7 @@ void CWeaponHL2MPBase::FallInit( void )
 
 					IPhysicsConstraint *pConstraint = GetConstraint();
 
-					pConstraint = physenv->CreateFixedConstraint( pReferenceObject, pAttachedObject, NULL, fixed );
+					pConstraint = EntityList()->PhysGetEnv()->CreateFixedConstraint( pReferenceObject, pAttachedObject, NULL, fixed );
 
 					pConstraint->SetGameData( (void *) this );
 				}

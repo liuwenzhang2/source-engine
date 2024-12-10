@@ -496,7 +496,7 @@ void CBaseCombatWeapon::FallInit( void )
 			//Constrain the weapon in place
 			IPhysicsObject *pReferenceObject, *pAttachedObject;
 			
-			pReferenceObject = g_PhysWorldObject;
+			pReferenceObject = EntityList()->PhysGetWorldObject();
 			pAttachedObject = GetEngineObject()->VPhysicsGetObject();
 
 			if ( pReferenceObject && pAttachedObject )
@@ -508,7 +508,7 @@ void CBaseCombatWeapon::FallInit( void )
 				fixed.constraint.forceLimit	= lbs2kg( 10000 );
 				fixed.constraint.torqueLimit = lbs2kg( 10000 );
 
-				m_pConstraint = physenv->CreateFixedConstraint( pReferenceObject, pAttachedObject, NULL, fixed );
+				m_pConstraint = EntityList()->PhysGetEnv()->CreateFixedConstraint( pReferenceObject, pAttachedObject, NULL, fixed );
 
 				m_pConstraint->SetGameData( (void *) this );
 			}

@@ -58,7 +58,7 @@ public:
 	{
 		if ( m_pSpring )
 		{
-			physenv->DestroySpring( m_pSpring );
+			EntityList()->PhysGetEnv()->DestroySpring( m_pSpring );
 		}
 	}
 
@@ -110,7 +110,7 @@ public:
 
 	~CPropCrane( void )
 	{
-		physenv->DestroyConstraintGroup( m_pConstraintGroup );
+		EntityList()->PhysGetEnv()->DestroyConstraintGroup( m_pConstraintGroup );
 	}
 
 	// CBaseEntity

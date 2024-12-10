@@ -517,7 +517,7 @@ void CBaseEntity::ResolveFlyCollisionBounce( trace_t &trace, Vector &vecVelocity
 
 	// Get the impact surface's elasticity.
 	float flSurfaceElasticity;
-	physprops->GetPhysicsProperties( trace.surface.surfaceProps, NULL, NULL, NULL, &flSurfaceElasticity );
+	EntityList()->PhysGetProps()->GetPhysicsProperties( trace.surface.surfaceProps, NULL, NULL, NULL, &flSurfaceElasticity );
 	
 	float flTotalElasticity = GetEngineObject()->GetElasticity() * flSurfaceElasticity;
 	if ( flMinTotalElasticity > 0.9f )
@@ -601,7 +601,7 @@ void CBaseEntity::ResolveFlyCollisionSlide( trace_t &trace, Vector &vecVelocity 
 {
 	// Get the impact surface's friction.
 	float flSurfaceFriction;
-	physprops->GetPhysicsProperties( trace.surface.surfaceProps, NULL, NULL, &flSurfaceFriction, NULL );
+	EntityList()->PhysGetProps()->GetPhysicsProperties( trace.surface.surfaceProps, NULL, NULL, &flSurfaceFriction, NULL );
 
 	// A backoff of 1.0 is a slide.
 	float flBackOff = 1.0f;	

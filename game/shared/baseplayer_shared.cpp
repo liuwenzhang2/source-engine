@@ -490,7 +490,7 @@ void CBasePlayer::EyePositionAndVectors( Vector *pPosition, Vector *pForward,
 #ifdef CLIENT_DLL
 surfacedata_t * CBasePlayer::GetFootstepSurface( const Vector &origin, const char *surfaceName )
 {
-	return physprops->GetSurfaceData( physprops->GetSurfaceIndex( surfaceName ) );
+	return EntityList()->PhysGetProps()->GetSurfaceData(EntityList()->PhysGetProps()->GetSurfaceIndex( surfaceName ) );
 }
 #endif
 
@@ -499,7 +499,7 @@ surfacedata_t *CBasePlayer::GetLadderSurface( const Vector &origin )
 #ifdef CLIENT_DLL
 	return GetFootstepSurface( origin, "ladder" );
 #else
-	return physprops->GetSurfaceData( physprops->GetSurfaceIndex( "ladder" ) );
+	return EntityList()->PhysGetProps()->GetSurfaceData(EntityList()->PhysGetProps()->GetSurfaceIndex( "ladder" ) );
 #endif
 }
 
@@ -598,13 +598,13 @@ void CBasePlayer::UpdateStepSound( surfacedata_t *psurface, const Vector &vecOri
 		{
 			iSkipStep = 0;
 		}
-		psurface = physprops->GetSurfaceData( physprops->GetSurfaceIndex( "wade" ) );
+		psurface = EntityList()->PhysGetProps()->GetSurfaceData(EntityList()->PhysGetProps()->GetSurfaceIndex( "wade" ) );
 		fvol = 0.65;
 		SetStepSoundTime( STEPSOUNDTIME_WATER_KNEE, bWalking );
 	}
 	else if ( GetWaterLevel() == WL_Feet )
 	{
-		psurface = physprops->GetSurfaceData( physprops->GetSurfaceIndex( "water" ) );
+		psurface = EntityList()->PhysGetProps()->GetSurfaceData(EntityList()->PhysGetProps()->GetSurfaceIndex( "water" ) );
 		fvol = bWalking ? 0.2 : 0.5;
 
 		SetStepSoundTime( STEPSOUNDTIME_WATER_FOOT, bWalking );
@@ -696,8 +696,7 @@ void CBasePlayer::PlayStepSound( Vector &vecOrigin, surfacedata_t *psurface, flo
 	}
 	else
 	{
-		IPhysicsSurfaceProps *physprops = MoveHelper()->GetSurfaceProps();
-		const char *pSoundName = physprops->GetString( stepSoundName );
+		const char *pSoundName = EntityList()->PhysGetProps()->GetString( stepSoundName );
 
 		// Give child classes an opportunity to override.
 		pSoundName = GetOverrideStepSound( pSoundName );

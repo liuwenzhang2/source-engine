@@ -2403,7 +2403,7 @@ void CBaseHeadcrab::CreateDust( bool placeDecal )
 
 	if ( tr.fraction < 1.0f )
 	{
-		const surfacedata_t *pdata = physprops->GetSurfaceData( tr.surface.surfaceProps );
+		const surfacedata_t *pdata = EntityList()->PhysGetProps()->GetSurfaceData( tr.surface.surfaceProps );
 
 		if ( ( (char) pdata->game.material == CHAR_TEX_CONCRETE ) || ( (char) pdata->game.material == CHAR_TEX_DIRT ) )
 		{

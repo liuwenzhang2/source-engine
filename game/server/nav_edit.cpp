@@ -339,7 +339,7 @@ bool CNavMesh::FindActiveNavArea( void )
 	{
 		if ( !IsEditMode( CREATING_AREA ) )
 		{
-			m_climbableSurface = physprops->GetSurfaceData( result.surface.surfaceProps )->game.climbable != 0;
+			m_climbableSurface = EntityList()->PhysGetProps()->GetSurfaceData( result.surface.surfaceProps )->game.climbable != 0;
 			if ( !m_climbableSurface )
 			{
 				m_climbableSurface = (result.contents & CONTENTS_LADDER) != 0;
@@ -523,7 +523,7 @@ bool CheckForClimbableSurface( const Vector &start, const Vector &end )
 	bool climbableSurface = false;
 	if (result.fraction != 1.0f)
 	{
-		climbableSurface = physprops->GetSurfaceData( result.surface.surfaceProps )->game.climbable != 0;
+		climbableSurface = EntityList()->PhysGetProps()->GetSurfaceData( result.surface.surfaceProps )->game.climbable != 0;
 		if ( !climbableSurface )
 		{
 			climbableSurface = (result.contents & CONTENTS_LADDER) != 0;

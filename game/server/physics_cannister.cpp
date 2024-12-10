@@ -222,7 +222,7 @@ void CPhysicsCannister::CannisterActivate( CBaseEntity *pActivator, const Vector
 	Vector thrustDirection = CalcLocalThrust( thrustOffset );
 	m_onActivate.FireOutput( pActivator, this, 0 );
 	m_thruster.CalcThrust( m_thrustOrigin, thrustDirection, GetEngineObject()->VPhysicsGetObject() );
-	m_pController = physenv->CreateMotionController( &m_thruster );
+	m_pController = EntityList()->PhysGetEnv()->CreateMotionController( &m_thruster );
 	IPhysicsObject *pPhys = GetEngineObject()->VPhysicsGetObject();
 	m_pController->AttachObject( pPhys, true );
 	// Make sure the object is simulated
@@ -332,7 +332,7 @@ void CPhysicsCannister::Deactivate(void)
 		return;
 
 	m_pController->DetachObject(GetEngineObject()->VPhysicsGetObject() );
-	physenv->DestroyMotionController( m_pController );
+	EntityList()->PhysGetEnv()->DestroyMotionController( m_pController );
 	m_pController = NULL;
 	GetEngineObject()->SetNextThink( TICK_NEVER_THINK );
 	m_thrustTime = 0;

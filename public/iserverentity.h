@@ -718,6 +718,14 @@ public:
 abstract_class IServerEntityList : public IEntityList, public ISaveRestoreBlockHandler
 {
 public:
+	virtual IPhysics* Physics() = 0;
+	virtual IPhysicsEnvironment* PhysGetEnv() = 0;
+	virtual IPhysicsSurfaceProps* PhysGetProps() = 0;
+	virtual IPhysicsCollision* PhysGetCollision() = 0;
+	virtual IPhysicsObjectPairHash* PhysGetEntityCollisionHash() = 0;
+	virtual const objectparams_t& PhysGetDefaultObjectParams() = 0;
+	virtual IPhysicsObject* PhysGetWorldObject() = 0;
+
 	virtual void InstallEntityFactory(IEntityFactory* pFactory) = 0;
 	virtual void UninstallEntityFactory(IEntityFactory* pFactory) = 0;
 	virtual bool CanCreateEntityClass(const char* pClassName) = 0;

@@ -153,6 +153,5 @@ class CSound;
 #include "recipientfilter.h"
 #include "gamemovement.h"
 
-inline IServerEntityList* EntityList() { return &ServerEntityList(); }
 
 #endif // CBASE_H

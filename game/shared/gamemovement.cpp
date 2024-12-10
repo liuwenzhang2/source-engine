@@ -920,10 +920,9 @@ void CBasePlayer::UpdateWetness()
 //-----------------------------------------------------------------------------
 void CGameMovement::CategorizeGroundSurface( trace_t &pm )
 {
-	IPhysicsSurfaceProps *physprops = MoveHelper()->GetSurfaceProps();
 	player->m_surfaceProps = pm.surface.surfaceProps;
-	player->m_pSurfaceData = physprops->GetSurfaceData( player->m_surfaceProps );
-	physprops->GetPhysicsProperties( player->m_surfaceProps, NULL, NULL, &player->m_surfaceFriction, NULL );
+	player->m_pSurfaceData = EntityList()->PhysGetProps()->GetSurfaceData( player->m_surfaceProps );
+	EntityList()->PhysGetProps()->GetPhysicsProperties( player->m_surfaceProps, NULL, NULL, &player->m_surfaceFriction, NULL );
 	
 	// HACKHACK: Scale this to fudge the relationship between vphysics friction values and player friction values.
 	// A value of 0.8f feels pretty normal for vphysics, whereas 1.0f is normal for players.
@@ -2822,10 +2821,9 @@ inline bool CGameMovement::OnLadder( trace_t &trace )
 	if ( trace.contents & CONTENTS_LADDER )
 		return true;
 
-	IPhysicsSurfaceProps *pPhysProps = MoveHelper( )->GetSurfaceProps();
-	if ( pPhysProps )
+	if ( EntityList()->PhysGetProps() )
 	{
-		const surfacedata_t *pSurfaceData = pPhysProps->GetSurfaceData( trace.surface.surfaceProps );
+		const surfacedata_t *pSurfaceData = EntityList()->PhysGetProps()->GetSurfaceData( trace.surface.surfaceProps );
 		if ( pSurfaceData )
 		{
 			if ( pSurfaceData->game.climbable != 0 )
@@ -3872,8 +3870,7 @@ void CGameMovement::CategorizePosition( void )
 		if ( player->IsInAVehicle() == false )
 		{
 			// If our gamematerial has changed, tell any player surface triggers that are watching
-			IPhysicsSurfaceProps *physprops = MoveHelper()->GetSurfaceProps();
-			surfacedata_t *pSurfaceProp = physprops->GetSurfaceData( pm.surface.surfaceProps );
+			surfacedata_t *pSurfaceProp = EntityList()->PhysGetProps()->GetSurfaceData( pm.surface.surfaceProps );
 			char cCurrGameMaterial = pSurfaceProp->game.material;
 			if ( !player->GetEngineObject()->GetGroundEntity() )
 			{

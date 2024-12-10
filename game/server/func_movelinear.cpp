@@ -152,7 +152,7 @@ bool CFuncMoveLinear::CreateVPhysics( void )
 		//FIXME: Currently there's no way to specify that you want slime
 		fluid.contents = CONTENTS_WATER;
 		
-		m_pFluidController = physenv->CreateFluidController( pPhysics, &fluid );
+		m_pFluidController = EntityList()->PhysGetEnv()->CreateFluidController( pPhysics, &fluid );
 	}
 
 	return true;

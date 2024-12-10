@@ -1007,7 +1007,7 @@ static CDODViewVectors g_DODViewVectors(
 					float flFriction;
 					float flElasticity;
 
-					physprops->GetPhysicsProperties( nMaterialIndex, &flDensity,
+					EntityList()->PhysGetProps()->GetPhysicsProperties( nMaterialIndex, &flDensity,
 						&flThickness, &flFriction, &flElasticity );
 
 					const float ONE_OVER_DENSITY_ABSORB_ALL_DAMAGE = ( 1.0 / 3000.0 );

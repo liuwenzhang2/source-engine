@@ -68,7 +68,7 @@
 #include "dt_utlvector_send.h"
 #include "vote_controller.h"
 #include "ai_speech.h"
-
+#include "physics_shared.h"
 #if defined USES_ECON_ITEMS
 #include "econ_wearable.h"
 #endif

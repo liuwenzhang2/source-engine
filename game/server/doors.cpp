@@ -448,7 +448,7 @@ bool CBaseDoor::CreateVPhysics( )
 		//FIXME: Currently there's no way to specify that you want slime
 		fluid.contents = CONTENTS_WATER;
 		
-		physenv->CreateFluidController( pPhysics, &fluid );
+		EntityList()->PhysGetEnv()->CreateFluidController( pPhysics, &fluid );
 	}
 	return true;
 }

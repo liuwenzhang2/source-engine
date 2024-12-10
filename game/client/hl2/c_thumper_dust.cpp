@@ -21,7 +21,7 @@
 #define THUMPER_MAX_PARTICLES		24
 
 
-extern IPhysicsSurfaceProps *physprops;
+//extern IPhysicsSurfaceProps *physprops;
 
 
 class ThumperDustEmitter : public CSimpleEmitter

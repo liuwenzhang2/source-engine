@@ -2427,7 +2427,7 @@ void CLogicAutosave::InputSetMinHitpointsThreshold( inputdata_t &inputdata )
 IPhysicsObject *FindPhysicsObjectByNameOrWorld( string_t name, CBaseEntity *pErrorEntity )
 {
 	if ( !name )
-		return g_PhysWorldObject;
+		return EntityList()->PhysGetWorldObject();
 
 	IPhysicsObject *pPhysics = FindPhysicsObjectByName( name.ToCStr(), pErrorEntity );
 	if ( !pPhysics )

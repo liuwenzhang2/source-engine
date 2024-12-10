@@ -672,7 +672,7 @@ bool CRagdollProp::TestCollision( const Ray_t &ray, unsigned int mask, trace_t& 
 		if(GetEngineObject()->GetElement(i) )
 		{
 			GetEngineObject()->GetElement(i)->GetPosition( &position, &angles );
-			physcollision->TraceBox( ray, GetEngineObject()->GetElement(i)->GetCollide(), position, angles, &tr );
+			EntityList()->PhysGetCollision()->TraceBox( ray, GetEngineObject()->GetElement(i)->GetCollide(), position, angles, &tr );
 
 			if ( tr.fraction < trace.fraction )
 			{
@@ -889,7 +889,7 @@ public:
 
 	~CRagdollPropAttached()
 	{
-		physenv->DestroyConstraint( m_pAttachConstraint );
+		EntityList()->PhysGetEnv()->DestroyConstraint( m_pAttachConstraint );
 		m_pAttachConstraint = NULL;
 	}
 
@@ -983,7 +983,7 @@ void CRagdollPropAttached::Detach()
 	GetEngineObject()->SetAbsAngles( vec3_angle );
 	GetEngineObject()->SetMoveType( MOVETYPE_VPHYSICS );
 	GetEngineObject()->RemoveSolidFlags( FSOLID_NOT_SOLID );
-	physenv->DestroyConstraint( m_pAttachConstraint );
+	EntityList()->PhysGetEnv()->DestroyConstraint( m_pAttachConstraint );
 	m_pAttachConstraint = NULL;
 	const float dampingScale = 1.0f / ATTACHED_DAMPING_SCALE;
 	for ( int i = 0; i < GetEngineObject()->RagdollBoneCount(); i++ )
@@ -1063,7 +1063,7 @@ void CRagdollPropAttached::InitRagdollAttached(
 	MatrixSetColumn( attachmentPointRagdollSpace, 3, constraint.constraintToReference );
 
 	PhysDisableEntityCollisions( pAttached, GetEngineObject()->GetElement(0));
-	m_pAttachConstraint = physenv->CreateRagdollConstraint( pRefObject, pAttached, GetEngineObject()->GetConstraintGroup(), constraint);
+	m_pAttachConstraint = EntityList()->PhysGetEnv()->CreateRagdollConstraint( pRefObject, pAttached, GetEngineObject()->GetConstraintGroup(), constraint);
 
 	GetEngineObject()->SetParent( pFollow->GetEngineObject() );
 	SetOwnerEntity( pFollow );

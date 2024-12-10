@@ -556,7 +556,7 @@ void CPortalSimulator::TraceRay(const Ray_t& ray, unsigned int fMask, ITraceFilt
 						const PS_SD_Static_World_StaticProps_ClippedProp_t* pCurrentProp = pCollisionEntity->GetEnginePortal()->GetStaticProps(iIndex);
 						if ((!bFilterStaticProps) || pTraceFilter->ShouldHitEntity(pCurrentProp->pSourceProp, fMask))
 						{
-							physcollision->TraceBox(ray, pCurrentProp->pCollide, vTransform, qTransform, &TempTrace);
+							EntityList()->PhysGetCollision()->TraceBox(ray, pCurrentProp->pCollide, vTransform, qTransform, &TempTrace);
 							if ((TempTrace.fraction < pTrace->fraction))
 							{
 								*pTrace = TempTrace;
@@ -590,7 +590,7 @@ void CPortalSimulator::TraceRay(const Ray_t& ray, unsigned int fMask, ITraceFilt
 							const PS_SD_Static_World_StaticProps_ClippedProp_t* pCurrentProp = pLinkedPortalSimulator->pCollisionEntity->GetEnginePortal()->GetStaticProps(iIndex);
 							if ((!bFilterStaticProps) || pTraceFilter->ShouldHitEntity(pCurrentProp->pSourceProp, fMask))
 							{
-								physcollision->TraceBox(ray, pCurrentProp->pCollide, vTransform, qTransform, &TempTrace);
+								EntityList()->PhysGetCollision()->TraceBox(ray, pCurrentProp->pCollide, vTransform, qTransform, &TempTrace);
 								if ((TempTrace.fraction < pTrace->fraction))
 								{
 									*pTrace = TempTrace;
@@ -755,7 +755,7 @@ void CPortalSimulator::TraceEntity(CBaseEntity* pEntity, const Vector& vecAbsSta
 							//physcollision->TraceCollide( vecAbsStart, vecAbsEnd, pCollision, qCollisionAngles,
 							//							pCurrentProp->pCollide, vTransform, qTransform, &tempTrace );
 
-							physcollision->TraceBox(entRay, MASK_ALL, NULL, pCurrentProp->pCollide, vTransform, qTransform, &tempTrace);
+							EntityList()->PhysGetCollision()->TraceBox(entRay, MASK_ALL, NULL, pCurrentProp->pCollide, vTransform, qTransform, &tempTrace);
 
 							if (tempTrace.startsolid || (tempTrace.fraction < pTrace->fraction))
 							{
@@ -1702,7 +1702,7 @@ static void PortalSimulatorDumps_DumpCollideToGlView( CPhysCollide *pCollide, co
 
 	printf("Writing %s...\n", pFilename );
 	Vector *outVerts;
-	int vertCount = physcollision->CreateDebugMesh( pCollide, &outVerts );
+	int vertCount = EntityList()->PhysGetCollision()->CreateDebugMesh( pCollide, &outVerts );
 	FileHandle_t fp = filesystem->Open( pFilename, "ab" );
 	int triCount = vertCount / 3;
 	int vert = 0;
@@ -1724,7 +1724,7 @@ static void PortalSimulatorDumps_DumpCollideToGlView( CPhysCollide *pCollide, co
 		vert++;
 	}
 	filesystem->Close( fp );
-	physcollision->DestroyDebugMesh( vertCount, outVerts );
+	EntityList()->PhysGetCollision()->DestroyDebugMesh( vertCount, outVerts );
 }
 
 static void PortalSimulatorDumps_DumpPlanesToGlView( float *pPlanes, int iPlaneCount, const char *pszFileName )

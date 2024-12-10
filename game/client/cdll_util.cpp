@@ -330,7 +330,7 @@ void UTIL_ScreenShake( const Vector &center, float amplitude, float frequency, f
 
 char TEXTURETYPE_Find( trace_t *ptr )
 {
-	surfacedata_t *psurfaceData = physprops->GetSurfaceData( ptr->surface.surfaceProps );
+	surfacedata_t *psurfaceData = EntityList()->PhysGetProps()->GetSurfaceData(ptr->surface.surfaceProps);
 
 	return psurfaceData->game.material;
 }

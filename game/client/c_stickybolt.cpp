@@ -31,8 +31,7 @@
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
-extern IPhysicsSurfaceProps *physprops;
-IPhysicsObject *GetWorldPhysObject( void );
+//extern IPhysicsSurfaceProps *physprops;
 
 extern ITempEnts* tempents;
 
@@ -87,7 +86,7 @@ public:
 
 		if ( tr.fraction < 1.0 )
 		{
-			IPhysicsObject *pReference = GetWorldPhysObject();
+			IPhysicsObject *pReference = EntityList()->PhysGetWorldObject();
 
 			if ( pReference == NULL || pPhysicsObject == NULL )
 				 return ITERATION_CONTINUE;
@@ -101,7 +100,7 @@ public:
 			pReference->WorldToLocal( &ballsocket.constraintPosition[0], m_vWorld );
 			pPhysicsObject->WorldToLocal( &ballsocket.constraintPosition[1], tr.endpos );
 	
-			physenv->CreateBallsocketConstraint( pReference, pPhysicsObject, NULL, ballsocket );
+			EntityList()->PhysGetEnv()->CreateBallsocketConstraint(pReference, pPhysicsObject, NULL, ballsocket);
 
 			//Play a sound
 			CPASAttenuationFilter filter( pEnt );

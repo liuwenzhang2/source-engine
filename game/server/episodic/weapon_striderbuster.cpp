@@ -308,7 +308,7 @@ void CWeaponStriderBuster::DestroyConstraint( void )
 	// Destroy the constraint
 	if ( m_pConstraint != NULL )
 	{ 
-		physenv->DestroyConstraint( m_pConstraint );
+		EntityList()->PhysGetEnv()->DestroyConstraint( m_pConstraint );
 		m_pConstraint = NULL;
 	}
 }
@@ -343,7 +343,7 @@ bool CWeaponStriderBuster::CreateConstraintToObject( CBaseEntity *pObject )
 	fixedConstraint.Defaults();
 	fixedConstraint.InitWithCurrentObjectState( pPhysObject, pMyPhysObject );
 
-	IPhysicsConstraint *pConstraint = physenv->CreateFixedConstraint( pPhysObject, pMyPhysObject, NULL, fixedConstraint );
+	IPhysicsConstraint *pConstraint = EntityList()->PhysGetEnv()->CreateFixedConstraint( pPhysObject, pMyPhysObject, NULL, fixedConstraint );
 	if ( pConstraint == NULL )
 		return false;
 

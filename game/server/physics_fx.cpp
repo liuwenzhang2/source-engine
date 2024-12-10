@@ -54,10 +54,10 @@ void PhysicsSplash( IPhysicsFluidController *pFluid, IPhysicsObject *pObject, CB
 	
 	// Get object extents in basis
 	Vector tanPts[2], binPts[2];
-	tanPts[0] = physcollision->CollideGetExtent( pObject->GetCollide(), pEntity->GetEngineObject()->GetAbsOrigin(), pEntity->GetEngineObject()->GetAbsAngles(), -tangent );
-	tanPts[1] = physcollision->CollideGetExtent( pObject->GetCollide(), pEntity->GetEngineObject()->GetAbsOrigin(), pEntity->GetEngineObject()->GetAbsAngles(), tangent );
-	binPts[0] = physcollision->CollideGetExtent( pObject->GetCollide(), pEntity->GetEngineObject()->GetAbsOrigin(), pEntity->GetEngineObject()->GetAbsAngles(), -binormal );
-	binPts[1] = physcollision->CollideGetExtent( pObject->GetCollide(), pEntity->GetEngineObject()->GetAbsOrigin(), pEntity->GetEngineObject()->GetAbsAngles(), binormal );
+	tanPts[0] = EntityList()->PhysGetCollision()->CollideGetExtent( pObject->GetCollide(), pEntity->GetEngineObject()->GetAbsOrigin(), pEntity->GetEngineObject()->GetAbsAngles(), -tangent );
+	tanPts[1] = EntityList()->PhysGetCollision()->CollideGetExtent( pObject->GetCollide(), pEntity->GetEngineObject()->GetAbsOrigin(), pEntity->GetEngineObject()->GetAbsAngles(), tangent );
+	binPts[0] = EntityList()->PhysGetCollision()->CollideGetExtent( pObject->GetCollide(), pEntity->GetEngineObject()->GetAbsOrigin(), pEntity->GetEngineObject()->GetAbsAngles(), -binormal );
+	binPts[1] = EntityList()->PhysGetCollision()->CollideGetExtent( pObject->GetCollide(), pEntity->GetEngineObject()->GetAbsOrigin(), pEntity->GetEngineObject()->GetAbsAngles(), binormal );
 
 	// now compute the centered bbox
 	float mins[2], maxs[2], center[2], extents[2];

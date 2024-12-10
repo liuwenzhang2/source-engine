@@ -585,8 +585,7 @@ void CPortalGameMovement::CategorizePosition( void )
 		if ( player->IsInAVehicle() == false )
 		{
 			// If our gamematerial has changed, tell any player surface triggers that are watching
-			IPhysicsSurfaceProps *physprops = MoveHelper()->GetSurfaceProps();
-			surfacedata_t *pSurfaceProp = physprops->GetSurfaceData( pm.surface.surfaceProps );
+			surfacedata_t *pSurfaceProp = EntityList()->PhysGetProps()->GetSurfaceData( pm.surface.surfaceProps );
 			char cCurrGameMaterial = pSurfaceProp->game.material;
 			if ( !player->GetEngineObject()->GetGroundEntity() )
 			{

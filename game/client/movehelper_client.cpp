@@ -40,7 +40,6 @@ public:
 	virtual void	StartSound( const Vector& origin, int channel, char const* sample, float volume, soundlevel_t soundlevel, int fFlags, int pitch );
 	virtual void	StartSound( const Vector& origin, const char *soundname ); 
 	virtual void	PlaybackEventFull( int flags, int clientindex, unsigned short eventindex, float delay, Vector& origin, Vector& angles, float fparam1, float fparam2, int iparam1, int iparam2, int bparam1, int bparam2 );
-	virtual IPhysicsSurfaceProps *GetSurfaceProps( void );
 
 	virtual bool IsWorldEntity( const CBaseHandle &handle );
 
@@ -220,16 +219,6 @@ void CMoveHelperClient::PlaybackEventFull( int flags, int clientindex, unsigned 
 	if (g_pMoveData->m_bFirstRunOfFunctions )
 	{
 	}
-}
-
-//-----------------------------------------------------------------------------
-// Surface properties interface
-//-----------------------------------------------------------------------------
-
-IPhysicsSurfaceProps *CMoveHelperClient::GetSurfaceProps( void )
-{
-	extern IPhysicsSurfaceProps *physprops;
-	return physprops;
 }
 
 //-----------------------------------------------------------------------------

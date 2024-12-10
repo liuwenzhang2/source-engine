@@ -41,7 +41,7 @@
 #include "gamestats.h"
 // NVNT haptic utils
 #include "haptics/haptic_utils.h"
-
+#include "physics_shared.h"
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
@@ -332,7 +332,7 @@ static QAngle AlignAngles( const QAngle &angles, float cosineAlignAngle )
 
 static void TraceCollideAgainstBBox( const CPhysCollide *pCollide, const Vector &start, const Vector &end, const QAngle &angles, const Vector &boxOrigin, const Vector &mins, const Vector &maxs, trace_t *ptr )
 {
-	physcollision->TraceBox( boxOrigin, boxOrigin + (start-end), mins, maxs, pCollide, start, angles, ptr );
+	EntityList()->PhysGetCollision()->TraceBox( boxOrigin, boxOrigin + (start-end), mins, maxs, pCollide, start, angles, ptr );
 
 	if ( ptr->DidHit() )
 	{
@@ -746,7 +746,7 @@ void CGrabController::AttachEntity( CBasePlayer *pPlayer, CBaseEntity *pEntity, 
 	// Carried entities can never block LOS
 	m_bCarriedEntityBlocksLOS = pEntity->BlocksLOS();
 	pEntity->SetBlocksLOS( false );
-	m_controller = physenv->CreateMotionController( this );
+	m_controller = EntityList()->PhysGetEnv()->CreateMotionController( this );
 	m_controller->AttachObject( pPhys, true );
 	// Don't do this, it's causing trouble with constraint solvers.
 	//m_controller->SetPriority( IPhysicsMotionController::HIGH_PRIORITY );
@@ -868,7 +868,7 @@ void CGrabController::DetachEntity( bool bClearVelocity )
 	}
 
 	m_attachedEntity = NULL;
-	physenv->DestroyMotionController( m_controller );
+	EntityList()->PhysGetEnv()->DestroyMotionController( m_controller );
 	m_controller = NULL;
 }
 
@@ -2774,7 +2774,7 @@ bool CGrabController::UpdateObject( CBasePlayer *pPlayer, float flError )
 	
 	
 	// Now clamp a sphere of object radius at end to the player's bbox
-	Vector radial = physcollision->CollideGetExtent( pPhys->GetCollide(), vec3_origin, pEntity->GetEngineObject()->GetAbsAngles(), -forward );
+	Vector radial = EntityList()->PhysGetCollision()->CollideGetExtent( pPhys->GetCollide(), vec3_origin, pEntity->GetEngineObject()->GetAbsAngles(), -forward );
 	Vector player2d = pPlayer->GetEngineObject()->OBBMaxs();
 	float playerRadius = player2d.Length2D();
 	float radius = playerRadius + fabs(DotProduct( forward, radial ));

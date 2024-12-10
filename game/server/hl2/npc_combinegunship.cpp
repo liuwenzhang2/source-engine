@@ -734,7 +734,7 @@ CNPC_CombineGunship::~CNPC_CombineGunship(void)
 
 	if ( m_pCrashingController )
 	{
-		physenv->DestroyMotionController( m_pCrashingController );
+		EntityList()->PhysGetEnv()->DestroyMotionController( m_pCrashingController );
 	}
 }
 
@@ -2068,7 +2068,7 @@ void CNPC_CombineGunship::BeginDestruct( void )
 	// ROBIN: Disabled this for now.
 	//
 	// Create the crashing controller and attach it to the ragdoll physics objects
-	m_pCrashingController = physenv->CreateMotionController( &m_crashCallback );
+	m_pCrashingController = EntityList()->PhysGetEnv()->CreateMotionController( &m_crashCallback );
 	IPhysicsObject *pList[VPHYSICS_MAX_OBJECT_LIST_COUNT];
 	int count = m_hRagdoll->VPhysicsGetObjectList( pList, ARRAYSIZE(pList) );
 	for ( int i = 0; i < count; i++ )

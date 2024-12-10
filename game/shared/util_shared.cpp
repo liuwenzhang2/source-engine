@@ -559,7 +559,7 @@ public:
 	{
 		m_pRootParent = pEntity->GetEngineObject()->GetRootMoveParent()? pEntity->GetEngineObject()->GetRootMoveParent()->GetOuter():NULL;
 		m_pEntity = pEntity;
-		m_checkHash = g_EntityCollisionHash->IsObjectInHash(pEntity);
+		m_checkHash = EntityList()->PhysGetEntityCollisionHash()->IsObjectInHash(pEntity);
 	}
 
 	bool ShouldHitEntity( IHandleEntity *pHandleEntity, int contentsMask )
@@ -575,7 +575,7 @@ public:
 
 		if ( m_checkHash )
 		{
-			if ( g_EntityCollisionHash->IsObjectPairInHash( m_pEntity, pEntity ) )
+			if (EntityList()->PhysGetEntityCollisionHash()->IsObjectPairInHash( m_pEntity, pEntity ) )
 				return false;
 		}
 
@@ -1174,6 +1174,85 @@ const char* UTIL_GetActiveHolidayString()
 #else
 	return NULL;
 #endif
+}
+
+void PhysRecheckObjectPair(IPhysicsObject* pObject0, IPhysicsObject* pObject1)
+{
+	if (!pObject0->IsStatic())
+	{
+		pObject0->RecheckCollisionFilter();
+	}
+	if (!pObject1->IsStatic())
+	{
+		pObject1->RecheckCollisionFilter();
+	}
+}
+
+// disables collisions between entities (each entity may contain multiple objects)
+void PhysDisableObjectCollisions(IPhysicsObject* pObject0, IPhysicsObject* pObject1)
+{
+	if (!pObject0 || !pObject1)
+		return;
+
+	EntityList()->PhysGetEntityCollisionHash()->AddObjectPair(pObject0, pObject1);
+	PhysRecheckObjectPair(pObject0, pObject1);
+}
+
+// disables collisions between entities (each entity may contain multiple objects)
+void PhysDisableEntityCollisions(IPhysicsObject* pObject0, IPhysicsObject* pObject1)
+{
+	if (!pObject0 || !pObject1)
+		return;
+
+	EntityList()->PhysGetEntityCollisionHash()->AddObjectPair(pObject0->GetGameData(), pObject1->GetGameData());
+	PhysRecheckObjectPair(pObject0, pObject1);
+}
+
+void PhysDisableEntityCollisions(IHandleEntity* pEntity0, IHandleEntity* pEntity1)
+{
+	if (!pEntity0 || !pEntity1)
+		return;
+
+	EntityList()->PhysGetEntityCollisionHash()->AddObjectPair(pEntity0, pEntity1);
+#ifndef CLIENT_DLL
+	pEntity0->GetEngineObject()->CollisionRulesChanged();
+	pEntity1->GetEngineObject()->CollisionRulesChanged();
+#endif
+}
+
+void PhysEnableObjectCollisions(IPhysicsObject* pObject0, IPhysicsObject* pObject1)
+{
+	if (!pObject0 || !pObject1)
+		return;
+
+	EntityList()->PhysGetEntityCollisionHash()->RemoveObjectPair(pObject0, pObject1);
+	PhysRecheckObjectPair(pObject0, pObject1);
+}
+
+void PhysEnableEntityCollisions(IPhysicsObject* pObject0, IPhysicsObject* pObject1)
+{
+	if (!pObject0 || !pObject1)
+		return;
+
+	EntityList()->PhysGetEntityCollisionHash()->RemoveObjectPair(pObject0->GetGameData(), pObject1->GetGameData());
+	PhysRecheckObjectPair(pObject0, pObject1);
+}
+
+void PhysEnableEntityCollisions(IHandleEntity* pEntity0, IHandleEntity* pEntity1)
+{
+	if (!pEntity0 || !pEntity1)
+		return;
+
+	EntityList()->PhysGetEntityCollisionHash()->RemoveObjectPair(pEntity0, pEntity1);
+#ifndef CLIENT_DLL
+	pEntity0->GetEngineObject()->CollisionRulesChanged();
+	pEntity1->GetEngineObject()->CollisionRulesChanged();
+#endif
+}
+
+bool PhysEntityCollisionsAreDisabled(IHandleEntity* pEntity0, IHandleEntity* pEntity1)
+{
+	return EntityList()->PhysGetEntityCollisionHash()->IsObjectPairInHash(pEntity0, pEntity1);
 }
 
 extern ConVar hl2_episodic;

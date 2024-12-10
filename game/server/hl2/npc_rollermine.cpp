@@ -478,7 +478,7 @@ CNPC_RollerMine::~CNPC_RollerMine( void )
 {
 	if ( m_pMotionController != NULL )
 	{
-		physenv->DestroyMotionController( m_pMotionController );
+		EntityList()->PhysGetEnv()->DestroyMotionController( m_pMotionController );
 		m_pMotionController = NULL;
 	}
 
@@ -777,7 +777,7 @@ bool CNPC_RollerMine::BecomePhysical( void )
 	if ( pPhysicsObject == NULL )
 		return false;
 
-	m_pMotionController = physenv->CreateMotionController( &m_RollerController );
+	m_pMotionController = EntityList()->PhysGetEnv()->CreateMotionController( &m_RollerController );
 	m_pMotionController->AttachObject( pPhysicsObject, true );
 
 	GetEngineObject()->SetMoveType( MOVETYPE_VPHYSICS );
@@ -2159,7 +2159,7 @@ void CNPC_RollerMine::StickToVehicle( CBaseEntity *pOther )
 	fixed.constraint.Defaults();
 	fixed.constraint.forceLimit	= ImpulseScale( pPhysics->GetMass(), 200 );
 	fixed.constraint.torqueLimit = ImpulseScale( pPhysics->GetMass(), 800 );
-	m_pConstraint = physenv->CreateFixedConstraint( pOtherPhysics, pPhysics, NULL, fixed );
+	m_pConstraint = EntityList()->PhysGetEnv()->CreateFixedConstraint( pOtherPhysics, pPhysics, NULL, fixed );
 	m_pConstraint->SetGameData( (void *)this );
 
 	// Kick the vehicle so the player knows we've arrived
@@ -2433,7 +2433,7 @@ void CNPC_RollerMine::UnstickFromVehicle( void )
 {
 	if ( m_pConstraint )
 	{
-		physenv->DestroyConstraint( m_pConstraint );
+		EntityList()->PhysGetEnv()->DestroyConstraint( m_pConstraint );
 		m_pConstraint = NULL;
 	}
 

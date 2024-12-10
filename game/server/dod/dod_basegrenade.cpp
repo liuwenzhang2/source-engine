@@ -60,7 +60,7 @@ CDODBaseGrenade::~CDODBaseGrenade( void )
 {
 	if ( m_pMotionController != NULL )
 	{
-		physenv->DestroyMotionController( m_pMotionController );
+		EntityList()->PhysGetEnv()->DestroyMotionController( m_pMotionController );
 		m_pMotionController = NULL;
 	}
 }
@@ -85,7 +85,7 @@ void CDODBaseGrenade::Spawn( void )
 
 		if ( pPhysicsObject )
 		{
-			m_pMotionController = physenv->CreateMotionController( &m_GrenadeController );
+			m_pMotionController = EntityList()->PhysGetEnv()->CreateMotionController( &m_GrenadeController );
 			m_pMotionController->AttachObject( pPhysicsObject, true );
 
 			pPhysicsObject->EnableGravity( false );

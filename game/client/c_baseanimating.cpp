@@ -2114,17 +2114,17 @@ void MaterialFootstepSound( C_BaseAnimating *pEnt, bool bLeftFoot, float flVolum
 	UTIL_TraceLine( traceStart, traceStart - Vector( 0, 0, 48.0f), MASK_SHOT_HULL, pEnt, COLLISION_GROUP_NONE, &tr );
 	if( tr.fraction < 1.0 && tr.m_pEnt )
 	{
-		surfacedata_t *psurf = physprops->GetSurfaceData( tr.surface.surfaceProps );
+		surfacedata_t *psurf = EntityList()->PhysGetProps()->GetSurfaceData( tr.surface.surfaceProps );
 		if( psurf )
 		{
 			EmitSound_t params;
 			if( bLeftFoot )
 			{
-				params.m_pSoundName = physprops->GetString(psurf->sounds.stepleft);
+				params.m_pSoundName = EntityList()->PhysGetProps()->GetString(psurf->sounds.stepleft);
 			}
 			else
 			{
-				params.m_pSoundName = physprops->GetString(psurf->sounds.stepright);
+				params.m_pSoundName = EntityList()->PhysGetProps()->GetString(psurf->sounds.stepright);
 			}
 
 			CPASAttenuationFilter filter( pEnt, params.m_pSoundName );
@@ -3312,13 +3312,13 @@ bool C_BaseAnimating::TestHitboxes( const Ray_t &ray, unsigned int fContentsMask
 	const matrix3x4_t *hitboxbones[MAXSTUDIOBONES];
 	GetEngineObject()->GetHitboxBoneTransforms(hitboxbones);
 
-	if ( TraceToStudio( physprops, ray, pStudioHdr, set, hitboxbones, fContentsMask, GetRenderOrigin(), GetEngineObject()->GetModelScale(), tr ) )
+	if ( TraceToStudio(EntityList()->PhysGetProps(), ray, pStudioHdr, set, hitboxbones, fContentsMask, GetRenderOrigin(), GetEngineObject()->GetModelScale(), tr ) )
 	{
 		mstudiobbox_t *pbox = set->pHitbox( tr.hitbox );
 		mstudiobone_t *pBone = pStudioHdr->pBone(pbox->bone);
 		tr.surface.name = "**studio**";
 		tr.surface.flags = SURF_HITBOX;
-		tr.surface.surfaceProps = physprops->GetSurfaceIndex( pBone->pszSurfaceProp() );
+		tr.surface.surfaceProps = EntityList()->PhysGetProps()->GetSurfaceIndex( pBone->pszSurfaceProp() );
 		if (GetEngineObject()->IsRagdoll() )
 		{
 			IPhysicsObject *pReplace = GetEngineObject()->GetElement( tr.physicsbone );
@@ -4017,7 +4017,7 @@ bool C_BoneFollower::TestCollision( const Ray_t &ray, unsigned int mask, trace_t
 	vcollide_t *pCollide = modelinfo->GetVCollide( m_modelIndex );
 	Assert( pCollide && pCollide->solidCount > m_solidIndex );
 
-	physcollision->TraceBox( ray, pCollide->solids[m_solidIndex], GetEngineObject()->GetAbsOrigin(), GetEngineObject()->GetAbsAngles(), &trace );
+	EntityList()->PhysGetCollision()->TraceBox( ray, pCollide->solids[m_solidIndex], GetEngineObject()->GetAbsOrigin(), GetEngineObject()->GetAbsAngles(), &trace );
 
 	if ( trace.fraction >= 1 )
 		return false;

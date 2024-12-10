@@ -204,7 +204,7 @@ void CPropEnergyBall::VPhysicsCollision( int index, gamevcollisionevent_t *pEven
 
 				// Since we're going 'through', don't do surfaceprop based collision effects
 				// because the it will look like we didn't hit anything.
-				pEvent->surfaceProps[0] = pEvent->surfaceProps[1] = physprops->GetSurfaceIndex( "default" );
+				pEvent->surfaceProps[0] = pEvent->surfaceProps[1] = EntityList()->PhysGetProps()->GetSurfaceIndex( "default" );
 				bIsEnteringPortalAndLockingAxisForward = true;
 			}
 			else // Closer to 'away from' the portal. Force the energy ball to go that direction
@@ -260,7 +260,7 @@ void CPropEnergyBall::VPhysicsCollision( int index, gamevcollisionevent_t *pEven
 
 	// Try to update the velocity now, however I'm told this rarely works.
 	// We will spam updates in our think function to help get us in the direction we want to go.
-	PhysCallbackSetVelocity( pEvent->pObjects[index], vecFinalVelocity ); 
+	gEntList.PhysCallbackSetVelocity( pEvent->pObjects[index], vecFinalVelocity );
 }
 
 void CPropEnergyBall::NotifySystemEvent(CBaseEntity *pNotify, notify_system_event_t eventType, const notify_system_event_params_t &params )
