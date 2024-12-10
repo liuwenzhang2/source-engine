@@ -2279,6 +2279,19 @@ struct entitem_t
 	static void operator delete(void* pMem, int nBlockUse, const char* pFileName, int nLine) { operator delete(pMem); }
 };
 
+class CEntityList
+{
+public:
+	CEntityList();
+	~CEntityList();
+
+	int m_iNumItems;
+	entitem_t* m_pItemList;	// null terminated singly-linked list
+
+	void AddEntity(CBaseEntity*);
+	void DeleteEntity(CBaseEntity*);
+};
+
 struct vehiclescript_t
 {
 	string_t scriptName;
@@ -5927,22 +5940,6 @@ inline bool FindEntityByName<CAI_BaseNPC>( const char *pszName, CAI_BaseNPC **pp
 	return ( *ppResult != NULL );
 }
 #endif
-
-
-class CEntityList
-{
-public:
-	CEntityList();
-	~CEntityList();
-
-	int m_iNumItems;
-	entitem_t *m_pItemList;	// null terminated singly-linked list
-
-	void AddEntity( CBaseEntity * );
-	void DeleteEntity( CBaseEntity * );
-};
-
-
 
 struct notify_teleport_params_t
 {
