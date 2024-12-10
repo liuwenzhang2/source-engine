@@ -25,6 +25,7 @@
 #include "client_class.h"
 #include "collisionproperty.h"
 #include "c_baseentity.h"
+#include "c_baseanimating.h"
 #include "gamestringpool.h"
 #include "saverestoretypes.h"
 #include "physics_saverestore.h"
@@ -46,6 +47,7 @@
 #include "movevars_shared.h"
 #include "vphysics_sound.h"
 #include "engine/IEngineSound.h"
+#include "soundenvelope.h"
 
 //class C_Beam;
 //class C_BaseViewModel;
@@ -2861,12 +2863,60 @@ public:
 	void AddImpactSound(void* pGameData, IPhysicsObject* pObject, int surfaceProps, int surfacePropsHit, float volume, float speed);
 	void PhysicsSimulate();
 
+	void PhysFrictionSound(IHandleEntity* pEntity, IPhysicsObject* pObject, const char* pSoundName, HSOUNDSCRIPTHANDLE& handle, float flVolume)
+	{
+		if (!pEntity)
+			return;
+
+		// cut out the quiet sounds
+		// UNDONE: Separate threshold for starting a sound vs. continuing?
+		flVolume = clamp(flVolume, 0.0f, 1.0f);
+		if (flVolume > (1.0f / 128.0f))
+		{
+			friction_t* pFriction = m_Collisions.FindFriction((CBaseEntity*)pEntity);
+			if (!pFriction)
+				return;
+
+			CSoundParameters params;
+			if (!g_pSoundEmitterSystem->GetParametersForSound(pSoundName, handle, params, NULL))//CBaseEntity::
+				return;
+
+			if (!pFriction->pObject)
+			{
+				// don't create really quiet scrapes
+				if (params.volume * flVolume <= 0.1f)
+					return;
+
+				pFriction->pObject = pEntity;
+				CPASAttenuationFilter filter((CBaseEntity*)pEntity, params.soundlevel);
+				int entindex = ((CBaseEntity*)pEntity)->entindex();
+
+				// clientside created entites doesn't have a valid entindex, let 'world' play the sound for them
+				if (entindex < 0)
+					entindex = 0;
+
+				pFriction->patch = CSoundEnvelopeController::GetController().SoundCreate(
+					filter, entindex, CHAN_BODY, pSoundName, params.soundlevel);
+				CSoundEnvelopeController::GetController().Play(pFriction->patch, params.volume * flVolume, params.pitch);
+			}
+			else
+			{
+				float pitch = (flVolume * (params.pitchhigh - params.pitchlow)) + params.pitchlow;
+				CSoundEnvelopeController::GetController().SoundChangeVolume(pFriction->patch, params.volume * flVolume, 0.1f);
+				CSoundEnvelopeController::GetController().SoundChangePitch(pFriction->patch, pitch, 0.1f);
+			}
+
+			pFriction->flLastUpdateTime = gpGlobals->curtime;
+			pFriction->flLastEffectTime = gpGlobals->curtime;
+		}
+	}
+
 	void PhysCleanupFrictionSounds(IHandleEntity* pEntity)
 	{
-		friction_t* pFriction = g_Collisions.FindFriction((CBaseEntity*)pEntity);
+		friction_t* pFriction = m_Collisions.FindFriction((CBaseEntity*)pEntity);
 		if (pFriction && pFriction->patch)
 		{
-			g_Collisions.ShutdownFriction(*pFriction);
+			m_Collisions.ShutdownFriction(*pFriction);
 		}
 	}
 
@@ -2895,7 +2945,7 @@ private:
 	void AddRestoredEntity(T* pEntity);
 	bool PhysIsInCallback()
 	{
-		if ((physenv && physenv->IsInSimulation()) || g_Collisions.IsInCallback())
+		if ((physenv && physenv->IsInSimulation()) || m_Collisions.IsInCallback())
 			return true;
 
 		return false;
@@ -2908,6 +2958,8 @@ private:
 
 	CEntityFactoryDictionary m_EntityFactoryDictionary;
 	physicssound::soundlist_t m_impactSounds;
+	CCollisionEvent m_Collisions;
+
 	// Cached info for networked entities.
 //struct EntityCacheInfo_t
 //{
@@ -3545,8 +3597,6 @@ void CClientEntityList<T>::LevelInitPreEntity()
 	PrecachePhysicsSounds();
 }
 
-extern CCollisionEvent g_Collisions;
-
 #define DEFAULT_XBOX_CLIENT_VPHYSICS_TICK	0.025		// 25ms ticks on xbox ragdolls
 template<class T>
 void CClientEntityList<T>::LevelInitPostEntity()
@@ -3567,8 +3617,8 @@ void CClientEntityList<T>::LevelInitPostEntity()
 	// 15 ms per tick
 	// NOTE: Always run client physics at this rate - helps keep ragdolls stable
 	physenv->SetSimulationTimestep(IsXbox() ? DEFAULT_XBOX_CLIENT_VPHYSICS_TICK : DEFAULT_TICK_INTERVAL);
-	physenv->SetCollisionEventHandler(&g_Collisions);
-	physenv->SetCollisionSolver(&g_Collisions);
+	physenv->SetCollisionEventHandler(&m_Collisions);
+	physenv->SetCollisionSolver(&m_Collisions);
 
 	g_PhysWorldObject = PhysCreateWorld_Shared(GetBaseEntity(0), modelinfo->GetVCollide(1), g_PhysDefaultObjectParams);
 
@@ -4867,7 +4917,7 @@ void CClientEntityList<T>::PhysicsSimulate()
 	{
 		tmZone(TELEMETRY_LEVEL0, TMZF_NONE, "%s %d", __FUNCTION__, physenv->GetActiveObjectCount());
 
-		g_Collisions.BufferTouchEvents(true);
+		m_Collisions.BufferTouchEvents(true);
 #ifdef _DEBUG
 		physenv->DebugCheckContacts();
 #endif
@@ -4894,8 +4944,8 @@ void CClientEntityList<T>::PhysicsSimulate()
 			}
 		}
 
-		g_Collisions.BufferTouchEvents(false);
-		g_Collisions.FrameUpdate();
+		m_Collisions.BufferTouchEvents(false);
+		m_Collisions.FrameUpdate();
 	}
 	physicssound::PlayImpactSounds(m_impactSounds);
 }

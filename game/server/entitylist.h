@@ -41,6 +41,7 @@
 #include "vphysics_sound.h"
 #include "engine/IEngineSound.h"
 #include "coordsize.h"
+#include "soundenvelope.h"
 #ifdef PORTAL
 #include "portal_physics_collisionevent.h"
 #include "physicsshadowclone.h"
@@ -72,8 +73,6 @@ enum
 };
 
 extern IVEngineServer* engine;
-//extern CUtlVector<IServerNetworkable*> g_DeleteList;
-extern void PhysOnCleanupDeleteList();
 extern CServerGameDLL g_ServerGameDLL;
 extern bool TestEntityTriggerIntersection_Accurate(IEngineObjectServer* pTrigger, IEngineObjectServer* pEntity);
 extern ISaveRestoreBlockHandler* GetPhysSaveRestoreBlockHandler();
@@ -2478,7 +2477,7 @@ public:
 	// returns true when processing a callback - so we can defer things that can't be done inside a callback
 	bool PhysIsInCallback()
 	{
-		if ((physenv && physenv->IsInSimulation()) || g_Collisions.IsInCallback())
+		if ((physenv && physenv->IsInSimulation()) || m_Collisions.IsInCallback())
 			return true;
 
 		return false;
@@ -2527,12 +2526,54 @@ public:
 		physicssound::AddBreakSound(m_breakSounds, vecOrigin, pPhysObject->GetMaterialIndex());
 	}
 
+	void PhysFrictionSound(IHandleEntity* pEntity, IPhysicsObject* pObject, const char* pSoundName, HSOUNDSCRIPTHANDLE& handle, float flVolume)
+	{
+		if (!pEntity)
+			return;
+
+		// cut out the quiet sounds
+		// UNDONE: Separate threshold for starting a sound vs. continuing?
+		flVolume = clamp(flVolume, 0.0f, 1.0f);
+		if (flVolume > (1.0f / 128.0f))
+		{
+			friction_t* pFriction = m_Collisions.FindFriction((CBaseEntity*)pEntity);
+			if (!pFriction)
+				return;
+
+			CSoundParameters params;
+			if (!g_pSoundEmitterSystem->GetParametersForSound(pSoundName, handle, params, NULL))//CBaseEntity::
+				return;
+
+			if (!pFriction->pObject)
+			{
+				// don't create really quiet scrapes
+				if (params.volume * flVolume <= 0.1f)
+					return;
+
+				pFriction->pObject = pEntity;
+				CPASAttenuationFilter filter((CBaseEntity*)pEntity, params.soundlevel);
+				pFriction->patch = CSoundEnvelopeController::GetController().SoundCreate(
+					filter, ((CBaseEntity*)pEntity)->entindex(), CHAN_BODY, pSoundName, params.soundlevel);
+				CSoundEnvelopeController::GetController().Play(pFriction->patch, params.volume * flVolume, params.pitch);
+			}
+			else
+			{
+				float pitch = (flVolume * (params.pitchhigh - params.pitchlow)) + params.pitchlow;
+				CSoundEnvelopeController::GetController().SoundChangeVolume(pFriction->patch, params.volume * flVolume, 0.1f);
+				CSoundEnvelopeController::GetController().SoundChangePitch(pFriction->patch, pitch, 0.1f);
+			}
+
+			pFriction->flLastUpdateTime = gpGlobals->curtime;
+			pFriction->flLastEffectTime = gpGlobals->curtime;
+		}
+	}
+
 	void PhysCleanupFrictionSounds(IHandleEntity* pEntity)
 	{
-		friction_t* pFriction = g_Collisions.FindFriction((CBaseEntity*)pEntity);
+		friction_t* pFriction = m_Collisions.FindFriction((CBaseEntity*)pEntity);
 		if (pFriction && pFriction->patch)
 		{
-			g_Collisions.ShutdownFriction(*pFriction);
+			m_Collisions.ShutdownFriction(*pFriction);
 		}
 	}
 
@@ -2592,6 +2633,177 @@ public:
 			}
 		}
 	}
+
+	void PhysCallbackDamage(CBaseEntity* pEntity, const CTakeDamageInfo& info, gamevcollisionevent_t& event, int hurtIndex)
+	{
+		Assert(physenv->IsInSimulation());
+		int otherIndex = !hurtIndex;
+		m_Collisions.AddDamageEvent(pEntity, info, event.pObjects[otherIndex], true, event.preVelocity[otherIndex], event.preAngularVelocity[otherIndex]);
+	}
+
+	void PhysCallbackDamage(CBaseEntity* pEntity, const CTakeDamageInfo& info)
+	{
+		if (gEntList.PhysIsInCallback())
+		{
+			CBaseEntity* pInflictor = info.GetInflictor();
+			IPhysicsObject* pInflictorPhysics = (pInflictor) ? pInflictor->GetEngineObject()->VPhysicsGetObject() : NULL;
+			m_Collisions.AddDamageEvent(pEntity, info, pInflictorPhysics, false, vec3_origin, vec3_origin);
+			if (pEntity && info.GetInflictor())
+			{
+				DevMsg(2, "Warning: Physics damage event with no recovery info!\nObjects: %s, %s\n", pEntity->GetClassname(), info.GetInflictor()->GetClassname());
+			}
+		}
+		else
+		{
+			pEntity->TakeDamage(info);
+		}
+	}
+
+	void PhysCallbackRemove(CBaseEntity* pRemove)
+	{
+		if (gEntList.PhysIsInCallback())
+		{
+			m_Collisions.AddRemoveObject(pRemove);
+		}
+		else
+		{
+			gEntList.DestroyEntity(pRemove);
+		}
+	}
+
+	void PhysGetListOfPenetratingEntities(CBaseEntity* pSearch, CUtlVector<CBaseEntity*>& list)
+	{
+		m_Collisions.GetListOfPenetratingEntities(pSearch, list);
+	}
+
+	bool PhysGetTriggerEvent(triggerevent_t* pEvent, CBaseEntity* pTriggerEntity)
+	{
+		return m_Collisions.GetTriggerEvent(pEvent, pTriggerEntity);
+	}
+
+	bool PhysGetDamageInflictorVelocityStartOfFrame(IPhysicsObject* pInflictor, Vector& velocity, AngularImpulse& angVelocity)
+	{
+		return m_Collisions.GetInflictorVelocity(pInflictor, velocity, angVelocity);
+	}
+
+	bool PhysShouldCollide(IPhysicsObject* pObj0, IPhysicsObject* pObj1)
+	{
+		void* pGameData0 = pObj0->GetGameData();
+		void* pGameData1 = pObj1->GetGameData();
+		if (!pGameData0 || !pGameData1)
+			return false;
+		return m_Collisions.ShouldCollide(pObj0, pObj1, pGameData0, pGameData1) ? true : false;
+	}
+
+	void OutputVPhysicsBudgetInfo() {
+		int activeCount = physenv->GetActiveObjectCount();
+
+		IPhysicsObject** pActiveList = NULL;
+		CUtlVector<CBaseEntity*> ents;
+		if (activeCount)
+		{
+			int i;
+
+			pActiveList = (IPhysicsObject**)stackalloc(sizeof(IPhysicsObject*) * activeCount);
+			physenv->GetActiveObjects(pActiveList);
+			for (i = 0; i < activeCount; i++)
+			{
+				CBaseEntity* pEntity = reinterpret_cast<CBaseEntity*>(pActiveList[i]->GetGameData());
+				if (pEntity)
+				{
+					int index = -1;
+					for (int j = 0; j < ents.Count(); j++)
+					{
+						if (pEntity == ents[j])
+						{
+							index = j;
+							break;
+						}
+					}
+					if (index >= 0)
+						continue;
+
+					ents.AddToTail(pEntity);
+				}
+			}
+			stackfree(pActiveList);
+
+			if (!ents.Count())
+				return;
+
+			CUtlVector<float> times;
+			float totalTime = 0.f;
+			m_Collisions.BufferTouchEvents(true);
+			float full = engine->Time();
+			physenv->Simulate(gpGlobals->interval_per_tick);
+			full = engine->Time() - full;
+			float lastTime = full;
+
+			times.SetSize(ents.Count());
+
+
+			// NOTE: This is just a heuristic.  Attempt to estimate cost by putting each object to sleep in turn.
+			//	note that simulation may wake the objects again and some costs scale with sets of objects/constraints/etc
+			//	so these are only generally useful for broad questions, not real metrics!
+			for (i = 0; i < ents.Count(); i++)
+			{
+				for (int j = 0; j < i; j++)
+				{
+					PhysForceEntityToSleep(ents[j], ents[j]->GetEngineObject()->VPhysicsGetObject());
+				}
+				float start = engine->Time();
+				physenv->Simulate(gpGlobals->interval_per_tick);
+				float end = engine->Time();
+
+				float elapsed = end - start;
+				float avgTime = lastTime - elapsed;
+				times[i] = clamp(avgTime, 0.00001f, 1.0f);
+				totalTime += times[i];
+				lastTime = elapsed;
+			}
+
+			totalTime = MAX(totalTime, 0.001);
+			for (i = 0; i < ents.Count(); i++)
+			{
+				float fraction = times[i] / totalTime;
+				Msg("%s (%s): %.3fms (%.3f%%) @ %s\n", ents[i]->GetClassname(), ents[i]->GetDebugName(), fraction * totalTime * 1000.0f, fraction * 100.0f, VecToString(ents[i]->GetEngineObject()->GetAbsOrigin()));
+			}
+			m_Collisions.BufferTouchEvents(false);
+		}
+	}
+
+	void OutputVPhysicsDebugInfo(CBaseEntity* pEntity)
+	{
+		if (pEntity)
+		{
+			Msg("Entity %s (%s) %s Collision Group %d\n", pEntity->GetClassname(), pEntity->GetDebugName(), pEntity->IsNavIgnored() ? "NAV IGNORE" : "", pEntity->GetEngineObject()->GetCollisionGroup());
+			CUtlVector<CBaseEntity*> list;
+			m_Collisions.GetListOfPenetratingEntities(pEntity, list);
+			for (int i = 0; i < list.Count(); i++)
+			{
+				Msg("  penetration with entity %s (%s)\n", list[i]->GetDebugName(), STRING(list[i]->GetEngineObject()->GetModelName()));
+			}
+
+			IPhysicsObject* pList[VPHYSICS_MAX_OBJECT_LIST_COUNT];
+			int physCount = pEntity->GetEngineObject()->VPhysicsGetObjectList(pList, ARRAYSIZE(pList));
+			if (physCount)
+			{
+				if (physCount > 1)
+				{
+					for (int i = 0; i < physCount; i++)
+					{
+						Msg("Object %d (of %d) =========================\n", i + 1, physCount);
+						pList[i]->OutputDebugInfo();
+					}
+				}
+				else
+				{
+					pList[0]->OutputDebugInfo();
+				}
+			}
+		}
+	}
+
 protected:
 	virtual void AfterCreated(IHandleEntity* pEntity);
 	virtual void BeforeDestroy(IHandleEntity* pEntity);
@@ -2631,6 +2843,16 @@ protected:
 
 	// mark an entity as deleted
 	void AddToDeleteList(T* ent);
+
+	// the delete list is getting flushed, clean up ours
+	void PhysOnCleanupDeleteList()
+	{
+		m_Collisions.FlushQueuedOperations();
+		if (physenv)
+		{
+			physenv->CleanupDeleteList();
+		}
+	}
 private:
 	CEntityFactoryDictionary m_EntityFactoryDictionary;
 	int m_iHighestEnt; // the topmost used array index
@@ -2684,7 +2906,11 @@ private:
 	physicssound::soundlist_t m_impactSounds;
 	CUtlVector<physicssound::breaksound_t> m_breakSounds;
 	CUtlVector<masscenteroverride_t>	m_massCenterOverrides;
-
+#ifdef PORTAL
+	CPortal_CollisionEvent m_Collisions;
+#else
+	CCollisionEvent m_Collisions;
+#endif
 };
 
 template<class T>
@@ -2746,16 +2972,16 @@ void CGlobalEntityList<T>::LevelInitPreEntity()
 	physenv->SetDebugOverlay(factories.engineFactory);
 	physenv->EnableDeleteQueue(true);
 
-	IPhysicsCollisionSolver* const g_pCollisionSolver = &g_Collisions;
-	IPhysicsCollisionEvent* const g_pCollisionEventHandler = &g_Collisions;
-	IPhysicsObjectEvent* const g_pObjectEventHandler = &g_Collisions;
+	IPhysicsCollisionSolver* const g_pCollisionSolver = &m_Collisions;
+	IPhysicsCollisionEvent* const g_pCollisionEventHandler = &m_Collisions;
+	IPhysicsObjectEvent* const g_pObjectEventHandler = &m_Collisions;
 
-	physenv->SetCollisionSolver(&g_Collisions);
-	physenv->SetCollisionEventHandler(&g_Collisions);
+	physenv->SetCollisionSolver(&m_Collisions);
+	physenv->SetCollisionEventHandler(&m_Collisions);
 	physenv->SetConstraintEventHandler(g_pConstraintEvents);
 	physenv->EnableConstraintNotify(true); // callback when an object gets deleted that is attached to a constraint
 
-	physenv->SetObjectEventHandler(&g_Collisions);
+	physenv->SetObjectEventHandler(&m_Collisions);
 
 	physenv->SetSimulationTimestep(gpGlobals->interval_per_tick); // 15 ms per tick
 	// HL Game gravity, not real-world gravity
@@ -2797,7 +3023,7 @@ void CGlobalEntityList<T>::LevelShutdownPostEntity()
 
 	g_pPhysSaveRestoreManager->ForgetAllModels();
 
-	g_Collisions.LevelShutdown();
+	m_Collisions.LevelShutdown();
 
 	physics->DestroyEnvironment(physenv);
 	physenv = NULL;
@@ -2827,24 +3053,19 @@ void CGlobalEntityList<T>::PortalPhysFrame(float deltaTime) //small wrapper for 
 	if (sv_fullsyncclones.GetBool())
 		CPhysicsShadowClone::FullSyncAllClones();
 
-	g_Collisions.BufferTouchEvents(true);
+	m_Collisions.BufferTouchEvents(true);
 
 	PhysFrame(deltaTime);
 
-	g_Collisions.PortalPostSimulationFrame();
+	m_Collisions.PortalPostSimulationFrame();
 
-	g_Collisions.BufferTouchEvents(false);
-	g_Collisions.FrameUpdate();
+	m_Collisions.BufferTouchEvents(false);
+	m_Collisions.FrameUpdate();
 
 	CProp_Portal::PostPhysFrame();
 }
 #endif
 
-#ifdef PORTAL
-extern CPortal_CollisionEvent g_Collisions;
-#else
-extern CCollisionEvent g_Collisions;
-#endif
 extern ConVar phys_speeds;
 // Advance physics by time (in seconds)
 template<class T>
@@ -2886,7 +3107,7 @@ void CGlobalEntityList<T>::PhysFrame(float deltaTime)
 #endif
 
 #ifndef PORTAL //instead of wrapping 1 simulation with this, portal needs to wrap 3
-	g_Collisions.BufferTouchEvents(true);
+	m_Collisions.BufferTouchEvents(true);
 #endif
 
 	physenv->Simulate(deltaTime);
@@ -2947,8 +3168,8 @@ void CGlobalEntityList<T>::PhysFrame(float deltaTime)
 	}
 
 #ifndef PORTAL //instead of wrapping 1 simulation with this, portal needs to wrap 3
-	g_Collisions.BufferTouchEvents(false);
-	g_Collisions.FrameUpdate();
+	m_Collisions.BufferTouchEvents(false);
+	m_Collisions.FrameUpdate();
 #endif
 }
 

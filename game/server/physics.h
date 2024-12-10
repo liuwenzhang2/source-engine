@@ -108,8 +108,8 @@ void PhysCollisionWarpEffect( gamevcollisionevent_t *pEvent, surfacedata_t *phit
 // plays the impact sound for a particular material
 //void PhysicsImpactSound( CBaseEntity *pEntity, IPhysicsObject *pPhysObject, int channel, int surfaceProps, int surfacePropsHit, float volume, float impactSpeed );
 
-void PhysCallbackDamage( CBaseEntity *pEntity, const CTakeDamageInfo &info );
-void PhysCallbackDamage( CBaseEntity *pEntity, const CTakeDamageInfo &info, gamevcollisionevent_t &event, int hurtIndex );
+//void PhysCallbackDamage( CBaseEntity *pEntity, const CTakeDamageInfo &info );
+//void PhysCallbackDamage( CBaseEntity *pEntity, const CTakeDamageInfo &info, gamevcollisionevent_t &event, int hurtIndex );
 
 // Applies force impulses at a later time
 void PhysCallbackImpulse( IPhysicsObject *pPhysicsObject, const Vector &vecCenterForce, const AngularImpulse &vecCenterTorque );
@@ -118,9 +118,9 @@ void PhysCallbackImpulse( IPhysicsObject *pPhysicsObject, const Vector &vecCente
 void PhysCallbackSetVelocity( IPhysicsObject *pPhysicsObject, const Vector &vecVelocity );
 
 // queue up a delete on this object
-void PhysCallbackRemove(CBaseEntity *pRemove);
+//void PhysCallbackRemove(CBaseEntity *pRemove);
 
-bool PhysGetDamageInflictorVelocityStartOfFrame( IPhysicsObject *pInflictor, Vector &velocity, AngularImpulse &angVelocity );
+//bool PhysGetDamageInflictorVelocityStartOfFrame( IPhysicsObject *pInflictor, Vector &velocity, AngularImpulse &angVelocity );
 
 // force a physics entity to sleep immediately
 void PhysForceEntityToSleep( CBaseEntity *pEntity, IPhysicsObject *pObject );
@@ -128,17 +128,17 @@ void PhysForceEntityToSleep( CBaseEntity *pEntity, IPhysicsObject *pObject );
 // teleport an entity to it's position relative to an object it's constrained to
 void PhysTeleportConstrainedEntity( CBaseEntity *pTeleportSource, IPhysicsObject *pObject0, IPhysicsObject *pObject1, const Vector &prevPosition, const QAngle &prevAngles, bool physicsRotate );
 
-void PhysGetListOfPenetratingEntities( CBaseEntity *pSearch, CUtlVector<CBaseEntity *> &list );
-bool PhysShouldCollide( IPhysicsObject *pObj0, IPhysicsObject *pObj1 );
+//void PhysGetListOfPenetratingEntities( CBaseEntity *pSearch, CUtlVector<CBaseEntity *> &list );
+//bool PhysShouldCollide( IPhysicsObject *pObj0, IPhysicsObject *pObj1 );
 
-bool PhysGetTriggerEvent( triggerevent_t *pEvent, CBaseEntity *pTrigger );
+//bool PhysGetTriggerEvent( triggerevent_t *pEvent, CBaseEntity *pTrigger );
 // note: pErrorEntity is used to report errors (object not found, more than one found).  It can be NULL
 IPhysicsObject *FindPhysicsObjectByName( const char *pName, CBaseEntity *pErrorEntity );
 bool PhysFindOrAddVehicleScript( const char *pScriptName, struct vehicleparams_t *pParams, struct vehiclesounds_t *pSounds );
 void PhysFlushVehicleScripts();
 
 // this is called to flush all queues when the delete list is cleared
-void PhysOnCleanupDeleteList();
+//void PhysOnCleanupDeleteList();
 
 struct masscenteroverride_t
 {

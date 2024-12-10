@@ -3204,7 +3204,7 @@ void CBaseCombatCharacter::VPhysicsShadowCollision( int index, gamevcollisioneve
 
 	// UNDONE: Find one near damagePos?
 	GetEngineObject()->SetForceBone(0);
-	PhysCallbackDamage( this, dmgInfo, *pEvent, index );
+	gEntList.PhysCallbackDamage( this, dmgInfo, *pEvent, index );
 }
 
 

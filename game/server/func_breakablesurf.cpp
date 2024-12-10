@@ -1257,7 +1257,7 @@ void CBreakableSurface::VPhysicsCollision( int index, gamevcollisionevent_t *pEv
 			int otherIndex = !index;
 			CBaseEntity *pInflictor = pEvent->pEntities[otherIndex];
 			CTakeDamageInfo info( pInflictor, pInflictor, normal, damagePos, damage, damageType );
-			PhysCallbackDamage( this, info, *pEvent, index );
+			gEntList.PhysCallbackDamage( this, info, *pEvent, index );
 		}
 		else if ( damage > 0 )
 		{

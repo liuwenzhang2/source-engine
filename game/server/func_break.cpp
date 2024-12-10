@@ -796,7 +796,7 @@ void CBreakable::VPhysicsCollision( int index, gamevcollisionevent_t *pEvent )
 			pEvent->pObjects[index]->SetMass( 2.0f );
 		}
 		CTakeDamageInfo dmgInfo( pHitEntity, pHitEntity, damageForce, damagePos, (m_iHealth + 1), DMG_CRUSH );
-		PhysCallbackDamage( this, dmgInfo, *pEvent, index );
+		gEntList.PhysCallbackDamage( this, dmgInfo, *pEvent, index );
 	}
 	else if ( !GetEngineObject()->HasSpawnFlags( SF_BREAK_DONT_TAKE_PHYSICS_DAMAGE ) )
 	{
@@ -815,7 +815,7 @@ void CBreakable::VPhysicsCollision( int index, gamevcollisionevent_t *pEvent )
 				pEvent->pObjects[index]->SetMass( 2.0f );
 			}
 			CTakeDamageInfo dmgInfo( pOther, pOther, damageForce, damagePos, damage, damageType );
-			PhysCallbackDamage( this, dmgInfo, *pEvent, index );
+			gEntList.PhysCallbackDamage( this, dmgInfo, *pEvent, index );
 		}
 	}
 }

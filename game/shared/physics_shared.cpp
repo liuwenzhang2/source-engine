@@ -24,6 +24,13 @@
 #include "SoundEmitterSystem/isoundemittersystembase.h"
 #include "util_shared.h"
 #include "physics_saverestore.h"
+#ifdef CLIENT_DLL
+#include "cliententitylist.h"
+#endif // CLIENT_DLL
+#ifdef GAME_DLL
+#include "entitylist.h"
+#endif // GAME_DLL
+
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
@@ -1035,7 +1042,13 @@ void PhysFrictionSound( IHandleEntity *pEntity, IPhysicsObject *pObject, float e
 
 	const char *pSoundName = physprops->GetString( soundName );
 
-	PhysFrictionSound( pEntity, pObject, pSoundName, *soundHandle, volume );
+#ifdef CLIENT_DLL
+	ClientEntityList().PhysFrictionSound(pEntity, pObject, pSoundName, *soundHandle, volume);
+#endif // CLIENT_DLL
+#ifdef GAME_DLL
+	gEntList.PhysFrictionSound(pEntity, pObject, pSoundName, *soundHandle, volume);
+#endif // GAME_DLL
+
 }
 
 //-----------------------------------------------------------------------------

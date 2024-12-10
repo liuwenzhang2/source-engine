@@ -4087,7 +4087,7 @@ void CTriggerVPhysicsMotion::StartTouch( CBaseEntity *pOther )
 	}
 
 	triggerevent_t event;
-	PhysGetTriggerEvent( &event, this );
+	gEntList.PhysGetTriggerEvent( &event, this );
 	if ( event.pObject )
 	{
 		// these all get done again on save/load, so check
@@ -4126,7 +4126,7 @@ void CTriggerVPhysicsMotion::EndTouch( CBaseEntity *pOther )
 		pPlayer->m_Local.m_bSlowMovement = false;
 	}
 	triggerevent_t event;
-	PhysGetTriggerEvent( &event, this );
+	gEntList.PhysGetTriggerEvent( &event, this );
 	if ( event.pObject && m_pController )
 	{
 		m_pController->DetachObject( event.pObject );

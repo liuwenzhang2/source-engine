@@ -950,7 +950,7 @@ void CPropAirboat::VPhysicsFriction( IPhysicsObject *pObject, float energy, int 
 	surfacedata_t *psurf = physprops->GetSurfaceData( surfaceProps );
 	const char *pSoundName = physprops->GetString( psurf->sounds.scrapeRough );
 
-	PhysFrictionSound( this, pObject, pSoundName, psurf->soundhandles.scrapeRough, flVolume );
+	gEntList.PhysFrictionSound( this, pObject, pSoundName, psurf->soundhandles.scrapeRough, flVolume );
 }
 
 

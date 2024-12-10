@@ -8105,7 +8105,7 @@ void CBasePlayer::VPhysicsShadowUpdate( IPhysicsObject *pPhysics )
 	if ( pPhysics->GetGameFlags() & FVPHYSICS_PENETRATING )
 	{
 		CUtlVector<CBaseEntity *> list;
-		PhysGetListOfPenetratingEntities( this, list );
+		gEntList.PhysGetListOfPenetratingEntities( this, list );
 		for ( int i = list.Count()-1; i >= 0; --i )
 		{
 			// filter out anything that isn't simulated by vphysics

@@ -1259,7 +1259,7 @@ void CBaseEntity::TakeDamage( const CTakeDamageInfo &inputInfo )
 
 	if (gEntList.PhysIsInCallback() )
 	{
-		PhysCallbackDamage( this, inputInfo );
+		gEntList.PhysCallbackDamage( this, inputInfo );
 	}
 	else
 	{

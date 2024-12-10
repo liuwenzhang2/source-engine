@@ -318,7 +318,7 @@ float CalculatePhysicsImpactDamage( int index, gamevcollisionevent_t *pEvent, co
 
 #if 0
 	{
-		PhysGetDamageInflictorVelocityStartOfFrame( pEvent->pObjects[otherIndex], pEvent->preVelocity[otherIndex], pEvent->preAngularVelocity[otherIndex] );
+		gEntList.PhysGetDamageInflictorVelocityStartOfFrame( pEvent->pObjects[otherIndex], pEvent->preVelocity[otherIndex], pEvent->preAngularVelocity[otherIndex] );
 	}
 #endif
 

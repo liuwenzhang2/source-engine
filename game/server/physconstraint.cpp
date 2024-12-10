@@ -309,7 +309,7 @@ void CPhysConstraint::OnBreak( void )
 	m_OnBreak.FireOutput( this, this );
 	// queue this up to be deleted at the end of physics 
 	// The Deactivate() call should make sure we don't get more of these callbacks.
-	PhysCallbackRemove( this );
+	gEntList.PhysCallbackRemove( this );
 }
 
 void CPhysConstraint::InputBreak( inputdata_t &inputdata )

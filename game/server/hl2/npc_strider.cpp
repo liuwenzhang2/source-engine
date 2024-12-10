@@ -4237,7 +4237,7 @@ void CNPC_Strider::VPhysicsShadowCollision( int index, gamevcollisionevent_t *pE
 
 		// UNDONE: Find one near damagePos?
 		GetEngineObject()->SetForceBone(0);
-		PhysCallbackDamage( this, dmgInfo, *pEvent, index );
+		gEntList.PhysCallbackDamage( this, dmgInfo, *pEvent, index );
 		return;
 	}
 

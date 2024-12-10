@@ -36,9 +36,6 @@ ConVar	cl_phys_timescale( "cl_phys_timescale", "1.0", FCVAR_CHEAT, "Sets the sca
 
 extern IVEngineClient *engine;
 
-CCollisionEvent g_Collisions;
-
-
 ConVar cl_ragdoll_collide( "cl_ragdoll_collide", "0" );
 
 int CCollisionEvent::ShouldCollide( IPhysicsObject *pObj0, IPhysicsObject *pObj1, void *pGameData0, void *pGameData1 )
@@ -360,7 +357,7 @@ void CCollisionEvent::Friction( IPhysicsObject *pObject, float energy, int surfa
 		
 	if ( pEntity  )
 	{
-		friction_t *pFriction = g_Collisions.FindFriction( pEntity );
+		friction_t *pFriction = FindFriction( pEntity );
 
 		if ( (gpGlobals->maxClients > 1) && pFriction && pFriction->pObject) 
 		{
@@ -660,52 +657,6 @@ IPhysicsObject *GetWorldPhysObject ( void )
 	return g_PhysWorldObject;
 }
 
-void PhysFrictionSound( IHandleEntity *pEntity, IPhysicsObject *pObject, const char *pSoundName, HSOUNDSCRIPTHANDLE& handle, float flVolume )
-{
-	if ( !pEntity )
-		return;
-	
-	// cut out the quiet sounds
-	// UNDONE: Separate threshold for starting a sound vs. continuing?
-	flVolume = clamp( flVolume, 0.0f, 1.0f );
-	if ( flVolume > (1.0f/128.0f) )
-	{
-		friction_t *pFriction = g_Collisions.FindFriction((CBaseEntity*)pEntity );
-		if ( !pFriction )
-			return;
 
-		CSoundParameters params;
-		if ( !g_pSoundEmitterSystem->GetParametersForSound( pSoundName, handle, params, NULL ) )//CBaseEntity::
-			return;
-
-		if ( !pFriction->pObject )
-		{
-			// don't create really quiet scrapes
-			if ( params.volume * flVolume <= 0.1f )
-				return;
-
-			pFriction->pObject = pEntity;
-			CPASAttenuationFilter filter((CBaseEntity*)pEntity, params.soundlevel );
-			int entindex = ((CBaseEntity*)pEntity)->entindex();
-
-			// clientside created entites doesn't have a valid entindex, let 'world' play the sound for them
-			if ( entindex < 0 )
-				entindex = 0;
-
-			pFriction->patch = CSoundEnvelopeController::GetController().SoundCreate( 
-				filter, entindex, CHAN_BODY, pSoundName, params.soundlevel );
-			CSoundEnvelopeController::GetController().Play( pFriction->patch, params.volume * flVolume, params.pitch );
-		}
-		else
-		{
-			float pitch = (flVolume * (params.pitchhigh - params.pitchlow)) + params.pitchlow;
-			CSoundEnvelopeController::GetController().SoundChangeVolume( pFriction->patch, params.volume * flVolume, 0.1f );
-			CSoundEnvelopeController::GetController().SoundChangePitch( pFriction->patch, pitch, 0.1f );
-		}
-
-		pFriction->flLastUpdateTime = gpGlobals->curtime;
-		pFriction->flLastEffectTime = gpGlobals->curtime;
-	}
-}
 
 
