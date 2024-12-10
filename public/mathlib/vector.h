@@ -30,6 +30,7 @@
 
 #include "tier0/dbg.h"
 #include "tier0/threadtools.h"
+#include "tier1/fmtstr.h"
 #include "mathlib/vector2d.h"
 #include "mathlib/math_pfns.h"
 
