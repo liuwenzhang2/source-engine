@@ -853,6 +853,9 @@ public:
 	void SetAlternateSorting(bool bAlternateSorting) { m_bAlternateSorting = bAlternateSorting; }
 	void IncrementInterpolationFrame(); // Call this to cause a discontinuity (teleport)
 
+	bool PhysModelParseSolid(solid_t& solid);
+	bool PhysModelParseSolidByIndex(solid_t& solid, int solidIndex);
+	void PhysForceClearVelocity(IPhysicsObject* pPhys);
 public:
 	// Networking related methods
 	void NetworkStateChanged();
@@ -1768,7 +1771,7 @@ public:
 	}
 	virtual void			VPhysicsDestroyObject();
 	// Player Physics Shadow
-	void					SetupVPhysicsShadow(const Vector& vecAbsOrigin, const Vector& vecAbsVelocity, CPhysCollide* pStandModel, const char* pStandHullName, CPhysCollide* pCrouchModel, const char* pCrouchHullName);
+	void					SetupVPhysicsShadow(const Vector& vHullMin, const Vector& vHullMax, const Vector& vDuckHullMin, const Vector& vDuckHullMax);
 	IPhysicsPlayerController* GetPhysicsController() { return m_pPhysicsController; }
 	void UpdateVPhysicsPosition(const Vector& position, const Vector& velocity, float secondsToArrival);
 	void					SetVCollisionState(const Vector& vecAbsOrigin, const Vector& vecAbsVelocity, int collisionState);

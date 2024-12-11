@@ -73,7 +73,7 @@ public:
 	void		CheckTimeBasedDamage( void );
 
 	// from cbasecombatcharacter
-	void		InitVCollision( const Vector &vecAbsOrigin, const Vector &vecAbsVelocity );
+	void		InitVCollision();
 
 	Class_T		Classify ( void );
 	Class_T		m_nControlClass;			// Class when player is controlling another entity

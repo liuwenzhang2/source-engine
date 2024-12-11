@@ -18,7 +18,7 @@
 #include "engine/IStaticPropMgr.h"
 #include "shared_classnames.h"
 #include "shareddefs.h"
-
+#include "vphysics/friction.h"
 #ifdef CLIENT_DLL
 #include "cdll_client_int.h"
 #endif
@@ -633,6 +633,11 @@ void PhysEnableObjectCollisions(IPhysicsObject* pObject0, IPhysicsObject* pObjec
 void PhysEnableEntityCollisions(IPhysicsObject* pObject0, IPhysicsObject* pObject1);
 void PhysEnableEntityCollisions(IHandleEntity* pEntity0, IHandleEntity* pEntity1);
 bool PhysEntityCollisionsAreDisabled(IHandleEntity* pEntity0, IHandleEntity* pEntity1);
+
+// Compute an output velocity based on sliding along the current contact points 
+// in the closest direction toward inputVelocity.
+void PhysComputeSlideDirection(IPhysicsObject* pPhysics, const Vector& inputVelocity, const AngularImpulse& inputAngularVelocity,
+	Vector* pOutputVelocity, Vector* pOutputAngularVelocity, float minMass);
 
 // Manages ragdolls fading for the low violence versions
 class CRagdollLowViolenceManager

@@ -10,7 +10,7 @@
 #include "physics_bone_follower.h"
 #include "vcollide_parse.h"
 #include "saverestore_utlvector.h"
-#include "physics_shared.h"
+
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
@@ -110,7 +110,7 @@ bool CBoneFollowerManager::CreatePhysicsFollower( CBaseAnimating *pParentEntity,
 		int physicsBone = pBone->physicsbone;
 		if ( !pSolid )
 		{
-			if ( !PhysModelParseSolidByIndex( solidTmp, pParentEntity, pParentEntity->GetEngineObject()->GetModelIndex(), physicsBone ) )
+			if ( !pParentEntity->GetEngineObject()->PhysModelParseSolidByIndex( solidTmp, physicsBone ) )
 				return false;
 			pSolid = &solidTmp;
 		}

@@ -45,7 +45,7 @@
 #include "gamestats.h"
 // NVNT haptic utils
 #include "haptics/haptic_utils.h"
-#include "physics_shared.h"
+
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
@@ -966,7 +966,7 @@ void CGrabController::DetachEntity( bool bClearVelocity )
 			PhysClearGameFlags( pPhys, FVPHYSICS_PLAYER_HELD );
 			if ( bClearVelocity )
 			{
-				PhysForceClearVelocity( pPhys );
+				pEntity->GetEngineObject()->PhysForceClearVelocity( pPhys );
 			}
 			else
 			{

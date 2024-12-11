@@ -79,10 +79,7 @@ void PhysParseSurfaceData( class IPhysicsSurfaceProps *pProps, class IFileSystem
 // fill out this solid_t with the AABB defaults (high inertia/no rotation)
 void PhysGetDefaultAABBSolid( solid_t &solid );
 
-// Compute an output velocity based on sliding along the current contact points 
-// in the closest direction toward inputVelocity.
-void PhysComputeSlideDirection( IPhysicsObject *pPhysics, const Vector &inputVelocity, const AngularImpulse &inputAngularVelocity, 
-							   Vector *pOutputVelocity, Vector *pOutputAngularVelocity, float minMass );
+
 
 void PhysForceClearVelocity( IPhysicsObject *pPhys );
 bool PhysHasContactWithOtherInDirection( IPhysicsObject *pPhysics, const Vector &dir );

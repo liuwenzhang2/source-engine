@@ -637,7 +637,7 @@ public:
 	Vector					GetSmoothedVelocity( void );
 
 	virtual	void			RefreshCollisionBounds( void );
-	virtual void			InitVCollision( const Vector &vecAbsOrigin, const Vector &vecAbsVelocity );
+	virtual void			InitVCollision();
 	void					PostThinkVPhysics( void );
 	virtual void			UpdatePhysicsShadowToCurrentPosition();
 

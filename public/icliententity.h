@@ -586,6 +586,9 @@ public:
 	virtual void MoveToLastReceivedPosition(bool force = false) = 0;
 	virtual void ResetLatched() = 0;
 	virtual bool IsReadyToDraw() = 0;
+	virtual bool PhysModelParseSolid(solid_t& solid) = 0;
+	virtual bool PhysModelParseSolidByIndex(solid_t& solid, int solidIndex) = 0;
+	virtual void PhysForceClearVelocity(IPhysicsObject* pPhys) = 0;
 };
 
 class IEnginePortalClient {

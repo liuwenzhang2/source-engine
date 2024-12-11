@@ -7,7 +7,7 @@
 #include "cbase.h"
 #include "vcollide_parse.h"
 #include "c_gib.h"
-#include "physics_shared.h"
+
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
@@ -65,7 +65,7 @@ bool C_Gib::InitializeGib( const char *pszModelName, Vector vecOrigin, Vector ve
 	GetEngineObject()->SetCollisionGroup( COLLISION_GROUP_DEBRIS );
 
 	solid_t tmpSolid;
-	PhysModelParseSolid( tmpSolid, this, GetEngineObject()->GetModelIndex() );
+	GetEngineObject()->PhysModelParseSolid( tmpSolid);
 	
 	GetEngineObject()->VPhysicsInitNormal( SOLID_VPHYSICS, 0, false, &tmpSolid );
 	

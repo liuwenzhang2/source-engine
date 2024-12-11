@@ -955,11 +955,11 @@ bool CDODPlayer::ShouldInstantRespawn( void )
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-void CDODPlayer::InitVCollision( const Vector &vecAbsOrigin, const Vector &vecAbsVelocity )
+void CDODPlayer::InitVCollision()
 {
 	if ( 0 ) //if ( !sv_turbophysics.GetBool() )
 	{
-		BaseClass::InitVCollision( vecAbsOrigin, vecAbsVelocity );
+		BaseClass::InitVCollision();
 
 		// Setup the HL2 specific callback.
 		GetEnginePlayer()->GetPhysicsController()->SetEventHandler( &playerCallback );

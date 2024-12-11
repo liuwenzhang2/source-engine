@@ -14,7 +14,7 @@
 #include "datacache/imdlcache.h"
 #include "view.h"
 #include "tier0/vprof.h"
-#include "physics_shared.h"
+
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
@@ -261,7 +261,7 @@ bool C_PhysPropClientside::Initialize()
 
 	// Create the object in the physics system
 
-	if ( !PhysModelParseSolid( tmpSolid, this, GetEngineObject()->GetModelIndex() ) )
+	if ( !GetEngineObject()->PhysModelParseSolid( tmpSolid ) )
 	{
 		DevMsg("C_PhysPropClientside::Initialize: PhysModelParseSolid failed for entity %i.\n", GetEngineObject()->GetModelIndex() );
 		return false;

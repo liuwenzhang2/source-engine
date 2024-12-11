@@ -350,7 +350,7 @@ public:
 	void SetBazookaDeployed( bool bDeployed ) { m_bBazookaDeployed = bDeployed; }
 
 	// from cbasecombatcharacter
-	virtual void InitVCollision( const Vector &vecAbsOrigin, const Vector &vecAbsVelocity );
+	virtual void InitVCollision();
 	virtual void VPhysicsShadowUpdate( IPhysicsObject *pPhysics );
 
 	void DeathSound( const CTakeDamageInfo &info );

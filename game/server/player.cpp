@@ -68,7 +68,7 @@
 #include "dt_utlvector_send.h"
 #include "vote_controller.h"
 #include "ai_speech.h"
-#include "physics_shared.h"
+
 #if defined USES_ECON_ITEMS
 #include "econ_wearable.h"
 #endif
@@ -5034,7 +5034,7 @@ void CBasePlayer::Spawn( void )
 
 	m_flLaggedMovementValue = 1.0f;
 	m_vecSmoothedVelocity = vec3_origin;
-	InitVCollision(GetEngineObject()->GetAbsOrigin(), GetEngineObject()->GetAbsVelocity() );
+	InitVCollision();
 
 #if !defined( TF_DLL )
 	IGameEvent *event = gameeventmanager->CreateEvent( "player_spawn" );
@@ -5167,20 +5167,20 @@ int CBasePlayer::Save( ISave &save )
 
 
 // Friend class of CBaseEntity to access private member data.
-class CPlayerRestoreHelper
-{
-public:
-
-	const Vector &GetAbsOrigin( CBaseEntity *pent )
-	{
-		return pent->GetEngineObject()->GetAbsOrigin();
-	}
-
-	const Vector &GetAbsVelocity( CBaseEntity *pent )
-	{
-		return pent->GetEngineObject()->GetAbsVelocity();
-	}
-};
+//class CPlayerRestoreHelper
+//{
+//public:
+//
+//	const Vector &GetAbsOrigin( CBaseEntity *pent )
+//	{
+//		return pent->GetEngineObject()->GetAbsOrigin();
+//	}
+//
+//	const Vector &GetAbsVelocity( CBaseEntity *pent )
+//	{
+//		return pent->GetEngineObject()->GetAbsVelocity();
+//	}
+//};
 
 
 int CBasePlayer::Restore( IRestore &restore )
@@ -5228,8 +5228,8 @@ int CBasePlayer::Restore( IRestore &restore )
 	// We need to get at m_vecAbsOrigin as it was restored but can't let it be
 	// recalculated by a call to GetAbsOrigin because hierarchy isn't fully restored yet,
 	// so we use this backdoor to get at the private data in CBaseEntity.
-	CPlayerRestoreHelper helper;
-	InitVCollision( helper.GetAbsOrigin( this ), helper.GetAbsVelocity( this ) );
+	//CPlayerRestoreHelper helper;
+	InitVCollision();//helper.GetAbsOrigin( this ), helper.GetAbsVelocity( this )
 
 	// success
 	return 1;
@@ -8307,14 +8307,14 @@ void CBasePlayer::RefreshCollisionBounds( void )
 {
 	BaseClass::RefreshCollisionBounds();
 
-	InitVCollision(GetEngineObject()->GetAbsOrigin(), GetEngineObject()->GetAbsVelocity() );
+	InitVCollision();
 	SetViewOffset( VEC_VIEW_SCALED( this ) );
 }
 
 //-----------------------------------------------------------------------------
 // Purpose:
 //-----------------------------------------------------------------------------
-void CBasePlayer::InitVCollision( const Vector &vecAbsOrigin, const Vector &vecAbsVelocity )
+void CBasePlayer::InitVCollision()
 {
 	// Cleanup any old vphysics stuff.
 	GetEngineObject()->VPhysicsDestroyObject();
@@ -8323,17 +8323,8 @@ void CBasePlayer::InitVCollision( const Vector &vecAbsOrigin, const Vector &vecA
 	if ( sv_turbophysics.GetBool() )
 		return;
 	
-	CPhysCollide *pModel = PhysCreateBbox( VEC_HULL_MIN_SCALED( this ), VEC_HULL_MAX_SCALED( this ) );
-	CPhysCollide *pCrouchModel = PhysCreateBbox( VEC_DUCK_HULL_MIN_SCALED( this ), VEC_DUCK_HULL_MAX_SCALED( this ) );
-
-	GetEnginePlayer()->SetupVPhysicsShadow( vecAbsOrigin, vecAbsVelocity, pModel, "player_stand", pCrouchModel, "player_crouch" );
+	GetEnginePlayer()->SetupVPhysicsShadow(VEC_HULL_MIN_SCALED(this), VEC_HULL_MAX_SCALED(this), VEC_DUCK_HULL_MIN_SCALED(this), VEC_DUCK_HULL_MAX_SCALED(this));
 }
-
-
-
-
-
-
 
 //-----------------------------------------------------------------------------
 // Purpose: 

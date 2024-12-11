@@ -117,7 +117,7 @@ public:
 	virtual bool		ClientCommand( const CCommand &args );
 
 	// from cbasecombatcharacter
-	void				InitVCollision( const Vector &vecAbsOrigin, const Vector &vecAbsVelocity );
+	void				InitVCollision();
 	WeaponProficiency_t CalcWeaponProficiency( CBaseCombatWeapon *pWeapon );
 
 	Class_T				Classify ( void );

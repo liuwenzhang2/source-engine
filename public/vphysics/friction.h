@@ -10,6 +10,8 @@
 #pragma once
 #endif
 
+#include "vphysics_interface.h"
+
 // NOTE: This is an iterator for the contact points on an object
 // NOTE: This should only be used temporarily.  Holding one of these
 // NOTE: across collision callbacks or calls into simulation will cause errors!

@@ -23,7 +23,7 @@
 #include "collisionutils.h"
 #include "decals.h"
 #include "bone_setup.h"
-#include "physics_shared.h"
+
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
@@ -508,7 +508,7 @@ static bool ShouldDampRotation( const CPhysCollide *pCollide )
 bool CPhysBox::CreateVPhysics()
 {
 	solid_t tmpSolid;
-	PhysModelParseSolid( tmpSolid, this, GetEngineObject()->GetModelIndex() );
+	GetEngineObject()->PhysModelParseSolid( tmpSolid );
 	if ( m_massScale > 0 )
 	{
 		tmpSolid.params.mass *= m_massScale;
@@ -1567,7 +1567,7 @@ void CPhysMagnet::Spawn( void )
 	m_takedamage = DAMAGE_EVENTS_ONLY;
 
 	solid_t tmpSolid;
-	PhysModelParseSolid( tmpSolid, this, GetEngineObject()->GetModelIndex() );
+	GetEngineObject()->PhysModelParseSolid( tmpSolid );
 	if ( m_massScale > 0 )
 	{
 		tmpSolid.params.mass *= m_massScale;

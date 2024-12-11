@@ -43,7 +43,7 @@
 #include "weapon_hl2mpbasehlmpcombatweapon.h"
 #include "vphysics/friction.h"
 #include "debugoverlay_shared.h"
-#include "physics_shared.h"
+
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
@@ -622,7 +622,7 @@ void CGrabController::DetachEntity( bool bClearVelocity )
 			PhysClearGameFlags( pPhys, FVPHYSICS_PLAYER_HELD );
 			if ( bClearVelocity )
 			{
-				PhysForceClearVelocity( pPhys );
+				pEntity->GetEngineObject()->PhysForceClearVelocity( pPhys );
 			}
 			else
 			{
@@ -2450,7 +2450,7 @@ void CWeaponPhysCannon::ManagePredictedObject( void )
 {
 	CBaseEntity *pAttachedObject = m_hAttachedObject.Get();
 
-	if ( m_hAttachedObject )
+	if (pAttachedObject)
 	{
 		// NOTE :This must happen after OnPhysGunPickup because that can change the mass
 		if ( pAttachedObject != GetGrabController().GetAttached() )
@@ -2460,7 +2460,7 @@ void CWeaponPhysCannon::ManagePredictedObject( void )
 			if ( pPhysics == NULL )
 			{
 				solid_t tmpSolid;
-				PhysModelParseSolid( tmpSolid, m_hAttachedObject, pAttachedObject->GetEngineObject()->GetModelIndex() );
+				pAttachedObject->GetEngineObject()->PhysModelParseSolid( tmpSolid );
 
 				pAttachedObject->GetEngineObject()->VPhysicsInitNormal( SOLID_VPHYSICS, 0, false, &tmpSolid );
 			}

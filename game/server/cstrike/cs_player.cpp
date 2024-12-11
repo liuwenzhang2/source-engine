@@ -1408,9 +1408,9 @@ void CCSPlayer::DeathSound( const CTakeDamageInfo &info )
 //-----------------------------------------------------------------------------
 // Purpose:
 //-----------------------------------------------------------------------------
-void CCSPlayer::InitVCollision( const Vector &vecAbsOrigin, const Vector &vecAbsVelocity )
+void CCSPlayer::InitVCollision()
 {
-	BaseClass::InitVCollision( vecAbsOrigin, vecAbsVelocity );
+	BaseClass::InitVCollision();
 
 	if ( sv_turbophysics.GetBool() )
 		return;

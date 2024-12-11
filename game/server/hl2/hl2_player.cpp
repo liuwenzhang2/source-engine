@@ -1364,9 +1364,9 @@ static CPhysicsPlayerCallback playerCallback;
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-void CHL2_Player::InitVCollision( const Vector &vecAbsOrigin, const Vector &vecAbsVelocity )
+void CHL2_Player::InitVCollision()
 {
-	BaseClass::InitVCollision( vecAbsOrigin, vecAbsVelocity );
+	BaseClass::InitVCollision();
 
 	// Setup the HL2 specific callback.
 	IPhysicsPlayerController *pPlayerController = GetEnginePlayer()->GetPhysicsController();

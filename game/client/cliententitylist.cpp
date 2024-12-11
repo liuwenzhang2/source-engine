@@ -7129,6 +7129,21 @@ void C_EngineObjectInternal::ResetLatched()
 	Interp_Reset();
 }
 
+bool C_EngineObjectInternal::PhysModelParseSolid(solid_t& solid)
+{
+	return ::PhysModelParseSolid(solid, m_pOuter, GetModelIndex());
+}
+
+bool C_EngineObjectInternal::PhysModelParseSolidByIndex(solid_t& solid, int solidIndex)
+{
+	return ::PhysModelParseSolidByIndex(solid, m_pOuter, GetModelIndex(), solidIndex);
+}
+
+void C_EngineObjectInternal::PhysForceClearVelocity(IPhysicsObject* pPhys)
+{
+	::PhysForceClearVelocity(pPhys);
+}
+
 C_EnginePortalInternal::C_EnginePortalInternal(IClientEntityList* pClientEntityList, int iForceEdictIndex, int iSerialNum)
 :C_EngineObjectInternal(pClientEntityList, iForceEdictIndex, iSerialNum), m_DataAccess(m_InternalData)
 {

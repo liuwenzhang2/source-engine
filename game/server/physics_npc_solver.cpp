@@ -9,7 +9,7 @@
 #include "vphysics/friction.h"
 #include "ai_basenpc.h"
 #include "movevars_shared.h"
-#include "physics_shared.h"
+
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 

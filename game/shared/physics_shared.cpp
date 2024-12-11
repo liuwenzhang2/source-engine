@@ -777,71 +777,7 @@ bool CPhysicsGameTrace::VehiclePointInWater( const Vector &vecPoint )
 }
 
 
-void PhysComputeSlideDirection( IPhysicsObject *pPhysics, const Vector &inputVelocity, const AngularImpulse &inputAngularVelocity, 
-							   Vector *pOutputVelocity, Vector *pOutputAngularVelocity, float minMass )
-{
-	Vector velocity = inputVelocity;
-	AngularImpulse angVel = inputAngularVelocity;
-	Vector pos;
 
-	IPhysicsFrictionSnapshot *pSnapshot = pPhysics->CreateFrictionSnapshot();
-	while ( pSnapshot->IsValid() )
-	{
-		IPhysicsObject *pOther = pSnapshot->GetObject( 1 );
-		if ( !pOther->IsMoveable() || pOther->GetMass() > minMass )
-		{
-			Vector normal;
-			pSnapshot->GetSurfaceNormal( normal );
-
-			// BUGBUG: Figure out the correct rotation clipping equation
-			if ( pOutputAngularVelocity )
-			{
-				angVel = normal * DotProduct( angVel, normal );
-#if 0
-				pSnapshot->GetContactPoint( point );
-				Vector point, dummy;
-				AngularImpulse angularClip, clip2;
-
-				pPhysics->CalculateVelocityOffset( normal, point, dummy, angularClip );
-				VectorNormalize( angularClip );
-				float proj = DotProduct( angVel, angularClip );
-				if ( proj > 0 )
-				{
-					angVel -= angularClip * proj;
-				}
-				CrossProduct( angularClip, normal, clip2 );
-				proj = DotProduct( angVel, clip2 );
-				if ( proj > 0 )
-				{
-					angVel -= clip2 * proj;
-				}
-				//NDebugOverlay::Line( point, point - normal * 20, 255, 0, 0, true, 0.1 );
-#endif
-			}
-
-			// Determine how far along plane to slide based on incoming direction.
-			// NOTE: Normal points away from this object
-			float proj = DotProduct( velocity, normal );
-			if ( proj > 0.0f )
-			{
-				velocity -= normal * proj;
-			}
-		}
-		pSnapshot->NextFrictionData();
-	}
-	pPhysics->DestroyFrictionSnapshot( pSnapshot );
-
-	//NDebugOverlay::Line( pos, pos + unitVel * 20, 0, 0, 255, true, 0.1 );
-	
-	if ( pOutputVelocity )
-	{
-		*pOutputVelocity = velocity;
-	}
-	if ( pOutputAngularVelocity )
-	{
-		*pOutputAngularVelocity = angVel;
-	}
-}
 
 bool PhysHasContactWithOtherInDirection( IPhysicsObject *pPhysics, const Vector &dir )
 {

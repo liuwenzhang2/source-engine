@@ -354,7 +354,7 @@ public:
 	virtual void PlayStepSound( Vector &vecOrigin, surfacedata_t *psurface, float fvol, bool force );
 	
 	// from cbasecombatcharacter
-	void InitVCollision( const Vector &vecAbsOrigin, const Vector &vecAbsVelocity );
+	void InitVCollision();
 	void VPhysicsShadowUpdate( IPhysicsObject *pPhysics );
 	
 	bool HasShield() const;

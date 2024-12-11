@@ -1723,7 +1723,7 @@ public:
 	}
 	
 	// Used to access m_vecAbsOrigin during restore when it's unsafe to call GetAbsOrigin.
-	friend class CPlayerRestoreHelper;
+	//friend class CPlayerRestoreHelper;
 	
 	
 

@@ -6108,6 +6108,21 @@ void CEngineObjectInternal::IncrementInterpolationFrame()
 	m_ubInterpolationFrame = (m_ubInterpolationFrame + 1) % NOINTERP_PARITY_MAX;
 }
 
+bool CEngineObjectInternal::PhysModelParseSolid(solid_t& solid) 
+{
+	return ::PhysModelParseSolid(solid, m_pOuter, GetModelIndex());
+}
+
+bool CEngineObjectInternal::PhysModelParseSolidByIndex(solid_t& solid, int solidIndex)
+{
+	return ::PhysModelParseSolidByIndex(solid, m_pOuter, GetModelIndex(), solidIndex);
+}
+
+void CEngineObjectInternal::PhysForceClearVelocity(IPhysicsObject* pPhys)
+{
+	::PhysForceClearVelocity(pPhys);
+}
+
 void CEnginePlayerInternal::VPhysicsDestroyObject()
 {
 	// Since CBasePlayer aliases its pointer to the physics object, tell CBaseEntity to 
@@ -6139,7 +6154,7 @@ void CEnginePlayerInternal::VPhysicsDestroyObject()
 	CEngineObjectInternal::VPhysicsDestroyObject();
 }
 
-void CEnginePlayerInternal::SetupVPhysicsShadow(const Vector& vecAbsOrigin, const Vector& vecAbsVelocity, CPhysCollide* pStandModel, const char* pStandHullName, CPhysCollide* pCrouchModel, const char* pCrouchHullName)
+void CEnginePlayerInternal::SetupVPhysicsShadow(const Vector& vHullMin, const Vector& vHullMax, const Vector& vDuckHullMin, const Vector& vDuckHullMax)
 {
 	solid_t solid;
 	Q_strncpy(solid.surfaceprop, "player", sizeof(solid.surfaceprop));
@@ -6150,11 +6165,13 @@ void CEnginePlayerInternal::SetupVPhysicsShadow(const Vector& vecAbsOrigin, cons
 	//disable drag
 	solid.params.dragCoefficient = 0;
 	// create standing hull
-	m_pShadowStand = PhysModelCreateCustom(this->m_pOuter, pStandModel, GetLocalOrigin(), GetLocalAngles(), pStandHullName, false, &solid);
+	CPhysCollide* pStandModel = PhysCreateBbox(vHullMin, vHullMax);
+	m_pShadowStand = PhysModelCreateCustom(this->m_pOuter, pStandModel, GetLocalOrigin(), GetLocalAngles(), "player_stand", false, &solid);
 	m_pShadowStand->SetCallbackFlags(CALLBACK_GLOBAL_COLLISION | CALLBACK_SHADOW_COLLISION);
 
 	// create crouchig hull
-	m_pShadowCrouch = PhysModelCreateCustom(this->m_pOuter, pCrouchModel, GetLocalOrigin(), GetLocalAngles(), pCrouchHullName, false, &solid);
+	CPhysCollide* pCrouchModel = PhysCreateBbox(vDuckHullMin, vDuckHullMax);
+	m_pShadowCrouch = PhysModelCreateCustom(this->m_pOuter, pCrouchModel, GetLocalOrigin(), GetLocalAngles(), "player_crouch", false, &solid);
 	m_pShadowCrouch->SetCallbackFlags(CALLBACK_GLOBAL_COLLISION | CALLBACK_SHADOW_COLLISION);
 
 	// default to stand
@@ -6167,16 +6184,16 @@ void CEnginePlayerInternal::SetupVPhysicsShadow(const Vector& vecAbsOrigin, cons
 	m_pPhysicsController->SetPushSpeedLimit(50.0f);
 
 	// Give the controller a valid position so it doesn't do anything rash.
-	UpdatePhysicsShadowToPosition(vecAbsOrigin);
+	UpdatePhysicsShadowToPosition(m_vecAbsOrigin);
 
 	// init state
 	if (GetFlags() & FL_DUCKING)
 	{
-		SetVCollisionState(vecAbsOrigin, vecAbsVelocity, VPHYS_CROUCH);
+		SetVCollisionState(m_vecAbsOrigin, m_vecAbsVelocity, VPHYS_CROUCH);
 	}
 	else
 	{
-		SetVCollisionState(vecAbsOrigin, vecAbsVelocity, VPHYS_WALK);
+		SetVCollisionState(m_vecAbsOrigin, m_vecAbsVelocity, VPHYS_WALK);
 	}
 }
 
@@ -9001,7 +9018,7 @@ bool CEngineVehicleInternal::ParseVehicleScript(const char* pScriptName, solid_t
 	m_debugRadius = vehicle.axles[0].wheels.radius;
 	CalcWheelData(vehicle);
 
-	PhysModelParseSolid(solid, m_pOuter, GetModelIndex());
+	PhysModelParseSolid(solid);
 
 	// Allow the script to shift the center of mass
 	if (vehicle.body.massCenterOverride != vec3_origin)

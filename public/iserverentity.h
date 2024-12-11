@@ -509,6 +509,9 @@ public:
 	virtual bool GetAttachment(const char* szName, Vector& absOrigin, QAngle& absAngles) = 0;
 	virtual void SetAlternateSorting(bool bAlternateSorting) = 0;
 	virtual void IncrementInterpolationFrame() = 0;
+	virtual bool PhysModelParseSolid(solid_t& solid) = 0;
+	virtual bool PhysModelParseSolidByIndex(solid_t& solid, int solidIndex) = 0;
+	virtual void PhysForceClearVelocity(IPhysicsObject* pPhys) = 0;
 };
 
 class IEngineWorldServer{
@@ -518,7 +521,7 @@ public:
 
 class IEnginePlayerServer{
 public:
-	virtual void SetupVPhysicsShadow(const Vector& vecAbsOrigin, const Vector& vecAbsVelocity, CPhysCollide* pStandModel, const char* pStandHullName, CPhysCollide* pCrouchModel, const char* pCrouchHullName) = 0;
+	virtual void SetupVPhysicsShadow(const Vector& vHullMin, const Vector& vHullMax, const Vector& vDuckHullMin, const Vector& vDuckHullMax) = 0;
 	virtual IPhysicsPlayerController* GetPhysicsController() = 0;
 	virtual void UpdateVPhysicsPosition(const Vector& position, const Vector& velocity, float secondsToArrival) = 0;
 	virtual void SetVCollisionState(const Vector& vecAbsOrigin, const Vector& vecAbsVelocity, int collisionState) = 0;

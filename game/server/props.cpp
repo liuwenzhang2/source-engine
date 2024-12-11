@@ -40,7 +40,7 @@
 #include "physics_collisionevent.h"
 #include "gamestats.h"
 #include "vehicle_base.h"
-#include "physics_shared.h"
+
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
@@ -2592,7 +2592,7 @@ bool CPhysicsProp::CreateVPhysics()
 	bool asleep = GetEngineObject()->HasSpawnFlags( SF_PHYSPROP_START_ASLEEP ) ? true : false;
 
 	solid_t tmpSolid;
-	PhysModelParseSolid( tmpSolid, this, GetEngineObject()->GetModelIndex() );
+	GetEngineObject()->PhysModelParseSolid( tmpSolid );
 	
 	if ( m_massScale > 0 )
 	{
@@ -6111,7 +6111,7 @@ bool UTIL_CreateScaledPhysObject( CBaseAnimating *pInstance, float flScale )
 
 	// Get our solid info
 	solid_t tmpSolid;
-	if ( !PhysModelParseSolidByIndex( tmpSolid, pInstance, pInstance->GetEngineObject()->GetModelIndex(), -1 ) )
+	if ( !pInstance->GetEngineObject()->PhysModelParseSolid( tmpSolid ) )
 		return false;
 
 	// Physprops get keyvalues that effect the mass, this block is to respect those fields when we scale

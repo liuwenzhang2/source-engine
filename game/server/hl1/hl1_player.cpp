@@ -26,7 +26,7 @@
 #include "predicted_viewmodel.h"
 #include "physics_saverestore.h"
 #include "gamestats.h"
-#include "physics_shared.h"
+
 
 #define DMG_FREEZE		DMG_VEHICLE
 #define DMG_SLOWFREEZE	DMG_DISSOLVE
@@ -685,9 +685,9 @@ static CPhysicsPlayerCallback playerCallback;
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-void CHL1_Player::InitVCollision( const Vector &vecAbsOrigin, const Vector &vecAbsVelocity )
+void CHL1_Player::InitVCollision()
 {
-	BaseClass::InitVCollision( vecAbsOrigin, vecAbsVelocity );
+	BaseClass::InitVCollision();
 
 	// Setup the HL2 specific callback.
 	GetEnginePlayer()->GetPhysicsController()->SetEventHandler( &playerCallback );
@@ -1762,7 +1762,7 @@ void CGrabController::DetachEntity()
 			PhysClearGameFlags( pPhys, FVPHYSICS_PLAYER_HELD );
 			if ( pPhys->GetContactPoint( NULL, NULL ) )
 			{
-				PhysForceClearVelocity( pPhys );
+				pEntity->GetEngineObject()->PhysForceClearVelocity( pPhys );
 			}
 			else
 			{

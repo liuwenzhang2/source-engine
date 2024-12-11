@@ -1153,6 +1153,10 @@ public:
 
 	virtual void ResetLatched();
 	bool IsReadyToDraw() { return m_bReadyToDraw; }
+
+	bool PhysModelParseSolid(solid_t& solid);
+	bool PhysModelParseSolidByIndex(solid_t& solid, int solidIndex);
+	void PhysForceClearVelocity(IPhysicsObject* pPhys);
 private:
 	void LockStudioHdr();
 	void UnlockStudioHdr();
