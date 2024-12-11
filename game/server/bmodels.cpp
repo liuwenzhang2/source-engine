@@ -7,7 +7,7 @@
 #include "cbase.h"
 #include "doors.h"
 #include "mathlib/mathlib.h"
-#include "physics.h"
+//#include "physics.h"
 #include "ndebugoverlay.h"
 #include "engine/IEngineSound.h"
 #include "globals.h"

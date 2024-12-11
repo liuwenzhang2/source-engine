@@ -8,7 +8,7 @@
 #include "cbase.h"
 #include "doors.h"
 //#include "entitylist.h"
-#include "physics.h"
+//#include "physics.h"
 #include "ndebugoverlay.h"
 #include "engine/IEngineSound.h"
 #include "physics_npc_solver.h"

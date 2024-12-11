@@ -53,30 +53,18 @@
 #endif
 
 #include "physics_shared.h"
+#include "te_effect_dispatch.h"
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
-ConVar phys_speeds( "phys_speeds", "0" );
 
-CEntityList *g_pShadowEntities = NULL;
 //#ifdef PORTAL
 //CEntityList *g_pShadowEntities_Main = NULL;
 //#endif
 
 
-CCallQueue g_PostSimulationQueue;
 
 static bool IsDebris( int collisionGroup );
-
-void TimescaleChanged( IConVar *var, const char *pOldString, float flOldValue )
-{
-	if ( gEntList.PhysGetEnv() )
-	{
-		gEntList.PhysGetEnv()->ResetSimulationClock();
-	}
-}
-
-ConVar phys_timescale( "phys_timescale", "1", 0, "Scale time for physics", TimescaleChanged );
 
 #if _DEBUG
 ConVar phys_dontprintint( "phys_dontprintint", "1", FCVAR_NONE, "Don't print inter-penetration warnings." );
@@ -346,7 +334,6 @@ bool FindMaxContact( IPhysicsObject *pObject, float minForce, IPhysicsObject **p
 
 bool CCollisionEvent::ShouldFreezeObject( IPhysicsObject *pObject )
 {
-	extern bool PropIsGib(CBaseEntity *pEntity);
 	// for now, don't apply a per-object limit to ai MOVETYPE_PUSH objects
 	// NOTE: If this becomes a problem (too many collision checks this tick) we should add a path
 	// to inform the logic in VPhysicsUpdatePusher() about the limit being applied so 
@@ -388,7 +375,7 @@ bool CCollisionEvent::ShouldFreezeObject( IPhysicsObject *pObject )
 			else
 			{
 				// can't be damaged, so do something else:
-				if ( PropIsGib(pEntity) )
+				if ( pEntity->IsGib() )
 				{
 					// it's always safe to delete gibs, so kill this one to avoid simulation problems
 					gEntList.PhysCallbackRemove( pEntity );
@@ -397,7 +384,7 @@ bool CCollisionEvent::ShouldFreezeObject( IPhysicsObject *pObject )
 				{
 					// not a gib, create a solver:
 					// UNDONE: Add a property to override this in gameplay critical scenarios?
-					g_PostSimulationQueue.QueueCall( EntityPhysics_CreateSolver, pOther, pEntity, true, 1.0f );
+					gEntList.PhysGetPostSimulationQueue().QueueCall( EntityPhysics_CreateSolver, pOther, pEntity, true, 1.0f );
 				}
 			}
 		}
@@ -732,6 +719,230 @@ int CCollisionEvent::ShouldSolvePenetration( IPhysicsObject *pObj0, IPhysicsObje
 	return true;
 }
 
+static int BestAxisMatchingNormal(const matrix3x4_t& matrix, const Vector& normal)
+{
+	float bestDot = -1;
+	int best = 0;
+	for (int i = 0; i < 3; i++)
+	{
+		Vector tmp;
+		MatrixGetColumn(matrix, i, tmp);
+		float dot = fabs(DotProduct(tmp, normal));
+		if (dot > bestDot)
+		{
+			bestDot = dot;
+			best = i;
+		}
+	}
+
+	return best;
+}
+
+void PhysicsSplash(IPhysicsFluidController* pFluid, IPhysicsObject* pObject, CBaseEntity* pEntity)
+{
+	Vector normal;
+	float dist;
+	pFluid->GetSurfacePlane(&normal, &dist);
+
+	const matrix3x4_t& matrix = pEntity->GetEngineObject()->EntityToWorldTransform();
+
+	// Find the local axis that best matches the water surface normal
+	int bestAxis = BestAxisMatchingNormal(matrix, normal);
+
+	Vector tangent, binormal;
+	MatrixGetColumn(matrix, (bestAxis + 1) % 3, tangent);
+	binormal = CrossProduct(normal, tangent);
+	VectorNormalize(binormal);
+	tangent = CrossProduct(binormal, normal);
+	VectorNormalize(tangent);
+
+	// Now we have a basis tangent to the surface that matches the object's local orientation as well as possible
+	// compute an OBB using this basis
+
+	// Get object extents in basis
+	Vector tanPts[2], binPts[2];
+	tanPts[0] = EntityList()->PhysGetCollision()->CollideGetExtent(pObject->GetCollide(), pEntity->GetEngineObject()->GetAbsOrigin(), pEntity->GetEngineObject()->GetAbsAngles(), -tangent);
+	tanPts[1] = EntityList()->PhysGetCollision()->CollideGetExtent(pObject->GetCollide(), pEntity->GetEngineObject()->GetAbsOrigin(), pEntity->GetEngineObject()->GetAbsAngles(), tangent);
+	binPts[0] = EntityList()->PhysGetCollision()->CollideGetExtent(pObject->GetCollide(), pEntity->GetEngineObject()->GetAbsOrigin(), pEntity->GetEngineObject()->GetAbsAngles(), -binormal);
+	binPts[1] = EntityList()->PhysGetCollision()->CollideGetExtent(pObject->GetCollide(), pEntity->GetEngineObject()->GetAbsOrigin(), pEntity->GetEngineObject()->GetAbsAngles(), binormal);
+
+	// now compute the centered bbox
+	float mins[2], maxs[2], center[2], extents[2];
+	mins[0] = DotProduct(tanPts[0], tangent);
+	maxs[0] = DotProduct(tanPts[1], tangent);
+
+	mins[1] = DotProduct(binPts[0], binormal);
+	maxs[1] = DotProduct(binPts[1], binormal);
+
+	center[0] = 0.5 * (mins[0] + maxs[0]);
+	center[1] = 0.5 * (mins[1] + maxs[1]);
+
+	extents[0] = maxs[0] - center[0];
+	extents[1] = maxs[1] - center[1];
+
+	Vector centerPoint = center[0] * tangent + center[1] * binormal + dist * normal;
+
+	Vector axes[2];
+	axes[0] = (maxs[0] - center[0]) * tangent;
+	axes[1] = (maxs[1] - center[1]) * binormal;
+
+	// visualize OBB hit
+	/*
+	Vector corner1 = centerPoint - axes[0] - axes[1];
+	Vector corner2 = centerPoint + axes[0] - axes[1];
+	Vector corner3 = centerPoint + axes[0] + axes[1];
+	Vector corner4 = centerPoint - axes[0] + axes[1];
+	NDebugOverlay::Line( corner1, corner2, 0, 0, 255, false, 10 );
+	NDebugOverlay::Line( corner2, corner3, 0, 0, 255, false, 10 );
+	NDebugOverlay::Line( corner3, corner4, 0, 0, 255, false, 10 );
+	NDebugOverlay::Line( corner4, corner1, 0, 0, 255, false, 10 );
+	*/
+
+	Vector	corner[4];
+
+	corner[0] = centerPoint - axes[0] - axes[1];
+	corner[1] = centerPoint + axes[0] - axes[1];
+	corner[2] = centerPoint + axes[0] + axes[1];
+	corner[3] = centerPoint - axes[0] + axes[1];
+
+	CEffectData	data;
+
+	if (pObject->GetGameFlags() & FVPHYSICS_PART_OF_RAGDOLL)
+	{
+		/*
+		data.m_vOrigin = centerPoint;
+		data.m_vNormal = normal;
+		VectorAngles( normal, data.m_vAngles );
+		data.m_flScale = random->RandomFloat( 8, 10 );
+
+		DispatchEffect( "watersplash", data );
+
+		int		splashes = 4;
+		Vector	point;
+
+		for ( int i = 0; i < splashes; i++ )
+		{
+			point = RandomVector( -32.0f, 32.0f );
+			point[2] = 0.0f;
+
+			point += corner[i];
+
+			data.m_vOrigin = point;
+			data.m_vNormal = normal;
+			VectorAngles( normal, data.m_vAngles );
+			data.m_flScale = random->RandomFloat( 4, 6 );
+
+			DispatchEffect( "watersplash", data );
+		}
+		*/
+
+		//FIXME: This code will not work correctly given how the ragdoll/fluid collision is acting currently
+		return;
+	}
+
+	Vector vel;
+	pObject->GetVelocity(&vel, NULL);
+	float rawSpeed = -DotProduct(normal, vel);
+
+	// proportional to cross-sectional area times velocity squared (fluid pressure)
+	float speed = rawSpeed * rawSpeed * extents[0] * extents[1] * (1.0f / 2500000.0f) * pObject->GetMass() * (0.01f);
+
+	speed = clamp(speed, 0.f, 50.f);
+
+	bool bRippleOnly = false;
+
+	// allow the entity to perform a custom splash effect
+	if (pEntity->PhysicsSplash(centerPoint, normal, rawSpeed, speed))
+		return;
+
+	//Deny really weak hits
+	//FIXME: We still need to ripple the surface in this case
+	if (speed <= 0.35f)
+	{
+		if (speed <= 0.1f)
+			return;
+
+		bRippleOnly = true;
+	}
+
+	float size = RemapVal(speed, 0.35, 50, 8, 18);
+
+	//Find the surface area
+	float	radius = extents[0] * extents[1];
+	//int	splashes = clamp ( radius / 128.0f, 1, 2 );	//One splash for every three square feet of area
+
+	//Msg( "Speed: %.2f, Size: %.2f\n, Radius: %.2f, Splashes: %d", speed, size, radius, splashes );
+
+	Vector point;
+
+	data.m_fFlags = 0;
+	data.m_vOrigin = centerPoint;
+	data.m_vNormal = normal;
+	VectorAngles(normal, data.m_vAngles);
+	data.m_flScale = size + random->RandomFloat(0, 2);
+	if (pEntity->GetWaterType() & CONTENTS_SLIME)
+	{
+		data.m_fFlags |= FX_WATER_IN_SLIME;
+	}
+
+	if (bRippleOnly)
+	{
+		DispatchEffect("waterripple", data);
+	}
+	else
+	{
+		DispatchEffect("watersplash", data);
+	}
+
+	if (radius > 500.0f)
+	{
+		int splashes = random->RandomInt(1, 4);
+
+		for (int i = 0; i < splashes; i++)
+		{
+			point = RandomVector(-4.0f, 4.0f);
+			point[2] = 0.0f;
+
+			point += corner[i];
+
+			data.m_fFlags = 0;
+			data.m_vOrigin = point;
+			data.m_vNormal = normal;
+			VectorAngles(normal, data.m_vAngles);
+			data.m_flScale = size + random->RandomFloat(-3, 1);
+			if (pEntity->GetWaterType() & CONTENTS_SLIME)
+			{
+				data.m_fFlags |= FX_WATER_IN_SLIME;
+			}
+
+			if (bRippleOnly)
+			{
+				DispatchEffect("waterripple", data);
+			}
+			else
+			{
+				DispatchEffect("watersplash", data);
+			}
+		}
+	}
+
+	/*
+	for ( i = 0; i < splashes; i++ )
+	{
+		point = RandomVector( -8.0f, 8.0f );
+		point[2] = 0.0f;
+
+		point += centerPoint + axes[0] * random->RandomFloat( -1, 1 ) + axes[1] * random->RandomFloat( -1, 1 );
+
+		data.m_vOrigin = point;
+		data.m_vNormal = normal;
+		VectorAngles( normal, data.m_vAngles );
+		data.m_flScale = size + random->RandomFloat( -2, 4 );
+
+		DispatchEffect( "watersplash", data );
+	}
+	*/
+}
 
 void CCollisionEvent::FluidStartTouch( IPhysicsObject *pObject, IPhysicsFluidController *pFluid ) 
 {
@@ -802,385 +1013,6 @@ void CCollisionEvent::FluidEndTouch( IPhysicsObject *pObject, IPhysicsFluidContr
 	pEntity->GetEngineObject()->RemoveEFlags( EFL_TOUCHING_FLUID );
 	pEntity->OnEntityEvent( ENTITY_EVENT_WATER_UNTOUCH, (void*)(intp)pFluid->GetContents() );
 }
-
-class CSkipKeys : public IVPhysicsKeyHandler
-{
-public:
-	virtual void ParseKeyValue( void *pData, const char *pKey, const char *pValue ) {}
-	virtual void SetDefaults( void *pData ) {}
-};
-
-void PhysSolidOverride( solid_t &solid, string_t overrideScript )
-{
-	if ( overrideScript != NULL_STRING)
-	{
-		// parser destroys this data
-		bool collisions = solid.params.enableCollisions;
-
-		char pTmpString[4096];
-
-		// write a header for a solid_t
-		Q_strncpy( pTmpString, "solid { ", sizeof(pTmpString) );
-
-		// suck out the comma delimited tokens and turn them into quoted key/values
-		char szToken[256];
-		const char *pStr = nexttoken(szToken, STRING(overrideScript), ',');
-		while ( szToken[0] != 0 )
-		{
-			Q_strncat( pTmpString, "\"", sizeof(pTmpString), COPY_ALL_CHARACTERS );
-			Q_strncat( pTmpString, szToken, sizeof(pTmpString), COPY_ALL_CHARACTERS );
-			Q_strncat( pTmpString, "\" ", sizeof(pTmpString), COPY_ALL_CHARACTERS );
-			pStr = nexttoken(szToken, pStr, ',');
-		}
-		// terminate the script
-		Q_strncat( pTmpString, "}", sizeof(pTmpString), COPY_ALL_CHARACTERS );
-
-		// parse that sucker
-		IVPhysicsKeyParser *pParse = gEntList.PhysGetCollision()->VPhysicsKeyParserCreate( pTmpString );
-		CSkipKeys tmp;
-		pParse->ParseSolid( &solid, &tmp );
-		gEntList.PhysGetCollision()->VPhysicsKeyParserDestroy( pParse );
-
-		// parser destroys this data
-		solid.params.enableCollisions = collisions;
-	}
-}
-
-float PhysGetEntityMass( CBaseEntity *pEntity )
-{
-	IPhysicsObject *pList[VPHYSICS_MAX_OBJECT_LIST_COUNT];
-	int physCount = pEntity->GetEngineObject()->VPhysicsGetObjectList( pList, ARRAYSIZE(pList) );
-	float otherMass = 0;
-	for ( int i = 0; i < physCount; i++ )
-	{
-		otherMass += pList[i]->GetMass();
-	}
-
-	return otherMass;
-}
-
-static void CallbackHighlight( CBaseEntity *pEntity )
-{
-	pEntity->m_debugOverlays |= OVERLAY_ABSBOX_BIT | OVERLAY_PIVOT_BIT;
-}
-
-static void CallbackReport( CBaseEntity *pEntity )
-{
-	const char *pName = STRING(pEntity->GetEntityName());
-	if ( !Q_strlen(pName) )
-	{
-		pName = STRING(pEntity->GetEngineObject()->GetModelName());
-	}
-	Msg( "%s - %s\n", pEntity->GetClassname(), pName );
-}
-
-CON_COMMAND(physics_highlight_active, "Turns on the absbox for all active physics objects")
-{
-	if ( !UTIL_IsCommandIssuedByServerAdmin() )
-		return;
-
-	gEntList.IterateActivePhysicsEntities( CallbackHighlight );
-}
-
-CON_COMMAND(physics_report_active, "Lists all active physics objects")
-{
-	if ( !UTIL_IsCommandIssuedByServerAdmin() )
-		return;
-
-	gEntList.IterateActivePhysicsEntities( CallbackReport );
-}
-
-CON_COMMAND_F(surfaceprop, "Reports the surface properties at the cursor", FCVAR_CHEAT )
-{
-	if ( !UTIL_IsCommandIssuedByServerAdmin() )
-		return;
-
-	CBasePlayer *pPlayer = UTIL_GetCommandClient();
-
-	trace_t tr;
-	Vector forward;
-	pPlayer->EyeVectors( &forward );
-	UTIL_TraceLine(pPlayer->EyePosition(), pPlayer->EyePosition() + forward * MAX_COORD_RANGE,
-		MASK_SHOT_HULL|CONTENTS_GRATE|CONTENTS_DEBRIS, pPlayer, COLLISION_GROUP_NONE, &tr );
-
-	if ( tr.DidHit() )
-	{
-		const model_t *pModel = modelinfo->GetModel(((CBaseEntity*)tr.m_pEnt)->GetEngineObject()->GetModelIndex() );
-		const char *pModelName = STRING(((CBaseEntity*)tr.m_pEnt)->GetEngineObject()->GetModelName());
-		if ( tr.DidHitWorld() && tr.hitbox > 0 )
-		{
-			ICollideable *pCollide = staticpropmgr->GetStaticPropByIndex( tr.hitbox-1 );
-			pModel = pCollide->GetCollisionModel();
-			pModelName = modelinfo->GetModelName( pModel );
-		}
-		CFmtStr modelStuff;
-		if ( pModel )
-		{
-			modelStuff.sprintf("%s.%s ", modelinfo->IsTranslucent( pModel ) ? "Translucent" : "Opaque", 
-				modelinfo->IsTranslucentTwoPass( pModel ) ? "  Two-pass." : "" );
-		}
-		
-		// Calculate distance to surface that was hit
-		Vector vecVelocity = tr.startpos - tr.endpos;
-		int length = vecVelocity.Length();
-
-		Msg("Hit surface \"%s\" (entity %s, model \"%s\" %s), texture \"%s\"\n", EntityList()->PhysGetProps()->GetPropName( tr.surface.surfaceProps ), ((CBaseEntity*)tr.m_pEnt)->GetClassname(), pModelName, modelStuff.Access(), tr.surface.name);
-		Msg("Distance to surface: %d\n", length );
-	}
-}
-
-static void OutputVPhysicsDebugInfo( CBaseEntity *pEntity )
-{
-	gEntList.OutputVPhysicsDebugInfo(pEntity);
-}
-
-class CConstraintFloodEntry
-{
-public:
-	CConstraintFloodEntry() : isMarked(false), isConstraint(false) {}
-
-	CUtlVector<CBaseEntity *> linkList;
-	bool isMarked;
-	bool isConstraint;
-};
-
-class CConstraintFloodList
-{
-public:
-	CConstraintFloodList()
-	{
-		SetDefLessFunc( m_list );
-		m_list.EnsureCapacity(64);
-		m_entryList.EnsureCapacity(64);
-	}
-
-	bool IsWorldEntity( CBaseEntity *pEnt )
-	{
-		if ( pEnt->entindex()!=-1 )
-			return pEnt->IsWorld();
-		return false;
-	}
-
-	void AddLink( CBaseEntity *pEntity, CBaseEntity *pLink, bool bIsConstraint )
-	{
-		if ( !pEntity || !pLink || IsWorldEntity(pEntity) || IsWorldEntity(pLink) )
-			return;
-		int listIndex = m_list.Find(pEntity);
-		if ( listIndex == m_list.InvalidIndex() )
-		{
-			int entryIndex = m_entryList.AddToTail();
-			m_entryList[entryIndex].isConstraint = bIsConstraint;
-			listIndex = m_list.Insert( pEntity, entryIndex );
-		}
-		int entryIndex = m_list.Element(listIndex);
-		CConstraintFloodEntry &entry = m_entryList.Element(entryIndex);
-		Assert( entry.isConstraint == bIsConstraint );
-		if ( entry.linkList.Find(pLink) < 0 )
-		{
-			entry.linkList.AddToTail( pLink );
-		}
-	}
-
-	void BuildGraphFromEntity( CBaseEntity *pEntity, CUtlVector<CBaseEntity *> &constraintList )
-	{
-		int listIndex = m_list.Find(pEntity);
-		if ( listIndex != m_list.InvalidIndex() )
-		{
-			int entryIndex = m_list.Element(listIndex);
-			CConstraintFloodEntry &entry = m_entryList.Element(entryIndex);
-			if ( !entry.isMarked )
-			{
-				if ( entry.isConstraint )
-				{
-					Assert( constraintList.Find(pEntity) < 0);
-					constraintList.AddToTail( pEntity );
-				}
-				entry.isMarked = true;
-				for ( int i = 0; i < entry.linkList.Count(); i++ )
-				{
-					// now recursively traverse the graph from here
-					BuildGraphFromEntity( entry.linkList[i], constraintList );
-				}
-			}
-		}
-	}
-	CUtlMap<CBaseEntity *, int>	m_list;
-	CUtlVector<CConstraintFloodEntry> m_entryList;
-};
-
-// traverses the graph of attachments (currently supports springs & constraints) starting at an entity
-// Then turns on debug info for each link in the graph (springs/constraints are links)
-static void DebugConstraints( CBaseEntity *pEntity )
-{
-	extern bool GetSpringAttachments( CBaseEntity *pEntity, CBaseEntity *pAttach[2], IPhysicsObject *pAttachVPhysics[2] );
-	extern bool GetConstraintAttachments( CBaseEntity *pEntity, CBaseEntity *pAttach[2], IPhysicsObject *pAttachVPhysics[2] );
-	extern void DebugConstraint(CBaseEntity *pEntity);
-
-	if ( !pEntity )
-		return;
-
-	CBaseEntity *pAttach[2];
-	IPhysicsObject *pAttachVPhysics[2];
-	CConstraintFloodList list;
-
-	for ( CBaseEntity *pList = gEntList.FirstEnt(); pList != NULL; pList = gEntList.NextEnt(pList) )
-	{
-		if ( GetConstraintAttachments(pList, pAttach, pAttachVPhysics) || GetSpringAttachments(pList, pAttach, pAttachVPhysics) )
-		{
-			list.AddLink( pList, pAttach[0], true );
-			list.AddLink( pList, pAttach[1], true );
-			list.AddLink( pAttach[0], pList, false );
-			list.AddLink( pAttach[1], pList, false );
-		}
-	}
-
-	CUtlVector<CBaseEntity *> constraints;
-	list.BuildGraphFromEntity( pEntity, constraints );
-	for ( int i = 0; i < constraints.Count(); i++ )
-	{
-		if ( !GetConstraintAttachments(constraints[i], pAttach, pAttachVPhysics) )
-		{
-			GetSpringAttachments(constraints[i], pAttach, pAttachVPhysics);
-		}
-		const char *pName0 = "world";
-		const char *pName1 = "world";
-		const char *pModel0 = "";
-		const char *pModel1 = "";
-		int index0 = 0;
-		int index1 = 0;
-		if ( pAttach[0] )
-		{
-			pName0 = pAttach[0]->GetClassname();
-			pModel0 = STRING(pAttach[0]->GetEngineObject()->GetModelName());
-			index0 = pAttachVPhysics[0]->GetGameIndex();
-		}
-		if ( pAttach[1] )
-		{
-			pName1 = pAttach[1]->GetClassname();
-			pModel1 = STRING(pAttach[1]->GetEngineObject()->GetModelName());
-			index1 = pAttachVPhysics[1]->GetGameIndex();
-		}
-		Msg("**********************\n%s connects %s(%s:%d) to %s(%s:%d)\n", constraints[i]->GetClassname(), pName0, pModel0, index0, pName1, pModel1, index1 );
-		DebugConstraint(constraints[i]);
-		constraints[i]->m_debugOverlays |= OVERLAY_BBOX_BIT | OVERLAY_TEXT_BIT;
-	}
-}
-
-static void MarkVPhysicsDebug( CBaseEntity *pEntity )
-{
-	if ( pEntity )
-	{
-		IPhysicsObject *pPhysics = pEntity->GetEngineObject()->VPhysicsGetObject();
-		if ( pPhysics )
-		{
-			unsigned short callbacks = pPhysics->GetCallbackFlags();
-			callbacks ^= CALLBACK_MARKED_FOR_TEST;
-			pPhysics->SetCallbackFlags( callbacks );
-		}
-	}
-}
-
-void PhysicsCommand( const CCommand &args, void (*func)( CBaseEntity *pEntity ) )
-{
-	if ( args.ArgC() < 2 )
-	{
-		CBasePlayer *pPlayer = UTIL_GetCommandClient();
-
-		trace_t tr;
-		Vector forward;
-		pPlayer->EyeVectors( &forward );
-		UTIL_TraceLine(pPlayer->EyePosition(), pPlayer->EyePosition() + forward * MAX_COORD_RANGE,
-			MASK_SHOT_HULL|CONTENTS_GRATE|CONTENTS_DEBRIS, pPlayer, COLLISION_GROUP_NONE, &tr );
-
-		if ( tr.DidHit() )
-		{
-			func((CBaseEntity*)tr.m_pEnt );
-		}
-	}
-	else
-	{
-		CBaseEntity *pEnt = NULL;
-		while ( ( pEnt = gEntList.FindEntityGeneric( pEnt, args[1] ) ) != NULL )
-		{
-			func( pEnt );
-		}
-	}
-}
-
-CON_COMMAND(physics_constraints, "Highlights constraint system graph for an entity")
-{
-	if ( !UTIL_IsCommandIssuedByServerAdmin() )
-		return;
-
-	PhysicsCommand( args, DebugConstraints );
-}
-
-CON_COMMAND(physics_debug_entity, "Dumps debug info for an entity")
-{
-	if ( !UTIL_IsCommandIssuedByServerAdmin() )
-		return;
-
-	PhysicsCommand( args, OutputVPhysicsDebugInfo );
-}
-
-CON_COMMAND(physics_select, "Dumps debug info for an entity")
-{
-	if ( !UTIL_IsCommandIssuedByServerAdmin() )
-		return;
-
-	PhysicsCommand( args, MarkVPhysicsDebug );
-}
-
-CON_COMMAND( physics_budget, "Times the cost of each active object" )
-{
-	if ( !UTIL_IsCommandIssuedByServerAdmin() )
-		return;
-
-	gEntList.OutputVPhysicsBudgetInfo();
-}
-
-void PhysAddShadow( CBaseEntity *pEntity )
-{
-	g_pShadowEntities->AddEntity( pEntity );
-}
-
-void PhysRemoveShadow( CBaseEntity *pEntity )
-{
-	g_pShadowEntities->DeleteEntity( pEntity );
-}
-
-bool PhysHasShadow( CBaseEntity *pEntity )
-{
-	EHANDLE hTestEnt = pEntity;
-	entitem_t *pCurrent = g_pShadowEntities->m_pItemList;
-	while( pCurrent )
-	{
-		if( pCurrent->hEnt == hTestEnt )
-		{
-			return true;
-		}
-		pCurrent = pCurrent->pNext;
-	}
-	return false;
-}
-
-void PhysEnableFloating( IPhysicsObject *pObject, bool bEnable )
-{
-	if ( pObject != NULL )
-	{
-		unsigned short flags = pObject->GetCallbackFlags();
-		if ( bEnable )
-		{
-			flags |= CALLBACK_DO_FLUID_SIMULATION;
-		}
-		else
-		{
-			flags &= ~CALLBACK_DO_FLUID_SIMULATION;
-		}
-		pObject->SetCallbackFlags( flags );
-	}
-}
-
 
 //-----------------------------------------------------------------------------
 // CollisionEvent system 
@@ -1354,7 +1186,7 @@ void CCollisionEvent::UpdateRemoveObjects()
 void CCollisionEvent::PostSimulationFrame()
 {
 	UpdateDamageEvents();
-	g_PostSimulationQueue.CallQueued();
+	gEntList.PhysGetPostSimulationQueue().CallQueued();
 	UpdateRemoveObjects();
 }
 
@@ -1363,7 +1195,7 @@ void CCollisionEvent::FlushQueuedOperations()
 	int loopCount = 0;
 	while ( loopCount < 20 )
 	{
-		int count = m_triggerEvents.Count() + m_touchEvents.Count() + m_damageEvents.Count() + m_removeObjects.Count() + g_PostSimulationQueue.Count();
+		int count = m_triggerEvents.Count() + m_touchEvents.Count() + m_damageEvents.Count() + m_removeObjects.Count() + gEntList.PhysGetPostSimulationQueue().Count();
 		if ( !count )
 			break;
 		// testing, if this assert fires it proves we've fixed the crash
@@ -1373,7 +1205,7 @@ void CCollisionEvent::FlushQueuedOperations()
 		loopCount++;
 		UpdateTouchEvents();
 		UpdateDamageEvents();
-		g_PostSimulationQueue.CallQueued();
+		gEntList.PhysGetPostSimulationQueue().CallQueued();
 		UpdateRemoveObjects();
 	}
 }
@@ -1385,7 +1217,7 @@ void CCollisionEvent::FrameUpdate( void )
 	UpdatePenetrateEvents();
 	UpdateFluidEvents();
 	UpdateDamageEvents(); // if there was no PSI in physics, we'll still need to do some of these because collisions are solved in between PSIs
-	g_PostSimulationQueue.CallQueued();
+	gEntList.PhysGetPostSimulationQueue().CallQueued();
 	UpdateRemoveObjects();
 
 	// There are some queued operations that must complete each frame, iterate until these are done
@@ -1898,248 +1730,4 @@ bool CCollisionEvent::GetTriggerEvent( triggerevent_t *pEvent, CBaseEntity *pTri
 }
 
 
-
-
-//-----------------------------------------------------------------------------
-
-
-
-
-ConVar collision_shake_amp("collision_shake_amp", "0.2");
-ConVar collision_shake_freq("collision_shake_freq", "0.5");
-ConVar collision_shake_time("collision_shake_time", "0.5");
-				 
-void PhysCollisionScreenShake( gamevcollisionevent_t *pEvent, int index )
-{
-	int otherIndex = !index;
-	float mass = pEvent->pObjects[index]->GetMass();
-	if ( mass >= VPHYSICS_LARGE_OBJECT_MASS && pEvent->pObjects[otherIndex]->IsStatic() && 
-		!(pEvent->pObjects[index]->GetGameFlags() & FVPHYSICS_PENETRATING) )
-	{
-		mass = clamp(mass, VPHYSICS_LARGE_OBJECT_MASS, 2000.f);
-		if ( pEvent->collisionSpeed > 30 && pEvent->deltaCollisionTime > 0.25f )
-		{
-			Vector vecPos;
-			pEvent->pInternalData->GetContactPoint( vecPos );
-			float impulse = pEvent->collisionSpeed * mass;
-			float amplitude = impulse * (collision_shake_amp.GetFloat() / (30.0f * VPHYSICS_LARGE_OBJECT_MASS));
-			UTIL_ScreenShake( vecPos, amplitude, collision_shake_freq.GetFloat(), collision_shake_time.GetFloat(), amplitude * 60, SHAKE_START );
-		}
-	}
-}
-
-#if HL2_EPISODIC
-// Uses DispatchParticleEffect because, so far as I know, that is the new means of kicking
-// off flinders for this kind of collision. Should this be in g_pEffects instead? 
-void PhysCollisionWarpEffect( gamevcollisionevent_t *pEvent, surfacedata_t *phit )
-{
-	Vector vecPos; 
-	QAngle vecAngles;
-
-	pEvent->pInternalData->GetContactPoint( vecPos );
-	{
-		Vector vecNormal;
-		pEvent->pInternalData->GetSurfaceNormal(vecNormal);
-		VectorAngles( vecNormal, vecAngles );
-	}
-
-	DispatchParticleEffect( "warp_shield_impact", vecPos, vecAngles );
-}
-#endif
-
-void PhysCollisionDust( gamevcollisionevent_t *pEvent, surfacedata_t *phit )
-{
-
-	switch ( phit->game.material )
-	{
-	case CHAR_TEX_SAND:
-	case CHAR_TEX_DIRT:
-
-		if ( pEvent->collisionSpeed < 200.0f )
-			return;
-		
-		break;
-
-	case CHAR_TEX_CONCRETE:
-
-		if ( pEvent->collisionSpeed < 340.0f )
-			return;
-
-		break;
-
-#if HL2_EPISODIC 
-		// this is probably redundant because BaseEntity::VHandleCollision should have already dispatched us elsewhere
-	case CHAR_TEX_WARPSHIELD:
-		PhysCollisionWarpEffect(pEvent,phit);
-		return;
-
-		break;
-#endif
-
-	default:
-		return;
-	}
-
-	//Kick up dust
-	Vector	vecPos, vecVel;
-
-	pEvent->pInternalData->GetContactPoint( vecPos );
-
-	vecVel.Random( -1.0f, 1.0f );
-	vecVel.z = random->RandomFloat( 0.3f, 1.0f );
-	VectorNormalize( vecVel );
-	g_pEffects->Dust( vecPos, vecVel, 8.0f, pEvent->collisionSpeed );
-}
-
-
-
-
-
-
-
-
-
-
-
-void PhysSetEntityGameFlags( CBaseEntity *pEntity, unsigned short flags )
-{
-	IPhysicsObject *pList[VPHYSICS_MAX_OBJECT_LIST_COUNT];
-	int count = pEntity->GetEngineObject()->VPhysicsGetObjectList( pList, ARRAYSIZE(pList) );
-	for ( int i = 0; i < count; i++ )
-	{
-		PhysSetGameFlags( pList[i], flags );
-	}
-}
-
-bool PhysFindOrAddVehicleScript( const char *pScriptName, vehicleparams_t *pParams, vehiclesounds_t *pSounds )
-{
-	return gEntList.FindOrAddVehicleScript(pScriptName, pParams, pSounds);
-}
-
-void PhysFlushVehicleScripts()
-{
-	gEntList.FlushVehicleScripts();
-}
-
-IPhysicsObject *FindPhysicsObjectByName( const char *pName, CBaseEntity *pErrorEntity )
-{
-	if ( !pName || !strlen(pName) )
-		return NULL;
-
-	CBaseEntity *pEntity = NULL;
-	IPhysicsObject *pBestObject = NULL;
-	while (1)
-	{
-		pEntity = gEntList.FindEntityByName( pEntity, pName );
-		if ( !pEntity )
-			break;
-		if ( pEntity->GetEngineObject()->VPhysicsGetObject() )
-		{
-			if ( pBestObject )
-			{
-				const char *pErrorName = pErrorEntity ? pErrorEntity->GetClassname() : "Unknown";
-				Vector origin = pErrorEntity ? pErrorEntity->GetEngineObject()->GetAbsOrigin() : vec3_origin;
-				DevWarning("entity %s at %s has physics attachment to more than one entity with the name %s!!!\n", pErrorName, VecToString(origin), pName );
-				while ( ( pEntity = gEntList.FindEntityByName( pEntity, pName ) ) != NULL )
-				{
-					DevWarning("Found %s\n", pEntity->GetClassname() );
-				}
-				break;
-
-			}
-			pBestObject = pEntity->GetEngineObject()->VPhysicsGetObject();
-		}
-	}
-	return pBestObject;
-}
-
-void CC_AirDensity( const CCommand &args )
-{
-	if ( !gEntList.PhysGetEnv())
-		return;
-
-	if ( args.ArgC() < 2 )
-	{
-		Msg( "air_density <value>\nCurrent air density is %.2f\n", gEntList.PhysGetEnv()->GetAirDensity() );
-	}
-	else
-	{
-		float density = atof( args[1] );
-		gEntList.PhysGetEnv()->SetAirDensity( density );
-	}
-}
-static ConCommand air_density("air_density", CC_AirDensity, "Changes the density of air for drag computations.", FCVAR_CHEAT);
-
-void DebugDrawContactPoints(IPhysicsObject *pPhysics)
-{
-	IPhysicsFrictionSnapshot *pSnapshot = pPhysics->CreateFrictionSnapshot();
-
-	while ( pSnapshot->IsValid() )
-	{
-		Vector pt, normal;
-		pSnapshot->GetContactPoint( pt );
-		pSnapshot->GetSurfaceNormal( normal );
-		NDebugOverlay::Box( pt, -Vector(1,1,1), Vector(1,1,1), 0, 255, 0, 32, 0 );
-		NDebugOverlay::Line( pt, pt - normal * 20, 0, 255, 0, false, 0 );
-		IPhysicsObject *pOther = pSnapshot->GetObject(1);
-		CBaseEntity *pEntity0 = static_cast<CBaseEntity *>(pOther->GetGameData());
-		CFmtStr str("%s (%s): %s [%0.2f]", pEntity0->GetClassname(), STRING(pEntity0->GetEngineObject()->GetModelName()), pEntity0->GetDebugName(), pSnapshot->GetFrictionCoefficient() );
-		NDebugOverlay::Text( pt, str.Access(), false, 0 );
-		pSnapshot->NextFrictionData();
-	}
-	pSnapshot->DeleteAllMarkedContacts( true );
-	pPhysics->DestroyFrictionSnapshot( pSnapshot );
-}
-
-
-
-#if 0
-
-#include "filesystem.h"
-//-----------------------------------------------------------------------------
-// Purpose: This will append a collide to a glview file.  Then you can view the 
-//			collisionmodels with glview.
-// Input  : *pCollide - collision model
-//			&origin - position of the instance of this model
-//			&angles - orientation of instance
-//			*pFilename - output text file
-//-----------------------------------------------------------------------------
-// examples:
-// world:
-//	DumpCollideToGlView( pWorldCollide->solids[0], vec3_origin, vec3_origin, "jaycollide.txt" );
-// static_prop:
-//	DumpCollideToGlView( info.m_pCollide->solids[0], info.m_Origin, info.m_Angles, "jaycollide.txt" );
-//
-//-----------------------------------------------------------------------------
-void DumpCollideToGlView( CPhysCollide *pCollide, const Vector &origin, const QAngle &angles, const char *pFilename )
-{
-	if ( !pCollide )
-		return;
-
-	printf("Writing %s...\n", pFilename );
-	Vector *outVerts;
-	int vertCount = gEntList.PhysGetCollision()->CreateDebugMesh( pCollide, &outVerts );
-	FileHandle_t fp = filesystem->Open( pFilename, "ab" );
-	int triCount = vertCount / 3;
-	int vert = 0;
-	VMatrix tmp = SetupMatrixOrgAngles( origin, angles );
-	int i;
-	for ( i = 0; i < vertCount; i++ )
-	{
-		outVerts[i] = tmp.VMul4x3( outVerts[i] );
-	}
-	for ( i = 0; i < triCount; i++ )
-	{
-		filesystem->FPrintf( fp, "3\n" );
-		filesystem->FPrintf( fp, "%6.3f %6.3f %6.3f 1 0 0\n", outVerts[vert].x, outVerts[vert].y, outVerts[vert].z );
-		vert++;
-		filesystem->FPrintf( fp, "%6.3f %6.3f %6.3f 0 1 0\n", outVerts[vert].x, outVerts[vert].y, outVerts[vert].z );
-		vert++;
-		filesystem->FPrintf( fp, "%6.3f %6.3f %6.3f 0 0 1\n", outVerts[vert].x, outVerts[vert].y, outVerts[vert].z );
-		vert++;
-	}
-	filesystem->Close( fp );
-	gEntList.PhysGetCollision()->DestroyDebugMesh( vertCount, outVerts );
-}
-#endif
 

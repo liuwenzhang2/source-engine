@@ -17,7 +17,7 @@
 #include "player.h"
 #include "gamerules.h"
 //#include "entitylist.h"
-#include "physics.h"
+//#include "physics.h"
 #include "game.h"
 #include "ai_network.h"
 #include "ai_node.h"

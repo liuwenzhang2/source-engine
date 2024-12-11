@@ -19,7 +19,7 @@
 #include "gamerules.h"
 #include "teamplay_gamerules.h"
 //#include "entitylist.h"
-#include "physics.h"
+//#include "physics.h"
 #include "game.h"
 #include "player_resource.h"
 #include "engine/IEngineSound.h"

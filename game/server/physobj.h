@@ -12,7 +12,7 @@
 #endif
 
 #ifndef PHYSICS_H
-#include "physics.h"
+//#include "physics.h"
 #endif
 
 #include "entityoutput.h"

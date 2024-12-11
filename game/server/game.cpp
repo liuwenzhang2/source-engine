@@ -7,7 +7,7 @@
 //=============================================================================//
 #include "cbase.h"
 #include "game.h"
-#include "physics.h"
+//#include "physics.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"

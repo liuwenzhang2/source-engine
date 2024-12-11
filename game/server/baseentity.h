@@ -72,7 +72,7 @@ class IPhysicsShadowController;
 class CBaseCombatCharacter;
 class CTeam;
 class Vector;
-struct gamevcollisionevent_t;
+//struct gamevcollisionevent_t;
 class CBaseAnimating;
 class CBasePlayer;
 class IServerVehicle;
@@ -970,6 +970,7 @@ public:
 	virtual bool	IsViewable( void );					// is this something that would be looked at (model, sprite, etc.)?
 	
 	virtual bool	IsChangeLevelTrigger() { return false; };
+	virtual bool	IsGib() { return false; }
 	virtual const char* GetNewLandmarkName() { return ""; };
 	virtual const char* GetNewMapName() { return ""; };
 

@@ -46,7 +46,7 @@
 #include "ai_speech.h"
 #include "soundenvelope.h"
 #include "usermessages.h"
-#include "physics.h"
+//#include "physics.h"
 #include "igameevents.h"
 #include "EventLog.h"
 #include "datacache/idatacache.h"

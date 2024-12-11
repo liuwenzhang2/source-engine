@@ -16,7 +16,7 @@
 #include "basecombatweapon.h"
 #include "model_types.h"
 #include "player.h"
-#include "physics.h"
+//#include "physics.h"
 #include "baseparticleentity.h"
 #include "ndebugoverlay.h"
 #include "IEffects.h"

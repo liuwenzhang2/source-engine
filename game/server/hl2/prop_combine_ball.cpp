@@ -1025,7 +1025,7 @@ void CPropCombineBall::DoExplosion( )
 
 	if (gEntList.PhysIsInCallback() )
 	{
-		g_PostSimulationQueue.QueueCall( this, &CPropCombineBall::DoExplosion );
+		EntityList()->PhysGetPostSimulationQueue().QueueCall( this, &CPropCombineBall::DoExplosion );
 		return;
 	}
 	// Tell the respawner to make a new one

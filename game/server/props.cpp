@@ -13,7 +13,7 @@
 #include "engine/IEngineSound.h"
 #include "locksounds.h"
 #include "filters.h"
-#include "physics.h"
+//#include "physics.h"
 #include "entityoutput.h"
 #include "vcollide_parse.h"
 #include "studio.h"
@@ -703,7 +703,7 @@ void CBreakableProp::HandleInteractionStick( int index, gamevcollisionevent_t *p
 				vecEmbed *= 8;
 
 				position += vecEmbed;
-				g_PostSimulationQueue.QueueCall( this, &CBreakableProp::StickAtPosition, position, savePosition, angles );
+				EntityList()->PhysGetPostSimulationQueue().QueueCall( this, &CBreakableProp::StickAtPosition, position, savePosition, angles );
 			}
 		}
 	}
@@ -2482,17 +2482,6 @@ END_DATADESC()
 IMPLEMENT_SERVERCLASS_ST( CPhysicsProp, DT_PhysicsProp )
 	SendPropBool( SENDINFO( m_bAwake ) ),
 END_SEND_TABLE()
-
-// external function to tell if this entity is a gib physics prop
-bool PropIsGib( CBaseEntity *pEntity )
-{
-	if ( FClassnameIs(pEntity, "prop_physics") )
-	{
-		CPhysicsProp *pProp = static_cast<CPhysicsProp *>(pEntity);
-		return pProp->IsGib();
-	}
-	return false;
-}
 
 void CPhysicsProp::UpdateOnRemove(void) 
 {

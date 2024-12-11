@@ -118,6 +118,15 @@ ConVar g_ragdoll_maxcount("g_ragdoll_maxcount", "8", FCVAR_REPLICATED);
 #endif
 ConVar g_debug_ragdoll_removal("g_debug_ragdoll_removal", "0", FCVAR_REPLICATED | FCVAR_CHEAT);
 ConVar sv_fullsyncclones("sv_fullsyncclones", "1", FCVAR_CHEAT);
+void TimescaleChanged(IConVar* var, const char* pOldString, float flOldValue)
+{
+	if (gEntList.PhysGetEnv())
+	{
+		gEntList.PhysGetEnv()->ResetSimulationClock();
+	}
+}
+ConVar phys_timescale("phys_timescale", "1", 0, "Scale time for physics", TimescaleChanged);
+ConVar phys_speeds("phys_speeds", "0");
 
 
 //-----------------------------------------------------------------------------
@@ -4875,9 +4884,7 @@ void CEngineObjectInternal::VPhysicsDestroyObject(void)
 {
 	if (m_pPhysicsObject && !m_ragdoll.listCount)
 	{
-#ifndef CLIENT_DLL
-		PhysRemoveShadow(this->m_pOuter);
-#endif
+		gEntList.PhysRemoveShadow(this->m_pOuter);
 		PhysDestroyObject(m_pPhysicsObject, this->m_pOuter);
 		m_pPhysicsObject = NULL;
 	}
@@ -4932,7 +4939,7 @@ void CEngineObjectInternal::VPhysicsSwapObject(IPhysicsObject* pSwap)
 {
 	if (!pSwap)
 	{
-		PhysRemoveShadow(this->m_pOuter);
+		gEntList.PhysRemoveShadow(this->m_pOuter);
 	}
 
 	if (!m_pPhysicsObject)
@@ -6130,7 +6137,7 @@ void CEnginePlayerInternal::VPhysicsDestroyObject()
 	// the aliased objects twice.
 	VPhysicsSetObject(NULL);
 
-	PhysRemoveShadow(this->m_pOuter);
+	gEntList.PhysRemoveShadow(this->m_pOuter);
 
 	if (m_pPhysicsController)
 	{
@@ -6178,7 +6185,7 @@ void CEnginePlayerInternal::SetupVPhysicsShadow(const Vector& vHullMin, const Ve
 	VPhysicsSetObject(m_pShadowStand);
 
 	// tell physics lists I'm a shadow controller object
-	PhysAddShadow(this->m_pOuter);
+	gEntList.PhysAddShadow(this->m_pOuter);
 	m_pPhysicsController = gEntList.PhysGetEnv()->CreatePlayerController(m_pShadowStand);
 	m_pPhysicsController->SetPushMassLimit(350.0f);
 	m_pPhysicsController->SetPushSpeedLimit(50.0f);
@@ -9013,7 +9020,7 @@ void CEngineVehicleInternal::InitializePoseParameters()
 bool CEngineVehicleInternal::ParseVehicleScript(const char* pScriptName, solid_t& solid, vehicleparams_t& vehicle)
 {
 	// Physics keeps a cache of these to share among spawns of vehicles or flush for debugging
-	PhysFindOrAddVehicleScript(pScriptName, &vehicle, NULL);
+	gEntList.FindOrAddVehicleScript(pScriptName, &vehicle, NULL);
 
 	m_debugRadius = vehicle.axles[0].wheels.radius;
 	CalcWheelData(vehicle);
@@ -9152,6 +9159,7 @@ void CEngineVehicleInternal::Spawn()
 	InitializePoseParameters();
 }
 
+extern IPhysicsGameTrace* physgametrace;
 
 //-----------------------------------------------------------------------------
 // Purpose: Initializes the vehicle physics
@@ -9342,108 +9350,6 @@ void CEngineVehicleInternal::Teleport(matrix3x4_t& relativeTransform)
 			pObj->Wake();
 		}
 	//}
-}
-
-#if 1
-// For the #if 0 debug code below!
-#define HL2IVP_FACTOR	METERS_PER_INCH
-#define IVP2HL(x)		(float)(x * (1.0f/HL2IVP_FACTOR))
-#define HL2IVP(x)		(double)(x * HL2IVP_FACTOR)		
-#endif
-
-//-----------------------------------------------------------------------------
-// Debugging methods
-//-----------------------------------------------------------------------------
-void CEngineVehicleInternal::DrawDebugGeometryOverlays()
-{
-	for (int iWheel = 0; iWheel < m_wheelCount; iWheel++)
-	{
-		IPhysicsObject* pWheel = m_pVehicle->GetWheel(iWheel);
-		float radius = pWheel->GetSphereRadius();
-
-		Vector vecPos;
-		QAngle vecRot;
-		pWheel->GetPosition(&vecPos, &vecRot);
-		// draw the physics object position/orientation
-		NDebugOverlay::Sphere(vecPos, vecRot, radius, 0, 255, 0, 0, false, 0);
-		// draw the animation position/orientation
-		NDebugOverlay::Sphere(m_wheelPosition[iWheel], m_wheelRotation[iWheel], radius, 255, 255, 0, 0, false, 0);
-	}
-
-	// Render vehicle data.
-	IPhysicsObject* pBody = VPhysicsGetObject();
-	if (pBody)
-	{
-		const vehicleparams_t vehicleParams = m_pVehicle->GetVehicleParams();
-
-		// Draw a red cube as the "center" of the vehicle.
-		Vector vecBodyPosition;
-		QAngle angBodyDirection;
-		pBody->GetPosition(&vecBodyPosition, &angBodyDirection);
-		NDebugOverlay::BoxAngles(vecBodyPosition, Vector(-5, -5, -5), Vector(5, 5, 5), angBodyDirection, 255, 0, 0, 0, 0);
-
-		matrix3x4_t matrix;
-		AngleMatrix(angBodyDirection, vecBodyPosition, matrix);
-
-		// Draw green cubes at axle centers.
-		Vector vecAxlePositions[2], vecAxlePositionsHL[2];
-		vecAxlePositions[0] = vehicleParams.axles[0].offset;
-		vecAxlePositions[1] = vehicleParams.axles[1].offset;
-
-		VectorTransform(vecAxlePositions[0], matrix, vecAxlePositionsHL[0]);
-		VectorTransform(vecAxlePositions[1], matrix, vecAxlePositionsHL[1]);
-
-		NDebugOverlay::BoxAngles(vecAxlePositionsHL[0], Vector(-3, -3, -3), Vector(3, 3, 3), angBodyDirection, 0, 255, 0, 0, 0);
-		NDebugOverlay::BoxAngles(vecAxlePositionsHL[1], Vector(-3, -3, -3), Vector(3, 3, 3), angBodyDirection, 0, 255, 0, 0, 0);
-
-		// Draw wheel raycasts in yellow
-		vehicle_debugcarsystem_t debugCarSystem;
-		m_pVehicle->GetCarSystemDebugData(debugCarSystem);
-		for (int iWheel = 0; iWheel < 4; ++iWheel)
-		{
-			Vector vecStart, vecEnd, vecImpact;
-
-			// Hack for now.
-			float tmpY = IVP2HL(debugCarSystem.vecWheelRaycasts[iWheel][0].z);
-			vecStart.z = -IVP2HL(debugCarSystem.vecWheelRaycasts[iWheel][0].y);
-			vecStart.y = tmpY;
-			vecStart.x = IVP2HL(debugCarSystem.vecWheelRaycasts[iWheel][0].x);
-
-			tmpY = IVP2HL(debugCarSystem.vecWheelRaycasts[iWheel][1].z);
-			vecEnd.z = -IVP2HL(debugCarSystem.vecWheelRaycasts[iWheel][1].y);
-			vecEnd.y = tmpY;
-			vecEnd.x = IVP2HL(debugCarSystem.vecWheelRaycasts[iWheel][1].x);
-
-			tmpY = IVP2HL(debugCarSystem.vecWheelRaycastImpacts[iWheel].z);
-			vecImpact.z = -IVP2HL(debugCarSystem.vecWheelRaycastImpacts[iWheel].y);
-			vecImpact.y = tmpY;
-			vecImpact.x = IVP2HL(debugCarSystem.vecWheelRaycastImpacts[iWheel].x);
-
-			NDebugOverlay::BoxAngles(vecStart, Vector(-1, -1, -1), Vector(1, 1, 1), angBodyDirection, 0, 255, 0, 0, 0);
-			NDebugOverlay::Line(vecStart, vecEnd, 255, 255, 0, true, 0);
-			NDebugOverlay::BoxAngles(vecEnd, Vector(-1, -1, -1), Vector(1, 1, 1), angBodyDirection, 255, 0, 0, 0, 0);
-
-			NDebugOverlay::BoxAngles(vecImpact, Vector(-0.5f, -0.5f, -0.5f), Vector(0.5f, 0.5f, 0.5f), angBodyDirection, 0, 0, 255, 0, 0);
-			DebugDrawContactPoints(m_pVehicle->GetWheel(iWheel));
-		}
-	}
-}
-
-int CEngineVehicleInternal::DrawDebugTextOverlays(int nOffset)
-{
-	const vehicle_operatingparams_t& params = m_pVehicle->GetOperatingParams();
-	char tempstr[512];
-	Q_snprintf(tempstr, sizeof(tempstr), "Speed %.1f  T/S/B (%.0f/%.0f/%.1f)", params.speed, m_controls.throttle, m_controls.steering, m_controls.brake);
-	m_pOuter->EntityText(nOffset, tempstr, 0);
-	nOffset++;
-	Msg("%s", tempstr);
-
-	Q_snprintf(tempstr, sizeof(tempstr), "Gear: %d, RPM %4d", params.gear, (int)params.engineRPM);
-	m_pOuter->EntityText(nOffset, tempstr, 0);
-	nOffset++;
-	Msg(" %s\n", tempstr);
-
-	return nOffset;
 }
 
 //----------------------------------------------------

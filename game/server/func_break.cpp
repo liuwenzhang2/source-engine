@@ -12,7 +12,7 @@
 #include "decals.h"
 #include "explode.h"
 #include "in_buttons.h"
-#include "physics.h"
+//#include "physics.h"
 #include "IEffects.h"
 #include "vstdlib/random.h"
 #include "engine/IEngineSound.h"

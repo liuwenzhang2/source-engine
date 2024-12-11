@@ -2860,7 +2860,7 @@ public:
 	void SetLocalPlayer(C_BaseEntity* pBasePlayer);
 
 	IPhysics* Physics() {
-		return physics;
+		return m_physics;
 	}
 
 	IPhysicsEnvironment* PhysGetEnv() {
@@ -3112,7 +3112,7 @@ private:
 
 	C_BaseEntity* m_pLocalPlayer = NULL;
 
-	IPhysics* physics;
+	IPhysics* m_physics;
 	IPhysicsEnvironment* m_pPhysenv = NULL;
 	IPhysicsSurfaceProps* m_pPhysprops = NULL;
 	IPhysicsCollision* m_pPhyscollision = NULL;
@@ -3638,7 +3638,7 @@ bool CClientEntityList<T>::Init()
 	if (!factories.physicsFactory)
 		return false;
 
-	if ((physics = (IPhysics*)factories.physicsFactory(VPHYSICS_INTERFACE_VERSION, NULL)) == NULL ||
+	if ((m_physics = (IPhysics*)factories.physicsFactory(VPHYSICS_INTERFACE_VERSION, NULL)) == NULL ||
 		(m_pPhysprops = (IPhysicsSurfaceProps*)factories.physicsFactory(VPHYSICS_SURFACEPROPS_INTERFACE_VERSION, NULL)) == NULL ||
 		(m_pPhyscollision = (IPhysicsCollision*)factories.physicsFactory(VPHYSICS_COLLISION_INTERFACE_VERSION, NULL)) == NULL)
 	{
@@ -3676,14 +3676,14 @@ extern IPhysicsObject* PhysCreateWorld_Shared(IHandleEntity* pWorld, vcollide_t*
 template<class T>
 void CClientEntityList<T>::LevelInitPostEntity()
 {
-	m_pPhysenv = physics->CreateEnvironment();
+	m_pPhysenv = m_physics->CreateEnvironment();
 	assert(m_pPhysenv);
 //#ifdef PORTAL
 //	physenv_main = physenv;
 //#endif
 	{
 		MEM_ALLOC_CREDIT();
-		m_EntityCollisionHash = physics->CreateObjectPairHash();
+		m_EntityCollisionHash = m_physics->CreateObjectPairHash();
 	}
 
 	// TODO: need to get the right factory function here
@@ -3719,12 +3719,12 @@ void CClientEntityList<T>::LevelShutdownPostEntity()
 	{
 		// environment destroys all objects
 		// entities are gone, so this is safe now
-		physics->DestroyEnvironment(m_pPhysenv);
+		m_physics->DestroyEnvironment(m_pPhysenv);
 	}
-	physics->DestroyObjectPairHash(m_EntityCollisionHash);
+	m_physics->DestroyObjectPairHash(m_EntityCollisionHash);
 	m_EntityCollisionHash = NULL;
 
-	physics->DestroyAllCollisionSets();
+	m_physics->DestroyAllCollisionSets();
 
 	m_pPhysenv = NULL;
 	m_PhysWorldObject = NULL;

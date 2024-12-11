@@ -18,6 +18,7 @@
 #include "isaverestore.h"
 #include "vcollide_parse.h"
 #include "studio.h"
+#include "tier1/callqueue.h"
 
 struct Ray_t;
 class ServerClass;
@@ -607,9 +608,6 @@ public:
 	virtual bool Think() = 0;
 	virtual void PlaceWheelDust(int wheelIndex, bool ignoreSpeed = false) = 0;
 
-	virtual void DrawDebugGeometryOverlays() = 0;
-	virtual int DrawDebugTextOverlays(int nOffset) = 0;
-
 	// Updates the controls based on user input
 	virtual void UpdateDriverControls(CUserCmd* cmd, float flFrameTime) = 0;
 
@@ -641,12 +639,16 @@ public:
 	// Shared code to compute the vehicle view position
 	virtual void GetVehicleViewPosition(const char* pViewAttachment, float flPitchFactor, Vector* pAbsPosition, QAngle* pAbsAngles) = 0;
 
+	virtual int GetWheelCount() = 0;
 	virtual IPhysicsObject* GetWheel(int iWheel) = 0;
+	virtual const Vector& GetWheelPosition(int iWheel) = 0;
+	virtual const QAngle GetWheelRotation(int iWheel) = 0;
 
 	virtual int	GetSpeed() const = 0;
 	virtual int GetMaxSpeed() const = 0;
 	virtual int GetRPM() const = 0;
 	virtual float GetThrottle() const = 0;
+	virtual float GetBrake() const = 0;
 	virtual bool HasBoost() const = 0;
 	virtual int BoostTimeLeft() const = 0;
 	virtual bool IsBoosting(void) = 0;
@@ -728,6 +730,7 @@ public:
 	virtual IPhysicsObjectPairHash* PhysGetEntityCollisionHash() = 0;
 	virtual const objectparams_t& PhysGetDefaultObjectParams() = 0;
 	virtual IPhysicsObject* PhysGetWorldObject() = 0;
+	virtual CCallQueue& PhysGetPostSimulationQueue() = 0;
 
 	virtual void InstallEntityFactory(IEntityFactory* pFactory) = 0;
 	virtual void UninstallEntityFactory(IEntityFactory* pFactory) = 0;

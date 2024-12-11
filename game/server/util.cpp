@@ -2685,6 +2685,577 @@ const char* UTIL_FunctionToName(datamap_t* pMap, inputfunc_t function)
 	return NULL;
 }
 
+class CSkipKeys : public IVPhysicsKeyHandler
+{
+public:
+	virtual void ParseKeyValue(void* pData, const char* pKey, const char* pValue) {}
+	virtual void SetDefaults(void* pData) {}
+};
+
+void PhysSolidOverride(solid_t& solid, string_t overrideScript)
+{
+	if (overrideScript != NULL_STRING)
+	{
+		// parser destroys this data
+		bool collisions = solid.params.enableCollisions;
+
+		char pTmpString[4096];
+
+		// write a header for a solid_t
+		Q_strncpy(pTmpString, "solid { ", sizeof(pTmpString));
+
+		// suck out the comma delimited tokens and turn them into quoted key/values
+		char szToken[256];
+		const char* pStr = nexttoken(szToken, STRING(overrideScript), ',');
+		while (szToken[0] != 0)
+		{
+			Q_strncat(pTmpString, "\"", sizeof(pTmpString), COPY_ALL_CHARACTERS);
+			Q_strncat(pTmpString, szToken, sizeof(pTmpString), COPY_ALL_CHARACTERS);
+			Q_strncat(pTmpString, "\" ", sizeof(pTmpString), COPY_ALL_CHARACTERS);
+			pStr = nexttoken(szToken, pStr, ',');
+		}
+		// terminate the script
+		Q_strncat(pTmpString, "}", sizeof(pTmpString), COPY_ALL_CHARACTERS);
+
+		// parse that sucker
+		IVPhysicsKeyParser* pParse = gEntList.PhysGetCollision()->VPhysicsKeyParserCreate(pTmpString);
+		CSkipKeys tmp;
+		pParse->ParseSolid(&solid, &tmp);
+		gEntList.PhysGetCollision()->VPhysicsKeyParserDestroy(pParse);
+
+		// parser destroys this data
+		solid.params.enableCollisions = collisions;
+	}
+}
+
+void PhysEnableFloating(IPhysicsObject* pObject, bool bEnable)
+{
+	if (pObject != NULL)
+	{
+		unsigned short flags = pObject->GetCallbackFlags();
+		if (bEnable)
+		{
+			flags |= CALLBACK_DO_FLUID_SIMULATION;
+		}
+		else
+		{
+			flags &= ~CALLBACK_DO_FLUID_SIMULATION;
+		}
+		pObject->SetCallbackFlags(flags);
+	}
+}
+
+ConVar collision_shake_amp("collision_shake_amp", "0.2");
+ConVar collision_shake_freq("collision_shake_freq", "0.5");
+ConVar collision_shake_time("collision_shake_time", "0.5");
+
+void PhysCollisionScreenShake(gamevcollisionevent_t* pEvent, int index)
+{
+	int otherIndex = !index;
+	float mass = pEvent->pObjects[index]->GetMass();
+	if (mass >= VPHYSICS_LARGE_OBJECT_MASS && pEvent->pObjects[otherIndex]->IsStatic() &&
+		!(pEvent->pObjects[index]->GetGameFlags() & FVPHYSICS_PENETRATING))
+	{
+		mass = clamp(mass, VPHYSICS_LARGE_OBJECT_MASS, 2000.f);
+		if (pEvent->collisionSpeed > 30 && pEvent->deltaCollisionTime > 0.25f)
+		{
+			Vector vecPos;
+			pEvent->pInternalData->GetContactPoint(vecPos);
+			float impulse = pEvent->collisionSpeed * mass;
+			float amplitude = impulse * (collision_shake_amp.GetFloat() / (30.0f * VPHYSICS_LARGE_OBJECT_MASS));
+			UTIL_ScreenShake(vecPos, amplitude, collision_shake_freq.GetFloat(), collision_shake_time.GetFloat(), amplitude * 60, SHAKE_START);
+		}
+	}
+}
+
+#if HL2_EPISODIC
+// Uses DispatchParticleEffect because, so far as I know, that is the new means of kicking
+// off flinders for this kind of collision. Should this be in g_pEffects instead? 
+void PhysCollisionWarpEffect(gamevcollisionevent_t* pEvent, surfacedata_t* phit)
+{
+	Vector vecPos;
+	QAngle vecAngles;
+
+	pEvent->pInternalData->GetContactPoint(vecPos);
+	{
+		Vector vecNormal;
+		pEvent->pInternalData->GetSurfaceNormal(vecNormal);
+		VectorAngles(vecNormal, vecAngles);
+	}
+
+	DispatchParticleEffect("warp_shield_impact", vecPos, vecAngles);
+}
+#endif
+
+void PhysCollisionDust(gamevcollisionevent_t* pEvent, surfacedata_t* phit)
+{
+
+	switch (phit->game.material)
+	{
+	case CHAR_TEX_SAND:
+	case CHAR_TEX_DIRT:
+
+		if (pEvent->collisionSpeed < 200.0f)
+			return;
+
+		break;
+
+	case CHAR_TEX_CONCRETE:
+
+		if (pEvent->collisionSpeed < 340.0f)
+			return;
+
+		break;
+
+#if HL2_EPISODIC 
+		// this is probably redundant because BaseEntity::VHandleCollision should have already dispatched us elsewhere
+	case CHAR_TEX_WARPSHIELD:
+		PhysCollisionWarpEffect(pEvent, phit);
+		return;
+
+		break;
+#endif
+
+	default:
+		return;
+	}
+
+	//Kick up dust
+	Vector	vecPos, vecVel;
+
+	pEvent->pInternalData->GetContactPoint(vecPos);
+
+	vecVel.Random(-1.0f, 1.0f);
+	vecVel.z = random->RandomFloat(0.3f, 1.0f);
+	VectorNormalize(vecVel);
+	g_pEffects->Dust(vecPos, vecVel, 8.0f, pEvent->collisionSpeed);
+}
+
+float PhysGetEntityMass(CBaseEntity* pEntity)
+{
+	IPhysicsObject* pList[VPHYSICS_MAX_OBJECT_LIST_COUNT];
+	int physCount = pEntity->GetEngineObject()->VPhysicsGetObjectList(pList, ARRAYSIZE(pList));
+	float otherMass = 0;
+	for (int i = 0; i < physCount; i++)
+	{
+		otherMass += pList[i]->GetMass();
+	}
+
+	return otherMass;
+}
+
+void PhysSetEntityGameFlags(CBaseEntity* pEntity, unsigned short flags)
+{
+	IPhysicsObject* pList[VPHYSICS_MAX_OBJECT_LIST_COUNT];
+	int count = pEntity->GetEngineObject()->VPhysicsGetObjectList(pList, ARRAYSIZE(pList));
+	for (int i = 0; i < count; i++)
+	{
+		PhysSetGameFlags(pList[i], flags);
+	}
+}
+
+void DebugDrawContactPoints(IPhysicsObject* pPhysics)
+{
+	IPhysicsFrictionSnapshot* pSnapshot = pPhysics->CreateFrictionSnapshot();
+
+	while (pSnapshot->IsValid())
+	{
+		Vector pt, normal;
+		pSnapshot->GetContactPoint(pt);
+		pSnapshot->GetSurfaceNormal(normal);
+		NDebugOverlay::Box(pt, -Vector(1, 1, 1), Vector(1, 1, 1), 0, 255, 0, 32, 0);
+		NDebugOverlay::Line(pt, pt - normal * 20, 0, 255, 0, false, 0);
+		IPhysicsObject* pOther = pSnapshot->GetObject(1);
+		CBaseEntity* pEntity0 = static_cast<CBaseEntity*>(pOther->GetGameData());
+		CFmtStr str("%s (%s): %s [%0.2f]", pEntity0->GetClassname(), STRING(pEntity0->GetEngineObject()->GetModelName()), pEntity0->GetDebugName(), pSnapshot->GetFrictionCoefficient());
+		NDebugOverlay::Text(pt, str.Access(), false, 0);
+		pSnapshot->NextFrictionData();
+	}
+	pSnapshot->DeleteAllMarkedContacts(true);
+	pPhysics->DestroyFrictionSnapshot(pSnapshot);
+}
+
+IPhysicsObject* FindPhysicsObjectByName(const char* pName, CBaseEntity* pErrorEntity)
+{
+	if (!pName || !strlen(pName))
+		return NULL;
+
+	CBaseEntity* pEntity = NULL;
+	IPhysicsObject* pBestObject = NULL;
+	while (1)
+	{
+		pEntity = gEntList.FindEntityByName(pEntity, pName);
+		if (!pEntity)
+			break;
+		if (pEntity->GetEngineObject()->VPhysicsGetObject())
+		{
+			if (pBestObject)
+			{
+				const char* pErrorName = pErrorEntity ? pErrorEntity->GetClassname() : "Unknown";
+				Vector origin = pErrorEntity ? pErrorEntity->GetEngineObject()->GetAbsOrigin() : vec3_origin;
+				DevWarning("entity %s at %s has physics attachment to more than one entity with the name %s!!!\n", pErrorName, VecToString(origin), pName);
+				while ((pEntity = gEntList.FindEntityByName(pEntity, pName)) != NULL)
+				{
+					DevWarning("Found %s\n", pEntity->GetClassname());
+				}
+				break;
+
+			}
+			pBestObject = pEntity->GetEngineObject()->VPhysicsGetObject();
+		}
+	}
+	return pBestObject;
+}
+
+static void CallbackHighlight(CBaseEntity* pEntity)
+{
+	pEntity->m_debugOverlays |= OVERLAY_ABSBOX_BIT | OVERLAY_PIVOT_BIT;
+}
+
+CON_COMMAND(physics_highlight_active, "Turns on the absbox for all active physics objects")
+{
+	if (!UTIL_IsCommandIssuedByServerAdmin())
+		return;
+
+	gEntList.IterateActivePhysicsEntities(CallbackHighlight);
+}
+
+static void CallbackReport(CBaseEntity* pEntity)
+{
+	const char* pName = STRING(pEntity->GetEntityName());
+	if (!Q_strlen(pName))
+	{
+		pName = STRING(pEntity->GetEngineObject()->GetModelName());
+	}
+	Msg("%s - %s\n", pEntity->GetClassname(), pName);
+}
+
+CON_COMMAND(physics_report_active, "Lists all active physics objects")
+{
+	if (!UTIL_IsCommandIssuedByServerAdmin())
+		return;
+
+	gEntList.IterateActivePhysicsEntities(CallbackReport);
+}
+
+CON_COMMAND_F(surfaceprop, "Reports the surface properties at the cursor", FCVAR_CHEAT)
+{
+	if (!UTIL_IsCommandIssuedByServerAdmin())
+		return;
+
+	CBasePlayer* pPlayer = UTIL_GetCommandClient();
+
+	trace_t tr;
+	Vector forward;
+	pPlayer->EyeVectors(&forward);
+	UTIL_TraceLine(pPlayer->EyePosition(), pPlayer->EyePosition() + forward * MAX_COORD_RANGE,
+		MASK_SHOT_HULL | CONTENTS_GRATE | CONTENTS_DEBRIS, pPlayer, COLLISION_GROUP_NONE, &tr);
+
+	if (tr.DidHit())
+	{
+		const model_t* pModel = modelinfo->GetModel(((CBaseEntity*)tr.m_pEnt)->GetEngineObject()->GetModelIndex());
+		const char* pModelName = STRING(((CBaseEntity*)tr.m_pEnt)->GetEngineObject()->GetModelName());
+		if (tr.DidHitWorld() && tr.hitbox > 0)
+		{
+			ICollideable* pCollide = staticpropmgr->GetStaticPropByIndex(tr.hitbox - 1);
+			pModel = pCollide->GetCollisionModel();
+			pModelName = modelinfo->GetModelName(pModel);
+		}
+		CFmtStr modelStuff;
+		if (pModel)
+		{
+			modelStuff.sprintf("%s.%s ", modelinfo->IsTranslucent(pModel) ? "Translucent" : "Opaque",
+				modelinfo->IsTranslucentTwoPass(pModel) ? "  Two-pass." : "");
+		}
+
+		// Calculate distance to surface that was hit
+		Vector vecVelocity = tr.startpos - tr.endpos;
+		int length = vecVelocity.Length();
+
+		Msg("Hit surface \"%s\" (entity %s, model \"%s\" %s), texture \"%s\"\n", EntityList()->PhysGetProps()->GetPropName(tr.surface.surfaceProps), ((CBaseEntity*)tr.m_pEnt)->GetClassname(), pModelName, modelStuff.Access(), tr.surface.name);
+		Msg("Distance to surface: %d\n", length);
+	}
+}
+
+class CConstraintFloodEntry
+{
+public:
+	CConstraintFloodEntry() : isMarked(false), isConstraint(false) {}
+
+	CUtlVector<CBaseEntity*> linkList;
+	bool isMarked;
+	bool isConstraint;
+};
+
+class CConstraintFloodList
+{
+public:
+	CConstraintFloodList()
+	{
+		SetDefLessFunc(m_list);
+		m_list.EnsureCapacity(64);
+		m_entryList.EnsureCapacity(64);
+	}
+
+	bool IsWorldEntity(CBaseEntity* pEnt)
+	{
+		if (pEnt->entindex() != -1)
+			return pEnt->IsWorld();
+		return false;
+	}
+
+	void AddLink(CBaseEntity* pEntity, CBaseEntity* pLink, bool bIsConstraint)
+	{
+		if (!pEntity || !pLink || IsWorldEntity(pEntity) || IsWorldEntity(pLink))
+			return;
+		int listIndex = m_list.Find(pEntity);
+		if (listIndex == m_list.InvalidIndex())
+		{
+			int entryIndex = m_entryList.AddToTail();
+			m_entryList[entryIndex].isConstraint = bIsConstraint;
+			listIndex = m_list.Insert(pEntity, entryIndex);
+		}
+		int entryIndex = m_list.Element(listIndex);
+		CConstraintFloodEntry& entry = m_entryList.Element(entryIndex);
+		Assert(entry.isConstraint == bIsConstraint);
+		if (entry.linkList.Find(pLink) < 0)
+		{
+			entry.linkList.AddToTail(pLink);
+		}
+	}
+
+	void BuildGraphFromEntity(CBaseEntity* pEntity, CUtlVector<CBaseEntity*>& constraintList)
+	{
+		int listIndex = m_list.Find(pEntity);
+		if (listIndex != m_list.InvalidIndex())
+		{
+			int entryIndex = m_list.Element(listIndex);
+			CConstraintFloodEntry& entry = m_entryList.Element(entryIndex);
+			if (!entry.isMarked)
+			{
+				if (entry.isConstraint)
+				{
+					Assert(constraintList.Find(pEntity) < 0);
+					constraintList.AddToTail(pEntity);
+				}
+				entry.isMarked = true;
+				for (int i = 0; i < entry.linkList.Count(); i++)
+				{
+					// now recursively traverse the graph from here
+					BuildGraphFromEntity(entry.linkList[i], constraintList);
+				}
+			}
+		}
+	}
+	CUtlMap<CBaseEntity*, int>	m_list;
+	CUtlVector<CConstraintFloodEntry> m_entryList;
+};
+
+void PhysicsCommand(const CCommand& args, void (*func)(CBaseEntity* pEntity))
+{
+	if (args.ArgC() < 2)
+	{
+		CBasePlayer* pPlayer = UTIL_GetCommandClient();
+
+		trace_t tr;
+		Vector forward;
+		pPlayer->EyeVectors(&forward);
+		UTIL_TraceLine(pPlayer->EyePosition(), pPlayer->EyePosition() + forward * MAX_COORD_RANGE,
+			MASK_SHOT_HULL | CONTENTS_GRATE | CONTENTS_DEBRIS, pPlayer, COLLISION_GROUP_NONE, &tr);
+
+		if (tr.DidHit())
+		{
+			func((CBaseEntity*)tr.m_pEnt);
+		}
+	}
+	else
+	{
+		CBaseEntity* pEnt = NULL;
+		while ((pEnt = gEntList.FindEntityGeneric(pEnt, args[1])) != NULL)
+		{
+			func(pEnt);
+		}
+	}
+}
+
+// traverses the graph of attachments (currently supports springs & constraints) starting at an entity
+// Then turns on debug info for each link in the graph (springs/constraints are links)
+static void DebugConstraints(CBaseEntity* pEntity)
+{
+	extern bool GetSpringAttachments(CBaseEntity * pEntity, CBaseEntity * pAttach[2], IPhysicsObject * pAttachVPhysics[2]);
+	extern bool GetConstraintAttachments(CBaseEntity * pEntity, CBaseEntity * pAttach[2], IPhysicsObject * pAttachVPhysics[2]);
+	extern void DebugConstraint(CBaseEntity * pEntity);
+
+	if (!pEntity)
+		return;
+
+	CBaseEntity* pAttach[2];
+	IPhysicsObject* pAttachVPhysics[2];
+	CConstraintFloodList list;
+
+	for (CBaseEntity* pList = gEntList.FirstEnt(); pList != NULL; pList = gEntList.NextEnt(pList))
+	{
+		if (GetConstraintAttachments(pList, pAttach, pAttachVPhysics) || GetSpringAttachments(pList, pAttach, pAttachVPhysics))
+		{
+			list.AddLink(pList, pAttach[0], true);
+			list.AddLink(pList, pAttach[1], true);
+			list.AddLink(pAttach[0], pList, false);
+			list.AddLink(pAttach[1], pList, false);
+		}
+	}
+
+	CUtlVector<CBaseEntity*> constraints;
+	list.BuildGraphFromEntity(pEntity, constraints);
+	for (int i = 0; i < constraints.Count(); i++)
+	{
+		if (!GetConstraintAttachments(constraints[i], pAttach, pAttachVPhysics))
+		{
+			GetSpringAttachments(constraints[i], pAttach, pAttachVPhysics);
+		}
+		const char* pName0 = "world";
+		const char* pName1 = "world";
+		const char* pModel0 = "";
+		const char* pModel1 = "";
+		int index0 = 0;
+		int index1 = 0;
+		if (pAttach[0])
+		{
+			pName0 = pAttach[0]->GetClassname();
+			pModel0 = STRING(pAttach[0]->GetEngineObject()->GetModelName());
+			index0 = pAttachVPhysics[0]->GetGameIndex();
+		}
+		if (pAttach[1])
+		{
+			pName1 = pAttach[1]->GetClassname();
+			pModel1 = STRING(pAttach[1]->GetEngineObject()->GetModelName());
+			index1 = pAttachVPhysics[1]->GetGameIndex();
+		}
+		Msg("**********************\n%s connects %s(%s:%d) to %s(%s:%d)\n", constraints[i]->GetClassname(), pName0, pModel0, index0, pName1, pModel1, index1);
+		DebugConstraint(constraints[i]);
+		constraints[i]->m_debugOverlays |= OVERLAY_BBOX_BIT | OVERLAY_TEXT_BIT;
+	}
+}
+
+CON_COMMAND(physics_constraints, "Highlights constraint system graph for an entity")
+{
+	if (!UTIL_IsCommandIssuedByServerAdmin())
+		return;
+
+	PhysicsCommand(args, DebugConstraints);
+}
+
+static void OutputVPhysicsDebugInfo(CBaseEntity* pEntity)
+{
+	gEntList.OutputVPhysicsDebugInfo(pEntity);
+}
+
+CON_COMMAND(physics_debug_entity, "Dumps debug info for an entity")
+{
+	if (!UTIL_IsCommandIssuedByServerAdmin())
+		return;
+
+	PhysicsCommand(args, OutputVPhysicsDebugInfo);
+}
+
+static void MarkVPhysicsDebug(CBaseEntity* pEntity)
+{
+	if (pEntity)
+	{
+		IPhysicsObject* pPhysics = pEntity->GetEngineObject()->VPhysicsGetObject();
+		if (pPhysics)
+		{
+			unsigned short callbacks = pPhysics->GetCallbackFlags();
+			callbacks ^= CALLBACK_MARKED_FOR_TEST;
+			pPhysics->SetCallbackFlags(callbacks);
+		}
+	}
+}
+
+CON_COMMAND(physics_select, "Dumps debug info for an entity")
+{
+	if (!UTIL_IsCommandIssuedByServerAdmin())
+		return;
+
+	PhysicsCommand(args, MarkVPhysicsDebug);
+}
+
+CON_COMMAND(physics_budget, "Times the cost of each active object")
+{
+	if (!UTIL_IsCommandIssuedByServerAdmin())
+		return;
+
+	gEntList.OutputVPhysicsBudgetInfo();
+}
+
+//-----------------------------------------------------------------------------
+
+void CC_AirDensity(const CCommand& args)
+{
+	if (!gEntList.PhysGetEnv())
+		return;
+
+	if (args.ArgC() < 2)
+	{
+		Msg("air_density <value>\nCurrent air density is %.2f\n", gEntList.PhysGetEnv()->GetAirDensity());
+	}
+	else
+	{
+		float density = atof(args[1]);
+		gEntList.PhysGetEnv()->SetAirDensity(density);
+	}
+}
+static ConCommand air_density("air_density", CC_AirDensity, "Changes the density of air for drag computations.", FCVAR_CHEAT);
+
+#if 0
+
+#include "filesystem.h"
+//-----------------------------------------------------------------------------
+// Purpose: This will append a collide to a glview file.  Then you can view the 
+//			collisionmodels with glview.
+// Input  : *pCollide - collision model
+//			&origin - position of the instance of this model
+//			&angles - orientation of instance
+//			*pFilename - output text file
+//-----------------------------------------------------------------------------
+// examples:
+// world:
+//	DumpCollideToGlView( pWorldCollide->solids[0], vec3_origin, vec3_origin, "jaycollide.txt" );
+// static_prop:
+//	DumpCollideToGlView( info.m_pCollide->solids[0], info.m_Origin, info.m_Angles, "jaycollide.txt" );
+//
+//-----------------------------------------------------------------------------
+void DumpCollideToGlView(CPhysCollide* pCollide, const Vector& origin, const QAngle& angles, const char* pFilename)
+{
+	if (!pCollide)
+		return;
+
+	printf("Writing %s...\n", pFilename);
+	Vector* outVerts;
+	int vertCount = gEntList.PhysGetCollision()->CreateDebugMesh(pCollide, &outVerts);
+	FileHandle_t fp = filesystem->Open(pFilename, "ab");
+	int triCount = vertCount / 3;
+	int vert = 0;
+	VMatrix tmp = SetupMatrixOrgAngles(origin, angles);
+	int i;
+	for (i = 0; i < vertCount; i++)
+	{
+		outVerts[i] = tmp.VMul4x3(outVerts[i]);
+	}
+	for (i = 0; i < triCount; i++)
+	{
+		filesystem->FPrintf(fp, "3\n");
+		filesystem->FPrintf(fp, "%6.3f %6.3f %6.3f 1 0 0\n", outVerts[vert].x, outVerts[vert].y, outVerts[vert].z);
+		vert++;
+		filesystem->FPrintf(fp, "%6.3f %6.3f %6.3f 0 1 0\n", outVerts[vert].x, outVerts[vert].y, outVerts[vert].z);
+		vert++;
+		filesystem->FPrintf(fp, "%6.3f %6.3f %6.3f 0 0 1\n", outVerts[vert].x, outVerts[vert].y, outVerts[vert].z);
+		vert++;
+	}
+	filesystem->Close(fp);
+	gEntList.PhysGetCollision()->DestroyDebugMesh(vertCount, outVerts);
+}
+#endif
+
 //=============================================================================
 //
 // Tests!

@@ -192,6 +192,7 @@ ConVar g_ragdoll_maxcount("g_ragdoll_maxcount", "4", FCVAR_REPLICATED);
 ConVar g_ragdoll_maxcount("g_ragdoll_maxcount", "8", FCVAR_REPLICATED);
 #endif
 ConVar g_debug_ragdoll_removal("g_debug_ragdoll_removal", "0", FCVAR_REPLICATED | FCVAR_CHEAT);
+ConVar	cl_phys_timescale("cl_phys_timescale", "1.0", FCVAR_CHEAT, "Sets the scale of time for client-side physics (ragdolls)");
 
 //-----------------------------------------------------------------------------
 // Portal-specific hack designed to eliminate re-entrancy in touch functions
@@ -4958,9 +4959,6 @@ void C_EngineObjectInternal::VPhysicsDestroyObject(void)
 	}
 	if (m_pPhysicsObject && !m_ragdoll.listCount)
 	{
-#ifndef CLIENT_DLL
-		PhysRemoveShadow(this);
-#endif
 		PhysDestroyObject(m_pPhysicsObject, this->m_pOuter);
 		m_pPhysicsObject = NULL;
 	}

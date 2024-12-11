@@ -109,7 +109,7 @@ void CPropVehicle::Spawn( )
 // This is useful for tuning vehicles or updating old saved game formats
 CON_COMMAND(vehicle_flushscript, "Flush and reload all vehicle scripts")
 {
-	PhysFlushVehicleScripts();
+	gEntList.FlushVehicleScripts();
 	for ( CBaseEntity *pEnt = gEntList.FirstEnt(); pEnt != NULL; pEnt = gEntList.NextEnt(pEnt) )
 	{
 		IServerVehicle *pServerVehicle = pEnt->GetServerVehicle();
@@ -146,6 +146,13 @@ void CPropVehicle::Teleport( const Vector *newPosition, const QAngle *newAngles,
 	GetEngineVehicle()->Teleport( xform );
 }
 
+#if 1
+// For the #if 0 debug code below!
+#define HL2IVP_FACTOR	METERS_PER_INCH
+#define IVP2HL(x)		(float)(x * (1.0f/HL2IVP_FACTOR))
+#define HL2IVP(x)		(double)(x * HL2IVP_FACTOR)		
+#endif
+
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
@@ -153,7 +160,77 @@ void CPropVehicle::DrawDebugGeometryOverlays()
 {
 	if (m_debugOverlays & OVERLAY_BBOX_BIT) 
 	{	
-		GetEngineVehicle()->DrawDebugGeometryOverlays();
+		for (int iWheel = 0; iWheel < GetEngineVehicle()->GetWheelCount(); iWheel++)
+		{
+			IPhysicsObject* pWheel = GetEngineVehicle()->GetWheel(iWheel);
+			float radius = pWheel->GetSphereRadius();
+
+			Vector vecPos;
+			QAngle vecRot;
+			pWheel->GetPosition(&vecPos, &vecRot);
+			// draw the physics object position/orientation
+			NDebugOverlay::Sphere(vecPos, vecRot, radius, 0, 255, 0, 0, false, 0);
+			// draw the animation position/orientation
+			NDebugOverlay::Sphere(GetEngineVehicle()->GetWheelPosition(iWheel), GetEngineVehicle()->GetWheelRotation(iWheel), radius, 255, 255, 0, 0, false, 0);
+		}
+
+		// Render vehicle data.
+		IPhysicsObject* pBody = GetEngineObject()->VPhysicsGetObject();
+		if (pBody)
+		{
+			const vehicleparams_t vehicleParams = GetEngineVehicle()->GetVehicle()->GetVehicleParams();
+
+			// Draw a red cube as the "center" of the vehicle.
+			Vector vecBodyPosition;
+			QAngle angBodyDirection;
+			pBody->GetPosition(&vecBodyPosition, &angBodyDirection);
+			NDebugOverlay::BoxAngles(vecBodyPosition, Vector(-5, -5, -5), Vector(5, 5, 5), angBodyDirection, 255, 0, 0, 0, 0);
+
+			matrix3x4_t matrix;
+			AngleMatrix(angBodyDirection, vecBodyPosition, matrix);
+
+			// Draw green cubes at axle centers.
+			Vector vecAxlePositions[2], vecAxlePositionsHL[2];
+			vecAxlePositions[0] = vehicleParams.axles[0].offset;
+			vecAxlePositions[1] = vehicleParams.axles[1].offset;
+
+			VectorTransform(vecAxlePositions[0], matrix, vecAxlePositionsHL[0]);
+			VectorTransform(vecAxlePositions[1], matrix, vecAxlePositionsHL[1]);
+
+			NDebugOverlay::BoxAngles(vecAxlePositionsHL[0], Vector(-3, -3, -3), Vector(3, 3, 3), angBodyDirection, 0, 255, 0, 0, 0);
+			NDebugOverlay::BoxAngles(vecAxlePositionsHL[1], Vector(-3, -3, -3), Vector(3, 3, 3), angBodyDirection, 0, 255, 0, 0, 0);
+
+			// Draw wheel raycasts in yellow
+			vehicle_debugcarsystem_t debugCarSystem;
+			GetEngineVehicle()->GetVehicle()->GetCarSystemDebugData(debugCarSystem);
+			for (int iWheel = 0; iWheel < 4; ++iWheel)
+			{
+				Vector vecStart, vecEnd, vecImpact;
+
+				// Hack for now.
+				float tmpY = IVP2HL(debugCarSystem.vecWheelRaycasts[iWheel][0].z);
+				vecStart.z = -IVP2HL(debugCarSystem.vecWheelRaycasts[iWheel][0].y);
+				vecStart.y = tmpY;
+				vecStart.x = IVP2HL(debugCarSystem.vecWheelRaycasts[iWheel][0].x);
+
+				tmpY = IVP2HL(debugCarSystem.vecWheelRaycasts[iWheel][1].z);
+				vecEnd.z = -IVP2HL(debugCarSystem.vecWheelRaycasts[iWheel][1].y);
+				vecEnd.y = tmpY;
+				vecEnd.x = IVP2HL(debugCarSystem.vecWheelRaycasts[iWheel][1].x);
+
+				tmpY = IVP2HL(debugCarSystem.vecWheelRaycastImpacts[iWheel].z);
+				vecImpact.z = -IVP2HL(debugCarSystem.vecWheelRaycastImpacts[iWheel].y);
+				vecImpact.y = tmpY;
+				vecImpact.x = IVP2HL(debugCarSystem.vecWheelRaycastImpacts[iWheel].x);
+
+				NDebugOverlay::BoxAngles(vecStart, Vector(-1, -1, -1), Vector(1, 1, 1), angBodyDirection, 0, 255, 0, 0, 0);
+				NDebugOverlay::Line(vecStart, vecEnd, 255, 255, 0, true, 0);
+				NDebugOverlay::BoxAngles(vecEnd, Vector(-1, -1, -1), Vector(1, 1, 1), angBodyDirection, 255, 0, 0, 0, 0);
+
+				NDebugOverlay::BoxAngles(vecImpact, Vector(-0.5f, -0.5f, -0.5f), Vector(0.5f, 0.5f, 0.5f), angBodyDirection, 0, 0, 255, 0, 0);
+				DebugDrawContactPoints(GetEngineVehicle()->GetWheel(iWheel));
+			}
+		}
 	}
 	BaseClass::DrawDebugGeometryOverlays();
 }
@@ -166,7 +243,17 @@ int CPropVehicle::DrawDebugTextOverlays()
 	int nOffset = BaseClass::DrawDebugTextOverlays();
 	if (m_debugOverlays & OVERLAY_TEXT_BIT) 
 	{
-		nOffset = GetEngineVehicle()->DrawDebugTextOverlays( nOffset );
+		const vehicle_operatingparams_t& params = GetEngineVehicle()->GetVehicle()->GetOperatingParams();
+		char tempstr[512];
+		Q_snprintf(tempstr, sizeof(tempstr), "Speed %.1f  T/S/B (%.0f/%.0f/%.1f)", params.speed, GetEngineVehicle()->GetThrottle(), GetEngineVehicle()->GetSteering(), GetEngineVehicle()->GetBrake());
+		EntityText(nOffset, tempstr, 0);
+		nOffset++;
+		Msg("%s", tempstr);
+
+		Q_snprintf(tempstr, sizeof(tempstr), "Gear: %d, RPM %4d", params.gear, (int)params.engineRPM);
+		EntityText(nOffset, tempstr, 0);
+		nOffset++;
+		Msg(" %s\n", tempstr);
 	}
 	return nOffset;
 }

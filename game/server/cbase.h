@@ -148,7 +148,7 @@ class CSound;
 #include "basetempentity.h"
 #include "player.h"
 #include "te.h"
-#include "physics.h"
+//#include "physics.h"
 #include "ndebugoverlay.h"
 #include "recipientfilter.h"
 #include "gamemovement.h"

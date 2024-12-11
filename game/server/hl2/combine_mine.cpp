@@ -11,7 +11,7 @@
 #include "ai_basenpc.h"
 #include "soundent.h"
 #include "explode.h"
-#include "physics.h"
+//#include "physics.h"
 #include "physics_saverestore.h"
 #include "combine_mine.h"
 #include "movevars_shared.h"

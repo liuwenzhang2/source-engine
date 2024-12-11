@@ -8,7 +8,7 @@
 
 #include "cbase.h"
 #include "PortalSimulation.h"
-#include "physics.h"
+//#include "physics.h"
 #include "portal_shareddefs.h"
 #include "StaticCollisionPolyhedronCache.h"
 #include "model_types.h"

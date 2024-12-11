@@ -15,10 +15,10 @@
 #pragma once
 #endif
 
-#include "physics.h"
+//#include "physics.h"
 #include "tier1/callqueue.h"
 
-extern CCallQueue g_PostSimulationQueue;
+//extern CCallQueue g_PostSimulationQueue;
 
 struct damageevent_t
 {

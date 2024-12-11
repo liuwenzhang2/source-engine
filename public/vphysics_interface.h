@@ -18,7 +18,7 @@
 #include "mathlib/vector4d.h"
 #include "vcollide.h"
 #include "basehandle.h"
-
+#include "string_t.h"
 // ------------------------------------------------------------------------------------
 // UNITS:
 // ------------------------------------------------------------------------------------
@@ -1242,6 +1242,81 @@ struct fluidevent_t
 {
 	CBaseHandle		hEntity;
 	float			impactTime;
+};
+
+class CBaseEntity;
+struct gamevcollisionevent_t : public vcollisionevent_t
+{
+	Vector			preVelocity[2];
+	Vector			postVelocity[2];
+	AngularImpulse	preAngularVelocity[2];
+	CBaseEntity* pEntities[2];
+
+	void Init(vcollisionevent_t* pEvent)
+	{
+		*((vcollisionevent_t*)this) = *pEvent;
+		pEntities[0] = NULL;
+		pEntities[1] = NULL;
+	}
+};
+
+struct triggerevent_t
+{
+	CBaseEntity* pTriggerEntity;
+	IPhysicsObject* pTriggerPhysics;
+	CBaseEntity* pEntity;
+	IPhysicsObject* pObject;
+	bool			bStart;
+
+	inline void Init(CBaseEntity* triggerEntity, IPhysicsObject* triggerPhysics, CBaseEntity* entity, IPhysicsObject* object, bool startTouch)
+	{
+		pTriggerEntity = triggerEntity;
+		pTriggerPhysics = triggerPhysics;
+		pEntity = entity;
+		pObject = object;
+		bStart = startTouch;
+	}
+	inline void Clear()
+	{
+		memset(this, 0, sizeof(*this));
+	}
+};
+
+const float VPHYSICS_LARGE_OBJECT_MASS = 500.0f;
+
+struct masscenteroverride_t
+{
+	enum align_type
+	{
+		ALIGN_POINT = 0,
+		ALIGN_AXIS = 1,
+	};
+
+	void Defaults()
+	{
+		entityName = NULL_STRING;
+	}
+
+	void SnapToPoint(string_t name, const Vector& pointWS)
+	{
+		entityName = name;
+		center = pointWS;
+		axis.Init();
+		alignType = ALIGN_POINT;
+	}
+
+	void SnapToAxis(string_t name, const Vector& axisStartWS, const Vector& unitAxisDirWS)
+	{
+		entityName = name;
+		center = axisStartWS;
+		axis = unitAxisDirWS;
+		alignType = ALIGN_AXIS;
+	}
+
+	Vector		center;
+	Vector		axis;
+	int			alignType;
+	string_t	entityName;
 };
 
 #endif // VPHYSICS_INTERFACE_H

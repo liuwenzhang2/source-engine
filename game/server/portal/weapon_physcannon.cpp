@@ -12,7 +12,7 @@
 #include "gamerules.h"
 #include "soundenvelope.h"
 #include "engine/IEngineSound.h"
-#include "physics.h"
+//#include "physics.h"
 #include "in_buttons.h"
 #include "soundent.h"
 #include "IEffects.h"

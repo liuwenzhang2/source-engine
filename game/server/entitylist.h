@@ -31,7 +31,7 @@
 #include "gamestringpool.h"
 #include "util.h"
 #include "debugoverlay_shared.h"
-#include "physics.h"
+//#include "physics.h"
 #include "bone_accessor.h"
 #include "init_factory.h"
 #include "vphysics/performance.h"
@@ -1970,9 +1970,6 @@ public:
 	bool Think();
 	void PlaceWheelDust(int wheelIndex, bool ignoreSpeed = false);
 
-	void DrawDebugGeometryOverlays();
-	int DrawDebugTextOverlays(int nOffset);
-
 	// Updates the controls based on user input
 	void UpdateDriverControls(CUserCmd* cmd, float flFrameTime);
 
@@ -2004,12 +2001,16 @@ public:
 	// Shared code to compute the vehicle view position
 	void GetVehicleViewPosition(const char* pViewAttachment, float flPitchFactor, Vector* pAbsPosition, QAngle* pAbsAngles);
 
+	int				GetWheelCount() { return m_wheelCount; }
 	IPhysicsObject* GetWheel(int iWheel) { return m_pWheels[iWheel]; }
+	const Vector& GetWheelPosition(int iWheel) { return m_wheelPosition[iWheel]; }
+	const QAngle GetWheelRotation(int iWheel) { return m_wheelRotation[iWheel]; }
 
 	int	GetSpeed() const;
 	int GetMaxSpeed() const;
 	int GetRPM() const;
 	float GetThrottle() const;
+	float GetBrake() const;
 	bool HasBoost() const;
 	int BoostTimeLeft() const;
 	bool IsBoosting(void);
@@ -2112,6 +2113,11 @@ inline int CEngineVehicleInternal::GetRPM() const
 inline float CEngineVehicleInternal::GetThrottle() const
 {
 	return m_controls.throttle;
+}
+
+inline float CEngineVehicleInternal::GetBrake() const 
+{
+	return m_controls.brake;
 }
 
 inline bool CEngineVehicleInternal::HasBoost() const
@@ -2308,6 +2314,7 @@ extern void PostSimulation_ImpulseEvent(IPhysicsObject* pObject, const Vector& c
 extern void PostSimulation_SetVelocityEvent(IPhysicsObject* pPhysicsObject, const Vector& vecVelocity);
 extern const objectparams_t g_PhysDefaultObjectParams;
 extern void PhysForceClearVelocity(IPhysicsObject* pPhys);
+extern ConVar phys_timescale;
 
 //-----------------------------------------------------------------------------
 // Purpose: a global list of all the entities in the game.  All iteration through
@@ -2498,7 +2505,7 @@ public:
 	}
 
 	IPhysics* Physics() {
-		return physics;
+		return m_physics;
 	}
 
 	IPhysicsEnvironment* PhysGetEnv() {
@@ -2523,6 +2530,14 @@ public:
 
 	IPhysicsObject* PhysGetWorldObject() {
 		return m_PhysWorldObject;
+	}
+
+	CCallQueue& PhysGetPostSimulationQueue() {
+		return m_PostSimulationQueue;
+	}
+
+	float PhysGetTimeScale() {
+		return phys_timescale.GetFloat();
 	}
 
 	// returns true when processing a callback - so we can defer things that can't be done inside a callback
@@ -2761,13 +2776,13 @@ public:
 	void PhysCallbackImpulse(IPhysicsObject* pPhysicsObject, const Vector& vecCenterForce, const AngularImpulse& vecCenterTorque)
 	{
 		Assert(m_pPhysenv->IsInSimulation());
-		g_PostSimulationQueue.QueueCall(PostSimulation_ImpulseEvent, pPhysicsObject, RefToVal(vecCenterForce), RefToVal(vecCenterTorque));
+		m_PostSimulationQueue.QueueCall(PostSimulation_ImpulseEvent, pPhysicsObject, RefToVal(vecCenterForce), RefToVal(vecCenterTorque));
 	}
 
 	void PhysCallbackSetVelocity(IPhysicsObject* pPhysicsObject, const Vector& vecVelocity)
 	{
 		Assert(m_pPhysenv->IsInSimulation());
-		g_PostSimulationQueue.QueueCall(PostSimulation_SetVelocityEvent, pPhysicsObject, RefToVal(vecVelocity));
+		m_PostSimulationQueue.QueueCall(PostSimulation_SetVelocityEvent, pPhysicsObject, RefToVal(vecVelocity));
 	}
 
 	void PhysGetListOfPenetratingEntities(CBaseEntity* pSearch, CUtlVector<CBaseEntity*>& list)
@@ -2876,6 +2891,31 @@ public:
 				}
 			}
 		}
+	}
+
+	void PhysAddShadow(CBaseEntity* pEntity)
+	{
+		m_pShadowEntities->AddEntity(pEntity);
+	}
+
+	void PhysRemoveShadow(CBaseEntity* pEntity)
+	{
+		m_pShadowEntities->DeleteEntity(pEntity);
+	}
+
+	bool PhysHasShadow(CBaseEntity* pEntity)
+	{
+		EHANDLE hTestEnt = pEntity;
+		entitem_t* pCurrent = m_pShadowEntities->m_pItemList;
+		while (pCurrent)
+		{
+			if (pCurrent->hEnt == hTestEnt)
+			{
+				return true;
+			}
+			pCurrent = pCurrent->pNext;
+		}
+		return false;
 	}
 
 	void OutputVPhysicsBudgetInfo() {
@@ -3080,7 +3120,7 @@ private:
 	int m_iRagdollCount;
 	int m_DestroyImmediateSemaphore = 0;
 
-	IPhysics* physics;
+	IPhysics* m_physics;
 	IPhysicsEnvironment* m_pPhysenv = NULL;
 	IPhysicsSurfaceProps* m_pPhysprops = NULL;
 	IPhysicsCollision* m_pPhyscollision = NULL;
@@ -3091,7 +3131,8 @@ private:
 	CUtlVector<vehiclescript_t>			m_vehicleScripts;
 	bool		m_bPaused;
 	// local variables
-	float g_PhysAverageSimTime;
+	float m_PhysAverageSimTime;
+	CEntityList* m_pShadowEntities = NULL;
 	physicssound::soundlist_t m_impactSounds;
 	CUtlVector<physicssound::breaksound_t> m_breakSounds;
 	CUtlVector<masscenteroverride_t>	m_massCenterOverrides;
@@ -3100,6 +3141,7 @@ private:
 #else
 	CCollisionEvent m_Collisions;
 #endif
+	CCallQueue m_PostSimulationQueue;
 };
 
 extern void PhysParseSurfaceData(class IPhysicsSurfaceProps* pProps, class IFileSystem* pFileSystem);
@@ -3115,7 +3157,7 @@ bool CGlobalEntityList<T>::Init()
 	if (!factories.physicsFactory)
 		return false;
 
-	if ((physics = (IPhysics*)factories.physicsFactory(VPHYSICS_INTERFACE_VERSION, NULL)) == NULL ||
+	if ((m_physics = (IPhysics*)factories.physicsFactory(VPHYSICS_INTERFACE_VERSION, NULL)) == NULL ||
 		(m_pPhyscollision = (IPhysicsCollision*)factories.physicsFactory(VPHYSICS_COLLISION_INTERFACE_VERSION, NULL)) == NULL ||
 		(m_pPhysprops = (IPhysicsSurfaceProps*)factories.physicsFactory(VPHYSICS_SURFACEPROPS_INTERFACE_VERSION, NULL)) == NULL
 		)
@@ -3144,7 +3186,7 @@ extern IPhysicsObject* PhysCreateWorld_Shared(IHandleEntity* pWorld, vcollide_t*
 template<class T>
 void CGlobalEntityList<T>::LevelInitPreEntity()
 {
-	m_pPhysenv = physics->CreateEnvironment();
+	m_pPhysenv = m_physics->CreateEnvironment();
 	physics_performanceparams_t params;
 	params.Defaults();
 	params.maxCollisionsPerObjectPerTimestep = 10;
@@ -3154,7 +3196,7 @@ void CGlobalEntityList<T>::LevelInitPreEntity()
 //	physenv_main = physenv;
 //#endif
 	{
-		m_EntityCollisionHash = physics->CreateObjectPairHash();
+		m_EntityCollisionHash = m_physics->CreateObjectPairHash();
 	}
 	factorylist_t factories;
 	FactoryList_Retrieve(factories);
@@ -3175,12 +3217,12 @@ void CGlobalEntityList<T>::LevelInitPreEntity()
 	m_pPhysenv->SetSimulationTimestep(gpGlobals->interval_per_tick); // 15 ms per tick
 	// HL Game gravity, not real-world gravity
 	m_pPhysenv->SetGravity(Vector(0, 0, -GetCurrentGravity()));
-	g_PhysAverageSimTime = 0;
+	m_PhysAverageSimTime = 0;
 
 	staticpropmgr->CreateVPhysicsRepresentations(m_pPhysenv, g_pSolidSetup, GetBaseEntity(0));
 	m_PhysWorldObject = PhysCreateWorld_Shared(GetBaseEntity(0), modelinfo->GetVCollide(1), g_PhysDefaultObjectParams);
 
-	g_pShadowEntities = new CEntityList;
+	m_pShadowEntities = new CEntityList;
 //#ifdef PORTAL
 //	g_pShadowEntities_Main = g_pShadowEntities;
 //#endif
@@ -3215,18 +3257,18 @@ void CGlobalEntityList<T>::LevelShutdownPostEntity()
 
 	m_Collisions.LevelShutdown();
 
-	physics->DestroyEnvironment(m_pPhysenv);
+	m_physics->DestroyEnvironment(m_pPhysenv);
 	m_pPhysenv = NULL;
 
-	physics->DestroyObjectPairHash(m_EntityCollisionHash);
+	m_physics->DestroyObjectPairHash(m_EntityCollisionHash);
 	m_EntityCollisionHash = NULL;
 
-	physics->DestroyAllCollisionSets();
+	m_physics->DestroyAllCollisionSets();
 
 	m_PhysWorldObject = NULL;
 
-	delete g_pShadowEntities;
-	g_pShadowEntities = NULL;
+	delete m_pShadowEntities;
+	m_pShadowEntities = NULL;
 	m_impactSounds.RemoveAll();
 	m_breakSounds.RemoveAll();
 	m_massCenterOverrides.Purge();
@@ -3324,7 +3366,7 @@ void CGlobalEntityList<T>::PhysFrame(float deltaTime)
 		stackfree(pActiveList);
 	}
 
-	for (pItem = g_pShadowEntities->m_pItemList; pItem; pItem = pItem->pNext)
+	for (pItem = m_pShadowEntities->m_pItemList; pItem; pItem = pItem->pNext)
 	{
 		CBaseEntity* pEntity = pItem->hEnt.Get();
 		if (!pEntity)
@@ -3347,11 +3389,11 @@ void CGlobalEntityList<T>::PhysFrame(float deltaTime)
 
 		if (simRealTime < 0)
 			simRealTime = 0;
-		g_PhysAverageSimTime *= 0.8;
-		g_PhysAverageSimTime += (simRealTime * 0.2);
+		m_PhysAverageSimTime *= 0.8;
+		m_PhysAverageSimTime += (simRealTime * 0.2);
 		if (lastObjectCount != 0 || activeCount != 0)
 		{
-			Msg("Physics: %3d objects, %4.1fms / AVG: %4.1fms\n", activeCount, simRealTime * 1000, g_PhysAverageSimTime * 1000);
+			Msg("Physics: %3d objects, %4.1fms / AVG: %4.1fms\n", activeCount, simRealTime * 1000, m_PhysAverageSimTime * 1000);
 		}
 
 		lastObjectCount = activeCount;

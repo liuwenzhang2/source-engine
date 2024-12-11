@@ -47,7 +47,7 @@
 #include "tier0/vprof.h"
 #include "engine/IEngineTrace.h"
 #include "engine/ivmodelinfo.h"
-#include "physics.h"
+//#include "physics.h"
 #include "usermessages.h"
 #include "gamestringpool.h"
 #include "c_user_message_register.h"

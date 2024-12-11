@@ -9,7 +9,7 @@
 #include "cbase.h"
 #include "basecombatcharacter.h"
 #include "entityoutput.h"
-#include "physics.h"
+//#include "physics.h"
 #include "explode.h"
 #include "collisionutils.h"
 #include "steamjet.h"

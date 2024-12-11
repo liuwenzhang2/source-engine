@@ -423,7 +423,7 @@ void CBaseHelicopter::DoWashPushOnAirboat( CBaseEntity *pAirboat,
 	pAirboat->VPhysicsTakeDamage( CTakeDamageInfo( this, this, vecForce, vecWashOrigin, flWashAmount, DMG_BLAST ) );
 }
 
-
+extern ConVar phys_pushscale;
 //-----------------------------------------------------------------------------
 // Purpose: Push a physics object in our wash. Return false if it's now out of our wash
 //-----------------------------------------------------------------------------

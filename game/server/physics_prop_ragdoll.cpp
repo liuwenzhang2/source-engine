@@ -7,7 +7,7 @@
 #include "cbase.h"
 #include "baseanimating.h"
 #include "studio.h"
-#include "physics.h"
+//#include "physics.h"
 #include "physics_saverestore.h"
 #include "ai_basenpc.h"
 #include "vphysics/constraints.h"

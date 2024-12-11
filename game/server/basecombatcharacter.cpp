@@ -16,7 +16,7 @@
 #include "ammodef.h"
 #include "ndebugoverlay.h"
 #include "player.h"
-#include "physics.h"
+//#include "physics.h"
 #include "engine/IEngineSound.h"
 #include "tier1/strtools.h"
 #include "sendproxy.h"

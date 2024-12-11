@@ -13,7 +13,7 @@
 #include "mathlib/mathlib.h"
 #include "model_types.h"
 #include "datacache/imdlcache.h"
-#include "physics.h"
+//#include "physics.h"
 #include "ndebugoverlay.h"
 #include "tier1/strtools.h"
 #include "npcevent.h"

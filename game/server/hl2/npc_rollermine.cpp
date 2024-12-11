@@ -2120,7 +2120,7 @@ void CNPC_RollerMine::VPhysicsCollision( int index, gamevcollisionevent_t *pEven
 			// clear the flag so we don't queue more than once
 			m_bEmbedOnGroundImpact = false;
 			// call this when physics is done
-			g_PostSimulationQueue.QueueCall( this, &CNPC_RollerMine::EmbedTouch, pOther );
+			EntityList()->PhysGetPostSimulationQueue().QueueCall(this, &CNPC_RollerMine::EmbedTouch, pOther);
 		}
 		return;
 	}

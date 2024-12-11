@@ -10,7 +10,7 @@
 #include "utlpriorityqueue.h"
 #include "utlmap.h"
 #include "isaverestore.h"
-#include "physics.h"
+//#include "physics.h"
 #include "physics_saverestore.h"
 #include "saverestoretypes.h"
 #include "gamestringpool.h"
@@ -114,6 +114,7 @@ END_DATADESC()
 //-----------------------------------------------------------------------------
 // Purpose:	The central manager of physics save/load
 //
+extern IPhysicsGameTrace* physgametrace;
 
 class CPhysSaveRestoreBlockHandler : public CDefSaveRestoreBlockHandler, 
 									 public IPhysSaveRestoreManager

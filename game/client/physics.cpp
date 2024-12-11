@@ -29,11 +29,7 @@
 // file system interface
 extern IFileSystem *filesystem;
 
-ConVar	cl_phys_timescale( "cl_phys_timescale", "1.0", FCVAR_CHEAT, "Sets the scale of time for client-side physics (ragdolls)" );
-
-
 //FIXME: Replicated from server end, consolidate?
-
 
 extern IVEngineClient *engine;
 

@@ -6,7 +6,7 @@
 //===========================================================================//
 
 #include "cbase.h"
-#include "physics.h"
+//#include "physics.h"
 #include "entityoutput.h"
 #include "engine/IEngineSound.h"
 #include "igamesystem.h"

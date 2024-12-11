@@ -17,7 +17,7 @@
 #include "basecombatweapon.h"
 #include "player.h"		// For debug draw sending
 #include "ndebugoverlay.h"
-#include "physics.h"
+//#include "physics.h"
 #include "model_types.h"
 #include "team.h"
 #include "sendproxy.h"

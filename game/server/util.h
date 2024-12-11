@@ -551,4 +551,19 @@ bool UTIL_LoadAndSpawnEntitiesFromScript( CUtlVector <CBaseEntity*> &entities, c
 // Given a vector, clamps the scalar axes to MAX_COORD_FLOAT ranges from worldsize.h
 void UTIL_BoundToWorldSize( Vector *pVecPos );
 
+// parse solid parameter overrides out of a string 
+void PhysSolidOverride(solid_t& solid, string_t overrideScript);
+void PhysEnableFloating(IPhysicsObject* pObject, bool bEnable);
+void PhysCollisionScreenShake(gamevcollisionevent_t* pEvent, int index);
+#if HL2_EPISODIC
+void PhysCollisionWarpEffect(gamevcollisionevent_t* pEvent, surfacedata_t* phit);
+#endif
+void PhysCollisionDust(gamevcollisionevent_t* pEvent, surfacedata_t* phit);
+float PhysGetEntityMass(CBaseEntity* pEntity);
+void PhysSetEntityGameFlags(CBaseEntity* pEntity, unsigned short flags);
+void DebugDrawContactPoints(IPhysicsObject* pPhysics);
+IPhysicsObject* FindPhysicsObjectByName(const char* pName, CBaseEntity* pErrorEntity);
+
+
+
 #endif // UTIL_H

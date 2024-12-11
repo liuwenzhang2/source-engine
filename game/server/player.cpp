@@ -8148,7 +8148,7 @@ void CBasePlayer::VPhysicsShadowUpdate( IPhysicsObject *pPhysics )
 		return;
 	}
 
-	if ( phys_timescale.GetFloat() == 0.0f )
+	if ( gEntList.PhysGetTimeScale() == 0.0f )
 	{
 		physicsUpdated = false;
 	}

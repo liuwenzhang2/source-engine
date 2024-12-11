@@ -7,7 +7,7 @@
 
 #include "cbase.h"
 #include "player.h"
-#include "physics.h"
+//#include "physics.h"
 #include "vcollide_parse.h"
 //#include "entitylist.h"
 #include "physobj.h"
@@ -1141,6 +1141,7 @@ void CPhysImpact::PointAtEntity( void )
 	UTIL_PointAtNamedEntity( this, m_directionEntityName );
 }
 
+extern ConVar phys_pushscale;
 //-----------------------------------------------------------------------------
 // Purpose: 
 // Input  : *pActivator - 
