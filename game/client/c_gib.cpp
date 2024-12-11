@@ -7,7 +7,7 @@
 #include "cbase.h"
 #include "vcollide_parse.h"
 #include "c_gib.h"
-
+#include "physics_shared.h"
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 

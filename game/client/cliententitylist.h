@@ -43,7 +43,6 @@
 #include "usercmd.h"
 #include "engine/ivdebugoverlay.h"
 #include "client_factorylist.h"
-#include "physics_shared.h"
 #include "movevars_shared.h"
 #include "vphysics_sound.h"
 #include "engine/IEngineSound.h"
@@ -3621,6 +3620,8 @@ CClientEntityList<T>::~CClientEntityList(void)
 {
 	Release();
 }
+
+extern void PhysParseSurfaceData(class IPhysicsSurfaceProps* pProps, class IFileSystem* pFileSystem);
 
 template<class T>
 bool CClientEntityList<T>::Init()
