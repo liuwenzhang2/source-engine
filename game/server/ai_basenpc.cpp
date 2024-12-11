@@ -9384,6 +9384,14 @@ void CAI_BaseNPC::ReportAIState( void )
 ConVar ai_report_task_timings_on_limit( "ai_report_task_timings_on_limit", "0", FCVAR_ARCHIVE );
 ConVar ai_think_limit_label( "ai_think_limit_label", "0", FCVAR_ARCHIVE );
 
+bool CAI_BaseNPC::ShouldReportOverThinkLimit()
+{
+	if (GetCurSchedule()) {
+		return true;
+	}
+	return false; 
+}
+
 void CAI_BaseNPC::ReportOverThinkLimit( float time )
 {
 	DevMsg( "%s thinking for %.02fms!!! (%s); r%.2f (c%.2f, pst%.2f, ms%.2f), p-r%.2f, m%.2f\n",

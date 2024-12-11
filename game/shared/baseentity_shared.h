@@ -18,16 +18,7 @@ extern ConVar hl2_episodic;
 
 
 
-//-----------------------------------------------------------------------------
-// For invalidate physics recursive
-//-----------------------------------------------------------------------------
-enum InvalidatePhysicsBits_t
-{
-	POSITION_CHANGED	= 0x1,
-	ANGLES_CHANGED		= 0x2,
-	VELOCITY_CHANGED	= 0x4,
-	ANIMATION_CHANGED	= 0x8,
-};
+
 
 
 #if defined( CLIENT_DLL )
@@ -74,10 +65,10 @@ inline CBaseEntity	*CBaseEntity::GetEffectEntity() const
 // Shared EntityMessage between game and client .dlls
 #define BASEENTITY_MSG_REMOVE_DECALS	1
 
-extern float k_flMaxEntityPosCoord;
-extern float k_flMaxEntityEulerAngle;
-extern float k_flMaxEntitySpeed;
-extern float k_flMaxEntitySpinRate;
+extern const float k_flMaxEntityPosCoord;
+extern const float k_flMaxEntityEulerAngle;
+extern const float k_flMaxEntitySpeed;
+extern const float k_flMaxEntitySpinRate;
 
 inline bool IsEntityCoordinateReasonable ( const vec_t c )
 {

@@ -2060,6 +2060,7 @@ public:
 	CAI_Schedule*		m_interuptSchedule;			// The schedule that was interrupted last
 	int					m_nDebugCurIndex;			// Index used for stepping through AI
 	virtual void		ReportAIState( void );
+	virtual bool		ShouldReportOverThinkLimit();
 	virtual void		ReportOverThinkLimit( float time );
 	void 				DumpTaskTimings();
 	void				DrawDebugGeometryOverlays(void);

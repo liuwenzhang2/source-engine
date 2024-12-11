@@ -20,6 +20,8 @@
 #include "mathlib/vmatrix.h"
 #include "mathlib/polyhedron.h"
 #include "cmodel.h"
+#include "tier1/utldict.h"
+#include "vphysics_interface.h"
 
 #ifdef CLIENT_DLL
 class C_BaseEntity;
@@ -321,6 +323,17 @@ private:
 	}
 
 	CUtlHash< HashEntry >	m_HashTable;
+};
+
+//-----------------------------------------------------------------------------
+// For invalidate physics recursive
+//-----------------------------------------------------------------------------
+enum InvalidatePhysicsBits_t
+{
+	POSITION_CHANGED = 0x1,
+	ANGLES_CHANGED = 0x2,
+	VELOCITY_CHANGED = 0x4,
+	ANIMATION_CHANGED = 0x8,
 };
 
 // These are the types of data that hang off of CBaseEntities and the flag bits used to mark their presence

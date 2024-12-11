@@ -58,4 +58,48 @@
 #include "engine/ivmodelinfo.h"
 #include "gamemovement.h"
 
+abstract_class C_BaseEntityClassList
+{
+public:
+	C_BaseEntityClassList();
+	~C_BaseEntityClassList();
+	virtual void LevelShutdown() = 0;
+
+	C_BaseEntityClassList* m_pNextClassList;
+};
+
+template< class T >
+class C_EntityClassList : public C_BaseEntityClassList
+{
+public:
+	virtual void LevelShutdown() { m_pClassList = NULL; }
+
+	void Insert(T* pEntity)
+	{
+		pEntity->m_pNext = m_pClassList;
+		m_pClassList = pEntity;
+	}
+
+	void Remove(T* pEntity)
+	{
+		T** pPrev = &m_pClassList;
+		T* pCur = *pPrev;
+		while (pCur)
+		{
+			if (pCur == pEntity)
+			{
+				*pPrev = pCur->m_pNext;
+				return;
+			}
+			pPrev = &pCur->m_pNext;
+			pCur = *pPrev;
+		}
+	}
+
+	static T* m_pClassList;
+};
+
+// Maximum size of entity list
+#define INVALID_CLIENTENTITY_HANDLE CBaseHandle( INVALID_EHANDLE_INDEX )
+
 #endif // CBASE_H

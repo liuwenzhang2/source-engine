@@ -79,15 +79,7 @@ extern bool TestEntityTriggerIntersection_Accurate(IEngineObjectServer* pTrigger
 extern ISaveRestoreBlockHandler* GetPhysSaveRestoreBlockHandler();
 extern ISaveRestoreBlockHandler* GetAISaveRestoreBlockHandler();
 
-abstract_class CBaseEntityClassList
-{
-public:
-	CBaseEntityClassList();
-	~CBaseEntityClassList();
-	virtual void LevelShutdownPostEntity() = 0;
 
-	CBaseEntityClassList *m_pNextClassList;
-};
 
 class CAimTargetManager : public IEntityListener<CBaseEntity>
 {
@@ -108,37 +100,6 @@ public:
 
 private:
 	CUtlVector<CBaseEntity*>	m_targetList;
-};
-
-template< class T >
-class CEntityClassList : public CBaseEntityClassList
-{
-public:
-	virtual void LevelShutdownPostEntity()  { m_pClassList = NULL; }
-
-	void Insert( T *pEntity )
-	{
-		pEntity->m_pNext = m_pClassList;
-		m_pClassList = pEntity;
-	}
-
-	void Remove( T *pEntity )
-	{
-		T **pPrev = &m_pClassList;
-		T *pCur = *pPrev;
-		while ( pCur )
-		{
-			if ( pCur == pEntity )
-			{
-				*pPrev = pCur->m_pNext;
-				return;
-			}
-			pPrev = &pCur->m_pNext;
-			pCur = *pPrev;
-		}
-	}
-
-	static T *m_pClassList;
 };
 
 // Derive a class from this if you want to filter entity list searches

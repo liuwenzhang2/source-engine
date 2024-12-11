@@ -12,6 +12,7 @@
 #pragma once
 #endif
 
+#include "baseplayer_shared.h"
 #include "c_playerlocaldata.h"
 #include "c_basecombatcharacter.h"
 #include "PlayerState.h"

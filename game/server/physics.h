@@ -26,7 +26,6 @@ class IPhysicsSpring;
 class IPhysicsSurfaceProps;
 class CTakeDamageInfo;
 class ConVar;
-class CEntityList;
 
 //extern IPhysicsMaterial		*g_Material;
 

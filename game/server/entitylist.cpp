@@ -5,7 +5,8 @@
 // $NoKeywords: $
 //=============================================================================//
 
-#include "cbase.h"
+//#include "cbase.h"
+#include "sendproxy.h"
 #include "entitylist.h"
 #ifdef _WIN32
 #include "typeinfo"
@@ -22,8 +23,7 @@
 #include "UtlSortVector.h"
 #include "tier0/vprof.h"
 #include "mapentities.h"
-#include "client.h"
-#include "ai_initutils.h"
+
 #include "datacache/imdlcache.h"
 #include "positionwatcher.h"
 #include "mapentities_shared.h"
@@ -46,10 +46,8 @@
 #include "rope_helpers.h"
 #include "bone_setup.h"
 #include "ragdoll_shared.h"
-#ifdef HL2_DLL
-#include "npc_playercompanion.h"
-#endif // HL2_DLL
 #include "physics_shared.h"
+#include "player.h"
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
@@ -58,7 +56,6 @@ extern ConVar think_limit;
 
 //extern bool ParseKeyvalue(void* pObject, typedescription_t* pFields, int iNumFields, const char* szKeyName, const char* szValue);
 extern bool ExtractKeyvalue(void* pObject, typedescription_t* pFields, int iNumFields, const char* szKeyName, char* szValue, int iMaxLen);
-void SceneManager_ClientActive(CBasePlayer* player);
 
 CGlobalEntityList<CBaseEntity> gEntList;
 CBaseEntityList<CBaseEntity>* g_pEntityList = &gEntList;
@@ -2019,13 +2016,39 @@ void CEngineObjectInternal::SetAbsVelocity(const Vector& vecAbsVelocity)
 	m_vecVelocity = vNew;
 }
 
+static double s_LastEntityReasonableEmitTime;
+bool CheckEmitReasonablePhysicsSpew()
+{
+
+	// Reported recently?
+	double now = Plat_FloatTime();
+	if (now >= s_LastEntityReasonableEmitTime && now < s_LastEntityReasonableEmitTime + 5.0)
+	{
+		// Already reported recently
+		return false;
+	}
+
+	// Not reported recently.  Report it now
+	s_LastEntityReasonableEmitTime = now;
+	return true;
+}
+
+inline bool IsPositionReasonable(const Vector& v)
+{
+	float r = MAX_COORD_FLOAT;
+	return
+		v.x > -r && v.x < r &&
+		v.y > -r && v.y < r &&
+		v.z > -r && v.z < r;
+}
+
 //-----------------------------------------------------------------------------
 // Methods that modify local physics state, and let us know to compute abs state later
 //-----------------------------------------------------------------------------
 void CEngineObjectInternal::SetLocalOrigin(const Vector& origin)
 {
 	// Safety check against NaN's or really huge numbers
-	if (!IsEntityPositionReasonable(origin))
+	if (!IsPositionReasonable(origin))
 	{
 		if (CheckEmitReasonablePhysicsSpew())
 		{
@@ -2057,6 +2080,15 @@ void CEngineObjectInternal::SetLocalOrigin(const Vector& origin)
 	}
 }
 
+inline bool IsQAngleReasonable(const QAngle& q)
+{
+	float r = 360.0 * 1000.0f;
+	return
+		q.x > -r && q.x < r &&
+		q.y > -r && q.y < r &&
+		q.z > -r && q.z < r;
+}
+
 void CEngineObjectInternal::SetLocalAngles(const QAngle& angles)
 {
 	// NOTE: The angle normalize is a little expensive, but we can save
@@ -2068,7 +2100,7 @@ void CEngineObjectInternal::SetLocalAngles(const QAngle& angles)
 	//QAngle angleNormalize( AngleNormalize( angles.x ), AngleNormalize( angles.y ), AngleNormalize( angles.z ) );
 
 	// Safety check against NaN's or really huge numbers
-	if (!IsEntityQAngleReasonable(angles))
+	if (!IsQAngleReasonable(angles))
 	{
 		if (CheckEmitReasonablePhysicsSpew())
 		{
@@ -2085,6 +2117,29 @@ void CEngineObjectInternal::SetLocalAngles(const QAngle& angles)
 		m_angRotation = angles;
 		SetSimulationTime(gpGlobals->curtime);
 	}
+}
+
+int CheckEntityVelocity(Vector& v)
+{
+	float r = 2000.0f * 2.0f;
+	if (
+		v.x > -r && v.x < r &&
+		v.y > -r && v.y < r &&
+		v.z > -r && v.z < r)
+	{
+		// The usual case.  It's totally reasonable
+		return 1;
+	}
+	float speed = v.Length();
+	if (speed < 2000.0f * 2.0f * 100.0f)
+	{
+		// Sort of suspicious.  Clamp it
+		v *= 2000.0f * 2.0f / speed;
+		return 0;
+	}
+
+	// A terrible, horrible, no good, very bad velocity.
+	return -1;
 }
 
 void CEngineObjectInternal::SetLocalVelocity(const Vector& inVecVelocity)
@@ -3859,17 +3914,16 @@ void CEngineObjectInternal::PhysicsDispatchThink(THINKPTR thinkFunc)
 			}
 #endif
 			// If its an NPC print out the shedule/task that took so long
-			CAI_BaseNPC* pNPC = m_pOuter->MyNPCPointer();
-			if (pNPC && pNPC->GetCurSchedule())
+			if (m_pOuter->ShouldReportOverThinkLimit())
 			{
-				pNPC->ReportOverThinkLimit(time);
+				m_pOuter->ReportOverThinkLimit(time);
 			}
 			else
 			{
 #ifdef _WIN32
-				Msg("%s(%s) thinking for %.02f ms!!!\n", GetClassname(), typeid(m_pOuter).raw_name(), time);
+				Msg("%s(%s) thinking for %.02f ms!!!\n", STRING(GetClassname()), typeid(m_pOuter).raw_name(), time);
 #elif POSIX
-				Msg("%s(%s) thinking for %.02f ms!!!\n", GetClassname(), typeid(m_pOuter).name(), time);
+				Msg("%s(%s) thinking for %.02f ms!!!\n", STRING(GetClassname()), typeid(m_pOuter).name(), time);
 #else
 #error "typeinfo"
 #endif
@@ -5995,12 +6049,11 @@ void CEngineObjectInternal::UpdateStepOrigin()
 			Vector toAbs = GetAbsOrigin() - GetLocalOrigin();
 			if (toAbs.z == 0.0)
 			{
-				CAI_BaseNPC* pNPC = m_pOuter->MyNPCPointer();
 				// FIXME:  There needs to be a default step height somewhere
 				float height = 18.0f;
-				if (pNPC)
+				if (m_pOuter->IsNPC())
 				{
-					height = pNPC->StepHeight();
+					height = m_pOuter->StepHeight();
 				}
 
 				// debounce floor location
@@ -8904,42 +8957,42 @@ BEGIN_DATADESC(CEngineVehicleInternal)
 //	DEFINE_PHYSPTR( m_pVehicle ),
 DEFINE_PHYSPTR(m_pVehicle),
 
-DEFINE_FIELD(m_nSpeed, FIELD_INTEGER),
-DEFINE_FIELD(m_nLastSpeed, FIELD_INTEGER),
-DEFINE_FIELD(m_nRPM, FIELD_INTEGER),
-DEFINE_FIELD(m_fLastBoost, FIELD_FLOAT),
-DEFINE_FIELD(m_nBoostTimeLeft, FIELD_INTEGER),
-DEFINE_FIELD(m_nHasBoost, FIELD_INTEGER),
+	DEFINE_FIELD(m_nSpeed, FIELD_INTEGER),
+	DEFINE_FIELD(m_nLastSpeed, FIELD_INTEGER),
+	DEFINE_FIELD(m_nRPM, FIELD_INTEGER),
+	DEFINE_FIELD(m_fLastBoost, FIELD_FLOAT),
+	DEFINE_FIELD(m_nBoostTimeLeft, FIELD_INTEGER),
+	DEFINE_FIELD(m_nHasBoost, FIELD_INTEGER),
 
-DEFINE_FIELD(m_maxThrottle, FIELD_FLOAT),
-DEFINE_FIELD(m_flMaxRevThrottle, FIELD_FLOAT),
-DEFINE_FIELD(m_flMaxSpeed, FIELD_FLOAT),
-DEFINE_FIELD(m_actionSpeed, FIELD_FLOAT),
+	DEFINE_FIELD(m_maxThrottle, FIELD_FLOAT),
+	DEFINE_FIELD(m_flMaxRevThrottle, FIELD_FLOAT),
+	DEFINE_FIELD(m_flMaxSpeed, FIELD_FLOAT),
+	DEFINE_FIELD(m_actionSpeed, FIELD_FLOAT),
 
-// This has to be handled by the containing class owing to 'owner' issues
-//	DEFINE_PHYSPTR_ARRAY( m_pWheels ),
-DEFINE_PHYSPTR_ARRAY(m_pWheels),
+	// This has to be handled by the containing class owing to 'owner' issues
+	//	DEFINE_PHYSPTR_ARRAY( m_pWheels ),
+	DEFINE_PHYSPTR_ARRAY(m_pWheels),
 
-DEFINE_FIELD(m_wheelCount, FIELD_INTEGER),
+	DEFINE_FIELD(m_wheelCount, FIELD_INTEGER),
 
-DEFINE_ARRAY(m_wheelPosition, FIELD_VECTOR, 4),
-DEFINE_ARRAY(m_wheelRotation, FIELD_VECTOR, 4),
-DEFINE_ARRAY(m_wheelBaseHeight, FIELD_FLOAT, 4),
-DEFINE_ARRAY(m_wheelTotalHeight, FIELD_FLOAT, 4),
-DEFINE_ARRAY(m_poseParameters, FIELD_INTEGER, 12),
-DEFINE_FIELD(m_actionValue, FIELD_FLOAT),
-DEFINE_KEYFIELD(m_actionScale, FIELD_FLOAT, "actionScale"),
-DEFINE_FIELD(m_debugRadius, FIELD_FLOAT),
-DEFINE_FIELD(m_throttleRate, FIELD_FLOAT),
-DEFINE_FIELD(m_throttleStartTime, FIELD_FLOAT),
-DEFINE_FIELD(m_throttleActiveTime, FIELD_FLOAT),
-DEFINE_FIELD(m_turboTimer, FIELD_FLOAT),
+	DEFINE_ARRAY(m_wheelPosition, FIELD_VECTOR, 4),
+	DEFINE_ARRAY(m_wheelRotation, FIELD_VECTOR, 4),
+	DEFINE_ARRAY(m_wheelBaseHeight, FIELD_FLOAT, 4),
+	DEFINE_ARRAY(m_wheelTotalHeight, FIELD_FLOAT, 4),
+	DEFINE_ARRAY(m_poseParameters, FIELD_INTEGER, 12),
+	DEFINE_FIELD(m_actionValue, FIELD_FLOAT),
+	DEFINE_KEYFIELD(m_actionScale, FIELD_FLOAT, "actionScale"),
+	DEFINE_FIELD(m_debugRadius, FIELD_FLOAT),
+	DEFINE_FIELD(m_throttleRate, FIELD_FLOAT),
+	DEFINE_FIELD(m_throttleStartTime, FIELD_FLOAT),
+	DEFINE_FIELD(m_throttleActiveTime, FIELD_FLOAT),
+	DEFINE_FIELD(m_turboTimer, FIELD_FLOAT),
 
-DEFINE_FIELD(m_flVehicleVolume, FIELD_FLOAT),
-DEFINE_FIELD(m_bIsOn, FIELD_BOOLEAN),
-DEFINE_FIELD(m_bLastThrottle, FIELD_BOOLEAN),
-DEFINE_FIELD(m_bLastBoost, FIELD_BOOLEAN),
-DEFINE_FIELD(m_bLastSkid, FIELD_BOOLEAN),
+	DEFINE_FIELD(m_flVehicleVolume, FIELD_FLOAT),
+	DEFINE_FIELD(m_bIsOn, FIELD_BOOLEAN),
+	DEFINE_FIELD(m_bLastThrottle, FIELD_BOOLEAN),
+	DEFINE_FIELD(m_bLastBoost, FIELD_BOOLEAN),
+	DEFINE_FIELD(m_bLastSkid, FIELD_BOOLEAN),
 END_DATADESC()
 
 //-----------------------------------------------------------------------------
@@ -10143,44 +10196,44 @@ int CEngineVehicleInternal::VPhysicsGetObjectList(IPhysicsObject** pList, int li
 }
 
 BEGIN_SEND_TABLE(CEngineRopeInternal, DT_EngineRope)
-SendPropEHandle(SENDINFO(m_hStartPoint)),
-SendPropEHandle(SENDINFO(m_hEndPoint)),
-SendPropInt(SENDINFO(m_iStartAttachment), 5, 0),
-SendPropInt(SENDINFO(m_iEndAttachment), 5, 0),
+	SendPropEHandle(SENDINFO(m_hStartPoint)),
+	SendPropEHandle(SENDINFO(m_hEndPoint)),
+	SendPropInt(SENDINFO(m_iStartAttachment), 5, 0),
+	SendPropInt(SENDINFO(m_iEndAttachment), 5, 0),
 
-SendPropInt(SENDINFO(m_Slack), 12),
-SendPropInt(SENDINFO(m_RopeLength), 15),
-SendPropInt(SENDINFO(m_fLockedPoints), 4, SPROP_UNSIGNED),
-SendPropInt(SENDINFO(m_RopeFlags), ROPE_NUMFLAGS, SPROP_UNSIGNED),
-SendPropInt(SENDINFO(m_nSegments), 4, SPROP_UNSIGNED),
-SendPropBool(SENDINFO(m_bConstrainBetweenEndpoints)),
-SendPropInt(SENDINFO(m_iRopeMaterialModelIndex), 16, SPROP_UNSIGNED),
-SendPropInt(SENDINFO(m_Subdiv), 4, SPROP_UNSIGNED),
+	SendPropInt(SENDINFO(m_Slack), 12),
+	SendPropInt(SENDINFO(m_RopeLength), 15),
+	SendPropInt(SENDINFO(m_fLockedPoints), 4, SPROP_UNSIGNED),
+	SendPropInt(SENDINFO(m_RopeFlags), ROPE_NUMFLAGS, SPROP_UNSIGNED),
+	SendPropInt(SENDINFO(m_nSegments), 4, SPROP_UNSIGNED),
+	SendPropBool(SENDINFO(m_bConstrainBetweenEndpoints)),
+	SendPropInt(SENDINFO(m_iRopeMaterialModelIndex), 16, SPROP_UNSIGNED),
+	SendPropInt(SENDINFO(m_Subdiv), 4, SPROP_UNSIGNED),
 
-SendPropFloat(SENDINFO(m_TextureScale), 10, 0, 0.1f, 10.0f),
-SendPropFloat(SENDINFO(m_Width), 0, SPROP_NOSCALE),
-SendPropFloat(SENDINFO(m_flScrollSpeed), 0, SPROP_NOSCALE),
+	SendPropFloat(SENDINFO(m_TextureScale), 10, 0, 0.1f, 10.0f),
+	SendPropFloat(SENDINFO(m_Width), 0, SPROP_NOSCALE),
+	SendPropFloat(SENDINFO(m_flScrollSpeed), 0, SPROP_NOSCALE),
 END_SEND_TABLE()
 
 BEGIN_DATADESC(CEngineRopeInternal)
-DEFINE_FIELD(m_RopeFlags, FIELD_INTEGER),
-DEFINE_KEYFIELD(m_Slack, FIELD_INTEGER, "Slack"),
-DEFINE_KEYFIELD(m_Width, FIELD_FLOAT, "Width"),
-DEFINE_KEYFIELD(m_TextureScale, FIELD_FLOAT, "TextureScale"),
-DEFINE_FIELD(m_nSegments, FIELD_INTEGER),
-DEFINE_FIELD(m_bConstrainBetweenEndpoints, FIELD_BOOLEAN),
-DEFINE_FIELD(m_strRopeMaterialModel, FIELD_STRING),
-DEFINE_FIELD(m_iRopeMaterialModelIndex, FIELD_MODELINDEX),
-DEFINE_KEYFIELD(m_Subdiv, FIELD_INTEGER, "Subdiv"),
-DEFINE_FIELD(m_RopeLength, FIELD_INTEGER),
-DEFINE_FIELD(m_fLockedPoints, FIELD_INTEGER),
-DEFINE_KEYFIELD(m_flScrollSpeed, FIELD_FLOAT, "ScrollSpeed"),
-DEFINE_FIELD(m_hStartPoint, FIELD_EHANDLE),
-DEFINE_FIELD(m_hEndPoint, FIELD_EHANDLE),
-DEFINE_FIELD(m_iStartAttachment, FIELD_SHORT),
-DEFINE_FIELD(m_iEndAttachment, FIELD_SHORT),
-DEFINE_FIELD(m_bStartPointValid, FIELD_BOOLEAN),
-DEFINE_FIELD(m_bEndPointValid, FIELD_BOOLEAN),
+	DEFINE_FIELD(m_RopeFlags, FIELD_INTEGER),
+	DEFINE_KEYFIELD(m_Slack, FIELD_INTEGER, "Slack"),
+	DEFINE_KEYFIELD(m_Width, FIELD_FLOAT, "Width"),
+	DEFINE_KEYFIELD(m_TextureScale, FIELD_FLOAT, "TextureScale"),
+	DEFINE_FIELD(m_nSegments, FIELD_INTEGER),
+	DEFINE_FIELD(m_bConstrainBetweenEndpoints, FIELD_BOOLEAN),
+	DEFINE_FIELD(m_strRopeMaterialModel, FIELD_STRING),
+	DEFINE_FIELD(m_iRopeMaterialModelIndex, FIELD_MODELINDEX),
+	DEFINE_KEYFIELD(m_Subdiv, FIELD_INTEGER, "Subdiv"),
+	DEFINE_FIELD(m_RopeLength, FIELD_INTEGER),
+	DEFINE_FIELD(m_fLockedPoints, FIELD_INTEGER),
+	DEFINE_KEYFIELD(m_flScrollSpeed, FIELD_FLOAT, "ScrollSpeed"),
+	DEFINE_FIELD(m_hStartPoint, FIELD_EHANDLE),
+	DEFINE_FIELD(m_hEndPoint, FIELD_EHANDLE),
+	DEFINE_FIELD(m_iStartAttachment, FIELD_SHORT),
+	DEFINE_FIELD(m_iEndAttachment, FIELD_SHORT),
+	DEFINE_FIELD(m_bStartPointValid, FIELD_BOOLEAN),
+	DEFINE_FIELD(m_bEndPointValid, FIELD_BOOLEAN),
 END_DATADESC()
 
 IMPLEMENT_SERVERCLASS(CEngineRopeInternal, DT_EngineRope)
@@ -10860,14 +10913,88 @@ void SimThink_EntityChanged(CBaseEntity* pEntity)
 	g_SimThinkManager.EntityChanged(pEntity);
 }
 
-static CBaseEntityClassList* s_pClassLists = NULL;
-CBaseEntityClassList::CBaseEntityClassList()
+CEntityList::CEntityList()
 {
-	m_pNextClassList = s_pClassLists;
-	s_pClassLists = this;
+	m_pItemList = NULL;
+	m_iNumItems = 0;
 }
-CBaseEntityClassList::~CBaseEntityClassList()
+
+CEntityList::~CEntityList()
 {
+	// remove all items from the list
+	entitem_t* next, * e = m_pItemList;
+	while (e != NULL)
+	{
+		next = e->pNext;
+		delete e;
+		e = next;
+	}
+	m_pItemList = NULL;
+}
+
+void CEntityList::AddEntity(CBaseEntity* pEnt)
+{
+	// check if it's already in the list; if not, add it
+	entitem_t* e = m_pItemList;
+	while (e != NULL)
+	{
+		if (e->hEnt == pEnt)
+		{
+			// it's already in the list
+			return;
+		}
+
+		if (e->pNext == NULL)
+		{
+			// we've hit the end of the list, so tack it on
+			e->pNext = new entitem_t;
+			e->pNext->hEnt = pEnt;
+			e->pNext->pNext = NULL;
+			m_iNumItems++;
+			return;
+		}
+
+		e = e->pNext;
+	}
+
+	// empty list
+	m_pItemList = new entitem_t;
+	m_pItemList->hEnt = pEnt;
+	m_pItemList->pNext = NULL;
+	m_iNumItems = 1;
+}
+
+void CEntityList::DeleteEntity(CBaseEntity* pEnt)
+{
+	// find the entry in the list and delete it
+	entitem_t* prev = NULL, * e = m_pItemList;
+	while (e != NULL)
+	{
+		// delete the link if it's the matching entity OR if the link is NULL
+		if (e->hEnt == pEnt || e->hEnt == NULL)
+		{
+			if (prev)
+			{
+				prev->pNext = e->pNext;
+			}
+			else
+			{
+				m_pItemList = e->pNext;
+			}
+
+			delete e;
+			m_iNumItems--;
+
+			// REVISIT: Is this correct?  Is this just here to clean out dead EHANDLEs?
+			// restart the loop
+			e = m_pItemList;
+			prev = NULL;
+			continue;
+		}
+
+		prev = e;
+		e = e->pNext;
+	}
 }
 
 //-----------------------------------------------------------------------------
@@ -11071,20 +11198,7 @@ void CEntityTouchManager::FrameUpdatePostEntityThink()
 	}
 }
 
-class CRespawnEntitiesFilter : public IMapEntityFilter
-{
-public:
-	virtual bool ShouldCreateEntity(const char* pClassname)
-	{
-		// Create everything but the world
-		return Q_stricmp(pClassname, "worldspawn") != 0;
-	}
 
-	virtual CBaseEntity* CreateNextEntity(const char* pClassname)
-	{
-		return gEntList.CreateEntityByName(pClassname);
-	}
-};
 
 // One hook to rule them all...
 // Since most of the little list managers in here only need one or two of the game
@@ -11094,7 +11208,7 @@ class CEntityListSystem : public CAutoGameSystemPerFrame
 public:
 	CEntityListSystem(char const* name) : CAutoGameSystemPerFrame(name)
 	{
-		m_bRespawnAllEntities = false;
+
 	}
 	void LevelInitPreEntity()
 	{
@@ -11102,9 +11216,6 @@ public:
 		g_TouchManager.LevelInitPreEntity();
 		g_AimManager.LevelInitPreEntity();
 		g_SimThinkManager.LevelInitPreEntity();
-#ifdef HL2_DLL
-		OverrideMoveCache_LevelInitPreEntity();
-#endif	// HL2_DLL
 	}
 	void LevelShutdownPreEntity()
 	{
@@ -11115,15 +11226,6 @@ public:
 		g_TouchManager.LevelShutdownPostEntity();
 		g_AimManager.LevelShutdownPostEntity();
 		g_SimThinkManager.LevelShutdownPostEntity();
-#ifdef HL2_DLL
-		OverrideMoveCache_LevelShutdownPostEntity();
-#endif // HL2_DLL
-		CBaseEntityClassList* pClassList = s_pClassLists;
-		while (pClassList)
-		{
-			pClassList->LevelShutdownPostEntity();
-			pClassList = pClassList->m_pNextClassList;
-		}
 	}
 
 	void Update(float frametime)
@@ -11136,71 +11238,10 @@ public:
 		//This is pretty hacky, it's only called on the server so it just calls the update method.
 		gEntList.UpdateRagdolls(0);
 		g_TouchManager.FrameUpdatePostEntityThink();
-
-		if (m_bRespawnAllEntities)
-		{
-			m_bRespawnAllEntities = false;
-
-			// Don't change globalstate owing to deletion here
-			engine->GlobalEntity_EnableStateUpdates(false);
-
-			// Remove all entities
-			int nPlayerIndex = -1;
-			CBaseEntity* pEnt = gEntList.FirstEnt();
-			while (pEnt)
-			{
-				CBaseEntity* pNextEnt = gEntList.NextEnt(pEnt);
-				if (pEnt->IsPlayer())
-				{
-					nPlayerIndex = pEnt->entindex();
-				}
-				if (!pEnt->GetEngineObject()->IsEFlagSet(EFL_KEEP_ON_RECREATE_ENTITIES))
-				{
-					gEntList.DestroyEntity(pEnt);
-				}
-				pEnt = pNextEnt;
-			}
-
-			gEntList.CleanupDeleteList();
-
-			engine->GlobalEntity_EnableStateUpdates(true);
-
-			// Allows us to immediately re-use the edict indices we just freed to avoid edict overflow
-			//engine->AllowImmediateEdictReuse();
-
-			// Reset node counter used during load
-			CNodeEnt::m_nNodeCount = 0;
-
-			CRespawnEntitiesFilter filter;
-			MapEntity_ParseAllEntities(engine->GetMapEntitiesString(), &filter, true);
-
-			// Allocate a CBasePlayer for pev, and call spawn
-			if (nPlayerIndex >= 0)
-			{
-				CBaseEntity* pEdict = gEntList.GetBaseEntity(nPlayerIndex);
-				ClientPutInServer(nPlayerIndex, "unnamed");
-				ClientActive(nPlayerIndex, false);
-
-				CBasePlayer* pPlayer = (CBasePlayer*)pEdict;
-				SceneManager_ClientActive(pPlayer);
-			}
-		}
 	}
-
-	bool m_bRespawnAllEntities;
 };
 
 static CEntityListSystem g_EntityListSystem("CEntityListSystem");
-
-//-----------------------------------------------------------------------------
-// Respawns all entities in the level
-//-----------------------------------------------------------------------------
-void RespawnEntities()
-{
-	g_EntityListSystem.m_bRespawnAllEntities = true;
-}
-
-static ConCommand restart_entities("respawn_entities", RespawnEntities, "Respawn all the entities in the map.", FCVAR_CHEAT | FCVAR_SPONLY);
 
 class CSortedEntityList
 {

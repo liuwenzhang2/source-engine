@@ -793,6 +793,8 @@ public:
 			(this->*GetEngineObject()->GetPfnThink())();
 	};
 
+	virtual bool		ShouldReportOverThinkLimit() { return false; }
+	virtual void		ReportOverThinkLimit(float time) {}
 
 
 
@@ -933,6 +935,7 @@ public:
 	virtual bool			IsTriggered( CBaseEntity *pActivator ) {return true;}
 	virtual bool			IsNPC( void ) const { return false; }
 	CAI_BaseNPC				*MyNPCPointer( void ); 
+	virtual float			StepHeight() const { return 0.0f; }
 	virtual CBaseCombatCharacter *MyCombatCharacterPointer( void ) { return NULL; }
 	virtual INextBot		*MyNextBotPointer( void ) { return NULL; }
 	virtual float			GetDelay( void ) { return 0; }

@@ -84,8 +84,12 @@ OUTPUTS:
 #include "tier1/strtools.h"
 #include "datacache/imdlcache.h"
 #include "env_debughistory.h"
-
+#include "ai_initutils.h"
 #include "tier0/vprof.h"
+#ifdef HL2_DLL
+#include "npc_playercompanion.h"
+#endif // HL2_DLL
+#include "client.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
@@ -1782,90 +1786,131 @@ void entitem_t::operator delete( void *pMem )
 	g_EntListMemPool.Free( pMem );
 }
 
-#include "tier0/memdbgon.h"
-
-
-CEntityList::CEntityList()
+static CBaseEntityClassList* s_pClassLists = NULL;
+CBaseEntityClassList::CBaseEntityClassList()
 {
-	m_pItemList = NULL;
-	m_iNumItems = 0;
+	m_pNextClassList = s_pClassLists;
+	s_pClassLists = this;
+}
+CBaseEntityClassList::~CBaseEntityClassList()
+{
 }
 
-CEntityList::~CEntityList()
+class CRespawnEntitiesFilter : public IMapEntityFilter
 {
-	// remove all items from the list
-	entitem_t *next, *e = m_pItemList;
-	while ( e != NULL )
+public:
+	virtual bool ShouldCreateEntity(const char* pClassname)
 	{
-		next = e->pNext;
-		delete e;
-		e = next;
+		// Create everything but the world
+		return Q_stricmp(pClassname, "worldspawn") != 0;
 	}
-	m_pItemList = NULL;
-}
 
-void CEntityList::AddEntity( CBaseEntity *pEnt )
-{
-	// check if it's already in the list; if not, add it
-	entitem_t *e = m_pItemList;
-	while ( e != NULL )
+	virtual CBaseEntity* CreateNextEntity(const char* pClassname)
 	{
-		if ( e->hEnt == pEnt )
-		{
-			// it's already in the list
-			return;
-		}
-
-		if ( e->pNext == NULL )
-		{
-			// we've hit the end of the list, so tack it on
-			e->pNext = new entitem_t;
-			e->pNext->hEnt = pEnt;
-			e->pNext->pNext = NULL;
-			m_iNumItems++;
-			return;
-		}
-
-		e = e->pNext;
+		return gEntList.CreateEntityByName(pClassname);
 	}
-	
-	// empty list
-	m_pItemList = new entitem_t;
-	m_pItemList->hEnt = pEnt;
-	m_pItemList->pNext = NULL;
-	m_iNumItems = 1;
-}
+};
 
-void CEntityList::DeleteEntity( CBaseEntity *pEnt )
+extern void SceneManager_ClientActive(CBasePlayer* player);
+
+class CBaseSystem : public CAutoGameSystemPerFrame
 {
-	// find the entry in the list and delete it
-	entitem_t *prev = NULL, *e = m_pItemList;
-	while ( e != NULL )
+public:
+	CBaseSystem(char const* name) : CAutoGameSystemPerFrame(name)
 	{
-		// delete the link if it's the matching entity OR if the link is NULL
-		if ( e->hEnt == pEnt || e->hEnt == NULL )
+		m_bRespawnAllEntities = false;
+	}
+	void LevelInitPreEntity()
+	{
+#ifdef HL2_DLL
+		OverrideMoveCache_LevelInitPreEntity();
+#endif	// HL2_DLL
+	}
+	void LevelShutdownPreEntity()
+	{
+
+	}
+	void LevelShutdownPostEntity()
+	{
+#ifdef HL2_DLL
+		OverrideMoveCache_LevelShutdownPostEntity();
+#endif // HL2_DLL
+		CBaseEntityClassList* pClassList = s_pClassLists;
+		while (pClassList)
 		{
-			if ( prev )
+			pClassList->LevelShutdownPostEntity();
+			pClassList = pClassList->m_pNextClassList;
+		}
+	}
+
+	void Update(float frametime)
+	{
+
+	}
+
+	void FrameUpdatePostEntityThink()
+	{
+		if (m_bRespawnAllEntities)
+		{
+			m_bRespawnAllEntities = false;
+
+			// Don't change globalstate owing to deletion here
+			engine->GlobalEntity_EnableStateUpdates(false);
+
+			// Remove all entities
+			int nPlayerIndex = -1;
+			CBaseEntity* pEnt = gEntList.FirstEnt();
+			while (pEnt)
 			{
-				prev->pNext = e->pNext;
+				CBaseEntity* pNextEnt = gEntList.NextEnt(pEnt);
+				if (pEnt->IsPlayer())
+				{
+					nPlayerIndex = pEnt->entindex();
+				}
+				if (!pEnt->GetEngineObject()->IsEFlagSet(EFL_KEEP_ON_RECREATE_ENTITIES))
+				{
+					gEntList.DestroyEntity(pEnt);
+				}
+				pEnt = pNextEnt;
 			}
-			else
+
+			gEntList.CleanupDeleteList();
+
+			engine->GlobalEntity_EnableStateUpdates(true);
+
+			// Allows us to immediately re-use the edict indices we just freed to avoid edict overflow
+			//engine->AllowImmediateEdictReuse();
+
+			// Reset node counter used during load
+			CNodeEnt::m_nNodeCount = 0;
+
+			CRespawnEntitiesFilter filter;
+			MapEntity_ParseAllEntities(engine->GetMapEntitiesString(), &filter, true);
+
+			// Allocate a CBasePlayer for pev, and call spawn
+			if (nPlayerIndex >= 0)
 			{
-				m_pItemList = e->pNext;
+				CBaseEntity* pEdict = gEntList.GetBaseEntity(nPlayerIndex);
+				ClientPutInServer(nPlayerIndex, "unnamed");
+				ClientActive(nPlayerIndex, false);
+
+				CBasePlayer* pPlayer = (CBasePlayer*)pEdict;
+				SceneManager_ClientActive(pPlayer);
 			}
-
-			delete e;
-			m_iNumItems--;
-
-			// REVISIT: Is this correct?  Is this just here to clean out dead EHANDLEs?
-			// restart the loop
-			e = m_pItemList;
-			prev = NULL;
-			continue;
 		}
-
-		prev = e;
-		e = e->pNext;
 	}
+
+	bool m_bRespawnAllEntities;
+};
+
+static CBaseSystem g_BaseSystem("CBaseSystem");
+
+//-----------------------------------------------------------------------------
+// Respawns all entities in the level
+//-----------------------------------------------------------------------------
+void RespawnEntities()
+{
+	g_BaseSystem.m_bRespawnAllEntities = true;
 }
 
+static ConCommand restart_entities("respawn_entities", RespawnEntities, "Respawn all the entities in the map.", FCVAR_CHEAT | FCVAR_SPONLY);

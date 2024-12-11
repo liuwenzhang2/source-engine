@@ -733,6 +733,15 @@ public:
 	
 };
 
+class CPVSNotifyInfo
+{
+public:
+	IPVSNotify* m_pNotify;
+	IClientRenderable* m_pRenderable;
+	unsigned char m_InPVSStatus;				// Combination of the INPVS_ flags.
+	unsigned short m_PVSNotifiersLink;			// Into m_PVSNotifyInfos.
+};
+
 //-----------------------------------------------------------------------------
 // Purpose: Exposes IClientEntity's to engine
 //-----------------------------------------------------------------------------

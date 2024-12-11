@@ -10,7 +10,8 @@
 // Purpose: a global list of all the entities in the game.  All iteration through
 //			entities is done through this object.
 //-----------------------------------------------------------------------------
-#include "cbase.h"
+//#include "cbase.h"
+#include "recvproxy.h"
 #include "tier0/vprof.h"
 #include "cdll_bounded_cvars.h"
 #include "cliententitylist.h"
@@ -36,6 +37,8 @@
 #include "view.h"
 #include "ragdoll_shared.h"
 #include "physics_shared.h"
+#include "c_baseplayer.h"
+#include "basecombatweapon_shared.h"
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
@@ -1040,7 +1043,7 @@ void C_EngineObjectInternal::MarkMessageReceived()
 	m_flLastMessageTime = engine->GetLastTimeStamp();
 }
 
-
+extern IUniformRandomStream* random;
 //-----------------------------------------------------------------------------
 // Purpose: Entity data has been parsed and unpacked.  Now do any necessary decoding, munging
 // Input  : bnewentity - was this entity new in this update packet?

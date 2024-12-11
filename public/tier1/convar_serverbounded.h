@@ -10,6 +10,7 @@
 #pragma once
 #endif
 
+#include "tier1/convar.h"
 
 // This class is used to virtualize a ConVar's value, so the client can restrict its 
 // value while connected to a server. When using this across modules, it's important
