@@ -2017,7 +2017,7 @@ void CEngineObjectInternal::SetAbsVelocity(const Vector& vecAbsVelocity)
 }
 
 static double s_LastEntityReasonableEmitTime;
-bool CheckEmitReasonablePhysicsSpew()
+bool EmitReasonablePhysicsSpew()
 {
 
 	// Reported recently?
@@ -2050,7 +2050,7 @@ void CEngineObjectInternal::SetLocalOrigin(const Vector& origin)
 	// Safety check against NaN's or really huge numbers
 	if (!IsPositionReasonable(origin))
 	{
-		if (CheckEmitReasonablePhysicsSpew())
+		if (EmitReasonablePhysicsSpew())
 		{
 			Warning("Bad SetLocalOrigin(%f,%f,%f) on %s\n", origin.x, origin.y, origin.z, m_pOuter->GetDebugName());
 		}
@@ -2102,7 +2102,7 @@ void CEngineObjectInternal::SetLocalAngles(const QAngle& angles)
 	// Safety check against NaN's or really huge numbers
 	if (!IsQAngleReasonable(angles))
 	{
-		if (CheckEmitReasonablePhysicsSpew())
+		if (EmitReasonablePhysicsSpew())
 		{
 			Warning("Bad SetLocalAngles(%f,%f,%f) on %s\n", angles.x, angles.y, angles.z, m_pOuter->GetDebugName());
 		}
@@ -2119,7 +2119,7 @@ void CEngineObjectInternal::SetLocalAngles(const QAngle& angles)
 	}
 }
 
-int CheckEntityVelocity(Vector& v)
+int CheckVelocity(Vector& v)
 {
 	float r = 2000.0f * 2.0f;
 	if (
@@ -2147,14 +2147,14 @@ void CEngineObjectInternal::SetLocalVelocity(const Vector& inVecVelocity)
 	Vector vecVelocity = inVecVelocity;
 
 	// Safety check against receive a huge impulse, which can explode physics
-	switch (CheckEntityVelocity(vecVelocity))
+	switch (CheckVelocity(vecVelocity))
 	{
 	case -1:
 		Warning("Discarding SetLocalVelocity(%f,%f,%f) on %s\n", vecVelocity.x, vecVelocity.y, vecVelocity.z, m_pOuter->GetDebugName());
 		Assert(false);
 		return;
 	case 0:
-		if (CheckEmitReasonablePhysicsSpew())
+		if (EmitReasonablePhysicsSpew())
 		{
 			Warning("Clamping SetLocalVelocity(%f,%f,%f) on %s\n", inVecVelocity.x, inVecVelocity.y, inVecVelocity.z, m_pOuter->GetDebugName());
 		}
