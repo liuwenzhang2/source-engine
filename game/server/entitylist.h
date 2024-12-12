@@ -2447,6 +2447,7 @@ template<class T>
 class CGlobalEntityList : public CBaseEntityList<T>, public IServerEntityList, public IEntityCallBack
 {
 	friend class CEngineObjectInternal;
+	friend class CEnginePortalInternal;
 	friend class CEngineShadowCloneInternal;
 	typedef CBaseEntityList<T> BaseClass;
 public:
@@ -3269,6 +3270,7 @@ private:
 	CCollisionEvent m_Collisions;
 #endif
 	CCallQueue m_PostSimulationQueue;
+	CUtlVector<CEnginePortalInternal*> m_ActivePortals;
 	CUtlVector<CEngineShadowCloneInternal*> m_ActiveShadowClones;
 };
 

@@ -51,6 +51,8 @@
 #include "prop_combine_ball.h"
 #include "portal_player.h"
 #include "portal/weapon_physcannon.h" //grab controller
+#else
+class CGrabController;
 #endif // PORTAL
 
 // memdbgon must be the last include file in a .cpp file!!!
@@ -8428,11 +8430,12 @@ void CEnginePlayerInternal::SetVCollisionState(const Vector& vecAbsOrigin, const
 CEnginePortalInternal::CEnginePortalInternal(IServerEntityList* pServerEntityList, int iForceEdictIndex, int iSerialNum)
 : CEngineObjectInternal(pServerEntityList, iForceEdictIndex, iSerialNum), m_DataAccess(m_InternalData)
 {
-
+	gEntList.m_ActivePortals.AddToTail(this);
 }
 
-CEnginePortalInternal::~CEnginePortalInternal(){
-	
+CEnginePortalInternal::~CEnginePortalInternal()
+{
+	gEntList.m_ActivePortals.FindAndRemove(this); //also removed in UpdateOnRemove()	
 }
 
 IPhysicsObject* CEnginePortalInternal::VPhysicsGetObject(void) const
