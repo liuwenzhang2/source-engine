@@ -514,7 +514,7 @@ static IPhysicsConstraintGroup *GetRagdollConstraintGroup( IPhysicsObject *pObj 
 	if ( pObj )
 	{
 		CBaseEntity *pEntity = static_cast<CBaseEntity *>(pObj->GetGameData());
-		ragdoll_t *pRagdoll = Ragdoll_GetRagdoll(pEntity);
+		ragdoll_t *pRagdoll = pEntity->GetEngineObject()->GetRagdoll();
 		if ( pRagdoll )
 			return pRagdoll->pGroup;
 	}

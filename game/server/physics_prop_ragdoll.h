@@ -142,7 +142,6 @@ CBaseAnimating *CreateServerRagdollSubmodel( CBaseAnimating *pOwner, const char 
 
 bool Ragdoll_IsPropRagdoll( CBaseEntity *pEntity );
 void Ragdoll_GetAngleOverrideString( char *pOut, int size, CBaseEntity *pEntity );
-ragdoll_t *Ragdoll_GetRagdoll( CBaseEntity *pEntity );
 extern const char* s_pFadeOutContext;
 extern const char* s_pDebrisContext;
 #endif // PHYSICS_PROP_RAGDOLL_H

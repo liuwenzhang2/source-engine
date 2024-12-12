@@ -1133,13 +1133,7 @@ bool Ragdoll_IsPropRagdoll( CBaseEntity *pEntity )
 	return false;
 }
 
-ragdoll_t *Ragdoll_GetRagdoll( CBaseEntity *pEntity )
-{
-	CRagdollProp *pProp = dynamic_cast<CRagdollProp *>(pEntity);
-	if ( pProp )
-		return pProp->GetEngineObject()->GetRagdoll();
-	return NULL;
-}
+
 
 
 
