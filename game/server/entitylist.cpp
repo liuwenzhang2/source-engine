@@ -456,7 +456,7 @@ bool FindMaxContact(IPhysicsObject* pObject, float minForce, IPhysicsObject** pO
 	return false;
 }
 
-CBaseEntity* EntityPhysics_CreateSolver(CBaseEntity* pMovingEntity, CBaseEntity* pPhysicsObject, bool disableCollisions, float separationDuration)
+CBaseEntity* Physics_CreateSolver(CBaseEntity* pMovingEntity, CBaseEntity* pPhysicsObject, bool disableCollisions, float separationDuration)
 {
 	return pMovingEntity->EntityPhysics_CreateSolver(pPhysicsObject, disableCollisions, separationDuration);
 }
@@ -513,7 +513,7 @@ bool CCollisionEvent::ShouldFreezeObject(IPhysicsObject* pObject)
 				{
 					// not a gib, create a solver:
 					// UNDONE: Add a property to override this in gameplay critical scenarios?
-					gEntList.PhysGetPostSimulationQueue().QueueCall(EntityPhysics_CreateSolver, pOther, pEntity, true, 1.0f);
+					gEntList.PhysGetPostSimulationQueue().QueueCall(Physics_CreateSolver, pOther, pEntity, true, 1.0f);
 				}
 			}
 		}
@@ -666,7 +666,7 @@ void CCollisionEvent::UpdatePenetrateEvents(void)
 					pEntity0 = pEntity1;
 					pEntity1 = pTmp;
 				}
-				EntityPhysics_CreateSolver(pEntity0, pEntity1, true, 1.0f);
+				Physics_CreateSolver(pEntity0, pEntity1, true, 1.0f);
 			}
 			// transferred to solver, clear event
 		}

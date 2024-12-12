@@ -2570,15 +2570,6 @@ void CProp_Portal::ReleaseOwnershipOfEntity(CBaseEntity* pEntity, bool bMovingTo
 	MarkAsReleased(pEntity);
 	Assert(GetSimulatorThatOwnsEntity(pEntity) == NULL);
 
-	for (int i = m_OwnedEntities.Count(); --i >= 0; )
-	{
-		if (m_OwnedEntities[i] == pEntity)
-		{
-			m_OwnedEntities.FastRemove(i);
-			break;
-		}
-	}
-
 	if (bMovingToLinkedSimulator == false)
 	{
 		RecheckEntityCollision(pEntity);
@@ -2913,7 +2904,6 @@ void CProp_Portal::MarkAsReleased(CBaseEntity* pEntity)
 		}
 	}
 	Assert(i >= 0);
-
 
 	if (pEntity->IsPlayer())
 	{
