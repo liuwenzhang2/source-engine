@@ -1640,7 +1640,7 @@ void CFastZombie::ClimbTouch( CBaseEntity *pOther )
 	}
 	else if ( dynamic_cast<CPhysicsProp *>(pOther) )
 	{
-		NPCPhysics_CreateSolver( this, pOther, true, 5.0 );
+		this->NPCPhysics_CreateSolver( pOther, true, 5.0 );
 	}
 }
 

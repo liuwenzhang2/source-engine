@@ -4538,7 +4538,7 @@ void CAI_BaseNPC::CheckOnGround( void )
 						{
 							// stuck inside a small physics object?  
 							m_CheckOnGroundTimer.Set(0.1f);
-							NPCPhysics_CreateSolver( this, (CBaseEntity*)trace.m_pEnt, true, 0.25f );
+							this->NPCPhysics_CreateSolver( (CBaseEntity*)trace.m_pEnt, true, 0.25f );
 							if (GetEngineObject()->VPhysicsGetObject() )
 							{
 								GetEngineObject()->VPhysicsGetObject()->RecheckContactPoints();
@@ -6663,7 +6663,7 @@ void CAI_BaseNPC::CheckPhysicsContacts()
 		if ( createSolver )
 		{
 			// turn collisions back on once we've been separated for enough time
-			NPCPhysics_CreateSolver( this, pOtherEntity, true, solverTime );
+			this->NPCPhysics_CreateSolver( pOtherEntity, true, solverTime );
 			pPhysics->RecheckContactPoints();
 		}
 	}

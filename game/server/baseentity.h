@@ -1428,6 +1428,8 @@ public:
 	{
 		return Pickup_DefaultPhysGunLaunchVelocity(vecForward, flMass);
 	}
+	virtual CBaseEntity* NPCPhysics_CreateSolver(CBaseEntity* pPhysicsObject, bool disableCollisions, float separationDuration);
+	virtual CBaseEntity* EntityPhysics_CreateSolver(CBaseEntity* pPhysicsBlocker, bool disableCollisions, float separationDuration);
 public:
 //#if !defined( NO_ENTITY_PREDICTION )
 //	// The player drives simulation of this entity

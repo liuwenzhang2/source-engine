@@ -513,6 +513,8 @@ public:
 	virtual bool PhysModelParseSolid(solid_t& solid) = 0;
 	virtual bool PhysModelParseSolidByIndex(solid_t& solid, int solidIndex) = 0;
 	virtual void PhysForceClearVelocity(IPhysicsObject* pPhys) = 0;
+	virtual bool IsPortalSimulatorCollisionEntity() = 0;
+	virtual bool IsShadowClone() = 0;
 };
 
 class IEngineWorldServer{

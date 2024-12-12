@@ -63,7 +63,7 @@
 #include "EntityFlame.h"
 #include "EntityDissolve.h"
 //#include "ragdoll_shared.h"
-
+#include "physics_npc_solver.h"
 #if defined( TF_DLL )
 #include "tf_gamerules.h"
 #endif
@@ -6467,6 +6467,15 @@ bool CBaseEntity::HasNPCsOnIt(void)
 	}
 
 	return false;
+}
+
+CBaseEntity* CBaseEntity::NPCPhysics_CreateSolver(CBaseEntity* pPhysicsObject, bool disableCollisions, float separationDuration) 
+{
+	return ::NPCPhysics_CreateSolver((CAI_BaseNPC*)this, pPhysicsObject, disableCollisions, separationDuration);
+}
+CBaseEntity* CBaseEntity::EntityPhysics_CreateSolver(CBaseEntity* pPhysicsBlocker, bool disableCollisions, float separationDuration) 
+{
+	return ::EntityPhysics_CreateSolver(this, pPhysicsBlocker, disableCollisions, separationDuration);
 }
 
 //------------------------------------------------------------------------------

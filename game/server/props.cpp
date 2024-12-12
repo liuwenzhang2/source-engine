@@ -4454,7 +4454,7 @@ void CBasePropDoor::Blocked(CBaseEntity *pOther)
 	if ( m_bForceClosed && ( pOther->GetEngineObject()->GetMoveType() == MOVETYPE_VPHYSICS ) &&
 		 ( pOther->m_takedamage == DAMAGE_NO || pOther->m_takedamage == DAMAGE_EVENTS_ONLY ) )
 	{
-		EntityPhysics_CreateSolver( this, pOther, true, 4.0f );
+		this->EntityPhysics_CreateSolver( pOther, true, 4.0f );
 	}
 	else if ( m_bForceClosed && ( pOther->GetEngineObject()->GetMoveType() == MOVETYPE_VPHYSICS ) && ( pOther->m_takedamage == DAMAGE_YES ) )
 	{

@@ -300,7 +300,7 @@ bool CAI_BaseActor::StartSceneEvent( CSceneEventInfo *info, CChoreoScene *scene,
 					info->m_nType = SCENE_AI_IGNORECOLLISION;
 					info->m_hTarget = pTarget;
 					float remaining = event->GetEndTime() - scene->GetTime();
-					NPCPhysics_CreateSolver( this, pTarget, true, remaining );
+					this->NPCPhysics_CreateSolver( pTarget, true, remaining );
 					info->m_flNext = gpGlobals->curtime + remaining;
 					return true;
 				}
@@ -536,7 +536,7 @@ bool CAI_BaseActor::ProcessSceneEvent( CSceneEventInfo *info, CChoreoScene *scen
 					if (info->m_hTarget && info->m_flNext < gpGlobals->curtime)
 					{
 						float remaining = event->GetEndTime() - scene->GetTime();
-						NPCPhysics_CreateSolver( this, info->m_hTarget, true, remaining );
+						this->NPCPhysics_CreateSolver( info->m_hTarget, true, remaining );
 						info->m_flNext = gpGlobals->curtime + remaining;
 					}
 

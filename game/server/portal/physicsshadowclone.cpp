@@ -24,9 +24,8 @@ ConVar sv_use_shadow_clones( "sv_use_shadow_clones", "1", FCVAR_REPLICATED | FCV
 
 LINK_ENTITY_TO_CLASS( physicsshadowclone, CPhysicsShadowClone );
 
-static CUtlVector<CPhysicsShadowClone *> s_ActiveShadowClones;
-CUtlVector<CPhysicsShadowClone *> const &CPhysicsShadowClone::g_ShadowCloneList = s_ActiveShadowClones;
-static bool s_IsShadowClone[MAX_EDICTS] = { false };
+
+//static bool s_IsShadowClone[MAX_EDICTS] = { false };
 
 static CPhysicsShadowCloneLL *s_EntityClones[MAX_EDICTS] = { NULL };
 struct ShadowCloneLLEntryManager
@@ -59,14 +58,12 @@ static ShadowCloneLLEntryManager s_SCLLManager;
 
 CPhysicsShadowClone::CPhysicsShadowClone( void )
 {
-	s_ActiveShadowClones.AddToTail( this );
 }
 
 CPhysicsShadowClone::~CPhysicsShadowClone( void )
 {
 	//VPhysicsDestroyObject();
 	//GetEngineObject()->VPhysicsSetObject( NULL );
-	s_ActiveShadowClones.FindAndRemove( this ); //also removed in UpdateOnRemove()
 }
 
 void CPhysicsShadowClone::UpdateOnRemove( void )
@@ -118,9 +115,8 @@ void CPhysicsShadowClone::UpdateOnRemove( void )
 	GetEngineObject()->VPhysicsDestroyObject();
 	GetEngineObject()->VPhysicsSetObject( NULL );
 	GetEngineShadowClone()->SetClonedEntity(NULL);
-	s_ActiveShadowClones.FindAndRemove( this ); //also removed in Destructor
-	Assert(s_IsShadowClone[entindex()] == true);
-	s_IsShadowClone[entindex()] = false;
+	//Assert(s_IsShadowClone[entindex()] == true);
+	//s_IsShadowClone[entindex()] = false;
 	BaseClass::UpdateOnRemove();
 }
 
@@ -134,7 +130,7 @@ void CPhysicsShadowClone::Spawn( void )
 	
 	BaseClass::Spawn();
 
-	s_IsShadowClone[entindex()] = true;
+	//s_IsShadowClone[entindex()] = true;
 }
 
 bool CPhysicsShadowClone::ShouldCollide( int collisionGroup, int contentsMask ) const
@@ -226,7 +222,7 @@ CPhysicsShadowClone *CPhysicsShadowClone::CreateShadowClone( IPhysicsEnvironment
 	if( pClonedEntity == NULL )
 		return NULL;
 
-	AssertMsg( IsShadowClone( pClonedEntity ) == false, "Shouldn't attempt to clone clones" );
+	AssertMsg(pClonedEntity->GetEngineObject()->IsShadowClone() == false, "Shouldn't attempt to clone clones" );
 
 	if( pClonedEntity->GetEngineObject()->IsMarkedForDeletion() )
 		return NULL;
@@ -267,7 +263,7 @@ CPhysicsShadowClone *CPhysicsShadowClone::CreateShadowClone( IPhysicsEnvironment
 	++g_iShadowCloneCount;
 
 	CPhysicsShadowClone *pClone = (CPhysicsShadowClone*)gEntList.CreateEntityByName("physicsshadowclone");
-	s_IsShadowClone[pClone->entindex()] = true;
+	//s_IsShadowClone[pClone->entindex()] = true;
 	pClone->GetEngineShadowClone()->SetOwnerEnvironment(pInPhysicsEnvironment);
 	pClone->GetEngineShadowClone()->SetClonedEntity(hEntToClone);
 	DBG_CODE_NOSCOPE( pClone->m_szDebugMarker = szDebugMarker; );
@@ -296,23 +292,17 @@ void CPhysicsShadowClone::ReleaseShadowClone(CPhysicsShadowClone* pShadowClone)
 }
 
 
-void CPhysicsShadowClone::FullSyncAllClones( void )
-{
-	for( int i = s_ActiveShadowClones.Count(); --i >= 0; )
-	{
-		s_ActiveShadowClones[i]->GetEngineShadowClone()->FullSync( true );
-	}
-}
+
 
 void CPhysicsShadowClone::VPhysicsCollision( int index, gamevcollisionevent_t *pEvent )
 {
 	//the baseclass just screenshakes, makes sounds, and outputs dust, we rely on the original entity to do this when applicable
 }
 
-bool CPhysicsShadowClone::IsShadowClone( const CBaseEntity *pEntity )
-{
-	return s_IsShadowClone[pEntity->entindex()];
-}
+//bool CPhysicsShadowClone::IsShadowClone( const CBaseEntity *pEntity )
+//{
+//	return s_IsShadowClone[pEntity->entindex()];
+//}
 
 CPhysicsShadowCloneLL *CPhysicsShadowClone::GetClonesOfEntity( const CBaseEntity *pEntity )
 {
@@ -322,7 +312,7 @@ CPhysicsShadowCloneLL *CPhysicsShadowClone::GetClonesOfEntity( const CBaseEntity
 bool CTraceFilterTranslateClones::ShouldHitEntity( IHandleEntity *pEntity, int contentsMask )
 {
 	CBaseEntity *pEnt = EntityFromEntityHandle( pEntity );
-	if( CPhysicsShadowClone::IsShadowClone( pEnt ) )
+	if(pEnt->GetEngineObject()->IsShadowClone() )
 	{
 		CBaseEntity *pClonedEntity = ((CPhysicsShadowClone *)pEnt)->GetEngineShadowClone()->GetClonedEntity();
 		CProp_Portal *pSimulator = CProp_Portal::GetSimulatorThatOwnsEntity( pClonedEntity );

@@ -2303,8 +2303,8 @@ void CProp_Portal::BeforeMove()
 	for (int i = m_OwnedEntities.Count(); --i >= 0; )
 	{
 		CBaseEntity* pEntity = m_OwnedEntities[i];
-		if (CPhysicsShadowClone::IsShadowClone(pEntity) ||
-			CPortalSimulator::IsPortalSimulatorCollisionEntity(pEntity))
+		if (pEntity->GetEngineObject()->IsShadowClone() ||
+			pEntity->GetEngineObject()->IsPortalSimulatorCollisionEntity())
 			continue;
 
 		if (EntityIsInPortalHole(pEntity))
@@ -2359,7 +2359,7 @@ void CProp_Portal::TakeOwnershipOfEntity(CBaseEntity* pEntity)
 	if (pEntity->IsWorld())
 		return;
 
-	if (CPhysicsShadowClone::IsShadowClone(pEntity))
+	if (pEntity->GetEngineObject()->IsShadowClone())
 		return;
 
 	if (pEntity->GetServerVehicle() != NULL) //we don't take kindly to vehicles in these here parts. Their physics controllers currently don't migrate properly and cause a crash
@@ -2420,10 +2420,10 @@ void CProp_Portal::TakePhysicsOwnership(CBaseEntity* pEntity)
 	if ( GetPhysicsEnvironment() == NULL)
 		return;
 
-	if (CPortalSimulator::IsPortalSimulatorCollisionEntity(pEntity))
+	if (pEntity->GetEngineObject()->IsPortalSimulatorCollisionEntity())
 		return;
 
-	Assert(CPhysicsShadowClone::IsShadowClone(pEntity) == false);
+	Assert(pEntity->GetEngineObject()->IsShadowClone() == false);
 	Assert(OwnsEntity(pEntity)); //taking physics ownership happens AFTER general ownership
 
 	if (OwnsPhysicsForEntity(pEntity))
@@ -2655,8 +2655,8 @@ void CProp_Portal::AfterLinkedPhysicsCreated()
 	CUtlVector<CBaseEntity*>& RemoteOwnedEntities = GetLinkedPortal()->m_OwnedEntities;
 	for (int i = RemoteOwnedEntities.Count(); --i >= 0; )
 	{
-		if (CPhysicsShadowClone::IsShadowClone(RemoteOwnedEntities[i]) ||
-			CPortalSimulator::IsPortalSimulatorCollisionEntity(RemoteOwnedEntities[i]))
+		if (RemoteOwnedEntities[i]->GetEngineObject()->IsShadowClone() ||
+			RemoteOwnedEntities[i]->GetEngineObject()->IsPortalSimulatorCollisionEntity())
 			continue;
 
 		int j;
@@ -2690,8 +2690,8 @@ void CProp_Portal::ReleaseAllEntityOwnership(void)
 	while (m_OwnedEntities.Count() != iSkippedObjects) //the release function changes m_OwnedEntities
 	{
 		CBaseEntity* pEntity = m_OwnedEntities[iSkippedObjects];
-		if (CPhysicsShadowClone::IsShadowClone(pEntity) ||
-			CPortalSimulator::IsPortalSimulatorCollisionEntity(pEntity))
+		if (pEntity->GetEngineObject()->IsShadowClone() ||
+			pEntity->GetEngineObject()->IsPortalSimulatorCollisionEntity())
 		{
 			++iSkippedObjects;
 			continue;
@@ -2713,11 +2713,11 @@ void CProp_Portal::ReleasePhysicsOwnership(CBaseEntity* pEntity, bool bContinueP
 		return;
 	}
 
-	if (CPortalSimulator::IsPortalSimulatorCollisionEntity(pEntity))
+	if (pEntity->GetEngineObject()->IsPortalSimulatorCollisionEntity())
 		return;
 
 	Assert(OwnsEntity(pEntity)); //releasing physics ownership happens BEFORE releasing general ownership
-	Assert(CPhysicsShadowClone::IsShadowClone(pEntity) == false);
+	Assert(pEntity->GetEngineObject()->IsShadowClone() == false);
 
 	if (GetPhysicsEnvironment() == NULL)
 		return;
@@ -2830,7 +2830,7 @@ void CProp_Portal::StartCloningEntity(CBaseEntity* pEntity)
 		return;
 	}
 
-	if (CPhysicsShadowClone::IsShadowClone(pEntity) || CPortalSimulator::IsPortalSimulatorCollisionEntity(pEntity))
+	if (pEntity->GetEngineObject()->IsShadowClone() || pEntity->GetEngineObject()->IsPortalSimulatorCollisionEntity())
 		return;
 
 	if ((m_EntFlags[pEntity->entindex()] & PSEF_CLONES_ENTITY_FROM_MAIN) != 0)
@@ -2899,7 +2899,7 @@ void CProp_Portal::MarkAsReleased(CBaseEntity* pEntity)
 	Assert(pEntity != NULL);
 	int iEntIndex = pEntity->entindex();
 	Assert(s_OwnedEntityMap[iEntIndex] == this);
-	Assert(((m_EntFlags[iEntIndex] & PSEF_OWNS_ENTITY) != 0) || CPortalSimulator::IsPortalSimulatorCollisionEntity(pEntity));
+	Assert(((m_EntFlags[iEntIndex] & PSEF_OWNS_ENTITY) != 0) || pEntity->GetEngineObject()->IsPortalSimulatorCollisionEntity());
 
 	s_OwnedEntityMap[iEntIndex] = NULL;
 	m_EntFlags[iEntIndex] &= ~PSEF_OWNS_ENTITY;
@@ -2931,10 +2931,10 @@ int CProp_Portal::GetMoveableOwnedEntities(CBaseEntity** pEntsOut, int iEntOutLi
 		CBaseEntity* pEnt = m_OwnedEntities[i];
 		Assert(pEnt != NULL);
 
-		if (CPhysicsShadowClone::IsShadowClone(pEnt))
+		if (pEnt->GetEngineObject()->IsShadowClone())
 			continue;
 
-		if (CPortalSimulator::IsPortalSimulatorCollisionEntity(pEnt))
+		if (pEnt->GetEngineObject()->IsPortalSimulatorCollisionEntity())
 			continue;
 
 		if (pEnt->GetEngineObject()->GetMoveType() == MOVETYPE_NONE)
@@ -3029,8 +3029,8 @@ public:
 
 		//NDebugOverlay::EntityBounds( pEntity, 0, 0, 0, 50, 5.0f );
 
-		if ((CPhysicsShadowClone::IsShadowClone(pEntity) == false) &&
-			(CPortalSimulator::IsPortalSimulatorCollisionEntity(pEntity) == false))
+		if ((pEntity->GetEngineObject()->IsShadowClone() == false) &&
+			(pEntity->GetEngineObject()->IsPortalSimulatorCollisionEntity() == false))
 		{
 			CProp_Portal* pOwningSimulator = CProp_Portal::GetSimulatorThatOwnsEntity(pEntity);
 			if (pOwningSimulator)
@@ -3132,7 +3132,7 @@ void CProp_Portal::PrePhysFrame(void)
 				for (int j = 0; j != iOwnedEntities; ++j)
 				{
 					CBaseEntity* pEntity = pOwnedEntities[j];
-					if (CPhysicsShadowClone::IsShadowClone(pEntity))
+					if (pEntity->GetEngineObject()->IsShadowClone())
 						continue;
 
 					Assert((pEntity != NULL) && (pEntity->GetEngineObject()->IsMarkedForDeletion() == false));

@@ -1716,7 +1716,7 @@ void CFuncTrackTrain::Blocked( CBaseEntity *pOther )
 				{
 					// been stuck for more than one tick without moving much?
 					// yes, disable collisions with the physics object most likely to be blocking us
-					EntityPhysics_CreateSolver( this, pPhysicsBlocker, true, 4.0f );
+					this->EntityPhysics_CreateSolver( pPhysicsBlocker, true, 4.0f );
 				}
 			}
 			// first time blocking or moved too far since last block, reset

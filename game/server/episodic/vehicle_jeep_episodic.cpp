@@ -1227,7 +1227,7 @@ static void SolveBlockingProps( CPropJeepEpisodic *pVehicleEntity, IPhysicsObjec
 	{
 		for ( int i = 0; i < solveList.Count(); i++ )
 		{
-			EntityPhysics_CreateSolver( pVehicleEntity, solveList[i], true, 4.0f );
+			pVehicleEntity->EntityPhysics_CreateSolver( solveList[i], true, 4.0f );
 		}
 		pVehiclePhysics->RecheckContactPoints();
 	}

@@ -1470,7 +1470,7 @@ void CBaseHeadcrab::StartTask( const Task_t *pTask )
 				{
 					if( ground->GetEngineObject()->VPhysicsGetObject()->GetGameFlags() & FVPHYSICS_PLAYER_HELD )
 					{
-						NPCPhysics_CreateSolver( this, ground, true, 0.5 );
+						this->NPCPhysics_CreateSolver( ground, true, 0.5 );
 					}
 				}
 

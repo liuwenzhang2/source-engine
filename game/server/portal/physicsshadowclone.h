@@ -80,11 +80,9 @@ public:
 
 	
 
-	static bool IsShadowClone( const CBaseEntity *pEntity );
+	//static bool IsShadowClone( const CBaseEntity *pEntity );
 	static CPhysicsShadowCloneLL *GetClonesOfEntity( const CBaseEntity *pEntity );
-	static void FullSyncAllClones( void );
 
-	static CUtlVector<CPhysicsShadowClone *> const &g_ShadowCloneList;
 };
 
 

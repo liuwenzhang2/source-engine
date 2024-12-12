@@ -47,7 +47,6 @@
 #include "physics_shared.h"
 #include "player.h"
 #include "vphysics/collision_set.h"
-#include "physics_npc_solver.h"
 #ifdef PORTAL
 #include "prop_combine_ball.h"
 #include "portal_player.h"
@@ -455,6 +454,11 @@ bool FindMaxContact(IPhysicsObject* pObject, float minForce, IPhysicsObject** pO
 	return false;
 }
 
+CBaseEntity* EntityPhysics_CreateSolver(CBaseEntity* pMovingEntity, CBaseEntity* pPhysicsObject, bool disableCollisions, float separationDuration)
+{
+	return pMovingEntity->EntityPhysics_CreateSolver(pPhysicsObject, disableCollisions, separationDuration);
+}
+
 bool CCollisionEvent::ShouldFreezeObject(IPhysicsObject* pObject)
 {
 	// for now, don't apply a per-object limit to ai MOVETYPE_PUSH objects
@@ -480,7 +484,7 @@ bool CCollisionEvent::ShouldFreezeObject(IPhysicsObject* pObject)
 	// After doing the experiment of constraining the dynamic range of mass while solving friction
 	// contacts, I like the results of this tradeoff better.  So damage or remove the debris object
 	// wherever possible once we hit this case:
-	if (IsDebris(pEntity->GetEngineObject()->GetCollisionGroup()) && !pEntity->IsNPC())
+	if (pEntity && IsDebris(pEntity->GetEngineObject()->GetCollisionGroup()) && !pEntity->IsNPC())
 	{
 		IPhysicsObject* pOtherObject = NULL;
 		Vector contactPos;
@@ -636,15 +640,17 @@ void CCollisionEvent::UpdatePenetrateEvents(void)
 		{
 			if (pEntity0 && pEntity1)
 			{
-				CAI_BaseNPC* pNPC = pEntity0->MyNPCPointer();
+				bool IsNPC = pEntity0->IsNPC();
+				CBaseEntity* pNPC = pEntity0;
 				CBaseEntity* pBlocker = pEntity1;
-				if (!pNPC)
+				if (!IsNPC)
 				{
-					pNPC = pEntity1->MyNPCPointer();
-					Assert(pNPC);
+					IsNPC = pEntity1->IsNPC();
+					Assert(IsNPC);
+					pNPC = pEntity1;
 					pBlocker = pEntity0;
 				}
-				NPCPhysics_CreateSolver(pNPC, pBlocker, true, 1.0f);
+				pNPC->NPCPhysics_CreateSolver(pBlocker, true, 1.0f);
 			}
 			// transferred to solver, clear event
 		}
@@ -1883,13 +1889,12 @@ int CPortal_CollisionEvent::ShouldCollide(IPhysicsObject* pObj0, IPhysicsObject*
 #ifdef _DEBUG
 		for (int i = 0; i != 2; ++i)
 		{
-			if ((pSimulators[i] != NULL) && CPhysicsShadowClone::IsShadowClone(pEntities[i]))
+			if ((pSimulators[i] != NULL) && pEntities[i]->GetEngineObject()->IsShadowClone())
 			{
-				CPhysicsShadowClone* pClone = (CPhysicsShadowClone*)pEntities[i];
-				CBaseEntity* pSource = pClone->GetEngineShadowClone()->GetClonedEntity();
+				CBaseEntity* pSource = pEntities[i]->GetEngineShadowClone()->GetClonedEntity();
 
 				CProp_Portal* pSourceSimulator = CProp_Portal::GetSimulatorThatOwnsEntity(pSource);
-				Assert((pSimulators[i]->m_EntFlags[pClone->entindex()] & PSEF_IS_IN_PORTAL_HOLE) == (pSourceSimulator->m_EntFlags[pSource->entindex()] & PSEF_IS_IN_PORTAL_HOLE));
+				Assert((pSimulators[i]->m_EntFlags[pEntities[i]->entindex()] & PSEF_IS_IN_PORTAL_HOLE) == (pSourceSimulator->m_EntFlags[pSource->entindex()] & PSEF_IS_IN_PORTAL_HOLE));
 			}
 		}
 #endif
@@ -1904,7 +1909,7 @@ int CPortal_CollisionEvent::ShouldCollide(IPhysicsObject* pObj0, IPhysicsObject*
 					{
 						if (bStatic[i])
 						{
-							if (CPortalSimulator::IsPortalSimulatorCollisionEntity(pEntities[i]))
+							if (pEntities[i]->GetEngineObject()->IsPortalSimulatorCollisionEntity())
 							{
 								PS_PhysicsObjectSourceType_t objectSource;
 								if (pSimulators[i]->CreatedPhysicsObject(pPhysObjects[i], &objectSource) &&
@@ -1963,8 +1968,8 @@ int CPortal_CollisionEvent::ShouldCollide(IPhysicsObject* pObj0, IPhysicsObject*
 			}
 			else
 			{
-				Assert(CPortalSimulator::IsPortalSimulatorCollisionEntity(pEntities[0]) == false);
-				Assert(CPortalSimulator::IsPortalSimulatorCollisionEntity(pEntities[1]) == false);
+				Assert(pEntities[0]->GetEngineObject()->IsPortalSimulatorCollisionEntity() == false);
+				Assert(pEntities[1]->GetEngineObject()->IsPortalSimulatorCollisionEntity() == false);
 
 				for (int i = 0; i != 2; ++i)
 				{
@@ -1988,8 +1993,8 @@ int CPortal_CollisionEvent::ShouldSolvePenetration(IPhysicsObject* pObj0, IPhysi
 	if ((pGameData0 == NULL) || (pGameData1 == NULL))
 		return 0;
 
-	if (CPortalSimulator::IsPortalSimulatorCollisionEntity((CBaseEntity*)pGameData0) ||
-		CPortalSimulator::IsPortalSimulatorCollisionEntity((CBaseEntity*)pGameData1))
+	if (((CBaseEntity*)pGameData0)->GetEngineObject()->IsPortalSimulatorCollisionEntity() ||
+		((CBaseEntity*)pGameData1)->GetEngineObject()->IsPortalSimulatorCollisionEntity())
 		return 0;
 
 	// For portal, don't solve penetrations on combine balls
@@ -2027,8 +2032,8 @@ int CPortal_CollisionEvent::ShouldSolvePenetration(IPhysicsObject* pObj0, IPhysi
 		//most localized way to make a fix.
 		//Note that we're not actually going to change whether it should solve, we're just going to tack on some hacks
 		CPortal_Player* pHoldingPlayer = (CPortal_Player*)GetPlayerHoldingEntity(pHeld);
-		if (!pHoldingPlayer && CPhysicsShadowClone::IsShadowClone(pHeld))
-			pHoldingPlayer = (CPortal_Player*)GetPlayerHoldingEntity(((CPhysicsShadowClone*)pHeld)->GetEngineShadowClone()->GetClonedEntity());
+		if (!pHoldingPlayer && pHeld->GetEngineObject()->IsShadowClone())
+			pHoldingPlayer = (CPortal_Player*)GetPlayerHoldingEntity(pHeld->GetEngineShadowClone()->GetClonedEntity());
 
 		Assert(pHoldingPlayer);
 		if (pHoldingPlayer)
@@ -2071,7 +2076,7 @@ int CPortal_CollisionEvent::ShouldSolvePenetration(IPhysicsObject* pObj0, IPhysi
 				if (!pObjects[j]->IsMoveable())
 					return 0; //don't solve between shadow clones and statics
 
-				if (((CPhysicsShadowClone*)(pObjects[i]->GetGameData()))->GetEngineShadowClone()->GetClonedEntity() == (pObjects[j]->GetGameData()))
+				if (((CBaseEntity*)(pObjects[i]->GetGameData()))->GetEngineShadowClone()->GetClonedEntity() == (pObjects[j]->GetGameData()))
 					return 0; //don't solve between a shadow clone and its source entity
 			}
 		}
@@ -2100,7 +2105,7 @@ static void ModifyWeight_PreCollision(vcollisionevent_t* pEvent)
 	{
 		if (pEvent->pObjects[i]->GetGameFlags() & FVPHYSICS_IS_SHADOWCLONE)
 		{
-			CPhysicsShadowClone* pClone = ((CPhysicsShadowClone*)pEvent->pObjects[i]->GetGameData());
+			CBaseEntity* pClone = ((CBaseEntity*)pEvent->pObjects[i]->GetGameData());
 			pUnshadowedEntities[i] = pClone->GetEngineShadowClone()->GetClonedEntity();
 
 			if (pUnshadowedEntities[i] == NULL)
@@ -10311,6 +10316,20 @@ bool CEnginePortalInternal::CreatedPhysicsObject(const IPhysicsObject* pObject, 
 	}
 
 	return false;
+}
+
+CEngineShadowCloneInternal::CEngineShadowCloneInternal(IServerEntityList* pServerEntityList, int iForceEdictIndex, int iSerialNum)
+	:CEngineObjectInternal(pServerEntityList, iForceEdictIndex, iSerialNum)
+{
+	m_matrixShadowTransform.Identity();
+	m_matrixShadowTransform_Inverse.Identity();
+	m_bShadowTransformIsIdentity = true;
+	gEntList.m_ActiveShadowClones.AddToTail(this);
+}
+
+CEngineShadowCloneInternal::~CEngineShadowCloneInternal() {
+	m_hClonedEntity = NULL;
+	gEntList.m_ActiveShadowClones.FindAndRemove(this); //also removed in UpdateOnRemove()
 }
 
 void CEngineShadowCloneInternal::SetClonedEntity(CBaseEntity* pEntToClone)

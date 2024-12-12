@@ -89,7 +89,7 @@ public:
 	{
 		return SetTransmitState(FL_EDICT_ALWAYS);
 	}
-	static bool		IsPortalSimulatorCollisionEntity(const CBaseEntity* pEntity);
+	//static bool		IsPortalSimulatorCollisionEntity(const CBaseEntity* pEntity);
 #endif // GAME_DLL
 	void UpdateOnRemove(void);
 	virtual void		BeforeMove() {};

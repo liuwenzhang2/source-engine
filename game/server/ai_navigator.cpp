@@ -1317,7 +1317,7 @@ void CAI_Navigator::OnNavFailed( AI_TaskFailureCode_t code, bool bMovement )
 				if (pBlocker && !pBlocker->IsWorld() && !pBlocker->IsPlayer() && !FClassnameIs( pBlocker, "func_tracktrain" ))
 				{
 					//pBlocker->DrawBBoxOverlay( 2.0f );
-					if (NPCPhysics_CreateSolver( GetOuter(), pBlocker, true, 10.0f ) != NULL)
+					if (GetOuter()->NPCPhysics_CreateSolver( pBlocker, true, 10.0f ) != NULL)
 					{
 						ClearNavFailCounter();
 					}
@@ -1338,7 +1338,7 @@ void CAI_Navigator::OnNavFailed( AI_TaskFailureCode_t code, bool bMovement )
 				if (pBlocker)
 				{
 					//pBlocker->DrawBBoxOverlay( 2.0f );
-					if (NPCPhysics_CreateSolver( GetOuter(), pBlocker, true, 10.0f ) != NULL)
+					if (GetOuter()->NPCPhysics_CreateSolver( pBlocker, true, 10.0f ) != NULL)
 					{
 						ClearNavFailCounter();
 					}

@@ -204,7 +204,7 @@ END_NETWORK_TABLE()
 
 LINK_ENTITY_TO_CLASS(portalsimulator_collisionentity, CPSCollisionEntity);
 
-static bool s_PortalSimulatorCollisionEntities[MAX_EDICTS] = { false };
+//static bool s_PortalSimulatorCollisionEntities[MAX_EDICTS] = { false };
 
 //-----------------------------------------------------------------------------
 // Networking
@@ -1568,7 +1568,7 @@ void CPSCollisionEntity::UpdateOnRemove( void )
 		m_pOwningSimulator->pCollisionEntity = NULL;
 		m_pOwningSimulator = NULL;
 	}
-	s_PortalSimulatorCollisionEntities[entindex()] = false;
+	//s_PortalSimulatorCollisionEntities[entindex()] = false;
 #endif // GAME_DLL
 	BaseClass::UpdateOnRemove();
 }
@@ -1579,7 +1579,7 @@ void CPSCollisionEntity::Spawn( void )
 	GetEngineObject()->SetSolid( SOLID_CUSTOM );
 	GetEngineObject()->SetMoveType( MOVETYPE_NONE );
 	GetEngineObject()->SetCollisionGroup( COLLISION_GROUP_NONE );
-	s_PortalSimulatorCollisionEntities[entindex()] = true;
+	//s_PortalSimulatorCollisionEntities[entindex()] = true;
 	GetEngineObject()->VPhysicsSetObject( NULL );
 	GetEngineObject()->AddFlag( FL_WORLDBRUSH );
 	GetEngineObject()->AddEffects( EF_NODRAW | EF_NOSHADOW | EF_NORECEIVESHADOW );
@@ -1610,15 +1610,15 @@ bool CPSCollisionEntity::ShouldCollide( int collisionGroup, int contentsMask ) c
 }
 
 
-#ifdef GAME_DLL
-bool CPortalSimulator::IsPortalSimulatorCollisionEntity( const CBaseEntity *pEntity )
-{
-	if (!((CBaseEntity*)pEntity)->IsNetworkable() || pEntity->entindex() == -1) {
-		return false;
-	}
-	return s_PortalSimulatorCollisionEntities[pEntity->entindex()];
-}
-#endif // GAME_DLL
+//#ifdef GAME_DLL
+//bool CPortalSimulator::IsPortalSimulatorCollisionEntity( const CBaseEntity *pEntity )
+//{
+//	if (!((CBaseEntity*)pEntity)->IsNetworkable() || pEntity->entindex() == -1) {
+//		return false;
+//	}
+//	return s_PortalSimulatorCollisionEntities[pEntity->entindex()];
+//}
+//#endif // GAME_DLL
 
 
 //const Vector& CPortalSimulator::GetOrigin() const { return pCollisionEntity->GetOrigin(); }
