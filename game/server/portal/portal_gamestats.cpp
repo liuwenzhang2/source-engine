@@ -578,7 +578,7 @@ void CPortalGameStats::Event_PlayerStuck( CPortal_Player *pPlayer )
 
 	StuckSpot.ptPlayerPosition = pPlayer->GetAbsOrigin();
 	StuckSpot.qPlayerAngles = pPlayer->GetAbsAngles();
-	StuckSpot.bNearPortal = (pPlayer->m_hPortalEnvironment.Get() != NULL);
+	StuckSpot.bNearPortal = (pPlayer->GetPortalEnvironment() != NULL);
 	StuckSpot.bDucking = ((pPlayer->m_nButtons & IN_DUCK) != 0);
 #endif
 }

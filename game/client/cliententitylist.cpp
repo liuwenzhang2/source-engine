@@ -7763,10 +7763,27 @@ void C_EngineObjectInternal::PhysForceClearVelocity(IPhysicsObject* pPhys)
 	::PhysForceClearVelocity(pPhys);
 }
 
+BEGIN_RECV_TABLE(C_EnginePlayerInternal, DT_EnginePlayer)
+	RecvPropEHandle(RECVINFO(m_hPortalEnvironment)),
+END_RECV_TABLE()
+
+IMPLEMENT_CLIENTCLASS_NO_FACTORY(C_EnginePlayerInternal, DT_EnginePlayer, CEnginePlayerInternal)
+
+C_EnginePlayerInternal::C_EnginePlayerInternal(IClientEntityList* pClientEntityList, int iForceEdictIndex, int iSerialNum)
+	:C_EngineObjectInternal(pClientEntityList, iForceEdictIndex, iSerialNum)
+{
+
+}
+C_EnginePlayerInternal::~C_EnginePlayerInternal()
+{
+
+}
+
 C_EnginePortalInternal::C_EnginePortalInternal(IClientEntityList* pClientEntityList, int iForceEdictIndex, int iSerialNum)
 :C_EngineObjectInternal(pClientEntityList, iForceEdictIndex, iSerialNum), m_DataAccess(m_InternalData)
 {
-
+	static int s_iPortalSimulatorGUIDAllocator = 0;
+	m_iPortalSimulatorGUID = s_iPortalSimulatorGUIDAllocator++;
 }
 
 C_EnginePortalInternal::~C_EnginePortalInternal() {
@@ -7776,6 +7793,16 @@ C_EnginePortalInternal::~C_EnginePortalInternal() {
 void C_EnginePortalInternal::VPhysicsDestroyObject(void)
 {
 	VPhysicsSetObject(NULL);
+}
+
+void C_EnginePortalInternal::SetVPhysicsSimulationEnabled(bool bEnabled)
+{
+	m_bSimulateVPhysics = bEnabled;
+}
+
+bool C_EnginePortalInternal::IsSimulatingVPhysics(void) const
+{
+	return m_bSimulateVPhysics;
 }
 
 void C_EnginePortalInternal::MoveTo(const Vector& ptCenter, const QAngle& angles)
@@ -7829,6 +7856,19 @@ void C_EnginePortalInternal::MoveTo(const Vector& ptCenter, const QAngle& angles
 					m_InternalData.Placement.PortalPlane.type = PLANE_ANYZ;
 			}
 		}
+	}
+}
+
+void C_EnginePortalInternal::AttachTo(IEnginePortalClient* pLinkedPortal)
+{
+	m_pLinkedPortal = (C_EnginePortalInternal*)pLinkedPortal;
+	m_pLinkedPortal->m_pLinkedPortal = this;
+}
+
+void C_EnginePortalInternal::DetachFromLinked(void) {
+	if (m_pLinkedPortal) {
+		m_pLinkedPortal->m_pLinkedPortal = NULL;
+		m_pLinkedPortal = NULL;
 	}
 }
 
@@ -8175,12 +8215,12 @@ IPhysicsObject* C_EnginePortalInternal::GetRemoteWallBrushesPhysicsObject() cons
 
 IPhysicsEnvironment* C_EnginePortalInternal::GetPhysicsEnvironment()
 {
-	return pPhysicsEnvironment;
+	return m_pPhysicsEnvironment;
 }
 
 void C_EnginePortalInternal::CreatePhysicsEnvironment()
 {
-	pPhysicsEnvironment = ClientEntityList().PhysGetEnv();
+	m_pPhysicsEnvironment = ClientEntityList().PhysGetEnv();
 //#ifdef PORTAL
 //	pPhysicsEnvironment = physenv_main;
 //#endif
@@ -8188,7 +8228,7 @@ void C_EnginePortalInternal::CreatePhysicsEnvironment()
 
 void C_EnginePortalInternal::ClearPhysicsEnvironment()
 {
-	pPhysicsEnvironment = NULL;
+	m_pPhysicsEnvironment = NULL;
 }
 
 class CStaticCollisionPolyhedronCache : public CAutoGameSystem
@@ -9335,7 +9375,7 @@ void C_EnginePortalInternal::CreateLocalPhysics(void)
 		Assert(m_InternalData.Simulation.Static.World.Brushes.pPhysicsObject == NULL); //Be sure to find graceful fixes for asserts, performance is a big concern with portal simulation
 		if (m_InternalData.Simulation.Static.World.Brushes.pCollideable != NULL)
 		{
-			m_InternalData.Simulation.Static.World.Brushes.pPhysicsObject = pPhysicsEnvironment->CreatePolyObjectStatic(m_InternalData.Simulation.Static.World.Brushes.pCollideable, m_InternalData.Simulation.Static.SurfaceProperties.surface.surfaceProps, vec3_origin, vec3_angle, &params);
+			m_InternalData.Simulation.Static.World.Brushes.pPhysicsObject = m_pPhysicsEnvironment->CreatePolyObjectStatic(m_InternalData.Simulation.Static.World.Brushes.pCollideable, m_InternalData.Simulation.Static.SurfaceProperties.surface.surfaceProps, vec3_origin, vec3_angle, &params);
 
 			if (VPhysicsGetObject() == NULL)
 				VPhysicsSetObject(m_InternalData.Simulation.Static.World.Brushes.pPhysicsObject);
@@ -9360,7 +9400,7 @@ void C_EnginePortalInternal::CreateLocalPhysics(void)
 				Assert(Representation.pCollide != NULL);
 				Assert(Representation.pPhysicsObject == NULL);
 
-				Representation.pPhysicsObject = pPhysicsEnvironment->CreatePolyObjectStatic(Representation.pCollide, Representation.iTraceSurfaceProps, vec3_origin, vec3_angle, &params);
+				Representation.pPhysicsObject = m_pPhysicsEnvironment->CreatePolyObjectStatic(Representation.pCollide, Representation.iTraceSurfaceProps, vec3_origin, vec3_angle, &params);
 				Assert(Representation.pPhysicsObject != NULL);
 				Representation.pPhysicsObject->RecheckCollisionFilter(); //some filters only work after the variable is stored in the class
 			}
@@ -9373,7 +9413,7 @@ void C_EnginePortalInternal::CreateLocalPhysics(void)
 		Assert(m_InternalData.Simulation.Static.Wall.Local.Brushes.pPhysicsObject == NULL); //Be sure to find graceful fixes for asserts, performance is a big concern with portal simulation
 		if (m_InternalData.Simulation.Static.Wall.Local.Brushes.pCollideable != NULL)
 		{
-			m_InternalData.Simulation.Static.Wall.Local.Brushes.pPhysicsObject = pPhysicsEnvironment->CreatePolyObjectStatic(m_InternalData.Simulation.Static.Wall.Local.Brushes.pCollideable, m_InternalData.Simulation.Static.SurfaceProperties.surface.surfaceProps, vec3_origin, vec3_angle, &params);
+			m_InternalData.Simulation.Static.Wall.Local.Brushes.pPhysicsObject = m_pPhysicsEnvironment->CreatePolyObjectStatic(m_InternalData.Simulation.Static.Wall.Local.Brushes.pCollideable, m_InternalData.Simulation.Static.SurfaceProperties.surface.surfaceProps, vec3_origin, vec3_angle, &params);
 
 			if (VPhysicsGetObject() == NULL)
 				VPhysicsSetObject(m_InternalData.Simulation.Static.World.Brushes.pPhysicsObject);
@@ -9384,7 +9424,7 @@ void C_EnginePortalInternal::CreateLocalPhysics(void)
 		Assert(m_InternalData.Simulation.Static.Wall.Local.Tube.pPhysicsObject == NULL); //Be sure to find graceful fixes for asserts, performance is a big concern with portal simulation
 		if (m_InternalData.Simulation.Static.Wall.Local.Tube.pCollideable != NULL)
 		{
-			m_InternalData.Simulation.Static.Wall.Local.Tube.pPhysicsObject = pPhysicsEnvironment->CreatePolyObjectStatic(m_InternalData.Simulation.Static.Wall.Local.Tube.pCollideable, m_InternalData.Simulation.Static.SurfaceProperties.surface.surfaceProps, vec3_origin, vec3_angle, &params);
+			m_InternalData.Simulation.Static.Wall.Local.Tube.pPhysicsObject = m_pPhysicsEnvironment->CreatePolyObjectStatic(m_InternalData.Simulation.Static.Wall.Local.Tube.pCollideable, m_InternalData.Simulation.Static.SurfaceProperties.surface.surfaceProps, vec3_origin, vec3_angle, &params);
 
 			if (VPhysicsGetObject() == NULL)
 				VPhysicsSetObject(m_InternalData.Simulation.Static.World.Brushes.pPhysicsObject);
@@ -9411,7 +9451,7 @@ void C_EnginePortalInternal::CreateLinkedPhysics(IEnginePortalClient* pRemoteCol
 	Assert(m_InternalData.Simulation.Static.Wall.RemoteTransformedToLocal.Brushes.pPhysicsObject == NULL); //Be sure to find graceful fixes for asserts, performance is a big concern with portal simulation
 	if (RemoteSimulationStaticWorld.Brushes.pCollideable != NULL)
 	{
-		m_InternalData.Simulation.Static.Wall.RemoteTransformedToLocal.Brushes.pPhysicsObject = pPhysicsEnvironment->CreatePolyObjectStatic(RemoteSimulationStaticWorld.Brushes.pCollideable, pRemotePortalInternal->m_InternalData.Simulation.Static.SurfaceProperties.surface.surfaceProps, m_InternalData.Placement.ptaap_LinkedToThis.ptOriginTransform, m_InternalData.Placement.ptaap_LinkedToThis.qAngleTransform, &params);
+		m_InternalData.Simulation.Static.Wall.RemoteTransformedToLocal.Brushes.pPhysicsObject = m_pPhysicsEnvironment->CreatePolyObjectStatic(RemoteSimulationStaticWorld.Brushes.pCollideable, pRemotePortalInternal->m_InternalData.Simulation.Static.SurfaceProperties.surface.surfaceProps, m_InternalData.Placement.ptaap_LinkedToThis.ptOriginTransform, m_InternalData.Placement.ptaap_LinkedToThis.qAngleTransform, &params);
 		m_InternalData.Simulation.Static.Wall.RemoteTransformedToLocal.Brushes.pPhysicsObject->RecheckCollisionFilter(); //some filters only work after the variable is stored in the class
 	}
 
@@ -9422,7 +9462,7 @@ void C_EnginePortalInternal::CreateLinkedPhysics(IEnginePortalClient* pRemoteCol
 		for (int i = RemoteSimulationStaticWorld.StaticProps.ClippedRepresentations.Count(); --i >= 0; )
 		{
 			PS_SD_Static_World_StaticProps_ClippedProp_t& Representation = RemoteSimulationStaticWorld.StaticProps.ClippedRepresentations[i];
-			IPhysicsObject* pPhysObject = pPhysicsEnvironment->CreatePolyObjectStatic(Representation.pCollide, Representation.iTraceSurfaceProps, m_InternalData.Placement.ptaap_LinkedToThis.ptOriginTransform, m_InternalData.Placement.ptaap_LinkedToThis.qAngleTransform, &params);
+			IPhysicsObject* pPhysObject = m_pPhysicsEnvironment->CreatePolyObjectStatic(Representation.pCollide, Representation.iTraceSurfaceProps, m_InternalData.Placement.ptaap_LinkedToThis.ptOriginTransform, m_InternalData.Placement.ptaap_LinkedToThis.qAngleTransform, &params);
 			if (pPhysObject)
 			{
 				m_InternalData.Simulation.Static.Wall.RemoteTransformedToLocal.StaticProps.PhysicsObjects.AddToTail(pPhysObject);
@@ -9436,7 +9476,7 @@ void C_EnginePortalInternal::ClearLocalPhysics(void)
 {
 	if (m_InternalData.Simulation.Static.World.Brushes.pPhysicsObject)
 	{
-		pPhysicsEnvironment->DestroyObject(m_InternalData.Simulation.Static.World.Brushes.pPhysicsObject);
+		m_pPhysicsEnvironment->DestroyObject(m_InternalData.Simulation.Static.World.Brushes.pPhysicsObject);
 		m_InternalData.Simulation.Static.World.Brushes.pPhysicsObject = NULL;
 	}
 
@@ -9448,7 +9488,7 @@ void C_EnginePortalInternal::ClearLocalPhysics(void)
 			PS_SD_Static_World_StaticProps_ClippedProp_t& Representation = m_InternalData.Simulation.Static.World.StaticProps.ClippedRepresentations[i];
 			if (Representation.pPhysicsObject)
 			{
-				pPhysicsEnvironment->DestroyObject(Representation.pPhysicsObject);
+				m_pPhysicsEnvironment->DestroyObject(Representation.pPhysicsObject);
 				Representation.pPhysicsObject = NULL;
 			}
 		}
@@ -9457,13 +9497,13 @@ void C_EnginePortalInternal::ClearLocalPhysics(void)
 
 	if (m_InternalData.Simulation.Static.Wall.Local.Brushes.pPhysicsObject)
 	{
-		pPhysicsEnvironment->DestroyObject(m_InternalData.Simulation.Static.Wall.Local.Brushes.pPhysicsObject);
+		m_pPhysicsEnvironment->DestroyObject(m_InternalData.Simulation.Static.Wall.Local.Brushes.pPhysicsObject);
 		m_InternalData.Simulation.Static.Wall.Local.Brushes.pPhysicsObject = NULL;
 	}
 
 	if (m_InternalData.Simulation.Static.Wall.Local.Tube.pPhysicsObject)
 	{
-		pPhysicsEnvironment->DestroyObject(m_InternalData.Simulation.Static.Wall.Local.Tube.pPhysicsObject);
+		m_pPhysicsEnvironment->DestroyObject(m_InternalData.Simulation.Static.Wall.Local.Tube.pPhysicsObject);
 		m_InternalData.Simulation.Static.Wall.Local.Tube.pPhysicsObject = NULL;
 	}
 	VPhysicsSetObject(NULL);
@@ -9475,14 +9515,14 @@ void C_EnginePortalInternal::ClearLinkedPhysics(void)
 	{
 		if (m_InternalData.Simulation.Static.Wall.RemoteTransformedToLocal.Brushes.pPhysicsObject)
 		{
-			pPhysicsEnvironment->DestroyObject(m_InternalData.Simulation.Static.Wall.RemoteTransformedToLocal.Brushes.pPhysicsObject);
+			m_pPhysicsEnvironment->DestroyObject(m_InternalData.Simulation.Static.Wall.RemoteTransformedToLocal.Brushes.pPhysicsObject);
 			m_InternalData.Simulation.Static.Wall.RemoteTransformedToLocal.Brushes.pPhysicsObject = NULL;
 		}
 
 		if (m_InternalData.Simulation.Static.Wall.RemoteTransformedToLocal.StaticProps.PhysicsObjects.Count())
 		{
 			for (int i = m_InternalData.Simulation.Static.Wall.RemoteTransformedToLocal.StaticProps.PhysicsObjects.Count(); --i >= 0; )
-				pPhysicsEnvironment->DestroyObject(m_InternalData.Simulation.Static.Wall.RemoteTransformedToLocal.StaticProps.PhysicsObjects[i]);
+				m_pPhysicsEnvironment->DestroyObject(m_InternalData.Simulation.Static.Wall.RemoteTransformedToLocal.StaticProps.PhysicsObjects[i]);
 
 			m_InternalData.Simulation.Static.Wall.RemoteTransformedToLocal.StaticProps.PhysicsObjects.RemoveAll();
 		}

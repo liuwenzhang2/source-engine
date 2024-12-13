@@ -5753,7 +5753,7 @@ int CNPC_Hunter::OnTakeDamage( const CTakeDamageInfo &info )
 			// a flechette hitting us so we dissolve when killed and award
 			// the achievement of killing a hunter with its flechettes.
 			CUtlVector<IEngineObjectServer *> children;
-			GetAllChildren( pInflictor->GetEngineObject(), children );
+			pInflictor->GetEngineObject()->GetAllChildren( children );
 			for (int i = 0; i < children.Count(); i++ )
 			{
 				CBaseEntity *pent = children.Element( i )->GetOuter();

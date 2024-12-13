@@ -523,15 +523,13 @@ void UTIL_Portal_TraceEntity( CBaseEntity *pEntity, const Vector &vecAbsStart, c
 	Assert( (GameRules() == NULL) || GameRules()->IsMultiplayer() );
 	Assert( pEntity->IsPlayer() );
 
-	CPortalSimulator *pPortalSimulator = NULL;
+	IEnginePortalClient *pPortalSimulator = NULL;
 	if( pEntity->IsPlayer() )
 	{
-		C_Prop_Portal *pPortal = ((C_Portal_Player *)pEntity)->m_hPortalEnvironment.Get();
-		if( pPortal )
-			pPortalSimulator = pPortal;//->m_hPortalSimulator
+		pPortalSimulator = pEntity->GetEnginePlayer()->GetPortalEnvironment();
 	}
 #else
-	CProp_Portal *pPortalSimulator = CProp_Portal::GetSimulatorThatOwnsEntity( pEntity );
+	IEnginePortalServer *pPortalSimulator = pEntity->GetEngineObject()->GetSimulatorThatOwnsEntity();
 #endif
 
 	memset( pTrace, 0, sizeof(trace_t));
@@ -559,7 +557,7 @@ void UTIL_Portal_TraceEntity( CBaseEntity *pEntity, const Vector &vecAbsStart, c
 	}
 	else
 	{
-		pPortalSimulator->TraceEntity(pEntity, vecAbsStart, vecAbsEnd, mask, pFilter, pTrace);
+		((CPSCollisionEntity*)pPortalSimulator->AsEngineObject()->GetOuter())->GetPortalSimulator()->TraceEntity(pEntity, vecAbsStart, vecAbsEnd, mask, pFilter, pTrace);
 	}
 }
 

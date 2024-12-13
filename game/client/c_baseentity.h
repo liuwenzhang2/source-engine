@@ -810,6 +810,8 @@ public:
 
 	virtual IEngineObjectClient* GetEngineObject();
 	virtual const IEngineObjectClient* GetEngineObject() const;
+	virtual IEnginePlayerClient* GetEnginePlayer();
+	virtual const IEnginePlayerClient* GetEnginePlayer() const;
 	virtual IEnginePortalClient* GetEnginePortal();
 	virtual const IEnginePortalClient* GetEnginePortal() const;
 	virtual IEngineRopeClient* GetEngineRope();

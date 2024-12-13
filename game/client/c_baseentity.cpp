@@ -402,6 +402,13 @@ const IEngineObjectClient* C_BaseEntity::GetEngineObject() const {
 	return ClientEntityList().GetEngineObject(entindex());
 }
 
+IEnginePlayerClient* C_BaseEntity::GetEnginePlayer() {
+	return dynamic_cast<IEnginePlayerClient*>(GetEngineObject());
+}
+const IEnginePlayerClient* C_BaseEntity::GetEnginePlayer() const {
+	return dynamic_cast<const IEnginePlayerClient*>(GetEngineObject());
+}
+
 IEnginePortalClient* C_BaseEntity::GetEnginePortal()
 {
 	return dynamic_cast<IEnginePortalClient*>(GetEngineObject());

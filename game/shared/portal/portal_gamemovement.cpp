@@ -138,7 +138,7 @@ void CPortalGameMovement::ProcessMovement( CBasePlayer *pPlayer, CMoveData *pMov
 	mv = pMove;
 	mv->m_flMaxSpeed = sv_maxspeed.GetFloat();
 	
-	m_bInPortalEnv = (((CPortal_Player *)pPlayer)->m_hPortalEnvironment != NULL);
+	m_bInPortalEnv = (((CPortal_Player *)pPlayer)->GetPortalEnvironment() != NULL);
 
 	g_bAllowForcePortalTrace = m_bInPortalEnv;
 	g_bForcePortalTrace = m_bInPortalEnv;
@@ -402,7 +402,7 @@ void TracePlayerBBoxForGround2( const Vector& start, const Vector& end, const Ve
 	VPROF( "TracePlayerBBoxForGround" );
 
 	CPortal_Player *pPortalPlayer = dynamic_cast<CPortal_Player *>(player);
-	CProp_Portal *pPlayerPortal = pPortalPlayer->m_hPortalEnvironment;
+	CProp_Portal *pPlayerPortal = pPortalPlayer->GetPortalEnvironment();
 
 #ifndef CLIENT_DLL
 	if( pPlayerPortal && pPlayerPortal->IsReadyToSimulate() == false )//m_hPortalSimulator->
@@ -622,9 +622,9 @@ int CPortalGameMovement::CheckStuck( void )
 
 		//try to fix it, then recheck
 		Vector vIndecisive;
-		if( pPortalPlayer->m_hPortalEnvironment )
+		if( pPortalPlayer->GetPortalEnvironment())
 		{
-			pPortalPlayer->m_hPortalEnvironment->GetEngineObject()->GetVectors( &vIndecisive, NULL, NULL );
+			pPortalPlayer->GetPortalEnvironment()->GetEngineObject()->GetVectors( &vIndecisive, NULL, NULL );
 		}
 		else
 		{
@@ -632,7 +632,7 @@ int CPortalGameMovement::CheckStuck( void )
 		}
 		Vector ptOldOrigin = pPortalPlayer->GetEngineObject()->GetAbsOrigin();
 
-		if( pPortalPlayer->m_hPortalEnvironment )
+		if( pPortalPlayer->GetPortalEnvironment())
 		{
 			if( !FindClosestPassableSpace( pPortalPlayer, vIndecisive ) )
 			{
@@ -694,7 +694,7 @@ void CPortalGameMovement::TracePlayerBBox( const Vector& start, const Vector& en
 	CTraceFilterTranslateClones traceFilter( &baseFilter );
 #endif
 
-	UTIL_Portal_TraceRay_With( pPortalPlayer->m_hPortalEnvironment, ray, fMask, &traceFilter, &pm );
+	UTIL_Portal_TraceRay_With( pPortalPlayer->GetPortalEnvironment(), ray, fMask, &traceFilter, &pm );
 
 	// If we're moving through a portal and failed to hit anything with the above ray trace
 	// Use UTIL_Portal_TraceEntity to test this movement through a portal and override the trace with the result

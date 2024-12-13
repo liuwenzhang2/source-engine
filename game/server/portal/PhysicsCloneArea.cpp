@@ -43,7 +43,7 @@ void CPhysicsCloneArea::StartTouch( CBaseEntity *pOther )
 	}
 #endif
 
-	m_pAttachedSimulator->StartCloningEntity( pOther );
+	m_pAttachedSimulator->pCollisionEntity->GetEnginePortal()->StartCloningEntity( pOther );
 }
 
 void CPhysicsCloneArea::Touch( CBaseEntity *pOther )
@@ -71,7 +71,7 @@ void CPhysicsCloneArea::EndTouch( CBaseEntity *pOther )
 	}
 #endif
 
-	m_pAttachedSimulator->StopCloningEntity( pOther );
+	m_pAttachedSimulator->pCollisionEntity->GetEnginePortal()->StopCloningEntity( pOther );
 }
 
 void CPhysicsCloneArea::Spawn( void )
@@ -222,7 +222,7 @@ void CPhysicsCloneArea::CloneTouchingEntities( void )
 		if( root )
 		{
 			for( servertouchlink_t *link = root->nextLink; link != root; link = link->nextLink )
-				m_pAttachedSimulator->StartCloningEntity( (CBaseEntity*)gEntList.GetServerEntityFromHandle(link->entityTouched) );
+				m_pAttachedSimulator->pCollisionEntity->GetEnginePortal()->StartCloningEntity( (CBaseEntity*)gEntList.GetServerEntityFromHandle(link->entityTouched) );
 		}
 	}
 }

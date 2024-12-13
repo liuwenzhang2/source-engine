@@ -28,15 +28,12 @@ class CPhysicsShadowClone : public CBaseAnimating
 
 private:
 
-
-
 public:
 	CPhysicsShadowClone( void );
 	virtual ~CPhysicsShadowClone( void );
 	
 	static int GetEngineObjectTypeStatic() { return ENGINEOBJECT_SHADOWCLONE; }
 
-	DBG_CODE_NOSCOPE( const char *m_szDebugMarker; );
 
 	//do the thing with the stuff, you know, the one that goes WooooWooooWooooWooooWoooo
 	virtual void	Spawn( void );
@@ -69,12 +66,6 @@ public:
 	virtual int		OnTakeDamage( const CTakeDamageInfo &info );
 	virtual int		TakeHealth( float flHealth, int bitsDamageType );
 	virtual void	Event_Killed( const CTakeDamageInfo &info );
-
-
-	static CPhysicsShadowClone *CreateShadowClone( IPhysicsEnvironment *pInPhysicsEnvironment, EHANDLE hEntToClone, const char *szDebugMarker, const matrix3x4_t *pTransformationMatrix = NULL );
-	static void ReleaseShadowClone(CPhysicsShadowClone* pShadowClone);
-
-	
 
 	//static bool IsShadowClone( const CBaseEntity *pEntity );
 	//static CPhysicsShadowCloneLL *GetClonesOfEntity( const CBaseEntity *pEntity );

@@ -282,7 +282,6 @@ RecvPropInt( RECVINFO( m_iPlayerSoundType ) ),
 RecvPropBool( RECVINFO( m_bHeldObjectOnOppositeSideOfPortal ) ),
 RecvPropEHandle( RECVINFO( m_pHeldObjectPortal ) ),
 RecvPropBool( RECVINFO( m_bPitchReorientation ) ),
-RecvPropEHandle( RECVINFO( m_hPortalEnvironment ) ),
 RecvPropEHandle( RECVINFO( m_hSurroundingLiquidPortal ) ),
 RecvPropBool( RECVINFO( m_bSuppressingCrosshair ) ),
 END_RECV_TABLE()
@@ -1043,8 +1042,8 @@ void C_Portal_Player::PlayerPortalled( C_Prop_Portal *pEnteredPortal )
 
 void C_Portal_Player::OnPreDataChanged( DataUpdateType_t type )
 {
-	Assert( m_pPortalEnvironment_LastCalcView == m_hPortalEnvironment.Get() );
-	PreDataChanged_Backup.m_hPortalEnvironment = m_hPortalEnvironment;
+	Assert( m_pPortalEnvironment_LastCalcView == GetPortalEnvironment() );
+	PreDataChanged_Backup.m_hPortalEnvironment = GetPortalEnvironment();
 	PreDataChanged_Backup.m_hSurroundingLiquidPortal = m_hSurroundingLiquidPortal;
 	PreDataChanged_Backup.m_qEyeAngles = m_iv_angEyeAngles.GetCurrent();
 
@@ -1411,7 +1410,7 @@ void C_Portal_Player::CalcView( Vector &eyeOrigin, QAngle &eyeAngles, float &zNe
 
 	QAngle qEyeAngleBackup = EyeAngles();
 	Vector ptEyePositionBackup = EyePosition();
-	C_Prop_Portal *pPortalBackup = m_hPortalEnvironment.Get();
+	C_Prop_Portal *pPortalBackup = GetPortalEnvironment();
 
 	if ( m_lifeState != LIFE_ALIVE )
 	{
@@ -1471,7 +1470,7 @@ void C_Portal_Player::CalcView( Vector &eyeOrigin, QAngle &eyeAngles, float &zNe
 			else
 			{
 				CalcPlayerView( eyeOrigin, eyeAngles, fov );
-				if( m_hPortalEnvironment.Get() != NULL )
+				if(GetPortalEnvironment() != NULL )
 				{
 					//time for hax
 					m_bEyePositionIsTransformedByPortal = bEyeTransform_Backup;
@@ -1514,6 +1513,11 @@ void C_Portal_Player::SetViewAngles( const QAngle& ang )
 	}
 }
 
+C_Prop_Portal* C_Portal_Player::GetPortalEnvironment()
+{
+	return GetEnginePlayer()->GetPortalEnvironment() ? (C_Prop_Portal*)((CPSCollisionEntity*)GetEnginePlayer()->GetPortalEnvironment()->AsEngineObject()->GetOuter())->GetPortalSimulator() : NULL;
+}
+
 void C_Portal_Player::CalcPortalView( Vector &eyeOrigin, QAngle &eyeAngles )
 {
 	//although we already ran CalcPlayerView which already did these copies, they also fudge these numbers in ways we don't like, so recopy
@@ -1523,7 +1527,7 @@ void C_Portal_Player::CalcPortalView( Vector &eyeOrigin, QAngle &eyeAngles )
 	//Re-apply the screenshake (we just stomped it)
 	vieweffects->ApplyShake( eyeOrigin, eyeAngles, 1.0 );
 
-	C_Prop_Portal *pPortal = m_hPortalEnvironment.Get();
+	C_Prop_Portal *pPortal = GetPortalEnvironment();
 	assert( pPortal );
 
 	C_Prop_Portal *pRemotePortal = pPortal->GetLinkedPortal();

@@ -42,11 +42,6 @@
 #include "coordsize.h"
 #include "soundenvelope.h"
 #include "datacache/idatacache.h"
-#ifdef PORTAL
-//#include "PortalSimulation.h"
-#include "prop_portal.h"
-//void PortalPhysFrame(float deltaTime); //small wrapper for PhysFrame that simulates all 3 environments at once
-#endif
 
 //class CBaseEntity;
 // We can only ever move 512 entities across a transition
@@ -331,6 +326,9 @@ public:
 	void UnlinkAllChildren();
 	void UnlinkFromParent();
 	void TransferChildren(IEngineObjectServer* pNewParent);
+	int GetAllChildren(CUtlVector<IEngineObjectServer*>& list);
+	bool EntityIsParentOf(IEngineObjectServer* pEntity);
+	int GetAllInHierarchy(CUtlVector<IEngineObjectServer*>& list);
 
 	int AreaNum() const;
 	PVSInfo_t* GetPVSInfo();
@@ -819,7 +817,10 @@ public:
 	bool IsPortalSimulatorCollisionEntity() { return false; }
 	bool IsShadowClone() { return false; }
 	CEngineObjectInternal* GetClonesOfEntity() const;
-	IEngineShadowCloneServer* AsEngineShadowCloneServer() { return NULL; }
+	IEngineShadowCloneServer* AsEngineShadowClone() { return NULL; }
+	IEnginePortalServer* GetSimulatorThatOwnsEntity(); //fairly cheap to call
+	bool IsPlayer() { return false; }
+	IEnginePlayerServer* AsEnginePlayer() { return NULL; }
 public:
 	// Networking related methods
 	void NetworkStateChanged();
@@ -1723,16 +1724,12 @@ public:
 
 class CEnginePlayerInternal : public CEngineObjectInternal, public IEnginePlayerServer {
 public:
+	friend class CEnginePortalInternal;
+	template<class T> friend class CGlobalEntityList;
 	DECLARE_CLASS(CEnginePlayerInternal, CEngineObjectInternal);
-	CEnginePlayerInternal(IServerEntityList* pServerEntityList, int iForceEdictIndex, int iSerialNum)
-		:CEngineObjectInternal(pServerEntityList, iForceEdictIndex, iSerialNum)
-	{
-
-	}
-
-	~CEnginePlayerInternal() {
-
-	}
+	DECLARE_DATADESC();
+	CEnginePlayerInternal(IServerEntityList* pServerEntityList, int iForceEdictIndex, int iSerialNum);
+	~CEnginePlayerInternal();
 	virtual void			VPhysicsDestroyObject();
 	// Player Physics Shadow
 	void					SetupVPhysicsShadow(const Vector& vHullMin, const Vector& vHullMax, const Vector& vDuckHullMin, const Vector& vDuckHullMax);
@@ -1740,27 +1737,52 @@ public:
 	void UpdateVPhysicsPosition(const Vector& position, const Vector& velocity, float secondsToArrival);
 	void					SetVCollisionState(const Vector& vecAbsOrigin, const Vector& vecAbsVelocity, int collisionState);
 	int GetVphysicsCollisionState() { return m_vphysicsCollisionState; }
-
+	bool IsPlayer() { return true; }
+	CEnginePlayerInternal* AsEnginePlayer() { return this; }
+	CEngineObjectInternal* AsEngineObject() { return this; }
+	IEnginePortalServer* GetPortalEnvironment() { return m_hPortalEnvironment.Get() ? m_hPortalEnvironment.Get()->GetEnginePortal() : NULL; }
+	void SetPortalEnvironment(IEnginePortalServer* pEnginePortal) { m_hPortalEnvironment = pEnginePortal ? pEnginePortal->AsEngineObject()->GetOuter() : NULL; }
 private:
 	void UpdatePhysicsShadowToPosition(const Vector& vecAbsOrigin);
-
 private:
 	IPhysicsPlayerController* m_pPhysicsController;
 	IPhysicsObject* m_pShadowStand;
 	IPhysicsObject* m_pShadowCrouch;
 	// Player Physics Shadow
 	int m_vphysicsCollisionState;
+	bool m_bPlayerIsInSimulator = false;
+	CNetworkHandle(CBaseEntity, m_hPortalEnvironment); //if the player is in a portal environment, this is the associated portal
+
+};
+
+class CEngineShadowCloneInternal;
+struct PS_SD_Dynamic_PhysicsShadowClones_t
+{
+	CUtlVector<CBaseEntity*> ShouldCloneFromMain; //a list of entities that should be cloned from main if physics simulation is enabled
+	//in single-environment mode, this helps us track who should collide with who
+
+	CUtlVector<CEngineShadowCloneInternal*> FromLinkedPortal;
 };
 
 class CEnginePortalInternal : public CEngineObjectInternal, public IEnginePortalServer {
 public:
+	friend class CEngineObjectInternal;
+	template<class T> friend class CGlobalEntityList;
 	DECLARE_CLASS(CEnginePortalInternal, CEngineObjectInternal);
 	CEnginePortalInternal(IServerEntityList* pServerEntityList, int iForceEdictIndex, int iSerialNum);
 	~CEnginePortalInternal();
 	virtual IPhysicsObject* VPhysicsGetObject(void) const;
 	virtual int		VPhysicsGetObjectList(IPhysicsObject** pList, int listMax);
 	void	VPhysicsDestroyObject(void);
+	int					GetPortalSimulatorGUID(void) const { return m_iPortalSimulatorGUID; }
+	void				SetVPhysicsSimulationEnabled(bool bEnabled); //enable/disable vphysics simulation. Will automatically update the linked portal to be the same
+	bool				IsSimulatingVPhysics(void) const; //this portal is setup to handle any physically simulated object, false means the portal is handling player movement only
+	bool				IsLocalDataIsReady() { return m_bLocalDataIsReady; }
+	void				SetLocalDataIsReady(bool bLocalDataIsReady) { m_bLocalDataIsReady = bLocalDataIsReady; }
+	bool				IsReadyToSimulate(void) const; //is active and linked to another portal
 	void				MoveTo(const Vector& ptCenter, const QAngle& angles);
+	void				AttachTo(IEnginePortalServer* pLinkedPortal);
+	void				DetachFromLinked(void);
 	void				UpdateLinkMatrix(IEnginePortalServer* pRemoteCollisionEntity);
 	bool				EntityIsInPortalHole(IEngineObjectServer* pEntity) const; //true if the entity is within the portal cutout bounds and crossing the plane. Not just *near* the portal
 	bool				EntityHitBoxExtentIsInPortalHole(IEngineObjectServer* pBaseAnimating) const; //true if the entity is within the portal cutout bounds and crossing the plane. Not just *near* the portal
@@ -1802,11 +1824,72 @@ public:
 	void				CreateHoleShapeCollideable();
 	void				ClearHoleShapeCollideable();
 	bool				IsPortalSimulatorCollisionEntity() { return true; }
+	bool				OwnsEntity(const CBaseEntity* pEntity) const;
+	bool				OwnsPhysicsForEntity(const CBaseEntity* pEntity) const;
+	void				MarkAsOwned(CBaseEntity* pEntity);
+	void				MarkAsReleased(CBaseEntity* pEntity);
+	//these three really should be made internal and the public interface changed to a "watch this entity" setup
+	void				TakeOwnershipOfEntity(CBaseEntity* pEntity); //general ownership, not necessarily physics ownership
+	void				ReleaseOwnershipOfEntity(CBaseEntity* pEntity, bool bMovingToLinkedSimulator = false); //if bMovingToLinkedSimulator is true, the code skips some steps that are going to be repeated when the entity is added to the other simulator
+	void				ReleaseAllEntityOwnership(void); //go back to not owning any entities
+
+	void				TakePhysicsOwnership(CBaseEntity* pEntity);
+	void				ReleasePhysicsOwnership(CBaseEntity* pEntity, bool bContinuePhysicsCloning = true, bool bMovingToLinkedSimulator = false);
+
+	int					GetMoveableOwnedEntities(CBaseEntity** pEntsOut, int iEntOutLimit); //gets owned entities that aren't either world or static props. Excludes fake portal ents such as physics clones
+
+	virtual void		BeforeMove();
+	virtual void        AfterMove();
+
+	virtual void		BeforeLocalPhysicsClear();
+	virtual	void		AfterLocalPhysicsCreated();
+	virtual void		BeforeLinkedPhysicsClear();
+	virtual void		AfterLinkedPhysicsCreated();
+
+	virtual void				AfterCollisionEntityCreated();
+	virtual void				BeforeCollisionEntityDestroy();
+
+	void				StartCloningEntity(CBaseEntity* pEntity);
+	void				StopCloningEntity(CBaseEntity* pEntity);
+	void				ClearLinkedEntities(void); //gets rid of transformed shadow clones
+
+	CEngineObjectInternal* AsEngineObject() { return this; }
+	unsigned int GetEntFlags(int entindex) { return m_EntFlags[entindex]; }
+	unsigned int m_EntFlags[MAX_EDICTS]; //flags maintained for every entity in the world based on its index
 private:
+	int					m_iPortalSimulatorGUID;
+	CEnginePortalInternal* m_pLinkedPortal;
+	bool				m_bSimulateVPhysics;
+	bool				m_bLocalDataIsReady; //this side of the portal is properly setup, no guarantees as to linkage to another portal
 	PS_InternalData_t m_InternalData;
 	const PS_InternalData_t& m_DataAccess;
-	IPhysicsEnvironment* pPhysicsEnvironment = NULL;
+	IPhysicsEnvironment* m_pPhysicsEnvironment = NULL;
+	PS_SD_Dynamic_PhysicsShadowClones_t m_ShadowClones;
+	CUtlVector<CBaseEntity*> m_OwnedEntities;
+	int m_iFixEntityCount;
+	CBaseEntity** m_pFixEntities;
+	cplane_t m_OldPlane;
 };
+
+//inline const VMatrix& CProp_Portal::MatrixThisToLinked() const
+//{
+//	return m_matrixThisToLinked;
+//}
+
+inline bool CEnginePortalInternal::OwnsEntity(const CBaseEntity* pEntity) const
+{
+	return ((m_EntFlags[pEntity->entindex()] & PSEF_OWNS_ENTITY) != 0);
+}
+
+inline bool CEnginePortalInternal::OwnsPhysicsForEntity(const CBaseEntity* pEntity) const
+{
+	return ((m_EntFlags[pEntity->entindex()] & PSEF_OWNS_PHYSICS) != 0);
+}
+
+inline bool CEnginePortalInternal::IsReadyToSimulate(void) const
+{
+	return m_bLocalDataIsReady && m_pLinkedPortal && m_pLinkedPortal->m_bLocalDataIsReady;
+}
 
 #ifdef DEBUG_PORTAL_SIMULATION_CREATION_TIMES
 #define STARTDEBUGTIMER(x) { x.Start(); }
@@ -1838,6 +1921,7 @@ struct PhysicsObjectCloneLink_t
 
 class CEngineShadowCloneInternal : public CEngineObjectInternal, public IEngineShadowCloneServer {
 public:
+	friend class CEnginePortalInternal;
 	DECLARE_CLASS(CEngineShadowCloneInternal, CEngineObjectInternal);
 	CEngineShadowCloneInternal(IServerEntityList* pServerEntityList, int iForceEdictIndex, int iSerialNum);
 	~CEngineShadowCloneInternal();
@@ -1866,9 +1950,12 @@ public:
 	//given a physics object that is part of this clone, tells you which physics object in the source
 	IPhysicsObject* TranslatePhysicsToClonedEnt(const IPhysicsObject* pPhysics);
 	bool			IsShadowClone() { return true; }
-	CEngineShadowCloneInternal* AsEngineShadowCloneServer() { return this; }
-	CEngineObjectInternal* AsEngineObjectServer() { return this; }
+	CEngineShadowCloneInternal* AsEngineShadowClone() { return this; }
+	CEngineObjectInternal* AsEngineObject() { return this; }
 	CEngineShadowCloneInternal* GetNext() { return m_pNext; }
+
+	static CEngineShadowCloneInternal* CreateShadowClone(IPhysicsEnvironment* pInPhysicsEnvironment, EHANDLE hEntToClone, const char* szDebugMarker, const matrix3x4_t* pTransformationMatrix = NULL);
+	static void ReleaseShadowClone(CEngineShadowCloneInternal* pShadowClone);
 private:
 	EHANDLE			m_hClonedEntity; //the entity we're supposed to be cloning the physics of
 	VMatrix			m_matrixShadowTransform; //all cloned coordinates and angles will be run through this matrix before being applied
@@ -1882,6 +1969,7 @@ private:
 	IPhysicsEnvironment* m_pOwnerPhysEnvironment; //clones exist because of multi-environment situations
 	bool			m_bShouldUpSync;
 	CEngineShadowCloneInternal* m_pNext = NULL;
+	DBG_CODE_NOSCOPE(const char* m_szDebugMarker; );
 };
 
 
@@ -2444,6 +2532,7 @@ struct CPhysicsShadowCloneLL
 	CPhysicsShadowCloneLL* pNext;
 };
 
+#define MAX_SHADOW_CLONE_COUNT 200
 
 struct ShadowCloneLLEntryManager
 {
@@ -2489,6 +2578,7 @@ class CGlobalEntityList : public CBaseEntityList<T>, public IServerEntityList, p
 	friend class CEngineObjectInternal;
 	friend class CEnginePortalInternal;
 	friend class CEngineShadowCloneInternal;
+	friend class CEnginePlayerInternal;
 	typedef CBaseEntityList<T> BaseClass;
 public:
 
@@ -2723,6 +2813,8 @@ public:
 
 	virtual void PreClientUpdate();
 
+	void PrePhysFrame(void);
+	void PostPhysFrame(void);
 #ifdef PORTAL
 	void PortalPhysFrame(float deltaTime);
 #endif // PORTAL
@@ -3192,6 +3284,7 @@ public:
 		}
 	}
 
+	CEnginePortalInternal* GetSimulatorThatCreatedPhysicsObject(const IPhysicsObject* pObject, PS_PhysicsObjectSourceType_t* pOut_SourceType = NULL);
 protected:
 	virtual void AfterCreated(IHandleEntity* pEntity);
 	virtual void BeforeDestroy(IHandleEntity* pEntity);
@@ -3314,6 +3407,8 @@ private:
 	CUtlVector<CEngineShadowCloneInternal*> m_ActiveShadowClones;
 	CPhysicsShadowCloneLL* m_EntityClones[MAX_EDICTS] = { NULL };
 	ShadowCloneLLEntryManager m_SCLLManager;
+	CEnginePortalInternal* m_OwnedEntityMap[MAX_EDICTS] = { NULL };
+	CUtlVector<CEnginePlayerInternal*> m_ActivePlayers;
 };
 
 extern void PhysParseSurfaceData(class IPhysicsSurfaceProps* pProps, class IFileSystem* pFileSystem);
@@ -3447,12 +3542,95 @@ void CGlobalEntityList<T>::LevelShutdownPostEntity()
 	FlushVehicleScripts();
 }
 
+extern void UpdateShadowClonesPortalSimulationFlags(const CBaseEntity* pSourceEntity, unsigned int iFlags, int iSourceFlags);
+
+template<class T>
+void CGlobalEntityList<T>::PrePhysFrame(void)
+{
+	int iPortalSimulators = m_ActivePortals.Count();
+
+	if (iPortalSimulators != 0)
+	{
+		CEnginePortalInternal** pAllSimulators = m_ActivePortals.Base();
+		for (int i = 0; i != iPortalSimulators; ++i)
+		{
+			CEnginePortalInternal* pSimulator = pAllSimulators[i];
+			if (!pSimulator->IsReadyToSimulate())
+				continue;
+
+			int iOwnedEntities = pSimulator->m_OwnedEntities.Count();
+			if (iOwnedEntities != 0)
+			{
+				CBaseEntity** pOwnedEntities = pSimulator->m_OwnedEntities.Base();
+
+				for (int j = 0; j != iOwnedEntities; ++j)
+				{
+					CBaseEntity* pEntity = pOwnedEntities[j];
+					if (pEntity->GetEngineObject()->IsShadowClone())
+						continue;
+
+					Assert((pEntity != NULL) && (pEntity->GetEngineObject()->IsMarkedForDeletion() == false));
+					IPhysicsObject* pPhysObject = pEntity->GetEngineObject()->VPhysicsGetObject();
+					if ((pPhysObject == NULL) || pPhysObject->IsAsleep())
+						continue;
+
+					int iEntIndex = pEntity->entindex();
+					int iExistingFlags = pSimulator->m_EntFlags[iEntIndex];
+					if (pSimulator->EntityIsInPortalHole(pEntity->GetEngineObject()))
+						pSimulator->m_EntFlags[iEntIndex] |= PSEF_IS_IN_PORTAL_HOLE;
+					else
+						pSimulator->m_EntFlags[iEntIndex] &= ~PSEF_IS_IN_PORTAL_HOLE;
+
+					UpdateShadowClonesPortalSimulationFlags(pEntity, PSEF_IS_IN_PORTAL_HOLE, pSimulator->m_EntFlags[iEntIndex]);
+
+					if (((iExistingFlags ^ pSimulator->m_EntFlags[iEntIndex]) & PSEF_IS_IN_PORTAL_HOLE) != 0) //value changed
+					{
+						pEntity->GetEngineObject()->CollisionRulesChanged(); //entity moved into or out of the portal hole, need to either add or remove collision with transformed geometry
+
+						IEngineObjectServer* pClones = pEntity->GetEngineObject()->GetClonesOfEntity();
+						while (pClones)
+						{
+							pClones->CollisionRulesChanged();
+							pClones = pClones->AsEngineShadowClone()->GetNext() ? pClones->AsEngineShadowClone()->GetNext()->AsEngineObject() : NULL;
+						}
+					}
+				}
+			}
+		}
+	}
+}
+
+template<class T>
+void CGlobalEntityList<T>::PostPhysFrame(void)
+{
+	if (m_ActivePlayers.Count()) {
+		for (int i = 0; i < m_ActivePlayers.Count(); i++) {
+			CEnginePlayerInternal* pPlayer = m_ActivePlayers[i];
+			if (pPlayer->m_bPlayerIsInSimulator)
+			{
+				IEnginePortalServer* pTouchedPortal = pPlayer->GetPortalEnvironment();
+				IEnginePortalServer* pSim = pPlayer->AsEngineObject()->GetSimulatorThatOwnsEntity();
+				if (pTouchedPortal && pSim && (pTouchedPortal->GetPortalSimulatorGUID() != pSim->GetPortalSimulatorGUID()))//m_hPortalSimulator->
+				{
+					Warning("Player is simulated in a physics environment but isn't touching a portal! Can't teleport, but can fall through portal hole. Returning player to main environment.\n");
+					//ADD_DEBUG_HISTORY(HISTORY_PLAYER_DAMAGE, UTIL_VarArgs("Player in PortalSimulator but not touching a portal, removing from sim at : %f\n", gpGlobals->curtime));
+
+					if (pSim)
+					{
+						pSim->ReleaseOwnershipOfEntity(pPlayer->AsEngineObject()->GetOuter(), false);
+					}
+				}
+			}
+		}
+	}
+}
+
 #ifdef PORTAL
 extern ConVar sv_fullsyncclones;
 template<class T>
 void CGlobalEntityList<T>::PortalPhysFrame(float deltaTime) //small wrapper for PhysFrame that simulates all environments at once
 {
-	CProp_Portal::PrePhysFrame();
+	PrePhysFrame();
 
 	if (sv_fullsyncclones.GetBool())
 		FullSyncAllClones();
@@ -3466,7 +3644,7 @@ void CGlobalEntityList<T>::PortalPhysFrame(float deltaTime) //small wrapper for 
 	m_Collisions.BufferTouchEvents(false);
 	m_Collisions.FrameUpdate();
 
-	CProp_Portal::PostPhysFrame();
+	PostPhysFrame();
 }
 #endif
 
@@ -6281,6 +6459,18 @@ void CGlobalEntityList<T>::FullSyncAllClones(void)
 	{
 		m_ActiveShadowClones[i]->FullSync(true);
 	}
+}
+
+template<class T>
+CEnginePortalInternal* CGlobalEntityList<T>::GetSimulatorThatCreatedPhysicsObject(const IPhysicsObject* pObject, PS_PhysicsObjectSourceType_t* pOut_SourceType)
+{
+	for (int i = m_ActivePortals.Count(); --i >= 0; )
+	{
+		if (m_ActivePortals[i]->CreatedPhysicsObject(pObject, pOut_SourceType))
+			return m_ActivePortals[i];
+	}
+
+	return NULL;
 }
 
 extern CGlobalEntityList<CBaseEntity> gEntList;

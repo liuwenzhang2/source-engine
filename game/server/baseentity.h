@@ -1430,6 +1430,8 @@ public:
 	}
 	virtual CBaseEntity* NPCPhysics_CreateSolver(CBaseEntity* pPhysicsObject, bool disableCollisions, float separationDuration);
 	virtual CBaseEntity* EntityPhysics_CreateSolver(CBaseEntity* pPhysicsBlocker, bool disableCollisions, float separationDuration);
+	virtual void			PortalSimulator_TookOwnershipOfEntity(IEnginePortalServer* pEntity) {}
+	virtual void			PortalSimulator_ReleasedOwnershipOfEntity(IEnginePortalServer* pEntity) {}
 public:
 //#if !defined( NO_ENTITY_PREDICTION )
 //	// The player drives simulation of this entity

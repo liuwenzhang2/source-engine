@@ -18,8 +18,7 @@
 #include "prop_portal.h"
 
 
-static int g_iShadowCloneCount = 0;
-ConVar sv_use_shadow_clones( "sv_use_shadow_clones", "1", FCVAR_REPLICATED | FCVAR_CHEAT ); //should we create shadow clones?
+
 
 LINK_ENTITY_TO_CLASS( physicsshadowclone, CPhysicsShadowClone );
 
@@ -144,82 +143,7 @@ void CPhysicsShadowClone::Event_Killed( const CTakeDamageInfo &info )
 		BaseClass::Event_Killed( info );
 }
 
-CPhysicsShadowClone *CPhysicsShadowClone::CreateShadowClone( IPhysicsEnvironment *pInPhysicsEnvironment, EHANDLE hEntToClone, const char *szDebugMarker, const matrix3x4_t *pTransformationMatrix /*= NULL*/ )
-{
-	AssertMsg( szDebugMarker != NULL, "All shadow clones must have a debug marker for where it came from in debug builds." );
 
-	if( !sv_use_shadow_clones.GetBool() )
-		return NULL;
-
-	CBaseEntity *pClonedEntity = hEntToClone.Get();
-	if( pClonedEntity == NULL )
-		return NULL;
-
-	AssertMsg(pClonedEntity->GetEngineObject()->IsShadowClone() == false, "Shouldn't attempt to clone clones" );
-
-	if( pClonedEntity->GetEngineObject()->IsMarkedForDeletion() )
-		return NULL;
-
-	//if( pClonedEntity->IsPlayer() )
-	//	return NULL;
-
-	IPhysicsObject *pPhysics = pClonedEntity->GetEngineObject()->VPhysicsGetObject();
-
-	if( pPhysics == NULL )
-		return NULL;
-
-	if( pPhysics->IsStatic() )
-		return NULL;
-
-	if( pClonedEntity->GetEngineObject()->GetSolid() == SOLID_BSP )
-		return NULL;
-
-	if( pClonedEntity->GetEngineObject()->GetSolidFlags() & (FSOLID_NOT_SOLID | FSOLID_TRIGGER) )
-		return NULL;
-
-	if( pClonedEntity->GetEngineObject()->GetFlags() & (FL_WORLDBRUSH | FL_STATICPROP) )
-		return NULL;
-
-	/*if( FClassnameIs( pClonedEntity, "func_door" ) )
-	{
-		//only clone func_door's that are in front of the portal
-		
-		return NULL;
-	}*/
-
-	// Too many shadow clones breaks the game (too many entities)
-	if( g_iShadowCloneCount >= MAX_SHADOW_CLONE_COUNT )
-	{
-		AssertMsg( false, "Too many shadow clones, consider upping the limit or reducing the level's physics props" );
-		return NULL;
-	}
-	++g_iShadowCloneCount;
-
-	CPhysicsShadowClone *pClone = (CPhysicsShadowClone*)gEntList.CreateEntityByName("physicsshadowclone");
-	//s_IsShadowClone[pClone->entindex()] = true;
-	pClone->GetEngineShadowClone()->SetOwnerEnvironment(pInPhysicsEnvironment);
-	pClone->GetEngineShadowClone()->SetClonedEntity(hEntToClone);
-	DBG_CODE_NOSCOPE( pClone->m_szDebugMarker = szDebugMarker; );
-
-
-
-	if( pTransformationMatrix )
-	{
-		pClone->GetEngineShadowClone()->SetCloneTransformationMatrix(*pTransformationMatrix);
-	}
-
-	DispatchSpawn( pClone );
-
-	return pClone;
-}
-
-void CPhysicsShadowClone::ReleaseShadowClone(CPhysicsShadowClone* pShadowClone)
-{
-	gEntList.DestroyEntity(pShadowClone);
-
-	//Too many shadow clones breaks the game (too many entities)
-	--g_iShadowCloneCount;
-}
 
 
 
@@ -245,8 +169,8 @@ bool CTraceFilterTranslateClones::ShouldHitEntity( IHandleEntity *pEntity, int c
 	if(pEnt->GetEngineObject()->IsShadowClone() )
 	{
 		CBaseEntity *pClonedEntity = ((CPhysicsShadowClone *)pEnt)->GetEngineShadowClone()->GetClonedEntity();
-		CProp_Portal *pSimulator = CProp_Portal::GetSimulatorThatOwnsEntity( pClonedEntity );
-		if( pSimulator->m_EntFlags[pClonedEntity->entindex()] & PSEF_IS_IN_PORTAL_HOLE )
+		IEnginePortalServer *pSimulator = pClonedEntity->GetEngineObject()->GetSimulatorThatOwnsEntity();
+		if( pSimulator->GetEntFlags(pClonedEntity->entindex()) & PSEF_IS_IN_PORTAL_HOLE )
 			return m_pActualFilter->ShouldHitEntity( pClonedEntity, contentsMask );
 		else
 			return false;

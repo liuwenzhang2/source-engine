@@ -396,7 +396,7 @@ void CBreakableProp::SetEnableMotionPosition( const Vector &position, const QAng
 CBaseEntity	*CBreakableProp::FindEnableMotionFixup()
 {
 	CUtlVector<IEngineObjectServer*> list;
-	GetAllChildren( this->GetEngineObject(), list );
+	this->GetEngineObject()->GetAllChildren( list );
 	for ( int i = list.Count()-1; i >= 0; --i )
 	{
 		if ( FClassnameIs( list[i]->GetOuter(), "point_enable_motion_fixup"))
@@ -526,7 +526,7 @@ void CBreakableProp::HandleFirstCollisionInteractions( int index, gamevcollision
 	if ( HasInteraction( PROPINTER_PHYSGUN_NOTIFY_CHILDREN ) )
 	{
 		CUtlVector<IEngineObjectServer *> children;
-		GetAllChildren( this->GetEngineObject(), children );
+		this->GetEngineObject()->GetAllChildren( children );
 		for (int i = 0; i < children.Count(); i++ )
 		{
 			CBaseEntity *pent = children.Element( i )->GetOuter();
@@ -2829,7 +2829,7 @@ void CPhysicsProp::OnPhysGunDrop( CBasePlayer *pPhysGunUser, PhysGunDrop_t Reaso
 	if ( HasInteraction( PROPINTER_PHYSGUN_NOTIFY_CHILDREN ) )
 	{
 		CUtlVector<IEngineObjectServer *> children;
-		GetAllChildren( this->GetEngineObject(), children );
+		this->GetEngineObject()->GetAllChildren( children );
 		for (int i = 0; i < children.Count(); i++ )
 		{
 			CBaseEntity *pent = children.Element( i )->GetOuter();

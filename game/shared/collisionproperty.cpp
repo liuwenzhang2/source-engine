@@ -569,7 +569,7 @@ void CCollisionProperty::SetSolid( SolidType_t val )
 			// NOTE: This assumes things don't change back from SOLID_BSP
 			// NOTE: This is 100% true for HL2 - need to support removing the flag to support changing from SOLID_BSP
 			CUtlVector<IEngineObjectServer *> list;
-			GetAllChildren( GetOuter(), list);
+			GetOuter()->GetAllChildren( list);
 			for ( int i = list.Count()-1; i>=0; --i )
 			{
 				list[i]->AddSolidFlags(FSOLID_ROOT_PARENT_ALIGNED);

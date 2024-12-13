@@ -175,7 +175,10 @@ public:
 	CNetworkHandle( CBaseEntity, m_hRagdoll );	// networked entity handle
 
 	void SuppressCrosshair( bool bState ) { m_bSuppressingCrosshair = bState; }
-		
+	virtual void			PortalSimulator_TookOwnershipOfEntity(IEnginePortalServer* pEntity);
+	virtual void			PortalSimulator_ReleasedOwnershipOfEntity(IEnginePortalServer* pEntity);
+
+	CProp_Portal* GetPortalEnvironment();
 private:
 
 	virtual CAI_Expresser* CreateExpresser( void );
@@ -224,7 +227,6 @@ private:
 public:
 
 	CNetworkVar( bool, m_bPitchReorientation );
-	CNetworkHandle( CProp_Portal, m_hPortalEnvironment ); //if the player is in a portal environment, this is the associated portal
 	CNetworkHandle( CFunc_LiquidPortal, m_hSurroundingLiquidPortal ); //if the player is standing in a liquid portal, this will point to it
 
 	friend class CProp_Portal;

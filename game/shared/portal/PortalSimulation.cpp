@@ -226,9 +226,7 @@ BEGIN_NETWORK_TABLE(CPortalSimulator, DT_PortalSimulator)
 END_NETWORK_TABLE()
 
 CPortalSimulator::CPortalSimulator( void )
-: m_bLocalDataIsReady(false),
-	m_bGenerateCollision(true),
-	m_bSimulateVPhysics(true),
+:	m_bGenerateCollision(true),
 	m_bSharedCollisionConfiguration(false),
 	m_pLinkedPortal(NULL),
 	m_bInCrossLinkedFunction(false)
@@ -247,10 +245,7 @@ CPortalSimulator::CPortalSimulator( void )
 	m_CreationChecklist.bLocalPhysicsGenerated = false;
 	m_CreationChecklist.bLinkedPhysicsGenerated = false;
 
-#ifdef PORTAL_SIMULATORS_EMBED_GUID
-	static int s_iPortalSimulatorGUIDAllocator = 0;
-	m_iPortalSimulatorGUID = s_iPortalSimulatorGUIDAllocator++;
-#endif
+
 
 #ifndef CLIENT_DLL
 	PS_SD_Static_World_StaticProps_ClippedProp_t::pTraceEntity = GetWorldEntity(); //will overinitialize, but it's cheap
@@ -278,7 +273,7 @@ void CPortalSimulator::PostConstructor(const char* szClassname, int iForceEdictI
 	pCollisionEntity = (CPSCollisionEntity*)gEntList.CreateEntityByName("portalsimulator_collisionentity");
 	Assert(pCollisionEntity != NULL);
 	pCollisionEntity->m_pOwningSimulator = this;
-	AfterCollisionEntityCreated();
+	pCollisionEntity->GetEnginePortal()->AfterCollisionEntityCreated();
 	DispatchSpawn(pCollisionEntity);
 }
 #endif // GAME_DLL
@@ -297,7 +292,7 @@ void CPortalSimulator::UpdateOnRemove(void)
 #ifndef CLIENT_DLL
 	if (pCollisionEntity.Get())
 	{
-		BeforeCollisionEntityDestroy();
+		pCollisionEntity->GetEnginePortal()->BeforeCollisionEntityDestroy();
 		pCollisionEntity->m_pOwningSimulator = NULL;
 		gEntList.DestroyEntity(pCollisionEntity);
 		pCollisionEntity = NULL;
@@ -334,7 +329,7 @@ void CPortalSimulator::MoveTo( const Vector &ptCenter, const QAngle &angles )
 	DEBUGTIMERONLY( DevMsg( 2, "[PSDT:%d] %sCPortalSimulator::MoveTo() START\n", GetPortalSimulatorGUID(), TABSPACING ); );
 	INCREMENTTABSPACING();
 
-	BeforeMove();
+	pCollisionEntity->GetEnginePortal()->BeforeMove();
 	//update geometric data
 	pCollisionEntity->GetEnginePortal()->MoveTo(ptCenter, angles);
 
@@ -347,7 +342,7 @@ void CPortalSimulator::MoveTo( const Vector &ptCenter, const QAngle &angles )
 	ClearLocalCollision();
 	ClearPolyhedrons();
 
-	m_bLocalDataIsReady = true;
+	pCollisionEntity->GetEnginePortal()->SetLocalDataIsReady(true);
 	UpdateLinkMatrix();
 
 	pCollisionEntity->GetEnginePortal()->CreateHoleShapeCollideable();
@@ -358,7 +353,7 @@ void CPortalSimulator::MoveTo( const Vector &ptCenter, const QAngle &angles )
 	CreateAllPhysics();
 #endif
 
-	AfterMove();
+	pCollisionEntity->GetEnginePortal()->AfterMove();
 
 #if defined( DEBUG_PORTAL_COLLISION_ENVIRONMENTS ) && !defined( CLIENT_DLL )
 	if(   sv_dump_portalsimulator_collision.GetBool() )
@@ -385,7 +380,7 @@ void CPortalSimulator::MoveTo( const Vector &ptCenter, const QAngle &angles )
 
 void CPortalSimulator::UpdateLinkMatrix( void )
 {
-	if( m_pLinkedPortal && m_pLinkedPortal->m_bLocalDataIsReady )
+	if( m_pLinkedPortal && m_pLinkedPortal->pCollisionEntity->GetEnginePortal()->IsLocalDataIsReady() )
 	{
 		pCollisionEntity->GetEnginePortal()->UpdateLinkMatrix(m_pLinkedPortal->pCollisionEntity->GetEnginePortal());
 	}
@@ -409,7 +404,7 @@ static ConVar sv_debug_dumpportalhole_nextcheck( "sv_debug_dumpportalhole_nextch
 
 bool CPortalSimulator::EntityIsInPortalHole( CBaseEntity *pEntity ) const
 {
-	if( m_bLocalDataIsReady == false )
+	if( pCollisionEntity->GetEnginePortal()->IsLocalDataIsReady() == false)
 		return false;
 
 	return pCollisionEntity->GetEnginePortal()->EntityIsInPortalHole(pEntity->GetEngineObject());
@@ -417,7 +412,7 @@ bool CPortalSimulator::EntityIsInPortalHole( CBaseEntity *pEntity ) const
 
 bool CPortalSimulator::EntityHitBoxExtentIsInPortalHole( CBaseAnimating *pBaseAnimating ) const
 {
-	if( m_bLocalDataIsReady == false )
+	if( pCollisionEntity->GetEnginePortal()->IsLocalDataIsReady() == false)
 		return false;
 
 	return pCollisionEntity->GetEnginePortal()->EntityHitBoxExtentIsInPortalHole(pBaseAnimating->GetEngineObject());
@@ -859,8 +854,9 @@ void CPortalSimulator::AttachTo( CPortalSimulator *pLinkedPortalSimulator )
 
 	m_pLinkedPortal = pLinkedPortalSimulator;
 	pLinkedPortalSimulator->m_pLinkedPortal = this;
+	pCollisionEntity->GetEnginePortal()->AttachTo(pLinkedPortalSimulator->pCollisionEntity->GetEnginePortal());
 
-	if( m_bLocalDataIsReady && m_pLinkedPortal->m_bLocalDataIsReady )
+	if( pCollisionEntity->GetEnginePortal()->IsLocalDataIsReady() && m_pLinkedPortal->pCollisionEntity->GetEnginePortal()->IsLocalDataIsReady())
 	{
 		UpdateLinkMatrix();
 		CreateLinkedCollision();
@@ -949,7 +945,7 @@ void CPortalSimulator::CreateLocalPhysics( void )
 	if( IsSimulatingVPhysics() == false )
 		return;
 
-	AssertMsg( m_bLocalDataIsReady, "Portal simulator attempting to create local physics before being placed." );
+	AssertMsg( pCollisionEntity->GetEnginePortal()->IsLocalDataIsReady(), "Portal simulator attempting to create local physics before being placed.");
 
 	if( m_CreationChecklist.bLocalPhysicsGenerated )
 		return;
@@ -966,7 +962,7 @@ void CPortalSimulator::CreateLocalPhysics( void )
 	//if( pCollisionEntity )
 	pCollisionEntity->GetEngineObject()->CollisionRulesChanged();
 
-	AfterLocalPhysicsCreated();
+	pCollisionEntity->GetEnginePortal()->AfterLocalPhysicsCreated();
 	
 	STOPDEBUGTIMER( functionTimer );
 	DECREMENTTABSPACING();
@@ -982,9 +978,9 @@ void CPortalSimulator::CreateLinkedPhysics( void )
 	if( IsSimulatingVPhysics() == false )
 		return;
 
-	AssertMsg( m_bLocalDataIsReady, "Portal simulator attempting to create linked physics before being placed itself." );
+	AssertMsg( pCollisionEntity->GetEnginePortal()->IsLocalDataIsReady(), "Portal simulator attempting to create linked physics before being placed itself.");
 
-	if( (m_pLinkedPortal == NULL) || (m_pLinkedPortal->m_bLocalDataIsReady == false) )
+	if( (m_pLinkedPortal == NULL) || (m_pLinkedPortal->pCollisionEntity->GetEnginePortal()->IsLocalDataIsReady() == false))
 		return;
 
 	if( m_CreationChecklist.bLinkedPhysicsGenerated )
@@ -1001,7 +997,7 @@ void CPortalSimulator::CreateLinkedPhysics( void )
 	//if( pCollisionEntity )
 	pCollisionEntity->GetEngineObject()->CollisionRulesChanged();
 
-	AfterLinkedPhysicsCreated();
+	pCollisionEntity->GetEnginePortal()->AfterLinkedPhysicsCreated();
 
 	if( m_pLinkedPortal && (m_pLinkedPortal->m_bInCrossLinkedFunction == false) )
 	{
@@ -1076,7 +1072,7 @@ void CPortalSimulator::ClearLocalPhysics( void )
 	GetPhysicsEnvironment()->CleanupDeleteList();
 	GetPhysicsEnvironment()->SetQuickDelete( true ); //if we don't do this, things crash the next time we cleanup the delete list while checking mindists
 
-	BeforeLocalPhysicsClear();
+	pCollisionEntity->GetEnginePortal()->BeforeLocalPhysicsClear();
 
 	if (pCollisionEntity.Get()) {
 		pCollisionEntity->GetEnginePortal()->ClearLocalPhysics();
@@ -1115,7 +1111,7 @@ void CPortalSimulator::ClearLinkedPhysics( void )
 	GetPhysicsEnvironment()->CleanupDeleteList();
 	GetPhysicsEnvironment()->SetQuickDelete( true ); //if we don't do this, things crash the next time we cleanup the delete list while checking mindists
 
-	BeforeLinkedPhysicsClear();
+	pCollisionEntity->GetEnginePortal()->BeforeLinkedPhysicsClear();
 
 	if (pCollisionEntity.Get()) {
 		pCollisionEntity->GetEnginePortal()->ClearLinkedPhysics();
@@ -1168,7 +1164,7 @@ void CPortalSimulator::CreateAllCollision( void )
 
 void CPortalSimulator::CreateLocalCollision( void )
 {
-	AssertMsg( m_bLocalDataIsReady, "Portal simulator attempting to create local collision before being placed." );
+	AssertMsg( pCollisionEntity->GetEnginePortal()->IsLocalDataIsReady(), "Portal simulator attempting to create local collision before being placed.");
 
 	if( m_CreationChecklist.bLocalCollisionGenerated )
 		return;
@@ -1340,6 +1336,7 @@ void CPortalSimulator::DetachFromLinked( void )
 	}
 
 	m_pLinkedPortal = NULL;
+	pCollisionEntity->GetEnginePortal()->DetachFromLinked();
 
 	STOPDEBUGTIMER( functionTimer );
 	DECREMENTTABSPACING();
@@ -1359,9 +1356,9 @@ void CPortalSimulator::DetachFromLinked( void )
 
 void CPortalSimulator::SetVPhysicsSimulationEnabled( bool bEnabled )
 {
-	AssertMsg( (m_pLinkedPortal == NULL) || (m_pLinkedPortal->m_bSimulateVPhysics == m_bSimulateVPhysics), "Linked portals are in disagreement as to whether they would simulate VPhysics." );
+	AssertMsg( (m_pLinkedPortal == NULL) || (m_pLinkedPortal->pCollisionEntity->GetEnginePortal()->IsSimulatingVPhysics() == pCollisionEntity->GetEnginePortal()->IsSimulatingVPhysics()), "Linked portals are in disagreement as to whether they would simulate VPhysics.");
 
-	if( bEnabled == m_bSimulateVPhysics )
+	if( bEnabled == pCollisionEntity->GetEnginePortal()->IsSimulatingVPhysics() )
 		return;
 
 	CREATEDEBUGTIMER( functionTimer );
@@ -1370,7 +1367,7 @@ void CPortalSimulator::SetVPhysicsSimulationEnabled( bool bEnabled )
 	DEBUGTIMERONLY( DevMsg( 2, "[PSDT:%d] %sCPortalSimulator::SetVPhysicsSimulationEnabled() START\n", GetPortalSimulatorGUID(), TABSPACING ); );
 	INCREMENTTABSPACING();
 	
-	m_bSimulateVPhysics = bEnabled;
+	pCollisionEntity->GetEnginePortal()->SetVPhysicsSimulationEnabled(bEnabled);
 	if( bEnabled )
 	{
 		//we took some local collision shortcuts when generating while physics simulation is off, regenerate
@@ -1403,16 +1400,6 @@ void CPortalSimulator::SetVPhysicsSimulationEnabled( bool bEnabled )
 }
 
 #ifndef CLIENT_DLL
-CPortalSimulator *CPortalSimulator::GetSimulatorThatCreatedPhysicsObject( const IPhysicsObject *pObject, PS_PhysicsObjectSourceType_t *pOut_SourceType )
-{
-	for( int i = s_PortalSimulators.Count(); --i >= 0; )
-	{
-		if( s_PortalSimulators[i]->pCollisionEntity->GetEnginePortal()->CreatedPhysicsObject( pObject, pOut_SourceType ) )
-			return s_PortalSimulators[i];
-	}
-	
-	return NULL;
-}
 
 bool CPortalSimulator::CreatedPhysicsObject( const IPhysicsObject *pObject, PS_PhysicsObjectSourceType_t *pOut_SourceType ) const
 {
@@ -1563,7 +1550,7 @@ void CPSCollisionEntity::UpdateOnRemove( void )
 	GetEnginePortal()->ClearPolyhedrons();
 #ifdef GAME_DLL
 	if (m_pOwningSimulator) {
-		m_pOwningSimulator->BeforeCollisionEntityDestroy();
+		m_pOwningSimulator->pCollisionEntity->GetEnginePortal()->BeforeCollisionEntityDestroy();
 		m_pOwningSimulator->m_bActivated = false;
 		m_pOwningSimulator->pCollisionEntity = NULL;
 		m_pOwningSimulator = NULL;

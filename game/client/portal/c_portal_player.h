@@ -99,7 +99,7 @@ public:
 
 	inline bool		IsCloseToPortal( void ) //it's usually a good idea to turn on draw hacks when this is true
 	{
-		return ((PortalEyeInterpolation.m_bEyePositionIsInterpolating) || (m_hPortalEnvironment.Get() != NULL));	
+		return ((PortalEyeInterpolation.m_bEyePositionIsInterpolating) || (GetPortalEnvironment() != NULL));
 	} 
 
 	bool	CanSprint( void );
@@ -120,7 +120,7 @@ public:
 	CWeaponPortalBase* GetActivePortalWeapon() const;
 
 	bool IsSuppressingCrosshair( void ) { return m_bSuppressingCrosshair; }
-
+	C_Prop_Portal* GetPortalEnvironment();
 private:
 
 	C_Portal_Player( const C_Portal_Player & );
@@ -204,7 +204,6 @@ public:
 	float	m_fReorientationRate;
 	bool	m_bEyePositionIsTransformedByPortal; //when the eye and body positions are not on the same side of a portal
 
-	CHandle<C_Prop_Portal>	m_hPortalEnvironment; //a portal whose environment the player is currently in, should be invalid most of the time
 	CHandle<C_Func_LiquidPortal>	m_hSurroundingLiquidPortal; //a liquid portal whose volume the player is standing in
 };
 

@@ -1632,7 +1632,7 @@ void CFuncTrackTrain::Stop( void )
 static CBaseEntity *FindPhysicsBlockerForHierarchy( CBaseEntity *pParentEntity )
 {
 	CUtlVector<IEngineObjectServer *> list;
-	GetAllInHierarchy( pParentEntity->GetEngineObject(), list );
+	pParentEntity->GetEngineObject()->GetAllInHierarchy( list );
 	CBaseEntity *pPhysicsBlocker = NULL;
 	float maxForce = 0;
 	for ( int i = 0; i < list.Count(); i++ )

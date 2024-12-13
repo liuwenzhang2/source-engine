@@ -380,7 +380,7 @@ void CBaseEntity::UpdateOnRemove(void)
 
 	// Any children still connected are orphans, mark all for delete
 	CUtlVector<IEngineObjectServer*> childrenList;
-	GetAllChildren(this->GetEngineObject(), childrenList);
+	this->GetEngineObject()->GetAllChildren(childrenList);
 	if (childrenList.Count())
 	{
 		DevMsg(2, "Warning: Deleting orphaned children of %s\n", GetClassname());
@@ -2036,7 +2036,7 @@ void CBaseEntity::VPhysicsUpdatePusher( IPhysicsObject *pPhysics )
 	if (GetEngineObject()->GetSolid() != SOLID_BSP && pPhysics->GetShadowPosition( &origin, &angles ) )
 	{
 		CUtlVector<IEngineObjectServer *> list;
-		GetAllInHierarchy( this->GetEngineObject(), list );
+		this->GetEngineObject()->GetAllInHierarchy( list );
 		//NDebugOverlay::BoxAngles( origin, GetEngineObject()->OBBMins(), GetEngineObject()->OBBMaxs(), angles, 255,0,0,0, gpGlobals->frametime);
 
 		physicspushlist_t *pList = NULL;
