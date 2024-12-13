@@ -17,7 +17,6 @@
 #include "PortalSimulation.h"
 #include "prop_portal.h"
 
-#define MAX_SHADOW_CLONE_COUNT 200
 
 static int g_iShadowCloneCount = 0;
 ConVar sv_use_shadow_clones( "sv_use_shadow_clones", "1", FCVAR_REPLICATED | FCVAR_CHEAT ); //should we create shadow clones?
@@ -27,33 +26,7 @@ LINK_ENTITY_TO_CLASS( physicsshadowclone, CPhysicsShadowClone );
 
 //static bool s_IsShadowClone[MAX_EDICTS] = { false };
 
-static CPhysicsShadowCloneLL *s_EntityClones[MAX_EDICTS] = { NULL };
-struct ShadowCloneLLEntryManager
-{
-	CPhysicsShadowCloneLL m_ShadowCloneLLEntries[MAX_SHADOW_CLONE_COUNT];
-	CPhysicsShadowCloneLL *m_pFreeShadowCloneLLEntries[MAX_SHADOW_CLONE_COUNT];
-	int m_iUsedEntryIndex;
 
-	ShadowCloneLLEntryManager( void )
-	{
-		m_iUsedEntryIndex = 0;
-		for( int i = 0; i != MAX_SHADOW_CLONE_COUNT; ++i )
-		{
-			m_pFreeShadowCloneLLEntries[i] = &m_ShadowCloneLLEntries[i];
-		}
-	}
-
-	inline CPhysicsShadowCloneLL *Alloc( void )
-	{
-		return m_pFreeShadowCloneLLEntries[m_iUsedEntryIndex++];
-	}
-
-	inline void Free( CPhysicsShadowCloneLL *pFree )
-	{
-		m_pFreeShadowCloneLLEntries[--m_iUsedEntryIndex] = pFree;
-	}
-};
-static ShadowCloneLLEntryManager s_SCLLManager;
 
 
 CPhysicsShadowClone::CPhysicsShadowClone( void )
@@ -72,46 +45,6 @@ void CPhysicsShadowClone::UpdateOnRemove( void )
 	GetEngineObject()->SetSolid(SOLID_NONE);
 	GetEngineObject()->SetSolidFlags(0);
 	GetEngineObject()->SetCollisionGroup(COLLISION_GROUP_NONE);
-	CBaseEntity *pSource = GetEngineShadowClone()->GetClonedEntity();
-	if( pSource )
-	{
-		CPhysicsShadowCloneLL *pCloneListHead = s_EntityClones[pSource->entindex()];
-		Assert( pCloneListHead != NULL );
-
-		CPhysicsShadowCloneLL *pFind = pCloneListHead;
-		CPhysicsShadowCloneLL *pLast = pFind;
-		while( pFind->pClone != this )
-		{
-			pLast = pFind;
-			Assert( pFind->pNext != NULL );
-			pFind = pFind->pNext;
-		}
-
-		if( pFind == pCloneListHead )
-		{
-			s_EntityClones[pSource->entindex()] = pFind->pNext;
-		}
-		else
-		{
-			pLast->pNext = pFind->pNext;
-		}
-		s_SCLLManager.Free( pFind );
-	}
-#ifdef _DEBUG
-	else
-	{
-		//verify that it didn't weasel into a list somewhere and get left behind
-		for( int i = 0; i != MAX_SHADOW_CLONE_COUNT; ++i )
-		{
-			CPhysicsShadowCloneLL *pCloneSearch = s_EntityClones[i];
-			while( pCloneSearch )
-			{
-				Assert( pCloneSearch->pClone != this );
-				pCloneSearch = pCloneSearch->pNext;
-			}
-		}
-	}
-#endif
 	GetEngineObject()->VPhysicsDestroyObject();
 	GetEngineObject()->VPhysicsSetObject( NULL );
 	GetEngineShadowClone()->SetClonedEntity(NULL);
@@ -268,10 +201,7 @@ CPhysicsShadowClone *CPhysicsShadowClone::CreateShadowClone( IPhysicsEnvironment
 	pClone->GetEngineShadowClone()->SetClonedEntity(hEntToClone);
 	DBG_CODE_NOSCOPE( pClone->m_szDebugMarker = szDebugMarker; );
 
-	CPhysicsShadowCloneLL *pCloneLLEntry = s_SCLLManager.Alloc();
-	pCloneLLEntry->pClone = pClone;
-	pCloneLLEntry->pNext = s_EntityClones[pClonedEntity->entindex()];
-	s_EntityClones[pClonedEntity->entindex()] = pCloneLLEntry;
+
 
 	if( pTransformationMatrix )
 	{
@@ -304,10 +234,10 @@ void CPhysicsShadowClone::VPhysicsCollision( int index, gamevcollisionevent_t *p
 //	return s_IsShadowClone[pEntity->entindex()];
 //}
 
-CPhysicsShadowCloneLL *CPhysicsShadowClone::GetClonesOfEntity( const CBaseEntity *pEntity )
-{
-	return s_EntityClones[pEntity->entindex()];
-}
+//CPhysicsShadowCloneLL *CPhysicsShadowClone::GetClonesOfEntity( const CBaseEntity *pEntity )
+//{
+//	return s_EntityClones[pEntity->entindex()];
+//}
 
 bool CTraceFilterTranslateClones::ShouldHitEntity( IHandleEntity *pEntity, int contentsMask )
 {

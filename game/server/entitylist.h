@@ -127,6 +127,8 @@ private:
 	CEngineObjectInternal* const m_pOuter = NULL;;
 };
 
+class CEngineShadowCloneInternal;
+
 class CEngineObjectInternal : public IEngineObjectServer {
 public:
 	DECLARE_CLASS_NOBASE(CEngineObjectInternal);
@@ -816,6 +818,8 @@ public:
 	void PhysForceClearVelocity(IPhysicsObject* pPhys);
 	bool IsPortalSimulatorCollisionEntity() { return false; }
 	bool IsShadowClone() { return false; }
+	CEngineObjectInternal* GetClonesOfEntity() const;
+	IEngineShadowCloneServer* AsEngineShadowCloneServer() { return NULL; }
 public:
 	// Networking related methods
 	void NetworkStateChanged();
@@ -1862,6 +1866,9 @@ public:
 	//given a physics object that is part of this clone, tells you which physics object in the source
 	IPhysicsObject* TranslatePhysicsToClonedEnt(const IPhysicsObject* pPhysics);
 	bool			IsShadowClone() { return true; }
+	CEngineShadowCloneInternal* AsEngineShadowCloneServer() { return this; }
+	CEngineObjectInternal* AsEngineObjectServer() { return this; }
+	CEngineShadowCloneInternal* GetNext() { return m_pNext; }
 private:
 	EHANDLE			m_hClonedEntity; //the entity we're supposed to be cloning the physics of
 	VMatrix			m_matrixShadowTransform; //all cloned coordinates and angles will be run through this matrix before being applied
@@ -1874,7 +1881,7 @@ private:
 
 	IPhysicsEnvironment* m_pOwnerPhysEnvironment; //clones exist because of multi-environment situations
 	bool			m_bShouldUpSync;
-
+	CEngineShadowCloneInternal* m_pNext = NULL;
 };
 
 
@@ -2430,6 +2437,39 @@ public:
 	void AddDamageEvent(CBaseEntity* pEntity, const CTakeDamageInfo& info, IPhysicsObject* pInflictorPhysics, bool bRestoreVelocity, const Vector& savedVel, const AngularImpulse& savedAngVel);
 };
 #endif // PORTAL
+
+struct CPhysicsShadowCloneLL
+{
+	CEngineShadowCloneInternal* pClone;
+	CPhysicsShadowCloneLL* pNext;
+};
+
+
+struct ShadowCloneLLEntryManager
+{
+	CPhysicsShadowCloneLL m_ShadowCloneLLEntries[MAX_SHADOW_CLONE_COUNT];
+	CPhysicsShadowCloneLL* m_pFreeShadowCloneLLEntries[MAX_SHADOW_CLONE_COUNT];
+	int m_iUsedEntryIndex;
+
+	ShadowCloneLLEntryManager(void)
+	{
+		m_iUsedEntryIndex = 0;
+		for (int i = 0; i != MAX_SHADOW_CLONE_COUNT; ++i)
+		{
+			m_pFreeShadowCloneLLEntries[i] = &m_ShadowCloneLLEntries[i];
+		}
+	}
+
+	inline CPhysicsShadowCloneLL* Alloc(void)
+	{
+		return m_pFreeShadowCloneLLEntries[m_iUsedEntryIndex++];
+	}
+
+	inline void Free(CPhysicsShadowCloneLL* pFree)
+	{
+		m_pFreeShadowCloneLLEntries[--m_iUsedEntryIndex] = pFree;
+	}
+};
 
 
 typedef void (*EntityCallbackFunction) (CBaseEntity* pEntity);
@@ -3272,6 +3312,8 @@ private:
 	CCallQueue m_PostSimulationQueue;
 	CUtlVector<CEnginePortalInternal*> m_ActivePortals;
 	CUtlVector<CEngineShadowCloneInternal*> m_ActiveShadowClones;
+	CPhysicsShadowCloneLL* m_EntityClones[MAX_EDICTS] = { NULL };
+	ShadowCloneLLEntryManager m_SCLLManager;
 };
 
 extern void PhysParseSurfaceData(class IPhysicsSurfaceProps* pProps, class IFileSystem* pFileSystem);

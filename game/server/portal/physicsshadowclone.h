@@ -19,11 +19,7 @@ class CPhysicsShadowClone;
 class IPhysicsEnvironment;
 
 
-struct CPhysicsShadowCloneLL
-{
-	CPhysicsShadowClone *pClone;
-	CPhysicsShadowCloneLL *pNext;
-};
+
 
 
 class CPhysicsShadowClone : public CBaseAnimating
@@ -81,7 +77,7 @@ public:
 	
 
 	//static bool IsShadowClone( const CBaseEntity *pEntity );
-	static CPhysicsShadowCloneLL *GetClonesOfEntity( const CBaseEntity *pEntity );
+	//static CPhysicsShadowCloneLL *GetClonesOfEntity( const CBaseEntity *pEntity );
 
 };
 

@@ -8300,6 +8300,14 @@ void CEngineObjectInternal::PhysForceClearVelocity(IPhysicsObject* pPhys)
 	::PhysForceClearVelocity(pPhys);
 }
 
+CEngineObjectInternal* CEngineObjectInternal::GetClonesOfEntity() const
+{
+	if (gEntList.m_EntityClones[this->entindex()]) {
+		return gEntList.m_EntityClones[this->entindex()]->pClone;
+	}
+	return NULL;
+}
+
 void CEnginePlayerInternal::VPhysicsDestroyObject()
 {
 	// Since CBasePlayer aliases its pointer to the physics object, tell CBaseEntity to 
@@ -10330,17 +10338,67 @@ CEngineShadowCloneInternal::CEngineShadowCloneInternal(IServerEntityList* pServe
 	gEntList.m_ActiveShadowClones.AddToTail(this);
 }
 
-CEngineShadowCloneInternal::~CEngineShadowCloneInternal() {
-	m_hClonedEntity = NULL;
+CEngineShadowCloneInternal::~CEngineShadowCloneInternal() 
+{
+	SetClonedEntity(NULL);
 	gEntList.m_ActiveShadowClones.FindAndRemove(this); //also removed in UpdateOnRemove()
 }
 
 void CEngineShadowCloneInternal::SetClonedEntity(CBaseEntity* pEntToClone)
 {
 	VPhysicsDestroyObject();
+	CBaseEntity* pSource = m_hClonedEntity.Get();
+	if (pSource)
+	{
+		CPhysicsShadowCloneLL* pCloneListHead = gEntList.m_EntityClones[pSource->entindex()];
+		Assert(pCloneListHead != NULL);
 
+		CPhysicsShadowCloneLL* pFind = pCloneListHead;
+		CPhysicsShadowCloneLL* pLast = pFind;
+		while (pFind->pClone != this)
+		{
+			pLast = pFind;
+			Assert(pFind->pNext != NULL);
+			pFind = pFind->pNext;
+		}
+
+		if (pFind == pCloneListHead)
+		{
+			gEntList.m_EntityClones[pSource->entindex()] = pFind->pNext;
+		}
+		else
+		{
+			pLast->pNext = pFind->pNext;
+			pLast->pClone->m_pNext = pFind->pNext->pClone;
+		}
+		m_pNext = NULL;
+		gEntList.m_SCLLManager.Free(pFind);
+	}
+#ifdef _DEBUG
+	else
+	{
+		//verify that it didn't weasel into a list somewhere and get left behind
+		for (int i = 0; i != MAX_SHADOW_CLONE_COUNT; ++i)
+		{
+			CPhysicsShadowCloneLL* pCloneSearch = gEntList.m_EntityClones[i];
+			while (pCloneSearch)
+			{
+				Assert(pCloneSearch->pClone != this);
+				pCloneSearch = pCloneSearch->pNext;
+			}
+		}
+	}
+#endif
 	m_hClonedEntity = pEntToClone;
-
+	if (m_hClonedEntity.Get()) {
+		CPhysicsShadowCloneLL* pCloneLLEntry = gEntList.m_SCLLManager.Alloc();
+		pCloneLLEntry->pClone = this;
+		pCloneLLEntry->pNext = gEntList.m_EntityClones[pEntToClone->entindex()];
+		if (gEntList.m_EntityClones[pEntToClone->entindex()]) {
+			m_pNext = gEntList.m_EntityClones[pEntToClone->entindex()]->pClone;
+		}
+		gEntList.m_EntityClones[pEntToClone->entindex()] = pCloneLLEntry;
+	}
 	//FullSyncClonedPhysicsObjects();
 }
 

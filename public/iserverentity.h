@@ -94,6 +94,7 @@ struct thinkfunc_t
 };
 
 class IServerEntity;
+class IEngineShadowCloneServer;
 
 class IEngineObjectServer : public IEngineObject {
 public:
@@ -515,6 +516,8 @@ public:
 	virtual void PhysForceClearVelocity(IPhysicsObject* pPhys) = 0;
 	virtual bool IsPortalSimulatorCollisionEntity() = 0;
 	virtual bool IsShadowClone() = 0;
+	virtual IEngineObjectServer* GetClonesOfEntity() const = 0;
+	virtual IEngineShadowCloneServer* AsEngineShadowCloneServer() = 0;
 };
 
 class IEngineWorldServer{
@@ -594,6 +597,8 @@ public:
 	virtual void			PartialSync(bool bPullChanges) = 0;
 	//given a physics object that is part of this clone, tells you which physics object in the source
 	virtual IPhysicsObject* TranslatePhysicsToClonedEnt(const IPhysicsObject* pPhysics) = 0;
+	virtual IEngineShadowCloneServer* GetNext() = 0;
+	virtual IEngineObjectServer* AsEngineObjectServer() = 0;
 };
 
 class IEngineVehicleServer {

@@ -664,5 +664,7 @@ enum vehicle_pose_params
 
 const unsigned int FCLIENTANIM_SEQUENCE_CYCLE = 0x00000001;
 
+#define MAX_SHADOW_CLONE_COUNT 200
+
 #endif
 

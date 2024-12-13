@@ -3085,10 +3085,10 @@ void UpdateShadowClonesPortalSimulationFlags(const CBaseEntity* pSourceEntity, u
 {
 	unsigned int iOrFlags = iSourceFlags & iFlags;
 
-	CPhysicsShadowCloneLL* pClones = CPhysicsShadowClone::GetClonesOfEntity(pSourceEntity);
+	IEngineObjectServer* pClones = pSourceEntity->GetEngineObject()->GetClonesOfEntity();
 	while (pClones)
 	{
-		CPhysicsShadowClone* pClone = pClones->pClone;
+		CPhysicsShadowClone* pClone = (CPhysicsShadowClone*)pClones->GetOuter();
 		CProp_Portal* pCloneSimulator = CProp_Portal::GetSimulatorThatOwnsEntity(pClone);
 
 		unsigned int* pFlags = (unsigned int*)&pCloneSimulator->m_EntFlags[pClone->entindex()];
@@ -3097,7 +3097,7 @@ void UpdateShadowClonesPortalSimulationFlags(const CBaseEntity* pSourceEntity, u
 
 		Assert(((iSourceFlags ^ *pFlags) & iFlags) == 0);
 
-		pClones = pClones->pNext;
+		pClones = pClones->AsEngineShadowCloneServer()->GetNext() ? pClones->AsEngineShadowCloneServer()->GetNext()->AsEngineObjectServer() : NULL;
 	}
 }
 
@@ -3143,11 +3143,11 @@ void CProp_Portal::PrePhysFrame(void)
 					{
 						pEntity->GetEngineObject()->CollisionRulesChanged(); //entity moved into or out of the portal hole, need to either add or remove collision with transformed geometry
 
-						CPhysicsShadowCloneLL* pClones = CPhysicsShadowClone::GetClonesOfEntity(pEntity);
+						IEngineObjectServer* pClones = pEntity->GetEngineObject()->GetClonesOfEntity();
 						while (pClones)
 						{
-							pClones->pClone->GetEngineObject()->CollisionRulesChanged();
-							pClones = pClones->pNext;
+							pClones->CollisionRulesChanged();
+							pClones = pClones->AsEngineShadowCloneServer()->GetNext() ? pClones->AsEngineShadowCloneServer()->GetNext()->AsEngineObjectServer() : NULL;
 						}
 					}
 				}
