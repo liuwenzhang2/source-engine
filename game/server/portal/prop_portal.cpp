@@ -1245,7 +1245,7 @@ void CProp_Portal::TeleportTouchingEntity( CBaseEntity *pOther )
 
 				pHeldEntity->Teleport( &vTargetPosition, &qTargetOrientation, 0 );
 
-				FindClosestPassableSpace( pHeldEntity, m_hLinkedPortal->GetVectorForward());
+				pHeldEntity->FindClosestPassableSpace( m_hLinkedPortal->GetVectorForward());
 			}
 		}
 		
@@ -2328,14 +2328,18 @@ public:
 			}
 
 			//might be cloned from main to a few environments
-			for (int i = CProp_Portal_Shared::AllPortals.Count(); --i >= 0; )
-				CProp_Portal_Shared::AllPortals[i]->pCollisionEntity->GetEnginePortal()->StopCloningEntity(pEntity);
+			for (int i = CProp_Portal_Shared::AllPortals.Count(); --i >= 0; ) {
+				CProp_Portal* pPortal = CProp_Portal_Shared::AllPortals[i];
+				if (pPortal->pCollisionEntity) {
+					pPortal->pCollisionEntity->GetEnginePortal()->StopCloningEntity(pEntity);
+				}
+			}
 		}
 
 		for (int i = CProp_Portal_Shared::AllPortals.Count(); --i >= 0; )
 		{
-			if (!CProp_Portal_Shared::AllPortals[i]->pCollisionEntity->GetEnginePortal()->GetEntFlags(pEntity->entindex()) == 0) {
-				Error("GetEntFlags(pEntity->entindex()) is not 0!\n");
+			if (CProp_Portal_Shared::AllPortals[i]->pCollisionEntity) {
+				CProp_Portal_Shared::AllPortals[i]->pCollisionEntity->GetEnginePortal()->ClearEntFlags(pEntity->entindex());
 			}
 		}
 

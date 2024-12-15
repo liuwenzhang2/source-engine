@@ -966,7 +966,7 @@ Vector CAI_Motor::GetSmoothedVelocity()
 
 float CAI_Motor::StepHeight() const
 {
-	return GetOuter()->StepHeight();
+	return GetOuter()->GetStepHeight();
 }
 
 bool CAI_Motor::CanStandOn( CBaseEntity *pSurface ) const

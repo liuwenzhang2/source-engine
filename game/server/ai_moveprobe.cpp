@@ -1371,7 +1371,7 @@ bool CAI_MoveProbe::IterativeFloorPoint( const Vector &vecStart, unsigned int co
 
 float CAI_MoveProbe::StepHeight() const
 {
-	return GetOuter()->StepHeight();
+	return GetOuter()->GetStepHeight();
 }
 
 //-----------------------------------------------------------------------------

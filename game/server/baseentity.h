@@ -935,7 +935,7 @@ public:
 	virtual bool			IsTriggered( CBaseEntity *pActivator ) {return true;}
 	virtual bool			IsNPC( void ) const { return false; }
 	CAI_BaseNPC				*MyNPCPointer( void ); 
-	virtual float			StepHeight() const { return 0.0f; }
+	virtual float			GetStepHeight() const { return 0.0f; }
 	virtual CBaseCombatCharacter *MyCombatCharacterPointer( void ) { return NULL; }
 	virtual INextBot		*MyNextBotPointer( void ) { return NULL; }
 	virtual float			GetDelay( void ) { return 0; }
@@ -1432,6 +1432,7 @@ public:
 	virtual CBaseEntity* EntityPhysics_CreateSolver(CBaseEntity* pPhysicsBlocker, bool disableCollisions, float separationDuration);
 	virtual void			PortalSimulator_TookOwnershipOfEntity(IEnginePortalServer* pEntity) {}
 	virtual void			PortalSimulator_ReleasedOwnershipOfEntity(IEnginePortalServer* pEntity) {}
+	bool FindClosestPassableSpace(const Vector& vIndecisivePush, unsigned int fMask = MASK_SOLID); //assumes the object is already in a mostly passable space
 public:
 //#if !defined( NO_ENTITY_PREDICTION )
 //	// The player drives simulation of this entity

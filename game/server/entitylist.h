@@ -1727,6 +1727,7 @@ public:
 	friend class CEnginePortalInternal;
 	template<class T> friend class CGlobalEntityList;
 	DECLARE_CLASS(CEnginePlayerInternal, CEngineObjectInternal);
+	DECLARE_SERVERCLASS();
 	DECLARE_DATADESC();
 	CEnginePlayerInternal(IServerEntityList* pServerEntityList, int iForceEdictIndex, int iSerialNum);
 	~CEnginePlayerInternal();
@@ -1855,6 +1856,7 @@ public:
 
 	CEngineObjectInternal* AsEngineObject() { return this; }
 	unsigned int GetEntFlags(int entindex) { return m_EntFlags[entindex]; }
+	void ClearEntFlags(int entindex) { m_EntFlags[entindex] = 0; }
 	unsigned int m_EntFlags[MAX_EDICTS]; //flags maintained for every entity in the world based on its index
 private:
 	int					m_iPortalSimulatorGUID;

@@ -1296,7 +1296,7 @@ public:
 	virtual bool		IsJumpLegal( const Vector &startPos, const Vector &apex, const Vector &endPos ) const; // Override for specific creature types
 	bool				IsJumpLegal( const Vector &startPos, const Vector &apex, const Vector &endPos, float maxUp, float maxDown, float maxDist ) const;
 	bool 				ShouldMoveWait();
-	virtual float		StepHeight() const			{ return 18.0f; }
+	virtual float		GetStepHeight() const			{ return 18.0f; }
 	float				GetStepDownMultiplier() const;
 	virtual float		GetMaxJumpSpeed() const		{ return 350.0f; }
 	virtual float		GetJumpGravity() const		{ return 1.0f; }

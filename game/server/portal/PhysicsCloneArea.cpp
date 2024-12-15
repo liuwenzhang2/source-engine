@@ -43,7 +43,9 @@ void CPhysicsCloneArea::StartTouch( CBaseEntity *pOther )
 	}
 #endif
 
-	m_pAttachedSimulator->pCollisionEntity->GetEnginePortal()->StartCloningEntity( pOther );
+	if (m_pAttachedSimulator->pCollisionEntity) {
+		m_pAttachedSimulator->pCollisionEntity->GetEnginePortal()->StartCloningEntity(pOther);
+	}
 }
 
 void CPhysicsCloneArea::Touch( CBaseEntity *pOther )
@@ -71,7 +73,9 @@ void CPhysicsCloneArea::EndTouch( CBaseEntity *pOther )
 	}
 #endif
 
-	m_pAttachedSimulator->pCollisionEntity->GetEnginePortal()->StopCloningEntity( pOther );
+	if (m_pAttachedSimulator->pCollisionEntity) {
+		m_pAttachedSimulator->pCollisionEntity->GetEnginePortal()->StopCloningEntity(pOther);
+	}
 }
 
 void CPhysicsCloneArea::Spawn( void )
@@ -221,8 +225,11 @@ void CPhysicsCloneArea::CloneTouchingEntities( void )
 		servertouchlink_t *root = (servertouchlink_t* )GetEngineObject()->GetDataObject( TOUCHLINK );
 		if( root )
 		{
-			for( servertouchlink_t *link = root->nextLink; link != root; link = link->nextLink )
-				m_pAttachedSimulator->pCollisionEntity->GetEnginePortal()->StartCloningEntity( (CBaseEntity*)gEntList.GetServerEntityFromHandle(link->entityTouched) );
+			for (servertouchlink_t* link = root->nextLink; link != root; link = link->nextLink) {
+				if (m_pAttachedSimulator->pCollisionEntity) {
+					m_pAttachedSimulator->pCollisionEntity->GetEnginePortal()->StartCloningEntity((CBaseEntity*)gEntList.GetServerEntityFromHandle(link->entityTouched));
+				}
+			}
 		}
 	}
 }

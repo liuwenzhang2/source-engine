@@ -31,7 +31,7 @@
 	#include "player_pickup.h"
 	#include "waterbullet.h"
 	#include "func_break.h"
-
+	#include "env_debughistory.h"
 #ifdef HL2MP
 	#include "te_hl2mp_shotgun_shot.h"
 #endif
@@ -228,6 +228,7 @@ const float k_flMaxEntitySpinRate = k_flMaxAngularVelocity * 10.0f;
 ConVar	ai_shot_bias_min( "ai_shot_bias_min", "-1.0", FCVAR_REPLICATED );
 ConVar	ai_shot_bias_max( "ai_shot_bias_max", "1.0", FCVAR_REPLICATED );
 ConVar	ai_debug_shoot_positions( "ai_debug_shoot_positions", "0", FCVAR_REPLICATED | FCVAR_CHEAT );
+ConVar sv_use_find_closest_passable_space("sv_use_find_closest_passable_space", "1", FCVAR_REPLICATED | FCVAR_CHEAT, "Enables heavy-handed player teleporting stuck fix code.");
 
 // Utility func to throttle rate at which the "reasonable position" spew goes out
 static double s_LastEntityReasonableEmitTime;
@@ -1812,7 +1813,170 @@ void CBaseEntity::SetWaterType( int nType )
 }
 
 
+bool CBaseEntity::FindClosestPassableSpace(const Vector& vIndecisivePush, unsigned int fMask) //assumes the object is already in a mostly passable space
+{
+	if (sv_use_find_closest_passable_space.GetBool() == false)
+		return true;
 
+	// Don't ever do this to entities with a move parent
+	if (this->GetEngineObject()->GetMoveParent())
+		return true;
+
+#ifndef CLIENT_DLL
+	ADD_DEBUG_HISTORY(HISTORY_PLAYER_DAMAGE, UTIL_VarArgs("RUNNING FIND CLOSEST PASSABLE SPACE on %s..\n", this->GetDebugName()));
+#endif
+
+	Vector ptExtents[8]; //ordering is going to be like 3 bits, where 0 is a min on the related axis, and 1 is a max on the same axis, axis order x y z
+
+	float fExtentsValidation[8]; //some points are more valid than others, and this is our measure
+
+
+	Vector vEntityMaxs;// = pEntity->WorldAlignMaxs();
+	Vector vEntityMins;// = pEntity->WorldAlignMins();
+	this->GetEngineObject()->WorldSpaceAABB(&vEntityMins, &vEntityMaxs);
+
+	Vector ptEntityCenter = ((vEntityMins + vEntityMaxs) / 2.0f);
+	vEntityMins -= ptEntityCenter;
+	vEntityMaxs -= ptEntityCenter;
+
+	Vector ptEntityOriginalCenter = ptEntityCenter;
+
+	ptEntityCenter.z += 0.001f; //to satisfy m_IsSwept on first pass
+
+	int iEntityCollisionGroup = this->GetEngineObject()->GetCollisionGroup();
+
+	trace_t traces[2];
+	Ray_t entRay;
+	//entRay.Init( ptEntityCenter, ptEntityCenter, vEntityMins, vEntityMaxs );
+	entRay.m_Extents = vEntityMaxs;
+	entRay.m_IsRay = false;
+	entRay.m_IsSwept = true;
+	entRay.m_StartOffset = vec3_origin;
+
+	Vector vOriginalExtents = vEntityMaxs;
+
+	Vector vGrowSize = vEntityMaxs / 101.0f;
+	vEntityMaxs -= vGrowSize;
+	vEntityMins += vGrowSize;
+
+
+	Ray_t testRay;
+	testRay.m_Extents = vGrowSize;
+	testRay.m_IsRay = false;
+	testRay.m_IsSwept = true;
+	testRay.m_StartOffset = vec3_origin;
+
+
+
+	unsigned int iFailCount;
+	for (iFailCount = 0; iFailCount != 100; ++iFailCount)
+	{
+		entRay.m_Start = ptEntityCenter;
+		entRay.m_Delta = ptEntityOriginalCenter - ptEntityCenter;
+
+		UTIL_TraceRay(entRay, fMask, this, iEntityCollisionGroup, &traces[0]);
+		if (traces[0].startsolid == false)
+		{
+			Vector vNewPos = traces[0].endpos + (this->GetEngineObject()->GetAbsOrigin() - ptEntityOriginalCenter);
+#ifdef CLIENT_DLL
+			this->GetEngineObject()->SetAbsOrigin(vNewPos);
+#else
+			this->Teleport(&vNewPos, NULL, NULL);
+#endif
+			return true; //current placement worked
+		}
+
+		bool bExtentInvalid[8];
+		for (int i = 0; i != 8; ++i)
+		{
+			fExtentsValidation[i] = 0.0f;
+			ptExtents[i] = ptEntityCenter;
+			ptExtents[i].x += ((i & (1 << 0)) ? vEntityMaxs.x : vEntityMins.x);
+			ptExtents[i].y += ((i & (1 << 1)) ? vEntityMaxs.y : vEntityMins.y);
+			ptExtents[i].z += ((i & (1 << 2)) ? vEntityMaxs.z : vEntityMins.z);
+
+			bExtentInvalid[i] = enginetrace->PointOutsideWorld(ptExtents[i]);
+		}
+
+		unsigned int counter, counter2;
+		for (counter = 0; counter != 7; ++counter)
+		{
+			for (counter2 = counter + 1; counter2 != 8; ++counter2)
+			{
+
+				testRay.m_Delta = ptExtents[counter2] - ptExtents[counter];
+
+				if (bExtentInvalid[counter])
+					traces[0].startsolid = true;
+				else
+				{
+					testRay.m_Start = ptExtents[counter];
+					UTIL_TraceRay(testRay, fMask, this, iEntityCollisionGroup, &traces[0]);
+				}
+
+				if (bExtentInvalid[counter2])
+					traces[1].startsolid = true;
+				else
+				{
+					testRay.m_Start = ptExtents[counter2];
+					testRay.m_Delta = -testRay.m_Delta;
+					UTIL_TraceRay(testRay, fMask, this, iEntityCollisionGroup, &traces[1]);
+				}
+
+				float fDistance = testRay.m_Delta.Length();
+
+				for (int i = 0; i != 2; ++i)
+				{
+					int iExtent = (i == 0) ? (counter) : (counter2);
+
+					if (traces[i].startsolid)
+					{
+						fExtentsValidation[iExtent] -= 100.0f;
+					}
+					else
+					{
+						fExtentsValidation[iExtent] += traces[i].fraction * fDistance;
+					}
+				}
+			}
+		}
+
+		Vector vNewOriginDirection(0.0f, 0.0f, 0.0f);
+		float fTotalValidation = 0.0f;
+		for (counter = 0; counter != 8; ++counter)
+		{
+			if (fExtentsValidation[counter] > 0.0f)
+			{
+				vNewOriginDirection += (ptExtents[counter] - ptEntityCenter) * fExtentsValidation[counter];
+				fTotalValidation += fExtentsValidation[counter];
+			}
+		}
+
+		if (fTotalValidation != 0.0f)
+		{
+			ptEntityCenter += (vNewOriginDirection / fTotalValidation);
+
+			//increase sizing
+			testRay.m_Extents += vGrowSize;
+			vEntityMaxs -= vGrowSize;
+			vEntityMins = -vEntityMaxs;
+		}
+		else
+		{
+			//no point was valid, apply the indecisive vector
+			ptEntityCenter += vIndecisivePush;
+
+			//reset sizing
+			testRay.m_Extents = vGrowSize;
+			vEntityMaxs = vOriginalExtents;
+			vEntityMins = -vEntityMaxs;
+		}
+	}
+
+	// X360TBD: Hits in portal devtest
+	AssertMsg(IsX360() || iFailCount != 100, "FindClosestPassableSpace() failure.");
+	return false;
+}
 
 
 

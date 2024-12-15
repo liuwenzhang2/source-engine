@@ -434,6 +434,7 @@ public:
 	// Used when the collision prop is told to ask game code for the world-space surrounding box
 	virtual void					ComputeWorldSpaceSurroundingBox(Vector* pVecWorldMins, Vector* pVecWorldMaxs);
 
+	bool FindClosestPassableSpace(const Vector& vIndecisivePush, unsigned int fMask = MASK_SOLID); //assumes the object is already in a mostly passable space
 
 
 	//virtual class CMouthInfo		*GetMouth( void );

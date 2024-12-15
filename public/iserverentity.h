@@ -626,6 +626,7 @@ public:
 	virtual void				ClearLinkedEntities(void) = 0; //gets rid of transformed shadow clones
 	virtual IEngineObjectServer* AsEngineObject() = 0;
 	virtual unsigned int GetEntFlags(int entindex) = 0;
+	virtual void ClearEntFlags(int entindex) = 0;
 };
 
 class IEngineShadowCloneServer {

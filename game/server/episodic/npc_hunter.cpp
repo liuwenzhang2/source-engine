@@ -2754,7 +2754,7 @@ bool CNPC_Hunter::ShouldCharge( const Vector &startPos, const Vector &endPos, bo
 			if ( moveTrace.pObstruction == gEntList.GetBaseEntity(0) )
 			{	
 				// Can't be too far above/below the target
-				if ( fabs( moveTrace.vEndPosition.z - vecTargetPos.z ) > StepHeight() )
+				if ( fabs( moveTrace.vEndPosition.z - vecTargetPos.z ) > GetStepHeight() )
 					return false;
 
 				// Allow it if we got pretty close
@@ -3359,7 +3359,7 @@ void CNPC_Hunter::TaskFindDodgeActivity()
 
 		// Trace a bit high so this works better on uneven terrain.
 		Vector testHullMins = GetHullMins();
-		testHullMins.z += ( StepHeight() * 2 );
+		testHullMins.z += (GetStepHeight() * 2 );
 
 		// See if all is clear in that direction.
 		trace_t tr;
@@ -4052,7 +4052,7 @@ float CNPC_Hunter::ChargeSteer()
 
 	// Offset by step height
 	Vector testHullMins = GetHullMins();
-	testHullMins.z += (StepHeight() * 2);
+	testHullMins.z += (GetStepHeight() * 2);
 
 	// Probe
 	HunterTraceHull_SkipPhysics(GetEngineObject()->GetAbsOrigin(), testPos, testHullMins, GetHullMaxs(), MASK_NPCSOLID, this, COLLISION_GROUP_NONE, &tr, GetEngineObject()->VPhysicsGetObject()->GetMass() * 0.5f );

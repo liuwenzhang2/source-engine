@@ -8173,7 +8173,7 @@ void CEngineObjectInternal::UpdateStepOrigin()
 				float height = 18.0f;
 				if (m_pOuter->IsNPC())
 				{
-					height = m_pOuter->StepHeight();
+					height = m_pOuter->GetStepHeight();
 				}
 
 				// debounce floor location
@@ -8375,6 +8375,8 @@ END_SEND_TABLE()
 BEGIN_DATADESC(CEnginePlayerInternal)
 	DEFINE_FIELD(m_hPortalEnvironment, FIELD_EHANDLE),
 END_DATADESC()
+
+IMPLEMENT_SERVERCLASS(CEnginePlayerInternal, DT_EnginePlayer)
 
 CEnginePlayerInternal::CEnginePlayerInternal(IServerEntityList* pServerEntityList, int iForceEdictIndex, int iSerialNum)
 	:CEngineObjectInternal(pServerEntityList, iForceEdictIndex, iSerialNum)
@@ -10646,7 +10648,7 @@ void CEnginePortalInternal::ReleaseAllEntityOwnership(void)
 		}
 		if (EntityIsInPortalHole(pEntity->GetEngineObject()))
 		{
-			FindClosestPassableSpace(pEntity, GetPortalPlane().normal);
+			pEntity->FindClosestPassableSpace(GetPortalPlane().normal);
 		}
 		ReleaseOwnershipOfEntity(pEntity);
 	}
@@ -10944,7 +10946,7 @@ void CEnginePortalInternal::AfterMove()
 		{
 			//this entity is most definitely stuck in a solid wall right now
 			//pFixEntities[i]->SetAbsOrigin( pFixEntities[i]->GetAbsOrigin() + (OldPlane.m_Normal * 50.0f) );
-			FindClosestPassableSpace(m_pFixEntities[i], m_OldPlane.normal);
+			m_pFixEntities[i]->FindClosestPassableSpace( m_OldPlane.normal);
 			continue;
 		}
 

@@ -607,8 +607,8 @@ bool CAI_PassengerBehavior::ReserveEntryPoint( VehicleSeatQuery_e eSeatSearchTyp
 bool CAI_PassengerBehavior::IsValidTransitionPoint( const Vector &vecStartPos, const Vector &vecEndPos )
 {
 	// Now sweep a hull through space to see if we can validly exit there
-	Vector vecHullMins = GetOuter()->GetHullMins() + Vector( 0, 0, GetOuter()->StepHeight()*2.0f );
-	Vector vecHullMaxs = GetOuter()->GetHullMaxs() - Vector( 0, 0, GetOuter()->StepHeight() );
+	Vector vecHullMins = GetOuter()->GetHullMins() + Vector( 0, 0, GetOuter()->GetStepHeight()*2.0f );
+	Vector vecHullMaxs = GetOuter()->GetHullMaxs() - Vector( 0, 0, GetOuter()->GetStepHeight() );
 
 	trace_t tr;
 	CTraceFilterVehicleTransition skipFilter( GetOuter(), m_hVehicle, COLLISION_GROUP_NONE );

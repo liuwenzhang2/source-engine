@@ -1138,7 +1138,7 @@ bool CNPC_AntlionGuard::ShouldCharge( const Vector &startPos, const Vector &endP
 			if ( moveTrace.pObstruction == gEntList.GetBaseEntity( 0 ) )
 			{	
 				// Can't be too far above/below the target
-				if ( fabs( moveTrace.vEndPosition.z - vecTargetPos.z ) > StepHeight() )
+				if ( fabs( moveTrace.vEndPosition.z - vecTargetPos.z ) > GetStepHeight() )
 					return false;
 
 				// Allow it if we got pretty close
@@ -2846,7 +2846,7 @@ void CNPC_AntlionGuard::ChargeLookAhead( void )
 	GetVectors( &vecForward, NULL, NULL );
 	Vector vecTestPos = GetEngineObject()->GetAbsOrigin() + ( vecForward * GetEngineObject()->GetGroundSpeed() * 0.75 );
 	Vector testHullMins = GetHullMins();
-	testHullMins.z += (StepHeight() * 2);
+	testHullMins.z += (GetStepHeight() * 2);
 	TraceHull_SkipPhysics(GetEngineObject()->GetAbsOrigin(), vecTestPos, testHullMins, GetHullMaxs(), MASK_SHOT_HULL, this, COLLISION_GROUP_NONE, &tr, GetEngineObject()->VPhysicsGetObject()->GetMass() * 0.5 );
 
 	//NDebugOverlay::Box( tr.startpos, testHullMins, GetHullMaxs(), 0, 255, 0, true, 0.1f );
@@ -3001,7 +3001,7 @@ float CNPC_AntlionGuard::ChargeSteer( void )
 
 	//Offset by step height
 	Vector testHullMins = GetHullMins();
-	testHullMins.z += (StepHeight() * 2);
+	testHullMins.z += (GetStepHeight() * 2);
 
 	//Probe
 	TraceHull_SkipPhysics(GetEngineObject()->GetAbsOrigin(), testPos, testHullMins, GetHullMaxs(), MASK_SOLID_BRUSHONLY, this, COLLISION_GROUP_NONE, &tr, GetEngineObject()->VPhysicsGetObject()->GetMass() * 0.5f );

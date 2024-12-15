@@ -634,7 +634,7 @@ int CPortalGameMovement::CheckStuck( void )
 
 		if( pPortalPlayer->GetPortalEnvironment())
 		{
-			if( !FindClosestPassableSpace( pPortalPlayer, vIndecisive ) )
+			if( !pPortalPlayer->FindClosestPassableSpace( vIndecisive ) )
 			{
 #ifndef CLIENT_DLL
 				DevMsg( "Hurting the player for FindClosestPassableSpaceFailure!" );

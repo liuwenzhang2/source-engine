@@ -1283,7 +1283,7 @@ void CPortal_Player::VPhysicsShadowUpdate( IPhysicsObject *pPhysics )
 				}
 				else
 				{
-					if( !FindClosestPassableSpace( this, newPosition - GetEngineObject()->GetAbsOrigin(), MASK_PLAYERSOLID ) )
+					if( !this->FindClosestPassableSpace( newPosition - GetEngineObject()->GetAbsOrigin(), MASK_PLAYERSOLID ) )
 					{
 						// Try moving the player closer to the center of the portal
 						CProp_Portal *pPortal = GetPortalEnvironment();

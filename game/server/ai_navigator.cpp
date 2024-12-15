@@ -1388,7 +1388,7 @@ bool CAI_Navigator::TeleportAlongPath()
 		vecStart = GetPath()->CurWaypointPos();
 		AdvancePath();
 
-		GetOuter()->GetMoveProbe()->FloorPoint( vecStart, MASK_NPCSOLID, GetOuter()->StepHeight(), -64, &vTestPoint );
+		GetOuter()->GetMoveProbe()->FloorPoint( vecStart, MASK_NPCSOLID, GetOuter()->GetStepHeight(), -64, &vTestPoint );
 
 		if ( CanFitAtPosition( vTestPoint, MASK_NPCSOLID, false, false ) )
 		{
@@ -3276,7 +3276,7 @@ bool CAI_Navigator::CanFitAtNode(int nodeNum, unsigned int collisionMask )
 	// -------------------------------------------------------------------
 	if (!CanFitAtPosition( startPos, collisionMask ))
 	{
-		startPos.z += GetOuter()->StepHeight();
+		startPos.z += GetOuter()->GetStepHeight();
 		if (!CanFitAtPosition( startPos, collisionMask ))
 			return false;
 	}
