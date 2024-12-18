@@ -90,6 +90,90 @@ typedef unsigned int			AimEntsListHandle_t;
 typedef unsigned int			ClientSideAnimationListHandle_t;
 #define		INVALID_CLIENTSIDEANIMATION_LIST_HANDLE	(ClientSideAnimationListHandle_t)~0
 
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
+// derive from this so we can add save/load data to it
+struct c_game_shadowcontrol_params_t : public hlshadowcontrol_params_t
+{
+	DECLARE_SIMPLE_DATADESC();
+};
+
+//-----------------------------------------------------------------------------
+class C_GrabControllerInternal : public IGrabControllerClient, public IMotionEvent
+{
+	DECLARE_SIMPLE_DATADESC();
+
+public:
+
+	C_GrabControllerInternal(void);
+	~C_GrabControllerInternal(void);
+	void AttachEntity(C_BasePlayer* pPlayer, C_BaseEntity* pEntity, IPhysicsObject* pPhys, bool bIsMegaPhysCannon, const Vector& vGrabPosition, bool bUseGrabPosition);
+	void DetachEntity(bool bClearVelocity);
+	void OnRestore();
+
+	bool UpdateObject(C_BasePlayer* pPlayer, float flError);
+
+	void SetTargetPosition(const Vector& target, const QAngle& targetOrientation);
+	void GetTargetPosition(Vector* target, QAngle* targetOrientation);
+	float ComputeError();
+	float GetLoadWeight(void) const { return m_flLoadWeight; }
+	void SetAngleAlignment(float alignAngleCosine) { m_angleAlignment = alignAngleCosine; }
+	void SetIgnorePitch(bool bIgnore) { m_bIgnoreRelativePitch = bIgnore; }
+	QAngle TransformAnglesToPlayerSpace(const QAngle& anglesIn, C_BasePlayer* pPlayer);
+	QAngle TransformAnglesFromPlayerSpace(const QAngle& anglesIn, C_BasePlayer* pPlayer);
+
+	C_BaseEntity* GetAttached() { return (C_BaseEntity*)m_attachedEntity; }
+	const QAngle& GetAttachedAnglesPlayerSpace() { return m_attachedAnglesPlayerSpace; }
+	void SetAttachedAnglesPlayerSpace(const QAngle& attachedAnglesPlayerSpace) { m_attachedAnglesPlayerSpace = attachedAnglesPlayerSpace; }
+	const Vector& GetAttachedPositionObjectSpace() { return m_attachedPositionObjectSpace; }
+	void SetAttachedPositionObjectSpace(const Vector& attachedPositionObjectSpace) { m_attachedPositionObjectSpace = attachedPositionObjectSpace; }
+
+	IMotionEvent::simresult_e Simulate(IPhysicsMotionController* pController, IPhysicsObject* pObject, float deltaTime, Vector& linear, AngularImpulse& angular);
+	float GetSavedMass(IPhysicsObject* pObject);
+	void GetSavedParamsForCarriedPhysObject(IPhysicsObject* pObject, float* pSavedMassOut, float* pSavedRotationalDampingOut);
+#ifndef CLIENT_DLL
+	bool IsObjectAllowedOverhead(C_BaseEntity* pEntity);
+#endif
+	//set when a held entity is penetrating another through a portal. Needed for special fixes
+	void SetPortalPenetratingEntity(C_BaseEntity* pPenetrated);
+
+private:
+	// Compute the max speed for an attached object
+	void ComputeMaxSpeed(C_BaseEntity* pEntity, IPhysicsObject* pPhysics);
+
+	c_game_shadowcontrol_params_t m_shadow;
+	float			m_timeToArrive;
+	float			m_errorTime;
+	float			m_error;
+	float			m_contactAmount;
+	float			m_angleAlignment;
+	bool			m_bCarriedEntityBlocksLOS;
+	bool			m_bIgnoreRelativePitch;
+
+	float			m_flLoadWeight;
+	float			m_savedRotDamping[VPHYSICS_MAX_OBJECT_LIST_COUNT];
+	float			m_savedMass[VPHYSICS_MAX_OBJECT_LIST_COUNT];
+	EHANDLE			m_attachedEntity;
+	QAngle			m_vecPreferredCarryAngles;
+	bool			m_bHasPreferredCarryAngles;
+	float			m_flDistanceOffset;
+
+	QAngle			m_attachedAnglesPlayerSpace;
+	Vector			m_attachedPositionObjectSpace;
+
+	IPhysicsMotionController* m_controller;
+
+	// NVNT player controlling this grab controller
+	C_BasePlayer*	m_pControllingPlayer;
+#ifndef CLIENT_DLL
+	bool			m_bAllowObjectOverhead; // Can the player hold this object directly overhead? (Default is NO)
+#endif // !CLIENT_DLL
+	//set when a held entity is penetrating another through a portal. Needed for special fixes
+	EHANDLE			m_PenetratedEntity;
+	int				m_frameCount;
+};
+
 class C_EngineObjectInternal : public IEngineObjectClient {
 	friend class CPortalCollideableEnumerator;
 	template<class T> friend class CClientEntityList;
@@ -1109,6 +1193,8 @@ public:
 	bool PhysModelParseSolid(solid_t& solid);
 	bool PhysModelParseSolidByIndex(solid_t& solid, int solidIndex);
 	void PhysForceClearVelocity(IPhysicsObject* pPhys);
+
+	C_GrabControllerInternal* GetGrabController() { return &m_grabController; }
 private:
 	void LockStudioHdr();
 	void UnlockStudioHdr();
@@ -1386,6 +1472,8 @@ protected:
 	byte							m_ubOldInterpolationFrame;
 	// Interpolation says don't draw yet
 	bool							m_bReadyToDraw;
+
+	C_GrabControllerInternal		m_grabController;
 };
 
 //-----------------------------------------------------------------------------
@@ -2574,7 +2662,7 @@ public:
 	virtual void ObjectEnterTrigger(IPhysicsObject* pTrigger, IPhysicsObject* pObject) {}
 	virtual void ObjectLeaveTrigger(IPhysicsObject* pTrigger, IPhysicsObject* pObject) {}
 
-	float	DeltaTimeSinceLastFluid(CBaseEntity* pEntity);
+	float	DeltaTimeSinceLastFluid(C_BaseEntity* pEntity);
 	void	FrameUpdate(void);
 
 	void	UpdateFluidEvents(void);
@@ -2613,7 +2701,7 @@ public:
 	}
 
 
-	friction_t* FindFriction(CBaseEntity* pObject);
+	friction_t* FindFriction(C_BaseEntity* pObject);
 	void ShutdownFriction(friction_t& friction);
 	void UpdateFrictionSounds();
 	bool IsInCallback() { return m_inCallback > 0 ? true : false; }
@@ -2667,6 +2755,7 @@ class CClientEntityList : public CBaseEntityList<T>, public IClientEntityList, p
 	friend class C_BaseEntityIterator;
 	friend class C_EngineObjectInternal;
 	friend class C_EnginePortalInternal;
+	friend class C_GrabControllerInternal;
 	//friend class C_AllBaseEntityIterator;
 	typedef CBaseEntityList<T> BaseClass;
 public:
@@ -2939,7 +3028,7 @@ public:
 		flVolume = clamp(flVolume, 0.0f, 1.0f);
 		if (flVolume > (1.0f / 128.0f))
 		{
-			friction_t* pFriction = m_Collisions.FindFriction((CBaseEntity*)pEntity);
+			friction_t* pFriction = m_Collisions.FindFriction((C_BaseEntity*)pEntity);
 			if (!pFriction)
 				return;
 
@@ -2954,8 +3043,8 @@ public:
 					return;
 
 				pFriction->pObject = pEntity;
-				CPASAttenuationFilter filter((CBaseEntity*)pEntity, params.soundlevel);
-				int entindex = ((CBaseEntity*)pEntity)->entindex();
+				CPASAttenuationFilter filter((C_BaseEntity*)pEntity, params.soundlevel);
+				int entindex = pEntity->entindex();
 
 				// clientside created entites doesn't have a valid entindex, let 'world' play the sound for them
 				if (entindex < 0)
@@ -2979,7 +3068,7 @@ public:
 
 	void PhysCleanupFrictionSounds(IHandleEntity* pEntity)
 	{
-		friction_t* pFriction = m_Collisions.FindFriction((CBaseEntity*)pEntity);
+		friction_t* pFriction = m_Collisions.FindFriction((C_BaseEntity*)pEntity);
 		if (pFriction && pFriction->patch)
 		{
 			m_Collisions.ShutdownFriction(*pFriction);
@@ -3413,7 +3502,7 @@ template<class T>
 void CClientEntityList<T>::Restore(IRestore* pRestore, bool createPlayers)
 {
 	entitytable_t* pEntInfo;
-	CBaseEntity* pent;
+	C_BaseEntity* pent;
 
 	CGameSaveRestoreInfo* pSaveData = pRestore->GetGameSaveRestoreInfo();
 

@@ -80,30 +80,21 @@ typedef void (IHandleEntity::* USEPTR)(CBaseEntity* pActivator, CBaseEntity* pCa
 #define DEFINE_TOUCHFUNC( function ) DEFINE_FUNCTION_RAW( function, TOUCHPTR )
 #define DEFINE_USEFUNC( function ) DEFINE_FUNCTION_RAW( function, USEPTR )
 
-//-----------------------------------------------------------------------------
-// Purpose: think contexts
-//-----------------------------------------------------------------------------
-struct thinkfunc_t
-{
-	THINKPTR	m_pfnThink;
-	string_t	m_iszContext;
-	int			m_nNextThinkTick;
-	int			m_nLastThinkTick;
-
-	DECLARE_SIMPLE_DATADESC();
-};
-
 class IServerEntity;
 class IEngineShadowCloneServer;
 class IEnginePortalServer;
 class IEnginePlayerServer;
 class CBasePlayer;
 
-class IGrabController {
+class IGrabControllerServer {
 public:
 	virtual void AttachEntity(CBasePlayer* pPlayer, CBaseEntity* pEntity, IPhysicsObject* pPhys, bool bIsMegaPhysCannon, const Vector& vGrabPosition, bool bUseGrabPosition) = 0;
 	virtual void DetachEntity(bool bClearVelocity) = 0;
 	virtual CBaseEntity* GetAttached() = 0;
+	virtual const QAngle& GetAttachedAnglesPlayerSpace() = 0;
+	virtual void SetAttachedAnglesPlayerSpace(const QAngle& attachedAnglesPlayerSpace) = 0;
+	virtual const Vector& GetAttachedPositionObjectSpace() = 0;
+	virtual void SetAttachedPositionObjectSpace(const Vector& attachedPositionObjectSpace) = 0;
 	virtual void SetIgnorePitch(bool bIgnore) = 0;
 	virtual void SetAngleAlignment(float alignAngleCosine) = 0;
 	virtual float GetLoadWeight(void) const = 0;
@@ -543,7 +534,7 @@ public:
 	virtual IEnginePortalServer* GetSimulatorThatOwnsEntity() = 0;
 	virtual bool IsPlayer() = 0;
 	virtual IEnginePlayerServer* AsEnginePlayer() = 0;
-	virtual IGrabController* GetGrabController() = 0;
+	virtual IGrabControllerServer* GetGrabController() = 0;
 };
 
 class IEngineWorldServer{

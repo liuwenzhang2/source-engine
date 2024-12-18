@@ -29,6 +29,6 @@ float PhysCannonGetHeldObjectMass( CBaseCombatWeapon *pActiveWeapon, IPhysicsObj
 void UpdateGrabControllerTargetPosition( CBasePlayer *pPlayer, Vector *vPosition, QAngle *qAngles );
 bool PhysCannonAccountableForObject( CBaseCombatWeapon *pPhysCannon, CBaseEntity *pObject );
 
-void GrabController_SetPortalPenetratingEntity( IGrabController *pController, CBaseEntity *pPenetrated );
+void GrabController_SetPortalPenetratingEntity( IGrabControllerServer *pController, CBaseEntity *pPenetrated );
 
 #endif // WEAPON_PHYSCANNON_H

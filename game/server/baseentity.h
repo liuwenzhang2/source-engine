@@ -1420,7 +1420,7 @@ public:
 	virtual CBaseEntity*	GetPlayerHeldEntity() { return NULL; }
 	virtual CBaseEntity*	PhysCannonGetHeldEntity() { return NULL; }
 	virtual float			GetHeldObjectMass(IPhysicsObject* pHeldObject) { return 0; }
-	virtual IGrabController* GetGrabController() { return NULL; }
+	virtual IGrabControllerServer* GetGrabController() { return NULL; }
 	virtual void			PickupObject(CBaseEntity* pObject, bool bLimitMassAndSize = true) {}
 	virtual void			ForceDropOfCarriedPhysObjects(CBaseEntity* pOnlyIfHoldindThis = NULL) {}
 	virtual bool			OnAttemptPhysGunPickup(CBasePlayer* pPhysGunUser, PhysGunPickup_t reason = PICKED_UP_BY_CANNON) { return true; }

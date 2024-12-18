@@ -36,6 +36,7 @@ struct PS_SD_Static_SurfaceProperties_t;
 class CIKContext;
 typedef unsigned int HTOOLHANDLE;
 class CUserCmd;
+class C_BasePlayer;
 
 class VarMapEntry_t
 {
@@ -93,6 +94,26 @@ struct clientthinkfunc_t
 };
 
 class IClientEntity;
+
+class IGrabControllerClient {
+public:
+	virtual void AttachEntity(C_BasePlayer* pPlayer, C_BaseEntity* pEntity, IPhysicsObject* pPhys, bool bIsMegaPhysCannon, const Vector& vGrabPosition, bool bUseGrabPosition) = 0;
+	virtual void DetachEntity(bool bClearVelocity) = 0;
+	virtual C_BaseEntity* GetAttached() = 0;
+	virtual const QAngle& GetAttachedAnglesPlayerSpace() = 0;
+	virtual void SetAttachedAnglesPlayerSpace(const QAngle& attachedAnglesPlayerSpace) = 0;
+	virtual const Vector& GetAttachedPositionObjectSpace() = 0;
+	virtual void SetAttachedPositionObjectSpace(const Vector& attachedPositionObjectSpace) = 0;
+	virtual void SetIgnorePitch(bool bIgnore) = 0;
+	virtual void SetAngleAlignment(float alignAngleCosine) = 0;
+	virtual float GetLoadWeight(void) const = 0;
+	virtual float ComputeError() = 0;
+	virtual bool UpdateObject(C_BasePlayer* pPlayer, float flError) = 0;
+	virtual float GetSavedMass(IPhysicsObject* pObject) = 0;
+	virtual void GetSavedParamsForCarriedPhysObject(IPhysicsObject* pObject, float* pSavedMassOut, float* pSavedRotationalDampingOut) = 0;
+	virtual void GetTargetPosition(Vector* target, QAngle* targetOrientation) = 0;
+	virtual void SetPortalPenetratingEntity(C_BaseEntity* pPenetrated) = 0;
+};
 
 class IEngineObjectClient : public IEngineObject, public IClientNetworkable, public IClientRenderable {
 public:
@@ -590,6 +611,7 @@ public:
 	virtual bool PhysModelParseSolid(solid_t& solid) = 0;
 	virtual bool PhysModelParseSolidByIndex(solid_t& solid, int solidIndex) = 0;
 	virtual void PhysForceClearVelocity(IPhysicsObject* pPhys) = 0;
+	virtual IGrabControllerClient* GetGrabController() = 0;
 };
 
 class IEnginePortalClient;

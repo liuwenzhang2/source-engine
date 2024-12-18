@@ -312,13 +312,14 @@ public:
 	void Use( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value );
 	void OnRestore()
 	{
+		BaseClass::OnRestore();
 		//m_grabController.OnRestore();
 	}
 	void VPhysicsUpdate( IPhysicsObject *pPhysics ){}
 	void VPhysicsShadowUpdate( IPhysicsObject *pPhysics ) {}
 
 	bool IsHoldingEntity( CBaseEntity *pEnt );
-	IGrabController* GetGrabController() { return GetEngineObject()->GetGrabController(); }
+	IGrabControllerServer* GetGrabController() { return GetEngineObject()->GetGrabController(); }
 
 private:
 	//CGrabController		m_grabController;
@@ -614,7 +615,7 @@ public:
 
 	void	ForceDrop( void );
 	bool	DropIfEntityHeld( CBaseEntity *pTarget );	// Drops its held entity if it matches the entity passed in
-	IGrabController* GetGrabController() { return GetEngineObject()->GetGrabController(); }
+	IGrabControllerServer* GetGrabController() { return GetEngineObject()->GetGrabController(); }
 
 	bool	CanHolster( void );
 	bool	Holster( CBaseCombatWeapon *pSwitchingTo = NULL );
@@ -3784,7 +3785,7 @@ float PhysCannonGetHeldObjectMass( CBaseCombatWeapon *pActiveWeapon, IPhysicsObj
 	CWeaponPhysCannon *pCannon = dynamic_cast<CWeaponPhysCannon *>(pActiveWeapon);
 	if ( pCannon )
 	{
-		IGrabController* grab = pCannon->GetGrabController();
+		IGrabControllerServer* grab = pCannon->GetGrabController();
 		mass = grab->GetSavedMass( pHeldObject );
 	}
 
@@ -3795,7 +3796,7 @@ CBaseEntity * CWeaponPhysCannon::PhysCannonGetHeldEntity()
 {
 	if ( this )
 	{
-		IGrabController* grab = this->GetGrabController();
+		IGrabControllerServer* grab = this->GetGrabController();
 		return grab->GetAttached();
 	}
 
@@ -3828,7 +3829,7 @@ CBaseEntity * CPortal_Player::GetPlayerHeldEntity()
 	return pObject;
 }
 
-IGrabController * CPortal_Player::GetGrabController()
+IGrabControllerServer* CPortal_Player::GetGrabController()
 {
 	CPlayerPickupController *pPlayerPickupController = (CPlayerPickupController *)(this->GetUseEntity());
 	if( pPlayerPickupController )
@@ -3839,7 +3840,7 @@ IGrabController * CPortal_Player::GetGrabController()
 
 void UpdateGrabControllerTargetPosition( CBasePlayer *pPlayer, Vector *vPosition, QAngle *qAngles )
 {
-	IGrabController *pGrabController = pPlayer->GetGrabController();
+	IGrabControllerServer*pGrabController = pPlayer->GetGrabController();
 
 	if ( !pGrabController )
 		return;
@@ -3866,14 +3867,14 @@ float PlayerPickupGetHeldObjectMass( CBaseEntity *pPickupControllerEntity, IPhys
 	CPlayerPickupController *pController = dynamic_cast<CPlayerPickupController *>(pPickupControllerEntity);
 	if ( pController )
 	{
-		IGrabController* grab = pController->GetGrabController();
+		IGrabControllerServer* grab = pController->GetGrabController();
 		mass = grab->GetSavedMass( pHeldObject );
 	}
 	return mass;
 }
 
 
-void GrabController_SetPortalPenetratingEntity( IGrabController *pController, CBaseEntity *pPenetrated )
+void GrabController_SetPortalPenetratingEntity( IGrabControllerServer *pController, CBaseEntity *pPenetrated )
 {
 	pController->SetPortalPenetratingEntity( pPenetrated );
 }

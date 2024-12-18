@@ -52,7 +52,7 @@
 static const char *s_pWaitForUpgradeContext = "WaitForUpgrade";
 
 ConVarRef	g_debug_physcannon( "g_debug_physcannon" );
-
+ConVarRef physcannon_maxmass("physcannon_maxmass");
 ConVar physcannon_minforce( "physcannon_minforce", "700", FCVAR_REPLICATED | FCVAR_CHEAT );
 ConVar physcannon_maxforce( "physcannon_maxforce", "1500", FCVAR_REPLICATED | FCVAR_CHEAT );
 ConVar physcannon_tracelength( "physcannon_tracelength", "250", FCVAR_REPLICATED | FCVAR_CHEAT );
@@ -165,13 +165,14 @@ public:
 	void Use( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value );
 	void OnRestore()
 	{
-		m_grabController.OnRestore();
+		BaseClass::OnRestore();
+		//m_grabController.OnRestore();
 	}
 	void VPhysicsUpdate( IPhysicsObject *pPhysics ){}
 	void VPhysicsShadowUpdate( IPhysicsObject *pPhysics ) {}
 
 	bool IsHoldingEntity( CBaseEntity *pEnt );
-	IGrabController* GetGrabController() { return GetEngineObject()->GetGrabController(); }
+	IGrabControllerServer* GetGrabController() { return GetEngineObject()->GetGrabController(); }
 
 private:
 	//CGrabController		m_grabController;
@@ -214,13 +215,13 @@ void CPlayerPickupController::Init( CBasePlayer *pPlayer, CBaseEntity *pObject )
 
 	// done so I'll go across level transitions with the player
 	GetEngineObject()->SetParent( pPlayer->GetEngineObject() );
-	m_grabController.SetIgnorePitch( true );
-	m_grabController.SetAngleAlignment( DOT_30DEGREE );
+	GetGrabController()->SetIgnorePitch( true );
+	GetGrabController()->SetAngleAlignment( DOT_30DEGREE );
 	m_pPlayer = pPlayer;
 	IPhysicsObject *pPhysics = pObject->GetEngineObject()->VPhysicsGetObject();
 	Pickup_OnPhysGunPickup( pObject, m_pPlayer );
 	
-	m_grabController.AttachEntity( pPlayer, pObject, pPhysics, false, vec3_origin, false );
+	GetGrabController()->AttachEntity( pPlayer, pObject, pPhysics, false, vec3_origin, false );
 	
 	m_pPlayer->m_Local.m_iHideHUD |= HIDEHUD_WEAPONSELECTION;
 	m_pPlayer->SetUseEntity( this );
@@ -235,7 +236,7 @@ void CPlayerPickupController::Init( CBasePlayer *pPlayer, CBaseEntity *pObject )
 void CPlayerPickupController::Shutdown( bool bThrown )
 {
 #ifndef CLIENT_DLL
-	CBaseEntity *pObject = m_grabController.GetAttached();
+	CBaseEntity *pObject = GetGrabController()->GetAttached();
 
 	bool bClearVelocity = false;
 	if ( !bThrown && pObject && pObject->GetEngineObject()->VPhysicsGetObject() && pObject->GetEngineObject()->VPhysicsGetObject()->GetContactPoint(NULL,NULL) )
@@ -243,7 +244,7 @@ void CPlayerPickupController::Shutdown( bool bThrown )
 		bClearVelocity = true;
 	}
 
-	m_grabController.DetachEntity( bClearVelocity );
+	GetGrabController()->DetachEntity( bClearVelocity );
 
 	if ( pObject != NULL )
 	{
@@ -283,11 +284,11 @@ void CPlayerPickupController::Use( CBaseEntity *pActivator, CBaseEntity *pCaller
 {
 	if ( ToBasePlayer(pActivator) == m_pPlayer )
 	{
-		CBaseEntity *pAttached = m_grabController.GetAttached();
+		CBaseEntity *pAttached = GetGrabController()->GetAttached();
 
 		// UNDONE: Use vphysics stress to decide to drop objects
 		// UNDONE: Must fix case of forcing objects into the ground you're standing on (causes stress) before that will work
-		if ( !pAttached || useType == USE_OFF || (m_pPlayer->m_nButtons & IN_ATTACK2) || m_grabController.ComputeError() > 12 )
+		if ( !pAttached || useType == USE_OFF || (m_pPlayer->m_nButtons & IN_ATTACK2) || GetGrabController()->ComputeError() > 12 )
 		{
 			Shutdown();
 			return;
@@ -330,7 +331,7 @@ void CPlayerPickupController::Use( CBaseEntity *pActivator, CBaseEntity *pCaller
 		if ( useType == USE_SET )
 		{
 			// update position
-			m_grabController.UpdateObject( m_pPlayer, 12 );
+			GetGrabController()->UpdateObject( m_pPlayer, 12 );
 		}
 	}
 }
@@ -342,7 +343,7 @@ void CPlayerPickupController::Use( CBaseEntity *pActivator, CBaseEntity *pCaller
 //-----------------------------------------------------------------------------
 bool CPlayerPickupController::IsHoldingEntity( CBaseEntity *pEnt )
 {
-	return ( m_grabController.GetAttached() == pEnt );
+	return (GetGrabController()->GetAttached() == pEnt );
 }
 
 void PlayerPickupObject( CBasePlayer *pPlayer, CBaseEntity *pObject )
@@ -378,7 +379,7 @@ float PlayerPickupGetHeldObjectMass(CBaseEntity* pPickupControllerEntity, IPhysi
 	CPlayerPickupController* pController = dynamic_cast<CPlayerPickupController*>(pPickupControllerEntity);
 	if (pController)
 	{
-		IGrabController* grab = pController->GetGrabController();
+		IGrabControllerServer* grab = pController->GetGrabController();
 		mass = grab->GetSavedMass(pHeldObject);
 	}
 	return mass;
@@ -547,8 +548,11 @@ public:
 
 	void	ForceDrop( void );
 	bool	DropIfEntityHeld( CBaseEntity *pTarget );	// Drops its held entity if it matches the entity passed in
+#ifdef CLIENT_DLL
+	IGrabControllerClient* GetGrabController() { return GetEngineObject()->GetGrabController(); }
+#endif // CLIENT_DLL
 #ifdef GAME_DLL
-	IGrabController* GetGrabController() { return GetEngineObject()->GetGrabController(); }
+	IGrabControllerServer* GetGrabController() { return GetEngineObject()->GetGrabController(); }
 	CBaseEntity* PhysCannonGetHeldEntity();
 #endif // GAME_DLL
 
@@ -821,7 +825,7 @@ void CWeaponPhysCannon::Precache( void )
 void CWeaponPhysCannon::OnRestore()
 {
 	BaseClass::OnRestore();
-	m_grabController.OnRestore();
+	//m_grabController.OnRestore();
 
 	// Tracker 8106:  Physcannon effects disappear through level transition, so
 	//  just recreate any effects here
@@ -952,7 +956,7 @@ bool CWeaponPhysCannon::DropIfEntityHeld( CBaseEntity *pTarget )
 	if ( pTarget == NULL )
 		return false;
 
-	CBaseEntity *pHeld = m_grabController.GetAttached();
+	CBaseEntity *pHeld = GetGrabController()->GetAttached();
 	
 	if ( pHeld == NULL )
 		return false;
@@ -1280,7 +1284,7 @@ void CWeaponPhysCannon::PrimaryAttack( void )
 		pOwner->EyeVectors( &forward );
 
 		// Validate the item is within punt range
-		CBaseEntity *pHeld = m_grabController.GetAttached();
+		CBaseEntity *pHeld = GetGrabController()->GetAttached();
 		Assert( pHeld != NULL );
 
 		if ( pHeld != NULL )
@@ -1468,8 +1472,8 @@ bool CWeaponPhysCannon::AttachObject( CBaseEntity *pObject, const Vector &vPosit
 	if ( CanPickupObject( pObject ) == false )
 		return false;
 
-	m_grabController.SetIgnorePitch( false );
-	m_grabController.SetAngleAlignment( 0 );
+	GetGrabController()->SetIgnorePitch( false );
+	GetGrabController()->SetAngleAlignment( 0 );
 
 	IPhysicsObject *pPhysics = pObject->GetEngineObject()->VPhysicsGetObject();
 
@@ -1487,10 +1491,10 @@ bool CWeaponPhysCannon::AttachObject( CBaseEntity *pObject, const Vector &vPosit
 	}
 
 	// NOTE :This must happen after OnPhysGunPickup because that can change the mass
-	m_grabController.AttachEntity( pOwner, pObject, pPhysics, false, vPosition, false );
+	GetGrabController()->AttachEntity( pOwner, pObject, pPhysics, false, vPosition, false );
 	m_hAttachedObject = pObject;
-	m_attachedPositionObjectSpace = m_grabController.m_attachedPositionObjectSpace;
-	m_attachedAnglesPlayerSpace = m_grabController.m_attachedAnglesPlayerSpace;
+	m_attachedPositionObjectSpace = GetGrabController()->GetAttachedPositionObjectSpace();
+	m_attachedAnglesPlayerSpace = GetGrabController()->GetAttachedAnglesPlayerSpace();
 
 	m_bResetOwnerEntity = false;
 
@@ -1693,7 +1697,7 @@ void CWeaponPhysCannon::UpdateObject( void )
 	Assert( pPlayer );
 
 	float flError = 12;
-	if ( !m_grabController.UpdateObject( pPlayer, flError ) )
+	if ( !GetGrabController()->UpdateObject( pPlayer, flError ) )
 	{
 		DetachObject();
 		return;
@@ -1715,9 +1719,9 @@ void CWeaponPhysCannon::DetachObject( bool playSound, bool wasLaunched )
 		pOwner->SetMaxSpeed( hl2_normspeed.GetFloat() );
 	}
 
-	CBaseEntity *pObject = m_grabController.GetAttached();
+	CBaseEntity *pObject = GetGrabController()->GetAttached();
 
-	m_grabController.DetachEntity( wasLaunched );
+	GetGrabController()->DetachEntity( wasLaunched );
 
 	if ( pObject != NULL )
 	{
@@ -1748,7 +1752,7 @@ void CWeaponPhysCannon::DetachObject( bool playSound, bool wasLaunched )
 	
 #else
 
-	m_grabController.DetachEntity( wasLaunched );
+	GetGrabController()->DetachEntity( wasLaunched );
 
 	if ( m_hAttachedObject )
 	{
@@ -1766,7 +1770,7 @@ void CWeaponPhysCannon::ManagePredictedObject( void )
 	if (pAttachedObject)
 	{
 		// NOTE :This must happen after OnPhysGunPickup because that can change the mass
-		if ( pAttachedObject != GetGrabController().GetAttached() )
+		if ( pAttachedObject != GetGrabController()->GetAttached() )
 		{
 			IPhysicsObject *pPhysics = pAttachedObject->GetEngineObject()->VPhysicsGetObject();
 
@@ -1782,12 +1786,12 @@ void CWeaponPhysCannon::ManagePredictedObject( void )
 
 			if ( pPhysics )
 			{
-				m_grabController.SetIgnorePitch( false );
-				m_grabController.SetAngleAlignment( 0 );
+				GetGrabController()->SetIgnorePitch( false );
+				GetGrabController()->SetAngleAlignment( 0 );
 
-				GetGrabController().AttachEntity( ToBasePlayer( GetOwner() ), pAttachedObject, pPhysics, false, vec3_origin, false );
-				GetGrabController().m_attachedPositionObjectSpace = m_attachedPositionObjectSpace;
-				GetGrabController().m_attachedAnglesPlayerSpace = m_attachedAnglesPlayerSpace;
+				GetGrabController()->AttachEntity( ToBasePlayer( GetOwner() ), pAttachedObject, pPhysics, false, vec3_origin, false );
+				GetGrabController()->SetAttachedPositionObjectSpace(m_attachedPositionObjectSpace);
+				GetGrabController()->SetAttachedAnglesPlayerSpace(m_attachedAnglesPlayerSpace);
 			}
 		}
 	}
@@ -1795,7 +1799,7 @@ void CWeaponPhysCannon::ManagePredictedObject( void )
 	{
 		if ( m_hOldAttachedObject && m_hOldAttachedObject->GetEngineObject()->VPhysicsGetObject() )
 		{
-			GetGrabController().DetachEntity( false );
+			GetGrabController()->DetachEntity( false );
 
 			m_hOldAttachedObject->GetEngineObject()->VPhysicsDestroyObject();
 		}
@@ -2058,7 +2062,7 @@ void CWeaponPhysCannon::ItemPostFrame()
 
 void CWeaponPhysCannon::LaunchObject( const Vector &vecDir, float flForce )
 {
-	CBaseEntity *pObject = m_grabController.GetAttached();
+	CBaseEntity *pObject = GetGrabController()->GetAttached();
 
 	if ( !(m_hLastPuntedObject == pObject && gpGlobals->curtime < m_flRepuntObjectTime) )
 	{
@@ -2214,7 +2218,7 @@ void CWeaponPhysCannon::CloseElements( void )
 //-----------------------------------------------------------------------------
 float CWeaponPhysCannon::GetLoadPercentage( void )
 {
-	float loadWeight = m_grabController.GetLoadWeight();
+	float loadWeight = GetGrabController()->GetLoadWeight();
 	loadWeight /= physcannon_maxmass.GetFloat();	
 	loadWeight = clamp( loadWeight, 0.0f, 1.0f );
 	return loadWeight;
@@ -2901,7 +2905,7 @@ float PhysCannonGetHeldObjectMass( CBaseCombatWeapon *pActiveWeapon, IPhysicsObj
 	CWeaponPhysCannon *pCannon = dynamic_cast<CWeaponPhysCannon *>(pActiveWeapon);
 	if ( pCannon )
 	{
-		IGrabController* grab = pCannon->GetGrabController();
+		IGrabControllerServer* grab = pCannon->GetGrabController();
 		mass = grab->GetSavedMass( pHeldObject );
 	}
 
@@ -2914,12 +2918,26 @@ CBaseEntity * CWeaponPhysCannon::PhysCannonGetHeldEntity()
 {
 	if ( this )
 	{
-		IGrabController* grab = this->GetGrabController();
+		IGrabControllerServer* grab = this->GetGrabController();
 		return grab->GetAttached();
 	}
 
 	return NULL;
 }
+
+CBaseEntity* CHL2_Player::GetPlayerHeldEntity()
+{
+	CBaseEntity* pObject = NULL;
+	CPlayerPickupController* pPlayerPickupController = (CPlayerPickupController*)(this->GetUseEntity());
+
+	if (pPlayerPickupController)
+	{
+		pObject = pPlayerPickupController->GetGrabController()->GetAttached();
+	}
+
+	return pObject;
+}
+
 #endif // GAME_DLL
 
 

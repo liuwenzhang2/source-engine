@@ -1306,13 +1306,14 @@ public:
 	void Use( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value );
 	void OnRestore()
 	{
+		BaseClass::OnRestore();
 		//m_grabController.OnRestore();
 	}
 	void VPhysicsUpdate( IPhysicsObject *pPhysics ){}
 	void VPhysicsShadowUpdate( IPhysicsObject *pPhysics ) {}
 
 	bool IsHoldingEntity( CBaseEntity *pEnt );
-	IGrabController* GetGrabController() { return GetEngineObject()->GetGrabController(); }
+	IGrabControllerServer* GetGrabController() { return GetEngineObject()->GetGrabController(); }
 
 private:
 	//CGrabController		m_grabController;
@@ -1361,12 +1362,12 @@ void CPlayerPickupController::Init( CBasePlayer *pPlayer, CBaseEntity *pObject )
 
 	// done so I'll go across level transitions with the player
 	GetEngineObject()->SetParent( pPlayer->GetEngineObject() );
-	m_grabController.SetIgnorePitch( true );
-	m_grabController.SetAngleAlignment( DOT_30DEGREE );
+	GetGrabController()->SetIgnorePitch( true );
+	GetGrabController()->SetAngleAlignment( DOT_30DEGREE );
 	m_pPlayer = pPlayer;
 	IPhysicsObject *pPhysics = pObject->GetEngineObject()->VPhysicsGetObject();
 	Pickup_OnPhysGunPickup( pObject, m_pPlayer );
-	m_grabController.AttachEntity( pPlayer, pObject, pPhysics );
+	GetGrabController()->AttachEntity( pPlayer, pObject, pPhysics, false, vec3_origin, false);
 	
 	m_pPlayer->m_Local.m_iHideHUD |= HIDEHUD_WEAPONSELECTION;
 	m_pPlayer->SetUseEntity( this );
@@ -1379,9 +1380,9 @@ void CPlayerPickupController::Init( CBasePlayer *pPlayer, CBaseEntity *pObject )
 //-----------------------------------------------------------------------------
 void CPlayerPickupController::Shutdown( bool bThrown )
 {
-	CBaseEntity *pObject = m_grabController.GetAttached();
+	CBaseEntity *pObject = GetGrabController()->GetAttached();
 
-	m_grabController.DetachEntity();
+	GetGrabController()->DetachEntity(false);
 
 	if ( pObject != NULL )
 	{
@@ -1406,11 +1407,11 @@ void CPlayerPickupController::Use( CBaseEntity *pActivator, CBaseEntity *pCaller
 {
 	if ( ToBasePlayer(pActivator) == m_pPlayer )
 	{
-		CBaseEntity *pAttached = m_grabController.GetAttached();
+		CBaseEntity *pAttached = GetGrabController()->GetAttached();
 
 		// UNDONE: Use vphysics stress to decide to drop objects
 		// UNDONE: Must fix case of forcing objects into the ground you're standing on (causes stress) before that will work
-		if ( !pAttached || useType == USE_OFF || (m_pPlayer->m_nButtons & IN_ATTACK2) || m_grabController.ComputeError() > 12 )
+		if ( !pAttached || useType == USE_OFF || (m_pPlayer->m_nButtons & IN_ATTACK2) || GetGrabController()->ComputeError() > 12 )
 		{
 			Shutdown();
 			return;
@@ -1453,7 +1454,7 @@ void CPlayerPickupController::Use( CBaseEntity *pActivator, CBaseEntity *pCaller
 		if ( useType == USE_SET )
 		{
 			// update position
-			m_grabController.UpdateObject( m_pPlayer, 12 );
+			GetGrabController()->UpdateObject( m_pPlayer, 12 );
 		}
 	}
 }
@@ -1465,7 +1466,7 @@ void CPlayerPickupController::Use( CBaseEntity *pActivator, CBaseEntity *pCaller
 //-----------------------------------------------------------------------------
 bool CPlayerPickupController::IsHoldingEntity( CBaseEntity *pEnt )
 {
-	return ( m_grabController.GetAttached() == pEnt );
+	return (GetGrabController()->GetAttached() == pEnt );
 }
 
 ConVar hl1_new_pull( "hl1_new_pull", "1" );

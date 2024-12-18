@@ -132,14 +132,14 @@ struct game_shadowcontrol_params_t : public hlshadowcontrol_params_t
 };
 
 //-----------------------------------------------------------------------------
-class CGrabController : public IGrabController, public IMotionEvent
+class CGrabControllerInternal : public IGrabControllerServer, public IMotionEvent
 {
 	DECLARE_SIMPLE_DATADESC();
 
 public:
 
-	CGrabController(void);
-	~CGrabController(void);
+	CGrabControllerInternal(void);
+	~CGrabControllerInternal(void);
 	void AttachEntity(CBasePlayer* pPlayer, CBaseEntity* pEntity, IPhysicsObject* pPhys, bool bIsMegaPhysCannon, const Vector& vGrabPosition, bool bUseGrabPosition);
 	void DetachEntity(bool bClearVelocity);
 	void OnRestore();
@@ -156,6 +156,10 @@ public:
 	QAngle TransformAnglesFromPlayerSpace(const QAngle& anglesIn, CBasePlayer* pPlayer);
 
 	CBaseEntity* GetAttached() { return (CBaseEntity*)m_attachedEntity; }
+	const QAngle& GetAttachedAnglesPlayerSpace() { return m_attachedAnglesPlayerSpace; }
+	void SetAttachedAnglesPlayerSpace(const QAngle& attachedAnglesPlayerSpace) { m_attachedAnglesPlayerSpace = attachedAnglesPlayerSpace; }
+	const Vector& GetAttachedPositionObjectSpace() { return m_attachedPositionObjectSpace; }
+	void SetAttachedPositionObjectSpace(const Vector& attachedPositionObjectSpace) { m_attachedPositionObjectSpace = attachedPositionObjectSpace; }
 
 	IMotionEvent::simresult_e Simulate(IPhysicsMotionController* pController, IPhysicsObject* pObject, float deltaTime, Vector& linear, AngularImpulse& angular);
 	float GetSavedMass(IPhysicsObject* pObject);
@@ -193,13 +197,26 @@ private:
 	IPhysicsMotionController* m_controller;
 
 	// NVNT player controlling this grab controller
-	CBasePlayer* m_pControllingPlayer;
+	CBasePlayer*	m_pControllingPlayer;
 
 	bool			m_bAllowObjectOverhead; // Can the player hold this object directly overhead? (Default is NO)
 
 	//set when a held entity is penetrating another through a portal. Needed for special fixes
 	EHANDLE			m_PenetratedEntity;
 	int				m_frameCount;
+};
+
+//-----------------------------------------------------------------------------
+// Purpose: think contexts
+//-----------------------------------------------------------------------------
+struct thinkfunc_t
+{
+	THINKPTR	m_pfnThink;
+	string_t	m_iszContext;
+	int			m_nNextThinkTick;
+	int			m_nLastThinkTick;
+
+	DECLARE_SIMPLE_DATADESC();
 };
 
 class CEngineShadowCloneInternal;
@@ -905,7 +922,7 @@ public:
 	IEnginePortalServer* GetSimulatorThatOwnsEntity(); //fairly cheap to call
 	bool IsPlayer() { return false; }
 	IEnginePlayerServer* AsEnginePlayer() { return NULL; }
-	CGrabController* GetGrabController() { return &m_grabController; }
+	CGrabControllerInternal* GetGrabController() { return &m_grabController; }
 public:
 	// Networking related methods
 	void NetworkStateChanged();
@@ -1074,7 +1091,7 @@ private:
 	CNetworkVar(bool, m_bAlternateSorting);
 	CNetworkVar(int, m_ubInterpolationFrame);
 
-	CGrabController		m_grabController;
+	CGrabControllerInternal m_grabController;
 };
 
 inline int CEngineObjectNetworkProperty::entindex() const {
@@ -2704,7 +2721,7 @@ class CGlobalEntityList : public CBaseEntityList<T>, public IServerEntityList, p
 	friend class CEnginePortalInternal;
 	friend class CEngineShadowCloneInternal;
 	friend class CEnginePlayerInternal;
-	friend class CGrabController;
+	friend class CGrabControllerInternal;
 	typedef CBaseEntityList<T> BaseClass;
 public:
 
@@ -6611,7 +6628,7 @@ CBasePlayer* CGlobalEntityList<T>::GetPlayerHoldingEntity(CBaseEntity* pEntity)
 {
 	for (int i = 1; i <= gpGlobals->maxClients; ++i)
 	{
-		CBaseEntity* pPlayer = gEntList.GetBaseEntity(i);
+		CBaseEntity* pPlayer = GetBaseEntity(i);
 		if (pPlayer)
 		{
 			if (pPlayer->GetPlayerHeldEntity() == pEntity || (pPlayer->GetActiveWeapon() && pPlayer->GetActiveWeapon()->PhysCannonGetHeldEntity() == pEntity))

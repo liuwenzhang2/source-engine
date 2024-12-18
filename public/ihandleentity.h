@@ -62,6 +62,7 @@ class SINGLE_INHERITANCE IHandleEntity
 {
 public:
 	virtual ~IHandleEntity() {}
+	virtual int entindex() const = 0;
 	virtual datamap_t* GetDataDescMap(void) = 0;
 	virtual void SetRefEHandle( const CBaseHandle &handle ) = 0;
 	virtual const CBaseHandle& GetRefEHandle() const = 0;

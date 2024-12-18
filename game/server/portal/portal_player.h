@@ -144,7 +144,7 @@ public:
 	virtual void PickupObject(CBaseEntity *pObject, bool bLimitMassAndSize );
 	virtual void ForceDropOfCarriedPhysObjects( CBaseEntity *pOnlyIfHoldingThis );
 	virtual CBaseEntity* GetPlayerHeldEntity();
-	virtual IGrabController* GetGrabController();
+	virtual IGrabControllerServer* GetGrabController();
 
 
 	void SetStuckOnPortalCollisionObject( void ) { m_bStuckOnPortalCollisionObject = true; }

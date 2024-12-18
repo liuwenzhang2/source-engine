@@ -665,7 +665,7 @@
       <PreprocessorDefinitions>WIN32;DEBUG;_DEBUG;_WIN32;_WINDOWS;_DLL_EXT=.dll;COMPILER_MSVC;COMPILER_MSVC32;MSVC;_ALLOW_RUNTIME_LIBRARY_MISMATCH;_ALLOW_ITERATOR_DEBUG_LEVEL_MISMATCH;CLIENT_DLL;GAMECLIENTHL2_EXPORTS;CSTRIKE_DLL;VERSION_SAFE_STEAM_API_INTERFACES;_CRT_SECURE_NO_WARNINGS</PreprocessorDefinitions>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>..\..\..\game\client;..\..\..\game\client\game_controls;..\..\..\common;..\..\..\public;..\..\..\public\tier0;..\..\..\public\tier1;..\..\..\vgui2;..\..\..\game\shared;..\..\..\thirdparty\SDL;..\..\..\game\client\cstrike;..\..\..\game\client\cstrike\VGUI;..\..\..\game\shared\cstrike;..\..\..\public\matsys_controls</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\..\game\client;..\..\..\game\client\game_controls;..\..\..\common;..\..\..\public;..\..\..\public\tier0;..\..\..\public\tier1;..\..\..\vgui2;..\..\..\game\shared;..\..\..\thirdparty\SDL;..\..\..\game\client\cstrike;..\..\..\game\client\cstrike\VGUI;..\..\..\game\shared\cstrike;..\..\..\public\matsys_controls;..\..\..\game\shared\hl2</AdditionalIncludeDirectories>
       <FloatingPointModel>Fast</FloatingPointModel>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <DisableSpecificWarnings>4819</DisableSpecificWarnings>
@@ -689,7 +689,7 @@
       <PreprocessorDefinitions>WIN32;NDEBUG;_WIN32;_WINDOWS;_DLL_EXT=.dll;COMPILER_MSVC;COMPILER_MSVC32;MSVC;_ALLOW_RUNTIME_LIBRARY_MISMATCH;_ALLOW_ITERATOR_DEBUG_LEVEL_MISMATCH;CLIENT_DLL;GAMECLIENTHL2_EXPORTS;CSTRIKE_DLL;VERSION_SAFE_STEAM_API_INTERFACES;_CRT_SECURE_NO_WARNINGS</PreprocessorDefinitions>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>..\..\..\game\client;..\..\..\game\client\game_controls;..\..\..\common;..\..\..\public;..\..\..\public\tier0;..\..\..\public\tier1;..\..\..\vgui2;..\..\..\game\shared;..\..\..\thirdparty\SDL;..\..\..\game\client\cstrike;..\..\..\game\client\cstrike\VGUI;..\..\..\game\shared\cstrike;..\..\..\public\matsys_controls</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\..\game\client;..\..\..\game\client\game_controls;..\..\..\common;..\..\..\public;..\..\..\public\tier0;..\..\..\public\tier1;..\..\..\vgui2;..\..\..\game\shared;..\..\..\thirdparty\SDL;..\..\..\game\client\cstrike;..\..\..\game\client\cstrike\VGUI;..\..\..\game\shared\cstrike;..\..\..\public\matsys_controls;..\..\..\game\shared\hl2</AdditionalIncludeDirectories>
       <FloatingPointModel>Fast</FloatingPointModel>
       <DisableSpecificWarnings>4819</DisableSpecificWarnings>
       <Optimization>Disabled</Optimization>

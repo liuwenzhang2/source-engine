@@ -2044,7 +2044,7 @@ int CPortal_CollisionEvent::ShouldSolvePenetration(IPhysicsObject* pObj0, IPhysi
 		Assert(pHoldingPlayer);
 		if (pHoldingPlayer)
 		{
-			IGrabController* pGrabController = pHoldingPlayer->GetGrabController();
+			IGrabControllerServer* pGrabController = pHoldingPlayer->GetGrabController();
 
 			if (!pGrabController)
 				pGrabController = pHoldingPlayer->GetActiveWeapon()->GetGrabController();
@@ -2203,7 +2203,7 @@ static void ModifyWeight_PreCollision(vcollisionevent_t* pEvent)
 				s_bChangedMass[i] = true;
 				s_fSavedMass[i] = pUnshadowedObjects[i]->GetMass();
 
-				IGrabController* pGrabController = NULL;
+				IGrabControllerServer* pGrabController = NULL;
 				CBaseEntity* pLookingForEntity = (CBaseEntity*)pEvent->pObjects[i]->GetGameData();
 				CBasePlayer* pHoldingPlayer = gEntList.GetPlayerHoldingEntity(pLookingForEntity);
 				if (pHoldingPlayer)
@@ -2434,7 +2434,7 @@ BEGIN_SIMPLE_DATADESC(game_shadowcontrol_params_t)
 
 END_DATADESC()
 
-BEGIN_SIMPLE_DATADESC(CGrabController)
+BEGIN_SIMPLE_DATADESC(CGrabControllerInternal)
 
 	DEFINE_EMBEDDED(m_shadow),
 
@@ -2464,7 +2464,7 @@ END_DATADESC()
 const float DEFAULT_MAX_ANGULAR = 360.0f * 10.0f;
 const float REDUCED_CARRY_MASS = 1.0f;
 
-CGrabController::CGrabController(void)
+CGrabControllerInternal::CGrabControllerInternal(void)
 {
 	m_shadow.dampFactor = 1.0;
 	m_shadow.teleportDistance = 0;
@@ -2483,12 +2483,12 @@ CGrabController::CGrabController(void)
 	m_pControllingPlayer = NULL;
 }
 
-CGrabController::~CGrabController(void)
+CGrabControllerInternal::~CGrabControllerInternal(void)
 {
 	DetachEntity(false);
 }
 
-void CGrabController::OnRestore()
+void CGrabControllerInternal::OnRestore()
 {
 	if (m_controller)
 	{
@@ -2546,7 +2546,7 @@ static void ComputePlayerMatrix(CBasePlayer* pPlayer, matrix3x4_t& out)
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-bool CGrabController::UpdateObject(CBasePlayer* pPlayer, float flError)
+bool CGrabControllerInternal::UpdateObject(CBasePlayer* pPlayer, float flError)
 {
 	CBaseEntity* pPenetratedEntity = m_PenetratedEntity.Get();
 	if (pPenetratedEntity)
@@ -2795,7 +2795,7 @@ bool CGrabController::UpdateObject(CBasePlayer* pPlayer, float flError)
 	return true;
 }
 
-void CGrabController::SetTargetPosition(const Vector& target, const QAngle& targetOrientation)
+void CGrabControllerInternal::SetTargetPosition(const Vector& target, const QAngle& targetOrientation)
 {
 	m_shadow.targetPosition = target;
 	m_shadow.targetRotation = targetOrientation;
@@ -2818,7 +2818,7 @@ void CGrabController::SetTargetPosition(const Vector& target, const QAngle& targ
 	}
 }
 
-void CGrabController::GetTargetPosition(Vector* target, QAngle* targetOrientation)
+void CGrabControllerInternal::GetTargetPosition(Vector* target, QAngle* targetOrientation)
 {
 	if (target)
 		*target = m_shadow.targetPosition;
@@ -2830,7 +2830,7 @@ void CGrabController::GetTargetPosition(Vector* target, QAngle* targetOrientatio
 // Purpose: 
 // Output : float
 //-----------------------------------------------------------------------------
-float CGrabController::ComputeError()
+float CGrabControllerInternal::ComputeError()
 {
 	if (m_errorTime <= 0)
 		return 0;
@@ -2911,7 +2911,7 @@ float CGrabController::ComputeError()
 #define MASS_SPEED_SCALE	60
 #define MAX_MASS			40
 
-void CGrabController::ComputeMaxSpeed(CBaseEntity* pEntity, IPhysicsObject* pPhysics)
+void CGrabControllerInternal::ComputeMaxSpeed(CBaseEntity* pEntity, IPhysicsObject* pPhysics)
 {
 	m_shadow.maxSpeed = 1000;
 	m_shadow.maxAngular = DEFAULT_MAX_ANGULAR;
@@ -2941,7 +2941,7 @@ void CGrabController::ComputeMaxSpeed(CBaseEntity* pEntity, IPhysicsObject* pPhy
 }
 
 
-QAngle CGrabController::TransformAnglesToPlayerSpace(const QAngle& anglesIn, CBasePlayer* pPlayer)
+QAngle CGrabControllerInternal::TransformAnglesToPlayerSpace(const QAngle& anglesIn, CBasePlayer* pPlayer)
 {
 	if (m_bIgnoreRelativePitch)
 	{
@@ -2954,7 +2954,7 @@ QAngle CGrabController::TransformAnglesToPlayerSpace(const QAngle& anglesIn, CBa
 	return TransformAnglesToLocalSpace(anglesIn, pPlayer->GetEngineObject()->EntityToWorldTransform());
 }
 
-QAngle CGrabController::TransformAnglesFromPlayerSpace(const QAngle& anglesIn, CBasePlayer* pPlayer)
+QAngle CGrabControllerInternal::TransformAnglesFromPlayerSpace(const QAngle& anglesIn, CBasePlayer* pPlayer)
 {
 	if (m_bIgnoreRelativePitch)
 	{
@@ -3061,7 +3061,7 @@ static QAngle AlignAngles(const QAngle& angles, float cosineAlignAngle)
 	return out;
 }
 
-void CGrabController::AttachEntity(CBasePlayer* pPlayer, CBaseEntity* pEntity, IPhysicsObject* pPhys, bool bIsMegaPhysCannon, const Vector& vGrabPosition, bool bUseGrabPosition)
+void CGrabControllerInternal::AttachEntity(CBasePlayer* pPlayer, CBaseEntity* pEntity, IPhysicsObject* pPhys, bool bIsMegaPhysCannon, const Vector& vGrabPosition, bool bUseGrabPosition)
 {
 	// play the impact sound of the object hitting the player
 	// used as feedback to let the player know he picked up the object
@@ -3237,7 +3237,7 @@ static void ClampPhysicsVelocity(IPhysicsObject* pPhys, float linearLimit, float
 	pPhys->AddVelocity(&vel, &angVel);
 }
 
-void CGrabController::DetachEntity(bool bClearVelocity)
+void CGrabControllerInternal::DetachEntity(bool bClearVelocity)
 {
 	Assert(!gEntList.PhysIsInCallback());
 	CBaseEntity* pEntity = GetAttached();
@@ -3272,8 +3272,10 @@ void CGrabController::DetachEntity(bool bClearVelocity)
 	}
 
 	m_attachedEntity = NULL;
-	EntityList()->PhysGetEnv()->DestroyMotionController(m_controller);
-	m_controller = NULL;
+	if (m_controller) {
+		EntityList()->PhysGetEnv()->DestroyMotionController(m_controller);
+		m_controller = NULL;
+	}
 }
 
 static bool InContactWithHeavyObject(IPhysicsObject* pObject, float heavyMass)
@@ -3294,7 +3296,7 @@ static bool InContactWithHeavyObject(IPhysicsObject* pObject, float heavyMass)
 	return contact;
 }
 
-IMotionEvent::simresult_e CGrabController::Simulate(IPhysicsMotionController* pController, IPhysicsObject* pObject, float deltaTime, Vector& linear, AngularImpulse& angular)
+IMotionEvent::simresult_e CGrabControllerInternal::Simulate(IPhysicsMotionController* pController, IPhysicsObject* pObject, float deltaTime, Vector& linear, AngularImpulse& angular)
 {
 	game_shadowcontrol_params_t shadowParams = m_shadow;
 	if (InContactWithHeavyObject(pObject, GetLoadWeight()))
@@ -3322,7 +3324,7 @@ IMotionEvent::simresult_e CGrabController::Simulate(IPhysicsMotionController* pC
 	return SIM_LOCAL_ACCELERATION;
 }
 
-float CGrabController::GetSavedMass(IPhysicsObject* pObject)
+float CGrabControllerInternal::GetSavedMass(IPhysicsObject* pObject)
 {
 	CBaseEntity* pHeld = m_attachedEntity;
 	if (pHeld)
@@ -3341,7 +3343,7 @@ float CGrabController::GetSavedMass(IPhysicsObject* pObject)
 	return 0.0f;
 }
 
-void CGrabController::GetSavedParamsForCarriedPhysObject(IPhysicsObject* pObject, float* pSavedMassOut, float* pSavedRotationalDampingOut)
+void CGrabControllerInternal::GetSavedParamsForCarriedPhysObject(IPhysicsObject* pObject, float* pSavedMassOut, float* pSavedRotationalDampingOut)
 {
 	CBaseEntity* pHeld = m_attachedEntity;
 	if (pHeld)
@@ -3380,7 +3382,7 @@ void CGrabController::GetSavedParamsForCarriedPhysObject(IPhysicsObject* pObject
 // directly overhead? The default behavior prevents lifting objects directly
 // overhead, but there are exceptions for gameplay purposes.
 //-----------------------------------------------------------------------------
-bool CGrabController::IsObjectAllowedOverhead(CBaseEntity* pEntity)
+bool CGrabControllerInternal::IsObjectAllowedOverhead(CBaseEntity* pEntity)
 {
 	// Allow combine balls overhead 
 	if (pEntity->IsCombineBall())
@@ -3401,10 +3403,7 @@ bool CGrabController::IsObjectAllowedOverhead(CBaseEntity* pEntity)
 	return false;
 }
 
-
-
-
-void CGrabController::SetPortalPenetratingEntity(CBaseEntity* pPenetrated)
+void CGrabControllerInternal::SetPortalPenetratingEntity(CBaseEntity* pPenetrated)
 {
 	m_PenetratedEntity = pPenetrated;
 }
@@ -3517,8 +3516,6 @@ class CIKSaveRestoreOps : public CClassPtrSaveRestoreOps
 		*pIK = (bHasIK) ? new CIKContext : NULL;
 	}
 };
-
-
 
 static CIKSaveRestoreOps s_IKSaveRestoreOp;
 
@@ -13134,7 +13131,7 @@ void CEngineShadowCloneInternal::SyncEntity(bool bPullChanges)
 
 static void FullSyncPhysicsObject(IPhysicsObject* pSource, IPhysicsObject* pDest, const VMatrix* pTransform, bool bTeleport)
 {
-	IGrabController* pGrabController = NULL;
+	IGrabControllerServer* pGrabController = NULL;
 
 	if (!pSource->IsAsleep())
 		pDest->Wake();
