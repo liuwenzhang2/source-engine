@@ -10,8 +10,6 @@
 #pragma once
 #endif
 
-class CGrabController;
-
 //-----------------------------------------------------------------------------
 // Do we have the super-phys gun?
 //-----------------------------------------------------------------------------
@@ -26,16 +24,13 @@ void ShutdownPickupController( CBaseEntity *pPickupControllerEntity );
 float PlayerPickupGetHeldObjectMass( CBaseEntity *pPickupControllerEntity, IPhysicsObject *pHeldObject );
 float PhysCannonGetHeldObjectMass( CBaseCombatWeapon *pActiveWeapon, IPhysicsObject *pHeldObject );
 
-CBaseEntity *PhysCannonGetHeldEntity( CBaseCombatWeapon *pActiveWeapon );
-CBaseEntity *GetPlayerHeldEntity( CBasePlayer *pPlayer );
-CBasePlayer *GetPlayerHoldingEntity( CBaseEntity *pEntity );
 
-CGrabController *GetGrabControllerForPlayer( CBasePlayer *pPlayer );
-CGrabController *GetGrabControllerForPhysCannon( CBaseCombatWeapon *pActiveWeapon );
-void GetSavedParamsForCarriedPhysObject( CGrabController *pGrabController, IPhysicsObject *pObject, float *pSavedMassOut, float *pSavedRotationalDampingOut );
+
+IGrabController *GetGrabControllerForPlayer( CBasePlayer *pPlayer );
+IGrabController *GetGrabControllerForPhysCannon( CBaseCombatWeapon *pActiveWeapon );
 void UpdateGrabControllerTargetPosition( CBasePlayer *pPlayer, Vector *vPosition, QAngle *qAngles );
 bool PhysCannonAccountableForObject( CBaseCombatWeapon *pPhysCannon, CBaseEntity *pObject );
 
-void GrabController_SetPortalPenetratingEntity( CGrabController *pController, CBaseEntity *pPenetrated );
+void GrabController_SetPortalPenetratingEntity( IGrabController *pController, CBaseEntity *pPenetrated );
 
 #endif // WEAPON_PHYSCANNON_H

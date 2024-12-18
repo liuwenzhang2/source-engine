@@ -29,6 +29,7 @@
 #include "props.h"
 #include "particle_parse.h"
 #include "ai_tacticalservices.h"
+#include "basecombatweapon.h"
 
 #ifdef HL2_EPISODIC
 #include "grenade_spit.h"

@@ -7765,6 +7765,8 @@ void C_EngineObjectInternal::PhysForceClearVelocity(IPhysicsObject* pPhys)
 
 BEGIN_RECV_TABLE(C_EnginePlayerInternal, DT_EnginePlayer)
 	RecvPropEHandle(RECVINFO(m_hPortalEnvironment)),
+	RecvPropEHandle(RECVINFO(m_pHeldObjectPortal)),
+	RecvPropBool(RECVINFO(m_bHeldObjectOnOppositeSideOfPortal)),
 END_RECV_TABLE()
 
 IMPLEMENT_CLIENTCLASS_NO_FACTORY(C_EnginePlayerInternal, DT_EnginePlayer, CEnginePlayerInternal)
@@ -7772,22 +7774,35 @@ IMPLEMENT_CLIENTCLASS_NO_FACTORY(C_EnginePlayerInternal, DT_EnginePlayer, CEngin
 C_EnginePlayerInternal::C_EnginePlayerInternal(IClientEntityList* pClientEntityList, int iForceEdictIndex, int iSerialNum)
 	:C_EngineObjectInternal(pClientEntityList, iForceEdictIndex, iSerialNum)
 {
-
+	m_hPortalEnvironment = NULL;
+	m_pHeldObjectPortal = NULL;
+	m_bHeldObjectOnOppositeSideOfPortal = false;
 }
 C_EnginePlayerInternal::~C_EnginePlayerInternal()
 {
 
 }
 
+BEGIN_RECV_TABLE(C_EnginePortalInternal, DT_EnginePortal)
+	RecvPropEHandle(RECVINFO(m_hLinkedPortal)),
+	RecvPropBool(RECVINFO(m_bActivated)),
+	RecvPropBool(RECVINFO(m_bIsPortal2)),
+END_RECV_TABLE()
+
+IMPLEMENT_CLIENTCLASS_NO_FACTORY(C_EnginePortalInternal, DT_EnginePortal, CEnginePortalInternal)
+
 C_EnginePortalInternal::C_EnginePortalInternal(IClientEntityList* pClientEntityList, int iForceEdictIndex, int iSerialNum)
 :C_EngineObjectInternal(pClientEntityList, iForceEdictIndex, iSerialNum), m_DataAccess(m_InternalData)
 {
 	static int s_iPortalSimulatorGUIDAllocator = 0;
 	m_iPortalSimulatorGUID = s_iPortalSimulatorGUIDAllocator++;
+	m_bActivated = false;
+	m_bIsPortal2 = false;
 }
 
-C_EnginePortalInternal::~C_EnginePortalInternal() {
-
+C_EnginePortalInternal::~C_EnginePortalInternal() 
+{
+	int aaa = 0;
 }
 
 void C_EnginePortalInternal::VPhysicsDestroyObject(void)
@@ -7861,14 +7876,14 @@ void C_EnginePortalInternal::MoveTo(const Vector& ptCenter, const QAngle& angles
 
 void C_EnginePortalInternal::AttachTo(IEnginePortalClient* pLinkedPortal)
 {
-	m_pLinkedPortal = (C_EnginePortalInternal*)pLinkedPortal;
-	m_pLinkedPortal->m_pLinkedPortal = this;
+	m_hLinkedPortal = pLinkedPortal->AsEngineObject()->GetOuter();
+	GetLinkedPortal()->m_hLinkedPortal = this->AsEngineObject()->GetOuter();
 }
 
 void C_EnginePortalInternal::DetachFromLinked(void) {
-	if (m_pLinkedPortal) {
-		m_pLinkedPortal->m_pLinkedPortal = NULL;
-		m_pLinkedPortal = NULL;
+	if (GetLinkedPortal()) {
+		GetLinkedPortal()->m_hLinkedPortal = NULL;
+		m_hLinkedPortal = NULL;
 	}
 }
 
@@ -8115,15 +8130,313 @@ bool C_EnginePortalInternal::TraceWallBrushes(const Ray_t& ray, trace_t* pTrace)
 	return false;
 }
 
-bool C_EnginePortalInternal::TraceTransformedWorldBrushes(IEnginePortalClient* pRemoteCollisionEntity, const Ray_t& ray, trace_t* pTrace) const
+bool C_EnginePortalInternal::TraceTransformedWorldBrushes(const IEnginePortalClient* pRemoteCollisionEntity, const Ray_t& ray, trace_t* pTrace) const
 {
-	C_EnginePortalInternal* pRemotePortalInternal = dynamic_cast<C_EnginePortalInternal*>(pRemoteCollisionEntity);
+	const C_EnginePortalInternal* pRemotePortalInternal = dynamic_cast<const C_EnginePortalInternal*>(pRemoteCollisionEntity);
 	if (pRemotePortalInternal->m_DataAccess.Simulation.Static.World.Brushes.pCollideable && sv_portal_trace_vs_world.GetBool())
 	{
 		ClientEntityList().PhysGetCollision()->TraceBox(ray, pRemotePortalInternal->m_DataAccess.Simulation.Static.World.Brushes.pCollideable, m_DataAccess.Placement.ptaap_LinkedToThis.ptOriginTransform, m_DataAccess.Placement.ptaap_LinkedToThis.qAngleTransform, pTrace);
 		return true;
 	}
 	return false;
+}
+
+//only enumerates entities in front of the associated portal and are solid (as in a player would get stuck in them)
+class CPortalCollideableEnumerator : public IPartitionEnumerator
+{
+private:
+	EHANDLE m_hTestPortal; //the associated portal that we only want objects in front of
+	Vector m_vPlaneNormal; //portal plane normal
+	float m_fPlaneDist; //plane equation distance
+	Vector m_ptForward1000; //a point exactly 1000 units from the portal center along its forward vector
+public:
+	IHandleEntity* m_pHandles[1024];
+	int m_iHandleCount;
+	CPortalCollideableEnumerator(const C_EnginePortalInternal* pAssociatedPortal);
+	virtual IterationRetval_t EnumElement(IHandleEntity* pHandleEntity);
+};
+
+#define PORTAL_TELEPORTATION_PLANE_OFFSET 7.0f
+
+CPortalCollideableEnumerator::CPortalCollideableEnumerator(const C_EnginePortalInternal* pAssociatedPortal)
+{
+	Assert(pAssociatedPortal);
+	m_hTestPortal = pAssociatedPortal->m_pOuter;
+
+	pAssociatedPortal->GetVectors(&m_vPlaneNormal, NULL, NULL);
+
+	m_ptForward1000 = pAssociatedPortal->GetAbsOrigin();
+	m_ptForward1000 += m_vPlaneNormal * PORTAL_TELEPORTATION_PLANE_OFFSET;
+	m_fPlaneDist = m_vPlaneNormal.Dot(m_ptForward1000);
+
+	m_ptForward1000 += m_vPlaneNormal * 1000.0f;
+
+	m_iHandleCount = 0;
+}
+
+IterationRetval_t CPortalCollideableEnumerator::EnumElement(IHandleEntity* pHandleEntity)
+{
+	EHANDLE hEnt = pHandleEntity->GetRefEHandle();
+
+	CBaseEntity* pEnt = hEnt.Get();
+	if (pEnt == NULL) //I really never thought this would be necessary
+		return ITERATION_CONTINUE;
+
+	if (hEnt == m_hTestPortal)
+		return ITERATION_CONTINUE; //ignore this portal
+
+	/*if( staticpropmgr->IsStaticProp( pHandleEntity ) )
+	{
+		//we're dealing with a static prop, which unfortunately doesn't have everything I want to use for checking
+
+		ICollideable *pCollideable = pEnt->GetCollideable();
+
+		Vector vMins, vMaxs;
+		pCollideable->WorldSpaceSurroundingBounds( &vMins, &vMaxs );
+
+		Vector ptTest( (m_vPlaneNormal.x > 0.0f)?(vMaxs.x):(vMins.x),
+						(m_vPlaneNormal.y > 0.0f)?(vMaxs.y):(vMins.y),
+						(m_vPlaneNormal.z > 0.0f)?(vMaxs.z):(vMins.z) );
+
+		float fPtPlaneDist = m_vPlaneNormal.Dot( ptTest ) - m_fPlaneDist;
+		if( fPtPlaneDist <= 0.0f )
+			return ITERATION_CONTINUE;
+	}
+	else*/
+	{
+		//not a static prop, w00t
+
+		if (!pEnt->GetEngineObject()->IsSolid())
+			return ITERATION_CONTINUE; //not solid
+
+		Vector ptEntCenter = pEnt->GetEngineObject()->WorldSpaceCenter();
+
+		float fBoundRadius = pEnt->GetEngineObject()->BoundingRadius();
+		float fPtPlaneDist = m_vPlaneNormal.Dot(ptEntCenter) - m_fPlaneDist;
+
+		if (fPtPlaneDist < -fBoundRadius)
+			return ITERATION_CONTINUE; //object wholly behind the portal
+
+		if (!(fPtPlaneDist > fBoundRadius) && (fPtPlaneDist > -fBoundRadius)) //object is not wholly in front of the portal, but could be partially in front, do more checks
+		{
+			Vector ptNearest;
+			pEnt->GetEngineObject()->CalcNearestPoint(m_ptForward1000, &ptNearest);
+			fPtPlaneDist = m_vPlaneNormal.Dot(ptNearest) - m_fPlaneDist;
+			if (fPtPlaneDist < 0.0f)
+				return ITERATION_CONTINUE; //closest point was behind the portal plane, we don't want it
+		}
+
+
+	}
+
+	//if we're down here, this entity needs to be added to our enumeration
+	Assert(m_iHandleCount < 1024);
+	if (m_iHandleCount < 1024)
+		m_pHandles[m_iHandleCount] = pHandleEntity;
+	++m_iHandleCount;
+
+	return ITERATION_CONTINUE;
+}
+
+void C_EnginePortalInternal::TraceRay(const Ray_t& ray, unsigned int fMask, ITraceFilter* pTraceFilter, trace_t* pTrace, bool bTraceHolyWall) const//traces against a specific portal's environment, does no *real* tracing
+{
+#ifdef CLIENT_DLL
+	Assert((GameRules() == NULL) || GameRules()->IsMultiplayer());
+#endif
+	Assert(IsReadyToSimulate()); //a trace shouldn't make it down this far if the portal is incapable of changing the results of the trace
+
+	CTraceFilterHitAll traceFilterHitAll;
+	if (!pTraceFilter)
+	{
+		pTraceFilter = &traceFilterHitAll;
+	}
+
+	pTrace->fraction = 2.0f;
+	pTrace->startsolid = true;
+	pTrace->allsolid = true;
+
+	trace_t TempTrace;
+	int counter;
+
+	const C_EnginePortalInternal* pLinkedPortalSimulator = GetLinkedPortal();
+
+	//bool bTraceDisplacements = sv_portal_trace_vs_displacements.GetBool();
+	bool bTraceStaticProps = sv_portal_trace_vs_staticprops.GetBool();
+	if (sv_portal_trace_vs_holywall.GetBool() == false)
+		bTraceHolyWall = false;
+
+	bool bTraceTransformedGeometry = ((pLinkedPortalSimulator != NULL) && bTraceHolyWall && RayIsInPortalHole(ray));
+
+	bool bCopyBackBrushTraceData = false;
+
+
+
+	// Traces vs world
+	if (pTraceFilter->GetTraceType() != TRACE_ENTITIES_ONLY)
+	{
+		//trace_t RealTrace;
+		//enginetrace->TraceRay( ray, fMask, pTraceFilter, &RealTrace );
+		if (TraceWorldBrushes(ray, pTrace))
+		{
+			bCopyBackBrushTraceData = true;
+		}
+
+		if (bTraceHolyWall)
+		{
+			if (TraceWallTube(ray, &TempTrace))
+			{
+				if ((TempTrace.startsolid == false) && (TempTrace.fraction < pTrace->fraction)) //never allow something to be stuck in the tube, it's more of a last-resort guide than a real collideable
+				{
+					*pTrace = TempTrace;
+					bCopyBackBrushTraceData = true;
+				}
+			}
+
+			if (TraceWallBrushes(ray, &TempTrace))
+			{
+				if ((TempTrace.fraction < pTrace->fraction))
+				{
+					*pTrace = TempTrace;
+					bCopyBackBrushTraceData = true;
+				}
+			}
+
+			//if( portalSimulator->m_DataAccess.Simulation.Static.Wall.RemoteTransformedToLocal.Brushes.pCollideable && sv_portal_trace_vs_world.GetBool() )
+			if (bTraceTransformedGeometry && TraceTransformedWorldBrushes(pLinkedPortalSimulator, ray, &TempTrace))
+			{
+				if ((TempTrace.fraction < pTrace->fraction))
+				{
+					*pTrace = TempTrace;
+					bCopyBackBrushTraceData = true;
+				}
+			}
+		}
+
+		if (bCopyBackBrushTraceData)
+		{
+			pTrace->surface = GetSurfaceProperties().surface;
+			pTrace->contents = GetSurfaceProperties().contents;
+			pTrace->m_pEnt = GetSurfaceProperties().pEntity;
+
+			bCopyBackBrushTraceData = false;
+		}
+	}
+
+	// Traces vs entities
+	if (pTraceFilter->GetTraceType() != TRACE_WORLD_ONLY)
+	{
+		bool bFilterStaticProps = (pTraceFilter->GetTraceType() == TRACE_EVERYTHING_FILTER_PROPS);
+
+		//solid entities
+		CPortalCollideableEnumerator enumerator(this);
+		partition->EnumerateElementsAlongRay(PARTITION_ENGINE_SOLID_EDICTS | PARTITION_ENGINE_STATIC_PROPS, ray, false, &enumerator);
+		for (counter = 0; counter != enumerator.m_iHandleCount; ++counter)
+		{
+			if (staticpropmgr->IsStaticProp(enumerator.m_pHandles[counter]))
+			{
+				//if( bFilterStaticProps && !pTraceFilter->ShouldHitEntity( enumerator.m_pHandles[counter], fMask ) )
+				continue; //static props are handled separately, with clipped versions
+			}
+			else if (!pTraceFilter->ShouldHitEntity(enumerator.m_pHandles[counter], fMask))
+			{
+				continue;
+			}
+
+			enginetrace->ClipRayToEntity(ray, fMask, enumerator.m_pHandles[counter], &TempTrace);
+			if ((TempTrace.fraction < pTrace->fraction))
+				*pTrace = TempTrace;
+		}
+
+
+
+
+		if (bTraceStaticProps)
+		{
+			//local clipped static props
+			{
+				int iLocalStaticCount = GetStaticPropsCount();
+				if (iLocalStaticCount != 0 && StaticPropsCollisionExists())
+				{
+					int iIndex = 0;
+					Vector vTransform = vec3_origin;
+					QAngle qTransform = vec3_angle;
+
+					do
+					{
+						const PS_SD_Static_World_StaticProps_ClippedProp_t* pCurrentProp = GetStaticProps(iIndex);
+						if ((!bFilterStaticProps) || pTraceFilter->ShouldHitEntity(pCurrentProp->pSourceProp, fMask))
+						{
+							EntityList()->PhysGetCollision()->TraceBox(ray, pCurrentProp->pCollide, vTransform, qTransform, &TempTrace);
+							if ((TempTrace.fraction < pTrace->fraction))
+							{
+								*pTrace = TempTrace;
+								pTrace->surface.flags = pCurrentProp->iTraceSurfaceFlags;
+								pTrace->surface.surfaceProps = pCurrentProp->iTraceSurfaceProps;
+								pTrace->surface.name = pCurrentProp->szTraceSurfaceName;
+								pTrace->contents = pCurrentProp->iTraceContents;
+								pTrace->m_pEnt = pCurrentProp->pTraceEntity;
+							}
+						}
+
+						++iIndex;
+					} while (iIndex != iLocalStaticCount);
+				}
+			}
+
+			if (bTraceHolyWall)
+			{
+				//remote clipped static props transformed into our wall space
+				if (bTraceTransformedGeometry && (pTraceFilter->GetTraceType() != TRACE_WORLD_ONLY) && sv_portal_trace_vs_staticprops.GetBool())
+				{
+					int iLocalStaticCount = pLinkedPortalSimulator->GetStaticPropsCount();
+					if (iLocalStaticCount != 0)
+					{
+						int iIndex = 0;
+						Vector vTransform = GetTransformedOrigin();
+						QAngle qTransform = GetTransformedAngles();
+
+						do
+						{
+							const PS_SD_Static_World_StaticProps_ClippedProp_t* pCurrentProp = pLinkedPortalSimulator->GetStaticProps(iIndex);
+							if ((!bFilterStaticProps) || pTraceFilter->ShouldHitEntity(pCurrentProp->pSourceProp, fMask))
+							{
+								EntityList()->PhysGetCollision()->TraceBox(ray, pCurrentProp->pCollide, vTransform, qTransform, &TempTrace);
+								if ((TempTrace.fraction < pTrace->fraction))
+								{
+									*pTrace = TempTrace;
+									pTrace->surface.flags = pCurrentProp->iTraceSurfaceFlags;
+									pTrace->surface.surfaceProps = pCurrentProp->iTraceSurfaceProps;
+									pTrace->surface.name = pCurrentProp->szTraceSurfaceName;
+									pTrace->contents = pCurrentProp->iTraceContents;
+									pTrace->m_pEnt = pCurrentProp->pTraceEntity;
+								}
+							}
+
+							++iIndex;
+						} while (iIndex != iLocalStaticCount);
+					}
+				}
+			}
+		}
+	}
+
+	if (pTrace->fraction > 1.0f) //this should only happen if there was absolutely nothing to trace against
+	{
+		//AssertMsg( 0, "Nothing to trace against" );
+		memset(pTrace, 0, sizeof(trace_t));
+		pTrace->fraction = 1.0f;
+		pTrace->startpos = ray.m_Start - ray.m_StartOffset;
+		pTrace->endpos = pTrace->startpos + ray.m_Delta;
+	}
+	else if (pTrace->fraction < 0)
+	{
+		// For all brush traces, use the 'portal backbrush' surface surface contents
+		// BUGBUG: Doing this is a great solution because brushes near a portal
+		// will have their contents and surface properties homogenized to the brush the portal ray hit.
+		pTrace->contents = GetSurfaceProperties().contents;
+		pTrace->surface = GetSurfaceProperties().surface;
+		pTrace->m_pEnt = GetSurfaceProperties().pEntity;
+	}
 }
 
 int C_EnginePortalInternal::GetStaticPropsCount() const

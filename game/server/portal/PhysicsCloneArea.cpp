@@ -34,7 +34,7 @@ void CPhysicsCloneArea::StartTouch( CBaseEntity *pOther )
 
 	if( sv_portal_debug_touch.GetBool() )
 	{
-		DevMsg( "PortalCloneArea %i Start Touch: %s : %f\n", ((m_pAttachedPortal->m_bIsPortal2)?(2):(1)), pOther->GetClassname(), gpGlobals->curtime );
+		DevMsg( "PortalCloneArea %i Start Touch: %s : %f\n", ((m_pAttachedPortal->pCollisionEntity->GetEnginePortal()->IsPortal2())?(2):(1)), pOther->GetClassname(), gpGlobals->curtime );
 	}
 #if !defined( DISABLE_DEBUG_HISTORY )
 	if ( !GetEngineObject()->IsMarkedForDeletion() )
@@ -64,7 +64,7 @@ void CPhysicsCloneArea::EndTouch( CBaseEntity *pOther )
 
 	if( sv_portal_debug_touch.GetBool() )
 	{
-		DevMsg( "PortalCloneArea %i End Touch: %s : %f\n", ((m_pAttachedPortal->m_bIsPortal2)?(2):(1)), pOther->GetClassname(), gpGlobals->curtime );
+		DevMsg( "PortalCloneArea %i End Touch: %s : %f\n", ((m_pAttachedPortal->pCollisionEntity->GetEnginePortal()->IsPortal2())?(2):(1)), pOther->GetClassname(), gpGlobals->curtime );
 	}
 #if !defined( DISABLE_DEBUG_HISTORY )
 	if ( !GetEngineObject()->IsMarkedForDeletion() )
@@ -130,7 +130,7 @@ void CPhysicsCloneArea::UpdatePosition( void )
 
 	GetEngineObject()->SetAbsOrigin( m_pAttachedPortal->GetEngineObject()->GetAbsOrigin() );
 	GetEngineObject()->SetAbsAngles( m_pAttachedPortal->GetEngineObject()->GetAbsAngles() );
-	m_bActive = m_pAttachedPortal->m_bActivated;
+	m_bActive = m_pAttachedPortal->pCollisionEntity->GetEnginePortal()->IsActivated();
 
 	//NDebugOverlay::EntityBounds( this, 0, 0, 255, 25, 5.0f );
 
@@ -220,7 +220,7 @@ void CPhysicsCloneArea::CloneNearbyEntities( void )
 
 void CPhysicsCloneArea::CloneTouchingEntities( void )
 {
-	if( m_pAttachedPortal && m_pAttachedPortal->m_bActivated )
+	if( m_pAttachedPortal && m_pAttachedPortal->pCollisionEntity->GetEnginePortal()->IsActivated() )
 	{
 		servertouchlink_t *root = (servertouchlink_t* )GetEngineObject()->GetDataObject( TOUCHLINK );
 		if( root )

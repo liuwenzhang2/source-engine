@@ -36,7 +36,7 @@ public:
 
 	//CNetworkHandle( CProp_Portal, m_hLinkedPortal ); //the portal this portal is linked to
 	CProp_Portal* GetLinkedPortal() { return (CProp_Portal*)CPortalSimulator::GetLinkedPortal(); }
-
+	const CProp_Portal* GetLinkedPortal() const { return (const CProp_Portal*)CPortalSimulator::GetLinkedPortal(); }
 	//VMatrix					m_matrixThisToLinked; //the matrix that will transform a point relative to this portal, to a point relative to the linked portal
 
 	Vector	m_vPrevForward; //used for the indecisive push in find closest passable spaces when portal is moved
@@ -112,8 +112,7 @@ public:
 
 	bool					SharedEnvironmentCheck( CBaseEntity *pEntity ); //does all testing to verify that the object is better handled with this portal instead of the other
 
-	// The four corners of the portal in worldspace, updated on placement. The four points will be coplanar on the portal plane.
-	Vector m_vPortalCorners[4];
+
 
 	//CNetworkHandle(CPortalSimulator, m_hPortalSimulator);
 
@@ -138,7 +137,6 @@ private:
 
 	CPhysCollide			*m_pCollisionShape;
 	void					RemovePortalMicAndSpeaker();	// Cleans up the portal's internal audio members
-	void					UpdateCorners( void );			// Updates the four corners of this portal on spawn and placement
 
 public:
 	inline unsigned char	GetLinkageGroup( void ) const { return m_iLinkageGroupID; };

@@ -964,7 +964,7 @@ public:
 
 	virtual bool	IsBaseCombatWeapon( void ) const { return false; }
 	virtual bool	IsWearable( void ) const { return false; }
-	virtual CBaseCombatWeapon *MyCombatWeaponPointer( void ) { return NULL; }
+	virtual CBaseEntity *MyCombatWeaponPointer( void ) { return NULL; }
 
 	// If this is a vehicle, returns the vehicle interface
 	virtual IServerVehicle*			GetServerVehicle() { return NULL; }
@@ -1415,6 +1415,9 @@ public:
 	bool					IsFloating();
 	void SetScaledPhysics(IPhysicsObject* pNewObject);
 
+	virtual CBaseEntity*	GetActiveWeapon() const { return NULL; }
+	virtual CBaseEntity*	GetPlayerHeldEntity() { return NULL; }
+	virtual CBaseEntity*	PhysCannonGetHeldEntity() { return NULL; }
 	virtual bool			OnAttemptPhysGunPickup(CBasePlayer* pPhysGunUser, PhysGunPickup_t reason = PICKED_UP_BY_CANNON) { return true; }
 	virtual CBaseEntity* OnFailedPhysGunPickup(Vector vPhysgunPos) { return NULL; }
 	virtual void			OnPhysGunPickup(CBasePlayer* pPhysGunUser, PhysGunPickup_t reason = PICKED_UP_BY_CANNON) {}

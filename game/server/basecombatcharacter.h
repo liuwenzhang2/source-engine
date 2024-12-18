@@ -29,10 +29,10 @@
 #include "ai_hull.h"
 #include "ai_utils.h"
 #include "physics_impact_damage.h"
+#include "basecombatweapon_shared.h"
 
 class CNavArea;
 class CScriptedTarget;
-typedef CHandle<CBaseCombatWeapon> CBaseCombatWeaponHandle;
 
 // -------------------------------------
 //  Capability Bits
@@ -79,7 +79,7 @@ enum Capability_t
 #define bits_CAP_MELEE_ATTACK_GROUP	(bits_CAP_WEAPON_MELEE_ATTACK1 | bits_CAP_WEAPON_MELEE_ATTACK2)
 
 
-class CBaseCombatWeapon;
+//class CBaseCombatWeapon;
 
 #define BCC_DEFAULT_LOOK_TOWARDS_TOLERANCE 0.9f
 
@@ -137,15 +137,15 @@ public:
 	static void			ResetVisibilityCache( CBaseCombatCharacter *pBCC = NULL );
 
 #ifdef PORTAL
-	virtual	bool		FVisibleThroughPortal( const CProp_Portal *pPortal, CBaseEntity *pEntity, int traceMask = MASK_BLOCKLOS, CBaseEntity **ppBlocker = NULL );
+	virtual	bool		FVisibleThroughPortal( const IEnginePortalServer *pPortal, CBaseEntity *pEntity, int traceMask = MASK_BLOCKLOS, CBaseEntity **ppBlocker = NULL );
 #endif
 
 	virtual bool		FInViewCone( CBaseEntity *pEntity );
 	virtual bool		FInViewCone( const Vector &vecSpot );
 
 #ifdef PORTAL
-	virtual CProp_Portal*	FInViewConeThroughPortal( CBaseEntity *pEntity );
-	virtual CProp_Portal*	FInViewConeThroughPortal( const Vector &vecSpot );
+	virtual IEnginePortalServer*	FInViewConeThroughPortal( CBaseEntity *pEntity );
+	virtual IEnginePortalServer*	FInViewConeThroughPortal( const Vector &vecSpot );
 #endif
 
 	virtual bool		FInAimCone( CBaseEntity *pEntity );

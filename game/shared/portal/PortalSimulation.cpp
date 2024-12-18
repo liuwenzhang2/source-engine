@@ -194,6 +194,13 @@ CBaseEntity *PS_SD_Static_World_StaticProps_ClippedProp_t::pTraceEntity = NULL;
 
 IMPLEMENT_NETWORKCLASS_ALIASED(PSCollisionEntity, DT_PSCollisionEntity)
 
+#ifdef GAME_DLL
+BEGIN_DATADESC(CPSCollisionEntity)
+//saving
+	DEFINE_FIELD(m_pOwningSimulator, FIELD_EHANDLE),
+END_DATADESC()
+#endif // GAME_DLL
+
 BEGIN_NETWORK_TABLE(CPSCollisionEntity, DT_PSCollisionEntity)
 #if !defined( CLIENT_DLL )
 	SendPropEHandle(SENDINFO(m_pOwningSimulator)),
@@ -215,13 +222,9 @@ BEGIN_NETWORK_TABLE(CPortalSimulator, DT_PortalSimulator)
 #if !defined( CLIENT_DLL )
 	SendPropEHandle(SENDINFO(pCollisionEntity)),
 	SendPropEHandle(SENDINFO(m_hLinkedPortal)),
-	SendPropBool(SENDINFO(m_bActivated)),
-	SendPropBool(SENDINFO(m_bIsPortal2)),
 #else
 	RecvPropEHandle(RECVINFO(pCollisionEntity)),
 	RecvPropEHandle(RECVINFO(m_hLinkedPortal)),
-	RecvPropBool(RECVINFO(m_bActivated)),
-	RecvPropBool(RECVINFO(m_bIsPortal2)),
 #endif
 END_NETWORK_TABLE()
 
@@ -237,8 +240,6 @@ CPortalSimulator::CPortalSimulator( void )
 #ifdef CLIENT_DLL
 	m_bGenerateCollision = (GameRules() && GameRules()->IsMultiplayer());
 #endif
-	m_bActivated = false;
-	m_bIsPortal2 = false;
 	m_CreationChecklist.bPolyhedronsGenerated = false;
 	m_CreationChecklist.bLocalCollisionGenerated = false;
 	m_CreationChecklist.bLinkedCollisionGenerated = false;
@@ -270,11 +271,6 @@ void CPortalSimulator::GetToolRecordingState(KeyValues* msg) {
 #ifdef GAME_DLL
 void CPortalSimulator::PostConstructor(const char* szClassname, int iForceEdictIndex) {
 	BaseClass::PostConstructor(szClassname, iForceEdictIndex);
-	pCollisionEntity = (CPSCollisionEntity*)gEntList.CreateEntityByName("portalsimulator_collisionentity");
-	Assert(pCollisionEntity != NULL);
-	pCollisionEntity->m_pOwningSimulator = this;
-	pCollisionEntity->GetEnginePortal()->AfterCollisionEntityCreated();
-	DispatchSpawn(pCollisionEntity);
 }
 #endif // GAME_DLL
 
@@ -293,13 +289,13 @@ void CPortalSimulator::UpdateOnRemove(void)
 	if (pCollisionEntity.Get())
 	{
 		pCollisionEntity->GetEnginePortal()->BeforeCollisionEntityDestroy();
+		pCollisionEntity->GetEnginePortal()->SetActivated(false);
 		pCollisionEntity->m_pOwningSimulator = NULL;
 		gEntList.DestroyEntity(pCollisionEntity);
 		pCollisionEntity = NULL;
 	}
 #endif
 	BaseClass::UpdateOnRemove();
-	m_bActivated = false;
 }
 
 CPortalSimulator::~CPortalSimulator( void )
@@ -319,7 +315,7 @@ CPortalSimulator::~CPortalSimulator( void )
 void CPortalSimulator::MoveTo( const Vector &ptCenter, const QAngle &angles )
 {
 #ifdef GAME_DLL
-	if( (pCollisionEntity->GetEngineObject()->GetAbsOrigin() == ptCenter) && (pCollisionEntity->GetEngineObject()->GetAbsAngles() == angles)) //not actually moving at all
+	if( (pCollisionEntity->GetEngineObject()->GetAbsOrigin() == ptCenter) && (pCollisionEntity->GetEngineObject()->GetAbsAngles() == angles) && pCollisionEntity->GetEngineObject()->VPhysicsGetObject()) //not actually moving at all
 		return;
 #endif // GAME_DLL
 
@@ -421,207 +417,6 @@ bool CPortalSimulator::EntityHitBoxExtentIsInPortalHole( CBaseAnimating *pBaseAn
 bool CPortalSimulator::RayIsInPortalHole(const Ray_t& ray) const
 {
 	return pCollisionEntity->GetEnginePortal()->RayIsInPortalHole(ray);
-}
-
-void CPortalSimulator::TraceRay(const Ray_t& ray, unsigned int fMask, ITraceFilter* pTraceFilter, trace_t* pTrace, bool bTraceHolyWall) const//traces against a specific portal's environment, does no *real* tracing
-{
-#ifdef CLIENT_DLL
-	Assert((GameRules() == NULL) || GameRules()->IsMultiplayer());
-#endif
-	Assert(IsReadyToSimulate()); //a trace shouldn't make it down this far if the portal is incapable of changing the results of the trace
-
-	CTraceFilterHitAll traceFilterHitAll;
-	if (!pTraceFilter)
-	{
-		pTraceFilter = &traceFilterHitAll;
-	}
-
-	pTrace->fraction = 2.0f;
-	pTrace->startsolid = true;
-	pTrace->allsolid = true;
-
-	trace_t TempTrace;
-	int counter;
-
-	CPortalSimulator* pLinkedPortalSimulator = GetLinkedPortalSimulator();
-
-	//bool bTraceDisplacements = sv_portal_trace_vs_displacements.GetBool();
-	bool bTraceStaticProps = sv_portal_trace_vs_staticprops.GetBool();
-	if (sv_portal_trace_vs_holywall.GetBool() == false)
-		bTraceHolyWall = false;
-
-	bool bTraceTransformedGeometry = ((pLinkedPortalSimulator != NULL) && bTraceHolyWall && RayIsInPortalHole(ray));
-
-	bool bCopyBackBrushTraceData = false;
-
-
-
-	// Traces vs world
-	if (pTraceFilter->GetTraceType() != TRACE_ENTITIES_ONLY)
-	{
-		//trace_t RealTrace;
-		//enginetrace->TraceRay( ray, fMask, pTraceFilter, &RealTrace );
-		if (pCollisionEntity->GetEnginePortal()->TraceWorldBrushes(ray, pTrace))
-		{
-			bCopyBackBrushTraceData = true;
-		}
-
-		if (bTraceHolyWall)
-		{
-			if (pCollisionEntity->GetEnginePortal()->TraceWallTube(ray, &TempTrace))
-			{
-				if ((TempTrace.startsolid == false) && (TempTrace.fraction < pTrace->fraction)) //never allow something to be stuck in the tube, it's more of a last-resort guide than a real collideable
-				{
-					*pTrace = TempTrace;
-					bCopyBackBrushTraceData = true;
-				}
-			}
-
-			if (pCollisionEntity->GetEnginePortal()->TraceWallBrushes(ray, &TempTrace))
-			{
-				if ((TempTrace.fraction < pTrace->fraction))
-				{
-					*pTrace = TempTrace;
-					bCopyBackBrushTraceData = true;
-				}
-			}
-
-			//if( portalSimulator->m_DataAccess.Simulation.Static.Wall.RemoteTransformedToLocal.Brushes.pCollideable && sv_portal_trace_vs_world.GetBool() )
-			if (bTraceTransformedGeometry && pCollisionEntity->GetEnginePortal()->TraceTransformedWorldBrushes(pLinkedPortalSimulator->pCollisionEntity->GetEnginePortal(), ray, &TempTrace))
-			{
-				if ((TempTrace.fraction < pTrace->fraction))
-				{
-					*pTrace = TempTrace;
-					bCopyBackBrushTraceData = true;
-				}
-			}
-		}
-
-		if (bCopyBackBrushTraceData)
-		{
-			pTrace->surface = pCollisionEntity->GetEnginePortal()->GetSurfaceProperties().surface;
-			pTrace->contents = pCollisionEntity->GetEnginePortal()->GetSurfaceProperties().contents;
-			pTrace->m_pEnt = pCollisionEntity->GetEnginePortal()->GetSurfaceProperties().pEntity;
-
-			bCopyBackBrushTraceData = false;
-		}
-	}
-
-	// Traces vs entities
-	if (pTraceFilter->GetTraceType() != TRACE_WORLD_ONLY)
-	{
-		bool bFilterStaticProps = (pTraceFilter->GetTraceType() == TRACE_EVERYTHING_FILTER_PROPS);
-
-		//solid entities
-		CPortalCollideableEnumerator enumerator(this);
-		partition->EnumerateElementsAlongRay(PARTITION_ENGINE_SOLID_EDICTS | PARTITION_ENGINE_STATIC_PROPS, ray, false, &enumerator);
-		for (counter = 0; counter != enumerator.m_iHandleCount; ++counter)
-		{
-			if (staticpropmgr->IsStaticProp(enumerator.m_pHandles[counter]))
-			{
-				//if( bFilterStaticProps && !pTraceFilter->ShouldHitEntity( enumerator.m_pHandles[counter], fMask ) )
-				continue; //static props are handled separately, with clipped versions
-			}
-			else if (!pTraceFilter->ShouldHitEntity(enumerator.m_pHandles[counter], fMask))
-			{
-				continue;
-			}
-
-			enginetrace->ClipRayToEntity(ray, fMask, enumerator.m_pHandles[counter], &TempTrace);
-			if ((TempTrace.fraction < pTrace->fraction))
-				*pTrace = TempTrace;
-		}
-
-
-
-
-		if (bTraceStaticProps)
-		{
-			//local clipped static props
-			{
-				int iLocalStaticCount = pCollisionEntity->GetEnginePortal()->GetStaticPropsCount();
-				if (iLocalStaticCount != 0 && pCollisionEntity->GetEnginePortal()->StaticPropsCollisionExists())
-				{
-					int iIndex = 0;
-					Vector vTransform = vec3_origin;
-					QAngle qTransform = vec3_angle;
-
-					do
-					{
-						const PS_SD_Static_World_StaticProps_ClippedProp_t* pCurrentProp = pCollisionEntity->GetEnginePortal()->GetStaticProps(iIndex);
-						if ((!bFilterStaticProps) || pTraceFilter->ShouldHitEntity(pCurrentProp->pSourceProp, fMask))
-						{
-							EntityList()->PhysGetCollision()->TraceBox(ray, pCurrentProp->pCollide, vTransform, qTransform, &TempTrace);
-							if ((TempTrace.fraction < pTrace->fraction))
-							{
-								*pTrace = TempTrace;
-								pTrace->surface.flags = pCurrentProp->iTraceSurfaceFlags;
-								pTrace->surface.surfaceProps = pCurrentProp->iTraceSurfaceProps;
-								pTrace->surface.name = pCurrentProp->szTraceSurfaceName;
-								pTrace->contents = pCurrentProp->iTraceContents;
-								pTrace->m_pEnt = pCurrentProp->pTraceEntity;
-							}
-						}
-
-						++iIndex;
-					} while (iIndex != iLocalStaticCount);
-				}
-			}
-
-			if (bTraceHolyWall)
-			{
-				//remote clipped static props transformed into our wall space
-				if (bTraceTransformedGeometry && (pTraceFilter->GetTraceType() != TRACE_WORLD_ONLY) && sv_portal_trace_vs_staticprops.GetBool())
-				{
-					int iLocalStaticCount = pLinkedPortalSimulator->pCollisionEntity->GetEnginePortal()->GetStaticPropsCount();
-					if (iLocalStaticCount != 0)
-					{
-						int iIndex = 0;
-						Vector vTransform = pCollisionEntity->GetEnginePortal()->GetTransformedOrigin();
-						QAngle qTransform = pCollisionEntity->GetEnginePortal()->GetTransformedAngles();
-
-						do
-						{
-							const PS_SD_Static_World_StaticProps_ClippedProp_t* pCurrentProp = pLinkedPortalSimulator->pCollisionEntity->GetEnginePortal()->GetStaticProps(iIndex);
-							if ((!bFilterStaticProps) || pTraceFilter->ShouldHitEntity(pCurrentProp->pSourceProp, fMask))
-							{
-								EntityList()->PhysGetCollision()->TraceBox(ray, pCurrentProp->pCollide, vTransform, qTransform, &TempTrace);
-								if ((TempTrace.fraction < pTrace->fraction))
-								{
-									*pTrace = TempTrace;
-									pTrace->surface.flags = pCurrentProp->iTraceSurfaceFlags;
-									pTrace->surface.surfaceProps = pCurrentProp->iTraceSurfaceProps;
-									pTrace->surface.name = pCurrentProp->szTraceSurfaceName;
-									pTrace->contents = pCurrentProp->iTraceContents;
-									pTrace->m_pEnt = pCurrentProp->pTraceEntity;
-								}
-							}
-
-							++iIndex;
-						} while (iIndex != iLocalStaticCount);
-					}
-				}
-			}
-		}
-	}
-
-	if (pTrace->fraction > 1.0f) //this should only happen if there was absolutely nothing to trace against
-	{
-		//AssertMsg( 0, "Nothing to trace against" );
-		memset(pTrace, 0, sizeof(trace_t));
-		pTrace->fraction = 1.0f;
-		pTrace->startpos = ray.m_Start - ray.m_StartOffset;
-		pTrace->endpos = pTrace->startpos + ray.m_Delta;
-	}
-	else if (pTrace->fraction < 0)
-	{
-		// For all brush traces, use the 'portal backbrush' surface surface contents
-		// BUGBUG: Doing this is a great solution because brushes near a portal
-		// will have their contents and surface properties homogenized to the brush the portal ray hit.
-		pTrace->contents = pCollisionEntity->GetEnginePortal()->GetSurfaceProperties().contents;
-		pTrace->surface = pCollisionEntity->GetEnginePortal()->GetSurfaceProperties().surface;
-		pTrace->m_pEnt = pCollisionEntity->GetEnginePortal()->GetSurfaceProperties().pEntity;
-	}
 }
 
 void CPortalSimulator::TraceEntity(CBaseEntity* pEntity, const Vector& vecAbsStart, const Vector& vecAbsEnd, unsigned int mask, ITraceFilter* pFilter, trace_t* pTrace) const
@@ -1551,7 +1346,7 @@ void CPSCollisionEntity::UpdateOnRemove( void )
 #ifdef GAME_DLL
 	if (m_pOwningSimulator) {
 		m_pOwningSimulator->pCollisionEntity->GetEnginePortal()->BeforeCollisionEntityDestroy();
-		m_pOwningSimulator->m_bActivated = false;
+		m_pOwningSimulator->pCollisionEntity->GetEnginePortal()->SetActivated(false);
 		m_pOwningSimulator->pCollisionEntity = NULL;
 		m_pOwningSimulator = NULL;
 	}
@@ -1581,10 +1376,10 @@ void CPSCollisionEntity::Activate( void )
 	GetEngineObject()->CollisionRulesChanged();
 }
 
-int CPSCollisionEntity::ObjectCaps( void )
-{
-	return ((BaseClass::ObjectCaps() | FCAP_DONT_SAVE) & ~(FCAP_FORCE_TRANSITION | FCAP_ACROSS_TRANSITION | FCAP_MUST_SPAWN | FCAP_SAVE_NON_NETWORKABLE));
-}
+//int CPSCollisionEntity::ObjectCaps( void )
+//{
+//	return ((BaseClass::ObjectCaps() | FCAP_DONT_SAVE) & ~(FCAP_FORCE_TRANSITION | FCAP_ACROSS_TRANSITION | FCAP_MUST_SPAWN | FCAP_SAVE_NON_NETWORKABLE));
+//}
 
 bool CPSCollisionEntity::ShouldCollide( int collisionGroup, int contentsMask ) const
 {

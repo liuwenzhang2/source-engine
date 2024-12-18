@@ -97,12 +97,30 @@ class IServerEntity;
 class IEngineShadowCloneServer;
 class IEnginePortalServer;
 class IEnginePlayerServer;
+class CBasePlayer;
+
+class IGrabController {
+public:
+	virtual void AttachEntity(CBasePlayer* pPlayer, CBaseEntity* pEntity, IPhysicsObject* pPhys, bool bIsMegaPhysCannon, const Vector& vGrabPosition, bool bUseGrabPosition) = 0;
+	virtual void DetachEntity(bool bClearVelocity) = 0;
+	virtual CBaseEntity* GetAttached() = 0;
+	virtual void SetIgnorePitch(bool bIgnore) = 0;
+	virtual void SetAngleAlignment(float alignAngleCosine) = 0;
+	virtual float GetLoadWeight(void) const = 0;
+	virtual float ComputeError() = 0;
+	virtual bool UpdateObject(CBasePlayer* pPlayer, float flError) = 0;
+	virtual float GetSavedMass(IPhysicsObject* pObject) = 0;
+	virtual void GetSavedParamsForCarriedPhysObject(IPhysicsObject* pObject, float* pSavedMassOut, float* pSavedRotationalDampingOut) = 0;
+	virtual void GetTargetPosition(Vector* target, QAngle* targetOrientation) = 0;
+	virtual void SetPortalPenetratingEntity(CBaseEntity* pPenetrated) = 0;
+};
 
 class IEngineObjectServer : public IEngineObject {
 public:
 
 	virtual IServerEntity* GetServerEntity() = 0;
 	virtual CBaseEntity* GetOuter() = 0;
+	virtual IHandleEntity* GetHandleEntity() const = 0;
 
 	virtual void ParseMapData(IEntityMapData* mapData) = 0;
 	virtual int	Save(ISave& save) = 0;
@@ -525,6 +543,7 @@ public:
 	virtual IEnginePortalServer* GetSimulatorThatOwnsEntity() = 0;
 	virtual bool IsPlayer() = 0;
 	virtual IEnginePlayerServer* AsEnginePlayer() = 0;
+	virtual IGrabController* GetGrabController() = 0;
 };
 
 class IEngineWorldServer{
@@ -543,9 +562,16 @@ public:
 	virtual int GetVphysicsCollisionState() = 0;
 	virtual IEnginePortalServer* GetPortalEnvironment() = 0;
 	virtual void SetPortalEnvironment(IEnginePortalServer* pEnginePortal) = 0;
+	virtual IEnginePortalServer* GetHeldObjectPortal(void) = 0;
+	virtual void SetHeldObjectPortal(IEnginePortalServer* pPortal) = 0;
+	virtual void ToggleHeldObjectOnOppositeSideOfPortal(void) = 0;
+	virtual void SetHeldObjectOnOppositeSideOfPortal(bool p_bHeldObjectOnOppositeSideOfPortal) = 0;
+	virtual bool IsHeldObjectOnOppositeSideOfPortal(void) = 0;
+	virtual bool IsSilentDropAndPickup() = 0;
+	virtual void SetSilentDropAndPickup(bool bSilentDropAndPickup) = 0;
 };
 
-class IEnginePortalServer {
+class IEnginePortalServer : public IEnginePortal {
 public:
 	virtual int					GetPortalSimulatorGUID(void) const = 0;
 	virtual void				SetVPhysicsSimulationEnabled(bool bEnabled) = 0;
@@ -553,8 +579,11 @@ public:
 	virtual bool				IsLocalDataIsReady() = 0;
 	virtual void				SetLocalDataIsReady(bool bLocalDataIsReady) = 0;
 	virtual bool				IsReadyToSimulate(void) const = 0;
+	virtual bool				IsActivedAndLinked(void) const = 0;
 	virtual void				MoveTo(const Vector& ptCenter, const QAngle& angles) = 0;
 	virtual void				AttachTo(IEnginePortalServer* pLinkedPortal) = 0;
+	virtual IEnginePortalServer* GetLinkedPortal() = 0;
+	virtual const IEnginePortalServer* GetLinkedPortal() const = 0;
 	virtual void				DetachFromLinked(void) = 0;
 	virtual void				UpdateLinkMatrix(IEnginePortalServer* pRemoteCollisionEntity) = 0;
 	virtual bool				EntityIsInPortalHole(IEngineObjectServer* pEntity) const = 0; //true if the entity is within the portal cutout bounds and crossing the plane. Not just *near* the portal
@@ -563,7 +592,8 @@ public:
 	virtual bool				TraceWorldBrushes(const Ray_t& ray, trace_t* pTrace) const = 0;
 	virtual bool				TraceWallTube(const Ray_t& ray, trace_t* pTrace) const = 0;
 	virtual bool				TraceWallBrushes(const Ray_t& ray, trace_t* pTrace) const = 0;
-	virtual bool				TraceTransformedWorldBrushes(IEnginePortalServer* pRemoteCollisionEntity, const Ray_t& ray, trace_t* pTrace) const = 0;
+	virtual bool				TraceTransformedWorldBrushes(const IEnginePortalServer* pRemoteCollisionEntity, const Ray_t& ray, trace_t* pTrace) const = 0;
+	virtual void				TraceRay(const Ray_t& ray, unsigned int fMask, ITraceFilter* pTraceFilter, trace_t* pTrace, bool bTraceHolyWall = true) const = 0;
 	virtual int					GetStaticPropsCount() const = 0;
 	virtual const PS_SD_Static_World_StaticProps_ClippedProp_t* GetStaticProps(int index) const = 0;
 	virtual bool				StaticPropsCollisionExists() const = 0;
@@ -625,8 +655,15 @@ public:
 	virtual void				StopCloningEntity(CBaseEntity* pEntity) = 0;
 	virtual void				ClearLinkedEntities(void) = 0; //gets rid of transformed shadow clones
 	virtual IEngineObjectServer* AsEngineObject() = 0;
-	virtual unsigned int GetEntFlags(int entindex) = 0;
-	virtual void ClearEntFlags(int entindex) = 0;
+	virtual const IEngineObjectServer* AsEngineObject() const = 0;
+	virtual unsigned int		GetEntFlags(int entindex) = 0;
+	virtual void				ClearEntFlags(int entindex) = 0;
+	virtual bool				IsActivated() const = 0;
+	virtual void				SetActivated(bool bActivated) = 0;
+	virtual bool				IsPortal2() const = 0;
+	virtual void				SetPortal2(bool bPortal2) = 0;
+	virtual void				UpdateCorners(void) = 0;
+	virtual const Vector&		GetPortalCorners(int iCorner)  const = 0;
 };
 
 class IEngineShadowCloneServer {
@@ -649,6 +686,7 @@ public:
 	virtual IPhysicsObject* TranslatePhysicsToClonedEnt(const IPhysicsObject* pPhysics) = 0;
 	virtual IEngineShadowCloneServer* GetNext() = 0;
 	virtual IEngineObjectServer* AsEngineObject() = 0;
+	virtual const IEngineObjectServer* AsEngineObject() const = 0;
 };
 
 class IEngineVehicleServer {
@@ -858,6 +896,7 @@ public:
 	virtual IEngineObject* GetPredictionPlayer(void) = 0;
 	virtual void SetPredictionPlayer(IEngineObject* player) = 0;
 	virtual bool IsSimulatingOnAlternateTicks() = 0;
+	virtual CBasePlayer* GetPlayerHoldingEntity(CBaseEntity* pEntity) = 0;
 };
 
 extern IServerEntityList* serverEntitylist;

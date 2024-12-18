@@ -25,8 +25,7 @@ bool PlayerPickupControllerIsHoldingEntity( CBaseEntity *pPickupController, CBas
 float PlayerPickupGetHeldObjectMass( CBaseEntity *pPickupControllerEntity, IPhysicsObject *pHeldObject );
 float PhysCannonGetHeldObjectMass( CBaseCombatWeapon *pActiveWeapon, IPhysicsObject *pHeldObject );
 
-CBaseEntity *PhysCannonGetHeldEntity( CBaseCombatWeapon *pActiveWeapon );
-CBaseEntity *GetPlayerHeldEntity( CBasePlayer *pPlayer );
+
 
 bool PhysCannonAccountableForObject( CBaseCombatWeapon *pPhysCannon, CBaseEntity *pObject );
 

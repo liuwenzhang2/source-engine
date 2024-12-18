@@ -71,7 +71,7 @@ public:
 	virtual void ProcessMovement( CBasePlayer *pPlayer, CMoveData *pMove );
 	virtual bool CheckJumpButton( void );
 
-	void FunnelIntoPortal( CProp_Portal *pPortal, Vector &wishdir );
+	void FunnelIntoPortal( IEnginePortal *pPortal, Vector &wishdir );
 
 	virtual void AirAccelerate( Vector& wishdir, float wishspeed, float accel );
 	virtual void AirMove( void );
@@ -176,7 +176,7 @@ bool CPortalGameMovement::CheckJumpButton()
 	return false;
 }
 
-void CPortalGameMovement::FunnelIntoPortal( CProp_Portal *pPortal, Vector &wishdir )
+void CPortalGameMovement::FunnelIntoPortal( IEnginePortal *pPortal, Vector &wishdir )
 {
 	// Make sure there's a portal
 	if ( !pPortal )
@@ -184,7 +184,7 @@ void CPortalGameMovement::FunnelIntoPortal( CProp_Portal *pPortal, Vector &wishd
 
 	// Get portal vectors
 	Vector vPortalForward, vPortalRight, vPortalUp;
-	pPortal->GetEngineObject()->GetVectors( &vPortalForward, &vPortalRight, &vPortalUp );
+	pPortal->AsEngineObject()->GetVectors( &vPortalForward, &vPortalRight, &vPortalUp );
 
 	// Make sure it's a floor portal
 	if ( vPortalForward.z < 0.8f )
@@ -205,7 +205,7 @@ void CPortalGameMovement::FunnelIntoPortal( CProp_Portal *pPortal, Vector &wishd
 		return;
 
 	Vector vPlayerOrigin = pPlayer->GetEngineObject()->GetAbsOrigin();
-	Vector vPlayerToPortal = pPortal->GetEngineObject()->GetAbsOrigin() - vPlayerOrigin;
+	Vector vPlayerToPortal = pPortal->AsEngineObject()->GetAbsOrigin() - vPlayerOrigin;
 
 	// Make sure the player is trying to air control, they're falling downward and they are vertically close to the portal
 	if ( fabsf( wishdir[ 0 ] ) > 64.0f || fabsf( wishdir[ 1 ] ) > 64.0f || mv->m_vecVelocity[ 2 ] > -165.0f || vPlayerToPortal.z < -512.0f )
@@ -339,7 +339,7 @@ void CPortalGameMovement::AirMove( void )
 			CProp_Portal **pPortals = CProp_Portal_Shared::AllPortals.Base();
 			for( int i = 0; i != iPortalCount; ++i )
 			{
-				CProp_Portal *pTempPortal = pPortals[i];
+				IEnginePortal *pTempPortal = pPortals[i]->pCollisionEntity->GetEnginePortal();
 				if( pTempPortal->IsActivedAndLinked() )
 				{
 					FunnelIntoPortal( pTempPortal, wishdir );
@@ -420,8 +420,8 @@ void TracePlayerBBoxForGround2( const Vector& start, const Vector& end, const Ve
 	maxs.Init( MIN( 0, maxsSrc.x ), MIN( 0, maxsSrc.y ), maxsSrc.z );
 	ray.Init( start, end, mins, maxs );
 
-	if( pPlayerPortal )
-		UTIL_Portal_TraceRay( pPlayerPortal, ray, fMask, player, collisionGroup, &pm );
+	if (pPlayerPortal)
+		UTIL_Portal_TraceRay(pPlayerPortal->pCollisionEntity->GetEnginePortal(), ray, fMask, player, collisionGroup, &pm);
 	else
 		UTIL_TraceRay( ray, fMask, player, collisionGroup, &pm );
 
@@ -438,7 +438,7 @@ void TracePlayerBBoxForGround2( const Vector& start, const Vector& end, const Ve
 	ray.Init( start, end, mins, maxs );
 
 	if( pPlayerPortal )
-		UTIL_Portal_TraceRay( pPlayerPortal, ray, fMask, player, collisionGroup, &pm );
+		UTIL_Portal_TraceRay( pPlayerPortal->pCollisionEntity->GetEnginePortal(), ray, fMask, player, collisionGroup, &pm);
 	else
 		UTIL_TraceRay( ray, fMask, player, collisionGroup, &pm );
 
@@ -455,7 +455,7 @@ void TracePlayerBBoxForGround2( const Vector& start, const Vector& end, const Ve
 	ray.Init( start, end, mins, maxs );
 
 	if( pPlayerPortal )
-		UTIL_Portal_TraceRay( pPlayerPortal, ray, fMask, player, collisionGroup, &pm );
+		UTIL_Portal_TraceRay( pPlayerPortal->pCollisionEntity->GetEnginePortal(), ray, fMask, player, collisionGroup, &pm);
 	else
 		UTIL_TraceRay( ray, fMask, player, collisionGroup, &pm );
 
@@ -472,7 +472,7 @@ void TracePlayerBBoxForGround2( const Vector& start, const Vector& end, const Ve
 	ray.Init( start, end, mins, maxs );
 
 	if( pPlayerPortal )
-		UTIL_Portal_TraceRay( pPlayerPortal, ray, fMask, player, collisionGroup, &pm );
+		UTIL_Portal_TraceRay( pPlayerPortal->pCollisionEntity->GetEnginePortal(), ray, fMask, player, collisionGroup, &pm);
 	else
 		UTIL_TraceRay( ray, fMask, player, collisionGroup, &pm );
 
@@ -694,7 +694,7 @@ void CPortalGameMovement::TracePlayerBBox( const Vector& start, const Vector& en
 	CTraceFilterTranslateClones traceFilter( &baseFilter );
 #endif
 
-	UTIL_Portal_TraceRay_With( pPortalPlayer->GetPortalEnvironment(), ray, fMask, &traceFilter, &pm );
+	UTIL_Portal_TraceRay_With(pPortalPlayer->GetPortalEnvironment() ? pPortalPlayer->GetPortalEnvironment()->pCollisionEntity->GetEnginePortal() : NULL, ray, fMask, &traceFilter, &pm);
 
 	// If we're moving through a portal and failed to hit anything with the above ray trace
 	// Use UTIL_Portal_TraceEntity to test this movement through a portal and override the trace with the result

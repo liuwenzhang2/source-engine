@@ -143,12 +143,9 @@ public:
 	// physics interactions
 	virtual void PickupObject(CBaseEntity *pObject, bool bLimitMassAndSize );
 	virtual void ForceDropOfCarriedPhysObjects( CBaseEntity *pOnlyIfHoldingThis );
+	virtual CBaseEntity* GetPlayerHeldEntity();
 
-	void ToggleHeldObjectOnOppositeSideOfPortal( void ) { m_bHeldObjectOnOppositeSideOfPortal = !m_bHeldObjectOnOppositeSideOfPortal; }
-	void SetHeldObjectOnOppositeSideOfPortal( bool p_bHeldObjectOnOppositeSideOfPortal ) { m_bHeldObjectOnOppositeSideOfPortal = p_bHeldObjectOnOppositeSideOfPortal; }
-	bool IsHeldObjectOnOppositeSideOfPortal( void ) { return m_bHeldObjectOnOppositeSideOfPortal; }
-	CProp_Portal *GetHeldObjectPortal( void ) { return m_pHeldObjectPortal; }
-	void SetHeldObjectPortal( CProp_Portal *pPortal ) { m_pHeldObjectPortal = pPortal; }
+
 
 	void SetStuckOnPortalCollisionObject( void ) { m_bStuckOnPortalCollisionObject = true; }
 
@@ -169,7 +166,6 @@ public:
 
 	Vector m_vecTotalBulletForce;	//Accumulator for bullet force in a single frame
 
-	bool m_bSilentDropAndPickup;
 
 	// Tracks our ragdoll entity.
 	CNetworkHandle( CBaseEntity, m_hRagdoll );	// networked entity handle
@@ -194,8 +190,6 @@ private:
 	CNetworkVar( int, m_iPlayerSoundType );
 	CNetworkVar( bool, m_bSuppressingCrosshair );
 
-	CNetworkVar( bool, m_bHeldObjectOnOppositeSideOfPortal );
-	CNetworkHandle( CProp_Portal, m_pHeldObjectPortal );	// networked entity handle
 
 	bool m_bIntersectingPortalPlane;
 	bool m_bStuckOnPortalCollisionObject;

@@ -22,20 +22,7 @@ class CProp_Portal;
 #endif
 class CPortalSimulator;
 
-//only enumerates entities in front of the associated portal and are solid (as in a player would get stuck in them)
-class CPortalCollideableEnumerator : public IPartitionEnumerator
-{
-private:
-	EHANDLE m_hTestPortal; //the associated portal that we only want objects in front of
-	Vector m_vPlaneNormal; //portal plane normal
-	float m_fPlaneDist; //plane equation distance
-	Vector m_ptForward1000; //a point exactly 1000 units from the portal center along its forward vector
-public:
-	IHandleEntity *m_pHandles[1024];
-	int m_iHandleCount;
-	CPortalCollideableEnumerator( const CPortalSimulator *pAssociatedPortal );
-	virtual IterationRetval_t EnumElement( IHandleEntity *pHandleEntity );
-};
+
 
 
 

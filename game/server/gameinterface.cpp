@@ -3282,18 +3282,18 @@ int TestAreaPortalVisibilityThroughPortals ( CFuncAreaPortalBase* pAreaPortal, I
 
 	for ( int i = 0; i != iPortalCount; ++i )
 	{
-		CProp_Portal* pLocalPortal = pPortals[ i ];
-		if ( pLocalPortal && pLocalPortal->m_bActivated )
+		IEnginePortalServer* pLocalPortal = pPortals[ i ]->pCollisionEntity->GetEnginePortal();
+		if ( pLocalPortal && pLocalPortal->IsActivated() )
 		{
-			CProp_Portal* pRemotePortal = pLocalPortal->GetLinkedPortal();
+			IEnginePortalServer* pRemotePortal = pLocalPortal->GetLinkedPortal();
 
 			// Make sure this portal's linked portal is in the PVS before we add what it can see
-			if ( pRemotePortal && pRemotePortal->m_bActivated && pRemotePortal->NetworkProp() && 
-				pRemotePortal->GetEngineObject()->IsInPVS( (CBaseEntity*)pViewEntity, pvs, pvssize ) )
+			if ( pRemotePortal && pRemotePortal->IsActivated() &&//&& pRemotePortal->NetworkProp() 
+				pRemotePortal->AsEngineObject()->IsInPVS( (CBaseEntity*)pViewEntity, pvs, pvssize ) )
 			{
 				bool bIsOpenOnClient = true;
 				float fovDistanceAdjustFactor = 1.0f;
-				Vector portalOrg = pLocalPortal->GetEngineObject()->GetAbsOrigin();
+				Vector portalOrg = pLocalPortal->AsEngineObject()->GetAbsOrigin();
 				int iPortalNeedsThisPortalOpen = pAreaPortal->UpdateVisibility( portalOrg, fovDistanceAdjustFactor, bIsOpenOnClient );
 
 				// Stop checking on success, this portal needs to be open

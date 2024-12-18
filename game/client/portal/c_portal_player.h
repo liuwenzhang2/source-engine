@@ -111,10 +111,7 @@ public:
 	int		GetIDTarget() const;
 	void	UpdateIDTarget( void );
 
-	void ToggleHeldObjectOnOppositeSideOfPortal( void ) { m_bHeldObjectOnOppositeSideOfPortal = !m_bHeldObjectOnOppositeSideOfPortal; }
-	void SetHeldObjectOnOppositeSideOfPortal( bool p_bHeldObjectOnOppositeSideOfPortal ) { m_bHeldObjectOnOppositeSideOfPortal = p_bHeldObjectOnOppositeSideOfPortal; }
-	bool IsHeldObjectOnOppositeSideOfPortal( void ) { return m_bHeldObjectOnOppositeSideOfPortal; }
-	CProp_Portal *GetHeldObjectPortal( void ) { return m_pHeldObjectPortal; }
+
 
 	Activity TranslateActivity( Activity baseAct, bool *pRequired = NULL );
 	CWeaponPortalBase* GetActivePortalWeapon() const;
@@ -160,8 +157,6 @@ private:
 
 	int	  m_iPlayerSoundType;
 
-	bool  m_bHeldObjectOnOppositeSideOfPortal;
-	CProp_Portal *m_pHeldObjectPortal;
 
 	int	m_iForceNoDrawInPortalSurface; //only valid for one frame, used to temp disable drawing of the player model in a surface because of freaky artifacts
 

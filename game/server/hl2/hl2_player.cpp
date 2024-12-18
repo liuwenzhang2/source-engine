@@ -78,7 +78,7 @@ extern int gEvilImpulse101;
 ConVar sv_autojump( "sv_autojump", "0" );
 
 ConVar hl2_walkspeed( "hl2_walkspeed", "150" );
-ConVar hl2_normspeed( "hl2_normspeed", "190" );
+ConVarRef hl2_normspeed("hl2_normspeed");
 ConVar hl2_sprintspeed( "hl2_sprintspeed", "320" );
 
 ConVar hl2_darkness_flashlight_factor ( "hl2_darkness_flashlight_factor", "1" );
@@ -1395,7 +1395,7 @@ bool CHL2_Player::CommanderFindGoal( commandgoal_t *pGoal )
 	
 	//---------------------------------
 	// MASK_SHOT on purpose! So that you don't hit the invisible hulls of the NPCs.
-	CTraceFilterSkipTwoEntities filter( this, PhysCannonGetHeldEntity( GetActiveWeapon() ), COLLISION_GROUP_INTERACTIVE_DEBRIS );
+	CTraceFilterSkipTwoEntities filter(this, GetActiveWeapon() ? GetActiveWeapon()->PhysCannonGetHeldEntity() : NULL, COLLISION_GROUP_INTERACTIVE_DEBRIS);
 
 	UTIL_TraceLine( EyePosition(), EyePosition() + forward * MAX_COORD_RANGE, MASK_SHOT, &filter, &tr );
 
@@ -3176,7 +3176,7 @@ bool CHL2_Player::Weapon_CanSwitchTo( CBaseCombatWeapon *pWeapon )
 
 	if ( GetActiveWeapon() )
 	{
-		if ( PhysCannonGetHeldEntity( GetActiveWeapon() ) == pWeapon && 
+		if ( (GetActiveWeapon()&& GetActiveWeapon()->PhysCannonGetHeldEntity() == pWeapon) &&
 			Weapon_OwnsThisType( pWeapon->GetClassname(), pWeapon->GetSubType()) )
 		{
 			return true;
@@ -3242,7 +3242,7 @@ void CHL2_Player::ForceDropOfCarriedPhysObjects( CBaseEntity *pOnlyIfHoldingThis
 #ifdef HL2_EPISODIC
 	if ( hl2_episodic.GetBool() )
 	{
-		CBaseEntity *pHeldEntity = PhysCannonGetHeldEntity( GetActiveWeapon() );
+		CBaseEntity* pHeldEntity = GetActiveWeapon() ? GetActiveWeapon()->PhysCannonGetHeldEntity() : NULL;
 		if( pHeldEntity && pHeldEntity->ClassMatches( "grenade_helicopter" ) )
 		{
 			return;

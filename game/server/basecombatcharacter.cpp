@@ -441,7 +441,7 @@ void CBaseCombatCharacter::ResetVisibilityCache( CBaseCombatCharacter *pBCC )
 }
 
 #ifdef PORTAL
-bool CBaseCombatCharacter::FVisibleThroughPortal( const CProp_Portal *pPortal, CBaseEntity *pEntity, int traceMask, CBaseEntity **ppBlocker )
+bool CBaseCombatCharacter::FVisibleThroughPortal( const IEnginePortalServer *pPortal, CBaseEntity *pEntity, int traceMask, CBaseEntity **ppBlocker )
 {
 	VPROF( "CBaseCombatCharacter::FVisible" );
 
@@ -463,7 +463,7 @@ bool CBaseCombatCharacter::FVisibleThroughPortal( const CProp_Portal *pPortal, C
 	CTraceFilterLOS traceFilter( this, COLLISION_GROUP_NONE, pEntity );
 
 	Vector vecTranslatedTargetOrigin;
-	UTIL_Portal_PointTransform( pPortal->m_hLinkedPortal->MatrixThisToLinked(), vecTargetOrigin, vecTranslatedTargetOrigin );
+	UTIL_Portal_PointTransform( pPortal->GetLinkedPortal()->MatrixThisToLinked(), vecTargetOrigin, vecTranslatedTargetOrigin);
 	Ray_t ray;
 	ray.Init( vecLookerOrigin, vecTranslatedTargetOrigin );
 
@@ -475,7 +475,7 @@ bool CBaseCombatCharacter::FVisibleThroughPortal( const CProp_Portal *pPortal, C
 		traceMask = MASK_BLOCKLOS_AND_NPCS;
 	}
 
-	UTIL_Portal_TraceRay_Bullets( pPortal, ray, traceMask, &traceFilter, &tr );
+	UTIL_Portal_TraceRay_Bullets(pPortal, ray, traceMask, &traceFilter, &tr);
 
 	if (tr.fraction != 1.0 || tr.startsolid )
 	{
@@ -544,7 +544,7 @@ bool CBaseCombatCharacter::FInViewCone( const Vector &vecSpot )
 // the caller's forward view cone. The dot product is performed
 // in 2d, making the view cone infinitely tall. 
 //=========================================================
-CProp_Portal* CBaseCombatCharacter::FInViewConeThroughPortal( CBaseEntity *pEntity )
+IEnginePortalServer* CBaseCombatCharacter::FInViewConeThroughPortal( CBaseEntity *pEntity )
 {
 	return FInViewConeThroughPortal( pEntity->WorldSpaceCenter() );
 }
@@ -554,7 +554,7 @@ CProp_Portal* CBaseCombatCharacter::FInViewConeThroughPortal( CBaseEntity *pEnti
 // the caller's forward view cone. The dot product is performed
 // in 2d, making the view cone infinitely tall. 
 //=========================================================
-CProp_Portal* CBaseCombatCharacter::FInViewConeThroughPortal( const Vector &vecSpot )
+IEnginePortalServer* CBaseCombatCharacter::FInViewConeThroughPortal( const Vector &vecSpot )
 {
 	int iPortalCount = CProp_Portal_Shared::AllPortals.Count();
 	if( iPortalCount == 0 )
@@ -563,27 +563,27 @@ CProp_Portal* CBaseCombatCharacter::FInViewConeThroughPortal( const Vector &vecS
 	const Vector ptEyePosition = EyePosition();
 
 	float fDistToBeat = 1e20; //arbitrarily high number
-	CProp_Portal *pBestPortal = NULL;
+	IEnginePortalServer *pBestPortal = NULL;
 
 	CProp_Portal **pPortals = CProp_Portal_Shared::AllPortals.Base();
 
 	// Check through both portals
 	for ( int iPortal = 0; iPortal < iPortalCount; ++iPortal )
 	{
-		CProp_Portal *pPortal = pPortals[iPortal];
+		IEnginePortalServer *pPortal = pPortals[iPortal]->pCollisionEntity->GetEnginePortal();
 
 		// Check if this portal is active, linked, and in the view cone
-		if( pPortal->IsActivedAndLinked() && FInViewCone( pPortal ) )
+		if( pPortal->IsActivedAndLinked() && FInViewCone( pPortal->AsEngineObject()->GetOuter() ) )
 		{
 			// The facing direction is the eye to the portal to set up a proper FOV through the relatively small portal hole
-			Vector facingDir = pPortal->GetEngineObject()->GetAbsOrigin() - ptEyePosition;
+			Vector facingDir = pPortal->AsEngineObject()->GetAbsOrigin() - ptEyePosition;
 
 			// If the portal isn't facing the eye, bail
 			if ( facingDir.Dot( pPortal->GetPortalPlane().normal) > 0.0f)
 				continue;
 
 			// If the point is behind the linked portal, bail
-			if ( ( vecSpot - pPortal->m_hLinkedPortal->GetEngineObject()->GetAbsOrigin() ).Dot( pPortal->m_hLinkedPortal->GetPortalPlane().normal ) < 0.0f )
+			if ( ( vecSpot - pPortal->GetLinkedPortal()->AsEngineObject()->GetAbsOrigin()).Dot(pPortal->GetLinkedPortal()->GetPortalPlane().normal) < 0.0f)
 				continue;
 
 			// Remove height from the equation
@@ -592,7 +592,7 @@ CProp_Portal* CBaseCombatCharacter::FInViewConeThroughPortal( const Vector &vecS
 
 			// Translate the target spot across the portal
 			Vector vTranslatedVecSpot;
-			UTIL_Portal_PointTransform( pPortal->m_hLinkedPortal->MatrixThisToLinked(), vecSpot, vTranslatedVecSpot );
+			UTIL_Portal_PointTransform( pPortal->GetLinkedPortal()->MatrixThisToLinked(), vecSpot, vTranslatedVecSpot);
 
 			// do this in 2D
 			Vector los = ( vTranslatedVecSpot - ptEyePosition );
@@ -615,7 +615,7 @@ CProp_Portal* CBaseCombatCharacter::FInViewConeThroughPortal( const Vector &vecS
 				//Vector vPortalCorner = pPortal->GetAbsOrigin() + vPortalRight * PORTAL_HALF_WIDTH * ( ( i / 2 == 0 ) ? ( 1.0f ) : ( -1.0f ) ) + 
 				//												 vPortalUp * PORTAL_HALF_HEIGHT * ( ( i % 2 == 0 ) ? ( 1.0f ) : ( -1.0f ) );
 
-				Vector vEyeToCorner = pPortal->m_vPortalCorners[i] - ptEyePosition;
+				Vector vEyeToCorner = pPortal->GetPortalCorners(i) - ptEyePosition;
 				vEyeToCorner.z = 0.0f;
 				VectorNormalize( vEyeToCorner );
 

@@ -1266,12 +1266,12 @@ bool CNPC_FloorTurret::IsValidEnemy( CBaseEntity *pEnemy )
 #ifdef PORTAL
 	if ( !FInViewCone( pEnemy ) || !FVisible( pEnemy ) )
 	{
-		CProp_Portal *pPortal = FInViewConeThroughPortal( pEnemy );
+		IEnginePortalServer *pPortal = FInViewConeThroughPortal( pEnemy );
 
 		if ( pPortal )
 		{
 			// Translate our target across the portal
-			UTIL_Portal_PointTransform( pPortal->m_hLinkedPortal->MatrixThisToLinked(), vEnemyPos, vEnemyPos );
+			UTIL_Portal_PointTransform( pPortal->GetLinkedPortal()->MatrixThisToLinked(), vEnemyPos, vEnemyPos);
 		}
 	}
 #endif

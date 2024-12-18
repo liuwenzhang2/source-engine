@@ -63,6 +63,7 @@
 #include "monstermaker.h"
 #include "weapon_rpg.h"
 #include "gameinterface.h"
+#include "basecombatweapon.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
@@ -4958,11 +4959,11 @@ int CNPC_Hunter::MeleeAttack1Conditions ( float flDot, float flDist )
 				Assert( pPlayer != NULL );
 
 				// Is the player carrying something?
-				CBaseEntity *pObject = GetPlayerHeldEntity(pPlayer);
+				CBaseEntity *pObject = pPlayer->GetPlayerHeldEntity();
 
 				if ( !pObject )
 				{
-					pObject = PhysCannonGetHeldEntity( pPlayer->GetActiveWeapon() );
+					pObject = pPlayer->GetActiveWeapon() ? pPlayer->GetActiveWeapon()->PhysCannonGetHeldEntity() : NULL;
 				}
 
 				if ( pObject )

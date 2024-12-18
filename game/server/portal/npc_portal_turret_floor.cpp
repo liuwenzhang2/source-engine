@@ -795,7 +795,7 @@ void CNPC_Portal_FloorTurret::ActiveThink( void )
 	m_flDistToEnemy = VectorNormalize( vecDirToEnemy );
 
 	// If the enemy isn't in the normal fov, check the fov through portals
-	CProp_Portal *pPortal = NULL;
+	IEnginePortalServer *pPortal = NULL;
 	if ( pEnemy->IsAlive() )
 	{
 		pPortal = FInViewConeThroughPortal( pEnemy );
@@ -804,7 +804,7 @@ void CNPC_Portal_FloorTurret::ActiveThink( void )
 		{
 			// Translate our target across the portal
 			Vector vecMidEnemyTransformed;
-			UTIL_Portal_PointTransform( pPortal->m_hLinkedPortal->MatrixThisToLinked(), vecMidEnemy, vecMidEnemyTransformed );
+			UTIL_Portal_PointTransform( pPortal->GetLinkedPortal()->MatrixThisToLinked(), vecMidEnemy, vecMidEnemyTransformed);
 
 			//Calculate dir and dist to enemy
 			Vector	vecDirToEnemyTransformed = vecMidEnemyTransformed - vecMid;	
@@ -968,7 +968,7 @@ void CNPC_Portal_FloorTurret::ActiveThink( void )
 		if ( pPortal && pPortal->IsActivedAndLinked() )
 		{
 			// Translate our target across the portal
-			UTIL_Portal_PointTransform( pPortal->m_hLinkedPortal->MatrixThisToLinked(), vEnemyWorldSpaceCenter, vEnemyWorldSpaceCenter );
+			UTIL_Portal_PointTransform( pPortal->GetLinkedPortal()->MatrixThisToLinked(), vEnemyWorldSpaceCenter, vEnemyWorldSpaceCenter);
 		}
 
 		Vector	vecDirToEnemyEyes = vEnemyWorldSpaceCenter - vecMid;
@@ -1030,14 +1030,14 @@ void CNPC_Portal_FloorTurret::SearchThink( void )
 		m_flDistToEnemy = VectorNormalize( vecDirToEnemy );
 
 		// If the enemy isn't in the normal fov, check the fov through portals
-		CProp_Portal *pPortal = NULL;
+		IEnginePortalServer *pPortal = NULL;
 		pPortal = FInViewConeThroughPortal( pEnemy );
 
 		if ( pPortal && FVisibleThroughPortal( pPortal, pEnemy ) )
 		{
 			// Translate our target across the portal
 			Vector vecMidEnemyTransformed;
-			UTIL_Portal_PointTransform( pPortal->m_hLinkedPortal->MatrixThisToLinked(), vecMidEnemy, vecMidEnemyTransformed );
+			UTIL_Portal_PointTransform( pPortal->GetLinkedPortal()->MatrixThisToLinked(), vecMidEnemy, vecMidEnemyTransformed);
 
 			//Calculate dir and dist to enemy
 			Vector	vecDirToEnemyTransformed = vecMidEnemyTransformed - vecMid;	

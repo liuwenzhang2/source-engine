@@ -100,6 +100,7 @@ public:
 	virtual datamap_t* GetPredDescMap(void) = 0;
 	virtual IClientEntity* GetClientEntity() = 0;
 	virtual C_BaseEntity* GetOuter() = 0;
+	virtual IHandleEntity* GetHandleEntity() const = 0;
 	virtual int entindex() const = 0;
 	virtual void ParseMapData(IEntityMapData* mapData) = 0;
 	virtual int Save(ISave& save) = 0;
@@ -596,9 +597,13 @@ class IEnginePortalClient;
 class IEnginePlayerClient {
 public:
 	virtual IEnginePortalClient* GetPortalEnvironment() = 0;
+	virtual IEnginePortalClient* GetHeldObjectPortal(void) = 0;
+	virtual void ToggleHeldObjectOnOppositeSideOfPortal(void) = 0;
+	virtual void SetHeldObjectOnOppositeSideOfPortal(bool p_bHeldObjectOnOppositeSideOfPortal) = 0;
+	virtual bool IsHeldObjectOnOppositeSideOfPortal(void) = 0;
 };
 
-class IEnginePortalClient {
+class IEnginePortalClient : public IEnginePortal {
 public:
 	virtual int					GetPortalSimulatorGUID(void) const = 0;
 	virtual void				SetVPhysicsSimulationEnabled(bool bEnabled) = 0;
@@ -606,8 +611,11 @@ public:
 	virtual bool				IsLocalDataIsReady() = 0;
 	virtual void				SetLocalDataIsReady(bool bLocalDataIsReady) = 0;
 	virtual bool				IsReadyToSimulate(void) const = 0;
+	virtual bool				IsActivedAndLinked(void) const = 0;
 	virtual void				MoveTo(const Vector& ptCenter, const QAngle& angles) = 0;
 	virtual void				AttachTo(IEnginePortalClient* pLinkedPortal) = 0;
+	virtual IEnginePortalClient* GetLinkedPortal() = 0;
+	virtual const IEnginePortalClient* GetLinkedPortal() const = 0;
 	virtual void				DetachFromLinked(void) = 0;
 	virtual void				UpdateLinkMatrix(IEnginePortalClient* pRemoteCollisionEntity) = 0;
 	virtual bool				EntityIsInPortalHole(IEngineObjectClient* pEntity) const = 0; //true if the entity is within the portal cutout bounds and crossing the plane. Not just *near* the portal
@@ -616,7 +624,8 @@ public:
 	virtual bool				TraceWorldBrushes(const Ray_t& ray, trace_t* pTrace) const = 0;
 	virtual bool				TraceWallTube(const Ray_t& ray, trace_t* pTrace) const = 0;
 	virtual bool				TraceWallBrushes(const Ray_t& ray, trace_t* pTrace) const = 0;
-	virtual bool				TraceTransformedWorldBrushes(IEnginePortalClient* pRemoteCollisionEntity, const Ray_t& ray, trace_t* pTrace) const = 0;
+	virtual bool				TraceTransformedWorldBrushes(const IEnginePortalClient* pRemoteCollisionEntity, const Ray_t& ray, trace_t* pTrace) const = 0;
+	virtual void				TraceRay(const Ray_t& ray, unsigned int fMask, ITraceFilter* pTraceFilter, trace_t* pTrace, bool bTraceHolyWall = true) const = 0;
 	virtual int					GetStaticPropsCount() const = 0;
 	virtual const PS_SD_Static_World_StaticProps_ClippedProp_t* GetStaticProps(int index) const = 0;
 	virtual bool				StaticPropsCollisionExists() const = 0;
@@ -652,6 +661,10 @@ public:
 	virtual void				BeforeMove() = 0;
 	virtual void				AfterMove() = 0;
 	virtual IEngineObjectClient* AsEngineObject() = 0;
+	virtual const IEngineObjectClient* AsEngineObject() const = 0;
+	virtual bool				IsActivated() const = 0;
+	virtual bool				IsPortal2() const = 0;
+	virtual void				SetPortal2(bool bPortal2) = 0;
 };
 
 class IEngineVehicleClient {

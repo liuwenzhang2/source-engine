@@ -95,7 +95,7 @@ void CFuncNoPortalVolume::OnActivate( void )
 		for( int i = 0; i != iPortalCount; ++i )
 		{
 			CProp_Portal *pTempPortal = pPortals[i];
-			if( pTempPortal->m_bActivated && 
+			if( pTempPortal->pCollisionEntity->GetEnginePortal()->IsActivated() &&
 				IsOBBIntersectingOBB( pTempPortal->GetEngineObject()->GetAbsOrigin(), pTempPortal->GetEngineObject()->GetAbsAngles(), CProp_Portal_Shared::vLocalMins, CProp_Portal_Shared::vLocalMaxs,
 									  GetEngineObject()->GetAbsOrigin(), GetCollideable()->GetCollisionAngles(), GetCollideable()->OBBMins(), GetCollideable()->OBBMaxs() ) )
 			{

@@ -279,8 +279,6 @@ RecvPropFloat( RECVINFO( m_angEyeAngles[1] ) ),
 RecvPropEHandle( RECVINFO( m_hRagdoll ) ),
 RecvPropInt( RECVINFO( m_iSpawnInterpCounter ) ),
 RecvPropInt( RECVINFO( m_iPlayerSoundType ) ),
-RecvPropBool( RECVINFO( m_bHeldObjectOnOppositeSideOfPortal ) ),
-RecvPropEHandle( RECVINFO( m_pHeldObjectPortal ) ),
 RecvPropBool( RECVINFO( m_bPitchReorientation ) ),
 RecvPropEHandle( RECVINFO( m_hSurroundingLiquidPortal ) ),
 RecvPropBool( RECVINFO( m_bSuppressingCrosshair ) ),
@@ -315,8 +313,6 @@ C_Portal_Player::C_Portal_Player()
 	m_hRagdoll.Set( NULL );
 	m_flStartLookTime = 0.0f;
 
-	m_bHeldObjectOnOppositeSideOfPortal = false;
-	m_pHeldObjectPortal = 0;
 
 	m_bPitchReorientation = false;
 	m_fReorientationRate = 0.0f;
@@ -475,13 +471,13 @@ void C_Portal_Player::UpdateLookAt( void )
 		// Test through any active portals: This may be a shorter distance to the target
 		for( int i = 0; i != iPortalCount; ++i )
 		{
-			CProp_Portal *pTempPortal = pPortals[i];
+			IEnginePortalClient *pTempPortal = pPortals[i]->pCollisionEntity->GetEnginePortal();
 
-			if( pTempPortal && pTempPortal->m_bActivated && pTempPortal->m_hLinkedPortal.Get() )
+			if( pTempPortal && pTempPortal->IsActivated() && pTempPortal->GetLinkedPortal())
 			{
 				Vector vEyeForward, vPortalForward;
 				EyeVectors( &vEyeForward );
-				pTempPortal->GetEngineObject()->GetVectors( &vPortalForward, NULL, NULL );
+				pTempPortal->AsEngineObject()->GetVectors( &vPortalForward, NULL, NULL );
 				fPortalDot[i] = vEyeForward.Dot( vPortalForward );
 				if ( fPortalDot[i] < flLowDot )
 				{
@@ -1618,7 +1614,7 @@ void C_Portal_Player::CalcPortalView( Vector &eyeOrigin, QAngle &eyeAngles )
 
 	if( bOverrideSpecialEffects )
 	{		
-		m_iForceNoDrawInPortalSurface = ((pRemotePortal->m_bIsPortal2)?(2):(1));
+		m_iForceNoDrawInPortalSurface = ((pRemotePortal->pCollisionEntity->GetEnginePortal()->IsPortal2())?(2):(1));
 		pRemotePortal->m_fStaticAmount = 0.0f;
 	}
 }

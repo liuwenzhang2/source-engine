@@ -51,10 +51,11 @@
 #include "prop_combine_ball.h"
 #include "portal_player.h"
 #include "portal/weapon_physcannon.h" //grab controller
-#else
-class CGrabController;
+#include "prop_portal_shared.h"
 #endif // PORTAL
 #include "env_debughistory.h"
+#include "physics_prop_ragdoll.h"
+#include "hl2_gamerules.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
@@ -138,6 +139,10 @@ ConVar phys_dontprintint("phys_dontprintint", "1", FCVAR_NONE, "Don't print inte
 static ConVar phys_penetration_error_time("phys_penetration_error_time", "10", 0, "Controls the duration of vphysics penetration error boxes.");
 static int g_iShadowCloneCount = 0;
 ConVar sv_use_shadow_clones("sv_use_shadow_clones", "1", FCVAR_REPLICATED | FCVAR_CHEAT); //should we create shadow clones?
+ConVar physcannon_maxmass("physcannon_maxmass", "250", FCVAR_REPLICATED | FCVAR_CHEAT);
+ConVar hl2_normspeed("hl2_normspeed", "190");
+ConVar	g_debug_physcannon("g_debug_physcannon", "0", FCVAR_REPLICATED | FCVAR_CHEAT);
+
 
 //-----------------------------------------------------------------------------
 // Call these in pre-save + post save
@@ -1866,10 +1871,10 @@ int CPortal_CollisionEvent::ShouldCollide(IPhysicsObject* pObj0, IPhysicsObject*
 			//at least one is held
 
 			//don't let players collide with objects they're holding, they get kinda messed up sometimes
-			if (pGameData0 && ((CBaseEntity*)pGameData0)->IsPlayer() && (GetPlayerHeldEntity((CBasePlayer*)pGameData0) == (CBaseEntity*)pGameData1))
+			if (pGameData0 && ((CBaseEntity*)pGameData0)->IsPlayer() && (((CBasePlayer*)pGameData0)->GetPlayerHeldEntity() == (CBaseEntity*)pGameData1))
 				return 0;
 
-			if (pGameData1 && ((CBaseEntity*)pGameData1)->IsPlayer() && (GetPlayerHeldEntity((CBasePlayer*)pGameData1) == (CBaseEntity*)pGameData0))
+			if (pGameData1 && ((CBaseEntity*)pGameData1)->IsPlayer() && (((CBasePlayer*)pGameData1)->GetPlayerHeldEntity() == (CBaseEntity*)pGameData0))
 				return 0;
 		}
 	}
@@ -2030,20 +2035,20 @@ int CPortal_CollisionEvent::ShouldSolvePenetration(IPhysicsObject* pObj0, IPhysi
 		}
 
 		//don't let players collide with objects they're holding, they get kinda messed up sometimes
-		if (pOther->IsPlayer() && (GetPlayerHeldEntity((CBasePlayer*)pOther) == pHeld))
+		if (pOther->IsPlayer() && (((CBasePlayer*)pOther)->GetPlayerHeldEntity() == pHeld))
 			return 0;
 
 		//held objects are clipping into other objects when travelling across a portal. We're close to ship, so this seems to be the
 		//most localized way to make a fix.
 		//Note that we're not actually going to change whether it should solve, we're just going to tack on some hacks
-		CPortal_Player* pHoldingPlayer = (CPortal_Player*)GetPlayerHoldingEntity(pHeld);
+		CPortal_Player* pHoldingPlayer = (CPortal_Player*)gEntList.GetPlayerHoldingEntity(pHeld);
 		if (!pHoldingPlayer && pHeld->GetEngineObject()->IsShadowClone())
-			pHoldingPlayer = (CPortal_Player*)GetPlayerHoldingEntity(pHeld->GetEngineShadowClone()->GetClonedEntity());
+			pHoldingPlayer = (CPortal_Player*)gEntList.GetPlayerHoldingEntity(pHeld->GetEngineShadowClone()->GetClonedEntity());
 
 		Assert(pHoldingPlayer);
 		if (pHoldingPlayer)
 		{
-			CGrabController* pGrabController = GetGrabControllerForPlayer(pHoldingPlayer);
+			IGrabController* pGrabController = GetGrabControllerForPlayer(pHoldingPlayer);
 
 			if (!pGrabController)
 				pGrabController = GetGrabControllerForPhysCannon(pHoldingPlayer->GetActiveWeapon());
@@ -2202,16 +2207,16 @@ static void ModifyWeight_PreCollision(vcollisionevent_t* pEvent)
 				s_bChangedMass[i] = true;
 				s_fSavedMass[i] = pUnshadowedObjects[i]->GetMass();
 
-				CGrabController* pGrabController = NULL;
+				IGrabController* pGrabController = NULL;
 				CBaseEntity* pLookingForEntity = (CBaseEntity*)pEvent->pObjects[i]->GetGameData();
-				CBasePlayer* pHoldingPlayer = GetPlayerHoldingEntity(pLookingForEntity);
+				CBasePlayer* pHoldingPlayer = gEntList.GetPlayerHoldingEntity(pLookingForEntity);
 				if (pHoldingPlayer)
 					pGrabController = GetGrabControllerForPlayer(pHoldingPlayer);
 
 				float fSavedMass, fSavedRotationalDamping;
 
 				AssertMsg(pGrabController, "Physics object is held, but we can't find the holding controller.");
-				GetSavedParamsForCarriedPhysObject(pGrabController, pUnshadowedObjects[i], &fSavedMass, &fSavedRotationalDamping);
+				pGrabController->GetSavedParamsForCarriedPhysObject(pUnshadowedObjects[i], &fSavedMass, &fSavedRotationalDamping);
 
 				pEvent->pObjects[i]->SetMass(fSavedMass);
 				if (pUnshadowedObjects[i] != pEvent->pObjects[i])
@@ -2418,6 +2423,994 @@ inline void FreeGroundLink(servergroundlink_t* link)
 	}
 
 	g_EntityGroundLinks.Free(link);
+}
+
+BEGIN_SIMPLE_DATADESC(game_shadowcontrol_params_t)
+
+	DEFINE_FIELD(targetPosition, FIELD_POSITION_VECTOR),
+	DEFINE_FIELD(targetRotation, FIELD_VECTOR),
+	DEFINE_FIELD(maxAngular, FIELD_FLOAT),
+	DEFINE_FIELD(maxDampAngular, FIELD_FLOAT),
+	DEFINE_FIELD(maxSpeed, FIELD_FLOAT),
+	DEFINE_FIELD(maxDampSpeed, FIELD_FLOAT),
+	DEFINE_FIELD(dampFactor, FIELD_FLOAT),
+	DEFINE_FIELD(teleportDistance, FIELD_FLOAT),
+
+END_DATADESC()
+
+BEGIN_SIMPLE_DATADESC(CGrabController)
+
+	DEFINE_EMBEDDED(m_shadow),
+
+	DEFINE_FIELD(m_timeToArrive, FIELD_FLOAT),
+	DEFINE_FIELD(m_errorTime, FIELD_FLOAT),
+	DEFINE_FIELD(m_error, FIELD_FLOAT),
+	DEFINE_FIELD(m_contactAmount, FIELD_FLOAT),
+	DEFINE_AUTO_ARRAY(m_savedRotDamping, FIELD_FLOAT),
+	DEFINE_AUTO_ARRAY(m_savedMass, FIELD_FLOAT),
+	DEFINE_FIELD(m_flLoadWeight, FIELD_FLOAT),
+	DEFINE_FIELD(m_bCarriedEntityBlocksLOS, FIELD_BOOLEAN),
+	DEFINE_FIELD(m_bIgnoreRelativePitch, FIELD_BOOLEAN),
+	DEFINE_FIELD(m_attachedEntity, FIELD_EHANDLE),
+	DEFINE_FIELD(m_angleAlignment, FIELD_FLOAT),
+	DEFINE_FIELD(m_vecPreferredCarryAngles, FIELD_VECTOR),
+	DEFINE_FIELD(m_bHasPreferredCarryAngles, FIELD_BOOLEAN),
+	DEFINE_FIELD(m_flDistanceOffset, FIELD_FLOAT),
+	DEFINE_FIELD(m_attachedAnglesPlayerSpace, FIELD_VECTOR),
+	DEFINE_FIELD(m_attachedPositionObjectSpace, FIELD_VECTOR),
+	DEFINE_FIELD(m_bAllowObjectOverhead, FIELD_BOOLEAN),
+
+	// Physptrs can't be inside embedded classes
+	// DEFINE_PHYSPTR( m_controller ),
+
+END_DATADESC()
+
+const float DEFAULT_MAX_ANGULAR = 360.0f * 10.0f;
+const float REDUCED_CARRY_MASS = 1.0f;
+
+CGrabController::CGrabController(void)
+{
+	m_shadow.dampFactor = 1.0;
+	m_shadow.teleportDistance = 0;
+	m_errorTime = 0;
+	m_error = 0;
+	// make this controller really stiff!
+	m_shadow.maxSpeed = 1000;
+	m_shadow.maxAngular = DEFAULT_MAX_ANGULAR;
+	m_shadow.maxDampSpeed = m_shadow.maxSpeed * 2;
+	m_shadow.maxDampAngular = m_shadow.maxAngular;
+	m_attachedEntity = NULL;
+	m_vecPreferredCarryAngles = vec3_angle;
+	m_bHasPreferredCarryAngles = false;
+	m_flDistanceOffset = 0;
+	// NVNT constructing m_pControllingPlayer to NULL
+	m_pControllingPlayer = NULL;
+}
+
+CGrabController::~CGrabController(void)
+{
+	DetachEntity(false);
+}
+
+void CGrabController::OnRestore()
+{
+	if (m_controller)
+	{
+		m_controller->SetEventHandler(this);
+	}
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: Computes a local matrix for the player clamped to valid carry ranges
+//-----------------------------------------------------------------------------
+// when looking level, hold bottom of object 8 inches below eye level
+#define PLAYER_HOLD_LEVEL_EYES	-8
+
+// when looking down, hold bottom of object 0 inches from feet
+#define PLAYER_HOLD_DOWN_FEET	2
+
+// when looking up, hold bottom of object 24 inches above eye level
+#define PLAYER_HOLD_UP_EYES		24
+
+// use a +/-30 degree range for the entire range of motion of pitch
+#define PLAYER_LOOK_PITCH_RANGE	30
+
+// player can reach down 2ft below his feet (otherwise he'll hold the object above the bottom)
+#define PLAYER_REACH_DOWN_DISTANCE	24
+
+static void ComputePlayerMatrix(CBasePlayer* pPlayer, matrix3x4_t& out)
+{
+	if (!pPlayer)
+		return;
+
+	QAngle angles = pPlayer->EyeAngles();
+	Vector origin = pPlayer->EyePosition();
+
+	// 0-360 / -180-180
+	//angles.x = init ? 0 : AngleDistance( angles.x, 0 );
+	//angles.x = clamp( angles.x, -PLAYER_LOOK_PITCH_RANGE, PLAYER_LOOK_PITCH_RANGE );
+	angles.x = 0;
+
+	float feet = pPlayer->GetEngineObject()->GetAbsOrigin().z + pPlayer->GetEngineObject()->WorldAlignMins().z;
+	float eyes = origin.z;
+	float zoffset = 0;
+	// moving up (negative pitch is up)
+	if (angles.x < 0)
+	{
+		zoffset = RemapVal(angles.x, 0, -PLAYER_LOOK_PITCH_RANGE, PLAYER_HOLD_LEVEL_EYES, PLAYER_HOLD_UP_EYES);
+	}
+	else
+	{
+		zoffset = RemapVal(angles.x, 0, PLAYER_LOOK_PITCH_RANGE, PLAYER_HOLD_LEVEL_EYES, PLAYER_HOLD_DOWN_FEET + (feet - eyes));
+	}
+	origin.z += zoffset;
+	angles.x = 0;
+	AngleMatrix(angles, origin, out);
+}
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+bool CGrabController::UpdateObject(CBasePlayer* pPlayer, float flError)
+{
+	CBaseEntity* pPenetratedEntity = m_PenetratedEntity.Get();
+	if (pPenetratedEntity)
+	{
+		//FindClosestPassableSpace( pPenetratedEntity, Vector( 0.0f, 0.0f, 1.0f ) );
+		IPhysicsObject* pPhysObject = pPenetratedEntity->GetEngineObject()->VPhysicsGetObject();
+		if (pPhysObject)
+			pPhysObject->Wake();
+
+		m_PenetratedEntity = NULL; //assume we won
+	}
+
+	CBaseEntity* pEntity = GetAttached();
+	if (!pEntity || ComputeError() > flError || (pPlayer->GetEngineObject()->GetGroundEntity() ? pPlayer->GetEngineObject()->GetGroundEntity()->GetOuter() : NULL) == pEntity || !pEntity->GetEngineObject()->VPhysicsGetObject())
+	{
+		return false;
+	}
+	if (!pEntity->GetEngineObject()->VPhysicsGetObject())
+		return false;
+	if (m_frameCount == gpGlobals->framecount)
+	{
+		return true;
+	}
+	m_frameCount = gpGlobals->framecount;
+	//Adrian: Oops, our object became motion disabled, let go!
+	IPhysicsObject* pPhys = pEntity->GetEngineObject()->VPhysicsGetObject();
+	if (pPhys && pPhys->IsMoveable() == false)
+	{
+		return false;
+	}
+
+	Vector forward, right, up;
+	QAngle playerAngles = pPlayer->EyeAngles();
+	float pitch = AngleDistance(playerAngles.x, 0);
+	if (!m_bAllowObjectOverhead)
+	{
+		playerAngles.x = clamp(pitch, -75, 75);
+	}
+	else
+	{
+		playerAngles.x = clamp(pitch, -90, 75);
+	}
+	AngleVectors(playerAngles, &forward, &right, &up);
+
+	if (HL2GameRules()->MegaPhyscannonActive())
+	{
+		Vector los = (pEntity->WorldSpaceCenter() - pPlayer->Weapon_ShootPosition());
+		VectorNormalize(los);
+
+		float flDot = DotProduct(los, forward);
+
+		//Let go of the item if we turn around too fast.
+		if (flDot <= 0.35f)
+			return false;
+	}
+
+	Vector start = pPlayer->Weapon_ShootPosition();
+
+	// If the player is upside down then we need to hold the box closer to their feet.
+	if (up.z < 0.0f)
+		start += pPlayer->GetViewOffset() * up.z;
+	if (right.z < 0.0f)
+		start += pPlayer->GetViewOffset() * right.z;
+
+
+	// Find out if it's being held across a portal
+	bool bLookingAtHeldPortal = true;
+	IEnginePortalServer* pPortal = pPlayer->GetEnginePlayer()->GetHeldObjectPortal();
+
+	if (!pPortal)
+	{
+		// If the portal is invalid make sure we don't try to hold it across the portal
+		pPlayer->GetEnginePlayer()->SetHeldObjectOnOppositeSideOfPortal(false);
+	}
+
+	if (pPlayer->GetEnginePlayer()->IsHeldObjectOnOppositeSideOfPortal())
+	{
+		Ray_t rayPortalTest;
+		rayPortalTest.Init(start, start + forward * 1024.0f);
+
+		// Check if we're looking at the portal we're holding through
+		if (pPortal)
+		{
+			if (UTIL_IntersectRayWithPortal(rayPortalTest, pPortal) < 0.0f)
+			{
+				bLookingAtHeldPortal = false;
+			}
+		}
+		// If our end point hasn't gone into the portal yet we at least need to know what portal is in front of us
+		else
+		{
+			int iPortalCount = gEntList.m_ActivePortals.Count();
+			if (iPortalCount != 0)
+			{
+				CEnginePortalInternal** pPortals = gEntList.m_ActivePortals.Base();
+				float fMinDist = 2.0f;
+				for (int i = 0; i != iPortalCount; ++i)
+				{
+					CEnginePortalInternal* pTempPortal = pPortals[i];
+					if (pTempPortal->IsActivated() &&
+						(pTempPortal->GetLinkedPortal() != NULL))
+					{
+						float fDist = UTIL_IntersectRayWithPortal(rayPortalTest, pTempPortal);
+						if ((fDist >= 0.0f) && (fDist < fMinDist))
+						{
+							fMinDist = fDist;
+							pPortal = pTempPortal;
+						}
+					}
+				}
+			}
+		}
+	}
+	else
+	{
+		pPortal = NULL;
+	}
+
+	QAngle qEntityAngles = pEntity->GetEngineObject()->GetAbsAngles();
+
+	if (pPortal)
+	{
+		// If the portal isn't linked we need to drop the object
+		if (!pPortal->GetLinkedPortal())
+		{
+			pPlayer->ForceDropOfCarriedPhysObjects();
+			return false;
+		}
+
+		UTIL_Portal_AngleTransform(pPortal->GetLinkedPortal()->MatrixThisToLinked(), qEntityAngles, qEntityAngles);
+	}
+	// Now clamp a sphere of object radius at end to the player's bbox
+	Vector radial = EntityList()->PhysGetCollision()->CollideGetExtent(pPhys->GetCollide(), vec3_origin, qEntityAngles, -forward);
+	Vector player2d = pPlayer->GetEngineObject()->OBBMaxs();
+	float playerRadius = player2d.Length2D();
+
+	float radius = playerRadius + radial.Length();//float radius = playerRadius + fabs(DotProduct( forward, radial ));
+
+	float distance = 24 + (radius * 2.0f);
+
+	// Add the prop's distance offset
+	distance += m_flDistanceOffset;
+
+	Vector end = start + (forward * distance);
+
+	trace_t	tr;
+	CTraceFilterSkipTwoEntities traceFilter(pPlayer, pEntity, COLLISION_GROUP_NONE);
+	Ray_t ray;
+	ray.Init(start, end);
+	//enginetrace->TraceRay( ray, MASK_SOLID_BRUSHONLY, &traceFilter, &tr );
+	UTIL_Portal_TraceRay(ray, MASK_SOLID_BRUSHONLY, &traceFilter, &tr);//enginetrace->TraceRay( ray, MASK_SOLID_BRUSHONLY, &traceFilter, &tr );
+
+	if (tr.fraction < 0.5)
+	{
+		end = start + forward * (radius * 0.5f);
+	}
+	else if (tr.fraction <= 1.0f)
+	{
+		end = start + forward * (distance - radius);
+	}
+	Vector playerMins, playerMaxs, nearest;
+	pPlayer->GetEngineObject()->WorldSpaceAABB(&playerMins, &playerMaxs);
+	Vector playerLine = pPlayer->GetEngineObject()->WorldSpaceCenter();
+	CalcClosestPointOnLine(end, playerLine + Vector(0, 0, playerMins.z), playerLine + Vector(0, 0, playerMaxs.z), nearest, NULL);
+
+	if (!m_bAllowObjectOverhead)
+	{
+		Vector delta = end - nearest;
+		float len = VectorNormalize(delta);
+		if (len < radius)
+		{
+			end = nearest + radius * delta;
+		}
+	}
+
+	//Show overlays of radius
+	if (g_debug_physcannon.GetBool())
+	{
+		NDebugOverlay::Box(end, -Vector(2, 2, 2), Vector(2, 2, 2), 0, 255, 0, true, 0);
+
+		NDebugOverlay::Box(GetAttached()->WorldSpaceCenter(),
+			-Vector(radius, radius, radius),
+			Vector(radius, radius, radius),
+			255, 0, 0,
+			true,
+			0.0f);
+	}
+
+	QAngle angles = TransformAnglesFromPlayerSpace(m_attachedAnglesPlayerSpace, pPlayer);
+
+	// If it has a preferred orientation, update to ensure we're still oriented correctly.
+	Pickup_GetPreferredCarryAngles(pEntity, pPlayer, pPlayer->GetEngineObject()->EntityToWorldTransform(), angles);
+
+	// We may be holding a prop that has preferred carry angles
+	if (m_bHasPreferredCarryAngles)
+	{
+		matrix3x4_t tmp;
+		ComputePlayerMatrix(pPlayer, tmp);
+		angles = TransformAnglesToWorldSpace(m_vecPreferredCarryAngles, tmp);
+	}
+
+	matrix3x4_t attachedToWorld;
+	Vector offset;
+	AngleMatrix(angles, attachedToWorld);
+	VectorRotate(m_attachedPositionObjectSpace, attachedToWorld, offset);
+
+	// Translate hold position and angles across portal
+	if (pPlayer->GetEnginePlayer()->IsHeldObjectOnOppositeSideOfPortal())
+	{
+		IEnginePortalServer* pPortalLinked = pPortal->GetLinkedPortal();
+		if (pPortal && pPortal->IsActivated() && pPortalLinked != NULL)
+		{
+			Vector vTeleportedPosition;
+			QAngle qTeleportedAngles;
+
+			if (!bLookingAtHeldPortal && (start - pPortal->AsEngineObject()->GetAbsOrigin()).Length() > distance - radius)
+			{
+				// Pull the object through the portal
+				Vector vPortalLinkedForward;
+				pPortalLinked->AsEngineObject()->GetVectors(&vPortalLinkedForward, NULL, NULL);
+				vTeleportedPosition = pPortalLinked->AsEngineObject()->GetAbsOrigin() - vPortalLinkedForward * (1.0f + offset.Length());
+				qTeleportedAngles = pPortalLinked->AsEngineObject()->GetAbsAngles();
+			}
+			else
+			{
+				// Translate hold position and angles across the portal
+				VMatrix matThisToLinked = pPortal->MatrixThisToLinked();
+				UTIL_Portal_PointTransform(matThisToLinked, end - offset, vTeleportedPosition);
+				UTIL_Portal_AngleTransform(matThisToLinked, angles, qTeleportedAngles);
+			}
+
+			SetTargetPosition(vTeleportedPosition, qTeleportedAngles);
+			pPlayer->GetEnginePlayer()->SetHeldObjectPortal(pPortal);
+		}
+		else
+		{
+			pPlayer->ForceDropOfCarriedPhysObjects();
+		}
+	}
+	else
+	{
+		SetTargetPosition(end - offset, angles);
+		pPlayer->GetEnginePlayer()->SetHeldObjectPortal(NULL);
+	}
+
+	return true;
+}
+
+void CGrabController::SetTargetPosition(const Vector& target, const QAngle& targetOrientation)
+{
+	m_shadow.targetPosition = target;
+	m_shadow.targetRotation = targetOrientation;
+
+	m_timeToArrive = gpGlobals->frametime;
+
+	CBaseEntity* pAttached = GetAttached();
+	if (pAttached)
+	{
+		IPhysicsObject* pObj = pAttached->GetEngineObject()->VPhysicsGetObject();
+
+		if (pObj != NULL)
+		{
+			pObj->Wake();
+		}
+		else
+		{
+			DetachEntity(false);//DetachEntity();
+		}
+	}
+}
+
+void CGrabController::GetTargetPosition(Vector* target, QAngle* targetOrientation)
+{
+	if (target)
+		*target = m_shadow.targetPosition;
+
+	if (targetOrientation)
+		*targetOrientation = m_shadow.targetRotation;
+}
+//-----------------------------------------------------------------------------
+// Purpose: 
+// Output : float
+//-----------------------------------------------------------------------------
+float CGrabController::ComputeError()
+{
+	if (m_errorTime <= 0)
+		return 0;
+
+	CBaseEntity* pAttached = GetAttached();
+	if (pAttached)
+	{
+		Vector pos;
+		IPhysicsObject* pObj = pAttached->GetEngineObject()->VPhysicsGetObject();
+
+		if (pObj)
+		{
+			pObj->GetShadowPosition(&pos, NULL);
+
+			float error = (m_shadow.targetPosition - pos).Length();
+			if (m_errorTime > 0)
+			{
+				if (m_errorTime > 1)
+				{
+					m_errorTime = 1;
+				}
+				float speed = error / m_errorTime;
+				if (speed > m_shadow.maxSpeed)
+				{
+					error *= 0.5;
+				}
+				m_error = (1 - m_errorTime) * m_error + error * m_errorTime;
+			}
+		}
+		else
+		{
+			DevMsg("Object attached to Physcannon has no physics object\n");
+			DetachEntity(false);//DetachEntity();
+			return 9999; // force detach
+		}
+	}
+
+	if (pAttached->GetEngineObject()->IsEFlagSet(EFL_IS_BEING_LIFTED_BY_BARNACLE))
+	{
+		m_error *= 3.0f;
+	}
+
+	// If held across a portal but not looking at the portal multiply error
+	CBasePlayer* pPortalPlayer = gEntList.GetPlayerHoldingEntity(pAttached);
+	Assert(pPortalPlayer);
+	if (pPortalPlayer->GetEnginePlayer()->IsHeldObjectOnOppositeSideOfPortal())
+	{
+		Vector forward, right, up;
+		QAngle playerAngles = pPortalPlayer->EyeAngles();
+
+		float pitch = AngleDistance(playerAngles.x, 0);
+		playerAngles.x = clamp(pitch, -75, 75);
+		AngleVectors(playerAngles, &forward, &right, &up);
+
+		Vector start = pPortalPlayer->Weapon_ShootPosition();
+
+		// If the player is upside down then we need to hold the box closer to their feet.
+		if (up.z < 0.0f)
+			start += pPortalPlayer->GetViewOffset() * up.z;
+		if (right.z < 0.0f)
+			start += pPortalPlayer->GetViewOffset() * right.z;
+
+		Ray_t rayPortalTest;
+		rayPortalTest.Init(start, start + forward * 256.0f);
+
+		if (UTIL_IntersectRayWithPortal(rayPortalTest, pPortalPlayer->GetEnginePlayer()->GetHeldObjectPortal()) < 0.0f)
+		{
+			m_error *= 2.5f;
+		}
+	}
+
+	m_errorTime = 0;
+
+	return m_error;
+}
+
+
+#define MASS_SPEED_SCALE	60
+#define MAX_MASS			40
+
+void CGrabController::ComputeMaxSpeed(CBaseEntity* pEntity, IPhysicsObject* pPhysics)
+{
+	m_shadow.maxSpeed = 1000;
+	m_shadow.maxAngular = DEFAULT_MAX_ANGULAR;
+
+	// Compute total mass...
+	float flMass = PhysGetEntityMass(pEntity);
+	float flMaxMass = physcannon_maxmass.GetFloat();
+	if (flMass <= flMaxMass)
+		return;
+
+	float flLerpFactor = clamp(flMass, flMaxMass, 500.0f);
+	flLerpFactor = SimpleSplineRemapVal(flLerpFactor, flMaxMass, 500.0f, 0.0f, 1.0f);
+
+	float invMass = pPhysics->GetInvMass();
+	float invInertia = pPhysics->GetInvInertia().Length();
+
+	float invMaxMass = 1.0f / MAX_MASS;
+	float ratio = invMaxMass / invMass;
+	invMass = invMaxMass;
+	invInertia *= ratio;
+
+	float maxSpeed = invMass * MASS_SPEED_SCALE * 200;
+	float maxAngular = invInertia * MASS_SPEED_SCALE * 360;
+
+	m_shadow.maxSpeed = Lerp(flLerpFactor, m_shadow.maxSpeed, maxSpeed);
+	m_shadow.maxAngular = Lerp(flLerpFactor, m_shadow.maxAngular, maxAngular);
+}
+
+
+QAngle CGrabController::TransformAnglesToPlayerSpace(const QAngle& anglesIn, CBasePlayer* pPlayer)
+{
+	if (m_bIgnoreRelativePitch)
+	{
+		matrix3x4_t test;
+		QAngle angleTest = pPlayer->EyeAngles();
+		angleTest.x = 0;
+		AngleMatrix(angleTest, test);
+		return TransformAnglesToLocalSpace(anglesIn, test);
+	}
+	return TransformAnglesToLocalSpace(anglesIn, pPlayer->GetEngineObject()->EntityToWorldTransform());
+}
+
+QAngle CGrabController::TransformAnglesFromPlayerSpace(const QAngle& anglesIn, CBasePlayer* pPlayer)
+{
+	if (m_bIgnoreRelativePitch)
+	{
+		matrix3x4_t test;
+		QAngle angleTest = pPlayer->EyeAngles();
+		angleTest.x = 0;
+		AngleMatrix(angleTest, test);
+		return TransformAnglesToWorldSpace(anglesIn, test);
+	}
+	return TransformAnglesToWorldSpace(anglesIn, pPlayer->GetEngineObject()->EntityToWorldTransform());
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: Finds the nearest ragdoll sub-piece to a location and returns it
+// Input  : *pTarget - entity that is the potential ragdoll
+//			&position - position we're testing against
+// Output : IPhysicsObject - sub-object (if any)
+//-----------------------------------------------------------------------------
+IPhysicsObject* GetRagdollChildAtPosition(CBaseEntity* pTarget, const Vector& position)
+{
+	// Check for a ragdoll
+	if (dynamic_cast<CRagdollProp*>(pTarget) == NULL)
+		return NULL;
+
+	// Get the root
+	IPhysicsObject* pList[VPHYSICS_MAX_OBJECT_LIST_COUNT];
+	int count = pTarget->GetEngineObject()->VPhysicsGetObjectList(pList, ARRAYSIZE(pList));
+
+	IPhysicsObject* pBestChild = NULL;
+	float			flBestDist = 99999999.0f;
+	float			flDist;
+	Vector			vPos;
+
+	// Find the nearest child to where we're looking
+	for (int i = 0; i < count; i++)
+	{
+		pList[i]->GetPosition(&vPos, NULL);
+
+		flDist = (position - vPos).LengthSqr();
+
+		if (flDist < flBestDist)
+		{
+			pBestChild = pList[i];
+			flBestDist = flDist;
+		}
+	}
+
+	// Make this our base now
+	pTarget->GetEngineObject()->VPhysicsSwapObject(pBestChild);
+
+	return pTarget->GetEngineObject()->VPhysicsGetObject();
+}
+
+#define SIGN(x) ( (x) < 0 ? -1 : 1 )
+
+static void MatrixOrthogonalize(matrix3x4_t& matrix, int column)
+{
+	Vector columns[3];
+	int i;
+
+	for (i = 0; i < 3; i++)
+	{
+		MatrixGetColumn(matrix, i, columns[i]);
+	}
+
+	int index0 = column;
+	int index1 = (column + 1) % 3;
+	int index2 = (column + 2) % 3;
+
+	columns[index2] = CrossProduct(columns[index0], columns[index1]);
+	columns[index1] = CrossProduct(columns[index2], columns[index0]);
+	VectorNormalize(columns[index2]);
+	VectorNormalize(columns[index1]);
+	MatrixSetColumn(columns[index1], index1, matrix);
+	MatrixSetColumn(columns[index2], index2, matrix);
+}
+
+static QAngle AlignAngles(const QAngle& angles, float cosineAlignAngle)
+{
+	matrix3x4_t alignMatrix;
+	AngleMatrix(angles, alignMatrix);
+
+	// NOTE: Must align z first
+	for (int j = 3; --j >= 0; )
+	{
+		Vector vec;
+		MatrixGetColumn(alignMatrix, j, vec);
+		for (int i = 0; i < 3; i++)
+		{
+			if (fabs(vec[i]) > cosineAlignAngle)
+			{
+				vec[i] = SIGN(vec[i]);
+				vec[(i + 1) % 3] = 0;
+				vec[(i + 2) % 3] = 0;
+				MatrixSetColumn(vec, j, alignMatrix);
+				MatrixOrthogonalize(alignMatrix, j);
+				break;
+			}
+		}
+	}
+
+	QAngle out;
+	MatrixAngles(alignMatrix, out);
+	return out;
+}
+
+void CGrabController::AttachEntity(CBasePlayer* pPlayer, CBaseEntity* pEntity, IPhysicsObject* pPhys, bool bIsMegaPhysCannon, const Vector& vGrabPosition, bool bUseGrabPosition)
+{
+	// play the impact sound of the object hitting the player
+	// used as feedback to let the player know he picked up the object
+	if (!pPlayer->GetEnginePlayer()->IsSilentDropAndPickup())
+	{
+		int hitMaterial = pPhys->GetMaterialIndex();
+		int playerMaterial = pPlayer->GetEngineObject()->VPhysicsGetObject() ? pPlayer->GetEngineObject()->VPhysicsGetObject()->GetMaterialIndex() : hitMaterial;
+		gEntList.PhysicsImpactSound(pPlayer, pPhys, CHAN_STATIC, hitMaterial, playerMaterial, 1.0, 64);
+	}
+	Vector position;
+	QAngle angles;
+	pPhys->GetPosition(&position, &angles);
+	// If it has a preferred orientation, use that instead.
+	Pickup_GetPreferredCarryAngles(pEntity, pPlayer, pPlayer->GetEngineObject()->EntityToWorldTransform(), angles);
+
+	//Fix attachment orientation weirdness
+	if (pPlayer->GetEnginePlayer()->IsHeldObjectOnOppositeSideOfPortal())
+	{
+		Vector vPlayerForward;
+		pPlayer->EyeVectors(&vPlayerForward);
+
+		Vector radial = EntityList()->PhysGetCollision()->CollideGetExtent(pPhys->GetCollide(), vec3_origin, pEntity->GetEngineObject()->GetAbsAngles(), -vPlayerForward);
+		Vector player2d = pPlayer->GetEngineObject()->OBBMaxs();
+		float playerRadius = player2d.Length2D();
+		float flDot = DotProduct(vPlayerForward, radial);
+
+		float radius = playerRadius + fabs(flDot);
+
+		float distance = 24 + (radius * 2.0f);
+
+		//find out which portal the object is on the other side of....
+		Vector start = pPlayer->Weapon_ShootPosition();
+		Vector end = start + (vPlayerForward * distance);
+
+		IEnginePortalServer* pObjectPortal = NULL;
+		pObjectPortal = pPlayer->GetEnginePlayer()->GetHeldObjectPortal();
+
+		// If our end point hasn't gone into the portal yet we at least need to know what portal is in front of us
+		if (!pObjectPortal)
+		{
+			Ray_t rayPortalTest;
+			rayPortalTest.Init(start, start + vPlayerForward * 1024.0f);
+
+			int iPortalCount = gEntList.m_ActivePortals.Count();
+			if (iPortalCount != 0)
+			{
+				CEnginePortalInternal** pPortals = gEntList.m_ActivePortals.Base();
+				float fMinDist = 2.0f;
+				for (int i = 0; i != iPortalCount; ++i)
+				{
+					CEnginePortalInternal* pTempPortal = pPortals[i];
+					if (pTempPortal->m_bActivated &&
+						(pTempPortal->GetLinkedPortal() != NULL))
+					{
+						float fDist = UTIL_IntersectRayWithPortal(rayPortalTest, pTempPortal);
+						if ((fDist >= 0.0f) && (fDist < fMinDist))
+						{
+							fMinDist = fDist;
+							pObjectPortal = pTempPortal;
+						}
+					}
+				}
+			}
+		}
+
+		if (pObjectPortal)
+		{
+			UTIL_Portal_AngleTransform(pObjectPortal->GetLinkedPortal()->MatrixThisToLinked(), angles, angles);
+		}
+	}
+
+	VectorITransform(pEntity->WorldSpaceCenter(), pEntity->GetEngineObject()->EntityToWorldTransform(), m_attachedPositionObjectSpace);
+	//	ComputeMaxSpeed( pEntity, pPhys );
+
+		// If we haven't been killed by a grab, we allow the gun to grab the nearest part of a ragdoll
+	if (bUseGrabPosition)
+	{
+		IPhysicsObject* pChild = GetRagdollChildAtPosition(pEntity, vGrabPosition);
+
+		if (pChild)
+		{
+			pPhys = pChild;
+		}
+	}
+
+	// Carried entities can never block LOS
+	m_bCarriedEntityBlocksLOS = pEntity->BlocksLOS();
+	pEntity->SetBlocksLOS(false);
+	m_controller = EntityList()->PhysGetEnv()->CreateMotionController(this);
+	m_controller->AttachObject(pPhys, true);
+	// Don't do this, it's causing trouble with constraint solvers.
+	//m_controller->SetPriority( IPhysicsMotionController::HIGH_PRIORITY );
+
+	pPhys->Wake();
+	PhysSetGameFlags(pPhys, FVPHYSICS_PLAYER_HELD);
+	SetTargetPosition(position, angles);
+	m_attachedEntity = pEntity;
+	IPhysicsObject* pList[VPHYSICS_MAX_OBJECT_LIST_COUNT];
+	int count = pEntity->GetEngineObject()->VPhysicsGetObjectList(pList, ARRAYSIZE(pList));
+	m_flLoadWeight = 0;
+	float damping = 10;
+	float flFactor = count / 7.5f;
+	if (flFactor < 1.0f)
+	{
+		flFactor = 1.0f;
+	}
+	for (int i = 0; i < count; i++)
+	{
+		float mass = pList[i]->GetMass();
+		pList[i]->GetDamping(NULL, &m_savedRotDamping[i]);
+		m_flLoadWeight += mass;
+		m_savedMass[i] = mass;
+
+		// reduce the mass to prevent the player from adding crazy amounts of energy to the system
+		pList[i]->SetMass(REDUCED_CARRY_MASS / flFactor);
+		pList[i]->SetDamping(NULL, &damping);
+	}
+
+	// NVNT setting m_pControllingPlayer to the player attached
+	m_pControllingPlayer = pPlayer;
+
+	// Give extra mass to the phys object we're actually picking up
+	pPhys->SetMass(REDUCED_CARRY_MASS);
+	pPhys->EnableDrag(false);
+
+	m_errorTime = bIsMegaPhysCannon ? -1.5f : -1.0f; // 1 seconds until error starts accumulating
+	m_error = 0;
+	m_contactAmount = 0;
+
+	m_attachedAnglesPlayerSpace = TransformAnglesToPlayerSpace(angles, pPlayer);
+	if (m_angleAlignment != 0)
+	{
+		m_attachedAnglesPlayerSpace = AlignAngles(m_attachedAnglesPlayerSpace, m_angleAlignment);
+	}
+
+	// Ragdolls don't offset this way
+	if (dynamic_cast<CRagdollProp*>(pEntity))
+	{
+		m_attachedPositionObjectSpace.Init();
+	}
+	else
+	{
+		VectorITransform(pEntity->WorldSpaceCenter(), pEntity->GetEngineObject()->EntityToWorldTransform(), m_attachedPositionObjectSpace);
+	}
+
+	// If it's a prop, see if it has desired carry angles
+	CPhysicsProp* pProp = dynamic_cast<CPhysicsProp*>(pEntity);
+	if (pProp)
+	{
+		m_bHasPreferredCarryAngles = pProp->GetPropDataAngles("preferred_carryangles", m_vecPreferredCarryAngles);
+		m_flDistanceOffset = pProp->GetCarryDistanceOffset();
+	}
+	else
+	{
+		m_bHasPreferredCarryAngles = false;
+		m_flDistanceOffset = 0;
+	}
+
+	m_bAllowObjectOverhead = IsObjectAllowedOverhead(pEntity);
+}
+
+static void ClampPhysicsVelocity(IPhysicsObject* pPhys, float linearLimit, float angularLimit)
+{
+	Vector vel;
+	AngularImpulse angVel;
+	pPhys->GetVelocity(&vel, &angVel);
+	float speed = VectorNormalize(vel) - linearLimit;
+	float angSpeed = VectorNormalize(angVel) - angularLimit;
+	speed = speed < 0 ? 0 : -speed;
+	angSpeed = angSpeed < 0 ? 0 : -angSpeed;
+	vel *= speed;
+	angVel *= angSpeed;
+	pPhys->AddVelocity(&vel, &angVel);
+}
+
+void CGrabController::DetachEntity(bool bClearVelocity)
+{
+	Assert(!gEntList.PhysIsInCallback());
+	CBaseEntity* pEntity = GetAttached();
+	if (pEntity)
+	{
+		// Restore the LS blocking state
+		pEntity->SetBlocksLOS(m_bCarriedEntityBlocksLOS);
+		IPhysicsObject* pList[VPHYSICS_MAX_OBJECT_LIST_COUNT];
+		int count = pEntity->GetEngineObject()->VPhysicsGetObjectList(pList, ARRAYSIZE(pList));
+		for (int i = 0; i < count; i++)
+		{
+			IPhysicsObject* pPhys = pList[i];
+			if (!pPhys)
+				continue;
+
+			// on the odd chance that it's gone to sleep while under anti-gravity
+			pPhys->EnableDrag(true);
+			pPhys->Wake();
+			pPhys->SetMass(m_savedMass[i]);
+			pPhys->SetDamping(NULL, &m_savedRotDamping[i]);
+			PhysClearGameFlags(pPhys, FVPHYSICS_PLAYER_HELD);
+			if (bClearVelocity)// pPhys->GetContactPoint( NULL, NULL ) 
+			{
+				pEntity->GetEngineObject()->PhysForceClearVelocity(pPhys);
+			}
+			else
+			{
+				ClampPhysicsVelocity(pPhys, hl2_normspeed.GetFloat() * 1.5f, 2.0f * 360.0f);
+			}
+
+		}
+	}
+
+	m_attachedEntity = NULL;
+	EntityList()->PhysGetEnv()->DestroyMotionController(m_controller);
+	m_controller = NULL;
+}
+
+static bool InContactWithHeavyObject(IPhysicsObject* pObject, float heavyMass)
+{
+	bool contact = false;
+	IPhysicsFrictionSnapshot* pSnapshot = pObject->CreateFrictionSnapshot();
+	while (pSnapshot->IsValid())
+	{
+		IPhysicsObject* pOther = pSnapshot->GetObject(1);
+		if (!pOther->IsMoveable() || pOther->GetMass() > heavyMass)
+		{
+			contact = true;
+			break;
+		}
+		pSnapshot->NextFrictionData();
+	}
+	pObject->DestroyFrictionSnapshot(pSnapshot);
+	return contact;
+}
+
+IMotionEvent::simresult_e CGrabController::Simulate(IPhysicsMotionController* pController, IPhysicsObject* pObject, float deltaTime, Vector& linear, AngularImpulse& angular)
+{
+	game_shadowcontrol_params_t shadowParams = m_shadow;
+	if (InContactWithHeavyObject(pObject, GetLoadWeight()))
+	{
+		m_contactAmount = Approach(0.1f, m_contactAmount, deltaTime * 2.0f);
+	}
+	else
+	{
+		m_contactAmount = Approach(1.0f, m_contactAmount, deltaTime * 2.0f);
+	}
+	shadowParams.maxAngular = m_shadow.maxAngular * m_contactAmount * m_contactAmount * m_contactAmount;
+	m_timeToArrive = pObject->ComputeShadowControl(shadowParams, m_timeToArrive, deltaTime);
+
+	// Slide along the current contact points to fix bouncing problems
+	Vector velocity;
+	AngularImpulse angVel;
+	pObject->GetVelocity(&velocity, &angVel);
+	PhysComputeSlideDirection(pObject, velocity, angVel, &velocity, &angVel, GetLoadWeight());
+	pObject->SetVelocityInstantaneous(&velocity, NULL);
+
+	linear.Init();
+	angular.Init();
+	m_errorTime += deltaTime;
+
+	return SIM_LOCAL_ACCELERATION;
+}
+
+float CGrabController::GetSavedMass(IPhysicsObject* pObject)
+{
+	CBaseEntity* pHeld = m_attachedEntity;
+	if (pHeld)
+	{
+		if (pObject->GetGameData() == (void*)pHeld)
+		{
+			IPhysicsObject* pList[VPHYSICS_MAX_OBJECT_LIST_COUNT];
+			int count = pHeld->GetEngineObject()->VPhysicsGetObjectList(pList, ARRAYSIZE(pList));
+			for (int i = 0; i < count; i++)
+			{
+				if (pList[i] == pObject)
+					return m_savedMass[i];
+			}
+		}
+	}
+	return 0.0f;
+}
+
+void CGrabController::GetSavedParamsForCarriedPhysObject(IPhysicsObject* pObject, float* pSavedMassOut, float* pSavedRotationalDampingOut)
+{
+	CBaseEntity* pHeld = m_attachedEntity;
+	if (pHeld)
+	{
+		if (pObject->GetGameData() == (void*)pHeld)
+		{
+			IPhysicsObject* pList[VPHYSICS_MAX_OBJECT_LIST_COUNT];
+			int count = pHeld->GetEngineObject()->VPhysicsGetObjectList(pList, ARRAYSIZE(pList));
+			for (int i = 0; i < count; i++)
+			{
+				if (pList[i] == pObject)
+				{
+					if (pSavedMassOut)
+						*pSavedMassOut = m_savedMass[i];
+
+					if (pSavedRotationalDampingOut)
+						*pSavedRotationalDampingOut = m_savedRotDamping[i];
+
+					return;
+				}
+			}
+		}
+	}
+
+	if (pSavedMassOut)
+		*pSavedMassOut = 0.0f;
+
+	if (pSavedRotationalDampingOut)
+		*pSavedRotationalDampingOut = 0.0f;
+
+	return;
+}
+
+//-----------------------------------------------------------------------------
+// Is this an object that the player is allowed to lift to a position 
+// directly overhead? The default behavior prevents lifting objects directly
+// overhead, but there are exceptions for gameplay purposes.
+//-----------------------------------------------------------------------------
+bool CGrabController::IsObjectAllowedOverhead(CBaseEntity* pEntity)
+{
+	// Allow combine balls overhead 
+	if (UTIL_IsCombineBallDefinite(pEntity))
+		return true;
+
+	// Allow props that are specifically flagged as such
+	CPhysicsProp* pPhysProp = dynamic_cast<CPhysicsProp*>(pEntity);
+	if (pPhysProp != NULL && pPhysProp->HasInteraction(PROPINTER_PHYSGUN_ALLOW_OVERHEAD))
+		return true;
+
+	// String checks are fine here, we only run this code one time- when the object is picked up.
+	if (pEntity->ClassMatches("grenade_helicopter"))
+		return true;
+
+	if (pEntity->ClassMatches("weapon_striderbuster"))
+		return true;
+
+	return false;
+}
+
+
+
+
+void CGrabController::SetPortalPenetratingEntity(CBaseEntity* pPenetrated)
+{
+	m_PenetratedEntity = pPenetrated;
 }
 
 class CThinkContextsSaveDataOps : public CDefSaveRestoreOps
@@ -2648,6 +3641,9 @@ BEGIN_DATADESC_NO_BASE(CEngineObjectInternal)
 	DEFINE_FIELD(m_iIKCounter, FIELD_INTEGER),
 	DEFINE_FIELD(m_fBoneCacheFlags, FIELD_SHORT),
 	DEFINE_FIELD(m_bAlternateSorting, FIELD_BOOLEAN),
+	DEFINE_EMBEDDED(m_grabController),
+	// Physptrs can't be inside embedded classes
+	DEFINE_PHYSPTR(m_grabController.m_controller),
 END_DATADESC()
 
 void SendProxy_Origin(const SendProp* pProp, const void* pStruct, const void* pData, DVariant* pOut, int iElement, int objectID)
@@ -3544,6 +4540,7 @@ void CEngineObjectInternal::OnRestore()
 		RagdollSetupCollisions(m_ragdoll, modelinfo->GetVCollide(GetModelIndex()), GetModelIndex());
 	}
 	m_flEstIkFloor = GetLocalOrigin().z;
+	m_grabController.OnRestore();
 	m_pOuter->OnRestore();
 	m_pOuter->NetworkStateChanged();
 }
@@ -8370,10 +9367,15 @@ int	CEngineObjectInternal::GetAllInHierarchy(CUtlVector<IEngineObjectServer*>& l
 
 BEGIN_SEND_TABLE(CEnginePlayerInternal, DT_EnginePlayer)
 	SendPropEHandle(SENDINFO(m_hPortalEnvironment)),
+	SendPropEHandle(SENDINFO(m_pHeldObjectPortal)),
+	SendPropBool(SENDINFO(m_bHeldObjectOnOppositeSideOfPortal)),
 END_SEND_TABLE()
 
 BEGIN_DATADESC(CEnginePlayerInternal)
 	DEFINE_FIELD(m_hPortalEnvironment, FIELD_EHANDLE),
+	DEFINE_FIELD(m_pHeldObjectPortal, FIELD_EHANDLE),
+	DEFINE_FIELD(m_bHeldObjectOnOppositeSideOfPortal, FIELD_BOOLEAN),
+	DEFINE_FIELD(m_bSilentDropAndPickup, FIELD_BOOLEAN),
 END_DATADESC()
 
 IMPLEMENT_SERVERCLASS(CEnginePlayerInternal, DT_EnginePlayer)
@@ -8381,6 +9383,10 @@ IMPLEMENT_SERVERCLASS(CEnginePlayerInternal, DT_EnginePlayer)
 CEnginePlayerInternal::CEnginePlayerInternal(IServerEntityList* pServerEntityList, int iForceEdictIndex, int iSerialNum)
 	:CEngineObjectInternal(pServerEntityList, iForceEdictIndex, iSerialNum)
 {
+	m_hPortalEnvironment = NULL;
+	m_pHeldObjectPortal = NULL;
+	m_bHeldObjectOnOppositeSideOfPortal = false;
+	m_bSilentDropAndPickup = false;
 	gEntList.m_ActivePlayers.AddToTail(this);
 }
 
@@ -8516,12 +9522,34 @@ void CEnginePlayerInternal::SetVCollisionState(const Vector& vecAbsOrigin, const
 	}
 }
 
+BEGIN_SEND_TABLE(CEnginePortalInternal, DT_EnginePortal)
+	SendPropEHandle(SENDINFO(m_hLinkedPortal)),
+	SendPropBool(SENDINFO(m_bActivated)),
+	SendPropBool(SENDINFO(m_bIsPortal2)),
+END_SEND_TABLE()
+
+BEGIN_DATADESC(CEnginePortalInternal)
+	DEFINE_FIELD(m_hLinkedPortal, FIELD_EHANDLE),
+	DEFINE_KEYFIELD(m_bActivated, FIELD_BOOLEAN, "Activated"),
+	DEFINE_KEYFIELD(m_bIsPortal2, FIELD_BOOLEAN, "PortalTwo"),
+	DEFINE_ARRAY(m_vPortalCorners, FIELD_POSITION_VECTOR, 4),
+END_DATADESC()
+
+IMPLEMENT_SERVERCLASS(CEnginePortalInternal, DT_EnginePortal)
+
 CEnginePortalInternal::CEnginePortalInternal(IServerEntityList* pServerEntityList, int iForceEdictIndex, int iSerialNum)
 : CEngineObjectInternal(pServerEntityList, iForceEdictIndex, iSerialNum), m_DataAccess(m_InternalData), m_bSimulateVPhysics(true), m_bLocalDataIsReady(false)
 {
 	static int s_iPortalSimulatorGUIDAllocator = 0;
 	m_iPortalSimulatorGUID = s_iPortalSimulatorGUIDAllocator++;
 	memset(m_EntFlags, 0, sizeof(m_EntFlags));
+	m_bActivated = false;
+	m_bIsPortal2 = false;
+	// Init to something safe
+	for (int i = 0; i < 4; ++i)
+	{
+		m_vPortalCorners[i] = Vector(0, 0, 0);
+	}
 	gEntList.m_ActivePortals.AddToTail(this);
 }
 
@@ -8591,6 +9619,11 @@ void CEnginePortalInternal::VPhysicsDestroyObject(void)
 	VPhysicsSetObject(NULL);
 }
 
+void CEnginePortalInternal::OnRestore(void)
+{
+	BaseClass::OnRestore();
+}
+
 void CEnginePortalInternal::SetVPhysicsSimulationEnabled(bool bEnabled)
 {
 	m_bSimulateVPhysics = bEnabled;
@@ -8657,14 +9690,14 @@ void CEnginePortalInternal::MoveTo(const Vector& ptCenter, const QAngle& angles)
 
 void CEnginePortalInternal::AttachTo(IEnginePortalServer* pLinkedPortal) 
 {
-	m_pLinkedPortal = (CEnginePortalInternal*)pLinkedPortal;
-	m_pLinkedPortal->m_pLinkedPortal = this;
+	m_hLinkedPortal = pLinkedPortal->AsEngineObject()->GetOuter();
+	GetLinkedPortal()->m_hLinkedPortal = this->AsEngineObject()->GetOuter();
 }
 
 void CEnginePortalInternal::DetachFromLinked(void) {
-	if (m_pLinkedPortal) {
-		m_pLinkedPortal->m_pLinkedPortal = NULL;
-		m_pLinkedPortal = NULL;
+	if (GetLinkedPortal()) {
+		GetLinkedPortal()->m_hLinkedPortal = NULL;
+		m_hLinkedPortal = NULL;
 	}
 }
 
@@ -8911,15 +9944,313 @@ bool CEnginePortalInternal::TraceWallBrushes(const Ray_t& ray, trace_t* pTrace) 
 	return false;
 }
 
-bool CEnginePortalInternal::TraceTransformedWorldBrushes(IEnginePortalServer* pRemoteCollisionEntity, const Ray_t& ray, trace_t* pTrace) const
+bool CEnginePortalInternal::TraceTransformedWorldBrushes(const IEnginePortalServer* pRemoteCollisionEntity, const Ray_t& ray, trace_t* pTrace) const
 {
-	CEnginePortalInternal* pRemotePortalInternal = dynamic_cast<CEnginePortalInternal*>(pRemoteCollisionEntity);
+	const CEnginePortalInternal* pRemotePortalInternal = dynamic_cast<const CEnginePortalInternal*>(pRemoteCollisionEntity);
 	if (pRemotePortalInternal->m_DataAccess.Simulation.Static.World.Brushes.pCollideable && sv_portal_trace_vs_world.GetBool())
 	{
 		gEntList.PhysGetCollision()->TraceBox(ray, pRemotePortalInternal->m_DataAccess.Simulation.Static.World.Brushes.pCollideable, m_DataAccess.Placement.ptaap_LinkedToThis.ptOriginTransform, m_DataAccess.Placement.ptaap_LinkedToThis.qAngleTransform, pTrace);
 		return true;
 	}
 	return false;
+}
+
+//only enumerates entities in front of the associated portal and are solid (as in a player would get stuck in them)
+class CPortalCollideableEnumerator : public IPartitionEnumerator
+{
+private:
+	EHANDLE m_hTestPortal; //the associated portal that we only want objects in front of
+	Vector m_vPlaneNormal; //portal plane normal
+	float m_fPlaneDist; //plane equation distance
+	Vector m_ptForward1000; //a point exactly 1000 units from the portal center along its forward vector
+public:
+	IHandleEntity* m_pHandles[1024];
+	int m_iHandleCount;
+	CPortalCollideableEnumerator(const CEnginePortalInternal* pAssociatedPortal);
+	virtual IterationRetval_t EnumElement(IHandleEntity* pHandleEntity);
+};
+
+#define PORTAL_TELEPORTATION_PLANE_OFFSET 7.0f
+
+CPortalCollideableEnumerator::CPortalCollideableEnumerator(const CEnginePortalInternal* pAssociatedPortal)
+{
+	Assert(pAssociatedPortal);
+	m_hTestPortal = pAssociatedPortal->m_pOuter;
+
+	pAssociatedPortal->GetVectors(&m_vPlaneNormal, NULL, NULL);
+
+	m_ptForward1000 = pAssociatedPortal->GetAbsOrigin();
+	m_ptForward1000 += m_vPlaneNormal * PORTAL_TELEPORTATION_PLANE_OFFSET;
+	m_fPlaneDist = m_vPlaneNormal.Dot(m_ptForward1000);
+
+	m_ptForward1000 += m_vPlaneNormal * 1000.0f;
+
+	m_iHandleCount = 0;
+}
+
+IterationRetval_t CPortalCollideableEnumerator::EnumElement(IHandleEntity* pHandleEntity)
+{
+	EHANDLE hEnt = pHandleEntity->GetRefEHandle();
+
+	CBaseEntity* pEnt = hEnt.Get();
+	if (pEnt == NULL) //I really never thought this would be necessary
+		return ITERATION_CONTINUE;
+
+	if (hEnt == m_hTestPortal)
+		return ITERATION_CONTINUE; //ignore this portal
+
+	/*if( staticpropmgr->IsStaticProp( pHandleEntity ) )
+	{
+		//we're dealing with a static prop, which unfortunately doesn't have everything I want to use for checking
+
+		ICollideable *pCollideable = pEnt->GetCollideable();
+
+		Vector vMins, vMaxs;
+		pCollideable->WorldSpaceSurroundingBounds( &vMins, &vMaxs );
+
+		Vector ptTest( (m_vPlaneNormal.x > 0.0f)?(vMaxs.x):(vMins.x),
+						(m_vPlaneNormal.y > 0.0f)?(vMaxs.y):(vMins.y),
+						(m_vPlaneNormal.z > 0.0f)?(vMaxs.z):(vMins.z) );
+
+		float fPtPlaneDist = m_vPlaneNormal.Dot( ptTest ) - m_fPlaneDist;
+		if( fPtPlaneDist <= 0.0f )
+			return ITERATION_CONTINUE;
+	}
+	else*/
+	{
+		//not a static prop, w00t
+
+		if (!pEnt->GetEngineObject()->IsSolid())
+			return ITERATION_CONTINUE; //not solid
+
+		Vector ptEntCenter = pEnt->GetEngineObject()->WorldSpaceCenter();
+
+		float fBoundRadius = pEnt->GetEngineObject()->BoundingRadius();
+		float fPtPlaneDist = m_vPlaneNormal.Dot(ptEntCenter) - m_fPlaneDist;
+
+		if (fPtPlaneDist < -fBoundRadius)
+			return ITERATION_CONTINUE; //object wholly behind the portal
+
+		if (!(fPtPlaneDist > fBoundRadius) && (fPtPlaneDist > -fBoundRadius)) //object is not wholly in front of the portal, but could be partially in front, do more checks
+		{
+			Vector ptNearest;
+			pEnt->GetEngineObject()->CalcNearestPoint(m_ptForward1000, &ptNearest);
+			fPtPlaneDist = m_vPlaneNormal.Dot(ptNearest) - m_fPlaneDist;
+			if (fPtPlaneDist < 0.0f)
+				return ITERATION_CONTINUE; //closest point was behind the portal plane, we don't want it
+		}
+
+
+	}
+
+	//if we're down here, this entity needs to be added to our enumeration
+	Assert(m_iHandleCount < 1024);
+	if (m_iHandleCount < 1024)
+		m_pHandles[m_iHandleCount] = pHandleEntity;
+	++m_iHandleCount;
+
+	return ITERATION_CONTINUE;
+}
+
+void CEnginePortalInternal::TraceRay(const Ray_t& ray, unsigned int fMask, ITraceFilter* pTraceFilter, trace_t* pTrace, bool bTraceHolyWall) const//traces against a specific portal's environment, does no *real* tracing
+{
+#ifdef CLIENT_DLL
+	Assert((GameRules() == NULL) || GameRules()->IsMultiplayer());
+#endif
+	Assert(IsReadyToSimulate()); //a trace shouldn't make it down this far if the portal is incapable of changing the results of the trace
+
+	CTraceFilterHitAll traceFilterHitAll;
+	if (!pTraceFilter)
+	{
+		pTraceFilter = &traceFilterHitAll;
+	}
+
+	pTrace->fraction = 2.0f;
+	pTrace->startsolid = true;
+	pTrace->allsolid = true;
+
+	trace_t TempTrace;
+	int counter;
+
+	const CEnginePortalInternal* pLinkedPortalSimulator = GetLinkedPortal();
+
+	//bool bTraceDisplacements = sv_portal_trace_vs_displacements.GetBool();
+	bool bTraceStaticProps = sv_portal_trace_vs_staticprops.GetBool();
+	if (sv_portal_trace_vs_holywall.GetBool() == false)
+		bTraceHolyWall = false;
+
+	bool bTraceTransformedGeometry = ((pLinkedPortalSimulator != NULL) && bTraceHolyWall && RayIsInPortalHole(ray));
+
+	bool bCopyBackBrushTraceData = false;
+
+
+
+	// Traces vs world
+	if (pTraceFilter->GetTraceType() != TRACE_ENTITIES_ONLY)
+	{
+		//trace_t RealTrace;
+		//enginetrace->TraceRay( ray, fMask, pTraceFilter, &RealTrace );
+		if (TraceWorldBrushes(ray, pTrace))
+		{
+			bCopyBackBrushTraceData = true;
+		}
+
+		if (bTraceHolyWall)
+		{
+			if (TraceWallTube(ray, &TempTrace))
+			{
+				if ((TempTrace.startsolid == false) && (TempTrace.fraction < pTrace->fraction)) //never allow something to be stuck in the tube, it's more of a last-resort guide than a real collideable
+				{
+					*pTrace = TempTrace;
+					bCopyBackBrushTraceData = true;
+				}
+			}
+
+			if (TraceWallBrushes(ray, &TempTrace))
+			{
+				if ((TempTrace.fraction < pTrace->fraction))
+				{
+					*pTrace = TempTrace;
+					bCopyBackBrushTraceData = true;
+				}
+			}
+
+			//if( portalSimulator->m_DataAccess.Simulation.Static.Wall.RemoteTransformedToLocal.Brushes.pCollideable && sv_portal_trace_vs_world.GetBool() )
+			if (bTraceTransformedGeometry && TraceTransformedWorldBrushes(pLinkedPortalSimulator, ray, &TempTrace))
+			{
+				if ((TempTrace.fraction < pTrace->fraction))
+				{
+					*pTrace = TempTrace;
+					bCopyBackBrushTraceData = true;
+				}
+			}
+		}
+
+		if (bCopyBackBrushTraceData)
+		{
+			pTrace->surface = GetSurfaceProperties().surface;
+			pTrace->contents = GetSurfaceProperties().contents;
+			pTrace->m_pEnt = GetSurfaceProperties().pEntity;
+
+			bCopyBackBrushTraceData = false;
+		}
+	}
+
+	// Traces vs entities
+	if (pTraceFilter->GetTraceType() != TRACE_WORLD_ONLY)
+	{
+		bool bFilterStaticProps = (pTraceFilter->GetTraceType() == TRACE_EVERYTHING_FILTER_PROPS);
+
+		//solid entities
+		CPortalCollideableEnumerator enumerator(this);
+		partition->EnumerateElementsAlongRay(PARTITION_ENGINE_SOLID_EDICTS | PARTITION_ENGINE_STATIC_PROPS, ray, false, &enumerator);
+		for (counter = 0; counter != enumerator.m_iHandleCount; ++counter)
+		{
+			if (staticpropmgr->IsStaticProp(enumerator.m_pHandles[counter]))
+			{
+				//if( bFilterStaticProps && !pTraceFilter->ShouldHitEntity( enumerator.m_pHandles[counter], fMask ) )
+				continue; //static props are handled separately, with clipped versions
+			}
+			else if (!pTraceFilter->ShouldHitEntity(enumerator.m_pHandles[counter], fMask))
+			{
+				continue;
+			}
+
+			enginetrace->ClipRayToEntity(ray, fMask, enumerator.m_pHandles[counter], &TempTrace);
+			if ((TempTrace.fraction < pTrace->fraction))
+				*pTrace = TempTrace;
+		}
+
+
+
+
+		if (bTraceStaticProps)
+		{
+			//local clipped static props
+			{
+				int iLocalStaticCount = GetStaticPropsCount();
+				if (iLocalStaticCount != 0 && StaticPropsCollisionExists())
+				{
+					int iIndex = 0;
+					Vector vTransform = vec3_origin;
+					QAngle qTransform = vec3_angle;
+
+					do
+					{
+						const PS_SD_Static_World_StaticProps_ClippedProp_t* pCurrentProp = GetStaticProps(iIndex);
+						if ((!bFilterStaticProps) || pTraceFilter->ShouldHitEntity(pCurrentProp->pSourceProp, fMask))
+						{
+							EntityList()->PhysGetCollision()->TraceBox(ray, pCurrentProp->pCollide, vTransform, qTransform, &TempTrace);
+							if ((TempTrace.fraction < pTrace->fraction))
+							{
+								*pTrace = TempTrace;
+								pTrace->surface.flags = pCurrentProp->iTraceSurfaceFlags;
+								pTrace->surface.surfaceProps = pCurrentProp->iTraceSurfaceProps;
+								pTrace->surface.name = pCurrentProp->szTraceSurfaceName;
+								pTrace->contents = pCurrentProp->iTraceContents;
+								pTrace->m_pEnt = pCurrentProp->pTraceEntity;
+							}
+						}
+
+						++iIndex;
+					} while (iIndex != iLocalStaticCount);
+				}
+			}
+
+			if (bTraceHolyWall)
+			{
+				//remote clipped static props transformed into our wall space
+				if (bTraceTransformedGeometry && (pTraceFilter->GetTraceType() != TRACE_WORLD_ONLY) && sv_portal_trace_vs_staticprops.GetBool())
+				{
+					int iLocalStaticCount = pLinkedPortalSimulator->GetStaticPropsCount();
+					if (iLocalStaticCount != 0)
+					{
+						int iIndex = 0;
+						Vector vTransform = GetTransformedOrigin();
+						QAngle qTransform = GetTransformedAngles();
+
+						do
+						{
+							const PS_SD_Static_World_StaticProps_ClippedProp_t* pCurrentProp = pLinkedPortalSimulator->GetStaticProps(iIndex);
+							if ((!bFilterStaticProps) || pTraceFilter->ShouldHitEntity(pCurrentProp->pSourceProp, fMask))
+							{
+								EntityList()->PhysGetCollision()->TraceBox(ray, pCurrentProp->pCollide, vTransform, qTransform, &TempTrace);
+								if ((TempTrace.fraction < pTrace->fraction))
+								{
+									*pTrace = TempTrace;
+									pTrace->surface.flags = pCurrentProp->iTraceSurfaceFlags;
+									pTrace->surface.surfaceProps = pCurrentProp->iTraceSurfaceProps;
+									pTrace->surface.name = pCurrentProp->szTraceSurfaceName;
+									pTrace->contents = pCurrentProp->iTraceContents;
+									pTrace->m_pEnt = pCurrentProp->pTraceEntity;
+								}
+							}
+
+							++iIndex;
+						} while (iIndex != iLocalStaticCount);
+					}
+				}
+			}
+		}
+	}
+
+	if (pTrace->fraction > 1.0f) //this should only happen if there was absolutely nothing to trace against
+	{
+		//AssertMsg( 0, "Nothing to trace against" );
+		memset(pTrace, 0, sizeof(trace_t));
+		pTrace->fraction = 1.0f;
+		pTrace->startpos = ray.m_Start - ray.m_StartOffset;
+		pTrace->endpos = pTrace->startpos + ray.m_Delta;
+	}
+	else if (pTrace->fraction < 0)
+	{
+		// For all brush traces, use the 'portal backbrush' surface surface contents
+		// BUGBUG: Doing this is a great solution because brushes near a portal
+		// will have their contents and surface properties homogenized to the brush the portal ray hit.
+		pTrace->contents = GetSurfaceProperties().contents;
+		pTrace->surface = GetSurfaceProperties().surface;
+		pTrace->m_pEnt = GetSurfaceProperties().pEntity;
+	}
 }
 
 int CEnginePortalInternal::GetStaticPropsCount() const
@@ -10569,7 +11900,7 @@ void CEnginePortalInternal::TakeOwnershipOfEntity(CBaseEntity* pEntity)
 		if (pOwningSimulator != this)
 		{
 			if (pOwningSimulator != NULL)
-				pOwningSimulator->ReleaseOwnershipOfEntity(pEnt, (pOwningSimulator == m_pLinkedPortal));
+				pOwningSimulator->ReleaseOwnershipOfEntity(pEnt, (pOwningSimulator == GetLinkedPortal()));
 
 			TakeOwnershipOfEntity(childrenList[i]->GetOuter());
 		}
@@ -10690,11 +12021,11 @@ void CEnginePortalInternal::TakePhysicsOwnership(CBaseEntity* pEntity)
 			}
 			AssertMsg(iDebugIndex < 0, "Trying to own an entity, when a clone from the linked portal already exists");
 
-			if (m_pLinkedPortal)
+			if (GetLinkedPortal())
 			{
-				for (iDebugIndex = m_pLinkedPortal->m_ShadowClones.FromLinkedPortal.Count(); --iDebugIndex >= 0; )
+				for (iDebugIndex = GetLinkedPortal()->m_ShadowClones.FromLinkedPortal.Count(); --iDebugIndex >= 0; )
 				{
-					if (m_pLinkedPortal->m_ShadowClones.FromLinkedPortal[iDebugIndex]->GetClonedEntity() == pEntity)
+					if (GetLinkedPortal()->m_ShadowClones.FromLinkedPortal[iDebugIndex]->GetClonedEntity() == pEntity)
 						break;
 				}
 				AssertMsg(iDebugIndex < 0, "Trying to own an entity, when we're already exporting a clone to the linked portal");
@@ -10707,29 +12038,29 @@ void CEnginePortalInternal::TakePhysicsOwnership(CBaseEntity* pEntity)
 		EHANDLE hEnt = pEntity;
 
 		//To linked portal
-		if (m_pLinkedPortal && m_pLinkedPortal->GetPhysicsEnvironment())
+		if (GetLinkedPortal() && GetLinkedPortal()->GetPhysicsEnvironment())
 		{
 
 			DBG_CODE(
-				for (int i = m_pLinkedPortal->m_ShadowClones.FromLinkedPortal.Count(); --i >= 0; )
-					AssertMsg(m_pLinkedPortal->m_ShadowClones.FromLinkedPortal[i]->GetClonedEntity() != pEntity, "Already cloning to linked portal.");
+				for (int i = GetLinkedPortal()->m_ShadowClones.FromLinkedPortal.Count(); --i >= 0; )
+					AssertMsg(GetLinkedPortal()->m_ShadowClones.FromLinkedPortal[i]->GetClonedEntity() != pEntity, "Already cloning to linked portal.");
 					);
 
-			CEngineShadowCloneInternal* pClone = CEngineShadowCloneInternal::CreateShadowClone(m_pLinkedPortal->GetPhysicsEnvironment(), hEnt, "CPortalSimulator::TakePhysicsOwnership(): To Linked Portal", &MatrixThisToLinked().As3x4());
+			CEngineShadowCloneInternal* pClone = CEngineShadowCloneInternal::CreateShadowClone(GetLinkedPortal()->GetPhysicsEnvironment(), hEnt, "CPortalSimulator::TakePhysicsOwnership(): To Linked Portal", &MatrixThisToLinked().As3x4());
 			if (pClone)
 			{
 				//bool bHeldByPhyscannon = false;
 				CBaseEntity* pHeldEntity = NULL;
-				CPortal_Player* pPlayer = (CPortal_Player*)GetPlayerHoldingEntity(pEntity);
+				CBasePlayer* pPlayer = gEntList.GetPlayerHoldingEntity(pEntity);
 
 				if (!pPlayer && pEntity->IsPlayer())
 				{
-					pPlayer = (CPortal_Player*)pEntity;
+					pPlayer = (CBasePlayer*)pEntity;
 				}
 
 				if (pPlayer)
 				{
-					pHeldEntity = GetPlayerHeldEntity(pPlayer);
+					pHeldEntity = pPlayer->GetPlayerHeldEntity();
 					/*if ( !pHeldEntity )
 					{
 						pHeldEntity = PhysCannonGetHeldEntity( pPlayer->GetActiveWeapon() );
@@ -10740,16 +12071,16 @@ void CEnginePortalInternal::TakePhysicsOwnership(CBaseEntity* pEntity)
 				if (pHeldEntity)
 				{
 					//player is holding the entity, force them to pick it back up again
-					bool bIsHeldObjectOnOppositeSideOfPortal = pPlayer->IsHeldObjectOnOppositeSideOfPortal();
-					pPlayer->m_bSilentDropAndPickup = true;
+					bool bIsHeldObjectOnOppositeSideOfPortal = pPlayer->GetEnginePlayer()->IsHeldObjectOnOppositeSideOfPortal();
+					pPlayer->GetEnginePlayer()->SetSilentDropAndPickup(true);
 					pPlayer->ForceDropOfCarriedPhysObjects(pHeldEntity);
-					pPlayer->SetHeldObjectOnOppositeSideOfPortal(bIsHeldObjectOnOppositeSideOfPortal);
+					pPlayer->GetEnginePlayer()->SetHeldObjectOnOppositeSideOfPortal(bIsHeldObjectOnOppositeSideOfPortal);
 				}
 
-				m_pLinkedPortal->m_ShadowClones.FromLinkedPortal.AddToTail(pClone);
-				m_pLinkedPortal->MarkAsOwned(pClone->AsEngineObject()->GetOuter());
-				m_pLinkedPortal->m_EntFlags[pClone->entindex()] |= PSEF_OWNS_PHYSICS;
-				m_pLinkedPortal->m_EntFlags[pClone->entindex()] |= m_EntFlags[pEntity->entindex()] & PSEF_IS_IN_PORTAL_HOLE;
+				GetLinkedPortal()->m_ShadowClones.FromLinkedPortal.AddToTail(pClone);
+				GetLinkedPortal()->MarkAsOwned(pClone->AsEngineObject()->GetOuter());
+				GetLinkedPortal()->m_EntFlags[pClone->entindex()] |= PSEF_OWNS_PHYSICS;
+				GetLinkedPortal()->m_EntFlags[pClone->entindex()] |= m_EntFlags[pEntity->entindex()] & PSEF_IS_IN_PORTAL_HOLE;
 				pClone->AsEngineObject()->CollisionRulesChanged(); //adding the clone to the portal simulator changes how it collides
 
 				if (pHeldEntity)
@@ -10762,7 +12093,7 @@ void CEnginePortalInternal::TakePhysicsOwnership(CBaseEntity* pEntity)
 					{
 						PlayerPickupObject(pPlayer, pHeldEntity);
 					}
-					pPlayer->m_bSilentDropAndPickup = false;
+					pPlayer->GetEnginePlayer()->SetSilentDropAndPickup(false);
 				}
 			}
 		}
@@ -10815,30 +12146,30 @@ void CEnginePortalInternal::ReleasePhysicsOwnership(CBaseEntity* pEntity, bool b
 			DBG_CODE_NOSCOPE(const char* szLastFoundMarker = NULL; );
 
 			//to linked portal
-			if (m_pLinkedPortal)
+			if (GetLinkedPortal())
 			{
 				DBG_CODE_NOSCOPE(bFoundAlready = false; );
-				for (int i = m_pLinkedPortal->m_ShadowClones.FromLinkedPortal.Count(); --i >= 0; )
+				for (int i = GetLinkedPortal()->m_ShadowClones.FromLinkedPortal.Count(); --i >= 0; )
 				{
-					if (m_pLinkedPortal->m_ShadowClones.FromLinkedPortal[i]->GetClonedEntity() == pEntity)
+					if (GetLinkedPortal()->m_ShadowClones.FromLinkedPortal[i]->GetClonedEntity() == pEntity)
 					{
-						CEngineShadowCloneInternal* pClone = m_pLinkedPortal->m_ShadowClones.FromLinkedPortal[i];
+						CEngineShadowCloneInternal* pClone = GetLinkedPortal()->m_ShadowClones.FromLinkedPortal[i];
 						AssertMsg(bFoundAlready == false, "Multiple clones to linked portal found.");
 						DBG_CODE_NOSCOPE(bFoundAlready = true; );
 						DBG_CODE_NOSCOPE(szLastFoundMarker = pClone->m_szDebugMarker);
 
 						//bool bHeldByPhyscannon = false;
 						CBaseEntity* pHeldEntity = NULL;
-						CPortal_Player* pPlayer = (CPortal_Player*)GetPlayerHoldingEntity(pEntity);
+						CBasePlayer* pPlayer = gEntList.GetPlayerHoldingEntity(pEntity);
 
 						if (!pPlayer && pEntity->IsPlayer())
 						{
-							pPlayer = (CPortal_Player*)pEntity;
+							pPlayer = (CBasePlayer*)pEntity;
 						}
 
 						if (pPlayer)
 						{
-							pHeldEntity = GetPlayerHeldEntity(pPlayer);
+							pHeldEntity = pPlayer->GetPlayerHeldEntity();
 							/*if ( !pHeldEntity )
 							{
 								pHeldEntity = PhysCannonGetHeldEntity( pPlayer->GetActiveWeapon() );
@@ -10849,20 +12180,20 @@ void CEnginePortalInternal::ReleasePhysicsOwnership(CBaseEntity* pEntity, bool b
 						if (pHeldEntity)
 						{
 							//player is holding the entity, force them to pick it back up again
-							bool bIsHeldObjectOnOppositeSideOfPortal = pPlayer->IsHeldObjectOnOppositeSideOfPortal();
-							pPlayer->m_bSilentDropAndPickup = true;
+							bool bIsHeldObjectOnOppositeSideOfPortal = pPlayer->GetEnginePlayer()->IsHeldObjectOnOppositeSideOfPortal();
+							pPlayer->GetEnginePlayer()->SetSilentDropAndPickup(true);
 							pPlayer->ForceDropOfCarriedPhysObjects(pHeldEntity);
-							pPlayer->SetHeldObjectOnOppositeSideOfPortal(bIsHeldObjectOnOppositeSideOfPortal);
+							pPlayer->GetEnginePlayer()->SetHeldObjectOnOppositeSideOfPortal(bIsHeldObjectOnOppositeSideOfPortal);
 						}
 						else
 						{
 							pHeldEntity = NULL;
 						}
 
-						m_pLinkedPortal->m_EntFlags[pClone->entindex()] &= ~PSEF_OWNS_PHYSICS;
-						m_pLinkedPortal->MarkAsReleased(pClone->AsEngineObject()->GetOuter());
+						GetLinkedPortal()->m_EntFlags[pClone->entindex()] &= ~PSEF_OWNS_PHYSICS;
+						GetLinkedPortal()->MarkAsReleased(pClone->AsEngineObject()->GetOuter());
 						CEngineShadowCloneInternal::ReleaseShadowClone(pClone);
-						m_pLinkedPortal->m_ShadowClones.FromLinkedPortal.FastRemove(i);
+						GetLinkedPortal()->m_ShadowClones.FromLinkedPortal.FastRemove(i);
 
 						if (pHeldEntity)
 						{
@@ -10874,7 +12205,7 @@ void CEnginePortalInternal::ReleasePhysicsOwnership(CBaseEntity* pEntity, bool b
 							{
 								PlayerPickupObject(pPlayer, pHeldEntity);
 							}
-							pPlayer->m_bSilentDropAndPickup = false;
+							pPlayer->GetEnginePlayer()->SetSilentDropAndPickup(false);
 						}
 
 						DBG_CODE_NOSCOPE(continue; );
@@ -11014,7 +12345,7 @@ void CEnginePortalInternal::BeforeLinkedPhysicsClear()
 void CEnginePortalInternal::AfterLinkedPhysicsCreated()
 {
 	//re-clone physicsshadowclones from the remote environment
-	CUtlVector<CBaseEntity*>& RemoteOwnedEntities = m_pLinkedPortal->m_OwnedEntities;
+	CUtlVector<CBaseEntity*>& RemoteOwnedEntities = GetLinkedPortal()->m_OwnedEntities;
 	for (int i = RemoteOwnedEntities.Count(); --i >= 0; )
 	{
 		if (RemoteOwnedEntities[i]->GetEngineObject()->IsShadowClone() ||
@@ -11112,6 +12443,23 @@ void CEnginePortalInternal::ClearLinkedEntities(void)
 		}
 
 		m_ShadowClones.FromLinkedPortal.RemoveAll();
+	}
+}
+
+void CEnginePortalInternal::UpdateCorners()
+{
+	Vector vOrigin = GetAbsOrigin();
+	Vector vUp, vRight;
+	GetVectors(NULL, &vRight, &vUp);
+
+	for (int i = 0; i < 4; ++i)
+	{
+		Vector vAddPoint = vOrigin;
+
+		vAddPoint += vRight * ((i & (1 << 0)) ? (PORTAL_HALF_WIDTH) : (-PORTAL_HALF_WIDTH));
+		vAddPoint += vUp * ((i & (1 << 1)) ? (PORTAL_HALF_HEIGHT) : (-PORTAL_HALF_HEIGHT));
+
+		m_vPortalCorners[i] = vAddPoint;
 	}
 }
 
@@ -11488,7 +12836,7 @@ void CEngineShadowCloneInternal::SyncEntity(bool bPullChanges)
 
 static void FullSyncPhysicsObject(IPhysicsObject* pSource, IPhysicsObject* pDest, const VMatrix* pTransform, bool bTeleport)
 {
-	CGrabController* pGrabController = NULL;
+	IGrabController* pGrabController = NULL;
 
 	if (!pSource->IsAsleep())
 		pDest->Wake();
@@ -11502,7 +12850,7 @@ static void FullSyncPhysicsObject(IPhysicsObject* pSource, IPhysicsObject* pDest
 
 		CBaseEntity* pLookingForEntity = (CBaseEntity*)pSource->GetGameData();
 
-		CBasePlayer* pHoldingPlayer = GetPlayerHoldingEntity(pLookingForEntity);
+		CBasePlayer* pHoldingPlayer = gEntList.GetPlayerHoldingEntity(pLookingForEntity);
 		if (pHoldingPlayer)
 		{
 			pGrabController = GetGrabControllerForPlayer(pHoldingPlayer);
@@ -11512,7 +12860,7 @@ static void FullSyncPhysicsObject(IPhysicsObject* pSource, IPhysicsObject* pDest
 		}
 
 		AssertMsg(pGrabController, "Physics object is held, but we can't find the holding controller.");
-		GetSavedParamsForCarriedPhysObject(pGrabController, pSource, &fSavedMass, &fSavedRotationalDamping);
+		pGrabController->GetSavedParamsForCarriedPhysObject(pSource, &fSavedMass, &fSavedRotationalDamping);
 	}
 #endif // PORTAL
 
@@ -12003,8 +13351,8 @@ BEGIN_DATADESC(CEngineVehicleInternal)
 	DEFINE_FIELD(m_controls.bHasBrakePedal, FIELD_BOOLEAN),
 
 	// This has to be handled by the containing class owing to 'owner' issues
-//	DEFINE_PHYSPTR( m_pVehicle ),
-DEFINE_PHYSPTR(m_pVehicle),
+	//	DEFINE_PHYSPTR( m_pVehicle ),
+	DEFINE_PHYSPTR(m_pVehicle),
 
 	DEFINE_FIELD(m_nSpeed, FIELD_INTEGER),
 	DEFINE_FIELD(m_nLastSpeed, FIELD_INTEGER),

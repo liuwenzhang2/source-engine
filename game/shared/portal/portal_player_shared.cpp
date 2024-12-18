@@ -327,7 +327,7 @@ CBaseEntity* CPortal_Player::FindUseEntityThroughPortal( void )
 	Vector forward, up;
 	EyeVectors( &forward, NULL, &up );
 
-	CProp_Portal *pPortal = GetHeldObjectPortal();
+	IEnginePortal *pPortal = GetEnginePlayer()->GetHeldObjectPortal();
 
 	trace_t tr;
 	// Search for objects in a sphere (tests for entities that are not solid, yet still useable)

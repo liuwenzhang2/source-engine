@@ -11,12 +11,21 @@
 #endif
 #include "platform.h"
 
-
+class IHandleEntity;
 class CBaseHandle;
 class IEntityFactory;
 class IEntityList;
 class datamap_t;
 struct string_t;
+class Vector;
+class QAngle;
+class VMatrix;
+struct Ray_t;
+struct PS_SD_Static_SurfaceProperties_t;
+class ITraceFilter;
+class CGameTrace;
+typedef CGameTrace trace_t;
+struct cplane_t;
 
 class IEngineObject {
 public:
@@ -27,6 +36,25 @@ public:
 	virtual string_t GetModelName(void) const = 0;
 	virtual bool IsMarkedForDeletion(void) = 0;
 	virtual void CollisionRulesChanged() = 0;
+	virtual const Vector& GetAbsOrigin(void) const = 0;
+	virtual const QAngle& GetAbsAngles(void) const = 0;
+	virtual void GetVectors(Vector* forward, Vector* right, Vector* up) const = 0;
+	virtual IHandleEntity* GetHandleEntity() const = 0;
+};
+
+class IEnginePortal {
+public:
+	virtual bool IsActivated() const = 0;
+	virtual bool IsPortal2() const = 0;
+	virtual bool IsActivedAndLinked(void) const = 0;
+	virtual bool IsReadyToSimulate(void) const = 0;
+	virtual const IEngineObject* AsEngineObject() const = 0;
+	virtual const VMatrix& MatrixThisToLinked() const = 0;
+	virtual const cplane_t& GetPortalPlane() const = 0;
+	virtual const IEnginePortal* GetLinkedPortal() const = 0;
+	virtual bool RayIsInPortalHole(const Ray_t& ray) const = 0;
+	virtual void TraceRay(const Ray_t& ray, unsigned int fMask, ITraceFilter* pTraceFilter, trace_t* pTrace, bool bTraceHolyWall = true) const = 0;
+	virtual const PS_SD_Static_SurfaceProperties_t& GetSurfaceProperties() const = 0;
 };
 
 // An IHandleEntity-derived class can go into an entity list and use ehandles.

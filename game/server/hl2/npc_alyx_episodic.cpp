@@ -700,7 +700,7 @@ void CNPC_Alyx::SearchForInteractTargets()
 		return;
 	}
 
-	CBaseEntity *pProspect = PhysCannonGetHeldEntity(pPlayer->GetActiveWeapon());
+	CBaseEntity* pProspect = pPlayer->GetActiveWeapon() ? pPlayer->GetActiveWeapon()->PhysCannonGetHeldEntity() : NULL;
 
 	if( !pProspect )
 	{

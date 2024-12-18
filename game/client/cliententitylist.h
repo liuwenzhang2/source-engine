@@ -91,6 +91,7 @@ typedef unsigned int			ClientSideAnimationListHandle_t;
 #define		INVALID_CLIENTSIDEANIMATION_LIST_HANDLE	(ClientSideAnimationListHandle_t)~0
 
 class C_EngineObjectInternal : public IEngineObjectClient {
+	friend class CPortalCollideableEnumerator;
 	template<class T> friend class CClientEntityList;
 public:
 	DECLARE_CLASS_NOBASE(C_EngineObjectInternal);
@@ -297,6 +298,10 @@ public:
 	}
 
 	C_BaseEntity* GetOuter() {
+		return m_pOuter;
+	}
+
+	IHandleEntity* GetHandleEntity() const {
 		return m_pOuter;
 	}
 
@@ -2172,13 +2177,21 @@ public:
 	C_EnginePlayerInternal(IClientEntityList* pClientEntityList, int iForceEdictIndex, int iSerialNum);
 	~C_EnginePlayerInternal();
 	IEnginePortalClient* GetPortalEnvironment() { return m_hPortalEnvironment ? m_hPortalEnvironment->GetEnginePortal() : NULL; }
+	IEnginePortalClient* GetHeldObjectPortal(void) { return m_pHeldObjectPortal ? m_pHeldObjectPortal->GetEnginePortal() : NULL; }
+	void ToggleHeldObjectOnOppositeSideOfPortal(void) { m_bHeldObjectOnOppositeSideOfPortal = !m_bHeldObjectOnOppositeSideOfPortal; }
+	void SetHeldObjectOnOppositeSideOfPortal(bool p_bHeldObjectOnOppositeSideOfPortal) { m_bHeldObjectOnOppositeSideOfPortal = p_bHeldObjectOnOppositeSideOfPortal; }
+	bool IsHeldObjectOnOppositeSideOfPortal(void) { return m_bHeldObjectOnOppositeSideOfPortal; }
 private:
 	EHANDLE	m_hPortalEnvironment; //a portal whose environment the player is currently in, should be invalid most of the time
+	EHANDLE m_pHeldObjectPortal;
+	bool  m_bHeldObjectOnOppositeSideOfPortal;
+
 };
 
 class C_EnginePortalInternal : public C_EngineObjectInternal, public IEnginePortalClient {
 public:
 	DECLARE_CLASS(C_EnginePortalInternal, C_EngineObjectInternal);
+	DECLARE_CLIENTCLASS();
 	C_EnginePortalInternal(IClientEntityList* pClientEntityList, int iForceEdictIndex, int iSerialNum);
 	~C_EnginePortalInternal();
 	void	VPhysicsDestroyObject(void);
@@ -2188,8 +2201,11 @@ public:
 	bool				IsLocalDataIsReady() { return m_bLocalDataIsReady; }
 	void				SetLocalDataIsReady(bool bLocalDataIsReady) { m_bLocalDataIsReady = bLocalDataIsReady; }
 	bool				IsReadyToSimulate(void) const; //is active and linked to another portal
+	bool				IsActivedAndLinked(void) const;
 	void				MoveTo(const Vector& ptCenter, const QAngle& angles);
 	void				AttachTo(IEnginePortalClient* pLinkedPortal);
+	C_EnginePortalInternal* GetLinkedPortal() { return m_hLinkedPortal.Get() ? (C_EnginePortalInternal*)m_hLinkedPortal.Get()->GetEnginePortal() : NULL; }
+	const C_EnginePortalInternal* GetLinkedPortal() const { return m_hLinkedPortal.Get() ? (const C_EnginePortalInternal*)m_hLinkedPortal.Get()->GetEnginePortal() : NULL; }
 	void				DetachFromLinked(void);
 	void				UpdateLinkMatrix(IEnginePortalClient* pRemoteCollisionEntity);
 	bool				EntityIsInPortalHole(IEngineObjectClient* pEntity) const; //true if the entity is within the portal cutout bounds and crossing the plane. Not just *near* the portal
@@ -2198,7 +2214,8 @@ public:
 	bool				TraceWorldBrushes(const Ray_t& ray, trace_t* pTrace) const;
 	bool				TraceWallTube(const Ray_t& ray, trace_t* pTrace) const;
 	bool				TraceWallBrushes(const Ray_t& ray, trace_t* pTrace) const;
-	bool				TraceTransformedWorldBrushes(IEnginePortalClient* pRemoteCollisionEntity, const Ray_t& ray, trace_t* pTrace) const;
+	bool				TraceTransformedWorldBrushes(const IEnginePortalClient* pRemoteCollisionEntity, const Ray_t& ray, trace_t* pTrace) const;
+	void				TraceRay(const Ray_t& ray, unsigned int fMask, ITraceFilter* pTraceFilter, trace_t* pTrace, bool bTraceHolyWall = true) const; //traces against a specific portal's environment, does no *real* tracing
 	int					GetStaticPropsCount() const;
 	const PS_SD_Static_World_StaticProps_ClippedProp_t* GetStaticProps(int index) const;
 	bool				StaticPropsCollisionExists() const;
@@ -2234,9 +2251,16 @@ public:
 	void				BeforeMove() {}
 	void				AfterMove() {}
 	C_EngineObjectInternal* AsEngineObject() { return this; }
+	const C_EngineObjectInternal* AsEngineObject() const { return this; }
+	bool				IsActivated() const { return m_bActivated; }
+	bool				IsPortal2() const { return m_bIsPortal2; }
+	void				SetPortal2(bool bPortal2) { m_bIsPortal2 = bPortal2; }
 private:
 	int					m_iPortalSimulatorGUID;
-	C_EnginePortalInternal* m_pLinkedPortal;
+	//IPhysicsEnvironment* pPhysicsEnvironment = NULL;
+	bool				m_bActivated; //a portal can exist and not be active
+	bool				m_bIsPortal2; //For teleportation, this doesn't matter, but for drawing and moving, it matters
+	EHANDLE				m_hLinkedPortal;
 	bool				m_bSimulateVPhysics;
 	bool				m_bLocalDataIsReady; //this side of the portal is properly setup, no guarantees as to linkage to another portal
 	PS_InternalData_t m_InternalData;
@@ -2246,7 +2270,12 @@ private:
 
 inline bool C_EnginePortalInternal::IsReadyToSimulate(void) const
 {
-	return m_bLocalDataIsReady && m_pLinkedPortal && m_pLinkedPortal->m_bLocalDataIsReady;
+	return m_bLocalDataIsReady && GetLinkedPortal() && GetLinkedPortal()->m_bLocalDataIsReady;
+}
+
+inline bool C_EnginePortalInternal::IsActivedAndLinked(void) const
+{
+	return (m_bActivated && GetLinkedPortal() != NULL);
 }
 
 #ifdef DEBUG_PORTAL_SIMULATION_CREATION_TIMES

@@ -124,7 +124,7 @@ void CTriggerPortalCleanser::Touch( CBaseEntity *pOther )
 				{
 					CProp_Portal *pPortal = CProp_Portal::FindPortal( pPortalgun->m_iPortalLinkageGroupID, false );
 
-					if ( pPortal && pPortal->m_bActivated )
+					if ( pPortal && pPortal->pCollisionEntity->GetEnginePortal()->IsActivated() )
 					{
 						pPortal->DoFizzleEffect( PORTAL_FIZZLE_KILLED, false );
 						pPortal->Fizzle();
@@ -147,7 +147,7 @@ void CTriggerPortalCleanser::Touch( CBaseEntity *pOther )
 				{
 					CProp_Portal *pPortal = CProp_Portal::FindPortal( pPortalgun->m_iPortalLinkageGroupID, true );
 
-					if ( pPortal && pPortal->m_bActivated )
+					if ( pPortal && pPortal->pCollisionEntity->GetEnginePortal()->IsActivated() )
 					{
 						pPortal->DoFizzleEffect( PORTAL_FIZZLE_KILLED, false );
 						pPortal->Fizzle();
@@ -225,7 +225,7 @@ void CTriggerPortalCleanser::Touch( CBaseEntity *pOther )
 
 		if ( pOldPhys && ( pOldPhys->GetGameFlags() & FVPHYSICS_PLAYER_HELD ) )
 		{
-			CPortal_Player *pPlayer = (CPortal_Player *)GetPlayerHoldingEntity( pBaseAnimating );
+			CPortal_Player *pPlayer = (CPortal_Player *)EntityList()->GetPlayerHoldingEntity( pBaseAnimating );
 			if( pPlayer )
 			{
 				// Modify the velocity for held objects so it gets away from the player

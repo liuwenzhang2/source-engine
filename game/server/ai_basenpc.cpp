@@ -9539,11 +9539,11 @@ Vector CAI_BaseNPC::GetShootEnemyDir( const Vector &shootOrigin, bool bNoisy )
 		// Translate the enemy's position across the portals if it's only seen in the portal view cone
 		if ( !FInViewCone( vecEnemyLKP ) || !FVisible( vecEnemyLKP ) )
 		{
-			CProp_Portal *pPortal = FInViewConeThroughPortal( vecEnemyLKP );
+			IEnginePortalServer *pPortal = FInViewConeThroughPortal( vecEnemyLKP );
 			if ( pPortal )
 			{
-				UTIL_Portal_VectorTransform( pPortal->m_hLinkedPortal->MatrixThisToLinked(), vecEnemyOffset, vecEnemyOffset );
-				UTIL_Portal_PointTransform( pPortal->m_hLinkedPortal->MatrixThisToLinked(), vecEnemyLKP, vecEnemyLKP );
+				UTIL_Portal_VectorTransform( pPortal->GetLinkedPortal()->MatrixThisToLinked(), vecEnemyOffset, vecEnemyOffset);
+				UTIL_Portal_PointTransform( pPortal->GetLinkedPortal()->MatrixThisToLinked(), vecEnemyLKP, vecEnemyLKP);
 			}
 		}
 #endif
@@ -9620,14 +9620,14 @@ Vector CAI_BaseNPC::GetActualShootPosition( const Vector &shootOrigin )
 
 #ifdef PORTAL
 	// Check if it's also visible through portals
-	CProp_Portal *pPortal = FInViewConeThroughPortal( vecEnemyLKP );
+	IEnginePortalServer *pPortal = FInViewConeThroughPortal( vecEnemyLKP );
 	if ( pPortal )
 	{
 		// Get the target's position through portals
 		Vector vecEnemyOffsetTransformed;
 		Vector vecEnemyLKPTransformed;
-		UTIL_Portal_VectorTransform( pPortal->m_hLinkedPortal->MatrixThisToLinked(), vecEnemyOffset, vecEnemyOffsetTransformed );
-		UTIL_Portal_PointTransform( pPortal->m_hLinkedPortal->MatrixThisToLinked(), vecEnemyLKP, vecEnemyLKPTransformed );
+		UTIL_Portal_VectorTransform( pPortal->GetLinkedPortal()->MatrixThisToLinked(), vecEnemyOffset, vecEnemyOffsetTransformed);
+		UTIL_Portal_PointTransform( pPortal->GetLinkedPortal()->MatrixThisToLinked(), vecEnemyLKP, vecEnemyLKPTransformed);
 		Vector vecTargetPositionTransformed = vecEnemyOffsetTransformed + vecEnemyLKPTransformed;
 
 		// Get the distance to the target with and without portals

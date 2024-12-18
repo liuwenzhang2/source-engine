@@ -13,6 +13,7 @@
 #include "IEffects.h"
 #include "explode.h"
 #include "ai_route.h"
+#include "basecombatweapon.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"

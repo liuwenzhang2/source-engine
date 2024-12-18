@@ -2173,7 +2173,7 @@ void CViewRenderBeams::DrawBeam( C_Beam* pbeam, ITraceFilter *pEntityBeamTraceFi
 
 	CTraceFilterChain traceFilterChain( &traceFilter, pEntityBeamTraceFilter );
 
-	C_Prop_Portal *pPortal = UTIL_Portal_TraceRay_Beam( rayBeam, MASK_SHOT, &traceFilterChain, &fEndFraction );
+	IEnginePortalClient *pPortal = (IEnginePortalClient*)UTIL_Portal_TraceRay_Beam( rayBeam, MASK_SHOT, &traceFilterChain, &fEndFraction );
 
 	// Get the point that we hit a portal or wall
 	Vector vEndPoint = rayBeam.m_Start + rayBeam.m_Delta * fEndFraction;
@@ -2209,7 +2209,7 @@ void CViewRenderBeams::DrawBeam( C_Beam* pbeam, ITraceFilter *pEntityBeamTraceFi
 				pbeam->PointsInit( vTransformedStart, vTransformedEnd );
 			if ( bIsReversed )
 				pbeam->SetEndWidth( pbeam->GetWidth() );
-			pbeam->SetStartEntity( pPortal->m_hLinkedPortal );
+			pbeam->SetStartEntity( pPortal->GetLinkedPortal()->AsEngineObject()->GetOuter() );
 
 			// Draw the sub beam
 			bBeamDrawingThroughPortal = true;

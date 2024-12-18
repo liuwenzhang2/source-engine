@@ -107,7 +107,7 @@ void CWeaponPortalgun::Activate()
 
 	if ( pPlayer )
 	{
-		CBaseEntity *pHeldObject = GetPlayerHeldEntity( pPlayer );
+		CBaseEntity *pHeldObject = pPlayer->GetPlayerHeldEntity();
 		OpenProngs( ( pHeldObject ) ? ( false ) : ( true ) );
 		OpenProngs( ( pHeldObject ) ? ( true ) : ( false ) );
 
@@ -340,7 +340,7 @@ float CWeaponPortalgun::TraceFirePortal( bool bPortal2, const Vector &vTraceStar
 
 	float fMustBeCloserThan = 2.0f;
 
-	CProp_Portal *pNearPortal = UTIL_Portal_FirstAlongRay( rayEyeArea, fMustBeCloserThan );
+	IEnginePortal *pNearPortal = UTIL_Portal_FirstAlongRay( rayEyeArea, fMustBeCloserThan );
 
 	if ( !pNearPortal )
 	{
@@ -357,7 +357,7 @@ float CWeaponPortalgun::TraceFirePortal( bool bPortal2, const Vector &vTraceStar
 		iPlacedBy = PORTAL_PLACED_BY_PEDESTAL;
 
 		Vector vPortalForward;
-		pNearPortal->GetVectors( &vPortalForward, 0, 0 );
+		pNearPortal->AsEngineObject()->GetVectors( &vPortalForward, 0, 0 );
 
 		if ( vDirection.Dot( vPortalForward ) < 0.01f )
 		{
@@ -366,9 +366,9 @@ float CWeaponPortalgun::TraceFirePortal( bool bPortal2, const Vector &vTraceStar
 			{
 				CProp_Portal *pPortal = CProp_Portal::FindPortal( m_iPortalLinkageGroupID, bPortal2, true );
 
-				pPortal->m_iDelayedFailure = ( ( pNearPortal->m_bIsPortal2 ) ? ( PORTAL_FIZZLE_NEAR_RED ) : ( PORTAL_FIZZLE_NEAR_BLUE ) );
+				pPortal->m_iDelayedFailure = ( ( pNearPortal->IsPortal2() ) ? ( PORTAL_FIZZLE_NEAR_RED ) : ( PORTAL_FIZZLE_NEAR_BLUE ) );
 				VectorAngles( vPortalForward, pPortal->m_qDelayedAngles );
-				pPortal->m_vDelayedPosition = pNearPortal->GetEngineObject()->GetAbsOrigin();
+				pPortal->m_vDelayedPosition = pNearPortal->AsEngineObject()->GetAbsOrigin();
 
 				vFinalPosition = pPortal->m_vDelayedPosition;
 				qFinalAngles = pPortal->m_qDelayedAngles;
@@ -499,7 +499,8 @@ float CWeaponPortalgun::TraceFirePortal( bool bPortal2, const Vector &vTraceStar
 	VectorAngles( tr.plane.normal, vUp, qFinalAngles );
 
 	vFinalPosition = tr.endpos;
-	return VerifyPortalPlacement( CProp_Portal::FindPortal( m_iPortalLinkageGroupID, bPortal2 ), vFinalPosition, qFinalAngles, iPlacedBy, bTest );
+	CProp_Portal* pPortal = CProp_Portal::FindPortal(m_iPortalLinkageGroupID, bPortal2);
+	return VerifyPortalPlacement(pPortal ? pPortal->pCollisionEntity->GetEnginePortal() : NULL, vFinalPosition, qFinalAngles, iPlacedBy, bTest);
 }
 
 float CWeaponPortalgun::FirePortal( bool bPortal2, Vector *pVector /*= 0*/, bool bTest /*= false*/ )
@@ -625,7 +626,7 @@ float CWeaponPortalgun::FirePortal( bool bPortal2, Vector *pVector /*= 0*/, bool
 
 		QAngle qFireAngles;
 		VectorAngles( vDirection, qFireAngles );
-		DoEffectBlast( pPortal->m_bIsPortal2, ePlacedBy, vTracerOrigin, vFinalPosition, qFireAngles, fDelay );
+		DoEffectBlast( pPortal->pCollisionEntity->GetEnginePortal()->IsPortal2(), ePlacedBy, vTracerOrigin, vFinalPosition, qFireAngles, fDelay);
 
 		pPortal->SetContextThink( &CProp_Portal::DelayedPlacementThink, gpGlobals->curtime + fDelay, s_pDelayedPlacementContext ); 
 		pPortal->m_vDelayedPosition = vFinalPosition;

@@ -16,6 +16,7 @@
 
 #define DEFINE_SIMTIMER( type, name ) 	DEFINE_EMBEDDED( type, name )
 
+extern IUniformRandomStream* random;
 //-----------------------------------------------------------------------------
 
 class CSimpleSimTimer

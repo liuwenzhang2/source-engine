@@ -162,8 +162,6 @@ SendPropAngle( SENDINFO_VECTORELEM(m_angEyeAngles, 1), 11, SPROP_CHANGES_OFTEN )
 SendPropEHandle( SENDINFO( m_hRagdoll ) ),
 SendPropInt( SENDINFO( m_iSpawnInterpCounter), 4 ),
 SendPropInt( SENDINFO( m_iPlayerSoundType), 3 ),
-SendPropBool( SENDINFO( m_bHeldObjectOnOppositeSideOfPortal) ),
-SendPropEHandle( SENDINFO( m_pHeldObjectPortal ) ),
 SendPropBool( SENDINFO( m_bPitchReorientation ) ),
 SendPropEHandle( SENDINFO( m_hSurroundingLiquidPortal ) ),
 SendPropBool( SENDINFO( m_bSuppressingCrosshair ) ),
@@ -175,8 +173,6 @@ BEGIN_DATADESC( CPortal_Player )
 
 	DEFINE_SOUNDPATCH( m_pWooshSound ),
 
-	DEFINE_FIELD( m_bHeldObjectOnOppositeSideOfPortal, FIELD_BOOLEAN ),
-	DEFINE_FIELD( m_pHeldObjectPortal, FIELD_EHANDLE ),
 	DEFINE_FIELD( m_bIntersectingPortalPlane, FIELD_BOOLEAN ),
 	DEFINE_FIELD( m_bStuckOnPortalCollisionObject, FIELD_BOOLEAN ),
 	DEFINE_FIELD( m_fTimeLastHurt, FIELD_TIME ),
@@ -192,7 +188,6 @@ BEGIN_DATADESC( CPortal_Player )
 	DEFINE_FIELD( m_iszExpressionScene, FIELD_STRING ),
 	DEFINE_FIELD( m_hExpressionSceneEnt, FIELD_EHANDLE ),
 	DEFINE_FIELD( m_vecTotalBulletForce, FIELD_VECTOR ),
-	DEFINE_FIELD( m_bSilentDropAndPickup, FIELD_BOOLEAN ),
 	DEFINE_FIELD( m_hRagdoll, FIELD_EHANDLE ),
 	DEFINE_FIELD( m_angEyeAngles, FIELD_VECTOR ),
 	DEFINE_FIELD( m_iPlayerSoundType, FIELD_INTEGER ),
@@ -249,14 +244,11 @@ CPortal_Player::CPortal_Player()
 
 	m_iSpawnInterpCounter = 0;
 
-	m_bHeldObjectOnOppositeSideOfPortal = false;
-	m_pHeldObjectPortal = 0;
 
 	m_bIntersectingPortalPlane = false;
 
 	m_bPitchReorientation = false;
 
-	m_bSilentDropAndPickup = false;
 
 	m_iszExpressionScene = NULL_STRING;
 	m_hExpressionSceneEnt = NULL;
@@ -448,7 +440,7 @@ void CPortal_Player::NotifySystemEvent(CBaseEntity *pNotify, notify_system_event
 		if ( event )
 		{
 			event->SetInt( "userid", GetUserID() );
-			event->SetBool( "portal2", pEnteredPortal->m_bIsPortal2 );
+			event->SetBool( "portal2", pEnteredPortal->pCollisionEntity->GetEnginePortal()->IsPortal2() );
 			gameeventmanager->FireEvent( event );
 		}
 	}
@@ -667,7 +659,7 @@ void CPortal_Player::PostThink( void )
 	// Try to fix the player if they're stuck
 	if ( m_bStuckOnPortalCollisionObject )
 	{
-		Vector vForward = ((CProp_Portal*)GetPortalEnvironment())->m_vPrevForward;
+		Vector vForward = GetPortalEnvironment()->m_vPrevForward;
 		Vector vNewPos = GetEngineObject()->GetAbsOrigin() + vForward * gpGlobals->frametime * -1000.0f;
 		Teleport( &vNewPos, NULL, &vForward );
 		m_bStuckOnPortalCollisionObject = false;
@@ -770,7 +762,7 @@ void CPortal_Player::PlayerDeathThink(void)
 void CPortal_Player::UpdatePortalPlaneSounds( void )
 {
 	CProp_Portal *pPortal = GetPortalEnvironment();
-	if ( pPortal && pPortal->m_bActivated)
+	if ( pPortal && pPortal->pCollisionEntity->GetEnginePortal()->IsActivated())
 	{
 		Vector vVelocity;
 		GetVelocity( &vVelocity, NULL );
@@ -787,7 +779,7 @@ void CPortal_Player::UpdatePortalPlaneSounds( void )
 			{
 				vDiagonal *= 0.25f;
 
-				if ( UTIL_IsBoxIntersectingPortal( vEarCenter, vDiagonal, pPortal ) )
+				if ( UTIL_IsBoxIntersectingPortal( vEarCenter, vDiagonal, pPortal->pCollisionEntity->GetEnginePortal() ) )
 				{
 					m_bIntersectingPortalPlane = true;
 
@@ -807,7 +799,7 @@ void CPortal_Player::UpdatePortalPlaneSounds( void )
 			{
 				vDiagonal *= 0.30f;
 
-				if ( !UTIL_IsBoxIntersectingPortal( vEarCenter, vDiagonal, pPortal ) )
+				if ( !UTIL_IsBoxIntersectingPortal( vEarCenter, vDiagonal, pPortal->pCollisionEntity->GetEnginePortal() ) )
 				{
 					m_bIntersectingPortalPlane = false;
 
@@ -1106,7 +1098,7 @@ bool CPortal_Player::BumpWeapon( CBaseCombatWeapon *pWeapon )
 	// If we're holding and object before picking up portalgun, drop it
 	if ( pPickupPortalgun )
 	{
-		ForceDropOfCarriedPhysObjects( GetPlayerHeldEntity( this ) );
+		ForceDropOfCarriedPhysObjects(this->GetPlayerHeldEntity() );
 	}
 
 	return true;
@@ -1268,14 +1260,14 @@ void CPortal_Player::VPhysicsShadowUpdate( IPhysicsObject *pPhysics )
 
 			CTraceFilterSimple OriginalTraceFilter( this, COLLISION_GROUP_PLAYER_MOVEMENT );
 			CTraceFilterTranslateClones traceFilter( &OriginalTraceFilter );
-			UTIL_Portal_TraceRay_With(GetPortalEnvironment(), ray, MASK_PLAYERSOLID, &traceFilter, &trace);
+			UTIL_Portal_TraceRay_With(GetPortalEnvironment() ? GetPortalEnvironment()->pCollisionEntity->GetEnginePortal() : NULL, ray, MASK_PLAYERSOLID, & traceFilter, & trace);
 
 			// current position is not ok, fixup
 			if ( trace.allsolid || trace.startsolid )
 			{
 				//try again with new position
 				ray.Init( newPosition, newPosition, GetEngineObject()->WorldAlignMins(), GetEngineObject()->WorldAlignMaxs() );
-				UTIL_Portal_TraceRay_With(GetPortalEnvironment(), ray, MASK_PLAYERSOLID, &traceFilter, &trace );
+				UTIL_Portal_TraceRay_With(GetPortalEnvironment() ? GetPortalEnvironment()->pCollisionEntity->GetEnginePortal() : NULL, ray, MASK_PLAYERSOLID, &traceFilter, &trace);
 
 				if( trace.startsolid == false )
 				{
@@ -1497,7 +1489,7 @@ void CPortal_Player::PlayerUse( void )
 	// Found an object
 	if ( pUseEntity )
 	{
-		SetHeldObjectOnOppositeSideOfPortal( false );
+		GetEnginePlayer()->SetHeldObjectOnOppositeSideOfPortal( false );
 
 		// TODO: Removed because we no longer have ghost animatings. May need to rework this code.
 		//// If we found a ghost animating then it needs to be held across a portal
@@ -1531,17 +1523,17 @@ void CPortal_Player::PlayerUse( void )
 
 		float fMustBeCloserThan = 2.0f;
 
-		CProp_Portal *pPortal = UTIL_Portal_FirstAlongRay( rayPortalTest, fMustBeCloserThan );
+		IEnginePortalServer *pPortal = (IEnginePortalServer*)UTIL_Portal_FirstAlongRay( rayPortalTest, fMustBeCloserThan );
 
 		if ( pPortal )
 		{
-			SetHeldObjectPortal( pPortal );
+			GetEnginePlayer()->SetHeldObjectPortal( pPortal );
 			pUseEntity = FindUseEntityThroughPortal();
 		}
 
 		if ( pUseEntity )
 		{
-			SetHeldObjectOnOppositeSideOfPortal( true );
+			GetEnginePlayer()->SetHeldObjectOnOppositeSideOfPortal( true );
 			usedSomething = UseFoundEntity( pUseEntity );
 		}
 		else if ( m_afButtonPressed & IN_USE )
@@ -1759,7 +1751,7 @@ void CPortal_Player::Event_Killed( const CTakeDamageInfo &info )
 	{
 		CProp_Portal *pTempPortal = pPortals[i];
 
-		if( pTempPortal && pTempPortal->m_bActivated )
+		if( pTempPortal && pTempPortal->pCollisionEntity->GetEnginePortal()->IsActivated() )
 		{
 			pTempPortal->Fizzle();
 		}
@@ -1978,7 +1970,7 @@ void CPortal_Player::PickupObject(CBaseEntity *pObject, bool bLimitMassAndSize )
 
 void CPortal_Player::ForceDropOfCarriedPhysObjects( CBaseEntity *pOnlyIfHoldingThis )
 {
-	m_bHeldObjectOnOppositeSideOfPortal = false;
+	GetEnginePlayer()->SetHeldObjectOnOppositeSideOfPortal(false);
 	BaseClass::ForceDropOfCarriedPhysObjects( pOnlyIfHoldingThis );
 }
 
@@ -2059,15 +2051,15 @@ void CPortal_Player::UpdatePortalViewAreaBits( unsigned char *pvs, int pvssize )
 	// setup area bits for these portals
 	for ( int i = 0; i < iPortalCount; ++i )
 	{
-		CProp_Portal* pLocalPortal = pPortals[ i ];
+		IEnginePortalServer* pLocalPortal = pPortals[ i ]->pCollisionEntity->GetEnginePortal();
 		// Make sure this portal is active before adding it's location to the pvs
-		if ( pLocalPortal && pLocalPortal->m_bActivated )
+		if ( pLocalPortal && pLocalPortal->IsActivated() )
 		{
-			CProp_Portal* pRemotePortal = pLocalPortal->GetLinkedPortal();
+			const IEnginePortalServer* pRemotePortal = pLocalPortal->GetLinkedPortal();
 
 			// Make sure this portal's linked portal is in the PVS before we add what it can see
-			if ( pRemotePortal && pRemotePortal->m_bActivated && pRemotePortal->NetworkProp() && 
-				pRemotePortal->GetEngineObject()->IsInPVS( this, pvs, pvssize ) )
+			if ( pRemotePortal && pRemotePortal->IsActivated() &&//&& pRemotePortal->NetworkProp() 
+				((IEngineObjectServer*)pRemotePortal->AsEngineObject())->IsInPVS( this, pvs, pvssize ) )
 			{
 				portalArea[ i ] = engine->GetArea( pPortals[ i ]->GetEngineObject()->GetAbsOrigin() );
 
@@ -2101,7 +2093,7 @@ void CPortal_Player::UpdatePortalViewAreaBits( unsigned char *pvs, int pvssize )
 // Subroutine to wrap the adding of portal corners to the PVS which is called once for the setup of each portal.
 // input - pPortal: the portal we are viewing 'out of' which needs it's corners added to the PVS
 //////////////////////////////////////////////////////////////////////////
-void AddPortalCornersToEnginePVS( CProp_Portal* pPortal )
+void AddPortalCornersToEnginePVS(IEnginePortalServer* pPortal )
 {
 	Assert ( pPortal );
 
@@ -2109,10 +2101,10 @@ void AddPortalCornersToEnginePVS( CProp_Portal* pPortal )
 		return;
 
 	Vector vForward, vRight, vUp;
-	pPortal->GetVectors( &vForward, &vRight, &vUp );
+	pPortal->AsEngineObject()->GetVectors( &vForward, &vRight, &vUp );
 
 	// Center of the remote portal
-	Vector ptOrigin			= pPortal->GetEngineObject()->GetAbsOrigin();
+	Vector ptOrigin			= pPortal->AsEngineObject()->GetAbsOrigin();
 
 	// Distance offsets to the different edges of the portal... Used in the placement checks
 	Vector vToTopEdge = vUp * ( PORTAL_HALF_HEIGHT - PORTAL_BUMP_FORGIVENESS );
@@ -2140,15 +2132,15 @@ void PortalSetupVisibility( CBaseEntity *pPlayer, int area, unsigned char *pvs, 
 	CProp_Portal **pPortals = CProp_Portal_Shared::AllPortals.Base();
 	for( int i = 0; i != iPortalCount; ++i )
 	{
-		CProp_Portal *pPortal = pPortals[i];
+		IEnginePortalServer *pPortal = pPortals[i]->pCollisionEntity->GetEnginePortal();
 
-		if ( pPortal && pPortal->m_bActivated )
+		if ( pPortal && pPortal->IsActivated() )
 		{
-			if ( pPortal->GetEngineObject()->IsInPVS( pPlayer, pvs, pvssize ) )
+			if ( pPortal->AsEngineObject()->IsInPVS( pPlayer, pvs, pvssize ) )
 			{
-				if ( engine->CheckAreasConnected( area, pPortal->GetEngineObject()->AreaNum() ) )
+				if ( engine->CheckAreasConnected( area, pPortal->AsEngineObject()->AreaNum() ) )
 				{
-					CProp_Portal *pLinkedPortal = static_cast<CProp_Portal*>( pPortal->m_hLinkedPortal.Get() );
+					IEnginePortalServer *pLinkedPortal = pPortal->GetLinkedPortal();
 					if ( pLinkedPortal )
 					{
 						AddPortalCornersToEnginePVS ( pLinkedPortal );
@@ -2174,7 +2166,7 @@ void CPortal_Player::SetupVisibility( CBaseEntity *pViewEntity, unsigned char *p
 		pPortal = GetPortalEnvironment();
 		pRemotePortal = pPortal->GetLinkedPortal();
 
-		if ( pPortal && pRemotePortal && pPortal->m_bActivated && pRemotePortal->m_bActivated )
+		if ( pPortal && pRemotePortal && pPortal->pCollisionEntity->GetEnginePortal()->IsActivated() && pRemotePortal->pCollisionEntity->GetEnginePortal()->IsActivated())
 		{		
 			Vector ptPortalCenter = pPortal->GetEngineObject()->GetAbsOrigin();
 			Vector vPortalForward;

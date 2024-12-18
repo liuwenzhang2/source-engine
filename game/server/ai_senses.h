@@ -75,7 +75,7 @@ public:
 	bool			ShouldSeeEntity( CBaseEntity *pEntity ); // logical query
 	bool			CanSeeEntity( CBaseEntity *pSightEnt ); // more expensive cone & raycast test
 #ifdef PORTAL
-	bool			CanSeeEntityThroughPortal( const CProp_Portal *pPortal, CBaseEntity *pSightEnt ); // more expensive cone & raycast test
+	bool			CanSeeEntityThroughPortal( const IEnginePortalServer *pPortal, CBaseEntity *pSightEnt ); // more expensive cone & raycast test
 #endif
 	
 	bool			DidSeeEntity( CBaseEntity *pSightEnt ) const; //  a less expensive query that looks at cached results from recent conditionsa gathering
@@ -112,7 +112,7 @@ private:
 	
 	bool 			Look( CBaseEntity *pSightEnt );
 #ifdef PORTAL
-	bool 			LookThroughPortal( const CProp_Portal *pPortal, CBaseEntity *pSightEnt );
+	bool 			LookThroughPortal( const IEnginePortalServer *pPortal, CBaseEntity *pSightEnt );
 #endif
 
 	int 			LookForHighPriorityEntities( int iDistance );

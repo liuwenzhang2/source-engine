@@ -1076,11 +1076,11 @@ static bool AdvisorCanPickObject(CBasePlayer *pPlayer, CBaseEntity *pEnt)
 	Assert( pPlayer != NULL );
 
 	// Is the player carrying something?
-	CBaseEntity *pHeldObject = GetPlayerHeldEntity(pPlayer);
+	CBaseEntity *pHeldObject = pPlayer->GetPlayerHeldEntity();
 
 	if( !pHeldObject )
 	{
-		pHeldObject = PhysCannonGetHeldEntity( pPlayer->GetActiveWeapon() );
+		pHeldObject = pPlayer->GetActiveWeapon() ? pPlayer->GetActiveWeapon()->PhysCannonGetHeldEntity() : NULL;
 	}
 
 	if( pHeldObject == pEnt )

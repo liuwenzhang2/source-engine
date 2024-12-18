@@ -141,8 +141,8 @@ class CSound;
 // headers contain these headers.
 #include "precache_register.h"
 #include "baseanimating.h"
-#include "basecombatweapon.h"
-#include "basecombatcharacter.h"
+//#include "basecombatweapon.h"
+//#include "basecombatcharacter.h"
 #include "gamerules.h"
 #include "entitylist.h"
 #include "basetempentity.h"

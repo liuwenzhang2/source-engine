@@ -83,7 +83,7 @@ bool IsPassThroughMaterial( const csurface_t &surface )
 }
 
 
-void TracePortals( const CProp_Portal *pIgnorePortal, const Vector &vForward, const Vector &vStart, const Vector &vEnd, trace_t &tr )
+void TracePortals( const IEnginePortalServer *pIgnorePortal, const Vector &vForward, const Vector &vStart, const Vector &vEnd, trace_t &tr )
 {
 	UTIL_ClearTrace( tr );
 
@@ -98,11 +98,11 @@ void TracePortals( const CProp_Portal *pIgnorePortal, const Vector &vForward, co
 		CProp_Portal **pPortals = CProp_Portal_Shared::AllPortals.Base();
 		for( int i = 0; i != iPortalCount; ++i )
 		{
-			CProp_Portal *pTempPortal = pPortals[i];
-			if( pTempPortal != pIgnorePortal && pTempPortal->m_bActivated )
+			IEnginePortalServer *pTempPortal = pPortals[i]->pCollisionEntity->GetEnginePortal();
+			if( pTempPortal != pIgnorePortal && pTempPortal->IsActivated() )
 			{
-				Vector vOtherOrigin = pTempPortal->GetEngineObject()->GetAbsOrigin();
-				QAngle qOtherAngles = pTempPortal->GetEngineObject()->GetAbsAngles();
+				Vector vOtherOrigin = pTempPortal->AsEngineObject()->GetAbsOrigin();
+				QAngle qOtherAngles = pTempPortal->AsEngineObject()->GetAbsAngles();
 
 				Vector vLinkedForward;
 				AngleVectors( qOtherAngles, &vLinkedForward, NULL, NULL );
@@ -197,7 +197,7 @@ bool TraceBumpingEntities( const Vector &vStart, const Vector &vEnd, trace_t &tr
 	return bClosestIsSoftBumper;
 }
 
-bool TracePortalCorner( const CProp_Portal *pIgnorePortal, const Vector &vOrigin, const Vector &vCorner, const Vector &vForward, int iPlacedBy, ITraceFilter *pTraceFilterPortalShot, trace_t &tr, bool &bSoftBump )
+bool TracePortalCorner( const IEnginePortalServer *pIgnorePortal, const Vector &vOrigin, const Vector &vCorner, const Vector &vForward, int iPlacedBy, ITraceFilter *pTraceFilterPortalShot, trace_t &tr, bool &bSoftBump )
 {
 	Vector vOriginToCorner = vCorner - vOrigin;
 
@@ -399,7 +399,7 @@ Vector FindBumpVectorInCorner( const Vector &ptCorner1, const Vector &ptCorner2,
 }
 
 
-bool FitPortalOnSurface( const CProp_Portal *pIgnorePortal, Vector &vOrigin, const Vector &vForward, const Vector &vRight, 
+bool FitPortalOnSurface( const IEnginePortalServer *pIgnorePortal, Vector &vOrigin, const Vector &vForward, const Vector &vRight, 
 						 const Vector &vTopEdge, const Vector &vBottomEdge, const Vector &vRightEdge, const Vector &vLeftEdge, 
 						 int iPlacedBy, ITraceFilter *pTraceFilterPortalShot, 
 						 int iRecursions /*= 0*/, const CPortalCornerFitData *pPortalCornerFitData /*= 0*/, const int *p_piIntersectionIndex /*= 0*/, const int *piIntersectionCount /*= 0*/ )
@@ -925,7 +925,7 @@ bool FitPortalOnSurface( const CProp_Portal *pIgnorePortal, Vector &vOrigin, con
 	return true;
 }
 
-void FitPortalAroundOtherPortals( const CProp_Portal *pIgnorePortal, Vector &vOrigin, const Vector &vForward, const Vector &vRight, const Vector &vUp )
+void FitPortalAroundOtherPortals( const IEnginePortalServer *pIgnorePortal, Vector &vOrigin, const Vector &vForward, const Vector &vRight, const Vector &vUp )
 {
 	int iPortalCount = CProp_Portal_Shared::AllPortals.Count();
 	if( iPortalCount != 0 )
@@ -933,11 +933,11 @@ void FitPortalAroundOtherPortals( const CProp_Portal *pIgnorePortal, Vector &vOr
 		CProp_Portal **pPortals = CProp_Portal_Shared::AllPortals.Base();
 		for( int i = 0; i != iPortalCount; ++i )
 		{
-			CProp_Portal *pTempPortal = pPortals[i];
-			if( pTempPortal != pIgnorePortal && pTempPortal->m_bActivated )
+			IEnginePortalServer *pTempPortal = pPortals[i]->pCollisionEntity->GetEnginePortal();
+			if( pTempPortal != pIgnorePortal && pTempPortal->IsActivated() )
 			{
-				Vector vOtherOrigin = pTempPortal->GetEngineObject()->GetAbsOrigin();
-				QAngle qOtherAngles = pTempPortal->GetEngineObject()->GetAbsAngles();
+				Vector vOtherOrigin = pTempPortal->AsEngineObject()->GetAbsOrigin();
+				QAngle qOtherAngles = pTempPortal->AsEngineObject()->GetAbsAngles();
 
 				Vector vLinkedForward;
 				AngleVectors( qOtherAngles, &vLinkedForward, NULL, NULL );
@@ -946,7 +946,7 @@ void FitPortalAroundOtherPortals( const CProp_Portal *pIgnorePortal, Vector &vOr
 				if ( vForward.Dot( vLinkedForward ) < 0.95f )
 					continue;
 
-				Vector vDiff = vOrigin - pTempPortal->GetEngineObject()->GetLocalOrigin();
+				Vector vDiff = vOrigin - pTempPortal->AsEngineObject()->GetLocalOrigin();
 
 				Vector vDiffProjRight = vDiff.Dot( vRight ) * vRight;
 				Vector vDiffProjUp = vDiff.Dot( vUp ) * vUp;
@@ -1009,7 +1009,7 @@ bool IsPortalIntersectingNoPortalVolume( const Vector &vOrigin, const QAngle &qA
 	return false;
 }
 
-bool IsPortalOverlappingOtherPortals( const CProp_Portal *pIgnorePortal, const Vector &vOrigin, const QAngle &qAngles, bool bFizzle /*= false*/ )
+bool IsPortalOverlappingOtherPortals( const IEnginePortalServer *pIgnorePortal, const Vector &vOrigin, const QAngle &qAngles, bool bFizzle /*= false*/ )
 {
 	bool bOverlappedOtherPortal = false;
 
@@ -1026,7 +1026,7 @@ bool IsPortalOverlappingOtherPortals( const CProp_Portal *pIgnorePortal, const V
 		for( int i = 0; i != iPortalCount; ++i )
 		{
 			CProp_Portal *pTempPortal = pPortals[i];
-			if( pTempPortal != pIgnorePortal && pTempPortal->m_bActivated )
+			if( pTempPortal->pCollisionEntity->GetEnginePortal() != pIgnorePortal && pTempPortal->pCollisionEntity->GetEnginePortal()->IsActivated() )
 			{
 				Vector vOtherOrigin = pTempPortal->GetEngineObject()->GetAbsOrigin();
 				QAngle qOtherAngles = pTempPortal->GetEngineObject()->GetAbsAngles();
@@ -1044,7 +1044,7 @@ bool IsPortalOverlappingOtherPortals( const CProp_Portal *pIgnorePortal, const V
 					if ( sv_portal_placement_debug.GetBool() )
 					{
 						UTIL_Portal_NDebugOverlay( vOrigin, qAngles, 0, 0, 255, 128, false, 0.5f );
-						UTIL_Portal_NDebugOverlay( pTempPortal, 255, 0, 0, 128, false, 0.5f );
+						UTIL_Portal_NDebugOverlay( pTempPortal->pCollisionEntity->GetEnginePortal(), 255, 0, 0, 128, false, 0.5f);
 
 						DevMsg( "Portal overlapped another portal.\n" );
 					}
@@ -1155,7 +1155,7 @@ bool IsPortalOnValidSurface( const Vector &vOrigin, const Vector &vForward, cons
 	return true;
 }
 
-float VerifyPortalPlacement( const CProp_Portal *pIgnorePortal, Vector &vOrigin, QAngle &qAngles, int iPlacedBy, bool bTest /*= false*/ )
+float VerifyPortalPlacement( const IEnginePortalServer *pIgnorePortal, Vector &vOrigin, QAngle &qAngles, int iPlacedBy, bool bTest /*= false*/ )
 {
 	Vector vOriginalOrigin = vOrigin;
 
@@ -1167,7 +1167,7 @@ float VerifyPortalPlacement( const CProp_Portal *pIgnorePortal, Vector &vOrigin,
 	VectorNormalize( vUp );
 
 	trace_t tr;
-	CTraceFilterSimpleClassnameList baseFilter( pIgnorePortal, COLLISION_GROUP_NONE );
+	CTraceFilterSimpleClassnameList baseFilter(pIgnorePortal ? pIgnorePortal->AsEngineObject()->GetHandleEntity() : NULL, COLLISION_GROUP_NONE);
 	UTIL_Portal_Trace_Filter( &baseFilter );
 	baseFilter.AddClassnameToIgnore( "prop_portal" );
 	CTraceFilterTranslateClones traceFilterPortalShot( &baseFilter );

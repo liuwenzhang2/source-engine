@@ -1065,7 +1065,7 @@ void CBaseEntity::FireBullets( const FireBulletsInfo_t &info )
 		vecEnd = info.m_vecSrc + vecDir * info.m_flDistance;
 
 #ifdef PORTAL
-		CProp_Portal *pShootThroughPortal = NULL;
+		IEnginePortal *pShootThroughPortal = NULL;
 		float fPortalFraction = 2.0f;
 #endif
 
@@ -1077,7 +1077,7 @@ void CBaseEntity::FireBullets( const FireBulletsInfo_t &info )
 			Ray_t rayBullet;
 			rayBullet.Init( info.m_vecSrc, vecEnd );
 			pShootThroughPortal = UTIL_Portal_FirstAlongRay( rayBullet, fPortalFraction );
-			if ( !UTIL_Portal_TraceRay_Bullets( pShootThroughPortal, rayBullet, MASK_SHOT, &traceFilter, &tr ) )
+			if (!UTIL_Portal_TraceRay_Bullets(pShootThroughPortal, rayBullet, MASK_SHOT, &traceFilter, &tr))
 			{
 				pShootThroughPortal = NULL;
 			}
@@ -1091,7 +1091,7 @@ void CBaseEntity::FireBullets( const FireBulletsInfo_t &info )
 			Ray_t rayBullet;
 			rayBullet.Init( info.m_vecSrc, vecEnd );
 			pShootThroughPortal = UTIL_Portal_FirstAlongRay( rayBullet, fPortalFraction );
-			if ( !UTIL_Portal_TraceRay_Bullets( pShootThroughPortal, rayBullet, MASK_SHOT, &traceFilter, &tr ) )
+			if (!UTIL_Portal_TraceRay_Bullets(pShootThroughPortal, rayBullet, MASK_SHOT, &traceFilter, &tr))
 			{
 				pShootThroughPortal = NULL;
 			}

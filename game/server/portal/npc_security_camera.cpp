@@ -663,7 +663,7 @@ void CNPC_SecurityCamera::ActiveThink( void )
 	Vector	vecDirToEnemy = vecMidEnemy - vecMid;	
 	float	flDistToEnemy = VectorNormalize( vecDirToEnemy );
 
-	CProp_Portal *pPortal = NULL;
+	IEnginePortalServer *pPortal = NULL;
 
 	if ( pEnemy->IsAlive() )
 	{
@@ -673,7 +673,7 @@ void CNPC_SecurityCamera::ActiveThink( void )
 		{
 			// Translate our target across the portal
 			Vector vecMidEnemyTransformed;
-			UTIL_Portal_PointTransform( pPortal->m_hLinkedPortal->MatrixThisToLinked(), vecMidEnemy, vecMidEnemyTransformed );
+			UTIL_Portal_PointTransform( pPortal->GetLinkedPortal()->MatrixThisToLinked(), vecMidEnemy, vecMidEnemyTransformed);
 
 			//Calculate dir and dist to enemy
 			Vector	vecDirToEnemyTransformed = vecMidEnemyTransformed - vecMid;	
@@ -715,7 +715,7 @@ void CNPC_SecurityCamera::ActiveThink( void )
 
 	if ( pPortal )
 	{
-		UTIL_Portal_PointTransform( pPortal->m_hLinkedPortal->MatrixThisToLinked(), vEnemyEyes, vEnemyEyes );
+		UTIL_Portal_PointTransform( pPortal->GetLinkedPortal()->MatrixThisToLinked(), vEnemyEyes, vEnemyEyes);
 	}
 
 	Vector	vecDirToEnemyEyes = ( vEnemyEyes + m_vNoisePos ) - vecMid;
@@ -819,7 +819,7 @@ void CNPC_SecurityCamera::SearchThink( void )
 				}
 				else
 				{
-					CProp_Portal *pPortal = FInViewConeThroughPortal( pPlayer );
+					IEnginePortalServer *pPortal = FInViewConeThroughPortal( pPlayer );
 					if ( pPortal && FVisibleThroughPortal( pPortal, pPlayer ) )
 					{
 						pEnemy = pPlayer;

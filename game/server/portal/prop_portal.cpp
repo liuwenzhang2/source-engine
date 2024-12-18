@@ -54,11 +54,10 @@ static CUtlVector<CProp_Portal *> s_PortalLinkageGroups[256];
 
 BEGIN_DATADESC( CProp_Portal )
 	//saving
+	DEFINE_FIELD(pCollisionEntity, FIELD_EHANDLE),
 	DEFINE_FIELD( m_hLinkedPortal,		FIELD_EHANDLE ),
 	DEFINE_KEYFIELD( m_iLinkageGroupID,	FIELD_CHARACTER,	"LinkageGroupID" ),
 	//DEFINE_FIELD( m_matrixThisToLinked, FIELD_VMATRIX ),
-	DEFINE_KEYFIELD( m_bActivated,		FIELD_BOOLEAN,		"Activated" ),
-	DEFINE_KEYFIELD( m_bIsPortal2,		FIELD_BOOLEAN,		"PortalTwo" ),
 	DEFINE_FIELD( m_vPrevForward,		FIELD_VECTOR ),
 	DEFINE_FIELD( m_hMicrophone,		FIELD_EHANDLE ),
 	DEFINE_FIELD( m_hSpeaker,			FIELD_EHANDLE ),
@@ -77,7 +76,6 @@ BEGIN_DATADESC( CProp_Portal )
 	// DEFINE_FIELD( m_pCollisionShape, CPhysCollide ),
 	
 	DEFINE_FIELD( m_bSharedEnvironmentConfiguration, FIELD_BOOLEAN ),
-	DEFINE_ARRAY( m_vPortalCorners, FIELD_POSITION_VECTOR, 4 ),
 
 	// Function Pointers
 	DEFINE_THINKFUNC( DelayedPlacementThink ),
@@ -110,11 +108,7 @@ CProp_Portal::CProp_Portal( void )
 	//m_hPortalSimulator = (CPortalSimulator*)gEntList.CreateEntityByName("portal_simulator");
 	//SetPortalSimulatorCallbacks( this );//m_hPortalSimulator->
 
-	// Init to something safe
-	for ( int i = 0; i < 4; ++i )
-	{
-		m_vPortalCorners[i] = Vector(0,0,0);
-	}
+
 
 
 	//create the collision shape.... TODO: consider having one shared collideable between all portals
@@ -177,7 +171,7 @@ void CProp_Portal::UpdateOnRemove( void )
 	{
 		DetachFromLinked();//m_hPortalSimulator->
 		m_hLinkedPortal = NULL;
-		m_bActivated = false;
+		pCollisionEntity->GetEnginePortal()->SetActivated(false);
 		pRemote->UpdatePortalLinkage();
 		//pRemote->UpdatePortalTeleportMatrix();
 	}
@@ -262,7 +256,13 @@ void CProp_Portal::StopLoopingSounds()
 void CProp_Portal::Spawn( void )
 {
 	Precache();
-
+	if (!pCollisionEntity) {
+		pCollisionEntity = (CPSCollisionEntity*)gEntList.CreateEntityByName("portalsimulator_collisionentity");
+		Assert(pCollisionEntity != NULL);
+		pCollisionEntity->m_pOwningSimulator = this;
+		pCollisionEntity->GetEnginePortal()->AfterCollisionEntityCreated();
+		DispatchSpawn(pCollisionEntity);
+	}
 	Assert( s_PortalLinkageGroups[m_iLinkageGroupID].Find( this ) == -1 );
 	s_PortalLinkageGroups[m_iLinkageGroupID].AddToTail( this );
 
@@ -280,7 +280,7 @@ void CProp_Portal::Spawn( void )
 	ResetModel();	
 	SetSize( CProp_Portal_Shared::vLocalMins, CProp_Portal_Shared::vLocalMaxs );
 
-	UpdateCorners();
+	pCollisionEntity->GetEnginePortal()->UpdateCorners();
 
 	BaseClass::Spawn();
 
@@ -289,17 +289,17 @@ void CProp_Portal::Spawn( void )
 
 void CProp_Portal::OnRestore()
 {
-	UpdateCorners();
-
+	pCollisionEntity->GetEnginePortal()->UpdateCorners();
+	MoveTo(GetEngineObject()->GetAbsOrigin(),GetEngineObject()->GetAbsAngles());
 	Assert( m_pAttachedCloningArea == NULL );
 	m_pAttachedCloningArea = CPhysicsCloneArea::CreatePhysicsCloneArea( this );
 
 	BaseClass::OnRestore();
 
-	if ( m_bActivated )
+	if ( pCollisionEntity->GetEnginePortal()->IsActivated() )
 	{
-		DispatchParticleEffect( ( ( m_bIsPortal2 ) ? ( "portal_2_particles" ) : ( "portal_1_particles" ) ), PATTACH_POINT_FOLLOW, this, "particles_2", true );
-		DispatchParticleEffect( ( ( m_bIsPortal2 ) ? ( "portal_2_edge" ) : ( "portal_1_edge" ) ), PATTACH_POINT_FOLLOW, this, "particlespin" );
+		DispatchParticleEffect( ( (pCollisionEntity->GetEnginePortal()->IsPortal2()) ? ( "portal_2_particles" ) : ( "portal_1_particles" ) ), PATTACH_POINT_FOLLOW, this, "particles_2", true );
+		DispatchParticleEffect( ( (pCollisionEntity->GetEnginePortal()->IsPortal2()) ? ( "portal_2_edge" ) : ( "portal_1_edge" ) ), PATTACH_POINT_FOLLOW, this, "particlespin" );
 	}
 }
 
@@ -327,7 +327,7 @@ void CProp_Portal::DelayedPlacementThink( void )
 	// Bad surface and near fizzle effects take priority
 	if ( m_iDelayedFailure != PORTAL_FIZZLE_BAD_SURFACE && m_iDelayedFailure != PORTAL_FIZZLE_NEAR_BLUE && m_iDelayedFailure != PORTAL_FIZZLE_NEAR_RED )
 	{
-		if ( IsPortalOverlappingOtherPortals( this, m_vDelayedPosition, m_qDelayedAngles ) )
+		if ( IsPortalOverlappingOtherPortals( this->pCollisionEntity->GetEnginePortal(), m_vDelayedPosition, m_qDelayedAngles))
 		{
 			m_iDelayedFailure = PORTAL_FIZZLE_OVERLAPPED_LINKED;
 		}
@@ -351,7 +351,7 @@ void CProp_Portal::DelayedPlacementThink( void )
 	}
 
 	// Do effects at old location if it was active
-	if ( m_bActivated )
+	if ( pCollisionEntity->GetEnginePortal()->IsActivated() )
 	{
 		DoFizzleEffect( PORTAL_FIZZLE_CLOSE, false );
 	}
@@ -444,7 +444,7 @@ void CProp_Portal::TestRestingSurfaceThink( void )
 
 void CProp_Portal::ResetModel( void )
 {
-	if( !m_bIsPortal2 )
+	if( !pCollisionEntity->GetEnginePortal()->IsPortal2() )
 		SetModel( "models/portals/portal1.mdl" );
 	else
 		SetModel( "models/portals/portal2.mdl" );
@@ -467,7 +467,7 @@ void CProp_Portal::DoFizzleEffect( int iEffect, bool bDelayedPos /*= true*/ )
 	AngleVectors( fxData.m_vAngles, &vForward, &vUp, NULL );
 	fxData.m_vOrigin = m_vAudioOrigin + vForward * 1.0f;
 
-	fxData.m_nColor = ( ( m_bIsPortal2 ) ? ( 1 ) : ( 0 ) );
+	fxData.m_nColor = ( ( pCollisionEntity->GetEnginePortal()->IsPortal2() ) ? ( 1 ) : ( 0 ) );
 
 	EmitSound_t ep;
 	CPASAttenuationFilter filter( m_vDelayedPosition );
@@ -497,7 +497,7 @@ void CProp_Portal::DoFizzleEffect( int iEffect, bool bDelayedPos /*= true*/ )
 			//DispatchEffect( "PortalFizzleCantFit", fxData );
 			//ep.m_pSoundName = "Portal.fizzle_invalid_surface";
 			VectorAngles( vUp, vForward, fxData.m_vAngles );
-			DispatchParticleEffect( ( ( m_bIsPortal2 ) ? ( "portal_2_nofit" ) : ( "portal_1_nofit" ) ), fxData.m_vOrigin, fxData.m_vAngles, this );
+			DispatchParticleEffect( ( ( pCollisionEntity->GetEnginePortal()->IsPortal2() ) ? ( "portal_2_nofit" ) : ( "portal_1_nofit" ) ), fxData.m_vOrigin, fxData.m_vAngles, this );
 			break;
 
 		case PORTAL_FIZZLE_OVERLAPPED_LINKED:
@@ -512,7 +512,7 @@ void CProp_Portal::DoFizzleEffect( int iEffect, bool bDelayedPos /*= true*/ )
 
 			//DispatchEffect( "PortalFizzleOverlappedLinked", fxData );
 			VectorAngles( vUp, vForward, fxData.m_vAngles );
-			DispatchParticleEffect( ( ( m_bIsPortal2 ) ? ( "portal_2_overlap" ) : ( "portal_1_overlap" ) ), fxData.m_vOrigin, fxData.m_vAngles, this );
+			DispatchParticleEffect( ( ( pCollisionEntity->GetEnginePortal()->IsPortal2() ) ? ( "portal_2_overlap" ) : ( "portal_1_overlap" ) ), fxData.m_vOrigin, fxData.m_vAngles, this );
 			ep.m_pSoundName = "Portal.fizzle_invalid_surface";
 			break;
 		}
@@ -520,41 +520,41 @@ void CProp_Portal::DoFizzleEffect( int iEffect, bool bDelayedPos /*= true*/ )
 		case PORTAL_FIZZLE_BAD_VOLUME:
 			//DispatchEffect( "PortalFizzleBadVolume", fxData );
 			VectorAngles( vUp, vForward, fxData.m_vAngles );
-			DispatchParticleEffect( ( ( m_bIsPortal2 ) ? ( "portal_2_badvolume" ) : ( "portal_1_badvolume" ) ), fxData.m_vOrigin, fxData.m_vAngles );
+			DispatchParticleEffect( ( ( pCollisionEntity->GetEnginePortal()->IsPortal2() ) ? ( "portal_2_badvolume" ) : ( "portal_1_badvolume" ) ), fxData.m_vOrigin, fxData.m_vAngles );
 			ep.m_pSoundName = "Portal.fizzle_invalid_surface";
 			break;
 
 		case PORTAL_FIZZLE_BAD_SURFACE:
 			//DispatchEffect( "PortalFizzleBadSurface", fxData );
 			VectorAngles( vUp, vForward, fxData.m_vAngles );
-			DispatchParticleEffect( ( ( m_bIsPortal2 ) ? ( "portal_2_badsurface" ) : ( "portal_1_badsurface" ) ), fxData.m_vOrigin, fxData.m_vAngles );
+			DispatchParticleEffect( ( ( pCollisionEntity->GetEnginePortal()->IsPortal2() ) ? ( "portal_2_badsurface" ) : ( "portal_1_badsurface" ) ), fxData.m_vOrigin, fxData.m_vAngles );
 			ep.m_pSoundName = "Portal.fizzle_invalid_surface";
 			break;
 
 		case PORTAL_FIZZLE_KILLED:
 			//DispatchEffect( "PortalFizzleKilled", fxData );
 			VectorAngles( vUp, vForward, fxData.m_vAngles );
-			DispatchParticleEffect( ( ( m_bIsPortal2 ) ? ( "portal_2_close" ) : ( "portal_1_close" ) ), fxData.m_vOrigin, fxData.m_vAngles );
+			DispatchParticleEffect( ( ( pCollisionEntity->GetEnginePortal()->IsPortal2() ) ? ( "portal_2_close" ) : ( "portal_1_close" ) ), fxData.m_vOrigin, fxData.m_vAngles );
 			ep.m_pSoundName = "Portal.fizzle_moved";
 			break;
 
 		case PORTAL_FIZZLE_CLEANSER:
 			//DispatchEffect( "PortalFizzleCleanser", fxData );
 			VectorAngles( vUp, vForward, fxData.m_vAngles );
-			DispatchParticleEffect( ( ( m_bIsPortal2 ) ? ( "portal_2_cleanser" ) : ( "portal_1_cleanser" ) ), fxData.m_vOrigin, fxData.m_vAngles, this );
+			DispatchParticleEffect( ( ( pCollisionEntity->GetEnginePortal()->IsPortal2() ) ? ( "portal_2_cleanser" ) : ( "portal_1_cleanser" ) ), fxData.m_vOrigin, fxData.m_vAngles, this );
 			ep.m_pSoundName = "Portal.fizzle_invalid_surface";
 			break;
 
 		case PORTAL_FIZZLE_CLOSE:
 			//DispatchEffect( "PortalFizzleKilled", fxData );
 			VectorAngles( vUp, vForward, fxData.m_vAngles );
-			DispatchParticleEffect( ( ( m_bIsPortal2 ) ? ( "portal_2_close" ) : ( "portal_1_close" ) ), fxData.m_vOrigin, fxData.m_vAngles );
-			ep.m_pSoundName = ( ( m_bIsPortal2 ) ? ( "Portal.close_red" ) : ( "Portal.close_blue" ) );
+			DispatchParticleEffect( ( ( pCollisionEntity->GetEnginePortal()->IsPortal2() ) ? ( "portal_2_close" ) : ( "portal_1_close" ) ), fxData.m_vOrigin, fxData.m_vAngles );
+			ep.m_pSoundName = ( ( pCollisionEntity->GetEnginePortal()->IsPortal2() ) ? ( "Portal.close_red" ) : ( "Portal.close_blue" ) );
 			break;
 
 		case PORTAL_FIZZLE_NEAR_BLUE:
 		{
-			if ( !m_bIsPortal2 )
+			if ( !pCollisionEntity->GetEnginePortal()->IsPortal2() )
 			{
 				Vector vLinkedForward;
 				m_hLinkedPortal->GetVectors( &vLinkedForward, NULL, NULL );
@@ -571,14 +571,14 @@ void CProp_Portal::DoFizzleEffect( int iEffect, bool bDelayedPos /*= true*/ )
 			//DispatchEffect( "PortalFizzleNear", fxData );
 			AngleVectors( fxData.m_vAngles, &vForward, &vUp, NULL );
 			VectorAngles( vUp, vForward, fxData.m_vAngles );
-			DispatchParticleEffect( ( ( m_bIsPortal2 ) ? ( "portal_2_near" ) : ( "portal_1_near" ) ), fxData.m_vOrigin, fxData.m_vAngles );
+			DispatchParticleEffect( ( (pCollisionEntity->GetEnginePortal()->IsPortal2()) ? ( "portal_2_near" ) : ( "portal_1_near" ) ), fxData.m_vOrigin, fxData.m_vAngles );
 			ep.m_pSoundName = "Portal.fizzle_invalid_surface";
 			break;
 		}
 
 		case PORTAL_FIZZLE_NEAR_RED:
 		{
-			if ( m_bIsPortal2 )
+			if (pCollisionEntity->GetEnginePortal()->IsPortal2())
 			{
 				Vector vLinkedForward;
 				m_hLinkedPortal->GetVectors( &vLinkedForward, NULL, NULL );
@@ -595,14 +595,14 @@ void CProp_Portal::DoFizzleEffect( int iEffect, bool bDelayedPos /*= true*/ )
 			//DispatchEffect( "PortalFizzleNear", fxData );
 			AngleVectors( fxData.m_vAngles, &vForward, &vUp, NULL );
 			VectorAngles( vUp, vForward, fxData.m_vAngles );
-			DispatchParticleEffect( ( ( m_bIsPortal2 ) ? ( "portal_2_near" ) : ( "portal_1_near" ) ), fxData.m_vOrigin, fxData.m_vAngles );
+			DispatchParticleEffect( ( (pCollisionEntity->GetEnginePortal()->IsPortal2()) ? ( "portal_2_near" ) : ( "portal_1_near" ) ), fxData.m_vOrigin, fxData.m_vAngles );
 			ep.m_pSoundName = "Portal.fizzle_invalid_surface";
 			break;
 		}
 
 		case PORTAL_FIZZLE_SUCCESS:
 			VectorAngles( vUp, vForward, fxData.m_vAngles );
-			DispatchParticleEffect( ( ( m_bIsPortal2 ) ? ( "portal_2_success" ) : ( "portal_1_success" ) ), fxData.m_vOrigin, fxData.m_vAngles );
+			DispatchParticleEffect( ( (pCollisionEntity->GetEnginePortal()->IsPortal2()) ? ( "portal_2_success" ) : ( "portal_1_success" ) ), fxData.m_vOrigin, fxData.m_vAngles );
 			// Don't make a sound!
 			return;
 
@@ -632,7 +632,7 @@ void CProp_Portal::FizzleThink( void )
 
 	StopParticleEffects( this );
 
-	m_bActivated = false;
+	pCollisionEntity->GetEnginePortal()->SetActivated(false);
 	m_hLinkedPortal = NULL;
 	DetachFromLinked();//m_hPortalSimulator->
 	pCollisionEntity->GetEnginePortal()->ReleaseAllEntityOwnership();//m_hPortalSimulator->
@@ -716,7 +716,7 @@ void CProp_Portal::PunchPenetratingPlayer( CBaseEntity *pPlayer )
 
 			pCollideable->WorldSpaceSurroundingBounds( &vMin, &vMax );
 
-			if ( UTIL_IsBoxIntersectingPortal( ( vMin + vMax ) / 2.0f, ( vMax - vMin ) / 2.0f, this ) )
+			if ( UTIL_IsBoxIntersectingPortal( ( vMin + vMax ) / 2.0f, ( vMax - vMin ) / 2.0f, this->pCollisionEntity->GetEnginePortal()))
 			{
 				Vector vForward;
 				GetVectors( &vForward, 0, 0 );
@@ -755,7 +755,7 @@ void CProp_Portal::Activate( void )
 
 	GetEngineObject()->AddEffects( EF_NOSHADOW | EF_NORECEIVESHADOW );
 
-	if( m_bActivated && (m_hLinkedPortal.Get() != NULL) )
+	if( pCollisionEntity->GetEnginePortal()->IsActivated() && (m_hLinkedPortal.Get() != NULL))
 	{
 		Vector ptCenter = GetEngineObject()->GetAbsOrigin();
 		QAngle qAngles = GetEngineObject()->GetAbsAngles();
@@ -807,7 +807,7 @@ bool CProp_Portal::ShouldTeleportTouchingEntity( CBaseEntity *pOther )
 #endif
 		if ( sv_portal_debug_touch.GetBool() )
 		{
-			Msg( "Portal %i not teleporting %s because it's not simulated by this portal. : %f \n", ((m_bIsPortal2)?(2):(1)), pOther->GetDebugName(), gpGlobals->curtime );
+			Msg( "Portal %i not teleporting %s because it's not simulated by this portal. : %f \n", ((pCollisionEntity->GetEnginePortal()->IsPortal2())?(2):(1)), pOther->GetDebugName(), gpGlobals->curtime );
 		}
 		return false;
 	}
@@ -825,7 +825,7 @@ bool CProp_Portal::ShouldTeleportTouchingEntity( CBaseEntity *pOther )
 #endif
 		if ( sv_portal_debug_touch.GetBool() )
 		{
-			Msg( "Portal %i not teleporting %s because it has no linked partner portal.\n", ((m_bIsPortal2)?(2):(1)), pOther->GetDebugName() );
+			Msg( "Portal %i not teleporting %s because it has no linked partner portal.\n", ((pCollisionEntity->GetEnginePortal()->IsPortal2())?(2):(1)), pOther->GetDebugName() );
 		}
 		return false;
 	}
@@ -912,7 +912,7 @@ bool CProp_Portal::ShouldTeleportTouchingEntity( CBaseEntity *pOther )
 #endif
 			if ( sv_portal_debug_touch.GetBool() )
 			{
-				Msg( "Portal %i not teleporting %s because it was not in the portal hole.\n", ((m_bIsPortal2)?(2):(1)), pOther->GetDebugName() );
+				Msg( "Portal %i not teleporting %s because it was not in the portal hole.\n", ((pCollisionEntity->GetEnginePortal()->IsPortal2())?(2):(1)), pOther->GetDebugName() );
 			}
 		}
 	}
@@ -1091,7 +1091,7 @@ void CProp_Portal::TeleportTouchingEntity( CBaseEntity *pOther )
 		float fPlayerFaceDotPortalFace = GetVectorForward().Dot( vPlayerForward );
 		float fPlayerFaceDotPortalUp = GetVectorUp().Dot( vPlayerForward );
 
-		CBaseEntity *pHeldEntity = GetPlayerHeldEntity( pOtherAsPlayer );
+		CBaseEntity *pHeldEntity = pOtherAsPlayer->GetPlayerHeldEntity();
 
 		// Sometimes reorienting by pitch is more desirable than by roll depending on the portals' orientations and the relative player facing direction
 		if ( pHeldEntity )	// never pitch reorient while holding an object
@@ -1169,7 +1169,7 @@ void CProp_Portal::TeleportTouchingEntity( CBaseEntity *pOther )
 
 	if( sv_portal_debug_touch.GetBool() )
 	{
-		DevMsg( "PORTAL %i TELEPORTING: %s\n", ((m_bIsPortal2)?(2):(1)), pOther->GetClassname() );
+		DevMsg( "PORTAL %i TELEPORTING: %s\n", ((pCollisionEntity->GetEnginePortal()->IsPortal2())?(2):(1)), pOther->GetClassname() );
 	}
 #if !defined ( DISABLE_DEBUG_HISTORY )
 	if ( !GetEngineObject()->IsMarkedForDeletion() )
@@ -1217,26 +1217,26 @@ void CProp_Portal::TeleportTouchingEntity( CBaseEntity *pOther )
 	IPhysicsObject *pPhys = pOther->GetEngineObject()->VPhysicsGetObject();
 	if( (pPhys != NULL) && (pPhys->GetGameFlags() & FVPHYSICS_PLAYER_HELD) )
 	{
-		CPortal_Player *pHoldingPlayer = (CPortal_Player *)GetPlayerHoldingEntity( pOther );
-		pHoldingPlayer->ToggleHeldObjectOnOppositeSideOfPortal();
-		if ( pHoldingPlayer->IsHeldObjectOnOppositeSideOfPortal() )
-			pHoldingPlayer->SetHeldObjectPortal( this );
+		CPortal_Player *pHoldingPlayer = (CPortal_Player *)EntityList()->GetPlayerHoldingEntity( pOther );
+		pHoldingPlayer->GetEnginePlayer()->ToggleHeldObjectOnOppositeSideOfPortal();
+		if ( pHoldingPlayer->GetEnginePlayer()->IsHeldObjectOnOppositeSideOfPortal() )
+			pHoldingPlayer->GetEnginePlayer()->SetHeldObjectPortal( this->pCollisionEntity->GetEnginePortal() );
 		else
-			pHoldingPlayer->SetHeldObjectPortal( NULL );
+			pHoldingPlayer->GetEnginePlayer()->SetHeldObjectPortal( NULL );
 	}
 	else if( bPlayer )
 	{
-		CBaseEntity *pHeldEntity = GetPlayerHeldEntity( pOtherAsPlayer );
+		CBaseEntity *pHeldEntity = pOtherAsPlayer->GetPlayerHeldEntity();
 		if( pHeldEntity )
 		{
-			pOtherAsPlayer->ToggleHeldObjectOnOppositeSideOfPortal();
-			if( pOtherAsPlayer->IsHeldObjectOnOppositeSideOfPortal() )
+			pOtherAsPlayer->GetEnginePlayer()->ToggleHeldObjectOnOppositeSideOfPortal();
+			if( pOtherAsPlayer->GetEnginePlayer()->IsHeldObjectOnOppositeSideOfPortal() )
 			{
-				pOtherAsPlayer->SetHeldObjectPortal(GetLinkedPortal());
+				pOtherAsPlayer->GetEnginePlayer()->SetHeldObjectPortal(GetLinkedPortal()->pCollisionEntity->GetEnginePortal());
 			}
 			else
 			{
-				pOtherAsPlayer->SetHeldObjectPortal( NULL );
+				pOtherAsPlayer->GetEnginePlayer()->SetHeldObjectPortal( NULL );
 
 				//we need to make sure the held object and player don't interpenetrate when the player's shape changes
 				Vector vTargetPosition;
@@ -1317,7 +1317,7 @@ void CProp_Portal::Touch( CBaseEntity *pOther )
 	pOther->Touch( this );
 
 	// Don't do anything on touch if it's not active
-	if( !m_bActivated || (m_hLinkedPortal.Get() == NULL) )
+	if( !pCollisionEntity->GetEnginePortal()->IsActivated() || (m_hLinkedPortal.Get() == NULL))
 	{
 		Assert( !pCollisionEntity->GetEnginePortal()->OwnsEntity( pOther ) );//m_hPortalSimulator->
 		Assert( !pOther->IsPlayer() || (((CPortal_Player *)pOther)->GetPortalEnvironment() != this) );
@@ -1347,7 +1347,7 @@ void CProp_Portal::Touch( CBaseEntity *pOther )
 				Vector vMin, vMax;
 				pOther->GetCollideable()->WorldSpaceSurroundingBounds( &vMin, &vMax );
 
-				if ( UTIL_IsBoxIntersectingPortal( ( vMin + vMax ) / 2.0f, ( vMax - vMin ) / 2.0f - Vector( 2.0f, 2.0f, 2.0f ), this, 0.0f ) )
+				if ( UTIL_IsBoxIntersectingPortal( ( vMin + vMax ) / 2.0f, ( vMax - vMin ) / 2.0f - Vector( 2.0f, 2.0f, 2.0f ), this->pCollisionEntity->GetEnginePortal(), 0.0f))
 				{
 					DevMsg( "Moving brush intersected portal plane.\n" );
 
@@ -1397,14 +1397,14 @@ void CProp_Portal::Touch( CBaseEntity *pOther )
 			if ( bIsStuckPlayer )
 			{
 				Assert ( !"Player stuck" );
-				DevMsg( "Player in solid behind behind portal %i's plane, Adding to it's environment to run find closest passable space.\n", ((m_bIsPortal2)?(2):(1)) );
+				DevMsg( "Player in solid behind behind portal %i's plane, Adding to it's environment to run find closest passable space.\n", ((pCollisionEntity->GetEnginePortal()->IsPortal2())?(2):(1)) );
 			}
 
 			if ( bObjectCenterInFrontOfPortal || bIsStuckPlayer )
 			{
 				if( sv_portal_debug_touch.GetBool() )
 				{
-					DevMsg( "Portal %i took control of shared object: %s\n", ((m_bIsPortal2)?(2):(1)), pOther->GetClassname() );
+					DevMsg( "Portal %i took control of shared object: %s\n", ((pCollisionEntity->GetEnginePortal()->IsPortal2())?(2):(1)), pOther->GetClassname() );
 				}
 #if !defined ( DISABLE_DEBUG_HISTORY )
 				if ( !GetEngineObject()->IsMarkedForDeletion() )
@@ -1440,7 +1440,7 @@ void CProp_Portal::StartTouch( CBaseEntity *pOther )
 
 	if( sv_portal_debug_touch.GetBool() )
 	{
-		DevMsg( "Portal %i StartTouch: %s : %f\n", ((m_bIsPortal2)?(2):(1)), pOther->GetClassname(), gpGlobals->curtime );
+		DevMsg( "Portal %i StartTouch: %s : %f\n", ((pCollisionEntity->GetEnginePortal()->IsPortal2())?(2):(1)), pOther->GetClassname(), gpGlobals->curtime );
 	}
 #if !defined ( DISABLE_DEBUG_HISTORY )
 	if ( !GetEngineObject()->IsMarkedForDeletion() )
@@ -1449,7 +1449,7 @@ void CProp_Portal::StartTouch( CBaseEntity *pOther )
 	}
 #endif
 
-	if( (m_hLinkedPortal == NULL) || (m_bActivated == false) )
+	if( (m_hLinkedPortal == NULL) || (pCollisionEntity->GetEnginePortal()->IsActivated() == false))
 		return;
 
 	if( CProp_Portal_Shared::IsEntityTeleportable( pOther ) )
@@ -1484,7 +1484,7 @@ void CProp_Portal::EndTouch( CBaseEntity *pOther )
 	pOther->EndTouch( this );
 
 	// Don't do anything on end touch if it's not active
-	if( !m_bActivated )
+	if(!pCollisionEntity || !pCollisionEntity->GetEnginePortal()->IsActivated() )
 	{
 		return;
 	}
@@ -1506,7 +1506,7 @@ void CProp_Portal::EndTouch( CBaseEntity *pOther )
 
 	if( sv_portal_debug_touch.GetBool() )
 	{
-		DevMsg( "Portal %i EndTouch: %s : %f\n", ((m_bIsPortal2)?(2):(1)), pOther->GetClassname(), gpGlobals->curtime );
+		DevMsg( "Portal %i EndTouch: %s : %f\n", ((pCollisionEntity->GetEnginePortal()->IsPortal2())?(2):(1)), pOther->GetClassname(), gpGlobals->curtime );
 	}
 
 #if !defined( DISABLE_DEBUG_HISTORY )
@@ -1622,10 +1622,10 @@ void CProp_Portal::WakeNearbyEntities( void )
 						Vector vBoxCenter = ( vMin + vMax ) * 0.5f;
 						Vector vBoxExtents = ( vMax - vMin ) * 0.5f;
 
-						if ( UTIL_IsBoxIntersectingPortal( vBoxCenter, vBoxExtents, this ) )
+						if ( UTIL_IsBoxIntersectingPortal( vBoxCenter, vBoxExtents, this->pCollisionEntity->GetEnginePortal() ) )
 						{
 							// It's intersecting this portal
-							if ( m_bIsPortal2 )
+							if ( pCollisionEntity->GetEnginePortal()->IsPortal2() )
 								pPortalDetector->m_OnStartTouchPortal2.FireOutput( this, pPortalDetector );
 							else
 								pPortalDetector->m_OnStartTouchPortal1.FireOutput( this, pPortalDetector );
@@ -1634,7 +1634,7 @@ void CProp_Portal::WakeNearbyEntities( void )
 							{
 								pPortalDetector->m_OnStartTouchLinkedPortal.FireOutput( this, pPortalDetector );
 
-								if ( UTIL_IsBoxIntersectingPortal( vBoxCenter, vBoxExtents, GetLinkedPortal()) )
+								if ( UTIL_IsBoxIntersectingPortal( vBoxCenter, vBoxExtents, GetLinkedPortal()->pCollisionEntity->GetEnginePortal()) )
 								{
 									pPortalDetector->m_OnStartTouchBothLinkedPortals.FireOutput( this, pPortalDetector );
 								}
@@ -1752,11 +1752,11 @@ void CProp_Portal::WakeNearbyEntities( void )
 
 void CProp_Portal::UpdatePortalLinkage( void )
 {
-	if( m_bActivated )
+	if( pCollisionEntity->GetEnginePortal()->IsActivated() )
 	{
 		CProp_Portal *pLink = GetLinkedPortal();
 
-		if( !(pLink && pLink->m_bActivated) )
+		if( !(pLink && pLink->pCollisionEntity->GetEnginePortal()->IsActivated()) )
 		{
 			//no old link, or inactive old link
 
@@ -1779,7 +1779,7 @@ void CProp_Portal::UpdatePortalLinkage( void )
 					CProp_Portal *pCurrentPortal = pPortals[i];
 					if( pCurrentPortal == this )
 						continue;
-					if( pCurrentPortal->m_bActivated && pCurrentPortal->m_hLinkedPortal.Get() == NULL )
+					if (pCurrentPortal->pCollisionEntity && pCurrentPortal->pCollisionEntity->GetEnginePortal()->IsActivated() && pCurrentPortal->m_hLinkedPortal.Get() == NULL)
 					{
 						pLink = pCurrentPortal;
 						pCurrentPortal->m_hLinkedPortal = this;
@@ -1800,7 +1800,7 @@ void CProp_Portal::UpdatePortalLinkage( void )
 
 			this->m_hLinkedPortal = hRemote;
 			pLink->m_hLinkedPortal = hThis;
-			m_bIsPortal2 = !m_hLinkedPortal->m_bIsPortal2;
+			pCollisionEntity->GetEnginePortal()->SetPortal2(!m_hLinkedPortal->pCollisionEntity->GetEnginePortal()->IsPortal2());
 
 			// Initialize mics/speakers
 			if( m_hMicrophone == 0 )
@@ -1816,7 +1816,7 @@ void CProp_Portal::UpdatePortalLinkage( void )
 				m_hSpeaker = gEntList.CreateEntityByName( "env_speaker" );
 				CSpeaker *pSpeaker = static_cast<CSpeaker*>( m_hSpeaker.Get() );
 
-				if( !m_bIsPortal2 )
+				if( !pCollisionEntity->GetEnginePortal()->IsPortal2() )
 				{
 					pSpeaker->SetName( "PortalSpeaker1" );
 					pMicrophone->SetName( "PortalMic1" );
@@ -1847,7 +1847,7 @@ void CProp_Portal::UpdatePortalLinkage( void )
 				GetLinkedPortal()->m_hSpeaker = gEntList.CreateEntityByName( "env_speaker" );
 				CSpeaker *pLinkedSpeaker = static_cast<CSpeaker*>(GetLinkedPortal()->m_hSpeaker.Get() );
 
-				if ( !m_bIsPortal2 )
+				if ( !pCollisionEntity->GetEnginePortal()->IsPortal2() )
 				{
 					pLinkedSpeaker->SetName( "PortalSpeaker2" );
 					pLinkedMicrophone->SetName( "PortalMic2" );
@@ -1917,7 +1917,7 @@ void CProp_Portal::PlacePortal( const Vector &vOrigin, const QAngle &qAngles, fl
 	Vector vNewOrigin = vOrigin;
 	QAngle qNewAngles = qAngles;
 
-	UTIL_TestForOrientationVolumes( qNewAngles, vNewOrigin, this );
+	UTIL_TestForOrientationVolumes( qNewAngles, vNewOrigin, this->pCollisionEntity->GetEnginePortal() );
 
 	if ( sv_portal_placement_never_fail.GetBool() )
 	{
@@ -2020,21 +2020,21 @@ void CProp_Portal::NewLocation( const Vector &vOrigin, const QAngle &qAngles )
 		controller.SoundChangeVolume( m_pAmbientSound, 0.4, 0.1 );
 	}
 
-	DispatchParticleEffect( ( ( m_bIsPortal2 ) ? ( "portal_2_particles" ) : ( "portal_1_particles" ) ), PATTACH_POINT_FOLLOW, this, "particles_2", true );
-	DispatchParticleEffect( ( ( m_bIsPortal2 ) ? ( "portal_2_edge" ) : ( "portal_1_edge" ) ), PATTACH_POINT_FOLLOW, this, "particlespin" );
+	DispatchParticleEffect( ( ( pCollisionEntity->GetEnginePortal()->IsPortal2() ) ? ( "portal_2_particles" ) : ( "portal_1_particles" ) ), PATTACH_POINT_FOLLOW, this, "particles_2", true );
+	DispatchParticleEffect( ( ( pCollisionEntity->GetEnginePortal()->IsPortal2() ) ? ( "portal_2_edge" ) : ( "portal_1_edge" ) ), PATTACH_POINT_FOLLOW, this, "particlespin" );
 
 	//if the other portal should be static, let's not punch stuff resting on it
 	bool bOtherShouldBeStatic = false;
 	if( !m_hLinkedPortal )
 		bOtherShouldBeStatic = true;
 
-	m_bActivated = true;
+	pCollisionEntity->GetEnginePortal()->SetActivated(true);
 
 	UpdatePortalLinkage();
 	//UpdatePortalTeleportMatrix();
 
 	// Update the four corners of this portal for faster reference
-	UpdateCorners();
+	pCollisionEntity->GetEnginePortal()->UpdateCorners();
 
 	WakeNearbyEntities();
 
@@ -2047,7 +2047,7 @@ void CProp_Portal::NewLocation( const Vector &vOrigin, const QAngle &qAngles )
 		}
 	}
 
-	if ( m_bIsPortal2 )
+	if ( pCollisionEntity->GetEnginePortal()->IsPortal2() )
 	{
 		const char* soundname = "Portal.open_red";
 		CPASAttenuationFilter filter(this, soundname);
@@ -2075,10 +2075,10 @@ void CProp_Portal::NewLocation( const Vector &vOrigin, const QAngle &qAngles )
 
 void CProp_Portal::InputSetActivatedState( inputdata_t &inputdata )
 {
-	m_bActivated = inputdata.value.Bool();
+	pCollisionEntity->GetEnginePortal()->SetActivated(inputdata.value.Bool());
 	m_hPlacedBy = NULL;
 
-	if ( m_bActivated )
+	if ( pCollisionEntity->GetEnginePortal()->IsActivated() )
 	{
 		Vector vOrigin;
 		vOrigin = GetEngineObject()->GetAbsOrigin();
@@ -2096,13 +2096,13 @@ void CProp_Portal::InputSetActivatedState( inputdata_t &inputdata )
 		QAngle qAngles;
 		VectorAngles( tr.plane.normal, vUp, qAngles );
 
-		float fPlacementSuccess = VerifyPortalPlacement( this, tr.endpos, qAngles, PORTAL_PLACED_BY_FIXED );
+		float fPlacementSuccess = VerifyPortalPlacement( this->pCollisionEntity->GetEnginePortal(), tr.endpos, qAngles, PORTAL_PLACED_BY_FIXED);
 		PlacePortal( tr.endpos, qAngles, fPlacementSuccess );
 
 		// If the fixed portal is overlapping a portal that was placed before it... kill it!
 		if ( fPlacementSuccess )
 		{
-			IsPortalOverlappingOtherPortals( this, vOrigin, GetEngineObject()->GetAbsAngles(), true );
+			IsPortalOverlappingOtherPortals( this->pCollisionEntity->GetEnginePortal(), vOrigin, GetEngineObject()->GetAbsAngles(), true);
 
 			CreateSounds();
 
@@ -2113,10 +2113,10 @@ void CProp_Portal::InputSetActivatedState( inputdata_t &inputdata )
 				controller.SoundChangeVolume( m_pAmbientSound, 0.4, 0.1 );
 			}
 
-			DispatchParticleEffect( ( ( m_bIsPortal2 ) ? ( "portal_2_particles" ) : ( "portal_1_particles" ) ), PATTACH_POINT_FOLLOW, this, "particles_2", true );
-			DispatchParticleEffect( ( ( m_bIsPortal2 ) ? ( "portal_2_edge" ) : ( "portal_1_edge" ) ), PATTACH_POINT_FOLLOW, this, "particlespin" );
+			DispatchParticleEffect( ( ( pCollisionEntity->GetEnginePortal()->IsPortal2() ) ? ( "portal_2_particles" ) : ( "portal_1_particles" ) ), PATTACH_POINT_FOLLOW, this, "particles_2", true );
+			DispatchParticleEffect( ( ( pCollisionEntity->GetEnginePortal()->IsPortal2() ) ? ( "portal_2_edge" ) : ( "portal_1_edge" ) ), PATTACH_POINT_FOLLOW, this, "particlespin" );
 
-			if ( m_bIsPortal2 )
+			if ( pCollisionEntity->GetEnginePortal()->IsPortal2() )
 			{
 				const char* soundname = "Portal.open_red";
 				CPASAttenuationFilter filter(this, soundname);
@@ -2196,22 +2196,7 @@ void CProp_Portal::InputNewLocation( inputdata_t &inputdata )
 	NewLocation( vNewOrigin, vNewAngles );
 }
 
-void CProp_Portal::UpdateCorners()
-{
-	Vector vOrigin = GetEngineObject()->GetAbsOrigin();
-	Vector vUp, vRight;
-	GetVectors( NULL, &vRight, &vUp );
 
-	for ( int i = 0; i < 4; ++i )
-	{
-		Vector vAddPoint = vOrigin;
-
-		vAddPoint += vRight * ((i & (1<<0))?(PORTAL_HALF_WIDTH):(-PORTAL_HALF_WIDTH));
-		vAddPoint += vUp * ((i & (1<<1))?(PORTAL_HALF_HEIGHT):(-PORTAL_HALF_HEIGHT));
-
-		m_vPortalCorners[i] = vAddPoint;
-	}
-}
 
 
 
@@ -2236,9 +2221,9 @@ CProp_Portal *CProp_Portal::FindPortal( unsigned char iLinkageGroupID, bool bPor
 		CProp_Portal **pPortals = s_PortalLinkageGroups[iLinkageGroupID].Base();
 		for( int i = 0; i != iPortalCount; ++i )
 		{
-			if( pPortals[i]->m_bIsPortal2 == bPortal2 )
+			if( pPortals[i]->pCollisionEntity->GetEnginePortal()->IsPortal2() == bPortal2)
 			{
-				if( pPortals[i]->m_bActivated )
+				if( pPortals[i]->pCollisionEntity->GetEnginePortal()->IsActivated() )
 					return pPortals[i];
 				else
 					pFoundInactive = pPortals[i];
@@ -2252,9 +2237,9 @@ CProp_Portal *CProp_Portal::FindPortal( unsigned char iLinkageGroupID, bool bPor
 	if( bCreateIfNothingFound )
 	{
 		CProp_Portal *pPortal = (CProp_Portal *)gEntList.CreateEntityByName( "prop_portal" );
+		DispatchSpawn(pPortal);
 		pPortal->m_iLinkageGroupID = iLinkageGroupID;
-		pPortal->m_bIsPortal2 = bPortal2;
-		DispatchSpawn( pPortal );
+		pPortal->pCollisionEntity->GetEnginePortal()->SetPortal2(bPortal2);
 		return pPortal;
 	}
 

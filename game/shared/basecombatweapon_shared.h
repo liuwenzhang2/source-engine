@@ -17,6 +17,13 @@
 #include "baseviewmodel_shared.h"
 #include "weapon_proficiency.h"
 #include "utlmap.h"
+#ifdef CLIENT_DLL
+#include "c_baseanimating.h"
+#endif // CLIENT_DLL
+#ifdef GAME_DLL
+#include "baseanimating.h"
+#endif // GAME_DLL
+
 
 #if defined( CLIENT_DLL )
 #define CBaseCombatWeapon C_BaseCombatWeapon
@@ -638,4 +645,5 @@ protected:
 #endif // End Client .dll only
 };
 
+typedef CHandle<CBaseCombatWeapon> CBaseCombatWeaponHandle;
 #endif // COMBATWEAPON_SHARED_H

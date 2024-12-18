@@ -122,6 +122,86 @@ private:
 	CEngineObjectInternal* const m_pOuter = NULL;;
 };
 
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
+// derive from this so we can add save/load data to it
+struct game_shadowcontrol_params_t : public hlshadowcontrol_params_t
+{
+	DECLARE_SIMPLE_DATADESC();
+};
+
+//-----------------------------------------------------------------------------
+class CGrabController : public IGrabController, public IMotionEvent
+{
+	DECLARE_SIMPLE_DATADESC();
+
+public:
+
+	CGrabController(void);
+	~CGrabController(void);
+	void AttachEntity(CBasePlayer* pPlayer, CBaseEntity* pEntity, IPhysicsObject* pPhys, bool bIsMegaPhysCannon, const Vector& vGrabPosition, bool bUseGrabPosition);
+	void DetachEntity(bool bClearVelocity);
+	void OnRestore();
+
+	bool UpdateObject(CBasePlayer* pPlayer, float flError);
+
+	void SetTargetPosition(const Vector& target, const QAngle& targetOrientation);
+	void GetTargetPosition(Vector* target, QAngle* targetOrientation);
+	float ComputeError();
+	float GetLoadWeight(void) const { return m_flLoadWeight; }
+	void SetAngleAlignment(float alignAngleCosine) { m_angleAlignment = alignAngleCosine; }
+	void SetIgnorePitch(bool bIgnore) { m_bIgnoreRelativePitch = bIgnore; }
+	QAngle TransformAnglesToPlayerSpace(const QAngle& anglesIn, CBasePlayer* pPlayer);
+	QAngle TransformAnglesFromPlayerSpace(const QAngle& anglesIn, CBasePlayer* pPlayer);
+
+	CBaseEntity* GetAttached() { return (CBaseEntity*)m_attachedEntity; }
+
+	IMotionEvent::simresult_e Simulate(IPhysicsMotionController* pController, IPhysicsObject* pObject, float deltaTime, Vector& linear, AngularImpulse& angular);
+	float GetSavedMass(IPhysicsObject* pObject);
+	void GetSavedParamsForCarriedPhysObject(IPhysicsObject* pObject, float* pSavedMassOut, float* pSavedRotationalDampingOut);
+
+	bool IsObjectAllowedOverhead(CBaseEntity* pEntity);
+
+	//set when a held entity is penetrating another through a portal. Needed for special fixes
+	void SetPortalPenetratingEntity(CBaseEntity* pPenetrated);
+
+private:
+	// Compute the max speed for an attached object
+	void ComputeMaxSpeed(CBaseEntity* pEntity, IPhysicsObject* pPhysics);
+
+	game_shadowcontrol_params_t	m_shadow;
+	float			m_timeToArrive;
+	float			m_errorTime;
+	float			m_error;
+	float			m_contactAmount;
+	float			m_angleAlignment;
+	bool			m_bCarriedEntityBlocksLOS;
+	bool			m_bIgnoreRelativePitch;
+
+	float			m_flLoadWeight;
+	float			m_savedRotDamping[VPHYSICS_MAX_OBJECT_LIST_COUNT];
+	float			m_savedMass[VPHYSICS_MAX_OBJECT_LIST_COUNT];
+	EHANDLE			m_attachedEntity;
+	QAngle			m_vecPreferredCarryAngles;
+	bool			m_bHasPreferredCarryAngles;
+	float			m_flDistanceOffset;
+
+	QAngle			m_attachedAnglesPlayerSpace;
+	Vector			m_attachedPositionObjectSpace;
+
+	IPhysicsMotionController* m_controller;
+
+	// NVNT player controlling this grab controller
+	CBasePlayer* m_pControllingPlayer;
+
+	bool			m_bAllowObjectOverhead; // Can the player hold this object directly overhead? (Default is NO)
+
+	//set when a held entity is penetrating another through a portal. Needed for special fixes
+	EHANDLE			m_PenetratedEntity;
+	int				m_frameCount;
+};
+
 class CEngineShadowCloneInternal;
 
 class CEngineObjectInternal : public IEngineObjectServer {
@@ -239,6 +319,10 @@ public:
 	}
 
 	CBaseEntity* GetOuter() {
+		return m_pOuter;
+	}
+
+	IHandleEntity* GetHandleEntity() const {
 		return m_pOuter;
 	}
 
@@ -821,6 +905,7 @@ public:
 	IEnginePortalServer* GetSimulatorThatOwnsEntity(); //fairly cheap to call
 	bool IsPlayer() { return false; }
 	IEnginePlayerServer* AsEnginePlayer() { return NULL; }
+	CGrabController* GetGrabController() { return &m_grabController; }
 public:
 	// Networking related methods
 	void NetworkStateChanged();
@@ -989,6 +1074,7 @@ private:
 	CNetworkVar(bool, m_bAlternateSorting);
 	CNetworkVar(int, m_ubInterpolationFrame);
 
+	CGrabController		m_grabController;
 };
 
 inline int CEngineObjectNetworkProperty::entindex() const {
@@ -1741,8 +1827,16 @@ public:
 	bool IsPlayer() { return true; }
 	CEnginePlayerInternal* AsEnginePlayer() { return this; }
 	CEngineObjectInternal* AsEngineObject() { return this; }
+	const CEngineObjectInternal* AsEngineObject() const { return this; }
 	IEnginePortalServer* GetPortalEnvironment() { return m_hPortalEnvironment.Get() ? m_hPortalEnvironment.Get()->GetEnginePortal() : NULL; }
 	void SetPortalEnvironment(IEnginePortalServer* pEnginePortal) { m_hPortalEnvironment = pEnginePortal ? pEnginePortal->AsEngineObject()->GetOuter() : NULL; }
+	IEnginePortalServer* GetHeldObjectPortal(void) { return m_pHeldObjectPortal.Get() ? m_pHeldObjectPortal.Get()->GetEnginePortal() : NULL; }
+	void SetHeldObjectPortal(IEnginePortalServer* pPortal) { m_pHeldObjectPortal = pPortal ? pPortal->AsEngineObject()->GetOuter() : NULL; }
+	void ToggleHeldObjectOnOppositeSideOfPortal(void) { m_bHeldObjectOnOppositeSideOfPortal = !m_bHeldObjectOnOppositeSideOfPortal; }
+	void SetHeldObjectOnOppositeSideOfPortal(bool p_bHeldObjectOnOppositeSideOfPortal) { m_bHeldObjectOnOppositeSideOfPortal = p_bHeldObjectOnOppositeSideOfPortal; }
+	bool IsHeldObjectOnOppositeSideOfPortal(void) { return m_bHeldObjectOnOppositeSideOfPortal; }
+	bool IsSilentDropAndPickup() { return m_bSilentDropAndPickup; }
+	void SetSilentDropAndPickup(bool bSilentDropAndPickup) { m_bSilentDropAndPickup = bSilentDropAndPickup; }
 private:
 	void UpdatePhysicsShadowToPosition(const Vector& vecAbsOrigin);
 private:
@@ -1753,6 +1847,9 @@ private:
 	int m_vphysicsCollisionState;
 	bool m_bPlayerIsInSimulator = false;
 	CNetworkHandle(CBaseEntity, m_hPortalEnvironment); //if the player is in a portal environment, this is the associated portal
+	CNetworkHandle(CBaseEntity, m_pHeldObjectPortal);	// networked entity handle
+	CNetworkVar(bool, m_bHeldObjectOnOppositeSideOfPortal);
+	bool m_bSilentDropAndPickup;
 
 };
 
@@ -1770,19 +1867,25 @@ public:
 	friend class CEngineObjectInternal;
 	template<class T> friend class CGlobalEntityList;
 	DECLARE_CLASS(CEnginePortalInternal, CEngineObjectInternal);
+	DECLARE_SERVERCLASS();
+	DECLARE_DATADESC();
 	CEnginePortalInternal(IServerEntityList* pServerEntityList, int iForceEdictIndex, int iSerialNum);
 	~CEnginePortalInternal();
 	virtual IPhysicsObject* VPhysicsGetObject(void) const;
 	virtual int		VPhysicsGetObjectList(IPhysicsObject** pList, int listMax);
 	void	VPhysicsDestroyObject(void);
+	virtual void			OnRestore(void);
 	int					GetPortalSimulatorGUID(void) const { return m_iPortalSimulatorGUID; }
 	void				SetVPhysicsSimulationEnabled(bool bEnabled); //enable/disable vphysics simulation. Will automatically update the linked portal to be the same
 	bool				IsSimulatingVPhysics(void) const; //this portal is setup to handle any physically simulated object, false means the portal is handling player movement only
 	bool				IsLocalDataIsReady() { return m_bLocalDataIsReady; }
 	void				SetLocalDataIsReady(bool bLocalDataIsReady) { m_bLocalDataIsReady = bLocalDataIsReady; }
 	bool				IsReadyToSimulate(void) const; //is active and linked to another portal
+	bool				IsActivedAndLinked(void) const;
 	void				MoveTo(const Vector& ptCenter, const QAngle& angles);
 	void				AttachTo(IEnginePortalServer* pLinkedPortal);
+	CEnginePortalInternal* GetLinkedPortal() { return m_hLinkedPortal.Get() ? (CEnginePortalInternal*)m_hLinkedPortal.Get()->GetEnginePortal() : NULL; }
+	const CEnginePortalInternal* GetLinkedPortal() const { return m_hLinkedPortal.Get() ? (const CEnginePortalInternal*)m_hLinkedPortal.Get()->GetEnginePortal() : NULL; }
 	void				DetachFromLinked(void);
 	void				UpdateLinkMatrix(IEnginePortalServer* pRemoteCollisionEntity);
 	bool				EntityIsInPortalHole(IEngineObjectServer* pEntity) const; //true if the entity is within the portal cutout bounds and crossing the plane. Not just *near* the portal
@@ -1791,7 +1894,8 @@ public:
 	bool				TraceWorldBrushes(const Ray_t& ray, trace_t* pTrace) const;
 	bool				TraceWallTube(const Ray_t& ray, trace_t* pTrace) const;
 	bool				TraceWallBrushes(const Ray_t& ray, trace_t* pTrace) const;
-	bool				TraceTransformedWorldBrushes(IEnginePortalServer* pRemoteCollisionEntity, const Ray_t& ray, trace_t* pTrace) const;
+	bool				TraceTransformedWorldBrushes(const IEnginePortalServer* pRemoteCollisionEntity, const Ray_t& ray, trace_t* pTrace) const;
+	void				TraceRay(const Ray_t& ray, unsigned int fMask, ITraceFilter* pTraceFilter, trace_t* pTrace, bool bTraceHolyWall = true) const; //traces against a specific portal's environment, does no *real* tracing
 	int					GetStaticPropsCount() const;
 	const PS_SD_Static_World_StaticProps_ClippedProp_t* GetStaticProps(int index) const;
 	bool				StaticPropsCollisionExists() const;
@@ -1855,12 +1959,22 @@ public:
 	void				ClearLinkedEntities(void); //gets rid of transformed shadow clones
 
 	CEngineObjectInternal* AsEngineObject() { return this; }
+	const CEngineObjectInternal* AsEngineObject() const { return this; }
 	unsigned int GetEntFlags(int entindex) { return m_EntFlags[entindex]; }
 	void ClearEntFlags(int entindex) { m_EntFlags[entindex] = 0; }
+	bool IsActivated() const { return m_bActivated; }
+	void SetActivated(bool bActivated) { m_bActivated = bActivated; }
+	bool IsPortal2() const { return m_bIsPortal2; }
+	void SetPortal2(bool bPortal2) { m_bIsPortal2 = bPortal2; }
+	void					UpdateCorners(void);			// Updates the four corners of this portal on spawn and placement
+	const Vector& GetPortalCorners(int iCorner) const { return m_vPortalCorners[iCorner]; }
 	unsigned int m_EntFlags[MAX_EDICTS]; //flags maintained for every entity in the world based on its index
 private:
 	int					m_iPortalSimulatorGUID;
-	CEnginePortalInternal* m_pLinkedPortal;
+	//IPhysicsEnvironment* pPhysicsEnvironment = NULL;
+	CNetworkVar(bool, m_bActivated); //a portal can exist and not be active
+	CNetworkVar(bool, m_bIsPortal2); //For teleportation, this doesn't matter, but for drawing and moving, it matters
+	CNetworkHandle(CBaseEntity, m_hLinkedPortal);
 	bool				m_bSimulateVPhysics;
 	bool				m_bLocalDataIsReady; //this side of the portal is properly setup, no guarantees as to linkage to another portal
 	PS_InternalData_t m_InternalData;
@@ -1871,6 +1985,8 @@ private:
 	int m_iFixEntityCount;
 	CBaseEntity** m_pFixEntities;
 	cplane_t m_OldPlane;
+	// The four corners of the portal in worldspace, updated on placement. The four points will be coplanar on the portal plane.
+	Vector m_vPortalCorners[4];
 };
 
 //inline const VMatrix& CProp_Portal::MatrixThisToLinked() const
@@ -1890,7 +2006,12 @@ inline bool CEnginePortalInternal::OwnsPhysicsForEntity(const CBaseEntity* pEnti
 
 inline bool CEnginePortalInternal::IsReadyToSimulate(void) const
 {
-	return m_bLocalDataIsReady && m_pLinkedPortal && m_pLinkedPortal->m_bLocalDataIsReady;
+	return m_bLocalDataIsReady && GetLinkedPortal() && GetLinkedPortal()->m_bLocalDataIsReady;
+}
+
+inline bool CEnginePortalInternal::IsActivedAndLinked(void) const
+{
+	return (m_bActivated && GetLinkedPortal() != NULL);
 }
 
 #ifdef DEBUG_PORTAL_SIMULATION_CREATION_TIMES
@@ -1954,6 +2075,7 @@ public:
 	bool			IsShadowClone() { return true; }
 	CEngineShadowCloneInternal* AsEngineShadowClone() { return this; }
 	CEngineObjectInternal* AsEngineObject() { return this; }
+	const CEngineObjectInternal* AsEngineObject() const { return this; }
 	CEngineShadowCloneInternal* GetNext() { return m_pNext; }
 
 	static CEngineShadowCloneInternal* CreateShadowClone(IPhysicsEnvironment* pInPhysicsEnvironment, EHANDLE hEntToClone, const char* szDebugMarker, const matrix3x4_t* pTransformationMatrix = NULL);
@@ -2581,6 +2703,7 @@ class CGlobalEntityList : public CBaseEntityList<T>, public IServerEntityList, p
 	friend class CEnginePortalInternal;
 	friend class CEngineShadowCloneInternal;
 	friend class CEnginePlayerInternal;
+	friend class CGrabController;
 	typedef CBaseEntityList<T> BaseClass;
 public:
 
@@ -3287,6 +3410,9 @@ public:
 	}
 
 	CEnginePortalInternal* GetSimulatorThatCreatedPhysicsObject(const IPhysicsObject* pObject, PS_PhysicsObjectSourceType_t* pOut_SourceType = NULL);
+
+	CBasePlayer* GetPlayerHoldingEntity(CBaseEntity* pEntity);
+
 protected:
 	virtual void AfterCreated(IHandleEntity* pEntity);
 	virtual void BeforeDestroy(IHandleEntity* pEntity);
@@ -3437,6 +3563,7 @@ bool CGlobalEntityList<T>::Init()
 	m_isFinalTick = true;
 	m_impactSoundTime = 0;
 	m_vehicleScripts.EnsureCapacity(4);
+	return true;
 }
 
 template<class T>
@@ -6472,6 +6599,21 @@ CEnginePortalInternal* CGlobalEntityList<T>::GetSimulatorThatCreatedPhysicsObjec
 			return m_ActivePortals[i];
 	}
 
+	return NULL;
+}
+
+template<class T>
+CBasePlayer* CGlobalEntityList<T>::GetPlayerHoldingEntity(CBaseEntity* pEntity)
+{
+	for (int i = 1; i <= gpGlobals->maxClients; ++i)
+	{
+		CBaseEntity* pPlayer = gEntList.GetBaseEntity(i);
+		if (pPlayer)
+		{
+			if (pPlayer->GetPlayerHeldEntity() == pEntity || (pPlayer->GetActiveWeapon() && pPlayer->GetActiveWeapon()->PhysCannonGetHeldEntity() == pEntity))
+				return (CBasePlayer*)pPlayer;
+		}
+	}
 	return NULL;
 }
 

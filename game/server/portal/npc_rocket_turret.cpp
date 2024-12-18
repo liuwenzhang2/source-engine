@@ -152,7 +152,7 @@ protected:
 
 	bool	TestLOS( const Vector& vAimPoint );
 	bool	TestPortalsForLOS( Vector* pOutVec, bool bConsiderNonPortalAimPoint );
-	bool	FindAimPointThroughPortal( const CProp_Portal* pPortal, Vector* pVecOut );
+	bool	FindAimPointThroughPortal( const IEnginePortalServer* pPortal, Vector* pVecOut );
 	void	SyncPoseToAimAngles ( void );
 	void	LaserOn ( void );
 	void	LaserOff ( void );
@@ -634,8 +634,8 @@ void CNPC_RocketTurret::FollowThink( void )
 	CTraceFilterSimple subfilter( this, COLLISION_GROUP_NONE );
 	CTraceFilterTranslateClones filter ( &subfilter );
 	float flRequiredParameter = 2.0f;
-	CProp_Portal* pFirstPortal = UTIL_Portal_FirstAlongRay( rayDmg, flRequiredParameter );
-	UTIL_Portal_TraceRay_Bullets( pFirstPortal, rayDmg, MASK_VISIBLE_AND_NPCS, &filter, &traceDmg, false );
+	IEnginePortal* pFirstPortal = UTIL_Portal_FirstAlongRay( rayDmg, flRequiredParameter );
+	UTIL_Portal_TraceRay_Bullets(pFirstPortal, rayDmg, MASK_VISIBLE_AND_NPCS, &filter, &traceDmg, false);
 
 	if ( traceDmg.m_pEnt )
 	{
@@ -1033,10 +1033,10 @@ bool CNPC_RocketTurret::TestPortalsForLOS( Vector* pOutVec, bool bConsiderNonPor
 	// Test through any active portals: This may be a shorter distance to the target
 	for( int i = 0; i != iPortalCount; ++i )
 	{
-		CProp_Portal *pTempPortal = pPortals[i];
+		IEnginePortalServer *pTempPortal = pPortals[i]->pCollisionEntity->GetEnginePortal();
 
-		if( !pTempPortal->m_bActivated ||
-			(pTempPortal->m_hLinkedPortal.Get() == NULL) )
+		if( !pTempPortal->IsActivated() ||
+			(pTempPortal->GetLinkedPortal() == NULL) )
 		{
 			//portalAimPoints[i] = vec3_invalid;
 			bUsable[i] = false;
@@ -1044,7 +1044,7 @@ bool CNPC_RocketTurret::TestPortalsForLOS( Vector* pOutVec, bool bConsiderNonPor
 		}
 
 		
-		bUsable[i] = FindAimPointThroughPortal( pPortals[ i ], &portalAimPoints[ i ] );
+		bUsable[i] = FindAimPointThroughPortal( pTempPortal, &portalAimPoints[ i ] );
 		if ( 1 )
 		{
 			QAngle goalAngles;
@@ -1094,21 +1094,21 @@ bool CNPC_RocketTurret::TestPortalsForLOS( Vector* pOutVec, bool bConsiderNonPor
 // Input  : pPortal - The portal to look through
 // Output : Vector& output point in world space where the target *appears* to be as seen through the portal
 //-----------------------------------------------------------------------------
-bool CNPC_RocketTurret::FindAimPointThroughPortal( const CProp_Portal* pPortal, Vector* pVecOut )
+bool CNPC_RocketTurret::FindAimPointThroughPortal( const IEnginePortalServer* pPortal, Vector* pVecOut )
 { 
-	if ( pPortal && pPortal->m_bActivated )
+	if ( pPortal && pPortal->IsActivated() )
 	{
-		CProp_Portal* pLinked = ((CProp_Portal*)pPortal)->GetLinkedPortal();
+		const IEnginePortalServer* pLinked = pPortal->GetLinkedPortal();
 		CBaseEntity*  pTarget = GetEnemy();
 
 		// Require that the portal is facing towards the beam to test through it
 		Vector vRocketToPortal, vPortalForward;
-		VectorSubtract ( pPortal->GetEngineObject()->GetAbsOrigin(), EyePosition(), vRocketToPortal );
-		pPortal->GetVectors( &vPortalForward, NULL, NULL);
+		VectorSubtract ( pPortal->AsEngineObject()->GetAbsOrigin(), EyePosition(), vRocketToPortal );
+		pPortal->AsEngineObject()->GetVectors( &vPortalForward, NULL, NULL);
 		float fDot = DotProduct( vRocketToPortal, vPortalForward );
 
 		// Portal must be facing the turret, and have a linked partner
-		if ( fDot < 0.0f && pLinked && pLinked->m_bActivated && pTarget )
+		if ( fDot < 0.0f && pLinked && pLinked->IsActivated() && pTarget)
 		{
 			VMatrix matToPortalView = pLinked->MatrixThisToLinked();
 			Vector vTargetAimPoint = pTarget->GetEngineObject()->GetAbsOrigin() + (pTarget->GetEngineObject()->WorldAlignMins() + pTarget->GetEngineObject()->WorldAlignMaxs()) * 0.5f;

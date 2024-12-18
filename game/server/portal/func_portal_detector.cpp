@@ -84,9 +84,9 @@ void CFuncPortalDetector::OnActivate( void )
 
 			//require that it's active and/or linked?
 
-			if( pTempPortal->GetLinkageGroup() == m_iLinkageGroupID && UTIL_IsBoxIntersectingPortal( vBoxCenter, vBoxExtents, pTempPortal ) )
+			if( pTempPortal->GetLinkageGroup() == m_iLinkageGroupID && UTIL_IsBoxIntersectingPortal( vBoxCenter, vBoxExtents, pTempPortal->pCollisionEntity->GetEnginePortal() ) )
 			{
-				if( pTempPortal->IsPortal2() )
+				if( pTempPortal->pCollisionEntity->GetEnginePortal()->IsPortal2() )
 				{
 					m_OnStartTouchPortal2.FireOutput( pTempPortal, this );
 

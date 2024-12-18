@@ -31,7 +31,7 @@ CFuncPortalOrientation* GetPortalOrientationVolumeList()
 //			pPortal - The portal attempting to place
 // Output : Returns true on success, false on failure.
 //-----------------------------------------------------------------------------
-bool UTIL_TestForOrientationVolumes( QAngle& vecCurAngles, const Vector& vecCurOrigin, const CProp_Portal* pPortal )
+bool UTIL_TestForOrientationVolumes( QAngle& vecCurAngles, const Vector& vecCurOrigin, const IEnginePortalServer* pPortal )
 {
 	if ( !pPortal )
 		return false;
@@ -55,11 +55,11 @@ bool UTIL_TestForOrientationVolumes( QAngle& vecCurAngles, const Vector& vecCurO
 			{
 				// This feature requires a linked portal on a floor or ceiling. Bail without effecting
 				// the placement angles if we fail those requirements.
-				CProp_Portal* pLinked = ((CProp_Portal*)pPortal)->GetLinkedPortal();
+				const IEnginePortalServer* pLinked = pPortal->GetLinkedPortal();
 				if ( !pLinked || !(AnglesAreEqual( vecCurAngles.x, -90.0f, 0.1f ) || AnglesAreEqual( vecCurAngles.x, 90.0f, 0.1f )) )
 					return false;
 
-				vecGoalAngles = pLinked->GetEngineObject()->GetAbsAngles();
+				vecGoalAngles = pLinked->AsEngineObject()->GetAbsAngles();
 				vecCurAngles.y = 0.0f;
 				vecCurAngles.z = vecGoalAngles.z;
 			}
@@ -141,7 +141,7 @@ void CFuncPortalOrientation::OnActivate( void )
 					if ( !pLinked )
 						return;
 
-					angNewAngles = pTempPortal->m_hLinkedPortal->GetEngineObject()->GetAbsAngles();
+					angNewAngles = pTempPortal->GetLinkedPortal()->GetEngineObject()->GetAbsAngles();
 				}
 				else
 				{
