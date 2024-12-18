@@ -4547,7 +4547,7 @@ void CGameMovement::PlayerMove( void )
 	VPROF( "CGameMovement::PlayerMove" );
 
 	CheckParameters();
-	
+
 	// clear output applied velocity
 	mv->m_outWishVel.Init();
 	mv->m_outJumpVel.Init();

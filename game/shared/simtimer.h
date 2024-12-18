@@ -12,6 +12,8 @@
 #pragma once
 #endif
 
+#include "vstdlib/random.h"
+
 #define ST_EPS 0.001
 
 #define DEFINE_SIMTIMER( type, name ) 	DEFINE_EMBEDDED( type, name )
