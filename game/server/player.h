@@ -17,7 +17,6 @@
 #include "game/server/iplayerinfo.h"
 #include "hintsystem.h"
 #include "SoundEmitterSystem/isoundemittersystembase.h"
-#include "util_shared.h"
 
 #if defined USES_ECON_ITEMS
 #include "game_item_schema.h"
@@ -98,6 +97,22 @@ struct surfacedata_t;
 
 // !!!set this bit on guns and stuff that should never respawn.
 #define	SF_NORESPAWN	( 1 << 30 )
+
+// used by suit voice to indicate damage sustained and repaired type to player
+enum
+{
+	itbd_Paralyze = 0,
+	itbd_NerveGas,
+	itbd_PoisonRecover,
+	itbd_Radiation,
+	itbd_DrownRecover,
+	itbd_Acid,
+	itbd_SlowBurn,
+	itbd_SlowFreeze,
+
+	// Must be last!
+	CDMG_TIMEBASED
+};
 
 //
 // Player PHYSICS FLAGS bits
@@ -550,10 +565,7 @@ public:
 	// physics interactions
 	// mass/size limit set to zero for none
 	static bool				CanPickupObject( CBaseEntity *pObject, float massLimit, float sizeLimit );
-	virtual void			PickupObject( CBaseEntity *pObject, bool bLimitMassAndSize = true ) {}
-	virtual void			ForceDropOfCarriedPhysObjects( CBaseEntity *pOnlyIfHoldindThis = NULL ) {}
-	virtual float			GetHeldObjectMass( IPhysicsObject *pHeldObject );
-	virtual CBaseEntity*	GetPlayerHeldEntity() { return NULL; }
+
 
 	void					CheckSuitUpdate();
 	void					SetSuitUpdate(const char *name, int fgroup, int iNoRepeat);

@@ -14,6 +14,8 @@
 #pragma once
 #endif
 
+#include "baseanimating.h"
+
 class CBaseAnimatingOverlay;
 
 class CAnimationLayer

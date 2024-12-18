@@ -46,7 +46,7 @@ bool UTIL_TestForOrientationVolumes( QAngle& vecCurAngles, const Vector& vecCurO
 			continue;
 		}
 
-		if ( IsOBBIntersectingOBB( vecCurOrigin, vecCurAngles, CProp_Portal_Shared::vLocalMins, CProp_Portal_Shared::vLocalMaxs, 
+		if ( IsOBBIntersectingOBB( vecCurOrigin, vecCurAngles, vPortalLocalMins, vPortalLocalMaxs,
 			pList->GetEngineObject()->GetAbsOrigin(), pList->GetCollideable()->GetCollisionAngles(), pList->GetCollideable()->OBBMins(), pList->GetCollideable()->OBBMaxs() ) )
 		{
 			QAngle vecGoalAngles;
@@ -131,7 +131,7 @@ void CFuncPortalOrientation::OnActivate( void )
 		for( int i = 0; i != iPortalCount; ++i )
 		{
 			CProp_Portal *pTempPortal = pPortals[i];
-			if( IsOBBIntersectingOBB( pTempPortal->GetEngineObject()->GetAbsOrigin(), pTempPortal->GetEngineObject()->GetAbsAngles(), CProp_Portal_Shared::vLocalMins, CProp_Portal_Shared::vLocalMaxs,
+			if( IsOBBIntersectingOBB( pTempPortal->GetEngineObject()->GetAbsOrigin(), pTempPortal->GetEngineObject()->GetAbsAngles(), vPortalLocalMins, vPortalLocalMaxs,
 			GetEngineObject()->GetAbsOrigin(), GetCollideable()->GetCollisionAngles(), GetCollideable()->OBBMins(), GetCollideable()->OBBMaxs() ) )
 			{
 				QAngle angNewAngles;

@@ -594,6 +594,7 @@ public:
 	virtual bool				TraceWallBrushes(const Ray_t& ray, trace_t* pTrace) const = 0;
 	virtual bool				TraceTransformedWorldBrushes(const IEnginePortalServer* pRemoteCollisionEntity, const Ray_t& ray, trace_t* pTrace) const = 0;
 	virtual void				TraceRay(const Ray_t& ray, unsigned int fMask, ITraceFilter* pTraceFilter, trace_t* pTrace, bool bTraceHolyWall = true) const = 0;
+	virtual void				TraceEntity(CBaseEntity* pEntity, const Vector& vecAbsStart, const Vector& vecAbsEnd, unsigned int mask, ITraceFilter* pFilter, trace_t* ptr) const = 0;
 	virtual int					GetStaticPropsCount() const = 0;
 	virtual const PS_SD_Static_World_StaticProps_ClippedProp_t* GetStaticProps(int index) const = 0;
 	virtual bool				StaticPropsCollisionExists() const = 0;
@@ -638,7 +639,7 @@ public:
 	virtual void				TakePhysicsOwnership(CBaseEntity* pEntity) = 0;
 	virtual void				ReleasePhysicsOwnership(CBaseEntity* pEntity, bool bContinuePhysicsCloning = true, bool bMovingToLinkedSimulator = false) = 0;
 
-	virtual int					GetMoveableOwnedEntities(CBaseEntity** pEntsOut, int iEntOutLimit) = 0; //gets owned entities that aren't either world or static props. Excludes fake portal ents such as physics clones
+	virtual int					GetMoveableOwnedEntities(CBaseEntity** pEntsOut, int iEntOutLimit) const = 0; //gets owned entities that aren't either world or static props. Excludes fake portal ents such as physics clones
 
 	virtual void				BeforeMove() = 0;
 	virtual void				AfterMove() = 0;
@@ -897,6 +898,8 @@ public:
 	virtual void SetPredictionPlayer(IEngineObject* player) = 0;
 	virtual bool IsSimulatingOnAlternateTicks() = 0;
 	virtual CBasePlayer* GetPlayerHoldingEntity(CBaseEntity* pEntity) = 0;
+	virtual int GetPortalCount() = 0;
+	virtual IEnginePortalServer* GetPortal(int index) = 0;
 };
 
 extern IServerEntityList* serverEntitylist;

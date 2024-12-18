@@ -27,11 +27,6 @@
 #include "enginecallback.h"
 #endif // GAME_DLL
 
-
-#ifdef PORTAL
-#include "portal_util_shared.h"
-#endif
-
 //-----------------------------------------------------------------------------
 // Forward declarations
 //-----------------------------------------------------------------------------

@@ -2216,6 +2216,7 @@ public:
 	bool				TraceWallBrushes(const Ray_t& ray, trace_t* pTrace) const;
 	bool				TraceTransformedWorldBrushes(const IEnginePortalClient* pRemoteCollisionEntity, const Ray_t& ray, trace_t* pTrace) const;
 	void				TraceRay(const Ray_t& ray, unsigned int fMask, ITraceFilter* pTraceFilter, trace_t* pTrace, bool bTraceHolyWall = true) const; //traces against a specific portal's environment, does no *real* tracing
+	void				TraceEntity(C_BaseEntity* pEntity, const Vector& vecAbsStart, const Vector& vecAbsEnd, unsigned int mask, ITraceFilter* pFilter, trace_t* ptr) const;
 	int					GetStaticPropsCount() const;
 	const PS_SD_Static_World_StaticProps_ClippedProp_t* GetStaticProps(int index) const;
 	bool				StaticPropsCollisionExists() const;
@@ -2665,6 +2666,7 @@ class CClientEntityList : public CBaseEntityList<T>, public IClientEntityList, p
 {
 	friend class C_BaseEntityIterator;
 	friend class C_EngineObjectInternal;
+	friend class C_EnginePortalInternal;
 	//friend class C_AllBaseEntityIterator;
 	typedef CBaseEntityList<T> BaseClass;
 public:
@@ -3003,6 +3005,9 @@ public:
 		}
 		return gpGlobals->curtime;
 	}
+
+	int GetPortalCount() { return m_ActivePortals.Count(); }
+	C_EnginePortalInternal* GetPortal(int index) { return m_ActivePortals[index]; }
 private:
 	void AddPVSNotifier(IClientUnknown* pUnknown);
 	void RemovePVSNotifier(IClientUnknown* pUnknown);
@@ -3117,6 +3122,8 @@ private:
 	IPhysicsObject* m_PhysWorldObject = NULL;
 	physicssound::soundlist_t m_impactSounds;
 	CCollisionEvent m_Collisions;
+
+	CUtlVector<C_EnginePortalInternal*> m_ActivePortals;
 };
 
 template<class T>

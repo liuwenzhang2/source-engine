@@ -1695,9 +1695,6 @@
     <ClCompile Include="..\..\..\game\shared\portal\portal_usermessages.cpp">
       <Filter>源文件\Portal</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\game\shared\portal\portal_util_shared.cpp">
-      <Filter>源文件\Portal</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\game\shared\portal\portal_weapon_parse.cpp">
       <Filter>源文件\Portal</Filter>
     </ClCompile>
@@ -1732,6 +1729,9 @@
       <Filter>源文件\Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\public\ehandle.cpp">
+      <Filter>源文件\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\shared\portal_util_shared.cpp">
       <Filter>源文件\Source Files</Filter>
     </ClCompile>
   </ItemGroup>

@@ -32,8 +32,8 @@ public:
 	//static CProp_Portal *GetPortal1( bool bCreateIfNotFound = false );
 	//static CProp_Portal *GetPortal2( bool bCreateIfNotFound = false );
 
-	static const Vector		vLocalMins;
-	static const Vector		vLocalMaxs;
+	//static const Vector		vLocalMins;
+	//static const Vector		vLocalMaxs;
 
 #ifdef CLIENT_DLL
 	static CUtlVector<C_Prop_Portal *> AllPortals; //an array of existing portal entities	

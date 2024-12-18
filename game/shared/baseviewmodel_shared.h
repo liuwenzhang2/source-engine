@@ -22,8 +22,7 @@ class CBaseCombatCharacter;
 class CVGuiScreen;
 
 #if defined( CLIENT_DLL )
-#define CBaseViewModel C_BaseViewModel
-#define CBaseCombatWeapon C_BaseCombatWeapon
+
 #endif
 
 #define VIEWMODEL_INDEX_BITS 1

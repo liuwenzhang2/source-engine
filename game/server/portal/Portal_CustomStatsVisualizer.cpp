@@ -141,7 +141,7 @@ void CPortalGameStatsVisualizer::FrameUpdatePostEntityThink()
 			else
 				 brightnessval = 64;//failed
 				
-			NDebugOverlay::BoxAngles( PlacementStat.ptPlacementPosition, CProp_Portal_Shared::vLocalMins, CProp_Portal_Shared::vLocalMaxs, m_PortalPlacementAngles[i], 0, brightnessval, brightnessval, 100, PORTALSTATSVISUALIZER_DISPLAYTIME );
+			NDebugOverlay::BoxAngles( PlacementStat.ptPlacementPosition, vPortalLocalMins, vPortalLocalMaxs, m_PortalPlacementAngles[i], 0, brightnessval, brightnessval, 100, PORTALSTATSVISUALIZER_DISPLAYTIME );
 			NDebugOverlay::Box( PlacementStat.ptPlayerFiredFrom, vSmallBoxMins, vSmallBoxMaxs, 0, brightnessval, brightnessval, 100, PORTALSTATSVISUALIZER_DISPLAYTIME );
 			NDebugOverlay::Line( PlacementStat.ptPlayerFiredFrom, PlacementStat.ptPlacementPosition, 0, brightnessval, brightnessval, false, PORTALSTATSVISUALIZER_DISPLAYTIME );
 		}

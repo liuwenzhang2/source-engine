@@ -1016,8 +1016,8 @@ bool IsPortalOverlappingOtherPortals( const IEnginePortalServer *pIgnorePortal, 
 	Vector vForward;
 	AngleVectors( qAngles, &vForward, NULL, NULL );
 
-	Vector vPortalOBBMin = CProp_Portal_Shared::vLocalMins + Vector( 1.0f, 1.0f, 1.0f );
-	Vector vPortalOBBMax = CProp_Portal_Shared::vLocalMaxs - Vector( 1.0f, 1.0f, 1.0f );
+	Vector vPortalOBBMin = vPortalLocalMins + Vector( 1.0f, 1.0f, 1.0f );
+	Vector vPortalOBBMax = vPortalLocalMaxs - Vector( 1.0f, 1.0f, 1.0f );
 
 	int iPortalCount = CProp_Portal_Shared::AllPortals.Count();
 	if( iPortalCount != 0 )

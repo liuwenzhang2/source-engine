@@ -14,7 +14,7 @@
 #include "baseentity_shared.h"
 #include "baseplayer_shared.h"
 #if !defined( CLIENT_DLL )
-#include "entityoutput.h"
+//#include "entityoutput.h"
 #endif
 
 #include "beam_flags.h"

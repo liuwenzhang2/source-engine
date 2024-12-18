@@ -15,13 +15,16 @@
 extern bool g_bBulletPortalTrace;
 
 #ifdef CLIENT_DLL
-	#include "client_class.h"
-	#include "interpolatedvar.h"
+	//#include "client_class.h"
+	//#include "interpolatedvar.h"
 	class C_Beam;
 	typedef C_Beam CBeam;
 #else
 	class CBeam;
 #endif
+
+extern const Vector vPortalLocalMins;
+extern const Vector vPortalLocalMaxs;
 
 Color UTIL_Portal_Color( int iPortal );
 

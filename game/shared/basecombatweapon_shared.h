@@ -24,11 +24,6 @@
 #include "baseanimating.h"
 #endif // GAME_DLL
 
-
-#if defined( CLIENT_DLL )
-#define CBaseCombatWeapon C_BaseCombatWeapon
-#endif
-
 // Hacky
 #if defined ( TF_CLIENT_DLL ) || defined ( TF_DLL )
 #include "econ_entity.h"
@@ -452,6 +447,8 @@ public:
 	void					Use( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value );
 
 	virtual CDmgAccumulator	*GetDmgAccumulator( void ) { return NULL; }
+
+	virtual CBaseEntity*	PhysCannonGetHeldEntity() { return NULL; }
 
 // Client only methods
 #else

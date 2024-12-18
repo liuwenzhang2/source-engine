@@ -7,6 +7,7 @@
 #ifndef AI_UTILS_H
 #define AI_UTILS_H
 
+#include "util.h"
 #include "simtimer.h"
 #include "ai_component.h"
 

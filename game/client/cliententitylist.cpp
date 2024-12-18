@@ -42,6 +42,8 @@
 #include "vphysics/object_hash.h"
 #include "vphysics/collision_set.h"
 #include "gamerules.h"
+#include "portal_util_shared.h"
+
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
@@ -7798,11 +7800,12 @@ C_EnginePortalInternal::C_EnginePortalInternal(IClientEntityList* pClientEntityL
 	m_iPortalSimulatorGUID = s_iPortalSimulatorGUIDAllocator++;
 	m_bActivated = false;
 	m_bIsPortal2 = false;
+	ClientEntityList().m_ActivePortals.AddToTail(this);
 }
 
 C_EnginePortalInternal::~C_EnginePortalInternal() 
 {
-	int aaa = 0;
+	ClientEntityList().m_ActivePortals.FindAndRemove(this); //also removed in UpdateOnRemove()	
 }
 
 void C_EnginePortalInternal::VPhysicsDestroyObject(void)
@@ -8437,6 +8440,197 @@ void C_EnginePortalInternal::TraceRay(const Ray_t& ray, unsigned int fMask, ITra
 		pTrace->surface = GetSurfaceProperties().surface;
 		pTrace->m_pEnt = GetSurfaceProperties().pEntity;
 	}
+}
+
+void C_EnginePortalInternal::TraceEntity(C_BaseEntity* pEntity, const Vector& vecAbsStart, const Vector& vecAbsEnd, unsigned int mask, ITraceFilter* pFilter, trace_t* pTrace) const
+{
+
+	const C_EnginePortalInternal* pLinkedPortalSimulator = this->GetLinkedPortal();
+	ICollideable* pCollision = enginetrace->GetCollideable(pEntity);
+
+	Ray_t entRay;
+	entRay.Init(vecAbsStart, vecAbsEnd, pCollision->OBBMins(), pCollision->OBBMaxs());
+
+#if 0 // this trace for brush ents made sense at one time, but it's 'overcolliding' during portal transitions (bugzilla#25)
+	if (realTrace.m_pEnt && (realTrace.m_pEnt->GetEngineObject()->GetMoveType() != MOVETYPE_NONE)) //started by hitting something moving which wouldn't be detected in the following traces
+	{
+		float fFirstPortalFraction = 2.0f;
+		CProp_Portal* pFirstPortal = UTIL_Portal_FirstAlongRay(entRay, fFirstPortalFraction);
+
+		if (!pFirstPortal)
+			*pTrace = realTrace;
+		else
+		{
+			Vector vFirstPortalForward;
+			pFirstPortal->GetVectors(&vFirstPortalForward, NULL, NULL);
+			if (vFirstPortalForward.Dot(realTrace.endpos - pFirstPortal->GetAbsOrigin()) > 0.0f)
+				*pTrace = realTrace;
+		}
+	}
+#endif
+
+	// We require both environments to be active in order to trace against them
+	Assert(pCollision);
+	if (!pCollision)
+	{
+		return;
+	}
+
+	// World, displacements and holy wall are stored in separate collideables
+	// Traces against each and keep the closest intersection (if any)
+	trace_t tempTrace;
+
+	// Hit the world
+	if (pFilter->GetTraceType() != TRACE_ENTITIES_ONLY)
+	{
+		if (TraceWorldBrushes(entRay, &tempTrace))
+		{
+			//physcollision->TraceCollide( vecAbsStart, vecAbsEnd, pCollision, qCollisionAngles, 
+			//							pPortalSimulator->m_DataAccess.Simulation.Static.World.Brushes.pCollideable, vec3_origin, vec3_angle, &tempTrace );
+			if (tempTrace.startsolid || (tempTrace.fraction < pTrace->fraction))
+			{
+				*pTrace = tempTrace;
+			}
+		}
+
+		//if( pPortalSimulator->m_DataAccess.Simulation.Static.Wall.RemoteTransformedToLocal.Brushes.pCollideable &&
+		if (pLinkedPortalSimulator && TraceTransformedWorldBrushes(pLinkedPortalSimulator, entRay, &tempTrace))
+		{
+			//physcollision->TraceCollide( vecAbsStart, vecAbsEnd, pCollision, qCollisionAngles,
+			//							pLinkedPortalSimulator->m_DataAccess.Simulation.Static.World.Brushes.pCollideable, pPortalSimulator->m_DataAccess.Placement.ptaap_LinkedToThis.ptOriginTransform, pPortalSimulator->m_DataAccess.Placement.ptaap_LinkedToThis.qAngleTransform, &tempTrace );
+
+			if (tempTrace.startsolid || (tempTrace.fraction < pTrace->fraction))
+			{
+				*pTrace = tempTrace;
+			}
+		}
+
+		if (TraceWallBrushes(entRay, &tempTrace))
+		{
+			//physcollision->TraceCollide( vecAbsStart, vecAbsEnd, pCollision, qCollisionAngles,
+			//							pPortalSimulator->m_DataAccess.Simulation.Static.Wall.Local.Brushes.pCollideable, vec3_origin, vec3_angle, &tempTrace );
+
+			if (tempTrace.startsolid || (tempTrace.fraction < pTrace->fraction))
+			{
+				if (tempTrace.fraction == 0.0f)
+					tempTrace.startsolid = true;
+
+				if (tempTrace.fractionleftsolid == 1.0f)
+					tempTrace.allsolid = true;
+
+				*pTrace = tempTrace;
+			}
+		}
+
+		if (TraceWallTube(entRay, &tempTrace))
+		{
+			//physcollision->TraceCollide( vecAbsStart, vecAbsEnd, pCollision, qCollisionAngles,
+			//							pPortalSimulator->m_DataAccess.Simulation.Static.Wall.Local.Tube.pCollideable, vec3_origin, vec3_angle, &tempTrace );
+
+			if ((tempTrace.startsolid == false) && (tempTrace.fraction < pTrace->fraction)) //never allow something to be stuck in the tube, it's more of a last-resort guide than a real collideable
+			{
+				*pTrace = tempTrace;
+			}
+		}
+
+		// For all brush traces, use the 'portal backbrush' surface surface contents
+		// BUGBUG: Doing this is a great solution because brushes near a portal
+		// will have their contents and surface properties homogenized to the brush the portal ray hit.
+		if (pTrace->startsolid || (pTrace->fraction < 1.0f))
+		{
+			pTrace->surface = GetSurfaceProperties().surface;
+			pTrace->contents = GetSurfaceProperties().contents;
+			pTrace->m_pEnt = GetSurfaceProperties().pEntity;
+		}
+	}
+
+	// Trace vs entities
+	if (pFilter->GetTraceType() != TRACE_WORLD_ONLY)
+	{
+		if (sv_portal_trace_vs_staticprops.GetBool() && (pFilter->GetTraceType() != TRACE_ENTITIES_ONLY))
+		{
+			bool bFilterStaticProps = (pFilter->GetTraceType() == TRACE_EVERYTHING_FILTER_PROPS);
+
+			//local clipped static props
+			{
+				int iLocalStaticCount = GetStaticPropsCount();
+				if (iLocalStaticCount != 0 && StaticPropsCollisionExists())
+				{
+					int iIndex = 0;
+					Vector vTransform = vec3_origin;
+					QAngle qTransform = vec3_angle;
+
+					do
+					{
+						const PS_SD_Static_World_StaticProps_ClippedProp_t* pCurrentProp = GetStaticProps(iIndex);
+						if ((!bFilterStaticProps) || pFilter->ShouldHitEntity(pCurrentProp->pSourceProp, mask))
+						{
+							//physcollision->TraceCollide( vecAbsStart, vecAbsEnd, pCollision, qCollisionAngles,
+							//							pCurrentProp->pCollide, vTransform, qTransform, &tempTrace );
+
+							EntityList()->PhysGetCollision()->TraceBox(entRay, MASK_ALL, NULL, pCurrentProp->pCollide, vTransform, qTransform, &tempTrace);
+
+							if (tempTrace.startsolid || (tempTrace.fraction < pTrace->fraction))
+							{
+								*pTrace = tempTrace;
+								pTrace->surface.flags = pCurrentProp->iTraceSurfaceFlags;
+								pTrace->surface.surfaceProps = pCurrentProp->iTraceSurfaceProps;
+								pTrace->surface.name = pCurrentProp->szTraceSurfaceName;
+								pTrace->contents = pCurrentProp->iTraceContents;
+								pTrace->m_pEnt = pCurrentProp->pTraceEntity;
+							}
+						}
+
+						++iIndex;
+					} while (iIndex != iLocalStaticCount);
+				}
+			}
+
+			if (pLinkedPortalSimulator && EntityIsInPortalHole(pEntity->GetEngineObject()))
+			{
+
+#ifndef CLIENT_DLL
+				if (sv_use_transformed_collideables.GetBool()) //if this never gets turned off, it should be removed before release
+				{
+					//moving entities near the remote portal
+					CBaseEntity* pEnts[1024];
+					int iEntCount = pLinkedPortalSimulator->GetMoveableOwnedEntities(pEnts, 1024);
+
+					CTransformedCollideable transformedCollideable;
+					transformedCollideable.m_matTransform = pLinkedPortalSimulator->MatrixThisToLinked();
+					transformedCollideable.m_matInvTransform = pLinkedPortalSimulator->MatrixLinkedToThis();
+					for (int i = 0; i != iEntCount; ++i)
+					{
+						CBaseEntity* pRemoteEntity = pEnts[i];
+						if (pRemoteEntity->GetEngineObject()->GetSolid() == SOLID_NONE)
+							continue;
+
+						transformedCollideable.m_pWrappedCollideable = pRemoteEntity->GetCollideable();
+						Assert(transformedCollideable.m_pWrappedCollideable != NULL);
+
+						//enginetrace->ClipRayToCollideable( entRay, mask, &transformedCollideable, pTrace );
+
+						enginetrace->ClipRayToCollideable(entRay, mask, &transformedCollideable, &tempTrace);
+						if (tempTrace.startsolid || (tempTrace.fraction < pTrace->fraction))
+						{
+							*pTrace = tempTrace;
+						}
+					}
+				}
+#endif //#ifndef CLIENT_DLL
+			}
+		}
+	}
+
+	if (pTrace->fraction == 1.0f)
+	{
+		memset(pTrace, 0, sizeof(trace_t));
+		pTrace->fraction = 1.0f;
+		pTrace->startpos = vecAbsStart;
+		pTrace->endpos = vecAbsEnd;
+	}
+	//#endif
+
 }
 
 int C_EnginePortalInternal::GetStaticPropsCount() const

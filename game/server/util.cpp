@@ -3665,6 +3665,16 @@ void CC_CollisionTest( const CCommand &args )
 }
 static ConCommand collision_test("collision_test", CC_CollisionTest, "Tests collision system", FCVAR_CHEAT );
 
+#ifndef CLIENT_DLL
 
+void CC_Debug_FixMyPosition(void)
+{
+	CBaseEntity* pPlayer = UTIL_GetCommandClient();
+
+	pPlayer->FindClosestPassableSpace(vec3_origin);
+}
+
+static ConCommand debug_fixmyposition("debug_fixmyposition", CC_Debug_FixMyPosition, "Runs FindsClosestPassableSpace() on player.", FCVAR_CHEAT);
+#endif
 
 

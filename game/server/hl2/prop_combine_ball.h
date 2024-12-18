@@ -34,6 +34,7 @@ public:
 
 	virtual void Precache();
 	virtual void Spawn();
+	virtual bool IsCombineBall() { return true; }
 	virtual void UpdateOnRemove();
 	void StopLoopingSounds();
 

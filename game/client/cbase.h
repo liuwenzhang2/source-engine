@@ -22,8 +22,8 @@
 #include <tier1/strtools.h>
 #include <vstdlib/random.h>
 #include <utlvector.h>
-
 #include <const.h>
+#include <icvar.h>
 
 #include "string_t.h"
 
@@ -32,23 +32,19 @@
 //#include <predictable_entity.h>
 #include "ehandle.h"
 #include "recvproxy.h"
-#include "shared_classnames.h"
-#include "cdll_util.h"
-#include <util_shared.h>
-
-#include <icvar.h>
-#include <baseentity_shared.h>
-#include "cliententitylist.h"
-
+#include "engine/IEngineTrace.h"
 // This is a precompiled header.  Include a bunch of common stuff.
 // This is kind of ugly in that it adds a bunch of dependency where it isn't needed.
 // But on balance, the compile time is much lower (even incrementally) once the precompiled
 // headers contain these headers.
 #include "precache_register.h"
-#include "c_basecombatweapon.h"
-#include "c_basecombatcharacter.h"
+//#include "c_basecombatweapon.h"
+//#include "c_basecombatcharacter.h"
+#include "shared_classnames.h"
+#include <baseentity_shared.h>
 #include "gamerules.h"
 #include "c_baseplayer.h"
+#include "cliententitylist.h"
 #include "itempents.h"
 #include "vphysics_interface.h"
 //#include "physics.h"
@@ -57,6 +53,9 @@
 #include "worldsize.h"
 #include "engine/ivmodelinfo.h"
 #include "gamemovement.h"
+#include "portal_util_shared.h"
+#include <util_shared.h>
+#include "cdll_util.h"
 
 abstract_class C_BaseEntityClassList
 {

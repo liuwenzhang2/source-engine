@@ -26,8 +26,6 @@ float PhysCannonGetHeldObjectMass( CBaseCombatWeapon *pActiveWeapon, IPhysicsObj
 
 
 
-IGrabController *GetGrabControllerForPlayer( CBasePlayer *pPlayer );
-IGrabController *GetGrabControllerForPhysCannon( CBaseCombatWeapon *pActiveWeapon );
 void UpdateGrabControllerTargetPosition( CBasePlayer *pPlayer, Vector *vPosition, QAngle *qAngles );
 bool PhysCannonAccountableForObject( CBaseCombatWeapon *pPhysCannon, CBaseEntity *pObject );
 

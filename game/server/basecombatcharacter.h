@@ -21,15 +21,15 @@
 #define POWERUP_THINK_CONTEXT	"PowerupThink"
 #endif
 
-#include "cbase.h"
-#include "baseentity.h"
+//#include "cbase.h"
+//#include "baseentity.h"
 #include "baseflex.h"
 #include "damagemodifier.h"
 #include "utllinkedlist.h"
 #include "ai_hull.h"
 #include "ai_utils.h"
 #include "physics_impact_damage.h"
-#include "basecombatweapon_shared.h"
+#include "basecombatweapon.h"
 
 class CNavArea;
 class CScriptedTarget;

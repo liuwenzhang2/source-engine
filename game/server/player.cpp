@@ -2917,12 +2917,6 @@ bool CBasePlayer::CanPickupObject( CBaseEntity *pObject, float massLimit, float 
 #endif
 }
 
-float CBasePlayer::GetHeldObjectMass( IPhysicsObject *pHeldObject )
-{
-	return 0;
-}
-
-
 //-----------------------------------------------------------------------------
 // Purpose:	Server side of jumping rules.  Most jumping logic is already
 //			handled in shared gamemovement code.  Put stuff here that should

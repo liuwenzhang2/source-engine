@@ -18,7 +18,8 @@
 #define CBaseCombatCharacter	C_BaseCombatCharacter
 #define CBaseAnimating			C_BaseAnimating
 #define CBasePlayer				C_BasePlayer
-
+#define CBaseViewModel			C_BaseViewModel
+#define CBaseCombatWeapon		C_BaseCombatWeapon
 #endif
 
 

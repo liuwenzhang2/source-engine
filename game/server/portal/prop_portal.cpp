@@ -116,32 +116,32 @@ CProp_Portal::CProp_Portal( void )
 	fPlanes[(0*4) + 0] = 1.0f;
 	fPlanes[(0*4) + 1] = 0.0f;
 	fPlanes[(0*4) + 2] = 0.0f;
-	fPlanes[(0*4) + 3] = CProp_Portal_Shared::vLocalMaxs.x;
+	fPlanes[(0*4) + 3] = vPortalLocalMaxs.x;
 
 	fPlanes[(1*4) + 0] = -1.0f;
 	fPlanes[(1*4) + 1] = 0.0f;
 	fPlanes[(1*4) + 2] = 0.0f;
-	fPlanes[(1*4) + 3] = -CProp_Portal_Shared::vLocalMins.x;
+	fPlanes[(1*4) + 3] = -vPortalLocalMins.x;
 
 	fPlanes[(2*4) + 0] = 0.0f;
 	fPlanes[(2*4) + 1] = 1.0f;
 	fPlanes[(2*4) + 2] = 0.0f;
-	fPlanes[(2*4) + 3] = CProp_Portal_Shared::vLocalMaxs.y;
+	fPlanes[(2*4) + 3] = vPortalLocalMaxs.y;
 
 	fPlanes[(3*4) + 0] = 0.0f;
 	fPlanes[(3*4) + 1] = -1.0f;
 	fPlanes[(3*4) + 2] = 0.0f;
-	fPlanes[(3*4) + 3] = -CProp_Portal_Shared::vLocalMins.y;
+	fPlanes[(3*4) + 3] = -vPortalLocalMins.y;
 
 	fPlanes[(4*4) + 0] = 0.0f;
 	fPlanes[(4*4) + 1] = 0.0f;
 	fPlanes[(4*4) + 2] = 1.0f;
-	fPlanes[(4*4) + 3] = CProp_Portal_Shared::vLocalMaxs.z;
+	fPlanes[(4*4) + 3] = vPortalLocalMaxs.z;
 
 	fPlanes[(5*4) + 0] = 0.0f;
 	fPlanes[(5*4) + 1] = 0.0f;
 	fPlanes[(5*4) + 2] = -1.0f;
-	fPlanes[(5*4) + 3] = -CProp_Portal_Shared::vLocalMins.z;
+	fPlanes[(5*4) + 3] = -vPortalLocalMins.z;
 
 	CPolyhedron *pPolyhedron = GeneratePolyhedronFromPlanes( fPlanes, 6, 0.00001f, true );
 	Assert( pPolyhedron != NULL );
@@ -278,7 +278,7 @@ void CProp_Portal::Spawn( void )
 	//VPhysicsInitNormal( SOLID_VPHYSICS, FSOLID_TRIGGER, false );
 	//CreateVPhysics();
 	ResetModel();	
-	SetSize( CProp_Portal_Shared::vLocalMins, CProp_Portal_Shared::vLocalMaxs );
+	SetSize(vPortalLocalMins, vPortalLocalMaxs);
 
 	pCollisionEntity->GetEnginePortal()->UpdateCorners();
 
@@ -449,7 +449,7 @@ void CProp_Portal::ResetModel( void )
 	else
 		SetModel( "models/portals/portal2.mdl" );
 
-	SetSize( CProp_Portal_Shared::vLocalMins, CProp_Portal_Shared::vLocalMaxs );
+	SetSize(vPortalLocalMins, vPortalLocalMaxs);
 
 	GetEngineObject()->SetSolid( SOLID_OBB );
 	GetEngineObject()->SetSolidFlags( FSOLID_TRIGGER | FSOLID_NOT_SOLID | FSOLID_CUSTOMBOXTEST | FSOLID_CUSTOMRAYTEST );
@@ -1565,14 +1565,14 @@ void CProp_Portal::WakeNearbyEntities( void )
 	QAngle qAngles = GetEngineObject()->GetAbsAngles();
 
 	Vector ptOBBStart = ptOrigin;
-	ptOBBStart += vForward * CProp_Portal_Shared::vLocalMins.x;
-	ptOBBStart += vRight * CProp_Portal_Shared::vLocalMins.y;
-	ptOBBStart += vUp * CProp_Portal_Shared::vLocalMins.z;
+	ptOBBStart += vForward * vPortalLocalMins.x;
+	ptOBBStart += vRight * vPortalLocalMins.y;
+	ptOBBStart += vUp * vPortalLocalMins.z;
 
 
-	vForward *= CProp_Portal_Shared::vLocalMaxs.x - CProp_Portal_Shared::vLocalMins.x;
-	vRight *= CProp_Portal_Shared::vLocalMaxs.y - CProp_Portal_Shared::vLocalMins.y;
-	vUp *= CProp_Portal_Shared::vLocalMaxs.z - CProp_Portal_Shared::vLocalMins.z;
+	vForward *= vPortalLocalMaxs.x - vPortalLocalMins.x;
+	vRight *= vPortalLocalMaxs.y - vPortalLocalMins.y;
+	vUp *= vPortalLocalMaxs.z - vPortalLocalMins.z;
 
 
 	Vector vAABBMins, vAABBMaxs;
@@ -1604,7 +1604,7 @@ void CProp_Portal::WakeNearbyEntities( void )
 		{
 
 			//double check intersection at the OBB vs OBB level, we don't want to affect large piles of physics objects if we don't have to. It gets slow
-			if( IsOBBIntersectingOBB( ptOrigin, qAngles, CProp_Portal_Shared::vLocalMins, CProp_Portal_Shared::vLocalMaxs, 
+			if( IsOBBIntersectingOBB( ptOrigin, qAngles, vPortalLocalMins, vPortalLocalMaxs,
 				pEntity->GetEngineObject()->GetCollisionOrigin(), pEntity->GetEngineObject()->GetCollisionAngles(), 
 				pEntity->GetEngineObject()->OBBMins(), pEntity->GetEngineObject()->OBBMaxs() ) )
 			{

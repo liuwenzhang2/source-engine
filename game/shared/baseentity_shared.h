@@ -11,6 +11,7 @@
 #pragma once
 #endif
 
+#include "tier1/convar.h"
 
 extern ConVar hl2_episodic;
 

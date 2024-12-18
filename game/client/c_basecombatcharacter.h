@@ -17,8 +17,9 @@
 #ifdef GLOWS_ENABLE
 #include "glow_outline_effect.h"
 #endif // GLOWS_ENABLE
+#include "c_basecombatweapon.h"
 
-class C_BaseCombatWeapon;
+//class C_BaseCombatWeapon;
 class C_WeaponCombatShield;
 
 #define BCC_DEFAULT_LOOK_TOWARDS_TOLERANCE 0.9f

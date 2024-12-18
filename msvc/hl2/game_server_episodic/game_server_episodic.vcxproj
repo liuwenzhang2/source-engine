@@ -536,6 +536,7 @@
     <ClCompile Include="..\..\..\game\shared\physics_shared.cpp" />
     <ClCompile Include="..\..\..\game\shared\point_bonusmaps_accessor.cpp" />
     <ClCompile Include="..\..\..\game\shared\point_posecontroller.cpp" />
+    <ClCompile Include="..\..\..\game\shared\portal_util_shared.cpp" />
     <ClCompile Include="..\..\..\game\shared\precache_register.cpp" />
     <ClCompile Include="..\..\..\game\shared\predictableid.cpp" />
     <ClCompile Include="..\..\..\game\shared\props_shared.cpp" />

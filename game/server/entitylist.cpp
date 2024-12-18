@@ -6,6 +6,7 @@
 //=============================================================================//
 
 //#include "cbase.h"
+#include "baseentity_shared.h"
 #include "sendproxy.h"
 #include "entitylist.h"
 #ifdef _WIN32
@@ -47,15 +48,10 @@
 #include "physics_shared.h"
 #include "player.h"
 #include "vphysics/collision_set.h"
-#ifdef PORTAL
-#include "prop_combine_ball.h"
-#include "portal_player.h"
-#include "portal/weapon_physcannon.h" //grab controller
-#include "prop_portal_shared.h"
-#endif // PORTAL
 #include "env_debughistory.h"
 #include "physics_prop_ragdoll.h"
 #include "hl2_gamerules.h"
+#include "portal_util_shared.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
@@ -2041,22 +2037,22 @@ int CPortal_CollisionEvent::ShouldSolvePenetration(IPhysicsObject* pObj0, IPhysi
 		//held objects are clipping into other objects when travelling across a portal. We're close to ship, so this seems to be the
 		//most localized way to make a fix.
 		//Note that we're not actually going to change whether it should solve, we're just going to tack on some hacks
-		CPortal_Player* pHoldingPlayer = (CPortal_Player*)gEntList.GetPlayerHoldingEntity(pHeld);
+		CBasePlayer* pHoldingPlayer = gEntList.GetPlayerHoldingEntity(pHeld);
 		if (!pHoldingPlayer && pHeld->GetEngineObject()->IsShadowClone())
-			pHoldingPlayer = (CPortal_Player*)gEntList.GetPlayerHoldingEntity(pHeld->GetEngineShadowClone()->GetClonedEntity());
+			pHoldingPlayer = gEntList.GetPlayerHoldingEntity(pHeld->GetEngineShadowClone()->GetClonedEntity());
 
 		Assert(pHoldingPlayer);
 		if (pHoldingPlayer)
 		{
-			IGrabController* pGrabController = GetGrabControllerForPlayer(pHoldingPlayer);
+			IGrabController* pGrabController = pHoldingPlayer->GetGrabController();
 
 			if (!pGrabController)
-				pGrabController = GetGrabControllerForPhysCannon(pHoldingPlayer->GetActiveWeapon());
+				pGrabController = pHoldingPlayer->GetActiveWeapon()->GetGrabController();
 
 			Assert(pGrabController);
 			if (pGrabController)
 			{
-				GrabController_SetPortalPenetratingEntity(pGrabController, pOther);
+				pGrabController->SetPortalPenetratingEntity(pOther);
 			}
 
 			//NDebugOverlay::EntityBounds( pHeld, 0, 0, 255, 16, 1.0f );
@@ -2140,7 +2136,7 @@ static void ModifyWeight_PreCollision(vcollisionevent_t* pEvent)
 		int j = 1 - i;
 
 		// One is a combine ball, if the other is a movable brush, reduce the combine ball mass
-		if (dynamic_cast<CPropCombineBall*>(pUnshadowedEntities[j]) != NULL && pUnshadowedEntities[i] != NULL)
+		if (pUnshadowedEntities[j]->IsCombineBall() && pUnshadowedEntities[i] != NULL)
 		{
 			if (pUnshadowedEntities[i]->GetEngineObject()->GetMoveType() == MOVETYPE_PUSH)
 			{
@@ -2169,7 +2165,7 @@ static void ModifyWeight_PreCollision(vcollisionevent_t* pEvent)
 		if ((pUnshadowedObjects[i] && pUnshadowedObjects[i]->GetGameFlags() & FVPHYSICS_PLAYER_HELD))
 		{
 			int j = 1 - i;
-			if (dynamic_cast<CPropCombineBall*>(pUnshadowedEntities[j]) != NULL)
+			if (pUnshadowedEntities[j]->IsCombineBall())
 			{
 				// [j] is the combine ball, set mass low
 				// if the above ball vs brush entity check didn't already change the mass, change the mass
@@ -2211,7 +2207,7 @@ static void ModifyWeight_PreCollision(vcollisionevent_t* pEvent)
 				CBaseEntity* pLookingForEntity = (CBaseEntity*)pEvent->pObjects[i]->GetGameData();
 				CBasePlayer* pHoldingPlayer = gEntList.GetPlayerHoldingEntity(pLookingForEntity);
 				if (pHoldingPlayer)
-					pGrabController = GetGrabControllerForPlayer(pHoldingPlayer);
+					pGrabController = pHoldingPlayer->GetGrabController();
 
 				float fSavedMass, fSavedRotationalDamping;
 
@@ -3387,7 +3383,7 @@ void CGrabController::GetSavedParamsForCarriedPhysObject(IPhysicsObject* pObject
 bool CGrabController::IsObjectAllowedOverhead(CBaseEntity* pEntity)
 {
 	// Allow combine balls overhead 
-	if (UTIL_IsCombineBallDefinite(pEntity))
+	if (pEntity->IsCombineBall())
 		return true;
 
 	// Allow props that are specifically flagged as such
@@ -10253,6 +10249,308 @@ void CEnginePortalInternal::TraceRay(const Ray_t& ray, unsigned int fMask, ITrac
 	}
 }
 
+class CTransformedCollideable : public ICollideable //wraps an existing collideable, but transforms everything that pertains to world space by another transform
+{
+public:
+	VMatrix m_matTransform; //the transformation we apply to the wrapped collideable
+	VMatrix m_matInvTransform; //cached inverse of m_matTransform
+
+	ICollideable* m_pWrappedCollideable; //the collideable we're transforming without it knowing
+
+	struct CTC_ReferenceVars_t
+	{
+		Vector m_vCollisionOrigin;
+		QAngle m_qCollisionAngles;
+		matrix3x4_t m_matCollisionToWorldTransform;
+		matrix3x4_t m_matRootParentToWorldTransform;
+	};
+
+	mutable CTC_ReferenceVars_t m_ReferencedVars; //when returning a const reference, it needs to point to something, so here we go
+
+	//abstract functions which require no transforms, just pass them along to the wrapped collideable
+	virtual IHandleEntity* GetEntityHandle() { return m_pWrappedCollideable->GetEntityHandle(); }
+	virtual const Vector& OBBMinsPreScaled() const { return m_pWrappedCollideable->OBBMinsPreScaled(); }
+	virtual const Vector& OBBMaxsPreScaled() const { return m_pWrappedCollideable->OBBMaxsPreScaled(); }
+	virtual const Vector& OBBMins() const { return m_pWrappedCollideable->OBBMins(); }
+	virtual const Vector& OBBMaxs() const { return m_pWrappedCollideable->OBBMaxs(); }
+	virtual int				GetCollisionModelIndex() { return m_pWrappedCollideable->GetCollisionModelIndex(); }
+	virtual const model_t* GetCollisionModel() { return m_pWrappedCollideable->GetCollisionModel(); }
+	virtual SolidType_t		GetSolid() const { return m_pWrappedCollideable->GetSolid(); }
+	virtual int				GetSolidFlags() const { return m_pWrappedCollideable->GetSolidFlags(); }
+	//virtual IClientUnknown*	GetIClientUnknown() { return m_pWrappedCollideable->GetIClientUnknown(); }
+	virtual int				GetCollisionGroup() const { return m_pWrappedCollideable->GetCollisionGroup(); }
+	virtual bool			ShouldTouchTrigger(int triggerSolidFlags) const { return m_pWrappedCollideable->ShouldTouchTrigger(triggerSolidFlags); }
+
+	//slightly trickier functions
+	virtual void			WorldSpaceTriggerBounds(Vector* pVecWorldMins, Vector* pVecWorldMaxs) const;
+	virtual bool			TestCollision(const Ray_t& ray, unsigned int fContentsMask, trace_t& tr);
+	virtual bool			TestHitboxes(const Ray_t& ray, unsigned int fContentsMask, trace_t& tr);
+	virtual const Vector& GetCollisionOrigin() const;
+	virtual const QAngle& GetCollisionAngles() const;
+	virtual const matrix3x4_t& CollisionToWorldTransform() const;
+	virtual void			WorldSpaceSurroundingBounds(Vector* pVecMins, Vector* pVecMaxs);
+	virtual const matrix3x4_t* GetRootParentToWorldTransform() const;
+};
+
+void CTransformedCollideable::WorldSpaceTriggerBounds(Vector* pVecWorldMins, Vector* pVecWorldMaxs) const
+{
+	m_pWrappedCollideable->WorldSpaceTriggerBounds(pVecWorldMins, pVecWorldMaxs);
+
+	if (pVecWorldMins)
+		*pVecWorldMins = m_matTransform * (*pVecWorldMins);
+
+	if (pVecWorldMaxs)
+		*pVecWorldMaxs = m_matTransform * (*pVecWorldMaxs);
+}
+
+bool CTransformedCollideable::TestCollision(const Ray_t& ray, unsigned int fContentsMask, trace_t& tr)
+{
+	//TODO: Transform the ray by inverse matTransform and transform the trace results by matTransform? AABB Errors arise by transforming the ray.
+	return m_pWrappedCollideable->TestCollision(ray, fContentsMask, tr);
+}
+
+bool CTransformedCollideable::TestHitboxes(const Ray_t& ray, unsigned int fContentsMask, trace_t& tr)
+{
+	//TODO: Transform the ray by inverse matTransform and transform the trace results by matTransform? AABB Errors arise by transforming the ray.
+	return m_pWrappedCollideable->TestHitboxes(ray, fContentsMask, tr);
+}
+
+const Vector& CTransformedCollideable::GetCollisionOrigin() const
+{
+	m_ReferencedVars.m_vCollisionOrigin = m_matTransform * m_pWrappedCollideable->GetCollisionOrigin();
+	return m_ReferencedVars.m_vCollisionOrigin;
+}
+
+const QAngle& CTransformedCollideable::GetCollisionAngles() const
+{
+	m_ReferencedVars.m_qCollisionAngles = TransformAnglesToWorldSpace(m_pWrappedCollideable->GetCollisionAngles(), m_matTransform.As3x4());
+	return m_ReferencedVars.m_qCollisionAngles;
+}
+
+const matrix3x4_t& CTransformedCollideable::CollisionToWorldTransform() const
+{
+	//1-2 order correct?
+	ConcatTransforms(m_matTransform.As3x4(), m_pWrappedCollideable->CollisionToWorldTransform(), m_ReferencedVars.m_matCollisionToWorldTransform);
+	return m_ReferencedVars.m_matCollisionToWorldTransform;
+}
+
+void CTransformedCollideable::WorldSpaceSurroundingBounds(Vector* pVecMins, Vector* pVecMaxs)
+{
+	if ((pVecMins == NULL) && (pVecMaxs == NULL))
+		return;
+
+	Vector vMins, vMaxs;
+	m_pWrappedCollideable->WorldSpaceSurroundingBounds(&vMins, &vMaxs);
+
+	TransformAABB(m_matTransform.As3x4(), vMins, vMaxs, vMins, vMaxs);
+
+	if (pVecMins)
+		*pVecMins = vMins;
+	if (pVecMaxs)
+		*pVecMaxs = vMaxs;
+}
+
+const matrix3x4_t* CTransformedCollideable::GetRootParentToWorldTransform() const
+{
+	const matrix3x4_t* pWrappedVersion = m_pWrappedCollideable->GetRootParentToWorldTransform();
+	if (pWrappedVersion == NULL)
+		return NULL;
+
+	ConcatTransforms(m_matTransform.As3x4(), *pWrappedVersion, m_ReferencedVars.m_matRootParentToWorldTransform);
+	return &m_ReferencedVars.m_matRootParentToWorldTransform;
+}
+
+void CEnginePortalInternal::TraceEntity(CBaseEntity* pEntity, const Vector& vecAbsStart, const Vector& vecAbsEnd, unsigned int mask, ITraceFilter* pFilter, trace_t* pTrace) const
+{
+
+	const CEnginePortalInternal* pLinkedPortalSimulator = this->GetLinkedPortal();
+	ICollideable* pCollision = enginetrace->GetCollideable(pEntity);
+
+	Ray_t entRay;
+	entRay.Init(vecAbsStart, vecAbsEnd, pCollision->OBBMins(), pCollision->OBBMaxs());
+
+#if 0 // this trace for brush ents made sense at one time, but it's 'overcolliding' during portal transitions (bugzilla#25)
+	if (realTrace.m_pEnt && (realTrace.m_pEnt->GetEngineObject()->GetMoveType() != MOVETYPE_NONE)) //started by hitting something moving which wouldn't be detected in the following traces
+	{
+		float fFirstPortalFraction = 2.0f;
+		CProp_Portal* pFirstPortal = UTIL_Portal_FirstAlongRay(entRay, fFirstPortalFraction);
+
+		if (!pFirstPortal)
+			*pTrace = realTrace;
+		else
+		{
+			Vector vFirstPortalForward;
+			pFirstPortal->GetVectors(&vFirstPortalForward, NULL, NULL);
+			if (vFirstPortalForward.Dot(realTrace.endpos - pFirstPortal->GetAbsOrigin()) > 0.0f)
+				*pTrace = realTrace;
+		}
+	}
+#endif
+
+	// We require both environments to be active in order to trace against them
+	Assert(pCollision);
+	if (!pCollision)
+	{
+		return;
+	}
+
+	// World, displacements and holy wall are stored in separate collideables
+	// Traces against each and keep the closest intersection (if any)
+	trace_t tempTrace;
+
+	// Hit the world
+	if (pFilter->GetTraceType() != TRACE_ENTITIES_ONLY)
+	{
+		if (TraceWorldBrushes(entRay, &tempTrace))
+		{
+			//physcollision->TraceCollide( vecAbsStart, vecAbsEnd, pCollision, qCollisionAngles, 
+			//							pPortalSimulator->m_DataAccess.Simulation.Static.World.Brushes.pCollideable, vec3_origin, vec3_angle, &tempTrace );
+			if (tempTrace.startsolid || (tempTrace.fraction < pTrace->fraction))
+			{
+				*pTrace = tempTrace;
+			}
+		}
+
+		//if( pPortalSimulator->m_DataAccess.Simulation.Static.Wall.RemoteTransformedToLocal.Brushes.pCollideable &&
+		if (pLinkedPortalSimulator && TraceTransformedWorldBrushes(pLinkedPortalSimulator, entRay, &tempTrace))
+		{
+			//physcollision->TraceCollide( vecAbsStart, vecAbsEnd, pCollision, qCollisionAngles,
+			//							pLinkedPortalSimulator->m_DataAccess.Simulation.Static.World.Brushes.pCollideable, pPortalSimulator->m_DataAccess.Placement.ptaap_LinkedToThis.ptOriginTransform, pPortalSimulator->m_DataAccess.Placement.ptaap_LinkedToThis.qAngleTransform, &tempTrace );
+
+			if (tempTrace.startsolid || (tempTrace.fraction < pTrace->fraction))
+			{
+				*pTrace = tempTrace;
+			}
+		}
+
+		if (TraceWallBrushes(entRay, &tempTrace))
+		{
+			//physcollision->TraceCollide( vecAbsStart, vecAbsEnd, pCollision, qCollisionAngles,
+			//							pPortalSimulator->m_DataAccess.Simulation.Static.Wall.Local.Brushes.pCollideable, vec3_origin, vec3_angle, &tempTrace );
+
+			if (tempTrace.startsolid || (tempTrace.fraction < pTrace->fraction))
+			{
+				if (tempTrace.fraction == 0.0f)
+					tempTrace.startsolid = true;
+
+				if (tempTrace.fractionleftsolid == 1.0f)
+					tempTrace.allsolid = true;
+
+				*pTrace = tempTrace;
+			}
+		}
+
+		if (TraceWallTube(entRay, &tempTrace))
+		{
+			//physcollision->TraceCollide( vecAbsStart, vecAbsEnd, pCollision, qCollisionAngles,
+			//							pPortalSimulator->m_DataAccess.Simulation.Static.Wall.Local.Tube.pCollideable, vec3_origin, vec3_angle, &tempTrace );
+
+			if ((tempTrace.startsolid == false) && (tempTrace.fraction < pTrace->fraction)) //never allow something to be stuck in the tube, it's more of a last-resort guide than a real collideable
+			{
+				*pTrace = tempTrace;
+			}
+		}
+
+		// For all brush traces, use the 'portal backbrush' surface surface contents
+		// BUGBUG: Doing this is a great solution because brushes near a portal
+		// will have their contents and surface properties homogenized to the brush the portal ray hit.
+		if (pTrace->startsolid || (pTrace->fraction < 1.0f))
+		{
+			pTrace->surface = GetSurfaceProperties().surface;
+			pTrace->contents = GetSurfaceProperties().contents;
+			pTrace->m_pEnt = GetSurfaceProperties().pEntity;
+		}
+	}
+
+	// Trace vs entities
+	if (pFilter->GetTraceType() != TRACE_WORLD_ONLY)
+	{
+		if (sv_portal_trace_vs_staticprops.GetBool() && (pFilter->GetTraceType() != TRACE_ENTITIES_ONLY))
+		{
+			bool bFilterStaticProps = (pFilter->GetTraceType() == TRACE_EVERYTHING_FILTER_PROPS);
+
+			//local clipped static props
+			{
+				int iLocalStaticCount = GetStaticPropsCount();
+				if (iLocalStaticCount != 0 && StaticPropsCollisionExists())
+				{
+					int iIndex = 0;
+					Vector vTransform = vec3_origin;
+					QAngle qTransform = vec3_angle;
+
+					do
+					{
+						const PS_SD_Static_World_StaticProps_ClippedProp_t* pCurrentProp = GetStaticProps(iIndex);
+						if ((!bFilterStaticProps) || pFilter->ShouldHitEntity(pCurrentProp->pSourceProp, mask))
+						{
+							//physcollision->TraceCollide( vecAbsStart, vecAbsEnd, pCollision, qCollisionAngles,
+							//							pCurrentProp->pCollide, vTransform, qTransform, &tempTrace );
+
+							EntityList()->PhysGetCollision()->TraceBox(entRay, MASK_ALL, NULL, pCurrentProp->pCollide, vTransform, qTransform, &tempTrace);
+
+							if (tempTrace.startsolid || (tempTrace.fraction < pTrace->fraction))
+							{
+								*pTrace = tempTrace;
+								pTrace->surface.flags = pCurrentProp->iTraceSurfaceFlags;
+								pTrace->surface.surfaceProps = pCurrentProp->iTraceSurfaceProps;
+								pTrace->surface.name = pCurrentProp->szTraceSurfaceName;
+								pTrace->contents = pCurrentProp->iTraceContents;
+								pTrace->m_pEnt = pCurrentProp->pTraceEntity;
+							}
+						}
+
+						++iIndex;
+					} while (iIndex != iLocalStaticCount);
+				}
+			}
+
+			if (pLinkedPortalSimulator && EntityIsInPortalHole(pEntity->GetEngineObject()))
+			{
+
+#ifndef CLIENT_DLL
+				if (sv_use_transformed_collideables.GetBool()) //if this never gets turned off, it should be removed before release
+				{
+					//moving entities near the remote portal
+					CBaseEntity* pEnts[1024];
+					int iEntCount = pLinkedPortalSimulator->GetMoveableOwnedEntities(pEnts, 1024);
+
+					CTransformedCollideable transformedCollideable;
+					transformedCollideable.m_matTransform = pLinkedPortalSimulator->MatrixThisToLinked();
+					transformedCollideable.m_matInvTransform = pLinkedPortalSimulator->MatrixLinkedToThis();
+					for (int i = 0; i != iEntCount; ++i)
+					{
+						CBaseEntity* pRemoteEntity = pEnts[i];
+						if (pRemoteEntity->GetEngineObject()->GetSolid() == SOLID_NONE)
+							continue;
+
+						transformedCollideable.m_pWrappedCollideable = pRemoteEntity->GetCollideable();
+						Assert(transformedCollideable.m_pWrappedCollideable != NULL);
+
+						//enginetrace->ClipRayToCollideable( entRay, mask, &transformedCollideable, pTrace );
+
+						enginetrace->ClipRayToCollideable(entRay, mask, &transformedCollideable, &tempTrace);
+						if (tempTrace.startsolid || (tempTrace.fraction < pTrace->fraction))
+						{
+							*pTrace = tempTrace;
+						}
+					}
+				}
+#endif //#ifndef CLIENT_DLL
+			}
+		}
+	}
+
+	if (pTrace->fraction == 1.0f)
+	{
+		memset(pTrace, 0, sizeof(trace_t));
+		pTrace->fraction = 1.0f;
+		pTrace->startpos = vecAbsStart;
+		pTrace->endpos = vecAbsEnd;
+	}
+	//#endif
+
+}
+
 int CEnginePortalInternal::GetStaticPropsCount() const
 {
 	return m_DataAccess.Simulation.Static.World.StaticProps.ClippedRepresentations.Count();
@@ -12091,7 +12389,7 @@ void CEnginePortalInternal::TakePhysicsOwnership(CBaseEntity* pEntity)
 					}
 					else*/
 					{
-						PlayerPickupObject(pPlayer, pHeldEntity);
+						pPlayer->PickupObject(pHeldEntity);
 					}
 					pPlayer->GetEnginePlayer()->SetSilentDropAndPickup(false);
 				}
@@ -12203,7 +12501,7 @@ void CEnginePortalInternal::ReleasePhysicsOwnership(CBaseEntity* pEntity, bool b
 							}
 							else*/
 							{
-								PlayerPickupObject(pPlayer, pHeldEntity);
+								pPlayer->PickupObject(pHeldEntity);
 							}
 							pPlayer->GetEnginePlayer()->SetSilentDropAndPickup(false);
 						}
@@ -12219,7 +12517,7 @@ void CEnginePortalInternal::ReleasePhysicsOwnership(CBaseEntity* pEntity, bool b
 	//PortalSimulator_ReleasedPhysicsOwnershipOfEntity(pEntity);
 }
 
-int CEnginePortalInternal::GetMoveableOwnedEntities(CBaseEntity** pEntsOut, int iEntOutLimit)
+int CEnginePortalInternal::GetMoveableOwnedEntities(CBaseEntity** pEntsOut, int iEntOutLimit) const
 {
 	int iOwnedEntCount = m_OwnedEntities.Count();
 	int iOutputCount = 0;
@@ -12853,10 +13151,10 @@ static void FullSyncPhysicsObject(IPhysicsObject* pSource, IPhysicsObject* pDest
 		CBasePlayer* pHoldingPlayer = gEntList.GetPlayerHoldingEntity(pLookingForEntity);
 		if (pHoldingPlayer)
 		{
-			pGrabController = GetGrabControllerForPlayer(pHoldingPlayer);
+			pGrabController = pHoldingPlayer->GetGrabController();
 
 			if (!pGrabController)
-				pGrabController = GetGrabControllerForPhysCannon(pHoldingPlayer->GetActiveWeapon());
+				pGrabController = pHoldingPlayer->GetActiveWeapon()->GetGrabController();
 		}
 
 		AssertMsg(pGrabController, "Physics object is held, but we can't find the holding controller.");

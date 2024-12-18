@@ -974,6 +974,7 @@ public:
 	
 	virtual bool	IsChangeLevelTrigger() { return false; };
 	virtual bool	IsGib() { return false; }
+	virtual bool	IsCombineBall() { return false; }
 	virtual const char* GetNewLandmarkName() { return ""; };
 	virtual const char* GetNewMapName() { return ""; };
 
@@ -1418,8 +1419,12 @@ public:
 	virtual CBaseEntity*	GetActiveWeapon() const { return NULL; }
 	virtual CBaseEntity*	GetPlayerHeldEntity() { return NULL; }
 	virtual CBaseEntity*	PhysCannonGetHeldEntity() { return NULL; }
+	virtual float			GetHeldObjectMass(IPhysicsObject* pHeldObject) { return 0; }
+	virtual IGrabController* GetGrabController() { return NULL; }
+	virtual void			PickupObject(CBaseEntity* pObject, bool bLimitMassAndSize = true) {}
+	virtual void			ForceDropOfCarriedPhysObjects(CBaseEntity* pOnlyIfHoldindThis = NULL) {}
 	virtual bool			OnAttemptPhysGunPickup(CBasePlayer* pPhysGunUser, PhysGunPickup_t reason = PICKED_UP_BY_CANNON) { return true; }
-	virtual CBaseEntity* OnFailedPhysGunPickup(Vector vPhysgunPos) { return NULL; }
+	virtual CBaseEntity*	OnFailedPhysGunPickup(Vector vPhysgunPos) { return NULL; }
 	virtual void			OnPhysGunPickup(CBasePlayer* pPhysGunUser, PhysGunPickup_t reason = PICKED_UP_BY_CANNON) {}
 	virtual void			OnPhysGunDrop(CBasePlayer* pPhysGunUser, PhysGunDrop_t reason) {}
 	virtual bool			HasPreferredCarryAnglesForPlayer(CBasePlayer* pPlayer) { return false; }

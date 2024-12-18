@@ -9,7 +9,8 @@
 #define HL2_PLAYER_H
 #pragma once
 
-
+#include "gamerules.h"
+#include "baseentity_shared.h"
 #include "player.h"
 #include "hl2_playerlocaldata.h"
 #include "simtimer.h"

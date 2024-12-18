@@ -637,7 +637,6 @@ public:
 
 	CBaseEntity* PhysCannonGetHeldEntity();
 
-
 protected:
 	enum FindObjectResult_t
 	{
@@ -3829,29 +3828,18 @@ CBaseEntity * CPortal_Player::GetPlayerHeldEntity()
 	return pObject;
 }
 
-IGrabController *GetGrabControllerForPlayer( CBasePlayer *pPlayer )
+IGrabController * CPortal_Player::GetGrabController()
 {
-	CPlayerPickupController *pPlayerPickupController = (CPlayerPickupController *)(pPlayer->GetUseEntity());
+	CPlayerPickupController *pPlayerPickupController = (CPlayerPickupController *)(this->GetUseEntity());
 	if( pPlayerPickupController )
 		return pPlayerPickupController->GetGrabController();
 
 	return NULL;
 }
 
-IGrabController *GetGrabControllerForPhysCannon( CBaseCombatWeapon *pActiveWeapon )
-{
-	CWeaponPhysCannon *pCannon = dynamic_cast<CWeaponPhysCannon *>(pActiveWeapon);
-	if ( pCannon )
-	{
-		return pCannon->GetGrabController();
-	}
-
-	return NULL;
-}
-
 void UpdateGrabControllerTargetPosition( CBasePlayer *pPlayer, Vector *vPosition, QAngle *qAngles )
 {
-	IGrabController *pGrabController = GetGrabControllerForPlayer( pPlayer );
+	IGrabController *pGrabController = pPlayer->GetGrabController();
 
 	if ( !pGrabController )
 		return;

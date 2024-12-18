@@ -66,7 +66,6 @@
 
 
 #include "datamap.h"
-#include "util.h"
 //#include "predictable_entity.h"
 //#include "predictableid.h"
 #include "sendproxy.h"
@@ -78,7 +77,6 @@
 #include "base_transmit_proxy.h"
 #include "soundflags.h"
 #include "networkvar.h"
-#include "baseentity_shared.h"
 #include "basetoggle.h"
 #include "igameevents.h"
 
@@ -102,23 +100,6 @@ extern void FireTargets( const char *targetName, CBaseEntity *pActivator, CBaseE
 
 #define MAX_OLD_ENEMIES		4 // how many old enemies to remember
 
-// used by suit voice to indicate damage sustained and repaired type to player
-
-enum
-{
-	itbd_Paralyze = 0,
-	itbd_NerveGas,
-	itbd_PoisonRecover,
-	itbd_Radiation,
-	itbd_DrownRecover,
-	itbd_Acid,
-	itbd_SlowBurn,
-	itbd_SlowFreeze,
-
-	// Must be last!
-	CDMG_TIMEBASED
-};
-
 // when calling KILLED(), a value that governs gib behavior is expected to be 
 // one of these three values
 #define GIB_NORMAL			0// gib if entity was overkilled
@@ -134,24 +115,28 @@ class CSound;
 #else
 #undef FUNCTANK_AUTOUSE
 #endif//_XBOX
-
+#include "engine/IEngineTrace.h"
 // This is a precompiled header.  Include a bunch of common stuff.
 // This is kind of ugly in that it adds a bunch of dependency where it isn't needed.
 // But on balance, the compile time is much lower (even incrementally) once the precompiled
 // headers contain these headers.
 #include "precache_register.h"
-#include "baseanimating.h"
+//#include "baseanimating.h"
 //#include "basecombatweapon.h"
 //#include "basecombatcharacter.h"
+#include "baseentity_shared.h"
 #include "gamerules.h"
-#include "entitylist.h"
-#include "basetempentity.h"
 #include "player.h"
+#include "basetempentity.h"
+#include "entitylist.h"
 #include "te.h"
 //#include "physics.h"
 #include "ndebugoverlay.h"
 #include "recipientfilter.h"
 #include "gamemovement.h"
+#include "portal_util_shared.h"
+#include "util_shared.h"
+#include "util.h"
 
 abstract_class CBaseEntityClassList
 {
