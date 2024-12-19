@@ -4188,7 +4188,14 @@ void CEngineObjectInternal::ParseMapData(IEntityMapData* mapData)
 	{
 		do
 		{
-			if (!m_pOuter->KeyValue(keyName, value)) {
+			if (m_pOuter->KeyValue(keyName, value)) 
+			{
+				if (KeyValue(keyName, value)) {
+					Msg("Entity %s has multiparsed key: %s!\n", GetClassname(), keyName);
+				}
+			}
+			else 
+			{
 				if (!KeyValue(keyName, value)) {
 					Msg("Entity %s has unparsed key: %s!\n", GetClassname(), keyName);
 				}
