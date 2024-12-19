@@ -915,75 +915,22 @@ bool UTIL_IsSpaceEmpty( CBaseEntity *pMainEnt, const Vector &vMin, const Vector 
 
 void UTIL_StringToFloatArray( float *pVector, int count, const char *pString )
 {
-	char *pstr, *pfront, tempString[128];
-	int	j;
-
-	Q_strncpy( tempString, pString, sizeof(tempString) );
-	pstr = pfront = tempString;
-
-	for ( j = 0; j < count; j++ )			// lifted from pr_edict.c
-	{
-		pVector[j] = atof( pfront );
-
-		// skip any leading whitespace
-		while ( *pstr && *pstr <= ' ' )
-			pstr++;
-
-		// skip to next whitespace
-		while ( *pstr && *pstr > ' ' )
-			pstr++;
-
-		if (!*pstr)
-			break;
-
-		pstr++;
-		pfront = pstr;
-	}
-	for ( j++; j < count; j++ )
-	{
-		pVector[j] = 0;
-	}
+	datamap_t::UTIL_StringToFloatArray(pVector, count, pString);
 }
 
 void UTIL_StringToVector( float *pVector, const char *pString )
 {
-	UTIL_StringToFloatArray( pVector, 3, pString );
+	datamap_t::UTIL_StringToVector(pVector, pString);
 }
 
 void UTIL_StringToIntArray( int *pVector, int count, const char *pString )
 {
-	char *pstr, *pfront, tempString[128];
-	int	j;
-
-	Q_strncpy( tempString, pString, sizeof(tempString) );
-	pstr = pfront = tempString;
-
-	for ( j = 0; j < count; j++ )			// lifted from pr_edict.c
-	{
-		pVector[j] = atoi( pfront );
-
-		while ( *pstr && *pstr != ' ' )
-			pstr++;
-		if (!*pstr)
-			break;
-		pstr++;
-		pfront = pstr;
-	}
-
-	for ( j++; j < count; j++ )
-	{
-		pVector[j] = 0;
-	}
+	datamap_t::UTIL_StringToIntArray(pVector, count, pString);
 }
 
 void UTIL_StringToColor32( color32 *color, const char *pString )
 {
-	int tmp[4];
-	UTIL_StringToIntArray( tmp, 4, pString );
-	color->r = tmp[0];
-	color->g = tmp[1];
-	color->b = tmp[2];
-	color->a = tmp[3];
+	datamap_t::UTIL_StringToColor32(color, pString);
 }
 
 #ifndef _XBOX

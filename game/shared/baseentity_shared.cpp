@@ -62,8 +62,6 @@ ConVar hl2_episodic( "hl2_episodic", "0", FCVAR_REPLICATED );
 
 #ifdef GAME_DLL
 	ConVar ent_debugkeys( "ent_debugkeys", "" );
-	extern bool ParseKeyvalue( void *pObject, typedescription_t *pFields, int iNumFields, const char *szKeyName, const char *szValue );
-	extern bool ExtractKeyvalue( void *pObject, typedescription_t *pFields, int iNumFields, const char *szKeyName, char *szValue, int iMaxLen );
 #endif
 	extern ISoundEmitterSystemBase* soundemitterbase;
 
@@ -492,7 +490,7 @@ bool CBaseEntity::KeyValue( const char *szKeyName, const char *szValue )
 	{
 		for (datamap_t* dmap = this->GetDataDescMap(); dmap != NULL; dmap = dmap->baseMap)
 		{
-			if (::ParseKeyvalue(this, dmap->dataDesc, dmap->dataNumFields, szKeyName, szValue)) {
+			if (dmap->ParseKeyvalue(this, szKeyName, szValue, &AllocPooledString)) {
 				return true;
 				//break;
 			}
@@ -521,7 +519,7 @@ bool CBaseEntity::KeyValue( const char *szKeyName, const char *szValue )
 				debugName = dmap->dataClassName;
 			}
 
-			if (::ParseKeyvalue(this, dmap->dataDesc, dmap->dataNumFields, szKeyName, szValue))
+			if (dmap->ParseKeyvalue(this, szKeyName, szValue, &AllocPooledString))
 			{
 				if (printKeyHits)
 					Msg("(%s) key: %-16s value: %s\n", debugName, szKeyName, szValue);
@@ -649,7 +647,7 @@ bool CBaseEntity::GetKeyValue( const char *szKeyName, char *szValue, int iMaxLen
 
 	for ( datamap_t *dmap = GetDataDescMap(); dmap != NULL; dmap = dmap->baseMap )
 	{
-		if ( ::ExtractKeyvalue( this, dmap->dataDesc, dmap->dataNumFields, szKeyName, szValue, iMaxLen ) )
+		if (dmap->ExtractKeyvalue( this, szKeyName, szValue, iMaxLen ) )
 			return true;
 	}
 #endif

@@ -17,6 +17,7 @@
 
 #include "tier1/utlvector.h"
 #include "ihandleentity.h"
+#include "string_t.h"
 #include "tier0/memdbgon.h"
 
 struct inputdata_t;
@@ -329,6 +330,40 @@ static int g_FieldSizes[FIELD_TYPECOUNT] =
 	FIELD_SIZE(FIELD_POINTER),
 };
 
+typedef string_t(*AllocStringFunc)(const char* pszValue);
+struct SaveRestoreFieldInfo_t
+{
+	void* pField;
+
+	// Note that it is legal for the following two fields to be NULL,
+	// though it may be disallowed by implementors of ISaveRestoreOps
+	void* pOwner;
+	typedescription_t* pTypeDesc;
+};
+
+class ISave;
+class IRestore;
+abstract_class ISaveRestoreOps
+{
+public:
+	// save data type interface
+	virtual void Save(const SaveRestoreFieldInfo_t & fieldInfo, ISave * pSave) = 0;
+	virtual void Restore(const SaveRestoreFieldInfo_t& fieldInfo, IRestore* pRestore) = 0;
+
+	virtual bool IsEmpty(const SaveRestoreFieldInfo_t& fieldInfo) = 0;
+	virtual void MakeEmpty(const SaveRestoreFieldInfo_t& fieldInfo) = 0;
+	virtual bool Parse(const SaveRestoreFieldInfo_t& fieldInfo, char const* szValue) = 0;
+
+	//---------------------------------
+
+	void Save(void* pField, ISave* pSave) { SaveRestoreFieldInfo_t fieldInfo = { pField, NULL, NULL }; Save(fieldInfo, pSave); }
+	void Restore(void* pField, IRestore* pRestore) { SaveRestoreFieldInfo_t fieldInfo = { pField, NULL, NULL }; Restore(fieldInfo, pRestore); }
+
+	bool IsEmpty(void* pField) { SaveRestoreFieldInfo_t fieldInfo = { pField, NULL, NULL }; return IsEmpty(fieldInfo); }
+	void MakeEmpty(void* pField) { SaveRestoreFieldInfo_t fieldInfo = { pField, NULL, NULL }; MakeEmpty(fieldInfo); }
+	bool Parse(void* pField, char const* pszValue) { SaveRestoreFieldInfo_t fieldInfo = { pField, NULL, NULL }; return Parse(fieldInfo, pszValue); }
+};
+
 //-----------------------------------------------------------------------------
 // Purpose: stores the list of objects in the hierarchy
 //			used to iterate through an object's data descriptions
@@ -499,6 +534,380 @@ public:
 		return current_position;
 	}
 
+	//-----------------------------------------------------------------------------
+// Purpose: iterates through a typedescript data block, so it can insert key/value data into the block
+// Input  : *pObject - pointer to the struct or class the data is to be insterted into
+//			*pFields - description of the data
+//			iNumFields - number of fields contained in pFields
+//			char *szKeyName - name of the variable to look for
+//			char *szValue - value to set the variable to
+// Output : Returns true if the variable is found and set, false if the key is not found.
+//-----------------------------------------------------------------------------
+	bool ParseKeyvalue(void* pObject, const char* szKeyName, const char* szValue, AllocStringFunc func)//typedescription_t* pFields, int iNumFields, 
+	{
+		int i;
+		typedescription_t* pField;
+
+		for (i = 0; i < this->dataNumFields; i++)
+		{
+			pField = &this->dataDesc[i];
+
+			int fieldOffset = pField->fieldOffset[TD_OFFSET_NORMAL];
+
+			// Check the nested classes, but only if they aren't in array form.
+			if ((pField->fieldType == FIELD_EMBEDDED) && (pField->fieldSize == 1))
+			{
+				for (datamap_t* dmap = pField->td; dmap != NULL; dmap = dmap->baseMap)
+				{
+					void* pEmbeddedObject = (void*)((char*)pObject + fieldOffset);
+					if (dmap->ParseKeyvalue(pEmbeddedObject, szKeyName, szValue, func))
+						return true;
+				}
+			}
+
+			if ((pField->flags & FTYPEDESC_KEY) && !stricmp(pField->externalName, szKeyName))
+			{
+				switch (pField->fieldType)
+				{
+				case FIELD_MODELNAME:
+				case FIELD_SOUNDNAME:
+				case FIELD_STRING:
+					(*(string_t*)((char*)pObject + fieldOffset)) = func(szValue);
+					return true;
+
+				case FIELD_TIME:
+				case FIELD_FLOAT:
+					(*(float*)((char*)pObject + fieldOffset)) = atof(szValue);
+					return true;
+
+				case FIELD_BOOLEAN:
+					(*(bool*)((char*)pObject + fieldOffset)) = (bool)(atoi(szValue) != 0);
+					return true;
+
+				case FIELD_CHARACTER:
+					(*(char*)((char*)pObject + fieldOffset)) = (char)atoi(szValue);
+					return true;
+
+				case FIELD_SHORT:
+					(*(short*)((char*)pObject + fieldOffset)) = (short)atoi(szValue);
+					return true;
+
+				case FIELD_INTEGER:
+				case FIELD_TICK:
+					(*(int*)((char*)pObject + fieldOffset)) = atoi(szValue);
+					return true;
+
+				case FIELD_POSITION_VECTOR:
+				case FIELD_VECTOR:
+					UTIL_StringToVector((float*)((char*)pObject + fieldOffset), szValue);
+					return true;
+
+				case FIELD_VMATRIX:
+				case FIELD_VMATRIX_WORLDSPACE:
+					UTIL_StringToFloatArray((float*)((char*)pObject + fieldOffset), 16, szValue);
+					return true;
+
+				case FIELD_MATRIX3X4_WORLDSPACE:
+					UTIL_StringToFloatArray((float*)((char*)pObject + fieldOffset), 12, szValue);
+					return true;
+
+				case FIELD_COLOR32:
+					UTIL_StringToColor32((color32*)((char*)pObject + fieldOffset), szValue);
+					return true;
+
+				case FIELD_CUSTOM:
+				{
+					SaveRestoreFieldInfo_t fieldInfo =
+					{
+						(char*)pObject + fieldOffset,
+						pObject,
+						pField
+					};
+					pField->pSaveRestoreOps->Parse(fieldInfo, szValue);
+					return true;
+				}
+
+				default:
+				case FIELD_INTERVAL: // Fixme, could write this if needed
+				case FIELD_CLASSPTR:
+				case FIELD_MODELINDEX:
+				case FIELD_MATERIALINDEX:
+				case FIELD_EDICT:
+					Warning("Bad field in entity!!\n");
+					Assert(0);
+					break;
+				}
+			}
+		}
+
+		return false;
+	}
+
+	//-----------------------------------------------------------------------------
+// Purpose: iterates through a typedescript data block, so it can insert key/value data into the block
+// Input  : *pObject - pointer to the struct or class the data is to be insterted into
+//			*pFields - description of the data
+//			iNumFields - number of fields contained in pFields
+//			char *szKeyName - name of the variable to look for
+//			char *szValue - value to set the variable to
+// Output : Returns true if the variable is found and set, false if the key is not found.
+//-----------------------------------------------------------------------------
+	bool ExtractKeyvalue(void* pObject, const char* szKeyName, char* szValue, int iMaxLen)//typedescription_t* pFields, int iNumFields, 
+	{
+		int i;
+		typedescription_t* pField;
+
+		for (i = 0; i < this->dataNumFields; i++)
+		{
+			pField = &this->dataDesc[i];
+
+			int fieldOffset = pField->fieldOffset[TD_OFFSET_NORMAL];
+
+			// Check the nested classes, but only if they aren't in array form.
+			if ((pField->fieldType == FIELD_EMBEDDED) && (pField->fieldSize == 1))
+			{
+				for (datamap_t* dmap = pField->td; dmap != NULL; dmap = dmap->baseMap)
+				{
+					void* pEmbeddedObject = (void*)((char*)pObject + fieldOffset);
+					if (dmap->ExtractKeyvalue(pEmbeddedObject, szKeyName, szValue, iMaxLen))
+						return true;
+				}
+			}
+
+			if ((pField->flags & FTYPEDESC_KEY) && !stricmp(pField->externalName, szKeyName))
+			{
+				switch (pField->fieldType)
+				{
+				case FIELD_MODELNAME:
+				case FIELD_SOUNDNAME:
+				case FIELD_STRING:
+					Q_strncpy(szValue, ((char*)pObject + fieldOffset), iMaxLen);
+					return true;
+
+				case FIELD_TIME:
+				case FIELD_FLOAT:
+					Q_snprintf(szValue, iMaxLen, "%f", (*(float*)((char*)pObject + fieldOffset)));
+					return true;
+
+				case FIELD_BOOLEAN:
+					Q_snprintf(szValue, iMaxLen, "%d", (*(bool*)((char*)pObject + fieldOffset)) != 0);
+					return true;
+
+				case FIELD_CHARACTER:
+					Q_snprintf(szValue, iMaxLen, "%d", (*(char*)((char*)pObject + fieldOffset)));
+					return true;
+
+				case FIELD_SHORT:
+					Q_snprintf(szValue, iMaxLen, "%d", (*(short*)((char*)pObject + fieldOffset)));
+					return true;
+
+				case FIELD_INTEGER:
+				case FIELD_TICK:
+					Q_snprintf(szValue, iMaxLen, "%d", (*(int*)((char*)pObject + fieldOffset)));
+					return true;
+
+				case FIELD_POSITION_VECTOR:
+				case FIELD_VECTOR:
+					Q_snprintf(szValue, iMaxLen, "%f %f %f",
+						((float*)((char*)pObject + fieldOffset))[0],
+						((float*)((char*)pObject + fieldOffset))[1],
+						((float*)((char*)pObject + fieldOffset))[2]);
+					return true;
+
+				case FIELD_VMATRIX:
+				case FIELD_VMATRIX_WORLDSPACE:
+					//UTIL_StringToFloatArray( (float *)((char *)pObject + fieldOffset), 16, szValue );
+					return false;
+
+				case FIELD_MATRIX3X4_WORLDSPACE:
+					//UTIL_StringToFloatArray( (float *)((char *)pObject + fieldOffset), 12, szValue );
+					return false;
+
+				case FIELD_COLOR32:
+					Q_snprintf(szValue, iMaxLen, "%d %d %d %d",
+						((int*)((char*)pObject + fieldOffset))[0],
+						((int*)((char*)pObject + fieldOffset))[1],
+						((int*)((char*)pObject + fieldOffset))[2],
+						((int*)((char*)pObject + fieldOffset))[3]);
+					return true;
+
+				case FIELD_CUSTOM:
+				{
+					/*
+					SaveRestoreFieldInfo_t fieldInfo =
+					{
+						(char *)pObject + fieldOffset,
+						pObject,
+						pField
+					};
+					pField->pSaveRestoreOps->Parse( fieldInfo, szValue );
+					*/
+					return false;
+				}
+
+				default:
+				case FIELD_INTERVAL: // Fixme, could write this if needed
+				case FIELD_CLASSPTR:
+				case FIELD_MODELINDEX:
+				case FIELD_MATERIALINDEX:
+				case FIELD_EDICT:
+					Warning("Bad field in entity!!\n");
+					Assert(0);
+					break;
+				}
+			}
+		}
+
+		return false;
+	}
+
+	//-----------------------------------------------------------------------------
+// Purpose: Search this datamap for the name of this member function
+//			This is used to save/restore function pointers (convert pointer to text)
+// Input  : *function - pointer to member function
+// Output : const char * - function name
+//-----------------------------------------------------------------------------
+	const char* UTIL_FunctionToName(inputfunc_t function)//datamap_t* pMap, 
+	{
+		datamap_t* pMap = this;
+		while (pMap)
+		{
+			for (int i = 0; i < pMap->dataNumFields; i++)
+			{
+				if (pMap->dataDesc[i].flags & FTYPEDESC_FUNCTIONTABLE)
+				{
+#ifdef WIN32
+					Assert(sizeof(pMap->dataDesc[i].inputFunc) == sizeof(void*));
+#elif defined(POSIX)
+					Assert(sizeof(pMap->dataDesc[i].inputFunc) == 8);
+#else
+#error
+#endif
+					inputfunc_t pTest = pMap->dataDesc[i].inputFunc;
+
+					if (pTest == function)
+						return pMap->dataDesc[i].fieldName;
+				}
+			}
+			pMap = pMap->baseMap;
+		}
+
+		return NULL;
+	}
+
+	// Misc useful
+	inline bool FStrEq(const char* sz1, const char* sz2)
+	{
+		return (sz1 == sz2 || V_stricmp(sz1, sz2) == 0);
+	}
+	//-----------------------------------------------------------------------------
+// Purpose: Search the datamap for a function named pName
+//			This is used to save/restore function pointers (convert text back to pointer)
+// Input  : *pName - name of the member function
+//-----------------------------------------------------------------------------
+	inputfunc_t UTIL_FunctionFromName(const char* pName)
+	{
+		datamap_t* pMap = this;
+		while (pMap)
+		{
+			for (int i = 0; i < pMap->dataNumFields; i++)
+			{
+#ifdef WIN32
+				Assert(sizeof(pMap->dataDesc[i].inputFunc) == sizeof(void*));
+#elif defined(POSIX)
+				Assert(sizeof(pMap->dataDesc[i].inputFunc) == 8);
+#else
+#error
+#endif
+
+				if (pMap->dataDesc[i].flags & FTYPEDESC_FUNCTIONTABLE)
+				{
+					if (FStrEq(pName, pMap->dataDesc[i].fieldName))
+					{
+						return pMap->dataDesc[i].inputFunc;
+					}
+				}
+			}
+			pMap = pMap->baseMap;
+		}
+
+		Msg("Failed to find function %s\n", pName);
+
+		return NULL;
+	}
+
+	static void UTIL_StringToFloatArray(float* pVector, int count, const char* pString)
+	{
+		char* pstr, * pfront, tempString[128];
+		int	j;
+
+		Q_strncpy(tempString, pString, sizeof(tempString));
+		pstr = pfront = tempString;
+
+		for (j = 0; j < count; j++)			// lifted from pr_edict.c
+		{
+			pVector[j] = atof(pfront);
+
+			// skip any leading whitespace
+			while (*pstr && *pstr <= ' ')
+				pstr++;
+
+			// skip to next whitespace
+			while (*pstr && *pstr > ' ')
+				pstr++;
+
+			if (!*pstr)
+				break;
+
+			pstr++;
+			pfront = pstr;
+		}
+		for (j++; j < count; j++)
+		{
+			pVector[j] = 0;
+		}
+	}
+
+	static void UTIL_StringToVector(float* pVector, const char* pString)
+	{
+		UTIL_StringToFloatArray(pVector, 3, pString);
+	}
+
+	static void UTIL_StringToIntArray(int* pVector, int count, const char* pString)
+	{
+		char* pstr, * pfront, tempString[128];
+		int	j;
+
+		Q_strncpy(tempString, pString, sizeof(tempString));
+		pstr = pfront = tempString;
+
+		for (j = 0; j < count; j++)			// lifted from pr_edict.c
+		{
+			pVector[j] = atoi(pfront);
+
+			while (*pstr && *pstr != ' ')
+				pstr++;
+			if (!*pstr)
+				break;
+			pstr++;
+			pfront = pstr;
+		}
+
+		for (j++; j < count; j++)
+		{
+			pVector[j] = 0;
+		}
+	}
+
+	static void UTIL_StringToColor32(color32* color, const char* pString)
+	{
+		int tmp[4];
+		UTIL_StringToIntArray(tmp, 4, pString);
+		color->r = tmp[0];
+		color->g = tmp[1];
+		color->b = tmp[2];
+		color->a = tmp[3];
+	}
 };
 
 

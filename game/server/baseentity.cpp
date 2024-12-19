@@ -2766,7 +2766,7 @@ void CBaseEntity::FunctionCheck( void *pFunction, const char *name )
 	// Note, if you crash here and your class is using multiple inheritance, it is
 	// probably the case that CBaseEntity (or a descendant) is not the first
 	// class in your list of ancestors, which it must be.
-	if (pFunction && !UTIL_FunctionToName( GetDataDescMap(), *(inputfunc_t*)pFunction ) )
+	if (pFunction && !GetDataDescMap()->UTIL_FunctionToName( *(inputfunc_t*)pFunction ) )
 	{
 		Warning( "FUNCTION NOT IN TABLE!: %s:%s (%08lx)\n", STRING(GetEngineObject()->GetClassname()), name, (unsigned long)pFunction );
 		Assert(0);
@@ -4600,45 +4600,48 @@ void CC_Ent_Dump( const CCommand& args )
 				// search through all the actions in the data description, printing out details
 				for ( int i = 0; i < dmap->dataNumFields; i++ )
 				{
-					variant_t var;
-					if ( ent->ReadKeyField( dmap->dataDesc[i].externalName, &var) )
-					{
-						char buf[256];
-						buf[0] = 0;
-						switch( var.FieldType() )
-						{
-						case FIELD_STRING:
-							Q_strncpy( buf, var.String() ,sizeof(buf));
-							break;
-						case FIELD_INTEGER:
-							if ( var.Int() )
-								Q_snprintf( buf,sizeof(buf), "%d", var.Int() );
-							break;
-						case FIELD_FLOAT:
-							if ( var.Float() )
-								Q_snprintf( buf,sizeof(buf), "%.2f", var.Float() );
-							break;
-						case FIELD_EHANDLE:
-							{
-								// get the entities name
-								if ( var.Entity() )
-								{
-									Q_snprintf( buf,sizeof(buf), "%s", STRING(var.Entity()->GetEntityName()) );
-								}
-							}
-							break;
-						}
-
-						// don't print out the duplicate keys
-						if ( !Q_stricmp("parentname",dmap->dataDesc[i].externalName) || !Q_stricmp("targetname",dmap->dataDesc[i].externalName) )
-							continue;
-
-						// don't print out empty keys
-						if ( buf[0] )
-						{
-							ClientPrint( pPlayer, HUD_PRINTCONSOLE, UTIL_VarArgs("  %s: %s\n", dmap->dataDesc[i].externalName, buf) );
-						}
+					if (!dmap->dataDesc[i].externalName) {
+						continue;
 					}
+					variant_t var;
+					var.Set(dmap->dataDesc[i].fieldType, ((char*)ent) + dmap->dataDesc[i].fieldOffset[TD_OFFSET_NORMAL]);
+					
+					char buf[256];
+					buf[0] = 0;
+					switch( var.FieldType() )
+					{
+					case FIELD_STRING:
+						Q_strncpy( buf, var.String() ,sizeof(buf));
+						break;
+					case FIELD_INTEGER:
+						if ( var.Int() )
+							Q_snprintf( buf,sizeof(buf), "%d", var.Int() );
+						break;
+					case FIELD_FLOAT:
+						if ( var.Float() )
+							Q_snprintf( buf,sizeof(buf), "%.2f", var.Float() );
+						break;
+					case FIELD_EHANDLE:
+						{
+							// get the entities name
+							if ( var.Entity() )
+							{
+								Q_snprintf( buf,sizeof(buf), "%s", STRING(var.Entity()->GetEntityName()) );
+							}
+						}
+						break;
+					}
+
+					// don't print out the duplicate keys
+					if ( !Q_stricmp("parentname",dmap->dataDesc[i].externalName) || !Q_stricmp("targetname",dmap->dataDesc[i].externalName) )
+						continue;
+
+					// don't print out empty keys
+					if ( buf[0] )
+					{
+						ClientPrint( pPlayer, HUD_PRINTCONSOLE, UTIL_VarArgs("  %s: %s\n", dmap->dataDesc[i].externalName, buf) );
+					}
+					
 				}
 			}
 		}

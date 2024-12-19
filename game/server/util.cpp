@@ -2652,39 +2652,6 @@ void UTIL_BoundToWorldSize( Vector *pVecPos )
 // UNDONE: Cast to BASEPTR or something else here?
 //#define EXTRACT_INPUTFUNC_FUNCTIONPTR(x)		(*(inputfunc_t **)(&(x)))
 
-//-----------------------------------------------------------------------------
-// Purpose: Search this datamap for the name of this member function
-//			This is used to save/restore function pointers (convert pointer to text)
-// Input  : *function - pointer to member function
-// Output : const char * - function name
-//-----------------------------------------------------------------------------
-const char* UTIL_FunctionToName(datamap_t* pMap, inputfunc_t function)
-{
-	while (pMap)
-	{
-		for (int i = 0; i < pMap->dataNumFields; i++)
-		{
-			if (pMap->dataDesc[i].flags & FTYPEDESC_FUNCTIONTABLE)
-			{
-#ifdef WIN32
-				Assert(sizeof(pMap->dataDesc[i].inputFunc) == sizeof(void*));
-#elif defined(POSIX)
-				Assert(sizeof(pMap->dataDesc[i].inputFunc) == 8);
-#else
-#error
-#endif
-				inputfunc_t pTest = pMap->dataDesc[i].inputFunc;
-
-				if (pTest == function)
-					return pMap->dataDesc[i].fieldName;
-			}
-		}
-		pMap = pMap->baseMap;
-	}
-
-	return NULL;
-}
-
 class CSkipKeys : public IVPhysicsKeyHandler
 {
 public:

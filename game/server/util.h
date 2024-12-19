@@ -532,9 +532,6 @@ bool UTIL_IsFacingWithinTolerance( CBaseEntity *pViewer, CBaseEntity *pTarget, f
 
 void UTIL_GetDebugColorForRelationship( int nRelationship, int &r, int &g, int &b );
 
-class datamap_t;
-const char	*UTIL_FunctionToName( datamap_t *pMap, inputfunc_t function );
-
 int UTIL_GetCommandClientIndex( void );
 CBasePlayer *UTIL_GetCommandClient( void );
 bool UTIL_GetModDir( char *lpszTextOut, unsigned int nSize );

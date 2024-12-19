@@ -320,36 +320,9 @@ protected:
 //
 //
 
-struct SaveRestoreFieldInfo_t
-{
-	void *			   pField;
 
-	// Note that it is legal for the following two fields to be NULL,
-	// though it may be disallowed by implementors of ISaveRestoreOps
-	void *			   pOwner;
-	typedescription_t *pTypeDesc;
-};
 
-abstract_class ISaveRestoreOps
-{
-public:
-	// save data type interface
-	virtual void Save( const SaveRestoreFieldInfo_t &fieldInfo, ISave *pSave ) = 0;
-	virtual void Restore( const SaveRestoreFieldInfo_t &fieldInfo, IRestore *pRestore ) = 0;
 
-	virtual bool IsEmpty( const SaveRestoreFieldInfo_t &fieldInfo ) = 0;
-	virtual void MakeEmpty( const SaveRestoreFieldInfo_t &fieldInfo ) = 0;
-	virtual bool Parse( const SaveRestoreFieldInfo_t &fieldInfo, char const* szValue ) = 0;
-
-	//---------------------------------
-
-	void Save( void *pField, ISave *pSave )				{ SaveRestoreFieldInfo_t fieldInfo = { pField, NULL, NULL }; Save( fieldInfo, pSave ); }
-	void Restore( void *pField, IRestore *pRestore )	{ SaveRestoreFieldInfo_t fieldInfo = { pField, NULL, NULL }; Restore( fieldInfo, pRestore ); }
-
-	bool IsEmpty( void *pField)							{ SaveRestoreFieldInfo_t fieldInfo = { pField, NULL, NULL }; return IsEmpty( fieldInfo ); }
-	void MakeEmpty( void *pField)						{ SaveRestoreFieldInfo_t fieldInfo = { pField, NULL, NULL }; MakeEmpty( fieldInfo ); }
-	bool Parse( void *pField, char const *pszValue )	{ SaveRestoreFieldInfo_t fieldInfo = { pField, NULL, NULL }; return Parse( fieldInfo, pszValue ); }
-};
 
 //-------------------------------------
 
