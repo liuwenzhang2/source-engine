@@ -47,9 +47,11 @@
 
 static const char *s_pWaitForUpgradeContext = "WaitForUpgrade";
 
-ConVarRef physcannon_maxmass("physcannon_maxmass");
+ConVar	g_debug_physcannon( "g_debug_physcannon", "0" );
+
 ConVar physcannon_minforce( "physcannon_minforce", "700" );
 ConVar physcannon_maxforce( "physcannon_maxforce", "1500" );
+ConVar physcannon_maxmass( "physcannon_maxmass", "250" );
 ConVar physcannon_tracelength( "physcannon_tracelength", "250" );
 ConVar physcannon_mega_tracelength( "physcannon_mega_tracelength", "850" );
 ConVar physcannon_chargetime("physcannon_chargetime", "2" );

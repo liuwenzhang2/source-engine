@@ -203,7 +203,6 @@ ConVar g_ragdoll_maxcount("g_ragdoll_maxcount", "8", FCVAR_REPLICATED);
 ConVar g_debug_ragdoll_removal("g_debug_ragdoll_removal", "0", FCVAR_REPLICATED | FCVAR_CHEAT);
 ConVar	cl_phys_timescale("cl_phys_timescale", "1.0", FCVAR_CHEAT, "Sets the scale of time for client-side physics (ragdolls)");
 ConVar cl_ragdoll_collide("cl_ragdoll_collide", "0");
-ConVar	g_debug_physcannon("g_debug_physcannon", "0", FCVAR_REPLICATED | FCVAR_CHEAT);
 
 int CCollisionEvent::ShouldCollide(IPhysicsObject* pObj0, IPhysicsObject* pObj1, void* pGameData0, void* pGameData1)
 #if _DEBUG
@@ -1265,7 +1264,7 @@ bool C_GrabControllerInternal::UpdateObject(C_BasePlayer* pPlayer, float flError
 #endif
 
 	QAngle angles = TransformAnglesFromPlayerSpace(m_attachedAnglesPlayerSpace, pPlayer);
-
+	ConVarRef	g_debug_physcannon("g_debug_physcannon");
 	if (g_debug_physcannon.GetBool())
 	{
 #ifdef CLIENT_DLL
@@ -1485,6 +1484,7 @@ void C_GrabControllerInternal::ComputeMaxSpeed(C_BaseEntity* pEntity, IPhysicsOb
 
 	// Compute total mass...
 	float flMass = PhysGetEntityMass(pEntity);
+	ConVarRef physcannon_maxmass("physcannon_maxmass");
 	float flMaxMass = physcannon_maxmass.GetFloat();
 	if (flMass <= flMaxMass)
 		return;
@@ -1854,6 +1854,7 @@ void C_GrabControllerInternal::DetachEntity(bool bClearVelocity)
 			else
 			{
 #ifndef CLIENT_DLL
+				ConVarRef hl2_normspeed("hl2_normspeed");
 				ClampPhysicsVelocity(pPhys, hl2_normspeed.GetFloat() * 1.5f, 2.0f * 360.0f);
 #endif
 			}

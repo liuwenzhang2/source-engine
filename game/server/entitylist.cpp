@@ -135,9 +135,6 @@ ConVar phys_dontprintint("phys_dontprintint", "1", FCVAR_NONE, "Don't print inte
 static ConVar phys_penetration_error_time("phys_penetration_error_time", "10", 0, "Controls the duration of vphysics penetration error boxes.");
 static int g_iShadowCloneCount = 0;
 ConVar sv_use_shadow_clones("sv_use_shadow_clones", "1", FCVAR_REPLICATED | FCVAR_CHEAT); //should we create shadow clones?
-ConVar physcannon_maxmass("physcannon_maxmass", "250", FCVAR_REPLICATED | FCVAR_CHEAT);
-ConVar hl2_normspeed("hl2_normspeed", "190");
-ConVar	g_debug_physcannon("g_debug_physcannon", "0", FCVAR_REPLICATED | FCVAR_CHEAT);
 
 
 //-----------------------------------------------------------------------------
@@ -2723,6 +2720,7 @@ bool CGrabControllerInternal::UpdateObject(CBasePlayer* pPlayer, float flError)
 	}
 
 	//Show overlays of radius
+	ConVarRef	g_debug_physcannon("g_debug_physcannon");
 	if (g_debug_physcannon.GetBool())
 	{
 		NDebugOverlay::Box(end, -Vector(2, 2, 2), Vector(2, 2, 2), 0, 255, 0, true, 0);
@@ -2918,6 +2916,7 @@ void CGrabControllerInternal::ComputeMaxSpeed(CBaseEntity* pEntity, IPhysicsObje
 
 	// Compute total mass...
 	float flMass = PhysGetEntityMass(pEntity);
+	ConVarRef physcannon_maxmass("physcannon_maxmass");
 	float flMaxMass = physcannon_maxmass.GetFloat();
 	if (flMass <= flMaxMass)
 		return;
@@ -3265,6 +3264,7 @@ void CGrabControllerInternal::DetachEntity(bool bClearVelocity)
 			}
 			else
 			{
+				ConVarRef hl2_normspeed("hl2_normspeed");
 				ClampPhysicsVelocity(pPhys, hl2_normspeed.GetFloat() * 1.5f, 2.0f * 360.0f);
 			}
 
