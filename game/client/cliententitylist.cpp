@@ -1827,7 +1827,7 @@ static void ClampPhysicsVelocity(IPhysicsObject* pPhys, float linearLimit, float
 
 void C_GrabControllerInternal::DetachEntity(bool bClearVelocity)
 {
-	Assert(!gEntList.PhysIsInCallback());
+	Assert(!ClientEntityList().PhysIsInCallback());
 	C_BaseEntity* pEntity = GetAttached();
 	if (pEntity)
 	{

@@ -12,13 +12,12 @@
 #pragma once
 #endif
 
-#include "vstdlib/random.h"
+#include "sharedInterface.h"
 
 #define ST_EPS 0.001
 
 #define DEFINE_SIMTIMER( type, name ) 	DEFINE_EMBEDDED( type, name )
 
-extern IUniformRandomStream* random;
 //-----------------------------------------------------------------------------
 
 class CSimpleSimTimer
