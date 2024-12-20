@@ -333,13 +333,12 @@ void CPortalGameMovement::AirMove( void )
 	//
 	else if ( sv_player_funnel_into_portals.GetBool() )
 	{
-		int iPortalCount = CProp_Portal_Shared::AllPortals.Count();
+		int iPortalCount = EntityList()->GetPortalCount();
 		if( iPortalCount != 0 )
 		{
-			CProp_Portal **pPortals = CProp_Portal_Shared::AllPortals.Base();
 			for( int i = 0; i != iPortalCount; ++i )
 			{
-				IEnginePortal *pTempPortal = pPortals[i]->pCollisionEntity->GetEnginePortal();
+				IEnginePortal *pTempPortal = EntityList()->GetPortal(i);
 				if( pTempPortal->IsActivedAndLinked() )
 				{
 					FunnelIntoPortal( pTempPortal, wishdir );

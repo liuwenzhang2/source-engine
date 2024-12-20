@@ -6271,14 +6271,16 @@ bool CLogicalEntity::KeyValue( const char *szKeyName, const char *szValue )
 //-----------------------------------------------------------------------------
 void CBaseEntity::RemoveDeferred( void )
 {
-	// Set our next think to remove us
-	SetThink( &CBaseEntity::SUB_Remove );
-	GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.1f );
+	if (GetEngineObject()->GetPfnThink() != &CBaseEntity::SUB_Remove) {
+		// Set our next think to remove us
+		SetThink(&CBaseEntity::SUB_Remove);
+		GetEngineObject()->SetNextThink(gpGlobals->curtime + 0.1f);
 
-	// Hide us completely
-	GetEngineObject()->AddEffects( EF_NODRAW );
-	GetEngineObject()->AddSolidFlags( FSOLID_NOT_SOLID );
-	GetEngineObject()->SetMoveType( MOVETYPE_NONE );
+		// Hide us completely
+		GetEngineObject()->AddEffects(EF_NODRAW);
+		GetEngineObject()->AddSolidFlags(FSOLID_NOT_SOLID);
+		GetEngineObject()->SetMoveType(MOVETYPE_NONE);
+	}
 }
 
 #define MIN_CORPSE_FADE_TIME		10.0

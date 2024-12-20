@@ -37,8 +37,6 @@
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
-CCallQueue *GetPortalCallQueue();
-
 extern IPhysicsConstraintEvent *g_pConstraintEvents;
 
 extern ConVar sv_portal_trace_vs_world;
@@ -1035,21 +1033,18 @@ CPSCollisionEntity::~CPSCollisionEntity( void )
 
 void CPSCollisionEntity::UpdateOnRemove( void )
 {
+#ifdef GAME_DLL
+	if (m_pOwningSimulator) {
+		gEntList.DestroyEntity(m_pOwningSimulator);
+	}
+	//s_PortalSimulatorCollisionEntities[entindex()] = false;
+#endif // GAME_DLL
 	GetEngineObject()->VPhysicsSetObject( NULL );
 	GetEnginePortal()->ClearHoleShapeCollideable();
 	GetEnginePortal()->ClearLinkedPhysics();
 	GetEnginePortal()->ClearLocalPhysics();
 	GetEnginePortal()->ClearLocalCollision();
 	GetEnginePortal()->ClearPolyhedrons();
-#ifdef GAME_DLL
-	if (m_pOwningSimulator) {
-		m_pOwningSimulator->pCollisionEntity->GetEnginePortal()->BeforeCollisionEntityDestroy();
-		m_pOwningSimulator->pCollisionEntity->GetEnginePortal()->SetActivated(false);
-		m_pOwningSimulator->pCollisionEntity = NULL;
-		m_pOwningSimulator = NULL;
-	}
-	//s_PortalSimulatorCollisionEntities[entindex()] = false;
-#endif // GAME_DLL
 	BaseClass::UpdateOnRemove();
 }
 

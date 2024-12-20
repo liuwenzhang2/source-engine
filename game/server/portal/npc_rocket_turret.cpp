@@ -1014,7 +1014,7 @@ bool CNPC_RocketTurret::TestPortalsForLOS( Vector* pOutVec, bool bConsiderNonPor
 	}
 	Vector vAimPoint = pTarget->GetEngineObject()->GetAbsOrigin() + (pTarget->GetEngineObject()->WorldAlignMins() + pTarget->GetEngineObject()->WorldAlignMaxs()) * 0.5f;
 
-	int iPortalCount = CProp_Portal_Shared::AllPortals.Count();
+	int iPortalCount = EntityList()->GetPortalCount();
 	if( iPortalCount == 0 )
 	{
 		*pOutVec = vAimPoint;
@@ -1025,7 +1025,6 @@ bool CNPC_RocketTurret::TestPortalsForLOS( Vector* pOutVec, bool bConsiderNonPor
 	AngleVectors( m_vecCurrentAngles.m_Value, &vCurAim );
 	vCurAim.NormalizeInPlace();
 
-	CProp_Portal **pPortals = CProp_Portal_Shared::AllPortals.Base();
 	Vector *portalAimPoints = (Vector *)stackalloc( sizeof( Vector ) * iPortalCount );
 	bool *bUsable = (bool *)stackalloc( sizeof( bool ) * iPortalCount );
 	float *fPortalDot = (float *)stackalloc( sizeof( float ) * iPortalCount );
@@ -1033,7 +1032,7 @@ bool CNPC_RocketTurret::TestPortalsForLOS( Vector* pOutVec, bool bConsiderNonPor
 	// Test through any active portals: This may be a shorter distance to the target
 	for( int i = 0; i != iPortalCount; ++i )
 	{
-		IEnginePortalServer *pTempPortal = pPortals[i]->pCollisionEntity->GetEnginePortal();
+		IEnginePortalServer *pTempPortal = EntityList()->GetPortal(i);
 
 		if( !pTempPortal->IsActivated() ||
 			(pTempPortal->GetLinkedPortal() == NULL) )

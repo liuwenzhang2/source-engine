@@ -3274,15 +3274,13 @@ void CServerGameClients::ClientSettingsChanged( int pEdict )
 //-----------------------------------------------------------------------------
 int TestAreaPortalVisibilityThroughPortals ( CFuncAreaPortalBase* pAreaPortal, IServerEntity *pViewEntity, unsigned char *pvs, int pvssize  )
 {
-	int iPortalCount = CProp_Portal_Shared::AllPortals.Count();
+	int iPortalCount = EntityList()->GetPortalCount();
 	if( iPortalCount == 0 )
 		return 0;
 
-	CProp_Portal **pPortals = CProp_Portal_Shared::AllPortals.Base();
-
 	for ( int i = 0; i != iPortalCount; ++i )
 	{
-		IEnginePortalServer* pLocalPortal = pPortals[ i ]->pCollisionEntity->GetEnginePortal();
+		IEnginePortalServer* pLocalPortal = EntityList()->GetPortal(i);
 		if ( pLocalPortal && pLocalPortal->IsActivated() )
 		{
 			IEnginePortalServer* pRemotePortal = pLocalPortal->GetLinkedPortal();

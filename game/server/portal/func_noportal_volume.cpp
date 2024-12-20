@@ -88,19 +88,18 @@ void CFuncNoPortalVolume::OnActivate( void )
 	if ( !GetCollideable() )
 		return;
 
-	int iPortalCount = CProp_Portal_Shared::AllPortals.Count();
+	int iPortalCount = EntityList()->GetPortalCount();
 	if( iPortalCount != 0 )
 	{
-		CProp_Portal **pPortals = CProp_Portal_Shared::AllPortals.Base();
 		for( int i = 0; i != iPortalCount; ++i )
 		{
-			CProp_Portal *pTempPortal = pPortals[i];
-			if( pTempPortal->pCollisionEntity->GetEnginePortal()->IsActivated() &&
-				IsOBBIntersectingOBB( pTempPortal->GetEngineObject()->GetAbsOrigin(), pTempPortal->GetEngineObject()->GetAbsAngles(), vPortalLocalMins, vPortalLocalMaxs,
+			IEnginePortalServer *pTempPortal = EntityList()->GetPortal(i);
+			if( pTempPortal->IsActivated() &&
+				IsOBBIntersectingOBB( pTempPortal->AsEngineObject()->GetAbsOrigin(), pTempPortal->AsEngineObject()->GetAbsAngles(), vPortalLocalMins, vPortalLocalMaxs,
 									  GetEngineObject()->GetAbsOrigin(), GetCollideable()->GetCollisionAngles(), GetCollideable()->OBBMins(), GetCollideable()->OBBMaxs() ) )
 			{
-				pTempPortal->DoFizzleEffect( PORTAL_FIZZLE_KILLED, false );
-				pTempPortal->Fizzle();
+				//pTempPortal->DoFizzleEffect( PORTAL_FIZZLE_KILLED, false );
+				gEntList.DestroyEntity(pTempPortal->AsEngineObject()->GetOuter());
 			}
 		}
 	}

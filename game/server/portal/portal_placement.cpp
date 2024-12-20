@@ -92,13 +92,12 @@ void TracePortals( const IEnginePortalServer *pIgnorePortal, const Vector &vForw
 
 	trace_t trTemp;
 
-	int iPortalCount = CProp_Portal_Shared::AllPortals.Count();
+	int iPortalCount = EntityList()->GetPortalCount();
 	if( iPortalCount != 0 )
 	{
-		CProp_Portal **pPortals = CProp_Portal_Shared::AllPortals.Base();
 		for( int i = 0; i != iPortalCount; ++i )
 		{
-			IEnginePortalServer *pTempPortal = pPortals[i]->pCollisionEntity->GetEnginePortal();
+			IEnginePortalServer *pTempPortal = EntityList()->GetPortal(i);
 			if( pTempPortal != pIgnorePortal && pTempPortal->IsActivated() )
 			{
 				Vector vOtherOrigin = pTempPortal->AsEngineObject()->GetAbsOrigin();
@@ -927,13 +926,12 @@ bool FitPortalOnSurface( const IEnginePortalServer *pIgnorePortal, Vector &vOrig
 
 void FitPortalAroundOtherPortals( const IEnginePortalServer *pIgnorePortal, Vector &vOrigin, const Vector &vForward, const Vector &vRight, const Vector &vUp )
 {
-	int iPortalCount = CProp_Portal_Shared::AllPortals.Count();
+	int iPortalCount = EntityList()->GetPortalCount();
 	if( iPortalCount != 0 )
 	{
-		CProp_Portal **pPortals = CProp_Portal_Shared::AllPortals.Base();
 		for( int i = 0; i != iPortalCount; ++i )
 		{
-			IEnginePortalServer *pTempPortal = pPortals[i]->pCollisionEntity->GetEnginePortal();
+			IEnginePortalServer *pTempPortal = EntityList()->GetPortal(i);
 			if( pTempPortal != pIgnorePortal && pTempPortal->IsActivated() )
 			{
 				Vector vOtherOrigin = pTempPortal->AsEngineObject()->GetAbsOrigin();
@@ -1019,17 +1017,16 @@ bool IsPortalOverlappingOtherPortals( const IEnginePortalServer *pIgnorePortal, 
 	Vector vPortalOBBMin = vPortalLocalMins + Vector( 1.0f, 1.0f, 1.0f );
 	Vector vPortalOBBMax = vPortalLocalMaxs - Vector( 1.0f, 1.0f, 1.0f );
 
-	int iPortalCount = CProp_Portal_Shared::AllPortals.Count();
+	int iPortalCount = EntityList()->GetPortalCount();
 	if( iPortalCount != 0 )
 	{
-		CProp_Portal **pPortals = CProp_Portal_Shared::AllPortals.Base();
 		for( int i = 0; i != iPortalCount; ++i )
 		{
-			CProp_Portal *pTempPortal = pPortals[i];
-			if( pTempPortal->pCollisionEntity->GetEnginePortal() != pIgnorePortal && pTempPortal->pCollisionEntity->GetEnginePortal()->IsActivated() )
+			IEnginePortalServer *pTempPortal = EntityList()->GetPortal(i);
+			if( pTempPortal != pIgnorePortal && pTempPortal->IsActivated() )
 			{
-				Vector vOtherOrigin = pTempPortal->GetEngineObject()->GetAbsOrigin();
-				QAngle qOtherAngles = pTempPortal->GetEngineObject()->GetAbsAngles();
+				Vector vOtherOrigin = pTempPortal->AsEngineObject()->GetAbsOrigin();
+				QAngle qOtherAngles = pTempPortal->AsEngineObject()->GetAbsAngles();
 
 				Vector vLinkedForward;
 				AngleVectors( qOtherAngles, &vLinkedForward, NULL, NULL );
@@ -1044,15 +1041,15 @@ bool IsPortalOverlappingOtherPortals( const IEnginePortalServer *pIgnorePortal, 
 					if ( sv_portal_placement_debug.GetBool() )
 					{
 						UTIL_Portal_NDebugOverlay( vOrigin, qAngles, 0, 0, 255, 128, false, 0.5f );
-						UTIL_Portal_NDebugOverlay( pTempPortal->pCollisionEntity->GetEnginePortal(), 255, 0, 0, 128, false, 0.5f);
+						UTIL_Portal_NDebugOverlay( pTempPortal, 255, 0, 0, 128, false, 0.5f);
 
 						DevMsg( "Portal overlapped another portal.\n" );
 					}
 
 					if ( bFizzle )
 					{
-						pTempPortal->DoFizzleEffect( PORTAL_FIZZLE_KILLED, false );
-						pTempPortal->Fizzle();
+						//pTempPortal->DoFizzleEffect( PORTAL_FIZZLE_KILLED, false );
+						gEntList.DestroyEntity(pTempPortal->AsEngineObject()->GetOuter());
 						bOverlappedOtherPortal = true;
 					}
 					else

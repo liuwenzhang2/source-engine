@@ -42,9 +42,6 @@
 #define MINIMUM_FLOOR_PORTAL_EXIT_VELOCITY_PLAYER 300.0f
 #define MAXIMUM_PORTAL_EXIT_VELOCITY 1000.0f
 
-CCallQueue *GetPortalCallQueue();
-
-
 ConVar sv_portal_debug_touch("sv_portal_debug_touch", "0", FCVAR_REPLICATED );
 ConVar sv_portal_placement_never_fail("sv_portal_placement_never_fail", "0", FCVAR_REPLICATED | FCVAR_CHEAT );
 ConVar sv_portal_new_velocity_check("sv_portal_new_velocity_check", "1", FCVAR_CHEAT );
@@ -162,6 +159,7 @@ CProp_Portal::~CProp_Portal( void )
 
 void CProp_Portal::UpdateOnRemove( void )
 {
+	DoFizzleEffect(PORTAL_FIZZLE_KILLED, false);
 	ClearEverything();//m_hPortalSimulator->
 
 	RemovePortalMicAndSpeaker();
@@ -187,6 +185,8 @@ void CProp_Portal::UpdateOnRemove( void )
 	//	m_hPortalSimulator = NULL;
 	//}
 	BaseClass::UpdateOnRemove();
+	CProp_Portal_Shared::AllPortals.FindAndRemove(this);
+	s_PortalLinkageGroups[m_iLinkageGroupID].FindAndRemove(this);
 }
 
 void CProp_Portal::Precache( void )
@@ -419,7 +419,7 @@ void CProp_Portal::TestRestingSurfaceThink( void )
 		if ( tr.fraction == 1.0f && !tr.startsolid && ( !tr.m_pEnt || ( tr.m_pEnt && !FClassnameIs((CBaseEntity*)tr.m_pEnt, "func_physbox" ) && !FClassnameIs((CBaseEntity*)tr.m_pEnt, "simple_physics_brush" ) ) ) )
 		{
 			DevMsg( "Surface removed from behind portal.\n" );
-			Fizzle();
+			gEntList.DestroyEntity(this);
 			SetContextThink( NULL, TICK_NEVER_THINK, s_pTestRestingSurfaceContext );
 			break;
 		}
@@ -650,10 +650,10 @@ void CProp_Portal::FizzleThink( void )
 //-----------------------------------------------------------------------------
 // Purpose: Portal will fizzle next time we get to think
 //-----------------------------------------------------------------------------
-void CProp_Portal::Fizzle( void )
-{
-	SetContextThink( &CProp_Portal::FizzleThink, gpGlobals->curtime, s_pFizzleThink );
-}
+//void CProp_Portal::Fizzle( void )
+//{
+//	SetContextThink( &CProp_Portal::FizzleThink, gpGlobals->curtime, s_pFizzleThink );
+//}
 
 //-----------------------------------------------------------------------------
 // Purpose: Removes the portal microphone and speakers. This is done in two places
@@ -922,9 +922,9 @@ bool CProp_Portal::ShouldTeleportTouchingEntity( CBaseEntity *pOther )
 
 void CProp_Portal::TeleportTouchingEntity( CBaseEntity *pOther )
 {
-	if ( GetPortalCallQueue() )
+	if (EntityList()->GetPostTouchQueue() )
 	{
-		GetPortalCallQueue()->QueueCall( this, &CProp_Portal::TeleportTouchingEntity, pOther );
+		EntityList()->GetPostTouchQueue()->QueueCall( this, &CProp_Portal::TeleportTouchingEntity, pOther );
 		return;
 	}
 
@@ -1351,8 +1351,8 @@ void CProp_Portal::Touch( CBaseEntity *pOther )
 				{
 					DevMsg( "Moving brush intersected portal plane.\n" );
 
-					DoFizzleEffect( PORTAL_FIZZLE_KILLED, false );
-					Fizzle();
+					//DoFizzleEffect( PORTAL_FIZZLE_KILLED, false );
+					gEntList.DestroyEntity(this);
 				}
 				else
 				{
@@ -1367,15 +1367,15 @@ void CProp_Portal::Touch( CBaseEntity *pOther )
 					{
 						DevMsg( "Surface removed from behind portal.\n" );
 
-						DoFizzleEffect( PORTAL_FIZZLE_KILLED, false );
-						Fizzle();
+						//DoFizzleEffect( PORTAL_FIZZLE_KILLED, false );
+						gEntList.DestroyEntity(this);
 					}
 					else if ( tr.m_pEnt && ((CBaseEntity*)tr.m_pEnt)->IsMoving() )
 					{
 						DevMsg( "Surface behind portal is moving.\n" );
 
-						DoFizzleEffect( PORTAL_FIZZLE_KILLED, false );
-						Fizzle();
+						//DoFizzleEffect( PORTAL_FIZZLE_KILLED, false );
+						gEntList.DestroyEntity(this);
 					}
 				}
 			}
@@ -2162,7 +2162,7 @@ void CProp_Portal::InputSetActivatedState( inputdata_t &inputdata )
 void CProp_Portal::InputFizzle( inputdata_t &inputdata )
 {
 	DoFizzleEffect( PORTAL_FIZZLE_KILLED, false );
-	Fizzle();
+	SetContextThink(&CProp_Portal::FizzleThink, gpGlobals->curtime, s_pFizzleThink);
 }
 
 //-----------------------------------------------------------------------------
@@ -2313,19 +2313,15 @@ public:
 			}
 
 			//might be cloned from main to a few environments
-			for (int i = CProp_Portal_Shared::AllPortals.Count(); --i >= 0; ) {
-				CProp_Portal* pPortal = CProp_Portal_Shared::AllPortals[i];
-				if (pPortal->pCollisionEntity) {
-					pPortal->pCollisionEntity->GetEnginePortal()->StopCloningEntity(pEntity);
-				}
+			for (int i = EntityList()->GetPortalCount(); --i >= 0; ) {
+				IEnginePortalServer* pPortal = EntityList()->GetPortal(i);
+					pPortal->StopCloningEntity(pEntity);
 			}
 		}
 
-		for (int i = CProp_Portal_Shared::AllPortals.Count(); --i >= 0; )
+		for (int i = EntityList()->GetPortalCount(); --i >= 0; )
 		{
-			if (CProp_Portal_Shared::AllPortals[i]->pCollisionEntity) {
-				CProp_Portal_Shared::AllPortals[i]->pCollisionEntity->GetEnginePortal()->ClearEntFlags(pEntity->entindex());
-			}
+			EntityList()->GetPortal(i)->ClearEntFlags(pEntity->entindex());
 		}
 
 		//if (physenv != physenv_main) {

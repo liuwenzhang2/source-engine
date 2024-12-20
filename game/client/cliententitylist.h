@@ -2756,6 +2756,7 @@ class CClientEntityList : public CBaseEntityList<T>, public IClientEntityList, p
 	friend class C_EngineObjectInternal;
 	friend class C_EnginePortalInternal;
 	friend class C_GrabControllerInternal;
+	friend class CPortalTouchScope;
 	//friend class C_AllBaseEntityIterator;
 	typedef CBaseEntityList<T> BaseClass;
 public:
@@ -3097,6 +3098,7 @@ public:
 
 	int GetPortalCount() { return m_ActivePortals.Count(); }
 	C_EnginePortalInternal* GetPortal(int index) { return m_ActivePortals[index]; }
+	CCallQueue* GetPostTouchQueue();
 private:
 	void AddPVSNotifier(IClientUnknown* pUnknown);
 	void RemovePVSNotifier(IClientUnknown* pUnknown);
@@ -3213,6 +3215,8 @@ private:
 	CCollisionEvent m_Collisions;
 
 	CUtlVector<C_EnginePortalInternal*> m_ActivePortals;
+	int m_nTouchDepth = 0;
+	CCallQueue m_PostTouchQueue;
 };
 
 template<class T>
@@ -5116,6 +5120,12 @@ void CClientEntityList<T>::PhysicsSimulate()
 		m_Collisions.FrameUpdate();
 	}
 	physicssound::PlayImpactSounds(m_impactSounds);
+}
+
+template<class T>
+CCallQueue* CClientEntityList<T>::GetPostTouchQueue()
+{
+	return m_nTouchDepth > 0 ? &m_PostTouchQueue : NULL;
 }
 
 //-----------------------------------------------------------------------------

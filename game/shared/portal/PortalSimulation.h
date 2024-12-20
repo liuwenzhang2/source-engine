@@ -93,7 +93,7 @@ public:
 	}
 	//static bool		IsPortalSimulatorCollisionEntity(const CBaseEntity* pEntity);
 #endif // GAME_DLL
-	void UpdateOnRemove(void);
+	void				UpdateOnRemove(void);
 	void				MoveTo( const Vector &ptCenter, const QAngle &angles );
 
 	virtual void		OnClearEverything() {};

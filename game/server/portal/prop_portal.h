@@ -33,7 +33,7 @@ public:
 
 							CProp_Portal( void );
 	virtual					~CProp_Portal( void );
-
+	virtual bool	IsPortal() { return true; }
 	//CNetworkHandle( CProp_Portal, m_hLinkedPortal ); //the portal this portal is linked to
 	CProp_Portal* GetLinkedPortal() { return (CProp_Portal*)CPortalSimulator::GetLinkedPortal(); }
 	const CProp_Portal* GetLinkedPortal() const { return (const CProp_Portal*)CPortalSimulator::GetLinkedPortal(); }
@@ -92,7 +92,7 @@ public:
 
 	void					ResetModel( void ); //sets the model and bounding box
 	void					DoFizzleEffect( int iEffect, bool bDelayedPos = true ); //display cool visual effect
-	void					Fizzle( void ); //go inactive
+	//void					Fizzle( void ); //go inactive
 	void					PunchPenetratingPlayer( CBaseEntity *pPlayer ); // adds outward force to player intersecting the portal plane
 	void					PunchAllPenetratingPlayers( void ); // adds outward force to player intersecting the portal plane
 

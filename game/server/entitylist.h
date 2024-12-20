@@ -2651,7 +2651,6 @@ private:
 	bool						m_bBufferTouchEvents;
 };
 
-#ifdef PORTAL
 class CPortal_CollisionEvent : public CCollisionEvent
 {
 public:
@@ -2666,7 +2665,6 @@ public:
 	void PortalPostSimulationFrame(void);
 	void AddDamageEvent(CBaseEntity* pEntity, const CTakeDamageInfo& info, IPhysicsObject* pInflictorPhysics, bool bRestoreVelocity, const Vector& savedVel, const AngularImpulse& savedAngVel);
 };
-#endif // PORTAL
 
 struct CPhysicsShadowCloneLL
 {
@@ -2722,6 +2720,9 @@ class CGlobalEntityList : public CBaseEntityList<T>, public IServerEntityList, p
 	friend class CEngineShadowCloneInternal;
 	friend class CEnginePlayerInternal;
 	friend class CGrabControllerInternal;
+	friend class CPortalTouchScope;
+	friend void FullSyncPhysicsObject(IPhysicsObject* pSource, IPhysicsObject* pDest, const VMatrix* pTransform, bool bTeleport);
+	friend class CPortal_CollisionEvent;
 	typedef CBaseEntityList<T> BaseClass;
 public:
 
@@ -2958,9 +2959,7 @@ public:
 
 	void PrePhysFrame(void);
 	void PostPhysFrame(void);
-#ifdef PORTAL
 	void PortalPhysFrame(float deltaTime);
-#endif // PORTAL
 	void PhysFrame(float deltaTime);
 
 	//-----------------------------------------------------------------------------
@@ -3433,6 +3432,7 @@ public:
 
 	int GetPortalCount() { return m_ActivePortals.Count(); }
 	CEnginePortalInternal* GetPortal(int index) { return m_ActivePortals[index]; }
+	CCallQueue* GetPostTouchQueue();
 
 protected:
 	virtual void AfterCreated(IHandleEntity* pEntity);
@@ -3546,11 +3546,7 @@ private:
 	physicssound::soundlist_t m_impactSounds;
 	CUtlVector<physicssound::breaksound_t> m_breakSounds;
 	CUtlVector<masscenteroverride_t>	m_massCenterOverrides;
-#ifdef PORTAL
 	CPortal_CollisionEvent m_Collisions;
-#else
-	CCollisionEvent m_Collisions;
-#endif
 	CCallQueue m_PostSimulationQueue;
 	CUtlVector<CEnginePortalInternal*> m_ActivePortals;
 	CUtlVector<CEngineShadowCloneInternal*> m_ActiveShadowClones;
@@ -3558,6 +3554,8 @@ private:
 	ShadowCloneLLEntryManager m_SCLLManager;
 	CEnginePortalInternal* m_OwnedEntityMap[MAX_EDICTS] = { NULL };
 	CUtlVector<CEnginePlayerInternal*> m_ActivePlayers;
+	int m_nTouchDepth = 0;
+	CCallQueue m_PostTouchQueue;
 };
 
 extern void PhysParseSurfaceData(class IPhysicsSurfaceProps* pProps, class IFileSystem* pFileSystem);
@@ -3775,7 +3773,6 @@ void CGlobalEntityList<T>::PostPhysFrame(void)
 	}
 }
 
-#ifdef PORTAL
 extern ConVar sv_fullsyncclones;
 template<class T>
 void CGlobalEntityList<T>::PortalPhysFrame(float deltaTime) //small wrapper for PhysFrame that simulates all environments at once
@@ -3796,7 +3793,6 @@ void CGlobalEntityList<T>::PortalPhysFrame(float deltaTime) //small wrapper for 
 
 	PostPhysFrame();
 }
-#endif
 
 extern ConVar phys_speeds;
 // Advance physics by time (in seconds)
@@ -3838,9 +3834,9 @@ void CGlobalEntityList<T>::PhysFrame(float deltaTime)
 	m_pPhysenv->DebugCheckContacts();
 #endif
 
-#ifndef PORTAL //instead of wrapping 1 simulation with this, portal needs to wrap 3
-	m_Collisions.BufferTouchEvents(true);
-#endif
+	if (m_ActivePortals.Count() == 0) { //instead of wrapping 1 simulation with this, portal needs to wrap 3
+		m_Collisions.BufferTouchEvents(true);
+	}
 
 	m_pPhysenv->Simulate(deltaTime);
 
@@ -3899,10 +3895,10 @@ void CGlobalEntityList<T>::PhysFrame(float deltaTime)
 		lastObjectCount = activeCount;
 	}
 
-#ifndef PORTAL //instead of wrapping 1 simulation with this, portal needs to wrap 3
-	m_Collisions.BufferTouchEvents(false);
-	m_Collisions.FrameUpdate();
-#endif
+	if (m_ActivePortals.Count() == 0) { //instead of wrapping 1 simulation with this, portal needs to wrap 3
+		m_Collisions.BufferTouchEvents(false);
+		m_Collisions.FrameUpdate();
+	}
 }
 
 template<class T>
@@ -3919,20 +3915,22 @@ void CGlobalEntityList<T>::FrameUpdatePostEntityThink()
 	{
 		m_isFinalTick = false;
 
-#ifdef PORTAL //slight detour if we're the portal mod
-		PortalPhysFrame(interval);
-#else
-		PhysFrame(interval);
-#endif
+		if (m_ActivePortals.Count() > 0) {
+			PortalPhysFrame(interval);
+		}
+		else {
+			PhysFrame(interval);
+		}
 
 	}
 	m_isFinalTick = true;
 
-#ifdef PORTAL //slight detour if we're the portal mod
-	PortalPhysFrame(interval);
-#else
-	PhysFrame(interval);
-#endif
+	if (m_ActivePortals.Count() > 0) {
+		PortalPhysFrame(interval);
+	}
+	else {
+		PhysFrame(interval);
+	}
 
 }
 
@@ -6636,6 +6634,12 @@ CBasePlayer* CGlobalEntityList<T>::GetPlayerHoldingEntity(CBaseEntity* pEntity)
 		}
 	}
 	return NULL;
+}
+
+template<class T>
+CCallQueue* CGlobalEntityList<T>::GetPostTouchQueue()
+{
+	return m_nTouchDepth > 0 ? &m_PostTouchQueue : NULL;
 }
 
 extern CGlobalEntityList<CBaseEntity> gEntList;

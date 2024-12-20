@@ -1843,248 +1843,249 @@ bool CCollisionEvent::GetTriggerEvent(triggerevent_t* pEvent, CBaseEntity* pTrig
 	return false;
 }
 
-#ifdef PORTAL
 int CPortal_CollisionEvent::ShouldCollide(IPhysicsObject* pObj0, IPhysicsObject* pObj1, void* pGameData0, void* pGameData1)
 {
-	if (!pGameData0 || !pGameData1)
-		return 1;
+	if (gEntList.m_ActivePortals.Count() > 0) {
+		if (!pGameData0 || !pGameData1)
+			return 1;
 
-	AssertOnce(pObj0 && pObj1);
-	bool bShadowClonesInvolved = ((pObj0->GetGameFlags() | pObj1->GetGameFlags()) & FVPHYSICS_IS_SHADOWCLONE) != 0;
+		AssertOnce(pObj0 && pObj1);
+		bool bShadowClonesInvolved = ((pObj0->GetGameFlags() | pObj1->GetGameFlags()) & FVPHYSICS_IS_SHADOWCLONE) != 0;
 
-	if (bShadowClonesInvolved)
-	{
-		//at least one shadow clone
-
-		if ((pObj0->GetGameFlags() & pObj1->GetGameFlags()) & FVPHYSICS_IS_SHADOWCLONE)
-			return 0; //both are shadow clones
-
-		if ((pObj0->GetGameFlags() | pObj1->GetGameFlags()) & FVPHYSICS_PLAYER_HELD)
+		if (bShadowClonesInvolved)
 		{
-			//at least one is held
+			//at least one shadow clone
 
-			//don't let players collide with objects they're holding, they get kinda messed up sometimes
-			if (pGameData0 && ((CBaseEntity*)pGameData0)->IsPlayer() && (((CBasePlayer*)pGameData0)->GetPlayerHeldEntity() == (CBaseEntity*)pGameData1))
-				return 0;
+			if ((pObj0->GetGameFlags() & pObj1->GetGameFlags()) & FVPHYSICS_IS_SHADOWCLONE)
+				return 0; //both are shadow clones
 
-			if (pGameData1 && ((CBaseEntity*)pGameData1)->IsPlayer() && (((CBasePlayer*)pGameData1)->GetPlayerHeldEntity() == (CBaseEntity*)pGameData0))
-				return 0;
-		}
-	}
-
-
-
-	//everything is in one environment. This means we must tightly control what collides with what
-	if (pGameData0 != pGameData1)
-	{
-		//this code only decides what CAN'T collide due to portal environment differences, things that should collide will pass through here to deeper ShouldCollide() code
-		CBaseEntity* pEntities[2] = { (CBaseEntity*)pGameData0, (CBaseEntity*)pGameData1 };
-		IPhysicsObject* pPhysObjects[2] = { pObj0, pObj1 };
-		bool bStatic[2] = { pObj0->IsStatic(), pObj1->IsStatic() };
-		CEnginePortalInternal* pSimulators[2];
-		for (int i = 0; i != 2; ++i)
-			pSimulators[i] = (CEnginePortalInternal*)pEntities[i]->GetEngineObject()->GetSimulatorThatOwnsEntity();
-
-		AssertOnce((bStatic[0] && bStatic[1]) == false); //hopefully the system doesn't even call in for this, they're both static and can't collide
-		if (bStatic[0] && bStatic[1])
-			return 0;
-
-#ifdef _DEBUG
-		for (int i = 0; i != 2; ++i)
-		{
-			if ((pSimulators[i] != NULL) && pEntities[i]->GetEngineObject()->IsShadowClone())
+			if ((pObj0->GetGameFlags() | pObj1->GetGameFlags()) & FVPHYSICS_PLAYER_HELD)
 			{
-				CBaseEntity* pSource = pEntities[i]->GetEngineShadowClone()->GetClonedEntity();
+				//at least one is held
 
-				CEnginePortalInternal* pSourceSimulator = (CEnginePortalInternal*)pSource->GetEngineObject()->GetSimulatorThatOwnsEntity();
-				Assert((pSimulators[i]->m_EntFlags[pEntities[i]->entindex()] & PSEF_IS_IN_PORTAL_HOLE) == (pSourceSimulator->m_EntFlags[pSource->entindex()] & PSEF_IS_IN_PORTAL_HOLE));
+				//don't let players collide with objects they're holding, they get kinda messed up sometimes
+				if (pGameData0 && ((CBaseEntity*)pGameData0)->IsPlayer() && (((CBasePlayer*)pGameData0)->GetPlayerHeldEntity() == (CBaseEntity*)pGameData1))
+					return 0;
+
+				if (pGameData1 && ((CBaseEntity*)pGameData1)->IsPlayer() && (((CBasePlayer*)pGameData1)->GetPlayerHeldEntity() == (CBaseEntity*)pGameData0))
+					return 0;
 			}
 		}
+
+
+
+		//everything is in one environment. This means we must tightly control what collides with what
+		if (pGameData0 != pGameData1)
+		{
+			//this code only decides what CAN'T collide due to portal environment differences, things that should collide will pass through here to deeper ShouldCollide() code
+			CBaseEntity* pEntities[2] = { (CBaseEntity*)pGameData0, (CBaseEntity*)pGameData1 };
+			IPhysicsObject* pPhysObjects[2] = { pObj0, pObj1 };
+			bool bStatic[2] = { pObj0->IsStatic(), pObj1->IsStatic() };
+			CEnginePortalInternal* pSimulators[2];
+			for (int i = 0; i != 2; ++i)
+				pSimulators[i] = (CEnginePortalInternal*)pEntities[i]->GetEngineObject()->GetSimulatorThatOwnsEntity();
+
+			AssertOnce((bStatic[0] && bStatic[1]) == false); //hopefully the system doesn't even call in for this, they're both static and can't collide
+			if (bStatic[0] && bStatic[1])
+				return 0;
+
+#ifdef _DEBUG
+			for (int i = 0; i != 2; ++i)
+			{
+				if ((pSimulators[i] != NULL) && pEntities[i]->GetEngineObject()->IsShadowClone())
+				{
+					CBaseEntity* pSource = pEntities[i]->GetEngineShadowClone()->GetClonedEntity();
+
+					CEnginePortalInternal* pSourceSimulator = (CEnginePortalInternal*)pSource->GetEngineObject()->GetSimulatorThatOwnsEntity();
+					Assert((pSimulators[i]->m_EntFlags[pEntities[i]->entindex()] & PSEF_IS_IN_PORTAL_HOLE) == (pSourceSimulator->m_EntFlags[pSource->entindex()] & PSEF_IS_IN_PORTAL_HOLE));
+				}
+			}
 #endif
 
-		if (pSimulators[0] == pSimulators[1]) //same simulator
-		{
-			if (pSimulators[0] != NULL) //and not main world
+			if (pSimulators[0] == pSimulators[1]) //same simulator
 			{
+				if (pSimulators[0] != NULL) //and not main world
+				{
+					if (bStatic[0] || bStatic[1])
+					{
+						for (int i = 0; i != 2; ++i)
+						{
+							if (bStatic[i])
+							{
+								if (pEntities[i]->GetEngineObject()->IsPortalSimulatorCollisionEntity())
+								{
+									PS_PhysicsObjectSourceType_t objectSource;
+									if (pSimulators[i]->CreatedPhysicsObject(pPhysObjects[i], &objectSource) &&
+										((objectSource == PSPOST_REMOTE_BRUSHES) || (objectSource == PSPOST_REMOTE_STATICPROPS)))
+									{
+										if ((pSimulators[1 - i]->m_EntFlags[pEntities[1 - i]->entindex()] & PSEF_IS_IN_PORTAL_HOLE) == 0)
+											return 0; //require that the entity be in the portal hole before colliding with transformed geometry
+										//FIXME: The above requirement might fail horribly for transformed collision blocking the portal from the other side and fast moving objects
+									}
+								}
+								break;
+							}
+						}
+					}
+					else if (bShadowClonesInvolved)
+					{
+						if (((pSimulators[0]->m_EntFlags[pEntities[0]->entindex()] |
+							pSimulators[1]->m_EntFlags[pEntities[1]->entindex()]) &
+							PSEF_IS_IN_PORTAL_HOLE) == 0)
+						{
+							return 0; //neither entity was actually in the portal hole
+						}
+					}
+				}
+			}
+			else //different simulators
+			{
+				if (bShadowClonesInvolved) //entities can only collide with shadow clones "owned" by the same simulator.
+					return 0;
+
 				if (bStatic[0] || bStatic[1])
 				{
 					for (int i = 0; i != 2; ++i)
 					{
 						if (bStatic[i])
 						{
-							if (pEntities[i]->GetEngineObject()->IsPortalSimulatorCollisionEntity())
+							int j = 1 - i;
+							CEnginePortalInternal* pSimulator_Entity = pSimulators[j];
+
+							if (pEntities[i]->IsWorld())
 							{
-								PS_PhysicsObjectSourceType_t objectSource;
-								if (pSimulators[i]->CreatedPhysicsObject(pPhysObjects[i], &objectSource) &&
-									((objectSource == PSPOST_REMOTE_BRUSHES) || (objectSource == PSPOST_REMOTE_STATICPROPS)))
-								{
-									if ((pSimulators[1 - i]->m_EntFlags[pEntities[1 - i]->entindex()] & PSEF_IS_IN_PORTAL_HOLE) == 0)
-										return 0; //require that the entity be in the portal hole before colliding with transformed geometry
-									//FIXME: The above requirement might fail horribly for transformed collision blocking the portal from the other side and fast moving objects
-								}
+								Assert(gEntList.GetSimulatorThatCreatedPhysicsObject(pPhysObjects[i]) == NULL);
+								if (pSimulator_Entity)
+									return 0;
+							}
+							else
+							{
+								CEnginePortalInternal* pSimulator_Static = gEntList.GetSimulatorThatCreatedPhysicsObject(pPhysObjects[i]); //might have been a static prop which would yield a new simulator
+
+								if (pSimulator_Static && (pSimulator_Static != pSimulator_Entity))
+									return 0; //static collideable is from a different simulator
 							}
 							break;
 						}
 					}
 				}
-				else if (bShadowClonesInvolved)
+				else
 				{
-					if (((pSimulators[0]->m_EntFlags[pEntities[0]->entindex()] |
-						pSimulators[1]->m_EntFlags[pEntities[1]->entindex()]) &
-						PSEF_IS_IN_PORTAL_HOLE) == 0)
-					{
-						return 0; //neither entity was actually in the portal hole
-					}
-				}
-			}
-		}
-		else //different simulators
-		{
-			if (bShadowClonesInvolved) //entities can only collide with shadow clones "owned" by the same simulator.
-				return 0;
+					Assert(pEntities[0]->GetEngineObject()->IsPortalSimulatorCollisionEntity() == false);
+					Assert(pEntities[1]->GetEngineObject()->IsPortalSimulatorCollisionEntity() == false);
 
-			if (bStatic[0] || bStatic[1])
-			{
-				for (int i = 0; i != 2; ++i)
-				{
-					if (bStatic[i])
+					for (int i = 0; i != 2; ++i)
 					{
-						int j = 1 - i;
-						CEnginePortalInternal* pSimulator_Entity = pSimulators[j];
-
-						if (pEntities[i]->IsWorld())
+						if (pSimulators[i])
 						{
-							Assert(gEntList.GetSimulatorThatCreatedPhysicsObject(pPhysObjects[i]) == NULL);
-							if (pSimulator_Entity)
+							//entities in the physics environment only collide with statics created by the environment (handled above), entities in the same environment (also above), or entities that should be cloned from main to the same environment
+							if ((pSimulators[i]->m_EntFlags[pEntities[1 - i]->entindex()] & PSEF_CLONES_ENTITY_FROM_MAIN) == 0) //not cloned from main
 								return 0;
 						}
-						else
-						{
-							CEnginePortalInternal* pSimulator_Static = gEntList.GetSimulatorThatCreatedPhysicsObject(pPhysObjects[i]); //might have been a static prop which would yield a new simulator
-
-							if (pSimulator_Static && (pSimulator_Static != pSimulator_Entity))
-								return 0; //static collideable is from a different simulator
-						}
-						break;
 					}
 				}
-			}
-			else
-			{
-				Assert(pEntities[0]->GetEngineObject()->IsPortalSimulatorCollisionEntity() == false);
-				Assert(pEntities[1]->GetEngineObject()->IsPortalSimulatorCollisionEntity() == false);
 
-				for (int i = 0; i != 2; ++i)
-				{
-					if (pSimulators[i])
-					{
-						//entities in the physics environment only collide with statics created by the environment (handled above), entities in the same environment (also above), or entities that should be cloned from main to the same environment
-						if ((pSimulators[i]->m_EntFlags[pEntities[1 - i]->entindex()] & PSEF_CLONES_ENTITY_FROM_MAIN) == 0) //not cloned from main
-							return 0;
-					}
-				}
 			}
-
 		}
 	}
-
 	return BaseClass::ShouldCollide(pObj0, pObj1, pGameData0, pGameData1);
 }
 
 int CPortal_CollisionEvent::ShouldSolvePenetration(IPhysicsObject* pObj0, IPhysicsObject* pObj1, void* pGameData0, void* pGameData1, float dt)
 {
-	if ((pGameData0 == NULL) || (pGameData1 == NULL))
-		return 0;
-
-	if (((CBaseEntity*)pGameData0)->GetEngineObject()->IsPortalSimulatorCollisionEntity() ||
-		((CBaseEntity*)pGameData1)->GetEngineObject()->IsPortalSimulatorCollisionEntity())
-		return 0;
-
-	// For portal, don't solve penetrations on combine balls
-	if (FClassnameIs((CBaseEntity*)pGameData0, "prop_energy_ball") ||
-		FClassnameIs((CBaseEntity*)pGameData1, "prop_energy_ball"))
-		return 0;
-
-	if ((pObj0->GetGameFlags() | pObj1->GetGameFlags()) & FVPHYSICS_PLAYER_HELD)
-	{
-		//at least one is held
-		CBaseEntity* pHeld;
-		CBaseEntity* pOther;
-		IPhysicsObject* pPhysHeld;
-		IPhysicsObject* pPhysOther;
-		if (pObj0->GetGameFlags() & FVPHYSICS_PLAYER_HELD)
-		{
-			pHeld = (CBaseEntity*)pGameData0;
-			pPhysHeld = pObj0;
-			pOther = (CBaseEntity*)pGameData1;
-			pPhysOther = pObj1;
-		}
-		else
-		{
-			pHeld = (CBaseEntity*)pGameData1;
-			pPhysHeld = pObj1;
-			pOther = (CBaseEntity*)pGameData0;
-			pPhysOther = pObj0;
-		}
-
-		//don't let players collide with objects they're holding, they get kinda messed up sometimes
-		if (pOther->IsPlayer() && (((CBasePlayer*)pOther)->GetPlayerHeldEntity() == pHeld))
+	if (gEntList.m_ActivePortals.Count() > 0) {
+		if ((pGameData0 == NULL) || (pGameData1 == NULL))
 			return 0;
 
-		//held objects are clipping into other objects when travelling across a portal. We're close to ship, so this seems to be the
-		//most localized way to make a fix.
-		//Note that we're not actually going to change whether it should solve, we're just going to tack on some hacks
-		CBasePlayer* pHoldingPlayer = gEntList.GetPlayerHoldingEntity(pHeld);
-		if (!pHoldingPlayer && pHeld->GetEngineObject()->IsShadowClone())
-			pHoldingPlayer = gEntList.GetPlayerHoldingEntity(pHeld->GetEngineShadowClone()->GetClonedEntity());
-
-		Assert(pHoldingPlayer);
-		if (pHoldingPlayer)
-		{
-			IGrabControllerServer* pGrabController = pHoldingPlayer->GetGrabController();
-
-			if (!pGrabController)
-				pGrabController = pHoldingPlayer->GetActiveWeapon()->GetGrabController();
-
-			Assert(pGrabController);
-			if (pGrabController)
-			{
-				pGrabController->SetPortalPenetratingEntity(pOther);
-			}
-
-			//NDebugOverlay::EntityBounds( pHeld, 0, 0, 255, 16, 1.0f );
-			//NDebugOverlay::EntityBounds( pOther, 255, 0, 0, 16, 1.0f );
-			//pPhysOther->Wake();
-			//FindClosestPassableSpace( pOther, Vector( 0.0f, 0.0f, 1.0f ) );
-		}
-	}
-
-
-	if ((pObj0->GetGameFlags() | pObj1->GetGameFlags()) & FVPHYSICS_IS_SHADOWCLONE)
-	{
-		//at least one shadowclone is involved
-
-		if ((pObj0->GetGameFlags() & pObj1->GetGameFlags()) & FVPHYSICS_IS_SHADOWCLONE) //don't solve between two shadowclones, they're just going to resync in a frame anyways
+		if (((CBaseEntity*)pGameData0)->GetEngineObject()->IsPortalSimulatorCollisionEntity() ||
+			((CBaseEntity*)pGameData1)->GetEngineObject()->IsPortalSimulatorCollisionEntity())
 			return 0;
 
+		// For portal, don't solve penetrations on combine balls
+		if (FClassnameIs((CBaseEntity*)pGameData0, "prop_energy_ball") ||
+			FClassnameIs((CBaseEntity*)pGameData1, "prop_energy_ball"))
+			return 0;
 
-
-		IPhysicsObject* const pObjects[2] = { pObj0, pObj1 };
-
-		for (int i = 0; i != 2; ++i)
+		if ((pObj0->GetGameFlags() | pObj1->GetGameFlags()) & FVPHYSICS_PLAYER_HELD)
 		{
-			if (pObjects[i]->GetGameFlags() & FVPHYSICS_IS_SHADOWCLONE)
+			//at least one is held
+			CBaseEntity* pHeld;
+			CBaseEntity* pOther;
+			IPhysicsObject* pPhysHeld;
+			IPhysicsObject* pPhysOther;
+			if (pObj0->GetGameFlags() & FVPHYSICS_PLAYER_HELD)
 			{
-				int j = 1 - i;
-				if (!pObjects[j]->IsMoveable())
-					return 0; //don't solve between shadow clones and statics
+				pHeld = (CBaseEntity*)pGameData0;
+				pPhysHeld = pObj0;
+				pOther = (CBaseEntity*)pGameData1;
+				pPhysOther = pObj1;
+			}
+			else
+			{
+				pHeld = (CBaseEntity*)pGameData1;
+				pPhysHeld = pObj1;
+				pOther = (CBaseEntity*)pGameData0;
+				pPhysOther = pObj0;
+			}
 
-				if (((CBaseEntity*)(pObjects[i]->GetGameData()))->GetEngineShadowClone()->GetClonedEntity() == (pObjects[j]->GetGameData()))
-					return 0; //don't solve between a shadow clone and its source entity
+			//don't let players collide with objects they're holding, they get kinda messed up sometimes
+			if (pOther->IsPlayer() && (((CBasePlayer*)pOther)->GetPlayerHeldEntity() == pHeld))
+				return 0;
+
+			//held objects are clipping into other objects when travelling across a portal. We're close to ship, so this seems to be the
+			//most localized way to make a fix.
+			//Note that we're not actually going to change whether it should solve, we're just going to tack on some hacks
+			CBasePlayer* pHoldingPlayer = gEntList.GetPlayerHoldingEntity(pHeld);
+			if (!pHoldingPlayer && pHeld->GetEngineObject()->IsShadowClone())
+				pHoldingPlayer = gEntList.GetPlayerHoldingEntity(pHeld->GetEngineShadowClone()->GetClonedEntity());
+
+			Assert(pHoldingPlayer);
+			if (pHoldingPlayer)
+			{
+				IGrabControllerServer* pGrabController = pHoldingPlayer->GetGrabController();
+
+				if (!pGrabController)
+					pGrabController = pHoldingPlayer->GetActiveWeapon()->GetGrabController();
+
+				Assert(pGrabController);
+				if (pGrabController)
+				{
+					pGrabController->SetPortalPenetratingEntity(pOther);
+				}
+
+				//NDebugOverlay::EntityBounds( pHeld, 0, 0, 255, 16, 1.0f );
+				//NDebugOverlay::EntityBounds( pOther, 255, 0, 0, 16, 1.0f );
+				//pPhysOther->Wake();
+				//FindClosestPassableSpace( pOther, Vector( 0.0f, 0.0f, 1.0f ) );
+			}
+		}
+
+
+		if ((pObj0->GetGameFlags() | pObj1->GetGameFlags()) & FVPHYSICS_IS_SHADOWCLONE)
+		{
+			//at least one shadowclone is involved
+
+			if ((pObj0->GetGameFlags() & pObj1->GetGameFlags()) & FVPHYSICS_IS_SHADOWCLONE) //don't solve between two shadowclones, they're just going to resync in a frame anyways
+				return 0;
+
+
+
+			IPhysicsObject* const pObjects[2] = { pObj0, pObj1 };
+
+			for (int i = 0; i != 2; ++i)
+			{
+				if (pObjects[i]->GetGameFlags() & FVPHYSICS_IS_SHADOWCLONE)
+				{
+					int j = 1 - i;
+					if (!pObjects[j]->IsMoveable())
+						return 0; //don't solve between shadow clones and statics
+
+					if (((CBaseEntity*)(pObjects[i]->GetGameData()))->GetEngineShadowClone()->GetClonedEntity() == (pObjects[j]->GetGameData()))
+						return 0; //don't solve between a shadow clone and its source entity
+				}
 			}
 		}
 	}
-
 	return BaseClass::ShouldSolvePenetration(pObj0, pObj1, pGameData0, pGameData1, dt);
 }
 
@@ -2228,8 +2229,10 @@ static void ModifyWeight_PreCollision(vcollisionevent_t* pEvent)
 
 void CPortal_CollisionEvent::PreCollision(vcollisionevent_t* pEvent)
 {
-	ModifyWeight_PreCollision(pEvent);
-	return BaseClass::PreCollision(pEvent);
+	if (gEntList.m_ActivePortals.Count() > 0) {
+		ModifyWeight_PreCollision(pEvent);
+	}
+	BaseClass::PreCollision(pEvent);
 }
 
 
@@ -2252,42 +2255,52 @@ static void ModifyWeight_PostCollision(vcollisionevent_t* pEvent)
 
 void CPortal_CollisionEvent::PostCollision(vcollisionevent_t* pEvent)
 {
-	ModifyWeight_PostCollision(pEvent);
-
-	return BaseClass::PostCollision(pEvent);
+	if (gEntList.m_ActivePortals.Count() > 0) {
+		ModifyWeight_PostCollision(pEvent);
+	}
+	BaseClass::PostCollision(pEvent);
 }
 
 void CPortal_CollisionEvent::PostSimulationFrame()
 {
 	//this actually happens once per physics environment simulation, and we don't want that, so do nothing and we'll get a different version manually called
+	if (gEntList.m_ActivePortals.Count() == 0) {
+		BaseClass::PostSimulationFrame();
+	}
 }
 
 void CPortal_CollisionEvent::PortalPostSimulationFrame(void)
 {
-	BaseClass::PostSimulationFrame();
+	if (gEntList.m_ActivePortals.Count() > 0) {
+		BaseClass::PostSimulationFrame();
+	}
 }
 
 
 void CPortal_CollisionEvent::AddDamageEvent(CBaseEntity* pEntity, const CTakeDamageInfo& info, IPhysicsObject* pInflictorPhysics, bool bRestoreVelocity, const Vector& savedVel, const AngularImpulse& savedAngVel)
 {
-	const CTakeDamageInfo* pPassDownInfo = &info;
-	CTakeDamageInfo ReplacementDamageInfo; //only used some of the time
+	if (gEntList.m_ActivePortals.Count() > 0) {
+		const CTakeDamageInfo* pPassDownInfo = &info;
+		CTakeDamageInfo ReplacementDamageInfo; //only used some of the time
 
-	if ((info.GetDamageType() & DMG_CRUSH) &&
-		(pInflictorPhysics->GetGameFlags() & FVPHYSICS_IS_SHADOWCLONE) &&
-		(!info.BaseDamageIsValid()) &&
-		(info.GetDamageForce().LengthSqr() > (20000.0f * 20000.0f))
-		)
-	{
-		//VERY likely this was caused by the penetration solver. Since a shadow clone is involved we're going to ignore it becuase it causes more problems than it solves in this case
-		ReplacementDamageInfo = info;
-		ReplacementDamageInfo.SetDamage(0.0f);
-		pPassDownInfo = &ReplacementDamageInfo;
+		if ((info.GetDamageType() & DMG_CRUSH) &&
+			(pInflictorPhysics->GetGameFlags() & FVPHYSICS_IS_SHADOWCLONE) &&
+			(!info.BaseDamageIsValid()) &&
+			(info.GetDamageForce().LengthSqr() > (20000.0f * 20000.0f))
+			)
+		{
+			//VERY likely this was caused by the penetration solver. Since a shadow clone is involved we're going to ignore it becuase it causes more problems than it solves in this case
+			ReplacementDamageInfo = info;
+			ReplacementDamageInfo.SetDamage(0.0f);
+			pPassDownInfo = &ReplacementDamageInfo;
+		}
+
+		BaseClass::AddDamageEvent(pEntity, *pPassDownInfo, pInflictorPhysics, bRestoreVelocity, savedVel, savedAngVel);
 	}
-
-	BaseClass::AddDamageEvent(pEntity, *pPassDownInfo, pInflictorPhysics, bRestoreVelocity, savedVel, savedAngVel);
+	else {
+		BaseClass::AddDamageEvent(pEntity, info, pInflictorPhysics, bRestoreVelocity, savedVel, savedAngVel);
+	}
 }
-#endif // PORTAL
 
 
 //-----------------------------------------------------------------------------
@@ -2296,35 +2309,20 @@ void CPortal_CollisionEvent::AddDamageEvent(CBaseEntity* pEntity, const CTakeDam
 class CPortalTouchScope
 {
 public:
-	CPortalTouchScope();
-	~CPortalTouchScope();
-
-public:
-	static int m_nDepth;
-	static CCallQueue m_CallQueue;
-};
-
-int CPortalTouchScope::m_nDepth = 0;
-CCallQueue CPortalTouchScope::m_CallQueue;
-
-CCallQueue* GetPortalCallQueue()
-{
-	return (CPortalTouchScope::m_nDepth > 0) ? &CPortalTouchScope::m_CallQueue : NULL;
-}
-
-CPortalTouchScope::CPortalTouchScope()
-{
-	++m_nDepth;
-}
-
-CPortalTouchScope::~CPortalTouchScope()
-{
-	Assert(m_nDepth >= 1);
-	if (--m_nDepth == 0)
+	CPortalTouchScope::CPortalTouchScope()
 	{
-		m_CallQueue.CallQueued();
+		++gEntList.m_nTouchDepth;
 	}
-}
+
+	CPortalTouchScope::~CPortalTouchScope()
+	{
+		Assert(gEntList.m_nTouchDepth >= 1);
+		if (--gEntList.m_nTouchDepth == 0)
+		{
+			gEntList.m_PostTouchQueue.CallQueued();
+		}
+	}
+};
 
 //-----------------------------------------------------------------------------
 // Purpose: 
@@ -5688,9 +5686,9 @@ servertouchlink_t* CEngineObjectInternal::PhysicsMarkEntityAsTouched(IEngineObje
 		return NULL;
 	}
 
-#ifdef PORTAL
-	CPortalTouchScope scope;
-#endif
+	if (gEntList.m_ActivePortals.Count() > 0) {
+		CPortalTouchScope scope;
+	}
 
 	// check if the edict is already in the list
 	servertouchlink_t* root = (servertouchlink_t*)GetDataObject(TOUCHLINK);
@@ -5813,9 +5811,9 @@ void CEngineObjectInternal::PhysicsCheckForEntityUntouch(void)
 	servertouchlink_t* root = (servertouchlink_t*)this->GetDataObject(TOUCHLINK);
 	if (root)
 	{
-#ifdef PORTAL
-		CPortalTouchScope scope;
-#endif
+		if (gEntList.m_ActivePortals.Count() > 0) {
+			CPortalTouchScope scope;
+		}
 		bool saveCleanup = g_bCleanupDatObject;
 		g_bCleanupDatObject = false;
 
@@ -5901,9 +5899,9 @@ void CEngineObjectInternal::PhysicsNotifyOtherOfUntouch(IEngineObjectServer* ent
 //-----------------------------------------------------------------------------
 void CEngineObjectInternal::PhysicsRemoveTouchedList()
 {
-#ifdef PORTAL
-	CPortalTouchScope scope;
-#endif
+	if (gEntList.m_ActivePortals.Count() > 0) {
+		CPortalTouchScope scope;
+	}
 
 	servertouchlink_t* link, * nextLink;
 
@@ -12105,7 +12103,7 @@ void CEnginePortalInternal::TakeOwnershipOfEntity(CBaseEntity* pEntity)
 void RecheckEntityCollision(CBaseEntity* pEntity)
 {
 	CCallQueue* pCallQueue;
-	if ((pCallQueue = GetPortalCallQueue()) != NULL)
+	if ((pCallQueue = gEntList.GetPostTouchQueue()) != NULL)
 	{
 		pCallQueue->QueueCall(RecheckEntityCollision, pEntity);
 		return;
@@ -13037,27 +13035,27 @@ static void FullSyncPhysicsObject(IPhysicsObject* pSource, IPhysicsObject* pDest
 		pDest->Wake();
 
 	float fSavedMass = 0.0f, fSavedRotationalDamping; //setting mass to 0.0f purely to kill a warning that I can't seem to kill with pragmas
-#ifdef PORTAL
-	if (pSource->GetGameFlags() & FVPHYSICS_PLAYER_HELD)
-	{
-		//CBasePlayer *pPlayer = UTIL_PlayerByIndex( 1 );
-		//Assert( pPlayer );
-
-		CBaseEntity* pLookingForEntity = (CBaseEntity*)pSource->GetGameData();
-
-		CBasePlayer* pHoldingPlayer = gEntList.GetPlayerHoldingEntity(pLookingForEntity);
-		if (pHoldingPlayer)
+	if (gEntList.m_ActivePortals.Count() > 0) {
+		if (pSource->GetGameFlags() & FVPHYSICS_PLAYER_HELD)
 		{
-			pGrabController = pHoldingPlayer->GetGrabController();
+			//CBasePlayer *pPlayer = UTIL_PlayerByIndex( 1 );
+			//Assert( pPlayer );
 
-			if (!pGrabController)
-				pGrabController = pHoldingPlayer->GetActiveWeapon()->GetGrabController();
+			CBaseEntity* pLookingForEntity = (CBaseEntity*)pSource->GetGameData();
+
+			CBasePlayer* pHoldingPlayer = gEntList.GetPlayerHoldingEntity(pLookingForEntity);
+			if (pHoldingPlayer)
+			{
+				pGrabController = pHoldingPlayer->GetGrabController();
+
+				if (!pGrabController)
+					pGrabController = pHoldingPlayer->GetActiveWeapon()->GetGrabController();
+			}
+
+			AssertMsg(pGrabController, "Physics object is held, but we can't find the holding controller.");
+			pGrabController->GetSavedParamsForCarriedPhysObject(pSource, &fSavedMass, &fSavedRotationalDamping);
 		}
-
-		AssertMsg(pGrabController, "Physics object is held, but we can't find the holding controller.");
-		pGrabController->GetSavedParamsForCarriedPhysObject(pSource, &fSavedMass, &fSavedRotationalDamping);
 	}
-#endif // PORTAL
 
 	//Boiler plate
 	{

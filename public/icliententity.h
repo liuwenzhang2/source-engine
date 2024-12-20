@@ -869,6 +869,7 @@ public:
 
 	virtual int GetPortalCount() = 0;
 	virtual IEnginePortalClient* GetPortal(int index) = 0;
+	virtual CCallQueue* GetPostTouchQueue() = 0;
 };
 
 extern IClientEntityList* entitylist;

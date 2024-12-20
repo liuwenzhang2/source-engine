@@ -191,14 +191,13 @@ C_Prop_Portal::C_Prop_Portal( void )
 
 C_Prop_Portal::~C_Prop_Portal( void )
 {
-	CProp_Portal_Shared::AllPortals.FindAndRemove( this );
-	g_pPortalRender->RemovePortal( this );
-
 	for( int i = m_GhostRenderables.Count(); --i >= 0; )
 	{
 		cl_entitylist->DestroyEntity((IHandleEntity*)m_GhostRenderables[i]);
 	}
 	m_GhostRenderables.RemoveAll();
+	g_pPortalRender->RemovePortal(this);
+	CProp_Portal_Shared::AllPortals.FindAndRemove(this);
 }
 
 void C_Prop_Portal::Spawn( void )
@@ -489,12 +488,13 @@ void C_Prop_Portal::UpdateOnRemove( void )
 		TransformedLighting.m_LightShadowHandle = CLIENTSHADOW_INVALID_HANDLE;
 	}
 
-	g_pPortalRender->RemovePortal( this );
 	//if (m_hPortalSimulator.Get() && !m_hPortalSimulator.Get()->GetEngineObject()->IsMarkedForDeletion()) {
 	//	ClientEntityList().DestroyEntity(m_hPortalSimulator);
 	//	m_hPortalSimulator = NULL;
 	//}
 	BaseClass::UpdateOnRemove();
+	g_pPortalRender->RemovePortal(this);
+	CProp_Portal_Shared::AllPortals.FindAndRemove(this);
 }
 
 void C_Prop_Portal::OnNewParticleEffect( const char *pszParticleName, CNewParticleEffect *pNewParticleEffect )
@@ -504,13 +504,12 @@ void C_Prop_Portal::OnNewParticleEffect( const char *pszParticleName, CNewPartic
 		float fClosestDistanceSqr = -1.0f;
 		Vector vClosestPosition;
 
-		int iPortalCount = CProp_Portal_Shared::AllPortals.Count();
+		int iPortalCount = EntityList()->GetPortalCount();
 		if( iPortalCount != 0 )
 		{
-			CProp_Portal **pPortals = CProp_Portal_Shared::AllPortals.Base();
 			for( int i = 0; i != iPortalCount; ++i )
 			{
-				IEnginePortalClient *pTempPortal = pPortals[i]->pCollisionEntity->GetEnginePortal();
+				IEnginePortalClient *pTempPortal = EntityList()->GetPortal(i);
 				if ( pTempPortal != this->pCollisionEntity->GetEnginePortal() && pTempPortal->IsActivated())
 				{
 					Vector vPosition = pTempPortal->AsEngineObject()->GetAbsOrigin();

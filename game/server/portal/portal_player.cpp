@@ -1745,15 +1745,14 @@ void CPortal_Player::Event_Killed( const CTakeDamageInfo &info )
 
 #if PORTAL_HIDE_PLAYER_RAGDOLL
 	// Fizzle all portals so they don't see the player disappear
-	int iPortalCount = CProp_Portal_Shared::AllPortals.Count();
-	CProp_Portal **pPortals = CProp_Portal_Shared::AllPortals.Base();
+	int iPortalCount = EntityList()->GetPortalCount();
 	for( int i = 0; i != iPortalCount; ++i )
 	{
-		CProp_Portal *pTempPortal = pPortals[i];
+		IEnginePortalServer *pTempPortal = EntityList()->GetPortal(i);
 
-		if( pTempPortal && pTempPortal->pCollisionEntity->GetEnginePortal()->IsActivated() )
+		if( pTempPortal && pTempPortal->IsActivated() )
 		{
-			pTempPortal->Fizzle();
+			gEntList.DestroyEntity(pTempPortal->AsEngineObject()->GetOuter());
 		}
 	}
 #endif // PORTAL_HIDE_PLAYER_RAGDOLL
@@ -2037,11 +2036,10 @@ void CPortal_Player::UpdatePortalViewAreaBits( unsigned char *pvs, int pvssize )
 {
 	Assert ( pvs );
 
-	int iPortalCount = CProp_Portal_Shared::AllPortals.Count();
+	int iPortalCount = EntityList()->GetPortalCount();
 	if( iPortalCount == 0 )
 		return;
 
-	CProp_Portal **pPortals = CProp_Portal_Shared::AllPortals.Base();
 	int *portalArea = (int *)stackalloc( sizeof( int ) * iPortalCount );
 	bool *bUsePortalForVis = (bool *)stackalloc( sizeof( bool ) * iPortalCount );
 
@@ -2051,7 +2049,7 @@ void CPortal_Player::UpdatePortalViewAreaBits( unsigned char *pvs, int pvssize )
 	// setup area bits for these portals
 	for ( int i = 0; i < iPortalCount; ++i )
 	{
-		IEnginePortalServer* pLocalPortal = pPortals[ i ]->pCollisionEntity->GetEnginePortal();
+		IEnginePortalServer* pLocalPortal = EntityList()->GetPortal(i);
 		// Make sure this portal is active before adding it's location to the pvs
 		if ( pLocalPortal && pLocalPortal->IsActivated() )
 		{
@@ -2061,7 +2059,7 @@ void CPortal_Player::UpdatePortalViewAreaBits( unsigned char *pvs, int pvssize )
 			if ( pRemotePortal && pRemotePortal->IsActivated() &&//&& pRemotePortal->NetworkProp() 
 				((IEngineObjectServer*)pRemotePortal->AsEngineObject())->IsInPVS( this, pvs, pvssize ) )
 			{
-				portalArea[ i ] = engine->GetArea( pPortals[ i ]->GetEngineObject()->GetAbsOrigin() );
+				portalArea[ i ] = engine->GetArea(pLocalPortal->AsEngineObject()->GetAbsOrigin() );
 
 				if ( portalArea [ i ] >= 0 )
 				{
@@ -2125,14 +2123,13 @@ void AddPortalCornersToEnginePVS(IEnginePortalServer* pPortal )
 
 void PortalSetupVisibility( CBaseEntity *pPlayer, int area, unsigned char *pvs, int pvssize )
 {
-	int iPortalCount = CProp_Portal_Shared::AllPortals.Count();
+	int iPortalCount = EntityList()->GetPortalCount();
 	if( iPortalCount == 0 )
 		return;
 
-	CProp_Portal **pPortals = CProp_Portal_Shared::AllPortals.Base();
 	for( int i = 0; i != iPortalCount; ++i )
 	{
-		IEnginePortalServer *pPortal = pPortals[i]->pCollisionEntity->GetEnginePortal();
+		IEnginePortalServer *pPortal = EntityList()->GetPortal(i);
 
 		if ( pPortal && pPortal->IsActivated() )
 		{

@@ -975,6 +975,7 @@ public:
 	virtual bool	IsChangeLevelTrigger() { return false; };
 	virtual bool	IsGib() { return false; }
 	virtual bool	IsCombineBall() { return false; }
+	virtual bool	IsPortal() { return false; }
 	virtual const char* GetNewLandmarkName() { return ""; };
 	virtual const char* GetNewMapName() { return ""; };
 

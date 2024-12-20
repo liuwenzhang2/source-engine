@@ -556,7 +556,7 @@ IEnginePortalServer* CBaseCombatCharacter::FInViewConeThroughPortal( CBaseEntity
 //=========================================================
 IEnginePortalServer* CBaseCombatCharacter::FInViewConeThroughPortal( const Vector &vecSpot )
 {
-	int iPortalCount = CProp_Portal_Shared::AllPortals.Count();
+	int iPortalCount = EntityList()->GetPortalCount();
 	if( iPortalCount == 0 )
 		return NULL;
 
@@ -565,12 +565,10 @@ IEnginePortalServer* CBaseCombatCharacter::FInViewConeThroughPortal( const Vecto
 	float fDistToBeat = 1e20; //arbitrarily high number
 	IEnginePortalServer *pBestPortal = NULL;
 
-	CProp_Portal **pPortals = CProp_Portal_Shared::AllPortals.Base();
-
 	// Check through both portals
 	for ( int iPortal = 0; iPortal < iPortalCount; ++iPortal )
 	{
-		IEnginePortalServer *pPortal = pPortals[iPortal]->pCollisionEntity->GetEnginePortal();
+		IEnginePortalServer *pPortal = EntityList()->GetPortal(iPortal);
 
 		// Check if this portal is active, linked, and in the view cone
 		if( pPortal->IsActivedAndLinked() && FInViewCone( pPortal->AsEngineObject()->GetOuter() ) )

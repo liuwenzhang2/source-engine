@@ -824,35 +824,21 @@ void CCollisionEvent::FluidEndTouch(IPhysicsObject* pObject, IPhysicsFluidContro
 class CPortalTouchScope
 {
 public:
-	CPortalTouchScope();
-	~CPortalTouchScope();
-
-public:
-	static int m_nDepth;
-	static CCallQueue m_CallQueue;
-};
-
-int CPortalTouchScope::m_nDepth = 0;
-CCallQueue CPortalTouchScope::m_CallQueue;
-
-CCallQueue* GetPortalCallQueue()
-{
-	return (CPortalTouchScope::m_nDepth > 0) ? &CPortalTouchScope::m_CallQueue : NULL;
-}
-
-CPortalTouchScope::CPortalTouchScope()
-{
-	++m_nDepth;
-}
-
-CPortalTouchScope::~CPortalTouchScope()
-{
-	Assert(m_nDepth >= 1);
-	if (--m_nDepth == 0)
+	CPortalTouchScope::CPortalTouchScope()
 	{
-		m_CallQueue.CallQueued();
+		++ClientEntityList().m_nTouchDepth;
 	}
-}
+
+	CPortalTouchScope::~CPortalTouchScope()
+	{
+		Assert(ClientEntityList().m_nTouchDepth >= 1);
+		if (--ClientEntityList().m_nTouchDepth == 0)
+		{
+			ClientEntityList().m_PostTouchQueue.CallQueued();
+		}
+	}
+
+};
 
 //-----------------------------------------------------------------------------
 // Purpose: 
@@ -4824,9 +4810,9 @@ clienttouchlink_t* C_EngineObjectInternal::PhysicsMarkEntityAsTouched(IEngineObj
 		return NULL;
 	}
 
-#ifdef PORTAL
-	CPortalTouchScope scope;
-#endif
+	if (ClientEntityList().m_ActivePortals.Count() > 0) {
+		CPortalTouchScope scope;
+	}
 
 	// check if the edict is already in the list
 	clienttouchlink_t* root = (clienttouchlink_t*)GetDataObject(TOUCHLINK);
@@ -4948,9 +4934,9 @@ void C_EngineObjectInternal::PhysicsCheckForEntityUntouch(void)
 	clienttouchlink_t* root = (clienttouchlink_t*)this->GetDataObject(TOUCHLINK);
 	if (root)
 	{
-#ifdef PORTAL
-		CPortalTouchScope scope;
-#endif
+		if (ClientEntityList().m_ActivePortals.Count() > 0) {
+			CPortalTouchScope scope;
+		}
 		bool saveCleanup = g_bCleanupDatObject;
 		g_bCleanupDatObject = false;
 
@@ -5036,9 +5022,9 @@ void C_EngineObjectInternal::PhysicsNotifyOtherOfUntouch(IEngineObjectClient* en
 //-----------------------------------------------------------------------------
 void C_EngineObjectInternal::PhysicsRemoveTouchedList()
 {
-#ifdef PORTAL
-	CPortalTouchScope scope;
-#endif
+	if (ClientEntityList().m_ActivePortals.Count() > 0) {
+		CPortalTouchScope scope;
+	}
 
 	clienttouchlink_t* link, * nextLink;
 

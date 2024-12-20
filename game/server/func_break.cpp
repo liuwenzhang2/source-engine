@@ -900,7 +900,7 @@ void CBreakable::ResetOnGroundFlags(void)
 #ifdef PORTAL
 	// !!! HACK  This should work!
 	// Tell touching portals to fizzle
-	int iPortalCount = CProp_Portal_Shared::AllPortals.Count();
+	int iPortalCount = EntityList()->GetPortalCount();
 	if( iPortalCount != 0 )
 	{
 		Vector vMin, vMax;
@@ -909,14 +909,13 @@ void CBreakable::ResetOnGroundFlags(void)
 		Vector vBoxCenter = ( vMin + vMax ) * 0.5f;
 		Vector vBoxExtents = ( vMax - vMin ) * 0.5f;
 
-		CProp_Portal **pPortals = CProp_Portal_Shared::AllPortals.Base();
 		for( int i = 0; i != iPortalCount; ++i )
 		{
-			CProp_Portal *pTempPortal = pPortals[i];
-			if( UTIL_IsBoxIntersectingPortal( vBoxCenter, vBoxExtents, pTempPortal->pCollisionEntity->GetEnginePortal() ) )
+			IEnginePortalServer *pTempPortal = EntityList()->GetPortal(i);
+			if( UTIL_IsBoxIntersectingPortal( vBoxCenter, vBoxExtents, pTempPortal ) )
 			{
-				pTempPortal->DoFizzleEffect( PORTAL_FIZZLE_KILLED, false );
-				pTempPortal->Fizzle();
+				//pTempPortal->DoFizzleEffect( PORTAL_FIZZLE_KILLED, false );
+				gEntList.DestroyEntity(pTempPortal->AsEngineObject()->GetOuter());
 			}
 		}
 	}

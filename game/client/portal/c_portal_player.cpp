@@ -443,8 +443,7 @@ void C_Portal_Player::UpdateLookAt( void )
 		return;
 
 	// Player looks at themselves through portals. Pick the portal we're turned towards.
-	const int iPortalCount = CProp_Portal_Shared::AllPortals.Count();
-	CProp_Portal **pPortals = CProp_Portal_Shared::AllPortals.Base();
+	const int iPortalCount = EntityList()->GetPortalCount();
 	float *fPortalDot = (float *)stackalloc( sizeof( float ) * iPortalCount );
 	float flLowDot = 1.0f;
 	int iUsePortal = -1;
@@ -466,12 +465,12 @@ void C_Portal_Player::UpdateLookAt( void )
 		// player is in a portal
 		vCurLookTarget = EyePosition() + vPlayerForward*10.0f;
 	}
-	else if ( pPortals && pPortals[0] )
+	else if (iPortalCount)
 	{
 		// Test through any active portals: This may be a shorter distance to the target
 		for( int i = 0; i != iPortalCount; ++i )
 		{
-			IEnginePortalClient *pTempPortal = pPortals[i]->pCollisionEntity->GetEnginePortal();
+			IEnginePortalClient *pTempPortal = EntityList()->GetPortal(i);
 
 			if( pTempPortal && pTempPortal->IsActivated() && pTempPortal->GetLinkedPortal())
 			{
@@ -489,7 +488,7 @@ void C_Portal_Player::UpdateLookAt( void )
 
 		if ( iUsePortal >= 0 )
 		{
-			C_Prop_Portal* pPortal = pPortals[iUsePortal];
+			IEnginePortalClient* pPortal = EntityList()->GetPortal(iUsePortal);
 			if ( pPortal )
 			{
 				vCurLookTarget = pPortal->MatrixThisToLinked()*vCurLookTarget;

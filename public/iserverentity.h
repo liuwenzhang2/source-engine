@@ -891,6 +891,7 @@ public:
 	virtual CBasePlayer* GetPlayerHoldingEntity(CBaseEntity* pEntity) = 0;
 	virtual int GetPortalCount() = 0;
 	virtual IEnginePortalServer* GetPortal(int index) = 0;
+	virtual CCallQueue* GetPostTouchQueue() = 0;
 };
 
 extern IServerEntityList* serverEntitylist;
