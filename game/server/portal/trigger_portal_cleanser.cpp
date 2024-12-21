@@ -124,10 +124,10 @@ void CTriggerPortalCleanser::Touch( CBaseEntity *pOther )
 				{
 					CProp_Portal *pPortal = CProp_Portal::FindPortal( pPortalgun->m_iPortalLinkageGroupID, false );
 
-					if ( pPortal && pPortal->pCollisionEntity->GetEnginePortal()->IsActivated() )
+					if ( pPortal && pPortal->GetEnginePortal()->IsActivated() )
 					{
 						//pPortal->DoFizzleEffect( PORTAL_FIZZLE_KILLED, false );
-						gEntList.DestroyEntity(pPortal->pCollisionEntity);
+						gEntList.DestroyEntity(pPortal);
 						// HACK HACK! Used to make the gun visually change when going through a cleanser!
 						pPortalgun->m_fEffectsMaxSize1 = 50.0f;
 
@@ -147,7 +147,7 @@ void CTriggerPortalCleanser::Touch( CBaseEntity *pOther )
 				{
 					CProp_Portal *pPortal = CProp_Portal::FindPortal( pPortalgun->m_iPortalLinkageGroupID, true );
 
-					if ( pPortal && pPortal->pCollisionEntity->GetEnginePortal()->IsActivated() )
+					if ( pPortal && pPortal->GetEnginePortal()->IsActivated() )
 					{
 						//pPortal->DoFizzleEffect( PORTAL_FIZZLE_KILLED, false );
 						gEntList.DestroyEntity(pPortal);

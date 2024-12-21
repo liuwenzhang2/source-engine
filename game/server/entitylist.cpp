@@ -4901,7 +4901,7 @@ const matrix3x4_t& CEngineObjectInternal::GetParentToWorldTransform(matrix3x4_t&
 void CEngineObjectInternal::SetAbsOrigin(const Vector& absOrigin)
 {
 	AssertMsg(absOrigin.IsValid(), "Invalid origin set");
-
+	
 	// This is necessary to get the other fields of m_rgflCoordinateFrame ok
 	CalcAbsolutePosition();
 

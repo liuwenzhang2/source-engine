@@ -119,7 +119,6 @@ public:
 	//virtual bool			CreateVPhysics( void );
 	//virtual void			VPhysicsDestroyObject( void );
 
-	virtual bool			TestCollision( const Ray_t &ray, unsigned int fContentsMask, trace_t& tr );
 
 
 
@@ -135,7 +134,6 @@ public:
 private:
 	unsigned char			m_iLinkageGroupID; //a group ID specifying which portals this one can possibly link to
 
-	CPhysCollide			*m_pCollisionShape;
 	void					RemovePortalMicAndSpeaker();	// Cleans up the portal's internal audio members
 
 public:

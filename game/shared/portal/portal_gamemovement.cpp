@@ -420,7 +420,7 @@ void TracePlayerBBoxForGround2( const Vector& start, const Vector& end, const Ve
 	ray.Init( start, end, mins, maxs );
 
 	if (pPlayerPortal)
-		UTIL_Portal_TraceRay(pPlayerPortal->pCollisionEntity->GetEnginePortal(), ray, fMask, player, collisionGroup, &pm);
+		UTIL_Portal_TraceRay(pPlayerPortal->GetEnginePortal(), ray, fMask, player, collisionGroup, &pm);
 	else
 		UTIL_TraceRay( ray, fMask, player, collisionGroup, &pm );
 
@@ -437,7 +437,7 @@ void TracePlayerBBoxForGround2( const Vector& start, const Vector& end, const Ve
 	ray.Init( start, end, mins, maxs );
 
 	if( pPlayerPortal )
-		UTIL_Portal_TraceRay( pPlayerPortal->pCollisionEntity->GetEnginePortal(), ray, fMask, player, collisionGroup, &pm);
+		UTIL_Portal_TraceRay( pPlayerPortal->GetEnginePortal(), ray, fMask, player, collisionGroup, &pm);
 	else
 		UTIL_TraceRay( ray, fMask, player, collisionGroup, &pm );
 
@@ -454,7 +454,7 @@ void TracePlayerBBoxForGround2( const Vector& start, const Vector& end, const Ve
 	ray.Init( start, end, mins, maxs );
 
 	if( pPlayerPortal )
-		UTIL_Portal_TraceRay( pPlayerPortal->pCollisionEntity->GetEnginePortal(), ray, fMask, player, collisionGroup, &pm);
+		UTIL_Portal_TraceRay( pPlayerPortal->GetEnginePortal(), ray, fMask, player, collisionGroup, &pm);
 	else
 		UTIL_TraceRay( ray, fMask, player, collisionGroup, &pm );
 
@@ -471,7 +471,7 @@ void TracePlayerBBoxForGround2( const Vector& start, const Vector& end, const Ve
 	ray.Init( start, end, mins, maxs );
 
 	if( pPlayerPortal )
-		UTIL_Portal_TraceRay( pPlayerPortal->pCollisionEntity->GetEnginePortal(), ray, fMask, player, collisionGroup, &pm);
+		UTIL_Portal_TraceRay( pPlayerPortal->GetEnginePortal(), ray, fMask, player, collisionGroup, &pm);
 	else
 		UTIL_TraceRay( ray, fMask, player, collisionGroup, &pm );
 
@@ -693,7 +693,7 @@ void CPortalGameMovement::TracePlayerBBox( const Vector& start, const Vector& en
 	CTraceFilterTranslateClones traceFilter( &baseFilter );
 #endif
 
-	UTIL_Portal_TraceRay_With(pPortalPlayer->GetPortalEnvironment() ? pPortalPlayer->GetPortalEnvironment()->pCollisionEntity->GetEnginePortal() : NULL, ray, fMask, &traceFilter, &pm);
+	UTIL_Portal_TraceRay_With(pPortalPlayer->GetPortalEnvironment() ? pPortalPlayer->GetPortalEnvironment()->GetEnginePortal() : NULL, ray, fMask, &traceFilter, &pm);
 
 	// If we're moving through a portal and failed to hit anything with the above ray trace
 	// Use UTIL_Portal_TraceEntity to test this movement through a portal and override the trace with the result

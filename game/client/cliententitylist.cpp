@@ -3539,7 +3539,7 @@ void C_EngineObjectInternal::SetAbsOrigin(const Vector& absOrigin)
 {
 	// This is necessary to get the other fields of m_rgflCoordinateFrame ok
 	CalcAbsolutePosition();
-
+	
 	if (m_vecAbsOrigin == absOrigin)
 		return;
 

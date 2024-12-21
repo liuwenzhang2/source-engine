@@ -510,7 +510,7 @@ void C_Prop_Portal::OnNewParticleEffect( const char *pszParticleName, CNewPartic
 			for( int i = 0; i != iPortalCount; ++i )
 			{
 				IEnginePortalClient *pTempPortal = EntityList()->GetPortal(i);
-				if ( pTempPortal != this->pCollisionEntity->GetEnginePortal() && pTempPortal->IsActivated())
+				if ( pTempPortal != this->GetEnginePortal() && pTempPortal->IsActivated())
 				{
 					Vector vPosition = pTempPortal->AsEngineObject()->GetAbsOrigin();
 
@@ -535,11 +535,8 @@ void C_Prop_Portal::OnNewParticleEffect( const char *pszParticleName, CNewPartic
 void C_Prop_Portal::OnPreDataChanged( DataUpdateType_t updateType )
 {
 	//PreDataChanged.m_matrixThisToLinked = m_matrixThisToLinked;
-	if (!pCollisionEntity) {
-		int aaa = 0;
-	}
-	PreDataChanged.m_bIsPortal2 = pCollisionEntity ? pCollisionEntity->GetEnginePortal()->IsPortal2() : false;
-	PreDataChanged.m_bActivated = pCollisionEntity ? pCollisionEntity->GetEnginePortal()->IsActivated() : false;
+	PreDataChanged.m_bIsPortal2 = GetEnginePortal()->IsPortal2();
+	PreDataChanged.m_bActivated = GetEnginePortal()->IsActivated();
 	PreDataChanged.m_vOrigin = GetEngineObject()->GetNetworkOrigin();
 	PreDataChanged.m_qAngles = GetEngineObject()->GetNetworkAngles();
 	PreDataChanged.m_hLinkedTo = m_hLinkedPortal.Get();
@@ -561,13 +558,13 @@ void C_Prop_Portal::OnDataChanged( DataUpdateType_t updateType )
 	bool bPortalMoved = ( (PreDataChanged.m_vOrigin != m_ptOrigin ) ||
 						(PreDataChanged.m_qAngles != GetEngineObject()->GetNetworkAngles()) ||
 						(PreDataChanged.m_bActivated == false) ||
-						(PreDataChanged.m_bIsPortal2 != pCollisionEntity->GetEnginePortal()->IsPortal2()) );
+						(PreDataChanged.m_bIsPortal2 != GetEnginePortal()->IsPortal2()) );
 
 	bool bNewLinkage = ( (PreDataChanged.m_hLinkedTo.Get() != m_hLinkedPortal.Get()) );
 	if( bNewLinkage )
 		DetachFromLinked(); //detach now so moves are theoretically faster m_hPortalSimulator->
 
-	if( pCollisionEntity->GetEnginePortal()->IsActivated() )
+	if( GetEnginePortal()->IsActivated() )
 	{
 		//generic stuff we'll need
 		Vector vRemoteUp, vRemoteRight, vRemoteForward, ptRemoteOrigin;
@@ -857,7 +854,7 @@ extern ConVar building_cubemaps;
 int C_Prop_Portal::DrawModel( int flags )
 {
 	// Don't draw in cube maps because it makes an ugly colored splotch
-	if( pCollisionEntity->GetEnginePortal()->IsActivated() == false || building_cubemaps.GetBool())
+	if( GetEnginePortal()->IsActivated() == false || building_cubemaps.GetBool())
 		return 0;
 
 	int iRetVal = 0;
@@ -892,9 +889,9 @@ void C_Prop_Portal::GetToolRecordingState( KeyValues *msg )
 		return;
 
 	VPROF_BUDGET( "C_Prop_Portal::GetToolRecordingState", VPROF_BUDGETGROUP_TOOLS );
-	BaseClass::GetToolRecordingState( pCollisionEntity->GetEnginePortal()->IsActivated(), msg);
+	BaseClass::GetToolRecordingState( GetEnginePortal()->IsActivated(), msg);
 
-	if ( !pCollisionEntity->GetEnginePortal()->IsActivated() )
+	if ( !GetEnginePortal()->IsActivated() )
 	{
 		BaseEntityRecordingState_t *pBaseEntity = (BaseEntityRecordingState_t*)msg->GetPtr( "baseentity" );
 		pBaseEntity->m_bVisible = false;

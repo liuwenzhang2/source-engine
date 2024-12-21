@@ -440,7 +440,7 @@ void CPortal_Player::NotifySystemEvent(CBaseEntity *pNotify, notify_system_event
 		if ( event )
 		{
 			event->SetInt( "userid", GetUserID() );
-			event->SetBool( "portal2", pEnteredPortal->pCollisionEntity->GetEnginePortal()->IsPortal2() );
+			event->SetBool( "portal2", pEnteredPortal->GetEnginePortal()->IsPortal2() );
 			gameeventmanager->FireEvent( event );
 		}
 	}
@@ -762,7 +762,7 @@ void CPortal_Player::PlayerDeathThink(void)
 void CPortal_Player::UpdatePortalPlaneSounds( void )
 {
 	CProp_Portal *pPortal = GetPortalEnvironment();
-	if ( pPortal && pPortal->pCollisionEntity->GetEnginePortal()->IsActivated())
+	if ( pPortal && pPortal->GetEnginePortal()->IsActivated())
 	{
 		Vector vVelocity;
 		GetVelocity( &vVelocity, NULL );
@@ -779,7 +779,7 @@ void CPortal_Player::UpdatePortalPlaneSounds( void )
 			{
 				vDiagonal *= 0.25f;
 
-				if ( UTIL_IsBoxIntersectingPortal( vEarCenter, vDiagonal, pPortal->pCollisionEntity->GetEnginePortal() ) )
+				if ( UTIL_IsBoxIntersectingPortal( vEarCenter, vDiagonal, pPortal->GetEnginePortal() ) )
 				{
 					m_bIntersectingPortalPlane = true;
 
@@ -799,7 +799,7 @@ void CPortal_Player::UpdatePortalPlaneSounds( void )
 			{
 				vDiagonal *= 0.30f;
 
-				if ( !UTIL_IsBoxIntersectingPortal( vEarCenter, vDiagonal, pPortal->pCollisionEntity->GetEnginePortal() ) )
+				if ( !UTIL_IsBoxIntersectingPortal( vEarCenter, vDiagonal, pPortal->GetEnginePortal() ) )
 				{
 					m_bIntersectingPortalPlane = false;
 
@@ -1260,14 +1260,14 @@ void CPortal_Player::VPhysicsShadowUpdate( IPhysicsObject *pPhysics )
 
 			CTraceFilterSimple OriginalTraceFilter( this, COLLISION_GROUP_PLAYER_MOVEMENT );
 			CTraceFilterTranslateClones traceFilter( &OriginalTraceFilter );
-			UTIL_Portal_TraceRay_With(GetPortalEnvironment() ? GetPortalEnvironment()->pCollisionEntity->GetEnginePortal() : NULL, ray, MASK_PLAYERSOLID, & traceFilter, & trace);
+			UTIL_Portal_TraceRay_With(GetPortalEnvironment() ? GetPortalEnvironment()->GetEnginePortal() : NULL, ray, MASK_PLAYERSOLID, & traceFilter, & trace);
 
 			// current position is not ok, fixup
 			if ( trace.allsolid || trace.startsolid )
 			{
 				//try again with new position
 				ray.Init( newPosition, newPosition, GetEngineObject()->WorldAlignMins(), GetEngineObject()->WorldAlignMaxs() );
-				UTIL_Portal_TraceRay_With(GetPortalEnvironment() ? GetPortalEnvironment()->pCollisionEntity->GetEnginePortal() : NULL, ray, MASK_PLAYERSOLID, &traceFilter, &trace);
+				UTIL_Portal_TraceRay_With(GetPortalEnvironment() ? GetPortalEnvironment()->GetEnginePortal() : NULL, ray, MASK_PLAYERSOLID, &traceFilter, &trace);
 
 				if( trace.startsolid == false )
 				{
@@ -2163,7 +2163,7 @@ void CPortal_Player::SetupVisibility( CBaseEntity *pViewEntity, unsigned char *p
 		pPortal = GetPortalEnvironment();
 		pRemotePortal = pPortal->GetLinkedPortal();
 
-		if ( pPortal && pRemotePortal && pPortal->pCollisionEntity->GetEnginePortal()->IsActivated() && pRemotePortal->pCollisionEntity->GetEnginePortal()->IsActivated())
+		if ( pPortal && pRemotePortal && pPortal->GetEnginePortal()->IsActivated() && pRemotePortal->GetEnginePortal()->IsActivated())
 		{		
 			Vector ptPortalCenter = pPortal->GetEngineObject()->GetAbsOrigin();
 			Vector vPortalForward;
@@ -2204,7 +2204,7 @@ void CPortal_Player::PortalSimulator_ReleasedOwnershipOfEntity(IEnginePortalServ
 
 CProp_Portal* CPortal_Player::GetPortalEnvironment()
 {
-	return GetEnginePlayer()->GetPortalEnvironment() ? (CProp_Portal*)((CPSCollisionEntity*)GetEnginePlayer()->GetPortalEnvironment()->AsEngineObject()->GetOuter())->GetPortalSimulator() : NULL;
+	return GetEnginePlayer()->GetPortalEnvironment() ? (CProp_Portal*)GetEnginePlayer()->GetPortalEnvironment()->AsEngineObject()->GetOuter() : NULL;
 }
 
 #ifdef PORTAL_MP

@@ -567,7 +567,7 @@ public:
 	virtual int					GetPortalSimulatorGUID(void) const = 0;
 	virtual void				SetVPhysicsSimulationEnabled(bool bEnabled) = 0;
 	virtual bool				IsSimulatingVPhysics(void) const = 0;
-	virtual bool				IsLocalDataIsReady() = 0;
+	virtual bool				IsLocalDataIsReady() const = 0;
 	virtual void				SetLocalDataIsReady(bool bLocalDataIsReady) = 0;
 	virtual bool				IsReadyToSimulate(void) const = 0;
 	virtual bool				IsActivedAndLinked(void) const = 0;

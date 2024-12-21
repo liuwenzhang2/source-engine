@@ -1510,7 +1510,7 @@ void C_Portal_Player::SetViewAngles( const QAngle& ang )
 
 C_Prop_Portal* C_Portal_Player::GetPortalEnvironment()
 {
-	return GetEnginePlayer()->GetPortalEnvironment() ? (C_Prop_Portal*)((CPSCollisionEntity*)GetEnginePlayer()->GetPortalEnvironment()->AsEngineObject()->GetOuter())->GetPortalSimulator() : NULL;
+	return GetEnginePlayer()->GetPortalEnvironment() ? (C_Prop_Portal*)GetEnginePlayer()->GetPortalEnvironment()->AsEngineObject()->GetOuter() : NULL;
 }
 
 void C_Portal_Player::CalcPortalView( Vector &eyeOrigin, QAngle &eyeAngles )
@@ -1613,7 +1613,7 @@ void C_Portal_Player::CalcPortalView( Vector &eyeOrigin, QAngle &eyeAngles )
 
 	if( bOverrideSpecialEffects )
 	{		
-		m_iForceNoDrawInPortalSurface = ((pRemotePortal->pCollisionEntity->GetEnginePortal()->IsPortal2())?(2):(1));
+		m_iForceNoDrawInPortalSurface = ((pRemotePortal->GetEnginePortal()->IsPortal2())?(2):(1));
 		pRemotePortal->m_fStaticAmount = 0.0f;
 	}
 }

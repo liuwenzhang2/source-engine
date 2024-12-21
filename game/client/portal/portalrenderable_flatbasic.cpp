@@ -118,7 +118,7 @@ void CPortalRenderable_FlatBasic::GetToolRecordingState( bool bActive, KeyValues
 	state.m_fStaticAmount = m_fStaticAmount;
 	state.m_fSecondaryStaticAmount = m_fSecondaryStaticAmount;
 	state.m_fOpenAmount = m_fOpenAmount;
-	state.m_bIsPortal2 = pCollisionEntity->GetEnginePortal()->IsPortal2();
+	state.m_bIsPortal2 = GetEnginePortal()->IsPortal2();
 	msg->SetPtr( "portal", &state );
 }
 
@@ -538,7 +538,7 @@ void CPortalRenderable_FlatBasic::RenderPortalViewToTexture( CViewRender *pViewR
 		return;
 
 	ITexture *pRenderTarget;
-	if( pCollisionEntity->GetEnginePortal()->IsPortal2() )
+	if( GetEnginePortal()->IsPortal2() )
 		pRenderTarget = portalrendertargets->GetPortal2Texture();
 	else
 		pRenderTarget = portalrendertargets->GetPortal1Texture();
@@ -666,7 +666,7 @@ void CPortalRenderable_FlatBasic::DrawPreStencilMask( void )
 {
 	if ( ( m_fOpenAmount > 0.0f ) && ( m_fOpenAmount < 1.0f ) )
 	{
-		DrawSimplePortalMesh( m_Materials.m_Portal_Refract[ ( ( pCollisionEntity->GetEnginePortal()->IsPortal2() ) ? ( 1 ) : ( 0 ) ) ] );
+		DrawSimplePortalMesh( m_Materials.m_Portal_Refract[ ( ( GetEnginePortal()->IsPortal2() ) ? ( 1 ) : ( 0 ) ) ] );
 	}
 }
 
@@ -704,7 +704,7 @@ void CPortalRenderable_FlatBasic::HandlePortalPlaybackMessage( KeyValues *pKeyVa
 	m_fOpenAmount = pKeyValues->GetFloat( "openAmount" );
 	m_fStaticAmount = pKeyValues->GetFloat( "staticAmount" );
 	m_fSecondaryStaticAmount = pKeyValues->GetFloat( "secondaryStaticAmount" );
-	pCollisionEntity->GetEnginePortal()->SetPortal2(pKeyValues->GetInt( "isPortal2" ) != 0);
+	GetEnginePortal()->SetPortal2(pKeyValues->GetInt( "isPortal2" ) != 0);
 	//GetLinkedPortal() = nLinkedPortalId >= 0 ? (CPortalRenderable_FlatBasic *)FindRecordedPortal( nLinkedPortalId ) : NULL;
 	matrix3x4_t *pMat = (matrix3x4_t*)pKeyValues->GetPtr( "portalToWorld" );
 
@@ -763,7 +763,7 @@ void CPortalRenderable_FlatBasic::DrawComplexPortalMesh( const IMaterial *pMater
 	}
 	else
 	{
-		pMaterial = m_Materials.m_PortalMaterials[(pCollisionEntity->GetEnginePortal()->IsPortal2())?1:0];
+		pMaterial = m_Materials.m_PortalMaterials[(GetEnginePortal()->IsPortal2())?1:0];
 	}
 
 
@@ -811,7 +811,7 @@ void CPortalRenderable_FlatBasic::DrawSimplePortalMesh( const IMaterial *pMateri
 	if( pMaterialOverride )
 		pMaterial = pMaterialOverride;
 	else
-		pMaterial = m_Materials.m_PortalMaterials[pCollisionEntity->GetEnginePortal()->IsPortal2() ? 1 : 0];
+		pMaterial = m_Materials.m_PortalMaterials[GetEnginePortal()->IsPortal2() ? 1 : 0];
 
 	CMatRenderContextPtr pRenderContext( materials );
 	pRenderContext->Bind( (IMaterial *)pMaterial, GetClientRenderable() );
@@ -911,7 +911,7 @@ void CPortalRenderable_FlatBasic::DrawRenderFixMesh( const IMaterial *pMaterialO
 	if( pMaterialOverride )
 		pMaterial = pMaterialOverride;
 	else
-		pMaterial = m_Materials.m_PortalRenderFixMaterials[(pCollisionEntity->GetEnginePortal()->IsPortal2())?1:0];
+		pMaterial = m_Materials.m_PortalRenderFixMaterials[(GetEnginePortal()->IsPortal2())?1:0];
 
 	if( g_pPortalRender->GetViewRecursionLevel() != 0 )
 		return; //a render fix should only ever be necessary in the primary view
@@ -1178,11 +1178,11 @@ void CPortalRenderable_FlatBasic::DrawPortal( void )
 			{
 				if ( ( m_fOpenAmount > 0.0f ) && ( m_fOpenAmount < 1.0f ) )
 				{
-					DrawSimplePortalMesh( m_Materials.m_Portal_Refract[ ( ( pCollisionEntity->GetEnginePortal()->IsPortal2() ) ? ( 1 ) : ( 0 ) ) ] );
+					DrawSimplePortalMesh( m_Materials.m_Portal_Refract[ ( ( GetEnginePortal()->IsPortal2() ) ? ( 1 ) : ( 0 ) ) ] );
 				}
 			}
 
-			DrawSimplePortalMesh( m_Materials.m_PortalStaticOverlay[((pCollisionEntity->GetEnginePortal()->IsPortal2())?(1):(0))] );
+			DrawSimplePortalMesh( m_Materials.m_PortalStaticOverlay[((GetEnginePortal()->IsPortal2())?(1):(0))] );
 			DrawRenderFixMesh( g_pPortalRender->m_MaterialsAccess.m_WriteZ_Model );
 		}
 		else if( g_pPortalRender->GetCurrentViewExitPortal() != this )
@@ -1191,7 +1191,7 @@ void CPortalRenderable_FlatBasic::DrawPortal( void )
 			{
 				if ( ( m_fOpenAmount > 0.0f ) && ( m_fOpenAmount < 1.0f ) )
 				{
-					DrawSimplePortalMesh( m_Materials.m_Portal_Refract[ ( ( pCollisionEntity->GetEnginePortal()->IsPortal2() ) ? ( 1 ) : ( 0 ) ) ] );
+					DrawSimplePortalMesh( m_Materials.m_Portal_Refract[ ( ( GetEnginePortal()->IsPortal2() ) ? ( 1 ) : ( 0 ) ) ] );
 				}
 			}
 
@@ -1203,7 +1203,7 @@ void CPortalRenderable_FlatBasic::DrawPortal( void )
 			}
 			else
 			{
-				DrawSimplePortalMesh( m_Materials.m_PortalStaticOverlay[((pCollisionEntity->GetEnginePortal()->IsPortal2())?(1):(0))] );
+				DrawSimplePortalMesh( m_Materials.m_PortalStaticOverlay[((GetEnginePortal()->IsPortal2())?(1):(0))] );
 			}
 		}
 	}
@@ -1216,7 +1216,7 @@ void CPortalRenderable_FlatBasic::DrawPortal( void )
 		{			
 			if ( ( m_fOpenAmount > 0.0f ) && ( m_fOpenAmount < 1.0f ) )
 			{
-				DrawSimplePortalMesh( m_Materials.m_Portal_Refract[ ( (pCollisionEntity->GetEnginePortal()->IsPortal2()) ? ( 1 ) : ( 0 ) ) ] );
+				DrawSimplePortalMesh( m_Materials.m_Portal_Refract[ ( (GetEnginePortal()->IsPortal2()) ? ( 1 ) : ( 0 ) ) ] );
 			}
 
 			DrawComplexPortalMesh();
@@ -1226,9 +1226,9 @@ void CPortalRenderable_FlatBasic::DrawPortal( void )
 		{
 			if ( ( m_fOpenAmount > 0.0f ) && ( m_fOpenAmount < 1.0f ) )
 			{
-				DrawSimplePortalMesh( m_Materials.m_Portal_Refract[ ( (pCollisionEntity->GetEnginePortal()->IsPortal2()) ? ( 1 ) : ( 0 ) ) ] );
+				DrawSimplePortalMesh( m_Materials.m_Portal_Refract[ ( (GetEnginePortal()->IsPortal2()) ? ( 1 ) : ( 0 ) ) ] );
 			}
-			DrawSimplePortalMesh( m_Materials.m_PortalStaticOverlay[((pCollisionEntity->GetEnginePortal()->IsPortal2())?(1):(0))] ); //FIXME: find out why the projection mesh screws up at the second level of rendering in -nouserclip situations
+			DrawSimplePortalMesh( m_Materials.m_PortalStaticOverlay[((GetEnginePortal()->IsPortal2())?(1):(0))] ); //FIXME: find out why the projection mesh screws up at the second level of rendering in -nouserclip situations
 		}
 
 		EndPortalPixelVisibilityQuery();

@@ -34,7 +34,7 @@ void CPhysicsCloneArea::StartTouch( CBaseEntity *pOther )
 
 	if( sv_portal_debug_touch.GetBool() )
 	{
-		DevMsg( "PortalCloneArea %i Start Touch: %s : %f\n", ((m_pAttachedPortal->pCollisionEntity->GetEnginePortal()->IsPortal2())?(2):(1)), pOther->GetClassname(), gpGlobals->curtime );
+		DevMsg( "PortalCloneArea %i Start Touch: %s : %f\n", ((m_pAttachedPortal->GetEnginePortal()->IsPortal2())?(2):(1)), pOther->GetClassname(), gpGlobals->curtime );
 	}
 #if !defined( DISABLE_DEBUG_HISTORY )
 	if ( !GetEngineObject()->IsMarkedForDeletion() )
@@ -43,8 +43,8 @@ void CPhysicsCloneArea::StartTouch( CBaseEntity *pOther )
 	}
 #endif
 
-	if (m_pAttachedSimulator->pCollisionEntity) {
-		m_pAttachedSimulator->pCollisionEntity->GetEnginePortal()->StartCloningEntity(pOther);
+	if (m_pAttachedSimulator) {
+		m_pAttachedSimulator->GetEnginePortal()->StartCloningEntity(pOther);
 	}
 }
 
@@ -64,7 +64,7 @@ void CPhysicsCloneArea::EndTouch( CBaseEntity *pOther )
 
 	if( sv_portal_debug_touch.GetBool() )
 	{
-		DevMsg( "PortalCloneArea %i End Touch: %s : %f\n", ((m_pAttachedPortal->pCollisionEntity->GetEnginePortal()->IsPortal2())?(2):(1)), pOther->GetClassname(), gpGlobals->curtime );
+		DevMsg( "PortalCloneArea %i End Touch: %s : %f\n", ((m_pAttachedPortal->GetEnginePortal()->IsPortal2())?(2):(1)), pOther->GetClassname(), gpGlobals->curtime );
 	}
 #if !defined( DISABLE_DEBUG_HISTORY )
 	if ( !GetEngineObject()->IsMarkedForDeletion() )
@@ -73,8 +73,8 @@ void CPhysicsCloneArea::EndTouch( CBaseEntity *pOther )
 	}
 #endif
 
-	if (m_pAttachedSimulator->pCollisionEntity) {
-		m_pAttachedSimulator->pCollisionEntity->GetEnginePortal()->StopCloningEntity(pOther);
+	if (m_pAttachedSimulator) {
+		m_pAttachedSimulator->GetEnginePortal()->StopCloningEntity(pOther);
 	}
 }
 
@@ -130,7 +130,7 @@ void CPhysicsCloneArea::UpdatePosition( void )
 
 	GetEngineObject()->SetAbsOrigin( m_pAttachedPortal->GetEngineObject()->GetAbsOrigin() );
 	GetEngineObject()->SetAbsAngles( m_pAttachedPortal->GetEngineObject()->GetAbsAngles() );
-	m_bActive = m_pAttachedPortal->pCollisionEntity->GetEnginePortal()->IsActivated();
+	m_bActive = m_pAttachedPortal->GetEnginePortal()->IsActivated();
 
 	//NDebugOverlay::EntityBounds( this, 0, 0, 255, 25, 5.0f );
 
@@ -220,14 +220,14 @@ void CPhysicsCloneArea::CloneNearbyEntities( void )
 
 void CPhysicsCloneArea::CloneTouchingEntities( void )
 {
-	if( m_pAttachedPortal && m_pAttachedPortal->pCollisionEntity->GetEnginePortal()->IsActivated() )
+	if( m_pAttachedPortal && m_pAttachedPortal->GetEnginePortal()->IsActivated() )
 	{
 		servertouchlink_t *root = (servertouchlink_t* )GetEngineObject()->GetDataObject( TOUCHLINK );
 		if( root )
 		{
 			for (servertouchlink_t* link = root->nextLink; link != root; link = link->nextLink) {
-				if (m_pAttachedSimulator->pCollisionEntity) {
-					m_pAttachedSimulator->pCollisionEntity->GetEnginePortal()->StartCloningEntity((CBaseEntity*)gEntList.GetServerEntityFromHandle(link->entityTouched));
+				if (m_pAttachedSimulator) {
+					m_pAttachedSimulator->GetEnginePortal()->StartCloningEntity((CBaseEntity*)gEntList.GetServerEntityFromHandle(link->entityTouched));
 				}
 			}
 		}

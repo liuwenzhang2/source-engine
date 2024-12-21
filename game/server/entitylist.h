@@ -1895,7 +1895,7 @@ public:
 	int					GetPortalSimulatorGUID(void) const { return m_iPortalSimulatorGUID; }
 	void				SetVPhysicsSimulationEnabled(bool bEnabled); //enable/disable vphysics simulation. Will automatically update the linked portal to be the same
 	bool				IsSimulatingVPhysics(void) const; //this portal is setup to handle any physically simulated object, false means the portal is handling player movement only
-	bool				IsLocalDataIsReady() { return m_bLocalDataIsReady; }
+	bool				IsLocalDataIsReady() const { return m_bLocalDataIsReady; }
 	void				SetLocalDataIsReady(bool bLocalDataIsReady) { m_bLocalDataIsReady = bLocalDataIsReady; }
 	bool				IsReadyToSimulate(void) const; //is active and linked to another portal
 	bool				IsActivedAndLinked(void) const;

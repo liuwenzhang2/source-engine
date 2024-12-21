@@ -853,7 +853,7 @@ void UTIL_Portal_AABB( const IEnginePortal *pPortal, Vector &vMin, Vector &vMax 
 
 float UTIL_IntersectRayWithPortal( const Ray_t &ray, const IEnginePortal *pPortal )
 {
-	if ( !pPortal || !pPortal->IsActivated() )//pCollisionEntity->GetEnginePortal()->
+	if ( !pPortal || !pPortal->IsActivated() )
 	{
 		return -1.0f;
 	}

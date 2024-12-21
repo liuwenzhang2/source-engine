@@ -500,7 +500,7 @@ float CWeaponPortalgun::TraceFirePortal( bool bPortal2, const Vector &vTraceStar
 
 	vFinalPosition = tr.endpos;
 	CProp_Portal* pPortal = CProp_Portal::FindPortal(m_iPortalLinkageGroupID, bPortal2);
-	return VerifyPortalPlacement(pPortal ? pPortal->pCollisionEntity->GetEnginePortal() : NULL, vFinalPosition, qFinalAngles, iPlacedBy, bTest);
+	return VerifyPortalPlacement(pPortal ? pPortal->GetEnginePortal() : NULL, vFinalPosition, qFinalAngles, iPlacedBy, bTest);
 }
 
 float CWeaponPortalgun::FirePortal( bool bPortal2, Vector *pVector /*= 0*/, bool bTest /*= false*/ )
@@ -626,7 +626,7 @@ float CWeaponPortalgun::FirePortal( bool bPortal2, Vector *pVector /*= 0*/, bool
 
 		QAngle qFireAngles;
 		VectorAngles( vDirection, qFireAngles );
-		DoEffectBlast( pPortal->pCollisionEntity->GetEnginePortal()->IsPortal2(), ePlacedBy, vTracerOrigin, vFinalPosition, qFireAngles, fDelay);
+		DoEffectBlast( pPortal->GetEnginePortal()->IsPortal2(), ePlacedBy, vTracerOrigin, vFinalPosition, qFireAngles, fDelay);
 
 		pPortal->SetContextThink( &CProp_Portal::DelayedPlacementThink, gpGlobals->curtime + fDelay, s_pDelayedPlacementContext ); 
 		pPortal->m_vDelayedPosition = vFinalPosition;
