@@ -213,6 +213,7 @@ void CPortalSimulator::MoveTo( const Vector &ptCenter, const QAngle &angles )
 	INCREMENTTABSPACING();
 
 	pCollisionEntity->GetEnginePortal()->BeforeMove();
+		pCollisionEntity->GetEngineObject()->SetAbsOrigin(ptCenter);
 	//update geometric data
 	pCollisionEntity->GetEnginePortal()->MoveTo(ptCenter, angles);
 
