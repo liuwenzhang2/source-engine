@@ -1067,6 +1067,7 @@ CPSCollisionEntity::CPSCollisionEntity( void )
 
 CPSCollisionEntity::~CPSCollisionEntity( void )
 {
+#ifdef GAME_DLL
 	if( m_pOwningSimulator )
 	{
 		Error("m_pOwningSimulator must be NULL");
@@ -1075,6 +1076,7 @@ CPSCollisionEntity::~CPSCollisionEntity( void )
 		//m_pOwningSimulator->m_InternalData.Simulation.pCollisionEntity = NULL;
 		//m_pOwningSimulator = NULL;
 	}
+#endif // GAME_DLL
 	//s_PortalSimulatorCollisionEntities[entindex()] = false;
 }
 
