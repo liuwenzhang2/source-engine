@@ -106,7 +106,7 @@ public:
 	virtual const QAngle& EyeAngles();
 	virtual const Vector& GetRenderOrigin();  // return ragdoll origin if dead
 
-	bool dod_IsInterpolationEnabled( void ) { return ClientEntityList().IsInterpolationEnabled(); }
+	bool dod_IsInterpolationEnabled( void ) { return EntityList()->IsInterpolationEnabled(); }
 
 	void CreateViewAngleAnimations( void );
 
@@ -125,7 +125,7 @@ public:
 
 	virtual bool ShouldReceiveProjectedTextures( int flags )
 	{
-		return ( this != (C_BasePlayer*)ClientEntityList().GetLocalPlayer() );
+		return ( this != (C_BasePlayer*)EntityList()->GetLocalPlayer() );
 	}
 
 	bool IsNemesisOfLocalPlayer();

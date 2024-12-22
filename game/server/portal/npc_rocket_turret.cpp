@@ -131,7 +131,7 @@ public:
 	Vector	EyePosition( void )
 	{
 		Vector vMuzzlePos;
-		GetAttachment( m_iMuzzleAttachment, vMuzzlePos, NULL, NULL, NULL );
+		GetEngineObject()->GetAttachment( m_iMuzzleAttachment, vMuzzlePos, NULL, NULL, NULL );
 		return vMuzzlePos;
 	}
 

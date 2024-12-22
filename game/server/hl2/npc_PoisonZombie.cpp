@@ -627,7 +627,7 @@ Vector CNPC_PoisonZombie::HeadTarget( const Vector &posSrc )
 
 	Vector vecPosition;
 
-	GetAttachment( iCrabAttachment, vecPosition );
+	GetEngineObject()->GetAttachment( iCrabAttachment, vecPosition );
 
 	return vecPosition;
 }

@@ -24,7 +24,7 @@
 #include "utlmap.h"
 #include "client_class.h"
 #include "collisionproperty.h"
-#include "c_baseentity.h"
+#include "baseentity_shared.h"
 //#include "c_baseanimating.h"
 #include "gamestringpool.h"
 #include "saverestoretypes.h"
@@ -53,21 +53,6 @@
 //class C_BaseEntity;
 
 extern IVEngineClient* engine;
-
-#define INPVS_YES			0x0001		// The entity thinks it's in the PVS.
-#define INPVS_THISFRAME		0x0002		// Accumulated as different views are rendered during the frame and used to notify the entity if
-										// it is not in the PVS anymore (at the end of the frame).
-#define INPVS_NEEDSNOTIFY	0x0004		// The entity thinks it's in the PVS.
-							   
-// Implement this class and register with entlist to receive entity create/delete notification
-class IClientEntityListener
-{
-public:
-	virtual void OnEntityCreated(C_BaseEntity* pEntity) {};
-	//virtual void OnEntitySpawned( C_BaseEntity *pEntity ) {};
-	virtual void OnEntityDeleted(C_BaseEntity* pEntity) {};
-};
-
 
 enum
 {
@@ -1070,6 +1055,9 @@ public:
 	virtual void BuildTransformations(IStudioHdr* pStudioHdr, Vector* pos, Quaternion q[], const matrix3x4_t& cameraTransform, int boneMask, CBoneBitList& boneComputed);
 	// Call this if SetupBones() has already been called this frame but you need to move the
 // entity and rerender.
+		// Computes a box that surrounds all hitboxes
+	bool ComputeHitboxSurroundingBox(Vector* pVecWorldMins, Vector* pVecWorldMaxs);
+	bool ComputeEntitySpaceHitboxSurroundingBox(Vector* pVecWorldMins, Vector* pVecWorldMaxs);
 	void GetHitboxBoneTransform(int iBone, matrix3x4_t& pBoneToWorld);
 	void GetHitboxBoneTransforms(const matrix3x4_t* hitboxbones[MAXSTUDIOBONES]);
 	void GetHitboxBonePosition(int iBone, Vector& origin, QAngle& angles);
@@ -2367,27 +2355,6 @@ inline bool C_EnginePortalInternal::IsActivedAndLinked(void) const
 	return (m_bActivated && GetLinkedPortal() != NULL);
 }
 
-#ifdef DEBUG_PORTAL_SIMULATION_CREATION_TIMES
-#define STARTDEBUGTIMER(x) { x.Start(); }
-#define STOPDEBUGTIMER(x) { x.End(); }
-#define DEBUGTIMERONLY(x) x
-#define CREATEDEBUGTIMER(x) CFastTimer x;
-static const char* s_szTabSpacing[] = { "", "\t", "\t\t", "\t\t\t", "\t\t\t\t", "\t\t\t\t\t", "\t\t\t\t\t\t", "\t\t\t\t\t\t\t", "\t\t\t\t\t\t\t\t", "\t\t\t\t\t\t\t\t\t", "\t\t\t\t\t\t\t\t\t\t" };
-static int s_iTabSpacingIndex = 0;
-static int s_iPortalSimulatorGUID = 0; //used in standalone function that have no idea what a portal simulator is
-#define INCREMENTTABSPACING() ++s_iTabSpacingIndex;
-#define DECREMENTTABSPACING() --s_iTabSpacingIndex;
-#define TABSPACING (s_szTabSpacing[s_iTabSpacingIndex])
-#else
-#define STARTDEBUGTIMER(x)
-#define STOPDEBUGTIMER(x)
-#define DEBUGTIMERONLY(x)
-#define CREATEDEBUGTIMER(x)
-#define INCREMENTTABSPACING()
-#define DECREMENTTABSPACING()
-#define TABSPACING
-#endif
-
 class C_EngineShadowCloneInternal : public C_EngineObjectInternal {
 public:
 	DECLARE_CLASS(C_EngineShadowCloneInternal, C_EngineObjectInternal);
@@ -2537,23 +2504,6 @@ private:
 	Vector			m_vColorMod;				// Color modulation on all verts?
 };
 
-//=============================================================================
-//
-// Rope Manager
-//
-abstract_class IRopeManager
-{
-public:
-	virtual						~IRopeManager() {}
-	virtual void				ResetRenderCache(void) = 0;
-	virtual void				AddToRenderCache(C_EngineRopeInternal* pRope) = 0;
-	virtual void				DrawRenderCache(bool bShadowDepth) = 0;
-	virtual void				OnRenderStart(void) = 0;
-	virtual void				SetHolidayLightMode(bool bHoliday) = 0;
-	virtual bool				IsHolidayLightMode(void) = 0;
-	virtual int					GetHolidayLightStyle(void) = 0;
-};
-
 IRopeManager* RopeManager();
 void Rope_ResetCounters();
 
@@ -2572,7 +2522,7 @@ public:
 
 	void SetGhostedSource(C_BaseEntity* pGhostedSource) {
 		m_pGhostedSource = pGhostedSource;
-		m_bSourceIsBaseAnimating = m_pGhostedSource->GetEngineObject()->GetModelPtr() != NULL;
+		m_bSourceIsBaseAnimating = m_pGhostedSource ? m_pGhostedSource->GetEngineObject()->GetModelPtr() != NULL : NULL;
 	}
 
 	C_BaseEntity* GetGhostedSource() { return m_pGhostedSource; }
@@ -2617,19 +2567,6 @@ private:
 //private:
 //	unsigned short m_CurBaseEntity;
 //};
-
-class C_BaseEntityIterator
-{
-public:
-	C_BaseEntityIterator();
-
-	void Restart();
-	C_BaseEntity* Next();	// keep calling this until it returns null.
-
-private:
-	bool start = false;
-	CBaseHandle m_CurBaseEntity;
-};
 
 struct clientanimating_t
 {
@@ -2733,6 +2670,23 @@ private:
 	CUtlVector<touchevent_t>	m_touchEvents;
 	int							m_inCallback;
 	bool						m_bBufferTouchEvents;
+};
+
+class C_WatcherList : public IWatcherList
+{
+public:
+	//CWatcherList(); NOTE: Dataobj doesn't support constructors - it zeros the memory
+	~C_WatcherList();	// frees the positionwatcher_t's to the pool
+	void Init();
+
+	void AddToList(IHandleEntity* pWatcher);
+	void RemoveWatcher(IHandleEntity* pWatcher);
+
+private:
+	int GetCallbackObjects(IWatcherCallback** pList, int listMax);
+
+	unsigned short Find(IHandleEntity* pEntity);
+	unsigned short m_list;
 };
 
 extern ConVar cl_phys_timescale;
@@ -2848,15 +2802,12 @@ public:
 	ICollideable*			GetCollideableFromHandle( CBaseHandle hEnt );
 	IClientThinkable*		GetClientThinkableFromHandle( CBaseHandle hEnt );
 
-	// Convenience methods to convert between entindex + CBaseHandle
-	CBaseHandle	EntIndexToHandle( int entnum );
-	int						HandleToEntIndex( CBaseHandle handle );
+	CBaseHandle				FirstHandle() const { return BaseClass::FirstHandle(); }
+	CBaseHandle				NextHandle(CBaseHandle hEnt) const { return BaseClass::NextHandle(hEnt); }
+	CBaseHandle				InvalidHandle() { return BaseClass::InvalidHandle(); }
 
 	// Is a handle valid?
 	bool					IsHandleValid( CBaseHandle handle ) const;
-
-	// For backwards compatibility...
-	C_BaseEntity*			GetEnt( int entnum ) { return GetBaseEntity( entnum ); }
 
 	void					RecomputeHighestEntityUsed( void );
 
@@ -2920,6 +2871,9 @@ public:
 
 	// Update client side animations
 	void UpdateClientSideAnimations();
+	void UpdateDirtySpatialPartitionEntities() {
+		::UpdateDirtySpatialPartitionEntities();
+	}
 
 	int GetPredictionRandomSeed(void);
 	void SetPredictionRandomSeed(const CUserCmd* cmd);
@@ -3099,6 +3053,14 @@ public:
 	int GetPortalCount() { return m_ActivePortals.Count(); }
 	C_EnginePortalInternal* GetPortal(int index) { return m_ActivePortals[index]; }
 	CCallQueue* GetPostTouchQueue();
+
+	IRopeManager* RopeManager() {
+		return ::RopeManager();
+	}
+
+	void Rope_ResetCounters() {
+		::Rope_ResetCounters();
+	}
 private:
 	void AddPVSNotifier(IClientUnknown* pUnknown);
 	void RemovePVSNotifier(IClientUnknown* pUnknown);
@@ -3681,19 +3643,6 @@ inline CUtlLinkedList<CPVSNotifyInfo,unsigned short>& CClientEntityList<T>::GetP
 	return m_PVSNotifyInfos;
 }
 
-
-//-----------------------------------------------------------------------------
-// Convenience methods to convert between entindex + CBaseHandle
-//-----------------------------------------------------------------------------
-template<class T>
-inline CBaseHandle CClientEntityList<T>::EntIndexToHandle( int entnum )
-{
-	if ( entnum < -1 )
-		return INVALID_EHANDLE_INDEX;
-	T *pUnk = GetListedEntity( entnum );
-	return pUnk ? pUnk->GetRefEHandle() : INVALID_EHANDLE_INDEX; 
-}
-
 bool PVSNotifierMap_LessFunc(IClientUnknown* const& a, IClientUnknown* const& b);
 
 //-----------------------------------------------------------------------------
@@ -3750,13 +3699,29 @@ bool CClientEntityList<T>::Init()
 		cl_phys_timescale.SetValue(0.9f);
 	}
 	PhysParseSurfaceData(m_pPhysprops, filesystem);
+
+	AddDataAccessor(TOUCHLINK, new CEntityDataInstantiator<C_BaseEntity, clienttouchlink_t >);
+	AddDataAccessor(GROUNDLINK, new CEntityDataInstantiator<C_BaseEntity, clientgroundlink_t >);
+	AddDataAccessor(STEPSIMULATION, new CEntityDataInstantiator<C_BaseEntity, StepSimulationData >);
+	AddDataAccessor(MODELSCALE, new CEntityDataInstantiator<C_BaseEntity, ModelScale >);
+	AddDataAccessor(POSITIONWATCHER, new CEntityDataInstantiator<C_BaseEntity, C_WatcherList >);
+	//AddDataAccessor(PHYSICSPUSHLIST, new CEntityDataInstantiator<C_BaseEntity, physicspushlist_t >);
+	//AddDataAccessor(VPHYSICSUPDATEAI, new CEntityDataInstantiator<C_BaseEntity, vphysicsupdateai_t >);
+	AddDataAccessor(VPHYSICSWATCHER, new CEntityDataInstantiator<C_BaseEntity, C_WatcherList >);
 	return true;
 }
 
 template<class T>
 void CClientEntityList<T>::Shutdown()
 {
-
+	RemoveDataAccessor(TOUCHLINK);
+	RemoveDataAccessor(GROUNDLINK);
+	RemoveDataAccessor(STEPSIMULATION);
+	RemoveDataAccessor(MODELSCALE);
+	RemoveDataAccessor(POSITIONWATCHER);
+	RemoveDataAccessor(PHYSICSPUSHLIST);
+	RemoveDataAccessor(VPHYSICSUPDATEAI);
+	RemoveDataAccessor(VPHYSICSWATCHER);
 }
 
 extern void PrecachePhysicsSounds(void);
@@ -3927,20 +3892,6 @@ int CClientEntityList<T>::GetMaxEntities(void)
 {
 	return m_iMaxServerEnts;
 }
-
-
-//-----------------------------------------------------------------------------
-// Convenience methods to convert between entindex + CBaseHandle
-//-----------------------------------------------------------------------------
-template<class T>
-int CClientEntityList<T>::HandleToEntIndex(CBaseHandle handle)
-{
-	if (handle == INVALID_EHANDLE_INDEX)
-		return -1;
-	C_BaseEntity* pEnt = GetBaseEntityFromHandle(handle);
-	return pEnt ? pEnt->entindex() : -1;
-}
-
 
 //-----------------------------------------------------------------------------
 // Purpose: Because m_iNumServerEnts != last index
@@ -4770,10 +4721,10 @@ void CClientEntityList<T>::CheckInterpolatedVarParanoidMeasurement()
 	// list and make sure that there's no entity that should be in the list that isn't.
 
 #ifdef INTERPOLATEDVAR_PARANOID_MEASUREMENT
-	int iHighest = ClientEntityList().GetHighestEntityIndex();
+	int iHighest = GetHighestEntityIndex();
 	for (int i = 0; i <= iHighest; i++)
 	{
-		C_BaseEntity* pEnt = ClientEntityList().GetBaseEntity(i);
+		C_BaseEntity* pEnt = GetBaseEntity(i);
 		if (!pEnt || pEnt->m_InterpolationListEntry != 0xFFFF || !pEnt->ShouldInterpolate())
 			continue;
 
@@ -5129,31 +5080,6 @@ CCallQueue* CClientEntityList<T>::GetPostTouchQueue()
 {
 	return m_nTouchDepth > 0 ? &m_PostTouchQueue : NULL;
 }
-
-//-----------------------------------------------------------------------------
-// Returns the client entity list
-//-----------------------------------------------------------------------------
-//template<class T>
-extern CClientEntityList<C_BaseEntity> *cl_entitylist;
-
-inline CClientEntityList<C_BaseEntity>& ClientEntityList()
-{
-	return *cl_entitylist;
-}
-
-template<class T>
-inline T* CHandle<T>::Get() const
-{
-#ifdef CLIENT_DLL
-	//extern CBaseEntityList<IHandleEntity>* g_pEntityList;
-	return (T*)ClientEntityList().LookupEntity(*this);
-#endif // CLIENT_DLL
-#ifdef GAME_DLL
-	//extern CBaseEntityList<IHandleEntity>* g_pEntityList;
-	return (T*)g_pEntityList->LookupEntity(*this);
-#endif // GAME_DLL
-}
-
 
 #endif // CLIENTENTITYLIST_H
 

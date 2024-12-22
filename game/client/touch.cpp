@@ -630,7 +630,7 @@ void CTouchControls::Frame()
 	if (!initialized)
 		return;
 
-	C_BasePlayer *pPlayer = (C_BasePlayer*)ClientEntityList().GetLocalPlayer();
+	C_BasePlayer *pPlayer = (C_BasePlayer*)EntityList()->GetLocalPlayer();
 
 	if( pPlayer && (pPlayer->GetEngineObject()->GetFlags() & FL_FROZEN || g_pIntroData != NULL) )
 	{

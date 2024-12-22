@@ -1218,7 +1218,7 @@ void CNPC_Combine::Event_Killed( const CTakeDamageInfo &info )
 		{
 			// Drop the grenade as an item.
 			Vector vecStart;
-			GetAttachment( "lefthand", vecStart );
+			GetEngineObject()->GetAttachment( "lefthand", vecStart );
 
 			CBaseEntity *pItem = DropItem( "weapon_frag", vecStart, RandomAngle(0,360) );
 
@@ -2420,7 +2420,7 @@ void CNPC_Combine::HandleAnimEvent( animevent_t *pEvent )
 				vecSpin.z = random->RandomFloat( -1000.0, 1000.0 );
 
 				Vector vecStart;
-				GetAttachment( "lefthand", vecStart );
+				GetEngineObject()->GetAttachment( "lefthand", vecStart );
 
 				if( m_NPCState == NPC_STATE_SCRIPT )
 				{
@@ -2472,7 +2472,7 @@ void CNPC_Combine::HandleAnimEvent( animevent_t *pEvent )
 		case COMBINE_AE_GREN_DROP:
 			{
 				Vector vecStart;
-				GetAttachment( "lefthand", vecStart );
+				GetEngineObject()->GetAttachment( "lefthand", vecStart );
 
 				Fraggrenade_Create( vecStart, vec3_angle, m_vecTossVelocity, vec3_origin, this, COMBINE_GRENADE_TIMER, true );
 				m_iNumGrenades--;
@@ -2960,7 +2960,7 @@ bool CNPC_Combine::CanAltFireEnemy( bool bUseFreeKnowledge )
 
 	if ( GetActiveWeapon() )
 	{
-		GetActiveWeapon()->GetAttachment( "muzzle", vShootPosition );
+		GetActiveWeapon()->GetEngineObject()->GetAttachment( "muzzle", vShootPosition );
 	}
 
 	// Trace a hull about the size of the combine ball.
@@ -3075,7 +3075,7 @@ Vector CNPC_Combine::EyePosition( void )
 
 	/*
 	Vector m_EyePos;
-	GetAttachment( "eyes", m_EyePos );
+	GetEngineObject()->GetAttachment( "eyes", m_EyePos );
 	return m_EyePos;
 	*/
 }

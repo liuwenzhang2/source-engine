@@ -272,7 +272,7 @@ void CModelPanel::DeleteVCDData( void )
 	{
 		m_hScene->StopClientOnlyScene();
 
-		cl_entitylist->DestroyEntity(m_hScene);// ->Remove();
+		EntityList()->DestroyEntity(m_hScene);// ->Remove();
 		m_hScene = NULL;
 	}
 }
@@ -287,7 +287,7 @@ void CModelPanel::SetupVCD( void )
 
 	DeleteVCDData();
 
-	C_SceneEntity *pEnt = (C_SceneEntity*)cl_entitylist->CreateEntityByName( "C_SceneEntity" );
+	C_SceneEntity *pEnt = (C_SceneEntity*)EntityList()->CreateEntityByName( "C_SceneEntity" );
 
 	if ( !pEnt )
 		return;
@@ -295,7 +295,7 @@ void CModelPanel::SetupVCD( void )
 	if ( pEnt->InitializeAsClientEntity( "", RENDER_GROUP_OTHER ) == false )
 	{
 		// we failed to initialize this entity so just return gracefully
-		cl_entitylist->DestroyEntity(pEnt);// ->Remove();
+		EntityList()->DestroyEntity(pEnt);// ->Remove();
 		return;
 	}
 
@@ -324,7 +324,7 @@ void CModelPanel::DeleteModelData( void )
 {
 	if ( m_hModel.Get() )
 	{
-		cl_entitylist->DestroyEntity(m_hModel);// ->Remove();
+		EntityList()->DestroyEntity(m_hModel);// ->Remove();
 		m_hModel = NULL;
 		m_flFrameDistance = 0;
 	}
@@ -333,7 +333,7 @@ void CModelPanel::DeleteModelData( void )
 	{
 		if ( m_AttachedModels[i].Get() )
 		{
-			cl_entitylist->DestroyEntity(m_AttachedModels[i]);// ->Remove();
+			EntityList()->DestroyEntity(m_AttachedModels[i]);// ->Remove();
 		}
 		m_AttachedModels.Remove( i );
 	}
@@ -400,7 +400,7 @@ void CModelPanel::SetupModel( void )
 		return;
 
 	// create the new model
-	CModelPanelModel *pEnt = (CModelPanelModel*)cl_entitylist->CreateEntityByName( "CModelPanelMode" );
+	CModelPanelModel *pEnt = (CModelPanelModel*)EntityList()->CreateEntityByName( "CModelPanelMode" );
 
 	if ( !pEnt )
 		return;
@@ -408,7 +408,7 @@ void CModelPanel::SetupModel( void )
 	if ( pEnt->InitializeAsClientEntity( pszModelName, RENDER_GROUP_OPAQUE_ENTITY ) == false )
 	{
 		// we failed to initialize this entity so just return gracefully
-		cl_entitylist->DestroyEntity(pEnt);// ->Remove();
+		EntityList()->DestroyEntity(pEnt);// ->Remove();
 		return;
 	}
 	
@@ -466,14 +466,14 @@ void CModelPanel::SetupModel( void )
 	for ( int i = 0 ; i < m_pModelInfo->m_AttachedModelsInfo.Count() ; i++ )
 	{
 		CModelPanelAttachedModelInfo *pInfo = m_pModelInfo->m_AttachedModelsInfo[i];
-		C_BaseAnimating *pTemp = (C_BaseAnimating*)cl_entitylist->CreateEntityByName( "C_BaseAnimating" );
+		C_BaseAnimating *pTemp = (C_BaseAnimating*)EntityList()->CreateEntityByName( "C_BaseAnimating" );
 
 		if ( pTemp )
 		{
 			if ( pTemp->InitializeAsClientEntity( pInfo->m_pszModelName, RENDER_GROUP_OPAQUE_ENTITY ) == false )
 			{	
 				// we failed to initialize this model so just skip it
-				cl_entitylist->DestroyEntity(pTemp);// ->Remove();
+				EntityList()->DestroyEntity(pTemp);// ->Remove();
 				continue;
 			}
 
@@ -544,7 +544,7 @@ void CModelPanel::Paint()
 {
 	BaseClass::Paint();
 
-	C_BasePlayer *pLocalPlayer = (C_BasePlayer*)ClientEntityList().GetLocalPlayer();
+	C_BasePlayer *pLocalPlayer = (C_BasePlayer*)EntityList()->GetLocalPlayer();
 
 	if ( !pLocalPlayer || !m_pModelInfo )
 		return;

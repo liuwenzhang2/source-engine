@@ -1203,38 +1203,6 @@ inline bool CBaseAnimating::CanSkipAnimation( void )
 //}
 
 //-----------------------------------------------------------------------------
-// Purpose: Returns the world location of an attachment
-// Input  : attachment index
-// Output :	location and angles
-//-----------------------------------------------------------------------------
-bool CBaseAnimating::GetAttachment( const char *szName, Vector &absOrigin, Vector *forward, Vector *right, Vector *up )
-{																
-	return GetAttachment(GetEngineObject()->LookupAttachment( szName ), absOrigin, forward, right, up );
-}
-
-bool CBaseAnimating::GetAttachment( int iAttachment, Vector &absOrigin, Vector *forward, Vector *right, Vector *up )
-{
-	matrix3x4_t attachmentToWorld;
-
-	bool bRet = GetEngineObject()->GetAttachment( iAttachment, attachmentToWorld );
-	MatrixPosition( attachmentToWorld, absOrigin );
-	if (forward)
-	{
-		MatrixGetColumn( attachmentToWorld, 0, forward );
-	}
-	if (right)
-	{
-		MatrixGetColumn( attachmentToWorld, 1, right );
-	}
-	if (up)
-	{
-		MatrixGetColumn( attachmentToWorld, 2, up );
-	}
-	return bRet;
-}
-
-
-//-----------------------------------------------------------------------------
 // Returns the attachment in local space
 //-----------------------------------------------------------------------------
 bool CBaseAnimating::GetAttachmentLocal( const char *szName, Vector &origin, QAngle &angles )
@@ -1769,7 +1737,7 @@ int CBaseAnimating::DrawDebugTextOverlays(void)
 			// Iterate all the stored attachments
 			for ( int i = 1; i <= pStudioHdr->GetNumAttachments(); i++ )
 			{
-				GetAttachment( i, vecPos, &vecForward, &vecRight, &vecUp );
+				GetEngineObject()->GetAttachment( i, vecPos, &vecForward, &vecRight, &vecUp );
 
 				// Red - forward, green - right, blue - up
 				NDebugOverlay::Line( vecPos, vecPos + ( vecForward * 4.0f ), 255, 0, 0, true, 0.05f );
@@ -1943,92 +1911,6 @@ int CBaseAnimating::GetHitboxBone( int hitboxIndex )
 	}
 	return 0;
 }
-
-
-//-----------------------------------------------------------------------------
-// Computes a box that surrounds all hitboxes
-//-----------------------------------------------------------------------------
-bool CBaseAnimating::ComputeHitboxSurroundingBox( Vector *pVecWorldMins, Vector *pVecWorldMaxs )
-{
-	// Note that this currently should not be called during Relink because of IK.
-	// The code below recomputes bones so as to get at the hitboxes,
-	// which causes IK to trigger, which causes raycasts against the other entities to occur,
-	// which is illegal to do while in the Relink phase.
-
-	IStudioHdr *pStudioHdr = GetEngineObject()->GetModelPtr();
-	if (!pStudioHdr)
-		return false;
-
-	mstudiohitboxset_t *set = pStudioHdr->pHitboxSet(GetEngineObject()->GetHitboxSet() );
-	if ( !set || !set->numhitboxes )
-		return false;
-
-	const matrix3x4_t* hitboxbones[MAXSTUDIOBONES];
-	GetEngineObject()->GetHitboxBoneTransforms(hitboxbones);
-
-	// Compute a box in world space that surrounds this entity
-	pVecWorldMins->Init( FLT_MAX, FLT_MAX, FLT_MAX );
-	pVecWorldMaxs->Init( -FLT_MAX, -FLT_MAX, -FLT_MAX );
-
-	Vector vecBoxAbsMins, vecBoxAbsMaxs;
-	for ( int i = 0; i < set->numhitboxes; i++ )
-	{
-		mstudiobbox_t *pbox = set->pHitbox(i);
-		const matrix3x4_t *pMatrix = hitboxbones[pbox->bone];
-
-		if ( pMatrix )
-		{
-			TransformAABB( *pMatrix, pbox->bbmin * GetEngineObject()->GetModelScale(), pbox->bbmax * GetEngineObject()->GetModelScale(), vecBoxAbsMins, vecBoxAbsMaxs );
-			VectorMin( *pVecWorldMins, vecBoxAbsMins, *pVecWorldMins );
-			VectorMax( *pVecWorldMaxs, vecBoxAbsMaxs, *pVecWorldMaxs );
-		}
-	}
-	return true;
-}
-
-//-----------------------------------------------------------------------------
-// Computes a box that surrounds all hitboxes, in entity space
-//-----------------------------------------------------------------------------
-bool CBaseAnimating::ComputeEntitySpaceHitboxSurroundingBox( Vector *pVecWorldMins, Vector *pVecWorldMaxs )
-{
-	// Note that this currently should not be called during position recomputation because of IK.
-	// The code below recomputes bones so as to get at the hitboxes,
-	// which causes IK to trigger, which causes raycasts against the other entities to occur,
-	// which is illegal to do while in the computeabsposition phase.
-
-	IStudioHdr *pStudioHdr = GetEngineObject()->GetModelPtr();
-	if (!pStudioHdr)
-		return false;
-
-	mstudiohitboxset_t *set = pStudioHdr->pHitboxSet(GetEngineObject()->GetHitboxSet() );
-	if ( !set || !set->numhitboxes )
-		return false;
-
-	const matrix3x4_t *hitboxbones[MAXSTUDIOBONES];
-	GetEngineObject()->GetHitboxBoneTransforms(hitboxbones);
-
-	// Compute a box in world space that surrounds this entity
-	pVecWorldMins->Init( FLT_MAX, FLT_MAX, FLT_MAX );
-	pVecWorldMaxs->Init( -FLT_MAX, -FLT_MAX, -FLT_MAX );
-
-	matrix3x4_t worldToEntity, boneToEntity;
-	MatrixInvert(GetEngineObject()->EntityToWorldTransform(), worldToEntity );
-
-	Vector vecBoxAbsMins, vecBoxAbsMaxs;
-	for ( int i = 0; i < set->numhitboxes; i++ )
-	{
-		mstudiobbox_t *pbox = set->pHitbox(i);
-
-		ConcatTransforms( worldToEntity, *hitboxbones[pbox->bone], boneToEntity );
-		TransformAABB( boneToEntity, pbox->bbmin, pbox->bbmax, vecBoxAbsMins, vecBoxAbsMaxs );
-		VectorMin( *pVecWorldMins, vecBoxAbsMins, *pVecWorldMins );
-		VectorMax( *pVecWorldMaxs, vecBoxAbsMaxs, *pVecWorldMaxs );
-	}
-	return true;
-}
-
-
-
 
 bool CBaseAnimating::LookupHitbox( const char *szName, int& outSet, int& outBox )
 {

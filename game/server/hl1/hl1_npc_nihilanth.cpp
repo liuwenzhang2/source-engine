@@ -1254,7 +1254,7 @@ void CNPC_Nihilanth::HandleAnimEvent( animevent_t *pEvent )
 	case 7:
 		/*
 		Vector vecSrc, vecAngles;
-		GetAttachment( 0, vecSrc, vecAngles ); 
+		GetEngineObject()->GetAttachment( 0, vecSrc, vecAngles ); 
 		CNihilanthHVR *pEntity = (CNihilanthHVR *)Create( "nihilanth_energy_ball", vecSrc, pev->angles, edict() );
 		pEntity->pev->velocity = Vector ( RANDOM_FLOAT( -0.7, 0.7 ), RANDOM_FLOAT( -0.7, 0.7 ), 1.0 ) * 600.0;
 		pEntity->GreenBallInit( );

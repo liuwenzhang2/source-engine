@@ -742,7 +742,7 @@ void UTIL_Tracer( const Vector &vecStart, const Vector &vecEnd, int iEntIndex,
 	data.m_vStart = vecStart;
 	data.m_vOrigin = vecEnd;
 #ifdef CLIENT_DLL
-	data.m_hEntity = ClientEntityList().GetBaseEntity( iEntIndex );
+	data.m_hEntity = EntityList()->GetBaseEntity( iEntIndex );
 #else
 	data.m_nEntIndex = iEntIndex;
 #endif
@@ -979,7 +979,7 @@ float CountdownTimer::Now( void ) const
 #ifdef CLIENT_DLL
 	CBasePlayer *UTIL_PlayerByIndex( int entindex )
 	{
-		return ToBasePlayer( ClientEntityList().GetEnt( entindex ) );
+		return ToBasePlayer( EntityList()->GetEnt( entindex ) );
 	}
 
 //=============================================================================

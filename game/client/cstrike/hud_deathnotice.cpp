@@ -426,7 +426,7 @@ void CHudDeathNotice::FireGameEvent( IGameEvent *event )
 	deathMsg.bHeadshot = headshot;
 	deathMsg.iDominationImageId = -1;
 
-	CCSPlayer* pKiller = ToCSPlayer(ClientEntityList().GetBaseEntity(iKiller));
+	CCSPlayer* pKiller = ToCSPlayer(EntityList()->GetBaseEntity(iKiller));
 
 	// the local player is dead, see if this is a new nemesis or a revenge
 	if ( event->GetInt( "dominated" ) > 0 || (pKiller != NULL && pKiller->IsPlayerDominated(iVictim)) )

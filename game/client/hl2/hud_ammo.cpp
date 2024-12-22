@@ -259,7 +259,7 @@ void CHudAmmo::OnThink()
 //-----------------------------------------------------------------------------
 void CHudAmmo::UpdateAmmoDisplays()
 {
-	C_BasePlayer *player = (C_BasePlayer*)ClientEntityList().GetLocalPlayer();
+	C_BasePlayer *player = (C_BasePlayer*)EntityList()->GetLocalPlayer();
 	IClientVehicle *pVehicle = player ? player->GetVehicle() : NULL;
 
 	if ( !pVehicle )
@@ -445,7 +445,7 @@ protected:
 	{
 		// set whether or not the panel draws based on if we have a weapon that supports secondary ammo
 		C_BaseCombatWeapon *wpn = GetActiveWeapon();
-		C_BasePlayer *player = (C_BasePlayer*)ClientEntityList().GetLocalPlayer();
+		C_BasePlayer *player = (C_BasePlayer*)EntityList()->GetLocalPlayer();
 		IClientVehicle *pVehicle = player ? player->GetVehicle() : NULL;
 		if (!wpn || !player || pVehicle)
 		{
@@ -466,7 +466,7 @@ protected:
 	void UpdateAmmoState()
 	{
 		C_BaseCombatWeapon *wpn = GetActiveWeapon();
-		C_BasePlayer *player = (C_BasePlayer*)ClientEntityList().GetLocalPlayer();
+		C_BasePlayer *player = (C_BasePlayer*)EntityList()->GetLocalPlayer();
 
 		if (player && wpn && wpn->UsesSecondaryAmmo())
 		{

@@ -541,7 +541,7 @@ Vector CNPC_CombineCamera::HeadDirection2D()
 {
 	Vector	vecMuzzle, vecMuzzleDir;
 
-	GetAttachment("eyes", vecMuzzle, &vecMuzzleDir );
+	GetEngineObject()->GetAttachment("eyes", vecMuzzle, &vecMuzzleDir );
 	vecMuzzleDir.z = 0;
 	VectorNormalize(vecMuzzleDir);
 
@@ -756,7 +756,7 @@ void CNPC_CombineCamera::TrackTarget( CBaseEntity *pTarget )
 	Vector vecMuzzle, vecMuzzleDir;
 	QAngle vecMuzzleAng;
 	
-	GetAttachment("eyes", vecMuzzle, &vecMuzzleDir);
+	GetEngineObject()->GetAttachment("eyes", vecMuzzle, &vecMuzzleDir);
 	
 	SetIdealActivity((Activity) ACT_COMBINE_CAMERA_OPEN_IDLE);
 

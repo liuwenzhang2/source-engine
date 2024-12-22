@@ -71,7 +71,7 @@ int C_RollerMine::DrawModel( int flags )
 			offset += Vector(2,2,2) * scale;
 			beamInfo.m_vecEnd = GetEngineObject()->GetAbsOrigin() + offset;
 
-			beamInfo.m_pStartEnt= cl_entitylist->GetEnt( BEAMENT_ENTITY( entindex() ) );
+			beamInfo.m_pStartEnt= EntityList()->GetEnt( BEAMENT_ENTITY( entindex() ) );
 			beamInfo.m_pEndEnt	= beamInfo.m_pStartEnt;
 			beamInfo.m_nStartAttachment = random->RandomInt( 0, NUM_ATTACHMENTS );
 			beamInfo.m_nEndAttachment = random->RandomInt( 0, NUM_ATTACHMENTS );

@@ -122,8 +122,8 @@ bool CGameRules::IsBonusChallengeTimeBased( void )
 
 bool CGameRules::IsLocalPlayer( int nEntIndex )
 {
-	C_BasePlayer *pLocalPlayer = (C_BasePlayer*)ClientEntityList().GetLocalPlayer();
-	return ( pLocalPlayer && pLocalPlayer == ClientEntityList().GetEnt( nEntIndex ) );
+	C_BasePlayer *pLocalPlayer = (C_BasePlayer*)EntityList()->GetLocalPlayer();
+	return ( pLocalPlayer && pLocalPlayer == EntityList()->GetEnt( nEntIndex ) );
 }
 
 CGameRules::CGameRules() : CAutoGameSystemPerFrame( "CGameRules" )

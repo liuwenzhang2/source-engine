@@ -58,7 +58,7 @@ void CHudFlashlight::Paint( void )
 	bool	bIsOn;
 	Color	clrFlash;
 
-	C_HL1_Player *pPlayer = ToHL1Player(ClientEntityList().GetLocalPlayer() );
+	C_HL1_Player *pPlayer = ToHL1Player(EntityList()->GetLocalPlayer() );
 	if ( !pPlayer )
 		return;
 

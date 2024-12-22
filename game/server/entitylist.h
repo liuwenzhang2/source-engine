@@ -880,6 +880,9 @@ public:
 	matrix3x4_t& GetBoneForWrite(int iBone);
 	virtual void SetupBones(matrix3x4_t* pBoneToWorldOut, int nMaxBones, int boneMask, float currentTime);
 	void DrawRawSkeleton(matrix3x4_t boneToWorld[], int boneMask, bool noDepthTest = true, float duration = 0.0f, bool monocolor = false);
+	// Computes a box that surrounds all hitboxes
+	bool ComputeHitboxSurroundingBox(Vector* pVecWorldMins, Vector* pVecWorldMaxs);
+	bool ComputeEntitySpaceHitboxSurroundingBox(Vector* pVecWorldMins, Vector* pVecWorldMaxs);
 	virtual void GetHitboxBoneTransform(int iBone, matrix3x4_t& pBoneToWorld);
 	virtual void GetHitboxBoneTransforms(const matrix3x4_t* hitboxbones[MAXSTUDIOBONES]);
 	virtual void GetHitboxBonePosition(int iBone, Vector& origin, QAngle& angles);
@@ -909,6 +912,9 @@ public:
 	{
 		return GetAttachment(LookupAttachment(szName), absOrigin, absAngles);
 	}
+	bool GetAttachment(int iAttachment, Vector& absOrigin, Vector* forward = NULL, Vector* right = NULL, Vector* up = NULL);
+	// Non-angle versions of the attachments in world space
+	bool GetAttachment(const char* szName, Vector& absOrigin, Vector* forward = NULL, Vector* right = NULL, Vector* up = NULL);
 	void SetAlternateSorting(bool bAlternateSorting) { m_bAlternateSorting = bAlternateSorting; }
 	void IncrementInterpolationFrame(); // Call this to cause a discontinuity (teleport)
 
@@ -2032,27 +2038,6 @@ inline bool CEnginePortalInternal::IsActivedAndLinked(void) const
 	return (m_bActivated && GetLinkedPortal() != NULL);
 }
 
-#ifdef DEBUG_PORTAL_SIMULATION_CREATION_TIMES
-#define STARTDEBUGTIMER(x) { x.Start(); }
-#define STOPDEBUGTIMER(x) { x.End(); }
-#define DEBUGTIMERONLY(x) x
-#define CREATEDEBUGTIMER(x) CFastTimer x;
-static const char* s_szTabSpacing[] = { "", "\t", "\t\t", "\t\t\t", "\t\t\t\t", "\t\t\t\t\t", "\t\t\t\t\t\t", "\t\t\t\t\t\t\t", "\t\t\t\t\t\t\t\t", "\t\t\t\t\t\t\t\t\t", "\t\t\t\t\t\t\t\t\t\t" };
-static int s_iTabSpacingIndex = 0;
-static int s_iPortalSimulatorGUID = 0; //used in standalone function that have no idea what a portal simulator is
-#define INCREMENTTABSPACING() ++s_iTabSpacingIndex;
-#define DECREMENTTABSPACING() --s_iTabSpacingIndex;
-#define TABSPACING (s_szTabSpacing[s_iTabSpacingIndex])
-#else
-#define STARTDEBUGTIMER(x)
-#define STOPDEBUGTIMER(x)
-#define DEBUGTIMERONLY(x)
-#define CREATEDEBUGTIMER(x)
-#define INCREMENTTABSPACING()
-#define DECREMENTTABSPACING()
-#define TABSPACING
-#endif
-
 struct PhysicsObjectCloneLink_t
 {
 	IPhysicsObject* pSource;
@@ -2700,6 +2685,22 @@ struct ShadowCloneLLEntryManager
 	}
 };
 
+class CWatcherList : public IWatcherList
+{
+public:
+	//CWatcherList(); NOTE: Dataobj doesn't support constructors - it zeros the memory
+	~CWatcherList();	// frees the positionwatcher_t's to the pool
+	void Init();
+
+	void AddToList(IHandleEntity* pWatcher);
+	void RemoveWatcher(IHandleEntity* pWatcher);
+
+private:
+	int GetCallbackObjects(IWatcherCallback** pList, int listMax);
+
+	unsigned short Find(IHandleEntity* pEntity);
+	unsigned short m_list;
+};
 
 typedef void (*EntityCallbackFunction) (CBaseEntity* pEntity);
 extern void PostSimulation_ImpulseEvent(IPhysicsObject* pObject, const Vector& centerForce, const AngularImpulse& centerTorque);
@@ -6647,12 +6648,7 @@ extern CGlobalEntityList<CBaseEntity> gEntList;
 template<class T>
 inline T* CHandle<T>::Get() const
 {
-#ifdef CLIENT_DLL
-	//extern CBaseEntityList<IHandleEntity>* g_pEntityList;
-	return (T*)g_pEntityList->LookupEntity(*this);
-#endif // CLIENT_DLL
 #ifdef GAME_DLL
-	//extern CBaseEntityList<IHandleEntity>* g_pEntityList;
 	return (T*)gEntList.LookupEntity(*this);
 #endif // GAME_DLL
 }

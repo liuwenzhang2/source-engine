@@ -841,7 +841,7 @@ Vector CNPC_Stalker::LaserStartPosition(Vector vStalkerPos)
 {
 	// Get attachment position
 	Vector vAttachPos;
-	GetAttachment(STALKER_LASER_ATTACHMENT,vAttachPos);
+	GetEngineObject()->GetAttachment(STALKER_LASER_ATTACHMENT,vAttachPos);
 
 	// Now convert to vStalkerPos
 	vAttachPos = vAttachPos - GetEngineObject()->GetAbsOrigin() + vStalkerPos;
@@ -1048,7 +1048,7 @@ void CNPC_Stalker::DrawAttackBeam(void)
 	m_pBeam->RelinkBeam();
 
 	Vector vAttachPos;
-	GetAttachment(STALKER_LASER_ATTACHMENT,vAttachPos);
+	GetEngineObject()->GetAttachment(STALKER_LASER_ATTACHMENT,vAttachPos);
 
 	Vector vecAimDir = tr.endpos - vAttachPos;
 	VectorNormalize( vecAimDir );

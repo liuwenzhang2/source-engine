@@ -222,7 +222,7 @@ void C_AR2Explosion::Start(CParticleMgr *pParticleMgr, IPrototypeArgAccess *pArg
 	#else
 		{
 			nSurfInfos = 0;
-			C_BaseEntity *ent = cl_entitylist->GetEnt( 0 );
+			C_BaseEntity *ent = EntityList()->GetEnt( 0 );
 			if ( ent )
 			{
 				nSurfInfos = engine->GetIntersectingSurfaces(

@@ -147,7 +147,7 @@ void CHUDAutoAim::VidInit( void )
 bool CHUDAutoAim::ShouldDraw( void )
 {	
 #ifndef HL1_CLIENT_DLL
-	C_BaseHLPlayer *pLocalPlayer = (C_BaseHLPlayer *)ClientEntityList().GetLocalPlayer();
+	C_BaseHLPlayer *pLocalPlayer = (C_BaseHLPlayer *)EntityList()->GetLocalPlayer();
 	if ( pLocalPlayer )
 	{
 		if( !pLocalPlayer->m_HL2Local.m_bDisplayReticle )
@@ -177,7 +177,7 @@ void CHUDAutoAim::OnThink()
 	BaseClass::OnThink();
 
 	// Get the HL2 player
-	C_BaseHLPlayer *pLocalPlayer = (C_BaseHLPlayer *)ClientEntityList().GetLocalPlayer();
+	C_BaseHLPlayer *pLocalPlayer = (C_BaseHLPlayer *)EntityList()->GetLocalPlayer();
 	if ( pLocalPlayer == NULL )
 	{
 		// Just turn the autoaim crosshair off.
@@ -456,7 +456,7 @@ void CHUDAutoAim::Paint()
 		int r,g,b,a;
 		clr.GetColor( r,g,b,a );
 
-		C_BaseHLPlayer *pLocalPlayer = (C_BaseHLPlayer *)ClientEntityList().GetLocalPlayer();
+		C_BaseHLPlayer *pLocalPlayer = (C_BaseHLPlayer *)EntityList()->GetLocalPlayer();
 		if( pLocalPlayer && pLocalPlayer->m_HL2Local.m_hAutoAimTarget.Get() )
 		{
 			r = 250; 

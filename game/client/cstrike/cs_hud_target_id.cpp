@@ -185,8 +185,8 @@ void CTargetID::Paint()
 	// Is this an entindex sent by the server?
 	if ( iEntIndex )
 	{
-		C_BasePlayer *pPlayer = static_cast<C_BasePlayer*>(cl_entitylist->GetEnt( iEntIndex ));
-		C_BasePlayer *pLocalPlayer = (C_BasePlayer*)ClientEntityList().GetLocalPlayer();
+		C_BasePlayer *pPlayer = static_cast<C_BasePlayer*>(EntityList()->GetEnt( iEntIndex ));
+		C_BasePlayer *pLocalPlayer = (C_BasePlayer*)EntityList()->GetLocalPlayer();
 
 		const char *printFormatString = NULL;
 		wchar_t wszClanTag[ MAX_PLAYER_NAME_LENGTH ];
@@ -250,7 +250,7 @@ void CTargetID::Paint()
 		}
 		else
 		{
-			C_BaseEntity *pEnt = cl_entitylist->GetEnt( iEntIndex );
+			C_BaseEntity *pEnt = EntityList()->GetEnt( iEntIndex );
 
 			//Hostages!
 
@@ -336,7 +336,7 @@ void CTargetID::Paint()
 
 		if ( sIDString[0] )
 		{
-			C_BasePlayer *pPlayer = (C_BasePlayer*)ClientEntityList().GetLocalPlayer();
+			C_BasePlayer *pPlayer = (C_BasePlayer*)EntityList()->GetLocalPlayer();
 			bool bObserverMode = pPlayer && pPlayer->IsObserver();
 
 			int wide, tall;

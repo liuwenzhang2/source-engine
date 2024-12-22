@@ -314,7 +314,7 @@ void CEnvEffectsScript::HandleAnimEvent ( animevent_t *pEvent )
 				if ( pCurrent->m_bStopFollowOnKill == true )
 				{
 					Vector vOrigin;
-					GetAttachment( pCurrent->m_pTrail->m_nAttachment, vOrigin );
+					GetEngineObject()->GetAttachment( pCurrent->m_pTrail->m_nAttachment, vOrigin );
 
 					pCurrent->m_pTrail->GetEngineObject()->StopFollowingEntity();
 
@@ -333,7 +333,7 @@ void CEnvEffectsScript::HandleAnimEvent ( animevent_t *pEvent )
 				if ( pCurrent->m_bStopFollowOnKill == true )
 				{
 					Vector vOrigin;
-					GetAttachment( pCurrent->m_pSprite->m_nAttachment, vOrigin );
+					GetEngineObject()->GetAttachment( pCurrent->m_pSprite->m_nAttachment, vOrigin );
 
 					pCurrent->m_pSprite->GetEngineObject()->StopFollowingEntity();
 

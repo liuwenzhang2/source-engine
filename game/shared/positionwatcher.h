@@ -12,13 +12,6 @@
 
 #include "ehandle.h"
 
-// inherit from this interface to be able to call WatchPositionChanges
-abstract_class IWatcherCallback
-{
-public:
-	virtual ~IWatcherCallback() {}
-};
-
 abstract_class IPositionWatcher : public IWatcherCallback
 {
 public:

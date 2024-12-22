@@ -121,7 +121,7 @@ void CHudLocator::VidInit( void )
 //-----------------------------------------------------------------------------
 bool CHudLocator::ShouldDraw( void )
 {
-	C_BaseHLPlayer *pPlayer = (C_BaseHLPlayer *)ClientEntityList().GetLocalPlayer();
+	C_BaseHLPlayer *pPlayer = (C_BaseHLPlayer *)EntityList()->GetLocalPlayer();
 	if ( !pPlayer )
 		return false;
 
@@ -245,7 +245,7 @@ void CHudLocator::Paint()
 
 	SetAlpha( alpha );
 
-	C_BaseHLPlayer *pPlayer = (C_BaseHLPlayer *)ClientEntityList().GetLocalPlayer();
+	C_BaseHLPlayer *pPlayer = (C_BaseHLPlayer *)EntityList()->GetLocalPlayer();
 	if ( !pPlayer )
 		return;
 

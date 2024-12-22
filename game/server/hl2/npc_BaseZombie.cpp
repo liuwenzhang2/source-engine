@@ -1381,20 +1381,20 @@ CBaseEntity *CNPC_BaseZombie::ClawAttack( float flDist, int iDamage, QAngle &qaV
 			switch( BloodOrigin )
 			{
 			case ZOMBIE_BLOOD_LEFT_HAND:
-				if( GetAttachment( "blood_left", vecBloodPos ) )
+				if(GetEngineObject()->GetAttachment( "blood_left", vecBloodPos ) )
 					SpawnBlood( vecBloodPos, g_vecAttackDir, pHurt->BloodColor(), MIN( iDamage, 30 ) );
 				break;
 
 			case ZOMBIE_BLOOD_RIGHT_HAND:
-				if( GetAttachment( "blood_right", vecBloodPos ) )
+				if(GetEngineObject()->GetAttachment( "blood_right", vecBloodPos ) )
 					SpawnBlood( vecBloodPos, g_vecAttackDir, pHurt->BloodColor(), MIN( iDamage, 30 ) );
 				break;
 
 			case ZOMBIE_BLOOD_BOTH_HANDS:
-				if( GetAttachment( "blood_left", vecBloodPos ) )
+				if(GetEngineObject()->GetAttachment( "blood_left", vecBloodPos ) )
 					SpawnBlood( vecBloodPos, g_vecAttackDir, pHurt->BloodColor(), MIN( iDamage, 30 ) );
 
-				if( GetAttachment( "blood_right", vecBloodPos ) )
+				if(GetEngineObject()->GetAttachment( "blood_right", vecBloodPos ) )
 					SpawnBlood( vecBloodPos, g_vecAttackDir, pHurt->BloodColor(), MIN( iDamage, 30 ) );
 				break;
 
@@ -1679,7 +1679,7 @@ void CNPC_BaseZombie::HandleAnimEvent( animevent_t *pEvent )
 		int iSpeed = atoi( token );
 
 		GetInteractionPartner()->GetEngineObject()->GetHitboxBonePosition( boneIndex, vecBonePosition, angles );
-		GetAttachment( iCrabAttachment, vecHeadCrabPosition );
+		GetEngineObject()->GetAttachment( iCrabAttachment, vecHeadCrabPosition );
 
 		Vector vVelocity = vecHeadCrabPosition - vecBonePosition;
 		VectorNormalize( vVelocity );
@@ -2698,7 +2698,7 @@ Vector CNPC_BaseZombie::HeadTarget( const Vector &posSrc )
 
 	Vector vecPosition;
 
-	GetAttachment( iCrabAttachment, vecPosition );
+	GetEngineObject()->GetAttachment( iCrabAttachment, vecPosition );
 
 	return vecPosition;
 }

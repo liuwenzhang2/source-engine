@@ -82,7 +82,7 @@ void CWeaponIFMBase::OnDataChanged( DataUpdateType_t type )
 
 bool CWeaponIFMBase::ShouldPredict()
 {
-	if ( GetOwner() && GetOwner() == (C_BasePlayer*)ClientEntityList().GetLocalPlayer() )
+	if ( GetOwner() && GetOwner() == (C_BasePlayer*)EntityList()->GetLocalPlayer() )
 		return true;
 
 	return BaseClass::ShouldPredict();

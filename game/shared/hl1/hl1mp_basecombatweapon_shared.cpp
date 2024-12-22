@@ -104,7 +104,7 @@ void CBaseHL1MPCombatWeapon::OnDataChanged( DataUpdateType_t type )
 
 bool CBaseHL1MPCombatWeapon::ShouldPredict()
 {
-	if ( GetOwner() && GetOwner() == (C_BasePlayer*)ClientEntityList().GetLocalPlayer() )
+	if ( GetOwner() && GetOwner() == (C_BasePlayer*)EntityList()->GetLocalPlayer() )
 		return true;
 
 	return BaseClass::ShouldPredict();

@@ -226,7 +226,7 @@ void C_PointCommentaryNode::OnDataChanged( DataUpdateType_t updateType )
 	if ( m_bWasActive == m_bActive && !m_bRestartAfterRestore )
 		return;
 
-	C_BasePlayer *pPlayer = (C_BasePlayer*)ClientEntityList().GetLocalPlayer();
+	C_BasePlayer *pPlayer = (C_BasePlayer*)EntityList()->GetLocalPlayer();
 	if ( m_bActive && pPlayer )
 	{
 		// Use the HDR / Non-HDR version based on whether we're running HDR or not
@@ -258,7 +258,7 @@ void C_PointCommentaryNode::OnDataChanged( DataUpdateType_t updateType )
 		}
 		else if ( render->GetViewEntity() )
 		{
-			pSoundEntity = cl_entitylist->GetEnt( render->GetViewEntity() );
+			pSoundEntity = EntityList()->GetEnt( render->GetViewEntity() );
 			es.m_SoundLevel = SNDLVL_NONE;
 		}
 		else

@@ -14,22 +14,11 @@
 #include "worldsize.h"
 #include "sharedInterface.h"
 #ifdef CLIENT_DLL
-
-#include "c_baseentity.h"
-#include "c_baseanimating.h"
-#include "recvproxy.h"
 #include "cliententitylist.h"
-
-#endif
+#endif // CLIENT_DLL
 #ifdef GAME_DLL
-
-#include "baseentity.h"
-#include "baseanimating.h"
-#include "sendproxy.h"
-#include "hierarchy.h"
-#include "entitylist.h"   
-
-#endif
+#include "entitylist.h"
+#endif // GAME_DLL
 
 //#include "predictable_entity.h"
 
@@ -183,7 +172,7 @@ void CDirtySpatialPartitionEntityList::OnPreQuery( SpatialPartitionListMask_t li
 
 #ifdef CLIENT_DLL
 	// FIXME: This should really be an assertion... feh!
-	if ( !ClientEntityList().IsAbsRecomputationsEnabled() )
+	if ( !EntityList()->IsAbsRecomputationsEnabled() )
 	{
 		LockPartitionForRead();
 		return;
@@ -212,7 +201,7 @@ void CDirtySpatialPartitionEntityList::OnPreQuery( SpatialPartitionListMask_t li
 #ifndef CLIENT_DLL
 				CBaseEntity *pEntity = gEntList.GetBaseEntity( handle );
 #else
-				CBaseEntity *pEntity = cl_entitylist->GetBaseEntityFromHandle( handle );
+				CBaseEntity *pEntity = EntityList()->GetBaseEntityFromHandle( handle );
 #endif
 
 				if ( pEntity )
@@ -1014,13 +1003,7 @@ void CCollisionProperty::ComputeVPhysicsSurroundingBox( Vector *pVecWorldMins, V
 //-----------------------------------------------------------------------------
 bool CCollisionProperty::ComputeHitboxSurroundingBox( Vector *pVecWorldMins, Vector *pVecWorldMaxs )
 {
-	CBaseAnimating *pAnim = GetOuter()->GetOuter()->GetBaseAnimating();
-	if (pAnim)
-	{
-		return pAnim->ComputeHitboxSurroundingBox( pVecWorldMins, pVecWorldMaxs );
-	}
-
-	return false;
+	return GetOuter()->ComputeHitboxSurroundingBox(pVecWorldMins, pVecWorldMaxs);
 }
 
 //-----------------------------------------------------------------------------
@@ -1028,13 +1011,7 @@ bool CCollisionProperty::ComputeHitboxSurroundingBox( Vector *pVecWorldMins, Vec
 //-----------------------------------------------------------------------------
 bool CCollisionProperty::ComputeEntitySpaceHitboxSurroundingBox( Vector *pVecWorldMins, Vector *pVecWorldMaxs )
 {
-	CBaseAnimating *pAnim = GetOuter()->GetOuter()->GetBaseAnimating();
-	if (pAnim)
-	{
-		return pAnim->ComputeEntitySpaceHitboxSurroundingBox( pVecWorldMins, pVecWorldMaxs );
-	}
-
-	return false;
+	return GetOuter()->ComputeEntitySpaceHitboxSurroundingBox(pVecWorldMins, pVecWorldMaxs);
 }
 
 //-----------------------------------------------------------------------------

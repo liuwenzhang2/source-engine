@@ -568,6 +568,8 @@ public:
 	virtual int GetAccumulatedBoneMask() = 0;
 	virtual CIKContext* GetIk() = 0;
 	virtual bool SetupBones(matrix3x4_t* pBoneToWorldOut, int nMaxBones, int boneMask, float currentTime) = 0;
+	virtual bool ComputeHitboxSurroundingBox(Vector* pVecWorldMins, Vector* pVecWorldMaxs) = 0;
+	virtual bool ComputeEntitySpaceHitboxSurroundingBox(Vector* pVecWorldMins, Vector* pVecWorldMaxs) = 0;
 	virtual void GetHitboxBoneTransform(int iBone, matrix3x4_t& pBoneToWorld) = 0;
 	virtual void GetHitboxBoneTransforms(const matrix3x4_t* hitboxbones[MAXSTUDIOBONES]) = 0;
 	virtual void GetHitboxBonePosition(int iBone, Vector& origin, QAngle& angles) = 0;
@@ -786,6 +788,10 @@ public:
 	
 };
 
+#define INPVS_YES			0x0001		// The entity thinks it's in the PVS.
+#define INPVS_THISFRAME		0x0002		// Accumulated as different views are rendered during the frame and used to notify the entity if								// it is not in the PVS anymore (at the end of the frame).
+#define INPVS_NEEDSNOTIFY	0x0004		// The entity thinks it's in the PVS.
+
 class CPVSNotifyInfo
 {
 public:
@@ -795,12 +801,48 @@ public:
 	unsigned short m_PVSNotifiersLink;			// Into m_PVSNotifyInfos.
 };
 
+// Implement this class and register with entlist to receive entity create/delete notification
+class IClientEntityListener
+{
+public:
+	virtual void OnEntityCreated(C_BaseEntity* pEntity) {};
+	//virtual void OnEntitySpawned( C_BaseEntity *pEntity ) {};
+	virtual void OnEntityDeleted(C_BaseEntity* pEntity) {};
+};
+
+//=============================================================================
+//
+// Rope Manager
+//
+abstract_class IRopeManager
+{
+public:
+	virtual						~IRopeManager() {}
+	virtual void				ResetRenderCache(void) = 0;
+	virtual void				DrawRenderCache(bool bShadowDepth) = 0;
+	virtual void				OnRenderStart(void) = 0;
+	virtual void				SetHolidayLightMode(bool bHoliday) = 0;
+	virtual bool				IsHolidayLightMode(void) = 0;
+	virtual int					GetHolidayLightStyle(void) = 0;
+};
+
 //-----------------------------------------------------------------------------
 // Purpose: Exposes IClientEntity's to engine
 //-----------------------------------------------------------------------------
 abstract_class IClientEntityList : public IEntityList, public ISaveRestoreBlockHandler
 {
 public:
+	virtual bool Init() = 0;
+	virtual void Shutdown() = 0;
+
+	// Level init, shutdown
+	virtual void LevelInitPreEntity() = 0;
+	virtual void LevelInitPostEntity() = 0;
+
+	// The level is shutdown in two parts
+	virtual void LevelShutdownPreEntity() = 0;
+	virtual void LevelShutdownPostEntity() = 0;
+
 	virtual IPhysics* Physics() = 0;
 	virtual IPhysicsEnvironment* PhysGetEnv() = 0;
 	virtual IPhysicsSurfaceProps* PhysGetProps() = 0;
@@ -808,31 +850,43 @@ public:
 	virtual IPhysicsObjectPairHash* PhysGetEntityCollisionHash() = 0;
 	virtual const objectparams_t& PhysGetDefaultObjectParams() = 0;
 	virtual IPhysicsObject* PhysGetWorldObject() = 0;
+	virtual void PhysCleanupFrictionSounds(IHandleEntity* pEntity) = 0;
+	virtual float PhysGetSyncCreateTime() = 0;
+	virtual void PhysicsReset() = 0;
 
 	virtual void InstallEntityFactory(IEntityFactory* pFactory) = 0;
 	virtual void UninstallEntityFactory(IEntityFactory* pFactory) = 0;
 	virtual bool CanCreateEntityClass(const char* pClassName) = 0;
 	virtual const char* GetMapClassName(const char* pClassName) = 0;
 	virtual const char* GetDllClassName(const char* pClassName) = 0;
-	virtual size_t		GetEntitySize(const char* pClassName) = 0;
+	virtual size_t GetEntitySize(const char* pClassName) = 0;
 	virtual const char* GetCannonicalName(const char* pClassName) = 0;
 	virtual void ReportEntitySizes() = 0;
 	virtual void DumpEntityFactories() = 0;
 
 	virtual const char* GetBlockName() = 0;
+	virtual void PreSave(CSaveRestoreData* pSaveData) = 0;
+	virtual void Save(ISave* pSave) = 0;
+	virtual void WriteSaveHeaders(ISave* pSave) = 0;
+	virtual void PostSave() = 0;
+	virtual void PreRestore() = 0;
+	virtual void ReadRestoreHeaders(IRestore* pRestore) = 0;
+	virtual void Restore(IRestore* pRestore, bool createPlayers) = 0;
+	virtual void PostRestore() = 0;
 
-	virtual void			PreSave(CSaveRestoreData* pSaveData) = 0;
-	virtual void			Save(ISave* pSave) = 0;
-	virtual void			WriteSaveHeaders(ISave* pSave) = 0;
-	virtual void			PostSave() = 0;
+	virtual IClientEntity* CreateEntityByName(const char* className, int iForceEdictIndex = -1, int iSerialNum = -1) = 0;
+	virtual void DestroyEntity(IHandleEntity* pEntity) = 0;
+	virtual void Release() = 0;		// clears everything and releases entities
 
-	virtual void			PreRestore() = 0;
-	virtual void			ReadRestoreHeaders(IRestore* pRestore) = 0;
-	virtual void			Restore(IRestore* pRestore, bool createPlayers) = 0;
-	virtual void			PostRestore() = 0;
+	// add a class that gets notified of entity events
+	virtual void AddListenerEntity(IClientEntityListener* pListener) = 0;
+	virtual void RemoveListenerEntity(IClientEntityListener* pListener) = 0;
 
-	virtual IClientEntity*	CreateEntityByName(const char* className, int iForceEdictIndex = -1, int iSerialNum = -1) = 0;
-	virtual void			DestroyEntity(IHandleEntity* pEntity) = 0;
+	virtual CUtlLinkedList<CPVSNotifyInfo, unsigned short>& GetPVSNotifiers() = 0;
+
+	virtual CBaseHandle FirstHandle() const = 0;
+	virtual CBaseHandle NextHandle(CBaseHandle hEnt) const = 0;
+	virtual CBaseHandle InvalidHandle() = 0;
 
 	// Get IClientNetworkable interface for specified entity
 	virtual IEngineObjectClient* GetEngineObject(int entnum) = 0;
@@ -840,22 +894,55 @@ public:
 	virtual IClientNetworkable* GetClientNetworkable(int entnum) = 0;
 	virtual IClientNetworkable* GetClientNetworkableFromHandle(CBaseHandle hEnt) = 0;
 	virtual IClientUnknown* GetClientUnknownFromHandle(CBaseHandle hEnt) = 0;
+	virtual IClientRenderable* GetClientRenderableFromHandle(CBaseHandle hEnt) = 0;
+	virtual IClientThinkable* GetClientThinkableFromHandle(CBaseHandle hEnt) = 0;
 
 	// NOTE: This function is only a convenience wrapper.
 	// It returns GetClientNetworkable( entnum )->GetIClientEntity().
 	virtual IClientEntity* GetClientEntity(int entnum) = 0;
 	virtual IClientEntity* GetClientEntityFromHandle(CBaseHandle hEnt) = 0;
 
+	virtual C_BaseEntity* GetBaseEntity(int entnum) = 0;
+	// For backwards compatibility...
+	virtual C_BaseEntity* GetEnt(int entnum) { return GetBaseEntity(entnum); }
+	virtual C_BaseEntity* GetBaseEntityFromHandle(CBaseHandle hEnt) = 0;
+	virtual C_BaseEntity* FirstBaseEntity() const = 0;
+	virtual C_BaseEntity* NextBaseEntity(C_BaseEntity* pEnt) const = 0;
+	virtual C_BaseEntity* GetLocalPlayer(void) = 0;
+	virtual void SetLocalPlayer(C_BaseEntity* pBasePlayer) = 0;
+
 	// Returns number of entities currently in use
-	virtual int					NumberOfEntities(bool bIncludeNonNetworkable) = 0;
+	virtual int NumberOfEntities(bool bIncludeNonNetworkable) = 0;
 
 	// Returns highest index actually used
-	virtual int					GetHighestEntityIndex(void) = 0;
+	virtual int GetHighestEntityIndex(void) = 0;
 
 	// Sizes entity list to specified size
-	virtual void				SetMaxEntities(int maxents) = 0;
-	virtual int					GetMaxEntities() = 0;
-
+	virtual void SetMaxEntities(int maxents) = 0;
+	virtual int GetMaxEntities() = 0;
+	virtual bool IsInterpolationEnabled() = 0;
+	virtual void InterpolateServerEntities() = 0;
+	virtual void UpdateClientSideAnimations() = 0;
+	virtual void UpdateDirtySpatialPartitionEntities() = 0;
+	virtual void PhysicsSimulate() = 0;
+	virtual void ToolRecordEntities() = 0;
+	virtual void MarkAimEntsDirty() = 0;
+	virtual void CalcAimEntPositions() = 0;
+	virtual void SetAbsQueriesValid(bool bValid) = 0;
+	virtual bool IsAbsQueriesValid(void) = 0;
+	// Enable/disable abs recomputations on a stack.
+	virtual void PushEnableAbsRecomputations(bool bEnable) = 0;
+	virtual void PopEnableAbsRecomputations() = 0;
+	virtual void EnableAbsRecomputations(bool bEnable) = 0;
+	virtual bool IsAbsRecomputationsEnabled(void) = 0;
+	virtual void PushAllowBoneAccess(bool bAllowForNormalModels, bool bAllowForViewModels, char const* tagPush) = 0;
+	virtual void PopBoneAccess(char const* tagPop) = 0;
+	virtual void PreThreadedBoneSetup() = 0;
+	virtual void PostThreadedBoneSetup() = 0;
+	virtual void ThreadedBoneSetup() = 0;
+	virtual void InitBoneSetupThreadPool() = 0;
+	virtual void ShutdownBoneSetupThreadPool() = 0;
+	virtual void InvalidateBoneCaches() = 0;
 	virtual unsigned long GetPreviousBoneCounter() = 0;
 	virtual CUtlVector<IEngineObjectClient*>& GetPreviousBoneSetups() = 0;
 	virtual unsigned long GetModelBoneCounter() = 0;
@@ -869,6 +956,13 @@ public:
 	virtual int GetPortalCount() = 0;
 	virtual IEnginePortalClient* GetPortal(int index) = 0;
 	virtual CCallQueue* GetPostTouchQueue() = 0;
+
+	virtual void MoveToTopOfLRU(C_BaseEntity* pRagdoll, bool bImportant = false) = 0;
+	virtual void SetMaxRagdollCount(int iMaxCount) = 0;
+	virtual int CountRagdolls(bool bOnlySimulatingRagdolls) = 0;
+
+	virtual IRopeManager* RopeManager() = 0;
+	virtual void Rope_ResetCounters() = 0;
 };
 
 extern IClientEntityList* entitylist;

@@ -184,7 +184,7 @@ void SetBuyData( const ConVar &buyVar, const char *filename )
 
 void MsgFunc_KillCam(bf_read &msg) 
 {
-	C_CSPlayer *pPlayer = ToCSPlayer((C_BasePlayer*)ClientEntityList().GetLocalPlayer() );
+	C_CSPlayer *pPlayer = ToCSPlayer((C_BasePlayer*)EntityList()->GetLocalPlayer() );
 
 	if ( !pPlayer )
 		return;
@@ -349,7 +349,7 @@ void ClientModeCSNormal::Update()
 /*
 void ClientModeCSNormal::UpdateSpectatorMode( void )
 {
-	C_BasePlayer *pPlayer = (C_BasePlayer*)ClientEntityList().GetLocalPlayer();
+	C_BasePlayer *pPlayer = (C_BasePlayer*)EntityList()->GetLocalPlayer();
 
 	if ( !pPlayer )
 		return;
@@ -388,7 +388,7 @@ void ClientModeCSNormal::UpdateSpectatorMode( void )
 	
 	for ( int i = 1; i<= MAX_PLAYERS; i++)
 	{
-		C_BaseEntity *ent = ClientEntityList().GetEnt( i );
+		C_BaseEntity *ent = EntityList()->GetEnt( i );
 
 		if ( !ent || !ent->IsPlayer() )
 			continue;
@@ -451,7 +451,7 @@ int ClientModeCSNormal::GetDeathMessageStartHeight( void )
 void ClientModeCSNormal::FireGameEvent( IGameEvent *event )
 {
 	CBaseHudChat *pHudChat = (CBaseHudChat *)GET_HUDELEMENT( CHudChat );
-	C_BasePlayer *pLocalPlayer = (C_BasePlayer*)ClientEntityList().GetLocalPlayer();
+	C_BasePlayer *pLocalPlayer = (C_BasePlayer*)EntityList()->GetLocalPlayer();
 	CLocalPlayerFilter filter;
 	
 	if ( !pLocalPlayer || !pHudChat )
@@ -473,7 +473,7 @@ void ClientModeCSNormal::FireGameEvent( IGameEvent *event )
 			// double-check that the EHANDLE is still valid
 			if ( g_HostageRagdolls[i] )
 			{
-				cl_entitylist->DestroyEntity(g_HostageRagdolls[i]);// ->Release();
+				EntityList()->DestroyEntity(g_HostageRagdolls[i]);// ->Release();
 			}
 		}
 		g_HostageRagdolls.RemoveAll();
@@ -632,7 +632,7 @@ void ClientModeCSNormal::FireGameEvent( IGameEvent *event )
 			csPlayer->ClearSoundEvents();
 		}
 
-		if ( pPlayer == (C_BasePlayer*)ClientEntityList().GetLocalPlayer() )
+		if ( pPlayer == (C_BasePlayer*)EntityList()->GetLocalPlayer() )
 		{
 			// we just died, hide any buy panels
 			gViewPortInterface->ShowPanel( PANEL_BUY, false );
@@ -738,14 +738,14 @@ void RemoveClassImageEntity()
 	C_BaseAnimating *pEnt = g_ClassImagePlayer;
 	if ( pEnt )
 	{
-		cl_entitylist->DestroyEntity(pEnt);// ->Remove();
+		EntityList()->DestroyEntity(pEnt);// ->Remove();
 		g_ClassImagePlayer = NULL;
 	}
 
 	pEnt = g_ClassImageWeapon;
 	if ( pEnt )
 	{
-		cl_entitylist->DestroyEntity(pEnt);// ->Remove();
+		EntityList()->DestroyEntity(pEnt);// ->Remove();
 		g_ClassImageWeapon = NULL;
 	}
 }
@@ -779,7 +779,7 @@ void UpdateClassImageEntity(
 	const char *pModelName,
 	int x, int y, int width, int height )
 {
-	C_BasePlayer *pLocalPlayer = (C_BasePlayer*)ClientEntityList().GetLocalPlayer();
+	C_BasePlayer *pLocalPlayer = (C_BasePlayer*)EntityList()->GetLocalPlayer();
 	
 	if ( !pLocalPlayer )
 		return;
@@ -818,9 +818,9 @@ void UpdateClassImageEntity(
 	if ( recreatePlayer )
 	{
 		if (pPlayerModel)
-			cl_entitylist->DestroyEntity(pPlayerModel);// ->Remove();
+			EntityList()->DestroyEntity(pPlayerModel);// ->Remove();
 
-		pPlayerModel = (C_BaseAnimatingOverlay*)cl_entitylist->CreateEntityByName( "C_BaseAnimatingOverlay" );
+		pPlayerModel = (C_BaseAnimatingOverlay*)EntityList()->CreateEntityByName( "C_BaseAnimatingOverlay" );
 		pPlayerModel->InitializeAsClientEntity( pModelName, RENDER_GROUP_OPAQUE_ENTITY );
 		pPlayerModel->GetEngineObject()->AddEffects( EF_NODRAW ); // don't let the renderer draw the model normally
 
@@ -842,9 +842,9 @@ void UpdateClassImageEntity(
 	if ( recreatePlayer || ShouldRecreateClassImageEntity( pWeaponModel, pWeaponName ) )
 	{
 		if (pWeaponModel)
-			cl_entitylist->DestroyEntity(pWeaponModel);// ->Remove();
+			EntityList()->DestroyEntity(pWeaponModel);// ->Remove();
 
-		pWeaponModel = (C_BaseAnimating*)cl_entitylist->CreateEntityByName( "C_BaseAnimating" );
+		pWeaponModel = (C_BaseAnimating*)EntityList()->CreateEntityByName( "C_BaseAnimating" );
 		pWeaponModel->InitializeAsClientEntity( pWeaponName, RENDER_GROUP_OPAQUE_ENTITY );
 		pWeaponModel->GetEngineObject()->AddEffects( EF_NODRAW ); // don't let the renderer draw the model normally
 		pWeaponModel->GetEngineObject()->FollowEntity( pPlayerModel->GetEngineObject()); // attach to player model

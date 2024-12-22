@@ -171,7 +171,7 @@ EXPOSE_SINGLE_INTERFACE_GLOBALVAR( CClientTools, IClientTools, VCLIENTTOOLS_INTE
 CClientTools::CClientTools() : m_Handles( 0, 0, HandleLessFunc )
 {
 	m_bInRecordingMode = false;
-	cl_entitylist->AddListenerEntity( this );
+	EntityList()->AddListenerEntity( this );
 }
 
 
@@ -227,7 +227,7 @@ void CClientTools::AddClientRenderable( IClientRenderable *pRenderable, int rend
 {
 	Assert( pRenderable );
 
-	//cl_entitylist->AddNonNetworkableEntity( (C_BaseEntity*)pRenderable->GetIClientUnknown() );
+	//EntityList()->AddNonNetworkableEntity( (C_BaseEntity*)pRenderable->GetIClientUnknown() );
 
 	ClientRenderHandle_t handle = pRenderable->GetRenderHandle();
 	if ( INVALID_CLIENT_RENDER_HANDLE == handle )
@@ -251,7 +251,7 @@ void CClientTools::RemoveClientRenderable( IClientRenderable *pRenderable )
 	{
 		ClientLeafSystem()->RemoveRenderable( handle );
 	}
-	//cl_entitylist->RemoveEntity( pRenderable->GetIClientUnknown()->GetBaseEntity() );
+	//EntityList()->RemoveEntity( pRenderable->GetIClientUnknown()->GetBaseEntity() );
 }
 
 void CClientTools::MarkClientRenderableDirty( IClientRenderable *pRenderable )
@@ -424,11 +424,11 @@ EntitySearchResult CClientTools::NextEntity( EntitySearchResult currentEnt )
 	C_BaseEntity *ent = reinterpret_cast< C_BaseEntity* >( currentEnt );
 	if ( ent == NULL )
 	{
-		ent = cl_entitylist->FirstBaseEntity();
+		ent = EntityList()->FirstBaseEntity();
 	}
 	else
 	{
-		ent = cl_entitylist->NextBaseEntity( ent );
+		ent = EntityList()->NextBaseEntity( ent );
 	}
 	return reinterpret_cast< EntitySearchResult >( ent );
 }
@@ -589,13 +589,13 @@ HTOOLHANDLE CClientTools::GetToolHandleForEntityByIndex( int entindex )
 
 EntitySearchResult CClientTools::GetLocalPlayer()
 {
-	C_BasePlayer *p = (C_BasePlayer*)ClientEntityList().GetLocalPlayer();
+	C_BasePlayer *p = (C_BasePlayer*)EntityList()->GetLocalPlayer();
 	return reinterpret_cast< EntitySearchResult >( p );
 }
 
 bool CClientTools::GetLocalPlayerEyePosition( Vector& org, QAngle& ang, float &fov )
 {
-	C_BasePlayer *pl = (C_BasePlayer*)ClientEntityList().GetLocalPlayer();
+	C_BasePlayer *pl = (C_BasePlayer*)EntityList()->GetLocalPlayer();
 	if ( pl == NULL )
 		return false;
 

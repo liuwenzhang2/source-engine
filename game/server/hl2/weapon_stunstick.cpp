@@ -314,7 +314,7 @@ void CWeaponStunStick::SetStunState( bool state )
 
 		Vector vecAttachment;
 
-		GetAttachment( 1, vecAttachment );
+		GetEngineObject()->GetAttachment( 1, vecAttachment );
 		g_pEffects->Sparks( vecAttachment );
 
 		//FIXME: END - Move to client-side

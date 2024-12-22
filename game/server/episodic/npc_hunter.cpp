@@ -944,7 +944,7 @@ void CHunterFlechette::Explode()
 	
 	// Move the explosion effect to the tip to reduce intersection with the world.
 	Vector vecFuse;
-	GetAttachment( s_nFlechetteFuseAttach, vecFuse );
+	GetEngineObject()->GetAttachment( s_nFlechetteFuseAttach, vecFuse );
 	DispatchParticleEffect( "hunter_projectile_explosion_1", vecFuse, GetEngineObject()->GetAbsAngles(), NULL );
 
 	int nDamageType = DMG_DISSOLVE;
@@ -1893,8 +1893,8 @@ void CNPC_Hunter::SetupGlobalModelData()
 	// Measure the radius of the head.	
 	Vector vecHeadCenter;
 	Vector vecHeadBottom;
-	GetAttachment( gm_nHeadCenterAttachment, vecHeadCenter );
-	GetAttachment( gm_nHeadBottomAttachment, vecHeadBottom );
+	GetEngineObject()->GetAttachment( gm_nHeadCenterAttachment, vecHeadCenter );
+	GetEngineObject()->GetAttachment( gm_nHeadBottomAttachment, vecHeadBottom );
 	gm_flHeadRadius = ( vecHeadCenter - vecHeadBottom ).Length();
 
 	int nSequence = GetEngineObject()->SelectWeightedSequence( ACT_HUNTER_RANGE_ATTACK2_UNPLANTED );
@@ -2062,11 +2062,11 @@ void CNPC_Hunter::Activate()
 
 		// Currently just using the gun for the vertical component!
 		Vector defEyePos;
-		pHunter->GetAttachment( "minigunbase", defEyePos );
+		pHunter->GetEngineObject()->GetAttachment( "minigunbase", defEyePos );
 		gm_flMinigunDistZ = defEyePos.z - pHunter->GetEngineObject()->GetAbsOrigin().z;
 
 		Vector position;
-		pHunter->GetAttachment( gm_nTopGunAttachment, position );
+		pHunter->GetEngineObject()->GetAttachment( gm_nTopGunAttachment, position );
 		VectorITransform( position, pHunter->GetEngineObject()->EntityToWorldTransform(), gm_vecLocalRelativePositionMinigun );
 		gEntList.DestroyEntity( pHunter );
 	}
@@ -2217,10 +2217,10 @@ void CNPC_Hunter::UpdateEyes()
 	/*Vector vecEyePos;
 	Vector vecEyeDir;
 
-	GetAttachment( gm_nTopGunAttachment, vecEyePos, &vecEyeDir );
+	GetEngineObject()->GetAttachment( gm_nTopGunAttachment, vecEyePos, &vecEyeDir );
 	NDebugOverlay::Line( vecEyePos, vecEyePos + vecEyeDir * 36, 255, 0, 0, 0, 0.1 );
 
-	GetAttachment( gm_nBottomGunAttachment, vecEyePos, &vecEyeDir );
+	GetEngineObject()->GetAttachment( gm_nBottomGunAttachment, vecEyePos, &vecEyeDir );
 	NDebugOverlay::Line( vecEyePos, vecEyePos + vecEyeDir * 36, 255, 0, 0, 0, 0.1 );*/
 }
 
@@ -5297,7 +5297,7 @@ CBaseEntity *CNPC_Hunter::MeleeAttack( float flDist, int iDamage, QAngle &qaView
 				{
 					case HUNTER_BLOOD_LEFT_FOOT:
 					{
-						if ( GetAttachment( "blood_left", vecBloodPos ) )
+						if (GetEngineObject()->GetAttachment( "blood_left", vecBloodPos ) )
 						{
 							SpawnBlood( vecBloodPos, g_vecAttackDir, pHurt->BloodColor(), MIN( iDamage, 30 ) );
 						}
@@ -6452,7 +6452,7 @@ Vector CNPC_Hunter::LeftFootHit( float eventtime )
 {
 	Vector footPosition;
 
-	GetAttachment( "left foot", footPosition );
+	GetEngineObject()->GetAttachment( "left foot", footPosition );
 	CPASAttenuationFilter filter( this );
 	g_pSoundEmitterSystem->EmitSound( filter, entindex(), "NPC_Hunter.Footstep", &footPosition, eventtime );
 
@@ -6468,7 +6468,7 @@ Vector CNPC_Hunter::RightFootHit( float eventtime )
 {
 	Vector footPosition;
 
-	GetAttachment( "right foot", footPosition );
+	GetEngineObject()->GetAttachment( "right foot", footPosition );
 	CPASAttenuationFilter filter( this );
 	g_pSoundEmitterSystem->EmitSound( filter, entindex(), "NPC_Hunter.Footstep", &footPosition, eventtime );
 	FootFX( footPosition );
@@ -6483,7 +6483,7 @@ Vector CNPC_Hunter::BackFootHit( float eventtime )
 {
 	Vector footPosition;
 
-	GetAttachment( "back foot", footPosition );
+	GetEngineObject()->GetAttachment( "back foot", footPosition );
 	CPASAttenuationFilter filter( this );
 	g_pSoundEmitterSystem->EmitSound( filter, entindex(), "NPC_Hunter.BackFootstep", &footPosition, eventtime );
 	FootFX( footPosition );
@@ -6613,7 +6613,7 @@ void CNPC_Hunter::PlayerHasIlluminatedNPC( CBasePlayer *pPlayer, float flDot )
 bool CNPC_Hunter::PlayerFlashlightOnMyEyes( CBasePlayer *pPlayer )
 {
 	Vector vecEyes, vecEyeForward, vecPlayerForward;
- 	GetAttachment( gm_nTopGunAttachment, vecEyes, &vecEyeForward );
+	GetEngineObject()->GetAttachment( gm_nTopGunAttachment, vecEyes, &vecEyeForward );
  	pPlayer->EyeVectors( &vecPlayerForward );
 
 	Vector vecToEyes = (vecEyes - pPlayer->EyePosition());

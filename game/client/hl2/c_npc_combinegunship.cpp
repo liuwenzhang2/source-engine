@@ -267,7 +267,7 @@ int	C_GunshipFX::DrawModel( int )
 	if ( !m_active )
 		return 1;
 
-	C_BaseEntity *ent = cl_entitylist->GetEnt( m_entityIndex );
+	C_BaseEntity *ent = EntityList()->GetEnt( m_entityIndex );
 	if ( ent )
 	{
 		QAngle angles;

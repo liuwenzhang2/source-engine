@@ -264,7 +264,7 @@ void CHudDamageIndicator::CalcDamageDirection( const Vector &vecFrom )
 		return;
 	}
 
-	C_BasePlayer *pLocalPlayer = (C_BasePlayer*)ClientEntityList().GetLocalPlayer();
+	C_BasePlayer *pLocalPlayer = (C_BasePlayer*)EntityList()->GetLocalPlayer();
 	if ( !pLocalPlayer )
 	{
 		return;

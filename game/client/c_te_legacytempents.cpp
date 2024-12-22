@@ -226,7 +226,7 @@ int	C_LocalTempEntity::DrawModel( int flags )
 			GetEngineObject()->GetAbsOrigin(),
 			GetEngineObject()->GetAbsAngles(),
 			m_flFrame,  // sprite frame to render
-			GetEngineObject()->GetBody() > 0 ? cl_entitylist->GetBaseEntity(GetEngineObject()->GetBody()) : NULL,  // attach to
+			GetEngineObject()->GetBody() > 0 ? EntityList()->GetBaseEntity(GetEngineObject()->GetBody()) : NULL,  // attach to
 			GetEngineObject()->GetSkin(),  // attachment point
 			GetRenderMode(), // rendermode
 			GetEngineObject()->GetRenderFX(), // renderfx
@@ -307,7 +307,7 @@ bool C_LocalTempEntity::Frame( float frametime, int framenumber )
 
 	if ( flags & FTENT_PLYRATTACHMENT )
 	{
-		if ( C_BaseEntity *pClient = cl_entitylist->GetBaseEntity( clientIndex ) )
+		if ( C_BaseEntity *pClient = EntityList()->GetBaseEntity( clientIndex ) )
 		{
 			GetEngineObject()->SetLocalOrigin( pClient->GetEngineObject()->GetAbsOrigin() + tentOffset );
 		}
@@ -434,7 +434,7 @@ bool C_LocalTempEntity::Frame( float frametime, int framenumber )
 				if  ( 
 					(trace.fraction != 1) && 
 						( (trace.DidHitWorld()) || 
-						  (trace.m_pEnt != ClientEntityList().GetEnt(clientIndex)) ) 
+						  (trace.m_pEnt != EntityList()->GetEnt(clientIndex)) ) 
 					)
 				{
 					traceFraction = trace.fraction;
@@ -499,7 +499,7 @@ bool C_LocalTempEntity::Frame( float frametime, int framenumber )
 
 			//	data.m_nDamageType = TEAM_UNASSIGNED;
 
-			//	IClientNetworkable *pClient = cl_entitylist->GetClientEntity( clientIndex );
+			//	IClientNetworkable *pClient = EntityList()->GetClientEntity( clientIndex );
 
 			//	if ( pClient )
 			//	{
@@ -512,7 +512,7 @@ bool C_LocalTempEntity::Frame( float frametime, int framenumber )
 
 			//	if ( trace.m_pEnt )
 			//	{
-			//		data.m_hEntity = ClientEntityList().EntIndexToHandle(((C_BaseEntity*)trace.m_pEnt)->entindex() );
+			//		data.m_hEntity = EntityList()->EntIndexToHandle(((C_BaseEntity*)trace.m_pEnt)->entindex() );
 			//	}
 			//	DispatchEffect( m_pszImpactEffect, data );
 			//}
@@ -638,7 +638,7 @@ bool C_LocalTempEntity::Frame( float frametime, int framenumber )
 //		return NULL;
 //
 //	// Add the entity to the ClientEntityList and create the particle system.
-//	ClientEntityList().AddNonNetworkableEntity( this );
+//	EntityList()->AddNonNetworkableEntity( this );
 //	CNewParticleEffect* pEffect = ParticleProp()->Create( pszParticleEffect, PATTACH_ABSORIGIN_FOLLOW );
 //
 //	// Set the particle flag on the temp entity and save the name of the particle effect.
@@ -1122,7 +1122,7 @@ void CTempEnts::PhysicsProp( int modelindex, int skin, const Vector& pos, const 
 
 	if ( !pEntity->Initialize() )
 	{
-		cl_entitylist->DestroyEntity(pEntity);// ->Release();
+		EntityList()->DestroyEntity(pEntity);// ->Release();
 		return;
 	}
 
@@ -1135,7 +1135,7 @@ void CTempEnts::PhysicsProp( int modelindex, int skin, const Vector& pos, const 
 	else
 	{
 		// failed to create a physics object
-		cl_entitylist->DestroyEntity(pEntity);// ->Release();
+		EntityList()->DestroyEntity(pEntity);// ->Release();
 		return;
 	}
 
@@ -1187,7 +1187,7 @@ C_LocalTempEntity *CTempEnts::ClientProjectile( const Vector& vecOrigin, const V
 	//if ( pszParticleEffect )
 	//{
 	//	// Add the entity to the ClientEntityList and create the particle system.
-	//	ClientEntityList().AddNonNetworkableEntity( pTemp );
+	//	EntityList()->AddNonNetworkableEntity( pTemp );
 	//	pTemp->ParticleProp()->Create( pszParticleEffect, PATTACH_ABSORIGIN_FOLLOW );
 
 	//	// Set the particle flag on the temp entity and save the name of the particle effect.
@@ -1407,7 +1407,7 @@ void CTempEnts::AttachTentToPlayer( int client, int modelIndex, float zoffset, f
 		return;
 	}
 
-	C_BaseEntity *clientClass = cl_entitylist->GetBaseEntity( client );
+	C_BaseEntity *clientClass = EntityList()->GetBaseEntity( client );
 	if ( !clientClass )
 	{
 		Warning("Couldn't get IClientEntity for %i\n", client );
@@ -1937,7 +1937,7 @@ void CTempEnts::Clear( void )
 		C_LocalTempEntity *p = m_TempEnts[ i ];
 
 		//m_TempEntsPool.Free( p );
-		ClientEntityList().DestroyEntity(p);
+		EntityList()->DestroyEntity(p);
 	}
 
 	m_TempEnts.RemoveAll();
@@ -2003,7 +2003,7 @@ C_LocalTempEntity *CTempEnts::TempEntAlloc( const Vector& org, const model_t *mo
 			first = false;
 		}
 #endif
-//		ClientEntityList().AddNonNetworkableEntity(	pTemp );
+//		EntityList()->AddNonNetworkableEntity(	pTemp );
 	}
 
 	return pTemp;
@@ -2019,7 +2019,7 @@ C_LocalTempEntity *CTempEnts::TempEntAlloc()
 		return NULL;
 
 	//C_LocalTempEntity *pTemp = m_TempEntsPool.AllocZero();
-	C_LocalTempEntity* pTemp = (C_LocalTempEntity*)ClientEntityList().CreateEntityByName("C_LocalTempEntity");
+	C_LocalTempEntity* pTemp = (C_LocalTempEntity*)EntityList()->CreateEntityByName("C_LocalTempEntity");
 	return pTemp;
 }
 
@@ -2042,13 +2042,13 @@ void CTempEnts::TempEntFree( int index )
 		//	{
 		//		pTemp->ParticleProp()->StopEmission();
 		//	}
-		//	ClientEntityList().RemoveEntity( pTemp->GetRefEHandle() );
+		//	EntityList()->RemoveEntity( pTemp->GetRefEHandle() );
 		//}
 
 		pTemp->OnRemoveTempEntity();
 	
 		//m_TempEntsPool.Free( pTemp );
-		ClientEntityList().DestroyEntity(pTemp);
+		EntityList()->DestroyEntity(pTemp);
 	}
 }
 
@@ -2122,7 +2122,7 @@ C_LocalTempEntity *CTempEnts::TempEntAllocHigh( const Vector& org, const model_t
 
 	if ( CommandLine()->CheckParm( "-tools" ) != NULL )
 	{
-//		ClientEntityList().AddNonNetworkableEntity(	pTemp );
+//		EntityList()->AddNonNetworkableEntity(	pTemp );
 	}
 
 	return pTemp;
@@ -2303,7 +2303,7 @@ int CTempEnts::AddVisibleTempEntity( C_LocalTempEntity *pEntity )
 	// does the box intersect a visible leaf?
 	//if ( engine->IsBoxInViewCluster( mins, maxs ) )
 	{
-		// Temporary entities have no corresponding element in cl_entitylist
+		// Temporary entities have no corresponding element in EntityList()
 		//pEntity->index = -1;//aaa need check
 		
 		// Add to list
@@ -2782,7 +2782,7 @@ void CTempEnts::MuzzleFlash_Combine_NPC( C_BaseEntity* hEntity, int attachmentIn
 
 	if ( muzzleflash_light.GetBool() )
 	{
-		C_BaseEntity *pEnt = hEntity;//ClientEntityList().GetBaseEntityFromHandle( 
+		C_BaseEntity *pEnt = hEntity;//EntityList()->GetBaseEntityFromHandle( 
 		if ( pEnt )
 		{
 			dlight_t *el = effects->CL_AllocElight( LIGHT_INDEX_MUZZLEFLASH + pEnt->entindex() );
@@ -2949,7 +2949,7 @@ void CTempEnts::MuzzleFlash_Shotgun_NPC(C_BaseEntity* hEntity, int attachmentInd
 
 	// Setup the origin.
 	Vector	origin;
-	IClientRenderable *pRenderable = hEntity->GetEngineObject();//ClientEntityList().GetClientRenderableFromHandle( 
+	IClientRenderable *pRenderable = hEntity->GetEngineObject();//EntityList()->GetClientRenderableFromHandle( 
 	if ( !pRenderable )
 		return;
 

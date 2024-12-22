@@ -115,7 +115,7 @@ public:
 
 	virtual bool ShouldPredict( void )
 	{
-		if ( GetOwner() && GetOwner() == (C_BasePlayer*)ClientEntityList().GetLocalPlayer() )
+		if ( GetOwner() && GetOwner() == (C_BasePlayer*)EntityList()->GetLocalPlayer() )
 			return true;
 
 		return BaseClass::ShouldPredict();

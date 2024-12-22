@@ -443,9 +443,9 @@ bool C_BasePlayer::Init(int entnum, int iSerialNum) {
 C_BasePlayer::~C_BasePlayer()
 {
 	DeactivateVguiScreen( m_pCurrentVguiScreen.Get() );
-	if ( this == ClientEntityList().GetLocalPlayer() )
+	if ( this == EntityList()->GetLocalPlayer() )
 	{
-		ClientEntityList().SetLocalPlayer(NULL);
+		EntityList()->SetLocalPlayer(NULL);
 	}
 
 	delete m_pFlashlight;
@@ -795,8 +795,8 @@ void C_BasePlayer::PostDataUpdate( DataUpdateType_t updateType )
 
 		if ( iLocalPlayerIndex == entindex())
 		{
-			Assert( ClientEntityList().GetLocalPlayer() == NULL);
-			ClientEntityList().SetLocalPlayer(this);
+			Assert( EntityList()->GetLocalPlayer() == NULL);
+			EntityList()->SetLocalPlayer(this);
 
 			// Reset our sound mixed in case we were in a freeze cam when we
 			// changed level, which would cause the snd_soundmixer to be left modified.
@@ -1532,9 +1532,9 @@ void C_BasePlayer::CalcChaseCamView(Vector& eyeOrigin, QAngle& eyeAngles, float&
 
 	trace_t trace;
 	CTraceFilterNoNPCsOrPlayer filter( target, COLLISION_GROUP_NONE );
-	ClientEntityList().PushEnableAbsRecomputations( false ); // HACK don't recompute positions while doing RayTrace
+	EntityList()->PushEnableAbsRecomputations( false ); // HACK don't recompute positions while doing RayTrace
 	UTIL_TraceHull( origin, viewpoint, WALL_MIN, WALL_MAX, MASK_SOLID, &filter, &trace );
-	ClientEntityList().PopEnableAbsRecomputations();
+	EntityList()->PopEnableAbsRecomputations();
 
 	if (trace.fraction < 1.0)
 	{
@@ -1564,7 +1564,7 @@ void C_BasePlayer::CalcRoamingView(Vector& eyeOrigin, QAngle& eyeAngles, float& 
 	
 	if ( spec_track.GetInt() > 0 )
 	{
-		C_BaseEntity *target =  ClientEntityList().GetBaseEntity( spec_track.GetInt() );
+		C_BaseEntity *target =  EntityList()->GetBaseEntity( spec_track.GetInt() );
 
 		if ( target )
 		{
@@ -1630,9 +1630,9 @@ void C_BasePlayer::CalcFreezeCamView( Vector& eyeOrigin, QAngle& eyeAngles, floa
 
 	// Now trace out from the target, so that we're put in front of any walls
 	trace_t trace;
-	ClientEntityList().PushEnableAbsRecomputations( false ); // HACK don't recompute positions while doing RayTrace
+	EntityList()->PushEnableAbsRecomputations( false ); // HACK don't recompute positions while doing RayTrace
 	UTIL_TraceHull( vecCamTarget, vecTargetPos, WALL_MIN, WALL_MAX, MASK_SOLID, pTarget, COLLISION_GROUP_NONE, &trace );
-	ClientEntityList().PopEnableAbsRecomputations();
+	EntityList()->PopEnableAbsRecomputations();
 	if (trace.fraction < 1.0)
 	{
 		// The camera's going to be really close to the target. So we don't end up
@@ -1642,9 +1642,9 @@ void C_BasePlayer::CalcFreezeCamView( Vector& eyeOrigin, QAngle& eyeAngles, floa
 
 		// To stop all close in views looking up at character's chins, move the view up.
 		vecTargetPos.z += fabs(vecCamTarget.z - vecTargetPos.z) * 0.85;
-		ClientEntityList().PushEnableAbsRecomputations( false ); // HACK don't recompute positions while doing RayTrace
+		EntityList()->PushEnableAbsRecomputations( false ); // HACK don't recompute positions while doing RayTrace
 		UTIL_TraceHull( vecCamTarget, vecTargetPos, WALL_MIN, WALL_MAX, MASK_SOLID, pTarget, COLLISION_GROUP_NONE, &trace );
-		ClientEntityList().PopEnableAbsRecomputations();
+		EntityList()->PopEnableAbsRecomputations();
 		vecTargetPos = trace.endpos;
 	}
 
@@ -1773,9 +1773,9 @@ void C_BasePlayer::CalcDeathCamView(Vector& eyeOrigin, QAngle& eyeAngles, float&
 	VectorMA( origin, -m_flObserverChaseDistance, vForward, eyeOrigin );
 
 	trace_t trace; // clip against world
-	ClientEntityList().PushEnableAbsRecomputations( false ); // HACK don't recompute positions while doing RayTrace
+	EntityList()->PushEnableAbsRecomputations( false ); // HACK don't recompute positions while doing RayTrace
 	UTIL_TraceHull( origin, eyeOrigin, WALL_MIN, WALL_MAX, MASK_SOLID, this, COLLISION_GROUP_NONE, &trace );
-	ClientEntityList().PopEnableAbsRecomputations();
+	EntityList()->PopEnableAbsRecomputations();
 
 	if (trace.fraction < 1.0)
 	{
@@ -1848,7 +1848,7 @@ void C_BasePlayer::ThirdPersonSwitch( bool bThirdperson )
 //-----------------------------------------------------------------------------
 /*static*/ bool C_BasePlayer::LocalPlayerInFirstPersonView()
 {
-	C_BasePlayer *pLocalPlayer = (C_BasePlayer*)ClientEntityList().GetLocalPlayer();
+	C_BasePlayer *pLocalPlayer = (C_BasePlayer*)EntityList()->GetLocalPlayer();
 	if ( pLocalPlayer == NULL )
 	{
 		return false;
@@ -1889,7 +1889,7 @@ bool C_BasePlayer::InFirstPersonView()
 	{
 		return LocalPlayerInFirstPersonView();
 	}
-	C_BasePlayer *pLocalPlayer = (C_BasePlayer*)ClientEntityList().GetLocalPlayer();
+	C_BasePlayer *pLocalPlayer = (C_BasePlayer*)EntityList()->GetLocalPlayer();
 	if ( pLocalPlayer == NULL )
 	{
 		return false;
@@ -1935,7 +1935,7 @@ bool C_BasePlayer::ShouldDrawThisPlayer()
 //-----------------------------------------------------------------------------
 bool C_BasePlayer::IsLocalPlayer( void ) const
 {
-	return ((C_BasePlayer*)ClientEntityList().GetLocalPlayer() == this );
+	return ((C_BasePlayer*)EntityList()->GetLocalPlayer() == this );
 }
 
 int	C_BasePlayer::GetUserID( void )
@@ -2088,7 +2088,7 @@ void C_BasePlayer::GetToolRecordingState( KeyValues *msg )
 void C_BasePlayer::Simulate()
 {
 	//Frame updates
-	if ( this == (C_BasePlayer*)ClientEntityList().GetLocalPlayer() )
+	if ( this == (C_BasePlayer*)EntityList()->GetLocalPlayer() )
 	{
 		//Update the flashlight
 		Flashlight();
@@ -2142,7 +2142,7 @@ C_BaseCombatWeapon	*C_BasePlayer::GetActiveWeapon( void ) const
 	const C_BasePlayer *fromPlayer = this;
 
 	// if localplayer is in InEye spectator mode, return weapon on chased player
-	if ( (fromPlayer == (C_BasePlayer*)ClientEntityList().GetLocalPlayer()) && ( GetObserverMode() == OBS_MODE_IN_EYE) )
+	if ( (fromPlayer == (C_BasePlayer*)EntityList()->GetLocalPlayer()) && ( GetObserverMode() == OBS_MODE_IN_EYE) )
 	{
 		C_BaseEntity *target =  GetObserverTarget();
 
@@ -2608,7 +2608,7 @@ void C_BasePlayer::GetRagdollInitBoneArrays( matrix3x4_t *pDeltaBones0, matrix3x
 	}
 	ForceSetupBonesAtTimeFakeInterpolation( pDeltaBones0, -boneDt );
 	ForceSetupBonesAtTimeFakeInterpolation( pDeltaBones1, 0 );
-	float ragdollCreateTime = ClientEntityList().PhysGetSyncCreateTime();
+	float ragdollCreateTime = EntityList()->PhysGetSyncCreateTime();
 	if ( ragdollCreateTime != gpGlobals->curtime )
 	{
 		ForceSetupBonesAtTimeFakeInterpolation( pCurrentBones, ragdollCreateTime - gpGlobals->curtime );
@@ -2661,7 +2661,7 @@ IMaterial *C_BasePlayer::GetHeadLabelMaterial( void )
 
 bool IsInFreezeCam( void )
 {
-	C_BasePlayer *pPlayer = (C_BasePlayer*)ClientEntityList().GetLocalPlayer();
+	C_BasePlayer *pPlayer = (C_BasePlayer*)EntityList()->GetLocalPlayer();
 	if ( pPlayer && pPlayer->GetObserverMode() == OBS_MODE_FREEZECAM )
 		return true;
 
@@ -2949,7 +2949,7 @@ void C_BasePlayer::BuildFirstPersonMeathookTransformations( IStudioHdr *hdr, Vec
 
 void CC_DumpClientSoundscapeData( const CCommand& args )
 {
-	C_BasePlayer *pPlayer = (C_BasePlayer*)ClientEntityList().GetLocalPlayer();
+	C_BasePlayer *pPlayer = (C_BasePlayer*)EntityList()->GetLocalPlayer();
 	if ( !pPlayer )
 		return;
 

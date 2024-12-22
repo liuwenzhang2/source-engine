@@ -240,7 +240,7 @@ static inline C_BaseEntity* ParticleGetEntity( int index )
 #if defined(PARTICLEPROTOTYPE_APP)
 	return NULL;
 #else
-	return cl_entitylist->GetEnt( index );
+	return EntityList()->GetEnt( index );
 #endif
 }
 

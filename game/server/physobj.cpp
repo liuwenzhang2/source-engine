@@ -842,7 +842,7 @@ int CPhysBox::OnTakeDamage( const CTakeDamageInfo &info )
 //-----------------------------------------------------------------------------
 // Purpose: Return true if this physbox has preferred carry angles
 //-----------------------------------------------------------------------------
-bool CPhysBox::HasPreferredCarryAnglesForPlayer( CBasePlayer *pPlayer )
+bool CPhysBox::HasPreferredCarryAnglesForPlayer( CBaseEntity *pPlayer )
 {
 	return GetEngineObject()->HasSpawnFlags( SF_PHYSBOX_USEPREFERRED );
 }

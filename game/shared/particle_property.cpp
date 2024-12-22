@@ -8,21 +8,6 @@
 #include "particle_property.h"
 #include "utlvector.h"
 
-#ifdef CLIENT_DLL
-
-#include "c_baseentity.h"
-#include "c_baseanimating.h"
-#include "recvproxy.h"
-#include "particles_new.h"
-#include "engine/ivdebugoverlay.h"
-#include "bone_setup.h"
-#else
-
-#include "baseentity.h"
-#include "baseanimating.h"
-#include "sendproxy.h"
-#endif
-
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
@@ -613,7 +598,7 @@ void CParticleProperty::UpdateControlPoint( ParticleEffectList_t *pEffect, int i
 					if ( !pAnimating->GetEngineObject()->GetAttachment( pPoint->iAttachmentPoint, attachmentToWorld ) )
 					{
 						// try C_BaseAnimating if attach point is not on the weapon
-						if ( !pAnimating->C_BaseAnimating::GetEngineObject()->GetAttachment( pPoint->iAttachmentPoint, attachmentToWorld ) )
+						if ( !pAnimating->GetEngineObject()->GetAttachment( pPoint->iAttachmentPoint, attachmentToWorld ) )
 						{
 							Warning( "Cannot update control point %d for effect '%s'.\n", pPoint->iAttachmentPoint, pEffect->pParticleEffect->GetEffectName() );
 							attachmentToWorld = pAnimating->GetEngineObject()->RenderableToWorldTransform();

@@ -191,9 +191,9 @@ void C_DynamicLight::ClientThink(void)
 		VectorMA(GetEngineObject()->GetAbsOrigin(), m_Radius, forward, end );
 
 		trace_t		pm;
-		ClientEntityList().PushEnableAbsRecomputations( false );	 // HACK don't recompute positions while doing RayTrace
+		EntityList()->PushEnableAbsRecomputations( false );	 // HACK don't recompute positions while doing RayTrace
 		UTIL_TraceLine(GetEngineObject()->GetAbsOrigin(), end, MASK_NPCWORLDSTATIC, NULL, COLLISION_GROUP_NONE, &pm );
-		ClientEntityList().PopEnableAbsRecomputations();
+		EntityList()->PopEnableAbsRecomputations();
 		VectorCopy( pm.endpos, m_pSpotlightEnd->origin );
 		
 		if (pm.fraction == 1.0f)

@@ -9,6 +9,7 @@
 //#include "portal_shareddefs.h"
 //#include "portal_collideable_enumerator.h"
 #include "collisionutils.h"
+#include "entitylist_base.h"
 #ifdef GAME_DLL
 	//#include "util.h"
 	#include "baseentity.h"
@@ -20,7 +21,7 @@
 	#include "shared_classnames.h"
 	#include "c_baseentity.h"
 	#include "gamerules.h"
-	#include "cliententitylist.h"
+	//#include "cliententitylist.h"
 #endif
 #include "beam_shared.h"
 #include "portal_util_shared.h"

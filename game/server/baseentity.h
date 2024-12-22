@@ -954,6 +954,7 @@ public:
 	virtual bool	IsGib() { return false; }
 	virtual bool	IsCombineBall() { return false; }
 	virtual bool	IsPortal() { return false; }
+	virtual bool	IsPhysicsProp() { return false; }
 	virtual const char* GetNewLandmarkName() { return ""; };
 	virtual const char* GetNewMapName() { return ""; };
 
@@ -1411,11 +1412,13 @@ public:
 	virtual CBaseEntity*	OnFailedPhysGunPickup(Vector vPhysgunPos) { return NULL; }
 	virtual void			OnPhysGunPickup(CBasePlayer* pPhysGunUser, PhysGunPickup_t reason = PICKED_UP_BY_CANNON) {}
 	virtual void			OnPhysGunDrop(CBasePlayer* pPhysGunUser, PhysGunDrop_t reason) {}
-	virtual bool			HasPreferredCarryAnglesForPlayer(CBasePlayer* pPlayer) { return false; }
+	virtual bool			IsObjectAllowedOverhead() { return false; }
+	virtual bool			HasPreferredCarryAnglesForPlayer(CBaseEntity* pPlayer) { return false; }
 	virtual bool			Pickup_GetPreferredCarryAngles(CBaseEntity* pPlayer, const matrix3x4_t& localToWorld, QAngle& outputAnglesWorldSpace) {
 		return ::Pickup_GetPreferredCarryAngles(this, (CBasePlayer*)pPlayer, localToWorld, outputAnglesWorldSpace);
 	}
 	virtual QAngle			PreferredCarryAngles(void) { return vec3_angle; }
+	virtual float			GetCarryDistanceOffset(void) { return 0; }
 	virtual bool			ForcePhysgunOpen(CBasePlayer* pPlayer) { return false; }
 	virtual AngularImpulse	PhysGunLaunchAngularImpulse() { return RandomAngularImpulse(-600, 600); }
 	virtual bool			ShouldPuntUseLaunchForces(PhysGunForce_t reason) { return reason == PHYSGUN_FORCE_LAUNCHED; }

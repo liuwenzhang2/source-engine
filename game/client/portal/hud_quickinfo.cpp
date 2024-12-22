@@ -174,7 +174,7 @@ bool CHUDQuickInfo::ShouldDraw( void )
 	if ( !m_icon_c || !m_icon_rb || !m_icon_rbe || !m_icon_lb || !m_icon_lbe )
 		return false;
 
-	C_Portal_Player *player = ToPortalPlayer(ClientEntityList().GetLocalPlayer());
+	C_Portal_Player *player = ToPortalPlayer(EntityList()->GetLocalPlayer());
 	if ( player == NULL )
 		return false;
 
@@ -190,7 +190,7 @@ bool CHUDQuickInfo::ShouldDraw( void )
 
 void CHUDQuickInfo::Paint()
 {
-	C_Portal_Player *pPortalPlayer = (C_Portal_Player*)ClientEntityList().GetLocalPlayer();
+	C_Portal_Player *pPortalPlayer = (C_Portal_Player*)EntityList()->GetLocalPlayer();
 	if ( pPortalPlayer == NULL )
 		return;
 

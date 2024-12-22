@@ -158,7 +158,7 @@ void CBasePlayerAnimState::Update( float eyeYaw, float eyePitch )
 	}
 	else if ( cl_showanimstate.GetInt() == -2 )
 	{
-		C_BasePlayer *targetPlayer = (C_BasePlayer*)ClientEntityList().GetLocalPlayer();
+		C_BasePlayer *targetPlayer = (C_BasePlayer*)EntityList()->GetLocalPlayer();
 
 		if( targetPlayer && ( targetPlayer->GetObserverMode() == OBS_MODE_IN_EYE || targetPlayer->GetObserverMode() == OBS_MODE_CHASE ) )
 		{

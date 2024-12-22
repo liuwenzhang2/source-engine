@@ -554,7 +554,7 @@ void C_EntityDissolve::ClientThink( void )
 	{
 		// Do NOT remove from the client entity list. It'll confuse the local network backdoor, and the entity will never get destroyed
 		// because when the server says to destroy it, the client won't be able to find it.
-		// ClientEntityList().RemoveEntity( GetClientHandle() );
+		// EntityList()->RemoveEntity( GetClientHandle() );
 
 		partition->Remove( PARTITION_CLIENT_SOLID_EDICTS | PARTITION_CLIENT_RESPONSIVE_EDICTS | PARTITION_CLIENT_NON_STATIC_EDICTS, GetEngineObject()->GetPartitionHandle() );
 
@@ -564,7 +564,7 @@ void C_EntityDissolve::ClientThink( void )
 		//Adrian: I'll assume we don't need the ragdoll either so I'll remove that too.
 		if ( m_bLinkedToServerEnt == false )
 		{
-			cl_entitylist->DestroyEntity(this);//Release();
+			EntityList()->DestroyEntity(this);//Release();
 
 			C_ClientRagdoll *pRagdoll = dynamic_cast <C_ClientRagdoll *> ( pEnt );
 
@@ -575,7 +575,7 @@ void C_EntityDissolve::ClientThink( void )
 #ifdef TF_CLIENT_DLL
 			else
 			{
-				cl_entitylist->DestroyEntity(pEnt);// ->Release();
+				EntityList()->DestroyEntity(pEnt);// ->Release();
 			}
 #endif
 		}

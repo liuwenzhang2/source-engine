@@ -2693,7 +2693,7 @@ void CTriggerCamera::FollowTarget( )
 	if ( m_iAttachmentIndex )
 	{
 		Vector vecOrigin;
-		m_hTarget->GetBaseAnimating()->GetAttachment( m_iAttachmentIndex, vecOrigin );
+		m_hTarget->GetBaseAnimating()->GetEngineObject()->GetAttachment( m_iAttachmentIndex, vecOrigin );
 		VectorAngles( vecOrigin - GetEngineObject()->GetAbsOrigin(), vecGoal );
 	}
 	else

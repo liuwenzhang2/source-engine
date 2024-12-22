@@ -198,7 +198,7 @@ void CPropThumper::Thump ( void )
 	if ( m_iHammerAttachment != -1 )
 	{
 		Vector vOrigin;
-		GetAttachment( m_iHammerAttachment, vOrigin );
+		GetEngineObject()->GetAttachment( m_iHammerAttachment, vOrigin );
 
 		CEffectData	data;
 

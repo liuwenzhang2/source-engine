@@ -259,7 +259,7 @@ void FX_AR2Tracer( Vector& start, Vector& end, int velocity, bool makeWhiz )
 //-----------------------------------------------------------------------------
 void AR2TracerCallback( const CEffectData &data )
 {
-	C_BasePlayer *player = (C_BasePlayer*)ClientEntityList().GetLocalPlayer();
+	C_BasePlayer *player = (C_BasePlayer*)EntityList()->GetLocalPlayer();
 	
 	if ( player == NULL )
 		return;
@@ -409,7 +409,7 @@ void CreateMuzzleflashELight( const Vector &origin, int exponent, int nMinRadius
 {
 	if ( muzzleflash_light.GetInt() )
 	{
-		int entityIndex = hEntity->entindex();// ClientEntityList().HandleToEntIndex(hEntity);
+		int entityIndex = hEntity->entindex();
 		if ( entityIndex >= 0 )
 		{
 			dlight_t *el = effects->CL_AllocElight( LIGHT_INDEX_MUZZLEFLASH + entityIndex );

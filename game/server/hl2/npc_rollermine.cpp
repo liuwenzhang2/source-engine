@@ -1956,7 +1956,7 @@ void CNPC_RollerMine::ShockTarget( CBaseEntity *pOther )
 
 	if ( startAttach > 0 && pAnimating )
 	{
-		pAnimating->GetAttachment( startAttach, shockPos );
+		pAnimating->GetEngineObject()->GetAttachment( startAttach, shockPos );
 	}
 
 	Vector shockDir = (GetEngineObject()->GetAbsOrigin() - shockPos );

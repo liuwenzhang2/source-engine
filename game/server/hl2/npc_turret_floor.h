@@ -76,7 +76,7 @@ public:
 	// Player pickup
 	virtual void	OnPhysGunPickup( CBasePlayer *pPhysGunUser, PhysGunPickup_t reason );
 	virtual void	OnPhysGunDrop( CBasePlayer *pPhysGunUser, PhysGunDrop_t Reason );
-	virtual bool	HasPreferredCarryAnglesForPlayer( CBasePlayer *pPlayer );
+	virtual bool	HasPreferredCarryAnglesForPlayer( CBaseEntity *pPlayer );
 	virtual QAngle	PreferredCarryAngles( void );
 	virtual bool	OnAttemptPhysGunPickup( CBasePlayer *pPhysGunUser, PhysGunPickup_t reason );
 

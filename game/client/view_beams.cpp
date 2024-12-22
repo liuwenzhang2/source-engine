@@ -862,9 +862,9 @@ void CViewRenderBeams::CreateBeamEnts( int startEnt, int endEnt, int modelIndex,
 	BeamInfo_t beamInfo;
 
 	beamInfo.m_nType = type;
-	beamInfo.m_pStartEnt = cl_entitylist->GetEnt( BEAMENT_ENTITY( startEnt ) );
+	beamInfo.m_pStartEnt = EntityList()->GetEnt( BEAMENT_ENTITY( startEnt ) );
 	beamInfo.m_nStartAttachment = BEAMENT_ATTACHMENT( startEnt );
-	beamInfo.m_pEndEnt = cl_entitylist->GetEnt( BEAMENT_ENTITY( endEnt ) );
+	beamInfo.m_pEndEnt = EntityList()->GetEnt( BEAMENT_ENTITY( endEnt ) );
 	beamInfo.m_nEndAttachment = BEAMENT_ATTACHMENT( endEnt );
 	beamInfo.m_nModelIndex = modelIndex;
 	beamInfo.m_nHaloIndex = haloIndex;
@@ -956,7 +956,7 @@ void CViewRenderBeams::CreateBeamEntPoint( int nStartEntity, const Vector *pStar
 	}
 	else
 	{
-		beamInfo.m_pStartEnt = cl_entitylist->GetEnt( BEAMENT_ENTITY( nStartEntity ) );
+		beamInfo.m_pStartEnt = EntityList()->GetEnt( BEAMENT_ENTITY( nStartEntity ) );
 		beamInfo.m_nStartAttachment = BEAMENT_ATTACHMENT( nStartEntity );
 
 		// Don't start beams out of the PVS
@@ -971,7 +971,7 @@ void CViewRenderBeams::CreateBeamEntPoint( int nStartEntity, const Vector *pStar
 	}
 	else
 	{
-		beamInfo.m_pEndEnt = cl_entitylist->GetEnt( BEAMENT_ENTITY( nEndEntity ) );
+		beamInfo.m_pEndEnt = EntityList()->GetEnt( BEAMENT_ENTITY( nEndEntity ) );
 		beamInfo.m_nEndAttachment = BEAMENT_ATTACHMENT( nEndEntity );
 
 		// Don't start beams out of the PVS
@@ -1217,7 +1217,7 @@ void CViewRenderBeams::CreateBeamFollow( int startEnt, int modelIndex, int haloI
 {
 	BeamInfo_t beamInfo;
 
-	beamInfo.m_pStartEnt = cl_entitylist->GetEnt( BEAMENT_ENTITY( startEnt ) );
+	beamInfo.m_pStartEnt = EntityList()->GetEnt( BEAMENT_ENTITY( startEnt ) );
 	beamInfo.m_nStartAttachment = BEAMENT_ATTACHMENT( startEnt );
 	beamInfo.m_nModelIndex = modelIndex;
 	beamInfo.m_nHaloIndex = haloIndex;
@@ -1358,9 +1358,9 @@ void CViewRenderBeams::CreateBeamRing( int startEnt, int endEnt, int modelIndex,
 {
 	BeamInfo_t beamInfo;
 
-	beamInfo.m_pStartEnt = cl_entitylist->GetEnt( BEAMENT_ENTITY( startEnt ) );
+	beamInfo.m_pStartEnt = EntityList()->GetEnt( BEAMENT_ENTITY( startEnt ) );
 	beamInfo.m_nStartAttachment = BEAMENT_ATTACHMENT( startEnt );
-	beamInfo.m_pEndEnt = cl_entitylist->GetEnt( BEAMENT_ENTITY( endEnt ) );
+	beamInfo.m_pEndEnt = EntityList()->GetEnt( BEAMENT_ENTITY( endEnt ) );
 	beamInfo.m_nEndAttachment = BEAMENT_ATTACHMENT( endEnt );
 	beamInfo.m_nModelIndex = modelIndex;
 	beamInfo.m_nHaloIndex = haloIndex;

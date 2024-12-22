@@ -28,7 +28,7 @@
 	static void RecvProxy_EntIndex( const CRecvProxyData *pData, void *pStruct, void *pOut )
 	{
 		int nEntIndex = pData->m_Value.m_Int;
-		((CEffectData*)pStruct)->m_hEntity = (nEntIndex < 0) ? NULL : ClientEntityList().GetBaseEntity( nEntIndex );
+		((CEffectData*)pStruct)->m_hEntity = (nEntIndex < 0) ? NULL : EntityList()->GetBaseEntity( nEntIndex );
 	}
 
 	BEGIN_RECV_TABLE_NOBASE( CEffectData, DT_EffectData )
@@ -142,17 +142,17 @@
 
 IClientRenderable *CEffectData::GetRenderable() const
 {
-	return m_hEntity->GetEngineObject();//ClientEntityList().GetClientRenderableFromHandle( 
+	return m_hEntity->GetEngineObject();//EntityList()->GetClientRenderableFromHandle( 
 }
 
 C_BaseEntity *CEffectData::GetEntity() const
 {
-	return m_hEntity;//ClientEntityList().GetBaseEntityFromHandle( 
+	return m_hEntity;//EntityList()->GetBaseEntityFromHandle( 
 }
 
 int CEffectData::entindex() const
 {
-	//C_BaseEntity *pEnt = ClientEntityList().GetBaseEntityFromHandle( m_hEntity );
+	//C_BaseEntity *pEnt = EntityList()->GetBaseEntityFromHandle( m_hEntity );
 	return m_hEntity ? m_hEntity->entindex() : -1;
 }
 

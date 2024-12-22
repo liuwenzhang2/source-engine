@@ -101,10 +101,10 @@ void CNPC_Portal_GroundTurret::Spawn( void )
 
 	Vector vecPos;
 
-	GetAttachment( "eyes", vecPos );
+	GetEngineObject()->GetAttachment( "eyes", vecPos );
 	SetViewOffset( vecPos - GetEngineObject()->GetAbsOrigin() );
 
-	GetAttachment( "light", vecPos );
+	GetEngineObject()->GetAttachment( "light", vecPos );
 	m_vecLightOffset = vecPos - GetEngineObject()->GetAbsOrigin();
 }
 

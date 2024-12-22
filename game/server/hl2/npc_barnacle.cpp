@@ -421,7 +421,7 @@ void CNPC_Barnacle::InitTonguePosition( void )
 
 	Vector origin;
 
-	GetAttachment( "TongueEnd", origin );
+	GetEngineObject()->GetAttachment( "TongueEnd", origin );
 
 	float flTongueAdj = origin.z - GetEngineObject()->GetAbsOrigin().z;
 	m_vecRoot = origin - Vector(0,0,flTongueAdj);
@@ -1611,7 +1611,7 @@ void CNPC_Barnacle::SpitPrey()
 		if (pObject)
 		{
 			Vector vecPosition, force;
-			GetAttachment( m_nSpitAttachment, vecPosition, &force );
+			GetEngineObject()->GetAttachment( m_nSpitAttachment, vecPosition, &force );
 
 			force *= pObject->GetMass() * 50.0f;
 			pObject->ApplyForceOffset( force, vec3_origin );

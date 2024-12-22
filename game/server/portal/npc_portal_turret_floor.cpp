@@ -520,7 +520,7 @@ void CNPC_Portal_FloorTurret::Shoot( const Vector &vecSrc, const Vector &vecDirT
 		// Just shoot where you're facing!
 		Vector vecMuzzle, vecMuzzleDir;
 
-		GetAttachment( m_iMuzzleAttachment, vecMuzzle, &vecMuzzleDir );
+		GetEngineObject()->GetAttachment( m_iMuzzleAttachment, vecMuzzle, &vecMuzzleDir );
 
 		info.m_vecSrc = vecSrc;
 		info.m_vecDirShooting = vecMuzzleDir;
@@ -1149,7 +1149,7 @@ void CNPC_Portal_FloorTurret::TippedThink( void )
 			else
 			{
 				Vector vecMuzzle, vecMuzzleDir;
-				GetAttachment( m_iMuzzleAttachment, vecMuzzle, &vecMuzzleDir );
+				GetEngineObject()->GetAttachment( m_iMuzzleAttachment, vecMuzzle, &vecMuzzleDir );
 
 				SetActivity( (Activity) ACT_FLOOR_TURRET_OPEN_IDLE );
 				SetActivity( (Activity)( ( m_bShootWithBottomBarrels ) ? ( ACT_FLOOR_TURRET_FIRE2 ) : ( ACT_FLOOR_TURRET_FIRE ) ) );
@@ -1572,7 +1572,7 @@ void CNPC_Portal_FloorTurret::FireBullet( const char *pTargetName )
 	VectorAngles( vecDirToEnemyEyes, vecAnglesToEnemy );
 
 	Vector vecMuzzle, vecMuzzleDir;
-	GetAttachment( m_iMuzzleAttachment, vecMuzzle, &vecMuzzleDir );
+	GetEngineObject()->GetAttachment( m_iMuzzleAttachment, vecMuzzle, &vecMuzzleDir );
 
 	if ( m_flShotTime < gpGlobals->curtime )
 	{

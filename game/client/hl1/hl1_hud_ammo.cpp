@@ -71,7 +71,7 @@ void CHudAmmo::VidInit( void )
 
 void CHudAmmo::OnThink( void )
 {
-	C_BasePlayer *pPlayer = (C_BasePlayer*)ClientEntityList().GetLocalPlayer();
+	C_BasePlayer *pPlayer = (C_BasePlayer*)EntityList()->GetLocalPlayer();
 	if ( !pPlayer )
 		return;
 
@@ -99,7 +99,7 @@ void CHudAmmo::Paint( void )
 	if (!ShouldDraw())
 		return;
 
-	C_BasePlayer *pPlayer = (C_BasePlayer*)ClientEntityList().GetLocalPlayer();
+	C_BasePlayer *pPlayer = (C_BasePlayer*)EntityList()->GetLocalPlayer();
 	C_BaseCombatWeapon *pActiveWeapon = GetActiveWeapon();
 	// find and display our current selection
 

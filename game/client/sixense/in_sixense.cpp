@@ -894,7 +894,7 @@ void SixenseInput::FireGameEvent( IGameEvent *pEvent )
 
 	if( FStrEq(eventName, "player_spawn") )
 	{
-		C_BasePlayer *pPlayer = (C_BasePlayer*)ClientEntityList().GetLocalPlayer();
+		C_BasePlayer *pPlayer = (C_BasePlayer*)EntityList()->GetLocalPlayer();
 
 		C_BasePlayer *spawner = UTIL_PlayerByUserId( pEvent->GetInt( "userid" ) );
 
@@ -910,7 +910,7 @@ void SixenseInput::FireGameEvent( IGameEvent *pEvent )
 		int	playerId = pEvent->GetInt( "userid", 0 );
 
 		// Only set view on player that sent the event
-		C_BasePlayer * pPlayer = (C_BasePlayer*)ClientEntityList().GetLocalPlayer();
+		C_BasePlayer * pPlayer = (C_BasePlayer*)EntityList()->GetLocalPlayer();
 
 		if ( pPlayer && pPlayer->GetUserID() == playerId )
 		{
@@ -935,7 +935,7 @@ void SixenseInput::FireGameEvent( IGameEvent *pEvent )
 	else if ( Q_strcmp( type, "player_drop" ) == 0 )
 	{
 		int playerId = pEvent->GetInt( "userid", 0 );
-		C_BasePlayer* pPlayer = (C_BasePlayer*)ClientEntityList().GetLocalPlayer();
+		C_BasePlayer* pPlayer = (C_BasePlayer*)EntityList()->GetLocalPlayer();
 		if ( pPlayer && ( pPlayer->GetUserID() == playerId ) )
 		{
 			PlayerDroppedEntity( pEvent->GetInt( "entity", 0 ) );
@@ -945,7 +945,7 @@ void SixenseInput::FireGameEvent( IGameEvent *pEvent )
 	else if ( Q_strcmp( type, "player_use" ) == 0 )
 	{
 		int playerId = pEvent->GetInt( "userid", 0 );
-		C_BasePlayer* pPlayer = (C_BasePlayer*)ClientEntityList().GetLocalPlayer();
+		C_BasePlayer* pPlayer = (C_BasePlayer*)EntityList()->GetLocalPlayer();
 		if ( pPlayer && pPlayer->GetUserID() == playerId )
 		{
 			PlayerUsedEntity( pEvent->GetInt( "entity", 0 ) );
@@ -957,7 +957,7 @@ void SixenseInput::FireGameEvent( IGameEvent *pEvent )
 #ifdef PORTAL2
 void SixenseInput::PlayerDroppedEntity( int entityID )
 {
-	if ( UTIL_IsScaledCube( cl_entitylist->GetBaseEntity( entityID ) ) &&
+	if ( UTIL_IsScaledCube( EntityList()->GetBaseEntity( entityID ) ) &&
 		!m_bIsIn1to1Mode &&
 		m_pFPSViewAngles &&
 		( m_pFPSViewAngles->getParameter( sixenseUtils::IFPSViewAngles::AIM_METROID_MAX_SPEED ) <= sixense_aim_freeaim_max_speed.GetFloat() ) )
@@ -1112,7 +1112,7 @@ bool SixenseInput::IsHoldingObject()
 
 C_BaseEntity *SixenseInput::GetHeldObject()
 {
-	C_BasePlayer* pLocalPlayer = (C_BasePlayer*)ClientEntityList().GetLocalPlayer();
+	C_BasePlayer* pLocalPlayer = (C_BasePlayer*)EntityList()->GetLocalPlayer();
 
 	if ( pLocalPlayer )
 	{
@@ -1142,7 +1142,7 @@ bool SixenseInput::IsInAlwaysOneToOneMode()
 		return false;
 	}
 
-	return ( (C_BasePlayer*)ClientEntityList().GetLocalPlayer()->GetSixenseFlags() & CBasePlayer::PLAYER_SIXENSE_HOLDING_OBJECT_ALWAYS_ONE_TO_ONE ) ? true : false;
+	return ( (C_BasePlayer*)EntityList()->GetLocalPlayer()->GetSixenseFlags() & CBasePlayer::PLAYER_SIXENSE_HOLDING_OBJECT_ALWAYS_ONE_TO_ONE ) ? true : false;
 }
 #endif
 
@@ -1201,7 +1201,7 @@ void SixenseInput::SetEnabled( bool bEnabled )
 
 		if ( m_bPlayerValid )
 		{
-			C_BasePlayer * pPlayer = (C_BasePlayer*)ClientEntityList().GetLocalPlayer();
+			C_BasePlayer * pPlayer = (C_BasePlayer*)EntityList()->GetLocalPlayer();
 
 			if ( pPlayer )
 			{
@@ -1218,7 +1218,7 @@ void SixenseInput::SetEnabled( bool bEnabled )
 #ifdef PORTAL2
 	if ( m_bPlayerValid )
 	{
-		C_BasePlayer * pPlayer = (C_BasePlayer*)ClientEntityList().GetLocalPlayer();
+		C_BasePlayer * pPlayer = (C_BasePlayer*)EntityList()->GetLocalPlayer();
 		if ( pPlayer )
 		{
 			GetGameInstructor().ForceStopAllLessons();
@@ -1369,7 +1369,7 @@ void SixenseInput::GetFOV( float *hfov, float *vfov )
 	float engineAspectRatio = engine->GetScreenAspectRatio( ScreenWidth(), ScreenHeight() );
 #endif
 
-	C_BasePlayer * pPlayer = (C_BasePlayer*)ClientEntityList().GetLocalPlayer();
+	C_BasePlayer * pPlayer = (C_BasePlayer*)EntityList()->GetLocalPlayer();
 	if( pPlayer ) 
 	{
 		*hfov = pPlayer->GetFOV();
@@ -1484,7 +1484,7 @@ bool SixenseInput::InMenuMode()
 #endif
 
 #if defined( TF_CLIENT_DLL )
-	CTFPlayer *pTFPlayer = dynamic_cast<CTFPlayer *>(ClientEntityList().GetLocalPlayer());
+	CTFPlayer *pTFPlayer = dynamic_cast<CTFPlayer *>(EntityList()->GetLocalPlayer());
 	if( pTFPlayer && pTFPlayer->m_Shared.GetState() == TF_STATE_DYING )
 	{
 		return true;
@@ -1532,7 +1532,7 @@ bool SixenseInput::SixenseFrame( float flFrametime, CUserCmd *pCmd )
 	}
 
 #ifdef SIXENSE_PLAYER_DATA
-	C_BasePlayer * pLocalPlayer = (C_BasePlayer*)ClientEntityList().GetLocalPlayer();
+	C_BasePlayer * pLocalPlayer = (C_BasePlayer*)EntityList()->GetLocalPlayer();
 
 	// If sixense is disabled, hide the controller manager screens and return
 	if ( pLocalPlayer )
@@ -1756,7 +1756,7 @@ void SixenseInput::CheckWeaponForScope()
 	bool zoomed = false;
 
 #if defined( TERROR ) || defined (CSTRIKE15) || defined (CSTRIKE_DLL)
-	C_BasePlayer *pPlayer = (C_BasePlayer*)ClientEntityList().GetLocalPlayer();
+	C_BasePlayer *pPlayer = (C_BasePlayer*)EntityList()->GetLocalPlayer();
 	if ( pPlayer && (pPlayer->GetFOV() != pPlayer->GetDefaultFOV()) )
 	{
 		zoomed = true;
@@ -1764,7 +1764,7 @@ void SixenseInput::CheckWeaponForScope()
 #endif
 
 #if defined( HL2_CLIENT_DLL )
-	C_BaseHLPlayer *hlPlayer = dynamic_cast<C_BaseHLPlayer *>(ClientEntityList().GetLocalPlayer());
+	C_BaseHLPlayer *hlPlayer = dynamic_cast<C_BaseHLPlayer *>(EntityList()->GetLocalPlayer());
 
 	if ( hlPlayer && hlPlayer->m_HL2Local.m_bZooming )
 	{
@@ -1773,7 +1773,7 @@ void SixenseInput::CheckWeaponForScope()
 #endif
 
 #if defined( TF_CLIENT_DLL)
-	CTFPlayer *ctfPlayer = dynamic_cast<CTFPlayer *>((C_BasePlayer*)ClientEntityList().GetLocalPlayer());
+	CTFPlayer *ctfPlayer = dynamic_cast<CTFPlayer *>((C_BasePlayer*)EntityList()->GetLocalPlayer());
 
 	if ( ctfPlayer && ctfPlayer->m_Shared.InCond( TF_COND_ZOOMED ) )
 	{
@@ -1782,7 +1782,7 @@ void SixenseInput::CheckWeaponForScope()
 #endif
 
 #if !defined( HL2_CLIENT_DLL ) && !defined( CSTRIKE_DLL ) && !defined( TF_CLIENT_DLL)
-	C_BasePlayer *pPlayer = (C_BasePlayer*)ClientEntityList().GetLocalPlayer();
+	C_BasePlayer *pPlayer = (C_BasePlayer*)EntityList()->GetLocalPlayer();
 
 	if( pPlayer )
 	{
@@ -1825,7 +1825,7 @@ void SixenseInput::CheckWeaponForScope()
 #if defined( TF_CLIENT_DLL)
 
 		// In TF2 wait until we're done reloading before switching back to metroid mode
-		C_BasePlayer *pPlayer = (C_BasePlayer*)ClientEntityList().GetLocalPlayer();
+		C_BasePlayer *pPlayer = (C_BasePlayer*)EntityList()->GetLocalPlayer();
 
 		if( pPlayer )
 		{
@@ -1839,7 +1839,7 @@ void SixenseInput::CheckWeaponForScope()
 #endif
 
 #if defined( CSTRIKE15 ) || defined (CSTRIKE_DLL)
-		C_CSPlayer *csPlayer = dynamic_cast<C_CSPlayer *>((C_BasePlayer*)ClientEntityList().GetLocalPlayer());
+		C_CSPlayer *csPlayer = dynamic_cast<C_CSPlayer *>((C_BasePlayer*)EntityList()->GetLocalPlayer());
 
 		if( csPlayer && csPlayer->m_bResumeZoom )
 		{
@@ -2029,7 +2029,7 @@ void SixenseInput::SetPlayerHandPositions( CUserCmd *pCmd, float flFrametime )
 
 
 	// Tell the client player about the hand positions. This will get sent to the server player as part of the usercmd
-	C_BasePlayer *player = (C_BasePlayer*)ClientEntityList().GetLocalPlayer();
+	C_BasePlayer *player = (C_BasePlayer*)EntityList()->GetLocalPlayer();
 
 
 	// Maintain the player and command one-to-one flags
@@ -2435,7 +2435,7 @@ void SixenseInput::SetView( float flInputSampleFrametime, CUserCmd *pCmd )
 	static bool last_charge = false, charging = false;
 	bool charge_started=false, charge_stopped=false;
 
-	CTFPlayer *pPlayer = ToTFPlayer(ClientEntityList().GetLocalPlayer() );
+	CTFPlayer *pPlayer = ToTFPlayer(EntityList()->GetLocalPlayer() );
 	if ( pPlayer ) 
 	{
 		charging = pPlayer->m_Shared.InCond( TF_COND_SHIELD_CHARGE );
@@ -2529,9 +2529,9 @@ void SixenseInput::SetView( float flInputSampleFrametime, CUserCmd *pCmd )
 
 	// Also set the player direction, this is the view frustum direction, which in metroid mode counter-rotates
 	// from the aim direction engine angles.
-	(C_BasePlayer*)ClientEntityList().GetLocalPlayer()->SetEyeAngleOffset( GetViewAngleOffset() ); // This is the way the player is looking, and the orientation of the weapon model
+	(C_BasePlayer*)EntityList()->GetLocalPlayer()->SetEyeAngleOffset( GetViewAngleOffset() ); // This is the way the player is looking, and the orientation of the weapon model
 
-	//C_BaseEntity *pEntOrg = (C_BasePlayer*)ClientEntityList().GetLocalPlayer()->GetViewEntity();
+	//C_BaseEntity *pEntOrg = (C_BasePlayer*)EntityList()->GetLocalPlayer()->GetViewEntity();
 
 #ifdef SIXENSE_PLAYER_DATA
 	// Set the eye offset angles in the ucmd so thay get sent to the server
@@ -2554,7 +2554,7 @@ void SixenseInput::SixenseUpdateKeys( float flFrametime, CUserCmd *pCmd )
 
 	// If the controller manager is up or the game is paused, don't do anything.
 	if ( InMenuMode() ||
-		((C_BasePlayer*)ClientEntityList().GetLocalPlayer() && (C_BasePlayer*)ClientEntityList().GetLocalPlayer()->IsObserver()) ||
+		((C_BasePlayer*)EntityList()->GetLocalPlayer() && (C_BasePlayer*)EntityList()->GetLocalPlayer()->IsObserver()) ||
 		( m_nLeftIndex == -1 ) ||
 		( m_nRightIndex == -1 ) ||
 		( m_nGesturesDisabled == 1 ) )
@@ -2597,7 +2597,7 @@ void SixenseInput::SixenseUpdateKeys( float flFrametime, CUserCmd *pCmd )
 
 
 		// hard code some commands for when we're observing
-		C_BasePlayer *pPlayer = (C_BasePlayer*)ClientEntityList().GetLocalPlayer();
+		C_BasePlayer *pPlayer = (C_BasePlayer*)EntityList()->GetLocalPlayer();
 		if( pPlayer && pPlayer->IsObserver() )
 		{
 			if( m_pLeftButtonStates->stickJustPressed( sixenseUtils::IButtonStates::DIR_RIGHT ) )
@@ -2890,7 +2890,7 @@ void SixenseInput::SixenseUpdateKeys( float flFrametime, CUserCmd *pCmd )
 		// check to see how long the zoom button was pressed. If it was really short, we should lock the zoom
 		if ( ( m_pACD->controllers[m_nRightIndex].buttons & SIXENSE_BUTTON_JOYSTICK ) &&
 			!momentary_zoom &&
-			( (C_BasePlayer*)ClientEntityList().GetLocalPlayer() && (C_BasePlayer*)ClientEntityList().GetLocalPlayer()->IsZoomed() ) )
+			( (C_BasePlayer*)EntityList()->GetLocalPlayer() && (C_BasePlayer*)EntityList()->GetLocalPlayer()->IsZoomed() ) )
 		{
 			double current_time = sixenseUtils::Time::getTimeInMilliseconds();
 			double button_held_time = current_time - zoom_button_press_time;

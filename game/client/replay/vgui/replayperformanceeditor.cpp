@@ -1742,7 +1742,7 @@ void CReplayPerformanceEditorPanel::OnTick()
 	// target's visibility wouldn't be updated until the replay was unpaused (they would be invisible)
 	if ( m_bCurrentTargetNeedsVisibilityUpdate )
 	{
-		C_BaseEntity *pTarget = ClientEntityList().GetEnt( pCamera->GetPrimaryTargetIndex() );
+		C_BaseEntity *pTarget = EntityList()->GetEnt( pCamera->GetPrimaryTargetIndex() );
 		if ( pTarget )
 		{
 			pTarget->UpdateVisibility();

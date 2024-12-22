@@ -701,7 +701,7 @@ void CPropJeepEpisodic::CreateCargoTrigger( void )
 	{
 		Vector vecAttachOrigin;
 		Vector vecForward, vecRight, vecUp;
-		GetAttachment( nAttachment, vecAttachOrigin, &vecForward, &vecRight, &vecUp );
+		GetEngineObject()->GetAttachment( nAttachment, vecAttachOrigin, &vecForward, &vecRight, &vecUp );
 
 		// Approx size of the hold
 		Vector vecMins( -8.0, -6.0, 0 );
@@ -1155,7 +1155,7 @@ CBaseEntity *CPropJeepEpisodic::OnFailedPhysGunPickup( Vector vPhysgunPos )
 		// Origin and facing of the cargo hold
 		Vector vecCargoOrigin;
 		Vector vecCargoForward;
-		GetAttachment( "cargo", vecCargoOrigin, &vecCargoForward );
+		GetEngineObject()->GetAttachment( "cargo", vecCargoOrigin, &vecCargoForward );
 
 		// Direction from the cargo to the player's position
 		Vector vecPickupDir = ( vecCargoOrigin - vPhysgunPos );
@@ -1705,11 +1705,11 @@ void CPropJeepEpisodic::InputCreateLinkController( inputdata_t &data )
 	Vector vecWFL, vecWFR;	// Front wheels
 	Vector vecWRL, vecWRR;	// Back wheels
 
-	GetAttachment( "wheel_fr", vecWFR );
-	GetAttachment( "wheel_fl", vecWFL );
+	GetEngineObject()->GetAttachment( "wheel_fr", vecWFR );
+	GetEngineObject()->GetAttachment( "wheel_fl", vecWFL );
 
-	GetAttachment( "wheel_rr", vecWRR );
-	GetAttachment( "wheel_rl", vecWRL );
+	GetEngineObject()->GetAttachment( "wheel_rr", vecWRR );
+	GetEngineObject()->GetAttachment( "wheel_rl", vecWRL );
 
 	vecFront = (vecWFL + vecWFR) * 0.5f;
 	vecRear = (vecWRL + vecWRR) * 0.5f;

@@ -74,7 +74,7 @@ bool IsPlayerIndex( int index )
 
 int GetLocalPlayerIndex( void )
 {
-	C_BasePlayer * player = (C_BasePlayer*)ClientEntityList().GetLocalPlayer();
+	C_BasePlayer * player = (C_BasePlayer*)EntityList()->GetLocalPlayer();
 
 	if ( player )
 		return player->entindex();
@@ -84,7 +84,7 @@ int GetLocalPlayerIndex( void )
 
 int GetLocalPlayerVisionFilterFlags( bool bWeaponsCheck /*= false */ )
 {
-	C_BasePlayer * player = (C_BasePlayer*)ClientEntityList().GetLocalPlayer();
+	C_BasePlayer * player = (C_BasePlayer*)EntityList()->GetLocalPlayer();
 
 	if ( player )
 		return player->GetVisionFilterFlags( bWeaponsCheck );
@@ -116,7 +116,7 @@ bool IsLocalPlayerUsingVisionFilterFlags( int nFlags, bool bWeaponsCheck /* = fa
 
 bool IsLocalPlayerSpectator( void )
 {
-	C_BasePlayer * player = (C_BasePlayer*)ClientEntityList().GetLocalPlayer();
+	C_BasePlayer * player = (C_BasePlayer*)EntityList()->GetLocalPlayer();
 
 	if ( player )
 		return player->IsObserver();
@@ -126,7 +126,7 @@ bool IsLocalPlayerSpectator( void )
 
 int GetSpectatorMode( void )
 {
-	C_BasePlayer * player = (C_BasePlayer*)ClientEntityList().GetLocalPlayer();
+	C_BasePlayer * player = (C_BasePlayer*)EntityList()->GetLocalPlayer();
 
 	if ( player )
 		return player->GetObserverMode();
@@ -136,7 +136,7 @@ int GetSpectatorMode( void )
 
 int GetSpectatorTarget( void )
 {
-	C_BasePlayer * player = (C_BasePlayer*)ClientEntityList().GetLocalPlayer();
+	C_BasePlayer * player = (C_BasePlayer*)EntityList()->GetLocalPlayer();
 
 	if ( player )
 	{
@@ -155,7 +155,7 @@ int GetSpectatorTarget( void )
 
 int GetLocalPlayerTeam( void ) 
 { 
-	C_BasePlayer *pPlayer = (C_BasePlayer*)ClientEntityList().GetLocalPlayer();
+	C_BasePlayer *pPlayer = (C_BasePlayer*)EntityList()->GetLocalPlayer();
 	
 	if ( pPlayer )
 		return pPlayer->GetTeamNumber(); 
@@ -343,7 +343,7 @@ void UTIL_Tracer( const Vector &vecStart, const Vector &vecEnd, int iEntIndex, i
 	CEffectData data;
 	data.m_vStart = vecStart;
 	data.m_vOrigin = vecEnd;
-	data.m_hEntity = ClientEntityList().GetBaseEntity( iEntIndex );
+	data.m_hEntity = EntityList()->GetBaseEntity( iEntIndex );
 	data.m_flScale = flVelocity;
 
 	// Flags
@@ -471,7 +471,7 @@ void UTIL_PrecacheOther( const char *szClassname )
 	// Client should only do this once entities are coming down from server!!!
 	// Assert( engine->IsConnected() );
 
-	C_BaseEntity	*pEntity = cl_entitylist->CreateEntityByName( szClassname );
+	C_BaseEntity	*pEntity = (C_BaseEntity*)EntityList()->CreateEntityByName( szClassname );
 	if ( !pEntity )
 	{
 		Warning( "NULL Ent in UTIL_PrecacheOther\n" );
@@ -484,7 +484,7 @@ void UTIL_PrecacheOther( const char *szClassname )
 	}
 
 	// Bye bye
-	cl_entitylist->DestroyEntity(pEntity);// ->Release();
+	EntityList()->DestroyEntity(pEntity);// ->Release();
 }
 
 static csurface_t	g_NullSurface = { "**empty**", 0 };
@@ -637,7 +637,7 @@ bool CFlaggedEntitiesEnum::AddToList( C_BaseEntity *pEntity )
 
 IterationRetval_t CFlaggedEntitiesEnum::EnumElement( IHandleEntity *pHandleEntity )
 {
-	IClientEntity *pClientEntity = cl_entitylist->GetClientEntityFromHandle( pHandleEntity->GetRefEHandle() );
+	IClientEntity *pClientEntity = EntityList()->GetClientEntityFromHandle( pHandleEntity->GetRefEHandle() );
 	C_BaseEntity *pEntity = pClientEntity ? pClientEntity->GetBaseEntity() : NULL;
 	if ( pEntity )
 	{
@@ -1077,7 +1077,7 @@ static unsigned char ComputeDistanceFade( C_BaseEntity *pEntity, float flMinDist
 	flMaxDist *= flMaxDist;
 
 	float flCurrentDistanceSq = CurrentViewOrigin().DistToSqr( pEntity->WorldSpaceCenter() );
-	C_BasePlayer *pLocal = (C_BasePlayer*)ClientEntityList().GetLocalPlayer();
+	C_BasePlayer *pLocal = (C_BasePlayer*)EntityList()->GetLocalPlayer();
 	if ( pLocal )
 	{
 		float flDistFactor = pLocal->GetFOVDistanceAdjustFactor();

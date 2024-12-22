@@ -11,6 +11,7 @@
 //			entities is done through this object.
 //-----------------------------------------------------------------------------
 //#include "cbase.h"
+#include "baseentity_shared.h"
 #include "recvproxy.h"
 #include "tier0/vprof.h"
 #include "cdll_bounded_cvars.h"
@@ -44,6 +45,7 @@
 #include "gamerules.h"
 #include "hl2_gamerules.h"
 #include "portal_util_shared.h"
+#include "utlmultilist.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
@@ -73,16 +75,11 @@ extern ConVar	cl_showerror;
 extern ConVar think_limit;
 
 // Create interface
-static CClientEntityList<C_BaseEntity> s_EntityList;
-CBaseEntityList<C_BaseEntity> *g_pEntityList = &s_EntityList;
-IClientEntityList* entitylist = &s_EntityList;
+CClientEntityList<C_BaseEntity> g_EntityList;
+IClientEntityList* entitylist = &g_EntityList;
 
 // Expose list to engine
-EXPOSE_SINGLE_INTERFACE_GLOBALVAR( CClientEntityList, IClientEntityList, VCLIENTENTITYLIST_INTERFACE_VERSION, s_EntityList );
-
-// Store local pointer to interface for rest of client .dll only 
-//  (CClientEntityList instead of IClientEntityList )
-CClientEntityList<C_BaseEntity> *cl_entitylist = &s_EntityList;
+EXPOSE_SINGLE_INTERFACE_GLOBALVAR( CClientEntityList, IClientEntityList, VCLIENTENTITYLIST_INTERFACE_VERSION, g_EntityList);
 
 //static clienttouchlink_t *g_pNextLink = NULL;
 int linksallocated = 0;
@@ -233,7 +230,7 @@ int CCollisionEvent::ShouldCollide_2(IPhysicsObject* pObj0, IPhysicsObject* pObj
 		if ((gameFlags0 | gameFlags1) & FVPHYSICS_NO_SELF_COLLISIONS)
 			return 0;
 
-		IPhysicsCollisionSet* pSet = ClientEntityList().Physics()->FindCollisionSet(pEntity0->GetEngineObject()->GetModelIndex());
+		IPhysicsCollisionSet* pSet = g_EntityList.Physics()->FindCollisionSet(pEntity0->GetEngineObject()->GetModelIndex());
 		if (pSet)
 			return pSet->ShouldCollide(pObj0->GetGameIndex(), pObj1->GetGameIndex());
 
@@ -257,10 +254,10 @@ int CCollisionEvent::ShouldCollide_2(IPhysicsObject* pObj0, IPhysicsObject* pObj
 	if (!(pObj0->GetContents() & pEntity1->PhysicsSolidMaskForEntity()) || !(pObj1->GetContents() & pEntity0->PhysicsSolidMaskForEntity()))
 		return 0;
 
-	if (ClientEntityList().PhysGetEntityCollisionHash()->IsObjectPairInHash(pGameData0, pGameData1))
+	if (g_EntityList.PhysGetEntityCollisionHash()->IsObjectPairInHash(pGameData0, pGameData1))
 		return 0;
 
-	if (ClientEntityList().PhysGetEntityCollisionHash()->IsObjectPairInHash(pObj0, pObj1))
+	if (g_EntityList.PhysGetEntityCollisionHash()->IsObjectPairInHash(pObj0, pObj1))
 		return 0;
 
 #if 0
@@ -319,11 +316,10 @@ int CCollisionEvent::ShouldSolvePenetration(IPhysicsObject* pObj0, IPhysicsObjec
 		{
 			// this is a ragdoll, self penetrating
 			C_BaseEntity* pEnt = reinterpret_cast<C_BaseEntity*>(pGameData0);
-			C_BaseAnimating* pAnim = pEnt->GetBaseAnimating();
 
-			if (pAnim && pAnim->GetEngineObject()->RagdollBoneCount())
+			if (pEnt && pEnt->GetEngineObject()->RagdollBoneCount())
 			{
-				IPhysicsConstraintGroup* pGroup = pAnim->GetEngineObject()->GetConstraintGroup();
+				IPhysicsConstraintGroup* pGroup = pEnt->GetEngineObject()->GetConstraintGroup();
 				if (pGroup)
 				{
 					pGroup->SolvePenetration(pObj0, pObj1);
@@ -356,7 +352,7 @@ void CCollisionEvent::ObjectSound(int index, vcollisionevent_t* pEvent)
 
 		if (surfaceProps >= 0)
 		{
-			ClientEntityList().AddImpactSound(pGameData, pObject, surfaceProps, pEvent->surfaceProps[!index], volume, speed);
+			g_EntityList.AddImpactSound(pGameData, pObject, surfaceProps, pEvent->surfaceProps[!index], volume, speed);
 		}
 	}
 }
@@ -537,7 +533,7 @@ void CCollisionEvent::Friction(IPhysicsObject* pObject, float energy, int surfac
 			}
 		}
 
-		ClientEntityList().PhysFrictionSound(pEntity, pObject, energy, surfaceProps, surfacePropsHit);
+		g_EntityList.PhysFrictionSound(pEntity, pObject, energy, surfaceProps, surfacePropsHit);
 	}
 
 	PhysFrictionEffect(vecPos, vecVel, energy, surfaceProps, surfacePropsHit);
@@ -648,10 +644,10 @@ void PhysicsSplash(IPhysicsFluidController* pFluid, IPhysicsObject* pObject, C_B
 
 	// Get object extents in basis
 	Vector tanPts[2], binPts[2];
-	tanPts[0] = EntityList()->PhysGetCollision()->CollideGetExtent(pObject->GetCollide(), pEntity->GetEngineObject()->GetAbsOrigin(), pEntity->GetEngineObject()->GetAbsAngles(), -tangent);
-	tanPts[1] = EntityList()->PhysGetCollision()->CollideGetExtent(pObject->GetCollide(), pEntity->GetEngineObject()->GetAbsOrigin(), pEntity->GetEngineObject()->GetAbsAngles(), tangent);
-	binPts[0] = EntityList()->PhysGetCollision()->CollideGetExtent(pObject->GetCollide(), pEntity->GetEngineObject()->GetAbsOrigin(), pEntity->GetEngineObject()->GetAbsAngles(), -binormal);
-	binPts[1] = EntityList()->PhysGetCollision()->CollideGetExtent(pObject->GetCollide(), pEntity->GetEngineObject()->GetAbsOrigin(), pEntity->GetEngineObject()->GetAbsAngles(), binormal);
+	tanPts[0] = g_EntityList.PhysGetCollision()->CollideGetExtent(pObject->GetCollide(), pEntity->GetEngineObject()->GetAbsOrigin(), pEntity->GetEngineObject()->GetAbsAngles(), -tangent);
+	tanPts[1] = g_EntityList.PhysGetCollision()->CollideGetExtent(pObject->GetCollide(), pEntity->GetEngineObject()->GetAbsOrigin(), pEntity->GetEngineObject()->GetAbsAngles(), tangent);
+	binPts[0] = g_EntityList.PhysGetCollision()->CollideGetExtent(pObject->GetCollide(), pEntity->GetEngineObject()->GetAbsOrigin(), pEntity->GetEngineObject()->GetAbsAngles(), -binormal);
+	binPts[1] = g_EntityList.PhysGetCollision()->CollideGetExtent(pObject->GetCollide(), pEntity->GetEngineObject()->GetAbsOrigin(), pEntity->GetEngineObject()->GetAbsAngles(), binormal);
 
 	// now compute the centered bbox
 	float mins[2], maxs[2], center[2], extents[2];
@@ -772,7 +768,7 @@ float CCollisionEvent::DeltaTimeSinceLastFluid(C_BaseEntity* pEntity)
 {
 	for (int i = m_fluidEvents.Count() - 1; i >= 0; --i)
 	{
-		if (ClientEntityList().GetBaseEntityFromHandle(m_fluidEvents[i].hEntity) == pEntity)
+		if (g_EntityList.GetBaseEntityFromHandle(m_fluidEvents[i].hEntity) == pEntity)
 		{
 			return gpGlobals->curtime - m_fluidEvents[i].impactTime;
 		}
@@ -827,15 +823,15 @@ class CPortalTouchScope
 public:
 	CPortalTouchScope()
 	{
-		++ClientEntityList().m_nTouchDepth;
+		++g_EntityList.m_nTouchDepth;
 	}
 
 	~CPortalTouchScope()
 	{
-		Assert(ClientEntityList().m_nTouchDepth >= 1);
-		if (--ClientEntityList().m_nTouchDepth == 0)
+		Assert(g_EntityList.m_nTouchDepth >= 1);
+		if (--g_EntityList.m_nTouchDepth == 0)
 		{
-			ClientEntityList().m_PostTouchQueue.CallQueued();
+			g_EntityList.m_PostTouchQueue.CallQueued();
 		}
 	}
 
@@ -1159,10 +1155,10 @@ bool C_GrabControllerInternal::UpdateObject(C_BaseEntity* pPlayer, float flError
 		// If our end point hasn't gone into the portal yet we at least need to know what portal is in front of us
 		else
 		{
-			int iPortalCount = ClientEntityList().m_ActivePortals.Count();
+			int iPortalCount = g_EntityList.m_ActivePortals.Count();
 			if (iPortalCount != 0)
 			{
-				C_EnginePortalInternal** pPortals = ClientEntityList().m_ActivePortals.Base();
+				C_EnginePortalInternal** pPortals = g_EntityList.m_ActivePortals.Base();
 				float fMinDist = 2.0f;
 				for (int i = 0; i != iPortalCount; ++i)
 				{
@@ -1203,7 +1199,7 @@ bool C_GrabControllerInternal::UpdateObject(C_BaseEntity* pPlayer, float flError
 		UTIL_Portal_AngleTransform(pPortal->GetLinkedPortal()->MatrixThisToLinked(), qEntityAngles, qEntityAngles);
 	}
 	// Now clamp a sphere of object radius at end to the player's bbox
-	Vector radial = EntityList()->PhysGetCollision()->CollideGetExtent(pPhys->GetCollide(), vec3_origin, qEntityAngles, -forward);
+	Vector radial = g_EntityList.PhysGetCollision()->CollideGetExtent(pPhys->GetCollide(), vec3_origin, qEntityAngles, -forward);
 	Vector player2d = pPlayer->GetEngineObject()->OBBMaxs();
 	float playerRadius = player2d.Length2D();
 
@@ -1425,7 +1421,7 @@ float C_GrabControllerInternal::ComputeError()
 
 #ifndef CLIENT_DLL
 	// If held across a portal but not looking at the portal multiply error
-	CBaseEntity* pPortalPlayer = ClientEntityList().GetPlayerHoldingEntity(pAttached);
+	CBaseEntity* pPortalPlayer = g_EntityList.GetPlayerHoldingEntity(pAttached);
 	Assert(pPortalPlayer);
 	if (pPortalPlayer->GetEnginePlayer()->IsHeldObjectOnOppositeSideOfPortal())
 	{
@@ -1644,7 +1640,7 @@ void C_GrabControllerInternal::AttachEntity(C_BaseEntity* pPlayer, C_BaseEntity*
 		Vector vPlayerForward;
 		pPlayer->EyeVectors(&vPlayerForward);
 
-		Vector radial = EntityList()->PhysGetCollision()->CollideGetExtent(pPhys->GetCollide(), vec3_origin, pEntity->GetEngineObject()->GetAbsAngles(), -vPlayerForward);
+		Vector radial = g_EntityList.PhysGetCollision()->CollideGetExtent(pPhys->GetCollide(), vec3_origin, pEntity->GetEngineObject()->GetAbsAngles(), -vPlayerForward);
 		Vector player2d = pPlayer->GetEngineObject()->OBBMaxs();
 		float playerRadius = player2d.Length2D();
 		float flDot = DotProduct(vPlayerForward, radial);
@@ -1666,10 +1662,10 @@ void C_GrabControllerInternal::AttachEntity(C_BaseEntity* pPlayer, C_BaseEntity*
 			Ray_t rayPortalTest;
 			rayPortalTest.Init(start, start + vPlayerForward * 1024.0f);
 
-			int iPortalCount = ClientEntityList().m_ActivePortals.Count();
+			int iPortalCount = g_EntityList.m_ActivePortals.Count();
 			if (iPortalCount != 0)
 			{
-				C_EnginePortalInternal** pPortals = ClientEntityList().m_ActivePortals.Base();
+				C_EnginePortalInternal** pPortals = g_EntityList.m_ActivePortals.Base();
 				float fMinDist = 2.0f;
 				for (int i = 0; i != iPortalCount; ++i)
 				{
@@ -1713,7 +1709,7 @@ void C_GrabControllerInternal::AttachEntity(C_BaseEntity* pPlayer, C_BaseEntity*
 	// Carried entities can never block LOS
 	m_bCarriedEntityBlocksLOS = pEntity->BlocksLOS();
 	pEntity->SetBlocksLOS(false);
-	m_controller = EntityList()->PhysGetEnv()->CreateMotionController(this);
+	m_controller = g_EntityList.PhysGetEnv()->CreateMotionController(this);
 	m_controller->AttachObject(pPhys, true);
 	// Don't do this, it's causing trouble with constraint solvers.
 	//m_controller->SetPriority( IPhysicsMotionController::HIGH_PRIORITY );
@@ -1814,7 +1810,7 @@ static void ClampPhysicsVelocity(IPhysicsObject* pPhys, float linearLimit, float
 
 void C_GrabControllerInternal::DetachEntity(bool bClearVelocity)
 {
-	Assert(!ClientEntityList().PhysIsInCallback());
+	Assert(!g_EntityList.PhysIsInCallback());
 	C_BaseEntity* pEntity = GetAttached();
 	if (pEntity)
 	{
@@ -1851,7 +1847,7 @@ void C_GrabControllerInternal::DetachEntity(bool bClearVelocity)
 
 	m_attachedEntity = NULL;
 	if (m_controller) {
-		EntityList()->PhysGetEnv()->DestroyMotionController(m_controller);
+		g_EntityList.PhysGetEnv()->DestroyMotionController(m_controller);
 		m_controller = NULL;
 	}
 }
@@ -2617,7 +2613,7 @@ void C_EngineObjectInternal::OnRestore()
 		m_ragdoll.list[0].originParentSpace.Init();
 
 		RagdollActivate(m_ragdoll, modelinfo->GetVCollide(GetModelIndex()), GetModelIndex(), true);
-		RagdollSetupAnimatedFriction(ClientEntityList().PhysGetEnv(), &m_ragdoll, GetModelIndex());
+		RagdollSetupAnimatedFriction(g_EntityList.PhysGetEnv(), &m_ragdoll, GetModelIndex());
 
 		BuildRagdollBounds();
 
@@ -3467,7 +3463,7 @@ int C_EngineObjectInternal::BaseInterpolatePart1(float& currentTime, Vector& old
 
 
 	// These get moved to the parent position automatically
-	if (IsFollowingEntity() || !ClientEntityList().IsInterpolationEnabled())
+	if (IsFollowingEntity() || !g_EntityList.IsInterpolationEnabled())
 	{
 		// Assume current origin ( no interpolation )
 		MoveToLastReceivedPosition();
@@ -3479,7 +3475,7 @@ int C_EngineObjectInternal::BaseInterpolatePart1(float& currentTime, Vector& old
 
 	if (m_pOuter->GetPredictable() /*|| IsClientCreated()*/)
 	{
-		C_BasePlayer* localplayer = (C_BasePlayer*)ClientEntityList().GetLocalPlayer();
+		C_BasePlayer* localplayer = (C_BasePlayer*)g_EntityList.GetLocalPlayer();
 		if (localplayer && currentTime == gpGlobals->curtime)
 		{
 			currentTime = localplayer->GetFinalPredictedTime();
@@ -3707,14 +3703,14 @@ void C_EngineObjectInternal::SetLocalAnglesDim(int iDim, vec_t flValue)
 
 const Vector& C_EngineObjectInternal::GetAbsVelocity()
 {
-	Assert(ClientEntityList().IsAbsQueriesValid());
+	Assert(g_EntityList.IsAbsQueriesValid());
 	const_cast<C_EngineObjectInternal*>(this)->CalcAbsoluteVelocity();
 	return m_vecAbsVelocity;
 }
 
 const Vector& C_EngineObjectInternal::GetAbsVelocity() const
 {
-	Assert(ClientEntityList().IsAbsQueriesValid());
+	Assert(g_EntityList.IsAbsQueriesValid());
 	const_cast<C_EngineObjectInternal*>(this)->CalcAbsoluteVelocity();
 	return m_vecAbsVelocity;
 }
@@ -3753,14 +3749,14 @@ void C_EngineObjectInternal::ResetRgflCoordinateFrame() {
 //-----------------------------------------------------------------------------
 matrix3x4_t& C_EngineObjectInternal::EntityToWorldTransform()
 {
-	Assert(ClientEntityList().IsAbsQueriesValid());
+	Assert(g_EntityList.IsAbsQueriesValid());
 	CalcAbsolutePosition();
 	return m_rgflCoordinateFrame;
 }
 
 const matrix3x4_t& C_EngineObjectInternal::EntityToWorldTransform() const
 {
-	Assert(ClientEntityList().IsAbsQueriesValid());
+	Assert(g_EntityList.IsAbsQueriesValid());
 	const_cast<C_EngineObjectInternal*>(this)->CalcAbsolutePosition();
 	return m_rgflCoordinateFrame;
 }
@@ -3802,7 +3798,7 @@ void C_EngineObjectInternal::CalcAbsolutePosition()
 	// fact that we're in an indeterminant state and abs queries (which
 	// shouldn't be happening at all; I have assertions for those), will
 	// just have to accept stale data.
-	if (!ClientEntityList().IsAbsRecomputationsEnabled())
+	if (!g_EntityList.IsAbsRecomputationsEnabled())
 		return;
 
 	// FIXME: Recompute absbox!!!
@@ -4402,7 +4398,7 @@ int C_EngineObjectInternal::RestoreData(const char* context, int slot, int type)
 //-----------------------------------------------------------------------------
 void C_EngineObjectInternal::EstimateAbsVelocity(Vector& vel)
 {
-	if (this->m_pOuter == (C_BasePlayer*)ClientEntityList().GetLocalPlayer())
+	if (this->m_pOuter == (C_BasePlayer*)g_EntityList.GetLocalPlayer())
 	{
 		// This is interpolated and networked
 		vel = GetAbsVelocity();
@@ -4558,14 +4554,14 @@ void* C_EngineObjectInternal::GetDataObject(int type)
 	Assert(type >= 0 && type < NUM_DATAOBJECT_TYPES);
 	if (!HasDataObjectType(type))
 		return NULL;
-	return ClientEntityList().GetDataObject(type, m_pOuter);
+	return g_EntityList.GetDataObject(type, m_pOuter);
 }
 
 void* C_EngineObjectInternal::CreateDataObject(int type)
 {
 	Assert(type >= 0 && type < NUM_DATAOBJECT_TYPES);
 	AddDataObjectType(type);
-	return ClientEntityList().CreateDataObject(type, m_pOuter);
+	return g_EntityList.CreateDataObject(type, m_pOuter);
 }
 
 void C_EngineObjectInternal::DestroyDataObject(int type)
@@ -4573,7 +4569,7 @@ void C_EngineObjectInternal::DestroyDataObject(int type)
 	Assert(type >= 0 && type < NUM_DATAOBJECT_TYPES);
 	if (!HasDataObjectType(type))
 		return;
-	ClientEntityList().DestroyDataObject(type, m_pOuter);
+	g_EntityList.DestroyDataObject(type, m_pOuter);
 	RemoveDataObjectType(type);
 }
 
@@ -4811,7 +4807,7 @@ clienttouchlink_t* C_EngineObjectInternal::PhysicsMarkEntityAsTouched(IEngineObj
 		return NULL;
 	}
 
-	if (ClientEntityList().m_ActivePortals.Count() > 0) {
+	if (g_EntityList.m_ActivePortals.Count() > 0) {
 		CPortalTouchScope scope;
 	}
 
@@ -4826,7 +4822,7 @@ clienttouchlink_t* C_EngineObjectInternal::PhysicsMarkEntityAsTouched(IEngineObj
 				// update stamp
 				link->touchStamp = GetTouchStamp();
 
-				if (!ClientEntityList().IsDisableTouchFuncs())
+				if (!g_EntityList.IsDisableTouchFuncs())
 				{
 					PhysicsTouch(other);
 				}
@@ -4867,7 +4863,7 @@ clienttouchlink_t* C_EngineObjectInternal::PhysicsMarkEntityAsTouched(IEngineObj
 	if (bShouldTouch && !other->IsSolidFlagSet(FSOLID_TRIGGER))
 	{
 		link->flags |= FTOUCHLINK_START_TOUCH;
-		if (!ClientEntityList().IsDisableTouchFuncs())
+		if (!g_EntityList.IsDisableTouchFuncs())
 		{
 			PhysicsStartTouch(other);
 		}
@@ -4935,7 +4931,7 @@ void C_EngineObjectInternal::PhysicsCheckForEntityUntouch(void)
 	clienttouchlink_t* root = (clienttouchlink_t*)this->GetDataObject(TOUCHLINK);
 	if (root)
 	{
-		if (ClientEntityList().m_ActivePortals.Count() > 0) {
+		if (g_EntityList.m_ActivePortals.Count() > 0) {
 			CPortalTouchScope scope;
 		}
 		bool saveCleanup = g_bCleanupDatObject;
@@ -5023,7 +5019,7 @@ void C_EngineObjectInternal::PhysicsNotifyOtherOfUntouch(IEngineObjectClient* en
 //-----------------------------------------------------------------------------
 void C_EngineObjectInternal::PhysicsRemoveTouchedList()
 {
-	if (ClientEntityList().m_ActivePortals.Count() > 0) {
+	if (g_EntityList.m_ActivePortals.Count() > 0) {
 		CPortalTouchScope scope;
 	}
 
@@ -5183,7 +5179,7 @@ void C_EngineObjectInternal::PhysicsRemoveGround(clientgroundlink_t* link)
 	// Every start Touch gets a corresponding end touch
 	if (link->entity != INVALID_EHANDLE_INDEX)
 	{
-		C_BaseEntity* linkEntity = (C_BaseEntity*)ClientEntityList().GetClientEntityFromHandle(link->entity);
+		C_BaseEntity* linkEntity = (C_BaseEntity*)g_EntityList.GetClientEntityFromHandle(link->entity);
 		C_BaseEntity* otherEntity = this->m_pOuter;
 		if (linkEntity && otherEntity)
 		{
@@ -5213,7 +5209,7 @@ void C_EngineObjectInternal::PhysicsRemoveGroundList()
 			nextLink = link->nextLink;
 
 			// notify the other entity that this ent has gone away
-			C_BaseEntity* pEntity = ((C_BaseEntity*)ClientEntityList().GetClientEntityFromHandle(link->entity));
+			C_BaseEntity* pEntity = ((C_BaseEntity*)g_EntityList.GetClientEntityFromHandle(link->entity));
 			if (pEntity) {
 				pEntity->GetEngineObject()->PhysicsNotifyOtherOfGroundRemoval(this);
 			}
@@ -5315,7 +5311,7 @@ void C_EngineObjectInternal::CollisionRulesChanged()
 	// that can change the state that a collision filter will return (like m_Solid) needs to call RecheckCollisionFilter.
 	if (VPhysicsGetObject())
 	{
-		if (ClientEntityList().PhysIsInCallback())
+		if (g_EntityList.PhysIsInCallback())
 		{
 			Warning("Changing collision rules within a callback is likely to cause crashes!\n");
 			Assert(0);
@@ -6860,7 +6856,7 @@ void C_EngineObjectInternal::InitRagdoll(
 	params.jointFrictionScale = 1.0;
 	params.allowStretch = false;
 	params.fixedConstraints = bFixedConstraints;
-	RagdollCreate(m_ragdoll, params, ClientEntityList().PhysGetEnv());
+	RagdollCreate(m_ragdoll, params, g_EntityList.PhysGetEnv());
 	VPhysicsSetObject(NULL);
 	VPhysicsSetObject(m_ragdoll.list[0].pObject);
 	// Mark the ragdoll as debris.
@@ -7499,9 +7495,9 @@ void C_EngineObjectInternal::Simulate() {
 bool C_EngineObjectInternal::IsBoneAccessAllowed() const
 {
 	if (m_pOuter->IsViewModel())
-		return ClientEntityList().GetAllowBoneAccessForViewModels();
+		return g_EntityList.GetAllowBoneAccessForViewModels();
 	else
-		return ClientEntityList().GetAllowBoneAccessForNormalModels();
+		return g_EntityList.GetAllowBoneAccessForNormalModels();
 }
 
 //-----------------------------------------------------------------------------
@@ -7523,11 +7519,11 @@ void C_EngineObjectInternal::SetToolRecording(bool recording)
 	m_bToolRecording = recording;
 	if (m_bToolRecording)
 	{
-		ClientEntityList().AddToRecordList(m_pOuter->GetRefEHandle());
+		g_EntityList.AddToRecordList(m_pOuter->GetRefEHandle());
 	}
 	else
 	{
-		ClientEntityList().RemoveFromRecordList(m_pOuter->GetRefEHandle());
+		g_EntityList.RemoveFromRecordList(m_pOuter->GetRefEHandle());
 	}
 #endif
 }
@@ -7944,7 +7940,7 @@ bool C_EngineObjectInternal::SetupBones(matrix3x4_t* pBoneToWorldOut, int nMaxBo
 		boneMask |= BONE_USED_BY_ANYTHING;
 	}
 
-	if (ClientEntityList().GetInThreadedBoneSetup())
+	if (g_EntityList.GetInThreadedBoneSetup())
 	{
 		if (!m_BoneSetupLock.TryLock())
 		{
@@ -7968,12 +7964,12 @@ bool C_EngineObjectInternal::SetupBones(matrix3x4_t* pBoneToWorldOut, int nMaxBo
 
 	AUTO_LOCK(m_BoneSetupLock);
 
-	if (ClientEntityList().GetInThreadedBoneSetup())
+	if (g_EntityList.GetInThreadedBoneSetup())
 	{
 		m_BoneSetupLock.Unlock();
 	}
 
-	if (m_iMostRecentModelBoneCounter != ClientEntityList().GetModelBoneCounter())
+	if (m_iMostRecentModelBoneCounter != g_EntityList.GetModelBoneCounter())
 	{
 		// Clear out which bones we've touched this frame if this is 
 		// the first time we've seen this object this frame.
@@ -7994,14 +7990,14 @@ bool C_EngineObjectInternal::SetupBones(matrix3x4_t* pBoneToWorldOut, int nMaxBo
 #endif
 	}
 	// Make sure that we know that we've already calculated some bone stuff this time around.
-	m_iMostRecentModelBoneCounter = ClientEntityList().GetModelBoneCounter();
+	m_iMostRecentModelBoneCounter = g_EntityList.GetModelBoneCounter();
 
 	int nBoneCount = m_CachedBoneData.Count();
-	if (ClientEntityList().GetDoThreadedBoneSetup() && !ClientEntityList().GetInThreadedBoneSetup() && (nBoneCount >= 16) && !GetMoveParent() && m_iMostRecentBoneSetupRequest != ClientEntityList().GetPreviousBoneCounter())
+	if (g_EntityList.GetDoThreadedBoneSetup() && !g_EntityList.GetInThreadedBoneSetup() && (nBoneCount >= 16) && !GetMoveParent() && m_iMostRecentBoneSetupRequest != g_EntityList.GetPreviousBoneCounter())
 	{
-		m_iMostRecentBoneSetupRequest = ClientEntityList().GetPreviousBoneCounter();
-		Assert(ClientEntityList().GetPreviousBoneSetups().Find(this) == -1);
-		ClientEntityList().GetPreviousBoneSetups().AddToTail(this);
+		m_iMostRecentBoneSetupRequest = g_EntityList.GetPreviousBoneCounter();
+		Assert(g_EntityList.GetPreviousBoneSetups().Find(this) == -1);
+		g_EntityList.GetPreviousBoneSetups().AddToTail(this);
 	}
 
 	// Have we cached off all bones meeting the flag set?
@@ -8165,9 +8161,9 @@ void C_EngineObjectInternal::GetBoneCache(IStudioHdr* pStudioHdr)
 		pStudioHdr = GetModelPtr();
 	Assert(pStudioHdr);
 
-	ClientEntityList().PushAllowBoneAccess(true, false, "GetBoneCache");
+	g_EntityList.PushAllowBoneAccess(true, false, "GetBoneCache");
 	SetupBones(NULL, -1, boneMask, gpGlobals->curtime);
-	ClientEntityList().PopBoneAccess("GetBoneCache");
+	g_EntityList.PopBoneAccess("GetBoneCache");
 
 	//if (pcache)
 	//{
@@ -8214,6 +8210,84 @@ int C_EngineObjectInternal::LookupBone(const char* szName)
 	Assert(GetModelPtr());
 
 	return  GetModelPtr()->Studio_BoneIndexByName(szName);
+}
+
+//-----------------------------------------------------------------------------
+// Computes a box that surrounds all hitboxes
+//-----------------------------------------------------------------------------
+bool C_EngineObjectInternal::ComputeHitboxSurroundingBox(Vector* pVecWorldMins, Vector* pVecWorldMaxs)
+{
+	// Note that this currently should not be called during position recomputation because of IK.
+	// The code below recomputes bones so as to get at the hitboxes,
+	// which causes IK to trigger, which causes raycasts against the other entities to occur,
+	// which is illegal to do while in the computeabsposition phase.
+
+	IStudioHdr* pStudioHdr = GetModelPtr();
+	if (!pStudioHdr)
+		return false;
+
+	mstudiohitboxset_t* set = pStudioHdr->pHitboxSet(GetHitboxSet());
+	if (!set || !set->numhitboxes)
+		return false;
+
+	const matrix3x4_t* hitboxbones[MAXSTUDIOBONES];
+	GetHitboxBoneTransforms(hitboxbones);
+
+	// Compute a box in world space that surrounds this entity
+	pVecWorldMins->Init(FLT_MAX, FLT_MAX, FLT_MAX);
+	pVecWorldMaxs->Init(-FLT_MAX, -FLT_MAX, -FLT_MAX);
+
+	Vector vecBoxAbsMins, vecBoxAbsMaxs;
+	for (int i = 0; i < set->numhitboxes; i++)
+	{
+		mstudiobbox_t* pbox = set->pHitbox(i);
+
+		TransformAABB(*hitboxbones[pbox->bone], pbox->bbmin * GetModelScale(), pbox->bbmax * GetModelScale(), vecBoxAbsMins, vecBoxAbsMaxs);
+		VectorMin(*pVecWorldMins, vecBoxAbsMins, *pVecWorldMins);
+		VectorMax(*pVecWorldMaxs, vecBoxAbsMaxs, *pVecWorldMaxs);
+	}
+	return true;
+}
+
+//-----------------------------------------------------------------------------
+// Computes a box that surrounds all hitboxes, in entity space
+//-----------------------------------------------------------------------------
+bool C_EngineObjectInternal::ComputeEntitySpaceHitboxSurroundingBox(Vector* pVecWorldMins, Vector* pVecWorldMaxs)
+{
+	// Note that this currently should not be called during position recomputation because of IK.
+	// The code below recomputes bones so as to get at the hitboxes,
+	// which causes IK to trigger, which causes raycasts against the other entities to occur,
+	// which is illegal to do while in the computeabsposition phase.
+
+	IStudioHdr* pStudioHdr = GetModelPtr();
+	if (!pStudioHdr)
+		return false;
+
+	mstudiohitboxset_t* set = pStudioHdr->pHitboxSet(GetHitboxSet());
+	if (!set || !set->numhitboxes)
+		return false;
+
+	const matrix3x4_t* hitboxbones[MAXSTUDIOBONES];
+	GetHitboxBoneTransforms(hitboxbones);
+
+	// Compute a box in world space that surrounds this entity
+	pVecWorldMins->Init(FLT_MAX, FLT_MAX, FLT_MAX);
+	pVecWorldMaxs->Init(-FLT_MAX, -FLT_MAX, -FLT_MAX);
+
+	matrix3x4_t worldToEntity, boneToEntity;
+	MatrixInvert(EntityToWorldTransform(), worldToEntity);
+
+	Vector vecBoxAbsMins, vecBoxAbsMaxs;
+	for (int i = 0; i < set->numhitboxes; i++)
+	{
+		mstudiobbox_t* pbox = set->pHitbox(i);
+
+		ConcatTransforms(worldToEntity, *hitboxbones[pbox->bone], boneToEntity);
+		TransformAABB(boneToEntity, pbox->bbmin * GetModelScale(), pbox->bbmax * GetModelScale(), vecBoxAbsMins, vecBoxAbsMaxs);
+		VectorMin(*pVecWorldMins, vecBoxAbsMins, *pVecWorldMins);
+		VectorMax(*pVecWorldMaxs, vecBoxAbsMaxs, *pVecWorldMaxs);
+	}
+	return true;
 }
 
 //=========================================================
@@ -8615,7 +8689,7 @@ void C_EngineObjectInternal::AddToAimEntsList()
 	if (m_AimEntsListHandle != INVALID_AIMENTS_LIST_HANDLE)
 		return;
 
-	m_AimEntsListHandle = ClientEntityList().m_AimEntsList.AddToTail(this);
+	m_AimEntsListHandle = g_EntityList.m_AimEntsList.AddToTail(this);
 }
 
 void C_EngineObjectInternal::RemoveFromAimEntsList()
@@ -8626,7 +8700,7 @@ void C_EngineObjectInternal::RemoveFromAimEntsList()
 		return;
 	}
 
-	unsigned int c = ClientEntityList().m_AimEntsList.Count();
+	unsigned int c = g_EntityList.m_AimEntsList.Count();
 
 	Assert(m_AimEntsListHandle < c);
 
@@ -8635,17 +8709,17 @@ void C_EngineObjectInternal::RemoveFromAimEntsList()
 	if (last == m_AimEntsListHandle)
 	{
 		// Just wipe the final entry
-		ClientEntityList().m_AimEntsList.FastRemove(last);
+		g_EntityList.m_AimEntsList.FastRemove(last);
 	}
 	else
 	{
-		C_EngineObjectInternal* lastEntity = ClientEntityList().m_AimEntsList[last];
+		C_EngineObjectInternal* lastEntity = g_EntityList.m_AimEntsList[last];
 		// Remove the last entry
-		ClientEntityList().m_AimEntsList.FastRemove(last);
+		g_EntityList.m_AimEntsList.FastRemove(last);
 
 		// And update it's handle to point to this slot.
 		lastEntity->m_AimEntsListHandle = m_AimEntsListHandle;
-		ClientEntityList().m_AimEntsList[m_AimEntsListHandle] = lastEntity;
+		g_EntityList.m_AimEntsList[m_AimEntsListHandle] = lastEntity;
 	}
 
 	// Invalidate our handle no matter what.
@@ -8659,7 +8733,7 @@ void C_EngineObjectInternal::AddToClientSideAnimationList()
 		return;
 
 	clientanimating_t list(this, 0);
-	m_ClientSideAnimationListHandle = ClientEntityList().m_ClientSideAnimationList.AddToTail(list);
+	m_ClientSideAnimationListHandle = g_EntityList.m_ClientSideAnimationList.AddToTail(list);
 	ClientSideAnimationChanged();
 
 	UpdateRelevantInterpolatedVars();
@@ -8671,7 +8745,7 @@ void C_EngineObjectInternal::RemoveFromClientSideAnimationList()
 	if (INVALID_CLIENTSIDEANIMATION_LIST_HANDLE == m_ClientSideAnimationListHandle)
 		return;
 
-	unsigned int c = ClientEntityList().m_ClientSideAnimationList.Count();
+	unsigned int c = g_EntityList.m_ClientSideAnimationList.Count();
 
 	Assert(m_ClientSideAnimationListHandle < c);
 
@@ -8680,17 +8754,17 @@ void C_EngineObjectInternal::RemoveFromClientSideAnimationList()
 	if (last == m_ClientSideAnimationListHandle)
 	{
 		// Just wipe the final entry
-		ClientEntityList().m_ClientSideAnimationList.FastRemove(last);
+		g_EntityList.m_ClientSideAnimationList.FastRemove(last);
 	}
 	else
 	{
-		clientanimating_t lastEntry = ClientEntityList().m_ClientSideAnimationList[last];
+		clientanimating_t lastEntry = g_EntityList.m_ClientSideAnimationList[last];
 		// Remove the last entry
-		ClientEntityList().m_ClientSideAnimationList.FastRemove(last);
+		g_EntityList.m_ClientSideAnimationList.FastRemove(last);
 
 		// And update it's handle to point to this slot.
 		lastEntry.pAnimating->m_ClientSideAnimationListHandle = m_ClientSideAnimationListHandle;
-		ClientEntityList().m_ClientSideAnimationList[m_ClientSideAnimationListHandle] = lastEntry;
+		g_EntityList.m_ClientSideAnimationList[m_ClientSideAnimationListHandle] = lastEntry;
 	}
 
 	// Invalidate our handle no matter what.
@@ -8706,7 +8780,7 @@ void C_EngineObjectInternal::ClientSideAnimationChanged()
 
 	MDLCACHE_CRITICAL_SECTION();
 
-	clientanimating_t& anim = ClientEntityList().m_ClientSideAnimationList.Element(m_ClientSideAnimationListHandle);
+	clientanimating_t& anim = g_EntityList.m_ClientSideAnimationList.Element(m_ClientSideAnimationListHandle);
 	Assert(anim.pAnimating == this);
 	anim.flags = m_pOuter->ComputeClientSideAnimationFlags();
 
@@ -8722,7 +8796,7 @@ void C_EngineObjectInternal::ForceClientSideAnimationOn()
 void C_EngineObjectInternal::AddToInterpolationList()
 {
 	if (m_InterpolationListEntry == 0xFFFF)
-		m_InterpolationListEntry = ClientEntityList().m_InterpolationList.AddToTail(this);
+		m_InterpolationListEntry = g_EntityList.m_InterpolationList.AddToTail(this);
 }
 
 
@@ -8730,7 +8804,7 @@ void C_EngineObjectInternal::RemoveFromInterpolationList()
 {
 	if (m_InterpolationListEntry != 0xFFFF)
 	{
-		ClientEntityList().m_InterpolationList.Remove(m_InterpolationListEntry);
+		g_EntityList.m_InterpolationList.Remove(m_InterpolationListEntry);
 		m_InterpolationListEntry = 0xFFFF;
 	}
 }
@@ -8739,7 +8813,7 @@ void C_EngineObjectInternal::RemoveFromInterpolationList()
 void C_EngineObjectInternal::AddToTeleportList()
 {
 	if (m_TeleportListEntry == 0xFFFF)
-		m_TeleportListEntry = ClientEntityList().m_TeleportList.AddToTail(this);
+		m_TeleportListEntry = g_EntityList.m_TeleportList.AddToTail(this);
 }
 
 
@@ -8747,7 +8821,7 @@ void C_EngineObjectInternal::RemoveFromTeleportList()
 {
 	if (m_TeleportListEntry != 0xFFFF)
 	{
-		ClientEntityList().m_TeleportList.Remove(m_TeleportListEntry);
+		g_EntityList.m_TeleportList.Remove(m_TeleportListEntry);
 		m_TeleportListEntry = 0xFFFF;
 	}
 }
@@ -8846,12 +8920,12 @@ C_EnginePortalInternal::C_EnginePortalInternal(IClientEntityList* pClientEntityL
 	m_iPortalSimulatorGUID = s_iPortalSimulatorGUIDAllocator++;
 	m_bActivated = false;
 	m_bIsPortal2 = false;
-	ClientEntityList().m_ActivePortals.AddToTail(this);
+	g_EntityList.m_ActivePortals.AddToTail(this);
 }
 
 C_EnginePortalInternal::~C_EnginePortalInternal() 
 {
-	ClientEntityList().m_ActivePortals.FindAndRemove(this); //also removed in UpdateOnRemove()	
+	g_EntityList.m_ActivePortals.FindAndRemove(this); //also removed in UpdateOnRemove()	
 }
 
 void C_EnginePortalInternal::VPhysicsDestroyObject(void)
@@ -9013,7 +9087,7 @@ bool C_EnginePortalInternal::EntityIsInPortalHole(IEngineObjectClient* pEntity) 
 
 			for (int i = 0; i != pVCollide->solidCount; ++i)
 			{
-				ClientEntityList().PhysGetCollision()->TraceCollide(ptEntityPosition, ptEntityPosition, pVCollide->solids[i], qEntityAngles, m_InternalData.Placement.pHoleShapeCollideable, vec3_origin, vec3_angle, &Trace);
+				g_EntityList.PhysGetCollision()->TraceCollide(ptEntityPosition, ptEntityPosition, pVCollide->solids[i], qEntityAngles, m_InternalData.Placement.pHoleShapeCollideable, vec3_origin, vec3_angle, &Trace);
 
 				if (Trace.startsolid)
 					return true;
@@ -9027,7 +9101,7 @@ bool C_EnginePortalInternal::EntityIsInPortalHole(IEngineObjectClient* pEntity) 
 			ptCenter = (vMins + vMaxs) * 0.5f;
 			vMins -= ptCenter;
 			vMaxs -= ptCenter;
-			ClientEntityList().PhysGetCollision()->TraceBox(ptCenter, ptCenter, vMins, vMaxs, m_InternalData.Placement.pHoleShapeCollideable, vec3_origin, vec3_angle, &Trace);
+			g_EntityList.PhysGetCollision()->TraceBox(ptCenter, ptCenter, vMins, vMaxs, m_InternalData.Placement.pHoleShapeCollideable, vec3_origin, vec3_angle, &Trace);
 
 			return Trace.startsolid;
 		}
@@ -9036,7 +9110,7 @@ bool C_EnginePortalInternal::EntityIsInPortalHole(IEngineObjectClient* pEntity) 
 
 	case SOLID_BBOX:
 	{
-		ClientEntityList().PhysGetCollision()->TraceBox(pEntity->GetAbsOrigin(), pEntity->GetAbsOrigin(),
+		g_EntityList.PhysGetCollision()->TraceBox(pEntity->GetAbsOrigin(), pEntity->GetAbsOrigin(),
 			pEntity->OBBMins(), pEntity->OBBMaxs(),
 			m_InternalData.Placement.pHoleShapeCollideable, vec3_origin, vec3_angle, &Trace);
 
@@ -9134,7 +9208,7 @@ bool C_EnginePortalInternal::EntityHitBoxExtentIsInPortalHole(IEngineObjectClien
 	vMaxExtent -= ptCenter;
 
 	trace_t Trace;
-	ClientEntityList().PhysGetCollision()->TraceBox(ptCenter, ptCenter, vMinExtent, vMaxExtent, m_InternalData.Placement.pHoleShapeCollideable, vec3_origin, vec3_angle, &Trace);
+	g_EntityList.PhysGetCollision()->TraceBox(ptCenter, ptCenter, vMinExtent, vMaxExtent, m_InternalData.Placement.pHoleShapeCollideable, vec3_origin, vec3_angle, &Trace);
 
 	if (Trace.startsolid)
 		return true;
@@ -9145,7 +9219,7 @@ bool C_EnginePortalInternal::EntityHitBoxExtentIsInPortalHole(IEngineObjectClien
 bool C_EnginePortalInternal::RayIsInPortalHole(const Ray_t& ray) const //traces a ray against the same detector for EntityIsInPortalHole(), bias is towards false positives
 {
 	trace_t Trace;
-	ClientEntityList().PhysGetCollision()->TraceBox(ray, m_InternalData.Placement.pHoleShapeCollideable, vec3_origin, vec3_angle, &Trace);
+	g_EntityList.PhysGetCollision()->TraceBox(ray, m_InternalData.Placement.pHoleShapeCollideable, vec3_origin, vec3_angle, &Trace);
 	return Trace.DidHit();
 }
 
@@ -9153,7 +9227,7 @@ bool C_EnginePortalInternal::TraceWorldBrushes(const Ray_t& ray, trace_t* pTrace
 {
 	if (m_DataAccess.Simulation.Static.World.Brushes.pCollideable && sv_portal_trace_vs_world.GetBool())
 	{
-		ClientEntityList().PhysGetCollision()->TraceBox(ray, m_DataAccess.Simulation.Static.World.Brushes.pCollideable, vec3_origin, vec3_angle, pTrace);
+		g_EntityList.PhysGetCollision()->TraceBox(ray, m_DataAccess.Simulation.Static.World.Brushes.pCollideable, vec3_origin, vec3_angle, pTrace);
 		return true;
 	}
 	return false;
@@ -9163,7 +9237,7 @@ bool C_EnginePortalInternal::TraceWallTube(const Ray_t& ray, trace_t* pTrace) co
 {
 	if (m_DataAccess.Simulation.Static.Wall.Local.Tube.pCollideable && sv_portal_trace_vs_holywall.GetBool())
 	{
-		ClientEntityList().PhysGetCollision()->TraceBox(ray, m_DataAccess.Simulation.Static.Wall.Local.Tube.pCollideable, vec3_origin, vec3_angle, pTrace);
+		g_EntityList.PhysGetCollision()->TraceBox(ray, m_DataAccess.Simulation.Static.Wall.Local.Tube.pCollideable, vec3_origin, vec3_angle, pTrace);
 		return true;
 	}
 	return false;
@@ -9173,7 +9247,7 @@ bool C_EnginePortalInternal::TraceWallBrushes(const Ray_t& ray, trace_t* pTrace)
 {
 	if (m_DataAccess.Simulation.Static.Wall.Local.Brushes.pCollideable && sv_portal_trace_vs_holywall.GetBool())
 	{
-		ClientEntityList().PhysGetCollision()->TraceBox(ray, m_DataAccess.Simulation.Static.Wall.Local.Brushes.pCollideable, vec3_origin, vec3_angle, pTrace);
+		g_EntityList.PhysGetCollision()->TraceBox(ray, m_DataAccess.Simulation.Static.Wall.Local.Brushes.pCollideable, vec3_origin, vec3_angle, pTrace);
 		return true;
 	}
 	return false;
@@ -9184,7 +9258,7 @@ bool C_EnginePortalInternal::TraceTransformedWorldBrushes(const IEnginePortalCli
 	const C_EnginePortalInternal* pRemotePortalInternal = dynamic_cast<const C_EnginePortalInternal*>(pRemoteCollisionEntity);
 	if (pRemotePortalInternal->m_DataAccess.Simulation.Static.World.Brushes.pCollideable && sv_portal_trace_vs_world.GetBool())
 	{
-		ClientEntityList().PhysGetCollision()->TraceBox(ray, pRemotePortalInternal->m_DataAccess.Simulation.Static.World.Brushes.pCollideable, m_DataAccess.Placement.ptaap_LinkedToThis.ptOriginTransform, m_DataAccess.Placement.ptaap_LinkedToThis.qAngleTransform, pTrace);
+		g_EntityList.PhysGetCollision()->TraceBox(ray, pRemotePortalInternal->m_DataAccess.Simulation.Static.World.Brushes.pCollideable, m_DataAccess.Placement.ptaap_LinkedToThis.ptOriginTransform, m_DataAccess.Placement.ptaap_LinkedToThis.qAngleTransform, pTrace);
 		return true;
 	}
 	return false;
@@ -9415,7 +9489,7 @@ void C_EnginePortalInternal::TraceRay(const Ray_t& ray, unsigned int fMask, ITra
 						const PS_SD_Static_World_StaticProps_ClippedProp_t* pCurrentProp = GetStaticProps(iIndex);
 						if ((!bFilterStaticProps) || pTraceFilter->ShouldHitEntity(pCurrentProp->pSourceProp, fMask))
 						{
-							EntityList()->PhysGetCollision()->TraceBox(ray, pCurrentProp->pCollide, vTransform, qTransform, &TempTrace);
+							g_EntityList.PhysGetCollision()->TraceBox(ray, pCurrentProp->pCollide, vTransform, qTransform, &TempTrace);
 							if ((TempTrace.fraction < pTrace->fraction))
 							{
 								*pTrace = TempTrace;
@@ -9449,7 +9523,7 @@ void C_EnginePortalInternal::TraceRay(const Ray_t& ray, unsigned int fMask, ITra
 							const PS_SD_Static_World_StaticProps_ClippedProp_t* pCurrentProp = pLinkedPortalSimulator->GetStaticProps(iIndex);
 							if ((!bFilterStaticProps) || pTraceFilter->ShouldHitEntity(pCurrentProp->pSourceProp, fMask))
 							{
-								EntityList()->PhysGetCollision()->TraceBox(ray, pCurrentProp->pCollide, vTransform, qTransform, &TempTrace);
+								g_EntityList.PhysGetCollision()->TraceBox(ray, pCurrentProp->pCollide, vTransform, qTransform, &TempTrace);
 								if ((TempTrace.fraction < pTrace->fraction))
 								{
 									*pTrace = TempTrace;
@@ -9614,7 +9688,7 @@ void C_EnginePortalInternal::TraceEntity(C_BaseEntity* pEntity, const Vector& ve
 							//physcollision->TraceCollide( vecAbsStart, vecAbsEnd, pCollision, qCollisionAngles,
 							//							pCurrentProp->pCollide, vTransform, qTransform, &tempTrace );
 
-							EntityList()->PhysGetCollision()->TraceBox(entRay, MASK_ALL, NULL, pCurrentProp->pCollide, vTransform, qTransform, &tempTrace);
+							g_EntityList.PhysGetCollision()->TraceBox(entRay, MASK_ALL, NULL, pCurrentProp->pCollide, vTransform, qTransform, &tempTrace);
 
 							if (tempTrace.startsolid || (tempTrace.fraction < pTrace->fraction))
 							{
@@ -9773,7 +9847,7 @@ IPhysicsEnvironment* C_EnginePortalInternal::GetPhysicsEnvironment()
 
 void C_EnginePortalInternal::CreatePhysicsEnvironment()
 {
-	m_pPhysicsEnvironment = ClientEntityList().PhysGetEnv();
+	m_pPhysicsEnvironment = g_EntityList.PhysGetEnv();
 //#ifdef PORTAL
 //	pPhysicsEnvironment = physenv_main;
 //#endif
@@ -10111,11 +10185,11 @@ void CStaticCollisionPolyhedronCache::Update(void)
 					for (int i = 0; i != pCollide->solidCount; ++i)
 					{
 						CPhysConvex* ConvexesArray[1024];
-						int iConvexes = ClientEntityList().PhysGetCollision()->GetConvexesUsedInCollideable(pCollide->solids[i], ConvexesArray, 1024);
+						int iConvexes = g_EntityList.PhysGetCollision()->GetConvexesUsedInCollideable(pCollide->solids[i], ConvexesArray, 1024);
 
 						for (int j = 0; j != iConvexes; ++j)
 						{
-							CPolyhedron* pTempPolyhedron = ClientEntityList().PhysGetCollision()->PolyhedronFromConvex(ConvexesArray[j], true);
+							CPolyhedron* pTempPolyhedron = g_EntityList.PhysGetCollision()->PolyhedronFromConvex(ConvexesArray[j], true);
 							if (pTempPolyhedron)
 							{
 								for (int iPointCounter = 0; iPointCounter != pTempPolyhedron->iVertexCount; ++iPointCounter)
@@ -10172,11 +10246,11 @@ void CStaticCollisionPolyhedronCache::Update(void)
 								m_StaticPropPolyhedrons.AddToTail(pWorkSpacePolyhedron);
 
 #ifdef _DEBUG
-								CPhysConvex* pConvex = ClientEntityList().PhysGetCollision()->ConvexFromConvexPolyhedron(*pTempPolyhedron);
+								CPhysConvex* pConvex = g_EntityList.PhysGetCollision()->ConvexFromConvexPolyhedron(*pTempPolyhedron);
 								AssertMsg(pConvex != NULL, "Conversion from Convex to Polyhedron was unreversable");
 								if (pConvex)
 								{
-									ClientEntityList().PhysGetCollision()->ConvexFree(pConvex);
+									g_EntityList.PhysGetCollision()->ConvexFree(pConvex);
 								}
 #endif
 
@@ -10452,7 +10526,7 @@ void C_EnginePortalInternal::CreatePolyhedrons(void)
 						IStudioHdr* pStudioHdr = modelinfo->GetStudiomodel(pModel);
 						Assert(pStudioHdr != NULL);
 						NewEntry.iTraceContents = pStudioHdr->contents();
-						NewEntry.iTraceSurfaceProps = EntityList()->PhysGetProps()->GetSurfaceIndex(pStudioHdr->pszSurfaceProp());
+						NewEntry.iTraceSurfaceProps = g_EntityList.PhysGetProps()->GetSurfaceIndex(pStudioHdr->pszSurfaceProp());
 					}
 					else
 					{
@@ -10754,7 +10828,7 @@ static CPhysCollide* ConvertPolyhedronsToCollideable(CPolyhedron** pPolyhedrons,
 	STARTDEBUGTIMER(convexTimer);
 	for (int i = 0; i != iPolyhedronCount; ++i)
 	{
-		pConvexes[iConvexCount] = ClientEntityList().PhysGetCollision()->ConvexFromConvexPolyhedron(*pPolyhedrons[i]);
+		pConvexes[iConvexCount] = g_EntityList.PhysGetCollision()->ConvexFromConvexPolyhedron(*pPolyhedrons[i]);
 
 		Assert(pConvexes[iConvexCount] != NULL);
 
@@ -10770,7 +10844,7 @@ static CPhysCollide* ConvertPolyhedronsToCollideable(CPolyhedron** pPolyhedrons,
 	{
 		CREATEDEBUGTIMER(collideTimer);
 		STARTDEBUGTIMER(collideTimer);
-		pReturn = ClientEntityList().PhysGetCollision()->ConvertConvexToCollide(pConvexes, iConvexCount);
+		pReturn = g_EntityList.PhysGetCollision()->ConvertConvexToCollide(pConvexes, iConvexCount);
 		STOPDEBUGTIMER(collideTimer);
 		DEBUGTIMERONLY(DevMsg(2, "[PSDT:%d] %sCollideable Generation:%fms\n", s_iPortalSimulatorGUID, TABSPACING, collideTimer.GetDuration().GetMillisecondsF()); );
 	}
@@ -10854,7 +10928,7 @@ void C_EnginePortalInternal::CreateLocalCollision(void)
 		{
 			m_InternalData.Simulation.Static.SurfaceProperties.contents = Trace.contents;
 			m_InternalData.Simulation.Static.SurfaceProperties.surface = Trace.surface;
-			m_InternalData.Simulation.Static.SurfaceProperties.pEntity = (C_BaseEntity*)Trace.m_pEnt;
+			m_InternalData.Simulation.Static.SurfaceProperties.pEntity = Trace.m_pEnt;
 		}
 		else
 		{
@@ -10865,7 +10939,7 @@ void C_EnginePortalInternal::CreateLocalCollision(void)
 #ifndef CLIENT_DLL
 			m_InternalData.Simulation.Static.SurfaceProperties.pEntity = gEntList.GetBaseEntity(0);
 #else
-			m_InternalData.Simulation.Static.SurfaceProperties.pEntity = ClientEntityList().GetBaseEntity(0);
+			m_InternalData.Simulation.Static.SurfaceProperties.pEntity = g_EntityList.GetBaseEntity(0);
 #endif
 		}
 
@@ -10880,19 +10954,19 @@ void C_EnginePortalInternal::ClearLocalCollision(void)
 {
 	if (m_InternalData.Simulation.Static.Wall.Local.Brushes.pCollideable)
 	{
-		ClientEntityList().PhysGetCollision()->DestroyCollide(m_InternalData.Simulation.Static.Wall.Local.Brushes.pCollideable);
+		g_EntityList.PhysGetCollision()->DestroyCollide(m_InternalData.Simulation.Static.Wall.Local.Brushes.pCollideable);
 		m_InternalData.Simulation.Static.Wall.Local.Brushes.pCollideable = NULL;
 	}
 
 	if (m_InternalData.Simulation.Static.Wall.Local.Tube.pCollideable)
 	{
-		ClientEntityList().PhysGetCollision()->DestroyCollide(m_InternalData.Simulation.Static.Wall.Local.Tube.pCollideable);
+		g_EntityList.PhysGetCollision()->DestroyCollide(m_InternalData.Simulation.Static.Wall.Local.Tube.pCollideable);
 		m_InternalData.Simulation.Static.Wall.Local.Tube.pCollideable = NULL;
 	}
 
 	if (m_InternalData.Simulation.Static.World.Brushes.pCollideable)
 	{
-		ClientEntityList().PhysGetCollision()->DestroyCollide(m_InternalData.Simulation.Static.World.Brushes.pCollideable);
+		g_EntityList.PhysGetCollision()->DestroyCollide(m_InternalData.Simulation.Static.World.Brushes.pCollideable);
 		m_InternalData.Simulation.Static.World.Brushes.pCollideable = NULL;
 	}
 
@@ -10904,7 +10978,7 @@ void C_EnginePortalInternal::ClearLocalCollision(void)
 			PS_SD_Static_World_StaticProps_ClippedProp_t& Representation = m_InternalData.Simulation.Static.World.StaticProps.ClippedRepresentations[i];
 			if (Representation.pCollide)
 			{
-				ClientEntityList().PhysGetCollision()->DestroyCollide(Representation.pCollide);
+				g_EntityList.PhysGetCollision()->DestroyCollide(Representation.pCollide);
 				Representation.pCollide = NULL;
 			}
 		}
@@ -10914,8 +10988,8 @@ void C_EnginePortalInternal::ClearLocalCollision(void)
 
 void C_EnginePortalInternal::CreateLocalPhysics(void)
 {
-	//int iDefaultSurfaceIndex = EntityList()->PhysGetProps()->GetSurfaceIndex( "default" );
-	objectparams_t params = ClientEntityList().PhysGetDefaultObjectParams();
+	//int iDefaultSurfaceIndex = g_EntityList.PhysGetProps()->GetSurfaceIndex( "default" );
+	objectparams_t params = g_EntityList.PhysGetDefaultObjectParams();
 
 	// Any non-moving object can point to world safely-- Make sure we dont use 'params' for something other than that beyond this point.
 	//if( m_InternalData.Simulation.pCollisionEntity )
@@ -10990,8 +11064,8 @@ void C_EnginePortalInternal::CreateLocalPhysics(void)
 void C_EnginePortalInternal::CreateLinkedPhysics(IEnginePortalClient* pRemoteCollisionEntity)
 {
 	C_EnginePortalInternal* pRemotePortalInternal = dynamic_cast<C_EnginePortalInternal*>(pRemoteCollisionEntity);
-	//int iDefaultSurfaceIndex = EntityList()->PhysGetProps()->GetSurfaceIndex( "default" );
-	objectparams_t params = ClientEntityList().PhysGetDefaultObjectParams();
+	//int iDefaultSurfaceIndex = g_EntityList.PhysGetProps()->GetSurfaceIndex( "default" );
+	objectparams_t params = g_EntityList.PhysGetDefaultObjectParams();
 
 	//if( pCollisionEntity )
 	params.pGameData = this->m_pOuter;
@@ -11087,7 +11161,7 @@ void C_EnginePortalInternal::CreateHoleShapeCollideable()
 	//update hole shape - used to detect if an entity is within the portal hole bounds
 	{
 		if (m_InternalData.Placement.pHoleShapeCollideable)
-			ClientEntityList().PhysGetCollision()->DestroyCollide(m_InternalData.Placement.pHoleShapeCollideable);
+			g_EntityList.PhysGetCollision()->DestroyCollide(m_InternalData.Placement.pHoleShapeCollideable);
 
 		float fHolePlanes[6 * 4];
 
@@ -11128,17 +11202,17 @@ void C_EnginePortalInternal::CreateHoleShapeCollideable()
 
 		CPolyhedron* pPolyhedron = GeneratePolyhedronFromPlanes(fHolePlanes, 6, PORTAL_POLYHEDRON_CUT_EPSILON, true);
 		Assert(pPolyhedron != NULL);
-		CPhysConvex* pConvex = ClientEntityList().PhysGetCollision()->ConvexFromConvexPolyhedron(*pPolyhedron);
+		CPhysConvex* pConvex = g_EntityList.PhysGetCollision()->ConvexFromConvexPolyhedron(*pPolyhedron);
 		pPolyhedron->Release();
 		Assert(pConvex != NULL);
-		m_InternalData.Placement.pHoleShapeCollideable = ClientEntityList().PhysGetCollision()->ConvertConvexToCollide(&pConvex, 1);
+		m_InternalData.Placement.pHoleShapeCollideable = g_EntityList.PhysGetCollision()->ConvertConvexToCollide(&pConvex, 1);
 	}
 }
 
 void C_EnginePortalInternal::ClearHoleShapeCollideable()
 {
 	if (m_InternalData.Placement.pHoleShapeCollideable) {
-		ClientEntityList().PhysGetCollision()->DestroyCollide(m_InternalData.Placement.pHoleShapeCollideable);
+		g_EntityList.PhysGetCollision()->DestroyCollide(m_InternalData.Placement.pHoleShapeCollideable);
 		m_InternalData.Placement.pHoleShapeCollideable = NULL;
 	}
 }
@@ -12696,7 +12770,7 @@ bool C_EngineRopeInternal::GetEndPointAttachment(int iPt, Vector& vPos, QAngle& 
 
 void C_EngineRopeInternal::AddToRenderCache()
 {
-	RopeManager()->AddToRenderCache(this);
+	s_RopeManager.AddToRenderCache(this);
 }
 
 void C_EngineRopeInternal::RopeThink()
@@ -13135,17 +13209,17 @@ bool PVSNotifierMap_LessFunc( IClientUnknown* const &a, IClientUnknown* const &b
 //
 //void C_AllBaseEntityIterator::Restart()
 //{
-//	m_CurBaseEntity = ClientEntityList().m_BaseEntities.Head();
+//	m_CurBaseEntity = g_EntityList.m_BaseEntities.Head();
 //}
 //
 //	
 //C_BaseEntity* C_AllBaseEntityIterator::Next()
 //{
-//	if ( m_CurBaseEntity == ClientEntityList().m_BaseEntities.InvalidIndex() )
+//	if ( m_CurBaseEntity == g_EntityList.m_BaseEntities.InvalidIndex() )
 //		return NULL;
 //
-//	C_BaseEntity *pRet = ClientEntityList().m_BaseEntities[m_CurBaseEntity];
-//	m_CurBaseEntity = ClientEntityList().m_BaseEntities.Next( m_CurBaseEntity );
+//	C_BaseEntity *pRet = g_EntityList.m_BaseEntities[m_CurBaseEntity];
+//	m_CurBaseEntity = g_EntityList.m_BaseEntities.Next( m_CurBaseEntity );
 //	return pRet;
 //}
 
@@ -13217,42 +13291,6 @@ bool ShouldRemoveThisRagdoll(C_BaseEntity* pRagdoll)
 	return false;
 }
 
-
-// -------------------------------------------------------------------------------------------------- //
-// C_BaseEntityIterator
-// -------------------------------------------------------------------------------------------------- //
-C_BaseEntityIterator::C_BaseEntityIterator()
-{
-	Restart();
-}
-
-void C_BaseEntityIterator::Restart()
-{
-	start = false;
-	m_CurBaseEntity.Term();
-}
-
-C_BaseEntity* C_BaseEntityIterator::Next()
-{
-	while (!start || m_CurBaseEntity.IsValid()) {
-		if (!start) {
-			start = true;
-			m_CurBaseEntity = ClientEntityList().FirstHandle();
-		}
-		else {
-			m_CurBaseEntity = ClientEntityList().NextHandle(m_CurBaseEntity);
-		}
-		if (!m_CurBaseEntity.IsValid()) {
-			break;
-		}
-		C_BaseEntity* pRet = ClientEntityList().GetBaseEntityFromHandle(m_CurBaseEntity);
-		if (!pRet->IsDormant())
-			return pRet;
-	}
-
-	return NULL;
-}
-
 // One hook to rule them all...
 // Since most of the little list managers in here only need one or two of the game
 // system callbacks, this hook is a game system that passes them the appropriate callbacks
@@ -13278,15 +13316,101 @@ public:
 
 	void Update(float frametime) 
 	{
-		ClientEntityList().UpdateRagdolls(frametime);
+		g_EntityList.UpdateRagdolls(frametime);
 	}
 
 	void FrameUpdatePostEntityThink()
 	{
 		//This is pretty hacky, it's only called on the server so it just calls the update method.
-		ClientEntityList().UpdateRagdolls(0);
+		g_EntityList.UpdateRagdolls(0);
 	}
 
 };
 
 static CEntityListSystem g_EntityListSystem("CEntityListSystem");
+
+struct watcher_t
+{
+	EHANDLE				hWatcher;
+	IWatcherCallback* pWatcherCallback;
+};
+
+static CUtlMultiList<watcher_t, unsigned short>	g_WatcherList;
+
+void C_WatcherList::Init()
+{
+	m_list = g_WatcherList.CreateList();
+}
+
+C_WatcherList::~C_WatcherList()
+{
+	g_WatcherList.DestroyList(m_list);
+}
+
+int C_WatcherList::GetCallbackObjects(IWatcherCallback** pList, int listMax)
+{
+	int index = 0;
+	unsigned short next = g_WatcherList.InvalidIndex();
+	for (unsigned short node = g_WatcherList.Head(m_list); node != g_WatcherList.InvalidIndex(); node = next)
+	{
+		next = g_WatcherList.Next(node);
+		watcher_t* pNode = &g_WatcherList.Element(node);
+		if (pNode->hWatcher.Get())
+		{
+			pList[index] = pNode->pWatcherCallback;
+			index++;
+			if (index >= listMax)
+			{
+				Assert(0);
+				return index;
+			}
+		}
+		else
+		{
+			g_WatcherList.Remove(m_list, node);
+		}
+	}
+	return index;
+}
+
+unsigned short C_WatcherList::Find(IHandleEntity* pEntity)
+{
+	unsigned short next = g_WatcherList.InvalidIndex();
+	for (unsigned short node = g_WatcherList.Head(m_list); node != g_WatcherList.InvalidIndex(); node = next)
+	{
+		next = g_WatcherList.Next(node);
+		watcher_t* pNode = &g_WatcherList.Element(node);
+		if (pNode->hWatcher.Get() == pEntity)
+		{
+			return node;
+		}
+	}
+	return g_WatcherList.InvalidIndex();
+}
+
+void C_WatcherList::RemoveWatcher(IHandleEntity* pEntity)
+{
+	unsigned short node = Find(pEntity);
+	if (node != g_WatcherList.InvalidIndex())
+	{
+		g_WatcherList.Remove(m_list, node);
+	}
+}
+
+
+void C_WatcherList::AddToList(IHandleEntity* pWatcher)
+{
+	unsigned short node = Find(pWatcher);
+	if (node == g_WatcherList.InvalidIndex())
+	{
+		watcher_t watcher;
+		watcher.hWatcher = pWatcher->GetRefEHandle();
+		// save this separately so we can use the EHANDLE to test for deletion
+		watcher.pWatcherCallback = dynamic_cast<IWatcherCallback*> (pWatcher);
+
+		if (watcher.pWatcherCallback)
+		{
+			g_WatcherList.AddToTail(m_list, watcher);
+		}
+	}
+}

@@ -117,7 +117,7 @@ bool CHudZoom::ShouldDraw( void )
 {
 	bool bNeedsDraw = false;
 
-	C_BaseHLPlayer *pPlayer = dynamic_cast<C_BaseHLPlayer *>(ClientEntityList().GetLocalPlayer());
+	C_BaseHLPlayer *pPlayer = dynamic_cast<C_BaseHLPlayer *>(EntityList()->GetLocalPlayer());
 	if ( pPlayer == NULL )
 		return false;
 
@@ -144,7 +144,7 @@ void CHudZoom::Paint( void )
 	m_bPainted = false;
 
 	// see if we're zoomed any
-	C_BaseHLPlayer *pPlayer = dynamic_cast<C_BaseHLPlayer *>(ClientEntityList().GetLocalPlayer());
+	C_BaseHLPlayer *pPlayer = dynamic_cast<C_BaseHLPlayer *>(EntityList()->GetLocalPlayer());
 	if ( pPlayer == NULL )
 		return;
 

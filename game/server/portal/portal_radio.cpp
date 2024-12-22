@@ -84,7 +84,7 @@ public:
 	virtual void Spawn();
 	virtual void Precache();
 	virtual QAngle PreferredCarryAngles( void ) { return QAngle( 0, 180, 0 ); }
-	virtual bool HasPreferredCarryAnglesForPlayer( CBasePlayer *pPlayer ) { return true; }
+	virtual bool HasPreferredCarryAnglesForPlayer( CBaseEntity *pPlayer ) { return true; }
 	virtual void Activate();
 
 

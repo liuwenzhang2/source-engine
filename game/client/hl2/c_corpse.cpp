@@ -42,7 +42,7 @@ int C_Corpse::DrawModel( int flags )
 		return 0;
 
 	// get copy of player
-	C_BasePlayer *player = dynamic_cast< C_BasePlayer *>( cl_entitylist->GetEnt( m_nReferencePlayer ) );
+	C_BasePlayer *player = dynamic_cast< C_BasePlayer *>( EntityList()->GetEnt( m_nReferencePlayer ) );
 	if ( player )
 	{
 		Vector zero;

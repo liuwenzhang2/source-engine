@@ -438,7 +438,7 @@ int	C_StriderFX::DrawModel( int )
 	if ( !m_active )
 		return 1;
 
-	C_BaseEntity *ent = cl_entitylist->GetEnt( m_entityIndex );
+	C_BaseEntity *ent = EntityList()->GetEnt( m_entityIndex );
 	if ( ent )
 	{
 		QAngle angles;
@@ -707,7 +707,7 @@ void C_Strider::ClientThink()
 	// which causes IK to trigger, which causes raycasts against the other entities to occur,
 	// which is illegal to do while in the Relink phase.
 
-	ComputeEntitySpaceHitboxSurroundingBox( &m_vecRenderMins, &m_vecRenderMaxs );
+	GetEngineObject()->ComputeEntitySpaceHitboxSurroundingBox( &m_vecRenderMins, &m_vecRenderMaxs );
 	// UNDONE: Disabled this until we can get closer to a final map and tune
 #if 0
 	// Cut ropes.
@@ -929,7 +929,7 @@ void MuzzleFlash_Strider( C_BaseEntity* hEntity, int attachmentIndex )
 	Vector		origin;
 	MatrixGetColumn( matAttachment, 3, &origin );
 
-	int entityIndex = hEntity->entindex();// ClientEntityList().HandleToEntIndex(hEntity);
+	int entityIndex = hEntity->entindex();
 	if ( entityIndex >= 0 )
 	{
 		dlight_t *el = effects->CL_AllocElight( LIGHT_INDEX_MUZZLEFLASH + entityIndex );

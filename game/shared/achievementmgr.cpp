@@ -1460,8 +1460,8 @@ void CAchievementMgr::FireGameEvent( IGameEvent *event )
 #ifdef CLIENT_DLL
 	else if ( 0 == Q_strcmp( name, "player_death" ) )
 	{
-		CBaseEntity *pVictim = ClientEntityList().GetEnt( engine->GetPlayerForUserID( event->GetInt("userid") ) );
-		CBaseEntity *pAttacker = ClientEntityList().GetEnt( engine->GetPlayerForUserID( event->GetInt("attacker") ) );
+		CBaseEntity *pVictim = EntityList()->GetEnt( engine->GetPlayerForUserID( event->GetInt("userid") ) );
+		CBaseEntity *pAttacker = EntityList()->GetEnt( engine->GetPlayerForUserID( event->GetInt("attacker") ) );
 		OnKillEvent( pVictim, pAttacker, NULL, event );
 	}
 	else if ( 0 == Q_strcmp( name, "localplayer_changeclass" ) )
@@ -1472,7 +1472,7 @@ void CAchievementMgr::FireGameEvent( IGameEvent *event )
 	else if ( 0 == Q_strcmp( name, "localplayer_changeteam" ) )
 	{
 		// keep track of the time of transitions to and from a game team
-		C_BasePlayer *pLocalPlayer = (C_BasePlayer*)ClientEntityList().GetLocalPlayer();
+		C_BasePlayer *pLocalPlayer = (C_BasePlayer*)EntityList()->GetLocalPlayer();
 		if ( pLocalPlayer )
 		{
 			int iTeam = pLocalPlayer->GetTeamNumber();
@@ -1549,7 +1549,7 @@ void CAchievementMgr::OnKillEvent( CBaseEntity *pVictim, CBaseEntity *pAttacker,
 		}
 	}
 #else
-	C_BasePlayer *pLocalPlayer = (C_BasePlayer*)ClientEntityList().GetLocalPlayer();
+	C_BasePlayer *pLocalPlayer = (C_BasePlayer*)EntityList()->GetLocalPlayer();
 	bVictimIsPlayerEnemy = !pLocalPlayer->InSameTeam( pVictim );
 	if ( pAttacker == pLocalPlayer )
 	{
@@ -1733,7 +1733,7 @@ void CAchievementMgr::Steam_OnUserStatsStored( UserStatsStored_t *pUserStatsStor
 			// send a message to the server about our achievement
 			if ( g_pGameRules && g_pGameRules->IsMultiplayer() )
 			{
-				C_BasePlayer *pLocalPlayer = (C_BasePlayer*)ClientEntityList().GetLocalPlayer();
+				C_BasePlayer *pLocalPlayer = (C_BasePlayer*)EntityList()->GetLocalPlayer();
 				if ( pLocalPlayer )
 				{
 					int nAchievementID = m_AchievementsAwarded[0];

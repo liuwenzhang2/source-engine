@@ -226,7 +226,7 @@ public:
 	void		 SetExplodeOnContact( bool bExplode ) { m_bExplodeOnContact = bExplode; }
 
 	virtual QAngle PreferredCarryAngles( void ) { return QAngle( -12, 98, 55 ); }
-	virtual bool HasPreferredCarryAnglesForPlayer( CBasePlayer *pPlayer ) { return true; }
+	virtual bool HasPreferredCarryAnglesForPlayer( CBaseEntity *pPlayer ) { return true; }
 
 	float GetBombLifetime();
 
@@ -1207,7 +1207,7 @@ void CNPC_AttackHelicopter::SpotlightStartup()
 
 	Vector vecForward;
 	Vector vecOrigin;
-	GetAttachment( m_nSpotlightAttachment, vecOrigin, &vecForward );
+	GetEngineObject()->GetAttachment( m_nSpotlightAttachment, vecOrigin, &vecForward );
 	m_Spotlight.SpotlightCreate( m_nSpotlightAttachment, vecForward );
 	SpotlightThink();
 }
@@ -1245,7 +1245,7 @@ void CNPC_AttackHelicopter::SpotlightThink()
 				{
 					Vector vecForward;
 					Vector vecOrigin;
-					GetAttachment( m_nSpotlightAttachment, vecOrigin, &vecForward );
+					GetEngineObject()->GetAttachment( m_nSpotlightAttachment, vecOrigin, &vecForward );
 					m_Spotlight.SetSpotlightTargetDirection( vecForward );
 				}
 				break;
@@ -2826,7 +2826,7 @@ void CNPC_AttackHelicopter::CreateBomb( bool bCheckForFairness, Vector *pVecVelo
 		return;
 
 	Vector vTipPos;
-	GetAttachment( m_nBombAttachment, vTipPos );
+	GetEngineObject()->GetAttachment( m_nBombAttachment, vTipPos );
 
 	if ( !CBombSuppressor::CanBomb( vTipPos ) )
 		return;
@@ -2914,7 +2914,7 @@ void CNPC_AttackHelicopter::InputDropBombStraightDown( inputdata_t &inputdata )
 	m_flInputDropBombTime = gpGlobals->curtime + 0.01f;
 
 	Vector vTipPos;
-	GetAttachment( m_nBombAttachment, vTipPos );
+	GetEngineObject()->GetAttachment( m_nBombAttachment, vTipPos );
 
 	// Make the bomb drop straight down
 	SpawnBombEntity( vTipPos, vec3_origin );
@@ -2948,7 +2948,7 @@ void CNPC_AttackHelicopter::InputDropBombAtTargetInternal( inputdata_t &inputdat
 	}
 
 	Vector vTipPos;
-	GetAttachment( m_nBombAttachment, vTipPos );
+	GetEngineObject()->GetAttachment( m_nBombAttachment, vTipPos );
 
 	// Compute the time it would take to fall to the target
 	Vector vecTarget = pBombEnt->BodyTarget(GetEngineObject()->GetAbsOrigin(), false );
@@ -3242,7 +3242,7 @@ bool CNPC_AttackHelicopter::FireGun( void )
 
 	// Get gun attachment points
 	Vector vBasePos;
-	GetAttachment( m_nGunBaseAttachment, vBasePos );
+	GetEngineObject()->GetAttachment( m_nGunBaseAttachment, vBasePos );
 
 	// Aim perfectly while idle, but after charging, the gun don't move so fast.
 	Vector vecFireAtPosition;
@@ -3270,7 +3270,7 @@ bool CNPC_AttackHelicopter::FireGun( void )
 	}
 
 	Vector vTipPos;
-	GetAttachment( m_nGunTipAttachment, vTipPos );
+	GetEngineObject()->GetAttachment( m_nGunTipAttachment, vTipPos );
 
 	Vector vGunDir = vTipPos - vBasePos;
 	VectorNormalize( vGunDir );

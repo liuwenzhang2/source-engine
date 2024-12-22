@@ -584,7 +584,7 @@ void CNPC_Dog::PullObject( bool bMantain )
 	CreateBeams();
 
 	Vector vGunPos;
-	GetAttachment( m_iPhysGunAttachment, vGunPos );
+	GetEngineObject()->GetAttachment( m_iPhysGunAttachment, vGunPos );
 	float flDistance = ( vGunPos - m_hPhysicsEnt->WorldSpaceCenter() ).Length();
 
 	if ( bMantain == false )
@@ -1386,7 +1386,7 @@ void CNPC_Dog::RunTask( const Task_t *pTask )
 
 
 				Vector vGunPos;
-				GetAttachment( m_iPhysGunAttachment, vGunPos );
+				GetEngineObject()->GetAttachment( m_iPhysGunAttachment, vGunPos );
 
 				Vector vToObject = m_hPhysicsEnt->WorldSpaceCenter() - vGunPos;
 				float flDistance = vToObject.Length();

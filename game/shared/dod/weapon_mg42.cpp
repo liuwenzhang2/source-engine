@@ -205,7 +205,7 @@ void CWeaponMG42::Spawn( void )
 		Vector vFront, vBack;	
 		QAngle angles;
 
-		C_BasePlayer *pLocalPlayer = (C_BasePlayer*)ClientEntityList().GetLocalPlayer();
+		C_BasePlayer *pLocalPlayer = (C_BasePlayer*)EntityList()->GetLocalPlayer();
 
 		bool bViewModel = false;
 

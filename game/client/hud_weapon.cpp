@@ -84,7 +84,7 @@ void CHudWeapon::PerformLayout()
 //-----------------------------------------------------------------------------
 void CHudWeapon::Paint( void )
 {
-	C_BasePlayer *player = (C_BasePlayer*)ClientEntityList().GetLocalPlayer();
+	C_BasePlayer *player = (C_BasePlayer*)EntityList()->GetLocalPlayer();
 
 	if ( !player )
 		return;

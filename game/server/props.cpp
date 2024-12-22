@@ -1492,7 +1492,7 @@ void CBreakableProp::CreateFlare( float flLifetime )
 		int iAttachment = GetEngineObject()->LookupAttachment( "fuse" );
 
 		Vector vOrigin;
-		GetAttachment( iAttachment, vOrigin );
+		GetEngineObject()->GetAttachment( iAttachment, vOrigin );
 
 		pFlare->GetEngineObject()->SetMoveType( MOVETYPE_NONE );
 		pFlare->GetEngineObject()->SetSolid( SOLID_NONE );
@@ -2841,6 +2841,14 @@ void CPhysicsProp::OnPhysGunDrop( CBasePlayer *pPhysGunUser, PhysGunDrop_t Reaso
 			}
 		}
 	}
+}
+
+bool CPhysicsProp::IsObjectAllowedOverhead()
+{
+	// Allow props that are specifically flagged as such
+	if (HasInteraction(PROPINTER_PHYSGUN_ALLOW_OVERHEAD))
+		return true;
+	return false;
 }
 
 //-----------------------------------------------------------------------------

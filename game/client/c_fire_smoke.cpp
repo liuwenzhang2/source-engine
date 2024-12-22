@@ -200,7 +200,7 @@ void C_FireSmoke::Start( void )
 //{
 //	Start();
 //
-//	ClientEntityList().AddNonNetworkableEntity(	this );
+//	EntityList()->AddNonNetworkableEntity(	this );
 //	GetEngineObject()->CreatePartitionHandle();
 //	AddEffects( EF_NORECEIVESHADOW | EF_NOSHADOW );
 //	AddToLeafSystem();
@@ -215,7 +215,7 @@ void C_FireSmoke::Start( void )
 //	ClientThinkList()->RemoveThinkable( GetClientHandle() );
 //
 //	// Remove from the client entity list.
-//	ClientEntityList().RemoveEntity( GetClientHandle() );
+//	EntityList()->RemoveEntity( GetClientHandle() );
 //
 //	partition->Remove( PARTITION_CLIENT_SOLID_EDICTS | PARTITION_CLIENT_RESPONSIVE_EDICTS | PARTITION_CLIENT_NON_STATIC_EDICTS, GetEngineObject()->GetPartitionHandle() );
 //
@@ -405,5 +405,5 @@ void C_EntityFlame::Simulate( void )
 void C_EntityFlame::ClientThink( void )
 {
 	StopEffect();
-	cl_entitylist->DestroyEntity(this);//Release();
+	EntityList()->DestroyEntity(this);//Release();
 }

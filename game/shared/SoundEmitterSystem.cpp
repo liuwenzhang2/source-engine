@@ -1101,7 +1101,7 @@ public:
 #ifdef GAME_DLL
 		//CBaseEntity* pEntity = UTIL_EntityByIndex(iEntIndex);
 #else
-		//C_BaseEntity* pEntity = ClientEntityList().GetEnt(iEntIndex);
+		//C_BaseEntity* pEntity = EntityList()->GetEnt(iEntIndex);
 		clientdll->ModifyEmitSoundParams(const_cast<EmitSound_t&>(params));
 #endif
 		//if (pEntity)
@@ -1127,7 +1127,7 @@ public:
 #ifdef GAME_DLL
 		//CBaseEntity* pEntity = UTIL_EntityByIndex(iEntIndex);
 #else
-		//C_BaseEntity* pEntity = ClientEntityList().GetEnt(iEntIndex);
+		//C_BaseEntity* pEntity = EntityList()->GetEnt(iEntIndex);
 		clientdll->ModifyEmitSoundParams(const_cast<EmitSound_t&>(params));
 #endif
 		//if (pEntity)

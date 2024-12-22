@@ -163,7 +163,7 @@ C_Hairball::C_Hairball()
 
 void C_Hairball::Init()
 {
-	//ClientEntityList().AddNonNetworkableEntity( this );
+	//EntityList()->AddNonNetworkableEntity( this );
 	ClientThinkList()->SetNextClientThink( GetClientHandle(), CLIENT_THINK_ALWAYS );
 	
 	GetEngineObject()->AddToLeafSystem( RENDER_GROUP_OPAQUE_ENTITY );
@@ -176,7 +176,7 @@ void C_Hairball::Init()
 void C_Hairball::ClientThink()
 {
 	// Do some AI-type stuff.. move the entity around.
-	//C_BasePlayer *pPlayer = (C_BasePlayer*)ClientEntityList().GetLocalPlayer();
+	//C_BasePlayer *pPlayer = (C_BasePlayer*)EntityList()->GetLocalPlayer();
 	//m_vecAngles = SetAbsAngles( pPlayer->GetAbsAngles() ); // copy player angles.
 
 	Assert( !GetEngineObject()->GetMoveParent() );
@@ -331,11 +331,11 @@ void CreateHairballCallback()
 {
 	for ( int i=0; i < 20; i++ )
 	{
-		C_Hairball *pHairball = (C_Hairball*)ClientEntityList().CreateEntityByName( "C_Hairball");
+		C_Hairball *pHairball = (C_Hairball*)EntityList()->CreateEntityByName( "C_Hairball");
 		pHairball->Init();
 		
 		// Put it a short distance in front of the player.
-		C_BasePlayer *pPlayer = (C_BasePlayer*)ClientEntityList().GetLocalPlayer();
+		C_BasePlayer *pPlayer = (C_BasePlayer*)EntityList()->GetLocalPlayer();
 		
 		if ( !pPlayer )
 			return;

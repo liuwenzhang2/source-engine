@@ -1615,7 +1615,7 @@ void CPropAirboat::FireGun( )
 	// Get the gun position.
 	Vector	vecGunPosition;
 	Vector vecForward;
-	GetAttachment( m_nGunBarrelAttachment, vecGunPosition, &vecForward );
+	GetEngineObject()->GetAttachment( m_nGunBarrelAttachment, vecGunPosition, &vecForward );
 	
 	// NOTE: For the airboat, unable to fire really means the aim is clamped
 	Vector vecAimPoint;
@@ -1706,7 +1706,7 @@ void CPropAirboat::FireGun( )
 	{
 		if ( IsX360() )
 		{
-			GetAttachment( m_nGunBarrelAttachment, vecEyePosition, &vecEyeDirection );
+			GetEngineObject()->GetAttachment( m_nGunBarrelAttachment, vecEyePosition, &vecEyeDirection );
 		}
 		else
 		{
@@ -2061,7 +2061,7 @@ void CPropAirboat::CreateSplash( int nSplashType )
 
 	Vector vecSplashPoint;
 	Vector vecForward, vecUp;
-	GetAttachment( m_nSplashAttachment, vecSplashPoint, &vecForward, &vecUp, NULL );
+	GetEngineObject()->GetAttachment( m_nSplashAttachment, vecSplashPoint, &vecForward, &vecUp, NULL );
 
 	CEffectData	data;
 	data.m_fFlags = 0;

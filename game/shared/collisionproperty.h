@@ -18,7 +18,6 @@
 #include "ispatialpartition.h"
 #ifdef CLIENT_DLL
 #include "dt_recv.h"
-#include "shared_classnames.h"
 #endif // CLIENT_DLL
 #ifdef GAME_DLL
 #include "dt_send.h"
@@ -32,7 +31,6 @@
 //-----------------------------------------------------------------------------
 // Forward declarations
 //-----------------------------------------------------------------------------
-class CBaseEntity;
 class CEngineObjectInternal;
 class IHandleEntity;
 class QAngle;

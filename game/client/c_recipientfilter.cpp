@@ -82,11 +82,11 @@ int	C_RecipientFilter::GetRecipientIndex( int slot ) const
 
 void C_RecipientFilter::AddAllPlayers( void )
 {
-	if ( !(C_BasePlayer*)ClientEntityList().GetLocalPlayer() )
+	if ( !(C_BasePlayer*)EntityList()->GetLocalPlayer() )
 		return;
 
 	m_Recipients.RemoveAll();
-	AddRecipient( (C_BasePlayer*)ClientEntityList().GetLocalPlayer() );
+	AddRecipient( (C_BasePlayer*)EntityList()->GetLocalPlayer() );
 }
 
 void C_RecipientFilter::AddRecipient( C_BasePlayer *player )
@@ -102,7 +102,7 @@ void C_RecipientFilter::AddRecipient( C_BasePlayer *player )
 	//  then don't send it to the local player again.
 	if ( m_bUsingPredictionRules )
 	{
-		Assert( player == (C_BasePlayer*)ClientEntityList().GetLocalPlayer() );
+		Assert( player == (C_BasePlayer*)EntityList()->GetLocalPlayer() );
 		Assert( prediction->InPrediction() );
 
 		// Only add local player if this is the first time doing prediction
@@ -146,7 +146,7 @@ void C_RecipientFilter::RemoveRecipientsByTeam( C_Team *team )
 
 void C_RecipientFilter::AddPlayersFromBitMask( CBitVec< ABSOLUTE_PLAYER_LIMIT >& playerbits )
 {
-	C_BasePlayer *pPlayer = (C_BasePlayer*)ClientEntityList().GetLocalPlayer();
+	C_BasePlayer *pPlayer = (C_BasePlayer*)EntityList()->GetLocalPlayer();
 
 	if ( !pPlayer )
 		return;
@@ -179,7 +179,7 @@ void C_RecipientFilter::UsePredictionRules( void )
 		return;
 	}
 
-	C_BasePlayer *local = (C_BasePlayer*)ClientEntityList().GetLocalPlayer();
+	C_BasePlayer *local = (C_BasePlayer*)EntityList()->GetLocalPlayer();
 	if ( !local )
 	{
 		Assert( 0 );
@@ -216,8 +216,8 @@ void C_RecipientFilter::SetIgnorePredictionCull( bool ignore )
 
 CLocalPlayerFilter::CLocalPlayerFilter()
 {
-	if ( (C_BasePlayer*)ClientEntityList().GetLocalPlayer() )
+	if ( (C_BasePlayer*)EntityList()->GetLocalPlayer() )
 	{
-		AddRecipient( (C_BasePlayer*)ClientEntityList().GetLocalPlayer() );
+		AddRecipient( (C_BasePlayer*)EntityList()->GetLocalPlayer() );
 	}
 }

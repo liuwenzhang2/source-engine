@@ -645,7 +645,7 @@ void CTeamRoundTimer::SendTimeWarning( int nWarning )
 	// don't play sounds if the level designer has turned them off or if it's during the WaitingForPlayers time
 	if ( !m_bTimerPaused && m_bAutoCountdown && !TeamplayRoundBasedRules()->IsInWaitingForPlayers() )
 	{
-		C_BasePlayer *pPlayer = (C_BasePlayer*)ClientEntityList().GetLocalPlayer();
+		C_BasePlayer *pPlayer = (C_BasePlayer*)EntityList()->GetLocalPlayer();
 		if ( pPlayer )
 		{
 			if ( ObjectiveResource() )
@@ -659,7 +659,7 @@ void CTeamRoundTimer::SendTimeWarning( int nWarning )
 
 					if ( IsStopWatchTimer() == true && IsWatchingTimeStamps() == false )
 					{
-						CTeamRoundTimer *pTimer = dynamic_cast< CTeamRoundTimer* >( ClientEntityList().GetEnt( iActiveTimer ) );
+						CTeamRoundTimer *pTimer = dynamic_cast< CTeamRoundTimer* >( EntityList()->GetEnt( iActiveTimer ) );
 
 						if ( pTimer && pTimer->IsTimerPaused() == false && pTimer->GetTimeRemaining() > GetTimeRemaining() )
 						{
@@ -668,7 +668,7 @@ void CTeamRoundTimer::SendTimeWarning( int nWarning )
 					}
 					else
 					{
-						CTeamRoundTimer *pStopWatch = dynamic_cast< CTeamRoundTimer* >( ClientEntityList().GetEnt( iStopWatchTimer ) );
+						CTeamRoundTimer *pStopWatch = dynamic_cast< CTeamRoundTimer* >( EntityList()->GetEnt( iStopWatchTimer ) );
 
 						if ( ObjectiveResource()->GetTimerToShowInHUD() == entindex()  )
 						{

@@ -961,7 +961,7 @@ void CInput::ControllerMove( float frametime, CUserCmd *cmd )
 		}
 #ifdef CSTRIKE_DLL
 		// NVNT cstrike fov grabing.
-		C_BasePlayer *player = (C_BasePlayer*)ClientEntityList().GetLocalPlayer();
+		C_BasePlayer *player = (C_BasePlayer*)EntityList()->GetLocalPlayer();
 		if(player){
 			haptics->UpdatePlayerFOV(player->GetFOV());
 		}
@@ -1082,7 +1082,7 @@ void CInput::ExtraMouseSample( float frametime, bool active )
 	// first
 	if ( active && UseVR() )
 	{
-		C_BasePlayer *pPlayer = (C_BasePlayer*)ClientEntityList().GetLocalPlayer();
+		C_BasePlayer *pPlayer = (C_BasePlayer*)EntityList()->GetLocalPlayer();
 		if( pPlayer && !pPlayer->GetVehicle() )
 		{
 			QAngle curViewangles, newViewangles;
@@ -1238,7 +1238,7 @@ void CInput::CreateMove ( int sequence_number, float input_sample_frametime, boo
 
 		if ( UseVR() )
 		{
-			C_BasePlayer *pPlayer = (C_BasePlayer*)ClientEntityList().GetLocalPlayer();
+			C_BasePlayer *pPlayer = (C_BasePlayer*)EntityList()->GetLocalPlayer();
 			if( pPlayer && !pPlayer->GetVehicle() )
 			{
 				QAngle curViewangles, newViewangles;

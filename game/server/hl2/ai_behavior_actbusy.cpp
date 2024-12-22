@@ -1518,7 +1518,7 @@ bool CAI_ActBusyBehavior::ShouldPlayerAvoid( void )
 void CAI_ActBusyBehavior::ComputeAndSetRenderBounds()
 {
 	Vector mins, maxs;
-	if ( GetOuter()->ComputeHitboxSurroundingBox( &mins, &maxs ) )
+	if ( GetOuter()->GetEngineObject()->ComputeHitboxSurroundingBox( &mins, &maxs ) )
 	{
 		UTIL_SetSize( GetOuter(), mins - GetAbsOrigin(), maxs - GetAbsOrigin());
 		if ( GetOuter()->GetEngineObject()->VPhysicsGetObject() )

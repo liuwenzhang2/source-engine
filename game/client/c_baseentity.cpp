@@ -396,10 +396,10 @@ C_BaseEntity::~C_BaseEntity()
 }
 
 IEngineObjectClient* C_BaseEntity::GetEngineObject() {
-	return ClientEntityList().GetEngineObject(entindex());
+	return EntityList()->GetEngineObject(entindex());
 }
 const IEngineObjectClient* C_BaseEntity::GetEngineObject() const {
-	return ClientEntityList().GetEngineObject(entindex());
+	return EntityList()->GetEngineObject(entindex());
 }
 
 IEnginePlayerClient* C_BaseEntity::GetEnginePlayer() {
@@ -522,7 +522,7 @@ bool C_BaseEntity::Init( int entnum, int iSerialNum )
 	//index = entnum;
 
 	if (entnum >= 0) {
-		//cl_entitylist->AddNetworkableEntity(this, entnum, iSerialNum);//GetIClientUnknown()
+		//EntityList()->AddNetworkableEntity(this, entnum, iSerialNum);//GetIClientUnknown()
 	}
 
 	return true;
@@ -571,8 +571,8 @@ bool C_BaseEntity::InitializeAsClientEntityByIndex( int iIndex, RenderGroup_t re
 	SetModelByIndex( iIndex );
 
 	// Add the client entity to the master entity list.
-	//cl_entitylist->AddNonNetworkableEntity( this );//GetIClientUnknown()
-	Assert( GetClientHandle() != ClientEntityList().InvalidHandle() );
+	//EntityList()->AddNonNetworkableEntity( this );//GetIClientUnknown()
+	Assert( GetClientHandle() != EntityList()->InvalidHandle() );
 
 	// Add the client entity to the renderable "leaf system." (Renderable)
 	GetEngineObject()->AddToLeafSystem( renderGroup );
@@ -601,7 +601,7 @@ bool C_BaseEntity::InitializeAsClientEntityByIndex( int iIndex, RenderGroup_t re
 //-----------------------------------------------------------------------------
 void C_BaseEntity::Release()
 {
-	cl_entitylist->DestroyEntity(this);
+	EntityList()->DestroyEntity(this);
 }
 
 void C_BaseEntity::SetRemovalFlag( bool bRemove ) 
@@ -1281,7 +1281,7 @@ void C_BaseEntity::NotifyShouldTransmit( ShouldTransmitState_t state )
 //				{
 //					Assert( otherEntity->IsClientCreated() );
 //					Assert( otherEntity->m_PredictableID.IsActive() );
-//					Assert( ClientEntityList().IsHandleValid( otherEntity->GetClientHandle() ) );
+//					Assert( EntityList()->IsHandleValid( otherEntity->GetClientHandle() ) );
 //
 //					otherEntity->m_PredictableID.SetAcknowledged( true );
 //
@@ -1411,7 +1411,7 @@ void C_BaseEntity::PostDataUpdate( DataUpdateType_t updateType )
 	// It's possible that a new entity will need to be forceably added to the 
 	//   player simulation list.  If so, do this here
 //#if !defined( NO_ENTITY_PREDICTION )
-//	C_BasePlayer *local = (C_BasePlayer*)ClientEntityList().GetLocalPlayer();
+//	C_BasePlayer *local = (C_BasePlayer*)EntityList()->GetLocalPlayer();
 //	if ( IsPlayerSimulated() &&
 //		( NULL != local ) && 
 //		( local == m_hOwnerEntity ) )
@@ -1436,7 +1436,7 @@ void C_BaseEntity::CheckInitPredictable( const char *context )
 	if ( !cl_predict->GetInt() )
 		return;
 
-	C_BasePlayer *player = (C_BasePlayer*)ClientEntityList().GetLocalPlayer();
+	C_BasePlayer *player = (C_BasePlayer*)EntityList()->GetLocalPlayer();
 
 	if ( !player )
 		return;
@@ -2581,7 +2581,7 @@ int C_BaseEntity::PrecacheModel( const char *name )
 
 C_BaseEntity* C_BaseEntity::Instance( CBaseHandle hEnt )
 {
-	return ClientEntityList().GetBaseEntityFromHandle( hEnt );
+	return EntityList()->GetBaseEntityFromHandle( hEnt );
 }
 
 
@@ -2592,7 +2592,7 @@ C_BaseEntity* C_BaseEntity::Instance( CBaseHandle hEnt )
 //-----------------------------------------------------------------------------
 C_BaseEntity *C_BaseEntity::Instance( int iEnt )
 {
-	return ClientEntityList().GetBaseEntity( iEnt );
+	return EntityList()->GetBaseEntity( iEnt );
 }
 
 #ifdef WIN32
@@ -2613,7 +2613,7 @@ const char *C_BaseEntity::GetClassname( void )
 #ifndef NO_ENTITY_PREDICTION
 	if ( GetPredDescMap() )
 	{
-		const char *mapname =  ClientEntityList().GetMapClassName( GetPredDescMap()->dataClassName );
+		const char *mapname =  EntityList()->GetMapClassName( GetPredDescMap()->dataClassName );
 		if ( mapname && mapname[ 0 ] ) 
 		{
 			Q_strncpy( outstr, mapname, sizeof( outstr ) );
@@ -2661,7 +2661,7 @@ CON_COMMAND( cl_sizeof, "Determines the size of the specified client class." )
 		return;
 	}
 
-	int size = ClientEntityList().GetEntitySize( args[ 1 ] );
+	int size = EntityList()->GetEntitySize( args[ 1 ] );
 
 	Msg( "%s is %i bytes\n", args[ 1 ], size );
 }
@@ -2670,7 +2670,7 @@ CON_COMMAND( cl_sizeof, "Determines the size of the specified client class." )
 CON_COMMAND_F( dlight_debug, "Creates a dlight in front of the player", FCVAR_CHEAT )
 {
 	dlight_t *el = effects->CL_AllocDlight( 1 );
-	C_BasePlayer *player = (C_BasePlayer*)ClientEntityList().GetLocalPlayer();
+	C_BasePlayer *player = (C_BasePlayer*)EntityList()->GetLocalPlayer();
 	if ( !player )
 		return;
 	Vector start = player->EyePosition();
@@ -2750,7 +2750,7 @@ CON_COMMAND_F( dlight_debug, "Creates a dlight in front of the player", FCVAR_CH
 //	}
 //
 //	// Try to create it
-//	ent = cl_entitylist->CreateEntityByName( classname );
+//	ent = EntityList()->CreateEntityByName( classname );
 //	if ( !ent )
 //	{
 //		return NULL;
@@ -2773,7 +2773,7 @@ CON_COMMAND_F( dlight_debug, "Creates a dlight in front of the player", FCVAR_CH
 //	ent->m_pPredictionContext = context;
 //
 //	// Add to client entity list
-//	//ClientEntityList().AddNonNetworkableEntity( ent );
+//	//EntityList()->AddNonNetworkableEntity( ent );
 //
 //	//  and predictables
 //	g_Predictables.AddToPredictableList( ent->GetClientHandle() );
@@ -2891,9 +2891,9 @@ void C_BaseEntity::UpdateOnRemove( void )
 		GetEngineObject()->DestroyIntermediateData();
 	}
 	// If it's play simulated, remove from simulation list if the player still exists...
-	//if ( IsPlayerSimulated() && (C_BasePlayer*)ClientEntityList().GetLocalPlayer() )
+	//if ( IsPlayerSimulated() && (C_BasePlayer*)EntityList()->GetLocalPlayer() )
 	//{
-	//	(C_BasePlayer*)ClientEntityList().GetLocalPlayer()->RemoveFromPlayerSimulationList( this );
+	//	(C_BasePlayer*)EntityList()->GetLocalPlayer()->RemoveFromPlayerSimulationList( this );
 	//}
 #endif
 	{
@@ -2919,7 +2919,7 @@ void C_BaseEntity::UpdateOnRemove( void )
 		}
 
 		// Remove from the client entity list.
-		//ClientEntityList().RemoveEntity( this );
+		//EntityList()->RemoveEntity( this );
 
 		//m_RefEHandle = INVALID_CLIENTENTITY_HANDLE;
 	}
@@ -3043,7 +3043,7 @@ void C_BaseEntity::SUB_Remove( void )
 
 CBaseEntity *FindEntityInFrontOfLocalPlayer()
 {
-	C_BasePlayer *pPlayer = (C_BasePlayer*)ClientEntityList().GetLocalPlayer();
+	C_BasePlayer *pPlayer = (C_BasePlayer*)EntityList()->GetLocalPlayer();
 	if ( pPlayer )
 	{
 		// Get the entity under my crosshair
@@ -3108,7 +3108,7 @@ static void ToggleBBoxVisualization( int fVisFlags, const CCommand &args )
 	}
 	else
 	{
-		pHit = cl_entitylist->GetBaseEntity( iEntity );
+		pHit = EntityList()->GetBaseEntity( iEntity );
 	}
 
 	if ( pHit )
@@ -3324,7 +3324,7 @@ float C_BaseEntity::GetInterpolationAmount( int flags )
 {
 	// If single player server is "skipping ticks" everything needs to interpolate for a bit longer
 	int serverTickMultiple = 1;
-	if ( ClientEntityList().IsSimulatingOnAlternateTicks() )
+	if ( EntityList()->IsSimulatingOnAlternateTicks() )
 	{
 		serverTickMultiple = 2;
 	}
@@ -3605,7 +3605,7 @@ bool C_BaseEntity::HasNPCsOnIt(void)
 	{
 		for (link = root->nextLink; link != root; link = link->nextLink)
 		{
-			if (ClientEntityList().GetClientEntityFromHandle(link->entity) && ((C_BaseEntity*)ClientEntityList().GetClientEntityFromHandle(link->entity))->MyNPCPointer())
+			if (EntityList()->GetClientEntityFromHandle(link->entity) && ((C_BaseEntity*)EntityList()->GetClientEntityFromHandle(link->entity))->MyNPCPointer())
 				return true;
 		}
 	}
@@ -3627,7 +3627,7 @@ void CC_CL_Find_Ent( const CCommand& args )
 	Msg("Searching for client entities with classname containing substring: '%s'\n", pszSubString );
 
 	C_BaseEntity *ent = NULL;
-	while ( (ent = ClientEntityList().NextBaseEntity(ent)) != NULL )
+	while ( (ent = EntityList()->NextBaseEntity(ent)) != NULL )
 	{
 		const char *pszClassname = ent->GetClassname();
 
@@ -3661,7 +3661,7 @@ void CC_CL_Find_Ent_Index( const CCommand& args )
 	}
 
 	int iIndex = atoi(args[1]);
-	C_BaseEntity *ent = ClientEntityList().GetBaseEntity( iIndex );
+	C_BaseEntity *ent = EntityList()->GetBaseEntity( iIndex );
 	if ( ent )
 	{
 		const char *pszClassname = ent->GetClassname();

@@ -100,9 +100,7 @@ public:
 
 	virtual void	GetAimEntOrigin( IClientEntity *pAttachedTo, Vector *pAbsOrigin, QAngle *pAbsAngles );
 
-	// Computes a box that surrounds all hitboxes
-	bool ComputeHitboxSurroundingBox( Vector *pVecWorldMins, Vector *pVecWorldMaxs );
-	bool ComputeEntitySpaceHitboxSurroundingBox( Vector *pVecWorldMins, Vector *pVecWorldMaxs );
+
 
 	// Gets the hitbox-to-world transforms, returns false if there was a problem
 	bool HitboxToWorldTransforms(const matrix3x4_t *pHitboxToWorld[MAXSTUDIOBONES] );

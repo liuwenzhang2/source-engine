@@ -246,7 +246,7 @@ void CDODMapOverview::InitTeamColorsAndIcons()
 
 void CDODMapOverview::DrawCamera()
 {
-	C_BasePlayer *localPlayer = (C_BasePlayer*)ClientEntityList().GetLocalPlayer();
+	C_BasePlayer *localPlayer = (C_BasePlayer*)EntityList()->GetLocalPlayer();
 
 	if ( !localPlayer )
 		return;
@@ -301,7 +301,7 @@ void CDODMapOverview::FireGameEvent( IGameEvent *event )
 // rules that define if you can see a player on the overview or not
 bool CDODMapOverview::CanPlayerBeSeen(MapPlayer_t *player)
 {
-	C_BasePlayer *localPlayer = (C_BasePlayer*)ClientEntityList().GetLocalPlayer();
+	C_BasePlayer *localPlayer = (C_BasePlayer*)EntityList()->GetLocalPlayer();
 
 	if ( !localPlayer || !player )
 		return false;
@@ -386,7 +386,7 @@ void CDODMapOverview::SetMode(int mode)
 			break;
 		}
 
-		C_BasePlayer *pPlayer = (C_BasePlayer*)ClientEntityList().GetLocalPlayer();
+		C_BasePlayer *pPlayer = (C_BasePlayer*)EntityList()->GetLocalPlayer();
 
 		if ( pPlayer )
 			SetFollowEntity( pPlayer->entindex() );
@@ -438,7 +438,7 @@ void CDODMapOverview::UpdateSizeAndPosition()
 
 void CDODMapOverview::AddGrenade( C_DODBaseGrenade *pGrenade )
 {
-	C_BasePlayer *localPlayer = (C_BasePlayer*)ClientEntityList().GetLocalPlayer();
+	C_BasePlayer *localPlayer = (C_BasePlayer*)EntityList()->GetLocalPlayer();
 
 	if ( !localPlayer )
 		return;
@@ -470,7 +470,7 @@ void CDODMapOverview::DrawMapPlayers()
 {
 	BaseClass::DrawMapPlayers();
 
-	C_BasePlayer *localPlayer = (C_BasePlayer*)ClientEntityList().GetLocalPlayer();
+	C_BasePlayer *localPlayer = (C_BasePlayer*)EntityList()->GetLocalPlayer();
 
 	Assert( localPlayer );
 

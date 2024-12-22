@@ -23,6 +23,7 @@ extern ConVar hl2_episodic;
 
 
 #if defined( CLIENT_DLL )
+#include "shared_classnames.h"
 #include "c_baseentity.h"
 #include "c_baseanimating.h"
 #else
@@ -122,23 +123,5 @@ inline bool IsEntityQAngleVelReasonable( const QAngle &q )
 }
 
 extern bool CheckEmitReasonablePhysicsSpew();
-
-class CWatcherList
-{
-public:
-	//CWatcherList(); NOTE: Dataobj doesn't support constructors - it zeros the memory
-	~CWatcherList();	// frees the positionwatcher_t's to the pool
-	void Init();
-
-	void AddToList(CBaseEntity* pWatcher);
-	void RemoveWatcher(CBaseEntity* pWatcher);
-
-	friend class CBaseEntity;
-private:
-	int GetCallbackObjects(IWatcherCallback** pList, int listMax);
-
-	unsigned short Find(CBaseEntity* pEntity);
-	unsigned short m_list;
-};
 
 #endif // BASEENTITY_SHARED_H

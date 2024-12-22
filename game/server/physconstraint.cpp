@@ -457,7 +457,7 @@ void FindPhysicsAnchor( string_t name, hl_constraint_info_t &info, int index, CB
 					{
 						Vector pos;
 						info.pObjects[index] = list[iPhysicsBone];
-						pAnim->GetAttachment( pAnchor->parentAttachment, pos );
+						pAnim->GetEngineObject()->GetAttachment( pAnchor->parentAttachment, pos );
 						list[iPhysicsBone]->WorldToLocal( &info.anchorPosition[index], pos );
 						bWroteAttachment = true;
 					}

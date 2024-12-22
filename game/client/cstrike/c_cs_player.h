@@ -134,7 +134,7 @@ public:
 
 	virtual bool ShouldReceiveProjectedTextures( int flags )
 	{
-		return ( this != (C_BasePlayer*)ClientEntityList().GetLocalPlayer() );
+		return ( this != (C_BasePlayer*)EntityList()->GetLocalPlayer() );
 	}
 
 	void ClearSoundEvents()

@@ -128,7 +128,7 @@ void C_EnvProjectedTexture::UpdateLight( bool bForceUpdate )
 		{
 			const QAngle &angles = GetEngineObject()->GetLocalAngles();
 
-			C_BasePlayer *pPlayer = (C_BasePlayer*)ClientEntityList().GetLocalPlayer();
+			C_BasePlayer *pPlayer = (C_BasePlayer*)EntityList()->GetLocalPlayer();
 			if( pPlayer )
 			{
 				const QAngle playerAngles = pPlayer->GetEngineObject()->GetAbsAngles();

@@ -1839,7 +1839,7 @@ void CParticleMgr::UpdateNewEffects( float flTimeDelta )
 
 	if ( nCount )
 	{
-		UpdateDirtySpatialPartitionEntities();
+		EntityList()->UpdateDirtySpatialPartitionEntities();
 		if ( !r_threaded_particles.GetBool() )
 		{
 			for( int i=0; i<nCount; i++)

@@ -103,7 +103,7 @@ void C_HL1MP_Player::UpdateClientSideAnimation()
 {
 	// Update the animation data. It does the local check here so this works when using
 	// a third-person camera (and we don't have valid player angles).
-	if ( this == (C_BasePlayer*)ClientEntityList().GetLocalPlayer() )
+	if ( this == (C_BasePlayer*)EntityList()->GetLocalPlayer() )
 		m_PlayerAnimState->Update( EyeAngles()[YAW], m_angEyeAngles[PITCH] );
 	else
 		m_PlayerAnimState->Update( m_angEyeAngles[YAW], m_angEyeAngles[PITCH] );
@@ -122,7 +122,7 @@ void C_HL1MP_Player::ProcessMuzzleFlashEvent()
 {
 #if 0
 	// Reenable when the weapons have muzzle flash attachments in the right spot.
-	if ( this != (C_BasePlayer*)ClientEntityList().GetLocalPlayer() )
+	if ( this != (C_BasePlayer*)EntityList()->GetLocalPlayer() )
 	{
 		Vector vAttachment;
 		QAngle dummyAngles;
@@ -214,7 +214,7 @@ void C_HL1MP_Player::PreThink( void )
 
 	QAngle vTempAngles = GetEngineObject()->GetLocalAngles();
 
-	if ((C_BasePlayer*)ClientEntityList().GetLocalPlayer() == this )
+	if ((C_BasePlayer*)EntityList()->GetLocalPlayer() == this )
 	{
 		vTempAngles[PITCH] = EyeAngles()[PITCH];
 	}
@@ -282,7 +282,7 @@ C_HL1MPRagdoll::C_HL1MPRagdoll()
 
 C_HL1MPRagdoll::~C_HL1MPRagdoll()
 {
-	ClientEntityList().PhysCleanupFrictionSounds( this );
+	EntityList()->PhysCleanupFrictionSounds( this );
 
 	if ( m_hPlayer )
 	{
@@ -377,9 +377,9 @@ void C_HL1MP_Player::CalcView( Vector &eyeOrigin, QAngle &eyeAngles, float &zNea
 		Vector WALL_MAX( WALL_OFFSET, WALL_OFFSET, WALL_OFFSET );
 
 		trace_t trace; // clip against world
-		ClientEntityList().PushEnableAbsRecomputations( false ); // HACK don't recompute positions while doing RayTrace
+		EntityList()->PushEnableAbsRecomputations( false ); // HACK don't recompute positions while doing RayTrace
 		UTIL_TraceHull( origin, eyeOrigin, WALL_MIN, WALL_MAX, MASK_SOLID_BRUSHONLY, this, COLLISION_GROUP_NONE, &trace );
-		ClientEntityList().PopEnableAbsRecomputations();
+		EntityList()->PopEnableAbsRecomputations();
 
 		if (trace.fraction < 1.0)
 		{
@@ -421,7 +421,7 @@ void C_HL1MPRagdoll::CreateHL1MPRagdoll( void )
 
 		// Copy all the interpolated vars from the player entity.
 		// The entity uses the interpolated history to get bone velocity.
-		bool bRemotePlayer = (pPlayer != (C_BasePlayer*)ClientEntityList().GetLocalPlayer());			
+		bool bRemotePlayer = (pPlayer != (C_BasePlayer*)EntityList()->GetLocalPlayer());			
 		if ( bRemotePlayer )
 		{
 			Interp_Copy( pPlayer );

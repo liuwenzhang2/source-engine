@@ -114,8 +114,8 @@ void CPredictableList::AddToPredictableList(CBaseHandle add)
 			ClientEntityHandle_t h1 = m_Predictables[i];
 			ClientEntityHandle_t h2 = m_Predictables[j];
 
-			C_BaseEntity* p1 = cl_entitylist->GetBaseEntityFromHandle(h1);
-			C_BaseEntity* p2 = cl_entitylist->GetBaseEntityFromHandle(h2);
+			C_BaseEntity* p1 = EntityList()->GetBaseEntityFromHandle(h1);
+			C_BaseEntity* p2 = EntityList()->GetBaseEntityFromHandle(h2);
 
 			if (!p1 || !p2)
 			{
@@ -155,7 +155,7 @@ void CPredictableList::RemoveFromPredictablesList(CBaseHandle remove)
 //-----------------------------------------------------------------------------
 C_BaseEntity* CPredictableList::GetPredictable(int slot)
 {
-	return cl_entitylist->GetBaseEntityFromHandle(m_Predictables[slot]);
+	return EntityList()->GetBaseEntityFromHandle(m_Predictables[slot]);
 }
 
 //-----------------------------------------------------------------------------
@@ -250,7 +250,7 @@ void CPrediction::CheckError( int commands_acknowledged )
 	if ( !cl_predict->GetInt() )
 		return;
 
-	player = (C_BasePlayer*)ClientEntityList().GetLocalPlayer();
+	player = (C_BasePlayer*)EntityList()->GetLocalPlayer();
 	if ( !player )
 		return;
 	
@@ -334,7 +334,7 @@ void CPrediction::ShutdownPredictables( void )
 		// Otherwise, release client created entities
 		else
 		{
-			cl_entitylist->DestroyEntity(ent);// ->Release();
+			EntityList()->DestroyEntity(ent);// ->Release();
 			release_count++;
 		}
 	}
@@ -360,10 +360,10 @@ void CPrediction::ReinitPredictables( void )
 #if !defined( NO_ENTITY_PREDICTION )
 	// Go through all entities and init any eligible ones
 	int i;
-	int c = ClientEntityList().GetHighestEntityIndex();
+	int c = EntityList()->GetHighestEntityIndex();
 	for ( i = 0; i <= c; i++ )
 	{
-		C_BaseEntity *e = ClientEntityList().GetBaseEntity( i );
+		C_BaseEntity *e = EntityList()->GetBaseEntity( i );
 		if ( !e )
 			continue;
 		
@@ -417,7 +417,7 @@ void CPrediction::PreEntityPacketReceived ( int commands_acknowledged, int curre
 		return;
 	}
 
-	C_BasePlayer *current = (C_BasePlayer*)ClientEntityList().GetLocalPlayer();
+	C_BasePlayer *current = (C_BasePlayer*)EntityList()->GetLocalPlayer();
 	// No local player object?
 	if ( !current )
 		return;
@@ -453,7 +453,7 @@ void CPrediction::PostEntityPacketReceived( void )
 	if ( !cl_predict->GetInt() )
 		return;
 
-	C_BasePlayer *current = (C_BasePlayer*)ClientEntityList().GetLocalPlayer();
+	C_BasePlayer *current = (C_BasePlayer*)EntityList()->GetLocalPlayer();
 	// No local player object?
 	if ( !current )
 		return;
@@ -544,7 +544,7 @@ void CPrediction::PostNetworkDataReceived( int commands_acknowledged )
 
 	bool entityDumped = false;
 
-	C_BasePlayer *current = (C_BasePlayer*)ClientEntityList().GetLocalPlayer();
+	C_BasePlayer *current = (C_BasePlayer*)EntityList()->GetLocalPlayer();
 	// No local player object?
 	if ( !current )
 		return;
@@ -668,10 +668,10 @@ void CPrediction::PostNetworkDataReceived( int commands_acknowledged )
 	int dumpentindex = cl_predictionentitydump.GetInt();
 	if ( dump && error_check && !entityDumped && dumpentindex != -1 )
 	{
-		int last_entity = ClientEntityList().GetHighestEntityIndex();
+		int last_entity = EntityList()->GetHighestEntityIndex();
 		if ( dumpentindex >= 0 && dumpentindex <= last_entity )
 		{
-			C_BaseEntity *ent = ClientEntityList().GetBaseEntity( dumpentindex );
+			C_BaseEntity *ent = EntityList()->GetBaseEntity( dumpentindex );
 			if ( ent )
 			{
 				dump->DumpEntity( ent, m_nServerCommandsAcknowledged );
@@ -843,8 +843,8 @@ void CPrediction::StartCommand( C_BasePlayer *player, CUserCmd *cmd )
 	//CPredictableId::ResetInstanceCounters();
 
 	player->m_pCurrentCommand = cmd;
-	ClientEntityList().SetPredictionRandomSeed( cmd );
-	ClientEntityList().SetPredictionPlayer( player->GetEngineObject() );
+	EntityList()->SetPredictionRandomSeed( cmd );
+	EntityList()->SetPredictionPlayer( player->GetEngineObject() );
 #endif
 }
 
@@ -858,8 +858,8 @@ void CPrediction::FinishCommand( C_BasePlayer *player )
 	VPROF( "CPrediction::FinishCommand" );
 
 	player->m_pCurrentCommand = NULL;
-	ClientEntityList().SetPredictionRandomSeed( NULL );
-	ClientEntityList().SetPredictionPlayer( NULL );
+	EntityList()->SetPredictionRandomSeed( NULL );
+	EntityList()->SetPredictionPlayer( NULL );
 #endif
 }
 
@@ -1216,7 +1216,7 @@ void CPrediction::RestoreOriginalEntityState( void )
 	VPROF( "CPrediction::RestoreOriginalEntityState" );
 	PREDICTION_TRACKVALUECHANGESCOPE( "restore" );
 
-	Assert(ClientEntityList().IsAbsRecomputationsEnabled() );
+	Assert(EntityList()->IsAbsRecomputationsEnabled() );
 
 	// Transfer intermediate data from other predictables
 	int pc = predictables->GetPredictableCount();
@@ -1413,7 +1413,7 @@ void CPrediction::ShiftIntermediateDataForward( int slots_to_remove, int number_
 	VPROF( "CPrediction::ShiftIntermediateDataForward" );
 	PREDICTION_TRACKVALUECHANGESCOPE( "shift" );
 
-	C_BasePlayer *current = (C_BasePlayer*)ClientEntityList().GetLocalPlayer();
+	C_BasePlayer *current = (C_BasePlayer*)EntityList()->GetLocalPlayer();
 	// No local player object?
 	if ( !current )
 		return;
@@ -1449,7 +1449,7 @@ void CPrediction::RestoreEntityToPredictedFrame( int predicted_frame )
 	VPROF( "CPrediction::RestoreEntityToPredictedFrame" );
 	PREDICTION_TRACKVALUECHANGESCOPE( "restoretopred" );
 
-	C_BasePlayer *current = (C_BasePlayer*)ClientEntityList().GetLocalPlayer();
+	C_BasePlayer *current = (C_BasePlayer*)EntityList()->GetLocalPlayer();
 	// No local player object?
 	if ( !current )
 		return;
@@ -1544,7 +1544,7 @@ int CPrediction::ComputeFirstCommandToExecute( bool received_new_world_update, i
 		{
 			if ( m_bPreviousAckHadErrors )
 			{
-				C_BasePlayer *pLocalPlayer = (C_BasePlayer*)ClientEntityList().GetLocalPlayer();
+				C_BasePlayer *pLocalPlayer = (C_BasePlayer*)EntityList()->GetLocalPlayer();
 				
 				// If an entity gets a prediction error, then we want to clear out its interpolated variables
 				// so we don't mix different samples at the same timestamps. We subtract 1 tick interval here because
@@ -1589,8 +1589,8 @@ bool CPrediction::PerformPrediction( bool received_new_world_update, C_BasePlaye
 	VPROF( "CPrediction::PerformPrediction" );
 
 	// This makes sure , tahe we are allwoed to sample the world when it may not be ready to be sampled
-	Assert(ClientEntityList().IsAbsQueriesValid() );
-	Assert(ClientEntityList().IsAbsRecomputationsEnabled() );
+	Assert(EntityList()->IsAbsQueriesValid() );
+	Assert(EntityList()->IsAbsRecomputationsEnabled() );
 
 	m_bInPrediction = true;
 
@@ -1757,7 +1757,7 @@ void CPrediction::_Update( bool received_new_world_update, bool validframe,
 						 int incoming_acknowledged, int outgoing_command )
 {
 #if !defined( NO_ENTITY_PREDICTION )
-	C_BasePlayer *localPlayer = (C_BasePlayer*)ClientEntityList().GetLocalPlayer();
+	C_BasePlayer *localPlayer = (C_BasePlayer*)EntityList()->GetLocalPlayer();
 	if ( !localPlayer )
 		return;
 
@@ -1784,7 +1784,7 @@ void CPrediction::_Update( bool received_new_world_update, bool validframe,
 	// This is cheesy, but if we have entities that are parented to attachments on other entities, then 
 	// it'll wind up needing to get a bone transform.
 	{
-		ClientEntityList().InvalidateBoneCaches();
+		EntityList()->InvalidateBoneCaches();
 		C_BaseAnimating::AutoAllowBoneAccess boneaccess( true, true );
 
 		// Remove any purely client predicted entities that were left "dangling" because the 
@@ -1805,7 +1805,7 @@ void CPrediction::_Update( bool received_new_world_update, bool validframe,
 	localPlayer->GetEngineObject()->SetLocalAngles( viewangles );
 
 	// This allows us to sample the world when it may not be ready to be sampled
-	Assert(ClientEntityList().IsAbsQueriesValid() );
+	Assert(EntityList()->IsAbsQueriesValid() );
 	
 	// FIXME: What about hierarchy here?!?
 	SetIdealPitch( localPlayer, localPlayer->GetEngineObject()->GetLocalOrigin(), localPlayer->GetEngineObject()->GetLocalAngles(), localPlayer->m_vecViewOffset );
@@ -1833,7 +1833,7 @@ bool CPrediction::IsFirstTimePredicted( void ) const
 //-----------------------------------------------------------------------------
 void CPrediction::GetViewOrigin( Vector& org )
 {
-	C_BasePlayer *player = (C_BasePlayer*)ClientEntityList().GetLocalPlayer();
+	C_BasePlayer *player = (C_BasePlayer*)EntityList()->GetLocalPlayer();
 	if ( !player )
 	{
 		org.Init();
@@ -1850,7 +1850,7 @@ void CPrediction::GetViewOrigin( Vector& org )
 //-----------------------------------------------------------------------------
 void CPrediction::SetViewOrigin( Vector& org )
 {
-	C_BasePlayer *player = (C_BasePlayer*)ClientEntityList().GetLocalPlayer();
+	C_BasePlayer *player = (C_BasePlayer*)EntityList()->GetLocalPlayer();
 	if ( !player )
 		return;
 
@@ -1866,7 +1866,7 @@ void CPrediction::SetViewOrigin( Vector& org )
 //-----------------------------------------------------------------------------
 void CPrediction::GetViewAngles( QAngle& ang )
 {
-	C_BasePlayer *player = (C_BasePlayer*)ClientEntityList().GetLocalPlayer();
+	C_BasePlayer *player = (C_BasePlayer*)EntityList()->GetLocalPlayer();
 	if ( !player )
 	{
 		ang.Init();
@@ -1883,7 +1883,7 @@ void CPrediction::GetViewAngles( QAngle& ang )
 //-----------------------------------------------------------------------------
 void CPrediction::SetViewAngles( QAngle& ang )
 {
-	C_BasePlayer *player = (C_BasePlayer*)ClientEntityList().GetLocalPlayer();
+	C_BasePlayer *player = (C_BasePlayer*)EntityList()->GetLocalPlayer();
 	if ( !player )
 		return;
 
@@ -1897,7 +1897,7 @@ void CPrediction::SetViewAngles( QAngle& ang )
 //-----------------------------------------------------------------------------
 void CPrediction::GetLocalViewAngles( QAngle& ang )
 {
-	C_BasePlayer *player = (C_BasePlayer*)ClientEntityList().GetLocalPlayer();
+	C_BasePlayer *player = (C_BasePlayer*)EntityList()->GetLocalPlayer();
 	if ( !player )
 	{
 		ang.Init();
@@ -1914,7 +1914,7 @@ void CPrediction::GetLocalViewAngles( QAngle& ang )
 //-----------------------------------------------------------------------------
 void CPrediction::SetLocalViewAngles( QAngle& ang )
 {
-	C_BasePlayer *player = (C_BasePlayer*)ClientEntityList().GetLocalPlayer();
+	C_BasePlayer *player = (C_BasePlayer*)EntityList()->GetLocalPlayer();
 	if ( !player )
 		return;
 

@@ -8,7 +8,7 @@
 #include "fx_cs_shared.h"
 #include "c_cs_player.h"
 #include "c_basetempentity.h"
-#include <cliententitylist.h>
+//#include <cliententitylist.h>
 
 
 class C_TEFireBullets : public C_BaseTempEntity

@@ -101,7 +101,7 @@ void CClientThinkList::SetNextClientThink( ClientEntityHandle_t hEnt, float flNe
 		return;
 	}
 
-	IClientThinkable *pThink = ClientEntityList().GetClientThinkableFromHandle( hEnt );
+	IClientThinkable *pThink = EntityList()->GetClientThinkableFromHandle( hEnt );
 	if ( !pThink )
 		return;
 
@@ -153,7 +153,7 @@ void CClientThinkList::RemoveThinkable( ClientThinkHandle_t hThink )
 	}
 
 	ThinkEntry_t *pEntry = GetThinkEntry( hThink );
-	IClientThinkable *pThink = ClientEntityList().GetClientThinkableFromHandle( pEntry->m_hEnt );
+	IClientThinkable *pThink = EntityList()->GetClientThinkableFromHandle( pEntry->m_hEnt );
 	if ( pThink )
 	{
 		pThink->SetThinkHandle( INVALID_THINK_HANDLE );
@@ -167,7 +167,7 @@ void CClientThinkList::RemoveThinkable( ClientThinkHandle_t hThink )
 //-----------------------------------------------------------------------------
 void CClientThinkList::RemoveThinkable( ClientEntityHandle_t hEnt )
 {
-	IClientThinkable *pThink = ClientEntityList().GetClientThinkableFromHandle( hEnt );
+	IClientThinkable *pThink = EntityList()->GetClientThinkableFromHandle( hEnt );
 	if ( pThink )
 	{
 		ClientThinkHandle_t hThink = pThink->GetThinkHandle();
@@ -185,7 +185,7 @@ void CClientThinkList::RemoveThinkable( ClientEntityHandle_t hEnt )
 //-----------------------------------------------------------------------------
 void CClientThinkList::PerformThinkFunction( ThinkEntry_t *pEntry, float flCurtime )
 {
-	IClientThinkable *pThink = ClientEntityList().GetClientThinkableFromHandle( pEntry->m_hEnt );
+	IClientThinkable *pThink = EntityList()->GetClientThinkableFromHandle( pEntry->m_hEnt );
 	if ( !pThink )
 	{
 		RemoveThinkable( pEntry->m_hEnt );
@@ -240,7 +240,7 @@ void CClientThinkList::AddEntityToFrameThinkList( ThinkEntry_t *pEntry, bool bAl
 		return;
 
 	// Respect hierarchy
-	C_BaseEntity *pEntity = ClientEntityList().GetBaseEntityFromHandle( pEntry->m_hEnt );
+	C_BaseEntity *pEntity = EntityList()->GetBaseEntityFromHandle( pEntry->m_hEnt );
 	if ( pEntity )
 	{
 		C_BaseEntity *pParent = pEntity->GetEngineObject()->GetMoveParent()?pEntity->GetEngineObject()->GetMoveParent()->GetOuter():NULL;
@@ -330,12 +330,12 @@ void CClientThinkList::PerformThinkFunctions()
 void CClientThinkList::AddToDeleteList( ClientEntityHandle_t hEnt )
 {
 	// Sanity check!
-	Assert( hEnt != ClientEntityList().InvalidHandle() );
-	if ( hEnt == ClientEntityList().InvalidHandle() )
+	Assert( hEnt != EntityList()->InvalidHandle() );
+	if ( hEnt == EntityList()->InvalidHandle() )
 		return;
 
 	// Check to see if entity is networkable -- don't let it release!
-	C_BaseEntity *pEntity = ClientEntityList().GetBaseEntityFromHandle( hEnt );
+	C_BaseEntity *pEntity = EntityList()->GetBaseEntityFromHandle( hEnt );
 	if ( pEntity )
 	{
 		// Check to see if the entity is already being removed!
@@ -355,8 +355,8 @@ void CClientThinkList::AddToDeleteList( ClientEntityHandle_t hEnt )
 void CClientThinkList::RemoveFromDeleteList( ClientEntityHandle_t hEnt )
 {
 	// Sanity check!
-	Assert( hEnt != ClientEntityList().InvalidHandle() );
-	if ( hEnt == ClientEntityList().InvalidHandle() )
+	Assert( hEnt != EntityList()->InvalidHandle() );
+	if ( hEnt == EntityList()->InvalidHandle() )
 		return;
 
 	int nSize = m_aDeleteList.Count();
@@ -364,9 +364,9 @@ void CClientThinkList::RemoveFromDeleteList( ClientEntityHandle_t hEnt )
 	{
 		if ( m_aDeleteList[iHandle] == hEnt )
 		{
-			m_aDeleteList[iHandle] = ClientEntityList().InvalidHandle();
+			m_aDeleteList[iHandle] = EntityList()->InvalidHandle();
 
-			C_BaseEntity *pEntity = ClientEntityList().GetBaseEntityFromHandle( hEnt );
+			C_BaseEntity *pEntity = EntityList()->GetBaseEntityFromHandle( hEnt );
 			if ( pEntity )
 			{
 				pEntity->SetRemovalFlag( false );
@@ -381,15 +381,15 @@ void CClientThinkList::CleanUpDeleteList()
 	for ( int iThink = 0; iThink < nThinkCount; ++iThink )
 	{
 		ClientEntityHandle_t handle = m_aDeleteList[iThink];
-		if ( handle != ClientEntityList().InvalidHandle() )
+		if ( handle != EntityList()->InvalidHandle() )
 		{
-			C_BaseEntity *pEntity = ClientEntityList().GetBaseEntityFromHandle( handle );
+			C_BaseEntity *pEntity = EntityList()->GetBaseEntityFromHandle( handle );
 			if ( pEntity )
 			{
 				pEntity->SetRemovalFlag( false );
 			}
 
-			IClientThinkable *pThink = ClientEntityList().GetClientThinkableFromHandle( handle );
+			IClientThinkable *pThink = EntityList()->GetClientThinkableFromHandle( handle );
 			if ( pThink )
 			{
 				pThink->Release();

@@ -258,7 +258,7 @@ void CAntlionGrub::CreateNugget( void )
 
 	Vector vecOrigin;
 	Vector vecForward;
-	GetAttachment(GetEngineObject()->LookupAttachment( "glow" ), vecOrigin, &vecForward );
+	GetEngineObject()->GetAttachment(GetEngineObject()->LookupAttachment( "glow" ), vecOrigin, &vecForward );
 
 	// Find out what size to make this nugget!
 	int nDenomination = GetNuggetDenomination();

@@ -45,7 +45,7 @@ void CHudVehicle::ApplySchemeSettings( IScheme *scheme )
 //-----------------------------------------------------------------------------
 IClientVehicle *CHudVehicle::GetLocalPlayerVehicle()
 {
-	C_BasePlayer *pPlayer = (C_BasePlayer*)ClientEntityList().GetLocalPlayer();
+	C_BasePlayer *pPlayer = (C_BasePlayer*)EntityList()->GetLocalPlayer();
 	if ( !pPlayer ||  !pPlayer->IsInAVehicle() )
 	{
 		return NULL;

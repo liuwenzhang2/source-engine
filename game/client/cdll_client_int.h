@@ -15,7 +15,7 @@
 #include "utllinkedlist.h"
 #include "cdll_int.h"
 #include "eiface.h"
-
+#include "networkvar.h"
 
 class IVModelRender;
 class IVEngineClient;
@@ -113,6 +113,14 @@ extern IReplayScreenshotManager *g_pReplayScreenshotManager;
 extern IEngineReplay *g_pEngineReplay;
 extern IEngineClientReplay *g_pEngineClientReplay;
 inline IClientEntityList* EntityList() { return entitylist; }
+
+template<class T>
+inline T* CHandle<T>::Get() const
+{
+#ifdef CLIENT_DLL
+	return (T*)EntityList()->GetClientEntityFromHandle(*this);
+#endif // CLIENT_DLL
+}
 
 //=============================================================================
 // HPE_BEGIN

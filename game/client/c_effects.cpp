@@ -756,7 +756,7 @@ bool CClient_Precipitation::ComputeEmissionArea( Vector& origin, Vector2D& size 
 
 	// calculate a volume around the player to snow in. Intersect this big magic
 	// box around the player with the volume of the current environmental ent.
-	C_BasePlayer *pPlayer = (C_BasePlayer*)ClientEntityList().GetLocalPlayer();
+	C_BasePlayer *pPlayer = (C_BasePlayer*)EntityList()->GetLocalPlayer();
 	if ( !pPlayer )
 		return false;
 
@@ -851,7 +851,7 @@ void CClient_Precipitation::CreateAshParticle( void )
 		m_iAshCount = 0;
 		}
 
-		C_BasePlayer *pPlayer = (C_BasePlayer*)ClientEntityList().GetLocalPlayer();
+		C_BasePlayer *pPlayer = (C_BasePlayer*)EntityList()->GetLocalPlayer();
 
 		if ( pPlayer == NULL )
 		return;
@@ -1036,7 +1036,7 @@ void CClient_Precipitation::EmitParticles( float fTimeDelta )
 	Vector2D size;
 	Vector vel, org;
 
-		C_BasePlayer *pPlayer = (C_BasePlayer*)ClientEntityList().GetLocalPlayer();
+		C_BasePlayer *pPlayer = (C_BasePlayer*)EntityList()->GetLocalPlayer();
 		if ( !pPlayer )
 		return;
 		Vector vPlayerCenter = pPlayer->WorldSpaceCenter();
@@ -1129,7 +1129,7 @@ public:
 	{
 		if ( r_RainHack.GetInt() )
 		{
-			CClient_Precipitation *pPrecipHackEnt = (CClient_Precipitation*)cl_entitylist->CreateEntityByName( "CClient_Precipitation" );
+			CClient_Precipitation *pPrecipHackEnt = (CClient_Precipitation*)EntityList()->CreateEntityByName( "CClient_Precipitation" );
 			pPrecipHackEnt->InitializeAsClientEntity( NULL, RENDER_GROUP_TRANSLUCENT_ENTITY );
 			g_pPrecipHackEnt = pPrecipHackEnt;
 		}
@@ -1140,7 +1140,7 @@ public:
 	{
 		if ( r_RainHack.GetInt() && g_pPrecipHackEnt )
 		{
-			cl_entitylist->DestroyEntity(g_pPrecipHackEnt);// ->Release();
+			EntityList()->DestroyEntity(g_pPrecipHackEnt);// ->Release();
 		}
 		m_bLevelInitted = false;
 	}
@@ -1897,7 +1897,7 @@ void CSnowFallManager::CreateSnowFall( void )
 #endif
 
 	// Check to see if we have a local player before starting the snow around a local player.
-	C_BasePlayer *pPlayer = (C_BasePlayer*)ClientEntityList().GetLocalPlayer();
+	C_BasePlayer *pPlayer = (C_BasePlayer*)EntityList()->GetLocalPlayer();
 	if ( pPlayer == NULL )
 		return;
 
@@ -2199,7 +2199,7 @@ bool SnowFallManagerCreate( CClient_Precipitation *pSnowEntity )
 {
 	if ( !s_pSnowFallMgr )
 		{
-		s_pSnowFallMgr = (CSnowFallManager*)cl_entitylist->CreateEntityByName( "CSnowFallManager");
+		s_pSnowFallMgr = (CSnowFallManager*)EntityList()->CreateEntityByName( "CSnowFallManager");
 		s_pSnowFallMgr->CreateEmitter();
 		s_pSnowFallMgr->InitializeAsClientEntity( NULL, RENDER_GROUP_OTHER );
 		if ( !s_pSnowFallMgr )
@@ -2217,7 +2217,7 @@ void SnowFallManagerDestroy( void )
 {
 	if ( s_pSnowFallMgr )
 	{
-		cl_entitylist->DestroyEntity(s_pSnowFallMgr);
+		EntityList()->DestroyEntity(s_pSnowFallMgr);
 		s_pSnowFallMgr = NULL;
 	}
 }

@@ -85,7 +85,7 @@ bool CHudCrosshair::ShouldDraw( void )
 	if ( m_bHideCrosshair )
 		return false;
 
-	C_BasePlayer* pPlayer = (C_BasePlayer*)ClientEntityList().GetLocalPlayer();
+	C_BasePlayer* pPlayer = (C_BasePlayer*)EntityList()->GetLocalPlayer();
 	if ( !pPlayer )
 		return false;
 
@@ -157,7 +157,7 @@ void CHudCrosshair::GetDrawPosition ( float *pX, float *pY, bool *pbBehindCamera
 
 	bool bBehindCamera = false;
 
-	C_BasePlayer* pPlayer = (C_BasePlayer*)ClientEntityList().GetLocalPlayer();
+	C_BasePlayer* pPlayer = (C_BasePlayer*)EntityList()->GetLocalPlayer();
 	if ( ( pPlayer != NULL ) && ( pPlayer->GetObserverMode()==OBS_MODE_NONE ) )
 	{
 		bool bUseOffset = false;
@@ -238,7 +238,7 @@ void CHudCrosshair::Paint( void )
 	if ( !IsCurrentViewAccessAllowed() )
 		return;
 
-	C_BasePlayer* pPlayer = (C_BasePlayer*)ClientEntityList().GetLocalPlayer();
+	C_BasePlayer* pPlayer = (C_BasePlayer*)EntityList()->GetLocalPlayer();
 	if ( !pPlayer )
 		return;
 

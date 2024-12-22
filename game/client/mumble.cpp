@@ -169,7 +169,7 @@ void CMumbleSystem::PostRender()
 	Vector vecOriginPlayer, vecOriginCamera = MainViewOrigin();
 	QAngle anglesPlayer, anglesCamera = MainViewAngles();
 
-	C_BasePlayer *pPlayer = (C_BasePlayer*)ClientEntityList().GetLocalPlayer();
+	C_BasePlayer *pPlayer = (C_BasePlayer*)EntityList()->GetLocalPlayer();
 	if ( pPlayer )
 	{
 		vecOriginPlayer = pPlayer->EyePosition();

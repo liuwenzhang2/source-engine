@@ -421,7 +421,7 @@ void CViewRender::DriftPitch (void)
 {
 	float		delta, move;
 
-	C_BasePlayer *player = (C_BasePlayer*)ClientEntityList().GetLocalPlayer();
+	C_BasePlayer *player = (C_BasePlayer*)EntityList()->GetLocalPlayer();
 	if ( !player )
 		return;
 
@@ -519,7 +519,7 @@ void CViewRender::OnRenderStart()
     SetUpViews();
 
 	// Adjust mouse sensitivity based upon the current FOV
-	C_BasePlayer *player = (C_BasePlayer*)ClientEntityList().GetLocalPlayer();
+	C_BasePlayer *player = (C_BasePlayer*)EntityList()->GetLocalPlayer();
 	if ( player )
 	{
 		default_fov.SetValue( player->m_iDefaultFOV );
@@ -620,7 +620,7 @@ float CViewRender::GetZFar()
 		// Use the far Z from the map's parameters.
 		farZ = r_mapextents.GetFloat() * 1.73205080757f;
 		
-		C_BasePlayer *pPlayer = (C_BasePlayer*)ClientEntityList().GetLocalPlayer();
+		C_BasePlayer *pPlayer = (C_BasePlayer*)EntityList()->GetLocalPlayer();
 		if( pPlayer && pPlayer->GetFogParams() )
 		{
 			if ( pPlayer->GetFogParams()->farz > 0 )
@@ -667,7 +667,7 @@ void CViewRender::SetUpViews()
 	// Enable spatial partition access to edicts
 	partition->SuppressLists( PARTITION_ALL_CLIENT_EDICTS, false );
 
-	C_BasePlayer *pPlayer = (C_BasePlayer*)ClientEntityList().GetLocalPlayer();
+	C_BasePlayer *pPlayer = (C_BasePlayer*)EntityList()->GetLocalPlayer();
 
 	// You in-view weapon aim.
 	bool bCalcViewModelView = false;
@@ -697,7 +697,7 @@ void CViewRender::SetUpViews()
 
 			if ( !g_nKillCamMode && (pPlayer->entindex() != viewentity) )
 			{
-				C_BaseEntity *ve = cl_entitylist->GetEnt( viewentity );
+				C_BaseEntity *ve = EntityList()->GetEnt( viewentity );
 				if ( ve )
 				{
 					VectorCopy( ve->GetEngineObject()->GetAbsOrigin(), view.origin );
@@ -788,8 +788,8 @@ void CViewRender::SetUpViews()
 	partition->SuppressLists( PARTITION_ALL_CLIENT_EDICTS, true );
 
 	// Enable access to all model bones
-	ClientEntityList().PopBoneAccess("OnRenderStart->CViewRender::SetUpView"); // pops the (true, false) bone access set in OnRenderStart
-	ClientEntityList().PushAllowBoneAccess( true, true, "CViewRender::SetUpView->OnRenderEnd" ); // pop is in OnRenderEnd()
+	EntityList()->PopBoneAccess("OnRenderStart->CViewRender::SetUpView"); // pops the (true, false) bone access set in OnRenderStart
+	EntityList()->PushAllowBoneAccess( true, true, "CViewRender::SetUpView->OnRenderEnd" ); // pop is in OnRenderEnd()
 
 	// Compute the world->main camera transform
     // This is only done for the main "middle-eye" view, not for the various other views.
@@ -1077,7 +1077,7 @@ void CViewRender::Render( vrect_t *rect )
 	// Assume normal vis
 	m_bForceNoVis			= false;
 	
-	C_BasePlayer *pPlayer = (C_BasePlayer*)ClientEntityList().GetLocalPlayer();
+	C_BasePlayer *pPlayer = (C_BasePlayer*)EntityList()->GetLocalPlayer();
 
 
     // Set for console commands, etc.
@@ -1325,7 +1325,7 @@ static void GetPos( const CCommand &args, Vector &vecOrigin, QAngle &angles )
 	angles = MainViewAngles();
 	if ( args.ArgC() == 2 && atoi( args[1] ) == 2 )
 	{
-		C_BasePlayer *pPlayer = (C_BasePlayer*)ClientEntityList().GetLocalPlayer();
+		C_BasePlayer *pPlayer = (C_BasePlayer*)EntityList()->GetLocalPlayer();
 		if ( pPlayer )
 		{
 			vecOrigin = pPlayer->GetEngineObject()->GetAbsOrigin();

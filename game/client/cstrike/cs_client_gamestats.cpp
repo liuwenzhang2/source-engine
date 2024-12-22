@@ -125,7 +125,7 @@ void CCSClientGameStats::FireGameEvent( IGameEvent *event )
 	else if ( Q_strcmp( pEventName, "round_start" ) == 0 && m_roundStats[CSSTAT_PLAYTIME] > 0 )
 	{
 		SRoundData *pRoundStatData = new SRoundData( &m_roundStats);
-		C_CSPlayer *pPlayer = ToCSPlayer((C_BasePlayer*)ClientEntityList().GetLocalPlayer() );
+		C_CSPlayer *pPlayer = ToCSPlayer((C_BasePlayer*)EntityList()->GetLocalPlayer() );
 		if ( pPlayer )
 		{
 			// Our current money + what we spent is what we started with at the beginning of round

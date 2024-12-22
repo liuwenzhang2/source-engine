@@ -87,7 +87,7 @@ void C_DynamicProp::GetRenderBounds( Vector& theMins, Vector& theMaxs )
 			// Only recompute if it's a new frame
 			if ( gpGlobals->framecount != m_iCachedFrameCount )
 			{
-				ComputeEntitySpaceHitboxSurroundingBox( &m_vecCachedRenderMins, &m_vecCachedRenderMaxs );
+				GetEngineObject()->ComputeEntitySpaceHitboxSurroundingBox( &m_vecCachedRenderMins, &m_vecCachedRenderMaxs );
 				m_iCachedFrameCount = gpGlobals->framecount;
 			}
 

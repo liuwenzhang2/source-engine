@@ -570,7 +570,7 @@ int CParticleSystemQuery::GetCollisionGroupFromName( const char *pszCollisionGro
 Vector CParticleSystemQuery::GetLocalPlayerPos( void )
 {
 #ifdef CLIENT_DLL
-	C_BasePlayer *pPlayer = (C_BasePlayer*)ClientEntityList().GetLocalPlayer();
+	C_BasePlayer *pPlayer = (C_BasePlayer*)EntityList()->GetLocalPlayer();
 	if ( !pPlayer )
 		return vec3_origin;
 	return pPlayer->WorldSpaceCenter();
@@ -585,7 +585,7 @@ Vector CParticleSystemQuery::GetLocalPlayerPos( void )
 void CParticleSystemQuery::GetLocalPlayerEyeVectors( Vector *pForward, Vector *pRight, Vector *pUp )
 {
 #ifdef CLIENT_DLL
-	C_BasePlayer *pPlayer = (C_BasePlayer*)ClientEntityList().GetLocalPlayer();
+	C_BasePlayer *pPlayer = (C_BasePlayer*)EntityList()->GetLocalPlayer();
 	if ( !pPlayer )
 	{
 		*pForward = vec3_origin;

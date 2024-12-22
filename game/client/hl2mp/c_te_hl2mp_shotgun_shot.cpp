@@ -6,7 +6,7 @@
 
 #include "cbase.h"
 #include "c_basetempentity.h"
-#include <cliententitylist.h>
+//#include <cliententitylist.h>
 #include "ammodef.h"
 #include "c_te_effect_dispatch.h"
 #include "shot_manipulator.h"
@@ -60,7 +60,7 @@ void C_TEHL2MPFireBullets::CreateEffects( void )
 	if ( pAmmoDef == NULL )
 		 return;
 
-	C_BaseEntity *pEnt = ClientEntityList().GetEnt( m_iPlayer );
+	C_BaseEntity *pEnt = EntityList()->GetEnt( m_iPlayer );
 
 	if ( pEnt )
 	{

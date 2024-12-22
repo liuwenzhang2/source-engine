@@ -1137,7 +1137,7 @@ void CNetGraphPanel::DrawLargePacketSizes( int x, int w, int graphtype, float wa
 //-----------------------------------------------------------------------------
 static bool IsTakingAFreezecamScreenshot()
 {
-	C_BasePlayer *pPlayer = (C_BasePlayer*)ClientEntityList().GetLocalPlayer();
+	C_BasePlayer *pPlayer = (C_BasePlayer*)EntityList()->GetLocalPlayer();
 	bool bInFreezeCam = ( pPlayer && pPlayer->GetObserverMode() == OBS_MODE_FREEZECAM );
 
 	return ( bInFreezeCam && engine->IsTakingScreenshot() );

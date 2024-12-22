@@ -162,7 +162,7 @@ void CReplayInputPanel::OnCommand( const char *command )
 			}
 
 			// Display a message - if we somehow disconnect, we can crash here if local player isn't checked
-			C_BasePlayer *pLocalPlayer = (C_BasePlayer*)ClientEntityList().GetLocalPlayer();
+			C_BasePlayer *pLocalPlayer = (C_BasePlayer*)EntityList()->GetLocalPlayer();
 			if ( pLocalPlayer )
 			{
 				g_pClientMode->DisplayReplayMessage( pLocalPlayer->IsAlive() ? "#Replay_ReplaySavedAlive" : "#Replay_ReplaySavedDead", -1.0f, false, "replay\\saved.wav", false );

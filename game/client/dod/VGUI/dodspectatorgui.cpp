@@ -33,7 +33,7 @@ CDODSpectatorGUI::CDODSpectatorGUI(IViewPort *pViewPort) : CSpectatorGUI(pViewPo
 //-----------------------------------------------------------------------------
 bool CDODSpectatorGUI::NeedsUpdate( void )
 {
-	if ( !(C_BasePlayer*)ClientEntityList().GetLocalPlayer() )
+	if ( !(C_BasePlayer*)EntityList()->GetLocalPlayer() )
 		return false;
 
 	if( IsVisible() )
@@ -42,10 +42,10 @@ bool CDODSpectatorGUI::NeedsUpdate( void )
 	//if ( DODGameRules()->IsGameUnderTimeLimit() && m_nLastTime != DODGameRules()->GetTimeLeft() )
 	//	return true;
 
-	if ( m_nLastSpecMode != ((C_BasePlayer*)ClientEntityList().GetLocalPlayer())->GetObserverMode() )
+	if ( m_nLastSpecMode != ((C_BasePlayer*)EntityList()->GetLocalPlayer())->GetObserverMode() )
 		return true;
 
-	if ( m_nLastSpecTarget != ((C_BasePlayer*)ClientEntityList().GetLocalPlayer())->GetObserverTarget() )
+	if ( m_nLastSpecTarget != ((C_BasePlayer*)EntityList()->GetLocalPlayer())->GetObserverTarget() )
 		return true;
 
 	return BaseClass::NeedsUpdate();
@@ -53,7 +53,7 @@ bool CDODSpectatorGUI::NeedsUpdate( void )
 
 Color CDODSpectatorGUI::GetClientColor(int index)
 {
-	C_BasePlayer *player = ToBasePlayer( ClientEntityList().GetEnt( index) );
+	C_BasePlayer *player = ToBasePlayer( EntityList()->GetEnt( index) );
 
 	int team = player->GetTeamNumber();
 
@@ -69,7 +69,7 @@ void CDODSpectatorGUI::Update()
 {
 	BaseClass::Update();
 	
-	C_BasePlayer *pLocalPlayer = (C_BasePlayer*)ClientEntityList().GetLocalPlayer();
+	C_BasePlayer *pLocalPlayer = (C_BasePlayer*)EntityList()->GetLocalPlayer();
 
 	if( pLocalPlayer )
 	{

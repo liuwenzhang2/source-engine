@@ -287,7 +287,7 @@ static inline C_BaseEntity* ParticleGetEntity(int index)
 	#if defined(PARTICLEPROTOTYPE_APP)
 		return NULL;
 	#else
-		return cl_entitylist->GetEnt(index);
+		return EntityList()->GetEnt(index);
 	#endif
 }
 
@@ -317,12 +317,12 @@ C_ParticleSmokeGrenade::C_ParticleSmokeGrenade()
 
 bool C_ParticleSmokeGrenade::Init(int entnum, int iSerialNum)
 {
-	m_pSmokeTrail = (C_SmokeTrail*)ClientEntityList().CreateEntityByName("C_SmokeTrail");
+	m_pSmokeTrail = (C_SmokeTrail*)EntityList()->CreateEntityByName("C_SmokeTrail");
 	return BaseClass::Init(entnum, iSerialNum);
 }
 
 void C_ParticleSmokeGrenade::UpdateOnRemove(void) {
-	ClientEntityList().DestroyEntity(m_pSmokeTrail);
+	EntityList()->DestroyEntity(m_pSmokeTrail);
 	m_pSmokeTrail = NULL;
 	BaseClass::UpdateOnRemove();
 }

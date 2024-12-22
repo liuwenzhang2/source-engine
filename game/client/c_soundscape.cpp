@@ -532,7 +532,7 @@ void C_SoundscapeSystem::Update( float frametime )
 	if ( m_forcedSoundscapeIndex >= 0 )
 	{
 		// generate fake positional sources
-		C_BasePlayer *pPlayer = (C_BasePlayer*)ClientEntityList().GetLocalPlayer();
+		C_BasePlayer *pPlayer = (C_BasePlayer*)EntityList()->GetLocalPlayer();
 		if ( pPlayer )
 		{
 			Vector origin, forward, right;
@@ -704,7 +704,7 @@ void C_SoundscapeSystem::ProcessDSPPlayer( KeyValues *pDSPPlayer )
 
 void C_SoundscapeSystem::ProcessSoundMixer( KeyValues *pSoundMixer, subsoundscapeparams_t &params )
 {
-	C_BasePlayer *pPlayer = (C_BasePlayer*)ClientEntityList().GetLocalPlayer();
+	C_BasePlayer *pPlayer = (C_BasePlayer*)EntityList()->GetLocalPlayer();
 	if ( !pPlayer || pPlayer->CanSetSoundMixer() )
 	{
 		m_pSoundMixerVar->SetValue( pSoundMixer->GetString() );
@@ -835,7 +835,7 @@ Vector C_SoundscapeSystem::GenerateRandomSoundPosition()
 	float angle = random->RandomFloat( -180, 180 );
 	float sinAngle, cosAngle;
 	SinCos( angle, &sinAngle, &cosAngle );
-	C_BasePlayer *pPlayer = (C_BasePlayer*)ClientEntityList().GetLocalPlayer();
+	C_BasePlayer *pPlayer = (C_BasePlayer*)EntityList()->GetLocalPlayer();
 	if ( pPlayer )
 	{
 		Vector origin, forward, right;

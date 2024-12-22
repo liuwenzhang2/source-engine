@@ -49,14 +49,14 @@ static CEntityFactory<C_PortalBlast> g_C_PortalBlast_Factory("","C_PortalBlast")
 
 void C_PortalBlast::Create( bool bIsPortal2, PortalPlacedByType ePlacedBy, const Vector &vStart, const Vector &vEnd, const QAngle &qAngles, float fDeathTime )
 {
-	C_PortalBlast *pPortalBlast = (C_PortalBlast*)cl_entitylist->CreateEntityByName( "C_PortalBlast" );
+	C_PortalBlast *pPortalBlast = (C_PortalBlast*)EntityList()->CreateEntityByName( "C_PortalBlast" );
 	pPortalBlast->Init( bIsPortal2, ePlacedBy, vStart, vEnd, qAngles, fDeathTime );
 }
 
 
 void C_PortalBlast::Init( bool bIsPortal2, PortalPlacedByType ePlacedBy, const Vector &vStart, const Vector &vEnd, const QAngle &qAngles, float fDeathTime )
 {
-	//ClientEntityList().AddNonNetworkableEntity( this );
+	//EntityList()->AddNonNetworkableEntity( this );
 	ClientThinkList()->SetNextClientThink( GetClientHandle(), CLIENT_THINK_ALWAYS );
 
 	GetEngineObject()->AddToLeafSystem( RENDER_GROUP_OPAQUE_ENTITY );
@@ -93,7 +93,7 @@ void C_PortalBlast::ClientThink( void )
 	if ( m_fCreationTime == 0.0f && m_fDeathTime == 0.0f )
 	{
 		// Die!
-		cl_entitylist->DestroyEntity(this);// Remove();
+		EntityList()->DestroyEntity(this);// Remove();
 		return;
 	}
 

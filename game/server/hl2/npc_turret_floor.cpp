@@ -577,7 +577,7 @@ void CNPC_FloorTurret::OnPhysGunDrop( CBasePlayer *pPhysGunUser, PhysGunDrop_t R
 // Purpose: Whether this should return carry angles
 // Output : Returns true on success, false on failure.
 //-----------------------------------------------------------------------------
-bool CNPC_FloorTurret::HasPreferredCarryAnglesForPlayer( CBasePlayer *pPlayer )
+bool CNPC_FloorTurret::HasPreferredCarryAnglesForPlayer( CBaseEntity *pPlayer )
 {
 	// Don't use preferred angles on enemy turrets
 	if ( IRelationType( pPlayer ) == D_HT )

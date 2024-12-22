@@ -163,7 +163,7 @@ void C_NPC_Vortigaunt::ReceiveMessage( int classID, bf_read &msg )
 	case VORTFX_ARMBEAM:
 		{
 			int nIndex = msg.ReadLong();
-			C_BaseEntity *pEnt = ClientEntityList().GetBaseEntityFromHandle( ClientEntityList().EntIndexToHandle( nIndex ) );
+			C_BaseEntity *pEnt = EntityList()->GetBaseEntity( nIndex );
 
 			if ( pEnt )
 			{

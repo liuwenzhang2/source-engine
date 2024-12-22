@@ -172,7 +172,7 @@ void FX_FireBullets(
 	bool bDoEffects = true;
 
 #ifdef CLIENT_DLL
-	C_DODPlayer *pPlayer = ToDODPlayer( ClientEntityList().GetBaseEntity( iPlayerIndex ) );
+	C_DODPlayer *pPlayer = ToDODPlayer( EntityList()->GetBaseEntity( iPlayerIndex ) );
 #else
 	CDODPlayer *pPlayer = ToDODPlayer( UTIL_PlayerByIndex( iPlayerIndex) );
 #endif

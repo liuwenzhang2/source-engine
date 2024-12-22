@@ -77,8 +77,8 @@ CON_COMMAND( overview_zoom, "Sets overview map zoom: <zoom> [<time>] [rel]" )
 
 	if( !g_pMapOverview->AllowConCommandsWhileAlive() )
 	{
-		C_BasePlayer *localPlayer = (C_BasePlayer*)ClientEntityList().GetLocalPlayer();
-		if( localPlayer && (C_BasePlayer*)ClientEntityList().GetLocalPlayer()->IsAlive() )
+		C_BasePlayer *localPlayer = (C_BasePlayer*)EntityList()->GetLocalPlayer();
+		if( localPlayer && (C_BasePlayer*)EntityList()->GetLocalPlayer()->IsAlive() )
 			return;// Not allowed to execute commands while alive
 		else if( localPlayer && localPlayer->GetObserverMode() == OBS_MODE_DEATHCAM )
 			return;// In the death cam spiral counts as alive
@@ -113,8 +113,8 @@ CON_COMMAND( overview_mode, "Sets overview map mode off,small,large: <0|1|2>" )
 
 	if( !g_pMapOverview->AllowConCommandsWhileAlive() )
 	{
-		C_BasePlayer *localPlayer = (C_BasePlayer*)ClientEntityList().GetLocalPlayer();
-		if( localPlayer && (C_BasePlayer*)ClientEntityList().GetLocalPlayer()->IsAlive() )
+		C_BasePlayer *localPlayer = (C_BasePlayer*)EntityList()->GetLocalPlayer();
+		if( localPlayer && (C_BasePlayer*)EntityList()->GetLocalPlayer()->IsAlive() )
 			return;// Not allowed to execute commands while alive
 		else if( localPlayer && localPlayer->GetObserverMode() == OBS_MODE_DEATHCAM )
 			return;// In the death cam spiral counts as alive
@@ -316,7 +316,7 @@ void CMapOverview::UpdateFollowEntity()
 {
 	if ( m_nFollowEntity != 0 )
 	{
-		C_BaseEntity *ent = ClientEntityList().GetEnt( m_nFollowEntity );
+		C_BaseEntity *ent = EntityList()->GetEnt( m_nFollowEntity );
 
 		if ( ent )
 		{
@@ -366,7 +366,7 @@ void CMapOverview::Paint()
 
 bool CMapOverview::CanPlayerBeSeen(MapPlayer_t *player)
 {
-	C_BasePlayer *localPlayer = (C_BasePlayer*)ClientEntityList().GetLocalPlayer();
+	C_BasePlayer *localPlayer = (C_BasePlayer*)EntityList()->GetLocalPlayer();
 
 	if ( !localPlayer || !player )
 		return false;
@@ -406,7 +406,7 @@ bool CMapOverview::CanPlayerBeSeen(MapPlayer_t *player)
 /// Note: index is 0-based
 bool CMapOverview::CanPlayerHealthBeSeen(MapPlayer_t *player)
 {
-	C_BasePlayer *localPlayer = (C_BasePlayer*)ClientEntityList().GetLocalPlayer();
+	C_BasePlayer *localPlayer = (C_BasePlayer*)EntityList()->GetLocalPlayer();
 
 	if ( !localPlayer )
 		return false;
@@ -470,7 +470,7 @@ void CMapOverview::Update( void )
 
 	m_fWorldTime = gpGlobals->curtime;
 
-	C_BasePlayer *pPlayer = (C_BasePlayer*)ClientEntityList().GetLocalPlayer();
+	C_BasePlayer *pPlayer = (C_BasePlayer*)EntityList()->GetLocalPlayer();
 
 	if ( !pPlayer )
 		return;
@@ -1032,7 +1032,7 @@ void CMapOverview::SetMode(int mode)
 		if ( m_nMode != MAP_MODE_OFF )
 			m_flChangeSpeed = 1000; // zoom effect
 
-		C_BasePlayer *pPlayer = (C_BasePlayer*)ClientEntityList().GetLocalPlayer();
+		C_BasePlayer *pPlayer = (C_BasePlayer*)EntityList()->GetLocalPlayer();
 
 		if ( pPlayer )
             SetFollowEntity( pPlayer->entindex() );
@@ -1329,7 +1329,7 @@ void CMapOverview::UpdateObjects()
 		if ( obj->index <= 0 )
 			continue;
 
-		C_BaseEntity *entity = ClientEntityList().GetEnt( obj->index );
+		C_BaseEntity *entity = EntityList()->GetEnt( obj->index );
 
 		if ( !entity )
 			continue;

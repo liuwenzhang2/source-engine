@@ -23,12 +23,6 @@
 #include "tier1/utldict.h"
 #include "vphysics_interface.h"
 
-#ifdef CLIENT_DLL
-class C_BaseEntity;
-#endif // CLIENT_DLL
-#ifdef GAME_DLL
-class CBaseEntity;
-#endif // GAME_DLL
 class CPhysCollide;
 
 template<class T>
@@ -266,7 +260,7 @@ public:
 			m_HashTable[handle].data = AllocDataObject(instance);
 
 			// FIXME: We'll have to remove this if any objects we instance have vtables!!!
-			Q_memset(m_HashTable[handle].data, 0, sizeof(V));
+			//Q_memset(m_HashTable[handle].data, 0, sizeof(V));
 		}
 
 		return (void*)m_HashTable[handle].data;
@@ -289,11 +283,14 @@ public:
 protected:
 
 	virtual V* AllocDataObject(const T* instance) {
-		return new V;
+		void* pMemory = malloc(sizeof(V));
+		Q_memset(pMemory, 0, sizeof(V));
+		return new (pMemory)V;
 	}
 
 	virtual void FreeDataObject(const T* instance, V* pDataObject) {
-		delete pDataObject;
+		pDataObject->~V();
+		free(pDataObject);
 	}
 
 private:
@@ -1081,13 +1078,6 @@ void CBaseEntityList<T>::DestroyDataObject(int type, T* instance) {
 	m_DataObjectAccessSystem.DestroyDataObject(type, instance);
 }
 
-#ifdef CLIENT_DLL
-extern CBaseEntityList<C_BaseEntity>* g_pEntityList;
-#endif // CLIENT_DLL
-#ifdef GAME_DLL
-extern CBaseEntityList<CBaseEntity>* g_pEntityList;
-#endif // GAME_DLL
-
 //-----------------------------------------------------------------------------
 // Entity creation factory
 //-----------------------------------------------------------------------------
@@ -1447,7 +1437,7 @@ struct PS_SD_Static_World_StaticProps_ClippedProp_t
 
 	int								iTraceContents;
 	short							iTraceSurfaceProps;
-	static CBaseEntity* pTraceEntity;
+	static IHandleEntity* pTraceEntity;
 	static const char* szTraceSurfaceName; //same for all static props, here just for easy reference
 	static const int				iTraceSurfaceFlags; //same for all static props, here just for easy reference
 };
@@ -1528,7 +1518,7 @@ struct PS_SD_Static_SurfaceProperties_t //surface properties to pretend every co
 {
 	int contents;
 	csurface_t surface;
-	CBaseEntity* pEntity;
+	IHandleEntity* pEntity;
 };
 
 struct PS_SD_Static_t //stuff that doesn't move around
@@ -1564,5 +1554,26 @@ struct PS_InternalData_t
 	PS_PlacementData_t Placement;
 	PS_SimulationData_t Simulation;
 };
+
+#ifdef DEBUG_PORTAL_SIMULATION_CREATION_TIMES
+#define STARTDEBUGTIMER(x) { x.Start(); }
+#define STOPDEBUGTIMER(x) { x.End(); }
+#define DEBUGTIMERONLY(x) x
+#define CREATEDEBUGTIMER(x) CFastTimer x;
+static const char* s_szTabSpacing[] = { "", "\t", "\t\t", "\t\t\t", "\t\t\t\t", "\t\t\t\t\t", "\t\t\t\t\t\t", "\t\t\t\t\t\t\t", "\t\t\t\t\t\t\t\t", "\t\t\t\t\t\t\t\t\t", "\t\t\t\t\t\t\t\t\t\t" };
+static int s_iTabSpacingIndex = 0;
+static int s_iPortalSimulatorGUID = 0; //used in standalone function that have no idea what a portal simulator is
+#define INCREMENTTABSPACING() ++s_iTabSpacingIndex;
+#define DECREMENTTABSPACING() --s_iTabSpacingIndex;
+#define TABSPACING (s_szTabSpacing[s_iTabSpacingIndex])
+#else
+#define STARTDEBUGTIMER(x)
+#define STOPDEBUGTIMER(x)
+#define DEBUGTIMERONLY(x)
+#define CREATEDEBUGTIMER(x)
+#define INCREMENTTABSPACING()
+#define DECREMENTTABSPACING()
+#define TABSPACING
+#endif
 
 #endif // ENTITYLIST_BASE_H

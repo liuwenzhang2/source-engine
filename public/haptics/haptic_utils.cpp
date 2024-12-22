@@ -165,14 +165,14 @@ void HapticsHandleMsg_HapSetConst( Vector const &constant )
 {
 	//Msg("__MsgFunc_HapSetConst: %f %f %f\n",constant.x,constant.y,constant.z);
 	haptics->SetConstantForce(constant);
-	//C_BasePlayer* pPlayer = (C_BasePlayer*)ClientEntityList().GetLocalPlayer();
+	//C_BasePlayer* pPlayer = (C_BasePlayer*)EntityList()->GetLocalPlayer();
 }
 
 
 //Might be able to handle this better...
 void HapticsHandleMsg_SPHapWeapEvent( int iActivity )
 {
-	C_BasePlayer* pPlayer = (C_BasePlayer*)ClientEntityList().GetLocalPlayer();
+	C_BasePlayer* pPlayer = (C_BasePlayer*)EntityList()->GetLocalPlayer();
 	C_BaseCombatWeapon* weap = NULL;
 	if(pPlayer)
 		weap = pPlayer->GetActiveWeapon();
@@ -196,7 +196,7 @@ void HapticsHandleMsg_HapDmg( float pitch, float yaw, float damage, int damageTy
 #ifdef TERROR
 	C_TerrorPlayer *pPlayer = C_TerrorPlayer::GetLocalTerrorPlayer();
 #else
-	C_BasePlayer *pPlayer = (C_BasePlayer*)ClientEntityList().GetLocalPlayer();
+	C_BasePlayer *pPlayer = (C_BasePlayer*)EntityList()->GetLocalPlayer();
 #endif
 
 	if(pPlayer)
@@ -232,7 +232,7 @@ void UpdateAvatarEffect(void)
 	Vector vvel;
 	Vector evel;
 	QAngle eye;
-	C_BasePlayer* pPlayer = (C_BasePlayer*)ClientEntityList().GetLocalPlayer();
+	C_BasePlayer* pPlayer = (C_BasePlayer*)EntityList()->GetLocalPlayer();
 	if(!pPlayer)
 		return;
 
@@ -363,7 +363,7 @@ void HapticProcessSound(const char* soundname, int entIndex)
 		bool local = false;
 		C_BaseEntity *ent = C_BaseEntity::Instance( entIndex );
 		if(ent)
-			local = (entIndex == -1  || ent == (C_BasePlayer*)ClientEntityList().GetLocalPlayer() || ent == ((C_BasePlayer*)ClientEntityList().GetLocalPlayer())->GetActiveWeapon());
+			local = (entIndex == -1  || ent == (C_BasePlayer*)EntityList()->GetLocalPlayer() || ent == ((C_BasePlayer*)EntityList()->GetLocalPlayer())->GetActiveWeapon());
 
 		haptics->ProcessHapticEvent(2,"Sounds",soundname);
 	}

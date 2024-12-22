@@ -60,7 +60,7 @@ void C_AI_BaseNPC::ClientThink( void )
 	BaseClass::ClientThink();
 
 #ifdef HL2_DLL
-	C_BaseHLPlayer *pPlayer = dynamic_cast<C_BaseHLPlayer*>(ClientEntityList().GetLocalPlayer() );
+	C_BaseHLPlayer *pPlayer = dynamic_cast<C_BaseHLPlayer*>(EntityList()->GetLocalPlayer() );
 
 	if ( ShouldModifyPlayerSpeed() == true )
 	{
@@ -95,7 +95,7 @@ void C_AI_BaseNPC::ClientThink( void )
 #endif // HL2_DLL
 
 #ifdef HL2_EPISODIC
-	C_BaseHLPlayer *pPlayer = dynamic_cast<C_BaseHLPlayer*>(ClientEntityList().GetLocalPlayer() );
+	C_BaseHLPlayer *pPlayer = dynamic_cast<C_BaseHLPlayer*>(EntityList()->GetLocalPlayer() );
 
 	if ( pPlayer && m_flTimePingEffect > gpGlobals->curtime )
 	{
@@ -149,7 +149,7 @@ void C_AI_BaseNPC::GetRagdollInitBoneArrays( matrix3x4_t *pDeltaBones0, matrix3x
 {
 	ForceSetupBonesAtTime( pDeltaBones0, gpGlobals->curtime - boneDt );
 	GetRagdollCurSequenceWithDeathPose( this, pDeltaBones1, gpGlobals->curtime, m_iDeathPose, m_iDeathFrame );
-	float ragdollCreateTime = ClientEntityList().PhysGetSyncCreateTime();
+	float ragdollCreateTime = EntityList()->PhysGetSyncCreateTime();
 	if ( ragdollCreateTime != gpGlobals->curtime )
 	{
 		// The next simulation frame begins before the end of this frame

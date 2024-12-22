@@ -125,7 +125,7 @@ void CCSSpectatorGUI::UpdateSpectatorPlayerList()
 
 bool CCSSpectatorGUI::NeedsUpdate( void )
 {
-	C_CSPlayer *player = (C_CSPlayer*)ClientEntityList().GetLocalPlayer();
+	C_CSPlayer *player = (C_CSPlayer*)EntityList()->GetLocalPlayer();
 	if ( !player )
 		return false;
 
@@ -207,7 +207,7 @@ void CCSSpectatorGUI::UpdateTimer()
 
 void CCSSpectatorGUI::UpdateAccount()
 {
-	C_CSPlayer *player = (C_CSPlayer*)ClientEntityList().GetLocalPlayer();
+	C_CSPlayer *player = (C_CSPlayer*)EntityList()->GetLocalPlayer();
 
 	if ( !player )
 		return;
@@ -231,11 +231,11 @@ void CCSSpectatorGUI::UpdateAccount()
 	int iTeamOnly = 0;// TODO = gCSViewPortInterface->GetForceCamera();
 
 	// if we're not a spectator or HLTV and iTeamOnly is set
-	if ( (C_BasePlayer*)ClientEntityList().GetLocalPlayer()->GetTeamNumber() // && !gEngfuncs.IsSpectateOnly() 
+	if ( (C_BasePlayer*)EntityList()->GetLocalPlayer()->GetTeamNumber() // && !gEngfuncs.IsSpectateOnly() 
 	&& iTeamOnly )
 	{
 		// then we want to force the same team
-		if ( (C_BasePlayer*)ClientEntityList().GetLocalPlayer()->GetTeamNumber() != iTeam )
+		if ( (C_BasePlayer*)EntityList()->GetLocalPlayer()->GetTeamNumber() != iTeam )
 		{
 			bRetVal = false;
 		}
@@ -248,7 +248,7 @@ void CCSSpectatorGUI::Update()
 {
 	BaseClass::Update();
 	
-	C_BasePlayer *pLocalPlayer = (C_BasePlayer*)ClientEntityList().GetLocalPlayer();
+	C_BasePlayer *pLocalPlayer = (C_BasePlayer*)EntityList()->GetLocalPlayer();
 
 	if( pLocalPlayer )
 	{
@@ -504,7 +504,7 @@ void CCSMapOverview::ApplySchemeSettings(vgui::IScheme *scheme)
 //-----------------------------------------------------------------------------
 void CCSMapOverview::Update( void )
 {
-	C_BasePlayer *pPlayer = (C_BasePlayer*)ClientEntityList().GetLocalPlayer();
+	C_BasePlayer *pPlayer = (C_BasePlayer*)EntityList()->GetLocalPlayer();
 
 	if ( !pPlayer )
 		return;
@@ -596,7 +596,7 @@ CCSMapOverview::CSMapPlayer_t* CCSMapOverview::GetCSInfoForHostage(MapPlayer_t *
 // rules that define if you can see a player on the overview or not
 bool CCSMapOverview::CanPlayerBeSeen( MapPlayer_t *player )
 {
-	C_BasePlayer *localPlayer = (C_BasePlayer*)ClientEntityList().GetLocalPlayer();
+	C_BasePlayer *localPlayer = (C_BasePlayer*)EntityList()->GetLocalPlayer();
 
 	if (!localPlayer || !player )
 		return false;
@@ -646,7 +646,7 @@ bool CCSMapOverview::CanPlayerBeSeen( MapPlayer_t *player )
 
 bool CCSMapOverview::CanHostageBeSeen( MapPlayer_t *hostage )
 {
-	C_BasePlayer *localPlayer = (C_BasePlayer*)ClientEntityList().GetLocalPlayer();
+	C_BasePlayer *localPlayer = (C_BasePlayer*)EntityList()->GetLocalPlayer();
 
 	if ( !localPlayer || !hostage )
 		return false;
@@ -750,7 +750,7 @@ void CCSMapOverview::UpdatePlayers()
 
 	float now = gpGlobals->curtime;
 
-	CBasePlayer *localPlayer = (C_BasePlayer*)ClientEntityList().GetLocalPlayer();
+	CBasePlayer *localPlayer = (C_BasePlayer*)EntityList()->GetLocalPlayer();
 	if( localPlayer == NULL )
 		return;
 
@@ -1060,7 +1060,7 @@ bool CCSMapOverview::ShouldDraw( void )
 		}
 
 		// We have to be alive and not blind to draw in this mode.
-		C_CSPlayer *pCSPlayer = (C_CSPlayer*)ClientEntityList().GetLocalPlayer();
+		C_CSPlayer *pCSPlayer = (C_CSPlayer*)EntityList()->GetLocalPlayer();
 		if( !pCSPlayer || pCSPlayer->GetObserverMode() == OBS_MODE_DEATHCAM ) 
 		{
 			return false;
@@ -1211,7 +1211,7 @@ void CCSMapOverview::DrawBomb()
     if( m_bomb.state == CSMapBomb_t::BOMB_INVALID )
 		return;
 
-	CBasePlayer *localPlayer = (C_BasePlayer*)ClientEntityList().GetLocalPlayer();
+	CBasePlayer *localPlayer = (C_BasePlayer*)EntityList()->GetLocalPlayer();
 	if( localPlayer == NULL )
 		return;
 	MapPlayer_t *localMapPlayer = GetPlayerByUserID(localPlayer->GetUserID());
@@ -1430,7 +1430,7 @@ void CCSMapOverview::DrawMapPlayers()
 	surface()->DrawSetTextFont( m_hIconFont );
 
 	Color colorGreen( 0, 255, 0, 255 );	// health bar color
-	CBasePlayer *localPlayer = (C_BasePlayer*)ClientEntityList().GetLocalPlayer();
+	CBasePlayer *localPlayer = (C_BasePlayer*)EntityList()->GetLocalPlayer();
 
 	for (int i=0; i < MAX_PLAYERS; i++)
 	{
@@ -1539,7 +1539,7 @@ void CCSMapOverview::DrawHostages()
 	surface()->DrawSetTextFont( m_hIconFont );
 
 	Color colorGreen( 0, 255, 0, 255 );	// health bar color
-	CBasePlayer *localPlayer = (C_BasePlayer*)ClientEntityList().GetLocalPlayer();
+	CBasePlayer *localPlayer = (C_BasePlayer*)EntityList()->GetLocalPlayer();
 
 	for (int i=0; i < MAX_HOSTAGES; i++)
 	{
@@ -1810,7 +1810,7 @@ void CCSMapOverview::ResetRound()
 
 void CCSMapOverview::DrawCamera()
 {
-	C_BasePlayer *localPlayer = (C_BasePlayer*)ClientEntityList().GetLocalPlayer();
+	C_BasePlayer *localPlayer = (C_BasePlayer*)EntityList()->GetLocalPlayer();
 
 	if (!localPlayer)
 		return;
@@ -1937,7 +1937,7 @@ void CCSMapOverview::FireGameEvent( IGameEvent *event )
 		if ( !player )
 			return;
 
-		CBasePlayer *localPlayer = (C_BasePlayer*)ClientEntityList().GetLocalPlayer();
+		CBasePlayer *localPlayer = (C_BasePlayer*)EntityList()->GetLocalPlayer();
 		if( localPlayer == NULL )
 			return;
 		MapPlayer_t *localMapPlayer = GetPlayerByUserID(localPlayer->GetUserID());
@@ -1967,8 +1967,8 @@ void CCSMapOverview::SetMode(int mode)
 
 		g_pClientMode->GetViewportAnimationController()->RunAnimationCommand( this, "zoom", desiredZoom, 0.0, 0, vgui::AnimationController::INTERPOLATOR_LINEAR );
 
-		if((C_BasePlayer*)ClientEntityList().GetLocalPlayer() )
-			SetFollowEntity(ClientEntityList().GetLocalPlayer()->entindex() );
+		if((C_BasePlayer*)EntityList()->GetLocalPlayer() )
+			SetFollowEntity(EntityList()->GetLocalPlayer()->entindex() );
 
 		SetPaintBackgroundType( 2 );// rounded corners
 		ShowPanel( true );

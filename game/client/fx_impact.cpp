@@ -38,7 +38,7 @@ CRagdollEnumerator::CRagdollEnumerator( Ray_t& shot, int iDamageType )
 
 IterationRetval_t CRagdollEnumerator::EnumElement( IHandleEntity *pHandleEntity )
 {
-	C_BaseEntity *pEnt = ClientEntityList().GetBaseEntityFromHandle( pHandleEntity->GetRefEHandle() );
+	C_BaseEntity *pEnt = EntityList()->GetBaseEntityFromHandle( pHandleEntity->GetRefEHandle() );
 	if ( pEnt == NULL )
 		return ITERATION_CONTINUE;
 
@@ -74,7 +74,7 @@ IterationRetval_t CRagdollEnumerator::EnumElement( IHandleEntity *pHandleEntity 
 bool FX_AffectRagdolls( Vector vecOrigin, Vector vecStart, int iDamageType )
 {
 	// don't do this when lots of ragdolls are simulating
-	if (ClientEntityList().CountRagdolls(true) > 1 )
+	if (EntityList()->CountRagdolls(true) > 1 )
 		return false;
 	Ray_t shotRay;
 	shotRay.Init( vecStart, vecOrigin );

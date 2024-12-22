@@ -390,7 +390,7 @@ Vector CPropVehicleChoreoGeneric::BodyTarget( const Vector &posSrc, bool bNoisy 
 	Vector	shotPos;
 
 	int eyeAttachmentIndex = GetEngineObject()->LookupAttachment("vehicle_driver_eyes");
-	GetAttachment( eyeAttachmentIndex, shotPos );
+	GetEngineObject()->GetAttachment( eyeAttachmentIndex, shotPos );
 
 	if ( bNoisy )
 	{

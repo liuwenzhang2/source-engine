@@ -26,15 +26,6 @@
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
-
-struct watcher_t
-{
-	EHANDLE				hWatcher;
-	IWatcherCallback	*pWatcherCallback;
-};
-
-static CUtlMultiList<watcher_t, unsigned short>	g_WatcherList;
-
 // Prints warnings if any entity think functions take longer than this many milliseconds
 #ifdef _DEBUG
 #define DEF_THINK_LIMIT "20"
@@ -44,92 +35,12 @@ static CUtlMultiList<watcher_t, unsigned short>	g_WatcherList;
 
 ConVar think_limit( "think_limit", DEF_THINK_LIMIT, FCVAR_REPLICATED, "Maximum think time in milliseconds, warning is printed if this is exceeded." );
 
-
-
-void CWatcherList::Init()
-{
-	m_list = g_WatcherList.CreateList();
-}
-
-CWatcherList::~CWatcherList()
-{
-	g_WatcherList.DestroyList( m_list );
-}
-
-int CWatcherList::GetCallbackObjects( IWatcherCallback **pList, int listMax )
-{
-	int index = 0;
-	unsigned short next = g_WatcherList.InvalidIndex();
-	for ( unsigned short node = g_WatcherList.Head( m_list ); node != g_WatcherList.InvalidIndex(); node = next )
-	{
-		next = g_WatcherList.Next( node );
-		watcher_t *pNode = &g_WatcherList.Element(node);
-		if ( pNode->hWatcher.Get() )
-		{
-			pList[index] = pNode->pWatcherCallback;
-			index++;
-			if ( index >= listMax )
-			{
-				Assert(0);
-				return index;
-			}
-		}
-		else
-		{
-			g_WatcherList.Remove( m_list, node );
-		}
-	}
-	return index;
-}
-
-unsigned short CWatcherList::Find( CBaseEntity *pEntity )
-{
-	unsigned short next = g_WatcherList.InvalidIndex();
-	for ( unsigned short node = g_WatcherList.Head( m_list ); node != g_WatcherList.InvalidIndex(); node = next )
-	{
-		next = g_WatcherList.Next( node );
-		watcher_t *pNode = &g_WatcherList.Element(node);
-		if ( pNode->hWatcher.Get() == pEntity )
-		{
-			return node;
-		}
-	}
-	return g_WatcherList.InvalidIndex();
-}
-
-void CWatcherList::RemoveWatcher( CBaseEntity *pEntity )
-{
-	unsigned short node = Find( pEntity );
-	if ( node != g_WatcherList.InvalidIndex() )
-	{
-		g_WatcherList.Remove( m_list, node );
-	}
-}
-
-
-void CWatcherList::AddToList( CBaseEntity *pWatcher )
-{
-	unsigned short node = Find( pWatcher );
-	if ( node == g_WatcherList.InvalidIndex() )
-	{
-		watcher_t watcher;
-		watcher.hWatcher = pWatcher;
-			// save this separately so we can use the EHANDLE to test for deletion
-		watcher.pWatcherCallback = dynamic_cast<IWatcherCallback *> (pWatcher);
-
-		if ( watcher.pWatcherCallback )
-		{
-			g_WatcherList.AddToTail( m_list, watcher );
-		}
-	}
-}
-
 void CBaseEntity::AddWatcherToEntity(CBaseEntity* pWatcher, int watcherType)
 {
-	CWatcherList* pList = (CWatcherList*)GetEngineObject()->GetDataObject(watcherType);
+	IWatcherList* pList = (IWatcherList*)GetEngineObject()->GetDataObject(watcherType);
 	if (!pList)
 	{
-		pList = (CWatcherList*)GetEngineObject()->CreateDataObject(watcherType);
+		pList = (IWatcherList*)GetEngineObject()->CreateDataObject(watcherType);
 		pList->Init();
 	}
 
@@ -138,7 +49,7 @@ void CBaseEntity::AddWatcherToEntity(CBaseEntity* pWatcher, int watcherType)
 
 void CBaseEntity::RemoveWatcherFromEntity(CBaseEntity* pWatcher, int watcherType)
 {
-	CWatcherList* pList = (CWatcherList*)GetEngineObject()->GetDataObject(watcherType);
+	IWatcherList* pList = (IWatcherList*)GetEngineObject()->GetDataObject(watcherType);
 	if (pList)
 	{
 		pList->RemoveWatcher(pWatcher);
@@ -147,7 +58,7 @@ void CBaseEntity::RemoveWatcherFromEntity(CBaseEntity* pWatcher, int watcherType
 
 void CBaseEntity::NotifyPositionChanged()
 {
-	CWatcherList* pList = (CWatcherList*)GetEngineObject()->GetDataObject(POSITIONWATCHER);
+	IWatcherList* pList = (IWatcherList*)GetEngineObject()->GetDataObject(POSITIONWATCHER);
 	IWatcherCallback* pCallbacks[1024]; // HACKHACK: Assumes this list is big enough
 	int count = pList->GetCallbackObjects(pCallbacks, ARRAYSIZE(pCallbacks));
 	for (int i = 0; i < count; i++)
@@ -162,7 +73,7 @@ void CBaseEntity::NotifyPositionChanged()
 
 void CBaseEntity::NotifyVPhysicsStateChanged(IPhysicsObject* pPhysics, bool bAwake)
 {
-	CWatcherList* pList = (CWatcherList*)GetEngineObject()->GetDataObject(VPHYSICSWATCHER);
+	IWatcherList* pList = (IWatcherList*)GetEngineObject()->GetDataObject(VPHYSICSWATCHER);
 	IWatcherCallback* pCallbacks[1024];	// HACKHACK: Assumes this list is big enough!
 	int count = pList->GetCallbackObjects(pCallbacks, ARRAYSIZE(pCallbacks));
 	for (int i = 0; i < count; i++)

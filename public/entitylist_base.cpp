@@ -13,7 +13,7 @@
 
 const char* PS_SD_Static_World_StaticProps_ClippedProp_t::szTraceSurfaceName = "**studio**";
 const int PS_SD_Static_World_StaticProps_ClippedProp_t::iTraceSurfaceFlags = 0;
-CBaseEntity* PS_SD_Static_World_StaticProps_ClippedProp_t::pTraceEntity = NULL;
+IHandleEntity* PS_SD_Static_World_StaticProps_ClippedProp_t::pTraceEntity = NULL;
 
 IEntityFactory* g_pEntityFactoryHead;
 

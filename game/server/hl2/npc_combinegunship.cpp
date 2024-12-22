@@ -853,7 +853,7 @@ Vector CNPC_CombineGunship::GetGroundAttackHitPosition( void )
 	trace_t	tr;
 	Vector	vecShootPos, vecShootDir;
 
-	GetAttachment( "BellyGun", vecShootPos, &vecShootDir, NULL, NULL );
+	GetEngineObject()->GetAttachment( "BellyGun", vecShootPos, &vecShootDir, NULL, NULL );
 
 	AI_TraceLine( vecShootPos, vecShootPos + Vector( 0, 0, -MAX_TRACE_LENGTH ), MASK_SHOT, this, COLLISION_GROUP_NONE, &tr );
 
@@ -926,7 +926,7 @@ void CNPC_CombineGunship::StartGroundAttack( void )
 	// Setup the attack effects
 	Vector	vecShootPos;
 
-	GetAttachment( "BellyGun", vecShootPos );
+	GetEngineObject()->GetAttachment( "BellyGun", vecShootPos );
 
 	EntityMessageBegin( this, true );
 		WRITE_BYTE( GUNSHIP_MSG_STREAKS );
@@ -961,7 +961,7 @@ void CNPC_CombineGunship::StartGroundAttack( void )
 void CNPC_CombineGunship::ManageWarningBeam( void )
 {
 	Vector vecSrc, vecShootDir;
-	GetAttachment( "BellyGun", vecSrc, NULL, NULL, NULL );
+	GetEngineObject()->GetAttachment( "BellyGun", vecSrc, NULL, NULL, NULL );
 
 	trace_t	tr;
 	CTraceFilterSkipTwoEntities filter( m_hGroundAttackTarget, this, COLLISION_GROUP_NONE );
@@ -1105,7 +1105,7 @@ void CNPC_CombineGunship::DoGroundAttackExplosion( void )
 	// Fire the bullets
 	Vector vecSrc, vecShootDir;
 	Vector vecAttachmentOrigin;
-	GetAttachment( "BellyGun", vecAttachmentOrigin, &vecShootDir, NULL, NULL );
+	GetEngineObject()->GetAttachment( "BellyGun", vecAttachmentOrigin, &vecShootDir, NULL, NULL );
 
 	vecSrc = vecAttachmentOrigin;
 
@@ -1387,7 +1387,7 @@ void CNPC_CombineGunship::DoCombat( void )
 	if (GetEngineObject()->HasSpawnFlags( SF_GUNSHIP_USE_CHOPPER_MODEL ) )
 	{
 		Vector vGunPosition;
-		GetAttachment( "gun", vGunPosition );
+		GetEngineObject()->GetAttachment( "gun", vGunPosition );
 		Vector vecToAttackPos = (m_vecAttackPosition - vGunPosition);
 		PoseGunTowardTargetDirection( vecToAttackPos );
 	}
@@ -1644,7 +1644,7 @@ bool CNPC_CombineGunship::FireGun( void )
 		Vector vecAimDir, vecToEnemy;
 		Vector vecMuzzle, vecEnemyTarget;
 
-		GetAttachment( "muzzle", vecMuzzle, &vecAimDir, NULL, NULL );
+		GetEngineObject()->GetAttachment( "muzzle", vecMuzzle, &vecAimDir, NULL, NULL );
 		vecEnemyTarget = GetEnemyTarget();
 
 		// Aim with the muzzle's attachment point.
@@ -1678,7 +1678,7 @@ void CNPC_CombineGunship::FireCannonRound( void )
 	Vector vecMuzzle;
 	Vector vecAimDir;
 
-	GetAttachment( "muzzle", vecMuzzle, &vecAimDir );
+	GetEngineObject()->GetAttachment( "muzzle", vecMuzzle, &vecAimDir );
 	vecEnemyTarget = GetEnemyTarget();
 	
 	// Aim with the muzzle's attachment point.
@@ -1694,7 +1694,7 @@ void CNPC_CombineGunship::FireCannonRound( void )
 	{
 		QAngle vecAimAngle;
 		Vector	vForward, vRight, vUp;
-		GetAttachment( "muzzle", vecMuzzle, &vForward, &vRight, &vUp );
+		GetEngineObject()->GetAttachment( "muzzle", vecMuzzle, &vForward, &vRight, &vUp );
 		AngleVectors( vecAimAngle, &vForward, &vRight, &vUp );
 		NDebugOverlay::Line( vecMuzzle, vecEnemyTarget, 255, 255, 0, true, 1.0f );
 
@@ -2420,7 +2420,7 @@ void CNPC_CombineGunship::UpdateRotorSoundPitch( int iPitch )
 	{
 		Vector pos;
 		Vector up;
-		GetAttachment( "rotor", pos, NULL, NULL, &up );
+		GetEngineObject()->GetAttachment( "rotor", pos, NULL, NULL, &up );
 
 		float flDistance = (pPlayer->WorldSpaceCenter() - pos).Length2DSqr();
 
@@ -2661,7 +2661,7 @@ void CNPC_CombineGunship::UpdateEnemyTarget( void )
 {
 	Vector	vGunPosition;
 
-	GetAttachment( "muzzle", vGunPosition );
+	GetEngineObject()->GetAttachment( "muzzle", vGunPosition );
 
 	// Follow mode
 	Vector	enemyPos;

@@ -39,7 +39,7 @@
 #include "model_types.h"
 #include "te_effect_dispatch.h"
 #include "movevars_shared.h"
-#include "vehicle_base.h"
+//#include "vehicle_base.h"
 #include "in_buttons.h"
 #include "rope_shared.h"
 #include "rope_helpers.h"
@@ -49,10 +49,11 @@
 //#include "player.h"
 #include "vphysics/collision_set.h"
 #include "env_debughistory.h"
-#include "physics_prop_ragdoll.h"
+//#include "physics_prop_ragdoll.h"
 #include "hl2_gamerules.h"
 #include "portal_util_shared.h"
 #include "sharedInterface.h"
+#include "utlmultilist.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
@@ -64,7 +65,6 @@ extern ConVar think_limit;
 //extern bool ExtractKeyvalue(void* pObject, typedescription_t* pFields, int iNumFields, const char* szKeyName, char* szValue, int iMaxLen);
 
 CGlobalEntityList<CBaseEntity> gEntList;
-CBaseEntityList<CBaseEntity>* g_pEntityList = &gEntList;
 IServerEntityList* serverEntitylist = &gEntList;
 
 // Expose list to engine
@@ -2975,7 +2975,7 @@ QAngle CGrabControllerInternal::TransformAnglesFromPlayerSpace(const QAngle& ang
 IPhysicsObject* GetRagdollChildAtPosition(CBaseEntity* pTarget, const Vector& position)
 {
 	// Check for a ragdoll
-	if (dynamic_cast<CRagdollProp*>(pTarget) == NULL)
+	if (!pTarget->GetEngineObject()->GetRagdoll())
 		return NULL;
 
 	// Get the root
@@ -3197,7 +3197,7 @@ void CGrabControllerInternal::AttachEntity(CBaseEntity* pPlayer, CBaseEntity* pE
 	}
 
 	// Ragdolls don't offset this way
-	if (dynamic_cast<CRagdollProp*>(pEntity))
+	if (pEntity->GetEngineObject()->GetRagdoll())
 	{
 		m_attachedPositionObjectSpace.Init();
 	}
@@ -3207,11 +3207,11 @@ void CGrabControllerInternal::AttachEntity(CBaseEntity* pPlayer, CBaseEntity* pE
 	}
 
 	// If it's a prop, see if it has desired carry angles
-	CPhysicsProp* pProp = dynamic_cast<CPhysicsProp*>(pEntity);
-	if (pProp)
+	if (pEntity->IsPhysicsProp())
 	{
-		m_bHasPreferredCarryAngles = pProp->GetPropDataAngles("preferred_carryangles", m_vecPreferredCarryAngles);
-		m_flDistanceOffset = pProp->GetCarryDistanceOffset();
+		m_bHasPreferredCarryAngles = pEntity->HasPreferredCarryAnglesForPlayer(pPlayer);
+		m_vecPreferredCarryAngles = pEntity->PreferredCarryAngles();
+		m_flDistanceOffset = pEntity->GetCarryDistanceOffset();
 	}
 	else
 	{
@@ -3388,11 +3388,6 @@ bool CGrabControllerInternal::IsObjectAllowedOverhead(CBaseEntity* pEntity)
 	if (pEntity->IsCombineBall())
 		return true;
 
-	// Allow props that are specifically flagged as such
-	CPhysicsProp* pPhysProp = dynamic_cast<CPhysicsProp*>(pEntity);
-	if (pPhysProp != NULL && pPhysProp->HasInteraction(PROPINTER_PHYSGUN_ALLOW_OVERHEAD))
-		return true;
-
 	// String checks are fine here, we only run this code one time- when the object is picked up.
 	if (pEntity->ClassMatches("grenade_helicopter"))
 		return true;
@@ -3400,7 +3395,7 @@ bool CGrabControllerInternal::IsObjectAllowedOverhead(CBaseEntity* pEntity)
 	if (pEntity->ClassMatches("weapon_striderbuster"))
 		return true;
 
-	return false;
+	return pEntity->IsObjectAllowedOverhead();
 }
 
 void CGrabControllerInternal::SetPortalPenetratingEntity(CBaseEntity* pPenetrated)
@@ -4885,8 +4880,7 @@ const matrix3x4_t& CEngineObjectInternal::GetParentToWorldTransform(matrix3x4_t&
 	{
 		MDLCACHE_CRITICAL_SECTION();
 
-		CBaseAnimating* pAnimating = pMoveParent->m_pOuter->GetBaseAnimating();
-		if (pAnimating && pAnimating->GetEngineObject()->GetAttachment(m_iParentAttachment, tempMatrix))
+		if (pMoveParent && pMoveParent->GetAttachment(m_iParentAttachment, tempMatrix))
 		{
 			return tempMatrix;
 		}
@@ -8886,6 +8880,88 @@ void CEngineObjectInternal::InvalidateBoneCacheIfOlderThan(float deltaTime)
 	}
 }
 
+//-----------------------------------------------------------------------------
+// Computes a box that surrounds all hitboxes
+//-----------------------------------------------------------------------------
+bool CEngineObjectInternal::ComputeHitboxSurroundingBox(Vector* pVecWorldMins, Vector* pVecWorldMaxs)
+{
+	// Note that this currently should not be called during Relink because of IK.
+	// The code below recomputes bones so as to get at the hitboxes,
+	// which causes IK to trigger, which causes raycasts against the other entities to occur,
+	// which is illegal to do while in the Relink phase.
+
+	IStudioHdr* pStudioHdr = GetModelPtr();
+	if (!pStudioHdr)
+		return false;
+
+	mstudiohitboxset_t* set = pStudioHdr->pHitboxSet(GetHitboxSet());
+	if (!set || !set->numhitboxes)
+		return false;
+
+	const matrix3x4_t* hitboxbones[MAXSTUDIOBONES];
+	GetHitboxBoneTransforms(hitboxbones);
+
+	// Compute a box in world space that surrounds this entity
+	pVecWorldMins->Init(FLT_MAX, FLT_MAX, FLT_MAX);
+	pVecWorldMaxs->Init(-FLT_MAX, -FLT_MAX, -FLT_MAX);
+
+	Vector vecBoxAbsMins, vecBoxAbsMaxs;
+	for (int i = 0; i < set->numhitboxes; i++)
+	{
+		mstudiobbox_t* pbox = set->pHitbox(i);
+		const matrix3x4_t* pMatrix = hitboxbones[pbox->bone];
+
+		if (pMatrix)
+		{
+			TransformAABB(*pMatrix, pbox->bbmin * GetModelScale(), pbox->bbmax * GetModelScale(), vecBoxAbsMins, vecBoxAbsMaxs);
+			VectorMin(*pVecWorldMins, vecBoxAbsMins, *pVecWorldMins);
+			VectorMax(*pVecWorldMaxs, vecBoxAbsMaxs, *pVecWorldMaxs);
+		}
+	}
+	return true;
+}
+
+//-----------------------------------------------------------------------------
+// Computes a box that surrounds all hitboxes, in entity space
+//-----------------------------------------------------------------------------
+bool CEngineObjectInternal::ComputeEntitySpaceHitboxSurroundingBox(Vector* pVecWorldMins, Vector* pVecWorldMaxs)
+{
+	// Note that this currently should not be called during position recomputation because of IK.
+	// The code below recomputes bones so as to get at the hitboxes,
+	// which causes IK to trigger, which causes raycasts against the other entities to occur,
+	// which is illegal to do while in the computeabsposition phase.
+
+	IStudioHdr* pStudioHdr = GetModelPtr();
+	if (!pStudioHdr)
+		return false;
+
+	mstudiohitboxset_t* set = pStudioHdr->pHitboxSet(GetHitboxSet());
+	if (!set || !set->numhitboxes)
+		return false;
+
+	const matrix3x4_t* hitboxbones[MAXSTUDIOBONES];
+	GetHitboxBoneTransforms(hitboxbones);
+
+	// Compute a box in world space that surrounds this entity
+	pVecWorldMins->Init(FLT_MAX, FLT_MAX, FLT_MAX);
+	pVecWorldMaxs->Init(-FLT_MAX, -FLT_MAX, -FLT_MAX);
+
+	matrix3x4_t worldToEntity, boneToEntity;
+	MatrixInvert(EntityToWorldTransform(), worldToEntity);
+
+	Vector vecBoxAbsMins, vecBoxAbsMaxs;
+	for (int i = 0; i < set->numhitboxes; i++)
+	{
+		mstudiobbox_t* pbox = set->pHitbox(i);
+
+		ConcatTransforms(worldToEntity, *hitboxbones[pbox->bone], boneToEntity);
+		TransformAABB(boneToEntity, pbox->bbmin * GetModelScale(), pbox->bbmax * GetModelScale(), vecBoxAbsMins, vecBoxAbsMaxs);
+		VectorMin(*pVecWorldMins, vecBoxAbsMins, *pVecWorldMins);
+		VectorMax(*pVecWorldMaxs, vecBoxAbsMaxs, *pVecWorldMaxs);
+	}
+	return true;
+}
+
 //=========================================================
 //=========================================================
 
@@ -9169,6 +9245,37 @@ bool CEngineObjectInternal::GetAttachment(int iAttachment, Vector& absOrigin, QA
 
 	bool bRet = GetAttachment(iAttachment, attachmentToWorld);
 	MatrixAngles(attachmentToWorld, absAngles, absOrigin);
+	return bRet;
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: Returns the world location of an attachment
+// Input  : attachment index
+// Output :	location and angles
+//-----------------------------------------------------------------------------
+bool CEngineObjectInternal::GetAttachment(const char* szName, Vector& absOrigin, Vector* forward, Vector* right, Vector* up)
+{
+	return GetAttachment(LookupAttachment(szName), absOrigin, forward, right, up);
+}
+
+bool CEngineObjectInternal::GetAttachment(int iAttachment, Vector& absOrigin, Vector* forward, Vector* right, Vector* up)
+{
+	matrix3x4_t attachmentToWorld;
+
+	bool bRet = GetAttachment(iAttachment, attachmentToWorld);
+	MatrixPosition(attachmentToWorld, absOrigin);
+	if (forward)
+	{
+		MatrixGetColumn(attachmentToWorld, 0, forward);
+	}
+	if (right)
+	{
+		MatrixGetColumn(attachmentToWorld, 1, right);
+	}
+	if (up)
+	{
+		MatrixGetColumn(attachmentToWorld, 2, up);
+	}
 	return bRet;
 }
 
@@ -11623,7 +11730,7 @@ void CEnginePortalInternal::CreateLocalCollision(void)
 		{
 			m_InternalData.Simulation.Static.SurfaceProperties.contents = Trace.contents;
 			m_InternalData.Simulation.Static.SurfaceProperties.surface = Trace.surface;
-			m_InternalData.Simulation.Static.SurfaceProperties.pEntity = (CBaseEntity*)Trace.m_pEnt;
+			m_InternalData.Simulation.Static.SurfaceProperties.pEntity = Trace.m_pEnt;
 		}
 		else
 		{
@@ -11634,7 +11741,7 @@ void CEnginePortalInternal::CreateLocalCollision(void)
 #ifndef CLIENT_DLL
 			m_InternalData.Simulation.Static.SurfaceProperties.pEntity = gEntList.GetBaseEntity(0);
 #else
-			m_InternalData.Simulation.Static.SurfaceProperties.pEntity = ClientEntityList().GetBaseEntity(0);
+			m_InternalData.Simulation.Static.SurfaceProperties.pEntity = EntityList()->GetBaseEntity(0);
 #endif
 		}
 
@@ -13029,7 +13136,7 @@ void CEngineShadowCloneInternal::SyncEntity(bool bPullChanges)
 	}
 }
 
-static void FullSyncPhysicsObject(IPhysicsObject* pSource, IPhysicsObject* pDest, const VMatrix* pTransform, bool bTeleport)
+void FullSyncPhysicsObject(IPhysicsObject* pSource, IPhysicsObject* pDest, const VMatrix* pTransform, bool bTeleport)
 {
 	IGrabControllerServer* pGrabController = NULL;
 
@@ -14940,12 +15047,12 @@ bool CEngineRopeInternal::SetupHangDistance(float flHangDist)
 
 	// Calculate starting conditions so we can force it to hang down N inches.
 	Vector v1 = pEnt1->GetEngineObject()->GetAbsOrigin();
-	if (pEnt1->GetBaseAnimating())
-		pEnt1->GetBaseAnimating()->GetAttachment(m_iStartAttachment, v1);
+	if (pEnt1->GetEngineObject()->GetModelPtr())
+		pEnt1->GetEngineObject()->GetAttachment(m_iStartAttachment, v1);
 
 	Vector v2 = pEnt2->GetEngineObject()->GetAbsOrigin();
-	if (pEnt2->GetBaseAnimating())
-		pEnt2->GetBaseAnimating()->GetAttachment(m_iEndAttachment, v2);
+	if (pEnt2->GetEngineObject()->GetModelPtr())
+		pEnt2->GetEngineObject()->GetAttachment(m_iEndAttachment, v2);
 
 	float flSlack, flLen;
 	CalcRopeStartingConditions(v1, v2, ROPE_MAX_SEGMENTS, flHangDist, &flLen, &flSlack);
@@ -14982,10 +15089,9 @@ bool CEngineRopeInternal::GetEndPointPos2(CBaseEntity* pAttached, int iAttachmen
 
 	if (iAttachment > 0)
 	{
-		CBaseAnimating* pAnim = pAttached->GetBaseAnimating();
-		if (pAnim)
+		if (GetModelPtr())
 		{
-			if (!pAnim->GetAttachment(iAttachment, vPos))
+			if (!GetAttachment(iAttachment, vPos))
 				return false;
 		}
 		else
@@ -15114,6 +15220,93 @@ void CEngineRopeInternal::EnableWind(bool bEnable)
 	}
 }
 
+
+
+struct watcher_t
+{
+	EHANDLE				hWatcher;
+	IWatcherCallback* pWatcherCallback;
+};
+
+static CUtlMultiList<watcher_t, unsigned short>	g_WatcherList;
+
+void CWatcherList::Init()
+{
+	m_list = g_WatcherList.CreateList();
+}
+
+CWatcherList::~CWatcherList()
+{
+	g_WatcherList.DestroyList(m_list);
+}
+
+int CWatcherList::GetCallbackObjects(IWatcherCallback** pList, int listMax)
+{
+	int index = 0;
+	unsigned short next = g_WatcherList.InvalidIndex();
+	for (unsigned short node = g_WatcherList.Head(m_list); node != g_WatcherList.InvalidIndex(); node = next)
+	{
+		next = g_WatcherList.Next(node);
+		watcher_t* pNode = &g_WatcherList.Element(node);
+		if (pNode->hWatcher.Get())
+		{
+			pList[index] = pNode->pWatcherCallback;
+			index++;
+			if (index >= listMax)
+			{
+				Assert(0);
+				return index;
+			}
+		}
+		else
+		{
+			g_WatcherList.Remove(m_list, node);
+		}
+	}
+	return index;
+}
+
+unsigned short CWatcherList::Find(IHandleEntity* pEntity)
+{
+	unsigned short next = g_WatcherList.InvalidIndex();
+	for (unsigned short node = g_WatcherList.Head(m_list); node != g_WatcherList.InvalidIndex(); node = next)
+	{
+		next = g_WatcherList.Next(node);
+		watcher_t* pNode = &g_WatcherList.Element(node);
+		if (pNode->hWatcher.Get() == pEntity)
+		{
+			return node;
+		}
+	}
+	return g_WatcherList.InvalidIndex();
+}
+
+void CWatcherList::RemoveWatcher(IHandleEntity* pEntity)
+{
+	unsigned short node = Find(pEntity);
+	if (node != g_WatcherList.InvalidIndex())
+	{
+		g_WatcherList.Remove(m_list, node);
+	}
+}
+
+
+void CWatcherList::AddToList(IHandleEntity* pWatcher)
+{
+	unsigned short node = Find(pWatcher);
+	if (node == g_WatcherList.InvalidIndex())
+	{
+		watcher_t watcher;
+		watcher.hWatcher = pWatcher->GetRefEHandle();
+		// save this separately so we can use the EHANDLE to test for deletion
+		watcher.pWatcherCallback = dynamic_cast<IWatcherCallback*> (pWatcher);
+
+		if (watcher.pWatcherCallback)
+		{
+			g_WatcherList.AddToTail(m_list, watcher);
+		}
+	}
+}
 
 struct collidelist_t
 {

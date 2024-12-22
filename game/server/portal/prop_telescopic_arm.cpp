@@ -304,7 +304,7 @@ Vector CPropTelescopicArm::FindTargetAimPoint( void )
 	else
 	{
 		Vector vFrontPoint;
-		GetAttachment( m_iFrontMarkerAttachment, vFrontPoint, NULL, NULL, NULL );
+		GetEngineObject()->GetAttachment( m_iFrontMarkerAttachment, vFrontPoint, NULL, NULL, NULL );
 
 		// Aim at the target through the world
 		Vector vAimPoint = pTarget->GetEngineObject()->GetAbsOrigin() + ( pTarget->GetEngineObject()->WorldAlignMins() + pTarget->GetEngineObject()->WorldAlignMaxs() ) * 0.5f;
@@ -364,7 +364,7 @@ bool CPropTelescopicArm::TestLOS( const Vector& vAimPoint )
 	// Test for LOS and fire outputs if the sight condition changes
 	Vector vFaceOrigin;
 	trace_t tr;
-	GetAttachment( m_iFrontMarkerAttachment, vFaceOrigin, NULL, NULL, NULL );
+	GetEngineObject()->GetAttachment( m_iFrontMarkerAttachment, vFaceOrigin, NULL, NULL, NULL );
 	Ray_t ray;
 	ray.Init( vFaceOrigin, vAimPoint );
 	ray.m_IsRay = true;
@@ -378,7 +378,7 @@ bool CPropTelescopicArm::TestLOS( const Vector& vAimPoint )
 void CPropTelescopicArm::AimAt( Vector vTarget )
 {
 	Vector vFaceOrigin;
-	GetAttachment( m_iFrontMarkerAttachment, vFaceOrigin, NULL, NULL, NULL );
+	GetEngineObject()->GetAttachment( m_iFrontMarkerAttachment, vFaceOrigin, NULL, NULL, NULL );
 
 	Vector vNormalToTarget = vTarget - vFaceOrigin;
 	VectorNormalize( vNormalToTarget );

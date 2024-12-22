@@ -59,7 +59,7 @@ void CHudSpecCrosshair::Paint( void )
 	if ( engine->IsDrawingLoadingImage() || engine->IsPaused() )
 		return;
 	
-	C_BasePlayer* pPlayer = (C_BasePlayer*)ClientEntityList().GetLocalPlayer();
+	C_BasePlayer* pPlayer = (C_BasePlayer*)EntityList()->GetLocalPlayer();
 
 	if ( !pPlayer )
 		return;

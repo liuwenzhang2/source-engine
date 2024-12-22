@@ -552,7 +552,7 @@ CBeam *CBeam::BeamCreate( const char *pSpriteName, float width )
 	return pBeam;
 #endif // GAME_DLL
 #ifdef CLIENT_DLL
-	CBeam* pBeam = (CBeam*)cl_entitylist->CreateEntityByName("beam");
+	CBeam* pBeam = (CBeam*)EntityList()->CreateEntityByName("beam");
 	pBeam->BeamInit(pSpriteName, width);
 	return pBeam;
 #endif // CLIENT_DLL

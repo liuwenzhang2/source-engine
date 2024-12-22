@@ -3027,7 +3027,7 @@ Vector CFuncTankAirboatGun::WorldBarrelPosition( void )
 	}
 
 	Vector vecOrigin;
-	m_hAirboatGunModel->GetAttachment( m_nGunBarrelAttachment, vecOrigin );
+	m_hAirboatGunModel->GetEngineObject()->GetAttachment( m_nGunBarrelAttachment, vecOrigin );
 	return vecOrigin;
 }
 

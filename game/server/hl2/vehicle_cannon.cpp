@@ -598,7 +598,7 @@ void CPropCannon::LaunchProjectile( void )
 
 	Vector vTipPos, vTipForward, vTipRight, vUp;
 
-	GetAttachment( "cable_tip", vTipPos, &vTipForward, &vTipRight, &vUp );
+	GetEngineObject()->GetAttachment( "cable_tip", vTipPos, &vTipForward, &vTipRight, &vUp );
 
 	bool bCollided = false;
 	bool bInSky = false;

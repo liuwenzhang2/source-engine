@@ -915,7 +915,7 @@ void C_Portal_Player::AddEntity( void )
 	// Zero out model pitch, blending takes care of all of it.
 	GetEngineObject()->SetLocalAnglesDim( X_INDEX, 0 );
 
-	if( this != (C_BasePlayer*)ClientEntityList().GetLocalPlayer() )
+	if( this != (C_BasePlayer*)EntityList()->GetLocalPlayer() )
 	{
 		if (GetEngineObject()->IsEffectActive( EF_DIMLIGHT ) )
 		{
@@ -1442,9 +1442,9 @@ void C_Portal_Player::CalcView( Vector &eyeOrigin, QAngle &eyeAngles, float &zNe
 		Vector WALL_MAX( WALL_OFFSET, WALL_OFFSET, WALL_OFFSET );
 
 		trace_t trace; // clip against world
-		ClientEntityList().PushEnableAbsRecomputations( false ); // HACK don't recompute positions while doing RayTrace
+		EntityList()->PushEnableAbsRecomputations( false ); // HACK don't recompute positions while doing RayTrace
 		UTIL_TraceHull( origin, eyeOrigin, WALL_MIN, WALL_MAX, MASK_SOLID_BRUSHONLY, this, COLLISION_GROUP_NONE, &trace );
-		ClientEntityList().PopEnableAbsRecomputations();
+		EntityList()->PopEnableAbsRecomputations();
 
 		if (trace.fraction < 1.0)
 		{

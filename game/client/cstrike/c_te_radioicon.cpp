@@ -58,7 +58,7 @@ void C_TERadioIcon::PostDataUpdate( DataUpdateType_t updateType )
 {
 	//Flash them on the radar
 	//this could be in a better place.
-	C_CSPlayer *pPlayer = static_cast<C_CSPlayer*>( cl_entitylist->GetEnt(m_iAttachToClient) );
+	C_CSPlayer *pPlayer = static_cast<C_CSPlayer*>( EntityList()->GetEnt(m_iAttachToClient) );
 
 	if ( pPlayer && !pPlayer->IsDormant() )
 	{

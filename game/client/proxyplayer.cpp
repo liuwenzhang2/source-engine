@@ -49,7 +49,7 @@ void CPlayerProximityProxy::OnBind( void *pC_BaseEntity )
 
 	// Find the distance between the player and this entity....
 	C_BaseEntity *pEntity = BindArgToEntity( pC_BaseEntity );
-	C_BaseEntity* pPlayer = (C_BasePlayer*)ClientEntityList().GetLocalPlayer();
+	C_BaseEntity* pPlayer = (C_BasePlayer*)EntityList()->GetLocalPlayer();
 	if (!pPlayer)
 		return;
 
@@ -96,7 +96,7 @@ void CPlayerTeamMatchProxy::OnBind( void *pC_BaseEntity )
 
 	// Find the distance between the player and this entity....
 	C_BaseEntity *pEntity = BindArgToEntity( pC_BaseEntity );
-	C_BaseEntity* pPlayer = (C_BasePlayer*)ClientEntityList().GetLocalPlayer();
+	C_BaseEntity* pPlayer = (C_BasePlayer*)EntityList()->GetLocalPlayer();
 	if (!pPlayer)
 		return;
 
@@ -141,7 +141,7 @@ void CPlayerViewProxy::OnBind( void *pC_BaseEntity )
 
 	// Find the view angle between the player and this entity....
 	C_BaseEntity *pEntity = BindArgToEntity( pC_BaseEntity );
-	C_BaseEntity* pPlayer = (C_BasePlayer*)ClientEntityList().GetLocalPlayer();
+	C_BaseEntity* pPlayer = (C_BasePlayer*)EntityList()->GetLocalPlayer();
 	if (!pPlayer)
 		return;
 
@@ -189,7 +189,7 @@ bool CPlayerSpeedProxy::Init( IMaterial *pMaterial, KeyValues *pKeyValues )
 void CPlayerSpeedProxy::OnBind( void *pC_BaseEntity )
 {
 	// Find the player speed....
-	C_BaseEntity* pPlayer = (C_BasePlayer*)ClientEntityList().GetLocalPlayer();
+	C_BaseEntity* pPlayer = (C_BasePlayer*)EntityList()->GetLocalPlayer();
 	if (!pPlayer)
 		return;
 
@@ -230,7 +230,7 @@ bool CPlayerPositionProxy::Init( IMaterial *pMaterial, KeyValues *pKeyValues )
 void CPlayerPositionProxy::OnBind( void *pC_BaseEntity )
 {
 	// Find the player speed....
-	C_BaseEntity* pPlayer = (C_BasePlayer*)ClientEntityList().GetLocalPlayer();
+	C_BaseEntity* pPlayer = (C_BasePlayer*)EntityList()->GetLocalPlayer();
 	if (!pPlayer)
 		return;
 

@@ -33,6 +33,7 @@
 #include "ehandle.h"
 #include "recvproxy.h"
 #include "engine/IEngineTrace.h"
+#include "entitylist_base.h"
 // This is a precompiled header.  Include a bunch of common stuff.
 // This is kind of ugly in that it adds a bunch of dependency where it isn't needed.
 // But on balance, the compile time is much lower (even incrementally) once the precompiled
@@ -40,11 +41,11 @@
 #include "precache_register.h"
 //#include "c_basecombatweapon.h"
 //#include "c_basecombatcharacter.h"
-#include "shared_classnames.h"
-#include <baseentity_shared.h>
+//#include "shared_classnames.h"
+#include "baseentity_shared.h"
 #include "gamerules.h"
 #include "c_baseplayer.h"
-#include "cliententitylist.h"
+//#include "cliententitylist.h"
 #include "itempents.h"
 #include "vphysics_interface.h"
 //#include "physics.h"

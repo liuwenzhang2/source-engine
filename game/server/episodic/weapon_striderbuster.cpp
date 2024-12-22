@@ -83,7 +83,7 @@ public:
 	virtual int		OnTakeDamage( const CTakeDamageInfo &info );
 	virtual bool	ShouldPuntUseLaunchForces( PhysGunForce_t reason ) { return ( reason == PHYSGUN_FORCE_LAUNCHED ); }
 	virtual QAngle	PreferredCarryAngles( void ) { return m_CarryAngles; }
-	virtual bool	HasPreferredCarryAnglesForPlayer( CBasePlayer *pPlayer ) { return true; }
+	virtual bool	HasPreferredCarryAnglesForPlayer( CBaseEntity *pPlayer ) { return true; }
 
 	virtual void OnPhysGunPickup( CBasePlayer *pPhysGunUser, PhysGunPickup_t reason );
 	virtual void OnPhysGunDrop( CBasePlayer *pPhysGunUser, PhysGunDrop_t Reason );
@@ -1025,7 +1025,7 @@ void CWeaponStriderBuster::BusterFlyThink()
 			case 4:
 				{
 					Vector toTarget;
-					pBestStrider->GetAttachment( "buster_target", toTarget );
+					pBestStrider->GetEngineObject()->GetAttachment( "buster_target", toTarget );
 
 					if ( striderbuster_debugseek.GetBool() )
 					{

@@ -1412,7 +1412,47 @@ inline Vector	C_BaseEntity::EarPosition( void ) const			// position of ears
 }
 
 
+class C_BaseEntityIterator
+{
+public:
+	// -------------------------------------------------------------------------------------------------- //
+	// C_BaseEntityIterator
+	// -------------------------------------------------------------------------------------------------- //
+	C_BaseEntityIterator()
+	{
+		Restart();
+	}
 
+	void Restart()
+	{
+		start = false;
+		m_CurBaseEntity.Term();
+	}
+
+	C_BaseEntity* Next()
+	{
+		while (!start || m_CurBaseEntity.IsValid()) {
+			if (!start) {
+				start = true;
+				m_CurBaseEntity = EntityList()->FirstHandle();
+			}
+			else {
+				m_CurBaseEntity = EntityList()->NextHandle(m_CurBaseEntity);
+			}
+			if (!m_CurBaseEntity.IsValid()) {
+				break;
+			}
+			C_BaseEntity* pRet = EntityList()->GetBaseEntityFromHandle(m_CurBaseEntity);
+			if (!pRet->IsDormant())
+				return pRet;
+		}
+
+		return NULL;
+	}
+private:
+	bool start = false;
+	CBaseHandle m_CurBaseEntity;
+};
 
 
 //C_BaseEntity *CreateEntityByName( const char *className );

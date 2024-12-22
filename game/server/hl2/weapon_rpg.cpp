@@ -1539,7 +1539,7 @@ void CWeaponRPG::Operator_HandleAnimEvent( animevent_t *pEvent, CBaseCombatChara
 
 			// look for a better launch location
 			Vector altLaunchPoint;
-			if (GetAttachment( "missile", altLaunchPoint ))
+			if (GetEngineObject()->GetAttachment( "missile", altLaunchPoint ))
 			{
 				// check to see if it's relativly free
 				trace_t tr;

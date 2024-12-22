@@ -55,7 +55,7 @@ public:
 	virtual void VPhysicsUpdate( IPhysicsObject *pPhysics );
 
 	virtual QAngle PreferredCarryAngles( void ) { return QAngle( -90, 0, 0 ); }
-	virtual bool HasPreferredCarryAnglesForPlayer( CBasePlayer *pPlayer ) { return true; }
+	virtual bool HasPreferredCarryAnglesForPlayer( CBaseEntity *pPlayer ) { return true; }
 
 	//
 	// Input handlers.

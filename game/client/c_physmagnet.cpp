@@ -110,7 +110,7 @@ void C_PhysMagnet::PostDataUpdate( DataUpdateType_t updateType )
 	// Make sure newly attached entities have vertical shadows too
 	for ( i = 0; i < iServerCount; i++ )
 	{
-		C_BaseEntity *pEntity = cl_entitylist->GetEnt( m_aAttachedObjectsFromServer[i] );
+		C_BaseEntity *pEntity = EntityList()->GetEnt( m_aAttachedObjectsFromServer[i] );
 		if ( m_aAttachedObjects.Find( pEntity ) == m_aAttachedObjects.InvalidIndex() )
 		{
 			pEntity->SetShadowUseOtherEntity( this );

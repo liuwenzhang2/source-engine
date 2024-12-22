@@ -536,7 +536,7 @@ int CNewParticleEffect::DrawModel( int flags )
 	if ( flags & STUDIO_TRANSPARENCY )
 	{
 		int viewentity = render->GetViewEntity();
-		C_BaseEntity *pCameraObject = cl_entitylist->GetEnt( viewentity );
+		C_BaseEntity *pCameraObject = EntityList()->GetEnt( viewentity );
 		// apply logic that lets you skip rendering a system if the camera is attached to its entity
 		if ( pCameraObject &&
 			 ( m_pDef->m_nSkipRenderControlPoint != -1 ) &&
@@ -555,7 +555,7 @@ int CNewParticleEffect::DrawModel( int flags )
 						return 0;
 
 					// If we're spectating in-eyes of the camera object, we don't see it
-					C_BasePlayer *pPlayer = (C_BasePlayer*)ClientEntityList().GetLocalPlayer();
+					C_BasePlayer *pPlayer = (C_BasePlayer*)EntityList()->GetLocalPlayer();
 					if ( pPlayer == pCameraObject )
 					{
 						C_BaseEntity *pObTarget = pPlayer->GetObserverTarget();

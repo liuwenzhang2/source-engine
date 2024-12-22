@@ -12,7 +12,7 @@
 
 bool CGameTrace::DidHitWorld() const
 {
-	return m_pEnt == ClientEntityList().GetBaseEntity( 0 );
+	return m_pEnt == EntityList()->GetBaseEntity( 0 );
 }
 
 

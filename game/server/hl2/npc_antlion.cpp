@@ -919,7 +919,7 @@ bool CNPC_Antlion::InnateWeaponLOSCondition( const Vector &ownerPos, const Vecto
 	if ( SeenEnemyWithinTime( 3.0f ) )
 	{
 		Vector vSpitPos;
-		GetAttachment( "mouth", vSpitPos );
+		GetEngineObject()->GetAttachment( "mouth", vSpitPos );
 		
 		return GetSpitVector( vSpitPos, targetPos, &m_vecSaveSpitVelocity );
 	}
@@ -1068,7 +1068,7 @@ void CNPC_Antlion::HandleAnimEvent( animevent_t *pEvent )
 			if ( GetEnemy() )
 			{
 				Vector vSpitPos;
-				GetAttachment( "mouth", vSpitPos );
+				GetEngineObject()->GetAttachment( "mouth", vSpitPos );
 
 				Vector	vTarget;
 				

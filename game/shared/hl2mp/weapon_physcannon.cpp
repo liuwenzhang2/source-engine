@@ -1862,7 +1862,7 @@ void CWeaponPhysCannon::ItemPreFrame()
 	BaseClass::ItemPreFrame();
 
 #ifdef CLIENT_DLL
-	C_BasePlayer *localplayer = (C_BasePlayer*)ClientEntityList().GetLocalPlayer();
+	C_BasePlayer *localplayer = (C_BasePlayer*)EntityList()->GetLocalPlayer();
 
 	if ( localplayer && !localplayer->IsObserver() )
 		ManagePredictedObject();
@@ -2966,7 +2966,7 @@ void CallbackPhyscannonImpact( const CEffectData &data )
 	VectorNormalize( dir );
 
 	// Do special first-person fix-up
-	if ( pWeapon->GetOwner() == (C_BasePlayer*)ClientEntityList().GetLocalPlayer() )
+	if ( pWeapon->GetOwner() == (C_BasePlayer*)EntityList()->GetLocalPlayer() )
 	{
 		// Translate the attachment entity to the viewmodel
 		C_BasePlayer *pPlayer = dynamic_cast<C_BasePlayer *>(pWeapon->GetOwner());

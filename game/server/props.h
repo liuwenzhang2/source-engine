@@ -81,7 +81,7 @@ public:
 	bool PropDataOverrodeBlockLOS( void ) { return m_bBlockLOSSetByPropData; }
 	bool PropDataOverrodeAIWalkable( void ) { return m_bIsWalkableSetByPropData; }
 
-	virtual bool   HasPreferredCarryAnglesForPlayer( CBasePlayer *pPlayer )
+	virtual bool   HasPreferredCarryAnglesForPlayer( CBaseEntity *pPlayer )
 	{
 		if ( HasInteraction( PROPINTER_PHYSGUN_LAUNCH_SPIN_Z ) )
 			return true;
@@ -338,7 +338,7 @@ public:
 	CPhysicsProp( void ) 
 	{
 	}
-
+	virtual bool IsPhysicsProp() { return true; }
 	void UpdateOnRemove(void);
 	void Spawn( void );
 	void Precache();
@@ -358,8 +358,19 @@ public:
 	bool CanBePickedUpByPhyscannon( void );
 	void OnPhysGunPickup( CBasePlayer *pPhysGunUser, PhysGunPickup_t reason );
 	void OnPhysGunDrop( CBasePlayer *pPhysGunUser, PhysGunDrop_t reason );
-
+	bool IsObjectAllowedOverhead();
 	bool GetPropDataAngles( const char *pKeyName, QAngle &vecAngles );
+	bool HasPreferredCarryAnglesForPlayer(CBaseEntity* pPlayer) { 
+		QAngle vecPreferredCarryAngles;
+		vecPreferredCarryAngles.Init();
+		return GetPropDataAngles("preferred_carryangles", vecPreferredCarryAngles);
+	}
+	QAngle PreferredCarryAngles(void) { 
+		QAngle vecPreferredCarryAngles;
+		vecPreferredCarryAngles.Init();
+		GetPropDataAngles("preferred_carryangles", vecPreferredCarryAngles);
+		return vecPreferredCarryAngles;
+	}
 	float GetCarryDistanceOffset( void );
 
 	int ObjectCaps();

@@ -199,6 +199,6 @@ void C_World::Spawn( void )
 C_World *GetClientWorldEntity()
 {
 	//Assert( g_pClientWorld != NULL );
-	return (C_World*)cl_entitylist->GetBaseEntity(0);
+	return (C_World*)EntityList()->GetBaseEntity(0);
 }
 

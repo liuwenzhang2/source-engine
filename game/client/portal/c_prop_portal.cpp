@@ -184,7 +184,7 @@ static C_PortalInitHelper s_PortalInitHelper;
 
 C_Prop_Portal::C_Prop_Portal( void )
 {
-	//m_hPortalSimulator = (CPortalSimulator*)ClientEntityList().CreateEntityByName("portal_simulator");
+	//m_hPortalSimulator = (CPortalSimulator*)EntityList()->CreateEntityByName("portal_simulator");
 	TransformedLighting.m_LightShadowHandle = CLIENTSHADOW_INVALID_HANDLE;
 	CProp_Portal_Shared::AllPortals.AddToTail( this );
 }
@@ -193,7 +193,7 @@ C_Prop_Portal::~C_Prop_Portal( void )
 {
 	for( int i = m_GhostRenderables.Count(); --i >= 0; )
 	{
-		cl_entitylist->DestroyEntity((IHandleEntity*)m_GhostRenderables[i]);
+		EntityList()->DestroyEntity((IHandleEntity*)m_GhostRenderables[i]);
 	}
 	m_GhostRenderables.RemoveAll();
 	g_pPortalRender->RemovePortal(this);
@@ -269,7 +269,7 @@ void C_Prop_Portal::Simulate()
 		//remove all ghost renderables
 		for( int i = m_GhostRenderables.Count(); --i >= 0; )
 		{
-			cl_entitylist->DestroyEntity((IHandleEntity*)m_GhostRenderables[i]);
+			EntityList()->DestroyEntity((IHandleEntity*)m_GhostRenderables[i]);
 		}
 		
 		m_GhostRenderables.RemoveAll();
@@ -407,7 +407,7 @@ void C_Prop_Portal::Simulate()
 			if ( pWeapon && ToPortalPlayer( pWeapon->GetOwner() ) )
 				bIsHeldWeapon = true;
 
-			C_PortalGhostRenderable *pNewGhost = (C_PortalGhostRenderable*)cl_entitylist->CreateEntityByName( "C_PortalGhostRenderable" );
+			C_PortalGhostRenderable *pNewGhost = (C_PortalGhostRenderable*)EntityList()->CreateEntityByName( "C_PortalGhostRenderable" );
 
 			Assert( pNewGhost );
 			pNewGhost->Init(this,
@@ -466,7 +466,7 @@ void C_Prop_Portal::Simulate()
 				}
 			}
 
-			cl_entitylist->DestroyEntity( pGhost);
+			EntityList()->DestroyEntity( pGhost);
 			m_GhostRenderables.FastRemove( i );
 		}
 	}
@@ -489,7 +489,7 @@ void C_Prop_Portal::UpdateOnRemove( void )
 	}
 
 	//if (m_hPortalSimulator.Get() && !m_hPortalSimulator.Get()->GetEngineObject()->IsMarkedForDeletion()) {
-	//	ClientEntityList().DestroyEntity(m_hPortalSimulator);
+	//	EntityList()->DestroyEntity(m_hPortalSimulator);
 	//	m_hPortalSimulator = NULL;
 	//}
 	BaseClass::UpdateOnRemove();

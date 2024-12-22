@@ -33,7 +33,7 @@ CON_COMMAND( viewanim_create, "viewanim_create" )
 		flags = atoi( args[1] );
 	}
 
-	g_pTestAnimation = (CViewAngleAnimation*)cl_entitylist->CreateEntityByName( "viewangleanim" );
+	g_pTestAnimation = (CViewAngleAnimation*)EntityList()->CreateEntityByName( "viewangleanim" );
 
 	if ( g_pTestAnimation )
 	{
@@ -155,7 +155,7 @@ void CViewAngleAnimation::Spawn( void )
 
 	m_bFinished = true;	// don't run right away
 
-	//ClientEntityList().AddNonNetworkableEntity(	this );
+	//EntityList()->AddNonNetworkableEntity(	this );
 	SetNextClientThink( CLIENT_THINK_ALWAYS );
 }
 

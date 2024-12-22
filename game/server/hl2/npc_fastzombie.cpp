@@ -1950,7 +1950,7 @@ void CFastZombie::Event_Killed( const CTakeDamageInfo &info )
 		int nRightHandBone = 31;//GetBaseAnimating()->LookupBone( "ValveBiped.Bip01_R_Finger2" );
 		Vector vecRightHandPos;
 		QAngle vecRightHandAngle;
-		GetAttachment( LookupAttachment( "Blood_Right" ), vecRightHandPos, vecRightHandAngle );
+		GetEngineObject()->GetAttachment(GetEngineObject()->LookupAttachment( "Blood_Right" ), vecRightHandPos, vecRightHandAngle );
 		//CTakeDamageInfo dInfo( GetEnemy(), GetEnemy(), RandomVector( -200, 200 ), WorldSpaceCenter(), 50.0f, DMG_CRUSH );
 		dInfo.SetDamageType( info.GetDamageType() | DMG_REMOVENORAGDOLL );
 		dInfo.ScaleDamageForce( 10.0f );

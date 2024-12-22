@@ -28,7 +28,7 @@
 //-----------------------------------------------------------------------------
 inline C_BaseEntity *IndexToEntity( int eindex )
 {
-	return ClientEntityList().GetBaseEntityFromHandle(ClientEntityList().EntIndexToHandle(eindex));
+	return EntityList()->GetBaseEntity(eindex);
 }
 
 

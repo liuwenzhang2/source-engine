@@ -220,7 +220,7 @@ void CVoiceStatus::DrawHeadLabels()
 		if ( !m_VoicePlayers[i] )
 			continue;
 		
-		IClientNetworkable *pClient = cl_entitylist->GetClientEntity( i+1 );
+		IClientNetworkable *pClient = EntityList()->GetClientEntity( i+1 );
 		
 		// Don't show an icon if the player is not in our PVS.
 		if ( !pClient || pClient->IsDormant() )

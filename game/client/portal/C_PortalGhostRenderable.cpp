@@ -19,7 +19,7 @@ C_PortalGhostRenderable::C_PortalGhostRenderable( )
 
 C_PortalGhostRenderable::~C_PortalGhostRenderable( void )
 {
-	//cl_entitylist->RemoveEntity( GetIClientUnknown()->GetRefEHandle() );
+	//EntityList()->RemoveEntity( GetIClientUnknown()->GetRefEHandle() );
 }
 
 void C_PortalGhostRenderable::Init(C_Prop_Portal* pOwningPortal, C_BaseEntity* pGhostSource, RenderGroup_t sourceRenderGroup, const VMatrix& matGhostTransform, float* pSharedRenderClipPlane, bool bLocalPlayer) {
@@ -29,7 +29,7 @@ void C_PortalGhostRenderable::Init(C_Prop_Portal* pOwningPortal, C_BaseEntity* p
 	m_bLocalPlayer = bLocalPlayer,
 	m_pOwningPortal = pOwningPortal;
 
-	//cl_entitylist->AddNonNetworkableEntity(this);//GetIClientUnknown()
+	//EntityList()->AddNonNetworkableEntity(this);//GetIClientUnknown()
 	g_pClientLeafSystem->AddRenderable(this->GetEngineObject(), sourceRenderGroup);
 }
 

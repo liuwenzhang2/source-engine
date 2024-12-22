@@ -42,7 +42,7 @@ public:
 	virtual IterationRetval_t EnumElement( IHandleEntity *pHandleEntity )
 	{
 #ifdef CLIENT_DLL
-		CBaseEntity *pEnt = ClientEntityList().GetBaseEntityFromHandle( pHandleEntity->GetRefEHandle() );
+		CBaseEntity *pEnt = EntityList()->GetBaseEntityFromHandle( pHandleEntity->GetRefEHandle() );
 #else
 		CBaseEntity *pEnt = gEntList.GetBaseEntity( pHandleEntity->GetRefEHandle() );
 #endif // CLIENT_DLL

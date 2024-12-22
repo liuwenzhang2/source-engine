@@ -37,7 +37,7 @@ void HL1GaussBeam( const CEffectData &data )
 	// beam expects ent + attach to be encoded in the entity index (legacy system)
 	int		nStartEntity	= data.entindex() | ((1 & 0xF)<<12);
 
-	C_BaseEntity * pEnt = cl_entitylist->GetEnt( BEAMENT_ENTITY(nStartEntity) );
+	C_BaseEntity * pEnt = EntityList()->GetEnt( BEAMENT_ENTITY(nStartEntity) );
 
 	if ( !pEnt->IsPlayer() )
 		return;

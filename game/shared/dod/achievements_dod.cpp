@@ -303,11 +303,11 @@ class CAchievementDODEndRoundKills : public CBaseAchievement
 	// Reset the count when we spawn
 	void FireGameEvent_Internal( IGameEvent *event )
 	{
-		if ( m_iKillCount > 0 &&  0 == Q_strcmp( event->GetName(), "player_spawn" ) && (C_BasePlayer*)ClientEntityList().GetLocalPlayer() )
+		if ( m_iKillCount > 0 &&  0 == Q_strcmp( event->GetName(), "player_spawn" ) && (C_BasePlayer*)EntityList()->GetLocalPlayer() )
 		{
 			int iUserID = event->GetInt("userid");
 
-			if ( iUserID == ((C_BasePlayer*)ClientEntityList().GetLocalPlayer())->GetUserID() )
+			if ( iUserID == ((C_BasePlayer*)EntityList()->GetLocalPlayer())->GetUserID() )
 			{
 				m_iKillCount = 0;
 			}
@@ -321,7 +321,7 @@ class CAchievementDODEndRoundKills : public CBaseAchievement
 
 		if ( state == STATE_ALLIES_WIN || state == STATE_AXIS_WIN )
 		{
-			Assert( pAttacker == (C_BasePlayer*)ClientEntityList().GetLocalPlayer() );
+			Assert( pAttacker == (C_BasePlayer*)EntityList()->GetLocalPlayer() );
 
 			if ( pVictim->GetTeamNumber() != pAttacker->GetTeamNumber() )
 			{
@@ -500,7 +500,7 @@ class CBaseAchievementKillsOnTeam : public CBaseAchievement
 
 	virtual void Event_EntityKilled( CBaseEntity *pVictim, CBaseEntity *pAttacker, CBaseEntity *pInflictor, IGameEvent *event ) 
 	{
-		Assert( pAttacker == (C_BasePlayer*)ClientEntityList().GetLocalPlayer() );
+		Assert( pAttacker == (C_BasePlayer*)EntityList()->GetLocalPlayer() );
 
 		if ( pVictim->GetTeamNumber() != pAttacker->GetTeamNumber() )
 		{
@@ -543,7 +543,7 @@ class CBaseAchievementKillsAsClass : public CBaseAchievement
 
 	virtual void Event_EntityKilled( CBaseEntity *pVictim, CBaseEntity *pAttacker, CBaseEntity *pInflictor, IGameEvent *event ) 
 	{
-		Assert( pAttacker == (C_BasePlayer*)ClientEntityList().GetLocalPlayer() );
+		Assert( pAttacker == (C_BasePlayer*)EntityList()->GetLocalPlayer() );
 
 		if ( pVictim->GetTeamNumber() != pAttacker->GetTeamNumber() )
 		{
@@ -578,7 +578,7 @@ class CBaseAchievementKillsWithWeapon : public CBaseAchievement
 {
 	virtual void Event_EntityKilled( CBaseEntity *pVictim, CBaseEntity *pAttacker, CBaseEntity *pInflictor, IGameEvent *event )
 	{
-		Assert( pAttacker == (C_BasePlayer*)ClientEntityList().GetLocalPlayer() );
+		Assert( pAttacker == (C_BasePlayer*)EntityList()->GetLocalPlayer() );
 
 		if ( pVictim->GetTeamNumber() != pAttacker->GetTeamNumber() && event != NULL )
 		{
@@ -798,7 +798,7 @@ class CAchievementDODBombsDefusedGrind : public CBaseAchievement
 	{
 		Assert( FStrEq( event->GetName(), "dod_bomb_defused" ) );
 
-		if ( event->GetInt("userid") == ((C_BasePlayer*)ClientEntityList().GetLocalPlayer())->GetUserID() )
+		if ( event->GetInt("userid") == ((C_BasePlayer*)EntityList()->GetLocalPlayer())->GetUserID() )
 		{
 			IncrementCount();
 		}

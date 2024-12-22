@@ -410,7 +410,7 @@ void CPropCrane::DrawDebugGeometryOverlays(void)
 		int iIndex = m_hCraneMagnet->GetEngineObject()->LookupAttachment("magnetcable_a");
 		if ( iIndex >= 0 )
 		{
-			m_hCraneMagnet->GetAttachment( iIndex, vecPoint );
+			m_hCraneMagnet->GetEngineObject()->GetAttachment( iIndex, vecPoint );
 		}
 
 		NDebugOverlay::Line( m_hCraneTip->GetEngineObject()->GetAbsOrigin(), vecPoint, 255,255,255, true, 0.1 );
@@ -1074,7 +1074,7 @@ bool CCraneTip::CreateConstraint( CBaseAnimating *pCraneMagnet, IPhysicsConstrai
 	int iIndex = pCraneMagnet->GetEngineObject()->LookupAttachment("magnetcable_a");
 	if ( iIndex >= 0 )
 	{
-		pCraneMagnet->GetAttachment( iIndex, vecPoint );
+		pCraneMagnet->GetEngineObject()->GetAttachment( iIndex, vecPoint );
 	}
 
 	// Create our spring

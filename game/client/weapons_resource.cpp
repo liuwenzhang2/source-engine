@@ -65,7 +65,7 @@ void WeaponsResource::Reset( void )
 //-----------------------------------------------------------------------------
 void WeaponsResource::LoadAllWeaponSprites( void )
 {
-	C_BasePlayer *player = (C_BasePlayer*)ClientEntityList().GetLocalPlayer();
+	C_BasePlayer *player = (C_BasePlayer*)EntityList()->GetLocalPlayer();
 	if ( !player )
 		return;
 
@@ -217,7 +217,7 @@ void WeaponsResource::LoadWeaponSprites( WEAPON_FILE_INFO_HANDLE hWeaponFileInfo
 //-----------------------------------------------------------------------------
 CHudTexture *WeaponsResource::GetAmmoIconFromWeapon( int iAmmoId )
 {
-	C_BasePlayer *player = (C_BasePlayer*)ClientEntityList().GetLocalPlayer();
+	C_BasePlayer *player = (C_BasePlayer*)EntityList()->GetLocalPlayer();
 	if ( !player )
 		return NULL;
 
@@ -245,7 +245,7 @@ CHudTexture *WeaponsResource::GetAmmoIconFromWeapon( int iAmmoId )
 //-----------------------------------------------------------------------------
 const FileWeaponInfo_t *WeaponsResource::GetWeaponFromAmmo( int iAmmoId )
 {
-	C_BasePlayer *player = (C_BasePlayer*)ClientEntityList().GetLocalPlayer();
+	C_BasePlayer *player = (C_BasePlayer*)EntityList()->GetLocalPlayer();
 	if ( !player )
 		return NULL;
 

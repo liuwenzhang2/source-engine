@@ -133,7 +133,7 @@ void CTeamPlayHud::OnThink()
 {
 	SetVisible( false );
 
-	C_BaseHLPlayer *pLocalPlayer = (C_BaseHLPlayer *)ClientEntityList().GetLocalPlayer();
+	C_BaseHLPlayer *pLocalPlayer = (C_BaseHLPlayer *)EntityList()->GetLocalPlayer();
 
 	if ( pLocalPlayer == NULL )
 		 return;

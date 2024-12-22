@@ -704,7 +704,7 @@ void CAI_BaseActor::UpdateLatchedValues( )
 		// set head latch
 		m_fLatchedPositions |= HUMANOID_LATCHED_HEAD;
 
-		if (!HasCondition( COND_IN_PVS ) || !GetAttachment( "eyes", m_latchedEyeOrigin, &m_latchedHeadDirection ))
+		if (!HasCondition( COND_IN_PVS ) || !GetEngineObject()->GetAttachment( "eyes", m_latchedEyeOrigin, &m_latchedHeadDirection ))
 		{
 			m_latchedEyeOrigin = BaseClass::EyePosition( );
 			AngleVectors(GetEngineObject()->GetLocalAngles(), &m_latchedHeadDirection );
@@ -807,7 +807,7 @@ float CAI_BaseActor::HeadTargetValidity(const Vector &lookTargetPos)
 	if ( iForward > 0 )
 	{
 		Vector tmp1;
-		GetAttachment( iForward, tmp1, &vFacing, NULL, NULL );
+		GetEngineObject()->GetAttachment( iForward, tmp1, &vFacing, NULL, NULL );
 	}
 
 	Vector lookTargetDir = lookTargetPos - EyePosition();
@@ -1542,7 +1542,7 @@ void CAI_BaseActor::MaintainLookTargets( float flInterval )
 			if ( iForward > 0)
 			{
 				Vector tmp1;
-				GetAttachment( iForward, tmp1, &dir, NULL, NULL );
+				GetEngineObject()->GetAttachment( iForward, tmp1, &dir, NULL, NULL );
 			}
 			else
 			{

@@ -47,5 +47,5 @@ void C_RagdollManager::OnDataChanged( DataUpdateType_t updateType )
 {
 	BaseClass::OnDataChanged( updateType );
 
-	ClientEntityList().SetMaxRagdollCount( m_iCurrentMaxRagdollCount );
+	EntityList()->SetMaxRagdollCount( m_iCurrentMaxRagdollCount );
 }

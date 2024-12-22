@@ -122,7 +122,7 @@ void C_ColorCorrection::ClientThink()
 		return;
 	}
 
-	C_BaseEntity *pPlayer = (C_BasePlayer*)ClientEntityList().GetLocalPlayer();
+	C_BaseEntity *pPlayer = (C_BasePlayer*)EntityList()->GetLocalPlayer();
 	if( !pPlayer )
 		return;
 

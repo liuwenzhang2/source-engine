@@ -2012,7 +2012,7 @@ CON_COMMAND_F( cl_pred_track, "<entindex> <fieldname>:  Track changes to entity 
 
 	int iEntIndex = Q_atoi( args[1] );
 
-	C_BaseEntity *ent = cl_entitylist->GetBaseEntity( iEntIndex );
+	C_BaseEntity *ent = EntityList()->GetBaseEntity( iEntIndex );
 	if ( !ent )
 	{
 		Msg( "cl_pred_track:  Unknown ent index %d\n", iEntIndex );

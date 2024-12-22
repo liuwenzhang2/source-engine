@@ -1029,7 +1029,7 @@ void CWeaponCSBase::DefaultTouch(CBaseEntity *pOther)
 		// clear crosshair
 		pCrosshair->SetCrosshair( 0, Color( 255, 255, 255, 255 ) );
 
-		CCSPlayer* pPlayer = (CCSPlayer*)ClientEntityList().GetLocalPlayer();
+		CCSPlayer* pPlayer = (CCSPlayer*)EntityList()->GetLocalPlayer();
 
 		if ( !pPlayer )
 			return;
@@ -1309,7 +1309,7 @@ void CWeaponCSBase::DefaultTouch(CBaseEntity *pOther)
 
 	bool CWeaponCSBase::ShouldPredict()
 	{
-		if ( GetOwner() && GetOwner() == (C_BasePlayer*)ClientEntityList().GetLocalPlayer() )
+		if ( GetOwner() && GetOwner() == (C_BasePlayer*)EntityList()->GetLocalPlayer() )
 			return true;
 
 		return BaseClass::ShouldPredict();

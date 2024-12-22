@@ -263,7 +263,7 @@ C_CSRagdoll::C_CSRagdoll()
 
 C_CSRagdoll::~C_CSRagdoll()
 {
-	ClientEntityList().PhysCleanupFrictionSounds( this );
+	EntityList()->PhysCleanupFrictionSounds( this );
 }
 
 void C_CSRagdoll::GetRagdollInitBoneArrays( matrix3x4_t *pDeltaBones0, matrix3x4_t *pDeltaBones1, matrix3x4_t *pCurrentBones, float boneDt )
@@ -428,7 +428,7 @@ void C_CSRagdoll::CreateCSRagdoll()
 
 		// Copy all the interpolated vars from the player entity.
 		// The entity uses the interpolated history to get bone velocity.
-		bool bRemotePlayer = (pPlayer != (C_BasePlayer*)ClientEntityList().GetLocalPlayer());
+		bool bRemotePlayer = (pPlayer != (C_BasePlayer*)EntityList()->GetLocalPlayer());
 		if ( bRemotePlayer )
 		{
 			Interp_Copy( pPlayer );
@@ -567,7 +567,7 @@ void C_CSRagdoll::OnDataChanged( DataUpdateType_t type )
 		// until the first render. 
 		if ( engine->IsPlayingDemo() && m_bCreatedWhilePlaybackSkipping )
 		{
-			cl_entitylist->DestroyEntity(this);//Release();
+			EntityList()->DestroyEntity(this);//Release();
 			return;
 		}
 
@@ -620,7 +620,7 @@ void RecvProxy_FlashTime( const CRecvProxyData *pData, void *pStruct, void *pOut
 {
 	C_CSPlayer *pPlayerData = (C_CSPlayer *) pStruct;
 
-	if( pPlayerData != (C_BasePlayer*)ClientEntityList().GetLocalPlayer() )
+	if( pPlayerData != (C_BasePlayer*)EntityList()->GetLocalPlayer() )
 		return;
 
 	if ( (pPlayerData->m_flFlashDuration != pData->m_Value.m_Float) && pData->m_Value.m_Float > 0 )
@@ -870,7 +870,7 @@ bool C_CSPlayer::IsVIP() const
 
 C_CSPlayer* C_CSPlayer::GetLocalCSPlayer()
 {
-	return (C_CSPlayer*)ClientEntityList().GetLocalPlayer();
+	return (C_CSPlayer*)EntityList()->GetLocalPlayer();
 }
 
 
@@ -1068,7 +1068,7 @@ void C_CSPlayer::CreateAddonModel( int i )
 	if ( iAttachment <= 0 )
 		return;
 
-	C_BreakableProp *pEnt = (C_BreakableProp*)cl_entitylist->CreateEntityByName("C_BreakableProp");
+	C_BreakableProp *pEnt = (C_BreakableProp*)EntityList()->CreateEntityByName("C_BreakableProp");
 
 	int addonType = (1<<i);
 	if ( addonType == ADDON_PISTOL || addonType == ADDON_PRIMARY )
@@ -1077,7 +1077,7 @@ void C_CSPlayer::CreateAddonModel( int i )
 		if ( !weaponInfo )
 		{
 			Warning( "C_CSPlayer::CreateAddonModel: Unable to get weapon info.\n" );
-			cl_entitylist->DestroyEntity(pEnt);// ->Release();
+			EntityList()->DestroyEntity(pEnt);// ->Release();
 			return;
 		}
 		if ( weaponInfo->m_szAddonModel[0] == 0 )
@@ -1119,7 +1119,7 @@ void C_CSPlayer::CreateAddonModel( int i )
 		}
 		else
 		{
-			cl_entitylist->DestroyEntity(pEnt);// ->Release();
+			EntityList()->DestroyEntity(pEnt);// ->Release();
 			Warning( "C_CSPlayer::CreateAddonModel: Unable to get weapon info for %s.\n", pAddonInfo->m_pWeaponClassName );
 			return;
 		}
@@ -1157,7 +1157,7 @@ void C_CSPlayer::UpdateAddonModels()
 		iCurAddonBits = 0;
 
 	// If the local player is observing this entity in first-person mode, get rid of its addons.
-	C_BasePlayer *pPlayer = (C_BasePlayer*)ClientEntityList().GetLocalPlayer();
+	C_BasePlayer *pPlayer = (C_BasePlayer*)EntityList()->GetLocalPlayer();
 	if ( pPlayer && pPlayer->GetObserverMode() == OBS_MODE_IN_EYE && pPlayer->GetObserverTarget() == this )
 		iCurAddonBits = 0;
 
@@ -1189,7 +1189,7 @@ void C_CSPlayer::UpdateAddonModels()
 		if ( !( iCurAddonBits & addonBit ) || (rebuildPistol2Addon && addonBit == ADDON_PISTOL2) )
 		{
 			if (pModel->m_hEnt.Get())
-				cl_entitylist->DestroyEntity(pModel->m_hEnt);// ->Release();
+				EntityList()->DestroyEntity(pModel->m_hEnt);// ->Release();
 
 			m_AddonModels.Remove( i );
 		}
@@ -1431,7 +1431,7 @@ int	C_CSPlayer::GetMaxHealth() const
 //-----------------------------------------------------------------------------
 C_CSPlayer* GetLocalOrInEyeCSPlayer( void )
 {
-	C_CSPlayer *player = (C_CSPlayer*)ClientEntityList().GetLocalPlayer();
+	C_CSPlayer *player = (C_CSPlayer*)EntityList()->GetLocalPlayer();
 
 	if( player && player->GetObserverMode() == OBS_MODE_IN_EYE )
 	{
@@ -1733,7 +1733,7 @@ void C_CSPlayer::UpdateClientSideAnimation()
 
 	// Update the animation data. It does the local check here so this works when using
 	// a third-person camera (and we don't have valid player angles).
-	if ( this == (C_CSPlayer*)ClientEntityList().GetLocalPlayer() )
+	if ( this == (C_CSPlayer*)EntityList()->GetLocalPlayer() )
 		m_PlayerAnimState->Update( EyeAngles()[YAW], m_angEyeAngles[PITCH] );
 	else
 		m_PlayerAnimState->Update( m_angEyeAngles[YAW], m_angEyeAngles[PITCH] );
@@ -1750,7 +1750,7 @@ float g_flMuzzleFlashScale=1;
 
 void C_CSPlayer::ProcessMuzzleFlashEvent()
 {
-	CBasePlayer *pLocalPlayer = (C_BasePlayer*)ClientEntityList().GetLocalPlayer();
+	CBasePlayer *pLocalPlayer = (C_BasePlayer*)EntityList()->GetLocalPlayer();
 
 	// Reenable when the weapons have muzzle flash attachments in the right spot.
 	if ( this == pLocalPlayer )
@@ -2071,7 +2071,7 @@ const IEngineObjectClient* C_CSPlayer::GetRepresentativeRagdoll() const
 void C_CSPlayer::PlayReloadEffect()
 {
 	// Only play the effect for other players.
-	if ( this == (C_CSPlayer*)ClientEntityList().GetLocalPlayer() )
+	if ( this == (C_CSPlayer*)EntityList()->GetLocalPlayer() )
 	{
 		Assert( false ); // We shouldn't have been sent this message.
 		return;
@@ -2226,7 +2226,7 @@ const Vector& C_CSPlayer::GetRenderOrigin( void )
 
 void C_CSPlayer::Simulate( void )
 {
-	if( this != (C_BasePlayer*)ClientEntityList().GetLocalPlayer() )
+	if( this != (C_BasePlayer*)EntityList()->GetLocalPlayer() )
 	{
 		if (GetEngineObject()->IsEffectActive( EF_DIMLIGHT ) )
 		{
@@ -2316,7 +2316,7 @@ void C_CSPlayer::ReleaseFlashlight( void )
 
 bool C_CSPlayer::HasC4( void )
 {
-	if( this == (C_CSPlayer*)ClientEntityList().GetLocalPlayer() )
+	if( this == (C_CSPlayer*)EntityList()->GetLocalPlayer() )
 	{
 		return Weapon_OwnsThisType( "weapon_c4" );
 	}
@@ -2508,9 +2508,9 @@ void C_CSPlayer::CalcFreezeCamView( Vector& eyeOrigin, QAngle& eyeAngles, float&
 
 	// Now trace out from the target, so that we're put in front of any walls
 	trace_t trace;
-	ClientEntityList().PushEnableAbsRecomputations( false ); // HACK don't recompute positions while doing RayTrace
+	EntityList()->PushEnableAbsRecomputations( false ); // HACK don't recompute positions while doing RayTrace
 	UTIL_TraceHull( vLookAt, vTargetPos, WALL_MIN, WALL_MAX, MASK_SOLID, pTarget, COLLISION_GROUP_NONE, &trace );
-	ClientEntityList().PopEnableAbsRecomputations();
+	EntityList()->PopEnableAbsRecomputations();
 	if ( trace.fraction < 1.0 )
 	{
 		// The camera's going to be really close to the target. So we don't end up
@@ -2519,9 +2519,9 @@ void C_CSPlayer::CalcFreezeCamView( Vector& eyeOrigin, QAngle& eyeAngles, float&
 
 		// To stop all close in views looking up at character's chins, move the view up.
 		vTargetPos.z += fabs(vLookAt.z - vTargetPos.z) * 0.85;
-		ClientEntityList().PushEnableAbsRecomputations( false ); // HACK don't recompute positions while doing RayTrace
+		EntityList()->PushEnableAbsRecomputations( false ); // HACK don't recompute positions while doing RayTrace
 		UTIL_TraceHull( vLookAt, vTargetPos, WALL_MIN, WALL_MAX, MASK_SOLID, pTarget, COLLISION_GROUP_NONE, &trace );
-		ClientEntityList().PopEnableAbsRecomputations();
+		EntityList()->PopEnableAbsRecomputations();
 		vTargetPos = trace.endpos;
 	}
 

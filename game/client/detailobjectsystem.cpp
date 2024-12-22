@@ -1329,7 +1329,7 @@ void CDetailModel::UpdatePlayerAvoid( void )
 	{
 		if ( i == c )
 		{
-			pEnt = (C_BasePlayer*)ClientEntityList().GetLocalPlayer();
+			pEnt = (C_BasePlayer*)EntityList()->GetLocalPlayer();
 			if ( !pEnt ) continue;
 		}
 		else
@@ -2049,7 +2049,7 @@ int CDetailObjectSystem::SortSpritesBackToFront( int nLeaf, const Vector &viewOr
 	ClientLeafSystem()->GetDetailObjectsInLeaf( nLeaf, nFirstDetailObject, nDetailObjectCount );
 
 	float flFactor = 1.0f;
-	C_BasePlayer *pLocalPlayer = (C_BasePlayer*)ClientEntityList().GetLocalPlayer();
+	C_BasePlayer *pLocalPlayer = (C_BasePlayer*)EntityList()->GetLocalPlayer();
 	if ( pLocalPlayer )
 	{
 		flFactor = 1.0 / pLocalPlayer->GetFOVDistanceAdjustFactor();
@@ -2804,7 +2804,7 @@ void CDetailObjectSystem::BuildDetailObjectRenderLists( const Vector &vViewOrigi
 	}
 
 	float factor = 1.0f;
-	C_BasePlayer *local = (C_BasePlayer*)ClientEntityList().GetLocalPlayer();
+	C_BasePlayer *local = (C_BasePlayer*)EntityList()->GetLocalPlayer();
 	if ( local )
 	{
 		factor = local->GetFOVDistanceAdjustFactor();

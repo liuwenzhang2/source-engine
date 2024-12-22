@@ -65,7 +65,7 @@ void C_TEFizz::PostDataUpdate( DataUpdateType_t updateType )
 {
 	VPROF( "C_TEFizz::PostDataUpdate" );
 
-	C_BaseEntity *pEnt = cl_entitylist->GetEnt( m_nEntity );
+	C_BaseEntity *pEnt = EntityList()->GetEnt( m_nEntity );
 	if (pEnt != NULL)
 	{
 		tempents->FizzEffect(pEnt, m_nModelIndex, m_nDensity, m_nCurrent );

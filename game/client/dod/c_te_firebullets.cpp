@@ -7,7 +7,7 @@
 #include "cbase.h"
 #include "fx_dod_shared.h"
 #include "c_basetempentity.h"
-#include <cliententitylist.h>
+//#include <cliententitylist.h>
 
 
 class C_TEFireBullets : public C_BaseTempEntity

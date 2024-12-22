@@ -102,7 +102,7 @@ void C_Team::PreDataUpdate( DataUpdateType_t updateType )
 //-----------------------------------------------------------------------------
 C_BasePlayer* C_Team::GetPlayer( int idx )
 {
-	return (C_BasePlayer*)cl_entitylist->GetEnt(m_aPlayers[idx]);
+	return (C_BasePlayer*)EntityList()->GetEnt(m_aPlayers[idx]);
 }
 
 
@@ -181,7 +181,7 @@ void C_Team::ClientThink()
 //-----------------------------------------------------------------------------
 C_Team *GetLocalTeam( void )
 {
-	C_BasePlayer *player = (C_BasePlayer*)ClientEntityList().GetLocalPlayer();
+	C_BasePlayer *player = (C_BasePlayer*)EntityList()->GetLocalPlayer();
 
 	if ( !player )
 		return NULL;

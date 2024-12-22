@@ -132,7 +132,7 @@ bool FX_GetAttachmentTransform(C_BaseEntity* hEntity, int attachmentIndex, Vecto
 	}
 
 	// Get the actual entity
-	IClientRenderable *pRenderable = hEntity->GetEngineObject();//ClientEntityList().GetClientRenderableFromHandle( 
+	IClientRenderable *pRenderable = hEntity->GetEngineObject();//EntityList()->GetClientRenderableFromHandle( 
 	if ( pRenderable )
 	{
 		Vector attachOrigin;
@@ -380,7 +380,7 @@ void FX_MuzzleEffectAttached(
 	if ( !clienttools->IsInRecordingMode() )
 		return;
 
-	C_BaseEntity *pEnt = hEntity;//ClientEntityList().GetBaseEntityFromHandle( 
+	C_BaseEntity *pEnt = hEntity;//EntityList()->GetBaseEntityFromHandle( 
 	if ( pEnt )
 	{
 		pEnt->RecordToolMessage();
@@ -644,7 +644,7 @@ public:
 		// PMaterialHandle hMaterial = GetPMaterial( "particle/particle_smokegrenade" );
 
 		Vector vecOrigin = m_vSortOrigin;
-		IClientRenderable* pRenderable = m_hEntity->GetEngineObject();//ClientEntityList().GetClientRenderableFromHandle(
+		IClientRenderable* pRenderable = m_hEntity->GetEngineObject();//EntityList()->GetClientRenderableFromHandle(
 		if ( pRenderable && m_nAttachmentIndex )
 		{
 			QAngle tmp;
@@ -1042,7 +1042,7 @@ void FX_BuildTesla(
 
 void FX_Tesla( const CTeslaInfo &teslaInfo )
 {
-	C_BaseEntity *pEntity = ClientEntityList().GetEnt( teslaInfo.m_nEntIndex );
+	C_BaseEntity *pEntity = EntityList()->GetEnt( teslaInfo.m_nEntIndex );
 
 	// Send out beams around us
 	int iNumBeamsAround = (teslaInfo.m_nBeams * 2) / 3; // (2/3 of the beams are placed around in a circle)
@@ -1256,7 +1256,7 @@ void FX_BuildTeslaHitbox( const CEffectData &data )
 {
 	Vector vColor( 1, 1, 1 );
 
-	C_BaseEntity *pEntity = ClientEntityList().GetEnt( data.entindex() );
+	C_BaseEntity *pEntity = EntityList()->GetEnt( data.entindex() );
 	C_BaseAnimating *pAnimating = pEntity ? pEntity->GetBaseAnimating() : NULL;
 	if (!pAnimating)
 		return;

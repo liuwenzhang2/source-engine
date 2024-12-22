@@ -704,10 +704,10 @@ static bool IsValidEntityPointer( void *ptr )
 	return gEntList.IsEntityPtr( ptr );
 #else
 	// Walk entities looking for pointer
-	int c = ClientEntityList().GetHighestEntityIndex();
+	int c = EntityList()->GetHighestEntityIndex();
 	for ( int i = 0; i <= c; i++ )
 	{
-		CBaseEntity *e = ClientEntityList().GetBaseEntity( i );
+		CBaseEntity *e = EntityList()->GetBaseEntity( i );
 		if ( !e )
 			continue;
 
@@ -736,7 +736,7 @@ public:
 			bFoundEntity = false;
 
 #if defined( CLIENT_DLL )
-			pOwnerEntity = ClientEntityList().GetBaseEntityFromHandle( pOwnerEntity->GetRefEHandle() );
+			pOwnerEntity = EntityList()->GetBaseEntityFromHandle( pOwnerEntity->GetRefEHandle() );
 
 			if ( pOwnerEntity  )
 			{
@@ -766,7 +766,7 @@ public:
 			bFoundEntity = false;
 
 #if defined( CLIENT_DLL )
-			pOwnerEntity = ClientEntityList().GetBaseEntityFromHandle( pOwnerEntity->GetRefEHandle() );
+			pOwnerEntity = EntityList()->GetBaseEntityFromHandle( pOwnerEntity->GetRefEHandle() );
 
 			if ( pOwnerEntity  )
 			{

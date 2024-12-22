@@ -120,7 +120,7 @@ void FX_FireBullets(
 	bool bDoEffects = true;
 
 #ifdef CLIENT_DLL
-	C_CSPlayer *pPlayer = ToCSPlayer( ClientEntityList().GetBaseEntity( iPlayerIndex ) );
+	C_CSPlayer *pPlayer = ToCSPlayer( EntityList()->GetBaseEntity( iPlayerIndex ) );
 #else
 	CCSPlayer *pPlayer = ToCSPlayer( UTIL_PlayerByIndex( iPlayerIndex) );
 #endif
@@ -312,7 +312,7 @@ void FX_FireBullets(
 void FX_PlantBomb( int iPlayerIndex, const Vector &vOrigin, PlantBombOption_t option )
 {
 #ifdef CLIENT_DLL
-	C_CSPlayer *pPlayer = ToCSPlayer( ClientEntityList().GetBaseEntity( iPlayerIndex ) );
+	C_CSPlayer *pPlayer = ToCSPlayer( EntityList()->GetBaseEntity( iPlayerIndex ) );
 #else
 	CCSPlayer *pPlayer = ToCSPlayer( UTIL_PlayerByIndex( iPlayerIndex) );
 #endif

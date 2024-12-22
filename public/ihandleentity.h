@@ -173,4 +173,19 @@ public:
 
 };
 
+// inherit from this interface to be able to call WatchPositionChanges
+abstract_class IWatcherCallback
+{
+public:
+	virtual ~IWatcherCallback() {}
+};
+
+class IWatcherList {
+public:
+	virtual void Init() = 0;
+	virtual void AddToList(IHandleEntity* pWatcher) = 0;
+	virtual void RemoveWatcher(IHandleEntity* pWatcher) = 0;
+	virtual int GetCallbackObjects(IWatcherCallback** pList, int listMax) = 0;
+};
+
 #endif // IHANDLEENTITY_H

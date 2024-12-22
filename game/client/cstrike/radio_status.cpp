@@ -297,7 +297,7 @@ void CRadioStatus::DrawHeadLabels()
 		if ( m_radioUntil[i] < gpGlobals->curtime )
 			continue;
 
-		IClientNetworkable *pClient = cl_entitylist->GetClientEntity( i+1 );
+		IClientNetworkable *pClient = EntityList()->GetClientEntity( i+1 );
 		
 		// Don't show an icon if the player is not in our PVS.
 		if ( !pClient || pClient->IsDormant() )
@@ -398,7 +398,7 @@ void CRadioStatus::ExpireBotVoice( bool force )
 		{
 			bool expire = force;
 
-			C_CSPlayer *player = static_cast<C_CSPlayer*>( cl_entitylist->GetEnt(i+1) );
+			C_CSPlayer *player = static_cast<C_CSPlayer*>( EntityList()->GetEnt(i+1) );
 			if ( !player )
 			{
 				// player left the game

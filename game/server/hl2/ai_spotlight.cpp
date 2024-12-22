@@ -145,7 +145,7 @@ void CAI_Spotlight::CreateSpotlightEntities( void )
 	}
 	else
 	{
-		GetOuter()->GetAttachment( m_nSpotlightAttachment, vecStartPoint );
+		GetOuter()->GetEngineObject()->GetAttachment( m_nSpotlightAttachment, vecStartPoint );
 	}
 
 	Vector vecEndPoint;
@@ -235,7 +235,7 @@ bool CAI_Spotlight::ConstrainToCone( Vector *pDirection )
 	}
 	else
 	{
-		GetOuter()->GetAttachment( m_nSpotlightAttachment, vecOrigin, &vecForward );
+		GetOuter()->GetEngineObject()->GetAttachment( m_nSpotlightAttachment, vecOrigin, &vecForward );
 	}
 
 

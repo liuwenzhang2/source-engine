@@ -836,7 +836,7 @@ void CHLClient::PreSave(CSaveRestoreData* pSaveData)
 //	return (CBaseEntity*)gEntList.GetServerEntityFromHandle(handle);
 //#endif // GAME_DLL
 //#ifdef CLIENT_DLL
-//	return (CBaseEntity*)ClientEntityList().GetClientEntityFromHandle(handle);
+//	return (CBaseEntity*)EntityList()->GetClientEntityFromHandle(handle);
 //#endif // CLIENT_DLL
 //}
 
@@ -1124,7 +1124,7 @@ int CHLClient::Init( CreateInterfaceFn appSystemFactory, CreateInterfaceFn physi
 		GetClientVoiceMgr()->Init( &g_VoiceStatusHelper, parent );
 	}
 
-	if ( !ClientEntityList().Init() )
+	if ( !EntityList()->Init() )
 		return false;
 
 	//engine->AddBlockHandler( GetEntitySaveRestoreBlockHandler() );
@@ -1133,7 +1133,7 @@ int CHLClient::Init( CreateInterfaceFn appSystemFactory, CreateInterfaceFn physi
 
 	//ClientWorldFactoryInit();
 
-	ClientEntityList().InitBoneSetupThreadPool();
+	EntityList()->InitBoneSetupThreadPool();
 
 #if defined( WIN32 ) && !defined( _X360 )
 	// NVNT connect haptics sytem
@@ -1143,14 +1143,7 @@ int CHLClient::Init( CreateInterfaceFn appSystemFactory, CreateInterfaceFn physi
 	HookHapticMessages(); // Always hook the messages
 #endif
 
-	ClientEntityList().AddDataAccessor(TOUCHLINK, new CEntityDataInstantiator<C_BaseEntity, clienttouchlink_t >);
-	ClientEntityList().AddDataAccessor(GROUNDLINK, new CEntityDataInstantiator<C_BaseEntity, clientgroundlink_t >);
-	ClientEntityList().AddDataAccessor(STEPSIMULATION, new CEntityDataInstantiator<C_BaseEntity, StepSimulationData >);
-	ClientEntityList().AddDataAccessor(MODELSCALE, new CEntityDataInstantiator<C_BaseEntity, ModelScale >);
-	ClientEntityList().AddDataAccessor(POSITIONWATCHER, new CEntityDataInstantiator<C_BaseEntity, CWatcherList >);
-	ClientEntityList().AddDataAccessor(PHYSICSPUSHLIST, new CEntityDataInstantiator<C_BaseEntity, physicspushlist_t >);
-	ClientEntityList().AddDataAccessor(VPHYSICSUPDATEAI, new CEntityDataInstantiator<C_BaseEntity, vphysicsupdateai_t >);
-	ClientEntityList().AddDataAccessor(VPHYSICSWATCHER, new CEntityDataInstantiator<C_BaseEntity, CWatcherList >);
+
 
 	return true;
 }
@@ -1226,15 +1219,6 @@ void CHLClient::PostInit()
 //-----------------------------------------------------------------------------
 void CHLClient::Shutdown( void )
 {
-	ClientEntityList().RemoveDataAccessor(TOUCHLINK);
-	ClientEntityList().RemoveDataAccessor(GROUNDLINK);
-	ClientEntityList().RemoveDataAccessor(STEPSIMULATION);
-	ClientEntityList().RemoveDataAccessor(MODELSCALE);
-	ClientEntityList().RemoveDataAccessor(POSITIONWATCHER);
-	ClientEntityList().RemoveDataAccessor(PHYSICSPUSHLIST);
-	ClientEntityList().RemoveDataAccessor(VPHYSICSUPDATEAI);
-	ClientEntityList().RemoveDataAccessor(VPHYSICSWATCHER);
-
     if (g_pAchievementsAndStatsInterface)
     {
         g_pAchievementsAndStatsInterface->ReleasePanel();
@@ -1246,8 +1230,8 @@ void CHLClient::Shutdown( void )
 	g_pSixenseInput = NULL;
 #endif
 
-	ClientEntityList().ShutdownBoneSetupThreadPool();
-	ClientEntityList().Shutdown();
+	EntityList()->ShutdownBoneSetupThreadPool();
+	EntityList()->Shutdown();
 	//ClientWorldFactoryShutdown();
 
 	engine->RemoveBlockHandler( GetViewEffectsRestoreBlockHandler() );
@@ -1345,9 +1329,9 @@ void CHLClient::HudUpdate( bool bActive )
 	gHUD.UpdateHud( bActive );
 
 	{
-		ClientEntityList().PushAllowBoneAccess(true, false, (char const*)1);
+		EntityList()->PushAllowBoneAccess(true, false, (char const*)1);
 		IGameSystem::UpdateAllSystems( frametime );
-		ClientEntityList().PopBoneAccess((char const*)1);
+		EntityList()->PopBoneAccess((char const*)1);
 	}
 
 	// run vgui animations
@@ -1375,7 +1359,7 @@ void CHLClient::HudUpdate( bool bActive )
 void CHLClient::HudReset( void )
 {
 	gHUD.VidInit();
-	ClientEntityList().PhysicsReset();
+	EntityList()->PhysicsReset();
 }
 
 //-----------------------------------------------------------------------------
@@ -1498,14 +1482,14 @@ int CHLClient::IN_KeyEvent( int eventcode, ButtonCode_t keynum, const char *pszC
 
 void CHLClient::ExtraMouseSample( float frametime, bool active )
 {
-	Assert(ClientEntityList().IsAbsRecomputationsEnabled());
-	Assert(ClientEntityList().IsAbsQueriesValid() );
+	Assert(EntityList()->IsAbsRecomputationsEnabled());
+	Assert(EntityList()->IsAbsQueriesValid() );
 
-	ClientEntityList().PushAllowBoneAccess(true, false, (char const*)1);
+	EntityList()->PushAllowBoneAccess(true, false, (char const*)1);
 
 	MDLCACHE_CRITICAL_SECTION();
 	input->ExtraMouseSample( frametime, active );
-	ClientEntityList().PopBoneAccess((char const*)1);
+	EntityList()->PopBoneAccess((char const*)1);
 }
 
 void CHLClient::IN_SetSampleTime( float frametime )
@@ -1526,14 +1510,14 @@ void CHLClient::IN_SetSampleTime( float frametime )
 void CHLClient::CreateMove ( int sequence_number, float input_sample_frametime, bool active )
 {
 
-	Assert(ClientEntityList().IsAbsRecomputationsEnabled() );
-	Assert(ClientEntityList().IsAbsQueriesValid() );
+	Assert(EntityList()->IsAbsRecomputationsEnabled() );
+	Assert(EntityList()->IsAbsQueriesValid() );
 
-	ClientEntityList().PushAllowBoneAccess(true, false, (char const*)1);
+	EntityList()->PushAllowBoneAccess(true, false, (char const*)1);
 
 	MDLCACHE_CRITICAL_SECTION();
 	input->CreateMove( sequence_number, input_sample_frametime, active );
-	ClientEntityList().PopBoneAccess((char const*)1);
+	EntityList()->PopBoneAccess((char const*)1);
 }
 
 //-----------------------------------------------------------------------------
@@ -1628,7 +1612,7 @@ void CHLClient::StartStatsReporting( HANDLE handle, bool bArbitrated )
 void CHLClient::InvalidateMdlCache()
 {
 	C_BaseAnimating *pAnimating;
-	for ( C_BaseEntity *pEntity = ClientEntityList().FirstBaseEntity(); pEntity; pEntity = ClientEntityList().NextBaseEntity(pEntity) )
+	for ( C_BaseEntity *pEntity = EntityList()->FirstBaseEntity(); pEntity; pEntity = EntityList()->NextBaseEntity(pEntity) )
 	{
 		pAnimating = dynamic_cast<C_BaseAnimating *>(pEntity);
 		if ( pAnimating )
@@ -1677,7 +1661,7 @@ void CHLClient::LevelInitPreEntity( char const* pMapName )
 	tempents->LevelInit();
 	ResetToneMapping(1.0);
 
-	ClientEntityList().LevelInitPreEntity();
+	EntityList()->LevelInitPreEntity();
 	IGameSystem::LevelInitPreEntityAllSystems(pMapName);
 
 #ifdef USES_ECON_ITEMS
@@ -1731,7 +1715,7 @@ void CHLClient::LevelInitPreEntity( char const* pMapName )
 void CHLClient::LevelInitPostEntity( )
 {
 	IGameSystem::LevelInitPostEntityAllSystems();
-	ClientEntityList().LevelInitPostEntity();
+	EntityList()->LevelInitPostEntity();
 	C_PhysPropClientside::RecreateAll();
 	internalCenterPrint->Clear();
 }
@@ -1767,11 +1751,11 @@ void CHLClient::LevelShutdown( void )
 	g_bLevelInitialized = false;
 
 	// Disable abs recomputations when everything is shutting down
-	ClientEntityList().EnableAbsRecomputations( false );
+	EntityList()->EnableAbsRecomputations( false );
 
 	// Level shutdown sequence.
 	// First do the pre-entity shutdown of all systems
-	ClientEntityList().LevelShutdownPreEntity();
+	EntityList()->LevelShutdownPreEntity();
 	IGameSystem::LevelShutdownPreEntityAllSystems();
 
 	C_PhysPropClientside::DestroyAll();
@@ -1783,7 +1767,7 @@ void CHLClient::LevelShutdown( void )
 	tempents->LevelShutdown();
 
 	// Now release/delete the entities
-	cl_entitylist->Release();
+	EntityList()->Release();
 
 	C_BaseEntityClassList *pClassList = s_pClassLists;
 	while ( pClassList )
@@ -1794,7 +1778,7 @@ void CHLClient::LevelShutdown( void )
 
 	// Now do the post-entity shutdown of all systems
 	IGameSystem::LevelShutdownPostEntityAllSystems();
-	ClientEntityList().LevelShutdownPostEntity();
+	EntityList()->LevelShutdownPostEntity();
 
 	view->LevelShutdown();
 	beams->ClearBeams();
@@ -2124,7 +2108,7 @@ void UpdateClientRenderableInPVSStatus()
 	// Vis for this view should already be setup at this point.
 
 	// For each client-only entity, notify it if it's newly coming into the PVS.
-	CUtlLinkedList<CPVSNotifyInfo,unsigned short> &theList = ClientEntityList().GetPVSNotifiers();//CClientEntityList<>::
+	CUtlLinkedList<CPVSNotifyInfo,unsigned short> &theList = EntityList()->GetPVSNotifiers();//CClientEntityList<>::
 	FOR_EACH_LL( theList, i )
 	{
 		CPVSNotifyInfo *pInfo = &theList[i];//CClientEntityList<>::
@@ -2159,7 +2143,7 @@ void UpdatePVSNotifiers()
 
 	// At this point, all the entities that were rendered in the previous frame have INPVS_THISFRAME set
 	// so we can tell the entities that aren't in the PVS anymore so.
-	CUtlLinkedList<CPVSNotifyInfo,unsigned short> &theList = ClientEntityList().GetPVSNotifiers();//CClientEntityList<>::
+	CUtlLinkedList<CPVSNotifyInfo,unsigned short> &theList = EntityList()->GetPVSNotifiers();//CClientEntityList<>::
 	FOR_EACH_LL( theList, i )
 	{
 		CPVSNotifyInfo *pInfo = &theList[i];//CClientEntityList<>::
@@ -2197,32 +2181,32 @@ void OnRenderStart()
 #endif
 
 	partition->SuppressLists( PARTITION_ALL_CLIENT_EDICTS, true );
-	ClientEntityList().SetAbsQueriesValid( false );
+	EntityList()->SetAbsQueriesValid( false );
 
-	Rope_ResetCounters();
+	EntityList()->Rope_ResetCounters();
 
 	// Interpolate server entities and move aiments.
 	{
 		PREDICTION_TRACKVALUECHANGESCOPE( "interpolation" );
-		ClientEntityList().InterpolateServerEntities();
+		EntityList()->InterpolateServerEntities();
 	}
 
 	{
 		// vprof node for this bloc of math
 		VPROF( "OnRenderStart: dirty bone caches");
 		// Invalidate any bone information.
-		ClientEntityList().InvalidateBoneCaches();
+		EntityList()->InvalidateBoneCaches();
 
-		ClientEntityList().SetAbsQueriesValid( true );
-		ClientEntityList().EnableAbsRecomputations( true );
+		EntityList()->SetAbsQueriesValid( true );
+		EntityList()->EnableAbsRecomputations( true );
 
 		// Enable access to all model bones except view models.
 		// This is necessary for aim-ent computation to occur properly
-		ClientEntityList().PushAllowBoneAccess(true, false, "OnRenderStart->CViewRender::SetUpView"); // pops in CViewRender::SetUpView
+		EntityList()->PushAllowBoneAccess(true, false, "OnRenderStart->CViewRender::SetUpView"); // pops in CViewRender::SetUpView
 
 		// FIXME: This needs to be done before the player moves; it forces
 		// aiments the player may be attached to to forcibly update their position
-		ClientEntityList().MarkAimEntsDirty();
+		EntityList()->MarkAimEntsDirty();
 	}
 
 	// Make sure the camera simulation happens before OnRenderStart, where it's used.
@@ -2234,10 +2218,10 @@ void OnRenderStart()
 	// are at the correct location
 	view->OnRenderStart();
 
-	RopeManager()->OnRenderStart();
+	EntityList()->RopeManager()->OnRenderStart();
 	
 	// This will place all entities in the correct position in world space and in the KD-tree
-	ClientEntityList().UpdateClientSideAnimations();
+	EntityList()->UpdateClientSideAnimations();
 
 	partition->SuppressLists( PARTITION_ALL_CLIENT_EDICTS, false );
 
@@ -2256,9 +2240,9 @@ void OnRenderStart()
 
 	// Simulate all the entities.
 	SimulateEntities();
-	ClientEntityList().PhysicsSimulate();
+	EntityList()->PhysicsSimulate();
 
-	ClientEntityList().ThreadedBoneSetup();
+	EntityList()->ThreadedBoneSetup();
 
 	{
 		VPROF_("Client TempEnts", 0, VPROF_BUDGETGROUP_CLIENT_SIM, false, BUDGETFLAG_CLIENT);
@@ -2287,12 +2271,12 @@ void OnRenderStart()
 
 	// Now that the view model's position is setup and aiments are marked dirty, update
 	// their positions so they're in the leaf system correctly.
-	ClientEntityList().CalcAimEntPositions();
+	EntityList()->CalcAimEntPositions();
 
 	// For entities marked for recording, post bone messages to IToolSystems
 	if ( ToolsEnabled() )
 	{
-		ClientEntityList().ToolRecordEntities();
+		EntityList()->ToolRecordEntities();
 	}
 
 #if defined( REPLAY_ENABLED )
@@ -2309,7 +2293,7 @@ void DisplayBoneSetupEnts();
 void OnRenderEnd()
 {
 	// Disallow access to bones (access is enabled in CViewRender::SetUpView).
-	ClientEntityList().PopBoneAccess("CViewRender::SetUpView->OnRenderEnd");
+	EntityList()->PopBoneAccess("CViewRender::SetUpView->OnRenderEnd");
 
 	UpdatePVSNotifiers();
 
@@ -2349,8 +2333,8 @@ void CHLClient::FrameStageNotify( ClientFrameStage_t curStage )
 		{
 			VPROF( "CHLClient::FrameStageNotify FRAME_NET_UPDATE_START" );
 			// disabled all recomputations while we update entities
-			ClientEntityList().EnableAbsRecomputations( false );
-			ClientEntityList().SetAbsQueriesValid( false );
+			EntityList()->EnableAbsRecomputations( false );
+			EntityList()->SetAbsQueriesValid( false );
 			Interpolation_SetLastPacketTimeStamp( engine->GetLastTimeStamp() );
 			partition->SuppressLists( PARTITION_ALL_CLIENT_EDICTS, true );
 
@@ -2362,8 +2346,8 @@ void CHLClient::FrameStageNotify( ClientFrameStage_t curStage )
 			ProcessCacheUsedMaterials();
 
 			// reenable abs recomputation since now all entities have been updated
-			ClientEntityList().EnableAbsRecomputations( true );
-			ClientEntityList().SetAbsQueriesValid( true );
+			EntityList()->EnableAbsRecomputations( true );
+			EntityList()->SetAbsQueriesValid( true );
 			partition->SuppressLists( PARTITION_ALL_CLIENT_EDICTS, false );
 
 			PREDICTION_ENDTRACKVALUE();
@@ -2453,7 +2437,7 @@ void CHLClient::FrameStageNotify( ClientFrameStage_t curStage )
 
 //void CHLClient::DispatchOnRestore()
 //{
-//	ClientEntityList().DispatchOnRestore();
+//	EntityList()->DispatchOnRestore();
 //}
 
 void CHLClient::WriteSaveGameScreenshot( const char *pFilename )
@@ -2884,7 +2868,7 @@ void CHLClient::FileReceived( const char * fileName, unsigned int transferID )
 void CHLClient::ClientAdjustStartSoundParams( StartSoundParams_t& params )
 {
 #ifdef TF_CLIENT_DLL
-	CBaseEntity *pEntity = ClientEntityList().GetEnt( params.soundsource );
+	CBaseEntity *pEntity = EntityList()->GetEnt( params.soundsource );
 
 	// A player speaking
 	if ( params.entchannel == CHAN_VOICE && GameRules() && pEntity && pEntity->IsPlayer() )

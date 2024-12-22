@@ -246,7 +246,7 @@ void CHudChat::MsgFunc_RawAudio( bf_read &msg )
 	if ( feedbackDuration > 0.0f )
 	{
 		//Flash them on the radar
-		C_CSPlayer *pPlayer = static_cast<C_CSPlayer*>( cl_entitylist->GetEnt(playerIndex) );
+		C_CSPlayer *pPlayer = static_cast<C_CSPlayer*>( EntityList()->GetEnt(playerIndex) );
 
 		if ( pPlayer )
 		{

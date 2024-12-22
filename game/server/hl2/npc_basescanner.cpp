@@ -1527,7 +1527,7 @@ void CNPC_BaseScanner::UpdateHead( float flInterval )
 
 	Vector	vLookPos;
 
-	if ( !HasCondition( COND_IN_PVS ) || GetAttachment( "eyes", vLookPos ) == false )
+	if ( !HasCondition( COND_IN_PVS ) || GetEngineObject()->GetAttachment( "eyes", vLookPos ) == false )
 	{
 		vLookPos = EyePosition();
 	}

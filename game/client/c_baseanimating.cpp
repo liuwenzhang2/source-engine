@@ -226,7 +226,7 @@ void C_ClientRagdoll::OnRestore( void )
 	SetNextClientThink( CLIENT_THINK_ALWAYS );
 	if ( m_bFadeOut == true )
 	{
-		ClientEntityList().MoveToTopOfLRU( this, m_bImportant );
+		EntityList()->MoveToTopOfLRU( this, m_bImportant );
 	}
 	NoteRagdollCreationTick(this);
 	BaseClass::OnRestore();
@@ -413,7 +413,7 @@ void C_ClientRagdoll::ClientThink( void )
 	if ( m_bReleaseRagdoll == true )
 	{
 		//DestroyBoneAttachments();
-		cl_entitylist->DestroyEntity(this);// Release();
+		EntityList()->DestroyEntity(this);// Release();
 		return;
 	}
 
@@ -503,14 +503,14 @@ void C_BaseAnimating::UpdateOnRemove(void)
 
 	if (pChild && pChild->GetEngineObject()->IsMarkedForDeletion() == false)
 	{
-		cl_entitylist->DestroyEntity(pChild);// ->Release();
+		EntityList()->DestroyEntity(pChild);// ->Release();
 	}
 
 	if (GetThinkHandle() != INVALID_THINK_HANDLE)
 	{
 		ClientThinkList()->RemoveThinkable(GetClientHandle());
 	}
-	//ClientEntityList().RemoveEntity( this );
+	//EntityList()->RemoveEntity( this );
 
 	partition->Remove(PARTITION_CLIENT_SOLID_EDICTS | PARTITION_CLIENT_RESPONSIVE_EDICTS | PARTITION_CLIENT_NON_STATIC_EDICTS, GetEngineObject()->GetPartitionHandle());
 	GetEngineObject()->RemoveFromLeafSystem();
@@ -819,7 +819,7 @@ void C_BaseAnimating::DelayedInitModelEffects( void )
 void C_BaseAnimating::TermRopes()
 {
 	FOR_EACH_LL(m_Ropes, i)
-		cl_entitylist->DestroyEntity(m_Ropes[i]);// ->Release();
+		EntityList()->DestroyEntity(m_Ropes[i]);// ->Release();
 
 	m_Ropes.Purge();
 }
@@ -1264,7 +1264,7 @@ void C_BaseAnimating::UpdateIKLocks( float currentTime )
 
 		if (pTarget->GetOwner() != -1)
 		{
-			C_BaseEntity *pOwner = cl_entitylist->GetEnt( pTarget->GetOwner() );
+			C_BaseEntity *pOwner = EntityList()->GetEnt( pTarget->GetOwner() );
 			if (pOwner != NULL)
 			{
 				pTarget->UpdateOwner( pOwner->entindex(), pOwner->GetEngineObject()->GetAbsOrigin(), pOwner->GetEngineObject()->GetAbsAngles() );
@@ -1291,7 +1291,7 @@ void C_BaseAnimating::CalculateIKLocks( float currentTime )
 	// partition that early in the rendering loop. So we allow access right here for that special case.
 	SpatialPartitionListMask_t curSuppressed = partition->GetSuppressedLists();
 	partition->SuppressLists( PARTITION_ALL_CLIENT_EDICTS, false );
-	ClientEntityList().PushEnableAbsRecomputations( false );
+	EntityList()->PushEnableAbsRecomputations( false );
 
 	Ray_t ray;
 	CTraceFilterSkipNPCsAndPlayers traceFilter( this, GetEngineObject()->GetCollisionGroup() );
@@ -1509,7 +1509,7 @@ void C_BaseAnimating::CalculateIKLocks( float currentTime )
 	}
 #endif
 
-	ClientEntityList().PopEnableAbsRecomputations();
+	EntityList()->PopEnableAbsRecomputations();
 	partition->SuppressLists( curSuppressed, true );
 }
 
@@ -1539,12 +1539,12 @@ void C_BaseAnimating::CalculateIKLocks( float currentTime )
 
 C_BaseAnimating::AutoAllowBoneAccess::AutoAllowBoneAccess( bool bAllowForNormalModels, bool bAllowForViewModels )
 {
-	ClientEntityList().PushAllowBoneAccess(bAllowForNormalModels, bAllowForViewModels, (char const*)1);
+	EntityList()->PushAllowBoneAccess(bAllowForNormalModels, bAllowForViewModels, (char const*)1);
 }
 
 C_BaseAnimating::AutoAllowBoneAccess::~AutoAllowBoneAccess( )
 {
-	ClientEntityList().PopBoneAccess( ( char const * ) 1 );
+	EntityList()->PopBoneAccess( ( char const * ) 1 );
 }
 
 bool C_BaseAnimating::ShouldDraw()
@@ -2625,7 +2625,7 @@ void C_BaseAnimating::FireObsoleteEvent( const Vector& origin, const QAngle& ang
 			{
 				GetEngineObject()->GetAttachment( iAttachment+1, attachOrigin, attachAngles );
 				int entId = render->GetViewEntity();
-				C_BaseEntity* hEntity = ClientEntityList().GetBaseEntity( entId );
+				C_BaseEntity* hEntity = EntityList()->GetBaseEntity( entId );
 				tempents->MuzzleFlash( attachOrigin, attachAngles, atoi( options ), hEntity, bFirstPerson );
 			}
 		}
@@ -2911,7 +2911,7 @@ void C_BaseAnimating::GetRagdollInitBoneArrays( matrix3x4_t *pDeltaBones0, matri
 {
 	ForceSetupBonesAtTime( pDeltaBones0, gpGlobals->curtime - boneDt );
 	ForceSetupBonesAtTime( pDeltaBones1, gpGlobals->curtime );
-	float ragdollCreateTime = ClientEntityList().PhysGetSyncCreateTime();
+	float ragdollCreateTime = EntityList()->PhysGetSyncCreateTime();
 	if ( ragdollCreateTime != gpGlobals->curtime )
 	{
 		// The next simulation frame begins before the end of this frame
@@ -2953,7 +2953,7 @@ C_BaseEntity *C_BaseAnimating::BecomeRagdollOnClient()
 
 	if (pRagdoll->InitializeAsClientEntity(pModelName, RENDER_GROUP_OPAQUE_ENTITY) == false)
 	{
-		cl_entitylist->DestroyEntity(pRagdoll);// ->Release();
+		EntityList()->DestroyEntity(pRagdoll);// ->Release();
 		return NULL;
 	}
 
@@ -2994,7 +2994,7 @@ C_BaseEntity *C_BaseAnimating::BecomeRagdollOnClient()
 	if (AddRagdollToFadeQueue() == true)
 	{
 		pRagdoll->m_bImportant = NPC_IsImportantNPC(this);
-		ClientEntityList().MoveToTopOfLRU(pRagdoll, pRagdoll->m_bImportant);
+		EntityList()->MoveToTopOfLRU(pRagdoll, pRagdoll->m_bImportant);
 		pRagdoll->m_bFadeOut = true;
 	}
 
@@ -3008,18 +3008,18 @@ C_ClientRagdoll* C_BaseAnimating::CreateRagdollCopy()
 	//Adrian: We now create a separate entity that becomes this entity's ragdoll.
 	//That way the server side version of this entity can go away. 
 	//Plus we can hook save/restore code to these ragdolls so they don't fall on restore anymore.
-	C_ClientRagdoll* pRagdoll = (C_ClientRagdoll*)cl_entitylist->CreateEntityByName("C_ClientRagdoll");//false
+	C_ClientRagdoll* pRagdoll = (C_ClientRagdoll*)EntityList()->CreateEntityByName("C_ClientRagdoll");//false
 	return pRagdoll;
 }
 
 
 C_EntityFlame* FireEffect(C_BaseAnimating* pTarget, C_BaseEntity* pServerFire, float* flScaleEnd, float* flTimeStart, float* flTimeEnd)
 {
-	C_EntityFlame* pFire = (C_EntityFlame*)cl_entitylist->CreateEntityByName("C_EntityFlame");
+	C_EntityFlame* pFire = (C_EntityFlame*)EntityList()->CreateEntityByName("C_EntityFlame");
 
 	if (pFire->InitializeAsClientEntity(NULL, RENDER_GROUP_TRANSLUCENT_ENTITY) == false)
 	{
-		cl_entitylist->DestroyEntity(pFire);// ->Release();
+		EntityList()->DestroyEntity(pFire);// ->Release();
 		return NULL;
 	}
 
@@ -3081,11 +3081,11 @@ void C_BaseAnimating::IgniteRagdoll(C_BaseEntity* pSource)
 
 C_EntityDissolve* DissolveEffect(C_BaseEntity* pTarget, float flTime)
 {
-	C_EntityDissolve* pDissolve = (C_EntityDissolve*)cl_entitylist->CreateEntityByName("C_EntityDissolve");
+	C_EntityDissolve* pDissolve = (C_EntityDissolve*)EntityList()->CreateEntityByName("C_EntityDissolve");
 
 	if (pDissolve->InitializeAsClientEntity("sprites/blueglow1.vmt", RENDER_GROUP_TRANSLUCENT_ENTITY) == false)
 	{
-		cl_entitylist->DestroyEntity(pDissolve);// ->Release();
+		EntityList()->DestroyEntity(pDissolve);// ->Release();
 		return NULL;
 	}
 
@@ -3874,85 +3874,6 @@ KeyValues *C_BaseAnimating::GetSequenceKeyValues( int iSequence )
 }
 
 //-----------------------------------------------------------------------------
-// Computes a box that surrounds all hitboxes
-//-----------------------------------------------------------------------------
-bool C_BaseAnimating::ComputeHitboxSurroundingBox( Vector *pVecWorldMins, Vector *pVecWorldMaxs )
-{
-	// Note that this currently should not be called during position recomputation because of IK.
-	// The code below recomputes bones so as to get at the hitboxes,
-	// which causes IK to trigger, which causes raycasts against the other entities to occur,
-	// which is illegal to do while in the computeabsposition phase.
-
-	IStudioHdr *pStudioHdr = GetEngineObject()->GetModelPtr();
-	if (!pStudioHdr)
-		return false;
-
-	mstudiohitboxset_t *set = pStudioHdr->pHitboxSet(GetEngineObject()->GetHitboxSet() );
-	if ( !set || !set->numhitboxes )
-		return false;
-
-	const matrix3x4_t *hitboxbones[MAXSTUDIOBONES];
-	GetEngineObject()->GetHitboxBoneTransforms(hitboxbones);
-
-	// Compute a box in world space that surrounds this entity
-	pVecWorldMins->Init( FLT_MAX, FLT_MAX, FLT_MAX );
-	pVecWorldMaxs->Init( -FLT_MAX, -FLT_MAX, -FLT_MAX );
-
-	Vector vecBoxAbsMins, vecBoxAbsMaxs;
-	for ( int i = 0; i < set->numhitboxes; i++ )
-	{
-		mstudiobbox_t *pbox = set->pHitbox(i);
-
-		TransformAABB( *hitboxbones[pbox->bone], pbox->bbmin, pbox->bbmax, vecBoxAbsMins, vecBoxAbsMaxs );
-		VectorMin( *pVecWorldMins, vecBoxAbsMins, *pVecWorldMins );
-		VectorMax( *pVecWorldMaxs, vecBoxAbsMaxs, *pVecWorldMaxs );
-	}
-	return true;
-}
-
-//-----------------------------------------------------------------------------
-// Computes a box that surrounds all hitboxes, in entity space
-//-----------------------------------------------------------------------------
-bool C_BaseAnimating::ComputeEntitySpaceHitboxSurroundingBox( Vector *pVecWorldMins, Vector *pVecWorldMaxs )
-{
-	// Note that this currently should not be called during position recomputation because of IK.
-	// The code below recomputes bones so as to get at the hitboxes,
-	// which causes IK to trigger, which causes raycasts against the other entities to occur,
-	// which is illegal to do while in the computeabsposition phase.
-
-	IStudioHdr *pStudioHdr = GetEngineObject()->GetModelPtr();
-	if (!pStudioHdr)
-		return false;
-
-	mstudiohitboxset_t *set = pStudioHdr->pHitboxSet(GetEngineObject()->GetHitboxSet() );
-	if ( !set || !set->numhitboxes )
-		return false;
-
-	const matrix3x4_t *hitboxbones[MAXSTUDIOBONES];
-	GetEngineObject()->GetHitboxBoneTransforms(hitboxbones);
-
-	// Compute a box in world space that surrounds this entity
-	pVecWorldMins->Init( FLT_MAX, FLT_MAX, FLT_MAX );
-	pVecWorldMaxs->Init( -FLT_MAX, -FLT_MAX, -FLT_MAX );
-
-	matrix3x4_t worldToEntity, boneToEntity;
-	MatrixInvert(GetEngineObject()->EntityToWorldTransform(), worldToEntity );
-
-	Vector vecBoxAbsMins, vecBoxAbsMaxs;
-	for ( int i = 0; i < set->numhitboxes; i++ )
-	{
-		mstudiobbox_t *pbox = set->pHitbox(i);
-
-		ConcatTransforms( worldToEntity, *hitboxbones[pbox->bone], boneToEntity );
-		TransformAABB( boneToEntity, pbox->bbmin, pbox->bbmax, vecBoxAbsMins, vecBoxAbsMaxs );
-		VectorMin( *pVecWorldMins, vecBoxAbsMins, *pVecWorldMins );
-		VectorMax( *pVecWorldMaxs, vecBoxAbsMaxs, *pVecWorldMaxs );
-	}
-	return true;
-}
-
-
-//-----------------------------------------------------------------------------
 // Purpose: Clientside bone follower class. Used just to visualize them.
 //			Bone followers WON'T be sent to the client if VISUALIZE_FOLLOWERS is
 //			undefined in the server's physics_bone_followers.cpp
@@ -3982,7 +3903,7 @@ END_RECV_TABLE()
 
 void VCollideWireframe_ChangeCallback( IConVar *pConVar, char const *pOldString, float flOldValue )
 {
-	for ( C_BaseEntity *pEntity = ClientEntityList().FirstBaseEntity(); pEntity; pEntity = ClientEntityList().NextBaseEntity(pEntity) )
+	for ( C_BaseEntity *pEntity = EntityList()->FirstBaseEntity(); pEntity; pEntity = EntityList()->NextBaseEntity(pEntity) )
 	{
 		pEntity->UpdateVisibility();
 	}

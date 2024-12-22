@@ -142,7 +142,7 @@ void CHeadIconManager::DrawHeadIcons()
 				continue;
 		}
 
-		IClientNetworkable *pClient = cl_entitylist->GetClientEntity( i+1 );
+		IClientNetworkable *pClient = EntityList()->GetClientEntity( i+1 );
 
 		// Don't show an icon if the player is not in our PVS.
 		if ( !pClient || pClient->IsDormant() )
@@ -165,8 +165,8 @@ void CHeadIconManager::DrawHeadIcons()
 		if ( GetClientVoiceMgr()->IsPlayerSpeaking( i+1 ) )
 			continue;
 
-		if ( ((C_BasePlayer*)ClientEntityList().GetLocalPlayer())->GetObserverMode() == OBS_MODE_IN_EYE &&
-			 ((C_BasePlayer*)ClientEntityList().GetLocalPlayer())->GetObserverTarget() == pPlayer )
+		if ( ((C_BasePlayer*)EntityList()->GetLocalPlayer())->GetObserverMode() == OBS_MODE_IN_EYE &&
+			 ((C_BasePlayer*)EntityList()->GetLocalPlayer())->GetObserverTarget() == pPlayer )
 			continue;
 
 		IMaterial *pMaterial = pPlayer->GetHeadIconMaterial();

@@ -42,7 +42,7 @@ public:
 	//Actual work code
 	virtual IterationRetval_t EnumElement( IHandleEntity *pHandleEntity )
 	{
-		C_BaseEntity *pEnt = ClientEntityList().GetBaseEntityFromHandle( pHandleEntity->GetRefEHandle() );
+		C_BaseEntity *pEnt = EntityList()->GetBaseEntityFromHandle( pHandleEntity->GetRefEHandle() );
 		if ( pEnt == NULL )
 			return ITERATION_CONTINUE;
 

@@ -21,7 +21,7 @@ CPlayerAndObjectEnumerator::CPlayerAndObjectEnumerator( float radius )
 {
 	m_flRadiusSquared		= radius * radius;
 	m_Objects.RemoveAll();
-	m_pLocal = (C_BasePlayer*)ClientEntityList().GetLocalPlayer();
+	m_pLocal = (C_BasePlayer*)EntityList()->GetLocalPlayer();
 }
 
 int	CPlayerAndObjectEnumerator::GetObjectCount()
@@ -43,7 +43,7 @@ IterationRetval_t CPlayerAndObjectEnumerator::EnumElement( IHandleEntity *pHandl
 	if ( !m_pLocal )
 		return ITERATION_STOP;
 
-	C_BaseEntity *pEnt = ClientEntityList().GetBaseEntityFromHandle( pHandleEntity->GetRefEHandle() );
+	C_BaseEntity *pEnt = EntityList()->GetBaseEntityFromHandle( pHandleEntity->GetRefEHandle() );
 	if ( pEnt == NULL )
 		return ITERATION_CONTINUE;
 

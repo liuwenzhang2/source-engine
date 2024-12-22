@@ -706,14 +706,14 @@ void CNPC_Strider::Activate()
 
 		// Currently just using the gun for the vertical component!
 		Vector defEyePos;
-		pStrider->GetAttachment( "minigunbase", defEyePos );
+		pStrider->GetEngineObject()->GetAttachment( "minigunbase", defEyePos );
 		gm_zMinigunDist = defEyePos.z - pStrider->GetEngineObject()->GetAbsOrigin().z;
 
 		Vector position;
-		pStrider->GetAttachment( "biggun", position );
+		pStrider->GetEngineObject()->GetAttachment( "biggun", position );
 		VectorITransform( position, pStrider->GetEngineObject()->EntityToWorldTransform(), gm_vLocalRelativePositionCannon );
 
-		pStrider->GetAttachment( "minigun", position );
+		pStrider->GetEngineObject()->GetAttachment( "minigun", position );
 		VectorITransform( position, pStrider->GetEngineObject()->EntityToWorldTransform(), gm_vLocalRelativePositionMinigun );
 		gEntList.DestroyEntity( pStrider );
 	}
@@ -1183,7 +1183,7 @@ void CNPC_Strider::GatherHeightConditions( const Vector &vTestPos, CBaseEntity *
 				Vector muzzlePos;
 				Vector targetPos = pEntity->BodyTarget( GetAdjustedOrigin() );
 
-				GetAttachment( "minigun", muzzlePos );
+				GetEngineObject()->GetAttachment( "minigun", muzzlePos );
 				
 				trace_t tr;
 				AI_TraceLine( muzzlePos, targetPos, MASK_SHOT, this, COLLISION_GROUP_NONE, &tr);
@@ -1538,7 +1538,7 @@ void CNPC_Strider::StartTask( const Task_t *pTask )
 			GetEngineObject()->SetPoseParameter( gm_YawControl, m_aimYaw );
 			GetEngineObject()->SetPoseParameter( gm_PitchControl, m_aimPitch );
 			Vector vecShootPos;
-			GetAttachment( gm_CannonAttachment, vecShootPos );
+			GetEngineObject()->GetAttachment( gm_CannonAttachment, vecShootPos );
 		
 			// tell the client side effect to complete
 			EntityMessageBegin( this, true );
@@ -1885,7 +1885,7 @@ void CNPC_Strider::HandleAnimEvent( animevent_t *pEvent )
 			GetEngineObject()->SetPoseParameter( gm_YawControl, m_aimYaw );
 			GetEngineObject()->SetPoseParameter( gm_PitchControl, m_aimPitch );
 			Vector vecShootPos;
-			GetAttachment( gm_CannonAttachment, vecShootPos );
+			GetEngineObject()->GetAttachment( gm_CannonAttachment, vecShootPos );
 		
 			// tell the client side effect to start
 			EntityMessageBegin( this, true );
@@ -1948,7 +1948,7 @@ void CNPC_Strider::HandleAnimEvent( animevent_t *pEvent )
 		break;
 	case STRIDER_AE_WHOOSH_LEFT:
 		{
-			GetAttachment( "left foot", footPosition );
+		GetEngineObject()->GetAttachment( "left foot", footPosition );
 
 			CPASAttenuationFilter filter( this, "NPC_Strider.Whoosh" );
 			g_pSoundEmitterSystem->EmitSound( filter, 0, "NPC_Strider.Whoosh", &footPosition );
@@ -1956,7 +1956,7 @@ void CNPC_Strider::HandleAnimEvent( animevent_t *pEvent )
 		break;
 	case STRIDER_AE_WHOOSH_RIGHT:
 		{
-			GetAttachment( "right foot", footPosition );
+			GetEngineObject()->GetAttachment( "right foot", footPosition );
 
 			CPASAttenuationFilter filter( this, "NPC_Strider.Whoosh" );
 			g_pSoundEmitterSystem->EmitSound( filter, 0, "NPC_Strider.Whoosh", &footPosition );
@@ -1964,7 +1964,7 @@ void CNPC_Strider::HandleAnimEvent( animevent_t *pEvent )
 		break;
 	case STRIDER_AE_WHOOSH_BACK:
 		{
-			GetAttachment( "back foot", footPosition );
+		GetEngineObject()->GetAttachment( "back foot", footPosition );
 
 			CPASAttenuationFilter filter( this, "NPC_Strider.Whoosh" );
 			g_pSoundEmitterSystem->EmitSound( filter, this->entindex(), "NPC_Strider.Whoosh", &footPosition );
@@ -2748,7 +2748,7 @@ bool CNPC_Strider::TestShootPosition(const Vector &vecShootPos, const Vector &ta
 Vector CNPC_Strider::Weapon_ShootPosition( )
 {
 	Vector vecShootPos;
-	GetAttachment( gm_CannonAttachment, vecShootPos );
+	GetEngineObject()->GetAttachment( gm_CannonAttachment, vecShootPos );
 
 	return vecShootPos;
 }
@@ -3320,7 +3320,7 @@ void CNPC_Strider::Event_Killed( const CTakeDamageInfo &info )
 	{
 		// Lifted this code from the gunship.
 		Vector vecExplode;
-		GetAttachment( "minigun", vecExplode );
+		GetEngineObject()->GetAttachment( "minigun", vecExplode );
 		ExplosionCreate( vecExplode, QAngle(0,0,1), this, 100, 128, false );
 	}
 
@@ -4027,7 +4027,7 @@ Vector CNPC_Strider::CannonPosition()
 	Vector position;
 
 	// Currently just using the gun for the vertical component!
-	GetAttachment( "biggun", position );
+	GetEngineObject()->GetAttachment( "biggun", position );
 	position.x = GetEngineObject()->GetAbsOrigin().x;
 	position.y = GetEngineObject()->GetAbsOrigin().y;
 
@@ -4147,7 +4147,7 @@ void CNPC_Strider::FireCannon()
 	m_nextShootTime = gpGlobals->curtime + 5;
 	trace_t tr;
 	Vector vecShootPos;
-	GetAttachment( gm_CannonAttachment, vecShootPos );
+	GetEngineObject()->GetAttachment( gm_CannonAttachment, vecShootPos );
 
 	Vector vecShootDir;
 	vecShootDir = m_hCannonTarget->WorldSpaceCenter() - vecShootPos;
@@ -4325,7 +4325,7 @@ Vector CNPC_Strider::RightFootHit( float eventtime )
 {
 	Vector footPosition;
 
-	GetAttachment( "right foot", footPosition );
+	GetEngineObject()->GetAttachment( "right foot", footPosition );
 	
 	if ( hl2_episodic.GetBool() )
 	{
@@ -4350,7 +4350,7 @@ Vector CNPC_Strider::BackFootHit( float eventtime )
 {
 	Vector footPosition;
 
-	GetAttachment( "back foot", footPosition );
+	GetEngineObject()->GetAttachment( "back foot", footPosition );
 
 	if ( hl2_episodic.GetBool() )
 	{
@@ -4430,7 +4430,7 @@ void CNPC_Strider::StompHit( int followerBoneIndex )
 	hitPosition = pEnemy->GetEngineObject()->GetAbsOrigin();
 
 	Vector footPosition;
-	GetAttachment( "left foot", footPosition );
+	GetEngineObject()->GetAttachment( "left foot", footPosition );
 
 	CPASAttenuationFilter filter( this, "NPC_Strider.Skewer" );
 	g_pSoundEmitterSystem->EmitSound( filter, 0, "NPC_Strider.Skewer", &hitPosition );
@@ -4513,8 +4513,8 @@ void CNPC_Strider::FootFX( const Vector &origin )
 Vector CNPC_Strider::CalculateStompHitPosition( CBaseEntity *pEnemy )
 {
 	Vector skewerPosition, footPosition;
-	GetAttachment( "left skewer", skewerPosition );
-	GetAttachment( "left foot", footPosition );
+	GetEngineObject()->GetAttachment( "left skewer", skewerPosition );
+	GetEngineObject()->GetAttachment( "left foot", footPosition );
 	Vector vecStabPos = ( pEnemy->WorldSpaceCenter() + pEnemy->EyePosition() ) * 0.5f;
 
 	return vecStabPos - skewerPosition + footPosition;

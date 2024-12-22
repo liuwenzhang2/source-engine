@@ -170,7 +170,7 @@ void CCSBaseAchievementFullRound::FireGameEvent_Internal( IGameEvent *event )
 {
 	if ( 0 == Q_strcmp( event->GetName(), "teamplay_round_win" ) )
 	{
-		C_BasePlayer *pLocalPlayer = (C_BasePlayer*)ClientEntityList().GetLocalPlayer();
+		C_BasePlayer *pLocalPlayer = (C_BasePlayer*)EntityList()->GetLocalPlayer();
 		if ( pLocalPlayer )
 		{
 			// is the player currently on a game team?

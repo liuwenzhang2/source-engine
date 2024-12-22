@@ -497,6 +497,8 @@ public:
 
 	virtual void SetupBones(matrix3x4_t* pBoneToWorldOut, int nMaxBones, int boneMask, float currentTime) = 0;
 	virtual void DrawRawSkeleton(matrix3x4_t boneToWorld[], int boneMask, bool noDepthTest = true, float duration = 0.0f, bool monocolor = false) = 0;
+	virtual bool ComputeHitboxSurroundingBox(Vector* pVecWorldMins, Vector* pVecWorldMaxs) = 0;
+	virtual bool ComputeEntitySpaceHitboxSurroundingBox(Vector* pVecWorldMins, Vector* pVecWorldMaxs) = 0;
 	virtual void GetHitboxBoneTransform(int iBone, matrix3x4_t& pBoneToWorld) = 0;
 	virtual void GetHitboxBoneTransforms(const matrix3x4_t* hitboxbones[MAXSTUDIOBONES]) = 0;
 	virtual void GetHitboxBonePosition(int iBone, Vector& origin, QAngle& angles) = 0;
@@ -520,7 +522,9 @@ public:
 	virtual int LookupAttachment(const char* szName) = 0;
 	virtual bool GetAttachment(int iAttachment, matrix3x4_t& attachmentToWorld) = 0;
 	virtual bool GetAttachment(int iAttachment, Vector& absOrigin, QAngle& absAngles) = 0;
+	virtual bool GetAttachment(int iAttachment, Vector& absOrigin, Vector* forward = NULL, Vector* right = NULL, Vector* up = NULL) = 0;
 	virtual bool GetAttachment(const char* szName, Vector& absOrigin, QAngle& absAngles) = 0;
+	virtual bool GetAttachment(const char* szName, Vector& absOrigin, Vector* forward = NULL, Vector* right = NULL, Vector* up = NULL) = 0;
 	virtual void SetAlternateSorting(bool bAlternateSorting) = 0;
 	virtual void IncrementInterpolationFrame() = 0;
 	virtual bool PhysModelParseSolid(solid_t& solid) = 0;
@@ -868,6 +872,7 @@ public:
 	virtual IServerEntity* GetServerEntity(int entnum) const = 0;
 	virtual IServerEntity* GetServerEntityFromHandle(CBaseHandle hEnt) const = 0;
 	virtual short		GetNetworkSerialNumber(int entnum) const = 0;
+	virtual CBaseEntity* GetBaseEntity(int entnum) const = 0;
 
 	// Returns number of entities currently in use
 	virtual int					NumberOfEntities() = 0;

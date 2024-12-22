@@ -127,7 +127,7 @@ bool CMoveHelperClient::AddToTouched( const trace_t& tr, const Vector& impactvel
 
 void CMoveHelperClient::ProcessImpacts( void )
 {
-	C_BasePlayer *pPlayer = (C_BasePlayer*)ClientEntityList().GetLocalPlayer();
+	C_BasePlayer *pPlayer = (C_BasePlayer*)EntityList()->GetLocalPlayer();
 	if ( !pPlayer )
 		return;
 
@@ -148,7 +148,7 @@ void CMoveHelperClient::ProcessImpacts( void )
 	for (int i = 0 ; i < m_TouchList.Size(); i++)
 	{
 		// Run the impact function as if we had run it during movement.
-		C_BaseEntity *entity = ClientEntityList().GetEnt(((C_BaseEntity*)m_TouchList[i].trace.m_pEnt)->entindex() );
+		C_BaseEntity *entity = EntityList()->GetEnt(((C_BaseEntity*)m_TouchList[i].trace.m_pEnt)->entindex() );
 		if ( !entity )
 			continue;
 
@@ -266,5 +266,5 @@ void CMoveHelperClient::PlayerSetAnimation( PLAYER_ANIM eAnim )
 
 bool CMoveHelperClient::IsWorldEntity( const CBaseHandle &handle )
 {
-	return handle == cl_entitylist->GetNetworkableHandle( 0 );
+	return handle == EntityList()->GetBaseEntity( 0 )->GetRefEHandle();
 }

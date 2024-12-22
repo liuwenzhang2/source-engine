@@ -204,7 +204,7 @@ void CPropAPC::Activate()
 
 	Vector vecWorldBarrelPos;
 	matrix3x4_t matRefToWorld;
-	GetAttachment( m_nMachineGunMuzzleAttachment, vecWorldBarrelPos );
+	GetEngineObject()->GetAttachment( m_nMachineGunMuzzleAttachment, vecWorldBarrelPos );
 	GetEngineObject()->GetAttachment( nMachineGunRefAttachment, matRefToWorld );
 	VectorITransform( vecWorldBarrelPos, matRefToWorld, m_vecBarrelPos );
 }
@@ -846,7 +846,7 @@ void CPropAPC::FireMachineGun( void )
 
 	Vector vecMachineGunShootPos;
 	Vector vecMachineGunDir;
-	GetAttachment( m_nMachineGunMuzzleAttachment, vecMachineGunShootPos, &vecMachineGunDir );
+	GetEngineObject()->GetAttachment( m_nMachineGunMuzzleAttachment, vecMachineGunShootPos, &vecMachineGunDir );
 	
 	// Fire the round
 	int	bulletType = GetAmmoDef()->Index("AR2");
@@ -870,7 +870,7 @@ void CPropAPC::FireMachineGun( void )
 //-----------------------------------------------------------------------------
 void CPropAPC::GetRocketShootPosition( Vector *pPosition )
 {
-	GetAttachment( m_nRocketAttachment, *pPosition );
+	GetEngineObject()->GetAttachment( m_nRocketAttachment, *pPosition );
 }
 
 

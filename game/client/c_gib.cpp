@@ -34,7 +34,7 @@ C_Gib::~C_Gib( void )
 //-----------------------------------------------------------------------------
 C_Gib *C_Gib::CreateClientsideGib( const char *pszModelName, Vector vecOrigin, Vector vecForceDir, AngularImpulse vecAngularImp, float flLifetime )
 {
-	C_Gib *pGib = (C_Gib*)cl_entitylist->CreateEntityByName( "C_Gib" );
+	C_Gib *pGib = (C_Gib*)EntityList()->CreateEntityByName( "C_Gib" );
 
 	if ( pGib == NULL )
 		return NULL;
@@ -57,7 +57,7 @@ bool C_Gib::InitializeGib( const char *pszModelName, Vector vecOrigin, Vector ve
 {
 	if ( InitializeAsClientEntity( pszModelName, RENDER_GROUP_OPAQUE_ENTITY ) == false )
 	{
-		cl_entitylist->DestroyEntity(this);//Release();
+		EntityList()->DestroyEntity(this);//Release();
 		return false;
 	}
 
@@ -80,7 +80,7 @@ bool C_Gib::InitializeGib( const char *pszModelName, Vector vecOrigin, Vector ve
 	else
 	{
 		// failed to create a physics object
-		cl_entitylist->DestroyEntity(this);//Release();
+		EntityList()->DestroyEntity(this);//Release();
 		return false;
 	}
 
@@ -102,7 +102,7 @@ void C_Gib::ClientThink( void )
 #ifdef HL2_CLIENT_DLL
 		s_AntlionGibManager.RemoveGib( this );
 #endif
-		cl_entitylist->DestroyEntity(this);//Release();
+		EntityList()->DestroyEntity(this);//Release();
 		return;
 	}
 

@@ -783,7 +783,7 @@ public:
 float GlowSightDistance( const Vector &glowOrigin, bool bShouldTrace )
 {
 	float dist = (glowOrigin - CurrentViewOrigin()).Length();
-	C_BasePlayer *local = (C_BasePlayer*)ClientEntityList().GetLocalPlayer();
+	C_BasePlayer *local = (C_BasePlayer*)EntityList()->GetLocalPlayer();
 	if ( local )
 	{
 		dist *= local->GetFOVDistanceAdjustFactor();

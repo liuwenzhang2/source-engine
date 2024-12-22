@@ -244,7 +244,7 @@ public:
 		
 		float	cameraDistance = ( CurrentViewOrigin() - (m_pOwner->GetEngineObject()->GetAbsOrigin())).Length();
 
-		C_BasePlayer *local = (C_BasePlayer*)ClientEntityList().GetLocalPlayer();
+		C_BasePlayer *local = (C_BasePlayer*)EntityList()->GetLocalPlayer();
 		if ( local )
 		{
 			cameraDistance *= local->GetFOVDistanceAdjustFactor();

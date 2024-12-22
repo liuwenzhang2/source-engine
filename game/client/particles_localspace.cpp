@@ -123,7 +123,7 @@ void CLocalSpaceEmitter::RenderParticles( CParticleRenderIterator *pIterator )
 //-----------------------------------------------------------------------------
 void CLocalSpaceEmitter::SetupTransformMatrix( void )
 {
-	IClientRenderable *pRenderable = ClientEntityList().GetClientRenderableFromHandle(m_hEntity); 
+	IClientRenderable *pRenderable = EntityList()->GetClientRenderableFromHandle(m_hEntity); 
 	if ( pRenderable )
 	{
 		matrix3x4_t mat;

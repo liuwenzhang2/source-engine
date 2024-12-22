@@ -135,7 +135,7 @@ void CBaseHudWeaponSelection::VidInit(void)
 void CBaseHudWeaponSelection::OnThink( void )
 {
 	// Don't allow weapon selection if we're frozen in place
-	C_BasePlayer *pPlayer = (C_BasePlayer*)ClientEntityList().GetLocalPlayer();
+	C_BasePlayer *pPlayer = (C_BasePlayer*)EntityList()->GetLocalPlayer();
 	if ( pPlayer->GetEngineObject()->GetFlags() & FL_FROZEN || pPlayer->IsPlayerDead() )
 	{
 		if ( IsInSelectionMode() )
@@ -150,7 +150,7 @@ void CBaseHudWeaponSelection::OnThink( void )
 //-----------------------------------------------------------------------------
 void CBaseHudWeaponSelection::ProcessInput()
 {
-	C_BasePlayer *pPlayer = (C_BasePlayer*)ClientEntityList().GetLocalPlayer();
+	C_BasePlayer *pPlayer = (C_BasePlayer*)EntityList()->GetLocalPlayer();
 	if ( !pPlayer )
 		return;
 
@@ -390,7 +390,7 @@ bool CBaseHudWeaponSelection::HandleHudMenuInput( int iSlot )
 bool CBaseHudWeaponSelection::IsHudMenuPreventingWeaponSelection()
 {
 	// Don't allow weapon selection if we're frozen in place
-	C_BasePlayer *pPlayer = (C_BasePlayer*)ClientEntityList().GetLocalPlayer();
+	C_BasePlayer *pPlayer = (C_BasePlayer*)EntityList()->GetLocalPlayer();
 	if ( pPlayer->GetEngineObject()->GetFlags() & FL_FROZEN || pPlayer->IsPlayerDead() )
 		return true;
 
@@ -487,7 +487,7 @@ void CBaseHudWeaponSelection::UserCmd_LastWeapon(void)
 void CBaseHudWeaponSelection::SwitchToLastWeapon( void )
 {
 	// Get the player's last weapon
-	C_BasePlayer *player = (C_BasePlayer*)ClientEntityList().GetLocalPlayer();
+	C_BasePlayer *player = (C_BasePlayer*)EntityList()->GetLocalPlayer();
 	if ( !player )
 		return;
 
@@ -516,7 +516,7 @@ void CBaseHudWeaponSelection::SelectWeapon( void )
 		return;
 	}
 
-	C_BasePlayer *player = (C_BasePlayer*)ClientEntityList().GetLocalPlayer();
+	C_BasePlayer *player = (C_BasePlayer*)EntityList()->GetLocalPlayer();
 	if ( !player )
 		return;
 
@@ -561,7 +561,7 @@ void CBaseHudWeaponSelection::SelectWeapon( void )
 //-----------------------------------------------------------------------------
 void CBaseHudWeaponSelection::CancelWeaponSelection( void )
 {
-	C_BasePlayer *player = (C_BasePlayer*)ClientEntityList().GetLocalPlayer();
+	C_BasePlayer *player = (C_BasePlayer*)EntityList()->GetLocalPlayer();
 	if ( !player )
 		return;
 
@@ -600,7 +600,7 @@ C_BaseCombatWeapon *CBaseHudWeaponSelection::GetFirstPos( int iSlot )
 	int iLowestPosition = MAX_WEAPON_POSITIONS;
 	C_BaseCombatWeapon *pFirstWeapon = NULL;
 
-	C_BasePlayer *player = (C_BasePlayer*)ClientEntityList().GetLocalPlayer();
+	C_BasePlayer *player = (C_BasePlayer*)EntityList()->GetLocalPlayer();
 	if ( !player )
 		return NULL;
 
@@ -635,7 +635,7 @@ C_BaseCombatWeapon *CBaseHudWeaponSelection::GetNextActivePos( int iSlot, int iS
 	int iLowestPosition = MAX_WEAPON_POSITIONS;
 	C_BaseCombatWeapon *pNextWeapon = NULL;
 
-	C_BasePlayer *player = (C_BasePlayer*)ClientEntityList().GetLocalPlayer();
+	C_BasePlayer *player = (C_BasePlayer*)EntityList()->GetLocalPlayer();
 	if ( !player )
 		return NULL;
 	for ( int i = 0; i < MAX_WEAPONS; i++ )

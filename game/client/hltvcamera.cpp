@@ -142,7 +142,7 @@ void C_HLTVCamera::CalcChaseCamView( Vector& eyeOrigin, QAngle& eyeAngles, float
 
 	if ( m_iTraget2 > 0 && (m_iTraget2 != m_iTraget1) && !bManual )
 	{
-		target2 = ClientEntityList().GetBaseEntity( m_iTraget2 );
+		target2 = EntityList()->GetBaseEntity( m_iTraget2 );
 
 		// if target is out PVS and not dead, it's not valid
 		if ( target2 && target2->IsDormant() && target2->IsAlive() )
@@ -217,9 +217,9 @@ void C_HLTVCamera::CalcChaseCamView( Vector& eyeOrigin, QAngle& eyeAngles, float
 
 	// clip against walls
   	trace_t trace;
-	ClientEntityList().PushEnableAbsRecomputations( false ); // HACK don't recompute positions while doing RayTrace
+	EntityList()->PushEnableAbsRecomputations( false ); // HACK don't recompute positions while doing RayTrace
 	UTIL_TraceHull( targetOrigin1, cameraOrigin, WALL_MIN, WALL_MAX, MASK_SOLID, target1, COLLISION_GROUP_NONE, &trace );
-	ClientEntityList().PopEnableAbsRecomputations();
+	EntityList()->PopEnableAbsRecomputations();
 
   	float dist = VectorLength( trace.endpos -  targetOrigin1 );
 
@@ -287,14 +287,14 @@ C_BaseEntity* C_HLTVCamera::GetPrimaryTarget()
 	if ( m_iTraget1 <= 0 )
 		return NULL;
 
-	C_BaseEntity* target = ClientEntityList().GetEnt( m_iTraget1 );
+	C_BaseEntity* target = EntityList()->GetEnt( m_iTraget1 );
 
 	return target;
 }
 
 C_BaseEntity *C_HLTVCamera::GetCameraMan()
 {
-	return ClientEntityList().GetEnt( m_iCameraMan );
+	return EntityList()->GetEnt( m_iCameraMan );
 }
 
 void C_HLTVCamera::CalcInEyeCamView( Vector& eyeOrigin, QAngle& eyeAngles, float& fov )
@@ -475,7 +475,7 @@ void C_HLTVCamera::CalcFixedView(Vector& eyeOrigin, QAngle& eyeAngles, float& fo
 	if ( m_iTraget1 == 0 )
 		return;
 
- 	C_BaseEntity * target = ClientEntityList().GetBaseEntity( m_iTraget1 );
+ 	C_BaseEntity * target = EntityList()->GetBaseEntity( m_iTraget1 );
 	
 	if ( target && target->IsAlive() )
 	{
@@ -495,8 +495,8 @@ void C_HLTVCamera::FixupMovmentParents()
 {
 	// Find resource zone
 	
-	for (	ClientEntityHandle_t e = ClientEntityList().FirstHandle();
-			e != ClientEntityList().InvalidHandle(); e = ClientEntityList().NextHandle( e ) )
+	for (	ClientEntityHandle_t e = EntityList()->FirstHandle();
+			e != EntityList()->InvalidHandle(); e = EntityList()->NextHandle( e ) )
 	{
 		C_BaseEntity *ent = C_BaseEntity::Instance( e );
 
@@ -582,7 +582,7 @@ void C_HLTVCamera::SetPrimaryTarget( int nEntity )
 	}
 	else if ( GetMode() == OBS_MODE_CHASE )
 	{
-		C_BaseEntity* target = ClientEntityList().GetEnt( m_iTraget1 );
+		C_BaseEntity* target = EntityList()->GetEnt( m_iTraget1 );
 		if ( target )
 		{
 			QAngle eyeAngle = target->EyeAngles();
