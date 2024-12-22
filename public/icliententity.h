@@ -36,7 +36,6 @@ struct PS_SD_Static_SurfaceProperties_t;
 class CIKContext;
 typedef unsigned int HTOOLHANDLE;
 class CUserCmd;
-class C_BasePlayer;
 
 class VarMapEntry_t
 {
@@ -97,7 +96,7 @@ class IClientEntity;
 
 class IGrabControllerClient {
 public:
-	virtual void AttachEntity(C_BasePlayer* pPlayer, C_BaseEntity* pEntity, IPhysicsObject* pPhys, bool bIsMegaPhysCannon, const Vector& vGrabPosition, bool bUseGrabPosition) = 0;
+	virtual void AttachEntity(C_BaseEntity* pPlayer, C_BaseEntity* pEntity, IPhysicsObject* pPhys, bool bIsMegaPhysCannon, const Vector& vGrabPosition, bool bUseGrabPosition) = 0;
 	virtual void DetachEntity(bool bClearVelocity) = 0;
 	virtual C_BaseEntity* GetAttached() = 0;
 	virtual const QAngle& GetAttachedAnglesPlayerSpace() = 0;
@@ -108,7 +107,7 @@ public:
 	virtual void SetAngleAlignment(float alignAngleCosine) = 0;
 	virtual float GetLoadWeight(void) const = 0;
 	virtual float ComputeError() = 0;
-	virtual bool UpdateObject(C_BasePlayer* pPlayer, float flError) = 0;
+	virtual bool UpdateObject(C_BaseEntity* pPlayer, float flError) = 0;
 	virtual float GetSavedMass(IPhysicsObject* pObject) = 0;
 	virtual void GetSavedParamsForCarriedPhysObject(IPhysicsObject* pObject, float* pSavedMassOut, float* pSavedRotationalDampingOut) = 0;
 	virtual void GetTargetPosition(Vector* target, QAngle* targetOrientation) = 0;

@@ -30,6 +30,7 @@ class CSteamAPIContext;
 class CSteamGameServerAPIContext;
 
 extern IVEngineServer			*engine;
+extern IServerEntityList*		serverEntitylist;
 extern IVoiceServer				*g_pVoiceServer;
 extern IFileSystem				*filesystem;
 extern IStaticPropMgrServer		*staticpropmgr;
@@ -45,6 +46,7 @@ extern IServerEngineTools		*serverenginetools;
 extern IXboxSystem				*xboxsystem; // 360 only
 extern CSteamAPIContext			*steamapicontext; // available on game clients
 extern CSteamGameServerAPIContext *steamgameserverapicontext; //available on game servers
+inline IServerEntityList* EntityList() { return serverEntitylist; }
 
 
 

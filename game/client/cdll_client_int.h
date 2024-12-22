@@ -11,7 +11,7 @@
 #pragma once
 #endif
 
-#include "iclientnetworkable.h"
+#include "icliententity.h"
 #include "utllinkedlist.h"
 #include "cdll_int.h"
 #include "eiface.h"
@@ -74,6 +74,7 @@ class AchievementsAndStatsInterface;
 
 extern IVModelRender *modelrender;
 extern IVEngineClient	*engine;
+extern IClientEntityList* entitylist;
 extern IVModelRender *modelrender;
 extern IVEfx *effects;
 extern IVRenderView *render;
@@ -111,6 +112,7 @@ extern IReplayManager *g_pReplayManager;
 extern IReplayScreenshotManager *g_pReplayScreenshotManager;
 extern IEngineReplay *g_pEngineReplay;
 extern IEngineClientReplay *g_pEngineClientReplay;
+inline IClientEntityList* EntityList() { return entitylist; }
 
 //=============================================================================
 // HPE_BEGIN

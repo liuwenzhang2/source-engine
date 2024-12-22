@@ -783,7 +783,10 @@ public:
 	virtual Vector			EyePosition(void);
 	virtual const QAngle& EyeAngles(void);		// Direction of eyes
 	virtual const QAngle& LocalEyeAngles(void);	// Direction of eyes in local space (pl.v_angle)
-
+	virtual Vector			Weapon_ShootPosition() { return EyePosition(); }
+	virtual void	EyeVectors(Vector* pForward, Vector* pRight = NULL, Vector* pUp = NULL) {
+		GetEngineObject()->GetVectors(pForward, pRight, pUp);
+	}
 	// position of ears
 	virtual Vector		EarPosition(void);
 

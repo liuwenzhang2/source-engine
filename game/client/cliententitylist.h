@@ -25,7 +25,7 @@
 #include "client_class.h"
 #include "collisionproperty.h"
 #include "c_baseentity.h"
-#include "c_baseanimating.h"
+//#include "c_baseanimating.h"
 #include "gamestringpool.h"
 #include "saverestoretypes.h"
 #include "physics_saverestore.h"
@@ -108,11 +108,11 @@ public:
 
 	C_GrabControllerInternal(void);
 	~C_GrabControllerInternal(void);
-	void AttachEntity(C_BasePlayer* pPlayer, C_BaseEntity* pEntity, IPhysicsObject* pPhys, bool bIsMegaPhysCannon, const Vector& vGrabPosition, bool bUseGrabPosition);
+	void AttachEntity(C_BaseEntity* pPlayer, C_BaseEntity* pEntity, IPhysicsObject* pPhys, bool bIsMegaPhysCannon, const Vector& vGrabPosition, bool bUseGrabPosition);
 	void DetachEntity(bool bClearVelocity);
 	void OnRestore();
 
-	bool UpdateObject(C_BasePlayer* pPlayer, float flError);
+	bool UpdateObject(C_BaseEntity* pPlayer, float flError);
 
 	void SetTargetPosition(const Vector& target, const QAngle& targetOrientation);
 	void GetTargetPosition(Vector* target, QAngle* targetOrientation);
@@ -120,8 +120,8 @@ public:
 	float GetLoadWeight(void) const { return m_flLoadWeight; }
 	void SetAngleAlignment(float alignAngleCosine) { m_angleAlignment = alignAngleCosine; }
 	void SetIgnorePitch(bool bIgnore) { m_bIgnoreRelativePitch = bIgnore; }
-	QAngle TransformAnglesToPlayerSpace(const QAngle& anglesIn, C_BasePlayer* pPlayer);
-	QAngle TransformAnglesFromPlayerSpace(const QAngle& anglesIn, C_BasePlayer* pPlayer);
+	QAngle TransformAnglesToPlayerSpace(const QAngle& anglesIn, C_BaseEntity* pPlayer);
+	QAngle TransformAnglesFromPlayerSpace(const QAngle& anglesIn, C_BaseEntity* pPlayer);
 
 	C_BaseEntity* GetAttached() { return (C_BaseEntity*)m_attachedEntity; }
 	const QAngle& GetAttachedAnglesPlayerSpace() { return m_attachedAnglesPlayerSpace; }
@@ -165,7 +165,7 @@ private:
 	IPhysicsMotionController* m_controller;
 
 	// NVNT player controlling this grab controller
-	C_BasePlayer*	m_pControllingPlayer;
+	C_BaseEntity*	m_pControllingPlayer;
 #ifndef CLIENT_DLL
 	bool			m_bAllowObjectOverhead; // Can the player hold this object directly overhead? (Default is NO)
 #endif // !CLIENT_DLL
@@ -2572,7 +2572,7 @@ public:
 
 	void SetGhostedSource(C_BaseEntity* pGhostedSource) {
 		m_pGhostedSource = pGhostedSource;
-		m_bSourceIsBaseAnimating = (dynamic_cast<C_BaseAnimating*>(m_pGhostedSource) != NULL);
+		m_bSourceIsBaseAnimating = m_pGhostedSource->GetEngineObject()->GetModelPtr() != NULL;
 	}
 
 	C_BaseEntity* GetGhostedSource() { return m_pGhostedSource; }
@@ -3290,7 +3290,7 @@ void CClientEntityList<T>::PreSave(CSaveRestoreData* pSaveData)
 	// Do this because it'll force entities to figure out their origins, and that requires
 	// SetupBones in the case of aiments.
 	{
-		C_BaseAnimating::AutoAllowBoneAccess boneaccess(true, true);
+		PushAllowBoneAccess(true, true, (char const*)1);
 
 		int last = GetHighestEntityIndex();
 		CBaseHandle iter = BaseClass::FirstHandle();
@@ -3316,6 +3316,8 @@ void CClientEntityList<T>::PreSave(CSaveRestoreData* pSaveData)
 
 			iter = BaseClass::NextHandle(iter);
 		}
+
+		PopBoneAccess((char const*)1);
 	}
 	SaveInitEntities(pSaveData);
 }
@@ -5138,8 +5140,6 @@ inline CClientEntityList<C_BaseEntity>& ClientEntityList()
 {
 	return *cl_entitylist;
 }
-
-inline IClientEntityList* EntityList() { return &ClientEntityList(); }
 
 template<class T>
 inline T* CHandle<T>::Get() const

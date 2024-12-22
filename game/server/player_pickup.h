@@ -16,7 +16,33 @@ extern ConVar physcannon_minforce;
 extern ConVar physcannon_maxforce;
 #endif
 
+class CBaseEntity;
+class CBasePlayer;
 
+// Reasons behind a pickup
+enum PhysGunPickup_t
+{
+	PICKED_UP_BY_CANNON,
+	PUNTED_BY_CANNON,
+	PICKED_UP_BY_PLAYER, // Picked up by +USE, not physgun.
+};
+
+// Reasons behind a drop
+enum PhysGunDrop_t
+{
+	DROPPED_BY_PLAYER,
+	THROWN_BY_PLAYER,
+	DROPPED_BY_CANNON,
+	LAUNCHED_BY_CANNON,
+};
+
+enum PhysGunForce_t
+{
+	PHYSGUN_FORCE_DROPPED,	// Dropped by +USE
+	PHYSGUN_FORCE_THROWN,	// Thrown from +USE
+	PHYSGUN_FORCE_PUNTED,	// Punted by cannon
+	PHYSGUN_FORCE_LAUNCHED,	// Launched by cannon
+};
 
 void PlayerPickupObject( CBasePlayer *pPlayer, CBaseEntity *pObject );
 void Pickup_ForcePlayerToDropThisObject( CBaseEntity *pTarget );

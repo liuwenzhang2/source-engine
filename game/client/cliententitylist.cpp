@@ -37,7 +37,7 @@
 #include "view.h"
 #include "ragdoll_shared.h"
 #include "physics_shared.h"
-#include "c_baseplayer.h"
+//#include "c_baseplayer.h"
 #include "basecombatweapon_shared.h"
 #include "vphysics/object_hash.h"
 #include "vphysics/collision_set.h"
@@ -75,6 +75,7 @@ extern ConVar think_limit;
 // Create interface
 static CClientEntityList<C_BaseEntity> s_EntityList;
 CBaseEntityList<C_BaseEntity> *g_pEntityList = &s_EntityList;
+IClientEntityList* entitylist = &s_EntityList;
 
 // Expose list to engine
 EXPOSE_SINGLE_INTERFACE_GLOBALVAR( CClientEntityList, IClientEntityList, VCLIENTENTITYLIST_INTERFACE_VERSION, s_EntityList );
@@ -1060,7 +1061,7 @@ static void ComputePlayerMatrix(C_BasePlayer* pPlayer, matrix3x4_t& out)
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-bool C_GrabControllerInternal::UpdateObject(C_BasePlayer* pPlayer, float flError)
+bool C_GrabControllerInternal::UpdateObject(C_BaseEntity* pPlayer, float flError)
 {
 	C_BaseEntity* pPenetratedEntity = m_PenetratedEntity.Get();
 	if (pPenetratedEntity)
@@ -1424,7 +1425,7 @@ float C_GrabControllerInternal::ComputeError()
 
 #ifndef CLIENT_DLL
 	// If held across a portal but not looking at the portal multiply error
-	CBasePlayer* pPortalPlayer = ClientEntityList().GetPlayerHoldingEntity(pAttached);
+	CBaseEntity* pPortalPlayer = ClientEntityList().GetPlayerHoldingEntity(pAttached);
 	Assert(pPortalPlayer);
 	if (pPortalPlayer->GetEnginePlayer()->IsHeldObjectOnOppositeSideOfPortal())
 	{
@@ -1495,7 +1496,7 @@ void C_GrabControllerInternal::ComputeMaxSpeed(C_BaseEntity* pEntity, IPhysicsOb
 }
 
 
-QAngle C_GrabControllerInternal::TransformAnglesToPlayerSpace(const QAngle& anglesIn, C_BasePlayer* pPlayer)
+QAngle C_GrabControllerInternal::TransformAnglesToPlayerSpace(const QAngle& anglesIn, C_BaseEntity* pPlayer)
 {
 	if (m_bIgnoreRelativePitch)
 	{
@@ -1508,7 +1509,7 @@ QAngle C_GrabControllerInternal::TransformAnglesToPlayerSpace(const QAngle& angl
 	return TransformAnglesToLocalSpace(anglesIn, pPlayer->GetEngineObject()->EntityToWorldTransform());
 }
 
-QAngle C_GrabControllerInternal::TransformAnglesFromPlayerSpace(const QAngle& anglesIn, C_BasePlayer* pPlayer)
+QAngle C_GrabControllerInternal::TransformAnglesFromPlayerSpace(const QAngle& anglesIn, C_BaseEntity* pPlayer)
 {
 	if (m_bIgnoreRelativePitch)
 	{
@@ -1617,7 +1618,7 @@ static QAngle AlignAngles(const QAngle& angles, float cosineAlignAngle)
 	return out;
 }
 
-void C_GrabControllerInternal::AttachEntity(C_BasePlayer* pPlayer, C_BaseEntity* pEntity, IPhysicsObject* pPhys, bool bIsMegaPhysCannon, const Vector& vGrabPosition, bool bUseGrabPosition)
+void C_GrabControllerInternal::AttachEntity(C_BaseEntity* pPlayer, C_BaseEntity* pEntity, IPhysicsObject* pPhys, bool bIsMegaPhysCannon, const Vector& vGrabPosition, bool bUseGrabPosition)
 {
 #ifndef CLIENT_DLL
 	// play the impact sound of the object hitting the player

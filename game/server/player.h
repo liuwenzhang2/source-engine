@@ -176,12 +176,7 @@ enum PlayerPhysFlag_e
 #define DOT_25DEGREE  0.9063077870367
 #define DOT_30DEGREE  0.866025403784
 #define DOT_45DEGREE  0.707106781187
-enum
-{
-	VPHYS_WALK = 0,
-	VPHYS_CROUCH,
-	VPHYS_NOCLIP,
-};
+
 
 
 enum PlayerConnectedState
@@ -1547,11 +1542,6 @@ int CollectHumanPlayers( CUtlVector< T * > *playerVector, int team = TEAM_ANY, b
 	return playerVector->Count();
 }
 
-enum
-{
-	VEHICLE_ANALOG_BIAS_NONE = 0,
-	VEHICLE_ANALOG_BIAS_FORWARD,
-	VEHICLE_ANALOG_BIAS_REVERSE,
-};
+
 
 #endif // PLAYER_H

@@ -46,12 +46,13 @@
 #include "bone_setup.h"
 #include "ragdoll_shared.h"
 #include "physics_shared.h"
-#include "player.h"
+//#include "player.h"
 #include "vphysics/collision_set.h"
 #include "env_debughistory.h"
 #include "physics_prop_ragdoll.h"
 #include "hl2_gamerules.h"
 #include "portal_util_shared.h"
+#include "sharedInterface.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
@@ -64,6 +65,7 @@ extern ConVar think_limit;
 
 CGlobalEntityList<CBaseEntity> gEntList;
 CBaseEntityList<CBaseEntity>* g_pEntityList = &gEntList;
+IServerEntityList* serverEntitylist = &gEntList;
 
 // Expose list to engine
 EXPOSE_SINGLE_INTERFACE_GLOBALVAR(CGlobalEntityList, IServerEntityList, VSERVERENTITYLIST_INTERFACE_VERSION, gEntList);
@@ -1864,10 +1866,10 @@ int CPortal_CollisionEvent::ShouldCollide(IPhysicsObject* pObj0, IPhysicsObject*
 				//at least one is held
 
 				//don't let players collide with objects they're holding, they get kinda messed up sometimes
-				if (pGameData0 && ((CBaseEntity*)pGameData0)->IsPlayer() && (((CBasePlayer*)pGameData0)->GetPlayerHeldEntity() == (CBaseEntity*)pGameData1))
+				if (pGameData0 && ((CBaseEntity*)pGameData0)->IsPlayer() && (((CBaseEntity*)pGameData0)->GetPlayerHeldEntity() == (CBaseEntity*)pGameData1))
 					return 0;
 
-				if (pGameData1 && ((CBaseEntity*)pGameData1)->IsPlayer() && (((CBasePlayer*)pGameData1)->GetPlayerHeldEntity() == (CBaseEntity*)pGameData0))
+				if (pGameData1 && ((CBaseEntity*)pGameData1)->IsPlayer() && (((CBaseEntity*)pGameData1)->GetPlayerHeldEntity() == (CBaseEntity*)pGameData0))
 					return 0;
 			}
 		}
@@ -2029,13 +2031,13 @@ int CPortal_CollisionEvent::ShouldSolvePenetration(IPhysicsObject* pObj0, IPhysi
 			}
 
 			//don't let players collide with objects they're holding, they get kinda messed up sometimes
-			if (pOther->IsPlayer() && (((CBasePlayer*)pOther)->GetPlayerHeldEntity() == pHeld))
+			if (pOther->IsPlayer() && pOther->GetPlayerHeldEntity() == pHeld)
 				return 0;
 
 			//held objects are clipping into other objects when travelling across a portal. We're close to ship, so this seems to be the
 			//most localized way to make a fix.
 			//Note that we're not actually going to change whether it should solve, we're just going to tack on some hacks
-			CBasePlayer* pHoldingPlayer = gEntList.GetPlayerHoldingEntity(pHeld);
+			CBaseEntity* pHoldingPlayer = gEntList.GetPlayerHoldingEntity(pHeld);
 			if (!pHoldingPlayer && pHeld->GetEngineObject()->IsShadowClone())
 				pHoldingPlayer = gEntList.GetPlayerHoldingEntity(pHeld->GetEngineShadowClone()->GetClonedEntity());
 
@@ -2203,7 +2205,7 @@ static void ModifyWeight_PreCollision(vcollisionevent_t* pEvent)
 
 				IGrabControllerServer* pGrabController = NULL;
 				CBaseEntity* pLookingForEntity = (CBaseEntity*)pEvent->pObjects[i]->GetGameData();
-				CBasePlayer* pHoldingPlayer = gEntList.GetPlayerHoldingEntity(pLookingForEntity);
+				CBaseEntity* pHoldingPlayer = gEntList.GetPlayerHoldingEntity(pLookingForEntity);
 				if (pHoldingPlayer)
 					pGrabController = pHoldingPlayer->GetGrabController();
 
@@ -2509,7 +2511,7 @@ void CGrabControllerInternal::OnRestore()
 // player can reach down 2ft below his feet (otherwise he'll hold the object above the bottom)
 #define PLAYER_REACH_DOWN_DISTANCE	24
 
-static void ComputePlayerMatrix(CBasePlayer* pPlayer, matrix3x4_t& out)
+static void ComputePlayerMatrix(CBaseEntity* pPlayer, matrix3x4_t& out)
 {
 	if (!pPlayer)
 		return;
@@ -2541,7 +2543,7 @@ static void ComputePlayerMatrix(CBasePlayer* pPlayer, matrix3x4_t& out)
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-bool CGrabControllerInternal::UpdateObject(CBasePlayer* pPlayer, float flError)
+bool CGrabControllerInternal::UpdateObject(CBaseEntity* pPlayer, float flError)
 {
 	CBaseEntity* pPenetratedEntity = m_PenetratedEntity.Get();
 	if (pPenetratedEntity)
@@ -2734,7 +2736,7 @@ bool CGrabControllerInternal::UpdateObject(CBasePlayer* pPlayer, float flError)
 	QAngle angles = TransformAnglesFromPlayerSpace(m_attachedAnglesPlayerSpace, pPlayer);
 
 	// If it has a preferred orientation, update to ensure we're still oriented correctly.
-	Pickup_GetPreferredCarryAngles(pEntity, pPlayer, pPlayer->GetEngineObject()->EntityToWorldTransform(), angles);
+	pEntity->Pickup_GetPreferredCarryAngles(pPlayer, pPlayer->GetEngineObject()->EntityToWorldTransform(), angles);
 
 	// We may be holding a prop that has preferred carry angles
 	if (m_bHasPreferredCarryAngles)
@@ -2870,7 +2872,7 @@ float CGrabControllerInternal::ComputeError()
 	}
 
 	// If held across a portal but not looking at the portal multiply error
-	CBasePlayer* pPortalPlayer = gEntList.GetPlayerHoldingEntity(pAttached);
+	CBaseEntity* pPortalPlayer = gEntList.GetPlayerHoldingEntity(pAttached);
 	Assert(pPortalPlayer);
 	if (pPortalPlayer->GetEnginePlayer()->IsHeldObjectOnOppositeSideOfPortal())
 	{
@@ -2938,7 +2940,7 @@ void CGrabControllerInternal::ComputeMaxSpeed(CBaseEntity* pEntity, IPhysicsObje
 }
 
 
-QAngle CGrabControllerInternal::TransformAnglesToPlayerSpace(const QAngle& anglesIn, CBasePlayer* pPlayer)
+QAngle CGrabControllerInternal::TransformAnglesToPlayerSpace(const QAngle& anglesIn, CBaseEntity* pPlayer)
 {
 	if (m_bIgnoreRelativePitch)
 	{
@@ -2951,7 +2953,7 @@ QAngle CGrabControllerInternal::TransformAnglesToPlayerSpace(const QAngle& angle
 	return TransformAnglesToLocalSpace(anglesIn, pPlayer->GetEngineObject()->EntityToWorldTransform());
 }
 
-QAngle CGrabControllerInternal::TransformAnglesFromPlayerSpace(const QAngle& anglesIn, CBasePlayer* pPlayer)
+QAngle CGrabControllerInternal::TransformAnglesFromPlayerSpace(const QAngle& anglesIn, CBaseEntity* pPlayer)
 {
 	if (m_bIgnoreRelativePitch)
 	{
@@ -3058,7 +3060,7 @@ static QAngle AlignAngles(const QAngle& angles, float cosineAlignAngle)
 	return out;
 }
 
-void CGrabControllerInternal::AttachEntity(CBasePlayer* pPlayer, CBaseEntity* pEntity, IPhysicsObject* pPhys, bool bIsMegaPhysCannon, const Vector& vGrabPosition, bool bUseGrabPosition)
+void CGrabControllerInternal::AttachEntity(CBaseEntity* pPlayer, CBaseEntity* pEntity, IPhysicsObject* pPhys, bool bIsMegaPhysCannon, const Vector& vGrabPosition, bool bUseGrabPosition)
 {
 	// play the impact sound of the object hitting the player
 	// used as feedback to let the player know he picked up the object
@@ -3072,7 +3074,7 @@ void CGrabControllerInternal::AttachEntity(CBasePlayer* pPlayer, CBaseEntity* pE
 	QAngle angles;
 	pPhys->GetPosition(&position, &angles);
 	// If it has a preferred orientation, use that instead.
-	Pickup_GetPreferredCarryAngles(pEntity, pPlayer, pPlayer->GetEngineObject()->EntityToWorldTransform(), angles);
+	pEntity->Pickup_GetPreferredCarryAngles(pPlayer, pPlayer->GetEngineObject()->EntityToWorldTransform(), angles);
 
 	//Fix attachment orientation weirdness
 	if (pPlayer->GetEnginePlayer()->IsHeldObjectOnOppositeSideOfPortal())
@@ -6113,7 +6115,7 @@ void CEngineObjectInternal::SetGroundEntity(IEngineObjectServer* ground)
 	// so trap it here and release held objects when they become player ground
 	if (ground && m_pOuter->IsPlayer() && ground->GetMoveType() == MOVETYPE_VPHYSICS)
 	{
-		CBasePlayer* pPlayer = static_cast<CBasePlayer*>(this->m_pOuter);
+		CBaseEntity* pPlayer = static_cast<CBaseEntity*>(this->m_pOuter);
 		IPhysicsObject* pPhysGround = ground->VPhysicsGetObject();
 		if (pPhysGround && pPlayer)
 		{
@@ -12244,11 +12246,11 @@ void CEnginePortalInternal::TakePhysicsOwnership(CBaseEntity* pEntity)
 			{
 				//bool bHeldByPhyscannon = false;
 				CBaseEntity* pHeldEntity = NULL;
-				CBasePlayer* pPlayer = gEntList.GetPlayerHoldingEntity(pEntity);
+				CBaseEntity* pPlayer = gEntList.GetPlayerHoldingEntity(pEntity);
 
 				if (!pPlayer && pEntity->IsPlayer())
 				{
-					pPlayer = (CBasePlayer*)pEntity;
+					pPlayer = pEntity;
 				}
 
 				if (pPlayer)
@@ -12353,11 +12355,11 @@ void CEnginePortalInternal::ReleasePhysicsOwnership(CBaseEntity* pEntity, bool b
 
 						//bool bHeldByPhyscannon = false;
 						CBaseEntity* pHeldEntity = NULL;
-						CBasePlayer* pPlayer = gEntList.GetPlayerHoldingEntity(pEntity);
+						CBaseEntity* pPlayer = gEntList.GetPlayerHoldingEntity(pEntity);
 
 						if (!pPlayer && pEntity->IsPlayer())
 						{
-							pPlayer = (CBasePlayer*)pEntity;
+							pPlayer = pEntity;
 						}
 
 						if (pPlayer)
@@ -13043,7 +13045,7 @@ static void FullSyncPhysicsObject(IPhysicsObject* pSource, IPhysicsObject* pDest
 
 			CBaseEntity* pLookingForEntity = (CBaseEntity*)pSource->GetGameData();
 
-			CBasePlayer* pHoldingPlayer = gEntList.GetPlayerHoldingEntity(pLookingForEntity);
+			CBaseEntity* pHoldingPlayer = gEntList.GetPlayerHoldingEntity(pLookingForEntity);
 			if (pHoldingPlayer)
 			{
 				pGrabController = pHoldingPlayer->GetGrabController();
@@ -14456,12 +14458,12 @@ void CEngineVehicleInternal::UpdateDriverControls(CUserCmd* cmd, float flFrameTi
 	//-------------------------------------------------------------------------
 	IDrivableVehicle* pDrivableVehicle = dynamic_cast<IDrivableVehicle*>(GetOuterServerVehicle());
 	CBaseEntity* pDriver = pDrivableVehicle ? pDrivableVehicle->GetDriver() : NULL;
-	CBasePlayer* pPlayerDriver;
+	CBaseEntity* pPlayerDriver;
 	float flBiasThreshold = xbox_throttlebias.GetFloat();
 
 	if (pDriver && pDriver->IsPlayer())
 	{
-		pPlayerDriver = dynamic_cast<CBasePlayer*>(pDriver);
+		pPlayerDriver = dynamic_cast<CBaseEntity*>(pDriver);
 
 		if (cmd->forwardmove == 0.0f && (fabs(cmd->sidemove) < 200.0f))
 		{
@@ -15241,23 +15243,24 @@ bool ShouldRemoveThisRagdoll(CBaseEntity* pRagdoll)
 	}
 
 #else
-	CBasePlayer* pPlayer = UTIL_GetLocalPlayer();
+	for (int i = 1; i <= gpGlobals->maxClients; i++) {
+		CBaseEntity* pPlayer = gEntList.GetBaseEntity(i);
 
-	if (!UTIL_FindClientInPVS(pRagdoll))
-	{
-		if (g_debug_ragdoll_removal.GetBool())
-			NDebugOverlay::Line(pRagdoll->GetEngineObject()->GetAbsOrigin(), pRagdoll->GetEngineObject()->GetAbsOrigin() + Vector(0, 0, 64), 0, 255, 0, true, 5);
+		if (!UTIL_FindClientInPVS(pRagdoll))
+		{
+			if (g_debug_ragdoll_removal.GetBool())
+				NDebugOverlay::Line(pRagdoll->GetEngineObject()->GetAbsOrigin(), pRagdoll->GetEngineObject()->GetAbsOrigin() + Vector(0, 0, 64), 0, 255, 0, true, 5);
 
-		return true;
+			return true;
+		}
+		else if (pPlayer && !pPlayer->FInViewCone(pRagdoll))
+		{
+			if (g_debug_ragdoll_removal.GetBool())
+				NDebugOverlay::Line(pRagdoll->GetEngineObject()->GetAbsOrigin(), pRagdoll->GetEngineObject()->GetAbsOrigin() + Vector(0, 0, 64), 0, 0, 255, true, 5);
+
+			return true;
+		}
 	}
-	else if (pPlayer && !pPlayer->FInViewCone(pRagdoll))
-	{
-		if (g_debug_ragdoll_removal.GetBool())
-			NDebugOverlay::Line(pRagdoll->GetEngineObject()->GetAbsOrigin(), pRagdoll->GetEngineObject()->GetAbsOrigin() + Vector(0, 0, 64), 0, 0, 255, true, 5);
-
-		return true;
-	}
-
 #endif
 
 	return false;

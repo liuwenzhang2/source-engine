@@ -140,11 +140,11 @@ public:
 
 	CGrabControllerInternal(void);
 	~CGrabControllerInternal(void);
-	void AttachEntity(CBasePlayer* pPlayer, CBaseEntity* pEntity, IPhysicsObject* pPhys, bool bIsMegaPhysCannon, const Vector& vGrabPosition, bool bUseGrabPosition);
+	void AttachEntity(CBaseEntity* pPlayer, CBaseEntity* pEntity, IPhysicsObject* pPhys, bool bIsMegaPhysCannon, const Vector& vGrabPosition, bool bUseGrabPosition);
 	void DetachEntity(bool bClearVelocity);
 	void OnRestore();
 
-	bool UpdateObject(CBasePlayer* pPlayer, float flError);
+	bool UpdateObject(CBaseEntity* pPlayer, float flError);
 
 	void SetTargetPosition(const Vector& target, const QAngle& targetOrientation);
 	void GetTargetPosition(Vector* target, QAngle* targetOrientation);
@@ -152,8 +152,8 @@ public:
 	float GetLoadWeight(void) const { return m_flLoadWeight; }
 	void SetAngleAlignment(float alignAngleCosine) { m_angleAlignment = alignAngleCosine; }
 	void SetIgnorePitch(bool bIgnore) { m_bIgnoreRelativePitch = bIgnore; }
-	QAngle TransformAnglesToPlayerSpace(const QAngle& anglesIn, CBasePlayer* pPlayer);
-	QAngle TransformAnglesFromPlayerSpace(const QAngle& anglesIn, CBasePlayer* pPlayer);
+	QAngle TransformAnglesToPlayerSpace(const QAngle& anglesIn, CBaseEntity* pPlayer);
+	QAngle TransformAnglesFromPlayerSpace(const QAngle& anglesIn, CBaseEntity* pPlayer);
 
 	CBaseEntity* GetAttached() { return (CBaseEntity*)m_attachedEntity; }
 	const QAngle& GetAttachedAnglesPlayerSpace() { return m_attachedAnglesPlayerSpace; }
@@ -197,7 +197,7 @@ private:
 	IPhysicsMotionController* m_controller;
 
 	// NVNT player controlling this grab controller
-	CBasePlayer*	m_pControllingPlayer;
+	CBaseEntity*	m_pControllingPlayer;
 
 	bool			m_bAllowObjectOverhead; // Can the player hold this object directly overhead? (Default is NO)
 
@@ -3428,7 +3428,7 @@ public:
 
 	CEnginePortalInternal* GetSimulatorThatCreatedPhysicsObject(const IPhysicsObject* pObject, PS_PhysicsObjectSourceType_t* pOut_SourceType = NULL);
 
-	CBasePlayer* GetPlayerHoldingEntity(CBaseEntity* pEntity);
+	CBaseEntity* GetPlayerHoldingEntity(CBaseEntity* pEntity);
 
 	int GetPortalCount() { return m_ActivePortals.Count(); }
 	CEnginePortalInternal* GetPortal(int index) { return m_ActivePortals[index]; }
@@ -6622,7 +6622,7 @@ CEnginePortalInternal* CGlobalEntityList<T>::GetSimulatorThatCreatedPhysicsObjec
 }
 
 template<class T>
-CBasePlayer* CGlobalEntityList<T>::GetPlayerHoldingEntity(CBaseEntity* pEntity)
+CBaseEntity* CGlobalEntityList<T>::GetPlayerHoldingEntity(CBaseEntity* pEntity)
 {
 	for (int i = 1; i <= gpGlobals->maxClients; ++i)
 	{
@@ -6630,7 +6630,7 @@ CBasePlayer* CGlobalEntityList<T>::GetPlayerHoldingEntity(CBaseEntity* pEntity)
 		if (pPlayer)
 		{
 			if (pPlayer->GetPlayerHeldEntity() == pEntity || (pPlayer->GetActiveWeapon() && pPlayer->GetActiveWeapon()->PhysCannonGetHeldEntity() == pEntity))
-				return (CBasePlayer*)pPlayer;
+				return pPlayer;
 		}
 	}
 	return NULL;
@@ -6643,13 +6643,6 @@ CCallQueue* CGlobalEntityList<T>::GetPostTouchQueue()
 }
 
 extern CGlobalEntityList<CBaseEntity> gEntList;
-
-inline CGlobalEntityList<CBaseEntity>& ServerEntityList()
-{
-	return gEntList;
-}
-
-inline IServerEntityList* EntityList() { return &ServerEntityList(); }
 
 template<class T>
 inline T* CHandle<T>::Get() const

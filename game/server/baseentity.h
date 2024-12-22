@@ -21,6 +21,7 @@
 #include "engine/ivmodelinfo.h"
 #include "SoundEmitterSystem/isoundemittersystembase.h"
 #include "takedamageinfo.h"
+#include "player_pickup.h"
 
 class CDamageModifier;
 class CDmgAccumulator;
@@ -300,31 +301,6 @@ enum DebugOverlayBits_t
 	OVERLAY_NPC_RELATION_BIT	=	0x20000000,		// show relationships between target and all children
 
 	OVERLAY_VIEWOFFSET			=	0x40000000,		// show view offset
-};
-
-// Reasons behind a pickup
-enum PhysGunPickup_t
-{
-	PICKED_UP_BY_CANNON,
-	PUNTED_BY_CANNON,
-	PICKED_UP_BY_PLAYER, // Picked up by +USE, not physgun.
-};
-
-// Reasons behind a drop
-enum PhysGunDrop_t
-{
-	DROPPED_BY_PLAYER,
-	THROWN_BY_PLAYER,
-	DROPPED_BY_CANNON,
-	LAUNCHED_BY_CANNON,
-};
-
-enum PhysGunForce_t
-{
-	PHYSGUN_FORCE_DROPPED,	// Dropped by +USE
-	PHYSGUN_FORCE_THROWN,	// Thrown from +USE
-	PHYSGUN_FORCE_PUNTED,	// Punted by cannon
-	PHYSGUN_FORCE_LAUNCHED,	// Launched by cannon
 };
 
 extern Vector Pickup_DefaultPhysGunLaunchVelocity(const Vector& vecForward, float flMass);
@@ -968,6 +944,8 @@ public:
 
 	// If this is a vehicle, returns the vehicle interface
 	virtual IServerVehicle*			GetServerVehicle() { return NULL; }
+	virtual int						GetVehicleAnalogControlBias() { return 0; }
+	virtual void					SetVehicleAnalogControlBias(int bias) {}
 
 	// UNDONE: Make this data instead of procedural?
 	virtual bool	IsViewable( void );					// is this something that would be looked at (model, sprite, etc.)?
@@ -1000,7 +978,8 @@ public:
 	//virtual bool	CanStandOn( edict_t	*ent ) const { return CanStandOn( GetContainingEntity( ent ) ); }
 	virtual CBaseEntity		*GetEnemy( void ) { return NULL; }
 	virtual CBaseEntity		*GetEnemy( void ) const { return NULL; }
-
+	virtual bool		FInViewCone(CBaseEntity* pEntity) { return false; }
+	virtual bool		FInViewCone(const Vector& vecSpot) { return false; }
 
 	void	ViewPunch( const QAngle &angleOffset );
 	void	VelocityPunch( const Vector &vecForce );
@@ -1216,6 +1195,9 @@ public:
 	virtual Vector	BodyTarget( const Vector &posSrc, bool bNoisy = true);		// position to shoot at
 	virtual Vector	HeadTarget( const Vector &posSrc );
 	virtual void	GetVectors(Vector* forward, Vector* right, Vector* up) const;
+	virtual void	EyeVectors(Vector* pForward, Vector* pRight = NULL, Vector* pUp = NULL) {
+		GetVectors(pForward, pRight, pUp);
+	}
 
 	virtual const Vector &GetViewOffset() const;
 	virtual void SetViewOffset( const Vector &v );
@@ -1418,6 +1400,7 @@ public:
 	void SetScaledPhysics(IPhysicsObject* pNewObject);
 
 	virtual CBaseEntity*	GetActiveWeapon() const { return NULL; }
+	virtual Vector			Weapon_ShootPosition() { return EyePosition(); }
 	virtual CBaseEntity*	GetPlayerHeldEntity() { return NULL; }
 	virtual CBaseEntity*	PhysCannonGetHeldEntity() { return NULL; }
 	virtual float			GetHeldObjectMass(IPhysicsObject* pHeldObject) { return 0; }
@@ -1429,6 +1412,9 @@ public:
 	virtual void			OnPhysGunPickup(CBasePlayer* pPhysGunUser, PhysGunPickup_t reason = PICKED_UP_BY_CANNON) {}
 	virtual void			OnPhysGunDrop(CBasePlayer* pPhysGunUser, PhysGunDrop_t reason) {}
 	virtual bool			HasPreferredCarryAnglesForPlayer(CBasePlayer* pPlayer) { return false; }
+	virtual bool			Pickup_GetPreferredCarryAngles(CBaseEntity* pPlayer, const matrix3x4_t& localToWorld, QAngle& outputAnglesWorldSpace) {
+		return ::Pickup_GetPreferredCarryAngles(this, (CBasePlayer*)pPlayer, localToWorld, outputAnglesWorldSpace);
+	}
 	virtual QAngle			PreferredCarryAngles(void) { return vec3_angle; }
 	virtual bool			ForcePhysgunOpen(CBasePlayer* pPlayer) { return false; }
 	virtual AngularImpulse	PhysGunLaunchAngularImpulse() { return RandomAngularImpulse(-600, 600); }

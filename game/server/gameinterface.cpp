@@ -162,6 +162,7 @@ CUtlLinkedList<CMapEntityRef, unsigned short> g_MapEntityRefs;
 
 // Engine interfaces.
 IVEngineServer	*engine = NULL;
+//IServerEntityList* serverEntitylist = NULL;
 IVoiceServer	*g_pVoiceServer = NULL;
 #if !defined(_STATIC_LINKED)
 IFileSystem		*filesystem = NULL;
@@ -697,6 +698,8 @@ bool CServerGameDLL::DLLInit( CreateInterfaceFn appSystemFactory,
 	// init each (seperated for ease of debugging)
 	if ( (engine = (IVEngineServer*)appSystemFactory(INTERFACEVERSION_VENGINESERVER, NULL)) == NULL )
 		return false;
+	//if ((serverEntitylist = (IServerEntityList*)appSystemFactory(VSERVERENTITYLIST_INTERFACE_VERSION, NULL)) == NULL)
+	//	return false;
 	if ( (g_pVoiceServer = (IVoiceServer*)appSystemFactory(INTERFACEVERSION_VOICESERVER, NULL)) == NULL )
 		return false;
 	if ( (networkstringtable = (INetworkStringTableContainer *)appSystemFactory(INTERFACENAME_NETWORKSTRINGTABLESERVER,NULL)) == NULL )

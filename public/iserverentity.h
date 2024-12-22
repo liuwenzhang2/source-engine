@@ -84,11 +84,10 @@ class IServerEntity;
 class IEngineShadowCloneServer;
 class IEnginePortalServer;
 class IEnginePlayerServer;
-class CBasePlayer;
 
 class IGrabControllerServer {
 public:
-	virtual void AttachEntity(CBasePlayer* pPlayer, CBaseEntity* pEntity, IPhysicsObject* pPhys, bool bIsMegaPhysCannon, const Vector& vGrabPosition, bool bUseGrabPosition) = 0;
+	virtual void AttachEntity(CBaseEntity* pPlayer, CBaseEntity* pEntity, IPhysicsObject* pPhys, bool bIsMegaPhysCannon, const Vector& vGrabPosition, bool bUseGrabPosition) = 0;
 	virtual void DetachEntity(bool bClearVelocity) = 0;
 	virtual CBaseEntity* GetAttached() = 0;
 	virtual const QAngle& GetAttachedAnglesPlayerSpace() = 0;
@@ -99,7 +98,7 @@ public:
 	virtual void SetAngleAlignment(float alignAngleCosine) = 0;
 	virtual float GetLoadWeight(void) const = 0;
 	virtual float ComputeError() = 0;
-	virtual bool UpdateObject(CBasePlayer* pPlayer, float flError) = 0;
+	virtual bool UpdateObject(CBaseEntity* pPlayer, float flError) = 0;
 	virtual float GetSavedMass(IPhysicsObject* pObject) = 0;
 	virtual void GetSavedParamsForCarriedPhysObject(IPhysicsObject* pObject, float* pSavedMassOut, float* pSavedRotationalDampingOut) = 0;
 	virtual void GetTargetPosition(Vector* target, QAngle* targetOrientation) = 0;
@@ -542,6 +541,13 @@ public:
 
 };
 
+enum
+{
+	VPHYS_WALK = 0,
+	VPHYS_CROUCH,
+	VPHYS_NOCLIP,
+};
+
 class IEnginePortalServer;
 
 class IEnginePlayerServer{
@@ -679,6 +685,13 @@ public:
 	virtual IEngineShadowCloneServer* GetNext() = 0;
 	virtual IEngineObjectServer* AsEngineObject() = 0;
 	virtual const IEngineObjectServer* AsEngineObject() const = 0;
+};
+
+enum
+{
+	VEHICLE_ANALOG_BIAS_NONE = 0,
+	VEHICLE_ANALOG_BIAS_FORWARD,
+	VEHICLE_ANALOG_BIAS_REVERSE,
 };
 
 class IEngineVehicleServer {
@@ -888,7 +901,7 @@ public:
 	virtual IEngineObject* GetPredictionPlayer(void) = 0;
 	virtual void SetPredictionPlayer(IEngineObject* player) = 0;
 	virtual bool IsSimulatingOnAlternateTicks() = 0;
-	virtual CBasePlayer* GetPlayerHoldingEntity(CBaseEntity* pEntity) = 0;
+	virtual CBaseEntity* GetPlayerHoldingEntity(CBaseEntity* pEntity) = 0;
 	virtual int GetPortalCount() = 0;
 	virtual IEnginePortalServer* GetPortal(int index) = 0;
 	virtual CCallQueue* GetPostTouchQueue() = 0;
