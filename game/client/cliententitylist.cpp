@@ -825,12 +825,12 @@ void CCollisionEvent::FluidEndTouch(IPhysicsObject* pObject, IPhysicsFluidContro
 class CPortalTouchScope
 {
 public:
-	CPortalTouchScope::CPortalTouchScope()
+	CPortalTouchScope()
 	{
 		++ClientEntityList().m_nTouchDepth;
 	}
 
-	CPortalTouchScope::~CPortalTouchScope()
+	~CPortalTouchScope()
 	{
 		Assert(ClientEntityList().m_nTouchDepth >= 1);
 		if (--ClientEntityList().m_nTouchDepth == 0)

@@ -2311,12 +2311,12 @@ void CPortal_CollisionEvent::AddDamageEvent(CBaseEntity* pEntity, const CTakeDam
 class CPortalTouchScope
 {
 public:
-	CPortalTouchScope::CPortalTouchScope()
+	CPortalTouchScope()
 	{
 		++gEntList.m_nTouchDepth;
 	}
 
-	CPortalTouchScope::~CPortalTouchScope()
+	~CPortalTouchScope()
 	{
 		Assert(gEntList.m_nTouchDepth >= 1);
 		if (--gEntList.m_nTouchDepth == 0)
