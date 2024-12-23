@@ -121,6 +121,7 @@ class CSound;
 // But on balance, the compile time is much lower (even incrementally) once the precompiled
 // headers contain these headers.
 #include "precache_register.h"
+#include "enginecallback.h"
 //#include "baseanimating.h"
 //#include "basecombatweapon.h"
 //#include "basecombatcharacter.h"
