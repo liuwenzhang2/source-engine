@@ -77,21 +77,13 @@
 #include "base_transmit_proxy.h"
 #include "soundflags.h"
 #include "networkvar.h"
-#include "basetoggle.h"
 #include "igameevents.h"
-
-// saverestore.h declarations
-class ISave;
-class IRestore;
 
 // maximum number of targets a single multi_manager entity may be assigned.
 #define MAX_MULTI_TARGETS	16 
 
 // NPCEvent.h declarations
 struct animevent_t;
-
-//struct IStudioHdr;
-class IStudioHdr;
 
 extern void FireTargets( const char *targetName, CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value );
 
