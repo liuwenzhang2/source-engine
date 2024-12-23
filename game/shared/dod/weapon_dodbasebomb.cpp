@@ -158,7 +158,7 @@ void CDODBaseBombWeapon::PrimaryAttack()
 	if ( !pPlayer )
 		return;
 	
-	while( ( pEnt = gEntList.FindEntityByClassname( pEnt, "dod_bomb_target" ) ) != NULL )
+	while( ( pEnt = EntityList()->FindEntityByClassname( pEnt, "dod_bomb_target" ) ) != NULL )
 	{
 		CDODBombTarget *pTarget = static_cast<CDODBombTarget *>( pEnt );
 
@@ -274,7 +274,7 @@ void CDODBaseBombWeapon::CompletePlant( void )
 
 		// destroy the bomb weapon
 		pPlayer->Weapon_Drop( this, NULL, NULL );
-		gEntList.DestroyEntity(this);
+		EntityList()->DestroyEntity(this);
 
 		pPlayer->ResetProgressBar();
 

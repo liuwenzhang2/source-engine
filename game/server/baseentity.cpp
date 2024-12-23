@@ -306,7 +306,7 @@ void CBaseEntity::SetScaledPhysics( IPhysicsObject *pNewObject )
 // Purpose: Called just prior to object destruction
 //  Entities that need to unlink themselves from other entities should do the unlinking
 //  here rather than in their destructor.  The reason why is that when the global entity list
-//  is told to Clear(), it first takes a pass through all active entities and calls gEntList.DestroyEntity
+//  is told to Clear(), it first takes a pass through all active entities and calls EntityList()->DestroyEntity
 //  on each such entity.  Then it calls the delete function on each deleted entity in the list.
 // In the old code, the objects were simply destroyed in order and there was no guarantee that the
 //  destructor of one object would not try to access another object that might already have been
@@ -386,7 +386,7 @@ void CBaseEntity::UpdateOnRemove(void)
 		DevMsg(2, "Warning: Deleting orphaned children of %s\n", GetClassname());
 		for (int i = childrenList.Count() - 1; i >= 0; --i)
 		{
-			gEntList.DestroyEntity(childrenList[i]->GetOuter());
+			EntityList()->DestroyEntity(childrenList[i]->GetOuter());
 		}
 	}
 
@@ -410,7 +410,7 @@ void CBaseEntity::UpdateOnRemove(void)
 		gEntList.SetDisableEhandleAccess(true);
 
 		// Remove this entity from the ent list (NOTE:  This Makes EHANDLES go NULL)
-		//gEntList.DestroyEntity( this );
+		//EntityList()->DestroyEntity( this );
 	}
 }
 
@@ -431,7 +431,7 @@ CBaseEntity::~CBaseEntity( )
 	// EHANDLE accessors will check, in debug, for access to entities during destruction of
 	//  another entity.
 	// That kind of operation should only occur in UpdateOnRemove calls
-	// Deletion should only occur via gEntList.DestroyEntity(Immediate) calls, not via naked delete calls
+	// Deletion should only occur via EntityList()->DestroyEntity(Immediate) calls, not via naked delete calls
 	Assert( gEntList.IsDisableEhandleAccess() );
 
 	//GetEngineObject()->VPhysicsDestroyObject();
@@ -518,7 +518,7 @@ const IEngineRopeServer* CBaseEntity::GetEngineRope() const
 void CBaseEntity::Release() {
 	//GetEngineObject()->PhysicsRemoveTouchedList();
 	//CBaseEntity::PhysicsRemoveGroundList(this);
-	gEntList.DestroyEntity(this);
+	EntityList()->DestroyEntity(this);
 }
 
 void CBaseEntity::ClearModelIndexOverrides( void )
@@ -922,7 +922,7 @@ int CBaseEntity::DrawDebugTextOverlays(void)
 void CBaseEntity::SetParent( string_t newParent, CBaseEntity *pActivator, int iAttachment )
 {
 	// find and notify the new parent
-	CBaseEntity *pParent = gEntList.FindEntityByName( NULL, newParent, NULL, pActivator );
+	CBaseEntity *pParent = EntityList()->FindEntityByName( NULL, newParent, NULL, pActivator );
 
 	// debug check
 	if ( newParent != NULL_STRING && pParent == NULL )
@@ -932,7 +932,7 @@ void CBaseEntity::SetParent( string_t newParent, CBaseEntity *pActivator, int iA
 	else
 	{
 		// make sure there isn't any ambiguity
-		if ( gEntList.FindEntityByName( pParent, newParent, NULL, pActivator ) )
+		if ( EntityList()->FindEntityByName( pParent, newParent, NULL, pActivator ) )
 		{
 			Msg( "Entity %s(%s) has ambigious parent %s\n", STRING(GetEngineObject()->GetClassname()), GetDebugName(), STRING(newParent) );
 		}
@@ -1101,7 +1101,7 @@ void CBaseEntity::Activate( void )
 	// Get a handle to my damage filter entity if there is one.
 	if ( m_iszDamageFilterName != NULL_STRING )
 	{
-		m_hDamageFilter = gEntList.FindEntityByName( NULL, m_iszDamageFilterName );
+		m_hDamageFilter = EntityList()->FindEntityByName( NULL, m_iszDamageFilterName );
 	}
 
 	// Add any non-null context strings to our context vector
@@ -1390,7 +1390,7 @@ void CBaseEntity::Event_Killed( const CTakeDamageInfo &info )
 
 	m_takedamage = DAMAGE_NO;
 	m_lifeState = LIFE_DEAD;
-	gEntList.DestroyEntity( this );
+	EntityList()->DestroyEntity( this );
 }
 
 //-----------------------------------------------------------------------------
@@ -1431,7 +1431,7 @@ CBaseEntity *CBaseEntity::GetNextTarget( void )
 {
 	if ( !m_target )
 		return NULL;
-	return gEntList.FindEntityByName( NULL, m_target );
+	return EntityList()->FindEntityByName( NULL, m_target );
 }
 
 
@@ -2421,7 +2421,7 @@ extern ConVar ai_debug_los;
 void CC_AI_LOS_Debug( IConVar *var, const char *pOldString, float flOldValue )
 {
 	int iLOSMode = ai_debug_los.GetInt();
-	for ( CBaseEntity *pEntity = gEntList.FirstEnt(); pEntity != NULL; pEntity = gEntList.NextEnt(pEntity) )
+	for ( CBaseEntity *pEntity = EntityList()->FirstEnt(); pEntity != NULL; pEntity = EntityList()->NextEnt(pEntity) )
 	{
 		if ( iLOSMode == 1 && pEntity->GetEngineObject()->IsSolid() )
 		{
@@ -2644,7 +2644,7 @@ CBaseEntity *CBaseEntity::Create( const char *szName, const Vector &vecOrigin, c
 // will keep a pointer to it after this call.
 CBaseEntity * CBaseEntity::CreateNoSpawn( const char *szName, const Vector &vecOrigin, const QAngle &vecAngles, CBaseEntity *pOwner )
 {
-	CBaseEntity *pEntity = gEntList.CreateEntityByName( szName );
+	CBaseEntity *pEntity = (CBaseEntity*)EntityList()->CreateEntityByName( szName );
 	if ( !pEntity )
 	{
 		Assert( !"CreateNoSpawn: only works for CBaseEntities" );
@@ -2809,12 +2809,12 @@ void CBaseEntity::Spawn( void )
 
 CBaseEntity* CBaseEntity::Instance( const CBaseHandle &hEnt )
 {
-	return gEntList.GetBaseEntity( hEnt );
+	return EntityList()->GetBaseEntityFromHandle( hEnt );
 }
 
 //CBaseEntity* CBaseEntity::Instance(const edict_t* pent)
 //{
-//	return gEntList.GetBaseEntity(const_cast<edict_t*>(pent)->m_EdictIndex);
+//	return EntityList()->GetBaseEntity(const_cast<edict_t*>(pent)->m_EdictIndex);
 //}
 //
 //CBaseEntity* CBaseEntity::Instance(edict_t* pent)
@@ -2823,12 +2823,12 @@ CBaseEntity* CBaseEntity::Instance( const CBaseHandle &hEnt )
 //	{
 //		pent = INDEXENT(0);
 //	}
-//	return gEntList.GetBaseEntity(pent->m_EdictIndex);
+//	return EntityList()->GetBaseEntity(pent->m_EdictIndex);
 //}
 
 CBaseEntity* CBaseEntity::Instance(int iEnt)
 {
-	return gEntList.GetBaseEntity(iEnt);
+	return EntityList()->GetBaseEntity(iEnt);
 }
 
 int CBaseEntity::GetTransmitState( void )
@@ -2935,7 +2935,7 @@ int CBaseEntity::ShouldTransmit( const CCheckTransmitInfo *pInfo )
 //		return FL_EDICT_ALWAYS;
 //	}
 
-	CBaseEntity *pRecipientEntity = gEntList.GetBaseEntity( pInfo->m_pClientEnt );
+	CBaseEntity *pRecipientEntity = EntityList()->GetBaseEntity( pInfo->m_pClientEnt );
 
 	Assert( pRecipientEntity->IsPlayer() );
 	
@@ -3419,7 +3419,7 @@ void CBaseEntity::InputSetDamageFilter( inputdata_t &inputdata )
 	m_iszDamageFilterName = inputdata.value.StringID();
 	if ( m_iszDamageFilterName != NULL_STRING )
 	{
-		m_hDamageFilter = gEntList.FindEntityByName( NULL, m_iszDamageFilterName );
+		m_hDamageFilter = EntityList()->FindEntityByName( NULL, m_iszDamageFilterName );
 	}
 	else
 	{
@@ -3472,7 +3472,7 @@ void CBaseEntity::InputKill( inputdata_t &inputdata )
 		SetOwnerEntity( NULL );
 	}
 
-	gEntList.DestroyEntity( this );
+	EntityList()->DestroyEntity( this );
 }
 
 void CBaseEntity::InputKillHierarchy( inputdata_t &inputdata )
@@ -3492,7 +3492,7 @@ void CBaseEntity::InputKillHierarchy( inputdata_t &inputdata )
 		SetOwnerEntity( NULL );
 	}
 
-	gEntList.DestroyEntity( this );
+	EntityList()->DestroyEntity( this );
 }
 
 //------------------------------------------------------------------------------
@@ -4393,13 +4393,13 @@ void CC_Ent_Remove( const CCommand& args )
 		int index = atoi( args[1] );
 		if ( index )
 		{
-			pEntity = gEntList.GetBaseEntity( index );
+			pEntity = EntityList()->GetBaseEntity( index );
 		}
 		else
 		{
 			// Otherwise set bits based on name or classname
 			CBaseEntity *ent = NULL;
-			while ( (ent = gEntList.NextEnt(ent)) != NULL )
+			while ( (ent = EntityList()->NextEnt(ent)) != NULL )
 			{
 				if (  (ent->GetEntityName() != NULL_STRING	&& FStrEq(args[1], STRING(ent->GetEntityName())))	|| 
 					(ent->GetEngineObject()->GetClassname() != NULL_STRING	&& FStrEq(args[1], STRING(ent->GetEngineObject()->GetClassname()))) ||
@@ -4416,7 +4416,7 @@ void CC_Ent_Remove( const CCommand& args )
 	if ( pEntity )
 	{
 		Msg( "Removed %s(%s)\n", STRING(pEntity->GetEngineObject()->GetClassname()), pEntity->GetDebugName() );
-		gEntList.DestroyEntity( pEntity );
+		EntityList()->DestroyEntity( pEntity );
 	}
 }
 static ConCommand ent_remove("ent_remove", CC_Ent_Remove, "Removes the given entity(s)\n\tArguments:   	{entity_name} / {class_name} / no argument picks what player is looking at ", FCVAR_CHEAT);
@@ -4434,13 +4434,13 @@ void CC_Ent_RemoveAll( const CCommand& args )
 		// Otherwise remove based on name or classname
 		int iCount = 0;
 		CBaseEntity *ent = NULL;
-		while ( (ent = gEntList.NextEnt(ent)) != NULL )
+		while ( (ent = EntityList()->NextEnt(ent)) != NULL )
 		{
 			if (  (ent->GetEntityName() != NULL_STRING	&& FStrEq(args[1], STRING(ent->GetEntityName())))	|| 
 				  (ent->GetEngineObject()->GetClassname() != NULL_STRING	&& FStrEq(args[1], STRING(ent->GetEngineObject()->GetClassname()))) ||
 				  (ent->GetClassname()!=NULL && FStrEq(args[1], ent->GetClassname())))
 			{
-				gEntList.DestroyEntity( ent );
+				EntityList()->DestroyEntity( ent );
 				iCount++;
 			}
 		}
@@ -4481,7 +4481,7 @@ void CC_Ent_SetName( const CCommand& args )
 		{
 			// Otherwise set bits based on name or classname
 			CBaseEntity *ent = NULL;
-			while ( (ent = gEntList.NextEnt(ent)) != NULL )
+			while ( (ent = EntityList()->NextEnt(ent)) != NULL )
 			{
 				if (  (ent->GetEntityName() != NULL_STRING	&& FStrEq(args[1], STRING(ent->GetEntityName())))	|| 
 					  (ent->GetEngineObject()->GetClassname() != NULL_STRING	&& FStrEq(args[1], STRING(ent->GetEngineObject()->GetClassname()))) ||
@@ -4508,7 +4508,7 @@ void CC_Find_Ent( const CCommand& args )
 {
 	if ( args.ArgC() < 2 )
 	{
-		Msg( "Total entities: %d (%d edicts)\n", gEntList.NumberOfEntities(), gEntList.NumberOfEdicts() );
+		Msg( "Total entities: %d (%d edicts)\n", EntityList()->NumberOfEntities(), EntityList()->NumberOfEdicts() );
 		Msg( "Format: find_ent <substring>\n" );
 		return;
 	}
@@ -4518,7 +4518,7 @@ void CC_Find_Ent( const CCommand& args )
 	Msg("Searching for entities with class/target name containing substring: '%s'\n", pszSubString );
 
 	CBaseEntity *ent = NULL;
-	while ( (ent = gEntList.NextEnt(ent)) != NULL )
+	while ( (ent = EntityList()->NextEnt(ent)) != NULL )
 	{
 		const char *pszClassname = ent->GetClassname();
 		const char *pszTargetname = STRING(ent->GetEntityName());
@@ -4592,7 +4592,7 @@ void CC_Ent_Dump( const CCommand& args )
 		// iterate through all the ents of this name, printing out their details
 		CBaseEntity *ent = NULL;
 		bool bFound = false;
-		while ( ( ent = gEntList.FindEntityByName(ent, args[1] ) ) != NULL )
+		while ( ( ent = EntityList()->FindEntityByName(ent, args[1] ) ) != NULL )
 		{
 			bFound = true;
 			for ( datamap_t *dmap = ent->GetDataDescMap(); dmap != NULL; dmap = dmap->baseMap )
@@ -4760,7 +4760,7 @@ public:
 		CUtlRBTree< CUtlString > symbols( 0, 0, UtlStringLessFunc );
 
 		CBaseEntity *pos = NULL;
-		while ( ( pos = gEntList.NextEnt( pos ) ) != NULL )
+		while ( ( pos = EntityList()->NextEnt( pos ) ) != NULL )
 		{
 			// Check target name against partial string
 			if ( pos->GetEntityName() == NULL_STRING )
@@ -4824,7 +4824,7 @@ private:
 		Q_strncat( targetEntity, substring, sizeof( targetEntity ), nEntityNameLength );
 
 		// Find the target entity by name
-		CBaseEntity *target = gEntList.FindEntityByName( NULL, targetEntity );
+		CBaseEntity *target = EntityList()->FindEntityByName( NULL, targetEntity );
 		if ( target == NULL )
 			return 0;
 
@@ -4930,7 +4930,7 @@ void CC_Ent_Info( const CCommand& args )
 	else
 	{
 		// iterate through all the ents printing out their details
-		CBaseEntity *ent = gEntList.CreateEntityByName( args[1] );
+		CBaseEntity *ent = (CBaseEntity*)EntityList()->CreateEntityByName( args[1] );
 
 		if ( ent )
 		{
@@ -5211,7 +5211,7 @@ bool CBaseEntity::IsFloating()
 //	CPredictableId testId;
 //	testId.Init( player_index, command_number, classname, module, line );
 //
-//	ent = gEntList.CreateEntityByName( classname );
+//	ent = EntityList()->CreateEntityByName( classname );
 //	// No factory???
 //	if ( !ent )
 //		return NULL;
@@ -5330,7 +5330,7 @@ void CBaseEntity::ModifyOrAppendCriteria( AI_CriteriaSet& set )
 	}
 
 	// Append anything from world I/O/keyvalues with "world" as prefix
-	CWorld *world = (CWorld*)gEntList.GetBaseEntity( 0 );
+	CWorld *world = (CWorld*)EntityList()->GetBaseEntity( 0 );
 	if ( world )
 	{
 		world->AppendContextToCriteria( set, "world" );
@@ -6082,7 +6082,7 @@ void CInfoLightingRelative::Activate()
 	}
 	else
 	{
-		m_hLightingLandmark = gEntList.FindEntityByName(NULL, m_strLightingLandmark);
+		m_hLightingLandmark = EntityList()->FindEntityByName(NULL, m_strLightingLandmark);
 		if (!m_hLightingLandmark)
 		{
 			DevWarning("%s: Could not find lighting landmark '%s'!\n", GetClassname(), STRING(m_strLightingLandmark));
@@ -6143,7 +6143,7 @@ void CBaseEntity::SetLightingOriginRelative(string_t strLightingOriginRelative)
 	}
 	else
 	{
-		CBaseEntity* pLightingOrigin = gEntList.FindEntityByName(NULL, strLightingOriginRelative);
+		CBaseEntity* pLightingOrigin = EntityList()->FindEntityByName(NULL, strLightingOriginRelative);
 		if (!pLightingOrigin)
 		{
 			DevWarning("%s: Could not find info_lighting_relative '%s'!\n", GetClassname(), STRING(strLightingOriginRelative));
@@ -6181,7 +6181,7 @@ void CBaseEntity::SetLightingOrigin(string_t strLightingOrigin)
 	}
 	else
 	{
-		CBaseEntity* pLightingOrigin = gEntList.FindEntityByName(NULL, strLightingOrigin);
+		CBaseEntity* pLightingOrigin = EntityList()->FindEntityByName(NULL, strLightingOrigin);
 		if (!pLightingOrigin)
 		{
 			DevWarning("%s: Could not find lighting origin entity named '%s'!\n", GetClassname(), STRING(strLightingOrigin));
@@ -6402,7 +6402,7 @@ void CBaseEntity::SUB_FadeOut( void  )
 
 	if ( m_clrRender->a == 0 )
 	{
-		gEntList.DestroyEntity(this);
+		EntityList()->DestroyEntity(this);
 	}
 	else
 	{
@@ -6466,7 +6466,7 @@ bool CBaseEntity::HasNPCsOnIt(void)
 	{
 		for (link = root->nextLink; link != root; link = link->nextLink)
 		{
-			if (gEntList.GetServerEntityFromHandle(link->entity) && ((CBaseEntity*)gEntList.GetServerEntityFromHandle(link->entity))->MyNPCPointer())
+			if (EntityList()->GetBaseEntityFromHandle(link->entity) && EntityList()->GetBaseEntityFromHandle(link->entity)->MyNPCPointer())
 				return true;
 		}
 	}
@@ -6518,7 +6518,7 @@ void CC_Ent_Create( const CCommand& args )
 	engine->SetAllowPrecache( true );//CBaseEntity::
 
 	// Try to create entity
-	CBaseEntity *entity = dynamic_cast< CBaseEntity * >(gEntList.CreateEntityByName(args[1]) );
+	CBaseEntity *entity = dynamic_cast< CBaseEntity * >(EntityList()->CreateEntityByName(args[1]) );
 	if (entity)
 	{
 		entity->Precache();
@@ -6565,17 +6565,17 @@ bool CC_GetCommandEnt( const CCommand& args, CBaseEntity **ent, Vector *vecTarge
 	int iEntIndex = atoi( args[1] );
 	if ( iEntIndex )
 	{
-		*ent = gEntList.GetBaseEntity( iEntIndex );
+		*ent = EntityList()->GetBaseEntity( iEntIndex );
 	}
 	else
 	{
 		// Try finding it by name
-		*ent = gEntList.FindEntityByName( NULL, args[1] );
+		*ent = EntityList()->FindEntityByName( NULL, args[1] );
 
 		if ( !*ent )
 		{
 			// Finally, try finding it by classname
-			*ent = gEntList.FindEntityByClassname( NULL, args[1] );
+			*ent = EntityList()->FindEntityByClassname( NULL, args[1] );
 		}
 	}
 

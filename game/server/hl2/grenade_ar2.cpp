@@ -199,7 +199,7 @@ void CGrenadeAR2::Detonate(void)
 
 	if(m_hSmokeTrail)
 	{
-		gEntList.DestroyEntity(m_hSmokeTrail);
+		EntityList()->DestroyEntity(m_hSmokeTrail);
 		m_hSmokeTrail = NULL;
 	}
 
@@ -238,7 +238,7 @@ void CGrenadeAR2::Detonate(void)
 
 	RadiusDamage ( CTakeDamageInfo( this, GetThrower(), m_flDamage, DMG_BLAST ), GetEngineObject()->GetAbsOrigin(), m_DmgRadius, CLASS_NONE, NULL );
 
-	gEntList.DestroyEntity( this );
+	EntityList()->DestroyEntity( this );
 }
 
 void CGrenadeAR2::Precache( void )

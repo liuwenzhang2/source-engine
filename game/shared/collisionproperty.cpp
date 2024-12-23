@@ -199,7 +199,7 @@ void CDirtySpatialPartitionEntityList::OnPreQuery( SpatialPartitionListMask_t li
 				pCurrent = pNext;
 
 #ifndef CLIENT_DLL
-				CBaseEntity *pEntity = gEntList.GetBaseEntity( handle );
+				CBaseEntity *pEntity = EntityList()->GetBaseEntityFromHandle( handle );
 #else
 				CBaseEntity *pEntity = EntityList()->GetBaseEntityFromHandle( handle );
 #endif

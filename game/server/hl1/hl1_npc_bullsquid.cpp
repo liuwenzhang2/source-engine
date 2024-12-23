@@ -158,7 +158,7 @@ void CSquidSpit:: Spawn( void )
 
 void CSquidSpit::Shoot( CBaseEntity *pOwner, Vector vecStart, Vector vecVelocity )
 {
-	CSquidSpit *pSpit = (CSquidSpit*)gEntList.CreateEntityByName( "squidspit" );
+	CSquidSpit *pSpit = (CSquidSpit*)EntityList()->CreateEntityByName( "squidspit" );
 	pSpit->Spawn();
 	
 	UTIL_SetOrigin( pSpit, vecStart );
@@ -250,8 +250,8 @@ void CSquidSpit::Touch ( CBaseEntity *pOther )
 		pOther->TakeDamage( info );
 	}
 
-	gEntList.DestroyEntity( m_hSprite );
-	gEntList.DestroyEntity( this );
+	EntityList()->DestroyEntity( m_hSprite );
+	EntityList()->DestroyEntity( this );
 }
 
 

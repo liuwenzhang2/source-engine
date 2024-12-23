@@ -992,7 +992,7 @@ int CNPC_AttackHelicopter::ObjectCaps()
 
 void CNPC_AttackHelicopter::InputOutsideTransition( inputdata_t &inputdata )
 {
-	CBaseEntity *pEnt = gEntList.FindEntityByName( NULL, m_iszTransitionTarget );
+	CBaseEntity *pEnt = EntityList()->FindEntityByName( NULL, m_iszTransitionTarget );
 
 	if ( pEnt )
 	{
@@ -1098,7 +1098,7 @@ void CNPC_AttackHelicopter::Spawn( void )
 	SetActivity( ACT_IDLE );
 
 	int nBombAttachment = GetEngineObject()->LookupAttachment("bomb");
-	m_hSensor = static_cast<CBombDropSensor*>(gEntList.CreateEntityByName( "npc_helicoptersensor" ));
+	m_hSensor = static_cast<CBombDropSensor*>(EntityList()->CreateEntityByName( "npc_helicoptersensor" ));
 	m_hSensor->Spawn();
 	m_hSensor->GetEngineObject()->SetParent( this->GetEngineObject(), nBombAttachment);
 	m_hSensor->GetEngineObject()->SetLocalOrigin( vec3_origin );
@@ -1296,13 +1296,13 @@ void CNPC_AttackHelicopter::UpdateOnRemove()
 {
 	BaseClass::UpdateOnRemove();
 	StopLoopingSounds();
-	gEntList.DestroyEntity(m_hSensor);
+	EntityList()->DestroyEntity(m_hSensor);
 	DestroySmokeTrails();
 	for ( int i = 0; i < MAX_HELICOPTER_LIGHTS; ++i )
 	{
 		if ( m_hLights[i] )
 		{
-			gEntList.DestroyEntity( m_hLights[i] );
+			EntityList()->DestroyEntity( m_hLights[i] );
 			m_hLights[i] = NULL;
 		}
 	}
@@ -2795,7 +2795,7 @@ bool CNPC_AttackHelicopter::IsBombDropFair( const Vector &vecBombStartPos, const
 CGrenadeHelicopter *CNPC_AttackHelicopter::SpawnBombEntity( const Vector &vecPos, const Vector &vecVelocity )
 {
 	// Create the grenade and set it up
-	CGrenadeHelicopter *pGrenade = static_cast<CGrenadeHelicopter*>(gEntList.CreateEntityByName( "grenade_helicopter" ));
+	CGrenadeHelicopter *pGrenade = static_cast<CGrenadeHelicopter*>(EntityList()->CreateEntityByName( "grenade_helicopter" ));
 	pGrenade->GetEngineObject()->SetAbsOrigin( vecPos );
 	pGrenade->SetOwnerEntity( this );
 	pGrenade->SetThrower( this );
@@ -2940,7 +2940,7 @@ void CNPC_AttackHelicopter::InputDropBombAtTargetInternal( inputdata_t &inputdat
 
 	// Find our specified target
 	string_t strBombTarget = MAKE_STRING( inputdata.value.String() );
-	CBaseEntity *pBombEnt = gEntList.FindEntityByName( NULL, strBombTarget );
+	CBaseEntity *pBombEnt = EntityList()->FindEntityByName( NULL, strBombTarget );
 	if ( pBombEnt == NULL )
 	{
 		Warning( "%s: Could not find bomb drop target '%s'!\n", GetClassname(), STRING( strBombTarget ) );
@@ -3361,7 +3361,7 @@ void CNPC_AttackHelicopter::DestroySmokeTrails()
 {
 	for ( int i = m_nSmokeTrailCount; --i >= 0; )
 	{
-		gEntList.DestroyEntity( m_hSmokeTrail[i] );
+		EntityList()->DestroyEntity( m_hSmokeTrail[i] );
 		m_hSmokeTrail[i] = NULL;
 	}
 }
@@ -3373,7 +3373,7 @@ void CNPC_AttackHelicopter::DestroySmokeTrails()
 void Chopper_CreateChunk( CBaseEntity *pChopper, const Vector &vecChunkPos, const QAngle &vecChunkAngles, const char *pszChunkName, bool bSmall )
 {
 	// Drop a flaming, smoking chunk.
-	CGib *pChunk = (CGib*)gEntList.CreateEntityByName( "gib" );
+	CGib *pChunk = (CGib*)EntityList()->CreateEntityByName( "gib" );
 	pChunk->Spawn( pszChunkName );
 	pChunk->SetBloodColor( DONT_BLEED );
 
@@ -3771,7 +3771,7 @@ void CNPC_AttackHelicopter::Event_Killed( const CTakeDamageInfo &info )
 
 	if( GetCrashPoint() == NULL )
 	{
-		CBaseEntity *pCrashPoint = gEntList.FindEntityByClassname( NULL, "info_target_helicopter_crash" );
+		CBaseEntity *pCrashPoint = EntityList()->FindEntityByClassname( NULL, "info_target_helicopter_crash" );
 		if( pCrashPoint != NULL )
 		{
 			m_hCrashPoint.Set( pCrashPoint );
@@ -3828,7 +3828,7 @@ void CNPC_AttackHelicopter::Event_Killed( const CTakeDamageInfo &info )
 void CNPC_AttackHelicopter::CreateChopperHusk()
 {
 	// We're embedded into the ground
-	CBaseEntity *pCorpse = gEntList.CreateEntityByName( "prop_physics" );
+	CBaseEntity *pCorpse = (CBaseEntity*)EntityList()->CreateEntityByName( "prop_physics" );
 	pCorpse->GetEngineObject()->SetAbsOrigin(GetEngineObject()->GetAbsOrigin() );
 	pCorpse->GetEngineObject()->SetAbsAngles(GetEngineObject()->GetAbsAngles() );
 	pCorpse->SetModel( CHOPPER_MODEL_CORPSE_NAME );
@@ -5300,7 +5300,7 @@ void CGrenadeHelicopter::StopWarningBlinker()
 {
 	if( m_hWarningSprite.Get() )
 	{
-		gEntList.DestroyEntity( m_hWarningSprite.Get() );
+		EntityList()->DestroyEntity( m_hWarningSprite.Get() );
 		m_hWarningSprite.Set( NULL );
 	}
 }
@@ -5463,7 +5463,7 @@ void CGrenadeHelicopter::DoExplosion( const Vector &vecOrigin, const Vector &vec
 		DispatchEffect( "HelicopterMegaBomb", data );
 	}
 
-	gEntList.DestroyEntity( this );
+	EntityList()->DestroyEntity( this );
 }
 
 
@@ -5568,7 +5568,7 @@ void CGrenadeHelicopter::OnPhysGunPickup(CBasePlayer *pPhysGunUser, PhysGunPicku
 		{
 			if( m_hWarningSprite.Get() != NULL )
 			{
-				gEntList.DestroyEntity( m_hWarningSprite );
+				EntityList()->DestroyEntity( m_hWarningSprite );
 				m_hWarningSprite.Set(NULL);
 			}
 
@@ -5677,7 +5677,7 @@ END_DATADESC()
 //-----------------------------------------------------------------------------
 CBaseEntity *CreateHelicopterAvoidanceSphere( CBaseEntity *pParent, int nAttachment, float flRadius, bool bAvoidBelow )
 {
-	CAvoidSphere *pSphere = static_cast<CAvoidSphere*>(gEntList.CreateEntityByName( "npc_heli_avoidsphere" ));
+	CAvoidSphere *pSphere = static_cast<CAvoidSphere*>(EntityList()->CreateEntityByName( "npc_heli_avoidsphere" ));
 	pSphere->Init( flRadius );
 	if ( bAvoidBelow )
 	{
@@ -6139,7 +6139,7 @@ void CHelicopterChunk::CollisionCallback( CHelicopterChunk *pCaller )
 CHelicopterChunk *CHelicopterChunk::CreateHelicopterChunk( const Vector &vecPos, const QAngle &vecAngles, const Vector &vecVelocity, const char *pszModelName, int chunkID )
 {
 	// Drop a flaming, smoking chunk.
-	CHelicopterChunk *pChunk = (CHelicopterChunk*)gEntList.CreateEntityByName( "helicopter_chunk" );
+	CHelicopterChunk *pChunk = (CHelicopterChunk*)EntityList()->CreateEntityByName( "helicopter_chunk" );
 	
 	if ( pChunk == NULL )
 		return NULL;

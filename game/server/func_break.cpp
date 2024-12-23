@@ -370,7 +370,7 @@ void CBreakable::MaterialSoundRandom( int entindex, Materials soundMaterial, flo
 	if ( !g_pSoundEmitterSystem->GetParametersForSound( soundname, params, NULL ) )
 		return;
 
-	CPASAttenuationFilter filter( gEntList.GetBaseEntity( entindex ), params.soundlevel );
+	CPASAttenuationFilter filter(EntityList()->GetBaseEntity( entindex ), params.soundlevel );
 
 
 	EmitSound_t ep;
@@ -915,7 +915,7 @@ void CBreakable::ResetOnGroundFlags(void)
 			if( UTIL_IsBoxIntersectingPortal( vBoxCenter, vBoxExtents, pTempPortal ) )
 			{
 				//pTempPortal->DoFizzleEffect( PORTAL_FIZZLE_KILLED, false );
-				gEntList.DestroyEntity(pTempPortal->AsEngineObject()->GetOuter());
+				EntityList()->DestroyEntity(pTempPortal->AsEngineObject()->GetOuter());
 			}
 		}
 	}

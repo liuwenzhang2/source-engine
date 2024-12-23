@@ -73,7 +73,7 @@ void CNPC_Puppet::Spawn( void )
 	SetHealth( 100 );
 
 	// Find our animation target
-	CBaseEntity *pTarget = gEntList.FindEntityByName( NULL, m_sAnimTargetname );
+	CBaseEntity *pTarget = EntityList()->FindEntityByName( NULL, m_sAnimTargetname );
 	m_hAnimationTarget = pTarget;
 	if ( pTarget )
 	{
@@ -98,7 +98,7 @@ void CNPC_Puppet::InputSetAnimationTarget( inputdata_t &inputdata )
 	m_sAnimTargetname = MAKE_STRING( inputdata.value.String() );
 
 	// Find our animation target
-	CBaseEntity *pTarget = gEntList.FindEntityByName( NULL, m_sAnimTargetname );
+	CBaseEntity *pTarget = EntityList()->FindEntityByName( NULL, m_sAnimTargetname );
 	if ( pTarget == NULL )
 	{
 		Warning("Failed to find animation target %s for npc_puppet (%s)\n", STRING( m_sAnimTargetname ), STRING( GetEntityName() ) );

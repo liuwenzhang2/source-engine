@@ -504,7 +504,7 @@ void CBaseDoor::Activate( void )
 	// Get a handle to my filter entity if there is one
 	if (m_iBlockFilterName != NULL_STRING)
 	{
-		m_hBlockFilter = dynamic_cast<CBaseFilter *>(gEntList.FindEntityByName( NULL, m_iBlockFilterName, NULL ));
+		m_hBlockFilter = dynamic_cast<CBaseFilter *>(EntityList()->FindEntityByName( NULL, m_iBlockFilterName, NULL ));
 	}
 #endif
 }
@@ -697,7 +697,7 @@ void CBaseDoor::UpdateAreaPortals( bool isOpen )
 		return;
 	
 	CBaseEntity *pPortal = NULL;
-	while ( ( pPortal = gEntList.FindEntityByClassname( pPortal, "func_areaportal" ) ) != NULL )
+	while ( ( pPortal = EntityList()->FindEntityByClassname( pPortal, "func_areaportal" ) ) != NULL )
 	{
 		if ( pPortal->HasTarget( name ) )
 		{
@@ -772,7 +772,7 @@ void CBaseDoor::ChainUse( void )
 		return;
 
 	CBaseEntity *ent = NULL;
-	while ( ( ent = gEntList.FindEntityByName( ent, m_ChainTarget, NULL ) ) != NULL )
+	while ( ( ent = EntityList()->FindEntityByName( ent, m_ChainTarget, NULL ) ) != NULL )
 	{
 		if ( ent == this )
 			continue;
@@ -797,7 +797,7 @@ void CBaseDoor::ChainTouch( CBaseEntity *pOther )
 		return;
 
 	CBaseEntity *ent = NULL;
-	while ( ( ent = gEntList.FindEntityByName( ent, m_ChainTarget, NULL ) ) != NULL )
+	while ( ( ent = EntityList()->FindEntityByName( ent, m_ChainTarget, NULL ) ) != NULL )
 	{
 		if ( ent == this )
 			continue;
@@ -1142,7 +1142,7 @@ int CBaseDoor::GetDoorMovementGroup( CBaseDoor *pDoorList[], int listMax )
 	{
 		for (;;)
 		{
-			pTarget = gEntList.FindEntityByName( pTarget, GetEntityName(), NULL );
+			pTarget = EntityList()->FindEntityByName( pTarget, GetEntityName(), NULL );
 
 			if ( pTarget != this )
 			{

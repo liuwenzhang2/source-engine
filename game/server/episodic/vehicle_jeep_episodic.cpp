@@ -138,7 +138,7 @@ public:
 
 	static CVehicleCargoTrigger *Create( const Vector &vecOrigin, const Vector &vecMins, const Vector &vecMaxs, CBaseEntity *pOwner )
 	{
-		CVehicleCargoTrigger *pTrigger = (CVehicleCargoTrigger *)gEntList.CreateEntityByName( "trigger_vehicle_cargo" );
+		CVehicleCargoTrigger *pTrigger = (CVehicleCargoTrigger *)EntityList()->CreateEntityByName( "trigger_vehicle_cargo" );
 		if ( pTrigger == NULL )
 			return NULL;
 
@@ -406,12 +406,12 @@ void CPropJeepEpisodic::UpdateOnRemove( void )
 	{
 		if ( m_hWheelDust[i] != NULL )
 		{
-			gEntList.DestroyEntity( m_hWheelDust[i] );
+			EntityList()->DestroyEntity( m_hWheelDust[i] );
 		}
 
 		if ( m_hWheelWater[i] != NULL )
 		{
-			gEntList.DestroyEntity( m_hWheelWater[i] );
+			EntityList()->DestroyEntity( m_hWheelWater[i] );
 		}
 	}
 
@@ -621,7 +621,7 @@ void CPropJeepEpisodic::InputAddBusterToCargo( inputdata_t &data )
 		m_hCargoProp = NULL;
 	}
 
-	CBaseEntity *pNewBomb = gEntList.CreateEntityByName( "weapon_striderbuster" );
+	CBaseEntity *pNewBomb = (CBaseEntity*)EntityList()->CreateEntityByName( "weapon_striderbuster" );
 	if ( pNewBomb )
 	{
 		DispatchSpawn( pNewBomb );
@@ -753,7 +753,7 @@ void CPropJeepEpisodic::UpdateWheelDust( void )
 		if ( m_hWheelDust[i] == NULL )
 		{
 			// Create the dust effect in place
-			m_hWheelDust[i] = (CParticleSystem *)gEntList.CreateEntityByName( "info_particle_system" );
+			m_hWheelDust[i] = (CParticleSystem *)EntityList()->CreateEntityByName( "info_particle_system" );
 			if ( m_hWheelDust[i] == NULL )
 				continue;
 
@@ -771,7 +771,7 @@ void CPropJeepEpisodic::UpdateWheelDust( void )
 		if ( m_hWheelWater[i] == NULL )
 		{
 			// Create the dust effect in place
-			m_hWheelWater[i] = (CParticleSystem *)gEntList.CreateEntityByName( "info_particle_system" );
+			m_hWheelWater[i] = (CParticleSystem *)EntityList()->CreateEntityByName( "info_particle_system" );
 			if ( m_hWheelWater[i] == NULL )
 				continue;
 
@@ -1422,7 +1422,7 @@ void CPropJeepEpisodic::DestroyHazardLights( void )
 	{
 		if ( m_hHazardLights[i] != NULL )
 		{
-			gEntList.DestroyEntity( m_hHazardLights[i] );
+			EntityList()->DestroyEntity( m_hHazardLights[i] );
 		}
 	}
 
@@ -1624,7 +1624,7 @@ void CPropJeepEpisodic::InputOutsideTransition( inputdata_t &inputdata )
 	bool bSucceeded = false;
 
 	// Find all entities of the correct name and try and sit where they're at
-	while ( ( pEntity = (CInfoTargetVehicleTransition *) gEntList.FindEntityByClassname( pEntity, "info_target_vehicle_transition" ) ) != NULL )
+	while ( ( pEntity = (CInfoTargetVehicleTransition *) EntityList()->FindEntityByClassname( pEntity, "info_target_vehicle_transition" ) ) != NULL )
 	{
 		// Must be enabled
 		if ( pEntity->IsDisabled() )
@@ -1716,7 +1716,7 @@ void CPropJeepEpisodic::InputCreateLinkController( inputdata_t &data )
 
 	float flRadius = ( (vecFront - vecRear).Length() ) * 0.6f;
 
-	CAI_RadialLinkController *pLinkController = (CAI_RadialLinkController *)gEntList.CreateEntityByName( "info_radial_link_controller" );
+	CAI_RadialLinkController *pLinkController = (CAI_RadialLinkController *)EntityList()->CreateEntityByName( "info_radial_link_controller" );
 	if( pLinkController != NULL && m_hLinkControllerFront.Get() == NULL )
 	{
 		pLinkController->m_flRadius = flRadius;
@@ -1730,7 +1730,7 @@ void CPropJeepEpisodic::InputCreateLinkController( inputdata_t &data )
 		//NDebugOverlay::Circle( vecFront, Vector(0,1,0), Vector(1,0,0), flRadius, 255, 255, 255, 128, false, 100 );
 	}
 
-	pLinkController = (CAI_RadialLinkController *)gEntList.CreateEntityByName( "info_radial_link_controller" );
+	pLinkController = (CAI_RadialLinkController *)EntityList()->CreateEntityByName( "info_radial_link_controller" );
 	if( pLinkController != NULL && m_hLinkControllerRear.Get() == NULL  )
 	{
 		pLinkController->m_flRadius = flRadius;
@@ -1753,7 +1753,7 @@ void CPropJeepEpisodic::InputDestroyLinkController( inputdata_t &data )
 		if( pLinkController != NULL )
 		{
 			pLinkController->ModifyNodeLinks(false);
-			gEntList.DestroyEntity( pLinkController );
+			EntityList()->DestroyEntity( pLinkController );
 			m_hLinkControllerFront.Set(NULL);
 		}
 	}
@@ -1764,7 +1764,7 @@ void CPropJeepEpisodic::InputDestroyLinkController( inputdata_t &data )
 		if( pLinkController != NULL )
 		{
 			pLinkController->ModifyNodeLinks(false);
-			gEntList.DestroyEntity( pLinkController );
+			EntityList()->DestroyEntity( pLinkController );
 			m_hLinkControllerRear.Set(NULL);
 		}
 	}

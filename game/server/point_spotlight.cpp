@@ -335,7 +335,7 @@ void CPointSpotlight::SpotlightCreate(void)
 	trace_t tr;
 	UTIL_TraceLine(GetEngineObject()->GetAbsOrigin(), GetEngineObject()->GetAbsOrigin() + m_vSpotlightDir * m_flSpotlightMaxLength, MASK_SOLID_BRUSHONLY, this, COLLISION_GROUP_NONE, &tr);
 
-	m_hSpotlightTarget = (CSpotlightEnd*)gEntList.CreateEntityByName( "spotlight_end" );
+	m_hSpotlightTarget = (CSpotlightEnd*)EntityList()->CreateEntityByName( "spotlight_end" );
 	m_hSpotlightTarget->Spawn();
 	m_hSpotlightTarget->GetEngineObject()->SetAbsOrigin( tr.endpos );
 	m_hSpotlightTarget->SetOwnerEntity( this );
@@ -397,8 +397,8 @@ void CPointSpotlight::SpotlightDestroy(void)
 	{
 		m_OnOff.FireOutput( this, this );
 
-		gEntList.DestroyEntity(m_hSpotlight);
-		gEntList.DestroyEntity(m_hSpotlightTarget);
+		EntityList()->DestroyEntity(m_hSpotlight);
+		EntityList()->DestroyEntity(m_hSpotlightTarget);
 	}
 }
 

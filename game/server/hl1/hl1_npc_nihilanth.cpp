@@ -449,7 +449,7 @@ bool CNPC_Nihilanth::EmitSphere( void )
 		return false;
 
 	Vector vecSrc = m_hRecharger->GetEngineObject()->GetAbsOrigin();
-	CNihilanthHVR *pEntity = (CNihilanthHVR *)gEntList.CreateEntityByName( "nihilanth_energy_ball" );
+	CNihilanthHVR *pEntity = (CNihilanthHVR *)EntityList()->CreateEntityByName( "nihilanth_energy_ball" );
 	
 	
 	pEntity->GetEngineObject()->SetAbsOrigin( vecSrc );
@@ -477,13 +477,13 @@ void CNPC_Nihilanth::StartupThink( void )
 
 	CBaseEntity *pEntity;
 
-	pEntity = gEntList.FindEntityByName( NULL, "n_min" );
+	pEntity = EntityList()->FindEntityByName( NULL, "n_min" );
 	if (pEntity)
 		m_flMinZ = pEntity->GetEngineObject()->GetAbsOrigin().z;
 	else
 		m_flMinZ = -4096;
 
-	pEntity = gEntList.FindEntityByName( NULL, "n_max" );
+	pEntity = EntityList()->FindEntityByName( NULL, "n_max" );
 	if (pEntity)
 		m_flMaxZ = pEntity->GetEngineObject()->GetAbsOrigin().z;
 	else
@@ -515,7 +515,7 @@ void CNPC_Nihilanth::InputTurnBabyOn( inputdata_t &inputdata )
 
 void CNPC_Nihilanth::InputTurnBabyOff( inputdata_t &inputdata )
 {
-	CBaseEntity *pTouch = gEntList.FindEntityByName( NULL, m_szDeadTouch );
+	CBaseEntity *pTouch = EntityList()->FindEntityByName( NULL, m_szDeadTouch );
 	
 	if ( pTouch && GetEnemy() != NULL )
 		 pTouch->Touch( GetEnemy() );
@@ -722,7 +722,7 @@ void CNPC_Nihilanth::NextActivity( )
 
 		Q_snprintf(szName, sizeof( szName ), "%s%d", m_szRechargerTarget, m_iLevel );
 
-		while ((pEnt = gEntList.FindEntityByName( pEnt, szName )) != NULL )
+		while ((pEnt = EntityList()->FindEntityByName( pEnt, szName )) != NULL )
 		{
 			float flLocal = (pEnt->GetEngineObject()->GetAbsOrigin() - GetEngineObject()->GetAbsOrigin() ).Length();
 
@@ -820,10 +820,10 @@ void CNPC_Nihilanth::NextActivity( )
 					char szText[64];
 
 					Q_snprintf( szText, sizeof( szText ), "%s%d", m_szTeleportTouch, m_iTeleport );
-					CBaseEntity *pTouch = gEntList.FindEntityByName( NULL, szText );
+					CBaseEntity *pTouch = EntityList()->FindEntityByName( NULL, szText );
 
 					Q_snprintf( szText, sizeof( szText ), "%s%d", m_szTeleportUse, m_iTeleport );
-					CBaseEntity *pTrigger = gEntList.FindEntityByName( NULL, szText );
+					CBaseEntity *pTrigger = EntityList()->FindEntityByName( NULL, szText );
 
 					if (pTrigger != NULL || pTouch != NULL)
 					{
@@ -922,7 +922,7 @@ void CNPC_Nihilanth::ShootBalls( void )
 				VectorNormalize( vecDir );
 				vecSrc = vecSrc + vecDir * (gpGlobals->curtime - m_flShootTime);
 				
-				pEntity = (CNihilanthHVR *)gEntList.CreateEntityByName( "nihilanth_energy_ball" );
+				pEntity = (CNihilanthHVR *)EntityList()->CreateEntityByName( "nihilanth_energy_ball" );
 
 				pEntity->GetEngineObject()->SetAbsOrigin( vecSrc );
 				pEntity->GetEngineObject()->SetAbsAngles( vecAngle );
@@ -939,7 +939,7 @@ void CNPC_Nihilanth::ShootBalls( void )
 				
 				vecSrc = vecSrc + vecDir * (gpGlobals->curtime - m_flShootTime);
 				
-				pEntity = (CNihilanthHVR *)gEntList.CreateEntityByName( "nihilanth_energy_ball" );
+				pEntity = (CNihilanthHVR *)EntityList()->CreateEntityByName( "nihilanth_energy_ball" );
 
 				pEntity->GetEngineObject()->SetAbsOrigin( vecSrc );
 				pEntity->GetEngineObject()->SetAbsAngles( vecAngle );
@@ -1016,7 +1016,7 @@ void CNPC_Nihilanth::DyingThink( void )
 			GetEngineObject()->SetAbsVelocity( Vector( 0, 0, 0 ) );
 			GetEngineObject()->SetGravity( 0 );
 
-			while( ( pTrigger = gEntList.FindEntityByName( pTrigger, m_szDeadUse ) ) != NULL )
+			while( ( pTrigger = EntityList()->FindEntityByName( pTrigger, m_szDeadUse ) ) != NULL )
 			{
 				CLogicRelay *pRelay = (CLogicRelay*)pTrigger;
 				pRelay->m_OnTrigger.FireOutput( this, this );
@@ -1049,7 +1049,7 @@ void CNPC_Nihilanth::DyingThink( void )
 		}
 		else
 		{
-			gEntList.DestroyEntity( m_pBall );
+			EntityList()->DestroyEntity( m_pBall );
 			m_pBall = NULL;
 		}
 	}
@@ -1111,7 +1111,7 @@ void CNPC_Nihilanth::DyingThink( void )
 	pBeam->LiveForTime( 0.5 );
 	
 	GetEngineObject()->GetAttachment( 2, vecSrc, vecAngles );
-	CNihilanthHVR *pEntity = (CNihilanthHVR *)gEntList.CreateEntityByName( "nihilanth_energy_ball" );
+	CNihilanthHVR *pEntity = (CNihilanthHVR *)EntityList()->CreateEntityByName( "nihilanth_energy_ball" );
 	
 	pEntity->GetEngineObject()->SetAbsOrigin( vecSrc );
 	pEntity->GetEngineObject()->SetAbsAngles(GetEngineObject()->GetAbsAngles() );
@@ -1162,10 +1162,10 @@ void CNPC_Nihilanth::HandleAnimEvent( animevent_t *pEvent )
 			char szText[32];
 
 			Q_snprintf( szText, sizeof( szText ), "%s%d", m_szTeleportTouch, m_iTeleport );
-			CBaseEntity *pTouch = gEntList.FindEntityByName( NULL, szText );
+			CBaseEntity *pTouch = EntityList()->FindEntityByName( NULL, szText );
 
 			Q_snprintf( szText, sizeof( szText ), "%s%d", m_szTeleportUse, m_iTeleport );
-			CBaseEntity *pTrigger = gEntList.FindEntityByName( NULL, szText );
+			CBaseEntity *pTrigger = EntityList()->FindEntityByName( NULL, szText );
 
 			if (pTrigger != NULL || pTouch != NULL)
 			{
@@ -1177,7 +1177,7 @@ void CNPC_Nihilanth::HandleAnimEvent( animevent_t *pEvent )
 
 				GetEngineObject()->GetAttachment( 2, vecSrc, vecAngles );
 
-				CNihilanthHVR *pEntity = (CNihilanthHVR *)gEntList.CreateEntityByName( "nihilanth_energy_ball" );
+				CNihilanthHVR *pEntity = (CNihilanthHVR *)EntityList()->CreateEntityByName( "nihilanth_energy_ball" );
 				
 				pEntity->GetEngineObject()->SetAbsOrigin( vecSrc );
 				pEntity->GetEngineObject()->SetAbsAngles( vecAngles );
@@ -1240,7 +1240,7 @@ void CNPC_Nihilanth::HandleAnimEvent( animevent_t *pEvent )
 			QAngle vecAngles;
 			GetEngineObject()->GetAttachment( 3, vecSrc, vecAngles );
 						
-			CNihilanthHVR *pEntity = (CNihilanthHVR *)gEntList.CreateEntityByName( "nihilanth_energy_ball" );
+			CNihilanthHVR *pEntity = (CNihilanthHVR *)EntityList()->CreateEntityByName( "nihilanth_energy_ball" );
 
 			pEntity->GetEngineObject()->SetAbsOrigin( vecSrc );
 			pEntity->GetEngineObject()->SetAbsAngles( vecAngles );
@@ -1342,8 +1342,8 @@ void CNihilanthHVR::HoverThink( void  )
 	}
 	else
 	{
-		gEntList.DestroyEntity( GetSprite() );
-		gEntList.DestroyEntity( this );
+		EntityList()->DestroyEntity( GetSprite() );
+		EntityList()->DestroyEntity( this );
 	}
 }
 
@@ -1468,8 +1468,8 @@ void CNihilanthHVR::ZapThink( void  )
 	if ( GetEnemy() == NULL || GetEngineObject()->GetAbsOrigin().x < -4096 || GetEngineObject()->GetAbsOrigin().x > 4096 || GetEngineObject()->GetAbsOrigin().y < -4096 || GetEngineObject()->GetAbsOrigin().y > 4096 || GetEngineObject()->GetAbsOrigin().z < -4096 || GetEngineObject()->GetAbsOrigin().z > 4096)
 	{
 		SetTouch( NULL );
-		gEntList.DestroyEntity( GetSprite() );
-		gEntList.DestroyEntity( this );
+		EntityList()->DestroyEntity( GetSprite() );
+		EntityList()->DestroyEntity( this );
 		return;
 	}
 
@@ -1530,8 +1530,8 @@ void CNihilanthHVR::ZapTouch( CBaseEntity *pOther )
 	GetEngineObject()->SetAbsVelocity(GetEngineObject()->GetAbsVelocity() * 0 );
 
 	SetTouch( NULL );
-	gEntList.DestroyEntity( GetSprite() );
-	gEntList.DestroyEntity( this );
+	EntityList()->DestroyEntity( GetSprite() );
+	EntityList()->DestroyEntity( this );
 	GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.2 );
 }
 
@@ -1564,9 +1564,9 @@ void CNihilanthHVR::DissipateThink( void  )
 
 	if ( m_flBallScale > 5.0)
 	{
-		gEntList.DestroyEntity( this );
-		gEntList.DestroyEntity( GetSprite() );
-		gEntList.DestroyEntity( GetBeam() );
+		EntityList()->DestroyEntity( this );
+		EntityList()->DestroyEntity( GetSprite() );
+		EntityList()->DestroyEntity( GetBeam() );
 	}
 
 	pSprite->SetBrightness( pSprite->GetBrightness() - 7, 0 );
@@ -1580,9 +1580,9 @@ void CNihilanthHVR::DissipateThink( void  )
 	}
 	else
 	{
-		gEntList.DestroyEntity( this );
-		gEntList.DestroyEntity( GetSprite() );
-		gEntList.DestroyEntity( GetBeam() );
+		EntityList()->DestroyEntity( this );
+		EntityList()->DestroyEntity( GetSprite() );
+		EntityList()->DestroyEntity( GetBeam() );
 	}
 
 /*	MESSAGE_BEGIN( MSG_BROADCAST, SVC_TEMPENTITY );
@@ -1661,16 +1661,16 @@ void CNihilanthHVR::TeleportThink( void  )
 	if ( GetEnemy() == NULL || !GetEnemy()->IsAlive() || GetEngineObject()->GetAbsOrigin().x < -4096 || GetEngineObject()->GetAbsOrigin().x > 4096 || GetEngineObject()->GetAbsOrigin().y < -4096 || GetEngineObject()->GetAbsOrigin().y > 4096 || GetEngineObject()->GetAbsOrigin().z < -4096 || GetEngineObject()->GetAbsOrigin().z > 4096)
 	{
 		g_pSoundEmitterSystem->StopSound( entindex(), "NihilanthHVR.TeleAttack" );
-		gEntList.DestroyEntity( this );
-		gEntList.DestroyEntity( GetSprite() );
+		EntityList()->DestroyEntity( this );
+		EntityList()->DestroyEntity( GetSprite() );
 		return;
 	}
 
 	if (( GetEnemy()->WorldSpaceCenter() - GetEngineObject()->GetAbsOrigin() ).Length() < 128)
 	{
 		g_pSoundEmitterSystem->StopSound( entindex(), "NihilanthHVR.TeleAttack" );
-		gEntList.DestroyEntity( this );
-		gEntList.DestroyEntity( GetSprite() );
+		EntityList()->DestroyEntity( this );
+		EntityList()->DestroyEntity( GetSprite() );
 
 		if ( GetTarget() != NULL)
 		{
@@ -1715,8 +1715,8 @@ void CNihilanthHVR::TeleportTouch( CBaseEntity *pOther )
 
 	SetTouch( NULL );
 	g_pSoundEmitterSystem->StopSound( entindex(), "NihilanthHVR.TeleAttack" );
-	gEntList.DestroyEntity( this );
-	gEntList.DestroyEntity( GetSprite() );
+	EntityList()->DestroyEntity( this );
+	EntityList()->DestroyEntity( GetSprite() );
 }
 
 void CNihilanthHVR::GreenBallInit( )
@@ -1740,6 +1740,6 @@ void CNihilanthHVR::GreenBallInit( )
 void CNihilanthHVR::RemoveTouch( CBaseEntity *pOther )
 {
 	g_pSoundEmitterSystem->StopSound( entindex(), "NihilanthHVR.TeleAttack" );
-	gEntList.DestroyEntity( this );
-	gEntList.DestroyEntity( GetSprite() );
+	EntityList()->DestroyEntity( this );
+	EntityList()->DestroyEntity( GetSprite() );
 }

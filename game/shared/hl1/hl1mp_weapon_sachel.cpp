@@ -199,7 +199,7 @@ void CWeaponSatchel::PrimaryAttack( void )
 #ifndef CLIENT_DLL
 			CBaseEntity *pSatchel = NULL;
 
-			while ( (pSatchel = gEntList.FindEntityByClassname( pSatchel, "monster_satchel" ) ) != NULL)
+			while ( (pSatchel = EntityList()->FindEntityByClassname( pSatchel, "monster_satchel" ) ) != NULL)
 			{
 				if ( pSatchel->GetOwnerEntity() == pPlayer )
 				{
@@ -453,7 +453,7 @@ LINK_ENTITY_TO_CLASS( monster_satchel, CSatchelCharge );
 void CSatchelCharge::Deactivate( void )
 {
 	GetEngineObject()->AddSolidFlags( FSOLID_NOT_SOLID );
-	gEntList.DestroyEntity( this );
+	EntityList()->DestroyEntity( this );
 }
 
 
@@ -546,7 +546,7 @@ void CSatchelCharge::SatchelThink( void )
 
 	if (!IsInWorld())
 	{
-		gEntList.DestroyEntity( this );
+		EntityList()->DestroyEntity( this );
 		return;
 	}
 

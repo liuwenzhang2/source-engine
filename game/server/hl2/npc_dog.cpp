@@ -778,7 +778,7 @@ void CNPC_Dog::InputStopCatchThrowBehavior( inputdata_t &inputdata )
 
 void CNPC_Dog::InputSetThrowTarget( inputdata_t &inputdata )
 {
-	m_hThrowTarget = gEntList.FindEntityByName( NULL, inputdata.value.String(), NULL, inputdata.pActivator, inputdata.pCaller );
+	m_hThrowTarget = EntityList()->FindEntityByName( NULL, inputdata.value.String(), NULL, inputdata.pActivator, inputdata.pCaller );
 }
 
 void CNPC_Dog::SetTurnActivity( void )
@@ -1001,7 +1001,7 @@ void CNPC_Dog::ClearBeams( void )
 	{
 		if ( m_hBeams[i] != NULL )
 		{
-			gEntList.DestroyEntity( m_hBeams[i] );
+			EntityList()->DestroyEntity( m_hBeams[i] );
 			m_hBeams[i] = NULL;
 		}
 	}
@@ -1014,7 +1014,7 @@ void CNPC_Dog::ClearSprites( void )
 	{
 		if ( m_hGlowSprites[i] != NULL )
 		{
-			gEntList.DestroyEntity( m_hGlowSprites[i] );
+			EntityList()->DestroyEntity( m_hGlowSprites[i] );
 			m_hGlowSprites[i] = NULL;
 		}
 	}
@@ -1090,7 +1090,7 @@ bool CNPC_Dog::FindPhysicsObject( const char *pPickupName, CBaseEntity *pIgnore 
 
 	if ( pPickupName != NULL && strlen( pPickupName ) > 0 )
 	{
-		pEnt = gEntList.FindEntityByName( NULL, pPickupName );
+		pEnt = EntityList()->FindEntityByName( NULL, pPickupName );
 		
 		if ( m_hUnreachableObjects.Find( pEnt ) == -1  )
 		{
@@ -1100,7 +1100,7 @@ bool CNPC_Dog::FindPhysicsObject( const char *pPickupName, CBaseEntity *pIgnore 
 		}
 	}
 	
-	while ( ( pEnt = gEntList.FindEntityByClassname( pEnt, "prop_physics" ) ) != NULL )
+	while ( ( pEnt = EntityList()->FindEntityByClassname( pEnt, "prop_physics" ) ) != NULL )
 	{
 		//We don't want this one.
 		if ( pEnt == pIgnore )

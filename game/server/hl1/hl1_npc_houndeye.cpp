@@ -969,7 +969,7 @@ int CNPC_Houndeye::SquadRecruit( int searchRadius, int maxMembers )
 	if ( m_SquadName != NULL_STRING )
 	{
 		// I have a netname, so unconditionally recruit everyone else with that name.
-		pEntity = gEntList.FindEntityByClassname( pEntity, "monster_houndeye" );
+		pEntity = EntityList()->FindEntityByClassname( pEntity, "monster_houndeye" );
 
 		while ( pEntity && squadCount < maxMembers )
 		{
@@ -988,7 +988,7 @@ int CNPC_Houndeye::SquadRecruit( int searchRadius, int maxMembers )
 				}
 			}
 
-			pEntity = gEntList.FindEntityByClassname( pEntity, "monster_houndeye" );
+			pEntity = EntityList()->FindEntityByClassname( pEntity, "monster_houndeye" );
 		}
 
 		return squadCount;

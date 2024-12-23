@@ -452,7 +452,7 @@ void CNPC_Advisor::Activate()
 	m_hvStagingPositions.EnsureCapacity(6); // reserve six
 
 	// conditional assignment: find an entity by name and save it into pEnt. Bail out when none are left.
-	while ( pEnt = gEntList.FindEntityByName(pEnt,m_iszStagingEntities) )
+	while ( pEnt = EntityList()->FindEntityByName(pEnt,m_iszStagingEntities) )
 	{
 		m_hvStagingPositions.AddToTail(pEnt);
 	}
@@ -686,7 +686,7 @@ void CNPC_Advisor::StartTask( const Task_t *pTask )
 
 					virtual IterationRetval_t EnumElement( IHandleEntity *pHandleEntity )
 					{
-						CBaseEntity *pEntity = gEntList.GetBaseEntity( pHandleEntity->GetRefEHandle() );
+						CBaseEntity *pEntity = EntityList()->GetBaseEntity( pHandleEntity->GetRefEHandle() );
 						if ( AdvisorCanLevitateEntity( pEntity, m_nMinMass, m_nMaxMass ) )
 						{
 							return CFlaggedEntitiesEnum::EnumElement( pHandleEntity );
@@ -1688,7 +1688,7 @@ void CNPC_Advisor::InputPinPlayer( inputdata_t &inputdata )
 	}
 
 	// otherwise try to look up the entity and make it a target.
-	CBaseEntity *pEnt = gEntList.FindEntityByName(NULL,targetname);
+	CBaseEntity *pEnt = EntityList()->FindEntityByName(NULL,targetname);
 
 	if (pEnt)
 	{
@@ -1746,7 +1746,7 @@ void CNPC_Advisor::InputWrenchImmediate( inputdata_t &inputdata )
 	const Vector &myPos = GetAbsOrigin() + Vector(0,36.0f,0);
 
 	// conditional assignment: find an entity by name and save it into pEnt. Bail out when none are left.
-	while ( ( pEnt = gEntList.FindEntityByName(pEnt,groupname) ) != NULL )
+	while ( ( pEnt = EntityList()->FindEntityByName(pEnt,groupname) ) != NULL )
 	{
 		// if I'm not already levitating it, and if I didn't just throw it
 		if (!m_physicsObjects.HasElement(pEnt) )
@@ -1829,7 +1829,7 @@ void CNPC_Advisor::Write_AllBeamsOff( void )
 void CNPC_Advisor::InputTurnBeamOn( inputdata_t &inputdata )
 {
 	// inputdata should specify a target
-	CBaseEntity *pTarget = gEntList.FindEntityByName( NULL, inputdata.value.StringID() );
+	CBaseEntity *pTarget = EntityList()->FindEntityByName( NULL, inputdata.value.StringID() );
 	if ( pTarget )
 	{
 		Write_BeamOn( pTarget );
@@ -1847,7 +1847,7 @@ void CNPC_Advisor::InputTurnBeamOn( inputdata_t &inputdata )
 void CNPC_Advisor::InputTurnBeamOff( inputdata_t &inputdata )
 {
 	// inputdata should specify a target
-	CBaseEntity *pTarget = gEntList.FindEntityByName( NULL, inputdata.value.StringID() );
+	CBaseEntity *pTarget = EntityList()->FindEntityByName( NULL, inputdata.value.StringID() );
 	if ( pTarget )
 	{
 		Write_BeamOff( pTarget );

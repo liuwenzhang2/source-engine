@@ -358,7 +358,7 @@ void CFogSystem::LevelInitPostEntity( void )
 	CFogController *pFogController = NULL;
 	do
 	{
-		pFogController = static_cast<CFogController*>( gEntList.FindEntityByClassname( pFogController, "env_fog_controller" ) );
+		pFogController = static_cast<CFogController*>( EntityList()->FindEntityByClassname( pFogController, "env_fog_controller" ) );
 		if ( pFogController )
 		{
 			if ( m_pMasterController == NULL )

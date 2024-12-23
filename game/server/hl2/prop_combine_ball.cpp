@@ -67,7 +67,7 @@ static const char *s_pRemoveContext = "RemoveContext";
 //-----------------------------------------------------------------------------
 CBaseEntity *CreateCombineBall( const Vector &origin, const Vector &velocity, float radius, float mass, float lifetime, CBaseEntity *pOwner )
 {
-	CPropCombineBall *pBall = static_cast<CPropCombineBall*>(gEntList.CreateEntityByName( "prop_combine_ball" ) );
+	CPropCombineBall *pBall = static_cast<CPropCombineBall*>(EntityList()->CreateEntityByName( "prop_combine_ball" ) );
 	pBall->SetRadius( radius );
 
 	pBall->GetEngineObject()->SetAbsOrigin( origin );
@@ -575,7 +575,7 @@ void CPropCombineBall::InputKill( inputdata_t &inputdata )
 		SetOwnerEntity( NULL );
 	}
 
-	gEntList.DestroyEntity( this );
+	EntityList()->DestroyEntity( this );
 
 	NotifySpawnerOfRemoval();
 }
@@ -600,7 +600,7 @@ void CPropCombineBall::InputSocketed( inputdata_t &inputdata )
 		pPlayer->CombineBallSocketed( this );
 	}
 
-	gEntList.DestroyEntity( this );
+	EntityList()->DestroyEntity( this );
 
 	NotifySpawnerOfRemoval();
 }
@@ -612,7 +612,7 @@ void CPropCombineBall::UpdateOnRemove()
 {
 	if ( m_pGlowTrail != NULL )
 	{
-		gEntList.DestroyEntity( m_pGlowTrail );
+		EntityList()->DestroyEntity( m_pGlowTrail );
 		m_pGlowTrail = NULL;
 	}
 
@@ -667,7 +667,7 @@ void CPropCombineBall::DieThink()
 		GetSpawner()->RespawnBall( 0.1 );
 	}
 
-	gEntList.DestroyEntity( this );
+	EntityList()->DestroyEntity( this );
 }
 
 
@@ -1795,7 +1795,7 @@ CFuncCombineBallSpawner::CFuncCombineBallSpawner()
 //-----------------------------------------------------------------------------
 void CFuncCombineBallSpawner::SpawnBall()
 {
-	CPropCombineBall *pBall = static_cast<CPropCombineBall*>(gEntList.CreateEntityByName( "prop_combine_ball" ) );
+	CPropCombineBall *pBall = static_cast<CPropCombineBall*>(EntityList()->CreateEntityByName( "prop_combine_ball" ) );
 
 	float flRadius = m_flBallRadius;
 	pBall->SetRadius( flRadius );
@@ -1849,7 +1849,7 @@ void CFuncCombineBallSpawner::Spawn()
 	if ( m_flRadius <= 0.0f && m_bShooter == false )
 	{
 		Warning("Zero dimension func_combine_ball_spawner! Removing...\n");
-		gEntList.DestroyEntity( this );
+		EntityList()->DestroyEntity( this );
 		return;
 	}
 
@@ -2169,7 +2169,7 @@ void CPointCombineBallLauncher::InputLaunchBall ( inputdata_t &inputdata )
 //-----------------------------------------------------------------------------
 void CPointCombineBallLauncher::SpawnBall()
 {
-	CPropCombineBall *pBall = static_cast<CPropCombineBall*>(gEntList.CreateEntityByName( "prop_combine_ball" ) );
+	CPropCombineBall *pBall = static_cast<CPropCombineBall*>(EntityList()->CreateEntityByName( "prop_combine_ball" ) );
 
 	if ( pBall == NULL )
 		 return;
@@ -2207,7 +2207,7 @@ void CPointCombineBallLauncher::SpawnBall()
 
 	if(GetEngineObject()->GetSpawnFlags() & SF_COMBINE_BALL_LAUNCHER_ATTACH_BULLSEYE )
 	{
-		CNPC_Bullseye *pBullseye = static_cast<CNPC_Bullseye*>(gEntList.CreateEntityByName( "npc_bullseye" ) );
+		CNPC_Bullseye *pBullseye = static_cast<CNPC_Bullseye*>(EntityList()->CreateEntityByName( "npc_bullseye" ) );
 
 		if( pBullseye )
 		{

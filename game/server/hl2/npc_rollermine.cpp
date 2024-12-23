@@ -449,7 +449,7 @@ CBaseEntity *NPC_Rollermine_DropFromPoint( const Vector &originStart, CBaseEntit
 	}
 	else
 	{
-		pMine = (CNPC_RollerMine*)gEntList.CreateEntityByName("npc_rollermine");
+		pMine = (CNPC_RollerMine*)EntityList()->CreateEntityByName("npc_rollermine");
 	}
 
 	if ( pMine )
@@ -934,7 +934,7 @@ int CNPC_RollerMine::GetHackedIdleSchedule( void )
 		return SCHED_NONE;
 
 	// Are we near the player?
-	CBaseEntity *pPlayer = gEntList.FindEntityByName( NULL, "!player" );
+	CBaseEntity *pPlayer = EntityList()->FindEntityByName( NULL, "!player" );
 	if ( !pPlayer )
 		return SCHED_NONE;
 
@@ -1566,7 +1566,7 @@ void CNPC_RollerMine::RunTask( const Task_t *pTask )
 				return;
 			}
 
-			CBaseEntity *pPlayer = gEntList.FindEntityByName( NULL, "!player" );
+			CBaseEntity *pPlayer = EntityList()->FindEntityByName( NULL, "!player" );
 			if ( !pPlayer || m_bHeld || m_hVehicleStuckTo )
 			{
 				TaskFail( FAIL_NO_TARGET );

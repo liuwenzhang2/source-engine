@@ -140,11 +140,11 @@ CHL1MPRules::CHL1MPRules()
 	{
 		// Create basic server teams
 
-		CTeam *pTeam = static_cast<CTeam*>(gEntList.CreateEntityByName( "team_manager" ));
+		CTeam *pTeam = static_cast<CTeam*>(EntityList()->CreateEntityByName( "team_manager" ));
 		pTeam->Init( "Unassigned", 0 );
 		g_Teams.AddToTail( pTeam );
 
-		pTeam = static_cast<CTeam*>(gEntList.CreateEntityByName( "team_manager" ));
+		pTeam = static_cast<CTeam*>(EntityList()->CreateEntityByName( "team_manager" ));
 		pTeam->Init( "Spectator", 1 );
 		g_Teams.AddToTail( pTeam );
 
@@ -164,7 +164,7 @@ CHL1MPRules::CHL1MPRules()
 			if ( GetTeamIndex( pName ) < 0 )
 			{
 				// create team
-				pTeam = static_cast<CTeam*>(gEntList.CreateEntityByName( "team_manager" ));
+				pTeam = static_cast<CTeam*>(EntityList()->CreateEntityByName( "team_manager" ));
 				pTeam->Init( pName, num_teams + 2 );
 				g_Teams.AddToTail( pTeam );
 
@@ -176,12 +176,12 @@ CHL1MPRules::CHL1MPRules()
 		// Manually create teams
 		if ( num_teams == 0 )
 		{
-			pTeam = static_cast<CTeam*>(gEntList.CreateEntityByName( "team_manager" ) );
+			pTeam = static_cast<CTeam*>(EntityList()->CreateEntityByName( "team_manager" ) );
 			pTeam->Init( "robo", num_teams + 2 );
 			g_Teams.AddToTail( pTeam );
 			num_teams++;
 
-			pTeam = static_cast<CTeam*>(gEntList.CreateEntityByName( "team_manager" ) );
+			pTeam = static_cast<CTeam*>(EntityList()->CreateEntityByName( "team_manager" ) );
 			pTeam->Init( "hgrunt", num_teams + 2 );
 			g_Teams.AddToTail( pTeam );
 			num_teams++;

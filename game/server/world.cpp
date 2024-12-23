@@ -90,7 +90,7 @@ void CDecal::Spawn( void )
 	if ( m_nTexture < 0 || 
 		(gpGlobals->deathmatch && GetEngineObject()->HasSpawnFlags( SF_DECAL_NOTINDEATHMATCH )) )
 	{
-		gEntList.DestroyEntity( this );
+		EntityList()->DestroyEntity( this );
 		return;
 	} 
 }
@@ -289,7 +289,7 @@ void CProjectedDecal::Spawn( void )
 	if ( m_nTexture < 0 || 
 		(gpGlobals->deathmatch && GetEngineObject()->HasSpawnFlags( SF_DECAL_NOTINDEATHMATCH )) )
 	{
-		gEntList.DestroyEntity( this );
+		EntityList()->DestroyEntity( this );
 		return;
 	} 
 }

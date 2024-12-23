@@ -262,11 +262,11 @@ void CHLTVDirector::BuildCameraList( void )
 	m_nNumFixedCameras = 0;
 	memset( m_pFixedCameras, 0, sizeof ( m_pFixedCameras ) );
 
-	CBaseEntity *pCamera = gEntList.FindEntityByClassname( NULL, GetFixedCameraEntityName() );
+	CBaseEntity *pCamera = EntityList()->FindEntityByClassname( NULL, GetFixedCameraEntityName() );
 
 	while ( pCamera && m_nNumFixedCameras < MAX_NUM_CAMERAS)
 	{
-		CBaseEntity *pTarget = gEntList.FindEntityByName( NULL, STRING(pCamera->m_target) );
+		CBaseEntity *pTarget = EntityList()->FindEntityByName( NULL, STRING(pCamera->m_target) );
 
 		if ( pTarget )
 		{
@@ -279,7 +279,7 @@ void CHLTVDirector::BuildCameraList( void )
 		m_pFixedCameras[m_nNumFixedCameras] = pCamera;
 
 		m_nNumFixedCameras++;
-		pCamera = gEntList.FindEntityByClassname( pCamera, GetFixedCameraEntityName() );
+		pCamera = EntityList()->FindEntityByClassname( pCamera, GetFixedCameraEntityName() );
 	}
 }
 

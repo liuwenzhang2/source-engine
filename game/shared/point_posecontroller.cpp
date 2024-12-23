@@ -104,7 +104,7 @@ void CPoseController::Think( void )
 void CPoseController::BuildPropList( void )
 {
 	int iPropNum = 0;
-	CBaseEntity *pEnt = gEntList.FindEntityByName( NULL, m_iszPropName );
+	CBaseEntity *pEnt = EntityList()->FindEntityByName( NULL, m_iszPropName );
 
 	while ( pEnt && iPropNum < MAX_POSE_CONTROLLED_PROPS )
 	{
@@ -128,7 +128,7 @@ void CPoseController::BuildPropList( void )
 		}
 
 		// Get the next entity with specified targetname
-		pEnt = gEntList.FindEntityByName( pEnt, m_iszPropName );
+		pEnt = EntityList()->FindEntityByName( pEnt, m_iszPropName );
 	}
 
 	// Nullify the remaining handles

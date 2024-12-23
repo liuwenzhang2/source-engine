@@ -264,7 +264,7 @@ CSceneManager *GetSceneManager()
 	static CHandle< CSceneManager >	s_SceneManager;
 	if ( s_SceneManager == NULL )
 	{
-		s_SceneManager = ( CSceneManager * )gEntList.CreateEntityByName( "scene_manager" );
+		s_SceneManager = ( CSceneManager * )EntityList()->CreateEntityByName( "scene_manager" );
 		Assert( s_SceneManager );
 		if ( s_SceneManager )
 		{
@@ -3578,10 +3578,10 @@ CBaseEntity *CSceneEntity::FindNamedTarget( string_t iszTarget, bool bBaseFlexOn
 
 	// If we don't have a wildcard in the target, just return the first entity found
 	if ( !strchr( STRING(iszTarget), '*' ) )
-		return gEntList.FindEntityByName( NULL, iszTarget );
+		return EntityList()->FindEntityByName( NULL, iszTarget );
 
 	CBaseEntity *pTarget = NULL;
-	while ( (pTarget = gEntList.FindEntityByName( pTarget, iszTarget )) != NULL )
+	while ( (pTarget = EntityList()->FindEntityByName( pTarget, iszTarget )) != NULL )
 	{
 		if ( bBaseFlexOnly )
 		{
@@ -3839,7 +3839,7 @@ CBaseEntity *CSceneEntity::FindNamedEntity( const char *name, CBaseEntity *pActo
 		entity = NULL;
 		for( iCount = 0; iCount < FINDNAMEDENTITY_MAX_ENTITIES; iCount++ )
 		{
-			entity = gEntList.FindEntityByName( entity, name, NULL, pActor );
+			entity = EntityList()->FindEntityByName( entity, name, NULL, pActor );
 			if ( !entity )
 			{
 				break;
@@ -3949,7 +3949,7 @@ CBaseEntity *CSceneEntity::FindNamedEntityClosest( const char *name, CBaseEntity
 		CBaseEntity *current = NULL;
 		for( iCount = 0; iCount < FINDNAMEDENTITY_MAX_ENTITIES; iCount++ )
 		{
-			current = gEntList.FindEntityByName( current, name, NULL, pActor );
+			current = EntityList()->FindEntityByName( current, name, NULL, pActor );
 			if ( current )
 			{
 				if (RandomInt( 0, iCount ) == 0)
@@ -4115,8 +4115,8 @@ void scene_interrupt( const CCommand &args )
 	const char *scene1 = args[1];
 	const char *scene2 = args[2];
 
-	CSceneEntity *s1 = dynamic_cast< CSceneEntity * >( gEntList.FindEntityByName( NULL, scene1 ) );
-	CSceneEntity *s2 = dynamic_cast< CSceneEntity * >( gEntList.FindEntityByName( NULL, scene2 ) );
+	CSceneEntity *s1 = dynamic_cast< CSceneEntity * >( EntityList()->FindEntityByName( NULL, scene1 ) );
+	CSceneEntity *s2 = dynamic_cast< CSceneEntity * >( EntityList()->FindEntityByName( NULL, scene2 ) );
 
 	if ( !s1 || !s2 )
 		return;
@@ -4359,7 +4359,7 @@ int CSceneEntity::ShouldTransmit( const CCheckTransmitInfo *pInfo )
 		{
 			int iRecipient = m_pRecipientFilter->GetRecipientIndex(i);
 
-			CBasePlayer *player = static_cast< CBasePlayer * >( gEntList.GetBaseEntity( iRecipient ) );
+			CBasePlayer *player = static_cast< CBasePlayer * >(EntityList()->GetBaseEntity( iRecipient ) );
 
 			if ( player && player->entindex() == pInfo->m_pClientEnt )
 			{
@@ -4696,7 +4696,7 @@ void CInstancedSceneEntity::DoThink( float frametime )
 
 	if ( !m_pScene || !m_bIsPlayingBack || ( m_bHadOwner && m_hOwner == NULL ) )
 	{
-		gEntList.DestroyEntity( this );
+		EntityList()->DestroyEntity( this );
 		return;
 	}
 
@@ -4724,7 +4724,7 @@ void CInstancedSceneEntity::DoThink( float frametime )
 	{
 		OnSceneFinished( false, false );
 
-		gEntList.DestroyEntity( this );
+		EntityList()->DestroyEntity( this );
 	}
 }
 
@@ -4825,7 +4825,7 @@ void CInstancedSceneEntity::OnRestore()
 	if ( m_bHadOwner && !m_hOwner )
 	{
 		// probably just came back from a level transition
-		gEntList.DestroyEntity( this );
+		EntityList()->DestroyEntity( this );
 		return;
 	}
 	// reset background state
@@ -5015,7 +5015,7 @@ void CSceneManager::RemoveScenesInvolvingActor( CBaseFlex *pActor )
 					}
 
 					LocalScene_Printf( "%s : removed for '%s'\n", STRING( pInstancedScene->m_iszSceneFile ), pActor ? pActor->GetDebugName() : "NULL" );
-					gEntList.DestroyEntity( pInstancedScene );
+					EntityList()->DestroyEntity( pInstancedScene );
 				}
 			}
 		}
@@ -5427,7 +5427,7 @@ void CSceneListManager::Activate( void )
 		{
 			if ( m_iszScenes[i] != NULL_STRING )
 			{
-				m_hScenes[i] = gEntList.FindEntityByName( NULL, STRING(m_iszScenes[i]) );
+				m_hScenes[i] = EntityList()->FindEntityByName( NULL, STRING(m_iszScenes[i]) );
 				if ( m_hScenes[i] )
 				{
 					CSceneEntity *pScene = dynamic_cast<CSceneEntity*>(m_hScenes[i].Get());
@@ -5530,7 +5530,7 @@ void CSceneListManager::ShutdownList( void )
 		}
 	}
 
-	gEntList.DestroyEntity( this );
+	EntityList()->DestroyEntity( this );
 }
 
 //-----------------------------------------------------------------------------
@@ -5542,7 +5542,7 @@ void CSceneListManager::RemoveScene( int iIndex )
 	if ( pScene )
 	{
 		// Remove the scene
-		gEntList.DestroyEntity( pScene );
+		EntityList()->DestroyEntity( pScene );
 		return;
 	}
 

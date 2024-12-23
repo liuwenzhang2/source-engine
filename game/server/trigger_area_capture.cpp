@@ -1004,7 +1004,7 @@ void CTriggerAreaCapture::InputRoundSpawn( inputdata_t &inputdata )
 	// find the flag we're linked to
 	if( !m_hPoint )
 	{
-		m_hPoint = dynamic_cast<CTeamControlPoint*>( gEntList.FindEntityByName(NULL, STRING(m_iszCapPointName) ) );
+		m_hPoint = dynamic_cast<CTeamControlPoint*>( EntityList()->FindEntityByName(NULL, STRING(m_iszCapPointName) ) );
 
 		if ( m_hPoint )
 		{

@@ -570,7 +570,7 @@ const QAngle &CSpriteTrail::GetRenderAngles( void )
 //-----------------------------------------------------------------------------
 CSpriteTrail *CSpriteTrail::SpriteTrailCreate( const char *pSpriteName, const Vector &origin, bool animate )
 {
-	CSpriteTrail *pSprite = (CSpriteTrail*)gEntList.CreateEntityByName( "env_spritetrail" );
+	CSpriteTrail *pSprite = (CSpriteTrail*)EntityList()->CreateEntityByName( "env_spritetrail" );
 
 	pSprite->SpriteInit( pSpriteName, origin );
 	pSprite->GetEngineObject()->SetSolid( SOLID_NONE );
@@ -592,7 +592,7 @@ CSpriteTrail *CSpriteTrail::SpriteTrailCreate( const char *pSpriteName, const Ve
 
 int CSpriteTrail::ShouldTransmit( const CCheckTransmitInfo *pInfo )
 {
-	CBaseEntity *pRecipientEntity = gEntList.GetBaseEntity( pInfo->m_pClientEnt );
+	CBaseEntity *pRecipientEntity = EntityList()->GetBaseEntity( pInfo->m_pClientEnt );
 
 	Assert( pRecipientEntity->IsPlayer() );
 

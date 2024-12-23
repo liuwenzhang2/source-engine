@@ -695,7 +695,7 @@ void CNPC_Strider::Activate()
 	if ( gm_zCannonDist == 0 )
 	{
 		// Have to create a virgin strider to ensure proper pose
-		CNPC_Strider *pStrider = (CNPC_Strider *)gEntList.CreateEntityByName( "npc_strider" );
+		CNPC_Strider *pStrider = (CNPC_Strider *)EntityList()->CreateEntityByName( "npc_strider" );
 		Assert(pStrider);
 		pStrider->m_bDisableBoneFollowers = true; // don't create these since we're just going to destroy him
 		DispatchSpawn( pStrider );
@@ -715,7 +715,7 @@ void CNPC_Strider::Activate()
 
 		pStrider->GetEngineObject()->GetAttachment( "minigun", position );
 		VectorITransform( position, pStrider->GetEngineObject()->EntityToWorldTransform(), gm_vLocalRelativePositionMinigun );
-		gEntList.DestroyEntity( pStrider );
+		EntityList()->DestroyEntity( pStrider );
 	}
 }
 
@@ -930,7 +930,7 @@ void CNPC_Strider::PrescheduleThink()
 	// Next missile will kill me!
 	if( GetHealth() <= 50 && random->RandomInt( 0, 20 ) == 0 )
 	{
-		CBaseEntity *pTrail = gEntList.CreateEntityByName( "sparktrail" );
+		CBaseEntity *pTrail = (CBaseEntity*)EntityList()->CreateEntityByName( "sparktrail" );
 		pTrail->SetOwnerEntity( this );
 		pTrail->Spawn();
 	}
@@ -1770,7 +1770,7 @@ void CNPC_Strider::RunTask( const Task_t *pTask )
 				FixupBurningServerRagdoll(pRagdoll);
 				PhysSetEntityGameFlags(pRagdoll, FVPHYSICS_NO_SELF_COLLISIONS);
 				TaskComplete();
-				gEntList.DestroyEntity(this);
+				EntityList()->DestroyEntity(this);
 			}
 		}
 		break;
@@ -2068,7 +2068,7 @@ void CNPC_Strider::InputSetMinigunTime( inputdata_t &inputdata )
 //---------------------------------------------------------
 void CNPC_Strider::InputSetMinigunTarget( inputdata_t &inputdata )
 {
-	CBaseEntity *pTargetEntity = gEntList.FindEntityByName( NULL, inputdata.value.String(), NULL, inputdata.pActivator, inputdata.pCaller );
+	CBaseEntity *pTargetEntity = EntityList()->FindEntityByName( NULL, inputdata.value.String(), NULL, inputdata.pActivator, inputdata.pCaller );
 
 	m_pMinigun->StopShootingForSeconds( this, m_pMinigun->GetTarget(), 0 );
 	m_pMinigun->ShootAtTarget( this, pTargetEntity, m_miniGunShootDuration );
@@ -2079,7 +2079,7 @@ void CNPC_Strider::InputSetMinigunTarget( inputdata_t &inputdata )
 //---------------------------------------------------------
 void CNPC_Strider::InputSetCannonTarget( inputdata_t &inputdata )
 {
-	CBaseEntity *pTarget = gEntList.FindEntityByName( NULL, inputdata.value.String(), NULL, inputdata.pActivator, inputdata.pCaller );
+	CBaseEntity *pTarget = EntityList()->FindEntityByName( NULL, inputdata.value.String(), NULL, inputdata.pActivator, inputdata.pCaller );
 
 	if ( pTarget )
 	{
@@ -2859,7 +2859,7 @@ bool CNPC_Strider::CanShootThrough( const trace_t &tr, const Vector &vecTarget )
 //---------------------------------------------------------
 void CNPC_Strider::CreateFocus()
 {
-	m_hFocus = gEntList.CreateEntityByName( "bullseye_strider_focus" );
+	m_hFocus = (CBaseEntity*)EntityList()->CreateEntityByName( "bullseye_strider_focus" );
 
 	ASSERT( m_hFocus != NULL );
 	m_hFocus->GetEngineObject()->AddSpawnFlags( SF_BULLSEYE_NONSOLID | SF_BULLSEYE_NODAMAGE );
@@ -3432,7 +3432,7 @@ bool CNPC_Strider::BecomeRagdoll( const CTakeDamageInfo &info, const Vector &for
 			if ( maxRagdolls > 0 )
 			{
 				CUtlVectorFixed<CRagdollProp *, 2> striderRagdolls;
-				while ( ( pRagdoll = gEntList.NextEntByClass( pRagdoll ) ) != NULL )
+				while ( ( pRagdoll = NextEntByClass( pRagdoll ) ) != NULL )
 				{
 					if ( pRagdoll->GetEngineObject()->GetModelName() == GetEngineObject()->GetModelName() && !pRagdoll->IsFading() )
 					{
@@ -3487,7 +3487,7 @@ bool CNPC_Strider::BecomeRagdoll( const CTakeDamageInfo &info, const Vector &for
 		}
 	}
 	
-	gEntList.DestroyEntity(this);
+	EntityList()->DestroyEntity(this);
 
 	return true; 
 }
@@ -3767,7 +3767,7 @@ bool CNPC_Strider::HasPendingTargetPath()
 void CNPC_Strider::SetTargetPath()
 {
 	SetGoalEnt( NULL );
-	CBaseEntity *pGoalEnt = gEntList.FindEntityByName( NULL, m_strTrackName );
+	CBaseEntity *pGoalEnt = EntityList()->FindEntityByName( NULL, m_strTrackName );
 	if ( pGoalEnt == NULL )
 	{
 		DevWarning( "%s: Could not find target path '%s'!\n", GetClassname(), STRING( m_strTrackName ) );
@@ -3775,7 +3775,7 @@ void CNPC_Strider::SetTargetPath()
 		// Don't try anymore. It just hurts the AI.
 		m_strTrackName = MAKE_STRING( STRIDER_NO_TRACK_NAME );
 
-		gEntList.DestroyEntity( this );
+		EntityList()->DestroyEntity( this );
 		return;
 	}
 
@@ -4458,7 +4458,7 @@ void CNPC_Strider::StompHit( int followerBoneIndex )
 
 		m_hRagdoll = pRagdoll;
 		m_ragdollTime = gpGlobals->curtime + 10;
-		gEntList.DestroyEntity( pNPC );
+		EntityList()->DestroyEntity( pNPC );
 	}
 }
 
@@ -4543,13 +4543,13 @@ void AdjustStriderNodePosition( CAI_Network *pNetwork, CAI_Node *pNode )
 {
 	if ( pNode->GetHint() && pNode->GetHint()->HintType() == HINT_STRIDER_NODE )
 	{
-		CNPC_Strider *pStrider = (CNPC_Strider *)gEntList.FindEntityByClassname( NULL, "npc_strider" );
+		CNPC_Strider *pStrider = (CNPC_Strider *)EntityList()->FindEntityByClassname( NULL, "npc_strider" );
 		bool bCreated = false;
 		if ( !pStrider )
 		{
 			bool allowPrecache = engine->IsPrecacheAllowed();//CBaseEntity::
 			engine->SetAllowPrecache( true );//CBaseEntity::
-			pStrider = (CNPC_Strider *)gEntList.CreateEntityByName( "npc_strider" );
+			pStrider = (CNPC_Strider *)EntityList()->CreateEntityByName( "npc_strider" );
 			pStrider->m_bDisableBoneFollowers = true; // don't create these since we're just going to destroy him
 			DispatchSpawn( pStrider );
 			engine->SetAllowPrecache( allowPrecache );//CBaseEntity::
@@ -4560,7 +4560,7 @@ void AdjustStriderNodePosition( CAI_Network *pNetwork, CAI_Node *pNode )
 		{
 			pStrider->TranslateNavGoal( NULL, pNode->AccessOrigin() );
 			if ( bCreated )
-				gEntList.DestroyEntity( pStrider );
+				EntityList()->DestroyEntity( pStrider );
 		}
 	}
 }
@@ -5510,7 +5510,7 @@ void CSparkTrail::SparkThink()
 
 	if( m_iHealth-- < 1 )
 	{
-		gEntList.DestroyEntity( this );
+		EntityList()->DestroyEntity( this );
 	}
 }
 

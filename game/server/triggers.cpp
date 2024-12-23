@@ -53,7 +53,7 @@ bool IsTriggerClass( CBaseEntity *pEntity );
 void Cmd_ShowtriggersToggle_f( const CCommand &args )
 {
 	// Loop through the entities in the game and make visible anything derived from CBaseTrigger
-	CBaseEntity *pEntity = gEntList.FirstEnt();
+	CBaseEntity *pEntity = EntityList()->FirstEnt();
 	while ( pEntity )
 	{
 		if ( IsTriggerClass(pEntity) )
@@ -66,7 +66,7 @@ void Cmd_ShowtriggersToggle_f( const CCommand &args )
 				{
 					if ( !FClassnameIs( pEntity, sClassname ) )
 					{
-						pEntity = gEntList.NextEnt( pEntity );
+						pEntity = EntityList()->NextEnt( pEntity );
 						continue;
 					}
 				}
@@ -82,7 +82,7 @@ void Cmd_ShowtriggersToggle_f( const CCommand &args )
 			}
 		}
 
-		pEntity = gEntList.NextEnt( pEntity );
+		pEntity = EntityList()->NextEnt( pEntity );
 	}
 }
 
@@ -216,7 +216,7 @@ void CBaseTrigger::Activate( void )
 	// Get a handle to my filter entity if there is one
 	if (m_iFilterName != NULL_STRING)
 	{
-		m_hFilter = dynamic_cast<CBaseFilter *>(gEntList.FindEntityByName( NULL, m_iFilterName ));
+		m_hFilter = dynamic_cast<CBaseFilter *>(EntityList()->FindEntityByName( NULL, m_iFilterName ));
 	}
 
 	BaseClass::Activate();
@@ -625,7 +625,7 @@ void CTriggerRemove::Touch( CBaseEntity *pOther )
 	if (!PassesTriggerFilters(pOther))
 		return;
 
-	gEntList.DestroyEntity( pOther );
+	EntityList()->DestroyEntity( pOther );
 }
 
 
@@ -812,7 +812,7 @@ int CTriggerHurt::HurtAllTouchers( float dt )
 	{
 		for ( servertouchlink_t *link = root->nextLink; link != root; link = link->nextLink )
 		{
-			CBaseEntity *pTouch = (CBaseEntity*)gEntList.GetServerEntityFromHandle(link->entityTouched);
+			CBaseEntity *pTouch = EntityList()->GetBaseEntityFromHandle(link->entityTouched);
 			if ( pTouch )
 			{
 				if ( HurtEntity( pTouch, fldmg ) )
@@ -1399,7 +1399,7 @@ void CChangeLevel::Activate( void )
 		ConVarRef g_debug_transitions("g_debug_transitions");
 		if ( g_debug_transitions.GetInt() )
 		{
-			if ( !gEntList.FindEntityByClassname( NULL, "trigger_transition" ) )
+			if ( !EntityList()->FindEntityByClassname( NULL, "trigger_transition" ) )
 			{
 				Warning( "Map has no trigger_transition volumes for landmark %s\n", m_szLandmarkName );
 			}
@@ -1428,7 +1428,7 @@ void CChangeLevel::InputChangeLevel( inputdata_t &inputdata )
 
 void CChangeLevel::NotifyEntitiesOutOfTransition()
 {
-	CBaseEntity *pEnt = gEntList.FirstEnt();
+	CBaseEntity *pEnt = EntityList()->FirstEnt();
 	while ( pEnt )
 	{
 		// Found the landmark
@@ -1444,7 +1444,7 @@ void CChangeLevel::NotifyEntitiesOutOfTransition()
 				pEnt->AcceptInput( "InsideTransition", this, this, emptyVariant, 0 );
 			}
 		}
-		pEnt = gEntList.NextEnt( pEnt );
+		pEnt = EntityList()->NextEnt( pEnt );
 	}
 }
 
@@ -1705,7 +1705,7 @@ void CTriggerPush::Touch( CBaseEntity *pOther )
 		{
 			pOther->GetEngineObject()->SetGroundEntity( NULL );
 		}
-		gEntList.DestroyEntity( this );
+		EntityList()->DestroyEntity( this );
 		return;
 	}
 
@@ -1829,7 +1829,7 @@ void CTriggerTeleport::Touch( CBaseEntity *pOther )
 	}
 
 	// The activator and caller are the same
-	pentTarget = gEntList.FindEntityByName( pentTarget, m_target, NULL, pOther, pOther );
+	pentTarget = EntityList()->FindEntityByName( pentTarget, m_target, NULL, pOther, pOther );
 	if (!pentTarget)
 	{
 	   return;
@@ -1843,7 +1843,7 @@ void CTriggerTeleport::Touch( CBaseEntity *pOther )
 	if (m_iLandmark != NULL_STRING)
 	{
 		// The activator and caller are the same
-		pentLandmark = gEntList.FindEntityByName(pentLandmark, m_iLandmark, NULL, pOther, pOther );
+		pentLandmark = EntityList()->FindEntityByName(pentLandmark, m_iLandmark, NULL, pOther, pOther );
 		if (pentLandmark)
 		{
 			vecLandmarkOffset = pOther->GetEngineObject()->GetAbsOrigin() - pentLandmark->GetEngineObject()->GetAbsOrigin();
@@ -1932,7 +1932,7 @@ void CTriggerToggleSave::Spawn( void )
 {
 	if ( g_pGameRules->IsDeathmatch() )
 	{
-		gEntList.DestroyEntity( this );
+		EntityList()->DestroyEntity( this );
 		return;
 	}
 
@@ -1996,7 +1996,7 @@ void CTriggerSave::Spawn( void )
 
 	if ( g_pGameRules->IsDeathmatch() )
 	{
-		gEntList.DestroyEntity( this );
+		EntityList()->DestroyEntity( this );
 		return;
 	}
 
@@ -2034,7 +2034,7 @@ void CTriggerSave::Touch( CBaseEntity *pOther )
 	{
 		engine->ClearSaveDir();
 	}
-	gEntList.DestroyEntity( this );
+	EntityList()->DestroyEntity( this );
 
 	if ( m_fDangerousTimer != 0.0f )
 	{
@@ -2121,7 +2121,7 @@ void CAI_ChangeTarget::InputActivate( inputdata_t &inputdata )
 {
 	CBaseEntity *pTarget = NULL;
 
-	while ((pTarget = gEntList.FindEntityByName( pTarget, m_target, NULL, inputdata.pActivator, inputdata.pCaller )) != NULL)
+	while ((pTarget = EntityList()->FindEntityByName( pTarget, m_target, NULL, inputdata.pActivator, inputdata.pCaller )) != NULL)
 	{
 		pTarget->m_target = m_iszNewTarget;
 		CAI_BaseNPC *pNPC = pTarget->MyNPCPointer( );
@@ -2548,7 +2548,7 @@ void CTriggerCamera::Enable( void )
 
 	if ( m_sPath != NULL_STRING )
 	{
-		m_pPath = gEntList.FindEntityByName( NULL, m_sPath, NULL, m_hPlayer );
+		m_pPath = EntityList()->FindEntityByName( NULL, m_sPath, NULL, m_hPlayer );
 	}
 	else
 	{
@@ -2946,7 +2946,7 @@ void CTriggerCDAudio::PlayTrack( void )
 	PlayCDTrack( (int)m_iHealth );
 	
 	SetTouch( NULL );
-	gEntList.DestroyEntity( this );
+	EntityList()->DestroyEntity( this );
 }
 
 
@@ -3026,7 +3026,7 @@ void CTriggerProximity::Spawn(void)
 void CTriggerProximity::Activate(void)
 {
 	BaseClass::Activate();
-	m_hMeasureTarget = gEntList.FindEntityByName(NULL, m_iszMeasureTarget );
+	m_hMeasureTarget = EntityList()->FindEntityByName(NULL, m_iszMeasureTarget );
 
 	//
 	// Disable our Touch function if we were given a bad measure target.
@@ -3106,7 +3106,7 @@ void CTriggerProximity::MeasureThink( void )
 		servertouchlink_t *pLink = root->nextLink;
 		while (pLink && pLink != root)
 		{
-			CBaseEntity *pEntity = (CBaseEntity*)gEntList.GetServerEntityFromHandle(pLink->entityTouched);
+			CBaseEntity *pEntity = EntityList()->GetBaseEntityFromHandle(pLink->entityTouched);
 
 			// If this is an entity that we care about, check its distance.
 			if ( ( pEntity != NULL ) && PassesTriggerFilters( pEntity ) )
@@ -3788,7 +3788,7 @@ void CBaseVPhysicsTrigger::Activate( void )
 	// Get a handle to my filter entity if there is one
 	if (m_iFilterName != NULL_STRING)
 	{
-		m_hFilter = dynamic_cast<CBaseFilter *>(gEntList.FindEntityByName( NULL, m_iFilterName ));
+		m_hFilter = dynamic_cast<CBaseFilter *>(EntityList()->FindEntityByName( NULL, m_iFilterName ));
 	}
 
 	BaseClass::Activate();

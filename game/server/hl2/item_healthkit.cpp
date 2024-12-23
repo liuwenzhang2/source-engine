@@ -84,7 +84,7 @@ bool CHealthKit::MyTouch( CBasePlayer *pPlayer )
 		}
 		else
 		{
-			gEntList.DestroyEntity(this);	
+			EntityList()->DestroyEntity(this);	
 		}
 
 		return true;
@@ -137,7 +137,7 @@ public:
 			}
 			else
 			{
-				gEntList.DestroyEntity(this);	
+				EntityList()->DestroyEntity(this);	
 			}
 
 			return true;

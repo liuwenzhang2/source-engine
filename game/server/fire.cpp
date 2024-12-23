@@ -239,7 +239,7 @@ bool CFireSphere::AddToList( CFire *pFire )
 
 IterationRetval_t CFireSphere::EnumElement( IHandleEntity *pHandleEntity )
 {
-	CBaseEntity *pEntity = gEntList.GetBaseEntity( pHandleEntity->GetRefEHandle() );
+	CBaseEntity *pEntity = EntityList()->GetBaseEntityFromHandle( pHandleEntity->GetRefEHandle() );
 	if ( pEntity )
 	{
 		// UNDONE: Measure which of these is faster
@@ -408,7 +408,7 @@ bool FireSystem_StartFire( const Vector &position, float fireHeight, float attac
 	}
 
 	//Create a new fire entity
-	CFire *fire = (CFire *)gEntList.CreateEntityByName( "env_fire" );
+	CFire *fire = (CFire *)EntityList()->CreateEntityByName( "env_fire" );
 	
 	if ( fire == NULL )
 		return false;
@@ -458,7 +458,7 @@ bool FireSystem_StartFire( CBaseAnimating *pEntity, float fireHeight, float atta
 	}
 
 	// Create a new fire entity
-	CFire *fire = (CFire *)gEntList.CreateEntityByName( "env_fire" );
+	CFire *fire = (CFire *)EntityList()->CreateEntityByName( "env_fire" );
 	if ( fire == NULL )
 	{
 		return false;
@@ -785,7 +785,7 @@ void CFire::SpawnEffect( fireType_e type, float scale )
 	default:
 	case FIRE_NATURAL:
 		{
-			CFireSmoke	*fireSmoke = (CFireSmoke *)gEntList.CreateEntityByName( "_firesmoke" );
+			CFireSmoke	*fireSmoke = (CFireSmoke *)EntityList()->CreateEntityByName( "_firesmoke" );
 			fireSmoke->EnableSmoke( (GetEngineObject()->GetSpawnFlags() & SF_FIRE_SMOKELESS) == false);
 			fireSmoke->EnableGlow( (GetEngineObject()->GetSpawnFlags() & SF_FIRE_NO_GLOW) == false);
 			fireSmoke->EnableVisibleFromAbove( (GetEngineObject()->GetSpawnFlags() & SF_FIRE_VISIBLE_FROM_ABOVE) != false);
@@ -798,7 +798,7 @@ void CFire::SpawnEffect( fireType_e type, float scale )
 
 	case FIRE_PLASMA:
 		{
-			CPlasma	*plasma = (CPlasma *)gEntList.CreateEntityByName( "_plasma" );
+			CPlasma	*plasma = (CPlasma *)EntityList()->CreateEntityByName( "_plasma" );
 			plasma->EnableSmoke( true );
 		
 			pEffect			= plasma;
@@ -1070,7 +1070,7 @@ void CFire::DestroyEffect()
 	{
 		//disable the graphics and remove the entity
 		pEffect->Enable( false );
-		gEntList.DestroyEntity( pEffect );
+		EntityList()->DestroyEntity( pEffect );
 	}
 }
 //-----------------------------------------------------------------------------
@@ -1213,7 +1213,7 @@ bool CFire::GoOut()
 	GetEngineObject()->SetNextThink( TICK_NEVER_THINK );
 	if (GetEngineObject()->GetSpawnFlags() & SF_FIRE_DIE_PERMANENT)
 	{
-		gEntList.DestroyEntity( this );
+		EntityList()->DestroyEntity( this );
 		return true;
 	}
 	SetToOutSize();

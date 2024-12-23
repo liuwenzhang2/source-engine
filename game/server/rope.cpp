@@ -134,7 +134,7 @@ CRopeKeyframe* CRopeKeyframe::Create(
 	int numSegments
 	)
 {
-	CRopeKeyframe *pRet = (CRopeKeyframe*)gEntList.CreateEntityByName( "keyframe_rope" );
+	CRopeKeyframe *pRet = (CRopeKeyframe*)EntityList()->CreateEntityByName( "keyframe_rope" );
 	if( !pRet )
 		return NULL;
 
@@ -163,7 +163,7 @@ CRopeKeyframe* CRopeKeyframe::CreateWithSecondPointDetached(
 	bool bInitialHang
 	)
 {
-	CRopeKeyframe *pRet = (CRopeKeyframe*)gEntList.CreateEntityByName( "keyframe_rope" );
+	CRopeKeyframe *pRet = (CRopeKeyframe*)EntityList()->CreateEntityByName( "keyframe_rope" );
 	if( !pRet )
 		return NULL;
 
@@ -212,7 +212,7 @@ void CRopeKeyframe::Activate()
 		GetEngineRope()->SetRopeMaterialModelIndex(engine->PrecacheModel( "cable/cable.vmt" ));
 
 	// Find the next entity in our chain.
-	CBaseEntity *pEnt = gEntList.FindEntityByName( NULL, m_iNextLinkName );
+	CBaseEntity *pEnt = EntityList()->FindEntityByName( NULL, m_iNextLinkName );
 	if( pEnt && pEnt->entindex()!=-1 )
 	{
 		GetEngineRope()->SetEndPoint( pEnt );
@@ -327,7 +327,7 @@ bool CRopeKeyframe::Break( void )
 	// Find whoever references us and detach us from them.
 	// UNDONE: PERFORMANCE: This is very slow!!!
 	CRopeKeyframe *pTest = NULL;
-	pTest = gEntList.NextEntByClass( pTest );
+	pTest = NextEntByClass( pTest );
 	while ( pTest )
 	{
 		if( stricmp( STRING(pTest->m_iNextLinkName), STRING(GetEntityName()) ) == 0 )
@@ -335,7 +335,7 @@ bool CRopeKeyframe::Break( void )
 			pTest->GetEngineRope()->DetachPoint( 1 );
 		}
 	
-		pTest = gEntList.NextEntByClass( pTest );
+		pTest = NextEntByClass( pTest );
 	}
 
 	return true;

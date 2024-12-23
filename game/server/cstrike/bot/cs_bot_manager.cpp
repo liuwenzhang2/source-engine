@@ -1345,7 +1345,7 @@ void CCSBotManager::ExtractScenarioData( void )
 	int i;
 	for( i=1; i<gpGlobals->maxEntities; ++i )
 	{
-		entity = gEntList.GetBaseEntity( i );
+		entity = EntityList()->GetBaseEntity( i );
 
 		if (entity == NULL)
 			continue;
@@ -1415,9 +1415,9 @@ void CCSBotManager::ExtractScenarioData( void )
 	//
 	if (m_zoneCount == 0 && m_gameScenario == SCENARIO_RESCUE_HOSTAGES)
 	{
-		for( entity = gEntList.FindEntityByClassname( NULL, "info_player_start" );
+		for( entity = EntityList()->FindEntityByClassname( NULL, "info_player_start" );
 			 entity && entity->entindex()>0;
-			 entity = gEntList.FindEntityByClassname( entity, "info_player_start" ) )
+			 entity = EntityList()->FindEntityByClassname( entity, "info_player_start" ) )
 		{
 			if (m_zoneCount < MAX_ZONES)
 			{
@@ -1786,10 +1786,10 @@ static CBaseEntity * SelectSpawnSpot( const char *pEntClassName )
 	CBaseEntity* pSpot = NULL;
 
 	// Find the next spawn spot.
-	pSpot = gEntList.FindEntityByClassname( pSpot, pEntClassName );
+	pSpot = EntityList()->FindEntityByClassname( pSpot, pEntClassName );
 
 	if ( pSpot == NULL ) // skip over the null point
-		pSpot = gEntList.FindEntityByClassname( pSpot, pEntClassName );
+		pSpot = EntityList()->FindEntityByClassname( pSpot, pEntClassName );
 
 	CBaseEntity *pFirstSpot = pSpot;
 	do 
@@ -1799,7 +1799,7 @@ static CBaseEntity * SelectSpawnSpot( const char *pEntClassName )
 			// check if pSpot is valid
 			if ( pSpot->GetEngineObject()->GetAbsOrigin() == Vector( 0, 0, 0 ) )
 			{
-				pSpot = gEntList.FindEntityByClassname( pSpot, pEntClassName );
+				pSpot = EntityList()->FindEntityByClassname( pSpot, pEntClassName );
 				continue;
 			}
 
@@ -1807,7 +1807,7 @@ static CBaseEntity * SelectSpawnSpot( const char *pEntClassName )
 			return pSpot;
 		}
 		// increment pSpot
-		pSpot = gEntList.FindEntityByClassname( pSpot, pEntClassName );
+		pSpot = EntityList()->FindEntityByClassname( pSpot, pEntClassName );
 	} while ( pSpot != pFirstSpot ); // loop if we're not back to the start
 
 	return NULL;
@@ -2162,9 +2162,9 @@ CBaseEntity *CCSBotManager::GetRandomSpawn( int team ) const
 	if (team == TEAM_TERRORIST || team == TEAM_MAXCOUNT)
 	{
 		// collect T spawns
-		for( spot = gEntList.FindEntityByClassname( NULL, "info_player_terrorist" );
+		for( spot = EntityList()->FindEntityByClassname( NULL, "info_player_terrorist" );
 			 spot;
-			 spot = gEntList.FindEntityByClassname( spot, "info_player_terrorist" ) )
+			 spot = EntityList()->FindEntityByClassname( spot, "info_player_terrorist" ) )
 		{
 			spawnSet.AddToTail( spot );			
 		}
@@ -2173,9 +2173,9 @@ CBaseEntity *CCSBotManager::GetRandomSpawn( int team ) const
 	if (team == TEAM_CT || team == TEAM_MAXCOUNT)
 	{
 		// collect CT spawns
-		for( spot = gEntList.FindEntityByClassname( NULL, "info_player_counterterrorist" );
+		for( spot = EntityList()->FindEntityByClassname( NULL, "info_player_counterterrorist" );
 			 spot;
-			 spot = gEntList.FindEntityByClassname( spot, "info_player_counterterrorist" ) )
+			 spot = EntityList()->FindEntityByClassname( spot, "info_player_counterterrorist" ) )
 		{
 			spawnSet.AddToTail( spot );			
 		}

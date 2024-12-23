@@ -251,7 +251,7 @@ void CRpgRocket::SeekThink( void )
 	flMax = 4096;
 	
 	// Examine all entities within a reasonable radius
-	while ( (pOther = gEntList.FindEntityByClassname( pOther, "laser_spot" ) ) != NULL)
+	while ( (pOther = EntityList()->FindEntityByClassname( pOther, "laser_spot" ) ) != NULL)
 	{
 		CLaserDot *pDot = dynamic_cast<CLaserDot*>(pOther);
 
@@ -340,7 +340,7 @@ void CRpgRocket::Detonate( void )
 //-----------------------------------------------------------------------------
 CRpgRocket *CRpgRocket::Create( const Vector &vecOrigin, const QAngle &angAngles, CBasePlayer *pentOwner )
 {
-	CRpgRocket *pRocket = (CRpgRocket *)gEntList.CreateEntityByName( "rpg_rocket" );
+	CRpgRocket *pRocket = (CRpgRocket *)EntityList()->CreateEntityByName( "rpg_rocket" );
 	UTIL_SetOrigin( pRocket, vecOrigin );
 	pRocket->GetEngineObject()->SetAbsAngles( angAngles );
 	pRocket->Spawn();
@@ -654,7 +654,7 @@ CWeaponRPG::~CWeaponRPG()
 #ifndef CLIENT_DLL
 	if ( m_hLaserDot != NULL )
 	{
-		gEntList.DestroyEntity( m_hLaserDot );
+		EntityList()->DestroyEntity( m_hLaserDot );
 		m_hLaserDot = NULL;
 	}
 #endif
@@ -721,7 +721,7 @@ void CWeaponRPG::Drop( const Vector &vecVelocity )
 #ifndef CLIENT_DLL
 	if ( m_hLaserDot != NULL )
 	{
-		gEntList.DestroyEntity( m_hLaserDot );
+		EntityList()->DestroyEntity( m_hLaserDot );
 		m_hLaserDot = NULL;
 	}
 #endif
@@ -986,7 +986,7 @@ bool CWeaponRPG::Holster( CBaseCombatWeapon *pSwitchingTo )
 	if ( m_hLaserDot != NULL )
 	{
 		m_hLaserDot->TurnOff();
-		gEntList.DestroyEntity( m_hLaserDot );
+		EntityList()->DestroyEntity( m_hLaserDot );
 		m_hLaserDot = NULL;
 	}
 #endif

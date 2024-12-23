@@ -566,7 +566,7 @@ void CNPC_BaseScanner::Gib( void )
 	if ( m_pSmokeTrail )
 	{
 		m_pSmokeTrail->m_ParticleLifetime = 0;
-		gEntList.DestroyEntity(m_pSmokeTrail);
+		EntityList()->DestroyEntity(m_pSmokeTrail);
 		m_pSmokeTrail = NULL;
 	}
 
@@ -578,7 +578,7 @@ void CNPC_BaseScanner::Gib( void )
 		BaseClass::Event_Killed( m_KilledInfo );
 	}
 
-	gEntList.DestroyEntity(this);
+	EntityList()->DestroyEntity(this);
 }
 
 //-----------------------------------------------------------------------------

@@ -78,7 +78,7 @@ void CLookDoorThinker::LookThink(void)
 	}
 	else
 	{
-		gEntList.DestroyEntity(this);
+		EntityList()->DestroyEntity(this);
 	}
 }
 
@@ -128,7 +128,7 @@ void CLookDoor::Spawn(void)
 		Warning( "ERROR: DoorLook (%s) given no target.  Rejecting spawn.\n",GetDebugName());
 		return;
 	}
-	CLookDoorThinker* pLookThinker = (CLookDoorThinker*)gEntList.CreateEntityByName("lookdoorthinker");
+	CLookDoorThinker* pLookThinker = (CLookDoorThinker*)EntityList()->CreateEntityByName("lookdoorthinker");
 	if (pLookThinker)
 	{
 		pLookThinker->SetThink(&CLookDoorThinker::LookThink);
@@ -148,7 +148,7 @@ void CLookDoor::MoveThink(void)
 	// --------------------------------
 	if (m_hLooker == NULL)
 	{
-		m_hLooker = (CBaseEntity*)gEntList.FindEntityByName( NULL, m_target );
+		m_hLooker = (CBaseEntity*)EntityList()->FindEntityByName( NULL, m_target );
 
 		if (m_hLooker == NULL)
 		{

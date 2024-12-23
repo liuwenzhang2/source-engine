@@ -414,7 +414,7 @@ CBaseEntity	*CHL1_Player::GiveNamedItem( const char *pszName, int iSubType )
 
 	EHANDLE pent;
 
-	pent = gEntList.CreateEntityByName(pszName);
+	pent = (CBaseEntity*)EntityList()->CreateEntityByName(pszName);
 	if ( pent == NULL )
 	{
 		Msg( "NULL Ent in GiveNamedItem!\n" );
@@ -1241,7 +1241,7 @@ void CHL1_Player::CreateViewModel( int index /*=0*/ )
 	if ( GetViewModel( index ) )
 		return;
 
-	CPredictedViewModel *vm = ( CPredictedViewModel * )gEntList.CreateEntityByName( "predicted_viewmodel" );
+	CPredictedViewModel *vm = ( CPredictedViewModel * )EntityList()->CreateEntityByName( "predicted_viewmodel" );
 	if ( vm )
 	{
 		vm->GetEngineObject()->SetAbsOrigin(GetEngineObject()->GetAbsOrigin() );

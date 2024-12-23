@@ -642,7 +642,7 @@ bool CTeamplayRoundBasedRules::TimerMayExpire( void )
 {
 #ifndef CSTRIKE_DLL
 	// team_train_watchers can also prevent timer expiring ( overtime )
-	CTeamTrainWatcher *pWatcher = dynamic_cast<CTeamTrainWatcher*>( gEntList.FindEntityByClassname( NULL, "team_train_watcher" ) );
+	CTeamTrainWatcher *pWatcher = dynamic_cast<CTeamTrainWatcher*>( EntityList()->FindEntityByClassname( NULL, "team_train_watcher" ) );
 	while ( pWatcher )
 	{
 		if ( !pWatcher->TimerMayExpire() )
@@ -650,7 +650,7 @@ bool CTeamplayRoundBasedRules::TimerMayExpire( void )
 			return false;
 		}
 
-		pWatcher = dynamic_cast<CTeamTrainWatcher*>( gEntList.FindEntityByClassname( pWatcher, "team_train_watcher" ) );
+		pWatcher = dynamic_cast<CTeamTrainWatcher*>( EntityList()->FindEntityByClassname( pWatcher, "team_train_watcher" ) );
 	}
 #endif
 
@@ -752,7 +752,7 @@ void CTeamplayRoundBasedRules::SetInWaitingForPlayers( bool bWaitingForPlayers  
 
 		if ( m_hWaitingForPlayersTimer )
 		{
-			gEntList.DestroyEntity( m_hWaitingForPlayersTimer );
+			EntityList()->DestroyEntity( m_hWaitingForPlayersTimer );
 		}
 
 		RestoreActiveTimer();
@@ -779,13 +779,13 @@ void CTeamplayRoundBasedRules::SetOvertime( bool bOvertime )
 		// tell train watchers that we've transitioned to overtime
 
 #ifndef CSTRIKE_DLL
-		CTeamTrainWatcher *pWatcher = dynamic_cast<CTeamTrainWatcher*>( gEntList.FindEntityByClassname( NULL, "team_train_watcher" ) );
+		CTeamTrainWatcher *pWatcher = dynamic_cast<CTeamTrainWatcher*>( EntityList()->FindEntityByClassname( NULL, "team_train_watcher" ) );
 		while ( pWatcher )
 		{
 			variant_t emptyVariant;
 			pWatcher->AcceptInput( "OnStartOvertime", NULL, NULL, emptyVariant, 0 );
 
-			pWatcher = dynamic_cast<CTeamTrainWatcher*>( gEntList.FindEntityByClassname( pWatcher, "team_train_watcher" ) );
+			pWatcher = dynamic_cast<CTeamTrainWatcher*>( EntityList()->FindEntityByClassname( pWatcher, "team_train_watcher" ) );
 		}
 #endif
 	}
@@ -1808,7 +1808,7 @@ void CTeamplayRoundBasedRules::State_Enter_STALEMATE( void )
 
 	if ( m_hStalemateTimer )
 	{
-		gEntList.DestroyEntity( m_hStalemateTimer );
+		EntityList()->DestroyEntity( m_hStalemateTimer );
 		m_hStalemateTimer = NULL;
 	}
 
@@ -1851,7 +1851,7 @@ void CTeamplayRoundBasedRules::State_Leave_STALEMATE( void )
 
 	if ( m_hStalemateTimer )
 	{
-		gEntList.DestroyEntity( m_hStalemateTimer );
+		EntityList()->DestroyEntity( m_hStalemateTimer );
 	}
 
 	if ( IsInArenaMode() == false )
@@ -1929,7 +1929,7 @@ void CTeamplayRoundBasedRules::HideActiveTimer( void )
 	variant_t sVariant;
 	sVariant.SetInt( false );
 
-	while ((pEntity = gEntList.FindEntityByClassname( pEntity, "team_round_timer" )) != NULL)
+	while ((pEntity = EntityList()->FindEntityByClassname( pEntity, "team_round_timer" )) != NULL)
 	{
 		CTeamRoundTimer *pTimer = assert_cast<CTeamRoundTimer*>(pEntity);
 		if ( pTimer && pTimer->ShowInHud() )
@@ -2512,7 +2512,7 @@ void CTeamplayRoundBasedRules::HandleTimeLimitChange( void )
 	{
 		if ( m_hTimeLimitTimer )
 		{
-			gEntList.DestroyEntity( m_hTimeLimitTimer );
+			EntityList()->DestroyEntity( m_hTimeLimitTimer );
 			m_hTimeLimitTimer = NULL;
 		}
 	}
@@ -2525,7 +2525,7 @@ bool CTeamplayRoundBasedRules::MapHasActiveTimer( void )
 {
 #ifndef CSTRIKE_DLL
 	CBaseEntity *pEntity = NULL;
-	while ( ( pEntity = gEntList.FindEntityByClassname( pEntity, "team_round_timer" ) ) != NULL )
+	while ( ( pEntity = EntityList()->FindEntityByClassname( pEntity, "team_round_timer" ) ) != NULL )
 	{
 		CTeamRoundTimer *pTimer = assert_cast<CTeamRoundTimer*>( pEntity );
 		if ( pTimer && pTimer->ShowInHud() && ( Q_stricmp( STRING( pTimer->GetEntityName() ), "zz_teamplay_timelimit_timer" ) != 0 ) )
@@ -2655,11 +2655,11 @@ void CTeamplayRoundBasedRules::CleanUpMap()
 	if( mp_showcleanedupents.GetInt() )
 	{
 		Msg( "CleanUpMap\n===============\n" );
-		Msg( "  Entities: %d (%d edicts)\n", gEntList.NumberOfEntities(), gEntList.NumberOfEdicts() );
+		Msg( "  Entities: %d (%d edicts)\n", EntityList()->NumberOfEntities(), EntityList()->NumberOfEdicts() );
 	}
 
 	// Get rid of all entities except players.
-	CBaseEntity *pCur = gEntList.FirstEnt();
+	CBaseEntity *pCur = EntityList()->FirstEnt();
 	while ( pCur )
 	{
 		if ( !RoundCleanupShouldIgnore( pCur ) )
@@ -2668,10 +2668,10 @@ void CTeamplayRoundBasedRules::CleanUpMap()
 			{
 				Msg( "Removed Entity: %s\n", pCur->GetClassname() );
 			}
-			gEntList.DestroyEntity( pCur );
+			EntityList()->DestroyEntity( pCur );
 		}
 
-		pCur = gEntList.NextEnt( pCur );
+		pCur = EntityList()->NextEnt( pCur );
 	}
 
 	// Clear out the event queue
@@ -2685,11 +2685,11 @@ void CTeamplayRoundBasedRules::CleanUpMap()
 	if ( mp_showcleanedupents.GetInt() & 2 )
 	{
 		Msg( "  Entities Left:\n" );
-		pCur = gEntList.FirstEnt();
+		pCur = EntityList()->FirstEnt();
 		while ( pCur )
 		{
 			Msg( "  %s (%d)\n", pCur->GetClassname(), pCur->entindex() );
-			pCur = gEntList.NextEnt( pCur );
+			pCur = EntityList()->NextEnt( pCur );
 		}
 	}
 
@@ -2733,17 +2733,17 @@ void CTeamplayRoundBasedRules::CleanUpMap()
 				CMapEntityRef &ref = g_MapEntityRefs[m_iIterator];
 				m_iIterator = g_MapEntityRefs.Next( m_iIterator );	// Seek to the next entity.
 
-				if ( ref.m_iEdict == -1 || gEntList.GetBaseEntity( ref.m_iEdict ) )
+				if ( ref.m_iEdict == -1 || EntityList()->GetBaseEntity( ref.m_iEdict ) )
 				{
 					// Doh! The entity was delete and its slot was reused.
 					// Just use any old edict slot. This case sucks because we lose the baseline.
-					return gEntList.CreateEntityByName( pClassname );
+					return (CBaseEntity*)EntityList()->CreateEntityByName( pClassname );
 				}
 				else
 				{
 					// Cool, the slot where this entity was is free again (most likely, the entity was 
 					// freed above). Now create an entity with this specific index.
-					return gEntList.CreateEntityByName( pClassname, ref.m_iEdict );
+					return (CBaseEntity*)EntityList()->CreateEntityByName( pClassname, ref.m_iEdict );
 				}
 			}
 		}

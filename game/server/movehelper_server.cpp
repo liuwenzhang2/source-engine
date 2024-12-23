@@ -141,7 +141,7 @@ void CMoveHelperServer::SetHost( CBasePlayer *host )
 char const* CMoveHelperServer::GetName( EntityHandle_t handle ) const
 {
 	// This ain't pertickulerly fast, but it's for debugging anyways
-	CBaseEntity *ent = gEntList.GetBaseEntity(handle);
+	CBaseEntity *ent = EntityList()->GetBaseEntityFromHandle(handle);
 	
 	// Is it the world?
 	if (ent->entindex() == 0)
@@ -231,7 +231,7 @@ void CMoveHelperServer::ProcessImpacts( void )
 		Assert( entindex.IsValid() );
 
 		// Run the impact function as if we had run it during movement.
-		CBaseEntity *entity = gEntList.GetBaseEntity(entindex);
+		CBaseEntity *entity = EntityList()->GetBaseEntityFromHandle(entindex);
 		if ( !entity )
 			continue;
 
@@ -350,7 +350,7 @@ bool CMoveHelperServer::PlayerFallingDamage( void )
 	float flFallDamage = g_pGameRules->FlPlayerFallDamage( m_pHostPlayer );	
 	if ( flFallDamage > 0 )
 	{
-		m_pHostPlayer->TakeDamage( CTakeDamageInfo( gEntList.GetBaseEntity(0), gEntList.GetBaseEntity(0), flFallDamage, DMG_FALL ) ); 
+		m_pHostPlayer->TakeDamage( CTakeDamageInfo(EntityList()->GetBaseEntity(0), EntityList()->GetBaseEntity(0), flFallDamage, DMG_FALL ) );
 		StartSound( m_pHostPlayer->GetEngineObject()->GetAbsOrigin(), "Player.FallDamage" );
 
         //=============================================================================
@@ -400,5 +400,5 @@ void CMoveHelperServer::PlayerSetAnimation( PLAYER_ANIM eAnim )
 
 bool CMoveHelperServer::IsWorldEntity( const CBaseHandle &handle )
 {
-	return handle == gEntList.GetBaseEntity( 0 );
+	return handle == EntityList()->GetBaseEntity( 0 );
 }

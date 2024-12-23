@@ -170,7 +170,7 @@ void CBoneFollowerManager::DestroyBoneFollowers( void )
 		if ( !m_physBones[i].hFollower )
 			continue;
 
-		gEntList.DestroyEntity( m_physBones[i].hFollower );
+		EntityList()->DestroyEntity( m_physBones[i].hFollower );
 		m_physBones[i].hFollower = NULL;
 	}
 
@@ -383,7 +383,7 @@ void CBoneFollower::SetTraceData( int physicsBone, int hitGroup )
 
 CBoneFollower *CBoneFollower::Create( CBaseEntity *pOwner, const char *pModelName, solid_t &solid, const Vector &position, const QAngle &orientation )
 {
-	CBoneFollower *pFollower = (CBoneFollower *)gEntList.CreateEntityByName( "phys_bone_follower" );
+	CBoneFollower *pFollower = (CBoneFollower *)EntityList()->CreateEntityByName( "phys_bone_follower" );
 	if ( pFollower )
 	{
 		pFollower->Init( pOwner, pModelName, solid, position, orientation );

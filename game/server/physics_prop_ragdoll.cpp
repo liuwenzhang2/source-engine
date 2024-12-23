@@ -426,7 +426,7 @@ void CRagdollProp::VPhysicsCollision( int index, gamevcollisionevent_t *pEvent )
 			if ( !pHitEntity )
 			{
 				// hit world
-				pHitEntity = gEntList.GetBaseEntity( 0 );
+				pHitEntity = EntityList()->GetBaseEntity( 0 );
 			}
 			Vector damagePos;
 			pEvent->pInternalData->GetContactPoint( damagePos );
@@ -806,7 +806,7 @@ void CRagdollProp::FadeOutThink(void)
 		CBasePlayer *pPlayer = UTIL_GetLocalPlayer();
 		CTakeDamageInfo info( pPlayer, pPlayer, 10000.0, DMG_GENERIC );
 		TakeDamage( info );
-		gEntList.DestroyEntity( this );
+		EntityList()->DestroyEntity( this );
 	}
 }
 

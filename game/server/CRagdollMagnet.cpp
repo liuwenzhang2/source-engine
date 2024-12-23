@@ -71,7 +71,7 @@ CRagdollMagnet *CRagdollMagnet::FindBestMagnet( CBaseEntity *pNPC )
 	
 	do
 	{
-		pMagnet = (CRagdollMagnet *)gEntList.FindEntityByClassname( pMagnet, "phys_ragdollmagnet" );
+		pMagnet = (CRagdollMagnet *)EntityList()->FindEntityByClassname( pMagnet, "phys_ragdollmagnet" );
 
 		if( pMagnet && pMagnet->IsEnabled() )
 		{

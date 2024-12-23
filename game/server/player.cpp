@@ -497,7 +497,7 @@ void CBasePlayer::CreateViewModel( int index /*=0*/ )
 	if ( GetViewModel( index ) )
 		return;
 
-	CBaseViewModel *vm = ( CBaseViewModel * )gEntList.CreateEntityByName( "viewmodel" );
+	CBaseViewModel *vm = ( CBaseViewModel * )EntityList()->CreateEntityByName( "viewmodel" );
 	if ( vm )
 	{
 		vm->GetEngineObject()->SetAbsOrigin(GetEngineObject()->GetAbsOrigin() );
@@ -521,7 +521,7 @@ void CBasePlayer::DestroyViewModels( void )
 		if ( !vm )
 			continue;
 
-		gEntList.DestroyEntity( vm );
+		EntityList()->DestroyEntity( vm );
 		m_hViewModel.Set( i, NULL );
 	}
 }
@@ -536,7 +536,7 @@ CBasePlayer *CBasePlayer::CreatePlayer( const char *className, int ed )
 {
 	CBasePlayer *player;
 	//CBasePlayer::s_PlayerEdict = ed;
-	player = ( CBasePlayer * )gEntList.CreateEntityByName( className, ed );
+	player = ( CBasePlayer * )EntityList()->CreateEntityByName( className, ed );
 	return player;
 }
 
@@ -697,7 +697,7 @@ int CBasePlayer::ShouldTransmit( const CCheckTransmitInfo *pInfo )
 	// so transmit these 'cameramans' to the HLTV or Replay client
 	if ( HLTVDirector()->GetCameraMan() == entindex() )
 	{
-		CBaseEntity *pRecipientEntity = gEntList.GetBaseEntity( pInfo->m_pClientEnt );
+		CBaseEntity *pRecipientEntity = EntityList()->GetBaseEntity( pInfo->m_pClientEnt );
 		
 		Assert( pRecipientEntity->IsPlayer() );
 		
@@ -2035,7 +2035,7 @@ void CBasePlayer::WaterMove()
 					m_nDrownDmgRate = DROWNING_DAMAGE_MAX;
 				}
 
-				OnTakeDamage( CTakeDamageInfo( gEntList.GetBaseEntity(0), gEntList.GetBaseEntity(0), m_nDrownDmgRate, DMG_DROWN ) );
+				OnTakeDamage( CTakeDamageInfo(EntityList()->GetBaseEntity(0), EntityList()->GetBaseEntity(0), m_nDrownDmgRate, DMG_DROWN ) );
 				m_PainFinished = gpGlobals->curtime + 1;
 				
 				// track drowning damage, give it back when
@@ -2228,7 +2228,7 @@ void CBasePlayer::StartDeathCam( void )
 		return;
 	}
 
-	pSpot = gEntList.FindEntityByClassname( NULL, "info_intermission");	
+	pSpot = EntityList()->FindEntityByClassname( NULL, "info_intermission");	
 
 	if ( pSpot )
 	{
@@ -2237,7 +2237,7 @@ void CBasePlayer::StartDeathCam( void )
 
 		while ( iRand > 0 )
 		{
-			pNewSpot = gEntList.FindEntityByClassname( pSpot, "info_intermission");
+			pNewSpot = EntityList()->FindEntityByClassname( pSpot, "info_intermission");
 			
 			if ( pNewSpot )
 			{
@@ -3331,7 +3331,7 @@ void CBasePlayer::PhysicsSimulate( void )
 
 	// If we're running multiple ticks this frame, don't peel off all of the commands, spread them out over
 	// the server ticks.  Use blocks of two in alternate ticks
-	int commandLimit = gEntList.IsSimulatingOnAlternateTicks() ? 2 : 1;
+	int commandLimit = EntityList()->IsSimulatingOnAlternateTicks() ? 2 : 1;
 	int commandsToRun = vecAvailCommands.Count();
 	if ( gpGlobals->simTicksThisFrame >= commandLimit && vecAvailCommands.Count() > commandLimit )
 	{
@@ -4770,7 +4770,7 @@ CBaseEntity *FindPlayerStart(const char *pszClassName)
 {
 	#define SF_PLAYER_START_MASTER	1
 	
-	CBaseEntity *pStart = gEntList.FindEntityByClassname(NULL, pszClassName);
+	CBaseEntity *pStart = EntityList()->FindEntityByClassname(NULL, pszClassName);
 	CBaseEntity *pStartFirst = pStart;
 	while (pStart != NULL)
 	{
@@ -4779,7 +4779,7 @@ CBaseEntity *FindPlayerStart(const char *pszClassName)
 			return pStart;
 		}
 
-		pStart = gEntList.FindEntityByClassname(pStart, pszClassName);
+		pStart = EntityList()->FindEntityByClassname(pStart, pszClassName);
 	}
 
 	return pStartFirst;
@@ -4804,10 +4804,10 @@ CBaseEntity *CBasePlayer::EntSelectSpawnPoint()
 // choose a info_player_deathmatch point
 	if (g_pGameRules->IsCoOp())
 	{
-		pSpot = gEntList.FindEntityByClassname( g_pLastSpawn, "info_player_coop");
+		pSpot = EntityList()->FindEntityByClassname( g_pLastSpawn, "info_player_coop");
 		if ( pSpot )
 			goto ReturnSpot;
-		pSpot = gEntList.FindEntityByClassname( g_pLastSpawn, "info_player_start");
+		pSpot = EntityList()->FindEntityByClassname( g_pLastSpawn, "info_player_start");
 		if ( pSpot ) 
 			goto ReturnSpot;
 	}
@@ -4816,9 +4816,9 @@ CBaseEntity *CBasePlayer::EntSelectSpawnPoint()
 		pSpot = g_pLastSpawn;
 		// Randomize the start spot
 		for ( int i = random->RandomInt(1,5); i > 0; i-- )
-			pSpot = gEntList.FindEntityByClassname( pSpot, "info_player_deathmatch" );
+			pSpot = EntityList()->FindEntityByClassname( pSpot, "info_player_deathmatch" );
 		if ( !pSpot )  // skip over the null point
-			pSpot = gEntList.FindEntityByClassname( pSpot, "info_player_deathmatch" );
+			pSpot = EntityList()->FindEntityByClassname( pSpot, "info_player_deathmatch" );
 
 		CBaseEntity *pFirstSpot = pSpot;
 
@@ -4831,7 +4831,7 @@ CBaseEntity *CBasePlayer::EntSelectSpawnPoint()
 				{
 					if ( pSpot->GetEngineObject()->GetLocalOrigin() == vec3_origin )
 					{
-						pSpot = gEntList.FindEntityByClassname( pSpot, "info_player_deathmatch" );
+						pSpot = EntityList()->FindEntityByClassname( pSpot, "info_player_deathmatch" );
 						continue;
 					}
 
@@ -4840,7 +4840,7 @@ CBaseEntity *CBasePlayer::EntSelectSpawnPoint()
 				}
 			}
 			// increment pSpot
-			pSpot = gEntList.FindEntityByClassname( pSpot, "info_player_deathmatch" );
+			pSpot = EntityList()->FindEntityByClassname( pSpot, "info_player_deathmatch" );
 		} while ( pSpot != pFirstSpot ); // loop if we're not back to the start
 
 		// we haven't found a place to spawn yet,  so kill any guy at the first spawn point and spawn there
@@ -4851,7 +4851,7 @@ CBaseEntity *CBasePlayer::EntSelectSpawnPoint()
 			{
 				// if ent is a client, kill em (unless they are ourselves)
 				if ( ent->IsPlayer() && !(ent->entindex() == entindex()) )
-					ent->TakeDamage( CTakeDamageInfo( gEntList.GetBaseEntity(0), gEntList.GetBaseEntity(0), 300, DMG_GENERIC ) );
+					ent->TakeDamage( CTakeDamageInfo(EntityList()->GetBaseEntity(0), EntityList()->GetBaseEntity(0), 300, DMG_GENERIC ) );
 			}
 			goto ReturnSpot;
 		}
@@ -4866,7 +4866,7 @@ CBaseEntity *CBasePlayer::EntSelectSpawnPoint()
 	}
 	else
 	{
-		pSpot = gEntList.FindEntityByName( NULL, gpGlobals->startspot );
+		pSpot = EntityList()->FindEntityByName( NULL, gpGlobals->startspot );
 		if ( pSpot )
 			goto ReturnSpot;
 	}
@@ -4875,7 +4875,7 @@ ReturnSpot:
 	if ( !pSpot  )
 	{
 		Warning( "PutClientInServer: no info_player_start on level\n");
-		return gEntList.GetBaseEntity( 0 );
+		return EntityList()->GetBaseEntity( 0 );
 	}
 
 	g_pLastSpawn = pSpot;
@@ -5631,7 +5631,7 @@ void CSprayCan::Think( void )
 	}
 	
 	// Just painted last custom frame.
-	gEntList.DestroyEntity( this );
+	EntityList()->DestroyEntity( this );
 }
 
 class	CBloodSplat : public CPointEntity
@@ -5668,7 +5668,7 @@ void CBloodSplat::Think( void )
 
 		UTIL_BloodDecalTrace( &tr, BLOOD_COLOR_RED );
 	}
-	gEntList.DestroyEntity( this );
+	EntityList()->DestroyEntity( this );
 }
 
 //==============================================
@@ -5686,7 +5686,7 @@ CBaseEntity	*CBasePlayer::GiveNamedItem( const char *pszName, int iSubType )
 
 	EHANDLE pent;
 
-	pent = gEntList.CreateEntityByName(pszName);
+	pent = (CBaseEntity*)EntityList()->CreateEntityByName(pszName);
 	if ( pent == NULL )
 	{
 		Msg( "NULL Ent in GiveNamedItem!\n" );
@@ -5944,7 +5944,7 @@ void CBasePlayer::ImpulseCommands( )
 		if ( tr.fraction != 1.0 )
 		{// line hit something, so paint a decal
 			m_flNextDecalTime = gpGlobals->curtime + decalfrequency.GetFloat();
-			CSprayCan *pCan = (CSprayCan*)gEntList.CreateEntityByName( "spraycan" );
+			CSprayCan *pCan = (CSprayCan*)EntityList()->CreateEntityByName( "spraycan" );
 			pCan->Spawn( this );
 
 #ifdef CSTRIKE_DLL
@@ -6003,7 +6003,7 @@ static void CreateJalopy( CBasePlayer *pPlayer )
 	// Cheat to create a jeep in front of the player
 	Vector vecForward;
 	AngleVectors( pPlayer->EyeAngles(), &vecForward );
-	CBaseEntity *pJeep = (CBaseEntity *)gEntList.CreateEntityByName( "prop_vehicle_jeep" );
+	CBaseEntity *pJeep = (CBaseEntity *)EntityList()->CreateEntityByName( "prop_vehicle_jeep" );
 	if ( pJeep )
 	{
 		Vector vecOrigin = pPlayer->GetEngineObject()->GetAbsOrigin() + vecForward * 256 + Vector(0,0,64);
@@ -6040,7 +6040,7 @@ static void CreateJeep( CBasePlayer *pPlayer )
 	// Cheat to create a jeep in front of the player
 	Vector vecForward;
 	AngleVectors( pPlayer->EyeAngles(), &vecForward );
-	CBaseEntity *pJeep = (CBaseEntity *)gEntList.CreateEntityByName( "prop_vehicle_jeep" );
+	CBaseEntity *pJeep = (CBaseEntity *)EntityList()->CreateEntityByName( "prop_vehicle_jeep" );
 	if ( pJeep )
 	{
 		Vector vecOrigin = pPlayer->GetEngineObject()->GetAbsOrigin() + vecForward * 256 + Vector(0,0,64);
@@ -6077,7 +6077,7 @@ static void CreateAirboat( CBasePlayer *pPlayer )
 	// Cheat to create a jeep in front of the player
 	Vector vecForward;
 	AngleVectors( pPlayer->EyeAngles(), &vecForward );
-	CBaseEntity *pJeep = ( CBaseEntity* )gEntList.CreateEntityByName( "prop_vehicle_airboat" );
+	CBaseEntity *pJeep = ( CBaseEntity* )EntityList()->CreateEntityByName( "prop_vehicle_airboat" );
 	if ( pJeep )
 	{
 		Vector vecOrigin = pPlayer->GetEngineObject()->GetAbsOrigin() + vecForward * 256 + Vector( 0,0,64 );
@@ -6300,7 +6300,7 @@ void CBasePlayer::CheatImpulseCommands( int iImpulse )
 
 			if ( tr.fraction != 1.0 )
 			{// line hit something, so paint a decal
-				CBloodSplat *pBlood = (CBloodSplat*)gEntList.CreateEntityByName( "bloodsplat" );
+				CBloodSplat *pBlood = (CBloodSplat*)EntityList()->CreateEntityByName( "bloodsplat" );
 				pBlood->Spawn( this );
 			}
 		}
@@ -6309,7 +6309,7 @@ void CBasePlayer::CheatImpulseCommands( int iImpulse )
 		pEntity = FindEntityForward( this, true );
 		if ( pEntity )
 		{
-			gEntList.DestroyEntity( pEntity );
+			EntityList()->DestroyEntity( pEntity );
 //			if ( pEntity->m_takedamage )
 //				pEntity->SetThink(SUB_Remove);
 		}
@@ -6327,7 +6327,7 @@ bool CBasePlayer::ClientCommand( const CCommand &args )
 	{
 		if ( sv_cheats && sv_cheats->GetBool() )
 		{
-			ParticleSmokeGrenade *pSmoke = dynamic_cast<ParticleSmokeGrenade*>(gEntList.CreateEntityByName(PARTICLESMOKEGRENADE_ENTITYNAME) );
+			ParticleSmokeGrenade *pSmoke = dynamic_cast<ParticleSmokeGrenade*>(EntityList()->CreateEntityByName(PARTICLESMOKEGRENADE_ENTITYNAME) );
 			if ( pSmoke )
 			{
 				Vector vForward;
@@ -6588,7 +6588,7 @@ bool CBasePlayer::BumpWeapon( CBaseCombatWeapon *pWeapon )
 	{
 		if ( gEvilImpulse101 )
 		{
-			gEntList.DestroyEntity( pWeapon );
+			EntityList()->DestroyEntity( pWeapon );
 		}
 		return false;
 	}
@@ -6618,7 +6618,7 @@ bool CBasePlayer::BumpWeapon( CBaseCombatWeapon *pWeapon )
 			if ( pWeapon->HasPrimaryAmmo() )
 				return false;
 
-			gEntList.DestroyEntity( pWeapon );
+			EntityList()->DestroyEntity( pWeapon );
 			return true;
 		}
 		else
@@ -7426,7 +7426,7 @@ void CBasePlayer::RemoveWearable( CEconWearable *pItem )
 		if ( pWearable == pItem )
 		{
 			pItem->UnEquip( this );
-			gEntList.DestroyEntity( pWearable );
+			EntityList()->DestroyEntity( pWearable );
 			m_hMyWearables.Remove( i );
 			break;
 		}
@@ -7690,7 +7690,7 @@ END_DATADESC()
 
 CBaseEntity *CreatePlayerLoadSave( Vector vOrigin, float flDuration, float flHoldTime, float flLoadTime )
 {
-	CRevertSaved *pRevertSaved = (CRevertSaved *)gEntList.CreateEntityByName( "player_loadsaved" );
+	CRevertSaved *pRevertSaved = (CRevertSaved *)EntityList()->CreateEntityByName( "player_loadsaved" );
 
 	if ( pRevertSaved == NULL )
 		return NULL;
@@ -8233,7 +8233,7 @@ void CBasePlayer::VPhysicsShadowUpdate( IPhysicsObject *pPhysics )
 
 				if ( !GetEngineObject()->IsRideablePhysics(pPhysGround) )
 				{
-					if ( !(m_afPhysicsFlags & PFLAG_VPHYSICS_MOTIONCONTROLLER ) && gEntList.IsSimulatingOnAlternateTicks() )
+					if ( !(m_afPhysicsFlags & PFLAG_VPHYSICS_MOTIONCONTROLLER ) && EntityList()->IsSimulatingOnAlternateTicks() )
 					{
 						newVelocity *= 0.5f;
 					}
@@ -8614,7 +8614,7 @@ void CBasePlayer::InputSetHUDVisibility( inputdata_t &inputdata )
 void CBasePlayer::InputSetFogController( inputdata_t &inputdata )
 {
 	// Find the fog controller with the given name.
-	CFogController *pFogController = dynamic_cast<CFogController*>( gEntList.FindEntityByName( NULL, inputdata.value.String() ) );
+	CFogController *pFogController = dynamic_cast<CFogController*>( EntityList()->FindEntityByName( NULL, inputdata.value.String() ) );
 	if ( pFogController )
 	{
 		m_Local.m_PlayerFog.m_hCtrl.Set( pFogController );

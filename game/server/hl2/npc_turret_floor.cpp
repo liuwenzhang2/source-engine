@@ -199,19 +199,19 @@ void CNPC_FloorTurret::UpdateOnRemove( void )
 {
 	if ( m_pMotionController != NULL )
 	{
-		gEntList.DestroyEntity( m_pMotionController );
+		EntityList()->DestroyEntity( m_pMotionController );
 		m_pMotionController = NULL;
 	}
 
 	if ( m_hLaser != NULL )
 	{
-		gEntList.DestroyEntity( m_hLaser );
+		EntityList()->DestroyEntity( m_hLaser );
 		m_hLaser = NULL;
 	}
 
 	if ( m_hEyeGlow != NULL )
 	{
-		gEntList.DestroyEntity( m_hEyeGlow );
+		EntityList()->DestroyEntity( m_hEyeGlow );
 		m_hEyeGlow = NULL;
 	}
 
@@ -1616,7 +1616,7 @@ bool CNPC_FloorTurret::PreThink( turretState_e state )
 			else
 			{
 				// Take away the laser
-				gEntList.DestroyEntity( m_hLaser );
+				EntityList()->DestroyEntity( m_hLaser );
 				m_hLaser = NULL;
 
 				// Become inactive
@@ -2189,7 +2189,7 @@ void CNPC_FloorTurret::BreakThink( void )
 	}
 
 	// We're done!
-	gEntList.DestroyEntity( this );
+	EntityList()->DestroyEntity( this );
 }
 
 //-----------------------------------------------------------------------------
@@ -2205,7 +2205,7 @@ void CNPC_FloorTurret::SelfDestructThink( void )
 	{
 		SetThink( &CNPC_FloorTurret::BreakThink );
 		GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.1f );
-		gEntList.DestroyEntity( m_hFizzleEffect );
+		EntityList()->DestroyEntity( m_hFizzleEffect );
 		m_hFizzleEffect = NULL;
 		return;
 	}
@@ -2263,7 +2263,7 @@ void CNPC_FloorTurret::InputSelfDestruct( inputdata_t &inputdata )
 	GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.1f );
 
 	// Create the dust effect in place
-	m_hFizzleEffect = (CParticleSystem *)gEntList.CreateEntityByName( "info_particle_system" );
+	m_hFizzleEffect = (CParticleSystem *)EntityList()->CreateEntityByName( "info_particle_system" );
 	if ( m_hFizzleEffect != NULL )
 	{
 		Vector vecUp;
@@ -2340,7 +2340,7 @@ void CTurretTipController::Activate( void )
 
 	if ( m_pParentTurret == NULL )
 	{
-		gEntList.DestroyEntity(this);
+		EntityList()->DestroyEntity(this);
 		return;
 	}
 
@@ -2348,7 +2348,7 @@ void CTurretTipController::Activate( void )
 
 	if ( pPhys == NULL )
 	{
-		gEntList.DestroyEntity(this);
+		EntityList()->DestroyEntity(this);
 		return;
 	}
 

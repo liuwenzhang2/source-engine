@@ -589,7 +589,7 @@ CAI_Hint* CAI_HintManager::CreateHint( HintNodeData *pNodeData, const char *pMap
 	// Reset last found hint if new node is added
 	CAI_HintManager::ResetFoundHints();
 
-	CAI_Hint *pHint = (CAI_Hint*)gEntList.CreateEntityByName("ai_hint");
+	CAI_Hint *pHint = (CAI_Hint*)EntityList()->CreateEntityByName("ai_hint");
 	if ( pHint )
 	{	
 		// First, parse the mapdata chunk we were passed

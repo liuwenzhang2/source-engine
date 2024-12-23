@@ -34,7 +34,7 @@
 //-----------------------------------------------------------------------------
 void CAI_BaseNPC::ForceSelectedGo(CBaseEntity *pPlayer, const Vector &targetPos, const Vector &traceDir, bool bRun) 
 {
-	CAI_BaseNPC *npc = gEntList.NextEntByClass( (CAI_BaseNPC *)NULL );
+	CAI_BaseNPC *npc = NextEntByClass( (CAI_BaseNPC *)NULL );
 
 	while (npc)
 	{
@@ -68,7 +68,7 @@ void CAI_BaseNPC::ForceSelectedGo(CBaseEntity *pPlayer, const Vector &targetPos,
 				npc->SetSchedule( SCHED_FORCED_GO );
 			npc->m_flMoveWaitFinished = gpGlobals->curtime;
 		}
-		npc = gEntList.NextEntByClass(npc);
+		npc = NextEntByClass(npc);
 	}
 }
 
@@ -79,7 +79,7 @@ void CAI_BaseNPC::ForceSelectedGo(CBaseEntity *pPlayer, const Vector &targetPos,
 //-----------------------------------------------------------------------------
 void CAI_BaseNPC::ForceSelectedGoRandom(void) 
 {
-	CAI_BaseNPC *npc = gEntList.NextEntByClass( (CAI_BaseNPC *)NULL );
+	CAI_BaseNPC *npc = NextEntByClass( (CAI_BaseNPC *)NULL );
 
 	while (npc)
 	{
@@ -88,7 +88,7 @@ void CAI_BaseNPC::ForceSelectedGoRandom(void)
 			npc->SetSchedule( SCHED_RUN_RANDOM );
 			npc->GetNavigator()->SetMovementActivity(ACT_RUN);
 		}
-		npc = gEntList.NextEntByClass(npc);
+		npc = NextEntByClass(npc);
 	}
 }
 
@@ -255,7 +255,7 @@ float CAI_BaseNPC::OpenDoorAndWait( CBaseEntity *pDoor )
 			CBaseEntity *pTarget = NULL;
 			for (;;)
 			{
-				pTarget = gEntList.FindEntityByName( pTarget, pDoor->GetEntityName() );
+				pTarget = EntityList()->FindEntityByName( pTarget, pDoor->GetEntityName() );
 
 				if ( pTarget != pDoor )
 				{

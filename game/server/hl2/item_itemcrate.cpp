@@ -113,7 +113,7 @@ void CItem_ItemCrate::Spawn( void )
 { 
 	if ( g_pGameRules->IsAllowedToSpawn( this ) == false )
 	{
-		gEntList.DestroyEntity( this );
+		EntityList()->DestroyEntity( this );
 		return;
 	}
 
@@ -123,7 +123,7 @@ void CItem_ItemCrate::Spawn( void )
 	if ( NULL_STRING == m_strItemClass )
 	{
 		Warning( "CItem_ItemCrate(%i):  CRATE_SPECIFIC_ITEM with NULL ItemClass string (deleted)!!!\n", entindex() );
-		gEntList.DestroyEntity( this );
+		EntityList()->DestroyEntity( this );
 		return;
 	}
 
@@ -140,7 +140,7 @@ void CItem_ItemCrate::Spawn( void )
 //-----------------------------------------------------------------------------
 void CItem_ItemCrate::InputKill( inputdata_t &data )
 {
-	gEntList.DestroyEntity( this );
+	EntityList()->DestroyEntity( this );
 }
 
 
@@ -195,7 +195,7 @@ void CItem_ItemCrate::OnBreak( const Vector &vecVelocity, const AngularImpulse &
 		switch( m_CrateType )
 		{
 		case CRATE_SPECIFIC_ITEM:
-			pSpawn = gEntList.CreateEntityByName( STRING(m_strItemClass) );
+			pSpawn = (CBaseEntity*)EntityList()->CreateEntityByName( STRING(m_strItemClass) );
 			break;
 
 		default:

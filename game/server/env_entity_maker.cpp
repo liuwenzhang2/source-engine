@@ -114,7 +114,7 @@ void CEnvEntityMaker::Activate( void )
 	if ( m_iszTemplate == NULL_STRING )
 	{
 		Warning( "env_entity_maker %s has no template entity!\n", GetEntityName().ToCStr() );
-		gEntList.DestroyEntity( this );
+		EntityList()->DestroyEntity( this );
 		return;
 	}
 
@@ -132,7 +132,7 @@ void CEnvEntityMaker::Activate( void )
 CPointTemplate *CEnvEntityMaker::FindTemplate()
 {
 	// Find our point_template
-	CPointTemplate *pTemplate = dynamic_cast<CPointTemplate *>(gEntList.FindEntityByName( NULL, STRING(m_iszTemplate) ));
+	CPointTemplate *pTemplate = dynamic_cast<CPointTemplate *>(EntityList()->FindEntityByName( NULL, STRING(m_iszTemplate) ));
 	if ( !pTemplate )
 	{
 		Warning( "env_entity_maker %s failed to find template %s.\n", GetEntityName().ToCStr(), STRING(m_iszTemplate) );
@@ -357,7 +357,7 @@ void CEnvEntityMaker::InputForceSpawn( inputdata_t &inputdata )
 //-----------------------------------------------------------------------------
 void CEnvEntityMaker::InputForceSpawnAtEntityOrigin( inputdata_t &inputdata )
 {
-	CBaseEntity *pTargetEntity = gEntList.FindEntityByName( NULL, inputdata.value.String(), this, inputdata.pActivator, inputdata.pCaller );
+	CBaseEntity *pTargetEntity = EntityList()->FindEntityByName( NULL, inputdata.value.String(), this, inputdata.pActivator, inputdata.pCaller );
 		
 	if( pTargetEntity )
 	{

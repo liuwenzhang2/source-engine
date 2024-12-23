@@ -188,7 +188,7 @@ void CTeamControlPointMaster::Reset( void )
 bool CTeamControlPointMaster::FindControlPoints( void )
 {
 	//go through all the points
-	CBaseEntity *pEnt = gEntList.FindEntityByClassname( NULL, GetControlPointName() );
+	CBaseEntity *pEnt = EntityList()->FindEntityByClassname( NULL, GetControlPointName() );
 
 	int numFound = 0;
 	
@@ -211,11 +211,11 @@ bool CTeamControlPointMaster::FindControlPoints( void )
 			else
 			{
 				Warning( "!!!!\nMultiple control points with the same index, duplicates ignored\n!!!!\n" );
-				gEntList.DestroyEntity( pPoint );
+				EntityList()->DestroyEntity( pPoint );
 			}
 		}
 
-		pEnt = gEntList.FindEntityByClassname( pEnt, GetControlPointName() );
+		pEnt = EntityList()->FindEntityByClassname( pEnt, GetControlPointName() );
 	}
 
 	if( numFound > MAX_CONTROL_POINTS )
@@ -311,7 +311,7 @@ bool CTeamControlPointMaster::FindControlPointRounds( void )
 	bool bFoundRounds = false;
 
 	m_ControlPointRounds.RemoveAll();
-	CBaseEntity *pEnt = gEntList.FindEntityByClassname( NULL, GetControlPointRoundName() );
+	CBaseEntity *pEnt = EntityList()->FindEntityByClassname( NULL, GetControlPointRoundName() );
 
 	while( pEnt )
 	{
@@ -323,7 +323,7 @@ bool CTeamControlPointMaster::FindControlPointRounds( void )
 			m_ControlPointRounds.AddToHead( pRound );
 		}
 
-		pEnt = gEntList.FindEntityByClassname( pEnt, GetControlPointRoundName() );
+		pEnt = EntityList()->FindEntityByClassname( pEnt, GetControlPointRoundName() );
 	}
 
 	if ( m_ControlPointRounds.Count() > 0 ) 
@@ -394,7 +394,7 @@ bool CTeamControlPointMaster::SelectSpecificRound( void )
 		if ( pRules->GetRoundToPlayNext() != NULL_STRING )
 		{
 			// do we have the name of a round?
-			pRound = dynamic_cast<CTeamControlPointRound*>( gEntList.FindEntityByName( NULL, STRING( pRules->GetRoundToPlayNext() ) ) );
+			pRound = dynamic_cast<CTeamControlPointRound*>( EntityList()->FindEntityByName( NULL, STRING( pRules->GetRoundToPlayNext() ) ) );
 
 			if ( pRound )
 			{
@@ -1324,7 +1324,7 @@ void cc_PlayRound( const CCommand& args )
 			if ( pMaster->PlayingMiniRounds() )
 			{
 				// did we get the name of a round?
-				CTeamControlPointRound *pRound = dynamic_cast<CTeamControlPointRound*>( gEntList.FindEntityByName( NULL, args[1] ) );
+				CTeamControlPointRound *pRound = dynamic_cast<CTeamControlPointRound*>( EntityList()->FindEntityByName( NULL, args[1] ) );
 
 				if ( pRound )
 				{

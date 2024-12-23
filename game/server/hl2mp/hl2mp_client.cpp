@@ -87,7 +87,7 @@ called each time a player is spawned into the game
 void ClientPutInServer( int pEdict, const char *playername )
 {
 	// Allocate a CBaseTFPlayer for pev, and call spawn
-	CHL2MP_Player *pPlayer = (CHL2MP_Player*)gEntList.GetBaseEntity(pEdict);
+	CHL2MP_Player *pPlayer = (CHL2MP_Player*)EntityList()->GetBaseEntity(pEdict);
 	if (pPlayer == NULL) {
 		pPlayer = CHL2MP_Player::CreatePlayer("player", pEdict);
 	}
@@ -142,7 +142,7 @@ CBaseEntity* FindEntity( int pEdict, char *classname)
 	// If no name was given set bits based on the picked
 	if (FStrEq(classname,"")) 
 	{
-		return (FindPickerEntityClass( static_cast<CBasePlayer*>(gEntList.GetBaseEntity(pEdict)), classname ));
+		return (FindPickerEntityClass( static_cast<CBasePlayer*>(EntityList()->GetBaseEntity(pEdict)), classname ));
 	}
 	return NULL;
 }

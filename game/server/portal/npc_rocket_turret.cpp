@@ -756,7 +756,7 @@ void CNPC_RocketTurret::FiringThink( void )
 
 void CNPC_RocketTurret::FireRocket ( void )
 {
-	gEntList.DestroyEntity( m_hCurRocket );
+	EntityList()->DestroyEntity( m_hCurRocket );
 
 	CRocket_Turret_Projectile *pRocket = (CRocket_Turret_Projectile *) CBaseEntity::Create( "rocket_turret_projectile", EyePosition(), m_vecCurrentAngles, this );
 
@@ -1240,7 +1240,7 @@ void CNPC_RocketTurret::InputDisable( inputdata_t &inputdata )
 
 void CNPC_RocketTurret::InputSetTarget( inputdata_t &inputdata )
 {
-	CBaseEntity *pTarget = gEntList.FindEntityByName( NULL, inputdata.value.String(), NULL, NULL );
+	CBaseEntity *pTarget = EntityList()->FindEntityByName( NULL, inputdata.value.String(), NULL, NULL );
 	SetTarget( pTarget );
 }
 
@@ -1284,7 +1284,7 @@ void CRocket_Turret_Projectile::MissileTouch( CBaseEntity *pOther )
 		VectorAngles( vBounceVel, vBounceAngles );
 		GetEngineObject()->SetAbsAngles ( vBounceAngles );
 		SetLocalAngularVelocity ( QAngle ( 180, 90, 45 ) );
-		gEntList.DestroyEntity ( m_hRocketTrail );
+		EntityList()->DestroyEntity ( m_hRocketTrail );
 
 		GetEngineObject()->SetSolid ( SOLID_NONE );
 
@@ -1334,7 +1334,7 @@ void CRocket_Turret_Projectile::NotifySystemEvent(CBaseEntity *pNotify, notify_s
 		SetOwnerEntity( NULL );
 
 		// Restart smoke trail
-		gEntList.DestroyEntity( m_hRocketTrail );
+		EntityList()->DestroyEntity( m_hRocketTrail );
 		m_hRocketTrail = NULL; // This shouldn't leak cause the pointer has been handed to the delete list
 		CreateSmokeTrail();
 	}

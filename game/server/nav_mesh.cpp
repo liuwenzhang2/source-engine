@@ -2731,7 +2731,7 @@ void CommandNavShowLadderBounds( void )
 		return;
 
 	CFuncSimpleLadder *ladder = NULL;
-	while( (ladder = dynamic_cast< CFuncSimpleLadder * >(gEntList.FindEntityByClassname( ladder, "func_simpleladder" ))) != NULL )
+	while( (ladder = dynamic_cast< CFuncSimpleLadder * >(EntityList()->FindEntityByClassname( ladder, "func_simpleladder" ))) != NULL )
 	{
 		Vector mins, maxs;
 		ladder->GetEngineObject()->WorldSpaceSurroundingBounds( &mins, &maxs );

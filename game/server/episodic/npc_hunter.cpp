@@ -398,7 +398,7 @@ END_DATADESC()
 CHunterFlechette *CHunterFlechette::FlechetteCreate( const Vector &vecOrigin, const QAngle &angAngles, CBaseEntity *pentOwner )
 {
 	// Create a new entity with CHunterFlechette private data
-	CHunterFlechette *pFlechette = (CHunterFlechette *)gEntList.CreateEntityByName( "hunter_flechette" );
+	CHunterFlechette *pFlechette = (CHunterFlechette *)EntityList()->CreateEntityByName( "hunter_flechette" );
 	UTIL_SetOrigin( pFlechette, vecOrigin );
 	pFlechette->GetEngineObject()->SetAbsAngles( angAngles );
 	pFlechette->Spawn();
@@ -764,7 +764,7 @@ void CHunterFlechette::FlechetteTouch( CBaseEntity *pOther )
 			SetThink( NULL );
 			SetContextThink( NULL, 0, s_szHunterFlechetteBubbles );
 
-			gEntList.DestroyEntity( this );
+			EntityList()->DestroyEntity( this );
 		}
 	}
 	else
@@ -789,7 +789,7 @@ void CHunterFlechette::FlechetteTouch( CBaseEntity *pOther )
 				UTIL_ImpactTrace( &tr, DMG_BULLET );
 			}
 
-			gEntList.DestroyEntity( this );
+			EntityList()->DestroyEntity( this );
 		}
 	}
 }
@@ -2053,7 +2053,7 @@ void CNPC_Hunter::Activate()
 	if ( gm_flMinigunDistZ == 0 )
 	{
 		// Have to create a virgin hunter to ensure proper pose
-		CNPC_Hunter *pHunter = (CNPC_Hunter *)gEntList.CreateEntityByName( "npc_hunter" );
+		CNPC_Hunter *pHunter = (CNPC_Hunter *)EntityList()->CreateEntityByName( "npc_hunter" );
 		Assert(pHunter);
 		pHunter->Spawn();
 
@@ -2068,7 +2068,7 @@ void CNPC_Hunter::Activate()
 		Vector position;
 		pHunter->GetEngineObject()->GetAttachment( gm_nTopGunAttachment, position );
 		VectorITransform( position, pHunter->GetEngineObject()->EntityToWorldTransform(), gm_vecLocalRelativePositionMinigun );
-		gEntList.DestroyEntity( pHunter );
+		EntityList()->DestroyEntity( pHunter );
 	}
 }
 
@@ -2423,7 +2423,7 @@ void CNPC_Hunter::GatherConditions()
 //-----------------------------------------------------------------------------
 void CNPC_Hunter::CollectSiegeTargets()
 {
-	CBaseEntity *pTarget = gEntList.FindEntityByName( NULL, m_iszSiegeTargetName );
+	CBaseEntity *pTarget = EntityList()->FindEntityByName( NULL, m_iszSiegeTargetName );
 
 	while( pTarget != NULL )
 	{
@@ -2432,7 +2432,7 @@ void CNPC_Hunter::CollectSiegeTargets()
 			m_pSiegeTargets.AddToTail( pTarget );
 		}
 
-		pTarget = gEntList.FindEntityByName( pTarget, m_iszSiegeTargetName );
+		pTarget = EntityList()->FindEntityByName( pTarget, m_iszSiegeTargetName );
 	};
 
 	if( m_pSiegeTargets.Count() < 1 )
@@ -2542,7 +2542,7 @@ void CNPC_Hunter::KillCurrentSiegeTarget()
 	{
 		GetEnemies()->ClearMemory( m_hCurrentSiegeTarget );
 
-		gEntList.DestroyEntity( m_hCurrentSiegeTarget );
+		EntityList()->DestroyEntity( m_hCurrentSiegeTarget );
 		m_hCurrentSiegeTarget.Set( NULL );
 	}
 }
@@ -2752,7 +2752,7 @@ bool CNPC_Hunter::ShouldCharge( const Vector &startPos, const Vector &endPos, bo
 		if ( moveTrace.pObstruction != NULL )
 		{
 			// If we've hit the world, see if it's a cliff
-			if ( moveTrace.pObstruction == gEntList.GetBaseEntity(0) )
+			if ( moveTrace.pObstruction == EntityList()->GetBaseEntity(0) )
 			{	
 				// Can't be too far above/below the target
 				if ( fabs( moveTrace.vEndPosition.z - vecTargetPos.z ) > GetStepHeight() )
@@ -4541,7 +4541,7 @@ void CNPC_Hunter::FollowStrider( const char *szStrider )
 	if ( !szStrider )
 		return;
 
-	CBaseEntity *pEnt = gEntList.FindEntityByName( NULL, szStrider, this );
+	CBaseEntity *pEnt = EntityList()->FindEntityByName( NULL, szStrider, this );
 	CNPC_Strider *pStrider = dynamic_cast <CNPC_Strider *>( pEnt );
 	FollowStrider(pStrider);
 }
@@ -5560,7 +5560,7 @@ void CNPC_Hunter::PhysicsDamageEffect( const Vector &vecPos, const Vector &vecDi
 
 	if ( random->RandomInt( 0, 1 ) == 0 )
 	{
-		CBaseEntity *pTrail = gEntList.CreateEntityByName( "sparktrail" );
+		CBaseEntity *pTrail = (CBaseEntity*)EntityList()->CreateEntityByName( "sparktrail" );
 		pTrail->SetOwnerEntity( this );
 		pTrail->Spawn();
 	}
@@ -7168,7 +7168,7 @@ void CAI_HunterEscortBehavior::DistributeFreeHunters()
 	}
 
 #if 0
-	CBaseEntity *pHunterMaker = gEntList.FindEntityByClassname( NULL, "npc_hunter_maker" ); // TODO: this picks the same one every time!
+	CBaseEntity *pHunterMaker = EntityList()->FindEntityByClassname( NULL, "npc_hunter_maker" ); // TODO: this picks the same one every time!
 	if ( pHunterMaker )
 	{
 		for ( i = 0; i < freeHunters.Count(); i++ )

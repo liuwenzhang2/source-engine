@@ -82,7 +82,7 @@ void CLogicRelay::Think()
 	// We only get here if we had OnSpawn connections, so this is safe.
 	if (GetEngineObject()->GetSpawnFlags() & SF_REMOVE_ON_FIRE)
 	{
-		gEntList.DestroyEntity(this);
+		EntityList()->DestroyEntity(this);
 	}
 }
 
@@ -146,7 +146,7 @@ void CLogicRelay::InputTrigger( inputdata_t &inputdata )
 		
 		if (GetEngineObject()->GetSpawnFlags() & SF_REMOVE_ON_FIRE)
 		{
-			gEntList.DestroyEntity(this);
+			EntityList()->DestroyEntity(this);
 		}
 		else if (!(GetEngineObject()->GetSpawnFlags() & SF_ALLOW_FAST_RETRIGGER))
 		{

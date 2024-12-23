@@ -254,7 +254,7 @@ void CAmbientGeneric::Spawn( void )
 	if ( !m_iszSound || strlen( szSoundFile ) < 1 )
 	{
 		Warning( "Empty %s (%s) at %.2f, %.2f, %.2f\n", GetClassname(), GetDebugName(), GetEngineObject()->GetAbsOrigin().x, GetEngineObject()->GetAbsOrigin().y, GetEngineObject()->GetAbsOrigin().z );
-		gEntList.DestroyEntity(this);
+		EntityList()->DestroyEntity(this);
 		return;
 	}
 
@@ -453,7 +453,7 @@ void CAmbientGeneric::Activate( void )
 	{
 		if (m_sSourceEntName != NULL_STRING)
 		{
-			m_hSoundSource = gEntList.FindEntityByName( NULL, m_sSourceEntName );
+			m_hSoundSource = EntityList()->FindEntityByName( NULL, m_sSourceEntName );
 			if ( m_hSoundSource != NULL )
 			{
 				m_nSoundSourceEntIndex = m_hSoundSource->entindex();
@@ -484,7 +484,7 @@ void CAmbientGeneric::Activate( void )
 			{
 				if ( V_strcmp( STRING( GetEntityName() ), "radio_sound" ) == 0 )
 				{
-					gEntList.DestroyEntity( this );
+					EntityList()->DestroyEntity( this );
 					return;
 				}
 			}
@@ -534,7 +534,7 @@ void CAmbientGeneric::SetTransmit( CCheckTransmitInfo *pInfo, bool bAlways )
 		return;
 
 	Assert( pInfo->m_pClientEnt );
-	CBaseEntity *pClient = gEntList.GetBaseEntity( pInfo->m_pClientEnt);
+	CBaseEntity *pClient = EntityList()->GetBaseEntity( pInfo->m_pClientEnt);
 	if ( !pClient )
 		return;
 
@@ -1352,7 +1352,7 @@ int SENTENCEG_GetIndex(const char *szrootname)
 void UTIL_RestartAmbientSounds( void )
 {
 	CAmbientGeneric *pAmbient = NULL;
-	while ( ( pAmbient = (CAmbientGeneric*) gEntList.FindEntityByClassname( pAmbient, "ambient_generic" ) ) != NULL )
+	while ( ( pAmbient = (CAmbientGeneric*) EntityList()->FindEntityByClassname( pAmbient, "ambient_generic" ) ) != NULL )
 	{
 		if (pAmbient->m_fActive )
 		{

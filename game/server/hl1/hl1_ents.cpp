@@ -82,7 +82,7 @@ void CAutoTrigger::Think( void )
 		m_OnTrigger.FireOutput(NULL, this);
 
 		if (GetEngineObject()->GetSpawnFlags() & SF_AUTO_FIREONCE)
-			gEntList.DestroyEntity( this );
+			EntityList()->DestroyEntity( this );
 	}
 }
 
@@ -180,7 +180,7 @@ void CTriggerRelay::RefireThink( void )
 
 	if( gpGlobals->curtime > m_flTimeRefireDone )
 	{
-		gEntList.DestroyEntity( this );
+		EntityList()->DestroyEntity( this );
 	}
 	else
 	{
@@ -194,7 +194,7 @@ void CTriggerRelay::Use( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE
 	
 	if (GetEngineObject()->GetSpawnFlags() & SF_RELAY_FIREONCE)
 	{
-		gEntList.DestroyEntity( this );
+		EntityList()->DestroyEntity( this );
 	}
 
 	else if( m_flRefireDuration != -1 && m_flTimeRefireDone == -1 )
@@ -699,7 +699,7 @@ void CFuncMortarField::InputTrigger( inputdata_t &inputdata )
 
 			if ( m_iszXController != NULL_STRING )
 			{
-				pController = gEntList.FindEntityByName( NULL, STRING(m_iszXController) );
+				pController = EntityList()->FindEntityByName( NULL, STRING(m_iszXController) );
 				if (pController != NULL)
 				{
 					if ( FClassnameIs( pController, "momentary_rot_button" ) )
@@ -718,7 +718,7 @@ void CFuncMortarField::InputTrigger( inputdata_t &inputdata )
 			}
 			if ( m_iszYController != NULL_STRING )
 			{
-				pController = gEntList.FindEntityByName( NULL, STRING(m_iszYController) );
+				pController = EntityList()->FindEntityByName( NULL, STRING(m_iszYController) );
 				if (pController != NULL)
 				{
 					if ( FClassnameIs( pController, "momentary_rot_button" ) )
@@ -931,7 +931,7 @@ void CRenderFxManager::Use( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_T
 	if ( m_target != NULL_STRING )
 	{
 		CBaseEntity *pEntity = NULL;
-		while ( ( pEntity = gEntList.FindEntityByName( pEntity, STRING( m_target ) ) ) != NULL )
+		while ( ( pEntity = EntityList()->FindEntityByName( pEntity, STRING( m_target ) ) ) != NULL )
 		{
 			if ( !GetEngineObject()->HasSpawnFlags( SF_RENDER_MASKFX ) )
 				pEntity->GetEngineObject()->SetRenderFX(GetEngineObject()->GetRenderFX());
@@ -1146,7 +1146,7 @@ LINK_ENTITY_TO_CLASS( xen_ttrigger, CXenTreeTrigger );
 
 CXenTreeTrigger *CXenTreeTrigger::TriggerCreate( CBaseEntity *pOwner, const Vector &position )
 {
-	CXenTreeTrigger *pTrigger = (CXenTreeTrigger*)gEntList.CreateEntityByName( "xen_ttrigger" );
+	CXenTreeTrigger *pTrigger = (CXenTreeTrigger*)EntityList()->CreateEntityByName( "xen_ttrigger" );
 	pTrigger->GetEngineObject()->SetAbsOrigin( position );
 
 	pTrigger->GetEngineObject()->SetSolid( SOLID_BBOX );
@@ -1358,7 +1358,7 @@ public:
 
 CXenHull *CXenHull::CreateHull( CBaseEntity *source, const Vector &mins, const Vector &maxs, const Vector &offset )
 {
-	CXenHull *pHull = (CXenHull*)gEntList.CreateEntityByName( "xen_hull" );
+	CXenHull *pHull = (CXenHull*)EntityList()->CreateEntityByName( "xen_hull" );
 
 	UTIL_SetOrigin( pHull, source->GetEngineObject()->GetAbsOrigin() + offset );
 	pHull->GetEngineObject()->SetSolid( SOLID_BBOX );
@@ -1464,7 +1464,7 @@ void CHL1Gib::WaitTillLand ( void )
 {
 	if ( !IsInWorld() )
 	{
-		gEntList.DestroyEntity( this );
+		EntityList()->DestroyEntity( this );
 		return;
 	}
 
@@ -1632,7 +1632,7 @@ void CTriggerEndSection::Spawn( void )
 {
 	if ( gpGlobals->deathmatch )
 	{
-		gEntList.DestroyEntity( this );
+		EntityList()->DestroyEntity( this );
 		return;
 	}
 }
@@ -1649,5 +1649,5 @@ void CTriggerEndSection::InputEndSection( inputdata_t &data )
 		 engine->ClientCommand ( pPlayer->entindex(), "toggleconsole;disconnect\n");
 	}
 
-	gEntList.DestroyEntity( this );
+	EntityList()->DestroyEntity( this );
 }

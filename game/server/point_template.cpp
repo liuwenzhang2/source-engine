@@ -161,7 +161,7 @@ void CPointTemplate::StartBuildingTemplates( void )
 			CBaseEntity	*pEntity = NULL;
 			int iOldNum = m_hTemplateEntities.Count();
 			// Add all the entities with the matching targetname
-			while ( (pEntity = gEntList.FindEntityByName( pEntity, STRING(m_iszTemplateEntityNames[i]) )) != NULL )
+			while ( (pEntity = EntityList()->FindEntityByName( pEntity, STRING(m_iszTemplateEntityNames[i]) )) != NULL )
 			{
 				m_hTemplateEntities.AddToTail( pEntity );
 			}

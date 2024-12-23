@@ -2210,13 +2210,13 @@ void CNPC_Vortigaunt::ClearHandGlow( void )
 {
 	if ( m_hHandEffect[0] != NULL )
 	{
-		gEntList.DestroyEntity( m_hHandEffect[0] );
+		EntityList()->DestroyEntity( m_hHandEffect[0] );
 		m_hHandEffect[0] = NULL;
 	}
 	
 	if ( m_hHandEffect[1] != NULL )
 	{
-		gEntList.DestroyEntity( m_hHandEffect[1] );
+		EntityList()->DestroyEntity( m_hHandEffect[1] );
 		m_hHandEffect[1] = NULL;
 	}
 	
@@ -2260,7 +2260,7 @@ void CNPC_Vortigaunt::InputDisableArmorRecharge( inputdata_t &data )
 //-----------------------------------------------------------------------------
 void CNPC_Vortigaunt::InputChargeTarget( inputdata_t &data )
 {
-	CBaseEntity *pTarget = gEntList.FindEntityByName( NULL, data.value.String(), NULL, data.pActivator, data.pCaller );
+	CBaseEntity *pTarget = EntityList()->FindEntityByName( NULL, data.value.String(), NULL, data.pActivator, data.pCaller );
 
 	// Must be valid
 	if ( pTarget == NULL )
@@ -2288,7 +2288,7 @@ void CNPC_Vortigaunt::InputChargeTarget( inputdata_t &data )
 //-----------------------------------------------------------------------------
 void CNPC_Vortigaunt::InputExtractBugbait( inputdata_t &data )
 {
-	CBaseEntity *pTarget = gEntList.FindEntityByName( NULL, data.value.String(), NULL, data.pActivator, data.pCaller );
+	CBaseEntity *pTarget = EntityList()->FindEntityByName( NULL, data.value.String(), NULL, data.pActivator, data.pCaller );
 
 	// Must be valid
 	if ( pTarget == NULL )
@@ -3122,7 +3122,7 @@ m_hTarget( NULL )
 //-----------------------------------------------------------------------------
 CVortigauntChargeToken *CVortigauntChargeToken::CreateChargeToken( const Vector &vecOrigin, CBaseEntity *pOwner, CBaseEntity *pTarget )
 {
-	CVortigauntChargeToken *pToken = (CVortigauntChargeToken *)gEntList.CreateEntityByName( "vort_charge_token" );
+	CVortigauntChargeToken *pToken = (CVortigauntChargeToken *)EntityList()->CreateEntityByName( "vort_charge_token" );
 	if ( pToken == NULL )
 		return NULL;
 
@@ -3360,7 +3360,7 @@ CVortigauntEffectDispel::CVortigauntEffectDispel( void )
 //-----------------------------------------------------------------------------
 CVortigauntEffectDispel *CVortigauntEffectDispel::CreateEffectDispel( const Vector &vecOrigin, CBaseEntity *pOwner, CBaseEntity *pTarget )
 {
-	CVortigauntEffectDispel *pToken = (CVortigauntEffectDispel *)gEntList.CreateEntityByName( "vort_effect_dispel" );
+	CVortigauntEffectDispel *pToken = (CVortigauntEffectDispel *)EntityList()->CreateEntityByName( "vort_effect_dispel" );
 	if ( pToken == NULL )
 		return NULL;
 

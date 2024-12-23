@@ -147,7 +147,7 @@ void CScriptIntro::InputSetCameraViewEntity( inputdata_t &inputdata )
 	if ( iszEntityName == NULL_STRING )
 		return;
 
-	CBaseEntity *pEntity = gEntList.FindEntityByName( NULL, iszEntityName, NULL, inputdata.pActivator, inputdata.pCaller );
+	CBaseEntity *pEntity = EntityList()->FindEntityByName( NULL, iszEntityName, NULL, inputdata.pActivator, inputdata.pCaller );
 	if ( !pEntity )
 	{
 		Warning("script_intro %s couldn't find SetCameraViewEntity named %s\n", STRING(GetEntityName()), STRING(iszEntityName) );

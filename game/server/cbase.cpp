@@ -684,7 +684,7 @@ class CEventQueueSaveLoadProxy : public CLogicalEntity
 
 		// Now remove myself, because the CEventQueue_SaveRestoreBlockHandler
 		// will handle future saves.
-		gEntList.DestroyEntity( this );
+		EntityList()->DestroyEntity( this );
 
 		return iReturn;
 	}
@@ -929,7 +929,7 @@ void CEventQueue::ServiceEvents( void )
 			CBaseEntity *target = NULL;
 			while ( 1 )
 			{
-				target = gEntList.FindEntityByName( target, pe->m_iTarget, pSearchingEntity, pe->m_pActivator, pe->m_pCaller );
+				target = EntityList()->FindEntityByName( target, pe->m_iTarget, pSearchingEntity, pe->m_pActivator, pe->m_pCaller );
 				if ( !target )
 					break;
 
@@ -954,7 +954,7 @@ void CEventQueue::ServiceEvents( void )
 				CBaseEntity *target = NULL;
 				while ( 1 )
 				{
-					target = gEntList.FindEntityByClassname( target, STRING(pe->m_iTarget) );
+					target = EntityList()->FindEntityByClassname( target, STRING(pe->m_iTarget) );
 					if ( !target )
 						break;
 
@@ -1446,7 +1446,7 @@ bool variant_t::Convert( fieldtype_t newType )
 					if ( iszVal != NULL_STRING )
 					{
 						// FIXME: do we need to pass an activator in here?
-						ent = gEntList.FindEntityByName( NULL, iszVal );
+						ent = EntityList()->FindEntityByName( NULL, iszVal );
 					}
 					SetEntity( ent );
 					return true;
@@ -1807,7 +1807,7 @@ public:
 
 	virtual CBaseEntity* CreateNextEntity(const char* pClassname)
 	{
-		return gEntList.CreateEntityByName(pClassname);
+		return (CBaseEntity*)EntityList()->CreateEntityByName(pClassname);
 	}
 };
 
@@ -1859,17 +1859,17 @@ public:
 
 			// Remove all entities
 			int nPlayerIndex = -1;
-			CBaseEntity* pEnt = gEntList.FirstEnt();
+			CBaseEntity* pEnt = EntityList()->FirstEnt();
 			while (pEnt)
 			{
-				CBaseEntity* pNextEnt = gEntList.NextEnt(pEnt);
+				CBaseEntity* pNextEnt = EntityList()->NextEnt(pEnt);
 				if (pEnt->IsPlayer())
 				{
 					nPlayerIndex = pEnt->entindex();
 				}
 				if (!pEnt->GetEngineObject()->IsEFlagSet(EFL_KEEP_ON_RECREATE_ENTITIES))
 				{
-					gEntList.DestroyEntity(pEnt);
+					EntityList()->DestroyEntity(pEnt);
 				}
 				pEnt = pNextEnt;
 			}
@@ -1890,7 +1890,7 @@ public:
 			// Allocate a CBasePlayer for pev, and call spawn
 			if (nPlayerIndex >= 0)
 			{
-				CBaseEntity* pEdict = gEntList.GetBaseEntity(nPlayerIndex);
+				CBaseEntity* pEdict = EntityList()->GetBaseEntity(nPlayerIndex);
 				ClientPutInServer(nPlayerIndex, "unnamed");
 				ClientActive(nPlayerIndex, false);
 

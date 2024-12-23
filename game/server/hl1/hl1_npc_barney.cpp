@@ -509,7 +509,7 @@ void CNPC_Barney::SUB_LVFadeOut( void  )
 
 	if ( m_clrRender->a == 0 )
 	{
-		gEntList.DestroyEntity(this);
+		EntityList()->DestroyEntity(this);
 	}
 	else
 	{

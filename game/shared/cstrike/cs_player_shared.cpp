@@ -364,7 +364,7 @@ void CCSPlayer::FireBullet(
 #if 0
 	for ( int k = 1; k <= gpGlobals->maxClients; k++ )
 	{
-		CBasePlayer *clientClass = (CBasePlayer *)gEntList.GetBaseEntity( k );
+		CBasePlayer *clientClass = (CBasePlayer *)EntityList()->GetBaseEntity( k );
 
 		if ( clientClass == NULL )
 			 continue;

@@ -608,13 +608,13 @@ void CFuncTank::Activate( void )
 	// Find our control volume
 	if ( m_iszControlVolume != NULL_STRING )
 	{
-		m_hControlVolume = dynamic_cast<CBaseTrigger*>( gEntList.FindEntityByName( NULL, m_iszControlVolume ) );
+		m_hControlVolume = dynamic_cast<CBaseTrigger*>( EntityList()->FindEntityByName( NULL, m_iszControlVolume ) );
 	}
 
 	if (( !m_hControlVolume ) && (GetEngineObject()->GetSpawnFlags() & SF_TANK_CANCONTROL))
 	{
 		Msg( "ERROR: Couldn't find control volume for player-controllable func_tank %s.\n", STRING(GetEntityName()) );
-		gEntList.DestroyEntity( this );
+		EntityList()->DestroyEntity( this );
 	}
 }
 
@@ -1374,7 +1374,7 @@ void CFuncTankLaser::Activate( void )
 
 	if ( !GetLaser() )
 	{
-		gEntList.DestroyEntity(this);
+		EntityList()->DestroyEntity(this);
 		Warning( "Laser tank with no env_laser!\n" );
 	}
 	else
@@ -1398,7 +1398,7 @@ CEnvLaser *CFuncTankLaser::GetLaser( void )
 	if ( m_pLaser )
 		return m_pLaser;
 
-	CBaseEntity *pLaser = gEntList.FindEntityByName( NULL, m_iszLaserName );
+	CBaseEntity *pLaser = EntityList()->FindEntityByName( NULL, m_iszLaserName );
 	while ( pLaser )
 	{
 		// Found the landmark
@@ -1409,7 +1409,7 @@ CEnvLaser *CFuncTankLaser::GetLaser( void )
 		}
 		else
 		{
-			pLaser = gEntList.FindEntityByName( pLaser, m_iszLaserName );
+			pLaser = EntityList()->FindEntityByName( pLaser, m_iszLaserName );
 		}
 	}
 
@@ -1669,13 +1669,13 @@ void CFuncTankPhysCannister::Activate( void )
 	// Find our barrel volume
 	if ( m_iszBarrelVolume != NULL_STRING )
 	{
-		m_hBarrelVolume = dynamic_cast<CBaseTrigger*>( gEntList.FindEntityByName( NULL, m_iszBarrelVolume ) );
+		m_hBarrelVolume = dynamic_cast<CBaseTrigger*>( EntityList()->FindEntityByName( NULL, m_iszBarrelVolume ) );
 	}
 
 	if ( !m_hBarrelVolume )
 	{
 		Msg("ERROR: Couldn't find barrel volume for func_tankphyscannister %s.\n", STRING(GetEntityName()) );
-		gEntList.DestroyEntity( this );
+		EntityList()->DestroyEntity( this );
 	}
 }
 

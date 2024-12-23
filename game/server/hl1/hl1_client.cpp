@@ -41,7 +41,7 @@ called each time a player is spawned into the game
 */
 void ClientPutInServer( int pEdict, const char *playername )
 {
-	CHL1_Player *pPlayer = (CHL1_Player*)gEntList.GetBaseEntity(pEdict);
+	CHL1_Player *pPlayer = (CHL1_Player*)EntityList()->GetBaseEntity(pEdict);
 	if (pPlayer == NULL) {
 		// Allocate a CBasePlayer for pev, and call spawn
 		if (g_pGameRules->IsMultiplayer())
@@ -103,7 +103,7 @@ CBaseEntity* FindEntity( int pEdict, char *classname)
 	// If no name was given set bits based on the picked
 	if (FStrEq(classname,"")) 
 	{
-		return (FindPickerEntityClass( static_cast<CBasePlayer*>(gEntList.GetBaseEntity(pEdict)), classname ));
+		return (FindPickerEntityClass( static_cast<CBasePlayer*>(EntityList()->GetBaseEntity(pEdict)), classname ));
 	}
 	return NULL;
 }

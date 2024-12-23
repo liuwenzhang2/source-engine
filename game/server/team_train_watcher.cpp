@@ -213,7 +213,7 @@ bool CTeamTrainWatcherMaster::FindTrainWatchers( void )
 	m_pRedWatcher = NULL;
 
 	// find the train_watchers for this round
-	CTeamTrainWatcher *pTrainWatcher = (CTeamTrainWatcher *)gEntList.FindEntityByClassname( NULL, "team_train_watcher" );
+	CTeamTrainWatcher *pTrainWatcher = (CTeamTrainWatcher *)EntityList()->FindEntityByClassname( NULL, "team_train_watcher" );
 	while ( pTrainWatcher )
 	{
 		if ( pTrainWatcher->IsDisabled() == false )
@@ -228,7 +228,7 @@ bool CTeamTrainWatcherMaster::FindTrainWatchers( void )
 			}
 		}
 
-		pTrainWatcher = (CTeamTrainWatcher *)gEntList.FindEntityByClassname( pTrainWatcher, "team_train_watcher" );
+		pTrainWatcher = (CTeamTrainWatcher *)EntityList()->FindEntityByClassname( pTrainWatcher, "team_train_watcher" );
 	}
 
 	return ( m_pBlueWatcher && m_pRedWatcher );
@@ -746,7 +746,7 @@ void CTeamTrainWatcher::FindGlowEntity( void )
 		CBaseEntity *pGlowEnt = NULL;
 
 		// first try to find a phys_constraint relationship with the train
-		CPhysFixed *pPhysConstraint = dynamic_cast<CPhysFixed*>( gEntList.FindEntityByClassname( NULL, "phys_constraint" ) );
+		CPhysFixed *pPhysConstraint = dynamic_cast<CPhysFixed*>( EntityList()->FindEntityByClassname( NULL, "phys_constraint" ) );
 		while ( pPhysConstraint )
 		{
 			string_t iszName1 = pPhysConstraint->GetNameAttach1();
@@ -754,22 +754,22 @@ void CTeamTrainWatcher::FindGlowEntity( void )
 
 			if ( iszTrainName == iszName1 )
 			{
-				pGlowEnt = gEntList.FindEntityByName( NULL, STRING( iszName2 ) );
+				pGlowEnt = EntityList()->FindEntityByName( NULL, STRING( iszName2 ) );
 				break;
 			}
 			else if ( iszTrainName == iszName2 )
 			{
-				pGlowEnt = gEntList.FindEntityByName( NULL, STRING( iszName1 ) );
+				pGlowEnt = EntityList()->FindEntityByName( NULL, STRING( iszName1 ) );
 				break;
 			}
 			
-			pPhysConstraint = dynamic_cast<CPhysFixed*>( gEntList.FindEntityByClassname( pPhysConstraint, "phys_constraint" ) );
+			pPhysConstraint = dynamic_cast<CPhysFixed*>( EntityList()->FindEntityByClassname( pPhysConstraint, "phys_constraint" ) );
 		}
 
 		if ( !pGlowEnt )
 		{
 			// if we're here, we haven't found the glow entity yet...try all of the prop_dynamic entities
-			CDynamicProp *pPropDynamic = dynamic_cast<CDynamicProp*>( gEntList.FindEntityByClassname( NULL, "prop_dynamic" ) );
+			CDynamicProp *pPropDynamic = dynamic_cast<CDynamicProp*>( EntityList()->FindEntityByClassname( NULL, "prop_dynamic" ) );
 			while ( pPropDynamic )
 			{
 				if ( pPropDynamic->GetParent() == m_hTrain )
@@ -778,7 +778,7 @@ void CTeamTrainWatcher::FindGlowEntity( void )
 					break;
 				}
 
-				pPropDynamic = dynamic_cast<CDynamicProp*>( gEntList.FindEntityByClassname( pPropDynamic, "prop_dynamic" ) );
+				pPropDynamic = dynamic_cast<CDynamicProp*>( EntityList()->FindEntityByClassname( pPropDynamic, "prop_dynamic" ) );
 			}
 		}
 
@@ -817,7 +817,7 @@ void CTeamTrainWatcher::WatcherActivate( void )
 	StopCaptureAlarm();
 
 	// init our train
-	m_hTrain = dynamic_cast<CFuncTrackTrain*>( gEntList.FindEntityByName( NULL, m_iszTrain ) );
+	m_hTrain = dynamic_cast<CFuncTrackTrain*>( EntityList()->FindEntityByName( NULL, m_iszTrain ) );
 	if ( !m_hTrain )
 	{
 		Warning("%s failed to find train named '%s'\n", GetClassname(), STRING( m_iszTrain ) );
@@ -841,11 +841,11 @@ void CTeamTrainWatcher::WatcherActivate( void )
 		}
 
 		// init the sprites (if any)
-		CEnvSpark *pSpark = dynamic_cast<CEnvSpark*>( gEntList.FindEntityByName( NULL, m_iszSparkName ) );
+		CEnvSpark *pSpark = dynamic_cast<CEnvSpark*>( EntityList()->FindEntityByName( NULL, m_iszSparkName ) );
 		while ( pSpark )
 		{
 			m_Sparks.AddToTail( pSpark );
-			pSpark = dynamic_cast<CEnvSpark*>( gEntList.FindEntityByName( pSpark, m_iszSparkName ) );
+			pSpark = dynamic_cast<CEnvSpark*>( EntityList()->FindEntityByName( pSpark, m_iszSparkName ) );
 		}
 	}
 
@@ -855,8 +855,8 @@ void CTeamTrainWatcher::WatcherActivate( void )
 	int i;
 	for ( i = 0 ; i < MAX_CONTROL_POINTS ; i++ )
 	{
-		CPathTrack *pPathTrack = dynamic_cast<CPathTrack*>( gEntList.FindEntityByName( NULL, m_iszLinkedPathTracks[i] ) );
-		CTeamControlPoint *pCP = dynamic_cast<CTeamControlPoint*>( gEntList.FindEntityByName( NULL, m_iszLinkedCPs[i] ) );
+		CPathTrack *pPathTrack = dynamic_cast<CPathTrack*>( EntityList()->FindEntityByName( NULL, m_iszLinkedPathTracks[i] ) );
+		CTeamControlPoint *pCP = dynamic_cast<CTeamControlPoint*>( EntityList()->FindEntityByName( NULL, m_iszLinkedCPs[i] ) );
 		if ( pPathTrack && pCP )
 		{
 			m_CPLinks[m_iNumCPLinks].hPathTrack = pPathTrack;
@@ -868,13 +868,13 @@ void CTeamTrainWatcher::WatcherActivate( void )
 	}
 
 	// init our start and goal nodes
-	m_hStartNode = dynamic_cast<CPathTrack*>( gEntList.FindEntityByName( NULL, m_iszStartNode ) );
+	m_hStartNode = dynamic_cast<CPathTrack*>( EntityList()->FindEntityByName( NULL, m_iszStartNode ) );
 	if ( !m_hStartNode )
 	{
 		Warning("%s failed to find path_track named '%s'\n", GetClassname(), STRING(m_iszStartNode) );
 	}
 
-	m_hGoalNode = dynamic_cast<CPathTrack*>( gEntList.FindEntityByName( NULL, m_iszGoalNode ) );
+	m_hGoalNode = dynamic_cast<CPathTrack*>( EntityList()->FindEntityByName( NULL, m_iszGoalNode ) );
 	if ( !m_hGoalNode )
 	{
 		Warning("%s failed to find path_track named '%s'\n", GetClassname(), STRING(m_iszGoalNode) );
@@ -1523,7 +1523,7 @@ CON_COMMAND_F( tf_dumptrainstats, "Dump the stats for the current train watcher 
 		return;
 
 	CTeamTrainWatcher *pWatcher = NULL;
-	while( ( pWatcher = dynamic_cast< CTeamTrainWatcher * >( gEntList.FindEntityByClassname( pWatcher, "team_train_watcher" ) ) ) != NULL )
+	while( ( pWatcher = dynamic_cast< CTeamTrainWatcher * >( EntityList()->FindEntityByClassname( pWatcher, "team_train_watcher" ) ) ) != NULL )
 	{
 		pWatcher->DumpStats();
 	}

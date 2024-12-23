@@ -317,12 +317,12 @@ void CEnvHeadcrabCanister::UpdateOnRemove()
 	g_pSoundEmitterSystem->StopSound(this, "HeadcrabCanister.AfterLanding" );
 	if ( m_hTrail )
 	{
-		gEntList.DestroyEntity( m_hTrail );
+		EntityList()->DestroyEntity( m_hTrail );
 		m_hTrail = NULL;
 	}
 	if ( m_hSmokeTrail )
 	{
-		gEntList.DestroyEntity( m_hSmokeTrail );
+		EntityList()->DestroyEntity( m_hSmokeTrail );
 		m_hSmokeTrail = NULL;
 	}
 }
@@ -378,7 +378,7 @@ CSkyCamera *CEnvHeadcrabCanister::PlaceCanisterInWorld()
 	if ( m_iszLaunchPositionName != NULL_STRING )
 	{
 		// Get the launch position entity
-		CBaseEntity *pLaunchPos = gEntList.FindEntityByName( NULL, m_iszLaunchPositionName );
+		CBaseEntity *pLaunchPos = EntityList()->FindEntityByName( NULL, m_iszLaunchPositionName );
 		if ( !pLaunchPos )
 		{
 			Warning("%s (%s) could not find an entity matching LaunchPositionName of '%s'\n", GetEntityName().ToCStr(), GetDebugName(), STRING(m_iszLaunchPositionName) );
@@ -540,7 +540,7 @@ void CEnvHeadcrabCanister::InputStopSmoke( inputdata_t &inputdata )
 {
 	if ( m_hSmokeTrail != NULL )
 	{
-		gEntList.DestroyEntity( m_hSmokeTrail );
+		EntityList()->DestroyEntity( m_hSmokeTrail );
 		m_hSmokeTrail = NULL;
 	}
 }
@@ -568,7 +568,7 @@ public:
 		enginetrace->ClipRayToEntity( *m_pRay, m_nContentsMask, pHandleEntity, &tr );
 		if (( tr.fraction < 1.0f ) || (tr.startsolid) || (tr.allsolid))
 		{
-			CBaseEntity *pEntity = gEntList.GetBaseEntity( pHandleEntity->GetRefEHandle() );
+			CBaseEntity *pEntity = EntityList()->GetBaseEntityFromHandle( pHandleEntity->GetRefEHandle() );
 			m_Entities.AddToTail( pEntity );
 		}
 
@@ -710,7 +710,7 @@ void CEnvHeadcrabCanister::HeadcrabCanisterSpawnHeadcrabThink()
 	int nHeadCrabAttachment = GetEngineObject()->LookupAttachment( "headcrab" );
 	if (GetEngineObject()->GetAttachment( nHeadCrabAttachment, vecSpawnPosition, vecSpawnAngles ) )
 	{
-		CBaseEntity *pEnt = gEntList.CreateEntityByName( s_pHeadcrabClass[m_nHeadcrabType] );
+		CBaseEntity *pEnt = (CBaseEntity*)EntityList()->CreateEntityByName( s_pHeadcrabClass[m_nHeadcrabType] );
 		CBaseHeadcrab *pHeadCrab = assert_cast<CBaseHeadcrab*>(pEnt);
 
 		// Necessary to get it to eject properly (don't allow the NPC
@@ -1116,7 +1116,7 @@ void CEnvHeadcrabCanister::HeadcrabCanisterSkyboxRestartThink( void )
 {
 	if ( m_hTrail )
 	{
-		gEntList.DestroyEntity( m_hTrail );
+		EntityList()->DestroyEntity( m_hTrail );
 		m_hTrail = NULL;
 	}
 

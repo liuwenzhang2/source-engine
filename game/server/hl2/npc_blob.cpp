@@ -1046,7 +1046,7 @@ void CNPC_Blob::FormShapeFromPath( string_t iszPathName )
 			break;
 		}
 
-		CBaseEntity *pEntity = gEntList.FindEntityByName( NULL, iszPathName );
+		CBaseEntity *pEntity = EntityList()->FindEntityByName( NULL, iszPathName );
 
 		if( pEntity != NULL )
 		{
@@ -1146,7 +1146,7 @@ void CNPC_Blob::InputSetRadius( inputdata_t &inputdata )
 //-----------------------------------------------------------------------------
 void CNPC_Blob::InputChaseEntity( inputdata_t &inputdata )
 {
-	CBaseEntity *pEntity = gEntList.FindEntityByName( NULL, inputdata.value.StringID(), NULL, inputdata.pActivator, inputdata.pCaller );
+	CBaseEntity *pEntity = EntityList()->FindEntityByName( NULL, inputdata.value.StringID(), NULL, inputdata.pActivator, inputdata.pCaller );
 	
 	if ( pEntity )
 	{
@@ -1282,7 +1282,7 @@ void CNPC_Blob::AdvanceBatch()
 //-----------------------------------------------------------------------------
 CBlobElement *CNPC_Blob::CreateNewElement()
 {
-	CBlobElement *pElement = static_cast<CBlobElement*>(gEntList.CreateEntityByName( "blob_element" ));
+	CBlobElement *pElement = static_cast<CBlobElement*>(EntityList()->CreateEntityByName( "blob_element" ));
 
 	if( pElement != NULL )
 	{
@@ -1337,7 +1337,7 @@ void CNPC_Blob::InitializeElements()
 		angDistributor.y += step;
 	}
 
-	CBaseEntity *pEntity = gEntList.FindEntityByClassname( NULL, "info_target" );
+	CBaseEntity *pEntity = EntityList()->FindEntityByClassname( NULL, "info_target" );
 	for( i = 0 ; i < BLOB_MAX_AVOID_ORIGINS ; i++ )
 	{
 		if( pEntity )
@@ -1349,7 +1349,7 @@ void CNPC_Blob::InitializeElements()
 				m_iNumAvoidOrigins++;
 			}
 
-			pEntity = gEntList.FindEntityByClassname( pEntity, "info_target" );
+			pEntity = EntityList()->FindEntityByClassname( pEntity, "info_target" );
 		}
 		else
 		{

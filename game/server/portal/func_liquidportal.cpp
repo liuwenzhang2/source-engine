@@ -60,7 +60,7 @@ void CFunc_LiquidPortal::Spawn( void )
 	GetEngineObject()->SetMoveType( MOVETYPE_NONE );
 	SetModel( STRING(GetEngineObject()->GetModelName() ) );
 
-	CBaseEntity *pBaseEnt = gEntList.FindEntityByName( NULL, STRING(m_strInitialLinkedPortal) );
+	CBaseEntity *pBaseEnt = EntityList()->FindEntityByName( NULL, STRING(m_strInitialLinkedPortal) );
 	Assert( (pBaseEnt == NULL) || (dynamic_cast<CFunc_LiquidPortal *>(pBaseEnt) != NULL) );
 	SetLinkedLiquidPortal( (CFunc_LiquidPortal *)pBaseEnt );
 	SetThink( &CFunc_LiquidPortal::Think );
@@ -154,7 +154,7 @@ int	CFunc_LiquidPortal::Restore( IRestore &restore )
 
 void CFunc_LiquidPortal::InputSetLinkedLiquidPortal( inputdata_t &inputdata )
 {
-	CBaseEntity *pBaseEnt = gEntList.FindEntityByName( NULL, inputdata.value.String() );
+	CBaseEntity *pBaseEnt = EntityList()->FindEntityByName( NULL, inputdata.value.String() );
 	Assert( (pBaseEnt == NULL) || (dynamic_cast<CFunc_LiquidPortal *>(pBaseEnt) != NULL) );
 	SetLinkedLiquidPortal( (CFunc_LiquidPortal *)pBaseEnt );
 }

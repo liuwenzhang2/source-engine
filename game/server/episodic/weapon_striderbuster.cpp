@@ -246,7 +246,7 @@ void CWeaponStriderBuster::Spawn( void )
 
 	GetEngineObject()->AddFlag( FL_AIMTARGET|FL_OBJECT );
 
-	m_hParticleEffect = gEntList.CreateEntityByName( "info_particle_system" );
+	m_hParticleEffect = (CBaseEntity*)EntityList()->CreateEntityByName( "info_particle_system" );
 	if ( m_hParticleEffect )
 	{
 		m_hParticleEffect->KeyValue( "start_active", "1" );
@@ -382,7 +382,7 @@ void CWeaponStriderBuster::UpdateOnRemove( void )
 
 	if ( m_hParticleEffect )
 	{
-		gEntList.DestroyEntity( m_hParticleEffect );
+		EntityList()->DestroyEntity( m_hParticleEffect );
 	}
 
 	BaseClass::UpdateOnRemove();
@@ -469,7 +469,7 @@ bool CWeaponStriderBuster::StickToEntity( CBaseEntity *pOther )
 				{
 					// We don't have to save any pointers or handles to this because it's parented to the buster.
 					// So it will die when the buster dies. Yay.
-					CParticleSystem *pFlare = (CParticleSystem *)gEntList.CreateEntityByName( "info_particle_system" );
+					CParticleSystem *pFlare = (CParticleSystem *)EntityList()->CreateEntityByName( "info_particle_system" );
 					
 					if ( pFlare != NULL )
 					{
@@ -539,7 +539,7 @@ void CWeaponStriderBuster::CreateDestroyedEffect( void )
 	
 	for ( int i = 0; i < 3; i++ )
 	{
-		pTrail = gEntList.CreateEntityByName( "sparktrail" );
+		pTrail = (CBaseEntity*)EntityList()->CreateEntityByName( "sparktrail" );
 		pTrail->SetOwnerEntity( this );
 		DispatchSpawn( pTrail );
 	}

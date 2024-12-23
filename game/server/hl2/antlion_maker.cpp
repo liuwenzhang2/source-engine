@@ -105,7 +105,7 @@ void CAntlionMakerManager::GatherMakers( void )
 	m_Makers.Purge();
 
 	// Find these all once
-	while ( ( pSearch = gEntList.FindEntityByClassname( pSearch, "npc_antlion_template_maker" ) ) != NULL )
+	while ( ( pSearch = EntityList()->FindEntityByClassname( pSearch, "npc_antlion_template_maker" ) ) != NULL )
 	{
 		pMaker = static_cast<CAntlionTemplateMaker *>(pSearch);
 
@@ -228,7 +228,7 @@ void CAntlionTemplateMaker::FixupOrphans( void )
 	CNPC_Antlion	*pAntlion = NULL;
 
 	// Iterate through all antlions and see if there are any orphans
-	while ( ( pSearch = gEntList.FindEntityByClassname( pSearch, "npc_antlion" ) ) != NULL )
+	while ( ( pSearch = EntityList()->FindEntityByClassname( pSearch, "npc_antlion" ) ) != NULL )
 	{
 		pAntlion = dynamic_cast<CNPC_Antlion *>(pSearch);
 
@@ -304,7 +304,7 @@ void CAntlionTemplateMaker::ActivateSpore( const char* sporename, Vector vOrigin
 	char szName[64];
 	Q_snprintf( szName, sizeof( szName ), "%s_spore", sporename );
 
-	SporeExplosion *pSpore = (SporeExplosion*)gEntList.FindEntityByName( NULL, szName );
+	SporeExplosion *pSpore = (SporeExplosion*)EntityList()->FindEntityByName( NULL, szName );
 
 	//One already exists...
 	if ( pSpore )
@@ -318,7 +318,7 @@ void CAntlionTemplateMaker::ActivateSpore( const char* sporename, Vector vOrigin
 		return;
 	}
 
-	CBaseEntity *pEnt = gEntList.CreateEntityByName( "env_sporeexplosion" );
+	CBaseEntity *pEnt = (CBaseEntity*)EntityList()->CreateEntityByName( "env_sporeexplosion" );
 
 	if ( pEnt )
 	{
@@ -341,7 +341,7 @@ void CAntlionTemplateMaker::DisableSpore( const char* sporename )
 	char szName[64];
 	Q_snprintf( szName, sizeof( szName ), "%s_spore", sporename );
 
-	SporeExplosion *pSpore = (SporeExplosion*)gEntList.FindEntityByName( NULL, szName );
+	SporeExplosion *pSpore = (SporeExplosion*)EntityList()->FindEntityByName( NULL, szName );
 
 	if ( pSpore && pSpore->m_bDisabled == false )
 	{	
@@ -470,7 +470,7 @@ void CAntlionTemplateMaker::SetFightTarget( string_t strTarget, CBaseEntity *pAc
 		CBaseEntity *pSearch = m_hFightTarget;
 
 		for ( int i = random->RandomInt(1,5); i > 0; i-- )
-			pSearch = gEntList.FindEntityByName( pSearch, strTarget, this, pActivator, pCaller );
+			pSearch = EntityList()->FindEntityByName( pSearch, strTarget, this, pActivator, pCaller );
 
 		if ( pSearch != NULL )
 		{
@@ -478,12 +478,12 @@ void CAntlionTemplateMaker::SetFightTarget( string_t strTarget, CBaseEntity *pAc
 		}
 		else
 		{
-			SetFightTarget( gEntList.FindEntityByName( NULL, strTarget, this, pActivator, pCaller ) );
+			SetFightTarget( EntityList()->FindEntityByName( NULL, strTarget, this, pActivator, pCaller ) );
 		}
 	}
 	else 
 	{
-		SetFightTarget( gEntList.FindEntityByName( NULL, strTarget, this, pActivator, pCaller ) );
+		SetFightTarget( EntityList()->FindEntityByName( NULL, strTarget, this, pActivator, pCaller ) );
 	}
 }
 
@@ -523,7 +523,7 @@ void CAntlionTemplateMaker::SetFollowTarget( CBaseEntity *pTarget )
 //-----------------------------------------------------------------------------
 void CAntlionTemplateMaker::SetFollowTarget( string_t strTarget, CBaseEntity *pActivator, CBaseEntity *pCaller )
 {
-	CBaseEntity *pSearch = gEntList.FindEntityByName( NULL, strTarget, NULL, pActivator, pCaller );
+	CBaseEntity *pSearch = EntityList()->FindEntityByName( NULL, strTarget, NULL, pActivator, pCaller );
 
 	if ( pSearch != NULL )
 	{
@@ -549,7 +549,7 @@ void CAntlionTemplateMaker::CreateProxyTarget( const Vector &position )
 	// Create if we don't have one
 	if ( m_hProxyTarget == NULL )
 	{
-		m_hProxyTarget = gEntList.CreateEntityByName( "info_target" );
+		m_hProxyTarget = (CBaseEntity*)EntityList()->CreateEntityByName( "info_target" );
 	}
 
 	// Update if we do
@@ -566,7 +566,7 @@ void CAntlionTemplateMaker::DestroyProxyTarget( void )
 {
 	if ( m_hProxyTarget )
 	{
-		gEntList.DestroyEntity( m_hProxyTarget );
+		EntityList()->DestroyEntity( m_hProxyTarget );
 	}
 }
 
@@ -664,7 +664,7 @@ void CAntlionTemplateMaker::MakeNPC( void )
 	QAngle	targetAngles = GetEngineObject()->GetAbsAngles();
 
 	// Look for our target entity
-	CBaseEntity *pTarget = gEntList.FindEntityByName( NULL, m_strSpawnTarget, this );
+	CBaseEntity *pTarget = EntityList()->FindEntityByName( NULL, m_strSpawnTarget, this );
 
 	// Take its position if it exists
 	if ( pTarget != NULL )
@@ -1743,7 +1743,7 @@ void CAntlionTemplateMaker::DrawDebugGeometryOverlays( void )
 		if ( m_strSpawnTarget != NULL_STRING )
 		{
 			// Find all the possible targets
-			CBaseEntity *pTarget = gEntList.FindEntityByName( NULL, m_strSpawnTarget );
+			CBaseEntity *pTarget = EntityList()->FindEntityByName( NULL, m_strSpawnTarget );
 			if ( pTarget != NULL )
 			{
 				NDebugOverlay::VertArrow(GetEngineObject()->GetAbsOrigin(), pTarget->WorldSpaceCenter(), 4.0f, 255, 255, 255, 0, true, 0.05f );
@@ -1754,7 +1754,7 @@ void CAntlionTemplateMaker::DrawDebugGeometryOverlays( void )
 		if ( m_strFollowTarget != NULL_STRING )
 		{
 			// Find all the possible targets
-			CBaseEntity *pTarget = gEntList.FindEntityByName( NULL, m_strFollowTarget );
+			CBaseEntity *pTarget = EntityList()->FindEntityByName( NULL, m_strFollowTarget );
 			if ( pTarget != NULL )
 			{
 				NDebugOverlay::VertArrow(GetEngineObject()->GetAbsOrigin(), pTarget->WorldSpaceCenter(), 4.0f, 255, 255, 0, 0, true, 0.05f );
@@ -1765,7 +1765,7 @@ void CAntlionTemplateMaker::DrawDebugGeometryOverlays( void )
 		if ( m_strFightTarget != NULL_STRING )
 		{
 			// Find all the possible targets
-			CBaseEntity *pTarget = gEntList.FindEntityByName( NULL, m_strFightTarget );
+			CBaseEntity *pTarget = EntityList()->FindEntityByName( NULL, m_strFightTarget );
 			if ( pTarget != NULL )
 			{
 				NDebugOverlay::VertArrow(GetEngineObject()->GetAbsOrigin(), pTarget->WorldSpaceCenter(), 4.0f, 255, 0, 0, 0, true, 0.05f );

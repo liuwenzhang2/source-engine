@@ -32,7 +32,7 @@ END_DATADESC()
 
 AR2Explosion* AR2Explosion::CreateAR2Explosion(const Vector &pos)
 {
-	CBaseEntity *pEnt = gEntList.CreateEntityByName(AR2EXPLOSION_ENTITYNAME);
+	CBaseEntity *pEnt = (CBaseEntity*)EntityList()->CreateEntityByName(AR2EXPLOSION_ENTITYNAME);
 	if(pEnt)
 	{
 		AR2Explosion *pEffect = dynamic_cast<AR2Explosion*>(pEnt);
@@ -44,7 +44,7 @@ AR2Explosion* AR2Explosion::CreateAR2Explosion(const Vector &pos)
 		}
 		else
 		{
-			gEntList.DestroyEntity(pEnt);
+			EntityList()->DestroyEntity(pEnt);
 		}
 	}
 

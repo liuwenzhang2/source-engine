@@ -386,7 +386,7 @@ bool CAI_MoveProbe::CheckStep( const CheckStepArgs_t &args, CheckStepResult_t *p
 		}
 		else
 		{
-			pResult->pBlocker = gEntList.GetBaseEntity( 0 );
+			pResult->pBlocker = EntityList()->GetBaseEntity( 0 );
 		}
 		return false;
 	}
@@ -659,7 +659,7 @@ bool CAI_MoveProbe::TestGroundMove( const Vector &vecActualStart, const Vector &
 			NDebugOverlay::Cross3D( pMoveTrace->vEndPosition, 8, 255, 0, 0, false, 0.1 );
 #endif
 			// Ok, we ended up on a ledge above or below the desired destination
-			pMoveTrace->pObstruction = gEntList.GetBaseEntity( 0 );
+			pMoveTrace->pObstruction = EntityList()->GetBaseEntity(0);
 			pMoveTrace->vHitNormal	 = vec3_origin;
 			pMoveTrace->fStatus = AIMR_BLOCKED_WORLD;
 			pMoveTrace->flDistObstructed = ComputePathDistance( NAV_GROUND, pMoveTrace->vEndPosition, vecDesiredEnd );
@@ -690,7 +690,7 @@ void CAI_MoveProbe::GroundMoveLimit( const Vector &vecStart, const Vector &vecEn
 	if ( !IterativeFloorPoint( vecStart, collisionMask, &vecActualStart ) )
 	{
 		pTrace->flDistObstructed = pTrace->flTotalDist;
-		pTrace->pObstruction	= gEntList.GetBaseEntity( 0 );
+		pTrace->pObstruction	= EntityList()->GetBaseEntity( 0 );
 		pTrace->vHitNormal		= vec3_origin;
 		pTrace->fStatus			= AIMR_BLOCKED_WORLD;
 		pTrace->vEndPosition	= vecStart;
@@ -1048,7 +1048,7 @@ bool CAI_MoveProbe::MoveLimit( Navigation_t navType, const Vector &vecStart,
 			GroundMoveLimit(vecStart, vecEnd, collisionMask, pTarget, testGroundMoveFlags, pctToCheckStandPositions, pTrace);
 		else
 		{
-			pTrace->pObstruction = gEntList.GetBaseEntity( 0 );
+			pTrace->pObstruction = EntityList()->GetBaseEntity( 0 );
 			pTrace->vHitNormal	 = vec3_origin;
 			pTrace->fStatus		= AIMR_BLOCKED_WORLD;
 			pTrace->flDistObstructed = ComputePathDistance( NAV_GROUND, vecStart, vecEnd );

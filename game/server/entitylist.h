@@ -94,15 +94,6 @@ private:
 	CUtlVector<CBaseEntity*>	m_targetList;
 };
 
-// Derive a class from this if you want to filter entity list searches
-abstract_class IEntityFindFilter
-{
-public:
-	virtual bool ShouldFindEntity( CBaseEntity *pEntity ) = 0;
-	virtual CBaseEntity *GetFilterResult( void ) = 0;
-};
-
-
 class CEngineObjectInternal;
 
 class CEngineObjectNetworkProperty : public CServerNetworkProperty {
@@ -2786,7 +2777,7 @@ public:
 	IServerEntity* GetServerEntityFromHandle(CBaseHandle hEnt) const;
 	short		GetNetworkSerialNumber(int iEntity) const;
 	//CBaseNetworkable* GetBaseNetworkable( CBaseHandle hEnt ) const;
-	CBaseEntity* GetBaseEntity(CBaseHandle hEnt) const;
+	CBaseEntity* GetBaseEntityFromHandle(CBaseHandle hEnt) const;
 	CBaseEntity* GetBaseEntity(int entnum) const;
 	//edict_t* GetEdict( CBaseHandle hEnt ) const;
 
@@ -2812,19 +2803,6 @@ public:
 	// returns the next entity after pCurrentEnt;  if pCurrentEnt is NULL, return the first entity
 	CBaseEntity* NextEnt(CBaseEntity* pCurrentEnt);
 	CBaseEntity* FirstEnt() { return NextEnt(NULL); }
-
-	// returns the next entity of the specified class, using RTTI
-	template< class U >
-	U* NextEntByClass(U* start)
-	{
-		for (CBaseEntity* x = NextEnt(start); x; x = NextEnt(x))
-		{
-			start = dynamic_cast<U*>(x);
-			if (start)
-				return start;
-		}
-		return NULL;
-	}
 
 	// search functions
 	bool		 IsEntityPtr(void* pTest);
@@ -4071,7 +4049,7 @@ void CGlobalEntityList<T>::Save(ISave* pSave)
 		pEntInfo->location = pSave->GetWritePos();
 		pEntInfo->size = 0;
 
-		T* pEnt = (T*)GetServerEntityFromHandle(pEntInfo->hEnt);
+		T* pEnt = (T*)GetBaseEntityFromHandle(pEntInfo->hEnt);
 		if (pEnt && !(pEnt->ObjectCaps() & FCAP_DONT_SAVE))
 		{
 			MDLCACHE_CRITICAL_SECTION();
@@ -4248,7 +4226,7 @@ void CGlobalEntityList<T>::Restore(IRestore* pRestore, bool createPlayers)
 		pEntInfo = pSaveData->GetEntityInfo(i);
 		if (pEntInfo->edictindex != 0)
 		{
-			pent = (T*)GetServerEntityFromHandle(pEntInfo->hEnt);
+			pent = GetBaseEntityFromHandle(pEntInfo->hEnt);
 			pRestore->SetReadPos(pEntInfo->location);
 			if (pent)
 			{
@@ -4424,7 +4402,7 @@ void CGlobalEntityList<T>::PostRestore()
 // Call all entities' OnRestore handlers
 	for (int i = m_RestoredEntities.Count() - 1; i >= 0; --i)
 	{
-		T* pEntity = (T*)GetServerEntityFromHandle(m_RestoredEntities[i]);
+		T* pEntity = (T*)GetBaseEntityFromHandle(m_RestoredEntities[i]);
 		if (pEntity && !pEntity->IsDormant())
 		{
 			MDLCACHE_CRITICAL_SECTION();
@@ -4505,7 +4483,7 @@ int CGlobalEntityList<T>::CreateEntityTransitionListInternal(IRestore* pRestore,
 	for (i = 0; i < pSaveData->NumEntities(); i++)
 	{
 		pEntInfo = pSaveData->GetEntityInfo(i);
-		pent = (T*)GetServerEntityFromHandle(pEntInfo->hEnt);
+		pent = GetBaseEntityFromHandle(pEntInfo->hEnt);
 		//		pSaveData->currentIndex = i;
 		pRestore->SetReadPos(pEntInfo->location);
 
@@ -4524,12 +4502,12 @@ int CGlobalEntityList<T>::CreateEntityTransitionListInternal(IRestore* pRestore,
 				if (RestoreGlobalEntity(pent, pRestore, pEntInfo) > 0)
 				{
 					movedCount++;
-					pEntInfo->restoreentityindex = ((T*)GetServerEntityFromHandle(pEntInfo->hEnt))->entindex();
-					AddRestoredEntity((T*)GetServerEntityFromHandle(pEntInfo->hEnt));
+					pEntInfo->restoreentityindex = (GetBaseEntityFromHandle(pEntInfo->hEnt))->entindex();
+					AddRestoredEntity(GetBaseEntityFromHandle(pEntInfo->hEnt));
 				}
 				else
 				{
-					DestroyEntityImmediate((T*)GetServerEntityFromHandle(pEntInfo->hEnt));
+					DestroyEntityImmediate(GetBaseEntityFromHandle(pEntInfo->hEnt));
 				}
 				// -------------------------------------------------------------------------
 			}
@@ -4556,7 +4534,7 @@ int CGlobalEntityList<T>::CreateEntityTransitionListInternal(IRestore* pRestore,
 	for (i = checkList.Count() - 1; i >= 0; --i)
 	{
 		pEntInfo = pSaveData->GetEntityInfo(checkList[i]);
-		pent = (T*)GetServerEntityFromHandle(pEntInfo->hEnt);
+		pent = GetBaseEntityFromHandle(pEntInfo->hEnt);
 
 		// NOTE: pent can be NULL because UTIL_RemoveImmediate (called below) removes all in hierarchy
 		if (!pent)
@@ -5292,7 +5270,7 @@ short		CGlobalEntityList<T>::GetNetworkSerialNumber(int iEntity) const {
 }
 
 template<class T>
-inline CBaseEntity* CGlobalEntityList<T>::GetBaseEntity( CBaseHandle hEnt ) const
+inline CBaseEntity* CGlobalEntityList<T>::GetBaseEntityFromHandle( CBaseHandle hEnt ) const
 {
 	T *pUnk = (BaseClass::LookupEntity( hEnt ));
 	if ( pUnk )
@@ -5372,7 +5350,7 @@ void CGlobalEntityList<T>::Clear(void)
 	CBaseHandle hCur = BaseClass::FirstHandle();
 	while (hCur != BaseClass::InvalidHandle())
 	{
-		T* ent = GetBaseEntity(hCur);
+		T* ent = GetBaseEntityFromHandle(hCur);
 		if (ent)
 		{
 			MDLCACHE_CRITICAL_SECTION();
@@ -6644,14 +6622,6 @@ CCallQueue* CGlobalEntityList<T>::GetPostTouchQueue()
 }
 
 extern CGlobalEntityList<CBaseEntity> gEntList;
-
-template<class T>
-inline T* CHandle<T>::Get() const
-{
-#ifdef GAME_DLL
-	return (T*)gEntList.LookupEntity(*this);
-#endif // GAME_DLL
-}
 
 //-----------------------------------------------------------------------------
 // Common finds

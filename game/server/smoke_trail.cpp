@@ -133,7 +133,7 @@ void SmokeTrail::SetEmit(bool bVal)
 //-----------------------------------------------------------------------------
 SmokeTrail* SmokeTrail::CreateSmokeTrail()
 {
-	CBaseEntity *pEnt = gEntList.CreateEntityByName(SMOKETRAIL_ENTITYNAME);
+	CBaseEntity *pEnt = (CBaseEntity*)EntityList()->CreateEntityByName(SMOKETRAIL_ENTITYNAME);
 	if(pEnt)
 	{
 		SmokeTrail *pSmoke = dynamic_cast<SmokeTrail*>(pEnt);
@@ -144,7 +144,7 @@ SmokeTrail* SmokeTrail::CreateSmokeTrail()
 		}
 		else
 		{
-			gEntList.DestroyEntity(pEnt);
+			EntityList()->DestroyEntity(pEnt);
 		}
 	}
 
@@ -255,7 +255,7 @@ void RocketTrail::SetEmit(bool bVal)
 //-----------------------------------------------------------------------------
 RocketTrail* RocketTrail::CreateRocketTrail()
 {
-	CBaseEntity *pEnt = gEntList.CreateEntityByName( "env_rockettrail" );
+	CBaseEntity *pEnt = (CBaseEntity*)EntityList()->CreateEntityByName( "env_rockettrail" );
 	
 	if( pEnt != NULL )
 	{
@@ -268,7 +268,7 @@ RocketTrail* RocketTrail::CreateRocketTrail()
 		}
 		else
 		{
-			gEntList.DestroyEntity( pEnt );
+			EntityList()->DestroyEntity( pEnt );
 		}
 	}
 
@@ -341,7 +341,7 @@ SporeTrail::SporeTrail( void )
 //-----------------------------------------------------------------------------
 SporeTrail* SporeTrail::CreateSporeTrail()
 {
-	CBaseEntity *pEnt = gEntList.CreateEntityByName( SPORETRAIL_ENTITYNAME );
+	CBaseEntity *pEnt = (CBaseEntity*)EntityList()->CreateEntityByName( SPORETRAIL_ENTITYNAME );
 	
 	if(pEnt)
 	{
@@ -354,7 +354,7 @@ SporeTrail* SporeTrail::CreateSporeTrail()
 		}
 		else
 		{
-			gEntList.DestroyEntity( pEnt );
+			EntityList()->DestroyEntity( pEnt );
 		}
 	}
 
@@ -420,7 +420,7 @@ void SporeExplosion::Spawn( void )
 //-----------------------------------------------------------------------------
 SporeExplosion *SporeExplosion::CreateSporeExplosion()
 {
-	CBaseEntity *pEnt = gEntList.CreateEntityByName( SPOREEXPLOSION_ENTITYNAME );
+	CBaseEntity *pEnt = (CBaseEntity*)EntityList()->CreateEntityByName( SPOREEXPLOSION_ENTITYNAME );
 	
 	if ( pEnt )
 	{
@@ -433,7 +433,7 @@ SporeExplosion *SporeExplosion::CreateSporeExplosion()
 		}
 		else
 		{
-			gEntList.DestroyEntity( pEnt );
+			EntityList()->DestroyEntity( pEnt );
 		}
 	}
 
@@ -504,7 +504,7 @@ void CFireTrail::FollowEntity( CBaseEntity *pEntity, const char *pAttachmentName
 //-----------------------------------------------------------------------------
 CFireTrail *CFireTrail::CreateFireTrail( void )
 {
-	CBaseEntity *pEnt = gEntList.CreateEntityByName( "env_fire_trail" );
+	CBaseEntity *pEnt = (CBaseEntity*)EntityList()->CreateEntityByName( "env_fire_trail" );
 	
 	if ( pEnt )
 	{
@@ -517,7 +517,7 @@ CFireTrail *CFireTrail::CreateFireTrail( void )
 		}
 		else
 		{
-			gEntList.DestroyEntity( pEnt );
+			EntityList()->DestroyEntity( pEnt );
 		}
 	}
 
@@ -627,7 +627,7 @@ void DustTrail::SetEmit(bool bVal)
 //-----------------------------------------------------------------------------
 DustTrail* DustTrail::CreateDustTrail()
 {
-	CBaseEntity *pEnt = gEntList.CreateEntityByName(DUSTTRAIL_ENTITYNAME);
+	CBaseEntity *pEnt = (CBaseEntity*)EntityList()->CreateEntityByName(DUSTTRAIL_ENTITYNAME);
 	if(pEnt)
 	{
 		DustTrail *pDust = dynamic_cast<DustTrail*>(pEnt);
@@ -638,7 +638,7 @@ DustTrail* DustTrail::CreateDustTrail()
 		}
 		else
 		{
-			gEntList.DestroyEntity(pEnt);
+			EntityList()->DestroyEntity(pEnt);
 		}
 	}
 

@@ -93,7 +93,7 @@ void CNPC_APCDriver::Activate( void )
 	if ( !m_hAPC )
 	{
 		Warning( "npc_apcdriver %s couldn't find his apc named %s.\n", STRING(GetEntityName()), STRING(m_iszVehicleName) );
-		gEntList.DestroyEntity( this );
+		EntityList()->DestroyEntity( this );
 		return;
 	}
 	GetEngineObject()->SetParent( m_hAPC->GetEngineObject() );
@@ -283,7 +283,7 @@ void CNPC_APCDriver::PrescheduleThink( )
 	}
 	else if ( m_hAPC->m_lifeState == LIFE_DEAD )
 	{
-		gEntList.DestroyEntity( this );
+		EntityList()->DestroyEntity( this );
 	}
 }
 

@@ -101,13 +101,13 @@ void CAI_GoalEntity::ResolveNames()
 		{
 			case ST_ENTNAME:
 			{
-				pEntity = gEntList.FindEntityByName( pEntity, m_iszActor );
+				pEntity = EntityList()->FindEntityByName( pEntity, m_iszActor );
 				break;
 			}
 			
 			case ST_CLASSNAME:
 			{
-				pEntity = gEntList.FindEntityByClassname( pEntity, STRING( m_iszActor ) );
+				pEntity = EntityList()->FindEntityByClassname( pEntity, STRING( m_iszActor ) );
 				break;
 			}
 		}
@@ -125,7 +125,7 @@ void CAI_GoalEntity::ResolveNames()
 		}
 	}
 		
-	m_hGoalEntity = gEntList.FindEntityByName( NULL, m_iszGoal );
+	m_hGoalEntity = EntityList()->FindEntityByName( NULL, m_iszGoal );
 }
 
 //-------------------------------------

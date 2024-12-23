@@ -1265,7 +1265,7 @@ int CAI_ActBusyBehavior::SelectScheduleWhileNotBusy( int iBase )
 					if( m_hActBusyGoal && m_hActBusyGoal->m_iszSeeEntityName != NULL_STRING )
 					{
 						// Set the see entity Handle if we have one.
-						m_hSeeEntity.Set( gEntList.FindEntityByName(NULL, m_hActBusyGoal->m_iszSeeEntityName) );
+						m_hSeeEntity.Set( EntityList()->FindEntityByName(NULL, m_hActBusyGoal->m_iszSeeEntityName) );
 					}
 
 					// At this point we know we're starting. 
@@ -1555,14 +1555,14 @@ void CAI_ActBusyBehavior::CollectSafeZoneVolumes( CAI_ActBusyGoal *pActBusyGoal 
 
 	if( pActBusyGoal->m_iszSafeZoneVolume != NULL_STRING )
 	{
-		CBaseEntity *pVolume = gEntList.FindEntityByName( NULL, pActBusyGoal->m_iszSafeZoneVolume );
+		CBaseEntity *pVolume = EntityList()->FindEntityByName( NULL, pActBusyGoal->m_iszSafeZoneVolume );
 
 		while( pVolume != NULL )
 		{
 			busysafezone_t newSafeZone;
 			pVolume->GetEngineObject()->WorldSpaceAABB( &newSafeZone.vecMins, &newSafeZone.vecMaxs );
 			m_SafeZones.AddToTail( newSafeZone );
-			pVolume = gEntList.FindEntityByName( pVolume, pActBusyGoal->m_iszSafeZoneVolume );
+			pVolume = EntityList()->FindEntityByName( pVolume, pActBusyGoal->m_iszSafeZoneVolume );
 		}
 	}
 
@@ -2353,7 +2353,7 @@ CAI_ActBusyBehavior *CAI_ActBusyGoal::GetBusyBehaviorForNPC( CBaseEntity *pEntit
 //-----------------------------------------------------------------------------
 CAI_ActBusyBehavior *CAI_ActBusyGoal::GetBusyBehaviorForNPC( const char *pszActorName, CBaseEntity *pActivator, CBaseEntity *pCaller, const char *sInputName )
 {
-	CBaseEntity *pEntity = gEntList.FindEntityByName( NULL, MAKE_STRING(pszActorName), NULL, pActivator, pCaller );
+	CBaseEntity *pEntity = EntityList()->FindEntityByName( NULL, MAKE_STRING(pszActorName), NULL, pActivator, pCaller );
 	if ( !pEntity )
 	{
 		Msg("ai_goal_actbusy input %s fired targeting a non-existant entity (%s).\n", sInputName, pszActorName );
@@ -2487,7 +2487,7 @@ void CAI_ActBusyGoal::InputForceNPCToActBusy( inputdata_t &inputdata )
 	if ( pszParam )
 	{	
 		// Find the specified hintnode
-		CBaseEntity *pEntity = gEntList.FindEntityByName( NULL, pszParam, NULL, inputdata.pActivator, inputdata.pCaller );
+		CBaseEntity *pEntity = EntityList()->FindEntityByName( NULL, pszParam, NULL, inputdata.pActivator, inputdata.pCaller );
 		if ( pEntity )
 		{
 			pHintNode = dynamic_cast<CAI_Hint*>(pEntity);
@@ -2524,7 +2524,7 @@ void CAI_ActBusyGoal::InputForceNPCToActBusy( inputdata_t &inputdata )
 		}
 		else if ( !Q_strncmp( pszParam, "see:", 4 ) )
 		{
-			pSeeEntity = gEntList.FindEntityByName( NULL, pszParam+4 );
+			pSeeEntity = EntityList()->FindEntityByName( NULL, pszParam+4 );
 		}
 		else if ( pszParam[0] == '$' )
 		{
@@ -2756,18 +2756,18 @@ void CAI_ActBusyQueueGoal::InputActivate( inputdata_t &inputdata )
 				continue;
 			}
 
-			CBaseEntity *pEntity = gEntList.FindEntityByName( NULL, m_iszNodes[i] );
+			CBaseEntity *pEntity = EntityList()->FindEntityByName( NULL, m_iszNodes[i] );
 			if ( !pEntity )
 			{
 				Warning( "Unable to find ai_goal_actbusy_queue %s's node %d: %s\n", STRING(GetEntityName()), i, STRING(m_iszNodes[i]) );
-				gEntList.DestroyEntity( this );
+				EntityList()->DestroyEntity( this );
 				return;
 			}
 			m_hNodes[i] = dynamic_cast<CAI_Hint*>(pEntity);
 			if ( !m_hNodes[i] )
 			{
 				Warning( "ai_goal_actbusy_queue %s's node %d: '%s' is not an ai_hint.\n", STRING(GetEntityName()), i, STRING(m_iszNodes[i]) );
-				gEntList.DestroyEntity( this );
+				EntityList()->DestroyEntity( this );
 				return;
 			}
 
@@ -2783,11 +2783,11 @@ void CAI_ActBusyQueueGoal::InputActivate( inputdata_t &inputdata )
 		}
 
 		// Find the exit node
-		m_hExitNode = gEntList.FindEntityByName( NULL, m_iszExitNode );
+		m_hExitNode = EntityList()->FindEntityByName( NULL, m_iszExitNode );
 		if ( !m_hExitNode )
 		{
 			Warning( "Unable to find ai_goal_actbusy_queue %s's exit node: %s\n", STRING(GetEntityName()), STRING(m_iszExitNode) );
-			gEntList.DestroyEntity( this );
+			EntityList()->DestroyEntity( this );
 			return;
 		}
 

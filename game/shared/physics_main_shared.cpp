@@ -133,7 +133,7 @@ void CBaseEntity::NotifyVPhysicsStateChanged(IPhysicsObject* pPhysics, bool bAwa
 void SpewLinks()
 {
 	int nCount = 0;
-	for ( CBaseEntity *pClass = gEntList.FirstEnt(); pClass != NULL; pClass = gEntList.NextEnt(pClass) )
+	for ( CBaseEntity *pClass = EntityList()->FirstEnt(); pClass != NULL; pClass = EntityList()->NextEnt(pClass) )
 	{
 		if ( pClass /*&& !pClass->IsDormant()*/ )
 		{
@@ -147,7 +147,7 @@ void SpewLinks()
 					++nCount;
 					Msg("[%d] (%d) Link %d (%s) -> %d (%s)\n", nCount, pClass->IsDormant(),
 						pClass->entindex(), pClass->GetClassname(),
-						gEntList.GetServerEntityFromHandle(link->entityTouched)->entindex(), ((CBaseEntity*)gEntList.GetServerEntityFromHandle(link->entityTouched))->GetClassname() );
+						EntityList()->GetBaseEntityFromHandle(link->entityTouched)->entindex(), EntityList()->GetBaseEntityFromHandle(link->entityTouched)->GetClassname() );
 				}
 			}
 		}

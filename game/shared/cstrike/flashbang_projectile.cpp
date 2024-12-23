@@ -54,9 +54,9 @@ float PercentageOfFlashForPlayer(CBaseEntity *player, Vector flashPos, CBaseEnti
 
 	CBaseEntity *pSGren;
 
-	for( pSGren = gEntList.FindEntityByClassname( NULL, "env_particlesmokegrenade" );
+	for( pSGren = EntityList()->FindEntityByClassname( NULL, "env_particlesmokegrenade" );
 		pSGren;
-		pSGren = gEntList.FindEntityByClassname( pSGren, "env_particlesmokegrenade" ) )
+		pSGren = EntityList()->FindEntityByClassname( pSGren, "env_particlesmokegrenade" ) )
 	{
 		ParticleSmokeGrenade *pPSG =( ParticleSmokeGrenade* ) pSGren;
 
@@ -314,7 +314,7 @@ void CFlashbangProjectile::Detonate()
 		}
 	}
 
-	gEntList.DestroyEntity( this );
+	EntityList()->DestroyEntity( this );
 }
 
 //TODO: Let physics handle the sound!

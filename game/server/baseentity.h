@@ -2253,6 +2253,18 @@ public:
 	virtual bool KeyValue( const char *szKeyName, const char *szValue );
 };
 
+// returns the next entity of the specified class, using RTTI
+template< class U >
+U* NextEntByClass(U* start)
+{
+	for (CBaseEntity* x = EntityList()->NextEnt(start); x; x = EntityList()->NextEnt(x))
+	{
+		start = dynamic_cast<U*>(x);
+		if (start)
+			return start;
+	}
+	return NULL;
+}
 
 // Network proxy functions
 

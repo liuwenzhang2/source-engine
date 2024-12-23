@@ -263,8 +263,8 @@ void NextBotManager::Reset( void )
 		int iNext = m_botList.Next( i );
 		if ( m_botList[i]->IsRemovedOnReset() )
 		{
-			gEntList.DestroyEntity( m_botList[i]->GetEntity() );
-			//Assert( !m_botList.IsInList( i ) );	// gEntList.DestroyEntity() calls UpdateOnRemove, adds EFL_KILLME, but doesn't delete until the end of the frame
+			EntityList()->DestroyEntity( m_botList[i]->GetEntity() );
+			//Assert( !m_botList.IsInList( i ) );	// EntityList()->DestroyEntity() calls UpdateOnRemove, adds EFL_KILLME, but doesn't delete until the end of the frame
 		}
 		i = iNext;
 	}

@@ -131,7 +131,7 @@ void CPathCorner::DrawDebugGeometryOverlays(void)
 
 		if (m_target != NULL_STRING)
 		{
-			CBaseEntity *pTarget = gEntList.FindEntityByName( NULL, m_target );
+			CBaseEntity *pTarget = EntityList()->FindEntityByName( NULL, m_target );
 			if (pTarget)
 			{
 				NDebugOverlay::Line(GetEngineObject()->GetAbsOrigin(),pTarget->GetEngineObject()->GetAbsOrigin(),255,100,100,true,0.0);

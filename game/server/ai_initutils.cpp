@@ -88,7 +88,7 @@ CAI_TestHull* CAI_TestHull::GetTestHull(void)
 {
 	if (!CAI_TestHull::pTestHull)
 	{
-		CAI_TestHull::pTestHull = (CAI_TestHull*)gEntList.CreateEntityByName("aitesthull");
+		CAI_TestHull::pTestHull = (CAI_TestHull*)EntityList()->CreateEntityByName("aitesthull");
 		CAI_TestHull::pTestHull->Spawn();
 		CAI_TestHull::pTestHull->GetEngineObject()->AddFlag( FL_NPC );
 	}
@@ -116,7 +116,7 @@ void CAI_TestHull::ReturnTestHull(void)
 	CAI_TestHull::pTestHull->GetEngineObject()->AddSolidFlags( FSOLID_NOT_SOLID );
 	UTIL_SetSize(CAI_TestHull::pTestHull, vec3_origin, vec3_origin);
 
-	gEntList.DestroyEntityImmediate( pTestHull );
+	EntityList()->DestroyEntityImmediate( pTestHull );
 	pTestHull = NULL;
 }
 
@@ -218,7 +218,7 @@ int CNodeEnt::Spawn( const char *pMapData )
 		{
 			Warning("info_hint (HammerID: %d, position (%.2f, %.2f, %.2f)) with no hint type.\n", m_NodeData.nWCNodeID, m_NodeData.vecPosition.x, m_NodeData.vecPosition.y, m_NodeData.vecPosition.z );
 		}
-		gEntList.DestroyEntityImmediate( this );
+		EntityList()->DestroyEntityImmediate( this );
 		return -1;
 	}
 	
@@ -256,7 +256,7 @@ int CNodeEnt::Spawn( const char *pMapData )
 			}
 		}
 		m_nNodeCount++;
-		gEntList.DestroyEntityImmediate( this );
+		EntityList()->DestroyEntityImmediate( this );
 		return -1;
 	}	
 	else
@@ -323,7 +323,7 @@ int CNodeEnt::Spawn( const char *pMapData )
 		g_AINetworkBuilder.InitNodePosition( g_pBigAINet, new_node );
 	}
 
-	gEntList.DestroyEntityImmediate( this );
+	EntityList()->DestroyEntityImmediate( this );
 
 	return -1;
 }

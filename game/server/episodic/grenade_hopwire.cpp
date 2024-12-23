@@ -94,7 +94,7 @@ void CGravityVortexController::ConsumeEntity( CBaseEntity *pEnt )
 	}
 
 	// Destroy the entity
-	gEntList.DestroyEntity( pEnt );
+	EntityList()->DestroyEntity( pEnt );
 }
 
 //-----------------------------------------------------------------------------
@@ -189,7 +189,7 @@ bool CGravityVortexController::KillNPCInRange( CBaseEntity *pVictim, IPhysicsObj
 //-----------------------------------------------------------------------------
 void CGravityVortexController::CreateDenseBall( void )
 {
-	CBaseEntity *pBall = gEntList.CreateEntityByName( "prop_physics" );
+	CBaseEntity *pBall = (CBaseEntity*)EntityList()->CreateEntityByName( "prop_physics" );
 	
 	pBall->SetModel( DENSE_BALL_MODEL );
 	pBall->GetEngineObject()->SetAbsOrigin(GetEngineObject()->GetAbsOrigin() );
@@ -315,7 +315,7 @@ void CGravityVortexController::StartPull( const Vector &origin, float radius, fl
 CGravityVortexController *CGravityVortexController::Create( const Vector &origin, float radius, float strength, float duration )
 {
 	// Create an instance of the vortex
-	CGravityVortexController *pVortex = (CGravityVortexController *)gEntList.CreateEntityByName( "vortex_controller" );
+	CGravityVortexController *pVortex = (CGravityVortexController *)EntityList()->CreateEntityByName( "vortex_controller" );
 	if ( pVortex == NULL )
 		return NULL;
 

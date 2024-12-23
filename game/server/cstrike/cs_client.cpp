@@ -87,7 +87,7 @@ called each time a player is spawned into the game
 void ClientPutInServer( int pEdict, const char *playername )
 {
 	// Allocate a CBaseTFPlayer for pev, and call spawn
-	CCSPlayer *pPlayer = (CCSPlayer*)gEntList.GetBaseEntity(pEdict);
+	CCSPlayer *pPlayer = (CCSPlayer*)EntityList()->GetBaseEntity(pEdict);
 	if (pPlayer == NULL) {
 		pPlayer = CCSPlayer::CreatePlayer("player", pEdict);
 	}
@@ -110,7 +110,7 @@ void ClientActive( int pEdict, bool bLoadGame )
 	// Can't load games in CS!
 	Assert( !bLoadGame );
 
-	CCSPlayer *pPlayer = ToCSPlayer( gEntList.GetBaseEntity( pEdict ) );
+	CCSPlayer *pPlayer = ToCSPlayer(EntityList()->GetBaseEntity( pEdict ) );
 	FinishClientPutInServer( pPlayer );
 
 	CSingleUserRecipientFilter user( pPlayer );

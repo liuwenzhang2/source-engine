@@ -1408,7 +1408,7 @@ void CTeamRoundTimer::SetActiveTimer( CTeamRoundTimer *pNewlyActive )
 
 	// Ensure all other timers are off.
 	CBaseEntity *pEntity = NULL;
-	while ((pEntity = gEntList.FindEntityByClassname( pEntity, "team_round_timer" )) != NULL)
+	while ((pEntity = EntityList()->FindEntityByClassname( pEntity, "team_round_timer" )) != NULL)
 	{
 		if ( pEntity == pNewlyActive )
 			continue;

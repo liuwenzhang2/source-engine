@@ -93,7 +93,7 @@ bool CBaseCSGrenade::Deploy()
 	if( pPlayer->GetAmmoCount(m_iPrimaryAmmoType) <= 0 )
 	{
 		pPlayer->Weapon_Drop( this, NULL, NULL );
-		gEntList.DestroyEntity(this);
+		EntityList()->DestroyEntity(this);
 		return false;
 	}
 #endif
@@ -122,7 +122,7 @@ bool CBaseCSGrenade::Holster( CBaseCombatWeapon *pSwitchingTo )
 	{
 		CBaseCombatCharacter *pOwner = (CBaseCombatCharacter *)pPlayer;
 		pOwner->Weapon_Drop( this );
-		gEntList.DestroyEntity(this);
+		EntityList()->DestroyEntity(this);
 	}
 #endif
 
@@ -268,7 +268,7 @@ void CBaseCSGrenade::ItemPostFrame()
 			if( pPlayer->GetAmmoCount(m_iPrimaryAmmoType) <= 0 )
 			{
 				pPlayer->Weapon_Drop( this, NULL, NULL );
-				gEntList.DestroyEntity(this);
+				EntityList()->DestroyEntity(this);
 			}
 			else
 			{

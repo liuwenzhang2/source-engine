@@ -95,10 +95,10 @@ void CGrenadePathfollower::GrenadeTouch( CBaseEntity *pOther )
 	{
 		if(m_hRocketTrail)
 		{
-			gEntList.DestroyEntity(m_hRocketTrail);
+			EntityList()->DestroyEntity(m_hRocketTrail);
 			m_hRocketTrail = NULL;
 		}
-		gEntList.DestroyEntity( this );
+		EntityList()->DestroyEntity( this );
 	}
 	Detonate();
 }
@@ -116,7 +116,7 @@ void CGrenadePathfollower::Detonate(void)
 
 	if(m_hRocketTrail)
 	{
-		gEntList.DestroyEntity(m_hRocketTrail);
+		EntityList()->DestroyEntity(m_hRocketTrail);
 		m_hRocketTrail = NULL;
 	}
 
@@ -144,7 +144,7 @@ void CGrenadePathfollower::Detonate(void)
 	RadiusDamage ( CTakeDamageInfo( this, GetThrower(), m_flDamage, DMG_BLAST ), GetEngineObject()->GetAbsOrigin(),  m_DmgRadius, CLASS_NONE, NULL );
 	CPASAttenuationFilter filter2( this, "GrenadePathfollower.StopSounds" );
 	g_pSoundEmitterSystem->EmitSound( filter2, entindex(), "GrenadePathfollower.StopSounds" );
-	gEntList.DestroyEntity( this );
+	EntityList()->DestroyEntity( this );
 }
 
 //------------------------------------------------------------------------------
@@ -154,7 +154,7 @@ void CGrenadePathfollower::Detonate(void)
 //------------------------------------------------------------------------------
 void CGrenadePathfollower::Launch( float flLaunchSpeed, string_t sPathCornerName)
 {
-	m_pPathTarget = gEntList.FindEntityByName( NULL, sPathCornerName );
+	m_pPathTarget = EntityList()->FindEntityByName( NULL, sPathCornerName );
 	if (m_pPathTarget)
 	{
 		m_flFlySpeed = flLaunchSpeed;
@@ -242,7 +242,7 @@ void CGrenadePathfollower::AimThink( void )
 		float flLength = (GetEngineObject()->GetAbsOrigin() - m_pPathTarget->GetEngineObject()->GetAbsOrigin()).Length();
 		if (flLength < GRENADE_PF_TOLERANCE)
 		{
-			m_pPathTarget = gEntList.FindEntityByName( NULL, m_pPathTarget->m_target );
+			m_pPathTarget = EntityList()->FindEntityByName( NULL, m_pPathTarget->m_target );
 			if (!m_pPathTarget)
 			{	
 				GetEngineObject()->SetGravity( 1.0 );
@@ -310,7 +310,7 @@ CGrenadePathfollower::~CGrenadePathfollower(void)
 //------------------------------------------------------------------------------
 CGrenadePathfollower* CGrenadePathfollower::CreateGrenadePathfollower( string_t sModelName, string_t sFlySound, const Vector &vecOrigin, const QAngle &vecAngles, CBaseEntity *pentOwner )
 {
-	CGrenadePathfollower *pGrenade = (CGrenadePathfollower*)gEntList.CreateEntityByName( "grenade_pathfollower" );
+	CGrenadePathfollower *pGrenade = (CGrenadePathfollower*)EntityList()->CreateEntityByName( "grenade_pathfollower" );
 	if ( !pGrenade )
 	{
 		Warning( "NULL Ent in CGrenadePathfollower!\n" );

@@ -228,11 +228,11 @@ void NWCEdit::CreateAINode( CBasePlayer *pPlayer )
 			CNodeEnt *pNodeEnt;
 			if (g_pAINetworkManager->GetEditOps()->m_bAirEditMode)
 			{
-				pNodeEnt = (CNodeEnt*)gEntList.CreateEntityByName("info_node_air");
+				pNodeEnt = (CNodeEnt*)EntityList()->CreateEntityByName("info_node_air");
 			}
 			else
 			{
-				pNodeEnt = (CNodeEnt*)gEntList.CreateEntityByName("info_node");
+				pNodeEnt = (CNodeEnt*)EntityList()->CreateEntityByName("info_node");
 			}
 
 			// Note this is a new entity being created as part of wc editing
@@ -402,7 +402,7 @@ void NWCEdit::CreateAILink( CBasePlayer* pPlayer )
 			pAILink->m_LinkInfo &= ~bits_LINK_OFF;
 
 			CAI_DynamicLink* pDynamicLink = CAI_DynamicLink::GetDynamicLink(pAILink->m_iSrcID, pAILink->m_iDestID);
-			gEntList.DestroyEntity(pDynamicLink);
+			EntityList()->DestroyEntity(pDynamicLink);
 		}
 	}
 }
@@ -437,7 +437,7 @@ void NWCEdit::DestroyAILink( CBasePlayer *pPlayer )
 		else if (status == Editor_OK)
 		{
 			// Create dynamic link and mark the link
-			CAI_DynamicLink* pNewLink	= (CAI_DynamicLink*)gEntList.CreateEntityByName("info_node_link" );;
+			CAI_DynamicLink* pNewLink	= (CAI_DynamicLink*)EntityList()->CreateEntityByName("info_node_link" );;
 			pNewLink->m_nSrcID			= pAILink->m_iSrcID;
 			pNewLink->m_nDestID			= pAILink->m_iDestID;
 			pNewLink->m_nLinkState		= LINK_OFF;
@@ -782,7 +782,7 @@ CON_COMMAND( hammer_update_safe_entities, "Updates entities in the map that can 
 	// CUtlSymbolTable)
 
 	CUtlSymbolTable ignoredNames(16,32,true); // grow 16 strings at a time. Case insensitive.
-	while ( (pEnt = gEntList.FindEntityByClassname( pEnt, "hammer_updateignorelist" )) != NULL )
+	while ( (pEnt = EntityList()->FindEntityByClassname( pEnt, "hammer_updateignorelist" )) != NULL )
 	{
 		// for each name in each of those strings, add it to the symbol table.
 		CWC_UpdateIgnoreList *piglist = static_cast<CWC_UpdateIgnoreList *>(pEnt);
@@ -802,7 +802,7 @@ CON_COMMAND( hammer_update_safe_entities, "Updates entities in the map that can 
 
 
 	// now iterate through everything in the world
-	for ( pEnt = gEntList.FirstEnt(); pEnt != NULL; pEnt = gEntList.NextEnt(pEnt) )
+	for ( pEnt = EntityList()->FirstEnt(); pEnt != NULL; pEnt = EntityList()->NextEnt(pEnt) )
 	{
 		if ( !(pEnt->ObjectCaps() & FCAP_WCEDIT_POSITION) )
 			continue;

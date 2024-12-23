@@ -192,7 +192,7 @@ void CHL1MP_Player::DetonateSatchelCharges( void )
 {
 	CBaseEntity *pSatchel = NULL;
 
-	while ( (pSatchel = gEntList.FindEntityByClassname( pSatchel, "monster_satchel" ) ) != NULL)
+	while ( (pSatchel = EntityList()->FindEntityByClassname( pSatchel, "monster_satchel" ) ) != NULL)
 	{
 		if ( pSatchel->GetOwnerEntity() == this )
 		{
@@ -428,7 +428,7 @@ bool CHL1MP_Player::BumpWeapon( CBaseCombatWeapon *pWeapon )
         
 		if ( gEvilImpulse101 )
 		{
-			gEntList.DestroyEntity( pWeapon );
+			EntityList()->DestroyEntity( pWeapon );
 		}
 		return false;
 	}
@@ -454,7 +454,7 @@ bool CHL1MP_Player::BumpWeapon( CBaseCombatWeapon *pWeapon )
 		 {
 			 pWeapon->CheckRespawn();
 
-			 gEntList.DestroyEntity( pWeapon );
+			 EntityList()->DestroyEntity( pWeapon );
 
              if ( sv_debugweaponpickup.GetBool() )
                  Msg("sv_debugweaponpickup: Picking up weapon\n");
@@ -650,7 +650,7 @@ CRagdollProp* CHL1MP_Player::CreateRagdollProp()
     if ( !pRagdoll )
     {
         // Create a new one
-        pRagdoll = dynamic_cast< CHL1MPRagdoll* >(gEntList.CreateEntityByName( "hl1mp_ragdoll" ) );
+        pRagdoll = dynamic_cast< CHL1MPRagdoll* >(EntityList()->CreateEntityByName( "hl1mp_ragdoll" ) );
     }
 
     if ( pRagdoll )

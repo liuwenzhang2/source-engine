@@ -195,7 +195,7 @@ void CItem_DynamicResupply::Spawn( void )
 { 
 	if ( g_pGameRules->IsAllowedToSpawn( this ) == false )
 	{
-		gEntList.DestroyEntity( this );
+		EntityList()->DestroyEntity( this );
 		return;
 	}
 
@@ -286,7 +286,7 @@ void CItem_DynamicResupply::CheckPVSThink( void )
 //-----------------------------------------------------------------------------
 void CItem_DynamicResupply::InputKill( inputdata_t &data )
 {
-	gEntList.DestroyEntity( this );
+	EntityList()->DestroyEntity( this );
 }
 
 //-----------------------------------------------------------------------------
@@ -615,7 +615,7 @@ void CItem_DynamicResupply::SpawnDynamicItem( CBasePlayer *pPlayer )
 	}
 
 	SetThink( NULL );
-	gEntList.DestroyEntity( this );
+	EntityList()->DestroyEntity( this );
 }
 
 //-----------------------------------------------------------------------------
@@ -644,7 +644,7 @@ void DynamicResupply_InitFromAlternateMaster( CBaseEntity *pTargetEnt, string_t 
 	}
 
 	CItem_DynamicResupply *pTargetResupply = assert_cast<CItem_DynamicResupply *>( pTargetEnt );
-	CBaseEntity *pMasterEnt = gEntList.FindEntityByName( NULL, iszMaster );
+	CBaseEntity *pMasterEnt = EntityList()->FindEntityByName( NULL, iszMaster );
 
 	if ( !pMasterEnt || !pMasterEnt->ClassMatches( pTargetResupply->GetClassname() ) )
 	{

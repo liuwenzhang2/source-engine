@@ -345,7 +345,7 @@ void CNPC_Osprey::FindAllThink( void )
 	CBaseEntity *pEntity = NULL;
 
 	m_iUnits = 0;
-	while ( ( pEntity = gEntList.FindEntityByClassname( pEntity, "monster_human_grunt" ) ) != NULL)
+	while ( ( pEntity = EntityList()->FindEntityByClassname( pEntity, "monster_human_grunt" ) ) != NULL)
 	{
 		if ( m_iUnits > MAX_CARRY )
 			 break;
@@ -361,7 +361,7 @@ void CNPC_Osprey::FindAllThink( void )
 	if (m_iUnits == 0)
 	{
 		Msg( "osprey error: no grunts to resupply\n");
-		gEntList.DestroyEntity( this );
+		EntityList()->DestroyEntity( this );
 		return;
 	}
 
@@ -913,7 +913,7 @@ void CBaseHelicopter::FlyPathCorners( void )
 
 	if ( GetGoalEnt() == NULL && m_target != NULL_STRING )// this monster has a target
 	{
-		SetGoalEnt( gEntList.FindEntityByName( NULL, m_target ) );
+		SetGoalEnt( EntityList()->FindEntityByName( NULL, m_target ) );
 		if (GetGoalEnt())
 		{
 			m_vecDesiredPosition = GetGoalEnt()->GetEngineObject()->GetLocalOrigin();
@@ -937,7 +937,7 @@ void CBaseHelicopter::FlyPathCorners( void )
 
 			OnReachedTarget( GetGoalEnt() );
 
-			SetGoalEnt( gEntList.FindEntityByName( NULL, GetGoalEnt()->m_target ) );
+			SetGoalEnt( EntityList()->FindEntityByName( NULL, GetGoalEnt()->m_target ) );
 
 			if (GetGoalEnt())
 			{
@@ -980,7 +980,7 @@ void CBaseHelicopter::UpdatePlayerDopplerShift( )
 
 		// UNDONE: this needs to send different sounds to every player for multiplayer.	
 		// FIXME: this isn't the correct way to find a player!!!
-		pPlayer = gEntList.FindEntityByName( NULL, "!player" );
+		pPlayer = EntityList()->FindEntityByName( NULL, "!player" );
 		if (pPlayer)
 		{
 			Vector dir = pPlayer->GetEngineObject()->GetLocalOrigin() - GetEngineObject()->GetLocalOrigin();
@@ -1287,7 +1287,7 @@ void CBaseHelicopter::CrashTouch( CBaseEntity *pOther )
 			te->Explosion( filter, MIN( 0.99, i * 0.2 ),	&pos, g_sModelIndexFireball,	10, 15, TE_EXPLFLAG_NONE, 100, 0 );
 		}
 
-		gEntList.DestroyEntity( this );
+		EntityList()->DestroyEntity( this );
 	}
 }
 
@@ -1463,7 +1463,7 @@ void CBaseHelicopter::ChangePathCorner( const char *pszName )
 
 	if (GetGoalEnt())
 	{
-		SetGoalEnt( gEntList.FindEntityByName( NULL, pszName ) );
+		SetGoalEnt( EntityList()->FindEntityByName( NULL, pszName ) );
 
 		// I don't think we need to do this. The FLIGHT() code will do it for us (sjb)
 		if (GetGoalEnt())

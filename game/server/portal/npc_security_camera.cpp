@@ -970,7 +970,7 @@ void CNPC_SecurityCamera::RopesOff( void )
 		// Remove rope if it's alive
 		if ( m_hRopes[ iRope ] )
 		{
-			gEntList.DestroyEntity( m_hRopes[ iRope ] );
+			EntityList()->DestroyEntity( m_hRopes[ iRope ] );
 			m_hRopes[ iRope ] = NULL;
 		}
 	}
@@ -995,7 +995,7 @@ void CNPC_SecurityCamera::EyeOff( void )
 {
 	if ( m_hEyeGlow != NULL )
 	{
-		gEntList.DestroyEntity( m_hEyeGlow );
+		EntityList()->DestroyEntity( m_hEyeGlow );
 		m_hEyeGlow = NULL;
 	}
 }
@@ -1113,7 +1113,7 @@ void PlayDismountSounds()
 {
 	// Play GLaDOS's audio reaction
 	CPortal_Player* pPlayer = ToPortalPlayer( UTIL_PlayerByIndex( 1 ) );
-	CAI_BaseActor* pGlaDOS  = (CAI_BaseActor*)gEntList.FindEntityByName( NULL, "Aperture_AI" );
+	CAI_BaseActor* pGlaDOS  = (CAI_BaseActor*)EntityList()->FindEntityByName( NULL, "Aperture_AI" );
 	
 	if ( !pPlayer || !pGlaDOS )
 	{

@@ -149,7 +149,7 @@ void CNavMesh::BuildLadders( void )
 
 #ifdef TERROR
 	CFuncSimpleLadder *ladder = NULL;
-	while( (ladder = dynamic_cast< CFuncSimpleLadder * >(gEntList.FindEntityByClassname( ladder, "func_simpleladder" ))) != NULL )
+	while( (ladder = dynamic_cast< CFuncSimpleLadder * >(EntityList()->FindEntityByClassname( ladder, "func_simpleladder" ))) != NULL )
 	{
 		Vector mins, maxs;
 		ladder->GetEngineObject()->WorldSpaceSurroundingBounds( &mins, &maxs );
@@ -3374,7 +3374,7 @@ void CNavMesh::CreateNavAreasFromNodes( void )
 // adds walkable positions for any/all positions a mod specifies
 void CNavMesh::AddWalkableSeeds( void )
 {
-	CBaseEntity *spawn = gEntList.FindEntityByClassname( NULL, GetPlayerSpawnName() );
+	CBaseEntity *spawn = EntityList()->FindEntityByClassname( NULL, GetPlayerSpawnName() );
 
 	if (spawn )
 	{

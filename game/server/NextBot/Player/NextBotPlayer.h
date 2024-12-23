@@ -60,7 +60,7 @@ T * NextBotCreatePlayerBot( const char *name, bool bReportFakeClient = true )
 	}
 
 	// create an instance of the bot's class and bind it to the edict
-	T *bot = dynamic_cast< T * >( gEntList.GetBaseEntity( botEdict ) );
+	T *bot = dynamic_cast< T * >(EntityList()->GetBaseEntity( botEdict ) );
 
 	if ( bot == NULL )
 	{

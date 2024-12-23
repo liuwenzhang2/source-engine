@@ -523,7 +523,7 @@ void CAreaCapture::InputRoundInit( inputdata_t &inputdata )
 	// find the flag we're linked to
 	if( !m_pPoint )
 	{
-		m_pPoint = dynamic_cast<CControlPoint*>( gEntList.FindEntityByName(NULL, STRING(m_iszCapPointName) ) );
+		m_pPoint = dynamic_cast<CControlPoint*>( EntityList()->FindEntityByName(NULL, STRING(m_iszCapPointName) ) );
 
 		if ( m_pPoint )
 		{

@@ -240,7 +240,7 @@ void CNPC_Bullseye::Event_Killed( const CTakeDamageInfo &info )
 			// Unhook.
 			GetEngineObject()->SetParent(NULL);
 
-			gEntList.DestroyEntity(this);
+			EntityList()->DestroyEntity(this);
 			return;
 		}
 	}

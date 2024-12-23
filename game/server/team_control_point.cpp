@@ -408,7 +408,7 @@ int	CTeamControlPoint::GetPreviousPointForTeam( int iGameTeam, int iPrevPoint )
 	Assert( iPrevPoint >= 0 && iPrevPoint < MAX_PREVIOUS_POINTS );
 
 	int iRetVal = -1;
-	CBaseEntity *pEntity = gEntList.FindEntityByName( NULL, STRING(m_TeamData[iGameTeam].iszPreviousPoint[iPrevPoint]) );
+	CBaseEntity *pEntity = EntityList()->FindEntityByName( NULL, STRING(m_TeamData[iGameTeam].iszPreviousPoint[iPrevPoint]) );
 
 	if ( pEntity )
 	{
@@ -457,7 +457,7 @@ void CTeamControlPoint::CaptureStart( int iCapTeam, int iNumCappingPlayers, int 
 	int iNumCappers = iNumCappingPlayers;
 
 	float flLastOwnershipChangeTime = -1.f;
-	CBaseEntity *pEnt =	gEntList.FindEntityByClassname( NULL, GetControlPointMasterName() );
+	CBaseEntity *pEnt =	EntityList()->FindEntityByClassname( NULL, GetControlPointMasterName() );
 	while( pEnt )
 	{
 		CTeamControlPointMaster *pMaster = dynamic_cast<CTeamControlPointMaster *>( pEnt );
@@ -465,7 +465,7 @@ void CTeamControlPoint::CaptureStart( int iCapTeam, int iNumCappingPlayers, int 
 		{
 			flLastOwnershipChangeTime = pMaster->GetLastOwnershipChangeTime();
 		}
-		pEnt = gEntList.FindEntityByClassname( pEnt, GetControlPointMasterName() );
+		pEnt = EntityList()->FindEntityByClassname( pEnt, GetControlPointMasterName() );
 	}
 
 	IGameEvent *event = gameeventmanager->CreateEvent( "teamplay_point_startcapture" );
@@ -691,7 +691,7 @@ void CTeamControlPoint::InternalSetOwner( int iCapTeam, bool bMakeSound, int iNu
 	}
 
 	// Have control point master check the win conditions now!
-	CBaseEntity *pEnt =	gEntList.FindEntityByClassname( NULL, GetControlPointMasterName() );
+	CBaseEntity *pEnt =	EntityList()->FindEntityByClassname( NULL, GetControlPointMasterName() );
 
 	while( pEnt )
 	{
@@ -703,7 +703,7 @@ void CTeamControlPoint::InternalSetOwner( int iCapTeam, bool bMakeSound, int iNu
 			pMaster->SetLastOwnershipChangeTime( gpGlobals->curtime );
 		}
 
-		pEnt = gEntList.FindEntityByClassname( pEnt, GetControlPointMasterName() );
+		pEnt = EntityList()->FindEntityByClassname( pEnt, GetControlPointMasterName() );
 	}
 }
 

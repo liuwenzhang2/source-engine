@@ -102,7 +102,7 @@ LINK_ENTITY_TO_CLASS( prop_portal, CProp_Portal );
 CProp_Portal::CProp_Portal( void )
 {
 	m_vPrevForward = Vector( 0.0f, 0.0f, 0.0f );
-	//m_hPortalSimulator = (CPortalSimulator*)gEntList.CreateEntityByName("portal_simulator");
+	//m_hPortalSimulator = (CPortalSimulator*)EntityList()->CreateEntityByName("portal_simulator");
 	//SetPortalSimulatorCallbacks( this );//m_hPortalSimulator->
 
 	CProp_Portal_Shared::AllPortals.AddToTail( this );
@@ -134,12 +134,12 @@ void CProp_Portal::UpdateOnRemove( void )
 
 	if( m_pAttachedCloningArea )
 	{
-		gEntList.DestroyEntity( m_pAttachedCloningArea );
+		EntityList()->DestroyEntity( m_pAttachedCloningArea );
 		m_pAttachedCloningArea = NULL;
 	}
 	
 	//if (m_hPortalSimulator.Get() && !m_hPortalSimulator.Get()->GetEngineObject()->IsMarkedForDeletion()) {
-	//	gEntList.DestroyEntity(m_hPortalSimulator);
+	//	EntityList()->DestroyEntity(m_hPortalSimulator);
 	//	m_hPortalSimulator = NULL;
 	//}
 	BaseClass::UpdateOnRemove();
@@ -357,7 +357,7 @@ void CProp_Portal::TestRestingSurfaceThink( void )
 		if ( tr.fraction == 1.0f && !tr.startsolid && ( !tr.m_pEnt || ( tr.m_pEnt && !FClassnameIs((CBaseEntity*)tr.m_pEnt, "func_physbox" ) && !FClassnameIs((CBaseEntity*)tr.m_pEnt, "simple_physics_brush" ) ) ) )
 		{
 			DevMsg( "Surface removed from behind portal.\n" );
-			gEntList.DestroyEntity(this);
+			EntityList()->DestroyEntity(this);
 			SetContextThink( NULL, TICK_NEVER_THINK, s_pTestRestingSurfaceContext );
 			break;
 		}
@@ -604,7 +604,7 @@ void CProp_Portal::RemovePortalMicAndSpeaker()
 		{
 			inputdata_t in;
 			pMicrophone->InputDisable( in );
-			gEntList.DestroyEntity( pMicrophone );
+			EntityList()->DestroyEntity( pMicrophone );
 		}
 		m_hMicrophone = 0;
 	}
@@ -632,7 +632,7 @@ void CProp_Portal::RemovePortalMicAndSpeaker()
 			}
 			inputdata_t in;
 			pSpeaker->InputTurnOff( in );
-			gEntList.DestroyEntity( pSpeaker );
+			EntityList()->DestroyEntity( pSpeaker );
 		}
 		m_hSpeaker = 0;
 	}
@@ -700,7 +700,7 @@ void CProp_Portal::Activate( void )
 		{
 			for( servertouchlink_t *link = root->nextLink; link != root; link = link->nextLink )
 			{
-				CBaseEntity *pOther = (CBaseEntity*)gEntList.GetServerEntityFromHandle(link->entityTouched);
+				CBaseEntity *pOther = EntityList()->GetBaseEntityFromHandle(link->entityTouched);
 				if( CProp_Portal_Shared::IsEntityTeleportable( pOther ) )
 				{
 					Vector vWorldMins, vWorldMaxs;
@@ -1284,7 +1284,7 @@ void CProp_Portal::Touch( CBaseEntity *pOther )
 					DevMsg( "Moving brush intersected portal plane.\n" );
 
 					//DoFizzleEffect( PORTAL_FIZZLE_KILLED, false );
-					gEntList.DestroyEntity(this);
+					EntityList()->DestroyEntity(this);
 				}
 				else
 				{
@@ -1300,14 +1300,14 @@ void CProp_Portal::Touch( CBaseEntity *pOther )
 						DevMsg( "Surface removed from behind portal.\n" );
 
 						//DoFizzleEffect( PORTAL_FIZZLE_KILLED, false );
-						gEntList.DestroyEntity(this);
+						EntityList()->DestroyEntity(this);
 					}
 					else if ( tr.m_pEnt && ((CBaseEntity*)tr.m_pEnt)->IsMoving() )
 					{
 						DevMsg( "Surface behind portal is moving.\n" );
 
 						//DoFizzleEffect( PORTAL_FIZZLE_KILLED, false );
-						gEntList.DestroyEntity(this);
+						EntityList()->DestroyEntity(this);
 					}
 				}
 			}
@@ -1733,13 +1733,13 @@ void CProp_Portal::UpdatePortalLinkage( void )
 			{
 				inputdata_t inputdata;
 
-				m_hMicrophone = gEntList.CreateEntityByName( "env_microphone" );
+				m_hMicrophone = (CBaseEntity*)EntityList()->CreateEntityByName( "env_microphone" );
 				CEnvMicrophone *pMicrophone = static_cast<CEnvMicrophone*>( m_hMicrophone.Get() );
 				pMicrophone->GetEngineObject()->AddSpawnFlags( SF_MICROPHONE_IGNORE_NONATTENUATED );
 				pMicrophone->GetEngineObject()->AddSpawnFlags( SF_MICROPHONE_SOUND_COMBAT | SF_MICROPHONE_SOUND_WORLD | SF_MICROPHONE_SOUND_PLAYER | SF_MICROPHONE_SOUND_BULLET_IMPACT | SF_MICROPHONE_SOUND_EXPLOSION );
 				DispatchSpawn( pMicrophone );
 
-				m_hSpeaker = gEntList.CreateEntityByName( "env_speaker" );
+				m_hSpeaker = (CBaseEntity*)EntityList()->CreateEntityByName( "env_speaker" );
 				CSpeaker *pSpeaker = static_cast<CSpeaker*>( m_hSpeaker.Get() );
 
 				if( !GetEnginePortal()->IsPortal2() )
@@ -1764,13 +1764,13 @@ void CProp_Portal::UpdatePortalLinkage( void )
 			{
 				inputdata_t inputdata;
 
-				GetLinkedPortal()->m_hMicrophone = gEntList.CreateEntityByName( "env_microphone" );
+				GetLinkedPortal()->m_hMicrophone = (CBaseEntity*)EntityList()->CreateEntityByName( "env_microphone" );
 				CEnvMicrophone *pLinkedMicrophone = static_cast<CEnvMicrophone*>(GetLinkedPortal()->m_hMicrophone.Get() );
 				pLinkedMicrophone->GetEngineObject()->AddSpawnFlags( SF_MICROPHONE_IGNORE_NONATTENUATED );
 				pLinkedMicrophone->GetEngineObject()->AddSpawnFlags( SF_MICROPHONE_SOUND_COMBAT | SF_MICROPHONE_SOUND_WORLD | SF_MICROPHONE_SOUND_PLAYER | SF_MICROPHONE_SOUND_BULLET_IMPACT | SF_MICROPHONE_SOUND_EXPLOSION );
 				DispatchSpawn( pLinkedMicrophone );
 
-				GetLinkedPortal()->m_hSpeaker = gEntList.CreateEntityByName( "env_speaker" );
+				GetLinkedPortal()->m_hSpeaker = (CBaseEntity*)EntityList()->CreateEntityByName( "env_speaker" );
 				CSpeaker *pLinkedSpeaker = static_cast<CSpeaker*>(GetLinkedPortal()->m_hSpeaker.Get() );
 
 				if ( !GetEnginePortal()->IsPortal2() )
@@ -2162,7 +2162,7 @@ CProp_Portal *CProp_Portal::FindPortal( unsigned char iLinkageGroupID, bool bPor
 
 	if( bCreateIfNothingFound )
 	{
-		CProp_Portal *pPortal = (CProp_Portal *)gEntList.CreateEntityByName( "prop_portal" );
+		CProp_Portal *pPortal = (CProp_Portal *)EntityList()->CreateEntityByName( "prop_portal" );
 		DispatchSpawn(pPortal);
 		pPortal->m_iLinkageGroupID = iLinkageGroupID;
 		pPortal->GetEnginePortal()->SetPortal2(bPortal2);
@@ -2189,7 +2189,7 @@ void CProp_Portal::OnClearEverything()
 	Assert(GetEnginePortal()->OwnsEntity(this));
 }
 
-//Move all entities back to the main environment for removal, and make sure the main environment is in control during the gEntList.DestroyEntity process
+//Move all entities back to the main environment for removal, and make sure the main environment is in control during the EntityList()->DestroyEntity process
 //struct UTIL_Remove_PhysicsStack_t
 //{
 //	IPhysicsEnvironment* pPhysicsEnvironment;

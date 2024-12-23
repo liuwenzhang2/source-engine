@@ -96,7 +96,7 @@ void CAI_SpeechFilter::PopulateSubjectList( bool purge )
 	int iNumSubjects = 0;
 	do
 	{
-		pSearch = gEntList.FindEntityByName( pSearch, m_iszSubject );
+		pSearch = EntityList()->FindEntityByName( pSearch, m_iszSubject );
 		if ( pSearch )
 		{
 #ifndef CSTRIKE_DLL
@@ -131,7 +131,7 @@ void CAI_SpeechFilter::PopulateSubjectList( bool purge )
 		// No subjects found by targetname! Assume classname.
 		do
 		{
-			pSearch = gEntList.FindEntityByClassname( pSearch, STRING(m_iszSubject) );
+			pSearch = EntityList()->FindEntityByClassname( pSearch, STRING(m_iszSubject) );
 			if( pSearch )
 			{
 #ifndef CSTRIKE_DLL

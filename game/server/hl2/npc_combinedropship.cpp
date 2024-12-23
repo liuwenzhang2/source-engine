@@ -516,7 +516,7 @@ void CCombineDropshipContainer::CreateCorpse()
 
 	GetEngineObject()->AddSolidFlags( FSOLID_NOT_SOLID );
 	GetEngineObject()->AddEffects( EF_NODRAW );
-	gEntList.DestroyEntity( this );
+	EntityList()->DestroyEntity( this );
 }
 
 
@@ -537,7 +537,7 @@ void CCombineDropshipContainer::ThrowFlamingGib( void )
 	GetEngineObject()->RandomPointInBounds( vecNormalizedMins, vecNormalizedMaxs, &vecAbsPoint);
 
 	// Throw a flaming, smoking chunk.
-	CGib *pChunk = (CGib*)gEntList.CreateEntityByName( "gib" );
+	CGib *pChunk = (CGib*)EntityList()->CreateEntityByName( "gib" );
 	pChunk->Spawn( "models/gibs/hgibs.mdl" );
 	pChunk->SetBloodColor( DONT_BLEED );
 
@@ -836,7 +836,7 @@ CNPC_CombineDropship::~CNPC_CombineDropship(void)
 {
 	if ( m_hContainer )
 	{
-		gEntList.DestroyEntity( m_hContainer );		// get rid of container
+		EntityList()->DestroyEntity( m_hContainer );		// get rid of container
 	}
 }
 
@@ -874,7 +874,7 @@ void CNPC_CombineDropship::Spawn( void )
 		break;
 
 	case CRATE_SOLDIER:
-		m_hContainer = (CBaseAnimating*)gEntList.CreateEntityByName( "prop_dropship_container" );
+		m_hContainer = (CBaseAnimating*)EntityList()->CreateEntityByName( "prop_dropship_container" );
 		if ( m_hContainer )
 		{
 			m_hContainer->SetName( "dropship_container" );
@@ -908,7 +908,7 @@ void CNPC_CombineDropship::Spawn( void )
 		break;
 
 	case CRATE_STRIDER:
-		m_hContainer = (CBaseAnimating*)gEntList.CreateEntityByName( "npc_strider" );
+		m_hContainer = (CBaseAnimating*)EntityList()->CreateEntityByName( "npc_strider" );
 		m_hContainer->GetEngineObject()->SetAbsOrigin(GetEngineObject()->GetAbsOrigin() - Vector( 0, 0 , 100 ) );
 		m_hContainer->GetEngineObject()->SetAbsAngles(GetEngineObject()->GetAbsAngles() );
 		m_hContainer->GetEngineObject()->SetParent(this->GetEngineObject(), 0);
@@ -920,7 +920,7 @@ void CNPC_CombineDropship::Spawn( void )
 	case CRATE_APC:
 		{
 			m_soldiersToDrop = 0;
-			m_hContainer = (CBaseAnimating*)gEntList.FindEntityByName( NULL, m_iszAPCVehicleName );
+			m_hContainer = (CBaseAnimating*)EntityList()->FindEntityByName( NULL, m_iszAPCVehicleName );
 			if ( !m_hContainer )
 			{
 				Warning("Unable to find APC %s\n", STRING( m_iszAPCVehicleName ) ); 		
@@ -954,7 +954,7 @@ void CNPC_CombineDropship::Spawn( void )
 		break;
 
 	case CRATE_JEEP:
-		m_hContainer = (CBaseAnimating*)gEntList.CreateEntityByName( "prop_dynamic_override" );
+		m_hContainer = (CBaseAnimating*)EntityList()->CreateEntityByName( "prop_dynamic_override" );
 		if ( m_hContainer )
 		{
 			m_hContainer->SetModel( "models/buggy.mdl" );
@@ -1084,7 +1084,7 @@ void CNPC_CombineDropship::Precache( void )
 					if ( pEntity != NULL )
 					{
 						pEntity->Precache();
-						gEntList.DestroyEntityImmediate( pEntity );
+						EntityList()->DestroyEntityImmediate( pEntity );
 					}
 				}
 				else
@@ -1670,7 +1670,7 @@ void CNPC_CombineDropship::LandCommon( bool bHover )
 	// Do we have a land target?
 	if ( m_iszLandTarget != NULL_STRING )
 	{
-		CBaseEntity *pTarget = gEntList.FindEntityByName( NULL, m_iszLandTarget );
+		CBaseEntity *pTarget = EntityList()->FindEntityByName( NULL, m_iszLandTarget );
 		if ( !pTarget )
 		{
 			Warning("npc_combinedropship %s couldn't find land target named %s\n", STRING(GetEntityName()), STRING(m_iszLandTarget) );
@@ -1844,7 +1844,7 @@ void CNPC_CombineDropship::InputPickup( inputdata_t &inputdata )
 		Warning("npc_combinedropship %s tried to pickup with no specified pickup target.\n", STRING(GetEntityName()) );
 		return;
 	}
-	CBaseEntity *pTarget = gEntList.FindEntityByName( NULL, iszTargetName );
+	CBaseEntity *pTarget = EntityList()->FindEntityByName( NULL, iszTargetName );
 	if ( !pTarget )
 	{
 		Warning("npc_combinedropship %s couldn't find pickup target named %s\n", STRING(GetEntityName()), STRING(iszTargetName) );
@@ -2464,7 +2464,7 @@ void CNPC_CombineDropship::SpawnTroop( void )
 	pNPC->Activate();
 
 	// Spawn a scripted sequence entity to make the NPC run out of the dropship
-	CAI_ScriptedSequence *pSequence = (CAI_ScriptedSequence*)gEntList.CreateEntityByName( "scripted_sequence" );
+	CAI_ScriptedSequence *pSequence = (CAI_ScriptedSequence*)EntityList()->CreateEntityByName( "scripted_sequence" );
 	pSequence->KeyValue( "m_iszEntity", STRING(pNPC->GetEntityName()) );
 	pSequence->KeyValue( "m_iszPlay", "Dropship_Deploy" );
 	pSequence->KeyValue( "m_fMoveTo", "4" );	// CINE_MOVETO_TELEPORT
@@ -2521,7 +2521,7 @@ Vector CNPC_CombineDropship::GetDropoffFinishPosition( Vector vecOrigin, CAI_Bas
 //-----------------------------------------------------------------------------
 void CNPC_CombineDropship::InputNPCFinishDustoff( inputdata_t &inputdata )
 {
-	CBaseEntity *pEnt = gEntList.FindEntityByName( NULL, inputdata.value.StringID(), NULL, inputdata.pActivator, inputdata.pCaller );
+	CBaseEntity *pEnt = EntityList()->FindEntityByName( NULL, inputdata.value.StringID(), NULL, inputdata.pActivator, inputdata.pCaller );
 	if ( !pEnt )
 		return;
 
@@ -2535,7 +2535,7 @@ void CNPC_CombineDropship::InputNPCFinishDustoff( inputdata_t &inputdata )
 	CBaseEntity *pDustoff = NULL;
 	if ( m_sDustoffPoints[m_iCurrentTroopExiting-1] != NULL_STRING )
 	{
-		pDustoff = gEntList.FindEntityByName( NULL, m_sDustoffPoints[m_iCurrentTroopExiting-1] );
+		pDustoff = EntityList()->FindEntityByName( NULL, m_sDustoffPoints[m_iCurrentTroopExiting-1] );
 		if ( !pDustoff )
 		{
 			Warning("npc_combinedropship %s couldn't find dustoff target named %s\n", STRING(GetEntityName()), STRING(m_sDustoffPoints[m_iCurrentTroopExiting-1]) );

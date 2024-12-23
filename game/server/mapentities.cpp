@@ -68,14 +68,14 @@ void FreeContainingEntity( int ed )
 {
 	if ( ed!=-1 )
 	{
-		CBaseEntity *ent = gEntList.GetBaseEntity( ed );
+		CBaseEntity *ent = EntityList()->GetBaseEntity( ed );
 		if ( ent )
 		{
 			//engine->SetEdict(ed, false );
 			//CBaseEntity::PhysicsRemoveTouchedList( ent );
 			//CBaseEntity::PhysicsRemoveGroundList( ent );
 			//UTIL_RemoveImmediate( ent );
-			gEntList.DestroyEntityImmediate(ent);// ->Release();
+			EntityList()->DestroyEntityImmediate(ent);// ->Release();
 		}
 	}
 }
@@ -132,7 +132,7 @@ static int ComputeSpawnHierarchyDepth_r( CBaseEntity *pEntity )
 	if (pEntity->GetEngineObject()->GetParentName() == NULL_STRING)
 		return 1;
 
-	CBaseEntity *pParent = gEntList.FindEntityByName( NULL, ExtractParentName(pEntity->GetEngineObject()->GetParentName()) );
+	CBaseEntity *pParent = EntityList()->FindEntityByName( NULL, ExtractParentName(pEntity->GetEngineObject()->GetParentName()) );
 	if (!pParent)
 		return 1;
 	
@@ -211,7 +211,7 @@ void SetupParentsForSpawnList( int nEntities, HierarchicalSpawn_t *pSpawnList )
 				char szToken[256];
 				const char *pAttachmentName = nexttoken(szToken, STRING(pEntity->GetEngineObject()->GetParentName()), ',');
 				pEntity->GetEngineObject()->SetParentName( szToken);
-				CBaseEntity *pParent = gEntList.FindEntityByName( NULL, pEntity->GetEngineObject()->GetParentName() );
+				CBaseEntity *pParent = EntityList()->FindEntityByName( NULL, pEntity->GetEngineObject()->GetParentName() );
 				int iAttachment = -1;
 				CBaseAnimating* pAnim = pParent->GetBaseAnimating();
 				if (pAnim)
@@ -225,7 +225,7 @@ void SetupParentsForSpawnList( int nEntities, HierarchicalSpawn_t *pSpawnList )
 			}
 			else
 			{
-				CBaseEntity *pParent = gEntList.FindEntityByName( NULL, pEntity->GetEngineObject()->GetParentName() );
+				CBaseEntity *pParent = EntityList()->FindEntityByName( NULL, pEntity->GetEngineObject()->GetParentName() );
 
 				if ((pParent != NULL) && (pParent->entindex() != -1))
 				{
@@ -370,7 +370,7 @@ void MapEntity_ParseAllEntities(const char *pMapData, IMapEntityFilter *pFilter,
 			Templates_Add(pEntity, pCurMapData, (pMapData - pCurMapData) + 2);
 
 			// Remove the template entity so that it does not show up in FindEntityXXX searches.
-			gEntList.DestroyEntity(pEntity);
+			EntityList()->DestroyEntity(pEntity);
 			gEntList.CleanupDeleteList();
 			continue;
 		}
@@ -451,7 +451,7 @@ void MapEntity_ParseAllEntities(const char *pMapData, IMapEntityFilter *pFilter,
 		// First, tell the Point template to Spawn
 		if ( DispatchSpawn(pPointTemplate) < 0 )
 		{
-			gEntList.DestroyEntity(pPointTemplate);
+			EntityList()->DestroyEntity(pPointTemplate);
 			gEntList.CleanupDeleteList();
 			continue;
 		}
@@ -474,7 +474,7 @@ void MapEntity_ParseAllEntities(const char *pMapData, IMapEntityFilter *pFilter,
 					if ( pPointTemplate->ShouldRemoveTemplateEntities() )
 					{
 						// Remove the template entity so that it does not show up in FindEntityXXX searches.
-						gEntList.DestroyEntity(pEntity);
+						EntityList()->DestroyEntity(pEntity);
 						gEntList.CleanupDeleteList();
 
 						// Remove the entity from the spawn list
@@ -533,7 +533,7 @@ void MapEntity_PrecacheEntity( const char *pEntData, int &nStringSize )
 	}
 
 	// Construct via the LINK_ENTITY_TO_CLASS factory.
-	CBaseEntity *pEntity = gEntList.CreateEntityByName(className);
+	CBaseEntity *pEntity = (CBaseEntity*)EntityList()->CreateEntityByName(className);
 
 	//
 	// Set up keyvalues, which can set the model name, which is why we don't just do UTIL_PrecacheOther here...
@@ -542,7 +542,7 @@ void MapEntity_PrecacheEntity( const char *pEntData, int &nStringSize )
 	{
 		pEntity->GetEngineObject()->ParseMapData(&entData);
 		pEntity->Precache();
-		gEntList.DestroyEntityImmediate( pEntity );
+		EntityList()->DestroyEntityImmediate( pEntity );
 	}
 }
 
@@ -571,7 +571,7 @@ const char *MapEntity_ParseEntity(CBaseEntity *&pEntity, const char *pEntData, I
 		if ( pFilter )
 			pEntity = pFilter->CreateNextEntity( className );
 		else
-			pEntity = gEntList.CreateEntityByName(className);
+			pEntity = (CBaseEntity*)EntityList()->CreateEntityByName(className);
 
 		//
 		// Set up keyvalues.

@@ -124,7 +124,7 @@ void CEntityFlame::InputIgnite( inputdata_t &inputdata )
 //-----------------------------------------------------------------------------
 CEntityFlame *CEntityFlame::Create( CBaseEntity *pTarget, bool useHitboxes )
 {
-	CEntityFlame *pFlame = (CEntityFlame *)gEntList.CreateEntityByName( "entityflame" );
+	CEntityFlame *pFlame = (CEntityFlame *)EntityList()->CreateEntityByName( "entityflame" );
 
 	if ( pFlame == NULL )
 		return NULL;
@@ -268,7 +268,7 @@ void CEntityFlame::FlameThink( void )
 		CAI_BaseNPC *pNPC = m_hEntAttached->MyNPCPointer();
 		if ( pNPC && !pNPC->IsAlive() )
 		{
-			gEntList.DestroyEntity( this );
+			EntityList()->DestroyEntity( this );
 			// Notify the NPC that it's no longer burning!
 			pNPC->Extinguish();
 			return;
@@ -294,7 +294,7 @@ void CEntityFlame::FlameThink( void )
 	}
 	else
 	{
-		gEntList.DestroyEntity( this );
+		EntityList()->DestroyEntity( this );
 		return;
 	}
 

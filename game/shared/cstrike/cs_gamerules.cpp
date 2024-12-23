@@ -673,7 +673,7 @@ ConVar cl_autohelp(
 		// Create the team managers
 		for ( int i = 0; i < ARRAYSIZE( sTeamNames ); i++ )
 		{
-			CTeam *pTeam = static_cast<CTeam*>(gEntList.CreateEntityByName( "cs_team_manager" ));
+			CTeam *pTeam = static_cast<CTeam*>(EntityList()->CreateEntityByName( "cs_team_manager" ));
 			pTeam->Init( sTeamNames[i], i );
 
 			g_Teams.AddToTail( pTeam );
@@ -794,7 +794,7 @@ ConVar cl_autohelp(
 	//-----------------------------------------------------------------------------
 	void CCSGameRules::ClientCommandKeyValues( int pEntity, KeyValues *pKeyValues )
 	{
-		CCSPlayer *pPlayer = dynamic_cast< CCSPlayer * >( gEntList.GetBaseEntity( pEntity ) );
+		CCSPlayer *pPlayer = dynamic_cast< CCSPlayer * >(EntityList()->GetBaseEntity( pEntity ) );
 		if ( pPlayer )
 		{
 			char const *pszCommand = pKeyValues->GetName();
@@ -839,7 +839,7 @@ ConVar cl_autohelp(
 		bool addDefault = true;
 
 		CBaseEntity	*pWeaponEntity = NULL;
-		while ( ( pWeaponEntity = gEntList.FindEntityByClassname( pWeaponEntity, "game_player_equip" )) != NULL )
+		while ( ( pWeaponEntity = EntityList()->FindEntityByClassname( pWeaponEntity, "game_player_equip" )) != NULL )
 		{
 			if ( addDefault )
 			{
@@ -1653,7 +1653,7 @@ ConVar cl_autohelp(
         // [tj] Clear domination data when a player disconnects
         //=============================================================================
          
-        CCSPlayer *pPlayer = ToCSPlayer( gEntList.GetBaseEntity(pClient) );
+        CCSPlayer *pPlayer = ToCSPlayer(EntityList()->GetBaseEntity(pClient) );
         if ( pPlayer )
         {
             pPlayer->RemoveNemesisRelationships();
@@ -2426,12 +2426,12 @@ ConVar cl_autohelp(
 		
 		// Check to see if this map has a bomb target in it
 
-		if ( gEntList.FindEntityByClassname( NULL, "func_bomb_target" ) )
+		if ( EntityList()->FindEntityByClassname( NULL, "func_bomb_target" ) )
 		{
 			m_bMapHasBombTarget		= true;
 			m_bMapHasBombZone		= true;
 		}
-		else if ( gEntList.FindEntityByClassname( NULL, "info_bomb_target" ) )
+		else if ( EntityList()->FindEntityByClassname( NULL, "info_bomb_target" ) )
 		{
 			m_bMapHasBombTarget		= true;
 			m_bMapHasBombZone		= false;
@@ -2444,7 +2444,7 @@ ConVar cl_autohelp(
 
 		// Check to see if this map has hostage rescue zones
 
-		if ( gEntList.FindEntityByClassname( NULL, "func_hostage_rescue" ) )
+		if ( EntityList()->FindEntityByClassname( NULL, "func_hostage_rescue" ) )
 			m_bMapHasRescueZone = true;
 		else
 			m_bMapHasRescueZone = false;
@@ -2453,14 +2453,14 @@ ConVar cl_autohelp(
 		// See if the map has func_buyzone entities
 		// Used by CBasePlayer::HandleSignals() to support maps without these entities
 		
-		if ( gEntList.FindEntityByClassname( NULL, "func_buyzone" ) )
+		if ( EntityList()->FindEntityByClassname( NULL, "func_buyzone" ) )
 			m_bMapHasBuyZone = true;
 		else
 			m_bMapHasBuyZone = false;
 
 
 		// GOOSEMAN : See if this map has func_escapezone entities
-		if ( gEntList.FindEntityByClassname( NULL, "func_escapezone" ) )
+		if ( EntityList()->FindEntityByClassname( NULL, "func_escapezone" ) )
 		{
 			m_bMapHasEscapeZone = true;
 			m_iHaveEscaped = 0;
@@ -2477,7 +2477,7 @@ ConVar cl_autohelp(
 			m_bMapHasEscapeZone = false;
 
 		// Check to see if this map has VIP safety zones
-		if ( gEntList.FindEntityByClassname( NULL, "func_vip_safetyzone" ) )
+		if ( EntityList()->FindEntityByClassname( NULL, "func_vip_safetyzone" ) )
 		{
 			PickNextVIP();
 			m_iConsecutiveVIP++;
@@ -3580,7 +3580,7 @@ ConVar cl_autohelp(
 			m_iSpawnPointCount_Terrorist	= 0;
 			m_iSpawnPointCount_CT			= 0;
 
-			while ( ( ent = gEntList.FindEntityByClassname( ent, "info_player_terrorist" ) ) != NULL )
+			while ( ( ent = EntityList()->FindEntityByClassname( ent, "info_player_terrorist" ) ) != NULL )
 			{
 				if ( IsSpawnPointValid( ent, NULL ) )
 				{
@@ -3593,7 +3593,7 @@ ConVar cl_autohelp(
 				}
 			}
 
-			while ( ( ent = gEntList.FindEntityByClassname( ent, "info_player_counterterrorist" ) ) != NULL )
+			while ( ( ent = EntityList()->FindEntityByClassname( ent, "info_player_counterterrorist" ) ) != NULL )
 			{
 				if ( IsSpawnPointValid( ent, NULL ) ) 
 				{
@@ -3607,7 +3607,7 @@ ConVar cl_autohelp(
 			}
 
 			// Is this a logo map?
-			if ( gEntList.FindEntityByClassname( NULL, "info_player_logo" ) )
+			if ( EntityList()->FindEntityByClassname( NULL, "info_player_logo" ) )
 				m_bLogoMap = true;
 
 			m_bLevelInitialized = true;
@@ -3618,7 +3618,7 @@ ConVar cl_autohelp(
 	{
 		CBaseEntity* ent = NULL;
 		
-		while ( ( ent = gEntList.FindEntityByClassname( ent, "info_player_terrorist" ) ) != NULL )
+		while ( ( ent = EntityList()->FindEntityByClassname( ent, "info_player_terrorist" ) ) != NULL )
 		{
 			if ( IsSpawnPointValid( ent, NULL ) )
 			{
@@ -3630,7 +3630,7 @@ ConVar cl_autohelp(
 			}
 		}
 
-		while ( ( ent = gEntList.FindEntityByClassname( ent, "info_player_counterterrorist" ) ) != NULL )
+		while ( ( ent = EntityList()->FindEntityByClassname( ent, "info_player_counterterrorist" ) ) != NULL )
 		{
 			if ( IsSpawnPointValid( ent, NULL ) ) 
 			{
@@ -4464,12 +4464,12 @@ ConVar cl_autohelp(
 	void CCSGameRules::CheckMapConditions()
 	{
 		// Check to see if this map has a bomb target in it
-		if ( gEntList.FindEntityByClassname( NULL, "func_bomb_target" ) )
+		if ( EntityList()->FindEntityByClassname( NULL, "func_bomb_target" ) )
 		{
 			m_bMapHasBombTarget		= true;
 			m_bMapHasBombZone		= true;
 		}
-		else if ( gEntList.FindEntityByClassname( NULL, "info_bomb_target" ) )
+		else if ( EntityList()->FindEntityByClassname( NULL, "info_bomb_target" ) )
 		{
 			m_bMapHasBombTarget		= true;
 			m_bMapHasBombZone		= false;
@@ -4482,7 +4482,7 @@ ConVar cl_autohelp(
 
 		// See if the map has func_buyzone entities
 		// Used by CBasePlayer::HandleSignals() to support maps without these entities
-		if ( gEntList.FindEntityByClassname( NULL, "func_buyzone" ) )
+		if ( EntityList()->FindEntityByClassname( NULL, "func_buyzone" ) )
 		{
 			m_bMapHasBuyZone = true;
 		}
@@ -4492,7 +4492,7 @@ ConVar cl_autohelp(
 		}
 
 		// Check to see if this map has hostage rescue zones
-		if ( gEntList.FindEntityByClassname( NULL, "func_hostage_rescue" ) )
+		if ( EntityList()->FindEntityByClassname( NULL, "func_hostage_rescue" ) )
 		{
 			m_bMapHasRescueZone = true;
 		}
@@ -4502,7 +4502,7 @@ ConVar cl_autohelp(
 		}
 
 		// GOOSEMAN : See if this map has func_escapezone entities
-		if ( gEntList.FindEntityByClassname( NULL, "func_escapezone" ) )
+		if ( EntityList()->FindEntityByClassname( NULL, "func_escapezone" ) )
 		{
 			m_bMapHasEscapeZone = true;
 		}
@@ -4512,7 +4512,7 @@ ConVar cl_autohelp(
 		}
 
 		// Check to see if this map has VIP safety zones
-		if ( gEntList.FindEntityByClassname( NULL, "func_vip_safetyzone" ) )
+		if ( EntityList()->FindEntityByClassname( NULL, "func_vip_safetyzone" ) )
 		{
 			m_iMapHasVIPSafetyZone = 1;
 		}
@@ -4580,13 +4580,13 @@ ConVar cl_autohelp(
 
                 if ( pWeapon->ShouldRemoveOnRoundRestart() )
 				{
-					gEntList.DestroyEntity( pCur );
+					EntityList()->DestroyEntity( pCur );
 				}
 			}
 			// remove entities that has to be restored on roundrestart (breakables etc)
 			else if ( !CS_FindInList( s_PreserveEnts, pCur->GetClassname() ) )
 			{
-				gEntList.DestroyEntity( pCur );
+				EntityList()->DestroyEntity( pCur );
 			}
 			
 			pCur = gEntList.NextEnt( pCur );
@@ -4636,17 +4636,17 @@ ConVar cl_autohelp(
 					CMapEntityRef &ref = g_MapEntityRefs[m_iIterator];
 					m_iIterator = g_MapEntityRefs.Next( m_iIterator );	// Seek to the next entity.
 
-					if ( ref.m_iEdict == -1 || gEntList.GetBaseEntity( ref.m_iEdict ) )
+					if ( ref.m_iEdict == -1 || EntityList()->GetBaseEntity( ref.m_iEdict ) )
 					{
 						// Doh! The entity was delete and its slot was reused.
 						// Just use any old edict slot. This case sucks because we lose the baseline.
-						return gEntList.CreateEntityByName( pClassname );
+						return (CBaseEntity*)EntityList()->CreateEntityByName( pClassname );
 					}
 					else
 					{
 						// Cool, the slot where this entity was is free again (most likely, the entity was 
 						// freed above). Now create an entity with this specific index.
-						return gEntList.CreateEntityByName( pClassname, ref.m_iEdict );
+						return (CBaseEntity*)EntityList()->CreateEntityByName( pClassname, ref.m_iEdict );
 					}
 				}
 			}
@@ -4729,12 +4729,12 @@ ConVar cl_autohelp(
 		bool bBombFound = false;
 
 		/* are there any bombs, either laying around, or in someone's inventory? */
-		if( gEntList.FindEntityByClassname( NULL, WEAPON_C4_CLASSNAME ) != 0 )
+		if( EntityList()->FindEntityByClassname( NULL, WEAPON_C4_CLASSNAME ) != 0 )
 		{
 			bBombFound = true;
 		}
 		/* what about planted bombs!? */
-		else if( gEntList.FindEntityByClassname( NULL, PLANTED_C4_CLASSNAME ) != 0 )
+		else if( EntityList()->FindEntityByClassname( NULL, PLANTED_C4_CLASSNAME ) != 0 )
 		{
 			bBombFound = true;
 		}
@@ -5357,14 +5357,14 @@ CON_COMMAND_F( map_showbombradius, "Shows bomb radius from the center of each bo
 	Msg( "Bomb Damage is %.0f, Radius is %.0f\n", flBombDamage, flBombRadius );
 
 	CBaseEntity* ent = NULL;
-	while ( ( ent = gEntList.FindEntityByClassname( ent, "func_bomb_target" ) ) != NULL )
+	while ( ( ent = EntityList()->FindEntityByClassname( ent, "func_bomb_target" ) ) != NULL )
 	{
 		const Vector &pos = ent->WorldSpaceCenter();
 		DrawSphere( pos, flBombRadius, 255, 255, 0, 10 );
 	}
 
 	ent = NULL;
-	while ( ( ent = gEntList.FindEntityByClassname( ent, "planted_c4" ) ) != NULL )
+	while ( ( ent = EntityList()->FindEntityByClassname( ent, "planted_c4" ) ) != NULL )
 	{
 		const Vector &pos = ent->WorldSpaceCenter();
 		DrawSphere( pos, flBombRadius, 255, 0, 0, 10 );

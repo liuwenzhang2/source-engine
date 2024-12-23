@@ -87,7 +87,7 @@ public:
 	static CHL2_Player *CreatePlayer( const char *className, int ed )
 	{
 		//CHL2_Player::s_PlayerEdict = ed;
-		return (CHL2_Player*)gEntList.CreateEntityByName( className, ed );
+		return (CHL2_Player*)EntityList()->CreateEntityByName( className, ed );
 	}
 
 	DECLARE_SERVERCLASS();

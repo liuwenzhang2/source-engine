@@ -2289,7 +2289,7 @@ void CWeaponPhysCannon::WaitForUpgradeThink()
 	DestroyEffects();
 
 	// HACK: Hacky notification back to the level that we've finish upgrading
-	CBaseEntity *pEnt = gEntList.FindEntityByName( NULL, "script_physcannon_upgrade" );
+	CBaseEntity *pEnt = EntityList()->FindEntityByName( NULL, "script_physcannon_upgrade" );
 	if ( pEnt )
 	{
 		variant_t emptyVariant;
@@ -2351,7 +2351,7 @@ void CWeaponPhysCannon::DoEffectIdle( void )
 			}
 #endif
 
-			CCitadelEnergyCore *pCore = static_cast<CCitadelEnergyCore*>(gEntList.CreateEntityByName( "env_citadel_energy_core" ) );
+			CCitadelEnergyCore *pCore = static_cast<CCitadelEnergyCore*>(EntityList()->CreateEntityByName( "env_citadel_energy_core" ) );
 
 			if ( pCore == NULL )
 				return;
@@ -2856,13 +2856,13 @@ void CWeaponPhysCannon::DestroyEffects( void )
 	//Turn off main glow
 	if ( m_hCenterSprite != NULL )
 	{
-		gEntList.DestroyEntity( m_hCenterSprite );
+		EntityList()->DestroyEntity( m_hCenterSprite );
 		m_hCenterSprite = NULL;
 	}
 
 	if ( m_hBlastSprite != NULL )
 	{
-		gEntList.DestroyEntity( m_hBlastSprite );
+		EntityList()->DestroyEntity( m_hBlastSprite );
 		m_hBlastSprite = NULL;
 	}
 
@@ -2871,7 +2871,7 @@ void CWeaponPhysCannon::DestroyEffects( void )
 	{
 		if ( m_hBeams[i] != NULL )
 		{
-			gEntList.DestroyEntity( m_hBeams[i] );
+			EntityList()->DestroyEntity( m_hBeams[i] );
 			m_hBeams[i] = NULL;
 		}
 	}
@@ -2881,7 +2881,7 @@ void CWeaponPhysCannon::DestroyEffects( void )
 	{
 		if ( m_hGlowSprites[i] != NULL )
 		{
-			gEntList.DestroyEntity( m_hGlowSprites[i] );
+			EntityList()->DestroyEntity( m_hGlowSprites[i] );
 			m_hGlowSprites[i] = NULL;
 		}
 	}
@@ -2890,7 +2890,7 @@ void CWeaponPhysCannon::DestroyEffects( void )
 	{
 		if ( m_hEndSprites[i] != NULL )
 		{
-			gEntList.DestroyEntity( m_hEndSprites[i] );
+			EntityList()->DestroyEntity( m_hEndSprites[i] );
 			m_hEndSprites[i] = NULL;
 		}
 	}

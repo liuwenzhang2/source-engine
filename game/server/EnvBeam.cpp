@@ -225,7 +225,7 @@ void CEnvBeam::Activate( void )
 	// Get a handle to my filter entity if there is one
 	if (m_iFilterName != NULL_STRING)
 	{
-		m_hFilter = dynamic_cast<CBaseFilter *>(gEntList.FindEntityByName( NULL, m_iFilterName ));
+		m_hFilter = dynamic_cast<CBaseFilter *>(EntityList()->FindEntityByName( NULL, m_iFilterName ));
 	}
 
 	BaseClass::Activate();
@@ -700,8 +700,8 @@ void CEnvBeam::RandomPoint( const Vector &vecSrc )
 //-----------------------------------------------------------------------------
 void CEnvBeam::BeamUpdateVars( void )
 {
-	CBaseEntity *pStart = gEntList.FindEntityByName( NULL, m_iszStartEntity );
-	CBaseEntity *pEnd = gEntList.FindEntityByName( NULL, m_iszEndEntity );
+	CBaseEntity *pStart = EntityList()->FindEntityByName( NULL, m_iszStartEntity );
+	CBaseEntity *pEnd = EntityList()->FindEntityByName( NULL, m_iszEndEntity );
 
 	if (( pStart == NULL ) || ( pEnd == NULL ))
 	{

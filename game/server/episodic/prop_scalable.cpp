@@ -100,7 +100,7 @@ void CPropScalable::Spawn( void )
 		if (!szModel || !*szModel)
 		{
 			Warning( "prop_scalable at %.0f %.0f %0.f missing modelname\n", GetEngineObject()->GetAbsOrigin().x, GetEngineObject()->GetAbsOrigin().y, GetEngineObject()->GetAbsOrigin().z );
-			gEntList.DestroyEntity( this );
+			EntityList()->DestroyEntity( this );
 			return;
 		}
 

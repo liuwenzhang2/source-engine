@@ -371,7 +371,7 @@ bool CFuncPlat::CreateVPhysics()
 static void PlatSpawnInsideTrigger(CFuncPlat* pevPlatform)
 {
 	// old code: //GetClassPtr( (CPlatTrigger *)NULL)->SpawnInsideTrigger( GetClassPtr( (CFuncPlat *)pevPlatform ) );
-	CPlatTrigger *plattrig = (CPlatTrigger*)gEntList.CreateEntityByName( "plat_trigger" );
+	CPlatTrigger *plattrig = (CPlatTrigger*)EntityList()->CreateEntityByName( "plat_trigger" );
 	plattrig->SpawnInsideTrigger( pevPlatform );
 }
 		
@@ -1018,7 +1018,7 @@ void CFuncTrain::SetupTarget( void )
 	// Find our target whenever we don't have one (level transition)
 	if ( !m_hCurrentTarget )
 	{
-		CBaseEntity	*pTarg = gEntList.FindEntityByName( NULL, m_target );
+		CBaseEntity	*pTarg = EntityList()->FindEntityByName( NULL, m_target );
 
 		if ( pTarg == NULL )
 		{
@@ -1547,7 +1547,7 @@ void CFuncTrackTrain::SetSpeedForwardModifier( float flModifier )
 void CFuncTrackTrain::InputTeleportToPathTrack( inputdata_t &inputdata )
 {
 	const char *pszName = inputdata.value.String();
-	CPathTrack *pTrack = dynamic_cast<CPathTrack*>( gEntList.FindEntityByName( NULL, pszName ) );
+	CPathTrack *pTrack = dynamic_cast<CPathTrack*>( EntityList()->FindEntityByName( NULL, pszName ) );
 
 	if ( pTrack )
 	{
@@ -2523,7 +2523,7 @@ bool CFuncTrackTrain::OnControls( CBaseEntity *pTest )
 
 void CFuncTrackTrain::Find( void )
 {
-	m_ppath = (CPathTrack *)gEntList.FindEntityByName( NULL, m_target );
+	m_ppath = (CPathTrack *)EntityList()->FindEntityByName( NULL, m_target );
 	if ( !m_ppath )
 		return;
 
@@ -2818,7 +2818,7 @@ void CFuncTrainControls::Find( void )
 
 	do 
 	{
-		pTarget = gEntList.FindEntityByName( pTarget, m_target );
+		pTarget = EntityList()->FindEntityByName( pTarget, m_target );
 	} while ( pTarget && !FClassnameIs(pTarget, "func_tracktrain") );
 
 	if ( !pTarget )
@@ -2972,18 +2972,18 @@ void CFuncTrackChange::Find( void )
 	// Find track entities
 	CBaseEntity *target;
 
-	target = gEntList.FindEntityByName( NULL, m_trackTopName );
+	target = EntityList()->FindEntityByName( NULL, m_trackTopName );
 	if ( target )
 	{
 		m_trackTop = (CPathTrack*) target;
-		target = gEntList.FindEntityByName( NULL, m_trackBottomName );
+		target = EntityList()->FindEntityByName( NULL, m_trackBottomName );
 		if ( target )
 		{
 			m_trackBottom = (CPathTrack*) target;
-			target = gEntList.FindEntityByName( NULL, m_trainName );
+			target = EntityList()->FindEntityByName( NULL, m_trainName );
 			if ( target )
 			{
-				m_train = (CFuncTrackTrain *)gEntList.FindEntityByName( NULL, m_trainName );
+				m_train = (CFuncTrackTrain *)EntityList()->FindEntityByName( NULL, m_trainName );
 				if ( !m_train )
 				{
 					Warning( "Can't find train for track change! %s\n", STRING(m_trainName) );
@@ -3001,7 +3001,7 @@ void CFuncTrackChange::Find( void )
 			{
 				Warning( "Can't find train for track change! %s\n", STRING(m_trainName) );
 				Assert(0);
-				target = gEntList.FindEntityByName( NULL, m_trainName );
+				target = EntityList()->FindEntityByName( NULL, m_trainName );
 			}
 		}
 		else

@@ -284,22 +284,22 @@ void CNPC_Portal_FloorTurret::Activate( void )
 	BaseClass::Activate();
 
 	// Find all nearby physics objects and add them to the list of objects we will sense
-	CBaseEntity *pObject = gEntList.FindEntityByClassname( NULL, "prop_physics" );
+	CBaseEntity *pObject = EntityList()->FindEntityByClassname( NULL, "prop_physics" );
 	while ( pObject )
 	{
 		// Tell the AI sensing list that we want to consider this
 		g_AI_SensedObjectsManager.AddEntity( pObject );
 
-		pObject = gEntList.FindEntityByClassname( pObject, "prop_physics" );
+		pObject = EntityList()->FindEntityByClassname( pObject, "prop_physics" );
 	}
 
-	pObject = gEntList.FindEntityByClassname( NULL, "func_physbox" );
+	pObject = EntityList()->FindEntityByClassname( NULL, "func_physbox" );
 	while ( pObject )
 	{
 		// Tell the AI sensing list that we want to consider this
 		g_AI_SensedObjectsManager.AddEntity( pObject );
 
-		pObject = gEntList.FindEntityByClassname( pObject, "func_physbox" );
+		pObject = EntityList()->FindEntityByClassname( pObject, "func_physbox" );
 	}
 
 	m_iLastState = TURRET_AUTO_SEARCHING;
@@ -1541,7 +1541,7 @@ void CNPC_Portal_FloorTurret::RopesOff( void )
 		// Remove rope if it's alive
 		if ( m_hRopes[ iRope ] )
 		{
-			 gEntList.DestroyEntity( m_hRopes[ iRope ] );
+			 EntityList()->DestroyEntity( m_hRopes[ iRope ] );
 			 m_hRopes[ iRope ] = NULL;
 		}
 	}
@@ -1549,7 +1549,7 @@ void CNPC_Portal_FloorTurret::RopesOff( void )
 
 void CNPC_Portal_FloorTurret::FireBullet( const char *pTargetName )
 {
-	CBaseEntity *pEnemy = gEntList.FindEntityByName( NULL, pTargetName );
+	CBaseEntity *pEnemy = EntityList()->FindEntityByName( NULL, pTargetName );
 	if ( !pEnemy )
 		return;
 

@@ -202,7 +202,7 @@ void CSnark::HuntThink( void )
 	if (!IsInWorld())
 	{
 		SetTouch( NULL );
-		gEntList.DestroyEntity( this );
+		EntityList()->DestroyEntity( this );
 		return;
 	}
 	

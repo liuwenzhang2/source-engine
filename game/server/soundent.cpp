@@ -250,7 +250,7 @@ void CSoundEnt::OnRestore()
 	if ( g_pSoundEnt )
 	{
 		Assert( g_pSoundEnt != this );
-		gEntList.DestroyEntity( g_pSoundEnt );
+		EntityList()->DestroyEntity( g_pSoundEnt );
 	}
 	g_pSoundEnt = this;
 }
@@ -769,7 +769,7 @@ void CAISound::InputInsertSound( inputdata_t &inputdata )
 
 	if( m_iszProxyEntityName != NULL_STRING )
 	{
-		CBaseEntity *pProxy = gEntList.FindEntityByName( NULL, m_iszProxyEntityName );
+		CBaseEntity *pProxy = EntityList()->FindEntityByName( NULL, m_iszProxyEntityName );
 
 		if( pProxy )
 		{
@@ -790,7 +790,7 @@ void CAISound::InputEmitAISound( inputdata_t &inputdata )
 
 	if( m_iszProxyEntityName != NULL_STRING )
 	{
-		CBaseEntity *pProxy = gEntList.FindEntityByName( NULL, m_iszProxyEntityName );
+		CBaseEntity *pProxy = EntityList()->FindEntityByName( NULL, m_iszProxyEntityName );
 
 		if( pProxy )
 		{

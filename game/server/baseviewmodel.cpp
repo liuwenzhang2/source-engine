@@ -81,7 +81,7 @@ int CBaseViewModel::ShouldTransmit( const CCheckTransmitInfo *pInfo )
 	}
 
 	// check if recipient spectates the own of this viewmodel
-	CBaseEntity *pRecipientEntity = gEntList.GetBaseEntity( pInfo->m_pClientEnt );
+	CBaseEntity *pRecipientEntity = EntityList()->GetBaseEntity( pInfo->m_pClientEnt );
 
 	if ( pRecipientEntity->IsPlayer() )
 	{

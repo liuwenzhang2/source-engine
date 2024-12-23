@@ -422,7 +422,7 @@ CDODPlayer::~CDODPlayer()
 CDODPlayer *CDODPlayer::CreatePlayer( const char *className, int ed )
 {
 	//CDODPlayer::s_PlayerEdict = ed;
-	return (CDODPlayer*)gEntList.CreateEntityByName( className, ed );
+	return (CDODPlayer*)EntityList()->CreateEntityByName( className, ed );
 }
 
 void CDODPlayer::PrecachePlayerModel( const char *szPlayerModel )
@@ -640,14 +640,14 @@ CRagdollProp* CDODPlayer::CreateRagdollProp()
 	{
 		// MATTTODO: put ragdolls in a queue to disappear
 		// for now remove the old one ..
-		gEntList.DestroyEntity( pRagdoll );
+		EntityList()->DestroyEntity( pRagdoll );
 		pRagdoll = NULL;
 	}
 
 	if ( !pRagdoll )
 	{
 		// and create a new one
-		pRagdoll = dynamic_cast< CDODRagdoll* >(gEntList.CreateEntityByName( "dod_ragdoll" ) );
+		pRagdoll = dynamic_cast< CDODRagdoll* >(EntityList()->CreateEntityByName( "dod_ragdoll" ) );
 	}
 
 	if ( pRagdoll )
@@ -672,7 +672,7 @@ void CDODPlayer::DestroyRagdoll( void )
 	
 	if( pRagdoll )
 	{
-		gEntList.DestroyEntity( pRagdoll );
+		EntityList()->DestroyEntity( pRagdoll );
 	}
 }
 
@@ -1038,7 +1038,7 @@ CBaseEntity	*CDODPlayer::GiveNamedItem( const char *pszName, int iSubType )
 {
 	EHANDLE pent;
 
-	pent = gEntList.CreateEntityByName(pszName);
+	pent = (CBaseEntity*)EntityList()->CreateEntityByName(pszName);
 	if ( pent == NULL )
 	{
 		Msg( "NULL Ent in GiveNamedItem!\n" );
@@ -1805,7 +1805,7 @@ bool CDODPlayer::BumpWeapon( CBaseCombatWeapon *pBaseWeapon )
 		extern int gEvilImpulse101;
 		if ( gEvilImpulse101 )
 		{
-			gEntList.DestroyEntity( pWeapon );
+			EntityList()->DestroyEntity( pWeapon );
 		}
 		return false;
 	}
@@ -1842,7 +1842,7 @@ bool CDODPlayer::BumpWeapon( CBaseCombatWeapon *pBaseWeapon )
 			if ( pWeapon->HasPrimaryAmmo() )
 				return false;
 
-			gEntList.DestroyEntity( pWeapon );
+			EntityList()->DestroyEntity( pWeapon );
 			return true;
 		}
 		else
@@ -1954,7 +1954,7 @@ bool CDODPlayer::HandleCommand_JoinClass( int iClass )
 			{
 				if ( !pWeapon->GetOwner() )
 				{	
-					gEntList.DestroyEntity( m_hLastDroppedWeapon.Get() );
+					EntityList()->DestroyEntity( m_hLastDroppedWeapon.Get() );
 				}
 			}
 
@@ -1962,7 +1962,7 @@ bool CDODPlayer::HandleCommand_JoinClass( int iClass )
 			CAmmoBox *pAmmo = dynamic_cast<CAmmoBox *>( m_hLastDroppedAmmoBox.Get() );
 			if ( pAmmo )
 			{
-				gEntList.DestroyEntity( pAmmo );
+				EntityList()->DestroyEntity( pAmmo );
 			}
 		}
 	}
@@ -2043,7 +2043,7 @@ int CDODPlayer::GetNearestLocationAsString( char *pDest, int iDestSize )
 
 	const char *pLocationName = "";
 
-	CBaseEntity *pEnt =	gEntList.FindEntityByClassname( NULL, "dod_control_point" );
+	CBaseEntity *pEnt =	EntityList()->FindEntityByClassname( NULL, "dod_control_point" );
 
 	while( pEnt )
 	{
@@ -2057,10 +2057,10 @@ int CDODPlayer::GetNearestLocationAsString( char *pDest, int iDestSize )
 			flMinDist = flDist;
 		}
 
-		pEnt = gEntList.FindEntityByClassname( pEnt, "dod_control_point" );
+		pEnt = EntityList()->FindEntityByClassname( pEnt, "dod_control_point" );
 	}
 
-	pEnt =	gEntList.FindEntityByClassname( NULL, "dod_location" );
+	pEnt =	EntityList()->FindEntityByClassname( NULL, "dod_location" );
 
 	while( pEnt )
 	{
@@ -2074,7 +2074,7 @@ int CDODPlayer::GetNearestLocationAsString( char *pDest, int iDestSize )
 			flMinDist = flDist;
 		}
 
-		pEnt = gEntList.FindEntityByClassname( pEnt, "dod_location" );
+		pEnt = EntityList()->FindEntityByClassname( pEnt, "dod_location" );
 	}
 
 	Q_snprintf( pDest, iDestSize, "%s", pLocationName );
@@ -2911,11 +2911,11 @@ bool CDODPlayer::CanSprint()
 
 void CDODPlayer::MoveToNextIntroCamera()
 {
-	m_pIntroCamera = gEntList.FindEntityByClassname( m_pIntroCamera, "point_viewcontrol" );
+	m_pIntroCamera = EntityList()->FindEntityByClassname( m_pIntroCamera, "point_viewcontrol" );
 
 	// if m_pIntroCamera is NULL we just were at end of list, start searching from start again
 	if(!m_pIntroCamera)
-		m_pIntroCamera = gEntList.FindEntityByClassname(m_pIntroCamera, "point_viewcontrol");
+		m_pIntroCamera = EntityList()->FindEntityByClassname(m_pIntroCamera, "point_viewcontrol");
 
 	if( !m_pIntroCamera  ) //if there are no cameras find a spawn point and black out the screen
 	{
@@ -3028,7 +3028,7 @@ CBaseEntity *CDODPlayer::SelectSpawnSpot( CUtlVector<EHANDLE> *pSpawnPoints, int
 				QAngle spotAngles = pSpot->GetEngineObject()->GetAbsAngles();
 
 				// make a new spawnpoint so we don't have to do this a bunch of times
-				pSpot = gEntList.CreateEntityByName( pSpot->GetClassname() );
+				pSpot = (CBaseEntity*)EntityList()->CreateEntityByName( pSpot->GetClassname() );
 				pSpot->GetEngineObject()->SetAbsOrigin( origin );
 				pSpot->GetEngineObject()->SetAbsAngles( spotAngles );
 
@@ -3075,7 +3075,7 @@ CBaseEntity* CDODPlayer::EntSelectSpawnPoint()
 	case TEAM_UNASSIGNED:
 	default:
 		{
-			pSpot = gEntList.GetBaseEntity(0);
+			pSpot = EntityList()->GetBaseEntity(0);
 		}
 		break;		
 	}
@@ -3083,7 +3083,7 @@ CBaseEntity* CDODPlayer::EntSelectSpawnPoint()
 	if ( !pSpot )
 	{
 		Warning( "PutClientInServer: no valid spawns on level\n" );
-		return gEntList.GetBaseEntity(0);
+		return EntityList()->GetBaseEntity(0);
 	}
 
 	return pSpot;
@@ -3774,7 +3774,7 @@ void CDODPlayer::CreateViewModel( int index /*=0*/ )
 	if ( GetViewModel( index ) )
 		return;
 
-	CDODViewModel *vm = ( CDODViewModel * )gEntList.CreateEntityByName( "dod_viewmodel" );
+	CDODViewModel *vm = ( CDODViewModel * )EntityList()->CreateEntityByName( "dod_viewmodel" );
 	if ( vm )
 	{
 		vm->GetEngineObject()->SetAbsOrigin(GetEngineObject()->GetAbsOrigin() );
@@ -4234,7 +4234,7 @@ CBaseEntity *CDODPlayer::FindUseEntity()
 		// This is done separately since there might be something blocking our LOS to it
 		// but we might want to use it anyway if it's close enough.
 
-		while( ( pEnt = gEntList.FindEntityByClassname( pEnt, "dod_bomb_target" ) ) != NULL )
+		while( ( pEnt = EntityList()->FindEntityByClassname( pEnt, "dod_bomb_target" ) ) != NULL )
 		{
 			CDODBombTarget *pTarget = static_cast<CDODBombTarget *>( pEnt );
 

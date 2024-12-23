@@ -188,7 +188,7 @@ void CGameUI::InputActivate( inputdata_t &inputdata )
 	// Determine if we're specifying this as an override parameter
 	if ( inputdata.value.StringID() != NULL_STRING )
 	{
-		CBaseEntity *pEntity = gEntList.FindEntityByName( NULL, inputdata.value.String(), this, inputdata.pActivator, inputdata.pCaller );
+		CBaseEntity *pEntity = EntityList()->FindEntityByName( NULL, inputdata.value.String(), this, inputdata.pActivator, inputdata.pCaller );
 		if ( pEntity == NULL || pEntity->IsPlayer() == false )
 		{
 			Warning( "%s InputActivate: entity %s not found or is not a player!\n", GetEntityName().ToCStr(), inputdata.value.String() );

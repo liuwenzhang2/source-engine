@@ -202,7 +202,7 @@ void CPhysForce::Activate( void )
 
 	if ( m_attachedObject == NULL )
 	{
-		m_attachedObject = gEntList.FindEntityByName( NULL, m_nameAttach );
+		m_attachedObject = EntityList()->FindEntityByName( NULL, m_nameAttach );
 	}
 	
 	// Let the derived class set up before we throw the switch
@@ -721,7 +721,7 @@ void CPhysMotor::Spawn( void )
 		m_motor.m_speed = 0;
 		GetEngineObject()->SetNextThink( TICK_NEVER_THINK );
 
-		gEntList.DestroyEntity(this);
+		EntityList()->DestroyEntity(this);
 	}
 }
 
@@ -751,7 +751,7 @@ void CPhysMotor::Activate( void )
 	// This gets called after all objects spawn and after all objects restore
 	if ( m_attachedObject == NULL )
 	{
-		CBaseEntity *pAttach = gEntList.FindEntityByName( NULL, m_nameAttach );
+		CBaseEntity *pAttach = EntityList()->FindEntityByName( NULL, m_nameAttach );
 		if ( pAttach && pAttach->GetEngineObject()->GetMoveType() == MOVETYPE_VPHYSICS )
 		{
 			m_attachedObject = pAttach;
@@ -958,7 +958,7 @@ void CKeepUpright::Activate()
 
 		if ( !pPhys )
 		{
-			gEntList.DestroyEntity(this);
+			EntityList()->DestroyEntity(this);
 			return;
 		}
 		// HACKHACK: Due to changes in the vehicle simulator the keepupright controller used in coast_01 is unstable

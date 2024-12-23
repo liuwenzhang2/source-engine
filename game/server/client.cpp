@@ -411,11 +411,11 @@ CBaseEntity *GetNextCommandEntity( CBasePlayer *pPlayer, const char *name, CBase
 		if ( ent )
 			return NULL;
 
-		return gEntList.GetBaseEntity( index );
+		return EntityList()->GetBaseEntity( index );
 	}
 		
 	// Loop through all entities matching, starting from the specified previous
-	while ( (ent = gEntList.NextEnt(ent)) != NULL )
+	while ( (ent = EntityList()->NextEnt(ent)) != NULL )
 	{
 		if (  (ent->GetEntityName() != NULL_STRING	&& ent->NameMatches(name))	|| 
 			  (ent->GetEngineObject()->GetClassname() != NULL_STRING && ent->ClassMatches(name)) )
@@ -467,13 +467,13 @@ void KillTargets( const char *pKillTargetName )
 	CBaseEntity *pentKillTarget = NULL;
 
 	DevMsg( 2, "KillTarget: %s\n", pKillTargetName );
-	pentKillTarget = gEntList.FindEntityByName( NULL, pKillTargetName );
+	pentKillTarget = EntityList()->FindEntityByName( NULL, pKillTargetName );
 	while ( pentKillTarget )
 	{
-		gEntList.DestroyEntity( pentKillTarget );
+		EntityList()->DestroyEntity( pentKillTarget );
 
 		DevMsg( 2, "killing %s\n", STRING( pentKillTarget->GetEngineObject()->GetClassname() ) );
-		pentKillTarget = gEntList.FindEntityByName( pentKillTarget, pKillTargetName );
+		pentKillTarget = EntityList()->FindEntityByName( pentKillTarget, pKillTargetName );
 	}
 }
 
@@ -489,7 +489,7 @@ void ConsoleKillTarget( CBasePlayer *pPlayer, const char *name )
 		CBaseEntity *pEntity = FindPickerEntity( pPlayer );
 		if ( pEntity )
 		{
-			gEntList.DestroyEntity( pEntity );
+			EntityList()->DestroyEntity( pEntity );
 			Msg( "killing %s\n", pEntity->GetDebugName() );
 			return;
 		}
@@ -1359,7 +1359,7 @@ static bool IsInGroundList( CBaseEntity *ent, CBaseEntity *ground )
 		servergroundlink_t *link = root->nextLink;
 		while ( link != root )
 		{
-			CBaseEntity *other = (CBaseEntity*)gEntList.GetServerEntityFromHandle(link->entity);
+			CBaseEntity *other = EntityList()->GetBaseEntityFromHandle(link->entity);
 			if ( other == ent )
 				return true;
 			link = link->nextLink;
@@ -1386,7 +1386,7 @@ static int DescribeGroundList( CBaseEntity *ent )
 		servergroundlink_t *link = root->nextLink;
 		while ( link != root )
 		{
-			CBaseEntity *other = (CBaseEntity*)gEntList.GetServerEntityFromHandle(link->entity);
+			CBaseEntity *other = EntityList()->GetBaseEntityFromHandle(link->entity);
 			if ( other )
 			{
 				Msg( "  %02i:  %i %s\n", c++, other->entindex(), other->GetClassname() );
@@ -1423,7 +1423,7 @@ void CC_GroundList_f(const CCommand &args)
 	{
 		int idx = atoi( args[1] );
 
-		CBaseEntity *ground = gEntList.GetBaseEntity( idx );
+		CBaseEntity *ground = EntityList()->GetBaseEntity( idx );
 		if ( ground )
 		{
 			DescribeGroundList( ground );
@@ -1433,7 +1433,7 @@ void CC_GroundList_f(const CCommand &args)
 	{
 		CBaseEntity *ent = NULL;
 		int linkCount = 0;
-		while ( (ent = gEntList.NextEnt(ent)) != NULL )
+		while ( (ent = EntityList()->NextEnt(ent)) != NULL )
 		{
 			linkCount += DescribeGroundList( ent );
 		}
@@ -1502,11 +1502,11 @@ void ClientCommand( CBasePlayer *pPlayer, const CCommand &args )
 			{
 				// Destroy it
 				//
-				CBaseEntity *ent = gEntList.FindEntityByClassname( NULL, "te_tester" );
+				CBaseEntity *ent = EntityList()->FindEntityByClassname( NULL, "te_tester" );
 				while ( ent )
 				{
-					CBaseEntity *next = gEntList.FindEntityByClassname( ent, "te_tester" );
-					gEntList.DestroyEntity( ent );
+					CBaseEntity *next = EntityList()->FindEntityByClassname( ent, "te_tester" );
+					EntityList()->DestroyEntity( ent );
 					ent = next;
 				}
 			}

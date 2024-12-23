@@ -488,7 +488,7 @@ void CEnergyBallLauncher::Spawn()
 
 void CEnergyBallLauncher::SpawnBall()
 {
-	CPropEnergyBall *pBall = static_cast<CPropEnergyBall*>(gEntList.CreateEntityByName( "prop_energy_ball" ) );
+	CPropEnergyBall *pBall = static_cast<CPropEnergyBall*>(EntityList()->CreateEntityByName( "prop_energy_ball" ) );
 
 	if ( pBall == NULL )
 		return;
@@ -588,7 +588,7 @@ static void fire_energy_ball_f( void )
 
 
 	{
-		CPropEnergyBall *pBall = static_cast<CPropEnergyBall*>(gEntList.CreateEntityByName( "prop_energy_ball" ) );
+		CPropEnergyBall *pBall = static_cast<CPropEnergyBall*>(EntityList()->CreateEntityByName( "prop_energy_ball" ) );
 
 		if ( pBall == NULL )
 			return;

@@ -135,7 +135,7 @@ void CRagdollManager::InputSetMaxRagdollCountDX8(inputdata_t &inputdata)
 bool RagdollManager_SaveImportant( CAI_BaseNPC *pNPC )
 {
 #ifdef HL2_DLL
-	CRagdollManager *pEnt =	(CRagdollManager *)gEntList.FindEntityByClassname( NULL, "game_ragdoll_manager" );
+	CRagdollManager *pEnt =	(CRagdollManager *)EntityList()->FindEntityByClassname( NULL, "game_ragdoll_manager" );
 
 	if ( pEnt == NULL )
 		return false;

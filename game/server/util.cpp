@@ -114,7 +114,7 @@ bool CFlaggedEntitiesEnum::AddToList( CBaseEntity *pEntity )
 
 IterationRetval_t CFlaggedEntitiesEnum::EnumElement( IHandleEntity *pHandleEntity )
 {
-	CBaseEntity *pEntity = gEntList.GetBaseEntity( pHandleEntity->GetRefEHandle() );
+	CBaseEntity *pEntity = EntityList()->GetBaseEntityFromHandle( pHandleEntity->GetRefEHandle() );
 	if ( pEntity )
 	{
 		if ( m_flagMask && !(pEntity->GetEngineObject()->GetFlags() & m_flagMask) )	// Does it meet the criteria?
@@ -152,7 +152,7 @@ int UTIL_PrecacheDecal( const char *name, bool preload )
 //-----------------------------------------------------------------------------
 float UTIL_GetSimulationInterval()
 {
-	if ( gEntList.IsSimulatingOnAlternateTicks() )
+	if (EntityList()->IsSimulatingOnAlternateTicks() )
 		return ( TICK_INTERVAL * 2.0 );
 	return TICK_INTERVAL;
 }
@@ -337,7 +337,7 @@ CBasePlayer	*UTIL_PlayerByIndex( int playerIndex )
 
 	if ( playerIndex > 0 && playerIndex <= gpGlobals->maxClients )
 	{
-		pPlayer = (CBasePlayer*)gEntList.GetBaseEntity(playerIndex);
+		pPlayer = (CBasePlayer*)EntityList()->GetBaseEntity(playerIndex);
 	}
 	
 	return pPlayer;
@@ -468,7 +468,7 @@ bool UTIL_IsCommandIssuedByServerAdmin( void )
  */
 CBaseEntity	*UTIL_EntityByIndex( int entityIndex )
 {
-	return gEntList.GetBaseEntity(entityIndex);
+	return EntityList()->GetBaseEntity(entityIndex);
 }
 
 
@@ -1128,7 +1128,7 @@ bool UTIL_IsMasterTriggered(string_t sMaster, CBaseEntity *pActivator)
 {
 	if (sMaster != NULL_STRING)
 	{
-		CBaseEntity *pMaster = gEntList.FindEntityByName( NULL, sMaster, NULL, pActivator );
+		CBaseEntity *pMaster = EntityList()->FindEntityByName( NULL, sMaster, NULL, pActivator );
 	
 		if ( pMaster && (pMaster->ObjectCaps() & FCAP_MASTER) )
 		{
@@ -1529,7 +1529,7 @@ void UTIL_PrecacheOther( const char *szClassname, const char *modelName )
 		return;
 #endif
 
-	CBaseEntity	*pEntity = gEntList.CreateEntityByName( szClassname );
+	CBaseEntity	*pEntity = (CBaseEntity*)EntityList()->CreateEntityByName( szClassname );
 	if ( !pEntity )
 	{
 		Warning( "NULL Ent in UTIL_PrecacheOther\n" );
@@ -1545,7 +1545,7 @@ void UTIL_PrecacheOther( const char *szClassname, const char *modelName )
 	if (pEntity)
 		pEntity->Precache( );
 
-	gEntList.DestroyEntityImmediate( pEntity );
+	EntityList()->DestroyEntityImmediate( pEntity );
 }
 
 //=========================================================
@@ -1892,11 +1892,11 @@ static int UTIL_GetNewCheckClient( int check )
 
 		// Looped but didn't find anything else
 		if (i == check) {
-			ent = gEntList.GetBaseEntity(i);
+			ent = EntityList()->GetBaseEntity(i);
 			break;
 		}
 
-		ent = gEntList.GetBaseEntity( i );
+		ent = EntityList()->GetBaseEntity( i );
 		if ( !ent )
 			continue;
 
@@ -1957,7 +1957,7 @@ static CBaseEntity *UTIL_GetCurrentCheckClient()
 	}
 
 	// return check if it might be visible	
-	ent = gEntList.GetBaseEntity( g_CheckClient.m_lastcheck );
+	ent = EntityList()->GetBaseEntity( g_CheckClient.m_lastcheck );
 
 	// Allow dead clients -- JAY
 	// Our monsters know the difference, and this function gates alot of behavior
@@ -2132,7 +2132,7 @@ CBaseEntity *UTIL_EntitiesInPVS( CBaseEntity *pPVSEntity, CBaseEntity *pStarting
 		engine->GetPVSForCluster( clusterIndex, sizeof(pvs), pvs );
 	}
 
-	for ( CBaseEntity *pEntity = gEntList.NextEnt(pStartingEntity); pEntity; pEntity = gEntList.NextEnt(pEntity) )
+	for ( CBaseEntity *pEntity = EntityList()->NextEnt(pStartingEntity); pEntity; pEntity = EntityList()->NextEnt(pEntity) )
 	{
 		// Only return attached ents.
 		if (!pEntity->IsNetworkable() || pEntity->entindex()==-1 )
@@ -2246,7 +2246,7 @@ bool UTIL_PointAtEntity( CBaseEntity *pDest, CBaseEntity *pTarget )
 void UTIL_PointAtNamedEntity( CBaseEntity *pDest, string_t strTarget )
 {
 	//Attempt to find the entity
-	if ( !UTIL_PointAtEntity( pDest, gEntList.FindEntityByName( NULL, strTarget ) ) )
+	if ( !UTIL_PointAtEntity( pDest, EntityList()->FindEntityByName( NULL, strTarget ) ) )
 	{
 		DevMsg( 1, "%s (%s) was unable to point at an entity named: %s\n", pDest->GetClassname(), pDest->GetDebugName(), STRING( strTarget ) );
 	}
@@ -2500,7 +2500,7 @@ bool UTIL_LoadAndSpawnEntitiesFromScript( CUtlVector <CBaseEntity*> &entities, c
 			}
 
 			// Spawn the entity
-			CBaseEntity *pNode = gEntList.CreateEntityByName( pNodeName );
+			CBaseEntity *pNode = (CBaseEntity*)EntityList()->CreateEntityByName( pNodeName );
 
 			if ( pNode )
 			{
@@ -2851,7 +2851,7 @@ IPhysicsObject* FindPhysicsObjectByName(const char* pName, CBaseEntity* pErrorEn
 	IPhysicsObject* pBestObject = NULL;
 	while (1)
 	{
-		pEntity = gEntList.FindEntityByName(pEntity, pName);
+		pEntity = EntityList()->FindEntityByName(pEntity, pName);
 		if (!pEntity)
 			break;
 		if (pEntity->GetEngineObject()->VPhysicsGetObject())
@@ -2861,7 +2861,7 @@ IPhysicsObject* FindPhysicsObjectByName(const char* pName, CBaseEntity* pErrorEn
 				const char* pErrorName = pErrorEntity ? pErrorEntity->GetClassname() : "Unknown";
 				Vector origin = pErrorEntity ? pErrorEntity->GetEngineObject()->GetAbsOrigin() : vec3_origin;
 				DevWarning("entity %s at %s has physics attachment to more than one entity with the name %s!!!\n", pErrorName, VecToString(origin), pName);
-				while ((pEntity = gEntList.FindEntityByName(pEntity, pName)) != NULL)
+				while ((pEntity = EntityList()->FindEntityByName(pEntity, pName)) != NULL)
 				{
 					DevWarning("Found %s\n", pEntity->GetClassname());
 				}
@@ -3060,7 +3060,7 @@ static void DebugConstraints(CBaseEntity* pEntity)
 	IPhysicsObject* pAttachVPhysics[2];
 	CConstraintFloodList list;
 
-	for (CBaseEntity* pList = gEntList.FirstEnt(); pList != NULL; pList = gEntList.NextEnt(pList))
+	for (CBaseEntity* pList = EntityList()->FirstEnt(); pList != NULL; pList = EntityList()->NextEnt(pList))
 	{
 		if (GetConstraintAttachments(pList, pAttach, pAttachVPhysics) || GetSpringAttachments(pList, pAttach, pAttachVPhysics))
 		{
@@ -3236,7 +3236,7 @@ void CC_KDTreeTest( const CCommand &args )
 	Msg( "Testing kd-tree entity queries." );
 
 	// Get the testing spot.
-//	CBaseEntity *pSpot = gEntList.FindEntityByClassname( NULL, "info_player_start" );
+//	CBaseEntity *pSpot = EntityList()->FindEntityByClassname( NULL, "info_player_start" );
 //	Vector vecStart = pSpot->GetAbsOrigin();
 
 	CBasePlayer *pPlayer = static_cast<CBasePlayer*>( UTIL_GetLocalPlayer() );
@@ -3536,7 +3536,7 @@ void CC_CollisionTest( const CCommand &args )
 	Msg( "Testing collision system\n" );
 	partition->ReportStats( "" );
 	int i;
-	CBaseEntity *pSpot = gEntList.FindEntityByClassname( NULL, "info_player_start");
+	CBaseEntity *pSpot = EntityList()->FindEntityByClassname( NULL, "info_player_start");
 	Vector start = pSpot->GetEngineObject()->GetAbsOrigin();
 	static Vector *targets = NULL;
 	static bool first = true;

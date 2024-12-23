@@ -820,7 +820,7 @@ void CNPC_PoisonZombie::EvacuateNest( bool bExplosion, float flDamage, CBaseEnti
 
 			if( !HeadcrabFits(pCrab) )
 			{
-				gEntList.DestroyEntity(pCrab);
+				EntityList()->DestroyEntity(pCrab);
 				continue;
 			}
 

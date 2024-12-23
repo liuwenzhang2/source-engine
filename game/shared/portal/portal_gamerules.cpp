@@ -98,7 +98,7 @@ void CC_Create_PortalWeightBox( void )
 	engine->SetAllowPrecache( true );//CBaseEntity::
 
 	// Try to create entity
-	CBaseEntity *entity = dynamic_cast< CBaseEntity * >(gEntList.CreateEntityByName("prop_physics") );
+	CBaseEntity *entity = dynamic_cast< CBaseEntity * >(EntityList()->CreateEntityByName("prop_physics") );
 	if (entity)
 	{
 		engine->PrecacheModel( PORTAL_WEIGHT_BOX_MODEL_NAME );
@@ -141,7 +141,7 @@ void CC_Create_PortalMetalSphere( void )
 	engine->SetAllowPrecache( true );//CBaseEntity::
 
 	// Try to create entity
-	CBaseEntity *entity = dynamic_cast< CBaseEntity * >(gEntList.CreateEntityByName("prop_physics") );
+	CBaseEntity *entity = dynamic_cast< CBaseEntity * >(EntityList()->CreateEntityByName("prop_physics") );
 	if (entity)
 	{
 		engine->PrecacheModel( PORTAL_METAL_SPHERE_MODEL_NAME );

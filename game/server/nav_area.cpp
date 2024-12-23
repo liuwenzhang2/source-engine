@@ -561,7 +561,7 @@ void CNavArea::ConnectElevators( void )
 #ifdef TERROR
 	// connect elevators
 	CFuncElevator *elevator = NULL;
-	while( ( elevator = (CFuncElevator *)gEntList.FindEntityByClassname( elevator, "func_elevator" ) ) != NULL )
+	while( ( elevator = (CFuncElevator *)EntityList()->FindEntityByClassname( elevator, "func_elevator" ) ) != NULL )
 	{
 		if ( elevator->GetNumFloors() < 2 )
 		{

@@ -44,7 +44,7 @@ called each time a player is spawned into the game
 void ClientPutInServer( int pEdict, const char *playername )
 {
 	// Allocate a CBasePlayer for pev, and call spawn
-	CPortal_Player *pPlayer = (CPortal_Player*)gEntList.GetBaseEntity(pEdict);
+	CPortal_Player *pPlayer = (CPortal_Player*)EntityList()->GetBaseEntity(pEdict);
 	if (pPlayer == NULL) {
 		pPlayer = CPortal_Player::CreatePlayer("player", pEdict);
 	}
@@ -64,7 +64,7 @@ void ClientPutInServer( int pEdict, const char *playername )
 
 void ClientActive( int pEdict, bool bLoadGame )
 {
-	CPortal_Player *pPlayer = dynamic_cast< CPortal_Player* >( gEntList.GetBaseEntity( pEdict ) );
+	CPortal_Player *pPlayer = dynamic_cast< CPortal_Player* >(EntityList()->GetBaseEntity( pEdict ) );
 	Assert( pPlayer );
 
 	pPlayer->InitialSpawn();
@@ -103,7 +103,7 @@ CBaseEntity* FindEntity( int pEdict, char *classname)
 	// If no name was given set bits based on the picked
 	if (FStrEq(classname,"")) 
 	{
-		return (FindPickerEntityClass( static_cast<CBasePlayer*>(gEntList.GetBaseEntity(pEdict)), classname ));
+		return (FindPickerEntityClass( static_cast<CBasePlayer*>(EntityList()->GetBaseEntity(pEdict)), classname ));
 	}
 	return NULL;
 }

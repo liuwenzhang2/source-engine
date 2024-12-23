@@ -513,7 +513,7 @@ void CLogicLineToEntity::Activate(void)
 
 	if (m_target != NULL_STRING)
 	{
-		m_EndEntity = gEntList.FindEntityByName( NULL, m_target );
+		m_EndEntity = EntityList()->FindEntityByName( NULL, m_target );
 
 		//
 		// If we were given a bad measure target, just measure sound where we are.
@@ -531,7 +531,7 @@ void CLogicLineToEntity::Activate(void)
 
 	if (m_SourceName != NULL_STRING)
 	{
-		m_StartEntity = gEntList.FindEntityByName( NULL, m_SourceName );
+		m_StartEntity = EntityList()->FindEntityByName( NULL, m_SourceName );
 
 		//
 		// If we were given a bad measure target, just measure sound where we are.
@@ -911,7 +911,7 @@ void CEnvGlobal::Spawn( void )
 {
 	if ( !m_globalstate )
 	{
-		gEntList.DestroyEntity( this );
+		EntityList()->DestroyEntity( this );
 		return;
 	}
 
@@ -1277,13 +1277,13 @@ void CMultiSource::Register(void)
 		pTarget = gEntList.FindEntityByTarget( pTarget, STRING(GetEntityName()) );
 	}
 
-	pTarget = gEntList.FindEntityByClassname( NULL, "multi_manager" );
+	pTarget = EntityList()->FindEntityByClassname( NULL, "multi_manager" );
 	while (pTarget && (m_iTotal < MS_MAX_TARGETS))
 	{
 		if ( pTarget && pTarget->HasTarget(GetEntityName()) )
 			m_rgEntities[m_iTotal++] = pTarget;
 
-		pTarget = gEntList.FindEntityByClassname( pTarget, "multi_manager" );
+		pTarget = EntityList()->FindEntityByClassname( pTarget, "multi_manager" );
 	}
 
 	GetEngineObject()->RemoveSpawnFlags(SF_MULTI_INIT);

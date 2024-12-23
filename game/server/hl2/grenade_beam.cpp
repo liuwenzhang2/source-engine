@@ -85,7 +85,7 @@ void CGrenadeBeamChaser::ChaserThink( void )
 //------------------------------------------------------------------------------
 CGrenadeBeamChaser* CGrenadeBeamChaser::ChaserCreate( CGrenadeBeam *pTarget )
 {
-	CGrenadeBeamChaser *pChaser = (CGrenadeBeamChaser *)gEntList.CreateEntityByName( "grenade_beam_chaser" );
+	CGrenadeBeamChaser *pChaser = (CGrenadeBeamChaser *)EntityList()->CreateEntityByName( "grenade_beam_chaser" );
 	pChaser->GetEngineObject()->SetLocalOrigin( pTarget->GetEngineObject()->GetLocalOrigin() );
 	pChaser->m_pTarget		= pTarget;
 	pChaser->Spawn();
@@ -150,7 +150,7 @@ void CGrenadeBeam::Spawn( void )
 //------------------------------------------------------------------------------
 CGrenadeBeam* CGrenadeBeam::Create( CBaseEntity* pOwner, const Vector &vStart)
 {
-	CGrenadeBeam *pEnergy = (CGrenadeBeam *)gEntList.CreateEntityByName( "grenade_beam" );
+	CGrenadeBeam *pEnergy = (CGrenadeBeam *)EntityList()->CreateEntityByName( "grenade_beam" );
 	pEnergy->Spawn();
 	pEnergy->SetOwnerEntity( pOwner );
 	pEnergy->SetRenderColor( 255, 0, 0, 0 );
@@ -202,14 +202,14 @@ void CGrenadeBeam::KillBeam(void)
 	SetThink(NULL);
 	SetTouch(NULL);
 	m_hBeamChaser->SetThink(NULL);
-	gEntList.DestroyEntity(m_hBeamChaser);
-	gEntList.DestroyEntity(this);
+	EntityList()->DestroyEntity(m_hBeamChaser);
+	EntityList()->DestroyEntity(this);
 
 	for (int i=0;i<GRENADEBEAM_MAXBEAMS;i++)
 	{
 		if (m_pBeam[i])
 		{
-			gEntList.DestroyEntity(m_pBeam[i]);
+			EntityList()->DestroyEntity(m_pBeam[i]);
 		}
 	}
 }

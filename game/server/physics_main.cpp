@@ -602,7 +602,7 @@ private:
 
 	CBaseEntity *GetPushableEntity( IHandleEntity *pHandleEntity )
 	{
-		CBaseEntity *pCheck = gEntList.GetBaseEntity( pHandleEntity->GetRefEHandle() );
+		CBaseEntity *pCheck = EntityList()->GetBaseEntityFromHandle( pHandleEntity->GetRefEHandle() );
 		if ( !pCheck )
 			return NULL;
 
@@ -1540,7 +1540,7 @@ void CBaseEntity::StepSimulationThink( float dt )
 		step->m_Next.nTickCount = GetEngineObject()->GetNextThinkTick();
 
 		// Hack:  Add a tick if we are simulating every other tick
-		if ( gEntList.IsSimulatingOnAlternateTicks() )
+		if (EntityList()->IsSimulatingOnAlternateTicks() )
 		{
 			++step->m_Next.nTickCount;
 		}
@@ -1940,7 +1940,7 @@ void Physics_RunThinkFunctions( bool simulating )
 	}
 	else
 	{
-		gEntList.DisableDestroyImmediate();
+		EntityList()->DisableDestroyImmediate();
 		int listMax = SimThink_ListCount();
 		listMax = MAX(listMax,1);
 		CBaseEntity **list = (CBaseEntity **)stackalloc( sizeof(CBaseEntity *) * listMax );
@@ -1961,7 +1961,7 @@ void Physics_RunThinkFunctions( bool simulating )
 		}
 
 		stackfree( list );
-		gEntList.EnableDestroyImmediate();
+		EntityList()->EnableDestroyImmediate();
 	}
 
 	gpGlobals->curtime = starttime;

@@ -2432,7 +2432,7 @@ void CommandNavCenterInWorld( void )
 	}
 
 	// Get the world's extent
-	CWorld *world = dynamic_cast< CWorld * >( gEntList.GetBaseEntity( 0 ) );
+	CWorld *world = dynamic_cast< CWorld * >(EntityList()->GetBaseEntity( 0 ) );
 	if ( !world )
 		return;
 

@@ -86,7 +86,7 @@ void CAI_DynamicLinkController::GenerateLinksFromVolume()
 						{
 							Assert( IsBoxIntersectingRay( vAbsMins, vAbsMaxs, originOther, nodeOrigin - originOther ) );
 
-							CAI_DynamicLink *pLink = (CAI_DynamicLink *)gEntList.CreateEntityByName( "info_node_link" );
+							CAI_DynamicLink *pLink = (CAI_DynamicLink *)EntityList()->CreateEntityByName( "info_node_link" );
 							pLink->m_nSrcID = i;
 							pLink->m_nDestID = iLinkDest;
 							pLink->m_nSrcEditID = g_pAINetworkManager->GetEditOps()->GetWCIdFromNodeId( pLink->m_nSrcID );
@@ -204,7 +204,7 @@ bool CAI_DynamicLink::gm_bInitialized;
 void CAI_DynamicLink::GenerateControllerLinks()
 {
 	CAI_DynamicLinkController *pController = NULL;
-	while ( ( pController = gEntList.NextEntByClass( pController ) ) != NULL )
+	while ( ( pController = NextEntByClass( pController ) ) != NULL )
 	{
 		pController->GenerateLinksFromVolume();
 	}
@@ -311,7 +311,7 @@ void CAI_DynamicLink::InitDynamicLinks(void)
 			// Go on to the next dynamic link
 			pDynamicLink = pDynamicLink->m_pNextDynamicLink;
 
-			gEntList.DestroyEntityImmediate( pBadDynamicLink );
+			EntityList()->DestroyEntityImmediate( pBadDynamicLink );
 		}
 
 	}
@@ -369,7 +369,7 @@ void CAI_DynamicLink::PurgeDynamicLinks(void)
 			}
 #endif
 			// Safe to remove it here as this happens only after I leave this function
-			gEntList.DestroyEntity(pDynamicLink);
+			EntityList()->DestroyEntity(pDynamicLink);
 		}
 
 		// Go on to the next dynamic link

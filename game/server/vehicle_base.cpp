@@ -110,7 +110,7 @@ void CPropVehicle::Spawn( )
 CON_COMMAND(vehicle_flushscript, "Flush and reload all vehicle scripts")
 {
 	gEntList.FlushVehicleScripts();
-	for ( CBaseEntity *pEnt = gEntList.FirstEnt(); pEnt != NULL; pEnt = gEntList.NextEnt(pEnt) )
+	for ( CBaseEntity *pEnt = EntityList()->FirstEnt(); pEnt != NULL; pEnt = EntityList()->NextEnt(pEnt) )
 	{
 		IServerVehicle *pServerVehicle = pEnt->GetServerVehicle();
 		if ( pServerVehicle )
@@ -845,7 +845,7 @@ void CPropVehicleDriveable::Think()
 			m_hKeepUpright->AcceptInput( "TurnOff", this, this, emptyVariant, USE_TOGGLE );
 			m_flTurnOffKeepUpright = 0;
 
-			gEntList.DestroyEntity( m_hKeepUpright );
+			EntityList()->DestroyEntity( m_hKeepUpright );
 		}
 	}
 }

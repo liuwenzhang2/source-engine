@@ -138,7 +138,7 @@ void CFilterMultiple::Activate( void )
 	{
 		if ( m_iFilterName[i] != NULL_STRING )
 		{
-			CBaseEntity *pEntity = gEntList.FindEntityByName( NULL, m_iFilterName[i] );
+			CBaseEntity *pEntity = EntityList()->FindEntityByName( NULL, m_iFilterName[i] );
 			CBaseFilter *pFilter = dynamic_cast<CBaseFilter *>(pEntity);
 			if ( pFilter == NULL )
 			{

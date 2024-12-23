@@ -672,7 +672,7 @@ void CAI_Senses::PerformSensing( void )
 void CAI_SensedObjectsManager::Init()
 {
 	CBaseEntity *pEnt = NULL;
-	while ( ( pEnt = gEntList.NextEnt( pEnt ) ) != NULL )
+	while ( ( pEnt = EntityList()->NextEnt( pEnt ) ) != NULL )
 	{
 		OnEntitySpawned( pEnt );
 	}

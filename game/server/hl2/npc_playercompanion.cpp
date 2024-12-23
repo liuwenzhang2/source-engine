@@ -1387,7 +1387,7 @@ void CNPC_PlayerCompanion::HandleAnimEvent( animevent_t *pEvent )
 	// Create a flare and parent to our hand
 	if ( pEvent->event == AE_COMPANION_PRODUCE_FLARE )
 	{
-		m_hFlare = static_cast<CPhysicsProp *>(gEntList.CreateEntityByName( "prop_physics" ));
+		m_hFlare = static_cast<CPhysicsProp *>(EntityList()->CreateEntityByName( "prop_physics" ));
 		if ( m_hFlare != NULL )
 		{
 			// Set the model
@@ -3947,7 +3947,7 @@ public:
 		Clear();
 		CacheClassnames();
 
-		CBaseEntity *pEnt = gEntList.FirstEnt();
+		CBaseEntity *pEnt = EntityList()->FirstEnt();
 		while( pEnt )
 		{
 			if( MatchesCriteria( pEnt ) )
@@ -3955,7 +3955,7 @@ public:
 				m_Cache.AddToTail( pEnt );
 			}
 
-			pEnt = gEntList.NextEnt( pEnt );
+			pEnt = EntityList()->NextEnt( pEnt );
 		}
 	}
 

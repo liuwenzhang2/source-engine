@@ -280,7 +280,7 @@ void CAI_PassengerBehavior::FinishExitVehicle( void )
 	// Destroy the blocker
 	if ( m_hBlocker != NULL )
 	{
-		gEntList.DestroyEntity( m_hBlocker );
+		EntityList()->DestroyEntity( m_hBlocker );
 		m_hBlocker = NULL;
 	}
 

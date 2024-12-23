@@ -821,6 +821,14 @@ public:
 
 };
 
+// Derive a class from this if you want to filter entity list searches
+abstract_class IEntityFindFilter
+{
+public:
+	virtual bool ShouldFindEntity(CBaseEntity * pEntity) = 0;
+	virtual CBaseEntity* GetFilterResult(void) = 0;
+};
+
 //-----------------------------------------------------------------------------
 // Purpose: Exposes IClientEntity's to engine
 //-----------------------------------------------------------------------------
@@ -856,9 +864,15 @@ public:
 	virtual void EnableDestroyImmediate() = 0;
 	virtual void DestroyEntityImmediate(IHandleEntity* pEntity) = 0;
 	//virtual edict_t* GetEdict(CBaseHandle hEnt) const = 0;
+	// Returns number of entities currently in use
+	virtual int NumberOfEntities() = 0;
 	virtual int NumberOfEdicts(void) = 0;
 	virtual int NumberOfReservedEdicts(void) = 0;
 	virtual int IndexOfHighestEdict(void) = 0;
+
+	// returns the next entity after pCurrentEnt;  if pCurrentEnt is NULL, return the first entity
+	virtual CBaseEntity* NextEnt(CBaseEntity* pCurrentEnt) = 0;
+	virtual CBaseEntity* FirstEnt() { return NextEnt(NULL); }
 
 	virtual IEngineObjectServer* GetEngineObject(int entnum) = 0;
 	virtual IEngineObjectServer* GetEngineObjectFromHandle(CBaseHandle handle) = 0;
@@ -871,18 +885,21 @@ public:
 	// It returns GetServerNetworkable( entnum )->GetIServerEntity().
 	virtual IServerEntity* GetServerEntity(int entnum) const = 0;
 	virtual IServerEntity* GetServerEntityFromHandle(CBaseHandle hEnt) const = 0;
-	virtual short		GetNetworkSerialNumber(int entnum) const = 0;
+	virtual short GetNetworkSerialNumber(int entnum) const = 0;
 	virtual CBaseEntity* GetBaseEntity(int entnum) const = 0;
+	virtual CBaseEntity* GetBaseEntityFromHandle(CBaseHandle hEnt) const = 0;
 
-	// Returns number of entities currently in use
-	virtual int					NumberOfEntities() = 0;
+	virtual CBaseEntity* FindEntityByClassname(CBaseEntity* pStartEntity, const char* szName) = 0;
+	virtual CBaseEntity* FindEntityByName(CBaseEntity* pStartEntity, const char* szName, CBaseEntity* pSearchingEntity = NULL, CBaseEntity* pActivator = NULL, CBaseEntity* pCaller = NULL, IEntityFindFilter* pFilter = NULL) = 0;
+	virtual CBaseEntity* FindEntityByName(CBaseEntity* pStartEntity, string_t iszName, CBaseEntity* pSearchingEntity = NULL, CBaseEntity* pActivator = NULL, CBaseEntity* pCaller = NULL, IEntityFindFilter* pFilter = NULL) = 0;
+
 
 	// Returns highest index actually used
 	//virtual int					GetHighestEntityIndex(void) = 0;
 
 	// Sizes entity list to specified size
 	//virtual void				SetMaxEntities(int maxents) = 0;
-	//virtual int					GetMaxEntities() = 0;
+	//virtual int				GetMaxEntities() = 0;
 
 	virtual const char* GetBlockName() = 0;
 

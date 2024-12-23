@@ -1760,7 +1760,7 @@ void CNPC_Barnacle::BitePrey( void )
 		m_flDigestFinish = gpGlobals->curtime + 10.0;
 		if (m_hRagdoll)
 		{
-			gEntList.DestroyEntity( m_hRagdoll );
+			EntityList()->DestroyEntity( m_hRagdoll );
 		}
 
 
@@ -1932,7 +1932,7 @@ void CNPC_Barnacle::RemoveRagdoll( bool bDestroyRagdoll )
 		DetachAttachedRagdoll( m_hRagdoll );
 		if ( bDestroyRagdoll )
 		{
-			gEntList.DestroyEntity( m_hRagdoll );
+			EntityList()->DestroyEntity( m_hRagdoll );
 		}
 		m_hRagdoll = NULL;
 
@@ -2270,8 +2270,8 @@ void CNPC_Barnacle::WaitTillDead ( void )
 	if ( IsActivityFinished() && bTongueInPosition )
 	{
 		// Remove our tongue pieces
-		gEntList.DestroyEntity( m_hTongueTip );
-		gEntList.DestroyEntity( m_hTongueRoot );
+		EntityList()->DestroyEntity( m_hTongueTip );
+		EntityList()->DestroyEntity( m_hTongueRoot );
 		m_hTongueTip = NULL;
 		m_hTongueRoot = NULL;
 
@@ -2445,7 +2445,7 @@ bool CTongueEntitiesEnum::AddToList( CBaseEntity *pEntity )
 
 IterationRetval_t CTongueEntitiesEnum::EnumElement( IHandleEntity *pHandleEntity )
 {
-	CBaseEntity *pEntity = gEntList.GetBaseEntity( pHandleEntity->GetRefEHandle() );
+	CBaseEntity *pEntity = EntityList()->GetBaseEntityFromHandle( pHandleEntity->GetRefEHandle() );
 	if ( pEntity )
 	{
 		if ( !AddToList( pEntity ) )

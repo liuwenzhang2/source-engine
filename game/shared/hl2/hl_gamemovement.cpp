@@ -76,7 +76,7 @@ public:
 CReservePlayerSpot *CReservePlayerSpot::ReserveSpot( 
 	CBasePlayer *owner, const Vector& org, const Vector& mins, const Vector& maxs, bool& validspot )
 {
-	CReservePlayerSpot *spot = ( CReservePlayerSpot * )gEntList.CreateEntityByName( "reserved_spot" );
+	CReservePlayerSpot *spot = ( CReservePlayerSpot * )EntityList()->CreateEntityByName( "reserved_spot" );
 	Assert( spot );
 
 	spot->GetEngineObject()->SetAbsOrigin( org );
@@ -175,7 +175,7 @@ void CHL2GameMovement::StartForcedMove( bool mounting, float transit_speed, cons
 		// FIXME:  Play a deny sound?
 		if ( lm->m_hReservedSpot )
 		{
-			gEntList.DestroyEntity( lm->m_hReservedSpot );
+			EntityList()->DestroyEntity( lm->m_hReservedSpot );
 			lm->m_hReservedSpot = NULL;
 		}
 		return;
@@ -241,7 +241,7 @@ bool CHL2GameMovement::ContinueForcedMove()
 		// Remove "reservation entity"
 		if ( lm->m_hReservedSpot )
 		{
-			gEntList.DestroyEntity( lm->m_hReservedSpot );
+			EntityList()->DestroyEntity( lm->m_hReservedSpot );
 			lm->m_hReservedSpot = NULL;
 		}
 #endif

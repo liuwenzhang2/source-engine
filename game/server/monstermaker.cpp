@@ -174,7 +174,7 @@ bool CBaseNPCMaker::CanMakeNPC( bool bIgnoreSolidEntities )
 
 	if ( m_iszIngoreEnt != NULL_STRING )
 	{
-		m_hIgnoreEntity = gEntList.FindEntityByName( NULL, m_iszIngoreEnt );
+		m_hIgnoreEntity = EntityList()->FindEntityByName( NULL, m_iszIngoreEnt );
 	}
 
 	Vector mins = GetEngineObject()->GetAbsOrigin() - Vector( 34, 34, 0 );
@@ -419,7 +419,7 @@ void CNPCMaker::MakeNPC( void )
 	if (!CanMakeNPC())
 		return;
 
-	CAI_BaseNPC	*pent = (CAI_BaseNPC*)gEntList.CreateEntityByName( STRING(m_iszNPCClassname) );
+	CAI_BaseNPC	*pent = (CAI_BaseNPC*)EntityList()->CreateEntityByName( STRING(m_iszNPCClassname) );
 
 	if ( !pent )
 	{
@@ -503,7 +503,7 @@ void CBaseNPCMaker::ChildPostSpawn( CAI_BaseNPC *pChild )
 			{
 				// Set to non-solid so this loop doesn't keep finding it
 				((CBaseEntity*)tr.m_pEnt)->GetEngineObject()->AddSolidFlags( FSOLID_NOT_SOLID );
-				gEntList.DestroyEntityImmediate((CBaseEntity*)tr.m_pEnt );
+				EntityList()->DestroyEntityImmediate((CBaseEntity*)tr.m_pEnt );
 				continue;
 			}
 		}
@@ -601,7 +601,7 @@ void CTemplateNPCMaker::Precache()
 		if (!m_iszTemplateName)
 		{
 			Warning( "npc_template_maker %s has no template NPC!\n", STRING(GetEntityName()) );
-			gEntList.DestroyEntity( this );
+			EntityList()->DestroyEntity( this );
 			return;
 		}
 		else
@@ -610,7 +610,7 @@ void CTemplateNPCMaker::Precache()
 			if ( m_iszTemplateData == NULL_STRING )
 			{
 				DevWarning( "npc_template_maker %s: template NPC %s not found!\n", STRING(GetEntityName()), STRING(m_iszTemplateName) );
-				gEntList.DestroyEntity( this );
+				EntityList()->DestroyEntity( this );
 				return;
 			}
 		}
@@ -627,7 +627,7 @@ void CTemplateNPCMaker::Precache()
 		if ( pEntity != NULL )
 		{
 			PrecacheTemplateEntity( pEntity );
-			gEntList.DestroyEntityImmediate( pEntity );
+			EntityList()->DestroyEntityImmediate( pEntity );
 		}
 	}
 }
@@ -646,7 +646,7 @@ CNPCSpawnDestination *CTemplateNPCMaker::FindSpawnDestination()
 	}
 
 	// Collect all the qualifiying destination ents
-	pEnt = gEntList.FindEntityByName( NULL, m_iszDestinationGroup );
+	pEnt = EntityList()->FindEntityByName( NULL, m_iszDestinationGroup );
 
 	if( !pEnt )
 	{
@@ -697,7 +697,7 @@ CNPCSpawnDestination *CTemplateNPCMaker::FindSpawnDestination()
 			}
 		}
 
-		pEnt = gEntList.FindEntityByName( pEnt, m_iszDestinationGroup );
+		pEnt = EntityList()->FindEntityByName( pEnt, m_iszDestinationGroup );
 	}
 
 	if( count < 1 )
@@ -993,7 +993,7 @@ void CTemplateNPCMaker::MakeNPCInRadius( void )
 	if ( !PlaceNPCInRadius( pent ) )
 	{
 		// Failed to place the NPC. Abort
-		gEntList.DestroyEntityImmediate( pent );
+		EntityList()->DestroyEntityImmediate( pent );
 		return;
 	}
 

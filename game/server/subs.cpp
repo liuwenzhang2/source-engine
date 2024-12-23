@@ -34,7 +34,7 @@ public:
 // Null Entity, remove on startup
 void CNullEntity::Spawn( void )
 {
-	gEntList.DestroyEntity( this );
+	EntityList()->DestroyEntity( this );
 }
 LINK_ENTITY_TO_CLASS(info_null,CNullEntity);
 
@@ -82,7 +82,7 @@ void CBaseEntity::SUB_Remove( void )
 		DevWarning( 2, "SUB_Remove called on entity with health > 0\n");
 	}
 
-	gEntList.DestroyEntity( this );
+	EntityList()->DestroyEntity( this );
 }
 
 
@@ -111,7 +111,7 @@ void FireTargets( const char *targetName, CBaseEntity *pActivator, CBaseEntity *
 	for (;;)
 	{
 		CBaseEntity *pSearchingEntity = pActivator;
-		pTarget = gEntList.FindEntityByName( pTarget, targetName, pSearchingEntity, pActivator, pCaller );
+		pTarget = EntityList()->FindEntityByName( pTarget, targetName, pSearchingEntity, pActivator, pCaller );
 		if ( !pTarget )
 			break;
 

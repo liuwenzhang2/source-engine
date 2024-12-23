@@ -1117,7 +1117,7 @@ void CNPC_Antlion::HandleAnimEvent( animevent_t *pEvent )
 
 				for ( int i = 0; i < 6; i++ )
 				{
-					CGrenadeSpit *pGrenade = (CGrenadeSpit*)gEntList.CreateEntityByName( "grenade_spit" );
+					CGrenadeSpit *pGrenade = (CGrenadeSpit*)EntityList()->CreateEntityByName( "grenade_spit" );
 					pGrenade->GetEngineObject()->SetAbsOrigin( vSpitPos );
 					pGrenade->GetEngineObject()->SetAbsAngles( vec3_angle );
 					DispatchSpawn( pGrenade );
@@ -1771,7 +1771,7 @@ void CNPC_Antlion::StartTask( const Task_t *pTask )
 				SetOwnerEntity( NULL );
 			}
 
-			// NOTE: We can't gEntList.DestroyEntity here, because we're in the middle of running our AI, and
+			// NOTE: We can't EntityList()->DestroyEntity here, because we're in the middle of running our AI, and
 			//		 we'll crash later in the bowels of the AI. Remove ourselves next frame.
 			SetThink( &CNPC_Antlion::SUB_Remove );
 			GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.1 );
@@ -3285,7 +3285,7 @@ public:
 
 		if ( GetPassEntity() )
 		{
-			CBaseEntity *pEnt = gEntList.GetBaseEntity( GetPassEntity()->GetRefEHandle() );
+			CBaseEntity *pEnt = EntityList()->GetBaseEntityFromHandle( GetPassEntity()->GetRefEHandle() );
 
 			if ( pEnt->IsNPC() )
 			{
@@ -4031,7 +4031,7 @@ void CNPC_Antlion::InputFightToPosition( inputdata_t &inputdata )
 	if ( IsAlive() == false )
 		return;
 
-	CBaseEntity *pEntity = gEntList.FindEntityByName( NULL, inputdata.value.String(), NULL, inputdata.pActivator, inputdata.pCaller );
+	CBaseEntity *pEntity = EntityList()->FindEntityByName( NULL, inputdata.value.String(), NULL, inputdata.pActivator, inputdata.pCaller );
 
 	if ( pEntity != NULL )
 	{
@@ -4498,7 +4498,7 @@ void CNPC_Antlion::Flip( bool bZapped /*= false*/ )
 //-----------------------------------------------------------------------------
 void CNPC_Antlion::InputJumpAtTarget( inputdata_t &inputdata )
 {
-	CBaseEntity *pJumpTarget = gEntList.FindEntityByName( NULL, inputdata.value.String(), this, inputdata.pActivator, inputdata.pCaller );
+	CBaseEntity *pJumpTarget = EntityList()->FindEntityByName( NULL, inputdata.value.String(), this, inputdata.pActivator, inputdata.pCaller );
 	if ( pJumpTarget == NULL )
 	{
 		Msg("Unable to find jump target named (%s)\n", inputdata.value.String() );

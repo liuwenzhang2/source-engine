@@ -45,7 +45,7 @@ public:
 	static CPortal_Player *CreatePlayer( const char *className, int ed )
 	{
 		//CPortal_Player::s_PlayerEdict = ed;
-		return (CPortal_Player*)gEntList.CreateEntityByName( className, ed );
+		return (CPortal_Player*)EntityList()->CreateEntityByName( className, ed );
 	}
 
 	DECLARE_SERVERCLASS();

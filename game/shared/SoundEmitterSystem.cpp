@@ -427,7 +427,7 @@ public:
 		gender_t gender = GENDER_NONE;
 		CBaseEntity* ent = NULL;
 #ifdef GAME_DLL
-		ent = gEntList.GetBaseEntity(entindex);
+		ent = EntityList()->GetBaseEntity(entindex);
 #endif // GAME_DLL
 #ifdef CLIENT_DLL
 		ent = CBaseEntity::Instance(entindex);
@@ -724,7 +724,7 @@ public:
 //				byteflags |= CLOSE_CAPTION_FROMPLAYER;
 //			}
 //
-//			CBaseEntity *pActor = gEntList.GetBaseEntity( entindex );
+//			CBaseEntity *pActor = EntityList()->GetBaseEntity( entindex );
 //			if ( pActor )
 //			{
 //				char const *pszActorModel = STRING( pActor->GetModelName() );
@@ -797,7 +797,7 @@ public:
 //		bool fromplayer = false;
 //		CBaseEntity* ent = NULL;
 //#ifdef GAME_DLL
-//		ent = gEntList.GetBaseEntity(entindex);
+//		ent = EntityList()->GetBaseEntity(entindex);
 //#endif // GAME_DLL
 //#ifdef CLIENT_DLL
 //		ent = CBaseEntity::Instance(entindex);
@@ -1284,7 +1284,7 @@ public:
 //		bool fromplayer = false;
 //		CBaseEntity* ent = NULL;
 //#ifdef GAME_DLL
-//		ent = gEntList.GetBaseEntity(entindex);
+//		ent = EntityList()->GetBaseEntity(entindex);
 //#endif // GAME_DLL
 //#ifdef CLIENT_DLL
 //		ent = CBaseEntity::Instance(entindex);

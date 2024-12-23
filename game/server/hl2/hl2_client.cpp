@@ -44,7 +44,7 @@ called each time a player is spawned into the game
 void ClientPutInServer( int pEdict, const char *playername )
 {
 	// Allocate a CBasePlayer for pev, and call spawn
-	CHL2_Player* pPlayer = (CHL2_Player*)gEntList.GetBaseEntity(pEdict);
+	CHL2_Player* pPlayer = (CHL2_Player*)EntityList()->GetBaseEntity(pEdict);
 	if (pPlayer == NULL) {
 		pPlayer = CHL2_Player::CreatePlayer("player", pEdict);
 	}

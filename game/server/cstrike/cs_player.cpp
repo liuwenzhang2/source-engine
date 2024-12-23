@@ -468,7 +468,7 @@ void cc_CreatePredictionError_f( const CCommand &args )
 		distance = atof(args[1]);
 	}
 
-	CBaseEntity *pEnt = gEntList.GetBaseEntity( 1 );
+	CBaseEntity *pEnt = EntityList()->GetBaseEntity( 1 );
 	pEnt->GetEngineObject()->SetAbsOrigin( pEnt->GetEngineObject()->GetAbsOrigin() + Vector( distance, 0, 0 ) );
 }
 
@@ -602,7 +602,7 @@ CCSPlayer::~CCSPlayer()
 CCSPlayer *CCSPlayer::CreatePlayer( const char *className, int ed )
 {
 	//CCSPlayer::s_PlayerEdict = ed;
-	return (CCSPlayer*)gEntList.CreateEntityByName( className, ed );
+	return (CCSPlayer*)EntityList()->CreateEntityByName( className, ed );
 }
 
 
@@ -946,7 +946,7 @@ void CCSPlayer::Spawn()
 
 	if ( m_hRagdoll )
 	{
-		gEntList.DestroyEntity( m_hRagdoll );
+		EntityList()->DestroyEntity( m_hRagdoll );
 	}
 
 	m_hRagdoll = NULL;
@@ -1051,7 +1051,7 @@ CRagdollProp* CCSPlayer::CreateRagdollProp()
 	if (!pRagdoll)
 	{
 		// create a new one
-		pRagdoll = dynamic_cast<CCSRagdoll*>(gEntList.CreateEntityByName("cs_ragdoll"));
+		pRagdoll = dynamic_cast<CCSRagdoll*>(EntityList()->CreateEntityByName("cs_ragdoll"));
 	}
 
 	if (pRagdoll)
@@ -2539,7 +2539,7 @@ bool CCSPlayer::DoesPlayerGetRoundStartMoney()
 
 CCSPlayer* CCSPlayer::Instance( int iEnt )
 {
-	return dynamic_cast< CCSPlayer* >( gEntList.GetBaseEntity( iEnt ) );
+	return dynamic_cast< CCSPlayer* >(EntityList()->GetBaseEntity( iEnt ) );
 }
 
 
@@ -2854,23 +2854,23 @@ void CCSPlayer::PreThink()
 
 void CCSPlayer::MoveToNextIntroCamera()
 {
-	m_pIntroCamera = gEntList.FindEntityByClassname( m_pIntroCamera, "point_viewcontrol" );
+	m_pIntroCamera = EntityList()->FindEntityByClassname( m_pIntroCamera, "point_viewcontrol" );
 
 	// if m_pIntroCamera is NULL we just were at end of list, start searching from start again
 	if(!m_pIntroCamera)
-		m_pIntroCamera = gEntList.FindEntityByClassname(m_pIntroCamera, "point_viewcontrol");
+		m_pIntroCamera = EntityList()->FindEntityByClassname(m_pIntroCamera, "point_viewcontrol");
 
 	// find the target
 	CBaseEntity *Target = NULL;
 
 	if( m_pIntroCamera )
 	{
-		Target = gEntList.FindEntityByName( NULL, STRING(m_pIntroCamera->m_target) );
+		Target = EntityList()->FindEntityByName( NULL, STRING(m_pIntroCamera->m_target) );
 	}
 
 	// if we still couldn't find a camera, goto T spawn
 	if(!m_pIntroCamera)
-		m_pIntroCamera = gEntList.FindEntityByClassname(m_pIntroCamera, "info_player_terrorist");
+		m_pIntroCamera = EntityList()->FindEntityByClassname(m_pIntroCamera, "info_player_terrorist");
 
 	SetViewOffset( vec3_origin );	// no view offset
 	UTIL_SetSize( this, vec3_origin, vec3_origin ); // no bbox
@@ -5150,10 +5150,10 @@ int CCSPlayer::PlayerClass() const
 bool CCSPlayer::SelectSpawnSpot( const char *pEntClassName, CBaseEntity* &pSpot )
 {
 	// Find the next spawn spot.
-	pSpot = gEntList.FindEntityByClassname( pSpot, pEntClassName );
+	pSpot = EntityList()->FindEntityByClassname( pSpot, pEntClassName );
 
 	if ( pSpot == NULL ) // skip over the null point
-		pSpot = gEntList.FindEntityByClassname( pSpot, pEntClassName );
+		pSpot = EntityList()->FindEntityByClassname( pSpot, pEntClassName );
 
 	CBaseEntity *pFirstSpot = pSpot;
 	do
@@ -5165,7 +5165,7 @@ bool CCSPlayer::SelectSpawnSpot( const char *pEntClassName, CBaseEntity* &pSpot 
 			{
 				if ( pSpot->GetEngineObject()->GetAbsOrigin() == Vector( 0, 0, 0 ) )
 				{
-					pSpot = gEntList.FindEntityByClassname( pSpot, pEntClassName );
+					pSpot = EntityList()->FindEntityByClassname( pSpot, pEntClassName );
 					continue;
 				}
 
@@ -5174,7 +5174,7 @@ bool CCSPlayer::SelectSpawnSpot( const char *pEntClassName, CBaseEntity* &pSpot 
 			}
 		}
 		// increment pSpot
-		pSpot = gEntList.FindEntityByClassname( pSpot, pEntClassName );
+		pSpot = EntityList()->FindEntityByClassname( pSpot, pEntClassName );
 	} while ( pSpot != pFirstSpot ); // loop if we're not back to the start
 
 	DevMsg("CCSPlayer::SelectSpawnSpot: couldn't find valid spawn point.\n");
@@ -5245,7 +5245,7 @@ CBaseEntity* CCSPlayer::EntSelectSpawnPoint()
 	// If startspot is set, (re)spawn there.
 	if ( !gpGlobals->startspot || !strlen(STRING(gpGlobals->startspot)))
 	{
-		pSpot = gEntList.FindEntityByClassname(NULL, "info_player_terrorist");
+		pSpot = EntityList()->FindEntityByClassname(NULL, "info_player_terrorist");
 		if ( pSpot )
 			goto ReturnSpot;
 	}
@@ -5264,7 +5264,7 @@ ReturnSpot:
 		else
 			Warning( "PutClientInServer: no info_player_start on level\n" );
 
-		return gEntList.GetBaseEntity(0);
+		return EntityList()->GetBaseEntity(0);
 	}
 
 	return pSpot;
@@ -5694,7 +5694,7 @@ void CCSPlayer::Weapon_Equip( CBaseCombatWeapon *pWeapon )
 			if( Weapon_OwnsThisType( pCSWeapon->GetClassname() ) )
 			{
 				Weapon_EquipAmmoOnly( pWeapon );
-				gEntList.DestroyEntity( pCSWeapon );
+				EntityList()->DestroyEntity( pCSWeapon );
 				return;
 			}
 		}
@@ -5742,7 +5742,7 @@ bool CCSPlayer::BumpWeapon( CBaseCombatWeapon *pBaseWeapon )
 		extern int gEvilImpulse101;
 		if ( gEvilImpulse101 )
 		{
-			gEntList.DestroyEntity( pWeapon );
+			EntityList()->DestroyEntity( pWeapon );
 		}
 		return false;
 	}
@@ -5764,7 +5764,7 @@ bool CCSPlayer::BumpWeapon( CBaseCombatWeapon *pBaseWeapon )
 		if ( pWeapon->UsesClipsForAmmo1() && pWeapon->HasPrimaryAmmo() )
 			return false;
 
-		gEntList.DestroyEntity( pWeapon );
+		EntityList()->DestroyEntity( pWeapon );
 		return false;
 	}
 	*/
@@ -6694,7 +6694,7 @@ CBaseEntity *CCSPlayer::FindUseEntity()
 		// but we might want to use it anyway if it's close enough.  This should eliminate
 		// the vast majority of bomb placement exploits (places where the bomb can be planted
 		// but can't be "used".  This also mimics goldsrc cstrike behavior.
-		CBaseEntity *bomb = gEntList.FindEntityByClassname( NULL, PLANTED_C4_CLASSNAME );
+		CBaseEntity *bomb = EntityList()->FindEntityByClassname( NULL, PLANTED_C4_CLASSNAME );
 		if (bomb != NULL)
 		{
 			Vector bombPos = bomb->GetEngineObject()->GetAbsOrigin();
@@ -6784,7 +6784,7 @@ CBaseEntity	*CCSPlayer::GiveNamedItem( const char *pszName, int iSubType )
 		return NULL;
 #endif
 
-	pent = gEntList.CreateEntityByName(pszName);
+	pent = (CBaseEntity*)EntityList()->CreateEntityByName(pszName);
 	if ( pent == NULL )
 	{
 		Msg( "NULL Ent in GiveNamedItem!\n" );
@@ -7352,7 +7352,7 @@ void CCSPlayer::CreateViewModel( int index /*=0*/ )
 	if ( GetViewModel( index ) )
 		return;
 
-	CPredictedViewModel *vm = ( CPredictedViewModel * )gEntList.CreateEntityByName( "predicted_viewmodel" );
+	CPredictedViewModel *vm = ( CPredictedViewModel * )EntityList()->CreateEntityByName( "predicted_viewmodel" );
 	if ( vm )
 	{
 		vm->GetEngineObject()->SetAbsOrigin(GetEngineObject()->GetAbsOrigin() );

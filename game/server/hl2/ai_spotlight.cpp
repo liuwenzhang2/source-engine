@@ -151,7 +151,7 @@ void CAI_Spotlight::CreateSpotlightEntities( void )
 	Vector vecEndPoint;
 	ComputeEndpoint( vecStartPoint, &vecEndPoint );
 
-	m_hSpotlightTarget = (CSpotlightEnd*)gEntList.CreateEntityByName( "spotlight_end" );
+	m_hSpotlightTarget = (CSpotlightEnd*)EntityList()->CreateEntityByName( "spotlight_end" );
 	m_hSpotlightTarget->Spawn();
 	m_hSpotlightTarget->GetEngineObject()->SetAbsOrigin( vecEndPoint );
 	m_hSpotlightTarget->SetOwnerEntity( GetOuter() );
@@ -189,10 +189,10 @@ void CAI_Spotlight::SpotlightDestroy(void)
 {
 	if ( m_hSpotlight )
 	{
-		gEntList.DestroyEntity(m_hSpotlight);
+		EntityList()->DestroyEntity(m_hSpotlight);
 		m_hSpotlight = NULL;
 		
-		gEntList.DestroyEntity(m_hSpotlightTarget);
+		EntityList()->DestroyEntity(m_hSpotlightTarget);
 		m_hSpotlightTarget = NULL;
 	}
 }

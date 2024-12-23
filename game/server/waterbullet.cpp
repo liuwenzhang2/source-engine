@@ -103,5 +103,5 @@ void CWaterBullet::Touch( CBaseEntity *pOther )
 	UTIL_TraceLine( vecStart, vecEnd, MASK_SHOT, NULL, &tr );
 	UTIL_ImpactTrace( &tr, DMG_BULLET );
 
-	gEntList.DestroyEntity( this );
+	EntityList()->DestroyEntity( this );
 }

@@ -433,11 +433,11 @@ void CSlideshowDisplay::RestoreControlPanels( void )
 		if ( !pScreenClassname )
 			continue;
 
-		CVGuiScreen *pScreen = (CVGuiScreen *)gEntList.FindEntityByClassname( NULL, pScreenClassname );
+		CVGuiScreen *pScreen = (CVGuiScreen *)EntityList()->FindEntityByClassname( NULL, pScreenClassname );
 
 		while ( ( pScreen && pScreen->GetOwnerEntity() != this ) || Q_strcmp( pScreen->GetPanelName(), pScreenName ) != 0 )
 		{
-			pScreen = (CVGuiScreen *)gEntList.FindEntityByClassname( pScreen, pScreenClassname );
+			pScreen = (CVGuiScreen *)EntityList()->FindEntityByClassname( pScreen, pScreenClassname );
 		}
 
 		if ( pScreen )

@@ -420,7 +420,7 @@ void CMissile::Explode( void )
 	}
 
 	g_pSoundEmitterSystem->StopSound(this, "Missile.Ignite" );
-	gEntList.DestroyEntity( this );
+	EntityList()->DestroyEntity( this );
 }
 
 //-----------------------------------------------------------------------------
@@ -757,7 +757,7 @@ void CInfoAPCMissileHint::Activate( )
 {
 	BaseClass::Activate();
 
-	m_hTarget = gEntList.FindEntityByName( NULL, m_target );
+	m_hTarget = EntityList()->FindEntityByName( NULL, m_target );
 	if ( m_hTarget == NULL )
 	{
 		DevWarning( "%s: Could not find target '%s'!\n", GetClassname(), STRING( m_target ) );
@@ -1373,7 +1373,7 @@ CWeaponRPG::~CWeaponRPG()
 #ifndef CLIENT_DLL
 	if ( m_hLaserDot != NULL )
 	{
-		gEntList.DestroyEntity( m_hLaserDot );
+		EntityList()->DestroyEntity( m_hLaserDot );
 		m_hLaserDot = NULL;
 	}
 #endif
@@ -1718,7 +1718,7 @@ void CWeaponRPG::StopGuiding( void )
 	if ( m_hLaserDot != NULL )
 	{
 		m_hLaserDot->TurnOff();
-		gEntList.DestroyEntity( m_hLaserDot );
+		EntityList()->DestroyEntity( m_hLaserDot );
 		m_hLaserDot = NULL;
 	}
 #else

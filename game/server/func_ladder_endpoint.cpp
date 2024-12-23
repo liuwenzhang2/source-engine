@@ -50,7 +50,7 @@ bool CFuncLadderEndPoint::Validate()
 
 	Vector endPos = other->GetEngineObject()->GetAbsOrigin();
 
-	CFuncLadder *ladder = ( CFuncLadder * )gEntList.CreateEntityByName( "func_useableladder" );
+	CFuncLadder *ladder = ( CFuncLadder * )EntityList()->CreateEntityByName( "func_useableladder" );
 	if ( ladder )
 	{
 		ladder->SetEndPoints( startPos, endPos );
@@ -61,8 +61,8 @@ bool CFuncLadderEndPoint::Validate()
 	}
 
 	// Delete both endpoints
-	gEntList.DestroyEntity( other );
-	gEntList.DestroyEntity( this );
+	EntityList()->DestroyEntity( other );
+	EntityList()->DestroyEntity( this );
 
 	return true;
 }

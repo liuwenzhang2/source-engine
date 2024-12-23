@@ -10937,7 +10937,7 @@ void C_EnginePortalInternal::CreateLocalCollision(void)
 			m_InternalData.Simulation.Static.SurfaceProperties.surface.flags = 0;
 			m_InternalData.Simulation.Static.SurfaceProperties.surface.surfaceProps = 0;
 #ifndef CLIENT_DLL
-			m_InternalData.Simulation.Static.SurfaceProperties.pEntity = gEntList.GetBaseEntity(0);
+			m_InternalData.Simulation.Static.SurfaceProperties.pEntity = EntityList()->GetBaseEntity(0);
 #else
 			m_InternalData.Simulation.Static.SurfaceProperties.pEntity = g_EntityList.GetBaseEntity(0);
 #endif

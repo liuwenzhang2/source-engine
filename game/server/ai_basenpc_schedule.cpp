@@ -1707,7 +1707,7 @@ void CAI_BaseNPC::StartTask( const Task_t *pTask )
 
 	case TASK_TARGET_PLAYER:
 		{
-			CBaseEntity *pPlayer = gEntList.FindEntityByName( NULL, "!player" );
+			CBaseEntity *pPlayer = EntityList()->FindEntityByName( NULL, "!player" );
 			if ( pPlayer )
 			{
 				SetTarget( pPlayer );
@@ -2205,7 +2205,7 @@ void CAI_BaseNPC::StartTask( const Task_t *pTask )
 
 	case TASK_GET_PATH_TO_PLAYER:
 		{
-			CBaseEntity *pPlayer = gEntList.FindEntityByName( NULL, "!player" );
+			CBaseEntity *pPlayer = EntityList()->FindEntityByName( NULL, "!player" );
 
 			AI_NavGoal_t goal;
 

@@ -74,7 +74,7 @@ LINK_ENTITY_TO_CLASS( grenade_homer, CGrenadeHomer );
 //------------------------------------------------------------------------------
 CGrenadeHomer* CGrenadeHomer::CreateGrenadeHomer( string_t sModelName, string_t sFlySound, const Vector &vecOrigin, const QAngle &vecAngles, CBaseEntity *pentOwner )
 {
-	CGrenadeHomer *pGrenade = (CGrenadeHomer*)gEntList.CreateEntityByName( "grenade_homer" );
+	CGrenadeHomer *pGrenade = (CGrenadeHomer*)EntityList()->CreateEntityByName( "grenade_homer" );
 	if ( !pGrenade )
 	{
 		Warning( "NULL Ent in Create!\n" );
@@ -281,7 +281,7 @@ void CGrenadeHomer::StopRocketTrail()
 		if(m_hRocketTrail[i])
 		{
 			m_hRocketTrail[i]->SetEmit(false);
-			gEntList.DestroyEntity( m_hRocketTrail[i] );
+			EntityList()->DestroyEntity( m_hRocketTrail[i] );
 			m_hRocketTrail[i] = NULL;
 		}
 	}	
@@ -366,7 +366,7 @@ void CGrenadeHomer::GrenadeHomerTouch( CBaseEntity *pOther )
 	if (tr.surface.flags & SURF_SKY)
 	{
 		StopRocketTrail();
-		gEntList.DestroyEntity( this );
+		EntityList()->DestroyEntity( this );
 	}
 	else
 	{
@@ -459,7 +459,7 @@ void CGrenadeHomer::Detonate(void)
 	RadiusDamage ( CTakeDamageInfo( this, GetOwnerEntity(), m_flDamage, DMG_BLAST ), GetEngineObject()->GetAbsOrigin(), m_DmgRadius, CLASS_NONE, NULL );
 	CPASAttenuationFilter filter2( this, "GrenadeHomer.StopSounds" );
 	g_pSoundEmitterSystem->EmitSound( filter2, entindex(), "GrenadeHomer.StopSounds" );
-	gEntList.DestroyEntity( this );
+	EntityList()->DestroyEntity( this );
 }
 
 //-----------------------------------------------------------------------------

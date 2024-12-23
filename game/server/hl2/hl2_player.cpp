@@ -839,7 +839,7 @@ void CHL2_Player::PreThink(void)
 		do
 		{
 			// FIXME: Not a good or fast solution, but maybe it will catch the bug!
-			pBarnacle = (CNPC_Barnacle*)gEntList.FindEntityByClassname( pBarnacle, "npc_barnacle" );
+			pBarnacle = (CNPC_Barnacle*)EntityList()->FindEntityByClassname( pBarnacle, "npc_barnacle" );
 			if ( pBarnacle )
 			{
 				if ( pBarnacle->GetEnemy() == this )
@@ -1729,7 +1729,7 @@ void CHL2_Player::CheatImpulseCommands( int iImpulse )
 		// Cheat to create a dynamic resupply item
 		Vector vecForward;
 		AngleVectors( EyeAngles(), &vecForward );
-		CBaseEntity *pItem = (CBaseEntity *)gEntList.CreateEntityByName( "item_dynamic_resupply" );
+		CBaseEntity *pItem = (CBaseEntity *)EntityList()->CreateEntityByName( "item_dynamic_resupply" );
 		if ( pItem )
 		{
 			Vector vecOrigin = GetEngineObject()->GetAbsOrigin() + vecForward * 256 + Vector(0,0,64);
@@ -2527,24 +2527,24 @@ void CHL2_Player::Event_Killed( const CTakeDamageInfo &info )
 //-----------------------------------------------------------------------------
 void CHL2_Player::NotifyScriptsOfDeath( void )
 {
-	CBaseEntity *pEnt =	gEntList.FindEntityByClassname( NULL, "scripted_sequence" );
+	CBaseEntity *pEnt =	EntityList()->FindEntityByClassname( NULL, "scripted_sequence" );
 
 	while( pEnt )
 	{
 		variant_t emptyVariant;
 		pEnt->AcceptInput( "ScriptPlayerDeath", NULL, NULL, emptyVariant, 0 );
 
-		pEnt = gEntList.FindEntityByClassname( pEnt, "scripted_sequence" );
+		pEnt = EntityList()->FindEntityByClassname( pEnt, "scripted_sequence" );
 	}
 
-	pEnt =	gEntList.FindEntityByClassname( NULL, "logic_choreographed_scene" );
+	pEnt =	EntityList()->FindEntityByClassname( NULL, "logic_choreographed_scene" );
 
 	while( pEnt )
 	{
 		variant_t emptyVariant;
 		pEnt->AcceptInput( "ScriptPlayerDeath", NULL, NULL, emptyVariant, 0 );
 
-		pEnt = gEntList.FindEntityByClassname( pEnt, "logic_choreographed_scene" );
+		pEnt = EntityList()->FindEntityByClassname( pEnt, "logic_choreographed_scene" );
 	}
 }
 
@@ -2689,7 +2689,7 @@ bool CHL2_Player::Weapon_CanUse( CBaseCombatWeapon *pWeapon )
 	if ( pWeapon->ClassMatches( "weapon_stunstick" ) )
 	{
 		if ( ApplyBattery( 0.5 ) )
-			gEntList.DestroyEntity( pWeapon );
+			EntityList()->DestroyEntity( pWeapon );
 		return false;
 	}
 #endif
@@ -2737,7 +2737,7 @@ bool CHL2_Player::BumpWeapon( CBaseCombatWeapon *pWeapon )
 	{
 		if ( gEvilImpulse101 )
 		{
-			gEntList.DestroyEntity( pWeapon );
+			EntityList()->DestroyEntity( pWeapon );
 		}
 		return false;
 	}
@@ -2756,7 +2756,7 @@ bool CHL2_Player::BumpWeapon( CBaseCombatWeapon *pWeapon )
 		if ( pWeapon->UsesClipsForAmmo1() && pWeapon->HasPrimaryAmmo() )
 			return false;
 
-		gEntList.DestroyEntity( pWeapon );
+		EntityList()->DestroyEntity( pWeapon );
 		return false;
 	}
 	// -------------------------
@@ -3825,7 +3825,7 @@ CLogicPlayerProxy *CHL2_Player::GetPlayerProxy( void )
 
 	if ( pProxy == NULL )
 	{
-		pProxy = (CLogicPlayerProxy*)gEntList.FindEntityByClassname(NULL, "logic_playerproxy" );
+		pProxy = (CLogicPlayerProxy*)EntityList()->FindEntityByClassname(NULL, "logic_playerproxy" );
 
 		if ( pProxy == NULL )
 			return NULL;
@@ -3992,7 +3992,7 @@ void CLogicPlayerProxy::InputSetLocatorTargetEntity( inputdata_t &inputdata )
 
 	if( iszTarget != NULL_STRING )
 	{
-		pTarget = gEntList.FindEntityByName( NULL, iszTarget );
+		pTarget = EntityList()->FindEntityByName( NULL, iszTarget );
 	}
 
 	CHL2_Player *pPlayer = dynamic_cast<CHL2_Player*>(m_hPlayer.Get());

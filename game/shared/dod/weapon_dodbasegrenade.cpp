@@ -142,7 +142,7 @@ bool CWeaponDODBaseGrenade::CanHolster( void )
 		if( pPlayer && pPlayer->GetAmmoCount(m_iPrimaryAmmoType) <= 0 )
 		{
 			pPlayer->Weapon_Drop( this, NULL, NULL );
-			gEntList.DestroyEntity(this);
+			EntityList()->DestroyEntity(this);
 		}
 #endif
 
@@ -272,7 +272,7 @@ enum
 				if (pPlayer->GetAmmoCount(m_iPrimaryAmmoType) <= 0)
 				{
 					pPlayer->Weapon_Drop( this, NULL, NULL );
-					gEntList.DestroyEntity(this);
+					EntityList()->DestroyEntity(this);
 				}
 				else
                     Reload();
@@ -292,7 +292,7 @@ enum
 		if (pOwner->GetAmmoCount(m_iPrimaryAmmoType) <= 0)
 		{
             pOwner->Weapon_Drop( this, NULL, NULL );
-			gEntList.DestroyEntity(this);
+			EntityList()->DestroyEntity(this);
 		}
 	}
 

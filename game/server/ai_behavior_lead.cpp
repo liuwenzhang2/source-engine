@@ -203,7 +203,7 @@ void CAI_LeadBehavior::BeginScheduleSelection()
 bool CAI_LeadBehavior::SetGoal( const AI_LeadArgs_t &args )
 {
 	CBaseEntity *pGoalEnt;
-	pGoalEnt = gEntList.FindEntityByName( NULL, args.pszGoal );
+	pGoalEnt = EntityList()->FindEntityByName( NULL, args.pszGoal );
 	
 	if ( !pGoalEnt )
 		return false;
@@ -228,7 +228,7 @@ bool CAI_LeadBehavior::SetGoal( const AI_LeadArgs_t &args )
 
 	if ( args.pszWaitPoint && args.pszWaitPoint[0] )
 	{
-		CBaseEntity *pWaitPoint = gEntList.FindEntityByName( NULL, args.pszWaitPoint );
+		CBaseEntity *pWaitPoint = EntityList()->FindEntityByName( NULL, args.pszWaitPoint );
 		if ( pWaitPoint )
 		{
 			m_waitpoint = pWaitPoint->GetEngineObject()->GetLocalOrigin();

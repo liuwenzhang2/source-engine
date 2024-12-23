@@ -475,12 +475,12 @@ void CWeaponEgon::DestroyEffect( void )
 #ifndef CLIENT_DLL    
 	if ( m_hBeam )
 	{
-		gEntList.DestroyEntity( m_hBeam );
+		EntityList()->DestroyEntity( m_hBeam );
 		m_hBeam = NULL;
 	}
 	if ( m_hNoise )
 	{
-		gEntList.DestroyEntity( m_hNoise );
+		EntityList()->DestroyEntity( m_hNoise );
 		m_hNoise = NULL;
 	}
 	if ( m_hSprite )

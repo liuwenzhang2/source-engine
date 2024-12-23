@@ -487,7 +487,7 @@ bool CAI_Expresser::SpeakDispatchResponse( AIConcept_t concept, AI_Response *res
 
 		if ( result->IsApplyContextToWorld() )
 		{
-			CBaseEntity *pEntity = gEntList.GetBaseEntity( 0 ) ;
+			CBaseEntity *pEntity = EntityList()->GetBaseEntity( 0 ) ;
 			if ( pEntity )
 			{
 				pEntity->AddContext( result->GetContext() );
@@ -996,10 +996,10 @@ CON_COMMAND( npc_speakall, "Force the npc to try and speak all their responses" 
 
 	if ( args[1] && *args[1] )
 	{
-		pEntity = gEntList.FindEntityByName( NULL, args[1], NULL );
+		pEntity = EntityList()->FindEntityByName( NULL, args[1], NULL );
 		if ( !pEntity )
 		{
-			pEntity = gEntList.FindEntityByClassname( NULL, args[1] );
+			pEntity = EntityList()->FindEntityByClassname( NULL, args[1] );
 		}
 	}
 	else

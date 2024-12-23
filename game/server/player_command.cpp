@@ -46,8 +46,8 @@ void CPlayerMove::StartCommand( CBasePlayer *player, CUserCmd *cmd )
 //#endif
 
 	player->m_pCurrentCommand = cmd;
-	gEntList.SetPredictionRandomSeed( cmd );
-	gEntList.SetPredictionPlayer( player->GetEngineObject() );
+	EntityList()->SetPredictionRandomSeed( cmd );
+	EntityList()->SetPredictionPlayer( player->GetEngineObject() );
 	
 #if defined (HL2_DLL)
 	// pull out backchannel data and move this out
@@ -56,7 +56,7 @@ void CPlayerMove::StartCommand( CBasePlayer *player, CUserCmd *cmd )
 	for (i = 0; i < cmd->entitygroundcontact.Count(); i++)
 	{
 		int entindex =  cmd->entitygroundcontact[i].entindex;
-		CBaseEntity *pEntity = gEntList.GetBaseEntity( entindex);
+		CBaseEntity *pEntity = EntityList()->GetBaseEntity( entindex);
 		if (pEntity)
 		{
 			CBaseAnimating *pAnimating = pEntity->GetBaseAnimating();
@@ -79,8 +79,8 @@ void CPlayerMove::FinishCommand( CBasePlayer *player )
 	VPROF( "CPlayerMove::FinishCommand" );
 
 	player->m_pCurrentCommand = NULL;
-	gEntList.SetPredictionRandomSeed( NULL );
-	gEntList.SetPredictionPlayer( NULL );
+	EntityList()->SetPredictionRandomSeed( NULL );
+	EntityList()->SetPredictionPlayer( NULL );
 }
 
 //-----------------------------------------------------------------------------
@@ -377,7 +377,7 @@ void CPlayerMove::RunCommand ( CBasePlayer *player, CUserCmd *ucmd, IMoveHelper 
 	// Do weapon selection
 	if ( ucmd->weaponselect != 0 )
 	{
-		CBaseCombatWeapon *weapon = dynamic_cast< CBaseCombatWeapon * >( gEntList.GetBaseEntity( ucmd->weaponselect ) );
+		CBaseCombatWeapon *weapon = dynamic_cast< CBaseCombatWeapon * >(EntityList()->GetBaseEntity( ucmd->weaponselect ) );
 		if ( weapon )
 		{
 			VPROF( "player->SelectItem()" );

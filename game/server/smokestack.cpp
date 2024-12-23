@@ -134,7 +134,7 @@ void CSmokeStack::Activate()
 	CBaseEntity *pTestEnt = NULL;
 	while ( 1 )
 	{
-		pTestEnt = gEntList.FindEntityByClassname( pTestEnt, PARTICLELIGHT_ENTNAME );
+		pTestEnt = EntityList()->FindEntityByClassname( pTestEnt, PARTICLELIGHT_ENTNAME );
 		if ( !pTestEnt )
 			break;
 

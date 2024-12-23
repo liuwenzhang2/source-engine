@@ -163,7 +163,7 @@ void CPathKeyFrame::CalculateFrameDuration( void )
 //-----------------------------------------------------------------------------
 void CPathKeyFrame::Link( void )
 {
-	m_pNextKey = dynamic_cast<CPathKeyFrame*>( gEntList.FindEntityByName(NULL, m_iNextKey ) );
+	m_pNextKey = dynamic_cast<CPathKeyFrame*>( EntityList()->FindEntityByName(NULL, m_iNextKey ) );
 
 	if ( m_pNextKey )
 	{
@@ -228,7 +228,7 @@ CPathKeyFrame *CPathKeyFrame::PrevKey( int direction )
 //-----------------------------------------------------------------------------
 CPathKeyFrame *CPathKeyFrame::InsertNewKey( Vector newPos, QAngle newAngles )
 {
-	CPathKeyFrame *newKey = (CPathKeyFrame*)gEntList.CreateEntityByName( "keyframe_track" );
+	CPathKeyFrame *newKey = (CPathKeyFrame*)EntityList()->CreateEntityByName( "keyframe_track" );
 
 	// copy data across
 	newKey->SetKeyAngles( newAngles );

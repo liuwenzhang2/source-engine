@@ -271,7 +271,7 @@ CPortal_Player::~CPortal_Player( void )
 	CPortalRagdoll *pRagdoll = dynamic_cast<CPortalRagdoll*>( m_hRagdoll.Get() );	
 	if( pRagdoll )
 	{
-		gEntList.DestroyEntity( pRagdoll );
+		EntityList()->DestroyEntity( pRagdoll );
 	}
 }
 
@@ -1046,7 +1046,7 @@ bool CPortal_Player::BumpWeapon( CBaseCombatWeapon *pWeapon )
 	{
 		if ( gEvilImpulse101 )
 		{
-			gEntList.DestroyEntity( pWeapon );
+			EntityList()->DestroyEntity( pWeapon );
 		}
 		return false;
 	}
@@ -1074,7 +1074,7 @@ bool CPortal_Player::BumpWeapon( CBaseCombatWeapon *pWeapon )
 			if ( pPickupPortalgun->CanFirePortal2() )
 				pPortalGun->SetCanFirePortal2();
 
-			gEntList.DestroyEntity( pWeapon );
+			EntityList()->DestroyEntity( pWeapon );
 			return true;
 		}
 
@@ -1083,7 +1083,7 @@ bool CPortal_Player::BumpWeapon( CBaseCombatWeapon *pWeapon )
 		{
 			pWeapon->CheckRespawn();
 
-			gEntList.DestroyEntity( pWeapon );
+			EntityList()->DestroyEntity( pWeapon );
 			return true;
 		}
 		else
@@ -1615,7 +1615,7 @@ void CPortal_Player::CreateViewModel( int index /*=0*/ )
 	if ( GetViewModel( index ) )
 		return;
 
-	CPredictedViewModel *vm = ( CPredictedViewModel * )gEntList.CreateEntityByName( "predicted_viewmodel" );
+	CPredictedViewModel *vm = ( CPredictedViewModel * )EntityList()->CreateEntityByName( "predicted_viewmodel" );
 	if ( vm )
 	{
 		vm->GetEngineObject()->SetAbsOrigin(GetEngineObject()->GetAbsOrigin() );
@@ -1645,7 +1645,7 @@ CRagdollProp* CPortal_Player::CreateRagdollProp()
 	GetEngineObject()->AddEffects( EF_NODRAW | EF_NOSHADOW );
 	GetEngineObject()->AddEFlags( EFL_NO_DISSOLVE );
 #endif // PORTAL_HIDE_PLAYER_RAGDOLL
-	CPortalRagdoll* pRagdoll = (CPortalRagdoll*)gEntList.CreateEntityByName("portal_ragdoll");
+	CPortalRagdoll* pRagdoll = (CPortalRagdoll*)EntityList()->CreateEntityByName("portal_ragdoll");
 	//CBaseEntity *pRagdoll = CreateServerRagdoll( GetEngineObject()->GetForceBone(), info, COLLISION_GROUP_INTERACTIVE_DEBRIS, true);
 	pRagdoll->m_takedamage = DAMAGE_NO;
 	m_hRagdoll = pRagdoll;
@@ -1655,7 +1655,7 @@ CRagdollProp* CPortal_Player::CreateRagdollProp()
 	CPortalRagdoll *pRagdoll = dynamic_cast<CPortalRagdoll*>( m_hRagdoll.Get() );
 	if( pRagdoll )
 	{
-		gEntList.DestroyEntity( pRagdoll );
+		EntityList()->DestroyEntity( pRagdoll );
 		pRagdoll = NULL;
 	}
 	Assert( pRagdoll == NULL );
@@ -1752,7 +1752,7 @@ void CPortal_Player::Event_Killed( const CTakeDamageInfo &info )
 
 		if( pTempPortal && pTempPortal->IsActivated() )
 		{
-			gEntList.DestroyEntity(pTempPortal->AsEngineObject()->GetOuter());
+			EntityList()->DestroyEntity(pTempPortal->AsEngineObject()->GetOuter());
 		}
 	}
 #endif // PORTAL_HIDE_PLAYER_RAGDOLL
@@ -2229,7 +2229,7 @@ CBaseEntity* CPortal_Player::EntSelectSpawnPoint( void )
 	pLastSpawnPoint = g_pLastRebelSpawn;
 	}
 
-	if ( gEntList.FindEntityByClassname( NULL, pSpawnpointName ) == NULL )
+	if ( EntityList()->FindEntityByClassname( NULL, pSpawnpointName ) == NULL )
 	{
 	pSpawnpointName = "info_player_deathmatch";
 	pLastSpawnPoint = g_pLastSpawn;
@@ -2239,9 +2239,9 @@ CBaseEntity* CPortal_Player::EntSelectSpawnPoint( void )
 	pSpot = pLastSpawnPoint;
 	// Randomize the start spot
 	for ( int i = random->RandomInt(1,5); i > 0; i-- )
-		pSpot = gEntList.FindEntityByClassname( pSpot, pSpawnpointName );
+		pSpot = EntityList()->FindEntityByClassname( pSpot, pSpawnpointName );
 	if ( !pSpot )  // skip over the null point
-		pSpot = gEntList.FindEntityByClassname( pSpot, pSpawnpointName );
+		pSpot = EntityList()->FindEntityByClassname( pSpot, pSpawnpointName );
 
 	CBaseEntity *pFirstSpot = pSpot;
 
@@ -2254,7 +2254,7 @@ CBaseEntity* CPortal_Player::EntSelectSpawnPoint( void )
 			{
 				if ( pSpot->GetLocalOrigin() == vec3_origin )
 				{
-					pSpot = gEntList.FindEntityByClassname( pSpot, pSpawnpointName );
+					pSpot = EntityList()->FindEntityByClassname( pSpot, pSpawnpointName );
 					continue;
 				}
 
@@ -2263,7 +2263,7 @@ CBaseEntity* CPortal_Player::EntSelectSpawnPoint( void )
 			}
 		}
 		// increment pSpot
-		pSpot = gEntList.FindEntityByClassname( pSpot, pSpawnpointName );
+		pSpot = EntityList()->FindEntityByClassname( pSpot, pSpawnpointName );
 	} while ( pSpot != pFirstSpot ); // loop if we're not back to the start
 
 	// we haven't found a place to spawn yet,  so kill any guy at the first spawn point and spawn there
@@ -2274,14 +2274,14 @@ CBaseEntity* CPortal_Player::EntSelectSpawnPoint( void )
 		{
 			// if ent is a client, kill em (unless they are ourselves)
 			if ( ent->IsPlayer() && !(ent->entindex() == entindex()) )
-				ent->TakeDamage( CTakeDamageInfo( gEntList.GetBaseEntity(0), gEntList.GetBaseEntity(0), 300, DMG_GENERIC ) );
+				ent->TakeDamage( CTakeDamageInfo(EntityList()->GetBaseEntity(0), EntityList()->GetBaseEntity(0), 300, DMG_GENERIC ) );
 		}
 		goto ReturnSpot;
 	}
 
 	if ( !pSpot  )
 	{
-		pSpot = gEntList.FindEntityByClassname( pSpot, "info_player_start" );
+		pSpot = EntityList()->FindEntityByClassname( pSpot, "info_player_start" );
 
 		if ( pSpot )
 			goto ReturnSpot;

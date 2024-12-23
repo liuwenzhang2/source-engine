@@ -340,7 +340,7 @@ void CNPC_Crow::InputFlyAway( inputdata_t &inputdata )
 
 	if ( sTarget != NULL_STRING )// this npc has a target
 	{
-		CBaseEntity *pEnt = gEntList.FindEntityByName( NULL, sTarget );
+		CBaseEntity *pEnt = EntityList()->FindEntityByName( NULL, sTarget );
 
 		if ( pEnt )
 		{

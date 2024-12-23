@@ -215,7 +215,7 @@ CEntityDissolve *CEntityDissolve::Create( CBaseEntity *pTarget, const char *pMat
 		return NULL;
 	}
 
-	CEntityDissolve *pDissolve = (CEntityDissolve *)gEntList.CreateEntityByName( "env_entity_dissolver" );
+	CEntityDissolve *pDissolve = (CEntityDissolve *)EntityList()->CreateEntityByName( "env_entity_dissolver" );
 
 	if ( pDissolve == NULL )
 		return NULL;
@@ -244,7 +244,7 @@ CEntityDissolve *CEntityDissolve::Create( CBaseEntity *pTarget, const char *pMat
 				*pRagdollCreated = true;
 			}
 
-			gEntList.DestroyEntity( pTarget );
+			EntityList()->DestroyEntity( pTarget );
 			pTarget = pRagdoll;
 		}
 	}
@@ -323,7 +323,7 @@ void CEntityDissolve::DissolveThink( void )
 	
 	if ( pTarget == NULL )
 	{
-		gEntList.DestroyEntity( this );
+		EntityList()->DestroyEntity( this );
 		return;
 	}
 
@@ -356,10 +356,10 @@ void CEntityDissolve::DissolveThink( void )
 
 		if ( pTarget != pPlayer )
 		{
-			gEntList.DestroyEntity( pTarget );
+			EntityList()->DestroyEntity( pTarget );
 		}
 		
-		gEntList.DestroyEntity( this );
+		EntityList()->DestroyEntity( this );
 		
 		return;
 	}

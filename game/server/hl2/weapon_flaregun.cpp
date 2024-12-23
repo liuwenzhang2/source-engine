@@ -261,7 +261,7 @@ void CFlare::StartBurnSound( void )
 //-----------------------------------------------------------------------------
 CFlare *CFlare::Create( Vector vecOrigin, QAngle vecAngles, CBaseEntity *pOwner, float lifetime )
 {
-	CFlare *pFlare = (CFlare *)gEntList.CreateEntityByName( "env_flare" );
+	CFlare *pFlare = (CFlare *)EntityList()->CreateEntityByName( "env_flare" );
 
 	if ( pFlare == NULL )
 		return NULL;
@@ -332,7 +332,7 @@ void CFlare::FlareThink( void )
 		//Burned out
 		if ( m_flTimeBurnOut < gpGlobals->curtime )
 		{
-			gEntList.DestroyEntity( this );
+			EntityList()->DestroyEntity( this );
 			return;
 		}
 	}

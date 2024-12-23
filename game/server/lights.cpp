@@ -62,7 +62,7 @@ void CLight::Spawn( void )
 {
 	if (!GetEntityName())
 	{       // inert light
-		gEntList.DestroyEntity( this );
+		EntityList()->DestroyEntity( this );
 		return;
 	}
 	

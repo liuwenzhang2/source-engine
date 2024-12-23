@@ -2601,7 +2601,7 @@ void CHLClient::InternalEmitCloseCaption(IRecipientFilter& filter, int entindex,
 			byteflags |= CLOSE_CAPTION_FROMPLAYER;
 		}
 
-		CBaseEntity* pActor = gEntList.GetBaseEntity(entindex);
+		CBaseEntity* pActor = EntityList()->GetBaseEntity(entindex);
 		if (pActor)
 		{
 			char const* pszActorModel = STRING(pActor->GetModelName());
@@ -2674,7 +2674,7 @@ void CHLClient::InternalEmitCloseCaption(IRecipientFilter& filter, int entindex,
 	bool fromplayer = false;
 	CBaseEntity* ent = NULL;
 #ifdef GAME_DLL
-	ent = gEntList.GetBaseEntity(entindex);
+	ent = EntityList()->GetBaseEntity(entindex);
 #endif // GAME_DLL
 #ifdef CLIENT_DLL
 	ent = CBaseEntity::Instance(entindex);
@@ -2717,7 +2717,7 @@ void CHLClient::EmitCloseCaption(IRecipientFilter& filter, int entindex, char co
 	bool fromplayer = false;
 	CBaseEntity* ent = NULL;
 #ifdef GAME_DLL
-	ent = gEntList.GetBaseEntity(entindex);
+	ent = EntityList()->GetBaseEntity(entindex);
 #endif // GAME_DLL
 #ifdef CLIENT_DLL
 	ent = CBaseEntity::Instance(entindex);

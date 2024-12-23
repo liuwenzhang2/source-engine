@@ -215,7 +215,7 @@ void CTeamplayRules::ClientDisconnected( int pClient )
 {
 	// Msg( "CLIENT DISCONNECTED, REMOVING FROM TEAM.\n" );
 
-	CBasePlayer *pPlayer = (CBasePlayer *)gEntList.GetBaseEntity( pClient );
+	CBasePlayer *pPlayer = (CBasePlayer *)EntityList()->GetBaseEntity( pClient );
 	if ( pPlayer )
 	{
 		pPlayer->SetConnected( PlayerDisconnecting );

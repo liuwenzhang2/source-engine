@@ -2441,7 +2441,7 @@ void CNPC_MetroPolice::InputEnableManhackToss( inputdata_t &inputdata )
 //-----------------------------------------------------------------------------
 void CNPC_MetroPolice::InputSetPoliceGoal( inputdata_t &inputdata )
 {
-	CBaseEntity *pGoal = gEntList.FindEntityByName( NULL, inputdata.value.String() );
+	CBaseEntity *pGoal = EntityList()->FindEntityByName( NULL, inputdata.value.String() );
 
 	if ( pGoal == NULL )
 	{
@@ -2773,7 +2773,7 @@ void CNPC_MetroPolice::OnAnimEventStartDeployManhack( void )
 	}
 
 	// Create the manhack to throw
-	CNPC_Manhack *pManhack = (CNPC_Manhack *)gEntList.CreateEntityByName( "npc_manhack" );
+	CNPC_Manhack *pManhack = (CNPC_Manhack *)EntityList()->CreateEntityByName( "npc_manhack" );
 	
 	Vector	vecOrigin;
 	QAngle	vecAngles;

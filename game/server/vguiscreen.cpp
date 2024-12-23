@@ -415,6 +415,6 @@ void DestroyVGuiScreen( CVGuiScreen *pVGuiScreen )
 {
 	if (pVGuiScreen)
 	{
-		gEntList.DestroyEntity( pVGuiScreen );
+		EntityList()->DestroyEntity( pVGuiScreen );
 	}
 }

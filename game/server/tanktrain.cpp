@@ -34,7 +34,7 @@ void UTIL_RemoveHierarchy( CBaseEntity *pDead )
 			UTIL_RemoveHierarchy( pEntity );
 		}
 	}
-	gEntList.DestroyEntity( pDead );
+	EntityList()->DestroyEntity( pDead );
 }
 
 class CFuncTankTrain : public CFuncTrackTrain
@@ -138,14 +138,14 @@ void CTankTargetChange::Precache( void )
 
 void CTankTargetChange::Use( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value )
 {
-	CBaseEntity *pTarget = gEntList.FindEntityByName( NULL, m_target, NULL, pActivator, pCaller );
+	CBaseEntity *pTarget = EntityList()->FindEntityByName( NULL, m_target, NULL, pActivator, pCaller );
 
 	// UNDONE: This should use more of the event system
 	while ( pTarget )
 	{
 		// Change the target over
 		pTarget->AcceptInput( "TargetEntity", this, this, m_newTarget, 0 );
-		pTarget = gEntList.FindEntityByName( pTarget, m_target, NULL, pActivator, pCaller );
+		pTarget = EntityList()->FindEntityByName( pTarget, m_target, NULL, pActivator, pCaller );
 	}
 }
 
@@ -366,7 +366,7 @@ void CTankTrainAI::Activate( void )
 	{
 		do
 		{
-			pTarget = gEntList.FindEntityByName( pTarget, m_target );
+			pTarget = EntityList()->FindEntityByName( pTarget, m_target );
 			pTrain = dynamic_cast<CFuncTrackTrain *>(pTarget);
 		} while (!pTrain && pTarget);
 	}
@@ -478,7 +478,7 @@ void CTankTrainAI::Think( void )
 		SoundShutdown();
 		if ( pTrain )
 			UTIL_RemoveHierarchy( pTrain );
-		gEntList.DestroyEntity( this );
+		EntityList()->DestroyEntity( this );
 		return;
 	}
 

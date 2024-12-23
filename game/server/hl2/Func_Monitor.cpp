@@ -71,7 +71,7 @@ void CFuncMonitor::ReleaseCameraLink()
 {
 	if ( m_hInfoCameraLink )
 	{
-		gEntList.DestroyEntity( m_hInfoCameraLink );
+		EntityList()->DestroyEntity( m_hInfoCameraLink );
 		m_hInfoCameraLink = NULL;
 
 		// Keep the target up-to-date for save/load
@@ -86,7 +86,7 @@ void CFuncMonitor::ReleaseCameraLink()
 void CFuncMonitor::SetCameraByName(const char *szName)
 {
 	ReleaseCameraLink();
-	CBaseEntity *pBaseEnt = gEntList.FindEntityByName( NULL, szName );
+	CBaseEntity *pBaseEnt = EntityList()->FindEntityByName( NULL, szName );
 	if( pBaseEnt )
 	{
 		CPointCamera *pCamera = dynamic_cast<CPointCamera *>( pBaseEnt );

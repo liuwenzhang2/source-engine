@@ -89,7 +89,7 @@ END_DATADESC()
 CCrossbowBolt *CCrossbowBolt::BoltCreate( const Vector &vecOrigin, const QAngle &angAngles, CBasePlayer *pentOwner )
 {
 	// Create a new entity with CCrossbowBolt private data
-	CCrossbowBolt *pBolt = (CCrossbowBolt *)gEntList.CreateEntityByName( "crossbow_bolt" );
+	CCrossbowBolt *pBolt = (CCrossbowBolt *)EntityList()->CreateEntityByName( "crossbow_bolt" );
 	UTIL_SetOrigin( pBolt, vecOrigin );
 	pBolt->GetEngineObject()->SetAbsAngles( angAngles );
 	pBolt->Spawn();
@@ -198,7 +198,7 @@ void CCrossbowBolt::BoltTouch( CBaseEntity *pOther )
 
         if ( !g_pGameRules->IsMultiplayer() || !m_bExplode )
 		{
-			gEntList.DestroyEntity( this );
+			EntityList()->DestroyEntity( this );
 		}
 	}
 	else

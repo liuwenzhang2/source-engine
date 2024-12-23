@@ -213,7 +213,7 @@ void CCSPlayerResource::UpdatePlayerData( void )
 	{
 		// We only need to update these once a map, but we need the client to know about them.
 		CBaseEntity* ent = NULL;
-		while ( ( ent = gEntList.FindEntityByClassname( ent, "func_bomb_target" ) ) != NULL )
+		while ( ( ent = EntityList()->FindEntityByClassname( ent, "func_bomb_target" ) ) != NULL )
 		{
 			const Vector &pos = ent->WorldSpaceCenter();
 			CNavArea *area = TheNavMesh->GetNearestNavArea( pos, true, 10000.0f, false, false );
@@ -246,7 +246,7 @@ void CCSPlayerResource::UpdatePlayerData( void )
 		}
 
 		int hostageRescue = 0;
-		while ( (( ent = gEntList.FindEntityByClassname( ent, "func_hostage_rescue" ) ) != NULL)  &&  (hostageRescue < MAX_HOSTAGE_RESCUES) )
+		while ( (( ent = EntityList()->FindEntityByClassname( ent, "func_hostage_rescue" ) ) != NULL)  &&  (hostageRescue < MAX_HOSTAGE_RESCUES) )
 		{
 			const Vector &pos = ent->WorldSpaceCenter();
 			m_hostageRescueX.Set( hostageRescue, (int) pos.x );	

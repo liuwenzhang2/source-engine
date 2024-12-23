@@ -867,9 +867,9 @@ void CNavArea::ComputeEarliestOccupyTimes( void )
 
 	// determine the shortest time it will take a Terrorist to reach this area
 	int team = TEAM_TERRORIST % MAX_NAV_TEAMS;
-	for( spot = gEntList.FindEntityByClassname( NULL, "info_player_terrorist" );
+	for( spot = EntityList()->FindEntityByClassname( NULL, "info_player_terrorist" );
 		 spot;
-		 spot = gEntList.FindEntityByClassname( spot, "info_player_terrorist" ) )
+		 spot = EntityList()->FindEntityByClassname( spot, "info_player_terrorist" ) )
 	{
 		float travelDistance = NavAreaTravelDistance( spot->GetEngineObject()->GetAbsOrigin(), m_center, cost );
 		if (travelDistance < 0.0f)
@@ -885,9 +885,9 @@ void CNavArea::ComputeEarliestOccupyTimes( void )
 
 	// determine the shortest time it will take a CT to reach this area
 	team = TEAM_CT % MAX_NAV_TEAMS;
-	for( spot = gEntList.FindEntityByClassname( NULL, "info_player_counterterrorist" );
+	for( spot = EntityList()->FindEntityByClassname( NULL, "info_player_counterterrorist" );
 		 spot;
-		 spot = gEntList.FindEntityByClassname( spot, "info_player_counterterrorist" ) )
+		 spot = EntityList()->FindEntityByClassname( spot, "info_player_counterterrorist" ) )
 	{
 		float travelDistance = NavAreaTravelDistance( spot->GetEngineObject()->GetAbsOrigin(), m_center, cost );
 		if (travelDistance < 0.0f)
@@ -920,17 +920,17 @@ void CNavMesh::ComputeBattlefrontAreas( void )
 	ShortestPathCost cost;
 	CBaseEntity *tSpawn, *ctSpawn;
 
-	for( tSpawn = gEntList.FindEntityByClassname( NULL, "info_player_terrorist" );
+	for( tSpawn = EntityList()->FindEntityByClassname( NULL, "info_player_terrorist" );
 		 tSpawn;
-		 tSpawn = gEntList.FindEntityByClassname( tSpawn, "info_player_terrorist" ) )
+		 tSpawn = EntityList()->FindEntityByClassname( tSpawn, "info_player_terrorist" ) )
 	{
 		CNavArea *tArea = TheNavMesh->GetNavArea( tSpawn->GetAbsOrigin() );
 		if (tArea == NULL)
 			continue;
 
-		for( ctSpawn = gEntList.FindEntityByClassname( NULL, "info_player_counterterrorist" );
+		for( ctSpawn = EntityList()->FindEntityByClassname( NULL, "info_player_counterterrorist" );
 			 ctSpawn;
-			 ctSpawn = gEntList.FindEntityByClassname( ctSpawn, "info_player_counterterrorist" ) )
+			 ctSpawn = EntityList()->FindEntityByClassname( ctSpawn, "info_player_counterterrorist" ) )
 		{
 			CNavArea *ctArea = TheNavMesh->GetNavArea( ctSpawn->GetAbsOrigin() );
 

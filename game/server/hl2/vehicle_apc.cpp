@@ -217,7 +217,7 @@ void CPropAPC::UpdateOnRemove( void )
 {
 	if ( m_hLaserDot )
 	{
-		gEntList.DestroyEntity( m_hLaserDot );
+		EntityList()->DestroyEntity( m_hLaserDot );
 		m_hLaserDot = NULL;
 	}
 	BaseClass::UpdateOnRemove();
@@ -354,7 +354,7 @@ void CPropAPC::ExplodeAndThrowChunk( const Vector &vecExplosionPos )
 	UTIL_ScreenShake( vecExplosionPos, 25.0, 150.0, 1.0, 750.0f, SHAKE_START );
 
 	// Drop a flaming, smoking chunk.
-	CGib *pChunk = (CGib*)gEntList.CreateEntityByName( "gib" );
+	CGib *pChunk = (CGib*)EntityList()->CreateEntityByName( "gib" );
 	pChunk->Spawn( "models/gibs/hgibs.mdl" );
 	pChunk->SetBloodColor( DONT_BLEED );
 
@@ -442,7 +442,7 @@ void CPropAPC::Event_Killed( const CTakeDamageInfo &info )
 	for ( int i = 0; i < nGibs; i++)
 	{
 		// Throw a flaming, smoking chunk.
-		CGib *pChunk = (CGib*)gEntList.CreateEntityByName( "gib" );
+		CGib *pChunk = (CGib*)EntityList()->CreateEntityByName( "gib" );
 		pChunk->Spawn( "models/gibs/hgibs.mdl" );
 		pChunk->SetBloodColor( DONT_BLEED );
 
@@ -526,7 +526,7 @@ void CPropAPC::InputDestroy( inputdata_t &inputdata )
 void CPropAPC::InputFireMissileAt( inputdata_t &inputdata )
 {
 	string_t strMissileTarget = MAKE_STRING( inputdata.value.String() );
-	CBaseEntity *pTarget = gEntList.FindEntityByName( NULL, strMissileTarget, NULL, inputdata.pActivator, inputdata.pCaller );
+	CBaseEntity *pTarget = EntityList()->FindEntityByName( NULL, strMissileTarget, NULL, inputdata.pActivator, inputdata.pCaller );
 	if ( pTarget == NULL )
 	{
 		DevWarning( "%s: Could not find target '%s'!\n", GetClassname(), STRING( strMissileTarget ) );
@@ -883,7 +883,7 @@ void CPropAPC::CreateCorpse( )
 
 	for ( int i = 0; i < APC_MAX_GIBS; ++i )
 	{
-		CPhysicsProp *pGib = assert_cast<CPhysicsProp*>(gEntList.CreateEntityByName( "prop_physics" ));
+		CPhysicsProp *pGib = assert_cast<CPhysicsProp*>(EntityList()->CreateEntityByName( "prop_physics" ));
 		pGib->GetEngineObject()->SetAbsOrigin(GetEngineObject()->GetAbsOrigin() );
 		pGib->GetEngineObject()->SetAbsAngles(GetEngineObject()->GetAbsAngles() );
 		pGib->GetEngineObject()->SetAbsVelocity(GetEngineObject()->GetAbsVelocity() );
@@ -926,7 +926,7 @@ void CPropAPC::CreateCorpse( )
 
 	GetEngineObject()->AddSolidFlags( FSOLID_NOT_SOLID );
 	GetEngineObject()->AddEffects( EF_NODRAW );
-	gEntList.DestroyEntity( this );
+	EntityList()->DestroyEntity( this );
 }
 
 

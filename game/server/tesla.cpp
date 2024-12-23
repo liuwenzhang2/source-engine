@@ -123,7 +123,7 @@ CBaseEntity* CTesla::GetSourceEntity()
 {
 	if ( m_SourceEntityName != NULL_STRING )
 	{
-		CBaseEntity *pRet = gEntList.FindEntityByName( NULL, m_SourceEntityName );
+		CBaseEntity *pRet = EntityList()->FindEntityByName( NULL, m_SourceEntityName );
 		if ( pRet )
 			return pRet;
 	}

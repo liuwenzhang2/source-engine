@@ -413,7 +413,7 @@ void CGameTeamSet::InputTrigger( inputdata_t &inputdata )
 
 	if ( RemoveOnFire() )
 	{
-		gEntList.DestroyEntity( this );
+		EntityList()->DestroyEntity( this );
 	}
 }
 */
@@ -562,7 +562,7 @@ void CGamePlayerHurt::Use( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TY
 
 	if ( RemoveOnFire() )
 	{
-		gEntList.DestroyEntity( this );
+		EntityList()->DestroyEntity( this );
 	}
 }
 */
@@ -703,7 +703,7 @@ const char *CGamePlayerTeam::TargetTeamName( const char *pszTargetName, CBaseEnt
 {
 	CBaseEntity *pTeamEntity = NULL;
 
-	while ((pTeamEntity = gEntList.FindEntityByName( pTeamEntity, pszTargetName, NULL, pActivator )) != NULL)
+	while ((pTeamEntity = EntityList()->FindEntityByName( pTeamEntity, pszTargetName, NULL, pActivator )) != NULL)
 	{
 		if ( FClassnameIs( pTeamEntity, "game_team_master" ) )
 			return pTeamEntity->TeamID();
@@ -730,7 +730,7 @@ void CGamePlayerTeam::Use( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TY
 	
 	if ( RemoveOnFire() )
 	{
-		gEntList.DestroyEntity( this );
+		EntityList()->DestroyEntity( this );
 	}
 }
 

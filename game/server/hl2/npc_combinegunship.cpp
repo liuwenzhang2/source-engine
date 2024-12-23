@@ -500,7 +500,7 @@ CNPC_CombineGunship::CNPC_CombineGunship( void )
 
 void CNPC_CombineGunship::CreateBellyBlastEnergyCore( void )
 {
-	CCitadelEnergyCore *pCore = static_cast<CCitadelEnergyCore*>(gEntList.CreateEntityByName( "env_citadel_energy_core" ) );
+	CCitadelEnergyCore *pCore = static_cast<CCitadelEnergyCore*>(EntityList()->CreateEntityByName( "env_citadel_energy_core" ) );
 
 	if ( pCore == NULL )
 		return;
@@ -1951,7 +1951,7 @@ bool CNPC_CombineGunship::FindNearestGunshipCrash( void )
  	float flNearest = MAX_TRACE_LENGTH * MAX_TRACE_LENGTH;
 	CTargetGunshipCrash *pNearest = NULL;
 	CBaseEntity *pEnt = NULL;
-	while( (pEnt = gEntList.FindEntityByClassname(pEnt, "info_target_gunshipcrash")) != NULL )
+	while( (pEnt = EntityList()->FindEntityByClassname(pEnt, "info_target_gunshipcrash")) != NULL )
 	{
 		CTargetGunshipCrash *pCrashTarget = assert_cast<CTargetGunshipCrash*>(pEnt);
 		if ( pCrashTarget->IsDisabled() )
@@ -2539,7 +2539,7 @@ void CNPC_CombineGunship::SelfDestruct( void )
 
 		if ( m_hRagdoll )
 		{
-			gEntList.DestroyEntity( m_hRagdoll );
+			EntityList()->DestroyEntity( m_hRagdoll );
 		}
 	}
 	else
@@ -2559,7 +2559,7 @@ void CNPC_CombineGunship::SelfDestruct( void )
 		}
 	}
 
-	gEntList.DestroyEntity( this );
+	EntityList()->DestroyEntity( this );
 
 	// Record this so a nearby citizen can respond.
 	if ( GetCitizenResponse() )
@@ -2641,7 +2641,7 @@ void CNPC_CombineGunship::InputDisableGroundAttack( inputdata_t &inputdata )
 void CNPC_CombineGunship::InputDoGroundAttack( inputdata_t &inputdata )
 {
 	// Was a target node specified?
-	CBaseEntity *pEntity = gEntList.FindEntityByName( NULL, inputdata.value.StringID(), NULL, inputdata.pActivator, inputdata.pCaller );
+	CBaseEntity *pEntity = EntityList()->FindEntityByName( NULL, inputdata.value.StringID(), NULL, inputdata.pActivator, inputdata.pCaller );
 	if ( pEntity )
 	{
 		// Mapmaker wants us to ground attack a specific target

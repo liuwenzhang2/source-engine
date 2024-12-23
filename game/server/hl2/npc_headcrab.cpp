@@ -2133,7 +2133,7 @@ bool CBaseHeadcrab::HandleInteraction(int interactionType, void *data, CBaseComb
 		OnTakeDamage ( CTakeDamageInfo( sourceEnt, sourceEnt, m_iHealth, DMG_CRUSH|DMG_ALWAYSGIB ) );
 		
 		// Create dead headcrab in its place
-		CBaseHeadcrab *pEntity = (CBaseHeadcrab*)gEntList.CreateEntityByName( "npc_headcrab" );
+		CBaseHeadcrab *pEntity = (CBaseHeadcrab*)EntityList()->CreateEntityByName( "npc_headcrab" );
 		pEntity->Spawn();
 		pEntity->GetEngineObject()->SetLocalOrigin(GetEngineObject()->GetLocalOrigin() );
 		pEntity->GetEngineObject()->SetLocalAngles(GetEngineObject()->GetLocalAngles() );

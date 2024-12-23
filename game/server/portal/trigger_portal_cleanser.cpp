@@ -86,11 +86,11 @@ CBaseEntity* ConvertToSimpleProp ( CBaseEntity* pEnt )
 	const model_t *model = modelinfo->GetModel( modelindex );
 	if ( model && modelinfo->GetModelType(model) == mod_brush )
 	{
-		pRetVal = gEntList.CreateEntityByName( "simple_physics_brush" );
+		pRetVal = (CBaseEntity*)EntityList()->CreateEntityByName( "simple_physics_brush" );
 	}
 	else
 	{
-		pRetVal = gEntList.CreateEntityByName( "simple_physics_prop" );
+		pRetVal = (CBaseEntity*)EntityList()->CreateEntityByName( "simple_physics_prop" );
 	}
 
 	pRetVal->KeyValue( "model", STRING(pEnt->GetEngineObject()->GetModelName()) );
@@ -127,7 +127,7 @@ void CTriggerPortalCleanser::Touch( CBaseEntity *pOther )
 					if ( pPortal && pPortal->GetEnginePortal()->IsActivated() )
 					{
 						//pPortal->DoFizzleEffect( PORTAL_FIZZLE_KILLED, false );
-						gEntList.DestroyEntity(pPortal);
+						EntityList()->DestroyEntity(pPortal);
 						// HACK HACK! Used to make the gun visually change when going through a cleanser!
 						pPortalgun->m_fEffectsMaxSize1 = 50.0f;
 
@@ -150,7 +150,7 @@ void CTriggerPortalCleanser::Touch( CBaseEntity *pOther )
 					if ( pPortal && pPortal->GetEnginePortal()->IsActivated() )
 					{
 						//pPortal->DoFizzleEffect( PORTAL_FIZZLE_KILLED, false );
-						gEntList.DestroyEntity(pPortal);
+						EntityList()->DestroyEntity(pPortal);
 						// HACK HACK! Used to make the gun visually change when going through a cleanser!
 						pPortalgun->m_fEffectsMaxSize2 = 50.0f;
 
@@ -264,7 +264,7 @@ void CTriggerPortalCleanser::Touch( CBaseEntity *pOther )
 			}
 
 			pBaseAnimating->GetEngineObject()->AddFlag( FL_DISSOLVING );
-			gEntList.DestroyEntity( pBaseAnimating );
+			EntityList()->DestroyEntity( pBaseAnimating );
 		}
 		
 		CBaseAnimating *pDisolvingAnimating = dynamic_cast<CBaseAnimating*>( pDisolvingObj );

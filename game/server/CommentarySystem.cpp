@@ -587,11 +587,11 @@ public:
 
 		// If we find the commentary semaphore, the commentary entities already exist.
 		// This occurs when you transition back to a map that has saved commentary nodes in it.
-		if ( gEntList.FindEntityByName( NULL, COMMENTARY_SPAWNED_SEMAPHORE ) )
+		if ( EntityList()->FindEntityByName( NULL, COMMENTARY_SPAWNED_SEMAPHORE ) )
 			return;
 
 		// Spawn the commentary semaphore entity
-		CBaseEntity *pSemaphore = gEntList.CreateEntityByName( "info_target" );
+		CBaseEntity *pSemaphore = (CBaseEntity*)EntityList()->CreateEntityByName( "info_target" );
 		pSemaphore->SetName( COMMENTARY_SPAWNED_SEMAPHORE );
 
 		bool oldLock = engine->LockNetworkStringTables( false );
@@ -626,7 +626,7 @@ public:
 				}
 
 				// Spawn the commentary entity
-				CBaseEntity *pNode = gEntList.CreateEntityByName( pNodeName );
+				CBaseEntity *pNode = (CBaseEntity*)EntityList()->CreateEntityByName( pNodeName );
 				if ( pNode )
 				{
 					ParseEntKVBlock( pNode, pkvNode );
@@ -678,17 +678,17 @@ public:
 		{
 			if ( m_hSpawnedEntities[i] )
 			{
-				gEntList.DestroyEntity( m_hSpawnedEntities[i] );
+				EntityList()->DestroyEntity( m_hSpawnedEntities[i] );
 			}
 		}
 		m_hSpawnedEntities.Purge();
 		m_iCommentaryNodeCount = 0;
 
 		// Remove the commentary semaphore
-		CBaseEntity *pSemaphore = gEntList.FindEntityByName( NULL, COMMENTARY_SPAWNED_SEMAPHORE );
+		CBaseEntity *pSemaphore = EntityList()->FindEntityByName( NULL, COMMENTARY_SPAWNED_SEMAPHORE );
 		if ( pSemaphore )
 		{
-			gEntList.DestroyEntity( pSemaphore );
+			EntityList()->DestroyEntity( pSemaphore );
 		}
 
 		// Remove our global convar callback
@@ -762,7 +762,7 @@ public:
 			return;
 
 		CBaseEntity *pEnt = m_hLastCommentaryNode;
-		while ( ( pEnt = gEntList.FindEntityByClassname( pEnt, "point_commentary_node" ) ) != m_hLastCommentaryNode )
+		while ( ( pEnt = EntityList()->FindEntityByClassname( pEnt, "point_commentary_node" ) ) != m_hLastCommentaryNode )
 		{
 			CPointCommentaryNode *pNode = dynamic_cast<CPointCommentaryNode *>( pEnt );
 			if ( pNode && pNode->CanTeleportTo() )
@@ -915,7 +915,7 @@ void CPointCommentaryNode::Activate( void )
 
 	if ( m_iszViewTarget != NULL_STRING )
 	{
-		m_hViewTarget = gEntList.FindEntityByName( NULL, m_iszViewTarget );
+		m_hViewTarget = EntityList()->FindEntityByName( NULL, m_iszViewTarget );
 		if ( !m_hViewTarget )
 		{
 			Warning("%s: %s could not find viewtarget %s.\n", GetClassname(), GetDebugName(), STRING(m_iszViewTarget) );
@@ -924,7 +924,7 @@ void CPointCommentaryNode::Activate( void )
 
 	if ( m_iszViewPosition != NULL_STRING )
 	{
-		m_hViewPosition = gEntList.FindEntityByName( NULL, m_iszViewPosition );
+		m_hViewPosition = EntityList()->FindEntityByName( NULL, m_iszViewPosition );
 		if ( !m_hViewPosition.Get() )
 		{
 			Warning("%s: %s could not find viewposition %s.\n", GetClassname(), GetDebugName(), STRING(m_iszViewPosition) );
@@ -1169,7 +1169,7 @@ void CPointCommentaryNode::UpdateViewThink( void )
 		if ( !m_hViewTargetAngles && !m_hViewPositionMover )
 		{
 			// Make an invisible entity to attach view angles to
-			m_hViewTargetAngles = gEntList.CreateEntityByName( "point_commentary_viewpoint" );
+			m_hViewTargetAngles = (CBaseEntity*)EntityList()->CreateEntityByName( "point_commentary_viewpoint" );
 			m_hViewTargetAngles->GetEngineObject()->SetAbsOrigin( pPlayer->EyePosition() );
 			m_hViewTargetAngles->GetEngineObject()->SetAbsAngles( pPlayer->EyeAngles() );
 			pPlayer->SetViewEntity( m_hViewTargetAngles );
@@ -1237,7 +1237,7 @@ void CPointCommentaryNode::UpdateViewThink( void )
 		{
 			// Make an invisible info target entity for us to attach the view to, 
 			// and move it to the desired view position.
-			m_hViewPositionMover = gEntList.CreateEntityByName( "point_commentary_viewpoint" );
+			m_hViewPositionMover = (CBaseEntity*)EntityList()->CreateEntityByName( "point_commentary_viewpoint" );
 			m_hViewPositionMover->GetEngineObject()->SetAbsAngles( pPlayer->EyeAngles() );
 			pPlayer->SetViewEntity( m_hViewPositionMover );
 		}
@@ -1363,13 +1363,13 @@ void CPointCommentaryNode::CleanupPostCommentary( void )
 	{
 		pPlayer->SetViewEntity( NULL );
 	}
-	gEntList.DestroyEntity( m_hViewTargetAngles );
+	EntityList()->DestroyEntity( m_hViewTargetAngles );
 
 	if ( m_hViewPositionMover && pPlayer->GetViewEntity() == m_hViewPositionMover )
 	{
 		pPlayer->SetViewEntity( NULL );
 	}
-	gEntList.DestroyEntity( m_hViewPositionMover );
+	EntityList()->DestroyEntity( m_hViewPositionMover );
 
 	m_bActive = false;
 	GetEngineObject()->SetPlaybackRate(1.0);

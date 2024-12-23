@@ -628,7 +628,7 @@ void CProtoSniper::LaserOff( void )
 {
 	if( m_pBeam )
 	{
-		gEntList.DestroyEntity( m_pBeam);
+		EntityList()->DestroyEntity( m_pBeam);
 		m_pBeam = NULL;
 	}
 
@@ -1009,7 +1009,7 @@ void CProtoSniper::SetSweepTarget( const char *pszTarget )
 	// In case the sniper was sweeping a random set of targets when asked to sweep a normal chain.
 	ClearTargetGroup();
 
-	pTarget = gEntList.FindEntityByName( NULL, pszTarget );
+	pTarget = EntityList()->FindEntityByName( NULL, pszTarget );
 
 	if( !pTarget )
 	{
@@ -1071,7 +1071,7 @@ void CProtoSniper::InputSweepGroupRandomly( inputdata_t &inputdata )
 	// PERFORMANCE
 	// Go through the whole ent list? This could hurt. (sjb)
 	// Gary: Yes, this sucks. :)
-	pEnt = gEntList.FirstEnt();
+	pEnt = EntityList()->FirstEnt();
 
 	do
 	{
@@ -1089,7 +1089,7 @@ void CProtoSniper::InputSweepGroupRandomly( inputdata_t &inputdata )
 			}
 		}
 
-		pEnt = gEntList.NextEnt( pEnt );
+		pEnt = EntityList()->NextEnt( pEnt );
 
 	} while( pEnt );
 
@@ -1111,7 +1111,7 @@ void CProtoSniper::InputStopSweeping( inputdata_t &inputdata )
 //-----------------------------------------------------------------------------
 void CProtoSniper::InputProtectTarget( inputdata_t &inputdata )
 {
-	m_hProtectTarget = gEntList.FindEntityByName( NULL, inputdata.value.String(), NULL, inputdata.pActivator, inputdata.pCaller );
+	m_hProtectTarget = EntityList()->FindEntityByName( NULL, inputdata.value.String(), NULL, inputdata.pActivator, inputdata.pCaller );
 
 	if ( !m_hProtectTarget )
 	{
@@ -1367,7 +1367,7 @@ void CProtoSniper::Event_Killed( const CTakeDamageInfo &info )
 	params.m_bWarnOnDirectWaveReference = true;
 	g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 
-	gEntList.DestroyEntity( this );
+	EntityList()->DestroyEntity( this );
 }
 
 //---------------------------------------------------------
@@ -2220,7 +2220,7 @@ void CProtoSniper::RunTask( const Task_t *pTask )
 		{
 			// Time up! Paint the next target in the chain, or stop.
 			CBaseEntity *pNext;
-			pNext = gEntList.FindEntityByName( NULL, m_hSweepTarget->m_target );
+			pNext = EntityList()->FindEntityByName( NULL, m_hSweepTarget->m_target );
 
 			if ( m_hSweepTarget->GetEngineObject()->HasSpawnFlags( SF_SNIPERTARGET_SHOOTME ) )
 			{

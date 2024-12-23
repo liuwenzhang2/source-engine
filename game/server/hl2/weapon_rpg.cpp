@@ -396,7 +396,7 @@ void CMissile::Explode( void )
 	}
 
 	g_pSoundEmitterSystem->StopSound(this, "Missile.Ignite" );
-	gEntList.DestroyEntity( this );
+	EntityList()->DestroyEntity( this );
 }
 
 //-----------------------------------------------------------------------------
@@ -657,7 +657,7 @@ void CMissile::SeekThink( void )
 	Vector vecLaserDotPosition;
 	ComputeActualDotPosition( pLaserDot, &targetPos, &flHomingSpeed );
 
-	if ( gEntList.IsSimulatingOnAlternateTicks() )
+	if (EntityList()->IsSimulatingOnAlternateTicks() )
 		flHomingSpeed *= 2;
 
 	Vector	vTargetDir;
@@ -834,7 +834,7 @@ void CInfoAPCMissileHint::Activate( )
 {
 	BaseClass::Activate();
 
-	m_hTarget = gEntList.FindEntityByName( NULL, m_target );
+	m_hTarget = EntityList()->FindEntityByName( NULL, m_target );
 	if ( m_hTarget == NULL )
 	{
 		DevWarning( "%s: Could not find target '%s'!\n", GetClassname(), STRING( m_target ) );
@@ -1456,18 +1456,18 @@ CWeaponRPG::~CWeaponRPG()
 {
 	if ( m_hLaserDot != NULL )
 	{
-		gEntList.DestroyEntity( m_hLaserDot );
+		EntityList()->DestroyEntity( m_hLaserDot );
 		m_hLaserDot = NULL;
 	}
 
 	if ( m_hLaserMuzzleSprite )
 	{
-		gEntList.DestroyEntity( m_hLaserMuzzleSprite );
+		EntityList()->DestroyEntity( m_hLaserMuzzleSprite );
 	}
 
 	if ( m_hLaserBeam )
 	{
-		gEntList.DestroyEntity( m_hLaserBeam );
+		EntityList()->DestroyEntity( m_hLaserBeam );
 	}
 }
 
@@ -1903,7 +1903,7 @@ void CWeaponRPG::StopGuiding( void )
 	if ( m_hLaserDot != NULL )
 	{
 		m_hLaserDot->TurnOff();
-		gEntList.DestroyEntity( m_hLaserDot );
+		EntityList()->DestroyEntity( m_hLaserDot );
 		m_hLaserDot = NULL;
 	}
 }

@@ -597,7 +597,7 @@ ConVarRef suitcharger( "sk_suitcharger" );
 	{
 		if ( pClient )
 		{
-			CBasePlayer *pPlayer = (CBasePlayer *)gEntList.GetBaseEntity( pClient );
+			CBasePlayer *pPlayer = (CBasePlayer *)EntityList()->GetBaseEntity( pClient );
 
 			if ( pPlayer )
 			{
@@ -670,7 +670,7 @@ ConVarRef suitcharger( "sk_suitcharger" );
 		
 		addDefault = true;
 
-		while ( (pWeaponEntity = gEntList.FindEntityByClassname( pWeaponEntity, "game_player_equip" )) != NULL)
+		while ( (pWeaponEntity = EntityList()->FindEntityByClassname( pWeaponEntity, "game_player_equip" )) != NULL)
 		{
 			pWeaponEntity->Touch( pPlayer );
 			addDefault = false;
@@ -913,7 +913,7 @@ ConVarRef suitcharger( "sk_suitcharger" );
 	{
 		if ( pWeapon && (pWeapon->GetWeaponFlags() & ITEM_FLAG_LIMITINWORLD) )
 		{
-			if ( gEntList.NumberOfEntities() < (gpGlobals->maxEntities - ENTITY_INTOLERANCE) )
+			if (EntityList()->NumberOfEntities() < (gpGlobals->maxEntities - ENTITY_INTOLERANCE) )
 				return 0;
 
 			// we're past the entity tolerance level,  so delay the respawn
@@ -1599,7 +1599,7 @@ ConVarRef suitcharger( "sk_suitcharger" );
 
 	void CMultiplayRules::ClientCommandKeyValues( int pEntity, KeyValues *pKeyValues )
 	{
-		CBaseMultiplayerPlayer *pPlayer = dynamic_cast< CBaseMultiplayerPlayer * >( gEntList.GetBaseEntity( pEntity ) );
+		CBaseMultiplayerPlayer *pPlayer = dynamic_cast< CBaseMultiplayerPlayer * >(EntityList()->GetBaseEntity( pEntity ) );
 
 		if ( !pPlayer )
 			return;

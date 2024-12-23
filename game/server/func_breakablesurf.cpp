@@ -119,7 +119,7 @@ void CWindowPane::Die( void )
 					 WINDOW_PANEL_SIZE, WINDOW_PANEL_SIZE,WINDOW_SMALL_SHARD_SIZE,SHATTERSURFACE_GLASS,
 					 255,255,255,255,255,255);
 
-	gEntList.DestroyEntity(this);
+	EntityList()->DestroyEntity(this);
 }
 
 ///------------------------------------------------------------------------------
@@ -129,7 +129,7 @@ void CWindowPane::Die( void )
 //------------------------------------------------------------------------------
 CWindowPane* CWindowPane::CreateWindowPane( const Vector &vecOrigin, const QAngle &vecAngles )
 {
-	CWindowPane *pGlass = (CWindowPane*)gEntList.CreateEntityByName( "window_pane" );
+	CWindowPane *pGlass = (CWindowPane*)EntityList()->CreateEntityByName( "window_pane" );
 	if ( !pGlass )
 	{
 		Msg( "NULL Ent in CreateWindowPane!\n" );
@@ -1197,19 +1197,19 @@ void CBreakableSurface::Spawn(void)
 	if (m_nQuadError == QUAD_ERR_MULT_FACES)
 	{
 		Warning("Rejecting func_breakablesurf.  Has multiple faces that aren't NODRAW.\n");
-		gEntList.DestroyEntity(this);
+		EntityList()->DestroyEntity(this);
 	}
 	else if (m_nQuadError == QUAD_ERR_NOT_QUAD)
 	{
 		Warning("Rejecting func_breakablesurf.  Drawn face isn't a quad.\n");
-		gEntList.DestroyEntity(this);
+		EntityList()->DestroyEntity(this);
 	}
 
 	int materialCount = modelinfo->GetModelMaterialCount( const_cast<model_t*>(GetEngineObject()->GetModel()) );
 	if( materialCount != 1 )
 	{
 		Warning( "Encountered func_breakablesurf that has a material applied to more than one surface!\n" );
-		gEntList.DestroyEntity(this);
+		EntityList()->DestroyEntity(this);
 	}
 
 	// Get at the first material; even if there are more than one.

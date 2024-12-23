@@ -73,7 +73,7 @@ LINK_ENTITY_TO_CLASS( game_weapon_manager, CGameWeaponManager );
 
 void CreateWeaponManager( const char *pWeaponName, int iMaxPieces )
 {
-	CGameWeaponManager *pManager = (CGameWeaponManager *)gEntList.CreateEntityByName( "game_weapon_manager");
+	CGameWeaponManager *pManager = (CGameWeaponManager *)EntityList()->CreateEntityByName( "game_weapon_manager");
 
 	if( pManager )
 	{
@@ -141,16 +141,16 @@ void CGameWeaponManager::Spawn()
 {
 	SetThink( &CGameWeaponManager::Think );
 	GetEngineObject()->SetNextThink( gpGlobals->curtime );
-	CBaseEntity *pEntity = gEntList.CreateEntityByName( STRING(m_iszWeaponName) );
+	CBaseEntity *pEntity = (CBaseEntity*)EntityList()->CreateEntityByName( STRING(m_iszWeaponName) );
 	if ( !pEntity )
 	{
 		DevMsg("%s removed itself!\n", GetDebugName() );
-		gEntList.DestroyEntity(this);
+		EntityList()->DestroyEntity(this);
 	}
 	else
 	{
 		m_bExpectingWeapon = ( dynamic_cast<CBaseCombatWeapon *>(pEntity) != NULL );
-		gEntList.DestroyEntity(pEntity);
+		EntityList()->DestroyEntity(pEntity);
 	}
 }
 
@@ -194,7 +194,7 @@ void CGameWeaponManager::Think()
 		CBaseCombatWeapon *pWeapon = NULL;
 		// Firstly, count the total number of weapons of this type in the world.
 		// Also count how many of those can potentially be removed.
-		pWeapon = assert_cast<CBaseCombatWeapon *>(gEntList.FindEntityByClassname( pWeapon, pszWeaponName ));
+		pWeapon = assert_cast<CBaseCombatWeapon *>(EntityList()->FindEntityByClassname( pWeapon, pszWeaponName ));
 
 		while( pWeapon )
 		{
@@ -203,7 +203,7 @@ void CGameWeaponManager::Think()
 				candidates.AddToTail( pWeapon );
 			}
 
-			pWeapon = assert_cast<CBaseCombatWeapon *>(gEntList.FindEntityByClassname( pWeapon, pszWeaponName ));
+			pWeapon = assert_cast<CBaseCombatWeapon *>(EntityList()->FindEntityByClassname( pWeapon, pszWeaponName ));
 		}
 	}
 	else
@@ -267,7 +267,7 @@ void CGameWeaponManager::Think()
 		if( fRemovedOne )
 		{
 			pCandidate->GetEngineObject()->AddEffects( EF_NODRAW );
-			gEntList.DestroyEntity( pCandidate );
+			EntityList()->DestroyEntity( pCandidate );
 
 			DevMsg( 2, "Surplus %s removed\n", pszWeaponName);
 			surplus--;

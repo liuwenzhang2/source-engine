@@ -70,7 +70,7 @@ void CGrenadeTrail::SetEmit(bool bVal)
 //-----------------------------------------------------------------------------
 CGrenadeTrail* CGrenadeTrail::CreateGrenadeTrail()
 {
-	CBaseEntity *pEnt = gEntList.CreateEntityByName(GRENADETRAIL_ENTITYNAME);
+	CBaseEntity *pEnt = (CBaseEntity*)EntityList()->CreateEntityByName(GRENADETRAIL_ENTITYNAME);
 	if(pEnt)
 	{
 		CGrenadeTrail *pTrail = dynamic_cast<CGrenadeTrail*>(pEnt);
@@ -81,7 +81,7 @@ CGrenadeTrail* CGrenadeTrail::CreateGrenadeTrail()
 		}
 		else
 		{
-			gEntList.DestroyEntity(pEnt);
+			EntityList()->DestroyEntity(pEnt);
 		}
 	}
 

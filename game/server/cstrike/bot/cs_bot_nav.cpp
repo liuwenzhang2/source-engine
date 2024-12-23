@@ -949,7 +949,7 @@ bool CCSBot::IsAtEnemySpawn( void ) const
 	const char *spawnName = (GetTeamNumber() == TEAM_TERRORIST) ? "info_player_counterterrorist" : "info_player_terrorist";
 
 	// check if we are at any of the enemy's spawn points
-	for( spot = gEntList.FindEntityByClassname( NULL, spawnName ); spot; spot = gEntList.FindEntityByClassname( spot, spawnName ) )
+	for( spot = EntityList()->FindEntityByClassname( NULL, spawnName ); spot; spot = EntityList()->FindEntityByClassname( spot, spawnName ) )
 	{
 		CNavArea *area = TheNavMesh->GetNearestNavArea( spot->WorldSpaceCenter() );
 		if (area && GetLastKnownArea() == area)

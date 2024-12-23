@@ -317,7 +317,7 @@ CBaseEntity	*CNPCSimpleTalker::EnumFriends( CBaseEntity *pPrevious, int listNumb
 	Vector vecCheck;
 
 	pszFriend = m_szFriends[ FriendNumber(listNumber) ];
-	while ( pszFriend != NULL && ((pFriend = gEntList.FindEntityByClassname( pFriend, pszFriend )) != NULL) )
+	while ( pszFriend != NULL && ((pFriend = EntityList()->FindEntityByClassname( pFriend, pszFriend )) != NULL) )
 	{
 		if (pFriend == this || !pFriend->IsAlive())
 			// don't talk to self or dead people

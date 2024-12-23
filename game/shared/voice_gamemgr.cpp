@@ -52,7 +52,7 @@ static CBasePlayer* FindPlayerByName(const char *pTestName)
 {
 	for(int i=1; i <= gpGlobals->maxClients; i++)
 	{
-		CBaseEntity *pEnt = gEntList.GetBaseEntity(i);
+		CBaseEntity *pEnt = EntityList()->GetBaseEntity(i);
 		if(pEnt && pEnt->IsPlayer())
 		{			
 			const char *pNetName = STRING(pEnt->GetEntityName());

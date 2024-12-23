@@ -344,7 +344,7 @@ void CAI_StandoffBehavior::PrescheduleThink()
 	if( DrawBattleLines.GetInt() != 0 )
 	{
 		CBaseEntity *pEntity = NULL;
-		while ((pEntity = gEntList.FindEntityByClassname( pEntity, "ai_battle_line" )) != NULL)
+		while ((pEntity = EntityList()->FindEntityByClassname( pEntity, "ai_battle_line" )) != NULL)
 		{
 			// Visualize the battle line and its normal.
 			CAI_BattleLine *pLine = dynamic_cast<CAI_BattleLine *>(pEntity);
@@ -723,7 +723,7 @@ Vector CAI_StandoffBehavior::GetStandoffGoalPosition()
 		CAI_BattleLine *pBattleLine = NULL;
 		for (;;)
 		{
-			pBattleLine = (CAI_BattleLine *)gEntList.FindEntityByClassname( pBattleLine, "ai_battle_line" );
+			pBattleLine = (CAI_BattleLine *)EntityList()->FindEntityByClassname( pBattleLine, "ai_battle_line" );
 			
 			if ( !pBattleLine )
 				break;
@@ -783,7 +783,7 @@ void CAI_StandoffBehavior::UpdateBattleLines()
 		CAI_BattleLine *pBattleLine = NULL;
 		for (;;)
 		{
-			pBattleLine = (CAI_BattleLine *)gEntList.FindEntityByClassname( pBattleLine, "ai_battle_line" );
+			pBattleLine = (CAI_BattleLine *)EntityList()->FindEntityByClassname( pBattleLine, "ai_battle_line" );
 			
 			if ( !pBattleLine )
 				break;

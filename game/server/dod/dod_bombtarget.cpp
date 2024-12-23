@@ -704,7 +704,7 @@ CControlPoint *CDODBombTarget::GetControlPoint( void )
 			return NULL;
 
 		// try to find it
-		m_pControlPoint = dynamic_cast<CControlPoint *>( gEntList.FindEntityByName( NULL, STRING(m_iszCapPointName) ) );
+		m_pControlPoint = dynamic_cast<CControlPoint *>( EntityList()->FindEntityByName( NULL, STRING(m_iszCapPointName) ) );
 
 		if ( !m_pControlPoint )
 			Warning( "Could not find dod_control_point named \"%s\" for dod_bomb_target \"%s\"\n", STRING(m_iszCapPointName), STRING( GetEntityName() ) );

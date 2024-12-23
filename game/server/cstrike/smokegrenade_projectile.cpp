@@ -90,7 +90,7 @@ void CSmokeGrenadeProjectile::Think_Detonate()
 		CBaseEntity *pEntity = NULL;
 		variant_t var;	//send the location of the smoke?
 		var.SetVector3D(GetEngineObject()->GetAbsOrigin() );
-		while ( ( pEntity = gEntList.FindEntityByClassname( pEntity, "hostage_entity" ) ) != NULL)
+		while ( ( pEntity = EntityList()->FindEntityByClassname( pEntity, "hostage_entity" ) ) != NULL)
 		{
 			//send to hostages that have a resonable chance of being in it while its still smoking
 			if( (GetEngineObject()->GetAbsOrigin() - pEntity->GetEngineObject()->GetAbsOrigin()).Length() < 1000 )
@@ -156,7 +156,7 @@ void CSmokeGrenadeProjectile::Think_Fade()
 void CSmokeGrenadeProjectile::Think_Remove()
 {
 	if ( m_hSmokeEffect.Get() )
-		gEntList.DestroyEntity( m_hSmokeEffect );
+		EntityList()->DestroyEntity( m_hSmokeEffect );
 
 	TheBots->RemoveGrenade( this );
 

@@ -81,7 +81,7 @@ void CPointDevShotCamera::Spawn( void )
 	// Remove this entity immediately if we're not making devshots
 	if ( !CommandLine()->FindParm("-makedevshots") )
 	{
-		gEntList.DestroyEntity( this );
+		EntityList()->DestroyEntity( this );
 		return;
 	}
 
@@ -231,7 +231,7 @@ public:
 					const char *pCameraName = pkvCamera->GetName();
 
 					// Make a camera, and move it to the position specified
-					CPointDevShotCamera	*pCamera = (CPointDevShotCamera*)gEntList.CreateEntityByName( "point_devshot_camera" );
+					CPointDevShotCamera	*pCamera = (CPointDevShotCamera*)EntityList()->CreateEntityByName( "point_devshot_camera" );
 					Assert( pCamera );
 					pCamera->KeyValue( "cameraname", pCameraName );
 					pCamera->KeyValue( "origin", pkvCamera->GetString( "origin", "0 0 0" ) );

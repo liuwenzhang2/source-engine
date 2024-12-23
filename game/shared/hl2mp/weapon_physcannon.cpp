@@ -979,7 +979,7 @@ void CWeaponPhysCannon::Drop( const Vector &vecVelocity )
 	ForceDrop();
 
 #ifndef CLIENT_DLL
-	gEntList.DestroyEntity( this );
+	EntityList()->DestroyEntity( this );
 #endif
 }
 

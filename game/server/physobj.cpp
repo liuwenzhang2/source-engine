@@ -308,7 +308,7 @@ void CPhysicsSpring::Activate( void )
 		if ( (!pStart || !pEnd) || (pStart == pEnd) )
 		{
 			DevMsg("ERROR: Can't init spring %s from \"%s\" to \"%s\"\n", GetDebugName(), STRING(m_nameAttachStart), STRING(m_nameAttachEnd) );
-			gEntList.DestroyEntity( this );
+			EntityList()->DestroyEntity( this );
 			return;
 		}
 
@@ -902,7 +902,7 @@ CBaseEntity *CPhysExplosion::FindEntity( CBaseEntity *pEntity, CBaseEntity *pAct
 	if ( m_targetEntityName != NULL_STRING )
 	{
 		// Try an explicit name first
-		CBaseEntity *pTarget = gEntList.FindEntityByName( pEntity, m_targetEntityName, NULL, pActivator, pCaller );
+		CBaseEntity *pTarget = EntityList()->FindEntityByName( pEntity, m_targetEntityName, NULL, pActivator, pCaller );
 		if ( pTarget != NULL )
 			return pTarget;
 
@@ -1323,11 +1323,11 @@ static CBaseEntity *CreateSimplePhysicsObject( CBaseEntity *pEntity, bool create
 	const model_t *model = modelinfo->GetModel( modelindex );
 	if ( model && modelinfo->GetModelType(model) == mod_brush )
 	{
-		pPhysEntity = gEntList.CreateEntityByName( "simple_physics_brush" );
+		pPhysEntity = (CBaseEntity*)EntityList()->CreateEntityByName( "simple_physics_brush" );
 	}
 	else
 	{
-		pPhysEntity = gEntList.CreateEntityByName( "simple_physics_prop" );
+		pPhysEntity = (CBaseEntity*)EntityList()->CreateEntityByName( "simple_physics_prop" );
 	}
 
 	pPhysEntity->KeyValue( "model", STRING(pEntity->GetEngineObject()->GetModelName()) );
@@ -1392,11 +1392,11 @@ void CPhysConvert::InputConvertTarget( inputdata_t &inputdata )
 	m_OnConvert.FireOutput( inputdata.pActivator, this );
 
 	CBaseEntity *entlist[512];
-	CBaseEntity *pSwap = gEntList.FindEntityByName( NULL, m_swapModel, NULL, inputdata.pActivator, inputdata.pCaller );
+	CBaseEntity *pSwap = EntityList()->FindEntityByName( NULL, m_swapModel, NULL, inputdata.pActivator, inputdata.pCaller );
 	CBaseEntity *pEntity = NULL;
 	
 	int count = 0;
-	while ( (pEntity = gEntList.FindEntityByName( pEntity, m_target, NULL, inputdata.pActivator, inputdata.pCaller )) != NULL )
+	while ( (pEntity = EntityList()->FindEntityByName( pEntity, m_target, NULL, inputdata.pActivator, inputdata.pCaller )) != NULL )
 	{
 		entlist[count++] = pEntity;
 		if ( count >= ARRAYSIZE(entlist) )
@@ -1450,7 +1450,7 @@ void CPhysConvert::InputConvertTarget( inputdata_t &inputdata )
 			pEntity->GetEngineObject()->TransferChildren(pPhys->GetEngineObject());
 			pEntity->GetEngineObject()->AddSolidFlags( FSOLID_NOT_SOLID );
 			pEntity->GetEngineObject()->AddEffects( EF_NODRAW );
-			gEntList.DestroyEntity( pEntity );
+			EntityList()->DestroyEntity( pEntity );
 		}
 	}
 }
@@ -1650,7 +1650,7 @@ void CPhysMagnet::VPhysicsCollision( int index, gamevcollisionevent_t *pEvent )
 			else if ( pEvent->pObjects[ otherIndex ]->IsMoveable() )
 			{
 				// Otherwise, we're screwed, so just remove it
-				gEntList.DestroyEntity( pOther );
+				EntityList()->DestroyEntity( pOther );
 			}
 			else
 			{
@@ -1916,7 +1916,7 @@ public:
 			masscenteroverride_t params;
 			params.SnapToPoint( m_target, GetEngineObject()->GetAbsOrigin() );
 			gEntList.PhysSetMassCenterOverride( params );
-			gEntList.DestroyEntity( this );
+			EntityList()->DestroyEntity( this );
 		}
 	}
 };

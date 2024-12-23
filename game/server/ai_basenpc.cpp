@@ -384,13 +384,13 @@ void CPostFrameNavigationHook::EnqueueEntityNavigationQuery( CAI_BaseNPC *pNPC, 
 //-----------------------------------------------------------------------------
 void CAI_BaseNPC::ClearAllSchedules(void)
 {
-	CAI_BaseNPC *npc = gEntList.NextEntByClass( (CAI_BaseNPC *)NULL );
+	CAI_BaseNPC *npc = NextEntByClass( (CAI_BaseNPC *)NULL );
 
 	while (npc)
 	{
 		npc->ClearSchedule( "CAI_BaseNPC::ClearAllSchedules" );
 		npc->GetNavigator()->ClearGoal();
-		npc = gEntList.NextEntByClass(npc);
+		npc = NextEntByClass(npc);
 	}
 }
 
@@ -408,7 +408,7 @@ bool CAI_BaseNPC::Event_Gibbed( const CTakeDamageInfo &info )
 	if ( gibbed )
 	{
 		// don't remove players!
-		gEntList.DestroyEntity( this );
+		EntityList()->DestroyEntity( this );
 		SetThink( NULL ); //We're going away, so don't think anymore.
 	}
 	else
@@ -911,7 +911,7 @@ int CAI_BaseNPC::OnTakeDamage_Dying( const CTakeDamageInfo &info )
 
 			if (m_iHealth < -500)
 			{
-				gEntList.DestroyEntity(this);
+				EntityList()->DestroyEntity(this);
 			}
 		}
 	}
@@ -966,7 +966,7 @@ int CAI_BaseNPC::OnTakeDamage_Dead( const CTakeDamageInfo &info )
 
 			if (m_iHealth < -500)
 			{
-				gEntList.DestroyEntity(this);
+				EntityList()->DestroyEntity(this);
 			}
 		}
 	}
@@ -1369,7 +1369,7 @@ public:
 	{
 		trace_t tr;
 
-		CBaseEntity *pEnt = gEntList.GetBaseEntity( pHandleEntity->GetRefEHandle() );
+		CBaseEntity *pEnt = EntityList()->GetBaseEntityFromHandle( pHandleEntity->GetRefEHandle() );
 
 		// Done to avoid hitting an entity that's both solid & a trigger.
 		if ( pEnt->GetEngineObject()->IsSolid() )
@@ -5879,7 +5879,7 @@ void CAI_BaseNPC::CheckTarget( CBaseEntity *pTarget )
 CAI_BaseNPC *CAI_BaseNPC::CreateCustomTarget( const Vector &vecOrigin, float duration )
 {
 #ifdef HL2_DLL
-	CNPC_Bullseye *pTarget = (CNPC_Bullseye*)gEntList.CreateEntityByName( "npc_bullseye" );
+	CNPC_Bullseye *pTarget = (CNPC_Bullseye*)EntityList()->CreateEntityByName( "npc_bullseye" );
 
 	ASSERT( pTarget != NULL );
 
@@ -6776,7 +6776,7 @@ void CAI_BaseNPC::NPCInit ( void )
 {
 	if (!g_pGameRules->FAllowNPCs())
 	{
-		gEntList.DestroyEntity( this );
+		EntityList()->DestroyEntity( this );
 		return;
 	}
 
@@ -7207,13 +7207,13 @@ void CAI_BaseNPC::AddRelationship( const char *pszRelationship, CBaseEntity *pAc
 		bool bFoundEntity = false;
 
 		// Try to get pointer to an entity of this name
-		CBaseEntity *entity = gEntList.FindEntityByName( NULL, entityString );
+		CBaseEntity *entity = EntityList()->FindEntityByName( NULL, entityString );
 		while( entity )
 		{
 			// make sure you catch all entities of this name.
 			bFoundEntity = true;
 			AddEntityRelationship(entity, disposition, priority );
-			entity = gEntList.FindEntityByName( entity, entityString );
+			entity = EntityList()->FindEntityByName( entity, entityString );
 		}
 
 		if( !bFoundEntity )
@@ -7227,11 +7227,11 @@ void CAI_BaseNPC::AddRelationship( const char *pszRelationship, CBaseEntity *pAc
 			else
 			{
 				// HACKHACK:
-				CBaseEntity *pEntity = gEntList.CanCreateEntityClass( entityString ) ? gEntList.CreateEntityByName( entityString ) : NULL;
+				CBaseEntity *pEntity = gEntList.CanCreateEntityClass( entityString ) ? (CBaseEntity*)EntityList()->CreateEntityByName( entityString ) : NULL;
 				if (pEntity)
 				{
 					AddClassRelationship( pEntity->Classify(), disposition, priority );
-					gEntList.DestroyEntityImmediate(pEntity);
+					EntityList()->DestroyEntityImmediate(pEntity);
 				}
 				else
 				{
@@ -7332,7 +7332,7 @@ void CAI_BaseNPC::StartNPC( void )
 	if ( m_target != NULL_STRING )// this npc has a target
 	{
 		// Find the npc's initial target entity, stash it
-		SetGoalEnt( gEntList.FindEntityByName( NULL, m_target ) );
+		SetGoalEnt( EntityList()->FindEntityByName( NULL, m_target ) );
 
 		if ( !GetGoalEnt() )
 		{
@@ -8486,7 +8486,7 @@ void CAI_BaseNPC::HandleAnimEvent( animevent_t *pEvent )
 				if ( m_iDesiredWeaponState == DESIREDWEAPONSTATE_CHANGING_DESTROY )
 				{
 					// Get rid of it!
-					gEntList.DestroyEntity( pWeapon );
+					EntityList()->DestroyEntity( pWeapon );
 				}
 
 				if ( m_iDesiredWeaponState != DESIREDWEAPONSTATE_IGNORE )
@@ -10003,7 +10003,7 @@ CBaseEntity *CAI_BaseNPC::FindNamedEntity( const char *name, IEntityFindFilter *
 		entity = NULL;
 		for( iCount = 0; iCount < FINDNAMEDENTITY_MAX_ENTITIES; iCount++ )
 		{
-			entity = gEntList.FindEntityByName( entity, name, NULL, NULL, NULL, pFilter );
+			entity = EntityList()->FindEntityByName( entity, name, NULL, NULL, NULL, pFilter );
 			if ( !entity )
 			{
 				break;
@@ -10422,7 +10422,7 @@ CBaseEntity *CAI_BaseNPC::DropItem ( const char *pszItemName, Vector vecPos, QAn
 	{
 		if ( g_pGameRules->IsAllowedToSpawn( pItem ) == false )
 		{
-			gEntList.DestroyEntity( pItem );
+			EntityList()->DestroyEntity( pItem );
 			return NULL;
 		}
 
@@ -10908,7 +10908,7 @@ void CAI_BaseNPC::Activate( void )
 	// Get a handle to my enemy filter entity if there is one.
 	if ( m_iszEnemyFilterName != NULL_STRING )
 	{
-		CBaseEntity *pFilter = gEntList.FindEntityByName( NULL, m_iszEnemyFilterName );
+		CBaseEntity *pFilter = EntityList()->FindEntityByName( NULL, m_iszEnemyFilterName );
 		if ( pFilter != NULL )
 		{
 			m_hEnemyFilter = dynamic_cast<CBaseFilter*>(pFilter);
@@ -10934,7 +10934,7 @@ void CAI_BaseNPC::Precache( void )
 	if (!LoadedSchedules())
 	{
 		DevMsg("ERROR: Rejecting spawn of %s as error in NPC's schedules.\n",GetDebugName());
-		gEntList.DestroyEntity(this);
+		EntityList()->DestroyEntity(this);
 		return;
 	}
 
@@ -11596,7 +11596,7 @@ void CAI_BaseNPC::InputSetRelationship( inputdata_t &inputdata )
 void CAI_BaseNPC::InputSetEnemyFilter( inputdata_t &inputdata )
 {
 	// Get a handle to my enemy filter entity if there is one.
-	CBaseEntity *pFilter = gEntList.FindEntityByName( NULL, inputdata.value.StringID() );
+	CBaseEntity *pFilter = EntityList()->FindEntityByName( NULL, inputdata.value.StringID() );
 	m_hEnemyFilter = dynamic_cast<CBaseFilter*>(pFilter);
 }
 
@@ -11665,7 +11665,7 @@ void CAI_BaseNPC::InputWake( inputdata_t &inputdata )
 	if ( m_target != NULL_STRING )// this npc has a target
 	{
 		// Find the npc's initial target entity, stash it
-		SetGoalEnt( gEntList.FindEntityByName( NULL, m_target ) );
+		SetGoalEnt( EntityList()->FindEntityByName( NULL, m_target ) );
 
 		if ( !GetGoalEnt() )
 		{
@@ -11688,7 +11688,7 @@ void CAI_BaseNPC::InputForgetEntity( inputdata_t &inputdata )
 	if ( g_pDeveloper->GetInt() && pszEntityToForget[strlen( pszEntityToForget ) - 1] == '*' )
 		DevMsg( "InputForgetEntity does not support wildcards\n" );
 
-	CBaseEntity *pEntity = gEntList.FindEntityByName( NULL, pszEntityToForget );
+	CBaseEntity *pEntity = EntityList()->FindEntityByName( NULL, pszEntityToForget );
 	if ( pEntity )
 	{
 		if ( GetEnemy() == pEntity )
@@ -11720,7 +11720,7 @@ void CAI_BaseNPC::InputIgnoreDangerSounds( inputdata_t &inputdata )
 void CAI_BaseNPC::InputUpdateEnemyMemory( inputdata_t &inputdata )
 {
 	const char *pszEnemy = inputdata.value.String();
-	CBaseEntity *pEnemy = gEntList.FindEntityByName( NULL, pszEnemy );
+	CBaseEntity *pEnemy = EntityList()->FindEntityByName( NULL, pszEnemy );
 
 	if( pEnemy )
 	{
@@ -12022,7 +12022,7 @@ bool CAI_BaseNPC::CineCleanup()
 
 	if ( bDestroyCine )
 	{
-		gEntList.DestroyEntity( pOldCine );
+		EntityList()->DestroyEntity( pOldCine );
 	}
 
 	return true;
@@ -12826,7 +12826,7 @@ void CAI_BaseNPC::Break( CBaseEntity *pBreaker )
 	params.defBurstScale = 100;//pDamageInfo ? 0 : 100;
 	PropBreakableCreateAll(GetEngineObject()->GetModelIndex(), pPhysics, params, this, -1, false );
 
-	gEntList.DestroyEntity(this);
+	EntityList()->DestroyEntity(this);
 }
 
 
@@ -13292,7 +13292,7 @@ void CAI_BaseNPC::StartScriptedNPCInteraction( CAI_BaseNPC *pOtherNPC, ScriptedN
 	pInteraction->flNextAttemptTime = gpGlobals->curtime + pInteraction->flDelay + RandomFloat(-2,2);
 
 	// Spawn a scripted sequence for this NPC to play the interaction anim
-   	CAI_ScriptedSequence *pMySequence = (CAI_ScriptedSequence*)gEntList.CreateEntityByName( "scripted_sequence" );
+   	CAI_ScriptedSequence *pMySequence = (CAI_ScriptedSequence*)EntityList()->CreateEntityByName( "scripted_sequence" );
 	pMySequence->KeyValue( "m_iszEntry", pszEntrySequence );
 	pMySequence->KeyValue( "m_iszPlay", pszSequence );
 	pMySequence->KeyValue( "m_iszPostIdle", pszExitSequence );
@@ -13321,7 +13321,7 @@ void CAI_BaseNPC::StartScriptedNPCInteraction( CAI_BaseNPC *pOtherNPC, ScriptedN
 	CAI_ScriptedSequence *pTheirSequence = NULL;
 	if ( pOtherNPC )
 	{
-		pTheirSequence = (CAI_ScriptedSequence*)gEntList.CreateEntityByName( "scripted_sequence" );
+		pTheirSequence = (CAI_ScriptedSequence*)EntityList()->CreateEntityByName( "scripted_sequence" );
 		pTheirSequence->KeyValue( "m_iszEntry", pszEntrySequence );
 		pTheirSequence->KeyValue( "m_iszPlay", pszSequence );
 		pTheirSequence->KeyValue( "m_iszPostIdle", pszExitSequence );

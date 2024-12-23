@@ -456,7 +456,7 @@ static void SyncAnimatingWithPhysics(CBaseAnimating* pAnimating)
 
 CRagdollProp* CBaseAnimating::CreateRagdollProp()
 {
-	CRagdollProp* pRagdoll = (CRagdollProp*)gEntList.CreateEntityByName("prop_ragdoll");
+	CRagdollProp* pRagdoll = (CRagdollProp*)EntityList()->CreateEntityByName("prop_ragdoll");
 	return pRagdoll;
 }
 

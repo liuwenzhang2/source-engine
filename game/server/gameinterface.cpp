@@ -1035,7 +1035,7 @@ public:
 
 	virtual CBaseEntity* CreateNextEntity(const char* pClassname)
 	{
-		CBaseEntity* pRet = gEntList.CreateEntityByName(pClassname);
+		CBaseEntity* pRet = (CBaseEntity*)EntityList()->CreateEntityByName(pClassname);
 
 		CMapEntityRef ref;
 		ref.m_iEdict = -1;
@@ -1045,7 +1045,7 @@ public:
 		{
 			ref.m_iEdict = pRet->entindex();
 			if (pRet->entindex() != -1)
-				ref.m_iSerialNumber = gEntList.GetNetworkSerialNumber(pRet->entindex());
+				ref.m_iSerialNumber = EntityList()->GetNetworkSerialNumber(pRet->entindex());
 		}
 
 		g_MapEntityRefs.AddToTail(ref);
@@ -1206,7 +1206,7 @@ void CServerGameDLL::ServerActivate( IServerEntity *pEdictList, int edictCount, 
 		Msg( "%s", "ERROR: Entity delete queue not empty on level start!\n" );
 	}
 
-	for ( CBaseEntity *pEntity = gEntList.FirstEnt(); pEntity != NULL; pEntity = gEntList.NextEnt(pEntity) )
+	for ( CBaseEntity *pEntity = EntityList()->FirstEnt(); pEntity != NULL; pEntity = EntityList()->NextEnt(pEntity) )
 	{
 		if (pEntity && !pEntity->IsDormant() )
 		{
@@ -1298,7 +1298,7 @@ void CServerGameDLL::GameFrame( bool simulating )
 	if (IsRestoring())
 		return;
 
-	if ( gEntList.IsSimulatingOnAlternateTicks() )
+	if (EntityList()->IsSimulatingOnAlternateTicks() )
 	{
 		// only run simulation on even numbered ticks
 		if ( gpGlobals->tickcount & 1 )
@@ -1420,7 +1420,7 @@ void CServerGameDLL::PreClientUpdate( bool simulating )
 
 		while (1)
 		{
-			pEntity = gEntList.FindEntityByName( pEntity, sv_showhitboxes.GetString() );
+			pEntity = EntityList()->FindEntityByName( pEntity, sv_showhitboxes.GetString() );
 			if ( !pEntity )
 				break;
 
@@ -1434,7 +1434,7 @@ void CServerGameDLL::PreClientUpdate( bool simulating )
 		return;
 	}
 
-	CBaseAnimating *anim = dynamic_cast< CBaseAnimating * >( gEntList.GetBaseEntity( sv_showhitboxes.GetInt() )  );
+	CBaseAnimating *anim = dynamic_cast< CBaseAnimating * >(EntityList()->GetBaseEntity( sv_showhitboxes.GetInt() )  );
 	if ( !anim )
 		return;
 
@@ -1946,7 +1946,7 @@ bool CServerGameDLL::ShouldHideServer( void )
 void CServerGameDLL::InvalidateMdlCache()
 {
 	CBaseAnimating *pAnimating;
-	for ( CBaseEntity *pEntity = gEntList.FirstEnt(); pEntity != NULL; pEntity = gEntList.NextEnt(pEntity) )
+	for ( CBaseEntity *pEntity = EntityList()->FirstEnt(); pEntity != NULL; pEntity = EntityList()->NextEnt(pEntity) )
 	{
 		pAnimating = dynamic_cast<CBaseAnimating *>(pEntity);
 		if ( pAnimating )
@@ -2223,7 +2223,7 @@ void CServerGameDLL::RemoveRecipientsIfNotCloseCaptioning(CRecipientFilter& filt
 	{
 		int playerIndex = filter.GetRecipientIndex(i);
 
-		CBasePlayer* player = static_cast<CBasePlayer*>(gEntList.GetBaseEntity(playerIndex));
+		CBasePlayer* player = static_cast<CBasePlayer*>(EntityList()->GetBaseEntity(playerIndex));
 		if (!player)
 			continue;
 #if !defined( _XBOX )
@@ -2332,7 +2332,7 @@ void CServerGameDLL::InternalEmitCloseCaption(IRecipientFilter& filter, int enti
 			byteflags |= CLOSE_CAPTION_FROMPLAYER;
 		}
 
-		CBaseEntity* pActor = gEntList.GetBaseEntity(entindex);
+		CBaseEntity* pActor = EntityList()->GetBaseEntity(entindex);
 		if (pActor)
 		{
 			char const* pszActorModel = STRING(pActor->GetEngineObject()->GetModelName());
@@ -2405,7 +2405,7 @@ void CServerGameDLL::InternalEmitCloseCaption(IRecipientFilter& filter, int enti
 	bool fromplayer = false;
 	CBaseEntity* ent = NULL;
 #ifdef GAME_DLL
-	ent = gEntList.GetBaseEntity(entindex);
+	ent = EntityList()->GetBaseEntity(entindex);
 #endif // GAME_DLL
 #ifdef CLIENT_DLL
 	ent = CBaseEntity::Instance(entindex);
@@ -2438,7 +2438,7 @@ void CServerGameDLL::EmitCloseCaption(IRecipientFilter& filter, int entindex, ch
 	bool fromplayer = false;
 	CBaseEntity* ent = NULL;
 #ifdef GAME_DLL
-	ent = gEntList.GetBaseEntity(entindex);
+	ent = EntityList()->GetBaseEntity(entindex);
 #endif // GAME_DLL
 #ifdef CLIENT_DLL
 	ent = CBaseEntity::Instance(entindex);
@@ -2808,7 +2808,7 @@ void CServerGameEnts::FreeContainingEntity( int e )
 //CBaseEntity* CServerGameEnts::EdictToBaseEntity( edict_t *pEdict )
 //{
 //	if ( pEdict )
-//		return gEntList.GetBaseEntity( pEdict->m_EdictIndex );
+//		return EntityList()->GetBaseEntity( pEdict->m_EdictIndex );
 //	else
 //		return NULL;
 //}
@@ -2838,7 +2838,7 @@ void CServerGameEnts::CheckTransmit( CCheckTransmitInfo *pInfo, const unsigned s
 	// optimization which would be nice to keep.
 
 	// get recipient player's skybox:
-	CBaseEntity *pRecipientEntity = gEntList.GetBaseEntity( pInfo->m_pClientEnt );
+	CBaseEntity *pRecipientEntity = EntityList()->GetBaseEntity( pInfo->m_pClientEnt );
 
 	Assert( pRecipientEntity && pRecipientEntity->IsPlayer() );
 	if ( !pRecipientEntity )
@@ -2861,7 +2861,7 @@ void CServerGameEnts::CheckTransmit( CCheckTransmitInfo *pInfo, const unsigned s
 	{
 		int iEdict = pEdictIndices[i];
 
-		int nFlags = gEntList.GetBaseEntity(iEdict)->GetTransmitState() & (FL_EDICT_DONTSEND | FL_EDICT_ALWAYS | FL_EDICT_PVSCHECK | FL_EDICT_FULLCHECK);
+		int nFlags = EntityList()->GetBaseEntity(iEdict)->GetTransmitState() & (FL_EDICT_DONTSEND | FL_EDICT_ALWAYS | FL_EDICT_PVSCHECK | FL_EDICT_FULLCHECK);
 
 		// entity needs no transmit
 		if ( nFlags & FL_EDICT_DONTSEND )
@@ -2886,7 +2886,7 @@ void CServerGameEnts::CheckTransmit( CCheckTransmitInfo *pInfo, const unsigned s
 					pInfo->m_pTransmitAlways->Set( iEdict );
 				}
 #endif	
-				CBaseEntity *pEnt = gEntList.GetBaseEntity(iEdict);
+				CBaseEntity *pEnt = EntityList()->GetBaseEntity(iEdict);
 				if ( !pEnt )
 					break;
 
@@ -2901,7 +2901,7 @@ void CServerGameEnts::CheckTransmit( CCheckTransmitInfo *pInfo, const unsigned s
 		}
 
 		// FIXME: Would like to remove all dependencies
-		CBaseEntity *pEnt = ( CBaseEntity * )gEntList.GetBaseEntity(iEdict);
+		CBaseEntity *pEnt = ( CBaseEntity * )EntityList()->GetBaseEntity(iEdict);
 		//Assert( dynamic_cast< CBaseEntity* >( pEdict->GetUnknown() ) == pEnt );
 
 		if ( nFlags == FL_EDICT_FULLCHECK )
@@ -2975,7 +2975,7 @@ void CServerGameEnts::CheckTransmit( CCheckTransmitInfo *pInfo, const unsigned s
 				break;
 			}
 
-			int checkFlags = gEntList.GetBaseEntity(checkIndex)->GetTransmitState() & (FL_EDICT_DONTSEND | FL_EDICT_ALWAYS | FL_EDICT_PVSCHECK | FL_EDICT_FULLCHECK);
+			int checkFlags = EntityList()->GetBaseEntity(checkIndex)->GetTransmitState() & (FL_EDICT_DONTSEND | FL_EDICT_ALWAYS | FL_EDICT_PVSCHECK | FL_EDICT_FULLCHECK);
 			if ( checkFlags & FL_EDICT_DONTSEND )
 				break;
 
@@ -3060,14 +3060,14 @@ void CServerGameClients::ClientActive( int pEdict, bool bLoadGame )
 	if ( gpGlobals->eLoadType != MapLoad_LoadGame )
 	{
 		// notify all entities that the player is now in the game
-		for ( CBaseEntity *pEntity = gEntList.FirstEnt(); pEntity != NULL; pEntity = gEntList.NextEnt(pEntity) )
+		for ( CBaseEntity *pEntity = EntityList()->FirstEnt(); pEntity != NULL; pEntity = EntityList()->NextEnt(pEntity) )
 		{
 			pEntity->PostClientActive();
 		}
 	}
 
 	// Tell the sound controller to check looping sounds
-	CBasePlayer *pPlayer = ( CBasePlayer * )gEntList.GetBaseEntity( pEdict );
+	CBasePlayer *pPlayer = ( CBasePlayer * )EntityList()->GetBaseEntity( pEdict );
 	CSoundEnvelopeController::GetController().CheckLoopingSoundsForPlayer( pPlayer );
 	SceneManager_ClientActive( pPlayer );
 
@@ -3111,7 +3111,7 @@ void CServerGameClients::ClientDisconnect( int pEdict )
 {
 	extern bool	g_fGameOver;
 
-	CBasePlayer *player = ( CBasePlayer * )gEntList.GetBaseEntity( pEdict );
+	CBasePlayer *player = ( CBasePlayer * )EntityList()->GetBaseEntity( pEdict );
 	if ( player )
 	{
 		if ( !g_fGameOver )
@@ -3179,7 +3179,7 @@ void CServerGameClients::ClientPutInServer( int pEntity, const char *playername 
 
 void CServerGameClients::ClientCommand( int pEntity, const CCommand &args )
 {
-	CBasePlayer *pPlayer = ToBasePlayer( gEntList.GetBaseEntity( pEntity ) );
+	CBasePlayer *pPlayer = ToBasePlayer(EntityList()->GetBaseEntity( pEntity ) );
 	::ClientCommand( pPlayer, args );
 }
 
@@ -3192,10 +3192,10 @@ void CServerGameClients::ClientCommand( int pEntity, const CCommand &args )
 void CServerGameClients::ClientSettingsChanged( int pEdict )
 {
 	// Is the client spawned yet?
-	if ( !gEntList.GetBaseEntity(pEdict) )
+	if ( !EntityList()->GetBaseEntity(pEdict) )
 		return;
 
-	CBasePlayer *player = ( CBasePlayer * )gEntList.GetBaseEntity( pEdict );
+	CBasePlayer *player = ( CBasePlayer * )EntityList()->GetBaseEntity( pEdict );
 	
 	if ( !player )
 		return;
@@ -3346,7 +3346,7 @@ void CServerGameClients::ClientSetupVisibility(const IServerEntity *pViewEntity,
 
 	float fovDistanceAdjustFactor = 1;
 
-	CBasePlayer *pPlayer = ( CBasePlayer * )gEntList.GetBaseEntity( pClient );
+	CBasePlayer *pPlayer = ( CBasePlayer * )EntityList()->GetBaseEntity( pClient );
 	if ( pPlayer )
 	{
 		org = pPlayer->EyePosition();
@@ -3454,7 +3454,7 @@ float CServerGameClients::ProcessUsercmds( int player, bf_read *buf, int numcmds
 	Assert( ( totalcmds - numcmds ) >= 0 );
 
 	CBasePlayer *pPlayer = NULL;
-	CBaseEntity *pEnt = gEntList.GetBaseEntity(player);
+	CBaseEntity *pEnt = EntityList()->GetBaseEntity(player);
 	if ( pEnt && pEnt->IsPlayer() )
 	{
 		pPlayer = static_cast< CBasePlayer * >( pEnt );
@@ -3510,7 +3510,7 @@ void CServerGameClients::SetCommandClient( int index )
 
 int	CServerGameClients::GetReplayDelay( int pEdict, int &entity )
 {
-	CBasePlayer *pPlayer = ( CBasePlayer * )gEntList.GetBaseEntity( pEdict );
+	CBasePlayer *pPlayer = ( CBasePlayer * )EntityList()->GetBaseEntity( pEdict );
 
 	if ( !pPlayer )
 		return 0;
@@ -3526,7 +3526,7 @@ int	CServerGameClients::GetReplayDelay( int pEdict, int &entity )
 //-----------------------------------------------------------------------------
 void CServerGameClients::ClientEarPosition( int pEdict, Vector *pEarOrigin )
 {
-	CBasePlayer *pPlayer = ( CBasePlayer * )gEntList.GetBaseEntity( pEdict );
+	CBasePlayer *pPlayer = ( CBasePlayer * )EntityList()->GetBaseEntity( pEdict );
 	if (pPlayer)
 	{
 		*pEarOrigin = pPlayer->EarPosition();
@@ -3547,10 +3547,10 @@ void CServerGameClients::ClientEarPosition( int pEdict, Vector *pEarOrigin )
 CPlayerState *CServerGameClients::GetPlayerState( int player )
 {
 	// Is the client spawned yet?
-	if ( !player || !gEntList.GetBaseEntity(player) )
+	if ( !player || !EntityList()->GetBaseEntity(player) )
 		return NULL;
 
-	CBasePlayer *pBasePlayer = ( CBasePlayer * )gEntList.GetBaseEntity( player );
+	CBasePlayer *pBasePlayer = ( CBasePlayer * )EntityList()->GetBaseEntity( player );
 	if ( !pBasePlayer )
 		return NULL;
 

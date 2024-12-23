@@ -180,7 +180,7 @@ void CBaseProp::Spawn( void )
 	if (!szModel || !*szModel)
 	{
 		Warning( "prop at %.0f %.0f %0.f missing modelname\n", GetEngineObject()->GetAbsOrigin().x, GetEngineObject()->GetAbsOrigin().y, GetEngineObject()->GetAbsOrigin().z );
-		gEntList.DestroyEntity( this );
+		EntityList()->DestroyEntity( this );
 		return;
 	}
 
@@ -195,7 +195,7 @@ void CBaseProp::Spawn( void )
 		if ( iResult == PARSE_FAILED_BAD_DATA )
 		{
 			DevWarning( "%s at %.0f %.0f %0.f uses model %s, which has an invalid prop_data type. DELETED.\n", GetClassname(), GetEngineObject()->GetAbsOrigin().x, GetEngineObject()->GetAbsOrigin().y, GetEngineObject()->GetAbsOrigin().z, szModel );
-			gEntList.DestroyEntity( this );
+			EntityList()->DestroyEntity( this );
 			return;
 		}
 		else if ( iResult == PARSE_FAILED_NO_DATA )
@@ -204,7 +204,7 @@ void CBaseProp::Spawn( void )
 			if ( FClassnameIs( this, "prop_physics" ) )
 			{
 				DevWarning( "%s at %.0f %.0f %0.f uses model %s, which has no propdata which means it must be used on a prop_static. DELETED.\n", GetClassname(), GetEngineObject()->GetAbsOrigin().x, GetEngineObject()->GetAbsOrigin().y, GetEngineObject()->GetAbsOrigin().z, szModel );
-				gEntList.DestroyEntity( this );
+				EntityList()->DestroyEntity( this );
 				return;
 			}
 		}
@@ -214,7 +214,7 @@ void CBaseProp::Spawn( void )
 			if ( !dynamic_cast<CPhysicsProp*>(this) )
 			{
 				DevWarning( "%s at %.0f %.0f %0.f uses model %s, which has propdata which means that it be used on a prop_physics. DELETED.\n", GetClassname(), GetEngineObject()->GetAbsOrigin().x, GetEngineObject()->GetAbsOrigin().y, GetEngineObject()->GetAbsOrigin().z, szModel );
-				gEntList.DestroyEntity( this );
+				EntityList()->DestroyEntity( this );
 				return;
 			}
 		}
@@ -422,7 +422,7 @@ void CBreakableProp::ClearEnableMotionPosition()
 	if ( pFixup )
 	{
 		pFixup->GetEngineObject()->UnlinkFromParent();
-		gEntList.DestroyEntity( pFixup );
+		EntityList()->DestroyEntity( pFixup );
 	}
 }
 
@@ -631,7 +631,7 @@ void CPhysicsProp::HandleAnyCollisionInteractions( int index, gamevcollisioneven
 			{
 				Vector vecVelocity = pEvent->preVelocity[index] * pObj->GetMass();
 				gEntList.PhysCallbackImpulse( pObj, vecVelocity, vec3_origin );
-				gEntList.DestroyEntity( pNPC );
+				EntityList()->DestroyEntity( pNPC );
 				GetEngineObject()->AddSpawnFlags( SF_PHYSPROP_HAS_ATTACHED_RAGDOLLS );
 			}
 		}
@@ -715,7 +715,7 @@ void CBreakableProp::HandleInteractionStick( int index, gamevcollisionevent_t *p
 void CC_Prop_Debug( void )
 {
 	// Toggle the prop debug bit on all props
-	for ( CBaseEntity *pEntity = gEntList.FirstEnt(); pEntity != NULL; pEntity = gEntList.NextEnt(pEntity) )
+	for ( CBaseEntity *pEntity = EntityList()->FirstEnt(); pEntity != NULL; pEntity = EntityList()->NextEnt(pEntity) )
 	{
 		CBaseProp *pProp = dynamic_cast<CBaseProp*>(pEntity);
 		if ( pProp )
@@ -1756,7 +1756,7 @@ void CBreakableProp::Break( CBaseEntity *pBreaker, const CTakeDamageInfo &info )
 		MessageEnd();
 
 #ifndef HL2MP
-		gEntList.DestroyEntity( this );
+		EntityList()->DestroyEntity( this );
 #endif
 		return;
 	}
@@ -1822,7 +1822,7 @@ void CBreakableProp::Break( CBaseEntity *pBreaker, const CTakeDamageInfo &info )
 	}
 
 #ifndef HL2MP
-	gEntList.DestroyEntity( this );
+	EntityList()->DestroyEntity( this );
 #endif
 }
 
@@ -2424,7 +2424,7 @@ void COrnamentProp::InputSetAttached( inputdata_t &inputdata )
 void COrnamentProp::AttachTo( const char *pAttachName, CBaseEntity *pActivator, CBaseEntity *pCaller )
 {
 	// find and notify the new parent
-	CBaseEntity *pAttach = gEntList.FindEntityByName( NULL, pAttachName, NULL, pActivator, pCaller );
+	CBaseEntity *pAttach = EntityList()->FindEntityByName( NULL, pAttachName, NULL, pActivator, pCaller );
 	if ( pAttach )
 	{
 		GetEngineObject()->RemoveEffects( EF_NODRAW );
@@ -3083,7 +3083,7 @@ void CPhysicsProp::VPhysicsCollision( int index, gamevcollisionevent_t *pEvent )
 			if ( !pHitEntity )
 			{
 				// hit world
-				pHitEntity = gEntList.GetBaseEntity( 0 );
+				pHitEntity = EntityList()->GetBaseEntity( 0 );
 			}
 			Vector damagePos;
 			pEvent->pInternalData->GetContactPoint( damagePos );
@@ -3399,7 +3399,7 @@ CBaseEntity *BreakModelCreateSingle( CBaseEntity *pOwner, breakmodel_t *pModel, 
 		else
 		{
 			// failed to create a physics object
-			gEntList.DestroyEntity( pEntity );
+			EntityList()->DestroyEntity( pEntity );
 			return NULL;
 		}
 	}
@@ -3532,7 +3532,7 @@ bool PropBreakableCapEdictsOnCreateAll(int modelindex, IPhysicsObject *pPhysics,
 		}
 	}
 
-	return ( !numToCreate || ( (gpGlobals->maxClients + 1 + gEntList.NumberOfEdicts()- gEntList.NumberOfReservedEdicts()) + numToCreate + BREATHING_ROOM < MAX_EDICTS));
+	return ( !numToCreate || ( (gpGlobals->maxClients + 1 + EntityList()->NumberOfEdicts()- EntityList()->NumberOfReservedEdicts()) + numToCreate + BREATHING_ROOM < MAX_EDICTS));
 }
 
 
@@ -3735,7 +3735,7 @@ void CBasePropDoor::Activate( void )
 			}
 		}
 
-		while ( ( pTarget = gEntList.FindEntityByName( pTarget, iszSearchName ) ) != NULL )
+		while ( ( pTarget = EntityList()->FindEntityByName( pTarget, iszSearchName ) ) != NULL )
 		{
 			if ( pTarget != this )
 			{
@@ -3880,7 +3880,7 @@ void CBasePropDoor::UpdateAreaPortals(bool isOpen)
 		return;
 	
 	CBaseEntity *pPortal = NULL;
-	while ((pPortal = gEntList.FindEntityByClassname(pPortal, "func_areaportal")) != NULL)
+	while ((pPortal = EntityList()->FindEntityByClassname(pPortal, "func_areaportal")) != NULL)
 	{
 		if (pPortal->HasTarget(name))
 		{
@@ -4015,7 +4015,7 @@ void CBasePropDoor::InputOpen(inputdata_t &inputdata)
 //-----------------------------------------------------------------------------
 void CBasePropDoor::InputOpenAwayFrom(inputdata_t &inputdata)
 {
-	CBaseEntity *pOpenAwayFrom = gEntList.FindEntityByName( NULL, inputdata.value.String(), NULL, inputdata.pActivator, inputdata.pCaller );
+	CBaseEntity *pOpenAwayFrom = EntityList()->FindEntityByName( NULL, inputdata.value.String(), NULL, inputdata.pActivator, inputdata.pCaller );
 	OpenIfUnlocked(inputdata.pActivator, pOpenAwayFrom);
 }
 
@@ -4493,7 +4493,7 @@ void CBasePropDoor::Blocked(CBaseEntity *pOther)
 //		CBaseEntity pTarget = NULL;
 //		for (;;)
 //		{
-//			pTarget = gEntList.FindEntityByName(pTarget, GetEntityName() );
+//			pTarget = EntityList()->FindEntityByName(pTarget, GetEntityName() );
 //
 //			if (pTarget != this)
 //			{
@@ -4855,7 +4855,7 @@ CPropDoorRotating::~CPropDoorRotating( void )
 	// Remove our door blocker entity
 	if ( m_hDoorBlocker != NULL )
 	{
-		gEntList.DestroyEntity( m_hDoorBlocker );
+		EntityList()->DestroyEntity( m_hDoorBlocker );
 	}
 }
 
@@ -5015,7 +5015,7 @@ void CPropDoorRotating::OnDoorClosed( void )
 	if ( m_hDoorBlocker != NULL )
 	{
 		// Destroy the blocker that was preventing NPCs from getting in our way.
-		gEntList.DestroyEntity( m_hDoorBlocker );
+		EntityList()->DestroyEntity( m_hDoorBlocker );
 		
 		if ( g_debug_doors.GetBool() )
 		{
@@ -5314,7 +5314,7 @@ void CPropDoorRotating::BeginOpening(CBaseEntity *pOpenAwayFrom)
 
 	if ( m_hDoorBlocker != NULL )
 	{
-		gEntList.DestroyEntity( m_hDoorBlocker );
+		EntityList()->DestroyEntity( m_hDoorBlocker );
 	}
 
 	// Create a blocking entity to keep random entities out of our movement path
@@ -5662,7 +5662,7 @@ class CPhysicsPropMultiplayer : public CPhysicsProp, public IMultiplayerPhysics
 			}
 			else
 			{
-				gEntList.DestroyEntity( this );
+				EntityList()->DestroyEntity( this );
 				return;
 			}
 		}
@@ -5683,7 +5683,7 @@ class CPhysicsPropMultiplayer : public CPhysicsProp, public IMultiplayerPhysics
 			else
 			{
 				// don't spawn clientside props on server
-				gEntList.DestroyEntity( this );
+				EntityList()->DestroyEntity( this );
 				return;
 			}
 			
@@ -5837,7 +5837,7 @@ void CPhysicsPropRespawnable::Event_Killed( const CTakeDamageInfo &info )
 
 	if ( IsOnFire() || IsDissolving() )
 	{
-		gEntList.DestroyEntity( GetEffectEntity() );
+		EntityList()->DestroyEntity( GetEffectEntity() );
 	}
 
 	Teleport( &m_vOriginalSpawnOrigin, &m_vOriginalSpawnAngles, NULL );
@@ -5920,7 +5920,7 @@ void CC_Prop_Dynamic_Create( const CCommand &args )
 	MatrixToAngles( entToWorld, angles );
 
 	// Try to create entity
-	CDynamicProp *pProp = dynamic_cast< CDynamicProp * >(gEntList.CreateEntityByName( "dynamic_prop" ) );
+	CDynamicProp *pProp = dynamic_cast< CDynamicProp * >(EntityList()->CreateEntityByName( "dynamic_prop" ) );
 	if ( pProp )
 	{
 		char buf[512];
@@ -6004,7 +6004,7 @@ CPhysicsProp* CreatePhysicsProp( const char *pModelName, const Vector &vTraceSta
 	engine->SetAllowPrecache( true );//CBaseEntity::
 				  
 	// Try to create entity
-	CPhysicsProp *pProp = dynamic_cast< CPhysicsProp * >(gEntList.CreateEntityByName( pClassName ) );
+	CPhysicsProp *pProp = dynamic_cast< CPhysicsProp * >(EntityList()->CreateEntityByName( pClassName ) );
 	if ( pProp )
 	{
 		char buf[512];

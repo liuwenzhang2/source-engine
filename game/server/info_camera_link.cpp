@@ -96,13 +96,13 @@ void CInfoCameraLink::Activate()
 
 	if ( !m_hTargetEntity )
 	{
-		m_hTargetEntity = gEntList.FindEntityByName( NULL, STRING(m_target) );
+		m_hTargetEntity = EntityList()->FindEntityByName( NULL, STRING(m_target) );
 	}
 }
 
 void CInfoCameraLink::SetCameraByName(const char *szName)
 {
-	CBaseEntity *pBaseEnt = gEntList.FindEntityByName( NULL, szName );
+	CBaseEntity *pBaseEnt = EntityList()->FindEntityByName( NULL, szName );
 	if( pBaseEnt )
 	{
 		m_hCamera = dynamic_cast<CPointCamera *>( pBaseEnt );
@@ -129,7 +129,7 @@ void CInfoCameraLink::InputSetCamera(inputdata_t &inputdata)
 //-----------------------------------------------------------------------------
 CBaseEntity *CreateInfoCameraLink( CBaseEntity *pTarget, CPointCamera *pCamera )
 {
-	CInfoCameraLink *pInfoCameraLink = (CInfoCameraLink*)gEntList.CreateEntityByName( "info_camera_link" );
+	CInfoCameraLink *pInfoCameraLink = (CInfoCameraLink*)EntityList()->CreateEntityByName( "info_camera_link" );
 	if ( !pInfoCameraLink )
 		return NULL;
 
@@ -158,7 +158,7 @@ void PointCameraSetupVisibility( CBaseEntity *pPlayer, int area, unsigned char *
 		CBaseEntity *pTargetEnt = g_InfoCameraLinkList[i]->m_hTargetEntity;
 		if ( !pTargetEnt )
 		{
-			gEntList.DestroyEntity( g_InfoCameraLinkList[i] );
+			EntityList()->DestroyEntity( g_InfoCameraLinkList[i] );
 			continue;
 		}
 

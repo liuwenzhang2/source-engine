@@ -1049,7 +1049,7 @@ bool IsPortalOverlappingOtherPortals( const IEnginePortalServer *pIgnorePortal, 
 					if ( bFizzle )
 					{
 						//pTempPortal->DoFizzleEffect( PORTAL_FIZZLE_KILLED, false );
-						gEntList.DestroyEntity(pTempPortal->AsEngineObject()->GetOuter());
+						EntityList()->DestroyEntity(pTempPortal->AsEngineObject()->GetOuter());
 						bOverlappedOtherPortal = true;
 					}
 					else

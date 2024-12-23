@@ -79,7 +79,7 @@ void CAlyxEmpEffect::SetTargetEntity( const char *szEntityName )
 	CBaseEntity *pTargetEnt = NULL;
 	if ( szEntityName && szEntityName[0] )
 	{
-		pTargetEnt = gEntList.FindEntityByName( NULL, szEntityName );
+		pTargetEnt = EntityList()->FindEntityByName( NULL, szEntityName );
 
 		if ( pTargetEnt == NULL )
 		{
@@ -275,7 +275,7 @@ void CAlyxEmpEffect::Stop( float flDuration )
 
 	if ( m_hBeam != NULL )
 	{
-		gEntList.DestroyEntity( m_hBeam );
+		EntityList()->DestroyEntity( m_hBeam );
 		m_hBeam = NULL;
 	}
 

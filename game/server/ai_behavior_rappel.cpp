@@ -89,7 +89,7 @@ void CRopeAnchor::FallThink()
 //---------------------------------------------------------
 void CRopeAnchor::RemoveThink()
 {
-	gEntList.DestroyEntity( m_hRope );
+	EntityList()->DestroyEntity( m_hRope );
 	SetThink( &CRopeAnchor::SUB_Remove );
 	GetEngineObject()->SetNextThink( gpGlobals->curtime );
 }
@@ -365,10 +365,10 @@ void CAI_RappelBehavior::CutZipline()
 {
 	if( m_hLine )
 	{
-		gEntList.DestroyEntity( m_hLine );
+		EntityList()->DestroyEntity( m_hLine );
 	}
 
-	CBaseEntity *pAnchor = gEntList.CreateEntityByName( "rope_anchor" );
+	CBaseEntity *pAnchor = (CBaseEntity*)EntityList()->CreateEntityByName( "rope_anchor" );
 	pAnchor->SetOwnerEntity( GetOuter() ); // Boy, this is a hack!!
 	pAnchor->GetEngineObject()->SetAbsOrigin( m_vecRopeAnchor );
 	pAnchor->Spawn();

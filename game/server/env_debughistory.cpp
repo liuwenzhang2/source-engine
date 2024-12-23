@@ -58,11 +58,11 @@ void CDebugHistory::Spawn()
 	BaseClass::Spawn();
 
 #ifdef DISABLE_DEBUG_HISTORY
-	gEntList.DestroyEntity( this );
+	EntityList()->DestroyEntity( this );
 #else
 	if ( g_pGameRules && g_pGameRules->IsMultiplayer() )
 	{
-		gEntList.DestroyEntity( this );
+		EntityList()->DestroyEntity( this );
 	}
 	else
 	{
@@ -274,14 +274,14 @@ CDebugHistory *GetDebugHistory()
 
 	if ( s_DebugHistory == NULL )
 	{
-		CBaseEntity *pEnt = gEntList.FindEntityByClassname( NULL, "env_debughistory" );
+		CBaseEntity *pEnt = EntityList()->FindEntityByClassname( NULL, "env_debughistory" );
 		if ( pEnt )
 		{
 			s_DebugHistory = dynamic_cast<CDebugHistory*>(pEnt);
 		}
 		else
 		{
-			s_DebugHistory = ( CDebugHistory * )gEntList.CreateEntityByName( "env_debughistory" );
+			s_DebugHistory = ( CDebugHistory * )EntityList()->CreateEntityByName( "env_debughistory" );
 			if ( s_DebugHistory )
 			{
 				s_DebugHistory->Spawn();

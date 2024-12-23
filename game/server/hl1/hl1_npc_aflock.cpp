@@ -193,7 +193,7 @@ void CNPC_FlockingFlyerFlock::SpawnFlock( void )
 
 	for ( iCount = 0 ; iCount < m_cFlockSize ; iCount++ )
 	{
-		pBoid = (CNPC_FlockingFlyer*)gEntList.CreateEntityByName( "monster_flyer" );
+		pBoid = (CNPC_FlockingFlyer*)EntityList()->CreateEntityByName( "monster_flyer" );
 		
 		if ( !pLeader ) 
 		{
@@ -843,7 +843,7 @@ void CNPC_FlockingFlyer::FallHack( void )
 {
 	if (GetEngineObject()->GetFlags() & FL_ONGROUND )
 	{
-		CBaseEntity *groundentity = gEntList.GetBaseEntity(GetEngineObject()->GetGroundEntity()->GetOuter()->entindex());
+		CBaseEntity *groundentity = EntityList()->GetBaseEntity(GetEngineObject()->GetGroundEntity()->entindex());
 
 		if ( !FClassnameIs ( groundentity, "worldspawn" ) )
 		{

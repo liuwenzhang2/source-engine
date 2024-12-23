@@ -305,7 +305,7 @@ bool CNPC_BaseZombie::FindNearestPhysicsObject( int iMaxMass )
 
 		virtual IterationRetval_t EnumElement( IHandleEntity *pHandleEntity )
 		{
-			CBaseEntity *pEntity = gEntList.GetBaseEntity( pHandleEntity->GetRefEHandle() );
+			CBaseEntity *pEntity = EntityList()->GetBaseEntityFromHandle( pHandleEntity->GetRefEHandle() );
 			if ( pEntity && 
 				 pEntity->GetEngineObject()->VPhysicsGetObject() &&
 				 pEntity->GetEngineObject()->VPhysicsGetObject()->GetMass() <= m_iMaxMass &&
@@ -2443,7 +2443,7 @@ void CNPC_BaseZombie::ReleaseHeadcrab( const Vector &vecOrigin, const Vector &ve
 
 			if( !HeadcrabFits(pAnimatingGib) )
 			{
-				gEntList.DestroyEntity(pGib);
+				EntityList()->DestroyEntity(pGib);
 				return;
 			}
 
@@ -2470,7 +2470,7 @@ void CNPC_BaseZombie::ReleaseHeadcrab( const Vector &vecOrigin, const Vector &ve
 	}
 	else
 	{
-		pCrab = (CAI_BaseNPC*)gEntList.CreateEntityByName( GetHeadcrabClassname() );
+		pCrab = (CAI_BaseNPC*)EntityList()->CreateEntityByName( GetHeadcrabClassname() );
 
 		if ( !pCrab )
 		{
@@ -2512,7 +2512,7 @@ void CNPC_BaseZombie::ReleaseHeadcrab( const Vector &vecOrigin, const Vector &ve
 
 		if( !HeadcrabFits(pCrab) )
 		{
-			gEntList.DestroyEntity(pCrab);
+			EntityList()->DestroyEntity(pCrab);
 			return;
 		}
 

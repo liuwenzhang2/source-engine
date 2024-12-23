@@ -541,7 +541,7 @@ CPortal_Dinosaur *CSpawnDinosaurHack::SpawnDinosaur( radiolocs& loc )
 		Msg( "Dinosaur found with zero angles and origin. Replacing existing radio.\n" );
 #endif
 		// Find existing Dinosaur, kill it and spawn at its position
-		CPhysicsProp *pOldDinosaur	= (CPhysicsProp*)gEntList.FindEntityByClassname( NULL, "prop_physics" );
+		CPhysicsProp *pOldDinosaur	= (CPhysicsProp*)EntityList()->FindEntityByClassname( NULL, "prop_physics" );
 		while ( pOldDinosaur )
 		{
 			if ( V_strcmp( STRING( pOldDinosaur->GetEngineObject()->GetModelName() ), RADIO_MODEL_NAME ) == 0 )
@@ -549,7 +549,7 @@ CPortal_Dinosaur *CSpawnDinosaurHack::SpawnDinosaur( radiolocs& loc )
 				vSpawnPos = pOldDinosaur->GetEngineObject()->GetAbsOrigin();
 				vSpawnAng = pOldDinosaur->GetEngineObject()->GetAbsAngles();
 
-				gEntList.DestroyEntity( pOldDinosaur );
+				EntityList()->DestroyEntity( pOldDinosaur );
 
 #if defined ( RADIO_DEBUG_SERVER )
 				Msg( "Found Dinosaur exiting in level, replacing with %f, %f %f and %f %f %f.\n", XYZ(vSpawnPos), XYZ(vSpawnAng) );
@@ -557,13 +557,13 @@ CPortal_Dinosaur *CSpawnDinosaurHack::SpawnDinosaur( radiolocs& loc )
 				break;
 			}
 
-			pOldDinosaur = (CPhysicsProp*)gEntList.FindEntityByClassname( pOldDinosaur, "prop_physics" );
+			pOldDinosaur = (CPhysicsProp*)EntityList()->FindEntityByClassname( pOldDinosaur, "prop_physics" );
 		}
 	}
 
 	Assert( vSpawnPos != vec3_origin );
 
-	CPortal_Dinosaur *pDinosaur = (CPortal_Dinosaur*)gEntList.CreateEntityByName( "updateitem2" );
+	CPortal_Dinosaur *pDinosaur = (CPortal_Dinosaur*)EntityList()->CreateEntityByName( "updateitem2" );
 	Assert ( pDinosaur );
 	if ( pDinosaur )
 	{
@@ -577,7 +577,7 @@ CPortal_Dinosaur *CSpawnDinosaurHack::SpawnDinosaur( radiolocs& loc )
 
 CDinosaurSignal *CSpawnDinosaurHack::SpawnSignal( radiolocs& loc )
 {
-	CDinosaurSignal *pSignal = (CDinosaurSignal*)gEntList.CreateEntityByName( "updateitem1" );
+	CDinosaurSignal *pSignal = (CDinosaurSignal*)EntityList()->CreateEntityByName( "updateitem1" );
 	Assert ( pSignal );
 	if ( pSignal )
 	{
@@ -605,7 +605,7 @@ void CSpawnDinosaurHack::ApplyMapSpecificHacks()
 {
 	if ( V_strcmp( STRING(gpGlobals->mapname), "testchmb_a_02" ) == 0 )
 	{
-		CBaseEntity *pFilter = gEntList.CreateEntityByName( "filter_activator_name" );
+		CBaseEntity *pFilter = (CBaseEntity*)EntityList()->CreateEntityByName( "filter_activator_name" );
 		Assert( pFilter );
 		if ( pFilter )
 		{

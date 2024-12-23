@@ -108,7 +108,7 @@ void CTriggerWeaponDissolve::Activate( void )
 
 	CBaseEntity *pEntity = NULL;
 
-	while ( ( pEntity = gEntList.FindEntityByName( pEntity, m_strEmitterName ) ) != NULL )
+	while ( ( pEntity = EntityList()->FindEntityByName( pEntity, m_strEmitterName ) ) != NULL )
 	{
 		m_pConduitPoints.AddToTail( pEntity );
 	}
@@ -354,7 +354,7 @@ void CTriggerWeaponStrip::StartTouch(CBaseEntity *pOther)
 				continue;
 
 			pCharacter->Weapon_Drop( pWeapon );
-			gEntList.DestroyEntity( pWeapon );
+			EntityList()->DestroyEntity( pWeapon );
 		}
 		return;
 	}
@@ -366,7 +366,7 @@ void CTriggerWeaponStrip::StartTouch(CBaseEntity *pOther)
 		if ( pBugbait )
 		{
 			pCharacter->Weapon_Drop( pBugbait );
-			gEntList.DestroyEntity( pBugbait );
+			EntityList()->DestroyEntity( pBugbait );
 		}
 
 		pCharacter->Weapon_DropAll( true );
@@ -573,7 +573,7 @@ void CWateryDeathLeech::LeechThink( void )
 
 		if ( m_clrRender->a == 0 )
 		{
-			gEntList.DestroyEntity(this);
+			EntityList()->DestroyEntity(this);
 		}
 		else if ( m_clrRender->a == 255 )
 		{
@@ -684,7 +684,7 @@ void CTriggerWateryDeath::SpawnLeeches( CBaseEntity *pOther )
 	
 	for ( int i = 0; i < iMaxLeeches; i++ )
 	{
-		CWateryDeathLeech *pLeech = (CWateryDeathLeech*)gEntList.CreateEntityByName( "ent_watery_leech" );
+		CWateryDeathLeech *pLeech = (CWateryDeathLeech*)EntityList()->CreateEntityByName( "ent_watery_leech" );
 
 		if ( pLeech )
 		{

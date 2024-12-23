@@ -478,7 +478,7 @@ const Vector &CBeam::GetAbsStartPos( void ) const
 {
 	if ( GetType() == BEAM_ENTS && GetStartEntity() )
 	{
-		CBaseEntity* ent =  (CBaseEntity*)gEntList.GetServerEntity( GetStartEntity() );
+		CBaseEntity* ent =  EntityList()->GetBaseEntity( GetStartEntity() );
 		if ( !ent )
 		{
 			return GetEngineObject()->GetAbsOrigin();
@@ -493,7 +493,7 @@ const Vector &CBeam::GetAbsEndPos( void ) const
 {
 	if ( GetType() != BEAM_POINTS && GetType() != BEAM_HOSE && GetEndEntity() ) 
 	{
-		CBaseEntity *ent =  (CBaseEntity*)gEntList.GetServerEntity( GetEndEntity() );
+		CBaseEntity *ent =  EntityList()->GetBaseEntity( GetEndEntity() );
 		if ( ent )
 			return ent->GetEngineObject()->GetAbsOrigin();
 	}
@@ -547,7 +547,7 @@ CBeam *CBeam::BeamCreate( const char *pSpriteName, float width )
 {
 	// Create a new entity with CBeam private data
 #ifdef GAME_DLL
-	CBeam* pBeam = (CBeam*)gEntList.CreateEntityByName("beam");
+	CBeam* pBeam = (CBeam*)EntityList()->CreateEntityByName("beam");
 	pBeam->BeamInit(pSpriteName, width);
 	return pBeam;
 #endif // GAME_DLL
@@ -737,7 +737,7 @@ CBaseEntity *CBeam::RandomTargetname( const char *szName )
 
 	CBaseEntity *pEntity = NULL;
 	CBaseEntity *pNewEntity = NULL;
-	while ((pNewEntity = gEntList.FindEntityByName( pNewEntity, szName )) != NULL)
+	while ((pNewEntity = EntityList()->FindEntityByName( pNewEntity, szName )) != NULL)
 	{
 		total++;
 		if (random->RandomInt(0,total-1) < 1)

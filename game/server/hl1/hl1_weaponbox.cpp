@@ -124,7 +124,7 @@ void CWeaponBox::BoxTouch( CBaseEntity *pOther )
 	SetTouch(NULL);
 	if ( g_pGameRules->ItemShouldRespawn( this ) == GR_ITEM_RESPAWN_NO )
 	{
-		gEntList.DestroyEntity( this );
+		EntityList()->DestroyEntity( this );
 	}
 }
 

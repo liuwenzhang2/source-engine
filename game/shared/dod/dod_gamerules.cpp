@@ -223,7 +223,7 @@ static CDODViewVectors g_DODViewVectors(
 		// remove all ents in m_SpawnedEntities
 		for ( int i = 0; i < m_hSpawnedEntities.Count(); i++ )
 		{
-			gEntList.DestroyEntity( m_hSpawnedEntities[i] );
+			EntityList()->DestroyEntity( m_hSpawnedEntities[i] );
 		}
 
 		// delete the items from our list
@@ -253,7 +253,7 @@ static CDODViewVectors g_DODViewVectors(
 				if ( CanLoadEntityFromEntText( pNodeName ) )
 				{
 					// Spawn the entity
-					CBaseEntity *pNode = gEntList.CreateEntityByName( pNodeName );
+					CBaseEntity *pNode = (CBaseEntity*)EntityList()->CreateEntityByName( pNodeName );
 					if ( pNode )
 					{
 						ParseEntKVBlock( pNode, pkvNode );
@@ -1710,7 +1710,7 @@ static CDODViewVectors g_DODViewVectors(
 	void TestSpawnPointType( const char *pEntClassName )
 	{
 		// Find the next spawn spot.
-		CBaseEntity *pSpot = gEntList.FindEntityByClassname( NULL, pEntClassName );
+		CBaseEntity *pSpot = EntityList()->FindEntityByClassname( NULL, pEntClassName );
 
 		while( pSpot )
 		{
@@ -1739,7 +1739,7 @@ static CDODViewVectors g_DODViewVectors(
 			}
 
 			// increment pSpot
-			pSpot = gEntList.FindEntityByClassname( pSpot, pEntClassName );
+			pSpot = EntityList()->FindEntityByClassname( pSpot, pEntClassName );
 		}
 	}
 
@@ -2426,7 +2426,7 @@ const CDODViewVectors *CDODGameRules::GetDODViewVectors() const
 		int i;
 		for ( i = 0; i < 2; i++ )	// Unassigned and Spectators
 		{
-			CTeam *pTeam = static_cast<CTeam*>(gEntList.CreateEntityByName( "dod_team_manager" ));
+			CTeam *pTeam = static_cast<CTeam*>(EntityList()->CreateEntityByName( "dod_team_manager" ));
 			pTeam->Init( sTeamNames[i], i );
 
 			g_Teams.AddToTail( pTeam );
@@ -2435,12 +2435,12 @@ const CDODViewVectors *CDODGameRules::GetDODViewVectors() const
 		// clear the player class data
 		ResetFilePlayerClassInfoDatabase();
 
-		CTeam *pAllies = static_cast<CTeam*>(gEntList.CreateEntityByName( "dod_team_allies" ));
+		CTeam *pAllies = static_cast<CTeam*>(EntityList()->CreateEntityByName( "dod_team_allies" ));
 		Assert( pAllies );
 		pAllies->Init( sTeamNames[TEAM_ALLIES], TEAM_ALLIES );
 		g_Teams.AddToTail( pAllies );
 
-		CTeam *pAxis = static_cast<CTeam*>(gEntList.CreateEntityByName( "dod_team_axis" ));
+		CTeam *pAxis = static_cast<CTeam*>(EntityList()->CreateEntityByName( "dod_team_axis" ));
 		Assert( pAxis );
 		pAxis->Init( sTeamNames[TEAM_AXIS], TEAM_AXIS );
 		g_Teams.AddToTail( pAxis );
@@ -2552,7 +2552,7 @@ const CDODViewVectors *CDODGameRules::GetDODViewVectors() const
 		m_iLastAxisCapEvent = CAP_EVENT_NONE;
 
 		//find all the control points, init the timer
-		CBaseEntity *pEnt =	gEntList.FindEntityByClassname( NULL, "dod_control_point_master" );
+		CBaseEntity *pEnt =	EntityList()->FindEntityByClassname( NULL, "dod_control_point_master" );
 
 		if( !pEnt )
 		{
@@ -2588,7 +2588,7 @@ const CDODViewVectors *CDODGameRules::GetDODViewVectors() const
 					// Timer starts paused
 					if ( !m_pRoundTimer.Get() )
 					{
-						m_pRoundTimer = ( CDODRoundTimer *)gEntList.CreateEntityByName( "dod_round_timer" );
+						m_pRoundTimer = ( CDODRoundTimer *)EntityList()->CreateEntityByName( "dod_round_timer" );
 					}
 					
 					Assert( m_pRoundTimer );
@@ -2604,24 +2604,24 @@ const CDODViewVectors *CDODGameRules::GetDODViewVectors() const
 				}
 			}
 
-			pEnt = gEntList.FindEntityByClassname( pEnt, "dod_control_point_master" );
+			pEnt = EntityList()->FindEntityByClassname( pEnt, "dod_control_point_master" );
 		}
 
 		if ( bFoundTimer == false )
 		{
 			// No masters are active that require the round timer, destroy it
-			gEntList.DestroyEntity( m_pRoundTimer.Get() );
+			EntityList()->DestroyEntity( m_pRoundTimer.Get() );
 			m_pRoundTimer = NULL;
 		}
 
 		//init the cap areas
-		pEnt =	gEntList.FindEntityByClassname( NULL, "dod_capture_area" );
+		pEnt =	EntityList()->FindEntityByClassname( NULL, "dod_capture_area" );
 		while( pEnt )
 		{
 			variant_t emptyVariant;
 			pEnt->AcceptInput( "RoundInit", NULL, NULL, emptyVariant, 0 );
 
-			pEnt = gEntList.FindEntityByClassname( pEnt, "dod_capture_area" );
+			pEnt = EntityList()->FindEntityByClassname( pEnt, "dod_capture_area" );
 		}
 
 		IGameEvent *event = gameeventmanager->CreateEvent( "dod_round_start" );
@@ -2632,7 +2632,7 @@ const CDODViewVectors *CDODGameRules::GetDODViewVectors() const
 		m_bAlliesAreBombing = false;
 		m_bAxisAreBombing = false;
 
-		pEnt =	gEntList.FindEntityByClassname( NULL, "dod_bomb_target" );
+		pEnt =	EntityList()->FindEntityByClassname( NULL, "dod_bomb_target" );
 		while( pEnt )
 		{
 			CDODBombTarget *pTarget = dynamic_cast<CDODBombTarget *>( pEnt );
@@ -2652,7 +2652,7 @@ const CDODViewVectors *CDODGameRules::GetDODViewVectors() const
 				}			
 			}
 
-			pEnt = gEntList.FindEntityByClassname( pEnt, "dod_bomb_target" );
+			pEnt = EntityList()->FindEntityByClassname( pEnt, "dod_bomb_target" );
 		}
 	}
 
@@ -2667,14 +2667,14 @@ const CDODViewVectors *CDODGameRules::GetDODViewVectors() const
 	void CDODGameRules::State_Enter_RND_RUNNING( void )
 	{
 		//find all the control points, init the timer
-		CBaseEntity *pEnt =	gEntList.FindEntityByClassname( NULL, "dod_control_point_master" );
+		CBaseEntity *pEnt =	EntityList()->FindEntityByClassname( NULL, "dod_control_point_master" );
 
 		while( pEnt )
 		{
 			variant_t emptyVariant;
 			pEnt->AcceptInput( "RoundStart", NULL, NULL, emptyVariant, 0 );
 
-			pEnt = gEntList.FindEntityByClassname( pEnt, "dod_control_point_master" );
+			pEnt = EntityList()->FindEntityByClassname( pEnt, "dod_control_point_master" );
 		}
 
 		IGameEvent *event = gameeventmanager->CreateEvent( "dod_round_active" );
@@ -2708,7 +2708,7 @@ const CDODViewVectors *CDODGameRules::GetDODViewVectors() const
 				bool bBombBlocksWin = false;
 
 				//find all the control points, init the timer
-				CBaseEntity *pEnt =	gEntList.FindEntityByClassname( NULL, "dod_bomb_target" );
+				CBaseEntity *pEnt =	EntityList()->FindEntityByClassname( NULL, "dod_bomb_target" );
 
 				while( pEnt )
 				{
@@ -2731,7 +2731,7 @@ const CDODViewVectors *CDODGameRules::GetDODViewVectors() const
 						{
 							// find active dod_control_point_masters, ask them if this flag capping 
 							// would end the game
-							CBaseEntity *pEnt =	gEntList.FindEntityByClassname( NULL, "dod_control_point_master" );
+							CBaseEntity *pEnt =	EntityList()->FindEntityByClassname( NULL, "dod_control_point_master" );
 
 							while( pEnt )
 							{
@@ -2748,12 +2748,12 @@ const CDODViewVectors *CDODGameRules::GetDODViewVectors() const
 									}
 								}
 
-								pEnt = gEntList.FindEntityByClassname( pEnt, "dod_control_point_master" );
+								pEnt = EntityList()->FindEntityByClassname( pEnt, "dod_control_point_master" );
 							}							
 						}
 					}
 
-					pEnt = gEntList.FindEntityByClassname( pEnt, "dod_bomb_target" );
+					pEnt = EntityList()->FindEntityByClassname( pEnt, "dod_bomb_target" );
 				}
 
 				if ( bBombBlocksWin == false )
@@ -2764,7 +2764,7 @@ const CDODViewVectors *CDODGameRules::GetDODViewVectors() const
 					// minor hackage - dod_gamerules should be responsible for team win events, not dod_cpm
 
 					//find all the control points, init the timer
-					CBaseEntity *pEnt =	gEntList.FindEntityByClassname( NULL, "dod_control_point_master" );
+					CBaseEntity *pEnt =	EntityList()->FindEntityByClassname( NULL, "dod_control_point_master" );
 
 					while( pEnt )
 					{
@@ -2775,7 +2775,7 @@ const CDODViewVectors *CDODGameRules::GetDODViewVectors() const
 							pMaster->FireTeamWinOutput( m_iTimerWinTeam );
 						}
 
-						pEnt = gEntList.FindEntityByClassname( pEnt, "dod_control_point_master" );
+						pEnt = EntityList()->FindEntityByClassname( pEnt, "dod_control_point_master" );
 					}
 				}                
 			}
@@ -3068,7 +3068,7 @@ const CDODViewVectors *CDODGameRules::GetDODViewVectors() const
 				{
 					Msg( "Removed Entity: %s\n", pCur->GetClassname() );
 				}
-				gEntList.DestroyEntity( pCur );
+				EntityList()->DestroyEntity( pCur );
 			}
 			
 			pCur = gEntList.NextEnt( pCur );
@@ -3114,17 +3114,17 @@ const CDODViewVectors *CDODGameRules::GetDODViewVectors() const
 					CMapEntityRef &ref = g_MapEntityRefs[m_iIterator];
 					m_iIterator = g_MapEntityRefs.Next( m_iIterator );	// Seek to the next entity.
 
-					if ( ref.m_iEdict == -1 || gEntList.GetBaseEntity( ref.m_iEdict ) )
+					if ( ref.m_iEdict == -1 || EntityList()->GetBaseEntity( ref.m_iEdict ) )
 					{
 						// Doh! The entity was delete and its slot was reused.
 						// Just use any old edict slot. This case sucks because we lose the baseline.
-						return gEntList.CreateEntityByName( pClassname );
+						return (CBaseEntity*)EntityList()->CreateEntityByName( pClassname );
 					}
 					else
 					{
 						// Cool, the slot where this entity was is free again (most likely, the entity was 
 						// freed above). Now create an entity with this specific index.
-						return gEntList.CreateEntityByName( pClassname, ref.m_iEdict );
+						return (CBaseEntity*)EntityList()->CreateEntityByName( pClassname, ref.m_iEdict );
 					}
 				}
 			}
@@ -3314,7 +3314,7 @@ const CDODViewVectors *CDODGameRules::GetDODViewVectors() const
 		// the winners may have gotten an achievement
 		if ( FStrEq( STRING(gpGlobals->mapname), "dod_colmar" ) )
 		{
-			CControlPointMaster *pMaster = dynamic_cast<CControlPointMaster *>( gEntList.FindEntityByClassname( NULL, "dod_control_point_master" ) );
+			CControlPointMaster *pMaster = dynamic_cast<CControlPointMaster *>( EntityList()->FindEntityByClassname( NULL, "dod_control_point_master" ) );
 
 			if ( pMaster )
 			{
@@ -3829,7 +3829,7 @@ const CDODViewVectors *CDODGameRules::GetDODViewVectors() const
 			m_iSpawnPointCount_Allies	= 0;
 			m_iSpawnPointCount_Axis		= 0;
 
-			while ( ( ent = gEntList.FindEntityByClassname( ent, "info_player_allies" ) ) != NULL )
+			while ( ( ent = EntityList()->FindEntityByClassname( ent, "info_player_allies" ) ) != NULL )
 			{
 				if ( IsSpawnPointValid( ent, NULL ) )
 				{
@@ -3845,7 +3845,7 @@ const CDODViewVectors *CDODGameRules::GetDODViewVectors() const
 				}
 			}
 
-			while ( ( ent = gEntList.FindEntityByClassname( ent, "info_player_axis" ) ) != NULL )
+			while ( ( ent = EntityList()->FindEntityByClassname( ent, "info_player_axis" ) ) != NULL )
 			{
 				if ( IsSpawnPointValid( ent, NULL ) ) 
 				{
@@ -3962,7 +3962,7 @@ const CDODViewVectors *CDODGameRules::GetDODViewVectors() const
 		// Give a bonus to respawn time for each flag that we own that we 
 		// don't own by default.
 
-		CControlPointMaster *pMaster =	dynamic_cast<CControlPointMaster*>( gEntList.FindEntityByClassname( NULL, "dod_control_point_master" ) );
+		CControlPointMaster *pMaster =	dynamic_cast<CControlPointMaster*>( EntityList()->FindEntityByClassname( NULL, "dod_control_point_master" ) );
 
 		if( pMaster )
 		{
@@ -4149,7 +4149,7 @@ const CDODViewVectors *CDODGameRules::GetDODViewVectors() const
 			if ( pDODVictim->m_signals.GetState() & SIGNAL_CAPTUREAREA )
 			{
 				//find the area the player is in and see if his death causes a block
-				CAreaCapture *pArea = dynamic_cast<CAreaCapture *>(gEntList.FindEntityByClassname( NULL, "dod_capture_area" ) );
+				CAreaCapture *pArea = dynamic_cast<CAreaCapture *>(EntityList()->FindEntityByClassname( NULL, "dod_capture_area" ) );
 				while( pArea )
 				{
 					if ( pArea->CheckIfDeathCausesBlock( pDODVictim, pScorer ) )
@@ -4157,7 +4157,7 @@ const CDODViewVectors *CDODGameRules::GetDODViewVectors() const
 						break;
 					}
 
-					pArea = dynamic_cast<CAreaCapture *>( gEntList.FindEntityByClassname( pArea, "dod_capture_area" ) );
+					pArea = dynamic_cast<CAreaCapture *>( EntityList()->FindEntityByClassname( pArea, "dod_capture_area" ) );
 				}
 			}
 			if ( pDODVictim->m_bIsDefusing && pDODVictim->m_pDefuseTarget && pScorer->GetTeamNumber() != pDODVictim->GetTeamNumber() )
@@ -4190,7 +4190,7 @@ const CDODViewVectors *CDODGameRules::GetDODViewVectors() const
 
 		CBaseEntity *pEnt = NULL;
 		
-		pEnt = gEntList.FindEntityByClassname( pEnt, "info_doddetect" );
+		pEnt = EntityList()->FindEntityByClassname( pEnt, "info_doddetect" );
 
 		while( pEnt )
 		{
@@ -4205,7 +4205,7 @@ const CDODViewVectors *CDODGameRules::GetDODViewVectors() const
 				break;
 			}
 
-			pEnt = gEntList.FindEntityByClassname( pEnt, "info_doddetect" );
+			pEnt = EntityList()->FindEntityByClassname( pEnt, "info_doddetect" );
 		}
 
 		if( !bFound )
@@ -4349,7 +4349,7 @@ const CDODViewVectors *CDODGameRules::GetDODViewVectors() const
 
 	void CDODGameRules::ClientDisconnected( int pClient )
 	{
-		CDODPlayer *pPlayer = ToDODPlayer( gEntList.GetBaseEntity( pClient ) );
+		CDODPlayer *pPlayer = ToDODPlayer(EntityList()->GetBaseEntity( pClient ) );
 
 		if( pPlayer )
 		{

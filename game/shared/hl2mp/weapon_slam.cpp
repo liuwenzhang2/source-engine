@@ -254,7 +254,7 @@ void CWeapon_SLAM::SatchelDetonate()
 #ifndef CLIENT_DLL
 	CBaseEntity *pEntity = NULL;
 
-	while ((pEntity = gEntList.FindEntityByClassname( pEntity, "npc_satchel" )) != NULL)
+	while ((pEntity = EntityList()->FindEntityByClassname( pEntity, "npc_satchel" )) != NULL)
 	{
 		CSatchelCharge *pSatchel = dynamic_cast<CSatchelCharge *>(pEntity);
 		if (pSatchel->m_bIsLive && pSatchel->GetThrower() && GetOwner() && pSatchel->GetThrower() == GetOwner())
@@ -291,7 +291,7 @@ bool CWeapon_SLAM::AnyUndetonatedCharges(void)
 #ifndef CLIENT_DLL
 	CBaseEntity *pEntity = NULL;
 
-	while ((pEntity = gEntList.FindEntityByClassname( pEntity, "npc_satchel" )) != NULL)
+	while ((pEntity = EntityList()->FindEntityByClassname( pEntity, "npc_satchel" )) != NULL)
 	{
 		CSatchelCharge* pSatchel = dynamic_cast<CSatchelCharge *>(pEntity);
 		if (pSatchel->m_bIsLive && pSatchel->GetThrower() && pSatchel->GetThrower() == GetOwner())
@@ -935,7 +935,7 @@ void CWeapon_SLAM::WeaponIdle( void )
 			{
 #ifndef CLIENT_DLL
 				pOwner->Weapon_Drop( this );
-				gEntList.DestroyEntity(this);
+				EntityList()->DestroyEntity(this);
 #endif
 			}
 		}
@@ -943,7 +943,7 @@ void CWeapon_SLAM::WeaponIdle( void )
 		{
 #ifndef CLIENT_DLL
 			pOwner->Weapon_Drop( this );
-			gEntList.DestroyEntity(this);
+			EntityList()->DestroyEntity(this);
 #endif
 		}
 

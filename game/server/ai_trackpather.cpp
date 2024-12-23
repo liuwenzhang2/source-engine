@@ -115,7 +115,7 @@ void CAI_TrackPather::OnRestore( void )
 	// Restore current path
 	if ( m_strCurrentPathName != NULL_STRING )
 	{
-		m_pCurrentPathTarget = (CPathTrack *) gEntList.FindEntityByName( NULL, m_strCurrentPathName );
+		m_pCurrentPathTarget = (CPathTrack *) EntityList()->FindEntityByName( NULL, m_strCurrentPathName );
 	}
 	else
 	{
@@ -125,7 +125,7 @@ void CAI_TrackPather::OnRestore( void )
 	// Restore destination path
 	if ( m_strDestPathName != NULL_STRING )
 	{
-		m_pDestPathTarget = (CPathTrack *) gEntList.FindEntityByName( NULL, m_strDestPathName );
+		m_pDestPathTarget = (CPathTrack *) EntityList()->FindEntityByName( NULL, m_strDestPathName );
 	}
 	else
 	{
@@ -135,7 +135,7 @@ void CAI_TrackPather::OnRestore( void )
 	// Restore last path
 	if ( m_strLastPathName != NULL_STRING )
 	{
-		m_pLastPathTarget = (CPathTrack *) gEntList.FindEntityByName( NULL, m_strLastPathName );
+		m_pLastPathTarget = (CPathTrack *) EntityList()->FindEntityByName( NULL, m_strLastPathName );
 	}
 	else
 	{
@@ -145,7 +145,7 @@ void CAI_TrackPather::OnRestore( void )
 	// Restore target nearest path
 	if ( m_strTargetNearestPathName != NULL_STRING )
 	{
-		m_pTargetNearestPath = (CPathTrack *) gEntList.FindEntityByName( NULL, m_strTargetNearestPathName );
+		m_pTargetNearestPath = (CPathTrack *) EntityList()->FindEntityByName( NULL, m_strTargetNearestPathName );
 	}
 	else
 	{
@@ -1616,7 +1616,7 @@ void CAI_TrackPather::SetTrack( CBaseEntity *pGoalEnt )
 void CAI_TrackPather::SetTrack( string_t strTrackName )
 {
 	// Find our specified target
-	CBaseEntity *pGoalEnt = gEntList.FindEntityByName( NULL, strTrackName );
+	CBaseEntity *pGoalEnt = EntityList()->FindEntityByName( NULL, strTrackName );
 	if ( pGoalEnt == NULL )
 	{
 		DevWarning( "%s: Could not find path_track '%s'!\n", GetClassname(), STRING( strTrackName ) );
@@ -1644,7 +1644,7 @@ void CAI_TrackPather::InputSetTrack( inputdata_t &inputdata )
 //-----------------------------------------------------------------------------
 void CAI_TrackPather::FlyToPathTrack( string_t strTrackName )
 {
-	CBaseEntity *pGoalEnt = gEntList.FindEntityByName( NULL, strTrackName );
+	CBaseEntity *pGoalEnt = EntityList()->FindEntityByName( NULL, strTrackName );
 	if ( pGoalEnt == NULL )
 	{
 		DevWarning( "%s: Could not find path_track '%s'!\n", GetClassname(), STRING( strTrackName ) );

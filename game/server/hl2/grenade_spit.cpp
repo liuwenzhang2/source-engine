@@ -76,7 +76,7 @@ void CGrenadeSpit::Spawn( void )
 	GetEngineObject()->AddEffects( EF_NOSHADOW|EF_NORECEIVESHADOW );
 
 	// Create the dust effect in place
-	m_hSpitEffect = (CParticleSystem *)gEntList.CreateEntityByName( "info_particle_system" );
+	m_hSpitEffect = (CParticleSystem *)EntityList()->CreateEntityByName( "info_particle_system" );
 	if ( m_hSpitEffect != NULL )
 	{
 		// Setup our basic parameters
@@ -219,10 +219,10 @@ void CGrenadeSpit::Detonate(void)
 
 	if ( m_hSpitEffect )
 	{
-		gEntList.DestroyEntity( m_hSpitEffect );
+		EntityList()->DestroyEntity( m_hSpitEffect );
 	}
 
-	gEntList.DestroyEntity( this );
+	EntityList()->DestroyEntity( this );
 }
 
 void CGrenadeSpit::InitHissSound( void )

@@ -101,7 +101,7 @@ public:
 		if (GetEngineObject()->GetMoveParent() )
 		{
 			g_AnchorList.AddToList( this, m_massScale );
-			gEntList.DestroyEntity( this );
+			EntityList()->DestroyEntity( this );
 		}
 	}
 	DECLARE_DATADESC();
@@ -571,14 +571,14 @@ void CPhysConstraint::Activate( void )
 	{
 		if ( !ActivateConstraint() )
 		{
-			gEntList.DestroyEntity(this);
+			EntityList()->DestroyEntity(this);
 		}
 	}
 }
 
 IPhysicsConstraintGroup *GetConstraintGroup( string_t systemName )
 {
-	CBaseEntity *pMachine = gEntList.FindEntityByName( NULL, systemName );
+	CBaseEntity *pMachine = EntityList()->FindEntityByName( NULL, systemName );
 
 	if ( pMachine )
 	{

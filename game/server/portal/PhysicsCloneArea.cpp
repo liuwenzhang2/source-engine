@@ -243,7 +243,7 @@ CPhysicsCloneArea *CPhysicsCloneArea::CreatePhysicsCloneArea( CProp_Portal *pFol
 	if( !pFollowPortal )
 		return NULL;
 
-	CPhysicsCloneArea *pCloneArea = (CPhysicsCloneArea *)gEntList.CreateEntityByName( "physicsclonearea" );
+	CPhysicsCloneArea *pCloneArea = (CPhysicsCloneArea *)EntityList()->CreateEntityByName( "physicsclonearea" );
 
 	pCloneArea->m_pAttachedPortal = pFollowPortal;
 	pCloneArea->m_pAttachedSimulator = pFollowPortal;//->m_hPortalSimulator

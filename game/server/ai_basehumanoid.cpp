@@ -43,7 +43,7 @@ bool CAI_BaseHumanoid::HandleInteraction(int interactionType, void *data, CBaseC
 	{
 		// Destroy the entity, the barnacle is going to use the ragdoll that it is releasing
 		// as the corpse.
-		gEntList.DestroyEntity( this );
+		EntityList()->DestroyEntity( this );
 		return true;
 	}
 #endif

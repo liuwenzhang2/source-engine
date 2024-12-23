@@ -152,7 +152,7 @@ void CPortalSimulator::GetToolRecordingState(KeyValues* msg) {
 void CPortalSimulator::PostConstructor(const char* szClassname, int iForceEdictIndex) {
 	BaseClass::PostConstructor(szClassname, iForceEdictIndex);
 	GetEnginePortal()->AfterCollisionEntityCreated();
-	pCollisionEntity = (CPSCollisionEntity*)gEntList.CreateEntityByName("portalsimulator_collisionentity");
+	pCollisionEntity = (CPSCollisionEntity*)EntityList()->CreateEntityByName("portalsimulator_collisionentity");
 	Assert(pCollisionEntity != NULL);
 	pCollisionEntity->m_pOwningSimulator = this;
 	DispatchSpawn(pCollisionEntity);
@@ -188,7 +188,7 @@ void CPortalSimulator::UpdateOnRemove(void)
 	if (pCollisionEntity.Get())
 	{
 		pCollisionEntity->m_pOwningSimulator = NULL;
-		gEntList.DestroyEntity(pCollisionEntity);
+		EntityList()->DestroyEntity(pCollisionEntity);
 		pCollisionEntity = NULL;
 	}
 #endif
@@ -1085,7 +1085,7 @@ void CPSCollisionEntity::UpdateOnRemove( void )
 {
 #ifdef GAME_DLL
 	if (m_pOwningSimulator) {
-		gEntList.DestroyEntity(m_pOwningSimulator);
+		EntityList()->DestroyEntity(m_pOwningSimulator);
 		m_pOwningSimulator = NULL;
 	}
 	//s_PortalSimulatorCollisionEntities[entindex()] = false;

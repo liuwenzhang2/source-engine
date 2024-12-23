@@ -290,7 +290,7 @@ void CEnvTracer::Activate( void )
 {
 	BaseClass::Activate();
 
-	CBaseEntity *pEnd = gEntList.FindEntityByName( NULL, m_target );
+	CBaseEntity *pEnd = EntityList()->FindEntityByName( NULL, m_target );
 	if (pEnd != NULL)
 	{
 		m_vecEnd = pEnd->GetEngineObject()->GetLocalOrigin();
@@ -456,7 +456,7 @@ CGib *CGibShooter::CreateGib ( void )
 	if ( violence_hgibs.IsValid() && !violence_hgibs.GetInt() )
 		return NULL;
 
-	CGib *pGib = (CGib*)gEntList.CreateEntityByName( "gib" );
+	CGib *pGib = (CGib*)EntityList()->CreateEntityByName( "gib" );
 	pGib->Spawn( "models/gibs/hgibs.mdl" );
 	pGib->SetBloodColor( BLOOD_COLOR_RED );
 
@@ -734,7 +734,7 @@ void CEnvShooter::Precache ( void )
 
 CGib *CEnvShooter::CreateGib ( void )
 {
-	CGib *pGib = (CGib*)gEntList.CreateEntityByName( "gib" );
+	CGib *pGib = (CGib*)EntityList()->CreateEntityByName( "gib" );
 
 	if ( m_bIsSprite == true )
 	{
@@ -998,7 +998,7 @@ void CTestEffect::Think( void )
 	{
 		for (i = 0; i < m_iBeam; i++)
 		{
-			gEntList.DestroyEntity( m_pBeam[i] );
+			EntityList()->DestroyEntity( m_pBeam[i] );
 		}
 		m_flStartTime = gpGlobals->curtime;
 		m_iBeam = 0;
@@ -2156,7 +2156,7 @@ void CEnvGunfire::Activate( void )
 	// Find my target
 	if (m_target != NULL_STRING)
 	{
-		m_hTarget = gEntList.FindEntityByName( NULL, m_target );
+		m_hTarget = EntityList()->FindEntityByName( NULL, m_target );
 	}
 
 	BaseClass::Activate();

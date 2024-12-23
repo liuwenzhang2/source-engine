@@ -93,7 +93,7 @@ bool NextBotDestroyer::operator() ( INextBot *bot  )
 		}
 		else
 		{
-			gEntList.DestroyEntity( bot->GetEntity() );
+			EntityList()->DestroyEntity( bot->GetEntity() );
 		}
 	}
 	return true;

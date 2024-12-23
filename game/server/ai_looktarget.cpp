@@ -117,10 +117,10 @@ CAI_LookTarget *CAI_LookTarget::GetFirstLookTarget()
 		return NULL;
 	}
 
-	pEnt = gEntList.FirstEnt();
+	pEnt = EntityList()->FirstEnt();
 	while( pEnt && pEnt->GetEngineObject()->GetClassname() != iszLookTarget )
 	{
-		pEnt = gEntList.NextEnt( pEnt );
+		pEnt = EntityList()->NextEnt( pEnt );
 	}
 
 	return (CAI_LookTarget*)pEnt;
@@ -138,10 +138,10 @@ CAI_LookTarget *CAI_LookTarget::GetNextLookTarget( CAI_LookTarget *pCurrentTarge
 		return NULL;
 	}
 
-	pEnt = gEntList.NextEnt( pCurrentTarget );
+	pEnt = EntityList()->NextEnt( pCurrentTarget );
 	while( pEnt && pEnt->GetEngineObject()->GetClassname() != iszLookTarget )
 	{
-		pEnt = gEntList.NextEnt( pEnt );
+		pEnt = EntityList()->NextEnt( pEnt );
 	}
 
 	return (CAI_LookTarget*)pEnt;

@@ -488,7 +488,7 @@ void CNPC_Alyx::CreateEmpTool( void )
 	if (!m_bShouldHaveEMP || m_hEmpTool)
 		return;
 
-	m_hEmpTool = (CBaseAnimating*)gEntList.CreateEntityByName( "prop_dynamic" );
+	m_hEmpTool = (CBaseAnimating*)EntityList()->CreateEntityByName( "prop_dynamic" );
 	if ( m_hEmpTool )
 	{
 		m_hEmpTool->SetModel( "models/alyx_emptool_prop.mdl" );
@@ -523,7 +523,7 @@ void CNPC_Alyx::InputGiveEMP( inputdata_t &inputdata )
 	{
 		if (m_hEmpTool)
 		{
-			gEntList.DestroyEntity( m_hEmpTool );
+			EntityList()->DestroyEntity( m_hEmpTool );
 		}
 	}
 }
@@ -967,7 +967,7 @@ void CNPC_Alyx::Event_Killed( const CTakeDamageInfo &info )
 	// Destroy our EMP tool since it won't follow us onto the ragdoll anyway
 	if ( m_hEmpTool != NULL )
 	{
-		gEntList.DestroyEntity( m_hEmpTool	);
+		EntityList()->DestroyEntity( m_hEmpTool	);
 	}
 
 	BaseClass::Event_Killed( info );
@@ -2564,7 +2564,7 @@ void CNPC_Alyx::EmpZapTarget( CBaseEntity *pTarget )
 {
 	g_pEffects->Sparks( pTarget->WorldSpaceCenter() );
 
-	CAlyxEmpEffect *pEmpEffect = (CAlyxEmpEffect*)gEntList.CreateEntityByName( "env_alyxemp" );
+	CAlyxEmpEffect *pEmpEffect = (CAlyxEmpEffect*)EntityList()->CreateEntityByName( "env_alyxemp" );
 
 	if( pEmpEffect )
 	{

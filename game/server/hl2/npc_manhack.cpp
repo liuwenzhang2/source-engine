@@ -656,7 +656,7 @@ void CNPC_Manhack::DestroySmokeTrail()
 {
 	if ( m_hSmokeTrail.Get() )
 	{
-		gEntList.DestroyEntity( m_hSmokeTrail );
+		EntityList()->DestroyEntity( m_hSmokeTrail );
 		m_hSmokeTrail = NULL;
 	}
 }

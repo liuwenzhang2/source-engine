@@ -494,7 +494,7 @@ void CBaseServerVehicle::SetPassenger( int nRole, CBaseCombatCharacter *pPasseng
 
 		GetDrivableVehicle()->ExitVehicle( nRole );
 		GetDrivableVehicle()->SetVehicleEntryAnim( false );
-		gEntList.DestroyEntity( m_hExitBlocker );
+		EntityList()->DestroyEntity( m_hExitBlocker );
 	}
 }
 	

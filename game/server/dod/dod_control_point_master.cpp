@@ -87,7 +87,7 @@ void CControlPointMaster::Reset( void )
 bool CControlPointMaster::FindControlPoints( void )
 {
 	//go through all the points
-	CBaseEntity *pEnt = gEntList.FindEntityByClassname( NULL, "dod_control_point" );
+	CBaseEntity *pEnt = EntityList()->FindEntityByClassname( NULL, "dod_control_point" );
 
 	int numFound = 0;
 	
@@ -110,11 +110,11 @@ bool CControlPointMaster::FindControlPoints( void )
 			else
 			{
 				Warning( "!!!!\nMultiple control points with the same index, duplicates ignored\n!!!!\n" );
-				gEntList.DestroyEntity( pPoint );
+				EntityList()->DestroyEntity( pPoint );
 			}
 		}
 
-		pEnt = gEntList.FindEntityByClassname( pEnt, "dod_control_point" );
+		pEnt = EntityList()->FindEntityByClassname( pEnt, "dod_control_point" );
 	}
 
 	if( numFound > MAX_CONTROL_POINTS )
@@ -380,7 +380,7 @@ void CControlPointMaster::InputRoundInit( inputdata_t &input )
 	//init the ClientAreas
 	int index = 0;
 	
-	CBaseEntity *pEnt = gEntList.FindEntityByClassname( NULL, "dod_capture_area" );
+	CBaseEntity *pEnt = EntityList()->FindEntityByClassname( NULL, "dod_capture_area" );
 	while( pEnt )
 	{
 		CAreaCapture *pArea = (CAreaCapture *)pEnt;
@@ -388,7 +388,7 @@ void CControlPointMaster::InputRoundInit( inputdata_t &input )
 		pArea->area_SetIndex( index );
 		index++;
 
-		pEnt = gEntList.FindEntityByClassname( pEnt, "dod_capture_area" );
+		pEnt = EntityList()->FindEntityByClassname( pEnt, "dod_capture_area" );
 	}
 	
 	g_pObjectiveResource->ResetControlPoints();

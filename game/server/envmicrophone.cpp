@@ -124,12 +124,12 @@ void CEnvMicrophone::Activate(void)
 	// Get a handle to my filter entity if there is one
 	if (m_iszListenFilter != NULL_STRING)
 	{
-		m_hListenFilter = dynamic_cast<CBaseFilter *>(gEntList.FindEntityByName( NULL, m_iszListenFilter ));
+		m_hListenFilter = dynamic_cast<CBaseFilter *>(EntityList()->FindEntityByName( NULL, m_iszListenFilter ));
 	}
 
 	if (m_target != NULL_STRING)
 	{
-		m_hMeasureTarget = gEntList.FindEntityByName(NULL, STRING(m_target) );
+		m_hMeasureTarget = EntityList()->FindEntityByName(NULL, STRING(m_target) );
 
 		//
 		// If we were given a bad measure target, just measure sound where we are.
@@ -305,7 +305,7 @@ bool CEnvMicrophone::CanHearSound( int entindex, soundlevel_t soundlevel, float 
 	CBaseEntity *pEntity = NULL;
 	if ( entindex )
 	{
-		pEntity = gEntList.GetBaseEntity(entindex) ;
+		pEntity = EntityList()->GetBaseEntity(entindex) ;
 	}
 			    
 	// Cull out sounds except from specific entities
@@ -458,7 +458,7 @@ MicrophoneResult_t CEnvMicrophone::SoundPlayed( int entindex, const char *soundn
 		// find players, and we need to be able to specify !player for a speaker.
 		if ( m_iszSpeakerName != NULL_STRING )
 		{
-			m_hSpeaker = gEntList.FindEntityByName(NULL, STRING(m_iszSpeakerName) );
+			m_hSpeaker = EntityList()->FindEntityByName(NULL, STRING(m_iszSpeakerName) );
 
 			if ( !m_hSpeaker )
 			{

@@ -662,7 +662,7 @@ void CNPC_Combine_Cannon::UpdateOnRemove( void )
 	// Remove the main laser
 	if ( m_pBeam != NULL )
 	{
-		gEntList.DestroyEntity( m_pBeam);
+		EntityList()->DestroyEntity( m_pBeam);
 		m_pBeam = NULL;
 	}
 
@@ -672,7 +672,7 @@ void CNPC_Combine_Cannon::UpdateOnRemove( void )
 		if ( m_pAncillaryBeams[i] == NULL )
 			continue;
 
-		gEntList.DestroyEntity( m_pAncillaryBeams[i] );
+		EntityList()->DestroyEntity( m_pAncillaryBeams[i] );
 		m_pAncillaryBeams[i] = NULL;
 	}
 

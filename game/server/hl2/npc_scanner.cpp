@@ -359,7 +359,7 @@ void CNPC_CScanner::Gib( void )
 	// Add a random chance of spawning a battery...
 	if ( !GetEngineObject()->HasSpawnFlags(SF_NPC_NO_WEAPON_DROP) && random->RandomFloat( 0.0f, 1.0f) < 0.3f )
 	{
-		CItem *pBattery = (CItem*)gEntList.CreateEntityByName("item_battery");
+		CItem *pBattery = (CItem*)EntityList()->CreateEntityByName("item_battery");
 		if ( pBattery )
 		{
 			pBattery->GetEngineObject()->SetAbsOrigin(GetEngineObject()->GetAbsOrigin() );
@@ -399,7 +399,7 @@ void CNPC_CScanner::Event_Killed( const CTakeDamageInfo &info )
 	SpotlightDestroy();
 
 	// Remove sprite
-	gEntList.DestroyEntity(m_pEyeFlash);
+	EntityList()->DestroyEntity(m_pEyeFlash);
 	m_pEyeFlash = NULL;
 
 	// If I have an enemy and I'm up high, do a dive bomb (unless dissolved)
@@ -992,7 +992,7 @@ void CNPC_CScanner::InputEquipMine(inputdata_t &inputdata)
 
 	CBaseEntity *pEnt;
 
-	pEnt = gEntList.CreateEntityByName( "combine_mine" );
+	pEnt = (CBaseEntity*)EntityList()->CreateEntityByName( "combine_mine" );
 	bool bPlacedMine = false;
 
 	if( m_bIsClawScanner )
@@ -1541,10 +1541,10 @@ void CNPC_CScanner::SpotlightDestroy(void)
 {
 	if ( m_hSpotlight )
 	{
-		gEntList.DestroyEntity(m_hSpotlight);
+		EntityList()->DestroyEntity(m_hSpotlight);
 		m_hSpotlight = NULL;
 		
-		gEntList.DestroyEntity(m_hSpotlightTarget);
+		EntityList()->DestroyEntity(m_hSpotlightTarget);
 		m_hSpotlightTarget = NULL;
 	}
 }
@@ -1589,7 +1589,7 @@ void CNPC_CScanner::SpotlightCreate(void)
 	trace_t tr;
 	AI_TraceLine (GetEngineObject()->GetAbsOrigin(), GetEngineObject()->GetAbsOrigin() + m_vSpotlightDir * 2024, MASK_OPAQUE, this, COLLISION_GROUP_NONE, &tr );
 
-	m_hSpotlightTarget = (CSpotlightEnd*)gEntList.CreateEntityByName( "spotlight_end" );
+	m_hSpotlightTarget = (CSpotlightEnd*)EntityList()->CreateEntityByName( "spotlight_end" );
 	m_hSpotlightTarget->Spawn();
 	m_hSpotlightTarget->GetEngineObject()->SetLocalOrigin( tr.endpos );
 	m_hSpotlightTarget->SetOwnerEntity( this );

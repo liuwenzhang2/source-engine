@@ -272,7 +272,7 @@ void CPhysicsNPCSolver::Think()
 
 	if ( finished )
 	{
-		gEntList.DestroyEntity(this);
+		EntityList()->DestroyEntity(this);
 		return;
 	}
 	if ( m_allowIntersection )
@@ -280,7 +280,7 @@ void CPhysicsNPCSolver::Think()
 		IPhysicsObject *pObject = m_hEntity->GetEngineObject()->VPhysicsGetObject();
 		if ( !pObject )
 		{
-			gEntList.DestroyEntity(this);
+			EntityList()->DestroyEntity(this);
 			return;
 		}
 		pObject->Wake();
@@ -437,7 +437,7 @@ void CPhysicsEntitySolver::Spawn()
 
 void CPhysicsEntitySolver::Think()
 {
-	gEntList.DestroyEntity(this);
+	EntityList()->DestroyEntity(this);
 }
 
 void CPhysicsEntitySolver::UpdateOnRemove()

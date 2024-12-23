@@ -49,7 +49,7 @@ void Test_CreateEntity( const CCommand &args )
 		}
 	}
 
-	if ( !gEntList.CreateEntityByName( pClassName ) )
+	if ( !EntityList()->CreateEntityByName( pClassName ) )
 	{
 		Error( "Test_CreateEntity( %s ) failed.", pClassName );
 	}

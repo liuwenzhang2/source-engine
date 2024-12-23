@@ -245,7 +245,7 @@ END_PREDICTION_DATA()
 
 	CPlantedC4* CPlantedC4::ShootSatchelCharge( CCSPlayer *pevOwner, Vector vecStart, QAngle vecAngles )
 	{
-		CPlantedC4 *pGrenade = dynamic_cast< CPlantedC4* >(gEntList.CreateEntityByName( "planted_c4" ) );
+		CPlantedC4 *pGrenade = dynamic_cast< CPlantedC4* >(EntityList()->CreateEntityByName( "planted_c4" ) );
 		if ( pGrenade )
 		{
 			vecAngles[0] = 0;
@@ -309,7 +309,7 @@ END_PREDICTION_DATA()
 	{
 		if (!IsInWorld())
 		{
-			gEntList.DestroyEntity( this );
+			EntityList()->DestroyEntity( this );
 			return;
 		}
 
@@ -582,7 +582,7 @@ END_PREDICTION_DATA()
 		// Output to the bomb target ent
 		CBaseEntity *pTarget = NULL;
 		variant_t emptyVariant;
-		while ((pTarget = gEntList.FindEntityByClassname( pTarget, "func_bomb_target" )) != NULL)
+		while ((pTarget = EntityList()->FindEntityByClassname( pTarget, "func_bomb_target" )) != NULL)
 		{
 			//Adrian - But only to the one we want!
 			if ( pTarget->entindex() != m_iBombSiteIndex )
@@ -1048,7 +1048,7 @@ void CC4::PrimaryAttack()
 				
 				if ( pBombTarget )
 				{
-					CBaseEntity *pAttachPoint = gEntList.FindEntityByName( NULL, pBombTarget->GetBombMountTarget() );
+					CBaseEntity *pAttachPoint = EntityList()->FindEntityByName( NULL, pBombTarget->GetBombMountTarget() );
 
 					if ( pAttachPoint )
 					{
@@ -1118,7 +1118,7 @@ void CC4::PrimaryAttack()
 
 			// No more c4!
 			pPlayer->Weapon_Drop( this, NULL, NULL );
-			gEntList.DestroyEntity( this );
+			EntityList()->DestroyEntity( this );
 #endif
 
 			//don't allow the planting to start over again next frame.

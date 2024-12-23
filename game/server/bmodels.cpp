@@ -1482,7 +1482,7 @@ void CFuncVPhysicsClip::Activate( void )
 	// Get a handle to my filter entity if there is one
 	if (m_iFilterName != NULL_STRING)
 	{
-		m_hFilter = dynamic_cast<CBaseFilter *>(gEntList.FindEntityByName( NULL, m_iFilterName ));
+		m_hFilter = dynamic_cast<CBaseFilter *>(EntityList()->FindEntityByName( NULL, m_iFilterName ));
 	}
 	BaseClass::Activate();
 }

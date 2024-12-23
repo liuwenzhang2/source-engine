@@ -197,7 +197,7 @@ CBaseEntity* CScriptedTarget::FindEntity( void )
 	// ---------------------------------------------------
 	//	First try to find the entity by name
 	// ---------------------------------------------------
-	CBaseEntity *pEntity = gEntList.FindEntityByName( NULL, m_iszEntity );
+	CBaseEntity *pEntity = EntityList()->FindEntityByName( NULL, m_iszEntity );
 	if (pEntity && pEntity->GetEngineObject()->GetFlags() & FL_NPC)
 	{
 		CAI_BaseNPC* pNPC	= pEntity->MyNPCPointer();

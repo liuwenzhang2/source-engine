@@ -158,15 +158,15 @@ void CNPC_VehicleDriver::Activate( void )
 	if ( m_iszVehicleName == NULL_STRING )
 	{
 		Warning( "npc_vehicledriver %s has no vehicle to drive.\n", STRING(GetEntityName()) );
-		gEntList.DestroyEntity( this );
+		EntityList()->DestroyEntity( this );
 		return;
 	}
 
-	m_hVehicleEntity = (gEntList.FindEntityByName( NULL, STRING(m_iszVehicleName) ));
+	m_hVehicleEntity = (EntityList()->FindEntityByName( NULL, STRING(m_iszVehicleName) ));
 	if ( !m_hVehicleEntity )
 	{
 		Warning( "npc_vehicledriver %s couldn't find his vehicle named %s.\n", STRING(GetEntityName()), STRING(m_iszVehicleName) );
-		gEntList.DestroyEntity( this );
+		EntityList()->DestroyEntity( this );
 		return;
 	}
 
@@ -175,7 +175,7 @@ void CNPC_VehicleDriver::Activate( void )
 	if ( !m_pVehicleInterface->NPC_CanDrive() )
 	{
 		Warning( "npc_vehicledriver %s doesn't know how to drive vehicle %s.\n", STRING(GetEntityName()), STRING(m_hVehicleEntity->GetEntityName()) );
-		gEntList.DestroyEntity( this );
+		EntityList()->DestroyEntity( this );
 		return;
 	}
 
@@ -221,7 +221,7 @@ void CNPC_VehicleDriver::PrescheduleThink( void )
 	if ( !m_hVehicleEntity )
 	{
 		m_pVehicleInterface = NULL;
-		gEntList.DestroyEntity( this );
+		EntityList()->DestroyEntity( this );
 		return;
 	}
 
@@ -1110,7 +1110,7 @@ void CNPC_VehicleDriver::InputGotoPathCorner( inputdata_t &inputdata )
 	string_t iszPathName = inputdata.value.StringID();
 	if ( iszPathName != NULL_STRING )
 	{
-		CBaseEntity *pEntity = gEntList.FindEntityByName( NULL, iszPathName );
+		CBaseEntity *pEntity = EntityList()->FindEntityByName( NULL, iszPathName );
 		if ( !pEntity )
 		{
 			Warning("npc_vehicledriver %s couldn't find entity named %s\n", STRING(GetEntityName()), STRING(iszPathName) );

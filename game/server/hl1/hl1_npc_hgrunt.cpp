@@ -461,7 +461,7 @@ int CNPC_HGrunt::SquadRecruit( int searchRadius, int maxMembers )
 	if ( m_SquadName != NULL_STRING )
 	{
 		// I have a netname, so unconditionally recruit everyone else with that name.
-		pEntity = gEntList.FindEntityByClassname( pEntity, "monster_human_grunt" );
+		pEntity = EntityList()->FindEntityByClassname( pEntity, "monster_human_grunt" );
 
 		while ( pEntity )
 		{
@@ -480,7 +480,7 @@ int CNPC_HGrunt::SquadRecruit( int searchRadius, int maxMembers )
 				}
 			}
 	
-			pEntity = gEntList.FindEntityByClassname( pEntity, "monster_human_grunt" );
+			pEntity = EntityList()->FindEntityByClassname( pEntity, "monster_human_grunt" );
 		}
 
 		return squadCount;
@@ -1913,7 +1913,7 @@ void CNPC_HGruntRepel::RepelUse ( CBaseEntity *pActivator, CBaseEntity *pCaller,
 	pBeam->SetThink( &CBaseEntity::SUB_Remove );
 	GetEngineObject()->SetNextThink( gpGlobals->curtime + -4096.0 * tr.fraction / pGrunt->GetEngineObject()->GetAbsVelocity().z + 0.5 );
 
-	gEntList.DestroyEntity( this );
+	EntityList()->DestroyEntity( this );
 }
 
 

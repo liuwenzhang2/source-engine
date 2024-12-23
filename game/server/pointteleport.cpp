@@ -79,7 +79,7 @@ void CPointTeleport::Activate( void )
 	// Save off the spawn position of the target if instructed to do so
 	if (GetEngineObject()->GetSpawnFlags() & SF_TELEPORT_TO_SPAWN_POS)
 	{
-		CBaseEntity *pTarget = gEntList.FindEntityByName( NULL, m_target );
+		CBaseEntity *pTarget = EntityList()->FindEntityByName( NULL, m_target );
 		if ( pTarget )
 		{
 			// If teleport object is in a movement hierarchy, remove it first
@@ -99,7 +99,7 @@ void CPointTeleport::Activate( void )
 		else
 		{
 			Warning("ERROR: (%s) target '%s' not found. Deleting.\n", GetDebugName(), STRING(m_target));
-			gEntList.DestroyEntity( this );
+			EntityList()->DestroyEntity( this );
 			return;
 		}
 	}
@@ -113,7 +113,7 @@ void CPointTeleport::Activate( void )
 void CPointTeleport::InputTeleport( inputdata_t &inputdata )
 {
 	// Attempt to find the entity in question
-	CBaseEntity *pTarget = gEntList.FindEntityByName( NULL, m_target, this, inputdata.pActivator, inputdata.pCaller );
+	CBaseEntity *pTarget = EntityList()->FindEntityByName( NULL, m_target, this, inputdata.pActivator, inputdata.pCaller );
 	if ( pTarget == NULL )
 		return;
 

@@ -202,7 +202,7 @@ void CWeaponBugBait::OnPickedUp( CBaseCombatCharacter *pNewOwner )
 
 	if ( m_hSporeTrail )
 	{
-		gEntList.DestroyEntity( m_hSporeTrail );
+		EntityList()->DestroyEntity( m_hSporeTrail );
 	}
 }
 

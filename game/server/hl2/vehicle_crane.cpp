@@ -168,15 +168,15 @@ void CPropCrane::Activate( void )
 	if ( m_iszMagnetName == NULL_STRING )
 	{
 		Warning( "prop_vehicle_crane %s has no magnet entity specified!\n", STRING(GetEntityName()) );
-		gEntList.DestroyEntity( this );
+		EntityList()->DestroyEntity( this );
 		return;
 	}
 
-	m_hCraneMagnet = dynamic_cast<CPhysMagnet *>(gEntList.FindEntityByName( NULL, STRING(m_iszMagnetName) ));
+	m_hCraneMagnet = dynamic_cast<CPhysMagnet *>(EntityList()->FindEntityByName( NULL, STRING(m_iszMagnetName) ));
 	if ( !m_hCraneMagnet )
 	{
 		Warning( "prop_vehicle_crane %s failed to find magnet %s.\n", STRING(GetEntityName()), STRING(m_iszMagnetName) );
-		gEntList.DestroyEntity( this );
+		EntityList()->DestroyEntity( this );
 		return;
 	}
 
@@ -196,7 +196,7 @@ void CPropCrane::Activate( void )
 	m_hCraneTip = CCraneTip::Create( m_hCraneMagnet, m_pConstraintGroup, vecOrigin, vecAngles );
 	if ( !m_hCraneTip )
 	{
-		gEntList.DestroyEntity( this );
+		EntityList()->DestroyEntity( this );
 		return;
 	}
 	m_pConstraintGroup->Activate();

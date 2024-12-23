@@ -533,9 +533,9 @@ void CNPC_Citizen::Spawn()
 //-----------------------------------------------------------------------------
 void CNPC_Citizen::PostNPCInit()
 {
-	if ( !gEntList.FindEntityByClassname( NULL, COMMAND_POINT_CLASSNAME ) )
+	if ( !EntityList()->FindEntityByClassname( NULL, COMMAND_POINT_CLASSNAME ) )
 	{
-		gEntList.CreateEntityByName( COMMAND_POINT_CLASSNAME );
+		EntityList()->CreateEntityByName( COMMAND_POINT_CLASSNAME );
 	}
 	
 	if ( IsInPlayerSquad() )
@@ -753,8 +753,8 @@ void CNPC_Citizen::FixupMattWeapon()
 	if ( pWeapon && pWeapon->ClassMatches( "weapon_crowbar" ) && NameMatches( "matt" ) )
 	{
 		Weapon_Drop( pWeapon );
-		gEntList.DestroyEntity( pWeapon );
-		pWeapon = (CBaseCombatWeapon *)gEntList.CreateEntityByName( "weapon_crowbar" );
+		EntityList()->DestroyEntity( pWeapon );
+		pWeapon = (CBaseCombatWeapon *)EntityList()->CreateEntityByName( "weapon_crowbar" );
 		pWeapon->SetName( "matt_weapon" );
 		DispatchSpawn( pWeapon );
 
@@ -784,9 +784,9 @@ void CNPC_Citizen::OnRestore()
 
 	BaseClass::OnRestore();
 
-	if ( !gEntList.FindEntityByClassname( NULL, COMMAND_POINT_CLASSNAME ) )
+	if ( !EntityList()->FindEntityByClassname( NULL, COMMAND_POINT_CLASSNAME ) )
 	{
-		gEntList.CreateEntityByName( COMMAND_POINT_CLASSNAME );
+		EntityList()->CreateEntityByName( COMMAND_POINT_CLASSNAME );
 	}
 }
 
@@ -1049,7 +1049,7 @@ void CNPC_Citizen::PrescheduleThink()
 	{
 		if ( HaveCommandGoal() )
 		{
-			CBaseEntity *pCommandPoint = gEntList.FindEntityByClassname( NULL, COMMAND_POINT_CLASSNAME );
+			CBaseEntity *pCommandPoint = EntityList()->FindEntityByClassname( NULL, COMMAND_POINT_CLASSNAME );
 			
 			if ( pCommandPoint )
 			{
@@ -1945,7 +1945,7 @@ void CNPC_Citizen::PickupItem( CBaseEntity *pItem )
 		if ( TakeHealth( sk_healthkit.GetFloat(), DMG_GENERIC ) )
 		{
 			RemoveAllDecals();
-			gEntList.DestroyEntity( pItem );
+			EntityList()->DestroyEntity( pItem );
 		}
 	}
 	else if( FClassnameIs( pItem, "item_healthvial" ) )
@@ -1953,7 +1953,7 @@ void CNPC_Citizen::PickupItem( CBaseEntity *pItem )
 		if ( TakeHealth( sk_healthvial.GetFloat(), DMG_GENERIC ) )
 		{
 			RemoveAllDecals();
-			gEntList.DestroyEntity( pItem );
+			EntityList()->DestroyEntity( pItem );
 		}
 	}
 	else
@@ -3173,12 +3173,12 @@ void CNPC_Citizen::UpdateFollowCommandPoint()
 		if ( HaveCommandGoal() )
 		{
 			CBaseEntity *pFollowTarget = m_FollowBehavior.GetFollowTarget();
-			CBaseEntity *pCommandPoint = gEntList.FindEntityByClassname( NULL, COMMAND_POINT_CLASSNAME );
+			CBaseEntity *pCommandPoint = EntityList()->FindEntityByClassname( NULL, COMMAND_POINT_CLASSNAME );
 			
 			if( !pCommandPoint )
 			{
 				DevMsg("**\nVERY BAD THING\nCommand point vanished! Creating a new one\n**\n");
-				pCommandPoint = gEntList.CreateEntityByName( COMMAND_POINT_CLASSNAME );
+				pCommandPoint = (CBaseEntity*)EntityList()->CreateEntityByName( COMMAND_POINT_CLASSNAME );
 			}
 
 			if ( pFollowTarget != pCommandPoint )
@@ -3710,7 +3710,7 @@ void	CNPC_Citizen::TossHealthKit(CBaseCombatCharacter *pThrowAt, const Vector &o
 	}
 
 	// create a healthkit and toss it into the world
-	CBaseEntity *pHealthKit = gEntList.CreateEntityByName( "item_healthkit" );
+	CBaseEntity *pHealthKit = (CBaseEntity*)EntityList()->CreateEntityByName( "item_healthkit" );
 	Assert(pHealthKit);
 	if (pHealthKit)
 	{
@@ -4113,7 +4113,7 @@ void CCitizenResponseSystem::Spawn()
 	if ( g_pCitizenResponseSystem )
 	{
 		Warning("Multiple citizen response systems in level.\n");
-		gEntList.DestroyEntity( this );
+		EntityList()->DestroyEntity( this );
 		return;
 	}
 	g_pCitizenResponseSystem = this;
@@ -4178,7 +4178,7 @@ void CCitizenResponseSystem::ResponseThink()
 					CBaseEntity *pNearestCitizen = NULL;
 					CBaseEntity *pCitizen = NULL;
 					CBasePlayer *pPlayer = UTIL_GetLocalPlayer();
-					while ( (pCitizen = gEntList.FindEntityByClassname( pCitizen, "npc_citizen" ) ) != NULL)
+					while ( (pCitizen = EntityList()->FindEntityByClassname( pCitizen, "npc_citizen" ) ) != NULL)
 					{
 						float flDistToPlayer = (pPlayer->WorldSpaceCenter() - pCitizen->WorldSpaceCenter()).LengthSqr();
 						if ( flDistToPlayer < flNearestDist )
@@ -4215,7 +4215,7 @@ void CCitizenResponseSystem::ResponseThink()
 
 void CNPC_Citizen::AddInsignia()
 {
-	CBaseEntity *pMark = gEntList.CreateEntityByName( "squadinsignia" );
+	CBaseEntity *pMark = (CBaseEntity*)EntityList()->CreateEntityByName( "squadinsignia" );
 	pMark->SetOwnerEntity( this );
 	pMark->Spawn();
 }
@@ -4224,7 +4224,7 @@ void CNPC_Citizen::RemoveInsignia()
 {
 	// This is crap right now.
 	CBaseEntity *FirstEnt();
-	CBaseEntity *pEntity = gEntList.FirstEnt();
+	CBaseEntity *pEntity = EntityList()->FirstEnt();
 
 	while( pEntity )
 	{
@@ -4235,12 +4235,12 @@ void CNPC_Citizen::RemoveInsignia()
 
 			if( pInsignia )
 			{
-				gEntList.DestroyEntity( pInsignia );
+				EntityList()->DestroyEntity( pInsignia );
 				return;
 			}
 		}
 
-		pEntity = gEntList.NextEnt( pEntity );
+		pEntity = EntityList()->NextEnt( pEntity );
 	}
 }
 

@@ -305,7 +305,7 @@ void CControlPoint::InternalSetOwner( int owner, bool bMakeSound, int iNumCapper
 		SendCapString( m_iTeam, iNumCappers, pCappingPlayers );
 
 	// have control point master check the win conditions now!
-	CBaseEntity *pEnt =	gEntList.FindEntityByClassname( NULL, "dod_control_point_master" );
+	CBaseEntity *pEnt =	EntityList()->FindEntityByClassname( NULL, "dod_control_point_master" );
 
 	while( pEnt )
 	{
@@ -316,7 +316,7 @@ void CControlPoint::InternalSetOwner( int owner, bool bMakeSound, int iNumCapper
 			pMaster->CheckWinConditions();
 		}
 
-		pEnt = gEntList.FindEntityByClassname( pEnt, "dod_control_point_master" );
+		pEnt = EntityList()->FindEntityByClassname( pEnt, "dod_control_point_master" );
 	}
 
 	// Capping the last flag achievement

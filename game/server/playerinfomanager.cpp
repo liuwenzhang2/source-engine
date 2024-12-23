@@ -60,7 +60,7 @@ namespace
 
 	IPlayerInfo_V1 *CPlayerInfoManager_V1::GetPlayerInfo( int pEdict )
 	{
-		CBasePlayer *pPlayer = ( ( CBasePlayer * )gEntList.GetBaseEntity( pEdict ));
+		CBasePlayer *pPlayer = ( ( CBasePlayer * )EntityList()->GetBaseEntity( pEdict ));
 		if ( pPlayer )
 		{
 			return (IPlayerInfo_V1 *)pPlayer->GetPlayerInfo();
@@ -76,7 +76,7 @@ namespace
 
 IPlayerInfo *CPlayerInfoManager::GetPlayerInfo( int pEdict )
 {
-	CBasePlayer *pPlayer = ( ( CBasePlayer * )gEntList.GetBaseEntity( pEdict ));
+	CBasePlayer *pPlayer = ( ( CBasePlayer * )EntityList()->GetBaseEntity( pEdict ));
 	if ( pPlayer )
 	{
 		return pPlayer->GetPlayerInfo();
@@ -96,7 +96,7 @@ CGlobalVars *CPlayerInfoManager::GetGlobalVars()
 
 IBotController *CPluginBotManager::GetBotController( int pEdict )
 {
-	CBasePlayer *pPlayer = ( ( CBasePlayer * )gEntList.GetBaseEntity( pEdict ));
+	CBasePlayer *pPlayer = ( ( CBasePlayer * )EntityList()->GetBaseEntity( pEdict ));
 	if ( pPlayer && pPlayer->IsBot() )
 	{
 		return pPlayer->GetBotController();
@@ -117,7 +117,7 @@ int CPluginBotManager::CreateBot( const char *botname )
 	}
 
 	// Allocate a player entity for the bot, and call spawn
-	CBasePlayer *pPlayer = ((CBasePlayer*)gEntList.GetBaseEntity( pEdict ));
+	CBasePlayer *pPlayer = ((CBasePlayer*)EntityList()->GetBaseEntity( pEdict ));
 
 	pPlayer->GetEngineObject()->ClearFlags();
 	pPlayer->GetEngineObject()->AddFlag( FL_CLIENT | FL_FAKECLIENT );

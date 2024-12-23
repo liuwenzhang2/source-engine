@@ -719,7 +719,7 @@ void CNPC_AntlionGuard::DestroyGlows( void )
 {
 	if ( m_hCaveGlow[0] )
 	{
-		gEntList.DestroyEntity( m_hCaveGlow[0] );
+		EntityList()->DestroyEntity( m_hCaveGlow[0] );
 
 		// reset it to NULL in case there is a double death cleanup for some reason.
 		m_hCaveGlow[0] = NULL;
@@ -727,7 +727,7 @@ void CNPC_AntlionGuard::DestroyGlows( void )
 
 	if ( m_hCaveGlow[1] )
 	{
-		gEntList.DestroyEntity( m_hCaveGlow[1] );
+		EntityList()->DestroyEntity( m_hCaveGlow[1] );
 
 		// reset it to NULL in case there is a double death cleanup for some reason.
 		m_hCaveGlow[1] = NULL;
@@ -1135,7 +1135,7 @@ bool CNPC_AntlionGuard::ShouldCharge( const Vector &startPos, const Vector &endP
 		if ( moveTrace.pObstruction != NULL )
 		{
 			// If we've hit the world, see if it's a cliff
-			if ( moveTrace.pObstruction == gEntList.GetBaseEntity( 0 ) )
+			if ( moveTrace.pObstruction == EntityList()->GetBaseEntity( 0 ) )
 			{	
 				// Can't be too far above/below the target
 				if ( fabs( moveTrace.vEndPosition.z - vecTargetPos.z ) > GetStepHeight() )
@@ -3369,7 +3369,7 @@ void CNPC_AntlionGuard::SummonAntlions( void )
 			continue;
 		}
 
-		CAI_BaseNPC	*pent = (CAI_BaseNPC*)gEntList.CreateEntityByName( "npc_antlion" );
+		CAI_BaseNPC	*pent = (CAI_BaseNPC*)EntityList()->CreateEntityByName( "npc_antlion" );
 		if ( !pent )
 			break;
 
@@ -3467,7 +3467,7 @@ void CNPC_AntlionGuard::InputSetShoveTarget( inputdata_t &inputdata )
 	if ( IsAlive() == false )
 		return;
 
-	CBaseEntity *pTarget = gEntList.FindEntityByName( NULL, inputdata.value.String(), NULL, inputdata.pActivator, inputdata.pCaller );
+	CBaseEntity *pTarget = EntityList()->FindEntityByName( NULL, inputdata.value.String(), NULL, inputdata.pActivator, inputdata.pCaller );
 
 	if ( pTarget == NULL )
 	{
@@ -3493,7 +3493,7 @@ void CNPC_AntlionGuard::InputSetChargeTarget( inputdata_t &inputdata )
 
 	// Get charge target name
 	char *pszParam = strtok(parseString," ");
-	CBaseEntity *pTarget = gEntList.FindEntityByName( NULL, pszParam, NULL, inputdata.pActivator, inputdata.pCaller );
+	CBaseEntity *pTarget = EntityList()->FindEntityByName( NULL, pszParam, NULL, inputdata.pActivator, inputdata.pCaller );
 	if ( !pTarget )
 	{
 		Warning( "ERROR: Guard %s cannot find charge target '%s'\n", STRING(GetEntityName()), pszParam );
@@ -3502,7 +3502,7 @@ void CNPC_AntlionGuard::InputSetChargeTarget( inputdata_t &inputdata )
 
 	// Get the charge position name
 	pszParam = strtok(NULL," ");
-	CBaseEntity *pPosition = gEntList.FindEntityByName( NULL, pszParam, NULL, inputdata.pActivator, inputdata.pCaller );
+	CBaseEntity *pPosition = EntityList()->FindEntityByName( NULL, pszParam, NULL, inputdata.pActivator, inputdata.pCaller );
 	if ( !pPosition )
 	{
 		Warning( "ERROR: Guard %s cannot find charge position '%s'\nMake sure you've specified the parameters as [target start]!\n", STRING(GetEntityName()), pszParam );
@@ -4068,7 +4068,7 @@ CBaseEntity *CNPC_AntlionGuard::GetNextShoveTarget( CBaseEntity *pLastEntity, AI
 	// Try to find scripted items first
 	if ( m_strShoveTargets != NULL_STRING )
 	{
-		CBaseEntity *pFound = gEntList.FindEntityByName( pLastEntity, m_strShoveTargets );
+		CBaseEntity *pFound = EntityList()->FindEntityByName( pLastEntity, m_strShoveTargets );
 		if ( pFound )
 			return pFound;
 	}
@@ -4507,7 +4507,7 @@ void CNPC_AntlionGuard::Event_Killed( const CTakeDamageInfo &info )
 		CBaseEntity	*pSearch = NULL;
 
 		// Iterate through all antlions and see if there are any orphans
-		while ( ( pSearch = gEntList.FindEntityByClassname( pSearch, "npc_antlion" ) ) != NULL )
+		while ( ( pSearch = EntityList()->FindEntityByClassname( pSearch, "npc_antlion" ) ) != NULL )
 		{
 			CNPC_Antlion *pAntlion = assert_cast<CNPC_Antlion *>(pSearch);
 
@@ -4579,7 +4579,7 @@ bool CNPC_AntlionGuard::CanBecomeRagdoll( void )
 //		pRagdoll->GetEngineObject()->SetCollisionGroup( COLLISION_GROUP_DEBRIS );
 //		
 //		// Get rid of our old body
-//		gEntList.DestroyEntity(this);
+//		EntityList()->DestroyEntity(this);
 //
 //		return true;
 //	}

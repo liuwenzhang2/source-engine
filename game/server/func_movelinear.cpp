@@ -345,7 +345,7 @@ void CFuncMoveLinear::Blocked( CBaseEntity *pOther )
 		if ( pOther->m_takedamage == DAMAGE_EVENTS_ONLY )
 		{
 			if ( FClassnameIs( pOther, "gib" ) )
-				gEntList.DestroyEntity( pOther );
+				EntityList()->DestroyEntity( pOther );
 		}
 		else
 			pOther->TakeDamage( CTakeDamageInfo( this, this, m_flBlockDamage, DMG_CRUSH ) );

@@ -252,7 +252,7 @@ int CAntlionGrub::GetNuggetDenomination( void )
 //-----------------------------------------------------------------------------
 void CAntlionGrub::CreateNugget( void )
 {
-	CGrubNugget *pNugget = (CGrubNugget *)gEntList.CreateEntityByName( "item_grubnugget" );
+	CGrubNugget *pNugget = (CGrubNugget *)EntityList()->CreateEntityByName( "item_grubnugget" );
 	if ( pNugget == NULL )
 		return;
 
@@ -466,7 +466,7 @@ void CAntlionGrub::AttachToSurface( void )
 	{
 		// A grub was left hanging in the air, it must not be near any valid surfaces!
 		Warning("Antlion grub stranded in space at (%.02f, %.02f, %.02f) : REMOVED\n", GetEngineObject()->GetAbsOrigin().x, GetEngineObject()->GetAbsOrigin().y, GetEngineObject()->GetAbsOrigin().z );
-		gEntList.DestroyEntity( this );
+		EntityList()->DestroyEntity( this );
 		return;
 	}
 
@@ -960,7 +960,7 @@ bool CGrubNugget::MyTouch( CBasePlayer *pPlayer )
 	CPASAttenuationFilter filter( pPlayer, "GrubNugget.Touch" );
 	g_pSoundEmitterSystem->EmitSound( filter, pPlayer->entindex(), "GrubNugget.Touch" );
 
-	gEntList.DestroyEntity( this );	
+	EntityList()->DestroyEntity( this );	
 
 	return true;
 }
@@ -980,7 +980,7 @@ void CGrubNugget::VPhysicsCollision( int index, gamevcollisionevent_t *pEvent )
 		if ( pHitEntity == NULL )
 		{
 			// hit world
-			pHitEntity = gEntList.GetBaseEntity( 0 );
+			pHitEntity = EntityList()->GetBaseEntity( 0 );
 		}
 		
 		Vector damagePos;

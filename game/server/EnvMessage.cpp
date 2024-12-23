@@ -129,7 +129,7 @@ void CMessage::InputShowMessage( inputdata_t &inputdata )
 
 	if (GetEngineObject()->GetSpawnFlags() & SF_MESSAGE_ONCE )
 	{
-		gEntList.DestroyEntity( this );
+		EntityList()->DestroyEntity( this );
 	}
 
 	m_OnShowMessage.FireOutput( inputdata.pActivator, this );
@@ -191,7 +191,7 @@ void CCredits::Spawn( void )
 
 static void CreditsDone_f( void )
 {
-	CCredits *pCredits = (CCredits*)gEntList.FindEntityByClassname( NULL, "env_credits" );
+	CCredits *pCredits = (CCredits*)EntityList()->FindEntityByClassname( NULL, "env_credits" );
 
 	if ( pCredits )
 	{

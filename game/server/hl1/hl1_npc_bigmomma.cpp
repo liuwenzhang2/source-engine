@@ -498,7 +498,7 @@ void CNPC_BigMomma::NodeStart( string_t iszNextNode )
 	CBaseEntity *pTarget = NULL;
 
 	if ( pTargetName )
-		 pTarget = gEntList.FindEntityByName( NULL, pTargetName );
+		 pTarget = EntityList()->FindEntityByName( NULL, pTargetName );
 
 	if ( pTarget == NULL )
 	{
@@ -812,7 +812,7 @@ void CNPC_BigMomma::RunTask( const Task_t *pTask )
 			CBaseEntity *pTarget = NULL;
 
 			if (  GetTarget() )
-				 pTarget = gEntList.FindEntityByName( NULL, STRING( GetTarget()->m_target ) );
+				 pTarget = EntityList()->FindEntityByName( NULL, STRING( GetTarget()->m_target ) );
 
 			if ( pTarget )
 			{
@@ -1196,7 +1196,7 @@ void CBMortar::Animate( void )
 
 CBMortar *CBMortar::Shoot( CBaseEntity *pOwner, Vector vecStart, Vector vecVelocity )
 {
-	CBMortar *pSpit = (CBMortar*)gEntList.CreateEntityByName( "bmortar" );
+	CBMortar *pSpit = (CBMortar*)EntityList()->CreateEntityByName( "bmortar" );
 	pSpit->Spawn();
 	
 	UTIL_SetOrigin( pSpit, vecStart );
@@ -1279,8 +1279,8 @@ void CBMortar::Touch( CBaseEntity *pOther )
 
 	RadiusDamage( CTakeDamageInfo( this, pOwner, sk_bigmomma_dmg_blast.GetFloat(), DMG_ACID ), GetEngineObject()->GetAbsOrigin(), sk_bigmomma_radius_blast.GetFloat(), CLASS_NONE, NULL );
 		
-	gEntList.DestroyEntity( pSprite );
-	gEntList.DestroyEntity( this );
+	EntityList()->DestroyEntity( pSprite );
+	EntityList()->DestroyEntity( this );
 }
 
 

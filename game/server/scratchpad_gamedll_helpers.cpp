@@ -25,14 +25,14 @@ void ScratchPad_DrawWorldToScratchPad(
 
 	if ( flags & (SPDRAWWORLD_DRAW_PLAYERS | SPDRAWWORLD_DRAW_ENTITIES) )
 	{
-		CBaseEntity *pCur = gEntList.FirstEnt();
+		CBaseEntity *pCur = EntityList()->FirstEnt();
 		while ( pCur )
 		{
 			bool bPlayer = ( dynamic_cast< CBasePlayer* >( pCur ) != 0 );
 			if ( (bPlayer && !( flags & SPDRAWWORLD_DRAW_PLAYERS )) ||
 				(!bPlayer && !( flags & SPDRAWWORLD_DRAW_ENTITIES )) )
 			{
-				pCur = gEntList.NextEnt( pCur );
+				pCur = EntityList()->NextEnt( pCur );
 				continue;
 			}
 
@@ -43,7 +43,7 @@ void ScratchPad_DrawWorldToScratchPad(
 				bPlayer ? Vector( 1.0, 0.5, 0 ) : Vector( 0.3, 0.3, 1.0 )
 				);
 
-			pCur = gEntList.NextEnt( pCur );
+			pCur = EntityList()->NextEnt( pCur );
 		}
 	}
 }

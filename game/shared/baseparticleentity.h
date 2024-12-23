@@ -81,7 +81,7 @@ private:
 public:
 	void			FollowEntity(CBaseEntity *pEntity);
 	
-	// gEntList.DestroyEntity will be called after the specified amount of time.
+	// EntityList()->DestroyEntity will be called after the specified amount of time.
 	// If you pass in -1, the entity will never go away automatically.
 	void			SetLifetime(float lifetime);
 

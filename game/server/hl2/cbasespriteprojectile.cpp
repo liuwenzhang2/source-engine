@@ -88,7 +88,7 @@ void CBaseSpriteProjectile::HandleTouch( CBaseEntity *pOther )
 	GuessDamageForce( &info, (tr.endpos - tr.startpos), tr.endpos );
 	pOther->TakeDamage( info );
 	
-	gEntList.DestroyEntity( this );
+	EntityList()->DestroyEntity( this );
 }
 
 //---------------------------------------------------------

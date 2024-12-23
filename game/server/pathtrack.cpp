@@ -97,7 +97,7 @@ void CPathTrack::Link( void  )
 
 	if ( m_target != NULL_STRING )
 	{
-		pTarget = gEntList.FindEntityByName( NULL, m_target );
+		pTarget = EntityList()->FindEntityByName( NULL, m_target );
 
 		if ( pTarget == this)
 		{
@@ -106,7 +106,7 @@ void CPathTrack::Link( void  )
 			//FIXME: Why were we removing this?  If it was already connected to, we weren't updating the other linked
 			//		 end, causing problems with walking through bogus memory links!  -- jdw
 
-			//gEntList.DestroyEntity(this);
+			//EntityList()->DestroyEntity(this);
 			//return;
 		}
 		else if ( pTarget )
@@ -127,7 +127,7 @@ void CPathTrack::Link( void  )
 	// Find "alternate" path
 	if ( m_altName != NULL_STRING )
 	{
-		pTarget = gEntList.FindEntityByName( NULL, m_altName );
+		pTarget = EntityList()->FindEntityByName( NULL, m_altName );
 		if ( pTarget )
 		{
 			m_paltpath = dynamic_cast<CPathTrack*>( pTarget );

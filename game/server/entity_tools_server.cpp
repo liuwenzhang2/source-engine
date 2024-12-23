@@ -190,7 +190,7 @@ bool CServerTools::IsInNoClipMode( IClientEntity *pClientPlayer )
 
 CBaseEntity *CServerTools::FirstEntity( void )
 {
-	return gEntList.FirstEnt();
+	return EntityList()->FirstEnt();
 }
 
 CBaseEntity *CServerTools::NextEntity( CBaseEntity *pEntity )
@@ -199,24 +199,24 @@ CBaseEntity *CServerTools::NextEntity( CBaseEntity *pEntity )
 
 	if ( pEntity == NULL )
 	{
-		pEnt = gEntList.FirstEnt();
+		pEnt = EntityList()->FirstEnt();
 	}
 	else
 	{
-		pEnt = gEntList.NextEnt( (CBaseEntity *)pEntity );
+		pEnt = EntityList()->NextEnt( (CBaseEntity *)pEntity );
 	}
 	return pEnt;
 }
 
 CBaseEntity *CServerTools::FindEntityByHammerID( int iHammerID )
 {
-	CBaseEntity *pEntity = gEntList.FirstEnt();
+	CBaseEntity *pEntity = EntityList()->FirstEnt();
 
 	while (pEntity)
 	{
 		if (pEntity->m_iHammerID == iHammerID)
 			return pEntity;
-		pEntity = gEntList.NextEnt( pEntity );
+		pEntity = EntityList()->NextEnt( pEntity );
 	}
 	return NULL;
 }
@@ -247,7 +247,7 @@ bool CServerTools::SetKeyValue( CBaseEntity *pEntity, const char *szField, const
 //-----------------------------------------------------------------------------
 CBaseEntity *CServerTools::CreateEntityByName( const char *szClassName )
 {
-	return gEntList.CreateEntityByName( szClassName );
+	return (CBaseEntity*)EntityList()->CreateEntityByName( szClassName );
 }
 
 void CServerTools::DispatchSpawn( CBaseEntity *pEntity )
@@ -292,23 +292,23 @@ bool CServerTools::DestroyEntityByHammerId( int iHammerID )
 	if ( !pEntity )
 		return false;
 
-	gEntList.DestroyEntity( pEntity );
+	EntityList()->DestroyEntity( pEntity );
 	return true;
 }
 
 void CServerTools::RemoveEntity( CBaseEntity *pEntity )
 {
-	gEntList.DestroyEntity( pEntity );
+	EntityList()->DestroyEntity( pEntity );
 }
 
 void CServerTools::RemoveEntityImmediate( CBaseEntity *pEntity )
 {
-	gEntList.DestroyEntityImmediate( pEntity );
+	EntityList()->DestroyEntityImmediate( pEntity );
 }
 
 CBaseEntity *CServerTools::GetBaseEntityByEntIndex( int iEntIndex )
 {
-	return gEntList.GetBaseEntity(iEntIndex);
+	return EntityList()->GetBaseEntity(iEntIndex);
 }
 
 //IEntityFactoryDictionary *CServerTools::GetEntityFactoryDictionary( void )
@@ -381,12 +381,12 @@ bool CServerTools::IsEntityPtr( void *pTest )
 
 CBaseEntity *CServerTools::FindEntityByClassname( CBaseEntity *pStartEntity, const char *szName )
 {
-	return gEntList.FindEntityByClassname( pStartEntity, szName );
+	return EntityList()->FindEntityByClassname( pStartEntity, szName );
 }
 
 CBaseEntity *CServerTools::FindEntityByName( CBaseEntity *pStartEntity, const char *szName, CBaseEntity *pSearchingEntity, CBaseEntity *pActivator, CBaseEntity *pCaller, IEntityFindFilter *pFilter )
 {
-	return gEntList.FindEntityByName( pStartEntity, szName, pSearchingEntity, pActivator, pCaller, pFilter );
+	return EntityList()->FindEntityByName( pStartEntity, szName, pSearchingEntity, pActivator, pCaller, pFilter );
 }
 
 CBaseEntity *CServerTools::FindEntityInSphere( CBaseEntity *pStartEntity, const Vector &vecCenter, float flRadius )
@@ -468,7 +468,7 @@ public:
 	virtual EntitySearchResult	NextChoreoEntity( EntitySearchResult currentEnt )
 	{
 		CBaseEntity *ent = reinterpret_cast< CBaseEntity* >( currentEnt );
-		ent = gEntList.FindEntityByClassname( ent, "logic_choreographed_scene" );
+		ent = EntityList()->FindEntityByClassname( ent, "logic_choreographed_scene" );
 		return reinterpret_cast< EntitySearchResult >( ent );
 	}
 
@@ -496,7 +496,7 @@ public:
 
 	virtual void ReloadSceneFromDisk( int entindex )
 	{
-		CBaseEntity *ent = gEntList.GetBaseEntity( entindex );
+		CBaseEntity *ent = EntityList()->GetBaseEntity( entindex );
 		if ( !ent )
 			return;
 

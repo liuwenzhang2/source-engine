@@ -56,7 +56,7 @@ CRagdollBoogie *CRagdollBoogie::Create( CBaseEntity *pTarget, float flMagnitude,
 	if ( !pRagdoll )
 		return NULL;
 
-	CRagdollBoogie *pBoogie = (CRagdollBoogie *)gEntList.CreateEntityByName( "env_ragdoll_boogie" );
+	CRagdollBoogie *pBoogie = (CRagdollBoogie *)EntityList()->CreateEntityByName( "env_ragdoll_boogie" );
 	if ( pBoogie == NULL )
 		return NULL;
 
@@ -193,7 +193,7 @@ void CRagdollBoogie::AttachToEntity( CBaseEntity *pTarget )
 			continue;
 
 		m_nSuppressionCount = pBoogie->m_nSuppressionCount;
-		gEntList.DestroyEntity( pChild->GetOuter() );
+		EntityList()->DestroyEntity( pChild->GetOuter() );
 	}
 
 	GetEngineObject()->FollowEntity( pTarget->GetEngineObject());
@@ -231,7 +231,7 @@ void CRagdollBoogie::BoogieThink( void )
 	CRagdollProp *pRagdoll = dynamic_cast< CRagdollProp* >(GetEngineObject()->GetMoveParent()->GetOuter() );
 	if ( !pRagdoll )
 	{
-		gEntList.DestroyEntity( this );
+		EntityList()->DestroyEntity( this );
 		return;
 	}
 
@@ -244,7 +244,7 @@ void CRagdollBoogie::BoogieThink( void )
 			// Don't remove while suppressed... this helps if we try to start another boogie
 			if ( m_nSuppressionCount == 0 )
 			{
-				gEntList.DestroyEntity( this );
+				EntityList()->DestroyEntity( this );
 			}
 			SetThink( NULL );
 			return;

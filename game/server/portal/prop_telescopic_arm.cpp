@@ -98,17 +98,17 @@ void CPropTelescopicArm::UpdateOnRemove( void )
 
 	pPoseController = static_cast<CPoseController*>( m_hRotXPoseController.Get() );
 	if ( pPoseController )
-		gEntList.DestroyEntity( pPoseController );
+		EntityList()->DestroyEntity( pPoseController );
 	m_hRotXPoseController = 0;
 
 	pPoseController = static_cast<CPoseController*>( m_hRotYPoseController.Get() );
 	if ( pPoseController )
-		gEntList.DestroyEntity( pPoseController );
+		EntityList()->DestroyEntity( pPoseController );
 	m_hRotYPoseController = 0;
 
 	pPoseController = static_cast<CPoseController*>( m_hTelescopicPoseController.Get() );
 	if ( pPoseController )
-		gEntList.DestroyEntity( pPoseController );
+		EntityList()->DestroyEntity( pPoseController );
 	m_hTelescopicPoseController = 0;
 }
 
@@ -151,7 +151,7 @@ void CPropTelescopicArm::Spawn( void )
 
 	CPoseController *pPoseController;
 
-	pPoseController = static_cast<CPoseController*>(gEntList.CreateEntityByName( "point_posecontroller" ) );
+	pPoseController = static_cast<CPoseController*>(EntityList()->CreateEntityByName( "point_posecontroller" ) );
 	DispatchSpawn( pPoseController );
 	if ( pPoseController )
 	{
@@ -161,7 +161,7 @@ void CPropTelescopicArm::Spawn( void )
 		m_hRotXPoseController = pPoseController;
 	}
 
-	pPoseController = static_cast<CPoseController*>(gEntList.CreateEntityByName( "point_posecontroller" ) );
+	pPoseController = static_cast<CPoseController*>(EntityList()->CreateEntityByName( "point_posecontroller" ) );
 	DispatchSpawn( pPoseController );
 	if ( pPoseController )
 	{
@@ -171,7 +171,7 @@ void CPropTelescopicArm::Spawn( void )
 		m_hRotYPoseController = pPoseController;
 	}
 
-	pPoseController = static_cast<CPoseController*>(gEntList.CreateEntityByName( "point_posecontroller" ) );
+	pPoseController = static_cast<CPoseController*>(EntityList()->CreateEntityByName( "point_posecontroller" ) );
 	DispatchSpawn( pPoseController );
 	if ( pPoseController )
 	{
@@ -415,7 +415,7 @@ void CPropTelescopicArm::AimAt( Vector vTarget )
 
 void CPropTelescopicArm::SetTarget( const char *pchTargetName )
 {
-	CBaseEntity *pTarget = gEntList.FindEntityByName( NULL, pchTargetName, NULL, NULL );
+	CBaseEntity *pTarget = EntityList()->FindEntityByName( NULL, pchTargetName, NULL, NULL );
 
 	//if ( pTarget == NULL )
 	//	pTarget = UTIL_PlayerByIndex( 1 );

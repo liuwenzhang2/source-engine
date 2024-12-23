@@ -68,7 +68,7 @@ void CTeamControlPointRound::FindControlPoints( void )
 	if ( pMaster )
 	{
 		// go through all the points
-		CBaseEntity *pEnt = gEntList.FindEntityByClassname( NULL, pMaster->GetControlPointName() );
+		CBaseEntity *pEnt = EntityList()->FindEntityByClassname( NULL, pMaster->GetControlPointName() );
 		
 		while( pEnt )
 		{
@@ -95,7 +95,7 @@ void CTeamControlPointRound::FindControlPoints( void )
 				}
 			}
 
-			pEnt = gEntList.FindEntityByClassname( pEnt, pMaster->GetControlPointName() );
+			pEnt = EntityList()->FindEntityByClassname( pEnt, pMaster->GetControlPointName() );
 		}
 	}
 

@@ -831,7 +831,7 @@ void CBaseHelicopter::UpdatePlayerDopplerShift( )
 
 		// UNDONE: this needs to send different sounds to every player for multiplayer.	
 		// FIXME: this isn't the correct way to find a player!!!
-		pPlayer = gEntList.FindEntityByName( NULL, "!player" );
+		pPlayer = EntityList()->FindEntityByName( NULL, "!player" );
 		if (pPlayer)
 		{
 			Vector dir;
@@ -1123,7 +1123,7 @@ void CBaseHelicopter::StopRotorWash( void )
 {
 	if ( m_hRotorWash )
 	{
-		gEntList.DestroyEntity( m_hRotorWash );
+		EntityList()->DestroyEntity( m_hRotorWash );
 		m_hRotorWash = NULL;
 	}
 }
@@ -1141,7 +1141,7 @@ void CBaseHelicopter::DelayedKillThink( )
 		SetOwnerEntity( NULL );
 	}
 
-	gEntList.DestroyEntity( this );
+	EntityList()->DestroyEntity( this );
 }
 
 

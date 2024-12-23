@@ -189,7 +189,7 @@ CHL2MPRules::CHL2MPRules()
 	// Create the team managers
 	for ( int i = 0; i < ARRAYSIZE( sTeamNames ); i++ )
 	{
-		CTeam *pTeam = static_cast<CTeam*>(gEntList.CreateEntityByName( "team_manager" ));
+		CTeam *pTeam = static_cast<CTeam*>(EntityList()->CreateEntityByName( "team_manager" ));
 		pTeam->Init( sTeamNames[i], i );
 
 		g_Teams.AddToTail( pTeam );
@@ -1088,13 +1088,13 @@ void CHL2MPRules::CleanUpMap()
 		{
 			if ( !pWeapon->GetPlayerOwner() )
 			{
-				gEntList.DestroyEntity( pCur );
+				EntityList()->DestroyEntity( pCur );
 			}
 		}
 		// remove entities that has to be restored on roundrestart (breakables etc)
 		else if ( !FindInList( s_PreserveEnts, pCur->GetClassname() ) )
 		{
-			gEntList.DestroyEntity( pCur );
+			EntityList()->DestroyEntity( pCur );
 		}
 
 		pCur = gEntList.NextEnt( pCur );
@@ -1144,17 +1144,17 @@ void CHL2MPRules::CleanUpMap()
 				CMapEntityRef &ref = g_MapEntityRefs[m_iIterator];
 				m_iIterator = g_MapEntityRefs.Next( m_iIterator );	// Seek to the next entity.
 
-				if ( ref.m_iEdict == -1 || gEntList.GetBaseEntity( ref.m_iEdict ) )
+				if ( ref.m_iEdict == -1 || EntityList()->GetBaseEntity( ref.m_iEdict ) )
 				{
 					// Doh! The entity was delete and its slot was reused.
 					// Just use any old edict slot. This case sucks because we lose the baseline.
-					return gEntList.CreateEntityByName( pClassname );
+					return (CBaseEntity*)EntityList()->CreateEntityByName( pClassname );
 				}
 				else
 				{
 					// Cool, the slot where this entity was is free again (most likely, the entity was 
 					// freed above). Now create an entity with this specific index.
-					return gEntList.CreateEntityByName( pClassname, ref.m_iEdict );
+					return (CBaseEntity*)EntityList()->CreateEntityByName( pClassname, ref.m_iEdict );
 				}
 			}
 		}

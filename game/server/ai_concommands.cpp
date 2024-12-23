@@ -222,7 +222,7 @@ void CC_AI_Hull( const CCommand &args )
 		if ( !pEnt )
 		{
 			// Not found, try to create one.
-			pEnt = (CAI_BaseNPC *)gEntList.CreateEntityByName( args[1] );
+			pEnt = (CAI_BaseNPC *)EntityList()->CreateEntityByName( args[1] );
 			if ( !pEnt )
 			{
 				DevMsg( "Entity %s not found, and couldn't create!\n", args[1] );
@@ -245,7 +245,7 @@ void CC_AI_Hull( const CCommand &args )
 
 	if ( bSpawned )
 	{
-		gEntList.DestroyEntity( pEnt );
+		EntityList()->DestroyEntity( pEnt );
 	}
 
 	g_pAINetworkManager->GetEditOps()->DrawHull( eHull );
@@ -401,7 +401,7 @@ void CC_NPC_Create( const CCommand &args )
 	engine->SetAllowPrecache( true );//CBaseEntity::
 
 	// Try to create entity
-	CAI_BaseNPC *baseNPC = dynamic_cast< CAI_BaseNPC * >(gEntList.CreateEntityByName(args[1]) );
+	CAI_BaseNPC *baseNPC = dynamic_cast< CAI_BaseNPC * >(EntityList()->CreateEntityByName(args[1]) );
 	if (baseNPC)
 	{
 		baseNPC->KeyValue( "additionalequipment", npc_create_equipment.GetString() );
@@ -468,7 +468,7 @@ void CC_NPC_Create_Aimed( const CCommand &args )
 	engine->SetAllowPrecache( true );//CBaseEntity::
 
 	// Try to create entity
-	CAI_BaseNPC *baseNPC = dynamic_cast< CAI_BaseNPC * >(gEntList.CreateEntityByName(args[1]) );
+	CAI_BaseNPC *baseNPC = dynamic_cast< CAI_BaseNPC * >(EntityList()->CreateEntityByName(args[1]) );
 	if (baseNPC)
 	{
 		baseNPC->KeyValue( "additionalequipment", npc_create_equipment.GetString() );
@@ -532,7 +532,7 @@ static ConCommand npc_create_aimed("npc_create_aimed", CC_NPC_Create_Aimed, "Cre
 //------------------------------------------------------------------------------
 void CC_NPC_DestroyUnselected( void )
 {
-	CAI_BaseNPC *pNPC = gEntList.NextEntByClass( (CAI_BaseNPC *)NULL );
+	CAI_BaseNPC *pNPC = NextEntByClass( (CAI_BaseNPC *)NULL );
 
 	while (pNPC)
 	{
@@ -540,7 +540,7 @@ void CC_NPC_DestroyUnselected( void )
 		{
 			pNPC->m_debugOverlays |= OVERLAY_NPC_ZAP_BIT;
 		}
-		pNPC = gEntList.NextEntByClass(pNPC);
+		pNPC = NextEntByClass(pNPC);
 	}
 }
 static ConCommand npc_destroy_unselected("npc_destroy_unselected", CC_NPC_DestroyUnselected, "Removes all NPCs from the universe that aren't currently selected", FCVAR_CHEAT);
@@ -558,7 +558,7 @@ void CC_NPC_Freeze( const CCommand &args )
 		// No NPC was specified, try to freeze selected NPCs.
 		//
 		bool bFound = false;
-		CAI_BaseNPC *npc = gEntList.NextEntByClass( (CAI_BaseNPC *)NULL );
+		CAI_BaseNPC *npc = NextEntByClass( (CAI_BaseNPC *)NULL );
 		while (npc)
 		{
 			if (npc->m_debugOverlays & OVERLAY_NPC_SELECTED_BIT) 
@@ -566,7 +566,7 @@ void CC_NPC_Freeze( const CCommand &args )
 				bFound = true;
 				npc->ToggleFreeze();
 			}
-			npc = gEntList.NextEntByClass(npc);
+			npc = NextEntByClass(npc);
 		}
 
 		if (!bFound)
@@ -595,7 +595,7 @@ static ConCommand npc_freeze("npc_freeze", CC_NPC_Freeze, "Selected NPC(s) will 
 
 CON_COMMAND( npc_freeze_unselected, "Freeze all NPCs not selected" )
 {
-	CAI_BaseNPC *pNPC = gEntList.NextEntByClass( (CAI_BaseNPC *)NULL );
+	CAI_BaseNPC *pNPC = NextEntByClass( (CAI_BaseNPC *)NULL );
 
 	while (pNPC)
 	{
@@ -603,7 +603,7 @@ CON_COMMAND( npc_freeze_unselected, "Freeze all NPCs not selected" )
 		{
 			pNPC->ToggleFreeze();
 		}
-		pNPC = gEntList.NextEntByClass(pNPC);
+		pNPC = NextEntByClass(pNPC);
 	}
 }
 
@@ -641,7 +641,7 @@ void CC_NPC_Teleport( void )
 
 	if ( tr.fraction != 1.0)
 	{
-		CAI_BaseNPC *npc = gEntList.NextEntByClass( (CAI_BaseNPC *)NULL );
+		CAI_BaseNPC *npc = NextEntByClass( (CAI_BaseNPC *)NULL );
 
 		while (npc)
 		{
@@ -652,7 +652,7 @@ void CC_NPC_Teleport( void )
 				break;
 			}
 
-			npc = gEntList.NextEntByClass(npc);
+			npc = NextEntByClass(npc);
 		}
 	}
 }
@@ -794,7 +794,7 @@ static ConCommand npc_steering("npc_steering", CC_NPC_ViewSteeringRegulations, "
 
 void CC_NPC_ViewSteeringRegulationsAll( void )
 {
-	CAI_BaseNPC *pNPC = gEntList.NextEntByClass( (CAI_BaseNPC *)NULL );
+	CAI_BaseNPC *pNPC = NextEntByClass( (CAI_BaseNPC *)NULL );
 
 	while (pNPC)
 	{
@@ -806,7 +806,7 @@ void CC_NPC_ViewSteeringRegulationsAll( void )
 		{
 			pNPC->m_debugOverlays &= ~OVERLAY_NPC_STEERING_REGULATIONS;
 		}
-		pNPC = gEntList.NextEntByClass(pNPC);
+		pNPC = NextEntByClass(pNPC);
 	}
 }
 static ConCommand npc_steering_all("npc_steering_all", CC_NPC_ViewSteeringRegulationsAll, "Displays the steering obstructions of all NPCs (used to perform local avoidance)\n", FCVAR_CHEAT);
