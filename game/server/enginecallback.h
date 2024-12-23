@@ -56,6 +56,19 @@ inline T* CHandle<T>::Get() const
 #endif // GAME_DLL
 }
 
+// returns the next entity of the specified class, using RTTI
+template< class U >
+U* NextEntByClass(U* start)
+{
+	for (CBaseEntity* x = EntityList()->NextEnt(start); x; x = EntityList()->NextEnt(x))
+	{
+		start = dynamic_cast<U*>(x);
+		if (start)
+			return start;
+	}
+	return NULL;
+}
+
 //-----------------------------------------------------------------------------
 // Precaches a material
 //-----------------------------------------------------------------------------
