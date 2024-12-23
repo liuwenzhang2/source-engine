@@ -52,7 +52,7 @@ template<class T>
 inline T* CHandle<T>::Get() const
 {
 #ifdef GAME_DLL
-	return (T*)gEntList.LookupEntity(*this);
+	return (T*)EntityList()->GetServerEntityFromHandle(*this);
 #endif // GAME_DLL
 }
 
