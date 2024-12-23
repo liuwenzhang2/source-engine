@@ -18,6 +18,7 @@
 #include "player.h"
 #include "engine/IEngineSound.h"
 #include "in_buttons.h"
+#include "basetoggle.h"
 
 ConVar	sk_suitcharger( "sk_suitcharger","0" );
 #define HL1_MAX_ARMOR 100

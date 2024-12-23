@@ -11,7 +11,7 @@
 #include "engine/IEngineSound.h"
 #include "hl1_items.h"
 #include "in_buttons.h"
-
+#include "basetoggle.h"
 
 ConVar	sk_healthkit( "sk_healthkit","0" );		
 ConVar	sk_healthvial( "sk_healthvial","0" );		

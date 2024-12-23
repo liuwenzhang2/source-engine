@@ -23,7 +23,7 @@
 #include "func_break.h"
 #include "hl1_shareddefs.h"
 #include "eventqueue.h"
-
+#include "basetoggle.h"
 
 // 
 //	TRIGGERS: trigger_auto, trigger_relay, multimanager: replaced in src by logic_auto and logic_relay

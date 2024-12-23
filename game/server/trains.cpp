@@ -14,6 +14,7 @@
 #include "physics_npc_solver.h"
 #include "vphysics/friction.h"
 #include "hierarchy.h"
+#include "basetoggle.h"
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 class CFuncPlat;
