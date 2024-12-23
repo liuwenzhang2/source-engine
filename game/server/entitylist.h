@@ -867,7 +867,7 @@ public:
 	void UpdateNetworkDataFromVPhysics(int index);
 	bool GetAllAsleep() { return m_allAsleep; }
 	IPhysicsConstraintGroup* GetConstraintGroup() { return m_ragdoll.pGroup; }
-	ragdoll_t* GetRagdoll(void) { return &m_ragdoll; }
+	ragdoll_t* GetRagdoll(void) { return m_ragdoll.listCount ? &m_ragdoll : NULL; }
 	virtual bool IsRagdoll() const;
 	void ActiveRagdoll();
 	void ApplyAnimationAsVelocityToRagdoll(const matrix3x4_t* pPrevBones, const matrix3x4_t* pCurrentBones, float dt);

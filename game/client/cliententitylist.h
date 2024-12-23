@@ -996,7 +996,7 @@ public:
 	void ResetRagdollSleepAfterTime(void);
 	float GetLastVPhysicsUpdateTime() const { return m_lastUpdate; }
 
-	ragdoll_t* GetRagdoll(void) { return &m_ragdoll; }
+	ragdoll_t* GetRagdoll(void) { return m_ragdoll.listCount ? &m_ragdoll : NULL; }
 	// returns true if we're currently being ragdolled
 	bool							IsRagdoll() const;
 	bool							IsAboutToRagdoll() const;

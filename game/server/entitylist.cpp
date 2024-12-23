@@ -12393,7 +12393,7 @@ void CEnginePortalInternal::TakePhysicsOwnership(CBaseEntity* pEntity)
 					}
 					else*/
 					{
-						pPlayer->PickupObject(pHeldEntity);
+						pPlayer->PickupObject(pHeldEntity, false);
 					}
 					pPlayer->GetEnginePlayer()->SetSilentDropAndPickup(false);
 				}
@@ -12505,7 +12505,7 @@ void CEnginePortalInternal::ReleasePhysicsOwnership(CBaseEntity* pEntity, bool b
 							}
 							else*/
 							{
-								pPlayer->PickupObject(pHeldEntity);
+								pPlayer->PickupObject(pHeldEntity, false);
 							}
 							pPlayer->GetEnginePlayer()->SetSilentDropAndPickup(false);
 						}
