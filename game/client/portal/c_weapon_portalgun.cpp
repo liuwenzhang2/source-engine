@@ -949,7 +949,7 @@ void C_WeaponPortalgun::DrawEffectSprite( EffectType_t effectID, bool b3rdPerson
 
 	// Draw the sprite
 	CMatRenderContextPtr pRenderContext( materials );
-	pRenderContext->Bind( pMaterial, this );
+	pRenderContext->Bind( pMaterial, GetClientRenderable() );
 	DrawSprite( vecAttachment, scale, scale, color );
 }
 

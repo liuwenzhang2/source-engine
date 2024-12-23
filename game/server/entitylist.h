@@ -5111,7 +5111,7 @@ void CGlobalEntityList<T>::DestroyEntity(IHandleEntity* oldObj)
 	//CServerNetworkProperty* pProp = static_cast<CServerNetworkProperty*>(oldObj);
 	if (!pEntity || pEntity->GetEngineObject()->IsMarkedForDeletion())
 		return;
-
+	
 	if (PhysIsInCallback())
 	{
 		// This assert means that someone is deleting an entity inside a callback.  That isn't supported so

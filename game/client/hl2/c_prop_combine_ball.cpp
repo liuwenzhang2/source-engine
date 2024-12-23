@@ -272,7 +272,7 @@ int C_PropCombineBall::DrawModel( int flags )
 
 		// Draw the main ball body
 		CMatRenderContextPtr pRenderContext( materials );
-		pRenderContext->Bind( m_pBodyMaterial, (C_BaseEntity*) this );
+		pRenderContext->Bind( m_pBodyMaterial, GetClientRenderable());
 		DrawHaloOriented(GetEngineObject()->GetAbsOrigin(), m_flRadius + sinOffs, color, roll );
 	}
 	

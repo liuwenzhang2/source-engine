@@ -12152,7 +12152,7 @@ void CEnginePortalInternal::TakeOwnershipOfEntity(CBaseEntity* pEntity)
 	if (pEntity == NULL)
 		return;
 
-	if (!pEntity->IsNetworkable() || pEntity->entindex() == -1) {
+	if (!pEntity->IsNetworkable() || pEntity->entindex() == -1 || pEntity->GetEngineObject()->IsMarkedForDeletion()) {
 		return;
 	}
 

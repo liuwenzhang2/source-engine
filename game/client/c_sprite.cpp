@@ -73,7 +73,7 @@ void DrawSpriteModel( IClientEntity *baseentity, CEngineSprite *psprite, const V
 	}
 	else
 	{
-		pRenderContext->Bind( material, (IClientRenderable*)baseentity );
+		pRenderContext->Bind( material, baseentity->GetClientRenderable());
 	}
 
 	unsigned char color[4];

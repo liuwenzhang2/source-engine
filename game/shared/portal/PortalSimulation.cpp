@@ -1126,6 +1126,9 @@ bool CPSCollisionEntity::TestCollision(const Ray_t& ray, unsigned int fContentsM
 #ifdef GAME_DLL
 void CPSCollisionEntity::StartTouch(CBaseEntity* pOther)
 {
+	BaseClass::StartTouch(pOther);
+	// Since prop_portal is a trigger it doesn't send back start touch, so I'm forcing it
+	pOther->StartTouch(this);
 	if (m_pOwningSimulator) {
 		m_pOwningSimulator->StartTouch(pOther);
 	}
@@ -1133,6 +1136,8 @@ void CPSCollisionEntity::StartTouch(CBaseEntity* pOther)
 
 void CPSCollisionEntity::Touch(CBaseEntity* pOther)
 {
+	BaseClass::Touch(pOther);
+	pOther->Touch(this);
 	if (m_pOwningSimulator) {
 		m_pOwningSimulator->Touch(pOther);
 	}
@@ -1140,6 +1145,9 @@ void CPSCollisionEntity::Touch(CBaseEntity* pOther)
 
 void CPSCollisionEntity::EndTouch(CBaseEntity* pOther)
 {
+	BaseClass::EndTouch(pOther);
+	// Since prop_portal is a trigger it doesn't send back end touch, so I'm forcing it
+	pOther->EndTouch(this);
 	if (m_pOwningSimulator) {
 		m_pOwningSimulator->EndTouch(pOther);
 	}

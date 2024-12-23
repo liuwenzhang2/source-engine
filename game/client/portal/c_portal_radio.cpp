@@ -240,7 +240,7 @@ int C_Portal_Dinosaur::DrawModel( int flags )
 
 	// Draw the sprite
 	CMatRenderContextPtr pRenderContext( materials );
-	pRenderContext->Bind( hMaterial, this );
+	pRenderContext->Bind( hMaterial, GetClientRenderable());
 	color32 color;
 	color.r = ( m_bDinosaurExtinct ) ? 0 : 255;
 	color.g = ( m_bDinosaurExtinct ) ? 255 : 0;

@@ -1247,7 +1247,6 @@ void CProp_Portal::TeleportTouchingEntity( CBaseEntity *pOther )
 void CProp_Portal::Touch( CBaseEntity *pOther )
 {
 	BaseClass::Touch( pOther );
-	pOther->Touch( this );
 
 	// Don't do anything on touch if it's not active
 	if( !GetEnginePortal()->IsActivated() || (m_hLinkedPortal.Get() == NULL))
@@ -1368,9 +1367,6 @@ void CProp_Portal::StartTouch( CBaseEntity *pOther )
 {
 	BaseClass::StartTouch( pOther );
 
-	// Since prop_portal is a trigger it doesn't send back start touch, so I'm forcing it
-	pOther->StartTouch( this );
-
 	if( sv_portal_debug_touch.GetBool() )
 	{
 		DevMsg( "Portal %i StartTouch: %s : %f\n", ((GetEnginePortal()->IsPortal2())?(2):(1)), pOther->GetClassname(), gpGlobals->curtime );
@@ -1412,9 +1408,6 @@ void CProp_Portal::StartTouch( CBaseEntity *pOther )
 void CProp_Portal::EndTouch( CBaseEntity *pOther )
 {
 	BaseClass::EndTouch( pOther );
-
-	// Since prop_portal is a trigger it doesn't send back end touch, so I'm forcing it
-	pOther->EndTouch( this );
 
 	// Don't do anything on end touch if it's not active
 	if(!GetEnginePortal()->IsActivated() )

@@ -572,7 +572,7 @@ void C_BreakableSurface::DrawRenderList(IBrushSurface* pBrushSurface)
 
 			m_pCurrentDetailTexture = m_pEdge[nCurEdgeType][nCurStyle].m_pMaterialEdgeTexture;
 			pRenderContext->Flush(false);
-			pRenderContext->Bind(m_pCrackedMaterial, (IClientRenderable*)this);
+			pRenderContext->Bind(m_pCrackedMaterial, GetClientRenderable());
 			pMesh = pRenderContext->GetDynamicMesh( );
 		}
 
@@ -917,7 +917,7 @@ void C_BreakableSurface::DrawSolidBlocks(IBrushSurface* pBrushSurface)
 	// Gotta flush (in a non-stalling way) because we effectively 
 	// have a new material due to the new base texture
 	pRenderContext->Flush(false);
-	pRenderContext->Bind(m_pCrackedMaterial, (IClientRenderable*)this);
+	pRenderContext->Bind(m_pCrackedMaterial, GetClientRenderable());
 	IMesh* pMesh = pRenderContext->GetDynamicMesh( );
 	CMeshBuilder pMeshBuilder;
 
