@@ -22,6 +22,7 @@
 #include "SoundEmitterSystem/isoundemittersystembase.h"
 #include "takedamageinfo.h"
 #include "player_pickup.h"
+#include "enginecallback.h"
 
 class CDamageModifier;
 class CDmgAccumulator;
@@ -304,7 +305,6 @@ enum DebugOverlayBits_t
 };
 
 extern Vector Pickup_DefaultPhysGunLaunchVelocity(const Vector& vecForward, float flMass);
-extern CGlobalVars* gpGlobals;
 struct TimedOverlay_t;
 
 /* =========  CBaseEntity  ======== 
@@ -2210,6 +2210,41 @@ inline void CBaseEntity::FireBullets( int cShots, const Vector &vecSrc,
 inline bool FClassnameIs(CBaseEntity *pEntity, const char *szClassname)
 { 
 	return pEntity->ClassMatches(szClassname); 
+}
+
+// maximum number of targets a single multi_manager entity may be assigned.
+#define MAX_MULTI_TARGETS	16 
+
+//-----------------------------------------------------------------------------
+// Purpose: Finds all active entities with the given targetname and calls their
+//			'Use' function.
+// Input  : targetName - Target name to search for.
+//			pActivator - 
+//			pCaller - 
+//			useType - 
+//			value - 
+//-----------------------------------------------------------------------------
+inline void FireTargets(const char* targetName, CBaseEntity* pActivator, CBaseEntity* pCaller, USE_TYPE useType, float value)
+{
+	CBaseEntity* pTarget = NULL;
+	if (!targetName || !targetName[0])
+		return;
+
+	DevMsg(2, "Firing: (%s)\n", targetName);
+
+	for (;;)
+	{
+		CBaseEntity* pSearchingEntity = pActivator;
+		pTarget = EntityList()->FindEntityByName(pTarget, targetName, pSearchingEntity, pActivator, pCaller);
+		if (!pTarget)
+			break;
+
+		if (!pTarget->GetEngineObject()->IsMarkedForDeletion())	// Don't use dying ents
+		{
+			DevMsg(2, "[%03d] Found: %s, firing (%s)\n", gpGlobals->tickcount % 1000, pTarget->GetDebugName(), targetName);
+			pTarget->Use(pActivator, pCaller, useType, value);
+		}
+	}
 }
 
 class CPointEntity : public CBaseEntity

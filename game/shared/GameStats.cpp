@@ -64,7 +64,9 @@ extern const ConVar *sv_cheats;
 #endif
 */
 
+#ifdef GAME_DLL
 extern IUploadGameStats *gamestatsuploader;
+#endif // GAME_DLL
 
 static char s_szPseudoUniqueID[20] = "";
 
@@ -687,7 +689,7 @@ bool CBaseGameStats_Driver::Init()
 
 	gamestats->m_bLoggingToFile = CommandLine()->FindParm( "-gamestatsloggingtofile" ) ? true : false;
 	gamestats->m_bLogging = CommandLine()->FindParm( "-gamestatslogging" ) ? true : false;
-
+#ifdef GAME_DLL
 	if ( gamestatsuploader )
 	{
 		m_bEnabled = gamestatsuploader->IsGameStatsLoggingEnabled();
@@ -696,6 +698,7 @@ bool CBaseGameStats_Driver::Init()
 			gamestatsuploader->GetPseudoUniqueId( s_szPseudoUniqueID, sizeof( s_szPseudoUniqueID ) );
 		}
 	}
+#endif // GAME_DLL
 
 	ResetData();
 
@@ -1053,9 +1056,11 @@ void CBaseGameStats_Driver::SendData()
 	}
 	else
 	{
+#ifdef GAME_DLL
 		// upload the file to Steam
 		if ( gamestatsuploader )
 			gamestatsuploader->UploadGameStats( "", 1, buf.TellPut(), buf.Base() );
+#endif // GAME_DLL
 	}	
 
 	ResetData();

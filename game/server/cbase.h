@@ -79,29 +79,6 @@
 #include "networkvar.h"
 #include "igameevents.h"
 
-// maximum number of targets a single multi_manager entity may be assigned.
-#define MAX_MULTI_TARGETS	16 
-
-// NPCEvent.h declarations
-struct animevent_t;
-
-extern void FireTargets( const char *targetName, CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value );
-
-// people gib if their health is <= this at the time of death
-#define	GIB_HEALTH_VALUE	-30
-
-#define MAX_OLD_ENEMIES		4 // how many old enemies to remember
-
-// when calling KILLED(), a value that governs gib behavior is expected to be 
-// one of these three values
-#define GIB_NORMAL			0// gib if entity was overkilled
-#define GIB_NEVER			1// never gib, no matter how much death damage is done ( freezing, etc )
-#define GIB_ALWAYS			2// always gib
-
-class CAI_BaseNPC;
-class CAI_ScriptedSequence;
-class CSound;
-
 #ifdef _XBOX
 //#define FUNCTANK_AUTOUSE  We haven't made the decision to use this yet (sjb)
 #else
@@ -113,7 +90,7 @@ class CSound;
 // But on balance, the compile time is much lower (even incrementally) once the precompiled
 // headers contain these headers.
 #include "precache_register.h"
-#include "enginecallback.h"
+//#include "enginecallback.h"
 //#include "baseanimating.h"
 //#include "basecombatweapon.h"
 //#include "basecombatcharacter.h"

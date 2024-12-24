@@ -14,7 +14,6 @@
 #include "icliententity.h"
 #include "utllinkedlist.h"
 #include "cdll_int.h"
-#include "eiface.h"
 #include "networkvar.h"
 
 class IVModelRender;
@@ -60,7 +59,7 @@ class IEngineClientReplay;
 class IReplayScreenshotManager;
 class CSteamID;
 class IEngineObjectClient;
-
+class IReplaySystem;
 //=============================================================================
 // HPE_BEGIN
 // [dwenger] Necessary for stats display
@@ -104,7 +103,7 @@ extern ISceneFileCache *scenefilecache;
 extern IXboxSystem *xboxsystem;	// Xbox 360 only
 extern IMatchmaking *matchmaking;
 extern IVideoServices *g_pVideo;
-extern IUploadGameStats *gamestatsuploader;
+//extern IUploadGameStats *gamestatsuploader;
 extern CSteamAPIContext *steamapicontext;
 extern IReplaySystem *g_pReplay;
 extern IClientReplayContext *g_pClientReplayContext;

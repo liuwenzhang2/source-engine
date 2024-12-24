@@ -23,6 +23,9 @@
 #include "SoundEmitterSystem/isoundemittersystembase.h"
 #include "string_t.h"
 #include "isaverestore.h"
+#include "tier1/KeyValues.h"
+#include "cmodel.h"
+#include "globalvars_base.h"
 
 #if !defined( _X360 )
 #include "xbox/xboxstubs.h"

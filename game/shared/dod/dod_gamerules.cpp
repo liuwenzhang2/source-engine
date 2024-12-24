@@ -678,6 +678,7 @@ static CDODViewVectors g_DODViewVectors(
 			const void *pvBlobData = ( const void * )( &stats );
 			unsigned int uBlobSize = sizeof( stats );
 
+#ifdef GAME_DLL
 			if ( gamestatsuploader )
 			{
 				gamestatsuploader->UploadGameStats( 
@@ -686,6 +687,7 @@ static CDODViewVectors g_DODViewVectors(
 					uBlobSize,
 					pvBlobData );
 			}
+#endif
 		}
 	}
 

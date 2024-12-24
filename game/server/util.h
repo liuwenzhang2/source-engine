@@ -13,7 +13,7 @@
 
 #include "ai_activity.h"
 #include "steam/steam_gameserver.h"
-#include "enginecallback.h"
+//#include "enginecallback.h"
 #include "basetypes.h"
 #include "tempentity.h"
 #include "string_t.h"
@@ -106,8 +106,6 @@ void DBG_AssertFunction(bool fExpr, const char* szExpr, const char* szFile, int 
 
 class CBaseEntity;
 class CBasePlayer;
-
-extern CGlobalVars *gpGlobals;
 
 // Misc useful
 inline bool FStrEq(const char *sz1, const char *sz2)

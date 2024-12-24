@@ -50,7 +50,7 @@
 #include "vphysics_interface.h"
 //#include "physics.h"
 #include "c_recipientfilter.h"
-#include "cdll_client_int.h"
+//#include "cdll_client_int.h"
 #include "worldsize.h"
 #include "engine/ivmodelinfo.h"
 #include "gamemovement.h"

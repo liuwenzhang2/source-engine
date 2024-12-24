@@ -664,5 +664,15 @@ enum vehicle_pose_params
 
 const unsigned int FCLIENTANIM_SEQUENCE_CYCLE = 0x00000001;
 
+#define MAX_OLD_ENEMIES		4 // how many old enemies to remember
+
+// people gib if their health is <= this at the time of death
+#define	GIB_HEALTH_VALUE	-30
+// when calling KILLED(), a value that governs gib behavior is expected to be 
+// one of these three values
+#define GIB_NORMAL			0// gib if entity was overkilled
+#define GIB_NEVER			1// never gib, no matter how much death damage is done ( freezing, etc )
+#define GIB_ALWAYS			2// always gib
+
 #endif
 

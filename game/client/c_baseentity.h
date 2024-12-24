@@ -37,6 +37,7 @@
 #include "SoundEmitterSystem/isoundemittersystembase.h"
 //#include "engine\ivmodelrender.h"
 #include "bone_accessor.h"
+#include "cdll_client_int.h"
 
 class C_Team;
 class IPhysicsObject;

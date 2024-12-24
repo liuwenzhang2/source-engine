@@ -46,6 +46,7 @@ extern IServerEngineTools		*serverenginetools;
 extern IXboxSystem				*xboxsystem; // 360 only
 extern CSteamAPIContext			*steamapicontext; // available on game clients
 extern CSteamGameServerAPIContext *steamgameserverapicontext; //available on game servers
+extern CGlobalVars*				gpGlobals;
 inline IServerEntityList* EntityList() { return serverEntitylist; }
 
 template<class T>

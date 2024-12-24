@@ -91,38 +91,6 @@ void CBaseEntity::SUB_DoNothing( void )
 {
 }
 
-//-----------------------------------------------------------------------------
-// Purpose: Finds all active entities with the given targetname and calls their
-//			'Use' function.
-// Input  : targetName - Target name to search for.
-//			pActivator - 
-//			pCaller - 
-//			useType - 
-//			value - 
-//-----------------------------------------------------------------------------
-void FireTargets( const char *targetName, CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value )
-{
-	CBaseEntity *pTarget = NULL;
-	if ( !targetName || !targetName[0] )
-		return;
-
-	DevMsg( 2, "Firing: (%s)\n", targetName );
-
-	for (;;)
-	{
-		CBaseEntity *pSearchingEntity = pActivator;
-		pTarget = EntityList()->FindEntityByName( pTarget, targetName, pSearchingEntity, pActivator, pCaller );
-		if ( !pTarget )
-			break;
-
-		if (!pTarget->GetEngineObject()->IsMarkedForDeletion() )	// Don't use dying ents
-		{
-			DevMsg( 2, "[%03d] Found: %s, firing (%s)\n", gpGlobals->tickcount%1000, pTarget->GetDebugName(), targetName );
-			pTarget->Use( pActivator, pCaller, useType, value );
-		}
-	}
-}
-
 enum togglemovetypes_t
 {
 	MOVE_TOGGLE_NONE = 0,

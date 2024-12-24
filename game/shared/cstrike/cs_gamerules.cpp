@@ -70,7 +70,9 @@
 #define CS_GAME_STATS_UPDATE 79200 //22 hours
 #define CS_GAME_STATS_UPDATE_PERIOD 7200 // 2 hours
 
+#ifdef GAME_DLL
 extern IUploadGameStats *gamestatsuploader;
+#endif // GAME_DLL
 
 #if defined( REPLAY_ENABLED )
 extern IReplaySystem *g_pReplay;
@@ -4844,6 +4846,7 @@ void CCSGameRules::UploadGameStats( void )
 		const void *pvBlobData = ( const void * )( &stats );
 		unsigned int uBlobSize = sizeof( stats );
 
+#ifdef GAME_DLL
 		if ( gamestatsuploader )
 		{
 			gamestatsuploader->UploadGameStats( 
@@ -4852,7 +4855,7 @@ void CCSGameRules::UploadGameStats( void )
 				uBlobSize,
 				pvBlobData );
 		}
-
+#endif
 
 		memset( g_iWeaponPurchases, 0, sizeof( g_iWeaponPurchases) );
 		memset( g_iTerroristVictories, 0, sizeof( g_iTerroristVictories) );
