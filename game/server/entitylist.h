@@ -2545,8 +2545,6 @@ public:
 			e = e->pNext;
 		}
 	}
-
-private:
 	int m_iNumItems;
 	entitem_t* m_pItemList;	// null terminated singly-linked list
 };
