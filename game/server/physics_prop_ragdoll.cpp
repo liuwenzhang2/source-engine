@@ -292,7 +292,7 @@ void CRagdollProp::OnPhysGunPickup( CBasePlayer *pPhysGunUser, PhysGunPickup_t r
 
 	if (GetEngineObject()->HasSpawnFlags( SF_RAGDOLLPROP_USE_LRU_RETIREMENT ) )
 	{
-		gEntList.MoveToTopOfLRU( this );
+		EntityList()->MoveToTopOfLRU( this );
 	}
 
 	if ( !GetEngineObject()->HasSpawnFlags( SF_PHYSPROP_ENABLE_ON_PHYSCANNON ) )
@@ -323,7 +323,7 @@ void CRagdollProp::OnPhysGunDrop( CBasePlayer *pPhysGunUser, PhysGunDrop_t Reaso
 
 	if (GetEngineObject()->HasSpawnFlags( SF_RAGDOLLPROP_USE_LRU_RETIREMENT ) )
 	{
-		gEntList.MoveToTopOfLRU( this );
+		EntityList()->MoveToTopOfLRU( this );
 	}
 
 	// Make sure it's interactive debris for at most 5 seconds
@@ -439,7 +439,7 @@ void CRagdollProp::VPhysicsCollision( int index, gamevcollisionevent_t *pEvent )
 			}
 
 			// FIXME: this doesn't pass in who is responsible if some other entity "caused" this collision
-			gEntList.PhysCallbackDamage( this, CTakeDamageInfo( pHitEntity, pHitEntity, damageForce, damagePos, damage, damageType ), *pEvent, index );
+			EntityList()->PhysCallbackDamage( this, CTakeDamageInfo( pHitEntity, pHitEntity, damageForce, damagePos, damage, damageType ), *pEvent, index );
 		}
 	}
 

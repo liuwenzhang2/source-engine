@@ -457,7 +457,7 @@ void CNavLadder::OnRoundRestart( void )
 //--------------------------------------------------------------------------------------------------------------
 void CNavLadder::FindLadderEntity( void )
 {
-	m_ladderEntity = gEntList.FindEntityByClassnameNearest( "func_simpleladder", (m_top + m_bottom) * 0.5f, HalfHumanWidth );
+	m_ladderEntity = EntityList()->FindEntityByClassnameNearest( "func_simpleladder", (m_top + m_bottom) * 0.5f, HalfHumanWidth );
 }
 
 

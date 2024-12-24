@@ -477,7 +477,7 @@ int CWeaponSMG1::WeaponRangeAttack2Condition(/* float flDot, float flDist */)
 	// ---------------------------------------------------------------------
 	CBaseEntity *pTarget = NULL;
 
-	while ( ( pTarget = gEntList.FindEntityInSphere( pTarget, vecTarget, COMBINE_MIN_GRENADE_CLEAR_DIST ) ) != NULL )
+	while ( ( pTarget = EntityList()->FindEntityInSphere( pTarget, vecTarget, COMBINE_MIN_GRENADE_CLEAR_DIST ) ) != NULL )
 	{
 		//Check to see if the default relationship is hatred, and if so intensify that
 		if ( npcOwner->IRelationType( pTarget ) == D_LI )

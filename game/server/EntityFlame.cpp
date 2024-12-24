@@ -95,7 +95,7 @@ void CEntityFlame::InputIgnite( inputdata_t &inputdata )
 	if (m_target != NULL_STRING)
 	{
 		CBaseEntity *pTarget = NULL;
-		while ((pTarget = gEntList.FindEntityGeneric(pTarget, STRING(m_target), this, inputdata.pActivator)) != NULL)
+		while ((pTarget = EntityList()->FindEntityGeneric(pTarget, STRING(m_target), this, inputdata.pActivator)) != NULL)
 		{
 			// Combat characters know how to catch themselves on fire.
 			CBaseCombatCharacter *pBCC = pTarget->MyCombatCharacterPointer();

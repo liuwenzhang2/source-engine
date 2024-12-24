@@ -11,7 +11,6 @@
 #include "decals.h"
 #include "player.h"
 #include "gamerules.h"
-//#include "entitylist.h"
 #include "bspfile.h"
 #include "mathlib/mathlib.h"
 #include "IEffects.h"
@@ -71,7 +70,7 @@ void DumpEntityFactories_f()
 	if ( !UTIL_IsCommandIssuedByServerAdmin() )
 		return;
 
-	gEntList.DumpEntityFactories();
+	EntityList()->DumpEntityFactories();
 }
 
 static ConCommand dumpentityfactories( "dumpentityfactories", DumpEntityFactories_f, "Lists all entity factory names.", FCVAR_GAMEDLL );
@@ -85,7 +84,7 @@ CON_COMMAND( dump_entity_sizes, "Print sizeof(entclass)" )
 	if ( !UTIL_IsCommandIssuedByServerAdmin() )
 		return;
 
-	gEntList.ReportEntitySizes();
+	EntityList()->ReportEntitySizes();
 }
 
 //-----------------------------------------------------------------------------
@@ -1644,7 +1643,7 @@ int DispatchSpawn( CBaseEntity *pEntity )
 		//pEntity->SetAbsMaxs( pEntity->GetOrigin() + Vector(1,1,1) );
 
 #if defined(TRACK_ENTITY_MEMORY) && defined(USE_MEM_DEBUG)
-		const char *pszClassname = gEntList.GetCannonicalName(pEntity->GetClassname());
+		const char *pszClassname = EntityList()->GetCannonicalName(pEntity->GetClassname());
 		if ( pszClassname )
 		{
 			MemAlloc_PushAllocDbgInfo( pszClassname, __LINE__ );
@@ -1705,7 +1704,7 @@ int DispatchSpawn( CBaseEntity *pEntity )
 			}
 		}
 
-		gEntList.NotifySpawn( pEntity );
+		EntityList()->NotifySpawn( pEntity );
 	}
 
 	return 0;
@@ -2685,10 +2684,10 @@ void PhysSolidOverride(solid_t& solid, string_t overrideScript)
 		Q_strncat(pTmpString, "}", sizeof(pTmpString), COPY_ALL_CHARACTERS);
 
 		// parse that sucker
-		IVPhysicsKeyParser* pParse = gEntList.PhysGetCollision()->VPhysicsKeyParserCreate(pTmpString);
+		IVPhysicsKeyParser* pParse = EntityList()->PhysGetCollision()->VPhysicsKeyParserCreate(pTmpString);
 		CSkipKeys tmp;
 		pParse->ParseSolid(&solid, &tmp);
-		gEntList.PhysGetCollision()->VPhysicsKeyParserDestroy(pParse);
+		EntityList()->PhysGetCollision()->VPhysicsKeyParserDestroy(pParse);
 
 		// parser destroys this data
 		solid.params.enableCollisions = collisions;
@@ -2884,7 +2883,7 @@ CON_COMMAND(physics_highlight_active, "Turns on the absbox for all active physic
 	if (!UTIL_IsCommandIssuedByServerAdmin())
 		return;
 
-	gEntList.IterateActivePhysicsEntities(CallbackHighlight);
+	EntityList()->IterateActivePhysicsEntities(CallbackHighlight);
 }
 
 static void CallbackReport(CBaseEntity* pEntity)
@@ -2902,7 +2901,7 @@ CON_COMMAND(physics_report_active, "Lists all active physics objects")
 	if (!UTIL_IsCommandIssuedByServerAdmin())
 		return;
 
-	gEntList.IterateActivePhysicsEntities(CallbackReport);
+	EntityList()->IterateActivePhysicsEntities(CallbackReport);
 }
 
 CON_COMMAND_F(surfaceprop, "Reports the surface properties at the cursor", FCVAR_CHEAT)
@@ -3038,7 +3037,7 @@ void PhysicsCommand(const CCommand& args, void (*func)(CBaseEntity* pEntity))
 	else
 	{
 		CBaseEntity* pEnt = NULL;
-		while ((pEnt = gEntList.FindEntityGeneric(pEnt, args[1])) != NULL)
+		while ((pEnt = EntityList()->FindEntityGeneric(pEnt, args[1])) != NULL)
 		{
 			func(pEnt);
 		}
@@ -3113,7 +3112,7 @@ CON_COMMAND(physics_constraints, "Highlights constraint system graph for an enti
 
 static void OutputVPhysicsDebugInfo(CBaseEntity* pEntity)
 {
-	gEntList.OutputVPhysicsDebugInfo(pEntity);
+	EntityList()->OutputVPhysicsDebugInfo(pEntity);
 }
 
 CON_COMMAND(physics_debug_entity, "Dumps debug info for an entity")
@@ -3151,24 +3150,24 @@ CON_COMMAND(physics_budget, "Times the cost of each active object")
 	if (!UTIL_IsCommandIssuedByServerAdmin())
 		return;
 
-	gEntList.OutputVPhysicsBudgetInfo();
+	EntityList()->OutputVPhysicsBudgetInfo();
 }
 
 //-----------------------------------------------------------------------------
 
 void CC_AirDensity(const CCommand& args)
 {
-	if (!gEntList.PhysGetEnv())
+	if (!EntityList()->PhysGetEnv())
 		return;
 
 	if (args.ArgC() < 2)
 	{
-		Msg("air_density <value>\nCurrent air density is %.2f\n", gEntList.PhysGetEnv()->GetAirDensity());
+		Msg("air_density <value>\nCurrent air density is %.2f\n", EntityList()->PhysGetEnv()->GetAirDensity());
 	}
 	else
 	{
 		float density = atof(args[1]);
-		gEntList.PhysGetEnv()->SetAirDensity(density);
+		EntityList()->PhysGetEnv()->SetAirDensity(density);
 	}
 }
 static ConCommand air_density("air_density", CC_AirDensity, "Changes the density of air for drag computations.", FCVAR_CHEAT);
@@ -3198,7 +3197,7 @@ void DumpCollideToGlView(CPhysCollide* pCollide, const Vector& origin, const QAn
 
 	printf("Writing %s...\n", pFilename);
 	Vector* outVerts;
-	int vertCount = gEntList.PhysGetCollision()->CreateDebugMesh(pCollide, &outVerts);
+	int vertCount = EntityList()->PhysGetCollision()->CreateDebugMesh(pCollide, &outVerts);
 	FileHandle_t fp = filesystem->Open(pFilename, "ab");
 	int triCount = vertCount / 3;
 	int vert = 0;
@@ -3219,7 +3218,7 @@ void DumpCollideToGlView(CPhysCollide* pCollide, const Vector& origin, const QAn
 		vert++;
 	}
 	filesystem->Close(fp);
-	gEntList.PhysGetCollision()->DestroyDebugMesh(vertCount, outVerts);
+	EntityList()->PhysGetCollision()->DestroyDebugMesh(vertCount, outVerts);
 }
 #endif
 

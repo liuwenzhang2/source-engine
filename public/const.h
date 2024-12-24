@@ -674,5 +674,24 @@ const unsigned int FCLIENTANIM_SEQUENCE_CYCLE = 0x00000001;
 #define GIB_NEVER			1// never gib, no matter how much death damage is done ( freezing, etc )
 #define GIB_ALWAYS			2// always gib
 
+//-----------------------------------------------------------------------------
+// Ragdoll Spawnflags
+//-----------------------------------------------------------------------------
+#define	SF_RAGDOLLPROP_DEBRIS		0x0004
+#define SF_RAGDOLLPROP_USE_LRU_RETIREMENT	0x1000
+#define	SF_RAGDOLLPROP_ALLOW_DISSOLVE		0x2000	// Allow this prop to be dissolved
+#define	SF_RAGDOLLPROP_MOTIONDISABLED		0x4000
+#define	SF_RAGDOLLPROP_ALLOW_STRETCH		0x8000
+#define	SF_RAGDOLLPROP_STARTASLEEP			0x10000
+
+enum
+{
+	NUM_POSEPAREMETERS = 24,
+	NUM_BONECTRLS = 4
+};
+
+// How many data slots to use when in multiplayer.
+#define MULTIPLAYER_BACKUP			90
+
 #endif
 

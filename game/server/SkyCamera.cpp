@@ -6,7 +6,6 @@
 
 #include "cbase.h"
 #include "igamesystem.h"
-//#include "entitylist.h"
 #include "SkyCamera.h"
 
 // memdbgon must be the last include file in a .cpp file!!!

@@ -18,7 +18,6 @@
 #include	"soundent.h"
 #include	"game.h"
 #include	"npcevent.h"
-#include	"entitylist.h"
 #include	"activitylist.h"
 #include	"hl1_basegrenade.h"
 #include	"animation.h"

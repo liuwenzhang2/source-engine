@@ -8,7 +8,6 @@
 #include "ai_basenpc.h"
 #include "trains.h"
 #include "ndebugoverlay.h"
-//#include "entitylist.h"
 #include "engine/IEngineSound.h"
 #include "hl1_ents.h"
 #include "doors.h"

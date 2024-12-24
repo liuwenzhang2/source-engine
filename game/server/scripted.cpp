@@ -23,7 +23,6 @@
 #include "engine/IEngineSound.h"
 #include "animation.h"
 #include "scripted.h"
-//#include "entitylist.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
@@ -521,10 +520,10 @@ CAI_BaseNPC *CAI_ScriptedSequence::FindScriptEntity( )
 	{
 		interrupt = SS_INTERRUPT_BY_NAME;
 		
-		pEntity = gEntList.FindEntityByNameWithin( m_hLastFoundEntity, STRING( m_iszEntity ), GetEngineObject()->GetAbsOrigin(), m_flRadius );
+		pEntity = EntityList()->FindEntityByNameWithin( m_hLastFoundEntity, STRING( m_iszEntity ), GetEngineObject()->GetAbsOrigin(), m_flRadius );
 		if (!pEntity)
 		{
-			pEntity = gEntList.FindEntityByClassnameWithin( m_hLastFoundEntity, STRING( m_iszEntity ), GetEngineObject()->GetAbsOrigin(), m_flRadius );
+			pEntity = EntityList()->FindEntityByClassnameWithin( m_hLastFoundEntity, STRING( m_iszEntity ), GetEngineObject()->GetAbsOrigin(), m_flRadius );
 			interrupt = SS_INTERRUPT_BY_CLASS;
 		}
 	}
@@ -566,9 +565,9 @@ CAI_BaseNPC *CAI_ScriptedSequence::FindScriptEntity( )
 		else
 		{		
 			if ( interrupt == SS_INTERRUPT_BY_NAME )
-				pEntity = gEntList.FindEntityByNameWithin( pEntity, STRING( m_iszEntity ), GetEngineObject()->GetAbsOrigin(), m_flRadius );
+				pEntity = EntityList()->FindEntityByNameWithin( pEntity, STRING( m_iszEntity ), GetEngineObject()->GetAbsOrigin(), m_flRadius );
 			else
-				pEntity = gEntList.FindEntityByClassnameWithin( pEntity, STRING( m_iszEntity ), GetEngineObject()->GetAbsOrigin(), m_flRadius );
+				pEntity = EntityList()->FindEntityByClassnameWithin( pEntity, STRING( m_iszEntity ), GetEngineObject()->GetAbsOrigin(), m_flRadius );
 		}
 	}
 
@@ -1694,7 +1693,7 @@ void CAI_ScriptedSchedule::ScriptThink( void )
 //-----------------------------------------------------------------------------
 CAI_BaseNPC *CAI_ScriptedSchedule::FindScriptEntity( bool bCyclic )
 {
-	CBaseEntity *pEntity = gEntList.FindEntityGenericWithin( m_hLastFoundEntity, STRING( m_iszEntity ), GetEngineObject()->GetAbsOrigin(), m_flRadius, this, m_hActivator );
+	CBaseEntity *pEntity = EntityList()->FindEntityGenericWithin( m_hLastFoundEntity, STRING( m_iszEntity ), GetEngineObject()->GetAbsOrigin(), m_flRadius, this, m_hActivator );
 
 	while ( pEntity != NULL )
 	{
@@ -1710,7 +1709,7 @@ CAI_BaseNPC *CAI_ScriptedSchedule::FindScriptEntity( bool bCyclic )
 			return pNPC;
 		}
 
-		pEntity = gEntList.FindEntityGenericWithin( pEntity, STRING( m_iszEntity ), GetEngineObject()->GetAbsOrigin(), m_flRadius, this, NULL );
+		pEntity = EntityList()->FindEntityGenericWithin( pEntity, STRING( m_iszEntity ), GetEngineObject()->GetAbsOrigin(), m_flRadius, this, NULL );
 	}
 
 	m_hLastFoundEntity = NULL;
@@ -1727,7 +1726,7 @@ void CAI_ScriptedSchedule::StartSchedule( CAI_BaseNPC *pTarget )
 	if ( pTarget == NULL )
 		return;
 
-	CBaseEntity *pGoalEnt = gEntList.FindEntityGeneric( NULL, STRING( m_sGoalEnt ), this, NULL );
+	CBaseEntity *pGoalEnt = EntityList()->FindEntityGeneric( NULL, STRING( m_sGoalEnt ), this, NULL );
 
 	// NOTE: !!! all possible choices require a goal ent currently
 	if ( !pGoalEnt ) 
@@ -2210,7 +2209,7 @@ int CAI_ScriptedSentence::StartSentence( CAI_BaseNPC *pTarget )
 		if ( FStrEq( STRING(m_iszListener ), "!player" ) )
 			radius = MAX_TRACE_LENGTH;	// Always find the player
 
-		pListener = gEntList.FindEntityGenericNearest( STRING( m_iszListener ), pTarget->GetEngineObject()->GetAbsOrigin(), radius, this, NULL );
+		pListener = EntityList()->FindEntityGenericNearest( STRING( m_iszListener ), pTarget->GetEngineObject()->GetAbsOrigin(), radius, this, NULL );
 	}
 
 	int sentenceIndex = pTarget->PlayScriptedSentence( STRING(m_iszSentence), m_flDelay,  m_flVolume, m_iSoundLevel, bConcurrent, pListener );

@@ -5251,7 +5251,7 @@ CBaseEntity* CCSPlayer::EntSelectSpawnPoint()
 	}
 	else
 	{
-		pSpot = gEntList.FindEntityByTarget( NULL, STRING(gpGlobals->startspot) );
+		pSpot = EntityList()->FindEntityByTarget( NULL, STRING(gpGlobals->startspot) );
 		if ( pSpot )
 			goto ReturnSpot;
 	}

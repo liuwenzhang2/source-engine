@@ -176,7 +176,7 @@ void CEntityDissolve::InputDissolve( inputdata_t &inputdata )
 	}
 
 	CBaseEntity *pTarget = NULL;
-	while ((pTarget = gEntList.FindEntityGeneric(pTarget, STRING(strTarget), this, inputdata.pActivator)) != NULL)
+	while ((pTarget = EntityList()->FindEntityGeneric(pTarget, STRING(strTarget), this, inputdata.pActivator)) != NULL)
 	{
 		CBaseAnimating *pBaseAnim = pTarget->GetBaseAnimating();
 		if (pBaseAnim)

@@ -35,7 +35,6 @@
 #include "ai_basenpc.h"
 #include "AI_Criteria.h"
 #include "npc_barnacle.h"
-//#include "entitylist.h"
 #include "env_zoom.h"
 #include "hl2_gamerules.h"
 #include "prop_combine_ball.h"
@@ -3232,7 +3231,7 @@ float CHL2_Player::GetHeldObjectMass( IPhysicsObject *pHeldObject )
 //-----------------------------------------------------------------------------
 void CHL2_Player::ForceDropOfCarriedPhysObjects( CBaseEntity *pOnlyIfHoldingThis )
 {
-	if (gEntList.PhysIsInCallback() )
+	if (EntityList()->PhysIsInCallback() )
 	{
 		variant_t value;
 		g_EventQueue.AddEvent( this, "ForceDropPhysObjects", value, 0.01f, pOnlyIfHoldingThis, this );

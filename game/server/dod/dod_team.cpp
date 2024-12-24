@@ -6,7 +6,6 @@
 //=============================================================================//
 #include "cbase.h"
 #include "dod_team.h"
-//#include "entitylist.h"
 #include "dod_shareddefs.h"
 
 // memdbgon must be the last include file in a .cpp file!!!

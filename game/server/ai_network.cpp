@@ -121,7 +121,7 @@ CAI_Network::CAI_Network()
 	m_pNodeTree = NULL;
 #endif
 
-	gEntList.AddListenerEntity( this );
+	EntityList()->AddListenerEntity( this );
 }
 
 //-----------------------------------------------------------------------------
@@ -136,7 +136,7 @@ CAI_Network::~CAI_Network()
 	}
 #endif
 
-	gEntList.RemoveListenerEntity( this );
+	EntityList()->RemoveListenerEntity( this );
 
 	if ( m_pAInode )
 	{

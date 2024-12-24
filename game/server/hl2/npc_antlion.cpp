@@ -11,7 +11,6 @@
 #include "ai_route.h"
 #include "npcevent.h"
 #include "gib.h"
-//#include "entitylist.h"
 #include "ndebugoverlay.h"
 #include "antlion_dust.h"
 #include "engine/IEngineSound.h"
@@ -2476,7 +2475,7 @@ int CNPC_Antlion::SelectSchedule( void )
 			Vector		soundOrg = m_vecHeardSound;
 
 			//Find all entities within that sphere
-			while ( ( pTarget = gEntList.FindEntityInSphere( pTarget, soundOrg, bugbait_radius.GetInt() ) ) != NULL )
+			while ( ( pTarget = EntityList()->FindEntityInSphere( pTarget, soundOrg, bugbait_radius.GetInt() ) ) != NULL )
 			{
 				CAI_BaseNPC *pNPC = pTarget->MyNPCPointer();
 

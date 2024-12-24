@@ -7,7 +7,6 @@
 #include "cbase.h"
 #include "soundenvelope.h"
 #include "Sprite.h"
-//#include "entitylist.h"
 #include "ai_basenpc.h"
 #include "soundent.h"
 #include "explode.h"

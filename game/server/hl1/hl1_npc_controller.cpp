@@ -27,7 +27,6 @@
 #include	"soundent.h"
 #include	"game.h"
 #include	"npcevent.h"
-#include	"entitylist.h"
 #include	"activitylist.h"
 #include	"animation.h"
 #include	"basecombatweapon.h"

@@ -24,7 +24,6 @@
 #include	"soundent.h"
 #include	"game.h"
 #include	"npcevent.h"
-#include	"entitylist.h"
 #include	"activitylist.h"
 #include	"animation.h"
 #include	"basecombatweapon.h"
@@ -848,7 +847,7 @@ void CNPC_Gargantua::FlameDamage( Vector vecStart, Vector vecEnd, CBaseEntity *p
 	VectorNormalize( vecAim );
 
 	// iterate on all entities in the vicinity.
-	while ((pEntity = gEntList.FindEntityInSphere( pEntity, GetEngineObject()->GetAbsOrigin(), searchRadius )) != NULL)
+	while ((pEntity = EntityList()->FindEntityInSphere( pEntity, GetEngineObject()->GetAbsOrigin(), searchRadius )) != NULL)
 	{
 
 		if ( pEntity->m_takedamage != DAMAGE_NO )

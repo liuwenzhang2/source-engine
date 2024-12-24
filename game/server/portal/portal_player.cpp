@@ -1144,7 +1144,7 @@ void CPortal_Player::VPhysicsShadowUpdate( IPhysicsObject *pPhysics )
 	if ( pPhysics->GetGameFlags() & FVPHYSICS_PENETRATING )
 	{
 		CUtlVector<CBaseEntity *> list;
-		gEntList.PhysGetListOfPenetratingEntities( this, list );
+		EntityList()->PhysGetListOfPenetratingEntities( this, list );
 		for ( int i = list.Count()-1; i >= 0; --i )
 		{
 			// filter out anything that isn't simulated by vphysics
@@ -1174,7 +1174,7 @@ void CPortal_Player::VPhysicsShadowUpdate( IPhysicsObject *pPhysics )
 		return;
 	}
 
-	if (gEntList.PhysGetTimeScale() == 0.0f )
+	if (EntityList()->PhysGetTimeScale() == 0.0f )
 	{
 		physicsUpdated = false;
 	}
@@ -1236,7 +1236,7 @@ void CPortal_Player::VPhysicsShadowUpdate( IPhysicsObject *pPhysics )
 
 				if ( !GetEngineObject()->IsRideablePhysics(pPhysGround) )
 				{
-					if ( !(m_afPhysicsFlags & PFLAG_VPHYSICS_MOTIONCONTROLLER ) && gEntList.IsSimulatingOnAlternateTicks() )
+					if ( !(m_afPhysicsFlags & PFLAG_VPHYSICS_MOTIONCONTROLLER ) && EntityList()->IsSimulatingOnAlternateTicks() )
 					{
 						newVelocity *= 0.5f;
 					}
@@ -1636,7 +1636,7 @@ CRagdollProp* CPortal_Player::CreateRagdollProp()
 {
 	if ( m_hRagdoll )
 	{
-		gEntList.DestroyEntityImmediate( m_hRagdoll );
+		EntityList()->DestroyEntityImmediate( m_hRagdoll );
 		m_hRagdoll = NULL;
 	}
 

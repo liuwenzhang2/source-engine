@@ -96,16 +96,7 @@ enum CollideType_t
 	ENTITY_SHOULD_RESPOND
 };
 
-
-
-																	
-
 #define DECLARE_INTERPOLATION()
-
-
-// How many data slots to use when in multiplayer.
-#define MULTIPLAYER_BACKUP			90
-
 
 struct serialentity_t;
 

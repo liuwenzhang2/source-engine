@@ -7,7 +7,6 @@
 #include "cbase.h"
 #include "ai_basenpc.h"
 #include "player.h"
-//#include "entitylist.h"
 #include "ai_network.h"
 #include "ai_node.h"
 #include "ai_link.h"
@@ -217,7 +216,7 @@ void CC_AI_Hull( const CCommand &args )
 	else
 	{
 		// Find the entity specified on the command line.
-		pEnt = gEntList.FindEntityGeneric( NULL, args[1] );
+		pEnt = EntityList()->FindEntityGeneric( NULL, args[1] );
 
 		if ( !pEnt )
 		{

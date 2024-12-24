@@ -872,7 +872,7 @@ void CNPC_AntlionGuard::Activate( void )
 
 	// Find all nearby physics objects and add them to the list of objects we will sense
 	CBaseEntity *pObject = NULL;
-	while ( ( pObject = gEntList.FindEntityInSphere( pObject, WorldSpaceCenter(), 2500 ) ) != NULL )
+	while ( ( pObject = EntityList()->FindEntityInSphere( pObject, WorldSpaceCenter(), 2500 ) ) != NULL )
 	{
 		// Can't throw around debris
 		if ( pObject->GetEngineObject()->GetCollisionGroup() == COLLISION_GROUP_DEBRIS )
@@ -4275,7 +4275,7 @@ void CNPC_AntlionGuard::ImpactShock( const Vector &origin, float radius, float m
 	CBaseEntity *pEntity = NULL;
 
 	// Find anything within our radius
-	while ( ( pEntity = gEntList.FindEntityInSphere( pEntity, origin, radius ) ) != NULL )
+	while ( ( pEntity = EntityList()->FindEntityInSphere( pEntity, origin, radius ) ) != NULL )
 	{
 		// Don't affect the ignored target
 		if ( pEntity == pIgnored )

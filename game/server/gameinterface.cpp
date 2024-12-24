@@ -12,7 +12,6 @@
 #include "game.h"
 #include "entityapi.h"
 #include "client.h"
-//#include "entitylist.h"
 #include "gamerules.h"
 #include "soundent.h"
 #include "player.h"
@@ -550,16 +549,11 @@ void DrawAllDebugOverlays( void )
 	if ( g_pDeveloper->GetInt() && !engine->IsDedicatedServer() )
 	{
 		// iterate through all objects for debug overlays
-		const CEntInfo<CBaseEntity> *pInfo = gEntList.FirstEntInfo();
-
-		for ( ;pInfo; pInfo = pInfo->m_pNext )
-		{
-			CBaseEntity *ent = (CBaseEntity *)pInfo->m_pEntity;
-			// HACKHACK: to flag off these calls
-			if ( ent->m_debugOverlays || ent->m_pTimedOverlay )
+		for (CBaseEntity* pEntity = EntityList()->FirstEnt(); pEntity != NULL; pEntity = EntityList()->NextEnt(pEntity)) {
+			if (pEntity->m_debugOverlays || pEntity->m_pTimedOverlay)
 			{
 				MDLCACHE_CRITICAL_SECTION();
-				ent->DrawDebugGeometryOverlays();
+				pEntity->DrawDebugGeometryOverlays();
 			}
 		}
 	}
@@ -567,20 +561,16 @@ void DrawAllDebugOverlays( void )
 	if ( sv_massreport.GetInt() )
 	{
 		// iterate through all objects for debug overlays
-		const CEntInfo<CBaseEntity> *pInfo = gEntList.FirstEntInfo();
-
-		for ( ;pInfo; pInfo = pInfo->m_pNext )
-		{
-			CBaseEntity *ent = (CBaseEntity *)pInfo->m_pEntity;
-			if (!ent->GetEngineObject()->VPhysicsGetObject())
+		for (CBaseEntity* pEntity = EntityList()->FirstEnt(); pEntity != NULL; pEntity = EntityList()->NextEnt(pEntity)) {
+			if (!pEntity->GetEngineObject()->VPhysicsGetObject())
 				continue;
 
 			char tempstr[512];
-			Q_snprintf(tempstr, sizeof(tempstr),"%s: Mass: %.2f kg / %.2f lb (%s)", 
-				STRING( ent->GetEngineObject()->GetModelName() ), ent->GetEngineObject()->VPhysicsGetObject()->GetMass(),
-				kg2lbs(ent->GetEngineObject()->VPhysicsGetObject()->GetMass()),
-				GetMassEquivalent(ent->GetEngineObject()->VPhysicsGetObject()->GetMass()));
-			ent->EntityText(0, tempstr, 0);
+			Q_snprintf(tempstr, sizeof(tempstr), "%s: Mass: %.2f kg / %.2f lb (%s)",
+				STRING(pEntity->GetEngineObject()->GetModelName()), pEntity->GetEngineObject()->VPhysicsGetObject()->GetMass(),
+				kg2lbs(pEntity->GetEngineObject()->VPhysicsGetObject()->GetMass()),
+				GetMassEquivalent(pEntity->GetEngineObject()->VPhysicsGetObject()->GetMass()));
+			pEntity->EntityText(0, tempstr, 0);
 		}
 	}
 
@@ -589,6 +579,7 @@ void DrawAllDebugOverlays( void )
 }
 
 CServerGameDLL g_ServerGameDLL;
+IServerGameDLL* serverGameDLL = &g_ServerGameDLL;
 // INTERFACEVERSION_SERVERGAMEDLL_VERSION_8 is compatible with the latest since we're only adding things to the end, so expose that as well.
 //EXPOSE_SINGLE_INTERFACE_GLOBALVAR(CServerGameDLL, IServerGameDLL008, INTERFACEVERSION_SERVERGAMEDLL_VERSION_8, g_ServerGameDLL );
 EXPOSE_SINGLE_INTERFACE_GLOBALVAR(CServerGameDLL, IServerGameDLL, INTERFACEVERSION_SERVERGAMEDLL, g_ServerGameDLL);
@@ -610,11 +601,6 @@ void CServerGameDLL::PreSave(CSaveRestoreData* pSaveData)
 	IGameSystem::OnSaveAllSystems();
 }
 
-//---------------------------------
-
-//CBaseEntity* EntityFromHandle(CBaseHandle& handle) {
-//	return (CBaseEntity*)gEntList.GetServerEntityFromHandle(handle);
-//}
 
 void CServerGameDLL::Save(ISave* pSave)
 {
@@ -860,18 +846,9 @@ bool CServerGameDLL::DLLInit( CreateInterfaceFn appSystemFactory,
 	g_pClosecaption = cvar->FindVar("closecaption");
 	Assert(g_pClosecaption);
 
-	if (!gEntList.Init()) {
+	if (!EntityList()->Init()) {
 		return false;
 	}
-
-	gEntList.AddDataAccessor(TOUCHLINK, new CEntityDataInstantiator<CBaseEntity, servertouchlink_t >);
-	gEntList.AddDataAccessor(GROUNDLINK, new CEntityDataInstantiator<CBaseEntity, servergroundlink_t >);
-	gEntList.AddDataAccessor(STEPSIMULATION, new CEntityDataInstantiator<CBaseEntity, StepSimulationData >);
-	gEntList.AddDataAccessor(MODELSCALE, new CEntityDataInstantiator<CBaseEntity, ModelScale >);
-	gEntList.AddDataAccessor(POSITIONWATCHER, new CEntityDataInstantiator<CBaseEntity, CWatcherList >);
-	gEntList.AddDataAccessor(PHYSICSPUSHLIST, new CEntityDataInstantiator<CBaseEntity, physicspushlist_t >);
-	gEntList.AddDataAccessor(VPHYSICSUPDATEAI, new CEntityDataInstantiator<CBaseEntity, vphysicsupdateai_t >);
-	gEntList.AddDataAccessor(VPHYSICSWATCHER, new CEntityDataInstantiator<CBaseEntity, CWatcherList >);
 
 	return true;
 }
@@ -883,15 +860,8 @@ void CServerGameDLL::PostInit()
 
 void CServerGameDLL::DLLShutdown( void )
 {
-	gEntList.RemoveDataAccessor(TOUCHLINK);
-	gEntList.RemoveDataAccessor(GROUNDLINK);
-	gEntList.RemoveDataAccessor(STEPSIMULATION);
-	gEntList.RemoveDataAccessor(MODELSCALE);
-	gEntList.RemoveDataAccessor(POSITIONWATCHER);
-	gEntList.RemoveDataAccessor(PHYSICSPUSHLIST);
-	gEntList.RemoveDataAccessor(VPHYSICSUPDATEAI);
-	gEntList.RemoveDataAccessor(VPHYSICSWATCHER);
-	gEntList.Shutdown();
+
+	EntityList()->Shutdown();
 	// Due to dependencies, these are not autogamesystems
 	ModelSoundsCacheShutdown();
 
@@ -985,7 +955,7 @@ bool CServerGameDLL::GameInit( void )
 	engine->ResetGlobalState();
 	engine->ServerCommand( "exec game.cfg\n" );
 	engine->ServerExecute( );
-	gEntList.SetAccurateTriggerBboxChecks(true);
+	EntityList()->SetAccurateTriggerBboxChecks(true);
 
 	IGameEvent *event = gameeventmanager->CreateEvent( "game_init" );
 	if ( event )
@@ -1161,7 +1131,7 @@ bool CServerGameDLL::LevelInit( const char *pMapName, char const *pMapEntities, 
 
 	// Sometimes an ent will Remove() itself during its precache, so RemoveImmediate won't happen.
 	// This makes sure those ents get cleaned up.
-	gEntList.CleanupDeleteList();
+	EntityList()->CleanupDeleteList();
 
 	g_AIFriendliesTalkSemaphore.Release();
 	g_AIFoesTalkSemaphore.Release();
@@ -1201,7 +1171,7 @@ void CServerGameDLL::ServerActivate( IServerEntity *pEdictList, int edictCount, 
 	if (IsRestoring())
 		return;
 
-	if ( gEntList.ResetDeleteList() != 0 )
+	if (EntityList()->ResetDeleteList() != 0 )
 	{
 		Msg( "%s", "ERROR: Entity delete queue not empty on level start!\n" );
 	}
@@ -1221,7 +1191,7 @@ void CServerGameDLL::ServerActivate( IServerEntity *pEdictList, int edictCount, 
 	}
 
 	IGameSystem::LevelInitPostEntityAllSystems();
-	gEntList.LevelInitPostEntity();
+	EntityList()->LevelInitPostEntity();
 	// No more precaching after PostEntityAllSystems!!!
 	engine->SetAllowPrecache( false );//CBaseEntity::
 
@@ -1323,7 +1293,7 @@ void CServerGameDLL::GameFrame( bool simulating )
 
 	// Delete anything that was marked for deletion
 	//  outside of server frameloop (e.g., in response to concommand)
-	gEntList.CleanupDeleteList();
+	EntityList()->CleanupDeleteList();
 
 	IGameSystem::FrameUpdatePreEntityThinkAllSystems();
 	GameStartFrame();
@@ -1344,7 +1314,7 @@ void CServerGameDLL::GameFrame( bool simulating )
 	g_pServerBenchmark->UpdateBenchmark();
 
 	Physics_RunThinkFunctions( simulating );
-	gEntList.FrameUpdatePostEntityThink();
+	EntityList()->FrameUpdatePostEntityThink();
 	IGameSystem::FrameUpdatePostEntityThinkAllSystems();
 
 	// UNDONE: Make these systems IGameSystems and move these calls into FrameUpdatePostEntityThink()
@@ -1352,7 +1322,7 @@ void CServerGameDLL::GameFrame( bool simulating )
 	ServiceEventQueue();
 
 	// free all ents marked in think functions
-	gEntList.CleanupDeleteList();
+	EntityList()->CleanupDeleteList();
 
 	// FIXME:  Should this only occur on the final tick?
 	UpdateAllClientData();
@@ -1406,7 +1376,7 @@ void CServerGameDLL::PreClientUpdate( bool simulating )
 	DrawAllDebugOverlays();
 //#endif
 	
-	gEntList.PreClientUpdate();
+	EntityList()->PreClientUpdate();
 	IGameSystem::PreClientUpdateAllSystems();
 
 #ifdef _DEBUG
@@ -1482,7 +1452,7 @@ void CServerGameDLL::LevelShutdown( void )
 	g_pServerBenchmark->EndBenchmark();
 
 	MDLCACHE_CRITICAL_SECTION();
-	gEntList.LevelShutdownPreEntity();
+	EntityList()->LevelShutdownPreEntity();
 	IGameSystem::LevelShutdownPreEntityAllSystems();
 	engine->GlobalEntity_EnableStateUpdates(false);
 
@@ -1490,12 +1460,12 @@ void CServerGameDLL::LevelShutdown( void )
 	// This entity pointer is going away now and is corrupting memory on level transitions/restarts
 	CSoundEnt::ShutdownSoundEnt();
 
-	gEntList.Clear();
+	EntityList()->Clear();
 
 	InvalidateQueryCache();
 
 	IGameSystem::LevelShutdownPostEntityAllSystems();
-	gEntList.LevelShutdownPostEntity();
+	EntityList()->LevelShutdownPostEntity();
 	engine->GlobalEntity_EnableStateUpdates(true);
 
 	// In case we quit out during initial load
@@ -2921,8 +2891,6 @@ void CServerGameEnts::CheckTransmit( CCheckTransmitInfo *pInfo, const unsigned s
 		// don't send this entity
 		if ( !( nFlags & FL_EDICT_PVSCHECK ) )
 			continue;
-
-		//CServerNetworkProperty *netProp = static_cast<CServerNetworkProperty*>(gEntList.GetServerNetworkable(iEdict));
 
 #ifndef _X360
 		if ( bIsHLTV || bIsReplay )

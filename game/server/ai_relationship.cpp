@@ -139,12 +139,12 @@ void CAI_Relationship::SetActive( bool bActive )
 	if ( bActive && !m_bIsActive )
 	{
 		// Start getting entity updates!
-		gEntList.AddListenerEntity( this );
+		EntityList()->AddListenerEntity( this );
 	}
 	else if ( !bActive && m_bIsActive )
 	{
 		// Stop getting entity updates!
-		gEntList.RemoveListenerEntity( this );
+		EntityList()->RemoveListenerEntity( this );
 	}
 
 	m_bIsActive = bActive;
@@ -231,7 +231,7 @@ void CAI_Relationship::RevertToDefaultRelationship( CBaseEntity *pActivator, CBa
 //---------------------------------------------------------
 void CAI_Relationship::UpdateOnRemove()
 {
-	gEntList.RemoveListenerEntity( this );
+	EntityList()->RemoveListenerEntity( this );
 	// @TODO (toml 07-21-04): Should this actually revert on kill?
 	// RevertRelationship();
 	BaseClass::UpdateOnRemove();
@@ -244,7 +244,7 @@ void CAI_Relationship::OnRestore()
 	BaseClass::OnRestore();
 	if ( m_bIsActive )
 	{
-		gEntList.AddListenerEntity( this );
+		EntityList()->AddListenerEntity( this );
 	}
 }
 

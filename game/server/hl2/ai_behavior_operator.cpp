@@ -5,7 +5,6 @@
 //=============================================================================//
 
 #include "cbase.h"
-//#include "entitylist.h"
 #include "ai_navigator.h"
 #include "ai_behavior_operator.h"
 

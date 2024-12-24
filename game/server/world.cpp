@@ -605,7 +605,7 @@ void CWorld::Precache( void )
 	// Only allow precaching between LevelInitPreEntity and PostEntity
 	engine->SetAllowPrecache( true );//CBaseEntity::
 
-	gEntList.LevelInitPreEntity();
+	EntityList()->LevelInitPreEntity();
 	IGameSystem::LevelInitPreEntityAllSystems( STRING(GetEngineObject()->GetModelName() ) );
 
 	// Create the player resource

@@ -4562,7 +4562,7 @@ ConVar cl_autohelp(
 		// then remove everything else except the players.
 
 		// Get rid of all entities except players.
-		CBaseEntity *pCur = gEntList.FirstEnt();
+		CBaseEntity *pCur = EntityList()->FirstEnt();
 		while ( pCur )
 		{
 			CWeaponCSBase *pWeapon = dynamic_cast< CWeaponCSBase* >( pCur );
@@ -4591,11 +4591,11 @@ ConVar cl_autohelp(
 				EntityList()->DestroyEntity( pCur );
 			}
 			
-			pCur = gEntList.NextEnt( pCur );
+			pCur = EntityList()->NextEnt( pCur );
 		}
 		
 		// Really remove the entities so we can have access to their slots below.
-		gEntList.CleanupDeleteList();
+		EntityList()->CleanupDeleteList();
 
 		// Cancel all queued events, in case a func_bomb_target fired some delayed outputs that
 		// could kill respawning CTs

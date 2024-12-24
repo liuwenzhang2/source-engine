@@ -19,7 +19,6 @@
 #include "game.h"
 
 #include "player.h"
-//#include "entitylist.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"

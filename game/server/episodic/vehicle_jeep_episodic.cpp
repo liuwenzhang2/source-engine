@@ -868,7 +868,7 @@ void CPropJeepEpisodic::UpdateRadar( bool forceUpdate )
 	m_flNextRadarUpdateTime = gpGlobals->curtime + RADAR_UPDATE_FREQUENCY;
 	m_iNumRadarContacts = 0;
 
-	CBaseEntity *pEnt = gEntList.FirstEnt();
+	CBaseEntity *pEnt = EntityList()->FirstEnt();
 	string_t iszRadarTarget = FindPooledString( "info_radar_target" );
 	string_t iszStriderName = FindPooledString( "npc_strider" );
 	string_t iszHunterName = FindPooledString( "npc_hunter" );
@@ -935,7 +935,7 @@ void CPropJeepEpisodic::UpdateRadar( bool forceUpdate )
 				break;
 		}
 
-		pEnt = gEntList.NextEnt(pEnt);
+		pEnt = EntityList()->NextEnt(pEnt);
 	}
 
 	if( m_iNumRadarContacts > m_iNumOldRadarContacts )
@@ -1328,7 +1328,7 @@ static void KillBlockingEnemyNPCs( CBasePlayer *pPlayer, CBaseEntity *pVehicleEn
 			CTakeDamageInfo dmgInfo( pVehicleEntity, pVehicleEntity, damageForce, contactList[i], 200.0f, DMG_CRUSH|DMG_VEHICLE );
 			npcList[i]->TakeDamage( dmgInfo );
 			pVehiclePhysics->ApplyForceOffset( vehicleForce, contactList[i] );
-			gEntList.PhysCollisionSound( pVehicleEntity, npcList[i]->GetEngineObject()->VPhysicsGetObject(), CHAN_BODY, pVehiclePhysics->GetMaterialIndex(), npcList[i]->GetEngineObject()->VPhysicsGetObject()->GetMaterialIndex(), gpGlobals->frametime, 200.0f );
+			EntityList()->PhysCollisionSound( pVehicleEntity, npcList[i]->GetEngineObject()->VPhysicsGetObject(), CHAN_BODY, pVehiclePhysics->GetMaterialIndex(), npcList[i]->GetEngineObject()->VPhysicsGetObject()->GetMaterialIndex(), gpGlobals->frametime, 200.0f );
 		}
 	}
 }

@@ -1000,7 +1000,7 @@ bool CNPC_RollerMine::DetectedEnemyInProximity( void )
 	CBaseEntity *pBestEnemy = NULL;
 	float		flBestDist = MAX_TRACE_LENGTH;
 
-	while ( ( pEnt = gEntList.FindEntityInSphere( pEnt, GetAbsOrigin(), ROLLERMINE_DETECTION_RADIUS ) ) != NULL )
+	while ( ( pEnt = EntityList()->FindEntityInSphere( pEnt, GetAbsOrigin(), ROLLERMINE_DETECTION_RADIUS ) ) != NULL )
 	{
 		if ( IRelationType( pEnt ) != D_HT )
 			continue;

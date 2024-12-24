@@ -677,14 +677,14 @@ void CAI_SensedObjectsManager::Init()
 		OnEntitySpawned( pEnt );
 	}
 
-	gEntList.AddListenerEntity( this );
+	EntityList()->AddListenerEntity( this );
 }
 
 //-----------------------------------------------------------------------------
 
 void CAI_SensedObjectsManager::Term()
 {
-	gEntList.RemoveListenerEntity( this );
+	EntityList()->RemoveListenerEntity( this );
 	m_SensedObjects.RemoveAll();
 }
 

@@ -30,7 +30,6 @@
 #include "bitstring.h"
 #include "decals.h"
 #include "player.h"
-//#include "entitylist.h"
 #include "ndebugoverlay.h"
 #include "ai_interactions.h"
 #include "animation.h"

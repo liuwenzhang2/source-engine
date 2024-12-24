@@ -5,7 +5,6 @@
 //=============================================================================//
 
 #include "cbase.h"
-//#include "entitylist.h"
 #include "mapentities_shared.h"
 #include "soundent.h"
 #include "TemplateEntities.h"
@@ -285,7 +284,7 @@ void SpawnAllEntities( int nEntities, HierarchicalSpawn_t *pSpawnList, bool bAct
 					}
 				}
 				// Spawn failed.
-				gEntList.CleanupDeleteList();
+				EntityList()->CleanupDeleteList();
 				// Remove the entity from the spawn list
 				pSpawnList[nEntity].m_pEntity = NULL;
 			}
@@ -371,7 +370,7 @@ void MapEntity_ParseAllEntities(const char *pMapData, IMapEntityFilter *pFilter,
 
 			// Remove the template entity so that it does not show up in FindEntityXXX searches.
 			EntityList()->DestroyEntity(pEntity);
-			gEntList.CleanupDeleteList();
+			EntityList()->CleanupDeleteList();
 			continue;
 		}
 
@@ -401,7 +400,7 @@ void MapEntity_ParseAllEntities(const char *pMapData, IMapEntityFilter *pFilter,
 			//		 node spawn function.
 			if ( pNode->Spawn( pCurMapData ) < 0 )
 			{
-				gEntList.CleanupDeleteList();
+				EntityList()->CleanupDeleteList();
 			}
 			continue;
 		}
@@ -416,7 +415,7 @@ void MapEntity_ParseAllEntities(const char *pMapData, IMapEntityFilter *pFilter,
 			// NOTE: This solution prevents nodes & lights from being used inside point_templates.
 			if (DispatchSpawn(pEntity) < 0)
 			{
-				gEntList.CleanupDeleteList();
+				EntityList()->CleanupDeleteList();
 			}
 			continue;
 		}
@@ -452,7 +451,7 @@ void MapEntity_ParseAllEntities(const char *pMapData, IMapEntityFilter *pFilter,
 		if ( DispatchSpawn(pPointTemplate) < 0 )
 		{
 			EntityList()->DestroyEntity(pPointTemplate);
-			gEntList.CleanupDeleteList();
+			EntityList()->CleanupDeleteList();
 			continue;
 		}
 
@@ -475,7 +474,7 @@ void MapEntity_ParseAllEntities(const char *pMapData, IMapEntityFilter *pFilter,
 					{
 						// Remove the template entity so that it does not show up in FindEntityXXX searches.
 						EntityList()->DestroyEntity(pEntity);
-						gEntList.CleanupDeleteList();
+						EntityList()->CleanupDeleteList();
 
 						// Remove the entity from the spawn list
 						pSpawnList[iEntNum].m_pEntity = NULL;

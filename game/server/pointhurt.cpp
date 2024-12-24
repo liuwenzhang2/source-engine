@@ -6,7 +6,6 @@
 //=============================================================================//
 
 #include "cbase.h"
-//#include "entitylist.h"
 #include "gamerules.h"
 #include "basecombatcharacter.h"
 #include "ammodef.h"

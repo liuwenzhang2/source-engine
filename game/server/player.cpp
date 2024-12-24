@@ -15,7 +15,6 @@
 #include "gamerules.h"
 #include "game.h"
 #include "entityapi.h"
-//#include "entitylist.h"
 #include "eventqueue.h"
 #include "worldsize.h"
 #include "isaverestore.h"
@@ -5060,7 +5059,7 @@ void CBasePlayer::Activate( void )
 {
 	BaseClass::Activate();
 
-	AimTarget_ForceRepopulateList();
+	EntityList()->AimTarget_ForceRepopulateList();
 
 	RumbleEffect( RUMBLE_STOP_ALL, 0, RUMBLE_FLAGS_NONE );
 
@@ -5796,7 +5795,7 @@ CBaseEntity *FindPickerEntityClass( CBasePlayer *pPlayer, char *classname )
 		Vector origin;
 		pPlayer->EyeVectors( &forward );
 		origin = pPlayer->WorldSpaceCenter();		
-		pEntity = gEntList.FindEntityClassNearestFacing( origin, forward,0.95,classname);
+		pEntity = EntityList()->FindEntityClassNearestFacing( origin, forward,0.95,classname);
 	}
 	return pEntity;
 }
@@ -5822,7 +5821,7 @@ CBaseEntity *FindPickerEntity( CBasePlayer *pPlayer )
 		Vector origin;
 		pPlayer->EyeVectors( &forward );
 		origin = pPlayer->WorldSpaceCenter();		
-		pEntity = gEntList.FindEntityNearestFacing( origin, forward,0.95);
+		pEntity = EntityList()->FindEntityNearestFacing( origin, forward,0.95);
 	}
 	return pEntity;
 }
@@ -7130,11 +7129,11 @@ QAngle CBasePlayer::AutoaimDeflection( Vector &vecSrc, autoaim_params_t &params 
 		}
 	}
 
-	int count = AimTarget_ListCount();
+	int count = EntityList()->AimTarget_ListCount();
 	if ( count )
 	{
 		CBaseEntity **pList = (CBaseEntity **)stackalloc( sizeof(CBaseEntity *) * count );
-		AimTarget_ListCopy( pList, count );
+		EntityList()->AimTarget_ListCopy( pList, count );
 
 		for ( int i = 0; i < count; i++ )
 		{
@@ -8099,7 +8098,7 @@ void CBasePlayer::VPhysicsShadowUpdate( IPhysicsObject *pPhysics )
 	if ( pPhysics->GetGameFlags() & FVPHYSICS_PENETRATING )
 	{
 		CUtlVector<CBaseEntity *> list;
-		gEntList.PhysGetListOfPenetratingEntities( this, list );
+		EntityList()->PhysGetListOfPenetratingEntities( this, list );
 		for ( int i = list.Count()-1; i >= 0; --i )
 		{
 			// filter out anything that isn't simulated by vphysics
@@ -8142,7 +8141,7 @@ void CBasePlayer::VPhysicsShadowUpdate( IPhysicsObject *pPhysics )
 		return;
 	}
 
-	if ( gEntList.PhysGetTimeScale() == 0.0f )
+	if (EntityList()->PhysGetTimeScale() == 0.0f )
 	{
 		physicsUpdated = false;
 	}

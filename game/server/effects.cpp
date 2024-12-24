@@ -12,7 +12,6 @@
 #include "decals.h"
 #include "func_break.h"
 #include "EntityFlame.h"
-//#include "entitylist.h"
 #include "basecombatweapon.h"
 #include "model_types.h"
 #include "player.h"
@@ -1222,7 +1221,7 @@ void CBlood::InputEmitBlood( inputdata_t &inputdata )
 void CC_BloodSpray( const CCommand &args )
 {
 	CBaseEntity *pEnt = NULL;
-	while ( ( pEnt = gEntList.FindEntityGeneric( pEnt, args[1] ) ) != NULL )
+	while ( ( pEnt = EntityList()->FindEntityGeneric( pEnt, args[1] ) ) != NULL )
 	{
 		Vector forward;
 		pEnt->GetVectors(&forward, NULL, NULL);

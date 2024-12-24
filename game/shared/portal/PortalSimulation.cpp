@@ -37,8 +37,6 @@
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
-extern IPhysicsConstraintEvent *g_pConstraintEvents;
-
 extern ConVar sv_portal_trace_vs_world;
 extern ConVar sv_portal_trace_vs_displacements;
 extern ConVar sv_portal_trace_vs_holywall;
@@ -999,7 +997,7 @@ public:
 //#ifndef CLIENT_DLL
 //	virtual bool Init( void )
 //	{
-//		gEntList.AddListenerEntity( this );
+//		EntityList()->AddListenerEntity( this );
 //		return true;
 //	}
 //

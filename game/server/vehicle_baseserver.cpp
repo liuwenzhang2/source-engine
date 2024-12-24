@@ -187,7 +187,7 @@ void CBaseServerVehicle::Precache( void )
 bool CBaseServerVehicle::Initialize( const char *pScriptName )
 {
 	// Attempt to parse our vehicle script
-	if (gEntList.FindOrAddVehicleScript( pScriptName, NULL, &m_vehicleSounds ) == false )
+	if (EntityList()->FindOrAddVehicleScript( pScriptName, NULL, &m_vehicleSounds ) == false )
 		return false;
 
 	//Precache();
@@ -2571,7 +2571,7 @@ void CBaseServerVehicle::ReloadScript()
 		string_t script = GetDrivableVehicle()->GetVehicleScriptName();
 		IPhysicsVehicleController *pController = GetVehicleController();
 		vehicleparams_t *pVehicleParams = pController ? &(pController->GetVehicleParamsForChange()) : NULL;
-		gEntList.FindOrAddVehicleScript( script.ToCStr(), pVehicleParams, &m_vehicleSounds );
+		EntityList()->FindOrAddVehicleScript( script.ToCStr(), pVehicleParams, &m_vehicleSounds );
 		if ( pController )
 		{
 			pController->VehicleDataReload();

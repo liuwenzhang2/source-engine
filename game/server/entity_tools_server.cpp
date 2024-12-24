@@ -6,7 +6,6 @@
 #include "cbase.h"
 #include "const.h"
 #include "toolframework/itoolentity.h"
-//#include "entitylist.h"
 #include "toolframework/itoolsystem.h"
 #include "KeyValues.h"
 #include "icliententity.h"
@@ -56,7 +55,7 @@ public:
 
 	virtual ITempEntsSystem *GetTempEntsSystem( void );
 	virtual CBaseTempEntity *GetTempEntList( void );
-	virtual CGlobalEntityList<CBaseEntity> *GetEntityList( void );
+	virtual IServerEntityList *GetEntityList( void );
 	virtual bool IsEntityPtr( void *pTest );
 	virtual CBaseEntity *FindEntityByClassname( CBaseEntity *pStartEntity, const char *szName );
 	virtual CBaseEntity *FindEntityByName( CBaseEntity *pStartEntity, const char *szName, CBaseEntity *pSearchingEntity = NULL, CBaseEntity *pActivator = NULL, CBaseEntity *pCaller = NULL, IEntityFindFilter *pFilter = NULL );
@@ -107,18 +106,18 @@ IServerEntity *CServerTools::GetIServerEntity( IClientEntity *pClientEntity )
 	// Brian believes that everything should just restrict itself to 10 to make things simpler,
 	// so if/when he changes NUM_SERIAL_NUM_BITS to 10, we can switch back to this simpler code
 
-	IServerNetworkable *pNet = gEntList.GetServerNetworkable( ehandle );
+	IServerNetworkable *pNet = EntityList()->GetServerNetworkable( ehandle );
 	if ( pNet == NULL )
 		return NULL;
 
 	CBaseEntity *pServerEnt = pNet->GetBaseEntity();
 	return pServerEnt;
 #else
-	IHandleEntity *pEnt = gEntList.LookupEntityByNetworkIndex( ehandle.GetEntryIndex() );
+	IHandleEntity *pEnt = EntityList()->LookupEntityByNetworkIndex( ehandle.GetEntryIndex() );
 	if ( pEnt == NULL )
 		return NULL;
 
-	CBaseHandle h = gEntList.GetNetworkableHandle( ehandle.GetEntryIndex() );
+	CBaseHandle h = EntityList()->GetNetworkableHandle( ehandle.GetEntryIndex() );
 	const int mask = ( 1 << NUM_NETWORKED_EHANDLE_SERIAL_NUMBER_BITS ) - 1;
 	if ( !h.IsValid() || ( ( h.GetSerialNumber() & mask ) != ( ehandle.GetSerialNumber() & mask ) ) )
 		return NULL;
@@ -369,14 +368,14 @@ CBaseTempEntity *CServerTools::GetTempEntList( void )
 	return CBaseTempEntity::GetList();
 }
 
-CGlobalEntityList<CBaseEntity> *CServerTools::GetEntityList( void )
+IServerEntityList *CServerTools::GetEntityList( void )
 {
-	return &gEntList;
+	return EntityList();
 }
 
 bool CServerTools::IsEntityPtr( void *pTest )
 {
-	return gEntList.IsEntityPtr( pTest );
+	return EntityList()->IsEntityPtr( pTest );
 }
 
 CBaseEntity *CServerTools::FindEntityByClassname( CBaseEntity *pStartEntity, const char *szName )
@@ -391,72 +390,72 @@ CBaseEntity *CServerTools::FindEntityByName( CBaseEntity *pStartEntity, const ch
 
 CBaseEntity *CServerTools::FindEntityInSphere( CBaseEntity *pStartEntity, const Vector &vecCenter, float flRadius )
 {
-	return gEntList.FindEntityInSphere( pStartEntity, vecCenter, flRadius );
+	return EntityList()->FindEntityInSphere( pStartEntity, vecCenter, flRadius );
 }
 
 CBaseEntity *CServerTools::FindEntityByTarget( CBaseEntity *pStartEntity, const char *szName )
 {
-	return gEntList.FindEntityByTarget( pStartEntity, szName );
+	return EntityList()->FindEntityByTarget( pStartEntity, szName );
 }
 
 CBaseEntity *CServerTools::FindEntityByModel( CBaseEntity *pStartEntity, const char *szModelName )
 {
-	return gEntList.FindEntityByModel( pStartEntity, szModelName );
+	return EntityList()->FindEntityByModel( pStartEntity, szModelName );
 }
 
 CBaseEntity *CServerTools::FindEntityByNameNearest( const char *szName, const Vector &vecSrc, float flRadius, CBaseEntity *pSearchingEntity, CBaseEntity *pActivator, CBaseEntity *pCaller )
 {
-	return gEntList.FindEntityByNameNearest( szName, vecSrc, flRadius, pSearchingEntity, pActivator, pCaller );
+	return EntityList()->FindEntityByNameNearest( szName, vecSrc, flRadius, pSearchingEntity, pActivator, pCaller );
 }
 
 CBaseEntity *CServerTools::FindEntityByNameWithin( CBaseEntity *pStartEntity, const char *szName, const Vector &vecSrc, float flRadius, CBaseEntity *pSearchingEntity, CBaseEntity *pActivator, CBaseEntity *pCaller )
 {
-	return gEntList.FindEntityByNameWithin( pStartEntity, szName, vecSrc, flRadius, pSearchingEntity, pActivator, pCaller );
+	return EntityList()->FindEntityByNameWithin( pStartEntity, szName, vecSrc, flRadius, pSearchingEntity, pActivator, pCaller );
 }
 
 CBaseEntity *CServerTools::FindEntityByClassnameNearest( const char *szName, const Vector &vecSrc, float flRadius )
 {
-	return gEntList.FindEntityByClassnameNearest( szName, vecSrc, flRadius );
+	return EntityList()->FindEntityByClassnameNearest( szName, vecSrc, flRadius );
 }
 
 CBaseEntity *CServerTools::FindEntityByClassnameWithin( CBaseEntity *pStartEntity, const char *szName, const Vector &vecSrc, float flRadius )
 {
-	return gEntList.FindEntityByClassnameWithin( pStartEntity, szName, vecSrc, flRadius );
+	return EntityList()->FindEntityByClassnameWithin( pStartEntity, szName, vecSrc, flRadius );
 }
 
 CBaseEntity *CServerTools::FindEntityByClassnameWithin( CBaseEntity *pStartEntity, const char *szName, const Vector &vecMins, const Vector &vecMaxs )
 {
-	return gEntList.FindEntityByClassnameWithin( pStartEntity, szName, vecMins, vecMaxs );
+	return EntityList()->FindEntityByClassnameWithin( pStartEntity, szName, vecMins, vecMaxs );
 }
 
 CBaseEntity *CServerTools::FindEntityGeneric( CBaseEntity *pStartEntity, const char *szName, CBaseEntity *pSearchingEntity, CBaseEntity *pActivator, CBaseEntity *pCaller )
 {
-	return gEntList.FindEntityGeneric( pStartEntity, szName, pSearchingEntity, pActivator, pCaller );
+	return EntityList()->FindEntityGeneric( pStartEntity, szName, pSearchingEntity, pActivator, pCaller );
 }
 
 CBaseEntity *CServerTools::FindEntityGenericWithin( CBaseEntity *pStartEntity, const char *szName, const Vector &vecSrc, float flRadius, CBaseEntity *pSearchingEntity, CBaseEntity *pActivator, CBaseEntity *pCaller )
 {
-	return gEntList.FindEntityGenericWithin( pStartEntity, szName, vecSrc, flRadius, pSearchingEntity, pActivator, pCaller );
+	return EntityList()->FindEntityGenericWithin( pStartEntity, szName, vecSrc, flRadius, pSearchingEntity, pActivator, pCaller );
 }
 
 CBaseEntity *CServerTools::FindEntityGenericNearest( const char *szName, const Vector &vecSrc, float flRadius, CBaseEntity *pSearchingEntity, CBaseEntity *pActivator, CBaseEntity *pCaller )
 {
-	return gEntList.FindEntityGenericNearest( szName, vecSrc, flRadius, pSearchingEntity, pActivator, pCaller );
+	return EntityList()->FindEntityGenericNearest( szName, vecSrc, flRadius, pSearchingEntity, pActivator, pCaller );
 }
 
 CBaseEntity *CServerTools::FindEntityNearestFacing( const Vector &origin, const Vector &facing, float threshold )
 {
-	return gEntList.FindEntityNearestFacing( origin, facing, threshold );
+	return EntityList()->FindEntityNearestFacing( origin, facing, threshold );
 }
 
 CBaseEntity *CServerTools::FindEntityClassNearestFacing( const Vector &origin, const Vector &facing, float threshold, char *classname )
 {
-	return gEntList.FindEntityClassNearestFacing( origin, facing, threshold, classname );
+	return EntityList()->FindEntityClassNearestFacing( origin, facing, threshold, classname );
 }
 
 CBaseEntity *CServerTools::FindEntityProcedural( const char *szName, CBaseEntity *pSearchingEntity, CBaseEntity *pActivator, CBaseEntity *pCaller )
 {
-	return gEntList.FindEntityProcedural( szName, pSearchingEntity, pActivator, pCaller );
+	return EntityList()->FindEntityProcedural( szName, pSearchingEntity, pActivator, pCaller );
 }
 
 

@@ -7,7 +7,6 @@
 
 #include "cbase.h"
 #include "trains.h"
-//#include "entitylist.h"
 #include "soundenvelope.h"
 #include "engine/IEngineSound.h"
 
@@ -230,7 +229,7 @@ void CTankTrainAI::InputTargetEntity( inputdata_t &inputdata )
 //-----------------------------------------------------------------------------
 CBaseEntity *CTankTrainAI::FindTarget( string_t target, CBaseEntity *pActivator )
 {
-	return gEntList.FindEntityGeneric( NULL, STRING( target ), this, pActivator );
+	return EntityList()->FindEntityGeneric( NULL, STRING( target ), this, pActivator );
 }
 
 

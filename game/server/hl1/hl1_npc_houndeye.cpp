@@ -416,7 +416,7 @@ void CNPC_Houndeye::SonicAttack ( void )
 	
 	CBaseEntity *pEntity = NULL;
 	// iterate on all entities in the vicinity.
-	while ((pEntity = gEntList.FindEntityInSphere( pEntity, GetEngineObject()->GetAbsOrigin(), HOUNDEYE_MAX_ATTACK_RADIUS )) != NULL)
+	while ((pEntity = EntityList()->FindEntityInSphere( pEntity, GetEngineObject()->GetAbsOrigin(), HOUNDEYE_MAX_ATTACK_RADIUS )) != NULL)
 	{
 		if ( pEntity->m_takedamage  != DAMAGE_NO )
 		{
@@ -1000,7 +1000,7 @@ int CNPC_Houndeye::SquadRecruit( int searchRadius, int maxMembers )
 
 		m_SquadName = AllocPooledString( szSquadName );
 
-		while ( ( pEntity = gEntList.FindEntityInSphere( pEntity, GetEngineObject()->GetAbsOrigin(), searchRadius ) ) != NULL && squadCount < maxMembers )
+		while ( ( pEntity = EntityList()->FindEntityInSphere( pEntity, GetEngineObject()->GetAbsOrigin(), searchRadius ) ) != NULL && squadCount < maxMembers )
 		{
 			if ( !FClassnameIs ( pEntity, "monster_houndeye" ) )
 				continue;

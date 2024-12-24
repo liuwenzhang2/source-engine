@@ -23,6 +23,8 @@
 #include "entitylist_base.h"
 #include "utlmap.h"
 #include "client_class.h"
+#include "interpolatedvar.h"
+#include "bone_accessor.h"
 #include "collisionproperty.h"
 #include "baseentity_shared.h"
 //#include "c_baseanimating.h"
@@ -47,6 +49,8 @@
 #include "vphysics_sound.h"
 #include "engine/IEngineSound.h"
 #include "soundenvelope.h"
+#include "physics_shared.h"
+#include "ragdoll_shared.h"
 
 //class C_Beam;
 //class C_BaseViewModel;
@@ -54,11 +58,7 @@
 
 extern IVEngineClient* engine;
 
-enum
-{
-	NUM_POSEPAREMETERS = 24,
-	NUM_BONECTRLS = 4
-};
+
 
 class CAttachmentData
 {
@@ -2690,7 +2690,6 @@ private:
 };
 
 extern ConVar cl_phys_timescale;
-extern const objectparams_t g_PhysDefaultObjectParams;
 
 //
 // This is the IClientEntityList implemenation. It serves two functions:
@@ -3673,8 +3672,6 @@ CClientEntityList<T>::~CClientEntityList(void)
 	Release();
 }
 
-extern void PhysParseSurfaceData(class IPhysicsSurfaceProps* pProps, class IFileSystem* pFileSystem);
-
 template<class T>
 bool CClientEntityList<T>::Init()
 {
@@ -3724,7 +3721,6 @@ void CClientEntityList<T>::Shutdown()
 	RemoveDataAccessor(VPHYSICSWATCHER);
 }
 
-extern void PrecachePhysicsSounds(void);
 // Level init, shutdown
 template<class T>
 void CClientEntityList<T>::LevelInitPreEntity()
@@ -3732,9 +3728,6 @@ void CClientEntityList<T>::LevelInitPreEntity()
 	m_impactSounds.RemoveAll();
 	PrecachePhysicsSounds();
 }
-
-extern IVPhysicsKeyHandler* g_pSolidSetup;
-extern IPhysicsObject* PhysCreateWorld_Shared(IHandleEntity* pWorld, vcollide_t* pWorldCollide, const objectparams_t& defaultParams);
 
 #define DEFAULT_XBOX_CLIENT_VPHYSICS_TICK	0.025		// 25ms ticks on xbox ragdolls
 template<class T>

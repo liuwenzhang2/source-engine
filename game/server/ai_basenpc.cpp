@@ -13,7 +13,6 @@
 #include "basecombatweapon.h"
 #include "soundent.h"
 #include "decals.h"
-//#include "entitylist.h"
 #include "eventqueue.h"
 #include "entityapi.h"
 #include "bitstring.h"
@@ -7227,7 +7226,7 @@ void CAI_BaseNPC::AddRelationship( const char *pszRelationship, CBaseEntity *pAc
 			else
 			{
 				// HACKHACK:
-				CBaseEntity *pEntity = gEntList.CanCreateEntityClass( entityString ) ? (CBaseEntity*)EntityList()->CreateEntityByName( entityString ) : NULL;
+				CBaseEntity *pEntity = EntityList()->CanCreateEntityClass( entityString ) ? (CBaseEntity*)EntityList()->CreateEntityByName( entityString ) : NULL;
 				if (pEntity)
 				{
 					AddClassRelationship( pEntity->Classify(), disposition, priority );
@@ -8293,7 +8292,7 @@ void CAI_BaseNPC::HandleAnimEvent( animevent_t *pEvent )
 			if ( pEvent->options && strlen( pEvent->options ) > 0 )
 			{
 				// Pick up the weapon or item that was specified in the anim event.
-				pPickup = gEntList.FindEntityGenericNearest( pEvent->options, GetEngineObject()->GetAbsOrigin(), 256, this );
+				pPickup = EntityList()->FindEntityGenericNearest( pEvent->options, GetEngineObject()->GetAbsOrigin(), 256, this );
 			}
 			else
 			{
@@ -8401,7 +8400,7 @@ void CAI_BaseNPC::HandleAnimEvent( animevent_t *pEvent )
 			CBaseEntity *pTarget = NULL;
 			if (pEvent->options)
 			{
-				pTarget = gEntList.FindEntityGeneric(NULL, pEvent->options, this);
+				pTarget = EntityList()->FindEntityGeneric(NULL, pEvent->options, this);
 			}
 
 			if (pTarget)
@@ -8577,7 +8576,7 @@ void CAI_BaseNPC::HandleAnimEvent( animevent_t *pEvent )
 				CBaseEntity *pTarget = NULL;
 				if (pEvent->options)
 				{
-					pTarget = gEntList.FindEntityGeneric(NULL, pEvent->options, this);
+					pTarget = EntityList()->FindEntityGeneric(NULL, pEvent->options, this);
 				}
 
 				if (pTarget)

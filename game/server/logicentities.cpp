@@ -1267,14 +1267,14 @@ void CMultiSource::Register(void)
 	// search for all entities which target this multisource (m_iName)
 	// dvsents2: port multisource to entity I/O!
 
-	pTarget = gEntList.FindEntityByTarget( NULL, STRING(GetEntityName()) );
+	pTarget = EntityList()->FindEntityByTarget( NULL, STRING(GetEntityName()) );
 
 	while ( pTarget && (m_iTotal < MS_MAX_TARGETS) )
 	{
 		if ( pTarget )
 			m_rgEntities[m_iTotal++] = pTarget;
 
-		pTarget = gEntList.FindEntityByTarget( pTarget, STRING(GetEntityName()) );
+		pTarget = EntityList()->FindEntityByTarget( pTarget, STRING(GetEntityName()) );
 	}
 
 	pTarget = EntityList()->FindEntityByClassname( NULL, "multi_manager" );
@@ -2615,7 +2615,7 @@ void CLogicBranchList::Activate( void )
 	for ( int i = 0; i < MAX_LOGIC_BRANCH_NAMES; i++ )
 	{
 		CBaseEntity *pEntity = NULL;
-		while ( ( pEntity = gEntList.FindEntityGeneric( pEntity, STRING( m_nLogicBranchNames[i] ), this ) ) != NULL )
+		while ( ( pEntity = EntityList()->FindEntityGeneric( pEntity, STRING( m_nLogicBranchNames[i] ), this ) ) != NULL )
 		{
 			if ( FClassnameIs( pEntity, "logic_branch" ) )
 			{

@@ -18,7 +18,6 @@
 #include "engine/IEngineSound.h"
 
 #include "player.h"
-//#include "entitylist.h"
 #include "game/server/iservervehicle.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
@@ -197,7 +196,7 @@ void CAPCController::DeactivateRocketGuidance(void)
 //-----------------------------------------------------------------------------
 CBaseEntity *CAPCController::FindTarget( string_t targetName, CBaseEntity *pActivator ) 
 {
-	return gEntList.FindEntityGenericNearest( STRING( targetName ), GetEngineObject()->GetAbsOrigin(), 0, this, pActivator );
+	return EntityList()->FindEntityGenericNearest( STRING( targetName ), GetEngineObject()->GetAbsOrigin(), 0, this, pActivator );
 }
 
 //-----------------------------------------------------------------------------

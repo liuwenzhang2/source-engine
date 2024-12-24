@@ -9,7 +9,6 @@
 #include "basecombatweapon.h"
 #include "animation.h"
 #include "gib.h"
-//#include "entitylist.h"
 #include "gamerules.h"
 #include "ai_basenpc.h"
 #include "ai_squadslot.h"
@@ -3202,7 +3201,7 @@ void CBaseCombatCharacter::VPhysicsShadowCollision( int index, gamevcollisioneve
 
 	// UNDONE: Find one near damagePos?
 	GetEngineObject()->SetForceBone(0);
-	gEntList.PhysCallbackDamage( this, dmgInfo, *pEvent, index );
+	EntityList()->PhysCallbackDamage( this, dmgInfo, *pEvent, index );
 }
 
 

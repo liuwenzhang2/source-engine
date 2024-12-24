@@ -9,7 +9,6 @@
 #include "gamerules.h"
 #include "maprules.h"
 #include "player.h"
-//#include "entitylist.h"
 #include "ai_hull.h"
 #include "entityoutput.h"
 

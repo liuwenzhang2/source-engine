@@ -13,7 +13,6 @@
 #include "ai_task.h"
 #include "ai_senses.h"
 #include "ai_memory.h"
-//#include "entitylist.h"
 #include "soundenvelope.h"
 #include "gamerules.h"
 #include "grenade_homer.h"
@@ -558,7 +557,7 @@ void CBaseHelicopter::DoRotorPhysicsPush( const Vector &vecRotorOrigin, float fl
 	// Find the lightest physics entity below us and add it to our list to push around
 	CBaseEntity *pLightestEntity = NULL;
 	float flLightestMass = 9999;
-	while ((pEntity = gEntList.FindEntityInSphere(pEntity, vecPhysicsOrigin, BASECHOPPER_WASH_RADIUS )) != NULL)
+	while ((pEntity = EntityList()->FindEntityInSphere(pEntity, vecPhysicsOrigin, BASECHOPPER_WASH_RADIUS )) != NULL)
 	{
 		IRotorWashShooter *pShooter = GetRotorWashShooter( pEntity );
 

@@ -16,9 +16,6 @@
 #include "gamestringpool.h"
 #include "datacache/imdlcache.h"
 #include "physics_shared.h"
-#if !defined( CLIENT_DLL )
-//#include "entitylist.h"
-#endif
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
@@ -201,7 +198,7 @@ public:
 	virtual void PreRestore() 
 	{
 #if !defined( CLIENT_DLL )
-		gEntList.AddListenerEntity( this );
+		EntityList()->AddListenerEntity( this );
 #endif
 
 		// UNDONE: This never runs!!!!
@@ -411,7 +408,7 @@ public:
 		
 		m_QueuedRestores.RemoveAll();
 #if !defined( CLIENT_DLL )
-		gEntList.RemoveListenerEntity( this );
+		EntityList()->RemoveListenerEntity( this );
 #endif
 	}
 	
@@ -701,7 +698,7 @@ ISaveRestoreBlockHandler *GetPhysSaveRestoreBlockHandler()
 static bool IsValidEntityPointer( void *ptr )
 {
 #if !defined( CLIENT_DLL )
-	return gEntList.IsEntityPtr( ptr );
+	return EntityList()->IsEntityPtr( ptr );
 #else
 	// Walk entities looking for pointer
 	int c = EntityList()->GetHighestEntityIndex();

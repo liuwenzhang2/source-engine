@@ -221,7 +221,7 @@ public:
 //		for ( i = 0; i < nEntities; i++ )
 //		{
 //			pTable = GetEntityInfo( i );
-//			m_EntityToIndex.Insert(  CHashElement( gEntList.GetServerEntityFromHandle(pTable->hEnt), i ) );
+//			m_EntityToIndex.Insert(  CHashElement( EntityList()->GetServerEntityFromHandle(pTable->hEnt), i ) );
 //		}
 //#endif
 //	}

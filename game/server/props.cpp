@@ -630,7 +630,7 @@ void CPhysicsProp::HandleAnyCollisionInteractions( int index, gamevcollisioneven
 			if ( pRagdoll )
 			{
 				Vector vecVelocity = pEvent->preVelocity[index] * pObj->GetMass();
-				gEntList.PhysCallbackImpulse( pObj, vecVelocity, vec3_origin );
+				EntityList()->PhysCallbackImpulse( pObj, vecVelocity, vec3_origin );
 				EntityList()->DestroyEntity( pNPC );
 				GetEngineObject()->AddSpawnFlags( SF_PHYSPROP_HAS_ATTACHED_RAGDOLLS );
 			}
@@ -1681,7 +1681,7 @@ void CBreakableProp::Break( CBaseEntity *pBreaker, const CTakeDamageInfo &info )
 		angles = GetEngineObject()->GetAbsAngles();
 	}
 
-	gEntList.PhysBreakSound( this, GetEngineObject()->VPhysicsGetObject(), GetEngineObject()->GetAbsOrigin() );
+	EntityList()->PhysBreakSound( this, GetEngineObject()->VPhysicsGetObject(), GetEngineObject()->GetAbsOrigin() );
 
 	bool bExploded = false;
 
@@ -2595,7 +2595,7 @@ bool CPhysicsProp::CreateVPhysics()
 			tmpSolid.params.inertia = 0.5;
 	}
 
-	gEntList.PhysGetMassCenterOverride( this, modelinfo->GetVCollide(GetEngineObject()->GetModelIndex() ), tmpSolid );
+	EntityList()->PhysGetMassCenterOverride( this, modelinfo->GetVCollide(GetEngineObject()->GetModelIndex() ), tmpSolid );
 	if (GetEngineObject()->HasSpawnFlags(SF_PHYSPROP_NO_COLLISIONS) )
 	{
 		tmpSolid.params.enableCollisions = false;
@@ -3023,7 +3023,7 @@ void CPhysicsProp::ComputeEnablingImpulse( int index, gamevcollisionevent_t *pEv
 	AngularImpulse vecTorque;
 	pEvent->pObjects[index]->CalculateForceOffset( vecContactVelocity, vecContactPoint, &vecForce, &vecTorque );
 
-	gEntList.PhysCallbackImpulse( pEvent->pObjects[index], vecForce, vecTorque );
+	EntityList()->PhysCallbackImpulse( pEvent->pObjects[index], vecForce, vecTorque );
 }
 
 
@@ -3096,7 +3096,7 @@ void CPhysicsProp::VPhysicsCollision( int index, gamevcollisionevent_t *pEvent )
 			}
 
 			// FIXME: this doesn't pass in who is responsible if some other entity "caused" this collision
-			gEntList.PhysCallbackDamage( this, CTakeDamageInfo( pHitEntity, pHitEntity, damageForce, damagePos, damage, damageType ), *pEvent, index );
+			EntityList()->PhysCallbackDamage( this, CTakeDamageInfo( pHitEntity, pHitEntity, damageForce, damagePos, damage, damageType ), *pEvent, index );
 		}
 	}
 
@@ -5825,7 +5825,7 @@ void CPhysicsPropRespawnable::Event_Killed( const CTakeDamageInfo &info )
 
 	Break( info.GetInflictor(), info );
 
-	gEntList.PhysCleanupFrictionSounds( this );
+	EntityList()->PhysCleanupFrictionSounds( this );
 
 	GetEngineObject()->VPhysicsDestroyObject();
 

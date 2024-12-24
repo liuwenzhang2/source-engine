@@ -6,7 +6,6 @@
 //=============================================================================//
 
 #include "cbase.h"
-//#include "entitylist.h"
 //#include "physics.h"
 #include "vphysics/constraints.h"
 #include "physics_saverestore.h"

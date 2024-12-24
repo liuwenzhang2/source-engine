@@ -126,7 +126,7 @@ void RadiusFlash(
 	bool bInWater = (UTIL_PointContents( vecSrc ) == CONTENTS_WATER);
 
 	// iterate on all entities in the vicinity.
-	while ((pEntity = gEntList.FindEntityInSphere( pEntity, vecSrc, flRadius )) != NULL)
+	while ((pEntity = EntityList()->FindEntityInSphere( pEntity, vecSrc, flRadius )) != NULL)
 	{	
 		bool bPlayer = pEntity->IsPlayer();
 		bool bHostage = ( Q_stricmp( pEntity->GetClassname(), "hostage_entity" ) == 0 );

@@ -45,6 +45,8 @@ struct vehicleparams_t;
 struct vehicle_controlparams_t;
 struct vehicle_operatingparams_t;
 class CIKContext;
+class CTakeDamageInfo;
+struct vehiclesounds_t;
 
 struct servertouchlink_t
 {
@@ -829,12 +831,97 @@ public:
 	virtual CBaseEntity* GetFilterResult(void) = 0;
 };
 
+typedef void (*EntityCallbackFunction) (CBaseEntity* pEntity);
+typedef short HSOUNDSCRIPTHANDLE;
+
+const int MAX_PUSHED_ENTITIES = 32;
+struct physicspushlist_t
+{
+	float	localMoveTime;
+	Vector	localOrigin;
+	QAngle	localAngles;
+	int		pushedCount;
+	CBaseHandle	pushedEnts[MAX_PUSHED_ENTITIES];
+	Vector	pushVec[MAX_PUSHED_ENTITIES];
+};
+
+// this is used to temporarily allow the vphysics shadow object to update the entity's position
+// for entities that typically ignore those updates.
+struct vphysicsupdateai_t
+{
+	float	startUpdateTime;
+	float	stopUpdateTime;
+	float	savedShadowControllerMaxSpeed;
+};
+
+enum
+{
+	TRANSITION_VOLUME_SCREENED_OUT = 0,
+	TRANSITION_VOLUME_NOT_FOUND = 1,
+	TRANSITION_VOLUME_PASSED = 2,
+};
+
+#define ROLL_CURVE_ZERO		5		// roll less than this is clamped to zero
+#define ROLL_CURVE_LINEAR	45		// roll greater than this is copied out
+
+#define PITCH_CURVE_ZERO		10	// pitch less than this is clamped to zero
+#define PITCH_CURVE_LINEAR		45	// pitch greater than this is copied out
+
+// remaps an angular variable to a 3 band function:
+// 0 <= t < start :		f(t) = 0
+// start <= t <= end :	f(t) = end * spline(( t-start) / (end-start) )  // s curve between clamped and linear
+// end < t :			f(t) = t
+inline float RemapAngleRange(float startInterval, float endInterval, float value)
+{
+	// Fixup the roll
+	value = AngleNormalize(value);
+	float absAngle = fabs(value);
+
+	// beneath cutoff?
+	if (absAngle < startInterval)
+	{
+		value = 0;
+	}
+	// in spline range?
+	else if (absAngle <= endInterval)
+	{
+		float newAngle = SimpleSpline((absAngle - startInterval) / (endInterval - startInterval)) * endInterval;
+		// grab the sign from the initial value
+		if (value < 0)
+		{
+			newAngle *= -1;
+		}
+		value = newAngle;
+	}
+	// else leave it alone, in linear range
+
+	return value;
+}
+
+// the tires are considered to be skidding if they have sliding velocity of 10 in/s or more
+const float DEFAULT_SKID_THRESHOLD = 10.0f;
+
 //-----------------------------------------------------------------------------
 // Purpose: Exposes IClientEntity's to engine
 //-----------------------------------------------------------------------------
 abstract_class IServerEntityList : public IEntityList, public ISaveRestoreBlockHandler
 {
 public:
+
+	virtual bool Init() = 0;
+	virtual void Shutdown() = 0;
+
+	// Level init, shutdown
+	virtual void LevelInitPreEntity() = 0;
+	virtual void LevelInitPostEntity() = 0;
+
+	// The level is shutdown in two parts
+	virtual void LevelShutdownPreEntity() = 0;
+
+	virtual void LevelShutdownPostEntity() = 0;
+	virtual void FrameUpdatePostEntityThink() = 0;
+	virtual void PreClientUpdate() = 0;
+
 	virtual IPhysics* Physics() = 0;
 	virtual IPhysicsEnvironment* PhysGetEnv() = 0;
 	virtual IPhysicsSurfaceProps* PhysGetProps() = 0;
@@ -843,63 +930,38 @@ public:
 	virtual const objectparams_t& PhysGetDefaultObjectParams() = 0;
 	virtual IPhysicsObject* PhysGetWorldObject() = 0;
 	virtual CCallQueue& PhysGetPostSimulationQueue() = 0;
+	virtual bool PhysIsFinalTick() = 0;
+	virtual float PhysGetTimeScale() = 0;
+	virtual bool PhysIsInCallback() = 0;
+	virtual void PhysCallbackRemove(CBaseEntity* pRemove) = 0;
+	virtual void PhysCallbackImpulse(IPhysicsObject* pPhysicsObject, const Vector& vecCenterForce, const AngularImpulse& vecCenterTorque) = 0;
+	virtual void PhysCallbackSetVelocity(IPhysicsObject* pPhysicsObject, const Vector& vecVelocity) = 0;
+	virtual void PhysCallbackDamage(CBaseEntity* pEntity, const CTakeDamageInfo& info) = 0;
+	virtual void PhysCallbackDamage(CBaseEntity* pEntity, const CTakeDamageInfo& info, gamevcollisionevent_t& event, int hurtIndex) = 0;
+	virtual void PhysicsImpactSound(CBaseEntity* pEntity, IPhysicsObject* pPhysObject, int channel, int surfaceProps, int surfacePropsHit, float volume, float impactSpeed) = 0;
+	virtual void PhysCollisionSound(CBaseEntity* pEntity, IPhysicsObject* pPhysObject, int channel, int surfaceProps, int surfacePropsHit, float deltaTime, float speed) = 0;
+	virtual void PhysCleanupFrictionSounds(IHandleEntity* pEntity) = 0;
+	virtual void PhysBreakSound(CBaseEntity* pEntity, IPhysicsObject* pPhysObject, Vector vecOrigin) = 0;
+	virtual void PhysFrictionSound(IHandleEntity* pEntity, IPhysicsObject* pObject, float energy, int surfaceProps, int surfacePropsHit) = 0;
+	virtual void PhysFrictionSound(IHandleEntity* pEntity, IPhysicsObject* pObject, const char* pSoundName, HSOUNDSCRIPTHANDLE& handle, float flVolume) = 0;
+	virtual void PhysSetMassCenterOverride(masscenteroverride_t & override) = 0;
+	virtual void PhysGetMassCenterOverride(CBaseEntity* pEntity, vcollide_t* pCollide, solid_t& solidOut) = 0;
+	virtual void PhysTeleportConstrainedEntity(CBaseEntity* pTeleportSource, IPhysicsObject* pObject0, IPhysicsObject* pObject1, const Vector& prevPosition, const QAngle& prevAngles, bool physicsRotate) = 0;
+	virtual void PhysGetListOfPenetratingEntities(CBaseEntity* pSearch, CUtlVector<CBaseEntity*>& list) = 0;
+	virtual bool PhysGetTriggerEvent(triggerevent_t* pEvent, CBaseEntity* pTriggerEntity) = 0;
+	virtual void IterateActivePhysicsEntities(EntityCallbackFunction func) = 0;
+	virtual void OutputVPhysicsBudgetInfo() = 0;
+	virtual void OutputVPhysicsDebugInfo(CBaseEntity* pEntity) = 0;
 
 	virtual void InstallEntityFactory(IEntityFactory* pFactory) = 0;
 	virtual void UninstallEntityFactory(IEntityFactory* pFactory) = 0;
 	virtual bool CanCreateEntityClass(const char* pClassName) = 0;
 	virtual const char* GetMapClassName(const char* pClassName) = 0;
 	virtual const char* GetDllClassName(const char* pClassName) = 0;
-	virtual size_t		GetEntitySize(const char* pClassName) = 0;
+	virtual size_t GetEntitySize(const char* pClassName) = 0;
 	virtual const char* GetCannonicalName(const char* pClassName) = 0;
 	virtual void ReportEntitySizes() = 0;
 	virtual void DumpEntityFactories() = 0;
-
-	virtual void ReserveSlot(int index) = 0;
-	virtual int AllocateFreeSlot(bool bNetworkable = true, int index = -1) = 0;
-	virtual IServerEntity* CreateEntityByName(const char* className, int iForceEdictIndex = -1, int iSerialNum = -1) = 0;
-	// marks the entity for deletion so it will get removed next frame
-	virtual void DestroyEntity(IHandleEntity* pEntity) = 0;
-	// deletes an entity, without any delay.  Only use this when sure no pointers rely on this entity.
-	virtual void DisableDestroyImmediate() = 0;
-	virtual void EnableDestroyImmediate() = 0;
-	virtual void DestroyEntityImmediate(IHandleEntity* pEntity) = 0;
-	//virtual edict_t* GetEdict(CBaseHandle hEnt) const = 0;
-	// Returns number of entities currently in use
-	virtual int NumberOfEntities() = 0;
-	virtual int NumberOfEdicts(void) = 0;
-	virtual int NumberOfReservedEdicts(void) = 0;
-	virtual int IndexOfHighestEdict(void) = 0;
-
-	// returns the next entity after pCurrentEnt;  if pCurrentEnt is NULL, return the first entity
-	virtual CBaseEntity* NextEnt(CBaseEntity* pCurrentEnt) = 0;
-	virtual CBaseEntity* FirstEnt() { return NextEnt(NULL); }
-
-	virtual IEngineObjectServer* GetEngineObject(int entnum) = 0;
-	virtual IEngineObjectServer* GetEngineObjectFromHandle(CBaseHandle handle) = 0;
-	// Get IServerNetworkable interface for specified entity
-	virtual IServerNetworkable* GetServerNetworkable(int entnum) const = 0;
-	virtual IServerNetworkable* GetServerNetworkableFromHandle(CBaseHandle hEnt) const = 0;
-	virtual IServerUnknown* GetServerUnknownFromHandle(CBaseHandle hEnt) const = 0;
-
-	// NOTE: This function is only a convenience wrapper.
-	// It returns GetServerNetworkable( entnum )->GetIServerEntity().
-	virtual IServerEntity* GetServerEntity(int entnum) const = 0;
-	virtual IServerEntity* GetServerEntityFromHandle(CBaseHandle hEnt) const = 0;
-	virtual short GetNetworkSerialNumber(int entnum) const = 0;
-	virtual CBaseEntity* GetBaseEntity(int entnum) const = 0;
-	virtual CBaseEntity* GetBaseEntityFromHandle(CBaseHandle hEnt) const = 0;
-
-	virtual CBaseEntity* FindEntityByClassname(CBaseEntity* pStartEntity, const char* szName) = 0;
-	virtual CBaseEntity* FindEntityByName(CBaseEntity* pStartEntity, const char* szName, CBaseEntity* pSearchingEntity = NULL, CBaseEntity* pActivator = NULL, CBaseEntity* pCaller = NULL, IEntityFindFilter* pFilter = NULL) = 0;
-	virtual CBaseEntity* FindEntityByName(CBaseEntity* pStartEntity, string_t iszName, CBaseEntity* pSearchingEntity = NULL, CBaseEntity* pActivator = NULL, CBaseEntity* pCaller = NULL, IEntityFindFilter* pFilter = NULL) = 0;
-
-
-	// Returns highest index actually used
-	//virtual int					GetHighestEntityIndex(void) = 0;
-
-	// Sizes entity list to specified size
-	//virtual void				SetMaxEntities(int maxents) = 0;
-	//virtual int				GetMaxEntities() = 0;
 
 	virtual const char* GetBlockName() = 0;
 
@@ -913,11 +975,99 @@ public:
 	virtual void Restore(IRestore* pRestore, bool createPlayers) = 0;
 	virtual void PostRestore() = 0;
 
+	virtual CBaseEntity* FindLandmark(const char* pLandmarkName) = 0;
+	virtual void OnChangeLevel(const char* pNewMapName, const char* pNewLandmarkName) = 0;
+	virtual bool IsEntityInTransition(CBaseEntity* pEntity, const char* pLandmarkName) = 0;
+	virtual int InTransitionVolume(CBaseEntity* pEntity, const char* pVolumeName) = 0;
 	// Returns the number of entities moved across the transition
-	virtual int				CreateEntityTransitionList(IRestore* pRestore, int) = 0;
+	virtual int CreateEntityTransitionList(IRestore* pRestore, int) = 0;
 	// Build the list of maps adjacent to the current map
-	virtual void			BuildAdjacentMapList(ISave* pSave) = 0;
+	virtual void BuildAdjacentMapList(ISave* pSave) = 0;
 
+	virtual void AddListenerEntity(IEntityListener<CBaseEntity>* pListener) = 0;
+	virtual void RemoveListenerEntity(IEntityListener<CBaseEntity>* pListener) = 0;
+
+	virtual void ReserveSlot(int index) = 0;
+	virtual int AllocateFreeSlot(bool bNetworkable = true, int index = -1) = 0;
+	virtual IServerEntity* CreateEntityByName(const char* className, int iForceEdictIndex = -1, int iSerialNum = -1) = 0;
+	virtual void NotifyCreateEntity(CBaseEntity* pEnt) = 0;
+	virtual void NotifyRemoveEntity(CBaseEntity* pEnt) = 0;
+	virtual void NotifySpawn(CBaseEntity* pEnt) = 0;
+	// marks the entity for deletion so it will get removed next frame
+	virtual void DestroyEntity(IHandleEntity* pEntity) = 0;
+	// deletes an entity, without any delay.  Only use this when sure no pointers rely on this entity.
+	virtual void DisableDestroyImmediate() = 0;
+	virtual void EnableDestroyImmediate() = 0;
+	virtual void DestroyEntityImmediate(IHandleEntity* pEntity) = 0;
+	//virtual edict_t* GetEdict(CBaseHandle hEnt) const = 0;
+	// Returns number of entities currently in use
+	virtual int NumberOfEntities() = 0;
+	virtual int NumberOfEdicts(void) = 0;
+	virtual int NumberOfReservedEdicts(void) = 0;
+	virtual int IndexOfHighestEdict(void) = 0;
+	virtual void CleanupDeleteList(void) = 0;
+	virtual int ResetDeleteList(void) = 0;
+	virtual void Clear(void) = 0;
+
+	virtual CBaseHandle GetNetworkableHandle(int iEntity) const = 0;
+	virtual IHandleEntity* LookupEntityByNetworkIndex(int edictIndex) const = 0;
+	virtual bool IsEntityPtr(void* pTest) = 0;
+	virtual IEngineObjectServer* GetEngineObject(int entnum) = 0;
+	virtual IEngineObjectServer* GetEngineObjectFromHandle(CBaseHandle handle) = 0;
+	// Get IServerNetworkable interface for specified entity
+	virtual IServerNetworkable* GetServerNetworkable(int entnum) const = 0;
+	virtual IServerNetworkable* GetServerNetworkableFromHandle(CBaseHandle hEnt) const = 0;
+	virtual IServerUnknown* GetServerUnknownFromHandle(CBaseHandle hEnt) const = 0;
+
+	// returns the next entity after pCurrentEnt;  if pCurrentEnt is NULL, return the first entity
+	virtual CBaseEntity* NextEnt(CBaseEntity* pCurrentEnt) = 0;
+	virtual CBaseEntity* FirstEnt() { return NextEnt(NULL); }
+
+	// NOTE: This function is only a convenience wrapper.
+	// It returns GetServerNetworkable( entnum )->GetIServerEntity().
+	virtual IServerEntity* GetServerEntity(int entnum) const = 0;
+	virtual IServerEntity* GetServerEntityFromHandle(CBaseHandle hEnt) const = 0;
+	virtual short GetNetworkSerialNumber(int entnum) const = 0;
+	virtual CBaseEntity* GetBaseEntity(int entnum) const = 0;
+	virtual CBaseEntity* GetBaseEntityFromHandle(CBaseHandle hEnt) const = 0;
+
+	virtual CBaseEntity* FindEntityGeneric(CBaseEntity* pStartEntity, const char* szName, CBaseEntity* pSearchingEntity = NULL, CBaseEntity* pActivator = NULL, CBaseEntity* pCaller = NULL) = 0;
+	virtual CBaseEntity* FindEntityGenericWithin(CBaseEntity* pStartEntity, const char* szName, const Vector& vecSrc, float flRadius, CBaseEntity* pSearchingEntity = NULL, CBaseEntity* pActivator = NULL, CBaseEntity* pCaller = NULL) = 0;
+	virtual CBaseEntity* FindEntityGenericNearest(const char* szName, const Vector& vecSrc, float flRadius, CBaseEntity* pSearchingEntity = NULL, CBaseEntity* pActivator = NULL, CBaseEntity* pCaller = NULL) = 0;
+
+	virtual CBaseEntity* FindEntityByClassname(CBaseEntity* pStartEntity, const char* szName) = 0;
+	virtual CBaseEntity* FindEntityByClassnameNearest(const char* szName, const Vector& vecSrc, float flRadius) = 0;
+	virtual CBaseEntity* FindEntityByClassnameWithin(CBaseEntity* pStartEntity, const char* szName, const Vector& vecSrc, float flRadius) = 0;
+	virtual CBaseEntity* FindEntityByClassnameWithin(CBaseEntity* pStartEntity, const char* szName, const Vector& vecMins, const Vector& vecMaxs) = 0;
+
+	virtual CBaseEntity* FindEntityByName(CBaseEntity* pStartEntity, const char* szName, CBaseEntity* pSearchingEntity = NULL, CBaseEntity* pActivator = NULL, CBaseEntity* pCaller = NULL, IEntityFindFilter* pFilter = NULL) = 0;
+	virtual CBaseEntity* FindEntityByName(CBaseEntity* pStartEntity, string_t iszName, CBaseEntity* pSearchingEntity = NULL, CBaseEntity* pActivator = NULL, CBaseEntity* pCaller = NULL, IEntityFindFilter* pFilter = NULL) = 0;
+	virtual CBaseEntity* FindEntityByNameNearest(const char* szName, const Vector& vecSrc, float flRadius, CBaseEntity* pSearchingEntity = NULL, CBaseEntity* pActivator = NULL, CBaseEntity* pCaller = NULL) = 0;
+	virtual CBaseEntity* FindEntityByNameWithin(CBaseEntity* pStartEntity, const char* szName, const Vector& vecSrc, float flRadius, CBaseEntity* pSearchingEntity = NULL, CBaseEntity* pActivator = NULL, CBaseEntity* pCaller = NULL) = 0;
+
+	virtual CBaseEntity* FindEntityByTarget(CBaseEntity* pStartEntity, const char* szName) = 0;
+	virtual CBaseEntity* FindEntityByModel(CBaseEntity* pStartEntity, const char* szModelName) = 0;
+	virtual CBaseEntity* FindEntityInSphere(CBaseEntity* pStartEntity, const Vector& vecCenter, float flRadius) = 0;
+
+	virtual CBaseEntity* FindEntityNearestFacing(const Vector& origin, const Vector& facing, float threshold) = 0;
+	virtual CBaseEntity* FindEntityClassNearestFacing(const Vector& origin, const Vector& facing, float threshold, char* classname) = 0;
+	virtual CBaseEntity* FindEntityProcedural(const char* szName, CBaseEntity* pSearchingEntity = NULL, CBaseEntity* pActivator = NULL, CBaseEntity* pCaller = NULL) = 0;
+
+	virtual int AimTarget_ListCount() = 0;
+	virtual int AimTarget_ListCopy(CBaseEntity* pList[], int listMax) = 0;
+	virtual void AimTarget_ForceRepopulateList() = 0;
+	virtual void SimThink_EntityChanged(CBaseEntity* pEntity) = 0;
+	virtual int SimThink_ListCount() = 0;
+	virtual int SimThink_ListCopy(CBaseEntity* pList[], int listMax) = 0;
+
+	virtual bool IsAccurateTriggerBboxChecks() = 0;
+	virtual void SetAccurateTriggerBboxChecks(bool bAccurateTriggerBboxChecks) = 0;
+	virtual bool IsDisableTouchFuncs() = 0;
+	virtual void SetDisableTouchFuncs(bool bDisableTouchFuncs) = 0;
+	virtual bool IsDisableEhandleAccess() = 0;
+	virtual void SetDisableEhandleAccess(bool bDisableEhandleAccess) = 0;
+	virtual bool IsReceivedChainedUpdateOnRemove() = 0;
+	virtual void SetReceivedChainedUpdateOnRemove(bool bReceivedChainedUpdateOnRemove) = 0;
 	virtual int GetPredictionRandomSeed(void) = 0;
 	virtual void SetPredictionRandomSeed(const CUserCmd* cmd) = 0;
 	virtual IEngineObject* GetPredictionPlayer(void) = 0;
@@ -927,6 +1077,13 @@ public:
 	virtual int GetPortalCount() = 0;
 	virtual IEnginePortalServer* GetPortal(int index) = 0;
 	virtual CCallQueue* GetPostTouchQueue() = 0;
+
+	virtual void MoveToTopOfLRU(CBaseEntity* pRagdoll, bool bImportant = false) = 0;
+	virtual void SetMaxRagdollCount(int iMaxCount) = 0;
+	virtual int CountRagdolls(bool bOnlySimulatingRagdolls) = 0;
+
+	virtual bool FindOrAddVehicleScript(const char* pScriptName, vehicleparams_t* pVehicle, vehiclesounds_t* pSounds) = 0;
+	virtual void FlushVehicleScripts() = 0;
 };
 
 extern IServerEntityList* serverEntitylist;

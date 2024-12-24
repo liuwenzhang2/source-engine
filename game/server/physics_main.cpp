@@ -13,7 +13,6 @@
 #include "ai_basenpc.h"
 #include "gamerules.h"
 #include "mempool.h"
-//#include "entitylist.h"
 #include "engine/IEngineSound.h"
 #include "datacache/imdlcache.h"
 #include "ispatialpartition.h"
@@ -1836,7 +1835,7 @@ void Physics_SimulateEntity( CBaseEntity *pEntity )
 {
 	VPROF( ( !vprof_scope_entity_gamephys.GetBool() ) ? 
 			"Physics_SimulateEntity" : 
-			gEntList.GetCannonicalName( pEntity->GetClassname() ) );
+		EntityList()->GetCannonicalName( pEntity->GetClassname() ) );
 
 	if (pEntity->IsNetworkable() && pEntity->entindex()!=-1 )
 	{
@@ -1920,7 +1919,7 @@ void Physics_RunThinkFunctions( bool simulating )
 
 	float starttime = gpGlobals->curtime;
 	// clear all entites freed outside of this loop
-	gEntList.CleanupDeleteList();
+	EntityList()->CleanupDeleteList();
 
 	if ( !simulating )
 	{
@@ -1941,14 +1940,14 @@ void Physics_RunThinkFunctions( bool simulating )
 	else
 	{
 		EntityList()->DisableDestroyImmediate();
-		int listMax = SimThink_ListCount();
+		int listMax = EntityList()->SimThink_ListCount();
 		listMax = MAX(listMax,1);
 		CBaseEntity **list = (CBaseEntity **)stackalloc( sizeof(CBaseEntity *) * listMax );
 		// iterate through all entities and have them think or simulate
 		
 		// UNDONE: This has problems with UTIL_RemoveImmediate() (now disabled during this loop).  
 		// Do we really need UTIL_RemoveImmediate()?
-		int count = SimThink_ListCopy( list, listMax );
+		int count = EntityList()->SimThink_ListCopy( list, listMax );
 
 		//DevMsg(1, "Count: %d\n", count );
 		for ( int i = 0; i < count; i++ )

@@ -18,7 +18,6 @@
 #include "TemplateEntities.h"
 #include "baseanimating.h"
 #include "ai_senses.h"
-//#include "entitylist.h"
 #include "ammodef.h"
 #include "ndebugoverlay.h"
 #include "npc_combines.h"

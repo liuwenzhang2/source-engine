@@ -80,10 +80,6 @@ extern ConVar	sk_allow_autoaim;
 extern ConVar	sk_autoaim_scale1;
 extern ConVar	sk_autoaim_scale2;
 
-#if !defined ( CLIENT_DLL )
-extern ConVar	sv_alternateticks;
-#endif // !CLIENT_DLL
-
 #define PORTAL_WEIGHT_BOX_MODEL_NAME "models/props/metal_box.mdl"
 
 // Portal-only con commands
@@ -1109,6 +1105,7 @@ bool CPortalGameRules::Init()
 {
 #if !defined ( CLIENT_DLL )
 	// Portal never wants alternate ticks. Some low end hardware sets it in dxsupport.cfg so this will catch those cases.
+	ConVarRef sv_alternateticks("sv_alternateticks");
 	sv_alternateticks.SetValue( 0 );
 #endif // !CLIENT_DLL
 

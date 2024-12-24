@@ -110,7 +110,7 @@ void CLogicNavigation::Activate()
 	}
 	else if ( m_isOn )
 	{
-		gEntList.AddListenerEntity( this );
+		EntityList()->AddListenerEntity( this );
 	}
 }
 
@@ -121,7 +121,7 @@ void CLogicNavigation::UpdateOnRemove()
 {
 	if ( m_isOn )
 	{
-		gEntList.RemoveListenerEntity( this );
+		EntityList()->RemoveListenerEntity( this );
 	}
 
 	BaseClass::UpdateOnRemove();
@@ -146,7 +146,7 @@ void CLogicNavigation::TurnOn()
 	if ( m_isOn )
 		return;
 	m_isOn = true;
-	gEntList.AddListenerEntity( this );
+	EntityList()->AddListenerEntity( this );
 	UpdateProperty();
 }
 
@@ -178,7 +178,7 @@ void CLogicNavigation::TurnOff()
 		return;
 
 	m_isOn = false;
-	gEntList.RemoveListenerEntity( this );
+	EntityList()->RemoveListenerEntity( this );
 	UpdateProperty();
 }
 

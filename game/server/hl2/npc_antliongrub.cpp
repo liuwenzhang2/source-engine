@@ -994,7 +994,7 @@ void CGrubNugget::VPhysicsCollision( int index, gamevcollisionevent_t *pEvent )
 		}
 
 		// FIXME: this doesn't pass in who is responsible if some other entity "caused" this collision
-		gEntList.PhysCallbackDamage( this, CTakeDamageInfo( pHitEntity, pHitEntity, damageForce, damagePos, damage, damageType ), *pEvent, index );
+		EntityList()->PhysCallbackDamage( this, CTakeDamageInfo( pHitEntity, pHitEntity, damageForce, damagePos, damage, damageType ), *pEvent, index );
 	}
 
 	BaseClass::VPhysicsCollision( index, pEvent );

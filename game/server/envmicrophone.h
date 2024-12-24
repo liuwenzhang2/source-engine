@@ -11,7 +11,7 @@
 #endif
 
 class CBaseFilter;
-
+class CSound;
 
 const int SF_MICROPHONE_SOUND_COMBAT			= 0x01;
 const int SF_MICROPHONE_SOUND_WORLD				= 0x02;

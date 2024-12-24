@@ -23,7 +23,6 @@
 #include "physics_cannister.h"
 
 #include "player.h"
-//#include "entitylist.h"
 
 
 #define SF_TANK_ACTIVE			0x0001
@@ -517,7 +516,7 @@ void CFuncTank::TraceAttack( CBaseEntity *pAttacker, float flDamage, const Vecto
 //-----------------------------------------------------------------------------
 CBaseEntity *CFuncTank::FindTarget( string_t targetName, CBaseEntity *pActivator ) 
 {
-	return gEntList.FindEntityGenericNearest( STRING( targetName ), GetEngineObject()->GetAbsOrigin(), 0, this, pActivator );
+	return EntityList()->FindEntityGenericNearest( STRING( targetName ), GetEngineObject()->GetAbsOrigin(), 0, this, pActivator );
 }
 
 

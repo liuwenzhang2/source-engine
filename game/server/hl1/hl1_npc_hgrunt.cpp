@@ -27,7 +27,6 @@
 #include	"soundent.h"
 #include	"game.h"
 #include	"npcevent.h"
-#include	"entitylist.h"
 #include	"activitylist.h"
 #include	"animation.h"
 #include	"engine/IEngineSound.h"
@@ -492,7 +491,7 @@ int CNPC_HGrunt::SquadRecruit( int searchRadius, int maxMembers )
 
 		m_SquadName = AllocPooledString( szSquadName );
 
-		while ( ( pEntity = gEntList.FindEntityInSphere( pEntity, GetEngineObject()->GetAbsOrigin(), searchRadius ) ) != NULL )
+		while ( ( pEntity = EntityList()->FindEntityInSphere( pEntity, GetEngineObject()->GetAbsOrigin(), searchRadius ) ) != NULL )
 		{
 			if ( !FClassnameIs ( pEntity, "monster_human_grunt" ) )
 				  continue;

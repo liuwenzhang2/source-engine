@@ -36,8 +36,6 @@
 #include "jigglebones.h"
 #include "con_nprint.h"
 #include "view.h"
-#include "ragdoll_shared.h"
-#include "physics_shared.h"
 //#include "c_baseplayer.h"
 #include "basecombatweapon_shared.h"
 #include "vphysics/object_hash.h"
@@ -1623,7 +1621,7 @@ void C_GrabControllerInternal::AttachEntity(C_BaseEntity* pPlayer, C_BaseEntity*
 	{
 		int hitMaterial = pPhys->GetMaterialIndex();
 		int playerMaterial = pPlayer->GetEngineObject()->VPhysicsGetObject() ? pPlayer->GetEngineObject()->VPhysicsGetObject()->GetMaterialIndex() : hitMaterial;
-		gEntList.PhysicsImpactSound(pPlayer, pPhys, CHAN_STATIC, hitMaterial, playerMaterial, 1.0, 64);
+		EntityList()->PhysicsImpactSound(pPlayer, pPhys, CHAN_STATIC, hitMaterial, playerMaterial, 1.0, 64);
 	}
 #endif
 	Vector position;
@@ -5327,7 +5325,7 @@ void C_EngineObjectInternal::CollisionRulesChanged()
 }
 
 #if !defined( CLIENT_DLL )
-#define CHANGE_FLAGS(flags,newFlags) { unsigned int old = flags; flags = (newFlags); gEntList.ReportEntityFlagsChanged( this, old, flags ); }
+#define CHANGE_FLAGS(flags,newFlags) { unsigned int old = flags; flags = (newFlags); EntityList()->ReportEntityFlagsChanged( this, old, flags ); }
 #else
 #define CHANGE_FLAGS(flags,newFlags) (flags = (newFlags))
 #endif

@@ -10,7 +10,6 @@
 #include "scripted.h"
 #include "soundent.h"
 #include "animation.h"
-//#include "entitylist.h"
 #include "ai_navigator.h"
 #include "ai_motor.h"
 #include "player.h"

@@ -9,7 +9,6 @@
 #include "player.h"
 #include "gamerules.h"
 #include "entityapi.h"
-//#include "entitylist.h"
 #include "ndebugoverlay.h"
 #include "filters.h"
 #include "vstdlib/random.h"
@@ -1386,7 +1385,7 @@ void CChangeLevel::Activate( void )
 	}
 
 	// Level transitions will bust if they are in solid
-	CBaseEntity *pLandmark = gEntList.FindLandmark( m_szLandmarkName );
+	CBaseEntity *pLandmark = EntityList()->FindLandmark( m_szLandmarkName );
 	if ( pLandmark )
 	{
 		int clusterIndex = engine->GetClusterForOrigin( pLandmark->GetEngineObject()->GetAbsOrigin() );
@@ -1435,7 +1434,7 @@ void CChangeLevel::NotifyEntitiesOutOfTransition()
 		if ( pEnt->ObjectCaps() & FCAP_NOTIFY_ON_TRANSITION )
 		{
 			variant_t emptyVariant;
-			if ( !(pEnt->ObjectCaps() & (FCAP_ACROSS_TRANSITION|FCAP_FORCE_TRANSITION)) || !gEntList.IsEntityInTransition( pEnt, m_szLandmarkName) )
+			if ( !(pEnt->ObjectCaps() & (FCAP_ACROSS_TRANSITION|FCAP_FORCE_TRANSITION)) || !EntityList()->IsEntityInTransition( pEnt, m_szLandmarkName) )
 			{
 				pEnt->AcceptInput( "OutsideTransition", this, this, emptyVariant, 0 );
 			}
@@ -1492,7 +1491,7 @@ void CChangeLevel::ChangeLevelNow( CBaseEntity *pActivator )
 
 	CBaseEntity *pPlayer = (pActivator && pActivator->IsPlayer()) ? pActivator : UTIL_GetLocalPlayer();
 
-	int transitionState = gEntList.InTransitionVolume(pPlayer, m_szLandmarkName);
+	int transitionState = EntityList()->InTransitionVolume(pPlayer, m_szLandmarkName);
 	if ( transitionState == TRANSITION_VOLUME_SCREENED_OUT )
 	{
 		DevMsg( 2, "Player isn't in the transition volume %s, aborting\n", m_szLandmarkName );
@@ -1500,7 +1499,7 @@ void CChangeLevel::ChangeLevelNow( CBaseEntity *pActivator )
 	}
 
 	// look for a landmark entity		
-	pLandmark = gEntList.FindLandmark( m_szLandmarkName );
+	pLandmark = EntityList()->FindLandmark( m_szLandmarkName );
 
 	if ( !pLandmark )
 		return;
@@ -1531,7 +1530,7 @@ void CChangeLevel::ChangeLevelNow( CBaseEntity *pActivator )
 
 	WarnAboutActiveLead();
 
-	gEntList.OnChangeLevel(m_szMapName, m_szLandmarkName);
+	EntityList()->OnChangeLevel(m_szMapName, m_szLandmarkName);
 
 	m_hActivator = pActivator;
 
@@ -2189,19 +2188,19 @@ CAI_BaseNPC *CAI_ChangeHintGroup::FindQualifiedNPC( CAI_BaseNPC *pPrev, CBaseEnt
 		{
 			case 0:
 			{
-				pEntity = gEntList.FindEntityByNameWithin( pEntity, pszSearchName, GetEngineObject()->GetLocalOrigin(), m_flRadius, NULL, pActivator, pCaller );
+				pEntity = EntityList()->FindEntityByNameWithin( pEntity, pszSearchName, GetEngineObject()->GetLocalOrigin(), m_flRadius, NULL, pActivator, pCaller );
 				break;
 			}
 			
 			case 1:
 			{
-				pEntity = gEntList.FindEntityByClassnameWithin( pEntity, pszSearchName, GetEngineObject()->GetLocalOrigin(), m_flRadius );
+				pEntity = EntityList()->FindEntityByClassnameWithin( pEntity, pszSearchName, GetEngineObject()->GetLocalOrigin(), m_flRadius );
 				break;
 			}
 
 			case 2:
 			{
-				pEntity = gEntList.FindEntityInSphere( pEntity, GetEngineObject()->GetLocalOrigin(), ( m_flRadius != 0.0 ) ? m_flRadius : FLT_MAX );
+				pEntity = EntityList()->FindEntityInSphere( pEntity, GetEngineObject()->GetLocalOrigin(), ( m_flRadius != 0.0 ) ? m_flRadius : FLT_MAX );
 				break;
 			}
 		}
@@ -4087,7 +4086,7 @@ void CTriggerVPhysicsMotion::StartTouch( CBaseEntity *pOther )
 	}
 
 	triggerevent_t event;
-	gEntList.PhysGetTriggerEvent( &event, this );
+	EntityList()->PhysGetTriggerEvent( &event, this );
 	if ( event.pObject )
 	{
 		// these all get done again on save/load, so check
@@ -4126,7 +4125,7 @@ void CTriggerVPhysicsMotion::EndTouch( CBaseEntity *pOther )
 		pPlayer->m_Local.m_bSlowMovement = false;
 	}
 	triggerevent_t event;
-	gEntList.PhysGetTriggerEvent( &event, this );
+	EntityList()->PhysGetTriggerEvent( &event, this );
 	if ( event.pObject && m_pController )
 	{
 		m_pController->DetachObject( event.pObject );

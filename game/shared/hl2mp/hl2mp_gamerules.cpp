@@ -20,7 +20,6 @@
 	#include "gamerules.h"
 	#include "game.h"
 	#include "items.h"
-	//#include "entitylist.h"
 	#include "mapentities.h"
 	#include "in_buttons.h"
 	#include <ctype.h>
@@ -432,7 +431,7 @@ float CHL2MPRules::FlWeaponTryRespawn( CBaseCombatWeapon *pWeapon )
 #ifndef CLIENT_DLL
 	if ( pWeapon && (pWeapon->GetWeaponFlags() & ITEM_FLAG_LIMITINWORLD) )
 	{
-		if ( gEntList.NumberOfEntities() < (gpGlobals->maxEntities - ENTITY_INTOLERANCE) )
+		if (EntityList()->NumberOfEntities() < (gpGlobals->maxEntities - ENTITY_INTOLERANCE) )
 			return 0;
 
 		// we're past the entity tolerance level,  so delay the respawn
@@ -1079,7 +1078,7 @@ void CHL2MPRules::CleanUpMap()
 	// then remove everything else except the players.
 
 	// Get rid of all entities except players.
-	CBaseEntity *pCur = gEntList.FirstEnt();
+	CBaseEntity *pCur = EntityList()->FirstEnt();
 	while ( pCur )
 	{
 		CBaseHL2MPCombatWeapon *pWeapon = dynamic_cast< CBaseHL2MPCombatWeapon* >( pCur );
@@ -1097,11 +1096,11 @@ void CHL2MPRules::CleanUpMap()
 			EntityList()->DestroyEntity( pCur );
 		}
 
-		pCur = gEntList.NextEnt( pCur );
+		pCur = EntityList()->NextEnt( pCur );
 	}
 
 	// Really remove the entities so we can have access to their slots below.
-	gEntList.CleanupDeleteList();
+	EntityList()->CleanupDeleteList();
 
 	// Cancel all queued events, in case a func_bomb_target fired some delayed outputs that
 	// could kill respawning CTs

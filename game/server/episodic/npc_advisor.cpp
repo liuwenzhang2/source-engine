@@ -440,9 +440,9 @@ void CNPC_Advisor::Activate()
 {
 	BaseClass::Activate();
 	
-	m_hLevitateGoal1  = gEntList.FindEntityGeneric( NULL, STRING( m_iszLevitateGoal1 ),  this );
-	m_hLevitateGoal2  = gEntList.FindEntityGeneric( NULL, STRING( m_iszLevitateGoal2 ),  this );
-	m_hLevitationArea = gEntList.FindEntityGeneric( NULL, STRING( m_iszLevitationArea ), this );
+	m_hLevitateGoal1  = EntityList()->FindEntityGeneric( NULL, STRING( m_iszLevitateGoal1 ),  this );
+	m_hLevitateGoal2  = EntityList()->FindEntityGeneric( NULL, STRING( m_iszLevitateGoal2 ),  this );
+	m_hLevitationArea = EntityList()->FindEntityGeneric( NULL, STRING( m_iszLevitationArea ), this );
 
 	m_levitateCallback.m_Advisor = this;
 

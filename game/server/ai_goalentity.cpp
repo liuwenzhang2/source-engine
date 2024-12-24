@@ -57,7 +57,7 @@ void CAI_GoalEntity::OnRestore()
 	ExitDormant();
 
 	if ( ( m_flags & ACTIVE ) )
-		gEntList.AddListenerEntity( this );
+		EntityList()->AddListenerEntity( this );
 }
 
 //-------------------------------------
@@ -134,7 +134,7 @@ void CAI_GoalEntity::InputActivate( inputdata_t &inputdata )
 {
 	if ( !( m_flags & ACTIVE ) )
 	{
-		gEntList.AddListenerEntity( this );
+		EntityList()->AddListenerEntity( this );
 		
 		UpdateActors();
 		m_flags |= ACTIVE;
@@ -190,7 +190,7 @@ void CAI_GoalEntity::InputDeactivate( inputdata_t &inputdata )
 {
 	if ( m_flags & ACTIVE )
 	{
-		gEntList.RemoveListenerEntity( this );
+		EntityList()->RemoveListenerEntity( this );
 		UpdateActors();
 		m_flags &= ~ACTIVE;
 

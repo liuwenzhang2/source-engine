@@ -180,7 +180,7 @@ void CHL1MP_Player::UpdateOnRemove( void )
 {
     if ( m_hRagdoll )
     {
-		gEntList.DestroyEntityImmediate( m_hRagdoll );
+		EntityList()->DestroyEntityImmediate( m_hRagdoll );
         m_hRagdoll = NULL;
     }
 
@@ -640,7 +640,7 @@ CRagdollProp* CHL1MP_Player::CreateRagdollProp()
 {
     if ( m_hRagdoll )
     {
-		gEntList.DestroyEntityImmediate( m_hRagdoll );
+		EntityList()->DestroyEntityImmediate( m_hRagdoll );
         m_hRagdoll = NULL;
     }
 

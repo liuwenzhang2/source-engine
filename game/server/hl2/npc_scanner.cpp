@@ -1062,7 +1062,7 @@ void CNPC_CScanner::InputInspectTargetSpotlight(inputdata_t &inputdata)
 //-----------------------------------------------------------------------------
 void CNPC_CScanner::InspectTarget( inputdata_t &inputdata, ScannerFlyMode_t eFlyMode )
 {
-	CBaseEntity *pEnt = gEntList.FindEntityGeneric( NULL, inputdata.value.String(), this, inputdata.pActivator );
+	CBaseEntity *pEnt = EntityList()->FindEntityGeneric( NULL, inputdata.value.String(), this, inputdata.pActivator );
 	
 	if ( pEnt != NULL )
 	{

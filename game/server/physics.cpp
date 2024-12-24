@@ -10,7 +10,6 @@
 
 #include "cbase.h"
 #include "coordsize.h"
-//#include "entitylist.h"
 #include "vcollide_parse.h"
 #include "soundenvelope.h"
 #include "game.h"

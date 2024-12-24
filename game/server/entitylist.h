@@ -42,6 +42,9 @@
 #include "coordsize.h"
 #include "soundenvelope.h"
 #include "datacache/idatacache.h"
+#include "physics_shared.h"
+#include "ragdoll_shared.h"
+#include "physconstraint.h"
 
 //class CBaseEntity;
 // We can only ever move 512 entities across a transition
@@ -49,29 +52,10 @@
 #define MAX_ENTITY_BYTE_COUNT	(NUM_ENT_ENTRIES >> 3)
 #define DEBUG_TRANSITIONS_VERBOSE	2
 
-//-----------------------------------------------------------------------------
-// Spawnflags
-//-----------------------------------------------------------------------------
-#define	SF_RAGDOLLPROP_DEBRIS		0x0004
-#define SF_RAGDOLLPROP_USE_LRU_RETIREMENT	0x1000
-#define	SF_RAGDOLLPROP_ALLOW_DISSOLVE		0x2000	// Allow this prop to be dissolved
-#define	SF_RAGDOLLPROP_MOTIONDISABLED		0x4000
-#define	SF_RAGDOLLPROP_ALLOW_STRETCH		0x8000
-#define	SF_RAGDOLLPROP_STARTASLEEP			0x10000
-
-enum
-{
-	NUM_POSEPAREMETERS = 24,
-	NUM_BONECTRLS = 4
-};
-
 extern IVEngineServer* engine;
-extern CServerGameDLL g_ServerGameDLL;
 extern bool TestEntityTriggerIntersection_Accurate(IEngineObjectServer* pTrigger, IEngineObjectServer* pEntity);
 extern ISaveRestoreBlockHandler* GetPhysSaveRestoreBlockHandler();
 extern ISaveRestoreBlockHandler* GetAISaveRestoreBlockHandler();
-
-
 
 class CAimTargetManager : public IEntityListener<CBaseEntity>
 {
@@ -2103,16 +2087,7 @@ private:
 #define INS2MPH(x)		( (x) * INS2MPH_SCALE )
 #define MPH2INS(x)		( (x) * (1/INS2MPH_SCALE) )
 
-#define ROLL_CURVE_ZERO		5		// roll less than this is clamped to zero
-#define ROLL_CURVE_LINEAR	45		// roll greater than this is copied out
-
-#define PITCH_CURVE_ZERO		10	// pitch less than this is clamped to zero
-#define PITCH_CURVE_LINEAR		45	// pitch greater than this is copied out
-
 #define STICK_EXTENTS	400.0f
-
-// the tires are considered to be skidding if they have sliding velocity of 10 in/s or more
-const float DEFAULT_SKID_THRESHOLD = 10.0f;
 
 float RemapAngleRange(float startInterval, float endInterval, float value);
 
@@ -2642,6 +2617,28 @@ public:
 	void AddDamageEvent(CBaseEntity* pEntity, const CTakeDamageInfo& info, IPhysicsObject* pInflictorPhysics, bool bRestoreVelocity, const Vector& savedVel, const AngularImpulse& savedAngVel);
 };
 
+class CPhysConstraintEvents : public IPhysicsConstraintEvent
+{
+	void ConstraintBroken(IPhysicsConstraint* pConstraint)
+	{
+		CBaseEntity* pEntity = (CBaseEntity*)pConstraint->GetGameData();
+		if (pEntity)
+		{
+			IPhysicsConstraintEvent* pConstraintEvent = dynamic_cast<IPhysicsConstraintEvent*>(pEntity);
+			//Msg("Constraint broken %s\n", pEntity->GetDebugName() );
+			if (pConstraintEvent)
+			{
+				pConstraintEvent->ConstraintBroken(pConstraint);
+			}
+			else
+			{
+				variant_t emptyVariant;
+				pEntity->AcceptInput("ConstraintBroken", NULL, NULL, emptyVariant, 0);
+			}
+		}
+	}
+};
+
 struct CPhysicsShadowCloneLL
 {
 	CEngineShadowCloneInternal* pClone;
@@ -2693,11 +2690,8 @@ private:
 	unsigned short m_list;
 };
 
-typedef void (*EntityCallbackFunction) (CBaseEntity* pEntity);
 extern void PostSimulation_ImpulseEvent(IPhysicsObject* pObject, const Vector& centerForce, const AngularImpulse& centerTorque);
 extern void PostSimulation_SetVelocityEvent(IPhysicsObject* pPhysicsObject, const Vector& vecVelocity);
-extern const objectparams_t g_PhysDefaultObjectParams;
-extern void PhysForceClearVelocity(IPhysicsObject* pPhys);
 extern ConVar phys_timescale;
 
 //-----------------------------------------------------------------------------
@@ -2717,6 +2711,29 @@ class CGlobalEntityList : public CBaseEntityList<T>, public IServerEntityList, p
 	friend class CPortal_CollisionEvent;
 	typedef CBaseEntityList<T> BaseClass;
 public:
+	CBaseHandle GetNetworkableHandle(int iEntity) const {
+		return BaseClass::GetNetworkableHandle(iEntity);
+	}
+	T* LookupEntityByNetworkIndex(int edictIndex) const {
+		return BaseClass::LookupEntityByNetworkIndex(edictIndex);
+	}
+	void AddListenerEntity(IEntityListener<T>* pListener) {
+		BaseClass::AddListenerEntity(pListener);
+	}
+	void RemoveListenerEntity(IEntityListener<T>* pListener) {
+		BaseClass::RemoveListenerEntity(pListener);
+	}
+	void NotifyCreateEntity(T* pEnt) {
+		BaseClass::NotifyCreateEntity(pEnt);
+	}
+	void NotifySpawn(T* pEnt) {
+		BaseClass::NotifySpawn(pEnt);
+	}
+	void NotifyRemoveEntity(T* pEnt) {
+		BaseClass::NotifyRemoveEntity(pEnt);
+	}
+public:
+	CGlobalEntityList();
 
 	virtual bool Init();
 	virtual void Shutdown();
@@ -2754,6 +2771,11 @@ public:
 	virtual void Restore(IRestore* pRestore, bool createPlayers);
 	virtual void PostRestore();
 
+	IEntitySaveUtils* GetEntitySaveUtils() { return &m_EntitySaveUtils; }
+	T* FindLandmark(const char* pLandmarkName);
+	int InTransitionVolume(T* pEntity, const char* pVolumeName);
+	bool IsEntityInTransition(T* pEntity, const char* pLandmarkName);
+	void OnChangeLevel(const char* pNewMapName, const char* pNewLandmarkName);
 	virtual int	CreateEntityTransitionList(IRestore* pRestore, int) OVERRIDE;
 	virtual void BuildAdjacentMapList(ISave* pSave) OVERRIDE;
 
@@ -2832,18 +2854,18 @@ public:
 
 	CBaseEntity* FindEntityProcedural(const char* szName, CBaseEntity* pSearchingEntity = NULL, CBaseEntity* pActivator = NULL, CBaseEntity* pCaller = NULL);
 
-	CGlobalEntityList();
-
 	void AddDataAccessor(int type, IEntityDataInstantiator<T>* instantiator);
 	void RemoveDataAccessor(int type);
 	void* GetDataObject(int type, const T* instance);
 	void* CreateDataObject(int type, T* instance);
 	void DestroyDataObject(int type, T* instance);
-	IEntitySaveUtils* GetEntitySaveUtils() { return &m_EntitySaveUtils; }
-	T* FindLandmark(const char* pLandmarkName);
-	int InTransitionVolume(T* pEntity, const char* pVolumeName);
-	bool IsEntityInTransition(T* pEntity, const char* pLandmarkName);
-	void OnChangeLevel(const char* pNewMapName, const char* pNewLandmarkName);
+
+	int AimTarget_ListCount();
+	int AimTarget_ListCopy(CBaseEntity* pList[], int listMax);
+	void AimTarget_ForceRepopulateList();
+	void SimThink_EntityChanged(CBaseEntity* pEntity);
+	int SimThink_ListCount();
+	int SimThink_ListCopy(CBaseEntity* pList[], int listMax);
 
 	// Call this when hierarchy is not completely set up (such as during Restore) to throw asserts
 // when people call GetAbsAnything. 
@@ -3526,6 +3548,7 @@ private:
 	CUtlVector<physicssound::breaksound_t> m_breakSounds;
 	CUtlVector<masscenteroverride_t>	m_massCenterOverrides;
 	CPortal_CollisionEvent m_Collisions;
+	CPhysConstraintEvents m_Constraintevents;
 	CCallQueue m_PostSimulationQueue;
 	CUtlVector<CEnginePortalInternal*> m_ActivePortals;
 	CUtlVector<CEngineShadowCloneInternal*> m_ActiveShadowClones;
@@ -3536,8 +3559,6 @@ private:
 	int m_nTouchDepth = 0;
 	CCallQueue m_PostTouchQueue;
 };
-
-extern void PhysParseSurfaceData(class IPhysicsSurfaceProps* pProps, class IFileSystem* pFileSystem);
 
 template<class T>
 bool CGlobalEntityList<T>::Init()
@@ -3561,20 +3582,30 @@ bool CGlobalEntityList<T>::Init()
 	m_isFinalTick = true;
 	m_impactSoundTime = 0;
 	m_vehicleScripts.EnsureCapacity(4);
+
+	AddDataAccessor(TOUCHLINK, new CEntityDataInstantiator<CBaseEntity, servertouchlink_t >);
+	AddDataAccessor(GROUNDLINK, new CEntityDataInstantiator<CBaseEntity, servergroundlink_t >);
+	AddDataAccessor(STEPSIMULATION, new CEntityDataInstantiator<CBaseEntity, StepSimulationData >);
+	AddDataAccessor(MODELSCALE, new CEntityDataInstantiator<CBaseEntity, ModelScale >);
+	AddDataAccessor(POSITIONWATCHER, new CEntityDataInstantiator<CBaseEntity, CWatcherList >);
+	AddDataAccessor(PHYSICSPUSHLIST, new CEntityDataInstantiator<CBaseEntity, physicspushlist_t >);
+	AddDataAccessor(VPHYSICSUPDATEAI, new CEntityDataInstantiator<CBaseEntity, vphysicsupdateai_t >);
+	AddDataAccessor(VPHYSICSWATCHER, new CEntityDataInstantiator<CBaseEntity, CWatcherList >);
 	return true;
 }
 
 template<class T>
 void CGlobalEntityList<T>::Shutdown()
 {
-	
+	RemoveDataAccessor(TOUCHLINK);
+	RemoveDataAccessor(GROUNDLINK);
+	RemoveDataAccessor(STEPSIMULATION);
+	RemoveDataAccessor(MODELSCALE);
+	RemoveDataAccessor(POSITIONWATCHER);
+	RemoveDataAccessor(PHYSICSPUSHLIST);
+	RemoveDataAccessor(VPHYSICSUPDATEAI);
+	RemoveDataAccessor(VPHYSICSWATCHER);
 }
-
-extern IVPhysicsKeyHandler* g_pSolidSetup;
-// defined in phys_constraint
-extern IPhysicsConstraintEvent* g_pConstraintEvents;
-extern void PrecachePhysicsSounds(void);
-extern IPhysicsObject* PhysCreateWorld_Shared(IHandleEntity* pWorld, vcollide_t* pWorldCollide, const objectparams_t& defaultParams);
 
 // Level init, shutdown
 template<class T>
@@ -3603,7 +3634,7 @@ void CGlobalEntityList<T>::LevelInitPreEntity()
 
 	m_pPhysenv->SetCollisionSolver(&m_Collisions);
 	m_pPhysenv->SetCollisionEventHandler(&m_Collisions);
-	m_pPhysenv->SetConstraintEventHandler(g_pConstraintEvents);
+	m_pPhysenv->SetConstraintEventHandler(&m_Constraintevents);
 	m_pPhysenv->EnableConstraintNotify(true); // callback when an object gets deleted that is attached to a constraint
 
 	m_pPhysenv->SetObjectEventHandler(&m_Collisions);
@@ -4632,14 +4663,6 @@ int CGlobalEntityList<T>::AddLandmarkToList(levellist_t* pLevelList, int listCou
 	return 1;
 }
 
-enum
-{
-	TRANSITION_VOLUME_SCREENED_OUT = 0,
-	TRANSITION_VOLUME_NOT_FOUND = 1,
-	TRANSITION_VOLUME_PASSED = 2,
-};
-
-
 template<class T>
 int CGlobalEntityList<T>::InTransitionVolume(T* pEntity, const char* pVolumeName)
 {
@@ -5458,6 +5481,45 @@ void CGlobalEntityList<T>::ReportEntityFlagsChanged(CBaseEntity* pEntity, unsign
 			g_AimManager.RemoveEntity(pEntity);
 		}
 	}
+}
+
+template<class T>
+int CGlobalEntityList<T>::AimTarget_ListCount()
+{
+	return g_AimManager.ListCount();
+}
+
+template<class T>
+int CGlobalEntityList<T>::AimTarget_ListCopy(CBaseEntity* pList[], int listMax)
+{
+	return g_AimManager.ListCopy(pList, listMax);
+}
+
+template<class T>
+void CGlobalEntityList<T>::AimTarget_ForceRepopulateList()
+{
+	g_AimManager.ForceRepopulateList();
+}
+
+class CSimThinkManager;
+extern CSimThinkManager g_SimThinkManager;
+
+template<class T>
+int CGlobalEntityList<T>::SimThink_ListCount()
+{
+	return g_SimThinkManager.ListCount();
+}
+
+template<class T>
+int CGlobalEntityList<T>::SimThink_ListCopy(CBaseEntity* pList[], int listMax)
+{
+	return g_SimThinkManager.ListCopy(pList, listMax);
+}
+
+template<class T>
+void CGlobalEntityList<T>::SimThink_EntityChanged(CBaseEntity* pEntity)
+{
+	g_SimThinkManager.EntityChanged(pEntity);
 }
 
 //-----------------------------------------------------------------------------
@@ -6621,8 +6683,6 @@ CCallQueue* CGlobalEntityList<T>::GetPostTouchQueue()
 	return m_nTouchDepth > 0 ? &m_PostTouchQueue : NULL;
 }
 
-extern CGlobalEntityList<CBaseEntity> gEntList;
-
 //-----------------------------------------------------------------------------
 // Common finds
 #if 0
@@ -6660,75 +6720,5 @@ inline bool FindEntityByName<CAI_BaseNPC>( const char *pszName, CAI_BaseNPC **pp
 	return ( *ppResult != NULL );
 }
 #endif
-
-struct notify_teleport_params_t
-{
-	Vector prevOrigin;
-	QAngle prevAngles;
-	bool physicsRotate;
-};
-
-struct notify_destroy_params_t
-{
-};
-
-struct notify_system_event_params_t
-{
-	union
-	{
-		const notify_teleport_params_t *pTeleport;
-		const notify_destroy_params_t *pDestroy;
-	};
-	notify_system_event_params_t( const notify_teleport_params_t *pInTeleport ) { pTeleport = pInTeleport; }
-	notify_system_event_params_t( const notify_destroy_params_t *pInDestroy ) { pDestroy = pInDestroy; }
-};
-
-
-abstract_class INotify
-{
-public:
-	// Add notification for an entity
-	virtual void AddEntity( CBaseEntity *pNotify, CBaseEntity *pWatched ) = 0;
-
-	// Remove notification for an entity
-	virtual void RemoveEntity( CBaseEntity *pNotify, CBaseEntity *pWatched ) = 0;
-
-	// Call the named input in each entity who is watching pEvent's status
-	virtual void ReportNamedEvent( CBaseEntity *pEntity, const char *pEventName ) = 0;
-
-	// System events don't make sense as inputs, so are handled through a generic notify function
-	virtual void ReportSystemEvent( CBaseEntity *pEntity, notify_system_event_t eventType, const notify_system_event_params_t &params ) = 0;
-
-	inline void ReportDestroyEvent( CBaseEntity *pEntity )
-	{
-		notify_destroy_params_t destroy;
-		ReportSystemEvent( pEntity, NOTIFY_EVENT_DESTROY, notify_system_event_params_t(&destroy) );
-	}
-	
-	inline void ReportTeleportEvent( CBaseEntity *pEntity, const Vector &prevOrigin, const QAngle &prevAngles, bool physicsRotate )
-	{
-		notify_teleport_params_t teleport;
-		teleport.prevOrigin = prevOrigin;
-		teleport.prevAngles = prevAngles;
-		teleport.physicsRotate = physicsRotate;
-		ReportSystemEvent( pEntity, NOTIFY_EVENT_TELEPORT, notify_system_event_params_t(&teleport) );
-	}
-	
-	// Remove this entity from the notify list
-	virtual void ClearEntity( CBaseEntity *pNotify ) = 0;
-};
-
-
-
-// singleton
-extern INotify *g_pNotify;
-
-int AimTarget_ListCount();
-int AimTarget_ListCopy( CBaseEntity *pList[], int listMax );
-void AimTarget_ForceRepopulateList();
-
-void SimThink_EntityChanged( CBaseEntity *pEntity );
-int SimThink_ListCount();
-int SimThink_ListCopy( CBaseEntity *pList[], int listMax );
 
 #endif // ENTITYLIST_H

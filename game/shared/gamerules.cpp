@@ -20,7 +20,6 @@
 	#include "player.h"
 	#include "teamplay_gamerules.h"
 	#include "game.h"
-	//#include "entitylist.h"
 	#include "basecombatweapon.h"
 	#include "voice_gamemgr.h"
 	#include "player_resource.h"

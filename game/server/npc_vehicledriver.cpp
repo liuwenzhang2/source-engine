@@ -14,7 +14,6 @@
 #include "ai_senses.h"
 #include "ai_navigator.h"
 #include "ai_route.h"
-//#include "entitylist.h"
 #include "soundenvelope.h"
 #include "gamerules.h"
 #include "ndebugoverlay.h"

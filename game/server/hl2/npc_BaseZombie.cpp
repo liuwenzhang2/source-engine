@@ -33,7 +33,6 @@
 #include "hl2_shareddefs.h"
 #include "npcevent.h"
 #include "activitylist.h"
-//#include "entitylist.h"
 #include "gib.h"
 #include "soundenvelope.h"
 #include "ndebugoverlay.h"
@@ -1578,7 +1577,7 @@ void CNPC_BaseZombie::HandleAnimEvent( animevent_t *pEvent )
 			params.m_pflSoundDuration = NULL;
 			params.m_bWarnOnDirectWaveReference = true;
 			g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
-			gEntList.PhysicsImpactSound( pEnemy, pPhysObj, CHAN_BODY, pPhysObj->GetMaterialIndex(), EntityList()->PhysGetProps()->GetSurfaceIndex("flesh"), 0.5, 800 );
+			EntityList()->PhysicsImpactSound( pEnemy, pPhysObj, CHAN_BODY, pPhysObj->GetMaterialIndex(), EntityList()->PhysGetProps()->GetSurfaceIndex("flesh"), 0.5, 800 );
 
 			Vector physicsCenter = pPhysicsEntity->WorldSpaceCenter();
 			v = pEnemy->WorldSpaceCenter() - physicsCenter;

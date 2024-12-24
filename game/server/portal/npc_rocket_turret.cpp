@@ -1358,7 +1358,7 @@ void CRocket_Turret_Projectile::DoExplosion( void )
 	// Hackish: Knock turrets in the area
 	CBaseEntity* pTurretIter = NULL;
 
-	while ( (pTurretIter = gEntList.FindEntityByClassnameWithin( pTurretIter, "npc_portal_turret_floor", GetEngineObject()->GetAbsOrigin(), 128 )) != NULL )
+	while ( (pTurretIter = EntityList()->FindEntityByClassnameWithin( pTurretIter, "npc_portal_turret_floor", GetEngineObject()->GetAbsOrigin(), 128 )) != NULL )
 	{
 		CTakeDamageInfo info( this, this, 200, DMG_BLAST );
 		info.SetDamagePosition(GetEngineObject()->GetAbsOrigin() );

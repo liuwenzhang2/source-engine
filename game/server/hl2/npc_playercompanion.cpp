@@ -3862,12 +3862,12 @@ public:
 	void LevelInitPreEntity( void )
 	{ 
 		CacheClassnames();
-		gEntList.AddListenerEntity( this );
+		EntityList()->AddListenerEntity( this );
 		Clear(); 
 	}
 	void LevelShutdownPostEntity( void  )
 	{
-		gEntList.RemoveListenerEntity( this );
+		EntityList()->RemoveListenerEntity( this );
 		Clear();
 	}
 

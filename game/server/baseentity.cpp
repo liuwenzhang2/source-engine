@@ -6,7 +6,6 @@
 
 #include "cbase.h"
 #include "baseentity.h"
-//#include "entitylist.h"
 #include "isaverestore.h"
 #include "client.h"
 #include "decals.h"
@@ -254,14 +253,14 @@ void CBaseEntity::PostConstructor(const char* szClassname, int iForceEdictIndex)
 	//		if (IsEFlagSet(EFL_NO_AUTO_EDICT_ATTACH)) {
 	//			if (iForceEdictIndex == -1) {
 	//				//Error("iForceEdictIndex can not be -1 if set EFL_NO_AUTO_EDICT_ATTACH!");
-	//				iForceEdictIndex = gEntList.AllocateFreeSlot();
+	//				iForceEdictIndex = EntityList()->AllocateFreeSlot();
 	//			}
 	//			gEntList.AddNetworkableEntity(this, iForceEdictIndex);
 	//		}
 	//		else
 	//		{
 	//			if (iForceEdictIndex == -1) {
-	//				iForceEdictIndex = gEntList.AllocateFreeSlot();
+	//				iForceEdictIndex = EntityList()->AllocateFreeSlot();
 	//			}
 	//			gEntList.AddNetworkableEntity(this, iForceEdictIndex);
 	//			//NetworkProp()->AttachEdict();
@@ -330,13 +329,13 @@ void CBaseEntity::UpdateOnRemove(void)
 {
 	//Msg("%p ===== %s \n", this, GetClassName());
 
-	gEntList.SetReceivedChainedUpdateOnRemove(true);
+	EntityList()->SetReceivedChainedUpdateOnRemove(true);
 
 	// Virtual call to shut down any looping sounds.
 	StopLoopingSounds();
 
 	// Notifies entity listeners, etc
-	gEntList.NotifyRemoveEntity(this);
+	EntityList()->NotifyRemoveEntity(this);
 
 	GetEngineObject()->AddEFlags(EFL_KILLME);
 	GetEngineObject()->AddFlag(FL_KILLME);
@@ -405,9 +404,9 @@ void CBaseEntity::UpdateOnRemove(void)
 
 	// Need to remove references to this entity before EHANDLES go null
 	{
-		gEntList.SetDisableEhandleAccess(false);
+		EntityList()->SetDisableEhandleAccess(false);
 		GetEngineObject()->SetGroundEntity(NULL); // remove us from the ground entity if we are on it
-		gEntList.SetDisableEhandleAccess(true);
+		EntityList()->SetDisableEhandleAccess(true);
 
 		// Remove this entity from the ent list (NOTE:  This Makes EHANDLES go NULL)
 		//EntityList()->DestroyEntity( this );
@@ -421,7 +420,7 @@ CBaseEntity::~CBaseEntity( )
 {
 	// FIXME: This can't be called from UpdateOnRemove! There's at least one
 	// case where friction sounds are added between the call to UpdateOnRemove + ~CBaseEntity
-	gEntList.PhysCleanupFrictionSounds( this );
+	EntityList()->PhysCleanupFrictionSounds( this );
 
 	//Assert( !IsDynamicModelIndex( m_nModelIndex ) );
 	//Verify( !sg_DynamicLoadHandlers.Remove( this ) );
@@ -432,7 +431,7 @@ CBaseEntity::~CBaseEntity( )
 	//  another entity.
 	// That kind of operation should only occur in UpdateOnRemove calls
 	// Deletion should only occur via EntityList()->DestroyEntity(Immediate) calls, not via naked delete calls
-	Assert( gEntList.IsDisableEhandleAccess() );
+	Assert(EntityList()->IsDisableEhandleAccess() );
 
 	//GetEngineObject()->VPhysicsDestroyObject();
 
@@ -449,10 +448,10 @@ void CBaseEntity::PostClientActive( void )
 }
 
 IEngineObjectServer* CBaseEntity::GetEngineObject() {
-	return gEntList.GetEngineObject(entindex());
+	return EntityList()->GetEngineObject(entindex());
 }
 const IEngineObjectServer* CBaseEntity::GetEngineObject() const {
-	return gEntList.GetEngineObject(entindex());
+	return EntityList()->GetEngineObject(entindex());
 }
 
 IEnginePlayerServer* CBaseEntity::GetEnginePlayer()
@@ -1257,9 +1256,9 @@ void CBaseEntity::TakeDamage( const CTakeDamageInfo &inputInfo )
 		return;
 	}
 
-	if (gEntList.PhysIsInCallback() )
+	if (EntityList()->PhysIsInCallback() )
 	{
-		gEntList.PhysCallbackDamage( this, inputInfo );
+		EntityList()->PhysCallbackDamage( this, inputInfo );
 	}
 	else
 	{
@@ -1788,7 +1787,7 @@ static CBaseEntity *FindPhysicsBlocker( IPhysicsObject *pPhysics, physicspushlis
 		bool inList = false;
 		for ( int i = 0; i < list.pushedCount; i++ )
 		{
-			if ( pOtherEntity == list.pushedEnts[i] )
+			if ( pOtherEntity == EntityList()->GetBaseEntityFromHandle(list.pushedEnts[i]) )
 			{
 				inList = true;
 				break;
@@ -2024,7 +2023,7 @@ void CBaseEntity::VPhysicsUpdatePusher( IPhysicsObject *pPhysics )
 		return;
 
 	// only reconcile pushers on the final vphysics tick
-	if ( !gEntList.PhysIsFinalTick() )
+	if ( !EntityList()->PhysIsFinalTick() )
 		return;
 
 	Vector origin;
@@ -2086,7 +2085,7 @@ void CBaseEntity::VPhysicsUpdatePusher( IPhysicsObject *pPhysics )
 						physLocalTime = pList->localMoveTime;
 						for ( int i = 0; i < pList->pushedCount; i++ )
 						{
-							CBaseEntity *pEntity = pList->pushedEnts[i];
+							CBaseEntity *pEntity = EntityList()->GetBaseEntityFromHandle(pList->pushedEnts[i]);
 							if ( !pEntity )
 								continue;
 
@@ -2224,11 +2223,11 @@ void CBaseEntity::VPhysicsCollision( int index, gamevcollisionevent_t *pEvent )
 
 	if ( pHitEntity == this )
 	{
-		gEntList.PhysCollisionSound( this, pEvent->pObjects[index], CHAN_BODY, pEvent->surfaceProps[index], pEvent->surfaceProps[otherIndex], pEvent->deltaCollisionTime, pEvent->collisionSpeed );
+		EntityList()->PhysCollisionSound( this, pEvent->pObjects[index], CHAN_BODY, pEvent->surfaceProps[index], pEvent->surfaceProps[otherIndex], pEvent->deltaCollisionTime, pEvent->collisionSpeed );
 	}
 	else
 	{
-		gEntList.PhysCollisionSound( this, pEvent->pObjects[index], CHAN_STATIC, pEvent->surfaceProps[index], pEvent->surfaceProps[otherIndex], pEvent->deltaCollisionTime, pEvent->collisionSpeed );
+		EntityList()->PhysCollisionSound( this, pEvent->pObjects[index], CHAN_STATIC, pEvent->surfaceProps[index], pEvent->surfaceProps[otherIndex], pEvent->deltaCollisionTime, pEvent->collisionSpeed );
 	}
 	PhysCollisionScreenShake( pEvent, index );
 
@@ -2249,7 +2248,7 @@ void CBaseEntity::VPhysicsCollision( int index, gamevcollisionevent_t *pEvent )
 
 void CBaseEntity::VPhysicsFriction( IPhysicsObject *pObject, float energy, int surfaceProps, int surfacePropsHit )
 {
-	gEntList.PhysFrictionSound( this, pObject, energy, surfaceProps, surfacePropsHit );
+	EntityList()->PhysFrictionSound( this, pObject, energy, surfaceProps, surfacePropsHit );
 }
 
 // Tells the physics shadow to update it's target to the current position
@@ -2655,7 +2654,7 @@ CBaseEntity * CBaseEntity::CreateNoSpawn( const char *szName, const Vector &vecO
 	pEntity->GetEngineObject()->SetLocalAngles( vecAngles );
 	pEntity->SetOwnerEntity( pOwner );
 
-	gEntList.NotifyCreateEntity( pEntity );
+	EntityList()->NotifyCreateEntity( pEntity );
 
 	return pEntity;
 }
@@ -2695,9 +2694,9 @@ void CBaseEntity::OnRestore()
 	// disable touch functions while we recreate the touch links between entities
 	// NOTE: We don't do this on transitions, because we'd miss the OnStartTouch call!
 #if !defined(HL2_DLL) || ( defined(HL2_DLL) && defined(HL2_EPISODIC) )
-	gEntList.SetDisableTouchFuncs( gpGlobals->eLoadType != MapLoad_Transition );
+	EntityList()->SetDisableTouchFuncs( gpGlobals->eLoadType != MapLoad_Transition );
 	GetEngineObject()->PhysicsTouchTriggers();
-	gEntList.SetDisableTouchFuncs(false);
+	EntityList()->SetDisableTouchFuncs(false);
 #endif // HL2_EPISODIC
 
 	//Adrian: If I'm restoring with these fields it means I've become a client side ragdoll.

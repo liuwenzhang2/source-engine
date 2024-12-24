@@ -14,7 +14,6 @@
 #include "ai_node.h"
 #include "ai_task.h"
 #include "ai_motor.h"
-//#include "entitylist.h"
 #include "basecombatweapon.h"
 #include "soundenvelope.h"
 #include "gib.h"

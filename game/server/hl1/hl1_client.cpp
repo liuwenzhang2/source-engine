@@ -19,7 +19,6 @@
 #include "hl1_gamerules.h"
 #include "gamerules.h"
 #include "teamplay_gamerules.h"
-//#include "entitylist.h"
 //#include "physics.h"
 #include "game.h"
 #include "player_resource.h"

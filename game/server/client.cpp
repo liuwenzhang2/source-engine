@@ -20,7 +20,6 @@
 #include "gamerules.h"
 #include "game.h"
 //#include "physics.h"
-//#include "entitylist.h"
 #include "shake.h"
 #include "event_tempentity_tester.h"
 #include "ndebugoverlay.h"

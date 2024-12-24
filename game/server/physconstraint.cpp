@@ -264,7 +264,7 @@ void CPhysConstraint::OnBreak( void )
 	m_OnBreak.FireOutput( this, this );
 	// queue this up to be deleted at the end of physics 
 	// The Deactivate() call should make sure we don't get more of these callbacks.
-	gEntList.PhysCallbackRemove( this );
+	EntityList()->PhysCallbackRemove( this );
 }
 
 void CPhysConstraint::InputBreak( inputdata_t &inputdata )
@@ -656,7 +656,7 @@ void CPhysConstraint::NotifySystemEvent( CBaseEntity *pNotify, notify_system_eve
 
 	m_teleportTick = gpGlobals->tickcount;
 
-	gEntList.PhysTeleportConstrainedEntity( pNotify, m_pConstraint->GetReferenceObject(), m_pConstraint->GetAttachedObject(), params.pTeleport->prevOrigin, params.pTeleport->prevAngles, params.pTeleport->physicsRotate );
+	EntityList()->PhysTeleportConstrainedEntity( pNotify, m_pConstraint->GetReferenceObject(), m_pConstraint->GetAttachedObject(), params.pTeleport->prevOrigin, params.pTeleport->prevAngles, params.pTeleport->physicsRotate );
 }
 
 class CPhysHinge : public CPhysConstraint, public IVPhysicsWatcher
@@ -878,12 +878,12 @@ void CPhysHinge::Spawn( void )
 		if ( m_nameAttach1 == NULL_STRING )
 		{
 			params.SnapToAxis( m_nameAttach2, m_hinge.worldPosition, m_hinge.worldAxisDirection );
-			gEntList.PhysSetMassCenterOverride( params );
+			EntityList()->PhysSetMassCenterOverride( params );
 		}
 		else if ( m_nameAttach2 == NULL_STRING )
 		{
 			params.SnapToAxis( m_nameAttach1, m_hinge.worldPosition, m_hinge.worldAxisDirection );
-			gEntList.PhysSetMassCenterOverride( params );
+			EntityList()->PhysSetMassCenterOverride( params );
 		}
 		else
 		{
@@ -1558,38 +1558,6 @@ IPhysicsConstraint *CRagdollConstraint::CreateConstraint( IPhysicsConstraintGrou
 	}
 	return EntityList()->PhysGetEnv()->CreateRagdollConstraint( info.pObjects[0], info.pObjects[1], pGroup, ragdoll );
 }
-
-
-
-class CPhysConstraintEvents : public IPhysicsConstraintEvent
-{
-	void ConstraintBroken( IPhysicsConstraint *pConstraint )
-	{
-		CBaseEntity *pEntity = (CBaseEntity *)pConstraint->GetGameData();
-		if ( pEntity )
-		{
-			IPhysicsConstraintEvent *pConstraintEvent = dynamic_cast<IPhysicsConstraintEvent*>( pEntity );
-			//Msg("Constraint broken %s\n", pEntity->GetDebugName() );
-			if ( pConstraintEvent )
-			{
-				pConstraintEvent->ConstraintBroken( pConstraint );
-			}
-			else
-			{
-				variant_t emptyVariant;
-				pEntity->AcceptInput( "ConstraintBroken", NULL, NULL, emptyVariant, 0 );
-			}
-		}
-	}
-};
-
-static CPhysConstraintEvents constraintevents;
-// registered in physics.cpp
-IPhysicsConstraintEvent *g_pConstraintEvents = &constraintevents;
-
-
-
-
 
 #if HINGE_NOTIFY
 //-----------------------------------------------------------------------------

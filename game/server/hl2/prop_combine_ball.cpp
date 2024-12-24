@@ -1023,7 +1023,7 @@ void CPropCombineBall::DoExplosion( )
 	if (GetEngineObject()->GetMoveType() == MOVETYPE_NONE )
 		return;
 
-	if (gEntList.PhysIsInCallback() )
+	if (EntityList()->PhysIsInCallback() )
 	{
 		EntityList()->PhysGetPostSimulationQueue().QueueCall( this, &CPropCombineBall::DoExplosion );
 		return;
@@ -1336,7 +1336,7 @@ void CPropCombineBall::OnHitEntity( CBaseEntity *pHitEntity, float flSpeed, int 
 		VectorNormalize( vecFinalVelocity );
 		vecFinalVelocity *= GetSpeed();
 	}
-	gEntList.PhysCallbackSetVelocity( pEvent->pObjects[index], vecFinalVelocity );
+	EntityList()->PhysCallbackSetVelocity( pEvent->pObjects[index], vecFinalVelocity );
 }
 
 
@@ -1571,7 +1571,7 @@ void CPropCombineBall::DeflectTowardEnemy( float flSpeed, int index, gamevcollis
 		VectorSubtract( pBestTarget->WorldSpaceCenter(), vecStartPoint, vecDelta );
 		VectorNormalize( vecDelta );
 		vecDelta *= GetSpeed();
-		gEntList.PhysCallbackSetVelocity( pEvent->pObjects[index], vecDelta );
+		EntityList()->PhysCallbackSetVelocity( pEvent->pObjects[index], vecDelta );
 	}
 }
 
@@ -1593,7 +1593,7 @@ void CPropCombineBall::BounceInSpawner( float flSpeed, int index, gamevcollision
 	VectorNormalize( vecVelocity );
 	vecVelocity *= flSpeed;
 
-	gEntList.PhysCallbackSetVelocity( pEvent->pObjects[index], vecVelocity );
+	EntityList()->PhysCallbackSetVelocity( pEvent->pObjects[index], vecVelocity );
 }
 
 
@@ -1646,7 +1646,7 @@ void CPropCombineBall::VPhysicsCollision( int index, gamevcollisionevent_t *pEve
 
 			// Remove self without affecting the object that was hit. (Unless it was flesh)
 			NotifySpawnerOfRemoval();
-			gEntList.PhysCallbackRemove( this );
+			EntityList()->PhysCallbackRemove( this );
 
 			// disable dissolve damage so we don't kill off the player when he's the one we hit
 			PhysClearGameFlags(GetEngineObject()->VPhysicsGetObject(), FVPHYSICS_DMG_DISSOLVE );
@@ -1673,7 +1673,7 @@ void CPropCombineBall::VPhysicsCollision( int index, gamevcollisionevent_t *pEve
 	Vector vecFinalVelocity = pEvent->postVelocity[index];
 	VectorNormalize( vecFinalVelocity );
 	vecFinalVelocity *= GetSpeed();
-	gEntList.PhysCallbackSetVelocity( pEvent->pObjects[index], vecFinalVelocity );
+	EntityList()->PhysCallbackSetVelocity( pEvent->pObjects[index], vecFinalVelocity );
 
 	CBaseEntity *pHitEntity = pEvent->pEntities[!index];
 	if ( pHitEntity && IsHittableEntity( pHitEntity ) )
@@ -1690,7 +1690,7 @@ void CPropCombineBall::VPhysicsCollision( int index, gamevcollisionevent_t *pEve
 			return;
 		}
 
-		gEntList.PhysCallbackSetVelocity( pEvent->pObjects[index], vec3_origin ); 
+		EntityList()->PhysCallbackSetVelocity( pEvent->pObjects[index], vec3_origin );
 
 		// Delay the fade out so that we don't change our 
 		// collision rules inside a vphysics callback.

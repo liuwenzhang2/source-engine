@@ -612,7 +612,7 @@ void CBreakableSurface::Die( CBaseEntity *pBreaker, const Vector &vAttackDir )
 		return;
 
 	// Play a break sound
-	gEntList.PhysBreakSound( this, GetEngineObject()->VPhysicsGetObject(), GetEngineObject()->GetAbsOrigin() );
+	EntityList()->PhysBreakSound( this, GetEngineObject()->VPhysicsGetObject(), GetEngineObject()->GetAbsOrigin() );
 
 	m_bIsBroken = true;
 	m_iHealth = 0.0f;
@@ -1257,7 +1257,7 @@ void CBreakableSurface::VPhysicsCollision( int index, gamevcollisionevent_t *pEv
 			int otherIndex = !index;
 			CBaseEntity *pInflictor = pEvent->pEntities[otherIndex];
 			CTakeDamageInfo info( pInflictor, pInflictor, normal, damagePos, damage, damageType );
-			gEntList.PhysCallbackDamage( this, info, *pEvent, index );
+			EntityList()->PhysCallbackDamage( this, info, *pEvent, index );
 		}
 		else if ( damage > 0 )
 		{

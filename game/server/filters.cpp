@@ -6,7 +6,6 @@
 
 #include "cbase.h"
 #include "filters.h"
-//#include "entitylist.h"
 #include "ai_squad.h"
 #include "ai_basenpc.h"
 

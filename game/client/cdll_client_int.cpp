@@ -833,7 +833,7 @@ void CHLClient::PreSave(CSaveRestoreData* pSaveData)
 //---------------------------------
 //CBaseEntity* EntityFromHandle(CBaseHandle& handle) {
 //#ifdef GAME_DLL
-//	return (CBaseEntity*)gEntList.GetServerEntityFromHandle(handle);
+//	return (CBaseEntity*)EntityList()->GetServerEntityFromHandle(handle);
 //#endif // GAME_DLL
 //#ifdef CLIENT_DLL
 //	return (CBaseEntity*)EntityList()->GetClientEntityFromHandle(handle);

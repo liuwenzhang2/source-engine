@@ -13,7 +13,6 @@
 
 #define TEAMNUM_NUM_BITS	6
 
-//#include "entitylist.h"
 #include "entityoutput.h"
 #include "networkvar.h"
 #include "ServerNetworkProperty.h"
@@ -34,8 +33,6 @@ class IResponseSystem;
 class IEntitySaveUtils;
 class CRecipientFilter;
 class IStudioHdr;
-template<class T>
-class CGlobalEntityList;
 class CServerGameDLL;
 class ITraceFilter;
 

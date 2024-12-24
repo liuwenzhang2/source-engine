@@ -84,10 +84,11 @@ void PhysGetDefaultAABBSolid( solid_t &solid );
 void PhysForceClearVelocity( IPhysicsObject *pPhys );
 bool PhysHasContactWithOtherInDirection( IPhysicsObject *pPhysics, const Vector &dir );
 
+void PrecachePhysicsSounds(void);
 //-----------------------------------------------------------------------------
 // Singleton access
 //-----------------------------------------------------------------------------
 extern IVPhysicsKeyHandler* g_pSolidSetup;
-
+extern const objectparams_t g_PhysDefaultObjectParams;
 
 #endif // PHYSICS_SHARED_H

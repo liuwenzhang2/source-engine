@@ -11,12 +11,12 @@
 
 #if defined( GAME_DLL )
 	
-	//#include "entitylist.h"
+	
 
 
 	//void DebugCheckEHandleAccess( void *pEnt )
 	//{
-	//	if ( gEntList.IsDisableEhandleAccess() )
+	//	if ( EntityList()->IsDisableEhandleAccess() )
 	//	{
 	//		Msg( "Access of EHANDLE/CHandle for class %s:%p in destructor!\n",
 	//			STRING(((CBaseEntity*)pEnt)->GetEngineObject()->GetClassname() ), pEnt );

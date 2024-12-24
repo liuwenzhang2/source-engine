@@ -2202,7 +2202,7 @@ class CPortal_AutoGameSys_EntityListener : public CAutoGameSystem, public IEntit
 public:
 	virtual void LevelInitPreEntity(void)
 	{
-		gEntList.AddListenerEntity(this);
+		EntityList()->AddListenerEntity(this);
 	}
 
 	virtual bool Init(void)
@@ -2212,7 +2212,7 @@ public:
 
 	void LevelShutdownPostEntity()
 	{
-		gEntList.RemoveListenerEntity(this);
+		EntityList()->RemoveListenerEntity(this);
 	}
 
 	virtual void PreEntityRemove(CBaseEntity* pEntity)

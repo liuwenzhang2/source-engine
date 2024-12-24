@@ -343,7 +343,7 @@ void CFuncLadder::FindNearbyDismountPoints( const Vector& origin, float radius, 
 {
 #if !defined( CLIENT_DLL )
 	CBaseEntity *pEntity = NULL;
-	while ( (pEntity = gEntList.FindEntityByClassnameWithin( pEntity, "info_ladder_dismount", origin, radius)) != NULL )
+	while ( (pEntity = EntityList()->FindEntityByClassnameWithin( pEntity, "info_ladder_dismount", origin, radius)) != NULL )
 	{
 		CInfoLadderDismount *landingspot = static_cast< CInfoLadderDismount * >( pEntity );
 		Assert( landingspot );

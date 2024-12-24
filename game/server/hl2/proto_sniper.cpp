@@ -18,7 +18,6 @@
 #include "beam_shared.h"
 #include "game.h"
 #include "npcevent.h"
-//#include "entitylist.h"
 #include "activitylist.h"
 #include "soundent.h"
 #include "gib.h"

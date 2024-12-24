@@ -7,7 +7,6 @@
 
 #include "cbase.h"
 #include "func_areaportalwindow.h"
-//#include "entitylist.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"

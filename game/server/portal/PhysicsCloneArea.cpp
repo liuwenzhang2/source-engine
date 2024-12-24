@@ -116,7 +116,7 @@ void CPhysicsCloneArea::UpdatePosition( void )
 		//don't want to risk list corruption while untouching
 		CUtlVector<CBaseEntity *> TouchingEnts;
 		for( servertouchlink_t *link = root->nextLink; link != root; link = link->nextLink )
-			TouchingEnts.AddToTail( (CBaseEntity*)gEntList.GetServerEntityFromHandle(link->entityTouched) );
+			TouchingEnts.AddToTail( EntityList()->GetBaseEntityFromHandle(link->entityTouched) );
 
 
 		for( int i = TouchingEnts.Count(); --i >= 0; )
@@ -227,7 +227,7 @@ void CPhysicsCloneArea::CloneTouchingEntities( void )
 		{
 			for (servertouchlink_t* link = root->nextLink; link != root; link = link->nextLink) {
 				if (m_pAttachedSimulator) {
-					m_pAttachedSimulator->GetEnginePortal()->StartCloningEntity((CBaseEntity*)gEntList.GetServerEntityFromHandle(link->entityTouched));
+					m_pAttachedSimulator->GetEnginePortal()->StartCloningEntity(EntityList()->GetBaseEntityFromHandle(link->entityTouched));
 				}
 			}
 		}

@@ -35,7 +35,7 @@ void CAI_SpeechFilter::Spawn( void )
 {
 	BaseClass::Spawn();
 
-	gEntList.AddListenerEntity( this );
+	EntityList()->AddListenerEntity( this );
 }
 
 //-----------------------------------------------------------------------------
@@ -53,7 +53,7 @@ void CAI_SpeechFilter::Activate( void )
 //-----------------------------------------------------------------------------
 void CAI_SpeechFilter::UpdateOnRemove(void)
 {
-	gEntList.RemoveListenerEntity( this );
+	EntityList()->RemoveListenerEntity( this );
 	BaseClass::UpdateOnRemove();
 }
 

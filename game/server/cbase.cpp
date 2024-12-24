@@ -74,7 +74,6 @@ OUTPUTS:
 
 
 #include "cbase.h"
-//#include "entitylist.h"
 #include "mapentities_shared.h"
 #include "isaverestore.h"
 #include "eventqueue.h"
@@ -90,6 +89,7 @@ OUTPUTS:
 #include "npc_playercompanion.h"
 #endif // HL2_DLL
 #include "client.h"
+#include "mapentities.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
@@ -1765,26 +1765,127 @@ class CVariantSaveDataOps : public CDefSaveRestoreOps
 CVariantSaveDataOps g_VariantSaveDataOps;
 ISaveRestoreOps *variantFuncs = &g_VariantSaveDataOps;
 
-/////////////////////// entitylist /////////////////////
-
-CUtlMemoryPool g_EntListMemPool( sizeof(entitem_t), 256, CUtlMemoryPool::GROW_NONE, "g_EntListMemPool" );
-
-#include "tier0/memdbgoff.h"
-
-void *entitem_t::operator new( size_t stAllocateBlock )
+//-----------------------------------------------------------------------------
+// NOTIFY LIST
+// 
+// Allows entities to get events fired when another entity changes
+//-----------------------------------------------------------------------------
+struct entitynotify_t
 {
-	return g_EntListMemPool.Alloc( stAllocateBlock );
+	CBaseEntity* pNotify;
+	CBaseEntity* pWatched;
+};
+class CNotifyList : public INotify, public IEntityListener<CBaseEntity>
+{
+public:
+	// INotify
+	void AddEntity(CBaseEntity* pNotify, CBaseEntity* pWatched);
+	void RemoveEntity(CBaseEntity* pNotify, CBaseEntity* pWatched);
+	void ReportNamedEvent(CBaseEntity* pEntity, const char* pEventName);
+	void ClearEntity(CBaseEntity* pNotify);
+	void ReportSystemEvent(CBaseEntity* pEntity, notify_system_event_t eventType, const notify_system_event_params_t& params);
+
+	// IEntityListener
+	virtual void OnEntityCreated(CBaseEntity* pEntity);
+	virtual void OnEntityDeleted(CBaseEntity* pEntity);
+
+	// Called from CEntityListSystem
+	void LevelInitPreEntity();
+	void LevelShutdownPreEntity();
+
+private:
+	CUtlVector<entitynotify_t>	m_notifyList;
+};
+
+void CNotifyList::AddEntity(CBaseEntity* pNotify, CBaseEntity* pWatched)
+{
+	// OPTIMIZE: Also flag pNotify for faster "RemoveAllNotify" ?
+	pWatched->GetEngineObject()->AddEFlags(EFL_NOTIFY);
+	int index = m_notifyList.AddToTail();
+	entitynotify_t& notify = m_notifyList[index];
+	notify.pNotify = pNotify;
+	notify.pWatched = pWatched;
 }
 
-void *entitem_t::operator new( size_t stAllocateBlock, int nBlockUse, const char *pFileName, int nLine )
+// Remove noitfication for an entity
+void CNotifyList::RemoveEntity(CBaseEntity* pNotify, CBaseEntity* pWatched)
 {
-	return g_EntListMemPool.Alloc( stAllocateBlock );
+	for (int i = m_notifyList.Count(); --i >= 0; )
+	{
+		if (m_notifyList[i].pNotify == pNotify && m_notifyList[i].pWatched == pWatched)
+		{
+			m_notifyList.FastRemove(i);
+		}
+	}
 }
 
-void entitem_t::operator delete( void *pMem )
+
+void CNotifyList::ReportNamedEvent(CBaseEntity* pEntity, const char* pInputName)
 {
-	g_EntListMemPool.Free( pMem );
+	variant_t emptyVariant;
+
+	if (!pEntity->GetEngineObject()->IsEFlagSet(EFL_NOTIFY))
+		return;
+
+	for (int i = 0; i < m_notifyList.Count(); i++)
+	{
+		if (m_notifyList[i].pWatched == pEntity)
+		{
+			m_notifyList[i].pNotify->AcceptInput(pInputName, pEntity, pEntity, emptyVariant, 0);
+		}
+	}
 }
+
+void CNotifyList::LevelInitPreEntity()
+{
+	EntityList()->AddListenerEntity(this);
+}
+
+void CNotifyList::LevelShutdownPreEntity(void)
+{
+	EntityList()->RemoveListenerEntity(this);
+	m_notifyList.Purge();
+}
+
+void CNotifyList::OnEntityCreated(CBaseEntity* pEntity)
+{
+}
+
+void CNotifyList::OnEntityDeleted(CBaseEntity* pEntity)
+{
+	ReportDestroyEvent(pEntity);
+	ClearEntity(pEntity);
+}
+
+
+// UNDONE: Slow linear search?
+void CNotifyList::ClearEntity(CBaseEntity* pNotify)
+{
+	for (int i = m_notifyList.Count(); --i >= 0; )
+	{
+		if (m_notifyList[i].pNotify == pNotify || m_notifyList[i].pWatched == pNotify)
+		{
+			m_notifyList.FastRemove(i);
+		}
+	}
+}
+
+void CNotifyList::ReportSystemEvent(CBaseEntity* pEntity, notify_system_event_t eventType, const notify_system_event_params_t& params)
+{
+	if (!pEntity->GetEngineObject()->IsEFlagSet(EFL_NOTIFY))
+		return;
+
+	for (int i = 0; i < m_notifyList.Count(); i++)
+	{
+		if (m_notifyList[i].pWatched == pEntity)
+		{
+			m_notifyList[i].pNotify->NotifySystemEvent(pEntity, eventType, params);
+		}
+	}
+}
+
+static CNotifyList g_NotifyList;
+INotify* g_pNotify = &g_NotifyList;
 
 static CBaseEntityClassList* s_pClassLists = NULL;
 CBaseEntityClassList::CBaseEntityClassList()
@@ -1822,13 +1923,14 @@ public:
 	}
 	void LevelInitPreEntity()
 	{
+		g_NotifyList.LevelInitPreEntity();
 #ifdef HL2_DLL
 		OverrideMoveCache_LevelInitPreEntity();
 #endif	// HL2_DLL
 	}
 	void LevelShutdownPreEntity()
 	{
-
+		g_NotifyList.LevelShutdownPreEntity();
 	}
 	void LevelShutdownPostEntity()
 	{
@@ -1874,7 +1976,7 @@ public:
 				pEnt = pNextEnt;
 			}
 
-			gEntList.CleanupDeleteList();
+			EntityList()->CleanupDeleteList();
 
 			engine->GlobalEntity_EnableStateUpdates(true);
 

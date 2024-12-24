@@ -3061,7 +3061,7 @@ const CDODViewVectors *CDODGameRules::GetDODViewVectors() const
 		}
 
 		// Get rid of all entities except players.
-		CBaseEntity *pCur = gEntList.FirstEnt();
+		CBaseEntity *pCur = EntityList()->FirstEnt();
 		while ( pCur )
 		{
 			if ( !FindInList( s_PreserveEnts, pCur->GetClassname() ) )
@@ -3073,11 +3073,11 @@ const CDODViewVectors *CDODGameRules::GetDODViewVectors() const
 				EntityList()->DestroyEntity( pCur );
 			}
 			
-			pCur = gEntList.NextEnt( pCur );
+			pCur = EntityList()->NextEnt( pCur );
 		}
 		
 		// Really remove the entities so we can have access to their slots below.
-		gEntList.CleanupDeleteList();
+		EntityList()->CleanupDeleteList();
 		
 		// Now reload the map entities.
 		class CDODMapEntityFilter : public IMapEntityFilter

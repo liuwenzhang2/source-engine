@@ -9,7 +9,6 @@
 #include "player.h"
 //#include "physics.h"
 #include "vcollide_parse.h"
-//#include "entitylist.h"
 #include "physobj.h"
 #include "hierarchy.h"
 #include "game.h"
@@ -352,7 +351,7 @@ void CPhysicsSpring::NotifySystemEvent( CBaseEntity *pNotify, notify_system_even
 		return;
 
 	m_teleportTick = gpGlobals->tickcount;
-	gEntList.PhysTeleportConstrainedEntity( pNotify, m_pSpring->GetStartObject(), m_pSpring->GetEndObject(), params.pTeleport->prevOrigin, params.pTeleport->prevAngles, params.pTeleport->physicsRotate );
+	EntityList()->PhysTeleportConstrainedEntity( pNotify, m_pSpring->GetStartObject(), m_pSpring->GetEndObject(), params.pTeleport->prevOrigin, params.pTeleport->prevAngles, params.pTeleport->physicsRotate );
 }
 
 
@@ -515,7 +514,7 @@ bool CPhysBox::CreateVPhysics()
 	}
 
 	vcollide_t *pVCollide = modelinfo->GetVCollide(GetEngineObject()->GetModelIndex() );
-	gEntList.PhysGetMassCenterOverride( this, pVCollide, tmpSolid );
+	EntityList()->PhysGetMassCenterOverride( this, pVCollide, tmpSolid );
 	PhysSolidOverride( tmpSolid, m_iszOverrideScript );
 	if ( tmpSolid.params.rotdamping < 1.0f && ShouldDampRotation(pVCollide->solids[0]) )
 	{
@@ -907,11 +906,11 @@ CBaseEntity *CPhysExplosion::FindEntity( CBaseEntity *pEntity, CBaseEntity *pAct
 			return pTarget;
 
 		// Failing that, try a classname
-		return gEntList.FindEntityByClassnameWithin( pEntity, STRING(m_targetEntityName), GetEngineObject()->GetAbsOrigin(), GetRadius() );
+		return EntityList()->FindEntityByClassnameWithin( pEntity, STRING(m_targetEntityName), GetEngineObject()->GetAbsOrigin(), GetRadius() );
 	}
 
 	// Just find anything in the radius
-	return gEntList.FindEntityInSphere( pEntity, GetEngineObject()->GetAbsOrigin(), GetRadius() );
+	return EntityList()->FindEntityInSphere( pEntity, GetEngineObject()->GetAbsOrigin(), GetRadius() );
 }
 
 
@@ -1915,7 +1914,7 @@ public:
 		{
 			masscenteroverride_t params;
 			params.SnapToPoint( m_target, GetEngineObject()->GetAbsOrigin() );
-			gEntList.PhysSetMassCenterOverride( params );
+			EntityList()->PhysSetMassCenterOverride( params );
 			EntityList()->DestroyEntity( this );
 		}
 	}

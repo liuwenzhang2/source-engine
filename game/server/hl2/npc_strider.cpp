@@ -1902,7 +1902,7 @@ void CNPC_Strider::HandleAnimEvent( animevent_t *pEvent )
 
 	case STRIDER_AE_SHOOTMINIGUN:
 	{
-		CBaseEntity *pTarget = gEntList.FindEntityGeneric( NULL, pEvent->options, this, this );
+		CBaseEntity *pTarget = EntityList()->FindEntityGeneric( NULL, pEvent->options, this, this );
 		if ( pTarget )
 		{
 			Vector vecTarget = pTarget->GetEngineObject()->WorldSpaceCenter();
@@ -4237,7 +4237,7 @@ void CNPC_Strider::VPhysicsShadowCollision( int index, gamevcollisionevent_t *pE
 
 		// UNDONE: Find one near damagePos?
 		GetEngineObject()->SetForceBone(0);
-		gEntList.PhysCallbackDamage( this, dmgInfo, *pEvent, index );
+		EntityList()->PhysCallbackDamage( this, dmgInfo, *pEvent, index );
 		return;
 	}
 

@@ -1732,7 +1732,7 @@ void CHalfLife2::LevelInitPreEntity()
 	if ( !Q_strnicmp( gpGlobals->mapname.ToCStr(), "ep1_", 4 ) )
 	{
 		// episode 1 maps use the surrounding box trigger behavior
-		gEntList.SetAccurateTriggerBboxChecks(false);
+		EntityList()->SetAccurateTriggerBboxChecks(false);
 	}
 #endif
 	BaseClass::LevelInitPreEntity();

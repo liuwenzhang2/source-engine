@@ -109,7 +109,7 @@ void CPropVehicle::Spawn( )
 // This is useful for tuning vehicles or updating old saved game formats
 CON_COMMAND(vehicle_flushscript, "Flush and reload all vehicle scripts")
 {
-	gEntList.FlushVehicleScripts();
+	EntityList()->FlushVehicleScripts();
 	for ( CBaseEntity *pEnt = EntityList()->FirstEnt(); pEnt != NULL; pEnt = EntityList()->NextEnt(pEnt) )
 	{
 		IServerVehicle *pServerVehicle = pEnt->GetServerVehicle();

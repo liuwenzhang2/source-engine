@@ -760,7 +760,7 @@ CON_COMMAND( hammer_update_entity, "Updates the entity's position/angles when in
 	else
 	{
 		CBaseEntity *pEnt = NULL;
-		while ((pEnt = gEntList.FindEntityGeneric( pEnt, args[1] ) ) != NULL)
+		while ((pEnt = EntityList()->FindEntityGeneric( pEnt, args[1] ) ) != NULL)
 		{
 			NWCEdit::UpdateEntityPosition( pEnt );
 		}

@@ -24,7 +24,6 @@
 #include "shake.h"
 #include "particle_smokegrenade.h"
 #include "player.h"
-//#include "entitylist.h"
 #include "IEffects.h"
 #include "ai_basenpc.h"
 #include "ai_behavior_functank.h"
@@ -681,7 +680,7 @@ void CFuncTank::TraceAttack( CBaseEntity *pAttacker, float flDamage, const Vecto
 //-----------------------------------------------------------------------------
 CBaseEntity *CFuncTank::FindTarget( string_t targetName, CBaseEntity *pActivator ) 
 {
-	return gEntList.FindEntityGenericNearest( STRING( targetName ), GetEngineObject()->GetAbsOrigin(), 0, this, pActivator );
+	return EntityList()->FindEntityGenericNearest( STRING( targetName ), GetEngineObject()->GetAbsOrigin(), 0, this, pActivator );
 }
 
 

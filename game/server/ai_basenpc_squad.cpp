@@ -14,7 +14,6 @@
 #include "ai_squadslot.h"
 #include "ai_squad.h"
 #include "bitstring.h"
-//#include "entitylist.h"
 #include "ai_hint.h"
 #include "IEffects.h"
 

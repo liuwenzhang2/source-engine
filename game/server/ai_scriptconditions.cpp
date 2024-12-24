@@ -450,7 +450,7 @@ void CAI_ScriptConditions::Activate()
 		Enable();
 
 #ifdef HL2_EPISODIC
-	gEntList.AddListenerEntity( this );
+	EntityList()->AddListenerEntity( this );
 #endif
 }
 
@@ -458,7 +458,7 @@ void CAI_ScriptConditions::Activate()
 
 void CAI_ScriptConditions::UpdateOnRemove( void )
 {
-	gEntList.RemoveListenerEntity( this );
+	EntityList()->RemoveListenerEntity( this );
 	BaseClass::UpdateOnRemove();
 
 	m_ElementList.Purge();

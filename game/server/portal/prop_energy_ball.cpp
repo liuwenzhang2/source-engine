@@ -260,7 +260,7 @@ void CPropEnergyBall::VPhysicsCollision( int index, gamevcollisionevent_t *pEven
 
 	// Try to update the velocity now, however I'm told this rarely works.
 	// We will spam updates in our think function to help get us in the direction we want to go.
-	gEntList.PhysCallbackSetVelocity( pEvent->pObjects[index], vecFinalVelocity );
+	EntityList()->PhysCallbackSetVelocity( pEvent->pObjects[index], vecFinalVelocity );
 }
 
 void CPropEnergyBall::NotifySystemEvent(CBaseEntity *pNotify, notify_system_event_t eventType, const notify_system_event_params_t &params )

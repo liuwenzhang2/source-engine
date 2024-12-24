@@ -44,8 +44,6 @@
 #include "rope_shared.h"
 #include "rope_helpers.h"
 #include "bone_setup.h"
-#include "ragdoll_shared.h"
-#include "physics_shared.h"
 //#include "player.h"
 #include "vphysics/collision_set.h"
 #include "env_debughistory.h"
@@ -71,16 +69,15 @@ IServerEntityList* serverEntitylist = &gEntList;
 // Expose list to engine
 EXPOSE_SINGLE_INTERFACE_GLOBALVAR(CGlobalEntityList, IServerEntityList, VSERVERENTITYLIST_INTERFACE_VERSION, gEntList);
 
-// Store local pointer to interface for rest of client .dll only 
-//  (CClientEntityList instead of IClientEntityList )
-CGlobalEntityList<CBaseEntity>* sv_entitylist = &gEntList;
+// memory pool for storing links between entities
+static CUtlMemoryPool g_EdictTouchLinks(sizeof(servertouchlink_t), MAX_EDICTS, CUtlMemoryPool::GROW_NONE, "g_EdictTouchLinks");
+static CUtlMemoryPool g_EntityGroundLinks(sizeof(servergroundlink_t), MAX_EDICTS, CUtlMemoryPool::GROW_NONE, "g_EntityGroundLinks");
+static CUtlMemoryPool g_EntListMemPool(sizeof(entitem_t), 256, CUtlMemoryPool::GROW_NONE, "g_EntListMemPool");
 
 //static servertouchlink_t *g_pNextLink = NULL;
 int linksallocated = 0;
 int groundlinksallocated = 0;
-// memory pool for storing links between entities
-static CUtlMemoryPool g_EdictTouchLinks(sizeof(servertouchlink_t), MAX_EDICTS, CUtlMemoryPool::GROW_NONE, "g_EdictTouchLinks");
-static CUtlMemoryPool g_EntityGroundLinks(sizeof(servergroundlink_t), MAX_EDICTS, CUtlMemoryPool::GROW_NONE, "g_EntityGroundLinks");
+
 #ifndef CLIENT_DLL
 ConVar debug_touchlinks("debug_touchlinks", "0", 0, "Spew touch link activity");
 #define DebugTouchlinks() debug_touchlinks.GetBool()
@@ -139,6 +136,24 @@ static ConVar phys_penetration_error_time("phys_penetration_error_time", "10", 0
 static int g_iShadowCloneCount = 0;
 ConVar sv_use_shadow_clones("sv_use_shadow_clones", "1", FCVAR_REPLICATED | FCVAR_CHEAT); //should we create shadow clones?
 
+#include "tier0/memdbgoff.h"
+
+void* entitem_t::operator new(size_t stAllocateBlock)
+{
+	return g_EntListMemPool.Alloc(stAllocateBlock);
+}
+
+void* entitem_t::operator new(size_t stAllocateBlock, int nBlockUse, const char* pFileName, int nLine)
+{
+	return g_EntListMemPool.Alloc(stAllocateBlock);
+}
+
+void entitem_t::operator delete(void* pMem)
+{
+	g_EntListMemPool.Free(pMem);
+}
+
+#include "tier0/memdbgon.h"
 
 //-----------------------------------------------------------------------------
 // Call these in pre-save + post save
@@ -4384,7 +4399,7 @@ void CEngineObjectInternal::OnSave(IEntitySaveUtils* pUtils)
 //-----------------------------------------------------------------------------
 void CEngineObjectInternal::OnRestore()
 {
-	SimThink_EntityChanged(this->m_pOuter);
+	g_pEntList->SimThink_EntityChanged(this->m_pOuter);
 
 	// touchlinks get recomputed
 	if (IsEFlagSet(EFL_CHECK_UNTOUCH))
@@ -6640,7 +6655,7 @@ void CEngineObjectInternal::CheckHasThinkFunction(bool isThinking)
 		AddEFlags(EFL_NO_THINK_FUNCTION);
 	}
 #if !defined( CLIENT_DLL )
-	SimThink_EntityChanged(this->m_pOuter);
+	g_pEntList->SimThink_EntityChanged(this->m_pOuter);
 #endif
 }
 
@@ -7073,7 +7088,7 @@ void CEngineObjectInternal::CheckHasGamePhysicsSimulation()
 		AddEFlags(EFL_NO_GAME_PHYSICS_SIMULATION);
 	}
 #if !defined( CLIENT_DLL )
-	SimThink_EntityChanged(this->m_pOuter);
+	g_pEntList->SimThink_EntityChanged(this->m_pOuter);
 #endif
 }
 
@@ -13602,37 +13617,6 @@ void CEngineShadowCloneInternal::ReleaseShadowClone(CEngineShadowCloneInternal* 
 	--g_iShadowCloneCount;
 }
 
-// remaps an angular variable to a 3 band function:
-// 0 <= t < start :		f(t) = 0
-// start <= t <= end :	f(t) = end * spline(( t-start) / (end-start) )  // s curve between clamped and linear
-// end < t :			f(t) = t
-float RemapAngleRange(float startInterval, float endInterval, float value)
-{
-	// Fixup the roll
-	value = AngleNormalize(value);
-	float absAngle = fabs(value);
-
-	// beneath cutoff?
-	if (absAngle < startInterval)
-	{
-		value = 0;
-	}
-	// in spline range?
-	else if (absAngle <= endInterval)
-	{
-		float newAngle = SimpleSpline((absAngle - startInterval) / (endInterval - startInterval)) * endInterval;
-		// grab the sign from the initial value
-		if (value < 0)
-		{
-			newAngle *= -1;
-		}
-		value = newAngle;
-	}
-	// else leave it alone, in linear range
-
-	return value;
-}
-
 BEGIN_DATADESC(CEngineVehicleInternal)
 
 // These two are reset every time 
@@ -15529,20 +15513,6 @@ int CAimTargetManager::ListCopy(CBaseEntity* pList[], int listMax)
 
 CAimTargetManager g_AimManager;
 
-int AimTarget_ListCount()
-{
-	return g_AimManager.ListCount();
-}
-int AimTarget_ListCopy(CBaseEntity* pList[], int listMax)
-{
-	return g_AimManager.ListCopy(pList, listMax);
-}
-void AimTarget_ForceRepopulateList()
-{
-	g_AimManager.ForceRepopulateList();
-}
-
-
 // Manages a list of all entities currently doing game simulation or thinking
 // NOTE: This is usually a small subset of the global entity list, so it's
 // an optimization to maintain this list incrementally rather than polling each
@@ -15553,6 +15523,7 @@ struct simthinkentry_t
 	unsigned short	unused0;
 	int				nextThinkTick;
 };
+
 class CSimThinkManager : public IEntityListener<CBaseEntity>
 {
 public:
@@ -15685,21 +15656,6 @@ private:
 
 CSimThinkManager g_SimThinkManager;
 
-int SimThink_ListCount()
-{
-	return g_SimThinkManager.ListCount();
-}
-
-int SimThink_ListCopy(CBaseEntity* pList[], int listMax)
-{
-	return g_SimThinkManager.ListCopy(pList, listMax);
-}
-
-void SimThink_EntityChanged(CBaseEntity* pEntity)
-{
-	g_SimThinkManager.EntityChanged(pEntity);
-}
-
 CEntityList::CEntityList()
 {
 	m_pItemList = NULL;
@@ -15783,128 +15739,6 @@ void CEntityList::DeleteEntity(CBaseEntity* pEnt)
 		e = e->pNext;
 	}
 }
-
-//-----------------------------------------------------------------------------
-// NOTIFY LIST
-// 
-// Allows entities to get events fired when another entity changes
-//-----------------------------------------------------------------------------
-struct entitynotify_t
-{
-	CBaseEntity* pNotify;
-	CBaseEntity* pWatched;
-};
-class CNotifyList : public INotify, public IEntityListener<CBaseEntity>
-{
-public:
-	// INotify
-	void AddEntity(CBaseEntity* pNotify, CBaseEntity* pWatched);
-	void RemoveEntity(CBaseEntity* pNotify, CBaseEntity* pWatched);
-	void ReportNamedEvent(CBaseEntity* pEntity, const char* pEventName);
-	void ClearEntity(CBaseEntity* pNotify);
-	void ReportSystemEvent(CBaseEntity* pEntity, notify_system_event_t eventType, const notify_system_event_params_t& params);
-
-	// IEntityListener
-	virtual void OnEntityCreated(CBaseEntity* pEntity);
-	virtual void OnEntityDeleted(CBaseEntity* pEntity);
-
-	// Called from CEntityListSystem
-	void LevelInitPreEntity();
-	void LevelShutdownPreEntity();
-
-private:
-	CUtlVector<entitynotify_t>	m_notifyList;
-};
-
-void CNotifyList::AddEntity(CBaseEntity* pNotify, CBaseEntity* pWatched)
-{
-	// OPTIMIZE: Also flag pNotify for faster "RemoveAllNotify" ?
-	pWatched->GetEngineObject()->AddEFlags(EFL_NOTIFY);
-	int index = m_notifyList.AddToTail();
-	entitynotify_t& notify = m_notifyList[index];
-	notify.pNotify = pNotify;
-	notify.pWatched = pWatched;
-}
-
-// Remove noitfication for an entity
-void CNotifyList::RemoveEntity(CBaseEntity* pNotify, CBaseEntity* pWatched)
-{
-	for (int i = m_notifyList.Count(); --i >= 0; )
-	{
-		if (m_notifyList[i].pNotify == pNotify && m_notifyList[i].pWatched == pWatched)
-		{
-			m_notifyList.FastRemove(i);
-		}
-	}
-}
-
-
-void CNotifyList::ReportNamedEvent(CBaseEntity* pEntity, const char* pInputName)
-{
-	variant_t emptyVariant;
-
-	if (!pEntity->GetEngineObject()->IsEFlagSet(EFL_NOTIFY))
-		return;
-
-	for (int i = 0; i < m_notifyList.Count(); i++)
-	{
-		if (m_notifyList[i].pWatched == pEntity)
-		{
-			m_notifyList[i].pNotify->AcceptInput(pInputName, pEntity, pEntity, emptyVariant, 0);
-		}
-	}
-}
-
-void CNotifyList::LevelInitPreEntity()
-{
-	g_pEntList->AddListenerEntity(this);
-}
-
-void CNotifyList::LevelShutdownPreEntity(void)
-{
-	g_pEntList->RemoveListenerEntity(this);
-	m_notifyList.Purge();
-}
-
-void CNotifyList::OnEntityCreated(CBaseEntity* pEntity)
-{
-}
-
-void CNotifyList::OnEntityDeleted(CBaseEntity* pEntity)
-{
-	ReportDestroyEvent(pEntity);
-	ClearEntity(pEntity);
-}
-
-
-// UNDONE: Slow linear search?
-void CNotifyList::ClearEntity(CBaseEntity* pNotify)
-{
-	for (int i = m_notifyList.Count(); --i >= 0; )
-	{
-		if (m_notifyList[i].pNotify == pNotify || m_notifyList[i].pWatched == pNotify)
-		{
-			m_notifyList.FastRemove(i);
-		}
-	}
-}
-
-void CNotifyList::ReportSystemEvent(CBaseEntity* pEntity, notify_system_event_t eventType, const notify_system_event_params_t& params)
-{
-	if (!pEntity->GetEngineObject()->IsEFlagSet(EFL_NOTIFY))
-		return;
-
-	for (int i = 0; i < m_notifyList.Count(); i++)
-	{
-		if (m_notifyList[i].pWatched == pEntity)
-		{
-			m_notifyList[i].pNotify->NotifySystemEvent(pEntity, eventType, params);
-		}
-	}
-}
-
-static CNotifyList g_NotifyList;
-INotify* g_pNotify = &g_NotifyList;
 
 class CEntityTouchManager : public IEntityListener<CBaseEntity>
 {
@@ -15999,14 +15833,13 @@ public:
 	}
 	void LevelInitPreEntity()
 	{
-		g_NotifyList.LevelInitPreEntity();
 		g_TouchManager.LevelInitPreEntity();
 		g_AimManager.LevelInitPreEntity();
 		g_SimThinkManager.LevelInitPreEntity();
 	}
 	void LevelShutdownPreEntity()
 	{
-		g_NotifyList.LevelShutdownPreEntity();
+
 	}
 	void LevelShutdownPostEntity()
 	{
@@ -16157,7 +15990,7 @@ CON_COMMAND(report_simthinklist, "Lists all simulating/thinking entities")
 		return;
 
 	CBaseEntity* pTmp[NUM_ENT_ENTRIES];
-	int count = SimThink_ListCopy(pTmp, ARRAYSIZE(pTmp));
+	int count = g_pEntList->SimThink_ListCopy(pTmp, ARRAYSIZE(pTmp));
 
 	CSortedEntityList list;
 	for (int i = 0; i < count; i++)

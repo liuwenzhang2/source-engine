@@ -2678,7 +2678,7 @@ void CTeamplayRoundBasedRules::CleanUpMap()
 	g_EventQueue.Clear();
 
 	// Really remove the entities so we can have access to their slots below.
-	gEntList.CleanupDeleteList();
+	EntityList()->CleanupDeleteList();
 
 	//engine->AllowImmediateEdictReuse();
 
