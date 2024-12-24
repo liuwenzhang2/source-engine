@@ -15513,232 +15513,133 @@ int CAimTargetManager::ListCopy(CBaseEntity* pList[], int listMax)
 
 CAimTargetManager g_AimManager;
 
-// Manages a list of all entities currently doing game simulation or thinking
-// NOTE: This is usually a small subset of the global entity list, so it's
-// an optimization to maintain this list incrementally rather than polling each
-// frame.
-struct simthinkentry_t
+CSimThinkManager::CSimThinkManager()
 {
-	unsigned short	entEntry;
-	unsigned short	unused0;
-	int				nextThinkTick;
-};
+	Clear();
+}
 
-class CSimThinkManager : public IEntityListener<CBaseEntity>
+void CSimThinkManager::Clear()
 {
-public:
-	CSimThinkManager()
+	m_simThinkList.Purge();
+	for (int i = 0; i < ARRAYSIZE(m_entinfoIndex); i++)
 	{
-		Clear();
+		m_entinfoIndex[i] = 0xFFFF;
 	}
-	void Clear()
+}
+
+void CSimThinkManager::LevelInitPreEntity()
+{
+	g_pEntList->AddListenerEntity(this);
+}
+
+void CSimThinkManager::LevelShutdownPostEntity()
+{
+	g_pEntList->RemoveListenerEntity(this);
+	Clear();
+}
+
+void CSimThinkManager::OnEntityCreated(CBaseEntity* pEntity)
+{
+	Assert(m_entinfoIndex[pEntity->GetRefEHandle().GetEntryIndex()] == 0xFFFF);
+}
+
+void CSimThinkManager::OnEntityDeleted(CBaseEntity* pEntity)
+{
+	RemoveEntinfoIndex(pEntity->GetRefEHandle().GetEntryIndex());
+}
+
+void CSimThinkManager::RemoveEntinfoIndex(int index)
+{
+	int listHandle = m_entinfoIndex[index];
+	// If this guy is in the active list, remove him
+	if (listHandle != 0xFFFF)
 	{
-		m_simThinkList.Purge();
-		for (int i = 0; i < ARRAYSIZE(m_entinfoIndex); i++)
+		Assert(m_simThinkList[listHandle].entEntry == index);
+		m_simThinkList.FastRemove(listHandle);
+		m_entinfoIndex[index] = 0xFFFF;
+
+		// fast remove shifted someone, update that someone
+		if (listHandle < m_simThinkList.Count())
 		{
-			m_entinfoIndex[i] = 0xFFFF;
+			m_entinfoIndex[m_simThinkList[listHandle].entEntry] = listHandle;
 		}
 	}
-	void LevelInitPreEntity()
-	{
-		g_pEntList->AddListenerEntity(this);
-	}
+}
 
-	void LevelShutdownPostEntity()
-	{
-		g_pEntList->RemoveListenerEntity(this);
-		Clear();
-	}
+int CSimThinkManager::ListCount()
+{
+	return m_simThinkList.Count();
+}
 
-	void OnEntityCreated(CBaseEntity* pEntity)
+int CSimThinkManager::ListCopy(CBaseEntity* pList[], int listMax)
+{
+	int count = MIN(listMax, ListCount());
+	int out = 0;
+	for (int i = 0; i < count; i++)
 	{
-		Assert(m_entinfoIndex[pEntity->GetRefEHandle().GetEntryIndex()] == 0xFFFF);
-	}
-	void OnEntityDeleted(CBaseEntity* pEntity)
-	{
-		RemoveEntinfoIndex(pEntity->GetRefEHandle().GetEntryIndex());
-	}
-
-	void RemoveEntinfoIndex(int index)
-	{
-		int listHandle = m_entinfoIndex[index];
-		// If this guy is in the active list, remove him
-		if (listHandle != 0xFFFF)
+		// only copy out entities that will simulate or think this frame
+		if (m_simThinkList[i].nextThinkTick <= gpGlobals->tickcount)
 		{
-			Assert(m_simThinkList[listHandle].entEntry == index);
-			m_simThinkList.FastRemove(listHandle);
-			m_entinfoIndex[index] = 0xFFFF;
+			Assert(m_simThinkList[i].nextThinkTick >= 0);
+			int entinfoIndex = m_simThinkList[i].entEntry;
+			const CEntInfo<CBaseEntity>* pInfo = g_pEntList->GetEntInfoPtrByIndex(entinfoIndex);
+			pList[out] = (CBaseEntity*)pInfo->m_pEntity;
+			Assert(m_simThinkList[i].nextThinkTick == 0 || pList[out]->GetEngineObject()->GetFirstThinkTick() == m_simThinkList[i].nextThinkTick);
+			Assert(g_pEntList->IsEntityPtr(pList[out]));
+			out++;
+		}
+	}
 
-			// fast remove shifted someone, update that someone
-			if (listHandle < m_simThinkList.Count())
+	return out;
+}
+
+void CSimThinkManager::EntityChanged(CBaseEntity* pEntity)
+{
+	// might change after deletion, don't put back into the list
+	if (pEntity->GetEngineObject()->IsMarkedForDeletion())
+		return;
+
+	const CBaseHandle& eh = pEntity->GetRefEHandle();
+	if (!eh.IsValid())
+		return;
+
+	int index = eh.GetEntryIndex();
+	if (pEntity->GetEngineObject()->IsEFlagSet(EFL_NO_THINK_FUNCTION) && pEntity->GetEngineObject()->IsEFlagSet(EFL_NO_GAME_PHYSICS_SIMULATION))
+	{
+		RemoveEntinfoIndex(index);
+	}
+	else
+	{
+		// already in the list? (had think or sim last time, now has both - or had both last time, now just one)
+		if (m_entinfoIndex[index] == 0xFFFF)
+		{
+			MEM_ALLOC_CREDIT();
+			m_entinfoIndex[index] = m_simThinkList.AddToTail();
+			m_simThinkList[m_entinfoIndex[index]].entEntry = (unsigned short)index;
+			m_simThinkList[m_entinfoIndex[index]].nextThinkTick = 0;
+			if (pEntity->GetEngineObject()->IsEFlagSet(EFL_NO_GAME_PHYSICS_SIMULATION))
 			{
-				m_entinfoIndex[m_simThinkList[listHandle].entEntry] = listHandle;
+				m_simThinkList[m_entinfoIndex[index]].nextThinkTick = pEntity->GetEngineObject()->GetFirstThinkTick();
+				Assert(m_simThinkList[m_entinfoIndex[index]].nextThinkTick >= 0);
 			}
-		}
-	}
-	int ListCount()
-	{
-		return m_simThinkList.Count();
-	}
-
-	int ListCopy(CBaseEntity* pList[], int listMax)
-	{
-		int count = MIN(listMax, ListCount());
-		int out = 0;
-		for (int i = 0; i < count; i++)
-		{
-			// only copy out entities that will simulate or think this frame
-			if (m_simThinkList[i].nextThinkTick <= gpGlobals->tickcount)
-			{
-				Assert(m_simThinkList[i].nextThinkTick >= 0);
-				int entinfoIndex = m_simThinkList[i].entEntry;
-				const CEntInfo<CBaseEntity>* pInfo = g_pEntList->GetEntInfoPtrByIndex(entinfoIndex);
-				pList[out] = (CBaseEntity*)pInfo->m_pEntity;
-				Assert(m_simThinkList[i].nextThinkTick == 0 || pList[out]->GetEngineObject()->GetFirstThinkTick() == m_simThinkList[i].nextThinkTick);
-				Assert(g_pEntList->IsEntityPtr(pList[out]));
-				out++;
-			}
-		}
-
-		return out;
-	}
-
-	void EntityChanged(CBaseEntity* pEntity)
-	{
-		// might change after deletion, don't put back into the list
-		if (pEntity->GetEngineObject()->IsMarkedForDeletion())
-			return;
-
-		const CBaseHandle& eh = pEntity->GetRefEHandle();
-		if (!eh.IsValid())
-			return;
-
-		int index = eh.GetEntryIndex();
-		if (pEntity->GetEngineObject()->IsEFlagSet(EFL_NO_THINK_FUNCTION) && pEntity->GetEngineObject()->IsEFlagSet(EFL_NO_GAME_PHYSICS_SIMULATION))
-		{
-			RemoveEntinfoIndex(index);
 		}
 		else
 		{
-			// already in the list? (had think or sim last time, now has both - or had both last time, now just one)
-			if (m_entinfoIndex[index] == 0xFFFF)
+			// updating existing entry - if no sim, reset think time
+			if (pEntity->GetEngineObject()->IsEFlagSet(EFL_NO_GAME_PHYSICS_SIMULATION))
 			{
-				MEM_ALLOC_CREDIT();
-				m_entinfoIndex[index] = m_simThinkList.AddToTail();
-				m_simThinkList[m_entinfoIndex[index]].entEntry = (unsigned short)index;
-				m_simThinkList[m_entinfoIndex[index]].nextThinkTick = 0;
-				if (pEntity->GetEngineObject()->IsEFlagSet(EFL_NO_GAME_PHYSICS_SIMULATION))
-				{
-					m_simThinkList[m_entinfoIndex[index]].nextThinkTick = pEntity->GetEngineObject()->GetFirstThinkTick();
-					Assert(m_simThinkList[m_entinfoIndex[index]].nextThinkTick >= 0);
-				}
+				m_simThinkList[m_entinfoIndex[index]].nextThinkTick = pEntity->GetEngineObject()->GetFirstThinkTick();
+				Assert(m_simThinkList[m_entinfoIndex[index]].nextThinkTick >= 0);
 			}
 			else
 			{
-				// updating existing entry - if no sim, reset think time
-				if (pEntity->GetEngineObject()->IsEFlagSet(EFL_NO_GAME_PHYSICS_SIMULATION))
-				{
-					m_simThinkList[m_entinfoIndex[index]].nextThinkTick = pEntity->GetEngineObject()->GetFirstThinkTick();
-					Assert(m_simThinkList[m_entinfoIndex[index]].nextThinkTick >= 0);
-				}
-				else
-				{
-					m_simThinkList[m_entinfoIndex[index]].nextThinkTick = 0;
-				}
+				m_simThinkList[m_entinfoIndex[index]].nextThinkTick = 0;
 			}
 		}
 	}
-
-private:
-	unsigned short m_entinfoIndex[NUM_ENT_ENTRIES];
-	CUtlVector<simthinkentry_t>	m_simThinkList;
-};
+}
 
 CSimThinkManager g_SimThinkManager;
-
-CEntityList::CEntityList()
-{
-	m_pItemList = NULL;
-	m_iNumItems = 0;
-}
-
-CEntityList::~CEntityList()
-{
-	// remove all items from the list
-	entitem_t* next, * e = m_pItemList;
-	while (e != NULL)
-	{
-		next = e->pNext;
-		delete e;
-		e = next;
-	}
-	m_pItemList = NULL;
-}
-
-void CEntityList::AddEntity(CBaseEntity* pEnt)
-{
-	// check if it's already in the list; if not, add it
-	entitem_t* e = m_pItemList;
-	while (e != NULL)
-	{
-		if (e->hEnt == pEnt)
-		{
-			// it's already in the list
-			return;
-		}
-
-		if (e->pNext == NULL)
-		{
-			// we've hit the end of the list, so tack it on
-			e->pNext = new entitem_t;
-			e->pNext->hEnt = pEnt;
-			e->pNext->pNext = NULL;
-			m_iNumItems++;
-			return;
-		}
-
-		e = e->pNext;
-	}
-
-	// empty list
-	m_pItemList = new entitem_t;
-	m_pItemList->hEnt = pEnt;
-	m_pItemList->pNext = NULL;
-	m_iNumItems = 1;
-}
-
-void CEntityList::DeleteEntity(CBaseEntity* pEnt)
-{
-	// find the entry in the list and delete it
-	entitem_t* prev = NULL, * e = m_pItemList;
-	while (e != NULL)
-	{
-		// delete the link if it's the matching entity OR if the link is NULL
-		if (e->hEnt == pEnt || e->hEnt == NULL)
-		{
-			if (prev)
-			{
-				prev->pNext = e->pNext;
-			}
-			else
-			{
-				m_pItemList = e->pNext;
-			}
-
-			delete e;
-			m_iNumItems--;
-
-			// REVISIT: Is this correct?  Is this just here to clean out dead EHANDLEs?
-			// restart the loop
-			e = m_pItemList;
-			prev = NULL;
-			continue;
-		}
-
-		prev = e;
-		e = e->pNext;
-	}
-}
 
 class CEntityTouchManager : public IEntityListener<CBaseEntity>
 {
@@ -15754,7 +15655,32 @@ public:
 		g_pEntList->RemoveListenerEntity(this);
 		Clear();
 	}
-	void FrameUpdatePostEntityThink();
+	void FrameUpdatePostEntityThink()
+	{
+		VPROF("CEntityTouchManager::FrameUpdatePostEntityThink");
+		// Loop through all entities again, checking their untouch if flagged to do so
+
+		int count = m_updateList.Count();
+		if (count)
+		{
+			// copy off the list
+			CBaseEntity** ents = (CBaseEntity**)stackalloc(sizeof(CBaseEntity*) * count);
+			memcpy(ents, m_updateList.Base(), sizeof(CBaseEntity*) * count);
+			// clear it
+			m_updateList.RemoveAll();
+
+			// now update those ents
+			for (int i = 0; i < count; i++)
+			{
+				//Assert( ents[i]->GetCheckUntouch() );
+				if (ents[i]->GetEngineObject()->GetCheckUntouch())
+				{
+					ents[i]->GetEngineObject()->PhysicsCheckForEntityUntouch();
+				}
+			}
+			stackfree(ents);
+		}
+	}
 
 	void Clear()
 	{
@@ -15790,36 +15716,6 @@ void EntityTouch_Add(CBaseEntity* pEntity)
 {
 	g_TouchManager.AddEntity(pEntity);
 }
-
-
-void CEntityTouchManager::FrameUpdatePostEntityThink()
-{
-	VPROF("CEntityTouchManager::FrameUpdatePostEntityThink");
-	// Loop through all entities again, checking their untouch if flagged to do so
-
-	int count = m_updateList.Count();
-	if (count)
-	{
-		// copy off the list
-		CBaseEntity** ents = (CBaseEntity**)stackalloc(sizeof(CBaseEntity*) * count);
-		memcpy(ents, m_updateList.Base(), sizeof(CBaseEntity*) * count);
-		// clear it
-		m_updateList.RemoveAll();
-
-		// now update those ents
-		for (int i = 0; i < count; i++)
-		{
-			//Assert( ents[i]->GetCheckUntouch() );
-			if (ents[i]->GetEngineObject()->GetCheckUntouch())
-			{
-				ents[i]->GetEngineObject()->PhysicsCheckForEntityUntouch();
-			}
-		}
-		stackfree(ents);
-	}
-}
-
-
 
 // One hook to rule them all...
 // Since most of the little list managers in here only need one or two of the game

@@ -78,6 +78,36 @@ private:
 	CUtlVector<CBaseEntity*>	m_targetList;
 };
 
+// Manages a list of all entities currently doing game simulation or thinking
+// NOTE: This is usually a small subset of the global entity list, so it's
+// an optimization to maintain this list incrementally rather than polling each
+// frame.
+struct simthinkentry_t
+{
+	unsigned short	entEntry;
+	unsigned short	unused0;
+	int				nextThinkTick;
+};
+
+class CSimThinkManager : public IEntityListener<CBaseEntity>
+{
+public:
+	CSimThinkManager();
+	void Clear();
+	void LevelInitPreEntity();
+	void LevelShutdownPostEntity();
+	void OnEntityCreated(CBaseEntity* pEntity);
+	void OnEntityDeleted(CBaseEntity* pEntity);
+	void RemoveEntinfoIndex(int index);
+	int ListCount();
+	int ListCopy(CBaseEntity* pList[], int listMax);
+	void EntityChanged(CBaseEntity* pEntity);
+
+private:
+	unsigned short m_entinfoIndex[NUM_ENT_ENTRIES];
+	CUtlVector<simthinkentry_t>	m_simThinkList;
+};
+
 class CEngineObjectInternal;
 
 class CEngineObjectNetworkProperty : public CServerNetworkProperty {
@@ -2432,14 +2462,93 @@ struct entitem_t
 class CEntityList
 {
 public:
-	CEntityList();
-	~CEntityList();
+	CEntityList()
+	{
+		m_pItemList = NULL;
+		m_iNumItems = 0;
+	}
 
+	~CEntityList()
+	{
+		// remove all items from the list
+		entitem_t* next, * e = m_pItemList;
+		while (e != NULL)
+		{
+			next = e->pNext;
+			delete e;
+			e = next;
+		}
+		m_pItemList = NULL;
+	}
+
+	void AddEntity(CBaseEntity* pEnt)
+	{
+		// check if it's already in the list; if not, add it
+		entitem_t* e = m_pItemList;
+		while (e != NULL)
+		{
+			if (e->hEnt == pEnt)
+			{
+				// it's already in the list
+				return;
+			}
+
+			if (e->pNext == NULL)
+			{
+				// we've hit the end of the list, so tack it on
+				e->pNext = new entitem_t;
+				e->pNext->hEnt = pEnt;
+				e->pNext->pNext = NULL;
+				m_iNumItems++;
+				return;
+			}
+
+			e = e->pNext;
+		}
+
+		// empty list
+		m_pItemList = new entitem_t;
+		m_pItemList->hEnt = pEnt;
+		m_pItemList->pNext = NULL;
+		m_iNumItems = 1;
+	}
+
+	void DeleteEntity(CBaseEntity* pEnt)
+	{
+		// find the entry in the list and delete it
+		entitem_t* prev = NULL, * e = m_pItemList;
+		while (e != NULL)
+		{
+			// delete the link if it's the matching entity OR if the link is NULL
+			if (e->hEnt == pEnt || e->hEnt == NULL)
+			{
+				if (prev)
+				{
+					prev->pNext = e->pNext;
+				}
+				else
+				{
+					m_pItemList = e->pNext;
+				}
+
+				delete e;
+				m_iNumItems--;
+
+				// REVISIT: Is this correct?  Is this just here to clean out dead EHANDLEs?
+				// restart the loop
+				e = m_pItemList;
+				prev = NULL;
+				continue;
+			}
+
+			prev = e;
+			e = e->pNext;
+		}
+	}
+
+private:
 	int m_iNumItems;
 	entitem_t* m_pItemList;	// null terminated singly-linked list
-
-	void AddEntity(CBaseEntity*);
-	void DeleteEntity(CBaseEntity*);
 };
 
 struct vehiclescript_t
