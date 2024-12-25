@@ -355,7 +355,7 @@ int CCSPlayerAnimState::CalcSequenceIndex( const char *pBaseName, ... )
 	int iSequence = m_namedSequence.Find( szFullName );
 	if ( iSequence == m_namedSequence.InvalidIndex() )
 	{
-		iSequence = GetOuter()->LookupSequence( szFullName );
+		iSequence = GetOuter()->GetEngineObject()->LookupSequence( szFullName );
 		m_namedSequence.Insert( szFullName, iSequence );
 	}
 	else
@@ -364,7 +364,7 @@ int CCSPlayerAnimState::CalcSequenceIndex( const char *pBaseName, ... )
 	}
 
 #if defined(CLIENT_DLL) && defined(_DEBUG)
-	int realSequence = GetOuter()->LookupSequence( szFullName );
+	int realSequence = GetOuter()->GetEngineObject()->LookupSequence( szFullName );
 	Assert( realSequence == iSequence );
 #endif
 	
@@ -586,13 +586,13 @@ int CCSPlayerAnimState::CalcReloadLayerSequence( PlayerAnimEvent_t event )
 	// First, look for <prefix>_reload_<weapon name><_start|_loop|_end>.
 	char szName[512];
 	Q_snprintf( szName, sizeof( szName ), "%s_reload_%s%s", prefix, weaponSuffix, reloadSuffix );
-	int iReloadSequence = m_pOuter->LookupSequence( szName );
+	int iReloadSequence = m_pOuter->GetEngineObject()->LookupSequence( szName );
 	if ( iReloadSequence != -1 )
 		return iReloadSequence;
 
 	// Next, look for reload_<weapon name><_start|_loop|_end>.
 	Q_snprintf( szName, sizeof( szName ), "reload_%s%s", weaponSuffix, reloadSuffix );
-	iReloadSequence = m_pOuter->LookupSequence( szName );
+	iReloadSequence = m_pOuter->GetEngineObject()->LookupSequence( szName );
 	if ( iReloadSequence != -1 )
 		return iReloadSequence;
 
@@ -600,7 +600,7 @@ int CCSPlayerAnimState::CalcReloadLayerSequence( PlayerAnimEvent_t event )
 	if ( pWeapon->GetCSWpnData().m_WeaponType == WEAPONTYPE_PISTOL )
 	{
 		Q_snprintf( szName, sizeof( szName ), "reload_pistol" );
-		iReloadSequence = m_pOuter->LookupSequence( szName );
+		iReloadSequence = m_pOuter->GetEngineObject()->LookupSequence( szName );
 		if ( iReloadSequence != -1 )
 			return iReloadSequence;
 	}

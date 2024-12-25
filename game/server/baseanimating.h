@@ -85,7 +85,6 @@ public:
 	void    ResetEventIndexes ( void );
 
 	int		LookupActivity( const char *label );
-	int		LookupSequence ( const char *label );
 	KeyValues *GetSequenceKeyValues( int iSequence );
 
 

@@ -375,14 +375,6 @@ int CBaseAnimating::LookupActivity( const char *label )
 	return GetEngineObject()->GetModelPtr()->LookupActivity( label );
 }
 
-//=========================================================
-//=========================================================
-int CBaseAnimating::LookupSequence( const char *label )
-{
-	Assert(GetEngineObject()->GetModelPtr() );
-	return GetEngineObject()->GetModelPtr()->LookupSequence( label, SharedRandomSelect);
-}
-
 //-----------------------------------------------------------------------------
 // Purpose:
 // Input  :

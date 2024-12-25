@@ -1558,7 +1558,7 @@ bool C_BaseFlex::StartSceneEvent( CSceneEventInfo *info, CChoreoScene *scene, CC
 //-----------------------------------------------------------------------------
 bool C_BaseFlex::RequestStartSequenceSceneEvent( CSceneEventInfo *info, CChoreoScene *scene, CChoreoEvent *event, CChoreoActor *actor, CBaseEntity *pTarget )
 {
-	info->m_nSequence = LookupSequence( event->GetParameters() );
+	info->m_nSequence = GetEngineObject()->LookupSequence( event->GetParameters() );
 
 	// make sure sequence exists
 	if ( info->m_nSequence < 0 )

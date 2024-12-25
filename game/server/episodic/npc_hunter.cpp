@@ -563,7 +563,7 @@ void CHunterFlechette::SetupGlobalModelData()
 {
 	if ( s_nHunterFlechetteImpact == -2 )
 	{
-		s_nHunterFlechetteImpact = LookupSequence( "impact" );
+		s_nHunterFlechetteImpact = GetEngineObject()->LookupSequence( "impact" );
 		s_nFlechetteFuseAttach = GetEngineObject()->LookupAttachment( "attach_fuse" );
 	}
 }

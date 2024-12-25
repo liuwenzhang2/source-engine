@@ -217,7 +217,7 @@ void C_PortalRagdoll::CreatePortalRagdoll()
 		//GetEngineObject()->SetAbsVelocity( m_vecRagdollVelocity );
 
 		// Hack! Find a neutral standing pose or use the idle.
-		int iSeq = LookupSequence( "ragdoll" );
+		int iSeq = GetEngineObject()->LookupSequence( "ragdoll" );
 		if ( iSeq == -1 )
 		{
 			Assert( false );

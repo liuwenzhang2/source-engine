@@ -981,6 +981,7 @@ public:
 	//virtual bool					RetrieveRagdollInfo(Vector* pos, Quaternion* q);
 	//void UnragdollBlend(IStudioHdr* hdr, Vector pos[], Quaternion q[], float currentTime);
 
+	int								LookupSequence(const char* label);
 	// For prediction
 	int								SelectWeightedSequence(int activity);
 	virtual void					Simulate();

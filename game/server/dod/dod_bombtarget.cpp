@@ -253,7 +253,7 @@ void CDODBombTarget::State_Enter_ARMED( void )
 	params.m_bWarnOnDirectWaveReference = true;
 	g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 
-	static int iWickSeq = LookupSequence( "w_tnt_wick" );
+	static int iWickSeq = GetEngineObject()->LookupSequence( "w_tnt_wick" );
 	GetEngineObject()->ResetSequence( iWickSeq );
 }
 

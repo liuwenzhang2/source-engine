@@ -322,7 +322,7 @@ void CHL1MP_Player::SetAnimation( PLAYER_ANIM playerAnim )
 			Q_strncpy( szAnim, "ref_shoot_" ,sizeof(szAnim));
 		}
 		Q_strncat( szAnim, m_szAnimExtension ,sizeof(szAnim), COPY_ALL_CHARACTERS );
-		animDesired = LookupSequence( szAnim );
+		animDesired = GetEngineObject()->LookupSequence( szAnim );
 		if (animDesired == -1)
 			animDesired = 0;
 
@@ -344,11 +344,11 @@ void CHL1MP_Player::SetAnimation( PLAYER_ANIM playerAnim )
 	{
 		if (GetEngineObject()->GetFlags() & FL_DUCKING )
 		{
-			animDesired = LookupSequence( "crouch_idle" );
+			animDesired = GetEngineObject()->LookupSequence( "crouch_idle" );
 		}
 		else
 		{
-			animDesired = LookupSequence( "look_idle" );
+			animDesired = GetEngineObject()->LookupSequence( "look_idle" );
 		}
 		if (animDesired == -1)
 			animDesired = 0;

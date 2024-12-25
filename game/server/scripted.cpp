@@ -816,7 +816,7 @@ bool CAI_ScriptedSequence::StartSequence( CAI_BaseNPC *pTarget, string_t iszSeq,
 		return false;
 	}
 
-	int nSequence = pTarget->LookupSequence( STRING( iszSeq ) );
+	int nSequence = pTarget->GetEngineObject()->LookupSequence( STRING( iszSeq ) );
 	if (nSequence == -1)
 	{
 		Warning( "%s: unknown scripted sequence \"%s\"\n", pTarget->GetDebugName(), STRING( iszSeq ));

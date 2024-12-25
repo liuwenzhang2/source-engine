@@ -896,7 +896,7 @@ void CPointCommentaryNode::Spawn( void )
 	GetEngineObject()->AddEffects( EF_NOSHADOW );
 
 	// Setup for animation
-	GetEngineObject()->ResetSequence( LookupSequence("idle") );
+	GetEngineObject()->ResetSequence(GetEngineObject()->LookupSequence("idle") );
 	SetThink( &CPointCommentaryNode::SpinThink );
 	GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.1f );
 

@@ -402,7 +402,7 @@ void C_DODRagdoll::CreateLowViolenceRagdoll()
 	{
 		char str[512];
 		Q_snprintf( str, sizeof( str ), "death%d", iAnim );
-		if ( LookupSequence( str ) == -1 )
+		if (GetEngineObject()->LookupSequence( str ) == -1 )
 			break;
 		
 		iMinDeathAnim = MIN( iMinDeathAnim, iAnim );
@@ -419,7 +419,7 @@ void C_DODRagdoll::CreateLowViolenceRagdoll()
 		char str[512];
 		Q_snprintf( str, sizeof( str ), "death%d", iDeathAnim );
 
-		GetEngineObject()->SetSequence( LookupSequence( str ) );
+		GetEngineObject()->SetSequence(GetEngineObject()->LookupSequence( str ) );
 		GetEngineObject()->ForceClientSideAnimationOn();
 
 		//GetEngineObject()->SetNetworkOrigin( m_vecRagdollOrigin );
@@ -480,7 +480,7 @@ void C_DODRagdoll::CreateDODRagdoll()
 
 			//GetEngineObject()->SetAbsVelocity( m_vecRagdollVelocity );
 
-			int iSeq = LookupSequence( "RagdollSpawn" );	// hax, find a neutral standing pose
+			int iSeq = GetEngineObject()->LookupSequence( "RagdollSpawn" );	// hax, find a neutral standing pose
 			if ( iSeq == -1 )
 			{
 				Assert( false );	// missing look_idle?

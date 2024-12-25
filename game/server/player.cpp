@@ -1871,7 +1871,7 @@ void CBasePlayer::SetAnimation( PLAYER_ANIM playerAnim )
 			Q_strncpy( szAnim, "ref_shoot_" ,sizeof(szAnim));
 		}
 		Q_strncat( szAnim, m_szAnimExtension ,sizeof(szAnim), COPY_ALL_CHARACTERS );
-		animDesired = LookupSequence( szAnim );
+		animDesired = GetEngineObject()->LookupSequence( szAnim );
 		if (animDesired == -1)
 			animDesired = 0;
 
@@ -1902,7 +1902,7 @@ void CBasePlayer::SetAnimation( PLAYER_ANIM playerAnim )
 				Q_strncpy( szAnim, "ref_aim_" ,sizeof(szAnim));
 			}
 			Q_strncat( szAnim, m_szAnimExtension,sizeof(szAnim), COPY_ALL_CHARACTERS );
-			animDesired = LookupSequence( szAnim );
+			animDesired = GetEngineObject()->LookupSequence( szAnim );
 			if (animDesired == -1)
 				animDesired = 0;
 			SetActivity( ACT_WALK );

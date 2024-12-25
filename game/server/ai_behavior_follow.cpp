@@ -1843,7 +1843,7 @@ void CAI_FollowBehavior::RunTask( const Task_t *pTask )
 							}
 							else
 							{
-								int iSequence = GetOuter()->LookupSequence(STRING(GetHintNode()->HintActivityName()));
+								int iSequence = GetOuter()->GetEngineObject()->LookupSequence(STRING(GetHintNode()->HintActivityName()));
 								if ( iSequence != ACT_INVALID )
 								{
 									GetNavigator()->SetArrivalSequence( iSequence );

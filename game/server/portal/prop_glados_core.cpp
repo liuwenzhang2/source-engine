@@ -130,7 +130,7 @@ void CPropGladosCore::Spawn( void )
 	BaseClass::Spawn();
 
 	//Default to 'dropped' animation
-	GetEngineObject()->ResetSequence(LookupSequence("drop"));
+	GetEngineObject()->ResetSequence(GetEngineObject()->LookupSequence("drop"));
 	GetEngineObject()->SetCycle( 1.0f );
 
 	DisableAutoFade();
@@ -245,7 +245,7 @@ void CPropGladosCore::InputPanic( inputdata_t &inputdata )
 
 void CPropGladosCore::StartPanic( void )
 {
-	GetEngineObject()->ResetSequence( LookupSequence( STRING(m_iszLookAnimationName) ) );
+	GetEngineObject()->ResetSequence(GetEngineObject()->LookupSequence( STRING(m_iszLookAnimationName) ) );
 	SetThink( &CPropGladosCore::PanicThink );
 	GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.1f );
 }
@@ -314,7 +314,7 @@ void CPropGladosCore::TalkingThink( void )
 
 	// Loop the 'look around' animation after the first line.
 	int iCurSequence = GetEngineObject()->GetSequence();
-	int iLookSequence = LookupSequence( STRING(m_iszLookAnimationName) );
+	int iLookSequence = GetEngineObject()->LookupSequence( STRING(m_iszLookAnimationName) );
 	if ( iCurSequence != iLookSequence && m_iSpeechIter > 0 )
 	{
 		GetEngineObject()->ResetSequence( iLookSequence );
@@ -487,7 +487,7 @@ void CPropGladosCore::OnPhysGunPickup( CBasePlayer* pPhysGunUser, PhysGunPickup_
 	}
 
 	m_bFirstPickup = false;
-	GetEngineObject()->ResetSequence(LookupSequence("turn"));
+	GetEngineObject()->ResetSequence(GetEngineObject()->LookupSequence("turn"));
 
 	// +use always enables motion on these props
 	EnableMotion();

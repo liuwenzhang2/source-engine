@@ -2252,7 +2252,7 @@ void CDynamicProp::PropSetAnim( const char *szAnim )
 	if ( !szAnim )
 		return;
 
-	int nSequence = LookupSequence( szAnim );
+	int nSequence = GetEngineObject()->LookupSequence( szAnim );
 
 	// Set to the desired anim, or default anim if the desired is not present
 	if ( nSequence > ACTIVITY_NOT_AVAILABLE )

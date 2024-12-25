@@ -826,7 +826,7 @@ bool CAI_PassengerBehaviorCompanion::CanEnterVehicleImmediately( int *pResultSeq
 	{
 		// Find the activity for this animation name
 		pTransition = &pEntryAnims->Element(i);
-		nSequence = GetOuter()->LookupSequence( STRING( pTransition->GetAnimationName() ) );
+		nSequence = GetOuter()->GetEngineObject()->LookupSequence( STRING( pTransition->GetAnimationName() ) );
 		if ( nSequence == -1 )
 			continue;
 
@@ -1699,7 +1699,7 @@ int CAI_PassengerBehaviorCompanion::FindEntrySequence( bool bNearest /*= false*/
 	{
 		// Find the activity for this animation name
 		pTransition = &pEntryAnims->Element(i);
-		nSequence = GetOuter()->LookupSequence( STRING( pTransition->GetAnimationName() ) );
+		nSequence = GetOuter()->GetEngineObject()->LookupSequence( STRING( pTransition->GetAnimationName() ) );
 		if ( nSequence == -1 )
 			continue;
 

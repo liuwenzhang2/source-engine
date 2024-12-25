@@ -929,7 +929,7 @@ void CNPC_DeadScientist::Spawn( void )
 	else
 		GetEngineObject()->SetSkin(0);
 
-	GetEngineObject()->SetSequence( LookupSequence( m_szPoses[m_iPose] ) );
+	GetEngineObject()->SetSequence(GetEngineObject()->LookupSequence( m_szPoses[m_iPose] ) );
 
 	if (GetEngineObject()->GetSequence() == -1)
 	{
@@ -1023,14 +1023,14 @@ void CNPC_SittingScientist::Spawn( )
 	SetThink (&CNPC_SittingScientist::SittingThink);
 	GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.1f );
 
-	m_baseSequence = LookupSequence( "sitlookleft" );
+	m_baseSequence = GetEngineObject()->LookupSequence( "sitlookleft" );
 	GetEngineObject()->SetSequence( m_baseSequence + random->RandomInt(0,4) );
 	GetEngineObject()->ResetSequenceInfo( );
 }
 
 void CNPC_SittingScientist::Precache( void )
 {
-	m_baseSequence = LookupSequence( "sitlookleft" );
+	m_baseSequence = GetEngineObject()->LookupSequence( "sitlookleft" );
 	TalkInit();
 }
 

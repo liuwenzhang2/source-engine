@@ -1175,7 +1175,7 @@ void CPropAirboat::Think(void)
 		GetServerVehicle()->HandleEntryExitFinish( m_bExitAnimOn, false );
 
 		// Start the vehicle's idle animation
-		GetEngineObject()->ResetSequence(LookupSequence("propeller_spin1"));
+		GetEngineObject()->ResetSequence(GetEngineObject()->LookupSequence("propeller_spin1"));
 		GetEngineObject()->ResetClientsideFrame();
 	}
 
@@ -1265,7 +1265,7 @@ void CPropAirboat::UpdatePropeller()
 		{
 			SetBodygroup(AIRBOAT_BODYGROUP_PROP, false);
 			SetBodygroup(AIRBOAT_BODYGROUP_BLUR, true);
-			GetEngineObject()->SetSequence(LookupSequence("propeller_spin1"));
+			GetEngineObject()->SetSequence(GetEngineObject()->LookupSequence("propeller_spin1"));
 		}
 	}
 	else if (fabs(m_flSpinRate) > SPIN_RATE_MED)
@@ -1274,7 +1274,7 @@ void CPropAirboat::UpdatePropeller()
 		{
 			SetBodygroup(AIRBOAT_BODYGROUP_PROP, true);
 			SetBodygroup(AIRBOAT_BODYGROUP_BLUR, true);
-			GetEngineObject()->SetSequence(LookupSequence("propeller_spin1"));
+			GetEngineObject()->SetSequence(GetEngineObject()->LookupSequence("propeller_spin1"));
 		}
 	}
 	else
@@ -1283,7 +1283,7 @@ void CPropAirboat::UpdatePropeller()
 		{
 			SetBodygroup(AIRBOAT_BODYGROUP_PROP, true);
 			SetBodygroup(AIRBOAT_BODYGROUP_BLUR, false);
-			GetEngineObject()->SetSequence(LookupSequence("propeller_spin1"));
+			GetEngineObject()->SetSequence(GetEngineObject()->LookupSequence("propeller_spin1"));
 		}
 	}
 
@@ -1764,7 +1764,7 @@ void CPropAirboat::UpdateGunState( CUserCmd *ucmd )
 	{
 		if ( m_nGunState == GUN_STATE_IDLE )
 		{
-//			AddGestureSequence( LookupSequence( "fire_gun" ) );
+//			AddGestureSequence( GetEngineObject()->LookupSequence( "fire_gun" ) );
 			m_nGunState = GUN_STATE_FIRING;
 		}
 

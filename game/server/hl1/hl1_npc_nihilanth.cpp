@@ -764,7 +764,7 @@ void CNPC_Nihilanth::NextActivity( )
 		// at we at power up yet?
 		if (flDist < 128.0)
 		{
-			int iseq = LookupSequence( "recharge" );
+			int iseq = GetEngineObject()->LookupSequence( "recharge" );
 
 			if (iseq != GetEngineObject()->GetSequence())
 			{
@@ -775,7 +775,7 @@ void CNPC_Nihilanth::NextActivity( )
 
 				Msg( "fireing %s\n", szText );
 			}
-			GetEngineObject()->SetSequence ( LookupSequence( "recharge" ) );
+			GetEngineObject()->SetSequence (GetEngineObject()->LookupSequence( "recharge" ) );
 		}
 		else
 		{
@@ -806,13 +806,13 @@ void CNPC_Nihilanth::NextActivity( )
 		{
 			if (m_irritation >= 2 && m_iHealth < sk_nihilanth_health.GetFloat() / 2.0)
 			{
-				GetEngineObject()->SetSequence( LookupSequence( "attack1_open" ) );
+				GetEngineObject()->SetSequence(GetEngineObject()->LookupSequence( "attack1_open" ) );
 			}
 			else 
 			{
 				if ( random->RandomInt(0, 1 ) == 0)
 				{
-					GetEngineObject()->SetSequence( LookupSequence( "attack1" ) ); // zap
+					GetEngineObject()->SetSequence(GetEngineObject()->LookupSequence( "attack1" ) ); // zap
 				}
 				else
 				{
@@ -826,12 +826,12 @@ void CNPC_Nihilanth::NextActivity( )
 
 					if (pTrigger != NULL || pTouch != NULL)
 					{
-						GetEngineObject()->SetSequence( LookupSequence( "attack2" ) ); // teleport
+						GetEngineObject()->SetSequence(GetEngineObject()->LookupSequence( "attack2" ) ); // teleport
 					}
 					else
 					{
 						m_iTeleport++;
-						GetEngineObject()->SetSequence( LookupSequence( "attack1" ) ); // zap
+						GetEngineObject()->SetSequence(GetEngineObject()->LookupSequence( "attack1" ) ); // zap
 					}
 				}
 			}
@@ -959,27 +959,27 @@ void CNPC_Nihilanth::FloatSequence( void )
 {
 	if (m_irritation >= 2)
 	{
-		GetEngineObject()->SetSequence( LookupSequence( "float_open" ) );
+		GetEngineObject()->SetSequence(GetEngineObject()->LookupSequence( "float_open" ) );
 	}
 	else if (m_avelocity.y > 30)
 	{
-		GetEngineObject()->SetSequence( LookupSequence( "walk_r" ) );
+		GetEngineObject()->SetSequence(GetEngineObject()->LookupSequence( "walk_r" ) );
 	}
 	else if (m_avelocity.y < -30)
 	{
-		GetEngineObject()->SetSequence( LookupSequence( "walk_l" ) );
+		GetEngineObject()->SetSequence(GetEngineObject()->LookupSequence( "walk_l" ) );
 	}
 	else if (m_velocity.z > 30)
 	{
-		GetEngineObject()->SetSequence( LookupSequence( "walk_u" ) );
+		GetEngineObject()->SetSequence(GetEngineObject()->LookupSequence( "walk_u" ) );
 	} 
 	else if (m_velocity.z < -30)
 	{
-		GetEngineObject()->SetSequence( LookupSequence( "walk_d" ) );
+		GetEngineObject()->SetSequence(GetEngineObject()->LookupSequence( "walk_d" ) );
 	}
 	else
 	{
-		GetEngineObject()->SetSequence( LookupSequence( "float" ) );
+		GetEngineObject()->SetSequence(GetEngineObject()->LookupSequence( "float" ) );
 	}
 }
 
@@ -1037,7 +1037,7 @@ void CNPC_Nihilanth::DyingThink( void )
 			 qAngularVel.y = 100;
 
 		SetLocalAngularVelocity( qAngularVel );
-		GetEngineObject()->SetSequence( LookupSequence( "die1" ) );
+		GetEngineObject()->SetSequence(GetEngineObject()->LookupSequence( "die1" ) );
 	}
 
 	if ( m_pBall )

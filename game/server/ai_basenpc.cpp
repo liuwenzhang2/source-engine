@@ -6422,7 +6422,7 @@ void CAI_BaseNPC::OnChangeActivity( Activity eNewActivity )
 //=========================================================
 void CAI_BaseNPC::SetSequenceByName( const char *szSequence )
 {
-	int iSequence = LookupSequence( szSequence );
+	int iSequence = GetEngineObject()->LookupSequence( szSequence );
 
 	if ( iSequence > ACTIVITY_NOT_AVAILABLE )
 		SetSequenceById( iSequence );
@@ -6902,7 +6902,7 @@ void CAI_BaseNPC::NPCInit ( void )
 		const char *pStartSequence = CAI_ScriptedSequence::GetSpawnPreIdleSequenceForScript( this );
 		if ( pStartSequence )
 		{
-			GetEngineObject()->SetSequence( LookupSequence( pStartSequence ) );
+			GetEngineObject()->SetSequence(GetEngineObject()->LookupSequence( pStartSequence ) );
 		}
 	}
 
@@ -8371,7 +8371,7 @@ void CAI_BaseNPC::HandleAnimEvent( animevent_t *pEvent )
 		CBaseCombatWeapon *pWeapon = GetActiveWeapon();
 		if ((pWeapon) && (pEvent->options))
 		{
-			int nSequence = pWeapon->LookupSequence(pEvent->options);
+			int nSequence = pWeapon->GetEngineObject()->LookupSequence(pEvent->options);
 			if (nSequence != -1)
 			{
 				pWeapon->GetEngineObject()->ResetSequence(nSequence);
@@ -11187,7 +11187,7 @@ int CAI_BaseNPC::Restore( IRestore &restore )
 	bool bLostSequence = false;
 	if ( saveHeader.version >= AI_EXTENDED_SAVE_HEADER_FIRST_VERSION_WITH_SEQUENCE && saveHeader.szSequence[0] && GetEngineObject()->GetModelPtr() )
 	{
-		GetEngineObject()->SetSequence( LookupSequence( saveHeader.szSequence ) );
+		GetEngineObject()->SetSequence(GetEngineObject()->LookupSequence( saveHeader.szSequence ) );
 		if (GetEngineObject()->GetSequence() == ACT_INVALID )
 		{
 			DevMsg( this, AIMF_IGNORE_SELECTED, "Discarding missing sequence %s on load.\n", saveHeader.szSequence );
@@ -13558,12 +13558,12 @@ void CAI_BaseNPC::CalculateValidEnemyInteractions( void )
 			const char *pszSequence = GetScriptedNPCInteractionSequence( pInteraction, SNPCINT_SEQUENCE );
 			if ( !pszSequence )
 				continue;
-			if ( pNPC->LookupSequence( pszSequence ) == -1 )
+			if ( pNPC->GetEngineObject()->LookupSequence( pszSequence ) == -1 )
 				continue;
 		}
 		else
 		{
-			if ( pNPC->LookupSequence( STRING(pInteraction->sPhases[SNPCINT_SEQUENCE].iszSequence) ) == -1 )
+			if ( pNPC->GetEngineObject()->LookupSequence( STRING(pInteraction->sPhases[SNPCINT_SEQUENCE].iszSequence) ) == -1 )
 				continue;
 		}
 
@@ -13924,13 +13924,13 @@ void CAI_BaseNPC::InputForceInteractionWithNPC( inputdata_t &inputdata )
 				// Other NPC may have all the matching sequences, but just without the activity specified.
 				// Lets find a single sequence for us, and ensure they have a matching one.
 				int iMySeq = GetEngineObject()->SelectWeightedSequence( (Activity)m_ScriptedInteractions[i].sPhases[SNPCINT_SEQUENCE].iActivity );
-				if ( pNPC->LookupSequence( GetSequenceName(iMySeq) ) == -1 )
+				if ( pNPC->GetEngineObject()->LookupSequence( GetSequenceName(iMySeq) ) == -1 )
 					continue;
 			}
 		}
 		else
 		{
-			if ( pNPC->LookupSequence( STRING(m_ScriptedInteractions[i].sPhases[SNPCINT_SEQUENCE].iszSequence) ) == -1 )
+			if ( pNPC->GetEngineObject()->LookupSequence( STRING(m_ScriptedInteractions[i].sPhases[SNPCINT_SEQUENCE].iszSequence) ) == -1 )
 				continue;
 		}
 

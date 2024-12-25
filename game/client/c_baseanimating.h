@@ -233,7 +233,6 @@ public:
 	//virtual int GetSkin()			{ return GetEngineObject()->GetSkin(); }
 
 	void							GetBlendedLinearVelocity( Vector *pVec );
-	int								LookupSequence ( const char *label );
 	int								LookupActivity( const char *label );
 	char const						*GetSequenceName( int iSequence ); 
 	char const						*GetSequenceActivityName( int iSequence );

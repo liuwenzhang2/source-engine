@@ -475,6 +475,7 @@ public:
 	
 	virtual IPhysicsObject* GetGroundVPhysics() = 0;
 	virtual bool IsRideablePhysics(IPhysicsObject* pPhysics) = 0;
+	virtual int LookupSequence(const char* label) = 0;
 	virtual int SelectWeightedSequence(int activity) = 0;
 	virtual int SelectWeightedSequence(int activity, int curSequence) = 0;
 	virtual int SelectHeaviestSequence(int activity) = 0;

@@ -199,7 +199,7 @@ void CCycler::InputSetSequence( inputdata_t &inputdata )
 		if ( !iSeqNum && sChar[0] != '0' )
 		{
 			// Treat it as a sequence name
-			GetEngineObject()->ResetSequence( LookupSequence( sChar ) );
+			GetEngineObject()->ResetSequence(GetEngineObject()->LookupSequence( sChar ) );
 		}
 		else
 		{
@@ -454,7 +454,7 @@ void CBlendingCycler::Spawn( void )
 	// Initialise Sequence
 	if (m_iszSequence != NULL_STRING)
 	{
-		GetEngineObject()->SetSequence( LookupSequence( STRING(m_iszSequence) ) );
+		GetEngineObject()->SetSequence(GetEngineObject()->LookupSequence( STRING(m_iszSequence) ) );
 	}
 
 	m_iCurrent = m_iLowerBound;

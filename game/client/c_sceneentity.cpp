@@ -1152,7 +1152,7 @@ void C_SceneEntity::PrefetchAnimBlocks( CChoreoScene *pScene )
 
 					if ( pFlex )
 					{
-						int iSequence = pFlex->LookupSequence( pEvent->GetParameters() );
+						int iSequence = pFlex->GetEngineObject()->LookupSequence( pEvent->GetParameters() );
 						if ( iSequence >= 0 )
 						{
 							IStudioHdr *pStudioHdr = pFlex->GetEngineObject()->GetModelPtr();

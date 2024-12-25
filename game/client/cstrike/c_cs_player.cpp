@@ -370,7 +370,7 @@ void C_CSRagdoll::CreateLowViolenceRagdoll( void )
 	{
 		char str[512];
 		Q_snprintf( str, sizeof( str ), "death%d", iAnim );
-		if ( LookupSequence( str ) == -1 )
+		if (GetEngineObject()->LookupSequence( str ) == -1 )
 			break;
 
 		iMinDeathAnim = MIN( iMinDeathAnim, iAnim );
@@ -403,7 +403,7 @@ void C_CSRagdoll::CreateLowViolenceRagdoll( void )
 	int iDeathAnim = RandomInt( iMinDeathAnim, iMaxDeathAnim );
 	char str[512];
 	Q_snprintf( str, sizeof( str ), "death%d", iDeathAnim );
-	GetEngineObject()->SetSequence( LookupSequence( str ) );
+	GetEngineObject()->SetSequence(GetEngineObject()->LookupSequence( str ) );
 	GetEngineObject()->ForceClientSideAnimationOn();
 
 	GetEngineObject()->Interp_Reset();
@@ -450,7 +450,7 @@ void C_CSRagdoll::CreateCSRagdoll()
 
 			//GetEngineObject()->SetAbsVelocity( m_vecRagdollVelocity );
 
-			int iSeq = LookupSequence( "walk_lower" );
+			int iSeq = GetEngineObject()->LookupSequence( "walk_lower" );
 			if ( iSeq == -1 )
 			{
 				Assert( false );	// missing walk_lower?

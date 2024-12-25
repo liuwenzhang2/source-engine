@@ -925,7 +925,7 @@ void CNPC_DeadBarney::Spawn( void )
 
 	SetRenderColor( 255, 255, 255, 255 );
 
-	GetEngineObject()->SetSequence( m_iDesiredSequence = LookupSequence( m_szPoses[m_iPose] ) );
+	GetEngineObject()->SetSequence( m_iDesiredSequence = GetEngineObject()->LookupSequence( m_szPoses[m_iPose] ) );
 	if (GetEngineObject()->GetSequence() == -1 )
 	{
 		Msg ( "Dead barney with bad pose\n" );

@@ -393,12 +393,12 @@ void CNPC_RocketTurret::Spawn( void )
 	if ( m_bEnabled )
 	{
 		m_iLaserState = 1;
-		GetEngineObject()->SetSequence(LookupSequence("idle"));
+		GetEngineObject()->SetSequence(GetEngineObject()->LookupSequence("idle"));
 	}
 	else
 	{
 		m_iLaserState = 0;
-		GetEngineObject()->SetSequence(LookupSequence("inactive"));
+		GetEngineObject()->SetSequence(GetEngineObject()->LookupSequence("inactive"));
 	}
 	GetEngineObject()->SetCycle(1.0f);
 	UpdateSkin( ROCKET_SKIN_IDLE );
@@ -539,7 +539,7 @@ void CNPC_RocketTurret::SearchThink()
 	if ( PreThink() || GetEnemy() == NULL )
 		return;
 
-	GetEngineObject()->SetSequence ( LookupSequence( "idle" ) );
+	GetEngineObject()->SetSequence (GetEngineObject()->LookupSequence( "idle" ) );
 	UpdateAimPoint();
 
 	//Update our think time
@@ -595,7 +595,7 @@ void CNPC_RocketTurret::FollowThink( void )
 		SetEnemy(ToBasePlayer(EntityList()->GetLocalPlayer()) );
 	}
 
-	GetEngineObject()->SetSequence ( LookupSequence( "idle" ) );
+	GetEngineObject()->SetSequence (GetEngineObject()->LookupSequence( "idle" ) );
 	//Allow descended classes a chance to do something before the think function
 	if ( PreThink() || GetEnemy() == NULL )
 	{
@@ -703,7 +703,7 @@ void CNPC_RocketTurret::LockingThink( void )
 			//g_pSoundEmitterSystem->EmitSound(this, ROCKET_TURRET_SOUND_LOCKED, gpGlobals->curtime + ROCKET_TURRET_HALF_LOCKON_TIME);
 		}
 
-		GetEngineObject()->ResetSequence(LookupSequence("load"));
+		GetEngineObject()->ResetSequence(GetEngineObject()->LookupSequence("load"));
 
 		// Change lockon sprite
 		UpdateSkin( ROCKET_SKIN_LOCKING );
@@ -779,7 +779,7 @@ void CNPC_RocketTurret::FireRocket ( void )
 	params.m_pflSoundDuration = NULL;
 	params.m_bWarnOnDirectWaveReference = true;
 	g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
-	GetEngineObject()->ResetSequence(LookupSequence("fire"));
+	GetEngineObject()->ResetSequence(GetEngineObject()->LookupSequence("fire"));
 
 	pRocket->SetThink( NULL );
 	pRocket->GetEngineObject()->SetMoveType( MOVETYPE_FLY );
@@ -1171,7 +1171,7 @@ void CNPC_RocketTurret::Enable( void )
 		return;
 
 	m_bEnabled = true;
-	GetEngineObject()->ResetSequence( LookupSequence("open") );
+	GetEngineObject()->ResetSequence(GetEngineObject()->LookupSequence("open") );
 
 	SetThink( &CNPC_RocketTurret::OpeningThink );
 	GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.05 );
@@ -1188,7 +1188,7 @@ void CNPC_RocketTurret::Disable( void )
 	UpdateSkin( ROCKET_SKIN_IDLE );
 
 	m_bEnabled = false;
-	GetEngineObject()->ResetSequence(LookupSequence("close"));
+	GetEngineObject()->ResetSequence(GetEngineObject()->LookupSequence("close"));
 
 	SetThink( &CNPC_RocketTurret::ClosingThink );
 	GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.05 );

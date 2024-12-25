@@ -440,7 +440,7 @@ void CModelPanel::SetupModel( void )
 		}
 		else if ( pAnim->m_pszSequence && pAnim->m_pszSequence[0] )
 		{
-			sequence = pEnt->LookupSequence( pAnim->m_pszSequence );
+			sequence = pEnt->GetEngineObject()->LookupSequence( pAnim->m_pszSequence );
 		}
 		if ( sequence != ACT_INVALID )
 		{
@@ -728,7 +728,7 @@ bool CModelPanel::SetSequence( const char *pszName )
 
 		if ( m_hModel.Get() )
 		{
-			int sequence = m_hModel->LookupSequence( pszAnim );
+			int sequence = m_hModel->GetEngineObject()->LookupSequence( pszAnim );
 			if ( sequence != ACT_INVALID )
 			{
 				m_hModel->GetEngineObject()->ResetSequence( sequence );

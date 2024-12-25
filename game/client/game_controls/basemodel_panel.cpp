@@ -16,6 +16,11 @@ using namespace vgui;
 extern float GetAutoPlayTime( void );
 DECLARE_BUILD_FACTORY( CBaseModelPanel );
 
+int RandomSelectSequence(int iMinVal, int iMaxVal, int additionalSeed)
+{
+	return RandomInt(iMinVal, iMaxVal);
+}
+
 //-----------------------------------------------------------------------------
 // Purpose:
 //-----------------------------------------------------------------------------
@@ -262,7 +267,7 @@ void CBaseModelPanel::SetModelAnim( int iAnim )
 	}
 	else if ( m_BMPResData.m_aAnimations[iAnim].m_pszSequence && m_BMPResData.m_aAnimations[iAnim].m_pszSequence[0] )
 	{
-		iSequence = pStudioHdr->LookupSequence( m_BMPResData.m_aAnimations[iAnim].m_pszSequence, SharedRandomSelect);
+		iSequence = pStudioHdr->LookupSequence( m_BMPResData.m_aAnimations[iAnim].m_pszSequence, RandomSelectSequence);
 	}
 	
 	if ( iSequence != ACT_INVALID )
@@ -591,7 +596,7 @@ QAngle CBaseModelPanel::GetPlayerAngles() const
 void CBaseModelPanel::PlaySequence( const char *pszSequenceName )
 {
 	IStudioHdr* studioHDR = GetStudioHdr();//g_pMDLCache->GetIStudioHdr( )
-	int iSeq = studioHDR->LookupSequence( pszSequenceName, SharedRandomSelect);
+	int iSeq = studioHDR->LookupSequence( pszSequenceName, RandomSelectSequence);
 	if ( iSeq != ACT_INVALID )
 	{
 		m_nActiveSequence = iSeq;

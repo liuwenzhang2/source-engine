@@ -837,6 +837,7 @@ public:
 	IPhysicsObject* GetGroundVPhysics();
 	bool IsRideablePhysics(IPhysicsObject* pPhysics);
 
+	int		LookupSequence(const char* label);
 	int		SelectWeightedSequence(int activity);
 	int		SelectWeightedSequence(int activity, int curSequence);
 	int		SelectHeaviestSequence(int activity);

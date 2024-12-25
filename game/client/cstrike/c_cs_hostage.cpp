@@ -102,7 +102,7 @@ bool C_LowViolenceHostageDeathModel::SetupLowViolenceModel( C_CHostage *pHostage
 	}
 
 	// Play the low-violence death anim
-	if ( LookupSequence( "death1" ) == -1 )
+	if (GetEngineObject()->LookupSequence( "death1" ) == -1 )
 	{
 		EntityList()->DestroyEntity(this); //Release();
 		return false;
@@ -111,7 +111,7 @@ bool C_LowViolenceHostageDeathModel::SetupLowViolenceModel( C_CHostage *pHostage
 	m_flFadeOutStart = gpGlobals->curtime + 5.0f;
 	SetNextClientThink( CLIENT_THINK_ALWAYS );
 
-	GetEngineObject()->SetSequence( LookupSequence( "death1" ) );
+	GetEngineObject()->SetSequence(GetEngineObject()->LookupSequence( "death1" ) );
 	GetEngineObject()->ForceClientSideAnimationOn();
 
 	if ( pHostage && !pHostage->IsDormant() )

@@ -825,7 +825,7 @@ void UpdateClassImageEntity(
 		pPlayerModel->GetEngineObject()->AddEffects( EF_NODRAW ); // don't let the renderer draw the model normally
 
 		// let player walk ahead
-		pPlayerModel->GetEngineObject()->SetSequence( pPlayerModel->LookupSequence( "walk_lower" ) );
+		pPlayerModel->GetEngineObject()->SetSequence( pPlayerModel->GetEngineObject()->LookupSequence( "walk_lower" ) );
 		pPlayerModel->GetEngineObject()->SetPoseParameter( "move_yaw", 0.0f ); // move_yaw
 		pPlayerModel->GetEngineObject()->SetPoseParameter( "body_pitch", 10.0f ); // body_pitch, look down a bit
 		pPlayerModel->GetEngineObject()->SetPoseParameter( "body_yaw", 0.0f ); // body_yaw
@@ -880,13 +880,13 @@ void UpdateClassImageEntity(
 	// wacky hacky, set upper body animation
 	pPlayerModel->m_SequenceTransitioner.CheckForSequenceChange( 
 		pPlayerModel->GetEngineObject()->GetModelPtr(),
-		pPlayerModel->LookupSequence( "walk_lower" ),
+		pPlayerModel->GetEngineObject()->LookupSequence( "walk_lower" ),
 		false,
 		true
 	);
 	pPlayerModel->m_SequenceTransitioner.UpdateCurrent( 
 		pPlayerModel->GetEngineObject()->GetModelPtr(),
-		pPlayerModel->LookupSequence( "walk_lower" ),
+		pPlayerModel->GetEngineObject()->LookupSequence( "walk_lower" ),
 		pPlayerModel->GetEngineObject()->GetCycle(),
 		pPlayerModel->GetEngineObject()->GetPlaybackRate(),
 		gpGlobals->realtime
@@ -901,9 +901,9 @@ void UpdateClassImageEntity(
 
 		layer->m_flCycle = pPlayerModel->GetEngineObject()->GetCycle();
 		if ( i )
-			layer->m_nSequence = pPlayerModel->LookupSequence( pWeaponSequence );
+			layer->m_nSequence = pPlayerModel->GetEngineObject()->LookupSequence( pWeaponSequence );
 		else
-			layer->m_nSequence = pPlayerModel->LookupSequence( "walk_lower" );
+			layer->m_nSequence = pPlayerModel->GetEngineObject()->LookupSequence( "walk_lower" );
 
 		layer->m_flPlaybackRate = 1.0;
 		layer->m_flWeight = 1.0f;

@@ -658,7 +658,7 @@ int CAI_PassengerBehavior::FindEntrySequence( bool bNearest /*= false*/ )
 	{
 		// Find the activity for this animation name
 		pTransition = &pEntryAnims->Element(i);
-		nSequence = GetOuter()->LookupSequence( STRING( pTransition->GetAnimationName() ) );
+		nSequence = GetOuter()->GetEngineObject()->LookupSequence( STRING( pTransition->GetAnimationName() ) );
 		if ( nSequence == -1 )
 			continue;
 
@@ -710,7 +710,7 @@ int CAI_PassengerBehavior::FindExitSequence( void )
 	for ( int i = 0; i < pExitAnims->Count(); i++ )
 	{
 		// Find the activity for this animation name
-		int nSequence = GetOuter()->LookupSequence( STRING( pExitAnims->Element(i).GetAnimationName() ) );
+		int nSequence = GetOuter()->GetEngineObject()->LookupSequence( STRING( pExitAnims->Element(i).GetAnimationName() ) );
 		if ( nSequence == -1 )
 			continue;
 

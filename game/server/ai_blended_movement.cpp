@@ -472,7 +472,7 @@ int CAI_BlendedMotor::GetInteriorSequence( int fromSequence )
 
 			if (activity == ACT_INVALID || m_nInteriorSequence == ACT_INVALID)
 			{
-				m_nInteriorSequence = GetOuter()->LookupSequence( szActivity );
+				m_nInteriorSequence = GetOuter()->GetEngineObject()->LookupSequence( szActivity );
 			}
 		}
 	}

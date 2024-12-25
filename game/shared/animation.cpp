@@ -44,25 +44,3 @@
 
 
 
-
-
-
-#if !defined( MAKEXVCD )
-bool IsInPrediction()
-{
-	return EntityList()->GetPredictionPlayer() != NULL;
-}
-
-int SharedRandomSelect(int iMinVal, int iMaxVal) {
-	if (EntityList()->GetPredictionPlayer() != NULL)
-	{
-		return SharedRandomInt("SelectWeightedSequence", iMinVal, iMaxVal);
-	}
-	else
-	{
-		return RandomInt(iMinVal, iMaxVal);
-	}
-}
-#endif
-
-

@@ -1611,7 +1611,7 @@ bool CAI_ActBusyBehavior::HasAnimForActBusy( int iActBusy, busyanimparts_t AnimP
 
 	// Try and play the sequence first
 	if ( pBusyAnim->iszSequences[AnimPart] != NULL_STRING )
-		return (GetOuter()->LookupSequence( (char*)STRING(pBusyAnim->iszSequences[AnimPart]) ) != ACTIVITY_NOT_AVAILABLE);
+		return (GetOuter()->GetEngineObject()->LookupSequence( (char*)STRING(pBusyAnim->iszSequences[AnimPart]) ) != ACTIVITY_NOT_AVAILABLE);
 
 	// Try and play the activity second
 	if ( pBusyAnim->iActivities[AnimPart] != ACT_INVALID )
@@ -1949,7 +1949,7 @@ void CAI_ActBusyBehavior::StartTask( const Task_t *pTask )
 					// Try and play the sequence first
 					if ( pBusyAnim->iszSequences[BA_BUSY] != NULL_STRING )
 					{
-						GetNavigator()->SetArrivalSequence( GetOuter()->LookupSequence( STRING(pBusyAnim->iszSequences[BA_BUSY]) ) );
+						GetNavigator()->SetArrivalSequence( GetOuter()->GetEngineObject()->LookupSequence( STRING(pBusyAnim->iszSequences[BA_BUSY]) ) );
 					}
 					else if ( pBusyAnim->iActivities[BA_BUSY] != ACT_INVALID )
 					{
@@ -1962,7 +1962,7 @@ void CAI_ActBusyBehavior::StartTask( const Task_t *pTask )
 					// Robin: Set the arrival sequence / activity to be the entry animation.
 					if ( pBusyAnim->iszSequences[BA_ENTRY] != NULL_STRING )
 					{
-						GetNavigator()->SetArrivalSequence( GetOuter()->LookupSequence( STRING(pBusyAnim->iszSequences[BA_ENTRY]) ) );
+						GetNavigator()->SetArrivalSequence( GetOuter()->GetEngineObject()->LookupSequence( STRING(pBusyAnim->iszSequences[BA_ENTRY]) ) );
 					}
 					else if ( pBusyAnim->iActivities[BA_ENTRY] != ACT_INVALID )
 					{

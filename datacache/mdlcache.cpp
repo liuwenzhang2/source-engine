@@ -3702,7 +3702,7 @@ int CActivityToSequenceMapping::SelectWeightedSequence(CStudioHdr* pstudiohdr, i
 	// generate a random number from 0 to the total weight
 	int randomValue;
 	if (pRandomWeightFunc) {
-		randomValue = (*pRandomWeightFunc)(0, weighttotal - 1);
+		randomValue = pRandomWeightFunc(0, weighttotal - 1, 0);
 	}
 	else {
 		Error("pRandomWeightFunc must not been NULL");
@@ -7135,12 +7135,7 @@ int CStudioHdr::SelectWeightedSequence(int activity, int curSequence, RandomWeig
 			}
 			weighttotal += iabs(weight);
 
-			int randomValue;
-
-			if (IsInPrediction())
-				randomValue = SharedRandomInt("SelectWeightedSequence", 0, weighttotal - 1, i);
-			else
-				randomValue = RandomInt(0, weighttotal - 1);
+			int randomValue = pRandomWeightFunc(0, weighttotal - 1, i);
 
 			if (!weighttotal || randomValue < iabs(weight))
 				seq = i;

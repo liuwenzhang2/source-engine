@@ -144,7 +144,7 @@ void CPropVehicleViewController::InputForcePlayerIn( inputdata_t &inputdata )
 	int iEntryAnim = ACTIVITY_NOT_AVAILABLE;
 	if ( inputdata.value.StringID() != NULL_STRING )
 	{
-		iEntryAnim = LookupSequence( inputdata.value.String() );
+		iEntryAnim = GetEngineObject()->LookupSequence( inputdata.value.String() );
 		if ( iEntryAnim == ACTIVITY_NOT_AVAILABLE )
 		{
 			Warning("vehicle_viewcontroller %s could not find specified entry animation %s\n", STRING(GetEntityName()), inputdata.value.String() );

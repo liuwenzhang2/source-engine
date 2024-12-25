@@ -433,7 +433,7 @@ void CPropCombineBall::StartAnimating( void )
 	// Start our animation cycle. Use the random to avoid everything thinking the same frame
 	SetContextThink( &CPropCombineBall::AnimThink, gpGlobals->curtime + random->RandomFloat( 0.0f, 0.1f), s_pAnimThinkContext );
 
-	int nSequence = LookupSequence( "idle" );
+	int nSequence = GetEngineObject()->LookupSequence( "idle" );
 
 	GetEngineObject()->SetCycle( 0 );
 	GetEngineObject()->SetAnimTime(gpGlobals->curtime);

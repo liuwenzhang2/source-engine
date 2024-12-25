@@ -498,7 +498,7 @@ void CNewRecharge::Spawn()
 	SetModel( HEALTH_CHARGER_MODEL_NAME );
 	GetEngineObject()->AddEffects( EF_NOSHADOW );
 
-	GetEngineObject()->ResetSequence( LookupSequence( "idle" ) );
+	GetEngineObject()->ResetSequence(GetEngineObject()->LookupSequence( "idle" ) );
 
 	SetInitialCharge();
 
@@ -604,7 +604,7 @@ void CNewRecharge::InputRecharge( inputdata_t &inputdata )
 
 void CNewRecharge::InputSetCharge( inputdata_t &inputdata )
 {
-	GetEngineObject()->ResetSequence( LookupSequence( "idle" ) );
+	GetEngineObject()->ResetSequence(GetEngineObject()->LookupSequence( "idle" ) );
 
 	int iJuice = inputdata.value.Int();
 
@@ -658,7 +658,7 @@ void CNewRecharge::Use( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE 
 	if ( m_iJuice <= 0 )
 	{
 		// Start our deny animation over again
-		GetEngineObject()->ResetSequence( LookupSequence( "emptyclick" ) );
+		GetEngineObject()->ResetSequence(GetEngineObject()->LookupSequence( "emptyclick" ) );
 		
 		m_nState = 1;
 		
@@ -791,7 +791,7 @@ void CNewRecharge::Recharge(void)
 	params.m_pflSoundDuration = NULL;
 	params.m_bWarnOnDirectWaveReference = true;
 	g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
-	GetEngineObject()->ResetSequence( LookupSequence( "idle" ) );
+	GetEngineObject()->ResetSequence(GetEngineObject()->LookupSequence( "idle" ) );
 
 	UpdateJuice( MaxJuice() );
 

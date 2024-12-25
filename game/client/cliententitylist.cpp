@@ -7450,6 +7450,35 @@ bool C_EngineObjectInternal::IsAboutToRagdoll() const
 //	}
 //}
 
+#if !defined( MAKEXVCD )
+bool IsInPrediction()
+{
+	return g_EntityList.GetPredictionPlayer() != NULL;
+}
+
+int SharedRandomSelect(int iMinVal, int iMaxVal, int additionalSeed) {
+	if (g_EntityList.GetPredictionPlayer() != NULL)
+	{
+		return SharedRandomInt("SelectWeightedSequence", iMinVal, iMaxVal, additionalSeed);
+	}
+	else
+	{
+		return RandomInt(iMinVal, iMaxVal);
+	}
+}
+#endif
+
+//-----------------------------------------------------------------------------
+// Purpose: 
+// Input  : *label - 
+// Output : int
+//-----------------------------------------------------------------------------
+int C_EngineObjectInternal::LookupSequence(const char* label)
+{
+	Assert(GetModelPtr());
+	return GetModelPtr()->LookupSequence(label, SharedRandomSelect);
+}
+
 //-----------------------------------------------------------------------------
 // Purpose: 
 // Input  : activity - 

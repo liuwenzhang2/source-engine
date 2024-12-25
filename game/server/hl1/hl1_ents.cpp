@@ -866,7 +866,7 @@ void CNPC_DeadHEV::Spawn( void )
 	GetEngineObject()->SetBody(1);
 	m_bloodColor		= BLOOD_COLOR_RED;
 
-	GetEngineObject()->SetSequence( LookupSequence( m_szPoses[m_iPose] ) );
+	GetEngineObject()->SetSequence(GetEngineObject()->LookupSequence( m_szPoses[m_iPose] ) );
 
 	if (GetEngineObject()->GetSequence() == -1 )
 	{

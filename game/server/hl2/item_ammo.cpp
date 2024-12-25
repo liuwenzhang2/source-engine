@@ -755,7 +755,7 @@ void CItem_AmmoCrate::Spawn( void )
 	GetEngineObject()->SetSolid( SOLID_VPHYSICS );
 	CreateVPhysics();
 
-	GetEngineObject()->ResetSequence( LookupSequence( "Idle" ) );
+	GetEngineObject()->ResetSequence(GetEngineObject()->LookupSequence( "Idle" ) );
 	SetBodygroup( 1, true );
 
 	m_flCloseTime = gpGlobals->curtime;
@@ -824,7 +824,7 @@ void CItem_AmmoCrate::Use( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TY
 
 	m_OnUsed.FireOutput( pActivator, this );
 
-	int iSequence = LookupSequence( "Open" );
+	int iSequence = GetEngineObject()->LookupSequence( "Open" );
 
 	// See if we're not opening already
 	if (GetEngineObject()->GetSequence() != iSequence )
@@ -953,14 +953,14 @@ void CItem_AmmoCrate::CrateThink( void )
 	GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.1f );
 
 	// Start closing if we're not already
-	if (GetEngineObject()->GetSequence() != LookupSequence( "Close" ) )
+	if (GetEngineObject()->GetSequence() != GetEngineObject()->LookupSequence( "Close" ) )
 	{
 		// Not ready to close?
 		if ( m_flCloseTime <= gpGlobals->curtime )
 		{
 			m_hActivator = NULL;
 
-			GetEngineObject()->ResetSequence( LookupSequence( "Close" ) );
+			GetEngineObject()->ResetSequence(GetEngineObject()->LookupSequence( "Close" ) );
 		}
 	}
 	else
@@ -976,7 +976,7 @@ void CItem_AmmoCrate::CrateThink( void )
 			// FIXME: We're resetting the sequence here
 			// but setting Think to NULL will cause this to never have
 			// StudioFrameAdvance called. What are the consequences of that?
-			GetEngineObject()->ResetSequence( LookupSequence( "Idle" ) );
+			GetEngineObject()->ResetSequence(GetEngineObject()->LookupSequence( "Idle" ) );
 			SetBodygroup( 1, true );
 		}
 	}

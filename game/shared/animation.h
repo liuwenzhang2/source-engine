@@ -13,7 +13,4 @@ struct animevent_t;
 class IStudioHdr;
 struct mstudioseqdesc_t;
 
-int SharedRandomSelect(int iMinVal, int iMaxVal);
-
-
 #endif	//ANIMATION_H

@@ -2111,7 +2111,7 @@ struct vertexFileFixup_t
 class IDataCache;
 class IMDLCache;
 
-typedef int (*RandomWeightFunc)(int iMinVal, int iMaxVal);
+typedef int (*RandomWeightFunc)(int iMinVal, int iMaxVal, int additionalSeed);
 
 struct animevent_t
 {

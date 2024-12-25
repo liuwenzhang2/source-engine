@@ -437,7 +437,7 @@ void CBaseFlex::AddSceneEvent( CChoreoScene *scene, CChoreoEvent *event, CBaseEn
 
 bool CBaseFlex::RequestStartSequenceSceneEvent( CSceneEventInfo *info, CChoreoScene *scene, CChoreoEvent *event, CChoreoActor *actor, CBaseEntity *pTarget )
 {
-	info->m_nSequence = LookupSequence( event->GetParameters() );
+	info->m_nSequence = GetEngineObject()->LookupSequence( event->GetParameters() );
 
 	// make sure sequence exists
 	if (info->m_nSequence < 0)
@@ -455,7 +455,7 @@ bool CBaseFlex::RequestStartSequenceSceneEvent( CSceneEventInfo *info, CChoreoSc
 
 bool CBaseFlex::RequestStartGestureSceneEvent( CSceneEventInfo *info, CChoreoScene *scene, CChoreoEvent *event, CChoreoActor *actor, CBaseEntity *pTarget )
 {
-	info->m_nSequence = LookupSequence( event->GetParameters() );
+	info->m_nSequence = GetEngineObject()->LookupSequence( event->GetParameters() );
 
 	// make sure sequence exists
 	if (info->m_nSequence < 0)
@@ -475,7 +475,7 @@ bool CBaseFlex::HandleStartSequenceSceneEvent( CSceneEventInfo *info, CChoreoSce
 {
 	Assert( info->m_iLayer == REQUEST_DEFERRED_LAYER_ALLOCATION );
 
-	info->m_nSequence = LookupSequence( event->GetParameters() );
+	info->m_nSequence = GetEngineObject()->LookupSequence( event->GetParameters() );
 	info->m_iLayer = -1;
 
 	if (info->m_nSequence < 0)
@@ -533,7 +533,7 @@ bool CBaseFlex::HandleStartGestureSceneEvent( CSceneEventInfo *info, CChoreoScen
 {
 	Assert( info->m_iLayer == REQUEST_DEFERRED_LAYER_ALLOCATION );
 
-	info->m_nSequence = LookupSequence( event->GetParameters() );
+	info->m_nSequence = GetEngineObject()->LookupSequence( event->GetParameters() );
 	info->m_iLayer = -1;
 
 	if (info->m_nSequence < 0)

@@ -595,7 +595,7 @@ void CAI_AssaultBehavior::StartTask( const Task_t *pTask )
 			else if( m_hRallyPoint->m_RallySequenceName != NULL_STRING )
 			{
 				// The cue hasn't been given yet, so set to the rally sequence.
-				int sequence = GetOuter()->LookupSequence( STRING( m_hRallyPoint->m_RallySequenceName ) );
+				int sequence = GetOuter()->GetEngineObject()->LookupSequence( STRING( m_hRallyPoint->m_RallySequenceName ) );
 				if( sequence != -1 )
 				{
 					GetOuter()->GetEngineObject()->ResetSequence( sequence );

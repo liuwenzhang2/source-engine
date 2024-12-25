@@ -76,7 +76,7 @@ void CNPC_Alyx::HandleAnimEvent( animevent_t *pEvent )
 		if (!pEmpTool)
 			return;
 
-		int iSequence = pEmpTool->LookupSequence( pEvent->options );
+		int iSequence = pEmpTool->GetEngineObject()->LookupSequence( pEvent->options );
 		if (iSequence != ACT_INVALID)
 		{
 			pEmpTool->PropSetSequence( iSequence );

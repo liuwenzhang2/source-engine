@@ -759,7 +759,7 @@ void CEnvHeadcrabCanister::StartSpawningHeadcrabs( float flDelay )
 //-----------------------------------------------------------------------------
 void CEnvHeadcrabCanister::CanisterFinishedOpening( void )
 {
-	GetEngineObject()->ResetSequence( LookupSequence( "idle_open" ) );
+	GetEngineObject()->ResetSequence(GetEngineObject()->LookupSequence( "idle_open" ) );
 	m_OnOpened.FireOutput( this, this, 0 );
 	m_bOpened = true;
 	SetContextThink( NULL, gpGlobals->curtime, s_pOpenThinkContext );
@@ -780,7 +780,7 @@ void CEnvHeadcrabCanister::CanisterFinishedOpening( void )
 void CEnvHeadcrabCanister::WaitForOpenSequenceThink()
 {
 	StudioFrameAdvance();
-	if ( (GetEngineObject()->GetSequence() == LookupSequence( "open" ) ) && GetEngineObject()->IsSequenceFinished() )
+	if ( (GetEngineObject()->GetSequence() == GetEngineObject()->LookupSequence( "open" ) ) && GetEngineObject()->IsSequenceFinished() )
 	{
 		CanisterFinishedOpening();
 	}
@@ -799,7 +799,7 @@ void CEnvHeadcrabCanister::OpenCanister( void )
 	if ( m_bOpened )
 		return;
 
-	int nOpenSequence = LookupSequence( "open" );
+	int nOpenSequence = GetEngineObject()->LookupSequence( "open" );
 	if ( nOpenSequence != ACT_INVALID )
 	{
 		const char* soundname = "HeadcrabCanister.Open";

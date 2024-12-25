@@ -810,14 +810,14 @@ void CPropJeep::Think( void )
 	}
 
 	// See if the ammo crate needs to close
-	if ( ( m_flAmmoCrateCloseTime < gpGlobals->curtime ) && (GetEngineObject()->GetSequence() == LookupSequence( "ammo_open" ) ) )
+	if ( ( m_flAmmoCrateCloseTime < gpGlobals->curtime ) && (GetEngineObject()->GetSequence() == GetEngineObject()->LookupSequence( "ammo_open" ) ) )
 	{
 		GetEngineObject()->SetAnimTime(gpGlobals->curtime);
 		GetEngineObject()->SetPlaybackRate(0.0);
 		GetEngineObject()->SetCycle( 0 );
-		GetEngineObject()->ResetSequence( LookupSequence( "ammo_close" ) );
+		GetEngineObject()->ResetSequence(GetEngineObject()->LookupSequence( "ammo_close" ) );
 	}
-	else if ( (GetEngineObject()->GetSequence() == LookupSequence( "ammo_close" ) ) && GetEngineObject()->IsSequenceFinished() )
+	else if ( (GetEngineObject()->GetSequence() == GetEngineObject()->LookupSequence( "ammo_close" ) ) && GetEngineObject()->IsSequenceFinished() )
 	{
 		GetEngineObject()->SetAnimTime(gpGlobals->curtime);
 		GetEngineObject()->SetPlaybackRate(0.0);
@@ -1143,13 +1143,13 @@ void CPropJeep::Use( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE use
 		// Fill up his SMG ammo.
 		pPlayer->GiveAmmo( 300, "SMG1");
 		
-		if ( (GetEngineObject()->GetSequence() != LookupSequence( "ammo_open" ) ) && (GetEngineObject()->GetSequence() != LookupSequence( "ammo_close" ) ) )
+		if ( (GetEngineObject()->GetSequence() != GetEngineObject()->LookupSequence( "ammo_open" ) ) && (GetEngineObject()->GetSequence() != GetEngineObject()->LookupSequence( "ammo_close" ) ) )
 		{
 			// Open the crate
 			GetEngineObject()->SetAnimTime(gpGlobals->curtime);
 			GetEngineObject()->SetPlaybackRate(0.0);
 			GetEngineObject()->SetCycle( 0 );
-			GetEngineObject()->ResetSequence( LookupSequence( "ammo_open" ) );
+			GetEngineObject()->ResetSequence(GetEngineObject()->LookupSequence( "ammo_open" ) );
 			
 			CPASAttenuationFilter sndFilter( this, "PropJeep.AmmoOpen" );
 			g_pSoundEmitterSystem->EmitSound( sndFilter, entindex(), "PropJeep.AmmoOpen" );
@@ -1647,7 +1647,7 @@ void CPropJeep::InputStartRemoveTauCannon( inputdata_t &inputdata )
 	GetEngineObject()->SetAnimTime(gpGlobals->curtime);
 	GetEngineObject()->SetPlaybackRate(0.0);
 	GetEngineObject()->SetCycle( 0 );
-	GetEngineObject()->ResetSequence( LookupSequence( "tau_levitate" ) );
+	GetEngineObject()->ResetSequence(GetEngineObject()->LookupSequence( "tau_levitate" ) );
 
 	m_bGunHasBeenCutOff = true;
 }
@@ -1712,7 +1712,7 @@ int CJeepFourWheelServerVehicle::GetExitAnimToUse( Vector &vecEyeExitEndpoint, b
 		m_vecCurrentExitEndPoint = vecStart + ((vecEnd - vecStart) * tr.fraction);
 		vecEyeExitEndpoint = m_vecCurrentExitEndPoint + VEC_VIEW;
 		m_iCurrentExitAnim = 0;
-		return this->LookupSequence( "exit_tauremoved" );
+		return this->GetEngineObject()->LookupSequence( "exit_tauremoved" );
 	}
 
 	return BaseClass::GetExitAnimToUse( vecEyeExitEndpoint, bAllPointsBlocked );

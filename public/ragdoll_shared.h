@@ -72,10 +72,7 @@ class IStudioHdr;
 #include "inetchannelinfo.h"
 #include "entitylist_base.h"
 
-#include "debugoverlay_shared.h"
-#include "decals.h"
 #include "IEffects.h"
-#include "animation.h"
 #include "in_buttons.h"
 #include "sharedInterface.h"
 #include "rope_helpers.h"

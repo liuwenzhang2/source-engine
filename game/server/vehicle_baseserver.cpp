@@ -931,7 +931,7 @@ bool CBaseServerVehicle::GetLocalAttachmentAtTime( const char *lpszAnimName, int
 	//if ( pAnimating == NULL )
 	//	return false;
 
-	int nQuerySequence = this->LookupSequence( lpszAnimName );
+	int nQuerySequence = this->GetEngineObject()->LookupSequence( lpszAnimName );
 	if ( nQuerySequence < 0 )
 		return false;
 
@@ -1049,7 +1049,7 @@ void CBaseServerVehicle::HandlePassengerEntry( CBaseCombatCharacter *pPassenger,
 			// We failed to find a valid entry anim, but we've got to get back in because the player's
 			// got stuck exiting the vehicle. For now, just use the first get in anim
 			// UNDONE: We need a better solution for this.
-			iEntryAnim = this->LookupSequence( m_EntryAnimations[0].szAnimName );
+			iEntryAnim = this->GetEngineObject()->LookupSequence( m_EntryAnimations[0].szAnimName );
 		}
 
 		// Check to see if this vehicle can be controlled or if it's locked
@@ -1220,7 +1220,7 @@ int CBaseServerVehicle::GetEntryAnimForPoint( const Vector &vecEyePoint )
 				if ( m_EntryAnimations[entry].iHitboxGroup == pbox->group )
 				{
 					// Get the sequence for the animation
-					return this->LookupSequence( m_EntryAnimations[entry].szAnimName );
+					return this->GetEngineObject()->LookupSequence( m_EntryAnimations[entry].szAnimName );
 				}
 			}
 		}
@@ -1410,7 +1410,7 @@ int CBaseServerVehicle::GetExitAnimToUse( Vector &vecEyeExitEndpoint, bool &bAll
 
 		vecEyeExitEndpoint = vecBestExitPoint + VEC_VIEW;
 		m_iCurrentExitAnim = nBestExitAnim;
-		return this->LookupSequence( m_ExitAnimations[m_iCurrentExitAnim].szAnimName );
+		return this->GetEngineObject()->LookupSequence( m_ExitAnimations[m_iCurrentExitAnim].szAnimName );
 	}
 
 	// Fail, all exit points were blocked.

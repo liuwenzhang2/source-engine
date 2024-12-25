@@ -1156,7 +1156,7 @@ void CAI_BaseNPC::StartScriptMoveToTargetTask( int task )
 					}
 					else
 					{
-						goal.arrivalSequence = LookupSequence( m_strScriptArrivalSequence.ToCStr() );
+						goal.arrivalSequence = GetEngineObject()->LookupSequence( m_strScriptArrivalSequence.ToCStr() );
 					}
 				}
 					
@@ -1436,7 +1436,7 @@ void CAI_BaseNPC::StartTask( const Task_t *pTask )
 			}
 			else
 			{
-				int iSequence = LookupSequence(STRING(GetHintNode()->HintActivityName()));
+				int iSequence = GetEngineObject()->LookupSequence(STRING(GetHintNode()->HintActivityName()));
 				if ( iSequence > ACT_INVALID )
 				{
 					SetSequenceById( iSequence ); // ???
@@ -2385,7 +2385,7 @@ void CAI_BaseNPC::StartTask( const Task_t *pTask )
 					}
 					else
 					{
-						int iSequence = LookupSequence(STRING(GetHintNode()->HintActivityName()));;
+						int iSequence = GetEngineObject()->LookupSequence(STRING(GetHintNode()->HintActivityName()));;
 						if ( iSequence != ACT_INVALID )
 							GetNavigator()->SetArrivalSequence( iSequence );
 					}
@@ -4276,7 +4276,7 @@ Activity CAI_BaseNPC::GetScriptCustomMoveActivity( void )
 		if ( eActivity == ACT_INVALID )
 		{
 			// Not an activity, at least make sure it's a valid sequence.
-			if ( LookupSequence( STRING( m_hCine->m_iszCustomMove ) ) != ACT_INVALID )
+			if (GetEngineObject()->LookupSequence( STRING( m_hCine->m_iszCustomMove ) ) != ACT_INVALID )
 			{
 				eActivity = ACT_SCRIPT_CUSTOM_MOVE;
 			}
@@ -4306,7 +4306,7 @@ int CAI_BaseNPC::GetScriptCustomMoveSequence( void )
 	// If we have a scripted sequence entity, use it's custom move
 	if ( m_hCine != NULL )
 	{
-		iSequence = LookupSequence( STRING( m_hCine->m_iszCustomMove ) );
+		iSequence = GetEngineObject()->LookupSequence( STRING( m_hCine->m_iszCustomMove ) );
 		if ( iSequence == ACTIVITY_NOT_AVAILABLE )
 		{
 			DevMsg( "SCRIPT_CUSTOM_MOVE: %s has no sequence:%s\n", GetClassname(), STRING(m_hCine->m_iszCustomMove) );
@@ -4315,7 +4315,7 @@ int CAI_BaseNPC::GetScriptCustomMoveSequence( void )
 	else if ( m_iszSceneCustomMoveSeq != NULL_STRING )
 	{
 		// Otherwise, use the .vcd custom move
-		iSequence = LookupSequence( STRING( m_iszSceneCustomMoveSeq ) );
+		iSequence = GetEngineObject()->LookupSequence( STRING( m_iszSceneCustomMoveSeq ) );
 		if ( iSequence == ACTIVITY_NOT_AVAILABLE )
 		{
 			Warning( "SCRIPT_CUSTOM_MOVE: %s failed scripted custom move. Has no sequence called: %s\n", GetClassname(), STRING(m_iszSceneCustomMoveSeq) );

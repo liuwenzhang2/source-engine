@@ -359,7 +359,7 @@ void CEnvEffectsScript::InputSetSequence( inputdata_t &inputdata )
 {
 	if ( inputdata.value.StringID() != NULL_STRING )
 	{
-		int nSequence = LookupSequence( STRING( inputdata.value.StringID() ) );
+		int nSequence = GetEngineObject()->LookupSequence( STRING( inputdata.value.StringID() ) );
 		if ( nSequence != ACT_INVALID )
 		{
 			GetEngineObject()->SetSequence( nSequence );

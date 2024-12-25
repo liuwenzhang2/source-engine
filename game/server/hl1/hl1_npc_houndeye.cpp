@@ -601,7 +601,7 @@ void CNPC_Houndeye::SetActivity ( Activity NewActivity )
 	if ( m_NPCState == NPC_STATE_COMBAT && NewActivity == ACT_IDLE && random->RandomInt( 0, 1 ) )
 	{
 		// play pissed idle.
-		iSequence = LookupSequence( "madidle" );
+		iSequence = GetEngineObject()->LookupSequence( "madidle" );
 
 		SetActivity( NewActivity ); // Go ahead and set this so it doesn't keep trying when the anim is not present
 	

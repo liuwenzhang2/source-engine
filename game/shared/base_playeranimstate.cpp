@@ -462,7 +462,7 @@ int CBasePlayerAnimState::CalcSequenceIndex( const char *pBaseName, ... )
 	va_start( marker, pBaseName );
 	Q_vsnprintf( szFullName, sizeof( szFullName ), pBaseName, marker );
 	va_end( marker );
-	int iSequence = GetOuter()->LookupSequence( szFullName );
+	int iSequence = GetOuter()->GetEngineObject()->LookupSequence( szFullName );
 	
 	// Show warnings if we can't find anything here.
 	if ( iSequence == -1 )

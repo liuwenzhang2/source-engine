@@ -2166,7 +2166,7 @@ void CNPC_CombineDropship::PrescheduleThink( void )
 				m_flNextTroopSpawnAttempt = 0;
 
 				// Open our container
-				m_hContainer->GetEngineObject()->SetSequence( m_hContainer->LookupSequence("open_idle") );
+				m_hContainer->GetEngineObject()->SetSequence( m_hContainer->GetEngineObject()->LookupSequence("open_idle") );
 
 				// Start unloading troops
 				m_iCurrentTroopExiting = 0;
@@ -2269,7 +2269,7 @@ void CNPC_CombineDropship::PrescheduleThink( void )
 
 			if ( m_hContainer )
 			{
-				m_hContainer->GetEngineObject()->SetSequence( m_hContainer->LookupSequence("close_idle") );
+				m_hContainer->GetEngineObject()->SetSequence( m_hContainer->GetEngineObject()->LookupSequence("close_idle") );
 			}
 		}
 		break;

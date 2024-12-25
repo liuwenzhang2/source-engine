@@ -537,6 +537,7 @@ public:
 	virtual void Simulate() = 0;
 	//virtual void CreateUnragdollInfo(C_BaseEntity* pRagdoll) = 0;
 	virtual IPhysicsConstraintGroup* GetConstraintGroup() = 0;
+	virtual int LookupSequence(const char* label) = 0;
 	virtual int SelectWeightedSequence(int activity) = 0;
 	virtual float GetLastBoneChangeTime() = 0;
 	virtual int GetElementCount() = 0;

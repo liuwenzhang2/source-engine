@@ -2600,7 +2600,7 @@ void CNPC_DeadHGrunt::Spawn( void )
 	GetEngineObject()->SetSequence( 0 );
 	m_bloodColor		= BLOOD_COLOR_RED;
 
-	GetEngineObject()->SetSequence( LookupSequence( m_szPoses[m_iPose] ) );
+	GetEngineObject()->SetSequence(GetEngineObject()->LookupSequence( m_szPoses[m_iPose] ) );
 
 	if (GetEngineObject()->GetSequence() == -1 )
 	{

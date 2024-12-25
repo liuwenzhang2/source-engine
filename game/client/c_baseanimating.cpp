@@ -3739,24 +3739,6 @@ void C_BaseAnimating::DrawClientHitboxes( float duration /*= 0.0f*/, bool monoco
 	}
 }
 
-
-
-
-
-
-
-
-//-----------------------------------------------------------------------------
-// Purpose: 
-// Input  : *label - 
-// Output : int
-//-----------------------------------------------------------------------------
-int C_BaseAnimating::LookupSequence( const char *label )
-{
-	Assert(GetEngineObject()->GetModelPtr() );
-	return GetEngineObject()->GetModelPtr()->LookupSequence( label, SharedRandomSelect);
-}
-
 void C_BaseAnimating::Clear( void )
 {
 

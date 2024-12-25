@@ -602,7 +602,7 @@ void CTeamControlPoint::InternalSetOwner( int iCapTeam, bool bMakeSound, int iNu
 	SetModel( STRING(m_TeamData[m_iTeam].iszModel) );
 	SetBodygroup( 0, m_iTeam );
 	GetEngineObject()->SetSkin(( m_iTeam == TEAM_UNASSIGNED ) ? 2 : (m_iTeam - 2));
-	GetEngineObject()->ResetSequence( LookupSequence("idle") );
+	GetEngineObject()->ResetSequence(GetEngineObject()->LookupSequence("idle") );
 
 	// We add 1 to the index because we consider the default "no points capped" as 0.
 	TeamplayGameRules()->SetLastCapPointChanged( m_iPointIndex+1 );

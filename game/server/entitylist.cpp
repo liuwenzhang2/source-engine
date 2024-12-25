@@ -2704,14 +2704,18 @@ bool CGrabControllerInternal::UpdateObject(CBaseEntity* pPlayer, float flError)
 	ConVarRef	g_debug_physcannon("g_debug_physcannon");
 	if (g_debug_physcannon.GetBool())
 	{
-		NDebugOverlay::Box(end, -Vector(2, 2, 2), Vector(2, 2, 2), 0, 255, 0, true, 0);
+		if (debugoverlay)
+		{
+			debugoverlay->AddBoxOverlay(end, -Vector(2, 2, 2), Vector(2, 2, 2), vec3_angle, 0, 255, 0, true, 0);
 
-		NDebugOverlay::Box(GetAttached()->WorldSpaceCenter(),
-			-Vector(radius, radius, radius),
-			Vector(radius, radius, radius),
-			255, 0, 0,
-			true,
-			0.0f);
+			debugoverlay->AddBoxOverlay(GetAttached()->WorldSpaceCenter(),
+				-Vector(radius, radius, radius),
+				Vector(radius, radius, radius),
+				vec3_angle,
+				255, 0, 0,
+				true,
+				0.0f);
+		}
 	}
 
 	QAngle angles = TransformAnglesFromPlayerSpace(m_attachedAnglesPlayerSpace, pPlayer);
@@ -8151,6 +8155,32 @@ bool CEngineObjectInternal::IsRideablePhysics(IPhysicsObject* pPhysics)
 	return false;
 }
 
+#if !defined( MAKEXVCD )
+bool IsInPrediction()
+{
+	return gEntList.GetPredictionPlayer() != NULL;
+}
+
+int SharedRandomSelect(int iMinVal, int iMaxVal, int additionalSeed) {
+	if (gEntList.GetPredictionPlayer() != NULL)
+	{
+		return SharedRandomInt("SelectWeightedSequence", iMinVal, iMaxVal, additionalSeed);
+	}
+	else
+	{
+		return RandomInt(iMinVal, iMaxVal);
+	}
+}
+#endif
+
+//=========================================================
+//=========================================================
+int CEngineObjectInternal::LookupSequence(const char* label)
+{
+	Assert(GetModelPtr());
+	return GetModelPtr()->LookupSequence(label, SharedRandomSelect);
+}
+
 //=========================================================
 // SelectWeightedSequence
 //=========================================================
@@ -8600,7 +8630,32 @@ void CEngineObjectInternal::DrawRawSkeleton(matrix3x4_t boneToWorld[], int boneM
 			{
 				Vector p2;
 				MatrixPosition(boneToWorld[pStudioHdr->pBone(i)->parent], p2);
-				NDebugOverlay::Line(p1, p2, r, g, b, noDepthTest, duration);
+				CBaseEntity* player = gEntList.GetLocalPlayer();
+
+				if (player == NULL)
+					return;
+
+				// Clip line that is far away
+				if (((player->GetEngineObject()->GetAbsOrigin() - p1).LengthSqr() > 90000000) &&
+					((player->GetEngineObject()->GetAbsOrigin() - p2).LengthSqr() > 90000000))
+					return;
+
+				// Clip line that is behind the client 
+				Vector clientForward;
+				player->EyeVectors(&clientForward);
+
+				Vector toOrigin = p1 - player->GetEngineObject()->GetAbsOrigin();
+				Vector toTarget = p2 - player->GetEngineObject()->GetAbsOrigin();
+				float  dotOrigin = DotProduct(clientForward, toOrigin);
+				float  dotTarget = DotProduct(clientForward, toTarget);
+
+				if (dotOrigin < 0 && dotTarget < 0)
+					return;
+
+				if (debugoverlay)
+				{
+					debugoverlay->AddLineOverlay(p1, p2, r, g, b, noDepthTest, duration);
+				}
 			}
 		}
 	}
@@ -12898,7 +12953,10 @@ static void DrawDebugOverlayForShadowClone(CEngineShadowCloneInternal* pClone)
 	int iGreen = iColorIntensity;
 	int iBlue = iColorIntensity;
 
-	NDebugOverlay::EntityBounds(pClone->m_pOuter, iRed, iGreen, iBlue, (iColorIntensity >> 2), 0.05f);
+	if (debugoverlay)
+	{
+		debugoverlay->AddBoxOverlay(pClone->GetCollisionOrigin(), pClone->OBBMins(), pClone->OBBMaxs(), pClone->GetCollisionAngles(), iRed, iGreen, iBlue, (iColorIntensity >> 2), 0.05f);
+	}
 }
 
 void CEngineShadowCloneInternal::FullSync(bool bAllowAssumedSync)
@@ -15432,15 +15490,73 @@ bool ShouldRemoveThisRagdoll(CBaseEntity* pRagdoll)
 
 		if (!EntityList()->FindClientInPVS(pRagdoll))
 		{
-			if (g_debug_ragdoll_removal.GetBool())
-				NDebugOverlay::Line(pRagdoll->GetEngineObject()->GetAbsOrigin(), pRagdoll->GetEngineObject()->GetAbsOrigin() + Vector(0, 0, 64), 0, 255, 0, true, 5);
+			if (g_debug_ragdoll_removal.GetBool()) {
+				// --------------------------------------------------------------
+				// Clip the line before sending so we 
+				// don't overflow the client message buffer
+				// --------------------------------------------------------------
+				CBaseEntity* player = gEntList.GetLocalPlayer();
+
+				if (player != NULL) {
+					// Clip line that is far away
+					if (!(((player->GetEngineObject()->GetAbsOrigin() - pRagdoll->GetEngineObject()->GetAbsOrigin()).LengthSqr() > 90000000) &&
+						((player->GetEngineObject()->GetAbsOrigin() - pRagdoll->GetEngineObject()->GetAbsOrigin() + Vector(0, 0, 64)).LengthSqr() > 90000000))) {
+
+
+						// Clip line that is behind the client 
+						Vector clientForward;
+						player->EyeVectors(&clientForward);
+
+						Vector toOrigin = pRagdoll->GetEngineObject()->GetAbsOrigin() - player->GetEngineObject()->GetAbsOrigin();
+						Vector toTarget = pRagdoll->GetEngineObject()->GetAbsOrigin() + Vector(0, 0, 64) - player->GetEngineObject()->GetAbsOrigin();
+						float  dotOrigin = DotProduct(clientForward, toOrigin);
+						float  dotTarget = DotProduct(clientForward, toTarget);
+
+						if (!(dotOrigin < 0 && dotTarget < 0)) {
+							if (debugoverlay)
+							{
+								debugoverlay->AddLineOverlay(pRagdoll->GetEngineObject()->GetAbsOrigin(), pRagdoll->GetEngineObject()->GetAbsOrigin() + Vector(0, 0, 64), 0, 255, 0, true, 5);
+							}
+						}
+					}
+				}
+			}
 
 			return true;
 		}
 		else if (pPlayer && !pPlayer->FInViewCone(pRagdoll))
 		{
-			if (g_debug_ragdoll_removal.GetBool())
-				NDebugOverlay::Line(pRagdoll->GetEngineObject()->GetAbsOrigin(), pRagdoll->GetEngineObject()->GetAbsOrigin() + Vector(0, 0, 64), 0, 0, 255, true, 5);
+			if (g_debug_ragdoll_removal.GetBool()) {
+				// --------------------------------------------------------------
+				// Clip the line before sending so we 
+				// don't overflow the client message buffer
+				// --------------------------------------------------------------
+				CBaseEntity* player = gEntList.GetLocalPlayer();
+
+				if (player != NULL) {
+					// Clip line that is far away
+					if (!(((player->GetEngineObject()->GetAbsOrigin() - pRagdoll->GetEngineObject()->GetAbsOrigin()).LengthSqr() > 90000000) &&
+						((player->GetEngineObject()->GetAbsOrigin() - pRagdoll->GetEngineObject()->GetAbsOrigin() + Vector(0, 0, 64)).LengthSqr() > 90000000))) {
+
+
+						// Clip line that is behind the client 
+						Vector clientForward;
+						player->EyeVectors(&clientForward);
+
+						Vector toOrigin = pRagdoll->GetEngineObject()->GetAbsOrigin() - player->GetEngineObject()->GetAbsOrigin();
+						Vector toTarget = pRagdoll->GetEngineObject()->GetAbsOrigin() + Vector(0, 0, 64) - player->GetEngineObject()->GetAbsOrigin();
+						float  dotOrigin = DotProduct(clientForward, toOrigin);
+						float  dotTarget = DotProduct(clientForward, toTarget);
+
+						if (!(dotOrigin < 0 && dotTarget < 0)) {
+							if (debugoverlay)
+							{
+								debugoverlay->AddLineOverlay(pRagdoll->GetEngineObject()->GetAbsOrigin(), pRagdoll->GetEngineObject()->GetAbsOrigin() + Vector(0, 0, 64), 0, 255, 0, true, 5);
+							}
+						}
+					}
+				}
+			}
 
 			return true;
 		}

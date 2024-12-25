@@ -431,7 +431,7 @@ void CPropVehicleChoreoGeneric::Think(void)
 //------------------------------------------------------------------------------
 void CPropVehicleChoreoGeneric::InputOpen( inputdata_t &inputdata )
 {
-	int nSequence = LookupSequence( "open" );
+	int nSequence = GetEngineObject()->LookupSequence( "open" );
 
 	// Set to the desired anim, or default anim if the desired is not present
 	if ( nSequence > ACTIVITY_NOT_AVAILABLE )
@@ -458,7 +458,7 @@ void CPropVehicleChoreoGeneric::InputClose( inputdata_t &inputdata )
 	if ( m_bLocked || m_bEnterAnimOn )
 		return;
 
-	int nSequence = LookupSequence( "close" );
+	int nSequence = GetEngineObject()->LookupSequence( "close" );
 
 	// Set to the desired anim, or default anim if the desired is not present
 	if ( nSequence > ACTIVITY_NOT_AVAILABLE )

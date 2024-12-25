@@ -543,7 +543,7 @@ void CNewWallHealth::Spawn(void)
 	SetModel( HEALTH_CHARGER_MODEL_NAME );
 	GetEngineObject()->AddEffects( EF_NOSHADOW );
 
-	GetEngineObject()->ResetSequence( LookupSequence( "idle" ) );
+	GetEngineObject()->ResetSequence(GetEngineObject()->LookupSequence( "idle" ) );
 
 	m_iJuice = sk_healthcharger.GetFloat();
 
@@ -646,7 +646,7 @@ void CNewWallHealth::Use( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYP
 	// if there is no juice left, turn it off
 	if (m_iJuice <= 0)
 	{
-		GetEngineObject()->ResetSequence( LookupSequence( "emptyclick" ) );
+		GetEngineObject()->ResetSequence(GetEngineObject()->LookupSequence( "emptyclick" ) );
 		m_nState = 1;			
 		Off();
 	}
@@ -759,7 +759,7 @@ void CNewWallHealth::Recharge(void)
 	m_flJuice = m_iJuice = sk_healthcharger.GetFloat();
 	m_nState = 0;
 
-	GetEngineObject()->ResetSequence( LookupSequence( "idle" ) );
+	GetEngineObject()->ResetSequence(GetEngineObject()->LookupSequence( "idle" ) );
 	StudioFrameAdvance();
 
 	m_iReactivate = 0;

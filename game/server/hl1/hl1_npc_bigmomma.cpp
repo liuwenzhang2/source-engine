@@ -680,7 +680,7 @@ void CNPC_BigMomma::StartTask( const Task_t *pTask )
 
 			if ( pSequence ) //ugh
 			{
-				iSequence = LookupSequence( pSequence );
+				iSequence = GetEngineObject()->LookupSequence( pSequence );
 
 				if ( iSequence != -1 )
 				{
