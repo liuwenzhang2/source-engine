@@ -14339,6 +14339,7 @@ void CEngineVehicleInternal::GetVehicleViewPosition(const char* pViewAttachment,
 
 #ifdef HL2_DLL
 	// View dampening.
+	ConVarRef r_VehicleViewDampen("r_VehicleViewDampen");
 	if (r_VehicleViewDampen.GetInt())
 	{
 		GetOuterServerVehicle()->DampenEyePosition(vehicleEyeOrigin, vehicleEyeAngles);
