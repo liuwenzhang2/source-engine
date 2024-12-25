@@ -45,6 +45,7 @@
 #include "ragdoll_shared.h"
 #include "physconstraint.h"
 #include "filesystem.h"
+#include "util_shared.h"
 
 //class CBaseEntity;
 // We can only ever move 512 entities across a transition

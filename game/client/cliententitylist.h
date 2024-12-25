@@ -50,6 +50,7 @@
 #include "soundenvelope.h"
 #include "physics_shared.h"
 #include "ragdoll_shared.h"
+#include "util_shared.h"
 
 //class C_Beam;
 //class C_BaseViewModel;
