@@ -55,7 +55,7 @@ public:
 	//virtual void	CreateServerVehicle( void );
 	virtual void	DriveVehicle( float flFrameTime, CUserCmd *ucmd, int iButtonsDown, int iButtonsReleased );
 	virtual void	ProcessMovement( CBasePlayer *pPlayer, CMoveData *pMoveData );
-	virtual Class_T	ClassifyPassenger( CBaseCombatCharacter *pPassenger, Class_T defaultClassification );
+	virtual int		ClassifyPassenger( CBaseCombatCharacter *pPassenger, int defaultClassification );
 	virtual int		OnTakeDamage( const CTakeDamageInfo &info );
 	virtual float	PassengerDamageModifier( const CTakeDamageInfo &info );
 

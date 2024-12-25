@@ -22,7 +22,6 @@ class CBaseCombatCharacter;
 class CNPC_VehicleDriver;
 enum VehicleSeatQuery_e;
 class CTakeDamageInfo;
-enum Class_T;
 
 struct vbs_sound_update_t
 {
@@ -85,7 +84,7 @@ public:
 	virtual int				GetExitAnimToUse( Vector &vecEyeExitEndpoint, bool &bAllPointsBlocked ) = 0;
 	virtual void			HandleEntryExitFinish( bool bExitAnimOn, bool bResetAnim ) = 0;
 
-	virtual Class_T			ClassifyPassenger( CBaseCombatCharacter *pPassenger, Class_T defaultClassification ) = 0;
+	virtual int			ClassifyPassenger( CBaseCombatCharacter *pPassenger, int defaultClassification ) = 0;
 	virtual float			PassengerDamageModifier( const CTakeDamageInfo &info ) = 0;
 
 	// Get me the parameters for this vehicle

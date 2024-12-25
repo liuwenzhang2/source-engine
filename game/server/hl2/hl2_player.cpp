@@ -992,7 +992,7 @@ Class_T  CHL2_Player::Classify ( void )
 		if(IsInAVehicle())
 		{
 			IServerVehicle *pVehicle = GetVehicle();
-			return pVehicle->ClassifyPassenger( this, CLASS_PLAYER );
+			return (Class_T)pVehicle->ClassifyPassenger( this, CLASS_PLAYER );
 		}
 		else
 		{

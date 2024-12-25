@@ -239,7 +239,7 @@ void CPropAPC::UpdateOnRemove( void )
 // Purpose: 
 // Input  : *pMoveData - 
 //-----------------------------------------------------------------------------
-Class_T	CPropAPC::ClassifyPassenger( CBaseCombatCharacter *pPassenger, Class_T defaultClassification )
+int	CPropAPC::ClassifyPassenger( CBaseCombatCharacter *pPassenger, int defaultClassification )
 { 
 	return CLASS_COMBINE;	
 }

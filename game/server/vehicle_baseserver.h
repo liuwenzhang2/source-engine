@@ -136,7 +136,7 @@ public:
 
 	virtual void			GetPassengerSeatPoint( int nRole, Vector *pPoint, QAngle *pAngles );
 	virtual bool			GetPassengerExitPoint( int nRole, Vector *pPoint, QAngle *pAngles );
-	virtual Class_T			ClassifyPassenger( CBaseCombatCharacter *pPassenger, Class_T defaultClassification ) { return defaultClassification; }
+	virtual int				ClassifyPassenger( CBaseCombatCharacter *pPassenger, int defaultClassification ) { return defaultClassification; }
 	virtual float			PassengerDamageModifier( const CTakeDamageInfo &info ) { return 1.0; }
 	virtual const vehicleparams_t	*GetVehicleParams( void ) { return NULL; }
 	virtual bool			IsVehicleBodyInWater( void ) { return false; }

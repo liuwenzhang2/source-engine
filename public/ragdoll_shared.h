@@ -58,6 +58,7 @@ class IStudioHdr;
 #include "bone_accessor.h"
 #include "jigglebones.h"
 #include "engine/ivdebugoverlay.h"
+#include "con_nprint.h"
 #include "posedebugger.h"
 #include "usercmd.h"
 #include "saverestoretypes.h"
