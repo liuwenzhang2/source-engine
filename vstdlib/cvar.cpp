@@ -16,7 +16,7 @@
 #include "tier0/vprof.h"
 #include "tier1/tier1.h"
 #include "tier1/utlbuffer.h"
-
+#include "tier1/utldict.h"
 #ifdef _X360
 #include "xbox/xbox_console.h"
 #endif
@@ -118,7 +118,7 @@ private:
 	CUtlVector< IConsoleDisplayFunc* >	m_DisplayFuncs;
 	int									m_nNextDLLIdentifier;
 	ConCommandBase						*m_pConCommandList;
-
+	CUtlDict< ConCommandBase*, unsigned short > m_ConCommandDict;
 	// temporary console area so we can store prints before console display funs are installed
 	mutable CUtlBuffer					m_TempConsoleBuffer;
 protected:
@@ -223,7 +223,7 @@ CCvar::CCvar() : m_TempConsoleBuffer( 0, 1024 )
 {
 	m_nNextDLLIdentifier = 0;
 	m_pConCommandList = NULL;
-
+	m_ConCommandDict.RemoveAll();
 	m_bMaterialSystemThreadSetAllowed = false;
 }
 
@@ -405,6 +405,14 @@ void CCvar::RegisterConCommand( ConCommandBase *variable )
 	// link the variable in
 	variable->m_pNext = m_pConCommandList;
 	m_pConCommandList = variable;
+	if (!variable->IsCommand()) {
+		unsigned short nIndex = m_ConCommandDict.Find(variable->GetName());
+		if (nIndex != m_ConCommandDict.InvalidIndex()) {
+			ConCommandBase* pExistCommand = m_ConCommandDict[nIndex];
+			Error("ConVar %s exist!\n", variable->GetName());
+		}
+		m_ConCommandDict.Insert(variable->GetName(), variable);
+	}
 }
 
 void CCvar::UnregisterConCommand( ConCommandBase *pCommandToRemove )
@@ -435,6 +443,17 @@ void CCvar::UnregisterConCommand( ConCommandBase *pCommandToRemove )
 		}
 		pCommand->m_pNext = NULL;
 		break;
+	}
+	if (!pCommandToRemove->IsCommand()) {
+		unsigned short nIndex = m_ConCommandDict.Find(pCommandToRemove->GetName());
+		if (nIndex == m_ConCommandDict.InvalidIndex()) {
+			Error("ConVar %s not exist!\n", pCommandToRemove->GetName());
+		}
+		ConCommandBase* pExistCommand = m_ConCommandDict[nIndex];
+		if (pExistCommand != pCommandToRemove) {
+			Error("ConVar %s not equal!\n", pCommandToRemove->GetName());
+		}
+		m_ConCommandDict.Remove(pCommandToRemove->GetName());
 	}
 }
 
@@ -471,6 +490,17 @@ void CCvar::UnregisterConCommands( CVarDLLIdentifier_t id )
 	}
 
 	m_pConCommandList = pNewList;
+	unsigned short nIndex = m_ConCommandDict.First();
+	while (nIndex != m_ConCommandDict.InvalidIndex()) {
+		ConCommandBase* pExistCommand = m_ConCommandDict[nIndex];
+		if (pExistCommand->GetDLLIdentifier() == id) {
+			m_ConCommandDict.RemoveAt(nIndex);
+			nIndex = m_ConCommandDict.First();
+		}
+		else {
+			nIndex = m_ConCommandDict.Next(nIndex);
+		}
+	}
 }
 #ifdef WIN32
 #pragma optimize( "", on )
@@ -482,6 +512,10 @@ void CCvar::UnregisterConCommands( CVarDLLIdentifier_t id )
 //-----------------------------------------------------------------------------
 const ConCommandBase *CCvar::FindCommandBase( const char *name ) const
 {
+	unsigned short nIndex = m_ConCommandDict.Find(name);
+	if (nIndex != m_ConCommandDict.InvalidIndex()) {
+		return m_ConCommandDict[nIndex];
+	}
 	const ConCommandBase *cmd = GetCommands();
 	for ( ; cmd; cmd = cmd->GetNext() )
 	{
@@ -493,6 +527,10 @@ const ConCommandBase *CCvar::FindCommandBase( const char *name ) const
 
 ConCommandBase *CCvar::FindCommandBase( const char *name )
 {
+	unsigned short nIndex = m_ConCommandDict.Find(name);
+	if (nIndex != m_ConCommandDict.InvalidIndex()) {
+		return m_ConCommandDict[nIndex];
+	}
 	ConCommandBase *cmd = GetCommands();
 	for ( ; cmd; cmd = cmd->GetNext() )
 	{

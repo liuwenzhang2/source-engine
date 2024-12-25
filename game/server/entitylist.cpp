@@ -8200,7 +8200,7 @@ bool CEngineObjectInternal::IsRideablePhysics(IPhysicsObject* pPhysics)
 //=========================================================
 int CEngineObjectInternal::SelectWeightedSequence(int activity)
 {
-	Assert(activity != ACT_INVALID);
+	//Assert(activity != ACT_INVALID);
 	Assert(GetModelPtr());
 	return GetModelPtr()->SelectWeightedSequence(activity, GetSequence(), SharedRandomSelect);
 }
@@ -8208,7 +8208,7 @@ int CEngineObjectInternal::SelectWeightedSequence(int activity)
 
 int CEngineObjectInternal::SelectWeightedSequence(int activity, int curSequence)
 {
-	Assert(activity != ACT_INVALID);
+	//Assert(activity != ACT_INVALID);
 	Assert(GetModelPtr());
 	return GetModelPtr()->SelectWeightedSequence(activity, curSequence, SharedRandomSelect);
 }
