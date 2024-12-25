@@ -174,7 +174,7 @@ void FX_FireBullets(
 #ifdef CLIENT_DLL
 	C_DODPlayer *pPlayer = ToDODPlayer( EntityList()->GetBaseEntity( iPlayerIndex ) );
 #else
-	CDODPlayer *pPlayer = ToDODPlayer( UTIL_PlayerByIndex( iPlayerIndex) );
+	CDODPlayer *pPlayer = ToDODPlayer( EntityList()->GetPlayerByIndex( iPlayerIndex) );
 #endif
 
 	const char * weaponAlias =	WeaponIDToAlias( iWeaponID );

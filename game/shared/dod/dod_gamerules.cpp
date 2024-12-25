@@ -597,7 +597,7 @@ static CDODViewVectors g_DODViewVectors(
 			// Player Data
 			for ( i=1;i<=MAX_PLAYERS;i++ )
 			{
-				CDODPlayer *pPlayer = ToDODPlayer( UTIL_PlayerByIndex( i ) );
+				CDODPlayer *pPlayer = ToDODPlayer( EntityList()->GetPlayerByIndex( i ) );
 
 				if ( pPlayer )
 				{
@@ -1353,7 +1353,7 @@ static CDODViewVectors g_DODViewVectors(
 			if ( playerbits.Get(i) == false )
 				continue;
 
-			pEntity = UTIL_EntityByIndex( i+1 );
+			pEntity = EntityList()->GetBaseEntity( i+1 );
 
 			if ( !pEntity || !pEntity->IsPlayer() )
 				continue;
@@ -1427,7 +1427,7 @@ static CDODViewVectors g_DODViewVectors(
 		// set all players to FL_FROZEN
 		for ( int i = 1; i <= MAX_PLAYERS; i++ )
 		{
-			CDODPlayer *pPlayer = ToDODPlayer( UTIL_PlayerByIndex( i ) );
+			CDODPlayer *pPlayer = ToDODPlayer( EntityList()->GetPlayerByIndex( i ) );
 
 			if ( pPlayer )
 			{
@@ -1620,7 +1620,7 @@ static CDODViewVectors g_DODViewVectors(
 		// check all players
 		for ( i=1; i<=gpGlobals->maxClients; i++ )
 		{
-			CBasePlayer *pPlayer = UTIL_PlayerByIndex( i );
+			CBasePlayer *pPlayer = ToBasePlayer(EntityList()->GetPlayerByIndex( i ));
 
 			if ( !pPlayer )
 				continue;
@@ -1642,7 +1642,7 @@ static CDODViewVectors g_DODViewVectors(
 
 		for ( i=1; i<=gpGlobals->maxClients; i++ )
 		{
-			CBasePlayer *pPlayer = UTIL_PlayerByIndex( i );
+			CBasePlayer *pPlayer = ToBasePlayer(EntityList()->GetPlayerByIndex( i ));
 			
 			if ( !pPlayer )
 				continue;
@@ -1667,7 +1667,7 @@ static CDODViewVectors g_DODViewVectors(
 				if ( !bUpdatePlayer[i] )
 					continue;
 
-				CBasePlayer *pOtherPlayer = UTIL_PlayerByIndex( i+1 );
+				CBasePlayer *pOtherPlayer = ToBasePlayer(EntityList()->GetPlayerByIndex( i+1 ));
 
 				if ( !pOtherPlayer )
 					continue; // nothing there
@@ -3022,7 +3022,7 @@ const CDODViewVectors *CDODGameRules::GetDODViewVectors() const
 
 		for( int i = 1; i <= gpGlobals->maxClients; i++ )
 		{
-			pDODPlayer = ToDODPlayer( UTIL_PlayerByIndex( i ) );
+			pDODPlayer = ToDODPlayer( EntityList()->GetPlayerByIndex( i ) );
 
 			if (pDODPlayer == NULL)
 				continue;
@@ -3150,7 +3150,7 @@ const CDODViewVectors *CDODGameRules::GetDODViewVectors() const
 
 		for (i = 1; i <= gpGlobals->maxClients; i++ )
 		{
-			pDODPlayer = ToDODPlayer( UTIL_PlayerByIndex( i ) );
+			pDODPlayer = ToDODPlayer( EntityList()->GetPlayerByIndex( i ) );
 
 			if( pDODPlayer )
 			{
@@ -3172,7 +3172,7 @@ const CDODViewVectors *CDODGameRules::GetDODViewVectors() const
 		// reset per-round scores for each player
 		for ( int i=0;i<MAX_PLAYERS;i++ )
 		{
-			CDODPlayer *pPlayer = ToDODPlayer( UTIL_PlayerByIndex( i ) );
+			CDODPlayer *pPlayer = ToDODPlayer( EntityList()->GetPlayerByIndex( i ) );
 
 			if ( pPlayer )
 			{
@@ -3612,7 +3612,7 @@ const CDODViewVectors *CDODGameRules::GetDODViewVectors() const
 			CUtlVector<playerscore_t> m_TopCappers;
 			CUtlVector<playerscore_t> m_TopBombers;
 
-			CDODPlayer *pPlayer = ToDODPlayer( UTIL_PlayerByIndex(1) );
+			CDODPlayer *pPlayer = ToDODPlayer( EntityList()->GetPlayerByIndex(1) );
 
 			if ( !pPlayer )
 				return;
@@ -3669,7 +3669,7 @@ const CDODViewVectors *CDODGameRules::GetDODViewVectors() const
 		CDODPlayer *pPlayer;
 		for ( int i = 1; i <= gpGlobals->maxClients; i++ )
 		{
-			pPlayer = ToDODPlayer( UTIL_PlayerByIndex( i ) );
+			pPlayer = ToDODPlayer( EntityList()->GetPlayerByIndex( i ) );
 
 			if ( !pPlayer )
 				continue;
@@ -3779,7 +3779,7 @@ const CDODViewVectors *CDODGameRules::GetDODViewVectors() const
 
 		for ( int i = 1; i <= gpGlobals->maxClients; i++ )
 		{
-			pDODPlayer = ToDODPlayer( UTIL_PlayerByIndex( i ) );
+			pDODPlayer = ToDODPlayer( EntityList()->GetPlayerByIndex( i ) );
 
 			if (pDODPlayer == NULL)
 				continue;
@@ -4328,7 +4328,7 @@ const CDODViewVectors *CDODGameRules::GetDODViewVectors() const
 				bBreakLoop = true;
 			}
 
-			pPlayer = ToDODPlayer( UTIL_PlayerByIndex( iCurrent ) );
+			pPlayer = ToDODPlayer( EntityList()->GetPlayerByIndex( iCurrent ) );
 
 			if (pPlayer == NULL)
 				continue;
@@ -4378,7 +4378,7 @@ const CDODViewVectors *CDODGameRules::GetDODViewVectors() const
 			// for every other player, set all all the kills with respect to this player to 0
 			for ( int i = 1; i <= MAX_PLAYERS; i++ )
 			{
-				CDODPlayer *p = ToDODPlayer( UTIL_PlayerByIndex(i) );
+				CDODPlayer *p = ToDODPlayer( EntityList()->GetPlayerByIndex(i) );
 				if ( !p )
 					continue;
 
@@ -5013,7 +5013,7 @@ void CDODGameRules::WriteStatsFile( const char *pszLogName )
 	// per player
 	for ( i=0;i<MAX_PLAYERS;i++ )
 	{
-		CDODPlayer *pPlayer = ToDODPlayer( UTIL_PlayerByIndex( i ) );
+		CDODPlayer *pPlayer = ToDODPlayer( EntityList()->GetPlayerByIndex( i ) );
 
 		if ( pPlayer )
 		{

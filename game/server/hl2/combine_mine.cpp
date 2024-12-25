@@ -911,7 +911,7 @@ float CBounceBomb::FindNearestNPC()
 	}
 
 	// finally, check the player.
-	CBasePlayer *pPlayer = UTIL_GetLocalPlayer();
+	CBasePlayer *pPlayer = ToBasePlayer(EntityList()->GetLocalPlayer());
 
 	if( pPlayer && !(pPlayer->GetEngineObject()->GetFlags() & FL_NOTARGET) )
 	{
@@ -991,7 +991,7 @@ bool CBounceBomb::IsFriend( CBaseEntity *pEntity )
 //---------------------------------------------------------
 void CBounceBomb::SearchThink()
 {
-	if( !UTIL_FindClientInPVS(this) )
+	if( !EntityList()->FindClientInPVS(this) )
 	{
 		// Sleep!
 		GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.5 );

@@ -2304,7 +2304,7 @@ void CLogicAutosave::InputSave( inputdata_t &inputdata )
 //-----------------------------------------------------------------------------
 void CLogicAutosave::InputSaveDangerous( inputdata_t &inputdata )
 {
-	CBasePlayer *pPlayer = UTIL_PlayerByIndex( 1 );
+	CBasePlayer *pPlayer = ToBasePlayer(EntityList()->GetPlayerByIndex( 1 ));
 
 	if ( g_ServerGameDLL.m_fAutoSaveDangerousTime != 0.0f && g_ServerGameDLL.m_fAutoSaveDangerousTime >= gpGlobals->curtime )
 	{
@@ -2353,7 +2353,7 @@ class CLogicActiveAutosave : public CLogicAutosave
 
 	void SaveThink()
 	{
-		CBasePlayer *pPlayer = UTIL_GetLocalPlayer();
+		CBasePlayer *pPlayer = ToBasePlayer(EntityList()->GetLocalPlayer());
 		if ( pPlayer )
 		{
 			if ( m_flStartTime < 0 )

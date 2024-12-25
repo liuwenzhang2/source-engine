@@ -349,7 +349,7 @@ void CNPC_PlayerCompanion::GatherConditions()
 
 	if ( AI_IsSinglePlayer() )
 	{
-		CBasePlayer *pPlayer = UTIL_GetLocalPlayer();
+		CBasePlayer *pPlayer = ToBasePlayer(EntityList()->GetLocalPlayer());
 
 		if ( Classify() == CLASS_PLAYER_ALLY_VITAL )
 		{
@@ -497,7 +497,7 @@ void CNPC_PlayerCompanion::GatherConditions()
 
 	if ( AI_IsSinglePlayer() && hl2_episodic.GetBool() && !GetEnemy() && HasCondition( COND_HEAR_PLAYER ) )
 	{
-		Vector los = ( UTIL_GetLocalPlayer()->EyePosition() - EyePosition() );
+		Vector los = (EntityList()->GetLocalPlayer()->EyePosition() - EyePosition() );
 		los.z = 0;
 		VectorNormalize( los );
 
@@ -971,7 +971,7 @@ int CNPC_PlayerCompanion::TranslateSchedule( int scheduleType )
 			{
 				if ( AI_IsSinglePlayer() )
 				{
-					CBasePlayer *pPlayer = UTIL_GetLocalPlayer();
+					CBasePlayer *pPlayer = ToBasePlayer(EntityList()->GetLocalPlayer());
 					pWeapon = pPlayer->GetActiveWeapon();
 					if( pWeapon && pWeapon->UsesClipsForAmmo1() && 
 						pWeapon->Clip1() < ( pWeapon->GetMaxClip1() * .75 ) &&
@@ -1154,7 +1154,7 @@ void CNPC_PlayerCompanion::RunTask( const Task_t *pTask )
 			{
 				if ( AI_IsSinglePlayer() )
 				{
-					GetNavigator()->SetAllowBigStep( UTIL_GetLocalPlayer() );
+					GetNavigator()->SetAllowBigStep(ToBasePlayer(EntityList()->GetLocalPlayer()) );
 				}
 				ChainRunTask( TASK_MOVE_AWAY_PATH, 48 );
 			}
@@ -1749,7 +1749,7 @@ void CNPC_PlayerCompanion::UpdateReadiness()
 		const float GRADLENGTH	= 4.0f;
 
 		Vector right;
-		UTIL_PlayerByIndex( 1 )->GetVectors( NULL, &right, NULL );
+		EntityList()->GetPlayerByIndex( 1 )->GetVectors( NULL, &right, NULL );
 
 		if ( IsInScriptedReadinessState() )
  		{
@@ -3018,7 +3018,7 @@ float CNPC_PlayerCompanion::GetIdealAccel() const
 	float multiplier = 1.0;
 	if ( AI_IsSinglePlayer() )
 	{
-		if ( m_bMovingAwayFromPlayer && (UTIL_PlayerByIndex(1)->GetEngineObject()->GetAbsOrigin() - GetEngineObject()->GetAbsOrigin()).Length2DSqr() < Square(3.0*12.0) )
+		if ( m_bMovingAwayFromPlayer && (EntityList()->GetPlayerByIndex(1)->GetEngineObject()->GetAbsOrigin() - GetEngineObject()->GetAbsOrigin()).Length2DSqr() < Square(3.0*12.0) )
 			multiplier = 2.0;
 	}
 	return BaseClass::GetIdealAccel() * multiplier;
@@ -3094,7 +3094,7 @@ void CNPC_PlayerCompanion::InputOutsideTransition( inputdata_t &inputdata )
 	if ( IsInAVehicle() )
 		return;
 
-	CBaseEntity *pPlayer = UTIL_GetLocalPlayer();
+	CBaseEntity *pPlayer = EntityList()->GetLocalPlayer();
 	const Vector &playerPos = pPlayer->GetEngineObject()->GetAbsOrigin();
 
 	// Mark us as already having succeeded if we're vital or always meant to come with the player

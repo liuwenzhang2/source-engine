@@ -1197,7 +1197,7 @@ bool CBaseFlex::ProcessFlexAnimationSceneEvent( CSceneEventInfo *info, CChoreoSc
 					// only check occasionally
 					else if (info->m_flNext <= gpGlobals->curtime)
 					{
-						CBasePlayer *pPlayer = UTIL_GetLocalPlayer();
+						CBasePlayer *pPlayer = ToBasePlayer(EntityList()->GetLocalPlayer());
 
 						// if not in view, disable
 						info->m_bHasArrived = (pPlayer && !pPlayer->FInViewCone( this ) );
@@ -1437,7 +1437,7 @@ bool CBaseFlex::ProcessMoveToSceneEvent( CSceneEventInfo *info, CChoreoScene *sc
 					// need route build failure case
 					// Msg("actor %s unable to build route\n", STRING( myNpc->GetEntityName() ) );
 					// Assert(0);
-
+					ConVarRef developer("developer");
 					if (developer.GetInt() > 0 && scene_showmoveto.GetBool())
 					{
 						Vector vTestPoint;
@@ -1470,6 +1470,7 @@ bool CBaseFlex::ProcessMoveToSceneEvent( CSceneEventInfo *info, CChoreoScene *sc
 	}
 
 	// show movement target
+	ConVarRef developer("developer");
 	if (developer.GetInt() > 0 && scene_showmoveto.GetBool() && IsMoving())
 	{
 		Vector vecStart, vTestPoint;
@@ -1524,6 +1525,7 @@ bool CBaseFlex::ProcessLookAtSceneEvent( CSceneEventInfo *info, CChoreoScene *sc
 		intensity = clamp( intensity, 0.0f, flMaxIntensity );
 
 		myNpc->AddLookTarget( info->m_hTarget, intensity, 0.1 );
+		ConVarRef developer("developer");
 		if (developer.GetInt() > 0 && scene_showlook.GetBool() && info->m_hTarget)
 		{
 			Vector tmp = info->m_hTarget->EyePosition() - myNpc->EyePosition();
@@ -2304,7 +2306,7 @@ void CFlexCycler::GenericCyclerSpawn(char *szModel, Vector vecMin, Vector vecMax
 
 	CFlexCycler::Spawn( );
 
-	UTIL_SetSize(this, vecMin, vecMax);
+	GetEngineObject()->SetSize( vecMin, vecMax);
 
 	Vector vecEyeOffset;
 	GetEngineObject()->GetModelPtr()->GetEyePosition( vecEyeOffset );
@@ -2712,7 +2714,7 @@ void CFlexCycler::Think( void )
 	Vector forward, right, up;
 	GetVectors( &forward, &right, &up );
 
-	CBaseEntity *pPlayer = (CBaseEntity *)UTIL_GetLocalPlayer();
+	CBaseEntity *pPlayer = EntityList()->GetLocalPlayer();
 	if (pPlayer)
 	{
 		if (pPlayer->GetSmoothedVelocity().Length() != 0 && DotProduct( forward, pPlayer->EyePosition() - EyePosition()) > 0.5)

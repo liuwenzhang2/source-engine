@@ -95,7 +95,7 @@ void CPlayerResource::UpdatePlayerData( void )
 {
 	for ( int i = 1; i <= gpGlobals->maxClients; i++ )
 	{
-		CBasePlayer *pPlayer = (CBasePlayer*)UTIL_PlayerByIndex( i );
+		CBasePlayer *pPlayer = (CBasePlayer*)EntityList()->GetPlayerByIndex( i );
 		
 		if ( pPlayer && pPlayer->IsConnected() )
 		{

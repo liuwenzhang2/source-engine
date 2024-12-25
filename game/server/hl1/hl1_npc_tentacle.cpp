@@ -290,7 +290,7 @@ void CNPC_Tentacle::Spawn( )
 	GetEngineObject()->SetSequence( 0 );
 
 	SetModel( "models/tentacle2.mdl" );
-	UTIL_SetSize( this, Vector( -32, -32, 0 ), Vector( 32, 32, 64 ) );
+	GetEngineObject()->SetSize( Vector( -32, -32, 0 ), Vector( 32, 32, 64 ) );
 
 	// Use our hitboxes to determine our render bounds
 	GetEngineObject()->SetSurroundingBoundsType( USE_HITBOXES );

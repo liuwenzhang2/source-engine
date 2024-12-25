@@ -664,7 +664,7 @@ void CProp_Portal::PunchAllPenetratingPlayers( void )
 {
 	for( int i = 1; i <= gpGlobals->maxClients; ++i )
 	{
-		CBasePlayer *pPlayer = UTIL_PlayerByIndex( i );
+		CBasePlayer *pPlayer = ToBasePlayer(EntityList()->GetPlayerByIndex( i ));
 		if( pPlayer )
 			PunchPenetratingPlayer( pPlayer );
 	}

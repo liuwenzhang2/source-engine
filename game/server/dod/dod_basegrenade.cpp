@@ -76,7 +76,7 @@ void CDODBaseGrenade::Spawn( void )
 	GetEngineObject()->SetElasticity(GRENADE_COEFFICIENT_OF_RESTITUTION);
 	GetEngineObject()->SetSolid( SOLID_BBOX );	// So it will collide with physics props!
 
-	UTIL_SetSize( this, Vector(-4,-4,-4), Vector(4,4,4) );
+	GetEngineObject()->SetSize( Vector(-4,-4,-4), Vector(4,4,4) );
 
 	if( m_bUseVPhysics )
 	{		 

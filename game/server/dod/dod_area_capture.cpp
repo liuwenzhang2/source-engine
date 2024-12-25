@@ -209,7 +209,7 @@ void CAreaCapture::Think( void )
 
 	for ( int i = 1; i <= gpGlobals->maxClients; i++ )
 	{
-		CBaseEntity *ent = UTIL_PlayerByIndex( i );
+		CBaseEntity *ent = EntityList()->GetPlayerByIndex( i );
 		if ( ent )
 		{
 			CDODPlayer *pPlayer = ToDODPlayer(ent);

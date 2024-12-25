@@ -223,7 +223,7 @@ void CNPC_Portal_GroundTurret::Scan( void )
 		return;
 	}
 
-	if( !UTIL_FindClientInPVS(this) )
+	if( !EntityList()->FindClientInPVS(this) )
 	{
 		return;
 	}

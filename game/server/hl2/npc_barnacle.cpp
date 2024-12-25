@@ -258,7 +258,7 @@ void CNPC_Barnacle::Spawn()
 	Precache( );
 
 	SetModel( "models/barnacle.mdl" );
-	UTIL_SetSize( this, Vector(-16, -16, -40), Vector(16, 16, 0) );
+	GetEngineObject()->SetSize( Vector(-16, -16, -40), Vector(16, 16, 0) );
 
 	GetEngineObject()->SetSolid( SOLID_BBOX );
 	GetEngineObject()->AddSolidFlags( FSOLID_NOT_STANDABLE );
@@ -584,7 +584,7 @@ void CNPC_Barnacle::BarnacleThink ( void )
 		// tip is in the PVS but the body isn't
 		Vector vecSurroundMins, vecSurroundMaxs;
 		GetEngineObject()->WorldSpaceSurroundingBounds( &vecSurroundMins, &vecSurroundMaxs );
-		if ( !UTIL_FindClientInPVS( vecSurroundMins, vecSurroundMaxs ) )
+		if ( !EntityList()->FindClientInPVS( vecSurroundMins, vecSurroundMaxs ) )
 		{
 			GetEngineObject()->SetNextThink( gpGlobals->curtime + random->RandomFloat(1,1.5) );	// Stagger a bit to keep barnacles from thinking on the same frame
 		}

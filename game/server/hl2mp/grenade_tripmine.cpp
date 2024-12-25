@@ -68,7 +68,7 @@ void CTripmineGrenade::Spawn( void )
 	GetEngineObject()->ResetSequenceInfo( );
 	GetEngineObject()->SetPlaybackRate(0);
 
-	UTIL_SetSize(this, Vector( -4, -4, -2), Vector(4, 4, 2));
+	GetEngineObject()->SetSize(Vector( -4, -4, -2), Vector(4, 4, 2));
 
 	m_flPowerUp = gpGlobals->curtime + 2.0;
 

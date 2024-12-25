@@ -839,7 +839,7 @@ void CAI_ActBusyBehavior::GatherConditions( void )
 					ClearCondition( COND_SEE_ENEMY );
 					ClearCondition( COND_NEW_ENEMY );
 
-					CBasePlayer *pPlayer = UTIL_PlayerByIndex(1);
+					CBasePlayer *pPlayer = ToBasePlayer(EntityList()->GetPlayerByIndex(1));
 
 					if( pPlayer )
 					{
@@ -1520,7 +1520,7 @@ void CAI_ActBusyBehavior::ComputeAndSetRenderBounds()
 	Vector mins, maxs;
 	if ( GetOuter()->GetEngineObject()->ComputeHitboxSurroundingBox( &mins, &maxs ) )
 	{
-		UTIL_SetSize( GetOuter(), mins - GetAbsOrigin(), maxs - GetAbsOrigin());
+		GetOuter()->GetEngineObject()->SetSize( mins - GetAbsOrigin(), maxs - GetAbsOrigin());
 		if ( GetOuter()->GetEngineObject()->VPhysicsGetObject() )
 		{
 			GetOuter()->SetupVPhysicsHull();

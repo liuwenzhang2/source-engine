@@ -1095,7 +1095,7 @@ void ClientModeShared::FireGameEvent( IGameEvent *event )
 		//If we're in the spectator team then we should be getting whatever messages the person I'm spectating gets.
 		if ( bValidTeam == false )
 		{
-			CBasePlayer *pSpectatorTarget = UTIL_PlayerByIndex( GetSpectatorTarget() );
+			CBasePlayer *pSpectatorTarget = ToBasePlayer(EntityList()->GetPlayerByIndex( GetSpectatorTarget() ));
 
 			if ( pSpectatorTarget && (GetSpectatorMode() == OBS_MODE_IN_EYE || GetSpectatorMode() == OBS_MODE_CHASE) )
 			{
@@ -1144,7 +1144,7 @@ void ClientModeShared::FireGameEvent( IGameEvent *event )
 	else if ( Q_strcmp( "achievement_earned", eventname ) == 0 )
 	{
 		int iPlayerIndex = event->GetInt( "player" );
-		C_BasePlayer *pPlayer = UTIL_PlayerByIndex( iPlayerIndex );
+		C_BasePlayer *pPlayer = ToBasePlayer(EntityList()->GetPlayerByIndex( iPlayerIndex ));
 		int iAchievement = event->GetInt( "achievement" );
 
 		if ( !hudChat || !pPlayer )
@@ -1200,7 +1200,7 @@ void ClientModeShared::FireGameEvent( IGameEvent *event )
 		entityquality_t iItemQuality = event->GetInt( "quality" );
 		int iMethod = event->GetInt( "method" );
 		int iItemDef = event->GetInt( "itemdef" );
-		C_BasePlayer *pPlayer = UTIL_PlayerByIndex( iPlayerIndex );
+		C_BasePlayer *pPlayer = EntityList()->GetPlayerByIndex( iPlayerIndex );
 		const GameItemDefinition_t *pItemDefinition = dynamic_cast<GameItemDefinition_t *>( GetItemSchema()->GetItemDefinition( iItemDef ) );
 
 		if ( !pPlayer || !pItemDefinition )

@@ -1006,7 +1006,7 @@ void CAI_PlayerAlly::StartTask( const Task_t *pTask )
 			if ( HasCondition( COND_PLAYER_PUSHING ) && AI_IsSinglePlayer() )
 			{
 				// @TODO (toml 10-22-04): cope with multiplayer push
-				GetMotor()->SetIdealYawToTarget( UTIL_GetLocalPlayer()->WorldSpaceCenter() );
+				GetMotor()->SetIdealYawToTarget(EntityList()->GetLocalPlayer()->WorldSpaceCenter() );
 			}
 			BaseClass::StartTask( pTask );
 			break;
@@ -1315,7 +1315,7 @@ CBaseEntity *CAI_PlayerAlly::FindSpeechTarget( int flags )
 	{
 		for ( i = 1; i <= gpGlobals->maxClients; i++ )
 		{
-			CBaseEntity *pPlayer = UTIL_PlayerByIndex( i );
+			CBaseEntity *pPlayer = EntityList()->GetPlayerByIndex( i );
 			if ( pPlayer )
 			{
 				distSq = ( vAbsOrigin - pPlayer->GetEngineObject()->GetAbsOrigin() ).LengthSqr();
@@ -1439,7 +1439,7 @@ bool CAI_PlayerAlly::IsOkToSpeak( ConceptCategory_t category, bool fRespondingTo
 	}
 
 	// if player is not in pvs, don't speak
-	if ( !UTIL_FindClientInPVS(this) )
+	if ( !EntityList()->FindClientInPVS(this) )
 		return false;
 
 	if ( category != SPEECH_PRIORITY )

@@ -38,96 +38,7 @@ bool NPC_CheckBrushExclude( CBaseEntity *pEntity, CBaseEntity *pBrush );
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
-ConVar r_visualizetraces( "r_visualizetraces", "0", FCVAR_CHEAT );
-ConVar developer("developer", "0", 0, "Set developer message level." ); // developer mode
 
-float UTIL_VecToYaw( const Vector &vec )
-{
-	if (vec.y == 0 && vec.x == 0)
-		return 0;
-	
-	float yaw = atan2( vec.y, vec.x );
-
-	yaw = RAD2DEG(yaw);
-
-	if (yaw < 0)
-		yaw += 360;
-
-	return yaw;
-}
-
-
-float UTIL_VecToPitch( const Vector &vec )
-{
-	if (vec.y == 0 && vec.x == 0)
-	{
-		if (vec.z < 0)
-			return 180.0;
-		else
-			return -180.0;
-	}
-
-	float dist = vec.Length2D();
-	float pitch = atan2( -vec.z, dist );
-
-	pitch = RAD2DEG(pitch);
-
-	return pitch;
-}
-
-float UTIL_VecToYaw( const matrix3x4_t &matrix, const Vector &vec )
-{
-	Vector tmp = vec;
-	VectorNormalize( tmp );
-
-	float x = matrix[0][0] * tmp.x + matrix[1][0] * tmp.y + matrix[2][0] * tmp.z;
-	float y = matrix[0][1] * tmp.x + matrix[1][1] * tmp.y + matrix[2][1] * tmp.z;
-
-	if (x == 0.0f && y == 0.0f)
-		return 0.0f;
-	
-	float yaw = atan2( -y, x );
-
-	yaw = RAD2DEG(yaw);
-
-	if (yaw < 0)
-		yaw += 360;
-
-	return yaw;
-}
-
-
-float UTIL_VecToPitch( const matrix3x4_t &matrix, const Vector &vec )
-{
-	Vector tmp = vec;
-	VectorNormalize( tmp );
-
-	float x = matrix[0][0] * tmp.x + matrix[1][0] * tmp.y + matrix[2][0] * tmp.z;
-	float z = matrix[0][2] * tmp.x + matrix[1][2] * tmp.y + matrix[2][2] * tmp.z;
-
-	if (x == 0.0f && z == 0.0f)
-		return 0.0f;
-	
-	float pitch = atan2( z, x );
-
-	pitch = RAD2DEG(pitch);
-
-	if (pitch < 0)
-		pitch += 360;
-
-	return pitch;
-}
-
-Vector UTIL_YawToVector( float yaw )
-{
-	Vector ret;
-	
-	ret.z = 0;
-	float angle = DEG2RAD( yaw );
-	SinCos( angle, &ret.y, &ret.x );
-
-	return ret;
-}
 
 //-----------------------------------------------------------------------------
 // Purpose: Helper function get get determinisitc random values for shared/prediction code
@@ -695,7 +606,7 @@ void UTIL_ClipTraceToPlayers( const Vector& vecAbsStart, const Vector& vecAbsEnd
 
 	for ( int k = 1; k <= gpGlobals->maxClients; ++k )
 	{
-		CBasePlayer *player = UTIL_PlayerByIndex( k );
+		CBasePlayer *player = ToBasePlayer(EntityList()->GetPlayerByIndex( k ));
 
 		if ( !player || !player->IsAlive() )
 			continue;
@@ -977,11 +888,6 @@ float CountdownTimer::Now( void ) const
 
 
 #ifdef CLIENT_DLL
-	CBasePlayer *UTIL_PlayerByIndex( int entindex )
-	{
-		return ToBasePlayer( EntityList()->GetEnt( entindex ) );
-	}
-
 //=============================================================================
 // HPE_BEGIN:
 // [menglish] Added UTIL function for events in client win_panel which transmit the player as a user ID
@@ -991,7 +897,7 @@ float CountdownTimer::Now( void ) const
 	{
 		for (int i = 1; i<=gpGlobals->maxClients; i++ )
 		{
-			CBasePlayer *pPlayer = UTIL_PlayerByIndex( i );
+			CBasePlayer *pPlayer = ToBasePlayer(EntityList()->GetPlayerByIndex( i ));
 
 			if ( !pPlayer )
 				continue;

@@ -317,6 +317,7 @@ inline void UTIL_TraceLineIgnoreTwoEntities( const Vector& vecAbsStart, const Ve
 	ray.Init( vecAbsStart, vecAbsEnd );
 	CTraceFilterSkipTwoEntities traceFilter( ignore, ignore2, collisionGroup );
 	enginetrace->TraceRay( ray, mask, &traceFilter, ptr );
+	ConVarRef r_visualizetraces("r_visualizetraces");
 	if( r_visualizetraces.GetBool() )
 	{
 		DebugDrawLine( ptr->startpos, ptr->endpos, 255, 0, 0, true, -1.0f );
@@ -405,7 +406,7 @@ void CCSPlayer::FireBullet(
 
 	if( sv_showplayerhitboxes.GetInt() > 0 )
 	{
-		CBasePlayer *lagPlayer = UTIL_PlayerByIndex( sv_showplayerhitboxes.GetInt() );
+		CBasePlayer *lagPlayer = ToBasePlayer(EntityList()->GetPlayerByIndex( sv_showplayerhitboxes.GetInt() ));
 		if( lagPlayer )
 		{
 #ifdef CLIENT_DLL

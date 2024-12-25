@@ -576,7 +576,7 @@ CSpriteTrail *CSpriteTrail::SpriteTrailCreate( const char *pSpriteName, const Ve
 	pSprite->GetEngineObject()->SetSolid( SOLID_NONE );
 	pSprite->GetEngineObject()->SetMoveType( MOVETYPE_NOCLIP );
 	
-	UTIL_SetSize( pSprite, vec3_origin, vec3_origin );
+	pSprite->GetEngineObject()->SetSize( vec3_origin, vec3_origin );
 
 	if ( animate )
 	{

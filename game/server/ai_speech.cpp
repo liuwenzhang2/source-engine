@@ -314,7 +314,7 @@ AI_Response *CAI_Expresser::SpeakFindResponse( AIConcept_t concept, const char *
 	// Append local player criteria to set, but not if this is a player doing the talking
 	if ( !GetOuter()->IsPlayer() )
 	{
-		CBasePlayer *pPlayer = UTIL_PlayerByIndex( 1 );
+		CBasePlayer *pPlayer = ToBasePlayer(EntityList()->GetPlayerByIndex( 1 ));
 		if( pPlayer )
 			pPlayer->ModifyOrAppendPlayerCriteria( set );
 	}
@@ -464,7 +464,8 @@ bool CAI_Expresser::SpeakDispatchResponse( AIConcept_t concept, AI_Response *res
 		break;
 	case RESPONSE_PRINT:
 		{
-			if ( g_pDeveloper->GetInt() > 0 )
+			ConVarRef developer("developer");
+			if ( developer.GetInt() > 0 )
 			{
 				Vector vPrintPos;
 				GetOuter()->GetEngineObject()->NormalizedToWorldSpace( Vector(0.5,0.5,1.0f), &vPrintPos );
@@ -478,7 +479,8 @@ bool CAI_Expresser::SpeakDispatchResponse( AIConcept_t concept, AI_Response *res
 	if ( spoke )
 	{
 		m_flLastTimeAcceptedSpeak = gpGlobals->curtime;
-		if ( DebuggingSpeech() && g_pDeveloper->GetInt() > 0 && response && result->GetType() != RESPONSE_PRINT )
+		ConVarRef developer("developer");
+		if ( DebuggingSpeech() && developer.GetInt() > 0 && response && result->GetType() != RESPONSE_PRINT )
 		{
 			Vector vPrintPos;
 			GetOuter()->GetEngineObject()->NormalizedToWorldSpace( Vector(0.5,0.5,1.0f), &vPrintPos );
@@ -986,7 +988,6 @@ void CAI_ExpresserHost_NPC_DoModifyOrAppendCriteria( CAI_BaseNPC *pSpeaker, AI_C
 // [Forrest] Remove npc_speakall from Counter-Strike.
 //=============================================================================
 #ifndef CSTRIKE_DLL
-extern CBaseEntity *FindPickerEntity( CBasePlayer *pPlayer );
 CON_COMMAND( npc_speakall, "Force the npc to try and speak all their responses" )
 {
 	if ( !UTIL_IsCommandIssuedByServerAdmin() )
@@ -1004,7 +1005,7 @@ CON_COMMAND( npc_speakall, "Force the npc to try and speak all their responses" 
 	}
 	else
 	{
-		pEntity = FindPickerEntity( UTIL_GetCommandClient() );
+		pEntity = EntityList()->FindPickerEntity( UTIL_GetCommandClient() );
 	}
 		
 	if ( pEntity )

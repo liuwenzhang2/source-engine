@@ -173,6 +173,7 @@ void CAI_MoveProbe::TraceHull(
 #endif
 	}
 
+	ConVarRef r_visualizetraces("r_visualizetraces");
 	if ( r_visualizetraces.GetBool() )
 		DebugDrawLine( pResult->startpos, pResult->endpos, 255, 255, 0, true, -1.0f );
 

@@ -1003,7 +1003,7 @@ void CXenPLight::Spawn( void )
 	GetEngineObject()->SetSolid( SOLID_BBOX );
 	GetEngineObject()->AddSolidFlags( FSOLID_TRIGGER | FSOLID_NOT_SOLID );
 
-	UTIL_SetSize( this, Vector(-80,-80,0), Vector(80,80,32));
+	GetEngineObject()->SetSize(Vector(-80,-80,0), Vector(80,80,32));
 	SetActivity( ACT_IDLE );
 	GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.1 );
 	GetEngineObject()->SetCycle( random->RandomFloat(0,1) );
@@ -1106,7 +1106,7 @@ void CXenHair::Spawn( void )
 {
 	Precache();
 	SetModel( "models/hair.mdl" );
-	UTIL_SetSize( this, Vector(-4,-4,0), Vector(4,4,32));
+	GetEngineObject()->SetSize(Vector(-4,-4,0), Vector(4,4,32));
 	GetEngineObject()->SetSequence( 0 );
 	
 	if ( !GetEngineObject()->HasSpawnFlags( SF_HAIR_SYNC ) )
@@ -1202,7 +1202,7 @@ void CXenTree::Spawn( void )
 
 	m_takedamage = DAMAGE_YES;
 
-	UTIL_SetSize( this, Vector(-30,-30,0), Vector(30,30,188));
+	GetEngineObject()->SetSize(Vector(-30,-30,0), Vector(30,30,188));
 	SetActivity( ACT_IDLE );
 	GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.1 );
 	GetEngineObject()->SetCycle( random->RandomFloat( 0,1 ) );
@@ -1215,7 +1215,7 @@ void CXenTree::Spawn( void )
 	
 	// Create the trigger
 	m_pTrigger = CXenTreeTrigger::TriggerCreate( this, triggerPosition );
-	UTIL_SetSize( m_pTrigger, Vector( -24, -24, 0 ), Vector( 24, 24, 128 ) );
+	m_pTrigger->GetEngineObject()->SetSize( Vector( -24, -24, 0 ), Vector( 24, 24, 128 ) );
 }
 
 void CXenTree::Precache( void )
@@ -1363,7 +1363,7 @@ CXenHull *CXenHull::CreateHull( CBaseEntity *source, const Vector &mins, const V
 	pHull->GetEngineObject()->SetSolid( SOLID_BBOX );
 	pHull->GetEngineObject()->SetMoveType( MOVETYPE_NONE );
 	pHull->SetOwnerEntity( source );
-	UTIL_SetSize( pHull, mins, maxs );
+	pHull->GetEngineObject()->SetSize( mins, maxs );
 	pHull->SetRenderColorA( 0 );
 	pHull->m_nRenderMode  = kRenderTransTexture;
 	return pHull;
@@ -1379,13 +1379,13 @@ void CXenSporeSmall::Spawn( void )
 {
 	GetEngineObject()->SetSkin(0);
 	CXenSpore::Spawn();
-	UTIL_SetSize( this, Vector(-16,-16,0), Vector(16,16,64));
+	GetEngineObject()->SetSize(Vector(-16,-16,0), Vector(16,16,64));
 }
 void CXenSporeMed::Spawn( void )
 {
 	GetEngineObject()->SetSkin(1);
 	CXenSpore::Spawn();
-	UTIL_SetSize( this, Vector(-40,-40,0), Vector(40,40,120));
+	GetEngineObject()->SetSize(Vector(-40,-40,0), Vector(40,40,120));
 }
 
 
@@ -1403,7 +1403,7 @@ void CXenSporeLarge::Spawn( void )
 {
 	GetEngineObject()->SetSkin(2);
 	CXenSpore::Spawn();
-	UTIL_SetSize( this, Vector(-48,-48,110), Vector(48,48,240));
+	GetEngineObject()->SetSize(Vector(-48,-48,110), Vector(48,48,240));
 	
 	Vector forward, right;
 
@@ -1581,7 +1581,7 @@ void CHL1Gib::Spawn( const char *szGibModel )
 	SetClassname( "gib" );
 
 	SetModel( szGibModel );
-	UTIL_SetSize( this, Vector( 0, 0, 0), Vector(0, 0, 0));
+	GetEngineObject()->SetSize(Vector( 0, 0, 0), Vector(0, 0, 0));
 
 	GetEngineObject()->SetNextThink( gpGlobals->curtime + 4 );
 
@@ -1638,7 +1638,7 @@ void CTriggerEndSection::Spawn( void )
 
 void CTriggerEndSection::InputEndSection( inputdata_t &data )
 {
-	CBaseEntity *pPlayer = UTIL_GetLocalPlayer();
+	CBaseEntity *pPlayer = ToBasePlayer(EntityList()->GetLocalPlayer());
 
 	if ( pPlayer )
 	{

@@ -192,7 +192,7 @@ ConVar  player_debug_print_damage( "player_debug_print_damage", "0", FCVAR_CHEAT
 
 void CC_GiveCurrentAmmo( void )
 {
-	CBasePlayer *pPlayer = UTIL_PlayerByIndex(1);
+	CBasePlayer *pPlayer = ToBasePlayer(EntityList()->GetPlayerByIndex(1));
 
 	if( pPlayer )
 	{
@@ -2798,7 +2798,7 @@ CBaseEntity * CBasePlayer::FindNextObserverTarget(bool bReverse)
 	
 	do
 	{
-		CBaseEntity * nextTarget = UTIL_PlayerByIndex( currentIndex );
+		CBaseEntity * nextTarget = EntityList()->GetPlayerByIndex( currentIndex );
 
 		if ( IsValidObserverTarget( nextTarget ) )
 		{
@@ -3699,6 +3699,7 @@ void CBasePlayer::PlayerRunCommand(CUserCmd *ucmd, IMoveHelper *moveHelper)
 
 	// Handle FL_FROZEN.
 	// Prevent player moving for some seconds after New Game, so that they pick up everything
+	ConVarRef developer("developer");
 	if(GetEngineObject()->GetFlags() & FL_FROZEN ||
 		(developer.GetInt() == 0 && gpGlobals->eLoadType == MapLoad_NewGame && gpGlobals->curtime < 3.0 ) )
 	{
@@ -5209,13 +5210,13 @@ int CBasePlayer::Restore( IRestore &restore )
 	{
 		// Use the crouch HACK
 		FixPlayerCrouchStuck( this );
-		UTIL_SetSize(this, VEC_DUCK_HULL_MIN, VEC_DUCK_HULL_MAX);
+		GetEngineObject()->SetSize(VEC_DUCK_HULL_MIN, VEC_DUCK_HULL_MAX);
 		m_Local.m_bDucked = true;
 	}
 	else
 	{
 		m_Local.m_bDucked = false;
-		UTIL_SetSize(this, VEC_HULL_MIN, VEC_HULL_MAX);
+		GetEngineObject()->SetSize(VEC_HULL_MIN, VEC_HULL_MAX);
 	}
 
 	// We need to get at m_vecAbsOrigin as it was restored but can't let it be
@@ -5738,44 +5739,6 @@ CBaseEntity *FindEntityClassForward( CBasePlayer *pMe, char *classname )
 }
 
 //-----------------------------------------------------------------------------
-// Purpose: Returns the nearest COLLIBALE entity in front of the player
-//			that has a clear line of sight. If HULL is true, the trace will
-//			hit the collision hull of entities. Otherwise, the trace will hit
-//			hitboxes.
-// Input  :
-// Output :
-//-----------------------------------------------------------------------------
-CBaseEntity *FindEntityForward( CBasePlayer *pMe, bool fHull )
-{
-	if ( pMe )
-	{
-		trace_t tr;
-		Vector forward;
-		int mask;
-
-		if( fHull )
-		{
-			mask = MASK_SOLID;
-		}
-		else
-		{
-			mask = MASK_SHOT;
-		}
-
-		pMe->EyeVectors( &forward );
-		UTIL_TraceLine(pMe->EyePosition(),
-			pMe->EyePosition() + forward * MAX_COORD_RANGE,
-			mask, pMe, COLLISION_GROUP_NONE, &tr );
-		if ( tr.fraction != 1.0 && tr.DidHitNonWorldEntity() )
-		{
-			return (CBaseEntity*)tr.m_pEnt;
-		}
-	}
-	return NULL;
-
-}
-
-//-----------------------------------------------------------------------------
 // Purpose: Finds the nearest entity in front of the player of the given
 //			classname, preferring collidable entities, but allows selection of 
 //			enities that are on the other side of walls or objects
@@ -5796,32 +5759,6 @@ CBaseEntity *FindPickerEntityClass( CBasePlayer *pPlayer, char *classname )
 		pPlayer->EyeVectors( &forward );
 		origin = pPlayer->WorldSpaceCenter();		
 		pEntity = EntityList()->FindEntityClassNearestFacing( origin, forward,0.95,classname);
-	}
-	return pEntity;
-}
-
-//-----------------------------------------------------------------------------
-// Purpose: Finds the nearest entity in front of the player, preferring
-//			collidable entities, but allows selection of enities that are
-//			on the other side of walls or objects
-// Input  :
-// Output :
-//-----------------------------------------------------------------------------
-CBaseEntity *FindPickerEntity( CBasePlayer *pPlayer )
-{
-	MDLCACHE_CRITICAL_SECTION();
-
-	// First try to trace a hull to an entity
-	CBaseEntity *pEntity = FindEntityForward( pPlayer, true );
-
-	// If that fails just look for the nearest facing entity
-	if (!pEntity) 
-	{
-		Vector forward;
-		Vector origin;
-		pPlayer->EyeVectors( &forward );
-		origin = pPlayer->WorldSpaceCenter();		
-		pEntity = EntityList()->FindEntityNearestFacing( origin, forward,0.95);
 	}
 	return pEntity;
 }
@@ -6203,7 +6140,7 @@ void CBasePlayer::CheatImpulseCommands( int iImpulse )
 
 	case 103:
 		// What the hell are you doing?
-		pEntity = FindEntityForward( this, true );
+		pEntity = EntityList()->FindEntityForward( this, true );
 		if ( pEntity )
 		{
 			CAI_BaseNPC *pNPC = pEntity->MyNPCPointer();
@@ -6214,7 +6151,7 @@ void CBasePlayer::CheatImpulseCommands( int iImpulse )
 
 	case 106:
 		// Give me the classname and targetname of this entity.
-		pEntity = FindEntityForward( this, true );
+		pEntity = EntityList()->FindEntityForward( this, true );
 		if ( pEntity )
 		{
 			Msg( "Classname: %s", pEntity->GetClassname() );
@@ -6261,7 +6198,7 @@ void CBasePlayer::CheatImpulseCommands( int iImpulse )
 	//
 	case 108:
 	{
-		pEntity = FindEntityForward( this, true );
+		pEntity = EntityList()->FindEntityForward( this, true );
 		if ( pEntity )
 		{
 			CAI_BaseNPC *pNPC = pEntity->MyNPCPointer();
@@ -6305,7 +6242,7 @@ void CBasePlayer::CheatImpulseCommands( int iImpulse )
 		}
 		break;
 	case	203:// remove creature.
-		pEntity = FindEntityForward( this, true );
+		pEntity = EntityList()->FindEntityForward( this, true );
 		if ( pEntity )
 		{
 			EntityList()->DestroyEntity( pEntity );
@@ -6511,7 +6448,7 @@ bool CBasePlayer::ClientCommand( const CCommand &args )
 			}
 			else
 			{
-				target = UTIL_PlayerByIndex( index );
+				target = ToBasePlayer(EntityList()->GetPlayerByIndex( index ));
 			}
 
 			if ( IsValidObserverTarget( target ) )
@@ -6557,7 +6494,7 @@ bool CBasePlayer::ClientCommand( const CCommand &args )
 			nRecords = MAX( Q_atoi( args.Arg( 2 ) ), 1 );
 		}
 
-		CBasePlayer *pl = UTIL_PlayerByIndex( nRecip );
+		CBasePlayer *pl = ToBasePlayer(EntityList()->GetPlayerByIndex( nRecip ));
 		if ( pl )
 		{
 			pl->DumpPerfToRecipient( this, nRecords );
@@ -7616,7 +7553,7 @@ void CStripWeapons::StripWeapons(inputdata_t &data, bool stripSuit)
 	}
 	else if ( !g_pGameRules->IsDeathmatch() )
 	{
-		pPlayer = UTIL_GetLocalPlayer();
+		pPlayer = ToBasePlayer(EntityList()->GetLocalPlayer());
 	}
 
 	if ( pPlayer )
@@ -7712,7 +7649,7 @@ void CRevertSaved::Use( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE 
 	GetEngineObject()->SetNextThink( gpGlobals->curtime + LoadTime() );
 	SetThink( &CRevertSaved::LoadThink );
 
-	CBasePlayer *pPlayer = UTIL_GetLocalPlayer();
+	CBasePlayer *pPlayer = ToBasePlayer(EntityList()->GetLocalPlayer());
 
 	if ( pPlayer )
 	{
@@ -7738,7 +7675,7 @@ void CRevertSaved::InputReload( inputdata_t &inputdata )
 	SetThink( &CRevertSaved::LoadThink );
 #endif
 
-	CBasePlayer *pPlayer = UTIL_GetLocalPlayer();
+	CBasePlayer *pPlayer = ToBasePlayer(EntityList()->GetLocalPlayer());
 
 	if ( pPlayer )
 	{
@@ -7850,7 +7787,7 @@ void CMovementSpeedMod::InputSpeedMod(inputdata_t &data)
 	}
 	else if ( !g_pGameRules->IsDeathmatch() )
 	{
-		pPlayer = UTIL_GetLocalPlayer();
+		pPlayer = ToBasePlayer(EntityList()->GetLocalPlayer());
 	}
 
 	if ( pPlayer )
@@ -8466,7 +8403,7 @@ void CBasePlayer::SetPunchAngle( const QAngle &punchAngle )
 
 		for ( int i = 1; i <= gpGlobals->maxClients; i++ )
 		{
-			CBasePlayer *pPlayer = UTIL_PlayerByIndex( i );
+			CBasePlayer *pPlayer = ToBasePlayer(EntityList()->GetPlayerByIndex( i ));
 
 			if ( pPlayer && i != index && pPlayer->GetObserverTarget() == this && pPlayer->GetObserverMode() == OBS_MODE_IN_EYE )
 			{

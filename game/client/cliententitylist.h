@@ -19,7 +19,6 @@
 #include "utlvector.h"
 #include "icliententityinternal.h"
 #include "ispatialpartition.h"
-#include "cdll_util.h"
 #include "entitylist_base.h"
 #include "utlmap.h"
 #include "client_class.h"
@@ -2804,6 +2803,7 @@ public:
 	CBaseHandle				FirstHandle() const { return BaseClass::FirstHandle(); }
 	CBaseHandle				NextHandle(CBaseHandle hEnt) const { return BaseClass::NextHandle(hEnt); }
 	CBaseHandle				InvalidHandle() { return BaseClass::InvalidHandle(); }
+	C_BaseEntity*			GetPlayerByIndex(int entindex);
 
 	// Is a handle valid?
 	bool					IsHandleValid( CBaseHandle handle ) const;
@@ -2946,8 +2946,8 @@ public:
 			return;
 
 		// don't make noise for hidden/invisible/sky materials
-		surfacedata_t* phit = EntityList()->PhysGetProps()->GetSurfaceData(surfacePropsHit);
-		surfacedata_t* psurf = EntityList()->PhysGetProps()->GetSurfaceData(surfaceProps);
+		surfacedata_t* phit = PhysGetProps()->GetSurfaceData(surfacePropsHit);
+		surfacedata_t* psurf = PhysGetProps()->GetSurfaceData(surfaceProps);
 
 		if (phit->game.material == 'X' || psurf->game.material == 'X')
 			return;
@@ -2967,7 +2967,7 @@ public:
 			soundHandle = &psurf->soundhandles.scrapeRough;
 		}
 
-		const char* pSoundName = EntityList()->PhysGetProps()->GetString(soundName);
+		const char* pSoundName = PhysGetProps()->GetString(soundName);
 
 		PhysFrictionSound(pEntity, pObject, pSoundName, *soundHandle, volume);
 	}
@@ -3977,6 +3977,16 @@ IClientThinkable* CClientEntityList<T>::GetClientThinkableFromHandle(CBaseHandle
 {
 	T* pEnt = GetClientUnknownFromHandle(hEnt);
 	return pEnt ? pEnt->GetClientThinkable() : 0;
+}
+
+template<class T>
+C_BaseEntity* CClientEntityList<T>::GetPlayerByIndex(int entindex)
+{
+	C_BaseEntity* pEntity = GetBaseEntity(entindex);
+	if (!pEntity || !pEntity->IsPlayer()) {
+		return NULL;
+	}
+	return pEntity;
 }
 
 template<class T>

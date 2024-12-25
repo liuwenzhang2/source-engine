@@ -661,7 +661,7 @@ void ClientModeCSNormal::FireGameEvent( IGameEvent *event )
     {
         CBaseHudChat *hudChat = (CBaseHudChat *)GET_HUDELEMENT( CHudChat );
         int iPlayerIndex = event->GetInt( "player" );
-        C_BasePlayer *pPlayer = UTIL_PlayerByIndex( iPlayerIndex );
+        C_BasePlayer *pPlayer = ToBasePlayer(EntityList()->GetPlayerByIndex( iPlayerIndex ));
         int iAchievement = event->GetInt( "achievement" );
 
         if ( !hudChat || !pPlayer )

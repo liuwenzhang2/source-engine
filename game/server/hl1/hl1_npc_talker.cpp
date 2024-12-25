@@ -62,7 +62,7 @@ void CHL1NPCTalker::RunTask( const Task_t *pTask )
 		case TASK_TALKER_CLIENT_STARE:
 		case TASK_TALKER_LOOK_AT_CLIENT:
 		{
-			CBasePlayer *pPlayer = UTIL_GetLocalPlayer();
+			CBasePlayer *pPlayer = ToBasePlayer(EntityList()->GetLocalPlayer());
 			
 			// track head to the client for a while.
 			if ( m_NPCState == NPC_STATE_IDLE		&& 
@@ -127,7 +127,7 @@ void CHL1NPCTalker::RunTask( const Task_t *pTask )
 
 		case TASK_FACE_PLAYER:
 		{
-			CBasePlayer *pPlayer = UTIL_GetLocalPlayer();
+			CBasePlayer *pPlayer = ToBasePlayer(EntityList()->GetLocalPlayer());
 			
 			if ( pPlayer )
 			{

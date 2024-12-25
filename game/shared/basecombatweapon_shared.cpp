@@ -738,7 +738,7 @@ void CBaseCombatWeapon::OnPickedUp( CBaseCombatCharacter *pNewOwner )
 		CRecipientFilter filter;
 		for ( int i=1; i <= gpGlobals->maxClients; ++i )
 		{
-			CBasePlayer *player = UTIL_PlayerByIndex(i);
+			CBasePlayer *player = ToBasePlayer(EntityList()->GetPlayerByIndex(i));
 			if ( player && !player->IsAlive() && player->GetObserverMode() == OBS_MODE_IN_EYE )
 			{
 				filter.AddRecipient( player );
@@ -2508,7 +2508,7 @@ void CDmgAccumulator::Process( void )
 {
 	FOR_EACH_MAP( m_TargetsDmgInfo, i )
 	{
-		CBaseEntity *pEntity = UTIL_EntityByIndex( m_TargetsDmgInfo.Key( i ) );
+		CBaseEntity *pEntity = EntityList()->GetBaseEntity( m_TargetsDmgInfo.Key( i ) );
 		if ( pEntity )
 		{
 			AddMultiDamage( m_TargetsDmgInfo[i], pEntity );

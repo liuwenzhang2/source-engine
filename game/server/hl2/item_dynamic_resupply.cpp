@@ -266,7 +266,7 @@ void CItem_DynamicResupply::Precache( void )
 //-----------------------------------------------------------------------------
 void CItem_DynamicResupply::CheckPVSThink( void )
 {
-	CBaseEntity *pentPlayer = UTIL_FindClientInPVS( this );
+	CBaseEntity *pentPlayer = EntityList()->FindClientInPVS( this );
 	if ( pentPlayer )
 	{
 		CBasePlayer *pPlayer = (CBasePlayer *)pentPlayer;
@@ -295,7 +295,7 @@ void CItem_DynamicResupply::InputKill( inputdata_t &data )
 //-----------------------------------------------------------------------------
 void CItem_DynamicResupply::InputCalculateType( inputdata_t &data )
 {
-	CBasePlayer *pPlayer = UTIL_GetLocalPlayer();
+	CBasePlayer *pPlayer = ToBasePlayer(EntityList()->GetLocalPlayer());
 	SpawnDynamicItem( pPlayer );
 }
 
@@ -398,7 +398,7 @@ void CItem_DynamicResupply::FindPotentialItems( int nCount, DynamicResupplyItems
 
 	// Count the potential addition of items in the PVS
 	CBaseEntity *pEntity = NULL;
-	while ( (pEntity = UTIL_EntitiesInPVS( this, pEntity )) != NULL )
+	while ( (pEntity = EntityList()->EntitiesInPVS( this, pEntity )) != NULL )
 	{
 		if ( pEntity->WorldSpaceCenter().DistToSqr( WorldSpaceCenter() ) > (POTENTIAL_ITEM_RADIUS * POTENTIAL_ITEM_RADIUS) )
 			continue;

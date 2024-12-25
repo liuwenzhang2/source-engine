@@ -62,7 +62,7 @@ C_NPC_RocketTurret::C_NPC_RocketTurret( void )
 	: m_filterBeams( NULL, NULL, COLLISION_GROUP_DEBRIS )
 {
 	m_filterBeams.SetPassEntity( this );
-	m_filterBeams.SetPassEntity2( UTIL_PlayerByIndex( 1 ) );
+	m_filterBeams.SetPassEntity2( EntityList()->GetPlayerByIndex( 1 ) );
 }
 
 C_NPC_RocketTurret::~C_NPC_RocketTurret( void )

@@ -100,7 +100,7 @@ public:
 	{ \
 		for ( int idx = 1; idx <= gpGlobals->maxClients; ++idx ) \
 		{ \
-			CBasePlayer *player = UTIL_PlayerByIndex( idx ); \
+			CBasePlayer *player = ToBasePlayer(EntityList()->GetPlayerByIndex( idx )); \
 			if (player == NULL) continue; \
 			if (!player->IsBot()) continue; \
 			CCSBot *bot = dynamic_cast< CCSBot * >(player); \

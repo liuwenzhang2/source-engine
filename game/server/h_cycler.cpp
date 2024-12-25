@@ -66,7 +66,7 @@ void CCycler::GenericCyclerSpawn(char *szModel, Vector vecMin, Vector vecMax)
 
 	CCycler::Spawn( );
 
-	UTIL_SetSize(this, vecMin, vecMax);
+	GetEngineObject()->SetSize(vecMin, vecMax);
 }
 
 
@@ -261,7 +261,7 @@ void CWeaponCycler::Spawn( )
 	m_iszModel = GetEngineObject()->GetModelName();
 	m_iModel = GetEngineObject()->GetModelIndex();
 
-	UTIL_SetSize(this, Vector(-16, -16, 0), Vector(16, 16, 16));
+	GetEngineObject()->SetSize(Vector(-16, -16, 0), Vector(16, 16, 16));
 	SetTouch( &CWeaponCycler::DefaultTouch );
 }
 

@@ -143,7 +143,7 @@ float GetLongFloorZ(const Vector &origin)
 //------------------------------------------------------------------------------
 void UTIL_DrawPositioningOverlay( float flCrossDistance )
 {
-	CBasePlayer* pPlayer = UTIL_PlayerByIndex(CBaseEntity::m_nDebugPlayer);
+	CBasePlayer* pPlayer = ToBasePlayer(EntityList()->GetPlayerByIndex(CBaseEntity::m_nDebugPlayer));
 
 	if (!pPlayer) 
 	{

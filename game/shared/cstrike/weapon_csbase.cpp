@@ -1813,7 +1813,7 @@ void CWeaponCSBase::OnPickedUp( CBaseCombatCharacter *pNewOwner )
 		CRecipientFilter filter;
 		for ( int i=0; i<gpGlobals->maxClients; ++i )
 		{
-			CBasePlayer *player = UTIL_PlayerByIndex(i);
+			CBasePlayer *player = ToBasePlayer(EntityList()->GetPlayerByIndex(i));
 			if ( player && !player->IsAlive() && player->GetObserverMode() == OBS_MODE_IN_EYE )
 			{
 				filter.AddRecipient( player );

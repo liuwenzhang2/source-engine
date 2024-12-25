@@ -2267,7 +2267,7 @@ ConVar cl_autohelp(
 		//=============================================================================
         for ( int clientIndex = 1; clientIndex <= gpGlobals->maxClients; clientIndex++ )
 		{
-			CCSPlayer *pPlayer = (CCSPlayer*) UTIL_PlayerByIndex( clientIndex );
+			CCSPlayer *pPlayer = (CCSPlayer*) EntityList()->GetPlayerByIndex( clientIndex );
 			if(pPlayer)
 			{
 				pPlayer->OnPreResetRound();
@@ -2577,7 +2577,7 @@ ConVar cl_autohelp(
 
 		for ( i = 1; i <= gpGlobals->maxClients; i++ )
 		{
-			CCSPlayer *pPlayer = (CCSPlayer*) UTIL_PlayerByIndex( i );
+			CCSPlayer *pPlayer = (CCSPlayer*) EntityList()->GetPlayerByIndex( i );
 
 			if ( !pPlayer )
 				continue;
@@ -2627,7 +2627,7 @@ ConVar cl_autohelp(
 		// know respawn all players
 		for ( i = 1; i <= gpGlobals->maxClients; i++ )
 		{
-			CCSPlayer *pPlayer = (CCSPlayer*) UTIL_PlayerByIndex( i );
+			CCSPlayer *pPlayer = (CCSPlayer*) EntityList()->GetPlayerByIndex( i );
 
 			if ( !pPlayer )
 				continue;
@@ -2697,7 +2697,7 @@ ConVar cl_autohelp(
         // [tj] Award same uniform achievement for qualifying teams
         for ( i = 1; i <= gpGlobals->maxClients; i++ )
         {
-            CCSPlayer *pPlayer = (CCSPlayer*) UTIL_PlayerByIndex( i );
+            CCSPlayer *pPlayer = (CCSPlayer*) EntityList()->GetPlayerByIndex( i );
 
             if ( !pPlayer )
                 continue;
@@ -2716,7 +2716,7 @@ ConVar cl_autohelp(
 		// [menglish] reset per-round achievement variables for each player
 		for ( i = 1; i <= gpGlobals->maxClients; i++ )
 		{
-			CCSPlayer *pPlayer = (CCSPlayer*) UTIL_PlayerByIndex( i );
+			CCSPlayer *pPlayer = (CCSPlayer*) EntityList()->GetPlayerByIndex( i );
 			if( pPlayer )
 			{
 				pPlayer->ResetRoundBasedAchievementVariables();
@@ -2744,7 +2744,7 @@ ConVar cl_autohelp(
 		// now run a tkpunish check, after the map has been cleaned up
 		for ( i = 1; i <= gpGlobals->maxClients; i++ )
 		{
-			CCSPlayer *pPlayer = (CCSPlayer*) UTIL_PlayerByIndex( i );
+			CCSPlayer *pPlayer = (CCSPlayer*) EntityList()->GetPlayerByIndex( i );
 
 			if ( !pPlayer )
 				continue;
@@ -2867,7 +2867,7 @@ ConVar cl_autohelp(
 		//Create an array of the indeces of bomb carrier candidates
 		for ( int i = 1; i <= gpGlobals->maxClients; i++ )
 		{
-			CCSPlayer *pPlayer = ToCSPlayer( UTIL_PlayerByIndex( i ) );
+			CCSPlayer *pPlayer = ToCSPlayer( EntityList()->GetPlayerByIndex( i ) );
 
 			if( pPlayer && pPlayer->IsAlive() && pPlayer->GetTeamNumber() == TEAM_TERRORIST && numAliveTs[ALL_TERRORISTS] < ABSOLUTE_PLAYER_LIMIT  )
 			{
@@ -2902,7 +2902,7 @@ ConVar cl_autohelp(
 				// give the C4 sequentially
 				index = (lastBombGuyIndex[which] + 1) % numAliveTs[which];
 			}
-			CCSPlayer *pPlayer = ToCSPlayer( UTIL_PlayerByIndex( iTerrorists[which][index] ) );
+			CCSPlayer *pPlayer = ToCSPlayer( EntityList()->GetPlayerByIndex( iTerrorists[which][index] ) );
 
 			Assert( pPlayer && pPlayer->GetTeamNumber() == TEAM_TERRORIST && pPlayer->IsAlive() );
 
@@ -2975,7 +2975,7 @@ ConVar cl_autohelp(
 			bool botSpeaking = false;
 			for ( int i=1; i <= gpGlobals->maxClients; ++i )
 			{
-				CBasePlayer *player = UTIL_PlayerByIndex( i );
+				CBasePlayer *player = ToBasePlayer(EntityList()->GetPlayerByIndex( i ));
 				if (player == NULL)
 					continue;
 
@@ -3057,7 +3057,7 @@ ConVar cl_autohelp(
 
 		for ( int i = 1; i <= gpGlobals->maxClients; i++ )
 		{
-			CBasePlayer *pPlayer = UTIL_PlayerByIndex( i );
+			CBasePlayer *pPlayer = ToBasePlayer(EntityList()->GetPlayerByIndex( i ));
 
 			if ( pPlayer && pPlayer->FragCount() >= fraglimit.GetInt() )
 			{
@@ -3332,7 +3332,7 @@ ConVar cl_autohelp(
 		// set all players to FL_FROZEN
 		for ( int i = 1; i <= MAX_PLAYERS; i++ )
 		{
-			CBasePlayer *pPlayer = UTIL_PlayerByIndex( i );
+			CBasePlayer *pPlayer = ToBasePlayer(EntityList()->GetPlayerByIndex( i ));
 
 			if ( pPlayer )
 			{
@@ -3374,7 +3374,7 @@ ConVar cl_autohelp(
 		IGameEvent *event2 = gameeventmanager->CreateEvent( "player_death" );
 		if ( event2 )
 		{
-			CCSPlayer *pPlayer = ToCSPlayer( UTIL_PlayerByIndex(1) );
+			CCSPlayer *pPlayer = ToCSPlayer( EntityList()->GetPlayerByIndex(1) );
 			
 			// pCappingPlayers is a null terminated list of player indeces
 			event2->SetInt("userid", pPlayer->GetUserID() );
@@ -3556,7 +3556,7 @@ ConVar cl_autohelp(
 		int playerNum;
 		for (playerNum = 1; playerNum <= gpGlobals->maxClients; ++playerNum)
 		{
-			CCSPlayer *player = (CCSPlayer *)UTIL_PlayerByIndex(playerNum);
+			CCSPlayer *player = (CCSPlayer *)EntityList()->GetPlayerByIndex(playerNum);
 			if (player == NULL)
 			{
 				continue;
@@ -3832,7 +3832,7 @@ ConVar cl_autohelp(
 			// search for player with highest UserID = most recently joined to switch over
 			for ( int j = 1; j <= gpGlobals->maxClients; j++ )
 			{
-				CCSPlayer *pPlayer = (CCSPlayer *)UTIL_PlayerByIndex( j );
+				CCSPlayer *pPlayer = (CCSPlayer *)EntityList()->GetPlayerByIndex( j );
 
 				if ( !pPlayer )
 					continue;
@@ -4248,7 +4248,7 @@ ConVar cl_autohelp(
 		// [tj] Inform players that the round is over
 		for ( int i = 1; i <= gpGlobals->maxClients; i++ )
 		{
-			CCSPlayer *pPlayer = (CCSPlayer*) UTIL_PlayerByIndex( i );
+			CCSPlayer *pPlayer = (CCSPlayer*) EntityList()->GetPlayerByIndex( i );
 			if(pPlayer)
 			{
 				pPlayer->OnRoundEnd(iWinnerTeam, iReason);
@@ -4319,7 +4319,7 @@ ConVar cl_autohelp(
 			
 			for ( int i = 1; i <= gpGlobals->maxClients; i++ )
 			{
-				CCSPlayer* pPlayer = (CCSPlayer*)UTIL_PlayerByIndex( i );
+				CCSPlayer* pPlayer = (CCSPlayer*)EntityList()->GetPlayerByIndex( i );
 				if (pPlayer)
 				{
 					int teamNum = pPlayer->GetTeamNumber();
@@ -4410,7 +4410,7 @@ ConVar cl_autohelp(
 
 		for ( int i = 1; i <= gpGlobals->maxClients; i++ )
 		{
-			CCSPlayer* pPlayer = (CCSPlayer*)UTIL_PlayerByIndex( i );
+			CCSPlayer* pPlayer = (CCSPlayer*)EntityList()->GetPlayerByIndex( i );
 			if (pPlayer)
 			{
 				int iTeam = pPlayer->GetTeamNumber();
@@ -5423,7 +5423,7 @@ void CCSGameRules::SpawningLatePlayer( CCSPlayer* pLatePlayer )
 	//Reset the round kills number of enemies for the opposite team
 	for ( int i = 1; i <= gpGlobals->maxClients; i++ )
 	{
-		CCSPlayer *pPlayer = (CCSPlayer*) UTIL_PlayerByIndex( i );
+		CCSPlayer *pPlayer = (CCSPlayer*) EntityList()->GetPlayerByIndex( i );
 		if(pPlayer)
 		{
 			if(pPlayer->GetTeamNumber() == pLatePlayer->GetTeamNumber())

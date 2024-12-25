@@ -263,7 +263,7 @@ int C_HLTVCamera::GetMode()
 {
 	if ( m_iCameraMan > 0 )
 	{
-		C_BasePlayer *pCameraMan = UTIL_PlayerByIndex( m_iCameraMan );
+		C_BasePlayer *pCameraMan = ToBasePlayer(EntityList()->GetPlayerByIndex( m_iCameraMan ));
 
 		if ( pCameraMan )
 			return pCameraMan->GetObserverMode();
@@ -276,7 +276,7 @@ C_BaseEntity* C_HLTVCamera::GetPrimaryTarget()
 {
 	if ( m_iCameraMan > 0 )
 	{
-		C_BasePlayer *pCameraMan = UTIL_PlayerByIndex( m_iCameraMan );
+		C_BasePlayer *pCameraMan = ToBasePlayer(EntityList()->GetPlayerByIndex( m_iCameraMan ));
 		
 		if ( pCameraMan )
 		{
@@ -299,7 +299,7 @@ C_BaseEntity *C_HLTVCamera::GetCameraMan()
 
 void C_HLTVCamera::CalcInEyeCamView( Vector& eyeOrigin, QAngle& eyeAngles, float& fov )
 {
-	C_BasePlayer *pPlayer = UTIL_PlayerByIndex( m_iTraget1 );
+	C_BasePlayer *pPlayer = ToBasePlayer(EntityList()->GetPlayerByIndex( m_iTraget1 ));
 
 	if ( !pPlayer )
 		return;
@@ -518,7 +518,7 @@ void C_HLTVCamera::CalcView(Vector& origin, QAngle& angles, float& fov)
 
 	if ( m_iCameraMan > 0 )
 	{
-		C_BasePlayer *pCameraMan = UTIL_PlayerByIndex( m_iCameraMan );
+		C_BasePlayer *pCameraMan = ToBasePlayer(EntityList()->GetPlayerByIndex( m_iCameraMan ));
 		if ( pCameraMan )
 		{
 			float zNear,zFar;
@@ -629,7 +629,7 @@ void C_HLTVCamera::SpecNextPlayer( bool bInverse )
 		if ( index == start )
 			break; // couldn't find a new valid player
 
-		C_BasePlayer *pPlayer =	UTIL_PlayerByIndex( index );
+		C_BasePlayer *pPlayer = ToBasePlayer(EntityList()->GetPlayerByIndex( index ));
 
 		if ( !pPlayer )
 			continue;
@@ -651,7 +651,7 @@ void C_HLTVCamera::SpecNamedPlayer( const char *szPlayerName )
 {
 	for ( int index = 1; index <= gpGlobals->maxClients; ++index )
 	{
-		C_BasePlayer *pPlayer =	UTIL_PlayerByIndex( index );
+		C_BasePlayer *pPlayer = ToBasePlayer(EntityList()->GetPlayerByIndex( index ));
 
 		if ( !pPlayer )
 			continue;

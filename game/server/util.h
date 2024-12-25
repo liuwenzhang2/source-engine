@@ -126,7 +126,6 @@ inline bool FStrEq( string_t str1, string_t str2 )
 const char *nexttoken(char *token, const char *str, char sep);
 
 // Misc. Prototypes
-void		UTIL_SetSize			(CBaseEntity *pEnt, const Vector &vecMin, const Vector &vecMax);
 void		UTIL_ClearTrace			( trace_t &trace );
 void		UTIL_SetTrace			(trace_t& tr, const Ray_t &ray, CBaseEntity* edict, float fraction, int hitgroup, unsigned int contents, const Vector& normal, float intercept );
 
@@ -142,15 +141,6 @@ float		UTIL_GetSimulationInterval();
 // Input  : playerIndex - index of the player - first player is index 1
 //-----------------------------------------------------------------------------
 
-// NOTENOTE: Use UTIL_GetLocalPlayer instead of UTIL_PlayerByIndex IF you're in single player
-// and you want the player.
-CBasePlayer	*UTIL_PlayerByIndex( int playerIndex );
-
-// NOTENOTE: Use this instead of UTIL_PlayerByIndex IF you're in single player
-// and you want the player.
-// not useable in multiplayer - see UTIL_GetListenServerHost()
-CBasePlayer* UTIL_GetLocalPlayer( void );
-
 // get the local player on a listen server
 CBasePlayer *UTIL_GetListenServerHost( void );
 
@@ -161,20 +151,7 @@ CBasePlayer* UTIL_PlayerByName( const char *name ); // not case sensitive
 // This is valid during ConCommand execution.
 bool UTIL_IsCommandIssuedByServerAdmin( void );
 
-CBaseEntity* UTIL_EntityByIndex( int entityIndex );
-
 void		UTIL_GetPlayerConnectionInfo( int playerIndex, int& ping, int &packetloss );
-
-void		UTIL_SetClientVisibilityPVS( CBaseEntity *pClient, const unsigned char *pvs, int pvssize );
-bool		UTIL_ClientPVSIsExpanded();
-
-CBaseEntity		*UTIL_FindClientInPVS( CBaseEntity *pEdict );
-CBaseEntity		*UTIL_FindClientInVisibilityPVS( CBaseEntity *pEdict );
-
-// This is a version which finds any clients whose PVS intersects the box
-CBaseEntity *UTIL_FindClientInPVS( const Vector &vecBoxMins, const Vector &vecBoxMaxs );
-
-CBaseEntity *UTIL_EntitiesInPVS( CBaseEntity *pPVSEntity, CBaseEntity *pStartingEntity );
 
 //-----------------------------------------------------------------------------
 // class CFlaggedEntitiesEnum
@@ -263,8 +240,6 @@ void		UTIL_ScreenFade			( CBaseEntity *pEntity, const color32 &color, float fade
 void		UTIL_MuzzleFlash		( const Vector &origin, const QAngle &angles, int scale, int type );
 Vector		UTIL_PointOnLineNearestPoint(const Vector& vStartPos, const Vector& vEndPos, const Vector& vPoint, bool clampEnds = false );
 
-int			UTIL_EntityInSolid( CBaseEntity *ent );
-
 bool		UTIL_IsMasterTriggered	(string_t sMaster, CBaseEntity *pActivator);
 void		UTIL_BloodStream( const Vector &origin, const Vector &direction, int color, int amount );
 void		UTIL_BloodSpray( const Vector &pos, const Vector &dir, int color, int amount, int flags );
@@ -281,7 +256,6 @@ void		UTIL_Beam( Vector &Start, Vector &End, int nModelIndex, int nHaloIndex, un
 				float Life, unsigned char Width, unsigned char EndWidth, unsigned char FadeLength, unsigned char Noise, unsigned char Red, unsigned char Green,
 				unsigned char Blue, unsigned char Brightness, unsigned char Speed);
 
-char		*UTIL_VarArgs( PRINTF_FORMAT_STRING const char *format, ... );
 bool		UTIL_IsValidEntity( CBaseEntity *pEnt );
 bool		UTIL_TeamsMatch( const char *pTeamName1, const char *pTeamName2 );
 
@@ -466,33 +440,6 @@ int  UTIL_EmitGroupIDSuit(CBaseEntity *entity, int isentenceg);
 int  UTIL_EmitGroupnameSuit(CBaseEntity *entity, const char *groupname);
 void UTIL_RestartAmbientSounds( void );
 
-class EntityMatrix : public VMatrix
-{
-public:
-	void InitFromEntity( CBaseEntity *pEntity, int iAttachment=0 );
-	void InitFromEntityLocal( CBaseEntity *entity );
-
-	inline Vector LocalToWorld( const Vector &vVec ) const
-	{
-		return VMul4x3( vVec );
-	}
-
-	inline Vector WorldToLocal( const Vector &vVec ) const
-	{
-		return VMul4x3Transpose( vVec );
-	}
-
-	inline Vector LocalToWorldRotation( const Vector &vVec ) const
-	{
-		return VMul3x3( vVec );
-	}
-
-	inline Vector WorldToLocalRotation( const Vector &vVec ) const
-	{
-		return VMul3x3Transpose( vVec );
-	}
-};
-
 inline float UTIL_DistApprox( const Vector &vec1, const Vector &vec2 );
 inline float UTIL_DistApprox2D( const Vector &vec1, const Vector &vec2 );
 
@@ -553,7 +500,6 @@ void PhysCollisionScreenShake(gamevcollisionevent_t* pEvent, int index);
 void PhysCollisionWarpEffect(gamevcollisionevent_t* pEvent, surfacedata_t* phit);
 #endif
 void PhysCollisionDust(gamevcollisionevent_t* pEvent, surfacedata_t* phit);
-float PhysGetEntityMass(CBaseEntity* pEntity);
 void PhysSetEntityGameFlags(CBaseEntity* pEntity, unsigned short flags);
 void DebugDrawContactPoints(IPhysicsObject* pPhysics);
 IPhysicsObject* FindPhysicsObjectByName(const char* pName, CBaseEntity* pErrorEntity);

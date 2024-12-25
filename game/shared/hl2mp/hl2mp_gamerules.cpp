@@ -338,7 +338,7 @@ void CHL2MPRules::Think( void )
 			// check if any player is over the frag limit
 			for ( int i = 1; i <= gpGlobals->maxClients; i++ )
 			{
-				CBasePlayer *pPlayer = UTIL_PlayerByIndex( i );
+				CBasePlayer *pPlayer = ToBasePlayer(EntityList()->GetPlayerByIndex( i ));
 
 				if ( pPlayer && pPlayer->FragCount() >= flFragLimit )
 				{
@@ -387,7 +387,7 @@ void CHL2MPRules::GoToIntermission( void )
 
 	for ( int i = 0; i < MAX_PLAYERS; i++ )
 	{
-		CBasePlayer *pPlayer = UTIL_PlayerByIndex( i );
+		CBasePlayer *pPlayer = ToBasePlayer(EntityList()->GetPlayerByIndex( i ));
 
 		if ( !pPlayer )
 			continue;
@@ -1027,7 +1027,7 @@ void CHL2MPRules::RestartGame()
 	// now respawn all players
 	for (int i = 1; i <= gpGlobals->maxClients; i++ )
 	{
-		CHL2MP_Player *pPlayer = (CHL2MP_Player*) UTIL_PlayerByIndex( i );
+		CHL2MP_Player *pPlayer = (CHL2MP_Player*) EntityList()->GetPlayerByIndex( i );
 
 		if ( !pPlayer )
 			continue;
@@ -1232,7 +1232,7 @@ void CHL2MPRules::CheckAllPlayersReady( void )
 {
 	for (int i = 1; i <= gpGlobals->maxClients; i++ )
 	{
-		CHL2MP_Player *pPlayer = (CHL2MP_Player*) UTIL_PlayerByIndex( i );
+		CHL2MP_Player *pPlayer = (CHL2MP_Player*) EntityList()->GetPlayerByIndex( i );
 
 		if ( !pPlayer )
 			continue;

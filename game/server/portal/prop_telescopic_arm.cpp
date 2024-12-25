@@ -210,12 +210,12 @@ void CPropTelescopicArm::EnabledThink( void )
 
 	if ( !pTarget )
 	{
-		//SetTarget ( UTIL_PlayerByIndex( 1 ) );
+		//SetTarget ( EntityList()->GetPlayerByIndex( 1 ) );
 
 		// Default to targeting a player
 		for( int i = 1; i <= gpGlobals->maxClients; ++i )
 		{
-			CBasePlayer *pPlayer = UTIL_PlayerByIndex( i );
+			CBasePlayer *pPlayer = ToBasePlayer(EntityList()->GetPlayerByIndex( i ));
 			if( pPlayer && FVisible( pPlayer ) && pPlayer->IsAlive() )
 			{
 				pTarget = pPlayer;
@@ -227,7 +227,7 @@ void CPropTelescopicArm::EnabledThink( void )
 			//search again, but don't require the player to be visible
 			for( int i = 1; i <= gpGlobals->maxClients; ++i )
 			{
-				CBasePlayer *pPlayer = UTIL_PlayerByIndex( i );
+				CBasePlayer *pPlayer = ToBasePlayer(EntityList()->GetPlayerByIndex( i ));
 				if( pPlayer && pPlayer->IsAlive() )
 				{
 					pTarget = pPlayer;
@@ -240,7 +240,7 @@ void CPropTelescopicArm::EnabledThink( void )
 				//search again, but don't require the player to be visible or alive
 				for( int i = 1; i <= gpGlobals->maxClients; ++i )
 				{
-					CBasePlayer *pPlayer = UTIL_PlayerByIndex( i );
+					CBasePlayer *pPlayer = ToBasePlayer(EntityList()->GetPlayerByIndex( i ));
 					if( pPlayer )
 					{
 						pTarget = pPlayer;
@@ -418,7 +418,7 @@ void CPropTelescopicArm::SetTarget( const char *pchTargetName )
 	CBaseEntity *pTarget = EntityList()->FindEntityByName( NULL, pchTargetName, NULL, NULL );
 
 	//if ( pTarget == NULL )
-	//	pTarget = UTIL_PlayerByIndex( 1 );
+	//	pTarget = EntityList()->GetPlayerByIndex( 1 );
 
 	return SetTarget( pTarget );
 }
@@ -509,12 +509,12 @@ void CPropTelescopicArm::InputSetTarget( inputdata_t &inputdata )
 
 void CPropTelescopicArm::InputTargetPlayer( inputdata_t &inputdata )
 {
-	//SetTarget( UTIL_PlayerByIndex( 1 ) );
+	//SetTarget( EntityList()->GetPlayerByIndex( 1 ) );
 
 	CBaseEntity *pTarget = NULL;
 	for( int i = 1; i <= gpGlobals->maxClients; ++i )
 	{
-		CBasePlayer *pPlayer = UTIL_PlayerByIndex( i );
+		CBasePlayer *pPlayer = ToBasePlayer(EntityList()->GetPlayerByIndex( i ));
 		if( pPlayer && FVisible( pPlayer ) && pPlayer->IsAlive() )
 		{
 			pTarget = pPlayer;
@@ -526,7 +526,7 @@ void CPropTelescopicArm::InputTargetPlayer( inputdata_t &inputdata )
 		//search again, but don't require the player to be visible
 		for( int i = 1; i <= gpGlobals->maxClients; ++i )
 		{
-			CBasePlayer *pPlayer = UTIL_PlayerByIndex( i );
+			CBasePlayer *pPlayer = ToBasePlayer(EntityList()->GetPlayerByIndex( i ));
 			if( pPlayer && pPlayer->IsAlive() )
 			{
 				pTarget = pPlayer;
@@ -539,7 +539,7 @@ void CPropTelescopicArm::InputTargetPlayer( inputdata_t &inputdata )
 			//search again, but don't require the player to be visible or alive
 			for( int i = 1; i <= gpGlobals->maxClients; ++i )
 			{
-				CBasePlayer *pPlayer = UTIL_PlayerByIndex( i );
+				CBasePlayer *pPlayer = ToBasePlayer(EntityList()->GetPlayerByIndex( i ));
 				if( pPlayer )
 				{
 					pTarget = pPlayer;

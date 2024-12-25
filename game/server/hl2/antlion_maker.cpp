@@ -1150,7 +1150,7 @@ CBaseEntity *CAntlionTemplateMaker::AllHintsFromClusterBlocked( CAI_Hint *pNode,
 						if ( pList[i]->GetEngineObject()->GetMoveType() != MOVETYPE_VPHYSICS )
 							continue;
 
-						if ( PhysGetEntityMass( pList[i] ) > ANTLION_MAKER_BLOCKED_MASS )
+						if (pList[i]->GetEngineObject()->PhysGetEntityMass() > ANTLION_MAKER_BLOCKED_MASS )
 						{
 							bBlocked = true;
 							iNumBlocked++;
@@ -1292,7 +1292,7 @@ void CAntlionTemplateMaker::BlockedCheckFunc( void )
 					if ( pList[i]->GetEngineObject()->GetMoveType() != MOVETYPE_VPHYSICS )
 						continue;
 
-					if ( PhysGetEntityMass( pList[i] ) > ANTLION_MAKER_BLOCKED_MASS )
+					if (pList[i]->GetEngineObject()->PhysGetEntityMass() > ANTLION_MAKER_BLOCKED_MASS )
 					{
 						iBlocked++;
 						break;

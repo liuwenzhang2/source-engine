@@ -105,6 +105,7 @@ void CFuncLadder::Spawn()
 		}
 
 		// Force geometry overlays on, but only if developer 2 is set...
+		ConVarRef developer("developer");
 		if ( developer.GetInt() > 1 )
 		{
 			m_debugOverlays |= OVERLAY_TEXT_BIT;
@@ -143,7 +144,7 @@ void CFuncLadder::Spawn()
 	mins += playerMins;
 	maxs += playerMaxs;
 
-	UTIL_SetSize( this, mins, maxs );
+	GetEngineObject()->SetSize( mins, maxs );
 
 	m_bFakeLadder = GetEngineObject()->HasSpawnFlags(SF_LADDER_DONTGETON);
 #endif
@@ -485,7 +486,7 @@ void CInfoLadderDismount::DrawDebugGeometryOverlays()
 {
 #if !defined( CLIENT_DLL )
 	BaseClass::DrawDebugGeometryOverlays();
-
+	ConVarRef developer("developer");
 	if ( developer.GetBool() )
 	{
 		NDebugOverlay::Box(GetEngineObject()->GetAbsOrigin(), Vector( -16, -16, 0 ), Vector( 16, 16, 8 ), 127, 127, 127, 127, 0 );

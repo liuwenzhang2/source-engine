@@ -283,7 +283,7 @@ bool CEnvEntityMaker::IsPlayerLooking()
 {
 	for ( int i = 1; i <= gpGlobals->maxClients; i++ )
 	{
-		CBasePlayer *pPlayer = UTIL_PlayerByIndex( i );
+		CBasePlayer *pPlayer = ToBasePlayer(EntityList()->GetPlayerByIndex( i ));
 		if ( pPlayer )
 		{
 			// Only spawn if the player's looking away from me

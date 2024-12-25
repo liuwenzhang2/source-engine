@@ -292,7 +292,7 @@ void CHL1MPRules::Think ( void )
 			// check if any player is over the frag limit
 			for ( int i = 1; i <= gpGlobals->maxClients; i++ )
 			{
-				CBasePlayer *pPlayer = UTIL_PlayerByIndex( i );
+				CBasePlayer *pPlayer = ToBasePlayer(EntityList()->GetPlayerByIndex( i ));
 
 				if ( pPlayer && pPlayer->FragCount() >= flFragLimit )
 				{
@@ -319,7 +319,7 @@ void CHL1MPRules::GoToIntermission()
 
 	for ( int i = 0; i < MAX_PLAYERS; i++ )
 	{
-		CBasePlayer *pPlayer = UTIL_PlayerByIndex( i );
+		CBasePlayer *pPlayer = ToBasePlayer(EntityList()->GetPlayerByIndex( i ));
 
 		if ( !pPlayer )
 			continue;

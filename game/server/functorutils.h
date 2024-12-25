@@ -310,7 +310,7 @@ inline bool ForEachActor( Functor &func )
 	// iterate all non-bot players
 	for( int i=1; i<=gpGlobals->maxClients; ++i )
 	{
-		CBasePlayer *player = UTIL_PlayerByIndex( i );
+		CBasePlayer *player = ToBasePlayer(EntityList()->GetPlayerByIndex( i ));
 
 		if ( player == NULL )
 			continue;
@@ -380,7 +380,7 @@ inline bool ForEachActor( IActorFunctor &func )
 	// iterate all non-bot players
 	for( int i=1; i<=gpGlobals->maxClients; ++i )
 	{
-		CBasePlayer *player = UTIL_PlayerByIndex( i );
+		CBasePlayer *player = ToBasePlayer(EntityList()->GetPlayerByIndex( i ));
 
 		if ( player == NULL )
 			continue;

@@ -106,7 +106,7 @@ void Bot_RunAll( void )
 {
 	for ( int i = 1; i <= gpGlobals->maxClients; i++ )
 	{
-		CDODPlayer *pPlayer = ToDODPlayer( UTIL_PlayerByIndex( i ) );
+		CDODPlayer *pPlayer = ToDODPlayer( EntityList()->GetPlayerByIndex( i ) );
 
 		if ( pPlayer && (pPlayer->GetEngineObject()->GetFlags() & FL_FAKECLIENT) )
 		{
@@ -124,7 +124,7 @@ bool RunMimicCommand( CUserCmd& cmd )
 		return false;
 
 	
-	CBasePlayer *pPlayer = UTIL_PlayerByIndex( bot_mimic.GetInt()  );
+	CBasePlayer *pPlayer = ToBasePlayer(EntityList()->GetPlayerByIndex( bot_mimic.GetInt()  ));
 	if ( !pPlayer )
 		return false;
 

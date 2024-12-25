@@ -70,7 +70,7 @@ void CDODBaseRocket::Spawn( void )
 
 	Assert(GetEngineObject()->GetModel() );	//derived classes must have set model
 
-	UTIL_SetSize( this, -Vector(2,2,2), Vector(2,2,2) );
+	GetEngineObject()->SetSize( -Vector(2,2,2), Vector(2,2,2) );
 
 	SetTouch( &CDODBaseRocket::RocketTouch );
 
@@ -128,7 +128,7 @@ void CDODBaseRocket::Fire( void )
 	GetEngineObject()->SetMoveType( MOVETYPE_FLY );
 
 	SetModel("models/weapons/w_missile.mdl");
-	UTIL_SetSize( this, vec3_origin, vec3_origin );
+	GetEngineObject()->SetSize( vec3_origin, vec3_origin );
 
 	const char* soundname = "Weapon_Bazooka.Shoot";
 	CPASAttenuationFilter filter(this, soundname);

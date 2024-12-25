@@ -115,7 +115,7 @@ public:
 	void	Start();
 	void	SetToOutSize()
 	{
-		UTIL_SetSize( this, Vector(-8,-8,0), Vector(8,8,8) );
+		GetEngineObject()->SetSize( Vector(-8,-8,0), Vector(8,8,8) );
 	}
 
 	float	GetHeatLevel()	{ return m_flHeatLevel; }
@@ -873,7 +873,7 @@ void CFire::Init( const Vector &position, float scale, float attackTime, float f
 void CFire::Start()
 {
 	float boxWidth = (m_flFireSize * (FIRE_WIDTH/FIRE_HEIGHT))*0.5f;
-	UTIL_SetSize(this, Vector(-boxWidth,-boxWidth,0),Vector(boxWidth,boxWidth,m_flFireSize));
+	GetEngineObject()->SetSize(Vector(-boxWidth,-boxWidth,0),Vector(boxWidth,boxWidth,m_flFireSize));
 
 	//Spawn the client-side effect
 	SpawnEffect( (fireType_e)m_nFireType, FIRE_SCALE_FROM_SIZE(m_flFireSize) );

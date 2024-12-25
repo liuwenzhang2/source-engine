@@ -296,8 +296,6 @@ LINK_ENTITY_TO_CLASS( player, CHL2_Player );
 
 PRECACHE_REGISTER(player);
 
-CBaseEntity *FindEntityForward( CBasePlayer *pMe, bool fHull );
-
 BEGIN_SIMPLE_DATADESC( LadderMove_t )
 	DEFINE_FIELD( m_bForceLadderMove, FIELD_BOOLEAN ),
 	DEFINE_FIELD( m_bForceMount, FIELD_BOOLEAN ),

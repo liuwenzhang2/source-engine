@@ -273,7 +273,7 @@ void CControlPoint::InternalSetOwner( int owner, bool bMakeSound, int iNumCapper
 
 			Assert( playerIndex > 0 && playerIndex <= gpGlobals->maxClients );
 
-			CDODPlayer *pPlayer = ToDODPlayer( UTIL_PlayerByIndex( playerIndex ) );
+			CDODPlayer *pPlayer = ToDODPlayer( EntityList()->GetPlayerByIndex( playerIndex ) );
 
 			Assert( pPlayer );
 
@@ -328,7 +328,7 @@ void CControlPoint::InternalSetOwner( int owner, bool bMakeSound, int iNumCapper
 		{
 			for ( int i=0;i<iNumCappers;i++ )
 			{
-				CDODPlayer *pDODPlayer = ToDODPlayer( UTIL_PlayerByIndex( pCappingPlayers[i] ) );
+				CDODPlayer *pDODPlayer = ToDODPlayer( EntityList()->GetPlayerByIndex( pCappingPlayers[i] ) );
 
 				if ( pDODPlayer )
 				{

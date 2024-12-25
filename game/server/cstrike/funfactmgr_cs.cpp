@@ -138,7 +138,7 @@ bool CCSFunFactMgr::GetRoundEndFunFact( int iWinningTeam, int iRoundResult, FunF
 		char szPlayerName[64];
 		const FunFact& funfact = validFunFacts[i];
 		if (funfact.iPlayer > 0)
-			V_strncpy(szPlayerName, ToCSPlayer(UTIL_PlayerByIndex(funfact.iPlayer))->GetPlayerName(), sizeof(szPlayerName));
+			V_strncpy(szPlayerName, ToCSPlayer(EntityList()->GetPlayerByIndex(funfact.iPlayer))->GetPlayerName(), sizeof(szPlayerName));
 		else
 			V_strcpy(szPlayerName, "");
 

@@ -1130,7 +1130,7 @@ Vector CBlood::BloodPosition( CBaseEntity *pActivator )
 		}
 		else
 		{
-			player = UTIL_GetLocalPlayer();
+			player = ToBasePlayer(EntityList()->GetLocalPlayer());
 		}
 
 		if ( player )
@@ -1422,7 +1422,7 @@ void CItemSoda::Spawn( void )
 	GetEngineObject()->SetMoveType( MOVETYPE_FLYGRAVITY );
 
 	SetModel ( "models/can.mdl" );
-	UTIL_SetSize ( this, Vector ( 0, 0, 0 ), Vector ( 0, 0, 0 ) );
+	GetEngineObject()->SetSize ( Vector ( 0, 0, 0 ), Vector ( 0, 0, 0 ) );
 
 	SetThink (&CItemSoda::CanThink);
 	GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.5f );
@@ -1444,9 +1444,9 @@ void CItemSoda::CanThink ( void )
 	GetEngineObject()->AddSolidFlags( FSOLID_TRIGGER );
 
 #ifdef HL1_DLL
-	UTIL_SetSize(this, Vector(-16, -16, 0), Vector(16, 16, 16));
+	GetEngineObject()->SetSize(Vector(-16, -16, 0), Vector(16, 16, 16));
 #else
-	UTIL_SetSize ( this, Vector ( -8, -8, 0 ), Vector ( 8, 8, 8 ) );
+	GetEngineObject()->SetSize ( Vector ( -8, -8, 0 ), Vector ( 8, 8, 8 ) );
 #endif
 
 	SetThink ( NULL );

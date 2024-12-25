@@ -425,7 +425,7 @@ void CEP2GameStats::Event_SaveGame( void )
 
 	Ep2LevelStats_t::SaveGameInfoRecord2_t *rec = map->m_SaveGameInfo.m_pCurrentRecord;
 
-	CBasePlayer *pPlayer = UTIL_GetLocalPlayer();
+	CBasePlayer *pPlayer = ToBasePlayer(EntityList()->GetLocalPlayer());
 	if ( pPlayer )
 	{
 		Vector pos = pPlayer->GetEngineObject()->GetAbsOrigin();
@@ -494,7 +494,7 @@ void CEP2GameStats::Event_PreSaveGameLoaded( char const *pSaveName, bool bInGame
 	if ( !bInGame )
 		return;
 
-	CBasePlayer *pPlayer = UTIL_GetLocalPlayer();
+	CBasePlayer *pPlayer = ToBasePlayer(EntityList()->GetLocalPlayer());
 	if ( !pPlayer )
 		return;
 

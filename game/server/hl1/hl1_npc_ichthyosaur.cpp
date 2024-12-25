@@ -192,7 +192,7 @@ void CNPC_Ichthyosaur::Spawn( void )
 	Precache( );
 
 	SetModel( "models/icky.mdl");
-	UTIL_SetSize( this, Vector( -32, -32, -32 ), Vector( 32, 32, 32 ) );
+	GetEngineObject()->SetSize(Vector( -32, -32, -32 ), Vector( 32, 32, 32 ) );
 	
 	SetHullType(HULL_LARGE_CENTERED);
 	SetHullSizeNormal();

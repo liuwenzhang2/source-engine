@@ -666,7 +666,7 @@ void CNPC_BabyCrab::Spawn( void )
 
 	SetRenderColor( 255, 255, 255, 192 );
 
-	UTIL_SetSize(this, Vector(-12, -12, 0), Vector(12, 12, 24));
+	GetEngineObject()->SetSize(Vector(-12, -12, 0), Vector(12, 12, 24));
 	
 	m_iHealth	  = sk_headcrab_health.GetFloat() * 0.25;	// less health than full grown
 }

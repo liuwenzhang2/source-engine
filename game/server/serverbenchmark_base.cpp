@@ -214,7 +214,7 @@ public:
 				CUtlVector<CBasePlayer*> curPlayers;
 				for ( int i = 1; i <= gpGlobals->maxClients; i++ )
 				{
-					CBasePlayer *pPlayer = UTIL_PlayerByIndex( i );
+					CBasePlayer *pPlayer = ToBasePlayer(EntityList()->GetPlayerByIndex( i ));
 					if ( pPlayer && (pPlayer->GetEngineObject()->GetFlags() & FL_FAKECLIENT) )
 					{
 						curPlayers.AddToTail( pPlayer );
@@ -344,7 +344,7 @@ public:
 
 		for ( int i = 1; i <= gpGlobals->maxClients; i++ )
 		{
-			CBasePlayer *pPlayer = UTIL_PlayerByIndex( i );
+			CBasePlayer *pPlayer = ToBasePlayer(EntityList()->GetPlayerByIndex( i ));
 			if ( pPlayer && (pPlayer->GetEngineObject()->GetFlags() & FL_FAKECLIENT) )
 			{
 				crc += pPlayer->GetTeamNumber();

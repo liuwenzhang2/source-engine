@@ -654,7 +654,7 @@ void CTeamControlPoint::InternalSetOwner( int iCapTeam, bool bMakeSound, int iNu
 			// Make the members of our old team say something
 			for ( int i = 1; i <= gpGlobals->maxClients; i++ )
 			{
-				CBaseMultiplayerPlayer *pPlayer = ToBaseMultiplayerPlayer( UTIL_PlayerByIndex( i ) );
+				CBaseMultiplayerPlayer *pPlayer = ToBaseMultiplayerPlayer( EntityList()->GetPlayerByIndex( i ) );
 				if ( !pPlayer )
 					continue;
 				if ( pPlayer->GetTeamNumber() == iOldTeam )
@@ -670,7 +670,7 @@ void CTeamControlPoint::InternalSetOwner( int iCapTeam, bool bMakeSound, int iNu
 
 			Assert( playerIndex > 0 && playerIndex <= gpGlobals->maxClients );
 
-			PlayerCapped( ToBaseMultiplayerPlayer(UTIL_PlayerByIndex( playerIndex )) );
+			PlayerCapped( ToBaseMultiplayerPlayer(EntityList()->GetPlayerByIndex( playerIndex )) );
 		}
 
 		// Remap team to get first game team = 1

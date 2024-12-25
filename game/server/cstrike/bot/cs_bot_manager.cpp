@@ -835,7 +835,7 @@ CON_COMMAND_F( bot_goto_mark, "Sends a bot to the selected nav area (useful for 
 	{
 		for ( int i = 1; i <= gpGlobals->maxClients; ++i )
 		{
-			CBasePlayer *player = static_cast<CBasePlayer *>( UTIL_PlayerByIndex( i ) );
+			CBasePlayer *player = static_cast<CBasePlayer *>( EntityList()->GetPlayerByIndex( i ) );
 
 			if (player == NULL)
 				continue;
@@ -1066,7 +1066,7 @@ int UTIL_CSSBotsInGame()
 
 	for (int i = 1; i <= gpGlobals->maxClients; ++i )
 	{
-		CCSBot *player = dynamic_cast<CCSBot *>(UTIL_PlayerByIndex( i ));
+		CCSBot *player = dynamic_cast<CCSBot *>(EntityList()->GetPlayerByIndex( i ));
 
 		if ( player == NULL )
 			continue;
@@ -1084,7 +1084,7 @@ bool UTIL_CSSKickBotFromTeam( int kickTeam )
 	// try to kick a dead bot first
 	for ( i = 1; i <= gpGlobals->maxClients; ++i )
 	{
-		CCSBot *player = dynamic_cast<CCSBot *>( UTIL_PlayerByIndex( i ) );
+		CCSBot *player = dynamic_cast<CCSBot *>( EntityList()->GetPlayerByIndex( i ) );
 
 		if (player == NULL)
 			continue;
@@ -1101,7 +1101,7 @@ bool UTIL_CSSKickBotFromTeam( int kickTeam )
 	// no dead bots, kick any bot on the given team
 	for ( i = 1; i <= gpGlobals->maxClients; ++i )
 	{
-		CCSBot *player = dynamic_cast<CCSBot *>( UTIL_PlayerByIndex( i ) );
+		CCSBot *player = dynamic_cast<CCSBot *>( EntityList()->GetPlayerByIndex( i ) );
 
 		if (player == NULL)
 			continue;
@@ -1939,7 +1939,7 @@ private:
 //--------------------------------------------------------------------------------------------------------------
 void CCSBotManager::OnBreakBreakable( IGameEvent *event )
 {
-	CheckAreasOverlappingBreakable collector( UTIL_EntityByIndex( event->GetInt( "entindex" ) ) );
+	CheckAreasOverlappingBreakable collector(EntityList()->GetBaseEntity( event->GetInt( "entindex" ) ) );
 	TheNavMesh->ForAllAreas( collector );
 
 	CCSBOTMANAGER_ITERATE_BOTS( OnBreakBreakable, event );
@@ -1949,7 +1949,7 @@ void CCSBotManager::OnBreakBreakable( IGameEvent *event )
 //--------------------------------------------------------------------------------------------------------------
 void CCSBotManager::OnBreakProp( IGameEvent *event )
 {
-	CheckAreasOverlappingBreakable collector( UTIL_EntityByIndex( event->GetInt( "entindex" ) ) );
+	CheckAreasOverlappingBreakable collector(EntityList()->GetBaseEntity( event->GetInt( "entindex" ) ) );
 	TheNavMesh->ForAllAreas( collector );
 
 	CCSBOTMANAGER_ITERATE_BOTS( OnBreakProp, event );

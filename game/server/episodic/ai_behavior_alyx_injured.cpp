@@ -428,7 +428,7 @@ void CAI_BehaviorAlyxInjured::GatherConditions( void )
 		bool bWarnPlayer = false;
 
 		// This only works in single-player
-		CBasePlayer *pPlayer = UTIL_PlayerByIndex( 1 );
+		CBasePlayer *pPlayer = ToBasePlayer(EntityList()->GetPlayerByIndex( 1 ));
 		if ( pPlayer != NULL )
 		{
 			// FIXME: This distance may need to be the length of the shortest walked path between the follower and the target
@@ -451,7 +451,7 @@ void CAI_BehaviorAlyxInjured::GatherConditions( void )
 		{
 			// FIXME: This should be routed through the normal speaking code with a system to emit from the player's suit.
 			
-			CBasePlayer *pPlayer = UTIL_PlayerByIndex( 1 );
+			CBasePlayer *pPlayer = ToBasePlayer(EntityList()->GetPlayerByIndex( 1 ));
 			//float flPlayerDistSqr = ( GetOuter()->GetAbsOrigin() - pPlayer->GetAbsOrigin() ).LengthSqr();
 
 			// If the player is too far away or we can't see him

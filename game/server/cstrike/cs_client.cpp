@@ -33,8 +33,6 @@
 #include "tier0/memdbgon.h"
 
 
-extern CBaseEntity *FindPickerEntity( CBasePlayer *pPlayer );
-
 extern bool			g_fGameOver;
 
 

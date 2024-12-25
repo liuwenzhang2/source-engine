@@ -776,7 +776,7 @@ bool CAI_ScriptConditions::ActorInPlayersPVS( CBaseEntity *pActor, bool bNot )
 	if ( pActor == NULL )
 		return true;
 
-	bool bInPVS = !!UTIL_FindClientInPVS( pActor);
+	bool bInPVS = !!EntityList()->FindClientInPVS( pActor);
 
 	if ( bInPVS )
 	{

@@ -615,7 +615,7 @@ void CEnvHeadcrabCanister::TestForCollisionsAgainstEntities( const Vector &vecEn
 		IPhysicsObject *pPhysObject = pEntity->GetEngineObject()->VPhysicsGetObject();
 		if ( pPhysObject )
 		{
-			float flMass = PhysGetEntityMass( pEntity );
+			float flMass = pEntity->GetEngineObject()->PhysGetEntityMass();
 			vecForceDir *= flMass * 750;
 			pPhysObject->ApplyForceCenter( vecForceDir );
 		}
@@ -671,7 +671,7 @@ void CEnvHeadcrabCanister::TestForCollisionsAgainstWorld( const Vector &vecEndPo
 		if ( pPhysObject )
 		{
 			// Send it flying!!!
-			float flMass = PhysGetEntityMass( pEntity );
+			float flMass = pEntity->GetEngineObject()->PhysGetEntityMass();
 			vecForceDir *= flMass * 750 * flScale;
 			pPhysObject->ApplyForceCenter( vecForceDir );
 		}
@@ -950,7 +950,7 @@ void CEnvHeadcrabCanister::Detonate( )
 	// Shake the screen unless flagged otherwise
 	if ( !GetEngineObject()->HasSpawnFlags( SF_NO_SHAKE ) )
 	{
-		CBasePlayer *pPlayer = UTIL_PlayerByIndex( 1 );
+		CBasePlayer *pPlayer = ToBasePlayer(EntityList()->GetPlayerByIndex( 1 ));
 
 		// If the player is on foot, then do a more limited shake
 		float shakeRadius = ( pPlayer && pPlayer->IsInAVehicle() ) ? sk_env_headcrabcanister_shake_radius_vehicle.GetFloat() : sk_env_headcrabcanister_shake_radius.GetFloat();

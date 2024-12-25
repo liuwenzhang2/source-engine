@@ -31,7 +31,7 @@ bool UTIL_IsNameTaken( const char *name, bool ignoreHumans )
 {
 	for ( int i = 1; i <= gpGlobals->maxClients; ++i )
 	{
-		CBasePlayer *player = static_cast<CBasePlayer *>( UTIL_PlayerByIndex( i ) );
+		CBasePlayer *player = static_cast<CBasePlayer *>( EntityList()->GetPlayerByIndex( i ) );
 
 		if (player == NULL)
 			continue;
@@ -67,7 +67,7 @@ int UTIL_ClientsInGame( void )
 
 	for ( int i = 1; i <= gpGlobals->maxClients; ++i )
 	{
-		CBaseEntity *player = UTIL_PlayerByIndex( i );
+		CBaseEntity *player = EntityList()->GetPlayerByIndex( i );
 
 		if (player == NULL)
 			continue;
@@ -88,7 +88,7 @@ int UTIL_HumansOnTeam( int teamID, bool isAlive )
 
 	for ( int i = 1; i <= gpGlobals->maxClients; ++i )
 	{
-		CBaseEntity *entity = UTIL_PlayerByIndex( i );
+		CBaseEntity *entity = EntityList()->GetPlayerByIndex( i );
 
 		if ( entity == NULL )
 			continue;
@@ -118,7 +118,7 @@ int UTIL_BotsInGame( void )
 
 	for (int i = 1; i <= gpGlobals->maxClients; ++i )
 	{
-		CBasePlayer *player = static_cast<CBasePlayer *>(UTIL_PlayerByIndex( i ));
+		CBasePlayer *player = static_cast<CBasePlayer *>(EntityList()->GetPlayerByIndex( i ));
 
 		if ( player == NULL )
 			continue;
@@ -143,7 +143,7 @@ bool UTIL_KickBotFromTeam( int kickTeam )
 	// try to kick a dead bot first
 	for ( i = 1; i <= gpGlobals->maxClients; ++i )
 	{
-		CBasePlayer *player = static_cast<CBasePlayer *>( UTIL_PlayerByIndex( i ) );
+		CBasePlayer *player = static_cast<CBasePlayer *>( EntityList()->GetPlayerByIndex( i ) );
 
 		if (player == NULL)
 			continue;
@@ -163,7 +163,7 @@ bool UTIL_KickBotFromTeam( int kickTeam )
 	// no dead bots, kick any bot on the given team
 	for ( i = 1; i <= gpGlobals->maxClients; ++i )
 	{
-		CBasePlayer *player = static_cast<CBasePlayer *>( UTIL_PlayerByIndex( i ) );
+		CBasePlayer *player = static_cast<CBasePlayer *>( EntityList()->GetPlayerByIndex( i ) );
 
 		if (player == NULL)
 			continue;
@@ -193,7 +193,7 @@ bool UTIL_IsTeamAllBots( int team )
 
 	for( int i=1; i <= gpGlobals->maxClients; ++i )
 	{
-		CBasePlayer *player = static_cast<CBasePlayer *>( UTIL_PlayerByIndex( i ) );
+		CBasePlayer *player = static_cast<CBasePlayer *>( EntityList()->GetPlayerByIndex( i ) );
 
 		if (player == NULL)
 			continue;
@@ -226,7 +226,7 @@ extern CBasePlayer *UTIL_GetClosestPlayer( const Vector &pos, float *distance )
 
 	for ( int i = 1; i <= gpGlobals->maxClients; ++i )
 	{
-		CBasePlayer *player = static_cast<CBasePlayer *>( UTIL_PlayerByIndex( i ) );
+		CBasePlayer *player = static_cast<CBasePlayer *>( EntityList()->GetPlayerByIndex( i ) );
 
 		if (!IsEntityValid( player ))
 			continue;
@@ -261,7 +261,7 @@ extern CBasePlayer *UTIL_GetClosestPlayer( const Vector &pos, int team, float *d
 
 	for ( int i = 1; i <= gpGlobals->maxClients; ++i )
 	{
-		CBasePlayer *player = static_cast<CBasePlayer *>( UTIL_PlayerByIndex( i ) );
+		CBasePlayer *player = static_cast<CBasePlayer *>( EntityList()->GetPlayerByIndex( i ) );
 
 		if (!IsEntityValid( player ))
 			continue;
@@ -361,7 +361,7 @@ bool UTIL_IsVisibleToTeam( const Vector &spot, int team )
 {
 	for( int i = 1; i <= gpGlobals->maxClients; ++i )
 	{
-		CBasePlayer *player = static_cast<CBasePlayer *>( UTIL_PlayerByIndex( i ) );
+		CBasePlayer *player = static_cast<CBasePlayer *>( EntityList()->GetPlayerByIndex( i ) );
 
 		if (player == NULL)
 			continue;
@@ -523,7 +523,7 @@ bool IsCrossingLineOfFire( const Vector &start, const Vector &finish, CBaseEntit
 {
 	for ( int p=1; p <= gpGlobals->maxClients; ++p )
 	{
-		CBasePlayer *player = static_cast<CBasePlayer *>( UTIL_PlayerByIndex( p ) );
+		CBasePlayer *player = static_cast<CBasePlayer *>( EntityList()->GetPlayerByIndex( p ) );
 
 		if (!IsEntityValid( player ))
 			continue;

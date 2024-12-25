@@ -404,7 +404,7 @@ int CAI_Senses::LookForHighPriorityEntities( int iDistance )
 		// Players
 		for ( int i = 1; i <= gpGlobals->maxClients; i++ )
 		{
-			CBaseEntity *pPlayer = UTIL_PlayerByIndex( i );
+			CBaseEntity *pPlayer = EntityList()->GetPlayerByIndex( i );
 
 			if ( pPlayer )
 			{

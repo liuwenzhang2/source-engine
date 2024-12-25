@@ -35,7 +35,7 @@ CBasePlayer *GetDebugPlayer( void )
 	//NOTENOTE: This doesn't necessarily make sense on the client
 	return GetLocalPlayer();
 #else
-	return UTIL_PlayerByIndex(CBaseEntity::m_nDebugPlayer);
+	return ToBasePlayer(EntityList()->GetPlayerByIndex(CBaseEntity::m_nDebugPlayer));
 #endif
 }
 

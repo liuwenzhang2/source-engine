@@ -121,7 +121,7 @@ void CHudRadar::MsgFunc_UpdateRadar(bf_read &msg )
 		if( i == pLocalPlayer->entindex() )
 			continue;
 
-		C_CSPlayer *pPlayer =	ToCSPlayer( UTIL_PlayerByIndex(i) );
+		C_CSPlayer *pPlayer =	ToCSPlayer( EntityList()->GetPlayerByIndex(i) );
 
 		if ( pPlayer )
 		{
@@ -137,7 +137,7 @@ void CHudRadar::MsgFunc_UpdateRadar(bf_read &msg )
 		int z = msg.ReadSBitLong( COORD_INTEGER_BITS-1 ) * 4;
 		int a = msg.ReadSBitLong( 9 );
 
-		C_CSPlayer *pPlayer =	ToCSPlayer( UTIL_PlayerByIndex(iPlayerEntity) );
+		C_CSPlayer *pPlayer =	ToCSPlayer( EntityList()->GetPlayerByIndex(iPlayerEntity) );
 
 		Vector origin( x, y, z );
 		QAngle angles( 0, a, 0 );
@@ -279,7 +279,7 @@ void CHudRadar::DrawPlayerOnRadar( int iPlayer, C_CSPlayer *pLocalPlayer )
 	if ( !pCSPR )
 		return;
 
-	C_CSPlayer *pPlayer = ToCSPlayer( UTIL_PlayerByIndex( iPlayer ) );
+	C_CSPlayer *pPlayer = ToCSPlayer( EntityList()->GetPlayerByIndex( iPlayer ) );
 
 	if ( !pPlayer )
 		return;

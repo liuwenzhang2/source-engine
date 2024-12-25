@@ -1742,7 +1742,7 @@ void CSceneEntity::DispatchStartSpeak( CChoreoScene *scene, CBaseFlex *actor, CC
 		for ( int i = 0; i < c; ++i )
 		{
 			int playerindex = filter.GetRecipientIndex( i );
-			CBasePlayer *player = UTIL_PlayerByIndex( playerindex );
+			CBasePlayer *player = ToBasePlayer(EntityList()->GetPlayerByIndex( playerindex ));
 			if ( !player )
 				continue;
 
@@ -1804,7 +1804,7 @@ void CSceneEntity::DispatchStartSpeak( CChoreoScene *scene, CBaseFlex *actor, CC
 					int c = filter.GetRecipientCount();
 					for ( int i = c - 1 ; i >= 0; --i )
 					{
-						CBasePlayer *player = UTIL_PlayerByIndex( filter.GetRecipientIndex( i ) );
+						CBasePlayer *player = ToBasePlayer(EntityList()->GetPlayerByIndex( filter.GetRecipientIndex( i ) ));
 						if ( !player )
 							continue;
 
@@ -2624,7 +2624,7 @@ void CSceneEntity::BuildSortedSpeakEventSoundsPrefetchList(
 				// In single player, try to use the combined or regular .wav files as needed
 				if ( gpGlobals->maxClients == 1 )
 				{
-					CBasePlayer *player = UTIL_GetLocalPlayer();
+					CBasePlayer *player = ToBasePlayer(EntityList()->GetLocalPlayer());
 					if ( player && !GetSoundNameForPlayer( event, player, soundname, sizeof( soundname ), player ) )
 					{
 						// Skip to next event
@@ -3748,7 +3748,7 @@ CBaseEntity *CSceneEntity::FindNamedEntity( const char *name, CBaseEntity *pActo
 
 	if ( !stricmp( name, "Player" ) || !stricmp( name, "!player" ))
 	{
-		entity = ( gpGlobals->maxClients == 1 ) ? ( CBaseEntity * )UTIL_GetLocalPlayer() : NULL;
+		entity = ( gpGlobals->maxClients == 1 ) ? ( CBaseEntity * )EntityList()->GetLocalPlayer() : NULL;
 	}
 	else if ( !stricmp( name, "!target1" ) )
 	{
@@ -3875,7 +3875,7 @@ CBaseEntity *CSceneEntity::FindNamedEntityClosest( const char *name, CBaseEntity
 	} 
 	else if ( !stricmp( name, "Player" ) || !stricmp( name, "!player" ))
 	{
-		entity = ( gpGlobals->maxClients == 1 ) ? ( CBaseEntity * )UTIL_GetLocalPlayer() : NULL;
+		entity = ( gpGlobals->maxClients == 1 ) ? ( CBaseEntity * )EntityList()->GetLocalPlayer() : NULL;
 		return entity;
 	}
 	else if ( !stricmp( name, "!target1" ) )
@@ -4647,6 +4647,7 @@ void PrecacheInstancedScene( char const *pszScene )
 	{
 		// Scenes are sloppy and don't always exist.
 		// A scene that is not in the pre-built cache image, but on disk, is a true error.
+		ConVarRef developer("developer");
 		if ( developer.GetInt() && ( IsX360() && ( g_pFullFileSystem->GetDVDMode() != DVDMODE_STRICT ) && g_pFullFileSystem->FileExists( pszScene, "GAME" ) ) )
 		{
 			Warning( "PrecacheInstancedScene: Missing scene '%s' from scene image cache.\nRebuild scene image cache!\n", pszScene );

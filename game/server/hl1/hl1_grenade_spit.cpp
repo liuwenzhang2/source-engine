@@ -42,7 +42,7 @@ void CGrenadeSpit::Spawn( void )
 	// FIXME, if these is a sprite, then we need a base class derived from CSprite rather than
 	// CBaseAnimating.  pev->scale becomes m_flSpriteScale in that case.
 	SetModel( "models/spitball_large.mdl" );
-	UTIL_SetSize(this, Vector(-3, -3, -3), Vector(3, 3, 3));
+	GetEngineObject()->SetSize(Vector(-3, -3, -3), Vector(3, 3, 3));
 
 	m_nRenderMode		= kRenderTransAdd;
 	SetRenderColor( 255, 255, 255, 255 );

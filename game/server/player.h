@@ -1383,7 +1383,7 @@ bool ForEachPlayer( Functor &func )
 {
 	for( int i=1; i<=gpGlobals->maxClients; ++i )
 	{
-		CBasePlayer *player = static_cast<CBasePlayer *>( UTIL_PlayerByIndex( i ) );
+		CBasePlayer *player = static_cast<CBasePlayer *>( EntityList()->GetPlayerByIndex( i ) );
 
 		if (player == NULL)
 			continue;
@@ -1434,7 +1434,7 @@ inline bool ForEachPlayer( IPlayerFunctor &func )
 	
 	for( int i=1; i<=gpGlobals->maxClients; ++i )
 	{
-		CBasePlayer *player = static_cast<CBasePlayer *>( UTIL_PlayerByIndex( i ) );
+		CBasePlayer *player = static_cast<CBasePlayer *>( EntityList()->GetPlayerByIndex( i ) );
 
 		if (player == NULL)
 			continue;
@@ -1477,7 +1477,7 @@ int CollectPlayers( CUtlVector< T * > *playerVector, int team = TEAM_ANY, bool i
 
 	for( int i=1; i<=gpGlobals->maxClients; ++i )
 	{
-		CBasePlayer *player = UTIL_PlayerByIndex( i );
+		CBasePlayer *player = ToBasePlayer(EntityList()->GetPlayerByIndex( i ));
 
 		if ( player == NULL )
 			continue;
@@ -1513,7 +1513,7 @@ int CollectHumanPlayers( CUtlVector< T * > *playerVector, int team = TEAM_ANY, b
 
 	for( int i=1; i<=gpGlobals->maxClients; ++i )
 	{
-		CBasePlayer *player = UTIL_PlayerByIndex( i );
+		CBasePlayer *player = ToBasePlayer(EntityList()->GetPlayerByIndex( i ));
 
 		if ( player == NULL )
 			continue;

@@ -36,6 +36,4 @@ extern ConVar	allowNPCs;
 
 extern ConVar	suitvolume;
 
-// Engine Cvars
-extern const ConVar *g_pDeveloper;
 #endif		// GAME_H

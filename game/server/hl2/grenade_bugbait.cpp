@@ -98,7 +98,7 @@ void CGrenadeBugBait::Spawn( void )
 	GetEngineObject()->SetMoveType( MOVETYPE_FLYGRAVITY, MOVECOLLIDE_DEFAULT );
 	GetEngineObject()->SetSolid( SOLID_BBOX );
 
-	UTIL_SetSize( this, Vector( -2, -2, -2), Vector( 2, 2, 2 ) );
+	GetEngineObject()->SetSize( Vector( -2, -2, -2), Vector( 2, 2, 2 ) );
 
 	SetTouch( &CGrenadeBugBait::BugBaitTouch );
 

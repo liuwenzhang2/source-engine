@@ -118,7 +118,7 @@ void CGrenadeHomer::Spawn( void )
 	GetEngineObject()->SetSolid( SOLID_BBOX );
 	GetEngineObject()->SetMoveType( MOVETYPE_FLY );
 
-	UTIL_SetSize(this, Vector(0, 0, 0), Vector(0, 0, 0));
+	GetEngineObject()->SetSize(Vector(0, 0, 0), Vector(0, 0, 0));
 
 	m_flDamage		= sk_dmg_homer_grenade.GetFloat();
 	m_DmgRadius		= sk_homer_grenade_radius.GetFloat();

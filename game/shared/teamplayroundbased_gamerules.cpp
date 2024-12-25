@@ -312,7 +312,7 @@ CON_COMMAND_F( mp_forcewin, "Forces team to win", FCVAR_CHEAT )
 		if ( args.ArgC() == 1 )
 		{
 			// if no team specified, use player 1's team
-			iTeam = UTIL_PlayerByIndex( 1 )->GetTeamNumber();	
+			iTeam = ToBasePlayer(EntityList()->GetPlayerByIndex( 1 ))->GetTeamNumber();
 		}
 		else if ( args.ArgC() == 2 )
 		{
@@ -705,7 +705,7 @@ void CTeamplayRoundBasedRules::GoToIntermission( void )
 	// set all players to FL_FROZEN
 	for ( int i = 1; i <= MAX_PLAYERS; i++ )
 	{
-		CBasePlayer *pPlayer = UTIL_PlayerByIndex( i );
+		CBasePlayer *pPlayer = ToBasePlayer(EntityList()->GetPlayerByIndex( i ));
 
 		if ( pPlayer )
 		{
@@ -1740,7 +1740,7 @@ void CTeamplayRoundBasedRules::State_Think_TEAM_WIN( void )
 		{
 			for ( int i = 1; i <= MAX_PLAYERS; i++ )
 			{
-				CBasePlayer *pPlayer = UTIL_PlayerByIndex( i );
+				CBasePlayer *pPlayer = ToBasePlayer(EntityList()->GetPlayerByIndex( i ));
 
 				if ( !pPlayer )
 					continue;
@@ -1772,7 +1772,7 @@ void CTeamplayRoundBasedRules::State_Think_TEAM_WIN( void )
 					{
 						for ( int i = 1; i <= MAX_PLAYERS; i++ )
 						{
-							CBasePlayer *pPlayer = UTIL_PlayerByIndex( i );
+							CBasePlayer *pPlayer = ToBasePlayer(EntityList()->GetPlayerByIndex( i ));
 
 							if ( !pPlayer )
 								continue;
@@ -2183,7 +2183,7 @@ void CTeamplayRoundBasedRules::SetWinningTeam( int team, int iWinReason, bool bF
 	{
 		for ( int i = 1; i <= gpGlobals->maxClients; i++ )
 		{
-			CBaseMultiplayerPlayer *pPlayer = ToBaseMultiplayerPlayer( UTIL_PlayerByIndex( i ) );
+			CBaseMultiplayerPlayer *pPlayer = ToBaseMultiplayerPlayer( EntityList()->GetPlayerByIndex( i ) );
 			if ( !pPlayer )
 				continue;
 
@@ -2409,7 +2409,7 @@ void CTeamplayRoundBasedRules::RespawnPlayers( bool bForceRespawn, bool bTeam /*
 	CBasePlayer *pPlayer;
 	for ( int i = 1; i <= gpGlobals->maxClients; i++ )
 	{
-		pPlayer = ToBasePlayer( UTIL_PlayerByIndex( i ) );
+		pPlayer = ToBasePlayer( EntityList()->GetPlayerByIndex( i ) );
 
 		if ( !pPlayer )
 			continue;
@@ -2484,7 +2484,7 @@ int CTeamplayRoundBasedRules::CountActivePlayers( void )
 
 	for (i = 1; i <= gpGlobals->maxClients; i++ )
 	{
-		pPlayer = ToBasePlayer( UTIL_PlayerByIndex( i ) );
+		pPlayer = ToBasePlayer( EntityList()->GetPlayerByIndex( i ) );
 
 		if ( pPlayer )
 		{
@@ -2637,7 +2637,7 @@ void CTeamplayRoundBasedRules::RoundRespawn( void )
 	// reset per-round scores for each player
 	for ( int i = 1; i <= MAX_PLAYERS; i++ )
 	{
-		CBasePlayer *pPlayer = ToBasePlayer( UTIL_PlayerByIndex( i ) );
+		CBasePlayer *pPlayer = ToBasePlayer( EntityList()->GetPlayerByIndex( i ) );
 
 		if ( pPlayer )
 		{
@@ -2997,7 +2997,7 @@ void CTeamplayRoundBasedRules::ResetScores( void )
 
 		for( int i = 1; i <= gpGlobals->maxClients; i++ )
 		{
-			pPlayer = ToBasePlayer( UTIL_PlayerByIndex( i ) );
+			pPlayer = ToBasePlayer( EntityList()->GetPlayerByIndex( i ) );
 
 			if (pPlayer == NULL)
 				continue;
@@ -3183,7 +3183,7 @@ CTeamRoundTimer *CTeamplayRoundBasedRules::GetActiveRoundTimer( void )
 {
 #ifdef TF_DLL
 	int iTimerEntIndex = ObjectiveResource()->GetTimerInHUD();
-	return ( dynamic_cast<CTeamRoundTimer *>( UTIL_EntityByIndex( iTimerEntIndex ) ) );
+	return ( dynamic_cast<CTeamRoundTimer *>(EntityList()->GetBaseEntity( iTimerEntIndex ) ) );
 #else
 	return NULL;
 #endif
@@ -3513,7 +3513,7 @@ void CTeamplayRoundBasedRules::GetAllPlayersLobbyInfo( CUtlVector<LobbyPlayerInf
 				continue;
 			bool bBot = pi.fakeplayer;
 		#else
-			CBasePlayer *pPlayer = UTIL_PlayerByIndex( i );
+			CBasePlayer *pPlayer = ToBasePlayer(EntityList()->GetPlayerByIndex( i ));
 			if ( !pPlayer )
 				continue;
 			if ( pPlayer->IsHLTV() || pPlayer->IsReplay() )

@@ -447,6 +447,7 @@ bool CAI_BaseActor::ProcessSceneEvent( CSceneEventInfo *info, CChoreoScene *scen
 				goalYaw = CalcIdealYaw( info->m_hTarget->EyePosition() );
 			}
 
+			ConVarRef developer("developer");
 			if (developer.GetInt() > 0 && scene_showfaceto.GetBool())
 			{
 				NDebugOverlay::YawArrow(GetEngineObject()->GetAbsOrigin() + Vector( 0, 0, 1 ), goalYaw, 8 + 32 * intensity, 8, 255, 255, 255, 0, true, 0.12 );

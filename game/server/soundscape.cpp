@@ -389,7 +389,7 @@ void CEnvSoundscape::DrawDebugGeometryOverlays( void )
 {
 	if ( m_debugOverlays & (OVERLAY_BBOX_BIT|OVERLAY_PIVOT_BIT|OVERLAY_ABSBOX_BIT) )
 	{
-		CBasePlayer *pPlayer = UTIL_PlayerByIndex(1);
+		CBasePlayer *pPlayer = ToBasePlayer(EntityList()->GetPlayerByIndex(1));
 		if ( pPlayer )
 		{
 			audioparams_t &audio = pPlayer->GetAudioParams();
@@ -563,7 +563,7 @@ void CTriggerSoundscape::PlayerUpdateThink()
 
 	for ( i=1; i <= gpGlobals->maxClients; ++i )
 	{
-		CBasePlayer *player = UTIL_PlayerByIndex( i );
+		CBasePlayer *player = ToBasePlayer(EntityList()->GetPlayerByIndex( i ));
 
 		if ( !player )
 			continue;

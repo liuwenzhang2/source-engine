@@ -1954,7 +1954,7 @@ CWeaponPhysCannon::FindObjectResult_t CWeaponPhysCannon::FindObject( void )
 	VectorNormalize( pullDir );
 	pullDir *= IsMegaPhysCannon() ? physcannon_mega_pullforce.GetFloat() : physcannon_pullforce.GetFloat();
 	
-	float mass = PhysGetEntityMass( pEntity );
+	float mass = pEntity->GetEngineObject()->PhysGetEntityMass();
 	if ( mass < 50.0f )
 	{
 		pullDir *= (mass + 0.5) * (1/50.0f);

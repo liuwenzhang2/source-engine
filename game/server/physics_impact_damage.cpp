@@ -338,7 +338,7 @@ float CalculatePhysicsImpactDamage( int index, gamevcollisionevent_t *pEvent, co
 		if ( gpGlobals->maxClients == 1 )
 		{
 			// if the player is holding the object, use it's real mass (player holding reduced the mass)
-			CBasePlayer *pPlayer = UTIL_GetLocalPlayer();
+			CBasePlayer *pPlayer = ToBasePlayer(EntityList()->GetLocalPlayer());
 			if ( pPlayer )
 			{
 				otherMass = pPlayer->GetHeldObjectMass( pEvent->pObjects[otherIndex] );
@@ -349,7 +349,7 @@ float CalculatePhysicsImpactDamage( int index, gamevcollisionevent_t *pEvent, co
 	// NOTE: sum the mass of each object in this system for the purpose of damage
 	if ( pEvent->pEntities[otherIndex] && (pEvent->pObjects[otherIndex]->GetGameFlags() & FVPHYSICS_MULTIOBJECT_ENTITY) )
 	{
-		otherMass = PhysGetEntityMass( pEvent->pEntities[otherIndex] );
+		otherMass = pEvent->pEntities[otherIndex]->GetEngineObject()->PhysGetEntityMass();
 	}
 	
 	if ( pEvent->pObjects[otherIndex]->GetGameFlags() & FVPHYSICS_HEAVY_OBJECT )
@@ -441,7 +441,7 @@ float CalculatePhysicsImpactDamage( int index, gamevcollisionevent_t *pEvent, co
 		if ( gpGlobals->maxClients == 1 )
 		{
 			// if the player is holding the object, use it's real mass (player holding reduced the mass)
-			CBasePlayer *pPlayer = UTIL_GetLocalPlayer();
+			CBasePlayer *pPlayer = ToBasePlayer(EntityList()->GetLocalPlayer());
 			if ( pPlayer )
 			{
 				float mass = pPlayer->GetHeldObjectMass( pEvent->pObjects[index] );

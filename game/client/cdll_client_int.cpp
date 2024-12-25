@@ -2571,7 +2571,7 @@ void CHLClient::InternalEmitCloseCaption(IRecipientFilter& filter, int entindex,
 			int c = filterCopy.GetRecipientCount();
 			for (int i = c - 1; i >= 0; --i)
 			{
-				CBasePlayer* player = UTIL_PlayerByIndex(filterCopy.GetRecipientIndex(i));
+				CBasePlayer* player = EntityList()->GetPlayerByIndex(filterCopy.GetRecipientIndex(i));
 				if (!player)
 					continue;
 

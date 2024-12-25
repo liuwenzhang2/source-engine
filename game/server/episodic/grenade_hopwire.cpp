@@ -102,7 +102,7 @@ void CGravityVortexController::ConsumeEntity( CBaseEntity *pEnt )
 //-----------------------------------------------------------------------------
 void CGravityVortexController::PullPlayersInRange( void )
 {
-	CBasePlayer *pPlayer = UTIL_GetLocalPlayer();
+	CBasePlayer *pPlayer = ToBasePlayer(EntityList()->GetLocalPlayer());
 	
 	Vector	vecForce = GetEngineObject()->GetAbsOrigin() - pPlayer->WorldSpaceCenter();
 	float	dist = VectorNormalize( vecForce );

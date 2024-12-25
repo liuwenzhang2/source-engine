@@ -64,7 +64,7 @@ void CGrenadePathfollower::Spawn( void )
 	GetEngineObject()->AddFlag( FL_OBJECT );	// So can be shot down
 	GetEngineObject()->AddEffects( EF_NODRAW );
 
-	UTIL_SetSize(this, Vector(0, 0, 0), Vector(0, 0, 0));
+	GetEngineObject()->SetSize(Vector(0, 0, 0), Vector(0, 0, 0));
 
 	m_flDamage		= sk_dmg_pathfollower_grenade.GetFloat();
 	m_DmgRadius		= sk_pathfollower_grenade_radius.GetFloat();

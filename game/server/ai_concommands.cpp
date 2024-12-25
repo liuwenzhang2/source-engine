@@ -19,7 +19,6 @@
 
 extern CAI_Node*	FindPickerAINode( CBasePlayer* pPlayer, NodeType_e nNodeType );
 extern void			SetDebugBits( CBasePlayer* pPlayer, const char *name, int bit );
-extern CBaseEntity *FindPickerEntity( CBasePlayer *pPlayer );
 
 extern bool g_bAIDisabledByUser;
 
@@ -206,7 +205,7 @@ void CC_AI_Hull( const CCommand &args )
 	if ( !args[1] || !args[1][0] )
 	{		
 		// No arg means the entity under the crosshair.
-		pEnt = FindPickerEntity( UTIL_GetCommandClient() );
+		pEnt = EntityList()->FindPickerEntity( UTIL_GetCommandClient() );
 		if ( !pEnt )
 		{
 			DevMsg( "No entity under the crosshair.\n" );
@@ -573,7 +572,7 @@ void CC_NPC_Freeze( const CCommand &args )
 			//	
 			// No selected NPCs, look for the NPC under the crosshair.
 			//
-			CBaseEntity *pEntity = FindPickerEntity( UTIL_GetCommandClient() );
+			CBaseEntity *pEntity = EntityList()->FindPickerEntity( UTIL_GetCommandClient() );
 			if ( pEntity )
 			{
 				CAI_BaseNPC *pNPC = pEntity->MyNPCPointer();
@@ -612,7 +611,7 @@ CON_COMMAND(npc_thinknow, "Trigger NPC to think")
 	if ( !UTIL_IsCommandIssuedByServerAdmin() )
 		return;
 
-	CBaseEntity *pEntity = FindPickerEntity( UTIL_GetCommandClient() );
+	CBaseEntity *pEntity = EntityList()->FindPickerEntity( UTIL_GetCommandClient() );
 	if ( pEntity )
 	{
 		CAI_BaseNPC *pNPC = pEntity->MyNPCPointer();
@@ -817,7 +816,7 @@ CON_COMMAND( npc_heal, "Heals the target back to full health" )
 	if ( !UTIL_IsCommandIssuedByServerAdmin() )
 		return;
 
-	CBaseEntity *pEntity = FindPickerEntity( UTIL_GetCommandClient() );
+	CBaseEntity *pEntity = EntityList()->FindPickerEntity( UTIL_GetCommandClient() );
 	if ( pEntity )
 	{
 		CAI_BaseNPC *pNPC = pEntity->MyNPCPointer();
@@ -833,7 +832,7 @@ CON_COMMAND( npc_ammo_deplete, "Subtracts half of the target's ammo" )
 	if ( !UTIL_IsCommandIssuedByServerAdmin() )
 		return;
 
-	CBaseEntity *pEntity = FindPickerEntity( UTIL_GetCommandClient() );
+	CBaseEntity *pEntity = EntityList()->FindPickerEntity( UTIL_GetCommandClient() );
 	if ( pEntity )
 	{
 		CAI_BaseNPC *pNPC = pEntity->MyNPCPointer();
@@ -868,9 +867,9 @@ CON_COMMAND( ai_test_los, "Test AI LOS from the player's POV" )
 
 	trace_t tr;
 	// Use the custom LOS trace filter
-	CTraceFilterLOS traceFilter( UTIL_GetLocalPlayer(), COLLISION_GROUP_NONE );
-	UTIL_TraceLine( UTIL_GetLocalPlayer()->EyePosition(), UTIL_GetLocalPlayer()->EyePosition() + UTIL_GetLocalPlayer()->EyeDirection3D() * MAX_COORD_RANGE, MASK_BLOCKLOS_AND_NPCS, &traceFilter, &tr );
-	NDebugOverlay::Line( UTIL_GetLocalPlayer()->EyePosition(), tr.endpos, 127, 127, 127, true, 5 );
+	CTraceFilterLOS traceFilter(EntityList()->GetLocalPlayer(), COLLISION_GROUP_NONE );
+	UTIL_TraceLine(EntityList()->GetLocalPlayer()->EyePosition(), EntityList()->GetLocalPlayer()->EyePosition() + ToBasePlayer(EntityList()->GetLocalPlayer())->EyeDirection3D() * MAX_COORD_RANGE, MASK_BLOCKLOS_AND_NPCS, &traceFilter, &tr );
+	NDebugOverlay::Line(EntityList()->GetLocalPlayer()->EyePosition(), tr.endpos, 127, 127, 127, true, 5 );
 	NDebugOverlay::Cross3D( tr.endpos, 24, 255, 255, 255, true, 5 );
 }
 

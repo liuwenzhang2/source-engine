@@ -37,7 +37,7 @@ void CDODPlayerResource::UpdatePlayerData( void )
 
 	for ( i = 1; i <= gpGlobals->maxClients; i++ )
 	{
-		CDODPlayer *pPlayer = (CDODPlayer*)UTIL_PlayerByIndex( i );
+		CDODPlayer *pPlayer = (CDODPlayer*)EntityList()->GetPlayerByIndex( i );
 		
 		if ( pPlayer && pPlayer->IsConnected() )
 		{

@@ -118,7 +118,7 @@ void CMessageEntity::Think( void )
 	GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.1f );
 
 	// check for player distance
-	CBasePlayer *pPlayer = UTIL_GetLocalPlayer();
+	CBasePlayer *pPlayer = ToBasePlayer(EntityList()->GetLocalPlayer());
 
 	if ( !pPlayer || ( pPlayer->GetEngineObject()->GetFlags() & FL_NOTARGET ) )
 		return;
@@ -143,7 +143,8 @@ void CMessageEntity::DrawOverlays(void)
 	if ( !m_drawText )
 		return;
 
-	if ( m_bDeveloperOnly && !g_pDeveloper->GetInt() )
+	ConVarRef developer("developer");
+	if ( m_bDeveloperOnly && !developer.GetInt() )
 		return;
 
 	if ( !m_bEnabled )

@@ -126,7 +126,7 @@ protected:
 		{
 			CBaseEntity *pThrower = pGrenade->GetThrower();
 			CBaseEntity *pOriginalThrower = pGrenade->GetOriginalThrower();
-			CBasePlayer *pPlayer = UTIL_GetLocalPlayer();
+			CBasePlayer *pPlayer = ToBasePlayer(EntityList()->GetLocalPlayer());
 			// check if player was most recent thrower, but the victim was the original thrower
 			if ( ( pPlayer == pThrower ) && ( pOriginalThrower == pVictim ) )
 			{
@@ -221,7 +221,7 @@ DECLARE_ACHIEVEMENT( CAchievementHLXKillEliteSoldierWithOwnEnergyBall, ACHIEVEME
 //-----------------------------------------------------------------------------
 int CalcPlayerAttacks( bool bBulletOnly )
 {
-	CBasePlayer *pPlayer = UTIL_GetLocalPlayer();
+	CBasePlayer *pPlayer = ToBasePlayer(EntityList()->GetLocalPlayer());
 	CAmmoDef *pAmmoDef = GetAmmoDef();
 	if ( !pPlayer || !pAmmoDef )
 		return 0;

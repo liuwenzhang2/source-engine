@@ -339,7 +339,7 @@ int CAntlionGrub::OnTakeDamage( const CTakeDamageInfo &info )
 //-----------------------------------------------------------------------------
 inline bool CAntlionGrub::InPVS( void )
 {
-	return ( UTIL_FindClientInPVS( this ) != NULL ) || (UTIL_ClientPVSIsExpanded() && UTIL_FindClientInVisibilityPVS( this ));
+	return (EntityList()->FindClientInPVS( this ) != NULL ) || (EntityList()->ClientPVSIsExpanded() && EntityList()->FindClientInVisibilityPVS( this ));
 }
 
 //-----------------------------------------------------------------------------
@@ -396,7 +396,7 @@ void CAntlionGrub::Spawn( void )
 	Vector vecMins, vecMaxs;
 	RotateAABB(GetEngineObject()->EntityToWorldTransform(), GetEngineObject()->OBBMins(), GetEngineObject()->OBBMaxs(), vecMins, vecMaxs );
 
-	UTIL_SetSize( this, vecMins, vecMaxs );
+	GetEngineObject()->SetSize( vecMins, vecMaxs );
 
 	// Start our idle activity
 	GetEngineObject()->SetSequence(GetEngineObject()->SelectWeightedSequence( ACT_IDLE ) );

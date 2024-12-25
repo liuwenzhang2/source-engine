@@ -26,7 +26,7 @@ CBaseEntity* MoveToRandomSpot( CBaseEntity *pEnt )
 {
 	if ( pEnt )
 	{
-		CBasePlayer *pLocalPlayer = UTIL_GetLocalPlayer();
+		CBasePlayer *pLocalPlayer = ToBasePlayer(EntityList()->GetLocalPlayer());
 		if ( pLocalPlayer )
 		{			
 			Vector vForward;

@@ -130,7 +130,7 @@ IServerEntity *CServerTools::GetIServerEntity( IClientEntity *pClientEntity )
 bool CServerTools::GetPlayerPosition( Vector &org, QAngle &ang, IClientEntity *pClientPlayer )
 {
 	IServerEntity *pServerPlayer = GetIServerEntity( pClientPlayer );
-	CBasePlayer *pPlayer = pServerPlayer ? ( CBasePlayer* )pServerPlayer : UTIL_GetLocalPlayer();
+	CBasePlayer *pPlayer = pServerPlayer ? ( CBasePlayer* )pServerPlayer : ToBasePlayer(EntityList()->GetLocalPlayer());
 	if ( pPlayer == NULL )
 		return false;
 
@@ -142,7 +142,7 @@ bool CServerTools::GetPlayerPosition( Vector &org, QAngle &ang, IClientEntity *p
 bool CServerTools::SnapPlayerToPosition( const Vector &org, const QAngle &ang, IClientEntity *pClientPlayer )
 {
 	IServerEntity *pServerPlayer = GetIServerEntity( pClientPlayer );
-	CBasePlayer *pPlayer = pServerPlayer ? ( CBasePlayer* )pServerPlayer : UTIL_GetLocalPlayer();
+	CBasePlayer *pPlayer = pServerPlayer ? ( CBasePlayer* )pServerPlayer : ToBasePlayer(EntityList()->GetLocalPlayer());
 	if ( pPlayer == NULL )
 		return false;
 
@@ -158,7 +158,7 @@ bool CServerTools::SnapPlayerToPosition( const Vector &org, const QAngle &ang, I
 int CServerTools::GetPlayerFOV( IClientEntity *pClientPlayer )
 {
 	IServerEntity *pServerPlayer = GetIServerEntity( pClientPlayer );
-	CBasePlayer *pPlayer = pServerPlayer ? ( CBasePlayer* )pServerPlayer : UTIL_GetLocalPlayer();
+	CBasePlayer *pPlayer = pServerPlayer ? ( CBasePlayer* )pServerPlayer : ToBasePlayer(EntityList()->GetLocalPlayer());
 	if ( pPlayer == NULL )
 		return 0;
 
@@ -168,7 +168,7 @@ int CServerTools::GetPlayerFOV( IClientEntity *pClientPlayer )
 bool CServerTools::SetPlayerFOV( int fov, IClientEntity *pClientPlayer )
 {
 	IServerEntity *pServerPlayer = GetIServerEntity( pClientPlayer );
-	CBasePlayer *pPlayer = pServerPlayer ? ( CBasePlayer* )pServerPlayer : UTIL_GetLocalPlayer();
+	CBasePlayer *pPlayer = pServerPlayer ? ( CBasePlayer* )pServerPlayer : ToBasePlayer(EntityList()->GetLocalPlayer());
 	if ( pPlayer == NULL )
 		return false;
 
@@ -180,7 +180,7 @@ bool CServerTools::SetPlayerFOV( int fov, IClientEntity *pClientPlayer )
 bool CServerTools::IsInNoClipMode( IClientEntity *pClientPlayer )
 {
 	IServerEntity *pServerPlayer = GetIServerEntity( pClientPlayer );
-	CBasePlayer *pPlayer = pServerPlayer ? ( CBasePlayer* )pServerPlayer : UTIL_GetLocalPlayer();
+	CBasePlayer *pPlayer = pServerPlayer ? ( CBasePlayer* )pServerPlayer : ToBasePlayer(EntityList()->GetLocalPlayer());
 	if ( pPlayer == NULL )
 		return true;
 
@@ -527,8 +527,7 @@ void CC_Ent_Keyvalue( const CCommand &args )
 		if (!pPlayer)
 			return;
 
-		extern CBaseEntity *FindPickerEntity( CBasePlayer *pPlayer );
-		pEnt = FindPickerEntity( pPlayer );
+		pEnt = EntityList()->FindPickerEntity( pPlayer );
 
 		if ( !pEnt )
 		{

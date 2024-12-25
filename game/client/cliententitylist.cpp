@@ -44,6 +44,7 @@
 #include "hl2_gamerules.h"
 #include "portal_util_shared.h"
 #include "utlmultilist.h"
+#include "util_shared.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
@@ -1464,7 +1465,7 @@ void C_GrabControllerInternal::ComputeMaxSpeed(C_BaseEntity* pEntity, IPhysicsOb
 	m_shadow.maxAngular = DEFAULT_MAX_ANGULAR;
 
 	// Compute total mass...
-	float flMass = PhysGetEntityMass(pEntity);
+	float flMass = pEntity->GetEngineObject()->PhysGetEntityMass();
 	ConVarRef physcannon_maxmass("physcannon_maxmass");
 	float flMaxMass = physcannon_maxmass.GetFloat();
 	if (flMass <= flMaxMass)
@@ -2484,7 +2485,7 @@ bool C_EngineObjectInternal::KeyValue(const char* szKeyName, const char* szValue
 	//}
 
 	// Fix up single angles
-	if (FStrEq(szKeyName, "angle"))
+	if (datamap_t::FStrEq(szKeyName, "angle"))
 	{
 		static char szBuf[64];
 
@@ -2507,10 +2508,10 @@ bool C_EngineObjectInternal::KeyValue(const char* szKeyName, const char* szValue
 	}
 
 	// NOTE: Have to do these separate because they set two values instead of one
-	if (FStrEq(szKeyName, "angles"))
+	if (datamap_t::FStrEq(szKeyName, "angles"))
 	{
 		QAngle angles;
-		UTIL_StringToVector(angles.Base(), szValue);
+		datamap_t::UTIL_StringToVector(angles.Base(), szValue);
 
 		// If you're hitting this assert, it's probably because you're
 		// calling SetLocalAngles from within a KeyValues method.. use SetAbsAngles instead!
@@ -2519,10 +2520,10 @@ bool C_EngineObjectInternal::KeyValue(const char* szKeyName, const char* szValue
 		return true;
 	}
 
-	if (FStrEq(szKeyName, "origin"))
+	if (datamap_t::FStrEq(szKeyName, "origin"))
 	{
 		Vector vecOrigin;
-		UTIL_StringToVector(vecOrigin.Base(), szValue);
+		datamap_t::UTIL_StringToVector(vecOrigin.Base(), szValue);
 
 		// If you're hitting this assert, it's probably because you're
 		// calling SetLocalOrigin from within a KeyValues method.. use SetAbsOrigin instead!
@@ -6969,7 +6970,20 @@ void C_EngineObjectInternal::RagdollSolveSeparation(ragdoll_t& ragdoll, IHandleE
 					Ray_t ray;
 					trace_t tr;
 					ray.Init(target, start);
-					UTIL_TraceRay(ray, MASK_SOLID, pEntity, COLLISION_GROUP_NONE, &tr);
+					unsigned int mask = MASK_SOLID;
+					const IHandleEntity* ignore = pEntity;
+					int collisionGroup = COLLISION_GROUP_NONE;
+					trace_t* ptr = &tr;
+					ShouldHitFunc_t pExtraShouldHitCheckFn = NULL;
+					CTraceFilterSimple traceFilter(ignore, collisionGroup, pExtraShouldHitCheckFn);
+
+					enginetrace->TraceRay(ray, mask, &traceFilter, ptr);
+
+					ConVarRef r_visualizetraces("r_visualizetraces");
+					if (r_visualizetraces.GetBool())
+					{
+						DebugDrawLine(ptr->startpos, ptr->endpos, 255, 0, 0, true, -1.0f);
+					}
 					if (tr.DidHit())
 					{
 						needsFix[i] = 1;
@@ -10920,7 +10934,21 @@ void C_EnginePortalInternal::CreateLocalCollision(void)
 	{
 		CTraceFilterWorldAndPropsOnly filter;
 		trace_t Trace;
-		UTIL_TraceLine(GetAbsOrigin() + m_InternalData.Placement.vForward, GetAbsOrigin() - (m_InternalData.Placement.vForward * 500.0f), MASK_SOLID_BRUSHONLY, &filter, &Trace);
+		const Vector& vecAbsStart = GetAbsOrigin() + m_InternalData.Placement.vForward;
+		const Vector& vecAbsEnd = GetAbsOrigin() - (m_InternalData.Placement.vForward * 500.0f);
+		unsigned int mask = MASK_SOLID_BRUSHONLY;
+		ITraceFilter* pFilter = &filter;
+		trace_t* ptr = &Trace;
+		Ray_t ray;
+		ray.Init(vecAbsStart, vecAbsEnd);
+
+		enginetrace->TraceRay(ray, mask, pFilter, ptr);
+
+		ConVarRef r_visualizetraces("r_visualizetraces");
+		if (r_visualizetraces.GetBool())
+		{
+			DebugDrawLine(ptr->startpos, ptr->endpos, 255, 0, 0, true, -1.0f);
+		}
 
 		if (Trace.fraction != 1.0f)
 		{
@@ -11651,7 +11679,7 @@ void BuildRope(C_EngineRopeInternal* pRope, RopeSegData_t* pSegmentData, const V
 	if (ShouldUseFakeAA(pRope->GetBackMaterial()))
 	{
 		// Compute screen width
-		float flScreenWidth = ScreenWidth();
+		float flScreenWidth = clientdll->GetScreenWidth();
 		float flHalfScreenWidth = flScreenWidth / 2.0f;
 
 		float flExtraScreenSpaceWidth = rope_smooth_enlarge.GetFloat();
@@ -12940,8 +12968,23 @@ void C_EngineRopeInternal::CPhysicsDelegate::ApplyConstraints(CSimplePhysics::CN
 			for (iIteration = 0; iIteration < nIterations; iIteration++)
 			{
 				trace_t trace;
-				UTIL_TraceHull(pNode->m_vPrevPos, pNode->m_vPos,
-					Vector(-2, -2, -2), Vector(2, 2, 2), MASK_SOLID_BRUSHONLY, &traceFilter, &trace);
+				const Vector& vecAbsStart = pNode->m_vPrevPos;
+				const Vector& vecAbsEnd = pNode->m_vPos;
+				const Vector& hullMin = Vector(-2, -2, -2);
+				const Vector& hullMax = Vector(2, 2, 2);
+				unsigned int mask = MASK_SOLID_BRUSHONLY;
+				ITraceFilter* pFilter = &traceFilter;
+				trace_t* ptr = &trace;
+				Ray_t ray;
+				ray.Init(vecAbsStart, vecAbsEnd, hullMin, hullMax);
+
+				enginetrace->TraceRay(ray, mask, pFilter, ptr);
+
+				ConVarRef r_visualizetraces("r_visualizetraces");
+				if (r_visualizetraces.GetBool())
+				{
+					DebugDrawLine(ptr->startpos, ptr->endpos, 255, 255, 0, true, -1.0f);
+				}
 
 				if (trace.fraction == 1)
 					break;
@@ -13267,9 +13310,9 @@ bool ShouldRemoveThisRagdoll(C_BaseEntity* pRagdoll)
 	}
 
 #else
-	CBasePlayer* pPlayer = UTIL_GetLocalPlayer();
+	CBasePlayer* pPlayer = EntityList()->GetLocalPlayer();
 
-	if (!UTIL_FindClientInPVS(pRagdoll))
+	if (!EntityList()->FindClientInPVS(pRagdoll))
 	{
 		if (g_debug_ragdoll_removal.GetBool())
 			NDebugOverlay::Line(pRagdoll->GetEngineObject()->GetAbsOrigin(), pRagdoll->GetEngineObject()->GetAbsOrigin() + Vector(0, 0, 64), 0, 255, 0, true, 5);

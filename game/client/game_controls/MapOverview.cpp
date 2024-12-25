@@ -268,7 +268,7 @@ void CMapOverview::UpdatePlayers()
 			}
 		}
 
-		C_BasePlayer *pPlayer = UTIL_PlayerByIndex( i );
+		C_BasePlayer *pPlayer = ToBasePlayer(EntityList()->GetPlayerByIndex( i ));
 
 		if ( !pPlayer )
 			continue;

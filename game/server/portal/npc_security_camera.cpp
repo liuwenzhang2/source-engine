@@ -806,10 +806,10 @@ void CNPC_SecurityCamera::SearchThink( void )
 	{
 		CBaseEntity *pEnemy = NULL;
 
-		//CBasePlayer *pPlayer = UTIL_PlayerByIndex( 1 );
+		//CBasePlayer *pPlayer = ToBasePlayer(EntityList()->GetPlayerByIndex( 1 ));
 		for( int i = 1; i <= gpGlobals->maxClients; ++i )
 		{
-			CBasePlayer *pPlayer = UTIL_PlayerByIndex( i );
+			CBasePlayer *pPlayer = ToBasePlayer(EntityList()->GetPlayerByIndex( i ));
 			if ( pPlayer && pPlayer->IsAlive() )
 			{
 				if ( FInViewCone( pPlayer ) && FVisible( pPlayer ) )
@@ -1112,7 +1112,7 @@ bool CNPC_SecurityCamera::CanBeAnEnemyOf( CBaseEntity *pEnemy )
 void PlayDismountSounds()
 {
 	// Play GLaDOS's audio reaction
-	CPortal_Player* pPlayer = ToPortalPlayer( UTIL_PlayerByIndex( 1 ) );
+	CPortal_Player* pPlayer = ToPortalPlayer( EntityList()->GetPlayerByIndex( 1 ) );
 	CAI_BaseActor* pGlaDOS  = (CAI_BaseActor*)EntityList()->FindEntityByName( NULL, "Aperture_AI" );
 	
 	if ( !pPlayer || !pGlaDOS )

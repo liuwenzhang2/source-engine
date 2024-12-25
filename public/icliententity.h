@@ -910,6 +910,7 @@ public:
 	virtual C_BaseEntity* NextBaseEntity(C_BaseEntity* pEnt) const = 0;
 	virtual C_BaseEntity* GetLocalPlayer(void) = 0;
 	virtual void SetLocalPlayer(C_BaseEntity* pBasePlayer) = 0;
+	virtual C_BaseEntity* GetPlayerByIndex(int playerIndex) = 0;
 
 	// Returns number of entities currently in use
 	virtual int NumberOfEntities(bool bIncludeNonNetworkable) = 0;

@@ -148,7 +148,7 @@ void CRpgRocket::Spawn( void )
 
 	GetEngineObject()->SetSolid( SOLID_BBOX );
 	SetModel("models/rpgrocket.mdl");
-	UTIL_SetSize( this, -Vector(0,0,0), Vector(0,0,0) );
+	GetEngineObject()->SetSize( -Vector(0,0,0), Vector(0,0,0) );
 
 	SetTouch( &CRpgRocket::RocketTouch );
 
@@ -450,7 +450,7 @@ CLaserDot *CLaserDot::Create( const Vector &origin, CBaseEntity *pOwner, bool bV
 	pLaserDot->GetEngineObject()->SetMoveType( MOVETYPE_NONE );
 	pLaserDot->GetEngineObject()->AddSolidFlags( FSOLID_NOT_SOLID );
 	pLaserDot->GetEngineObject()->AddEffects( EF_NOSHADOW );
-	UTIL_SetSize( pLaserDot, -Vector(6,6,6), Vector(6,6,6) );
+	pLaserDot->GetEngineObject()->SetSize( -Vector(6,6,6), Vector(6,6,6) );
 
 	pLaserDot->SetOwnerEntity( pOwner );
 

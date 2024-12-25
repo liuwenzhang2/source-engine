@@ -398,6 +398,7 @@ int CSoundEnt::IAllocSound( void )
 	if ( m_iFreeSound == SOUNDLIST_EMPTY )
 	{
 		// no free sound!
+		ConVarRef developer("developer");
 		if ( developer.GetInt() >= 2 )
 			Msg( "Free Sound List is full!\n" );
 

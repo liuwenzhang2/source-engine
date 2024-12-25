@@ -71,8 +71,6 @@ enum
 
 static CSteamWorksGameStatsUploader g_SteamWorksGameStats;
 
-extern ConVar developer;
-
 #if defined(CLIENT_DLL) || defined(CSTRIKE_DLL)
 void Show_Steam_Stats_Session_ID( void )
 {
@@ -450,7 +448,7 @@ EResult	CSteamWorksGameStatsUploader::RequestSessionID()
 		DevMsg( "Steamworks Stats: No stats collection because steamworks_stats_disable is set to 1.\n" );
 		return k_EResultAccessDenied;
 	}
-
+	ConVarRef developer("developer");
 	if ( developer.GetInt() == 1 )
 	{
 //		DevMsg( "Steamworks Stats: No stats collection because developer is set to 1.\n" );

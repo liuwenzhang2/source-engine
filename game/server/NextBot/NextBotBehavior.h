@@ -1061,6 +1061,7 @@ private:
 		{
 			if ( m_eventResult.m_priority == RESULT_CRITICAL )
 			{				
+				ConVarRef developer("developer");
 				if ( developer.GetBool() )
 				{
 					DevMsg( "%3.2f: WARNING: %s::%s() RESULT_CRITICAL collision\n", gpGlobals->curtime, GetName(), eventName );

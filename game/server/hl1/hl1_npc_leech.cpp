@@ -144,7 +144,7 @@ void CNPC_Leech::Spawn( void )
 	SetHullType(HULL_TINY_CENTERED); 
 	SetHullSizeNormal();
 
-	UTIL_SetSize( this, Vector(-1,-1,0), Vector(1,1,2));
+	GetEngineObject()->SetSize(Vector(-1,-1,0), Vector(1,1,2));
 
 	Vector vecSurroundingMins(-8,-8,0);
 	Vector vecSurroundingMaxs(8,8,2);

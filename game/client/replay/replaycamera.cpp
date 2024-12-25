@@ -322,7 +322,7 @@ C_BaseEntity* C_ReplayCamera::GetPrimaryTarget()
 
 void C_ReplayCamera::CalcInEyeCamView( Vector& eyeOrigin, QAngle& eyeAngles, float& fov, float flDelta )
 {
-	C_BasePlayer *pPlayer = UTIL_PlayerByIndex( m_iTarget1 );
+	C_BasePlayer *pPlayer = EntityList()->GetPlayerByIndex( m_iTarget1 );
 
 	if ( !pPlayer )
 		return;
@@ -811,7 +811,7 @@ void C_ReplayCamera::SpecNextPlayer( bool bInverse )
 		if ( index == start )
 			break; // couldn't find a new valid player
 
-		C_BasePlayer *pPlayer =	UTIL_PlayerByIndex( index );
+		C_BasePlayer *pPlayer =	EntityList()->GetPlayerByIndex( index );
 
 		if ( !pPlayer )
 			continue;
@@ -833,7 +833,7 @@ void C_ReplayCamera::SpecNamedPlayer( const char *szPlayerName )
 {
 	for ( int index = 1; index <= gpGlobals->maxClients; ++index )
 	{
-		C_BasePlayer *pPlayer =	UTIL_PlayerByIndex( index );
+		C_BasePlayer *pPlayer =	EntityList()->GetPlayerByIndex( index );
 
 		if ( !pPlayer )
 			continue;

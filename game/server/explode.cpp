@@ -53,7 +53,7 @@ void CShower::Spawn( void )
 	GetEngineObject()->SetGravity( UTIL_ScaleForGravity( 400 ) ); // fall a bit more slowly than normal
 	GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.1f );
 	GetEngineObject()->SetSolid( SOLID_NONE );
-	UTIL_SetSize(this, vec3_origin, vec3_origin );
+	GetEngineObject()->SetSize( vec3_origin, vec3_origin );
 	GetEngineObject()->AddEffects( EF_NODRAW );
 	m_flSpeed = random->RandomFloat( 0.5, 1.5 );
 

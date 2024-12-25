@@ -612,7 +612,7 @@ void CPropVehiclePrisonerPod::InputEnterVehicle( inputdata_t &inputdata )
 	if ( pPassenger == NULL )
 	{
 		// Activator was not a player, just grab the singleplayer player.
-		pPassenger = UTIL_PlayerByIndex( 1 );
+		pPassenger = ToBasePlayer(EntityList()->GetPlayerByIndex( 1 ));
 		if ( pPassenger == NULL )
 			return;
 	}
@@ -639,7 +639,7 @@ void CPropVehiclePrisonerPod::InputEnterVehicleImmediate( inputdata_t &inputdata
 	if ( pPassenger == NULL )
 	{
 		// Activator was not a player, just grab the singleplayer player.
-		pPassenger = UTIL_PlayerByIndex( 1 );
+		pPassenger = ToBasePlayer(EntityList()->GetPlayerByIndex( 1 ));
 		if ( pPassenger == NULL )
 			return;
 	}

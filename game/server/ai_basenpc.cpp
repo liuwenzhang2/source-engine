@@ -1282,7 +1282,7 @@ bool CAI_BaseNPC::PlayerInSpread( const Vector &sourcePos, const Vector &targetP
 	// loop through all players
 	for (int i = 1; i <= gpGlobals->maxClients; i++ )
 	{
-		CBasePlayer *pPlayer = UTIL_PlayerByIndex( i );
+		CBasePlayer *pPlayer = ToBasePlayer(EntityList()->GetPlayerByIndex( i ));
 
 		if ( pPlayer && ( !ignoreHatedPlayers || IRelationType( pPlayer ) != D_HT ) )
 		{
@@ -1304,7 +1304,7 @@ CBaseEntity *CAI_BaseNPC::PlayerInRange( const Vector &vecLocation, float flDist
 	// loop through all players
 	for (int i = 1; i <= gpGlobals->maxClients; i++ )
 	{
-		CBasePlayer *pPlayer = UTIL_PlayerByIndex( i );
+		CBasePlayer *pPlayer = ToBasePlayer(EntityList()->GetPlayerByIndex( i ));
 
 		if (pPlayer && (vecLocation - pPlayer->WorldSpaceCenter() ).Length2D() <= flDist)
 		{
@@ -1336,7 +1336,7 @@ void BulletWizz( Vector vecSrc, Vector vecEndPos, CBaseEntity *pShooter, bool is
 	// for multiplayer, we need to go through the list of clients.
 	for (int i = 1; i <= gpGlobals->maxClients; i++ )
 	{
-		pPlayer = UTIL_PlayerByIndex( i );
+		pPlayer = ToBasePlayer(EntityList()->GetPlayerByIndex( i ));
 
 		if ( !pPlayer )
 			continue;
@@ -3125,7 +3125,7 @@ void CAI_BaseNPC::UpdateEfficiency( bool bInPVS )
 	float	playerDist	= VectorNormalize( vToNPC );
 	bool	bPlayerFacing;
 
-	bool	bClientPVSExpanded = UTIL_ClientPVSIsExpanded();
+	bool	bClientPVSExpanded = EntityList()->ClientPVSIsExpanded();
 
 	if ( pPlayer )
 	{
@@ -3139,7 +3139,7 @@ void CAI_BaseNPC::UpdateEfficiency( bool bInPVS )
 
 	//---------------------------------
 
-	bool bInVisibilityPVS = ( bClientPVSExpanded && UTIL_FindClientInVisibilityPVS( this ) != NULL );
+	bool bInVisibilityPVS = ( bClientPVSExpanded && EntityList()->FindClientInVisibilityPVS( this ) != NULL );
 
 	//---------------------------------
 
@@ -3383,7 +3383,7 @@ void CAI_BaseNPC::UpdateSleepState( bool bInPVS )
 				{
 					for (int i = 1; i <= gpGlobals->maxClients; i++ )
 					{
-						CBasePlayer *pPlayer = UTIL_PlayerByIndex( i );
+						CBasePlayer *pPlayer = ToBasePlayer(EntityList()->GetPlayerByIndex( i ));
 						if ( pPlayer && !(pPlayer->GetEngineObject()->GetFlags() & FL_NOTARGET) && pPlayer->FVisible( this ) )
 							Wake();
 					}
@@ -3587,7 +3587,7 @@ void CAI_BaseNPC::RebalanceThinks()
 				else if ( pPlayer )
 				{
 					Vector vToCandidate = pCandidate->EyePosition() - vPlayerEyePosition;
-					rebalanceCandidates[iInfo].bInPVS = ( UTIL_FindClientInPVS( pCandidate ) != NULL );
+					rebalanceCandidates[iInfo].bInPVS = (EntityList()->FindClientInPVS( pCandidate ) != NULL );
 					rebalanceCandidates[iInfo].distPlayer = VectorNormalize( vToCandidate );
 					rebalanceCandidates[iInfo].dotPlayer = vPlayerForward.Dot( vToCandidate );
 				}
@@ -3880,7 +3880,7 @@ void CAI_BaseNPC::PlayerPenetratingVPhysics( void )
 
 bool CAI_BaseNPC::CheckPVSCondition()
 {
-	bool bInPVS = ( UTIL_FindClientInPVS( this ) != NULL ) || (UTIL_ClientPVSIsExpanded() && UTIL_FindClientInVisibilityPVS( this ));
+	bool bInPVS = ( EntityList()->FindClientInPVS( this ) != NULL ) || (EntityList()->ClientPVSIsExpanded() && EntityList()->FindClientInVisibilityPVS( this ));
 
 	if ( bInPVS )
 		SetCondition( COND_IN_PVS );
@@ -4653,7 +4653,7 @@ void CAI_BaseNPC::GatherConditions( void )
 
 		if (GetEngineObject()->GetPfnThink() != (THINKPTR)&CAI_BaseNPC::CallNPCThink )
 		{
-			if ( UTIL_FindClientInPVS( this ) != NULL )
+			if (EntityList()->FindClientInPVS( this ) != NULL )
 				SetCondition( COND_IN_PVS );
 			else
 				ClearCondition( COND_IN_PVS );
@@ -4815,7 +4815,7 @@ void CAI_BaseNPC::RunAI( void )
 
 		vecPoint = EyePosition() + Vector( 0, 0, 12 );
 
-		UTIL_GetLocalPlayer()->GetVectors( NULL, &right, NULL );
+		EntityList()->GetLocalPlayer()->GetVectors( NULL, &right, NULL );
 
 		NDebugOverlay::Line( vecPoint, vecPoint + Vector( 0, 0, 64 ), 255, 0, 0, false , 0.1 );
 		NDebugOverlay::Line( vecPoint, vecPoint + Vector( 0, 0, 32 ) + right * 32, 255, 0, 0, false , 0.1 );
@@ -4829,7 +4829,8 @@ void CAI_BaseNPC::RunAI( void )
 	m_bConditionsGathered = false;
 	m_bSkippedChooseEnemy = false;
 
-	if ( g_pDeveloper->GetInt() && !GetNavigator()->IsOnNetwork() )
+	ConVarRef developer("developer");
+	if ( developer.GetInt() && !GetNavigator()->IsOnNetwork() )
 	{
 		AddTimedOverlay( "NPC w/no reachable nodes!", 5 );
 	}
@@ -6618,7 +6619,7 @@ void CAI_BaseNPC::CheckPhysicsContacts()
 
 			if ( pOtherEntity && pGroundEntity != pOtherEntity )
 			{
-				float otherMass = PhysGetEntityMass(pOtherEntity);
+				float otherMass = pOtherEntity->GetEngineObject()->PhysGetEntityMass();
 
 				if ( pOtherEntity->GetEngineObject()->GetMoveType() == MOVETYPE_VPHYSICS &&  pOther->IsMoveable() &&
 					otherMass < VPHYSICS_LARGE_OBJECT_MASS  && !pOtherEntity->GetServerVehicle() )
@@ -6679,7 +6680,7 @@ void CAI_BaseNPC::StartTouch( CBaseEntity *pOther )
 }
 
 //-----------------------------------------------------------------------------
-// Purpose: To be called instead of UTIL_SetSize, so pathfinding hull
+// Purpose: To be called instead of GetEngineObject()->SetSize, so pathfinding hull
 //			and actual hull agree
 // Input  :
 // Output :
@@ -6693,7 +6694,7 @@ void CAI_BaseNPC::SetHullSizeNormal( bool force )
 		Vector vecMins = ( GetHullMins() * flScale );
 		Vector vecMaxs = ( GetHullMaxs() * flScale );
 		
-		UTIL_SetSize( this, vecMins, vecMaxs );
+		this->GetEngineObject()->SetSize( vecMins, vecMaxs );
 
 		m_fIsUsingSmallHull = false;
 		if (GetEngineObject()->VPhysicsGetObject() )
@@ -6704,7 +6705,7 @@ void CAI_BaseNPC::SetHullSizeNormal( bool force )
 }
 
 //-----------------------------------------------------------------------------
-// Purpose: To be called instead of UTIL_SetSize, so pathfinding hull
+// Purpose: To be called instead of GetEngineObject()->SetSize, so pathfinding hull
 //			and actual hull agree
 // Input  :
 // Output :
@@ -6713,7 +6714,7 @@ bool CAI_BaseNPC::SetHullSizeSmall( bool force )
 {
 	if ( !m_fIsUsingSmallHull || force )
 	{
-		UTIL_SetSize(this, NAI_Hull::SmallMins(GetHullType()),NAI_Hull::SmallMaxs(GetHullType()));
+		GetEngineObject()->SetSize(NAI_Hull::SmallMins(GetHullType()),NAI_Hull::SmallMaxs(GetHullType()));
 		m_fIsUsingSmallHull = true;
 		if (GetEngineObject()->VPhysicsGetObject() )
 		{
@@ -7315,7 +7316,8 @@ void CAI_BaseNPC::StartNPC( void )
 		if (!GetMoveProbe()->FloorPoint( origin + Vector(0, 0, 0.1), MASK_NPCSOLID, 0, -2048, &origin ))
 		{
 			Warning( "NPC %s stuck in wall--level design error at (%.2f %.2f %.2f)\n", GetClassname(), GetEngineObject()->GetAbsOrigin().x, GetEngineObject()->GetAbsOrigin().y, GetEngineObject()->GetAbsOrigin().z );
-			if ( g_pDeveloper->GetInt() > 1 )
+			ConVarRef developer("developer");
+			if ( developer.GetInt() > 1 )
 			{
 				m_debugOverlays |= OVERLAY_BBOX_BIT;
 			}
@@ -7562,7 +7564,8 @@ void CAI_BaseNPC::TaskFail( AI_TaskFailureCode_t code )
 	//}
 
 	// If in developer mode save the fail text for debug output
-	if (g_pDeveloper->GetInt())
+	ConVarRef developer("developer");
+	if (developer.GetInt())
 	{
 		m_failText = TaskFailureToString( code );
 
@@ -8824,7 +8827,7 @@ void CAI_BaseNPC::DrawDebugGeometryOverlays(void)
 		// Also include all players
 		for ( int i = 1; i <= gpGlobals->maxClients; i++ )
 		{
-			CBasePlayer	*pPlayer = UTIL_PlayerByIndex( i );
+			CBasePlayer	*pPlayer = ToBasePlayer(EntityList()->GetPlayerByIndex( i ));
 			if ( pPlayer == NULL )
 				continue;
 
@@ -10054,7 +10057,7 @@ void CAI_BaseNPC::NPCInitDead( void )
 	m_iMaxHealth		= m_iHealth;
 	m_lifeState		= LIFE_DEAD;
 
-	UTIL_SetSize(this, vec3_origin, vec3_origin );
+	GetEngineObject()->SetSize( vec3_origin, vec3_origin );
 
 	// Setup health counters, etc.
 	SetThink( &CAI_BaseNPC::CorpseFallThink );
@@ -11683,8 +11686,8 @@ void CAI_BaseNPC::InputWake( inputdata_t &inputdata )
 void CAI_BaseNPC::InputForgetEntity( inputdata_t &inputdata )
 {
 	const char *pszEntityToForget = inputdata.value.String();
-
-	if ( g_pDeveloper->GetInt() && pszEntityToForget[strlen( pszEntityToForget ) - 1] == '*' )
+	ConVarRef developer("developer");
+	if ( developer.GetInt() && pszEntityToForget[strlen( pszEntityToForget ) - 1] == '*' )
 		DevMsg( "InputForgetEntity does not support wildcards\n" );
 
 	CBaseEntity *pEntity = EntityList()->FindEntityByName( NULL, pszEntityToForget );
@@ -11897,7 +11900,7 @@ bool CAI_BaseNPC::CineCleanup()
 		GetEngineObject()->AddSolidFlags( FSOLID_NOT_SOLID );
 		SetState( NPC_STATE_DEAD );
 		m_lifeState = LIFE_DEAD;
-		UTIL_SetSize( this, GetEngineObject()->WorldAlignMins(), Vector(GetEngineObject()->WorldAlignMaxs().x, GetEngineObject()->WorldAlignMaxs().y, GetEngineObject()->WorldAlignMins().z + 2) );
+		this->GetEngineObject()->SetSize( GetEngineObject()->WorldAlignMins(), Vector(GetEngineObject()->WorldAlignMaxs().x, GetEngineObject()->WorldAlignMaxs().y, GetEngineObject()->WorldAlignMins().z + 2) );
 
 		if ( pOldCine && pOldCine->GetEngineObject()->HasSpawnFlags( SF_SCRIPT_LEAVECORPSE ) )
 		{
@@ -11963,7 +11966,7 @@ bool CAI_BaseNPC::CineCleanup()
 			{
 				GetEngineObject()->SetLocalOrigin( origin );
 
-				int drop = UTIL_DropToFloor( this, MASK_NPCSOLID, UTIL_GetLocalPlayer() );
+				int drop = UTIL_DropToFloor( this, MASK_NPCSOLID, EntityList()->GetLocalPlayer() );
 
 				// Origin in solid?  Set to org at the end of the sequence
 				if ( ( drop < 0 ) || sv_test_scripted_sequences.GetBool() )
@@ -12580,7 +12583,7 @@ bool CAI_BaseNPC::IsPlayerAlly( CBasePlayer *pPlayer )
 			return false;
 
 		// NULL means single player mode
-		pPlayer = UTIL_GetLocalPlayer();
+		pPlayer = ToBasePlayer(EntityList()->GetLocalPlayer());
 	}
 
 	return ( !pPlayer || IRelationType( pPlayer ) == D_LI ); 

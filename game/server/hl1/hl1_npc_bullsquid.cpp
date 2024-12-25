@@ -151,7 +151,7 @@ void CSquidSpit:: Spawn( void )
 
 	SetSprite( CSprite::SpriteCreate( "sprites/bigspit.vmt", GetEngineObject()->GetAbsOrigin(), true ) );
 	
-	UTIL_SetSize( this, Vector( 0, 0, 0), Vector(0, 0, 0) );
+	GetEngineObject()->SetSize( Vector( 0, 0, 0), Vector(0, 0, 0) );
 
 	GetEngineObject()->SetCollisionGroup( HL2COLLISION_GROUP_SPIT );
 }

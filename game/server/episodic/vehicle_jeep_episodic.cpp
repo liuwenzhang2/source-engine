@@ -143,7 +143,7 @@ public:
 			return NULL;
 
 		UTIL_SetOrigin( pTrigger, vecOrigin );
-		UTIL_SetSize( pTrigger, vecMins, vecMaxs );		
+		pTrigger->GetEngineObject()->SetSize( vecMins, vecMaxs );
 		pTrigger->SetOwnerEntity( pOwner );
 		pTrigger->GetEngineObject()->SetParent( pOwner?pOwner->GetEngineObject():NULL );
 
@@ -456,7 +456,7 @@ void CPropJeepEpisodic::Spawn( void )
 
 	SetBlocksLOS( false );
 
-	CBasePlayer	*pPlayer = UTIL_GetLocalPlayer();
+	CBasePlayer	*pPlayer = ToBasePlayer(EntityList()->GetLocalPlayer());
 	if ( pPlayer != NULL )
 	{
 		pPlayer->m_Local.m_iHideHUD |= HIDEHUD_VEHICLE_CROSSHAIR;

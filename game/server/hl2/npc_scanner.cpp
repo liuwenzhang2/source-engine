@@ -701,7 +701,7 @@ CBaseEntity* CNPC_CScanner::BestInspectTarget(void)
 		// Players
 		for ( i = 1; i <= gpGlobals->maxClients; i++ )
 		{
-			CBaseEntity *pPlayer = UTIL_PlayerByIndex( i );
+			CBaseEntity *pPlayer = EntityList()->GetPlayerByIndex( i );
 
 			if ( pPlayer )
 			{

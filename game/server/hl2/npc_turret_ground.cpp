@@ -167,7 +167,7 @@ bool CNPC_GroundTurret::CreateVPhysics( void )
 //-----------------------------------------------------------------------------
 void CNPC_GroundTurret::PrescheduleThink()
 {
-	if( UTIL_FindClientInPVS(this) )
+	if(EntityList()->FindClientInPVS(this) )
 	{
 		GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.03f );
 	}
@@ -349,7 +349,7 @@ void CNPC_GroundTurret::GatherConditions()
 		return;
 	}
 
-	if( !IsOpen() && !UTIL_FindClientInPVS( this ) )
+	if( !IsOpen() && !EntityList()->FindClientInPVS( this ) )
 	{
 		return;
 	}
@@ -636,7 +636,7 @@ void CNPC_GroundTurret::Scan()
 		return;
 	}
 
-	if( !UTIL_FindClientInPVS(this) )
+	if( !EntityList()->FindClientInPVS(this) )
 	{
 		return;
 	}

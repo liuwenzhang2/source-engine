@@ -402,7 +402,7 @@ void CPlatTrigger::SpawnInsideTrigger( CFuncPlat *pPlatform )
 		vecTMin.y = (m_pPlatform->GetEngineObject()->OBBMins().y + m_pPlatform->GetEngineObject()->OBBMaxs().y) / 2;
 		vecTMax.y = vecTMin.y + 1;
 	}
-	UTIL_SetSize ( this, vecTMin, vecTMax );
+	GetEngineObject()->SetSize ( vecTMin, vecTMax );
 }
 
 

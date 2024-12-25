@@ -136,7 +136,7 @@ void CGib::SpawnHeadGib( CBaseEntity *pVictim )
 
 		pGib->GetEngineObject()->SetLocalOrigin( pVictim->EyePosition() );
 		
-		CBaseEntity *pentPlayer = UTIL_FindClientInPVS( pGib );
+		CBaseEntity *pentPlayer = EntityList()->FindClientInPVS( pGib );
 		
 		if ( random->RandomInt ( 0, 100 ) <= 5 && pentPlayer )
 		{
@@ -400,7 +400,7 @@ bool CGib::SUB_AllowedToFade( void )
 			return false;
 	}
 
-	CBasePlayer *pPlayer = ( AI_IsSinglePlayer() ) ? UTIL_GetLocalPlayer() : NULL;
+	CBasePlayer *pPlayer = ( AI_IsSinglePlayer() ) ? ToBasePlayer(EntityList()->GetLocalPlayer()) : NULL;
 
 	if ( pPlayer && pPlayer->FInViewCone( this ) && m_bForceRemove == false )
 	{
@@ -601,7 +601,7 @@ void CGib::Spawn( const char *szGibModel )
 
 #ifdef HL1_DLL
 	GetEngineObject()->SetElasticity( 1.0 );
-	UTIL_SetSize( this, vec3_origin, vec3_origin );
+	GetEngineObject()->SetSize( vec3_origin, vec3_origin );
 #endif//HL1_DLL
 
 	GetEngineObject()->SetNextThink( gpGlobals->curtime + 4 );
@@ -663,7 +663,7 @@ void CRagGib::Spawn( const char *szModel, const Vector &vecOrigin, const Vector 
 	GetEngineObject()->SetSolid( SOLID_BBOX );
 	GetEngineObject()->AddSolidFlags( FSOLID_NOT_SOLID );
 	SetModel( szModel );
-	UTIL_SetSize(this, vec3_origin, vec3_origin);
+	GetEngineObject()->SetSize(vec3_origin, vec3_origin);
 	UTIL_SetOrigin( this, vecOrigin );
 	CTakeDamageInfo info;
 	info.SetDamageForce(vecForce);

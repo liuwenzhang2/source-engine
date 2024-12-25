@@ -212,7 +212,7 @@ bool CVoteController::CanTeamCastVote( int iTeam ) const
 //-----------------------------------------------------------------------------
 bool CVoteController::SetupVote( int iEntIndex )
 {
-	CBasePlayer *pVoteCaller = UTIL_PlayerByIndex( iEntIndex );
+	CBasePlayer *pVoteCaller = ToBasePlayer(EntityList()->GetPlayerByIndex( iEntIndex ));
 	if( !pVoteCaller )
 		return false;
 
@@ -284,7 +284,7 @@ bool CVoteController::CreateVote( int iEntIndex, const char *pszTypeString, cons
 	if( IsVoteActive() )
 		return false;
 
-	CBasePlayer *pVoteCaller = UTIL_PlayerByIndex( iEntIndex );
+	CBasePlayer *pVoteCaller = ToBasePlayer(EntityList()->GetPlayerByIndex( iEntIndex ));
 	if( !pVoteCaller && !bDedicatedServer )
 		return false;
 
@@ -441,8 +441,8 @@ CVoteController::TryCastVoteResult CVoteController::TryCastVote( int iEntIndex, 
 
 	if( m_potentialIssues[m_iActiveIssueIndex] && m_potentialIssues[m_iActiveIssueIndex]->IsAllyRestrictedVote() )
 	{
-		CBaseEntity *pVoteHolder = UTIL_EntityByIndex( m_iEntityHoldingVote );
-		CBaseEntity *pVoter = UTIL_EntityByIndex( iEntIndex );
+		CBaseEntity *pVoteHolder = EntityList()->GetBaseEntity( m_iEntityHoldingVote );
+		CBaseEntity *pVoter = EntityList()->GetBaseEntity( iEntIndex );
 
 		if( ( pVoteHolder == NULL ) || ( pVoter == NULL ) || ( GetVoterTeam( pVoteHolder ) != GetVoterTeam( pVoter ) ) )
 		{
@@ -958,7 +958,7 @@ bool CBaseIssue::CanCallVote( int iEntIndex, const char *pszDetails, vote_create
 	}
 #endif // TF_DLL
 
-	CBaseEntity *pVoteCaller = UTIL_EntityByIndex( iEntIndex );
+	CBaseEntity *pVoteCaller = EntityList()->GetBaseEntity( iEntIndex );
 	if( pVoteCaller && !CanTeamCallVote( GetVoterTeam( pVoteCaller ) ) )
 	{
 		nFailCode = VOTE_FAILED_TEAM_CANT_CALL;
@@ -1010,7 +1010,7 @@ int CBaseIssue::CountPotentialVoters( void )
 
 	for( int playerIndex = 1; playerIndex <= MAX_PLAYERS; ++playerIndex )
 	{
-		CBasePlayer *pPlayer = UTIL_PlayerByIndex( playerIndex );
+		CBasePlayer *pPlayer = ToBasePlayer(EntityList()->GetPlayerByIndex( playerIndex ));
 		if( g_voteController->IsValidVoter( pPlayer ) )
 		{
 			if ( g_voteController->CanTeamCastVote( GetVoterTeam( pPlayer ) ) )

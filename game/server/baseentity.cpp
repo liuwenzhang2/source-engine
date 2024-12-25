@@ -1348,7 +1348,7 @@ int CBaseEntity::VPhysicsTakeDamage( const CTakeDamageInfo &info )
 		if ( gameFlags & FVPHYSICS_PLAYER_HELD )
 		{
 			// if the player is holding the object, use it's real mass (player holding reduced the mass)
-			CBasePlayer *pPlayer = UTIL_GetLocalPlayer();
+			CBasePlayer *pPlayer = ToBasePlayer(EntityList()->GetLocalPlayer());
 			if ( pPlayer )
 			{
 				float mass = pPlayer->GetHeldObjectMass(GetEngineObject()->VPhysicsGetObject() );
@@ -3904,7 +3904,7 @@ void CBaseEntity::Teleport( const Vector *newPosition, const QAngle *newAngles, 
 // Stuff implemented for weapon prediction code
 void CBaseEntity::SetSize( const Vector &vecMin, const Vector &vecMax )
 {
-	UTIL_SetSize( this, vecMin, vecMax );
+	GetEngineObject()->SetSize( vecMin, vecMax );
 }
 
 IStudioHdr *ModelSoundsCache_LoadModel( const char *filename )
@@ -4296,7 +4296,6 @@ void CBaseEntity::PrecacheModelComponents( int nModelIndex )
 //}
 
 //   Entity degugging console commands
-extern CBaseEntity *FindPickerEntity( CBasePlayer *pPlayer );
 extern void			SetDebugBits( CBasePlayer* pPlayer, const char *name, int bit );
 extern CBaseEntity *GetNextCommandEntity( CBasePlayer *pPlayer, const char *name, CBaseEntity *ent );
 
@@ -4310,7 +4309,7 @@ void ConsoleFireTargets( CBasePlayer *pPlayer, const char *name)
 	// If no name was given use the picker
 	if (FStrEq(name,"")) 
 	{
-		CBaseEntity *pEntity = FindPickerEntity( pPlayer );
+		CBaseEntity *pEntity = EntityList()->FindPickerEntity( pPlayer );
 		if ( pEntity && !pEntity->GetEngineObject()->IsMarkedForDeletion())
 		{
 			Msg( "[%03d] Found: %s, firing\n", gpGlobals->tickcount%1000, pEntity->GetDebugName());
@@ -4385,7 +4384,7 @@ void CC_Ent_Remove( const CCommand& args )
 	// If no name was given set bits based on the picked
 	if ( FStrEq( args[1],"") ) 
 	{
-		pEntity = FindPickerEntity( UTIL_GetCommandClient() );
+		pEntity = EntityList()->FindPickerEntity( UTIL_GetCommandClient() );
 	}
 	else 
 	{
@@ -4474,7 +4473,7 @@ void CC_Ent_SetName( const CCommand& args )
 		// If no name was given set bits based on the picked
 		if ( FStrEq( args[2],"") ) 
 		{
-			pEntity = FindPickerEntity( UTIL_GetCommandClient() );
+			pEntity = EntityList()->FindPickerEntity( UTIL_GetCommandClient() );
 		}
 		else 
 		{
@@ -4560,7 +4559,7 @@ void CC_Find_Ent_Index( const CCommand& args )
 	}
 
 	int iIndex = atoi(args[1]);
-	CBaseEntity	*pEnt = UTIL_EntityByIndex( iIndex );
+	CBaseEntity	*pEnt = EntityList()->GetBaseEntity( iIndex );
 	if ( pEnt )
 	{
 		Msg("   '%s' : '%s' (entindex %d) \n", pEnt->GetClassname(), pEnt->GetEntityName().ToCStr(), iIndex );
@@ -5858,7 +5857,7 @@ void CBaseEntity::DispatchResponse( const char *conceptName )
 	ModifyOrAppendCriteria( set );
 
 	// Append local player criteria to set,too
-	CBasePlayer *pPlayer = UTIL_GetLocalPlayer();
+	CBasePlayer *pPlayer = ToBasePlayer(EntityList()->GetLocalPlayer());
 	if( pPlayer )
 		pPlayer->ModifyOrAppendPlayerCriteria( set );
 
@@ -5932,7 +5931,7 @@ void CBaseEntity::DumpResponseCriteria( void )
 	ModifyOrAppendCriteria( set );
 
 	// Append local player criteria to set,too
-	CBasePlayer *pPlayer = UTIL_GetLocalPlayer();
+	CBasePlayer *pPlayer = ToBasePlayer(EntityList()->GetLocalPlayer());
 	if ( pPlayer )
 	{
 		pPlayer->ModifyOrAppendPlayerCriteria( set );
@@ -6324,7 +6323,7 @@ void CBaseEntity::SUB_Vanish( void )
 	for ( int i = 1; i <= gpGlobals->maxClients; i++ )
 	{
 		//Get the next client
-		if ( ( pPlayer = UTIL_PlayerByIndex( i ) ) != NULL )
+		if ( ( pPlayer = ToBasePlayer(EntityList()->GetPlayerByIndex( i )) ) != NULL )
 		{
 			Vector corpseDir = (GetEngineObject()->GetAbsOrigin() - pPlayer->WorldSpaceCenter() );
 
@@ -6376,7 +6375,7 @@ bool CBaseEntity::SUB_AllowedToFade( void )
 
 	// on Xbox, allow these to fade out
 #ifndef _XBOX
-	CBasePlayer *pPlayer = ( AI_IsSinglePlayer() ) ? UTIL_GetLocalPlayer() : NULL;
+	CBasePlayer *pPlayer = ( AI_IsSinglePlayer() ) ? ToBasePlayer(EntityList()->GetLocalPlayer()) : NULL;
 
 	if ( pPlayer && pPlayer->FInViewCone( this ) )
 		return false;
@@ -6443,7 +6442,7 @@ void CBaseEntity::SetCollisionBoundsFromModel()
 	{
 		Vector mns, mxs;
 		modelinfo->GetModelBounds( pModel, mns, mxs );
-		UTIL_SetSize( this, mns, mxs );
+		GetEngineObject()->SetSize( mns, mxs );
 	}
 }
 

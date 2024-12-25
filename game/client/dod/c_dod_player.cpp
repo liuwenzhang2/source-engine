@@ -617,7 +617,7 @@ void C_DODRagdoll::ClientThink( void )
 
 	for( int iClient = 1; iClient <= gpGlobals->maxClients; ++iClient )
 	{
-		C_DODPlayer *pEnt = static_cast< C_DODPlayer *> ( UTIL_PlayerByIndex( iClient ) );
+		C_DODPlayer *pEnt = static_cast< C_DODPlayer *> ( EntityList()->GetPlayerByIndex( iClient ) );
 
 		if(!pEnt || !pEnt->IsPlayer())
 			continue;

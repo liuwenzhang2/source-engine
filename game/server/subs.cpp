@@ -17,7 +17,7 @@
 void CPointEntity::Spawn( void )
 {
 	GetEngineObject()->SetSolid( SOLID_NONE );
-//	UTIL_SetSize(this, vec3_origin, vec3_origin);
+//	GetEngineObject()->SetSize(vec3_origin, vec3_origin);
 }
 
 

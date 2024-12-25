@@ -243,7 +243,7 @@ void CLagCompensationManager::FrameUpdatePostEntityThink()
 	// Iterate all active players
 	for ( int i = 1; i <= gpGlobals->maxClients; i++ )
 	{
-		CBasePlayer *pPlayer = UTIL_PlayerByIndex( i );
+		CBasePlayer *pPlayer = ToBasePlayer(EntityList()->GetPlayerByIndex( i ));
 
 		CUtlFixedLinkedList< LagRecord > *track = &m_PlayerTrack[i-1];
 
@@ -389,7 +389,7 @@ void CLagCompensationManager::StartLagCompensation( CBasePlayer *player, CUserCm
 	const CBitVec<MAX_EDICTS> *pEntityTransmitBits = engine->GetEntityTransmitBitsForClient( player->entindex() - 1 );
 	for ( int i = 1; i <= gpGlobals->maxClients; i++ )
 	{
-		CBasePlayer *pPlayer = UTIL_PlayerByIndex( i );
+		CBasePlayer *pPlayer = ToBasePlayer(EntityList()->GetPlayerByIndex( i ));
 
 		if ( !pPlayer )
 		{
@@ -747,7 +747,7 @@ void CLagCompensationManager::FinishLagCompensation( CBasePlayer *player )
 			continue;
 		}
 
-		CBasePlayer *pPlayer = UTIL_PlayerByIndex( i );
+		CBasePlayer *pPlayer = ToBasePlayer(EntityList()->GetPlayerByIndex( i ));
 		if ( !pPlayer )
 		{
 			continue;

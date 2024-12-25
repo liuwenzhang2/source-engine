@@ -269,7 +269,7 @@ void CNPC_MissileDefense::Spawn( void )
 	Precache();
 
 	SetModel( "models/missile_defense.mdl" );
-	UTIL_SetSize( this, Vector( -36, -36 , 0 ), Vector( 36, 36, 64 ) );
+	GetEngineObject()->SetSize( Vector( -36, -36 , 0 ), Vector( 36, 36, 64 ) );
 
 	GetEngineObject()->SetSolid( SOLID_BBOX );
 	GetEngineObject()->SetMoveType( MOVETYPE_NONE );

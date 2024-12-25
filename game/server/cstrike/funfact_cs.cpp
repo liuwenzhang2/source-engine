@@ -174,7 +174,7 @@ public:
 
 		for ( int i = 1; i <= gpGlobals->maxClients; i++ )
 		{
-			CCSPlayer* pPlayer = ToCSPlayer(UTIL_PlayerByIndex( i ) );
+			CCSPlayer* pPlayer = ToCSPlayer(EntityList()->GetPlayerByIndex( i ) );
 			if ( pPlayer )
 			{
 				if (!PlayerQualifies(pPlayer, m_flags))
@@ -304,7 +304,7 @@ public:
 		  int iBestPlayer = 0;
 		  for ( int i = 1; i <= gpGlobals->maxClients; i++ )
 		  {
-			  CBasePlayer *pPlayer = UTIL_PlayerByIndex( i );
+			  CBasePlayer *pPlayer = ToBasePlayer(EntityList()->GetPlayerByIndex( i ));
 			  if ( pPlayer )
 			  {
 				  if (!PlayerQualifies(pPlayer, m_flags))
@@ -368,7 +368,7 @@ public:
 		  int iSum = 0;
 		  for ( int i = 1; i <= gpGlobals->maxClients; i++ )
 		  {
-			  CBasePlayer *pPlayer = UTIL_PlayerByIndex( i );
+			  CBasePlayer *pPlayer = ToBasePlayer(EntityList()->GetPlayerByIndex( i ));
 			  if ( pPlayer )
 			  {
 				  if (!PlayerQualifies(pPlayer, m_flags))
@@ -420,7 +420,7 @@ float GetTeamAccuracy( int teamNumber )
 	CBasePlayer *pPlayer = NULL;
 	for ( int i = 1; i <= gpGlobals->maxClients; i++ )
 	{
-		pPlayer = UTIL_PlayerByIndex( i );
+		pPlayer = ToBasePlayer(EntityList()->GetPlayerByIndex( i ));
 		if (pPlayer)
 		{
 			if (pPlayer->GetTeamNumber() == teamNumber)
@@ -548,7 +548,7 @@ bool FFEVAL_WON_AS_LAST_MEMBER( int &iPlayer, int &data1, int &data2, int &data3
 
 	for ( int i = 1; i <= gpGlobals->maxClients; i++ )
 	{
-		pCSPlayer = ToCSPlayer(UTIL_PlayerByIndex( i ) );
+		pCSPlayer = ToCSPlayer(EntityList()->GetPlayerByIndex( i ) );
 		if( pCSPlayer && pCSPlayer->GetTeamNumber() == winningTeam && pCSPlayer->IsAlive())
 		{
 			//Check if the player is still the only living member of his team ( on the off chance that a player joins late)
@@ -638,7 +638,7 @@ bool FFEVAL_SAME_UNIFORM( int iTeam, int &iData1, int &iData2, int &iData3 )
 
     for ( int i = 1; i <= gpGlobals->maxClients; i++ )
     {
-        CCSPlayer *pCSPlayer = ToCSPlayer(UTIL_PlayerByIndex( i ) );
+        CCSPlayer *pCSPlayer = ToCSPlayer(EntityList()->GetPlayerByIndex( i ) );
 		if ( pCSPlayer && pCSPlayer->GetTeamNumber() == iTeam && pCSPlayer->State_Get() != STATE_PICKINGCLASS)
         {		
             if (iUniform == -1)
@@ -662,7 +662,7 @@ bool FFEVAL_BEST_TERRORIST_ACCURACY( int &iPlayer, int &data1, int &data2, int &
     CBasePlayer *pPlayer = NULL;
     for ( int i = 1; i <= gpGlobals->maxClients; i++ )
     {
-        pPlayer = UTIL_PlayerByIndex( i );
+        pPlayer = ToBasePlayer(EntityList()->GetPlayerByIndex( i ));
 
         // Look only at terrorist players
         if ( pPlayer && pPlayer->GetTeamNumber() == TEAM_TERRORIST )
@@ -700,7 +700,7 @@ bool FFEVAL_BEST_COUNTERTERRORIST_ACCURACY( int &iPlayer, int &data1, int &data2
     CBasePlayer *pPlayer = NULL;
     for ( int i = 1; i <= gpGlobals->maxClients; i++ )
     {
-        pPlayer = UTIL_PlayerByIndex( i );
+        pPlayer = ToBasePlayer(EntityList()->GetPlayerByIndex( i ));
 
         // Look only at counter-terrorist players
         if ( pPlayer && pPlayer->GetTeamNumber() == TEAM_CT )

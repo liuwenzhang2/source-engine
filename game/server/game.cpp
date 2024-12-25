@@ -46,11 +46,6 @@ ConVar	teamlist( "mp_teamlist","hgrunt;scientist", FCVAR_NOTIFY );
 ConVar	teamoverride( "mp_teamoverride","1" );
 ConVar	defaultteam( "mp_defaultteam","0" );
 ConVar	allowNPCs( "mp_allowNPCs","1", FCVAR_NOTIFY );
-
-// Engine Cvars
-const ConVar	*g_pDeveloper = NULL;
-
-
 ConVar suitvolume( "suitvolume", "0.25", FCVAR_ARCHIVE );
 
 class CGameDLL_ConVarAccessor : public IConCommandBaseAccessor
@@ -105,7 +100,5 @@ void InitializeCvars( void )
 {
 	// Register cvars here:
 	ConVar_Register( FCVAR_GAMEDLL, &g_ConVarAccessor ); 
-
-	g_pDeveloper	= cvar->FindVar( "developer" );
 }
 

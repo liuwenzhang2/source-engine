@@ -141,15 +141,15 @@ void CGenericNPC::Spawn()
 
 /*
 	if ( FStrEq( STRING( GetModelName() ), "models/player.mdl" ) )
-		UTIL_SetSize(this, VEC_HUMAN_HULL_MIN, VEC_HUMAN_HULL_MAX);
+		GetEngineObject()->SetSize(VEC_HUMAN_HULL_MIN, VEC_HUMAN_HULL_MAX);
 	else
-		UTIL_SetSize(this, VEC_HULL_MIN, VEC_HULL_MAX);
+		GetEngineObject()->SetSize(VEC_HULL_MIN, VEC_HULL_MAX);
 */
 
 	if ( FStrEq( STRING(GetEngineObject()->GetModelName() ), "models/player.mdl" ) || FStrEq( STRING(GetEngineObject()->GetModelName() ), "models/holo.mdl" ) )
-		UTIL_SetSize(this, VEC_HULL_MIN, VEC_HULL_MAX);
+		GetEngineObject()->SetSize(VEC_HULL_MIN, VEC_HULL_MAX);
 	else
-		UTIL_SetSize(this, NAI_Hull::Mins(HULL_HUMAN), NAI_Hull::Maxs(HULL_HUMAN));
+		GetEngineObject()->SetSize(NAI_Hull::Mins(HULL_HUMAN), NAI_Hull::Maxs(HULL_HUMAN));
 
 	GetEngineObject()->SetSolid( SOLID_BBOX );
 	GetEngineObject()->AddSolidFlags( FSOLID_NOT_STANDABLE );

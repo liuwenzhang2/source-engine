@@ -43,7 +43,7 @@ void CBaseSpriteProjectile::Spawn(	char *pszModel,
 	GetEngineObject()->SetSolid( SOLID_BBOX );
 	SetModel( pszModel );
 
-	UTIL_SetSize( this, vec3_origin, vec3_origin );
+	GetEngineObject()->SetSize( vec3_origin, vec3_origin );
 
 	m_iDmg = iDamage;
 	m_iDmgType = iDamageType;

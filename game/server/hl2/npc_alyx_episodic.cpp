@@ -648,7 +648,7 @@ void CNPC_Alyx::PrescheduleThink( void )
 		// be sure, we wait a bit to prevent this from happening.
 		if ( m_fStayBlindUntil < gpGlobals->curtime )
 		{
- 			CBasePlayer *pPlayer = UTIL_PlayerByIndex(1);
+ 			CBasePlayer *pPlayer = ToBasePlayer(EntityList()->GetPlayerByIndex(1));
  			if ( pPlayer && (!CanBeBlindedByFlashlight( true ) || !pPlayer->IsIlluminatedByFlashlight(this, NULL ) || !PlayerFlashlightOnMyEyes( pPlayer )) &&
 				!BlindedByFlare() )
 			{
@@ -693,7 +693,7 @@ void CNPC_Alyx::SearchForInteractTargets()
 		return;
 	}
 
-	CBasePlayer *pPlayer = UTIL_PlayerByIndex(1);
+	CBasePlayer *pPlayer = ToBasePlayer(EntityList()->GetPlayerByIndex(1));
 
 	if( !pPlayer )
 	{
@@ -737,7 +737,7 @@ void CNPC_Alyx::GatherConditions()
 	ClearCondition( COND_ALYX_PLAYER_FLASHLIGHT_EXPIRED );
 	ClearCondition( COND_ALYX_PLAYER_TURNED_ON_FLASHLIGHT );
 	ClearCondition( COND_ALYX_PLAYER_TURNED_OFF_FLASHLIGHT );
-	CBasePlayer *pPlayer = UTIL_PlayerByIndex(1);
+	CBasePlayer *pPlayer = ToBasePlayer(EntityList()->GetPlayerByIndex(1));
 	if ( pPlayer )
 	{
 		bool bFlashlightState = pPlayer->FlashlightIsOn() != 0;
@@ -1569,7 +1569,7 @@ bool CNPC_Alyx::CanSeeEntityInDarkness( CBaseEntity *pEntity )
 	}
 	*/
 
-	CBasePlayer *pPlayer = UTIL_PlayerByIndex(1);
+	CBasePlayer *pPlayer = ToBasePlayer(EntityList()->GetPlayerByIndex(1));
 	if ( pPlayer && pEntity != pPlayer )
 	{
 		if ( pPlayer->IsIlluminatedByFlashlight(pEntity, NULL ) )
@@ -3034,7 +3034,7 @@ void CNPC_Alyx::ModifyOrAppendCriteria( AI_CriteriaSet &set )
 	set.AppendCriteria( "darkness_mode", UTIL_VarArgs( "%d", HasCondition( COND_ALYX_IN_DARK ) ) );
 	set.AppendCriteria( "water_level", UTIL_VarArgs( "%d", GetWaterLevel() ) );
 
-	CHL2_Player *pPlayer = assert_cast<CHL2_Player*>( UTIL_PlayerByIndex( 1 ) );
+	CHL2_Player *pPlayer = assert_cast<CHL2_Player*>( EntityList()->GetPlayerByIndex( 1 ) );
 	set.AppendCriteria( "num_companions", UTIL_VarArgs( "%d", pPlayer ? pPlayer->GetNumSquadCommandables() : 0 ) );
 	set.AppendCriteria( "flashlight_on", UTIL_VarArgs( "%d", pPlayer ? pPlayer->FlashlightIsOn() : 0 ) );
 
@@ -3180,7 +3180,7 @@ bool CNPC_Alyx::PlayerInSpread( const Vector &sourcePos, const Vector &targetPos
 	// loop through all players
 	for (int i = 1; i <= gpGlobals->maxClients; i++ )
 	{
-		CBasePlayer *pPlayer = UTIL_PlayerByIndex( i );
+		CBasePlayer *pPlayer = ToBasePlayer(EntityList()->GetPlayerByIndex( i ));
 
 		if ( pPlayer && ( !ignoreHatedPlayers || IRelationType( pPlayer ) != D_HT ) )
 		{

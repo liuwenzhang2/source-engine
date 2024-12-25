@@ -159,7 +159,7 @@ void CDynamicLight::Spawn( void )
 	Precache();
 	GetEngineObject()->SetSolid( SOLID_NONE );
 	m_On = true;
-	UTIL_SetSize( this, vec3_origin, vec3_origin );
+	GetEngineObject()->SetSize( vec3_origin, vec3_origin );
 	GetEngineObject()->AddEFlags( EFL_FORCE_CHECK_TRANSMIT );
 
 	// If we have a target, think so we can orient towards it

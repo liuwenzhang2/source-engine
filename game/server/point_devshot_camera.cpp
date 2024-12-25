@@ -68,7 +68,7 @@ static CBasePlayer * UTIL_GetLocalPlayerOrListenServerHost( void )
 		return UTIL_GetListenServerHost();
 	}
 
-	return UTIL_GetLocalPlayer();
+	return ToBasePlayer(EntityList()->GetLocalPlayer());
 }
 
 //-----------------------------------------------------------------------------

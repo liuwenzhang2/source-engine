@@ -4942,7 +4942,7 @@ END_DATADESC()
 void CBombDropSensor::Spawn()
 {
 	BaseClass::Spawn();
-	UTIL_SetSize(this, Vector(-30,-30,-30), Vector(30,30,30) );
+	GetEngineObject()->SetSize( Vector(-30,-30,-30), Vector(30,30,30) );
 	GetEngineObject()->SetSolid(SOLID_BBOX);
 
 	// Shots pass through
@@ -5635,7 +5635,7 @@ void CGrenadeHelicopter::OnPhysGunDrop( CBasePlayer *pPhysGunUser, PhysGunDrop_t
 bool CGrenadeHelicopter::IsThrownByPlayer()
 {
 	// if player is the owner and we're set to explode on contact, then the player threw this grenade.
-	return ( ( GetOwnerEntity() == UTIL_GetLocalPlayer() ) && m_bExplodeOnContact );
+	return ( ( GetOwnerEntity() == EntityList()->GetLocalPlayer() ) && m_bExplodeOnContact );
 }
 
 //-----------------------------------------------------------------------------

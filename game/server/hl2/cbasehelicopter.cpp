@@ -171,7 +171,7 @@ void CBaseHelicopter::Spawn( void )
 	//******
 	//	m_iAmmoType = g_pGameRules->GetAmmoDef()->Index("AR2"); 
 	//	SetModel( "models/attack_helicopter.mdl" );
-	//	UTIL_SetSize( this, Vector( -32, -32, -64 ), Vector( 32, 32, 0 ) );
+	//	GetEngineObject()->SetSize( Vector( -32, -32, -64 ), Vector( 32, 32, 0 ) );
 	//	UTIL_SetOrigin( this, GetLocalOrigin() );
 	//	m_iHealth = 100;
 	//	m_flFieldOfView = -0.707; // 270 degrees
@@ -1329,7 +1329,7 @@ void CBaseHelicopter::Event_Killed( const CTakeDamageInfo &info )
 
 	StopLoopingSounds();
 
-	UTIL_SetSize( this, Vector( -32, -32, -64), Vector( 32, 32, 0) );
+	GetEngineObject()->SetSize( Vector( -32, -32, -64), Vector( 32, 32, 0) );
 	SetThink( &CBaseHelicopter::CallDyingThink );
 	SetTouch( &CBaseHelicopter::CrashTouch );
 

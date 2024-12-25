@@ -1199,7 +1199,7 @@ void CNPC_Turret::Spawn()
 	m_iRetractHeight = 16;
 	m_iDeployHeight = 32;
 	m_iMinPitch	= -90;
-	UTIL_SetSize(this, Vector(-32, -32, -m_iRetractHeight), Vector(32, 32, m_iRetractHeight));
+	GetEngineObject()->SetSize(Vector(-32, -32, -m_iRetractHeight), Vector(32, 32, m_iRetractHeight));
 	
 	SetThink(&CNPC_BaseTurret::Initialize);	
 
@@ -1317,7 +1317,7 @@ void CNPC_MiniTurret::Spawn()
 	m_iRetractHeight = 16;
 	m_iDeployHeight = 32;
 	m_iMinPitch	= -90;
-	UTIL_SetSize(this, Vector(-16, -16, -m_iRetractHeight), Vector(16, 16, m_iRetractHeight));
+	GetEngineObject()->SetSize(Vector(-16, -16, -m_iRetractHeight), Vector(16, 16, m_iRetractHeight));
 
 	SetThink(&CNPC_MiniTurret::Initialize);	
 	GetEngineObject()->SetNextThink(gpGlobals->curtime + 0.3);
@@ -1416,7 +1416,7 @@ void CNPC_Sentry::Spawn()
 	m_iDeployHeight = 64;
 	m_iMinPitch	= -60;
 
-	UTIL_SetSize(this, Vector(-16, -16, -m_iRetractHeight), Vector(16, 16, m_iRetractHeight));
+	GetEngineObject()->SetSize(Vector(-16, -16, -m_iRetractHeight), Vector(16, 16, m_iRetractHeight));
 
 	SetTouch(&CNPC_Sentry::SentryTouch);
 	SetThink(&CNPC_Sentry::Initialize);	

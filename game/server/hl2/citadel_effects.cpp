@@ -50,7 +50,7 @@ void CCitadelEnergyCore::Spawn( void )
 {
 	Precache();
 
-	UTIL_SetSize( this, Vector( -8, -8, -8 ), Vector( 8, 8, 8 ) );
+	GetEngineObject()->SetSize( Vector( -8, -8, -8 ), Vector( 8, 8, 8 ) );
 
 	// See if we start active
 	if (GetEngineObject()->HasSpawnFlags( SF_ENERGYCORE_START_ON ) )

@@ -34,7 +34,7 @@ C_NeurotoxinCountdown::~C_NeurotoxinCountdown()
 
 int C_NeurotoxinCountdown::GetMinutes( void )
 {
-	C_BasePlayer *player = UTIL_PlayerByIndex( 1 );
+	C_BasePlayer *player = ToBasePlayer(EntityList()->GetPlayerByIndex( 1 ));
 	if ( player )
 		return player->GetBonusProgress() / 60;
 	
@@ -43,7 +43,7 @@ int C_NeurotoxinCountdown::GetMinutes( void )
 
 int C_NeurotoxinCountdown::GetSeconds( void )
 {
-	C_BasePlayer *player = UTIL_PlayerByIndex( 1 );
+	C_BasePlayer *player = ToBasePlayer(EntityList()->GetPlayerByIndex( 1 ));
 	if ( player )
 		return player->GetBonusProgress() % 60;
 

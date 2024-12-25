@@ -165,7 +165,7 @@ void CCrossbowBolt::Spawn( void )
 
 	SetModel( "models/crossbow_bolt.mdl" );
 	GetEngineObject()->SetMoveType( MOVETYPE_FLYGRAVITY, MOVECOLLIDE_FLY_CUSTOM );
-	UTIL_SetSize( this, -Vector(0.3f,0.3f,0.3f), Vector(0.3f,0.3f,0.3f) );
+	GetEngineObject()->SetSize( -Vector(0.3f,0.3f,0.3f), Vector(0.3f,0.3f,0.3f) );
 	GetEngineObject()->SetSolid( SOLID_BBOX );
 	GetEngineObject()->SetGravity( 0.05f );
 	

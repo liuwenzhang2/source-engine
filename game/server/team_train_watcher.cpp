@@ -420,7 +420,7 @@ void CTeamTrainWatcher::FireGameEvent( IGameEvent *event )
 	if ( FStrEq( pszEventName, "path_track_passed" ) )
 	{
 		int iIndex = event->GetInt( "index" );
-		CPathTrack *pNode = dynamic_cast< CPathTrack* >( UTIL_EntityByIndex( iIndex ) );
+		CPathTrack *pNode = dynamic_cast< CPathTrack* >(EntityList()->GetBaseEntity( iIndex ) );
 
 		if ( pNode )
 		{
@@ -1159,7 +1159,7 @@ void CTeamTrainWatcher::WatcherThink( void )
 			{
 				for ( int i = 1; i <= gpGlobals->maxClients; i++ )
 				{
-					CBaseMultiplayerPlayer *pPlayer = ToBaseMultiplayerPlayer( UTIL_PlayerByIndex( i ) );
+					CBaseMultiplayerPlayer *pPlayer = ToBaseMultiplayerPlayer( EntityList()->GetPlayerByIndex( i ) );
 					if ( pPlayer )
 					{
 						if ( m_hAreaCap->IsTouching( pPlayer ) )

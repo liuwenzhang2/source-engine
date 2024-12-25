@@ -351,7 +351,7 @@ void CAI_PlaneSolver::GenerateObstacleNpcs( const AILocalMoveGoal_t &goal, float
 			}
 		}
 
-		CBaseEntity *pPlayer = UTIL_PlayerByIndex( 1 );
+		CBaseEntity *pPlayer = EntityList()->GetPlayerByIndex( 1 );
 		if ( pPlayer )
 		{
 			Vector mins, maxs;

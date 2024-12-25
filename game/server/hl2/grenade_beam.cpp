@@ -139,7 +139,7 @@ void CGrenadeBeam::Spawn( void )
 	m_iHealth		= 1;
 	GetEngineObject()->SetGravity( 0.0001 );
 	m_nNumHits		= 0;
-	UTIL_SetSize( this, vec3_origin, vec3_origin );
+	GetEngineObject()->SetSize( vec3_origin, vec3_origin );
 }
 
 

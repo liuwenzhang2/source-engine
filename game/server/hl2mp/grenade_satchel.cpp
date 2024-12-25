@@ -68,7 +68,7 @@ void CSatchelCharge::Spawn( void )
 
 	GetEngineObject()->SetCollisionGroup( COLLISION_GROUP_WEAPON );
 
-	UTIL_SetSize(this, Vector( -6, -6, -2), Vector(6, 6, 2));
+	GetEngineObject()->SetSize(Vector( -6, -6, -2), Vector(6, 6, 2));
 
 	SetThink( &CSatchelCharge::SatchelThink );
 	GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.1f );
@@ -129,7 +129,7 @@ void CSatchelCharge::SatchelThink( void )
 	// If attached resize so player can pick up off wall
 	if (m_bIsAttached)
 	{
-		UTIL_SetSize(this, Vector( -2, -2, -6), Vector(2, 2, 6));
+		GetEngineObject()->SetSize(Vector( -2, -2, -6), Vector(2, 2, 6));
 	}
 
 	// See if I can lose my owner (has dropper moved out of way?)

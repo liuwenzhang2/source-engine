@@ -276,7 +276,7 @@ void CWeaponPortalBase::DoAnimationEvents( IStudioHdr *pStudioHdr )
 {
 	// HACK: Because this model renders view and world models in the same frame 
 	// it's using the wrong studio model when checking the sequences.
-	C_BasePlayer *pPlayer = UTIL_PlayerByIndex( 1 );
+	C_BasePlayer *pPlayer = ToBasePlayer(EntityList()->GetPlayerByIndex( 1 ));
 	if ( pPlayer && pPlayer->GetActiveWeapon() == this )
 	{
 		C_BaseViewModel *pViewModel = pPlayer->GetViewModel();
@@ -304,7 +304,7 @@ void CWeaponPortalBase::GetRenderBounds( Vector& theMins, Vector& theMaxs )
 
 		// HACK: Because this model renders view and world models in the same frame 
 		// it's using the wrong studio model when checking the sequences.
-		C_BasePlayer *pPlayer = UTIL_PlayerByIndex( 1 );
+		C_BasePlayer *pPlayer = ToBasePlayer(EntityList()->GetPlayerByIndex( 1 ));
 		if ( pPlayer && pPlayer->GetActiveWeapon() == this )
 		{
 			C_BaseViewModel *pViewModel = pPlayer->GetViewModel();

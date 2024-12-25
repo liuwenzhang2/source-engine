@@ -211,7 +211,7 @@ public:
 					bool bHadGag = pAllyNpc->GetEngineObject()->HasSpawnFlags(SF_NPC_GAG);
 
 					pAllyNpc->GetEngineObject()->AddSpawnFlags(SF_NPC_GAG);
-					pAllyNpc->TargetOrder( UTIL_GetLocalPlayer(), &pAllyNpc, 1 );
+					pAllyNpc->TargetOrder(EntityList()->GetLocalPlayer(), &pAllyNpc, 1 );
 					if ( !bHadGag )
 						pAllyNpc->GetEngineObject()->RemoveSpawnFlags(SF_NPC_GAG);
 				}
@@ -549,7 +549,7 @@ void CNPC_Citizen::PostNPCInit()
 	{
 		if ( (GetEngineObject()->GetSpawnFlags() & SF_CITIZEN_FOLLOW) && AI_IsSinglePlayer())
 		{
-			m_FollowBehavior.SetFollowTarget( UTIL_GetLocalPlayer() );
+			m_FollowBehavior.SetFollowTarget(EntityList()->GetLocalPlayer() );
 			m_FollowBehavior.SetParameters( AIF_SIMPLE );
 		}
 	}
@@ -896,7 +896,7 @@ void CNPC_Citizen::GatherConditions()
 	if( IsInPlayerSquad() && hl2_episodic.GetBool() )
 	{
 		// Leave the player squad if someone has made me neutral to player.
-		if( IRelationType(UTIL_GetLocalPlayer()) == D_NU )
+		if( IRelationType(EntityList()->GetLocalPlayer()) == D_NU )
 		{
 			RemoveFromPlayerSquad();
 		}
@@ -992,7 +992,7 @@ void CNPC_Citizen::PredictPlayerPush()
 
 	BaseClass::PredictPlayerPush();
 
-	CBasePlayer *pPlayer = UTIL_GetLocalPlayer();
+	CBasePlayer *pPlayer = ToBasePlayer(EntityList()->GetLocalPlayer());
 	if ( !bHadPlayerPush && HasCondition( COND_PLAYER_PUSHING ) && 
 		 pPlayer->FInViewCone( this ) && CanHeal() )
 	{
@@ -2351,7 +2351,7 @@ bool CNPC_Citizen::CanJoinPlayerSquad()
 	if ( !CanBeUsedAsAFriend() )
 		return false;
 
-	if ( IRelationType( UTIL_GetLocalPlayer() ) != D_LI )
+	if ( IRelationType(EntityList()->GetLocalPlayer() ) != D_LI )
 		return false;
 
 	return true;
@@ -2380,7 +2380,7 @@ bool CNPC_Citizen::IsCommandMoving()
 {
 	if ( AI_IsSinglePlayer() && IsInPlayerSquad() )
 	{
-		if ( m_FollowBehavior.GetFollowTarget() == UTIL_GetLocalPlayer() ||
+		if ( m_FollowBehavior.GetFollowTarget() == EntityList()->GetLocalPlayer() ||
 			 IsFollowingCommandPoint() )
 		{
 			return ( m_FollowBehavior.IsMovingToFollowTarget() );
@@ -2396,7 +2396,7 @@ bool CNPC_Citizen::ShouldAutoSummon()
 	if ( !AI_IsSinglePlayer() || !IsFollowingCommandPoint() || !IsInPlayerSquad() )
 		return false;
 
-	CHL2_Player *pPlayer = (CHL2_Player *)UTIL_GetLocalPlayer();
+	CHL2_Player *pPlayer = (CHL2_Player *)EntityList()->GetLocalPlayer();
 	
 	float distMovedSq = ( pPlayer->GetEngineObject()->GetAbsOrigin() - m_vAutoSummonAnchor ).LengthSqr();
 	float moveTolerance = player_squad_autosummon_move_tolerance.GetFloat() * 12;
@@ -2576,7 +2576,7 @@ void CNPC_Citizen::MoveOrder( const Vector &vecDest, CAI_BaseNPC **Allies, int n
 		return;
 	}
 
-	CHL2_Player *pPlayer = (CHL2_Player *)UTIL_GetLocalPlayer();
+	CHL2_Player *pPlayer = (CHL2_Player *)EntityList()->GetLocalPlayer();
 
 	m_AutoSummonTimer.Set( player_squad_autosummon_time.GetFloat() );
 	m_vAutoSummonAnchor = pPlayer->GetEngineObject()->GetAbsOrigin();
@@ -2666,7 +2666,7 @@ void CNPC_Citizen::CommanderUse( CBaseEntity *pActivator, CBaseEntity *pCaller, 
 		return;
 	}
 	
-	if ( pActivator == UTIL_GetLocalPlayer() )
+	if ( pActivator == EntityList()->GetLocalPlayer() )
 	{
 		// Don't say hi after you've been addressed by the player
 		SetSpokeConcept( TLK_HELLO, NULL );	
@@ -2780,7 +2780,7 @@ void CNPC_Citizen::TogglePlayerSquadState()
 		{
 			SpeakCommandResponse( TLK_COMMANDED );
 		}
-		else if ( m_FollowBehavior.GetFollowTarget() == UTIL_GetLocalPlayer() )
+		else if ( m_FollowBehavior.GetFollowTarget() == EntityList()->GetLocalPlayer() )
 		{
 			SpeakCommandResponse( TLK_STARTFOLLOW );
 		}
@@ -2808,7 +2808,7 @@ void CNPC_Citizen::UpdatePlayerSquad()
 	if ( !AI_IsSinglePlayer() )
 		return;
 
-	CBasePlayer *pPlayer = UTIL_GetLocalPlayer();
+	CBasePlayer *pPlayer = ToBasePlayer(EntityList()->GetLocalPlayer());
 	if ( ( pPlayer->GetEngineObject()->GetAbsOrigin().AsVector2D() - GetEngineObject()->GetAbsOrigin().AsVector2D() ).LengthSqr() < Square(20*12) )
 		m_flTimeLastCloseToPlayer = gpGlobals->curtime;
 
@@ -3148,7 +3148,7 @@ void CNPC_Citizen::FixupPlayerSquad()
 	}
 	else
 	{
-		m_FollowBehavior.SetFollowTarget( UTIL_GetLocalPlayer() );
+		m_FollowBehavior.SetFollowTarget(EntityList()->GetLocalPlayer() );
 		m_FollowBehavior.SetParameters( AIF_SIMPLE );
 	}
 }
@@ -3197,10 +3197,10 @@ void CNPC_Citizen::UpdateFollowCommandPoint()
 		{
 			if ( IsFollowingCommandPoint() )
 				ClearFollowTarget();
-			if ( m_FollowBehavior.GetFollowTarget() != UTIL_GetLocalPlayer() )
+			if ( m_FollowBehavior.GetFollowTarget() != EntityList()->GetLocalPlayer() )
 			{
 				DevMsg( "Expected to be following player, but not\n" );
-				m_FollowBehavior.SetFollowTarget( UTIL_GetLocalPlayer() );
+				m_FollowBehavior.SetFollowTarget(EntityList()->GetLocalPlayer() );
 				m_FollowBehavior.SetParameters( AIF_SIMPLE );
 			}
 		}
@@ -3259,7 +3259,7 @@ CAI_BaseNPC *CNPC_Citizen::GetSquadCommandRepresentative()
 			hCurrent = NULL;
 
 			CUtlVectorFixed<SquadMemberInfo_t, MAX_SQUAD_MEMBERS> candidates;
-			CBasePlayer *pPlayer = UTIL_GetLocalPlayer();
+			CBasePlayer *pPlayer = ToBasePlayer(EntityList()->GetLocalPlayer());
 
 			if ( pPlayer )
 			{
@@ -3745,7 +3745,7 @@ void	CNPC_Citizen::TossHealthKit(CBaseCombatCharacter *pThrowAt, const Vector &o
 //-----------------------------------------------------------------------------
 void	CNPC_Citizen::InputForceHealthKitToss( inputdata_t &inputdata )
 {
-	TossHealthKit( UTIL_GetLocalPlayer(), Vector(48.0f, 0.0f, 0.0f)  );
+	TossHealthKit(ToBasePlayer(EntityList()->GetLocalPlayer()), Vector(48.0f, 0.0f, 0.0f)  );
 }
 
 #endif
@@ -3768,7 +3768,7 @@ bool CNPC_Citizen::ShouldLookForHealthItem()
 		return false;
 
 	// Player is hurt, don't steal his health.
-	if( AI_IsSinglePlayer() && UTIL_GetLocalPlayer()->GetHealth() <= UTIL_GetLocalPlayer()->GetHealth() * 0.75f )
+	if( AI_IsSinglePlayer() && EntityList()->GetLocalPlayer()->GetHealth() <= EntityList()->GetLocalPlayer()->GetHealth() * 0.75f )
 		return false;
 
 	// Wait till you're standing still.
@@ -4177,7 +4177,7 @@ void CCitizenResponseSystem::ResponseThink()
 					float flNearestDist = (CITIZEN_RESPONSE_DISTANCE * CITIZEN_RESPONSE_DISTANCE);
 					CBaseEntity *pNearestCitizen = NULL;
 					CBaseEntity *pCitizen = NULL;
-					CBasePlayer *pPlayer = UTIL_GetLocalPlayer();
+					CBasePlayer *pPlayer = ToBasePlayer(EntityList()->GetLocalPlayer());
 					while ( (pCitizen = EntityList()->FindEntityByClassname( pCitizen, "npc_citizen" ) ) != NULL)
 					{
 						float flDistToPlayer = (pPlayer->WorldSpaceCenter() - pCitizen->WorldSpaceCenter()).LengthSqr();

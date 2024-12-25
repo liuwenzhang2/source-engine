@@ -113,7 +113,7 @@ void Bot_RunAll( void )
 {
 	for ( int i = 1; i <= gpGlobals->maxClients; i++ )
 	{
-		CHL1MP_Player *pPlayer = ToHL1MPPlayer( UTIL_PlayerByIndex( i ) );
+		CHL1MP_Player *pPlayer = ToHL1MPPlayer( EntityList()->GetPlayerByIndex( i ) );
 
 		if ( pPlayer && (pPlayer->GetEngineObject()->GetFlags() & FL_FAKECLIENT) )
 		{
@@ -131,7 +131,7 @@ bool RunMimicCommand( CUserCmd& cmd )
 		return false;
 
 	
-	CBasePlayer *pPlayer = UTIL_PlayerByIndex( bot_mimic.GetInt()  );
+	CBasePlayer *pPlayer = ToBasePlayer(EntityList()->GetPlayerByIndex( bot_mimic.GetInt()  ));
 	if ( !pPlayer )
 		return false;
 

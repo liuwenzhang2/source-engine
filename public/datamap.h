@@ -796,7 +796,7 @@ public:
 	}
 
 	// Misc useful
-	inline bool FStrEq(const char* sz1, const char* sz2)
+	static bool FStrEq(const char* sz1, const char* sz2)
 	{
 		return (sz1 == sz2 || V_stricmp(sz1, sz2) == 0);
 	}

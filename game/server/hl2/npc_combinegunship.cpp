@@ -2414,7 +2414,7 @@ void CNPC_CombineGunship::UpdateRotorSoundPitch( int iPitch )
 	controller.SoundChangePitch( m_pAirExhaustSound, iPitch, 0.1 );
 
 	// FIXME: Doesn't work in multiplayer
-	CBaseEntity *pPlayer = UTIL_PlayerByIndex(1);
+	CBaseEntity *pPlayer = EntityList()->GetPlayerByIndex(1);
 	if (pPlayer)
 	{
 		Vector pos;
@@ -2591,7 +2591,7 @@ void CNPC_CombineGunship::InputSetDockingBBox( inputdata_t &inputdata )
 {
 	Vector vecSize( 32, 32, 32 );
 
-	UTIL_SetSize( this, vecSize * -1, vecSize );
+	GetEngineObject()->SetSize( vecSize * -1, vecSize );
 }
 
 //------------------------------------------------------------------------------
@@ -2612,7 +2612,7 @@ void CNPC_CombineGunship::InputSetNormalBBox( inputdata_t &inputdata )
 	vecBBMin.y += GUNSHIP_TRIM_BOX;
 	vecBBMax.y -= GUNSHIP_TRIM_BOX;
 
-	UTIL_SetSize( this, vecBBMin, vecBBMax );
+	GetEngineObject()->SetSize( vecBBMin, vecBBMax );
 }
 
 //-----------------------------------------------------------------------------

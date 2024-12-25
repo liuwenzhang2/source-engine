@@ -85,6 +85,7 @@ void C_PropPortalStatsDisplay::OnDataChanged( DataUpdateType_t updateType )
 			ResetDisplayAnimation();
 
 			// Don't update if the player has cheated (and isn't at least developer level 2)
+			ConVarRef developer("developer");
 			if ( !m_bHasCheated || developer.GetInt() >= 2 )
 			{
 				int iStat = 0;

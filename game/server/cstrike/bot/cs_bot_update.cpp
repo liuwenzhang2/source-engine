@@ -1158,7 +1158,7 @@ void CCSBot::UpdateTravelDistanceToAllPlayers( void )
 
 		for( int i=1; i<=gpGlobals->maxClients; ++i )
 		{
-			CCSPlayer *player = static_cast< CCSPlayer * >( UTIL_PlayerByIndex( i ) );
+			CCSPlayer *player = static_cast< CCSPlayer * >( EntityList()->GetPlayerByIndex( i ) );
 
 			if (player == NULL)
 				continue;

@@ -218,7 +218,7 @@ int	CHalfLife1::Damage_GetShowOnHud( void )
 		pHead->GetEngineObject()->SetLocalAngles( pCorpse->GetEngineObject()->GetAbsAngles() );
 		UTIL_SetOrigin(pHead, pCorpse->GetEngineObject()->GetAbsOrigin());
 
-		UTIL_SetSize(pHead, pCorpse->GetEngineObject()->WorldAlignMins(), pCorpse->GetEngineObject()->WorldAlignMaxs());
+		pHead->GetEngineObject()->SetSize(pCorpse->GetEngineObject()->WorldAlignMins(), pCorpse->GetEngineObject()->WorldAlignMaxs());
 		g_pBodyQueueHead = (CCorpse *)pHead->GetOwnerEntity();
 	}
 

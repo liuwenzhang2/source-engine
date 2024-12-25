@@ -191,7 +191,7 @@ void CAI_Relationship::ApplyRelationship( CBaseEntity *pActivator, CBaseEntity *
 	
 	// The player spawns slightly after the NPCs, meaning that if we don't wait, the
 	// player will miss any relationships placed on them.
-	if ( AI_IsSinglePlayer() && !UTIL_GetLocalPlayer() )
+	if ( AI_IsSinglePlayer() && !EntityList()->GetLocalPlayer() )
 	{
 		SetThink( &CAI_Relationship::ApplyRelationshipThink );
 		GetEngineObject()->SetNextThink( gpGlobals->curtime );
@@ -378,7 +378,7 @@ void CAI_Relationship::ChangeRelationships( int disposition, int iReverting, CBa
 			break;
 		}
 
-		CBasePlayer	*pPlayer = UTIL_PlayerByIndex( i );
+		CBasePlayer	*pPlayer = ToBasePlayer(EntityList()->GetPlayerByIndex( i ));
 		if ( pPlayer )
 		{
 			if( IsASubject( pPlayer ) )

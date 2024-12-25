@@ -140,7 +140,7 @@ class CAchievementHL2KillEnemiesWithAntlions : public CBaseAchievement
 
 	virtual void Event_EntityKilled( CBaseEntity *pVictim, CBaseEntity *pAttacker, CBaseEntity *pInflictor, IGameEvent *event )
 	{
-		CBasePlayer *pPlayer = UTIL_GetLocalPlayer();
+		CBasePlayer *pPlayer = ToBasePlayer(EntityList()->GetLocalPlayer());
 		if ( pPlayer )
 		{
 			// Only count antlion kills once player owns bugbait. 
@@ -194,7 +194,7 @@ class CAchievementHL2DisintegrateSoldiersInField : public CBaseAchievement
 	{
 		if ( 0 == Q_strcmp( event->GetName(), "ragdoll_dissolved" ) )
 		{
-			CBaseEntity *pRagdoll = UTIL_EntityByIndex( event->GetInt( "entindex", 0 ) );
+			CBaseEntity *pRagdoll = EntityList()->GetBaseEntity( event->GetInt( "entindex", 0 ) );
 			if ( pRagdoll )
 			{
 				const char *pszName = GetModelName( pRagdoll );

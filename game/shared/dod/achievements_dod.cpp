@@ -891,7 +891,7 @@ class CAchievementDODCollectHolidayGifts : public CBaseAchievement
 		if ( Q_strcmp( event->GetName(), "christmas_gift_grab" ) == 0 )
 		{
 			int iPlayer = engine->GetPlayerForUserID( event->GetInt( "userid" ) );
-			CBaseEntity *pPlayer = UTIL_PlayerByIndex( iPlayer );
+			CBaseEntity *pPlayer = EntityList()->GetPlayerByIndex( iPlayer );
 
 			if ( pPlayer && pPlayer == C_DODPlayer::GetLocalDODPlayer() )
 			{

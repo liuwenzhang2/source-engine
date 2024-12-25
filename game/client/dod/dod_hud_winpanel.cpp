@@ -373,7 +373,7 @@ void CDODWinPanel::SetupAvatar( const char *pSide, int pos, int iPlayerIndex )
 
 		if ( bVisible )
 		{
-			CBasePlayer *pPlayer = UTIL_PlayerByIndex( iPlayerIndex );
+			CBasePlayer *pPlayer = ToBasePlayer(EntityList()->GetPlayerByIndex( iPlayerIndex ));
 			pPlayerAvatar->SetPlayer( pPlayer );
 		}
 

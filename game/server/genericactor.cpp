@@ -106,20 +106,20 @@ void CGenericActor::Spawn()
 
 /*
 	if ( FStrEq( STRING( GetModelName() ), "models/player.mdl" ) )
-		UTIL_SetSize(this, VEC_HUMAN_HULL_MIN, VEC_HUMAN_HULL_MAX);
+		GetEngineObject()->SetSize(this, VEC_HUMAN_HULL_MIN, VEC_HUMAN_HULL_MAX);
 	else
-		UTIL_SetSize(this, VEC_HULL_MIN, VEC_HULL_MAX);
+		GetEngineObject()->SetSize(this, VEC_HULL_MIN, VEC_HULL_MAX);
 */
 
 	if ( FStrEq( STRING(GetEngineObject()->GetModelName() ), "models/player.mdl" ) ||
 		 FStrEq( STRING(GetEngineObject()->GetModelName() ), "models/holo.mdl" ) ||
 		 FStrEq( STRING(GetEngineObject()->GetModelName() ), "models/blackout.mdl" ) )
 	{
-		UTIL_SetSize(this, VEC_HULL_MIN, VEC_HULL_MAX);
+		GetEngineObject()->SetSize(VEC_HULL_MIN, VEC_HULL_MAX);
 	}
 	else
 	{
-		UTIL_SetSize(this, NAI_Hull::Mins(HULL_HUMAN), NAI_Hull::Maxs(HULL_HUMAN));
+		GetEngineObject()->SetSize(NAI_Hull::Mins(HULL_HUMAN), NAI_Hull::Maxs(HULL_HUMAN));
 	}
 
 	if ( !FStrEq( STRING(GetEngineObject()->GetModelName() ), "models/blackout.mdl" ) )
@@ -447,7 +447,7 @@ void CFlextalkActor::ProcessSceneEvents( void )
 		}
 		else if (flex_talk.GetInt() == -4)
 		{
-			AddLookTarget( UTIL_PlayerByIndex( 1 ), 0.5, flex_looktime.GetFloat()  );
+			AddLookTarget( EntityList()->GetPlayerByIndex( 1 ), 0.5, flex_looktime.GetFloat()  );
 			flex_talk.SetValue( "0" );
 		}
 		else if (flex_talk.GetInt() == -5)

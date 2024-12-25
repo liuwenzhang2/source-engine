@@ -29,7 +29,6 @@
 #include "bone_setup.h"
 #include "usercmd.h"
 #include "gamestringpool.h"
-#include "util.h"
 #include "debugoverlay_shared.h"
 //#include "physics.h"
 #include "bone_accessor.h"
@@ -45,6 +44,7 @@
 #include "physics_shared.h"
 #include "ragdoll_shared.h"
 #include "physconstraint.h"
+#include "filesystem.h"
 
 //class CBaseEntity;
 // We can only ever move 512 entities across a transition
@@ -583,6 +583,10 @@ public:
 	ICollideable* GetCollideable();
 	// This defines collision bounds in OBB space
 	void SetCollisionBounds(const Vector& mins, const Vector& maxs);
+//-----------------------------------------------------------------------------
+// Sets the entity size
+//-----------------------------------------------------------------------------
+	void SetSize(const Vector& mins, const Vector& maxs);
 	SolidType_t GetSolid() const;
 	bool IsSolid() const;
 	void SetSolid(SolidType_t val);
@@ -926,6 +930,7 @@ public:
 	bool PhysModelParseSolid(solid_t& solid);
 	bool PhysModelParseSolidByIndex(solid_t& solid, int solidIndex);
 	void PhysForceClearVelocity(IPhysicsObject* pPhys);
+	float PhysGetEntityMass();
 	bool IsPortalSimulatorCollisionEntity() { return false; }
 	bool IsShadowClone() { return false; }
 	CEngineObjectInternal* GetClonesOfEntity() const;
@@ -1398,6 +1403,23 @@ inline SolidType_t CEngineObjectInternal::GetSolid() const
 inline void CEngineObjectInternal::SetCollisionBounds(const Vector& mins, const Vector& maxs)
 {
 	m_Collision.SetCollisionBounds(mins, maxs);
+}
+
+//-----------------------------------------------------------------------------
+// Sets the collision bounds + the size
+//-----------------------------------------------------------------------------
+inline void CEngineObjectInternal::SetSize(const Vector& mins, const Vector& maxs)
+{
+	for (int i = 0; i < 3; i++)
+	{
+		if (mins[i] > maxs[i])
+		{
+			Error("%s: backwards mins/maxs", m_pOuter->GetDebugName());
+		}
+	}
+
+	Assert(m_pOuter);
+	SetCollisionBounds(mins, maxs);
 }
 
 inline const Vector& CEngineObjectInternal::GetCollisionOrigin() const
@@ -2800,6 +2822,7 @@ private:
 extern void PostSimulation_ImpulseEvent(IPhysicsObject* pObject, const Vector& centerForce, const AngularImpulse& centerTorque);
 extern void PostSimulation_SetVelocityEvent(IPhysicsObject* pPhysicsObject, const Vector& vecVelocity);
 extern ConVar phys_timescale;
+extern ConVar sv_strict_notarget;
 
 //-----------------------------------------------------------------------------
 // Purpose: a global list of all the entities in the game.  All iteration through
@@ -2909,6 +2932,13 @@ public:
 	CBaseEntity* GetBaseEntityFromHandle(CBaseHandle hEnt) const;
 	CBaseEntity* GetBaseEntity(int entnum) const;
 	//edict_t* GetEdict( CBaseHandle hEnt ) const;
+	// NOTENOTE: Use GetLocalPlayer instead of EntityList()->GetPlayerByIndex IF you're in single player
+// and you want the player.
+	CBaseEntity* GetPlayerByIndex(int playerIndex);
+	// NOTENOTE: Use this instead of EntityList()->GetPlayerByIndex IF you're in single player
+// and you want the player.
+// not useable in multiplayer - see UTIL_GetListenServerHost()
+	CBaseEntity* GetLocalPlayer(void);
 
 	int NumberOfEntities(void);
 	int NumberOfEdicts(void);
@@ -2960,6 +2990,84 @@ public:
 	CBaseEntity* FindEntityByNetname(CBaseEntity* pStartEntity, const char* szModelName);
 
 	CBaseEntity* FindEntityProcedural(const char* szName, CBaseEntity* pSearchingEntity = NULL, CBaseEntity* pActivator = NULL, CBaseEntity* pCaller = NULL);
+
+	//-----------------------------------------------------------------------------
+// Purpose: Returns the nearest COLLIBALE entity in front of the player
+//			that has a clear line of sight. If HULL is true, the trace will
+//			hit the collision hull of entities. Otherwise, the trace will hit
+//			hitboxes.
+// Input  :
+// Output :
+//-----------------------------------------------------------------------------
+	CBaseEntity* FindEntityForward(CBaseEntity* pMe, bool fHull)
+	{
+		if (pMe)
+		{
+			trace_t tr;
+			Vector forward;
+			int mask;
+
+			if (fHull)
+			{
+				mask = MASK_SOLID;
+			}
+			else
+			{
+				mask = MASK_SHOT;
+			}
+
+			pMe->EyeVectors(&forward);
+			const Vector& vecAbsStart = pMe->EyePosition();
+			const Vector& vecAbsEnd = pMe->EyePosition() + forward * MAX_COORD_RANGE;
+			const IHandleEntity* ignore = pMe;
+			int collisionGroup = COLLISION_GROUP_NONE;
+			trace_t* ptr = &tr;
+
+			Ray_t ray;
+			ray.Init(vecAbsStart, vecAbsEnd);
+			CTraceFilterSimple traceFilter(ignore, collisionGroup);
+
+			enginetrace->TraceRay(ray, mask, &traceFilter, ptr);
+
+			ConVarRef r_visualizetraces("r_visualizetraces");
+			if (r_visualizetraces.GetBool())
+			{
+				DebugDrawLine(ptr->startpos, ptr->endpos, 255, 0, 0, true, -1.0f);
+			}
+			if (tr.fraction != 1.0 && tr.DidHitNonWorldEntity())
+			{
+				return (CBaseEntity*)tr.m_pEnt;
+			}
+		}
+		return NULL;
+
+	}
+
+	//-----------------------------------------------------------------------------
+// Purpose: Finds the nearest entity in front of the player, preferring
+//			collidable entities, but allows selection of enities that are
+//			on the other side of walls or objects
+// Input  :
+// Output :
+//-----------------------------------------------------------------------------
+	CBaseEntity* FindPickerEntity(CBaseEntity* pPlayer)
+	{
+		MDLCACHE_CRITICAL_SECTION();
+
+		// First try to trace a hull to an entity
+		CBaseEntity* pEntity = FindEntityForward(pPlayer, true);
+
+		// If that fails just look for the nearest facing entity
+		if (!pEntity)
+		{
+			Vector forward;
+			Vector origin;
+			pPlayer->EyeVectors(&forward);
+			origin = pPlayer->WorldSpaceCenter();
+			pEntity = EntityList()->FindEntityNearestFacing(origin, forward, 0.95);
+		}
+		return pEntity;
+	}
 
 	void AddDataAccessor(int type, IEntityDataInstantiator<T>* instantiator);
 	void RemoveDataAccessor(int type);
@@ -3105,8 +3213,8 @@ public:
 			return;
 
 		// don't make noise for hidden/invisible/sky materials
-		surfacedata_t* phit = EntityList()->PhysGetProps()->GetSurfaceData(surfacePropsHit);
-		surfacedata_t* psurf = EntityList()->PhysGetProps()->GetSurfaceData(surfaceProps);
+		surfacedata_t* phit = PhysGetProps()->GetSurfaceData(surfacePropsHit);
+		surfacedata_t* psurf = PhysGetProps()->GetSurfaceData(surfaceProps);
 
 		if (phit->game.material == 'X' || psurf->game.material == 'X')
 			return;
@@ -3126,7 +3234,7 @@ public:
 			soundHandle = &psurf->soundhandles.scrapeRough;
 		}
 
-		const char* pSoundName = EntityList()->PhysGetProps()->GetString(soundName);
+		const char* pSoundName = PhysGetProps()->GetString(soundName);
 
 
 		PhysFrictionSound(pEntity, pObject, pSoundName, *soundHandle, volume);
@@ -3542,6 +3650,174 @@ public:
 	CEnginePortalInternal* GetPortal(int index) { return m_ActivePortals[index]; }
 	CCallQueue* GetPostTouchQueue();
 
+	void SetClientVisibilityPVS(CBaseEntity* pClient, const unsigned char* pvs, int pvssize)
+	{
+		if (pClient == GetCurrentCheckClient())
+		{
+			Assert(pvssize <= sizeof(m_checkVisibilityPVS));
+
+			m_bClientPVSIsExpanded = false;
+
+			unsigned* pFrom = (unsigned*)pvs;
+			unsigned* pMask = (unsigned*)m_checkPVS;
+			unsigned* pTo = (unsigned*)m_checkVisibilityPVS;
+
+			int limit = pvssize / 4;
+			int i;
+
+			for (i = 0; i < limit; i++)
+			{
+				pTo[i] = pFrom[i] & ~pMask[i];
+
+				if (pFrom[i])
+				{
+					m_bClientPVSIsExpanded = true;
+				}
+			}
+
+			int remainder = pvssize % 4;
+			for (i = 0; i < remainder; i++)
+			{
+				((unsigned char*)&pTo[limit])[i] = ((unsigned char*)&pFrom[limit])[i] & !((unsigned char*)&pMask[limit])[i];
+
+				if (((unsigned char*)&pFrom[limit])[i] != 0)
+				{
+					m_bClientPVSIsExpanded = true;
+				}
+			}
+		}
+	}
+
+	bool ClientPVSIsExpanded()
+	{
+		return m_bClientPVSIsExpanded;
+	}
+
+	//-----------------------------------------------------------------------------
+	// Purpose: Returns a client (or object that has a client enemy) that would be a valid target.
+	//  If there are more than one valid options, they are cycled each frame
+	//  If (self.origin + self.viewofs) is not in the PVS of the current target, it is not returned at all.
+	// Input  : *pEdict - 
+	// Output : edict_t*
+	//-----------------------------------------------------------------------------
+	CBaseEntity* FindClientInPVS(const Vector& vecBoxMins, const Vector& vecBoxMaxs)
+	{
+		CBaseEntity* ent = GetCurrentCheckClient();
+		if (!ent)
+		{
+			return NULL;
+		}
+
+		if (!engine->CheckBoxInPVS(vecBoxMins, vecBoxMaxs, m_checkPVS, sizeof(m_checkPVS)))
+		{
+			return NULL;
+		}
+
+		// might be able to see it
+		return ent;
+	}
+
+	CBaseEntity* FindClientInPVSGuts(CBaseEntity* pEdict, unsigned char* pvs, unsigned pvssize)
+	{
+		Vector	view;
+
+		CBaseEntity* ent = GetCurrentCheckClient();
+		if (!ent)
+		{
+			return NULL;
+		}
+
+		CBaseEntity* pPlayerEntity = (CBaseEntity*)ent;
+		if ((!pPlayerEntity || (pPlayerEntity->GetEngineObject()->GetFlags() & FL_NOTARGET)) && sv_strict_notarget.GetBool())
+		{
+			return NULL;
+		}
+		// if current entity can't possibly see the check entity, return 0
+		// UNDONE: Build a box for this and do it over that box
+		// UNDONE: Use CM_BoxLeafnums()
+		CBaseEntity* pe = pEdict;
+		if (pe)
+		{
+			view = pe->EyePosition();
+
+			if (!engine->CheckOriginInPVS(view, pvs, pvssize))
+			{
+				return NULL;
+			}
+		}
+
+		// might be able to see it
+		return ent;
+	}
+
+	//-----------------------------------------------------------------------------
+	// Purpose: Returns a client that could see the entity directly
+	//-----------------------------------------------------------------------------
+
+	CBaseEntity* FindClientInPVS(CBaseEntity* pEdict)
+	{
+		return FindClientInPVSGuts(pEdict, m_checkPVS, sizeof(m_checkPVS));
+	}
+
+	//-----------------------------------------------------------------------------
+	// Purpose: Returns a client that could see the entity, including through a camera
+	//-----------------------------------------------------------------------------
+	CBaseEntity* FindClientInVisibilityPVS(CBaseEntity* pEdict)
+	{
+		return FindClientInPVSGuts(pEdict, m_checkVisibilityPVS, sizeof(m_checkVisibilityPVS));
+	}
+
+	//-----------------------------------------------------------------------------
+// Purpose: Returns a chain of entities within the PVS of another entity (client)
+//  starting_ent is the ent currently at in the list
+//  a starting_ent of NULL signifies the beginning of a search
+// Input  : *pplayer - 
+//			*starting_ent - 
+// Output : edict_t
+//-----------------------------------------------------------------------------
+	CBaseEntity* EntitiesInPVS(CBaseEntity* pPVSEntity, CBaseEntity* pStartingEntity)
+	{
+		Vector			org;
+		static byte		pvs[MAX_MAP_CLUSTERS / 8];
+		static Vector	lastOrg(0, 0, 0);
+		static int		lastCluster = -1;
+
+		if (!pPVSEntity)
+			return NULL;
+
+		// NOTE: These used to be caching code here to prevent this from
+		// being called over+over which breaks when you go back + forth
+		// across level transitions
+		// So, we'll always get the PVS each time we start a new EntitiesInPVS iteration.
+		// Given that weapon_binocs + leveltransition code is the only current clients
+		// of this, this seems safe.
+		if (!pStartingEntity)
+		{
+			org = pPVSEntity->EyePosition();
+			int clusterIndex = engine->GetClusterForOrigin(org);
+			Assert(clusterIndex >= 0);
+			engine->GetPVSForCluster(clusterIndex, sizeof(pvs), pvs);
+		}
+
+		for (CBaseEntity* pEntity = NextEnt(pStartingEntity); pEntity; pEntity = NextEnt(pEntity))
+		{
+			// Only return attached ents.
+			if (!pEntity->IsNetworkable() || pEntity->entindex() == -1)
+				continue;
+
+			CBaseEntity* pParent = pEntity->GetEngineObject()->GetRootMoveParent()->GetOuter();
+
+			Vector vecSurroundMins, vecSurroundMaxs;
+			pParent->GetEngineObject()->WorldSpaceSurroundingBounds(&vecSurroundMins, &vecSurroundMaxs);
+			if (!engine->CheckBoxInPVS(vecSurroundMins, vecSurroundMaxs, pvs, sizeof(pvs)))
+				continue;
+
+			return pEntity;
+		}
+
+		return NULL;
+	}
+
 protected:
 	virtual void AfterCreated(IHandleEntity* pEntity);
 	virtual void BeforeDestroy(IHandleEntity* pEntity);
@@ -3593,6 +3869,132 @@ protected:
 	}
 
 	void FullSyncAllClones(void);
+
+
+	int GetNewCheckClient(int check)
+	{
+		int		i;
+		CBaseEntity* ent = NULL;
+		Vector	org;
+
+		// cycle to the next one
+
+		if (check < 1)
+			check = 1;
+		if (check > gpGlobals->maxClients)
+			check = gpGlobals->maxClients;
+
+		if (check == gpGlobals->maxClients)
+			i = 1;
+		else
+			i = check + 1;
+
+		for (; ; i++)
+		{
+			if (i > gpGlobals->maxClients)
+			{
+				i = 1;
+			}
+
+			// Looped but didn't find anything else
+			if (i == check) {
+				ent = GetBaseEntity(i);
+				break;
+			}
+
+			ent = GetBaseEntity(i);
+			if (!ent)
+				continue;
+
+			//if ( !ent->GetUnknown() )
+			//	continue;
+
+			CBaseEntity* entity = ent;
+			if (!entity)
+				continue;
+
+			if (entity->GetEngineObject()->GetFlags() & FL_NOTARGET)
+				continue;
+
+			// anything that is a client, or has a client as an enemy
+			break;
+		}
+
+		if (i != check)
+		{
+			memset(m_checkVisibilityPVS, 0, sizeof(m_checkVisibilityPVS));
+			m_bClientPVSIsExpanded = false;
+		}
+
+		if (ent)
+		{
+			// get the PVS for the entity
+			CBaseEntity* pce = ent;
+			if (!pce)
+				return i;
+
+			org = pce->EyePosition();
+
+			int clusterIndex = engine->GetClusterForOrigin(org);
+			if (clusterIndex != m_checkCluster)
+			{
+				m_checkCluster = clusterIndex;
+				engine->GetPVSForCluster(clusterIndex, sizeof(m_checkPVS), m_checkPVS);
+			}
+		}
+
+		return i;
+	}
+
+	//-----------------------------------------------------------------------------
+// Gets the current check client....
+//-----------------------------------------------------------------------------
+	CBaseEntity* GetCurrentCheckClient()
+	{
+		CBaseEntity* ent;
+
+		// find a new check if on a new frame
+		float delta = gpGlobals->curtime - m_lastchecktime;
+		if (delta >= 0.1 || delta < 0)
+		{
+			m_lastcheck = GetNewCheckClient(m_lastcheck);
+			m_lastchecktime = gpGlobals->curtime;
+		}
+
+		// return check if it might be visible	
+		ent = GetBaseEntity(m_lastcheck);
+
+		// Allow dead clients -- JAY
+		// Our monsters know the difference, and this function gates alot of behavior
+		// It's annoying to die and see monsters stop thinking because you're no longer
+		// "in" their PVS
+		if (!ent)//|| ent->IsFree() || !ent->GetUnknown()
+		{
+			return NULL;
+		}
+
+		return ent;
+	}
+
+	// UNDONE: This could be a better test - can we run the absbox through the bsp and see
+// if it contains any solid space?  or would that eliminate some entities we want to keep?
+	int EntityInSolid(CBaseEntity* ent)
+	{
+		Vector	point;
+
+		IEngineObjectServer* pParent = ent->GetEngineObject()->GetMoveParent();
+		// HACKHACK -- If you're attached to a client, always go through
+		if (pParent)
+		{
+			if (pParent->GetOuter()->IsPlayer())
+				return 0;
+
+			ent = ent->GetEngineObject()->GetRootMoveParent()->GetOuter();
+		}
+
+		point = ent->WorldSpaceCenter();
+		return (enginetrace->GetPointContents(point) & MASK_SOLID);
+	}
 
 private:
 	CEntityFactoryDictionary m_EntityFactoryDictionary;
@@ -3665,6 +4067,18 @@ private:
 	CUtlVector<CEnginePlayerInternal*> m_ActivePlayers;
 	int m_nTouchDepth = 0;
 	CCallQueue m_PostTouchQueue;
+//-----------------------------------------------------------------------------
+// Purpose: Helper for FindClientInPVS
+// Input  : check - last checked client
+// Output : static int GetNewCheckClient
+//-----------------------------------------------------------------------------
+// FIXME:  include bspfile.h here?
+	byte	m_checkPVS[MAX_MAP_LEAFS / 8];
+	byte	m_checkVisibilityPVS[MAX_MAP_LEAFS / 8];
+	int		m_checkCluster;
+	int		m_lastcheck;
+	float	m_lastchecktime;
+	bool	m_bClientPVSIsExpanded;
 };
 
 template<class T>
@@ -3762,6 +4176,11 @@ void CGlobalEntityList<T>::LevelInitPreEntity()
 	PrecachePhysicsSounds();
 
 	m_bPaused = true;
+
+	m_checkCluster = -1;
+	m_lastcheck = 1;
+	m_lastchecktime = -1;
+	m_bClientPVSIsExpanded = false;
 }
 
 template<class T>
@@ -4194,7 +4613,7 @@ void CGlobalEntityList<T>::Save(ISave* pSave)
 
 			AssertMsg(pEnt->entindex() == -1 || (pEnt->GetEngineObject()->GetClassname() != NULL_STRING &&
 				(STRING(pEnt->GetEngineObject()->GetClassname())[0] != 0) &&
-				FStrEq(STRING(pEnt->GetEngineObject()->GetClassname()), pEnt->GetClassname())),
+				datamap_t::FStrEq(STRING(pEnt->GetEngineObject()->GetClassname()), pEnt->GetClassname())),
 				"Saving entity with invalid classname");
 
 
@@ -4339,7 +4758,7 @@ void CGlobalEntityList<T>::Restore(IRestore* pRestore, bool createPlayers)
 			pEntInfo->restoreentityindex = pent && pent->IsNetworkable() ? pent->entindex() : -1;
 			if (pent && pEntInfo->restoreentityindex == 0)
 			{
-				if (!FClassnameIs(pent, "worldspawn"))
+				if (!pent->ClassMatches("worldspawn"))
 				{
 					pEntInfo->restoreentityindex = -1;
 				}
@@ -4392,13 +4811,13 @@ T* CGlobalEntityList<T>::FindGlobalEntity(string_t classname, string_t globalnam
 
 	while ((pReturn = NextEnt(pReturn)) != NULL)
 	{
-		if (FStrEq(STRING(pReturn->GetEngineObject()->GetGlobalname()), STRING(globalname)))
+		if (datamap_t::FStrEq(STRING(pReturn->GetEngineObject()->GetGlobalname()), STRING(globalname)))
 			break;
 	}
 
 	if (pReturn)
 	{
-		if (!FClassnameIs(pReturn, STRING(classname)))
+		if (!pReturn->ClassMatches(STRING(classname)))
 		{
 			Warning("Global entity found %s, wrong class %s [expects class %s]\n", STRING(globalname), STRING(pReturn->GetEngineObject()->GetClassname()), STRING(classname));
 			pReturn = NULL;
@@ -4449,7 +4868,7 @@ int CGlobalEntityList<T>::RestoreEntity(T* pEntity, IRestore* pRestore, entityta
 			// Already dead? delete
 			if (engine->GlobalEntity_GetState(globalIndex) == GLOBAL_DEAD)
 				return -1;
-			else if (!FStrEq(STRING(gpGlobals->mapname), engine->GlobalEntity_GetMap(globalIndex)))
+			else if (!datamap_t::FStrEq(STRING(gpGlobals->mapname), engine->GlobalEntity_GetMap(globalIndex)))
 			{
 				pEntity->MakeDormant();	// Hasn't been moved to this level yet, wait but stay alive
 			}
@@ -4487,7 +4906,7 @@ int CGlobalEntityList<T>::RestoreGlobalEntity(T* pEntity, IRestore* pRestore, en
 	// pSaveData->szCurrentMapName is the level this entity is coming from
 	// pGlobal->levelName is the last level the global entity was active in.
 	// If they aren't the same, then this global update is out of date.
-	if (!FStrEq(pSaveData->levelInfo.szCurrentMapName, engine->GlobalEntity_GetMap(globalIndex)))
+	if (!datamap_t::FStrEq(pSaveData->levelInfo.szCurrentMapName, engine->GlobalEntity_GetMap(globalIndex)))
 	{
 		return 0;
 	}
@@ -4680,7 +5099,7 @@ int CGlobalEntityList<T>::CreateEntityTransitionListInternal(IRestore* pRestore,
 
 		MDLCACHE_CRITICAL_SECTION();
 
-		if (!(pEntInfo->flags & FENTTABLE_PLAYER) && UTIL_EntityInSolid(pent))
+		if (!(pEntInfo->flags & FENTTABLE_PLAYER) && EntityInSolid(pent))
 		{
 			// this can happen during normal processing - PVS is just a guess, some map areas won't exist in the new map
 			DevMsg(2, "Suppressing %s\n", STRING(pEntInfo->classname));
@@ -4729,7 +5148,7 @@ T* CGlobalEntityList<T>::FindLandmark(const char* pLandmarkName)
 	while (pentLandmark)
 	{
 		// Found the landmark
-		if (FClassnameIs(pentLandmark, "info_landmark"))
+		if (pentLandmark->ClassMatches("info_landmark"))
 			return pentLandmark;
 		else
 			pentLandmark = FindEntityByName(pentLandmark, pLandmarkName);
@@ -4786,7 +5205,7 @@ int CGlobalEntityList<T>::InTransitionVolume(T* pEntity, const char* pVolumeName
 	pVolume = FindEntityByName(NULL, pVolumeName);
 	while (pVolume)
 	{
-		if (pVolume && FClassnameIs(pVolume, "trigger_transition"))
+		if (pVolume && pVolume->ClassMatches("trigger_transition"))
 		{
 			if (TestEntityTriggerIntersection_Accurate(pVolume->GetEngineObject(), pEntity->GetEngineObject()))	// It touches one, it's in the volume
 				return TRANSITION_VOLUME_PASSED;
@@ -4923,7 +5342,7 @@ int CGlobalEntityList<T>::BuildEntityTransitionList(T* pLandmarkEntity, const ch
 
 	// Follow the linked list of entities in the PVS of the transition landmark
 	T* pEntity = NULL;
-	while ((pEntity = UTIL_EntitiesInPVS(pLandmarkEntity, pEntity)) != NULL)
+	while ((pEntity = EntitiesInPVS(pLandmarkEntity, pEntity)) != NULL)
 	{
 		int flags = ComputeEntitySaveFlags(pEntity);
 		if (!flags)
@@ -5419,6 +5838,47 @@ inline CBaseEntity* CGlobalEntityList<T>::GetBaseEntity(int entnum) const
 		return NULL;
 }
 
+// returns a CBaseEntity pointer to a player by index.  Only returns if the player is spawned and connected
+// otherwise returns NULL
+// Index is 1 based
+template<class T>
+CBaseEntity* CGlobalEntityList<T>::GetPlayerByIndex(int playerIndex)
+{
+	CBaseEntity* pPlayer = NULL;
+
+	if (playerIndex > 0 && playerIndex <= gpGlobals->maxClients)
+	{
+		pPlayer = EntityList()->GetBaseEntity(playerIndex);
+	}
+
+	return pPlayer;
+}
+
+//
+// Return the local player.
+// If this is a multiplayer game, return NULL.
+// 
+template<class T>
+CBaseEntity* CGlobalEntityList<T>::GetLocalPlayer(void)
+{
+	if (gpGlobals->maxClients > 1)
+	{
+		ConVarRef developer("developer");
+		if (developer.GetBool())
+		{
+			Assert(!"UTIL_GetLocalPlayer");
+
+#ifdef	DEBUG
+			Warning("UTIL_GetLocalPlayer() called in multiplayer game.\n");
+#endif
+		}
+
+		return NULL;
+	}
+
+	return GetPlayerByIndex(1);
+}
+
 template<class T>
 CGlobalEntityList<T>::CGlobalEntityList()
 {
@@ -5675,8 +6135,6 @@ CBaseEntity* CGlobalEntityList<T>::FindEntityByClassname(CBaseEntity* pStartEnti
 	return NULL;
 }
 
-CBaseEntity* FindPickerEntity(CBasePlayer* pPlayer);
-
 //-----------------------------------------------------------------------------
 // Purpose: Finds an entity given a procedural name.
 // Input  : szName - The procedural name to search for, should start with '!'.
@@ -5697,41 +6155,41 @@ CBaseEntity* CGlobalEntityList<T>::FindEntityProcedural(const char* szName, CBas
 		//
 		// It is a procedural name, look for the ones we understand.
 		//
-		if (FStrEq(pName, "player"))
+		if (datamap_t::FStrEq(pName, "player"))
 		{
-			return (CBaseEntity*)UTIL_PlayerByIndex(1);
+			return GetPlayerByIndex(1);
 		}
-		else if (FStrEq(pName, "pvsplayer"))
+		else if (datamap_t::FStrEq(pName, "pvsplayer"))
 		{
 			if (pSearchingEntity)
 			{
-				return UTIL_FindClientInPVS(pSearchingEntity);
+				return FindClientInPVS(pSearchingEntity);
 			}
 			else if (pActivator)
 			{
 				// FIXME: error condition?
-				return UTIL_FindClientInPVS(pActivator);
+				return FindClientInPVS(pActivator);
 			}
 			else
 			{
 				// FIXME: error condition?
-				return (CBaseEntity*)UTIL_PlayerByIndex(1);
+				return GetPlayerByIndex(1);
 			}
 
 		}
-		else if (FStrEq(pName, "activator"))
+		else if (datamap_t::FStrEq(pName, "activator"))
 		{
 			return pActivator;
 		}
-		else if (FStrEq(pName, "caller"))
+		else if (datamap_t::FStrEq(pName, "caller"))
 		{
 			return pCaller;
 		}
-		else if (FStrEq(pName, "picker"))
+		else if (datamap_t::FStrEq(pName, "picker"))
 		{
-			return FindPickerEntity(UTIL_PlayerByIndex(1));
+			return FindPickerEntity(GetPlayerByIndex(1));
 		}
-		else if (FStrEq(pName, "self"))
+		else if (datamap_t::FStrEq(pName, "self"))
 		{
 			return pSearchingEntity;
 		}
@@ -5818,7 +6276,7 @@ CBaseEntity* CGlobalEntityList<T>::FindEntityByModel(CBaseEntity* pStartEntity, 
 		if (ent->entindex()==-1 || !ent->GetEngineObject()->GetModelName())
 			continue;
 
-		if (FStrEq(STRING(ent->GetEngineObject()->GetModelName()), szModelName))
+		if (datamap_t::FStrEq(STRING(ent->GetEngineObject()->GetModelName()), szModelName))
 			return ent;
 	}
 
@@ -5849,7 +6307,7 @@ CBaseEntity* CGlobalEntityList<T>::FindEntityByTarget(CBaseEntity* pStartEntity,
 		if (!ent->m_target)
 			continue;
 
-		if (FStrEq(STRING(ent->m_target), szName))
+		if (datamap_t::FStrEq(STRING(ent->m_target), szName))
 			return ent;
 	}
 
@@ -6209,10 +6667,10 @@ CBaseEntity* CGlobalEntityList<T>::FindEntityClassNearestFacing(const Vector& or
 		float dot = DotProduct(facing, to_ent);
 		if (dot > bestDot)
 		{
-			if (FClassnameIs(ent, classname))
+			if (ent->ClassMatches(classname))
 			{
 				// Ignore if worldspawn
-				if (!FClassnameIs(ent, "worldspawn") && !FClassnameIs(ent, "soundent"))
+				if (!ent->ClassMatches("worldspawn") && !ent->ClassMatches("soundent"))
 				{
 					bestDot = dot;
 					best_ent = ent;
@@ -6261,7 +6719,7 @@ CBaseEntity* CGlobalEntityList<T>::FindEntityNearestFacing(const Vector& origin,
 			continue;
 
 		// Ignore if worldspawn
-		if (!FStrEq(STRING(ent->GetEngineObject()->GetClassname()), "worldspawn") && !FStrEq(STRING(ent->GetEngineObject()->GetClassname()), "soundent"))
+		if (!datamap_t::FStrEq(STRING(ent->GetEngineObject()->GetClassname()), "worldspawn") && !datamap_t::FStrEq(STRING(ent->GetEngineObject()->GetClassname()), "soundent"))
 		{
 			bestDot = dot;
 			best_ent = ent;
@@ -6530,7 +6988,7 @@ void CGlobalEntityList<T>::UpdateRagdolls(float frametime) // EPISODIC VERSION
 	int furthestOne = m_LRU.Head();
 	float furthestDistSq = 0;
 
-	CBaseEntity* pPlayer = (CBaseEntity*)UTIL_GetLocalPlayer();
+	CBaseEntity* pPlayer = GetLocalPlayer();
 
 	if (pPlayer && m_LRU.Count() > iMaxRagdollCount) // find the furthest one algorithm
 	{
@@ -6684,7 +7142,8 @@ bool CGlobalEntityList<T>::FindOrAddVehicleScript(const char* pScriptName, vehic
 
 	if (index < 0)
 	{
-		byte* pFile = UTIL_LoadFileForMe(pScriptName, NULL);
+		void* pFile = NULL;
+		int length = filesystem->ReadFileEx(pScriptName, "GAME", &pFile, true, true);
 		if (pFile)
 		{
 			// new script, parse it and write to the table
@@ -6712,7 +7171,7 @@ bool CGlobalEntityList<T>::FindOrAddVehicleScript(const char* pScriptName, vehic
 				}
 			}
 			m_pPhyscollision->VPhysicsKeyParserDestroy(pParse);
-			UTIL_FreeFile(pFile);
+			filesystem->FreeOptimalReadBuffer(pFile);
 		}
 	}
 

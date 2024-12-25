@@ -466,7 +466,7 @@ void CSatchelCharge::Spawn( void )
 
 	SetModel( SATCHEL_CHARGE_MODEL );
 
-	UTIL_SetSize( this, Vector( -4, -4, 0), Vector(4, 4, 8) );
+	GetEngineObject()->SetSize( Vector( -4, -4, 0), Vector(4, 4, 8) );
 
 	SetTouch( &CSatchelCharge::SatchelTouch );
 	SetUse( &CSatchelCharge::SatchelUse );

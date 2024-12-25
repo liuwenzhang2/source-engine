@@ -1617,7 +1617,7 @@ void CFuncTank::Think( void )
 		}
 
 #ifdef FUNCTANK_AUTOUSE
-		CBasePlayer *pPlayer = UTIL_PlayerByIndex(1);
+		CBasePlayer *pPlayer = ToBasePlayer(EntityList()->GetPlayerByIndex(1));
 		bool bThinkFast = false;
 
 		if( pPlayer )
@@ -2326,7 +2326,7 @@ void CFuncTank::Fire( int bulletCount, const Vector &barrelEnd, const Vector &fo
 	{
 		if ( IsX360() )
 		{
-			UTIL_PlayerByIndex(1)->RumbleEffect( RUMBLE_AR2, 0, RUMBLE_FLAG_RESTART | RUMBLE_FLAG_RANDOM_AMPLITUDE );
+			ToBasePlayer(EntityList()->GetPlayerByIndex(1))->RumbleEffect( RUMBLE_AR2, 0, RUMBLE_FLAG_RESTART | RUMBLE_FLAG_RANDOM_AMPLITUDE );
 		}
 		else
 		{
@@ -3550,7 +3550,7 @@ void CMortarShell::Spawn()
 	Vector mins( -MORTAR_BLAST_RADIUS, -MORTAR_BLAST_RADIUS, -MORTAR_BLAST_RADIUS );
 	Vector maxs(  MORTAR_BLAST_RADIUS,  MORTAR_BLAST_RADIUS,  MORTAR_BLAST_RADIUS );
 
-	UTIL_SetSize( this, mins, maxs );
+	GetEngineObject()->SetSize( mins, maxs );
 
 	m_vecFlyDir = GetEngineObject()->GetAbsOrigin() - m_vecFiredFrom;
 	VectorNormalize( m_vecFlyDir );
@@ -3582,7 +3582,7 @@ enum
 
 void UTIL_VisualizeCurve( int type, int steps, float bias )
 {
-	CBasePlayer *pPlayer = UTIL_PlayerByIndex( 1 );
+	CBasePlayer *pPlayer = ToBasePlayer(EntityList()->GetPlayerByIndex( 1 ));
 	Vector vForward, vRight, vUp;
 	
 	pPlayer->EyeVectors( &vForward, &vRight, &vUp );

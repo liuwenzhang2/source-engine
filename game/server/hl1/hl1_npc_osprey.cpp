@@ -185,7 +185,7 @@ void CNPC_Osprey::Spawn( void )
 	
 	Vector mins, maxs;
 	ExtractBbox( 0, mins, maxs );
-	UTIL_SetSize( this, mins, maxs ); 
+	GetEngineObject()->SetSize( mins, maxs ); 
 	UTIL_SetOrigin( this, GetEngineObject()->GetAbsOrigin() );
 
 	GetEngineObject()->AddFlag( FL_NPC );
@@ -1414,7 +1414,7 @@ void CBaseHelicopter::Event_Killed( const CTakeDamageInfo &info )
 
 	// Kill the rotor sound.
 
-	UTIL_SetSize( this, Vector( -32, -32, -64), Vector( 32, 32, 0) );
+	GetEngineObject()->SetSize( Vector( -32, -32, -64), Vector( 32, 32, 0) );
 	SetThink( &CBaseHelicopter::CallDyingThink );
 	SetTouch( &CBaseHelicopter::CrashTouch );
 

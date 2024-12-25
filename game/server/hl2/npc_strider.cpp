@@ -654,7 +654,7 @@ void CNPC_Strider::PostNPCInit()
 		GetEngineObject()->RemoveFlag( FL_FLY );
 	}
 
-	m_PlayerFreePass.SetPassTarget( UTIL_PlayerByIndex(1) );
+	m_PlayerFreePass.SetPassTarget( EntityList()->GetPlayerByIndex(1) );
 	
 	AI_FreePassParams_t freePassParams = 
 	{
@@ -780,7 +780,7 @@ int	CNPC_Strider::DrawDebugTextOverlays()
 			text_offset++;
 		}
 
-		CBaseEntity *pPlayer = UTIL_PlayerByIndex(1);
+		CBaseEntity *pPlayer = EntityList()->GetPlayerByIndex(1);
 		if ( pPlayer )
 		{
 			if ( GetSenses()->ShouldSeeEntity( pPlayer ) && GetSenses()->CanSeeEntity( pPlayer ) )
@@ -5485,7 +5485,7 @@ void CSparkTrail::Spawn()
 	if( random->RandomInt( 0, 1 ) == 0 )
 		vecVelocity.y *= -1;
 
-	UTIL_SetSize( this, Vector( 0, 0, 0 ), Vector( 0, 0, 0 ) );
+	GetEngineObject()->SetSize( Vector( 0, 0, 0 ), Vector( 0, 0, 0 ) );
 	GetEngineObject()->SetMoveType( MOVETYPE_FLYGRAVITY );
 	GetEngineObject()->SetSolid( SOLID_NONE );
 

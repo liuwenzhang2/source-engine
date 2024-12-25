@@ -29,7 +29,7 @@ void CBaseGrenadeTimed::Spawn( void )
 	GetEngineObject()->SetCollisionGroup( COLLISION_GROUP_PROJECTILE );
 	SetModel( "models/Weapons/w_grenade.mdl" ); 
 
-	UTIL_SetSize(this, Vector( -4, -4, -4), Vector(4, 4, 4));
+	GetEngineObject()->SetSize(Vector( -4, -4, -4), Vector(4, 4, 4));
 
 	QAngle angles;
 	Vector vel = GetEngineObject()->GetAbsVelocity();

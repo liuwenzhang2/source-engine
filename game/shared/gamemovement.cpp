@@ -3393,6 +3393,7 @@ int CGameMovement::CheckStuck( void )
 
 	// Deal with stuckness...
 #ifndef DEDICATED
+	ConVarRef developer("developer");
 	if ( developer.GetBool() )
 	{
 		bool isServer = player->IsServer();

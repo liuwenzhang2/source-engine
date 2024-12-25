@@ -78,7 +78,7 @@ void CMyNPC::Spawn()
 	Precache( );
 
 	engine.SetModel(edict(), "models/mymodel.mdl");
-	UTIL_SetSize( this, Vector( -12, -12, 0 ), Vector( 12, 12, 24 ) );
+	GetEngineObject()->SetSize( Vector( -12, -12, 0 ), Vector( 12, 12, 24 ) );
 
 	GetEngineObject()->SetSolid( SOLID_SLIDEBOX );
 	GetEngineObject()->SetMoveType( MOVETYPE_STEP );

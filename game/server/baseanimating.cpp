@@ -663,7 +663,7 @@ CBaseEntity* CBaseAnimating::CreateServerRagdoll(int forceBone, const CTakeDamag
 //		GetEngineObject()->AddFlag( FL_TRANSRAGDOLL );
 //
 //		GetEngineObject()->SetMoveType( MOVETYPE_NONE );
-//		//UTIL_SetSize( this, vec3_origin, vec3_origin );
+//		//GetEngineObject()->SetSize( vec3_origin, vec3_origin );
 //		SetThink( NULL );
 //	
 //		GetEngineObject()->SetNextThink( gpGlobals->curtime + 2.0f );
@@ -1410,7 +1410,7 @@ void CBaseAnimating::SetSequenceBox( void )
 		}
 		rmin.z = 0;
 		rmax.z = rmin.z + 1;
-		UTIL_SetSize( this, rmin, rmax );
+		GetEngineObject()->SetSize( rmin, rmax );
 	}
 }
 

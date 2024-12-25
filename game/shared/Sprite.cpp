@@ -389,7 +389,7 @@ CSprite *CSprite::SpriteCreate( const char *pSpriteName, const Vector &origin, b
 	CSprite *pSprite = (CSprite*)EntityList()->CreateEntityByName( "env_sprite" );
 	pSprite->SpriteInit( pSpriteName, origin );
 	pSprite->GetEngineObject()->SetSolid( SOLID_NONE );
-	UTIL_SetSize( pSprite, vec3_origin, vec3_origin );
+	pSprite->GetEngineObject()->SetSize( vec3_origin, vec3_origin );
 	pSprite->GetEngineObject()->SetMoveType( MOVETYPE_NONE );
 	if ( animate )
 		pSprite->TurnOn();

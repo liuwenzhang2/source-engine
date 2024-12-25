@@ -49,7 +49,6 @@
 extern int giPrecacheGrunt;
 
 // For not just using one big ai net
-extern CBaseEntity*	FindPickerEntity( CBasePlayer* pPlayer );
 
 extern bool IsInCommentaryMode( void );
 
@@ -210,7 +209,7 @@ void Host_Say( CBaseEntity *pEdict, const CCommand &args, bool teamonly )
 	client = NULL;
 	for ( int i = 1; i <= gpGlobals->maxClients; i++ )
 	{
-		client = ToBaseMultiplayerPlayer( UTIL_PlayerByIndex( i ) );
+		client = ToBaseMultiplayerPlayer( EntityList()->GetPlayerByIndex( i ) );
 		if ( !client || client->entindex()==-1 )
 			continue;
 		
@@ -399,7 +398,7 @@ CBaseEntity *GetNextCommandEntity( CBasePlayer *pPlayer, const char *name, CBase
 		if ( ent )
 			return NULL;
 
-		return FindPickerEntity( pPlayer );
+		return EntityList()->FindPickerEntity( pPlayer );
 	}
 
 	int index = atoi( name );
@@ -485,7 +484,7 @@ void ConsoleKillTarget( CBasePlayer *pPlayer, const char *name )
 	// If no name was given use the picker
 	if (FStrEq(name,"")) 
 	{
-		CBaseEntity *pEntity = FindPickerEntity( pPlayer );
+		CBaseEntity *pEntity = EntityList()->FindPickerEntity( pPlayer );
 		if ( pEntity )
 		{
 			EntityList()->DestroyEntity( pEntity );
@@ -643,7 +642,7 @@ void kill_helper( const CCommand &args, bool bExplode )
 		// Find the matching netname
 		for ( int i = 1; i <= gpGlobals->maxClients; i++ )
 		{
-			CBasePlayer *pPlayer = ToBasePlayer( UTIL_PlayerByIndex(i) );
+			CBasePlayer *pPlayer = ToBasePlayer( EntityList()->GetPlayerByIndex(i) );
 			if ( pPlayer )
 			{
 				if ( Q_strstr( pPlayer->GetPlayerName(), args[1] ) )
@@ -688,7 +687,7 @@ void killvector_helper( const CCommand &args, bool bExplode )
 		// Find the matching netname.
 		for ( int iClient = 1; iClient <= gpGlobals->maxClients; iClient++ )
 		{
-			CBasePlayer *pPlayer = ToBasePlayer( UTIL_PlayerByIndex( iClient ) );
+			CBasePlayer *pPlayer = ToBasePlayer( EntityList()->GetPlayerByIndex( iClient ) );
 			if ( pPlayer )
 			{
 				if ( Q_strstr( pPlayer->GetPlayerName(), args[1] ) )
@@ -860,7 +859,7 @@ void CC_Player_SetModel( const CCommand &args )
 		static char szName[256];
 		Q_snprintf( szName, sizeof( szName ), "models/%s.mdl", args[1] );
 		pPlayer->SetModel( szName );
-		UTIL_SetSize(pPlayer, VEC_HULL_MIN, VEC_HULL_MAX);
+		pPlayer->GetEngineObject()->SetSize(VEC_HULL_MIN, VEC_HULL_MAX);
 	}
 }
 static ConCommand setmodel("setmodel", CC_Player_SetModel, "Changes's player's model", FCVAR_CHEAT );
@@ -1479,7 +1478,8 @@ void ClientCommand( CBasePlayer *pPlayer, const CCommand &args )
 	
 	if ( FStrEq( pCmd, "killtarget" ) )
 	{
-		if ( g_pDeveloper->GetBool() && sv_cheats->GetBool() && UTIL_IsCommandIssuedByServerAdmin() )
+		ConVarRef developer("developer");
+		if ( developer.GetBool() && sv_cheats->GetBool() && UTIL_IsCommandIssuedByServerAdmin() )
 		{
 			ConsoleKillTarget( pPlayer, args[1] );
 		}

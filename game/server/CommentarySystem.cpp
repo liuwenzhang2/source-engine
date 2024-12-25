@@ -208,7 +208,7 @@ public:
 		GetEngineObject()->SetMoveType( MOVETYPE_NONE );
 		GetEngineObject()->AddSolidFlags( FSOLID_NOT_SOLID );
 		GetEngineObject()->AddEffects( EF_NOSHADOW );
-		UTIL_SetSize( this, vec3_origin, vec3_origin );
+		GetEngineObject()->SetSize( vec3_origin, vec3_origin );
 	}
 
 	virtual void Precache( void )
@@ -228,12 +228,12 @@ CBasePlayer *GetCommentaryPlayer( void )
 
 	if ( gpGlobals->maxClients <= 1 )
 	{
-		pPlayer = UTIL_GetLocalPlayer();
+		pPlayer = ToBasePlayer(EntityList()->GetLocalPlayer());
 	}
 	else
 	{
 		// only respond to the first player
-		pPlayer = UTIL_PlayerByIndex(1);
+		pPlayer = ToBasePlayer(EntityList()->GetPlayerByIndex(1));
 	}
 
 	return pPlayer;
@@ -890,7 +890,7 @@ void CPointCommentaryNode::Spawn( void )
 
 	Precache();
 	SetModel( szModel );
-	UTIL_SetSize( this, -Vector(16,16,16), Vector(16,16,16) );
+	GetEngineObject()->SetSize( -Vector(16,16,16), Vector(16,16,16) );
 	GetEngineObject()->SetSolid( SOLID_BBOX );
 	GetEngineObject()->AddSolidFlags( FSOLID_CUSTOMRAYTEST | FSOLID_CUSTOMBOXTEST );
 	GetEngineObject()->AddEffects( EF_NOSHADOW );

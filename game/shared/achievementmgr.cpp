@@ -62,8 +62,6 @@ ConVar	sv_nostats( "sv_nostats", "0", FCVAR_REPLICATED | FCVAR_NOTIFY, "Disable 
 
 const char *COM_GetModDirectory();
 
-extern ConVar developer;
-
 #define DEBUG_ACHIEVEMENTS_IN_RELEASE 0
 
 #ifdef SWDS
@@ -1120,6 +1118,7 @@ bool CAchievementMgr::CheckAchievementsEnabled()
 #ifndef NO_STEAM
 			// Cheats get turned on automatically if you run with -dev which many people do internally, so allow cheats if developer is turned on and we're not running
 			// on Steam public
+			ConVarRef developer("developer");
 			if ( developer.GetInt() == 0 || !steamapicontext->SteamUtils() || (k_EUniversePublic == steamapicontext->SteamUtils()->GetConnectedUniverse()) )
 			{
 				Msg( "Achievements disabled: cheats turned on in this app session.\n" );
@@ -1443,9 +1442,9 @@ void CAchievementMgr::FireGameEvent( IGameEvent *event )
 	if ( 0 == Q_strcmp( name, "entity_killed" ) )
 	{
 #ifdef GAME_DLL
-		CBaseEntity *pVictim = UTIL_EntityByIndex( event->GetInt( "entindex_killed", 0 ) );
-		CBaseEntity *pAttacker = UTIL_EntityByIndex( event->GetInt( "entindex_attacker", 0 ) );
-		CBaseEntity *pInflictor = UTIL_EntityByIndex( event->GetInt( "entindex_inflictor", 0 ) );
+		CBaseEntity *pVictim = EntityList()->GetBaseEntity( event->GetInt( "entindex_killed", 0 ) );
+		CBaseEntity *pAttacker = EntityList()->GetBaseEntity( event->GetInt( "entindex_attacker", 0 ) );
+		CBaseEntity *pInflictor = EntityList()->GetBaseEntity( event->GetInt( "entindex_inflictor", 0 ) );
 		OnKillEvent( pVictim, pAttacker, pInflictor, event );
 #endif // GAME_DLL
 	}
@@ -1533,7 +1532,7 @@ void CAchievementMgr::OnKillEvent( CBaseEntity *pVictim, CBaseEntity *pAttacker,
 #ifdef GAME_DLL
 	if ( !g_pGameRules->IsMultiplayer() )
 	{
-		CBasePlayer *pLocalPlayer = UTIL_GetLocalPlayer();
+		CBasePlayer *pLocalPlayer = ToBasePlayer(EntityList()->GetLocalPlayer());
 		if ( pLocalPlayer )
 		{
 			if ( pAttacker == pLocalPlayer )

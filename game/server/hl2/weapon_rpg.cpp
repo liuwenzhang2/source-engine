@@ -158,7 +158,7 @@ void CMissile::Spawn( void )
 
 	GetEngineObject()->SetSolid( SOLID_BBOX );
 	SetModel("models/weapons/w_missile_launch.mdl");
-	UTIL_SetSize( this, -Vector(4,4,4), Vector(4,4,4) );
+	GetEngineObject()->SetSize( -Vector(4,4,4), Vector(4,4,4) );
 
 	SetTouch( &CMissile::MissileTouch );
 
@@ -233,7 +233,7 @@ void CMissile::DumbFire( void )
 	GetEngineObject()->SetMoveType( MOVETYPE_FLY );
 
 	SetModel("models/weapons/w_missile.mdl");
-	UTIL_SetSize( this, vec3_origin, vec3_origin );
+	GetEngineObject()->SetSize( vec3_origin, vec3_origin );
 
 	const char* soundname = "Missile.Ignite";
 	CPASAttenuationFilter filter(this, soundname);
@@ -453,7 +453,7 @@ void CMissile::IgniteThink( void )
 {
 	GetEngineObject()->SetMoveType( MOVETYPE_FLY );
 	SetModel("models/weapons/w_missile.mdl");
-	UTIL_SetSize( this, vec3_origin, vec3_origin );
+	GetEngineObject()->SetSize( vec3_origin, vec3_origin );
 	GetEngineObject()->RemoveSolidFlags( FSOLID_NOT_SOLID );
 
 	//TODO: Play opening sound
@@ -1015,7 +1015,7 @@ void CAPCMissile::Init()
 {
 	GetEngineObject()->SetMoveType( MOVETYPE_FLY );
 	SetModel("models/weapons/w_missile.mdl");
-	UTIL_SetSize( this, vec3_origin, vec3_origin );
+	GetEngineObject()->SetSize( vec3_origin, vec3_origin );
 	CreateSmokeTrail();
 	SetTouch( &CAPCMissile::APCMissileTouch );
 	m_flLastHomingSpeed = APC_HOMING_SPEED;
@@ -2310,7 +2310,7 @@ CLaserDot *CLaserDot::Create( const Vector &origin, CBaseEntity *pOwner, bool bV
 	pLaserDot->GetEngineObject()->SetMoveType( MOVETYPE_NONE );
 	pLaserDot->GetEngineObject()->AddSolidFlags( FSOLID_NOT_SOLID );
 	pLaserDot->GetEngineObject()->AddEffects( EF_NOSHADOW );
-	UTIL_SetSize( pLaserDot, vec3_origin, vec3_origin );
+	pLaserDot->GetEngineObject()->SetSize( vec3_origin, vec3_origin );
 
 	//Create the graphic
 	pLaserDot->SpriteInit( "sprites/redglow1.vmt", origin );

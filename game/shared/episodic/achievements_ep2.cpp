@@ -68,7 +68,7 @@ protected:
 	virtual void Event_EntityKilled( CBaseEntity *pVictim, CBaseEntity *pAttacker, CBaseEntity *pInflictor, IGameEvent *event ) 
 	{
 		// count this if the object is a driveable vehicle and local player is driving
-		CBasePlayer *pLocalPlayer = UTIL_GetLocalPlayer();
+		CBasePlayer *pLocalPlayer = ToBasePlayer(EntityList()->GetLocalPlayer());
 		IDrivableVehicle *pDriveableVehicle = dynamic_cast<IDrivableVehicle *>( pInflictor );
 		if ( pLocalPlayer && pDriveableVehicle && pDriveableVehicle->GetDriver() == pLocalPlayer )
 		{

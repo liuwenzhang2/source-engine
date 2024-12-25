@@ -24,7 +24,7 @@ static void PrefixChanged( IConVar *c, const char *oldPrefix, float flOldValue )
 	{
 		for( int i = 1; i <= gpGlobals->maxClients; ++i )
 		{
-			CBasePlayer *player = static_cast<CBasePlayer *>( UTIL_PlayerByIndex( i ) );
+			CBasePlayer *player = static_cast<CBasePlayer *>( EntityList()->GetPlayerByIndex( i ) );
 
 			if ( !player )
 				continue;

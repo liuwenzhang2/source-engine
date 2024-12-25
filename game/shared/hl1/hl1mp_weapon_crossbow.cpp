@@ -102,7 +102,7 @@ void CCrossbowBolt::Spawn( )
 	Precache( );
 
 	SetModel( BOLT_MODEL );
-	UTIL_SetSize( this, -Vector(1, 1, 1), Vector(1, 1, 1) );
+	GetEngineObject()->SetSize( -Vector(1, 1, 1), Vector(1, 1, 1) );
 
 	GetEngineObject()->SetSolid( SOLID_BBOX );
 	GetEngineObject()->SetMoveType( MOVETYPE_FLYGRAVITY, MOVECOLLIDE_FLY_BOUNCE );

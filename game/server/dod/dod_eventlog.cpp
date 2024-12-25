@@ -376,7 +376,7 @@ protected:
 
 				Assert( iPlayerIndex != '\0' && iPlayerIndex > 0 && iPlayerIndex < MAX_PLAYERS );
 
-				CBasePlayer *pPlayer = UTIL_PlayerByIndex( iPlayerIndex );
+				CBasePlayer *pPlayer = ToBasePlayer(EntityList()->GetPlayerByIndex( iPlayerIndex ));
 
 				if ( i == 0 )
 				{
@@ -406,7 +406,7 @@ protected:
 
 			int iBlocker = event->GetInt( "blocker" );
 
-			CBasePlayer *pPlayer = UTIL_PlayerByIndex( iBlocker );
+			CBasePlayer *pPlayer = ToBasePlayer(EntityList()->GetPlayerByIndex( iBlocker ));
 
 			if ( !pPlayer )
 				return false;

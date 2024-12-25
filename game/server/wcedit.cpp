@@ -76,7 +76,7 @@ bool NWCEdit::IsWCVersionValid(void)
 //------------------------------------------------------------------------------
 Vector NWCEdit::AirNodePlacementPosition( void )
 {
-	CBasePlayer* pPlayer = UTIL_PlayerByIndex(CBaseEntity::m_nDebugPlayer);
+	CBasePlayer* pPlayer = ToBasePlayer(EntityList()->GetPlayerByIndex(CBaseEntity::m_nDebugPlayer));
 
 	if (!pPlayer) 
 	{
@@ -159,7 +159,7 @@ void NWCEdit::CreateAINode( CBasePlayer *pPlayer )
 		CBaseEntity *testHull = (CBaseEntity*)CAI_TestHull::GetTestHull();
 
 		// Set the size of the test hull
-		UTIL_SetSize(testHull, NAI_Hull::Mins(hullType), NAI_Hull::Maxs(hullType));
+		testHull->GetEngineObject()->SetSize(NAI_Hull::Mins(hullType), NAI_Hull::Maxs(hullType));
 
 		// Set origin of test hull
 		testHull->GetEngineObject()->SetLocalOrigin( vNewNodePos );

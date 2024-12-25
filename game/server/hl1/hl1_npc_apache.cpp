@@ -189,7 +189,7 @@ void CNPC_Apache::Spawn( void )
 
 	Vector mins, maxs;
 	ExtractBbox(0, mins, maxs);
-	UTIL_SetSize(this, mins, maxs);
+	GetEngineObject()->SetSize(mins, maxs);
 
 	//GetEngineObject()->SetSurroundingBoundsType( USE_SPECIFIED_BOUNDS, &s_vecSurroundingMins, &s_vecSurroundingMaxs );
 	//AddSolidFlags( FSOLID_CUSTOMRAYTEST | FSOLID_CUSTOMBOXTEST );

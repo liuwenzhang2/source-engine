@@ -311,7 +311,8 @@ bool CAI_BaseNPC::IsScheduleValid()
 	if (!testBits.IsAllClear()) 
 	{
 		// If in developer mode save the interrupt text for debug output
-		if (g_pDeveloper->GetInt()) 
+		ConVarRef developer("developer");
+		if (developer.GetInt()) 
 		{
 			// Reset memory of failed schedule 
 			m_failedSchedule   = NULL;
@@ -572,6 +573,7 @@ void CAI_BaseNPC::MaintainSchedule ( void )
 
 #if defined( VPROF_ENABLED )
 #if defined(DISABLE_DEBUG_HISTORY)
+	ConVarRef developer("developer");
 	bool bDebugTaskNames = ( developer.GetBool() || ( VProfAI() && g_VProfCurrentProfile.IsEnabled() ) );
 #else
 	bool bDebugTaskNames = true;
@@ -3137,10 +3139,10 @@ void CAI_BaseNPC::RunDieTask()
 			// a bit of a hack. If a corpses' bbox is positioned such that being left solid so that it can be attacked will
 			// block the player on a slope or stairs, the corpse is made nonsolid. 
 //					SetSolid( SOLID_NOT );
-			UTIL_SetSize ( this, Vector ( -4, -4, 0 ), Vector ( 4, 4, 1 ) );
+			GetEngineObject()->SetSize ( Vector ( -4, -4, 0 ), Vector ( 4, 4, 1 ) );
 		}
 		else // !!!HACKHACK - put NPC in a thin, wide bounding box until we fix the solid type/bounding volume problem
-			UTIL_SetSize ( this, GetEngineObject()->WorldAlignMins(), Vector (GetEngineObject()->WorldAlignMaxs().x, GetEngineObject()->WorldAlignMaxs().y, GetEngineObject()->WorldAlignMins().z + 1 ) );
+			GetEngineObject()->SetSize ( GetEngineObject()->WorldAlignMins(), Vector (GetEngineObject()->WorldAlignMaxs().x, GetEngineObject()->WorldAlignMaxs().y, GetEngineObject()->WorldAlignMins().z + 1 ) );
 	}
 }
 
@@ -3451,7 +3453,7 @@ void CAI_BaseNPC::RunTask( const Task_t *pTask )
 	case TASK_WAIT_PVS:
 		{
 			if ( ShouldAlwaysThink() || 
-				 UTIL_FindClientInPVS(this) ||
+				EntityList()->FindClientInPVS(this) ||
 				 ( GetState() == NPC_STATE_COMBAT && GetEnemy() && gpGlobals->curtime - GetEnemies()->LastTimeSeen( GetEnemy() ) < 15 ) )
 			{
 				TaskComplete();

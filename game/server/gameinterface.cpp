@@ -325,7 +325,7 @@ CBasePlayer *UTIL_GetCommandClient( void )
 	int idx = UTIL_GetCommandClientIndex();
 	if ( idx > 0 )
 	{
-		return UTIL_PlayerByIndex( idx );
+		return ToBasePlayer(EntityList()->GetPlayerByIndex( idx ));
 	}
 
 	// HLDS console issued command
@@ -360,7 +360,6 @@ bool UTIL_GetModDir( char *lpszTextOut, unsigned int nSize )
 
 extern void InitializeCvars( void );
 
-CBaseEntity*	FindPickerEntity( CBasePlayer* pPlayer );
 CAI_Node*		FindPickerAINode( CBasePlayer* pPlayer, NodeType_e nNodeType );
 CAI_Link*		FindPickerAILink( CBasePlayer* pPlayer );
 float			GetFloorZ(const Vector &origin);
@@ -446,12 +445,12 @@ void DrawAllDebugOverlays( void )
 	// If in debug select mode print the selection entities name or classname
 	if (CBaseEntity::m_bInDebugSelect)
 	{
-		CBasePlayer* pPlayer =  UTIL_PlayerByIndex( CBaseEntity::m_nDebugPlayer );
+		CBasePlayer* pPlayer = ToBasePlayer(EntityList()->GetPlayerByIndex( CBaseEntity::m_nDebugPlayer ));
 
 		if (pPlayer)
 		{
 			// First try to trace a hull to an entity
-			CBaseEntity *pEntity = FindPickerEntity( pPlayer );
+			CBaseEntity *pEntity = EntityList()->FindPickerEntity( pPlayer );
 
 			if ( pEntity ) 
 			{
@@ -472,7 +471,7 @@ void DrawAllDebugOverlays( void )
 	// ------------------------------------------------------------------------
 	if (engine->IsInEditMode())
 	{
-		CBasePlayer* pPlayer = UTIL_PlayerByIndex( CBaseEntity::m_nDebugPlayer );
+		CBasePlayer* pPlayer = ToBasePlayer(EntityList()->GetPlayerByIndex( CBaseEntity::m_nDebugPlayer ));
 		if (pPlayer) 
 		{
 			if (g_pAINetworkManager->GetEditOps()->m_bLinkEditMode)
@@ -546,7 +545,8 @@ void DrawAllDebugOverlays( void )
 	}
 
 	// PERFORMANCE: only do this in developer mode
-	if ( g_pDeveloper->GetInt() && !engine->IsDedicatedServer() )
+	ConVarRef developer("developer");
+	if ( developer.GetInt() && !engine->IsDedicatedServer() )
 	{
 		// iterate through all objects for debug overlays
 		for (CBaseEntity* pEntity = EntityList()->FirstEnt(); pEntity != NULL; pEntity = EntityList()->NextEnt(pEntity)) {
@@ -1196,7 +1196,8 @@ void CServerGameDLL::ServerActivate( IServerEntity *pEdictList, int edictCount, 
 	engine->SetAllowPrecache( false );//CBaseEntity::
 
 	// only display the think limit when the game is run with "developer" mode set
-	if ( !g_pDeveloper->GetInt() )
+	ConVarRef developer("developer");
+	if ( !developer.GetInt() )
 	{
 		think_limit.SetValue( 0 );
 	}
@@ -1417,7 +1418,7 @@ void CServerGameDLL::Think( bool finalTick )
 	if ( m_fAutoSaveDangerousTime != 0.0f && m_fAutoSaveDangerousTime < gpGlobals->curtime )
 	{
 		// The safety timer for a dangerous auto save has expired
-		CBasePlayer *pPlayer = UTIL_PlayerByIndex( 1 );
+		CBasePlayer *pPlayer = ToBasePlayer(EntityList()->GetPlayerByIndex( 1 ));
 
 		if ( pPlayer && ( pPlayer->GetDeathTime() == 0.0f || pPlayer->GetDeathTime() > gpGlobals->curtime )
 			&& !pPlayer->IsSinglePlayerGameEnding()
@@ -2272,7 +2273,7 @@ void CServerGameDLL::InternalEmitCloseCaption(IRecipientFilter& filter, int enti
 			int c = filterCopy.GetRecipientCount();
 			for (int i = c - 1; i >= 0; --i)
 			{
-				CBasePlayer* player = UTIL_PlayerByIndex(filterCopy.GetRecipientIndex(i));
+				CBasePlayer* player = ToBasePlayer(EntityList()->GetPlayerByIndex(filterCopy.GetRecipientIndex(i)));
 				if (!player)
 					continue;
 
@@ -3319,7 +3320,7 @@ void CServerGameClients::ClientSetupVisibility(const IServerEntity *pViewEntity,
 	{
 		org = pPlayer->EyePosition();
 		pPlayer->SetupVisibility( pVE, pvs, pvssize );
-		UTIL_SetClientVisibilityPVS(pPlayer, pvs, pvssize );
+		EntityList()->SetClientVisibilityPVS(pPlayer, pvs, pvssize );
 		fovDistanceAdjustFactor = pPlayer->GetFOVDistanceAdjustFactorForNetworking();
 	}
 
@@ -3541,7 +3542,7 @@ void CServerGameClients::GetBugReportInfo( char *buf, int buflen )
 
 	if ( gpGlobals->maxClients == 1 )
 	{
-		CBaseEntity *ent = FindPickerEntity( UTIL_PlayerByIndex(1) );
+		CBaseEntity *ent = EntityList()->FindPickerEntity(ToBasePlayer(EntityList()->GetPlayerByIndex(1)) );
 		if ( ent )
 		{
 			Q_snprintf( buf, buflen, "Picker %i/%s - ent %s model %s\n",

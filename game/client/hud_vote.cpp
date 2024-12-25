@@ -475,7 +475,7 @@ void CVoteSetupDialog::OnCommand(const char *command)
 						player_info_t playerInfo;
 						if ( engine->GetPlayerInfo( playerIndex, &playerInfo ) )
 						{
-							CBasePlayer *pPlayer = UTIL_PlayerByIndex( playerIndex );
+							CBasePlayer *pPlayer = ToBasePlayer(EntityList()->GetPlayerByIndex( playerIndex ));
 							Q_snprintf( szVoteCommand, sizeof( szVoteCommand ), "callvote %s \"%d %s\"\n;", szIssue, pPlayer->GetUserID(), pReasonString );
 							engine->ClientCmd( szVoteCommand );
 #ifdef TF_CLIENT_DLL
@@ -604,7 +604,7 @@ void CVoteSetupDialog::OnItemSelected( vgui::Panel *panel )
 				int nMaxClients = engine->GetMaxClients();
 				for ( int playerIndex = 1; playerIndex <= nMaxClients; playerIndex++ )
 				{
-					C_BasePlayer *pPlayer = UTIL_PlayerByIndex( playerIndex );
+					C_BasePlayer *pPlayer = ToBasePlayer(EntityList()->GetPlayerByIndex( playerIndex ));
 					if ( !pPlayer )
 						continue;
 
@@ -774,7 +774,7 @@ void CVoteSetupDialog::RefreshIssueParameters()
 					}
 
 					CSteamID steamID;
-					C_BasePlayer* pPlayer = UTIL_PlayerByIndex( playerIndex );
+					C_BasePlayer* pPlayer = ToBasePlayer(EntityList()->GetPlayerByIndex( playerIndex ));
 					if ( pPlayer && pPlayer->GetSteamID( &steamID ) && steamID.GetAccountID() != 0 )
 					{
 						CAvatarImage *pAvatar = new CAvatarImage();
@@ -1156,7 +1156,7 @@ void CHudVote::MsgFunc_VoteStart( bf_read &msg )
 	m_iVoteCallerIdx = msg.ReadByte();
 	if ( m_iVoteCallerIdx != DEDICATED_SERVER )
 	{
-		C_BasePlayer *pVoteCaller = UTIL_PlayerByIndex( m_iVoteCallerIdx );
+		C_BasePlayer *pVoteCaller = ToBasePlayer(EntityList()->GetPlayerByIndex( m_iVoteCallerIdx ));
 		if ( pVoteCaller )
 		{
 			pszCallerName = pVoteCaller->GetPlayerName();
@@ -1608,7 +1608,7 @@ void CHudVote::FireGameEvent( IGameEvent *event )
 	else if ( FStrEq( eventName, "vote_cast" ) )
 	{
 		int iPlayer = event->GetInt( "entityid" );
-		C_BasePlayer *pPlayer = UTIL_PlayerByIndex( iPlayer );
+		C_BasePlayer *pPlayer = ToBasePlayer(EntityList()->GetPlayerByIndex( iPlayer ));
 		if ( pPlayer != pLocalPlayer )
 			return;
 

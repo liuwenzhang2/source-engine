@@ -243,7 +243,7 @@ inline CPortal_Player *ToPortalPlayer( CBaseEntity *pEntity )
 
 inline CPortal_Player *GetPortalPlayer( int iPlayerIndex )
 {
-	return static_cast<CPortal_Player*>( UTIL_PlayerByIndex( iPlayerIndex ) );
+	return static_cast<CPortal_Player*>( EntityList()->GetPlayerByIndex( iPlayerIndex ) );
 }
 
 #endif //PORTAL_PLAYER_H

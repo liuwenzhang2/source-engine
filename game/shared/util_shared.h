@@ -34,9 +34,6 @@ class CGameTrace;
 class CBasePlayer;
 typedef CGameTrace trace_t;
 
-extern ConVar developer;	// developer mode
-
-
 //-----------------------------------------------------------------------------
 // Language IDs.
 //-----------------------------------------------------------------------------
@@ -44,16 +41,6 @@ extern ConVar developer;	// developer mode
 #define LANGUAGE_GERMAN					1
 #define LANGUAGE_FRENCH					2
 #define LANGUAGE_BRITISH				3
-
-
-//-----------------------------------------------------------------------------
-// Pitch + yaw
-//-----------------------------------------------------------------------------
-float		UTIL_VecToYaw			(const Vector &vec);
-float		UTIL_VecToPitch			(const Vector &vec);
-float		UTIL_VecToYaw			(const matrix3x4_t& matrix, const Vector &vec);
-float		UTIL_VecToPitch			(const matrix3x4_t& matrix, const Vector &vec);
-Vector		UTIL_YawToVector		( float yaw );
 
 //-----------------------------------------------------------------------------
 // Shared random number generators for shared/predicted code:
@@ -244,8 +231,6 @@ private:
 // helper
 void DebugDrawLine( const Vector& vecAbsStart, const Vector& vecAbsEnd, int r, int g, int b, bool test, float duration );
 
-extern ConVar r_visualizetraces;
-
 inline void UTIL_TraceLine( const Vector& vecAbsStart, const Vector& vecAbsEnd, unsigned int mask, 
 					 const IHandleEntity *ignore, int collisionGroup, trace_t *ptr )
 {
@@ -255,6 +240,7 @@ inline void UTIL_TraceLine( const Vector& vecAbsStart, const Vector& vecAbsEnd, 
 
 	enginetrace->TraceRay( ray, mask, &traceFilter, ptr );
 
+	ConVarRef r_visualizetraces("r_visualizetraces");
 	if( r_visualizetraces.GetBool() )
 	{
 		DebugDrawLine( ptr->startpos, ptr->endpos, 255, 0, 0, true, -1.0f );
@@ -269,6 +255,7 @@ inline void UTIL_TraceLine( const Vector& vecAbsStart, const Vector& vecAbsEnd, 
 
 	enginetrace->TraceRay( ray, mask, pFilter, ptr );
 
+	ConVarRef r_visualizetraces("r_visualizetraces");
 	if( r_visualizetraces.GetBool() )
 	{
 		DebugDrawLine( ptr->startpos, ptr->endpos, 255, 0, 0, true, -1.0f );
@@ -285,6 +272,7 @@ inline void UTIL_TraceHull( const Vector &vecAbsStart, const Vector &vecAbsEnd, 
 
 	enginetrace->TraceRay( ray, mask, &traceFilter, ptr );
 
+	ConVarRef r_visualizetraces("r_visualizetraces");
 	if( r_visualizetraces.GetBool() )
 	{
 		DebugDrawLine( ptr->startpos, ptr->endpos, 255, 255, 0, true, -1.0f );
@@ -299,6 +287,7 @@ inline void UTIL_TraceHull( const Vector &vecAbsStart, const Vector &vecAbsEnd, 
 
 	enginetrace->TraceRay( ray, mask, pFilter, ptr );
 
+	ConVarRef r_visualizetraces("r_visualizetraces");
 	if( r_visualizetraces.GetBool() )
 	{
 		DebugDrawLine( ptr->startpos, ptr->endpos, 255, 255, 0, true, -1.0f );
@@ -312,6 +301,7 @@ inline void UTIL_TraceRay( const Ray_t &ray, unsigned int mask,
 
 	enginetrace->TraceRay( ray, mask, &traceFilter, ptr );
 	
+	ConVarRef r_visualizetraces("r_visualizetraces");
 	if( r_visualizetraces.GetBool() )
 	{
 		DebugDrawLine( ptr->startpos, ptr->endpos, 255, 0, 0, true, -1.0f );
@@ -358,8 +348,6 @@ void		UTIL_StringToVector( float *pVector, const char *pString );
 void		UTIL_StringToIntArray( int *pVector, int count, const char *pString );
 void		UTIL_StringToFloatArray( float *pVector, int count, const char *pString );
 void		UTIL_StringToColor32( color32 *color, const char *pString );
-
-CBasePlayer *UTIL_PlayerByIndex( int entindex );
 
 //=============================================================================
 // HPE_BEGIN:

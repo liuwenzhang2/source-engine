@@ -803,7 +803,7 @@ void CRagdollProp::FadeOutThink(void)
 		// Necessary to cause it to do the appropriate death cleanup
 		// Yeah, the player may have nothing to do with it, but
 		// passing NULL to TakeDamage causes bad things to happen
-		CBasePlayer *pPlayer = UTIL_GetLocalPlayer();
+		CBasePlayer *pPlayer = ToBasePlayer(EntityList()->GetLocalPlayer());
 		CTakeDamageInfo info( pPlayer, pPlayer, 10000.0, DMG_GENERIC );
 		TakeDamage( info );
 		EntityList()->DestroyEntity( this );

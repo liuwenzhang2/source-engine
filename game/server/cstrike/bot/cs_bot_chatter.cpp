@@ -63,7 +63,7 @@ void BotMeme::Transmit( CCSBot *sender ) const
 {
 	for( int i = 1; i <= gpGlobals->maxClients; i++ )
 	{
-		CBasePlayer *player = static_cast<CBasePlayer *>( UTIL_PlayerByIndex( i ) );
+		CBasePlayer *player = static_cast<CBasePlayer *>( EntityList()->GetPlayerByIndex( i ) );
 
 		if (player == NULL)
 			continue;
@@ -1714,7 +1714,7 @@ BotStatement *BotChatterInterface::GetActiveStatement( void )
 
 	for( int i = 1; i <= gpGlobals->maxClients; i++ )
 	{
-		CBasePlayer *player = static_cast<CBasePlayer *>( UTIL_PlayerByIndex( i ) );
+		CBasePlayer *player = static_cast<CBasePlayer *>( EntityList()->GetPlayerByIndex( i ) );
 
 		if (player == NULL)
 			continue;

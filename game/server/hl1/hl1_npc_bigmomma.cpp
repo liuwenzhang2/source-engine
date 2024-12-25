@@ -395,7 +395,7 @@ void CNPC_BigMomma::Spawn()
 	Precache( );
 
 	SetModel( "models/big_mom.mdl" );
-	UTIL_SetSize( this, Vector( -32, -32, 0 ), Vector( 32, 32, 64 ) );
+	GetEngineObject()->SetSize( Vector( -32, -32, 0 ), Vector( 32, 32, 64 ) );
 
 	Vector vecSurroundingMins( -95, -95, 0 );
 	Vector vecSurroundingMaxs( 95, 95, 190 );
@@ -1165,7 +1165,7 @@ void CBMortar:: Spawn( void )
 		pSprite->SetScale( 2.5f );
 	}
 
-	UTIL_SetSize( this, Vector( 0, 0, 0), Vector(0, 0, 0) );
+	GetEngineObject()->SetSize( Vector( 0, 0, 0), Vector(0, 0, 0) );
 
 	m_maxFrame = (float)modelinfo->GetModelFrameCount(GetEngineObject()->GetModel() ) - 1;
 	m_flDmgTime = gpGlobals->curtime + 0.4;

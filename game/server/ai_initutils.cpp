@@ -114,7 +114,7 @@ void CAI_TestHull::ReturnTestHull(void)
 {
 	CAI_TestHull::pTestHull->bInUse = false;
 	CAI_TestHull::pTestHull->GetEngineObject()->AddSolidFlags( FSOLID_NOT_SOLID );
-	UTIL_SetSize(CAI_TestHull::pTestHull, vec3_origin, vec3_origin);
+	CAI_TestHull::pTestHull->GetEngineObject()->SetSize(vec3_origin, vec3_origin);
 
 	EntityList()->DestroyEntityImmediate( pTestHull );
 	pTestHull = NULL;

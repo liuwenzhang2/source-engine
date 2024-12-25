@@ -682,7 +682,7 @@ public:
 
 	// Methods implemented on both client and server
 public:
-	void							SetSize(const Vector& vecMin, const Vector& vecMax); // UTIL_SetSize( pev, mins, maxs );
+	void							SetSize(const Vector& vecMin, const Vector& vecMax); // GetEngineObject()->SetSize( mins, maxs );
 	char const* GetClassname(void);
 	char const* GetDebugName(void);
 	static int						PrecacheModel(const char* name);

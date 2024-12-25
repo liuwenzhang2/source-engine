@@ -129,7 +129,7 @@ void CAI_AllyManager::CountAllies( int *pTotal, int *pMedics )
 		return;
 	}
 
-	const Vector &	vPlayerPos = UTIL_GetLocalPlayer()->GetEngineObject()->GetAbsOrigin();
+	const Vector &	vPlayerPos = EntityList()->GetLocalPlayer()->GetEngineObject()->GetAbsOrigin();
 	CAI_BaseNPC **	ppAIs 	= g_AI_Manager.AccessAIs();
 	int 			nAIs 	= g_AI_Manager.NumAIs();
 
@@ -146,12 +146,12 @@ void CAI_AllyManager::CountAllies( int *pTotal, int *pMedics )
 				continue;
 			
 			// They only count if I can use them.
-			if( ppAIs[i]->IRelationType( UTIL_GetLocalPlayer() ) != D_LI )
+			if( ppAIs[i]->IRelationType(EntityList()->GetLocalPlayer() ) != D_LI )
 				continue;
 
 			// Skip distant NPCs
 			if ( !ppAIs[i]->IsInPlayerSquad() && 
-				!UTIL_FindClientInPVS( ppAIs[i] ) &&
+				!EntityList()->FindClientInPVS( ppAIs[i] ) &&
 				( ( ppAIs[i]->GetEngineObject()->GetAbsOrigin() - vPlayerPos ).LengthSqr() > 150*12 ||
 				  fabsf( ppAIs[i]->GetEngineObject()->GetAbsOrigin().z - vPlayerPos.z ) > 192 ) )
 				continue;

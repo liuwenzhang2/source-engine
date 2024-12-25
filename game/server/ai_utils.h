@@ -15,6 +15,8 @@
 #pragma once
 #endif
 
+extern CBasePlayer* ToBasePlayer(CBaseEntity* pEntity);
+
 //-----------------------------------------------------------------------------
 //
 // Function to get the local player. AI does not want asserts or warnings,
@@ -29,7 +31,7 @@ inline CBasePlayer *AI_GetSinglePlayer()
 		return NULL;
 	}
 	
-	return UTIL_GetLocalPlayer();
+	return ToBasePlayer(EntityList()->GetLocalPlayer());
 }
 
 inline bool AI_IsSinglePlayer()

@@ -500,7 +500,7 @@ void CNPC_Portal_FloorTurret::Shoot( const Vector &vecSrc, const Vector &vecDirT
 {
 	FireBulletsInfo_t info;
 
-	//if ( !bStrict && GetEnemy() == UTIL_PlayerByIndex( 1 ) )
+	//if ( !bStrict && GetEnemy() == EntityList()->GetPlayerByIndex( 1 ) )
 	CBaseEntity *pEnemy = GetEnemy();
 	if( !bStrict && (pEnemy && pEnemy->IsPlayer()) )
 	{

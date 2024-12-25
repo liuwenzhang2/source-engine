@@ -749,7 +749,7 @@ void CPropJeep::Think(void)
 	BaseClass::Think();
 
 /*
-	CBasePlayer	*pPlayer = UTIL_GetLocalPlayer();
+	CBasePlayer	*pPlayer = ToBasePlayer(EntityList()->GetLocalPlayer());
 
 	if ( m_bEngineLocked )
 	{

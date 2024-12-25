@@ -1564,4 +1564,152 @@ static int s_iPortalSimulatorGUID = 0; //used in standalone function that have n
 #define TABSPACING
 #endif
 
+inline char* UTIL_VarArgs(const char* format, ...)
+{
+	va_list		argptr;
+	static char		string[1024];
+
+	va_start(argptr, format);
+	Q_vsnprintf(string, sizeof(string), format, argptr);
+	va_end(argptr);
+
+	return string;
+}
+
+inline float UTIL_VecToYaw(const Vector& vec)
+{
+	if (vec.y == 0 && vec.x == 0)
+		return 0;
+
+	float yaw = atan2(vec.y, vec.x);
+
+	yaw = RAD2DEG(yaw);
+
+	if (yaw < 0)
+		yaw += 360;
+
+	return yaw;
+}
+
+inline float UTIL_VecToPitch(const Vector& vec)
+{
+	if (vec.y == 0 && vec.x == 0)
+	{
+		if (vec.z < 0)
+			return 180.0;
+		else
+			return -180.0;
+	}
+
+	float dist = vec.Length2D();
+	float pitch = atan2(-vec.z, dist);
+
+	pitch = RAD2DEG(pitch);
+
+	return pitch;
+}
+
+inline float UTIL_VecToYaw(const matrix3x4_t& matrix, const Vector& vec)
+{
+	Vector tmp = vec;
+	VectorNormalize(tmp);
+
+	float x = matrix[0][0] * tmp.x + matrix[1][0] * tmp.y + matrix[2][0] * tmp.z;
+	float y = matrix[0][1] * tmp.x + matrix[1][1] * tmp.y + matrix[2][1] * tmp.z;
+
+	if (x == 0.0f && y == 0.0f)
+		return 0.0f;
+
+	float yaw = atan2(-y, x);
+
+	yaw = RAD2DEG(yaw);
+
+	if (yaw < 0)
+		yaw += 360;
+
+	return yaw;
+}
+
+
+inline float UTIL_VecToPitch(const matrix3x4_t& matrix, const Vector& vec)
+{
+	Vector tmp = vec;
+	VectorNormalize(tmp);
+
+	float x = matrix[0][0] * tmp.x + matrix[1][0] * tmp.y + matrix[2][0] * tmp.z;
+	float z = matrix[0][2] * tmp.x + matrix[1][2] * tmp.y + matrix[2][2] * tmp.z;
+
+	if (x == 0.0f && z == 0.0f)
+		return 0.0f;
+
+	float pitch = atan2(z, x);
+
+	pitch = RAD2DEG(pitch);
+
+	if (pitch < 0)
+		pitch += 360;
+
+	return pitch;
+}
+
+inline Vector UTIL_YawToVector(float yaw)
+{
+	Vector ret;
+
+	ret.z = 0;
+	float angle = DEG2RAD(yaw);
+	SinCos(angle, &ret.y, &ret.x);
+
+	return ret;
+}
+
+class EntityMatrix : public VMatrix
+{
+public:
+	void InitFromEntity(CBaseEntity* pEntity, int iAttachment = 0);
+	void InitFromEntityLocal(CBaseEntity* entity);
+
+	inline Vector LocalToWorld(const Vector& vVec) const
+	{
+		return VMul4x3(vVec);
+	}
+
+	inline Vector WorldToLocal(const Vector& vVec) const
+	{
+		return VMul4x3Transpose(vVec);
+	}
+
+	inline Vector LocalToWorldRotation(const Vector& vVec) const
+	{
+		return VMul3x3(vVec);
+	}
+
+	inline Vector WorldToLocalRotation(const Vector& vVec) const
+	{
+		return VMul3x3Transpose(vVec);
+	}
+};
+
+//-----------------------------------------------------------------------------
+// Purpose: Convert angles to -180 t 180 range
+// Input  : angles - 
+//-----------------------------------------------------------------------------
+inline void NormalizeAngles(QAngle& angles)
+{
+	int i;
+
+	// Normalize angles to -180 to 180 range
+	for (i = 0; i < 3; i++)
+	{
+		if (angles[i] > 180.0)
+		{
+			angles[i] -= 360.0;
+		}
+		else if (angles[i] < -180.0)
+		{
+			angles[i] += 360.0;
+		}
+	}
+}
+
 #endif // ENTITYLIST_BASE_H

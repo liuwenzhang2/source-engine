@@ -42,7 +42,7 @@ CON_COMMAND(soundscape_flush, "Flushes the server & client side soundscapes")
 		// If the ds console typed it, send it to everyone.
 		for ( int i = 1; i <= gpGlobals->maxClients; i++ )
 		{
-			CBasePlayer	*pSendToPlayer = UTIL_PlayerByIndex( i );
+			CBasePlayer	*pSendToPlayer = ToBasePlayer(EntityList()->GetPlayerByIndex( i ));
 			if ( pSendToPlayer )
 				engine->ClientCommand( pSendToPlayer->entindex(), "cl_soundscape_flush\n" );
 		}
@@ -70,7 +70,8 @@ void CSoundscapeSystem::AddSoundscapeFile( const char *filename )
 		{
 			if ( pKeys->GetFirstSubKey() )
 			{
-				if ( g_pDeveloper->GetBool() )
+				ConVarRef developer("developer");
+				if ( developer.GetBool() )
 				{
 					if ( strstr( pKeys->GetName(), "{" ) )
 					{
@@ -317,7 +318,7 @@ void CSoundscapeSystem::FrameUpdatePostEntityThink()
 		for ( int i = 0; i < gpGlobals->maxClients && traceCount <= maxTraces && playerCount <= maxPlayers; i++ )
 		{
 			m_activeIndex = (m_activeIndex+1) % gpGlobals->maxClients;
-			CBasePlayer *pPlayer = UTIL_PlayerByIndex( m_activeIndex + 1 );
+			CBasePlayer *pPlayer = ToBasePlayer(EntityList()->GetPlayerByIndex( m_activeIndex + 1 ));
 			if ( pPlayer && pPlayer->IsNetClient() )
 			{
 				// check to see if this is the sound entity that is 

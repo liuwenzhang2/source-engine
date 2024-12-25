@@ -369,7 +369,7 @@ void CVGuiScreen::SetActualSize( float flWidth, float flHeight )
 	else
 		mins.y = flHeight;
 
-	UTIL_SetSize( this, mins, maxs );
+	GetEngineObject()->SetSize( mins, maxs );
 }
 
 //-----------------------------------------------------------------------------

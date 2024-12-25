@@ -162,7 +162,7 @@ void CNPC_EnemyFinder::Spawn( void )
 
 	SetModel( "models/player.mdl" );
 	// This is a dummy model that is never used!
-	UTIL_SetSize(this, vec3_origin, vec3_origin);
+	GetEngineObject()->SetSize(vec3_origin, vec3_origin);
 
 	GetEngineObject()->SetMoveType( MOVETYPE_NONE );
 	SetBloodColor( DONT_BLEED );
@@ -346,7 +346,7 @@ void CNPC_EnemyFinder::StartNPC ( void )
 
 	if ( AI_IsSinglePlayer() && m_PlayerFreePass.GetParams().duration > 0.1 )
 	{
-		m_PlayerFreePass.SetPassTarget( UTIL_PlayerByIndex(1) );
+		m_PlayerFreePass.SetPassTarget( EntityList()->GetPlayerByIndex(1) );
 
 		AI_FreePassParams_t freePassParams = m_PlayerFreePass.GetParams();
 

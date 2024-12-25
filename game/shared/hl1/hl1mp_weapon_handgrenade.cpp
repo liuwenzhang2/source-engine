@@ -55,7 +55,7 @@ void CHandGrenade::Spawn( void )
 
 	SetModel( HANDGRENADE_MODEL ); 
 
-	UTIL_SetSize( this, Vector( 0, 0, 0 ), Vector( 0, 0, 0 ) );
+	GetEngineObject()->SetSize( Vector( 0, 0, 0 ), Vector( 0, 0, 0 ) );
 
 	m_bHasWarnedAI = false;
 }

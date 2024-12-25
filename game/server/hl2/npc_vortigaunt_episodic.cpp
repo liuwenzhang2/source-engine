@@ -3176,7 +3176,7 @@ void CVortigauntChargeToken::Spawn( void )
 	Precache();
 
 	// Point-sized
-	UTIL_SetSize( this, -Vector(1,1,1), Vector(1,1,1) );
+	GetEngineObject()->SetSize( -Vector(1,1,1), Vector(1,1,1) );
 
 	GetEngineObject()->SetMoveType( MOVETYPE_FLY );
 	GetEngineObject()->SetSolid( SOLID_BBOX );
@@ -3379,7 +3379,7 @@ void CVortigauntEffectDispel::Spawn( void )
 {
 	Precache();
 
-	UTIL_SetSize( this, Vector( -8, -8, -8 ), Vector( 8, 8, 8 ) );
+	GetEngineObject()->SetSize( Vector( -8, -8, -8 ), Vector( 8, 8, 8 ) );
 
 	GetEngineObject()->SetSolid( SOLID_BBOX );
 	GetEngineObject()->SetSolidFlags( FSOLID_NOT_SOLID );

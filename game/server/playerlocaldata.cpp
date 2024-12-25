@@ -245,7 +245,7 @@ void UpdateAllClientData( void )
 
 	for ( i = 1; i <= gpGlobals->maxClients; i++ )
 	{
-		pl = ( CBasePlayer * )UTIL_PlayerByIndex( i );
+		pl = ( CBasePlayer * )EntityList()->GetPlayerByIndex( i );
 		if ( !pl )
 			continue;
 

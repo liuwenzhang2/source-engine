@@ -291,10 +291,10 @@ void CNPC_Nihilanth::Spawn( void )
 	GetEngineObject()->SetSolid( SOLID_BBOX );
 
 	SetModel( "models/nihilanth.mdl" );
-	//UTIL_SetSize( this, Vector( -300, -300, 0), Vector(300, 300, 512));
-	//UTIL_SetSize(this, Vector( -32, -32, 0), Vector(32, 32, 64 ));
+	//GetEngineObject()->SetSize(Vector( -300, -300, 0), Vector(300, 300, 512));
+	//GetEngineObject()->SetSize(Vector( -32, -32, 0), Vector(32, 32, 64 ));
 
-	UTIL_SetSize(this, Vector( -16 * N_SCALE, -16 * N_SCALE, -48 * N_SCALE ), Vector( 16 * N_SCALE, 16 * N_SCALE, 28 * N_SCALE ) );
+	GetEngineObject()->SetSize(Vector( -16 * N_SCALE, -16 * N_SCALE, -48 * N_SCALE ), Vector( 16 * N_SCALE, 16 * N_SCALE, 28 * N_SCALE ) );
 	
 	Vector vecSurroundingMins( -16 * N_SCALE, -16 * N_SCALE, -48 * N_SCALE );
 	Vector vecSurroundingMaxs( 16 * N_SCALE, 16 * N_SCALE, 28 * N_SCALE );
@@ -1296,7 +1296,7 @@ void CNihilanthHVR::CircleInit( CBaseEntity *pTarget )
 	GetEngineObject()->SetMoveType( MOVETYPE_FLY );
 	GetEngineObject()->SetSolid( SOLID_NONE );
 
-	UTIL_SetSize( this, Vector( 0, 0, 0), Vector(0, 0, 0));
+	GetEngineObject()->SetSize(Vector( 0, 0, 0), Vector(0, 0, 0));
 	UTIL_SetOrigin( this, GetEngineObject()->GetAbsOrigin() );
 
 	SetThink( &CNihilanthHVR::HoverThink );

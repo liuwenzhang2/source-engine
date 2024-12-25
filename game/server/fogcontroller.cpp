@@ -381,7 +381,7 @@ void CFogSystem::LevelInitPostEntity( void )
 	// is called, or we could just do this in the player itself.
 	if ( gpGlobals->maxClients == 1 )
 	{
-		CBasePlayer *pPlayer = UTIL_GetLocalPlayer();
+		CBasePlayer *pPlayer = ToBasePlayer(EntityList()->GetLocalPlayer());
 		if ( pPlayer && ( pPlayer->m_Local.m_PlayerFog.m_hCtrl.Get() == NULL ) )
 		{
 			pPlayer->InitFogController();

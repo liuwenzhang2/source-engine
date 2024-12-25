@@ -483,7 +483,7 @@ const char *CTeamplayRules::TeamWithFewestPlayers( void )
 	// loop through all clients, count number of players on each team
 	for ( i = 1; i <= gpGlobals->maxClients; i++ )
 	{
-		CBaseEntity *plr = UTIL_PlayerByIndex( i );
+		CBaseEntity *plr = EntityList()->GetPlayerByIndex( i );
 
 		if ( plr )
 		{
@@ -544,7 +544,7 @@ void CTeamplayRules::RecountTeams( void )
 	// loop through all clients
 	for ( int i = 1; i <= gpGlobals->maxClients; i++ )
 	{
-		CBasePlayer *plr = UTIL_PlayerByIndex( i );
+		CBasePlayer *plr = ToBasePlayer(EntityList()->GetPlayerByIndex( i ));
 
 		if ( plr )
 		{

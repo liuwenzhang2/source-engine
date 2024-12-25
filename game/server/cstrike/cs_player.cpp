@@ -105,7 +105,7 @@ static void SvNoMVPChangeCallback( IConVar *pConVar, const char *pOldValue, floa
 		// Clear the MVPs of all players when MVP is turned off.
 		for ( int i = 1; i <= MAX_PLAYERS; i++ )
 		{
-			CCSPlayer *pPlayer = ToCSPlayer( UTIL_PlayerByIndex( i ) );
+			CCSPlayer *pPlayer = ToCSPlayer( EntityList()->GetPlayerByIndex( i ) );
 
 			if ( pPlayer )
 			{
@@ -718,7 +718,7 @@ bool CCSPlayer::RunMimicCommand( CUserCmd& cmd )
 	if ( iMimic > gpGlobals->maxClients )
 		return false;
 
-	CBasePlayer *pPlayer = UTIL_PlayerByIndex( iMimic );
+	CBasePlayer *pPlayer = ToBasePlayer(EntityList()->GetPlayerByIndex( iMimic ));
 	if ( !pPlayer )
 		return false;
 
@@ -1316,7 +1316,7 @@ void CCSPlayer::Event_Killed( const CTakeDamageInfo &info )
 
 		for ( int i = 1; i <= gpGlobals->maxClients; i++ )
 		{
-			CCSPlayer* pPlayer = ToCSPlayer( UTIL_PlayerByIndex( i ) );
+			CCSPlayer* pPlayer = ToCSPlayer( EntityList()->GetPlayerByIndex( i ) );
 			if ( pPlayer )
 			{
 				// only consider players on the winning team
@@ -1578,7 +1578,7 @@ void CCSPlayer::UpdateRadar()
 
 	for ( int i=0; i < MAX_PLAYERS; i++ )
 	{
-		CCSPlayer *pPlayer = ToCSPlayer( UTIL_PlayerByIndex( i+1 ) );
+		CCSPlayer *pPlayer = ToCSPlayer( EntityList()->GetPlayerByIndex( i+1 ) );
 
 		if ( !pPlayer )
 			continue; // nothing there
@@ -1978,7 +1978,7 @@ int CCSPlayer::OnTakeDamage( const CTakeDamageInfo &inputInfo )
 				Msg( "%s attacked a teammate\n", pCSAttacker->GetPlayerName() );
 				for ( int i=1; i<=gpGlobals->maxClients; ++i )
 				{
-					CBasePlayer *pPlayer = UTIL_PlayerByIndex( i );
+					CBasePlayer *pPlayer = ToBasePlayer(EntityList()->GetPlayerByIndex( i ));
 					if ( pPlayer && pPlayer->GetTeamNumber() == GetTeamNumber()	)
 					{
 						ClientPrint( pPlayer, HUD_PRINTTALK, "#Game_teammate_attack", pCSAttacker->GetPlayerName() );
@@ -2873,7 +2873,7 @@ void CCSPlayer::MoveToNextIntroCamera()
 		m_pIntroCamera = EntityList()->FindEntityByClassname(m_pIntroCamera, "info_player_terrorist");
 
 	SetViewOffset( vec3_origin );	// no view offset
-	UTIL_SetSize( this, vec3_origin, vec3_origin ); // no bbox
+	GetEngineObject()->SetSize( vec3_origin, vec3_origin ); // no bbox
 
 	if( !Target ) //if there are no cameras(or the camera has no target, find a spawn point and black out the screen
 	{
@@ -2926,7 +2926,7 @@ CON_COMMAND( cs_make_vip, "Marks a player as the VIP" )
 		return;
 	}
 
-	CCSPlayer *player = static_cast< CCSPlayer * >(UTIL_PlayerByIndex( atoi( args[1] ) ));
+	CCSPlayer *player = static_cast< CCSPlayer * >(EntityList()->GetPlayerByIndex( atoi( args[1] ) ));
 	if ( !player )
 	{
 		// Invalid value clears out VIP
@@ -4076,7 +4076,7 @@ void CCSPlayer::ConstructRadioFilter( CRecipientFilter& filter )
 	int i;
 	for ( i = 1; i <= gpGlobals->maxClients; ++i )
 	{
-		CCSPlayer *player = static_cast<CCSPlayer *>( UTIL_PlayerByIndex( i ) );
+		CCSPlayer *player = static_cast<CCSPlayer *>( EntityList()->GetPlayerByIndex( i ) );
 		if ( !player )
 			continue;
 
@@ -4140,7 +4140,7 @@ void CCSPlayer::ListPlayers()
 	char buf[64];
 	for ( int i=1; i <= gpGlobals->maxClients; i++ )
 	{
-		CCSPlayer *pPlayer = dynamic_cast< CCSPlayer* >( UTIL_PlayerByIndex( i ) );
+		CCSPlayer *pPlayer = dynamic_cast< CCSPlayer* >( EntityList()->GetPlayerByIndex( i ) );
 		if ( pPlayer && !pPlayer->IsDormant() )
 		{
 			if ( pPlayer->IsBot() )
@@ -4451,7 +4451,7 @@ bool CCSPlayer::ClientCommand( const CCommand &args )
 	{
 		for ( int i=1; i <= gpGlobals->maxClients; i++ )
 		{
-			CCSPlayer *pPlayer = dynamic_cast< CCSPlayer* >( UTIL_PlayerByIndex( i ) );
+			CCSPlayer *pPlayer = dynamic_cast< CCSPlayer* >( EntityList()->GetPlayerByIndex( i ) );
 			if ( pPlayer && pPlayer != this && ( pPlayer->GetFlags() & FL_FAKECLIENT ) )
 			{
 				pPlayer->ClientCommand( pcmd );
@@ -4464,7 +4464,7 @@ bool CCSPlayer::ClientCommand( const CCommand &args )
 
 	if ( FStrEq( pcmd, "bot_cmd" ) )
 	{
-		CCSPlayer *pPlayer = dynamic_cast< CCSPlayer* >( UTIL_PlayerByIndex( atoi( args[1] ) ) );
+		CCSPlayer *pPlayer = dynamic_cast< CCSPlayer* >( EntityList()->GetPlayerByIndex( atoi( args[1] ) ) );
 		if ( pPlayer && pPlayer != this && ( pPlayer->GetEngineObject()->GetFlags() & FL_FAKECLIENT ) )
 		{
 			CCommand botArgs( args.ArgC() - 2, &args.ArgV()[2] );
@@ -7765,7 +7765,7 @@ void CCSPlayer::ProcessPlayerDeathAchievements( CCSPlayer *pAttacker, CCSPlayer 
 				//Now find the player who did that amount of damage
 				for ( int j = 1; j <= MAX_PLAYERS; j++ )
 				{
-					CBasePlayer *pPlayerIter = UTIL_PlayerByIndex( j );
+					CBasePlayer *pPlayerIter = ToBasePlayer(EntityList()->GetPlayerByIndex( j ));
 
 					if ( pPlayerIter && Q_strncmp( pPlayerIter->GetPlayerName(), pVictim->m_DamageTakenList[i]->GetPlayerName(), MAX_PLAYER_NAME_LENGTH ) == 0  &&
 						pPlayerIter->GetTeamNumber() != pVictim->GetTeamNumber() )
@@ -7996,7 +7996,7 @@ void CCSPlayer::ProcessPlayerDeathAchievements( CCSPlayer *pAttacker, CCSPlayer 
 	CCSPlayer *pAlivePlayer = NULL;
 	for ( int i = 1; i <= gpGlobals->maxClients; i++ )
 	{
-		CCSPlayer* pPlayer = (CCSPlayer*)UTIL_PlayerByIndex( i );
+		CCSPlayer* pPlayer = (CCSPlayer*)EntityList()->GetPlayerByIndex( i );
 		if (pPlayer)
 		{
 			int teamNum = pPlayer->GetTeamNumber();
@@ -8075,7 +8075,7 @@ void CCSPlayer::OnRoundEnd(int winningTeam, int reason)
 			int ignoreCount = 0;
 			for ( int i = 1; i <= gpGlobals->maxClients; i++ )
 			{
-				CCSPlayer* pPlayer = (CCSPlayer*)UTIL_PlayerByIndex( i );
+				CCSPlayer* pPlayer = (CCSPlayer*)EntityList()->GetPlayerByIndex( i );
 				if (pPlayer)
 				{
 					int teamNum = pPlayer->GetTeamNumber();
@@ -8283,7 +8283,7 @@ void CCSPlayer::RemoveNemesisRelationships()
 {
 	for ( int i = 1 ; i <= gpGlobals->maxClients ; i++ )
 	{
-		CCSPlayer *pTemp = ToCSPlayer( UTIL_PlayerByIndex( i ) );
+		CCSPlayer *pTemp = ToCSPlayer( EntityList()->GetPlayerByIndex( i ) );
 		if ( pTemp && pTemp != this )
 		{        
 			// set this player to be not dominating anyone else
@@ -8322,7 +8322,7 @@ int CCSPlayer::GetNumEnemyDamagers()
 	{
 		for ( int j = 1; j <= MAX_PLAYERS; j++ )
 		{
-			CBasePlayer *pPlayer = UTIL_PlayerByIndex( j );
+			CBasePlayer *pPlayer = ToBasePlayer(EntityList()->GetPlayerByIndex( j ));
 
 			if ( pPlayer && V_strncmp( pPlayer->GetPlayerName(), m_DamageTakenList[i]->GetPlayerName(), MAX_PLAYER_NAME_LENGTH ) == 0  &&
 				pPlayer->GetTeamNumber() != GetTeamNumber() )
@@ -8342,7 +8342,7 @@ int CCSPlayer::GetNumEnemiesDamaged()
 	{
 		for ( int j = 1; j <= MAX_PLAYERS; j++ )
 		{
-			CBasePlayer *pPlayer = UTIL_PlayerByIndex( j );
+			CBasePlayer *pPlayer = ToBasePlayer(EntityList()->GetPlayerByIndex( j ));
 
 			if ( pPlayer && V_strncmp( pPlayer->GetPlayerName(), m_DamageGivenList[i]->GetPlayerName(), MAX_PLAYER_NAME_LENGTH ) == 0  &&
 				pPlayer->GetTeamNumber() != GetTeamNumber() )
@@ -8362,7 +8362,7 @@ void UTIL_AwardMoneyToTeam( int iAmount, int iTeam, CBaseEntity *pIgnore )
 {
 	for ( int i = 1; i <= gpGlobals->maxClients; i++ )
 	{
-		CCSPlayer *pPlayer = (CCSPlayer*) UTIL_PlayerByIndex( i );
+		CCSPlayer *pPlayer = (CCSPlayer*) EntityList()->GetPlayerByIndex( i );
 
 		if ( !pPlayer )
 			continue;

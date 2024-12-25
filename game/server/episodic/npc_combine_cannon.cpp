@@ -577,7 +577,7 @@ void CNPC_Combine_Cannon::Spawn( void )
 	SetHullType( HULL_HUMAN );
 	SetHullSizeNormal();
 
-	UTIL_SetSize( this, Vector( -16, -16 , 0 ), Vector( 16, 16, 64 ) );
+	GetEngineObject()->SetSize( Vector( -16, -16 , 0 ), Vector( 16, 16, 64 ) );
 
 	GetEngineObject()->SetSolid( SOLID_BBOX );
 	GetEngineObject()->AddSolidFlags( FSOLID_NOT_STANDABLE );

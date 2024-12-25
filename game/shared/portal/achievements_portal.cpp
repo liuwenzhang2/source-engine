@@ -71,7 +71,7 @@ protected:
 		{
 			if ( m_bIsFlinging )
 			{
-				CBasePlayer *pLocalPlayer = UTIL_GetLocalPlayer();
+				CBasePlayer *pLocalPlayer = ToBasePlayer(EntityList()->GetLocalPlayer());
 
 				if ( pLocalPlayer )
 				{
@@ -156,7 +156,7 @@ protected:
 		{
 			if ( m_bIsFlinging )
 			{
-				CBasePlayer *pLocalPlayer = UTIL_GetLocalPlayer();
+				CBasePlayer *pLocalPlayer = ToBasePlayer(EntityList()->GetLocalPlayer());
 
 				if ( pLocalPlayer )
 				{

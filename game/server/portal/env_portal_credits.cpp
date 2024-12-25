@@ -101,7 +101,7 @@ void CPortalCredits::RollOutroCredits()
 {
 	sv_unlockedchapters.SetValue( "15" );
 	
-	CBasePlayer *pPlayer = UTIL_GetLocalPlayer();
+	CBasePlayer *pPlayer = ToBasePlayer(EntityList()->GetLocalPlayer());
 
 	CSingleUserRecipientFilter user( pPlayer );
 	user.MakeReliable();
@@ -125,7 +125,7 @@ void CPortalCredits::RollPortalOutroCredits()
 {
 	sv_unlockedchapters.SetValue( "15" );
 	
-	CBasePlayer *pPlayer = UTIL_GetLocalPlayer();
+	CBasePlayer *pPlayer = ToBasePlayer(EntityList()->GetLocalPlayer());
 
 	CSingleUserRecipientFilter user( pPlayer );
 	user.MakeReliable();
@@ -148,7 +148,7 @@ void CPortalCredits::InputRollPortalOutroCredits( inputdata_t &inputdata )
 
 void CPortalCredits::InputShowLogo( inputdata_t &inputdata )
 {
-	CBasePlayer *pPlayer = UTIL_GetLocalPlayer();
+	CBasePlayer *pPlayer = ToBasePlayer(EntityList()->GetLocalPlayer());
 
 	CSingleUserRecipientFilter user( pPlayer );
 	user.MakeReliable();
@@ -175,7 +175,7 @@ void CPortalCredits::InputSetLogoLength( inputdata_t &inputdata )
 
 void CPortalCredits::InputRollCredits( inputdata_t &inputdata )
 {
-	CBasePlayer *pPlayer = UTIL_GetLocalPlayer();
+	CBasePlayer *pPlayer = ToBasePlayer(EntityList()->GetLocalPlayer());
 
 	CSingleUserRecipientFilter user( pPlayer );
 	user.MakeReliable();

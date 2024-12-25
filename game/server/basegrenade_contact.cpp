@@ -34,7 +34,7 @@ void CBaseGrenadeContact::Spawn( void )
 	GetEngineObject()->SetCollisionGroup( COLLISION_GROUP_PROJECTILE );
 	SetModel( "models/weapons/w_grenade.mdl" );	// BUG: wrong model
 
-	UTIL_SetSize(this, vec3_origin, vec3_origin);
+	GetEngineObject()->SetSize(vec3_origin, vec3_origin);
 
 	// contact grenades arc lower
 	GetEngineObject()->SetGravity( UTIL_ScaleForGravity( 400 ) );	// use a lower gravity for grenades to make them easier to see

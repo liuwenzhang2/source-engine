@@ -400,7 +400,7 @@ void CAI_PassengerBehaviorCompanion::UpdateStuckStatus( void )
 	bool bVisibleToPlayer = false;
 	bool bPlayerInVehicle = false;
 
-	CBasePlayer *pPlayer = UTIL_PlayerByIndex( 1 );
+	CBasePlayer *pPlayer = ToBasePlayer(EntityList()->GetPlayerByIndex( 1 ));
 	if ( pPlayer )
 	{
 		bVisibleToPlayer = pPlayer->FInViewCone( GetOuter()->GetEngineObject()->GetAbsOrigin() );

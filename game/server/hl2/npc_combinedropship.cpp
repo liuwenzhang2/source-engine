@@ -983,12 +983,12 @@ void CNPC_CombineDropship::Spawn( void )
 	// Setup our bbox
 	if ( m_hContainer )
 	{
-		UTIL_SetSize( this, DROPSHIP_BBOX_CRATE_MIN, DROPSHIP_BBOX_CRATE_MAX );
+		GetEngineObject()->SetSize( DROPSHIP_BBOX_CRATE_MIN, DROPSHIP_BBOX_CRATE_MAX );
 		SetIdealActivity( (Activity)ACT_DROPSHIP_FLY_IDLE_CARGO );
 	}
 	else
 	{
-		UTIL_SetSize( this, DROPSHIP_BBOX_MIN, DROPSHIP_BBOX_MAX );
+		GetEngineObject()->SetSize( DROPSHIP_BBOX_MIN, DROPSHIP_BBOX_MAX );
 		SetIdealActivity( (Activity)ACT_DROPSHIP_FLY_IDLE_EXAGG );
 	}
 
@@ -1553,7 +1553,7 @@ void CNPC_CombineDropship::UpdateRotorWashVolume( CSoundPatch *pRotorSound, floa
 void CNPC_CombineDropship::UpdateRotorWashVolume()
 {
 	float flNearFactor = 0.0f; 
-	CBaseEntity *pPlayer = UTIL_PlayerByIndex( 1 );
+	CBaseEntity *pPlayer = EntityList()->GetPlayerByIndex( 1 );
 	if (pPlayer)
 	{
 		float flDist = pPlayer->GetEngineObject()->GetAbsOrigin().DistTo(GetEngineObject()->GetAbsOrigin() );
@@ -1759,7 +1759,7 @@ void CNPC_CombineDropship::InputDropAPC( inputdata_t &inputdata )
 		pPhysicsObject->RemoveShadowController();
 	}
 
-	UTIL_SetSize( this, DROPSHIP_BBOX_MIN, DROPSHIP_BBOX_MAX );
+	GetEngineObject()->SetSize( DROPSHIP_BBOX_MIN, DROPSHIP_BBOX_MAX );
 
 	m_hContainer = NULL;
 	m_OnFinishedDropoff.FireOutput( this, this );
@@ -1801,7 +1801,7 @@ void CNPC_CombineDropship::DropSoldierContainer( )
 		pPhysicsObject->SetVelocity( &vecAbsVelocity, &vec3_origin );
 	}
 
-	UTIL_SetSize( this, DROPSHIP_BBOX_MIN, DROPSHIP_BBOX_MAX );
+	GetEngineObject()->SetSize( DROPSHIP_BBOX_MIN, DROPSHIP_BBOX_MAX );
 
 	m_hContainer = NULL;
 	SetLandingState( LANDING_NO );
@@ -2243,7 +2243,7 @@ void CNPC_CombineDropship::PrescheduleThink( void )
 						}
 
 						m_hContainer = NULL;
-						UTIL_SetSize( this, DROPSHIP_BBOX_MIN, DROPSHIP_BBOX_MAX );
+						GetEngineObject()->SetSize( DROPSHIP_BBOX_MIN, DROPSHIP_BBOX_MAX );
 					}
 				}
 				else if ( (m_flTimeTakeOff - gpGlobals->curtime) < 0.5f )

@@ -793,7 +793,7 @@ void CCSMapOverview::UpdatePlayers()
 
 		Vector position = player->position;
 		QAngle angles = player->angle;
-		C_BasePlayer *pPlayer = UTIL_PlayerByIndex( i );
+		C_BasePlayer *pPlayer = ToBasePlayer(EntityList()->GetPlayerByIndex( i ));
 		if ( pPlayer && !pPlayer->IsDormant() )
 		{
 			// update position of active players in our PVS
@@ -851,7 +851,7 @@ void CCSMapOverview::UpdatePlayers()
 		{
 			MapPlayer_t *player = &m_Players[i-1];
 			CSMapPlayer_t *playerCS = GetCSInfoForPlayerIndex(i-1);
-			C_BasePlayer *pPlayer = UTIL_PlayerByIndex( i );
+			C_BasePlayer *pPlayer = ToBasePlayer(EntityList()->GetPlayerByIndex( i ));
 
 			if ( !pPlayer || !playerCS )
 				continue;
@@ -995,7 +995,7 @@ void CCSMapOverview::UpdateBomb()
 		{
 			if( pCSPR->HasC4(i) )
 			{
-				C_BasePlayer *pPlayer = UTIL_PlayerByIndex( i );
+				C_BasePlayer *pPlayer = ToBasePlayer(EntityList()->GetPlayerByIndex( i ));
 				if( pPlayer == NULL  ||  pPlayer->IsDormant() )
 				{
 					// Dormant or no player means we are relying on RadarUpdate messages so we can trust the MapOverview position.
@@ -1087,7 +1087,7 @@ CCSMapOverview::MapPlayer_t* CCSMapOverview::GetHostageByEntityID( int entityID 
 
 CCSMapOverview::MapPlayer_t* CCSMapOverview::GetPlayerByEntityID( int entityID )
 {
-	C_BasePlayer *realPlayer = UTIL_PlayerByIndex(entityID);
+	C_BasePlayer *realPlayer = ToBasePlayer(EntityList()->GetPlayerByIndex(entityID));
 
 	if( realPlayer == NULL )
 		return NULL;

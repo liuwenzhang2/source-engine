@@ -1694,7 +1694,7 @@ public:
 
 // Methods shared by client and server
 public:
-	void							SetSize( const Vector &vecMin, const Vector &vecMax ); // UTIL_SetSize( this, mins, maxs );
+	void							SetSize( const Vector &vecMin, const Vector &vecMax ); // GetEngineObject()->SetSize( mins, maxs );
 	//static int						PrecacheModel( const char *name, bool bPreload = true ); 
 	//static bool						PrecacheSound( const char *name );
 	//static void						PrefetchSound( const char *name );

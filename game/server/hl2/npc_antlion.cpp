@@ -373,7 +373,7 @@ void CNPC_Antlion::Activate( void )
 		// Handle all clients
 		for ( int i = 1; i <= gpGlobals->maxClients; i++ )
 		{
-			CBasePlayer *pPlayer = UTIL_PlayerByIndex( i );
+			CBasePlayer *pPlayer = ToBasePlayer(EntityList()->GetPlayerByIndex( i ));
 
 			if ( pPlayer != NULL )
 			{

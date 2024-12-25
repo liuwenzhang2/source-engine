@@ -43,8 +43,8 @@ void CGrenadeMP5::Spawn( void )
 	GetEngineObject()->AddFlag( FL_GRENADE );
 
 	SetModel( "models/grenade.mdl" );
-	//UTIL_SetSize(this, Vector(-3, -3, -3), Vector(3, 3, 3));
-	UTIL_SetSize(this, Vector(0, 0, 0), Vector(0, 0, 0));
+	//GetEngineObject()->SetSize(Vector(-3, -3, -3), Vector(3, 3, 3));
+	GetEngineObject()->SetSize(Vector(0, 0, 0), Vector(0, 0, 0));
 
 	SetUse( &CBaseGrenade::DetonateUse );
 	SetTouch( &CGrenadeMP5::GrenadeMP5Touch );

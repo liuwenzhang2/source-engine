@@ -1203,7 +1203,7 @@ void CDODPlayer::VoiceCommand( int iVoiceCommand )
 	int i;
 	for ( i=1; i<= MAX_PLAYERS; i++ )
 	{
-		CBasePlayer *pPlayer = UTIL_PlayerByIndex( i );
+		CBasePlayer *pPlayer = ToBasePlayer(EntityList()->GetPlayerByIndex( i ));
 
 		if ( !pPlayer )
 			continue;
@@ -2929,7 +2929,7 @@ void CDODPlayer::MoveToNextIntroCamera()
 			
 		QAngle CamAngles = m_pIntroCamera->GetEngineObject()->GetAbsAngles();
 
-		UTIL_SetSize( this, vec3_origin, vec3_origin );
+		GetEngineObject()->SetSize( vec3_origin, vec3_origin );
 	
 		GetEngineObject()->SetAbsOrigin( vIntroCamera );
 		GetEngineObject()->SetAbsAngles( CamAngles );
@@ -4786,7 +4786,7 @@ void CDODPlayer::RemoveNemesisRelationships()
 {
 	for ( int i = 1 ; i <= gpGlobals->maxClients ; i++ )
 	{
-		CDODPlayer *pPlayer = ToDODPlayer( UTIL_PlayerByIndex( i ) );
+		CDODPlayer *pPlayer = ToDODPlayer( EntityList()->GetPlayerByIndex( i ) );
 		if ( pPlayer && pPlayer != this )
 		{
 			// we are no longer dominating anyone

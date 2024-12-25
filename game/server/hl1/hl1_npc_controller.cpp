@@ -235,7 +235,7 @@ void CNPC_Controller::Spawn()
 	Precache( );
 
 	SetModel( "models/controller.mdl" );
-	UTIL_SetSize( this, Vector( -32, -32, 0 ), Vector( 32, 32, 64 ));
+	GetEngineObject()->SetSize( Vector( -32, -32, 0 ), Vector( 32, 32, 64 ));
 
 	GetEngineObject()->SetSolid( SOLID_BBOX );
 	GetEngineObject()->AddSolidFlags( FSOLID_NOT_STANDABLE );
@@ -1073,7 +1073,7 @@ void CNPC_ControllerHeadBall::Spawn( void )
 	m_pSprite->SetAttachment( this, 0 );
 	m_pSprite->SetScale( 2.0 );
 
-	UTIL_SetSize( this, Vector( 0, 0, 0), Vector(0, 0, 0) );
+	GetEngineObject()->SetSize( Vector( 0, 0, 0), Vector(0, 0, 0) );
 	UTIL_SetOrigin( this, GetEngineObject()->GetAbsOrigin() );
 
 	SetThink( &CNPC_ControllerHeadBall::HuntThink );
@@ -1237,7 +1237,7 @@ void CNPC_ControllerZapBall::Spawn( void )
 	m_pSprite->SetAttachment( this, 0 );
 	m_pSprite->SetScale( 0.5 );
 
-	UTIL_SetSize( this, Vector( 0, 0, 0), Vector(0, 0, 0) );
+	GetEngineObject()->SetSize( Vector( 0, 0, 0), Vector(0, 0, 0) );
 	UTIL_SetOrigin( this, GetEngineObject()->GetAbsOrigin() );
 
 	SetThink( &CNPC_ControllerZapBall::AnimateThink );

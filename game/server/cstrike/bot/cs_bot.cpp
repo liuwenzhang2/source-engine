@@ -35,7 +35,7 @@ int GetBotFollowCount( CCSPlayer *leader )
 
 	for( int i=1; i <= gpGlobals->maxClients; ++i )
 	{
-		CBaseEntity *entity = UTIL_PlayerByIndex( i );
+		CBaseEntity *entity = EntityList()->GetPlayerByIndex( i );
 
 		if (entity == NULL)
 			continue;
@@ -633,7 +633,7 @@ CCSPlayer *CCSBot::GetImportantEnemy( bool checkVisibility ) const
 
 	for ( int i = 1; i <= gpGlobals->maxClients; i++ )
 	{
-		CBaseEntity *entity = UTIL_PlayerByIndex( i );
+		CBaseEntity *entity = EntityList()->GetPlayerByIndex( i );
 
 		if (entity == NULL)
 			continue;

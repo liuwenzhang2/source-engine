@@ -53,8 +53,6 @@
 // (displayed when the supply crate is picked up)
 #define NUM_SUPPLY_CRATE_HUD_HINTS		3
 
-extern CBaseEntity *FindPickerEntity( CBasePlayer *pPlayer );
-
 
 ConVar g_debug_doors( "g_debug_doors", "0" );
 ConVar breakable_disable_gib_limit( "breakable_disable_gib_limit", "0" );
@@ -2630,7 +2628,8 @@ bool CPhysicsProp::CreateVPhysics()
 			PhysSetGameFlags( pPhysicsObject, FVPHYSICS_DMG_SLICE );
 
 #if 0
-			if( g_pDeveloper->GetInt() )
+			ConVarRef developer("developer");
+			if( developer.GetInt() )
 			{
 				// Highlight them in developer mode.
 				m_debugOverlays |= (OVERLAY_TEXT_BIT|OVERLAY_BBOX_BIT);
@@ -6190,7 +6189,7 @@ bool UTIL_CreateScaledPhysObject( CBaseAnimating *pInstance, float flScale )
 void CC_Ent_Rotate( const CCommand &args )
 {
 	CBasePlayer* pPlayer = UTIL_GetCommandClient();
-	CBaseEntity* pEntity = FindPickerEntity( pPlayer );
+	CBaseEntity* pEntity = EntityList()->FindPickerEntity( pPlayer );
 	if ( !pEntity )
 		return;
 

@@ -104,7 +104,7 @@ void CNPC_Barnacle::Spawn()
 	Precache( );
 
 	SetModel( "models/barnacle.mdl" );
-	UTIL_SetSize( this, Vector(-16, -16, -32), Vector(16, 16, 0) );
+	GetEngineObject()->SetSize( Vector(-16, -16, -32), Vector(16, 16, 0) );
 
 	GetEngineObject()->SetSolid( SOLID_BBOX );
 	GetEngineObject()->AddSolidFlags( FSOLID_NOT_STANDABLE );
@@ -303,9 +303,9 @@ void CNPC_Barnacle::BarnacleThink ( void )
 // barnacle has no prey right now, so just idle and check to see if anything is touching the tongue.
 
 		// If idle and no nearby client, don't think so often. Client should be out of PVS and not within 50 feet.
-		if ( !UTIL_FindClientInPVS(this) )
+		if ( !EntityList()->FindClientInPVS(this) )
 		{
-			CBasePlayer *pPlayer = UTIL_PlayerByIndex(1);
+			CBasePlayer *pPlayer = ToBasePlayer(EntityList()->GetPlayerByIndex(1));
 
 			if( pPlayer )
 			{

@@ -132,7 +132,7 @@ void CCSPlayerResource::UpdatePlayerData( void )
 
 	for ( i = 1; i <= gpGlobals->maxClients; i++ )
 	{
-		CCSPlayer *pPlayer = (CCSPlayer*)UTIL_PlayerByIndex( i );
+		CCSPlayer *pPlayer = (CCSPlayer*)EntityList()->GetPlayerByIndex( i );
 		
 		if ( pPlayer && pPlayer->IsConnected() )
 		{
@@ -271,7 +271,7 @@ void CCSPlayerResource::UpdatePlayerData( void )
 
 	for ( int i=0; i < MAX_PLAYERS+1; i++ )
 	{
-		CCSPlayer *target = ToCSPlayer( UTIL_PlayerByIndex( i ) );
+		CCSPlayer *target = ToCSPlayer( EntityList()->GetPlayerByIndex( i ) );
 
 		if ( !target || !target->IsAlive() )
 		{

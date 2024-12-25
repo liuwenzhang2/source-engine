@@ -225,7 +225,7 @@ bool CBaseNPCMaker::CanMakeNPC( bool bIgnoreSolidEntities )
 	{
 		for ( int i = 1; i <= gpGlobals->maxClients; i++ )
 		{
-			CBasePlayer *pPlayer = UTIL_PlayerByIndex(i);
+			CBasePlayer *pPlayer = ToBasePlayer(EntityList()->GetPlayerByIndex(i));
 			if ( pPlayer )
 			{
 				// Only spawn if the player's looking away from me
@@ -637,7 +637,7 @@ CNPCSpawnDestination *CTemplateNPCMaker::FindSpawnDestination()
 {
 	CNPCSpawnDestination *pDestinations[ MAX_DESTINATION_ENTS ];
 	CBaseEntity *pEnt = NULL;
-	CBasePlayer *pPlayer = UTIL_GetLocalPlayer();
+	CBasePlayer *pPlayer = ToBasePlayer(EntityList()->GetLocalPlayer());
 	int	count = 0;
 
 	if( !pPlayer )

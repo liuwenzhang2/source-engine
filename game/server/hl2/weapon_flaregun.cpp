@@ -190,7 +190,7 @@ void CFlare::Spawn( void )
 
 	SetModel( "models/weapons/flare.mdl" );
 
-	UTIL_SetSize( this, Vector( -2, -2, -2 ), Vector( 2, 2, 2 ) );
+	GetEngineObject()->SetSize( Vector( -2, -2, -2 ), Vector( 2, 2, 2 ) );
 
 	GetEngineObject()->SetSolid( SOLID_BBOX );
 	GetEngineObject()->AddSolidFlags( FSOLID_NOT_SOLID );

@@ -1044,7 +1044,7 @@ void CC4::PrimaryAttack()
 				UTIL_TraceEntity( pC4, GetEngineObject()->GetAbsOrigin(), GetEngineObject()->GetAbsOrigin() + Vector(0,0,-200), MASK_SOLID, this, COLLISION_GROUP_NONE, &tr );
 				pC4->GetEngineObject()->SetAbsOrigin( tr.endpos );
 
-				CBombTarget *pBombTarget = (CBombTarget*)UTIL_EntityByIndex( pPlayer->m_iBombSiteIndex );
+				CBombTarget *pBombTarget = (CBombTarget*)EntityList()->GetBaseEntity( pPlayer->m_iBombSiteIndex );
 				
 				if ( pBombTarget )
 				{
@@ -1232,7 +1232,7 @@ void CC4::PlayArmingBeeps( void )
 			CBasePlayer *pPlayer;
 			for( i=1;i<=gpGlobals->maxClients;i++ )
 			{
-				pPlayer = UTIL_PlayerByIndex( i );
+				pPlayer = ToBasePlayer(EntityList()->GetPlayerByIndex( i ));
 
 				if ( !pPlayer )
 					continue;

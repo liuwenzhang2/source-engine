@@ -170,7 +170,7 @@ void CBlobElement::Spawn()
 	GetEngineObject()->AddSolidFlags( FSOLID_NOT_STANDABLE | FSOLID_NOT_SOLID );
 
 	SetModel( GetBlobModelName() );
-	UTIL_SetSize( this, vec3_origin, vec3_origin );
+	GetEngineObject()->SetSize( vec3_origin, vec3_origin );
 
 	QAngle angles(0,0,0);
 	angles.y = random->RandomFloat( 0, 180 );

@@ -262,8 +262,8 @@ void CNPC_FlockingFlyer::SpawnCommonCode( )
 	//SET_MODEL(ENT(pev), "models/aflock.mdl");
 	SetModel( "models/boid.mdl" );
 
-//	UTIL_SetSize(this, Vector(0,0,0), Vector(0,0,0));
-	UTIL_SetSize(this, Vector(-5,-5,0), Vector(5,5,2));
+//	GetEngineObject()->SetSize(Vector(0,0,0), Vector(0,0,0));
+	GetEngineObject()->SetSize(Vector(-5,-5,0), Vector(5,5,2));
 }
 
 //=========================================================
@@ -285,7 +285,7 @@ void CNPC_FlockingFlyer::IdleThink( void )
 	GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.2 );
 
 	// see if there's a client in the same pvs as the monster
-	CBaseEntity* pEnt = UTIL_FindClientInPVS(this);
+	CBaseEntity* pEnt = EntityList()->FindClientInPVS(this);
 	if (pEnt&& pEnt->entindex()>0)
 	{
 		SetThink( &CNPC_FlockingFlyer::Start );
@@ -831,7 +831,7 @@ void CNPC_FlockingFlyer::Event_Killed( const CTakeDamageInfo &info )
 	GetEngineObject()->SetPlaybackRate(0);
 	GetEngineObject()->IncrementInterpolationFrame();
 
-	UTIL_SetSize( this, Vector(0,0,0), Vector(0,0,0) );
+	GetEngineObject()->SetSize( Vector(0,0,0), Vector(0,0,0) );
 	GetEngineObject()->SetMoveType( MOVETYPE_FLYGRAVITY );
 
 	SetThink ( &CNPC_FlockingFlyer::FallHack );

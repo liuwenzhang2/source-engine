@@ -110,7 +110,7 @@ const Vector C_CS_PlayerResource::GetC4Postion()
 	if ( m_iPlayerC4 > 0 )
 	{
 		// C4 is carried by player
-		C_BasePlayer *pPlayer = UTIL_PlayerByIndex( m_iPlayerC4 );
+		C_BasePlayer *pPlayer = ToBasePlayer(EntityList()->GetPlayerByIndex( m_iPlayerC4 ));
 
 		if ( pPlayer )
 		{

@@ -86,7 +86,7 @@ void CWeaponTripMine::Spawn( void )
 
 	if ( !g_pGameRules->IsDeathmatch() )
 	{
-		UTIL_SetSize( this, Vector(-16, -16, 0), Vector(16, 16, 28) ); 
+		GetEngineObject()->SetSize( Vector(-16, -16, 0), Vector(16, 16, 28) ); 
 	}
 }
 
@@ -307,7 +307,7 @@ void CTripmineGrenade::Spawn( void )
 	GetEngineObject()->ResetSequenceInfo();
 	GetEngineObject()->SetPlaybackRate(0);
 	
-	UTIL_SetSize( this, Vector( -8, -8, -8), Vector(8, 8, 8) );
+	GetEngineObject()->SetSize( Vector( -8, -8, -8), Vector(8, 8, 8) );
 
 	m_flDamage	= sk_plr_dmg_tripmine.GetFloat();
 	m_DmgRadius	= m_flDamage * 2.5;

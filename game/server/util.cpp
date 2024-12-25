@@ -327,21 +327,6 @@ realcheck:
 	return true;
 }
 
-// returns a CBaseEntity pointer to a player by index.  Only returns if the player is spawned and connected
-// otherwise returns NULL
-// Index is 1 based
-CBasePlayer	*UTIL_PlayerByIndex( int playerIndex )
-{
-	CBasePlayer *pPlayer = NULL;
-
-	if ( playerIndex > 0 && playerIndex <= gpGlobals->maxClients )
-	{
-		pPlayer = (CBasePlayer*)EntityList()->GetBaseEntity(playerIndex);
-	}
-	
-	return pPlayer;
-}
-
 CBasePlayer* UTIL_PlayerByName( const char *name )
 {
 	if ( !name || !name[0] )
@@ -349,7 +334,7 @@ CBasePlayer* UTIL_PlayerByName( const char *name )
 
 	for (int i = 1; i<=gpGlobals->maxClients; i++ )
 	{
-		CBasePlayer *pPlayer = UTIL_PlayerByIndex( i );
+		CBasePlayer *pPlayer = ToBasePlayer(EntityList()->GetPlayerByIndex( i ));
 		
 		if ( !pPlayer )
 			continue;
@@ -370,7 +355,7 @@ CBasePlayer* UTIL_PlayerByUserId( int userID )
 {
 	for (int i = 1; i<=gpGlobals->maxClients; i++ )
 	{
-		CBasePlayer *pPlayer = UTIL_PlayerByIndex( i );
+		CBasePlayer *pPlayer = ToBasePlayer(EntityList()->GetPlayerByIndex( i ));
 		
 		if ( !pPlayer )
 			continue;
@@ -388,29 +373,6 @@ CBasePlayer* UTIL_PlayerByUserId( int userID )
 }
 
 //
-// Return the local player.
-// If this is a multiplayer game, return NULL.
-// 
-CBasePlayer *UTIL_GetLocalPlayer( void )
-{
-	if ( gpGlobals->maxClients > 1 )
-	{
-		if ( developer.GetBool() )
-		{
-			Assert( !"UTIL_GetLocalPlayer" );
-			
-#ifdef	DEBUG
-			Warning( "UTIL_GetLocalPlayer() called in multiplayer game.\n" );
-#endif
-		}
-
-		return NULL;
-	}
-
-	return UTIL_PlayerByIndex( 1 );
-}
-
-//
 // Get the local player on a listen server - this is for multiplayer use only
 // 
 CBasePlayer *UTIL_GetListenServerHost( void )
@@ -423,7 +385,7 @@ CBasePlayer *UTIL_GetListenServerHost( void )
 		return NULL;
 	}
 
-	return UTIL_PlayerByIndex( 1 );
+	return ToBasePlayer(EntityList()->GetPlayerByIndex( 1 ));
 }
 
 
@@ -461,16 +423,6 @@ bool UTIL_IsCommandIssuedByServerAdmin( void )
 }
 
 
-//--------------------------------------------------------------------------------------------------------------
-/**
- * Returns a CBaseEntity pointer by entindex.  Index is 1 based.
- */
-CBaseEntity	*UTIL_EntityByIndex( int entityIndex )
-{
-	return EntityList()->GetBaseEntity(entityIndex);
-}
-
-
 //int ENTINDEX( CBaseEntity *pEnt )
 //{
 //	// This works just like ENTINDEX for edicts.
@@ -488,7 +440,7 @@ CBaseEntity	*UTIL_EntityByIndex( int entityIndex )
 //-----------------------------------------------------------------------------
 void UTIL_GetPlayerConnectionInfo( int playerIndex, int& ping, int &packetloss )
 {
-	CBasePlayer *player =  UTIL_PlayerByIndex( playerIndex );
+	CBasePlayer *player = ToBasePlayer(EntityList()->GetPlayerByIndex( playerIndex ));
 
 	INetChannelInfo *nci = engine->GetPlayerNetInfo(playerIndex);
 
@@ -609,7 +561,7 @@ void UTIL_ScreenShake( const Vector &center, float amplitude, float frequency, f
 	}
 	for ( i = 1; i <= gpGlobals->maxClients; i++ )
 	{
-		CBaseEntity *pPlayer = UTIL_PlayerByIndex( i );
+		CBaseEntity *pPlayer = EntityList()->GetPlayerByIndex( i );
 
 		//
 		// Only start shakes for players that are on the ground unless doing an air shake.
@@ -642,7 +594,7 @@ void UTIL_ScreenShakeObject( CBaseEntity *pEnt, const Vector &center, float ampl
 	CBaseEntity *pHighestParent = pEnt->GetEngineObject()->GetRootMoveParent()->GetOuter();
 	for ( i = 1; i <= gpGlobals->maxClients; i++ )
 	{
-		CBaseEntity *pPlayer = UTIL_PlayerByIndex( i );
+		CBaseEntity *pPlayer = EntityList()->GetPlayerByIndex( i );
 		if (!pPlayer)
 			continue;
 
@@ -697,7 +649,7 @@ void UTIL_ViewPunch( const Vector &center, QAngle angPunch, float radius, bool b
 {
 	for ( int i = 1; i <= gpGlobals->maxClients; i++ )
 	{
-		CBaseEntity *pPlayer = UTIL_PlayerByIndex( i );
+		CBaseEntity *pPlayer = EntityList()->GetPlayerByIndex( i );
 
 		//
 		// Only apply the punch to players that are on the ground unless doing an air punch.
@@ -773,7 +725,7 @@ void UTIL_ScreenFadeAll( const color32 &color, float fadeTime, float fadeHold, i
 
 	for ( i = 1; i <= gpGlobals->maxClients; i++ )
 	{
-		CBaseEntity *pPlayer = UTIL_PlayerByIndex( i );
+		CBaseEntity *pPlayer = EntityList()->GetPlayerByIndex( i );
 	
 		UTIL_ScreenFadeWrite( fade, pPlayer );
 	}
@@ -1013,36 +965,6 @@ void UTIL_ClearTrace( trace_t &trace )
 	trace.fractionleftsolid = 0;
 	trace.surface = g_NullSurface;
 }
-
-	
-
-//-----------------------------------------------------------------------------
-// Sets the entity size
-//-----------------------------------------------------------------------------
-static void SetMinMaxSize (CBaseEntity *pEnt, const Vector& mins, const Vector& maxs )
-{
-	for ( int i=0 ; i<3 ; i++ )
-	{
-		if ( mins[i] > maxs[i] )
-		{
-			Error( "%s: backwards mins/maxs", ( pEnt ) ? pEnt->GetDebugName() : "<NULL>" );
-		}
-	}
-
-	Assert( pEnt );
-
-	pEnt->GetEngineObject()->SetCollisionBounds( mins, maxs );
-}
-
-
-//-----------------------------------------------------------------------------
-// Sets the model size
-//-----------------------------------------------------------------------------
-void UTIL_SetSize( CBaseEntity *pEnt, const Vector &vecMin, const Vector &vecMax )
-{
-	SetMinMaxSize (pEnt, vecMin, vecMax);
-}
-
 	
 //-----------------------------------------------------------------------------
 // Sets the model to be associated with an entity
@@ -1066,7 +988,7 @@ void UTIL_SetModel( CBaseEntity *pEntity, const char *pModelName )
 
 	pEntity->GetEngineObject()->SetModelName( AllocPooledString( pModelName ) );
 	pEntity->GetEngineObject()->SetModelIndex( i ) ;
-	SetMinMaxSize(pEntity, vec3_origin, vec3_origin);
+	pEntity->GetEngineObject()->SetSize(vec3_origin, vec3_origin);
 	pEntity->SetCollisionBoundsFromModel();
 }
 
@@ -1109,18 +1031,6 @@ void UTIL_SnapDirectionToAxis( Vector &direction, float epsilon )
 			return;
 		}
 	}
-}
-
-char *UTIL_VarArgs( const char *format, ... )
-{
-	va_list		argptr;
-	static char		string[1024];
-	
-	va_start (argptr, format);
-	Q_vsnprintf(string, sizeof(string), format,argptr);
-	va_end (argptr);
-
-	return string;	
 }
 
 bool UTIL_IsMasterTriggered(string_t sMaster, CBaseEntity *pActivator)
@@ -1710,26 +1620,6 @@ int DispatchSpawn( CBaseEntity *pEntity )
 	return 0;
 }
 
-// UNDONE: This could be a better test - can we run the absbox through the bsp and see
-// if it contains any solid space?  or would that eliminate some entities we want to keep?
-int UTIL_EntityInSolid( CBaseEntity *ent )
-{
-	Vector	point;
-
-	IEngineObjectServer *pParent = ent->GetEngineObject()->GetMoveParent();
-	// HACKHACK -- If you're attached to a client, always go through
-	if ( pParent )
-	{
-		if ( pParent->GetOuter()->IsPlayer())
-			return 0;
-
-		ent = ent->GetEngineObject()->GetRootMoveParent()->GetOuter();
-	}
-
-	point = ent->WorldSpaceCenter();
-	return ( enginetrace->GetPointContents( point ) & MASK_SOLID );
-}
-
 
 //-----------------------------------------------------------------------------
 // Purpose: Initialize the matrix from an entity
@@ -1830,324 +1720,6 @@ const char *nexttoken(char *token, const char *str, char sep)
 	}
 
 	return(++str);
-}
-
-//-----------------------------------------------------------------------------
-// Purpose: Helper for UTIL_FindClientInPVS
-// Input  : check - last checked client
-// Output : static int UTIL_GetNewCheckClient
-//-----------------------------------------------------------------------------
-// FIXME:  include bspfile.h here?
-class CCheckClient : public CAutoGameSystem
-{
-public:
-	CCheckClient( char const *name ) : CAutoGameSystem( name )
-	{
-	}
-
-	void LevelInitPreEntity()
-	{
-		m_checkCluster = -1;
-		m_lastcheck = 1;
-		m_lastchecktime = -1;
-		m_bClientPVSIsExpanded = false;
-	}
-
-	byte	m_checkPVS[MAX_MAP_LEAFS/8];
-	byte	m_checkVisibilityPVS[MAX_MAP_LEAFS/8];
-	int		m_checkCluster;
-	int		m_lastcheck;
-	float	m_lastchecktime;
-	bool	m_bClientPVSIsExpanded;
-};
-
-CCheckClient g_CheckClient( "CCheckClient" );
-
-
-static int UTIL_GetNewCheckClient( int check )
-{
-	int		i;
-	CBaseEntity	*ent = NULL;
-	Vector	org;
-
-// cycle to the next one
-
-	if (check < 1)
-		check = 1;
-	if (check > gpGlobals->maxClients)
-		check = gpGlobals->maxClients;
-
-	if (check == gpGlobals->maxClients)
-		i = 1;
-	else
-		i = check + 1;
-
-	for ( ;  ; i++)
-	{
-		if ( i > gpGlobals->maxClients )
-		{
-			i = 1;
-		}
-
-		// Looped but didn't find anything else
-		if (i == check) {
-			ent = EntityList()->GetBaseEntity(i);
-			break;
-		}
-
-		ent = EntityList()->GetBaseEntity( i );
-		if ( !ent )
-			continue;
-
-		//if ( !ent->GetUnknown() )
-		//	continue;
-
-		CBaseEntity *entity = ent;
-		if ( !entity )
-			continue;
-
-		if ( entity->GetEngineObject()->GetFlags() & FL_NOTARGET )
-			continue;
-
-		// anything that is a client, or has a client as an enemy
-		break;
-	}
-
-	if ( i != check )
-	{
-		memset( g_CheckClient.m_checkVisibilityPVS, 0, sizeof(g_CheckClient.m_checkVisibilityPVS) );
-		g_CheckClient.m_bClientPVSIsExpanded = false;
-	}
-
-	if ( ent )
-	{
-		// get the PVS for the entity
-		CBaseEntity *pce = ent;
-		if ( !pce )
-			return i;
-
-		org = pce->EyePosition();
-
-		int clusterIndex = engine->GetClusterForOrigin( org );
-		if ( clusterIndex != g_CheckClient.m_checkCluster )
-		{
-			g_CheckClient.m_checkCluster = clusterIndex;
-			engine->GetPVSForCluster( clusterIndex, sizeof(g_CheckClient.m_checkPVS), g_CheckClient.m_checkPVS );
-		}
-	}
-	
-	return i;
-}
-
-
-//-----------------------------------------------------------------------------
-// Gets the current check client....
-//-----------------------------------------------------------------------------
-static CBaseEntity *UTIL_GetCurrentCheckClient()
-{
-	CBaseEntity	*ent;
-
-	// find a new check if on a new frame
-	float delta = gpGlobals->curtime - g_CheckClient.m_lastchecktime;
-	if ( delta >= 0.1 || delta < 0 )
-	{
-		g_CheckClient.m_lastcheck = UTIL_GetNewCheckClient( g_CheckClient.m_lastcheck );
-		g_CheckClient.m_lastchecktime = gpGlobals->curtime;
-	}
-
-	// return check if it might be visible	
-	ent = EntityList()->GetBaseEntity( g_CheckClient.m_lastcheck );
-
-	// Allow dead clients -- JAY
-	// Our monsters know the difference, and this function gates alot of behavior
-	// It's annoying to die and see monsters stop thinking because you're no longer
-	// "in" their PVS
-	if ( !ent )//|| ent->IsFree() || !ent->GetUnknown()
-	{
-		return NULL;
-	}
-
-	return ent;
-}
-
-void UTIL_SetClientVisibilityPVS( CBaseEntity *pClient, const unsigned char *pvs, int pvssize )
-{
-	if ( pClient == UTIL_GetCurrentCheckClient() )
-	{
-		Assert( pvssize <= sizeof(g_CheckClient.m_checkVisibilityPVS) );
-
-		g_CheckClient.m_bClientPVSIsExpanded = false;
-
-		unsigned *pFrom = (unsigned *)pvs;
-		unsigned *pMask = (unsigned *)g_CheckClient.m_checkPVS;
-		unsigned *pTo = (unsigned *)g_CheckClient.m_checkVisibilityPVS;
-
-		int limit = pvssize / 4;
-		int i;
-
-		for ( i = 0; i < limit; i++ )
-		{
-			pTo[i] = pFrom[i] & ~pMask[i];
-
-			if ( pFrom[i] )
-			{
-				g_CheckClient.m_bClientPVSIsExpanded = true;
-			}
-		}
-
-		int remainder = pvssize % 4;
-		for ( i = 0; i < remainder; i++ )
-		{
-			((unsigned char *)&pTo[limit])[i] = ((unsigned char *)&pFrom[limit])[i] & !((unsigned char *)&pMask[limit])[i];
-
-			if ( ((unsigned char *)&pFrom[limit])[i] != 0)
-			{
-				g_CheckClient.m_bClientPVSIsExpanded = true;
-			}
-		}
-	}
-}
-
-bool UTIL_ClientPVSIsExpanded()
-{
-	return g_CheckClient.m_bClientPVSIsExpanded;
-}
-
-
-//-----------------------------------------------------------------------------
-// Purpose: Returns a client (or object that has a client enemy) that would be a valid target.
-//  If there are more than one valid options, they are cycled each frame
-//  If (self.origin + self.viewofs) is not in the PVS of the current target, it is not returned at all.
-// Input  : *pEdict - 
-// Output : edict_t*
-//-----------------------------------------------------------------------------
-CBaseEntity *UTIL_FindClientInPVS( const Vector &vecBoxMins, const Vector &vecBoxMaxs )
-{
-	CBaseEntity	*ent = UTIL_GetCurrentCheckClient();
-	if ( !ent )
-	{
-		return NULL;
-	}
-
-	if ( !engine->CheckBoxInPVS( vecBoxMins, vecBoxMaxs, g_CheckClient.m_checkPVS, sizeof( g_CheckClient.m_checkPVS ) ) )
-	{
-		return NULL;
-	}
-
-	// might be able to see it
-	return ent;
-}
-
-//-----------------------------------------------------------------------------
-// Purpose: Returns a client (or object that has a client enemy) that would be a valid target.
-//  If there are more than one valid options, they are cycled each frame
-//  If (self.origin + self.viewofs) is not in the PVS of the current target, it is not returned at all.
-// Input  : *pEdict - 
-// Output : edict_t*
-//-----------------------------------------------------------------------------
-ConVar sv_strict_notarget( "sv_strict_notarget", "0", 0, "If set, notarget will cause entities to never think they are in the pvs" );
-
-static CBaseEntity *UTIL_FindClientInPVSGuts(CBaseEntity *pEdict, unsigned char *pvs, unsigned pvssize )
-{
-	Vector	view;
-
-	CBaseEntity	*ent = UTIL_GetCurrentCheckClient();
-	if ( !ent )
-	{
-		return NULL;
-	}
-
-	CBaseEntity *pPlayerEntity = (CBaseEntity*)ent;
-	if( (!pPlayerEntity || (pPlayerEntity->GetEngineObject()->GetFlags() & FL_NOTARGET)) && sv_strict_notarget.GetBool() )
-	{
-		return NULL;
-	}
-	// if current entity can't possibly see the check entity, return 0
-	// UNDONE: Build a box for this and do it over that box
-	// UNDONE: Use CM_BoxLeafnums()
-	CBaseEntity *pe = pEdict;
-	if ( pe )
-	{
-		view = pe->EyePosition();
-		
-		if ( !engine->CheckOriginInPVS( view, pvs, pvssize ) )
-		{
-			return NULL;
-		}
-	}
-
-	// might be able to see it
-	return ent;
-}
-
-//-----------------------------------------------------------------------------
-// Purpose: Returns a client that could see the entity directly
-//-----------------------------------------------------------------------------
-
-CBaseEntity *UTIL_FindClientInPVS(CBaseEntity *pEdict)
-{
-	return UTIL_FindClientInPVSGuts( pEdict, g_CheckClient.m_checkPVS, sizeof( g_CheckClient.m_checkPVS ) );
-}
-
-//-----------------------------------------------------------------------------
-// Purpose: Returns a client that could see the entity, including through a camera
-//-----------------------------------------------------------------------------
-CBaseEntity *UTIL_FindClientInVisibilityPVS( CBaseEntity *pEdict )
-{
-	return UTIL_FindClientInPVSGuts( pEdict, g_CheckClient.m_checkVisibilityPVS, sizeof( g_CheckClient.m_checkVisibilityPVS ) );
-}
-
-
-
-//-----------------------------------------------------------------------------
-// Purpose: Returns a chain of entities within the PVS of another entity (client)
-//  starting_ent is the ent currently at in the list
-//  a starting_ent of NULL signifies the beginning of a search
-// Input  : *pplayer - 
-//			*starting_ent - 
-// Output : edict_t
-//-----------------------------------------------------------------------------
-CBaseEntity *UTIL_EntitiesInPVS( CBaseEntity *pPVSEntity, CBaseEntity *pStartingEntity )
-{
-	Vector			org;
-	static byte		pvs[ MAX_MAP_CLUSTERS/8 ];
-	static Vector	lastOrg( 0, 0, 0 );
-	static int		lastCluster = -1;
-
-	if ( !pPVSEntity )
-		return NULL;
-
-	// NOTE: These used to be caching code here to prevent this from
-	// being called over+over which breaks when you go back + forth
-	// across level transitions
-	// So, we'll always get the PVS each time we start a new EntitiesInPVS iteration.
-	// Given that weapon_binocs + leveltransition code is the only current clients
-	// of this, this seems safe.
-	if ( !pStartingEntity )
-	{
-		org = pPVSEntity->EyePosition();
-		int clusterIndex = engine->GetClusterForOrigin( org );
-		Assert( clusterIndex >= 0 );
-		engine->GetPVSForCluster( clusterIndex, sizeof(pvs), pvs );
-	}
-
-	for ( CBaseEntity *pEntity = EntityList()->NextEnt(pStartingEntity); pEntity; pEntity = EntityList()->NextEnt(pEntity) )
-	{
-		// Only return attached ents.
-		if (!pEntity->IsNetworkable() || pEntity->entindex()==-1 )
-			continue;
-
-		CBaseEntity *pParent = pEntity->GetEngineObject()->GetRootMoveParent()->GetOuter();
-
-		Vector vecSurroundMins, vecSurroundMaxs;
-		pParent->GetEngineObject()->WorldSpaceSurroundingBounds( &vecSurroundMins, &vecSurroundMaxs );
-		if ( !engine->CheckBoxInPVS( vecSurroundMins, vecSurroundMaxs, pvs, sizeof( pvs ) ) )
-			continue;
-
-		return pEntity;
-	}
-
-	return NULL;
 }
 
 //-----------------------------------------------------------------------------
@@ -2797,19 +2369,6 @@ void PhysCollisionDust(gamevcollisionevent_t* pEvent, surfacedata_t* phit)
 	g_pEffects->Dust(vecPos, vecVel, 8.0f, pEvent->collisionSpeed);
 }
 
-float PhysGetEntityMass(CBaseEntity* pEntity)
-{
-	IPhysicsObject* pList[VPHYSICS_MAX_OBJECT_LIST_COUNT];
-	int physCount = pEntity->GetEngineObject()->VPhysicsGetObjectList(pList, ARRAYSIZE(pList));
-	float otherMass = 0;
-	for (int i = 0; i < physCount; i++)
-	{
-		otherMass += pList[i]->GetMass();
-	}
-
-	return otherMass;
-}
-
 void PhysSetEntityGameFlags(CBaseEntity* pEntity, unsigned short flags)
 {
 	IPhysicsObject* pList[VPHYSICS_MAX_OBJECT_LIST_COUNT];
@@ -3238,7 +2797,7 @@ void CC_KDTreeTest( const CCommand &args )
 //	CBaseEntity *pSpot = EntityList()->FindEntityByClassname( NULL, "info_player_start" );
 //	Vector vecStart = pSpot->GetAbsOrigin();
 
-	CBasePlayer *pPlayer = static_cast<CBasePlayer*>( UTIL_GetLocalPlayer() );
+	CBasePlayer *pPlayer = static_cast<CBasePlayer*>(EntityList()->GetLocalPlayer() );
 	Vector vecStart = pPlayer->GetEngineObject()->GetAbsOrigin();
 
 	static Vector *vecTargets = NULL;
@@ -3412,7 +2971,7 @@ void CC_VoxelTreePlayerView( void )
 {
 	Msg( "VoxelTreePlayerView\n" );
 
-	CBasePlayer *pPlayer = static_cast<CBasePlayer*>( UTIL_GetLocalPlayer() );
+	CBasePlayer *pPlayer = static_cast<CBasePlayer*>(EntityList()->GetLocalPlayer() );
 	Vector vecStart = pPlayer->GetEngineObject()->GetAbsOrigin();
 	partition->RenderObjectsInPlayerLeafs( vecStart - VEC_HULL_MIN_SCALED( pPlayer ), vecStart + VEC_HULL_MAX_SCALED( pPlayer ), 3.0f  );
 }

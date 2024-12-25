@@ -1870,7 +1870,7 @@ void Physics_SimulateEntity( CBaseEntity *pEntity )
 //			CBasePlayer *playerowner = ToBasePlayer( pEntity->GetOwnerEntity() );
 //			if ( playerowner )
 //			{
-//				CBasePlayer *pl = ToBasePlayer( UTIL_PlayerByIndex( pEntity->m_PredictableID->GetPlayer() + 1 ) );
+//				CBasePlayer *pl = ToBasePlayer( EntityList()->GetPlayerByIndex( pEntity->m_PredictableID->GetPlayer() + 1 ) );
 //				// Is the player who created it still the owner?
 //				if ( pl == playerowner )
 //				{
@@ -1926,7 +1926,7 @@ void Physics_RunThinkFunctions( bool simulating )
 		// only simulate players
 		for ( int i = 1; i <= gpGlobals->maxClients; i++ )
 		{
-			CBasePlayer *pPlayer = UTIL_PlayerByIndex( i );
+			CBasePlayer *pPlayer = ToBasePlayer(EntityList()->GetPlayerByIndex( i ));
 			if ( pPlayer )
 			{
 				// Always reset clock to real sv.time

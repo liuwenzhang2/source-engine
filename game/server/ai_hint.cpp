@@ -1369,7 +1369,7 @@ bool CAI_Hint::HintMatchesCriteria( CAI_BaseNPC *pNPC, const CHintCriteria &hint
 		// Test all potential seers
 		for ( int i = 1; i <= gpGlobals->maxClients; i++ )
 		{
-			CBasePlayer *pPlayer = UTIL_PlayerByIndex(i);
+			CBasePlayer *pPlayer = ToBasePlayer(EntityList()->GetPlayerByIndex(i));
 			
 			if ( pPlayer )
 			{

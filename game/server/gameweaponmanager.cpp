@@ -241,12 +241,12 @@ void CGameWeaponManager::Think()
 
 		if ( gpGlobals->maxClients == 1 )
 		{
-			CBasePlayer *pPlayer = UTIL_GetLocalPlayer();
+			CBasePlayer *pPlayer = ToBasePlayer(EntityList()->GetLocalPlayer());
 			// Nodraw serves as a flag that this weapon is already being removed since
 			// all we're really doing inside this loop is marking them for removal by
 			// the entity system. We don't want to count the same weapon as removed
 			// more than once.
-			if( !UTIL_FindClientInPVS( pCandidate ) )
+			if( !EntityList()->FindClientInPVS( pCandidate ) )
 			{
 				fRemovedOne = true;
 			}

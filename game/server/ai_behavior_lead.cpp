@@ -150,7 +150,7 @@ void CAI_LeadBehavior::LeadPlayer( const AI_LeadArgs_t &leadArgs, CAI_LeadBehavi
 	CAI_PlayerAlly *pOuter = dynamic_cast<CAI_PlayerAlly*>(GetOuter());
 	if ( pOuter && AI_IsSinglePlayer() )
 	{
-		pOuter->SetSpeechTarget( UTIL_GetLocalPlayer() );
+		pOuter->SetSpeechTarget(EntityList()->GetLocalPlayer() );
 	}
 #endif
 

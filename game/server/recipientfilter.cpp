@@ -91,7 +91,7 @@ void CRecipientFilter::AddAllPlayers( void )
 	int i;
 	for ( i = 1; i <= gpGlobals->maxClients; i++ )
 	{
-		CBasePlayer *pPlayer = UTIL_PlayerByIndex( i );
+		CBasePlayer *pPlayer = ToBasePlayer(EntityList()->GetPlayerByIndex( i ));
 		if ( !pPlayer )
 		{
 			continue;
@@ -191,7 +191,7 @@ void CRecipientFilter::RemoveRecipientsNotOnTeam( CTeam *team )
 	int i;
 	for ( i = 1; i <= gpGlobals->maxClients; i++ )
 	{
-		CBasePlayer *player = UTIL_PlayerByIndex( i );
+		CBasePlayer *player = ToBasePlayer(EntityList()->GetPlayerByIndex( i ));
 		if ( !player )
 			continue;
 
@@ -208,7 +208,7 @@ void CRecipientFilter::AddPlayersFromBitMask( CBitVec< ABSOLUTE_PLAYER_LIMIT >& 
 
 	while ( index > -1 )
 	{
-		CBasePlayer *pPlayer = UTIL_PlayerByIndex( index + 1 );
+		CBasePlayer *pPlayer = ToBasePlayer(EntityList()->GetPlayerByIndex( index + 1 ));
 		if ( pPlayer )
 		{
 			AddRecipient( pPlayer );
@@ -224,7 +224,7 @@ void CRecipientFilter::RemovePlayersFromBitMask( CBitVec< ABSOLUTE_PLAYER_LIMIT 
 
 	while ( index > -1 )
 	{
-		CBasePlayer *pPlayer = UTIL_PlayerByIndex( index + 1 );
+		CBasePlayer *pPlayer = ToBasePlayer(EntityList()->GetPlayerByIndex( index + 1 ));
 		if ( pPlayer )
 		{
 			RemoveRecipient( pPlayer );
@@ -334,7 +334,7 @@ CTeamRecipientFilter::CTeamRecipientFilter( int team, bool isReliable )
 
 	for ( int i = 1; i <= gpGlobals->maxClients; i++ )
 	{
-		CBasePlayer *pPlayer = UTIL_PlayerByIndex( i );
+		CBasePlayer *pPlayer = ToBasePlayer(EntityList()->GetPlayerByIndex( i ));
 
 		if ( !pPlayer )
 		{

@@ -83,7 +83,8 @@ bool CAI_SchedulesManager::LoadAllSchedules(void)
 #if 0
 		// If not in developer mode, free the string memory.  Otherwise
 		// keep it around for debugging information
-		if (!g_pDeveloper->GetInt())
+		ConVarRef developer("developer");
+		if (!developer.GetInt())
 		{
 			ClearStringRegistries();
 		}

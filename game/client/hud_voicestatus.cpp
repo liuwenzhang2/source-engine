@@ -219,7 +219,7 @@ void CHudVoiceStatus::OnThink( void )
 		{
 			//=============================================================================
 			// HPE_BEGIN:
-			// [Forrest] Don't use UTIL_PlayerByIndex here.  It may be null for some players when
+			// [Forrest] Don't use EntityList()->GetPlayerByIndex here.  It may be null for some players when
 			// a match starts because the server only passes full player info as it affects
 			// the client.
 			//=============================================================================
@@ -242,7 +242,7 @@ void CHudVoiceStatus::OnThink( void )
 				// [jpaquin] this allows counter strike to display default avatars for bots.  It can't be a virtual function on
 				// C_BasePlayer because there would be no way to get a game specific default image if the player is null.
 				extern vgui::IImage* GetDefaultAvatarImage( C_BasePlayer *pPlayer );
-				activeSpeaker.pAvatar->SetDefaultImage( GetDefaultAvatarImage( UTIL_PlayerByIndex( activeSpeaker.playerId ) ) );
+				activeSpeaker.pAvatar->SetDefaultImage( GetDefaultAvatarImage(ToBasePlayer(EntityList()->GetPlayerByIndex( activeSpeaker.playerId )) ) );
 #endif
 				activeSpeaker.pAvatar->SetDrawFriend(show_friend);
 				player_info_t pi;
@@ -366,7 +366,7 @@ void CHudVoiceStatus::Paint()
 		bool usedLocation = false;
 		if ( sv_alltalk && !sv_alltalk->GetBool() )
 		{
-			C_BasePlayer *pPlayer = UTIL_PlayerByIndex( playerId );
+			C_BasePlayer *pPlayer = ToBasePlayer(EntityList()->GetPlayerByIndex( playerId ));
 			if ( pPlayer )
 			{
 				const char *asciiLocation = pPlayer->GetLastKnownPlaceName();

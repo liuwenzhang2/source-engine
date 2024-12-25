@@ -81,7 +81,7 @@ void CCSBot::OnBombBeep( IGameEvent *event )
 	if ( player == this )
 		return;
 
-	CBaseEntity *entity = UTIL_EntityByIndex( event->GetInt( "entindex" ) );
+	CBaseEntity *entity = EntityList()->GetBaseEntity( event->GetInt( "entindex" ) );
 	Vector myOrigin = GetCentroid( this );
 
 	// if we don't know where the bomb is, but heard it beep, we've discovered it

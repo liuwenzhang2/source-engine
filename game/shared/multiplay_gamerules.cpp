@@ -385,7 +385,7 @@ ConVarRef suitcharger( "sk_suitcharger" );
 			// check if any player is over the frag limit
 			for ( int i = 1; i <= gpGlobals->maxClients; i++ )
 			{
-				CBasePlayer *pPlayer = UTIL_PlayerByIndex( i );
+				CBasePlayer *pPlayer = ToBasePlayer(EntityList()->GetPlayerByIndex( i ));
 
 				if ( pPlayer && pPlayer->FragCount() >= flFragLimit )
 				{
@@ -1139,7 +1139,7 @@ ConVarRef suitcharger( "sk_suitcharger" );
 
 		for ( int i = 1; i <= MAX_PLAYERS; i++ )
 		{
-			CBasePlayer *pPlayer = UTIL_PlayerByIndex( i );
+			CBasePlayer *pPlayer = ToBasePlayer(EntityList()->GetPlayerByIndex( i ));
 
 			if ( !pPlayer )
 				continue;
@@ -1671,7 +1671,7 @@ ConVarRef suitcharger( "sk_suitcharger" );
 						{
 							int index = filter.GetRecipientIndex(i);
 
-							CBasePlayer *pListener = UTIL_PlayerByIndex( index );
+							CBasePlayer *pListener = ToBasePlayer(EntityList()->GetPlayerByIndex( index ));
 
 							if ( pListener && pListener != pPlayer )
 							{
@@ -1740,7 +1740,7 @@ ConVarRef suitcharger( "sk_suitcharger" );
 		CBaseMultiplayerPlayer *pPlayer;
 		for ( int i = 1; i <= gpGlobals->maxClients; i++ )
 		{
-			pPlayer = ToBaseMultiplayerPlayer( UTIL_PlayerByIndex( i ) );
+			pPlayer = ToBaseMultiplayerPlayer( EntityList()->GetPlayerByIndex( i ) );
 
 			if ( !pPlayer )
 				continue;
@@ -1762,7 +1762,7 @@ ConVarRef suitcharger( "sk_suitcharger" );
 		CBaseMultiplayerPlayer *pPlayer;
 		for ( int i = 1; i <= gpGlobals->maxClients; i++ )
 		{
-			pPlayer = ToBaseMultiplayerPlayer( UTIL_PlayerByIndex( i ) );
+			pPlayer = ToBaseMultiplayerPlayer( EntityList()->GetPlayerByIndex( i ) );
 
 			if ( !pPlayer )
 				continue;

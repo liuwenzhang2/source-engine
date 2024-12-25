@@ -180,7 +180,7 @@ void CNPC_AlienGrunt::Spawn()
 	Precache();
 
 	SetModel( "models/agrunt.mdl");
-	UTIL_SetSize( this, Vector( -32, -32, 0 ), Vector( 32, 32, 64 ) );
+	GetEngineObject()->SetSize( Vector( -32, -32, 0 ), Vector( 32, 32, 64 ) );
 
 	GetEngineObject()->SetSolid( SOLID_BBOX );
 	GetEngineObject()->AddSolidFlags( FSOLID_NOT_STANDABLE );

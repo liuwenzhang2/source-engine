@@ -887,7 +887,7 @@ void CFuncTank::TrackTarget( void )
 				}
 				else	// HL1 style
 				{
-					m_hTarget = ToBasePlayer( ( UTIL_FindClientInPVS( this ) ) );
+					m_hTarget = ToBasePlayer( (EntityList()->FindClientInPVS( this ) ) );
 				}
 
 				if ( m_hTarget != NULL )

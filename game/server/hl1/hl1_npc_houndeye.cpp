@@ -865,7 +865,7 @@ int CNPC_Houndeye::TranslateSchedule( int scheduleType )
 		{
 			if ( m_NPCState == NPC_STATE_COMBAT )
 			{
-				CBaseEntity* pEnt = UTIL_FindClientInPVS(this);
+				CBaseEntity* pEnt = EntityList()->FindClientInPVS(this);
 				if (pEnt!=NULL && pEnt->entindex()>0)
 				{
 					// client in PVS

@@ -1198,7 +1198,7 @@ void CNPC_CombineCamera::SetHeight(float height)
 
 	GetEngineObject()->SetCollisionBounds(mins, maxs);
 
-	UTIL_SetSize(this, mins, maxs);
+	GetEngineObject()->SetSize(mins, maxs);
 }
 
 

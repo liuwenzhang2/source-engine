@@ -83,7 +83,7 @@ void CSnark::Spawn( void )
 	GetEngineObject()->SetFriction(1.0);
 
 	SetModel( "models/w_squeak2.mdl" );
-	UTIL_SetSize( this, Vector( -4, -4, 0 ), Vector( 4, 4, 8 ) );
+	GetEngineObject()->SetSize( Vector( -4, -4, 0 ), Vector( 4, 4, 8 ) );
 
 	SetBloodColor( BLOOD_COLOR_YELLOW );
 

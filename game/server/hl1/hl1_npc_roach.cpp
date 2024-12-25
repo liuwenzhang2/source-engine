@@ -99,7 +99,7 @@ void CNPC_Roach::Spawn()
 	Precache( );
 
 	SetModel( "models/roach.mdl" );
-	UTIL_SetSize( this, Vector( -1, -1, 0 ), Vector( 1, 1, 2 ) );
+	GetEngineObject()->SetSize( Vector( -1, -1, 0 ), Vector( 1, 1, 2 ) );
 
 	GetEngineObject()->SetSolid( SOLID_BBOX );
 	GetEngineObject()->AddSolidFlags( FSOLID_NOT_STANDABLE );
@@ -162,7 +162,7 @@ bool CNPC_Roach::ShouldEat( void )
 //=========================================================
 void CNPC_Roach::NPCThink( void  )
 {
-	CBaseEntity* pEnt = UTIL_FindClientInPVS(this);
+	CBaseEntity* pEnt = EntityList()->FindClientInPVS(this);
 	if (pEnt==NULL||pEnt->entindex()<=0)
 		GetEngineObject()->SetNextThink( gpGlobals->curtime + random->RandomFloat( 1.0f , 1.5f ) );
 	else
@@ -332,7 +332,7 @@ void CNPC_Roach::Look ( int iDistance )
 
 	// don't let monsters outside of the player's PVS act up, or most of the interesting
 	// things will happen before the player gets there!
-	CBaseEntity* pEnt = UTIL_FindClientInPVS(this);
+	CBaseEntity* pEnt = EntityList()->FindClientInPVS(this);
 	if (pEnt==NULL||pEnt->entindex()<=0)
 	{
 		return;

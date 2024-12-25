@@ -122,7 +122,7 @@ void FX_FireBullets(
 #ifdef CLIENT_DLL
 	C_CSPlayer *pPlayer = ToCSPlayer( EntityList()->GetBaseEntity( iPlayerIndex ) );
 #else
-	CCSPlayer *pPlayer = ToCSPlayer( UTIL_PlayerByIndex( iPlayerIndex) );
+	CCSPlayer *pPlayer = ToCSPlayer( EntityList()->GetPlayerByIndex( iPlayerIndex) );
 #endif
 
 	const char * weaponAlias =	WeaponIDToAlias( iWeaponID );
@@ -314,7 +314,7 @@ void FX_PlantBomb( int iPlayerIndex, const Vector &vOrigin, PlantBombOption_t op
 #ifdef CLIENT_DLL
 	C_CSPlayer *pPlayer = ToCSPlayer( EntityList()->GetBaseEntity( iPlayerIndex ) );
 #else
-	CCSPlayer *pPlayer = ToCSPlayer( UTIL_PlayerByIndex( iPlayerIndex) );
+	CCSPlayer *pPlayer = ToCSPlayer( EntityList()->GetPlayerByIndex( iPlayerIndex) );
 #endif
 
 	// Do the firing animation event.

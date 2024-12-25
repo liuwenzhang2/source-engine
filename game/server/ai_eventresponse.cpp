@@ -72,7 +72,7 @@ void CNPCEventResponseSystem::TriggerEvent( const char *pResponse, bool bForce, 
 //-----------------------------------------------------------------------------
 void CNPCEventResponseSystem::FrameUpdatePreEntityThink()
 {
- 	if ( !m_ActiveEvents.Count() || !AI_IsSinglePlayer() || !UTIL_GetLocalPlayer() )
+ 	if ( !m_ActiveEvents.Count() || !AI_IsSinglePlayer() || !EntityList()->GetLocalPlayer() )
 		return;
 
 	if ( m_flNextEventPoll > gpGlobals->curtime )
@@ -114,7 +114,7 @@ void CNPCEventResponseSystem::FrameUpdatePreEntityThink()
 			{
 				float flNearestDist = NPCEVENTRESPONSE_DISTANCE_SQR;
 				CAI_BaseNPC *pNearestNPC = NULL;
-				Vector vecPlayerCenter = UTIL_GetLocalPlayer()->WorldSpaceCenter();
+				Vector vecPlayerCenter = EntityList()->GetLocalPlayer()->WorldSpaceCenter();
 
 				// Try and find the nearest NPC to the player
 				CAI_BaseNPC **ppAIs = g_AI_Manager.AccessAIs();

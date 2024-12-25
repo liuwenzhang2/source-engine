@@ -344,7 +344,7 @@ ConVar  alyx_darkness_force( "alyx_darkness_force", "0", FCVAR_CHEAT | FCVAR_REP
 		pHead->GetEngineObject()->SetLocalAngles( pCorpse->GetEngineObject()->GetAbsAngles() );
 		UTIL_SetOrigin(pHead, pCorpse->GetEngineObject()->GetAbsOrigin());
 
-		UTIL_SetSize(pHead, pCorpse->GetEngineObject()->WorldAlignMins(), pCorpse->GetEngineObject()->WorldAlignMaxs());
+		pHead->GetEngineObject()->SetSize(pCorpse->GetEngineObject()->WorldAlignMins(), pCorpse->GetEngineObject()->WorldAlignMaxs());
 		g_pBodyQueueHead = (CCorpse *)pHead->GetOwnerEntity();
 	}
 
@@ -1397,7 +1397,7 @@ ConVar  alyx_darkness_force( "alyx_darkness_force", "0", FCVAR_CHEAT | FCVAR_REP
 		{
 			// A physics object has struck a player ally. Don't allow damage if it
 			// came from the player's physcannon. 
-			CBasePlayer *pPlayer = UTIL_PlayerByIndex(1);
+			CBasePlayer *pPlayer = ToBasePlayer(EntityList()->GetPlayerByIndex(1));
 
 			if( pPlayer )
 			{

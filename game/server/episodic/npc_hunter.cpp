@@ -533,7 +533,7 @@ void CHunterFlechette::Spawn()
 
 	SetModel( HUNTER_FLECHETTE_MODEL );
 	GetEngineObject()->SetMoveType( MOVETYPE_FLYGRAVITY, MOVECOLLIDE_FLY_CUSTOM );
-	UTIL_SetSize( this, -Vector(1,1,1), Vector(1,1,1) );
+	GetEngineObject()->SetSize( -Vector(1,1,1), Vector(1,1,1) );
 	GetEngineObject()->SetSolid( SOLID_BBOX );
 	GetEngineObject()->SetGravity( 0.05f );
 	GetEngineObject()->SetCollisionGroup( COLLISION_GROUP_PROJECTILE );
@@ -1020,7 +1020,7 @@ public:
 			// don't test small moveable physics objects (unless it's an NPC)
 			if ( !pEntity->IsNPC() && pEntity->GetEngineObject()->GetMoveType() == MOVETYPE_VPHYSICS )
 			{
-				float entMass = PhysGetEntityMass( pEntity ) ;
+				float entMass = pEntity->GetEngineObject()->PhysGetEntityMass() ;
 				if ( entMass < m_minMass )
 				{
 					if ( entMass < m_minMass * 0.666f || pEntity->GetEngineObject()->BoundingRadius() < (assert_cast<const CAI_BaseNPC *>(EntityFromEntityHandle( m_pPassEnt )))->GetHullHeight() )
@@ -2258,7 +2258,7 @@ void CNPC_Hunter::PrescheduleThink()
 	{
 		if ( m_flPupilDilateTime < gpGlobals->curtime )
 		{
- 			CBasePlayer *pPlayer = UTIL_PlayerByIndex( 1 );
+ 			CBasePlayer *pPlayer = ToBasePlayer(EntityList()->GetPlayerByIndex( 1 ));
  			if ( ( pPlayer && !pPlayer->IsIlluminatedByFlashlight( this, NULL ) ) || !PlayerFlashlightOnMyEyes( pPlayer ) )
 			{
 				//Msg( "NOT SHINING FLASHLIGHT ON ME\n" );
@@ -2362,8 +2362,8 @@ void CNPC_Hunter::GatherConditions()
 						if ( timeDrawnArrow != gpGlobals->curtime )
 						{
 							timeDrawnArrow = gpGlobals->curtime;
-							Vector vEndpoint( vecFuturePos.x, vecFuturePos.y, UTIL_GetLocalPlayer()->WorldSpaceCenter().z - 24 );
-							NDebugOverlay::HorzArrow( UTIL_GetLocalPlayer()->WorldSpaceCenter() - Vector(0, 0, 24), vEndpoint, hunter_dodge_warning_width.GetFloat(), 255, 0, 0, 64, true, .1 );
+							Vector vEndpoint( vecFuturePos.x, vecFuturePos.y, EntityList()->GetLocalPlayer()->WorldSpaceCenter().z - 24 );
+							NDebugOverlay::HorzArrow(EntityList()->GetLocalPlayer()->WorldSpaceCenter() - Vector(0, 0, 24), vEndpoint, hunter_dodge_warning_width.GetFloat(), 255, 0, 0, 64, true, .1 );
 						}
 					}
 				}
@@ -2388,8 +2388,8 @@ void CNPC_Hunter::GatherConditions()
 				if ( timeDrawnArrow != gpGlobals->curtime )
 				{
 					timeDrawnArrow = gpGlobals->curtime;
-					Vector vEndpoint( vecFuturePos.x, vecFuturePos.y, UTIL_GetLocalPlayer()->WorldSpaceCenter().z - 24 );
-					NDebugOverlay::HorzArrow( UTIL_GetLocalPlayer()->WorldSpaceCenter() - Vector(0, 0, 24), vEndpoint, hunter_dodge_warning_width.GetFloat(), 127, 127, 127, 64, true, .1 );
+					Vector vEndpoint( vecFuturePos.x, vecFuturePos.y, EntityList()->GetLocalPlayer()->WorldSpaceCenter().z - 24 );
+					NDebugOverlay::HorzArrow(EntityList()->GetLocalPlayer()->WorldSpaceCenter() - Vector(0, 0, 24), vEndpoint, hunter_dodge_warning_width.GetFloat(), 127, 127, 127, 64, true, .1 );
 				}
 			}
 
@@ -3099,7 +3099,7 @@ int CNPC_Hunter::SelectSchedule()
 				}
 				else
 				{
-					SetTarget( UTIL_GetLocalPlayer() );
+					SetTarget(EntityList()->GetLocalPlayer() );
 					return SCHED_TARGET_FACE;
 				}
 			}
@@ -3131,7 +3131,7 @@ int CNPC_Hunter::SelectSchedule()
 		}
 		else
 		{
-			SetTarget( UTIL_GetLocalPlayer() );
+			SetTarget(EntityList()->GetLocalPlayer() );
 			return SCHED_TARGET_FACE;
 		}
 
@@ -4244,7 +4244,7 @@ bool CNPC_Hunter::HandleChargeImpact( Vector vecImpact, CBaseEntity *pEntity )
 			if ( !pPhysics->IsMoveable() )
 				return true;
 
-			float entMass = PhysGetEntityMass( pEntity ) ;
+			float entMass = pEntity->GetEngineObject()->PhysGetEntityMass() ;
 			float minMass = GetEngineObject()->VPhysicsGetObject()->GetMass() * 0.5f;
 			if ( entMass < minMass )
 			{
@@ -5958,7 +5958,7 @@ void CNPC_Hunter::Event_Killed( const CTakeDamageInfo &info )
 			m_EscortBehavior.GetEscortTarget()->AlertSound();
 			if ( info.GetAttacker() && info.GetAttacker()->IsPlayer() )
 			{
-				m_EscortBehavior.GetEscortTarget()->UpdateEnemyMemory( UTIL_GetLocalPlayer(), UTIL_GetLocalPlayer()->GetEngineObject()->GetAbsOrigin(), this );
+				m_EscortBehavior.GetEscortTarget()->UpdateEnemyMemory(EntityList()->GetLocalPlayer(), EntityList()->GetLocalPlayer()->GetEngineObject()->GetAbsOrigin(), this );
 			}
 		}
 	}

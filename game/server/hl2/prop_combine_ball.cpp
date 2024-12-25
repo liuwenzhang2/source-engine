@@ -717,7 +717,7 @@ void CPropCombineBall::WhizSoundThink()
 	
 	if ( gpGlobals->maxClients == 1 )
 	{
-		CBasePlayer *pPlayer = UTIL_GetLocalPlayer();
+		CBasePlayer *pPlayer = ToBasePlayer(EntityList()->GetLocalPlayer());
 		if ( pPlayer )
 		{
 			Vector vecDelta;

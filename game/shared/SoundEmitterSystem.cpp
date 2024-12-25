@@ -694,7 +694,7 @@ public:
 //				int c = filterCopy.GetRecipientCount();
 //				for ( int i = c - 1 ; i >= 0; --i )
 //				{
-//					CBasePlayer *player = UTIL_PlayerByIndex( filterCopy.GetRecipientIndex( i ) );
+//					CBasePlayer *player = ToBasePlayer(EntityList()->GetPlayerByIndex( filterCopy.GetRecipientIndex( i ) ));
 //					if ( !player )
 //						continue;
 //
@@ -1099,7 +1099,7 @@ public:
 		VPROF_BUDGET("CBaseEntity::EmitSound", _T("CBaseEntity::EmitSound"));
 
 #ifdef GAME_DLL
-		//CBaseEntity* pEntity = UTIL_EntityByIndex(iEntIndex);
+		//CBaseEntity* pEntity = EntityList()->GetBaseEntity(iEntIndex);
 #else
 		//C_BaseEntity* pEntity = EntityList()->GetEnt(iEntIndex);
 		clientdll->ModifyEmitSoundParams(const_cast<EmitSound_t&>(params));
@@ -1125,7 +1125,7 @@ public:
 		VPROF_BUDGET("CBaseEntity::EmitSound", _T("CBaseEntity::EmitSound"));
 
 #ifdef GAME_DLL
-		//CBaseEntity* pEntity = UTIL_EntityByIndex(iEntIndex);
+		//CBaseEntity* pEntity = EntityList()->GetBaseEntity(iEntIndex);
 #else
 		//C_BaseEntity* pEntity = EntityList()->GetEnt(iEntIndex);
 		clientdll->ModifyEmitSoundParams(const_cast<EmitSound_t&>(params));

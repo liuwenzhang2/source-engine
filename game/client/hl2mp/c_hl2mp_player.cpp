@@ -234,7 +234,7 @@ void C_HL2MP_Player::ClientThink( void )
 
 	for( int iClient = 1; iClient <= gpGlobals->maxClients; ++iClient )
 	{
-		CBaseEntity *pEnt = UTIL_PlayerByIndex( iClient );
+		CBaseEntity *pEnt = EntityList()->GetPlayerByIndex( iClient );
 		if(!pEnt || !pEnt->IsPlayer())
 			continue;
 

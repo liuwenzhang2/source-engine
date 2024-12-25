@@ -258,7 +258,7 @@ void CPropPortalStatsDisplay::Enable( void )
 		return;
 
 	// Don't show stats display in non challenge mode!
-	CBasePlayer *pPlayer = UTIL_GetLocalPlayer();
+	CBasePlayer *pPlayer = ToBasePlayer(EntityList()->GetLocalPlayer());
 	if ( pPlayer && pPlayer->GetBonusChallenge() == 0 )
 		return;
 

@@ -59,7 +59,7 @@ void CNPC_Bloater::Spawn()
 	Precache( );
 
 	SetModel( "models/floater.mdl");
-//	UTIL_SetSize( this, VEC_HUMAN_HULL_MIN, VEC_HUMAN_HULL_MAX );
+//	GetEngineObject()->SetSize( VEC_HUMAN_HULL_MIN, VEC_HUMAN_HULL_MAX );
 
 	GetEngineObject()->SetSolid( SOLID_BBOX );
 	GetEngineObject()->AddSolidFlags( FSOLID_NOT_STANDABLE );

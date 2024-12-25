@@ -292,6 +292,7 @@ public:
 	virtual ICollideable* GetCollideable() = 0;
 	// This defines collision bounds in OBB space
 	virtual void SetCollisionBounds(const Vector& mins, const Vector& maxs) = 0;
+	virtual void SetSize(const Vector& mins, const Vector& maxs) = 0;
 	virtual SolidType_t GetSolid() const = 0;
 	virtual bool IsSolid() const = 0;
 	virtual void SetSolid(SolidType_t val) = 0;
@@ -532,6 +533,7 @@ public:
 	virtual bool PhysModelParseSolid(solid_t& solid) = 0;
 	virtual bool PhysModelParseSolidByIndex(solid_t& solid, int solidIndex) = 0;
 	virtual void PhysForceClearVelocity(IPhysicsObject* pPhys) = 0;
+	virtual float PhysGetEntityMass() = 0;
 	virtual bool IsPortalSimulatorCollisionEntity() = 0;
 	virtual bool IsShadowClone() = 0;
 	virtual IEngineObjectServer* GetClonesOfEntity() const = 0;
@@ -1030,6 +1032,8 @@ public:
 	virtual short GetNetworkSerialNumber(int entnum) const = 0;
 	virtual CBaseEntity* GetBaseEntity(int entnum) const = 0;
 	virtual CBaseEntity* GetBaseEntityFromHandle(CBaseHandle hEnt) const = 0;
+	virtual CBaseEntity* GetPlayerByIndex(int playerIndex) = 0;
+	virtual CBaseEntity* GetLocalPlayer() = 0;
 
 	virtual CBaseEntity* FindEntityGeneric(CBaseEntity* pStartEntity, const char* szName, CBaseEntity* pSearchingEntity = NULL, CBaseEntity* pActivator = NULL, CBaseEntity* pCaller = NULL) = 0;
 	virtual CBaseEntity* FindEntityGenericWithin(CBaseEntity* pStartEntity, const char* szName, const Vector& vecSrc, float flRadius, CBaseEntity* pSearchingEntity = NULL, CBaseEntity* pActivator = NULL, CBaseEntity* pCaller = NULL) = 0;
@@ -1052,6 +1056,9 @@ public:
 	virtual CBaseEntity* FindEntityNearestFacing(const Vector& origin, const Vector& facing, float threshold) = 0;
 	virtual CBaseEntity* FindEntityClassNearestFacing(const Vector& origin, const Vector& facing, float threshold, char* classname) = 0;
 	virtual CBaseEntity* FindEntityProcedural(const char* szName, CBaseEntity* pSearchingEntity = NULL, CBaseEntity* pActivator = NULL, CBaseEntity* pCaller = NULL) = 0;
+
+	virtual CBaseEntity* FindEntityForward(CBaseEntity* pMe, bool fHull) = 0;
+	virtual CBaseEntity* FindPickerEntity(CBaseEntity* pPlayer) = 0;
 
 	virtual int AimTarget_ListCount() = 0;
 	virtual int AimTarget_ListCopy(CBaseEntity* pList[], int listMax) = 0;
@@ -1084,6 +1091,17 @@ public:
 
 	virtual bool FindOrAddVehicleScript(const char* pScriptName, vehicleparams_t* pVehicle, vehiclesounds_t* pSounds) = 0;
 	virtual void FlushVehicleScripts() = 0;
+
+	virtual void SetClientVisibilityPVS(CBaseEntity* pClient, const unsigned char* pvs, int pvssize) = 0;
+	virtual bool ClientPVSIsExpanded() = 0;
+
+	virtual CBaseEntity* FindClientInPVS(CBaseEntity* pEdict) = 0;
+	virtual CBaseEntity* FindClientInVisibilityPVS(CBaseEntity* pEdict) = 0;
+
+	// This is a version which finds any clients whose PVS intersects the box
+	virtual CBaseEntity* FindClientInPVS(const Vector& vecBoxMins, const Vector& vecBoxMaxs) = 0;
+	virtual CBaseEntity* EntitiesInPVS(CBaseEntity* pPVSEntity, CBaseEntity* pStartingEntity) = 0;
+
 };
 
 extern IServerEntityList* serverEntitylist;

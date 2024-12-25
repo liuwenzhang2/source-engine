@@ -54,7 +54,7 @@ void CGrenadeSpit::Spawn( void )
 	GetEngineObject()->SetSolidFlags( FSOLID_NOT_STANDABLE );
 
 	SetModel( "models/spitball_large.mdl" );
-	UTIL_SetSize( this, vec3_origin, vec3_origin );
+	GetEngineObject()->SetSize( vec3_origin, vec3_origin );
 
 	SetUse( &CBaseGrenade::DetonateUse );
 	SetTouch( &CGrenadeSpit::GrenadeSpitTouch );

@@ -99,7 +99,7 @@ static void SvNoNemesisChangeCallback( IConVar *pConVar, const char *pOldValue, 
 		// Clear all nemesis relationships.
 		for ( int i = 1 ; i <= gpGlobals->maxClients ; i++ )
 		{
-			CCSPlayer *pTemp = ToCSPlayer( UTIL_PlayerByIndex( i ) );
+			CCSPlayer *pTemp = ToCSPlayer( EntityList()->GetPlayerByIndex( i ) );
 			if ( pTemp )
 			{
 				pTemp->RemoveNemesisRelationships();
@@ -595,7 +595,7 @@ void CCSGameStats::UpdatePlayerRoundStats(int winner)
 
 	for( int iPlayerIndex = 1 ; iPlayerIndex <= MAX_PLAYERS; iPlayerIndex++ )
 	{
-		CCSPlayer *pPlayer = ToCSPlayer( UTIL_PlayerByIndex( iPlayerIndex ) );
+		CCSPlayer *pPlayer = ToCSPlayer( EntityList()->GetPlayerByIndex( iPlayerIndex ) );
 		if ( pPlayer && pPlayer->IsConnected() )
 		{
 			if ( winner == TEAM_CT )
@@ -640,7 +640,7 @@ void CCSGameStats::UpdatePlayerRoundStats(int winner)
 	// send a stats update to all players
 	for ( int iPlayerIndex = 1; iPlayerIndex <= MAX_PLAYERS; iPlayerIndex++ )
 	{
-		CCSPlayer *pPlayer = ToCSPlayer( UTIL_PlayerByIndex( iPlayerIndex ) );
+		CCSPlayer *pPlayer = ToCSPlayer( EntityList()->GetPlayerByIndex( iPlayerIndex ) );
 		if ( pPlayer && pPlayer->IsConnected())
 		{
 			SendStatsToPlayer(pPlayer, CSSTAT_PRIORITY_ENDROUND);
@@ -725,7 +725,7 @@ void CCSGameStats::ComputeRollingStatAverages()
     {
         for( int iPlayerIndex = 1 ; iPlayerIndex <= MAX_PLAYERS; iPlayerIndex++ )
         {
-            CCSPlayer *pPlayer = ToCSPlayer( UTIL_PlayerByIndex( iPlayerIndex ) );
+            CCSPlayer *pPlayer = ToCSPlayer( EntityList()->GetPlayerByIndex( iPlayerIndex ) );
             if ( pPlayer && pPlayer->IsConnected())
             {
                 StatsCollection_t &roundStats = m_aPlayerStats[pPlayer->entindex()].statsCurrentRound;
@@ -781,7 +781,7 @@ void CCSGameStats::ComputeDirectStatAverages()
 
 	for( int iPlayerIndex = 1 ; iPlayerIndex <= MAX_PLAYERS; iPlayerIndex++ )
 	{
-		CCSPlayer *pPlayer = ToCSPlayer( UTIL_PlayerByIndex( iPlayerIndex ) );
+		CCSPlayer *pPlayer = ToCSPlayer( EntityList()->GetPlayerByIndex( iPlayerIndex ) );
 		if ( pPlayer && pPlayer->IsConnected())
 		{
 			StatsCollection_t &matchStats = m_aPlayerStats[pPlayer->entindex()].statsCurrentMatch;
@@ -1557,7 +1557,7 @@ void CCSGameStats::PreClientUpdate()
 	//The proper time has elapsed, now send the update to every player
 	for ( int iPlayerIndex = 1 ; iPlayerIndex <= MAX_PLAYERS; iPlayerIndex++ )
 	{
-		CCSPlayer *pPlayer = ToCSPlayer( UTIL_PlayerByIndex(iPlayerIndex) );
+		CCSPlayer *pPlayer = ToCSPlayer( EntityList()->GetPlayerByIndex(iPlayerIndex) );
 		SendStatsToPlayer(pPlayer, iMinStatPriority);
 	}
 }
@@ -1641,7 +1641,7 @@ void CCSGameStats::CalcDominationAndRevenge( CCSPlayer *pAttacker, CCSPlayer *pV
         int numConcurrentDominations = 0;
         for ( int i = 1 ; i <= gpGlobals->maxClients ; i++ )
         {
-            CCSPlayer *pPlayer= ToCSPlayer( UTIL_PlayerByIndex( i ) );
+            CCSPlayer *pPlayer= ToCSPlayer( EntityList()->GetPlayerByIndex( i ) );
             if (pPlayer && pAttacker->IsPlayerDominated(pPlayer->entindex()))
             {
                 numConcurrentDominations++;
@@ -1711,7 +1711,7 @@ void CCSGameStats::ResetPlayerClassMatchStats()
 {
 	for ( int i = 1; i <= MAX_PLAYERS; i++ )
 	{
-		CCSPlayer *pPlayer = ToCSPlayer( UTIL_PlayerByIndex( i ) );
+		CCSPlayer *pPlayer = ToCSPlayer( EntityList()->GetPlayerByIndex( i ) );
 
 		if ( pPlayer )
 		{

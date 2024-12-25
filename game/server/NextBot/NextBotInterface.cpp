@@ -427,7 +427,7 @@ void INextBot::DebugConColorMsg( NextBotDebugType debugType, const Color &color,
 
 	va_list argptr;
 	char data[ MAX_NEXTBOT_DEBUG_LINE_LENGTH ];
-
+	ConVarRef developer("developer");
 	if ( developer.GetBool() && IsDebugging( debugType ) )
 	{
 		va_start(argptr, fmt);

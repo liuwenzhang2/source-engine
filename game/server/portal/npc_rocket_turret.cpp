@@ -424,7 +424,7 @@ bool CNPC_RocketTurret::CreateVPhysics( void )
 void CNPC_RocketTurret::Activate( void )
 {
 	m_filterBeams.SetPassEntity( this );
-	m_filterBeams.SetPassEntity2( UTIL_GetLocalPlayer() );
+	m_filterBeams.SetPassEntity2(ToBasePlayer(EntityList()->GetLocalPlayer()) );
 	BaseClass::Activate();
 }
 
@@ -592,7 +592,7 @@ void CNPC_RocketTurret::FollowThink( void )
 	// Default to player as enemy
 	if ( GetEnemy() == NULL )
 	{
-		SetEnemy( UTIL_GetLocalPlayer() );
+		SetEnemy(ToBasePlayer(EntityList()->GetLocalPlayer()) );
 	}
 
 	GetEngineObject()->SetSequence ( LookupSequence( "idle" ) );
@@ -787,7 +787,7 @@ void CNPC_RocketTurret::FireRocket ( void )
 	pRocket->CreateSmokeTrail();
 
 	pRocket->SetModel( ROCKET_TURRET_PROJECTILE_NAME );
-	UTIL_SetSize( pRocket, vec3_origin, vec3_origin );
+	pRocket->GetEngineObject()->SetSize( vec3_origin, vec3_origin );
 
 	pRocket->GetEngineObject()->SetAbsVelocity( vForward * 550 );
 	pRocket->SetLauncher ( this );
@@ -1441,7 +1441,7 @@ static void fire_rocket_projectile_f( void )
 	pRocket->GetEngineObject()->SetMoveType( MOVETYPE_FLY );
 
 	pRocket->SetModel( ROCKET_TURRET_PROJECTILE_NAME );
-	UTIL_SetSize( pRocket, vec3_origin, vec3_origin );
+	pRocket->GetEngineObject()->SetSize( vec3_origin, vec3_origin );
 
 	pRocket->CreateSmokeTrail();
 

@@ -90,7 +90,7 @@ void CNPC_Hornet::Spawn( void )
 	}
 
 	SetModel( "models/hornet.mdl" );
-	UTIL_SetSize( this, Vector( -4, -4, -4 ), Vector( 4, 4, 4 ) );
+	GetEngineObject()->SetSize(Vector( -4, -4, -4 ), Vector( 4, 4, 4 ) );
 
 	SetTouch( &CNPC_Hornet::DieTouch );
 	SetThink( &CNPC_Hornet::StartTrack );

@@ -250,7 +250,7 @@ void CBaseMultiplayerPlayer::AwardAchievement( int iAchievement, int iCount )
 			iPlayerIndex = atoi( args[1] );
 		}
 
-		CBaseMultiplayerPlayer *pPlayer = ToBaseMultiplayerPlayer( UTIL_PlayerByIndex( iPlayerIndex ) );
+		CBaseMultiplayerPlayer *pPlayer = ToBaseMultiplayerPlayer( EntityList()->GetPlayerByIndex( iPlayerIndex ) );
 		if ( pPlayer && pPlayer->GetPerLifeCounterKeys() )
 		{
 			CUtlBuffer buf( 0, 0, CUtlBuffer::TEXT_BUFFER );

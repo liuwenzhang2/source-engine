@@ -144,7 +144,7 @@ void CHLTVDirector::SetHLTVServer( IHLTVServer *hltv )
 
 	if ( hltv ) 
 	{
-		m_pHLTVClient = UTIL_PlayerByIndex( hltv->GetHLTVSlot() + 1 );
+		m_pHLTVClient = ToBasePlayer(EntityList()->GetPlayerByIndex( hltv->GetHLTVSlot() + 1 ));
 
 		if ( m_pHLTVClient && m_pHLTVClient->IsHLTV() )
 		{
@@ -225,7 +225,7 @@ void CHLTVDirector::UpdateSettings()
 	// check if camera man is still valid 
 	if ( m_iCameraManIndex > 0 )
 	{
-		CBasePlayer *pPlayer = UTIL_PlayerByIndex( m_iCameraManIndex );
+		CBasePlayer *pPlayer = ToBasePlayer(EntityList()->GetPlayerByIndex( m_iCameraManIndex ));
 		if ( !pPlayer || pPlayer->GetTeamNumber() != TEAM_SPECTATOR )
 		{
 			SetCameraMan( 0 );
@@ -667,7 +667,7 @@ bool CHLTVDirector::SetCameraMan( int iPlayerIndex )
 
 	if ( iPlayerIndex > 0 )
 	{
-		pPlayer = UTIL_PlayerByIndex( iPlayerIndex );
+		pPlayer = ToBasePlayer(EntityList()->GetPlayerByIndex( iPlayerIndex ));
 		if ( !pPlayer || pPlayer->GetTeamNumber() != TEAM_SPECTATOR )
 			return false;
 	}
@@ -686,7 +686,7 @@ bool CHLTVDirector::SetCameraMan( int iPlayerIndex )
 
 	for ( int i = 1; i <= gpGlobals->maxClients; i++ )
 	{
-		CBasePlayer *pPlayer = UTIL_PlayerByIndex( i );
+		CBasePlayer *pPlayer = ToBasePlayer(EntityList()->GetPlayerByIndex( i ));
 
 		if ( pPlayer && pPlayer->GetTeamNumber() == TEAM_SPECTATOR && !pPlayer->IsFakeClient() )
 		{
@@ -1078,7 +1078,7 @@ void CHLTVDirector::BuildActivePlayerList()
 
 	for ( int i =1; i <= gpGlobals->maxClients; i++ )
 	{
-		CBasePlayer *pPlayer = UTIL_PlayerByIndex( i );
+		CBasePlayer *pPlayer = ToBasePlayer(EntityList()->GetPlayerByIndex( i ));
 
 		if ( !pPlayer )
 			continue;
