@@ -15426,7 +15426,7 @@ bool TestEntityTriggerIntersection_Accurate(IEngineObjectServer* pTrigger, IEngi
 
 bool ShouldRemoveThisRagdoll(CBaseEntity* pRagdoll)
 {
-	if (g_RagdollLVManager.IsLowViolence())
+	if (serverGameDLL->IsLowViolence())
 	{
 		return true;
 	}

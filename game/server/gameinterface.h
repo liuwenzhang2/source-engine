@@ -89,6 +89,7 @@ public:
 	virtual void			GameShutdown( void ) OVERRIDE;
 	virtual bool			LevelInit( const char *pMapName, char const *pMapEntities, char const *pOldLevel, char const *pLandmarkName, bool loadGame, bool background ) OVERRIDE;
 	virtual void			ServerActivate( IServerEntity *pEdictList, int edictCount, int clientMax ) OVERRIDE;
+	virtual bool			IsLowViolence();
 	virtual void			LevelShutdown( void ) OVERRIDE;
 	virtual void			GameFrame( bool simulating ) OVERRIDE; // could be called multiple times before sending data to clients
 	virtual void			PreClientUpdate( bool simulating ) OVERRIDE; // called after all GameFrame() calls, before sending data to clients

@@ -13266,7 +13266,7 @@ bool PVSNotifierMap_LessFunc( IClientUnknown* const &a, IClientUnknown* const &b
 
 bool ShouldRemoveThisRagdoll(C_BaseEntity* pRagdoll)
 {
-	if (g_RagdollLVManager.IsLowViolence())
+	if (clientdll->IsLowViolence())
 	{
 		return true;
 	}

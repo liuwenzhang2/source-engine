@@ -1219,6 +1219,11 @@ void CServerGameDLL::ServerActivate( IServerEntity *pEdictList, int edictCount, 
 #endif
 }
 
+bool CServerGameDLL::IsLowViolence()
+{
+	return g_RagdollLVManager.IsLowViolence();
+}
+
 //-----------------------------------------------------------------------------
 // Purpose: Called after the steam API has been activated post-level startup
 //-----------------------------------------------------------------------------

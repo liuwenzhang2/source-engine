@@ -560,6 +560,7 @@ public:
 	// The server is about to activate
 	virtual void			ServerActivate( IServerEntity *pEdictList, int edictCount, int clientMax ) = 0;
 
+	virtual bool			IsLowViolence() = 0;
 	// The server should run physics/think on all edicts
 	virtual void			GameFrame( bool simulating ) = 0;
 

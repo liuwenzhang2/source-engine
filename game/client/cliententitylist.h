@@ -4831,7 +4831,7 @@ void CClientEntityList<T>::UpdateRagdolls(float frametime) // EPISODIC VERSION
 	}
 
 	// fade them all for the low violence version
-	if (g_RagdollLVManager.IsLowViolence())
+	if (clientdll->IsLowViolence())
 	{
 		iMaxRagdollCount = 0;
 	}
@@ -4951,7 +4951,7 @@ void CClientEntityList<T>::UpdateRagdolls(float frametime) // Non-episodic versi
 	}
 
 	// fade them all for the low violence version
-	if (g_RagdollLVManager.IsLowViolence())
+	if (clientdll->IsLowViolence())
 	{
 		iMaxRagdollCount = 0;
 	}

@@ -535,6 +535,7 @@ public:
 
 	virtual void					LevelInitPreEntity( const char *pMapName );
 	virtual void					LevelInitPostEntity();
+	virtual bool					IsLowViolence();
 	virtual void					LevelShutdown( void );
 
 	virtual ClientClass				*GetAllClasses( void );
@@ -1719,6 +1720,12 @@ void CHLClient::LevelInitPostEntity( )
 	C_PhysPropClientside::RecreateAll();
 	internalCenterPrint->Clear();
 }
+
+bool CHLClient::IsLowViolence()
+{
+	return g_RagdollLVManager.IsLowViolence();
+}
+
 
 //-----------------------------------------------------------------------------
 // Purpose: Reset our global string table pointers

@@ -605,6 +605,7 @@ public:
 
 	virtual void			PostInit() = 0;
 
+	virtual bool			IsLowViolence() = 0;
 	// Called once when the client DLL is being unloaded
 	virtual void			Shutdown( void ) = 0;
 	

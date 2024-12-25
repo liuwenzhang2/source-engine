@@ -30,6 +30,7 @@ class CSteamAPIContext;
 class CSteamGameServerAPIContext;
 
 extern IVEngineServer			*engine;
+extern IServerGameDLL			*serverGameDLL;
 extern IServerEntityList*		serverEntitylist;
 extern IVoiceServer				*g_pVoiceServer;
 extern IFileSystem				*filesystem;
