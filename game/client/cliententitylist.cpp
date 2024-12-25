@@ -3922,7 +3922,8 @@ void C_EngineObjectInternal::PreEntityPacketReceived(int commands_acknowledged)
 	bool copyintermediate = (commands_acknowledged > 0) ? true : false;
 
 	Assert(m_pOuter->GetPredictable());
-	Assert(cl_predict->GetInt());
+	ConVarRef cl_predict("cl_predict");
+	Assert(cl_predict.GetInt());
 
 	// First copy in any intermediate predicted data for non-networked fields
 	if (copyintermediate)
@@ -3953,7 +3954,8 @@ void C_EngineObjectInternal::PostEntityPacketReceived(void)
 {
 #if !defined( NO_ENTITY_PREDICTION )
 	Assert(m_pOuter->GetPredictable());
-	Assert(cl_predict->GetInt());
+	ConVarRef cl_predict("cl_predict");
+	Assert(cl_predict.GetInt());
 
 	// Always mark as changed
 	AddDataChangeEvent(this, DATA_UPDATE_DATATABLE_CHANGED, &m_DataChangeEventRef);
