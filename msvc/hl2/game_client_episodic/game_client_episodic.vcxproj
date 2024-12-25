@@ -496,8 +496,6 @@
     <ClCompile Include="..\..\..\game\shared\predictableid.cpp" />
     <ClCompile Include="..\..\..\game\shared\predictioncopy.cpp" />
     <ClCompile Include="..\..\..\game\shared\props_shared.cpp" />
-    <ClCompile Include="..\..\..\game\shared\rope_helpers.cpp" />
-    <ClCompile Include="..\..\..\game\shared\saverestore.cpp" />
     <ClCompile Include="..\..\..\game\shared\sceneentity_shared.cpp" />
     <ClCompile Include="..\..\..\game\shared\script_intro_shared.cpp" />
     <ClCompile Include="..\..\..\game\shared\sequence_Transitioner.cpp" />
@@ -540,6 +538,7 @@
     <ClCompile Include="..\..\..\public\posedebugger.cpp" />
     <ClCompile Include="..\..\..\public\ragdoll_shared.cpp" />
     <ClCompile Include="..\..\..\public\renamed_recvtable_compat.cpp" />
+    <ClCompile Include="..\..\..\public\rope_helpers.cpp" />
     <ClCompile Include="..\..\..\public\rope_physics.cpp" />
     <ClCompile Include="..\..\..\public\scratchpad3d.cpp" />
     <ClCompile Include="..\..\..\public\ScratchPadUtils.cpp" />

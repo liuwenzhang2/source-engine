@@ -31,7 +31,9 @@
 
 //extern IVEngineClient* engine;
 
-
+inline string_t AllocPooledStringInEntityList(const char* pStr) {
+	return clientdll->AllocPooledString(pStr);
+}
 
 class CAttachmentData
 {
@@ -487,7 +489,7 @@ public:
 
 	void SetClassname(const char* className)
 	{
-		m_iClassname = AllocPooledString(className);
+		m_iClassname = AllocPooledStringInEntityList(className);
 	}
 	const string_t& GetClassname() const {
 		return 	m_iClassname;
@@ -3720,7 +3722,8 @@ void CClientEntityList<T>::LevelInitPostEntity()
 
 	// TODO: need to get the right factory function here
 	//physenv->SetDebugOverlay( appSystemFactory );
-	m_pPhysenv->SetGravity(Vector(0, 0, -GetCurrentGravity()));
+	ConVarRef	sv_gravity("sv_gravity");
+	m_pPhysenv->SetGravity(Vector(0, 0, -sv_gravity.GetFloat()));
 	// 15 ms per tick
 	// NOTE: Always run client physics at this rate - helps keep ragdolls stable
 	m_pPhysenv->SetSimulationTimestep(IsXbox() ? DEFAULT_XBOX_CLIENT_VPHYSICS_TICK : DEFAULT_TICK_INTERVAL);

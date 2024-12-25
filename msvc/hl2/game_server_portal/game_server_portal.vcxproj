@@ -409,7 +409,6 @@
     <ClCompile Include="..\..\..\game\server\ragdoll_manager.cpp" />
     <ClCompile Include="..\..\..\game\server\recipientfilter.cpp" />
     <ClCompile Include="..\..\..\game\server\rope.cpp" />
-    <ClCompile Include="..\..\..\game\server\saverestore_gamedll.cpp" />
     <ClCompile Include="..\..\..\game\server\sceneentity.cpp" />
     <ClCompile Include="..\..\..\game\server\scratchpad_gamedll_helpers.cpp" />
     <ClCompile Include="..\..\..\game\server\scripted.cpp" />
@@ -576,8 +575,6 @@
     <ClCompile Include="..\..\..\game\shared\predictableid.cpp" />
     <ClCompile Include="..\..\..\game\shared\props_shared.cpp" />
     <ClCompile Include="..\..\..\game\shared\querycache.cpp" />
-    <ClCompile Include="..\..\..\game\shared\rope_helpers.cpp" />
-    <ClCompile Include="..\..\..\game\shared\saverestore.cpp" />
     <ClCompile Include="..\..\..\game\shared\SceneCache.cpp" />
     <ClCompile Include="..\..\..\game\shared\sceneentity_shared.cpp" />
     <ClCompile Include="..\..\..\game\shared\script_intro_shared.cpp" />
@@ -616,6 +613,7 @@
     <ClCompile Include="..\..\..\public\networkvar.cpp" />
     <ClCompile Include="..\..\..\public\ragdoll_shared.cpp" />
     <ClCompile Include="..\..\..\public\registry.cpp" />
+    <ClCompile Include="..\..\..\public\rope_helpers.cpp" />
     <ClCompile Include="..\..\..\public\rope_physics.cpp" />
     <ClCompile Include="..\..\..\public\scratchpad3d.cpp" />
     <ClCompile Include="..\..\..\public\ScratchPadUtils.cpp" />

@@ -687,6 +687,7 @@ public:
 	virtual bool IsConnectedUserInfoChangeAllowed( IConVar *pCvar );
 	virtual void IN_TouchEvent( int type, int fingerId, int x, int y );
 
+	virtual void GetWindspeedAtTime(float flTime, Vector& vecVelocity);
 private:
 	void UncacheAllMaterials( );
 	void ResetStringTablePointers();
@@ -2975,4 +2976,9 @@ void CHLClient::IN_TouchEvent( int type, int fingerId, int x, int y )
 		inputsystem->GetTouchAccumulators( fingerId, ev.dx, ev.dy );
 
 	gTouch.ProcessEvent( &ev );
+}
+
+void CHLClient::GetWindspeedAtTime(float flTime, Vector& vecVelocity)
+{
+	return ::GetWindspeedAtTime(flTime, vecVelocity);
 }

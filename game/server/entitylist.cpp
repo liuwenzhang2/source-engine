@@ -4201,7 +4201,7 @@ bool CEngineObjectInternal::KeyValue(const char* szKeyName, const char* szValue)
 
 	if (datamap_t::FStrEq(szKeyName, "targetname"))
 	{
-		m_iName = AllocPooledString(szValue);
+		m_iName = AllocPooledStringInEntityList(szValue);
 		return true;
 	}
 
@@ -4210,7 +4210,7 @@ bool CEngineObjectInternal::KeyValue(const char* szKeyName, const char* szValue)
 	{
 		for (datamap_t* dmap = GetDataDescMap(); dmap != NULL; dmap = dmap->baseMap)
 		{
-			if (dmap->ParseKeyvalue(this, szKeyName, szValue, &AllocPooledString))
+			if (dmap->ParseKeyvalue(this, szKeyName, szValue, &AllocPooledStringInEntityList))
 				return true;
 		}
 	}
@@ -4237,7 +4237,7 @@ bool CEngineObjectInternal::KeyValue(const char* szKeyName, const char* szValue)
 				debugName = dmap->dataClassName;
 			}
 
-			if (dmap->ParseKeyvalue(this, szKeyName, szValue, &AllocPooledString))
+			if (dmap->ParseKeyvalue(this, szKeyName, szValue, &AllocPooledStringInEntityList))
 			{
 				if (printKeyHits)
 					Msg("(%s) key: %-16s value: %s\n", debugName, szKeyName, szValue);
@@ -6294,7 +6294,7 @@ int CEngineObjectInternal::RegisterThinkContext(const char* szContext)
 	Q_memset(&sNewFunc, 0, sizeof(sNewFunc));
 	sNewFunc.m_pfnThink = NULL;
 	sNewFunc.m_nNextThinkTick = 0;
-	sNewFunc.m_iszContext = AllocPooledString(szContext);
+	sNewFunc.m_iszContext = AllocPooledStringInEntityList(szContext);
 
 	// Insert it into our list
 	return m_aThinkFunctions.AddToTail(sNewFunc);
@@ -15238,7 +15238,7 @@ void CEngineRopeInternal::NotifyPositionChanged()
 
 void CEngineRopeInternal::SetMaterial(const char* pName)
 {
-	m_strRopeMaterialModel = AllocPooledString(pName);
+	m_strRopeMaterialModel = AllocPooledStringInEntityList(pName);
 	m_iRopeMaterialModelIndex = engine->PrecacheModel(STRING(m_strRopeMaterialModel));
 }
 

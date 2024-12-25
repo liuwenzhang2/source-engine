@@ -32,6 +32,9 @@ extern IVEngineServer* engine;
 extern bool TestEntityTriggerIntersection_Accurate(IEngineObjectServer* pTrigger, IEngineObjectServer* pEntity);
 extern ISaveRestoreBlockHandler* GetPhysSaveRestoreBlockHandler();
 extern ISaveRestoreBlockHandler* GetAISaveRestoreBlockHandler();
+inline string_t AllocPooledStringInEntityList(const char* pStr) {
+	return serverGameDLL->AllocPooledString(pStr);
+}
 
 class CAimTargetManager : public IEntityListener<CBaseEntity>
 {
@@ -428,7 +431,7 @@ public:
 
 	void SetClassname(const char* className)
 	{
-		m_iClassname = AllocPooledString(className);
+		m_iClassname = AllocPooledStringInEntityList(className);
 	}
 	const char* GetClassName() const
 	{
@@ -440,7 +443,7 @@ public:
 	}
 	void SetGlobalname(const char* iGlobalname) 
 	{
-		m_iGlobalname = AllocPooledString(iGlobalname);
+		m_iGlobalname = AllocPooledStringInEntityList(iGlobalname);
 	}
 	const string_t& GetGlobalname() const
 	{
@@ -448,7 +451,7 @@ public:
 	}
 	void SetParentName(const char* parentName)
 	{
-		m_iParent = AllocPooledString(parentName);
+		m_iParent = AllocPooledStringInEntityList(parentName);
 	}
 	string_t& GetParentName() 
 	{
@@ -456,7 +459,7 @@ public:
 	}
 	void SetName(const char* newName)
 	{
-		m_iName = AllocPooledString(newName);
+		m_iName = AllocPooledStringInEntityList(newName);
 	}
 	string_t& GetEntityName()
 	{
@@ -4138,8 +4141,9 @@ void CGlobalEntityList<T>::LevelInitPreEntity()
 	m_pPhysenv->SetObjectEventHandler(&m_Collisions);
 
 	m_pPhysenv->SetSimulationTimestep(gpGlobals->interval_per_tick); // 15 ms per tick
+	ConVarRef	sv_gravity("sv_gravity");
 	// HL Game gravity, not real-world gravity
-	m_pPhysenv->SetGravity(Vector(0, 0, -GetCurrentGravity()));
+	m_pPhysenv->SetGravity(Vector(0, 0, -sv_gravity.GetFloat()));
 	m_PhysAverageSimTime = 0;
 
 	staticpropmgr->CreateVPhysicsRepresentations(m_pPhysenv, g_pSolidSetup, GetBaseEntity(0));
@@ -7125,7 +7129,7 @@ bool CGlobalEntityList<T>::FindOrAddVehicleScript(const char* pScriptName, vehic
 		{
 			// new script, parse it and write to the table
 			index = m_vehicleScripts.AddToTail();
-			m_vehicleScripts[index].scriptName = AllocPooledString(pScriptName);
+			m_vehicleScripts[index].scriptName = AllocPooledStringInEntityList(pScriptName);
 			m_vehicleScripts[index].sounds.Init();
 
 			IVPhysicsKeyParser* pParse = m_pPhyscollision->VPhysicsKeyParserCreate((char*)pFile);

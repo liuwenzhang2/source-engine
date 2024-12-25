@@ -5367,7 +5367,7 @@ int C_EngineObjectInternal::RegisterThinkContext(const char* szContext)
 	Q_memset(&sNewFunc, 0, sizeof(sNewFunc));
 	sNewFunc.m_pfnThink = NULL;
 	sNewFunc.m_nNextThinkTick = 0;
-	sNewFunc.m_iszContext = AllocPooledString(szContext);
+	sNewFunc.m_iszContext = AllocPooledStringInEntityList(szContext);
 
 	// Insert it into our list
 	return m_aThinkFunctions.AddToTail(sNewFunc);
@@ -12885,7 +12885,7 @@ void C_EngineRopeInternal::CPhysicsDelegate::GetNodeForces(CSimplePhysics::CNode
 	if (!m_pKeyframe->m_LinksTouchingSomething[iNode] && m_pKeyframe->m_bApplyWind)
 	{
 		Vector vecWindVel;
-		GetWindspeedAtTime(gpGlobals->curtime, vecWindVel);
+		clientdll->GetWindspeedAtTime(gpGlobals->curtime, vecWindVel);
 		if (vecWindVel.LengthSqr() > 0)
 		{
 			Vector vecWindAccel;
