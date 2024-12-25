@@ -2191,7 +2191,7 @@ void CBaseServerVehicle::SoundState_Update( vbs_sound_update_t &params )
 
 void CBaseServerVehicle::InitSoundParams( vbs_sound_update_t &params )
 {
-	params.Defaults();
+	params.Defaults(gpGlobals->frametime);
 	params.bVehicleInWater = IsVehicleBodyInWater();
 }
 

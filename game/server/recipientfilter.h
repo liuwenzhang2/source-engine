@@ -13,11 +13,15 @@
 
 #include "irecipientfilter.h"
 #include "const.h"
+#include "mathlib/vector.h"
+#include "tier1/utlvector.h"
 //#include "player.h"
 #include "bitvec.h"
 
 class CBaseEntity;
 class CBasePlayer;
+class CTeam;
+class ISoundEmitterSystem;
 
 //-----------------------------------------------------------------------------
 // Purpose: A generic filter for determining whom to send message/sounds etc. to and

@@ -21,6 +21,8 @@ class CBasePlayer;
 class CBaseCombatCharacter;
 class CNPC_VehicleDriver;
 enum VehicleSeatQuery_e;
+class CTakeDamageInfo;
+enum Class_T;
 
 struct vbs_sound_update_t
 {
@@ -33,9 +35,9 @@ struct vbs_sound_update_t
 	bool	bVehicleInWater;
 	bool	bExitVehicle;
 
-	void Defaults()
+	void Defaults(float	FrameTime)
 	{
-		flFrameTime = gpGlobals->frametime;
+		flFrameTime = FrameTime;
 		flCurrentSpeedFraction = 0;
 		flWorldSpaceSpeed = 0;
 		bThrottleDown = false;

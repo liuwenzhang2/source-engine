@@ -17,14 +17,84 @@ class IPhysicsCollision;
 class IPhysicsEnvironment;
 class IPhysicsSurfaceProps;
 struct matrix3x4_t;
-
+struct ragdoll_t;
 struct vcollide_t;
 //struct IStudioHdr;
 class IStudioHdr;
 
+#include "tier0/vprof.h"
+#include "tier0/vcrmode.h"
+#include "tier1/mempool.h"
+#include "tier1/memstack.h"
+#ifdef _WIN32
+#include "typeinfo"
+// BUGBUG: typeinfo stomps some of the warning settings (in yvals.h)
+#pragma warning(disable:4244)
+#elif POSIX
+#include <typeinfo>
+#else
+#error "need typeinfo defined"
+#endif
+#include "utlvector.h"
+#include "utlmultilist.h"
+#include "UtlSortVector.h"
+#include "filesystem.h"
+#include "vstdlib/jobthread.h"
+#include "coordsize.h"
+#include "mathlib/polyhedron.h"
 #include "mathlib/vector.h"
-#include "bone_accessor.h"
+#include "server_class.h"
+#include "client_class.h"
+#include "collisionutils.h"
 #include "vphysics_interface.h"
+#include "vphysics/performance.h"
+#include "vphysics/object_hash.h"
+#include "vphysics/player_controller.h"
+#include "vphysics/constraints.h"
+#include "vphysics/collision_set.h"
+#include "datacache/idatacache.h"
+#include "datacache/imdlcache.h"
+#include "bone_setup.h"
+#include "bone_accessor.h"
+#include "jigglebones.h"
+#include "engine/ivdebugoverlay.h"
+#include "posedebugger.h"
+#include "usercmd.h"
+#include "saverestoretypes.h"
+#include "game/server/iservervehicle.h"
+#include "SoundEmitterSystem/isoundemittersystembase.h"
+#include "model_types.h"
+#include "rope_shared.h"
+#include "rope_physics.h"
+#include "vcollide_parse.h"
+#include "bspfile.h"
+#include "inetchannelinfo.h"
+#include "entitylist_base.h"
+
+#include "debugoverlay_shared.h"
+#include "decals.h"
+#include "IEffects.h"
+#include "animation.h"
+#include "in_buttons.h"
+#include "sharedInterface.h"
+#include "rope_helpers.h"
+#include "igamesystem.h"
+#include "soundenvelope.h"
+#include "saverestore_utlvector.h"
+#include "collisionproperty.h"
+#include "physics_saverestore.h"
+#include "gamestringpool.h"
+#include "mapentities_shared.h"
+#include "util_shared.h"
+#include "portal_util_shared.h"
+#include "physics_shared.h"
+#include "movevars_shared.h"
+#include "hl2_gamerules.h"
+#include "env_wind_shared.h"
+#include "predictioncopy.h"
+#include "baseentity_shared.h"
+#include "vphysics_sound.h"
+
 
 struct ragdollparams_t
 {

@@ -17,8 +17,10 @@
 #include "vphysics/object_hash.h"
 #include "saverestoretypes.h"
 
+class INetworkStringTable;
 class IReplayFactory;
 class CBasePlayer;
+class CRecipientFilter;
 
 extern INetworkStringTable *g_pStringTableInfoPanel;
 extern INetworkStringTable *g_pStringTableServerMapCycle;

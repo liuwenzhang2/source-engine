@@ -12,51 +12,24 @@
 #pragma once
 #endif
 
-#include "tier0/dbg.h"
-#include "icliententitylist.h"
-#include "iclientunknown.h"
-#include "utllinkedlist.h"
-#include "utlvector.h"
-#include "icliententityinternal.h"
-#include "ispatialpartition.h"
-#include "entitylist_base.h"
-#include "utlmap.h"
-#include "client_class.h"
-#include "interpolatedvar.h"
-#include "bone_accessor.h"
-#include "collisionproperty.h"
-#include "baseentity_shared.h"
-//#include "c_baseanimating.h"
-#include "gamestringpool.h"
-#include "saverestoretypes.h"
-#include "physics_saverestore.h"
-#include "mouthinfo.h"
-//#include "ragdoll_shared.h"
-#include "rope_physics.h"
-#include "rope_shared.h"
-#include "bone_setup.h"
-#include "jigglebones.h"
-#include "tier0/vprof.h"
-#include "vstdlib/jobthread.h"
-#include "bone_merge_cache.h"
-#include "toolframework_client.h"
-#include "inetchannelinfo.h"
-#include "usercmd.h"
-#include "engine/ivdebugoverlay.h"
-#include "client_factorylist.h"
-#include "movevars_shared.h"
-#include "vphysics_sound.h"
-#include "engine/IEngineSound.h"
-#include "soundenvelope.h"
-#include "physics_shared.h"
 #include "ragdoll_shared.h"
-#include "util_shared.h"
+
+#include "recvproxy.h"
+#include "client_factorylist.h"
+#include "toolframework_client.h"
+#include "clientleafsystem.h"
+#include "interpolatedvar.h"
+#include "bone_merge_cache.h"
+#include "view.h"
+#include "beamdraw.h"
+#include "c_te_effect_dispatch.h"
+#include "fx_water.h"
 
 //class C_Beam;
 //class C_BaseViewModel;
 //class C_BaseEntity;
 
-extern IVEngineClient* engine;
+//extern IVEngineClient* engine;
 
 
 

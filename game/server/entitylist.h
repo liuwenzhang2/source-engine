@@ -13,39 +13,14 @@
 #pragma once
 #endif
 
-#include "entitylist_base.h"
-#include "baseentity.h"
-#include "server_class.h"
-#include "collisionproperty.h"
-#include "collisionutils.h"
-#include "datacache/imdlcache.h"
-#include "tier0/vprof.h"
-#include "vphysics/object_hash.h"
-#include "saverestoretypes.h"
-#include "gameinterface.h"
-#include "vphysics/player_controller.h"
-//#include "ragdoll_shared.h"
-#include "game/server/iservervehicle.h"
-#include "bone_setup.h"
-#include "usercmd.h"
-#include "gamestringpool.h"
-#include "debugoverlay_shared.h"
-//#include "physics.h"
-#include "bone_accessor.h"
-#include "init_factory.h"
-#include "vphysics/performance.h"
-#include "movevars_shared.h"
-#include "physics_saverestore.h"
-#include "vphysics_sound.h"
-#include "engine/IEngineSound.h"
-#include "coordsize.h"
-#include "soundenvelope.h"
-#include "datacache/idatacache.h"
-#include "physics_shared.h"
+
 #include "ragdoll_shared.h"
-#include "physconstraint.h"
-#include "filesystem.h"
-#include "util_shared.h"
+
+#include "sendproxy.h"
+#include "env_debughistory.h"
+#include "init_factory.h"
+#include "gameinterface.h"
+#include "te_effect_dispatch.h"
 
 //class CBaseEntity;
 // We can only ever move 512 entities across a transition

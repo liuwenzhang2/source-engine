@@ -17,6 +17,7 @@
 #include "engine/IEngineSound.h"
 
 class CSoundPatch;
+class CBasePlayer;
 
 enum soundcommands_t
 {

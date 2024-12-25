@@ -11,40 +11,8 @@
 //			entities is done through this object.
 //-----------------------------------------------------------------------------
 //#include "cbase.h"
-#include "baseentity_shared.h"
-#include "recvproxy.h"
-#include "tier0/vprof.h"
-#include "cdll_bounded_cvars.h"
 #include "cliententitylist.h"
-#include "mapentities_shared.h"
-#include "coordsize.h"
-#include "predictioncopy.h"
-#include "tier1/mempool.h"
-#include "physics_saverestore.h"
-#include "vphysics/constraints.h"
-#include "animation.h"
-#include "mathlib/polyhedron.h"
-#include "model_types.h"
-#include "ragdoll.h"
-#include "env_wind_shared.h"
-#include "rope_helpers.h"
-#include "beamdraw.h"
-#include "tier1/memstack.h"
-#include "c_te_effect_dispatch.h"
-#include "bone_setup.h"
-#include "posedebugger.h"
-#include "jigglebones.h"
-#include "con_nprint.h"
-#include "view.h"
-//#include "c_baseplayer.h"
-#include "basecombatweapon_shared.h"
-#include "vphysics/object_hash.h"
-#include "vphysics/collision_set.h"
-#include "gamerules.h"
-#include "hl2_gamerules.h"
-#include "portal_util_shared.h"
-#include "utlmultilist.h"
-#include "util_shared.h"
+//#include "vphysics/collision_set.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
@@ -2706,7 +2674,6 @@ void C_EngineObjectInternal::MarkMessageReceived()
 	m_flLastMessageTime = engine->GetLastTimeStamp();
 }
 
-extern IUniformRandomStream* random;
 //-----------------------------------------------------------------------------
 // Purpose: Entity data has been parsed and unpacked.  Now do any necessary decoding, munging
 // Input  : bnewentity - was this entity new in this update packet?
@@ -3474,7 +3441,7 @@ int C_EngineObjectInternal::BaseInterpolatePart1(float& currentTime, Vector& old
 
 	if (m_pOuter->GetPredictable() /*|| IsClientCreated()*/)
 	{
-		C_BasePlayer* localplayer = (C_BasePlayer*)g_EntityList.GetLocalPlayer();
+		C_BaseEntity* localplayer = g_EntityList.GetLocalPlayer();
 		if (localplayer && currentTime == gpGlobals->curtime)
 		{
 			currentTime = localplayer->GetFinalPredictedTime();
@@ -4397,7 +4364,7 @@ int C_EngineObjectInternal::RestoreData(const char* context, int slot, int type)
 //-----------------------------------------------------------------------------
 void C_EngineObjectInternal::EstimateAbsVelocity(Vector& vel)
 {
-	if (this->m_pOuter == (C_BasePlayer*)g_EntityList.GetLocalPlayer())
+	if (this->m_pOuter == g_EntityList.GetLocalPlayer())
 	{
 		// This is interpolated and networked
 		vel = GetAbsVelocity();
@@ -12458,10 +12425,9 @@ bool C_EngineRopeInternal::CalculateEndPointAttachment(C_BaseEntity* pEnt, int i
 
 	if (m_RopeFlags & ROPE_PLAYER_WPN_ATTACH)
 	{
-		C_BasePlayer* pPlayer = dynamic_cast<C_BasePlayer*>(pEnt);
-		if (pPlayer)
+		if (pEnt->IsPlayer())
 		{
-			C_BaseAnimating* pModel = pPlayer->GetRenderedWeaponModel();
+			C_BaseEntity* pModel = pEnt->GetRenderedWeaponModel();
 			if (!pModel)
 				return false;
 
@@ -13097,11 +13063,10 @@ bool C_EngineGhostInternal::SetupBones(matrix3x4_t* pBoneToWorldOut, int nMaxBon
 		return false;
 
 	int nModelIndex = 0;
-	CBaseCombatWeapon* pParent = dynamic_cast<CBaseCombatWeapon*>(m_pGhostedSource);
-	if (pParent)
+	if (m_pGhostedSource->IsBaseCombatWeapon())
 	{
-		nModelIndex = pParent->GetEngineObject()->GetModelIndex();
-		pParent->GetEngineObject()->SetModelIndex(pParent->GetWorldModelIndex());
+		nModelIndex = m_pGhostedSource->GetEngineObject()->GetModelIndex();
+		m_pGhostedSource->GetEngineObject()->SetModelIndex(m_pGhostedSource->GetWorldModelIndex());
 	}
 
 	if (m_pGhostedSource->GetEngineObject()->SetupBones(pBoneToWorldOut, nMaxBones, boneMask, currentTime))
@@ -13116,9 +13081,9 @@ bool C_EngineGhostInternal::SetupBones(matrix3x4_t* pBoneToWorldOut, int nMaxBon
 		return true;
 	}
 
-	if (pParent)
+	if (m_pGhostedSource)
 	{
-		pParent->GetEngineObject()->SetModelIndex(nModelIndex);
+		m_pGhostedSource->GetEngineObject()->SetModelIndex(nModelIndex);
 	}
 
 	return false;

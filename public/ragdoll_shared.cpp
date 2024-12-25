@@ -6,33 +6,9 @@
 
 //#include "cbase.h"
 #include "ragdoll_shared.h"
-#include "bone_setup.h"
-#include "vphysics/constraints.h"
-#include "vphysics/collision_set.h"
-#include "vcollide_parse.h"
-#include "tier0/vprof.h"
-#include "engine/ivdebugoverlay.h"
-#include "physics_shared.h"
-#include "globalvars_base.h"
-#include "engine/ivmodelinfo.h"
-#ifdef CLIENT_DLL
-#include "cliententitylist.h"
-#endif // CLIENT_DLL
-#ifdef GAME_DLL
-#include "entitylist.h"
-#endif // GAME_DLL
-#include "util_shared.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
-
-//extern CGlobalVarsBase* gpGlobals;
-#ifdef CLIENT_DLL
-extern IVModelInfoClient* modelinfo;
-#endif // CLIENT_DLL
-#ifdef GAME_DLL
-extern IVModelInfo* modelinfo;
-#endif // GAME_DLL
 
 class CRagdollCollisionRules : public IVPhysicsKeyHandler
 {

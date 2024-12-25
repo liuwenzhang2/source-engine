@@ -662,6 +662,19 @@ enum vehicle_pose_params
 
 };
 
+//-----------------------------------------------------------------------------
+// Vehicles may have more than one passenger.
+// This enum may be expanded by derived classes
+//-----------------------------------------------------------------------------
+enum PassengerRole_t
+{
+	VEHICLE_ROLE_NONE = -1,
+
+	VEHICLE_ROLE_DRIVER = 0,	// Only one driver
+
+	LAST_SHARED_VEHICLE_ROLE,
+};
+
 const unsigned int FCLIENTANIM_SEQUENCE_CYCLE = 0x00000001;
 
 #define MAX_OLD_ENEMIES		4 // how many old enemies to remember

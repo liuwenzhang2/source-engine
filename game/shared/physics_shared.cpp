@@ -4,33 +4,7 @@
 //
 //=============================================================================//
 //#include "cbase.h"
-#include <stdio.h>
-#include <stdlib.h>
-#include "string_t.h"
-#include "bspfile.h"
-#include "vcollide_parse.h"
-#include "filesystem.h"
-//#include "movevars_shared.h"
-#include "engine/ivmodelinfo.h"
-#include "physics_shared.h"
-#include "model_types.h"
-#include "bone_setup.h"
-#include "vphysics/object_hash.h"
-#include "vphysics/friction.h"
-#include "coordsize.h"
-#include <KeyValues.h>
-#include "decals.h"
-#include "IEffects.h"
-#include "SoundEmitterSystem/isoundemittersystembase.h"
-#include "util_shared.h"
-#include "physics_saverestore.h"
-#ifdef CLIENT_DLL
-#include "cliententitylist.h"
-#endif // CLIENT_DLL
-#ifdef GAME_DLL
-#include "entitylist.h"
-#endif // GAME_DLL
-
+#include "ragdoll_shared.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
@@ -47,13 +21,7 @@
 // UNDONE: This hash holds both entity & IPhysicsObject pointer pairs
 // UNDONE: Split into separate hashes?
 //IPhysicsObjectPairHash *g_EntityCollisionHash = NULL;
-#ifdef CLIENT_DLL
-extern IVModelInfoClient* modelinfo;
-#endif // CLIENT_DLL
-#ifdef GAME_DLL
-extern IVModelInfo* modelinfo;
-#endif // GAME_DLL
-extern ISoundEmitterSystem* g_pSoundEmitterSystem;
+
 
 const char *SURFACEPROP_MANIFEST_FILE = "scripts/surfaceproperties_manifest.txt";
 

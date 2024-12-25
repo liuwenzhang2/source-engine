@@ -448,7 +448,7 @@ void CPropCannon::DriveCannon( int iDriverButtons, int iButtonsPressed )
 
 	float flSpeedPercentage = clamp( fabs(m_flTurn) / m_flMaxTurnSpeed, 0, 1 );
 	vbs_sound_update_t params;
-	params.Defaults();
+	params.Defaults(gpGlobals->frametime);
 	params.bThrottleDown = (m_iTurning != CANNON_TURNING_NOT);
 	params.flCurrentSpeedFraction = flSpeedPercentage;
 	params.flWorldSpaceSpeed = 0;

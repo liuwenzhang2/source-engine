@@ -12,7 +12,6 @@
 
 #include "ehandle.h"
 #include "SoundEmitterSystem/isoundemittersystembase.h"
-#include "vphysics_interface.h"
 
 class IPhysics;
 class IPhysicsEnvironment;

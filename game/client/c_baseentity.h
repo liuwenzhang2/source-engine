@@ -649,7 +649,7 @@ public:
 
 	//bool							GetPredictionEligible( void ) const;
 	//void							SetPredictionEligible( bool canpredict );
-
+	virtual float							GetFinalPredictedTime() const { return 0.0f; }
 
 
 	virtual char const* DamageDecal(int bitsDamageType, int gameMaterial);
@@ -766,6 +766,8 @@ public:
 	// TF2 specific
 	virtual bool					IsBaseObject(void) const { return false; }
 	virtual bool					IsBaseCombatWeapon(void) const { return false; }
+	virtual int						GetWorldModelIndex(void) { return GetEngineObject()->GetModelIndex(); }
+	virtual C_BaseEntity*			GetRenderedWeaponModel() { return NULL; }
 	virtual class C_BaseCombatWeapon* MyCombatWeaponPointer() { return NULL; }
 	virtual bool					IsCombatItem(void) const { return false; }
 

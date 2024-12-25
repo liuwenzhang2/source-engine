@@ -6,53 +6,9 @@
 //=============================================================================//
 
 //#include "cbase.h"
-#include "baseentity_shared.h"
-#include "sendproxy.h"
 #include "entitylist.h"
-#ifdef _WIN32
-#include "typeinfo"
-// BUGBUG: typeinfo stomps some of the warning settings (in yvals.h)
-#pragma warning(disable:4244)
-#elif POSIX
-#include <typeinfo>
-#else
-#error "need typeinfo defined"
-#endif
-#include "utlvector.h"
-#include "igamesystem.h"
-#include "collisionutils.h"
-#include "UtlSortVector.h"
-#include "tier0/vprof.h"
-#include "mapentities.h"
+//#include "vphysics/collision_set.h"
 
-#include "datacache/imdlcache.h"
-#include "positionwatcher.h"
-#include "mapentities_shared.h"
-#include "tier1/mempool.h"
-#include "saverestore_utlvector.h"
-#include "tier0/vcrmode.h"
-#include "coordsize.h"
-#include "physics_saverestore.h"
-#include "animation.h"
-#include "vphysics/constraints.h"
-#include "mathlib/polyhedron.h"
-#include "model_types.h"
-#include "te_effect_dispatch.h"
-#include "movevars_shared.h"
-//#include "vehicle_base.h"
-#include "in_buttons.h"
-#include "rope_shared.h"
-#include "rope_helpers.h"
-#include "bone_setup.h"
-//#include "player.h"
-#include "vphysics/collision_set.h"
-#include "env_debughistory.h"
-//#include "physics_prop_ragdoll.h"
-#include "hl2_gamerules.h"
-#include "portal_util_shared.h"
-#include "sharedInterface.h"
-#include "utlmultilist.h"
-#include "util_shared.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
@@ -14144,6 +14100,7 @@ void CEngineVehicleInternal::Teleport(matrix3x4_t& relativeTransform)
 void CEngineVehicleInternal::PlaceWheelDust(int wheelIndex, bool ignoreSpeed)
 {
 	// New vehicles handle this deeper into the base class
+	ConVarRef hl2_episodic("hl2_episodic");
 	if (hl2_episodic.GetBool())
 		return;
 
@@ -14867,7 +14824,7 @@ void CEngineVehicleInternal::UpdateDriverControls(CUserCmd* cmd, float flFrameTi
 
 	float flSpeedPercentage = clamp(m_nSpeed / m_flMaxSpeed, 0.f, 1.f);
 	vbs_sound_update_t params;
-	params.Defaults();
+	params.Defaults(gpGlobals->frametime);
 	params.bReverse = (m_controls.throttle < 0);
 	params.bThrottleDown = bThrottle;
 	params.bTurbo = IsBoosting();
