@@ -83,7 +83,6 @@ public:
 	{
 		return SetTransmitState(FL_EDICT_ALWAYS);
 	}
-	//static bool		IsPortalSimulatorCollisionEntity(const CBaseEntity* pEntity);
 	virtual void	VPhysicsCollision(int index, gamevcollisionevent_t* pEvent) {};
 	virtual void	VPhysicsFriction(IPhysicsObject* pObject, float energy, int surfaceProps, int surfacePropsHit) {};
 #endif // GAME_DLL

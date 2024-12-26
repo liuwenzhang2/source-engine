@@ -1498,7 +1498,7 @@ void CPortal_Player::PlayerUse( void )
 		//{
 		//	CProp_Portal *pPortal = NULL;
 
-		//	CPortalSimulator *pPortalSimulator = CPortalSimulator::GetSimulatorThatOwnsEntity( pGhostAnimating->GetSourceEntity() );
+		//	CPortalSimulator *pPortalSimulator = CPortalSimulator::GetPortalThatOwnsEntity( pGhostAnimating->GetSourceEntity() );
 
 		//	//HACKHACK: This assumes all portal simulators are a member of a prop_portal
 		//	pPortal = (CProp_Portal *)(((char *)pPortalSimulator) - ((int)&(((CProp_Portal *)0)->m_PortalSimulator)));

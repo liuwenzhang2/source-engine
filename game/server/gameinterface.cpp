@@ -1301,6 +1301,7 @@ void CServerGameDLL::GameFrame( bool simulating )
 	//  outside of server frameloop (e.g., in response to concommand)
 	EntityList()->CleanupDeleteList();
 
+	EntityList()->FrameUpdatePreEntityThink();
 	IGameSystem::FrameUpdatePreEntityThinkAllSystems();
 	GameStartFrame();
 

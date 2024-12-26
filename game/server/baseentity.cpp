@@ -450,68 +450,69 @@ void CBaseEntity::PostClientActive( void )
 IEngineObjectServer* CBaseEntity::GetEngineObject() {
 	return EntityList()->GetEngineObject(entindex());
 }
+
 const IEngineObjectServer* CBaseEntity::GetEngineObject() const {
 	return EntityList()->GetEngineObject(entindex());
 }
 
 IEnginePlayerServer* CBaseEntity::GetEnginePlayer()
 {
-	return dynamic_cast<IEnginePlayerServer*>(GetEngineObject());
+	return GetEngineObject()->AsEnginePlayer();
 }
 
 const IEnginePlayerServer* CBaseEntity::GetEnginePlayer() const
 {
-	return dynamic_cast<const IEnginePlayerServer*>(GetEngineObject());
+	return GetEngineObject()->AsEnginePlayer();
 }
 
 IEngineWorldServer* CBaseEntity::GetEngineWorld()
 {
-	return dynamic_cast<IEngineWorldServer*>(GetEngineObject());
+	return GetEngineObject()->AsEngineWorld();
 }
 
 const IEngineWorldServer* CBaseEntity::GetEngineWorld() const
 {
-	return dynamic_cast<const IEngineWorldServer*>(GetEngineObject());
+	return GetEngineObject()->AsEngineWorld();
 }
 
 IEnginePortalServer* CBaseEntity::GetEnginePortal()
 {
-	return dynamic_cast<IEnginePortalServer*>(GetEngineObject());
+	return GetEngineObject()->AsEnginePortal();
 }
 
 const IEnginePortalServer* CBaseEntity::GetEnginePortal() const
 {
-	return dynamic_cast<const IEnginePortalServer*>(GetEngineObject());
+	return GetEngineObject()->AsEnginePortal();
 }
 
 IEngineShadowCloneServer* CBaseEntity::GetEngineShadowClone()
 {
-	return dynamic_cast<IEngineShadowCloneServer*>(GetEngineObject());
+	return GetEngineObject()->AsEngineShadowClone();
 }
 
 const IEngineShadowCloneServer* CBaseEntity::GetEngineShadowClone() const
 {
-	return dynamic_cast<const IEngineShadowCloneServer*>(GetEngineObject());
+	return GetEngineObject()->AsEngineShadowClone();
 }
 
 IEngineVehicleServer* CBaseEntity::GetEngineVehicle()
 {
-	return dynamic_cast<IEngineVehicleServer*>(GetEngineObject());
+	return GetEngineObject()->AsEngineVehicle();
 }
 
 const IEngineVehicleServer* CBaseEntity::GetEngineVehicle() const
 {
-	return dynamic_cast<const IEngineVehicleServer*>(GetEngineObject());
+	return GetEngineObject()->AsEngineVehicle();
 }
 
 IEngineRopeServer* CBaseEntity::GetEngineRope()
 {
-	return dynamic_cast<IEngineRopeServer*>(GetEngineObject());
+	return GetEngineObject()->AsEngineRope();
 }
 
 const IEngineRopeServer* CBaseEntity::GetEngineRope() const
 {
-	return dynamic_cast<const IEngineRopeServer*>(GetEngineObject());
+	return GetEngineObject()->AsEngineRope();
 }
 
 void CBaseEntity::Release() {

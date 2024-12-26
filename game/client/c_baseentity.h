@@ -808,10 +808,14 @@ public:
 
 	virtual IEngineObjectClient* GetEngineObject();
 	virtual const IEngineObjectClient* GetEngineObject() const;
+	virtual IEngineWorldClient* GetEngineWorld();
+	virtual const IEngineWorldClient* GetEngineWorld() const;
 	virtual IEnginePlayerClient* GetEnginePlayer();
 	virtual const IEnginePlayerClient* GetEnginePlayer() const;
 	virtual IEnginePortalClient* GetEnginePortal();
 	virtual const IEnginePortalClient* GetEnginePortal() const;
+	virtual IEngineVehicleClient* GetEngineVehicle();
+	virtual const IEngineVehicleClient* GetEngineVehicle() const;
 	virtual IEngineRopeClient* GetEngineRope();
 	virtual const IEngineRopeClient* GetEngineRope() const;
 	virtual IEngineGhostClient* GetEngineGhost();

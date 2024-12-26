@@ -83,9 +83,13 @@ typedef void (IHandleEntity::* USEPTR)(CBaseEntity* pActivator, CBaseEntity* pCa
 #define DEFINE_USEFUNC( function ) DEFINE_FUNCTION_RAW( function, USEPTR )
 
 class IServerEntity;
-class IEngineShadowCloneServer;
-class IEnginePortalServer;
+class IEngineWorldServer;
 class IEnginePlayerServer;
+class IEnginePortalServer;
+class IEngineShadowCloneServer;
+class IEngineVehicleServer;
+class IEngineRopeServer;
+class IEngineGhostServer;
 
 class IGrabControllerServer {
 public:
@@ -535,13 +539,30 @@ public:
 	virtual bool PhysModelParseSolidByIndex(solid_t& solid, int solidIndex) = 0;
 	virtual void PhysForceClearVelocity(IPhysicsObject* pPhys) = 0;
 	virtual float PhysGetEntityMass() = 0;
-	virtual bool IsPortalSimulatorCollisionEntity() = 0;
-	virtual bool IsShadowClone() = 0;
 	virtual IEngineObjectServer* GetClonesOfEntity() const = 0;
-	virtual IEngineShadowCloneServer* AsEngineShadowClone() = 0;
-	virtual IEnginePortalServer* GetSimulatorThatOwnsEntity() = 0;
+	virtual IEnginePortalServer* GetPortalThatOwnsEntity() = 0;
+
+	virtual bool IsWorld() = 0;
+	virtual IEngineWorldServer* AsEngineWorld() = 0;
+	virtual const IEngineWorldServer* AsEngineWorld() const = 0;
 	virtual bool IsPlayer() = 0;
 	virtual IEnginePlayerServer* AsEnginePlayer() = 0;
+	virtual const IEnginePlayerServer* AsEnginePlayer() const = 0;
+	virtual bool IsPortal() = 0;
+	virtual IEnginePortalServer* AsEnginePortal() = 0;
+	virtual const IEnginePortalServer* AsEnginePortal() const = 0;
+	virtual bool IsShadowClone() = 0;
+	virtual IEngineShadowCloneServer* AsEngineShadowClone() = 0;
+	virtual const IEngineShadowCloneServer* AsEngineShadowClone() const = 0;
+	virtual bool IsVehicle() = 0;
+	virtual IEngineVehicleServer* AsEngineVehicle() = 0;
+	virtual const IEngineVehicleServer* AsEngineVehicle() const = 0;
+	virtual bool IsRope() = 0;
+	virtual IEngineRopeServer* AsEngineRope() = 0;
+	virtual const IEngineRopeServer* AsEngineRope() const = 0;
+	virtual bool IsGhost() = 0;
+	virtual IEngineGhostServer* AsEngineGhost() = 0;
+	virtual const IEngineGhostServer* AsEngineGhost() const = 0;
 	virtual IGrabControllerServer* GetGrabController() = 0;
 };
 
@@ -920,8 +941,9 @@ public:
 
 	// The level is shutdown in two parts
 	virtual void LevelShutdownPreEntity() = 0;
-
 	virtual void LevelShutdownPostEntity() = 0;
+
+	virtual void FrameUpdatePreEntityThink() = 0;
 	virtual void FrameUpdatePostEntityThink() = 0;
 	virtual void PreClientUpdate() = 0;
 

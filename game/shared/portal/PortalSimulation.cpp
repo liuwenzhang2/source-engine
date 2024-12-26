@@ -1008,13 +1008,13 @@ public:
 //	}
 //	virtual void OnEntityDeleted( CBaseEntity *pEntity )
 //	{
-//		CPortalSimulator *pSimulator = CPortalSimulator::GetSimulatorThatOwnsEntity( pEntity );
+//		CPortalSimulator *pSimulator = CPortalSimulator::GetPortalThatOwnsEntity( pEntity );
 //		if( pSimulator )
 //		{
 //			pSimulator->ReleasePhysicsOwnership( pEntity, false );
 //			pSimulator->ReleaseOwnershipOfEntity( pEntity );
 //		}
-//		Assert( CPortalSimulator::GetSimulatorThatOwnsEntity( pEntity ) == NULL );
+//		Assert( CPortalSimulator::GetPortalThatOwnsEntity( pEntity ) == NULL );
 //	}
 //#endif //#ifndef CLIENT_DLL
 };
@@ -1151,18 +1151,6 @@ void CPSCollisionEntity::EndTouch(CBaseEntity* pOther)
 	}
 }
 #endif // GAME_DLL
-
-
-//#ifdef GAME_DLL
-//bool CPortalSimulator::IsPortalSimulatorCollisionEntity( const CBaseEntity *pEntity )
-//{
-//	if (!((CBaseEntity*)pEntity)->IsNetworkable() || pEntity->entindex() == -1) {
-//		return false;
-//	}
-//	return s_PortalSimulatorCollisionEntities[pEntity->entindex()];
-//}
-//#endif // GAME_DLL
-
 
 //const Vector& CPortalSimulator::GetOrigin() const { return GetEnginePortal()->GetOrigin(); }
 //const QAngle& CPortalSimulator::GetAngles() const { return GetEnginePortal()->GetAngles(); }

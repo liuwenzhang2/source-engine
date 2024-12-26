@@ -93,6 +93,13 @@ struct clientthinkfunc_t
 };
 
 class IClientEntity;
+class IEngineWorldClient;
+class IEnginePlayerClient;
+class IEnginePortalClient;
+class IEngineShadowCloneClient;
+class IEngineVehicleClient;
+class IEngineRopeClient;
+class IEngineGhostClient;
 
 class IGrabControllerClient {
 public:
@@ -613,7 +620,34 @@ public:
 	virtual bool PhysModelParseSolid(solid_t& solid) = 0;
 	virtual bool PhysModelParseSolidByIndex(solid_t& solid, int solidIndex) = 0;
 	virtual void PhysForceClearVelocity(IPhysicsObject* pPhys) = 0;
+
+	virtual bool IsWorld() = 0;
+	virtual IEngineWorldClient* AsEngineWorld() = 0;
+	virtual const IEngineWorldClient* AsEngineWorld() const = 0;
+	virtual bool IsPlayer() = 0;
+	virtual IEnginePlayerClient* AsEnginePlayer() = 0;
+	virtual const IEnginePlayerClient* AsEnginePlayer() const = 0;
+	virtual bool IsPortal() = 0;
+	virtual IEnginePortalClient* AsEnginePortal() = 0;
+	virtual const IEnginePortalClient* AsEnginePortal() const = 0;
+	virtual bool IsShadowClone() = 0;
+	virtual IEngineShadowCloneClient* AsEngineShadowClone() = 0;
+	virtual const IEngineShadowCloneClient* AsEngineShadowClone() const = 0;
+	virtual bool IsVehicle() = 0;
+	virtual IEngineVehicleClient* AsEngineVehicle() = 0;
+	virtual const IEngineVehicleClient* AsEngineVehicle() const = 0;
+	virtual bool IsRope() = 0;
+	virtual IEngineRopeClient* AsEngineRope() = 0;
+	virtual const IEngineRopeClient* AsEngineRope() const = 0;
+	virtual bool IsGhost() = 0;
+	virtual IEngineGhostClient* AsEngineGhost() = 0;
+	virtual const IEngineGhostClient* AsEngineGhost() const = 0;
 	virtual IGrabControllerClient* GetGrabController() = 0;
+};
+
+class IEngineWorldClient {
+public:
+
 };
 
 class IEnginePortalClient;
@@ -690,6 +724,11 @@ public:
 	virtual bool				IsActivated() const = 0;
 	virtual bool				IsPortal2() const = 0;
 	virtual void				SetPortal2(bool bPortal2) = 0;
+};
+
+class IEngineShadowCloneClient {
+public:
+
 };
 
 class IEngineVehicleClient {

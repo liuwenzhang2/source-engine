@@ -715,7 +715,7 @@ void CProp_Portal::Activate( void )
 							Assert( ((GetLinkedPortalSimulator() == NULL) && (m_hLinkedPortal.Get() == NULL)) || //m_hPortalSimulator->
 								(GetLinkedPortalSimulator() == m_hLinkedPortal) ); //make sure this entity is linked to the same portal as our simulator m_hPortalSimulator->->m_hPortalSimulator
 
-							IEnginePortalServer*pOwningSimulator = pOther->GetEngineObject()->GetSimulatorThatOwnsEntity();
+							IEnginePortalServer*pOwningSimulator = pOther->GetEngineObject()->GetPortalThatOwnsEntity();
 							if( pOwningSimulator && (pOwningSimulator != this->GetEnginePortal()) )//m_hPortalSimulator
 								pOwningSimulator->ReleaseOwnershipOfEntity( pOther );
 
@@ -1346,7 +1346,7 @@ void CProp_Portal::Touch( CBaseEntity *pOther )
 #endif
 
 				//we should be interacting with this object, add it to our environment
-				IEnginePortalServer *pOwningSimulator = pOther->GetEngineObject()->GetSimulatorThatOwnsEntity();
+				IEnginePortalServer *pOwningSimulator = pOther->GetEngineObject()->GetPortalThatOwnsEntity();
 				if( pOwningSimulator && (pOwningSimulator != this->GetEnginePortal()) )//m_hPortalSimulator
 					pOwningSimulator->ReleaseOwnershipOfEntity( pOther );
 
@@ -1395,7 +1395,7 @@ void CProp_Portal::StartTouch( CBaseEntity *pOther )
 				Assert( ((GetLinkedPortalSimulator() == NULL) && (m_hLinkedPortal.Get() == NULL)) || //m_hPortalSimulator->
 					(GetLinkedPortalSimulator() == m_hLinkedPortal) ); //make sure this entity is linked to the same portal as our simulator m_hPortalSimulator->->m_hPortalSimulator
 
-				IEnginePortalServer *pOwningSimulator = pOther->GetEngineObject()->GetSimulatorThatOwnsEntity();
+				IEnginePortalServer *pOwningSimulator = pOther->GetEngineObject()->GetPortalThatOwnsEntity();
 				if( pOwningSimulator && (pOwningSimulator != this->GetEnginePortal()) )//m_hPortalSimulator
 					pOwningSimulator->ReleaseOwnershipOfEntity( pOther );
 
@@ -1448,7 +1448,7 @@ bool CProp_Portal::SharedEnvironmentCheck( CBaseEntity *pEntity )
 	Assert( ((GetLinkedPortalSimulator() == NULL) && (m_hLinkedPortal.Get() == NULL)) || //m_hPortalSimulator->
 		(GetLinkedPortalSimulator() == m_hLinkedPortal) ); //make sure this entity is linked to the same portal as our simulator m_hPortalSimulator->->m_hPortalSimulator
 
-	IEnginePortalServer *pOwningSimulator = pEntity->GetEngineObject()->GetSimulatorThatOwnsEntity();
+	IEnginePortalServer *pOwningSimulator = pEntity->GetEngineObject()->GetPortalThatOwnsEntity();
 	if( (pOwningSimulator == NULL) || (pOwningSimulator == this->GetEnginePortal()) )//m_hPortalSimulator
 	{
 		//nobody else is claiming ownership
@@ -2229,9 +2229,9 @@ public:
 		//NDebugOverlay::EntityBounds( pEntity, 0, 0, 0, 50, 5.0f );
 
 		if ((pEntity->GetEngineObject()->IsShadowClone() == false) &&
-			(pEntity->GetEngineObject()->IsPortalSimulatorCollisionEntity() == false))
+			(pEntity->GetEngineObject()->IsPortal() == false))
 		{
-			IEnginePortalServer* pOwningSimulator = pEntity->GetEngineObject()->GetSimulatorThatOwnsEntity();
+			IEnginePortalServer* pOwningSimulator = pEntity->GetEngineObject()->GetPortalThatOwnsEntity();
 			if (pOwningSimulator)
 			{
 				pOwningSimulator->ReleasePhysicsOwnership(pEntity, false);
@@ -2264,13 +2264,13 @@ public:
 	}
 	virtual void OnEntityDeleted(CBaseEntity* pEntity)
 	{
-		IEnginePortalServer* pSimulator = pEntity->GetEngineObject()->GetSimulatorThatOwnsEntity();
+		IEnginePortalServer* pSimulator = pEntity->GetEngineObject()->GetPortalThatOwnsEntity();
 		if (pSimulator)
 		{
 			pSimulator->ReleasePhysicsOwnership(pEntity, false);
 			pSimulator->ReleaseOwnershipOfEntity(pEntity);
 		}
-		Assert(pEntity->GetEngineObject()->GetSimulatorThatOwnsEntity() == NULL);
+		Assert(pEntity->GetEngineObject()->GetPortalThatOwnsEntity() == NULL);
 	}
 
 	virtual void PostEntityRemove(int entnum)

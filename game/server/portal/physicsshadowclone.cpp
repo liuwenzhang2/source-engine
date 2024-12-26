@@ -169,7 +169,7 @@ bool CTraceFilterTranslateClones::ShouldHitEntity( IHandleEntity *pEntity, int c
 	if(pEnt->GetEngineObject()->IsShadowClone() )
 	{
 		CBaseEntity *pClonedEntity = ((CPhysicsShadowClone *)pEnt)->GetEngineShadowClone()->GetClonedEntity();
-		IEnginePortalServer *pSimulator = pClonedEntity->GetEngineObject()->GetSimulatorThatOwnsEntity();
+		IEnginePortalServer *pSimulator = pClonedEntity->GetEngineObject()->GetPortalThatOwnsEntity();
 		if( pSimulator->GetEntFlags(pClonedEntity->entindex()) & PSEF_IS_IN_PORTAL_HOLE )
 			return m_pActualFilter->ShouldHitEntity( pClonedEntity, contentsMask );
 		else

@@ -1866,7 +1866,7 @@ int CPortal_CollisionEvent::ShouldCollide(IPhysicsObject* pObj0, IPhysicsObject*
 			bool bStatic[2] = { pObj0->IsStatic(), pObj1->IsStatic() };
 			CEnginePortalInternal* pSimulators[2];
 			for (int i = 0; i != 2; ++i)
-				pSimulators[i] = (CEnginePortalInternal*)pEntities[i]->GetEngineObject()->GetSimulatorThatOwnsEntity();
+				pSimulators[i] = (CEnginePortalInternal*)pEntities[i]->GetEngineObject()->GetPortalThatOwnsEntity();
 
 			AssertOnce((bStatic[0] && bStatic[1]) == false); //hopefully the system doesn't even call in for this, they're both static and can't collide
 			if (bStatic[0] && bStatic[1])
@@ -1879,7 +1879,7 @@ int CPortal_CollisionEvent::ShouldCollide(IPhysicsObject* pObj0, IPhysicsObject*
 				{
 					CBaseEntity* pSource = pEntities[i]->GetEngineShadowClone()->GetClonedEntity();
 
-					CEnginePortalInternal* pSourceSimulator = (CEnginePortalInternal*)pSource->GetEngineObject()->GetSimulatorThatOwnsEntity();
+					CEnginePortalInternal* pSourceSimulator = (CEnginePortalInternal*)pSource->GetEngineObject()->GetPortalThatOwnsEntity();
 					Assert((pSimulators[i]->m_EntFlags[pEntities[i]->entindex()] & PSEF_IS_IN_PORTAL_HOLE) == (pSourceSimulator->m_EntFlags[pSource->entindex()] & PSEF_IS_IN_PORTAL_HOLE));
 				}
 			}
@@ -1895,7 +1895,7 @@ int CPortal_CollisionEvent::ShouldCollide(IPhysicsObject* pObj0, IPhysicsObject*
 						{
 							if (bStatic[i])
 							{
-								if (pEntities[i]->GetEngineObject()->IsPortalSimulatorCollisionEntity())
+								if (pEntities[i]->GetEngineObject()->IsPortal())
 								{
 									PS_PhysicsObjectSourceType_t objectSource;
 									if (pSimulators[i]->CreatedPhysicsObject(pPhysObjects[i], &objectSource) &&
@@ -1954,8 +1954,8 @@ int CPortal_CollisionEvent::ShouldCollide(IPhysicsObject* pObj0, IPhysicsObject*
 				}
 				else
 				{
-					Assert(pEntities[0]->GetEngineObject()->IsPortalSimulatorCollisionEntity() == false);
-					Assert(pEntities[1]->GetEngineObject()->IsPortalSimulatorCollisionEntity() == false);
+					Assert(pEntities[0]->GetEngineObject()->IsPortal() == false);
+					Assert(pEntities[1]->GetEngineObject()->IsPortal() == false);
 
 					for (int i = 0; i != 2; ++i)
 					{
@@ -1980,8 +1980,8 @@ int CPortal_CollisionEvent::ShouldSolvePenetration(IPhysicsObject* pObj0, IPhysi
 		if ((pGameData0 == NULL) || (pGameData1 == NULL))
 			return 0;
 
-		if (((CBaseEntity*)pGameData0)->GetEngineObject()->IsPortalSimulatorCollisionEntity() ||
-			((CBaseEntity*)pGameData1)->GetEngineObject()->IsPortalSimulatorCollisionEntity())
+		if (((CBaseEntity*)pGameData0)->GetEngineObject()->IsPortal() ||
+			((CBaseEntity*)pGameData1)->GetEngineObject()->IsPortal())
 			return 0;
 
 		// For portal, don't solve penetrations on combine balls
@@ -9370,7 +9370,7 @@ CEngineObjectInternal* CEngineObjectInternal::GetClonesOfEntity() const
 	return NULL;
 }
 
-IEnginePortalServer* CEngineObjectInternal::GetSimulatorThatOwnsEntity()
+IEnginePortalServer* CEngineObjectInternal::GetPortalThatOwnsEntity()
 {
 	if (!this->m_pOuter->IsNetworkable() || this->entindex() == -1) {
 		return NULL;
@@ -12179,7 +12179,7 @@ void CEnginePortalInternal::MarkAsReleased(CBaseEntity* pEntity)
 	Assert(pEntity != NULL);
 	int iEntIndex = pEntity->entindex();
 	Assert(gEntList.m_OwnedEntityMap[iEntIndex] == this);
-	Assert(((m_EntFlags[iEntIndex] & PSEF_OWNS_ENTITY) != 0) || pEntity->GetEngineObject()->IsPortalSimulatorCollisionEntity());
+	Assert(((m_EntFlags[iEntIndex] & PSEF_OWNS_ENTITY) != 0) || pEntity->GetEngineObject()->IsPortal());
 
 	gEntList.m_OwnedEntityMap[iEntIndex] = NULL;
 	m_EntFlags[iEntIndex] &= ~PSEF_OWNS_ENTITY;
@@ -12208,7 +12208,7 @@ void UpdateShadowClonesPortalSimulationFlags(const CBaseEntity* pSourceEntity, u
 	while (pClones)
 	{
 		CBaseEntity* pClone = pClones->GetOuter();
-		CEnginePortalInternal* pCloneSimulator = (CEnginePortalInternal*)pClone->GetEngineObject()->GetSimulatorThatOwnsEntity();
+		CEnginePortalInternal* pCloneSimulator = (CEnginePortalInternal*)pClone->GetEngineObject()->GetPortalThatOwnsEntity();
 
 		unsigned int* pFlags = (unsigned int*)&pCloneSimulator->m_EntFlags[pClone->entindex()];
 		*pFlags &= ~iFlags;
@@ -12244,9 +12244,9 @@ void CEnginePortalInternal::TakeOwnershipOfEntity(CBaseEntity* pEntity)
 	if (OwnsEntity(pEntity))
 		return;
 
-	Assert(pEntity->GetEngineObject()->GetSimulatorThatOwnsEntity() == NULL);
+	Assert(pEntity->GetEngineObject()->GetPortalThatOwnsEntity() == NULL);
 	MarkAsOwned(pEntity);
-	Assert(pEntity->GetEngineObject()->GetSimulatorThatOwnsEntity() == this);
+	Assert(pEntity->GetEngineObject()->GetPortalThatOwnsEntity() == this);
 
 	if (EntityIsInPortalHole(pEntity->GetEngineObject()))
 		m_EntFlags[pEntity->entindex()] |= PSEF_IS_IN_PORTAL_HOLE;
@@ -12274,7 +12274,7 @@ void CEnginePortalInternal::TakeOwnershipOfEntity(CBaseEntity* pEntity)
 	for (int i = childrenList.Count(); --i >= 0; )
 	{
 		CBaseEntity* pEnt = childrenList[i]->GetOuter();
-		IEnginePortalServer* pOwningSimulator = pEnt->GetEngineObject()->GetSimulatorThatOwnsEntity();
+		IEnginePortalServer* pOwningSimulator = pEnt->GetEngineObject()->GetPortalThatOwnsEntity();
 		if (pOwningSimulator != this)
 		{
 			if (pOwningSimulator != NULL)
@@ -12325,9 +12325,9 @@ void CEnginePortalInternal::ReleaseOwnershipOfEntity(CBaseEntity* pEntity, bool 
 	m_EntFlags[pEntity->entindex()] &= ~PSEF_IS_IN_PORTAL_HOLE;
 	UpdateShadowClonesPortalSimulationFlags(pEntity, PSEF_IS_IN_PORTAL_HOLE, m_EntFlags[pEntity->entindex()]);
 
-	Assert(pEntity->GetEngineObject()->GetSimulatorThatOwnsEntity() == this);
+	Assert(pEntity->GetEngineObject()->GetPortalThatOwnsEntity() == this);
 	MarkAsReleased(pEntity);
-	Assert(pEntity->GetEngineObject()->GetSimulatorThatOwnsEntity() == NULL);
+	Assert(pEntity->GetEngineObject()->GetPortalThatOwnsEntity() == NULL);
 
 	if (bMovingToLinkedSimulator == false)
 	{
@@ -12350,7 +12350,7 @@ void CEnginePortalInternal::ReleaseAllEntityOwnership(void)
 	{
 		CBaseEntity* pEntity = m_OwnedEntities[iSkippedObjects];
 		if (pEntity->GetEngineObject()->IsShadowClone() ||
-			pEntity->GetEngineObject()->IsPortalSimulatorCollisionEntity())
+			pEntity->GetEngineObject()->IsPortal())
 		{
 			++iSkippedObjects;
 			continue;
@@ -12374,7 +12374,7 @@ void CEnginePortalInternal::TakePhysicsOwnership(CBaseEntity* pEntity)
 	if (GetPhysicsEnvironment() == NULL)
 		return;
 
-	if (pEntity->GetEngineObject()->IsPortalSimulatorCollisionEntity())
+	if (pEntity->GetEngineObject()->IsPortal())
 		return;
 
 	Assert(pEntity->GetEngineObject()->IsShadowClone() == false);
@@ -12486,7 +12486,7 @@ void CEnginePortalInternal::ReleasePhysicsOwnership(CBaseEntity* pEntity, bool b
 		return;
 	}
 
-	if (pEntity->GetEngineObject()->IsPortalSimulatorCollisionEntity())
+	if (pEntity->GetEngineObject()->IsPortal())
 		return;
 
 	Assert(OwnsEntity(pEntity)); //releasing physics ownership happens BEFORE releasing general ownership
@@ -12610,7 +12610,7 @@ int CEnginePortalInternal::GetMoveableOwnedEntities(CBaseEntity** pEntsOut, int 
 		if (pEnt->GetEngineObject()->IsShadowClone())
 			continue;
 
-		if (pEnt->GetEngineObject()->IsPortalSimulatorCollisionEntity())
+		if (pEnt->GetEngineObject()->IsPortal())
 			continue;
 
 		if (pEnt->GetEngineObject()->GetMoveType() == MOVETYPE_NONE)
@@ -12635,7 +12635,7 @@ void CEnginePortalInternal::BeforeMove()
 	{
 		CBaseEntity* pEntity = m_OwnedEntities[i];
 		if (pEntity->GetEngineObject()->IsShadowClone() ||
-			pEntity->GetEngineObject()->IsPortalSimulatorCollisionEntity())
+			pEntity->GetEngineObject()->IsPortal())
 			continue;
 
 		if (EntityIsInPortalHole(pEntity->GetEngineObject()))
@@ -12677,10 +12677,10 @@ void CEnginePortalInternal::BeforeLocalPhysicsClear()
 		for (int i = m_ShadowClones.FromLinkedPortal.Count(); --i >= 0; )
 		{
 			CEngineShadowCloneInternal* pClone = m_ShadowClones.FromLinkedPortal[i];
-			Assert(pClone->AsEngineObject()->GetSimulatorThatOwnsEntity() == this);
+			Assert(pClone->AsEngineObject()->GetPortalThatOwnsEntity() == this);
 			m_EntFlags[pClone->entindex()] &= ~PSEF_OWNS_PHYSICS;
 			MarkAsReleased(pClone->AsEngineObject()->GetOuter());
-			Assert(pClone->AsEngineObject()->GetSimulatorThatOwnsEntity() == NULL);
+			Assert(pClone->AsEngineObject()->GetPortalThatOwnsEntity() == NULL);
 			CEngineShadowCloneInternal::ReleaseShadowClone(pClone);
 		}
 
@@ -12727,7 +12727,7 @@ void CEnginePortalInternal::AfterLinkedPhysicsCreated()
 	for (int i = RemoteOwnedEntities.Count(); --i >= 0; )
 	{
 		if (RemoteOwnedEntities[i]->GetEngineObject()->IsShadowClone() ||
-			RemoteOwnedEntities[i]->GetEngineObject()->IsPortalSimulatorCollisionEntity())
+			RemoteOwnedEntities[i]->GetEngineObject()->IsPortal())
 			continue;
 
 		int j;
@@ -12773,7 +12773,7 @@ void CEnginePortalInternal::StartCloningEntity(CBaseEntity* pEntity)
 		return;
 	}
 
-	if (pEntity->GetEngineObject()->IsShadowClone() || pEntity->GetEngineObject()->IsPortalSimulatorCollisionEntity())
+	if (pEntity->GetEngineObject()->IsShadowClone() || pEntity->GetEngineObject()->IsPortal())
 		return;
 
 	if ((m_EntFlags[pEntity->entindex()] & PSEF_CLONES_ENTITY_FROM_MAIN) != 0)
@@ -14073,7 +14073,7 @@ void CEngineVehicleInternal::TurnOn()
 
 	if (!m_bIsOn)
 	{
-		GetOuterServerVehicle()->SoundStart();
+		m_pOuter->GetServerVehicle()->SoundStart();
 		m_bIsOn = true;
 	}
 }
@@ -14087,7 +14087,7 @@ void CEngineVehicleInternal::TurnOff()
 
 	if (m_bIsOn)
 	{
-		GetOuterServerVehicle()->SoundShutdown();
+		m_pOuter->GetServerVehicle()->SoundShutdown();
 		m_bIsOn = false;
 	}
 }
@@ -14252,7 +14252,7 @@ bool CEngineVehicleInternal::Think()
 			{
 				m_bLastSkid = true;
 				CPASAttenuationFilter filter(m_pOuter);
-				GetOuterServerVehicle()->PlaySound(VS_SKID_FRICTION_NORMAL);
+				m_pOuter->GetServerVehicle()->PlaySound(VS_SKID_FRICTION_NORMAL);
 			}
 
 			// kick up dust from the wheels while skidding
@@ -14264,7 +14264,7 @@ bool CEngineVehicleInternal::Think()
 		else if (m_bLastSkid == true)
 		{
 			m_bLastSkid = false;
-			GetOuterServerVehicle()->StopSound(VS_SKID_FRICTION_NORMAL);
+			m_pOuter->GetServerVehicle()->StopSound(VS_SKID_FRICTION_NORMAL);
 		}
 
 		// toss dust up from the wheels of the vehicle if we're moving fast enough
@@ -14342,7 +14342,7 @@ void CEngineVehicleInternal::GetVehicleViewPosition(const char* pViewAttachment,
 	ConVarRef r_VehicleViewDampen("r_VehicleViewDampen");
 	if (r_VehicleViewDampen.GetInt())
 	{
-		GetOuterServerVehicle()->DampenEyePosition(vehicleEyeOrigin, vehicleEyeAngles);
+		m_pOuter->GetServerVehicle()->DampenEyePosition(vehicleEyeOrigin, vehicleEyeAngles);
 	}
 #endif
 
@@ -14613,7 +14613,7 @@ void CEngineVehicleInternal::UpdateDriverControls(CUserCmd* cmd, float flFrameTi
 	// forward unless the player makes a significant motion towards reverse.
 	// (The inverse is true when driving in reverse and the stick is moved slightly forward)
 	//-------------------------------------------------------------------------
-	IDrivableVehicle* pDrivableVehicle = dynamic_cast<IDrivableVehicle*>(GetOuterServerVehicle());
+	IDrivableVehicle* pDrivableVehicle = dynamic_cast<IDrivableVehicle*>(m_pOuter->GetServerVehicle());
 	CBaseEntity* pDriver = pDrivableVehicle ? pDrivableVehicle->GetDriver() : NULL;
 	CBaseEntity* pPlayerDriver;
 	float flBiasThreshold = xbox_throttlebias.GetFloat();
@@ -14887,11 +14887,11 @@ void CEngineVehicleInternal::UpdateDriverControls(CUserCmd* cmd, float flFrameTi
 	params.bReverse = (m_controls.throttle < 0);
 	params.bThrottleDown = bThrottle;
 	params.bTurbo = IsBoosting();
-	params.bVehicleInWater = GetOuterServerVehicle()->IsVehicleBodyInWater();
+	params.bVehicleInWater = m_pOuter->GetServerVehicle()->IsVehicleBodyInWater();
 	params.flCurrentSpeedFraction = flSpeedPercentage;
 	params.flFrameTime = flFrameTime;
 	params.flWorldSpaceSpeed = carState.speed;
-	GetOuterServerVehicle()->SoundUpdate(params);
+	m_pOuter->GetServerVehicle()->SoundUpdate(params);
 }
 
 //-----------------------------------------------------------------------------

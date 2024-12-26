@@ -1162,6 +1162,27 @@ public:
 	bool PhysModelParseSolidByIndex(solid_t& solid, int solidIndex);
 	void PhysForceClearVelocity(IPhysicsObject* pPhys);
 
+	bool IsWorld() { return false; }
+	IEngineWorldClient* AsEngineWorld() { Error("I am not EngineWorld!"); }
+	const IEngineWorldClient* AsEngineWorld() const { Error("I am not EngineWorld!"); }
+	bool IsPlayer() { return false; }
+	IEnginePlayerClient* AsEnginePlayer() { Error("I am not EnginePlayer!"); }
+	const IEnginePlayerClient* AsEnginePlayer() const { Error("I am not EnginePlayer!"); }
+	bool IsPortal() { return false; }
+	IEnginePortalClient* AsEnginePortal() { Error("I am not EnginePortal!"); }
+	const IEnginePortalClient* AsEnginePortal() const { Error("I am not EnginePortal!"); }
+	bool IsShadowClone() { return false; }
+	IEngineShadowCloneClient* AsEngineShadowClone() { Error("I am not EngineShadowClone!"); }
+	const IEngineShadowCloneClient* AsEngineShadowClone() const { Error("I am not EngineShadowClone!"); }
+	bool IsVehicle() { return false; }
+	IEngineVehicleClient* AsEngineVehicle() { Error("I am not EngineVehicle!"); }
+	const IEngineVehicleClient* AsEngineVehicle() const { Error("I am not EngineVehicle!"); }
+	bool IsRope() { return false; }
+	IEngineRopeClient* AsEngineRope() { Error("I am not EngineRope!"); }
+	const IEngineRopeClient* AsEngineRope() const { Error("I am not EngineRope!"); }
+	bool IsGhost() { return false; }
+	IEngineGhostClient* AsEngineGhost() { Error("I am not EngineGhost!"); }
+	const IEngineGhostClient* AsEngineGhost() const { Error("I am not EngineGhost!"); }
 	C_GrabControllerInternal* GetGrabController() { return &m_grabController; }
 private:
 	void LockStudioHdr();
@@ -2216,7 +2237,7 @@ inline bool C_EngineObjectInternal::IsNoInterpolationFrame()
 	return m_ubOldInterpolationFrame != m_ubInterpolationFrame;
 }
 
-class C_EngineWorldInternal : public C_EngineObjectInternal {
+class C_EngineWorldInternal : public C_EngineObjectInternal, public IEngineWorldClient {
 public:
 	DECLARE_CLASS(C_EngineWorldInternal, C_EngineObjectInternal);
 	C_EngineWorldInternal(IClientEntityList* pClientEntityList, int iForceEdictIndex, int iSerialNum)
@@ -2224,6 +2245,10 @@ public:
 	{
 		
 	}
+
+	bool IsWorld() { return true; }
+	C_EngineWorldInternal* AsEngineWorld() { return this; }
+	const C_EngineWorldInternal* AsEngineWorld() const { return this; }
 };
 
 class C_EnginePlayerInternal : public C_EngineObjectInternal, public IEnginePlayerClient {
@@ -2237,6 +2262,9 @@ public:
 	void ToggleHeldObjectOnOppositeSideOfPortal(void) { m_bHeldObjectOnOppositeSideOfPortal = !m_bHeldObjectOnOppositeSideOfPortal; }
 	void SetHeldObjectOnOppositeSideOfPortal(bool p_bHeldObjectOnOppositeSideOfPortal) { m_bHeldObjectOnOppositeSideOfPortal = p_bHeldObjectOnOppositeSideOfPortal; }
 	bool IsHeldObjectOnOppositeSideOfPortal(void) { return m_bHeldObjectOnOppositeSideOfPortal; }
+	bool IsPlayer() { return true; }
+	C_EnginePlayerInternal* AsEnginePlayer() { return this; }
+	const C_EnginePlayerInternal* AsEnginePlayer() const { return this; }
 private:
 	EHANDLE	m_hPortalEnvironment; //a portal whose environment the player is currently in, should be invalid most of the time
 	EHANDLE m_pHeldObjectPortal;
@@ -2312,6 +2340,9 @@ public:
 	bool				IsActivated() const { return m_bActivated; }
 	bool				IsPortal2() const { return m_bIsPortal2; }
 	void				SetPortal2(bool bPortal2) { m_bIsPortal2 = bPortal2; }
+	bool IsPortal() { return true; }
+	C_EnginePortalInternal* AsEnginePortal() { return this; }
+	const C_EnginePortalInternal* AsEnginePortal() const { return this; }
 private:
 	int					m_iPortalSimulatorGUID;
 	//IPhysicsEnvironment* pPhysicsEnvironment = NULL;
@@ -2335,7 +2366,7 @@ inline bool C_EnginePortalInternal::IsActivedAndLinked(void) const
 	return (m_bActivated && GetLinkedPortal() != NULL);
 }
 
-class C_EngineShadowCloneInternal : public C_EngineObjectInternal {
+class C_EngineShadowCloneInternal : public C_EngineObjectInternal, public IEngineShadowCloneClient {
 public:
 	DECLARE_CLASS(C_EngineShadowCloneInternal, C_EngineObjectInternal);
 	C_EngineShadowCloneInternal(IClientEntityList* pClientEntityList, int iForceEdictIndex, int iSerialNum)
@@ -2343,6 +2374,10 @@ public:
 	{
 	
 	}
+
+	bool IsShadowClone() { return true; }
+	C_EngineShadowCloneInternal* AsEngineShadowClone() { return this; }
+	const C_EngineShadowCloneInternal* AsEngineShadowClone() const { return this; }
 };
 
 class C_EngineVehicleInternal : public C_EngineObjectInternal, public IEngineVehicleClient {
@@ -2353,6 +2388,10 @@ public:
 	{
 	
 	}
+
+	bool IsVehicle() { return true; }
+	C_EngineVehicleInternal* AsEngineVehicle() { return this; }
+	const C_EngineVehicleInternal* AsEngineVehicle() const { return this; }
 };
 
 class C_EngineRopeInternal : public C_EngineObjectInternal, public IEngineRopeClient {
@@ -2418,6 +2457,10 @@ public:
 	void			AddToRenderCache();
 	void			RopeThink();
 	Vector&			GetImpulse() { return m_flImpulse; }
+
+	bool IsRope() { return true; }
+	C_EngineRopeInternal* AsEngineRope() { return this; }
+	const C_EngineRopeInternal* AsEngineRope() const { return this; }
 private:
 	void			RunRopeSimulation(float flSeconds);
 	Vector			ConstrainNode(const Vector& vNormal, const Vector& vNodePosition, const Vector& vMidpiont, float fNormalLength);
@@ -2523,6 +2566,10 @@ public:
 	virtual bool GetAttachmentVelocity(int number, Vector& originVel, Quaternion& angleVel);
 	// Get the model instance of the ghosted model so that decals will properly draw across portals
 	virtual ModelInstanceHandle_t GetModelInstance();
+
+	bool IsGhost() { return true; }
+	C_EngineGhostInternal* AsEngineGhost() { return this; }
+	const C_EngineGhostInternal* AsEngineGhost() const { return this; }
 private:
 	C_BaseEntity* m_pGhostedSource; //the renderable we're transforming and re-rendering
 	bool m_bSourceIsBaseAnimating;

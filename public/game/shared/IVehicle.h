@@ -12,7 +12,7 @@
 #pragma once
 #endif
 
-//#include "baseplayer_shared.h"
+#include "tier0/platform.h"
 
 class CUserCmd;
 class IMoveHelper;

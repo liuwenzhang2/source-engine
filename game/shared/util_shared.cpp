@@ -706,7 +706,7 @@ void UTIL_TraceEntityThroughPortal(CBaseEntity* pEntity, const Vector& vecAbsSta
 		pPortal = pEntity->GetEnginePlayer()->GetPortalEnvironment();
 	}
 #else
-	IEnginePortalServer* pPortal = pEntity->GetEngineObject()->GetSimulatorThatOwnsEntity();
+	IEnginePortalServer* pPortal = pEntity->GetEngineObject()->GetPortalThatOwnsEntity();
 #endif
 
 	UTIL_Portal_TraceEntity(pPortal, pEntity, vecAbsStart, vecAbsEnd, mask, pFilter, pTrace);

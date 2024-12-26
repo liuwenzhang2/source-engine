@@ -398,45 +398,65 @@ C_BaseEntity::~C_BaseEntity()
 IEngineObjectClient* C_BaseEntity::GetEngineObject() {
 	return EntityList()->GetEngineObject(entindex());
 }
+
 const IEngineObjectClient* C_BaseEntity::GetEngineObject() const {
 	return EntityList()->GetEngineObject(entindex());
 }
 
-IEnginePlayerClient* C_BaseEntity::GetEnginePlayer() {
-	return dynamic_cast<IEnginePlayerClient*>(GetEngineObject());
+IEngineWorldClient* C_BaseEntity::GetEngineWorld() {
+	return GetEngineObject()->AsEngineWorld();
 }
+
+const IEngineWorldClient* C_BaseEntity::GetEngineWorld() const {
+	return GetEngineObject()->AsEngineWorld();
+}
+
+IEnginePlayerClient* C_BaseEntity::GetEnginePlayer() {
+	return GetEngineObject()->AsEnginePlayer();
+}
+
 const IEnginePlayerClient* C_BaseEntity::GetEnginePlayer() const {
-	return dynamic_cast<const IEnginePlayerClient*>(GetEngineObject());
+	return GetEngineObject()->AsEnginePlayer();
 }
 
 IEnginePortalClient* C_BaseEntity::GetEnginePortal()
 {
-	return dynamic_cast<IEnginePortalClient*>(GetEngineObject());
+	return GetEngineObject()->AsEnginePortal();
 }
 
 const IEnginePortalClient* C_BaseEntity::GetEnginePortal() const
 {
-	return dynamic_cast<const IEnginePortalClient*>(GetEngineObject());
+	return GetEngineObject()->AsEnginePortal();
+}
+
+IEngineVehicleClient* C_BaseEntity::GetEngineVehicle()
+{
+	return GetEngineObject()->AsEngineVehicle();
+}
+
+const IEngineVehicleClient* C_BaseEntity::GetEngineVehicle() const
+{
+	return GetEngineObject()->AsEngineVehicle();
 }
 
 IEngineRopeClient* C_BaseEntity::GetEngineRope()
 {
-	return dynamic_cast<IEngineRopeClient*>(GetEngineObject());
+	return GetEngineObject()->AsEngineRope();
 }
 
 const IEngineRopeClient* C_BaseEntity::GetEngineRope() const
 {
-	return dynamic_cast<const IEngineRopeClient*>(GetEngineObject());
+	return GetEngineObject()->AsEngineRope();
 }
 
 IEngineGhostClient* C_BaseEntity::GetEngineGhost()
 {
-	return dynamic_cast<IEngineGhostClient*>(GetEngineObject());
+	return GetEngineObject()->AsEngineGhost();
 }
 
 const IEngineGhostClient* C_BaseEntity::GetEngineGhost() const
 {
-	return dynamic_cast<const IEngineGhostClient*>(GetEngineObject());
+	return GetEngineObject()->AsEngineGhost();
 }
 
 void C_BaseEntity::Clear( void )
