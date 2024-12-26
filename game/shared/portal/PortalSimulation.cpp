@@ -126,11 +126,11 @@ CPortalSimulator::CPortalSimulator( void )
 
 
 
-#ifndef CLIENT_DLL
-	PS_SD_Static_World_StaticProps_ClippedProp_t::pTraceEntity = GetWorldEntity(); //will overinitialize, but it's cheap
-#else
-	PS_SD_Static_World_StaticProps_ClippedProp_t::pTraceEntity = GetClientWorldEntity();
-#endif
+//#ifndef CLIENT_DLL
+//	PS_SD_Static_World_StaticProps_ClippedProp_t::pTraceEntity = GetWorldEntity(); //will overinitialize, but it's cheap
+//#else
+//	PS_SD_Static_World_StaticProps_ClippedProp_t::pTraceEntity = GetClientWorldEntity();
+//#endif
 }
 
 #ifdef CLIENT_DLL

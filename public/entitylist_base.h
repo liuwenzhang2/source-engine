@@ -1425,9 +1425,9 @@ struct PS_SD_Static_World_StaticProps_ClippedProp_t
 
 	int								iTraceContents;
 	short							iTraceSurfaceProps;
-	static IHandleEntity* pTraceEntity;
-	static const char* szTraceSurfaceName; //same for all static props, here just for easy reference
-	static const int				iTraceSurfaceFlags; //same for all static props, here just for easy reference
+	//static IHandleEntity* pTraceEntity;
+	//static const char* szTraceSurfaceName; //same for all static props, here just for easy reference
+	//static const int				iTraceSurfaceFlags; //same for all static props, here just for easy reference
 };
 
 struct PS_SD_Static_World_StaticProps_t

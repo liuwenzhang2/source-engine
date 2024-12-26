@@ -15,6 +15,8 @@
 #include "ihandleentity.h"
 #include "collisionutils.h"
 #include "entitylist_base.h"
+#include "baseentity_shared.h"
+#include "gamerules.h"
 #include "util_shared.h"
 #include "portal_util_shared.h"
 

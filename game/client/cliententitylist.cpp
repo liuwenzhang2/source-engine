@@ -9503,11 +9503,11 @@ void C_EnginePortalInternal::TraceRay(const Ray_t& ray, unsigned int fMask, ITra
 							if ((TempTrace.fraction < pTrace->fraction))
 							{
 								*pTrace = TempTrace;
-								pTrace->surface.flags = pCurrentProp->iTraceSurfaceFlags;
+								pTrace->surface.flags = 0;
 								pTrace->surface.surfaceProps = pCurrentProp->iTraceSurfaceProps;
-								pTrace->surface.name = pCurrentProp->szTraceSurfaceName;
+								pTrace->surface.name = "**studio**";
 								pTrace->contents = pCurrentProp->iTraceContents;
-								pTrace->m_pEnt = pCurrentProp->pTraceEntity;
+								pTrace->m_pEnt = g_EntityList.GetBaseEntity(0);
 							}
 						}
 
@@ -9537,11 +9537,11 @@ void C_EnginePortalInternal::TraceRay(const Ray_t& ray, unsigned int fMask, ITra
 								if ((TempTrace.fraction < pTrace->fraction))
 								{
 									*pTrace = TempTrace;
-									pTrace->surface.flags = pCurrentProp->iTraceSurfaceFlags;
+									pTrace->surface.flags = 0;
 									pTrace->surface.surfaceProps = pCurrentProp->iTraceSurfaceProps;
-									pTrace->surface.name = pCurrentProp->szTraceSurfaceName;
+									pTrace->surface.name = "**studio**";
 									pTrace->contents = pCurrentProp->iTraceContents;
-									pTrace->m_pEnt = pCurrentProp->pTraceEntity;
+									pTrace->m_pEnt = g_EntityList.GetBaseEntity(0);
 								}
 							}
 
@@ -9703,11 +9703,11 @@ void C_EnginePortalInternal::TraceEntity(IHandleEntity* pEntity, const Vector& v
 							if (tempTrace.startsolid || (tempTrace.fraction < pTrace->fraction))
 							{
 								*pTrace = tempTrace;
-								pTrace->surface.flags = pCurrentProp->iTraceSurfaceFlags;
+								pTrace->surface.flags = 0;
 								pTrace->surface.surfaceProps = pCurrentProp->iTraceSurfaceProps;
-								pTrace->surface.name = pCurrentProp->szTraceSurfaceName;
+								pTrace->surface.name = "**studio**";
 								pTrace->contents = pCurrentProp->iTraceContents;
-								pTrace->m_pEnt = pCurrentProp->pTraceEntity;
+								pTrace->m_pEnt = g_EntityList.GetBaseEntity(0);
 							}
 						}
 

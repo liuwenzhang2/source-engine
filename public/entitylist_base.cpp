@@ -11,9 +11,9 @@
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
-const char* PS_SD_Static_World_StaticProps_ClippedProp_t::szTraceSurfaceName = "**studio**";
-const int PS_SD_Static_World_StaticProps_ClippedProp_t::iTraceSurfaceFlags = 0;
-IHandleEntity* PS_SD_Static_World_StaticProps_ClippedProp_t::pTraceEntity = NULL;
+//const char* PS_SD_Static_World_StaticProps_ClippedProp_t::szTraceSurfaceName = "**studio**";
+//const int PS_SD_Static_World_StaticProps_ClippedProp_t::iTraceSurfaceFlags = 0;
+//IHandleEntity* PS_SD_Static_World_StaticProps_ClippedProp_t::pTraceEntity = NULL;
 
 IEntityFactory* g_pEntityFactoryHead;
 
