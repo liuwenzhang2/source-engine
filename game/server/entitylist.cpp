@@ -858,10 +858,10 @@ void PhysicsSplash(IPhysicsFluidController* pFluid, IPhysicsObject* pObject, CBa
 
 	// Get object extents in basis
 	Vector tanPts[2], binPts[2];
-	tanPts[0] = EntityList()->PhysGetCollision()->CollideGetExtent(pObject->GetCollide(), pEntity->GetEngineObject()->GetAbsOrigin(), pEntity->GetEngineObject()->GetAbsAngles(), -tangent);
-	tanPts[1] = EntityList()->PhysGetCollision()->CollideGetExtent(pObject->GetCollide(), pEntity->GetEngineObject()->GetAbsOrigin(), pEntity->GetEngineObject()->GetAbsAngles(), tangent);
-	binPts[0] = EntityList()->PhysGetCollision()->CollideGetExtent(pObject->GetCollide(), pEntity->GetEngineObject()->GetAbsOrigin(), pEntity->GetEngineObject()->GetAbsAngles(), -binormal);
-	binPts[1] = EntityList()->PhysGetCollision()->CollideGetExtent(pObject->GetCollide(), pEntity->GetEngineObject()->GetAbsOrigin(), pEntity->GetEngineObject()->GetAbsAngles(), binormal);
+	tanPts[0] = gEntList.PhysGetCollision()->CollideGetExtent(pObject->GetCollide(), pEntity->GetEngineObject()->GetAbsOrigin(), pEntity->GetEngineObject()->GetAbsAngles(), -tangent);
+	tanPts[1] = gEntList.PhysGetCollision()->CollideGetExtent(pObject->GetCollide(), pEntity->GetEngineObject()->GetAbsOrigin(), pEntity->GetEngineObject()->GetAbsAngles(), tangent);
+	binPts[0] = gEntList.PhysGetCollision()->CollideGetExtent(pObject->GetCollide(), pEntity->GetEngineObject()->GetAbsOrigin(), pEntity->GetEngineObject()->GetAbsAngles(), -binormal);
+	binPts[1] = gEntList.PhysGetCollision()->CollideGetExtent(pObject->GetCollide(), pEntity->GetEngineObject()->GetAbsOrigin(), pEntity->GetEngineObject()->GetAbsAngles(), binormal);
 
 	// now compute the centered bbox
 	float mins[2], maxs[2], center[2], extents[2];
@@ -2657,7 +2657,7 @@ bool CGrabControllerInternal::UpdateObject(CBaseEntity* pPlayer, float flError)
 		UTIL_Portal_AngleTransform(pPortal->GetLinkedPortal()->MatrixThisToLinked(), qEntityAngles, qEntityAngles);
 	}
 	// Now clamp a sphere of object radius at end to the player's bbox
-	Vector radial = EntityList()->PhysGetCollision()->CollideGetExtent(pPhys->GetCollide(), vec3_origin, qEntityAngles, -forward);
+	Vector radial = gEntList.PhysGetCollision()->CollideGetExtent(pPhys->GetCollide(), vec3_origin, qEntityAngles, -forward);
 	Vector player2d = pPlayer->GetEngineObject()->OBBMaxs();
 	float playerRadius = player2d.Length2D();
 
@@ -2675,7 +2675,7 @@ bool CGrabControllerInternal::UpdateObject(CBaseEntity* pPlayer, float flError)
 	Ray_t ray;
 	ray.Init(start, end);
 	//enginetrace->TraceRay( ray, MASK_SOLID_BRUSHONLY, &traceFilter, &tr );
-	UTIL_Portal_TraceRay(ray, MASK_SOLID_BRUSHONLY, &traceFilter, &tr);//enginetrace->TraceRay( ray, MASK_SOLID_BRUSHONLY, &traceFilter, &tr );
+	UTIL_Portal_TraceRay(serverEntitylist, ray, MASK_SOLID_BRUSHONLY, &traceFilter, &tr);//enginetrace->TraceRay( ray, MASK_SOLID_BRUSHONLY, &traceFilter, &tr );
 
 	if (tr.fraction < 0.5)
 	{
@@ -3067,7 +3067,7 @@ void CGrabControllerInternal::AttachEntity(CBaseEntity* pPlayer, CBaseEntity* pE
 		Vector vPlayerForward;
 		pPlayer->EyeVectors(&vPlayerForward);
 
-		Vector radial = EntityList()->PhysGetCollision()->CollideGetExtent(pPhys->GetCollide(), vec3_origin, pEntity->GetEngineObject()->GetAbsAngles(), -vPlayerForward);
+		Vector radial = gEntList.PhysGetCollision()->CollideGetExtent(pPhys->GetCollide(), vec3_origin, pEntity->GetEngineObject()->GetAbsAngles(), -vPlayerForward);
 		Vector player2d = pPlayer->GetEngineObject()->OBBMaxs();
 		float playerRadius = player2d.Length2D();
 		float flDot = DotProduct(vPlayerForward, radial);
@@ -3134,7 +3134,7 @@ void CGrabControllerInternal::AttachEntity(CBaseEntity* pPlayer, CBaseEntity* pE
 	// Carried entities can never block LOS
 	m_bCarriedEntityBlocksLOS = pEntity->BlocksLOS();
 	pEntity->SetBlocksLOS(false);
-	m_controller = EntityList()->PhysGetEnv()->CreateMotionController(this);
+	m_controller = gEntList.PhysGetEnv()->CreateMotionController(this);
 	m_controller->AttachObject(pPhys, true);
 	// Don't do this, it's causing trouble with constraint solvers.
 	//m_controller->SetPriority( IPhysicsMotionController::HIGH_PRIORITY );
@@ -3258,7 +3258,7 @@ void CGrabControllerInternal::DetachEntity(bool bClearVelocity)
 
 	m_attachedEntity = NULL;
 	if (m_controller) {
-		EntityList()->PhysGetEnv()->DestroyMotionController(m_controller);
+		gEntList.PhysGetEnv()->DestroyMotionController(m_controller);
 		m_controller = NULL;
 	}
 }
@@ -10242,7 +10242,7 @@ void CEnginePortalInternal::TraceRay(const Ray_t& ray, unsigned int fMask, ITrac
 						const PS_SD_Static_World_StaticProps_ClippedProp_t* pCurrentProp = GetStaticProps(iIndex);
 						if ((!bFilterStaticProps) || pTraceFilter->ShouldHitEntity(pCurrentProp->pSourceProp, fMask))
 						{
-							EntityList()->PhysGetCollision()->TraceBox(ray, pCurrentProp->pCollide, vTransform, qTransform, &TempTrace);
+							gEntList.PhysGetCollision()->TraceBox(ray, pCurrentProp->pCollide, vTransform, qTransform, &TempTrace);
 							if ((TempTrace.fraction < pTrace->fraction))
 							{
 								*pTrace = TempTrace;
@@ -10276,7 +10276,7 @@ void CEnginePortalInternal::TraceRay(const Ray_t& ray, unsigned int fMask, ITrac
 							const PS_SD_Static_World_StaticProps_ClippedProp_t* pCurrentProp = pLinkedPortalSimulator->GetStaticProps(iIndex);
 							if ((!bFilterStaticProps) || pTraceFilter->ShouldHitEntity(pCurrentProp->pSourceProp, fMask))
 							{
-								EntityList()->PhysGetCollision()->TraceBox(ray, pCurrentProp->pCollide, vTransform, qTransform, &TempTrace);
+								gEntList.PhysGetCollision()->TraceBox(ray, pCurrentProp->pCollide, vTransform, qTransform, &TempTrace);
 								if ((TempTrace.fraction < pTrace->fraction))
 								{
 									*pTrace = TempTrace;
@@ -10426,7 +10426,7 @@ const matrix3x4_t* CTransformedCollideable::GetRootParentToWorldTransform() cons
 	return &m_ReferencedVars.m_matRootParentToWorldTransform;
 }
 
-void CEnginePortalInternal::TraceEntity(CBaseEntity* pEntity, const Vector& vecAbsStart, const Vector& vecAbsEnd, unsigned int mask, ITraceFilter* pFilter, trace_t* pTrace) const
+void CEnginePortalInternal::TraceEntity(IHandleEntity* pEntity, const Vector& vecAbsStart, const Vector& vecAbsEnd, unsigned int mask, ITraceFilter* pFilter, trace_t* pTrace) const
 {
 
 	const CEnginePortalInternal* pLinkedPortalSimulator = this->GetLinkedPortal();
@@ -10552,7 +10552,7 @@ void CEnginePortalInternal::TraceEntity(CBaseEntity* pEntity, const Vector& vecA
 							//physcollision->TraceCollide( vecAbsStart, vecAbsEnd, pCollision, qCollisionAngles,
 							//							pCurrentProp->pCollide, vTransform, qTransform, &tempTrace );
 
-							EntityList()->PhysGetCollision()->TraceBox(entRay, MASK_ALL, NULL, pCurrentProp->pCollide, vTransform, qTransform, &tempTrace);
+							gEntList.PhysGetCollision()->TraceBox(entRay, MASK_ALL, NULL, pCurrentProp->pCollide, vTransform, qTransform, &tempTrace);
 
 							if (tempTrace.startsolid || (tempTrace.fraction < pTrace->fraction))
 							{
@@ -10570,7 +10570,7 @@ void CEnginePortalInternal::TraceEntity(CBaseEntity* pEntity, const Vector& vecA
 				}
 			}
 
-			if (pLinkedPortalSimulator && EntityIsInPortalHole(pEntity->GetEngineObject()))
+			if (pLinkedPortalSimulator && EntityIsInPortalHole((IEngineObjectServer*)pEntity->GetEngineObject()))
 			{
 
 #ifndef CLIENT_DLL
@@ -11817,7 +11817,7 @@ void CEnginePortalInternal::CreateLocalCollision(void)
 #ifndef CLIENT_DLL
 			m_InternalData.Simulation.Static.SurfaceProperties.pEntity = gEntList.GetBaseEntity(0);
 #else
-			m_InternalData.Simulation.Static.SurfaceProperties.pEntity = EntityList()->GetBaseEntity(0);
+			m_InternalData.Simulation.Static.SurfaceProperties.pEntity = g_EntityList.GetBaseEntity(0);
 #endif
 		}
 
@@ -13226,7 +13226,7 @@ void FullSyncPhysicsObject(IPhysicsObject* pSource, IPhysicsObject* pDest, const
 	if (gEntList.m_ActivePortals.Count() > 0) {
 		if (pSource->GetGameFlags() & FVPHYSICS_PLAYER_HELD)
 		{
-			//CBasePlayer *pPlayer = EntityList()->GetPlayerByIndex( 1 );
+			//CBasePlayer *pPlayer = gEntList.GetPlayerByIndex( 1 );
 			//Assert( pPlayer );
 
 			CBaseEntity* pLookingForEntity = (CBaseEntity*)pSource->GetGameData();
@@ -15489,7 +15489,7 @@ bool ShouldRemoveThisRagdoll(CBaseEntity* pRagdoll)
 	for (int i = 1; i <= gpGlobals->maxClients; i++) {
 		CBaseEntity* pPlayer = gEntList.GetBaseEntity(i);
 
-		if (!EntityList()->FindClientInPVS(pRagdoll))
+		if (!gEntList.FindClientInPVS(pRagdoll))
 		{
 			if (g_debug_ragdoll_removal.GetBool()) {
 				// --------------------------------------------------------------

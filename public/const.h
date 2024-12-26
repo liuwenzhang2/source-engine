@@ -736,5 +736,7 @@ enum
 #define CHAR_TEX_GLASS			'Y'
 #define CHAR_TEX_WARPSHIELD		'Z' ///< wierd-looking jello effect for advisor shield.
 
+#define MAPKEY_MAXLENGTH	2048
+
 #endif
 

@@ -650,7 +650,7 @@ public:
 	virtual bool				TraceWallBrushes(const Ray_t& ray, trace_t* pTrace) const = 0;
 	virtual bool				TraceTransformedWorldBrushes(const IEnginePortalClient* pRemoteCollisionEntity, const Ray_t& ray, trace_t* pTrace) const = 0;
 	virtual void				TraceRay(const Ray_t& ray, unsigned int fMask, ITraceFilter* pTraceFilter, trace_t* pTrace, bool bTraceHolyWall = true) const = 0;
-	virtual void				TraceEntity(C_BaseEntity* pEntity, const Vector& vecAbsStart, const Vector& vecAbsEnd, unsigned int mask, ITraceFilter* pFilter, trace_t* ptr) const = 0;
+	virtual void				TraceEntity(IHandleEntity* pEntity, const Vector& vecAbsStart, const Vector& vecAbsEnd, unsigned int mask, ITraceFilter* pFilter, trace_t* ptr) const = 0;
 	virtual int					GetStaticPropsCount() const = 0;
 	virtual const PS_SD_Static_World_StaticProps_ClippedProp_t* GetStaticProps(int index) const = 0;
 	virtual bool				StaticPropsCollisionExists() const = 0;

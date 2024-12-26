@@ -455,8 +455,6 @@
     <ClCompile Include="..\..\..\game\shared\particle_parse.cpp" />
     <ClCompile Include="..\..\..\game\shared\particle_property.cpp" />
     <ClCompile Include="..\..\..\game\shared\physics_main_shared.cpp" />
-    <ClCompile Include="..\..\..\game\shared\physics_saverestore.cpp" />
-    <ClCompile Include="..\..\..\game\shared\physics_shared.cpp" />
     <ClCompile Include="..\..\..\game\shared\point_bonusmaps_accessor.cpp" />
     <ClCompile Include="..\..\..\game\shared\point_posecontroller.cpp" />
     <ClCompile Include="..\..\..\game\shared\portal_util_shared.cpp" />
@@ -503,6 +501,8 @@
     <ClCompile Include="..\..\..\public\interpolatortypes.cpp" />
     <ClCompile Include="..\..\..\public\jigglebones.cpp" />
     <ClCompile Include="..\..\..\public\networkvar.cpp" />
+    <ClCompile Include="..\..\..\public\physics_saverestore.cpp" />
+    <ClCompile Include="..\..\..\public\physics_shared.cpp" />
     <ClCompile Include="..\..\..\public\posedebugger.cpp" />
     <ClCompile Include="..\..\..\public\ragdoll_shared.cpp" />
     <ClCompile Include="..\..\..\public\renamed_recvtable_compat.cpp" />

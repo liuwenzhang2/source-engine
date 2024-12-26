@@ -1143,12 +1143,6 @@
     <ClCompile Include="..\..\..\game\shared\physics_main_shared.cpp">
       <Filter>源文件\Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\game\shared\physics_saverestore.cpp">
-      <Filter>源文件\Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\game\shared\physics_shared.cpp">
-      <Filter>源文件\Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\game\shared\point_bonusmaps_accessor.cpp">
       <Filter>源文件\Source Files</Filter>
     </ClCompile>
@@ -1681,6 +1675,12 @@
       <Filter>源文件\Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\public\rope_helpers.cpp">
+      <Filter>源文件\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\public\physics_shared.cpp">
+      <Filter>源文件\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\public\physics_saverestore.cpp">
       <Filter>源文件\Source Files</Filter>
     </ClCompile>
   </ItemGroup>

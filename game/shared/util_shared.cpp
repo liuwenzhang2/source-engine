@@ -19,6 +19,7 @@
 #include "particle_parse.h"
 #include "KeyValues.h"
 #include "time.h"
+#include "beam_shared.h"
 
 #ifdef USES_ECON_ITEMS
 	#include "econ_item_constants.h"
@@ -530,6 +531,187 @@ private:
 	const IHandleEntity *m_pIgnoreOther;
 };
 
+void UTIL_Portal_NDebugOverlay(const Vector& ptPortalCenter, const QAngle& qPortalAngles, int r, int g, int b, int a, bool noDepthTest, float duration)
+{
+#ifndef CLIENT_DLL
+	Vector pvTri1[3], pvTri2[3];
+
+	UTIL_Portal_Triangles(ptPortalCenter, qPortalAngles, pvTri1, pvTri2);
+	CBaseEntity* player = EntityList()->GetLocalPlayer();
+	if (!player)
+		return;
+	{
+		Vector to1 = pvTri1[0] - player->GetEngineObject()->GetAbsOrigin();
+		Vector to2 = pvTri1[1] - player->GetEngineObject()->GetAbsOrigin();
+		Vector to3 = pvTri1[2] - player->GetEngineObject()->GetAbsOrigin();
+
+		if ((to1.LengthSqr() > 90000000) &&
+			(to2.LengthSqr() > 90000000) &&
+			(to3.LengthSqr() > 90000000))
+		{
+			return;
+		}
+
+		// Clip triangles that are behind the client 
+		Vector clientForward;
+		player->EyeVectors(&clientForward);
+
+		float  dot1 = DotProduct(clientForward, to1);
+		float  dot2 = DotProduct(clientForward, to2);
+		float  dot3 = DotProduct(clientForward, to3);
+
+		if (dot1 < 0 && dot2 < 0 && dot3 < 0)
+			return;
+
+		if (debugoverlay)
+		{
+			debugoverlay->AddTriangleOverlay(pvTri1[0], pvTri1[1], pvTri1[2], r, g, b, a, noDepthTest, duration);
+		}
+	}
+	{
+		Vector to1 = pvTri2[0] - player->GetEngineObject()->GetAbsOrigin();
+		Vector to2 = pvTri2[1] - player->GetEngineObject()->GetAbsOrigin();
+		Vector to3 = pvTri2[2] - player->GetEngineObject()->GetAbsOrigin();
+
+		if ((to1.LengthSqr() > 90000000) &&
+			(to2.LengthSqr() > 90000000) &&
+			(to3.LengthSqr() > 90000000))
+		{
+			return;
+		}
+
+		// Clip triangles that are behind the client 
+		Vector clientForward;
+		player->EyeVectors(&clientForward);
+
+		float  dot1 = DotProduct(clientForward, to1);
+		float  dot2 = DotProduct(clientForward, to2);
+		float  dot3 = DotProduct(clientForward, to3);
+
+		if (dot1 < 0 && dot2 < 0 && dot3 < 0)
+			return;
+
+		if (debugoverlay)
+		{
+			debugoverlay->AddTriangleOverlay(pvTri2[0], pvTri2[1], pvTri2[2], r, g, b, a, noDepthTest, duration);
+		}
+	}
+#endif //#ifndef CLIENT_DLL
+}
+
+void UTIL_Portal_NDebugOverlay(const IEnginePortal* pPortal, int r, int g, int b, int a, bool noDepthTest, float duration)
+{
+#ifndef CLIENT_DLL
+	UTIL_Portal_NDebugOverlay(pPortal->AsEngineObject()->GetAbsOrigin(), pPortal->AsEngineObject()->GetAbsAngles(), r, g, b, a, noDepthTest, duration);
+#endif //#ifndef CLIENT_DLL
+}
+
+void UTIL_Portal_Trace_Filter(CTraceFilterSimpleClassnameList* traceFilterPortalShot)
+{
+	traceFilterPortalShot->AddClassnameToIgnore("prop_physics");
+	traceFilterPortalShot->AddClassnameToIgnore("func_physbox");
+	traceFilterPortalShot->AddClassnameToIgnore("npc_portal_turret_floor");
+	traceFilterPortalShot->AddClassnameToIgnore("prop_energy_ball");
+	traceFilterPortalShot->AddClassnameToIgnore("npc_security_camera");
+	traceFilterPortalShot->AddClassnameToIgnore("player");
+	traceFilterPortalShot->AddClassnameToIgnore("simple_physics_prop");
+	traceFilterPortalShot->AddClassnameToIgnore("simple_physics_brush");
+	traceFilterPortalShot->AddClassnameToIgnore("prop_ragdoll");
+	traceFilterPortalShot->AddClassnameToIgnore("prop_glados_core");
+	traceFilterPortalShot->AddClassnameToIgnore("updateitem2");
+}
+
+IEnginePortal* UTIL_Portal_TraceRay_Beam(IEntityList* pEntityList, const Ray_t& ray, unsigned int fMask, ITraceFilter* pTraceFilter, float* pfFraction)
+{
+	// Do a regular trace
+	trace_t tr;
+	UTIL_TraceLine(ray.m_Start, ray.m_Start + ray.m_Delta, fMask, pTraceFilter, &tr);
+	float fMustBeCloserThan = tr.fraction + 0.0001f;
+
+	IEnginePortal* pIntersectedPortal = UTIL_Portal_FirstAlongRay(pEntityList, ray, fMustBeCloserThan);
+
+	*pfFraction = fMustBeCloserThan; //will be real trace distance if it didn't hit a portal
+	return pIntersectedPortal;
+}
+
+
+bool UTIL_Portal_Trace_Beam(const CBeam* pBeam, Vector& vecStart, Vector& vecEnd, Vector& vecIntersectionStart, Vector& vecIntersectionEnd, ITraceFilter* pTraceFilter)
+{
+	vecStart = pBeam->GetAbsStartPos();
+	vecEnd = pBeam->GetAbsEndPos();
+
+	// Trace to see if we've intersected a portal
+	float fEndFraction;
+	Ray_t rayBeam;
+
+	bool bIsReversed = (pBeam->GetBeamFlags() & FBEAM_REVERSED) != 0x0;
+
+	if (!bIsReversed)
+		rayBeam.Init(vecStart, vecEnd);
+	else
+		rayBeam.Init(vecEnd, vecStart);
+
+	IEnginePortal* pPortal = UTIL_Portal_TraceRay_Beam(pBeam->GetEntityList(), rayBeam, MASK_SHOT, pTraceFilter, &fEndFraction);
+
+	// If we intersected a portal we need to modify the start and end points to match the actual trace through portal drawing extents
+	if (!pPortal)
+		return false;
+
+	// Modify the start and end points to match the actual trace through portal drawing extents
+	vecStart = rayBeam.m_Start;
+
+	Vector vecIntersection = rayBeam.m_Start + rayBeam.m_Delta * fEndFraction;
+
+	int iNumLoops = 0;
+
+	// Loop through the portals (at most 16 times)
+	while (pPortal && iNumLoops < 16)
+	{
+		// Get the point that we hit a portal or wall
+		vecIntersectionStart = vecIntersection;
+
+		VMatrix matThisToLinked = pPortal->MatrixThisToLinked();
+
+		// Get the transformed positions of the sub beam in the other portal's space
+		UTIL_Portal_PointTransform(matThisToLinked, vecIntersectionStart, vecIntersectionEnd);
+		UTIL_Portal_PointTransform(matThisToLinked, rayBeam.m_Start + rayBeam.m_Delta, vecEnd);
+
+		CTraceFilterSkipClassname traceFilter(pPortal->GetLinkedPortal()->AsEngineObject()->GetHandleEntity(), "prop_energy_ball", COLLISION_GROUP_NONE);
+
+		rayBeam.Init(vecIntersectionEnd, vecEnd);
+		pPortal = UTIL_Portal_TraceRay_Beam(pBeam->GetEntityList(), rayBeam, MASK_SHOT, &traceFilter, &fEndFraction);
+		vecIntersection = rayBeam.m_Start + rayBeam.m_Delta * fEndFraction;
+
+		++iNumLoops;
+	}
+
+	vecEnd = vecIntersection;
+
+	return true;
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: A version of trace entity which detects portals and translates the trace through portals
+//-----------------------------------------------------------------------------
+void UTIL_TraceEntityThroughPortal(CBaseEntity* pEntity, const Vector& vecAbsStart, const Vector& vecAbsEnd,
+	unsigned int mask, ITraceFilter* pFilter, trace_t* pTrace)
+{
+#ifdef CLIENT_DLL
+	Assert((GameRules() == NULL) || GameRules()->IsMultiplayer());
+	Assert(pEntity->IsPlayer());
+
+	IEnginePortalClient* pPortal = NULL;
+	if (pEntity->IsPlayer())
+	{
+		pPortal = pEntity->GetEnginePlayer()->GetPortalEnvironment();
+	}
+#else
+	IEnginePortalServer* pPortal = pEntity->GetEngineObject()->GetSimulatorThatOwnsEntity();
+#endif
+
+	UTIL_Portal_TraceEntity(pPortal, pEntity, vecAbsStart, vecAbsEnd, mask, pFilter, pTrace);
+}
+
 //-----------------------------------------------------------------------------
 // Sweeps a particular entity through the world 
 //-----------------------------------------------------------------------------
@@ -544,7 +726,7 @@ void UTIL_TraceEntity( CBaseEntity *pEntity, const Vector &vecAbsStart, const Ve
 	CTraceFilterEntity traceFilter( pEntity, pCollision->GetCollisionGroup() );
 
 #ifdef PORTAL
-	UTIL_Portal_TraceEntity( pEntity, vecAbsStart, vecAbsEnd, mask, &traceFilter, ptr );
+	UTIL_TraceEntityThroughPortal( pEntity, vecAbsStart, vecAbsEnd, mask, &traceFilter, ptr );
 #else
 	enginetrace->SweepCollideable( pCollision, vecAbsStart, vecAbsEnd, pCollision->GetCollisionAngles(), mask, &traceFilter, ptr );
 #endif
@@ -563,7 +745,7 @@ void UTIL_TraceEntity( CBaseEntity *pEntity, const Vector &vecAbsStart, const Ve
 	CTraceFilterEntityIgnoreOther traceFilter( pEntity, pIgnore, nCollisionGroup );
 
 #ifdef PORTAL
- 	UTIL_Portal_TraceEntity( pEntity, vecAbsStart, vecAbsEnd, mask, &traceFilter, ptr );
+	UTIL_TraceEntityThroughPortal( pEntity, vecAbsStart, vecAbsEnd, mask, &traceFilter, ptr );
 #else
 	enginetrace->SweepCollideable( pCollision, vecAbsStart, vecAbsEnd, pCollision->GetCollisionAngles(), mask, &traceFilter, ptr );
 #endif
@@ -580,7 +762,7 @@ void UTIL_TraceEntity( CBaseEntity *pEntity, const Vector &vecAbsStart, const Ve
 	Assert( pCollision->GetCollisionAngles() == vec3_angle );
 
 #ifdef PORTAL
-	UTIL_Portal_TraceEntity( pEntity, vecAbsStart, vecAbsEnd, mask, pFilter, ptr );
+	UTIL_TraceEntityThroughPortal( pEntity, vecAbsStart, vecAbsEnd, mask, pFilter, ptr );
 #else
 	enginetrace->SweepCollideable( pCollision, vecAbsStart, vecAbsEnd, pCollision->GetCollisionAngles(), mask, pFilter, ptr );
 #endif

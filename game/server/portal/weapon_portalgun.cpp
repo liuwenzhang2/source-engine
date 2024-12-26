@@ -340,7 +340,7 @@ float CWeaponPortalgun::TraceFirePortal( bool bPortal2, const Vector &vTraceStar
 
 	float fMustBeCloserThan = 2.0f;
 
-	IEnginePortal *pNearPortal = UTIL_Portal_FirstAlongRay( rayEyeArea, fMustBeCloserThan );
+	IEnginePortal *pNearPortal = UTIL_Portal_FirstAlongRay(EntityList(), rayEyeArea, fMustBeCloserThan );
 
 	if ( !pNearPortal )
 	{
@@ -349,7 +349,7 @@ float CWeaponPortalgun::TraceFirePortal( bool bPortal2, const Vector &vTraceStar
 
 		fMustBeCloserThan = 2.0f;
 
-		pNearPortal = UTIL_Portal_FirstAlongRay( rayEyeArea, fMustBeCloserThan );
+		pNearPortal = UTIL_Portal_FirstAlongRay(EntityList(), rayEyeArea, fMustBeCloserThan );
 	}
 
 	if ( pNearPortal && pNearPortal->IsActivedAndLinked() )

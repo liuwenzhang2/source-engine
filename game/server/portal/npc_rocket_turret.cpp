@@ -634,7 +634,7 @@ void CNPC_RocketTurret::FollowThink( void )
 	CTraceFilterSimple subfilter( this, COLLISION_GROUP_NONE );
 	CTraceFilterTranslateClones filter ( &subfilter );
 	float flRequiredParameter = 2.0f;
-	IEnginePortal* pFirstPortal = UTIL_Portal_FirstAlongRay( rayDmg, flRequiredParameter );
+	IEnginePortal* pFirstPortal = UTIL_Portal_FirstAlongRay(EntityList(), rayDmg, flRequiredParameter );
 	UTIL_Portal_TraceRay_Bullets(pFirstPortal, rayDmg, MASK_VISIBLE_AND_NPCS, &filter, &traceDmg, false);
 
 	if ( traceDmg.m_pEnt )
@@ -989,7 +989,7 @@ bool CNPC_RocketTurret::TestLOS( const Vector& vAimPoint )
 
 	// This aim point does hit target, now make sure there are no blocking objects in the way
 	CTraceFilterSimple filter ( this, COLLISION_GROUP_NONE );
-	UTIL_Portal_TraceRay( ray, MASK_VISIBLE_AND_NPCS, &filter, &trTarget, false );
+	UTIL_Portal_TraceRay(EntityList(), ray, MASK_VISIBLE_AND_NPCS, &filter, &trTarget, false );
 
 	// Set model back to current facing
 	m_vecCurrentAngles = vecOldAngles;

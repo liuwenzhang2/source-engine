@@ -311,7 +311,7 @@ Vector CPropTelescopicArm::FindTargetAimPoint( void )
 		//float  fDistToPoint = vFrontPoint.DistToSqr( vAimPoint );
 
 		IEnginePortal *pShortestDistPortal = NULL;
-		UTIL_Portal_ShortestDistance( vFrontPoint, vAimPoint, &pShortestDistPortal, true );
+		UTIL_Portal_ShortestDistance(EntityList(), vFrontPoint, vAimPoint, &pShortestDistPortal, true );
 
 		Vector ptShortestAimPoint;
 		if( pShortestDistPortal )
@@ -371,7 +371,7 @@ bool CPropTelescopicArm::TestLOS( const Vector& vAimPoint )
 
 	// This aim point does hit target, now make sure there are no blocking objects in the way
 	CTraceFilterWorldAndPropsOnly filter;
-	UTIL_Portal_TraceRay( ray, MASK_SHOT, &filter, &tr );
+	UTIL_Portal_TraceRay(EntityList(), ray, MASK_SHOT, &filter, &tr );
 	return !(tr.fraction < 1.0f);
 }
 

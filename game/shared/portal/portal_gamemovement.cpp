@@ -697,10 +697,10 @@ void CPortalGameMovement::TracePlayerBBox( const Vector& start, const Vector& en
 
 	// If we're moving through a portal and failed to hit anything with the above ray trace
 	// Use UTIL_Portal_TraceEntity to test this movement through a portal and override the trace with the result
-	if ( pm.fraction == 1.0f && UTIL_DidTraceTouchPortals( ray, pm ) && sv_player_trace_through_portals.GetBool() )
+	if ( pm.fraction == 1.0f && UTIL_DidTraceTouchPortals(EntityList(), ray, pm ) && sv_player_trace_through_portals.GetBool() )
 	{
 		trace_t tempTrace;
-		UTIL_Portal_TraceEntity( pPortalPlayer, start, end, fMask, &traceFilter, &tempTrace );
+		UTIL_Portal_TraceEntity(pPortalPlayer->GetPortalEnvironment() ? pPortalPlayer->GetPortalEnvironment()->GetEnginePortal() : NULL, pPortalPlayer, start, end, fMask, &traceFilter, &tempTrace );
 
 		if ( tempTrace.DidHit() && tempTrace.fraction < pm.fraction && !tempTrace.startsolid && !tempTrace.allsolid )
 		{

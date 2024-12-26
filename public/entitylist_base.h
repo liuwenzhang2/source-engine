@@ -1172,7 +1172,7 @@ class CEntityFactory : public IEntityFactory
 			return m_pEntityFactory; 
 		}
 
-		IEntityList* GetEntityList() { 
+		IEntityList* GetEntityList() const { 
 			return m_pEntityList;
 		}
 

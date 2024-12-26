@@ -20,8 +20,11 @@ class IPhysicsCollision;
 class IPhysicsObject;
 class IPhysicsObjectPairHash;
 class CSoundPatch;
-class IGameSystem;
 struct objectparams_t;
+class CPhysCollide;
+struct solid_t;
+struct vcollide_t;
+class IVPhysicsKeyHandler;
 
 //extern IPhysicsObject		*g_PhysWorldObject;
 //extern IPhysics				*physics;

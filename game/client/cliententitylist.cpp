@@ -1184,7 +1184,7 @@ bool C_GrabControllerInternal::UpdateObject(C_BaseEntity* pPlayer, float flError
 	Ray_t ray;
 	ray.Init(start, end);
 	//enginetrace->TraceRay( ray, MASK_SOLID_BRUSHONLY, &traceFilter, &tr );
-	UTIL_Portal_TraceRay(ray, MASK_SOLID_BRUSHONLY, &traceFilter, &tr);//enginetrace->TraceRay( ray, MASK_SOLID_BRUSHONLY, &traceFilter, &tr );
+	UTIL_Portal_TraceRay(entitylist, ray, MASK_SOLID_BRUSHONLY, &traceFilter, &tr);//enginetrace->TraceRay( ray, MASK_SOLID_BRUSHONLY, &traceFilter, &tr );
 
 	if (tr.fraction < 0.5)
 	{
@@ -1590,7 +1590,7 @@ void C_GrabControllerInternal::AttachEntity(C_BaseEntity* pPlayer, C_BaseEntity*
 	{
 		int hitMaterial = pPhys->GetMaterialIndex();
 		int playerMaterial = pPlayer->GetEngineObject()->VPhysicsGetObject() ? pPlayer->GetEngineObject()->VPhysicsGetObject()->GetMaterialIndex() : hitMaterial;
-		EntityList()->PhysicsImpactSound(pPlayer, pPhys, CHAN_STATIC, hitMaterial, playerMaterial, 1.0, 64);
+		gEntList.PhysicsImpactSound(pPlayer, pPhys, CHAN_STATIC, hitMaterial, playerMaterial, 1.0, 64);
 	}
 #endif
 	Vector position;
@@ -5295,7 +5295,7 @@ void C_EngineObjectInternal::CollisionRulesChanged()
 }
 
 #if !defined( CLIENT_DLL )
-#define CHANGE_FLAGS(flags,newFlags) { unsigned int old = flags; flags = (newFlags); EntityList()->ReportEntityFlagsChanged( this, old, flags ); }
+#define CHANGE_FLAGS(flags,newFlags) { unsigned int old = flags; flags = (newFlags); gEntList.ReportEntityFlagsChanged( this, old, flags ); }
 #else
 #define CHANGE_FLAGS(flags,newFlags) (flags = (newFlags))
 #endif
@@ -9572,7 +9572,7 @@ void C_EnginePortalInternal::TraceRay(const Ray_t& ray, unsigned int fMask, ITra
 	}
 }
 
-void C_EnginePortalInternal::TraceEntity(C_BaseEntity* pEntity, const Vector& vecAbsStart, const Vector& vecAbsEnd, unsigned int mask, ITraceFilter* pFilter, trace_t* pTrace) const
+void C_EnginePortalInternal::TraceEntity(IHandleEntity* pEntity, const Vector& vecAbsStart, const Vector& vecAbsEnd, unsigned int mask, ITraceFilter* pFilter, trace_t* pTrace) const
 {
 
 	const C_EnginePortalInternal* pLinkedPortalSimulator = this->GetLinkedPortal();
@@ -9716,7 +9716,7 @@ void C_EnginePortalInternal::TraceEntity(C_BaseEntity* pEntity, const Vector& ve
 				}
 			}
 
-			if (pLinkedPortalSimulator && EntityIsInPortalHole(pEntity->GetEngineObject()))
+			if (pLinkedPortalSimulator && EntityIsInPortalHole((IEngineObjectClient*)pEntity->GetEngineObject()))
 			{
 
 #ifndef CLIENT_DLL
@@ -10961,7 +10961,7 @@ void C_EnginePortalInternal::CreateLocalCollision(void)
 			m_InternalData.Simulation.Static.SurfaceProperties.surface.flags = 0;
 			m_InternalData.Simulation.Static.SurfaceProperties.surface.surfaceProps = 0;
 #ifndef CLIENT_DLL
-			m_InternalData.Simulation.Static.SurfaceProperties.pEntity = EntityList()->GetBaseEntity(0);
+			m_InternalData.Simulation.Static.SurfaceProperties.pEntity = gEntList.GetBaseEntity(0);
 #else
 			m_InternalData.Simulation.Static.SurfaceProperties.pEntity = g_EntityList.GetBaseEntity(0);
 #endif
@@ -13306,9 +13306,9 @@ bool ShouldRemoveThisRagdoll(C_BaseEntity* pRagdoll)
 	}
 
 #else
-	CBasePlayer* pPlayer = EntityList()->GetLocalPlayer();
+	CBasePlayer* pPlayer = gEntList.GetLocalPlayer();
 
-	if (!EntityList()->FindClientInPVS(pRagdoll))
+	if (!gEntList.FindClientInPVS(pRagdoll))
 	{
 		if (g_debug_ragdoll_removal.GetBool())
 			NDebugOverlay::Line(pRagdoll->GetEngineObject()->GetAbsOrigin(), pRagdoll->GetEngineObject()->GetAbsOrigin() + Vector(0, 0, 64), 0, 255, 0, true, 5);

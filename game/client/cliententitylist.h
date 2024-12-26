@@ -148,6 +148,10 @@ public:
 		return m_RefEHandle;
 	}
 
+	IClientEntityList* GetEntityList() const {
+		return m_pClientEntityList;
+	}
+
 	int entindex() const {
 		CBaseHandle Handle = this->GetRefEHandle();
 		if (Handle == INVALID_ENTITY_HANDLE) {
@@ -2268,7 +2272,7 @@ public:
 	bool				TraceWallBrushes(const Ray_t& ray, trace_t* pTrace) const;
 	bool				TraceTransformedWorldBrushes(const IEnginePortalClient* pRemoteCollisionEntity, const Ray_t& ray, trace_t* pTrace) const;
 	void				TraceRay(const Ray_t& ray, unsigned int fMask, ITraceFilter* pTraceFilter, trace_t* pTrace, bool bTraceHolyWall = true) const; //traces against a specific portal's environment, does no *real* tracing
-	void				TraceEntity(C_BaseEntity* pEntity, const Vector& vecAbsStart, const Vector& vecAbsEnd, unsigned int mask, ITraceFilter* pFilter, trace_t* ptr) const;
+	void				TraceEntity(IHandleEntity* pEntity, const Vector& vecAbsStart, const Vector& vecAbsEnd, unsigned int mask, ITraceFilter* pFilter, trace_t* ptr) const;
 	int					GetStaticPropsCount() const;
 	const PS_SD_Static_World_StaticProps_ClippedProp_t* GetStaticProps(int index) const;
 	bool				StaticPropsCollisionExists() const;

@@ -218,6 +218,10 @@ public:
 		return m_RefEHandle;
 	}
 
+	IServerEntityList* GetEntityList() const {
+		return m_pServerEntityList;
+	}
+
 	int entindex() const {
 		CBaseHandle Handle = this->GetRefEHandle();
 		if (Handle == INVALID_ENTITY_HANDLE) {
@@ -1926,7 +1930,7 @@ public:
 	bool				TraceWallBrushes(const Ray_t& ray, trace_t* pTrace) const;
 	bool				TraceTransformedWorldBrushes(const IEnginePortalServer* pRemoteCollisionEntity, const Ray_t& ray, trace_t* pTrace) const;
 	void				TraceRay(const Ray_t& ray, unsigned int fMask, ITraceFilter* pTraceFilter, trace_t* pTrace, bool bTraceHolyWall = true) const; //traces against a specific portal's environment, does no *real* tracing
-	void				TraceEntity(CBaseEntity* pEntity, const Vector& vecAbsStart, const Vector& vecAbsEnd, unsigned int mask, ITraceFilter* pFilter, trace_t* ptr) const;
+	void				TraceEntity(IHandleEntity* pEntity, const Vector& vecAbsStart, const Vector& vecAbsEnd, unsigned int mask, ITraceFilter* pFilter, trace_t* ptr) const;
 	int					GetStaticPropsCount() const;
 	const PS_SD_Static_World_StaticProps_ClippedProp_t* GetStaticProps(int index) const;
 	bool				StaticPropsCollisionExists() const;
@@ -2912,10 +2916,10 @@ public:
 	CBaseEntity* GetBaseEntityFromHandle(CBaseHandle hEnt) const;
 	CBaseEntity* GetBaseEntity(int entnum) const;
 	//edict_t* GetEdict( CBaseHandle hEnt ) const;
-	// NOTENOTE: Use GetLocalPlayer instead of EntityList()->GetPlayerByIndex IF you're in single player
+	// NOTENOTE: Use GetLocalPlayer instead of gEntList.GetPlayerByIndex IF you're in single player
 // and you want the player.
 	CBaseEntity* GetPlayerByIndex(int playerIndex);
-	// NOTENOTE: Use this instead of EntityList()->GetPlayerByIndex IF you're in single player
+	// NOTENOTE: Use this instead of gEntList.GetPlayerByIndex IF you're in single player
 // and you want the player.
 // not useable in multiplayer - see UTIL_GetListenServerHost()
 	CBaseEntity* GetLocalPlayer(void);
@@ -3044,7 +3048,7 @@ public:
 			Vector origin;
 			pPlayer->EyeVectors(&forward);
 			origin = pPlayer->WorldSpaceCenter();
-			pEntity = EntityList()->FindEntityNearestFacing(origin, forward, 0.95);
+			pEntity = FindEntityNearestFacing(origin, forward, 0.95);
 		}
 		return pEntity;
 	}
@@ -5829,7 +5833,7 @@ CBaseEntity* CGlobalEntityList<T>::GetPlayerByIndex(int playerIndex)
 
 	if (playerIndex > 0 && playerIndex <= gpGlobals->maxClients)
 	{
-		pPlayer = EntityList()->GetBaseEntity(playerIndex);
+		pPlayer = GetBaseEntity(playerIndex);
 	}
 
 	return pPlayer;

@@ -31,6 +31,7 @@ class IEngineObject {
 public:
 	virtual datamap_t* GetDataDescMap(void) = 0;
 	virtual const CBaseHandle& GetRefEHandle() const = 0;
+	virtual IEntityList* GetEntityList() const = 0;
 	virtual int entindex() const = 0;
 	virtual int GetModelIndex(void) const = 0;
 	virtual string_t GetModelName(void) const = 0;
@@ -40,6 +41,15 @@ public:
 	virtual const QAngle& GetAbsAngles(void) const = 0;
 	virtual void GetVectors(Vector* forward, Vector* right, Vector* up) const = 0;
 	virtual IHandleEntity* GetHandleEntity() const = 0;
+	virtual const Vector& WorldAlignMins() const = 0;
+	virtual const Vector& WorldAlignMaxs() const = 0;
+	virtual const Vector& WorldAlignSize() const = 0;
+	virtual void WorldSpaceAABB(Vector* pWorldMins, Vector* pWorldMaxs) const = 0;
+	virtual const Vector& OBBMins() const = 0;
+	virtual const Vector& OBBMaxs() const = 0;
+	virtual const Vector& OBBSize() const = 0;
+	virtual const Vector& GetCollisionOrigin() const = 0;
+	virtual const QAngle& GetCollisionAngles() const = 0;
 };
 
 class IEnginePortal {
@@ -54,6 +64,7 @@ public:
 	virtual const IEnginePortal* GetLinkedPortal() const = 0;
 	virtual bool RayIsInPortalHole(const Ray_t& ray) const = 0;
 	virtual void TraceRay(const Ray_t& ray, unsigned int fMask, ITraceFilter* pTraceFilter, trace_t* pTrace, bool bTraceHolyWall = true) const = 0;
+	virtual void TraceEntity(IHandleEntity* pEntity, const Vector& vecAbsStart, const Vector& vecAbsEnd, unsigned int mask, ITraceFilter* pFilter, trace_t* ptr) const = 0;
 	virtual const PS_SD_Static_SurfaceProperties_t& GetSurfaceProperties() const = 0;
 };
 
@@ -67,7 +78,7 @@ public:
 	virtual void SetRefEHandle( const CBaseHandle &handle ) = 0;
 	virtual const CBaseHandle& GetRefEHandle() const = 0;
 	virtual IEntityFactory* GetEntityFactory() { return NULL; }
-	virtual IEntityList* GetEntityList() { return NULL; }
+	virtual IEntityList* GetEntityList() const { return NULL; }
 	virtual IEngineObject* GetEngineObject() { return NULL; }
 	virtual const IEngineObject* GetEngineObject() const { return NULL; }
 	virtual void PostConstructor(const char* szClassname, int iForceEdictIndex) {}
@@ -119,6 +130,8 @@ abstract_class IEntityList
 public:
 	virtual IHandleEntity * CreateEntityByName(const char* className, int iForceEdictIndex = -1, int iSerialNum = -1) = 0;
 	virtual void DestroyEntity(IHandleEntity* pEntity) = 0;
+	virtual int GetPortalCount() = 0;
+	virtual IEnginePortal* GetPortal(int index) = 0;
 };
 
 abstract_class IEntityMapData

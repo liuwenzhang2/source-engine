@@ -26,6 +26,7 @@ class IStudioHdr;
 #include "tier0/vcrmode.h"
 #include "tier1/mempool.h"
 #include "tier1/memstack.h"
+#include "tier1/utlpriorityqueue.h"
 #ifdef _WIN32
 #include "typeinfo"
 // BUGBUG: typeinfo stomps some of the warning settings (in yvals.h)
@@ -67,6 +68,8 @@ class IStudioHdr;
 #include "game/server/iservervehicle.h"
 #include "SoundEmitterSystem/isoundemittersystembase.h"
 #include "model_types.h"
+#include "physics_shared.h"
+#include "physics_saverestore.h"
 #include "rope_shared.h"
 #include "rope_physics.h"
 #include "rope_helpers.h"
@@ -77,14 +80,10 @@ class IStudioHdr;
 
 #include "IEffects.h"
 #include "sharedInterface.h"
-#include "igamesystem.h"
 #include "soundenvelope.h"
 #include "collisionproperty.h"
-#include "physics_saverestore.h"
-#include "mapentities_shared.h"
 #include "util_shared.h"
 #include "portal_util_shared.h"
-#include "physics_shared.h"
 #include "hl2_gamerules.h"
 #include "predictioncopy.h"
 #include "baseentity_shared.h"

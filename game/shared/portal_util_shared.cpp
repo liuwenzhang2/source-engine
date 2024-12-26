@@ -8,26 +8,15 @@
 //#include "cbase.h"
 //#include "portal_shareddefs.h"
 //#include "portal_collideable_enumerator.h"
+#include "Color.h"
+#include "cmodel.h"
+#include "mathlib/vmatrix.h"
+#include "engine/ICollideable.h"
+#include "ihandleentity.h"
 #include "collisionutils.h"
 #include "entitylist_base.h"
-#ifdef GAME_DLL
-	//#include "util.h"
-	#include "baseentity.h"
-	#include "ndebugoverlay.h"
-	#include "env_debughistory.h"
-	#include "entitylist.h"
-#endif
-#ifdef CLIENT_DLL
-	#include "shared_classnames.h"
-	#include "c_baseentity.h"
-	#include "gamerules.h"
-	//#include "cliententitylist.h"
-#endif
-#include "beam_shared.h"
-#include "portal_util_shared.h"
 #include "util_shared.h"
-//#include "PortalSimulation.h"
-
+#include "portal_util_shared.h"
 
 bool g_bAllowForcePortalTrace = false;
 bool g_bForcePortalTrace = false;
@@ -56,32 +45,16 @@ Color UTIL_Portal_Color( int iPortal )
 	return Color( 255, 255, 255, 255 );
 }
 
-void UTIL_Portal_Trace_Filter( CTraceFilterSimpleClassnameList *traceFilterPortalShot )
-{
-	traceFilterPortalShot->AddClassnameToIgnore( "prop_physics" );
-	traceFilterPortalShot->AddClassnameToIgnore( "func_physbox" );
-	traceFilterPortalShot->AddClassnameToIgnore( "npc_portal_turret_floor" );
-	traceFilterPortalShot->AddClassnameToIgnore( "prop_energy_ball" );
-	traceFilterPortalShot->AddClassnameToIgnore( "npc_security_camera" );
-	traceFilterPortalShot->AddClassnameToIgnore( "player" );
-	traceFilterPortalShot->AddClassnameToIgnore( "simple_physics_prop" );
-	traceFilterPortalShot->AddClassnameToIgnore( "simple_physics_brush" );
-	traceFilterPortalShot->AddClassnameToIgnore( "prop_ragdoll" );
-	traceFilterPortalShot->AddClassnameToIgnore( "prop_glados_core" );
-	traceFilterPortalShot->AddClassnameToIgnore( "updateitem2" );
-}
-
-
-IEnginePortal* UTIL_Portal_FirstAlongRay( const Ray_t &ray, float &fMustBeCloserThan )
+IEnginePortal* UTIL_Portal_FirstAlongRay(IEntityList* pEntityList, const Ray_t &ray, float &fMustBeCloserThan )
 {
 	IEnginePortal *pIntersectedPortal = NULL;
 
-	int iPortalCount = EntityList()->GetPortalCount();
+	int iPortalCount = pEntityList->GetPortalCount();
 	if( iPortalCount != 0 )
 	{
 		for( int i = 0; i != iPortalCount; ++i )
 		{
-			IEnginePortal* pTempPortal = EntityList()->GetPortal(i);
+			IEnginePortal* pTempPortal = pEntityList->GetPortal(i);
 			if( pTempPortal->IsActivedAndLinked() )
 			{
 				float fIntersection = UTIL_IntersectRayWithPortal( ray, pTempPortal );
@@ -175,76 +148,6 @@ bool UTIL_Portal_TraceRay_Bullets( const IEnginePortal *pPortal, const Ray_t &ra
 	return true;
 }
 
-IEnginePortal* UTIL_Portal_TraceRay_Beam( const Ray_t &ray, unsigned int fMask, ITraceFilter *pTraceFilter, float *pfFraction )
-{
-	// Do a regular trace
-	trace_t tr;
-	UTIL_TraceLine( ray.m_Start, ray.m_Start + ray.m_Delta, fMask, pTraceFilter, &tr );
-	float fMustBeCloserThan = tr.fraction + 0.0001f;
-
-	IEnginePortal *pIntersectedPortal = UTIL_Portal_FirstAlongRay( ray, fMustBeCloserThan );
-
-	*pfFraction = fMustBeCloserThan; //will be real trace distance if it didn't hit a portal
-	return pIntersectedPortal;
-}
-
-
-bool UTIL_Portal_Trace_Beam( const CBeam *pBeam, Vector &vecStart, Vector &vecEnd, Vector &vecIntersectionStart, Vector &vecIntersectionEnd, ITraceFilter *pTraceFilter )
-{
-	vecStart = pBeam->GetAbsStartPos();
-	vecEnd = pBeam->GetAbsEndPos();
-
-	// Trace to see if we've intersected a portal
-	float fEndFraction;
-	Ray_t rayBeam;
-
-	bool bIsReversed = ( pBeam->GetBeamFlags() & FBEAM_REVERSED ) != 0x0;
-
-	if ( !bIsReversed )
-		rayBeam.Init( vecStart, vecEnd );
-	else
-		rayBeam.Init( vecEnd, vecStart );
-
-	IEnginePortal *pPortal = UTIL_Portal_TraceRay_Beam( rayBeam, MASK_SHOT, pTraceFilter, &fEndFraction );
-
-	// If we intersected a portal we need to modify the start and end points to match the actual trace through portal drawing extents
-	if ( !pPortal )
-		return false;
-
-	// Modify the start and end points to match the actual trace through portal drawing extents
-	vecStart = rayBeam.m_Start;
-
-	Vector vecIntersection = rayBeam.m_Start + rayBeam.m_Delta * fEndFraction;
-
-	int iNumLoops = 0;
-
-	// Loop through the portals (at most 16 times)
-	while ( pPortal && iNumLoops < 16 )
-	{
-		// Get the point that we hit a portal or wall
-		vecIntersectionStart = vecIntersection;
-
-		VMatrix matThisToLinked = pPortal->MatrixThisToLinked();
-
-		// Get the transformed positions of the sub beam in the other portal's space
-		UTIL_Portal_PointTransform( matThisToLinked, vecIntersectionStart, vecIntersectionEnd );
-		UTIL_Portal_PointTransform( matThisToLinked, rayBeam.m_Start + rayBeam.m_Delta, vecEnd );
-
-		CTraceFilterSkipClassname traceFilter( pPortal->GetLinkedPortal()->AsEngineObject()->GetHandleEntity(), "prop_energy_ball", COLLISION_GROUP_NONE);
-
-		rayBeam.Init( vecIntersectionEnd, vecEnd );
-		pPortal = UTIL_Portal_TraceRay_Beam( rayBeam, MASK_SHOT, &traceFilter, &fEndFraction );
-		vecIntersection = rayBeam.m_Start + rayBeam.m_Delta * fEndFraction;
-
-		++iNumLoops;
-	}
-
-	vecEnd = vecIntersection;
-
-	return true;
-}
-
-
 void UTIL_Portal_TraceRay_With( const IEnginePortal *pPortal, const Ray_t &ray, unsigned int fMask, ITraceFilter *pTraceFilter, trace_t *pTrace, bool bTraceHolyWall )
 {
 	//check to see if the player is theoretically in a portal environment
@@ -298,7 +201,7 @@ void UTIL_Portal_TraceRay_With( const IEnginePortal *pPortal, const Ray_t &ray, 
 			if ( PortalLinkedTrace.fraction < pTrace->fraction )
 			{
 				// Only collide with the cross-portal objects if this trace crossed a portal
-				if ( UTIL_DidTraceTouchPortals( ray, PortalLinkedTrace ) )
+				if ( UTIL_DidTraceTouchPortals(pPortal->AsEngineObject()->GetEntityList(), ray, PortalLinkedTrace ) )
 				{
 					*pTrace = PortalLinkedTrace;
 				}
@@ -323,9 +226,9 @@ void UTIL_Portal_TraceRay_With( const IEnginePortal *pPortal, const Ray_t &ray, 
 //		    pOutLocal - the portal touched (if any)
 //			pOutRemote - the portal linked to the portal touched
 //-----------------------------------------------------------------------------
-bool UTIL_DidTraceTouchPortals( const Ray_t& ray, const trace_t& trace,const IEnginePortal** pOutLocal,const IEnginePortal** pOutRemote )
+bool UTIL_DidTraceTouchPortals(IEntityList* pEntityList, const Ray_t& ray, const trace_t& trace,const IEnginePortal** pOutLocal,const IEnginePortal** pOutRemote )
 {
-	int iPortalCount = EntityList()->GetPortalCount();
+	int iPortalCount = pEntityList->GetPortalCount();
 	if( iPortalCount == 0 )
 	{
 		if( pOutLocal )
@@ -343,7 +246,7 @@ bool UTIL_DidTraceTouchPortals( const Ray_t& ray, const trace_t& trace,const IEn
 	{
 		float fMustBeCloserThan = trace.fraction + 0.0001f;
 
-		pIntersectedPortal = UTIL_Portal_FirstAlongRay( ray, fMustBeCloserThan );
+		pIntersectedPortal = UTIL_Portal_FirstAlongRay(pEntityList, ray, fMustBeCloserThan );
 	}
 	
 	if( (pIntersectedPortal == NULL) && !ray.m_IsRay )
@@ -356,7 +259,7 @@ bool UTIL_DidTraceTouchPortals( const Ray_t& ray, const trace_t& trace,const IEn
 
 		for( int i = 0; i != iPortalCount; ++i )
 		{
-			IEnginePortal *pTempPortal = EntityList()->GetPortal(i);
+			IEnginePortal *pTempPortal = pEntityList->GetPortal(i);
 			if( (pTempPortal->IsActivated()) && 
 				(pTempPortal->GetLinkedPortal() != NULL) )
 			{
@@ -422,10 +325,10 @@ bool UTIL_DidTraceTouchPortals( const Ray_t& ray, const trace_t& trace,const IEn
 //			*pTraceFilter - customizable filter on the trace
 //			*pTrace - trace struct to fill with output info
 //-----------------------------------------------------------------------------
-IEnginePortal* UTIL_Portal_TraceRay( const Ray_t &ray, unsigned int fMask, ITraceFilter *pTraceFilter, trace_t *pTrace, bool bTraceHolyWall )
+IEnginePortal* UTIL_Portal_TraceRay(IEntityList* pEntityList, const Ray_t &ray, unsigned int fMask, ITraceFilter *pTraceFilter, trace_t *pTrace, bool bTraceHolyWall )
 {
 	float fMustBeCloserThan = 2.0f;
-	IEnginePortal *pIntersectedPortal = UTIL_Portal_FirstAlongRay( ray, fMustBeCloserThan );
+	IEnginePortal *pIntersectedPortal = UTIL_Portal_FirstAlongRay(pEntityList, ray, fMustBeCloserThan );
 
 	if ( g_bBulletPortalTrace )
 	{
@@ -443,10 +346,10 @@ IEnginePortal* UTIL_Portal_TraceRay( const Ray_t &ray, unsigned int fMask, ITrac
 	}
 }
 
-IEnginePortal* UTIL_Portal_TraceRay( const Ray_t &ray, unsigned int fMask, const IHandleEntity *ignore, int collisionGroup, trace_t *pTrace, bool bTraceHolyWall )
+IEnginePortal* UTIL_Portal_TraceRay(IEntityList* pEntityList, const Ray_t &ray, unsigned int fMask, const IHandleEntity *ignore, int collisionGroup, trace_t *pTrace, bool bTraceHolyWall )
 {
 	CTraceFilterSimple traceFilter( ignore, collisionGroup );
-	return UTIL_Portal_TraceRay( ray, fMask, &traceFilter, pTrace, bTraceHolyWall );
+	return UTIL_Portal_TraceRay(pEntityList, ray, fMask, &traceFilter, pTrace, bTraceHolyWall );
 }
 
 
@@ -520,22 +423,9 @@ void UTIL_PortalLinked_TraceRay( const IEnginePortal *pPortal, const Ray_t &ray,
 //-----------------------------------------------------------------------------
 // Purpose: A version of trace entity which detects portals and translates the trace through portals
 //-----------------------------------------------------------------------------
-void UTIL_Portal_TraceEntity( CBaseEntity *pEntity, const Vector &vecAbsStart, const Vector &vecAbsEnd, 
+void UTIL_Portal_TraceEntity(IEnginePortal* pPortal, IHandleEntity *pEntity, const Vector &vecAbsStart, const Vector &vecAbsEnd,
 							 unsigned int mask, ITraceFilter *pFilter, trace_t *pTrace )
 {
-#ifdef CLIENT_DLL
-	Assert( (GameRules() == NULL) || GameRules()->IsMultiplayer() );
-	Assert( pEntity->IsPlayer() );
-
-	IEnginePortalClient *pPortal = NULL;
-	if( pEntity->IsPlayer() )
-	{
-		pPortal = pEntity->GetEnginePlayer()->GetPortalEnvironment();
-	}
-#else
-	IEnginePortalServer *pPortal = pEntity->GetEngineObject()->GetSimulatorThatOwnsEntity();
-#endif
-
 	memset( pTrace, 0, sizeof(trace_t));
 	pTrace->fraction = 1.0f;
 	pTrace->fractionleftsolid = 0;
@@ -678,16 +568,16 @@ float UTIL_Portal_DistanceThroughPortalSqr( const IEnginePortal *pPortal, const 
 	return vPoint1.DistToSqr( pPortal->AsEngineObject()->GetAbsOrigin() ) + pPortalLinked->AsEngineObject()->GetAbsOrigin().DistToSqr( vPoint2 );
 }
 
-float UTIL_Portal_ShortestDistance( const Vector &vPoint1, const Vector &vPoint2, IEnginePortal **pShortestDistPortal_Out /*= NULL*/, bool bRequireStraightLine /*= false*/ )
+float UTIL_Portal_ShortestDistance(IEntityList* pEntityList, const Vector &vPoint1, const Vector &vPoint2, IEnginePortal **pShortestDistPortal_Out /*= NULL*/, bool bRequireStraightLine /*= false*/ )
 {
-	return FastSqrt( UTIL_Portal_ShortestDistanceSqr( vPoint1, vPoint2, pShortestDistPortal_Out, bRequireStraightLine ) );
+	return FastSqrt( UTIL_Portal_ShortestDistanceSqr(pEntityList, vPoint1, vPoint2, pShortestDistPortal_Out, bRequireStraightLine ) );
 }
 
-float UTIL_Portal_ShortestDistanceSqr( const Vector &vPoint1, const Vector &vPoint2, IEnginePortal **pShortestDistPortal_Out /*= NULL*/, bool bRequireStraightLine /*= false*/ )
+float UTIL_Portal_ShortestDistanceSqr(IEntityList* pEntityList, const Vector &vPoint1, const Vector &vPoint2, IEnginePortal **pShortestDistPortal_Out /*= NULL*/, bool bRequireStraightLine /*= false*/ )
 {
 	float fMinDist = vPoint1.DistToSqr( vPoint2 );	
 	
-	int iPortalCount = EntityList()->GetPortalCount();
+	int iPortalCount = pEntityList->GetPortalCount();
 	if( iPortalCount == 0 )
 	{
 		if( pShortestDistPortal_Out )
@@ -700,7 +590,7 @@ float UTIL_Portal_ShortestDistanceSqr( const Vector &vPoint1, const Vector &vPoi
 
 	for( int i = 0; i != iPortalCount; ++i )
 	{
-		IEnginePortal *pTempPortal = EntityList()->GetPortal(i);
+		IEnginePortal *pTempPortal = pEntityList->GetPortal(i);
 		if( pTempPortal->IsActivated() )
 		{
 			const IEnginePortal *pLinkedPortal = pTempPortal->GetLinkedPortal();
@@ -932,9 +822,9 @@ bool UTIL_IsBoxIntersectingPortal( const Vector &vecBoxCenter, const Vector &vec
 	return UTIL_IsBoxIntersectingPortal( vecBoxCenter, vecBoxExtents, pPortal->AsEngineObject()->GetAbsOrigin(), pPortal->AsEngineObject()->GetAbsAngles(), flTolerance );
 }
 
-IEnginePortal *UTIL_IntersectEntityExtentsWithPortal( const CBaseEntity *pEntity )
+IEnginePortal *UTIL_IntersectEntityExtentsWithPortal( const IHandleEntity *pEntity )
 {
-	int iPortalCount = EntityList()->GetPortalCount();
+	int iPortalCount = pEntity->GetEntityList()->GetPortalCount();
 	if( iPortalCount == 0 )
 		return NULL;
 
@@ -945,7 +835,7 @@ IEnginePortal *UTIL_IntersectEntityExtentsWithPortal( const CBaseEntity *pEntity
 
 	for( int i = 0; i != iPortalCount; ++i )
 	{
-		IEnginePortal *pTempPortal = EntityList()->GetPortal(i);
+		IEnginePortal *pTempPortal = pEntity->GetEntityList()->GetPortal(i);
 		if( pTempPortal->IsActivated() &&
 			(pTempPortal->GetLinkedPortal() != NULL) &&
 			UTIL_IsBoxIntersectingPortal( ptCenter, vExtents, pTempPortal )	)
@@ -957,29 +847,7 @@ IEnginePortal *UTIL_IntersectEntityExtentsWithPortal( const CBaseEntity *pEntity
 	return NULL;
 }
 
-void UTIL_Portal_NDebugOverlay( const Vector &ptPortalCenter, const QAngle &qPortalAngles, int r, int g, int b, int a, bool noDepthTest, float duration )
-{
-#ifndef CLIENT_DLL
-	Vector pvTri1[ 3 ], pvTri2[ 3 ];
-
-	UTIL_Portal_Triangles( ptPortalCenter, qPortalAngles, pvTri1, pvTri2 );
-
-	NDebugOverlay::Triangle( pvTri1[ 0 ], pvTri1[ 1 ], pvTri1[ 2 ], r, g, b, a, noDepthTest, duration );
-	NDebugOverlay::Triangle( pvTri2[ 0 ], pvTri2[ 1 ], pvTri2[ 2 ], r, g, b, a, noDepthTest, duration );
-#endif //#ifndef CLIENT_DLL
-}
-
-void UTIL_Portal_NDebugOverlay( const IEnginePortal *pPortal, int r, int g, int b, int a, bool noDepthTest, float duration )
-{
-#ifndef CLIENT_DLL
-	UTIL_Portal_NDebugOverlay( pPortal->AsEngineObject()->GetAbsOrigin(), pPortal->AsEngineObject()->GetAbsAngles(), r, g, b, a, noDepthTest, duration );
-#endif //#ifndef CLIENT_DLL
-}
-
-
-
-
-bool UTIL_Portal_EntityIsInPortalHole( const IEnginePortal *pPortal, CBaseEntity *pEntity )
+bool UTIL_Portal_EntityIsInPortalHole( const IEnginePortal *pPortal, IHandleEntity *pEntity )
 {
 	Vector vMins = pEntity->GetEngineObject()->OBBMins();
 	Vector vMaxs = pEntity->GetEngineObject()->OBBMaxs();

@@ -5,17 +5,12 @@
 // $NoKeywords: $
 //=============================================================================//
 
-#include "cbase.h"
-
-#include "utlpriorityqueue.h"
-#include "utlmap.h"
-#include "isaverestore.h"
-//#include "physics.h"
-#include "physics_saverestore.h"
-#include "saverestoretypes.h"
-#include "gamestringpool.h"
-#include "datacache/imdlcache.h"
-#include "physics_shared.h"
+#ifdef GAME_DLL
+#include "entitylist.h"
+#endif // GAME_DLL
+#ifdef CLIENT_DLL
+#include "cliententitylist.h"
+#endif // CLIENT_DLL
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
@@ -427,7 +422,7 @@ public:
 		item.header.hEntity = pOwner;
 		item.header.type	= type;
 		item.header.nObjects = ( !fOnlyNotingExistence ) ? pTypeDesc->fieldSize : 0;
-		item.header.fieldName = AllocPooledString( pTypeDesc->fieldName ); 	
+		item.header.fieldName = AllocPooledStringInEntityList( pTypeDesc->fieldName );
 																	// A pooled string is used here because there is no way
 																	// right now to save a non-string_t string and have it 
 																	// compressed in the save symbol tables. Furthermore,
@@ -592,7 +587,7 @@ public:
 		int i = m_PhysObjectModels.Find( pObject );
 		if ( i == m_PhysObjectModels.InvalidIndex() )
 			return NULL_STRING;
-		return AllocPooledString( modelinfo->GetModelName( modelinfo->GetModel( m_PhysObjectModels[i] ) ) );
+		return AllocPooledStringInEntityList( modelinfo->GetModelName( modelinfo->GetModel( m_PhysObjectModels[i] ) ) );
 	}
 	
 	//---------------------------------
@@ -634,7 +629,7 @@ private:
 			item.header.hEntity 	= pOwner;
 			item.header.type		= type;
 			item.header.nObjects 	= pTypeDesc->fieldSize;
-			item.header.fieldName 	= AllocPooledString( pTypeDesc->fieldName ); 	// See comment in CPhysSaveRestoreBlockHandler::QueueSave()
+			item.header.fieldName 	= AllocPooledStringInEntityList( pTypeDesc->fieldName ); 	// See comment in CPhysSaveRestoreBlockHandler::QueueSave()
 			
 			return i;
 		}

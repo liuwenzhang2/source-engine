@@ -1967,7 +1967,7 @@ void CWeaponRPG::UpdateLaserPosition( Vector vecMuzzlePos, Vector vecEndPos )
 	g_bBulletPortalTrace = true;
 	Ray_t rayLaser;
 	rayLaser.Init( vecMuzzlePos, vecEndPos );
-	UTIL_Portal_TraceRay( rayLaser, (MASK_SHOT & ~CONTENTS_WINDOW), this, COLLISION_GROUP_NONE, &tr );
+	UTIL_Portal_TraceRay(EntityList(), rayLaser, (MASK_SHOT & ~CONTENTS_WINDOW), this, COLLISION_GROUP_NONE, &tr );
 	g_bBulletPortalTrace = false;
 #else
 	UTIL_TraceLine( vecMuzzlePos, vecEndPos, (MASK_SHOT & ~CONTENTS_WINDOW), this, COLLISION_GROUP_NONE, &tr );

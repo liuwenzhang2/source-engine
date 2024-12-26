@@ -150,7 +150,7 @@ void C_NPC_Portal_FloorTurret::LaserOn( void )
 
 	CTraceFilterSkipClassname traceFilter( this, "prop_energy_ball", COLLISION_GROUP_NONE );
 
-	if ( UTIL_Portal_TraceRay_Beam( rayPath, MASK_SHOT, &traceFilter, &fEndFraction ) )
+	if ( UTIL_Portal_TraceRay_Beam(EntityList(), rayPath, MASK_SHOT, &traceFilter, &fEndFraction ) )
 		vEndPoint = vecMuzzle + vecMuzzleDir * FLOOR_TURRET_PORTAL_LASER_RANGE;	// Trace went through portal and endpoint is unknown
 	else
 		vEndPoint = vecMuzzle + vecMuzzleDir * FLOOR_TURRET_PORTAL_LASER_RANGE * fEndFraction;	// Trace hit a wall

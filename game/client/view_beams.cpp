@@ -2173,7 +2173,7 @@ void CViewRenderBeams::DrawBeam( C_Beam* pbeam, ITraceFilter *pEntityBeamTraceFi
 
 	CTraceFilterChain traceFilterChain( &traceFilter, pEntityBeamTraceFilter );
 
-	IEnginePortalClient *pPortal = (IEnginePortalClient*)UTIL_Portal_TraceRay_Beam( rayBeam, MASK_SHOT, &traceFilterChain, &fEndFraction );
+	IEnginePortalClient *pPortal = (IEnginePortalClient*)UTIL_Portal_TraceRay_Beam(EntityList(), rayBeam, MASK_SHOT, &traceFilterChain, &fEndFraction );
 
 	// Get the point that we hit a portal or wall
 	Vector vEndPoint = rayBeam.m_Start + rayBeam.m_Delta * fEndFraction;

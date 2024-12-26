@@ -1523,7 +1523,7 @@ void CPortal_Player::PlayerUse( void )
 
 		float fMustBeCloserThan = 2.0f;
 
-		IEnginePortalServer *pPortal = (IEnginePortalServer*)UTIL_Portal_FirstAlongRay( rayPortalTest, fMustBeCloserThan );
+		IEnginePortalServer *pPortal = (IEnginePortalServer*)UTIL_Portal_FirstAlongRay(EntityList(), rayPortalTest, fMustBeCloserThan );
 
 		if ( pPortal )
 		{

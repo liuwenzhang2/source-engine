@@ -33,6 +33,12 @@
 class CGameTrace;
 class CBasePlayer;
 typedef CGameTrace trace_t;
+#ifdef CLIENT_DLL
+class C_Beam;
+typedef C_Beam CBeam;
+#else
+class CBeam;
+#endif
 
 //-----------------------------------------------------------------------------
 // Language IDs.
@@ -308,6 +314,17 @@ inline void UTIL_TraceRay( const Ray_t &ray, unsigned int mask,
 	}
 }
 
+void UTIL_Portal_NDebugOverlay(const Vector& ptPortalCenter, const QAngle& qPortalAngles, int r, int g, int b, int a, bool noDepthTest, float duration);
+void UTIL_Portal_NDebugOverlay(const IEnginePortal* pPortal, int r, int g, int b, int a, bool noDepthTest, float duration);
+
+void UTIL_Portal_Trace_Filter(class CTraceFilterSimpleClassnameList* traceFilterPortalShot);
+
+IEnginePortal* UTIL_Portal_TraceRay_Beam(IEntityList* pEntityList, const Ray_t& ray, unsigned int fMask, ITraceFilter* pTraceFilter, float* pfFraction);
+bool UTIL_Portal_Trace_Beam(const CBeam* pBeam, Vector& vecStart, Vector& vecEnd, Vector& vecIntersectionStart, Vector& vecIntersectionEnd, ITraceFilter* pTraceFilter);
+
+// Version of the TraceEntity functions which trace through portals
+void UTIL_TraceEntityThroughPortal(CBaseEntity* pEntity, const Vector& vecAbsStart, const Vector& vecAbsEnd,
+					unsigned int mask, ITraceFilter* pFilter, trace_t* ptr);
 
 // Sweeps a particular entity through the world
 void UTIL_TraceEntity( CBaseEntity *pEntity, const Vector &vecAbsStart, const Vector &vecAbsEnd, unsigned int mask, trace_t *ptr );

@@ -161,7 +161,7 @@ void C_NPC_RocketTurret::LaserOn( void )
 	Ray_t rayPath;
 	rayPath.Init( vecMuzzle, vecMuzzle + vecAimDir * ROCKET_TURRET_LASER_RANGE );
 
-	if ( UTIL_Portal_TraceRay_Beam( rayPath, MASK_SHOT, &m_filterBeams, &fEndFraction ) )
+	if ( UTIL_Portal_TraceRay_Beam(EntityList(), rayPath, MASK_SHOT, &m_filterBeams, &fEndFraction ) )
 		vEndPoint = vecMuzzle + vecAimDir * ROCKET_TURRET_LASER_RANGE;	// Trace went through portal and endpoint is unknown
 	else
 		vEndPoint = vecMuzzle + vecAimDir * ROCKET_TURRET_LASER_RANGE * fEndFraction;	// Trace hit a wall
