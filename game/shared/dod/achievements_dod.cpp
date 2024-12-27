@@ -885,9 +885,6 @@ class CAchievementDODCollectHolidayGifts : public CBaseAchievement
 
 	void FireGameEvent_Internal( IGameEvent *event )
 	{
-	//	if ( !UTIL_IsHolidayActive( kHoliday_Christmas ) )
-	//		return;
-
 		if ( Q_strcmp( event->GetName(), "christmas_gift_grab" ) == 0 )
 		{
 			int iPlayer = engine->GetPlayerForUserID( event->GetInt( "userid" ) );

@@ -472,5 +472,7 @@ enum
 	NUM_BEAM_TYPES
 };
 
+IEnginePortal* UTIL_Portal_TraceRay_Beam(IEntityList* pEntityList, const Ray_t& ray, unsigned int fMask, ITraceFilter* pTraceFilter, float* pfFraction);
+bool UTIL_Portal_Trace_Beam(const CBeam* pBeam, Vector& vecStart, Vector& vecEnd, Vector& vecIntersectionStart, Vector& vecIntersectionEnd, ITraceFilter* pTraceFilter);
 
 #endif // BEAM_H

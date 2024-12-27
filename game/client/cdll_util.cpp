@@ -27,6 +27,7 @@
 #include <vgui/ILocalize.h>
 #include "view.h"
 #include "ixboxsystem.h"
+#include "cdll_util.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
@@ -162,6 +163,31 @@ int GetLocalPlayerTeam( void )
 	else
 		return TEAM_UNASSIGNED;
 }
+
+//=============================================================================
+// HPE_BEGIN:
+// [menglish] Added UTIL function for events in client win_panel which transmit the player as a user ID
+//=============================================================================
+CBasePlayer* UTIL_PlayerByUserId( int userID )
+{
+	for (int i = 1; i<=gpGlobals->maxClients; i++ )
+	{
+		CBasePlayer *pPlayer = ToBasePlayer(EntityList()->GetPlayerByIndex( i ));
+
+		if ( !pPlayer )
+			continue;
+
+		if ( pPlayer->GetUserID() == userID )
+		{
+			return pPlayer;
+		}
+	}
+
+	return NULL;
+}
+//=============================================================================
+// HPE_END
+//=============================================================================
 
 //-----------------------------------------------------------------------------
 // Purpose: Interpolate Euler angles using quaternions to avoid singularities

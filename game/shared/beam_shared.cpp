@@ -1205,3 +1205,72 @@ void CBeam::ComputeBounds( Vector& mins, Vector& maxs )
 	maxs -= vecAbsOrigin;
 }
 #endif
+
+IEnginePortal* UTIL_Portal_TraceRay_Beam(IEntityList* pEntityList, const Ray_t& ray, unsigned int fMask, ITraceFilter* pTraceFilter, float* pfFraction)
+{
+	// Do a regular trace
+	trace_t tr;
+	UTIL_TraceLine(ray.m_Start, ray.m_Start + ray.m_Delta, fMask, pTraceFilter, &tr);
+	float fMustBeCloserThan = tr.fraction + 0.0001f;
+
+	IEnginePortal* pIntersectedPortal = UTIL_Portal_FirstAlongRay(pEntityList, ray, fMustBeCloserThan);
+
+	*pfFraction = fMustBeCloserThan; //will be real trace distance if it didn't hit a portal
+	return pIntersectedPortal;
+}
+
+
+bool UTIL_Portal_Trace_Beam(const CBeam* pBeam, Vector& vecStart, Vector& vecEnd, Vector& vecIntersectionStart, Vector& vecIntersectionEnd, ITraceFilter* pTraceFilter)
+{
+	vecStart = pBeam->GetAbsStartPos();
+	vecEnd = pBeam->GetAbsEndPos();
+
+	// Trace to see if we've intersected a portal
+	float fEndFraction;
+	Ray_t rayBeam;
+
+	bool bIsReversed = (pBeam->GetBeamFlags() & FBEAM_REVERSED) != 0x0;
+
+	if (!bIsReversed)
+		rayBeam.Init(vecStart, vecEnd);
+	else
+		rayBeam.Init(vecEnd, vecStart);
+
+	IEnginePortal* pPortal = UTIL_Portal_TraceRay_Beam(pBeam->GetEntityList(), rayBeam, MASK_SHOT, pTraceFilter, &fEndFraction);
+
+	// If we intersected a portal we need to modify the start and end points to match the actual trace through portal drawing extents
+	if (!pPortal)
+		return false;
+
+	// Modify the start and end points to match the actual trace through portal drawing extents
+	vecStart = rayBeam.m_Start;
+
+	Vector vecIntersection = rayBeam.m_Start + rayBeam.m_Delta * fEndFraction;
+
+	int iNumLoops = 0;
+
+	// Loop through the portals (at most 16 times)
+	while (pPortal && iNumLoops < 16)
+	{
+		// Get the point that we hit a portal or wall
+		vecIntersectionStart = vecIntersection;
+
+		VMatrix matThisToLinked = pPortal->MatrixThisToLinked();
+
+		// Get the transformed positions of the sub beam in the other portal's space
+		UTIL_Portal_PointTransform(matThisToLinked, vecIntersectionStart, vecIntersectionEnd);
+		UTIL_Portal_PointTransform(matThisToLinked, rayBeam.m_Start + rayBeam.m_Delta, vecEnd);
+
+		CTraceFilterSkipClassname traceFilter(pPortal->GetLinkedPortal()->AsEngineObject()->GetHandleEntity(), "prop_energy_ball", COLLISION_GROUP_NONE);
+
+		rayBeam.Init(vecIntersectionEnd, vecEnd);
+		pPortal = UTIL_Portal_TraceRay_Beam(pBeam->GetEntityList(), rayBeam, MASK_SHOT, &traceFilter, &fEndFraction);
+		vecIntersection = rayBeam.m_Start + rayBeam.m_Delta * fEndFraction;
+
+		++iNumLoops;
+	}
+
+	vecEnd = vecIntersection;
+
+	return true;
+}

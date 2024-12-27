@@ -44,7 +44,7 @@ public:
     // HPE_END
     //=============================================================================
 
-	virtual const char *GetHolidayString() = 0;
+    virtual const char *GetHolidayString() = 0;
 };
 
 #define GAMECLIENTEXPORTS_INTERFACE_VERSION "GameClientExports001"

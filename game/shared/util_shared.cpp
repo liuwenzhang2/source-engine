@@ -19,14 +19,6 @@
 #include "particle_parse.h"
 #include "KeyValues.h"
 #include "time.h"
-#include "beam_shared.h"
-
-#ifdef USES_ECON_ITEMS
-	#include "econ_item_constants.h"
-	#include "econ_holidays.h"
-	#include "rtime.h"
-#endif // USES_ECON_ITEMS
-
 #ifdef CLIENT_DLL
 	#include "c_te_effect_dispatch.h"
 #else
@@ -621,75 +613,6 @@ void UTIL_Portal_Trace_Filter(CTraceFilterSimpleClassnameList* traceFilterPortal
 	traceFilterPortalShot->AddClassnameToIgnore("updateitem2");
 }
 
-IEnginePortal* UTIL_Portal_TraceRay_Beam(IEntityList* pEntityList, const Ray_t& ray, unsigned int fMask, ITraceFilter* pTraceFilter, float* pfFraction)
-{
-	// Do a regular trace
-	trace_t tr;
-	UTIL_TraceLine(ray.m_Start, ray.m_Start + ray.m_Delta, fMask, pTraceFilter, &tr);
-	float fMustBeCloserThan = tr.fraction + 0.0001f;
-
-	IEnginePortal* pIntersectedPortal = UTIL_Portal_FirstAlongRay(pEntityList, ray, fMustBeCloserThan);
-
-	*pfFraction = fMustBeCloserThan; //will be real trace distance if it didn't hit a portal
-	return pIntersectedPortal;
-}
-
-
-bool UTIL_Portal_Trace_Beam(const CBeam* pBeam, Vector& vecStart, Vector& vecEnd, Vector& vecIntersectionStart, Vector& vecIntersectionEnd, ITraceFilter* pTraceFilter)
-{
-	vecStart = pBeam->GetAbsStartPos();
-	vecEnd = pBeam->GetAbsEndPos();
-
-	// Trace to see if we've intersected a portal
-	float fEndFraction;
-	Ray_t rayBeam;
-
-	bool bIsReversed = (pBeam->GetBeamFlags() & FBEAM_REVERSED) != 0x0;
-
-	if (!bIsReversed)
-		rayBeam.Init(vecStart, vecEnd);
-	else
-		rayBeam.Init(vecEnd, vecStart);
-
-	IEnginePortal* pPortal = UTIL_Portal_TraceRay_Beam(pBeam->GetEntityList(), rayBeam, MASK_SHOT, pTraceFilter, &fEndFraction);
-
-	// If we intersected a portal we need to modify the start and end points to match the actual trace through portal drawing extents
-	if (!pPortal)
-		return false;
-
-	// Modify the start and end points to match the actual trace through portal drawing extents
-	vecStart = rayBeam.m_Start;
-
-	Vector vecIntersection = rayBeam.m_Start + rayBeam.m_Delta * fEndFraction;
-
-	int iNumLoops = 0;
-
-	// Loop through the portals (at most 16 times)
-	while (pPortal && iNumLoops < 16)
-	{
-		// Get the point that we hit a portal or wall
-		vecIntersectionStart = vecIntersection;
-
-		VMatrix matThisToLinked = pPortal->MatrixThisToLinked();
-
-		// Get the transformed positions of the sub beam in the other portal's space
-		UTIL_Portal_PointTransform(matThisToLinked, vecIntersectionStart, vecIntersectionEnd);
-		UTIL_Portal_PointTransform(matThisToLinked, rayBeam.m_Start + rayBeam.m_Delta, vecEnd);
-
-		CTraceFilterSkipClassname traceFilter(pPortal->GetLinkedPortal()->AsEngineObject()->GetHandleEntity(), "prop_energy_ball", COLLISION_GROUP_NONE);
-
-		rayBeam.Init(vecIntersectionEnd, vecEnd);
-		pPortal = UTIL_Portal_TraceRay_Beam(pBeam->GetEntityList(), rayBeam, MASK_SHOT, &traceFilter, &fEndFraction);
-		vecIntersection = rayBeam.m_Start + rayBeam.m_Delta * fEndFraction;
-
-		++iNumLoops;
-	}
-
-	vecEnd = vecIntersection;
-
-	return true;
-}
-
 //-----------------------------------------------------------------------------
 // Purpose: A version of trace entity which detects portals and translates the trace through portals
 //-----------------------------------------------------------------------------
@@ -1068,38 +991,6 @@ float CountdownTimer::Now( void ) const
 	return gpGlobals->curtime;
 }
 
-
-#ifdef CLIENT_DLL
-//=============================================================================
-// HPE_BEGIN:
-// [menglish] Added UTIL function for events in client win_panel which transmit the player as a user ID
-//=============================================================================
-
-	CBasePlayer* UTIL_PlayerByUserId( int userID )
-	{
-		for (int i = 1; i<=gpGlobals->maxClients; i++ )
-		{
-			CBasePlayer *pPlayer = ToBasePlayer(EntityList()->GetPlayerByIndex( i ));
-
-			if ( !pPlayer )
-				continue;
-
-			if ( pPlayer->GetUserID() == userID )
-			{
-				return pPlayer;
-			}
-		}
-
-		return NULL;
-	}
-
-//=============================================================================
-// HPE_END
-//=============================================================================
-
-#endif
-
-
 char* ReadAndAllocStringValue( KeyValues *pSub, const char *pName, const char *pFilename )
 {
 	const char *pValue = pSub->GetString( pName, NULL );
@@ -1138,77 +1029,6 @@ int UTIL_StringFieldToInt( const char *szValue, const char **pValueStrings, int 
 int find_day_of_week( struct tm& found_day, int day_of_week, int step )
 {
 	return 0;
-}
-
-//-----------------------------------------------------------------------------
-// Purpose: 
-//-----------------------------------------------------------------------------
-#ifdef USES_ECON_ITEMS
-static bool					  s_HolidaysCalculated = false;
-static CBitVec<kHolidayCount> s_HolidaysActive;
-
-//-----------------------------------------------------------------------------
-// Purpose: Used at level change and round start to re-calculate which holiday is active
-//-----------------------------------------------------------------------------
-void UTIL_CalculateHolidays()
-{
-	s_HolidaysActive.ClearAll();
-
-	CRTime::UpdateRealTime();
-	for ( int iHoliday = 0; iHoliday < kHolidayCount; iHoliday++ )
-	{
-		if ( EconHolidays_IsHolidayActive( iHoliday, CRTime::RTime32TimeCur() ) )
-		{
-			s_HolidaysActive.Set( iHoliday );
-		}
-	}
-
-	s_HolidaysCalculated = true;
-}
-#endif // USES_ECON_ITEMS
-
-bool UTIL_IsHolidayActive( /*EHoliday*/ int eHoliday )
-{
-#ifdef USES_ECON_ITEMS
-	if ( IsX360() )
-		return false;
-
-	if ( !s_HolidaysCalculated )
-	{
-		UTIL_CalculateHolidays();
-	}
-
-	return s_HolidaysActive.IsBitSet( eHoliday );
-#else
-	return false;
-#endif
-}
-
-//-----------------------------------------------------------------------------
-// Purpose: 
-//-----------------------------------------------------------------------------
-int	UTIL_GetHolidayForString( const char* pszHolidayName )
-{
-#ifdef USES_ECON_ITEMS
-	if ( !pszHolidayName )
-		return kHoliday_None;
-
-	return EconHolidays_GetHolidayForString( pszHolidayName );
-#else
-	return 0;
-#endif
-}
-
-//-----------------------------------------------------------------------------
-// Purpose: 
-//-----------------------------------------------------------------------------
-const char* UTIL_GetActiveHolidayString()
-{
-#ifdef USES_ECON_ITEMS
-	return EconHolidays_GetActiveHolidayString();
-#else
-	return NULL;
-#endif
 }
 
 void PhysRecheckObjectPair(IPhysicsObject* pObject0, IPhysicsObject* pObject1)

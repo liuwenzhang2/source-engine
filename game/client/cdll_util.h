@@ -89,6 +89,12 @@ bool	IsLocalPlayerSpectator( void );
 void	InterpolateAngles( const QAngle& start, const QAngle& end, QAngle& output, float frac );
 void	InterpolateVector( float frac, const Vector& src, const Vector& dest, Vector& output );
 
+//=============================================================================
+// HPE_BEGIN:
+// [menglish] Added UTIL function for events in client win_panel which transmit the player as a user ID
+//=============================================================================
+CBasePlayer* UTIL_PlayerByUserId(int userID);
+
 const char *nexttoken(char *token, const char *str, char sep);
 
 //-----------------------------------------------------------------------------

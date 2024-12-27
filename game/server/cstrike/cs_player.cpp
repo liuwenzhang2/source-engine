@@ -1287,7 +1287,7 @@ void CCSPlayer::Event_Killed( const CTakeDamageInfo &info )
 	//CreateRagdollEntity();
 
 	// Special code to drop holiday gifts for the holiday achievement
-	if ( ( mp_holiday_nogifts.GetBool() == false ) && UTIL_IsHolidayActive( 3 /*kHoliday_Christmas*/ ) )
+	if ( ( mp_holiday_nogifts.GetBool() == false ))
 	{
 		if ( RandomInt( 0, 100 ) < 20 )
 		{

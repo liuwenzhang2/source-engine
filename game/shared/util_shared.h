@@ -33,12 +33,6 @@
 class CGameTrace;
 class CBasePlayer;
 typedef CGameTrace trace_t;
-#ifdef CLIENT_DLL
-class C_Beam;
-typedef C_Beam CBeam;
-#else
-class CBeam;
-#endif
 
 //-----------------------------------------------------------------------------
 // Language IDs.
@@ -319,9 +313,6 @@ void UTIL_Portal_NDebugOverlay(const IEnginePortal* pPortal, int r, int g, int b
 
 void UTIL_Portal_Trace_Filter(class CTraceFilterSimpleClassnameList* traceFilterPortalShot);
 
-IEnginePortal* UTIL_Portal_TraceRay_Beam(IEntityList* pEntityList, const Ray_t& ray, unsigned int fMask, ITraceFilter* pTraceFilter, float* pfFraction);
-bool UTIL_Portal_Trace_Beam(const CBeam* pBeam, Vector& vecStart, Vector& vecEnd, Vector& vecIntersectionStart, Vector& vecIntersectionEnd, ITraceFilter* pTraceFilter);
-
 // Version of the TraceEntity functions which trace through portals
 void UTIL_TraceEntityThroughPortal(CBaseEntity* pEntity, const Vector& vecAbsStart, const Vector& vecAbsEnd,
 					unsigned int mask, ITraceFilter* pFilter, trace_t* ptr);
@@ -366,11 +357,7 @@ void		UTIL_StringToIntArray( int *pVector, int count, const char *pString );
 void		UTIL_StringToFloatArray( float *pVector, int count, const char *pString );
 void		UTIL_StringToColor32( color32 *color, const char *pString );
 
-//=============================================================================
-// HPE_BEGIN:
-// [menglish] Added UTIL function for events in client win_panel which transmit the player as a user ID
-//=============================================================================
-CBasePlayer *UTIL_PlayerByUserId( int userID );
+
 //=============================================================================
 // HPE_END
 //=============================================================================
@@ -591,20 +578,6 @@ private:
 char* ReadAndAllocStringValue( KeyValues *pSub, const char *pName, const char *pFilename = NULL );
 
 int UTIL_StringFieldToInt( const char *szValue, const char **pValueStrings, int iNumStrings );
-
-//-----------------------------------------------------------------------------
-// Holidays
-//-----------------------------------------------------------------------------
-
-// Used at level change and round start to re-calculate which holiday is active
-void				UTIL_CalculateHolidays();
-
-bool				UTIL_IsHolidayActive( /*EHoliday*/ int eHoliday );
-/*EHoliday*/ int	UTIL_GetHolidayForString( const char* pszHolidayName );
-
-// This will return the first active holiday string it can find. In the case of multiple
-// holidays overlapping, the list order will act as priority.
-const char		   *UTIL_GetActiveHolidayString();
 
 // Convenience routine
 // ORs gameFlags with the physics object's current game flags
