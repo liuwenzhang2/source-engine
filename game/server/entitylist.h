@@ -418,6 +418,7 @@ public:
 	int GetAllChildren(CUtlVector<IEngineObjectServer*>& list);
 	bool EntityIsParentOf(IEngineObjectServer* pEntity);
 	int GetAllInHierarchy(CUtlVector<IEngineObjectServer*>& list);
+	bool EntityHasMatchingRootParent(IEngineObjectServer* pRootParent);
 
 	int AreaNum() const;
 	PVSInfo_t* GetPVSInfo();
@@ -1861,6 +1862,11 @@ public:
 	bool IsWorld() { return true; }
 	CEngineWorldInternal* AsEngineWorld() { return this; }
 	const CEngineWorldInternal* AsEngineWorld() const { return this; }
+	// Sweeps a particular entity through the world
+	void TraceEntity(IEngineObjectServer* pEntity, const Vector& vecAbsStart, const Vector& vecAbsEnd, unsigned int mask, trace_t* ptr);
+	void TraceEntity(IEngineObjectServer* pEntity, const Vector& vecAbsStart, const Vector& vecAbsEnd, unsigned int mask, ITraceFilter* pFilter, trace_t* ptr);
+	void TraceEntity(IEngineObjectServer* pEntity, const Vector& vecAbsStart, const Vector& vecAbsEnd, unsigned int mask, const IHandleEntity* ignore, int collisionGroup, trace_t* ptr);
+	void TraceLineFilterEntity(IEngineObjectServer* pEntity, const Vector& vecAbsStart, const Vector& vecAbsEnd, unsigned int mask, const int nCollisionGroup, trace_t* ptr);
 };
 
 class CEnginePlayerInternal : public CEngineObjectInternal, public IEnginePlayerServer {
@@ -2850,6 +2856,7 @@ template<class T>
 class CGlobalEntityList : public CBaseEntityList<T>, public IServerEntityList, public IEntityCallBack
 {
 	friend class CEngineObjectInternal;
+	friend class CEngineWorldInternal;
 	friend class CEnginePortalInternal;
 	friend class CEngineShadowCloneInternal;
 	friend class CEnginePlayerInternal;
@@ -2940,6 +2947,7 @@ public:
 	void DestroyEntityImmediate(IHandleEntity* oldObj);
 	IEngineObjectServer* GetEngineObject(int entnum);
 	IEngineObjectServer* GetEngineObjectFromHandle(CBaseHandle handle);
+	IEngineWorldServer* GetEngineWorld() { return GetEngineObject(0)->AsEngineWorld(); }
 	IServerNetworkable* GetServerNetworkable(CBaseHandle hEnt) const;
 	IServerNetworkable* GetServerNetworkable(int entnum) const;
 	IServerNetworkable* GetServerNetworkableFromHandle(CBaseHandle hEnt) const;
@@ -5621,33 +5629,41 @@ inline CBaseEntity* CGlobalEntityList<T>::CreateEntityByName(const char* classNa
 		Warning("Attempted to create unknown entity type %s!\n", className);
 		return NULL;
 	}
-	switch (pFactory->GetEngineObjectType()) {
-	case ENGINEOBJECT_BASE:
-		m_EngineObjectArray[iForceEdictIndex] = new CEngineObjectInternal(this, iForceEdictIndex, iSerialNum);
-		break;
-	case ENGINEOBJECT_WORLD:
+	if (iForceEdictIndex == 0) {
 		m_EngineObjectArray[iForceEdictIndex] = new CEngineWorldInternal(this, iForceEdictIndex, iSerialNum);
-		break;
-	case ENGINEOBJECT_PLAYER:
+	}
+	else if (iForceEdictIndex >= 1 && iForceEdictIndex <= gpGlobals->maxClients) {
 		m_EngineObjectArray[iForceEdictIndex] = new CEnginePlayerInternal(this, iForceEdictIndex, iSerialNum);
-		break;
-	case ENGINEOBJECT_PORTAL:
-		m_EngineObjectArray[iForceEdictIndex] = new CEnginePortalInternal(this, iForceEdictIndex, iSerialNum);
-		break;
-	case ENGINEOBJECT_SHADOWCLONE:
-		m_EngineObjectArray[iForceEdictIndex] = new CEngineShadowCloneInternal(this, iForceEdictIndex, iSerialNum);
-		break;
-	case ENGINEOBJECT_VEHICLE:
-		m_EngineObjectArray[iForceEdictIndex] = new CEngineVehicleInternal(this, iForceEdictIndex, iSerialNum);
-		break;
-	case ENGINEOBJECT_ROPE:
-		m_EngineObjectArray[iForceEdictIndex] = new CEngineRopeInternal(this, iForceEdictIndex, iSerialNum);
-		break;
-	case ENGINEOBJECT_GHOST:
-		m_EngineObjectArray[iForceEdictIndex] = new CEngineGhostInternal(this, iForceEdictIndex, iSerialNum);
-		break;
-	default:
-		Error("GetEngineObjectType error!\n");
+	} 
+	else {
+		switch (pFactory->GetEngineObjectType()) {
+		case ENGINEOBJECT_BASE:
+			m_EngineObjectArray[iForceEdictIndex] = new CEngineObjectInternal(this, iForceEdictIndex, iSerialNum);
+			break;
+		case ENGINEOBJECT_WORLD:
+			Error("ENGINEOBJECT_WORLD handled by engine!\n");
+			break;
+		case ENGINEOBJECT_PLAYER:
+			Error("ENGINEOBJECT_PLAYER handled by engine!\n");
+			break;
+		case ENGINEOBJECT_PORTAL:
+			m_EngineObjectArray[iForceEdictIndex] = new CEnginePortalInternal(this, iForceEdictIndex, iSerialNum);
+			break;
+		case ENGINEOBJECT_SHADOWCLONE:
+			m_EngineObjectArray[iForceEdictIndex] = new CEngineShadowCloneInternal(this, iForceEdictIndex, iSerialNum);
+			break;
+		case ENGINEOBJECT_VEHICLE:
+			m_EngineObjectArray[iForceEdictIndex] = new CEngineVehicleInternal(this, iForceEdictIndex, iSerialNum);
+			break;
+		case ENGINEOBJECT_ROPE:
+			m_EngineObjectArray[iForceEdictIndex] = new CEngineRopeInternal(this, iForceEdictIndex, iSerialNum);
+			break;
+		case ENGINEOBJECT_GHOST:
+			m_EngineObjectArray[iForceEdictIndex] = new CEngineGhostInternal(this, iForceEdictIndex, iSerialNum);
+			break;
+		default:
+			Error("GetEngineObjectType error!\n");
+		}
 	}
 	return (CBaseEntity*)m_EntityFactoryDictionary.Create(this, className, iForceEdictIndex, iSerialNum, this);
 }

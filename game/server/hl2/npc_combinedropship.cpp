@@ -2627,7 +2627,7 @@ float CNPC_CombineDropship::GetAltitude( void )
 	Vector vecBottom = GetEngineObject()->GetAbsOrigin();
 
 	// Uneven terrain causes us problems, so trace our box down
-	AI_TraceEntity( this, vecBottom, vecBottom - Vector(0,0,4096), MASK_SOLID_BRUSHONLY, &tr );
+	AI_TraceEntity( this->GetEngineObject(), vecBottom, vecBottom - Vector(0, 0, 4096), MASK_SOLID_BRUSHONLY, &tr);
 
 	float flAltitude = ( 4096 * tr.fraction );
 	//DevMsg(" Altitude: %.3f\n", flAltitude );

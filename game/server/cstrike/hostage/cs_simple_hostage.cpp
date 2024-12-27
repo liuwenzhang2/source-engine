@@ -798,12 +798,12 @@ void CHostage::AvoidPhysicsProps( void )
 		Vector start = GetEngineObject()->GetAbsOrigin();
 		Vector forward = m_accel;
 		forward.NormalizeInPlace();
-		UTIL_TraceEntity( this, start, start + forward, MASK_PLAYERSOLID, this, COLLISION_GROUP_PLAYER, &trace );
+		EntityList()->GetEngineWorld()->TraceEntity( this->GetEngineObject(), start, start + forward, MASK_PLAYERSOLID, this, COLLISION_GROUP_PLAYER, &trace);
 		if ( !trace.startsolid && trace.fraction < 1.0f && trace.plane.normal.z < 0.7f )
 		{
 			float groundFraction = trace.fraction;
 			start.z += StepHeight;
-			UTIL_TraceEntity( this, start, start + forward, MASK_PLAYERSOLID, this, COLLISION_GROUP_PLAYER, &trace );
+			EntityList()->GetEngineWorld()->TraceEntity( this->GetEngineObject(), start, start + forward, MASK_PLAYERSOLID, this, COLLISION_GROUP_PLAYER, &trace);
 			if ( !trace.startsolid && trace.fraction > groundFraction )
 			{
 				GetEngineObject()->SetAbsOrigin( start );

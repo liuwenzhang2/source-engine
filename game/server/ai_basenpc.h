@@ -547,7 +547,7 @@ public:
 	//---------------------------------
 
 	virtual bool			IsNPC( void ) const { return true; }
-
+	bool NPC_CheckBrushExclude(CBaseEntity* pBrush);
 	//---------------------------------
 
 	void TestPlayerPushing( CBaseEntity *pPlayer );

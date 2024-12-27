@@ -611,7 +611,7 @@ void CGameRules::EndGameFrame( void )
 float CGameRules::WeaponTraceEntity( CBaseEntity *pEntity, const Vector &vecStart, const Vector &vecEnd,
 					 unsigned int mask, trace_t *ptr )
 {
-	UTIL_TraceEntity( pEntity, vecStart, vecEnd, mask, ptr );
+	EntityList()->GetEngineWorld()->TraceEntity( pEntity->GetEngineObject(), vecStart, vecEnd, mask, ptr);
 	return 1.0f;
 }
 

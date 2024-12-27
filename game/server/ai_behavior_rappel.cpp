@@ -348,7 +348,7 @@ void CAI_RappelBehavior::BeginRappel()
 
 	trace_t tr;
 
-	UTIL_TraceEntity( GetOuter(), GetAbsOrigin(), GetAbsOrigin()-Vector(0,0,4096), MASK_SHOT, GetOuter(), COLLISION_GROUP_NONE, &tr );
+	EntityList()->GetEngineWorld()->TraceEntity( GetOuter()->GetEngineObject(), GetAbsOrigin(), GetAbsOrigin() - Vector(0, 0, 4096), MASK_SHOT, GetOuter(), COLLISION_GROUP_NONE, &tr);
 
 	if( tr.m_pEnt != NULL && ((CBaseEntity*)tr.m_pEnt)->IsNPC() )
 	{

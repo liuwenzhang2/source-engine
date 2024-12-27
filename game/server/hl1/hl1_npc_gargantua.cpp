@@ -463,7 +463,7 @@ CBaseEntity* CNPC_Gargantua::GargantuaCheckTraceHullAttack(float flDist, int iDa
 
 	//UTIL_TraceHull( vecStart, vecEnd, dont_ignore_monsters, head_hull, ENT(pev), &tr );
 
-	UTIL_TraceEntity( this, GetEngineObject()->GetAbsOrigin(), vecEnd, MASK_SOLID, &tr );
+	EntityList()->GetEngineWorld()->TraceEntity( this->GetEngineObject(), GetEngineObject()->GetAbsOrigin(), vecEnd, MASK_SOLID, &tr);
 	
 	if ( tr.m_pEnt )
 	{

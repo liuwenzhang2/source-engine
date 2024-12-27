@@ -2956,7 +2956,7 @@ CBaseEntity *CBaseCombatCharacter::Weapon_FindUsable( const Vector &range )
 			trace_t tr;
 
 			Vector	vAboveWeapon = pWeapon->GetEngineObject()->GetAbsOrigin();
-			UTIL_TraceEntity( this, vAboveWeapon, vAboveWeapon + Vector( 0, 0, 1 ), MASK_SOLID, pWeapon, COLLISION_GROUP_NONE, &tr );
+			EntityList()->GetEngineWorld()->TraceEntity( this->GetEngineObject(), vAboveWeapon, vAboveWeapon + Vector(0, 0, 1), MASK_SOLID, pWeapon, COLLISION_GROUP_NONE, &tr);
 
 			if ( tr.startsolid || (tr.fraction < 1.0) )
 				continue;

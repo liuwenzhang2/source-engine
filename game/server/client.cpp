@@ -1026,7 +1026,7 @@ static ConCommand use("use", CC_Player_Use, "Use a particular weapon\t\nArgument
 static bool TestEntityPosition ( CBasePlayer *pPlayer )
 {	
 	trace_t	trace;
-	UTIL_TraceEntity( pPlayer, pPlayer->GetEngineObject()->GetAbsOrigin(), pPlayer->GetEngineObject()->GetAbsOrigin(), MASK_PLAYERSOLID, &trace );
+	EntityList()->GetEngineWorld()->TraceEntity( pPlayer->GetEngineObject(), pPlayer->GetEngineObject()->GetAbsOrigin(), pPlayer->GetEngineObject()->GetAbsOrigin(), MASK_PLAYERSOLID, &trace);
 	return (trace.startsolid == 0);
 }
 

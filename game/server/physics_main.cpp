@@ -51,7 +51,7 @@ static void Physics_TraceEntity( CBaseEntity* pBaseEntity, const Vector &vecAbsS
 	}
 	else
 	{
-		UTIL_TraceEntity( pBaseEntity, vecAbsStart, vecAbsEnd, mask, ptr );
+		EntityList()->GetEngineWorld()->TraceEntity( pBaseEntity->GetEngineObject(), vecAbsStart, vecAbsEnd, mask, ptr);
 	}
 }
 
@@ -198,7 +198,7 @@ bool CPhysicsPushedEntities::IsPushedPositionValid( CBaseEntity *pBlocker )
 	CTraceFilterPushFinal pushFilter(pBlocker, pBlocker->GetEngineObject()->GetCollisionGroup() );
 
 	trace_t trace;
-	UTIL_TraceEntity( pBlocker, pBlocker->GetEngineObject()->GetAbsOrigin(), pBlocker->GetEngineObject()->GetAbsOrigin(), pBlocker->PhysicsSolidMaskForEntity(), &pushFilter, &trace );
+	EntityList()->GetEngineWorld()->TraceEntity( pBlocker->GetEngineObject(), pBlocker->GetEngineObject()->GetAbsOrigin(), pBlocker->GetEngineObject()->GetAbsOrigin(), pBlocker->PhysicsSolidMaskForEntity(), &pushFilter, &trace);
 
 	return !trace.startsolid;
 }
@@ -216,7 +216,7 @@ bool CPhysicsPushedEntities::SpeculativelyCheckPush( PhysicsPushedInfo_t &info, 
 	CTraceFilterPushMove pushFilter(pBlocker, pBlocker->GetEngineObject()->GetCollisionGroup() );
 
 	Vector pushDestPosition = pBlocker->GetEngineObject()->GetAbsOrigin() + vecAbsPush;
-	UTIL_TraceEntity( pBlocker, pBlocker->GetEngineObject()->GetAbsOrigin(), pushDestPosition,
+	EntityList()->GetEngineWorld()->TraceEntity( pBlocker->GetEngineObject(), pBlocker->GetEngineObject()->GetAbsOrigin(), pushDestPosition,
 		pBlocker->PhysicsSolidMaskForEntity(), &pushFilter, &info.m_Trace );
 
 	RelinkPusherList(pPusherHandles);
@@ -1681,10 +1681,6 @@ void CBaseEntity::PhysicsStep()
 	PhysicsRelinkChildren(dt);
 }
 
-
-void UTIL_TraceLineFilterEntity( CBaseEntity *pEntity, const Vector &vecAbsStart, const Vector &vecAbsEnd, 
-					   unsigned int mask, const int nCollisionGroup, trace_t *ptr );
-
 // Check to see what (if anything) this MOVETYPE_STEP entity is standing on
 void CBaseEntity::PhysicsStepRecheckGround()
 {
@@ -1708,7 +1704,7 @@ void CBaseEntity::PhysicsStepRecheckGround()
 
 			if ( pCollision && IsNPC() )
 			{
-				UTIL_TraceLineFilterEntity( this, point, point, mask, COLLISION_GROUP_NONE, &trace );
+				EntityList()->GetEngineWorld()->TraceLineFilterEntity( this->GetEngineObject(), point, point, mask, COLLISION_GROUP_NONE, &trace);
 			}
 			else
 			{

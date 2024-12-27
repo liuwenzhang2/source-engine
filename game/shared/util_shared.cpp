@@ -23,8 +23,6 @@
 	#include "c_te_effect_dispatch.h"
 #else
 	#include "te_effect_dispatch.h"
-
-bool NPC_CheckBrushExclude( CBaseEntity *pEntity, CBaseEntity *pBrush );
 #endif
 
 
@@ -437,92 +435,6 @@ void UTIL_TraceModel( const Vector &vecStart, const Vector &vecEnd, const Vector
 	}
 }
 
-bool UTIL_EntityHasMatchingRootParent( CBaseEntity *pRootParent, CBaseEntity *pEntity )
-{
-	if ( pRootParent )
-	{
-		// NOTE: Don't let siblings/parents collide.
-		if ( pRootParent->GetEngineObject() == pEntity->GetEngineObject()->GetRootMoveParent())
-			return true;
-		if ( pEntity->GetOwnerEntity() && pRootParent->GetEngineObject() == pEntity->GetOwnerEntity()->GetEngineObject()->GetRootMoveParent() )
-			return true;
-	}
-	return false;
-}
-
-//-----------------------------------------------------------------------------
-// Sweep an entity from the starting to the ending position 
-//-----------------------------------------------------------------------------
-class CTraceFilterEntity : public CTraceFilterSimple
-{
-	DECLARE_CLASS( CTraceFilterEntity, CTraceFilterSimple );
-
-public:
-	CTraceFilterEntity( CBaseEntity *pEntity, int nCollisionGroup ) 
-		: CTraceFilterSimple( pEntity, nCollisionGroup )
-	{
-		m_pRootParent = pEntity->GetEngineObject()->GetRootMoveParent()? pEntity->GetEngineObject()->GetRootMoveParent()->GetOuter():NULL;
-		m_pEntity = pEntity;
-		m_checkHash = EntityList()->PhysGetEntityCollisionHash()->IsObjectInHash(pEntity);
-	}
-
-	bool ShouldHitEntity( IHandleEntity *pHandleEntity, int contentsMask )
-	{
-		CBaseEntity *pEntity = EntityFromEntityHandle( pHandleEntity );
-		if ( !pEntity )
-			return false;
-
-		// Check parents against each other
-		// NOTE: Don't let siblings/parents collide.
-		if ( UTIL_EntityHasMatchingRootParent( m_pRootParent, pEntity ) )
-			return false;
-
-		if ( m_checkHash )
-		{
-			if (EntityList()->PhysGetEntityCollisionHash()->IsObjectPairInHash( m_pEntity, pEntity ) )
-				return false;
-		}
-
-#ifndef CLIENT_DLL
-		if ( m_pEntity->IsNPC() )
-		{
-			if ( NPC_CheckBrushExclude( m_pEntity, pEntity ) )
-				 return false;
-
-		}
-#endif
-
-		return BaseClass::ShouldHitEntity( pHandleEntity, contentsMask );
-	}
-
-private:
-
-	CBaseEntity *m_pRootParent;
-	CBaseEntity *m_pEntity;
-	bool		m_checkHash;
-};
-
-class CTraceFilterEntityIgnoreOther : public CTraceFilterEntity
-{
-	DECLARE_CLASS( CTraceFilterEntityIgnoreOther, CTraceFilterEntity );
-public:
-	CTraceFilterEntityIgnoreOther( CBaseEntity *pEntity, const IHandleEntity *pIgnore, int nCollisionGroup ) : 
-		CTraceFilterEntity( pEntity, nCollisionGroup ), m_pIgnoreOther( pIgnore )
-	{
-	}
-
-	bool ShouldHitEntity( IHandleEntity *pHandleEntity, int contentsMask )
-	{
-		if ( pHandleEntity == m_pIgnoreOther )
-			return false;
-
-		return BaseClass::ShouldHitEntity( pHandleEntity, contentsMask );
-	}
-
-private:
-	const IHandleEntity *m_pIgnoreOther;
-};
-
 void UTIL_Portal_NDebugOverlay(const Vector& ptPortalCenter, const QAngle& qPortalAngles, int r, int g, int b, int a, bool noDepthTest, float duration)
 {
 #ifndef CLIENT_DLL
@@ -611,93 +523,6 @@ void UTIL_Portal_Trace_Filter(CTraceFilterSimpleClassnameList* traceFilterPortal
 	traceFilterPortalShot->AddClassnameToIgnore("prop_ragdoll");
 	traceFilterPortalShot->AddClassnameToIgnore("prop_glados_core");
 	traceFilterPortalShot->AddClassnameToIgnore("updateitem2");
-}
-
-//-----------------------------------------------------------------------------
-// Purpose: A version of trace entity which detects portals and translates the trace through portals
-//-----------------------------------------------------------------------------
-void UTIL_TraceEntityThroughPortal(CBaseEntity* pEntity, const Vector& vecAbsStart, const Vector& vecAbsEnd,
-	unsigned int mask, ITraceFilter* pFilter, trace_t* pTrace)
-{
-#ifdef CLIENT_DLL
-	Assert((GameRules() == NULL) || GameRules()->IsMultiplayer());
-	Assert(pEntity->IsPlayer());
-
-	IEnginePortalClient* pPortal = NULL;
-	if (pEntity->IsPlayer())
-	{
-		pPortal = pEntity->GetEnginePlayer()->GetPortalEnvironment();
-	}
-#else
-	IEnginePortalServer* pPortal = pEntity->GetEngineObject()->GetPortalThatOwnsEntity();
-#endif
-
-	UTIL_Portal_TraceEntity(pPortal, pEntity, vecAbsStart, vecAbsEnd, mask, pFilter, pTrace);
-}
-
-//-----------------------------------------------------------------------------
-// Sweeps a particular entity through the world 
-//-----------------------------------------------------------------------------
-void UTIL_TraceEntity( CBaseEntity *pEntity, const Vector &vecAbsStart, const Vector &vecAbsEnd, unsigned int mask, trace_t *ptr )
-{
-	ICollideable *pCollision = pEntity->GetCollideable();
-
-	// Adding this assertion here so game code catches it, but really the assertion belongs in the engine
-	// because one day, rotated collideables will work!
-	Assert( pCollision->GetCollisionAngles() == vec3_angle );
-
-	CTraceFilterEntity traceFilter( pEntity, pCollision->GetCollisionGroup() );
-
-#ifdef PORTAL
-	UTIL_TraceEntityThroughPortal( pEntity, vecAbsStart, vecAbsEnd, mask, &traceFilter, ptr );
-#else
-	enginetrace->SweepCollideable( pCollision, vecAbsStart, vecAbsEnd, pCollision->GetCollisionAngles(), mask, &traceFilter, ptr );
-#endif
-}
-
-void UTIL_TraceEntity( CBaseEntity *pEntity, const Vector &vecAbsStart, const Vector &vecAbsEnd, 
-					  unsigned int mask, const IHandleEntity *pIgnore, int nCollisionGroup, trace_t *ptr )
-{
-	ICollideable *pCollision;
-	pCollision = pEntity->GetCollideable();
-
-	// Adding this assertion here so game code catches it, but really the assertion belongs in the engine
-	// because one day, rotated collideables will work!
-	Assert( pCollision->GetCollisionAngles() == vec3_angle );
-
-	CTraceFilterEntityIgnoreOther traceFilter( pEntity, pIgnore, nCollisionGroup );
-
-#ifdef PORTAL
-	UTIL_TraceEntityThroughPortal( pEntity, vecAbsStart, vecAbsEnd, mask, &traceFilter, ptr );
-#else
-	enginetrace->SweepCollideable( pCollision, vecAbsStart, vecAbsEnd, pCollision->GetCollisionAngles(), mask, &traceFilter, ptr );
-#endif
-}
-
-void UTIL_TraceEntity( CBaseEntity *pEntity, const Vector &vecAbsStart, const Vector &vecAbsEnd, 
-					  unsigned int mask, ITraceFilter *pFilter, trace_t *ptr )
-{
-	ICollideable *pCollision;
-	pCollision = pEntity->GetCollideable();
-
-	// Adding this assertion here so game code catches it, but really the assertion belongs in the engine
-	// because one day, rotated collideables will work!
-	Assert( pCollision->GetCollisionAngles() == vec3_angle );
-
-#ifdef PORTAL
-	UTIL_TraceEntityThroughPortal( pEntity, vecAbsStart, vecAbsEnd, mask, pFilter, ptr );
-#else
-	enginetrace->SweepCollideable( pCollision, vecAbsStart, vecAbsEnd, pCollision->GetCollisionAngles(), mask, pFilter, ptr );
-#endif
-}
-
-// ----
-// This is basically a regular TraceLine that uses the FilterEntity filter.
-void UTIL_TraceLineFilterEntity( CBaseEntity *pEntity, const Vector &vecAbsStart, const Vector &vecAbsEnd, 
-					   unsigned int mask, int nCollisionGroup, trace_t *ptr )
-{
-	CTraceFilterEntity traceFilter( pEntity, nCollisionGroup );
-	UTIL_TraceLine( vecAbsStart, vecAbsEnd, mask, &traceFilter, ptr );
 }
 
 void UTIL_ClipTraceToPlayers( const Vector& vecAbsStart, const Vector& vecAbsEnd, unsigned int mask, ITraceFilter *filter, trace_t *tr )

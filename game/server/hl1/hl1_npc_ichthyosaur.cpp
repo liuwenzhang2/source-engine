@@ -599,7 +599,7 @@ void CNPC_Ichthyosaur::RunTask(const Task_t *pTask )
 			trace_t tr;
 		
 //			UTIL_TraceHull( vecFrom, vecPos, ignore_monsters, large_hull, m_hEnemy->edict(), &tr );
-			UTIL_TraceEntity( this, vecFrom, vecPos, MASK_NPCSOLID, &tr );
+			EntityList()->GetEngineWorld()->TraceEntity( this->GetEngineObject(), vecFrom, vecPos, MASK_NPCSOLID, &tr);
 
 			if (tr.fraction > 0.5)
 			{
@@ -869,7 +869,7 @@ Vector CNPC_Ichthyosaur::DoProbe( const Vector &Probe )
 	bool bBumpedSomething = false;	// = ProbeZ(GetAbsOrigin(), Probe, &frac);
 
 	trace_t tr;
-	UTIL_TraceEntity( this, GetEngineObject()->GetAbsOrigin(), Probe, MASK_NPCSOLID, &tr );
+	EntityList()->GetEngineWorld()->TraceEntity( this->GetEngineObject(), GetEngineObject()->GetAbsOrigin(), Probe, MASK_NPCSOLID, &tr);
 	if ( tr.allsolid || tr.fraction < 0.99 )
 	{
 		if (tr.fraction < 0.0) tr.fraction = 0.0;

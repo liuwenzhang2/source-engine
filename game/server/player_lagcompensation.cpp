@@ -128,7 +128,7 @@ static void RestorePlayerTo( CBasePlayer *pPlayer, const Vector &vWantedPos )
 	// Try to move to the wanted position from our current position.
 	trace_t tr;
 	VPROF_BUDGET( "RestorePlayerTo", "CLagCompensationManager" );
-	UTIL_TraceEntity( pPlayer, vWantedPos, vWantedPos, MASK_PLAYERSOLID, pPlayer, COLLISION_GROUP_PLAYER_MOVEMENT, &tr );
+	EntityList()->GetEngineWorld()->TraceEntity( pPlayer->GetEngineObject(), vWantedPos, vWantedPos, MASK_PLAYERSOLID, pPlayer, COLLISION_GROUP_PLAYER_MOVEMENT, &tr);
 	if ( tr.startsolid || tr.allsolid )
 	{
 		if ( sv_unlag_debug.GetBool() )
@@ -137,7 +137,7 @@ static void RestorePlayerTo( CBasePlayer *pPlayer, const Vector &vWantedPos )
 					pPlayer->GetPlayerName(), vWantedPos.x, vWantedPos.y, vWantedPos.z );
 		}
 
-		UTIL_TraceEntity( pPlayer, pPlayer->GetEngineObject()->GetLocalOrigin(), vWantedPos, MASK_PLAYERSOLID, pPlayer, COLLISION_GROUP_PLAYER_MOVEMENT, &tr );
+		EntityList()->GetEngineWorld()->TraceEntity( pPlayer->GetEngineObject(), pPlayer->GetEngineObject()->GetLocalOrigin(), vWantedPos, MASK_PLAYERSOLID, pPlayer, COLLISION_GROUP_PLAYER_MOVEMENT, &tr);
 		if ( tr.startsolid || tr.allsolid )
 		{
 			// In this case, the guy got stuck back wherever we lag compensated him to. Nasty.
@@ -516,7 +516,7 @@ void CLagCompensationManager::BacktrackPlayer( CBasePlayer *pPlayer, float flTar
 	{
 		// Try to move to the wanted position from our current position.
 		trace_t tr;
-		UTIL_TraceEntity( pPlayer, org, org, MASK_PLAYERSOLID, &tr );
+		EntityList()->GetEngineWorld()->TraceEntity( pPlayer->GetEngineObject(), org, org, MASK_PLAYERSOLID, &tr);
 		if ( tr.startsolid || tr.allsolid )
 		{
 			if ( sv_unlag_debug.GetBool() )
@@ -546,7 +546,7 @@ void CLagCompensationManager::BacktrackPlayer( CBasePlayer *pPlayer, float flTar
 			}
 
 			// now trace us back as far as we can go
-			UTIL_TraceEntity( pPlayer, pPlayer->GetEngineObject()->GetLocalOrigin(), org, MASK_PLAYERSOLID, &tr );
+			EntityList()->GetEngineWorld()->TraceEntity( pPlayer->GetEngineObject(), pPlayer->GetEngineObject()->GetLocalOrigin(), org, MASK_PLAYERSOLID, &tr);
 
 			if ( tr.startsolid || tr.allsolid )
 			{

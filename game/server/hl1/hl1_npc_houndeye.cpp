@@ -909,7 +909,7 @@ int CNPC_Houndeye::SelectSchedule( void )
 					trace_t trace;
 					Vector v_forward;
 					GetVectors( &v_forward, NULL, NULL );
-					UTIL_TraceEntity( this, GetEngineObject()->GetAbsOrigin(), GetEngineObject()->GetAbsOrigin() + v_forward * -128, MASK_SOLID, &trace );
+					EntityList()->GetEngineWorld()->TraceEntity( this->GetEngineObject(), GetEngineObject()->GetAbsOrigin(), GetEngineObject()->GetAbsOrigin() + v_forward * -128, MASK_SOLID, &trace);
 					
 					if ( trace.fraction == 1.0 )
 					{

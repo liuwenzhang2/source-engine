@@ -457,7 +457,7 @@ void CNPC_Ichthyosaur::DragVictim( float moveDist )
 	Vector	newPos = GetEngineObject()->GetAbsOrigin() + ( (forward+(up*0.25f)) * ( moveDist + width + DRAG_OFFSET ) );
 
 	trace_t	tr;
-	AI_TraceEntity( this, m_pVictim->GetEngineObject()->GetAbsOrigin(), newPos, MASK_NPCSOLID, &tr );
+	AI_TraceEntity( this->GetEngineObject(), m_pVictim->GetEngineObject()->GetAbsOrigin(), newPos, MASK_NPCSOLID, &tr);
 
 	if ( ( tr.fraction == 1.0f ) && ( tr.m_pEnt != this ) )
 	{

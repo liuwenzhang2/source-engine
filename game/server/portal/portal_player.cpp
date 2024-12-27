@@ -1245,7 +1245,7 @@ void CPortal_Player::VPhysicsShadowUpdate( IPhysicsObject *pPhysics )
 			}
 
 			trace_t trace;
-			UTIL_TraceEntity( this, newPosition, newPosition, MASK_PLAYERSOLID, this, COLLISION_GROUP_PLAYER_MOVEMENT, &trace );
+			EntityList()->GetEngineWorld()->TraceEntity( this->GetEngineObject(), newPosition, newPosition, MASK_PLAYERSOLID, this, COLLISION_GROUP_PLAYER_MOVEMENT, &trace);
 			if ( !trace.allsolid && !trace.startsolid )
 			{
 				GetEngineObject()->SetAbsOrigin( newPosition );
@@ -1299,7 +1299,7 @@ void CPortal_Player::VPhysicsShadowUpdate( IPhysicsObject *pPhysics )
 			// check my position (physics object could have simulated into my position
 			// physics is not very far away, check my position
 			trace_t trace;
-			UTIL_TraceEntity( this, GetEngineObject()->GetAbsOrigin(), GetEngineObject()->GetAbsOrigin(),
+			EntityList()->GetEngineWorld()->TraceEntity( this->GetEngineObject(), GetEngineObject()->GetAbsOrigin(), GetEngineObject()->GetAbsOrigin(),
 				MASK_PLAYERSOLID, this, COLLISION_GROUP_PLAYER_MOVEMENT, &trace );
 
 			// is current position ok?
@@ -1308,7 +1308,7 @@ void CPortal_Player::VPhysicsShadowUpdate( IPhysicsObject *pPhysics )
 				// stuck????!?!?
 				//Msg("Stuck on %s\n", trace.m_pEnt->GetClassname());
 				GetEngineObject()->SetAbsOrigin( newPosition );
-				UTIL_TraceEntity( this, GetEngineObject()->GetAbsOrigin(), GetEngineObject()->GetAbsOrigin(),
+				EntityList()->GetEngineWorld()->TraceEntity( this->GetEngineObject(), GetEngineObject()->GetAbsOrigin(), GetEngineObject()->GetAbsOrigin(),
 					MASK_PLAYERSOLID, this, COLLISION_GROUP_PLAYER_MOVEMENT, &trace );
 				if ( trace.allsolid || trace.startsolid )
 				{

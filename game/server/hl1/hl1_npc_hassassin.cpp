@@ -378,7 +378,7 @@ void CNPC_HAssassin::RunTask ( const Task_t *pTask )
 		{
 			// I've waited two seconds and haven't hit the ground. Try to force it.
 			trace_t trace;
-			UTIL_TraceEntity( this, GetEngineObject()->GetAbsOrigin(), GetEngineObject()->GetAbsOrigin() - Vector( 0, 0, 1 ), MASK_NPCSOLID, this, COLLISION_GROUP_NONE, &trace );
+			EntityList()->GetEngineWorld()->TraceEntity( this->GetEngineObject(), GetEngineObject()->GetAbsOrigin(), GetEngineObject()->GetAbsOrigin() - Vector(0, 0, 1), MASK_NPCSOLID, this, COLLISION_GROUP_NONE, &trace);
 
 			if( trace.DidHitWorld() )
 			{

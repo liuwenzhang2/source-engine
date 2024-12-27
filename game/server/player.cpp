@@ -4717,7 +4717,7 @@ void CBasePlayer::PostThinkVPhysics( void )
 			end = position;
 			end.z += g_pMoveData->m_outStepHeight;
 			trace_t trace;
-			UTIL_TraceEntity( this, position, end, MASK_PLAYERSOLID, this, COLLISION_GROUP_PLAYER_MOVEMENT, &trace );
+			EntityList()->GetEngineWorld()->TraceEntity( this->GetEngineObject(), position, end, MASK_PLAYERSOLID, this, COLLISION_GROUP_PLAYER_MOVEMENT, &trace);
 			if ( trace.DidHit() )
 			{
 				g_pMoveData->m_outStepHeight = trace.endpos.z - position.z;
@@ -8125,12 +8125,12 @@ void CBasePlayer::VPhysicsShadowUpdate( IPhysicsObject *pPhysics )
 		// check my position (physics object could have simulated into my position
 		// physics is not very far away, check my position
 		trace_t trace;
-		UTIL_TraceEntity( this, GetEngineObject()->GetAbsOrigin(), GetEngineObject()->GetAbsOrigin(), MASK_PLAYERSOLID, this, COLLISION_GROUP_PLAYER_MOVEMENT, &trace );
+		EntityList()->GetEngineWorld()->TraceEntity( this->GetEngineObject(), GetEngineObject()->GetAbsOrigin(), GetEngineObject()->GetAbsOrigin(), MASK_PLAYERSOLID, this, COLLISION_GROUP_PLAYER_MOVEMENT, &trace);
 		if ( !trace.startsolid )
 			return;
 
 		// The physics shadow position is probably not in solid, try to move from there to the desired position
-		UTIL_TraceEntity( this, newPosition, GetEngineObject()->GetAbsOrigin(), MASK_PLAYERSOLID, this, COLLISION_GROUP_PLAYER_MOVEMENT, &trace );
+		EntityList()->GetEngineWorld()->TraceEntity( this->GetEngineObject(), newPosition, GetEngineObject()->GetAbsOrigin(), MASK_PLAYERSOLID, this, COLLISION_GROUP_PLAYER_MOVEMENT, &trace);
 		if ( !trace.startsolid )
 		{
 			// found a valid position between the two?  take it.
@@ -8178,7 +8178,7 @@ void CBasePlayer::VPhysicsShadowUpdate( IPhysicsObject *pPhysics )
 			}
 			
 			trace_t trace;
-			UTIL_TraceEntity( this, newPosition, newPosition, MASK_PLAYERSOLID, this, COLLISION_GROUP_PLAYER_MOVEMENT, &trace );
+			EntityList()->GetEngineWorld()->TraceEntity( this->GetEngineObject(), newPosition, newPosition, MASK_PLAYERSOLID, this, COLLISION_GROUP_PLAYER_MOVEMENT, &trace);
 			if ( !trace.allsolid && !trace.startsolid )
 			{
 				GetEngineObject()->SetAbsOrigin( newPosition );
@@ -8196,7 +8196,7 @@ void CBasePlayer::VPhysicsShadowUpdate( IPhysicsObject *pPhysics )
 			// check my position (physics object could have simulated into my position
 			// physics is not very far away, check my position
 			trace_t trace;
-			UTIL_TraceEntity( this, GetEngineObject()->GetAbsOrigin(), GetEngineObject()->GetAbsOrigin(),
+			EntityList()->GetEngineWorld()->TraceEntity( this->GetEngineObject(), GetEngineObject()->GetAbsOrigin(), GetEngineObject()->GetAbsOrigin(),
 				MASK_PLAYERSOLID, this, COLLISION_GROUP_PLAYER_MOVEMENT, &trace );
 			
 			// is current position ok?
@@ -8213,7 +8213,7 @@ void CBasePlayer::VPhysicsShadowUpdate( IPhysicsObject *pPhysics )
 	if ( bCheckStuck )
 	{
 		trace_t trace;
-		UTIL_TraceEntity( this, GetEngineObject()->GetAbsOrigin(), GetEngineObject()->GetAbsOrigin(), MASK_PLAYERSOLID, this, COLLISION_GROUP_PLAYER_MOVEMENT, &trace );
+		EntityList()->GetEngineWorld()->TraceEntity( this->GetEngineObject(), GetEngineObject()->GetAbsOrigin(), GetEngineObject()->GetAbsOrigin(), MASK_PLAYERSOLID, this, COLLISION_GROUP_PLAYER_MOVEMENT, &trace);
 
 		// current position is not ok, fixup
 		if ( trace.allsolid || trace.startsolid )

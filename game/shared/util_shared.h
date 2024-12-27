@@ -313,19 +313,6 @@ void UTIL_Portal_NDebugOverlay(const IEnginePortal* pPortal, int r, int g, int b
 
 void UTIL_Portal_Trace_Filter(class CTraceFilterSimpleClassnameList* traceFilterPortalShot);
 
-// Version of the TraceEntity functions which trace through portals
-void UTIL_TraceEntityThroughPortal(CBaseEntity* pEntity, const Vector& vecAbsStart, const Vector& vecAbsEnd,
-					unsigned int mask, ITraceFilter* pFilter, trace_t* ptr);
-
-// Sweeps a particular entity through the world
-void UTIL_TraceEntity( CBaseEntity *pEntity, const Vector &vecAbsStart, const Vector &vecAbsEnd, unsigned int mask, trace_t *ptr );
-void UTIL_TraceEntity( CBaseEntity *pEntity, const Vector &vecAbsStart, const Vector &vecAbsEnd, 
-					  unsigned int mask, ITraceFilter *pFilter, trace_t *ptr );
-void UTIL_TraceEntity( CBaseEntity *pEntity, const Vector &vecAbsStart, const Vector &vecAbsEnd, 
-					  unsigned int mask, const IHandleEntity *ignore, int collisionGroup, trace_t *ptr );
-
-bool UTIL_EntityHasMatchingRootParent( CBaseEntity *pRootParent, CBaseEntity *pEntity );
-
 inline int UTIL_PointContents( const Vector &vec )
 {
 	return enginetrace->GetPointContents( vec );

@@ -135,7 +135,7 @@ Vector CAI_BasePhysicsFlyingBot::VelocityToAvoidObstacles(float flInterval)
 	trace_t tr;
 	Vector vTravelDir = m_vCurrentVelocity*flInterval;
 	Vector endPos = GetEngineObject()->GetAbsOrigin() + vTravelDir;
-	AI_TraceEntity( this, GetEngineObject()->GetAbsOrigin(), endPos, MASK_NPCSOLID|CONTENTS_WATER, &tr);
+	AI_TraceEntity( this->GetEngineObject(), GetEngineObject()->GetAbsOrigin(), endPos, MASK_NPCSOLID | CONTENTS_WATER, &tr);
 	if (tr.fraction != 1.0)
 	{	
 		// Bounce off in normal 

@@ -182,6 +182,7 @@ public:
 	virtual void LinkChild(IEngineObjectClient* pChild) = 0;
 	virtual void HierarchySetParent(IEngineObjectClient* pNewParent) = 0;
 	virtual void UnlinkFromHierarchy() = 0;
+	virtual bool EntityHasMatchingRootParent(IEngineObjectClient* pRootParent) = 0;
 
 	// Methods relating to traversing hierarchy
 	virtual IEngineObjectClient* GetMoveParent(void) const = 0;
@@ -647,7 +648,11 @@ public:
 
 class IEngineWorldClient {
 public:
-
+	// Sweeps a particular entity through the world
+	virtual void TraceEntity(IEngineObjectClient* pEntity, const Vector& vecAbsStart, const Vector& vecAbsEnd, unsigned int mask, trace_t* ptr) = 0;
+	virtual void TraceEntity(IEngineObjectClient* pEntity, const Vector& vecAbsStart, const Vector& vecAbsEnd, unsigned int mask, ITraceFilter* pFilter, trace_t* ptr) = 0;
+	virtual void TraceEntity(IEngineObjectClient* pEntity, const Vector& vecAbsStart, const Vector& vecAbsEnd, unsigned int mask, const IHandleEntity* ignore, int collisionGroup, trace_t* ptr) = 0;
+	virtual void TraceLineFilterEntity(IEngineObjectClient* pEntity, const Vector& vecAbsStart, const Vector& vecAbsEnd, unsigned int mask, const int nCollisionGroup, trace_t* ptr) = 0;
 };
 
 class IEnginePortalClient;
@@ -931,6 +936,7 @@ public:
 	// Get IClientNetworkable interface for specified entity
 	virtual IEngineObjectClient* GetEngineObject(int entnum) = 0;
 	virtual IEngineObjectClient* GetEngineObjectFromHandle(CBaseHandle handle) = 0;
+	virtual IEngineWorldClient* GetEngineWorld() = 0;
 	virtual IClientNetworkable* GetClientNetworkable(int entnum) = 0;
 	virtual IClientNetworkable* GetClientNetworkableFromHandle(CBaseHandle hEnt) = 0;
 	virtual IClientUnknown* GetClientUnknownFromHandle(CBaseHandle hEnt) = 0;

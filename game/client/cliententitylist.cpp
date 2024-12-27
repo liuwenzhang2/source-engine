@@ -3345,6 +3345,18 @@ void C_EngineObjectInternal::UnlinkFromHierarchy()
 	}
 }
 
+bool C_EngineObjectInternal::EntityHasMatchingRootParent(IEngineObjectClient* pRootParent)
+{
+	if (pRootParent)
+	{
+		// NOTE: Don't let siblings/parents collide.
+		if (pRootParent == this->GetRootMoveParent())
+			return true;
+		if (this->m_pOuter->GetOwnerEntity() && pRootParent == this->m_pOuter->GetOwnerEntity()->GetEngineObject()->GetRootMoveParent())
+			return true;
+	}
+	return false;
+}
 
 void C_EngineObjectInternal::OnStoreLastNetworkedValue()
 {
@@ -8893,6 +8905,167 @@ bool C_EngineObjectInternal::PhysModelParseSolidByIndex(solid_t& solid, int soli
 void C_EngineObjectInternal::PhysForceClearVelocity(IPhysicsObject* pPhys)
 {
 	::PhysForceClearVelocity(pPhys);
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: A version of trace entity which detects portals and translates the trace through portals
+//-----------------------------------------------------------------------------
+void UTIL_TraceEntityThroughPortal(C_BaseEntity* pEntity, const Vector& vecAbsStart, const Vector& vecAbsEnd,
+	unsigned int mask, ITraceFilter* pFilter, trace_t* pTrace)
+{
+#ifdef CLIENT_DLL
+	Assert((GameRules() == NULL) || GameRules()->IsMultiplayer());
+	Assert(pEntity->IsPlayer());
+
+	IEnginePortalClient* pPortal = NULL;
+	if (pEntity->IsPlayer())
+	{
+		pPortal = pEntity->GetEnginePlayer()->GetPortalEnvironment();
+	}
+#else
+	IEnginePortalServer* pPortal = pEntity->GetEngineObject()->GetPortalThatOwnsEntity();
+#endif
+
+	UTIL_Portal_TraceEntity(pPortal, pEntity, vecAbsStart, vecAbsEnd, mask, pFilter, pTrace);
+}
+
+//-----------------------------------------------------------------------------
+// Sweep an entity from the starting to the ending position 
+//-----------------------------------------------------------------------------
+class CTraceFilterEntity : public CTraceFilterSimple
+{
+	DECLARE_CLASS(CTraceFilterEntity, CTraceFilterSimple);
+
+public:
+	CTraceFilterEntity(C_BaseEntity* pEntity, int nCollisionGroup)
+		: CTraceFilterSimple(pEntity, nCollisionGroup)
+	{
+		m_pRootParent = pEntity->GetEngineObject()->GetRootMoveParent() ? pEntity->GetEngineObject()->GetRootMoveParent()->GetOuter() : NULL;
+		m_pEntity = pEntity;
+		m_checkHash = EntityList()->PhysGetEntityCollisionHash()->IsObjectInHash(pEntity);
+	}
+
+	bool ShouldHitEntity(IHandleEntity* pHandleEntity, int contentsMask)
+	{
+		C_BaseEntity* pEntity = EntityFromEntityHandle(pHandleEntity);
+		if (!pEntity)
+			return false;
+
+		// Check parents against each other
+		// NOTE: Don't let siblings/parents collide.
+		if (pEntity->GetEngineObject()->EntityHasMatchingRootParent(m_pRootParent ? m_pRootParent->GetEngineObject() : NULL))
+			return false;
+
+		if (m_checkHash)
+		{
+			if (EntityList()->PhysGetEntityCollisionHash()->IsObjectPairInHash(m_pEntity, pEntity))
+				return false;
+		}
+
+#ifndef CLIENT_DLL
+		if (m_pEntity->IsNPC())
+		{
+			if (m_pEntity->NPC_CheckBrushExclude(pEntity))
+				return false;
+
+		}
+#endif
+
+		return BaseClass::ShouldHitEntity(pHandleEntity, contentsMask);
+	}
+
+private:
+
+	C_BaseEntity* m_pRootParent;
+	C_BaseEntity* m_pEntity;
+	bool		m_checkHash;
+};
+
+//-----------------------------------------------------------------------------
+// Sweeps a particular entity through the world 
+//-----------------------------------------------------------------------------
+void C_EngineWorldInternal::TraceEntity(IEngineObjectClient* pEntity, const Vector& vecAbsStart, const Vector& vecAbsEnd, unsigned int mask, trace_t* ptr)
+{
+	ICollideable* pCollision = pEntity->GetCollideable();
+
+	// Adding this assertion here so game code catches it, but really the assertion belongs in the engine
+	// because one day, rotated collideables will work!
+	Assert(pCollision->GetCollisionAngles() == vec3_angle);
+
+	CTraceFilterEntity traceFilter(pEntity->GetOuter(), pCollision->GetCollisionGroup());
+
+	if (g_EntityList.m_ActivePortals.Count() > 0) {
+		UTIL_TraceEntityThroughPortal(pEntity->GetOuter(), vecAbsStart, vecAbsEnd, mask, &traceFilter, ptr);
+	}
+	else {
+		enginetrace->SweepCollideable(pCollision, vecAbsStart, vecAbsEnd, pCollision->GetCollisionAngles(), mask, &traceFilter, ptr);
+	}
+}
+
+class CTraceFilterEntityIgnoreOther : public CTraceFilterEntity
+{
+	DECLARE_CLASS(CTraceFilterEntityIgnoreOther, CTraceFilterEntity);
+public:
+	CTraceFilterEntityIgnoreOther(C_BaseEntity* pEntity, const IHandleEntity* pIgnore, int nCollisionGroup) :
+		CTraceFilterEntity(pEntity, nCollisionGroup), m_pIgnoreOther(pIgnore)
+	{
+	}
+
+	bool ShouldHitEntity(IHandleEntity* pHandleEntity, int contentsMask)
+	{
+		if (pHandleEntity == m_pIgnoreOther)
+			return false;
+
+		return BaseClass::ShouldHitEntity(pHandleEntity, contentsMask);
+	}
+
+private:
+	const IHandleEntity* m_pIgnoreOther;
+};
+
+void C_EngineWorldInternal::TraceEntity(IEngineObjectClient* pEntity, const Vector& vecAbsStart, const Vector& vecAbsEnd, unsigned int mask, const IHandleEntity* pIgnore, int nCollisionGroup, trace_t* ptr)
+{
+	ICollideable* pCollision;
+	pCollision = pEntity->GetCollideable();
+
+	// Adding this assertion here so game code catches it, but really the assertion belongs in the engine
+	// because one day, rotated collideables will work!
+	Assert(pCollision->GetCollisionAngles() == vec3_angle);
+
+	CTraceFilterEntityIgnoreOther traceFilter(pEntity->GetOuter(), pIgnore, nCollisionGroup);
+
+	if (g_EntityList.m_ActivePortals.Count() > 0) {
+		UTIL_TraceEntityThroughPortal(pEntity->GetOuter(), vecAbsStart, vecAbsEnd, mask, &traceFilter, ptr);
+	}
+	else {
+		enginetrace->SweepCollideable(pCollision, vecAbsStart, vecAbsEnd, pCollision->GetCollisionAngles(), mask, &traceFilter, ptr);
+	}
+}
+
+void C_EngineWorldInternal::TraceEntity(IEngineObjectClient* pEntity, const Vector& vecAbsStart, const Vector& vecAbsEnd, unsigned int mask, ITraceFilter* pFilter, trace_t* ptr)
+{
+	ICollideable* pCollision;
+	pCollision = pEntity->GetCollideable();
+
+	// Adding this assertion here so game code catches it, but really the assertion belongs in the engine
+	// because one day, rotated collideables will work!
+	Assert(pCollision->GetCollisionAngles() == vec3_angle);
+
+	if (g_EntityList.m_ActivePortals.Count() > 0) {
+		UTIL_TraceEntityThroughPortal(pEntity->GetOuter(), vecAbsStart, vecAbsEnd, mask, pFilter, ptr);
+	}
+	else {
+		enginetrace->SweepCollideable(pCollision, vecAbsStart, vecAbsEnd, pCollision->GetCollisionAngles(), mask, pFilter, ptr);
+	}
+}
+
+// ----
+// This is basically a regular TraceLine that uses the FilterEntity filter.
+void C_EngineWorldInternal::TraceLineFilterEntity(IEngineObjectClient* pEntity, const Vector& vecAbsStart, const Vector& vecAbsEnd,
+	unsigned int mask, int nCollisionGroup, trace_t* ptr)
+{
+	CTraceFilterEntity traceFilter(pEntity->GetOuter(), nCollisionGroup);
+	UTIL_TraceLine(vecAbsStart, vecAbsEnd, mask, &traceFilter, ptr);
 }
 
 BEGIN_RECV_TABLE(C_EnginePlayerInternal, DT_EnginePlayer)

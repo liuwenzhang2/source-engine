@@ -918,7 +918,7 @@ void CBaseHeadcrab::RunTask( const Task_t *pTask )
 bool CBaseHeadcrab::HasHeadroom()
 {
 	trace_t tr;
-	UTIL_TraceEntity( this, GetEngineObject()->GetAbsOrigin(), GetEngineObject()->GetAbsOrigin() + Vector( 0, 0, 1 ), MASK_NPCSOLID, this, GetEngineObject()->GetCollisionGroup(), &tr );
+	EntityList()->GetEngineWorld()->TraceEntity( this->GetEngineObject(), GetEngineObject()->GetAbsOrigin(), GetEngineObject()->GetAbsOrigin() + Vector(0, 0, 1), MASK_NPCSOLID, this, GetEngineObject()->GetCollisionGroup(), &tr);
 
 #if 0
 	if( tr.fraction == 1.0f )

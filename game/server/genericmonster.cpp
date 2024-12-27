@@ -165,7 +165,7 @@ void CGenericNPC::Spawn()
 	if ( !GetEngineObject()->HasSpawnFlags(SF_GENERICNPC_NOTSOLID) )
 	{
 		trace_t tr;
-		UTIL_TraceEntity( this, GetEngineObject()->GetAbsOrigin(), GetEngineObject()->GetAbsOrigin(), MASK_SOLID, &tr );
+		EntityList()->GetEngineWorld()->TraceEntity( this->GetEngineObject(), GetEngineObject()->GetAbsOrigin(), GetEngineObject()->GetAbsOrigin(), MASK_SOLID, &tr);
 		if ( tr.startsolid )
 		{
 			Msg("Placed npc_generic in solid!!! (%s)\n", STRING(GetEngineObject()->GetModelName()) );

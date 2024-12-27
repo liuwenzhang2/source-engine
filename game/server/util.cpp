@@ -229,12 +229,12 @@ int UTIL_DropToFloor( CBaseEntity *pEntity, unsigned int mask, CBaseEntity *pIgn
 
 #if !defined(HL2MP) && !defined(HL1_DLL)
 	// HACK: is this really the only sure way to detect crossing a terrain boundry?
-	UTIL_TraceEntity( pEntity, pEntity->GetEngineObject()->GetAbsOrigin(), pEntity->GetEngineObject()->GetAbsOrigin(), mask, pIgnore, pEntity->GetEngineObject()->GetCollisionGroup(), &trace );
+	EntityList()->GetEngineWorld()->TraceEntity( pEntity->GetEngineObject(), pEntity->GetEngineObject()->GetAbsOrigin(), pEntity->GetEngineObject()->GetAbsOrigin(), mask, pIgnore, pEntity->GetEngineObject()->GetCollisionGroup(), &trace);
 	if (trace.fraction == 0.0)
 		return -1;
 #endif // HL2MP
 
-	UTIL_TraceEntity( pEntity, pEntity->GetEngineObject()->GetAbsOrigin() + Vector(0,0,1), pEntity->GetEngineObject()->GetAbsOrigin() - Vector(0,0,256), mask, pIgnore, pEntity->GetEngineObject()->GetCollisionGroup(), &trace );
+	EntityList()->GetEngineWorld()->TraceEntity( pEntity->GetEngineObject(), pEntity->GetEngineObject()->GetAbsOrigin() + Vector(0, 0, 1), pEntity->GetEngineObject()->GetAbsOrigin() - Vector(0, 0, 256), mask, pIgnore, pEntity->GetEngineObject()->GetCollisionGroup(), &trace);
 
 #ifdef HL1_DLL
 	if( fabs(pEntity->GetEngineObject()->GetAbsOrigin().z - trace.endpos.z) <= 2.f )

@@ -945,7 +945,7 @@ void CNPC_Barnacle::PullEnemyTorwardsMouth( bool bAdjustEnemyOrigin )
 
 				// find how far we can actually transport the player
 				trace_t tr;
-				UTIL_TraceEntity( pEnemy, playerOrigin, vecNewPos, MASK_PLAYERSOLID, m_hTongueTip.Get(), pEnemy->GetEngineObject()->GetCollisionGroup(), &tr );
+				EntityList()->GetEngineWorld()->TraceEntity( pEnemy->GetEngineObject(), playerOrigin, vecNewPos, MASK_PLAYERSOLID, m_hTongueTip.Get(), pEnemy->GetEngineObject()->GetCollisionGroup(), &tr);
 				pEnemy->Teleport(&tr.endpos, NULL, &desiredVelocity);
 #endif
 			}

@@ -908,6 +908,7 @@ public:
 	virtual bool			IsTriggered( CBaseEntity *pActivator ) {return true;}
 	virtual bool			IsNPC( void ) const { return false; }
 	CAI_BaseNPC				*MyNPCPointer( void ); 
+	virtual bool			NPC_CheckBrushExclude(CBaseEntity* pBrush) { return false; }
 	virtual float			GetStepHeight() const { return 0.0f; }
 	virtual CBaseCombatCharacter *MyCombatCharacterPointer( void ) { return NULL; }
 	virtual INextBot		*MyNextBotPointer( void ) { return NULL; }

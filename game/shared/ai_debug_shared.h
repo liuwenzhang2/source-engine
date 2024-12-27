@@ -51,13 +51,13 @@ inline void AI_TraceHull( const Vector &vecAbsStart, const Vector &vecAbsEnd, co
 inline void AI_TraceEntity( CBaseEntity *pEntity, const Vector &vecAbsStart, const Vector &vecAbsEnd, unsigned int mask, trace_t *ptr )
 {
 	VPROF( "AI_TraceEntity" );
-	UTIL_TraceEntity( pEntity, vecAbsStart, vecAbsEnd, mask, ptr );
+	EntityList()->GetEngineWorld()->TraceEntity( pEntity->GetEngineObject(), vecAbsStart, vecAbsEnd, mask, ptr);
 }
 
 #else
 #define AI_TraceLine UTIL_TraceLine
 #define AI_TraceHull UTIL_TraceHull
-#define AI_TraceEntity UTIL_TraceEntity
+#define AI_TraceEntity EntityList()->GetEngineWorld()->TraceEntity
 #endif
 
 

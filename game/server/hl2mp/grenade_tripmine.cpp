@@ -207,7 +207,7 @@ void CTripmineGrenade::BeamBreakThink( void  )
 		Vector	vUpBit = GetEngineObject()->GetAbsOrigin();
 		vUpBit.z += 5.0;
 
-		UTIL_TraceEntity( this, GetEngineObject()->GetAbsOrigin(), vUpBit, MASK_SHOT, &tr );
+		EntityList()->GetEngineWorld()->TraceEntity( this->GetEngineObject(), GetEngineObject()->GetAbsOrigin(), vUpBit, MASK_SHOT, &tr);
 		if ( !tr.startsolid && (tr.fraction == 1.0) )
 		{
 			GetEngineObject()->RemoveSolidFlags( FSOLID_NOT_SOLID );

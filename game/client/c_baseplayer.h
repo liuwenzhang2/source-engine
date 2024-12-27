@@ -81,8 +81,6 @@ public:
 	C_BasePlayer();
 	virtual			~C_BasePlayer();
 
-	static int GetEngineObjectTypeStatic() { return ENGINEOBJECT_PLAYER; }
-
 	bool Init(int entnum, int iSerialNum);
 
 	virtual void	Spawn( void );

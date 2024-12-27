@@ -1190,7 +1190,7 @@ void CProp_Portal::TeleportTouchingEntity( CBaseEntity *pOther )
 	//{
 		//trace_t Trace;
 		//memset( &Trace, 0, sizeof(trace_t) );
-		//UTIL_TraceEntity( pOther, ptNewOrigin, ptNewOrigin, MASK_SOLID, pOther, COLLISION_GROUP_NONE, &Trace ); //fires off some asserts, and we just need a dummy anyways
+		//EntityList()->GetEngineWorld()->TraceEntity( pOther->GetEngineObject(), ptNewOrigin, ptNewOrigin, MASK_SOLID, pOther, COLLISION_GROUP_NONE, &Trace ); //fires off some asserts, and we just need a dummy anyways
 
 		//pOther->GetEngineObject()->PhysicsMarkEntitiesAsTouching( m_hLinkedPortal.Get()->GetEngineObject(), Trace );
 		//m_hLinkedPortal.Get()->GetEngineObject()->PhysicsMarkEntitiesAsTouching( pOther->GetEngineObject(), Trace );

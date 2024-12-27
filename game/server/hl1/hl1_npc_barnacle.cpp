@@ -245,7 +245,7 @@ void CNPC_Barnacle::BarnacleThink ( void )
 			CBaseEntity *pEnemy = GetEnemy();
 
 			trace_t trace;
-			UTIL_TraceEntity( pEnemy, pEnemy->GetEngineObject()->GetAbsOrigin(), vecNewEnemyOrigin, MASK_SOLID_BRUSHONLY, pEnemy, COLLISION_GROUP_NONE, &trace );
+			EntityList()->GetEngineWorld()->TraceEntity( pEnemy->GetEngineObject(), pEnemy->GetEngineObject()->GetAbsOrigin(), vecNewEnemyOrigin, MASK_SOLID_BRUSHONLY, pEnemy, COLLISION_GROUP_NONE, &trace);
 
 			if( trace.fraction != 1.0 )
 			{

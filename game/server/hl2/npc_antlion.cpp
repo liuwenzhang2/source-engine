@@ -3263,7 +3263,6 @@ void CNPC_Antlion::ClearBurrowPoint( const Vector &origin )
 	}
 }
 
-bool NPC_CheckBrushExclude( CBaseEntity *pEntity, CBaseEntity *pBrush );
 //-----------------------------------------------------------------------------
 // traceline methods
 //-----------------------------------------------------------------------------
@@ -3288,7 +3287,7 @@ public:
 
 			if ( pEnt->IsNPC() )
 			{
-				if ( NPC_CheckBrushExclude( pEnt, pTestEntity ) == true )
+				if (pEnt->NPC_CheckBrushExclude( pTestEntity ) == true )
 					return false;
 			}
 		}

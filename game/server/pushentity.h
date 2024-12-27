@@ -139,8 +139,10 @@ public:
 	{
 		Assert( dynamic_cast<CBaseEntity*>(pHandleEntity) );
 		CBaseEntity *pTestEntity = static_cast<CBaseEntity*>(pHandleEntity);
+		if (!pTestEntity)
+			return false;
 
-		if ( UTIL_EntityHasMatchingRootParent( m_pRootParent, pTestEntity ) )
+		if (pTestEntity->GetEngineObject()->EntityHasMatchingRootParent(m_pRootParent ? m_pRootParent->GetEngineObject() : NULL))
 			return false;
 
 		if ( pTestEntity->GetEngineObject()->GetMoveType() == MOVETYPE_VPHYSICS &&

@@ -142,7 +142,7 @@ void CSatchelCharge::SatchelThink( void )
 
 		CBaseEntity* saveOwner	= GetOwnerEntity();
 		SetOwnerEntity( NULL );
-		UTIL_TraceEntity( this, GetEngineObject()->GetAbsOrigin(), vUpABit, MASK_SOLID, &tr );
+		EntityList()->GetEngineWorld()->TraceEntity( this->GetEngineObject(), GetEngineObject()->GetAbsOrigin(), vUpABit, MASK_SOLID, &tr);
 		if ( tr.startsolid || tr.fraction != 1.0 )
 		{
 			SetOwnerEntity( saveOwner );

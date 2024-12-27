@@ -162,6 +162,7 @@ public:
 	virtual void UnlinkAllChildren() = 0;
 	virtual void UnlinkFromParent() = 0;
 	virtual void TransferChildren(IEngineObjectServer* pNewParent) = 0;
+	virtual bool EntityHasMatchingRootParent(IEngineObjectServer* pRootParent) = 0;
 
 	virtual IEngineObjectServer* GetMoveParent(void) = 0;
 	//virtual void SetMoveParent(IEngineObjectServer* hMoveParent) = 0;
@@ -568,7 +569,11 @@ public:
 
 class IEngineWorldServer{
 public:
-
+	// Sweeps a particular entity through the world
+	virtual void TraceEntity(IEngineObjectServer* pEntity, const Vector& vecAbsStart, const Vector& vecAbsEnd, unsigned int mask, trace_t* ptr) = 0;
+	virtual void TraceEntity(IEngineObjectServer* pEntity, const Vector& vecAbsStart, const Vector& vecAbsEnd, unsigned int mask, ITraceFilter* pFilter, trace_t* ptr) = 0;
+	virtual void TraceEntity(IEngineObjectServer* pEntity, const Vector& vecAbsStart, const Vector& vecAbsEnd, unsigned int mask, const IHandleEntity* ignore, int collisionGroup, trace_t* ptr) = 0;
+	virtual void TraceLineFilterEntity(IEngineObjectServer* pEntity, const Vector& vecAbsStart, const Vector& vecAbsEnd, unsigned int mask, const int nCollisionGroup, trace_t* ptr) = 0;
 };
 
 enum
@@ -1039,6 +1044,7 @@ public:
 	virtual bool IsEntityPtr(void* pTest) = 0;
 	virtual IEngineObjectServer* GetEngineObject(int entnum) = 0;
 	virtual IEngineObjectServer* GetEngineObjectFromHandle(CBaseHandle handle) = 0;
+	virtual IEngineWorldServer* GetEngineWorld() = 0;
 	// Get IServerNetworkable interface for specified entity
 	virtual IServerNetworkable* GetServerNetworkable(int entnum) const = 0;
 	virtual IServerNetworkable* GetServerNetworkableFromHandle(CBaseHandle hEnt) const = 0;

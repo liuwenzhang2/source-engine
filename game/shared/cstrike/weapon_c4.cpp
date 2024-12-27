@@ -1041,7 +1041,7 @@ void CC4::PrimaryAttack()
 				pC4->SetBombSiteIndex( pPlayer->m_iBombSiteIndex );
 
 				trace_t tr;
-				UTIL_TraceEntity( pC4, GetEngineObject()->GetAbsOrigin(), GetEngineObject()->GetAbsOrigin() + Vector(0,0,-200), MASK_SOLID, this, COLLISION_GROUP_NONE, &tr );
+				EntityList()->GetEngineWorld()->TraceEntity( pC4->GetEngineObject(), GetEngineObject()->GetAbsOrigin(), GetEngineObject()->GetAbsOrigin() + Vector(0, 0, -200), MASK_SOLID, this, COLLISION_GROUP_NONE, &tr);
 				pC4->GetEngineObject()->SetAbsOrigin( tr.endpos );
 
 				CBombTarget *pBombTarget = (CBombTarget*)EntityList()->GetBaseEntity( pPlayer->m_iBombSiteIndex );

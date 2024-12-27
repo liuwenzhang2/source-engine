@@ -3775,16 +3775,9 @@ void CAI_BaseNPC::CallNPCThink( void )
 	PostNPCThink();
 } 
 
-bool NPC_CheckBrushExclude( CBaseEntity *pEntity, CBaseEntity *pBrush )
+bool CAI_BaseNPC::NPC_CheckBrushExclude(CBaseEntity *pBrush )
 {
-	CAI_BaseNPC *pNPC = pEntity->MyNPCPointer();
-
-	if ( pNPC )
-	{
-		return pNPC->GetMoveProbe()->ShouldBrushBeIgnored( pBrush );
-	}
-
-	return false;
+	return GetMoveProbe()->ShouldBrushBeIgnored(pBrush);
 }
 
 class CTraceFilterPlayerAvoidance : public CTraceFilterEntitiesOnly
@@ -12415,7 +12408,7 @@ int CAI_BaseNPC::FlyMove( const Vector& pfPosition, unsigned int mask )
 	// try the move	
 	VectorCopy(GetEngineObject()->GetAbsOrigin(), oldorg );
 	VectorAdd( oldorg, pfPosition, neworg );
-	UTIL_TraceEntity( this, oldorg, neworg, mask, &trace );				
+	EntityList()->GetEngineWorld()->TraceEntity( this->GetEngineObject(), oldorg, neworg, mask, &trace);
 	if (trace.fraction == 1)
 	{
 		if ( (GetEngineObject()->GetFlags() & FL_SWIM) && enginetrace->GetPointContents(trace.endpos) == CONTENTS_EMPTY )
@@ -12462,14 +12455,14 @@ int CAI_BaseNPC::WalkMove( const Vector& vecPosition, unsigned int mask )
 	VectorCopy(neworg, end);
 	end[2] -= flStepSize*2;
 
-	UTIL_TraceEntity( this, neworg, end, mask, &trace );
+	EntityList()->GetEngineWorld()->TraceEntity( this->GetEngineObject(), neworg, end, mask, &trace);
 	if ( trace.allsolid )
 		return false;
 
 	if (trace.startsolid)
 	{
 		neworg[2] -= flStepSize;
-		UTIL_TraceEntity( this, neworg, end, mask, &trace );
+		EntityList()->GetEngineWorld()->TraceEntity( this->GetEngineObject(), neworg, end, mask, &trace);
 		if ( trace.allsolid || trace.startsolid )
 			return false;
 	}

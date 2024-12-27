@@ -992,12 +992,12 @@ bool CNPC_Controller::OverrideMove( float flInterval )
 
 		if (pMoveTarget)
 		{
-			UTIL_TraceEntity( this, GetEngineObject()->GetAbsOrigin(), vMoveTargetPos,
+			EntityList()->GetEngineWorld()->TraceEntity( this->GetEngineObject(), GetEngineObject()->GetAbsOrigin(), vMoveTargetPos,
 				MASK_NPCSOLID_BRUSHONLY, pMoveTarget, GetEngineObject()->GetCollisionGroup(), &tr);
 		}
 		else
 		{
-			UTIL_TraceEntity( this, GetEngineObject()->GetAbsOrigin(), vMoveTargetPos, MASK_NPCSOLID_BRUSHONLY, &tr);
+			EntityList()->GetEngineWorld()->TraceEntity( this->GetEngineObject(), GetEngineObject()->GetAbsOrigin(), vMoveTargetPos, MASK_NPCSOLID_BRUSHONLY, &tr);
 		}
 /*
 		float fTargetDist = (1-tr.fraction)*(GetAbsOrigin() - vMoveTargetPos).Length();
