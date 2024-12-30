@@ -8934,7 +8934,7 @@ void UTIL_TraceEntityThroughPortal(C_BaseEntity* pEntity, const Vector& vecAbsSt
 	unsigned int mask, ITraceFilter* pFilter, trace_t* pTrace)
 {
 #ifdef CLIENT_DLL
-	Assert((g_EntityList.m_pGameRules == NULL) || g_EntityList.m_pGameRules->IsMultiplayer());
+	Assert((g_EntityList.GetGameRules() == NULL) || g_EntityList.GetGameRules()->IsMultiplayer());
 	Assert(pEntity->IsPlayer());
 
 	IEnginePortalClient* pPortal = NULL;
