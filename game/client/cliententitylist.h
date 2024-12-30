@@ -334,7 +334,7 @@ public:
 
 	
 
-	void Init(C_BaseEntity* pOuter) {
+	virtual void Init(C_BaseEntity* pOuter) {
 		m_pOuter = pOuter;
 		m_nCreationTick = gpGlobals->tickcount;
 		CreatePartitionHandle();
@@ -2241,12 +2241,10 @@ inline bool C_EngineObjectInternal::IsNoInterpolationFrame()
 class C_EngineWorldInternal : public C_EngineObjectInternal, public IEngineWorldClient {
 public:
 	DECLARE_CLASS(C_EngineWorldInternal, C_EngineObjectInternal);
-	C_EngineWorldInternal(IClientEntityList* pClientEntityList, int iForceEdictIndex, int iSerialNum)
-	:C_EngineObjectInternal(pClientEntityList, iForceEdictIndex, iSerialNum)
-	{
-		
-	}
+	C_EngineWorldInternal(IClientEntityList* pClientEntityList, int iForceEdictIndex, int iSerialNum);
+	~C_EngineWorldInternal();
 
+	void Init(C_BaseEntity* pOuter);
 	bool IsWorld() { return true; }
 	C_EngineWorldInternal* AsEngineWorld() { return this; }
 	const C_EngineWorldInternal* AsEngineWorld() const { return this; }
@@ -2759,7 +2757,6 @@ public:
 
 	// The level is shutdown in two parts
 	virtual void LevelShutdownPreEntity();
-
 	virtual void LevelShutdownPostEntity();
 
 	virtual void InstallEntityFactory(IEntityFactory* pFactory);
@@ -3213,6 +3210,7 @@ private:
 	CUtlVector<C_EnginePortalInternal*> m_ActivePortals;
 	int m_nTouchDepth = 0;
 	CCallQueue m_PostTouchQueue;
+	IClientGameRules* m_pGameRules = NULL;
 };
 
 template<class T>
@@ -3770,6 +3768,10 @@ void CClientEntityList<T>::LevelInitPreEntity()
 {
 	m_impactSounds.RemoveAll();
 	PrecachePhysicsSounds();
+	if (!m_pGameRules) {
+		Error("m_pGameRules not inited!\n");
+	}
+	m_pGameRules->LevelInitPreEntity();
 }
 
 #define DEFAULT_XBOX_CLIENT_VPHYSICS_TICK	0.025		// 25ms ticks on xbox ragdolls
@@ -3799,6 +3801,10 @@ void CClientEntityList<T>::LevelInitPostEntity()
 	m_PhysWorldObject = PhysCreateWorld_Shared(GetBaseEntity(0), modelinfo->GetVCollide(1), g_PhysDefaultObjectParams);
 
 	staticpropmgr->CreateVPhysicsRepresentations(m_pPhysenv, g_pSolidSetup, NULL);
+	if (!m_pGameRules) {
+		Error("m_pGameRules not inited!\n");
+	}
+	m_pGameRules->LevelInitPostEntity();
 }
 
 // The level is shutdown in two parts
@@ -3811,6 +3817,10 @@ void CClientEntityList<T>::LevelShutdownPreEntity()
 		// don't try to wake them up
 		m_pPhysenv->SetQuickDelete(true);
 	}
+	if (!m_pGameRules) {
+		Error("m_pGameRules not inited!\n");
+	}
+	m_pGameRules->LevelShutdownPreEntity();
 }
 
 template<class T>

@@ -26,15 +26,14 @@
 	extern ConVar mp_stalemate_timelimit;
 	extern ConVar mp_stalemate_enable;
 #else
-	#define CTeamplayRoundBasedRules C_TeamplayRoundBasedRules
-	#define CTeamplayRoundBasedRulesProxy C_TeamplayRoundBasedRulesProxy
+	#define CTeamplayRoundBasedWorld C_TeamplayRoundBasedWorld
 #endif
 
 extern ConVar	tf_arena_use_queue;
 extern ConVar	mp_stalemate_meleeonly;
 extern ConVar	mp_forceautoteam;
 
-class CTeamplayRoundBasedRules;
+class CTeamplayRoundBasedWorld;
 
 //-----------------------------------------------------------------------------
 // Round states
@@ -127,50 +126,31 @@ public:
 	gamerules_roundstate_t	m_iRoundState;
 	const char				*m_pStateName;
 
-	void (CTeamplayRoundBasedRules::*pfnEnterState)();	// Init and deinit the state.
-	void (CTeamplayRoundBasedRules::*pfnLeaveState)();
-	void (CTeamplayRoundBasedRules::*pfnThink)();	// Do a PreThink() in this state.
-};
-
-//-----------------------------------------------------------------------------
-// Purpose: 
-//-----------------------------------------------------------------------------
-class CTeamplayRoundBasedRulesProxy : public CGameRulesProxy
-{
-public:
-	DECLARE_CLASS( CTeamplayRoundBasedRulesProxy, CGameRulesProxy );
-	DECLARE_NETWORKCLASS();
-
-#ifdef GAME_DLL
-	DECLARE_DATADESC();
-	void	InputSetStalemateOnTimelimit( inputdata_t &inputdata );
-#endif
-
-	//----------------------------------------------------------------------------------
-	// Client specific
-#ifdef CLIENT_DLL
-	void			OnPreDataChanged( DataUpdateType_t updateType );
-	void			OnDataChanged( DataUpdateType_t updateType );
-#endif // CLIENT_DLL
+	void (CTeamplayRoundBasedWorld::*pfnEnterState)();	// Init and deinit the state.
+	void (CTeamplayRoundBasedWorld::*pfnLeaveState)();
+	void (CTeamplayRoundBasedWorld::*pfnThink)();	// Do a PreThink() in this state.
 };
 
 //-----------------------------------------------------------------------------
 // Purpose: Teamplay game rules that manage a round based structure for you
 //-----------------------------------------------------------------------------
-class CTeamplayRoundBasedRules : public CTeamplayRules
+class CTeamplayRoundBasedWorld : public CTeamplayWorld
 {
-	DECLARE_CLASS( CTeamplayRoundBasedRules, CTeamplayRules );
+	DECLARE_CLASS(CTeamplayRoundBasedWorld, CTeamplayWorld);
 public:
-	CTeamplayRoundBasedRules();
+	CTeamplayRoundBasedWorld();
 
 #ifdef CLIENT_DLL
-	DECLARE_CLIENTCLASS_NOBASE(); // This makes datatables able to access our private vars.
+	DECLARE_CLIENTCLASS(); // This makes datatables able to access our private vars.
 
 	void SetRoundState( int iRoundState );
 #else
-	DECLARE_SERVERCLASS_NOBASE(); // This makes datatables able to access our private vars.
+	DECLARE_SERVERCLASS(); // This makes datatables able to access our private vars.
 #endif
-
+#ifdef GAME_DLL
+	DECLARE_DATADESC();
+	void	InputSetStalemateOnTimelimit(inputdata_t& inputdata);
+#endif
 	float GetLastRoundStateChangeTime( void ) const { return m_flLastRoundStateChangeTime; }
 	float m_flLastRoundStateChangeTime;
 
@@ -583,9 +563,9 @@ public:
 // Utility function
 bool FindInList( const char **pStrings, const char *pToFind );
 
-inline CTeamplayRoundBasedRules* TeamplayRoundBasedRules()
+inline CTeamplayRoundBasedWorld* TeamplayRoundBasedRules()
 {
-	return static_cast<CTeamplayRoundBasedRules*>(g_pGameRules);
+	return (CTeamplayRoundBasedWorld*)EntityList()->GetBaseEntity(0);
 }
 
 #endif // TEAMPLAYROUNDBASED_GAMERULES_H

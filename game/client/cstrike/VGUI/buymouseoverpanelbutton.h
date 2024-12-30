@@ -129,11 +129,11 @@ public:
 
 	void SetPriceState()
 	{
-		if ( CSGameRules() && CSGameRules()->IsBlackMarket() )
-		{
-			SetMarketState();
-		}
-		else
+		//if ( CSGameRules() && CSGameRules()->IsBlackMarket() )
+		//{
+		//	SetMarketState();
+		//}
+		//else
 		{
 			if ( GetParent() )
 			{
@@ -292,7 +292,7 @@ public:
 
 	void SetMapTypeState()
 	{
-		CCSGameRules *pRules = CSGameRules();
+		CCSGameWorld *pRules = CSGameRules();
 
 		if ( pRules ) 
 		{
@@ -356,13 +356,13 @@ public:
 		if ( !Q_stricmp( m_command, "vguicancel" ) )
 			return;
 
-		if ( CSGameRules() && CSGameRules()->IsBlackMarket() )
-		{
-			if ( m_pBlackMarketPrice && !m_pBlackMarketPrice->IsVisible() )
-			{
-				m_pBlackMarketPrice->SetVisible( true );
-			}
-		}
+		//if ( CSGameRules() && CSGameRules()->IsBlackMarket() )
+		//{
+		//	if ( m_pBlackMarketPrice && !m_pBlackMarketPrice->IsVisible() )
+		//	{
+		//		m_pBlackMarketPrice->SetVisible( true );
+		//	}
+		//}
 	}
 
 	virtual void HidePage()

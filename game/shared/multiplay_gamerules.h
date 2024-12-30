@@ -12,10 +12,16 @@
 
 
 #include "gamerules.h"
+#ifdef CLIENT_DLL
+#include "c_world.h"
+#endif // CLIENT_DLL
+#ifdef GAME_DLL
+#include "world.h"
+#endif // GAME_DLL
 
 #ifdef CLIENT_DLL
 
-	#define CMultiplayRules C_MultiplayRules
+	#define CMultiplayWorld C_MultiplayWorld
 
 #else
 
@@ -73,15 +79,15 @@ extern ConVar mp_timelimit;
 // CMultiplayRules - rules for the basic half life multiplayer
 // competition
 //=========================================================
-class CMultiplayRules : public CGameRules
+class CMultiplayWorld : public CWorld
 {
 public:
-	DECLARE_CLASS( CMultiplayRules, CGameRules );
+	DECLARE_CLASS(CMultiplayWorld, CWorld);
 
 // Functions to verify the single/multiplayer status of a game
 	virtual bool IsMultiplayer( void );
 
-	virtual	bool	Init();
+	//virtual	bool	Init();
 
 	// Damage query implementations.
 	virtual bool	Damage_IsTimeBased( int iDmgType );			// Damage types that are time-based.
@@ -96,8 +102,8 @@ public:
 	virtual int		Damage_GetNoPhysicsForce( void );
 	virtual int		Damage_GetShouldNotBleed( void );
 
-	CMultiplayRules();
-	virtual ~CMultiplayRules() {}
+	CMultiplayWorld();
+	virtual ~CMultiplayWorld() {}
 
 	void LoadVoiceCommandScript( void );
 
@@ -231,8 +237,8 @@ public:
 	};
 	CUtlVector<ResponseRules_t>	m_ResponseRules;
 
-	virtual void InitCustomResponseRulesDicts()	{}
-	virtual void ShutdownCustomResponseRulesDicts() {}
+	//virtual void InitCustomResponseRulesDicts()	{}
+	//virtual void ShutdownCustomResponseRulesDicts() {}
 
 	// NVNT virtual to check for haptic device 
 	virtual void ClientSettingsChanged( CBasePlayer *pPlayer );
@@ -274,9 +280,9 @@ protected:
 		CUtlVector< CUtlVector< VoiceCommandMenuItem_t > > m_VoiceCommandMenus;
 };
 
-inline CMultiplayRules* MultiplayRules()
+inline CMultiplayWorld* MultiplayRules()
 {
-	return static_cast<CMultiplayRules*>(g_pGameRules);
+	return (CMultiplayWorld*)EntityList()->GetBaseEntity(0);
 }
 
 #endif // MULTIPLAY_GAMERULES_H

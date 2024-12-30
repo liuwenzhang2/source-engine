@@ -387,7 +387,7 @@ int CTeamControlPointMaster::NumPlayableControlPointRounds( void )
 bool CTeamControlPointMaster::SelectSpecificRound( void )
 {
 	CTeamControlPointRound *pRound = NULL;
-	CTeamplayRoundBasedRules *pRules = dynamic_cast<CTeamplayRoundBasedRules*>( GameRules() );
+	CTeamplayRoundBasedWorld *pRules = dynamic_cast<CTeamplayRoundBasedWorld*>( GameRules() );
 
 	if ( pRules )
 	{
@@ -440,7 +440,7 @@ bool CTeamControlPointMaster::SelectSpecificRound( void )
 void CTeamControlPointMaster::RegisterRoundBeingPlayed( void )
 {
 	// let the game rules know what round we're playing
-	CTeamplayRoundBasedRules *pRules = dynamic_cast<CTeamplayRoundBasedRules*>( GameRules() );
+	CTeamplayRoundBasedWorld *pRules = dynamic_cast<CTeamplayRoundBasedWorld*>( GameRules() );
 	if ( pRules )
 	{
 		string_t iszEntityName = m_ControlPointRounds[m_iCurrentRoundIndex]->GetEntityName();
@@ -504,7 +504,7 @@ bool CTeamControlPointMaster::GetControlPointRoundToPlay( void )
 	int nPriority = m_ControlPointRounds[i]->GetPriorityValue();
 	CUtlVector<int> nRounds;
 
-	CTeamplayRoundBasedRules *pRules = dynamic_cast<CTeamplayRoundBasedRules*>( GameRules() );
+	CTeamplayRoundBasedWorld *pRules = dynamic_cast<CTeamplayRoundBasedWorld*>( GameRules() );
 	string_t iszLastRoundPlayed = pRules ? pRules->GetLastPlayedRound() : NULL_STRING;
 	int iLastRoundPlayed = -1;
 
@@ -823,7 +823,7 @@ void CTeamControlPointMaster::InputRoundSpawn( inputdata_t &input )
 	{
 /*		if ( m_bFirstRoundAfterRestart )
 		{
-			CTeamplayRoundBasedRules *pRules = dynamic_cast<CTeamplayRoundBasedRules*>( GameRules() );
+			CTeamplayRoundBasedWorld *pRules = dynamic_cast<CTeamplayRoundBasedWorld*>( GameRules() );
 			if ( pRules && ( pRules->GetRoundToPlayNext() == NULL_STRING ) )
 			{
 				// we only want to handle the random points if we don't have a specific round to play next
@@ -1316,7 +1316,7 @@ void cc_PlayRound( const CCommand& args )
 {
 	if ( args.ArgC() > 1 )
 	{
-		CTeamplayRoundBasedRules *pRules = dynamic_cast<CTeamplayRoundBasedRules*>( GameRules() );
+		CTeamplayRoundBasedWorld *pRules = dynamic_cast<CTeamplayRoundBasedWorld*>( GameRules() );
 		CTeamControlPointMaster *pMaster = g_hControlPointMasters.Count() ? g_hControlPointMasters[0] : NULL;
 
 		if ( pRules && pMaster )

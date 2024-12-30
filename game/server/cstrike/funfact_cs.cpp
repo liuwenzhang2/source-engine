@@ -543,7 +543,7 @@ bool FFEVAL_WON_AS_LAST_MEMBER( int &iPlayer, int &data1, int &data2, int &data3
 
 	int losingTeam = (winningTeam == TEAM_TERRORIST) ? TEAM_CT : TEAM_TERRORIST;
 
-	CCSGameRules::TeamPlayerCounts playerCounts[TEAM_MAXCOUNT];
+	CCSGameWorld::TeamPlayerCounts playerCounts[TEAM_MAXCOUNT];
 	CSGameRules()->GetPlayerCounts(playerCounts);
 
 	for ( int i = 1; i <= gpGlobals->maxClients; i++ )

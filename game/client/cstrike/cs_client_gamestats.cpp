@@ -686,7 +686,7 @@ void CCSClientGameStats::UploadRoundData()
 	if ( !pKV )
 		return;
 
-	pKV->SetString( "MapID", MapName() );
+	pKV->SetString( "MapID", gpGlobals->mapname.ToCStr());
 
 	// Add all the vector based stats
 	for ( int k=0 ; k < m_RoundStatData.Count() ; ++k )

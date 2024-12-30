@@ -34,16 +34,8 @@ enum
 
 
 #ifdef CLIENT_DLL
-	#define CHL2MPRules C_HL2MPRules
-	#define CHL2MPGameRulesProxy C_HL2MPGameRulesProxy
+	#define CHL2MPWorld C_HL2MPWorld
 #endif
-
-class CHL2MPGameRulesProxy : public CGameRulesProxy
-{
-public:
-	DECLARE_CLASS( CHL2MPGameRulesProxy, CGameRulesProxy );
-	DECLARE_NETWORKCLASS();
-};
 
 class HL2MPViewVectors : public CViewVectors
 {
@@ -79,22 +71,22 @@ public:
 	Vector m_vCrouchTraceMax;	
 };
 
-class CHL2MPRules : public CTeamplayRules
+class CHL2MPWorld : public CTeamplayWorld
 {
 public:
-	DECLARE_CLASS( CHL2MPRules, CTeamplayRules );
+	DECLARE_CLASS(CHL2MPWorld, CTeamplayWorld);
 
 #ifdef CLIENT_DLL
 
-	DECLARE_CLIENTCLASS_NOBASE(); // This makes datatables able to access our private vars.
+	DECLARE_CLIENTCLASS(); // This makes datatables able to access our private vars.
 
 #else
 
-	DECLARE_SERVERCLASS_NOBASE(); // This makes datatables able to access our private vars.
+	DECLARE_SERVERCLASS(); // This makes datatables able to access our private vars.
 #endif
 	
-	CHL2MPRules();
-	virtual ~CHL2MPRules();
+	CHL2MPWorld();
+	virtual ~CHL2MPWorld();
 
 	virtual void Precache( void );
 	virtual bool ShouldCollide( int collisionGroup0, int collisionGroup1 );
@@ -164,9 +156,9 @@ private:
 #endif
 };
 
-inline CHL2MPRules* HL2MPRules()
+inline CHL2MPWorld* HL2MPRules()
 {
-	return static_cast<CHL2MPRules*>(g_pGameRules);
+	return (CHL2MPWorld*)EntityList()->GetBaseEntity(0);
 }
 
 #endif //HL2MP_GAMERULES_H

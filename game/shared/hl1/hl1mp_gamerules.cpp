@@ -42,10 +42,7 @@ extern CBaseEntity	 *g_pLastRebelSpawn;
 
 #endif
 
-
-REGISTER_GAMERULES_CLASS( CHL1MPRules );
-
-BEGIN_NETWORK_TABLE_NOBASE( CHL1MPRules, DT_HL1MPRules )
+BEGIN_NETWORK_TABLE( CHL1MPWorld, DT_HL1MPWorld )
 
 	#ifdef CLIENT_DLL
 		RecvPropBool( RECVINFO( m_bTeamPlayEnabled ) ),
@@ -56,34 +53,7 @@ BEGIN_NETWORK_TABLE_NOBASE( CHL1MPRules, DT_HL1MPRules )
 END_NETWORK_TABLE()
 
 
-LINK_ENTITY_TO_CLASS( hl1mp_gamerules, CHL1MPGameRulesProxy );
-IMPLEMENT_NETWORKCLASS_ALIASED( HL1MPGameRulesProxy, DT_HL1MPGameRulesProxy )
-
-
-#ifdef CLIENT_DLL
-	void RecvProxy_HL1MPRules( const RecvProp *pProp, void **pOut, void *pData, int objectID )
-	{
-		CHL1MPRules *pRules = HL1MPRules();
-		Assert( pRules );
-		*pOut = pRules;
-	}
-
-	BEGIN_RECV_TABLE( CHL1MPGameRulesProxy, DT_HL1MPGameRulesProxy )
-		RecvPropDataTable( "hl1mp_gamerules_data", 0, 0, &REFERENCE_RECV_TABLE( DT_HL1MPRules ), RecvProxy_HL1MPRules )
-	END_RECV_TABLE()
-#else
-	void* SendProxy_HL1MPRules( const SendProp *pProp, const void *pStructBase, const void *pData, CSendProxyRecipients *pRecipients, int objectID )
-	{
-		CHL1MPRules *pRules = HL1MPRules();
-		Assert( pRules );
-		return pRules;
-	}
-
-	BEGIN_SEND_TABLE( CHL1MPGameRulesProxy, DT_HL1MPGameRulesProxy )
-		SendPropDataTable( "hl1mp_gamerules_data", 0, &REFERENCE_SEND_TABLE( DT_HL1MPRules ), SendProxy_HL1MPRules )
-	END_SEND_TABLE()
-#endif
-
+IMPLEMENT_NETWORKCLASS_ALIASED(HL1MPWorld, DT_HL1MPWorld)
 #ifndef CLIENT_DLL
 
 #if 0
@@ -130,7 +100,7 @@ IMPLEMENT_NETWORKCLASS_ALIASED( HL1MPGameRulesProxy, DT_HL1MPGameRulesProxy )
 
 
 
-CHL1MPRules::CHL1MPRules()
+CHL1MPWorld::CHL1MPWorld()
 {
 #ifndef CLIENT_DLL
 	m_bTeamPlayEnabled = teamplay.GetBool();
@@ -190,7 +160,7 @@ CHL1MPRules::CHL1MPRules()
 #endif
 }
 
-CHL1MPRules::~CHL1MPRules( void )
+CHL1MPWorld::~CHL1MPWorld( void )
 {
 #ifndef CLIENT_DLL
 	// Note, don't delete each team since they are in the gEntList and will 
@@ -199,7 +169,7 @@ CHL1MPRules::~CHL1MPRules( void )
 #endif
 }
 
-void CHL1MPRules::CreateStandardEntities( void )
+void CHL1MPWorld::CreateStandardEntities( void )
 {
 
 #ifndef CLIENT_DLL
@@ -207,20 +177,20 @@ void CHL1MPRules::CreateStandardEntities( void )
 
 	BaseClass::CreateStandardEntities();
 
-#ifdef _DEBUG
-	CBaseEntity *pEnt = 
-#endif
-	CBaseEntity::Create( "hl1mp_gamerules", vec3_origin, vec3_angle );
-	Assert( pEnt );
+//#ifdef _DEBUG
+//	CBaseEntity *pEnt = 
+//#endif
+//	CBaseEntity::Create( "hl1mp_gamerules", vec3_origin, vec3_angle );
+//	Assert( pEnt );
 #endif
 }
 
-float CHL1MPRules::GetAmmoDamage( CBaseEntity *pAttacker, CBaseEntity *pVictim, int nAmmoType )
+float CHL1MPWorld::GetAmmoDamage( CBaseEntity *pAttacker, CBaseEntity *pVictim, int nAmmoType )
 {
     return BaseClass::GetAmmoDamage( pAttacker, pVictim, nAmmoType ) * GetDamageMultiplier();
 }
 
-float CHL1MPRules::GetDamageMultiplier( void )
+float CHL1MPWorld::GetDamageMultiplier( void )
 {
     if ( IsMultiplayer() )
         return sk_mp_dmg_multiplier.GetFloat();
@@ -229,7 +199,7 @@ float CHL1MPRules::GetDamageMultiplier( void )
 }
 
 
-bool CHL1MPRules::ClientCommand( CBaseEntity *pEdict, const CCommand &args )
+bool CHL1MPWorld::ClientCommand( CBaseEntity *pEdict, const CCommand &args )
 {
 #ifndef CLIENT_DLL
 	if( BaseClass::ClientCommand( pEdict, args ) )
@@ -250,9 +220,9 @@ bool CHL1MPRules::ClientCommand( CBaseEntity *pEdict, const CCommand &args )
 #else
 
 
-void CHL1MPRules::Think ( void )
+void CHL1MPWorld::Think ( void )
 {
-	CGameRules::Think();
+	CWorld::Think();
 
 	if ( g_fGameOver )   // someone else quit the game already
 	{
@@ -307,7 +277,7 @@ void CHL1MPRules::Think ( void )
 }
 
 
-void CHL1MPRules::GoToIntermission()
+void CHL1MPWorld::GoToIntermission()
 {
 #ifndef CLIENT_DLL
 	if ( g_fGameOver )
@@ -331,11 +301,11 @@ void CHL1MPRules::GoToIntermission()
 }
 
 
-const char * CHL1MPRules::SetDefaultPlayerTeam( CBasePlayer *pPlayer )
+const char * CHL1MPWorld::SetDefaultPlayerTeam( CBasePlayer *pPlayer )
 {
 	if ( !IsTeamplay() )
 	{
-		CMultiplayRules::SetDefaultPlayerTeam( pPlayer );
+		CMultiplayWorld::SetDefaultPlayerTeam( pPlayer );
 		return "";
 	}
 
@@ -359,7 +329,7 @@ const char * CHL1MPRules::SetDefaultPlayerTeam( CBasePlayer *pPlayer )
 }
 
 
-const char * CHL1MPRules::TeamWithFewestPlayers( void )
+const char * CHL1MPWorld::TeamWithFewestPlayers( void )
 {
 	const char * szName = "";
 	int iNumPlayers = 0xFFFF;
@@ -376,20 +346,20 @@ const char * CHL1MPRules::TeamWithFewestPlayers( void )
 }
 
 
-void CHL1MPRules::InitHUD( CBasePlayer *pPlayer )
+void CHL1MPWorld::InitHUD( CBasePlayer *pPlayer )
 {
 	SetDefaultPlayerTeam( pPlayer );
 	BaseClass::InitHUD( pPlayer );
 }
 
 
-void CHL1MPRules::ChangePlayerTeam( CBasePlayer *pPlayer, const char *pTeamName, bool bKill, bool bGib )
+void CHL1MPWorld::ChangePlayerTeam( CBasePlayer *pPlayer, const char *pTeamName, bool bKill, bool bGib )
 {
 	BaseClass::ChangePlayerTeam( pPlayer, pTeamName, bKill, bGib );
 }
 
 
-void CHL1MPRules::ClientSettingsChanged( CBasePlayer *pPlayer )
+void CHL1MPWorld::ClientSettingsChanged( CBasePlayer *pPlayer )
 {
 	CHL1MP_Player *pHL1Player = ToHL1MPPlayer( pPlayer );
 
@@ -452,7 +422,7 @@ void CHL1MPRules::ClientSettingsChanged( CBasePlayer *pPlayer )
 }
 
 
-int CHL1MPRules::GetTeamIndex( const char * pName )
+int CHL1MPWorld::GetTeamIndex( const char * pName )
 {
 	for ( int i = 0; i < GetNumberOfTeams(); i++ )
 	{
@@ -466,7 +436,7 @@ int CHL1MPRules::GetTeamIndex( const char * pName )
 }
 
 
-float CHL1MPRules::FlWeaponRespawnTime( CBaseCombatWeapon *pWeapon )
+float CHL1MPWorld::FlWeaponRespawnTime( CBaseCombatWeapon *pWeapon )
 {
 	if ( weaponstay.GetInt() > 0 )
 	{
@@ -481,7 +451,7 @@ float CHL1MPRules::FlWeaponRespawnTime( CBaseCombatWeapon *pWeapon )
 }
 
 
-float CHL1MPRules::FlItemRespawnTime( CItem *pItem )
+float CHL1MPWorld::FlItemRespawnTime( CItem *pItem )
 {
 	return sv_hl1mp_item_respawn_time.GetInt();
 }
@@ -489,7 +459,7 @@ float CHL1MPRules::FlItemRespawnTime( CItem *pItem )
 
 
 // This is a direct rip from CHalfLife1
-void CHL1MPRules::InitDefaultAIRelationships( void )
+void CHL1MPWorld::InitDefaultAIRelationships( void )
 {
 	int i, j;
 

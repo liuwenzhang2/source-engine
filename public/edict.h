@@ -46,7 +46,7 @@ public:
 public:
 	
 	// Current map
-	string_t		mapname;
+	//string_t		mapname; move to baseclass
 	int				mapversion;
 	string_t		startspot;
 	MapLoadType_t	eLoadType;		// How the current map was loaded

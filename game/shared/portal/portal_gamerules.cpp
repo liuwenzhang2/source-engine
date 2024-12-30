@@ -31,12 +31,7 @@
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
-
-
-
-REGISTER_GAMERULES_CLASS( CPortalGameRules );
-
-BEGIN_NETWORK_TABLE_NOBASE( CPortalGameRules, DT_PortalGameRules )
+BEGIN_NETWORK_TABLE( CPortalGameWorld, DT_PortalGameWorld )
 	#ifdef CLIENT_DLL
 		RecvPropBool( RECVINFO( m_bMegaPhysgun ) ),
 	#else
@@ -45,36 +40,7 @@ BEGIN_NETWORK_TABLE_NOBASE( CPortalGameRules, DT_PortalGameRules )
 END_NETWORK_TABLE()
 
 
-LINK_ENTITY_TO_CLASS( portal_gamerules, CPortalGameRulesProxy );
-IMPLEMENT_NETWORKCLASS_ALIASED( PortalGameRulesProxy, DT_PortalGameRulesProxy )
-
-
-#ifdef CLIENT_DLL
-	void RecvProxy_PortalGameRules( const RecvProp *pProp, void **pOut, void *pData, int objectID )
-	{
-		CPortalGameRules *pRules = PortalGameRules();
-		Assert( pRules );
-		*pOut = pRules;
-	}
-
-	BEGIN_RECV_TABLE( CPortalGameRulesProxy, DT_PortalGameRulesProxy )
-		RecvPropDataTable( "portal_gamerules_data", 0, 0, &REFERENCE_RECV_TABLE( DT_PortalGameRules ), RecvProxy_PortalGameRules )
-	END_RECV_TABLE()
-#else
-	void* SendProxy_PortalGameRules( const SendProp *pProp, const void *pStructBase, const void *pData, CSendProxyRecipients *pRecipients, int objectID )
-	{
-		CPortalGameRules *pRules = PortalGameRules();
-		Assert( pRules );
-		pRecipients->SetAllRecipients();
-		return pRules;
-	}
-
-	BEGIN_SEND_TABLE( CPortalGameRulesProxy, DT_PortalGameRulesProxy )
-		SendPropDataTable( "portal_gamerules_data", 0, &REFERENCE_SEND_TABLE( DT_PortalGameRules ), SendProxy_PortalGameRules )
-	END_SEND_TABLE()
-#endif
-
-
+IMPLEMENT_NETWORKCLASS_ALIASED(PortalGameWorld, DT_PortalGameWorld)
 extern ConVar	sv_robust_explosions;
 extern ConVar	sk_allow_autoaim;
 extern ConVar	sk_autoaim_scale1;
@@ -171,7 +137,7 @@ static ConCommand ent_create_portal_metal_sphere("ent_create_portal_metal_sphere
 
 #ifdef CLIENT_DLL //{
 
-
+	
 #else //}{
 
 	extern bool		g_fGameOver;
@@ -181,12 +147,19 @@ static ConCommand ent_create_portal_metal_sphere("ent_create_portal_metal_sphere
 	// Input  :
 	// Output :
 	//-----------------------------------------------------------------------------
-	CPortalGameRules::CPortalGameRules()
+	//-----------------------------------------------------------------------------
+	// Purpose: On starting a game, make global state changes specific to portal
+	//-----------------------------------------------------------------------------
+	CPortalGameWorld::CPortalGameWorld()
 	{
 		m_bMegaPhysgun = false;
 		g_pCVar->FindVar( "sv_maxreplay" )->SetValue( "1.5" );
+#if !defined ( CLIENT_DLL )
+		// Portal never wants alternate ticks. Some low end hardware sets it in dxsupport.cfg so this will catch those cases.
+		ConVarRef sv_alternateticks("sv_alternateticks");
+		sv_alternateticks.SetValue(0);
+#endif // !CLIENT_DLL
 	}
-
 
 	//-----------------------------------------------------------------------------
 	// Purpose: called each time a player uses a "cmd" command
@@ -194,7 +167,7 @@ static ConCommand ent_create_portal_metal_sphere("ent_create_portal_metal_sphere
 	//			Use engine.Cmd_Argv,  engine.Cmd_Argv, and engine.Cmd_Argc to get 
 	//			pointers the character string command.
 	//-----------------------------------------------------------------------------
-	bool CPortalGameRules::ClientCommand( CBaseEntity *pEdict, const CCommand &args )
+	bool CPortalGameWorld::ClientCommand( CBaseEntity *pEdict, const CCommand &args )
 	{
 		if( BaseClass::ClientCommand( pEdict, args ) )
 			return true;
@@ -210,7 +183,7 @@ static ConCommand ent_create_portal_metal_sphere("ent_create_portal_metal_sphere
 	//-----------------------------------------------------------------------------
 	// Purpose: Player has just spawned. Equip them.
 	//-----------------------------------------------------------------------------
-	void CPortalGameRules::PlayerSpawn( CBasePlayer *pPlayer )
+	void CPortalGameWorld::PlayerSpawn( CBasePlayer *pPlayer )
 	{
 	}
 
@@ -219,7 +192,7 @@ static ConCommand ent_create_portal_metal_sphere("ent_create_portal_metal_sphere
 	// Input   :
 	// Output  :
 	//------------------------------------------------------------------------------
-	void CPortalGameRules::InitDefaultAIRelationships( void )
+	void CPortalGameWorld::InitDefaultAIRelationships( void )
 	{
 		int i, j;
 
@@ -1034,7 +1007,7 @@ static ConCommand ent_create_portal_metal_sphere("ent_create_portal_metal_sphere
 	// Input   :
 	// Output  :
 	//------------------------------------------------------------------------------
-	const char* CPortalGameRules::AIClassText(int classType)
+	const char* CPortalGameWorld::AIClassText(int classType)
 	{
 		switch (classType)
 		{
@@ -1066,11 +1039,11 @@ static ConCommand ent_create_portal_metal_sphere("ent_create_portal_metal_sphere
 		}
 	}
 
-	void CPortalGameRules::PlayerThink( CBasePlayer *pPlayer )
+	void CPortalGameWorld::PlayerThink( CBasePlayer *pPlayer )
 	{
 	}
 
-	void CPortalGameRules::Think( void )
+	void CPortalGameWorld::Think( void )
 	{
 		BaseClass::Think();
 	}
@@ -1083,12 +1056,12 @@ static ConCommand ent_create_portal_metal_sphere("ent_create_portal_metal_sphere
 	//			nAmmoType - What been shot out.
 	// Output : How much hurt to put on dude what done got shot (pVictim).
 	//-----------------------------------------------------------------------------
-	float CPortalGameRules::GetAmmoDamage( CBaseEntity *pAttacker, CBaseEntity *pVictim, int nAmmoType )
+	float CPortalGameWorld::GetAmmoDamage( CBaseEntity *pAttacker, CBaseEntity *pVictim, int nAmmoType )
 	{
 		return BaseClass::GetAmmoDamage( pAttacker, pVictim, nAmmoType );
 	}
 
-	float CPortalGameRules::FlPlayerFallDamage( CBasePlayer *pPlayer )
+	float CPortalGameWorld::FlPlayerFallDamage( CBasePlayer *pPlayer )
 	{
 		// No fall damage in Portal!
 		return 0.0f;
@@ -1098,24 +1071,11 @@ static ConCommand ent_create_portal_metal_sphere("ent_create_portal_metal_sphere
 #endif //} !CLIENT_DLL
 
 
-//-----------------------------------------------------------------------------
-// Purpose: On starting a game, make global state changes specific to portal
-//-----------------------------------------------------------------------------
-bool CPortalGameRules::Init()
-{
-#if !defined ( CLIENT_DLL )
-	// Portal never wants alternate ticks. Some low end hardware sets it in dxsupport.cfg so this will catch those cases.
-	ConVarRef sv_alternateticks("sv_alternateticks");
-	sv_alternateticks.SetValue( 0 );
-#endif // !CLIENT_DLL
-
-	return BaseClass::Init();
-}
 
 // ------------------------------------------------------------------------------------ //
-// Shared CPortalGameRules implementation.
+// Shared CPortalGameWorld implementation.
 // ------------------------------------------------------------------------------------ //
-bool CPortalGameRules::ShouldCollide( int collisionGroup0, int collisionGroup1 )
+bool CPortalGameWorld::ShouldCollide( int collisionGroup0, int collisionGroup1 )
 {
 	// If it's a portal, we want to collide with it!
 	/*if ( collisionGroup0 == PORTALCOLLISION_GROUP_PORTAL && collisionGroup1 != PORTALCOLLISION_GROUP_PORTAL || 
@@ -1129,7 +1089,7 @@ bool CPortalGameRules::ShouldCollide( int collisionGroup0, int collisionGroup1 )
 
 //---------------------------------------------------------
 //---------------------------------------------------------
-bool CPortalGameRules::ShouldUseRobustRadiusDamage(CBaseEntity *pEntity)
+bool CPortalGameWorld::ShouldUseRobustRadiusDamage(CBaseEntity *pEntity)
 {
 #ifdef CLIENT_DLL
 	return false;
@@ -1159,14 +1119,14 @@ bool CPortalGameRules::ShouldUseRobustRadiusDamage(CBaseEntity *pEntity)
 #ifndef CLIENT_DLL
 //---------------------------------------------------------
 //---------------------------------------------------------
-bool CPortalGameRules::ShouldAutoAim( CBasePlayer *pPlayer, CBaseEntity *target )
+bool CPortalGameWorld::ShouldAutoAim( CBasePlayer *pPlayer, CBaseEntity *target )
 {
 	return sk_allow_autoaim.GetBool() != 0;
 }
 
 //---------------------------------------------------------
 //---------------------------------------------------------
-float CPortalGameRules::GetAutoAimScale( CBasePlayer *pPlayer )
+float CPortalGameWorld::GetAutoAimScale( CBasePlayer *pPlayer )
 {
 	switch( GetSkillLevel() )
 	{
@@ -1185,7 +1145,7 @@ float CPortalGameRules::GetAutoAimScale( CBasePlayer *pPlayer )
 // This takes the long way around to see if a prop should emit a DLIGHT when it
 // ignites, to avoid having Alyx-related code in props.cpp.
 //-----------------------------------------------------------------------------
-bool CPortalGameRules::ShouldBurningPropsEmitLight()
+bool CPortalGameWorld::ShouldBurningPropsEmitLight()
 {
 	return false;
 }
@@ -1193,7 +1153,7 @@ bool CPortalGameRules::ShouldBurningPropsEmitLight()
 //---------------------------------------------------------
 // This is the only way we can silence the radio sound from the first room without touching them map -- jdw
 //---------------------------------------------------------
-bool CPortalGameRules::ShouldRemoveRadio( void )
+bool CPortalGameWorld::ShouldRemoveRadio( void )
 {
 	IAchievement *pHeartbreaker = g_AchievementMgrPortal.GetAchievementByName( "PORTAL_BEAT_GAME" );
 	if ( pHeartbreaker && pHeartbreaker->IsAchieved() )
@@ -1207,7 +1167,7 @@ bool CPortalGameRules::ShouldRemoveRadio( void )
 
 #ifdef CLIENT_DLL
 
-bool CPortalGameRules::IsBonusChallengeTimeBased( void )
+bool CPortalGameWorld::IsBonusChallengeTimeBased( void )
 {
 	CBasePlayer* pPlayer = ToBasePlayer(EntityList()->GetPlayerByIndex( 1 ));
 	if ( !pPlayer )

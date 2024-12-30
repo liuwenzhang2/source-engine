@@ -226,8 +226,8 @@ CCSBaseBuyMenu::CCSBaseBuyMenu(IViewPort *pViewPort, const char *subPanelName) :
 #endif // USE_BUY_PRESETS
  	m_lastMoney = -1;
 
-	m_pBlackMarket = new EditablePanel( m_pMainMenu, "BlackMarket_Bargains" );
-	m_pBlackMarket->LoadControlSettings( "Resource/UI/BlackMarket_Bargains.res" );
+	//m_pBlackMarket = new EditablePanel( m_pMainMenu, "BlackMarket_Bargains" );
+	//m_pBlackMarket->LoadControlSettings( "Resource/UI/BlackMarket_Bargains.res" );
 }
 
 //-----------------------------------------------------------------------------
@@ -437,43 +437,43 @@ const char *g_pWeaponNames[] =
 	"#Cstrike_TitlesTXT_Nightvision_Goggles"
 };
 
-int GetWeeklyBargain( void )
-{
-	if ( CSGameRules() == NULL || CSGameRules()->m_pPrices == NULL )
-		return 0;
-
-	C_CSPlayer *pPlayer = C_CSPlayer::GetLocalCSPlayer();
-
-	if ( pPlayer == NULL )
-		return 0;
-
-	int iBestIndex = 0;
-	int iBestBargain = 99999;
-
-	for ( int i = 1; i < WEAPON_MAX; i++ )
-	{
-		if ( i == WEAPON_SHIELDGUN )
-			continue;
-
-		CCSWeaponInfo *info = GetWeaponInfo( (CSWeaponID)i );
-
-		if ( info == NULL )
-			continue;
-
-		if ( info->m_iTeam == TEAM_UNASSIGNED || info->m_iTeam == pPlayer->m_iTeamNum )
-		{		
-			int iBargain = info->GetWeaponPrice() - info->GetPrevousPrice();
-
-			if ( iBargain < iBestBargain )
-			{
-				iBestIndex = i;
-				iBestBargain = iBargain;
-			}
-		}
-	}
-
-	return iBestIndex;
-}
+//int GetWeeklyBargain( void )
+//{
+//	if ( CSGameRules() == NULL || CSGameRules()->m_pPrices == NULL )
+//		return 0;
+//
+//	C_CSPlayer *pPlayer = C_CSPlayer::GetLocalCSPlayer();
+//
+//	if ( pPlayer == NULL )
+//		return 0;
+//
+//	int iBestIndex = 0;
+//	int iBestBargain = 99999;
+//
+//	for ( int i = 1; i < WEAPON_MAX; i++ )
+//	{
+//		if ( i == WEAPON_SHIELDGUN )
+//			continue;
+//
+//		CCSWeaponInfo *info = GetWeaponInfo( (CSWeaponID)i );
+//
+//		if ( info == NULL )
+//			continue;
+//
+//		if ( info->m_iTeam == TEAM_UNASSIGNED || info->m_iTeam == pPlayer->m_iTeamNum )
+//		{		
+//			int iBargain = info->GetWeaponPrice() - info->GetPrevousPrice();
+//
+//			if ( iBargain < iBestBargain )
+//			{
+//				iBestIndex = i;
+//				iBestBargain = iBargain;
+//			}
+//		}
+//	}
+//
+//	return iBestIndex;
+//}
 
 #ifdef _DEBUG
 ConVar cs_testbargain( "cs_testbargain", "1" );
@@ -486,122 +486,122 @@ void CCSBaseBuyMenu::HandleBlackMarket( void )
 
 	if ( m_pLoadout )
 	{
-		if ( CSGameRules()->IsBlackMarket() )
-		{
-			if ( CSGameRules()->m_pPrices == NULL )
-				return;
+		//if ( CSGameRules()->IsBlackMarket() )
+		//{
+		//	if ( CSGameRules()->m_pPrices == NULL )
+		//		return;
 
-			if ( m_pBlackMarket == NULL )
-				return;
+		//	if ( m_pBlackMarket == NULL )
+		//		return;
 
-			int iBargain = GetWeeklyBargain();
-			CCSWeaponInfo *info = GetWeaponInfo( (CSWeaponID)iBargain );
+		//	int iBargain = GetWeeklyBargain();
+		//	CCSWeaponInfo *info = GetWeaponInfo( (CSWeaponID)iBargain );
 
-			wchar_t *wszWeaponName = g_pVGuiLocalize->Find( g_pWeaponNames[iBargain]);
+		//	wchar_t *wszWeaponName = g_pVGuiLocalize->Find( g_pWeaponNames[iBargain]);
 
-			if ( wszWeaponName == NULL )
-				return;
+		//	if ( wszWeaponName == NULL )
+		//		return;
 
-			if ( info == NULL )
-				return;
+		//	if ( info == NULL )
+		//		return;
 
-			m_pLoadout->SetVisible( false );
-			Label *pLabel = dynamic_cast< Label * >(m_pMainMenu->FindChildByName( "loadoutLabel" ));
+		//	m_pLoadout->SetVisible( false );
+		//	Label *pLabel = dynamic_cast< Label * >(m_pMainMenu->FindChildByName( "loadoutLabel" ));
 
-			if ( pLabel )
-			{
-				pLabel->SetVisible( false );
-			}
+		//	if ( pLabel )
+		//	{
+		//		pLabel->SetVisible( false );
+		//	}
 
-			pLabel = dynamic_cast< Label * >(m_pBlackMarket->FindChildByName( "MarketHeadline" ));
+		//	pLabel = dynamic_cast< Label * >(m_pBlackMarket->FindChildByName( "MarketHeadline" ));
 
-			if ( pLabel )
-			{
-				const int BufLen = 2048;
-				
-				wchar_t wbuf[BufLen] = L"";
-				const wchar_t *formatStr = g_pVGuiLocalize->Find("#Cstrike_MarketHeadline");
+		//	if ( pLabel )
+		//	{
+		//		const int BufLen = 2048;
+		//		
+		//		wchar_t wbuf[BufLen] = L"";
+		//		const wchar_t *formatStr = g_pVGuiLocalize->Find("#Cstrike_MarketHeadline");
 	
-				if ( !formatStr )
-					formatStr = L"%s1";
+		//		if ( !formatStr )
+		//			formatStr = L"%s1";
 
-				g_pVGuiLocalize->ConstructString( wbuf, sizeof(wbuf), formatStr, 1, wszWeaponName );
-				pLabel->SetText( wbuf );
-			}
+		//		g_pVGuiLocalize->ConstructString( wbuf, sizeof(wbuf), formatStr, 1, wszWeaponName );
+		//		pLabel->SetText( wbuf );
+		//	}
 
-			pLabel = dynamic_cast< Label * >(m_pBlackMarket->FindChildByName( "MarketBargain" ));
+		//	pLabel = dynamic_cast< Label * >(m_pBlackMarket->FindChildByName( "MarketBargain" ));
 
-			if ( pLabel )
-			{
-				const int BufLen = 2048;
-				wchar_t wbuf[BufLen] = L"";
-				const wchar_t *formatStr = g_pVGuiLocalize->Find("#Cstrike_MarketBargain");
-				
-				if ( !formatStr )
-					formatStr = L"%s1";
+		//	if ( pLabel )
+		//	{
+		//		const int BufLen = 2048;
+		//		wchar_t wbuf[BufLen] = L"";
+		//		const wchar_t *formatStr = g_pVGuiLocalize->Find("#Cstrike_MarketBargain");
+		//		
+		//		if ( !formatStr )
+		//			formatStr = L"%s1";
 
-				g_pVGuiLocalize->ConstructString( wbuf, sizeof(wbuf), formatStr, 1, wszWeaponName );
-				pLabel->SetText( wbuf );
-			}
+		//		g_pVGuiLocalize->ConstructString( wbuf, sizeof(wbuf), formatStr, 1, wszWeaponName );
+		//		pLabel->SetText( wbuf );
+		//	}
 
-			pLabel = dynamic_cast< Label * >(m_pBlackMarket->FindChildByName( "MarketStickerPrice" ));
+		//	pLabel = dynamic_cast< Label * >(m_pBlackMarket->FindChildByName( "MarketStickerPrice" ));
 
-			if ( pLabel )
-			{
-				char wbuf[16];
+		//	if ( pLabel )
+		//	{
+		//		char wbuf[16];
 
-				Q_snprintf( wbuf, 16, "%d", CSGameRules()->m_pPrices->iCurrentPrice[iBargain] );
+		//		Q_snprintf( wbuf, 16, "%d", CSGameRules()->m_pPrices->iCurrentPrice[iBargain] );
 
-				pLabel->SetText( wbuf );
-			}
+		//		pLabel->SetText( wbuf );
+		//	}
 
-			RichText *pText = dynamic_cast< RichText * >(m_pBlackMarket->FindChildByName( "MarketDescription" ));
+		//	RichText *pText = dynamic_cast< RichText * >(m_pBlackMarket->FindChildByName( "MarketDescription" ));
 
-			if ( pText )
-			{
-				char wbuf[2048];
-				g_pVGuiLocalize->ConvertUnicodeToANSI( g_pVGuiLocalize->Find("#Cstrike_MarketDescription"), wbuf, 2048 );
+		//	if ( pText )
+		//	{
+		//		char wbuf[2048];
+		//		g_pVGuiLocalize->ConvertUnicodeToANSI( g_pVGuiLocalize->Find("#Cstrike_MarketDescription"), wbuf, 2048 );
 
-				pText->SetText( "" );
-				pText->InsertPossibleURLString( wbuf, Color( 255, 255, 255, 255 ), Color( 255, 176, 0, 255 ) );
-				pText->SetVerticalScrollbar( false );
-				pText->SetPaintBorderEnabled( false );
-				pText->SetUnderlineFont( m_hUnderlineFont );
-			}
+		//		pText->SetText( "" );
+		//		pText->InsertPossibleURLString( wbuf, Color( 255, 255, 255, 255 ), Color( 255, 176, 0, 255 ) );
+		//		pText->SetVerticalScrollbar( false );
+		//		pText->SetPaintBorderEnabled( false );
+		//		pText->SetUnderlineFont( m_hUnderlineFont );
+		//	}
 
-			pLabel = dynamic_cast< Label * >(m_pBlackMarket->FindChildByName( "MarketBargainIcon" ));
-			
-			if ( pLabel )
-			{
-				char wbuff[12];
-				Q_snprintf( wbuff, 12, "%c", info->iconActive->cCharacterInFont );
-				
-				pLabel->SetText( wbuff );
-			}
+		//	pLabel = dynamic_cast< Label * >(m_pBlackMarket->FindChildByName( "MarketBargainIcon" ));
+		//	
+		//	if ( pLabel )
+		//	{
+		//		char wbuff[12];
+		//		Q_snprintf( wbuff, 12, "%c", info->iconActive->cCharacterInFont );
+		//		
+		//		pLabel->SetText( wbuff );
+		//	}
 
-			Button *pButton = dynamic_cast< Button * >(m_pMainMenu->FindChildByName( "BargainbuyButton" ));
+		//	Button *pButton = dynamic_cast< Button * >(m_pMainMenu->FindChildByName( "BargainbuyButton" ));
 
-			if ( pButton )
-			{
-				char command[512];
-				char *pWeaponName = Q_stristr( info->szClassName, "_" );
+		//	if ( pButton )
+		//	{
+		//		char command[512];
+		//		char *pWeaponName = Q_stristr( info->szClassName, "_" );
 
-				if ( pWeaponName )
-				{
-					pWeaponName++;
+		//		if ( pWeaponName )
+		//		{
+		//			pWeaponName++;
 
-					Q_snprintf( command, 512, "buy %s", pWeaponName );
-				}
+		//			Q_snprintf( command, 512, "buy %s", pWeaponName );
+		//		}
 
-				pButton->SetCommand( command );
-				pButton->SetVisible( true );
-			}
+		//		pButton->SetCommand( command );
+		//		pButton->SetVisible( true );
+		//	}
 
 
-			m_pBlackMarket->SetVisible( true );
-			m_pBlackMarket->SetZPos( -2 );
-		}
-		else
+		//	m_pBlackMarket->SetVisible( true );
+		//	m_pBlackMarket->SetZPos( -2 );
+		//}
+		//else
 		{
 			WeaponSet ws;
 
@@ -616,17 +616,17 @@ void CCSBaseBuyMenu::HandleBlackMarket( void )
 				pLabel->SetVisible( true );
 			}
 
-			if ( m_pBlackMarket )
-			{
-				m_pBlackMarket->SetVisible( false );
+			//if ( m_pBlackMarket )
+			//{
+			//	m_pBlackMarket->SetVisible( false );
 
-				Button *pButton = dynamic_cast< Button * >(m_pMainMenu->FindChildByName( "BargainbuyButton" ));
+			//	Button *pButton = dynamic_cast< Button * >(m_pMainMenu->FindChildByName( "BargainbuyButton" ));
 
-				if ( pButton )
-				{
-					pButton->SetVisible( false );
-				}
-			}
+			//	if ( pButton )
+			//	{
+			//		pButton->SetVisible( false );
+			//	}
+			//}
 		}
 	}
 }
@@ -862,32 +862,32 @@ void CCSBuySubMenu::HandleBlackMarket( void )
 			if ( info == NULL )
 				continue;
 
-			if ( CSGameRules()->IsBlackMarket() == false )
-			{
-                //=============================================================================
-                // HPE_BEGIN:
-                // [dwenger] Removed to avoid clearing of default price when not in black market mode
-                //=============================================================================
+			//if ( CSGameRules()->IsBlackMarket() == false )
+			//{
+   //             //=============================================================================
+   //             // HPE_BEGIN:
+   //             // [dwenger] Removed to avoid clearing of default price when not in black market mode
+   //             //=============================================================================
 
-                // pButton->SetCurrentPrice( info->GetDefaultPrice() );
+   //             // pButton->SetCurrentPrice( info->GetDefaultPrice() );
 
-                //=============================================================================
-                // HPE_END
-                //=============================================================================
-			}
-			else
-			{
-				int iBargain = info->GetWeaponPrice() - info->GetPrevousPrice();
+   //             //=============================================================================
+   //             // HPE_END
+   //             //=============================================================================
+			//}
+			//else
+			//{
+			//	int iBargain = info->GetWeaponPrice() - info->GetPrevousPrice();
 
-				pButton->SetCurrentPrice( info->GetWeaponPrice() );
-				pButton->SetPreviousPrice( info->GetPrevousPrice() );
+			//	pButton->SetCurrentPrice( info->GetWeaponPrice() );
+			//	pButton->SetPreviousPrice( info->GetPrevousPrice() );
 
-				if ( iBargain < iBestBargain )
-				{
-					iBestBargain = iBargain;
-					pButtonBargain = pButton;
-				}
-			}
+			//	if ( iBargain < iBestBargain )
+			//	{
+			//		iBestBargain = iBargain;
+			//		pButtonBargain = pButton;
+			//	}
+			//}
 		}
 	}
 

@@ -76,6 +76,7 @@ class IStudioHdr;
 #include "vcollide_parse.h"
 #include "bspfile.h"
 #include "inetchannelinfo.h"
+#include "gamerules.h"
 #include "entitylist_base.h"
 
 #include "IEffects.h"

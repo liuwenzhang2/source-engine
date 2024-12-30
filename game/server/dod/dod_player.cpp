@@ -2404,7 +2404,7 @@ bool CDODPlayer::ClientCommand( const CCommand &args )
 // can be closed...false if the menu should be displayed again
 bool CDODPlayer::HandleCommand_JoinTeam( int team )
 {
-	CDODGameRules *mp = DODGameRules();
+	CDODGameWorld *mp = DODGameRules();
 	int iOldTeam = GetTeamNumber();
 	int iOldPlayerClass = m_Shared.DesiredPlayerClass();
 

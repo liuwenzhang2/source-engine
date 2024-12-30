@@ -1552,7 +1552,7 @@ void CServerGameDLL::CreateNetworkStringTables( void )
 	PrecacheParticleSystem( "error" );	// ensure error particle system is handy
 	Assert( GetParticleSystemIndex( "error" ) == 0 );
 
-	CreateNetworkStringTables_GameRules();
+	//CreateNetworkStringTables_GameRules();
 
 	// Set up save/load utilities for string tables
 	g_VguiScreenStringOps.Init( g_pStringTableVguiScreen );

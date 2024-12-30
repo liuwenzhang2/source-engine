@@ -25,17 +25,9 @@
 
 #ifdef CLIENT_DLL
 #define CHalfLife2Survival C_HalfLife2Survival
-#define CHalfLife2SurvivalProxy C_HalfLife2SurvivalProxy
 #endif
 
 ConVar gamerules_survival( "gamerules_survival", "0", FCVAR_REPLICATED );
-
-class CHalfLife2SurvivalProxy : public CGameRulesProxy
-{
-public:
-	DECLARE_CLASS( CHalfLife2SurvivalProxy, CGameRulesProxy );
-	DECLARE_NETWORKCLASS();
-};
 
 class CSurvivalAmmo
 {
@@ -62,18 +54,18 @@ CSurvivalSettings::CSurvivalSettings()
 	m_iSpawnHealth = 100;
 }
 
-class CHalfLife2Survival : public CHalfLife2
+class CHalfLife2Survival : public CHalfLife2World
 {
 public:
-	DECLARE_CLASS( CHalfLife2Survival, CHalfLife2 );
+	DECLARE_CLASS( CHalfLife2Survival, CHalfLife2World);
 
 #ifdef CLIENT_DLL
 
-	DECLARE_CLIENTCLASS_NOBASE(); // This makes datatables able to access our private vars.
+	DECLARE_CLIENTCLASS(); // This makes datatables able to access our private vars.
 
 #else
 
-	DECLARE_SERVERCLASS_NOBASE(); // This makes datatables able to access our private vars.
+	DECLARE_SERVERCLASS(); // This makes datatables able to access our private vars.
 
 	CHalfLife2Survival();
 	virtual ~CHalfLife2Survival() {}
@@ -102,40 +94,12 @@ inline CHalfLife2Survival* HL2SurvivalGameRules()
 	return static_cast<CHalfLife2Survival*>(g_pGameRules);
 }
 
-REGISTER_GAMERULES_CLASS( CHalfLife2Survival );
+//REGISTER_GAMERULES_CLASS( CHalfLife2Survival );
 
-BEGIN_NETWORK_TABLE_NOBASE( CHalfLife2Survival, DT_HL2SurvivalGameRules )
+BEGIN_NETWORK_TABLE( CHalfLife2Survival, DT_HL2SurvivalWorld )
 END_NETWORK_TABLE()
 
-
-LINK_ENTITY_TO_CLASS( hl2_survival_gamerules, CHalfLife2SurvivalProxy );
-IMPLEMENT_NETWORKCLASS_ALIASED( HalfLife2SurvivalProxy, DT_HalfLife2SurvivalProxy )
-
-#ifdef CLIENT_DLL
-	void RecvProxy_HL2SurvivalGameRules( const RecvProp *pProp, void **pOut, void *pData, int objectID )
-	{
-		CHalfLife2Survival *pRules = HL2SurvivalGameRules();
-		Assert( pRules );
-		*pOut = pRules;
-	}
-
-	BEGIN_RECV_TABLE( CHalfLife2SurvivalProxy, DT_HalfLife2SurvivalProxy )
-	RecvPropDataTable( "hl2_survival_gamerules_data", 0, 0, &REFERENCE_RECV_TABLE( DT_HL2SurvivalGameRules ), RecvProxy_HL2SurvivalGameRules )
-	END_RECV_TABLE()
-	#else
-	void* SendProxy_HL2SurvivalGameRules( const SendProp *pProp, const void *pStructBase, const void *pData, CSendProxyRecipients *pRecipients, int objectID )
-	{
-		CHalfLife2Survival *pRules = HL2SurvivalGameRules();
-		Assert( pRules );
-		pRecipients->SetAllRecipients();
-		return pRules;
-	}
-
-	BEGIN_SEND_TABLE( CHalfLife2SurvivalProxy, DT_HalfLife2SurvivalProxy )
-	SendPropDataTable( "hl2_survival_gamerules_data", 0, &REFERENCE_SEND_TABLE( DT_HL2SurvivalGameRules ), SendProxy_HL2SurvivalGameRules )
-	END_SEND_TABLE()
-#endif
-
+IMPLEMENT_NETWORKCLASS_ALIASED(HalfLife2Survival, DT_HL2SurvivalWorld)
 #ifndef CLIENT_DLL
 
 CHalfLife2Survival::CHalfLife2Survival()

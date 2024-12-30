@@ -10,32 +10,22 @@
 extern ConVar sk_mp_dmg_multiplier ;
 
 #ifdef CLIENT_DLL
-	#define CHL1MPRules C_HL1MPRules
-	#define CHL1MPGameRulesProxy C_HL1MPGameRulesProxy
+	#define CHL1MPWorld C_HL1MPWorld
 #endif
 
-
-class CHL1MPGameRulesProxy : public CGameRulesProxy
+class CHL1MPWorld : public CTeamplayWorld
 {
 public:
-	DECLARE_CLASS( CHL1MPGameRulesProxy, CGameRulesProxy );
-	DECLARE_NETWORKCLASS();
-};
-
-
-class CHL1MPRules : public CTeamplayRules
-{
-public:
-	DECLARE_CLASS( CHL1MPRules, CTeamplayRules );
+	DECLARE_CLASS( CHL1MPWorld, CTeamplayWorld );
 
 #ifdef CLIENT_DLL
-	DECLARE_CLIENTCLASS_NOBASE();
+	DECLARE_CLIENTCLASS();
 #else
-	DECLARE_SERVERCLASS_NOBASE();
+	DECLARE_SERVERCLASS();
 #endif
 
-	CHL1MPRules();
-	virtual ~CHL1MPRules();
+	CHL1MPWorld();
+	virtual ~CHL1MPWorld();
 
 	virtual void CreateStandardEntities( void );
 
@@ -82,9 +72,9 @@ private:
 };
 
 
-inline CHL1MPRules* HL1MPRules()
+inline CHL1MPWorld* HL1MPRules()
 {
-	return dynamic_cast<CHL1MPRules*>(g_pGameRules);
+	return (CHL1MPWorld*)EntityList()->GetBaseEntity(0);
 }
 
 

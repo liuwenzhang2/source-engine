@@ -79,7 +79,7 @@ enum CSWeaponID
 
 #define MAX_EQUIPMENT (WEAPON_MAX - WEAPON_KEVLAR)
 
-void PrepareEquipmentInfo( void );
+//void PrepareEquipmentInfo( void );
 
 //--------------------------------------------------------------------------------------------------------
 const char * WeaponClassAsString( CSWeaponType weaponType );

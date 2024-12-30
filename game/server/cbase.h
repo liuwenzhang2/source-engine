@@ -108,6 +108,11 @@
 #include "util_shared.h"
 #include "util.h"
 
+extern IServerGameRules* g_pGameRules;
+inline IServerGameRules* GameRules() {
+	return g_pGameRules;
+}
+
 abstract_class CBaseEntityClassList
 {
 public:

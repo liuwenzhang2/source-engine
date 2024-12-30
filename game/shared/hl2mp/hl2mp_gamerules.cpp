@@ -53,10 +53,7 @@ extern CBaseEntity	 *g_pLastRebelSpawn;
 
 #endif
 
-
-REGISTER_GAMERULES_CLASS( CHL2MPRules );
-
-BEGIN_NETWORK_TABLE_NOBASE( CHL2MPRules, DT_HL2MPRules )
+BEGIN_NETWORK_TABLE( CHL2MPWorld, DT_HL2MPWorld )
 
 	#ifdef CLIENT_DLL
 		RecvPropBool( RECVINFO( m_bTeamPlayEnabled ) ),
@@ -67,9 +64,7 @@ BEGIN_NETWORK_TABLE_NOBASE( CHL2MPRules, DT_HL2MPRules )
 END_NETWORK_TABLE()
 
 
-LINK_ENTITY_TO_CLASS( hl2mp_gamerules, CHL2MPGameRulesProxy );
-IMPLEMENT_NETWORKCLASS_ALIASED( HL2MPGameRulesProxy, DT_HL2MPGameRulesProxy )
-
+IMPLEMENT_NETWORKCLASS_ALIASED(HL2MPWorld, DT_HL2MPWorld)
 static HL2MPViewVectors g_HL2MPViewVectors(
 	Vector( 0, 0, 64 ),       //VEC_VIEW (m_vView) 
 							  
@@ -132,32 +127,6 @@ static const char *s_PreserveEnts[] =
 	"", // END Marker
 };
 
-
-
-#ifdef CLIENT_DLL
-	void RecvProxy_HL2MPRules( const RecvProp *pProp, void **pOut, void *pData, int objectID )
-	{
-		CHL2MPRules *pRules = HL2MPRules();
-		Assert( pRules );
-		*pOut = pRules;
-	}
-
-	BEGIN_RECV_TABLE( CHL2MPGameRulesProxy, DT_HL2MPGameRulesProxy )
-		RecvPropDataTable( "hl2mp_gamerules_data", 0, 0, &REFERENCE_RECV_TABLE( DT_HL2MPRules ), RecvProxy_HL2MPRules )
-	END_RECV_TABLE()
-#else
-	void* SendProxy_HL2MPRules( const SendProp *pProp, const void *pStructBase, const void *pData, CSendProxyRecipients *pRecipients, int objectID )
-	{
-		CHL2MPRules *pRules = HL2MPRules();
-		Assert( pRules );
-		return pRules;
-	}
-
-	BEGIN_SEND_TABLE( CHL2MPGameRulesProxy, DT_HL2MPGameRulesProxy )
-		SendPropDataTable( "hl2mp_gamerules_data", 0, &REFERENCE_SEND_TABLE( DT_HL2MPRules ), SendProxy_HL2MPRules )
-	END_SEND_TABLE()
-#endif
-
 #ifndef CLIENT_DLL
 
 	class CVoiceGameMgrHelper : public IVoiceGameMgrHelper
@@ -182,7 +151,7 @@ char *sTeamNames[] =
 	"Rebels",
 };
 
-CHL2MPRules::CHL2MPRules()
+CHL2MPWorld::CHL2MPWorld()
 {
 #ifndef CLIENT_DLL
 	// Create the team managers
@@ -209,17 +178,17 @@ CHL2MPRules::CHL2MPRules()
 #endif
 }
 
-const CViewVectors* CHL2MPRules::GetViewVectors()const
+const CViewVectors* CHL2MPWorld::GetViewVectors()const
 {
 	return &g_HL2MPViewVectors;
 }
 
-const HL2MPViewVectors* CHL2MPRules::GetHL2MPViewVectors()const
+const HL2MPViewVectors* CHL2MPWorld::GetHL2MPViewVectors()const
 {
 	return &g_HL2MPViewVectors;
 }
 	
-CHL2MPRules::~CHL2MPRules( void )
+CHL2MPWorld::~CHL2MPWorld( void )
 {
 #ifndef CLIENT_DLL
 	// Note, don't delete each team since they are in the gEntList and will 
@@ -228,7 +197,7 @@ CHL2MPRules::~CHL2MPRules( void )
 #endif
 }
 
-void CHL2MPRules::CreateStandardEntities( void )
+void CHL2MPWorld::CreateStandardEntities( void )
 {
 
 #ifndef CLIENT_DLL
@@ -239,11 +208,11 @@ void CHL2MPRules::CreateStandardEntities( void )
 	g_pLastCombineSpawn = NULL;
 	g_pLastRebelSpawn = NULL;
 
-#ifdef DBGFLAG_ASSERT
-	CBaseEntity *pEnt = 
-#endif
-	CBaseEntity::Create( "hl2mp_gamerules", vec3_origin, vec3_angle );
-	Assert( pEnt );
+//#ifdef DBGFLAG_ASSERT
+//	CBaseEntity *pEnt = 
+//#endif
+//	CBaseEntity::Create( "hl2mp_gamerules", vec3_origin, vec3_angle );
+//	Assert( pEnt );
 #endif
 }
 
@@ -251,7 +220,7 @@ void CHL2MPRules::CreateStandardEntities( void )
 // FlWeaponRespawnTime - what is the time in the future
 // at which this weapon may spawn?
 //=========================================================
-float CHL2MPRules::FlWeaponRespawnTime( CBaseCombatWeapon *pWeapon )
+float CHL2MPWorld::FlWeaponRespawnTime( CBaseCombatWeapon *pWeapon )
 {
 #ifndef CLIENT_DLL
 	if ( weaponstay.GetInt() > 0 )
@@ -270,7 +239,7 @@ float CHL2MPRules::FlWeaponRespawnTime( CBaseCombatWeapon *pWeapon )
 }
 
 
-bool CHL2MPRules::IsIntermission( void )
+bool CHL2MPWorld::IsIntermission( void )
 {
 #ifndef CLIENT_DLL
 	return m_flIntermissionEndTime > gpGlobals->curtime;
@@ -279,7 +248,7 @@ bool CHL2MPRules::IsIntermission( void )
 	return false;
 }
 
-void CHL2MPRules::PlayerKilled( CBasePlayer *pVictim, const CTakeDamageInfo &info )
+void CHL2MPWorld::PlayerKilled( CBasePlayer *pVictim, const CTakeDamageInfo &info )
 {
 #ifndef CLIENT_DLL
 	if ( IsIntermission() )
@@ -289,12 +258,12 @@ void CHL2MPRules::PlayerKilled( CBasePlayer *pVictim, const CTakeDamageInfo &inf
 }
 
 
-void CHL2MPRules::Think( void )
+void CHL2MPWorld::Think( void )
 {
 
 #ifndef CLIENT_DLL
 	
-	CGameRules::Think();
+	CWorld::Think();
 
 	if ( g_fGameOver )   // someone else quit the game already
 	{
@@ -375,7 +344,7 @@ void CHL2MPRules::Think( void )
 #endif
 }
 
-void CHL2MPRules::GoToIntermission( void )
+void CHL2MPWorld::GoToIntermission( void )
 {
 #ifndef CLIENT_DLL
 	if ( g_fGameOver )
@@ -399,7 +368,7 @@ void CHL2MPRules::GoToIntermission( void )
 	
 }
 
-bool CHL2MPRules::CheckGameOver()
+bool CHL2MPWorld::CheckGameOver()
 {
 #ifndef CLIENT_DLL
 	if ( g_fGameOver )   // someone else quit the game already
@@ -426,7 +395,7 @@ bool CHL2MPRules::CheckGameOver()
 // now,  otherwise it returns the time at which it can try
 // to spawn again.
 //=========================================================
-float CHL2MPRules::FlWeaponTryRespawn( CBaseCombatWeapon *pWeapon )
+float CHL2MPWorld::FlWeaponTryRespawn( CBaseCombatWeapon *pWeapon )
 {
 #ifndef CLIENT_DLL
 	if ( pWeapon && (pWeapon->GetWeaponFlags() & ITEM_FLAG_LIMITINWORLD) )
@@ -445,7 +414,7 @@ float CHL2MPRules::FlWeaponTryRespawn( CBaseCombatWeapon *pWeapon )
 // VecWeaponRespawnSpot - where should this weapon spawn?
 // Some game variations may choose to randomize spawn locations
 //=========================================================
-Vector CHL2MPRules::VecWeaponRespawnSpot( CBaseCombatWeapon *pWeapon )
+Vector CHL2MPWorld::VecWeaponRespawnSpot( CBaseCombatWeapon *pWeapon )
 {
 #ifndef CLIENT_DLL
 	CWeaponHL2MPBase *pHL2Weapon = dynamic_cast< CWeaponHL2MPBase*>( pWeapon );
@@ -499,7 +468,7 @@ bool GetObjectsOriginalParameters( CBaseEntity *pObject, Vector &vOriginalOrigin
 	return false;
 }
 
-void CHL2MPRules::ManageObjectRelocation( void )
+void CHL2MPWorld::ManageObjectRelocation( void )
 {
 	int iTotal = m_hRespawnableItemsAndWeapons.Count();
 
@@ -563,7 +532,7 @@ void CHL2MPRules::ManageObjectRelocation( void )
 //=========================================================
 //AddLevelDesignerPlacedWeapon
 //=========================================================
-void CHL2MPRules::AddLevelDesignerPlacedObject( CBaseEntity *pEntity )
+void CHL2MPWorld::AddLevelDesignerPlacedObject( CBaseEntity *pEntity )
 {
 	if ( m_hRespawnableItemsAndWeapons.Find( pEntity ) == -1 )
 	{
@@ -574,7 +543,7 @@ void CHL2MPRules::AddLevelDesignerPlacedObject( CBaseEntity *pEntity )
 //=========================================================
 //RemoveLevelDesignerPlacedWeapon
 //=========================================================
-void CHL2MPRules::RemoveLevelDesignerPlacedObject( CBaseEntity *pEntity )
+void CHL2MPWorld::RemoveLevelDesignerPlacedObject( CBaseEntity *pEntity )
 {
 	if ( m_hRespawnableItemsAndWeapons.Find( pEntity ) != -1 )
 	{
@@ -586,7 +555,7 @@ void CHL2MPRules::RemoveLevelDesignerPlacedObject( CBaseEntity *pEntity )
 // Where should this item respawn?
 // Some game variations may choose to randomize spawn locations
 //=========================================================
-Vector CHL2MPRules::VecItemRespawnSpot( CItem *pItem )
+Vector CHL2MPWorld::VecItemRespawnSpot( CItem *pItem )
 {
 	return pItem->GetOriginalSpawnOrigin();
 }
@@ -594,7 +563,7 @@ Vector CHL2MPRules::VecItemRespawnSpot( CItem *pItem )
 //=========================================================
 // What angles should this item use to respawn?
 //=========================================================
-QAngle CHL2MPRules::VecItemRespawnAngles( CItem *pItem )
+QAngle CHL2MPWorld::VecItemRespawnAngles( CItem *pItem )
 {
 	return pItem->GetOriginalSpawnAngles();
 }
@@ -602,7 +571,7 @@ QAngle CHL2MPRules::VecItemRespawnAngles( CItem *pItem )
 //=========================================================
 // At what time in the future may this Item respawn?
 //=========================================================
-float CHL2MPRules::FlItemRespawnTime( CItem *pItem )
+float CHL2MPWorld::FlItemRespawnTime( CItem *pItem )
 {
 	return sv_hl2mp_item_respawn_time.GetFloat();
 }
@@ -612,7 +581,7 @@ float CHL2MPRules::FlItemRespawnTime( CItem *pItem )
 // CanHaveWeapon - returns false if the player is not allowed
 // to pick up this weapon
 //=========================================================
-bool CHL2MPRules::CanHavePlayerItem( CBasePlayer *pPlayer, CBaseCombatWeapon *pItem )
+bool CHL2MPWorld::CanHavePlayerItem( CBasePlayer *pPlayer, CBaseCombatWeapon *pItem )
 {
 	if ( weaponstay.GetInt() > 0 )
 	{
@@ -629,7 +598,7 @@ bool CHL2MPRules::CanHavePlayerItem( CBasePlayer *pPlayer, CBaseCombatWeapon *pI
 // WeaponShouldRespawn - any conditions inhibiting the
 // respawning of this weapon?
 //=========================================================
-int CHL2MPRules::WeaponShouldRespawn( CBaseCombatWeapon *pWeapon )
+int CHL2MPWorld::WeaponShouldRespawn( CBaseCombatWeapon *pWeapon )
 {
 #ifndef CLIENT_DLL
 	if ( pWeapon->GetEngineObject()->HasSpawnFlags( SF_NORESPAWN ) )
@@ -644,7 +613,7 @@ int CHL2MPRules::WeaponShouldRespawn( CBaseCombatWeapon *pWeapon )
 //-----------------------------------------------------------------------------
 // Purpose: Player has just left the game
 //-----------------------------------------------------------------------------
-void CHL2MPRules::ClientDisconnected( int pClient )
+void CHL2MPWorld::ClientDisconnected( int pClient )
 {
 #ifndef CLIENT_DLL
 	// Msg( "CLIENT DISCONNECTED, REMOVING FROM TEAM.\n" );
@@ -668,7 +637,7 @@ void CHL2MPRules::ClientDisconnected( int pClient )
 //=========================================================
 // Deathnotice. 
 //=========================================================
-void CHL2MPRules::DeathNotice( CBasePlayer *pVictim, const CTakeDamageInfo &info )
+void CHL2MPWorld::DeathNotice( CBasePlayer *pVictim, const CTakeDamageInfo &info )
 {
 #ifndef CLIENT_DLL
 	// Work out what killed the player, and send a message to all clients about it
@@ -769,7 +738,7 @@ void CHL2MPRules::DeathNotice( CBasePlayer *pVictim, const CTakeDamageInfo &info
 
 }
 
-void CHL2MPRules::ClientSettingsChanged( CBasePlayer *pPlayer )
+void CHL2MPWorld::ClientSettingsChanged( CBasePlayer *pPlayer )
 {
 #ifndef CLIENT_DLL
 	
@@ -832,7 +801,7 @@ void CHL2MPRules::ClientSettingsChanged( CBasePlayer *pPlayer )
 	
 }
 
-int CHL2MPRules::PlayerRelationship( CBaseEntity *pPlayer, CBaseEntity *pTarget )
+int CHL2MPWorld::PlayerRelationship( CBaseEntity *pPlayer, CBaseEntity *pTarget )
 {
 #ifndef CLIENT_DLL
 	// half life multiplay has a simple concept of Player Relationships.
@@ -849,7 +818,7 @@ int CHL2MPRules::PlayerRelationship( CBaseEntity *pPlayer, CBaseEntity *pTarget 
 	return GR_NOTTEAMMATE;
 }
 
-const char *CHL2MPRules::GetGameDescription( void )
+const char *CHL2MPWorld::GetGameDescription( void )
 { 
 	if ( IsTeamplay() )
 		return "Team Deathmatch"; 
@@ -857,12 +826,12 @@ const char *CHL2MPRules::GetGameDescription( void )
 	return "Deathmatch"; 
 } 
 
-bool CHL2MPRules::IsConnectedUserInfoChangeAllowed( CBasePlayer *pPlayer )
+bool CHL2MPWorld::IsConnectedUserInfoChangeAllowed( CBasePlayer *pPlayer )
 {
 	return true;
 }
  
-float CHL2MPRules::GetMapRemainingTime()
+float CHL2MPWorld::GetMapRemainingTime()
 {
 	// if timelimit is disabled, return 0
 	if ( mp_timelimit.GetInt() <= 0 )
@@ -878,12 +847,13 @@ float CHL2MPRules::GetMapRemainingTime()
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-void CHL2MPRules::Precache( void )
+void CHL2MPWorld::Precache( void )
 {
+	BaseClass::Precache();
 	g_pSoundEmitterSystem->PrecacheScriptSound( "AlyxEmp.Charge" );
 }
 
-bool CHL2MPRules::ShouldCollide( int collisionGroup0, int collisionGroup1 )
+bool CHL2MPWorld::ShouldCollide( int collisionGroup0, int collisionGroup1 )
 {
 	if ( collisionGroup0 > collisionGroup1 )
 	{
@@ -901,7 +871,7 @@ bool CHL2MPRules::ShouldCollide( int collisionGroup0, int collisionGroup1 )
 
 }
 
-bool CHL2MPRules::ClientCommand( CBaseEntity *pEdict, const CCommand &args )
+bool CHL2MPWorld::ClientCommand( CBaseEntity *pEdict, const CCommand &args )
 {
 #ifndef CLIENT_DLL
 	if( BaseClass::ClientCommand( pEdict, args ) )
@@ -989,7 +959,7 @@ CAmmoDef *GetAmmoDef()
 
 #endif
 
-	bool CHL2MPRules::FShouldSwitchWeapon( CBasePlayer *pPlayer, CBaseCombatWeapon *pWeapon )
+	bool CHL2MPWorld::FShouldSwitchWeapon( CBasePlayer *pPlayer, CBaseCombatWeapon *pWeapon )
 	{		
 		if ( pPlayer->GetActiveWeapon() && pPlayer->IsNetClient() )
 		{
@@ -1008,7 +978,7 @@ CAmmoDef *GetAmmoDef()
 
 #ifndef CLIENT_DLL
 
-void CHL2MPRules::RestartGame()
+void CHL2MPWorld::RestartGame()
 {
 	// bounds check
 	if ( mp_timelimit.GetInt() < 0 )
@@ -1072,7 +1042,7 @@ void CHL2MPRules::RestartGame()
 	}
 }
 
-void CHL2MPRules::CleanUpMap()
+void CHL2MPWorld::CleanUpMap()
 {
 	// Recreate all the map entities from the map data (preserving their indices),
 	// then remove everything else except the players.
@@ -1169,7 +1139,7 @@ void CHL2MPRules::CleanUpMap()
 	MapEntity_ParseAllEntities( engine->GetMapEntitiesString(), &filter, true );
 }
 
-void CHL2MPRules::CheckChatForReadySignal( CHL2MP_Player *pPlayer, const char *chatmsg )
+void CHL2MPWorld::CheckChatForReadySignal( CHL2MP_Player *pPlayer, const char *chatmsg )
 {
 	if( m_bAwaitingReadyRestart && FStrEq( chatmsg, mp_ready_signal.GetString() ) )
 	{
@@ -1180,7 +1150,7 @@ void CHL2MPRules::CheckChatForReadySignal( CHL2MP_Player *pPlayer, const char *c
 	}
 }
 
-void CHL2MPRules::CheckRestartGame( void )
+void CHL2MPWorld::CheckRestartGame( void )
 {
 	// Restart the game if specified by the server
 	int iRestartDelay = mp_restartgame.GetInt();
@@ -1228,7 +1198,7 @@ void CHL2MPRules::CheckRestartGame( void )
 	}
 }
 
-void CHL2MPRules::CheckAllPlayersReady( void )
+void CHL2MPWorld::CheckAllPlayersReady( void )
 {
 	for (int i = 1; i <= gpGlobals->maxClients; i++ )
 	{
@@ -1245,7 +1215,7 @@ void CHL2MPRules::CheckAllPlayersReady( void )
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-const char *CHL2MPRules::GetChatFormat( bool bTeamOnly, CBasePlayer *pPlayer )
+const char *CHL2MPWorld::GetChatFormat( bool bTeamOnly, CBasePlayer *pPlayer )
 {
 	if ( !pPlayer )  // dedicated server output
 	{

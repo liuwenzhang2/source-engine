@@ -1020,7 +1020,7 @@ void CCSGameStats::Event_PlayerKilledOther( CBasePlayer *pAttacker, CBaseEntity 
 		pPlayerAttacker->AwardAchievement(CSImmovableObject);
 	}
 
-	CCSGameRules::TeamPlayerCounts playerCounts[TEAM_MAXCOUNT];
+	CCSGameWorld::TeamPlayerCounts playerCounts[TEAM_MAXCOUNT];
 
 	CSGameRules()->GetPlayerCounts(playerCounts);
 	int iAttackerTeamNumber = pPlayerAttacker->GetTeamNumber() ;

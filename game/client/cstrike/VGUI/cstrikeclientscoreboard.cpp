@@ -1446,7 +1446,7 @@ void CCSClientScoreBoardDialog::UpdateMatchEndText()
 		wchar_t wzMatchEndCausesLabel[128], wzMatchEndCause[32];
 
 		// Time limit
-		if ( mp_timelimit.GetInt() != 0 )
+		if ( mp_timelimit.GetInt() != 0 && CSGameRules())
 		{
 			int timeTillEndOfMatch = CSGameRules()->GetMapRemainingTime();
 			bool showTime = ( timeTillEndOfMatch != -1 );

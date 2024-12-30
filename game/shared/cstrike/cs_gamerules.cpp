@@ -108,10 +108,7 @@ LINK_ENTITY_TO_CLASS(info_player_counterterrorist,CPointEntity);
 LINK_ENTITY_TO_CLASS(info_player_logo,CPointEntity);
 #endif
 
-REGISTER_GAMERULES_CLASS( CCSGameRules );
-
-
-BEGIN_NETWORK_TABLE_NOBASE( CCSGameRules, DT_CSGameRules )
+BEGIN_NETWORK_TABLE( CCSGameWorld, DT_CSGameWorld )
 	#ifdef CLIENT_DLL
 		RecvPropBool( RECVINFO( m_bFreezePeriod ) ),
 		RecvPropInt( RECVINFO( m_iRoundTime ) ),
@@ -121,7 +118,7 @@ BEGIN_NETWORK_TABLE_NOBASE( CCSGameRules, DT_CSGameRules )
 		RecvPropBool( RECVINFO( m_bMapHasBombTarget ) ),
 		RecvPropBool( RECVINFO( m_bMapHasRescueZone ) ),
 		RecvPropBool( RECVINFO( m_bLogoMap ) ),
-		RecvPropBool( RECVINFO( m_bBlackMarket ) )
+		//RecvPropBool( RECVINFO( m_bBlackMarket ) )
 	#else
 		SendPropBool( SENDINFO( m_bFreezePeriod ) ),
 		SendPropInt( SENDINFO( m_iRoundTime ), 16 ),
@@ -131,41 +128,11 @@ BEGIN_NETWORK_TABLE_NOBASE( CCSGameRules, DT_CSGameRules )
 		SendPropBool( SENDINFO( m_bMapHasBombTarget ) ),
 		SendPropBool( SENDINFO( m_bMapHasRescueZone ) ),
 		SendPropBool( SENDINFO( m_bLogoMap ) ),
-		SendPropBool( SENDINFO( m_bBlackMarket ) )
+		//SendPropBool( SENDINFO( m_bBlackMarket ) )
 	#endif
 END_NETWORK_TABLE()
 
-
-LINK_ENTITY_TO_CLASS( cs_gamerules, CCSGameRulesProxy );
-IMPLEMENT_NETWORKCLASS_ALIASED( CSGameRulesProxy, DT_CSGameRulesProxy )
-
-
-#ifdef CLIENT_DLL
-	void RecvProxy_CSGameRules( const RecvProp *pProp, void **pOut, void *pData, int objectID )
-	{
-		CCSGameRules *pRules = CSGameRules();
-		Assert( pRules );
-		*pOut = pRules;
-	}
-
-	BEGIN_RECV_TABLE( CCSGameRulesProxy, DT_CSGameRulesProxy )
-		RecvPropDataTable( "cs_gamerules_data", 0, 0, &REFERENCE_RECV_TABLE( DT_CSGameRules ), RecvProxy_CSGameRules )
-	END_RECV_TABLE()
-#else
-	void* SendProxy_CSGameRules( const SendProp *pProp, const void *pStructBase, const void *pData, CSendProxyRecipients *pRecipients, int objectID )
-	{
-		CCSGameRules *pRules = CSGameRules();
-		Assert( pRules );
-		return pRules;
-	}
-
-	BEGIN_SEND_TABLE( CCSGameRulesProxy, DT_CSGameRulesProxy )
-		SendPropDataTable( "cs_gamerules_data", 0, &REFERENCE_SEND_TABLE( DT_CSGameRules ), SendProxy_CSGameRules )
-	END_SEND_TABLE()
-#endif
-
-
-
+IMPLEMENT_NETWORKCLASS_ALIASED(CSGameWorld, DT_CSGameWorld)
 ConVar ammo_50AE_max( "ammo_50AE_max", "35", FCVAR_REPLICATED );
 ConVar ammo_762mm_max( "ammo_762mm_max", "90", FCVAR_REPLICATED );
 ConVar ammo_556mm_max( "ammo_556mm_max", "90", FCVAR_REPLICATED );
@@ -416,7 +383,7 @@ ConVar cl_autohelp(
 		FCVAR_REPLICATED,
 		"Ignore conditions which would end the current round");
 
-	ConCommand EndRound( "endround", &CCSGameRules::EndRound, "End the current round.", FCVAR_CHEAT );
+	ConCommand EndRound( "endround", &CCSGameWorld::EndRound, "End the current round.", FCVAR_CHEAT );
 
 
 	// --------------------------------------------------------------------------------------------------- //
@@ -567,10 +534,10 @@ ConVar cl_autohelp(
 	}
 
 	// --------------------------------------------------------------------------------------------------- //
-	// CCSGameRules implementation.
+	// CCSGameWorld implementation.
 	// --------------------------------------------------------------------------------------------------- //
 
-	CCSGameRules::CCSGameRules()
+	CCSGameWorld::CCSGameWorld()
 	{
 		m_iRoundTime = 0;
 		m_iRoundWinStatus = WINNER_NONE;
@@ -668,8 +635,8 @@ ConVar cl_autohelp(
 
 		ReadMultiplayCvars();
 
-		m_pPrices = NULL;
-		m_bBlackMarket = false;
+		//m_pPrices = NULL;
+		//m_bBlackMarket = false;
 		m_bDontUploadStats = false;
 
 		// Create the team managers
@@ -702,26 +669,26 @@ ConVar cl_autohelp(
 #endif
 	}
 
-	void CCSGameRules::AddPricesToTable( weeklyprice_t prices )
-	{
-		int iIndex = m_StringTableBlackMarket->FindStringIndex( "blackmarket_prices" );
+	//void CCSGameWorld::AddPricesToTable( weeklyprice_t prices )
+	//{
+	//	int iIndex = m_StringTableBlackMarket->FindStringIndex( "blackmarket_prices" );
 
-		if ( iIndex == INVALID_STRING_INDEX )
-		{
-			m_StringTableBlackMarket->AddString( CBaseEntity::IsServer(), "blackmarket_prices", sizeof( weeklyprice_t), &prices );
-		}
-		else
-		{
-			m_StringTableBlackMarket->SetStringUserData( iIndex, sizeof( weeklyprice_t), &prices );
-		}
+	//	if ( iIndex == INVALID_STRING_INDEX )
+	//	{
+	//		m_StringTableBlackMarket->AddString( CBaseEntity::IsServer(), "blackmarket_prices", sizeof( weeklyprice_t), &prices );
+	//	}
+	//	else
+	//	{
+	//		m_StringTableBlackMarket->SetStringUserData( iIndex, sizeof( weeklyprice_t), &prices );
+	//	}
 
-		SetBlackMarketPrices( false );
-	}
+	//	SetBlackMarketPrices( false );
+	//}
 
 	//-----------------------------------------------------------------------------
 	// Purpose: 
 	//-----------------------------------------------------------------------------
-	CCSGameRules::~CCSGameRules()
+	CCSGameWorld::~CCSGameWorld()
 	{
 		// Note, don't delete each team since they are in the gEntList and will 
 		// automatically be deleted from there, instead.
@@ -735,7 +702,7 @@ ConVar cl_autohelp(
 	//-----------------------------------------------------------------------------
 	// Purpose: 
 	//-----------------------------------------------------------------------------
-	void CCSGameRules::UpdateClientData( CBasePlayer *player )
+	void CCSGameWorld::UpdateClientData( CBasePlayer *player )
 	{
 	}
 
@@ -744,7 +711,7 @@ ConVar cl_autohelp(
 	// Input  :
 	// Output :
 	//-----------------------------------------------------------------------------
-	bool CCSGameRules::ClientCommand( CBaseEntity *pEdict, const CCommand &args )
+	bool CCSGameWorld::ClientCommand( CBaseEntity *pEdict, const CCommand &args )
 	{
 		CCSPlayer *pPlayer = ToCSPlayer( pEdict );
 
@@ -794,7 +761,7 @@ ConVar cl_autohelp(
 	//-----------------------------------------------------------------------------
 	// Purpose: Player has just spawned. Equip them.
 	//-----------------------------------------------------------------------------
-	void CCSGameRules::ClientCommandKeyValues( int pEntity, KeyValues *pKeyValues )
+	void CCSGameWorld::ClientCommandKeyValues( int pEntity, KeyValues *pKeyValues )
 	{
 		CCSPlayer *pPlayer = dynamic_cast< CCSPlayer * >(EntityList()->GetBaseEntity( pEntity ) );
 		if ( pPlayer )
@@ -827,7 +794,7 @@ ConVar cl_autohelp(
 	//-----------------------------------------------------------------------------
 	// Purpose: Player has just spawned. Equip them.
 	//-----------------------------------------------------------------------------
-	void CCSGameRules::PlayerSpawn( CBasePlayer *pBasePlayer )
+	void CCSGameWorld::PlayerSpawn( CBasePlayer *pBasePlayer )
 	{
 		CCSPlayer *pPlayer = ToCSPlayer( pBasePlayer );
 		if ( !pPlayer )
@@ -857,7 +824,7 @@ ConVar cl_autohelp(
 			pPlayer->GiveDefaultItems();
 	}
 
-	void CCSGameRules::BroadcastSound( const char *sound, int team )
+	void CCSGameWorld::BroadcastSound( const char *sound, int team )
 	{
 		CBroadcastRecipientFilter filter;
 		filter.MakeReliable();
@@ -882,7 +849,7 @@ ConVar cl_autohelp(
 	// the other.
 	//
 	// this algorithm was taken from the HL2 version of RadiusDamage.
-	float CCSGameRules::GetExplosionDamageAdjustment(Vector & vecSrc, Vector & vecEnd, CBaseEntity *pEntityToIgnore)
+	float CCSGameWorld::GetExplosionDamageAdjustment(Vector & vecSrc, Vector & vecEnd, CBaseEntity *pEntityToIgnore)
 	{
 		float retval = 0.0;
 		trace_t tr;
@@ -939,7 +906,7 @@ ConVar cl_autohelp(
 
 	// returns the percentage of the player that is visible from the given point in the world.
 	// return value is between 0 and 1.
-	float CCSGameRules::GetAmountOfEntityVisible(Vector & vecSrc, CBaseEntity *entity)
+	float CCSGameWorld::GetAmountOfEntityVisible(Vector & vecSrc, CBaseEntity *entity)
 	{
 		float retval = 0.0;
 
@@ -1013,13 +980,13 @@ ConVar cl_autohelp(
 		return retval;
 	}
 
-	void CCSGameRules::RadiusDamage( const CTakeDamageInfo &info, const Vector &vecSrcIn, float flRadius, int iClassIgnore, CBaseEntity * pEntityIgnore )
+	void CCSGameWorld::RadiusDamage( const CTakeDamageInfo &info, const Vector &vecSrcIn, float flRadius, int iClassIgnore, CBaseEntity * pEntityIgnore )
 	{
 		RadiusDamage( info, vecSrcIn, flRadius, iClassIgnore, false );
 	}
 
 	// Add the ability to ignore the world trace
-	void CCSGameRules::RadiusDamage( const CTakeDamageInfo &info, const Vector &vecSrcIn, float flRadius, int iClassIgnore, bool bIgnoreWorld )
+	void CCSGameWorld::RadiusDamage( const CTakeDamageInfo &info, const Vector &vecSrcIn, float flRadius, int iClassIgnore, bool bIgnoreWorld )
 	{
 		CBaseEntity *pEntity = NULL;
 		trace_t		tr;
@@ -1265,7 +1232,7 @@ ConVar cl_autohelp(
 	//			*pKiller - 
 	//			*pInflictor - 
 	//-----------------------------------------------------------------------------
-	void CCSGameRules::DeathNotice( CBasePlayer *pVictim, const CTakeDamageInfo &info )
+	void CCSGameWorld::DeathNotice( CBasePlayer *pVictim, const CTakeDamageInfo &info )
 	{
 		// Work out what killed the player, and send a message to all clients about it
 		const char *killer_weapon_name = "world";		// by default, the player is killed by the world
@@ -1356,7 +1323,7 @@ ConVar cl_autohelp(
 
 	//=========================================================
 	//=========================================================
-	void CCSGameRules::PlayerKilled( CBasePlayer *pVictim, const CTakeDamageInfo &info )
+	void CCSGameWorld::PlayerKilled( CBasePlayer *pVictim, const CTakeDamageInfo &info )
 	{
 		CBaseEntity *pInflictor = info.GetInflictor();
 		CBaseEntity *pKiller = info.GetAttacker();
@@ -1484,7 +1451,7 @@ ConVar cl_autohelp(
 	}
 
 
-	void CCSGameRules::InitDefaultAIRelationships()
+	void CCSGameWorld::InitDefaultAIRelationships()
 	{
 		//  Allocate memory for default relationships
 		CBaseCombatCharacter::AllocateDefaultRelationships();
@@ -1506,7 +1473,7 @@ ConVar cl_autohelp(
 	//------------------------------------------------------------------------------
 	// Purpose : Return classify text for classify type
 	//------------------------------------------------------------------------------
-	const char *CCSGameRules::AIClassText(int classType)
+	const char *CCSGameWorld::AIClassText(int classType)
 	{
 		switch (classType)
 		{
@@ -1523,7 +1490,7 @@ ConVar cl_autohelp(
 	//			*pWeapon - 
 	// Output : Returns true on success, false on failure.
 	//-----------------------------------------------------------------------------
-	bool CCSGameRules::FShouldSwitchWeapon( CBasePlayer *pPlayer, CBaseCombatWeapon *pWeapon )
+	bool CCSGameWorld::FShouldSwitchWeapon( CBasePlayer *pPlayer, CBaseCombatWeapon *pWeapon )
 	{
 		bool bIsBeingGivenItem = false;
 		CCSPlayer *pCSPlayer = ToCSPlayer( pPlayer );
@@ -1557,7 +1524,7 @@ ConVar cl_autohelp(
 	// Purpose: 
 	// Input  : allow - 
 	//-----------------------------------------------------------------------------
-	void CCSGameRules::SetAllowWeaponSwitch( bool allow )
+	void CCSGameWorld::SetAllowWeaponSwitch( bool allow )
 	{
 		m_bAllowWeaponSwitch = allow;
 	}
@@ -1566,7 +1533,7 @@ ConVar cl_autohelp(
 	// Purpose: 
 	// Output : Returns true on success, false on failure.
 	//-----------------------------------------------------------------------------
-	bool CCSGameRules::GetAllowWeaponSwitch()
+	bool CCSGameWorld::GetAllowWeaponSwitch()
 	{
 		return m_bAllowWeaponSwitch;
 	}
@@ -1576,14 +1543,14 @@ ConVar cl_autohelp(
 	// Input  : *pPlayer - 
 	// Output : const char
 	//-----------------------------------------------------------------------------
-	const char *CCSGameRules::SetDefaultPlayerTeam( CBasePlayer *pPlayer )
+	const char *CCSGameWorld::SetDefaultPlayerTeam( CBasePlayer *pPlayer )
 	{
 		Assert( pPlayer );
 		return BaseClass::SetDefaultPlayerTeam( pPlayer );
 	}
 
 
-	void CCSGameRules::LevelInitPreEntity()
+	void CCSGameWorld::LevelInitPreEntity()
 	{
 		BaseClass::LevelInitPreEntity();
 
@@ -1591,7 +1558,7 @@ ConVar cl_autohelp(
 	}
 
 
-	void CCSGameRules::LevelInitPostEntity()
+	void CCSGameWorld::LevelInitPostEntity()
 	{
 		BaseClass::LevelInitPostEntity();
 
@@ -1601,29 +1568,29 @@ ConVar cl_autohelp(
 		CheckMapConditions();
 	}
 	
-	INetworkStringTable *g_StringTableBlackMarket = NULL;
+	//INetworkStringTable *g_StringTableBlackMarket = NULL;
 
-	void CCSGameRules::CreateCustomNetworkStringTables( void )
-	{
-		m_StringTableBlackMarket = g_StringTableBlackMarket;
+	//void CCSGameWorld::CreateCustomNetworkStringTables( void )
+	//{
+	//	m_StringTableBlackMarket = g_StringTableBlackMarket;
 
-		if ( 0 )//mp_dynamicpricing.GetBool() )
-		{
-			m_bBlackMarket = BlackMarket_DownloadPrices();
+	//	if ( 0 )//mp_dynamicpricing.GetBool() )
+	//	{
+	//		m_bBlackMarket = BlackMarket_DownloadPrices();
 
-			if ( m_bBlackMarket == false )
-			{
-				Msg( "ERROR: mp_dynamicpricing set to 1 but couldn't download the price list!\n" );
-			}
-		}
-		else
-		{
-			m_bBlackMarket = false;
-			SetBlackMarketPrices( true );
-		}
-	}
+	//		if ( m_bBlackMarket == false )
+	//		{
+	//			Msg( "ERROR: mp_dynamicpricing set to 1 but couldn't download the price list!\n" );
+	//		}
+	//	}
+	//	else
+	//	{
+	//		m_bBlackMarket = false;
+	//		SetBlackMarketPrices( true );
+	//	}
+	//}
 
-	float CCSGameRules::FlPlayerFallDamage( CBasePlayer *pPlayer )
+	float CCSGameWorld::FlPlayerFallDamage( CBasePlayer *pPlayer )
 	{
 		float fFallVelocity = pPlayer->m_Local.m_flFallVelocity - CS_PLAYER_MAX_SAFE_FALL_SPEED;
 		float fallDamage = fFallVelocity * CS_DAMAGE_FOR_FALL_SPEED * 1.25;
@@ -1646,7 +1613,7 @@ ConVar cl_autohelp(
 	} 
 
 	
-	void CCSGameRules::ClientDisconnected( int pClient )
+	void CCSGameWorld::ClientDisconnected( int pClient )
 	{
 		BaseClass::ClientDisconnected( pClient );
 
@@ -1671,7 +1638,7 @@ ConVar cl_autohelp(
 
 
 	// Called when game rules are destroyed by CWorld
-	void CCSGameRules::LevelShutdown()
+	void CCSGameWorld::LevelShutdown()
 	{
 		int iLevelIndex = GetCSLevelIndex( STRING( gpGlobals->mapname ) );
 
@@ -1690,7 +1657,7 @@ ConVar cl_autohelp(
 	 * Check if the scenario has been won/lost.
 	 * Return true if the scenario is over, false if the scenario is still in progress
 	 */
-	bool CCSGameRules::CheckWinConditions( void )
+	bool CCSGameWorld::CheckWinConditions( void )
 	{
 		if ( mp_ignore_round_win_conditions.GetBool() )
 		{
@@ -1749,7 +1716,7 @@ ConVar cl_autohelp(
 	}
 
 
-	bool CCSGameRules::NeededPlayersCheck( bool &bNeededPlayers )
+	bool CCSGameWorld::NeededPlayersCheck( bool &bNeededPlayers )
 	{
 		// We needed players to start scoring
 		// Do we have them now?
@@ -1779,7 +1746,7 @@ ConVar cl_autohelp(
 	}
 
 
-	void CCSGameRules::InitializePlayerCounts(
+	void CCSGameWorld::InitializePlayerCounts(
 		int &NumAliveTerrorist,
 		int &NumAliveCT,
 		int &NumDeadTerrorist,
@@ -1840,7 +1807,7 @@ ConVar cl_autohelp(
 		}
 	}
 
-	bool CCSGameRules::HostageRescueRoundEndCheck( bool bNeededPlayers )
+	bool CCSGameWorld::HostageRescueRoundEndCheck( bool bNeededPlayers )
 	{
 		// Check to see if 50% of the hostages have been rescued.
 		CHostage* hostage = NULL;
@@ -1888,7 +1855,7 @@ ConVar cl_autohelp(
 	}
 
 
-	bool CCSGameRules::PrisonRoundEndCheck()
+	bool CCSGameWorld::PrisonRoundEndCheck()
 	{
 		//MIKETODO: get this working when working on prison escape
 		/*
@@ -1952,7 +1919,7 @@ ConVar cl_autohelp(
 	}
 
 
-	bool CCSGameRules::VIPRoundEndCheck( bool bNeededPlayers )
+	bool CCSGameWorld::VIPRoundEndCheck( bool bNeededPlayers )
 	{
 		if (m_iMapHasVIPSafetyZone != 1)
 			return false;
@@ -2033,7 +2000,7 @@ ConVar cl_autohelp(
 	}
 
 
-	bool CCSGameRules::BombRoundEndCheck( bool bNeededPlayers )
+	bool CCSGameWorld::BombRoundEndCheck( bool bNeededPlayers )
 	{
 		// Check to see if the bomb target was hit or the bomb defused.. if so, then let's end the round!
 		if ( ( m_bTargetBombed == true ) && ( m_bMapHasBombTarget == true ) )
@@ -2072,7 +2039,7 @@ ConVar cl_autohelp(
 	}
 
 
-	bool CCSGameRules::TeamExterminationCheck(
+	bool CCSGameWorld::TeamExterminationCheck(
 		int NumAliveTerrorist,
 		int NumAliveCT,
 		int NumDeadTerrorist,
@@ -2142,7 +2109,7 @@ ConVar cl_autohelp(
 	}
 
 
-	void CCSGameRules::PickNextVIP()
+	void CCSGameWorld::PickNextVIP()
 	{
 		// MIKETODO: work on this when getting VIP maps running.
 		/*
@@ -2235,14 +2202,14 @@ ConVar cl_autohelp(
 	}
 
 
-	void CCSGameRules::ReadMultiplayCvars()
+	void CCSGameWorld::ReadMultiplayCvars()
 	{
 		m_iRoundTime = (int)(mp_roundtime.GetFloat() * 60);
 		m_iFreezeTime = mp_freezetime.GetInt();
 	}
 
 
-	void CCSGameRules::RestartRound()
+	void CCSGameWorld::RestartRound()
 	{
 #if defined( REPLAY_ENABLED )
 		if ( g_pReplay )
@@ -2854,7 +2821,7 @@ ConVar cl_autohelp(
 		//=============================================================================
 	}
 
-	void CCSGameRules::GiveC4()
+	void CCSGameWorld::GiveC4()
 	{
 		enum {
 			ALL_TERRORISTS = 0,
@@ -2925,9 +2892,9 @@ ConVar cl_autohelp(
 		m_bBombDropped = false;
 	}
 
-	void CCSGameRules::Think()
+	void CCSGameWorld::Think()
 	{
-		CGameRules::Think();
+		CWorld::Think();
 
 		for ( int i = 0; i < GetNumberOfTeams(); i++ )
 		{
@@ -3016,14 +2983,14 @@ ConVar cl_autohelp(
 
 	// The bots do their processing after physics simulation etc so their visibility checks don't recompute
 	// bone positions multiple times a frame.
-	void CCSGameRules::EndGameFrame( void )
+	void CCSGameWorld::EndGameFrame( void )
 	{
 		TheBots->StartFrame();
 
 		BaseClass::EndGameFrame();
 	}
 
-	bool CCSGameRules::CheckGameOver()
+	bool CCSGameWorld::CheckGameOver()
 	{
 		if ( g_fGameOver )   // someone else quit the game already
 		{
@@ -3050,7 +3017,7 @@ ConVar cl_autohelp(
 		return false;
 	}
 
-	bool CCSGameRules::CheckFragLimit()
+	bool CCSGameWorld::CheckFragLimit()
 	{
 		if ( fraglimit.GetInt() <= 0 )
 			return false;
@@ -3080,7 +3047,7 @@ ConVar cl_autohelp(
 		return false;
 	}
 
-	bool CCSGameRules::CheckMaxRounds()
+	bool CCSGameWorld::CheckMaxRounds()
 	{
 		if ( mp_maxrounds.GetInt() != 0 )
 		{
@@ -3096,7 +3063,7 @@ ConVar cl_autohelp(
 	}
 
 
-	bool CCSGameRules::CheckWinLimit()
+	bool CCSGameWorld::CheckWinLimit()
 	{
 		// has one team won the specified number of rounds?
 		if ( mp_winlimit.GetInt() != 0 )
@@ -3119,7 +3086,7 @@ ConVar cl_autohelp(
 	}
 
 
-	void CCSGameRules::CheckFreezePeriodExpired()
+	void CCSGameWorld::CheckFreezePeriodExpired()
 	{
 		float startTime = m_fRoundStartTime;
 		if ( !IsFinite( startTime ) )
@@ -3213,7 +3180,7 @@ ConVar cl_autohelp(
 	}
 
 
-	void CCSGameRules::CheckRoundTimeExpired()
+	void CCSGameWorld::CheckRoundTimeExpired()
 	{
 		if ( mp_ignore_round_win_conditions.GetBool() )
 			return;
@@ -3273,7 +3240,7 @@ ConVar cl_autohelp(
 #endif
 	}
 
-	void CCSGameRules::GoToIntermission( void )
+	void CCSGameWorld::GoToIntermission( void )
 	{
 		Msg( "Going to intermission...\n" );
 
@@ -3493,7 +3460,7 @@ ConVar cl_autohelp(
 		}
 	}
 
-	void CCSGameRules::DumpTimers( void ) const
+	void CCSGameWorld::DumpTimers( void ) const
 	{
 		extern ConVar bot_join_delay;
 		CBasePlayer *player = UTIL_GetCommandClient();
@@ -3551,7 +3518,7 @@ ConVar cl_autohelp(
 
 	// living players on the given team need to be marked as not receiving any money
 	// next round.
-	void CCSGameRules::MarkLivingPlayersOnTeamAsNotReceivingMoneyNextRound(int team)
+	void CCSGameWorld::MarkLivingPlayersOnTeamAsNotReceivingMoneyNextRound(int team)
 	{
 		int playerNum;
 		for (playerNum = 1; playerNum <= gpGlobals->maxClients; ++playerNum)
@@ -3570,7 +3537,7 @@ ConVar cl_autohelp(
 	}
 
 
-	void CCSGameRules::CheckLevelInitialized( void )
+	void CCSGameWorld::CheckLevelInitialized( void )
 	{
 		if ( !m_bLevelInitialized )
 		{
@@ -3616,7 +3583,7 @@ ConVar cl_autohelp(
 		}
 	}
 
-	void CCSGameRules::ShowSpawnPoints( void )
+	void CCSGameWorld::ShowSpawnPoints( void )
 	{
 		CBaseEntity* ent = NULL;
 		
@@ -3645,7 +3612,7 @@ ConVar cl_autohelp(
 		}
 	}
 
-	void CCSGameRules::CheckRestartRound( void )
+	void CCSGameWorld::CheckRestartRound( void )
 	{
 		// Restart the game if specified by the server
 		int iRestartDelay = mp_restartgame.GetInt();
@@ -3733,7 +3700,7 @@ ConVar cl_autohelp(
 	};
 
 
-	void CCSGameRules::MoveHumansToHumanTeam( void )
+	void CCSGameWorld::MoveHumansToHumanTeam( void )
 	{
 		int targetTeam = GetHumanTeam();
 		if ( targetTeam != TEAM_TERRORIST && targetTeam != TEAM_CT )
@@ -3746,7 +3713,7 @@ ConVar cl_autohelp(
 	}
 
 
-	void CCSGameRules::BalanceTeams( void )
+	void CCSGameWorld::BalanceTeams( void )
 	{
 		int iTeamToSwap = TEAM_UNASSIGNED;
 		int iNumToSwap;
@@ -3868,7 +3835,7 @@ ConVar cl_autohelp(
 	}
 
 
-	bool CCSGameRules::TeamFull( int team_id )
+	bool CCSGameWorld::TeamFull( int team_id )
 	{
 		CheckLevelInitialized();
 
@@ -3884,7 +3851,7 @@ ConVar cl_autohelp(
 		return false;
 	}
 	
-	int CCSGameRules::GetHumanTeam()
+	int CCSGameWorld::GetHumanTeam()
 	{
 		if ( FStrEq( "CT", mp_humanteam.GetString() ) )
 		{
@@ -3898,7 +3865,7 @@ ConVar cl_autohelp(
 		return TEAM_UNASSIGNED;
 	}
 
-	int CCSGameRules::SelectDefaultTeam( bool ignoreBots /*= false*/ )
+	int CCSGameWorld::SelectDefaultTeam( bool ignoreBots /*= false*/ )
 	{
 		if ( ignoreBots && ( FStrEq( cv_bot_join_team.GetString(), "T" ) || FStrEq( cv_bot_join_team.GetString(), "CT" ) ) )
 		{
@@ -3971,7 +3938,7 @@ ConVar cl_autohelp(
 	}
 
 	//checks to see if the desired team is stacked, returns true if it is
-	bool CCSGameRules::TeamStacked( int newTeam_id, int curTeam_id  )
+	bool CCSGameWorld::TeamStacked( int newTeam_id, int curTeam_id  )
 	{
 		//players are allowed to change to their own team
 		if(newTeam_id == curTeam_id)
@@ -4023,7 +3990,7 @@ ConVar cl_autohelp(
 
 	//=========================================================
 	//=========================================================
-	bool CCSGameRules::FPlayerCanRespawn( CBasePlayer *pBasePlayer )
+	bool CCSGameWorld::FPlayerCanRespawn( CBasePlayer *pBasePlayer )
 	{
 		CCSPlayer *pPlayer = ToCSPlayer( pBasePlayer );
 		if ( !pPlayer )
@@ -4075,7 +4042,7 @@ ConVar cl_autohelp(
 		return true;
 	}
 
-	void CCSGameRules::TerminateRound(float tmDelay, int iReason )
+	void CCSGameWorld::TerminateRound(float tmDelay, int iReason )
 	{
 		variant_t emptyVariant;
 		int iWinnerTeam = WINNER_NONE;
@@ -4306,7 +4273,7 @@ ConVar cl_autohelp(
 	}
 
 	// [tj] This is where we check non-player-specific that occur at the end of the round
-	void CCSGameRules::ProcessEndOfRoundAchievements(int iWinnerTeam, int iReason)
+	void CCSGameWorld::ProcessEndOfRoundAchievements(int iWinnerTeam, int iReason)
 	{
 		if (iWinnerTeam == WINNER_CT || iWinnerTeam == WINNER_TER)
 		{
@@ -4404,7 +4371,7 @@ ConVar cl_autohelp(
 	}
 
 	//[tj] Counts the number of players in each category in the struct (dead, alive, etc...)
-	void CCSGameRules::GetPlayerCounts(TeamPlayerCounts teamCounts[TEAM_MAXCOUNT])
+	void CCSGameWorld::GetPlayerCounts(TeamPlayerCounts teamCounts[TEAM_MAXCOUNT])
 	{
 		memset(teamCounts, 0, sizeof(TeamPlayerCounts) * TEAM_MAXCOUNT);
 
@@ -4448,7 +4415,7 @@ ConVar cl_autohelp(
 	// HPE_END
 	//=============================================================================
 
-	void CCSGameRules::UpdateTeamScores()
+	void CCSGameWorld::UpdateTeamScores()
 	{
 		CTeam *pTerrorists = GetGlobalTeam( TEAM_TERRORIST );
 		CTeam *pCTs = GetGlobalTeam( TEAM_CT );
@@ -4463,7 +4430,7 @@ ConVar cl_autohelp(
 	}
 
 
-	void CCSGameRules::CheckMapConditions()
+	void CCSGameWorld::CheckMapConditions()
 	{
 		// Check to see if this map has a bomb target in it
 		if ( EntityList()->FindEntityByClassname( NULL, "func_bomb_target" ) )
@@ -4525,7 +4492,7 @@ ConVar cl_autohelp(
 	}
 
 
-	void CCSGameRules::SwapAllPlayers()
+	void CCSGameWorld::SwapAllPlayers()
 	{
 		// MOTODO we have to make sure that enought spaning points exits
 		Assert ( 0 );
@@ -4553,7 +4520,7 @@ ConVar cl_autohelp(
 		return FindInList( pStrings, pToFind );
 	}
 
-	void CCSGameRules::CleanUpMap()
+	void CCSGameWorld::CleanUpMap()
 	{
 		if (IsLogoMap())
 			return;
@@ -4665,7 +4632,7 @@ ConVar cl_autohelp(
 	}
 
 
-	bool CCSGameRules::IsThereABomber()
+	bool CCSGameWorld::IsThereABomber()
 	{
 		for ( int i = 1; i <= gpGlobals->maxClients; i++ )
 		{
@@ -4686,13 +4653,13 @@ ConVar cl_autohelp(
 	}
 
 
-	void CCSGameRules::EndRound()
+	void CCSGameWorld::EndRound()
 	{
 		// fake a round end
 		CSGameRules()->TerminateRound( 0.0f, Round_Draw );
 	}
 
-	CBaseEntity *CCSGameRules::GetPlayerSpawnSpot( CBasePlayer *pPlayer )
+	CBaseEntity *CCSGameWorld::GetPlayerSpawnSpot( CBasePlayer *pPlayer )
 	{
 		// gat valid spwan point
 		CBaseEntity *pSpawnSpot = pPlayer->EntSelectSpawnPoint();
@@ -4708,7 +4675,7 @@ ConVar cl_autohelp(
 	}
 	
 	// checks if the spot is clear of players
-	bool CCSGameRules::IsSpawnPointValid( CBaseEntity *pSpot, CBasePlayer *pPlayer )
+	bool CCSGameWorld::IsSpawnPointValid( CBaseEntity *pSpot, CBasePlayer *pPlayer )
 	{
 		if ( !pSpot->IsTriggered( pPlayer ) )
 		{
@@ -4726,7 +4693,7 @@ ConVar cl_autohelp(
 	}
 
 
-	bool CCSGameRules::IsThereABomb()
+	bool CCSGameWorld::IsThereABomb()
 	{
 		bool bBombFound = false;
 
@@ -4744,7 +4711,7 @@ ConVar cl_autohelp(
 		return bBombFound;
 	}
 
-	void CCSGameRules::HostageTouched()
+	void CCSGameWorld::HostageTouched()
 	{
 		if( gpGlobals->curtime > m_flNextHostageAnnouncement && m_iRoundWinStatus == WINNER_NONE )
 		{
@@ -4753,17 +4720,17 @@ ConVar cl_autohelp(
 		}		
 	}
 
-	void CCSGameRules::CreateStandardEntities()
+	void CCSGameWorld::CreateStandardEntities()
 	{
 		// Create the player resource
 		g_pPlayerResource = (CPlayerResource*)CBaseEntity::Create( "cs_player_manager", vec3_origin, vec3_angle );
 	
 		// Create the entity that will send our data to the client.
-#ifdef DBGFLAG_ASSERT
-		CBaseEntity *pEnt = 
-#endif
-			CBaseEntity::Create( "cs_gamerules", vec3_origin, vec3_angle );
-		Assert( pEnt );
+//#ifdef DBGFLAG_ASSERT
+//		CBaseEntity *pEnt = 
+//#endif
+//			CBaseEntity::Create( "cs_gamerules", vec3_origin, vec3_angle );
+//		Assert( pEnt );
 	}
 
 #define MY_USHRT_MAX	0xffff
@@ -4786,14 +4753,14 @@ bool DataHasChanged( void )
 	return false;
 }
 
-void CCSGameRules::UploadGameStats( void )
+void CCSGameWorld::UploadGameStats( void )
 {
 	g_flGameStatsUpdateTime -= gpGlobals->curtime;
 
 	if ( g_flGameStatsUpdateTime > 0 )
 		return;
 
-	if ( IsBlackMarket() == false )
+	//if ( IsBlackMarket() == false )
 		return;
 
 	if ( m_bDontUploadStats == true )
@@ -4876,7 +4843,7 @@ void CCSGameRules::UploadGameStats( void )
 }
 #endif	// CLIENT_DLL
 
-CBaseCombatWeapon *CCSGameRules::GetNextBestWeapon( CBaseCombatCharacter *pPlayer, CBaseCombatWeapon *pCurrentWeapon )
+CBaseCombatWeapon *CCSGameWorld::GetNextBestWeapon( CBaseCombatCharacter *pPlayer, CBaseCombatWeapon *pCurrentWeapon )
 {
 	CBaseCombatWeapon *bestWeapon = NULL;
 
@@ -4917,7 +4884,7 @@ CBaseCombatWeapon *CCSGameRules::GetNextBestWeapon( CBaseCombatCharacter *pPlaye
 	return bestWeapon;
 }
 
-float CCSGameRules::GetMapRemainingTime()
+float CCSGameWorld::GetMapRemainingTime()
 {
 #ifdef GAME_DLL
 	if ( nextlevel.GetString() && *nextlevel.GetString() )
@@ -4940,29 +4907,29 @@ float CCSGameRules::GetMapRemainingTime()
 	return flTimeLeft;
 }
 
-float CCSGameRules::GetMapElapsedTime( void )
+float CCSGameWorld::GetMapElapsedTime( void )
 {
 	return gpGlobals->curtime;
 }
 
-float CCSGameRules::GetRoundRemainingTime()
+float CCSGameWorld::GetRoundRemainingTime()
 {
 	return (float) (m_fRoundStartTime + m_iRoundTime) - gpGlobals->curtime; 
 }
 
-float CCSGameRules::GetRoundStartTime()
+float CCSGameWorld::GetRoundStartTime()
 {
 	return m_fRoundStartTime;
 }
 
 
-float CCSGameRules::GetRoundElapsedTime()
+float CCSGameWorld::GetRoundElapsedTime()
 {
 	return gpGlobals->curtime - m_fRoundStartTime;
 }
 
 
-bool CCSGameRules::ShouldCollide( int collisionGroup0, int collisionGroup1 )
+bool CCSGameWorld::ShouldCollide( int collisionGroup0, int collisionGroup1 )
 {
 	if ( collisionGroup0 > collisionGroup1 )
 	{
@@ -4996,50 +4963,50 @@ bool CCSGameRules::ShouldCollide( int collisionGroup0, int collisionGroup1 )
 }
 
 
-bool CCSGameRules::IsFreezePeriod()
+bool CCSGameWorld::IsFreezePeriod()
 {
 	return m_bFreezePeriod;
 }
 
 
-bool CCSGameRules::IsVIPMap() const
+bool CCSGameWorld::IsVIPMap() const
 {
 	//MIKETODO: VIP mode
 	return false;
 }
 
 
-bool CCSGameRules::IsBombDefuseMap() const
+bool CCSGameWorld::IsBombDefuseMap() const
 {
 	return m_bMapHasBombTarget;
 }
 
-bool CCSGameRules::IsHostageRescueMap() const
+bool CCSGameWorld::IsHostageRescueMap() const
 {
 	return m_bMapHasRescueZone;
 }
 
-bool CCSGameRules::IsLogoMap() const
+bool CCSGameWorld::IsLogoMap() const
 {
 	return m_bLogoMap;
 }
 
-float CCSGameRules::GetBuyTimeLength() const
+float CCSGameWorld::GetBuyTimeLength() const
 {
 	return ( mp_buytime.GetFloat() * 60 );
 }
 
-bool CCSGameRules::IsBuyTimeElapsed()
+bool CCSGameWorld::IsBuyTimeElapsed()
 {
 	return ( GetRoundElapsedTime() > GetBuyTimeLength() );
 }
 
-int CCSGameRules::DefaultFOV()
+int CCSGameWorld::DefaultFOV()
 {
 	return 90;
 }
 
-const CViewVectors* CCSGameRules::GetViewVectors() const
+const CViewVectors* CCSGameWorld::GetViewVectors() const
 {
 	return &g_CSViewVectors;
 }
@@ -5108,7 +5075,7 @@ CAmmoDef* GetAmmoDef()
 }
 
 #ifndef CLIENT_DLL
-const char *CCSGameRules::GetChatPrefix( bool bTeamOnly, CBasePlayer *pPlayer )
+const char *CCSGameWorld::GetChatPrefix( bool bTeamOnly, CBasePlayer *pPlayer )
 {
 	const char *pszPrefix = NULL;
 
@@ -5172,7 +5139,7 @@ const char *CCSGameRules::GetChatPrefix( bool bTeamOnly, CBasePlayer *pPlayer )
 	return pszPrefix;
 }
 
-const char *CCSGameRules::GetChatLocation( bool bTeamOnly, CBasePlayer *pPlayer )
+const char *CCSGameWorld::GetChatLocation( bool bTeamOnly, CBasePlayer *pPlayer )
 {
 	if ( !pPlayer )  // dedicated server output
 	{
@@ -5193,7 +5160,7 @@ const char *CCSGameRules::GetChatLocation( bool bTeamOnly, CBasePlayer *pPlayer 
 	return pPlayer->GetLastKnownPlaceName();
 }
 
-const char *CCSGameRules::GetChatFormat( bool bTeamOnly, CBasePlayer *pPlayer )
+const char *CCSGameWorld::GetChatFormat( bool bTeamOnly, CBasePlayer *pPlayer )
 {
 	if ( !pPlayer )  // dedicated server output
 	{
@@ -5271,7 +5238,7 @@ const char *CCSGameRules::GetChatFormat( bool bTeamOnly, CBasePlayer *pPlayer )
 	return pszFormat;
 }
 
-void CCSGameRules::ClientSettingsChanged( CBasePlayer *pPlayer )
+void CCSGameWorld::ClientSettingsChanged( CBasePlayer *pPlayer )
 {
 	const char *pszNewName = engine->GetClientConVarValue( pPlayer->entindex(), "name" );
 	const char *pszOldName = pPlayer->GetPlayerName();
@@ -5292,12 +5259,12 @@ void CCSGameRules::ClientSettingsChanged( CBasePlayer *pPlayer )
 	}
 }
 
-bool CCSGameRules::FAllowNPCs( void )
+bool CCSGameWorld::FAllowNPCs( void )
 {
 	return false;
 }
 
-bool CCSGameRules::IsFriendlyFireOn( void )
+bool CCSGameWorld::IsFriendlyFireOn( void )
 {
 	return friendlyfire.GetBool();
 }
@@ -5392,17 +5359,17 @@ CON_COMMAND_F( map_setbombradius, "Sets the bomb radius for the map.", FCVAR_CHE
 	map_showbombradius( args );
 }
 
-void CreateBlackMarketString( void )
-{
-	g_StringTableBlackMarket = networkstringtable->CreateStringTable( "BlackMarketTable" , 1 );
-}
+//void CreateBlackMarketString( void )
+//{
+//	g_StringTableBlackMarket = networkstringtable->CreateStringTable( "BlackMarketTable" , 1 );
+//}
 
-int CCSGameRules::GetStartMoney( void )
+int CCSGameWorld::GetStartMoney( void )
 {
-	if ( IsBlackMarket() )
-	{
-		return atoi( mp_startmoney.GetDefault() );
-	}
+	//if ( IsBlackMarket() )
+	//{
+	//	return atoi( mp_startmoney.GetDefault() );
+	//}
 
 	return mp_startmoney.GetInt();
 }
@@ -5418,7 +5385,7 @@ int CCSGameRules::GetStartMoney( void )
 //-----------------------------------------------------------------------------
 // Purpose: Called when a player joins the game after it's started yet can still spawn in
 //-----------------------------------------------------------------------------
-void CCSGameRules::SpawningLatePlayer( CCSPlayer* pLatePlayer )
+void CCSGameWorld::SpawningLatePlayer( CCSPlayer* pLatePlayer )
 {
 	//Reset the round kills number of enemies for the opposite team
 	for ( int i = 1; i <= gpGlobals->maxClients; i++ )
@@ -5445,7 +5412,7 @@ void CCSGameRules::SpawningLatePlayer( CCSPlayer* pLatePlayer )
 // when players cannot purchase anything primary weapons
 //=============================================================================
 
-bool CCSGameRules::IsPistolRound()
+bool CCSGameWorld::IsPistolRound()
 {
 	return m_iTotalRoundsPlayed == 0 && GetStartMoney() <= 800;
 }
@@ -5460,7 +5427,7 @@ bool CCSGameRules::IsPistolRound()
 // [menglish]
 //=============================================================================
 
-void CCSGameRules::PlayerTookDamage(CCSPlayer* player, const CTakeDamageInfo &damageInfo)
+void CCSGameWorld::PlayerTookDamage(CCSPlayer* player, const CTakeDamageInfo &damageInfo)
 {
 	CBaseEntity *pInflictor = damageInfo.GetInflictor();
 	CBaseEntity *pAttacker = damageInfo.GetAttacker();
@@ -5492,7 +5459,7 @@ void CCSGameRules::PlayerTookDamage(CCSPlayer* player, const CTakeDamageInfo &da
 //=============================================================================
 #endif
 
-bool CCSGameRules::IsConnectedUserInfoChangeAllowed( CBasePlayer *pPlayer )
+bool CCSGameWorld::IsConnectedUserInfoChangeAllowed( CBasePlayer *pPlayer )
 {
 #ifdef GAME_DLL
 	if( pPlayer )
@@ -5536,7 +5503,7 @@ convar_tags_t convars_to_check_for_tags[] =
 //-----------------------------------------------------------------------------
 // Purpose: Engine asks for the list of convars that should tag the server
 //-----------------------------------------------------------------------------
-void CCSGameRules::GetTaggedConVarList( KeyValues *pCvarTagList )
+void CCSGameWorld::GetTaggedConVarList( KeyValues *pCvarTagList )
 {
 	BaseClass::GetTaggedConVarList( pCvarTagList );
 
@@ -5553,58 +5520,58 @@ void CCSGameRules::GetTaggedConVarList( KeyValues *pCvarTagList )
 #endif
 
 
-int CCSGameRules::GetBlackMarketPriceForWeapon( int iWeaponID )
-{
-	if ( m_pPrices == NULL )
-	{
-		GetBlackMarketPriceList();
-	}
+//int CCSGameWorld::GetBlackMarketPriceForWeapon( int iWeaponID )
+//{
+//	if ( m_pPrices == NULL )
+//	{
+//		GetBlackMarketPriceList();
+//	}
+//
+//	if ( m_pPrices )
+//		return m_pPrices->iCurrentPrice[iWeaponID];
+//	else
+//		return 0;
+//}
 
-	if ( m_pPrices )
-		return m_pPrices->iCurrentPrice[iWeaponID];
-	else
-		return 0;
-}
+//int CCSGameWorld::GetBlackMarketPreviousPriceForWeapon( int iWeaponID )
+//{
+//	if ( m_pPrices == NULL )
+//	{
+//		GetBlackMarketPriceList();
+//	}
+//
+//	if ( m_pPrices )
+//		return m_pPrices->iPreviousPrice[iWeaponID];
+//	else
+//		return 0;
+//}
 
-int CCSGameRules::GetBlackMarketPreviousPriceForWeapon( int iWeaponID )
-{
-	if ( m_pPrices == NULL )
-	{
-		GetBlackMarketPriceList();
-	}
+//const weeklyprice_t *CCSGameWorld::GetBlackMarketPriceList( void )
+//{
+//	if ( m_StringTableBlackMarket == NULL )
+//	{
+//		m_StringTableBlackMarket = networkstringtable->FindTable( CS_GAMERULES_BLACKMARKET_TABLE_NAME);
+//	}
+//
+//	if ( m_pPrices == NULL )
+//	{
+//		int iSize = 0;
+//		INetworkStringTable *pTable = m_StringTableBlackMarket;
+//		if ( pTable && pTable->GetNumStrings() > 0 )
+//		{
+//			m_pPrices = (const weeklyprice_t *)pTable->GetStringUserData( 0, &iSize );
+//		}
+//	}
+//
+//	if ( m_pPrices )
+//	{
+//		PrepareEquipmentInfo();
+//	}
+//	
+//	return m_pPrices;
+//}
 
-	if ( m_pPrices )
-		return m_pPrices->iPreviousPrice[iWeaponID];
-	else
-		return 0;
-}
-
-const weeklyprice_t *CCSGameRules::GetBlackMarketPriceList( void )
-{
-	if ( m_StringTableBlackMarket == NULL )
-	{
-		m_StringTableBlackMarket = networkstringtable->FindTable( CS_GAMERULES_BLACKMARKET_TABLE_NAME);
-	}
-
-	if ( m_pPrices == NULL )
-	{
-		int iSize = 0;
-		INetworkStringTable *pTable = m_StringTableBlackMarket;
-		if ( pTable && pTable->GetNumStrings() > 0 )
-		{
-			m_pPrices = (const weeklyprice_t *)pTable->GetStringUserData( 0, &iSize );
-		}
-	}
-
-	if ( m_pPrices )
-	{
-		PrepareEquipmentInfo();
-	}
-	
-	return m_pPrices;
-}
-
-void CCSGameRules::SetBlackMarketPrices( bool bSetDefaults )
+void CCSGameWorld::SetBlackMarketPrices( bool bSetDefaults )
 {
 	for ( int i = 1; i < WEAPON_MAX; i++ )
 	{
@@ -5618,8 +5585,8 @@ void CCSGameRules::SetBlackMarketPrices( bool bSetDefaults )
 
 		if ( bSetDefaults == false )
 		{
-			info->SetWeaponPrice( GetBlackMarketPriceForWeapon( i ) );
-			info->SetPreviousPrice( GetBlackMarketPreviousPriceForWeapon( i ) );
+			//info->SetWeaponPrice( GetBlackMarketPriceForWeapon( i ) );
+			//info->SetPreviousPrice( GetBlackMarketPreviousPriceForWeapon( i ) );
 		}
 		else
 		{
@@ -5630,31 +5597,31 @@ void CCSGameRules::SetBlackMarketPrices( bool bSetDefaults )
 
 #ifdef CLIENT_DLL
 
-CCSGameRules::CCSGameRules()
+CCSGameWorld::CCSGameWorld()
 {
-	CSGameRules()->m_StringTableBlackMarket = NULL;
-	m_pPrices = NULL;
-	m_bBlackMarket = false;
+	//CSGameRules()->m_StringTableBlackMarket = NULL;
+	//m_pPrices = NULL;
+	//m_bBlackMarket = false;
 }
 
-void TestTable( void )
-{
-	CSGameRules()->m_StringTableBlackMarket = networkstringtable->FindTable( CS_GAMERULES_BLACKMARKET_TABLE_NAME);
-
-	if ( CSGameRules()->m_StringTableBlackMarket == NULL )
-		return;
-
-	int iIndex = CSGameRules()->m_StringTableBlackMarket->FindStringIndex( "blackmarket_prices" );
-	int iSize = 0;
-
-	const weeklyprice_t *pPrices = NULL;
-	
-	pPrices = (const weeklyprice_t *)(CSGameRules()->m_StringTableBlackMarket)->GetStringUserData( iIndex, &iSize );
-}
-
-#ifdef DEBUG
-ConCommand cs_testtable( "cs_testtable", TestTable );
-#endif
+//void TestTable( void )
+//{
+//	CSGameRules()->m_StringTableBlackMarket = networkstringtable->FindTable( CS_GAMERULES_BLACKMARKET_TABLE_NAME);
+//
+//	if ( CSGameRules()->m_StringTableBlackMarket == NULL )
+//		return;
+//
+//	int iIndex = CSGameRules()->m_StringTableBlackMarket->FindStringIndex( "blackmarket_prices" );
+//	int iSize = 0;
+//
+//	const weeklyprice_t *pPrices = NULL;
+//	
+//	pPrices = (const weeklyprice_t *)(CSGameRules()->m_StringTableBlackMarket)->GetStringUserData( iIndex, &iSize );
+//}
+//
+//#ifdef DEBUG
+//ConCommand cs_testtable( "cs_testtable", TestTable );
+//#endif
 
 //-----------------------------------------------------------------------------
 // Enforce certain values on the specified convar.

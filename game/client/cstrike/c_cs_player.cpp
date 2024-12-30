@@ -1371,17 +1371,17 @@ void C_CSPlayer::OnDataChanged( DataUpdateType_t type )
 	{
 		SetNextClientThink( CLIENT_THINK_ALWAYS );
 
-		if ( IsLocalPlayer() )
-		{
-			if ( CSGameRules() && CSGameRules()->IsBlackMarket() )
-			{
-				CSGameRules()->m_pPrices = NULL;
-				CSGameRules()->m_StringTableBlackMarket = NULL;
-				CSGameRules()->GetBlackMarketPriceList();
+		//if ( IsLocalPlayer() )
+		//{
+		//	if ( CSGameRules() && CSGameRules()->IsBlackMarket() )
+		//	{
+		//		CSGameRules()->m_pPrices = NULL;
+		//		CSGameRules()->m_StringTableBlackMarket = NULL;
+		//		CSGameRules()->GetBlackMarketPriceList();
 
-				CSGameRules()->SetBlackMarketPrices( false );
-			}
-		}
+		//		CSGameRules()->SetBlackMarketPrices( false );
+		//	}
+		//}
 	}
 
 	UpdateVisibility();

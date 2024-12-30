@@ -166,23 +166,23 @@ void GameStartFrame( void )
 //=========================================================
 void InstallGameRules()
 {
-	if ( !gpGlobals->deathmatch )
-	{
-		CreateGameRulesObject( "CPortalGameRules" );
-		return;
-	}
-	else
-	{
-		if ( teamplay.GetInt() > 0 )
-		{
-			// teamplay
-			CreateGameRulesObject( "CTeamplayRules" );
-		}
-		else
-		{
-			// vanilla deathmatch
-			CreateGameRulesObject( "CMultiplayRules" );
-		}
-	}
+	//if ( !gpGlobals->deathmatch )
+	//{
+	//	CreateGameRulesObject( "CPortalGameRules" );
+	//	return;
+	//}
+	//else
+	//{
+	//	if ( teamplay.GetInt() > 0 )
+	//	{
+	//		// teamplay
+	//		CreateGameRulesObject( "CTeamplayRules" );
+	//	}
+	//	else
+	//	{
+	//		// vanilla deathmatch
+	//		CreateGameRulesObject( "CMultiplayRules" );
+	//	}
+	//}
 }
 

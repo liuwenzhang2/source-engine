@@ -58,6 +58,11 @@
 #include <util_shared.h>
 #include "cdll_util.h"
 
+extern IClientGameRules* g_pGameRules;
+inline IClientGameRules* GameRules() {
+	return g_pGameRules;
+}
+
 abstract_class C_BaseEntityClassList
 {
 public:

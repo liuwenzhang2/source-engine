@@ -99,7 +99,7 @@ bool CHudRoundTimer::ShouldDraw()
 
 void CHudRoundTimer::Think()
 {
-	C_CSGameRules *pRules = CSGameRules();
+	C_CSGameWorld *pRules = CSGameRules();
 	if ( !pRules )
 		return;
 
@@ -195,7 +195,7 @@ void CHudRoundTimer::Think()
 void CHudRoundTimer::Paint()
 {
 	// Update the time.
-	C_CSGameRules *pRules = CSGameRules();
+	C_CSGameWorld *pRules = CSGameRules();
 	if ( !pRules )
 		return;
 

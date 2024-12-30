@@ -307,7 +307,7 @@ public:
 		m_pOuter = NULL;
 	}
 
-	void Init(CBaseEntity* pOuter) {
+	virtual void Init(CBaseEntity* pOuter) {
 		m_pOuter = pOuter;
 		m_PVSInfo.m_nClusterCount = 0;
 		m_bPVSInfoDirty = true;
@@ -1849,16 +1849,10 @@ inline matrix3x4_t& CEngineObjectInternal::GetBoneForWrite(int iBone)
 class CEngineWorldInternal : public CEngineObjectInternal, public IEngineWorldServer {
 public:
 	DECLARE_CLASS(CEngineWorldInternal, CEngineObjectInternal);
-	CEngineWorldInternal(IServerEntityList* pServerEntityList, int iForceEdictIndex, int iSerialNum)
-		:CEngineObjectInternal(pServerEntityList, iForceEdictIndex, iSerialNum)
-	{
+	CEngineWorldInternal(IServerEntityList* pServerEntityList, int iForceEdictIndex, int iSerialNum);
+	~CEngineWorldInternal();
 
-	}
-
-	~CEngineWorldInternal() {
-
-	}
-
+	void Init(CBaseEntity* pOuter);
 	bool IsWorld() { return true; }
 	CEngineWorldInternal* AsEngineWorld() { return this; }
 	const CEngineWorldInternal* AsEngineWorld() const { return this; }
@@ -4106,6 +4100,7 @@ private:
 	int		m_lastcheck;
 	float	m_lastchecktime;
 	bool	m_bClientPVSIsExpanded;
+	IServerGameRules* m_pGameRules = NULL;
 };
 
 template<class T>
@@ -4209,12 +4204,20 @@ void CGlobalEntityList<T>::LevelInitPreEntity()
 	m_lastcheck = 1;
 	m_lastchecktime = -1;
 	m_bClientPVSIsExpanded = false;
+	if (!m_pGameRules) {
+		Error("m_pGameRules not inited!\n");
+	}
+	m_pGameRules->LevelInitPreEntity();
 }
 
 template<class T>
 void CGlobalEntityList<T>::LevelInitPostEntity()
 {
 	m_bPaused = false;
+	if (!m_pGameRules) {
+		Error("m_pGameRules not inited!\n");
+	}
+	m_pGameRules->LevelInitPostEntity();
 }
 
 // The level is shutdown in two parts
@@ -4224,6 +4227,10 @@ void CGlobalEntityList<T>::LevelShutdownPreEntity()
 	if (!m_pPhysenv)
 		return;
 	m_pPhysenv->SetQuickDelete(true);
+	if (!m_pGameRules) {
+		Error("m_pGameRules not inited!\n");
+	}
+	m_pGameRules->LevelShutdownPreEntity();
 }
 
 template<class T>
@@ -4468,7 +4475,10 @@ void CGlobalEntityList<T>::PhysFrame(float deltaTime)
 template<class T>
 void CGlobalEntityList<T>::FrameUpdatePreEntityThink()
 {
-	
+	if (!m_pGameRules) {
+		Error("m_pGameRules not inited!\n");
+	}
+	m_pGameRules->FrameUpdatePreEntityThink();
 }
 
 template<class T>
@@ -4501,7 +4511,10 @@ void CGlobalEntityList<T>::FrameUpdatePostEntityThink()
 	else {
 		PhysFrame(interval);
 	}
-
+	if (!m_pGameRules) {
+		Error("m_pGameRules not inited!\n");
+	}
+	m_pGameRules->FrameUpdatePostEntityThink();
 }
 
 template<class T>
@@ -5985,6 +5998,9 @@ void CGlobalEntityList<T>::Clear(void)
 		T* ent = GetBaseEntityFromHandle(hCur);
 		if (ent)
 		{
+			if (ent->entindex() == 0) {
+				int aaa = 0;
+			}
 			MDLCACHE_CRITICAL_SECTION();
 			// Force UpdateOnRemove to be called
 			DestroyEntity(ent);

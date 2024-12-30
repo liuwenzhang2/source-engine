@@ -204,10 +204,10 @@ int CCollisionEvent::ShouldCollide_2(IPhysicsObject* pObj0, IPhysicsObject* pObj
 		return 1;
 	}
 	// Obey collision group rules
-	Assert(GameRules());
-	if (GameRules())
+	Assert(g_pGameRules);
+	if (g_pGameRules)
 	{
-		if (!GameRules()->ShouldCollide(pEntity0->GetEngineObject()->GetCollisionGroup(), pEntity1->GetEngineObject()->GetCollisionGroup()))
+		if (!g_pGameRules->ShouldCollide(pEntity0->GetEngineObject()->GetCollisionGroup(), pEntity1->GetEngineObject()->GetCollisionGroup()))
 			return 0;
 	}
 
@@ -8905,6 +8905,26 @@ bool C_EngineObjectInternal::PhysModelParseSolidByIndex(solid_t& solid, int soli
 void C_EngineObjectInternal::PhysForceClearVelocity(IPhysicsObject* pPhys)
 {
 	::PhysForceClearVelocity(pPhys);
+}
+
+C_EngineWorldInternal::C_EngineWorldInternal(IClientEntityList* pClientEntityList, int iForceEdictIndex, int iSerialNum)
+	:C_EngineObjectInternal(pClientEntityList, iForceEdictIndex, iSerialNum)
+{
+
+}
+
+C_EngineWorldInternal::~C_EngineWorldInternal() 
+{
+	g_EntityList.m_pGameRules = NULL;
+}
+
+void C_EngineWorldInternal::Init(C_BaseEntity* pOuter)
+{
+	BaseClass::Init(pOuter);
+	g_EntityList.m_pGameRules = dynamic_cast<IClientGameRules*>(pOuter);
+	if (!g_EntityList.m_pGameRules) {
+		Error("C_World does implement IGameRiles!\n");
+	}
 }
 
 //-----------------------------------------------------------------------------

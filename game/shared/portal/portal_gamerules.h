@@ -24,29 +24,17 @@
 #include "hl2_gamerules.h"
 
 #ifdef CLIENT_DLL
-	#define CPortalGameRules C_PortalGameRules
-	#define CPortalGameRulesProxy C_PortalGameRulesProxy
+	#define CPortalGameWorld C_PortalGameWorld
 #endif
 
 #if defined ( CLIENT_DLL )
 #include "steam/steam_api.h"
 #endif
 
-
-class CPortalGameRulesProxy : public CGameRulesProxy
+class CPortalGameWorld : public CHalfLife2World
 {
 public:
-	DECLARE_CLASS( CPortalGameRulesProxy, CGameRulesProxy );
-	DECLARE_NETWORKCLASS();
-};
-
-
-class CPortalGameRules : public CHalfLife2
-{
-public:
-	DECLARE_CLASS( CPortalGameRules, CSingleplayRules );
-
-	virtual bool	Init();
+	DECLARE_CLASS(CPortalGameWorld, CHalfLife2World);
 	
 	virtual bool	ShouldCollide( int collisionGroup0, int collisionGroup1 );
 	virtual bool	ShouldUseRobustRadiusDamage(CBaseEntity *pEntity);
@@ -65,14 +53,14 @@ private:
 
 #ifdef CLIENT_DLL
 
-	DECLARE_CLIENTCLASS_NOBASE(); // This makes datatables able to access our private vars.
+	DECLARE_CLIENTCLASS(); // This makes datatables able to access our private vars.
 
 #else
 
-	DECLARE_SERVERCLASS_NOBASE(); // This makes datatables able to access our private vars.
+	DECLARE_SERVERCLASS(); // This makes datatables able to access our private vars.
 
-	CPortalGameRules();
-	virtual ~CPortalGameRules() {}
+	CPortalGameWorld();
+	virtual ~CPortalGameWorld() {}
 
 	virtual void			Think( void );
 
@@ -107,9 +95,9 @@ private:
 //-----------------------------------------------------------------------------
 // Gets us at the Half-Life 2 game rules
 //-----------------------------------------------------------------------------
-inline CPortalGameRules* PortalGameRules()
+inline CPortalGameWorld* PortalGameRules()
 {
-	return static_cast<CPortalGameRules*>(g_pGameRules);
+	return (CPortalGameWorld*)EntityList()->GetBaseEntity(0);
 }
 
 #endif // PORTAL_GAMERULES_H

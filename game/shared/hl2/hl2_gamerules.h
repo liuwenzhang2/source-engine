@@ -15,23 +15,13 @@
 #include "hl2_shareddefs.h"
 
 #ifdef CLIENT_DLL
-	#define CHalfLife2 C_HalfLife2
-	#define CHalfLife2Proxy C_HalfLife2Proxy
+	#define CHalfLife2World C_HalfLife2World
 #endif
 
-
-class CHalfLife2Proxy : public CGameRulesProxy
+class CHalfLife2World : public CSingleplayWorld
 {
 public:
-	DECLARE_CLASS( CHalfLife2Proxy, CGameRulesProxy );
-	DECLARE_NETWORKCLASS();
-};
-
-
-class CHalfLife2 : public CSingleplayRules
-{
-public:
-	DECLARE_CLASS( CHalfLife2, CSingleplayRules );
+	DECLARE_CLASS(CHalfLife2World, CSingleplayWorld);
 
 	// Damage Query Overrides.
 	virtual bool			Damage_IsTimeBased( int iDmgType );
@@ -53,14 +43,14 @@ private:
 
 #ifdef CLIENT_DLL
 
-	DECLARE_CLIENTCLASS_NOBASE(); // This makes datatables able to access our private vars.
+	DECLARE_CLIENTCLASS(); // This makes datatables able to access our private vars.
 
 #else
 
-	DECLARE_SERVERCLASS_NOBASE(); // This makes datatables able to access our private vars.
+	DECLARE_SERVERCLASS(); // This makes datatables able to access our private vars.
 
-	CHalfLife2();
-	virtual ~CHalfLife2() {}
+	CHalfLife2World();
+	virtual ~CHalfLife2World() {}
 
 	virtual void			Think( void );
 
@@ -104,13 +94,9 @@ private:
 //-----------------------------------------------------------------------------
 // Gets us at the Half-Life 2 game rules
 //-----------------------------------------------------------------------------
-inline CHalfLife2* HL2GameRules()
+inline CHalfLife2World* HL2GameRules()
 {
-#if ( !defined( HL2_DLL ) && !defined( HL2_CLIENT_DLL ) ) || defined( HL2MP )
-	Assert( 0 );	// g_pGameRules is NOT an instance of CHalfLife2 and bad things happen
-#endif
-
-	return static_cast<CHalfLife2*>(g_pGameRules);
+	return (CHalfLife2World*)EntityList()->GetBaseEntity(0);
 }
 
 

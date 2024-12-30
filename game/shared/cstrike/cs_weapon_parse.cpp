@@ -97,46 +97,46 @@ WeaponNameInfo s_weaponNameInfo[] =
 
 CCSWeaponInfo g_EquipmentInfo[MAX_EQUIPMENT];
 
-void PrepareEquipmentInfo( void )
-{
-    // MoeMod : dont use memset here
-    for(int i = 0; i < MAX_EQUIPMENT; ++i)
-        g_EquipmentInfo[i] = {};
-
-	g_EquipmentInfo[2].SetWeaponPrice( CSGameRules()->GetBlackMarketPriceForWeapon( WEAPON_KEVLAR ) );
-	g_EquipmentInfo[2].SetDefaultPrice( KEVLAR_PRICE );
-	g_EquipmentInfo[2].SetPreviousPrice( CSGameRules()->GetBlackMarketPreviousPriceForWeapon( WEAPON_KEVLAR ) );
-	g_EquipmentInfo[2].m_iTeam = TEAM_UNASSIGNED;
-	Q_strcpy( g_EquipmentInfo[2].szClassName, "weapon_vest" );
-
-#ifdef CLIENT_DLL
-	g_EquipmentInfo[2].iconActive = new CHudTexture;
-	g_EquipmentInfo[2].iconActive->cCharacterInFont = 't';
-#endif
-
-	g_EquipmentInfo[1].SetWeaponPrice( CSGameRules()->GetBlackMarketPriceForWeapon( WEAPON_ASSAULTSUIT ) );
-	g_EquipmentInfo[1].SetDefaultPrice( ASSAULTSUIT_PRICE );
-	g_EquipmentInfo[1].SetPreviousPrice( CSGameRules()->GetBlackMarketPreviousPriceForWeapon( WEAPON_ASSAULTSUIT ) );
-	g_EquipmentInfo[1].m_iTeam = TEAM_UNASSIGNED;
-	Q_strcpy( g_EquipmentInfo[1].szClassName, "weapon_vesthelm" );
-
-#ifdef CLIENT_DLL
-	g_EquipmentInfo[1].iconActive = new CHudTexture;
-	g_EquipmentInfo[1].iconActive->cCharacterInFont = 'u';
-#endif
-
-	g_EquipmentInfo[0].SetWeaponPrice( CSGameRules()->GetBlackMarketPriceForWeapon( WEAPON_NVG ) );
-	g_EquipmentInfo[0].SetPreviousPrice( CSGameRules()->GetBlackMarketPreviousPriceForWeapon( WEAPON_NVG ) );
-	g_EquipmentInfo[0].SetDefaultPrice( NVG_PRICE );
-	g_EquipmentInfo[0].m_iTeam = TEAM_UNASSIGNED;
-	Q_strcpy( g_EquipmentInfo[0].szClassName, "weapon_nvgs" );
-
-#ifdef CLIENT_DLL
-	g_EquipmentInfo[0].iconActive = new CHudTexture;
-	g_EquipmentInfo[0].iconActive->cCharacterInFont = 's';
-#endif
-
-}
+//void PrepareEquipmentInfo( void )
+//{
+//    // MoeMod : dont use memset here
+//    for(int i = 0; i < MAX_EQUIPMENT; ++i)
+//        g_EquipmentInfo[i] = {};
+//
+//	g_EquipmentInfo[2].SetWeaponPrice( CSGameRules()->GetBlackMarketPriceForWeapon( WEAPON_KEVLAR ) );
+//	g_EquipmentInfo[2].SetDefaultPrice( KEVLAR_PRICE );
+//	g_EquipmentInfo[2].SetPreviousPrice( CSGameRules()->GetBlackMarketPreviousPriceForWeapon( WEAPON_KEVLAR ) );
+//	g_EquipmentInfo[2].m_iTeam = TEAM_UNASSIGNED;
+//	Q_strcpy( g_EquipmentInfo[2].szClassName, "weapon_vest" );
+//
+//#ifdef CLIENT_DLL
+//	g_EquipmentInfo[2].iconActive = new CHudTexture;
+//	g_EquipmentInfo[2].iconActive->cCharacterInFont = 't';
+//#endif
+//
+//	g_EquipmentInfo[1].SetWeaponPrice( CSGameRules()->GetBlackMarketPriceForWeapon( WEAPON_ASSAULTSUIT ) );
+//	g_EquipmentInfo[1].SetDefaultPrice( ASSAULTSUIT_PRICE );
+//	g_EquipmentInfo[1].SetPreviousPrice( CSGameRules()->GetBlackMarketPreviousPriceForWeapon( WEAPON_ASSAULTSUIT ) );
+//	g_EquipmentInfo[1].m_iTeam = TEAM_UNASSIGNED;
+//	Q_strcpy( g_EquipmentInfo[1].szClassName, "weapon_vesthelm" );
+//
+//#ifdef CLIENT_DLL
+//	g_EquipmentInfo[1].iconActive = new CHudTexture;
+//	g_EquipmentInfo[1].iconActive->cCharacterInFont = 'u';
+//#endif
+//
+//	g_EquipmentInfo[0].SetWeaponPrice( CSGameRules()->GetBlackMarketPriceForWeapon( WEAPON_NVG ) );
+//	g_EquipmentInfo[0].SetPreviousPrice( CSGameRules()->GetBlackMarketPreviousPriceForWeapon( WEAPON_NVG ) );
+//	g_EquipmentInfo[0].SetDefaultPrice( NVG_PRICE );
+//	g_EquipmentInfo[0].m_iTeam = TEAM_UNASSIGNED;
+//	Q_strcpy( g_EquipmentInfo[0].szClassName, "weapon_nvgs" );
+//
+//#ifdef CLIENT_DLL
+//	g_EquipmentInfo[0].iconActive = new CHudTexture;
+//	g_EquipmentInfo[0].iconActive->cCharacterInFont = 's';
+//#endif
+//
+//}
 
 //--------------------------------------------------------------------------------------------------------------
 CCSWeaponInfo * GetWeaponInfo( CSWeaponID weaponID )
@@ -305,14 +305,14 @@ void CCSWeaponInfo::Parse( KeyValues *pKeyValuesData, const char *szWeaponName )
 		Assert( false );
 	}
 
-	if ( CSGameRules()->IsBlackMarket() )
-	{
-		CSWeaponID iWeaponID = AliasToWeaponID( GetTranslatedWeaponAlias ( szWeaponName ) );
+	//if ( CSGameRules()->IsBlackMarket() )
+	//{
+	//	CSWeaponID iWeaponID = AliasToWeaponID( GetTranslatedWeaponAlias ( szWeaponName ) );
 
-		m_iDefaultPrice = m_iWeaponPrice;
-		m_iPreviousPrice = CSGameRules()->GetBlackMarketPreviousPriceForWeapon( iWeaponID );
-		m_iWeaponPrice = CSGameRules()->GetBlackMarketPriceForWeapon( iWeaponID );
-	}
+	//	m_iDefaultPrice = m_iWeaponPrice;
+	//	m_iPreviousPrice = CSGameRules()->GetBlackMarketPreviousPriceForWeapon( iWeaponID );
+	//	m_iWeaponPrice = CSGameRules()->GetBlackMarketPriceForWeapon( iWeaponID );
+	//}
 		
 	m_flArmorRatio				= pKeyValuesData->GetFloat( "WeaponArmorRatio", 1 );
 	m_iCrosshairMinDistance		= pKeyValuesData->GetInt( "CrosshairMinDistance", 4 );

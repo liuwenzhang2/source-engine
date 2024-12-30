@@ -481,7 +481,6 @@
     <ClCompile Include="..\..\..\game\shared\eventlist.cpp" />
     <ClCompile Include="..\..\..\game\shared\func_ladder.cpp" />
     <ClCompile Include="..\..\..\game\shared\gamemovement.cpp" />
-    <ClCompile Include="..\..\..\game\shared\gamerules.cpp" />
     <ClCompile Include="..\..\..\game\shared\gamerules_register.cpp" />
     <ClCompile Include="..\..\..\game\shared\GameStats.cpp" />
     <ClCompile Include="..\..\..\game\shared\gamestringpool.cpp" />
@@ -564,6 +563,7 @@
     <ClCompile Include="..\..\..\public\ehandle.cpp" />
     <ClCompile Include="..\..\..\public\entitylist_base.cpp" />
     <ClCompile Include="..\..\..\public\filesystem_helpers.cpp" />
+    <ClCompile Include="..\..\..\public\gamerules.cpp" />
     <ClCompile Include="..\..\..\public\haptics\haptic_msgs.cpp" />
     <ClCompile Include="..\..\..\public\haptics\haptic_utils.cpp" />
     <ClCompile Include="..\..\..\public\interpolatortypes.cpp" />

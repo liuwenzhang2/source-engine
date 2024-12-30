@@ -241,5 +241,5 @@ void GameStartFrame( void )
 //=========================================================
 void InstallGameRules()
 {
-	CreateGameRulesObject( "CDODGameRules" );
+	//CreateGameRulesObject( "CDODGameRules" );
 }

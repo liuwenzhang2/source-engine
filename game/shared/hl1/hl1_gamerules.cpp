@@ -24,10 +24,6 @@
 	#include "hl1mp_weapon_satchel.h"
 #endif
 
-
-REGISTER_GAMERULES_CLASS( CHalfLife1 );
-
-
 ConVar sk_plr_dmg_crowbar			( "sk_plr_dmg_crowbar",			"0", FCVAR_REPLICATED );
 
 ConVar sk_npc_dmg_9mm_bullet		( "sk_npc_dmg_9mm_bullet",		"0", FCVAR_REPLICATED );
@@ -78,12 +74,19 @@ ConVar sk_npc_dmg_12mm_bullet		( "sk_npc_dmg_12mm_bullet",		"0", FCVAR_REPLICATE
 
 ConVar sk_mp_dmg_multiplier ( "sk_mp_dmg_multiplier", "2.0" );
 
+BEGIN_NETWORK_TABLE(CHalfLife1World, DT_HalfLife1World)
+END_NETWORK_TABLE()
+
+
+IMPLEMENT_NETWORKCLASS_ALIASED(HalfLife1World, DT_HalfLife1World)
+
+
 // Damage Queries.
 
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-int	CHalfLife1::Damage_GetShowOnHud( void )
+int	CHalfLife1World::Damage_GetShowOnHud( void )
 {
 	int iDamage = (DMG_POISON | DMG_ACID | DMG_DISSOLVE/*DMG_FREEZE | DMG_SLOWFREEZE*/ | DMG_DROWN | DMG_BURN | DMG_SLOWBURN | DMG_NERVEGAS | DMG_RADIATION | DMG_SHOCK);
 	return iDamage;
@@ -93,7 +96,7 @@ int	CHalfLife1::Damage_GetShowOnHud( void )
 
 	extern bool		g_fGameOver;
 
-	const char *CHalfLife1::GetGameDescription( void )
+	const char *CHalfLife1World::GetGameDescription( void )
 	{
 		if ( IsMultiplayer() )
 		{
@@ -121,7 +124,7 @@ int	CHalfLife1::Damage_GetShowOnHud( void )
 	// Input  :
 	// Output :
 	//-----------------------------------------------------------------------------
-	CHalfLife1::CHalfLife1()
+	CHalfLife1World::CHalfLife1World()
 	{
 	}
 
@@ -131,7 +134,7 @@ int	CHalfLife1::Damage_GetShowOnHud( void )
 	//			Use engine.Cmd_Argv,  engine.Cmd_Argv, and engine.Cmd_Argc to get 
 	//			pointers the character string command.
 	//-----------------------------------------------------------------------------
-	bool CHalfLife1::ClientCommand( CBaseEntity *pEdict, const CCommand &args )
+	bool CHalfLife1World::ClientCommand( CBaseEntity *pEdict, const CCommand &args )
 	{
 		if( BaseClass::ClientCommand( pEdict, args ) )
 			return true;
@@ -147,7 +150,7 @@ int	CHalfLife1::Damage_GetShowOnHud( void )
 	//-----------------------------------------------------------------------------
 	// Purpose: Player has just spawned. Equip them.
 	//-----------------------------------------------------------------------------
-	void CHalfLife1::PlayerSpawn( CBasePlayer *pPlayer )
+	void CHalfLife1World::PlayerSpawn( CBasePlayer *pPlayer )
 	{
 	//	pPlayer->EquipSuit();
 	}
@@ -227,7 +230,7 @@ int	CHalfLife1::Damage_GetShowOnHud( void )
 	// Input   :
 	// Output  :
 	//------------------------------------------------------------------------------
-	void CHalfLife1::InitDefaultAIRelationships( void )
+	void CHalfLife1World::InitDefaultAIRelationships( void )
 	{
 		int i, j;
 
@@ -478,7 +481,7 @@ int	CHalfLife1::Damage_GetShowOnHud( void )
 	// Input   :
 	// Output  :
 	//------------------------------------------------------------------------------
-	const char* CHalfLife1::AIClassText(int classType)
+	const char* CHalfLife1World::AIClassText(int classType)
 	{
 		switch (classType)
 		{
@@ -500,12 +503,12 @@ int	CHalfLife1::Damage_GetShowOnHud( void )
 	}
 
 
-	void CHalfLife1::PlayerThink( CBasePlayer *pPlayer )
+	void CHalfLife1World::PlayerThink( CBasePlayer *pPlayer )
 	{
 	}
 
 
-	bool CHalfLife1::CanHavePlayerItem( CBasePlayer *pPlayer, CBaseCombatWeapon *pWeapon )
+	bool CHalfLife1World::CanHavePlayerItem( CBasePlayer *pPlayer, CBaseCombatWeapon *pWeapon )
 	{
 		if ( FClassnameIs( pWeapon, "weapon_satchel" ) )
 		{
@@ -523,7 +526,7 @@ int	CHalfLife1::Damage_GetShowOnHud( void )
 	}
 
 		
-	float CHalfLife1::FlPlayerFallDamage( CBasePlayer *pPlayer )
+	float CHalfLife1World::FlPlayerFallDamage( CBasePlayer *pPlayer )
 	{
 		CBaseEntity* pGroundEntity = pPlayer->GetEngineObject()->GetGroundEntity() ? pPlayer->GetEngineObject()->GetGroundEntity()->GetOuter() : NULL;
 
@@ -568,7 +571,7 @@ int	CHalfLife1::Damage_GetShowOnHud( void )
 		const IHandleEntity *m_pPassEnt;
 	};
 
-	void CHalfLife1::RadiusDamage( const CTakeDamageInfo &info, const Vector &vecSrcIn, float flRadius, int iClassIgnore )
+	void CHalfLife1World::RadiusDamage( const CTakeDamageInfo &info, const Vector &vecSrcIn, float flRadius, int iClassIgnore )
 	{
 		CBaseEntity *pEntity = NULL;
 		trace_t		tr;
@@ -668,10 +671,10 @@ int	CHalfLife1::Damage_GetShowOnHud( void )
 
 
 // ------------------------------------------------------------------------------------- //
-// CHalfLife1 shared implementation.
+// CHalfLife1World shared implementation.
 // ------------------------------------------------------------------------------------- //
 
-bool CHalfLife1::ShouldCollide( int collisionGroup0, int collisionGroup1 )
+bool CHalfLife1World::ShouldCollide( int collisionGroup0, int collisionGroup1 )
 {
 	// HL2 treats movement and tracing against players the same, so just remap here
 	if ( collisionGroup0 == COLLISION_GROUP_PLAYER_MOVEMENT )

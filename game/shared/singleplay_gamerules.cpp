@@ -26,7 +26,7 @@
 
 //=========================================================
 //=========================================================
-bool CSingleplayRules::IsMultiplayer( void )
+bool CSingleplayWorld::IsMultiplayer( void )
 {
 	return false;
 }
@@ -35,7 +35,7 @@ bool CSingleplayRules::IsMultiplayer( void )
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-int CSingleplayRules::Damage_GetTimeBased( void )
+int CSingleplayWorld::Damage_GetTimeBased( void )
 {
 	int iDamage = ( DMG_PARALYZE | DMG_NERVEGAS | DMG_POISON | DMG_RADIATION | DMG_DROWNRECOVER | DMG_ACID | DMG_SLOWBURN );
 	return iDamage;
@@ -44,7 +44,7 @@ int CSingleplayRules::Damage_GetTimeBased( void )
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-int	CSingleplayRules::Damage_GetShouldGibCorpse( void )
+int	CSingleplayWorld::Damage_GetShouldGibCorpse( void )
 {
 	int iDamage = ( DMG_CRUSH | DMG_FALL | DMG_BLAST | DMG_SONIC | DMG_CLUB );
 	return iDamage;
@@ -53,7 +53,7 @@ int	CSingleplayRules::Damage_GetShouldGibCorpse( void )
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-int CSingleplayRules::Damage_GetShowOnHud( void )
+int CSingleplayWorld::Damage_GetShowOnHud( void )
 {
 	int iDamage = ( DMG_POISON | DMG_ACID | DMG_DROWN | DMG_BURN | DMG_SLOWBURN | DMG_NERVEGAS | DMG_RADIATION | DMG_SHOCK );
 	return iDamage;
@@ -62,7 +62,7 @@ int CSingleplayRules::Damage_GetShowOnHud( void )
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-int	CSingleplayRules::Damage_GetNoPhysicsForce( void )
+int	CSingleplayWorld::Damage_GetNoPhysicsForce( void )
 {
 	int iTimeBasedDamage = Damage_GetTimeBased();
 	int iDamage = ( DMG_FALL | DMG_BURN | DMG_PLASMA | DMG_DROWN | iTimeBasedDamage | DMG_CRUSH | DMG_PHYSGUN | DMG_PREVENT_PHYSICS_FORCE );
@@ -72,7 +72,7 @@ int	CSingleplayRules::Damage_GetNoPhysicsForce( void )
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-int	CSingleplayRules::Damage_GetShouldNotBleed( void )
+int	CSingleplayWorld::Damage_GetShouldNotBleed( void )
 {
 	int iDamage = ( DMG_POISON | DMG_ACID );
 	return iDamage;
@@ -84,7 +84,7 @@ int	CSingleplayRules::Damage_GetShouldNotBleed( void )
 // Input  : iDmgType - 
 // Output : Returns true on success, false on failure.
 //-----------------------------------------------------------------------------
-bool CSingleplayRules::Damage_IsTimeBased( int iDmgType )
+bool CSingleplayWorld::Damage_IsTimeBased( int iDmgType )
 {
 	// Damage types that are time-based.
 	return ( ( iDmgType & ( DMG_PARALYZE | DMG_NERVEGAS | DMG_POISON | DMG_RADIATION | DMG_DROWNRECOVER | DMG_ACID | DMG_SLOWBURN ) ) != 0 );
@@ -95,7 +95,7 @@ bool CSingleplayRules::Damage_IsTimeBased( int iDmgType )
 // Input  : iDmgType - 
 // Output : Returns true on success, false on failure.
 //-----------------------------------------------------------------------------
-bool CSingleplayRules::Damage_ShouldGibCorpse( int iDmgType )
+bool CSingleplayWorld::Damage_ShouldGibCorpse( int iDmgType )
 {
 	// Damage types that gib the corpse.
 	return ( ( iDmgType & ( DMG_CRUSH | DMG_FALL | DMG_BLAST | DMG_SONIC | DMG_CLUB ) ) != 0 );
@@ -106,7 +106,7 @@ bool CSingleplayRules::Damage_ShouldGibCorpse( int iDmgType )
 // Input  : iDmgType - 
 // Output : Returns true on success, false on failure.
 //-----------------------------------------------------------------------------
-bool CSingleplayRules::Damage_ShowOnHUD( int iDmgType )
+bool CSingleplayWorld::Damage_ShowOnHUD( int iDmgType )
 {
 	// Damage types that have client HUD art.
 	return ( ( iDmgType & ( DMG_POISON | DMG_ACID | DMG_DROWN | DMG_BURN | DMG_SLOWBURN | DMG_NERVEGAS | DMG_RADIATION | DMG_SHOCK ) ) != 0 );
@@ -117,7 +117,7 @@ bool CSingleplayRules::Damage_ShowOnHUD( int iDmgType )
 // Input  : iDmgType - 
 // Output : Returns true on success, false on failure.
 //-----------------------------------------------------------------------------
-bool CSingleplayRules::Damage_NoPhysicsForce( int iDmgType )
+bool CSingleplayWorld::Damage_NoPhysicsForce( int iDmgType )
 {
 	// Damage types that don't have to supply a physics force & position.
 	int iTimeBasedDamage = Damage_GetTimeBased();
@@ -129,7 +129,7 @@ bool CSingleplayRules::Damage_NoPhysicsForce( int iDmgType )
 // Input  : iDmgType - 
 // Output : Returns true on success, false on failure.
 //-----------------------------------------------------------------------------
-bool CSingleplayRules::Damage_ShouldNotBleed( int iDmgType )
+bool CSingleplayWorld::Damage_ShouldNotBleed( int iDmgType )
 {
 	// Damage types that don't make the player bleed.
 	return ( ( iDmgType & ( DMG_POISON | DMG_ACID ) ) != 0 );
@@ -139,33 +139,33 @@ bool CSingleplayRules::Damage_ShouldNotBleed( int iDmgType )
 
 #else
 
-	extern CGameRules	*g_pGameRules;
+	//extern CGameRules	*g_pGameRules;
 	extern bool		g_fGameOver;
 
 	//=========================================================
 	//=========================================================
-	CSingleplayRules::CSingleplayRules( void )
+	CSingleplayWorld::CSingleplayWorld( void )
 	{
 		RefreshSkillData( true );
 	}
 
 	//=========================================================
 	//=========================================================
-	void CSingleplayRules::Think ( void )
+	void CSingleplayWorld::Think ( void )
 	{
 		BaseClass::Think();
 	}
 
 	//=========================================================
 	//=========================================================
-	bool CSingleplayRules::IsDeathmatch ( void )
+	bool CSingleplayWorld::IsDeathmatch ( void )
 	{
 		return false;
 	}
 
 	//=========================================================
 	//=========================================================
-	bool CSingleplayRules::IsCoOp( void )
+	bool CSingleplayWorld::IsCoOp( void )
 	{
 		return false;
 	}
@@ -174,7 +174,7 @@ bool CSingleplayRules::Damage_ShouldNotBleed( int iDmgType )
 	// Purpose: Determine whether the player should switch to the weapon passed in
 	// Output : Returns true on success, false on failure.
 	//-----------------------------------------------------------------------------
-	bool CSingleplayRules::FShouldSwitchWeapon( CBasePlayer *pPlayer, CBaseCombatWeapon *pWeapon )
+	bool CSingleplayWorld::FShouldSwitchWeapon( CBasePlayer *pPlayer, CBaseCombatWeapon *pWeapon )
 	{
 		//Must have ammo
 		if ( ( pWeapon->HasAnyAmmo() == false ) && ( pPlayer->GetAmmoCount( pWeapon->m_iPrimaryAmmoType ) <= 0 ) )
@@ -206,7 +206,7 @@ bool CSingleplayRules::Damage_ShouldNotBleed( int iDmgType )
 	//-----------------------------------------------------------------------------
 	// Purpose: Find the next best weapon to use and return it.
 	//-----------------------------------------------------------------------------
-	CBaseCombatWeapon *CSingleplayRules::GetNextBestWeapon( CBaseCombatCharacter *pPlayer, CBaseCombatWeapon *pCurrentWeapon )
+	CBaseCombatWeapon *CSingleplayWorld::GetNextBestWeapon( CBaseCombatCharacter *pPlayer, CBaseCombatWeapon *pCurrentWeapon )
 	{
 		if ( pCurrentWeapon && !pCurrentWeapon->AllowsAutoSwitchFrom() )
 			return NULL;
@@ -253,7 +253,7 @@ bool CSingleplayRules::Damage_ShouldNotBleed( int iDmgType )
 	// Purpose: 
 	// Output : Returns true on success, false on failure.
 	//-----------------------------------------------------------------------------
-	bool CSingleplayRules::SwitchToNextBestWeapon( CBaseCombatCharacter *pPlayer, CBaseCombatWeapon *pCurrentWeapon )
+	bool CSingleplayWorld::SwitchToNextBestWeapon( CBaseCombatCharacter *pPlayer, CBaseCombatWeapon *pCurrentWeapon )
 	{
 		CBaseCombatWeapon *pWeapon = GetNextBestWeapon( pPlayer, pCurrentWeapon );
 
@@ -265,24 +265,24 @@ bool CSingleplayRules::Damage_ShouldNotBleed( int iDmgType )
 
 	//=========================================================
 	//=========================================================
-	bool CSingleplayRules::ClientConnected( int pEntity, const char *pszName, const char *pszAddress, char *reject, int maxrejectlen )
+	bool CSingleplayWorld::ClientConnected( int pEntity, const char *pszName, const char *pszAddress, char *reject, int maxrejectlen )
 	{
 		return true;
 	}
 
-	void CSingleplayRules::InitHUD( CBasePlayer *pl )
+	void CSingleplayWorld::InitHUD( CBasePlayer *pl )
 	{
 	}
 
 	//=========================================================
 	//=========================================================
-	void CSingleplayRules::ClientDisconnected( int pClient )
+	void CSingleplayWorld::ClientDisconnected( int pClient )
 	{
 	}
 
 	//=========================================================
 	//=========================================================
-	float CSingleplayRules::FlPlayerFallDamage( CBasePlayer *pPlayer )
+	float CSingleplayWorld::FlPlayerFallDamage( CBasePlayer *pPlayer )
 	{
 		// subtract off the speed at which a player is allowed to fall without being hurt,
 		// so damage will be based on speed beyond that, not the entire fall
@@ -292,14 +292,14 @@ bool CSingleplayRules::Damage_ShouldNotBleed( int iDmgType )
 
 	//=========================================================
 	//=========================================================
-	bool CSingleplayRules::AllowDamage( CBaseEntity *pVictim, const CTakeDamageInfo &info )
+	bool CSingleplayWorld::AllowDamage( CBaseEntity *pVictim, const CTakeDamageInfo &info )
 	{
 		return true;
 	}
 
 	//=========================================================
 	//=========================================================
-	void CSingleplayRules::PlayerSpawn( CBasePlayer *pPlayer )
+	void CSingleplayWorld::PlayerSpawn( CBasePlayer *pPlayer )
 	{
 		// Player no longer gets all weapons to start.
 		// He has to pick them up now.  Use impulse 101
@@ -308,28 +308,28 @@ bool CSingleplayRules::Damage_ShouldNotBleed( int iDmgType )
 
 	//=========================================================
 	//=========================================================
-	bool CSingleplayRules::AllowAutoTargetCrosshair( void )
+	bool CSingleplayWorld::AllowAutoTargetCrosshair( void )
 	{
 		return ( IsSkillLevel(SKILL_EASY) );
 	}
 
 	//=========================================================
 	//=========================================================
-	int	CSingleplayRules::GetAutoAimMode()
+	int	CSingleplayWorld::GetAutoAimMode()
 	{
 		return sk_autoaim_mode.GetInt();
 	}
 
 	//=========================================================
 	//=========================================================
-	bool CSingleplayRules::FPlayerCanRespawn( CBasePlayer *pPlayer )
+	bool CSingleplayWorld::FPlayerCanRespawn( CBasePlayer *pPlayer )
 	{
 		return true;
 	}
 
 	//=========================================================
 	//=========================================================
-	float CSingleplayRules::FlPlayerSpawnTime( CBasePlayer *pPlayer )
+	float CSingleplayWorld::FlPlayerSpawnTime( CBasePlayer *pPlayer )
 	{
 		return gpGlobals->curtime;//now!
 	}
@@ -338,7 +338,7 @@ bool CSingleplayRules::Damage_ShouldNotBleed( int iDmgType )
 	// IPointsForKill - how many points awarded to anyone
 	// that kills this player?
 	//=========================================================
-	int CSingleplayRules::IPointsForKill( CBasePlayer *pAttacker, CBasePlayer *pKilled )
+	int CSingleplayWorld::IPointsForKill( CBasePlayer *pAttacker, CBasePlayer *pKilled )
 	{
 		return 1;
 	}
@@ -346,14 +346,14 @@ bool CSingleplayRules::Damage_ShouldNotBleed( int iDmgType )
 	//=========================================================
 	// PlayerKilled - someone/something killed this player
 	//=========================================================
-	void CSingleplayRules::PlayerKilled( CBasePlayer *pVictim, const CTakeDamageInfo &info )
+	void CSingleplayWorld::PlayerKilled( CBasePlayer *pVictim, const CTakeDamageInfo &info )
 	{
 	}
 
 	//=========================================================
 	// Deathnotice
 	//=========================================================
-	void CSingleplayRules::DeathNotice( CBasePlayer *pVictim, const CTakeDamageInfo &info )
+	void CSingleplayWorld::DeathNotice( CBasePlayer *pVictim, const CTakeDamageInfo &info )
 	{
 	}
 
@@ -361,7 +361,7 @@ bool CSingleplayRules::Damage_ShouldNotBleed( int iDmgType )
 	// FlWeaponRespawnTime - what is the time in the future
 	// at which this weapon may spawn?
 	//=========================================================
-	float CSingleplayRules::FlWeaponRespawnTime( CBaseCombatWeapon *pWeapon )
+	float CSingleplayWorld::FlWeaponRespawnTime( CBaseCombatWeapon *pWeapon )
 	{
 		return -1;
 	}
@@ -371,7 +371,7 @@ bool CSingleplayRules::Damage_ShouldNotBleed( int iDmgType )
 	// now,  otherwise it returns the time at which it can try
 	// to spawn again.
 	//=========================================================
-	float CSingleplayRules::FlWeaponTryRespawn( CBaseCombatWeapon *pWeapon )
+	float CSingleplayWorld::FlWeaponTryRespawn( CBaseCombatWeapon *pWeapon )
 	{
 		return 0;
 	}
@@ -380,7 +380,7 @@ bool CSingleplayRules::Damage_ShouldNotBleed( int iDmgType )
 	// VecWeaponRespawnSpot - where should this weapon spawn?
 	// Some game variations may choose to randomize spawn locations
 	//=========================================================
-	Vector CSingleplayRules::VecWeaponRespawnSpot( CBaseCombatWeapon *pWeapon )
+	Vector CSingleplayWorld::VecWeaponRespawnSpot( CBaseCombatWeapon *pWeapon )
 	{
 		return pWeapon->GetEngineObject()->GetAbsOrigin();
 	}
@@ -389,27 +389,27 @@ bool CSingleplayRules::Damage_ShouldNotBleed( int iDmgType )
 	// WeaponShouldRespawn - any conditions inhibiting the
 	// respawning of this weapon?
 	//=========================================================
-	int CSingleplayRules::WeaponShouldRespawn( CBaseCombatWeapon *pWeapon )
+	int CSingleplayWorld::WeaponShouldRespawn( CBaseCombatWeapon *pWeapon )
 	{
 		return GR_WEAPON_RESPAWN_NO;
 	}
 
 	//=========================================================
 	//=========================================================
-	bool CSingleplayRules::CanHaveItem( CBasePlayer *pPlayer, CItem *pItem )
+	bool CSingleplayWorld::CanHaveItem( CBasePlayer *pPlayer, CItem *pItem )
 	{
 		return true;
 	}
 
 	//=========================================================
 	//=========================================================
-	void CSingleplayRules::PlayerGotItem( CBasePlayer *pPlayer, CItem *pItem )
+	void CSingleplayWorld::PlayerGotItem( CBasePlayer *pPlayer, CItem *pItem )
 	{
 	}
 
 	//=========================================================
 	//=========================================================
-	int CSingleplayRules::ItemShouldRespawn( CItem *pItem )
+	int CSingleplayWorld::ItemShouldRespawn( CItem *pItem )
 	{
 		return GR_ITEM_RESPAWN_NO;
 	}
@@ -418,7 +418,7 @@ bool CSingleplayRules::Damage_ShouldNotBleed( int iDmgType )
 	//=========================================================
 	// At what time in the future may this Item respawn?
 	//=========================================================
-	float CSingleplayRules::FlItemRespawnTime( CItem *pItem )
+	float CSingleplayWorld::FlItemRespawnTime( CItem *pItem )
 	{
 		return -1;
 	}
@@ -427,7 +427,7 @@ bool CSingleplayRules::Damage_ShouldNotBleed( int iDmgType )
 	// Where should this item respawn?
 	// Some game variations may choose to randomize spawn locations
 	//=========================================================
-	Vector CSingleplayRules::VecItemRespawnSpot( CItem *pItem )
+	Vector CSingleplayWorld::VecItemRespawnSpot( CItem *pItem )
 	{
 		return pItem->GetEngineObject()->GetAbsOrigin();
 	}
@@ -435,48 +435,48 @@ bool CSingleplayRules::Damage_ShouldNotBleed( int iDmgType )
 	//=========================================================
 	// What angles should this item use to respawn?
 	//=========================================================
-	QAngle CSingleplayRules::VecItemRespawnAngles( CItem *pItem )
+	QAngle CSingleplayWorld::VecItemRespawnAngles( CItem *pItem )
 	{
 		return pItem->GetEngineObject()->GetAbsAngles();
 	}
 
 	//=========================================================
 	//=========================================================
-	bool CSingleplayRules::IsAllowedToSpawn( CBaseEntity *pEntity )
+	bool CSingleplayWorld::IsAllowedToSpawn( CBaseEntity *pEntity )
 	{
 		return true;
 	}
 
 	//=========================================================
 	//=========================================================
-	void CSingleplayRules::PlayerGotAmmo( CBaseCombatCharacter *pPlayer, char *szName, int iCount )
+	void CSingleplayWorld::PlayerGotAmmo( CBaseCombatCharacter *pPlayer, char *szName, int iCount )
 	{
 	}
 
 	//=========================================================
 	//=========================================================
-	float CSingleplayRules::FlHealthChargerRechargeTime( void )
+	float CSingleplayWorld::FlHealthChargerRechargeTime( void )
 	{
 		return 0;// don't recharge
 	}
 
 	//=========================================================
 	//=========================================================
-	int CSingleplayRules::DeadPlayerWeapons( CBasePlayer *pPlayer )
+	int CSingleplayWorld::DeadPlayerWeapons( CBasePlayer *pPlayer )
 	{
 		return GR_PLR_DROP_GUN_NO;
 	}
 
 	//=========================================================
 	//=========================================================
-	int CSingleplayRules::DeadPlayerAmmo( CBasePlayer *pPlayer )
+	int CSingleplayWorld::DeadPlayerAmmo( CBasePlayer *pPlayer )
 	{
 		return GR_PLR_DROP_AMMO_NO;
 	}
 
 	//=========================================================
 	//=========================================================
-	int CSingleplayRules::PlayerRelationship( CBaseEntity *pPlayer, CBaseEntity *pTarget )
+	int CSingleplayWorld::PlayerRelationship( CBaseEntity *pPlayer, CBaseEntity *pTarget )
 	{
 		// why would a single player in half life need this? 
 		return GR_NOTTEAMMATE;
@@ -484,14 +484,14 @@ bool CSingleplayRules::Damage_ShouldNotBleed( int iDmgType )
 
 	//=========================================================
 	//=========================================================
-	bool CSingleplayRules::PlayerCanHearChat( CBasePlayer *pListener, CBasePlayer *pSpeaker )
+	bool CSingleplayWorld::PlayerCanHearChat( CBasePlayer *pListener, CBasePlayer *pSpeaker )
 	{
 		return ( PlayerRelationship( pListener, pSpeaker ) == GR_TEAMMATE );
 	}
 
 	//=========================================================
 	//=========================================================
-	bool CSingleplayRules::FAllowNPCs( void )
+	bool CSingleplayWorld::FAllowNPCs( void )
 	{
 		return true;
 	}

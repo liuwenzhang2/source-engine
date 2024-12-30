@@ -210,5 +210,6 @@ void GameStartFrame( void )
 //=========================================================
 void InstallGameRules()
 {
-	CreateGameRulesObject( "CCSGameRules" );
+	//CreateGameRulesObject( "CCSGameRules" );
+	CSGameRules()->SetBlackMarketPrices(true);
 }

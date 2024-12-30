@@ -247,7 +247,7 @@ void CWeaponDODBase::ItemPostFrame()
 		return;
 
 #ifdef _DEBUG
-	CDODGameRules *mp = DODGameRules();
+	CDODGameWorld *mp = DODGameRules();
 #endif
 
 	assert( mp );

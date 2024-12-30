@@ -180,29 +180,29 @@ void InstallGameRules()
 	engine->ServerCommand( "exec game.cfg\n" );
 	engine->ServerExecute( );
 
-	if ( !gpGlobals->deathmatch )
-	{
-		// generic half-life
-		CreateGameRulesObject( "CHalfLife1" );
-		return;
-	}
-	else
-	{
-		CreateGameRulesObject( "CHL1MPRules" );
-		return;
+	//if ( !gpGlobals->deathmatch )
+	//{
+	//	// generic half-life
+	//	CreateGameRulesObject( "CHalfLife1" );
+	//	return;
+	//}
+	//else
+	//{
+	//	CreateGameRulesObject( "CHL1MPRules" );
+	//	return;
 
-		if ( teamplay.GetInt() > 0 )
-		{
-			// teamplay
-			CreateGameRulesObject( "CTeamplayRules" );
-			return;
-		}
+	//	if ( teamplay.GetInt() > 0 )
+	//	{
+	//		// teamplay
+	//		CreateGameRulesObject( "CTeamplayRules" );
+	//		return;
+	//	}
 
-		// vanilla deathmatch
-		CreateGameRulesObject( "CMultiplayRules" );
-		return;
-	}
+	//	// vanilla deathmatch
+	//	CreateGameRulesObject( "CMultiplayRules" );
+	//	return;
+	//}
 
-	CreateGameRulesObject( "CHalfLife1" );
+	//CreateGameRulesObject( "CHalfLife1" );
 }
 

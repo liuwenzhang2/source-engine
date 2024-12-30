@@ -1243,12 +1243,12 @@ void CEquipmentSelectBox::OnControlChanged()
 	int iKevlarPrice = KEVLAR_PRICE;
 	int iNVGPrice = NVG_PRICE;
 
-	if ( CSGameRules()->IsBlackMarket() )
-	{
-		iHelmetPrice = CSGameRules()->GetBlackMarketPriceForWeapon( WEAPON_ASSAULTSUIT ) - CSGameRules()->GetBlackMarketPriceForWeapon( WEAPON_KEVLAR );
-		iKevlarPrice = CSGameRules()->GetBlackMarketPriceForWeapon( WEAPON_KEVLAR );
-		iNVGPrice = CSGameRules()->GetBlackMarketPriceForWeapon( WEAPON_NVG );
-	}
+	//if ( CSGameRules()->IsBlackMarket() )
+	//{
+	//	iHelmetPrice = CSGameRules()->GetBlackMarketPriceForWeapon( WEAPON_ASSAULTSUIT ) - CSGameRules()->GetBlackMarketPriceForWeapon( WEAPON_KEVLAR );
+	//	iKevlarPrice = CSGameRules()->GetBlackMarketPriceForWeapon( WEAPON_KEVLAR );
+	//	iNVGPrice = CSGameRules()->GetBlackMarketPriceForWeapon( WEAPON_NVG );
+	//}
 
 	int count = m_pKevlar->GetActiveItem();
 	g_pVGuiLocalize->ConstructString( wbuf, sizeof( wbuf ),

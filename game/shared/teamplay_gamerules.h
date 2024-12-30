@@ -20,7 +20,7 @@
 
 #ifdef CLIENT_DLL
 
-	#define CTeamplayRules C_TeamplayRules
+	#define CTeamplayWorld C_TeamplayWorld
 
 #else
 
@@ -40,10 +40,10 @@
 #define TEAMPLAY_TEAMLISTLENGTH		MAX_TEAMS*MAX_TEAMNAME_LENGTH
 
 
-class CTeamplayRules : public CMultiplayRules
+class CTeamplayWorld : public CMultiplayWorld
 {
 public:
-	DECLARE_CLASS( CTeamplayRules, CMultiplayRules );
+	DECLARE_CLASS(CTeamplayWorld, CMultiplayWorld);
 
 	// Return the value of this player towards capturing a point
 	virtual int	 GetCaptureValueForPlayer( CBasePlayer *pPlayer ) { return 1; }
@@ -59,8 +59,8 @@ public:
 
 #else
 
-	CTeamplayRules();
-	virtual ~CTeamplayRules() {};
+	CTeamplayWorld();
+	virtual ~CTeamplayWorld() {};
 
 	virtual void Precache( void );
 
@@ -118,9 +118,9 @@ private:
 #endif
 };
 
-inline CTeamplayRules* TeamplayGameRules()
+inline CTeamplayWorld* TeamplayGameRules()
 {
-	return static_cast<CTeamplayRules*>(g_pGameRules);
+	return (CTeamplayWorld*)EntityList()->GetBaseEntity(0);
 }
 
 #endif // TEAMPLAY_GAMERULES_H

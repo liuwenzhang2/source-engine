@@ -626,7 +626,7 @@ public:
 	virtual bool			ReplayPostInit() = 0;
 
 	// Called at the start of each level change
-	virtual void			LevelInitPreEntity( char const* pMapName ) = 0;
+	virtual void			LevelInitPreEntity() = 0;
 	// Called at the start of a new level, after the entities have been received and created
 	virtual void			LevelInitPostEntity( ) = 0;
 	// Called at the end of a level

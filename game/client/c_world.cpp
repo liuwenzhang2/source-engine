@@ -15,6 +15,10 @@
 #include "eventlist.h"
 // NVNT haptic include for notification of world precache
 #include "haptics/haptic_utils.h"
+#include "ammodef.h"
+#include "iachievementmgr.h"
+#include "usermessages.h"
+
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
@@ -22,7 +26,28 @@
 #undef CWorld
 #endif
 
-C_GameRules *g_pGameRules = NULL;
+ConVar g_Language("g_Language", "0", FCVAR_REPLICATED);
+ConVar sk_autoaim_mode("sk_autoaim_mode", "1", FCVAR_ARCHIVE | FCVAR_REPLICATED);
+ConVar	old_radius_damage("old_radiusdamage", "0.0", FCVAR_REPLICATED);
+
+static CViewVectors g_DefaultViewVectors(
+	Vector(0, 0, 64),			//VEC_VIEW (m_vView)
+
+	Vector(-16, -16, 0),		//VEC_HULL_MIN (m_vHullMin)
+	Vector(16, 16, 72),		//VEC_HULL_MAX (m_vHullMax)
+
+	Vector(-16, -16, 0),		//VEC_DUCK_HULL_MIN (m_vDuckHullMin)
+	Vector(16, 16, 36),		//VEC_DUCK_HULL_MAX	(m_vDuckHullMax)
+	Vector(0, 0, 28),			//VEC_DUCK_VIEW		(m_vDuckView)
+
+	Vector(-10, -10, -10),		//VEC_OBS_HULL_MIN	(m_vObsHullMin)
+	Vector(10, 10, 10),		//VEC_OBS_HULL_MAX	(m_vObsHullMax)
+
+	Vector(0, 0, 14)			//VEC_DEAD_VIEWHEIGHT (m_vDeadViewHeight)
+);
+
+IClientGameRules* g_pGameRules = NULL;
+
 //static C_World *g_pClientWorld;
 
 
@@ -46,7 +71,7 @@ C_GameRules *g_pGameRules = NULL;
 //}
 
 
-IMPLEMENT_CLIENTCLASS( C_World, DT_World, CWorld );//, ClientWorldFactory
+IMPLEMENT_CLIENTCLASS_NO_FACTORY( C_World, DT_World, CWorld );//, ClientWorldFactory
 
 BEGIN_RECV_TABLE( C_World, DT_World )
 	RecvPropFloat(RECVINFO(m_flWaveHeight)),
@@ -64,10 +89,16 @@ END_RECV_TABLE()
 
 C_World::C_World( void )
 {
+	g_pGameRules = this;
 }
 
 C_World::~C_World( void )
 {
+	if (!g_pGameRules) {
+		Error("m_pGameRules not inited!\n");
+	}
+	g_pGameRules->LevelShutdownPostEntity();
+	g_pGameRules = NULL;
 }
 
 bool C_World::Init( int entnum, int iSerialNum )
@@ -179,6 +210,9 @@ void C_World::Precache( void )
 		RegisterSharedActivities();
 	}
 
+	EntityList()->LevelInitPreEntity();
+	IGameSystem::LevelInitPreEntityAllSystems();//pMapName
+
 	// Get weapon precaches
 	W_Precache();	
 
@@ -202,3 +236,185 @@ C_World *GetClientWorldEntity()
 	return (C_World*)EntityList()->GetBaseEntity(0);
 }
 
+// Level init, shutdown
+void C_World::LevelInitPreEntity()
+{
+
+}
+
+void C_World::LevelInitPostEntity()
+{
+
+}
+
+// The level is shutdown in two parts
+void C_World::LevelShutdownPreEntity()
+{
+
+}
+
+void C_World::LevelShutdownPostEntity()
+{
+
+}
+
+bool C_World::IsBonusChallengeTimeBased(void)
+{
+	return true;
+}
+
+bool C_World::IsLocalPlayer(int nEntIndex)
+{
+	C_BasePlayer* pLocalPlayer = (C_BasePlayer*)EntityList()->GetLocalPlayer();
+	return (pLocalPlayer && pLocalPlayer == EntityList()->GetEnt(nEntIndex));
+}
+
+bool C_World::SwitchToNextBestWeapon(CBaseCombatCharacter* pPlayer, CBaseCombatWeapon* pCurrentWeapon)
+{
+	return false;
+}
+
+CBaseCombatWeapon* C_World::GetNextBestWeapon(CBaseCombatCharacter* pPlayer, CBaseCombatWeapon* pCurrentWeapon)
+{
+	return NULL;
+}
+
+bool C_World::ShouldCollide(int collisionGroup0, int collisionGroup1)
+{
+	if (collisionGroup0 > collisionGroup1)
+	{
+		// swap so that lowest is always first
+		::V_swap(collisionGroup0, collisionGroup1);
+	}
+
+#ifndef HL2MP
+	if ((collisionGroup0 == COLLISION_GROUP_PLAYER || collisionGroup0 == COLLISION_GROUP_PLAYER_MOVEMENT) &&
+		collisionGroup1 == COLLISION_GROUP_PUSHAWAY)
+	{
+		return false;
+	}
+#endif
+
+	if (collisionGroup0 == COLLISION_GROUP_DEBRIS && collisionGroup1 == COLLISION_GROUP_PUSHAWAY)
+	{
+		// let debris and multiplayer objects collide
+		return true;
+	}
+
+	// --------------------------------------------------------------------------
+	// NOTE: All of this code assumes the collision groups have been sorted!!!!
+	// NOTE: Don't change their order without rewriting this code !!!
+	// --------------------------------------------------------------------------
+
+	// Don't bother if either is in a vehicle...
+	if ((collisionGroup0 == COLLISION_GROUP_IN_VEHICLE) || (collisionGroup1 == COLLISION_GROUP_IN_VEHICLE))
+		return false;
+
+	if ((collisionGroup1 == COLLISION_GROUP_DOOR_BLOCKER) && (collisionGroup0 != COLLISION_GROUP_NPC))
+		return false;
+
+	if ((collisionGroup0 == COLLISION_GROUP_PLAYER) && (collisionGroup1 == COLLISION_GROUP_PASSABLE_DOOR))
+		return false;
+
+	if (collisionGroup0 == COLLISION_GROUP_DEBRIS || collisionGroup0 == COLLISION_GROUP_DEBRIS_TRIGGER)
+	{
+		// put exceptions here, right now this will only collide with COLLISION_GROUP_NONE
+		return false;
+	}
+
+	// Dissolving guys only collide with COLLISION_GROUP_NONE
+	if ((collisionGroup0 == COLLISION_GROUP_DISSOLVING) || (collisionGroup1 == COLLISION_GROUP_DISSOLVING))
+	{
+		if (collisionGroup0 != COLLISION_GROUP_NONE)
+			return false;
+	}
+
+	// doesn't collide with other members of this group
+	// or debris, but that's handled above
+	if (collisionGroup0 == COLLISION_GROUP_INTERACTIVE_DEBRIS && collisionGroup1 == COLLISION_GROUP_INTERACTIVE_DEBRIS)
+		return false;
+
+#ifndef HL2MP
+	// This change was breaking HL2DM
+	// Adrian: TEST! Interactive Debris doesn't collide with the player.
+	if (collisionGroup0 == COLLISION_GROUP_INTERACTIVE_DEBRIS && (collisionGroup1 == COLLISION_GROUP_PLAYER_MOVEMENT || collisionGroup1 == COLLISION_GROUP_PLAYER))
+		return false;
+#endif
+
+	if (collisionGroup0 == COLLISION_GROUP_BREAKABLE_GLASS && collisionGroup1 == COLLISION_GROUP_BREAKABLE_GLASS)
+		return false;
+
+	// interactive objects collide with everything except debris & interactive debris
+	if (collisionGroup1 == COLLISION_GROUP_INTERACTIVE && collisionGroup0 != COLLISION_GROUP_NONE)
+		return false;
+
+	// Projectiles hit everything but debris, weapons, + other projectiles
+	if (collisionGroup1 == COLLISION_GROUP_PROJECTILE)
+	{
+		if (collisionGroup0 == COLLISION_GROUP_DEBRIS ||
+			collisionGroup0 == COLLISION_GROUP_WEAPON ||
+			collisionGroup0 == COLLISION_GROUP_PROJECTILE)
+		{
+			return false;
+		}
+	}
+
+	// Don't let vehicles collide with weapons
+	// Don't let players collide with weapons...
+	// Don't let NPCs collide with weapons
+	// Weapons are triggers, too, so they should still touch because of that
+	if (collisionGroup1 == COLLISION_GROUP_WEAPON)
+	{
+		if (collisionGroup0 == COLLISION_GROUP_VEHICLE ||
+			collisionGroup0 == COLLISION_GROUP_PLAYER ||
+			collisionGroup0 == COLLISION_GROUP_NPC)
+		{
+			return false;
+		}
+	}
+
+	// collision with vehicle clip entity??
+	if (collisionGroup0 == COLLISION_GROUP_VEHICLE_CLIP || collisionGroup1 == COLLISION_GROUP_VEHICLE_CLIP)
+	{
+		// yes then if it's a vehicle, collide, otherwise no collision
+		// vehicle sorts lower than vehicle clip, so must be in 0
+		if (collisionGroup0 == COLLISION_GROUP_VEHICLE)
+			return true;
+		// vehicle clip against non-vehicle, no collision
+		return false;
+	}
+
+	return true;
+}
+
+
+const CViewVectors* C_World::GetViewVectors() const
+{
+	return &g_DefaultViewVectors;
+}
+
+
+//-----------------------------------------------------------------------------
+// Purpose: Returns how much damage the given ammo type should do to the victim
+//			when fired by the attacker.
+// Input  : pAttacker - Dude what shot the gun.
+//			pVictim - Dude what done got shot.
+//			nAmmoType - What been shot out.
+// Output : How much hurt to put on dude what done got shot (pVictim).
+//-----------------------------------------------------------------------------
+float C_World::GetAmmoDamage(CBaseEntity* pAttacker, CBaseEntity* pVictim, int nAmmoType)
+{
+	float flDamage = 0;
+	CAmmoDef* pAmmoDef = GetAmmoDef();
+
+	if (pAttacker->IsPlayer())
+	{
+		flDamage = pAmmoDef->PlrDamage(nAmmoType);
+	}
+	else
+	{
+		flDamage = pAmmoDef->NPCDamage(nAmmoType);
+	}
+
+	return flDamage;
+}

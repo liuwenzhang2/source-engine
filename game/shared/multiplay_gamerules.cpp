@@ -46,9 +46,6 @@
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
-
-REGISTER_GAMERULES_CLASS( CMultiplayRules );
-
 ConVar mp_chattime(
 		"mp_chattime", 
 		"10", 
@@ -137,14 +134,14 @@ ConVar nextlevel( "nextlevel",
 #endif
 
 #ifndef CLIENT_DLL
-int CMultiplayRules::m_nMapCycleTimeStamp = 0;
-int CMultiplayRules::m_nMapCycleindex = 0;
-CUtlVector<char*> CMultiplayRules::m_MapList;
+int CMultiplayWorld::m_nMapCycleTimeStamp = 0;
+int CMultiplayWorld::m_nMapCycleindex = 0;
+CUtlVector<char*> CMultiplayWorld::m_MapList;
 #endif
 
 //=========================================================
 //=========================================================
-bool CMultiplayRules::IsMultiplayer( void )
+bool CMultiplayWorld::IsMultiplayer( void )
 {
 	return true;
 }
@@ -152,7 +149,7 @@ bool CMultiplayRules::IsMultiplayer( void )
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-int CMultiplayRules::Damage_GetTimeBased( void )
+int CMultiplayWorld::Damage_GetTimeBased( void )
 {
 	int iDamage = ( DMG_PARALYZE | DMG_NERVEGAS | DMG_POISON | DMG_RADIATION | DMG_DROWNRECOVER | DMG_ACID | DMG_SLOWBURN );
 	return iDamage;
@@ -161,7 +158,7 @@ int CMultiplayRules::Damage_GetTimeBased( void )
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-int	CMultiplayRules::Damage_GetShouldGibCorpse( void )
+int	CMultiplayWorld::Damage_GetShouldGibCorpse( void )
 {
 	int iDamage = ( DMG_CRUSH | DMG_FALL | DMG_BLAST | DMG_SONIC | DMG_CLUB );
 	return iDamage;
@@ -170,7 +167,7 @@ int	CMultiplayRules::Damage_GetShouldGibCorpse( void )
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-int CMultiplayRules::Damage_GetShowOnHud( void )
+int CMultiplayWorld::Damage_GetShowOnHud( void )
 {
 	int iDamage = ( DMG_POISON | DMG_ACID | DMG_DROWN | DMG_BURN | DMG_SLOWBURN | DMG_NERVEGAS | DMG_RADIATION | DMG_SHOCK );
 	return iDamage;
@@ -179,7 +176,7 @@ int CMultiplayRules::Damage_GetShowOnHud( void )
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-int	CMultiplayRules::Damage_GetNoPhysicsForce( void )
+int	CMultiplayWorld::Damage_GetNoPhysicsForce( void )
 {
 	int iTimeBasedDamage = Damage_GetTimeBased();
 	int iDamage = ( DMG_FALL | DMG_BURN | DMG_PLASMA | DMG_DROWN | iTimeBasedDamage | DMG_CRUSH | DMG_PHYSGUN | DMG_PREVENT_PHYSICS_FORCE );
@@ -189,7 +186,7 @@ int	CMultiplayRules::Damage_GetNoPhysicsForce( void )
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-int	CMultiplayRules::Damage_GetShouldNotBleed( void )
+int	CMultiplayWorld::Damage_GetShouldNotBleed( void )
 {
 	int iDamage = ( DMG_POISON | DMG_ACID );
 	return iDamage;
@@ -200,7 +197,7 @@ int	CMultiplayRules::Damage_GetShouldNotBleed( void )
 // Input  : iDmgType - 
 // Output : Returns true on success, false on failure.
 //-----------------------------------------------------------------------------
-bool CMultiplayRules::Damage_IsTimeBased( int iDmgType )
+bool CMultiplayWorld::Damage_IsTimeBased( int iDmgType )
 {
 	// Damage types that are time-based.
 	return ( ( iDmgType & ( DMG_PARALYZE | DMG_NERVEGAS | DMG_POISON | DMG_RADIATION | DMG_DROWNRECOVER | DMG_ACID | DMG_SLOWBURN ) ) != 0 );
@@ -211,7 +208,7 @@ bool CMultiplayRules::Damage_IsTimeBased( int iDmgType )
 // Input  : iDmgType - 
 // Output : Returns true on success, false on failure.
 //-----------------------------------------------------------------------------
-bool CMultiplayRules::Damage_ShouldGibCorpse( int iDmgType )
+bool CMultiplayWorld::Damage_ShouldGibCorpse( int iDmgType )
 {
 	// Damage types that gib the corpse.
 	return ( ( iDmgType & ( DMG_CRUSH | DMG_FALL | DMG_BLAST | DMG_SONIC | DMG_CLUB ) ) != 0 );
@@ -222,7 +219,7 @@ bool CMultiplayRules::Damage_ShouldGibCorpse( int iDmgType )
 // Input  : iDmgType - 
 // Output : Returns true on success, false on failure.
 //-----------------------------------------------------------------------------
-bool CMultiplayRules::Damage_ShowOnHUD( int iDmgType )
+bool CMultiplayWorld::Damage_ShowOnHUD( int iDmgType )
 {
 	// Damage types that have client HUD art.
 	return ( ( iDmgType & ( DMG_POISON | DMG_ACID | DMG_DROWN | DMG_BURN | DMG_SLOWBURN | DMG_NERVEGAS | DMG_RADIATION | DMG_SHOCK ) ) != 0 );
@@ -233,7 +230,7 @@ bool CMultiplayRules::Damage_ShowOnHUD( int iDmgType )
 // Input  : iDmgType - 
 // Output : Returns true on success, false on failure.
 //-----------------------------------------------------------------------------
-bool CMultiplayRules::Damage_NoPhysicsForce( int iDmgType )
+bool CMultiplayWorld::Damage_NoPhysicsForce( int iDmgType )
 {
 	// Damage types that don't have to supply a physics force & position.
 	int iTimeBasedDamage = Damage_GetTimeBased();
@@ -245,7 +242,7 @@ bool CMultiplayRules::Damage_NoPhysicsForce( int iDmgType )
 // Input  : iDmgType - 
 // Output : Returns true on success, false on failure.
 //-----------------------------------------------------------------------------
-bool CMultiplayRules::Damage_ShouldNotBleed( int iDmgType )
+bool CMultiplayWorld::Damage_ShouldNotBleed( int iDmgType )
 {
 	// Damage types that don't make the player bleed.
 	return ( ( iDmgType & ( DMG_POISON | DMG_ACID ) ) != 0 );
@@ -254,7 +251,7 @@ bool CMultiplayRules::Damage_ShouldNotBleed( int iDmgType )
 //*********************************************************
 // Rules for the half-life multiplayer game.
 //*********************************************************
-CMultiplayRules::CMultiplayRules()
+CMultiplayWorld::CMultiplayWorld()
 {
 #ifndef CLIENT_DLL
 	m_flTimeLastMapChangeOrPlayerWasConnected = 0.0f;
@@ -307,17 +304,17 @@ CMultiplayRules::CMultiplayRules()
 	LoadVoiceCommandScript();
 }
 
-bool CMultiplayRules::Init()
-{
-#ifdef GAME_DLL
-
-	// Initialize the custom response rule dictionaries.
-	InitCustomResponseRulesDicts();
-
-#endif
-
-	return BaseClass::Init();
-}
+//bool CMultiplayWorld::Init()
+//{
+//#ifdef GAME_DLL
+//
+//	// Initialize the custom response rule dictionaries.
+//	//InitCustomResponseRulesDicts();
+//
+//#endif
+//
+//	return BaseClass::Init();
+//}
 
 
 #ifdef CLIENT_DLL
@@ -333,7 +330,7 @@ bool CMultiplayRules::Init()
 
 	//=========================================================
 	//=========================================================
-	void CMultiplayRules::RefreshSkillData( bool forceUpdate )
+	void CMultiplayWorld::RefreshSkillData( bool forceUpdate )
 	{
 	// load all default values
 		BaseClass::RefreshSkillData( forceUpdate );
@@ -359,7 +356,7 @@ ConVarRef suitcharger( "sk_suitcharger" );
 
 	//=========================================================
 	//=========================================================
-	void CMultiplayRules::Think ( void )
+	void CMultiplayWorld::Think ( void )
 	{
 		BaseClass::Think();
 		
@@ -398,7 +395,7 @@ ConVarRef suitcharger( "sk_suitcharger" );
 
 	//=========================================================
 	//=========================================================
-	void CMultiplayRules::FrameUpdatePostEntityThink()
+	void CMultiplayWorld::FrameUpdatePostEntityThink()
 	{
 		BaseClass::FrameUpdatePostEntityThink();
 
@@ -445,21 +442,21 @@ ConVarRef suitcharger( "sk_suitcharger" );
 
 	//=========================================================
 	//=========================================================
-	bool CMultiplayRules::IsDeathmatch( void )
+	bool CMultiplayWorld::IsDeathmatch( void )
 	{
 		return true;
 	}
 
 	//=========================================================
 	//=========================================================
-	bool CMultiplayRules::IsCoOp( void )
+	bool CMultiplayWorld::IsCoOp( void )
 	{
 		return false;
 	}
 
 	//=========================================================
 	//=========================================================
-	bool CMultiplayRules::FShouldSwitchWeapon( CBasePlayer *pPlayer, CBaseCombatWeapon *pWeapon )
+	bool CMultiplayWorld::FShouldSwitchWeapon( CBasePlayer *pPlayer, CBaseCombatWeapon *pWeapon )
 	{
 		if ( !pPlayer->Weapon_CanSwitchTo( pWeapon ) )
 		{
@@ -497,7 +494,7 @@ ConVarRef suitcharger( "sk_suitcharger" );
 	// Purpose: Returns the weapon in the player's inventory that would be better than
 	//			the given weapon.
 	//-----------------------------------------------------------------------------
-	CBaseCombatWeapon *CMultiplayRules::GetNextBestWeapon( CBaseCombatCharacter *pPlayer, CBaseCombatWeapon *pCurrentWeapon )
+	CBaseCombatWeapon *CMultiplayWorld::GetNextBestWeapon( CBaseCombatCharacter *pPlayer, CBaseCombatWeapon *pCurrentWeapon )
 	{
 		CBaseCombatWeapon *pCheck;
 		CBaseCombatWeapon *pBest;// this will be used in the event that we don't find a weapon in the same category.
@@ -568,7 +565,7 @@ ConVarRef suitcharger( "sk_suitcharger" );
 	// Purpose: 
 	// Output : Returns true on success, false on failure.
 	//-----------------------------------------------------------------------------
-	bool CMultiplayRules::SwitchToNextBestWeapon( CBaseCombatCharacter *pPlayer, CBaseCombatWeapon *pCurrentWeapon )
+	bool CMultiplayWorld::SwitchToNextBestWeapon( CBaseCombatCharacter *pPlayer, CBaseCombatWeapon *pCurrentWeapon )
 	{
 		CBaseCombatWeapon *pWeapon = GetNextBestWeapon( pPlayer, pCurrentWeapon );
 
@@ -580,19 +577,19 @@ ConVarRef suitcharger( "sk_suitcharger" );
 
 	//=========================================================
 	//=========================================================
-	bool CMultiplayRules::ClientConnected( int pEntity, const char *pszName, const char *pszAddress, char *reject, int maxrejectlen )
+	bool CMultiplayWorld::ClientConnected( int pEntity, const char *pszName, const char *pszAddress, char *reject, int maxrejectlen )
 	{
 		GetVoiceGameMgr()->ClientConnected( pEntity );
 		return true;
 	}
 
-	void CMultiplayRules::InitHUD( CBasePlayer *pl )
+	void CMultiplayWorld::InitHUD( CBasePlayer *pl )
 	{
 	} 
 
 	//=========================================================
 	//=========================================================
-	void CMultiplayRules::ClientDisconnected( int pClient )
+	void CMultiplayWorld::ClientDisconnected( int pClient )
 	{
 		if ( pClient )
 		{
@@ -614,7 +611,7 @@ ConVarRef suitcharger( "sk_suitcharger" );
 
 	//=========================================================
 	//=========================================================
-	float CMultiplayRules::FlPlayerFallDamage( CBasePlayer *pPlayer )
+	float CMultiplayWorld::FlPlayerFallDamage( CBasePlayer *pPlayer )
 	{
 		int iFallDamage = (int)falldamage.GetFloat();
 
@@ -633,21 +630,21 @@ ConVarRef suitcharger( "sk_suitcharger" );
 
 	//=========================================================
 	//=========================================================
-	bool CMultiplayRules::AllowDamage( CBaseEntity *pVictim, const CTakeDamageInfo &info )
+	bool CMultiplayWorld::AllowDamage( CBaseEntity *pVictim, const CTakeDamageInfo &info )
 	{
 		return true;
 	}
 
 	//=========================================================
 	//=========================================================
-	bool CMultiplayRules::FPlayerCanTakeDamage( CBasePlayer *pPlayer, CBaseEntity *pAttacker, const CTakeDamageInfo &info )
+	bool CMultiplayWorld::FPlayerCanTakeDamage( CBasePlayer *pPlayer, CBaseEntity *pAttacker, const CTakeDamageInfo &info )
 	{
 		return true;
 	}
 
 	//=========================================================
 	//=========================================================
-	void CMultiplayRules::PlayerThink( CBasePlayer *pPlayer )
+	void CMultiplayWorld::PlayerThink( CBasePlayer *pPlayer )
 	{
 		if ( g_fGameOver )
 		{
@@ -660,7 +657,7 @@ ConVarRef suitcharger( "sk_suitcharger" );
 
 	//=========================================================
 	//=========================================================
-	void CMultiplayRules::PlayerSpawn( CBasePlayer *pPlayer )
+	void CMultiplayWorld::PlayerSpawn( CBasePlayer *pPlayer )
 	{
 		bool		addDefault;
 		CBaseEntity	*pWeaponEntity = NULL;
@@ -678,19 +675,19 @@ ConVarRef suitcharger( "sk_suitcharger" );
 
 	//=========================================================
 	//=========================================================
-	bool CMultiplayRules::FPlayerCanRespawn( CBasePlayer *pPlayer )
+	bool CMultiplayWorld::FPlayerCanRespawn( CBasePlayer *pPlayer )
 	{
 		return true;
 	}
 
 	//=========================================================
 	//=========================================================
-	float CMultiplayRules::FlPlayerSpawnTime( CBasePlayer *pPlayer )
+	float CMultiplayWorld::FlPlayerSpawnTime( CBasePlayer *pPlayer )
 	{
 		return gpGlobals->curtime;//now!
 	}
 
-	bool CMultiplayRules::AllowAutoTargetCrosshair( void )
+	bool CMultiplayWorld::AllowAutoTargetCrosshair( void )
 	{
 		return ( aimcrosshair.GetInt() != 0 );
 	}
@@ -699,7 +696,7 @@ ConVarRef suitcharger( "sk_suitcharger" );
 	// IPointsForKill - how many points awarded to anyone
 	// that kills this player?
 	//=========================================================
-	int CMultiplayRules::IPointsForKill( CBasePlayer *pAttacker, CBasePlayer *pKilled )
+	int CMultiplayWorld::IPointsForKill( CBasePlayer *pAttacker, CBasePlayer *pKilled )
 	{
 		return 1;
 	}
@@ -707,7 +704,7 @@ ConVarRef suitcharger( "sk_suitcharger" );
 	//-----------------------------------------------------------------------------
 	// Purpose: 
 	//-----------------------------------------------------------------------------
-	CBasePlayer *CMultiplayRules::GetDeathScorer( CBaseEntity *pKiller, CBaseEntity *pInflictor )
+	CBasePlayer *CMultiplayWorld::GetDeathScorer( CBaseEntity *pKiller, CBaseEntity *pInflictor )
 	{
 		if ( pKiller)
 		{
@@ -739,7 +736,7 @@ ConVarRef suitcharger( "sk_suitcharger" );
 	//-----------------------------------------------------------------------------
 	// Purpose: Returns player who should receive credit for kill
 	//-----------------------------------------------------------------------------
-	CBasePlayer *CMultiplayRules::GetDeathScorer( CBaseEntity *pKiller, CBaseEntity *pInflictor, CBaseEntity *pVictim )
+	CBasePlayer *CMultiplayWorld::GetDeathScorer( CBaseEntity *pKiller, CBaseEntity *pInflictor, CBaseEntity *pVictim )
 	{
 		// if this method not overridden by subclass, just call our default implementation
 		return GetDeathScorer( pKiller, pInflictor );
@@ -748,7 +745,7 @@ ConVarRef suitcharger( "sk_suitcharger" );
 	//=========================================================
 	// PlayerKilled - someone/something killed this player
 	//=========================================================
-	void CMultiplayRules::PlayerKilled( CBasePlayer *pVictim, const CTakeDamageInfo &info )
+	void CMultiplayWorld::PlayerKilled( CBasePlayer *pVictim, const CTakeDamageInfo &info )
 	{
 		DeathNotice( pVictim, info );
 
@@ -799,7 +796,7 @@ ConVarRef suitcharger( "sk_suitcharger" );
 	//=========================================================
 	// Deathnotice. 
 	//=========================================================
-	void CMultiplayRules::DeathNotice( CBasePlayer *pVictim, const CTakeDamageInfo &info )
+	void CMultiplayWorld::DeathNotice( CBasePlayer *pVictim, const CTakeDamageInfo &info )
 	{
 		// Work out what killed the player, and send a message to all clients about it
 		const char *killer_weapon_name = "world";		// by default, the player is killed by the world
@@ -885,7 +882,7 @@ ConVarRef suitcharger( "sk_suitcharger" );
 	// FlWeaponRespawnTime - what is the time in the future
 	// at which this weapon may spawn?
 	//=========================================================
-	float CMultiplayRules::FlWeaponRespawnTime( CBaseCombatWeapon *pWeapon )
+	float CMultiplayWorld::FlWeaponRespawnTime( CBaseCombatWeapon *pWeapon )
 	{
 		if ( weaponstay.GetInt() > 0 )
 		{
@@ -908,7 +905,7 @@ ConVarRef suitcharger( "sk_suitcharger" );
 	// now,  otherwise it returns the time at which it can try
 	// to spawn again.
 	//=========================================================
-	float CMultiplayRules::FlWeaponTryRespawn( CBaseCombatWeapon *pWeapon )
+	float CMultiplayWorld::FlWeaponTryRespawn( CBaseCombatWeapon *pWeapon )
 	{
 		if ( pWeapon && (pWeapon->GetWeaponFlags() & ITEM_FLAG_LIMITINWORLD) )
 		{
@@ -926,7 +923,7 @@ ConVarRef suitcharger( "sk_suitcharger" );
 	// VecWeaponRespawnSpot - where should this weapon spawn?
 	// Some game variations may choose to randomize spawn locations
 	//=========================================================
-	Vector CMultiplayRules::VecWeaponRespawnSpot( CBaseCombatWeapon *pWeapon )
+	Vector CMultiplayWorld::VecWeaponRespawnSpot( CBaseCombatWeapon *pWeapon )
 	{
 		return pWeapon->GetEngineObject()->GetAbsOrigin();
 	}
@@ -935,7 +932,7 @@ ConVarRef suitcharger( "sk_suitcharger" );
 	// WeaponShouldRespawn - any conditions inhibiting the
 	// respawning of this weapon?
 	//=========================================================
-	int CMultiplayRules::WeaponShouldRespawn( CBaseCombatWeapon *pWeapon )
+	int CMultiplayWorld::WeaponShouldRespawn( CBaseCombatWeapon *pWeapon )
 	{
 		if ( pWeapon->GetEngineObject()->HasSpawnFlags( SF_NORESPAWN ) )
 		{
@@ -949,7 +946,7 @@ ConVarRef suitcharger( "sk_suitcharger" );
 	// CanHaveWeapon - returns false if the player is not allowed
 	// to pick up this weapon
 	//=========================================================
-	bool CMultiplayRules::CanHavePlayerItem( CBasePlayer *pPlayer, CBaseCombatWeapon *pItem )
+	bool CMultiplayWorld::CanHavePlayerItem( CBasePlayer *pPlayer, CBaseCombatWeapon *pItem )
 	{
 		if ( weaponstay.GetInt() > 0 )
 		{
@@ -971,20 +968,20 @@ ConVarRef suitcharger( "sk_suitcharger" );
 
 	//=========================================================
 	//=========================================================
-	bool CMultiplayRules::CanHaveItem( CBasePlayer *pPlayer, CItem *pItem )
+	bool CMultiplayWorld::CanHaveItem( CBasePlayer *pPlayer, CItem *pItem )
 	{
 		return true;
 	}
 
 	//=========================================================
 	//=========================================================
-	void CMultiplayRules::PlayerGotItem( CBasePlayer *pPlayer, CItem *pItem )
+	void CMultiplayWorld::PlayerGotItem( CBasePlayer *pPlayer, CItem *pItem )
 	{
 	}
 
 	//=========================================================
 	//=========================================================
-	int CMultiplayRules::ItemShouldRespawn( CItem *pItem )
+	int CMultiplayWorld::ItemShouldRespawn( CItem *pItem )
 	{
 		if ( pItem->GetEngineObject()->HasSpawnFlags( SF_NORESPAWN ) )
 		{
@@ -998,7 +995,7 @@ ConVarRef suitcharger( "sk_suitcharger" );
 	//=========================================================
 	// At what time in the future may this Item respawn?
 	//=========================================================
-	float CMultiplayRules::FlItemRespawnTime( CItem *pItem )
+	float CMultiplayWorld::FlItemRespawnTime( CItem *pItem )
 	{
 		return gpGlobals->curtime + ITEM_RESPAWN_TIME;
 	}
@@ -1007,7 +1004,7 @@ ConVarRef suitcharger( "sk_suitcharger" );
 	// Where should this item respawn?
 	// Some game variations may choose to randomize spawn locations
 	//=========================================================
-	Vector CMultiplayRules::VecItemRespawnSpot( CItem *pItem )
+	Vector CMultiplayWorld::VecItemRespawnSpot( CItem *pItem )
 	{
 		return pItem->GetEngineObject()->GetAbsOrigin();
 	}
@@ -1015,20 +1012,20 @@ ConVarRef suitcharger( "sk_suitcharger" );
 	//=========================================================
 	// What angles should this item use to respawn?
 	//=========================================================
-	QAngle CMultiplayRules::VecItemRespawnAngles( CItem *pItem )
+	QAngle CMultiplayWorld::VecItemRespawnAngles( CItem *pItem )
 	{
 		return pItem->GetEngineObject()->GetAbsAngles();
 	}
 
 	//=========================================================
 	//=========================================================
-	void CMultiplayRules::PlayerGotAmmo( CBaseCombatCharacter *pPlayer, char *szName, int iCount )
+	void CMultiplayWorld::PlayerGotAmmo( CBaseCombatCharacter *pPlayer, char *szName, int iCount )
 	{
 	}
 
 	//=========================================================
 	//=========================================================
-	bool CMultiplayRules::IsAllowedToSpawn( CBaseEntity *pEntity )
+	bool CMultiplayWorld::IsAllowedToSpawn( CBaseEntity *pEntity )
 	{
 	//	if ( pEntity->GetFlags() & FL_NPC )
 	//		return false;
@@ -1039,32 +1036,32 @@ ConVarRef suitcharger( "sk_suitcharger" );
 
 	//=========================================================
 	//=========================================================
-	float CMultiplayRules::FlHealthChargerRechargeTime( void )
+	float CMultiplayWorld::FlHealthChargerRechargeTime( void )
 	{
 		return 60;
 	}
 
 
-	float CMultiplayRules::FlHEVChargerRechargeTime( void )
+	float CMultiplayWorld::FlHEVChargerRechargeTime( void )
 	{
 		return 30;
 	}
 
 	//=========================================================
 	//=========================================================
-	int CMultiplayRules::DeadPlayerWeapons( CBasePlayer *pPlayer )
+	int CMultiplayWorld::DeadPlayerWeapons( CBasePlayer *pPlayer )
 	{
 		return GR_PLR_DROP_GUN_ACTIVE;
 	}
 
 	//=========================================================
 	//=========================================================
-	int CMultiplayRules::DeadPlayerAmmo( CBasePlayer *pPlayer )
+	int CMultiplayWorld::DeadPlayerAmmo( CBasePlayer *pPlayer )
 	{
 		return GR_PLR_DROP_AMMO_ACTIVE;
 	}
 
-	CBaseEntity *CMultiplayRules::GetPlayerSpawnSpot( CBasePlayer *pPlayer )
+	CBaseEntity *CMultiplayWorld::GetPlayerSpawnSpot( CBasePlayer *pPlayer )
 	{
 		CBaseEntity *pentSpawnSpot = BaseClass::GetPlayerSpawnSpot( pPlayer );	
 
@@ -1082,18 +1079,18 @@ ConVarRef suitcharger( "sk_suitcharger" );
 
 	//=========================================================
 	//=========================================================
-	bool CMultiplayRules::PlayerCanHearChat( CBasePlayer *pListener, CBasePlayer *pSpeaker )
+	bool CMultiplayWorld::PlayerCanHearChat( CBasePlayer *pListener, CBasePlayer *pSpeaker )
 	{
 		return ( PlayerRelationship( pListener, pSpeaker ) == GR_TEAMMATE );
 	}
 
-	int CMultiplayRules::PlayerRelationship( CBaseEntity *pPlayer, CBaseEntity *pTarget )
+	int CMultiplayWorld::PlayerRelationship( CBaseEntity *pPlayer, CBaseEntity *pTarget )
 	{
 		// half life deathmatch has only enemies
 		return GR_NOTTEAMMATE;
 	}
 
-	bool CMultiplayRules::PlayFootstepSounds( CBasePlayer *pl )
+	bool CMultiplayWorld::PlayFootstepSounds( CBasePlayer *pl )
 	{
 		if ( footsteps.GetInt() == 0 )
 			return false;
@@ -1104,23 +1101,23 @@ ConVarRef suitcharger( "sk_suitcharger" );
 		return false;
 	}
 
-	bool CMultiplayRules::FAllowFlashlight( void ) 
+	bool CMultiplayWorld::FAllowFlashlight( void ) 
 	{ 
 		return flashlight.GetInt() != 0; 
 	}
 
 	//=========================================================
 	//=========================================================
-	bool CMultiplayRules::FAllowNPCs( void )
+	bool CMultiplayWorld::FAllowNPCs( void )
 	{
 		return true; // E3 hack
 		return ( allowNPCs.GetInt() != 0 );
 	}
 
 	//=========================================================
-	//======== CMultiplayRules private functions ===========
+	//======== CMultiplayWorld private functions ===========
 
-	void CMultiplayRules::GoToIntermission( void )
+	void CMultiplayWorld::GoToIntermission( void )
 	{
 		if ( g_fGameOver )
 			return;
@@ -1160,7 +1157,7 @@ ConVarRef suitcharger( "sk_suitcharger" );
 		*dst = '\0';
 	}
 
-	void CMultiplayRules::GetNextLevelName( char *pszNextMap, int bufsize, bool bRandom /* = false */ )
+	void CMultiplayWorld::GetNextLevelName( char *pszNextMap, int bufsize, bool bRandom /* = false */ )
 	{
 		char mapcfile[256];
 		DetermineMapCycleFilename( mapcfile, sizeof(mapcfile), false );
@@ -1205,7 +1202,7 @@ ConVarRef suitcharger( "sk_suitcharger" );
 		Q_strncpy( pszNextMap, m_MapList[m_nMapCycleindex], bufsize);
 	}
 
-	void CMultiplayRules::DetermineMapCycleFilename( char *pszResult, int nSizeResult, bool bForceSpew )
+	void CMultiplayWorld::DetermineMapCycleFilename( char *pszResult, int nSizeResult, bool bForceSpew )
 	{
 		static char szLastResult[ 256];
 
@@ -1272,7 +1269,7 @@ ConVarRef suitcharger( "sk_suitcharger" );
 		}
 	}
 
-	void CMultiplayRules::LoapMapCycleFileIntoVector( const char *pszMapCycleFile, CUtlVector<char *> &mapList )
+	void CMultiplayWorld::LoapMapCycleFileIntoVector( const char *pszMapCycleFile, CUtlVector<char *> &mapList )
 	{
 		CUtlBuffer buf;
 		if ( !filesystem->ReadFile( pszMapCycleFile, "GAME", buf ) )
@@ -1309,7 +1306,7 @@ ConVarRef suitcharger( "sk_suitcharger" );
 		}
 	}
 
-	void CMultiplayRules::FreeMapCycleFileVector( CUtlVector<char *> &mapList )
+	void CMultiplayWorld::FreeMapCycleFileVector( CUtlVector<char *> &mapList )
 	{
 		// Clear out existing map list. Not using Purge() or PurgeAndDeleteAll() because they won't delete [] each element.
 		for ( int i = 0; i < mapList.Count(); i++ )
@@ -1320,7 +1317,7 @@ ConVarRef suitcharger( "sk_suitcharger" );
 		mapList.RemoveAll();
 	}
 
-	bool CMultiplayRules::IsMapInMapCycle( const char *pszName )
+	bool CMultiplayWorld::IsMapInMapCycle( const char *pszName )
 	{
 		for ( int i = 0; i < m_MapList.Count(); i++ )
 		{
@@ -1333,7 +1330,7 @@ ConVarRef suitcharger( "sk_suitcharger" );
 		return false;
 	}
 
-	void CMultiplayRules::ChangeLevel( void )
+	void CMultiplayWorld::ChangeLevel( void )
 	{
 		char szNextMap[MAX_MAP_NAME];
 
@@ -1350,7 +1347,7 @@ ConVarRef suitcharger( "sk_suitcharger" );
 		ChangeLevelToMap( szNextMap );
 	}
 
-	void CMultiplayRules::LoadMapCycleFile( void )
+	void CMultiplayWorld::LoadMapCycleFile( void )
 	{
 		char mapcfile[256];
 		DetermineMapCycleFilename( mapcfile, sizeof(mapcfile), false );
@@ -1477,7 +1474,7 @@ ConVarRef suitcharger( "sk_suitcharger" );
 		}		
 	}
 
-	void CMultiplayRules::ChangeLevelToMap( const char *pszMap )
+	void CMultiplayWorld::ChangeLevelToMap( const char *pszMap )
 	{
 		g_fGameOver = true;
 		m_flTimeLastMapChangeOrPlayerWasConnected = 0.0f;
@@ -1492,7 +1489,7 @@ ConVarRef suitcharger( "sk_suitcharger" );
 	//-----------------------------------------------------------------------------
 	// Purpose: Shared script resource of voice menu commands and hud strings
 	//-----------------------------------------------------------------------------
-	void CMultiplayRules::LoadVoiceCommandScript( void )
+	void CMultiplayWorld::LoadVoiceCommandScript( void )
 	{
 		KeyValues *pKV = new KeyValues( "VoiceCommands" );
 
@@ -1544,7 +1541,7 @@ ConVarRef suitcharger( "sk_suitcharger" );
 
 #ifndef CLIENT_DLL
 
-	void CMultiplayRules::SkipNextMapInCycle()
+	void CMultiplayWorld::SkipNextMapInCycle()
 	{
 		char szSkippedMap[MAX_MAP_NAME];
 		char szNextMap[MAX_MAP_NAME];
@@ -1561,7 +1558,7 @@ ConVarRef suitcharger( "sk_suitcharger" );
 		}
 	}
 
-	void CMultiplayRules::IncrementMapCycleIndex()
+	void CMultiplayWorld::IncrementMapCycleIndex()
 	{
 		// Reset index if we've passed the end of the map list
 		if ( ++m_nMapCycleindex >= m_MapList.Count() )
@@ -1570,7 +1567,7 @@ ConVarRef suitcharger( "sk_suitcharger" );
 		}
 	}
 
-	bool CMultiplayRules::ClientCommand( CBaseEntity *pEdict, const CCommand &args )
+	bool CMultiplayWorld::ClientCommand( CBaseEntity *pEdict, const CCommand &args )
 	{
 		CBasePlayer *pPlayer = ToBasePlayer( pEdict );
 
@@ -1596,7 +1593,7 @@ ConVarRef suitcharger( "sk_suitcharger" );
 		return BaseClass::ClientCommand( pEdict, args );
 	}
 
-	void CMultiplayRules::ClientCommandKeyValues( int pEntity, KeyValues *pKeyValues )
+	void CMultiplayWorld::ClientCommandKeyValues( int pEntity, KeyValues *pKeyValues )
 	{
 		CBaseMultiplayerPlayer *pPlayer = dynamic_cast< CBaseMultiplayerPlayer * >(EntityList()->GetBaseEntity( pEntity ) );
 
@@ -1630,7 +1627,7 @@ ConVarRef suitcharger( "sk_suitcharger" );
 		}
 	}
 
-	VoiceCommandMenuItem_t *CMultiplayRules::VoiceCommand( CBaseMultiplayerPlayer *pPlayer, int iMenu, int iItem )
+	VoiceCommandMenuItem_t *CMultiplayWorld::VoiceCommand( CBaseMultiplayerPlayer *pPlayer, int iMenu, int iItem )
 	{
 		// have the player speak the concept that is in a particular menu slot
 		if ( !pPlayer )
@@ -1730,12 +1727,12 @@ ConVarRef suitcharger( "sk_suitcharger" );
 		return NULL;
 	}
 
-	bool CMultiplayRules::IsLoadingBugBaitReport()
+	bool CMultiplayWorld::IsLoadingBugBaitReport()
 	{
 		return ( !engine->IsDedicatedServer()&& CommandLine()->CheckParm( "-bugbait" ) && sv_cheats->GetBool() );
 	}
 
-	void CMultiplayRules::HaveAllPlayersSpeakConceptIfAllowed( int iConcept, int iTeam /* = TEAM_UNASSIGNED */, const char *modifiers /* = NULL */ )
+	void CMultiplayWorld::HaveAllPlayersSpeakConceptIfAllowed( int iConcept, int iTeam /* = TEAM_UNASSIGNED */, const char *modifiers /* = NULL */ )
 	{
 		CBaseMultiplayerPlayer *pPlayer;
 		for ( int i = 1; i <= gpGlobals->maxClients; i++ )
@@ -1755,7 +1752,7 @@ ConVarRef suitcharger( "sk_suitcharger" );
 		}
 	}
 
-	void CMultiplayRules::RandomPlayersSpeakConceptIfAllowed( int iConcept, int iNumRandomPlayer /*= 1*/, int iTeam /*= TEAM_UNASSIGNED*/, const char *modifiers /*= NULL*/ )
+	void CMultiplayWorld::RandomPlayersSpeakConceptIfAllowed( int iConcept, int iNumRandomPlayer /*= 1*/, int iTeam /*= TEAM_UNASSIGNED*/, const char *modifiers /*= NULL*/ )
 	{
 		CUtlVector< CBaseMultiplayerPlayer* > speakCandidates;
 
@@ -1786,7 +1783,7 @@ ConVarRef suitcharger( "sk_suitcharger" );
 		}
 	}
 
-	void CMultiplayRules::ClientSettingsChanged( CBasePlayer *pPlayer )
+	void CMultiplayWorld::ClientSettingsChanged( CBasePlayer *pPlayer )
 	{
 		// NVNT see if this user is still or has began using a haptic device
 		const char *pszHH = engine->GetClientConVarValue( pPlayer->entindex(), "hap_HasDevice" );
@@ -1797,7 +1794,7 @@ ConVarRef suitcharger( "sk_suitcharger" );
 		}
 
 	}
-	void CMultiplayRules::GetTaggedConVarList( KeyValues *pCvarTagList )
+	void CMultiplayWorld::GetTaggedConVarList( KeyValues *pCvarTagList )
 	{
 		BaseClass::GetTaggedConVarList( pCvarTagList );
 
@@ -1818,7 +1815,7 @@ ConVarRef suitcharger( "sk_suitcharger" );
 
 #else
 
-	const char *CMultiplayRules::GetVoiceCommandSubtitle( int iMenu, int iItem )
+	const char *CMultiplayWorld::GetVoiceCommandSubtitle( int iMenu, int iItem )
 	{
 		Assert( iMenu >= 0 && iMenu < m_VoiceCommandMenus.Count() );
 		if ( iMenu < 0 || iMenu >= m_VoiceCommandMenus.Count() )
@@ -1836,7 +1833,7 @@ ConVarRef suitcharger( "sk_suitcharger" );
 	}
 
 	// Returns false if no such menu is declared or if it's an empty menu
-	bool CMultiplayRules::GetVoiceMenuLabels( int iMenu, KeyValues *pKV )
+	bool CMultiplayWorld::GetVoiceMenuLabels( int iMenu, KeyValues *pKV )
 	{
 		Assert( iMenu >= 0 && iMenu < m_VoiceCommandMenus.Count() );
 		if ( iMenu < 0 || iMenu >= m_VoiceCommandMenus.Count() )

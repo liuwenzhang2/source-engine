@@ -19,6 +19,7 @@
 #include "dod_playerclass_info_parse.h"
 #include "dod_shareddefs.h"
 #include "dod_player.h"
+#include "dod_gamerules.h"
 
 typedef CUtlLinkedList< PLAYERCLASS_FILE_INFO_HANDLE, int > PlayerClassInfoList;
 
@@ -36,7 +37,7 @@ public:
 	virtual void Init( const char *pName, int iNumber );
 
 	CDODPlayerClassInfo const &GetPlayerClassInfo( int iPlayerClass ) const;
-	const unsigned char *GetEncryptionKey( void ) { return g_pGameRules->GetEncryptionKey(); }
+	const unsigned char *GetEncryptionKey( void ) { return DODGameRules()->GetEncryptionKey(); }
 
 	virtual void AddPlayerClass( const char *pszClassName );
 

@@ -29,7 +29,8 @@ public:
 	int GetNetworkBase( int nTick, int nEntity );
 
 public:
-	
+	// Current map
+	string_t		mapname;
 	// Absolute time (per frame still - Use Plat_FloatTime() for a high precision real time 
 	//  perf clock, but not that it doesn't obey host_timescale/host_framerate)
 	float			realtime;

@@ -62,9 +62,6 @@ public:
 	// destructor, cleans up automagically....
 	virtual ~IGameSystem();
 
-	// Client systems can use this to get at the map name
-	static char const*	MapName();
-
 	// These methods are used to add and remove server systems from the
 	// main server loop. The systems are invoked in the order in which
 	// they are added.
@@ -76,7 +73,7 @@ public:
 	static bool InitAllSystems();
 	static void PostInitAllSystems();
 	static void ShutdownAllSystems();
-	static void LevelInitPreEntityAllSystems( char const* pMapName );
+	static void LevelInitPreEntityAllSystems();
 	static void LevelInitPostEntityAllSystems();
 	static void LevelShutdownPreClearSteamAPIContextAllSystems(); // Called prior to steamgameserverapicontext->Clear()
 	static void LevelShutdownPreEntityAllSystems();

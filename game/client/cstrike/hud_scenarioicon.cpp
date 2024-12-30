@@ -83,7 +83,7 @@ void CHudScenarioIcon::Paint()
 		}
 	}
 
-	CCSGameRules *pRules = CSGameRules();
+	CCSGameWorld *pRules = CSGameRules();
 
 	// If there are hostages, draw how many there are
 	if( pRules && pRules->GetNumHostagesRemaining() )

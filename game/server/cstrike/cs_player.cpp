@@ -3226,7 +3226,7 @@ bool CCSPlayer::CanPlayerBuy( bool display )
 		return false;
 	}
 
-	CCSGameRules* mp = CSGameRules();
+	CCSGameWorld* mp = CSGameRules();
 
 	// is the player alive?
 	if ( m_lifeState != LIFE_ALIVE )
@@ -3280,10 +3280,10 @@ BuyResult_e CCSPlayer::AttemptToBuyVest( void )
 {
 	int iKevlarPrice = KEVLAR_PRICE;
 
-	if ( CSGameRules()->IsBlackMarket() )
-	{
-		iKevlarPrice = CSGameRules()->GetBlackMarketPriceForWeapon( WEAPON_KEVLAR );
-	}
+	//if ( CSGameRules()->IsBlackMarket() )
+	//{
+	//	iKevlarPrice = CSGameRules()->GetBlackMarketPriceForWeapon( WEAPON_KEVLAR );
+	//}
 
 	if ( ArmorValue() >= 100 )
 	{
@@ -3334,13 +3334,13 @@ BuyResult_e CCSPlayer::AttemptToBuyAssaultSuit( void )
 	int iKevlarPrice = KEVLAR_PRICE;
 	int iAssaultSuitPrice = ASSAULTSUIT_PRICE;
 
-	if ( CSGameRules()->IsBlackMarket() )
-	{
-		iKevlarPrice = CSGameRules()->GetBlackMarketPriceForWeapon( WEAPON_KEVLAR );
-		iAssaultSuitPrice = CSGameRules()->GetBlackMarketPriceForWeapon( WEAPON_ASSAULTSUIT );
+	//if ( CSGameRules()->IsBlackMarket() )
+	//{
+	//	iKevlarPrice = CSGameRules()->GetBlackMarketPriceForWeapon( WEAPON_KEVLAR );
+	//	iAssaultSuitPrice = CSGameRules()->GetBlackMarketPriceForWeapon( WEAPON_ASSAULTSUIT );
 
-		iHelmetPrice = iAssaultSuitPrice - iKevlarPrice;
-	}
+	//	iHelmetPrice = iAssaultSuitPrice - iKevlarPrice;
+	//}
 
 	if ( fullArmor && m_bHasHelmet )
 	{
@@ -3438,7 +3438,7 @@ BuyResult_e CCSPlayer::AttemptToBuyShield( void )
 
 BuyResult_e CCSPlayer::AttemptToBuyDefuser( void )
 {
-	CCSGameRules *MPRules = CSGameRules();
+	CCSGameWorld *MPRules = CSGameRules();
 
 	if( ( GetTeamNumber() == TEAM_CT ) && MPRules->IsBombDefuseMap() )
 	{
@@ -3473,10 +3473,10 @@ BuyResult_e CCSPlayer::AttemptToBuyNightVision( void )
 {
 	int iNVGPrice = NVG_PRICE;
 
-	if ( CSGameRules()->IsBlackMarket() )
-	{
-		iNVGPrice = CSGameRules()->GetBlackMarketPriceForWeapon( WEAPON_NVG );
-	}
+	//if ( CSGameRules()->IsBlackMarket() )
+	//{
+	//	iNVGPrice = CSGameRules()->GetBlackMarketPriceForWeapon( WEAPON_NVG );
+	//}
 
 	if ( m_bHasNightVision == TRUE )
 	{
@@ -4755,7 +4755,7 @@ bool CCSPlayer::ClientCommand( const CCommand &args )
 // can be closed...false if the menu should be displayed again
 bool CCSPlayer::HandleCommand_JoinTeam( int team )
 {
-	CCSGameRules *mp = CSGameRules();
+	CCSGameWorld *mp = CSGameRules();
 
 	if ( !GetGlobalTeam( team ) )
 	{
@@ -5061,7 +5061,7 @@ void CCSPlayer::GetIntoGame()
 	SetFOV( this, 0 );
 	m_flLastMovement = gpGlobals->curtime;
 
-	CCSGameRules *MPRules = CSGameRules();
+	CCSGameWorld *MPRules = CSGameRules();
 
 /*	//MIKETODO: Escape gameplay ?
 	if ( ( MPRules->m_bMapHasEscapeZone == true ) && ( m_iTeam == TEAM_CT ) )

@@ -26,10 +26,7 @@
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
-
-REGISTER_GAMERULES_CLASS( CHalfLife2 );
-
-BEGIN_NETWORK_TABLE_NOBASE( CHalfLife2, DT_HL2GameRules )
+BEGIN_NETWORK_TABLE( CHalfLife2World, DT_HL2GameWorld )
 	#ifdef CLIENT_DLL
 		RecvPropBool( RECVINFO( m_bMegaPhysgun ) ),
 	#else
@@ -37,36 +34,7 @@ BEGIN_NETWORK_TABLE_NOBASE( CHalfLife2, DT_HL2GameRules )
 	#endif
 END_NETWORK_TABLE()
 
-
-LINK_ENTITY_TO_CLASS( hl2_gamerules, CHalfLife2Proxy );
-IMPLEMENT_NETWORKCLASS_ALIASED( HalfLife2Proxy, DT_HalfLife2Proxy )
-
-
-#ifdef CLIENT_DLL
-	void RecvProxy_HL2GameRules( const RecvProp *pProp, void **pOut, void *pData, int objectID )
-	{
-		CHalfLife2 *pRules = HL2GameRules();
-		Assert( pRules );
-		*pOut = pRules;
-	}
-
-	BEGIN_RECV_TABLE( CHalfLife2Proxy, DT_HalfLife2Proxy )
-		RecvPropDataTable( "hl2_gamerules_data", 0, 0, &REFERENCE_RECV_TABLE( DT_HL2GameRules ), RecvProxy_HL2GameRules )
-	END_RECV_TABLE()
-#else
-	void* SendProxy_HL2GameRules( const SendProp *pProp, const void *pStructBase, const void *pData, CSendProxyRecipients *pRecipients, int objectID )
-	{
-		CHalfLife2 *pRules = HL2GameRules();
-		Assert( pRules );
-		pRecipients->SetAllRecipients();
-		return pRules;
-	}
-
-	BEGIN_SEND_TABLE( CHalfLife2Proxy, DT_HalfLife2Proxy )
-		SendPropDataTable( "hl2_gamerules_data", 0, &REFERENCE_SEND_TABLE( DT_HL2GameRules ), SendProxy_HL2GameRules )
-	END_SEND_TABLE()
-#endif
-
+IMPLEMENT_NETWORKCLASS_ALIASED(HalfLife2World, DT_HL2GameWorld)
 ConVar  physcannon_mega_enabled( "physcannon_mega_enabled", "0", FCVAR_CHEAT | FCVAR_REPLICATED );
 
 // Controls the application of the robus radius damage model.
@@ -185,7 +153,7 @@ ConVar	sk_npc_dmg_gunship_to_plr	( "sk_npc_dmg_gunship_to_plr", "0", FCVAR_REPLI
 // Input  : iDmgType - 
 // Output : Returns true on success, false on failure.
 //-----------------------------------------------------------------------------
-int CHalfLife2::Damage_GetTimeBased( void )
+int CHalfLife2World::Damage_GetTimeBased( void )
 {
 #ifdef HL2_EPISODIC
 	int iDamage = ( DMG_PARALYZE | DMG_NERVEGAS | DMG_POISON | DMG_RADIATION | DMG_DROWNRECOVER | DMG_ACID | DMG_SLOWBURN );
@@ -200,7 +168,7 @@ int CHalfLife2::Damage_GetTimeBased( void )
 // Input  : iDmgType - 
 // Output :		bool
 //-----------------------------------------------------------------------------
-bool CHalfLife2::Damage_IsTimeBased( int iDmgType )
+bool CHalfLife2World::Damage_IsTimeBased( int iDmgType )
 {
 	// Damage types that are time-based.
 #ifdef HL2_EPISODIC
@@ -246,7 +214,7 @@ ConVar  alyx_darkness_force( "alyx_darkness_force", "0", FCVAR_CHEAT | FCVAR_REP
 	// Input  :
 	// Output :
 	//-----------------------------------------------------------------------------
-	CHalfLife2::CHalfLife2()
+	CHalfLife2World::CHalfLife2World()
 	{
 		m_bMegaPhysgun = false;
 		
@@ -260,7 +228,7 @@ ConVar  alyx_darkness_force( "alyx_darkness_force", "0", FCVAR_CHEAT | FCVAR_REP
 	//			Use engine.Cmd_Argv,  engine.Cmd_Argv, and engine.Cmd_Argc to get 
 	//			pointers the character string command.
 	//-----------------------------------------------------------------------------
-	bool CHalfLife2::ClientCommand( CBaseEntity *pEdict, const CCommand &args )
+	bool CHalfLife2World::ClientCommand( CBaseEntity *pEdict, const CCommand &args )
 	{
 		if( BaseClass::ClientCommand( pEdict, args ) )
 			return true;
@@ -276,7 +244,7 @@ ConVar  alyx_darkness_force( "alyx_darkness_force", "0", FCVAR_CHEAT | FCVAR_REP
 	//-----------------------------------------------------------------------------
 	// Purpose: Player has just spawned. Equip them.
 	//-----------------------------------------------------------------------------
-	void CHalfLife2::PlayerSpawn( CBasePlayer *pPlayer )
+	void CHalfLife2World::PlayerSpawn( CBasePlayer *pPlayer )
 	{
 	}
 
@@ -353,7 +321,7 @@ ConVar  alyx_darkness_force( "alyx_darkness_force", "0", FCVAR_CHEAT | FCVAR_REP
 	// Input   :
 	// Output  :
 	//------------------------------------------------------------------------------
-	void CHalfLife2::InitDefaultAIRelationships( void )
+	void CHalfLife2World::InitDefaultAIRelationships( void )
 	{
 		int i, j;
 
@@ -1284,7 +1252,7 @@ ConVar  alyx_darkness_force( "alyx_darkness_force", "0", FCVAR_CHEAT | FCVAR_REP
 	// Input   :
 	// Output  :
 	//------------------------------------------------------------------------------
-	const char* CHalfLife2::AIClassText(int classType)
+	const char* CHalfLife2World::AIClassText(int classType)
 	{
 		switch (classType)
 		{
@@ -1318,11 +1286,11 @@ ConVar  alyx_darkness_force( "alyx_darkness_force", "0", FCVAR_CHEAT | FCVAR_REP
 		}
 	}
 
-	void CHalfLife2::PlayerThink( CBasePlayer *pPlayer )
+	void CHalfLife2World::PlayerThink( CBasePlayer *pPlayer )
 	{
 	}
 
-	void CHalfLife2::Think( void )
+	void CHalfLife2World::Think( void )
 	{
 		BaseClass::Think();
 
@@ -1345,7 +1313,7 @@ ConVar  alyx_darkness_force( "alyx_darkness_force", "0", FCVAR_CHEAT | FCVAR_REP
 	//			nAmmoType - What been shot out.
 	// Output : How much hurt to put on dude what done got shot (pVictim).
 	//-----------------------------------------------------------------------------
-	float CHalfLife2::GetAmmoDamage( CBaseEntity *pAttacker, CBaseEntity *pVictim, int nAmmoType )
+	float CHalfLife2World::GetAmmoDamage( CBaseEntity *pAttacker, CBaseEntity *pVictim, int nAmmoType )
 	{
 		float flDamage = 0.0f;
 		CAmmoDef *pAmmoDef = GetAmmoDef();
@@ -1388,7 +1356,7 @@ ConVar  alyx_darkness_force( "alyx_darkness_force", "0", FCVAR_CHEAT | FCVAR_REP
 
    	//-----------------------------------------------------------------------------
   	//-----------------------------------------------------------------------------
- 	bool CHalfLife2::AllowDamage( CBaseEntity *pVictim, const CTakeDamageInfo &info )
+ 	bool CHalfLife2World::AllowDamage( CBaseEntity *pVictim, const CTakeDamageInfo &info )
   	{
 #ifndef CLIENT_DLL
 	if( (info.GetDamageType() & DMG_CRUSH) && info.GetInflictor() && pVictim->MyNPCPointer() )
@@ -1429,7 +1397,7 @@ ConVar  alyx_darkness_force( "alyx_darkness_force", "0", FCVAR_CHEAT | FCVAR_REP
 	// Purpose: Whether or not the NPC should drop a health vial
 	// Output : Returns true on success, false on failure.
 	//-----------------------------------------------------------------------------
-	bool CHalfLife2::NPC_ShouldDropHealth( CBasePlayer *pRecipient )
+	bool CHalfLife2World::NPC_ShouldDropHealth( CBasePlayer *pRecipient )
 	{
 		// Can only do this every so often
 		if ( m_flLastHealthDropTime > gpGlobals->curtime )
@@ -1448,7 +1416,7 @@ ConVar  alyx_darkness_force( "alyx_darkness_force", "0", FCVAR_CHEAT | FCVAR_REP
 	// Purpose: Whether or not the NPC should drop a health vial
 	// Output : Returns true on success, false on failure.
 	//-----------------------------------------------------------------------------
-	bool CHalfLife2::NPC_ShouldDropGrenade( CBasePlayer *pRecipient )
+	bool CHalfLife2World::NPC_ShouldDropGrenade( CBasePlayer *pRecipient )
 	{
 		// Can only do this every so often
 		if ( m_flLastGrenadeDropTime > gpGlobals->curtime )
@@ -1467,7 +1435,7 @@ ConVar  alyx_darkness_force( "alyx_darkness_force", "0", FCVAR_CHEAT | FCVAR_REP
 	//-----------------------------------------------------------------------------
 	// Purpose: Update the drop counter for health
 	//-----------------------------------------------------------------------------
-	void CHalfLife2::NPC_DroppedHealth( void )
+	void CHalfLife2World::NPC_DroppedHealth( void )
 	{
 		m_flLastHealthDropTime = gpGlobals->curtime + sk_plr_health_drop_time.GetFloat();
 	}
@@ -1475,7 +1443,7 @@ ConVar  alyx_darkness_force( "alyx_darkness_force", "0", FCVAR_CHEAT | FCVAR_REP
 	//-----------------------------------------------------------------------------
 	// Purpose: Update the drop counter for grenades
 	//-----------------------------------------------------------------------------
-	void CHalfLife2::NPC_DroppedGrenade( void )
+	void CHalfLife2World::NPC_DroppedGrenade( void )
 	{
 		m_flLastGrenadeDropTime = gpGlobals->curtime + sk_plr_grenade_drop_time.GetFloat();
 	}
@@ -1484,9 +1452,9 @@ ConVar  alyx_darkness_force( "alyx_darkness_force", "0", FCVAR_CHEAT | FCVAR_REP
 
 
 // ------------------------------------------------------------------------------------ //
-// Shared CHalfLife2 implementation.
+// Shared CHalfLife2World implementation.
 // ------------------------------------------------------------------------------------ //
-bool CHalfLife2::ShouldCollide( int collisionGroup0, int collisionGroup1 )
+bool CHalfLife2World::ShouldCollide( int collisionGroup0, int collisionGroup1 )
 {
 	// The smaller number is always first
 	if ( collisionGroup0 > collisionGroup1 )
@@ -1597,7 +1565,7 @@ bool CHalfLife2::ShouldCollide( int collisionGroup0, int collisionGroup1 )
 #ifndef CLIENT_DLL
 //---------------------------------------------------------
 //---------------------------------------------------------
-void CHalfLife2::AdjustPlayerDamageTaken( CTakeDamageInfo *pInfo )
+void CHalfLife2World::AdjustPlayerDamageTaken( CTakeDamageInfo *pInfo )
 {
 	if( pInfo->GetDamageType() & (DMG_DROWN|DMG_CRUSH|DMG_FALL|DMG_POISON|DMG_SNIPER) )
 	{
@@ -1623,7 +1591,7 @@ void CHalfLife2::AdjustPlayerDamageTaken( CTakeDamageInfo *pInfo )
 
 //---------------------------------------------------------
 //---------------------------------------------------------
-float CHalfLife2::AdjustPlayerDamageInflicted( float damage )
+float CHalfLife2World::AdjustPlayerDamageInflicted( float damage )
 {
 	switch( GetSkillLevel() ) 
 	{
@@ -1648,7 +1616,7 @@ float CHalfLife2::AdjustPlayerDamageInflicted( float damage )
 
 //---------------------------------------------------------
 //---------------------------------------------------------
-bool CHalfLife2::ShouldUseRobustRadiusDamage(CBaseEntity *pEntity)
+bool CHalfLife2World::ShouldUseRobustRadiusDamage(CBaseEntity *pEntity)
 {
 #ifdef CLIENT_DLL
 	return false;
@@ -1678,14 +1646,14 @@ bool CHalfLife2::ShouldUseRobustRadiusDamage(CBaseEntity *pEntity)
 #ifndef CLIENT_DLL
 //---------------------------------------------------------
 //---------------------------------------------------------
-bool CHalfLife2::ShouldAutoAim( CBasePlayer *pPlayer, CBaseEntity *target )
+bool CHalfLife2World::ShouldAutoAim( CBasePlayer *pPlayer, CBaseEntity *target )
 {
 	return sk_allow_autoaim.GetBool() != 0;
 }
 
 //---------------------------------------------------------
 //---------------------------------------------------------
-float CHalfLife2::GetAutoAimScale( CBasePlayer *pPlayer )
+float CHalfLife2World::GetAutoAimScale( CBasePlayer *pPlayer )
 {
 #ifdef _X360
 	return 1.0f;
@@ -1706,7 +1674,7 @@ float CHalfLife2::GetAutoAimScale( CBasePlayer *pPlayer )
 
 //---------------------------------------------------------
 //---------------------------------------------------------
-float CHalfLife2::GetAmmoQuantityScale( int iAmmoIndex )
+float CHalfLife2World::GetAmmoQuantityScale( int iAmmoIndex )
 {
 	switch( GetSkillLevel() )
 	{
@@ -1724,7 +1692,7 @@ float CHalfLife2::GetAmmoQuantityScale( int iAmmoIndex )
 	}
 }
 
-void CHalfLife2::LevelInitPreEntity()
+void CHalfLife2World::LevelInitPreEntity()
 {
 	// Remove this if you fix the bug in ep1 where the striders need to touch
 	// triggers using their absbox instead of their bbox
@@ -1741,7 +1709,7 @@ void CHalfLife2::LevelInitPreEntity()
 //-----------------------------------------------------------------------------
 // Returns whether or not Alyx cares about light levels in order to see.
 //-----------------------------------------------------------------------------
-bool CHalfLife2::IsAlyxInDarknessMode()
+bool CHalfLife2World::IsAlyxInDarknessMode()
 {
 #ifdef HL2_EPISODIC
 	if ( alyx_darkness_force.GetBool() )
@@ -1758,7 +1726,7 @@ bool CHalfLife2::IsAlyxInDarknessMode()
 // This takes the long way around to see if a prop should emit a DLIGHT when it
 // ignites, to avoid having Alyx-related code in props.cpp.
 //-----------------------------------------------------------------------------
-bool CHalfLife2::ShouldBurningPropsEmitLight()
+bool CHalfLife2World::ShouldBurningPropsEmitLight()
 {
 #ifdef HL2_EPISODIC
 	return IsAlyxInDarknessMode();

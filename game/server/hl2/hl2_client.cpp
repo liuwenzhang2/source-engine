@@ -174,17 +174,17 @@ extern ConVar gamerules_survival;
 //=========================================================
 void InstallGameRules()
 {
-#ifdef HL2_EPISODIC
-	if ( gamerules_survival.GetBool() )
-	{
-		// Survival mode
-		CreateGameRulesObject( "CHalfLife2Survival" );
-	}
-	else
-#endif
-	{
-		// generic half-life
-		CreateGameRulesObject( "CHalfLife2" );
-	}
+//#ifdef HL2_EPISODIC
+//	if ( gamerules_survival.GetBool() )
+//	{
+//		// Survival mode
+//		CreateGameRulesObject( "CHalfLife2Survival" );
+//	}
+//	else
+//#endif
+//	{
+//		// generic half-life
+//		CreateGameRulesObject( "CHalfLife2" );
+//	}
 }
 

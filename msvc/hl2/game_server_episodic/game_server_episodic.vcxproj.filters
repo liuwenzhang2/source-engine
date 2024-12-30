@@ -1305,9 +1305,6 @@
     <ClCompile Include="..\..\..\game\shared\gamemovement.cpp">
       <Filter>源文件\Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\game\shared\gamerules.cpp">
-      <Filter>源文件\Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\game\shared\gamerules_register.cpp">
       <Filter>源文件\Source Files</Filter>
     </ClCompile>
@@ -1741,6 +1738,9 @@
       <Filter>源文件\Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\public\physics_saverestore.cpp">
+      <Filter>源文件\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\public\gamerules.cpp">
       <Filter>源文件\Source Files</Filter>
     </ClCompile>
   </ItemGroup>

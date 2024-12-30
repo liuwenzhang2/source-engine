@@ -492,7 +492,7 @@ bool CDODPlayer::CanAttack( void )
 		return false;
 	}
 
-	CDODGameRules *rules = DODGameRules();
+	CDODGameWorld *rules = DODGameRules();
 
 	Assert( rules );
 

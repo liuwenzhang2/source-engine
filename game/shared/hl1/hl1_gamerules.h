@@ -20,15 +20,21 @@
 
 
 #ifdef CLIENT_DLL
-	#define CHalfLife1 C_HalfLife1
+	#define CHalfLife1World C_HalfLife1World
 #endif
 
 
-class CHalfLife1 : public CSingleplayRules
+class CHalfLife1World : public CSingleplayWorld
 {
 public:
 
-	DECLARE_CLASS( CHalfLife1, CSingleplayRules );
+	DECLARE_CLASS(CHalfLife1World, CSingleplayWorld);
+
+#ifdef CLIENT_DLL
+	DECLARE_CLIENTCLASS(); // This makes datatables able to access our private vars.
+#else
+	DECLARE_SERVERCLASS(); // This makes datatables able to access our private vars.
+#endif
 
 	// Damage Queries.
 	virtual int		Damage_GetShowOnHud( void );
@@ -39,8 +45,8 @@ public:
 
 #ifndef CLIENT_DLL
 	
-	CHalfLife1();
-	virtual ~CHalfLife1() {}
+	CHalfLife1World();
+	virtual ~CHalfLife1World() {}
 
 	virtual bool			ClientCommand( CBaseEntity *pEdict, const CCommand &args );
 	virtual void			PlayerSpawn( CBasePlayer *pPlayer );

@@ -29,9 +29,7 @@ static int num_teams = 0;
 
 extern bool		g_fGameOver;
 
-REGISTER_GAMERULES_CLASS( CTeamplayRules );
-
-CTeamplayRules::CTeamplayRules()
+CTeamplayWorld::CTeamplayWorld()
 {
 	m_DisableDeathMessages = false;
 	m_DisableDeathPenalty = false;
@@ -51,8 +49,9 @@ CTeamplayRules::CTeamplayRules()
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-void CTeamplayRules::Precache( void )
+void CTeamplayWorld::Precache( void )
 {
+	BaseClass::Precache();
 	// Call the Team Manager's precaches
 	for ( int i = 0; i < GetNumberOfTeams(); i++ )
 	{
@@ -64,7 +63,7 @@ void CTeamplayRules::Precache( void )
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-void CTeamplayRules::Think ( void )
+void CTeamplayWorld::Think ( void )
 {
 	BaseClass::Think();
 
@@ -104,7 +103,7 @@ void CTeamplayRules::Think ( void )
 // the user has typed a command which is unrecognized by everything else;
 // this check to see if the gamerules knows anything about the command
 //=========================================================
-bool CTeamplayRules::ClientCommand( CBaseEntity *pEdict, const CCommand &args )
+bool CTeamplayWorld::ClientCommand( CBaseEntity *pEdict, const CCommand &args )
 {
 	if( BaseClass::ClientCommand( pEdict, args ) )
 		return true;
@@ -124,7 +123,7 @@ bool CTeamplayRules::ClientCommand( CBaseEntity *pEdict, const CCommand &args )
 	return false;
 }
 
-const char *CTeamplayRules::SetDefaultPlayerTeam( CBasePlayer *pPlayer )
+const char *CTeamplayWorld::SetDefaultPlayerTeam( CBasePlayer *pPlayer )
 {
 	// copy out the team name from the model
 	int clientIndex = pPlayer->entindex();
@@ -159,7 +158,7 @@ const char *CTeamplayRules::SetDefaultPlayerTeam( CBasePlayer *pPlayer )
 //=========================================================
 // InitHUD
 //=========================================================
-void CTeamplayRules::InitHUD( CBasePlayer *pPlayer )
+void CTeamplayWorld::InitHUD( CBasePlayer *pPlayer )
 {
 	SetDefaultPlayerTeam( pPlayer );
 	BaseClass::InitHUD( pPlayer );
@@ -189,7 +188,7 @@ void CTeamplayRules::InitHUD( CBasePlayer *pPlayer )
 }
 
 
-void CTeamplayRules::ChangePlayerTeam( CBasePlayer *pPlayer, const char *pTeamName, bool bKill, bool bGib )
+void CTeamplayWorld::ChangePlayerTeam( CBasePlayer *pPlayer, const char *pTeamName, bool bKill, bool bGib )
 {
 	int damageFlags = DMG_GENERIC;
 	// int clientIndex = pPlayer->entindex();
@@ -211,7 +210,7 @@ void CTeamplayRules::ChangePlayerTeam( CBasePlayer *pPlayer, const char *pTeamNa
 //-----------------------------------------------------------------------------
 // Purpose: Player has just left the game
 //-----------------------------------------------------------------------------
-void CTeamplayRules::ClientDisconnected( int pClient )
+void CTeamplayWorld::ClientDisconnected( int pClient )
 {
 	// Msg( "CLIENT DISCONNECTED, REMOVING FROM TEAM.\n" );
 
@@ -233,7 +232,7 @@ void CTeamplayRules::ClientDisconnected( int pClient )
 //=========================================================
 // ClientUserInfoChanged
 //=========================================================
-void CTeamplayRules::ClientSettingsChanged( CBasePlayer *pPlayer )
+void CTeamplayWorld::ClientSettingsChanged( CBasePlayer *pPlayer )
 {
 	/* TODO: handle skin, model & team changes 
 
@@ -301,7 +300,7 @@ void CTeamplayRules::ClientSettingsChanged( CBasePlayer *pPlayer )
 //=========================================================
 // Deathnotice. 
 //=========================================================
-void CTeamplayRules::DeathNotice( CBasePlayer *pVictim, const CTakeDamageInfo &info )
+void CTeamplayWorld::DeathNotice( CBasePlayer *pVictim, const CTakeDamageInfo &info )
 {
 	if ( m_DisableDeathMessages )
 		return;
@@ -334,7 +333,7 @@ void CTeamplayRules::DeathNotice( CBasePlayer *pVictim, const CTakeDamageInfo &i
 
 //=========================================================
 //=========================================================
-void CTeamplayRules::PlayerKilled( CBasePlayer *pVictim, const CTakeDamageInfo &info )
+void CTeamplayWorld::PlayerKilled( CBasePlayer *pVictim, const CTakeDamageInfo &info )
 {
 	if ( !m_DisableDeathPenalty )
 	{
@@ -347,12 +346,12 @@ void CTeamplayRules::PlayerKilled( CBasePlayer *pVictim, const CTakeDamageInfo &
 //=========================================================
 // IsTeamplay
 //=========================================================
-bool CTeamplayRules::IsTeamplay( void )
+bool CTeamplayWorld::IsTeamplay( void )
 {
 	return true;
 }
 
-bool CTeamplayRules::FPlayerCanTakeDamage( CBasePlayer *pPlayer, CBaseEntity *pAttacker, const CTakeDamageInfo &info )
+bool CTeamplayWorld::FPlayerCanTakeDamage( CBasePlayer *pPlayer, CBaseEntity *pAttacker, const CTakeDamageInfo &info )
 {
 	if ( pAttacker && PlayerRelationship( pPlayer, pAttacker ) == GR_TEAMMATE && !info.IsForceFriendlyFire() )
 	{
@@ -369,7 +368,7 @@ bool CTeamplayRules::FPlayerCanTakeDamage( CBasePlayer *pPlayer, CBaseEntity *pA
 
 //=========================================================
 //=========================================================
-int CTeamplayRules::PlayerRelationship( CBaseEntity *pPlayer, CBaseEntity *pTarget )
+int CTeamplayWorld::PlayerRelationship( CBaseEntity *pPlayer, CBaseEntity *pTarget )
 {
 	// half life multiplay has a simple concept of Player Relationships.
 	// you are either on another player's team, or you are not.
@@ -390,14 +389,14 @@ int CTeamplayRules::PlayerRelationship( CBaseEntity *pPlayer, CBaseEntity *pTarg
 //			*pSpeaker - 
 // Output : Returns true on success, false on failure.
 //-----------------------------------------------------------------------------
-bool CTeamplayRules::PlayerCanHearChat( CBasePlayer *pListener, CBasePlayer *pSpeaker )
+bool CTeamplayWorld::PlayerCanHearChat( CBasePlayer *pListener, CBasePlayer *pSpeaker )
 {
 	return ( PlayerRelationship( pListener, pSpeaker ) == GR_TEAMMATE );
 }
 
 //=========================================================
 //=========================================================
-bool CTeamplayRules::ShouldAutoAim( CBasePlayer *pPlayer, CBaseEntity *target )
+bool CTeamplayWorld::ShouldAutoAim( CBasePlayer *pPlayer, CBaseEntity *target )
 {
 	// always autoaim, unless target is a teammate
 	CBaseEntity *pTgt =  target ;
@@ -412,7 +411,7 @@ bool CTeamplayRules::ShouldAutoAim( CBasePlayer *pPlayer, CBaseEntity *target )
 
 //=========================================================
 //=========================================================
-int CTeamplayRules::IPointsForKill( CBasePlayer *pAttacker, CBasePlayer *pKilled )
+int CTeamplayWorld::IPointsForKill( CBasePlayer *pAttacker, CBasePlayer *pKilled )
 {
 	if ( !pKilled )
 		return 0;
@@ -428,7 +427,7 @@ int CTeamplayRules::IPointsForKill( CBasePlayer *pAttacker, CBasePlayer *pKilled
 
 //=========================================================
 //=========================================================
-const char *CTeamplayRules::GetTeamID( CBaseEntity *pEntity )
+const char *CTeamplayWorld::GetTeamID( CBaseEntity *pEntity )
 {
 	if ( pEntity == NULL || pEntity->entindex() == -1 )
 		return "";
@@ -438,7 +437,7 @@ const char *CTeamplayRules::GetTeamID( CBaseEntity *pEntity )
 }
 
 
-int CTeamplayRules::GetTeamIndex( const char *pTeamName )
+int CTeamplayWorld::GetTeamIndex( const char *pTeamName )
 {
 	if ( pTeamName && *pTeamName != 0 )
 	{
@@ -454,7 +453,7 @@ int CTeamplayRules::GetTeamIndex( const char *pTeamName )
 }
 
 
-const char *CTeamplayRules::GetIndexedTeamName( int teamIndex )
+const char *CTeamplayWorld::GetIndexedTeamName( int teamIndex )
 {
 	if ( teamIndex < 0 || teamIndex >= num_teams )
 		return "";
@@ -463,7 +462,7 @@ const char *CTeamplayRules::GetIndexedTeamName( int teamIndex )
 }
 
 
-bool CTeamplayRules::IsValidTeam( const char *pTeamName ) 
+bool CTeamplayWorld::IsValidTeam( const char *pTeamName ) 
 {
 	if ( !m_teamLimit )	// Any team is valid if the teamlist isn't set
 		return true;
@@ -471,7 +470,7 @@ bool CTeamplayRules::IsValidTeam( const char *pTeamName )
 	return ( GetTeamIndex( pTeamName ) != -1 ) ? true : false;
 }
 
-const char *CTeamplayRules::TeamWithFewestPlayers( void )
+const char *CTeamplayWorld::TeamWithFewestPlayers( void )
 {
 	int i;
 	int minPlayers = MAX_TEAMS;
@@ -509,7 +508,7 @@ const char *CTeamplayRules::TeamWithFewestPlayers( void )
 
 //=========================================================
 //=========================================================
-void CTeamplayRules::RecountTeams( void )
+void CTeamplayWorld::RecountTeams( void )
 {
 	char	*pName;
 	char	teamlist[TEAMPLAY_TEAMLISTLENGTH];

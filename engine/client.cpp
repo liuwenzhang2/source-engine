@@ -308,9 +308,10 @@ bool CClientState::SetSignonState ( int state, int count )
 				// Tell client .dll about the transition
 				char mapname[256];
 				CL_SetupMapName( modelloader->GetName( host_state.worldmodel ), mapname, sizeof( mapname ) );
+				g_ClientGlobalVariables.mapname = MAKE_STRING(mapname);
 
 				COM_TimestampedLog( "LevelInitPreEntity: start %d", state );
-				g_ClientDLL->LevelInitPreEntity(mapname);
+				g_ClientDLL->LevelInitPreEntity();
 				COM_TimestampedLog( "LevelInitPreEntity: end %d", state );
 
 				phonehome->Message( IPhoneHome::PHONE_MSG_MAPSTART, mapname );

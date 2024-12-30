@@ -303,7 +303,7 @@ bool C_SoundscapeSystem::Init()
 {
 	m_loopingSoundId = 0;
 
-	const char *mapname = MapName();
+	const char *mapname = gpGlobals->mapname.ToCStr();
 	const char *mapSoundscapeFilename = NULL;
 	if ( mapname && *mapname )
 	{

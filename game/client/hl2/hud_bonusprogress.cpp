@@ -108,7 +108,7 @@ void CHudBonusProgress::VidInit()
 //-----------------------------------------------------------------------------
 void CHudBonusProgress::OnThink()
 {
-	C_GameRules *pGameRules = GameRules();
+	IClientGameRules *pGameRules = GameRules();
 
 	if ( !pGameRules )
 	{

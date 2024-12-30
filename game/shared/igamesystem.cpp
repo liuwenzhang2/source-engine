@@ -39,9 +39,6 @@ static CUtlVector<IGameSystem*> s_GameSystems( 0, 4 );
 // List of all installed Game systems
 static CUtlVector<IGameSystemPerFrame*> s_GameSystemsPerFrame( 0, 4 );
 
-// The map name
-static char* s_pMapName = 0;
-
 static CBasePlayer *s_pRunCommandPlayer = NULL;
 static CUserCmd *s_pRunCommandUserCmd = NULL;
 
@@ -140,15 +137,6 @@ void IGameSystem::RemoveAll(  )
 	s_GameSystemsPerFrame.RemoveAll();
 }
 
-
-//-----------------------------------------------------------------------------
-// Client systems can use this to get at the map name
-//-----------------------------------------------------------------------------
-char const*	IGameSystem::MapName()
-{
-	return s_pMapName;
-}
-
 #ifndef CLIENT_DLL
 CBasePlayer *IGameSystem::RunCommandPlayer()
 {
@@ -240,18 +228,8 @@ void IGameSystem::ShutdownAllSystems()
 	InvokeMethodReverseOrder( &IGameSystem::Shutdown );
 }
 
-void IGameSystem::LevelInitPreEntityAllSystems( char const* pMapName )
+void IGameSystem::LevelInitPreEntityAllSystems()
 {
-	// Store off the map name
-	if ( s_pMapName )
-	{
-		delete[] s_pMapName;
-	}
-
-	int len = Q_strlen(pMapName) + 1;
-	s_pMapName = new char [ len ];
-	Q_strncpy( s_pMapName, pMapName, len );
-
 	InvokeMethod( &IGameSystem::LevelInitPreEntity, "LevelInitPreEntity" );
 }
 
@@ -273,12 +251,6 @@ void IGameSystem::LevelShutdownPreEntityAllSystems()
 void IGameSystem::LevelShutdownPostEntityAllSystems()
 {
 	InvokeMethodReverseOrder( &IGameSystem::LevelShutdownPostEntity );
-
-	if ( s_pMapName )
-	{
-		delete[] s_pMapName;
-		s_pMapName = 0;
-	}
 }
 
 void IGameSystem::OnSaveAllSystems()

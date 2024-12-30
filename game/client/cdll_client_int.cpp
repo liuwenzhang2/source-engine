@@ -533,7 +533,7 @@ public:
 	virtual bool					ReplayInit( CreateInterfaceFn fnReplayFactory );
 	virtual bool					ReplayPostInit();
 
-	virtual void					LevelInitPreEntity( const char *pMapName );
+	virtual void					LevelInitPreEntity();
 	virtual void					LevelInitPostEntity();
 	virtual bool					IsLowViolence();
 	virtual void					LevelShutdown( void );
@@ -1637,7 +1637,7 @@ void CHLClient::View_Fade( ScreenFade_t *pSF )
 //-----------------------------------------------------------------------------
 // Purpose: Per level init
 //-----------------------------------------------------------------------------
-void CHLClient::LevelInitPreEntity( char const* pMapName )
+void CHLClient::LevelInitPreEntity()
 {
 	// HACK: Bogus, but the logic is too complicated in the engine
 	if (g_bLevelInitialized)
@@ -1649,22 +1649,19 @@ void CHLClient::LevelInitPreEntity( char const* pMapName )
 	vieweffects->LevelInit();
 	
 	//Tony; loadup per-map manifests.
-	ParseParticleEffectsMap( pMapName, true );
+	ParseParticleEffectsMap( gpGlobals->mapname.ToCStr(), true);
 	
 	// Tell mode manager that map is changing
-	modemanager->LevelInit( pMapName );
+	modemanager->LevelInit(gpGlobals->mapname.ToCStr());
 	ParticleMgr()->LevelInit();
 
-	hudlcd->SetGlobalStat( "(mapname)", pMapName );
+	hudlcd->SetGlobalStat( "(mapname)", gpGlobals->mapname.ToCStr());
 
 	C_BaseTempEntity::ClearDynamicTempEnts();
 	clienteffects->Flush();
 	view->LevelInit();
 	tempents->LevelInit();
 	ResetToneMapping(1.0);
-
-	EntityList()->LevelInitPreEntity();
-	IGameSystem::LevelInitPreEntityAllSystems(pMapName);
 
 #ifdef USES_ECON_ITEMS
 	GameItemSchema_t *pItemSchema = ItemSystem()->GetItemSchema();
@@ -1696,7 +1693,7 @@ void CHLClient::LevelInitPreEntity( char const* pMapName )
 #endif
 
 	// Check low violence settings for this map
-	g_RagdollLVManager.SetLowViolence( pMapName );
+	g_RagdollLVManager.SetLowViolence(gpGlobals->mapname.ToCStr());
 
 	gHUD.LevelInit();
 	gTouch.LevelInit();
@@ -1984,7 +1981,7 @@ void CHLClient::InstallStringTableCallback( const char *tableName )
 	}
 #endif
 
-	InstallStringTableCallback_GameRules();
+	//InstallStringTableCallback_GameRules();
 }
 
 

@@ -12,11 +12,17 @@
 
 
 #include "gamerules.h"
+#ifdef CLIENT_DLL
+#include "c_world.h"
+#endif // CLIENT_DLL
+#ifdef GAME_DLL
+#include "world.h"
+#endif // GAME_DLL
 
 
 #ifdef CLIENT_DLL
 
-	#define CSingleplayRules C_SingleplayRules
+	#define CSingleplayWorld C_SingleplayWorld
 
 #endif
 
@@ -25,11 +31,11 @@
 // CSingleplayRules - rules for the single player Half-Life 
 // game.
 //=========================================================
-class CSingleplayRules : public CGameRules
+class CSingleplayWorld : public CWorld
 {
 public:
 
-	DECLARE_CLASS( CSingleplayRules, CGameRules );
+	DECLARE_CLASS(CSingleplayWorld, CWorld );
 
 
 // Functions to verify the single/multiplayer status of a game
@@ -52,8 +58,8 @@ public:
 
 #else
 
-	CSingleplayRules();
-	virtual ~CSingleplayRules() {}
+	CSingleplayWorld();
+	virtual ~CSingleplayWorld() {}
 
 // GR_Think
 	virtual void Think( void );

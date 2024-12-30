@@ -33,8 +33,7 @@
 #endif
 
 #ifdef CLIENT_DLL
-	#define CDODGameRules C_DODGameRules
-	#define CDODGameRulesProxy C_DODGameRulesProxy
+	#define CDODGameWorld C_DODGameWorld
 #else
 	extern IVoiceGameMgrHelper *g_pVoiceGameMgrHelper;
 	extern IUploadGameStats *gamestatsuploader;
@@ -56,14 +55,7 @@
 
 #endif
 
-class CDODGameRulesProxy : public CGameRulesProxy
-{
-public:
-	DECLARE_CLASS( CDODGameRulesProxy, CGameRulesProxy );
-	DECLARE_NETWORKCLASS();
-};
-
-class CDODGameRules;
+class CDODGameWorld;
 
 class CDODRoundStateInfo
 {
@@ -71,9 +63,9 @@ public:
 	DODRoundState m_iRoundState;
 	const char *m_pStateName;
 	
-	void (CDODGameRules::*pfnEnterState)();	// Init and deinit the state.
-	void (CDODGameRules::*pfnLeaveState)();
-	void (CDODGameRules::*pfnThink)();	// Do a PreThink() in this state.
+	void (CDODGameWorld::*pfnEnterState)();	// Init and deinit the state.
+	void (CDODGameWorld::*pfnLeaveState)();
+	void (CDODGameWorld::*pfnThink)();	// Do a PreThink() in this state.
 };
 
 typedef enum
@@ -176,10 +168,10 @@ public:
 };
 
 //GAMERULES
-class CDODGameRules : public CTeamplayRules
+class CDODGameWorld : public CTeamplayWorld
 {
 public:
-	DECLARE_CLASS( CDODGameRules, CTeamplayRules );
+	DECLARE_CLASS(CDODGameWorld, CTeamplayWorld );
 
 	virtual bool ShouldCollide( int collisionGroup0, int collisionGroup1 );
 
@@ -215,18 +207,18 @@ public:
 
 #ifdef CLIENT_DLL
 
-	DECLARE_CLIENTCLASS_NOBASE(); // This makes datatables able to access our private vars.
+	DECLARE_CLIENTCLASS(); // This makes datatables able to access our private vars.
 
 	void SetRoundState( int iRoundState );
 	float m_flLastRoundStateChangeTime;
 
 #else
 
-	DECLARE_SERVERCLASS_NOBASE(); // This makes datatables able to access our private vars.
+	DECLARE_SERVERCLASS(); // This makes datatables able to access our private vars.
 
-	CDODGameRules();
-	virtual ~CDODGameRules();
-
+	CDODGameWorld();
+	virtual ~CDODGameWorld();
+	void PostConstructor(const char* szClassname, int iForceEdictIndex);
 	virtual void LevelShutdown( void );
 	void UploadLevelStats( void );
 
@@ -511,9 +503,9 @@ public:
 // Gets us at the team fortress game rules
 //-----------------------------------------------------------------------------
 
-inline CDODGameRules* DODGameRules()
+inline CDODGameWorld* DODGameRules()
 {
-	return static_cast<CDODGameRules*>(g_pGameRules);
+	return (CDODGameWorld*)EntityList()->GetBaseEntity(0);
 }
 
 #ifdef CLIENT_DLL

@@ -288,7 +288,7 @@ void CTeamControlPointRound::InputRoundSpawn( inputdata_t &input )
 //-----------------------------------------------------------------------------
 void CTeamControlPointRound::SetupSpawnPoints( void )
 {
-	CTeamplayRoundBasedRules *pRules = TeamplayRoundBasedRules();
+	CTeamplayRoundBasedWorld *pRules = TeamplayRoundBasedRules();
 
 	if ( pRules )
 	{

@@ -208,6 +208,6 @@ void GameStartFrame( void )
 void InstallGameRules()
 {
 	// vanilla deathmatch
-	CreateGameRulesObject( "CHL2MPRules" );
+	//CreateGameRulesObject( "CHL2MPRules" );
 }
 

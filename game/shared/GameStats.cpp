@@ -996,7 +996,7 @@ void CBaseGameStats_Driver::CollectData( StatSendType_t sendType )
 			// make a map node in the KeyValues to use for this level
 			char szMap[MAX_PATH+1]="";
 #ifdef CLIENT_DLL	
-			Q_FileBase( MapName(), szMap, ARRAYSIZE( szMap ) );
+			Q_FileBase(gpGlobals->mapname.ToCStr(), szMap, ARRAYSIZE( szMap ) );
 #else
 			Q_strncpy( szMap, gpGlobals->mapname.ToCStr(), ARRAYSIZE( szMap ) );
 #endif // CLIENT_DLL

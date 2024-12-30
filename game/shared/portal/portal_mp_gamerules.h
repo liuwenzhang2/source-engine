@@ -22,8 +22,7 @@
 class CPortal_Player;
 
 #ifdef CLIENT_DLL
-#define CPortalMPGameRules C_PortalMPGameRules
-#define CPortalMPGameRulesProxy C_PortalMPGameRulesProxy
+#define CPortalMPGameWorld C_PortalMPGameWorld
 #endif
 
 
@@ -31,14 +30,6 @@ enum
 {
 	TEAM_COMBINE = 2,
 	TEAM_REBELS,
-};
-
-
-class CPortalMPGameRulesProxy : public CGameRulesProxy
-{
-public:
-	DECLARE_CLASS( CPortalMPGameRulesProxy, CGameRulesProxy );
-	DECLARE_NETWORKCLASS();
 };
 
 class PortalMPViewVectors : public CViewVectors
@@ -75,21 +66,21 @@ public:
 	Vector m_vCrouchTraceMax;	
 };
 
-class CPortalMPGameRules : public CTeamplayRules
+class CPortalMPGameWorld : public CTeamplayWorld
 {
 public:
 	//DECLARE_CLASS( CPortalGameRules, CSingleplayRules );
 	//DECLARE_CLASS( CPortalGameRules, CMultiplayRules );
-	DECLARE_CLASS( CPortalMPGameRules, CTeamplayRules );
+	DECLARE_CLASS(CPortalMPGameWorld, CTeamplayWorld);
 
 #ifdef CLIENT_DLL
-	DECLARE_CLIENTCLASS_NOBASE(); // This makes datatables able to access our private vars.
+	DECLARE_CLIENTCLASS(); // This makes datatables able to access our private vars.
 #else
-	DECLARE_SERVERCLASS_NOBASE(); // This makes datatables able to access our private vars.
+	DECLARE_SERVERCLASS(); // This makes datatables able to access our private vars.
 #endif
 
-	CPortalMPGameRules( void );
-	virtual ~CPortalMPGameRules( void );
+	CPortalMPGameWorld( void );
+	virtual ~CPortalMPGameWorld( void );
 
 	virtual void Precache( void );
 	virtual bool ShouldCollide( int collisionGroup0, int collisionGroup1 );
@@ -158,14 +149,14 @@ private:
 //-----------------------------------------------------------------------------
 // Gets us at the Half-Life 2 game rules
 //-----------------------------------------------------------------------------
-inline CPortalMPGameRules* PortalMPGameRules()
+inline CPortalMPGameWorld* PortalMPGameRules()
 {
-	return static_cast<CPortalMPGameRules*>(g_pGameRules);
+	return static_cast<CPortalMPGameWorld*>(g_pGameRules);
 }
 
-inline CPortalMPGameRules* PortalGameRules()
+inline CPortalMPGameWorld* PortalGameRules()
 {
-	return static_cast<CPortalMPGameRules*>(g_pGameRules);
+	return static_cast<CPortalMPGameWorld*>(g_pGameRules);
 }
 
 

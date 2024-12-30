@@ -14,7 +14,7 @@
 #pragma once
 #endif
 
-
+#include "gamerules.h"
 #include "teamplay_gamerules.h"
 #include "convar.h"
 #include "cs_shareddefs.h"
@@ -32,7 +32,7 @@
 
 //extern ConVar mp_dynamicpricing;
 
-#define CS_GAMERULES_BLACKMARKET_TABLE_NAME "BlackMarketTable"
+//#define CS_GAMERULES_BLACKMARKET_TABLE_NAME "BlackMarketTable"
 
 #define	WINNER_NONE		0
 #define WINNER_DRAW		1
@@ -63,8 +63,7 @@ extern ConVar mp_playerid;
 
 
 #ifdef CLIENT_DLL
-	#define CCSGameRules C_CSGameRules
-	#define CCSGameRulesProxy C_CSGameRulesProxy
+	#define CCSGameWorld C_CSGameWorld
 #endif
 
 #ifndef CLIENT_DLL
@@ -75,19 +74,10 @@ extern ConVar mp_playerid;
 	};
 #endif
 
-
-class CCSGameRulesProxy : public CGameRulesProxy
+class CCSGameWorld : public CTeamplayWorld
 {
 public:
-	DECLARE_CLASS( CCSGameRulesProxy, CGameRulesProxy );
-	DECLARE_NETWORKCLASS();
-};
-
-
-class CCSGameRules : public CTeamplayRules
-{
-public:
-	DECLARE_CLASS( CCSGameRules, CTeamplayRules );
+	DECLARE_CLASS(CCSGameWorld, CTeamplayWorld);
 
 	// Stuff that is shared between client and server.
 	bool IsFreezePeriod();
@@ -136,13 +126,13 @@ private:
 	CNetworkVar( bool, m_bMapHasBombTarget );
 	CNetworkVar( bool, m_bMapHasRescueZone );
 	CNetworkVar( bool, m_bLogoMap );		 // If there's an info_player_logo entity, then it's a logo map.
-	CNetworkVar( bool, m_bBlackMarket );
+	//CNetworkVar( bool, m_bBlackMarket );
 
 	bool		m_bDontUploadStats;
 
 public:
 
-	bool IsBlackMarket( void ) { return m_bBlackMarket; }
+	//bool IsBlackMarket( void ) { return m_bBlackMarket; }
 	int GetNumHostagesRemaining( void ) { return m_iHostagesRemaining; }
 
 	virtual CBaseCombatWeapon *GetNextBestWeapon( CBaseCombatCharacter *pPlayer, CBaseCombatWeapon *pCurrentWeapon );
@@ -151,15 +141,15 @@ public:
 
 #ifdef CLIENT_DLL
 
-	DECLARE_CLIENTCLASS_NOBASE(); // This makes datatables able to access our private vars.
-	CCSGameRules();
+	DECLARE_CLIENTCLASS(); // This makes datatables able to access our private vars.
+	CCSGameWorld();
 
 #else
 
-	DECLARE_SERVERCLASS_NOBASE(); // This makes datatables able to access our private vars.
+	DECLARE_SERVERCLASS(); // This makes datatables able to access our private vars.
 
-	CCSGameRules();
-	virtual ~CCSGameRules();
+	CCSGameWorld();
+	virtual ~CCSGameWorld();
 
 	void DumpTimers( void ) const;	// debugging to help track down a stuck server (rare?)
 
@@ -483,8 +473,8 @@ public:
 
 
 
-	void AddPricesToTable( weeklyprice_t prices );
-	virtual void CreateCustomNetworkStringTables( void );
+	//void AddPricesToTable( weeklyprice_t prices );
+	//virtual void CreateCustomNetworkStringTables( void );
 
 #endif
 
@@ -495,25 +485,25 @@ public:
 #endif
 
 public:
-	const weeklyprice_t *GetBlackMarketPriceList( void );
+	//const weeklyprice_t *GetBlackMarketPriceList( void );
 
-	int GetBlackMarketPriceForWeapon( int iWeaponID );
-	int GetBlackMarketPreviousPriceForWeapon( int iWeaponID );
+	//int GetBlackMarketPriceForWeapon( int iWeaponID );
+	//int GetBlackMarketPreviousPriceForWeapon( int iWeaponID );
 
 	void SetBlackMarketPrices( bool bSetDefaults );
 
 	// Black market
-	INetworkStringTable *m_StringTableBlackMarket;
-	const weeklyprice_t *m_pPrices;
+	//INetworkStringTable *m_StringTableBlackMarket;
+	//const weeklyprice_t *m_pPrices;
 };
 
 //-----------------------------------------------------------------------------
 // Gets us at the team fortress game rules
 //-----------------------------------------------------------------------------
 
-inline CCSGameRules* CSGameRules()
+inline CCSGameWorld* CSGameRules()
 {
-	return static_cast<CCSGameRules*>(g_pGameRules);
+	return (CCSGameWorld*)EntityList()->GetBaseEntity(0);
 }
 
 #define IGNORE_SPECTATORS true

@@ -8,7 +8,7 @@
 //#include "cbase.h"
 #include "entitylist.h"
 //#include "vphysics/collision_set.h"
-
+#include "igamesystem.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
@@ -2569,7 +2569,7 @@ bool CGrabControllerInternal::UpdateObject(CBaseEntity* pPlayer, float flError)
 	}
 	AngleVectors(playerAngles, &forward, &right, &up);
 
-	if (HL2GameRules()->MegaPhyscannonActive())
+	if (g_pGameRules->MegaPhyscannonActive())
 	{
 		Vector los = (pEntity->WorldSpaceCenter() - pPlayer->Weapon_ShootPosition());
 		VectorNormalize(los);
@@ -9438,6 +9438,26 @@ bool CEngineObjectInternal::EntityHasMatchingRootParent(IEngineObjectServer* pRo
 			return true;
 	}
 	return false;
+}
+
+CEngineWorldInternal::CEngineWorldInternal(IServerEntityList* pServerEntityList, int iForceEdictIndex, int iSerialNum)
+	:CEngineObjectInternal(pServerEntityList, iForceEdictIndex, iSerialNum)
+{
+
+}
+
+CEngineWorldInternal::~CEngineWorldInternal() 
+{
+	gEntList.m_pGameRules = NULL;
+}
+
+void CEngineWorldInternal::Init(CBaseEntity* pOuter) 
+{
+	BaseClass::Init(pOuter);
+	gEntList.m_pGameRules = dynamic_cast<IServerGameRules*>(pOuter);
+	if (!gEntList.m_pGameRules) {
+		Error("CWorld does implement IGameRiles!\n");
+	}
 }
 
 //-----------------------------------------------------------------------------
