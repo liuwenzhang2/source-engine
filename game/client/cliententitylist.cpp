@@ -8934,7 +8934,7 @@ void UTIL_TraceEntityThroughPortal(C_BaseEntity* pEntity, const Vector& vecAbsSt
 	unsigned int mask, ITraceFilter* pFilter, trace_t* pTrace)
 {
 #ifdef CLIENT_DLL
-	Assert((GameRules() == NULL) || GameRules()->IsMultiplayer());
+	Assert((g_pGameRules == NULL) || g_pGameRules->IsMultiplayer());
 	Assert(pEntity->IsPlayer());
 
 	IEnginePortalClient* pPortal = NULL;
@@ -9567,7 +9567,7 @@ IterationRetval_t CPortalCollideableEnumerator::EnumElement(IHandleEntity* pHand
 void C_EnginePortalInternal::TraceRay(const Ray_t& ray, unsigned int fMask, ITraceFilter* pTraceFilter, trace_t* pTrace, bool bTraceHolyWall) const//traces against a specific portal's environment, does no *real* tracing
 {
 #ifdef CLIENT_DLL
-	Assert((GameRules() == NULL) || GameRules()->IsMultiplayer());
+	Assert((g_pGameRules == NULL) || g_pGameRules->IsMultiplayer());
 #endif
 	Assert(IsReadyToSimulate()); //a trace shouldn't make it down this far if the portal is incapable of changing the results of the trace
 
