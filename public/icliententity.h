@@ -36,6 +36,7 @@ struct PS_SD_Static_SurfaceProperties_t;
 class CIKContext;
 typedef unsigned int HTOOLHANDLE;
 class CUserCmd;
+class IClientGameRules;
 
 class VarMapEntry_t
 {
@@ -1010,6 +1011,8 @@ public:
 
 	virtual IRopeManager* RopeManager() = 0;
 	virtual void Rope_ResetCounters() = 0;
+
+	virtual IClientGameRules* GetGameRules() = 0;
 };
 
 extern IClientEntityList* entitylist;

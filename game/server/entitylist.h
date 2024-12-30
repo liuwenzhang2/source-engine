@@ -2857,6 +2857,7 @@ class CGlobalEntityList : public CBaseEntityList<T>, public IServerEntityList, p
 	friend class CGrabControllerInternal;
 	friend class CPortalTouchScope;
 	friend void FullSyncPhysicsObject(IPhysicsObject* pSource, IPhysicsObject* pDest, const VMatrix* pTransform, bool bTeleport);
+	friend class CCollisionEvent;
 	friend class CPortal_CollisionEvent;
 	typedef CBaseEntityList<T> BaseClass;
 public:
@@ -3837,6 +3838,10 @@ public:
 		}
 
 		return NULL;
+	}
+
+	IServerGameRules* GetGameRules() {
+		return m_pGameRules;
 	}
 
 protected:

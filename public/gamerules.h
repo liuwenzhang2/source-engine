@@ -267,12 +267,4 @@ public:
 	virtual bool ShouldWarnOfAbandonOnQuit() = 0;
 };
 
-#ifdef GAME_DLL
-extern IServerGameRules* g_pGameRules;
-#endif // GAME_DLL
-#ifdef CLIENT_DLL
-extern IClientGameRules* g_pGameRules;
-#endif // CLIENT_DLL
-
-
 #endif // GAMERULES_H

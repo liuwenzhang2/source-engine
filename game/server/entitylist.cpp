@@ -394,7 +394,7 @@ int CCollisionEvent::ShouldCollide_2(IPhysicsObject* pObj0, IPhysicsObject* pObj
 		!(solid0 == SOLID_VPHYSICS || solid0 == SOLID_BSP || movetype0 == MOVETYPE_VPHYSICS))
 		return 0;
 
-	if (!g_pGameRules->ShouldCollide(pEntity0->GetEngineObject()->GetCollisionGroup(), pEntity1->GetEngineObject()->GetCollisionGroup()))
+	if (!gEntList.m_pGameRules->ShouldCollide(pEntity0->GetEngineObject()->GetCollisionGroup(), pEntity1->GetEngineObject()->GetCollisionGroup()))
 		return 0;
 
 	// check contents
@@ -1559,7 +1559,7 @@ void CCollisionEvent::AddDamageEvent(CBaseEntity* pEntity, const CTakeDamageInfo
 	if (pEntity->GetEngineObject()->IsMarkedForDeletion())
 		return;
 
-	int iTimeBasedDamage = g_pGameRules->Damage_GetTimeBased();
+	int iTimeBasedDamage = gEntList.m_pGameRules->Damage_GetTimeBased();
 	if (!(info.GetDamageType() & (DMG_BURN | DMG_DROWN | iTimeBasedDamage | DMG_PREVENT_PHYSICS_FORCE)))
 	{
 		Assert(info.GetDamageForce() != vec3_origin && info.GetDamagePosition() != vec3_origin);
@@ -2569,7 +2569,7 @@ bool CGrabControllerInternal::UpdateObject(CBaseEntity* pPlayer, float flError)
 	}
 	AngleVectors(playerAngles, &forward, &right, &up);
 
-	if (g_pGameRules->MegaPhyscannonActive())
+	if (gEntList.m_pGameRules->MegaPhyscannonActive())
 	{
 		Vector los = (pEntity->WorldSpaceCenter() - pPlayer->Weapon_ShootPosition());
 		VectorNormalize(los);

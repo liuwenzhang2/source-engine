@@ -47,6 +47,7 @@ struct vehicle_operatingparams_t;
 class CIKContext;
 class CTakeDamageInfo;
 struct vehiclesounds_t;
+class IServerGameRules;
 
 struct servertouchlink_t
 {
@@ -1130,6 +1131,8 @@ public:
 	// This is a version which finds any clients whose PVS intersects the box
 	virtual CBaseEntity* FindClientInPVS(const Vector& vecBoxMins, const Vector& vecBoxMaxs) = 0;
 	virtual CBaseEntity* EntitiesInPVS(CBaseEntity* pPVSEntity, CBaseEntity* pStartingEntity) = 0;
+
+	virtual IServerGameRules* GetGameRules() = 0;
 
 };
 

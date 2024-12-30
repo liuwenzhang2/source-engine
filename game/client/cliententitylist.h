@@ -2741,6 +2741,7 @@ class CClientEntityList : public CBaseEntityList<T>, public IClientEntityList, p
 	friend class C_EnginePortalInternal;
 	friend class C_GrabControllerInternal;
 	friend class CPortalTouchScope;
+	friend class CCollisionEvent;
 	//friend class C_AllBaseEntityIterator;
 	typedef CBaseEntityList<T> BaseClass;
 public:
@@ -3091,6 +3092,10 @@ public:
 
 	void Rope_ResetCounters() {
 		::Rope_ResetCounters();
+	}
+
+	IClientGameRules* GetGameRules() {
+		return m_pGameRules;
 	}
 private:
 	void AddPVSNotifier(IClientUnknown* pUnknown);

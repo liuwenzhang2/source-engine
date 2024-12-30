@@ -85,7 +85,6 @@ class IStudioHdr;
 #include "collisionproperty.h"
 #include "util_shared.h"
 #include "portal_util_shared.h"
-#include "hl2_gamerules.h"
 #include "predictioncopy.h"
 #include "baseentity_shared.h"
 #include "vphysics_sound.h"
