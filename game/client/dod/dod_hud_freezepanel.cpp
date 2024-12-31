@@ -212,7 +212,7 @@ void CDODFreezePanel::FireGameEvent( IGameEvent * event )
 
 		// Get the entity who killed us
 		m_iKillerIndex = event->GetInt( "killer" );
-		C_BaseEntity *pKiller =  EntityList()->GetBaseEntity( m_iKillerIndex );
+		C_BaseEntity *pKiller = (C_BaseEntity*)EntityList()->GetBaseEntity( m_iKillerIndex );
 
 		int xp,yp;
 		GetPos( xp, yp );

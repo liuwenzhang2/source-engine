@@ -205,7 +205,7 @@ void TE_PlayerDecal( IRecipientFilter& filter, float delay,
 		return;
 
 	// No valid target?
-	C_BaseEntity *ent = EntityList()->GetEnt( entity );
+	C_BaseEntity *ent = (C_BaseEntity*)EntityList()->GetEnt( entity );
 	if ( !ent )
 		return;
 

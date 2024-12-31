@@ -293,10 +293,10 @@ void CCSGameMovement::CheckParameters( void )
 	if ( !player->IsObserver()  && ( player->GetEngineObject()->GetMoveType() != MOVETYPE_LADDER ) )
 	{
 		int nLevels = 0;
-		CBaseEntity* pCurGround = player->GetEngineObject()->GetGroundEntity() ? player->GetEngineObject()->GetGroundEntity()->GetOuter() : NULL;
+		CBaseEntity* pCurGround = player->GetEngineObject()->GetGroundEntity() ? (CBaseEntity*)player->GetEngineObject()->GetGroundEntity()->GetOuter() : NULL;
 		while ( pCurGround && pCurGround->IsPlayer() && nLevels < 1000 )
 		{
-			pCurGround = pCurGround->GetEngineObject()->GetGroundEntity() ? pCurGround->GetEngineObject()->GetGroundEntity()->GetOuter() : NULL;
+			pCurGround = pCurGround->GetEngineObject()->GetGroundEntity() ? (CBaseEntity*)pCurGround->GetEngineObject()->GetGroundEntity()->GetOuter() : NULL;
 			++nLevels;
 		}
 		if ( nLevels == 1000 )

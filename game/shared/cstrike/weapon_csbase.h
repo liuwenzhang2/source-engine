@@ -196,7 +196,9 @@ public:
 	virtual bool	CanBeSelected( void );
 	virtual Activity GetDeployActivity( void );
 	virtual bool	DefaultDeploy( char *szViewModel, char *szWeaponModel, int iActivity, char *szAnimExt );
+#ifdef GAME_DLL
 	virtual void 	DefaultTouch( CBaseEntity *pOther );	// default weapon touch
+#endif // GAME_DLL
 	virtual bool	DefaultPistolReload();
 
 	virtual bool	Deploy();

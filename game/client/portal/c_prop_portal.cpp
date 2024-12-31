@@ -309,13 +309,13 @@ void C_Prop_Portal::Simulate()
 			{
 				moveType = pMoveEntity->GetEngineObject()->GetMoveType();
 
-				if ( !( moveType == MOVETYPE_NONE || moveType == MOVETYPE_PUSH ) )
+				if (!(moveType == MOVETYPE_NONE || moveType == MOVETYPE_PUSH))
 				{
 					bIsMovable = true;
 					pMoveEntity = NULL;
 				}
 				else
-					pMoveEntity = pMoveEntity->GetEngineObject()->GetMoveParent()? pMoveEntity->GetEngineObject()->GetMoveParent()->GetOuter():NULL;
+					pMoveEntity = pMoveEntity->GetEngineObject()->GetMoveParent() ? (C_BaseEntity*)pMoveEntity->GetEngineObject()->GetMoveParent()->GetOuter() : NULL;
 			}
 
 			if ( !bIsMovable )

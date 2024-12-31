@@ -1962,3 +1962,14 @@ void Physics_RunThinkFunctions( bool simulating )
 	gpGlobals->curtime = starttime;
 }
 
+void CBaseEntity::StartGroundContact(CBaseEntity* ground)
+{
+	GetEngineObject()->AddFlag(FL_ONGROUND);
+	//	Msg( "+++ %s starting contact with ground %s\n", GetClassname(), ground->GetClassname() );
+}
+
+void CBaseEntity::EndGroundContact(CBaseEntity* ground)
+{
+	GetEngineObject()->RemoveFlag(FL_ONGROUND);
+	//	Msg( "--- %s ending contact with ground %s\n", GetClassname(), ground->GetClassname() );
+}

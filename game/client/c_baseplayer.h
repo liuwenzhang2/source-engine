@@ -646,7 +646,7 @@ EXTERN_RECV_TABLE(DT_BasePlayer);
 //-----------------------------------------------------------------------------
 // Inline methods
 //-----------------------------------------------------------------------------
-inline C_BasePlayer *ToBasePlayer( C_BaseEntity *pEntity )
+inline C_BasePlayer *ToBasePlayer( IClientEntity *pEntity )
 {
 	if ( !pEntity || !pEntity->IsPlayer() )
 		return NULL;

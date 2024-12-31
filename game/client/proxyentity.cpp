@@ -29,7 +29,7 @@ void CEntityMaterialProxy::OnBind( void *pRenderable )
 		return;
 
 	IClientRenderable *pRend = ( IClientRenderable* )pRenderable;
-	C_BaseEntity *pEnt = pRend->GetIClientUnknown()->GetBaseEntity();
+	C_BaseEntity *pEnt = (C_BaseEntity*)pRend->GetIClientUnknown()->GetBaseEntity();
 	if ( pEnt )
 	{
 		OnBind( pEnt );

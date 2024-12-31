@@ -133,7 +133,7 @@ public:
 	virtual IClientNetworkable*	GetClientNetworkable()	{ return NULL; }
 	virtual IClientRenderable*	GetClientRenderable()	{ return this; }
 	virtual IClientEntity*		GetIClientEntity()		{ return NULL; }
-	virtual C_BaseEntity*		GetBaseEntity()			{ return NULL; }
+	virtual IClientEntity*		GetBaseEntity()			{ return NULL; }
 	virtual IClientThinkable*	GetClientThinkable()	{ return NULL; }
 public:
 	// These methods return a box defined in the space of the entity

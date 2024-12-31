@@ -871,7 +871,7 @@ void CBaseEntity::PhysicsSimulate( void )
 	Assert( !IsPlayer() );
 
 	// If we've got a moveparent, we must simulate that first.
-	CBaseEntity *pMoveParent = GetEngineObject()->GetMoveParent()?GetEngineObject()->GetMoveParent()->GetOuter():NULL;
+	CBaseEntity* pMoveParent = GetEngineObject()->GetMoveParent() ? (CBaseEntity*)GetEngineObject()->GetMoveParent()->GetOuter() : NULL;
 
 	if ( (GetEngineObject()->GetMoveType() == MOVETYPE_NONE && !pMoveParent) || (GetEngineObject()->GetMoveType() == MOVETYPE_VPHYSICS ) )
 	{
@@ -966,23 +966,6 @@ void CBaseEntity::PhysicsSimulate( void )
 		break;
 	}
 }
-
-void CBaseEntity::StartGroundContact( CBaseEntity *ground )
-{
-	GetEngineObject()->AddFlag( FL_ONGROUND );
-//	Msg( "+++ %s starting contact with ground %s\n", GetClassname(), ground->GetClassname() );
-}
-
-void CBaseEntity::EndGroundContact( CBaseEntity *ground )
-{
-	GetEngineObject()->RemoveFlag( FL_ONGROUND );
-//	Msg( "--- %s ending contact with ground %s\n", GetClassname(), ground->GetClassname() );
-}
-
-
-
-
-
 
 // Remove this as ground entity for all object resting on this object
 //-----------------------------------------------------------------------------

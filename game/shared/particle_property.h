@@ -19,6 +19,7 @@
 // Forward declarations
 //-----------------------------------------------------------------------------
 class CBaseEntity;
+typedef CHandle<CBaseEntity> EHANDLE;
 class CNewParticleEffect;
 
 // Argh: Server considers -1 to be an invalid attachment, whereas the client uses 0

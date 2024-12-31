@@ -699,7 +699,7 @@ static bool IsValidEntityPointer( void *ptr )
 	int c = EntityList()->GetHighestEntityIndex();
 	for ( int i = 0; i <= c; i++ )
 	{
-		CBaseEntity *e = EntityList()->GetBaseEntity( i );
+		CBaseEntity *e = (CBaseEntity*)EntityList()->GetBaseEntity( i );
 		if ( !e )
 			continue;
 
@@ -728,7 +728,7 @@ public:
 			bFoundEntity = false;
 
 #if defined( CLIENT_DLL )
-			pOwnerEntity = EntityList()->GetBaseEntityFromHandle( pOwnerEntity->GetRefEHandle() );
+			pOwnerEntity = (C_BaseEntity*)EntityList()->GetBaseEntityFromHandle( pOwnerEntity->GetRefEHandle() );
 
 			if ( pOwnerEntity  )
 			{
@@ -758,7 +758,7 @@ public:
 			bFoundEntity = false;
 
 #if defined( CLIENT_DLL )
-			pOwnerEntity = EntityList()->GetBaseEntityFromHandle( pOwnerEntity->GetRefEHandle() );
+			pOwnerEntity = (C_BaseEntity*)EntityList()->GetBaseEntityFromHandle( pOwnerEntity->GetRefEHandle() );
 
 			if ( pOwnerEntity  )
 			{

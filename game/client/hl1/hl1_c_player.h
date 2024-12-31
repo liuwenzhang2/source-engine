@@ -39,7 +39,7 @@ private:
 	
 };
 
-inline C_HL1_Player *ToHL1Player( CBaseEntity *pEntity )
+inline C_HL1_Player *ToHL1Player( IClientEntity *pEntity )
 {
 	if ( !pEntity || !pEntity->IsPlayer() )
 		return NULL;

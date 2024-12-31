@@ -2200,7 +2200,7 @@ void CClientShadowMgr::ComputeExtraClipPlanes( IClientRenderable* pRenderable,
 	}
 
 	ClientShadow_t& shadow = m_Shadows[handle];
-	C_BaseEntity *pEntity = EntityList()->GetBaseEntityFromHandle( shadow.m_Entity );
+	C_BaseEntity *pEntity = (C_BaseEntity*)EntityList()->GetBaseEntityFromHandle( shadow.m_Entity );
 	if ( pEntity && pEntity->m_bEnableRenderingClipPlane )
 	{
 		normal[ 0 ] = -pEntity->m_fRenderingClipPlane[ 0 ];
@@ -2437,7 +2437,7 @@ void CClientShadowMgr::DrawRenderToTextureDebugInfo( IClientRenderable* pRendera
 	VectorMA( start, -vecSize.y, vec[1], end );
 	debugoverlay->AddLineOverlay( start, end, 255, 0, 0, true, 0.01 ); 
 
-	C_BaseEntity *pEnt = pRenderable->GetIClientUnknown()->GetBaseEntity();
+	C_BaseEntity *pEnt = (C_BaseEntity*)pRenderable->GetIClientUnknown()->GetBaseEntity();
 	if ( pEnt )
 	{
 		debugoverlay->AddTextOverlay( vecOrigin, 0, "%d", pEnt->entindex() );
@@ -2662,7 +2662,7 @@ void CClientShadowMgr::BuildFlashlight( ClientShadowHandle_t handle )
 	// We know what we are focused on, so just add the shadow directly to that receiver
 	Assert( shadow.m_hTargetEntity->GetEngineObject()->GetModel() );
 
-	C_BaseEntity *pChild = shadow.m_hTargetEntity->GetEngineObject()->FirstMoveChild()?shadow.m_hTargetEntity->GetEngineObject()->FirstMoveChild()->GetOuter():NULL;
+	C_BaseEntity* pChild = shadow.m_hTargetEntity->GetEngineObject()->FirstMoveChild() ? (C_BaseEntity*)shadow.m_hTargetEntity->GetEngineObject()->FirstMoveChild()->GetOuter() : NULL;
 	while( pChild )
 	{
 		int modelType = modelinfo->GetModelType( pChild->GetEngineObject()->GetModel() );
@@ -2675,7 +2675,7 @@ void CClientShadowMgr::BuildFlashlight( ClientShadowHandle_t handle )
 			AddShadowToReceiver( handle, pChild->GetEngineObject(), SHADOW_RECEIVER_STUDIO_MODEL );
 		}
 
-		pChild = pChild->GetEngineObject()->NextMovePeer()? pChild->GetEngineObject()->NextMovePeer()->GetOuter():NULL;
+		pChild = pChild->GetEngineObject()->NextMovePeer() ? (C_BaseEntity*)pChild->GetEngineObject()->NextMovePeer()->GetOuter() : NULL;
 	}
 
 	int modelType = modelinfo->GetModelType( shadow.m_hTargetEntity->GetEngineObject()->GetModel() );
@@ -3480,7 +3480,7 @@ void CClientShadowMgr::AddShadowToReceiver( ClientShadowHandle_t handle,
 		{
 			// Also don't add them unless an NPC or player casts them..
 			// They are wickedly expensive!!!
-			C_BaseEntity *pEnt = pSourceRenderable->GetIClientUnknown()->GetBaseEntity();
+			C_BaseEntity *pEnt = (C_BaseEntity*)pSourceRenderable->GetIClientUnknown()->GetBaseEntity();
 			if ( pEnt && ( pEnt->GetEngineObject()->GetFlags() & (FL_NPC | FL_CLIENT)) )
 			{
 				staticpropmgr->AddShadowToStaticProp( shadow.m_ShadowHandle, pRenderable );
@@ -3605,7 +3605,7 @@ bool CClientShadowMgr::BuildSetupShadowHierarchy( IClientRenderable *pRenderable
 
 		if ( bDrawModelShadow )
 		{
-			C_BaseEntity *pEntity = pRenderable->GetIClientUnknown()->GetBaseEntity();
+			C_BaseEntity *pEntity = (C_BaseEntity*)pRenderable->GetIClientUnknown()->GetBaseEntity();
 			if ( pEntity )
 			{
 				if ( pEntity->IsNPC() )
@@ -4169,13 +4169,13 @@ bool CClientShadowMgr::IsFlashlightTarget( ClientShadowHandle_t shadowHandle, IC
 	if( shadow.m_hTargetEntity->GetClientRenderable() == pRenderable )
 		return true;
 
-	C_BaseEntity *pChild = shadow.m_hTargetEntity->GetEngineObject()->FirstMoveChild()?shadow.m_hTargetEntity->GetEngineObject()->FirstMoveChild()->GetOuter():NULL;
+	C_BaseEntity* pChild = shadow.m_hTargetEntity->GetEngineObject()->FirstMoveChild() ? (C_BaseEntity*)shadow.m_hTargetEntity->GetEngineObject()->FirstMoveChild()->GetOuter() : NULL;
 	while( pChild )
 	{
 		if( pChild->GetClientRenderable()==pRenderable )
 			return true;
 
-		pChild = pChild->GetEngineObject()->NextMovePeer()? pChild->GetEngineObject()->NextMovePeer()->GetOuter():NULL;
+		pChild = pChild->GetEngineObject()->NextMovePeer() ? (C_BaseEntity*)pChild->GetEngineObject()->NextMovePeer()->GetOuter() : NULL;
 	}
 							
 	return false;

@@ -43,7 +43,7 @@ float CAnimatedOffsetTextureProxy::GetAnimationStartTime( void* pArg )
 //-----------------------------------------------------------------------------
 void CAnimatedOffsetTextureProxy::OnBind( void *pBaseEntity )
 {
-	C_BaseEntity* pEntity = ((IClientRenderable*)pBaseEntity)->GetIClientUnknown()->GetBaseEntity();
+	C_BaseEntity* pEntity = (C_BaseEntity*)((IClientRenderable*)pBaseEntity)->GetIClientUnknown()->GetBaseEntity();
 	
 	if ( pEntity )
 	{

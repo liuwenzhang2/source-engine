@@ -697,7 +697,7 @@ void CViewRender::SetUpViews()
 
 			if ( !g_nKillCamMode && (pPlayer->entindex() != viewentity) )
 			{
-				C_BaseEntity *ve = EntityList()->GetEnt( viewentity );
+				C_BaseEntity *ve = (C_BaseEntity*)EntityList()->GetEnt( viewentity );
 				if ( ve )
 				{
 					VectorCopy( ve->GetEngineObject()->GetAbsOrigin(), view.origin );

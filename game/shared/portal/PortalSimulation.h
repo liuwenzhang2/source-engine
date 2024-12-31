@@ -17,8 +17,12 @@
 #include "tier1/utlmap.h"
 #include "tier1/utlvector.h"
 #ifdef CLIENT_DLL
+#include "c_baseanimating.h"
 #include "PortalRender.h"
 #endif // CLIENT_DLL
+#ifdef GAME_DLL
+#include "baseentity.h"
+#endif // GAME_DLL
 
 
 #define PORTAL_SIMULATORS_EMBED_GUID //define this to embed a unique integer with each portal simulator for debugging purposes

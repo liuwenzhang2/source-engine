@@ -307,7 +307,7 @@ bool C_LocalTempEntity::Frame( float frametime, int framenumber )
 
 	if ( flags & FTENT_PLYRATTACHMENT )
 	{
-		if ( C_BaseEntity *pClient = EntityList()->GetBaseEntity( clientIndex ) )
+		if ( C_BaseEntity *pClient = (C_BaseEntity*)EntityList()->GetBaseEntity( clientIndex ) )
 		{
 			GetEngineObject()->SetLocalOrigin( pClient->GetEngineObject()->GetAbsOrigin() + tentOffset );
 		}
@@ -1407,7 +1407,7 @@ void CTempEnts::AttachTentToPlayer( int client, int modelIndex, float zoffset, f
 		return;
 	}
 
-	C_BaseEntity *clientClass = EntityList()->GetBaseEntity( client );
+	C_BaseEntity *clientClass = (C_BaseEntity*)EntityList()->GetBaseEntity( client );
 	if ( !clientClass )
 	{
 		Warning("Couldn't get IClientEntity for %i\n", client );

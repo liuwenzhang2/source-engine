@@ -142,7 +142,7 @@ void C_HLTVCamera::CalcChaseCamView( Vector& eyeOrigin, QAngle& eyeAngles, float
 
 	if ( m_iTraget2 > 0 && (m_iTraget2 != m_iTraget1) && !bManual )
 	{
-		target2 = EntityList()->GetBaseEntity( m_iTraget2 );
+		target2 = (C_BaseEntity*)EntityList()->GetBaseEntity( m_iTraget2 );
 
 		// if target is out PVS and not dead, it's not valid
 		if ( target2 && target2->IsDormant() && target2->IsAlive() )
@@ -287,14 +287,14 @@ C_BaseEntity* C_HLTVCamera::GetPrimaryTarget()
 	if ( m_iTraget1 <= 0 )
 		return NULL;
 
-	C_BaseEntity* target = EntityList()->GetEnt( m_iTraget1 );
+	C_BaseEntity* target = (C_BaseEntity*)EntityList()->GetEnt( m_iTraget1 );
 
 	return target;
 }
 
 C_BaseEntity *C_HLTVCamera::GetCameraMan()
 {
-	return EntityList()->GetEnt( m_iCameraMan );
+	return (C_BaseEntity*)EntityList()->GetEnt( m_iCameraMan );
 }
 
 void C_HLTVCamera::CalcInEyeCamView( Vector& eyeOrigin, QAngle& eyeAngles, float& fov )
@@ -475,7 +475,7 @@ void C_HLTVCamera::CalcFixedView(Vector& eyeOrigin, QAngle& eyeAngles, float& fo
 	if ( m_iTraget1 == 0 )
 		return;
 
- 	C_BaseEntity * target = EntityList()->GetBaseEntity( m_iTraget1 );
+ 	C_BaseEntity * target = (C_BaseEntity*)EntityList()->GetBaseEntity( m_iTraget1 );
 	
 	if ( target && target->IsAlive() )
 	{
@@ -582,7 +582,7 @@ void C_HLTVCamera::SetPrimaryTarget( int nEntity )
 	}
 	else if ( GetMode() == OBS_MODE_CHASE )
 	{
-		C_BaseEntity* target = EntityList()->GetEnt( m_iTraget1 );
+		C_BaseEntity* target = (C_BaseEntity*)EntityList()->GetEnt( m_iTraget1 );
 		if ( target )
 		{
 			QAngle eyeAngle = target->EyeAngles();

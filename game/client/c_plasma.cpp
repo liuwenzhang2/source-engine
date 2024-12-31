@@ -461,7 +461,7 @@ void C_Plasma::Update( void )
 		while( m_tDecalSpawn.NextEvent( tempDelta ) )
 		{
 			// Add decal to floor
-			C_BaseEntity *ent = EntityList()->GetEnt( 0 );
+			C_BaseEntity *ent = (C_BaseEntity*)EntityList()->GetEnt( 0 );
 			if ( ent )
 			{
 				int index = decalsystem->GetDecalIndexForName( "PlasmaGlowFade" );

@@ -20,7 +20,8 @@
 #include "tier1/utlobjectreference.h"
 #include "ehandle.h"
 
-
+class C_BaseEntity;
+typedef CHandle<C_BaseEntity> EHANDLE;
 //-----------------------------------------------------------------------------
 // Particle effect
 //-----------------------------------------------------------------------------

@@ -273,7 +273,7 @@ private:
 	IMaterial *m_pHeadIconMaterial;
 };
 
-inline C_DODPlayer *ToDODPlayer( CBaseEntity *pEntity )
+inline C_DODPlayer *ToDODPlayer( IClientEntity *pEntity )
 {
 	if ( !pEntity || !pEntity->IsPlayer() )
 		return NULL;

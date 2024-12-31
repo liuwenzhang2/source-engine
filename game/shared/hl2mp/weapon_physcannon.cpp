@@ -957,7 +957,7 @@ bool CWeaponPhysCannon::DropIfEntityHeld( CBaseEntity *pTarget )
 	if ( pTarget == NULL )
 		return false;
 
-	CBaseEntity *pHeld = GetGrabController()->GetAttached();
+	CBaseEntity *pHeld = (CBaseEntity*)GetGrabController()->GetAttached();
 	
 	if ( pHeld == NULL )
 		return false;
@@ -1285,7 +1285,7 @@ void CWeaponPhysCannon::PrimaryAttack( void )
 		pOwner->EyeVectors( &forward );
 
 		// Validate the item is within punt range
-		CBaseEntity *pHeld = GetGrabController()->GetAttached();
+		CBaseEntity *pHeld = (CBaseEntity*)GetGrabController()->GetAttached();
 		Assert( pHeld != NULL );
 
 		if ( pHeld != NULL )
@@ -2063,7 +2063,7 @@ void CWeaponPhysCannon::ItemPostFrame()
 
 void CWeaponPhysCannon::LaunchObject( const Vector &vecDir, float flForce )
 {
-	CBaseEntity *pObject = GetGrabController()->GetAttached();
+	CBaseEntity *pObject = (CBaseEntity*)GetGrabController()->GetAttached();
 
 	if ( !(m_hLastPuntedObject == pObject && gpGlobals->curtime < m_flRepuntObjectTime) )
 	{

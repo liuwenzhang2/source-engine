@@ -2353,7 +2353,7 @@ void C_BaseEntity::SetNextClientThink( float nextThinkTime )
 //-----------------------------------------------------------------------------
 void C_BaseEntity::SetDormant( bool bDormant )
 {
-	Assert( IsServerEntity() );
+	Assert( IsNetworkable() );
 	m_bDormant = bDormant;
 
 	// Kill drawing if we became dormant.
@@ -2369,7 +2369,7 @@ void C_BaseEntity::SetDormant( bool bDormant )
 //-----------------------------------------------------------------------------
 bool C_BaseEntity::IsDormant( void )
 {
-	if ( IsServerEntity() )
+	if (IsNetworkable() )
 	{
 		return m_bDormant;
 	}
@@ -2601,7 +2601,7 @@ int C_BaseEntity::PrecacheModel( const char *name )
 
 C_BaseEntity* C_BaseEntity::Instance( CBaseHandle hEnt )
 {
-	return EntityList()->GetBaseEntityFromHandle( hEnt );
+	return (C_BaseEntity*)EntityList()->GetBaseEntityFromHandle( hEnt );
 }
 
 
@@ -2612,7 +2612,7 @@ C_BaseEntity* C_BaseEntity::Instance( CBaseHandle hEnt )
 //-----------------------------------------------------------------------------
 C_BaseEntity *C_BaseEntity::Instance( int iEnt )
 {
-	return EntityList()->GetBaseEntity( iEnt );
+	return (C_BaseEntity*)EntityList()->GetBaseEntity( iEnt );
 }
 
 #ifdef WIN32
@@ -3128,7 +3128,7 @@ static void ToggleBBoxVisualization( int fVisFlags, const CCommand &args )
 	}
 	else
 	{
-		pHit = EntityList()->GetBaseEntity( iEntity );
+		pHit = (C_BaseEntity*)EntityList()->GetBaseEntity( iEntity );
 	}
 
 	if ( pHit )
@@ -3331,7 +3331,7 @@ static float AdjustInterpolationAmount( C_BaseEntity *pEntity, float baseInterpo
 				if ( pEntity->IsNPC() )
 					return minNPCInterpolation;
 
-				pEntity = pEntity->GetEngineObject()->GetMoveParent()?pEntity->GetEngineObject()->GetMoveParent()->GetOuter():NULL;
+				pEntity = pEntity->GetEngineObject()->GetMoveParent() ? (C_BaseEntity*)pEntity->GetEngineObject()->GetMoveParent()->GetOuter() : NULL;
 			}
 		}
 	}
@@ -3647,7 +3647,7 @@ void CC_CL_Find_Ent( const CCommand& args )
 	Msg("Searching for client entities with classname containing substring: '%s'\n", pszSubString );
 
 	C_BaseEntity *ent = NULL;
-	while ( (ent = EntityList()->NextBaseEntity(ent)) != NULL )
+	while ( (ent = (C_BaseEntity*)EntityList()->NextBaseEntity(ent)) != NULL )
 	{
 		const char *pszClassname = ent->GetClassname();
 
@@ -3681,7 +3681,7 @@ void CC_CL_Find_Ent_Index( const CCommand& args )
 	}
 
 	int iIndex = atoi(args[1]);
-	C_BaseEntity *ent = EntityList()->GetBaseEntity( iIndex );
+	C_BaseEntity *ent = (C_BaseEntity*)EntityList()->GetBaseEntity( iIndex );
 	if ( ent )
 	{
 		const char *pszClassname = ent->GetClassname();

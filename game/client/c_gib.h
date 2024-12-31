@@ -25,9 +25,9 @@ public:
 	
 	bool	InitializeGib( const char *pszModelName, Vector vecOrigin, Vector vecForceDir, AngularImpulse vecAngularImp, float flLifetime = DEFAULT_GIB_LIFETIME );
 	void	ClientThink( void );
-	void	StartTouch( C_BaseEntity *pOther );
+	void	StartTouch( IClientEntity *pOther );
 
-	virtual	void HitSurface( C_BaseEntity *pOther );
+	virtual	void HitSurface( IClientEntity *pOther );
 
 protected:
 

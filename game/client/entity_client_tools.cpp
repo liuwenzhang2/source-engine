@@ -424,11 +424,11 @@ EntitySearchResult CClientTools::NextEntity( EntitySearchResult currentEnt )
 	C_BaseEntity *ent = reinterpret_cast< C_BaseEntity* >( currentEnt );
 	if ( ent == NULL )
 	{
-		ent = EntityList()->FirstBaseEntity();
+		ent = (C_BaseEntity*)EntityList()->FirstBaseEntity();
 	}
 	else
 	{
-		ent = EntityList()->NextBaseEntity( ent );
+		ent = (C_BaseEntity*)EntityList()->NextBaseEntity( ent );
 	}
 	return reinterpret_cast< EntitySearchResult >( ent );
 }

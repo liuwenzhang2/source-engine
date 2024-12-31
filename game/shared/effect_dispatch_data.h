@@ -19,7 +19,8 @@
 	#include "client_class.h"
 
 	EXTERN_RECV_TABLE( DT_EffectData );
-
+	class C_BaseEntity;
+	typedef CHandle<C_BaseEntity> EHANDLE;
 #else
 
 	#include "dt_send.h"

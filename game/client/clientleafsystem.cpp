@@ -343,7 +343,7 @@ void DefaultRenderBoundsWorldspace( IClientRenderable *pRenderable, Vector &absM
 {
 	// Tracker 37433:  This fixes a bug where if the stunstick is being wielded by a combine soldier, the fact that the stick was
 	//  attached to the soldier's hand would move it such that it would get frustum culled near the edge of the screen.
-	C_BaseEntity *pEnt = pRenderable->GetIClientUnknown()->GetBaseEntity();
+	C_BaseEntity *pEnt = (C_BaseEntity*)pRenderable->GetIClientUnknown()->GetBaseEntity();
 	if ( pEnt && pEnt->GetEngineObject()->IsFollowingEntity() )
 	{
 		IEngineObjectClient *pParent = pEnt->GetEngineObject()->GetFollowedEntity();
@@ -403,7 +403,7 @@ inline void CalcRenderableWorldSpaceAABB(
 // This is used for placement in the leaves, but the more expensive version is used for culling.
 void CalcRenderableWorldSpaceAABB_Fast( IClientRenderable *pRenderable, Vector &absMin, Vector &absMax )
 {
-	C_BaseEntity *pEnt = pRenderable->GetIClientUnknown()->GetBaseEntity();
+	C_BaseEntity *pEnt = (C_BaseEntity*)pRenderable->GetIClientUnknown()->GetBaseEntity();
 	if ( pEnt && pEnt->GetEngineObject()->IsFollowingEntity() )
 	{
 		IEngineObjectClient *pParent = pEnt->GetEngineObject()->GetMoveParent();

@@ -999,6 +999,7 @@ void CWeaponCSBase::Drop(const Vector &vecVelocity)
 #endif
 }
 
+#ifdef GAME_DLL
 // whats going on here is that if the player drops this weapon, they shouldn't take it back themselves
 // for a little while.  But if they throw it at someone else, the other player should get it immediately.
 void CWeaponCSBase::DefaultTouch(CBaseEntity *pOther)
@@ -1010,6 +1011,7 @@ void CWeaponCSBase::DefaultTouch(CBaseEntity *pOther)
 
 	BaseClass::DefaultTouch(pOther);
 }
+#endif // GAME_DLL
 
 #if defined( CLIENT_DLL )
 

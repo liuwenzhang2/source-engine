@@ -1908,7 +1908,7 @@ void CGameMovement::WalkMove( void )
 	AngleVectors (mv->m_vecViewAngles, &forward, &right, &up);  // Determine movement angles
 
 	CHandle< CBaseEntity > oldground;
-	oldground = player->GetEngineObject()->GetGroundEntity() ? player->GetEngineObject()->GetGroundEntity()->GetOuter() : NULL;
+	oldground = player->GetEngineObject()->GetGroundEntity() ? (CBaseEntity*)player->GetEngineObject()->GetGroundEntity()->GetOuter() : NULL;
 	
 	// Copy movement amounts
 	fmove = mv->m_flForwardMove;
@@ -3591,7 +3591,7 @@ void CGameMovement::SetGroundEntity( trace_t *pm )
 {
 	CBaseEntity *newGround = pm ? (CBaseEntity*)pm->m_pEnt : NULL;
 
-	CBaseEntity* oldGround = player->GetEngineObject()->GetGroundEntity() ? player->GetEngineObject()->GetGroundEntity()->GetOuter() : NULL;
+	CBaseEntity* oldGround = player->GetEngineObject()->GetGroundEntity() ? (CBaseEntity*)player->GetEngineObject()->GetGroundEntity()->GetOuter() : NULL;
 	Vector vecBaseVelocity = player->GetBaseVelocity();
 
 	if ( !oldGround && newGround )
@@ -3820,7 +3820,7 @@ void CGameMovement::CategorizePosition( void )
 		// We need to account for standing on a moving ground object in that case in order to determine if we really 
 		//  are moving away from the object we are standing on at too rapid a speed.  Note that CheckJump already sets
 		//  ground entity to NULL, so this wouldn't have any effect unless we are moving up rapidly not from the jump button.
-		CBaseEntity* ground = player->GetEngineObject()->GetGroundEntity() ? player->GetEngineObject()->GetGroundEntity()->GetOuter() : NULL;
+		CBaseEntity* ground = player->GetEngineObject()->GetGroundEntity() ? (CBaseEntity*)player->GetEngineObject()->GetGroundEntity()->GetOuter() : NULL;
 		if ( ground )
 		{
 			flGroundEntityVelZ = ground->GetEngineObject()->GetAbsVelocity().z;

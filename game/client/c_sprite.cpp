@@ -389,7 +389,7 @@ int C_SpriteRenderer::DrawSprite(
 	// Use attachment point
 	if ( attachedto )
 	{
-		C_BaseEntity *ent = attachedto->GetBaseEntity();
+		C_BaseEntity *ent = (C_BaseEntity*)attachedto->GetBaseEntity();
 		if ( ent )
 		{
 			// don't draw viewmodel effects in reflections

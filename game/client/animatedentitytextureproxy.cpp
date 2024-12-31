@@ -29,7 +29,7 @@ float CAnimatedEntityTextureProxy::GetAnimationStartTime( void* pArg )
 	if (!pRend)
 		return 0.0f;
 
-	C_BaseEntity* pEntity = pRend->GetIClientUnknown()->GetBaseEntity();
+	C_BaseEntity* pEntity = (C_BaseEntity*)pRend->GetIClientUnknown()->GetBaseEntity();
 	if (pEntity)
 	{
 		return pEntity->GetTextureAnimationStartTime();
@@ -43,7 +43,7 @@ void CAnimatedEntityTextureProxy::AnimationWrapped( void* pArg )
 	if (!pRend)
 		return;
 
-	C_BaseEntity* pEntity = pRend->GetIClientUnknown()->GetBaseEntity();
+	C_BaseEntity* pEntity = (C_BaseEntity*)pRend->GetIClientUnknown()->GetBaseEntity();
 	if (pEntity)
 	{
 		pEntity->TextureAnimationWrapped();

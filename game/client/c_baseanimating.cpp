@@ -1264,7 +1264,7 @@ void C_BaseAnimating::UpdateIKLocks( float currentTime )
 
 		if (pTarget->GetOwner() != -1)
 		{
-			C_BaseEntity *pOwner = EntityList()->GetEnt( pTarget->GetOwner() );
+			C_BaseEntity *pOwner = (C_BaseEntity*)EntityList()->GetEnt( pTarget->GetOwner() );
 			if (pOwner != NULL)
 			{
 				pTarget->UpdateOwner( pOwner->entindex(), pOwner->GetEngineObject()->GetAbsOrigin(), pOwner->GetEngineObject()->GetAbsAngles() );
@@ -2625,7 +2625,7 @@ void C_BaseAnimating::FireObsoleteEvent( const Vector& origin, const QAngle& ang
 			{
 				GetEngineObject()->GetAttachment( iAttachment+1, attachOrigin, attachAngles );
 				int entId = render->GetViewEntity();
-				C_BaseEntity* hEntity = EntityList()->GetBaseEntity( entId );
+				C_BaseEntity* hEntity = (C_BaseEntity*)EntityList()->GetBaseEntity( entId );
 				tempents->MuzzleFlash( attachOrigin, attachAngles, atoi( options ), hEntity, bFirstPerson );
 			}
 		}
@@ -3885,7 +3885,7 @@ END_RECV_TABLE()
 
 void VCollideWireframe_ChangeCallback( IConVar *pConVar, char const *pOldString, float flOldValue )
 {
-	for ( C_BaseEntity *pEntity = EntityList()->FirstBaseEntity(); pEntity; pEntity = EntityList()->NextBaseEntity(pEntity) )
+	for ( C_BaseEntity *pEntity = (C_BaseEntity*)EntityList()->FirstBaseEntity(); pEntity; pEntity = (C_BaseEntity*)EntityList()->NextBaseEntity(pEntity) )
 	{
 		pEntity->UpdateVisibility();
 	}

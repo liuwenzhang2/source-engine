@@ -153,7 +153,7 @@ void FormatViewModelAttachment( Vector &vOrigin, bool bInverse );
 //-----------------------------------------------------------------------------
 void C_VGuiScreen::GetAimEntOrigin( IClientEntity *pAttachedTo, Vector *pOrigin, QAngle *pAngles )
 {
-	C_BaseEntity *pEnt = pAttachedTo->GetBaseEntity();
+	C_BaseEntity *pEnt = (C_BaseEntity*)pAttachedTo->GetBaseEntity();
 	if (pEnt && (m_nAttachmentIndex > 0))
 	{
 		{
@@ -647,7 +647,7 @@ private:
 
 IterationRetval_t CVGuiScreenEnumerator::EnumElement( IHandleEntity *pHandleEntity )
 {
-	C_BaseEntity *pEnt = EntityList()->GetBaseEntityFromHandle( pHandleEntity->GetRefEHandle() );
+	C_BaseEntity *pEnt = (C_BaseEntity*)EntityList()->GetBaseEntityFromHandle( pHandleEntity->GetRefEHandle() );
 	if ( pEnt == NULL )
 		return ITERATION_CONTINUE;
 

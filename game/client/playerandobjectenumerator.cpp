@@ -43,7 +43,7 @@ IterationRetval_t CPlayerAndObjectEnumerator::EnumElement( IHandleEntity *pHandl
 	if ( !m_pLocal )
 		return ITERATION_STOP;
 
-	C_BaseEntity *pEnt = EntityList()->GetBaseEntityFromHandle( pHandleEntity->GetRefEHandle() );
+	C_BaseEntity *pEnt = (C_BaseEntity*)EntityList()->GetBaseEntityFromHandle( pHandleEntity->GetRefEHandle() );
 	if ( pEnt == NULL )
 		return ITERATION_CONTINUE;
 

@@ -173,7 +173,7 @@ void CResultProxy::SetFloatResult( float result )
 C_BaseEntity *CResultProxy::BindArgToEntity( void *pArg )
 {
 	IClientRenderable *pRend = (IClientRenderable *)pArg;
-	return pRend ? pRend->GetIClientUnknown()->GetBaseEntity() : NULL;
+	return pRend ? (C_BaseEntity*)pRend->GetIClientUnknown()->GetBaseEntity() : NULL;
 }
 
 IMaterial *CResultProxy::GetMaterial()

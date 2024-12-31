@@ -201,7 +201,7 @@ void CDirtySpatialPartitionEntityList::OnPreQuery( SpatialPartitionListMask_t li
 #ifndef CLIENT_DLL
 				CBaseEntity *pEntity = EntityList()->GetBaseEntityFromHandle( handle );
 #else
-				CBaseEntity *pEntity = EntityList()->GetBaseEntityFromHandle( handle );
+				CBaseEntity *pEntity = (CBaseEntity*)EntityList()->GetBaseEntityFromHandle( handle );
 #endif
 
 				if ( pEntity )
@@ -1352,7 +1352,7 @@ void CCollisionProperty::MarkPartitionHandleDirty()
 	if ( !m_pOuter->IsEFlagSet( EFL_DIRTY_SPATIAL_PARTITION ) )
 	{
 		m_pOuter->AddEFlags( EFL_DIRTY_SPATIAL_PARTITION );
-		s_DirtyKDTree.AddEntity( m_pOuter->GetOuter() );
+		s_DirtyKDTree.AddEntity((CBaseEntity*)m_pOuter->GetOuter() );
 	}
 
 #ifdef CLIENT_DLL

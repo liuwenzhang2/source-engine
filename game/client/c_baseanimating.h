@@ -27,7 +27,6 @@
 #include "tier0/threadtools.h"
 #include "datacache/idatacache.h"
 
-#define LIPSYNC_POSEPARAM_NAME "mouth"
 #define NUM_HITBOX_FIRES	10
 
 /*

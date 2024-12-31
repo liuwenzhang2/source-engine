@@ -139,7 +139,7 @@ void TE_Decal( IRecipientFilter& filter, float delay,
 		// Only decal the world + brush models
 		// Here we deal with decals on entities.
 		C_BaseEntity* ent;
-		if ( ( ent = EntityList()->GetEnt( entity ) ) == NULL )
+		if ( ( ent = (C_BaseEntity*)EntityList()->GetEnt( entity ) ) == NULL )
 			return;
 
 		ent->AddDecal( *start, *pos, *pos, hitbox, 

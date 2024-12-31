@@ -770,8 +770,8 @@ void C_WeaponStunStick::DrawThirdPersonEffects( void )
 			offset += Vector(4,4,4);
 			beamInfo.m_vecEnd = vecOrigin + offset;
 
-			beamInfo.m_pStartEnt= EntityList()->GetEnt( BEAMENT_ENTITY( entindex() ) );
-			beamInfo.m_pEndEnt	= EntityList()->GetEnt( BEAMENT_ENTITY( entindex() ) );
+			beamInfo.m_pStartEnt= (CBaseEntity*)EntityList()->GetEnt( BEAMENT_ENTITY( entindex() ) );
+			beamInfo.m_pEndEnt	= (CBaseEntity*)EntityList()->GetEnt( BEAMENT_ENTITY( entindex() ) );
 			beamInfo.m_nStartAttachment = 1;
 			beamInfo.m_nEndAttachment = -1;
 			

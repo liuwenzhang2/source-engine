@@ -113,7 +113,7 @@ void C_Gib::ClientThink( void )
 // Purpose: 
 // Input  : *pOther - 
 //-----------------------------------------------------------------------------
-void C_Gib::StartTouch( C_BaseEntity *pOther )
+void C_Gib::StartTouch( IClientEntity *pOther )
 {
 	// Limit the amount of times we can bounce
 	if ( m_flTouchDelta < gpGlobals->curtime )
@@ -129,7 +129,7 @@ void C_Gib::StartTouch( C_BaseEntity *pOther )
 // Purpose: 
 // Input  : *pOther - 
 //-----------------------------------------------------------------------------
-void C_Gib::HitSurface( C_BaseEntity *pOther )
+void C_Gib::HitSurface( IClientEntity *pOther )
 {
 	//TODO: Implement splatter or effects in child versions
 }

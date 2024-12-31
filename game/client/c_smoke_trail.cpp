@@ -195,7 +195,7 @@ C_SmokeTrail::~C_SmokeTrail()
 //-----------------------------------------------------------------------------
 void C_SmokeTrail::GetAimEntOrigin( IClientEntity *pAttachedTo, Vector *pAbsOrigin, QAngle *pAbsAngles )
 {
-	C_BaseEntity *pEnt = pAttachedTo->GetBaseEntity();
+	C_BaseEntity *pEnt = (C_BaseEntity*)pAttachedTo->GetBaseEntity();
 	if (pEnt && (m_nAttachment > 0))
 	{
 		pEnt->GetEngineObject()->GetAttachment( m_nAttachment, *pAbsOrigin, *pAbsAngles );
@@ -385,7 +385,7 @@ void C_SmokeTrail::CleanupToolRecordingState( KeyValues *msg )
 		return;
 	
 	// For now, we can't record smoketrails that don't have a moveparent
-	C_BaseEntity *pEnt = GetEngineObject()->GetMoveParent()?GetEngineObject()->GetMoveParent()->GetOuter():NULL;
+	C_BaseEntity* pEnt = GetEngineObject()->GetMoveParent() ? (C_BaseEntity*)GetEngineObject()->GetMoveParent()->GetOuter() : NULL;
 	if ( !pEnt )
 		return;
 
@@ -574,7 +574,7 @@ C_RocketTrail::~C_RocketTrail()
 //-----------------------------------------------------------------------------
 void C_RocketTrail::GetAimEntOrigin( IClientEntity *pAttachedTo, Vector *pAbsOrigin, QAngle *pAbsAngles )
 {
-	C_BaseEntity *pEnt = pAttachedTo->GetBaseEntity();
+	C_BaseEntity *pEnt = (C_BaseEntity*)pAttachedTo->GetBaseEntity();
 	if (pEnt && (m_nAttachment > 0))
 	{
 		pEnt->GetEngineObject()->GetAttachment( m_nAttachment, *pAbsOrigin, *pAbsAngles );
@@ -1393,7 +1393,7 @@ void C_SporeTrail::SimulateParticles( CParticleSimulateIterator *pIterator )
 //-----------------------------------------------------------------------------
 void C_SporeTrail::GetAimEntOrigin( IClientEntity *pAttachedTo, Vector *pAbsOrigin, QAngle *pAbsAngles )
 {
-	C_BaseEntity *pEnt = pAttachedTo->GetBaseEntity();
+	C_BaseEntity *pEnt = (C_BaseEntity*)pAttachedTo->GetBaseEntity();
 	
 	pEnt->GetEngineObject()->GetAttachment( 1, *pAbsOrigin, *pAbsAngles );
 
@@ -1907,7 +1907,7 @@ void C_DustTrail::CleanupToolRecordingState( KeyValues *msg )
 		return;
 	
 	// For now, we can't record Dusttrails that don't have a moveparent
-	C_BaseEntity *pEnt = GetEngineObject()->GetMoveParent()?GetEngineObject()->GetMoveParent()->GetOuter():NULL;
+	C_BaseEntity* pEnt = GetEngineObject()->GetMoveParent() ? (C_BaseEntity*)GetEngineObject()->GetMoveParent()->GetOuter() : NULL;
 	if ( !pEnt )
 		return;
 

@@ -1015,7 +1015,7 @@ void CViewRender::DrawRenderablesInList( CUtlVector< IClientRenderable * > &list
 		// Non-view models wanting to render in view model list...
 		if ( pRenderable->ShouldDraw() )
 		{
-			m_pCurrentlyDrawingEntity = pUnk->GetBaseEntity();
+			m_pCurrentlyDrawingEntity = (C_BaseEntity*)pUnk->GetBaseEntity();
 			pRenderable->DrawModel( STUDIO_RENDER | flags );
 		}
 	}
@@ -3793,7 +3793,7 @@ static inline void DrawOpaqueRenderable( IClientRenderable *pEnt, bool bTwoPass,
 		else
 			DrawClippedDepthBox( pEnt, pRenderClipPlane );
 		Assert( view->GetCurrentlyDrawingEntity() == NULL );
-		view->SetCurrentlyDrawingEntity( pEnt->GetIClientUnknown()->GetBaseEntity() );
+		view->SetCurrentlyDrawingEntity((C_BaseEntity*)pEnt->GetIClientUnknown()->GetBaseEntity() );
 		pEnt->DrawModel( flags );
 		view->SetCurrentlyDrawingEntity( NULL );
 		if( pRenderClipPlane && !materials->UsingFastClipping() )	
@@ -3802,7 +3802,7 @@ static inline void DrawOpaqueRenderable( IClientRenderable *pEnt, bool bTwoPass,
 	else
 	{
 		Assert( view->GetCurrentlyDrawingEntity() == NULL );
-		view->SetCurrentlyDrawingEntity( pEnt->GetIClientUnknown()->GetBaseEntity() );
+		view->SetCurrentlyDrawingEntity((C_BaseEntity*)pEnt->GetIClientUnknown()->GetBaseEntity() );
 		pEnt->DrawModel( flags );
 		view->SetCurrentlyDrawingEntity( NULL );
 	}
@@ -3984,7 +3984,7 @@ void CRendering3dView::DrawOpaqueRenderables( ERenderDepthMode DepthMode )
 			* const pEntitiesEnd = pEntitiesBegin + m_pRenderablesList->m_RenderGroupCounts[ RENDER_GROUP_OPAQUE_ENTITY_HUGE + 2 * bucket ],
 			*itEntity = pEntitiesBegin; itEntity < pEntitiesEnd; ++ itEntity )
 		{
-			C_BaseEntity *pEntity = itEntity->m_pRenderable ? itEntity->m_pRenderable->GetIClientUnknown()->GetBaseEntity() : NULL;
+			C_BaseEntity *pEntity = itEntity->m_pRenderable ? (C_BaseEntity*)itEntity->m_pRenderable->GetIClientUnknown()->GetBaseEntity() : NULL;
 			if ( pEntity )
 			{
 				if ( pEntity->IsNPC() )
@@ -4194,7 +4194,7 @@ static inline void DrawTranslucentRenderable( IClientRenderable *pEnt, bool twoP
 		else
 			DrawClippedDepthBox( pEnt, pRenderClipPlane );
 		Assert( view->GetCurrentlyDrawingEntity() == NULL );
-		view->SetCurrentlyDrawingEntity( pEnt->GetIClientUnknown()->GetBaseEntity() );
+		view->SetCurrentlyDrawingEntity((C_BaseEntity*)pEnt->GetIClientUnknown()->GetBaseEntity() );
 		pEnt->DrawModel( flags );
 		view->SetCurrentlyDrawingEntity( NULL );
 
@@ -4204,7 +4204,7 @@ static inline void DrawTranslucentRenderable( IClientRenderable *pEnt, bool twoP
 	else
 	{
 		Assert( view->GetCurrentlyDrawingEntity() == NULL );
-		view->SetCurrentlyDrawingEntity( pEnt->GetIClientUnknown()->GetBaseEntity() );
+		view->SetCurrentlyDrawingEntity((C_BaseEntity*)pEnt->GetIClientUnknown()->GetBaseEntity() );
 		pEnt->DrawModel( flags );
 		view->SetCurrentlyDrawingEntity( NULL );
 	}

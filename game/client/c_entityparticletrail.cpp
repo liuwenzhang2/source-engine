@@ -172,7 +172,7 @@ void C_EntityParticleTrail::Update( float fTimeDelta )
 	if ( !pMoveParent )
 		return;
 
-	C_BaseAnimating *pAnimating = pMoveParent->GetOuter()->GetBaseAnimating();
+	C_BaseAnimating *pAnimating = ((C_BaseEntity*)pMoveParent->GetOuter())->GetBaseAnimating();
 	if (!pAnimating)
 		goto trailNoHitboxes;
 

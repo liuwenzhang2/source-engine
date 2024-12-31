@@ -86,8 +86,8 @@ public:
 			offset += Vector(2,2,2);
 			beamInfo.m_vecEnd = vecOrigin + offset;
 
-			beamInfo.m_pStartEnt= EntityList()->GetEnt( BEAMENT_ENTITY( entindex() ) );
-			beamInfo.m_pEndEnt	= EntityList()->GetEnt( BEAMENT_ENTITY( entindex() ) );
+			beamInfo.m_pStartEnt= (C_BaseEntity*)EntityList()->GetEnt( BEAMENT_ENTITY( entindex() ) );
+			beamInfo.m_pEndEnt	= (C_BaseEntity*)EntityList()->GetEnt( BEAMENT_ENTITY( entindex() ) );
 			beamInfo.m_nStartAttachment = 1;
 			beamInfo.m_nEndAttachment = 2;
 			

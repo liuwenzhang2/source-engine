@@ -33,7 +33,7 @@ CRagdollExplosionEnumerator::CRagdollExplosionEnumerator( Vector origin, float r
 // Actual work code
 IterationRetval_t CRagdollExplosionEnumerator::EnumElement( IHandleEntity *pHandleEntity )
 {
-	C_BaseEntity *pEnt = EntityList()->GetBaseEntityFromHandle( pHandleEntity->GetRefEHandle() );
+	C_BaseEntity *pEnt = (C_BaseEntity*)EntityList()->GetBaseEntityFromHandle( pHandleEntity->GetRefEHandle() );
 	
 	if ( pEnt == NULL )
 		return ITERATION_CONTINUE;

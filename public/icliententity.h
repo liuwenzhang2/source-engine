@@ -24,7 +24,6 @@ struct Ray_t;
 class CGameTrace;
 typedef CGameTrace trace_t;
 class CMouthInfo;
-class IClientEntityInternal;
 struct SpatializationInfo_t;
 struct string_t;
 class IPhysicsObject;
@@ -36,6 +35,7 @@ struct PS_SD_Static_SurfaceProperties_t;
 class CIKContext;
 typedef unsigned int HTOOLHANDLE;
 class CUserCmd;
+class IClientEntity;
 class IClientGameRules;
 
 class VarMapEntry_t
@@ -62,7 +62,7 @@ struct VarMapping_t
 
 struct clienttouchlink_t
 {
-	C_BaseEntity* entityTouched = NULL;
+	IClientEntity* entityTouched = NULL;
 	int			touchStamp = 0;
 	clienttouchlink_t* nextLink = NULL;
 	clienttouchlink_t* prevLink = NULL;
@@ -80,7 +80,7 @@ struct clientgroundlink_t
 };
 
 typedef void (IHandleEntity::* CTHINKPTR)(void);
-typedef void (IHandleEntity::* CTOUCHPTR)(C_BaseEntity* pOther);
+typedef void (IHandleEntity::* CTOUCHPTR)(IClientEntity* pOther);
 
 //-----------------------------------------------------------------------------
 // Purpose: think contexts
@@ -93,7 +93,6 @@ struct clientthinkfunc_t
 	int			m_nLastThinkTick;
 };
 
-class IClientEntity;
 class IEngineWorldClient;
 class IEnginePlayerClient;
 class IEnginePortalClient;
@@ -104,9 +103,9 @@ class IEngineGhostClient;
 
 class IGrabControllerClient {
 public:
-	virtual void AttachEntity(C_BaseEntity* pPlayer, C_BaseEntity* pEntity, IPhysicsObject* pPhys, bool bIsMegaPhysCannon, const Vector& vGrabPosition, bool bUseGrabPosition) = 0;
+	virtual void AttachEntity(IClientEntity* pPlayer, IClientEntity* pEntity, IPhysicsObject* pPhys, bool bIsMegaPhysCannon, const Vector& vGrabPosition, bool bUseGrabPosition) = 0;
 	virtual void DetachEntity(bool bClearVelocity) = 0;
-	virtual C_BaseEntity* GetAttached() = 0;
+	virtual IClientEntity* GetAttached() = 0;
 	virtual const QAngle& GetAttachedAnglesPlayerSpace() = 0;
 	virtual void SetAttachedAnglesPlayerSpace(const QAngle& attachedAnglesPlayerSpace) = 0;
 	virtual const Vector& GetAttachedPositionObjectSpace() = 0;
@@ -115,11 +114,11 @@ public:
 	virtual void SetAngleAlignment(float alignAngleCosine) = 0;
 	virtual float GetLoadWeight(void) const = 0;
 	virtual float ComputeError() = 0;
-	virtual bool UpdateObject(C_BaseEntity* pPlayer, float flError) = 0;
+	virtual bool UpdateObject(IClientEntity* pPlayer, float flError) = 0;
 	virtual float GetSavedMass(IPhysicsObject* pObject) = 0;
 	virtual void GetSavedParamsForCarriedPhysObject(IPhysicsObject* pObject, float* pSavedMassOut, float* pSavedRotationalDampingOut) = 0;
 	virtual void GetTargetPosition(Vector* target, QAngle* targetOrientation) = 0;
-	virtual void SetPortalPenetratingEntity(C_BaseEntity* pPenetrated) = 0;
+	virtual void SetPortalPenetratingEntity(IClientEntity* pPenetrated) = 0;
 };
 
 class IEngineObjectClient : public IEngineObject, public IClientNetworkable, public IClientRenderable {
@@ -127,7 +126,7 @@ public:
 
 	virtual datamap_t* GetPredDescMap(void) = 0;
 	virtual IClientEntity* GetClientEntity() = 0;
-	virtual C_BaseEntity* GetOuter() = 0;
+	virtual IClientEntity* GetOuter() = 0;
 	virtual IHandleEntity* GetHandleEntity() const = 0;
 	virtual int entindex() const = 0;
 	virtual void ParseMapData(IEntityMapData* mapData) = 0;
@@ -526,7 +525,7 @@ public:
 	virtual IPhysicsObject* VPhysicsInitNormal(SolidType_t solidType, int nSolidFlags, bool createAsleep, solid_t* pSolid = NULL) = 0;
 	virtual IPhysicsObject* VPhysicsInitShadow(bool allowPhysicsMovement, bool allowPhysicsRotation, solid_t* pSolid = NULL) = 0;
 
-	virtual void RagdollBone(C_BaseEntity* ent, mstudiobone_t* pbones, int boneCount, bool* boneSimulated, CBoneAccessor& pBoneToWorld) = 0;
+	virtual void RagdollBone(IClientEntity* ent, mstudiobone_t* pbones, int boneCount, bool* boneSimulated, CBoneAccessor& pBoneToWorld) = 0;
 	virtual const Vector& GetRagdollOrigin() = 0;
 	virtual void GetRagdollBounds(Vector& mins, Vector& maxs) = 0;
 	virtual int RagdollBoneCount() const = 0;
@@ -544,7 +543,7 @@ public:
 	virtual bool IsAboutToRagdoll() const = 0;
 	virtual void SetBuiltRagdoll(bool builtRagdoll) = 0;
 	virtual void Simulate() = 0;
-	//virtual void CreateUnragdollInfo(C_BaseEntity* pRagdoll) = 0;
+	//virtual void CreateUnragdollInfo(IClientEntity* pRagdoll) = 0;
 	virtual IPhysicsConstraintGroup* GetConstraintGroup() = 0;
 	virtual int LookupSequence(const char* label) = 0;
 	virtual int SelectWeightedSequence(int activity) = 0;
@@ -759,7 +758,7 @@ public:
 	//virtual CSimplePhysics::IHelper* HookPhysics(CSimplePhysics::IHelper* pHook) = 0;
 	// Get the attachment position of one of the endpoints.
 	virtual bool			GetEndPointPos(int iPt, Vector& vPos, QAngle& vAngle) = 0;
-	virtual bool			CalculateEndPointAttachment(C_BaseEntity* pEnt, int iAttachment, Vector& vPos, QAngle& pAngles) = 0;
+	virtual bool			CalculateEndPointAttachment(IClientEntity* pEnt, int iAttachment, Vector& vPos, QAngle& pAngles) = 0;
 	virtual void			SetRopeFlags(int flags) = 0;
 	virtual int				GetRopeFlags() const = 0;
 	virtual int				GetSlack() = 0;
@@ -767,11 +766,11 @@ public:
 	virtual void			SetSlack(int slack) = 0;
 	virtual void			SetupHangDistance(float flHangDist) = 0;
 	// Change which entities the rope is connected to.
-	virtual void			SetStartEntity(C_BaseEntity* pEnt) = 0;
-	virtual void			SetEndEntity(C_BaseEntity* pEnt) = 0;
+	virtual void			SetStartEntity(IClientEntity* pEnt) = 0;
+	virtual void			SetEndEntity(IClientEntity* pEnt) = 0;
 
-	virtual C_BaseEntity*	GetStartEntity() const = 0;
-	virtual C_BaseEntity*	GetEndEntity() const = 0;
+	virtual IClientEntity*	GetStartEntity() const = 0;
+	virtual IClientEntity*	GetEndEntity() const = 0;
 	// Get the rope material data.
 	virtual IMaterial*		GetSolidMaterial(void) = 0;
 	virtual IMaterial*		GetBackMaterial(void) = 0;
@@ -794,8 +793,8 @@ public:
 class IEngineGhostClient {
 public:
 	virtual void SetMatGhostTransform(const VMatrix& matGhostTransform) = 0;
-	virtual void SetGhostedSource(C_BaseEntity* pGhostedSource) = 0;
-	virtual C_BaseEntity* GetGhostedSource() = 0;
+	virtual void SetGhostedSource(IClientEntity* pGhostedSource) = 0;
+	virtual IClientEntity* GetGhostedSource() = 0;
 	virtual void PerFrameUpdate(void) = 0;
 	virtual bool GetSourceIsBaseAnimating() = 0;
 	virtual Vector const& GetRenderOrigin(void) = 0;
@@ -813,25 +812,144 @@ public:
 abstract_class IClientEntity : public IClientUnknown, public IClientNetworkable, public IClientThinkable
 {
 public:
-	// Delete yourself.
-	virtual void			Release( void ) = 0;
-	
-	// Network origin + angles
-	//virtual const Vector&	GetAbsOrigin( void ) const = 0;
-	//virtual const QAngle&	GetAbsAngles( void ) const = 0;
-
-	//virtual CMouthInfo		*GetMouth( void ) = 0;
-
-	// Retrieve sound spatialization info for the specified sound on this entity
-	// Return false to indicate sound is not audible
-	virtual bool			GetSoundSpatialization( SpatializationInfo_t& info ) = 0;
-	virtual int				entindex() const { return IClientUnknown::entindex(); }
+	virtual ClientClass* GetClientClass() = 0;
+	virtual datamap_t* GetPredDescMap(void) = 0;
+	virtual void* GetDataTableBasePtr() { return this; }
 	virtual RecvTable* GetRecvTable() {
 		return GetClientClass()->m_pRecvTable;
 	}
-	virtual ClientClass* GetClientClass() = 0;
-	virtual void* GetDataTableBasePtr() { return this; }
-	
+	virtual int entindex() const { return IClientUnknown::entindex(); }
+	virtual char const* GetClassname(void) = 0;
+	virtual char const* GetDebugName(void) = 0;
+	virtual IEngineObjectClient* GetEngineObject() = 0;
+	virtual const IEngineObjectClient* GetEngineObject() const = 0;
+	virtual IEngineWorldClient* GetEngineWorld() = 0;
+	virtual const IEngineWorldClient* GetEngineWorld() const = 0;
+	virtual IEnginePlayerClient* GetEnginePlayer() = 0;
+	virtual const IEnginePlayerClient* GetEnginePlayer() const = 0;
+	virtual IEnginePortalClient* GetEnginePortal() = 0;
+	virtual const IEnginePortalClient* GetEnginePortal() const = 0;
+	virtual IEngineVehicleClient* GetEngineVehicle() = 0;
+	virtual const IEngineVehicleClient* GetEngineVehicle() const = 0;
+	virtual IEngineRopeClient* GetEngineRope() = 0;
+	virtual const IEngineRopeClient* GetEngineRope() const = 0;
+	virtual IEngineGhostClient* GetEngineGhost() = 0;
+	virtual const IEngineGhostClient* GetEngineGhost() const = 0;
+
+	virtual int ObjectCaps(void) = 0;
+	virtual void Spawn(void) = 0;
+	virtual void OnSave() = 0;
+	virtual int Save(ISave& save) = 0;
+	virtual void OnRestore() = 0;
+	virtual int Restore(IRestore& restore) = 0;
+	virtual bool KeyValue(const char* szKeyName, const char* szValue) = 0;
+	virtual bool KeyValue(const char* szKeyName, float flValue) = 0;
+	virtual bool KeyValue(const char* szKeyName, const Vector& vecValue) = 0;
+	virtual void SUB_Remove(void) = 0;
+	// Delete yourself.
+	virtual void Release(void) = 0;
+
+	virtual void SetBlocksLOS(bool bBlocksLOS) = 0;
+	virtual bool BlocksLOS(void) = 0;
+	virtual IClientEntity* GetOwnerEntity(void) const = 0;
+	virtual bool GetAttachmentVelocity(int number, Vector& originVel, Quaternion& angleVel) = 0;
+
+	virtual bool IsNPC(void) = 0;
+	virtual bool IsPlayer(void) const = 0;
+	virtual bool IsViewModel() const = 0;
+	virtual bool IsBaseCombatCharacter(void) = 0;
+	virtual bool IsBaseCombatWeapon(void) const = 0;
+	virtual bool IsAlive(void) = 0;
+	virtual bool IsFloating() = 0;
+	virtual bool IsStandable() const = 0;
+	virtual int CalcOverrideModelIndex() = 0;
+	virtual void ValidateModelIndex(void) = 0;
+	virtual IStudioHdr* OnNewModel() = 0;
+	virtual void OnPositionChanged() = 0;
+	virtual void OnAnglesChanged() = 0;
+	virtual void OnAnimationChanged() = 0;
+	virtual void MoveToAimEnt() = 0;
+	virtual void OnAddEffects(int nEffects) = 0;
+	virtual void OnRemoveEffects(int nEffects) = 0;
+	virtual void SetNextClientThink(float nextThinkTime) = 0;
+	virtual void Think(void) = 0;
+	virtual void NotifyVPhysicsStateChanged(IPhysicsObject* pPhysics, bool bAwake) = 0;
+	virtual void VPhysicsUpdate(IPhysicsObject* pPhysics) = 0;
+	virtual	void RefreshCollisionBounds(void) = 0;
+	virtual unsigned int PhysicsSolidMaskForEntity(void) const = 0;
+	virtual void ComputeWorldSpaceSurroundingBox(Vector* pVecWorldMins, Vector* pVecWorldMaxs) = 0;
+	virtual void UpdatePartitionListEntry() = 0;
+	virtual bool TestCollision(const Ray_t& ray, unsigned int fContentsMask, trace_t& tr) = 0;
+	virtual bool TestHitboxes(const Ray_t& ray, unsigned int fContentsMask, trace_t& tr) = 0;
+	virtual void StartTouch(IClientEntity* pOther) = 0;
+	virtual void Touch(IClientEntity* pOther) = 0;
+	virtual void EndTouch(IClientEntity* pOther) = 0;
+	virtual void StartGroundContact(IClientEntity* ground) = 0;
+	virtual void EndGroundContact(IClientEntity* ground) = 0;
+	virtual IClientEntity* BecomeRagdollOnClient() = 0;
+
+	virtual void PhysicsSimulate(void) = 0;
+
+	virtual void CheckInitPredictable(const char* context) = 0;
+	virtual bool GetPredictable(void) const = 0;
+	virtual bool ShouldInterpolate() = 0;
+	virtual float GetInterpolationAmount(int flags) = 0;
+	virtual bool Interpolate(float currentTime) = 0;
+	virtual void OnPostRestoreData() = 0;
+	virtual float GetFinalPredictedTime() const = 0;
+
+	virtual unsigned int ComputeClientSideAnimationFlags() = 0;
+	virtual void ClientSideAnimationChanged() = 0;
+	virtual void UpdateClientSideAnimation() = 0;
+
+	virtual	void StandardBlendingRules(IStudioHdr* pStudioHdr, Vector pos[], Quaternion q[], float currentTime, int boneMask) = 0;
+	virtual void UpdateIKLocks(float currentTime) = 0;
+	virtual void CalculateIKLocks(float currentTime) = 0;
+	virtual void BeforeBuildTransformations(IStudioHdr* pStudioHdr, Vector* pos, Quaternion q[], const matrix3x4_t& cameraTransform, int boneMask, CBoneBitList& boneComputed) = 0;
+	virtual void AfterBuildTransformations(IStudioHdr* pStudioHdr, Vector* pos, Quaternion q[], const matrix3x4_t& cameraTransform, int boneMask, CBoneBitList& boneComputed) = 0;
+	virtual void ApplyBoneMatrixTransform(matrix3x4_t& transform) = 0;
+	virtual void FormatViewModelAttachment(int nAttachment, matrix3x4_t& attachmentToWorld) = 0;
+
+	virtual void UpdateVisibility() = 0;
+	virtual IClientEntity* GetEffectEntity(void) const = 0;
+	virtual IPVSNotify* GetPVSNotifyInterface() = 0;
+	virtual void OnThreadedDrawSetup() = 0;
+	virtual bool ShouldDraw(void) = 0;
+	virtual bool IsTransparent(void) = 0;
+	virtual bool UsesPowerOfTwoFrameBufferTexture(void) = 0;
+	virtual bool UsesFullFrameBufferTexture() = 0;
+	virtual bool IsTwoPass(void) = 0;
+	virtual bool IgnoresZBuffer(void) const = 0;
+	virtual void ComputeFxBlend(void) = 0;
+	virtual int GetFxBlend(void) = 0;
+	virtual void GetColorModulation(float* color) = 0;
+	virtual bool UsesFlexDelayedWeights() = 0;
+	virtual void SetupWeights(const matrix3x4_t* pBoneToWorld, int nFlexWeightCount, float* pFlexWeights, float* pFlexDelayedWeights) = 0;
+	virtual const Vector& WorldSpaceCenter() const = 0;
+	virtual const QAngle& EyeAngles(void) const = 0;
+	virtual void EyeVectors(Vector* pForward, Vector* pRight = NULL, Vector* pUp = NULL) = 0;
+	virtual const Vector& GetViewOffset() const = 0;
+	virtual Vector Weapon_ShootPosition() = 0;
+	virtual bool ShouldReceiveProjectedTextures(int flags) = 0;
+	virtual const Vector& GetRenderOrigin(void) = 0;
+	virtual const QAngle& GetRenderAngles(void) = 0;
+	virtual void GetRenderBounds(Vector& mins, Vector& maxs) = 0;
+	virtual void GetRenderBoundsWorldspace(Vector& absMins, Vector& absMaxs) = 0;
+	virtual float* GetRenderClipPlane(void) = 0;
+	virtual ShadowType_t ShadowCastType() = 0;
+	virtual void GetShadowRenderBounds(Vector& mins, Vector& maxs, ShadowType_t shadowType) = 0;
+	virtual bool GetShadowCastDistance(float* pDist, ShadowType_t shadowType) const = 0;
+	virtual bool GetShadowCastDirection(Vector* pDirection, ShadowType_t shadowType) const = 0;
+	virtual RenderGroup_t GetRenderGroup() = 0;
+	virtual IClientEntity* GetRenderedWeaponModel() = 0;
+	virtual int GetWorldModelIndex(void) = 0;
+	virtual int DrawModel(int flags) = 0;
+
+	virtual void RecordToolMessage() = 0;
+	// Retrieve sound spatialization info for the specified sound on this entity
+	// Return false to indicate sound is not audible
+	virtual bool GetSoundSpatialization(SpatializationInfo_t& info) = 0;
+	virtual bool InitializeAsClientEntity(const char* pszModelName, RenderGroup_t renderGroup) = 0;
 };
 
 #define INPVS_YES			0x0001		// The entity thinks it's in the PVS.
@@ -851,9 +969,9 @@ public:
 class IClientEntityListener
 {
 public:
-	virtual void OnEntityCreated(C_BaseEntity* pEntity) {};
-	//virtual void OnEntitySpawned( C_BaseEntity *pEntity ) {};
-	virtual void OnEntityDeleted(C_BaseEntity* pEntity) {};
+	virtual void OnEntityCreated(IClientEntity* pEntity) {};
+	//virtual void OnEntitySpawned( IClientEntity *pEntity ) {};
+	virtual void OnEntityDeleted(IClientEntity* pEntity) {};
 };
 
 //=============================================================================
@@ -949,15 +1067,15 @@ public:
 	virtual IClientEntity* GetClientEntity(int entnum) = 0;
 	virtual IClientEntity* GetClientEntityFromHandle(CBaseHandle hEnt) = 0;
 
-	virtual C_BaseEntity* GetBaseEntity(int entnum) = 0;
+	virtual IClientEntity* GetBaseEntity(int entnum) = 0;
 	// For backwards compatibility...
-	virtual C_BaseEntity* GetEnt(int entnum) { return GetBaseEntity(entnum); }
-	virtual C_BaseEntity* GetBaseEntityFromHandle(CBaseHandle hEnt) = 0;
-	virtual C_BaseEntity* FirstBaseEntity() const = 0;
-	virtual C_BaseEntity* NextBaseEntity(C_BaseEntity* pEnt) const = 0;
-	virtual C_BaseEntity* GetLocalPlayer(void) = 0;
-	virtual void SetLocalPlayer(C_BaseEntity* pBasePlayer) = 0;
-	virtual C_BaseEntity* GetPlayerByIndex(int playerIndex) = 0;
+	virtual IClientEntity* GetEnt(int entnum) { return GetBaseEntity(entnum); }
+	virtual IClientEntity* GetBaseEntityFromHandle(CBaseHandle hEnt) = 0;
+	virtual IClientEntity* FirstBaseEntity() const = 0;
+	virtual IClientEntity* NextBaseEntity(IClientEntity* pEnt) const = 0;
+	virtual IClientEntity* GetLocalPlayer(void) = 0;
+	virtual void SetLocalPlayer(IClientEntity* pBasePlayer) = 0;
+	virtual IClientEntity* GetPlayerByIndex(int playerIndex) = 0;
 
 	// Returns number of entities currently in use
 	virtual int NumberOfEntities(bool bIncludeNonNetworkable) = 0;
@@ -1005,7 +1123,7 @@ public:
 	virtual IEnginePortalClient* GetPortal(int index) = 0;
 	virtual CCallQueue* GetPostTouchQueue() = 0;
 
-	virtual void MoveToTopOfLRU(C_BaseEntity* pRagdoll, bool bImportant = false) = 0;
+	virtual void MoveToTopOfLRU(IClientEntity* pRagdoll, bool bImportant = false) = 0;
 	virtual void SetMaxRagdollCount(int iMaxCount) = 0;
 	virtual int CountRagdolls(bool bOnlySimulatingRagdolls) = 0;
 

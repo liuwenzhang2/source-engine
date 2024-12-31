@@ -1459,8 +1459,8 @@ void CAchievementMgr::FireGameEvent( IGameEvent *event )
 #ifdef CLIENT_DLL
 	else if ( 0 == Q_strcmp( name, "player_death" ) )
 	{
-		CBaseEntity *pVictim = EntityList()->GetEnt( engine->GetPlayerForUserID( event->GetInt("userid") ) );
-		CBaseEntity *pAttacker = EntityList()->GetEnt( engine->GetPlayerForUserID( event->GetInt("attacker") ) );
+		CBaseEntity *pVictim = (CBaseEntity*)EntityList()->GetEnt( engine->GetPlayerForUserID( event->GetInt("userid") ) );
+		CBaseEntity *pAttacker = (CBaseEntity*)EntityList()->GetEnt( engine->GetPlayerForUserID( event->GetInt("attacker") ) );
 		OnKillEvent( pVictim, pAttacker, NULL, event );
 	}
 	else if ( 0 == Q_strcmp( name, "localplayer_changeclass" ) )

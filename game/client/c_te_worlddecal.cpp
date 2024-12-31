@@ -104,7 +104,7 @@ void C_TEWorldDecal::PostDataUpdate( DataUpdateType_t updateType )
 
 	if ( r_decals.GetInt() )
 	{
-		C_BaseEntity *ent = EntityList()->GetEnt( 0 );
+		C_BaseEntity *ent = (C_BaseEntity*)EntityList()->GetEnt( 0 );
 		if ( ent )
 		{
 			bool bNoBlood = UTIL_IsLowViolence();
@@ -136,7 +136,7 @@ void TE_WorldDecal( IRecipientFilter& filter, float delay, const Vector* pos, in
 {
 	if ( r_decals.GetInt() )
 	{
-		C_BaseEntity *ent = EntityList()->GetEnt( 0 );
+		C_BaseEntity *ent = (C_BaseEntity*)EntityList()->GetEnt( 0 );
 		if ( ent )
 		{
 			effects->DecalShoot( index, 0, ent->GetEngineObject()->GetModel(), ent->GetEngineObject()->GetAbsOrigin(), ent->GetEngineObject()->GetAbsAngles(), *pos, 0, 0 );

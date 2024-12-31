@@ -113,7 +113,7 @@ void StudioStats_FindClosestEntity( CClientRenderablesList *pClientRenderablesLi
 
 	if ( g_pStudioStatsEntity )
 	{
-		C_BaseEntity *pEntity = g_pStudioStatsEntity->GetIClientUnknown()->GetBaseEntity();
+		C_BaseEntity *pEntity = (C_BaseEntity*)g_pStudioStatsEntity->GetIClientUnknown()->GetBaseEntity();
 
 		if ( pEntity && ( pEntity != (C_BasePlayer*)EntityList()->GetLocalPlayer() ) )
 		{

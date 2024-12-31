@@ -240,10 +240,10 @@ void CClientThinkList::AddEntityToFrameThinkList( ThinkEntry_t *pEntry, bool bAl
 		return;
 
 	// Respect hierarchy
-	C_BaseEntity *pEntity = EntityList()->GetBaseEntityFromHandle( pEntry->m_hEnt );
+	C_BaseEntity *pEntity = (C_BaseEntity*)EntityList()->GetBaseEntityFromHandle( pEntry->m_hEnt );
 	if ( pEntity )
 	{
-		C_BaseEntity *pParent = pEntity->GetEngineObject()->GetMoveParent()?pEntity->GetEngineObject()->GetMoveParent()->GetOuter():NULL;
+		C_BaseEntity* pParent = pEntity->GetEngineObject()->GetMoveParent() ? (C_BaseEntity*)pEntity->GetEngineObject()->GetMoveParent()->GetOuter() : NULL;
 		if ( pParent && (pParent->GetThinkHandle() != INVALID_THINK_HANDLE) )
 		{
 			ThinkEntry_t *pParentEntry = GetThinkEntry( pParent->GetThinkHandle() );
@@ -335,7 +335,7 @@ void CClientThinkList::AddToDeleteList( ClientEntityHandle_t hEnt )
 		return;
 
 	// Check to see if entity is networkable -- don't let it release!
-	C_BaseEntity *pEntity = EntityList()->GetBaseEntityFromHandle( hEnt );
+	C_BaseEntity *pEntity = (C_BaseEntity*)EntityList()->GetBaseEntityFromHandle( hEnt );
 	if ( pEntity )
 	{
 		// Check to see if the entity is already being removed!
@@ -366,7 +366,7 @@ void CClientThinkList::RemoveFromDeleteList( ClientEntityHandle_t hEnt )
 		{
 			m_aDeleteList[iHandle] = EntityList()->InvalidHandle();
 
-			C_BaseEntity *pEntity = EntityList()->GetBaseEntityFromHandle( hEnt );
+			C_BaseEntity *pEntity = (C_BaseEntity*)EntityList()->GetBaseEntityFromHandle( hEnt );
 			if ( pEntity )
 			{
 				pEntity->SetRemovalFlag( false );
@@ -383,7 +383,7 @@ void CClientThinkList::CleanUpDeleteList()
 		ClientEntityHandle_t handle = m_aDeleteList[iThink];
 		if ( handle != EntityList()->InvalidHandle() )
 		{
-			C_BaseEntity *pEntity = EntityList()->GetBaseEntityFromHandle( handle );
+			C_BaseEntity *pEntity = (C_BaseEntity*)EntityList()->GetBaseEntityFromHandle( handle );
 			if ( pEntity )
 			{
 				pEntity->SetRemovalFlag( false );

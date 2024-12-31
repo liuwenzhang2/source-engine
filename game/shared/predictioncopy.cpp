@@ -1759,7 +1759,7 @@ CValueChangeTracker::CValueChangeTracker() :
 	Q_memset( m_OrigValueBuf, 0, sizeof( m_OrigValueBuf ) );
 }
 
-C_BaseEntity *CValueChangeTracker::GetEntity()
+IClientEntity *CValueChangeTracker::GetEntity()
 {
 	return m_hEntityToTrack.Get();
 }
@@ -1950,7 +1950,7 @@ static bool FindFieldStackByName_R( const char *fieldname, datamap_t *dmap, CUtl
 	return false;
 }
 
-void CValueChangeTracker::SetupTracking( C_BaseEntity *ent, char const *pchFieldName )
+void CValueChangeTracker::SetupTracking( IClientEntity *ent, char const *pchFieldName )
 {
 	ClearTracking();
 
@@ -2012,7 +2012,7 @@ CON_COMMAND_F( cl_pred_track, "<entindex> <fieldname>:  Track changes to entity 
 
 	int iEntIndex = Q_atoi( args[1] );
 
-	C_BaseEntity *ent = EntityList()->GetBaseEntity( iEntIndex );
+	C_BaseEntity *ent = (C_BaseEntity*)EntityList()->GetBaseEntity( iEntIndex );
 	if ( !ent )
 	{
 		Msg( "cl_pred_track:  Unknown ent index %d\n", iEntIndex );

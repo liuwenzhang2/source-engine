@@ -202,7 +202,7 @@ public:
 	CHandle<C_Func_LiquidPortal>	m_hSurroundingLiquidPortal; //a liquid portal whose volume the player is standing in
 };
 
-inline C_Portal_Player *ToPortalPlayer( CBaseEntity *pEntity )
+inline C_Portal_Player *ToPortalPlayer( IClientEntity *pEntity )
 {
 	if ( !pEntity || !pEntity->IsPlayer() )
 		return NULL;

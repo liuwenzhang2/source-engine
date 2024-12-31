@@ -148,7 +148,7 @@ void CMoveHelperClient::ProcessImpacts( void )
 	for (int i = 0 ; i < m_TouchList.Size(); i++)
 	{
 		// Run the impact function as if we had run it during movement.
-		C_BaseEntity *entity = EntityList()->GetEnt(((C_BaseEntity*)m_TouchList[i].trace.m_pEnt)->entindex() );
+		C_BaseEntity *entity = (C_BaseEntity*)EntityList()->GetEnt(((C_BaseEntity*)m_TouchList[i].trace.m_pEnt)->entindex() );
 		if ( !entity )
 			continue;
 

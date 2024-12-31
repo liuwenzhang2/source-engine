@@ -71,7 +71,7 @@ inline const CBaseEntity *EntityFromEntityHandle( const IHandleEntity *pConstHan
 
 #ifdef CLIENT_DLL
 	IClientUnknown *pUnk = (IClientUnknown*)pHandleEntity;
-	return pUnk->GetBaseEntity();
+	return (CBaseEntity*)pUnk->GetBaseEntity();
 #else
 	if ( staticpropmgr->IsStaticProp( pHandleEntity ) )
 		return NULL;
@@ -85,7 +85,7 @@ inline CBaseEntity *EntityFromEntityHandle( IHandleEntity *pHandleEntity )
 {
 #ifdef CLIENT_DLL
 	IClientUnknown *pUnk = (IClientUnknown*)pHandleEntity;
-	return pUnk->GetBaseEntity();
+	return (CBaseEntity*)pUnk->GetBaseEntity();
 #else
 	if ( staticpropmgr->IsStaticProp( pHandleEntity ) )
 		return NULL;

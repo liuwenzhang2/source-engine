@@ -250,7 +250,7 @@ void CTargetID::Paint()
 		}
 		else
 		{
-			C_BaseEntity *pEnt = EntityList()->GetEnt( iEntIndex );
+			C_BaseEntity *pEnt = (C_BaseEntity*)EntityList()->GetEnt( iEntIndex );
 
 			//Hostages!
 

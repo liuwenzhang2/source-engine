@@ -704,7 +704,7 @@ void CBaseEntity::ImpactTrace( trace_t *pTrace, int iDamageType, const char *pCu
 	data.m_nDamageType = iDamageType;
 	data.m_nHitBox = pTrace->hitbox;
 #ifdef CLIENT_DLL
-	data.m_hEntity = EntityList()->GetBaseEntity( pEntity->entindex() );
+	data.m_hEntity = (C_BaseEntity*)EntityList()->GetBaseEntity( pEntity->entindex() );
 #else
 	data.m_nEntIndex = pEntity->entindex();
 #endif

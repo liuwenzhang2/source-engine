@@ -908,7 +908,7 @@ void CC4::PrimaryAttack()
 		return;
 
 	int onGround = FBitSet( pPlayer->GetEngineObject()->GetFlags(), FL_ONGROUND );
-	CBaseEntity* groundEntity = (onGround) ? (pPlayer->GetEngineObject()->GetGroundEntity() ? pPlayer->GetEngineObject()->GetGroundEntity()->GetOuter() : NULL) : NULL;
+	CBaseEntity* groundEntity = (onGround) ? (pPlayer->GetEngineObject()->GetGroundEntity() ? (CBaseEntity*)pPlayer->GetEngineObject()->GetGroundEntity()->GetOuter() : NULL) : NULL;
 	if ( groundEntity )
 	{
 		// Don't let us stand on players, breakables, or pushaway physics objects to plant

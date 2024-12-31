@@ -38,7 +38,7 @@ CBaseToggleTextureProxy::~CBaseToggleTextureProxy()
 C_BaseEntity *CBaseToggleTextureProxy::BindArgToEntity( void *pArg )
 {
 	IClientRenderable *pRend = (IClientRenderable *)pArg;
-	return pRend->GetIClientUnknown()->GetBaseEntity();
+	return (C_BaseEntity*)pRend->GetIClientUnknown()->GetBaseEntity();
 }
 
 //-----------------------------------------------------------------------------

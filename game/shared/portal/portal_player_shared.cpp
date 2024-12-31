@@ -237,9 +237,9 @@ CBaseEntity *CPortal_Player::FindUseEntity()
 	// check ground entity first
 	// if you've got a useable ground entity, then shrink the cone of this search to 45 degrees
 	// otherwise, search out in a 90 degree cone (hemisphere)
-	if (GetEngineObject()->GetGroundEntity() && IsUseableEntity(GetEngineObject()->GetGroundEntity()->GetOuter(), FCAP_USE_ONGROUND))
+	if (GetEngineObject()->GetGroundEntity() && IsUseableEntity((CBaseEntity*)GetEngineObject()->GetGroundEntity()->GetOuter(), FCAP_USE_ONGROUND))
 	{
-		pNearest = GetEngineObject()->GetGroundEntity()->GetOuter();
+		pNearest = (CBaseEntity*)GetEngineObject()->GetGroundEntity()->GetOuter();
 		nearestDot = CONE_45_DEGREES;
 	}
 
@@ -393,9 +393,9 @@ CBaseEntity* CPortal_Player::FindUseEntityThroughPortal( void )
 	// check ground entity first
 	// if you've got a useable ground entity, then shrink the cone of this search to 45 degrees
 	// otherwise, search out in a 90 degree cone (hemisphere)
-	if (GetEngineObject()->GetGroundEntity() && IsUseableEntity(GetEngineObject()->GetGroundEntity()->GetOuter(), FCAP_USE_ONGROUND))
+	if (GetEngineObject()->GetGroundEntity() && IsUseableEntity((CBaseEntity*)GetEngineObject()->GetGroundEntity()->GetOuter(), FCAP_USE_ONGROUND))
 	{
-		pNearest = GetEngineObject()->GetGroundEntity()->GetOuter();
+		pNearest = (CBaseEntity*)GetEngineObject()->GetGroundEntity()->GetOuter();
 		nearestDot = CONE_45_DEGREES;
 	}
 

@@ -1564,7 +1564,7 @@ void C_BasePlayer::CalcRoamingView(Vector& eyeOrigin, QAngle& eyeAngles, float& 
 	
 	if ( spec_track.GetInt() > 0 )
 	{
-		C_BaseEntity *target =  EntityList()->GetBaseEntity( spec_track.GetInt() );
+		C_BaseEntity *target =  (C_BaseEntity*)EntityList()->GetBaseEntity( spec_track.GetInt() );
 
 		if ( target )
 		{

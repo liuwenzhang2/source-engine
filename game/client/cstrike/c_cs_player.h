@@ -400,7 +400,7 @@ private:
 
 C_CSPlayer* GetLocalOrInEyeCSPlayer( void );
 
-inline C_CSPlayer *ToCSPlayer( CBaseEntity *pEntity )
+inline C_CSPlayer *ToCSPlayer( IClientEntity *pEntity )
 {
 	if ( !pEntity || !pEntity->IsPlayer() )
 		return NULL;

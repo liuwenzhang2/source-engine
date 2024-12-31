@@ -258,7 +258,7 @@ void C_PointCommentaryNode::OnDataChanged( DataUpdateType_t updateType )
 		}
 		else if ( render->GetViewEntity() )
 		{
-			pSoundEntity = EntityList()->GetEnt( render->GetViewEntity() );
+			pSoundEntity = (C_BaseEntity*)EntityList()->GetEnt( render->GetViewEntity() );
 			es.m_SoundLevel = SNDLVL_NONE;
 		}
 		else

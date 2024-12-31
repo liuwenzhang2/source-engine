@@ -195,9 +195,11 @@ public:
 	virtual bool			HasAmmo( void );
 
 	// Weapon Pickup For Player
+#ifdef GAME_DLL
 	virtual void			SetPickupTouch( void );
 	virtual void 			DefaultTouch( CBaseEntity *pOther );	// default weapon touch
 	virtual void			GiveTo( CBaseEntity *pOther );
+#endif // GAME_DLL
 
 	// HUD Hints
 	virtual bool			ShouldDisplayAltFireHUDHint();

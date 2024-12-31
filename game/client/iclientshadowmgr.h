@@ -24,7 +24,8 @@
 // Forward decls
 //-----------------------------------------------------------------------------
 struct FlashlightState_t;
-
+class C_BaseEntity;
+typedef CHandle<C_BaseEntity> EHANDLE;
 
 //-----------------------------------------------------------------------------
 // Handles to a client shadow

@@ -141,17 +141,20 @@ void CWeapon_SLAM::Precache( void )
 // Input   :
 // Output  :
 //------------------------------------------------------------------------------
+#ifdef GAME_DLL
 void CWeapon_SLAM::SetPickupTouch( void )
 {
 	SetTouch(&CWeapon_SLAM::SlamTouch);
 }
+#endif // GAME_DLL
 
 //-----------------------------------------------------------------------------
 // Purpose: Override so give correct ammo
 // Input  : pOther - the entity that touched me
 // Output :
 //-----------------------------------------------------------------------------
-void CWeapon_SLAM::SlamTouch( CBaseEntity *pOther )
+#ifdef GAME_DLL
+void CWeapon_SLAM::SlamTouch(CBaseEntity* pOther)
 {
 #ifdef GAME_DLL
 	CBaseCombatCharacter* pBCC = ToBaseCombatCharacter( pOther );
@@ -166,6 +169,7 @@ void CWeapon_SLAM::SlamTouch( CBaseEntity *pOther )
 	// ---------------------------------------------------
 	BaseClass::DefaultTouch(pOther);
 }
+#endif // GAME_DLL
 
 //------------------------------------------------------------------------------
 // Purpose :

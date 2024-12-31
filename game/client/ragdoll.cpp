@@ -263,7 +263,7 @@ public:
 		// interpolate offset over some time
 		offset = m_vecOffset * (1-frac);
 
-		C_BaseAnimating *parent = GetEngineObject()->GetMoveParent()?GetEngineObject()->GetMoveParent()->GetOuter()->GetBaseAnimating():NULL;
+		C_BaseAnimating* parent = GetEngineObject()->GetMoveParent() ? ((C_BaseEntity*)GetEngineObject()->GetMoveParent()->GetOuter())->GetBaseAnimating() : NULL;
 		worldOrigin.Init();
 
 
@@ -289,7 +289,7 @@ public:
 
 		
 		//BaseClass::BuildTransformations(hdr, pos, q, cameraTransform, boneMask, boneComputed);
-		C_BaseAnimating* parent = GetEngineObject()->GetMoveParent() ? GetEngineObject()->GetMoveParent()->GetOuter()->GetBaseAnimating() : NULL;
+		C_BaseAnimating* parent = GetEngineObject()->GetMoveParent() ? ((C_BaseEntity*)GetEngineObject()->GetMoveParent()->GetOuter())->GetBaseAnimating() : NULL;
 		if (parent)
 		{
 			int index = GetEngineObject()->GetBoneIndex(m_ragdollAttachedObjectIndex);

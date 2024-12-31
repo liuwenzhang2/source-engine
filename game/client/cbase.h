@@ -12,6 +12,7 @@
 #endif
 
 //struct IStudioHdr;
+class C_BaseEntity;
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -31,6 +32,7 @@
 //#include <predictableid.h>
 //#include <predictable_entity.h>
 #include "ehandle.h"
+typedef CHandle<C_BaseEntity> EHANDLE;
 #include "recvproxy.h"
 #include "engine/IEngineTrace.h"
 #include "entitylist_base.h"

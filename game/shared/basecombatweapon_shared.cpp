@@ -808,16 +808,19 @@ void CBaseCombatWeapon::MakeTracer( const Vector &vecTracerSrc, const trace_t &t
 	}
 }
 
+#ifdef GAME_DLL
 void CBaseCombatWeapon::GiveTo( CBaseEntity *pOther )
 {
 	DefaultTouch( pOther );
 }
+#endif // GAME_DLL
 
 //-----------------------------------------------------------------------------
 // Purpose: Default Touch function for player picking up a weapon (not AI)
 // Input  : pOther - the entity that touched me
 // Output :
 //-----------------------------------------------------------------------------
+#ifdef GAME_DLL
 void CBaseCombatWeapon::DefaultTouch( CBaseEntity *pOther )
 {
 #if !defined( CLIENT_DLL )
@@ -849,6 +852,7 @@ void CBaseCombatWeapon::DefaultTouch( CBaseEntity *pOther )
 	}
 #endif
 }
+#endif // GAME_DLL
 
 //---------------------------------------------------------
 // It's OK for base classes to override this completely 
@@ -944,7 +948,7 @@ void CBaseCombatWeapon::RescindReloadHudHint()
 #endif//CLIENT_DLL
 }
 
-
+#ifdef GAME_DLL
 void CBaseCombatWeapon::SetPickupTouch( void )
 {
 #if !defined( CLIENT_DLL )
@@ -961,7 +965,7 @@ void CBaseCombatWeapon::SetPickupTouch( void )
 
 #endif
 }
-
+#endif // GAME_DLL
 
 //-----------------------------------------------------------------------------
 // Purpose: Become a child of the owner (MOVETYPE_FOLLOW)

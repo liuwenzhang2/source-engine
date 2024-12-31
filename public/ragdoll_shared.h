@@ -86,7 +86,10 @@ class IStudioHdr;
 #include "util_shared.h"
 #include "portal_util_shared.h"
 #include "predictioncopy.h"
+#ifdef GAME_DLL
 #include "baseentity_shared.h"
+#endif // GAME_DLL
+#include "ai_activity.h"
 #include "vphysics_sound.h"
 
 

@@ -145,7 +145,7 @@ bool C_PhysPropClientside::KeyValue( const char *szKeyName, const char *szValue 
 // Purpose: 
 // Input  : *pOther - 
 //-----------------------------------------------------------------------------
-void C_PhysPropClientside::StartTouch( C_BaseEntity *pOther )
+void C_PhysPropClientside::StartTouch( IClientEntity *pOther )
 {
 	// Limit the amount of times we can bounce
 	if ( m_flTouchDelta < gpGlobals->curtime )
@@ -161,7 +161,7 @@ void C_PhysPropClientside::StartTouch( C_BaseEntity *pOther )
 // Purpose: 
 // Input  : *pOther - 
 //-----------------------------------------------------------------------------
-void C_PhysPropClientside::HitSurface( C_BaseEntity *pOther )
+void C_PhysPropClientside::HitSurface( IClientEntity *pOther )
 {
 	if ( HasInteraction( PROPINTER_WORLD_BLOODSPLAT ) )
 	{
@@ -1007,7 +1007,7 @@ void C_FuncPhysicsRespawnZone::RespawnProps( void )
 		else
 		{
 			// If the prop has moved, bring it back
-			C_BaseEntity *pEntity = EntityList()->GetBaseEntityFromHandle( m_PropList[i].hClientEntity );
+			C_BaseEntity *pEntity = (C_BaseEntity*)EntityList()->GetBaseEntityFromHandle( m_PropList[i].hClientEntity );
 			if ( pEntity )
 			{
 				if ( !GetEngineObject()->IsPointInBounds( pEntity->WorldSpaceCenter() ) )

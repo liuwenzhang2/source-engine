@@ -227,7 +227,7 @@ void C_BaseEntity::PhysicsParent( void )
 // Purpose: Not yet supported on client .dll
 // Input  : *pOther - 
 //-----------------------------------------------------------------------------
-void C_BaseEntity::StartTouch( C_BaseEntity *pOther )
+void C_BaseEntity::StartTouch( IClientEntity *pOther )
 {
 	// notify parent
 //	if ( m_pParent != NULL )
@@ -238,7 +238,7 @@ void C_BaseEntity::StartTouch( C_BaseEntity *pOther )
 // Purpose: Call touch function if one is set
 // Input  : *pOther - 
 //-----------------------------------------------------------------------------
-void C_BaseEntity::Touch( C_BaseEntity *pOther )
+void C_BaseEntity::Touch( IClientEntity *pOther )
 { 
 	if ( m_pfnTouch ) 
 		(this->*m_pfnTouch)( pOther );
@@ -252,7 +252,7 @@ void C_BaseEntity::Touch( C_BaseEntity *pOther )
 // Purpose: Call end touch
 // Input  : *pOther - 
 //-----------------------------------------------------------------------------
-void C_BaseEntity::EndTouch( C_BaseEntity *pOther )
+void C_BaseEntity::EndTouch( IClientEntity *pOther )
 {
 	// notify parent
 //	if ( m_pParent != NULL )
@@ -261,6 +261,17 @@ void C_BaseEntity::EndTouch( C_BaseEntity *pOther )
 //	}
 }
 
+void CBaseEntity::StartGroundContact(IClientEntity* ground)
+{
+	GetEngineObject()->AddFlag(FL_ONGROUND);
+	//	Msg( "+++ %s starting contact with ground %s\n", GetClassname(), ground->GetClassname() );
+}
+
+void CBaseEntity::EndGroundContact(IClientEntity* ground)
+{
+	GetEngineObject()->RemoveFlag(FL_ONGROUND);
+	//	Msg( "--- %s ending contact with ground %s\n", GetClassname(), ground->GetClassname() );
+}
 
 
 

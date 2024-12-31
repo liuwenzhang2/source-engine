@@ -24,6 +24,8 @@
 
 struct model_t;
 struct BeamTrail_t;
+class C_BaseEntity;
+typedef CHandle<C_BaseEntity> EHANDLE;
 
 //-----------------------------------------------------------------------------
 // Purpose: Beams fill out this data structure

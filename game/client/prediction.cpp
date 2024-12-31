@@ -114,8 +114,8 @@ void CPredictableList::AddToPredictableList(CBaseHandle add)
 			ClientEntityHandle_t h1 = m_Predictables[i];
 			ClientEntityHandle_t h2 = m_Predictables[j];
 
-			C_BaseEntity* p1 = EntityList()->GetBaseEntityFromHandle(h1);
-			C_BaseEntity* p2 = EntityList()->GetBaseEntityFromHandle(h2);
+			C_BaseEntity* p1 = (C_BaseEntity*)EntityList()->GetBaseEntityFromHandle(h1);
+			C_BaseEntity* p2 = (C_BaseEntity*)EntityList()->GetBaseEntityFromHandle(h2);
 
 			if (!p1 || !p2)
 			{
@@ -155,7 +155,7 @@ void CPredictableList::RemoveFromPredictablesList(CBaseHandle remove)
 //-----------------------------------------------------------------------------
 C_BaseEntity* CPredictableList::GetPredictable(int slot)
 {
-	return EntityList()->GetBaseEntityFromHandle(m_Predictables[slot]);
+	return (C_BaseEntity*)EntityList()->GetBaseEntityFromHandle(m_Predictables[slot]);
 }
 
 //-----------------------------------------------------------------------------
@@ -363,7 +363,7 @@ void CPrediction::ReinitPredictables( void )
 	int c = EntityList()->GetHighestEntityIndex();
 	for ( i = 0; i <= c; i++ )
 	{
-		C_BaseEntity *e = EntityList()->GetBaseEntity( i );
+		C_BaseEntity *e = (C_BaseEntity*)EntityList()->GetBaseEntity( i );
 		if ( !e )
 			continue;
 		
@@ -671,7 +671,7 @@ void CPrediction::PostNetworkDataReceived( int commands_acknowledged )
 		int last_entity = EntityList()->GetHighestEntityIndex();
 		if ( dumpentindex >= 0 && dumpentindex <= last_entity )
 		{
-			C_BaseEntity *ent = EntityList()->GetBaseEntity( dumpentindex );
+			C_BaseEntity *ent = (C_BaseEntity*)EntityList()->GetBaseEntity( dumpentindex );
 			if ( ent )
 			{
 				dump->DumpEntity( ent, m_nServerCommandsAcknowledged );
@@ -809,7 +809,7 @@ void CPrediction::FinishMove( C_BasePlayer *player, CUserCmd *ucmd, CMoveData *m
 	// NOTE: Don't copy this.  the movement code modifies its local copy but is not expecting to be authoritative
 	//player->m_flMaxspeed = move->m_flClientMaxSpeed;
 	
-	m_hLastGround = player->GetEngineObject()->GetGroundEntity() ? player->GetEngineObject()->GetGroundEntity()->GetOuter() : NULL;
+	m_hLastGround = player->GetEngineObject()->GetGroundEntity() ? (C_BaseEntity*)player->GetEngineObject()->GetGroundEntity()->GetOuter() : NULL;
  
 	player->GetEngineObject()->SetLocalOrigin( move->GetAbsOrigin() );
 
@@ -1366,7 +1366,7 @@ void InvalidateEFlagsRecursive( C_BaseEntity *pEnt, int nDirtyFlags, int nChildF
 	nDirtyFlags |= nChildFlags;
 	for (IEngineObjectClient *pChild = pEnt->GetEngineObject()->FirstMoveChild(); pChild; pChild = pChild->NextMovePeer())
 	{
-		InvalidateEFlagsRecursive( pChild->GetOuter(), nDirtyFlags);
+		InvalidateEFlagsRecursive((C_BaseEntity*)pChild->GetOuter(), nDirtyFlags);
 	}
 }
 #endif
@@ -1595,13 +1595,13 @@ bool CPrediction::PerformPrediction( bool received_new_world_update, C_BasePlaye
 	m_bInPrediction = true;
 
 	// undo interpolation changes for entities we stand on
-	C_BaseEntity* entity = localPlayer->GetEngineObject()->GetGroundEntity() ? localPlayer->GetEngineObject()->GetGroundEntity()->GetOuter() : NULL;
+	C_BaseEntity* entity = localPlayer->GetEngineObject()->GetGroundEntity() ? (C_BaseEntity*)localPlayer->GetEngineObject()->GetGroundEntity()->GetOuter() : NULL;
 
 	while ( entity && entity->entindex() > 0)
 	{
 		entity->GetEngineObject()->MoveToLastReceivedPosition();
 		// undo changes for moveparents too
-		entity = entity->GetEngineObject()->GetMoveParent()?entity->GetEngineObject()->GetMoveParent()->GetOuter():NULL;
+		entity = entity->GetEngineObject()->GetMoveParent() ? (C_BaseEntity*)entity->GetEngineObject()->GetMoveParent()->GetOuter() : NULL;
 	}
 
 	// Start at command after last one server has processed and 

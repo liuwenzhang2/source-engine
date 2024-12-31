@@ -303,7 +303,7 @@ void CBasePlayer::ItemPostFrame()
 const QAngle &CBasePlayer::EyeAngles( )
 {
 	// NOTE: Viewangles are measured *relative* to the parent's coordinate system
-	CBaseEntity *pMoveParent = const_cast<CBasePlayer*>(this)->GetEngineObject()->GetMoveParent()? const_cast<CBasePlayer*>(this)->GetEngineObject()->GetMoveParent()->GetOuter():NULL;
+	CBaseEntity* pMoveParent = const_cast<CBasePlayer*>(this)->GetEngineObject()->GetMoveParent() ? (CBaseEntity*)const_cast<CBasePlayer*>(this)->GetEngineObject()->GetMoveParent()->GetOuter() : NULL;
 
 	if ( !pMoveParent )
 	{
@@ -1119,7 +1119,7 @@ CBaseEntity *CBasePlayer::FindUseEntity()
 		bool bUsable = IsUseableEntity(pObject, 0);
 		while ( pObject && !bUsable && pObject->GetEngineObject()->GetMoveParent() )
 		{
-			pObject = pObject->GetEngineObject()->GetMoveParent()->GetOuter();
+			pObject = (CBaseEntity*)pObject->GetEngineObject()->GetMoveParent()->GetOuter();
 			bUsable = IsUseableEntity(pObject, 0);
 		}
 
@@ -1163,9 +1163,9 @@ CBaseEntity *CBasePlayer::FindUseEntity()
 	// check ground entity first
 	// if you've got a useable ground entity, then shrink the cone of this search to 45 degrees
 	// otherwise, search out in a 90 degree cone (hemisphere)
-	if (GetEngineObject()->GetGroundEntity() && IsUseableEntity(GetEngineObject()->GetGroundEntity()->GetOuter(), FCAP_USE_ONGROUND))
+	if (GetEngineObject()->GetGroundEntity() && IsUseableEntity((CBaseEntity*)GetEngineObject()->GetGroundEntity()->GetOuter(), FCAP_USE_ONGROUND))
 	{
-		pNearest = GetEngineObject()->GetGroundEntity()->GetOuter();
+		pNearest = (CBaseEntity*)GetEngineObject()->GetGroundEntity()->GetOuter();
 	}
 	if ( pNearest )
 	{
@@ -1453,7 +1453,7 @@ static ConVar smoothstairs( "smoothstairs", "1", FCVAR_REPLICATED, "Smooth playe
 //-----------------------------------------------------------------------------
 void CBasePlayer::SmoothViewOnStairs( Vector& eyeOrigin )
 {
-	CBaseEntity* pGroundEntity = GetEngineObject()->GetGroundEntity() ? GetEngineObject()->GetGroundEntity()->GetOuter() : NULL;
+	CBaseEntity* pGroundEntity = GetEngineObject()->GetGroundEntity() ? (CBaseEntity*)GetEngineObject()->GetGroundEntity()->GetOuter() : NULL;
 	float flCurrentPlayerZ = GetEngineObject()->GetLocalOrigin().z;
 	float flCurrentPlayerViewOffsetZ = GetViewOffset().z;
 

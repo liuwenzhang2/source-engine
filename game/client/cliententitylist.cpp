@@ -26,7 +26,7 @@ void cc_cl_interp_all_changed(IConVar* pConVar, const char* pOldString, float fl
 	if (var.GetInt())
 	{
 		C_BaseEntityIterator iterator;
-		C_BaseEntity* pEnt;
+		IClientEntity* pEnt;
 		while ((pEnt = iterator.Next()) != NULL)
 		{
 			if (pEnt->ShouldInterpolate())
@@ -42,7 +42,7 @@ extern ConVar	cl_showerror;
 extern ConVar think_limit;
 
 // Create interface
-CClientEntityList<C_BaseEntity> g_EntityList;
+CClientEntityList<IClientEntity> g_EntityList;
 IClientEntityList* entitylist = &g_EntityList;
 
 // Expose list to engine
@@ -182,8 +182,8 @@ int CCollisionEvent::ShouldCollide_2(IPhysicsObject* pObj0, IPhysicsObject* pObj
 {
 	CallbackContext callback(this);
 
-	C_BaseEntity* pEntity0 = static_cast<C_BaseEntity*>(pGameData0);
-	C_BaseEntity* pEntity1 = static_cast<C_BaseEntity*>(pGameData1);
+	IClientEntity* pEntity0 = static_cast<IClientEntity*>(pGameData0);
+	IClientEntity* pEntity1 = static_cast<IClientEntity*>(pGameData1);
 
 	if (!pEntity0 || !pEntity1)
 		return 1;
@@ -282,7 +282,7 @@ int CCollisionEvent::ShouldSolvePenetration(IPhysicsObject* pObj0, IPhysicsObjec
 		if (pObj0->GetGameFlags() & FVPHYSICS_PART_OF_RAGDOLL)
 		{
 			// this is a ragdoll, self penetrating
-			C_BaseEntity* pEnt = reinterpret_cast<C_BaseEntity*>(pGameData0);
+			IClientEntity* pEnt = reinterpret_cast<IClientEntity*>(pGameData0);
 
 			if (pEnt && pEnt->GetEngineObject()->RagdollBoneCount())
 			{
@@ -357,12 +357,12 @@ void CCollisionEvent::UpdateTouchEvents(void)
 		const touchevent_t& event = m_touchEvents[i];
 		if (event.touchType == TOUCH_START)
 		{
-			DispatchStartTouch((C_BaseEntity*)event.pEntity0, (C_BaseEntity*)event.pEntity1, event.endPoint, event.normal);
+			DispatchStartTouch((IClientEntity*)event.pEntity0, (IClientEntity*)event.pEntity1, event.endPoint, event.normal);
 		}
 		else
 		{
 			// TOUCH_END
-			DispatchEndTouch((C_BaseEntity*)event.pEntity0, (C_BaseEntity*)event.pEntity1);
+			DispatchEndTouch((IClientEntity*)event.pEntity0, (IClientEntity*)event.pEntity1);
 		}
 	}
 
@@ -376,7 +376,7 @@ void CCollisionEvent::UpdateTouchEvents(void)
 //			*pEntity1 - 
 //			touchType - 
 //-----------------------------------------------------------------------------
-void CCollisionEvent::AddTouchEvent(C_BaseEntity* pEntity0, C_BaseEntity* pEntity1, int touchType, const Vector& point, const Vector& normal)
+void CCollisionEvent::AddTouchEvent(IClientEntity* pEntity0, IClientEntity* pEntity1, int touchType, const Vector& point, const Vector& normal)
 {
 	if (!pEntity0 || !pEntity1)
 		return;
@@ -399,8 +399,8 @@ void CCollisionEvent::AddTouchEvent(C_BaseEntity* pEntity0, C_BaseEntity* pEntit
 void CCollisionEvent::StartTouch(IPhysicsObject* pObject1, IPhysicsObject* pObject2, IPhysicsCollisionData* pTouchData)
 {
 	CallbackContext callback(this);
-	C_BaseEntity* pEntity1 = static_cast<C_BaseEntity*>(pObject1->GetGameData());
-	C_BaseEntity* pEntity2 = static_cast<C_BaseEntity*>(pObject2->GetGameData());
+	IClientEntity* pEntity1 = static_cast<IClientEntity*>(pObject1->GetGameData());
+	IClientEntity* pEntity2 = static_cast<IClientEntity*>(pObject2->GetGameData());
 
 	if (!pEntity1 || !pEntity2)
 		return;
@@ -423,7 +423,7 @@ void CCollisionEvent::StartTouch(IPhysicsObject* pObject1, IPhysicsObject* pObje
 // Input  : *pEntity0 - 
 //			*pEntity1 - 
 //-----------------------------------------------------------------------------
-void CCollisionEvent::DispatchStartTouch(C_BaseEntity* pEntity0, C_BaseEntity* pEntity1, const Vector& point, const Vector& normal)
+void CCollisionEvent::DispatchStartTouch(IClientEntity* pEntity0, IClientEntity* pEntity1, const Vector& point, const Vector& normal)
 {
 	trace_t trace;
 	memset(&trace, 0, sizeof(trace));
@@ -444,8 +444,8 @@ void CCollisionEvent::DispatchStartTouch(C_BaseEntity* pEntity0, C_BaseEntity* p
 void CCollisionEvent::EndTouch(IPhysicsObject* pObject1, IPhysicsObject* pObject2, IPhysicsCollisionData* pTouchData)
 {
 	CallbackContext callback(this);
-	C_BaseEntity* pEntity1 = static_cast<C_BaseEntity*>(pObject1->GetGameData());
-	C_BaseEntity* pEntity2 = static_cast<C_BaseEntity*>(pObject2->GetGameData());
+	IClientEntity* pEntity1 = static_cast<IClientEntity*>(pObject1->GetGameData());
+	IClientEntity* pEntity2 = static_cast<IClientEntity*>(pObject2->GetGameData());
 
 	if (!pEntity1 || !pEntity2)
 		return;
@@ -465,7 +465,7 @@ void CCollisionEvent::EndTouch(IPhysicsObject* pObject1, IPhysicsObject* pObject
 // Input  : *pEntity0 - 
 //			*pEntity1 - 
 //-----------------------------------------------------------------------------
-void CCollisionEvent::DispatchEndTouch(C_BaseEntity* pEntity0, C_BaseEntity* pEntity1)
+void CCollisionEvent::DispatchEndTouch(IClientEntity* pEntity0, IClientEntity* pEntity1)
 {
 	// frees the event-driven touchlinks
 	pEntity1->GetEngineObject()->PhysicsNotifyOtherOfUntouch(pEntity0->GetEngineObject());
@@ -483,7 +483,7 @@ void CCollisionEvent::Friction(IPhysicsObject* pObject, float energy, int surfac
 	pData->GetContactPoint(vecPos);
 	pObject->GetVelocityAtPoint(vecPos, &vecVel);
 
-	C_BaseEntity* pEntity = reinterpret_cast<C_BaseEntity*>(pObject->GetGameData());
+	IClientEntity* pEntity = reinterpret_cast<IClientEntity*>(pObject->GetGameData());
 
 	if (pEntity)
 	{
@@ -506,7 +506,7 @@ void CCollisionEvent::Friction(IPhysicsObject* pObject, float energy, int surfac
 	PhysFrictionEffect(vecPos, vecVel, energy, surfaceProps, surfacePropsHit);
 }
 
-friction_t* CCollisionEvent::FindFriction(C_BaseEntity* pObject)
+friction_t* CCollisionEvent::FindFriction(IClientEntity* pObject)
 {
 	friction_t* pFree = NULL;
 
@@ -576,7 +576,7 @@ static int BestAxisMatchingNormal(const matrix3x4_t& matrix, const Vector& norma
 //			*pObject - 
 //			*pEntity - 
 //-----------------------------------------------------------------------------
-void PhysicsSplash(IPhysicsFluidController* pFluid, IPhysicsObject* pObject, C_BaseEntity* pEntity)
+void PhysicsSplash(IPhysicsFluidController* pFluid, IPhysicsObject* pObject, IClientEntity* pEntity)
 {
 	//FIXME: For now just allow ragdolls for E3 - jdw
 	if ((pObject->GetGameFlags() & FVPHYSICS_PART_OF_RAGDOLL) == false)
@@ -731,7 +731,7 @@ void CCollisionEvent::UpdateFluidEvents(void)
 // Input  : *pEntity - 
 // Output : float
 //-----------------------------------------------------------------------------
-float CCollisionEvent::DeltaTimeSinceLastFluid(C_BaseEntity* pEntity)
+float CCollisionEvent::DeltaTimeSinceLastFluid(IClientEntity* pEntity)
 {
 	for (int i = m_fluidEvents.Count() - 1; i >= 0; --i)
 	{
@@ -758,7 +758,7 @@ void CCollisionEvent::FluidStartTouch(IPhysicsObject* pObject, IPhysicsFluidCont
 	if ((pObject == NULL) || (pFluid == NULL))
 		return;
 
-	C_BaseEntity* pEntity = static_cast<C_BaseEntity*>(pObject->GetGameData());
+	IClientEntity* pEntity = static_cast<IClientEntity*>(pObject->GetGameData());
 
 	if (pEntity)
 	{
@@ -1024,9 +1024,9 @@ static void ComputePlayerMatrix(C_BasePlayer* pPlayer, matrix3x4_t& out)
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-bool C_GrabControllerInternal::UpdateObject(C_BaseEntity* pPlayer, float flError)
+bool C_GrabControllerInternal::UpdateObject(IClientEntity* pPlayer, float flError)
 {
-	C_BaseEntity* pPenetratedEntity = m_PenetratedEntity.Get();
+	IClientEntity* pPenetratedEntity = m_PenetratedEntity.Get();
 	if (pPenetratedEntity)
 	{
 		//FindClosestPassableSpace( pPenetratedEntity, Vector( 0.0f, 0.0f, 1.0f ) );
@@ -1037,7 +1037,7 @@ bool C_GrabControllerInternal::UpdateObject(C_BaseEntity* pPlayer, float flError
 		m_PenetratedEntity = NULL; //assume we won
 	}
 
-	C_BaseEntity* pEntity = GetAttached();
+	IClientEntity* pEntity = GetAttached();
 	if (!pEntity || ComputeError() > flError || (pPlayer->GetEngineObject()->GetGroundEntity() ? pPlayer->GetEngineObject()->GetGroundEntity()->GetOuter() : NULL) == pEntity || !pEntity->GetEngineObject()->VPhysicsGetObject())
 	{
 		return false;
@@ -1315,7 +1315,7 @@ void C_GrabControllerInternal::SetTargetPosition(const Vector& target, const QAn
 
 	m_timeToArrive = gpGlobals->frametime;
 
-	C_BaseEntity* pAttached = GetAttached();
+	IClientEntity* pAttached = GetAttached();
 	if (pAttached)
 	{
 		IPhysicsObject* pObj = pAttached->GetEngineObject()->VPhysicsGetObject();
@@ -1348,7 +1348,7 @@ float C_GrabControllerInternal::ComputeError()
 	if (m_errorTime <= 0)
 		return 0;
 
-	C_BaseEntity* pAttached = GetAttached();
+	IClientEntity* pAttached = GetAttached();
 	if (pAttached)
 	{
 		Vector pos;
@@ -1426,7 +1426,7 @@ float C_GrabControllerInternal::ComputeError()
 #define MASS_SPEED_SCALE	60
 #define MAX_MASS			40
 
-void C_GrabControllerInternal::ComputeMaxSpeed(C_BaseEntity* pEntity, IPhysicsObject* pPhysics)
+void C_GrabControllerInternal::ComputeMaxSpeed(IClientEntity* pEntity, IPhysicsObject* pPhysics)
 {
 #ifndef CLIENT_DLL
 	m_shadow.maxSpeed = 1000;
@@ -1459,7 +1459,7 @@ void C_GrabControllerInternal::ComputeMaxSpeed(C_BaseEntity* pEntity, IPhysicsOb
 }
 
 
-QAngle C_GrabControllerInternal::TransformAnglesToPlayerSpace(const QAngle& anglesIn, C_BaseEntity* pPlayer)
+QAngle C_GrabControllerInternal::TransformAnglesToPlayerSpace(const QAngle& anglesIn, IClientEntity* pPlayer)
 {
 	if (m_bIgnoreRelativePitch)
 	{
@@ -1472,7 +1472,7 @@ QAngle C_GrabControllerInternal::TransformAnglesToPlayerSpace(const QAngle& angl
 	return TransformAnglesToLocalSpace(anglesIn, pPlayer->GetEngineObject()->EntityToWorldTransform());
 }
 
-QAngle C_GrabControllerInternal::TransformAnglesFromPlayerSpace(const QAngle& anglesIn, C_BaseEntity* pPlayer)
+QAngle C_GrabControllerInternal::TransformAnglesFromPlayerSpace(const QAngle& anglesIn, IClientEntity* pPlayer)
 {
 	if (m_bIgnoreRelativePitch)
 	{
@@ -1581,7 +1581,7 @@ static QAngle AlignAngles(const QAngle& angles, float cosineAlignAngle)
 	return out;
 }
 
-void C_GrabControllerInternal::AttachEntity(C_BaseEntity* pPlayer, C_BaseEntity* pEntity, IPhysicsObject* pPhys, bool bIsMegaPhysCannon, const Vector& vGrabPosition, bool bUseGrabPosition)
+void C_GrabControllerInternal::AttachEntity(IClientEntity* pPlayer, IClientEntity* pEntity, IPhysicsObject* pPhys, bool bIsMegaPhysCannon, const Vector& vGrabPosition, bool bUseGrabPosition)
 {
 #ifndef CLIENT_DLL
 	// play the impact sound of the object hitting the player
@@ -1778,7 +1778,7 @@ static void ClampPhysicsVelocity(IPhysicsObject* pPhys, float linearLimit, float
 void C_GrabControllerInternal::DetachEntity(bool bClearVelocity)
 {
 	Assert(!g_EntityList.PhysIsInCallback());
-	C_BaseEntity* pEntity = GetAttached();
+	IClientEntity* pEntity = GetAttached();
 	if (pEntity)
 	{
 		// Restore the LS blocking state
@@ -1871,7 +1871,7 @@ IMotionEvent::simresult_e C_GrabControllerInternal::Simulate(IPhysicsMotionContr
 
 float C_GrabControllerInternal::GetSavedMass(IPhysicsObject* pObject)
 {
-	C_BaseEntity* pHeld = m_attachedEntity;
+	IClientEntity* pHeld = m_attachedEntity;
 	if (pHeld)
 	{
 		if (pObject->GetGameData() == (void*)pHeld)
@@ -1890,7 +1890,7 @@ float C_GrabControllerInternal::GetSavedMass(IPhysicsObject* pObject)
 
 void C_GrabControllerInternal::GetSavedParamsForCarriedPhysObject(IPhysicsObject* pObject, float* pSavedMassOut, float* pSavedRotationalDampingOut)
 {
-	C_BaseEntity* pHeld = m_attachedEntity;
+	IClientEntity* pHeld = m_attachedEntity;
 	if (pHeld)
 	{
 		if (pObject->GetGameData() == (void*)pHeld)
@@ -1928,7 +1928,7 @@ void C_GrabControllerInternal::GetSavedParamsForCarriedPhysObject(IPhysicsObject
 // overhead, but there are exceptions for gameplay purposes.
 //-----------------------------------------------------------------------------
 #ifndef CLIENT_DLL
-bool C_GrabControllerInternal::IsObjectAllowedOverhead(C_BaseEntity* pEntity)
+bool C_GrabControllerInternal::IsObjectAllowedOverhead(IClientEntity* pEntity)
 {
 	// Allow combine balls overhead 
 	if (pEntity->IsCombineBall())
@@ -1950,7 +1950,7 @@ bool C_GrabControllerInternal::IsObjectAllowedOverhead(C_BaseEntity* pEntity)
 }
 #endif
 
-void C_GrabControllerInternal::SetPortalPenetratingEntity(C_BaseEntity* pPenetrated)
+void C_GrabControllerInternal::SetPortalPenetratingEntity(IClientEntity* pPenetrated)
 {
 	m_PenetratedEntity = pPenetrated;
 }
@@ -2051,10 +2051,10 @@ END_DATADESC()
 //-----------------------------------------------------------------------------
 void RecvProxy_IntToMoveParent(const CRecvProxyData* pData, void* pStruct, void* pOut)
 {
-	CHandle<C_BaseEntity>* pHandle = (CHandle<C_BaseEntity>*)pOut;
+	CHandle<IClientEntity>* pHandle = (CHandle<IClientEntity>*)pOut;
 	RecvProxy_IntToEHandle(pData, pStruct, (CBaseHandle*)pHandle);
 	C_EngineObjectInternal* pEntity = (C_EngineObjectInternal*)pStruct;
-	C_BaseEntity* pMoveParent = pHandle->Get();
+	IClientEntity* pMoveParent = pHandle->Get();
 	if (pMoveParent&& pMoveParent->entindex()==1) {
 		int aaa = 0;
 	}
@@ -2120,7 +2120,7 @@ void RecvProxy_InterpolationAmountChanged(const CRecvProxyData* pData, void* pSt
 
 //-----------------------------------------------------------------------------
 // Purpose: Decodes animtime and notes when it changes
-// Input  : *pStruct - ( C_BaseEntity * ) used to flag animtime is changine
+// Input  : *pStruct - ( IClientEntity * ) used to flag animtime is changine
 //			*pVarData - 
 //			*pIn - 
 //			objectID - 
@@ -2280,7 +2280,7 @@ IMPLEMENT_CLIENTCLASS_NO_FACTORY(C_EngineObjectInternal, DT_EngineObject, CEngin
 #include "tier0/memdbgoff.h"
 
 //-----------------------------------------------------------------------------
-// C_BaseEntity new/delete
+// IClientEntity new/delete
 // All fields in the object are all initialized to 0.
 //-----------------------------------------------------------------------------
 void* C_EngineObjectInternal::operator new(size_t stAllocateBlock)
@@ -2584,7 +2584,7 @@ void C_EngineObjectInternal::OnRestore()
 
 		BuildRagdollBounds();
 
-		// UNDONE: The shadow & leaf system cleanup should probably be in C_BaseEntity::OnRestore()
+		// UNDONE: The shadow & leaf system cleanup should probably be in IClientEntity::OnRestore()
 		// this must be recomputed because the model was NULL when this was set up
 		RemoveFromLeafSystem();
 		AddToLeafSystem(RENDER_GROUP_OPAQUE_ENTITY);
@@ -2604,7 +2604,7 @@ void C_EngineObjectInternal::OnRestore()
 //-----------------------------------------------------------------------------
 void C_EngineObjectInternal::PreDataUpdate(DataUpdateType_t updateType)
 {
-	VPROF("C_BaseEntity::PreDataUpdate");
+	VPROF("IClientEntity::PreDataUpdate");
 
 	// Register for an OnDataChanged call and call OnPreDataChanged().
 	if (AddDataChangeEvent(this, updateType, &m_DataChangeEventRef))
@@ -2923,7 +2923,7 @@ void C_EngineObjectInternal::OnDataChanged(DataUpdateType_t type)
 	// build a ragdoll if necessary
 	if (m_nRenderFX == kRenderFxRagdoll && !m_builtRagdoll)
 	{
-		((C_BaseAnimating*)m_pOuter)->BecomeRagdollOnClient();
+		m_pOuter->BecomeRagdollOnClient();
 	}
 
 	//HACKHACK!!!
@@ -3016,7 +3016,7 @@ void C_EngineObjectInternal::Interp_SetupMappings()
 
 void C_EngineObjectInternal::Interp_RestoreToLastNetworked()
 {
-	VPROF("C_BaseEntity::Interp_RestoreToLastNetworked");
+	VPROF("IClientEntity::Interp_RestoreToLastNetworked");
 
 	PREDICTION_TRACKVALUECHANGESCOPE_ENTITY(this->m_pOuter, "restoretolastnetworked");
 
@@ -3244,7 +3244,7 @@ void C_EngineObjectInternal::HierarchySetParent(IEngineObjectClient* pNewParent)
 {
 	// NOTE: When this is called, we expect to have a valid
 	// local origin, etc. that we received from network daa
-	//EHANDLE newParentHandle;
+	//ENTHANDLE newParentHandle;
 	//newParentHandle.Set( pNewParent );
 	if (pNewParent == m_pMoveParent)
 		return;
@@ -3273,7 +3273,7 @@ void C_EngineObjectInternal::SetParent(IEngineObjectClient* pParentEntity, int i
 {
 	// NOTE: This version is meant to be called *outside* of PostDataUpdate
 	// as it assumes the moveparent has a valid handle
-	//EHANDLE newParentHandle;
+	//ENTHANDLE newParentHandle;
 	//newParentHandle.Set( pParentEntity );
 	if (pParentEntity == m_pMoveParent)
 		return;
@@ -3294,7 +3294,7 @@ void C_EngineObjectInternal::SetParent(IEngineObjectClient* pParentEntity, int i
 		pParentEntity->LinkChild(this);
 	}
 
-	if (!m_pOuter->IsServerEntity())
+	if (!IsNetworkable())
 	{
 		SetNetworkMoveParent( pParentEntity);
 	}
@@ -3334,7 +3334,7 @@ void C_EngineObjectInternal::UnlinkFromHierarchy()
 	{
 		if (pChild->m_pMoveParent != this)
 		{
-			Warning("C_BaseEntity::UnlinkFromHierarchy(): Entity has a child with the wrong parent!\n");
+			Warning("IClientEntity::UnlinkFromHierarchy(): Entity has a child with the wrong parent!\n");
 			Assert(0);
 			UnlinkChild(pChild);
 			pChild->UnlinkFromHierarchy();
@@ -3453,7 +3453,7 @@ int C_EngineObjectInternal::BaseInterpolatePart1(float& currentTime, Vector& old
 
 	if (m_pOuter->GetPredictable() /*|| IsClientCreated()*/)
 	{
-		C_BaseEntity* localplayer = g_EntityList.GetLocalPlayer();
+		IClientEntity* localplayer = g_EntityList.GetLocalPlayer();
 		if (localplayer && currentTime == gpGlobals->curtime)
 		{
 			currentTime = localplayer->GetFinalPredictedTime();
@@ -4253,7 +4253,7 @@ void* C_EngineObjectInternal::GetOuterOriginalNetworkDataObject(void)
 int C_EngineObjectInternal::SaveData(const char* context, int slot, int type)
 {
 #if !defined( NO_ENTITY_PREDICTION )
-	VPROF("C_BaseEntity::SaveData");
+	VPROF("IClientEntity::SaveData");
 
 	void* dest = (slot == SLOT_ORIGINALDATA) ? GetOriginalNetworkDataObject() : GetPredictedFrame(slot);
 	Assert(dest);
@@ -4307,7 +4307,7 @@ int C_EngineObjectInternal::RestoreData(const char* context, int slot, int type)
 {
 	IStudioHdr* pHdr = GetModelPtr();
 #if !defined( NO_ENTITY_PREDICTION )
-	VPROF("C_BaseEntity::RestoreData");
+	VPROF("IClientEntity::RestoreData");
 
 	const void* src = (slot == SLOT_ORIGINALDATA) ? GetOriginalNetworkDataObject() : GetPredictedFrame(slot);
 	Assert(src);
@@ -5159,8 +5159,8 @@ void C_EngineObjectInternal::PhysicsRemoveGround(clientgroundlink_t* link)
 	// Every start Touch gets a corresponding end touch
 	if (link->entity != INVALID_EHANDLE_INDEX)
 	{
-		C_BaseEntity* linkEntity = (C_BaseEntity*)g_EntityList.GetClientEntityFromHandle(link->entity);
-		C_BaseEntity* otherEntity = this->m_pOuter;
+		IClientEntity* linkEntity = (IClientEntity*)g_EntityList.GetClientEntityFromHandle(link->entity);
+		IClientEntity* otherEntity = this->m_pOuter;
 		if (linkEntity && otherEntity)
 		{
 			linkEntity->EndGroundContact(otherEntity);
@@ -5189,7 +5189,7 @@ void C_EngineObjectInternal::PhysicsRemoveGroundList()
 			nextLink = link->nextLink;
 
 			// notify the other entity that this ent has gone away
-			C_BaseEntity* pEntity = ((C_BaseEntity*)g_EntityList.GetClientEntityFromHandle(link->entity));
+			IClientEntity* pEntity = ((IClientEntity*)g_EntityList.GetClientEntityFromHandle(link->entity));
 			if (pEntity) {
 				pEntity->GetEngineObject()->PhysicsNotifyOtherOfGroundRemoval(this);
 			}
@@ -5209,7 +5209,7 @@ void C_EngineObjectInternal::SetGroundEntity(IEngineObjectClient* ground)
 	if ((m_hGroundEntity.Get() ? m_hGroundEntity.Get()->GetEngineObject() : NULL) == ground)
 		return;
 
-	C_BaseEntity* oldGround = m_hGroundEntity.Get();
+	IClientEntity* oldGround = m_hGroundEntity.Get();
 	m_hGroundEntity = ground ? ground->GetOuter() : NULL;
 
 	// Just starting to touch
@@ -5727,7 +5727,7 @@ bool C_EngineObjectInternal::PhysicsRunThink(thinkmethods_t thinkMethod)
 	// Don't fire the base if we're avoiding it
 	if (thinkMethod != THINK_FIRE_ALL_BUT_BASE)
 	{
-		bAlive = PhysicsRunSpecificThink(-1, (CTHINKPTR) & C_BaseEntity::Think);
+		bAlive = PhysicsRunSpecificThink(-1, (CTHINKPTR) & IClientEntity::Think);
 		if (!bAlive)
 			return false;
 	}
@@ -6089,7 +6089,7 @@ void C_EngineObjectInternal::LockStudioHdr()
 		// Note:  We can't do this since if we get a DATA_UPDATE_CREATED (i.e., new entity) with both a new model and some valid pose parameters this will slam the 
 		//  pose parameters to zero and if the model goes dormant the pose parameter field will never be set to the true value.  We shouldn't have to zero these out
 		//  as they are under the control of the server and should be properly set
-		if (!m_pOuter->IsServerEntity())
+		if (!IsNetworkable())
 		{
 			SetPoseParameter(pStudioHdr, i, 0.0);
 		}
@@ -6870,7 +6870,7 @@ void C_EngineObjectInternal::InitRagdoll(
 
 
 
-void C_EngineObjectInternal::RagdollBone(C_BaseEntity* ent, mstudiobone_t* pbones, int boneCount, bool* boneSimulated, CBoneAccessor& pBoneToWorld)
+void C_EngineObjectInternal::RagdollBone(IClientEntity* ent, mstudiobone_t* pbones, int boneCount, bool* boneSimulated, CBoneAccessor& pBoneToWorld)
 {
 	for (int i = 0; i < m_ragdoll.listCount; i++)
 	{
@@ -7039,7 +7039,7 @@ void C_EngineObjectInternal::VPhysicsUpdate(IPhysicsObject* pPhysics)
 
 		if (m_ragdoll.pGroup->IsInErrorState())
 		{
-			C_BaseEntity* pEntity = static_cast<C_BaseEntity*>(m_ragdoll.list[0].pObject->GetGameData());
+			IClientEntity* pEntity = static_cast<IClientEntity*>(m_ragdoll.list[0].pObject->GetGameData());
 			RagdollSolveSeparation(m_ragdoll, pEntity);
 		}
 	}
@@ -7347,7 +7347,7 @@ bool C_EngineObjectInternal::IsAboutToRagdoll() const
 //	}
 //}
 
-//void C_EngineObjectInternal::CreateUnragdollInfo(C_BaseEntity* pRagdoll)
+//void C_EngineObjectInternal::CreateUnragdollInfo(IClientEntity* pRagdoll)
 //{
 //	IStudioHdr* hdr = GetModelPtr();
 //	if (!hdr)
@@ -8918,7 +8918,7 @@ C_EngineWorldInternal::~C_EngineWorldInternal()
 	g_EntityList.m_pGameRules = NULL;
 }
 
-void C_EngineWorldInternal::Init(C_BaseEntity* pOuter)
+void C_EngineWorldInternal::Init(IClientEntity* pOuter)
 {
 	BaseClass::Init(pOuter);
 	g_EntityList.m_pGameRules = dynamic_cast<IClientGameRules*>(pOuter);
@@ -8930,7 +8930,7 @@ void C_EngineWorldInternal::Init(C_BaseEntity* pOuter)
 //-----------------------------------------------------------------------------
 // Purpose: A version of trace entity which detects portals and translates the trace through portals
 //-----------------------------------------------------------------------------
-void UTIL_TraceEntityThroughPortal(C_BaseEntity* pEntity, const Vector& vecAbsStart, const Vector& vecAbsEnd,
+void UTIL_TraceEntityThroughPortal(IClientEntity* pEntity, const Vector& vecAbsStart, const Vector& vecAbsEnd,
 	unsigned int mask, ITraceFilter* pFilter, trace_t* pTrace)
 {
 #ifdef CLIENT_DLL
@@ -8957,7 +8957,7 @@ class CTraceFilterEntity : public CTraceFilterSimple
 	DECLARE_CLASS(CTraceFilterEntity, CTraceFilterSimple);
 
 public:
-	CTraceFilterEntity(C_BaseEntity* pEntity, int nCollisionGroup)
+	CTraceFilterEntity(IClientEntity* pEntity, int nCollisionGroup)
 		: CTraceFilterSimple(pEntity, nCollisionGroup)
 	{
 		m_pRootParent = pEntity->GetEngineObject()->GetRootMoveParent() ? pEntity->GetEngineObject()->GetRootMoveParent()->GetOuter() : NULL;
@@ -8967,7 +8967,7 @@ public:
 
 	bool ShouldHitEntity(IHandleEntity* pHandleEntity, int contentsMask)
 	{
-		C_BaseEntity* pEntity = EntityFromEntityHandle(pHandleEntity);
+		IClientEntity* pEntity = EntityFromEntityHandle(pHandleEntity);
 		if (!pEntity)
 			return false;
 
@@ -8996,8 +8996,8 @@ public:
 
 private:
 
-	C_BaseEntity* m_pRootParent;
-	C_BaseEntity* m_pEntity;
+	IClientEntity* m_pRootParent;
+	IClientEntity* m_pEntity;
 	bool		m_checkHash;
 };
 
@@ -9026,7 +9026,7 @@ class CTraceFilterEntityIgnoreOther : public CTraceFilterEntity
 {
 	DECLARE_CLASS(CTraceFilterEntityIgnoreOther, CTraceFilterEntity);
 public:
-	CTraceFilterEntityIgnoreOther(C_BaseEntity* pEntity, const IHandleEntity* pIgnore, int nCollisionGroup) :
+	CTraceFilterEntityIgnoreOther(IClientEntity* pEntity, const IHandleEntity* pIgnore, int nCollisionGroup) :
 		CTraceFilterEntity(pEntity, nCollisionGroup), m_pIgnoreOther(pIgnore)
 	{
 	}
@@ -9471,7 +9471,7 @@ bool C_EnginePortalInternal::TraceTransformedWorldBrushes(const IEnginePortalCli
 class CPortalCollideableEnumerator : public IPartitionEnumerator
 {
 private:
-	EHANDLE m_hTestPortal; //the associated portal that we only want objects in front of
+	ENTHANDLE m_hTestPortal; //the associated portal that we only want objects in front of
 	Vector m_vPlaneNormal; //portal plane normal
 	float m_fPlaneDist; //plane equation distance
 	Vector m_ptForward1000; //a point exactly 1000 units from the portal center along its forward vector
@@ -9502,9 +9502,9 @@ CPortalCollideableEnumerator::CPortalCollideableEnumerator(const C_EnginePortalI
 
 IterationRetval_t CPortalCollideableEnumerator::EnumElement(IHandleEntity* pHandleEntity)
 {
-	EHANDLE hEnt = pHandleEntity->GetRefEHandle();
+	ENTHANDLE hEnt = pHandleEntity->GetRefEHandle();
 
-	C_BaseEntity* pEnt = hEnt.Get();
+	IClientEntity* pEnt = hEnt.Get();
 	if (pEnt == NULL) //I really never thought this would be necessary
 		return ITERATION_CONTINUE;
 
@@ -12640,7 +12640,7 @@ bool C_EngineRopeInternal::AnyPointsMoved()
 	return false;
 }
 
-bool C_EngineRopeInternal::CalculateEndPointAttachment(C_BaseEntity* pEnt, int iAttachment, Vector& vPos, QAngle& pAngles)
+bool C_EngineRopeInternal::CalculateEndPointAttachment(IClientEntity* pEnt, int iAttachment, Vector& vPos, QAngle& pAngles)
 {
 	VPROF_BUDGET("C_RopeKeyframe::CalculateEndPointAttachment", VPROF_BUDGETGROUP_ROPES);
 
@@ -12651,7 +12651,7 @@ bool C_EngineRopeInternal::CalculateEndPointAttachment(C_BaseEntity* pEnt, int i
 	{
 		if (pEnt->IsPlayer())
 		{
-			C_BaseEntity* pModel = pEnt->GetRenderedWeaponModel();
+			IClientEntity* pModel = pEnt->GetRenderedWeaponModel();
 			if (!pModel)
 				return false;
 
@@ -12897,8 +12897,8 @@ void C_EngineRopeInternal::SetSlack(int slack)
 
 void C_EngineRopeInternal::SetupHangDistance(float flHangDist)
 {
-	C_BaseEntity* pEnt1 = m_hStartPoint;
-	C_BaseEntity* pEnt2 = m_hEndPoint;
+	IClientEntity* pEnt1 = m_hStartPoint;
+	IClientEntity* pEnt2 = m_hEndPoint;
 	if (!pEnt1 || !pEnt2)
 		return;
 
@@ -12920,25 +12920,25 @@ void C_EngineRopeInternal::SetupHangDistance(float flHangDist)
 	RecomputeSprings();
 }
 
-void C_EngineRopeInternal::SetStartEntity(C_BaseEntity* pEnt)
+void C_EngineRopeInternal::SetStartEntity(IClientEntity* pEnt)
 {
 	m_hStartPoint = pEnt;
 }
 
 
-void C_EngineRopeInternal::SetEndEntity(C_BaseEntity* pEnt)
+void C_EngineRopeInternal::SetEndEntity(IClientEntity* pEnt)
 {
 	m_hEndPoint = pEnt;
 }
 
 
-C_BaseEntity* C_EngineRopeInternal::GetStartEntity() const
+IClientEntity* C_EngineRopeInternal::GetStartEntity() const
 {
 	return m_hStartPoint;
 }
 
 
-C_BaseEntity* C_EngineRopeInternal::GetEndEntity() const
+IClientEntity* C_EngineRopeInternal::GetEndEntity() const
 {
 	return m_hEndPoint;
 }
@@ -13244,7 +13244,7 @@ void C_EngineGhostInternal::PerFrameUpdate(void)
 
 		if (m_bSourceIsBaseAnimating)
 		{
-			C_BaseAnimating* pSource = (C_BaseAnimating*)m_pGhostedSource;
+			IClientEntity* pSource = m_pGhostedSource;
 			SetCycle(pSource->GetEngineObject()->GetCycle());
 			SetSequence(pSource->GetEngineObject()->GetSequence());
 			SetBody(pSource->GetEngineObject()->GetBody());
@@ -13443,17 +13443,17 @@ bool PVSNotifierMap_LessFunc( IClientUnknown* const &a, IClientUnknown* const &b
 //}
 //
 //	
-//C_BaseEntity* C_AllBaseEntityIterator::Next()
+//IClientEntity* C_AllBaseEntityIterator::Next()
 //{
 //	if ( m_CurBaseEntity == g_EntityList.m_BaseEntities.InvalidIndex() )
 //		return NULL;
 //
-//	C_BaseEntity *pRet = g_EntityList.m_BaseEntities[m_CurBaseEntity];
+//	IClientEntity *pRet = g_EntityList.m_BaseEntities[m_CurBaseEntity];
 //	m_CurBaseEntity = g_EntityList.m_BaseEntities.Next( m_CurBaseEntity );
 //	return pRet;
 //}
 
-bool ShouldRemoveThisRagdoll(C_BaseEntity* pRagdoll)
+bool ShouldRemoveThisRagdoll(IClientEntity* pRagdoll)
 {
 	if (clientdll->IsLowViolence())
 	{
@@ -13561,7 +13561,7 @@ static CEntityListSystem g_EntityListSystem("CEntityListSystem");
 
 struct watcher_t
 {
-	EHANDLE				hWatcher;
+	ENTHANDLE				hWatcher;
 	IWatcherCallback* pWatcherCallback;
 };
 
@@ -13635,7 +13635,7 @@ void C_WatcherList::AddToList(IHandleEntity* pWatcher)
 	{
 		watcher_t watcher;
 		watcher.hWatcher = pWatcher->GetRefEHandle();
-		// save this separately so we can use the EHANDLE to test for deletion
+		// save this separately so we can use the ENTHANDLE to test for deletion
 		watcher.pWatcherCallback = dynamic_cast<IWatcherCallback*> (pWatcher);
 
 		if (watcher.pWatcherCallback)

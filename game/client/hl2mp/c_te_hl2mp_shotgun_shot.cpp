@@ -60,7 +60,7 @@ void C_TEHL2MPFireBullets::CreateEffects( void )
 	if ( pAmmoDef == NULL )
 		 return;
 
-	C_BaseEntity *pEnt = EntityList()->GetEnt( m_iPlayer );
+	C_BaseEntity *pEnt = (C_BaseEntity*)EntityList()->GetEnt( m_iPlayer );
 
 	if ( pEnt )
 	{

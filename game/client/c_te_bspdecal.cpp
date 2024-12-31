@@ -68,7 +68,7 @@ void TE_BSPDecal( IRecipientFilter& filter, float delay,
 	const Vector* pos, int entity, int index )
 {
 	C_BaseEntity *ent;
-	if ( ( ent = EntityList()->GetEnt( entity ) ) == NULL )
+	if ( ( ent = (C_BaseEntity*)EntityList()->GetEnt( entity ) ) == NULL )
 	{
 		DevMsg( 1, "Decal: entity = %i", entity );
 		return;
@@ -89,7 +89,7 @@ void C_TEBSPDecal::PostDataUpdate( DataUpdateType_t updateType )
 	VPROF( "C_TEBSPDecal::PostDataUpdate" );
 
 	C_BaseEntity *ent;
-	if ( ( ent = EntityList()->GetEnt( m_nEntity ) ) == NULL )
+	if ( ( ent = (C_BaseEntity*)EntityList()->GetEnt( m_nEntity ) ) == NULL )
 	{
 		DevMsg( 1, "Decal: entity = %i", m_nEntity );
 		return;

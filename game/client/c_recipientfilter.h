@@ -126,7 +126,7 @@ public:
 class CPASAttenuationFilter : public CPASFilter
 {
 public:
-	CPASAttenuationFilter( C_BaseEntity *entity, float attenuation = ATTN_NORM ) :
+	CPASAttenuationFilter( IClientEntity *entity, float attenuation = ATTN_NORM ) :
 		CPASFilter( entity->GetEngineObject()->GetAbsOrigin() )
 	{
 	}
@@ -136,7 +136,7 @@ public:
 	{
 	}
 
-	CPASAttenuationFilter( C_BaseEntity *entity, const char *lookupSound ) :
+	CPASAttenuationFilter( IClientEntity *entity, const char *lookupSound ) :
 		CPASFilter( entity->GetEngineObject()->GetAbsOrigin() )
 	{
 	}
@@ -146,7 +146,7 @@ public:
 	{
 	}
 
-	CPASAttenuationFilter( C_BaseEntity *entity, const char *lookupSound, HSOUNDSCRIPTHANDLE& handle ) :
+	CPASAttenuationFilter( IClientEntity *entity, const char *lookupSound, HSOUNDSCRIPTHANDLE& handle ) :
 		CPASFilter( entity->GetEngineObject()->GetAbsOrigin() )
 	{
 	}

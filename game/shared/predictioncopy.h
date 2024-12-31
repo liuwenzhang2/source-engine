@@ -17,6 +17,8 @@
 #include "tier1/utlstring.h"
 
 #if defined( CLIENT_DLL )
+class C_BaseEntity;
+typedef CHandle<C_BaseEntity> EHANDLE;
 #if defined( _DEBUG )
 // #define COPY_CHECK_STRESSTEST
 class IGameSystem;
@@ -209,12 +211,12 @@ public:
 
 	bool IsActive() const;
 
-	void SetupTracking( C_BaseEntity *ent, char const *pchFieldName );
+	void SetupTracking( IClientEntity *ent, char const *pchFieldName );
 	void ClearTracking();
 
 	void Spew();
 
-	C_BaseEntity *GetEntity();
+	IClientEntity *GetEntity();
 
 private:
 
@@ -228,7 +230,7 @@ private:
 
 	bool				m_bActive : 1;
 	bool				m_bTracking : 1;
-	EHANDLE				m_hEntityToTrack;
+	CHandle<IClientEntity>			m_hEntityToTrack;
 	CUtlVector< typedescription_t * > m_FieldStack;
 	CUtlString			m_strFieldName;
 	CUtlString			m_strContext;
@@ -249,7 +251,7 @@ public:
 	}
 
 	// Only calls Start/End if passed in entity matches entity to track
-	CValueChangeTrackerScope( C_BaseEntity *pEntity, char const *pchContext )
+	CValueChangeTrackerScope( IClientEntity *pEntity, char const *pchContext )
 	{
 		m_bCallEndTrack = g_pChangeTracker->GetEntity() == pEntity;
 		if ( m_bCallEndTrack )

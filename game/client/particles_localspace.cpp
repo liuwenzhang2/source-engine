@@ -139,7 +139,7 @@ void CLocalSpaceEmitter::SetupTransformMatrix( void )
 		m_ParticleEffect.SetLocalSpaceTransform( mat );
 		SetSortOrigin( origin );
 
-		C_BaseEntity *pEnt = pRenderable->GetIClientUnknown()->GetBaseEntity();
+		C_BaseEntity *pEnt = (C_BaseEntity*)pRenderable->GetIClientUnknown()->GetBaseEntity();
 		if ( pEnt )
 		{
 			Vector vWorldMins, vWorldMaxs;

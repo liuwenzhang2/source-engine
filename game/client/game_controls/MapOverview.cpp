@@ -78,7 +78,7 @@ CON_COMMAND( overview_zoom, "Sets overview map zoom: <zoom> [<time>] [rel]" )
 	if( !g_pMapOverview->AllowConCommandsWhileAlive() )
 	{
 		C_BasePlayer *localPlayer = (C_BasePlayer*)EntityList()->GetLocalPlayer();
-		if( localPlayer && (C_BasePlayer*)EntityList()->GetLocalPlayer()->IsAlive() )
+		if( localPlayer && EntityList()->GetLocalPlayer()->IsAlive() )
 			return;// Not allowed to execute commands while alive
 		else if( localPlayer && localPlayer->GetObserverMode() == OBS_MODE_DEATHCAM )
 			return;// In the death cam spiral counts as alive
@@ -114,7 +114,7 @@ CON_COMMAND( overview_mode, "Sets overview map mode off,small,large: <0|1|2>" )
 	if( !g_pMapOverview->AllowConCommandsWhileAlive() )
 	{
 		C_BasePlayer *localPlayer = (C_BasePlayer*)EntityList()->GetLocalPlayer();
-		if( localPlayer && (C_BasePlayer*)EntityList()->GetLocalPlayer()->IsAlive() )
+		if( localPlayer && EntityList()->GetLocalPlayer()->IsAlive() )
 			return;// Not allowed to execute commands while alive
 		else if( localPlayer && localPlayer->GetObserverMode() == OBS_MODE_DEATHCAM )
 			return;// In the death cam spiral counts as alive
@@ -316,7 +316,7 @@ void CMapOverview::UpdateFollowEntity()
 {
 	if ( m_nFollowEntity != 0 )
 	{
-		C_BaseEntity *ent = EntityList()->GetEnt( m_nFollowEntity );
+		C_BaseEntity *ent = (C_BaseEntity*)EntityList()->GetEnt( m_nFollowEntity );
 
 		if ( ent )
 		{
@@ -1329,7 +1329,7 @@ void CMapOverview::UpdateObjects()
 		if ( obj->index <= 0 )
 			continue;
 
-		C_BaseEntity *entity = EntityList()->GetEnt( obj->index );
+		C_BaseEntity *entity = (C_BaseEntity*)EntityList()->GetEnt( obj->index );
 
 		if ( !entity )
 			continue;

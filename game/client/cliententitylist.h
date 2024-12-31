@@ -24,12 +24,15 @@
 #include "beamdraw.h"
 #include "c_te_effect_dispatch.h"
 #include "fx_water.h"
+#include "mouthinfo.h"
 
 //class C_Beam;
 //class C_BaseViewModel;
-//class C_BaseEntity;
+//class IClientEntity;
 
 //extern IVEngineClient* engine;
+
+typedef CHandle<IClientEntity> ENTHANDLE;
 
 inline string_t AllocPooledStringInEntityList(const char* pStr) {
 	return clientdll->AllocPooledString(pStr);
@@ -49,6 +52,7 @@ typedef unsigned int			AimEntsListHandle_t;
 #define		INVALID_AIMENTS_LIST_HANDLE		(AimEntsListHandle_t)~0
 typedef unsigned int			ClientSideAnimationListHandle_t;
 #define		INVALID_CLIENTSIDEANIMATION_LIST_HANDLE	(ClientSideAnimationListHandle_t)~0
+#define LIPSYNC_POSEPARAM_NAME "mouth"
 
 //-----------------------------------------------------------------------------
 // Purpose: 
@@ -68,11 +72,11 @@ public:
 
 	C_GrabControllerInternal(void);
 	~C_GrabControllerInternal(void);
-	void AttachEntity(C_BaseEntity* pPlayer, C_BaseEntity* pEntity, IPhysicsObject* pPhys, bool bIsMegaPhysCannon, const Vector& vGrabPosition, bool bUseGrabPosition);
+	void AttachEntity(IClientEntity* pPlayer, IClientEntity* pEntity, IPhysicsObject* pPhys, bool bIsMegaPhysCannon, const Vector& vGrabPosition, bool bUseGrabPosition);
 	void DetachEntity(bool bClearVelocity);
 	void OnRestore();
 
-	bool UpdateObject(C_BaseEntity* pPlayer, float flError);
+	bool UpdateObject(IClientEntity* pPlayer, float flError);
 
 	void SetTargetPosition(const Vector& target, const QAngle& targetOrientation);
 	void GetTargetPosition(Vector* target, QAngle* targetOrientation);
@@ -80,10 +84,10 @@ public:
 	float GetLoadWeight(void) const { return m_flLoadWeight; }
 	void SetAngleAlignment(float alignAngleCosine) { m_angleAlignment = alignAngleCosine; }
 	void SetIgnorePitch(bool bIgnore) { m_bIgnoreRelativePitch = bIgnore; }
-	QAngle TransformAnglesToPlayerSpace(const QAngle& anglesIn, C_BaseEntity* pPlayer);
-	QAngle TransformAnglesFromPlayerSpace(const QAngle& anglesIn, C_BaseEntity* pPlayer);
+	QAngle TransformAnglesToPlayerSpace(const QAngle& anglesIn, IClientEntity* pPlayer);
+	QAngle TransformAnglesFromPlayerSpace(const QAngle& anglesIn, IClientEntity* pPlayer);
 
-	C_BaseEntity* GetAttached() { return (C_BaseEntity*)m_attachedEntity; }
+	IClientEntity* GetAttached() { return (IClientEntity*)m_attachedEntity; }
 	const QAngle& GetAttachedAnglesPlayerSpace() { return m_attachedAnglesPlayerSpace; }
 	void SetAttachedAnglesPlayerSpace(const QAngle& attachedAnglesPlayerSpace) { m_attachedAnglesPlayerSpace = attachedAnglesPlayerSpace; }
 	const Vector& GetAttachedPositionObjectSpace() { return m_attachedPositionObjectSpace; }
@@ -93,14 +97,14 @@ public:
 	float GetSavedMass(IPhysicsObject* pObject);
 	void GetSavedParamsForCarriedPhysObject(IPhysicsObject* pObject, float* pSavedMassOut, float* pSavedRotationalDampingOut);
 #ifndef CLIENT_DLL
-	bool IsObjectAllowedOverhead(C_BaseEntity* pEntity);
+	bool IsObjectAllowedOverhead(IClientEntity* pEntity);
 #endif
 	//set when a held entity is penetrating another through a portal. Needed for special fixes
-	void SetPortalPenetratingEntity(C_BaseEntity* pPenetrated);
+	void SetPortalPenetratingEntity(IClientEntity* pPenetrated);
 
 private:
 	// Compute the max speed for an attached object
-	void ComputeMaxSpeed(C_BaseEntity* pEntity, IPhysicsObject* pPhysics);
+	void ComputeMaxSpeed(IClientEntity* pEntity, IPhysicsObject* pPhysics);
 
 	c_game_shadowcontrol_params_t m_shadow;
 	float			m_timeToArrive;
@@ -114,7 +118,7 @@ private:
 	float			m_flLoadWeight;
 	float			m_savedRotDamping[VPHYSICS_MAX_OBJECT_LIST_COUNT];
 	float			m_savedMass[VPHYSICS_MAX_OBJECT_LIST_COUNT];
-	EHANDLE			m_attachedEntity;
+	ENTHANDLE			m_attachedEntity;
 	QAngle			m_vecPreferredCarryAngles;
 	bool			m_bHasPreferredCarryAngles;
 	float			m_flDistanceOffset;
@@ -125,12 +129,12 @@ private:
 	IPhysicsMotionController* m_controller;
 
 	// NVNT player controlling this grab controller
-	C_BaseEntity*	m_pControllingPlayer;
+	IClientEntity*	m_pControllingPlayer;
 #ifndef CLIENT_DLL
 	bool			m_bAllowObjectOverhead; // Can the player hold this object directly overhead? (Default is NO)
 #endif // !CLIENT_DLL
 	//set when a held entity is penetrating another through a portal. Needed for special fixes
-	EHANDLE			m_PenetratedEntity;
+	ENTHANDLE			m_PenetratedEntity;
 	int				m_frameCount;
 };
 
@@ -161,7 +165,7 @@ public:
 			return Handle.GetEntryIndex();
 		}
 	};
-
+	bool IsNetworkable(void) { return entindex() >= 0 && entindex() < MAX_EDICTS; }
 	RecvTable* GetRecvTable() { return GetClientClass()->m_pRecvTable; }
 	//ClientClass* GetClientClass() { return NULL; }
 	void* GetDataTableBasePtr() { return this; }
@@ -182,9 +186,9 @@ public:
 
 	C_EngineObjectInternal(IClientEntityList* pClientEntityList, int iForceEdictIndex, int iSerialNum)
 		:m_pClientEntityList(pClientEntityList), m_RefEHandle(iForceEdictIndex, iSerialNum),
-		m_iv_vecOrigin("C_BaseEntity::m_iv_vecOrigin", &m_vecOrigin, LATCH_SIMULATION_VAR),
-		m_iv_angRotation("C_BaseEntity::m_iv_angRotation", &m_angRotation, LATCH_SIMULATION_VAR),
-		m_iv_vecVelocity("C_BaseEntity::m_iv_vecVelocity", &m_vecVelocity, LATCH_SIMULATION_VAR),
+		m_iv_vecOrigin("IClientEntity::m_iv_vecOrigin", &m_vecOrigin, LATCH_SIMULATION_VAR),
+		m_iv_angRotation("IClientEntity::m_iv_angRotation", &m_angRotation, LATCH_SIMULATION_VAR),
+		m_iv_vecVelocity("IClientEntity::m_iv_vecVelocity", &m_vecVelocity, LATCH_SIMULATION_VAR),
 		m_iv_flCycle("C_BaseAnimating::m_iv_flCycle", &m_flCycle, LATCH_ANIMATION_VAR),
 		m_iv_flPoseParameter("C_BaseAnimating::m_iv_flPoseParameter", m_flPoseParameter, LATCH_ANIMATION_VAR),
 		m_iv_flEncodedController("C_BaseAnimating::m_iv_flEncodedController", m_flEncodedController, LATCH_ANIMATION_VAR),
@@ -334,7 +338,7 @@ public:
 
 	
 
-	virtual void Init(C_BaseEntity* pOuter) {
+	virtual void Init(IClientEntity* pOuter) {
 		m_pOuter = pOuter;
 		m_nCreationTick = gpGlobals->tickcount;
 		CreatePartitionHandle();
@@ -345,7 +349,7 @@ public:
 		return m_pOuter;
 	}
 
-	C_BaseEntity* GetOuter() {
+	IClientEntity* GetOuter() {
 		return m_pOuter;
 	}
 
@@ -946,7 +950,7 @@ public:
 		float boneDt,
 		bool bFixedConstraints = false);
 
-	virtual void RagdollBone(C_BaseEntity* ent, mstudiobone_t* pbones, int boneCount, bool* boneSimulated, CBoneAccessor& pBoneToWorld);
+	virtual void RagdollBone(IClientEntity* ent, mstudiobone_t* pbones, int boneCount, bool* boneSimulated, CBoneAccessor& pBoneToWorld);
 	virtual const Vector& GetRagdollOrigin();
 	virtual void GetRagdollBounds(Vector& theMins, Vector& theMaxs);
 	void	BuildRagdollBounds();
@@ -984,7 +988,7 @@ public:
 	//virtual void SaveRagdollInfo(int numbones, const matrix3x4_t& cameraTransform, CBoneAccessor& pBoneToWorld);
 	void							SetBuiltRagdoll(bool builtRagdoll) { m_builtRagdoll = builtRagdoll; }
 	void							ClearRagdoll();
-	//void							CreateUnragdollInfo(C_BaseEntity* pRagdoll);
+	//void							CreateUnragdollInfo(IClientEntity* pRagdoll);
 	//virtual bool					RetrieveRagdollInfo(Vector* pos, Quaternion* q);
 	//void UnragdollBlend(IStudioHdr* hdr, Vector pos[], Quaternion q[], float currentTime);
 
@@ -1206,7 +1210,7 @@ protected:
 
 	IClientEntityList* const m_pClientEntityList = NULL;
 	const CBaseHandle m_RefEHandle;
-	friend class C_BaseEntity;
+	friend class IClientEntity;
 	CThreadFastMutex m_CalcAbsolutePositionMutex;
 	CThreadFastMutex m_CalcAbsoluteVelocityMutex;
 	Vector							m_vecOrigin = Vector(0,0,0);
@@ -1220,7 +1224,7 @@ protected:
 	// Object orientation
 	QAngle							m_angAbsRotation = QAngle(0, 0, 0);
 	Vector							m_vecAbsVelocity = Vector(0, 0, 0);
-	C_BaseEntity* m_pOuter = NULL;
+	IClientEntity* m_pOuter = NULL;
 
 	// Hierarchy
 	C_EngineObjectInternal* m_pMoveParent = NULL;
@@ -1251,7 +1255,7 @@ protected:
 	Vector							m_vecNetworkOrigin = Vector(0, 0, 0);
 	QAngle							m_angNetworkAngles = QAngle(0, 0, 0);
 	// The moveparent received from networking data
-	CHandle<C_BaseEntity>			m_hNetworkMoveParent = NULL;
+	CHandle<IClientEntity>			m_hNetworkMoveParent = NULL;
 	unsigned char					m_iParentAttachment; // 0 if we're relative to the parent's absorigin and absangles.
 	unsigned char					m_iOldParentAttachment;
 
@@ -1263,7 +1267,7 @@ protected:
 	int								touchStamp;
 	int								m_fDataObjectTypes;
 
-	EHANDLE							m_hGroundEntity;
+	ENTHANDLE							m_hGroundEntity;
 	float							m_flGroundChangeTime;
 
 	string_t						m_ModelName;
@@ -2244,7 +2248,7 @@ public:
 	C_EngineWorldInternal(IClientEntityList* pClientEntityList, int iForceEdictIndex, int iSerialNum);
 	~C_EngineWorldInternal();
 
-	void Init(C_BaseEntity* pOuter);
+	void Init(IClientEntity* pOuter);
 	bool IsWorld() { return true; }
 	C_EngineWorldInternal* AsEngineWorld() { return this; }
 	const C_EngineWorldInternal* AsEngineWorld() const { return this; }
@@ -2269,8 +2273,8 @@ public:
 	C_EnginePlayerInternal* AsEnginePlayer() { return this; }
 	const C_EnginePlayerInternal* AsEnginePlayer() const { return this; }
 private:
-	EHANDLE	m_hPortalEnvironment; //a portal whose environment the player is currently in, should be invalid most of the time
-	EHANDLE m_pHeldObjectPortal;
+	ENTHANDLE	m_hPortalEnvironment; //a portal whose environment the player is currently in, should be invalid most of the time
+	ENTHANDLE m_pHeldObjectPortal;
 	bool  m_bHeldObjectOnOppositeSideOfPortal;
 
 };
@@ -2351,7 +2355,7 @@ private:
 	//IPhysicsEnvironment* pPhysicsEnvironment = NULL;
 	bool				m_bActivated; //a portal can exist and not be active
 	bool				m_bIsPortal2; //For teleportation, this doesn't matter, but for drawing and moving, it matters
-	EHANDLE				m_hLinkedPortal;
+	ENTHANDLE				m_hLinkedPortal;
 	bool				m_bSimulateVPhysics;
 	bool				m_bLocalDataIsReady; //this side of the portal is properly setup, no guarantees as to linkage to another portal
 	PS_InternalData_t m_InternalData;
@@ -2421,7 +2425,7 @@ public:
 	//CSimplePhysics::IHelper* HookPhysics(CSimplePhysics::IHelper* pHook);
 	// Get the attachment position of one of the endpoints.
 	bool			GetEndPointPos(int iPt, Vector& vPos, QAngle& vAngle);
-	bool			CalculateEndPointAttachment(C_BaseEntity* pEnt, int iAttachment, Vector& vPos, QAngle& pAngles);
+	bool			CalculateEndPointAttachment(IClientEntity* pEnt, int iAttachment, Vector& vPos, QAngle& pAngles);
 	void SetRopeFlags(int flags);
 	int GetRopeFlags() const;
 	int				GetSlack() { return m_Slack; }
@@ -2429,11 +2433,11 @@ public:
 	void SetSlack(int slack);
 	void SetupHangDistance(float flHangDist);
 	// Change which entities the rope is connected to.
-	void SetStartEntity(C_BaseEntity* pEnt);
-	void SetEndEntity(C_BaseEntity* pEnt);
+	void SetStartEntity(IClientEntity* pEnt);
+	void SetEndEntity(IClientEntity* pEnt);
 
-	C_BaseEntity* GetStartEntity() const;
-	C_BaseEntity* GetEndEntity() const;
+	IClientEntity* GetStartEntity() const;
+	IClientEntity* GetEndEntity() const;
 	// Get the rope material data.
 	IMaterial* GetSolidMaterial(void);
 	IMaterial* GetBackMaterial(void);
@@ -2512,8 +2516,8 @@ private:
 	Vector			m_LightValues[ROPE_MAX_SEGMENTS]; // light info when the rope is created.
 	bool			m_bEndPointAttachmentPositionsDirty : 1;
 	bool			m_bEndPointAttachmentAnglesDirty : 1;
-	EHANDLE			m_hStartPoint;		// StartPoint/EndPoint are entities
-	EHANDLE			m_hEndPoint;
+	ENTHANDLE			m_hStartPoint;		// StartPoint/EndPoint are entities
+	ENTHANDLE			m_hEndPoint;
 	short			m_iStartAttachment;	// StartAttachment/EndAttachment are attachment points.
 	short			m_iEndAttachment;
 	bool							m_bApplyWind;
@@ -2546,12 +2550,12 @@ public:
 		m_matGhostTransform = matGhostTransform;
 	}
 
-	void SetGhostedSource(C_BaseEntity* pGhostedSource) {
+	void SetGhostedSource(IClientEntity* pGhostedSource) {
 		m_pGhostedSource = pGhostedSource;
 		m_bSourceIsBaseAnimating = m_pGhostedSource ? m_pGhostedSource->GetEngineObject()->GetModelPtr() != NULL : NULL;
 	}
 
-	C_BaseEntity* GetGhostedSource() { return m_pGhostedSource; }
+	IClientEntity* GetGhostedSource() { return m_pGhostedSource; }
 	bool GetSourceIsBaseAnimating() { return m_bSourceIsBaseAnimating; }
 	void PerFrameUpdate(void);
 	virtual Vector const& GetRenderOrigin(void);
@@ -2574,7 +2578,7 @@ public:
 	C_EngineGhostInternal* AsEngineGhost() { return this; }
 	const C_EngineGhostInternal* AsEngineGhost() const { return this; }
 private:
-	C_BaseEntity* m_pGhostedSource; //the renderable we're transforming and re-rendering
+	IClientEntity* m_pGhostedSource; //the renderable we're transforming and re-rendering
 	bool m_bSourceIsBaseAnimating;
 	VMatrix m_matGhostTransform;
 	struct
@@ -2592,7 +2596,7 @@ private:
 //	C_AllBaseEntityIterator();
 //
 //	void Restart();
-//	C_BaseEntity* Next();	// keep calling this until it returns null.
+//	IClientEntity* Next();	// keep calling this until it returns null.
 //
 //private:
 //	unsigned short m_CurBaseEntity;
@@ -2605,7 +2609,7 @@ struct clientanimating_t
 	clientanimating_t(C_EngineObjectInternal* _pAnim, unsigned int _flags) : pAnimating(_pAnim), flags(_flags) {}
 };
 
-extern bool ShouldRemoveThisRagdoll(C_BaseEntity* pRagdoll);
+extern bool ShouldRemoveThisRagdoll(IClientEntity* pRagdoll);
 
 class CCollisionEvent : public IPhysicsCollisionEvent, public IPhysicsCollisionSolver, public IPhysicsObjectEvent
 {
@@ -2629,7 +2633,7 @@ public:
 	virtual void ObjectEnterTrigger(IPhysicsObject* pTrigger, IPhysicsObject* pObject) {}
 	virtual void ObjectLeaveTrigger(IPhysicsObject* pTrigger, IPhysicsObject* pObject) {}
 
-	float	DeltaTimeSinceLastFluid(C_BaseEntity* pEntity);
+	float	DeltaTimeSinceLastFluid(IClientEntity* pEntity);
 	void	FrameUpdate(void);
 
 	void	UpdateFluidEvents(void);
@@ -2649,7 +2653,7 @@ public:
 	// IPhysicsObjectEvent
 	virtual void ObjectWake(IPhysicsObject* pObject)
 	{
-		C_BaseEntity* pEntity = static_cast<C_BaseEntity*>(pObject->GetGameData());
+		IClientEntity* pEntity = static_cast<IClientEntity*>(pObject->GetGameData());
 		if (pEntity && pEntity->GetEngineObject()->HasDataObjectType(VPHYSICSWATCHER))
 		{
 			//ReportVPhysicsStateChanged( pObject, pEntity, true );
@@ -2659,7 +2663,7 @@ public:
 
 	virtual void ObjectSleep(IPhysicsObject* pObject)
 	{
-		C_BaseEntity* pEntity = static_cast<C_BaseEntity*>(pObject->GetGameData());
+		IClientEntity* pEntity = static_cast<IClientEntity*>(pObject->GetGameData());
 		if (pEntity && pEntity->GetEngineObject()->HasDataObjectType(VPHYSICSWATCHER))
 		{
 			//ReportVPhysicsStateChanged( pObject, pEntity, false );
@@ -2668,7 +2672,7 @@ public:
 	}
 
 
-	friction_t* FindFriction(C_BaseEntity* pObject);
+	friction_t* FindFriction(IClientEntity* pObject);
 	void ShutdownFriction(friction_t& friction);
 	void UpdateFrictionSounds();
 	bool IsInCallback() { return m_inCallback > 0 ? true : false; }
@@ -2691,9 +2695,9 @@ private:
 	};
 	friend class CallbackContext;
 
-	void	AddTouchEvent(C_BaseEntity* pEntity0, C_BaseEntity* pEntity1, int touchType, const Vector& point, const Vector& normal);
-	void	DispatchStartTouch(C_BaseEntity* pEntity0, C_BaseEntity* pEntity1, const Vector& point, const Vector& normal);
-	void	DispatchEndTouch(C_BaseEntity* pEntity0, C_BaseEntity* pEntity1);
+	void	AddTouchEvent(IClientEntity* pEntity0, IClientEntity* pEntity1, int touchType, const Vector& point, const Vector& normal);
+	void	DispatchStartTouch(IClientEntity* pEntity0, IClientEntity* pEntity1, const Vector& point, const Vector& normal);
+	void	DispatchEndTouch(IClientEntity* pEntity0, IClientEntity* pEntity1);
 
 	friction_t					m_current[8];
 	CUtlVector<fluidevent_t>	m_fluidEvents;
@@ -2786,7 +2790,7 @@ public:
 // Implement IClientEntityList
 public:
 
-	virtual C_BaseEntity*		CreateEntityByName(const char* className, int iForceEdictIndex = -1, int iSerialNum = -1);
+	virtual IClientEntity*		CreateEntityByName(const char* className, int iForceEdictIndex = -1, int iSerialNum = -1);
 	virtual void				DestroyEntity(IHandleEntity* pEntity);
 
 	virtual IEngineObjectClient* GetEngineObject(int entnum);
@@ -2825,18 +2829,18 @@ public:
 	T*			GetListedEntity( int entnum );
 	
 	// Simple wrappers for convenience..
-	C_BaseEntity*			GetBaseEntity( int entnum );
+	IClientEntity*			GetBaseEntity( int entnum );
 	ICollideable*			GetCollideable( int entnum );
 
 	IClientRenderable*		GetClientRenderableFromHandle( CBaseHandle hEnt );
-	C_BaseEntity*			GetBaseEntityFromHandle( CBaseHandle hEnt );
+	IClientEntity*			GetBaseEntityFromHandle( CBaseHandle hEnt );
 	ICollideable*			GetCollideableFromHandle( CBaseHandle hEnt );
 	IClientThinkable*		GetClientThinkableFromHandle( CBaseHandle hEnt );
 
 	CBaseHandle				FirstHandle() const { return BaseClass::FirstHandle(); }
 	CBaseHandle				NextHandle(CBaseHandle hEnt) const { return BaseClass::NextHandle(hEnt); }
 	CBaseHandle				InvalidHandle() { return BaseClass::InvalidHandle(); }
-	C_BaseEntity*			GetPlayerByIndex(int entindex);
+	IClientEntity*			GetPlayerByIndex(int entindex);
 
 	// Is a handle valid?
 	bool					IsHandleValid( CBaseHandle handle ) const;
@@ -2844,8 +2848,8 @@ public:
 	void					RecomputeHighestEntityUsed( void );
 
 	// Use this to iterate over all the C_BaseEntities.
-	C_BaseEntity*			FirstBaseEntity() const;
-	C_BaseEntity*			NextBaseEntity( C_BaseEntity *pEnt ) const;
+	IClientEntity*			FirstBaseEntity() const;
+	IClientEntity*			NextBaseEntity( IClientEntity *pEnt ) const;
 
 	// Get the list of all PVS notifiers.
 	CUtlLinkedList<CPVSNotifyInfo,unsigned short>& GetPVSNotifiers();
@@ -2854,8 +2858,8 @@ public:
 	void AddListenerEntity( IClientEntityListener *pListener );
 	void RemoveListenerEntity( IClientEntityListener *pListener );
 
-	void NotifyCreateEntity( C_BaseEntity *pEnt );
-	void NotifyRemoveEntity( C_BaseEntity *pEnt );
+	void NotifyCreateEntity( IClientEntity *pEnt );
+	void NotifyRemoveEntity( IClientEntity *pEnt );
 
 	void AddDataAccessor(int type, IEntityDataInstantiator<T>* instantiator);
 	void RemoveDataAccessor(int type);
@@ -2925,14 +2929,14 @@ public:
 	void CheckInterpolatedVarParanoidMeasurement();
 
 	// Move it to the top of the LRU
-	void MoveToTopOfLRU(C_BaseEntity* pRagdoll, bool bImportant = false);
+	void MoveToTopOfLRU(IClientEntity* pRagdoll, bool bImportant = false);
 	void SetMaxRagdollCount(int iMaxCount) { m_iMaxRagdolls = iMaxCount; }
 	int CountRagdolls(bool bOnlySimulatingRagdolls) { return bOnlySimulatingRagdolls ? m_iSimulatedRagdollCount : m_iRagdollCount; }
 	// Methods of IGameSystem
 	virtual void UpdateRagdolls(float frametime);
 
-	C_BaseEntity* GetLocalPlayer(void);
-	void SetLocalPlayer(C_BaseEntity* pBasePlayer);
+	IClientEntity* GetLocalPlayer(void);
+	void SetLocalPlayer(IClientEntity* pBasePlayer);
 
 	IPhysics* Physics() {
 		return m_physics;
@@ -3015,7 +3019,7 @@ public:
 		flVolume = clamp(flVolume, 0.0f, 1.0f);
 		if (flVolume > (1.0f / 128.0f))
 		{
-			friction_t* pFriction = m_Collisions.FindFriction((C_BaseEntity*)pEntity);
+			friction_t* pFriction = m_Collisions.FindFriction((IClientEntity*)pEntity);
 			if (!pFriction)
 				return;
 
@@ -3030,7 +3034,7 @@ public:
 					return;
 
 				pFriction->pObject = pEntity;
-				CPASAttenuationFilter filter((C_BaseEntity*)pEntity, params.soundlevel);
+				CPASAttenuationFilter filter((IClientEntity*)pEntity, params.soundlevel);
 				int entindex = pEntity->entindex();
 
 				// clientside created entites doesn't have a valid entindex, let 'world' play the sound for them
@@ -3055,7 +3059,7 @@ public:
 
 	void PhysCleanupFrictionSounds(IHandleEntity* pEntity)
 	{
-		friction_t* pFriction = m_Collisions.FindFriction((C_BaseEntity*)pEntity);
+		friction_t* pFriction = m_Collisions.FindFriction((IClientEntity*)pEntity);
 		if (pFriction && pFriction->patch)
 		{
 			m_Collisions.ShutdownFriction(*pFriction);
@@ -3136,7 +3140,7 @@ private:
 	//EntityCacheInfo_t	m_EntityCacheInfo[NUM_ENT_ENTRIES];
 
 	// For fast iteration.
-	//CUtlLinkedList<C_BaseEntity*, unsigned short> m_BaseEntities;
+	//CUtlLinkedList<IClientEntity*, unsigned short> m_BaseEntities;
 	C_EngineObjectInternal* m_EngineObjectArray[NUM_ENT_ENTRIES];
 	// These entities want to know when they enter and leave the PVS (server entities
 	// already can get the equivalent notification with NotifyShouldTransmit, but client
@@ -3194,14 +3198,14 @@ private:
 	CUtlLinkedList<C_EngineObjectInternal*, unsigned short> m_InterpolationList;
 	CUtlLinkedList<C_EngineObjectInternal*, unsigned short> m_TeleportList;
 
-	CUtlLinkedList< EHANDLE > m_LRU;
-	CUtlLinkedList< EHANDLE > m_LRUImportantRagdolls;
+	CUtlLinkedList< ENTHANDLE > m_LRU;
+	CUtlLinkedList< ENTHANDLE > m_LRUImportantRagdolls;
 
 	int m_iMaxRagdolls;
 	int m_iSimulatedRagdollCount;
 	int m_iRagdollCount;
 
-	C_BaseEntity* m_pLocalPlayer = NULL;
+	IClientEntity* m_pLocalPlayer = NULL;
 
 	IPhysics* m_physics;
 	IPhysicsEnvironment* m_pPhysenv = NULL;
@@ -3441,7 +3445,7 @@ bool CClientEntityList<T>::DoRestoreEntity(T* pEntity, IRestore* pRestore)
 {
 	MDLCACHE_CRITICAL_SECTION();
 
-	EHANDLE hEntity;
+	ENTHANDLE hEntity;
 
 	hEntity = pEntity;
 
@@ -3507,7 +3511,7 @@ template<class T>
 void CClientEntityList<T>::Restore(IRestore* pRestore, bool createPlayers)
 {
 	entitytable_t* pEntInfo;
-	C_BaseEntity* pent;
+	IClientEntity* pent;
 
 	CGameSaveRestoreInfo* pSaveData = pRestore->GetGameSaveRestoreInfo();
 
@@ -3597,7 +3601,7 @@ void CClientEntityList<T>::PostRestore()
 }
 
 template<class T>
-inline C_BaseEntity* CClientEntityList<T>::CreateEntityByName(const char* className, int iForceEdictIndex, int iSerialNum) {
+inline IClientEntity* CClientEntityList<T>::CreateEntityByName(const char* className, int iForceEdictIndex, int iSerialNum) {
 	if (iForceEdictIndex == -1) {
 		iForceEdictIndex = BaseClass::AllocateFreeSlot(false, iForceEdictIndex);
 		iSerialNum = BaseClass::GetNetworkSerialNumber(iForceEdictIndex);
@@ -3653,7 +3657,7 @@ inline C_BaseEntity* CClientEntityList<T>::CreateEntityByName(const char* classN
 			Error("GetEngineObjectType error!\n");
 		}
 	}
-	return (C_BaseEntity*)m_EntityFactoryDictionary.Create(this, className, iForceEdictIndex, iSerialNum, this);
+	return (IClientEntity*)m_EntityFactoryDictionary.Create(this, className, iForceEdictIndex, iSerialNum, this);
 }
 
 template<class T>
@@ -3743,14 +3747,14 @@ bool CClientEntityList<T>::Init()
 	}
 	PhysParseSurfaceData(m_pPhysprops, filesystem);
 
-	AddDataAccessor(TOUCHLINK, new CEntityDataInstantiator<C_BaseEntity, clienttouchlink_t >);
-	AddDataAccessor(GROUNDLINK, new CEntityDataInstantiator<C_BaseEntity, clientgroundlink_t >);
-	AddDataAccessor(STEPSIMULATION, new CEntityDataInstantiator<C_BaseEntity, StepSimulationData >);
-	AddDataAccessor(MODELSCALE, new CEntityDataInstantiator<C_BaseEntity, ModelScale >);
-	AddDataAccessor(POSITIONWATCHER, new CEntityDataInstantiator<C_BaseEntity, C_WatcherList >);
-	//AddDataAccessor(PHYSICSPUSHLIST, new CEntityDataInstantiator<C_BaseEntity, physicspushlist_t >);
-	//AddDataAccessor(VPHYSICSUPDATEAI, new CEntityDataInstantiator<C_BaseEntity, vphysicsupdateai_t >);
-	AddDataAccessor(VPHYSICSWATCHER, new CEntityDataInstantiator<C_BaseEntity, C_WatcherList >);
+	AddDataAccessor(TOUCHLINK, new CEntityDataInstantiator<IClientEntity, clienttouchlink_t >);
+	AddDataAccessor(GROUNDLINK, new CEntityDataInstantiator<IClientEntity, clientgroundlink_t >);
+	AddDataAccessor(STEPSIMULATION, new CEntityDataInstantiator<IClientEntity, StepSimulationData >);
+	AddDataAccessor(MODELSCALE, new CEntityDataInstantiator<IClientEntity, ModelScale >);
+	AddDataAccessor(POSITIONWATCHER, new CEntityDataInstantiator<IClientEntity, C_WatcherList >);
+	//AddDataAccessor(PHYSICSPUSHLIST, new CEntityDataInstantiator<IClientEntity, physicspushlist_t >);
+	//AddDataAccessor(VPHYSICSUPDATEAI, new CEntityDataInstantiator<IClientEntity, vphysicsupdateai_t >);
+	AddDataAccessor(VPHYSICSWATCHER, new CEntityDataInstantiator<IClientEntity, C_WatcherList >);
 	return true;
 }
 
@@ -3974,7 +3978,7 @@ void CClientEntityList<T>::RecomputeHighestEntityUsed(void)
 
 
 //-----------------------------------------------------------------------------
-// Purpose: Add a raw C_BaseEntity to the entity list.
+// Purpose: Add a raw IClientEntity to the entity list.
 // Input  : index - 
 //-----------------------------------------------------------------------------
 
@@ -3983,7 +3987,7 @@ void CClientEntityList<T>::RecomputeHighestEntityUsed(void)
 // Input  : index - 
 //-----------------------------------------------------------------------------
 template<class T>
-C_BaseEntity* CClientEntityList<T>::GetBaseEntity(int entnum)
+IClientEntity* CClientEntityList<T>::GetBaseEntity(int entnum)
 {
 	T* pEnt = GetListedEntity(entnum);
 	return pEnt ? pEnt->GetBaseEntity() : 0;
@@ -4018,7 +4022,7 @@ IClientRenderable* CClientEntityList<T>::GetClientRenderableFromHandle(CBaseHand
 }
 
 template<class T>
-C_BaseEntity* CClientEntityList<T>::GetBaseEntityFromHandle(CBaseHandle hEnt)
+IClientEntity* CClientEntityList<T>::GetBaseEntityFromHandle(CBaseHandle hEnt)
 {
 	T* pEnt = GetClientUnknownFromHandle(hEnt);
 	return pEnt ? pEnt->GetBaseEntity() : 0;
@@ -4039,9 +4043,9 @@ IClientThinkable* CClientEntityList<T>::GetClientThinkableFromHandle(CBaseHandle
 }
 
 template<class T>
-C_BaseEntity* CClientEntityList<T>::GetPlayerByIndex(int entindex)
+IClientEntity* CClientEntityList<T>::GetPlayerByIndex(int entindex)
 {
-	C_BaseEntity* pEntity = GetBaseEntity(entindex);
+	IClientEntity* pEntity = GetBaseEntity(entindex);
 	if (!pEntity || !pEntity->IsPlayer()) {
 		return NULL;
 	}
@@ -4162,8 +4166,8 @@ void CClientEntityList<T>::OnAddEntity(T* pEnt, CBaseHandle handle)
 
 	IClientUnknown* pUnknown = pEnt;//(IClientUnknown*)
 
-	// Store it in a special list for fast iteration if it's a C_BaseEntity.
-	C_BaseEntity* pBaseEntity = pUnknown->GetBaseEntity();
+	// Store it in a special list for fast iteration if it's a IClientEntity.
+	IClientEntity* pBaseEntity = pUnknown->GetBaseEntity();
 	//m_EngineObjectArray[entnum] = new C_EngineObjectInternal();
 	m_EngineObjectArray[entnum]->Init(pBaseEntity);
 
@@ -4217,7 +4221,7 @@ void CClientEntityList<T>::OnRemoveEntity(T* pEnt, CBaseHandle handle)
 	// If this is a PVS notifier, remove it.
 	RemovePVSNotifier(pUnknown);
 
-	C_BaseEntity* pBaseEntity = pUnknown->GetBaseEntity();
+	IClientEntity* pBaseEntity = pUnknown->GetBaseEntity();
 
 	if (pBaseEntity)
 	{
@@ -4248,7 +4252,7 @@ void CClientEntityList<T>::OnRemoveEntity(T* pEnt, CBaseHandle handle)
 
 // Use this to iterate over all the C_BaseEntities.
 template<class T>
-C_BaseEntity* CClientEntityList<T>::FirstBaseEntity() const
+IClientEntity* CClientEntityList<T>::FirstBaseEntity() const
 {
 	const CEntInfo<T>* pList = BaseClass::FirstEntInfo();
 	while (pList)
@@ -4256,7 +4260,7 @@ C_BaseEntity* CClientEntityList<T>::FirstBaseEntity() const
 		if (pList->m_pEntity)
 		{
 			T* pUnk = (pList->m_pEntity);//static_cast<IClientUnknown*>
-			C_BaseEntity* pRet = pUnk->GetBaseEntity();
+			IClientEntity* pRet = pUnk->GetBaseEntity();
 			if (pRet)
 				return pRet;
 		}
@@ -4268,12 +4272,12 @@ C_BaseEntity* CClientEntityList<T>::FirstBaseEntity() const
 }
 
 template<class T>
-C_BaseEntity* CClientEntityList<T>::NextBaseEntity(C_BaseEntity* pEnt) const
+IClientEntity* CClientEntityList<T>::NextBaseEntity(IClientEntity* pEnt) const
 {
 	if (pEnt == NULL)
 		return FirstBaseEntity();
 
-	// Run through the list until we get a C_BaseEntity.
+	// Run through the list until we get a IClientEntity.
 	const CEntInfo<T>* pList = BaseClass::GetEntInfoPtr(pEnt->GetRefEHandle());
 	if (pList)
 	{
@@ -4285,7 +4289,7 @@ C_BaseEntity* CClientEntityList<T>::NextBaseEntity(C_BaseEntity* pEnt) const
 		if (pList->m_pEntity)
 		{
 			T* pUnk = (pList->m_pEntity);//static_cast<IClientUnknown*>
-			C_BaseEntity* pRet = pUnk->GetBaseEntity();
+			IClientEntity* pRet = pUnk->GetBaseEntity();
 			if (pRet)
 				return pRet;
 		}
@@ -4399,7 +4403,7 @@ int CClientEntityList<T>::CountRecord()
 template<class T>
 void CClientEntityList<T>::ToolRecordEntities()
 {
-	VPROF_BUDGET("C_BaseEntity::ToolRecordEnties", VPROF_BUDGETGROUP_TOOLS);
+	VPROF_BUDGET("IClientEntity::ToolRecordEnties", VPROF_BUDGETGROUP_TOOLS);
 
 	if (!ToolsEnabled() || !clienttools->IsInRecordingMode())
 		return;
@@ -4701,7 +4705,7 @@ extern ConVar  cl_extrapolate;
 template<class T>
 void CClientEntityList<T>::InterpolateServerEntities()
 {
-	VPROF_BUDGET("C_BaseEntity::InterpolateServerEntities", VPROF_BUDGETGROUP_INTERPOLATION);
+	VPROF_BUDGET("IClientEntity::InterpolateServerEntities", VPROF_BUDGETGROUP_INTERPOLATION);
 
 	m_bInterpolate = cl_interpolate.GetBool();
 
@@ -4727,7 +4731,7 @@ void CClientEntityList<T>::InterpolateServerEntities()
 		m_bWasThreaded = IsEngineThreaded();
 
 		C_BaseEntityIterator iterator;
-		C_BaseEntity* pEnt;
+		IClientEntity* pEnt;
 		while ((pEnt = iterator.Next()) != NULL)
 		{
 			pEnt->GetEngineObject()->Interp_UpdateInterpolationAmounts();
@@ -4786,7 +4790,7 @@ void CClientEntityList<T>::CheckInterpolatedVarParanoidMeasurement()
 	int iHighest = GetHighestEntityIndex();
 	for (int i = 0; i <= iHighest; i++)
 	{
-		C_BaseEntity* pEnt = GetBaseEntity(i);
+		IClientEntity* pEnt = GetBaseEntity(i);
 		if (!pEnt || pEnt->m_InterpolationListEntry != 0xFFFF || !pEnt->ShouldInterpolate())
 			continue;
 
@@ -4835,7 +4839,7 @@ extern ConVar g_ragdoll_important_maxcount;
 // Move it to the top of the LRU
 //-----------------------------------------------------------------------------
 template<class T>
-void CClientEntityList<T>::MoveToTopOfLRU(C_BaseEntity* pRagdoll, bool bImportant)
+void CClientEntityList<T>::MoveToTopOfLRU(IClientEntity* pRagdoll, bool bImportant)
 {
 	if (bImportant)
 	{
@@ -4845,7 +4849,7 @@ void CClientEntityList<T>::MoveToTopOfLRU(C_BaseEntity* pRagdoll, bool bImportan
 		{
 			int iIndex = m_LRUImportantRagdolls.Head();
 
-			C_BaseEntity* pRagdoll = m_LRUImportantRagdolls[iIndex].Get();
+			IClientEntity* pRagdoll = m_LRUImportantRagdolls[iIndex].Get();
 
 			if (pRagdoll)
 			{
@@ -4902,7 +4906,7 @@ void CClientEntityList<T>::UpdateRagdolls(float frametime) // EPISODIC VERSION
 	for (i = m_LRU.Head(); i < m_LRU.InvalidIndex(); i = next)
 	{
 		next = m_LRU.Next(i);
-		C_BaseEntity* pRagdoll = m_LRU[i].Get();
+		IClientEntity* pRagdoll = m_LRU[i].Get();
 		if (pRagdoll)
 		{
 			m_iRagdollCount++;
@@ -4935,7 +4939,7 @@ void CClientEntityList<T>::UpdateRagdolls(float frametime) // EPISODIC VERSION
 	// so just remove the furthest one.
 	int furthestOne = m_LRU.Head();
 	float furthestDistSq = 0;
-	C_BaseEntity* pPlayer = GetLocalPlayer();
+	IClientEntity* pPlayer = GetLocalPlayer();
 
 	if (pPlayer && m_LRU.Count() > iMaxRagdollCount) // find the furthest one algorithm
 	{
@@ -4944,7 +4948,7 @@ void CClientEntityList<T>::UpdateRagdolls(float frametime) // EPISODIC VERSION
 
 		for (i = m_LRU.Head(); i < m_LRU.InvalidIndex(); i = next)
 		{
-			C_BaseEntity* pRagdoll = m_LRU[i].Get();
+			IClientEntity* pRagdoll = m_LRU[i].Get();
 
 			next = m_LRU.Next(i);
 			IPhysicsObject* pObject = pRagdoll->GetEngineObject()->VPhysicsGetObject();
@@ -4981,7 +4985,7 @@ void CClientEntityList<T>::UpdateRagdolls(float frametime) // EPISODIC VERSION
 
 			next = m_LRU.Next(i);
 
-			C_BaseEntity* pRagdoll = m_LRU[i].Get();
+			IClientEntity* pRagdoll = m_LRU[i].Get();
 
 			//Just ignore it until we're done burning/dissolving.
 			IPhysicsObject* pObject = pRagdoll->GetEngineObject()->VPhysicsGetObject();
@@ -5020,7 +5024,7 @@ void CClientEntityList<T>::UpdateRagdolls(float frametime) // Non-episodic versi
 	for (i = m_LRU.Head(); i < m_LRU.InvalidIndex(); i = next)
 	{
 		next = m_LRU.Next(i);
-		C_BaseEntity* pRagdoll = m_LRU[i].Get();
+		IClientEntity* pRagdoll = m_LRU[i].Get();
 		if (pRagdoll)
 		{
 			m_iRagdollCount++;
@@ -5059,7 +5063,7 @@ void CClientEntityList<T>::UpdateRagdolls(float frametime) // Non-episodic versi
 
 		next = m_LRU.Next(i);
 
-		C_BaseEntity* pRagdoll = m_LRU[i].Get();
+		IClientEntity* pRagdoll = m_LRU[i].Get();
 
 		//Just ignore it until we're done burning/dissolving.
 		if (pRagdoll && pRagdoll->GetEffectEntity())
@@ -5077,13 +5081,13 @@ void CClientEntityList<T>::UpdateRagdolls(float frametime) // Non-episodic versi
 // Output : C_BasePlayer
 //-----------------------------------------------------------------------------
 template<class T>
-C_BaseEntity* CClientEntityList<T>::GetLocalPlayer(void)
+IClientEntity* CClientEntityList<T>::GetLocalPlayer(void)
 {
 	return m_pLocalPlayer;
 }
 
 template<class T>
-void CClientEntityList<T>::SetLocalPlayer(C_BaseEntity* pBasePlayer)
+void CClientEntityList<T>::SetLocalPlayer(IClientEntity* pBasePlayer)
 {
 	m_pLocalPlayer = pBasePlayer;
 }
@@ -5119,7 +5123,7 @@ void CClientEntityList<T>::PhysicsSimulate()
 
 			for (int i = 0; i < activeCount; i++)
 			{
-				C_BaseEntity* pEntity = reinterpret_cast<C_BaseEntity*>(pActiveList[i]->GetGameData());
+				IClientEntity* pEntity = reinterpret_cast<IClientEntity*>(pActiveList[i]->GetGameData());
 				if (pEntity)
 				{
 					if (pEntity->GetEngineObject()->DoesVPhysicsInvalidateSurroundingBox())

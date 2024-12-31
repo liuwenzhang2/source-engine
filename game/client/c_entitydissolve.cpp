@@ -191,7 +191,7 @@ void C_EntityDissolve::BuildTeslaEffect( mstudiobbox_t *pHitBox, const matrix3x4
 	QAngle vecAngles;
 	MatrixGetColumn( hitboxToWorld, 3, vecOrigin );
 	MatrixAngles( hitboxToWorld, vecAngles.Base() );
-	C_BaseEntity *pEntity = GetEngineObject()->GetMoveParent()?GetEngineObject()->GetMoveParent()->GetOuter():NULL;
+	C_BaseEntity* pEntity = GetEngineObject()->GetMoveParent() ? (C_BaseEntity*)GetEngineObject()->GetMoveParent()->GetOuter() : NULL;
 
 	// Make a couple of tries at it
 	int iTries = -1;
@@ -503,7 +503,7 @@ float C_EntityDissolve::GetModelFadeOutPercentage( void )
 //-----------------------------------------------------------------------------
 void C_EntityDissolve::ClientThink( void )
 {
-	C_BaseEntity *pEnt = GetEngineObject()->GetMoveParent()?GetEngineObject()->GetMoveParent()->GetOuter():NULL;
+	C_BaseEntity* pEnt = GetEngineObject()->GetMoveParent() ? (C_BaseEntity*)GetEngineObject()->GetMoveParent()->GetOuter() : NULL;
 	if ( !pEnt )
 		return;
 
@@ -511,7 +511,7 @@ void C_EntityDissolve::ClientThink( void )
 #ifdef TF_CLIENT_DLL
 	bIsRagdoll = true;
 #else
-	C_BaseAnimating *pAnimating = GetEngineObject()->GetMoveParent() ? GetEngineObject()->GetMoveParent()->GetOuter()->GetBaseAnimating() : NULL;
+	C_BaseAnimating *pAnimating = GetEngineObject()->GetMoveParent() ? ((C_BaseEntity*)GetEngineObject()->GetMoveParent()->GetOuter())->GetBaseAnimating() : NULL;
 	if (!pAnimating)
 		return;
 	bIsRagdoll = pAnimating->GetEngineObject()->IsRagdoll();
@@ -593,7 +593,7 @@ int C_EntityDissolve::DrawModel( int flags )
 	if ( gpGlobals->frametime == 0 || GetEngineObject()->IsReadyToDraw() == false)
 		return 0;
 
-	C_BaseAnimating *pAnimating = GetEngineObject()->GetMoveParent() ? GetEngineObject()->GetMoveParent()->GetOuter()->GetBaseAnimating() : NULL;
+	C_BaseAnimating *pAnimating = GetEngineObject()->GetMoveParent() ? ((C_BaseEntity*)GetEngineObject()->GetMoveParent()->GetOuter())->GetBaseAnimating() : NULL;
 	if ( pAnimating == NULL )
 		return 0;
 

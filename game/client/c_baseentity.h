@@ -100,9 +100,6 @@ enum CollideType_t
 
 struct serialentity_t;
 
-typedef CHandle<C_BaseEntity> EHANDLE; // The client's version of EHANDLE.
-
-
 // For entity creation on the client
 typedef C_BaseEntity* (*DISPATCHFUNCTION)( void );
 
@@ -181,7 +178,7 @@ public:
 	C_BaseEntity();
 	virtual							~C_BaseEntity();
 
-	virtual bool IsNetworkable(void) { return C_BaseEntity::IsServerEntity(); }
+	virtual bool IsNetworkable(void) { return entindex() >= 0 && entindex() < MAX_EDICTS; }
 	static int GetEngineObjectTypeStatic() { return ENGINEOBJECT_BASE; }
 	//static C_BaseEntity				*CreatePredictedEntityByName( const char *classname, const char *module, int line, bool persist = false );
 
@@ -540,7 +537,6 @@ public:
 	virtual void					GetAimEntOrigin(IClientEntity* pAttachedTo, Vector* pAbsOrigin, QAngle* pAbsAngles);
 
 	inline ClientEntityHandle_t		GetClientHandle() const { return ClientEntityHandle_t(GetRefEHandle()); }
-	inline bool						IsServerEntity(void);
 
 	virtual RenderGroup_t			GetRenderGroup();
 
@@ -708,18 +704,18 @@ public:
 	virtual bool			CanBePoweredUp(void) { return false; }
 	virtual bool			AttemptToPowerup(int iPowerup, float flTime, float flAmount = 0, C_BaseEntity* pAttacker = NULL, CDamageModifier* pDamageModifier = NULL) { return false; }
 
-	virtual void			StartTouch(C_BaseEntity* pOther);
-	virtual void			Touch(C_BaseEntity* pOther);
-	virtual void			EndTouch(C_BaseEntity* pOther);
+	virtual void			StartTouch(IClientEntity* pOther);
+	virtual void			Touch(IClientEntity* pOther);
+	virtual void			EndTouch(IClientEntity* pOther);
 
-	void (C_BaseEntity ::* m_pfnTouch)(C_BaseEntity* pOther);
+	void (C_BaseEntity ::* m_pfnTouch)(IClientEntity* pOther);
 
 	void					PhysicsStep(void);
 
 public:
 
-	void					StartGroundContact(CBaseEntity* ground);
-	void					EndGroundContact(CBaseEntity* ground);
+	void					StartGroundContact(IClientEntity* ground);
+	void					EndGroundContact(IClientEntity* ground);
 
 
 
@@ -1027,7 +1023,7 @@ public:
 	virtual C_BaseEntity 			*GetShadowUseOtherEntity( void ) const;
 	virtual void					SetShadowUseOtherEntity( C_BaseEntity *pEntity );
 
-
+	virtual C_BaseEntity*			BecomeRagdollOnClient() { return NULL; }
 	virtual bool					AddRagdollToFadeQueue( void ) { return true; }
 
 	// used by SourceTV since move-parents may be missing when child spawns.
@@ -1257,17 +1253,9 @@ inline const CParticleProperty *C_BaseEntity::ParticleProp() const
 	return &m_Particles;
 }
 
-//-----------------------------------------------------------------------------
-// Purpose: Returns whether this entity was created on the client.
-//-----------------------------------------------------------------------------
-inline bool C_BaseEntity::IsServerEntity( void )
-{
-	return entindex() >= 0 && entindex() < MAX_EDICTS;
-}
-
 inline C_BaseEntity	*C_BaseEntity::Instance( IClientEntity *ent )
 {
-	return ent ? ent->GetBaseEntity() : NULL;
+	return ent ? dynamic_cast<C_BaseEntity*>(ent->GetBaseEntity()) : NULL;
 }
 
 // For debugging shared code
@@ -1440,9 +1428,9 @@ public:
 			if (!m_CurBaseEntity.IsValid()) {
 				break;
 			}
-			C_BaseEntity* pRet = EntityList()->GetBaseEntityFromHandle(m_CurBaseEntity);
+			IClientEntity* pRet = EntityList()->GetBaseEntityFromHandle(m_CurBaseEntity);
 			if (!pRet->IsDormant())
-				return pRet;
+				return dynamic_cast<C_BaseEntity*>(pRet);
 		}
 
 		return NULL;

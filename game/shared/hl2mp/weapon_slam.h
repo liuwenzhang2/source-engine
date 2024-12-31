@@ -55,9 +55,10 @@ public:
 	void				WeaponIdle( void );
 	void				Weapon_Switch( void );
 	void				SLAMThink( void );
-	
+#ifdef GAME_DLL
 	void				SetPickupTouch( void );
-	void				SlamTouch( CBaseEntity *pOther );	// default weapon touch
+	void				SlamTouch(CBaseEntity* pOther);	// default weapon touch
+#endif // GAME_DLL
 	void				ItemPostFrame( void );	
 	bool				Reload( void );
 	void				SetSlamState( int newState );

@@ -438,7 +438,7 @@ int	C_StriderFX::DrawModel( int )
 	if ( !m_active )
 		return 1;
 
-	C_BaseEntity *ent = EntityList()->GetEnt( m_entityIndex );
+	C_BaseEntity *ent = (C_BaseEntity*)EntityList()->GetEnt( m_entityIndex );
 	if ( ent )
 	{
 		QAngle angles;

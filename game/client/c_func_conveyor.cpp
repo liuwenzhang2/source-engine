@@ -89,7 +89,7 @@ bool CConveyorMaterialProxy::Init( IMaterial *pMaterial, KeyValues *pKeyValues )
 C_BaseEntity *CConveyorMaterialProxy::BindArgToEntity( void *pArg )
 {
 	IClientRenderable *pRend = (IClientRenderable *)pArg;
-	return pRend->GetIClientUnknown()->GetBaseEntity();
+	return (C_BaseEntity*)pRend->GetIClientUnknown()->GetBaseEntity();
 }
 
 void CConveyorMaterialProxy::OnBind( void *pC_BaseEntity )

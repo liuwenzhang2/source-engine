@@ -536,7 +536,7 @@ int CNewParticleEffect::DrawModel( int flags )
 	if ( flags & STUDIO_TRANSPARENCY )
 	{
 		int viewentity = render->GetViewEntity();
-		C_BaseEntity *pCameraObject = EntityList()->GetEnt( viewentity );
+		C_BaseEntity *pCameraObject = (C_BaseEntity*)EntityList()->GetEnt( viewentity );
 		// apply logic that lets you skip rendering a system if the camera is attached to its entity
 		if ( pCameraObject &&
 			 ( m_pDef->m_nSkipRenderControlPoint != -1 ) &&
@@ -550,7 +550,7 @@ int CNewParticleEffect::DrawModel( int flags )
 				{
 					if ( pEntity == pCameraObject )
 						return 0;
-					C_BaseEntity *pRootMove = pEntity->GetEngineObject()->GetRootMoveParent()? pEntity->GetEngineObject()->GetRootMoveParent()->GetOuter():NULL;
+					C_BaseEntity* pRootMove = pEntity->GetEngineObject()->GetRootMoveParent() ? (C_BaseEntity*)pEntity->GetEngineObject()->GetRootMoveParent()->GetOuter() : NULL;
 					if ( pRootMove == pCameraObject )
 						return 0;
 
