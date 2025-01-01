@@ -32,7 +32,7 @@ public:
 	void	Event_Killed( const CTakeDamageInfo &info );
 	bool	Event_Gibbed( const CTakeDamageInfo &info );
 	void	HuntThink( void );
-	void	SuperBounceTouch( CBaseEntity *pOther );
+	void	SuperBounceTouch( IServerEntity *pOther );
 
 	virtual void ResolveFlyCollisionCustom( trace_t &trace, Vector &vecVelocity );
 

@@ -226,7 +226,7 @@ public:
 	virtual void Event_Killed( const CTakeDamageInfo &info );
 	virtual void HandleAnimEvent( animevent_t *event );
 	virtual void OnNavAreaChanged( CNavArea *enteredArea, CNavArea *leftArea );	// invoked (by UpdateLastKnownArea) when we enter a new nav area (or it is reset to NULL)
-	virtual void Touch( CBaseEntity *other );
+	virtual void Touch( IServerEntity *other );
 	virtual void Weapon_Equip( CBaseCombatWeapon *weapon );						// for OnPickUp
 	virtual	void Weapon_Drop( CBaseCombatWeapon *weapon, const Vector *target, const Vector *velocity );	// for OnDrop
 	virtual void OnMainActivityComplete( Activity newActivity, Activity oldActivity );
@@ -761,7 +761,7 @@ inline void NextBotPlayer< PlayerType >::OnNavAreaChanged( CNavArea *enteredArea
 
 //----------------------------------------------------------------------------------------------------------
 template < typename PlayerType >
-inline void NextBotPlayer< PlayerType >::Touch( CBaseEntity *other )
+inline void NextBotPlayer< PlayerType >::Touch( IServerEntity *other )
 {
 	if ( ShouldTouch( other ) )
 	{

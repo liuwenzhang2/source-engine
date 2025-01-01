@@ -132,7 +132,7 @@ public:
 
 	void 			PickupItem( CBaseEntity *pItem );
 
-	void 			SimpleUse( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value );
+	void 			SimpleUse( IServerEntity *pActivator, IServerEntity *pCaller, USE_TYPE useType, float value );
 
 	bool			IgnorePlayerPushing( void );
 
@@ -178,7 +178,7 @@ public:
 	bool 			TargetOrder( CBaseEntity *pTarget, CAI_BaseNPC **Allies, int numAllies );
 	void 			MoveOrder( const Vector &vecDest, CAI_BaseNPC **Allies, int numAllies );
 	void			OnMoveOrder();
-	void 			CommanderUse( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value );
+	void 			CommanderUse( IServerEntity *pActivator, IServerEntity *pCaller, USE_TYPE useType, float value );
 	bool			ShouldSpeakRadio( CBaseEntity *pListener );
 	void			OnMoveToCommandGoalFailed();
 	void			AddToPlayerSquad();

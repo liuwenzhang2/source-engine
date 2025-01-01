@@ -115,7 +115,7 @@ public:
 	void	ThinkBecomeSolid( void );
 	void	SetGracePeriod( float duration );
 
-	void	BugBaitTouch( CBaseEntity *pOther );
+	void	BugBaitTouch( IServerEntity *pOther );
 
 	// Activate nearby bugbait targets
 	static  bool	ActivateBugbaitTargets( CBaseEntity *pOwner, Vector vecOrigin, bool bSqueezed );

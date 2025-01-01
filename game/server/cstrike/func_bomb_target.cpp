@@ -42,7 +42,7 @@ void CBombTarget::Spawn()
 	SetUse( &CBombTarget::BombTargetUse );
 }
 
-void CBombTarget::BombTargetTouch( CBaseEntity* pOther )
+void CBombTarget::BombTargetTouch( IServerEntity* pOther )
 {
 	CCSPlayer *p = dynamic_cast< CCSPlayer* >( pOther );
 	if ( p )
@@ -60,7 +60,7 @@ void CBombTarget::BombTargetTouch( CBaseEntity* pOther )
 	}
 }
 
-void CBombTarget::BombTargetUse( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value )
+void CBombTarget::BombTargetUse( IServerEntity *pActivator, IServerEntity *pCaller, USE_TYPE useType, float value )
 {
 	//SUB_UseTargets( NULL, USE_TOGGLE, 0 );
 	DevMsg( 2, "BombTargetUse does nothing\n" );

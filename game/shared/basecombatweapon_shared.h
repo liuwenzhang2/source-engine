@@ -197,7 +197,7 @@ public:
 	// Weapon Pickup For Player
 #ifdef GAME_DLL
 	virtual void			SetPickupTouch( void );
-	virtual void 			DefaultTouch( CBaseEntity *pOther );	// default weapon touch
+	virtual void 			DefaultTouch( IServerEntity *pOther );	// default weapon touch
 	virtual void			GiveTo( CBaseEntity *pOther );
 #endif // GAME_DLL
 
@@ -446,7 +446,7 @@ public:
 	virtual int				UpdateTransmitState( void );
 
 	void					InputHideWeapon( inputdata_t &inputdata );
-	void					Use( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value );
+	void					Use( IServerEntity *pActivator, IServerEntity *pCaller, USE_TYPE useType, float value );
 
 	virtual CDmgAccumulator	*GetDmgAccumulator( void ) { return NULL; }
 

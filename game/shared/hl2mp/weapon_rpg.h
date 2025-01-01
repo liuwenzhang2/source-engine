@@ -48,7 +48,7 @@ public:
 	
 	void	Spawn( void );
 	void	Precache( void );
-	void	MissileTouch( CBaseEntity *pOther );
+	void	MissileTouch( IServerEntity *pOther );
 	void	Explode( void );
 	void	ShotDown( void );
 	void	AccelerateThink( void );
@@ -138,7 +138,7 @@ private:
 	void BeginSeekThink();
 	void AugerStartThink();
 	void ExplodeThink();
-	void APCMissileTouch( CBaseEntity *pOther );
+	void APCMissileTouch( IServerEntity *pOther );
 
 	float	m_flReachedTargetTime;
 	float	m_flIgnitionTime;

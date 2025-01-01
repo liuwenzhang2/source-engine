@@ -226,9 +226,9 @@ public:
 
 	// engine inputs
 	void Spawn( void );
-	void StartTouch( CBaseEntity *pOther );
-	void EndTouch( CBaseEntity *pOther );
-	void Use( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value );
+	void StartTouch( IServerEntity *pOther );
+	void EndTouch( IServerEntity *pOther );
+	void Use( IServerEntity *pActivator, IServerEntity *pCaller, USE_TYPE useType, float value );
 
 	// input filtering (use/touch/blocked)
 	bool PassesInputFilter( CBaseEntity *pOther, int filter );
@@ -293,11 +293,11 @@ void CTriggerBrush::Spawn( void )
 // Purpose: Called when an entity starts touching us.
 // Input  : pOther - the entity that is now touching us.
 //-----------------------------------------------------------------------------
-void CTriggerBrush::StartTouch( CBaseEntity *pOther )
+void CTriggerBrush::StartTouch( IServerEntity *pOther )
 {
-	if ( PassesInputFilter(pOther, m_iInputFilter) && !(m_iInputFilter & TRIGGER_IGNORETOUCH) )
+	if ( PassesInputFilter((CBaseEntity*)pOther, m_iInputFilter) && !(m_iInputFilter & TRIGGER_IGNORETOUCH) )
 	{
-		m_OnStartTouch.FireOutput( pOther, this );
+		m_OnStartTouch.FireOutput((CBaseEntity*)pOther, this );
 		if ( !m_iDontMessageParent )
 			BaseClass::StartTouch( pOther );
 	}
@@ -308,11 +308,11 @@ void CTriggerBrush::StartTouch( CBaseEntity *pOther )
 // Purpose: Called when an entity stops touching us.
 // Input  : pOther - the entity that was touching us.
 //-----------------------------------------------------------------------------
-void CTriggerBrush::EndTouch( CBaseEntity *pOther )
+void CTriggerBrush::EndTouch( IServerEntity *pOther )
 {
-	if ( PassesInputFilter(pOther, m_iInputFilter) && !(m_iInputFilter & TRIGGER_IGNORETOUCH) )
+	if ( PassesInputFilter((CBaseEntity*)pOther, m_iInputFilter) && !(m_iInputFilter & TRIGGER_IGNORETOUCH) )
 	{
-		m_OnEndTouch.FireOutput( pOther, this );
+		m_OnEndTouch.FireOutput((CBaseEntity*)pOther, this );
 
 		if ( !m_iDontMessageParent )
 			BaseClass::EndTouch( pOther );
@@ -327,11 +327,11 @@ void CTriggerBrush::EndTouch( CBaseEntity *pOther )
 //			useType - 
 //			value - 
 //-----------------------------------------------------------------------------
-void CTriggerBrush::Use( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value )
+void CTriggerBrush::Use( IServerEntity *pActivator, IServerEntity *pCaller, USE_TYPE useType, float value )
 {
-	if ( PassesInputFilter(pActivator, m_iInputFilter) && !(m_iInputFilter & TRIGGER_IGNOREUSE) )
+	if ( PassesInputFilter((CBaseEntity*)pActivator, m_iInputFilter) && !(m_iInputFilter & TRIGGER_IGNOREUSE) )
 	{
-		m_OnUse.FireOutput( pActivator, this );
+		m_OnUse.FireOutput((CBaseEntity*)pActivator, this );
 		if ( !m_iDontMessageParent )
 		{
 			BaseClass::Use( pActivator, pCaller, useType, value );

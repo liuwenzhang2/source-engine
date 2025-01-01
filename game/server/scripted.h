@@ -79,7 +79,7 @@ class CAI_ScriptedSequence : public CBaseEntity
 public:
 	void Spawn( void );
 	virtual void Blocked( CBaseEntity *pOther );
-	virtual void Touch( CBaseEntity *pOther );
+	virtual void Touch( IServerEntity *pOther );
 	virtual int	 ObjectCaps( void ) { return (BaseClass::ObjectCaps() & ~FCAP_ACROSS_TRANSITION); }
 	virtual void Activate( void );
 	virtual void UpdateOnRemove( void );

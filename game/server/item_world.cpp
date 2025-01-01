@@ -213,7 +213,7 @@ unsigned int CItem::PhysicsSolidMaskForEntity( void ) const
 	return BaseClass::PhysicsSolidMaskForEntity() | CONTENTS_PLAYERCLIP;
 }
 
-void CItem::Use( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value )
+void CItem::Use( IServerEntity *pActivator, IServerEntity *pCaller, USE_TYPE useType, float value )
 {
 	CBasePlayer *pPlayer = ToBasePlayer( pActivator );
 
@@ -395,7 +395,7 @@ bool CItem::ItemCanBeTouchedByPlayer( CBasePlayer *pPlayer )
 // Purpose: 
 // Input  : pOther - 
 //-----------------------------------------------------------------------------
-void CItem::ItemTouch( CBaseEntity *pOther )
+void CItem::ItemTouch( IServerEntity *pOther )
 {
 	// Vehicles can touch items + pick them up
 	if ( pOther->GetServerVehicle() )
@@ -417,7 +417,7 @@ void CItem::ItemTouch( CBaseEntity *pOther )
 	if ( ItemCanBeTouchedByPlayer( pPlayer ) == false )
 		return;
 
-	m_OnCacheInteraction.FireOutput(pOther, this);
+	m_OnCacheInteraction.FireOutput((CBaseEntity*)pOther, this);
 
 	// Can I even pick stuff up?
 	if ( !pPlayer->IsAllowedToPickupWeapons() )
@@ -432,7 +432,7 @@ void CItem::ItemTouch( CBaseEntity *pOther )
 
 	if ( MyTouch( pPlayer ) )
 	{
-		m_OnPlayerTouch.FireOutput(pOther, this);
+		m_OnPlayerTouch.FireOutput((CBaseEntity*)pOther, this);
 
 		SetTouch( NULL );
 		SetThink( NULL );

@@ -250,7 +250,7 @@ void CBaseGrenade::Event_Killed( const CTakeDamageInfo &info )
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-void CBaseGrenade::Use( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value )
+void CBaseGrenade::Use( IServerEntity *pActivator, IServerEntity *pCaller, USE_TYPE useType, float value )
 {
 	// Support player pickup
 	if ( useType == USE_TOGGLE )
@@ -271,7 +271,7 @@ void CBaseGrenade::Use( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE 
 //-----------------------------------------------------------------------------
 // Purpose: Timed grenade, this think is called when time runs out.
 //-----------------------------------------------------------------------------
-void CBaseGrenade::DetonateUse( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value )
+void CBaseGrenade::DetonateUse( IServerEntity *pActivator, IServerEntity *pCaller, USE_TYPE useType, float value )
 {
 	SetThink( &CBaseGrenade::Detonate );
 	GetEngineObject()->SetNextThink( gpGlobals->curtime );
@@ -318,7 +318,8 @@ void CBaseGrenade::Detonate( void )
 //
 // Contact grenade, explode when it touches something
 // 
-void CBaseGrenade::ExplodeTouch( CBaseEntity *pOther )
+#ifdef GAME_DLL
+void CBaseGrenade::ExplodeTouch( IServerEntity *pOther )
 {
 	trace_t		tr;
 	Vector		vecSpot;// trace starts here!
@@ -334,7 +335,7 @@ void CBaseGrenade::ExplodeTouch( CBaseEntity *pOther )
 
 	Explode( &tr, DMG_BLAST );
 }
-
+#endif // GAME_DLL
 
 void CBaseGrenade::DangerSoundThink( void )
 {
@@ -356,8 +357,8 @@ void CBaseGrenade::DangerSoundThink( void )
 	}
 }
 
-
-void CBaseGrenade::BounceTouch( CBaseEntity *pOther )
+#ifdef GAME_DLL
+void CBaseGrenade::BounceTouch( IServerEntity *pOther )
 {
 	if ( pOther->GetEngineObject()->IsSolidFlagSet(FSOLID_TRIGGER | FSOLID_VOLUME_CONTENTS) )
 		return;
@@ -367,7 +368,7 @@ void CBaseGrenade::BounceTouch( CBaseEntity *pOther )
 		return;
 
 	// only do damage if we're moving fairly fast
-	if ( (pOther->m_takedamage != DAMAGE_NO) && (m_flNextAttack < gpGlobals->curtime && GetEngineObject()->GetAbsVelocity().Length() > 100))
+	if ( (pOther->GetTakeDamage() != DAMAGE_NO) && (m_flNextAttack < gpGlobals->curtime && GetEngineObject()->GetAbsVelocity().Length() > 100))
 	{
 		if (m_hThrower)
 		{
@@ -426,10 +427,10 @@ void CBaseGrenade::BounceTouch( CBaseEntity *pOther )
 		GetEngineObject()->SetPlaybackRate(0);
 
 }
+#endif // GAME_DLL
 
-
-
-void CBaseGrenade::SlideTouch( CBaseEntity *pOther )
+#ifdef GAME_DLL
+void CBaseGrenade::SlideTouch( IServerEntity *pOther )
 {
 	// don't hit the guy that launched this grenade
 	if ( pOther == GetThrower() )
@@ -452,6 +453,7 @@ void CBaseGrenade::SlideTouch( CBaseEntity *pOther )
 		BounceSound();
 	}
 }
+#endif // GAME_DLL
 
 void CBaseGrenade ::BounceSound( void )
 {

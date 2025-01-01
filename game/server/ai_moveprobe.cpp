@@ -1327,7 +1327,7 @@ bool CAI_MoveProbe::FloorPoint( const Vector &vecStart, unsigned int collisionMa
 	if (trace.startsolid)
 	{
 		if ( trace.m_pEnt && 
-			 (((CBaseEntity*)trace.m_pEnt)->GetEngineObject()->GetMoveType() == MOVETYPE_VPHYSICS || ((CBaseEntity*)trace.m_pEnt)->IsNPC() ) &&
+			 (trace.m_pEnt->GetEngineObject()->GetMoveType() == MOVETYPE_VPHYSICS || trace.m_pEnt->IsNPC() ) &&
 			 ( vecStart - GetLocalOrigin() ).Length() < 0.1 )
 		{
 			fStartedInObject = true;

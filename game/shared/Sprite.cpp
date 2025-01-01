@@ -568,7 +568,7 @@ void CSprite::TurnOn( void )
 
 #if !defined( CLIENT_DLL )
 // DVS TODO: Obsolete Use handler
-void CSprite::Use( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value )
+void CSprite::Use( IServerEntity *pActivator, IServerEntity *pCaller, USE_TYPE useType, float value )
 {
 	int on = !GetEngineObject()->IsEffectActive( EF_NODRAW );
 	if ( ShouldToggle( useType, on ) )

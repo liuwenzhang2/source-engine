@@ -66,7 +66,7 @@ void CBaseHL1CombatWeapon::FallInit( void )
 
 	if ( tr.fraction < 1.0 )
 	{
-		GetEngineObject()->SetGroundEntity((CBaseEntity*)tr.m_pEnt ? ((CBaseEntity*)tr.m_pEnt)->GetEngineObject() : NULL);
+		GetEngineObject()->SetGroundEntity( tr.m_pEnt ? (IEngineObjectServer*)tr.m_pEnt->GetEngineObject() : NULL);
 	}
 
 	SetViewOffset( Vector(0,0,8) );

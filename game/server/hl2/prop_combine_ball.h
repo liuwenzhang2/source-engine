@@ -242,7 +242,7 @@ private:
 	void	InputDisable( inputdata_t &inputdata );
 
 	// Fire ball grabbed output
-	void	GrabBallTouch( CBaseEntity *pOther );
+	void	GrabBallTouch( IServerEntity *pOther );
 
 public:
 	bool m_bShooter;

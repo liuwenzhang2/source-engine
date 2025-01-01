@@ -4044,7 +4044,7 @@ void CAI_BaseNPC::NPCThink( void )
 // CAI_BaseNPC - USE - will make a npc angry at whomever
 // activated it.
 //=========================================================
-void CAI_BaseNPC::NPCUse ( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value )
+void CAI_BaseNPC::NPCUse ( IServerEntity *pActivator, IServerEntity *pCaller, USE_TYPE useType, float value )
 {
 	return;
 
@@ -6662,7 +6662,7 @@ void CAI_BaseNPC::CheckPhysicsContacts()
 	}
 }
 
-void CAI_BaseNPC::StartTouch( CBaseEntity *pOther )
+void CAI_BaseNPC::StartTouch( IServerEntity *pOther )
 {
 	BaseClass::StartTouch(pOther);
 
@@ -9822,7 +9822,7 @@ Vector CAI_BaseNPC::GetActualShootTrajectory( const Vector &shootOrigin )
 
 		AI_TraceLine(shootOrigin, vecEnd, MASK_SHOT, this, COLLISION_GROUP_NONE, &tr);
 
-		if( tr.fraction != 1.0 && tr.m_pEnt && ((CBaseEntity*)tr.m_pEnt)->m_takedamage != DAMAGE_NO )
+		if( tr.fraction != 1.0 && tr.m_pEnt && tr.m_pEnt->GetTakeDamage() != DAMAGE_NO )
 		{
 			// Hit something we can harm. Just shoot it.
 			return manipulator.GetResult();
@@ -12664,7 +12664,7 @@ bool CAI_BaseNPC::IsCoverPosition( const Vector &vecThreat, const Vector &vecPos
 
 	if( tr.fraction != 1.0 && hl2_episodic.GetBool() )
 	{
-		if(((CBaseEntity*)tr.m_pEnt)->GetEngineObject()->GetClassname() == GetEngineObject()->GetClassname())
+		if(tr.m_pEnt->GetEngineObject()->GetClassname() == GetEngineObject()->GetClassname())
 		{
 			// Don't hide behind buddies!
 			return false;

@@ -80,9 +80,9 @@ public:
 
 	bool TestCollision( const Ray_t &ray, unsigned int mask, trace_t& trace );
 	int	 ObjectCaps( void );
-	void Use( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value );
+	void Use( IServerEntity *pActivator, IServerEntity *pCaller, USE_TYPE useType, float value );
 	
-	void Touch( CBaseEntity *pOther );
+	void Touch( IServerEntity *pOther );
 
 	void TraceAttack( const CTakeDamageInfo &info, const Vector &vecDir, trace_t *ptr, CDmgAccumulator *pAccumulator );
 

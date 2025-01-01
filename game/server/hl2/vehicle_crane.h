@@ -122,7 +122,7 @@ public:
 	void			InitCraneSpeeds( void );
 	void			Think(void);
 	virtual int		ObjectCaps( void ) { return BaseClass::ObjectCaps() | FCAP_IMPULSE_USE; };
-	virtual void	Use( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value );
+	virtual void	Use( IServerEntity *pActivator, IServerEntity *pCaller, USE_TYPE useType, float value );
 	virtual void	DrawDebugGeometryOverlays( void );
 	
 	virtual bool PassengerShouldReceiveDamage( CTakeDamageInfo &info ) 

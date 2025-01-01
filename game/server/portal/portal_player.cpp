@@ -1948,7 +1948,7 @@ void CPortal_Player::UnDuck( void )
 // Input  : *pObject - The object to lift
 //			bLimitMassAndSize - check for mass/size limits
 //-----------------------------------------------------------------------------
-void CPortal_Player::PickupObject(CBaseEntity *pObject, bool bLimitMassAndSize )
+void CPortal_Player::PickupObject(IServerEntity *pObject, bool bLimitMassAndSize )
 {
 	// can't pick up what you're standing on
 	if ((GetEngineObject()->GetGroundEntity() ? GetEngineObject()->GetGroundEntity()->GetOuter() : NULL) == pObject)
@@ -1964,10 +1964,10 @@ void CPortal_Player::PickupObject(CBaseEntity *pObject, bool bLimitMassAndSize )
 	if ( pObject->HasNPCsOnIt() )
 		return;
 
-	PlayerPickupObject( this, pObject );
+	PlayerPickupObject( this, (CBaseEntity*)pObject );
 }
 
-void CPortal_Player::ForceDropOfCarriedPhysObjects( CBaseEntity *pOnlyIfHoldingThis )
+void CPortal_Player::ForceDropOfCarriedPhysObjects( IServerEntity *pOnlyIfHoldingThis )
 {
 	GetEnginePlayer()->SetHeldObjectOnOppositeSideOfPortal(false);
 	BaseClass::ForceDropOfCarriedPhysObjects( pOnlyIfHoldingThis );

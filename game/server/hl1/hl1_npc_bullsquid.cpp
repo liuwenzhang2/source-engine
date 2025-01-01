@@ -96,7 +96,7 @@ public:
 	void Precache( void );
 
 	static void Shoot( CBaseEntity *pOwner, Vector vecStart, Vector vecVelocity );
-	void Touch( CBaseEntity *pOther );
+	void Touch( IServerEntity *pOther );
 	void Animate( void );
 
 	int m_nSquidSpitSprite;
@@ -183,7 +183,7 @@ void CSquidSpit::Shoot( CBaseEntity *pOwner, Vector vecStart, Vector vecVelocity
 	te->SpriteSpray( filter, 0.0, &vecStart , &vecVelocity, pSpit->m_nSquidSpitSprite, 210, 25, 15 );
 }
 
-void CSquidSpit::Touch ( CBaseEntity *pOther )
+void CSquidSpit::Touch ( IServerEntity *pOther )
 {
 	trace_t tr;
 	int		iPitch;
@@ -231,7 +231,7 @@ void CSquidSpit::Touch ( CBaseEntity *pOther )
 	params.m_bWarnOnDirectWaveReference = true;
 	g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 
-	if ( !pOther->m_takedamage )
+	if ( !pOther->GetTakeDamage() )
 	{
 		// make a splat on the wall
 		UTIL_TraceLine(GetEngineObject()->GetAbsOrigin(), GetEngineObject()->GetAbsOrigin() + GetEngineObject()->GetAbsVelocity() * 10, MASK_SOLID, this, COLLISION_GROUP_NONE, &tr );

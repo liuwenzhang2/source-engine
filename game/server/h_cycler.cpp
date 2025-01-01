@@ -150,7 +150,7 @@ void CCycler::Think( void )
 //
 // CyclerUse - starts a rotation trend
 //
-void CCycler::Use ( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value )
+void CCycler::Use ( IServerEntity *pActivator, IServerEntity *pCaller, USE_TYPE useType, float value )
 {
 	m_animate = !m_animate;
 	if (m_animate)

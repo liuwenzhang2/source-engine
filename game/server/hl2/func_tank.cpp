@@ -1230,7 +1230,7 @@ void CFuncTank::ControllerPostFrame( void )
 		
 		UTIL_TraceHull( start, start + forward * 8192, -Vector(8,8,8), Vector(8,8,8), MASK_SHOT, this, COLLISION_GROUP_NONE, &tr );
 		
-		if( tr.m_pEnt && ((CBaseEntity*)tr.m_pEnt)->m_takedamage != DAMAGE_NO && (((CBaseEntity*)tr.m_pEnt)->GetEngineObject()->GetFlags() & FL_AIMTARGET) )
+		if( tr.m_pEnt && tr.m_pEnt->GetTakeDamage() != DAMAGE_NO && (tr.m_pEnt->GetEngineObject()->GetFlags() & FL_AIMTARGET) )
 		{
 			forward = ((CBaseEntity*)tr.m_pEnt)->WorldSpaceCenter() - start;
 			VectorNormalize( forward );
@@ -1507,7 +1507,7 @@ int CFuncTank::GetRandomBurst( void )
 //			useType - 
 //			value - 
 //-----------------------------------------------------------------------------
-void CFuncTank::Use( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value )
+void CFuncTank::Use( IServerEntity *pActivator, IServerEntity *pCaller, USE_TYPE useType, float value )
 {
 	if ( !IsControllable() )
 		return;
@@ -3730,7 +3730,7 @@ void CMortarShell::Impact( void )
 	CEffectData	data;
 
 	// Do an extra effect if we struck the world
-	if ( tr.m_pEnt && ((CBaseEntity*)tr.m_pEnt)->IsWorld() )
+	if ( tr.m_pEnt && tr.m_pEnt->IsWorld() )
 	{
 		data.m_flRadius = flRadius * 0.5f;
 		data.m_vNormal	= tr.plane.normal;

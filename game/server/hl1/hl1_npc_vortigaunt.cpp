@@ -579,7 +579,7 @@ void CNPC_Vortigaunt::ArmBeam( int side )
 	if ( flDist == 1.0 )
 		 return;
 
-	if( tr.m_pEnt && ((CBaseEntity*)tr.m_pEnt)->m_takedamage && !((CBaseEntity*)tr.m_pEnt)->IsNPC() )
+	if( tr.m_pEnt && tr.m_pEnt->GetTakeDamage() && !tr.m_pEnt->IsNPC())
 	{
 		CTakeDamageInfo info( this, this, 10, DMG_SHOCK );
 		CalculateMeleeDamageForce( &info, vecAim, tr.endpos );

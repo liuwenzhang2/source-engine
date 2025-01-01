@@ -1192,7 +1192,7 @@ void CBaseHelicopter::UpdateRotorSoundPitch( int iPitch )
 // Input   :
 // Output  :
 //------------------------------------------------------------------------------
-void CBaseHelicopter::FlyTouch( CBaseEntity *pOther )
+void CBaseHelicopter::FlyTouch( IServerEntity *pOther )
 {
 	// bounce if we hit something solid
 	if ( pOther->GetEngineObject()->GetSolid() == SOLID_BSP)
@@ -1212,7 +1212,7 @@ void CBaseHelicopter::FlyTouch( CBaseEntity *pOther )
 // Input   :
 // Output  :
 //------------------------------------------------------------------------------
-void CBaseHelicopter::CrashTouch( CBaseEntity *pOther )
+void CBaseHelicopter::CrashTouch( IServerEntity *pOther )
 {
 	// only crash if we hit something solid
 	if ( pOther->GetEngineObject()->GetSolid() == SOLID_BSP)

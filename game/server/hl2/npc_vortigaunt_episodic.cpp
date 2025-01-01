@@ -1214,9 +1214,9 @@ void CNPC_Vortigaunt::Precache()
 //-----------------------------------------------------------------------------
 // Purpose: Interpret a player +USE'ing us
 //-----------------------------------------------------------------------------
-void CNPC_Vortigaunt::Use( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value )
+void CNPC_Vortigaunt::Use( IServerEntity *pActivator, IServerEntity *pCaller, USE_TYPE useType, float value )
 {
-	m_OnPlayerUse.FireOutput( pActivator, pCaller );
+	m_OnPlayerUse.FireOutput( (CBaseEntity*)pActivator, (CBaseEntity*)pCaller );
 
 	// Foremost, try and heal a wounded player
 	if ( HealBehaviorAvailable() )
@@ -3279,7 +3279,7 @@ void CVortigauntChargeToken::SeekThink( void )
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-void CVortigauntChargeToken::SeekTouch( CBaseEntity	*pOther )
+void CVortigauntChargeToken::SeekTouch( IServerEntity	*pOther )
 {
 	// Make sure this is a player
 	CBasePlayer *pPlayer = ToBasePlayer( pOther );

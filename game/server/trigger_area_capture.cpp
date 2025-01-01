@@ -172,7 +172,7 @@ bool CTriggerAreaCapture::IsActive( void )
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-void CTriggerAreaCapture::StartTouch(CBaseEntity *pOther)
+void CTriggerAreaCapture::StartTouch(IServerEntity *pOther)
 {
 	BaseClass::StartTouch( pOther );
 
@@ -218,7 +218,7 @@ void CTriggerAreaCapture::StartTouch(CBaseEntity *pOther)
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-void CTriggerAreaCapture::EndTouch(CBaseEntity *pOther)
+void CTriggerAreaCapture::EndTouch(IServerEntity *pOther)
 {
 	if ( IsTouching( pOther ) && m_hPoint )
 	{
@@ -252,7 +252,7 @@ bool CTriggerAreaCapture::CaptureModeScalesWithPlayers() const
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-void CTriggerAreaCapture::AreaTouch( CBaseEntity *pOther )
+void CTriggerAreaCapture::AreaTouch( IServerEntity *pOther )
 {
 	if ( !IsActive() )
 		return;

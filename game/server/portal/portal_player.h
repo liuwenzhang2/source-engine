@@ -141,8 +141,8 @@ public:
 	//void SetupBones( matrix3x4_t *pBoneToWorld, int boneMask );
 
 	// physics interactions
-	virtual void PickupObject(CBaseEntity *pObject, bool bLimitMassAndSize );
-	virtual void ForceDropOfCarriedPhysObjects( CBaseEntity *pOnlyIfHoldingThis );
+	virtual void PickupObject(IServerEntity *pObject, bool bLimitMassAndSize );
+	virtual void ForceDropOfCarriedPhysObjects( IServerEntity *pOnlyIfHoldingThis );
 	virtual CBaseEntity* GetPlayerHeldEntity();
 	virtual IGrabControllerServer* GetGrabController();
 
@@ -233,7 +233,7 @@ public:
 #endif
 };
 
-inline CPortal_Player *ToPortalPlayer( CBaseEntity *pEntity )
+inline CPortal_Player *ToPortalPlayer( IServerEntity *pEntity )
 {
 	if ( !pEntity || !pEntity->IsPlayer() )
 		return NULL;

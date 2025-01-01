@@ -123,7 +123,7 @@ void CHandGrenade ::BounceSound( void )
 }
 
 
-void CHandGrenade::BounceTouch( CBaseEntity *pOther )
+void CHandGrenade::BounceTouch( IServerEntity *pOther )
 {
 	if ( pOther->GetEngineObject()->IsSolidFlagSet(FSOLID_TRIGGER | FSOLID_VOLUME_CONTENTS) )
 		return;
@@ -139,7 +139,7 @@ void CHandGrenade::BounceTouch( CBaseEntity *pOther )
 		GetEngineObject()->SetCollisionGroup( COLLISION_GROUP_DEBRIS );
 	}
 	// only do damage if we're moving fairly fast
-	if ( (pOther->m_takedamage != DAMAGE_NO) && (m_flNextAttack < gpGlobals->curtime && GetEngineObject()->GetAbsVelocity().Length() > 100))
+	if ( (pOther->GetTakeDamage() != DAMAGE_NO) && (m_flNextAttack < gpGlobals->curtime && GetEngineObject()->GetAbsVelocity().Length() > 100))
 	{
 		if ( GetThrower() )
 		{

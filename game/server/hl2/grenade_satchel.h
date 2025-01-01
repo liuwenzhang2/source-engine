@@ -30,9 +30,9 @@ public:
 	void			BounceSound( void );
 	void			UpdateSlideSound( void );
 	void			KillSlideSound(void);
-	void			SatchelTouch( CBaseEntity *pOther );
+	void			SatchelTouch( IServerEntity *pOther );
 	void			SatchelThink( void );
-	void			SatchelUse( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value );
+	void			SatchelUse( IServerEntity *pActivator, IServerEntity *pCaller, USE_TYPE useType, float value );
 
 	CSoundPatch*	m_soundSlide;
 	float			m_flSlideVolume;

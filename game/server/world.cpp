@@ -103,7 +103,7 @@ public:
 	// Need to apply static decals here to get them into the signon buffer for the server appropriately
 	virtual void Activate();
 
-	void	TriggerDecal( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value );
+	void	TriggerDecal( IServerEntity *pActivator, IServerEntity *pCaller, USE_TYPE useType, float value );
 
 	// Input handlers.
 	void	InputActivate( inputdata_t &inputdata );
@@ -161,7 +161,7 @@ void CDecal::Activate()
 	}
 }
 
-void CDecal::TriggerDecal ( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value )
+void CDecal::TriggerDecal ( IServerEntity *pActivator, IServerEntity *pCaller, USE_TYPE useType, float value )
 {
 	// this is set up as a USE function for info_decals that have targetnames, so that the
 	// decal doesn't get applied until it is fired. (usually by a scripted sequence)
@@ -300,7 +300,7 @@ public:
 	// Need to apply static decals here to get them into the signon buffer for the server appropriately
 	virtual void Activate();
 
-	void	TriggerDecal( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value );
+	void	TriggerDecal( IServerEntity *pActivator, IServerEntity *pCaller, USE_TYPE useType, float value );
 
 	// Input handlers.
 	void	InputActivate( inputdata_t &inputdata );
@@ -371,7 +371,7 @@ void CProjectedDecal::ProjectDecal( CRecipientFilter& filter )
 		&GetEngineObject()->GetAbsOrigin(), &GetEngineObject()->GetAbsAngles(), m_flDistance, m_nTexture );
 }
 
-void CProjectedDecal::TriggerDecal ( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value )
+void CProjectedDecal::TriggerDecal ( IServerEntity *pActivator, IServerEntity *pCaller, USE_TYPE useType, float value )
 {
 	CBroadcastRecipientFilter filter;
 
@@ -1197,7 +1197,7 @@ void CWorld::RadiusDamage(const CTakeDamageInfo& info, const Vector& vecSrcIn, f
 		pEntity->TraceAttackToTriggers(adjustedInfo, vecSrc, tr.endpos, dir);
 
 #if defined( GAME_DLL )
-		if (info.GetAttacker() && info.GetAttacker()->IsPlayer() && ToBaseCombatCharacter((CBaseEntity*)tr.m_pEnt))
+		if (info.GetAttacker() && info.GetAttacker()->IsPlayer() && ToBaseCombatCharacter((IServerEntity*)tr.m_pEnt))
 		{
 
 			// This is a total hack!!!

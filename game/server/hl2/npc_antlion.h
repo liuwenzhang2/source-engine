@@ -102,7 +102,7 @@ public:
 	void		GatherConditions( void );
 	void		PrescheduleThink( void );
 	void		ZapThink( void );
-	void		BurrowUse( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value );
+	void		BurrowUse( IServerEntity *pActivator, IServerEntity *pCaller, USE_TYPE useType, float value );
 	bool		CreateVPhysics();
 				
 	bool		IsJumpLegal( const Vector &startPos, const Vector &apex, const Vector &endPos ) const;
@@ -117,7 +117,7 @@ public:
 	bool		ShouldHearBugbait( void ) { return ( m_bIgnoreBugbait == false ); }
 	int			SelectSchedule( void );
 
-	void		Touch( CBaseEntity *pOther );
+	void		Touch( IServerEntity *pOther );
 
 	virtual int		RangeAttack1Conditions( float flDot, float flDist );
 	virtual int		MeleeAttack1Conditions( float flDot, float flDist );

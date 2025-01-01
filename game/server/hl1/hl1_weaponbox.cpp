@@ -21,7 +21,7 @@ public:
 	void Spawn( void );
 	void Precache( void );
 	bool KeyValue( const char *szKeyName, const char *szValue );
-	void BoxTouch( CBaseEntity *pPlayer );
+	void BoxTouch( IServerEntity *pPlayer );
 
 	DECLARE_DATADESC();
 
@@ -82,7 +82,7 @@ void CWeaponBox::Precache( void )
 }
 
 
-void CWeaponBox::BoxTouch( CBaseEntity *pOther )
+void CWeaponBox::BoxTouch( IServerEntity *pOther )
 {
 	if ( !(GetEngineObject()->GetFlags() & FL_ONGROUND ) )
 	{
@@ -118,7 +118,7 @@ void CWeaponBox::BoxTouch( CBaseEntity *pOther )
 		}
 	}
 
-	CPASAttenuationFilter filter( pOther, "Item.Pickup" );
+	CPASAttenuationFilter filter( (CBaseEntity*)pOther, "Item.Pickup" );
 	g_pSoundEmitterSystem->EmitSound( filter, pOther->entindex(), "Item.Pickup" );
 
 	SetTouch(NULL);

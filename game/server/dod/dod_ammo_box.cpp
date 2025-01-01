@@ -72,7 +72,7 @@ void CAmmoBox::FlyThink( void )
 	SetOwnerEntity( NULL );	//so our owner can pick it back up
 }
 
-void CAmmoBox::BoxTouch( CBaseEntity *pOther )
+void CAmmoBox::BoxTouch( IServerEntity *pOther )
 {
 	Assert( pOther );
 

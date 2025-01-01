@@ -295,7 +295,7 @@ void NextBotCombatCharacter::DoThink( void )
 
 
 //----------------------------------------------------------------------------------------------------------
-void NextBotCombatCharacter::Touch( CBaseEntity *other )
+void NextBotCombatCharacter::Touch( IServerEntity *other )
 {
 	if ( ShouldTouch( other ) )
 	{
@@ -304,9 +304,9 @@ void NextBotCombatCharacter::Touch( CBaseEntity *other )
 		result = GetEngineObject()->GetTouchTrace();
 
 		// OnContact refers to *physical* contact, not triggers or other non-physical entities
-		if ( result.DidHit() || other->MyCombatCharacterPointer() != NULL )
+		if ( result.DidHit() || ((CBaseEntity*)other)->MyCombatCharacterPointer() != NULL )
 		{
-			OnContact( other, &result );
+			OnContact((CBaseEntity*)other, &result );
 		}
 	}
 	

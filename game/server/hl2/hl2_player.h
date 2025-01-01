@@ -238,9 +238,9 @@ public:
 	virtual bool		CanBreatheUnderwater() const { return m_HL2Local.m_flSuitPower > 0.0f; }
 
 	// physics interactions
-	virtual void		PickupObject( CBaseEntity *pObject, bool bLimitMassAndSize );
+	virtual void		PickupObject( IServerEntity *pObject, bool bLimitMassAndSize );
 	virtual	bool		IsHoldingEntity( CBaseEntity *pEnt );
-	virtual void		ForceDropOfCarriedPhysObjects( CBaseEntity *pOnlyIfHoldindThis );
+	virtual void		ForceDropOfCarriedPhysObjects( IServerEntity *pOnlyIfHoldindThis );
 	virtual float		GetHeldObjectMass( IPhysicsObject *pHeldObject );
 	virtual CBaseEntity* GetPlayerHeldEntity();
 

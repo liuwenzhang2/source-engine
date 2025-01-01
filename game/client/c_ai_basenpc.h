@@ -24,7 +24,7 @@ public:
 
 	C_AI_BaseNPC();
 	virtual unsigned int	PhysicsSolidMaskForEntity( void ) const;
-	virtual bool			IsNPC( void ) { return true; }
+	virtual bool			IsNPC( void ) const { return true; }
 	bool					IsMoving( void ){ return m_bIsMoving; }
 	bool					ShouldAvoidObstacle( void ){ return m_bPerformAvoidance; }
 	virtual bool			AddRagdollToFadeQueue( void ) { return m_bFadeCorpse; }

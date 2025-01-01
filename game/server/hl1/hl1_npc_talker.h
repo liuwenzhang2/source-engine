@@ -70,7 +70,7 @@ public:
 	int				PlayScriptedSentence( const char *pszSentence, float delay, float volume, soundlevel_t soundlevel, bool bConcurrent, CBaseEntity *pListener );
 
 	
-	void			Touch( CBaseEntity *pOther );
+	void			Touch( IServerEntity *pOther );
 
 	float			PickLookTarget( bool bExcludePlayers = false, float minTime = 1.5, float maxTime = 2.5 );
 
@@ -84,7 +84,7 @@ public:
 	bool IsValidSpeechTarget( int flags, CBaseEntity *pEntity );
 
 protected:
-	virtual void 	FollowerUse( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value );
+	virtual void 	FollowerUse( IServerEntity *pActivator, IServerEntity *pCaller, USE_TYPE useType, float value );
 	int FIdleSpeak ( void );
 
 private:

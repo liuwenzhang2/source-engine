@@ -28,7 +28,7 @@ class CProp_Portal_Shared  //defined as a class to make intellisense more intell
 public:
 	//static void UpdatePortalTransformationMatrix( const matrix3x4_t &localToWorld, const matrix3x4_t &remoteToWorld, VMatrix *pMatrix );
 
-	static bool IsEntityTeleportable( CBaseEntity *pEntity );
+	static bool IsEntityTeleportable( IHandleEntity *pEntity );
 	//static CProp_Portal *GetPortal1( bool bCreateIfNotFound = false );
 	//static CProp_Portal *GetPortal2( bool bCreateIfNotFound = false );
 

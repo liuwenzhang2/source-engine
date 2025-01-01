@@ -87,7 +87,7 @@ public:
 
 	void Start ( void );
 	void Cycle ( void );
-	void HitTouch( CBaseEntity *pOther );
+	void HitTouch( IServerEntity *pOther );
 
 	void HandleAnimEvent( animevent_t *pEvent );
 	float HearingSensitivity( void ) { return 2.0; };
@@ -921,7 +921,7 @@ void CNPC_Tentacle::HandleAnimEvent( animevent_t *pEvent )
 	}
 }
 
-void CNPC_Tentacle::HitTouch( CBaseEntity *pOther )
+void CNPC_Tentacle::HitTouch( IServerEntity *pOther )
 {
 	if (m_flHitTime > gpGlobals->curtime)
 		return;
@@ -933,7 +933,7 @@ void CNPC_Tentacle::HitTouch( CBaseEntity *pOther )
 	//Right now the BoneFollower will always be hit in box 0, and 
 	//will pass that to us. Make *any* touch by the physics objects a kill
 	//as the ragdoll only covers the top portion of the tentacle.
-	if ( pOther->m_takedamage )
+	if ( pOther->GetTakeDamage() )
 	{
 		CTakeDamageInfo info( this, this, m_iHitDmg, DMG_CLUB );
 

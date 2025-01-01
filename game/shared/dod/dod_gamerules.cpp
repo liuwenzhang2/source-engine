@@ -5221,7 +5221,7 @@ public:
 	virtual bool KeyValue( const char *szKeyName, const char *szValue ) ;
 	virtual bool ShouldCollide( int collisionGroup, int contentsMask ) const;
 
-	void WallTouch( CBaseEntity *pOther );
+	void WallTouch( IServerEntity *pOther );
 
 	void DrawThink( void );
 
@@ -5336,7 +5336,7 @@ bool CFuncTeamWall::ShouldCollide( int collisionGroup, int contentsMask ) const
 	return bShouldCollide;
 }
 
-void CFuncTeamWall::WallTouch( CBaseEntity *pOther )
+void CFuncTeamWall::WallTouch( IServerEntity *pOther )
 {
 	if ( !m_bShowWarning )
 		return;
@@ -5394,7 +5394,7 @@ void CFuncTeamWall::DrawThink( void )
 		virtual int		ShouldTransmit( const CCheckTransmitInfo *pInfo );
 		virtual bool	ShouldCollide( int collisionGroup, int contentsMask ) const;
 		
-		void WallTouch( CBaseEntity *pOther );
+		void WallTouch( IServerEntity *pOther );
 
 		void SetActive( bool bActive );
 
@@ -5494,7 +5494,7 @@ void CFuncTeamWall::DrawThink( void )
 		return false;
 	}
 
-	void CFuncNewTeamWall::WallTouch( CBaseEntity *pOther )
+	void CFuncNewTeamWall::WallTouch( IServerEntity *pOther )
 	{
 		//if ( !m_bShowWarning )
 		//	return;

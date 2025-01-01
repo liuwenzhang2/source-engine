@@ -18,7 +18,7 @@ public:
 	DECLARE_DATADESC();
 
 	virtual void Spawn( void );
-	void EXPORT Touch( CBaseEntity *pOther );
+	void EXPORT Touch( IServerEntity *pOther );
 
 	bool IsActive( void ) { return !m_bDisabled; }
 
@@ -70,7 +70,7 @@ void CDODBombDispenser::Spawn( void )
 	Assert( pIcon );
 }
 
-void CDODBombDispenser::Touch( CBaseEntity *pOther )
+void CDODBombDispenser::Touch( IServerEntity *pOther )
 {
 	if ( m_bDisabled )
 		return;

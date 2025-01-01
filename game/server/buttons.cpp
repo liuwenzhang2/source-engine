@@ -514,7 +514,7 @@ bool CBaseButton::OnUseLocked( CBaseEntity *pActivator )
 //			useType - 
 //			value - 
 //-----------------------------------------------------------------------------
-void CBaseButton::ButtonUse( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value )
+void CBaseButton::ButtonUse( IServerEntity *pActivator, IServerEntity *pCaller, USE_TYPE useType, float value )
 {
 	// Ignore touches if button is moving, or pushed-in and waiting to auto-come-out.
 	// UNDONE: Should this use ButtonResponseToTouch() too?
@@ -523,11 +523,11 @@ void CBaseButton::ButtonUse( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_
 
 	if (m_bLocked)
 	{
-		OnUseLocked( pActivator );
+		OnUseLocked( (CBaseEntity*)pActivator );
 		return;
 	}
 
-	m_hActivator = pActivator;
+	m_hActivator = (CBaseEntity*)pActivator;
 
 	if ( m_toggle_state == TS_AT_TOP)
 	{
@@ -595,20 +595,20 @@ CBaseButton::BUTTON_CODE CBaseButton::ButtonResponseToTouch( void )
 // Purpose: Touch function that activates the button if it responds to touch.
 // Input  : pOther - The entity that touched us.
 //-----------------------------------------------------------------------------
-void CBaseButton::ButtonTouch( CBaseEntity *pOther )
+void CBaseButton::ButtonTouch( IServerEntity *pOther )
 {
 	// Ignore touches by anything but players
 	if ( !pOther->IsPlayer() )
 		return;
 
-	m_hActivator = pOther;
+	m_hActivator = (CBaseEntity*)pOther;
 
 	BUTTON_CODE code = ButtonResponseToTouch();
 
 	if ( code == BUTTON_NOTHING )
 		return;
 
-	if (!UTIL_IsMasterTriggered(m_sMaster, pOther) || m_bLocked)
+	if (!UTIL_IsMasterTriggered(m_sMaster, (CBaseEntity*)pOther) || m_bLocked)
 	{
 		// play button locked sound
 		PlayLockSounds(this, &m_ls, TRUE, TRUE);
@@ -1307,14 +1307,14 @@ void CMomentaryRotButton::SetPositionMoveDone(void)
 //			useType - 
 //			value - 
 //-----------------------------------------------------------------------------
-void CMomentaryRotButton::Use( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value )
+void CMomentaryRotButton::Use( IServerEntity *pActivator, IServerEntity *pCaller, USE_TYPE useType, float value )
 {
 	if ( m_bDisabled == true )
 		return;
 
 	if (m_bLocked)
 	{
-		if ( OnUseLocked( pActivator ) && GetEngineObject()->HasSpawnFlags( SF_BUTTON_JIGGLE_ON_USE_LOCKED ) )
+		if ( OnUseLocked( (CBaseEntity*)pActivator ) && GetEngineObject()->HasSpawnFlags( SF_BUTTON_JIGGLE_ON_USE_LOCKED ) )
 		{
 			// Jiggle two degrees.
 			float flDist = 2.0 / m_flMoveDistance;

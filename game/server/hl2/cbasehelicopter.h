@@ -95,8 +95,8 @@ public:
 	virtual void GatherEnemyConditions( CBaseEntity *pEnemy );
 	virtual bool ChooseEnemy( void );
 	virtual void HelicopterPostThink( void ) { };
-	virtual void FlyTouch( CBaseEntity *pOther );
-	virtual void CrashTouch( CBaseEntity *pOther );
+	virtual void FlyTouch( IServerEntity *pOther );
+	virtual void CrashTouch( IServerEntity *pOther );
 	virtual void HelicopterThink( void );
 	virtual void DyingThink( void );
 	virtual void NullThink( void );

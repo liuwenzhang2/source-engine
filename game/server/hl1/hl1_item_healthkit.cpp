@@ -162,7 +162,7 @@ public:
 	void Off(void);
 	void Recharge(void);
 	bool KeyValue(  const char *szKeyName, const char *szValue );
-	void Use( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value );
+	void Use( IServerEntity *pActivator, IServerEntity *pCaller, USE_TYPE useType, float value );
 	virtual int	ObjectCaps( void ) { return BaseClass::ObjectCaps() | m_iCaps; }
 
 	float m_flNextCharge; 
@@ -267,7 +267,7 @@ void CWallHealth::Precache(void)
 //			useType - 
 //			value - 
 //-----------------------------------------------------------------------------
-void CWallHealth::Use( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value )
+void CWallHealth::Use( IServerEntity *pActivator, IServerEntity *pCaller, USE_TYPE useType, float value )
 { 
 	// Make sure that we have a caller
 	if (!pActivator)

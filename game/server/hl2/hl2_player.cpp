@@ -1423,9 +1423,9 @@ bool CHL2_Player::CommanderFindGoal( commandgoal_t *pGoal )
 		return false;
 	}
 
-	if (((CBaseEntity*)tr.m_pEnt)->IsNPC() && ((CAI_BaseNPC *)(tr.m_pEnt))->IsCommandable() )
+	if (tr.m_pEnt->IsNPC() && ((CAI_BaseNPC *)(tr.m_pEnt))->IsCommandable() )
 	{
-		pGoal->m_vecGoalLocation = ((CBaseEntity*)tr.m_pEnt)->GetEngineObject()->GetAbsOrigin();
+		pGoal->m_vecGoalLocation = tr.m_pEnt->GetEngineObject()->GetAbsOrigin();
 	}
 	else
 	{
@@ -3186,7 +3186,7 @@ bool CHL2_Player::Weapon_CanSwitchTo( CBaseCombatWeapon *pWeapon )
 	return true;
 }
 
-void CHL2_Player::PickupObject( CBaseEntity *pObject, bool bLimitMassAndSize )
+void CHL2_Player::PickupObject( IServerEntity *pObject, bool bLimitMassAndSize )
 {
 	// can't pick up what you're standing on
 	if ((GetEngineObject()->GetGroundEntity() ? GetEngineObject()->GetGroundEntity()->GetOuter() : NULL) == pObject)
@@ -3202,7 +3202,7 @@ void CHL2_Player::PickupObject( CBaseEntity *pObject, bool bLimitMassAndSize )
 	if ( pObject->HasNPCsOnIt() )
 		return;
 
-	PlayerPickupObject( this, pObject );
+	PlayerPickupObject( this, (CBaseEntity*)pObject );
 }
 
 //-----------------------------------------------------------------------------
@@ -3227,12 +3227,12 @@ float CHL2_Player::GetHeldObjectMass( IPhysicsObject *pHeldObject )
 //-----------------------------------------------------------------------------
 // Purpose: Force the player to drop any physics objects he's carrying
 //-----------------------------------------------------------------------------
-void CHL2_Player::ForceDropOfCarriedPhysObjects( CBaseEntity *pOnlyIfHoldingThis )
+void CHL2_Player::ForceDropOfCarriedPhysObjects( IServerEntity *pOnlyIfHoldingThis )
 {
 	if (EntityList()->PhysIsInCallback() )
 	{
 		variant_t value;
-		g_EventQueue.AddEvent( this, "ForceDropPhysObjects", value, 0.01f, pOnlyIfHoldingThis, this );
+		g_EventQueue.AddEvent( this, "ForceDropPhysObjects", value, 0.01f, (CBaseEntity*)pOnlyIfHoldingThis, this );
 		return;
 	}
 

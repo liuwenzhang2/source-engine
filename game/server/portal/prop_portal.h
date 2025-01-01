@@ -96,9 +96,9 @@ public:
 	void					PunchPenetratingPlayer( CBaseEntity *pPlayer ); // adds outward force to player intersecting the portal plane
 	void					PunchAllPenetratingPlayers( void ); // adds outward force to player intersecting the portal plane
 
-	virtual void			StartTouch( CBaseEntity *pOther );
-	virtual void			Touch( CBaseEntity *pOther ); 
-	virtual void			EndTouch( CBaseEntity *pOther );
+	virtual void			StartTouch( IServerEntity *pOther );
+	virtual void			Touch( IServerEntity *pOther ); 
+	virtual void			EndTouch( IServerEntity *pOther );
 	bool					ShouldTeleportTouchingEntity( CBaseEntity *pOther ); //assuming the entity is or was just touching the portal, check for teleportation conditions
 	void					TeleportTouchingEntity( CBaseEntity *pOther );
 	void					InputSetActivatedState( inputdata_t &inputdata );
@@ -110,7 +110,7 @@ public:
 
 	//void					SendInteractionMessage( CBaseEntity *pEntity, bool bEntering ); //informs clients that the entity is interacting with a portal (mostly used for clip planes)
 
-	bool					SharedEnvironmentCheck( CBaseEntity *pEntity ); //does all testing to verify that the object is better handled with this portal instead of the other
+	bool					SharedEnvironmentCheck( IServerEntity *pEntity ); //does all testing to verify that the object is better handled with this portal instead of the other
 
 
 

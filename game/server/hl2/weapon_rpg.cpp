@@ -403,7 +403,7 @@ void CMissile::Explode( void )
 // Purpose: 
 // Input  : *pOther - 
 //-----------------------------------------------------------------------------
-void CMissile::MissileTouch( CBaseEntity *pOther )
+void CMissile::MissileTouch( IServerEntity *pOther )
 {
 	Assert( pOther );
 	
@@ -411,7 +411,7 @@ void CMissile::MissileTouch( CBaseEntity *pOther )
 	if ( pOther->GetEngineObject()->IsSolidFlagSet(FSOLID_TRIGGER|FSOLID_VOLUME_CONTENTS) && pOther->GetEngineObject()->GetCollisionGroup() != COLLISION_GROUP_WEAPON )
 	{
 		// Some NPCs are triggers that can take damage (like antlion grubs). We should hit them.
-		if ( ( pOther->m_takedamage == DAMAGE_NO ) || ( pOther->m_takedamage == DAMAGE_EVENTS_ONLY ) )
+		if ( ( pOther->GetTakeDamage() == DAMAGE_NO) || (pOther->GetTakeDamage() == DAMAGE_EVENTS_ONLY))
 			return;
 	}
 
@@ -1042,7 +1042,7 @@ void CAPCMissile::AimAtSpecificTarget( CBaseEntity *pTarget )
 // Purpose: 
 // Input  : *pOther - 
 //-----------------------------------------------------------------------------
-void CAPCMissile::APCMissileTouch( CBaseEntity *pOther )
+void CAPCMissile::APCMissileTouch( IServerEntity *pOther )
 {
 	Assert( pOther );
 	if ( !pOther->GetEngineObject()->IsSolid() && !pOther->GetEngineObject()->IsSolidFlagSet(FSOLID_VOLUME_CONTENTS) )
@@ -1983,7 +1983,7 @@ void CWeaponRPG::UpdateLaserPosition( Vector vecMuzzlePos, Vector vecEndPos )
 		{
 			CBaseEntity *pHit = (CBaseEntity*)tr.m_pEnt;
 
-			if ( ( pHit != NULL ) && ( pHit->m_takedamage ) )
+			if ( ( pHit != NULL ) && ( pHit->GetTakeDamage() ) )
 			{
 				m_hLaserDot->SetTargetEntity( pHit );
 			}

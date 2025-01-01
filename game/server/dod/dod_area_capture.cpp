@@ -120,7 +120,7 @@ bool CAreaCapture::IsActive( void )
 	return !m_bDisabled;
 }
 
-void CAreaCapture::AreaTouch( CBaseEntity *pOther )
+void CAreaCapture::AreaTouch( IServerEntity *pOther )
 {
 	//if they are touching, set their SIGNAL flag on, and their m_iCapAreaNum to ours
 	//then in think do all the scoring

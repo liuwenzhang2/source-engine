@@ -94,7 +94,7 @@ void CWindowPane::Precache( void )
 // Purpose: 
 // Input  : pOther - 
 //-----------------------------------------------------------------------------
-void CWindowPane::PaneTouch( CBaseEntity *pOther )
+void CWindowPane::PaneTouch( IServerEntity *pOther )
 {
 	if (pOther &&
 		pOther->GetEngineObject()->GetCollisionGroup() != COLLISION_GROUP_BREAKABLE_GLASS)
@@ -254,7 +254,7 @@ void CBreakableSurface::Precache(void)
 // Input   :
 // Output  :
 //------------------------------------------------------------------------------
-void CBreakableSurface::SurfaceTouch( CBaseEntity *pOther )
+void CBreakableSurface::SurfaceTouch( IServerEntity *pOther )
 {
 	// If tile only break if object is moving fast
 	if (m_nSurfaceType == SHATTERSURFACE_TILE)
@@ -300,7 +300,7 @@ void CBreakableSurface::SurfaceTouch( CBaseEntity *pOther )
 	// If I'm not broken yet, break me
 	if ( !m_bIsBroken )
 	{
-		Die( pOther, vHitVel );
+		Die( (CBaseEntity*)pOther, vHitVel );
 	}
 
 	for (int height=nMinHeight;height<nMaxHeight;height++)

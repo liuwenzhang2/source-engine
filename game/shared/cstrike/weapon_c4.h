@@ -81,7 +81,7 @@
 		void DetonateThink();
 		void Explode( trace_t *pTrace, int bitsDamageType );
 
-		void Use( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value );
+		void Use( IServerEntity *pActivator, IServerEntity *pCaller, USE_TYPE useType, float value );
 
 		// Replicate timer length to the client for effects
 		CNetworkVar( float, m_flTimerLength );

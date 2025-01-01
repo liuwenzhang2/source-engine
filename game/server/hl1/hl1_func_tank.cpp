@@ -64,7 +64,7 @@ public:
 	bool	KeyValue( const char *szKeyName, const char *szValue );
 
 	int		ObjectCaps( void );
-	void	Use( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value );
+	void	Use( IServerEntity *pActivator, IServerEntity *pCaller, USE_TYPE useType, float value );
 	void	Think( void );
 	void	TrackTarget( void );
 	int		DrawDebugTextOverlays(void);
@@ -730,7 +730,7 @@ void CFuncTank::ControllerPostFrame( void )
 }
 
 
-void CFuncTank::Use( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value )
+void CFuncTank::Use( IServerEntity *pActivator, IServerEntity *pCaller, USE_TYPE useType, float value )
 {
 	if (GetEngineObject()->GetSpawnFlags() & SF_TANK_CANCONTROL )
 	{  

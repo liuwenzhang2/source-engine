@@ -1118,7 +1118,7 @@ bool IsPortalOnValidSurface( const Vector &vOrigin, const Vector &vForward, cons
 			}
 		}
 
-		if ( tr.m_pEnt && FClassnameIs((CBaseEntity*)tr.m_pEnt, "func_door" ) )
+		if ( tr.m_pEnt && FClassnameIs((IServerEntity*)tr.m_pEnt, "func_door" ) )
 		{
 			if ( sv_portal_placement_debug.GetBool() )
 			{
@@ -1189,7 +1189,7 @@ float VerifyPortalPlacement( const IEnginePortalServer *pIgnorePortal, Vector &v
 	Vector vVelocityCheck;
 	AngularImpulse vAngularImpulseCheck;
 
-	IPhysicsObject *pPhysicsObject = ((CBaseEntity*)tr.m_pEnt)->GetEngineObject()->VPhysicsGetObject();
+	IPhysicsObject *pPhysicsObject = tr.m_pEnt->GetEngineObject()->VPhysicsGetObject();
 
 	if ( pPhysicsObject )
 	{

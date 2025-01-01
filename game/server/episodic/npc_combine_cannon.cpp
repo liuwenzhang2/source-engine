@@ -729,7 +729,7 @@ bool CNPC_Combine_Cannon::VerifyShot( CBaseEntity *pTarget )
 		// Trace hit something.
 		if( tr.m_pEnt )
 		{
-			if(((CBaseEntity*)tr.m_pEnt)->m_takedamage == DAMAGE_YES )
+			if(tr.m_pEnt->GetTakeDamage() == DAMAGE_YES)
 			{
 				// Just shoot it if I can hurt it. Probably a breakable or glass pane.
 				return true;

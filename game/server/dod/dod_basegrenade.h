@@ -43,7 +43,7 @@ public:
 
 	void DetonateThink( void );
 
-	virtual void Use( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value );
+	virtual void Use( IServerEntity *pActivator, IServerEntity *pCaller, USE_TYPE useType, float value );
 
 	virtual char *GetExplodingClassname( void );
 

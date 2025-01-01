@@ -975,7 +975,7 @@ void CBreakableProp::InputDisablePhyscannonPickup( inputdata_t &inputdata )
 // Purpose: 
 // Input  : *pOther - 
 //-----------------------------------------------------------------------------
-void CBreakableProp::BreakablePropTouch( CBaseEntity *pOther )
+void CBreakableProp::BreakablePropTouch( IServerEntity *pOther )
 {
 	if (GetEngineObject()->HasSpawnFlags( SF_PHYSPROP_TOUCH ) )
 	{
@@ -986,10 +986,10 @@ void CBreakableProp::BreakablePropTouch( CBaseEntity *pOther )
 		{
 			// Make sure we can take damage
 			m_takedamage = DAMAGE_YES;
-			OnTakeDamage( CTakeDamageInfo( pOther, pOther, flDamage, DMG_CRUSH ) );
+			OnTakeDamage( CTakeDamageInfo((CBaseEntity*)pOther, (CBaseEntity*)pOther, flDamage, DMG_CRUSH ) );
 
 			// do a little damage to player if we broke glass or computer
-			CTakeDamageInfo info( pOther, pOther, flDamage/4, DMG_SLASH );
+			CTakeDamageInfo info((CBaseEntity*)pOther, (CBaseEntity*)pOther, flDamage/4, DMG_SLASH );
 			CalculateMeleeDamageForce( &info, (pOther->GetEngineObject()->GetAbsOrigin() - GetEngineObject()->GetAbsOrigin()), GetEngineObject()->GetAbsOrigin() );
 			pOther->TakeDamage( info );
 		}
@@ -1001,7 +1001,7 @@ void CBreakableProp::BreakablePropTouch( CBaseEntity *pOther )
 		// play creaking sound here.
 		// DamageSound();
 
-		m_hBreaker = pOther;
+		m_hBreaker = (CBaseEntity*)pOther;
 
 		if (GetEngineObject()->GetPfnThink() != (THINKPTR)&CBreakableProp::BreakThink )
 		{
@@ -1016,7 +1016,7 @@ void CBreakableProp::BreakablePropTouch( CBaseEntity *pOther )
 #ifdef HL2_EPISODIC
 	if ( m_hFlareEnt )
 	{
-		CAI_BaseNPC *pNPC = pOther->MyNPCPointer();
+		CAI_BaseNPC *pNPC = ((CBaseEntity*)pOther)->MyNPCPointer();
 
 		if ( pNPC && pNPC->AllowedToIgnite() && pNPC->IsOnFire() == false )
 		{
@@ -2932,7 +2932,7 @@ int CPhysicsProp::ObjectCaps()
 //			useType - 
 //			value - 
 //-----------------------------------------------------------------------------
-void CPhysicsProp::Use( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value )
+void CPhysicsProp::Use( IServerEntity *pActivator, IServerEntity *pCaller, USE_TYPE useType, float value )
 {
 	CBasePlayer *pPlayer = ToBasePlayer( pActivator );
 	if ( pPlayer )
@@ -3909,7 +3909,7 @@ void CBasePropDoor::SetDoorBlocker( CBaseEntity *pBlocker )
 //			useType - 
 //			value - 
 //-----------------------------------------------------------------------------
-void CBasePropDoor::Use( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value)
+void CBasePropDoor::Use( IServerEntity *pActivator, IServerEntity *pCaller, USE_TYPE useType, float value)
 {
 	if ( GetMaster() != NULL )
 	{
@@ -3930,13 +3930,13 @@ void CBasePropDoor::Use( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE
 //			useType - 
 //			value - 
 //-----------------------------------------------------------------------------
-void CBasePropDoor::OnUse( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value )
+void CBasePropDoor::OnUse( IServerEntity *pActivator, IServerEntity *pCaller, USE_TYPE useType, float value )
 {
 	// If we're blocked while closing, open away from our blocker. This will
 	// liberate whatever bit of detritus is stuck in us.
 	if ( IsDoorBlocked() && IsDoorClosing() )
 	{
-		m_hActivator = pActivator;
+		m_hActivator = (CBaseEntity*)pActivator;
 		DoorOpen( m_hBlocker );
 		return;
 	}
@@ -3948,11 +3948,11 @@ void CBasePropDoor::OnUse( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TY
 		{
 			PropSetSequence(GetEngineObject()->SelectWeightedSequence((Activity)ACT_DOOR_LOCKED));
 			PlayLockSounds(this, &m_ls, TRUE, FALSE);
-			m_OnLockedUse.FireOutput( pActivator, pCaller );
+			m_OnLockedUse.FireOutput((CBaseEntity*)pActivator, (CBaseEntity*)pCaller );
 		}
 		else
 		{
-			m_hActivator = pActivator;
+			m_hActivator = (CBaseEntity*)pActivator;
 
 			PlayLockSounds(this, &m_ls, FALSE, FALSE);
 			int nSequence = GetEngineObject()->SelectWeightedSequence((Activity)ACT_DOOR_OPEN);
@@ -3968,12 +3968,12 @@ void CBasePropDoor::OnUse( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TY
 	else if ( IsDoorOpening() && GetEngineObject()->HasSpawnFlags(SF_DOOR_USE_CLOSES) )
 	{
 		// We've been used while opening, close.
-		m_hActivator = pActivator;
+		m_hActivator = (CBaseEntity*)pActivator;
 		DoorClose();
 	}
 	else if ( IsDoorClosing() || IsDoorAjar() )
 	{
-		m_hActivator = pActivator;
+		m_hActivator = (CBaseEntity*)pActivator;
 		DoorOpen( m_hActivator );
 	}
 }
@@ -5145,7 +5145,7 @@ bool CPropDoorRotating::CheckDoorClear( doorCheck_e state )
 
 			if ( tr.m_pEnt )
 			{
-				NDebugOverlay::Box(((CBaseEntity*)tr.m_pEnt)->GetEngineObject()->GetAbsOrigin(), ((CBaseEntity*)tr.m_pEnt)->GetEngineObject()->OBBMins(), ((CBaseEntity*)tr.m_pEnt)->GetEngineObject()->OBBMaxs(), 220, 220, 0, true, 10.0f );
+				NDebugOverlay::Box(tr.m_pEnt->GetEngineObject()->GetAbsOrigin(), tr.m_pEnt->GetEngineObject()->OBBMins(), tr.m_pEnt->GetEngineObject()->OBBMaxs(), 220, 220, 0, true, 10.0f );
 			}
 		}
 

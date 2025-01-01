@@ -63,7 +63,7 @@ public:
 	void Spawn( void );
 	void Precache( void );
 	void BubbleThink( void );
-	void BoltTouch( CBaseEntity *pOther );
+	void BoltTouch( IServerEntity *pOther );
 	bool CreateVPhysics( void );
 	unsigned int PhysicsSolidMaskForEntity() const;
 	static CCrossbowBolt *BoltCreate( const Vector &vecOrigin, const QAngle &angAngles, CBasePlayer *pentOwner = NULL );
@@ -196,16 +196,16 @@ void CCrossbowBolt::Precache( void )
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-void CCrossbowBolt::BoltTouch( CBaseEntity *pOther )
+void CCrossbowBolt::BoltTouch( IServerEntity *pOther )
 {
 	if ( pOther->GetEngineObject()->IsSolidFlagSet(FSOLID_VOLUME_CONTENTS | FSOLID_TRIGGER) )
 	{
 		// Some NPCs are triggers that can take damage (like antlion grubs). We should hit them.
-		if ( ( pOther->m_takedamage == DAMAGE_NO ) || ( pOther->m_takedamage == DAMAGE_EVENTS_ONLY ) )
+		if ( ( pOther->GetTakeDamage() == DAMAGE_NO) || (pOther->GetTakeDamage() == DAMAGE_EVENTS_ONLY))
 			return;
 	}
 
-	if ( pOther->m_takedamage != DAMAGE_NO )
+	if (pOther->GetTakeDamage() != DAMAGE_NO )
 	{
 		trace_t	tr, tr2;
 		tr = GetEngineObject()->GetTouchTrace();
@@ -217,11 +217,11 @@ void CCrossbowBolt::BoltTouch( CBaseEntity *pOther )
 #if defined(HL2_EPISODIC)
 		//!!!HACKHACK - specific hack for ep2_outland_10 to allow crossbow bolts to pass through her bounding box when she's crouched in front of the player
 		// (the player thinks they have clear line of sight because Alyx is crouching, but her BBOx is still full-height and blocks crossbow bolts.
-		if( GetOwnerEntity() && GetOwnerEntity()->IsPlayer() && pOther->Classify() == CLASS_PLAYER_ALLY_VITAL && FStrEq(STRING(gpGlobals->mapname), "ep2_outland_10") )
+		if( GetOwnerEntity() && GetOwnerEntity()->IsPlayer() && ((CBaseEntity*)pOther)->Classify() == CLASS_PLAYER_ALLY_VITAL && FStrEq(STRING(gpGlobals->mapname), "ep2_outland_10") )
 		{
 			// Change the owner to stop further collisions with Alyx. We do this by making her the owner.
 			// The player won't get credit for this kill but at least the bolt won't magically disappear!
-			SetOwnerEntity( pOther );
+			SetOwnerEntity((CBaseEntity*)pOther );
 			return;
 		}
 #endif//HL2_EPISODIC

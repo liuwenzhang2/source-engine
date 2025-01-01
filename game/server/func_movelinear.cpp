@@ -269,7 +269,7 @@ void CFuncMoveLinear::MoveDone( void )
 //------------------------------------------------------------------------------
 // Purpose:
 //------------------------------------------------------------------------------
-void CFuncMoveLinear::Use( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value )
+void CFuncMoveLinear::Use( IServerEntity *pActivator, IServerEntity *pCaller, USE_TYPE useType, float value )
 {
 	if ( useType != USE_SET )		// Momentary buttons will pass down a float in here
 		return;

@@ -136,7 +136,7 @@ bool CHolidayGift::MyTouch( CBasePlayer *pPlayer )
 }
 
 //-----------------------------------------------------------------------------
-void CHolidayGift::ItemTouch( CBaseEntity *pOther )
+void CHolidayGift::ItemTouch( IServerEntity *pOther )
 {
 	if ( pOther->IsWorld() )
 	{

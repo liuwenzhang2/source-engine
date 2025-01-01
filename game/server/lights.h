@@ -21,7 +21,7 @@ public:
 	bool	KeyValue( const char *szKeyName, const char *szValue );
 	void	Spawn( void );
 	void	FadeThink( void );
-	void	Use( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value );
+	void	Use( IServerEntity *pActivator, IServerEntity *pCaller, USE_TYPE useType, float value );
 	
 	void	TurnOn( void );
 	void	TurnOff( void );

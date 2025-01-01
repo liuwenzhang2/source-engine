@@ -229,7 +229,7 @@ void CDODPlayer::FireBullets( const FireBulletsInfo_t &info )
 
 		// New hitbox code that uses hitbox groups instead of trying to trace
 		// through the player
-		if ( tr.m_pEnt && ((CBaseEntity*)tr.m_pEnt)->IsPlayer() )
+		if ( tr.m_pEnt && tr.m_pEnt->IsPlayer() )
 		{
 			switch( tr.hitgroup )
 			{
@@ -288,7 +288,7 @@ void CDODPlayer::FireBullets( const FireBulletsInfo_t &info )
 			// draw red client impact markers
 			debugoverlay->AddBoxOverlay( tr.endpos, Vector(-1,-1,-1), Vector(1,1,1), QAngle(0,0,0), 255, 0, 0, 127, 4 );
 
-			if ( tr.m_pEnt && ((CBaseEntity*)tr.m_pEnt)->IsPlayer() )
+			if ( tr.m_pEnt && tr.m_pEnt->IsPlayer() )
 			{
 				C_BasePlayer *player = ToBasePlayer((CBaseEntity*)tr.m_pEnt );
 				player->DrawClientHitboxes( 4, true );
@@ -297,7 +297,7 @@ void CDODPlayer::FireBullets( const FireBulletsInfo_t &info )
 			// draw blue server impact markers
 			NDebugOverlay::Box( tr.endpos, Vector(-1,-1,-1), Vector(1,1,1), 0,0,255,127, 4 );
 
-			if ( tr.m_pEnt && ((CBaseEntity*)tr.m_pEnt)->IsPlayer() )
+			if ( tr.m_pEnt && tr.m_pEnt->IsPlayer() )
 			{
 				CBasePlayer *player = ToBasePlayer((CBaseEntity*)tr.m_pEnt );
 				player->DrawServerHitboxes( 4, true );

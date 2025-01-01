@@ -152,7 +152,7 @@ public:
 
 	int				GetSoundInterests();
 	
-	void 			Touch( CBaseEntity *pOther );
+	void 			Touch( IServerEntity *pOther );
 
 	virtual bool	IgnorePlayerPushing( void );
 

@@ -412,7 +412,7 @@ int CBoneFollower::ObjectCaps()
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-void CBoneFollower::Use( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value )
+void CBoneFollower::Use( IServerEntity *pActivator, IServerEntity *pCaller, USE_TYPE useType, float value )
 {
 	CBaseEntity *pOwner = GetOwnerEntity();
 	if ( pOwner )
@@ -427,7 +427,7 @@ void CBoneFollower::Use( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE
 //-----------------------------------------------------------------------------
 // Purpose: Pass on Touch calls to the entity we're following
 //-----------------------------------------------------------------------------
-void CBoneFollower::Touch( CBaseEntity *pOther )
+void CBoneFollower::Touch( IServerEntity *pOther )
 {
 	CBaseEntity *pOwner = GetOwnerEntity();
 	if ( pOwner )

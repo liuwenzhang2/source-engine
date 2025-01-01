@@ -1002,7 +1002,7 @@ void CWeaponCSBase::Drop(const Vector &vecVelocity)
 #ifdef GAME_DLL
 // whats going on here is that if the player drops this weapon, they shouldn't take it back themselves
 // for a little while.  But if they throw it at someone else, the other player should get it immediately.
-void CWeaponCSBase::DefaultTouch(CBaseEntity *pOther)
+void CWeaponCSBase::DefaultTouch(IServerEntity *pOther)
 {
 	if ((m_prevOwner != NULL) && (pOther == m_prevOwner) && (gpGlobals->curtime < m_nextPrevOwnerTouchTime))
 	{
@@ -1504,13 +1504,13 @@ void CWeaponCSBase::DefaultTouch(CBaseEntity *pOther)
 	//-----------------------------------------------------------------------------
 	// Purpose:
 	//-----------------------------------------------------------------------------
-	void CWeaponCSBase::Use( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value )
+	void CWeaponCSBase::Use( IServerEntity *pActivator, IServerEntity *pCaller, USE_TYPE useType, float value )
 	{
 		CBasePlayer *pPlayer = ToBasePlayer( pActivator );
 		
 		if ( pPlayer )
 		{
-			m_OnPlayerUse.FireOutput( pActivator, pCaller );
+			m_OnPlayerUse.FireOutput( (CBaseEntity*)pActivator, (CBaseEntity*)pCaller );
 		}
 	}
 

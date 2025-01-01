@@ -176,7 +176,7 @@ void CRpgRocket::Spawn( void )
 // Purpose: 
 // Input  : *pOther - 
 //-----------------------------------------------------------------------------
-void CRpgRocket::RocketTouch( CBaseEntity *pOther )
+void CRpgRocket::RocketTouch( IServerEntity *pOther )
 {
 	if ( !pOther->GetEngineObject()->IsSolid() || pOther->GetEngineObject()->IsSolidFlagSet(FSOLID_VOLUME_CONTENTS) )
 		return;

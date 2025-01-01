@@ -80,7 +80,7 @@ protected:
 
 private:
 
-	void				VehicleLeapAttackTouch( CBaseEntity *pOther );
+	void				VehicleLeapAttackTouch( IServerEntity *pOther );
 	void				VehicleLeapAttack( void );
 	bool				CanBeOnEnemyVehicle( void );
 	float				GetEntryPointCost( const Vector &vecEntryPos );

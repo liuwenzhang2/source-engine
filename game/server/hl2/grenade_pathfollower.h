@@ -34,7 +34,7 @@ public:
 	Class_T			Classify( void);
 	void			Spawn( void );
 	void			AimThink( void );
-	void 			GrenadeTouch( CBaseEntity *pOther );
+	void 			GrenadeTouch( IServerEntity *pOther );
 	void			Event_Killed( const CTakeDamageInfo &info );
 	void			Launch( float flLaunchSpeed, string_t sPathCornerName);
 	void			PlayFlySound(void);

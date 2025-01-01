@@ -168,7 +168,7 @@ void CDODBombTarget::State_Think()
 //-----------------------------------------------------------------------------
 // Purpose:
 //-----------------------------------------------------------------------------
-void CDODBombTarget::State_Use( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value )
+void CDODBombTarget::State_Use( IServerEntity *pActivator, IServerEntity *pCaller, USE_TYPE useType, float value )
 {
 	if ( m_pCurStateInfo && m_pCurStateInfo->pfnUse )
 	{
@@ -538,7 +538,7 @@ void CDODBombTarget::State_Think_ARMED( void )
 //-----------------------------------------------------------------------------
 // Purpose:
 //-----------------------------------------------------------------------------
-void CDODBombTarget::State_Use_ACTIVE( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value )
+void CDODBombTarget::State_Use_ACTIVE( IServerEntity *pActivator, IServerEntity *pCaller, USE_TYPE useType, float value )
 {
 	CDODPlayer *pPlayer = ToDODPlayer( pActivator );
 
@@ -616,7 +616,7 @@ DefusingPlayer *CDODBombTarget::FindDefusingPlayer( CDODPlayer *pPlayer )
 //-----------------------------------------------------------------------------
 // Purpose:
 //-----------------------------------------------------------------------------
-void CDODBombTarget::State_Use_ARMED( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value )
+void CDODBombTarget::State_Use_ARMED( IServerEntity *pActivator, IServerEntity *pCaller, USE_TYPE useType, float value )
 {
 	// check for people disarming
 	CDODPlayer *pPlayer = ToDODPlayer( pActivator );

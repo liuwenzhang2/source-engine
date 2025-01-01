@@ -128,7 +128,7 @@ public:
 	DECLARE_DATADESC();
 
 	void	Spawn( void );
-	void	Use( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value );
+	void	Use( IServerEntity *pActivator, IServerEntity *pCaller, USE_TYPE useType, float value );
 	bool	KeyValue( const char *szKeyName, const char *szValue );
 
 	inline	int		Points( void ) { return m_Score; }
@@ -193,9 +193,9 @@ void CGameScore::InputApplyScore( inputdata_t &inputdata )
 	}
 }
 
-void CGameScore::Use( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value )
+void CGameScore::Use( IServerEntity *pActivator, IServerEntity *pCaller, USE_TYPE useType, float value )
 {
-	if ( !CanFireForActivator( pActivator ) )
+	if ( !CanFireForActivator( (CBaseEntity*)pActivator ) )
 		return;
 
 	// Only players can use this
@@ -223,7 +223,7 @@ public:
 	DECLARE_DATADESC();
 
 	void	InputGameEnd( inputdata_t &inputdata );
-	void	Use( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value );
+	void	Use( IServerEntity *pActivator, IServerEntity *pCaller, USE_TYPE useType, float value );
 private:
 };
 
@@ -242,9 +242,9 @@ void CGameEnd::InputGameEnd( inputdata_t &inputdata )
 	g_pGameRules->EndMultiplayerGame();
 }
 
-void CGameEnd::Use( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value )
+void CGameEnd::Use( IServerEntity *pActivator, IServerEntity *pCaller, USE_TYPE useType, float value )
 {
-	if ( !CanFireForActivator( pActivator ) )
+	if ( !CanFireForActivator( (CBaseEntity*)pActivator ) )
 		return;
 
 	g_pGameRules->EndMultiplayerGame();
@@ -274,9 +274,9 @@ public:
 	void InputDisplay( inputdata_t &inputdata );
 	void Display( CBaseEntity *pActivator );
 
-	void Use( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value )
+	void Use( IServerEntity *pActivator, IServerEntity *pCaller, USE_TYPE useType, float value )
 	{
-		Display( pActivator );
+		Display( (CBaseEntity*)pActivator );
 	}
 
 private:
@@ -516,7 +516,7 @@ class CGamePlayerHurt : public CRulePointEntity
 public:
 	DECLARE_CLASS( CGamePlayerHurt, CRulePointEntity );
 
-	void		Use( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value );
+	void		Use( IServerEntity *pActivator, IServerEntity *pCaller, USE_TYPE useType, float value );
 	inline bool RemoveOnFire( void ) { return (m_spawnflags & SF_PKILL_FIREONCE) ? true : false; }
 
 	DECLARE_DATADESC();
@@ -539,7 +539,7 @@ END_DATADESC()
 
 
 
-void CGamePlayerHurt::Use( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value )
+void CGamePlayerHurt::Use( IServerEntity *pActivator, IServerEntity *pCaller, USE_TYPE useType, float value )
 {
 	if ( !CanFireForActivator( pActivator ) )
 		return;
@@ -581,8 +581,8 @@ public:
 	DECLARE_CLASS( CGamePlayerEquip, CRulePointEntity );
 
 	bool		KeyValue( const char *szKeyName, const char *szValue );
-	void		Touch( CBaseEntity *pOther );
-	void		Use( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value );
+	void		Touch( IServerEntity *pOther );
+	void		Use( IServerEntity *pActivator, IServerEntity *pCaller, USE_TYPE useType, float value );
 
 	inline bool	UseOnly( void ) { return (GetEngineObject()->GetSpawnFlags() & SF_PLAYEREQUIP_USEONLY) ? true : false; }
 
@@ -633,15 +633,15 @@ bool CGamePlayerEquip::KeyValue( const char *szKeyName, const char *szValue )
 }
 
 
-void CGamePlayerEquip::Touch( CBaseEntity *pOther )
+void CGamePlayerEquip::Touch( IServerEntity *pOther )
 {
-	if ( !CanFireForActivator( pOther ) )
+	if ( !CanFireForActivator((CBaseEntity*)pOther ) )
 		return;
 
 	if ( UseOnly() )
 		return;
 
-	EquipPlayer( pOther );
+	EquipPlayer((CBaseEntity*)pOther );
 }
 
 void CGamePlayerEquip::EquipPlayer( CBaseEntity *pEntity )
@@ -663,9 +663,9 @@ void CGamePlayerEquip::EquipPlayer( CBaseEntity *pEntity )
 }
 
 
-void CGamePlayerEquip::Use( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value )
+void CGamePlayerEquip::Use( IServerEntity *pActivator, IServerEntity *pCaller, USE_TYPE useType, float value )
 {
-	EquipPlayer( pActivator );
+	EquipPlayer( (CBaseEntity*)pActivator );
 }
 
 
@@ -684,7 +684,7 @@ class CGamePlayerTeam : public CRulePointEntity
 public:
 	DECLARE_CLASS( CGamePlayerTeam, CRulePointEntity );
 
-	void		Use( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value );
+	void		Use( IServerEntity *pActivator, IServerEntity *pCaller, USE_TYPE useType, float value );
 
 private:
 
@@ -712,14 +712,14 @@ const char *CGamePlayerTeam::TargetTeamName( const char *pszTargetName, CBaseEnt
 }
 
 
-void CGamePlayerTeam::Use( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value )
+void CGamePlayerTeam::Use( IServerEntity *pActivator, IServerEntity *pCaller, USE_TYPE useType, float value )
 {
-	if ( !CanFireForActivator( pActivator ) )
+	if ( !CanFireForActivator( (CBaseEntity*)pActivator ) )
 		return;
 
 	if ( pActivator->IsPlayer() )
 	{
-		const char *pszTargetTeam = TargetTeamName( STRING(m_target), pActivator );
+		const char *pszTargetTeam = TargetTeamName( STRING(m_target), (CBaseEntity*)pActivator );
 		if ( pszTargetTeam )
 		{
 			CBasePlayer *pPlayer = (CBasePlayer *)pActivator;

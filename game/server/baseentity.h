@@ -606,7 +606,7 @@ public:
 
 	// handles an input (usually caused by outputs)
 	// returns true if the the value in the pass in should be set, false if the input is to be ignored
-	virtual bool AcceptInput( const char *szInputName, CBaseEntity *pActivator, CBaseEntity *pCaller, variant_t Value, int outputID );
+	virtual bool AcceptInput( const char *szInputName, IServerEntity *pActivator, IServerEntity *pCaller, variant_t Value, int outputID );
 
 	//
 	// Input handlers.
@@ -689,7 +689,7 @@ public:
 	void		 DrawAbsBoxOverlay();
 	void		 DrawRBoxOverlay();
 
-	void		 DrawInputOverlay(const char *szInputName, CBaseEntity *pCaller, variant_t Value);
+	void		 DrawInputOverlay(const char *szInputName, IServerEntity *pCaller, variant_t Value);
 	void		 DrawOutputOverlay(CEventAction *ev);
 	void		 SendDebugPivotOverlay( void );
 	void		 AddTimedOverlay( const char *msg, int endTime );
@@ -914,7 +914,7 @@ public:
 	virtual INextBot		*MyNextBotPointer( void ) { return NULL; }
 	virtual float			GetDelay( void ) { return 0; }
 	virtual bool			IsMoving( void );
-	bool					IsWorld() { return entindex() == 0; }
+	bool					IsWorld() const { return entindex() == 0; }
 	virtual char const		*DamageDecal( int bitsDamageType, int gameMaterial );
 	virtual void			DecalTrace( trace_t *pTrace, char const *decalName );
 	virtual void			ImpactTrace( trace_t *pTrace, int iDamageType, const char *pCustomImpactName = NULL );
@@ -986,14 +986,14 @@ public:
 	CBaseEntity *GetNextTarget( void );
 	
 	// fundamental callbacks
-	void (CBaseEntity ::*m_pfnTouch)( CBaseEntity *pOther );
-	void (CBaseEntity ::*m_pfnUse)( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value );
+	void (CBaseEntity ::*m_pfnTouch)( IServerEntity *pOther );
+	void (CBaseEntity ::*m_pfnUse)( IServerEntity *pActivator, IServerEntity *pCaller, USE_TYPE useType, float value );
 	void (CBaseEntity ::*m_pfnBlocked)( CBaseEntity *pOther );
 
-	virtual void			Use( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value );
-	virtual void			StartTouch( CBaseEntity *pOther );
-	virtual void			Touch( CBaseEntity *pOther ); 
-	virtual void			EndTouch( CBaseEntity *pOther );
+	virtual void			Use( IServerEntity *pActivator, IServerEntity *pCaller, USE_TYPE useType, float value );
+	virtual void			StartTouch( IServerEntity *pOther );
+	virtual void			Touch( IServerEntity *pOther ); 
+	virtual void			EndTouch( IServerEntity *pOther );
 	virtual void			StartBlocked( CBaseEntity *pOther ) {}
 	virtual void			Blocked( CBaseEntity *pOther );
 	virtual void			EndBlocked( void ) {}
@@ -1158,6 +1158,10 @@ public:
 	string_t	m_target;
 	CNetworkVarForDerived( int, m_iMaxHealth ); // CBaseEntity doesn't care about changes to this variable, but there are derived classes that do.
 	CNetworkVarForDerived( int, m_iHealth );
+
+	const char& GetTakeDamage() const {
+		return m_takedamage;
+	}
 
 	CNetworkVarForDerived( char, m_lifeState );
 	CNetworkVarForDerived( char , m_takedamage );
@@ -1404,8 +1408,8 @@ public:
 	virtual CBaseEntity*	PhysCannonGetHeldEntity() { return NULL; }
 	virtual float			GetHeldObjectMass(IPhysicsObject* pHeldObject) { return 0; }
 	virtual IGrabControllerServer* GetGrabController() { return NULL; }
-	virtual void			PickupObject(CBaseEntity* pObject, bool bLimitMassAndSize = true) {}
-	virtual void			ForceDropOfCarriedPhysObjects(CBaseEntity* pOnlyIfHoldindThis = NULL) {}
+	virtual void			PickupObject(IServerEntity* pObject, bool bLimitMassAndSize = true) {}
+	virtual void			ForceDropOfCarriedPhysObjects(IServerEntity* pOnlyIfHoldindThis = NULL) {}
 	virtual bool			OnAttemptPhysGunPickup(CBasePlayer* pPhysGunUser, PhysGunPickup_t reason = PICKED_UP_BY_CANNON) { return true; }
 	virtual CBaseEntity*	OnFailedPhysGunPickup(Vector vPhysgunPos) { return NULL; }
 	virtual void			OnPhysGunPickup(CBasePlayer* pPhysGunUser, PhysGunPickup_t reason = PICKED_UP_BY_CANNON) {}
@@ -1900,12 +1904,12 @@ inline bool	CBaseEntity::IsNavIgnored() const
 //-----------------------------------------------------------------------------
 // Network state optimization
 //-----------------------------------------------------------------------------
-inline CBaseCombatCharacter *ToBaseCombatCharacter( CBaseEntity *pEntity )
+inline CBaseCombatCharacter *ToBaseCombatCharacter( IServerEntity *pEntity )
 {
 	if ( !pEntity )
 		return NULL;
 
-	return pEntity->MyCombatCharacterPointer();
+	return ((CBaseEntity*)pEntity)->MyCombatCharacterPointer();
 }
 
 
@@ -2205,7 +2209,7 @@ inline void CBaseEntity::FireBullets( int cShots, const Vector &vecSrc,
 }
 
 
-inline bool FClassnameIs(CBaseEntity *pEntity, const char *szClassname)
+inline bool FClassnameIs(IServerEntity *pEntity, const char *szClassname)
 { 
 	return pEntity->ClassMatches(szClassname); 
 }

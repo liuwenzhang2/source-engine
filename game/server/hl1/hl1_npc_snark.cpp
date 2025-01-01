@@ -403,7 +403,7 @@ void CSnark::ResolveFlyCollisionCustom( trace_t &trace, Vector &vecVelocity )
 	}
 }
 
-void CSnark::SuperBounceTouch( CBaseEntity *pOther )
+void CSnark::SuperBounceTouch( IServerEntity *pOther )
 {
 	float	flpitch;
 	trace_t tr;
@@ -428,7 +428,7 @@ void CSnark::SuperBounceTouch( CBaseEntity *pOther )
 	// higher pitch as squeeker gets closer to detonation time
 	flpitch = 155.0 - 60.0 * ( ( m_flDie - gpGlobals->curtime ) / SQUEEK_DETONATE_DELAY );
 
-	if ( pOther->m_takedamage && m_flNextAttack < gpGlobals->curtime )
+	if ( pOther->GetTakeDamage() && m_flNextAttack < gpGlobals->curtime)
 	{
 		// attack!
 
@@ -436,7 +436,7 @@ void CSnark::SuperBounceTouch( CBaseEntity *pOther )
 		if ( tr.m_pEnt == pOther )
 		{
 			// and it's not another squeakgrenade
-			if (((CBaseEntity*)tr.m_pEnt)->GetEngineObject()->GetModelIndex() != GetEngineObject()->GetModelIndex() )
+			if (tr.m_pEnt->GetEngineObject()->GetModelIndex() != GetEngineObject()->GetModelIndex() )
 			{
 				// ALERT( at_console, "hit enemy\n");
 				ClearMultiDamage();

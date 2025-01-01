@@ -427,7 +427,7 @@ void CMissile::Explode( void )
 // Purpose: 
 // Input  : *pOther - 
 //-----------------------------------------------------------------------------
-void CMissile::MissileTouch( CBaseEntity *pOther )
+void CMissile::MissileTouch( IServerEntity *pOther )
 {
 	Assert( pOther );
 	
@@ -957,7 +957,7 @@ void CAPCMissile::AimAtSpecificTarget( CBaseEntity *pTarget )
 // Purpose: 
 // Input  : *pOther - 
 //-----------------------------------------------------------------------------
-void CAPCMissile::APCMissileTouch( CBaseEntity *pOther )
+void CAPCMissile::APCMissileTouch( IServerEntity *pOther )
 {
 	Assert( pOther );
 	if ( !pOther->GetEngineObject()->IsSolid() && !pOther->GetEngineObject()->IsSolidFlagSet(FSOLID_VOLUME_CONTENTS) )
@@ -1794,7 +1794,7 @@ void CWeaponRPG::UpdateLaserPosition( Vector vecMuzzlePos, Vector vecEndPos )
 		{
 			CBaseEntity *pHit = (CBaseEntity*)tr.m_pEnt;
 
-			if ( ( pHit != NULL ) && ( pHit->m_takedamage ) )
+			if ( ( pHit != NULL ) && ( pHit->GetTakeDamage() ) )
 			{
 				m_hLaserDot->SetTargetEntity( pHit );
 			}

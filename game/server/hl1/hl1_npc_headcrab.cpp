@@ -254,7 +254,7 @@ int CNPC_Headcrab::SelectSchedule( void )
 // Input   :
 // Output  :
 //------------------------------------------------------------------------------
-void CNPC_Headcrab::Touch( CBaseEntity *pOther )
+void CNPC_Headcrab::Touch( IServerEntity *pOther )
 { 
 	// If someone has smacked me into a wall then gib!
 /*	if (m_NPCState == NPC_STATE_DEAD) 
@@ -445,9 +445,9 @@ float CNPC_Headcrab::MaxYawSpeed ( void )
 // Purpose: LeapTouch - this is the headcrab's touch function when it is in the air.
 // Input  : *pOther - 
 //-----------------------------------------------------------------------------
-void CNPC_Headcrab::LeapTouch( CBaseEntity *pOther )
+void CNPC_Headcrab::LeapTouch( IServerEntity *pOther )
 {
-	if ( pOther->Classify() == Classify() )
+	if ( ((CBaseEntity*)pOther)->Classify() == Classify() )
 	{
 		return;
 	}
@@ -456,7 +456,7 @@ void CNPC_Headcrab::LeapTouch( CBaseEntity *pOther )
 	if ( !(GetEngineObject()->GetFlags() & FL_ONGROUND) && ( pOther->IsNPC() || pOther->IsPlayer() ) )
 	{
 		BiteSound();
-		TouchDamage( pOther );
+		TouchDamage((CBaseEntity*)pOther );
 	}
 
 	SetTouch( NULL );

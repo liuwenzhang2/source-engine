@@ -294,7 +294,7 @@ public:
 	void		TaskFail( AI_TaskFailureCode_t );
 	void		TaskFail( const char *pszGeneralFailText )	{ BaseClass::TaskFail( pszGeneralFailText ); }
 	void		ClearTransientConditions();
-	void		Touch(	CBaseEntity *pOther );
+	void		Touch(	IServerEntity *pOther );
 
 	//---------------------------------
 	// Combat

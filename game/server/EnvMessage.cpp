@@ -136,7 +136,7 @@ void CMessage::InputShowMessage( inputdata_t &inputdata )
 }
 
 
-void CMessage::Use( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value )
+void CMessage::Use( IServerEntity *pActivator, IServerEntity *pCaller, USE_TYPE useType, float value )
 {
 	inputdata_t inputdata;
 

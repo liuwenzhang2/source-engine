@@ -25,9 +25,9 @@ public:
 	static const Vector		vLocalMins;
 	static const Vector		vLocalMaxs;
 
-	virtual void			StartTouch( CBaseEntity *pOther );
-	virtual void			Touch( CBaseEntity *pOther ); 
-	virtual void			EndTouch( CBaseEntity *pOther );
+	virtual void			StartTouch( IServerEntity *pOther );
+	virtual void			Touch( IServerEntity *pOther ); 
+	virtual void			EndTouch( IServerEntity *pOther );
 
 	virtual void			Spawn( void );
 	virtual void			Activate( void );

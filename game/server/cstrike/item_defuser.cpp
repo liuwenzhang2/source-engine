@@ -15,7 +15,7 @@ public:
 	
 	void	Spawn( void );
 	void	Precache( void );
-	void	DefuserTouch( CBaseEntity *pOther );
+	void	DefuserTouch( IServerEntity *pOther );
 	void	ActivateThink( void );
 	
 	DECLARE_DATADESC();
@@ -62,7 +62,7 @@ void CItemDefuser::ActivateThink( void )
 	SetThink( NULL );
 }
 	
-void CItemDefuser::DefuserTouch( CBaseEntity *pOther )
+void CItemDefuser::DefuserTouch( IServerEntity *pOther )
 {
 	if ( !pOther->IsPlayer() )
 	{

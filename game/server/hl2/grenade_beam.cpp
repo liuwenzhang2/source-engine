@@ -218,7 +218,7 @@ void CGrenadeBeam::KillBeam(void)
 // Input   :
 // Output  :
 //------------------------------------------------------------------------------
-void CGrenadeBeam::GrenadeBeamTouch( CBaseEntity *pOther )
+void CGrenadeBeam::GrenadeBeamTouch( IServerEntity *pOther )
 {
 	//---------------------------------------------------------
 	// Make sure I'm not caught in a corner, if so remove me
@@ -265,7 +265,7 @@ void CGrenadeBeam::GrenadeBeamTouch( CBaseEntity *pOther )
 	// --------------------------------------------
 	//  Play burn sounds
 	// --------------------------------------------
-	if (pOther->m_takedamage)
+	if (pOther->GetTakeDamage())
 	{
 		pOther->TakeDamage( CTakeDamageInfo( this, this, m_flDamage, DMG_BURN ) );
 		KillBeam();

@@ -61,7 +61,7 @@ void CBaseAnimatingProjectile::Spawn(	char *pszModel,
 
 //---------------------------------------------------------
 //---------------------------------------------------------
-void CBaseAnimatingProjectile::Touch( CBaseEntity *pOther )
+void CBaseAnimatingProjectile::Touch( IServerEntity *pOther )
 {
 	CBaseEntity *pOwner;
 

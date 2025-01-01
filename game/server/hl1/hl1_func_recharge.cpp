@@ -36,7 +36,7 @@ public:
 	void Off(void);
 	void Recharge(void);
 	bool KeyValue( const char *szKeyName, const char *szValue );
-	void Use( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value );
+	void Use( IServerEntity *pActivator, IServerEntity *pCaller, USE_TYPE useType, float value );
 	virtual int	ObjectCaps( void ) { return (BaseClass::ObjectCaps() | m_iCaps ); }
 
 	DECLARE_DATADESC();
@@ -123,7 +123,7 @@ bool CRecharge::CreateVPhysics()
 	return true;
 }
 
-void CRecharge::Use( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value )
+void CRecharge::Use( IServerEntity *pActivator, IServerEntity *pCaller, USE_TYPE useType, float value )
 { 
 	// Make sure that we have a caller
 	if (!pActivator)
@@ -194,7 +194,7 @@ void CRecharge::Use( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE use
 	if (m_flNextCharge >= gpGlobals->curtime)
 		return;
 
-	m_hActivator = pActivator;
+	m_hActivator = (CBaseEntity*)pActivator;
 
 	
 	// Play the on sound or the looping charging sound
@@ -231,7 +231,7 @@ void CRecharge::Use( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE use
 
 	// Send the output.
 	float flRemaining = m_iJuice / sk_suitcharger.GetFloat();
-	m_OutRemainingCharge.Set(flRemaining, pActivator, this);
+	m_OutRemainingCharge.Set(flRemaining, (CBaseEntity*)pActivator, this);
 
 	// govern the rate of charge
 	m_flNextCharge = gpGlobals->curtime + 0.1;

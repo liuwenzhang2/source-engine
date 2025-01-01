@@ -24,7 +24,7 @@ public:
 	virtual void Spawn( void );
 	virtual void Precache( void );
 	virtual void Activate( void );
-	virtual void StartTouch( CBaseEntity *pOther );
+	virtual void StartTouch( IServerEntity *pOther );
 
 	inline bool HasWeapon( CBaseCombatWeapon *pWeapon );
 
@@ -145,7 +145,7 @@ void CTriggerWeaponDissolve::AddWeapon( CBaseCombatWeapon *pWeapon )
 // Purpose: Collect any weapons inside our volume
 // Input  : *pOther - 
 //-----------------------------------------------------------------------------
-void CTriggerWeaponDissolve::StartTouch( CBaseEntity *pOther )
+void CTriggerWeaponDissolve::StartTouch( IServerEntity *pOther )
 {
 	BaseClass::StartTouch( pOther );
 
@@ -315,8 +315,8 @@ class CTriggerWeaponStrip : public CTriggerMultiple
 	DECLARE_DATADESC();
 
 public:
-	void StartTouch(CBaseEntity *pOther);
-	void EndTouch(CBaseEntity *pOther);
+	void StartTouch(IServerEntity *pOther);
+	void EndTouch(IServerEntity *pOther);
 
 private:
 	bool m_bKillWeapons;
@@ -336,14 +336,14 @@ END_DATADESC()
 //-----------------------------------------------------------------------------
 // Drops all weapons, marks the character as not being able to pick up weapons
 //-----------------------------------------------------------------------------
-void CTriggerWeaponStrip::StartTouch(CBaseEntity *pOther)
+void CTriggerWeaponStrip::StartTouch(IServerEntity *pOther)
 {
 	BaseClass::StartTouch( pOther );
 
 	if ( PassesTriggerFilters(pOther) == false )
 		return;
 
-	CBaseCombatCharacter *pCharacter = pOther->MyCombatCharacterPointer();
+	CBaseCombatCharacter *pCharacter = ((CBaseEntity*)pOther)->MyCombatCharacterPointer();
 	
 	if ( m_bKillWeapons )
 	{
@@ -378,11 +378,11 @@ void CTriggerWeaponStrip::StartTouch(CBaseEntity *pOther)
 // Purpose: Called when an entity stops touching us.
 // Input  : pOther - The entity that was touching us.
 //-----------------------------------------------------------------------------
-void CTriggerWeaponStrip::EndTouch(CBaseEntity *pOther)
+void CTriggerWeaponStrip::EndTouch(IServerEntity *pOther)
 {
 	if ( IsTouching( pOther ) )
 	{
-		CBaseCombatCharacter *pCharacter = pOther->MyCombatCharacterPointer();
+		CBaseCombatCharacter *pCharacter = ((CBaseEntity*)pOther)->MyCombatCharacterPointer();
 		if ( pCharacter )
 		{
 			pCharacter->SetPreventWeaponPickup( false );
@@ -403,7 +403,7 @@ class CTriggerPhysicsTrap : public CTriggerMultiple
 	DECLARE_DATADESC();
 
 public:
-	void Touch( CBaseEntity *pOther );
+	void Touch( IServerEntity *pOther );
 
 private:
 	void InputEnable( inputdata_t &inputdata );
@@ -465,12 +465,12 @@ void CTriggerPhysicsTrap::InputDisable( inputdata_t &inputdata )
 //-----------------------------------------------------------------------------
 #define JOINTS_TO_CONSTRAIN 1
 
-void CTriggerPhysicsTrap::Touch( CBaseEntity *pOther )
+void CTriggerPhysicsTrap::Touch( IServerEntity *pOther )
 {
 	if ( !PassesTriggerFilters(pOther) )
 		return;
 
-	CBaseAnimating *pAnim = pOther->GetBaseAnimating();
+	CBaseAnimating *pAnim = ((CBaseEntity*)pOther)->GetBaseAnimating();
 	if ( !pAnim )
 		return;
 
@@ -609,7 +609,7 @@ public:
 
 	void Spawn( void );
 	void Precache( void );
-	void Touch( CBaseEntity *pOther );
+	void Touch( IServerEntity *pOther );
 	void SpawnLeeches( CBaseEntity *pOther );
 	
 	// Ignore non-living entities
@@ -621,8 +621,8 @@ public:
 		return (pOther->m_takedamage == DAMAGE_YES);
 	}
 
-	virtual void StartTouch(CBaseEntity *pOther);
-	virtual void EndTouch(CBaseEntity *pOther);
+	virtual void StartTouch(IServerEntity *pOther);
+	virtual void EndTouch(IServerEntity *pOther);
 
 private:
 
@@ -706,14 +706,14 @@ void CTriggerWateryDeath::SpawnLeeches( CBaseEntity *pOther )
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-void CTriggerWateryDeath::Touch( CBaseEntity *pOther )
+void CTriggerWateryDeath::Touch( IServerEntity *pOther )
 {	
-	if (!PassesTriggerFilters(pOther))
+	if (!PassesTriggerFilters((CBaseEntity*)pOther))
 		return;
 
 	// Find our index
 	EHANDLE hOther;
-	hOther = pOther;
+	hOther = (CBaseEntity*)pOther;
 	int iIndex = m_hTouchingEntities.Find( hOther );
 	if ( iIndex == m_hTouchingEntities.InvalidIndex() )
 		return;
@@ -736,7 +736,7 @@ void CTriggerWateryDeath::Touch( CBaseEntity *pOther )
 
 		// Use DMG_GENERIC & make the target inflict the damage on himself.
 		// This ensures that if the target is the player, the damage isn't modified by skill
-		CTakeDamageInfo info = CTakeDamageInfo( pOther, pOther, m_flPainValue, DMG_GENERIC );
+		CTakeDamageInfo info = CTakeDamageInfo((CBaseEntity*)pOther, (CBaseEntity*)pOther, m_flPainValue, DMG_GENERIC );
 
 		GuessDamageForce( &info, (pOther->GetEngineObject()->GetAbsOrigin() - GetEngineObject()->GetAbsOrigin()), pOther->GetEngineObject()->GetAbsOrigin() );
 		pOther->TakeDamage( info );
@@ -749,7 +749,7 @@ void CTriggerWateryDeath::Touch( CBaseEntity *pOther )
 // Purpose: Called when an entity starts touching us.
 // Input  : pOther - The entity that is touching us.
 //-----------------------------------------------------------------------------
-void CTriggerWateryDeath::StartTouch(CBaseEntity *pOther)
+void CTriggerWateryDeath::StartTouch(IServerEntity *pOther)
 {
 	BaseClass::StartTouch( pOther );
 
@@ -757,7 +757,7 @@ void CTriggerWateryDeath::StartTouch(CBaseEntity *pOther)
 
 	// If we added him to our list, store the start time
 	EHANDLE hOther;
-	hOther = pOther;
+	hOther = (CBaseEntity*)pOther;
 	if ( m_hTouchingEntities.Find( hOther ) != m_hTouchingEntities.InvalidIndex() )
 	{
 		// Always added to the end
@@ -775,7 +775,7 @@ void CTriggerWateryDeath::StartTouch(CBaseEntity *pOther)
 #ifdef HL2_DLL
 	if ( pOther->IsPlayer() )
 	{
-		SpawnLeeches( pOther );
+		SpawnLeeches((CBaseEntity*)pOther );
 
 		CHL2_Player *pHL2Player = dynamic_cast<CHL2_Player*>( pOther );
 
@@ -793,12 +793,12 @@ void CTriggerWateryDeath::StartTouch(CBaseEntity *pOther)
 // Purpose: Called when an entity stops touching us.
 // Input  : pOther - The entity that was touching us.
 //-----------------------------------------------------------------------------
-void CTriggerWateryDeath::EndTouch( CBaseEntity *pOther )
+void CTriggerWateryDeath::EndTouch( IServerEntity *pOther )
 {
 	if ( IsTouching( pOther ) )
 	{
 		EHANDLE hOther;
-		hOther = pOther;
+		hOther = (CBaseEntity*)pOther;
 
 		// Remove the time from our list
 		int iIndex = m_hTouchingEntities.Find( hOther );

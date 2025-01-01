@@ -38,7 +38,7 @@ public:
 	void	Operator_HandleAnimEvent( animevent_t *pEvent, CBaseCombatCharacter *pOperator );
 
 	void	Drop( const Vector &vecVelocity );
-	void	BugbaitStickyTouch( CBaseEntity *pOther );
+	void	BugbaitStickyTouch( IServerEntity *pOther );
 	void	OnPickedUp( CBaseCombatCharacter *pNewOwner );
 	bool	Deploy( void );
 	bool	Holster( CBaseCombatWeapon *pSwitchingTo );
@@ -181,7 +181,7 @@ void CWeaponBugBait::Drop( const Vector &vecVelocity )
 //-----------------------------------------------------------------------------
 // Purpose: Stick to the world when we touch it
 //-----------------------------------------------------------------------------
-void CWeaponBugBait::BugbaitStickyTouch( CBaseEntity *pOther )
+void CWeaponBugBait::BugbaitStickyTouch( IServerEntity *pOther )
 {
 	if ( !pOther->IsWorld() )
 		return;

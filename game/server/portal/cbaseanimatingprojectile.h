@@ -11,6 +11,8 @@
 #pragma once
 #endif
 
+#include "baseanimating.h"
+
 enum MoveType_t;
 enum MoveCollide_t;
 
@@ -23,7 +25,7 @@ class CBaseAnimatingProjectile : public CBaseAnimating
 	DECLARE_CLASS( CBaseAnimatingProjectile, CBaseAnimating );
 
 public:
-	void Touch( CBaseEntity *pOther );
+	void Touch( IServerEntity *pOther );
 
 	void Spawn(	char *pszModel,
 											const Vector &vecOrigin,

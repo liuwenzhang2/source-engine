@@ -1051,7 +1051,7 @@ inline CSPlayerState CCSPlayer::State_Get() const
 	return m_iPlayerState;
 }
 
-inline CCSPlayer *ToCSPlayer( CBaseEntity *pEntity )
+inline CCSPlayer *ToCSPlayer( IServerEntity *pEntity )
 {
 	if ( !pEntity || !pEntity->IsPlayer() )
 		return NULL;

@@ -33,7 +33,7 @@ public:
 
 	void		Spawn( void );
 	void		Precache( void );
-	void 		GrenadeAR2Touch( CBaseEntity *pOther );
+	void 		GrenadeAR2Touch( IServerEntity *pOther );
 	void		GrenadeAR2Think( void );
 	void		Event_Killed( const CTakeDamageInfo &info );
 

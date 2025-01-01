@@ -117,7 +117,7 @@ public:
 	virtual void Precache();
 
 	static CBMortar *Shoot( CBaseEntity *pOwner, Vector vecStart, Vector vecVelocity );
-	void Touch( CBaseEntity *pOther );
+	void Touch( IServerEntity *pOther );
 	void Animate( void );
 
 	float	m_flDmgTime;
@@ -1216,7 +1216,7 @@ void CBMortar::Precache()
 	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_BigMomma.SpitHit2" );
 }
 
-void CBMortar::Touch( CBaseEntity *pOther )
+void CBMortar::Touch( IServerEntity *pOther )
 {
 	trace_t tr;
 	int		iPitch;

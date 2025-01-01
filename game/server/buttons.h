@@ -29,12 +29,12 @@ protected:
 	void ButtonActivate( );
 	void SparkSoundCache( void );
 
-	void ButtonTouch( ::CBaseEntity *pOther );
+	void ButtonTouch( IServerEntity *pOther );
 	void ButtonSpark ( void );
 	void TriggerAndWait( void );
 	void ButtonReturn( void );
 	void ButtonBackHome( void );
-	void ButtonUse( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value );
+	void ButtonUse( IServerEntity *pActivator, IServerEntity *pCaller, USE_TYPE useType, float value );
 
 	bool OnUseLocked( CBaseEntity *pActivator );
 
@@ -110,7 +110,7 @@ public:
 	void	Spawn ( void );
 	bool	CreateVPhysics( void );
 	virtual int	ObjectCaps( void );
-	void	Use( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value );
+	void	Use( IServerEntity *pActivator, IServerEntity *pCaller, USE_TYPE useType, float value );
 	void	UseMoveDone( void );
 	void	ReturnMoveDone( void );
 	void	OutputMovementComplete(void);

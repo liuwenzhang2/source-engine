@@ -73,7 +73,7 @@ public:
 	// vorts have a very long head/neck swing, so debounce heavily
 	virtual	float	GetHeadDebounce( void ) { return 0.7; } // how much of previous head turn to use
 
-	virtual void		Use( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value );
+	virtual void		Use( IServerEntity *pActivator, IServerEntity *pCaller, USE_TYPE useType, float value );
 	virtual void		AlertSound( void );
 	virtual Class_T		Classify ( void ) { return IsGameEndAlly() ? CLASS_PLAYER_ALLY_VITAL : CLASS_VORTIGAUNT; }
 	virtual void		HandleAnimEvent( animevent_t *pEvent );
@@ -297,7 +297,7 @@ public:
 
 	void	FadeAndDie( void );
 	void	SeekThink( void );
-	void	SeekTouch( CBaseEntity	*pOther );
+	void	SeekTouch( IServerEntity	*pOther );
 	void	SetTargetEntity( CBaseEntity *pTarget ) { m_hTarget = pTarget; }
 
 private:

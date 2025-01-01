@@ -110,7 +110,7 @@ private:
 
 	void	SetPoses( Vector moveRel, float speed );
 
-	//void	IchTouch( CBaseEntity *pOther );
+	//void	IchTouch( IServerEntity *pOther );
 
 	float	GetGroundSpeed( void );
 
@@ -318,7 +318,7 @@ void CNPC_Ichthyosaur::Spawn( void )
 // Input  : *pOther - 
 //-----------------------------------------------------------------------------
 /*
-void CNPC_Ichthyosaur::IchTouch( CBaseEntity *pOther )
+void CNPC_Ichthyosaur::IchTouch( IServerEntity *pOther )
 {
 }
 */

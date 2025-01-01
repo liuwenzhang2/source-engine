@@ -484,7 +484,7 @@ void CBounceBomb::BounceThink()
 
 		float height;
 
-		if( tr.m_pEnt && ((CBaseEntity*)tr.m_pEnt)->GetEngineObject()->VPhysicsGetObject() )
+		if( tr.m_pEnt && tr.m_pEnt->GetEngineObject()->VPhysicsGetObject() )
 		{
 			// Physics object resting on me. Jump as hard as allowed to try to knock it away.
 			height = MINE_MAX_JUMP_HEIGHT;
@@ -554,7 +554,7 @@ void CBounceBomb::CavernBounceThink()
 
 		float height;
 
-		if( tr.m_pEnt && ((CBaseEntity*)tr.m_pEnt)->GetEngineObject()->VPhysicsGetObject() )
+		if( tr.m_pEnt && tr.m_pEnt->GetEngineObject()->VPhysicsGetObject() )
 		{
 			// Physics object resting on me. Jump as hard as allowed to try to knock it away.
 			height = MINE_MAX_JUMP_HEIGHT;
@@ -657,14 +657,14 @@ void CBounceBomb::SettleThink()
 			bool bHop = false;
 			if( tr.m_pEnt )
 			{
-				IPhysicsObject *pPhysics = ((CBaseEntity*)tr.m_pEnt)->GetEngineObject()->VPhysicsGetObject();
+				IPhysicsObject *pPhysics = tr.m_pEnt->GetEngineObject()->VPhysicsGetObject();
 
 				if( pPhysics && pPhysics->GetMass() <= 1000 )
 				{
 					// Light physics objects can be moved out from under the mine.
 					bHop = true;
 				}
-				else if(((CBaseEntity*)tr.m_pEnt)->m_takedamage != DAMAGE_NO )
+				else if(tr.m_pEnt->GetTakeDamage() != DAMAGE_NO )
 				{
 					// Things that can be harmed can likely be broken.
 					bHop = true;
@@ -1055,7 +1055,7 @@ void CBounceBomb::SearchThink()
 
 //---------------------------------------------------------
 //---------------------------------------------------------
-void CBounceBomb::ExplodeTouch( CBaseEntity *pOther )
+void CBounceBomb::ExplodeTouch( IServerEntity *pOther )
 {
 	// Don't touch anything if held by physgun.
 	if( m_bHeldByPhysgun )
@@ -1085,7 +1085,7 @@ void CBounceBomb::ExplodeTouch( CBaseEntity *pOther )
 
 	// Don't detonate against the world if not allowed. Actually, don't
 	// detonate against anything that's probably not an NPC (such as physics props)
-	if( m_flIgnoreWorldTime > gpGlobals->curtime && !pOther->MyCombatCharacterPointer() )
+	if( m_flIgnoreWorldTime > gpGlobals->curtime && !((CBaseEntity*)pOther)->MyCombatCharacterPointer() )
 	{
 		return;
 	}

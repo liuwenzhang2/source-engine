@@ -2024,7 +2024,7 @@ void CFuncCombineBallSpawner::BallGrabbed( CBaseEntity *pCombineBall )
 //-----------------------------------------------------------------------------
 // Fire ball grabbed output
 //-----------------------------------------------------------------------------
-void CFuncCombineBallSpawner::GrabBallTouch( CBaseEntity *pOther )
+void CFuncCombineBallSpawner::GrabBallTouch( IServerEntity *pOther )
 {
 	// Safety net for two balls hitting this at once
 	if ( m_nBallsRemainingInField >= m_nBallCount )

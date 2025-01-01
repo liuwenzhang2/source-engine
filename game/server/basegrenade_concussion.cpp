@@ -22,7 +22,7 @@ public:
 	void Spawn( void );
 	void Precache( void );
 	void FallThink(void);
-	void ExplodeConcussion( CBaseEntity *pOther );
+	void ExplodeConcussion( IServerEntity *pOther );
 
 protected:
 	static int m_nTrailSprite;
@@ -71,7 +71,7 @@ void CBaseGrenadeConcussion::FallThink(void)
 //
 // Contact grenade, explode when it touches something
 // 
-void CBaseGrenadeConcussion::ExplodeConcussion( CBaseEntity *pOther )
+void CBaseGrenadeConcussion::ExplodeConcussion( IServerEntity *pOther )
 {
 	trace_t		tr;
 	Vector		vecSpot;// trace starts here!

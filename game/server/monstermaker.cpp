@@ -499,11 +499,11 @@ void CBaseNPCMaker::ChildPostSpawn( CAI_BaseNPC *pChild )
 		//NDebugOverlay::Box( pChild->GetAbsOrigin(), pChild->WorldAlignMins(), pChild->WorldAlignMaxs(), 0, 255, 0, 32, 5.0 );
 		if ( tr.fraction != 1.0 && tr.m_pEnt )
 		{
-			if ( FClassnameIs((CBaseEntity*)tr.m_pEnt, "prop_physics" ) )
+			if ( FClassnameIs((IServerEntity*)tr.m_pEnt, "prop_physics" ) )
 			{
 				// Set to non-solid so this loop doesn't keep finding it
-				((CBaseEntity*)tr.m_pEnt)->GetEngineObject()->AddSolidFlags( FSOLID_NOT_SOLID );
-				EntityList()->DestroyEntityImmediate((CBaseEntity*)tr.m_pEnt );
+				tr.m_pEnt->GetEngineObject()->AddSolidFlags( FSOLID_NOT_SOLID );
+				EntityList()->DestroyEntityImmediate( tr.m_pEnt );
 				continue;
 			}
 		}

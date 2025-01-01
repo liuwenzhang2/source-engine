@@ -468,7 +468,7 @@ void CAI_ScriptedSequence::Blocked( CBaseEntity *pOther )
 // Purpose: 
 // Input  : pOther - The entity touching us.
 //-----------------------------------------------------------------------------
-void CAI_ScriptedSequence::Touch( CBaseEntity *pOther )
+void CAI_ScriptedSequence::Touch( IServerEntity *pOther )
 {
 /*
 	DevMsg( 2,  "Cine Touch\n" );

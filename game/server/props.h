@@ -58,7 +58,7 @@ public:
 	virtual void Precache();
 	virtual float GetAutoAimRadius() { return 24.0f; }
 
-	void BreakablePropTouch( CBaseEntity *pOther );
+	void BreakablePropTouch( IServerEntity *pOther );
 
 	virtual int OnTakeDamage( const CTakeDamageInfo &info );
 	void Event_Killed( const CTakeDamageInfo &info );
@@ -374,7 +374,7 @@ public:
 	float GetCarryDistanceOffset( void );
 
 	int ObjectCaps();
-	void Use( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value );
+	void Use( IServerEntity *pActivator, IServerEntity *pCaller, USE_TYPE useType, float value );
 
 	void GetMassCenter( Vector *pMassCenter );
 	float GetMass() const;

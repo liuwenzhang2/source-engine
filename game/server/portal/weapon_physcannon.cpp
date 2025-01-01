@@ -309,7 +309,7 @@ public:
 	void Init( CBasePlayer *pPlayer, CBaseEntity *pObject );
 	void Shutdown( bool bThrown = false );
 	bool OnControls( CBaseEntity *pControls ) { return true; }
-	void Use( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value );
+	void Use( IServerEntity *pActivator, IServerEntity *pCaller, USE_TYPE useType, float value );
 	void OnRestore()
 	{
 		BaseClass::OnRestore();
@@ -470,7 +470,7 @@ void CPlayerPickupController::Shutdown( bool bThrown )
 }
 
 
-void CPlayerPickupController::Use( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value )
+void CPlayerPickupController::Use( IServerEntity *pActivator, IServerEntity *pCaller, USE_TYPE useType, float value )
 {
 	if ( ToBasePlayer(pActivator) == m_pPlayer )
 	{
@@ -1520,7 +1520,7 @@ void CWeaponPhysCannon::PrimaryAttack( void )
 	UTIL_PhyscannonTraceHull( start, end, -Vector(8,8,8), Vector(8,8,8), pOwner, &tr );
 	bool bValid = true;
 	CBaseEntity *pEntity = (CBaseEntity*)tr.m_pEnt;
-	if ( tr.fraction == 1 || !tr.m_pEnt || ((CBaseEntity*)tr.m_pEnt)->GetEngineObject()->IsEFlagSet( EFL_NO_PHYSCANNON_INTERACTION ) )
+	if ( tr.fraction == 1 || !tr.m_pEnt || tr.m_pEnt->GetEngineObject()->IsEFlagSet( EFL_NO_PHYSCANNON_INTERACTION ) )
 	{
 		bValid = false;
 	}
@@ -1533,7 +1533,7 @@ void CWeaponPhysCannon::PrimaryAttack( void )
 	if ( !bValid )
 	{
 		UTIL_PhyscannonTraceLine( start, end, pOwner, &tr );
-		if ( tr.fraction == 1 || !tr.m_pEnt || ((CBaseEntity*)tr.m_pEnt)->GetEngineObject()->IsEFlagSet( EFL_NO_PHYSCANNON_INTERACTION ) )
+		if ( tr.fraction == 1 || !tr.m_pEnt || tr.m_pEnt->GetEngineObject()->IsEFlagSet( EFL_NO_PHYSCANNON_INTERACTION ) )
 		{
 			if( hl2_episodic.GetBool() )
 			{
@@ -1861,12 +1861,12 @@ CWeaponPhysCannon::FindObjectResult_t CWeaponPhysCannon::FindObject( void )
 	Vector	end = start + forward * testLength;
 	trace_t tr;
 	FindObjectTrace( pPlayer, &tr );
-	CBaseEntity *pEntity = tr.m_pEnt ? ((CBaseEntity*)tr.m_pEnt)->GetEngineObject()->GetRootMoveParent()->GetOuter() : NULL;
+	CBaseEntity *pEntity = tr.m_pEnt ? (CBaseEntity*)tr.m_pEnt->GetEngineObject()->GetRootMoveParent()->GetHandleEntity() : NULL;
 	bool	bAttach = false;
 	bool	bPull = false;
 
 	// If we hit something, pick it up or pull it
-	if ( ( tr.fraction != 1.0f ) && ( tr.m_pEnt ) && (((CBaseEntity*)tr.m_pEnt)->IsWorld() == false ) )
+	if ( ( tr.fraction != 1.0f ) && ( tr.m_pEnt ) && (tr.m_pEnt->IsWorld() == false ) )
 	{
 		// Attempt to attach if within range
 		if ( tr.fraction <= 0.25f )

@@ -28,7 +28,7 @@ public:
 
 	inline void SetMessage( string_t iszMessage ) { m_iszMessage = iszMessage; }
 
-	void Use( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value );
+	void Use( IServerEntity *pActivator, IServerEntity *pCaller, USE_TYPE useType, float value );
 
 private:
 

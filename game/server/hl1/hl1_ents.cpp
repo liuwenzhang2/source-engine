@@ -97,7 +97,7 @@ public:
 
 	bool KeyValue( const char *szKeyName, const char *szValue );
 	void Spawn( void );
-	void Use( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value );
+	void Use( IServerEntity *pActivator, IServerEntity *pCaller, USE_TYPE useType, float value );
 	void RefireThink( void );
 
 	int ObjectCaps( void ) { return BaseClass::ObjectCaps() & ~FCAP_ACROSS_TRANSITION; }
@@ -187,9 +187,9 @@ void CTriggerRelay::RefireThink( void )
 	}
 }
 
-void CTriggerRelay::Use( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value )
+void CTriggerRelay::Use( IServerEntity *pActivator, IServerEntity *pCaller, USE_TYPE useType, float value )
 {
-	m_OnTrigger.FireOutput(pActivator, this);
+	m_OnTrigger.FireOutput((CBaseEntity*)pActivator, this);
 	
 	if (GetEngineObject()->GetSpawnFlags() & SF_RELAY_FIREONCE)
 	{
@@ -220,7 +220,7 @@ public:
 	bool KeyValue( const char *szKeyName, const char *szValue );
 	void Spawn ( void );
 	void ManagerThink ( void );
-	void ManagerUse   ( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value );
+	void ManagerUse   ( IServerEntity *pActivator, IServerEntity *pCaller, USE_TYPE useType, float value );
 
 #if _DEBUG
 	void ManagerReport( void );
@@ -370,13 +370,13 @@ void CMultiManager::ManagerThink ( void )
 
 
 // The USE function builds the time table and starts the entity thinking.
-void CMultiManager::ManagerUse ( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value )
+void CMultiManager::ManagerUse ( IServerEntity *pActivator, IServerEntity *pCaller, USE_TYPE useType, float value )
 {
-	m_hActivator = pActivator;
+	m_hActivator = (CBaseEntity*)pActivator;
 	m_index = 0;
 	m_startTime = gpGlobals->curtime;
 
-	m_OnTrigger.FireOutput(pActivator, this);
+	m_OnTrigger.FireOutput((CBaseEntity*)pActivator, this);
 	
 	// Calculate the time to re-enable the multimanager - just after the last output is fired.
 	// dvsents2: need to disable multimanager until last output is fired
@@ -476,7 +476,7 @@ void CPendulum::Spawn( void )
 }
 
 
-void CPendulum::PendulumUse( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value )
+void CPendulum::PendulumUse( IServerEntity *pActivator, IServerEntity *pCaller, USE_TYPE useType, float value )
 {
 	if ( m_flSpeed )		// Pendulum is moving, stop it and auto-return if necessary
 	{
@@ -570,13 +570,13 @@ void CPendulum::Swing( void )
 	}
 }
 
-void CPendulum::Touch ( CBaseEntity *pOther )
+void CPendulum::Touch ( IServerEntity *pOther )
 {
 	if ( m_flBlockDamage <= 0 )
 		 return;
 
 	// we can't hurt this thing, so we're not concerned with it
-	if ( !pOther->m_takedamage )
+	if ( !pOther->GetTakeDamage() )
 		  return;
 
 	// calculate damage based on rotation speed
@@ -594,7 +594,7 @@ void CPendulum::Touch ( CBaseEntity *pOther )
 	pOther->GetEngineObject()->SetAbsVelocity( vNewVel * damage );
 }
 
-void CPendulum::RopeTouch ( CBaseEntity *pOther )
+void CPendulum::RopeTouch ( IServerEntity *pOther )
 {
 	if ( !pOther->IsPlayer() )
 	{// not a player!
@@ -605,7 +605,7 @@ void CPendulum::RopeTouch ( CBaseEntity *pOther )
 	if ( pOther == GetEnemy() )
 		 return;
 	
-	m_hEnemy = pOther;
+	m_hEnemy = (CBaseEntity*)pOther;
 	pOther->GetEngineObject()->SetAbsVelocity( Vector ( 0, 0, 0 ) );
 	pOther->GetEngineObject()->SetMoveType( MOVETYPE_NONE );
 }
@@ -631,7 +631,7 @@ public:
 
 	static	TYPEDESCRIPTION m_SaveData[];*/
 
-	//void EXPORT FieldUse( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value );
+	//void EXPORT FieldUse( IServerEntity *pActivator, IServerEntity *pCaller, USE_TYPE useType, float value );
 
 	void InputTrigger ( inputdata_t &inputdata );
 
@@ -902,7 +902,7 @@ class CRenderFxManager : public CBaseEntity
 	DECLARE_CLASS( CRenderFxManager, CBaseEntity );
 public:
 	void	Spawn( void );
-	void	Use( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value );
+	void	Use( IServerEntity *pActivator, IServerEntity *pCaller, USE_TYPE useType, float value );
 
 	// Input handlers.
 	void	InputActivate( inputdata_t &inputdata );
@@ -925,7 +925,7 @@ void CRenderFxManager::Spawn( void )
 }
 
 
-void CRenderFxManager::Use( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value )
+void CRenderFxManager::Use( IServerEntity *pActivator, IServerEntity *pCaller, USE_TYPE useType, float value )
 {
 	if ( m_target != NULL_STRING )
 	{
@@ -973,7 +973,7 @@ public:
 
 	void		Spawn( void );
 	void		Precache( void );
-	void		Touch( CBaseEntity *pOther );
+	void		Touch( IServerEntity *pOther );
 	void		Think( void );
 
 	void		LightOn( void );
@@ -1056,7 +1056,7 @@ void CXenPLight::Think( void )
 }
 
 
-void CXenPLight::Touch( CBaseEntity *pOther )
+void CXenPLight::Touch( IServerEntity *pOther )
 {
 	if ( pOther->IsPlayer() )
 	{
@@ -1138,7 +1138,7 @@ class CXenTreeTrigger : public CBaseEntity
 {
 	DECLARE_CLASS( CXenTreeTrigger, CBaseEntity );
 public:
-	void		Touch( CBaseEntity *pOther );
+	void		Touch( IServerEntity *pOther );
 	static CXenTreeTrigger *TriggerCreate( CBaseEntity *pOwner, const Vector &position );
 };
 LINK_ENTITY_TO_CLASS( xen_ttrigger, CXenTreeTrigger );
@@ -1157,7 +1157,7 @@ CXenTreeTrigger *CXenTreeTrigger::TriggerCreate( CBaseEntity *pOwner, const Vect
 }
 
 
-void CXenTreeTrigger::Touch( CBaseEntity *pOther )
+void CXenTreeTrigger::Touch( IServerEntity *pOther )
 {
 	if ( GetOwnerEntity() )
 	{
@@ -1173,7 +1173,7 @@ class CXenTree : public CActAnimating
 public:
 	void		Spawn( void );
 	void		Precache( void );
-	void		Touch( CBaseEntity *pOther );
+	void		Touch( IServerEntity *pOther );
 	void		Think( void );
 	int			OnTakeDamage( const CTakeDamageInfo &info ) { Attack(); return 0; }
 	void		HandleAnimEvent( animevent_t *pEvent );
@@ -1228,7 +1228,7 @@ void CXenTree::Precache( void )
 }
 
 
-void CXenTree::Touch( CBaseEntity *pOther )
+void CXenTree::Touch( IServerEntity *pOther )
 {
 	if ( !pOther->IsPlayer() && FClassnameIs( pOther, "monster_bigmomma" ) )
 		return;
@@ -1319,7 +1319,7 @@ class CXenSpore : public CActAnimating
 public:
 	void		Spawn( void );
 	void		Precache( void );
-	void		Touch( CBaseEntity *pOther );
+	void		Touch( IServerEntity *pOther );
 //	void		HandleAnimEvent( MonsterEvent_t *pEvent );
 	void		Attack( void ) {}
 
@@ -1447,7 +1447,7 @@ void CXenSpore::Precache( void )
 }
 
 
-void CXenSpore::Touch( CBaseEntity *pOther )
+void CXenSpore::Touch( IServerEntity *pOther )
 {
 }
 
@@ -1493,7 +1493,7 @@ void CHL1Gib::WaitTillLand ( void )
 //
 // Gib bounces on the ground or wall, sponges some blood down, too!
 //
-void CHL1Gib::BounceGibTouch ( CBaseEntity *pOther )
+void CHL1Gib::BounceGibTouch ( IServerEntity *pOther )
 {
 	Vector	vecSpot;
 	trace_t	tr;
@@ -1532,7 +1532,7 @@ void CHL1Gib::BounceGibTouch ( CBaseEntity *pOther )
 //
 // Sticky gib puts blood on the wall and stays put. 
 //
-void CHL1Gib::StickyGibTouch ( CBaseEntity *pOther )
+void CHL1Gib::StickyGibTouch ( IServerEntity *pOther )
 {
 	Vector	vecSpot;
 	trace_t	tr;

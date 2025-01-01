@@ -5160,12 +5160,12 @@ void CNPC_MetroPolice::StunnedTarget( CBaseEntity *pTarget )
 //-----------------------------------------------------------------------------
 // Purpose: Use response for when the player is pre-criminal
 //-----------------------------------------------------------------------------
-void CNPC_MetroPolice::PrecriminalUse( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value )
+void CNPC_MetroPolice::PrecriminalUse( IServerEntity *pActivator, IServerEntity *pCaller, USE_TYPE useType, float value )
 {
 	if ( IsInAScript() )
 		return;
 	// Don't respond if I'm busy hating the player
-	if ( IRelationType( pActivator ) == D_HT || ((GetState() != NPC_STATE_ALERT) && (GetState() != NPC_STATE_IDLE)) )
+	if ( IRelationType( (CBaseEntity*)pActivator ) == D_HT || ((GetState() != NPC_STATE_ALERT) && (GetState() != NPC_STATE_IDLE)) )
 		return;
 	if ( PlayerIsCriminal() )
 		return;

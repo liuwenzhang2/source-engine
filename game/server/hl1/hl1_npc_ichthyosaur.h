@@ -40,7 +40,7 @@ public:
 	void	RunTask( const Task_t *pTask );
 	int		RangeAttack1Conditions( float flDot, float flDist );
 	int		MeleeAttack1Conditions ( float flDot, float flDist );
-	void	BiteTouch( CBaseEntity *pOther );
+	void	BiteTouch( IServerEntity *pOther );
 	void	HandleAnimEvent( animevent_t *pEvent );
 	int		TranslateSchedule( int scheduleType );
 	int		SelectSchedule();

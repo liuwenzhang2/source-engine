@@ -51,7 +51,7 @@ public:
 	bool	CreateVPhysics();
 	void	Move( const Vector &force );
 	virtual int ObjectCaps();
-	virtual void Use( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value );
+	virtual void Use( IServerEntity *pActivator, IServerEntity *pCaller, USE_TYPE useType, float value );
 	
 	virtual int DrawDebugTextOverlays(void);
 
@@ -145,7 +145,7 @@ public:
 	DECLARE_CLASS( CPhysImpact, CPointEntity );
 
 	void		Spawn( void );
-	//void		Use( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value );
+	//void		Use( IServerEntity *pActivator, IServerEntity *pCaller, USE_TYPE useType, float value );
 	void		Activate( void );
 
 	void		InputImpact( inputdata_t &inputdata );
@@ -185,7 +185,7 @@ public:
 
 	void	Spawn( void );
 	void	Precache( void );
-	void	Touch( CBaseEntity *pOther );
+	void	Touch( IServerEntity *pOther );
 	void	VPhysicsCollision( int index, gamevcollisionevent_t *pEvent );
 	void	DoMagnetSuck( CBaseEntity *pOther );
 	void	SetConstraintGroup( IPhysicsConstraintGroup *pGroup );

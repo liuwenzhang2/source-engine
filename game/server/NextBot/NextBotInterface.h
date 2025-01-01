@@ -97,7 +97,7 @@ public:
 	/**
 	 * Should we ever care about noticing physical contact with this entity?
 	 */
-	virtual bool ShouldTouch( const CBaseEntity *object ) const		{ return true; }
+	virtual bool ShouldTouch( const IServerEntity *object ) const		{ return true; }
 
 	/**
 	 * This immobile system is used to track the global state of "am I actually moving or not".

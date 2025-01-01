@@ -59,7 +59,7 @@ class CNPC_BaseTurret : public CAI_BaseNPC
 public:
 	void Spawn(void);
 	virtual void Precache(void);
-	void EXPORT TurretUse( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value );
+	void EXPORT TurretUse( IServerEntity *pActivator, IServerEntity *pCaller, USE_TYPE useType, float value );
 	
 	virtual void TraceAttack( const CTakeDamageInfo &info, const Vector &vecDir, trace_t *ptr, CDmgAccumulator *pAccumulator );
 
@@ -1044,7 +1044,7 @@ int CNPC_BaseTurret::MoveTurret(void)
 	return bMoved;
 }
 
-void CNPC_BaseTurret::TurretUse( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value )
+void CNPC_BaseTurret::TurretUse( IServerEntity *pActivator, IServerEntity *pCaller, USE_TYPE useType, float value )
 {
 	if ( !ShouldToggle( useType, m_iOn ) )
 		return;
@@ -1366,7 +1366,7 @@ public:
 	void Shoot(Vector &vecSrc, Vector &vecDirToEnemy);
 	int OnTakeDamage_Alive(const CTakeDamageInfo &info);
 	void Event_Killed( const CTakeDamageInfo &info );
-	void SentryTouch( CBaseEntity *pOther );
+	void SentryTouch( IServerEntity *pOther );
 
 	DECLARE_DATADESC();
 
@@ -1492,14 +1492,14 @@ void CNPC_Sentry::Event_Killed( const CTakeDamageInfo &info )
 }
 
 
-void CNPC_Sentry::SentryTouch( CBaseEntity *pOther )
+void CNPC_Sentry::SentryTouch( IServerEntity *pOther )
 {
 	//trigger the sentry to turn on if a monster or player touches it
 	if ( pOther && (pOther->IsPlayer() || FBitSet ( pOther->GetEngineObject()->GetFlags(), FL_NPC )) )
 	{
 		CTakeDamageInfo info;
-		info.SetAttacker( pOther );
-		info.SetInflictor( pOther );
+		info.SetAttacker( (CBaseEntity*)pOther );
+		info.SetInflictor((CBaseEntity*)pOther );
 		info.SetDamage( 0 );
 
 		TakeDamage(info);

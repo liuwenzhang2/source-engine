@@ -59,8 +59,8 @@ public:
 	virtual bool ChooseEnemy( void );
 	virtual void HelicopterThink( void );
 	virtual void HelicopterPostThink( void ) { };
-	virtual void FlyTouch( CBaseEntity *pOther );
-	virtual void CrashTouch( CBaseEntity *pOther );
+	virtual void FlyTouch( IServerEntity *pOther );
+	virtual void CrashTouch( IServerEntity *pOther );
 	virtual void DyingThink( void );
 	virtual void Startup( void );
 	virtual void NullThink( void );

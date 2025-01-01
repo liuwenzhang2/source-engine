@@ -1206,7 +1206,7 @@ void CBaseEntity::FireBullets( const FireBulletsInfo_t &info )
 			// Adrian: Make sure to use the currect value if we hit a vehicle the player is currently driving.
 			if ( iPlayerDamage )
 			{
-				if (((CBaseEntity*)tr.m_pEnt)->IsPlayer() )
+				if (tr.m_pEnt->IsPlayer() )
 				{
 					flActualDamage = iPlayerDamage;
 				}
@@ -1286,7 +1286,7 @@ void CBaseEntity::FireBullets( const FireBulletsInfo_t &info )
 			if ( ( psurf != NULL ) && ( psurf->game.material == CHAR_TEX_GLASS ) && (((CBaseEntity*)tr.m_pEnt)->ClassMatches( "func_breakable" ) ) )
 			{
 				// Query the func_breakable for whether it wants to allow for bullet penetration
-				if (((CBaseEntity*)tr.m_pEnt)->GetEngineObject()->HasSpawnFlags( SF_BREAK_NO_BULLET_PENETRATION ) == false )
+				if (((IEngineObjectServer*)tr.m_pEnt->GetEngineObject())->HasSpawnFlags( SF_BREAK_NO_BULLET_PENETRATION ) == false )
 				{
 					bHitGlass = true;
 				}

@@ -141,8 +141,8 @@ private:
 	void Lock();
 	void Unlock();
 
-	void Use(CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value);
-	void OnUse( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value );
+	void Use(IServerEntity *pActivator, IServerEntity *pCaller, USE_TYPE useType, float value);
+	void OnUse( IServerEntity *pActivator, IServerEntity *pCaller, USE_TYPE useType, float value );
 
 	inline bool WillAutoReturn() { return m_flAutoReturnDelay != -1; }
 

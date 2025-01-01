@@ -33,7 +33,7 @@ public:
 	bool KeyValue( const char *szKeyName, const char *szValue );
 	void Spawn( void );
 	void Precache( void );
-	void ToggleUse ( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value );
+	void ToggleUse ( IServerEntity *pActivator, IServerEntity *pCaller, USE_TYPE useType, float value );
 	void SpeakerThink( void );
 	
 	virtual int	ObjectCaps( void ) { return (CBaseEntity::ObjectCaps() & ~FCAP_ACROSS_TRANSITION); }
@@ -158,7 +158,7 @@ void CSpeaker::SpeakerThink( void )
 //
 // ToggleUse - if an announcement is pending, cancel it.  If no announcement is pending, start one.
 //
-void CSpeaker::ToggleUse ( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value )
+void CSpeaker::ToggleUse ( IServerEntity *pActivator, IServerEntity *pCaller, USE_TYPE useType, float value )
 {
 	int fActive = (GetEngineObject()->GetNextThink() > 0.0);
 

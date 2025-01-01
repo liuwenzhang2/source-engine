@@ -61,7 +61,7 @@ public:
 
 	Class_T  Classify( void ) { return CLASS_INSECT; }
 
-	void Touch ( CBaseEntity *pOther );
+	void Touch ( IServerEntity *pOther );
 
 	void Event_Killed( const CTakeDamageInfo &info );
 	int		GetSoundInterests ( void );
@@ -422,7 +422,7 @@ void CNPC_Roach::Move ( float flInterval )
 	}
 }
 
-void CNPC_Roach::Touch ( CBaseEntity *pOther )
+void CNPC_Roach::Touch ( IServerEntity *pOther )
 {
 	Vector		vecSpot;
 	trace_t		tr;
@@ -441,7 +441,7 @@ void CNPC_Roach::Touch ( CBaseEntity *pOther )
 	UTIL_DecalTrace( &tr, "YellowBlood" );
 
 	// DMG_GENERIC because we don't want any physics force generated
-	TakeDamage( CTakeDamageInfo( pOther, pOther, m_iHealth, DMG_GENERIC ) );
+	TakeDamage( CTakeDamageInfo((CBaseEntity*)pOther, (CBaseEntity*)pOther, m_iHealth, DMG_GENERIC ) );
 }
 
 void CNPC_Roach::Event_Killed( const CTakeDamageInfo &info )

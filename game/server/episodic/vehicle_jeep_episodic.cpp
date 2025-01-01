@@ -155,7 +155,7 @@ public:
 	//
 	// Handles the trigger touching its intended quarry
 
-	void CargoTouch( CBaseEntity *pOther )
+	void CargoTouch( IServerEntity *pOther )
 	{
 		// Cannot be ignoring touches
 		if ( ( m_hIgnoreEntity == pOther ) || ( m_flIgnoreDuration >= gpGlobals->curtime ) )
@@ -165,10 +165,10 @@ public:
 		if ( pOther->GetEngineObject()->VPhysicsGetObject() == NULL || (pOther->GetEngineObject()->VPhysicsGetObject()->GetGameFlags() & FVPHYSICS_PLAYER_HELD) == false )
 			return;
 
-		if ( StriderBuster_NumFlechettesAttached( pOther ) > 0 )
+		if ( StriderBuster_NumFlechettesAttached( (CBaseEntity*)pOther ) > 0 )
 			return;
 
-		AddCargo( pOther );
+		AddCargo((CBaseEntity*)pOther );
 	}
 
 	bool AddCargo( CBaseEntity *pOther )
@@ -233,7 +233,7 @@ public:
 	//
 	// When we've stopped touching this entity, we ignore it
 
-	void EndTouch( CBaseEntity *pOther )
+	void EndTouch( IServerEntity *pOther )
 	{
 		if ( pOther == m_hIgnoreEntity )
 		{
@@ -717,7 +717,7 @@ void CPropJeepEpisodic::CreateCargoTrigger( void )
 //-----------------------------------------------------------------------------
 // Purpose: If the player uses the jeep while at the back, he gets ammo from the crate instead
 //-----------------------------------------------------------------------------
-void CPropJeepEpisodic::Use( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value )
+void CPropJeepEpisodic::Use( IServerEntity *pActivator, IServerEntity *pCaller, USE_TYPE useType, float value )
 {
 	// Fall back and get in the vehicle instead, skip giving ammo
 	BaseClass::BaseClass::Use( pActivator, pCaller, useType, value );

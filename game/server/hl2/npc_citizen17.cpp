@@ -2035,7 +2035,7 @@ const char *CNPC_Citizen::SelectRandomExpressionForState( NPC_STATE state )
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-void CNPC_Citizen::SimpleUse( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value )
+void CNPC_Citizen::SimpleUse( IServerEntity *pActivator, IServerEntity *pCaller, USE_TYPE useType, float value )
 {
 	// Under these conditions, citizens will refuse to go with the player.
 	// Robin: NPCs should always respond to +USE even if someone else has the semaphore.
@@ -2044,7 +2044,7 @@ void CNPC_Citizen::SimpleUse( CBaseEntity *pActivator, CBaseEntity *pCaller, USE
 	// First, try to speak the +USE concept
 	if ( !SelectPlayerUseSpeech() )
 	{
-		if (GetEngineObject()->HasSpawnFlags(SF_CITIZEN_NOT_COMMANDABLE) || IRelationType( pActivator ) == D_NU )
+		if (GetEngineObject()->HasSpawnFlags(SF_CITIZEN_NOT_COMMANDABLE) || IRelationType( (CBaseEntity*)pActivator ) == D_NU )
 		{
 			// If I'm denying commander mode because a level designer has made that decision,
 			// then fire this output in case they've hooked it to an event.
@@ -2654,9 +2654,9 @@ void CNPC_Citizen::OnMoveOrder()
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-void CNPC_Citizen::CommanderUse( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value )
+void CNPC_Citizen::CommanderUse( IServerEntity *pActivator, IServerEntity *pCaller, USE_TYPE useType, float value )
 {
-	m_OnPlayerUse.FireOutput( pActivator, pCaller );
+	m_OnPlayerUse.FireOutput( (CBaseEntity*)pActivator, (CBaseEntity*)pCaller );
 
 	// Under these conditions, citizens will refuse to go with the player.
 	// Robin: NPCs should always respond to +USE even if someone else has the semaphore.

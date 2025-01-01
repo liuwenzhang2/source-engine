@@ -163,7 +163,7 @@ void CNPC_Hornet::StartDart ( void )
 }
 
 
-void CNPC_Hornet::DieTouch ( CBaseEntity *pOther )
+void CNPC_Hornet::DieTouch ( IServerEntity *pOther )
 {
 	if ( !pOther || !pOther->GetEngineObject()->IsSolid() || pOther->GetEngineObject()->IsSolidFlagSet(FSOLID_VOLUME_CONTENTS) )
 	{
@@ -242,7 +242,7 @@ unsigned int CNPC_Hornet::PhysicsSolidMaskForEntity( void ) const
 //=========================================================
 // Tracking Hornet hit something
 //=========================================================
-void CNPC_Hornet::TrackTouch ( CBaseEntity *pOther )
+void CNPC_Hornet::TrackTouch ( IServerEntity *pOther )
 {
 	if ( !pOther->GetEngineObject()->IsSolid() || pOther->GetEngineObject()->IsSolidFlagSet(FSOLID_VOLUME_CONTENTS) )
 	{
@@ -255,7 +255,7 @@ void CNPC_Hornet::TrackTouch ( CBaseEntity *pOther )
 		return;
 	}
 
-	int nRelationship = IRelationType( pOther );
+	int nRelationship = IRelationType( (CBaseEntity*)pOther );
 	if ( (nRelationship == D_FR || nRelationship == D_NU || nRelationship == D_LI) )
 	{
 		// hit something we don't want to hurt, so turn around.
@@ -275,7 +275,7 @@ void CNPC_Hornet::TrackTouch ( CBaseEntity *pOther )
 	DieTouch( pOther );
 }
 
-void CNPC_Hornet::DartTouch( CBaseEntity *pOther )
+void CNPC_Hornet::DartTouch( IServerEntity *pOther )
 {
 	DieTouch( pOther );
 }

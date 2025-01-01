@@ -30,7 +30,7 @@ public:
 	void (CDODBombTarget::*pfnEnterState)();	// Init and deinit the state.
 	void (CDODBombTarget::*pfnLeaveState)();
 	void (CDODBombTarget::*pfnThink)();	// Do a PreThink() in this state.
-	void (CDODBombTarget::*pfnUse)( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value );
+	void (CDODBombTarget::*pfnUse)( IServerEntity *pActivator, IServerEntity *pCaller, USE_TYPE useType, float value );
 };
 
 
@@ -67,7 +67,7 @@ public:
 	void State_Enter( BombTargetState newState );
 	void State_Leave();
 	void State_Think();
-	void State_Use( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value );
+	void State_Use( IServerEntity *pActivator, IServerEntity *pCaller, USE_TYPE useType, float value );
 
 	int State_Get( void ) { return m_iState; }
 
@@ -85,8 +85,8 @@ public:
 	void State_Think_ARMED( void );
 
 	// Use
-	void State_Use_ACTIVE( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value );
-	void State_Use_ARMED( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value );
+	void State_Use_ACTIVE( IServerEntity *pActivator, IServerEntity *pCaller, USE_TYPE useType, float value );
+	void State_Use_ARMED( IServerEntity *pActivator, IServerEntity *pCaller, USE_TYPE useType, float value );
 
 	float GetBombTimerLength( void );
 

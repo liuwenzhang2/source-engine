@@ -37,8 +37,8 @@ public:
 	virtual void ExplodeThink( void );
 	// Update in a time till death update
 	virtual void Think ( void );
-	virtual void EndTouch( CBaseEntity *pOther );
-	virtual void StartTouch( CBaseEntity *pOther );
+	virtual void EndTouch( IServerEntity *pOther );
+	virtual void StartTouch( IServerEntity *pOther );
 	virtual void NotifySystemEvent( CBaseEntity *pNotify, notify_system_event_t eventType, const notify_system_event_params_t &params );
 
 	CHandle<CProp_Portal>		m_hTouchedPortal;	// Pointer to the portal we are touched most recently
@@ -377,7 +377,7 @@ void CPropEnergyBall::ExplodeThink( )
 	StopLoopingSounds();
 }
 
-void CPropEnergyBall::StartTouch( CBaseEntity *pOther )
+void CPropEnergyBall::StartTouch( IServerEntity *pOther )
 {
 	Assert( pOther );
 
@@ -420,7 +420,7 @@ void CPropEnergyBall::StartTouch( CBaseEntity *pOther )
 	BaseClass::StartTouch( pOther );
 }
 
-void CPropEnergyBall::EndTouch( CBaseEntity *pOther )
+void CPropEnergyBall::EndTouch( IServerEntity *pOther )
 {
 	CProp_Portal* pPortal = dynamic_cast<CProp_Portal*>(pOther);
 

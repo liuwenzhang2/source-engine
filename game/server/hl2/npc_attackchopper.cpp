@@ -251,7 +251,7 @@ private:
 	void WarningBlinkerThink();
 	void StopWarningBlinker();
 	void AnimateThink();
-	void ExplodeConcussion( CBaseEntity *pOther );
+	void ExplodeConcussion( IServerEntity *pOther );
 	void BecomeActive();
 	void ResolveFlyCollisionCustom( trace_t &trace, Vector &vecVelocity );
 
@@ -5515,7 +5515,7 @@ void CGrenadeHelicopter::ResolveFlyCollisionCustom( trace_t &trace, Vector &vecV
 //------------------------------------------------------------------------------
 // Contact grenade, explode when it touches something
 //------------------------------------------------------------------------------
-void CGrenadeHelicopter::ExplodeConcussion( CBaseEntity *pOther )
+void CGrenadeHelicopter::ExplodeConcussion( IServerEntity *pOther )
 {
 	if ( !pOther->GetEngineObject()->IsSolid() )
 		return;
@@ -5534,12 +5534,12 @@ void CGrenadeHelicopter::ExplodeConcussion( CBaseEntity *pOther )
 	}
 
 #ifdef HL2_EPISODIC
-	CBaseEntity *pEntityHit = pOther;
+	IServerEntity *pEntityHit = pOther;
 	if ( pEntityHit->ClassMatches( "phys_bone_follower" ) && pEntityHit->GetOwnerEntity() )
 	{
 		pEntityHit = pEntityHit->GetOwnerEntity();
 	}
-	if ( ( CLASS_COMBINE_GUNSHIP != pEntityHit->Classify() ) || !pEntityHit->ClassMatches( "npc_helicopter" ) )
+	if ( ( CLASS_COMBINE_GUNSHIP != ((CBaseEntity*)pEntityHit)->Classify() ) || !pEntityHit->ClassMatches( "npc_helicopter" ) )
 	{
 		// We hit something other than a helicopter.  If the player threw us, send a miss event
 		if ( IsThrownByPlayer() )

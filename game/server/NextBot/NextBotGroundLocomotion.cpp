@@ -526,7 +526,7 @@ bool NextBotGroundLocomotion::DetectCollision( trace_t *pTrace, int &recursionLi
 
 	/// @todo Only invoke OnContact() and Touch() once per collision pair
 	// inform other components of collision
-	if ( GetBot()->ShouldTouch( (CBaseEntity*)pTrace->m_pEnt ) )
+	if ( GetBot()->ShouldTouch( (IServerEntity*)pTrace->m_pEnt ) )
 	{
 		GetBot()->OnContact((CBaseEntity*)pTrace->m_pEnt, pTrace );
 	}

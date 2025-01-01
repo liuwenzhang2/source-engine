@@ -63,14 +63,14 @@ void CBaseSpriteProjectile::Spawn(	char *pszModel,
 
 //---------------------------------------------------------
 //---------------------------------------------------------
-void CBaseSpriteProjectile::Touch( CBaseEntity *pOther )
+void CBaseSpriteProjectile::Touch( IServerEntity *pOther )
 {
 	HandleTouch( pOther );
 }
 
 //---------------------------------------------------------
 //---------------------------------------------------------
-void CBaseSpriteProjectile::HandleTouch( CBaseEntity *pOther )
+void CBaseSpriteProjectile::HandleTouch( IServerEntity *pOther )
 {
 	CBaseEntity *pOwner;
 

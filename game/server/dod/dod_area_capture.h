@@ -38,7 +38,7 @@ public:
 	bool	CheckIfDeathCausesBlock( CDODPlayer *pVictim, CDODPlayer *pKiller );
 
 private:
-	void EXPORT AreaTouch( CBaseEntity *pOther );
+	void EXPORT AreaTouch( IServerEntity *pOther );
 	void	Think( void );
 
 	void	StartCapture( int team, int capmode );

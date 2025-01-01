@@ -49,7 +49,7 @@ public:
 	void		Spawn( void );
 	void		Precache( void );
 	void		Format( color32 clrColor, float flWidth);
-	void 		GrenadeBeamTouch( CBaseEntity *pOther );
+	void 		GrenadeBeamTouch( IServerEntity *pOther );
 	void 		KillBeam();
 	void		CreateBeams(void);
 	void		UpdateBeams(void);

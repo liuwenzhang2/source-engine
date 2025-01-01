@@ -36,10 +36,10 @@ public:
 	void JumpToBurrowHint( CAI_Hint *pHint );
 
 	bool	HasHeadroom();
-	void	LeapTouch ( CBaseEntity *pOther );
+	void	LeapTouch ( IServerEntity *pOther );
 	virtual void TouchDamage( CBaseEntity *pOther );
 	bool	CorpseGib( const CTakeDamageInfo &info );
-	void	Touch( CBaseEntity *pOther );
+	void	Touch( IServerEntity *pOther );
 	Vector	BodyTarget( const Vector &posSrc, bool bNoisy = true );
 	float	GetAutoAimRadius();
 	void	TraceAttack( const CTakeDamageInfo &info, const Vector &vecDir, trace_t *ptr, CDmgAccumulator *pAccumulator );
@@ -237,7 +237,7 @@ class CBlackHeadcrab : public CBaseHeadcrab
 
 public:
 	void Eject( const QAngle &vecAngles, float flVelocityScale, CBaseEntity *pEnemy );
-	void EjectTouch( CBaseEntity *pOther );
+	void EjectTouch( IServerEntity *pOther );
 
 	//
 	// CBaseHeadcrab implementation.

@@ -333,7 +333,7 @@ void CHL2MP_Player::Spawn(void)
 	m_bReady = false;
 }
 
-void CHL2MP_Player::PickupObject( CBaseEntity *pObject, bool bLimitMassAndSize )
+void CHL2MP_Player::PickupObject( IServerEntity *pObject, bool bLimitMassAndSize )
 {
 	
 }

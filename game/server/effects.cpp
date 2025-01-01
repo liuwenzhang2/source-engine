@@ -328,7 +328,7 @@ public:
 
 	void Spawn( void );
 	void Precache( void );
-	void Use( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value );
+	void Use( IServerEntity *pActivator, IServerEntity *pCaller, USE_TYPE useType, float value );
 
 	virtual CGib *CreateGib( void );
 
@@ -410,7 +410,7 @@ void CGibShooter::Precache ( void )
 }
 
 
-void CGibShooter::Use( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value )
+void CGibShooter::Use( IServerEntity *pActivator, IServerEntity *pCaller, USE_TYPE useType, float value )
 {
 	SetThink( &CGibShooter::ShootThink );
 	GetEngineObject()->SetNextThink( gpGlobals->curtime );
@@ -927,7 +927,7 @@ public:
 	void	Precache( void );
 	// bool	KeyValue( const char *szKeyName, const char *szValue );
 	void Think( void );
-	void Use( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value );
+	void Use( IServerEntity *pActivator, IServerEntity *pCaller, USE_TYPE useType, float value );
 
 	int		m_iLoop;
 	int		m_iBeam;
@@ -1006,7 +1006,7 @@ void CTestEffect::Think( void )
 }
 
 
-void CTestEffect::Use( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value )
+void CTestEffect::Use( IServerEntity *pActivator, IServerEntity *pCaller, USE_TYPE useType, float value )
 {
 	GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.1f );
 	m_flStartTime = gpGlobals->curtime;
@@ -1243,7 +1243,7 @@ public:
 
 	void	Spawn( void );
 	void	Precache( void );
-	void	Use( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value );
+	void	Use( IServerEntity *pActivator, IServerEntity *pCaller, USE_TYPE useType, float value );
 
 	int		m_iSprite;	// Don't save, precache
 };
@@ -1266,7 +1266,7 @@ void CEnvFunnel::Precache ( void )
 	m_iSprite = engine->PrecacheModel ( "sprites/flare6.vmt" );
 }
 
-void CEnvFunnel::Use( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value )
+void CEnvFunnel::Use( IServerEntity *pActivator, IServerEntity *pCaller, USE_TYPE useType, float value )
 {
 	CBroadcastRecipientFilter filter;
 	te->LargeFunnel( filter, 0.0,
@@ -1294,7 +1294,7 @@ public:
 
 	void	Spawn( void );
 	void	Precache( void );
-	void	Use( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value );
+	void	Use( IServerEntity *pActivator, IServerEntity *pCaller, USE_TYPE useType, float value );
 	bool	KeyValue( const char *szKeyName, const char *szValue );
 
 	// Input handlers.
@@ -1336,7 +1336,7 @@ bool CEnvBeverage::KeyValue( const char *szKeyName, const char *szValue )
 	return true;
 }
 
-void CEnvBeverage::Use( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value )
+void CEnvBeverage::Use( IServerEntity *pActivator, IServerEntity *pCaller, USE_TYPE useType, float value )
 {
 	if ( m_CanInDispenser || m_iHealth <= 0 )
 	{
@@ -1392,7 +1392,7 @@ public:
 	void	Spawn( void );
 	void	Precache( void );
 	void	CanThink ( void );
-	void	CanTouch ( CBaseEntity *pOther );
+	void	CanTouch ( IServerEntity *pOther );
 
 	DECLARE_DATADESC();
 };
@@ -1453,7 +1453,7 @@ void CItemSoda::CanThink ( void )
 	SetTouch ( &CItemSoda::CanTouch );
 }
 
-void CItemSoda::CanTouch ( CBaseEntity *pOther )
+void CItemSoda::CanTouch ( IServerEntity *pOther )
 {
 	if ( !pOther->IsPlayer() )
 	{
@@ -1662,7 +1662,7 @@ public:
 	void	Spawn( void );
 	void	Precache( void );
 
-	void	EmberUse( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value );
+	void	EmberUse( IServerEntity *pActivator, IServerEntity *pCaller, USE_TYPE useType, float value );
 
 	CNetworkVar( int, m_nDensity );
 	CNetworkVar( int, m_nLifetime );
@@ -1731,7 +1731,7 @@ void CEmbers::Precache( void )
 //			useType -
 //			value -
 //-----------------------------------------------------------------------------
-void CEmbers::EmberUse( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value )
+void CEmbers::EmberUse( IServerEntity *pActivator, IServerEntity *pCaller, USE_TYPE useType, float value )
 {
 	//If we're not toggable, only allow one use
 	if ( !GetEngineObject()->HasSpawnFlags( bitsSF_EMBERS_TOGGLE ) )

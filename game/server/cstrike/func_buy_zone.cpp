@@ -22,7 +22,7 @@ public:
 
 	CBuyZone();
 	void Spawn();
-	void EXPORT BuyZoneTouch( CBaseEntity* pOther );
+	void EXPORT BuyZoneTouch( IServerEntity* pOther );
 
 public:
 	int m_LegacyTeamNum;
@@ -62,7 +62,7 @@ void CBuyZone::Spawn()
 }
 
 	
-void CBuyZone::BuyZoneTouch( CBaseEntity* pOther )
+void CBuyZone::BuyZoneTouch( IServerEntity* pOther )
 {
 	CCSPlayer *p = dynamic_cast< CCSPlayer* >( pOther );
 	if ( p )

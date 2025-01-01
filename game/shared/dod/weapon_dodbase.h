@@ -339,7 +339,7 @@ public:
 		void			SetDieThink( bool bDie );
 		void			Die( void );
 
-		void Use( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value );
+		void Use( IServerEntity *pActivator, IServerEntity *pCaller, USE_TYPE useType, float value );
 
 	#endif
 

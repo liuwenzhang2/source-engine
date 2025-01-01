@@ -1060,7 +1060,7 @@ void CAI_PlayerAlly::ClearTransientConditions()
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-void CAI_PlayerAlly::Touch( CBaseEntity *pOther )
+void CAI_PlayerAlly::Touch( IServerEntity *pOther )
 {
 	BaseClass::Touch( pOther );
 
@@ -1075,7 +1075,7 @@ void CAI_PlayerAlly::Touch( CBaseEntity *pOther )
 		if ( GetExpresser()->IsSpeaking() )
 			return;
 			
-		TestPlayerPushing( pOther );
+		TestPlayerPushing( (CBaseEntity*)pOther );
 	}
 }
 

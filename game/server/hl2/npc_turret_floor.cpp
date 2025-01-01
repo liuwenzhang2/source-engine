@@ -1899,7 +1899,7 @@ void CNPC_FloorTurret::InputRestoreAmmo( inputdata_t &inputdata )
 //-----------------------------------------------------------------------------
 // Purpose: Allow players and npc's to turn the turret on and off
 //-----------------------------------------------------------------------------
-void CNPC_FloorTurret::ToggleUse ( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value )
+void CNPC_FloorTurret::ToggleUse ( IServerEntity *pActivator, IServerEntity *pCaller, USE_TYPE useType, float value )
 {
 	switch( useType )
 	{

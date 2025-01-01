@@ -1703,14 +1703,14 @@ int CBaseEntity::ObjectCaps( void )
 #endif
 }
 
-void CBaseEntity::StartTouch( CBaseEntity *pOther )
+void CBaseEntity::StartTouch( IServerEntity *pOther )
 {
 	// notify parent
 	if ( GetEngineObject()->GetMoveParent() != NULL )
 		GetEngineObject()->GetMoveParent()->GetOuter()->StartTouch(pOther);
 }
 
-void CBaseEntity::Touch( CBaseEntity *pOther )
+void CBaseEntity::Touch( IServerEntity *pOther )
 { 
 	if ( m_pfnTouch ) 
 		(this->*m_pfnTouch)( pOther );
@@ -1720,7 +1720,7 @@ void CBaseEntity::Touch( CBaseEntity *pOther )
 		GetEngineObject()->GetMoveParent()->GetOuter()->Touch( pOther );
 }
 
-void CBaseEntity::EndTouch( CBaseEntity *pOther )
+void CBaseEntity::EndTouch( IServerEntity *pOther )
 {
 	// notify parent
 	if (GetEngineObject()->GetMoveParent() != NULL )
@@ -1758,7 +1758,7 @@ void CBaseEntity::Blocked( CBaseEntity *pOther )
 //			useType - 
 //			value - 
 //-----------------------------------------------------------------------------
-void CBaseEntity::Use( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value ) 
+void CBaseEntity::Use( IServerEntity *pActivator, IServerEntity *pCaller, USE_TYPE useType, float value ) 
 {
 	if ( m_pfnUse != NULL ) 
 	{
@@ -3084,7 +3084,7 @@ const char *CBaseEntity::GetDebugName(void)
 // Input   :
 // Output  :
 //------------------------------------------------------------------------------
-void CBaseEntity::DrawInputOverlay(const char *szInputName, CBaseEntity *pCaller, variant_t Value)
+void CBaseEntity::DrawInputOverlay(const char *szInputName, IServerEntity *pCaller, variant_t Value)
 {
 	char bigstring[1024];
 	if ( Value.FieldType() == FIELD_INTEGER )
@@ -3222,7 +3222,7 @@ ConVar ent_messages_draw( "ent_messages_draw", "0", FCVAR_CHEAT, "Visualizes all
 //			*pCaller - entity from which this event is sent
 // Output : Returns true on success, false on failure.
 //-----------------------------------------------------------------------------
-bool CBaseEntity::AcceptInput( const char *szInputName, CBaseEntity *pActivator, CBaseEntity *pCaller, variant_t Value, int outputID )
+bool CBaseEntity::AcceptInput( const char *szInputName, IServerEntity *pActivator, IServerEntity *pCaller, variant_t Value, int outputID )
 {
 	if ( ent_messages_draw.GetBool() )
 	{
@@ -3290,8 +3290,8 @@ bool CBaseEntity::AcceptInput( const char *szInputName, CBaseEntity *pActivator,
 					{ 
 						// Package the data into a struct for passing to the input handler.
 						inputdata_t data;
-						data.pActivator = pActivator;
-						data.pCaller = pCaller;
+						data.pActivator = (CBaseEntity*)pActivator;
+						data.pCaller = (CBaseEntity*)pCaller;
 						data.value = Value;
 						data.nOutputID = outputID;
 

@@ -258,7 +258,7 @@ char *CDODBaseGrenade::GetExplodingClassname( void )
 	return NULL;
 }
 
-void CDODBaseGrenade::Use( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value )
+void CDODBaseGrenade::Use( IServerEntity *pActivator, IServerEntity *pCaller, USE_TYPE useType, float value )
 {
 	if ( !CanBePickedUp() )
 		return;
@@ -459,7 +459,7 @@ void CDODBaseGrenade::VPhysicsUpdate( IPhysicsObject *pPhysics )
 
 	bool bHitTeammate = false;
 
-	if ( m_bCollideWithTeammates == false && tr.m_pEnt && ((CBaseEntity*)tr.m_pEnt)->IsPlayer() && ((CBaseEntity*)tr.m_pEnt)->GetTeamNumber() == GetTeamNumber() )
+	if ( m_bCollideWithTeammates == false && tr.m_pEnt && tr.m_pEnt->IsPlayer() && ((CBaseEntity*)tr.m_pEnt)->GetTeamNumber() == GetTeamNumber() )
 	{
 		bHitTeammate = true;
 	}

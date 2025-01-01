@@ -83,7 +83,7 @@ void CLight::Spawn( void )
 }
 
 
-void CLight::Use( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value )
+void CLight::Use( IServerEntity *pActivator, IServerEntity *pCaller, USE_TYPE useType, float value )
 {
 	if (m_iStyle >= 32)
 	{

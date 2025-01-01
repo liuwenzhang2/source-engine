@@ -3157,7 +3157,7 @@ PassengerState_e CNPC_Alyx::GetPassengerState( void )
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-void CNPC_Alyx::Use( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value )
+void CNPC_Alyx::Use( IServerEntity *pActivator, IServerEntity *pCaller, USE_TYPE useType, float value )
 {
 	// if I'm in the vehicle, the player is probably trying to use the vehicle
 	if ( GetPassengerState() == PASSENGER_STATE_INSIDE && pActivator->IsPlayer() && GetEngineObject()->GetMoveParent() )
@@ -3169,7 +3169,7 @@ void CNPC_Alyx::Use( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE use
 	SpeakIfAllowed( TLK_USE );
 	m_bDontUseSemaphore = false;
 
-	m_OnPlayerUse.FireOutput( pActivator, pCaller );
+	m_OnPlayerUse.FireOutput( (CBaseEntity*)pActivator, (CBaseEntity*)pCaller );
 }
 
 //-----------------------------------------------------------------------------

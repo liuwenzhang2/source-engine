@@ -612,7 +612,7 @@ void CNPC_Manhack::VPhysicsShadowCollision( int index, gamevcollisionevent_t *pE
 // Input  :
 // Output :
 //-----------------------------------------------------------------------------
-void CNPC_Manhack::CrashTouch( CBaseEntity *pOther )
+void CNPC_Manhack::CrashTouch( IServerEntity *pOther )
 {
 	CTakeDamageInfo	info( GetWorldEntity(), GetWorldEntity(), 25, DMG_CRUSH );
 
@@ -1521,7 +1521,7 @@ void CNPC_Manhack::Slice( CBaseEntity *pHitEntity, float flInterval, trace_t &tr
 	Vector dir = (tr.endpos - tr.startpos);
 	if ( dir == vec3_origin )
 	{
-		dir = ((CBaseEntity*)tr.m_pEnt)->GetEngineObject()->GetAbsOrigin() - GetEngineObject()->GetAbsOrigin();
+		dir = tr.m_pEnt->GetEngineObject()->GetAbsOrigin() - GetEngineObject()->GetAbsOrigin();
 	}
 	CalculateMeleeDamageForce( &info, dir, tr.endpos );
 	pHitEntity->TakeDamage( info );
@@ -1769,7 +1769,7 @@ void CNPC_Manhack::CheckCollisions(float flInterval)
 
 	if ( (tr.fraction != 1.0 || tr.startsolid) && tr.m_pEnt)
 	{
-		GetEngineObject()->PhysicsMarkEntitiesAsTouching(((CBaseEntity*)tr.m_pEnt)->GetEngineObject(), tr );
+		GetEngineObject()->PhysicsMarkEntitiesAsTouching((IEngineObjectServer*)tr.m_pEnt->GetEngineObject(), tr );
 		pHitEntity = (CBaseEntity*)tr.m_pEnt;
 
 		if( m_bHeld && ((CBaseEntity*)tr.m_pEnt)->MyNPCPointer() && ((CBaseEntity*)tr.m_pEnt)->MyNPCPointer()->IsPlayerAlly() )

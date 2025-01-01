@@ -350,7 +350,7 @@ void CAI_RappelBehavior::BeginRappel()
 
 	EntityList()->GetEngineWorld()->TraceEntity( GetOuter()->GetEngineObject(), GetAbsOrigin(), GetAbsOrigin() - Vector(0, 0, 4096), MASK_SHOT, GetOuter(), COLLISION_GROUP_NONE, &tr);
 
-	if( tr.m_pEnt != NULL && ((CBaseEntity*)tr.m_pEnt)->IsNPC() )
+	if( tr.m_pEnt != NULL && tr.m_pEnt->IsNPC() )
 	{
 		Vector forward;
 		GetOuter()->GetVectors( &forward, NULL, NULL );

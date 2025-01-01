@@ -43,7 +43,7 @@ public:
 	DECLARE_CLASS( CTriggerPortalCleanser, CBaseTrigger );
 
 	void Spawn( void );
-	void Touch( CBaseEntity *pOther );
+	void Touch( IServerEntity *pOther );
 
 	DECLARE_DATADESC();
 
@@ -103,7 +103,7 @@ CBaseEntity* ConvertToSimpleProp ( CBaseEntity* pEnt )
 }
 
 
-void CTriggerPortalCleanser::Touch( CBaseEntity *pOther )
+void CTriggerPortalCleanser::Touch( IServerEntity *pOther )
 {
 	if ( !PassesTriggerFilters( pOther ) )
 		return;
@@ -170,7 +170,7 @@ void CTriggerPortalCleanser::Touch( CBaseEntity *pOther )
 				{
 					pPortalgun->SendWeaponAnim( ACT_VM_FIZZLE );
 					pPortalgun->SetLastFiredPortal( 0 );
-					m_OnFizzle.FireOutput( pOther, this );
+					m_OnFizzle.FireOutput((CBaseEntity*)pOther, this );
 					pPlayer->RumbleEffect( RUMBLE_RPG_MISSILE, 0, RUMBLE_FLAG_RESTART );
 				}
 			}
@@ -200,7 +200,7 @@ void CTriggerPortalCleanser::Touch( CBaseEntity *pOther )
 		// always being 'box'. We use special logic when the cleanser dissolves a box so this is a special output for it.
 		if ( pBaseAnimating->NameMatches( "box" ) )
 		{
-			m_OnDissolveBox.FireOutput( pOther, this );
+			m_OnDissolveBox.FireOutput((CBaseEntity*)pOther, this );
 		}
 
 		if ( FClassnameIs( pBaseAnimating, "updateitem2" ) )
@@ -273,6 +273,6 @@ void CTriggerPortalCleanser::Touch( CBaseEntity *pOther )
 			pDisolvingAnimating->Dissolve( "", gpGlobals->curtime, false, ENTITY_DISSOLVE_NORMAL );
 		}
 
-		m_OnDissolve.FireOutput( pOther, this );
+		m_OnDissolve.FireOutput((CBaseEntity*)pOther, this );
 	}
 }

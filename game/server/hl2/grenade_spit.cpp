@@ -126,12 +126,12 @@ void CGrenadeSpit::Event_Killed( const CTakeDamageInfo &info )
 //-----------------------------------------------------------------------------
 // Purpose: Handle spitting
 //-----------------------------------------------------------------------------
-void CGrenadeSpit::GrenadeSpitTouch( CBaseEntity *pOther )
+void CGrenadeSpit::GrenadeSpitTouch( IServerEntity *pOther )
 {
 	if ( pOther->GetEngineObject()->IsSolidFlagSet(FSOLID_VOLUME_CONTENTS | FSOLID_TRIGGER) )
 	{
 		// Some NPCs are triggers that can take damage (like antlion grubs). We should hit them.
-		if ( ( pOther->m_takedamage == DAMAGE_NO ) || ( pOther->m_takedamage == DAMAGE_EVENTS_ONLY ) )
+		if ( ( pOther->GetTakeDamage() == DAMAGE_NO) || (pOther->GetTakeDamage() == DAMAGE_EVENTS_ONLY))
 			return;
 	}
 

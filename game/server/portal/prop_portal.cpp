@@ -354,7 +354,7 @@ void CProp_Portal::TestRestingSurfaceThink( void )
 		enginetrace->TraceRay( ray, MASK_SOLID_BRUSHONLY, &traceFilterPortalShot, &tr );
 
 		// This corner isn't on a valid brush (skipping phys converts or physboxes because they frequently go through portals and can't be placed upon).
-		if ( tr.fraction == 1.0f && !tr.startsolid && ( !tr.m_pEnt || ( tr.m_pEnt && !FClassnameIs((CBaseEntity*)tr.m_pEnt, "func_physbox" ) && !FClassnameIs((CBaseEntity*)tr.m_pEnt, "simple_physics_brush" ) ) ) )
+		if ( tr.fraction == 1.0f && !tr.startsolid && ( !tr.m_pEnt || ( tr.m_pEnt && !FClassnameIs((IServerEntity*)tr.m_pEnt, "func_physbox" ) && !FClassnameIs((IServerEntity*)tr.m_pEnt, "simple_physics_brush" ) ) ) )
 		{
 			DevMsg( "Surface removed from behind portal.\n" );
 			EntityList()->DestroyEntity(this);
@@ -1244,7 +1244,7 @@ void CProp_Portal::TeleportTouchingEntity( CBaseEntity *pOther )
 }
 
 
-void CProp_Portal::Touch( CBaseEntity *pOther )
+void CProp_Portal::Touch( IServerEntity *pOther )
 {
 	BaseClass::Touch( pOther );
 
@@ -1324,7 +1324,7 @@ void CProp_Portal::Touch( CBaseEntity *pOther )
 		if( SharedEnvironmentCheck( pOther ) )
 		{
 			bool bObjectCenterInFrontOfPortal	= (GetPortalPlane().normal.Dot( pOther->WorldSpaceCenter() ) > GetPortalPlane().dist);
-			bool bIsStuckPlayer					= ( pOther->IsPlayer() )? ( !UTIL_IsSpaceEmpty( pOther, pOther->GetEngineObject()->WorldAlignMins(), pOther->GetEngineObject()->WorldAlignMaxs() ) ) : ( false );
+			bool bIsStuckPlayer					= ( pOther->IsPlayer() )? ( !UTIL_IsSpaceEmpty( (CBaseEntity*)pOther, pOther->GetEngineObject()->WorldAlignMins(), pOther->GetEngineObject()->WorldAlignMaxs() ) ) : ( false );
 
 			if ( bIsStuckPlayer )
 			{
@@ -1359,11 +1359,11 @@ void CProp_Portal::Touch( CBaseEntity *pOther )
 		}
 	}
 
-	if( ShouldTeleportTouchingEntity( pOther ) )
-		TeleportTouchingEntity( pOther );
+	if( ShouldTeleportTouchingEntity((CBaseEntity*)pOther ) )
+		TeleportTouchingEntity((CBaseEntity*)pOther );
 }
 
-void CProp_Portal::StartTouch( CBaseEntity *pOther )
+void CProp_Portal::StartTouch( IServerEntity *pOther )
 {
 	BaseClass::StartTouch( pOther );
 
@@ -1405,7 +1405,7 @@ void CProp_Portal::StartTouch( CBaseEntity *pOther )
 	}	
 }
 
-void CProp_Portal::EndTouch( CBaseEntity *pOther )
+void CProp_Portal::EndTouch( IServerEntity *pOther )
 {
 	BaseClass::EndTouch( pOther );
 
@@ -1415,8 +1415,8 @@ void CProp_Portal::EndTouch( CBaseEntity *pOther )
 		return;
 	}
 
-	if( ShouldTeleportTouchingEntity( pOther ) ) //an object passed through the plane and all the way out of the touch box
-		TeleportTouchingEntity( pOther );
+	if( ShouldTeleportTouchingEntity((CBaseEntity*)pOther ) ) //an object passed through the plane and all the way out of the touch box
+		TeleportTouchingEntity((CBaseEntity*)pOther );
 	else if( pOther->IsPlayer() && //player
 			(GetVectorForward().z < -0.7071f) && //most likely falling out of the portal m_hPortalSimulator->
 			(GetPortalPlane().normal.Dot(pOther->WorldSpaceCenter()) < GetPortalPlane().dist) && //but behind the portal plane m_hPortalSimulator->
@@ -1443,7 +1443,7 @@ void CProp_Portal::EndTouch( CBaseEntity *pOther )
 #endif
 }
 
-bool CProp_Portal::SharedEnvironmentCheck( CBaseEntity *pEntity )
+bool CProp_Portal::SharedEnvironmentCheck( IServerEntity *pEntity )
 {
 	Assert( ((GetLinkedPortalSimulator() == NULL) && (m_hLinkedPortal.Get() == NULL)) || //m_hPortalSimulator->
 		(GetLinkedPortalSimulator() == m_hLinkedPortal) ); //make sure this entity is linked to the same portal as our simulator m_hPortalSimulator->->m_hPortalSimulator

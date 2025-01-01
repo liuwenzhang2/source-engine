@@ -89,7 +89,7 @@ public:
 	virtual void OnPhysGunDrop( CBasePlayer *pPhysGunUser, PhysGunDrop_t Reason );
 	virtual Vector	PhysGunLaunchVelocity( const Vector &forward, float flMass );
 	virtual float	GetAutoAimRadius( void ) { return striderbuster_autoaim_radius.GetFloat(); }
-	virtual void	BusterTouch( CBaseEntity *pOther );
+	virtual void	BusterTouch( IServerEntity *pOther );
 
 	virtual bool	ShouldAttractAutoAim( CBaseEntity *pAimingEnt ) { return IsAttachedToStrider(); }
 
@@ -627,10 +627,10 @@ void CWeaponStriderBuster::VPhysicsCollision( int index, gamevcollisionevent_t *
 // Purpose: Called to see if we should attach to the victim
 // Input  : *pOther - the victim
 //-----------------------------------------------------------------------------
-void CWeaponStriderBuster::BusterTouch( CBaseEntity *pOther )
+void CWeaponStriderBuster::BusterTouch( IServerEntity *pOther )
 {
 	// Attempt to stick to the entity
-	StickToEntity( pOther );
+	StickToEntity( (CBaseEntity*)pOther );
 }
 
 //-----------------------------------------------------------------------------

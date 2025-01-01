@@ -28,7 +28,7 @@ public:
 	void			Spawn( void );
 	void			Precache( void );
 	void			BounceSound( void );
-	void			SatchelTouch( CBaseEntity *pOther );
+	void			SatchelTouch( IServerEntity *pOther );
 	void			SatchelThink( void );
 	
 	// Input handlers

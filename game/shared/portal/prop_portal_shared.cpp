@@ -44,7 +44,7 @@ static char *g_pszPortalNonTeleportable[] =
 	"physicsshadowclone"
 };
 
-bool CProp_Portal_Shared::IsEntityTeleportable( CBaseEntity *pEntity )
+bool CProp_Portal_Shared::IsEntityTeleportable( IHandleEntity *pEntity )
 {
 
 	do
@@ -61,14 +61,14 @@ bool CProp_Portal_Shared::IsEntityTeleportable( CBaseEntity *pEntity )
 		
 		for( int i = 0; i != ARRAYSIZE(g_pszPortalNonTeleportable); ++i )
 		{
-			if( FClassnameIs( pEntity, g_pszPortalNonTeleportable[i] ) )
+			if( FClassnameIs( (IServerEntity*)pEntity, g_pszPortalNonTeleportable[i] ) )
 				return false;
 		}
 
 #endif
 
 		Assert( pEntity->GetEngineObject() != pEntity->GetEngineObject()->GetMoveParent() );
-		pEntity = pEntity->GetEngineObject()->GetMoveParent() ? (CBaseEntity*)pEntity->GetEngineObject()->GetMoveParent()->GetOuter() : NULL;
+		pEntity = pEntity->GetEngineObject()->GetMoveParent() ? pEntity->GetEngineObject()->GetMoveParent()->GetHandleEntity() : NULL;
 	} while( pEntity );
 
 	return true;

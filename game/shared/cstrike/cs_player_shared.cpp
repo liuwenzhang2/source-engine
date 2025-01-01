@@ -484,9 +484,9 @@ void CCSPlayer::FireBullet(
 			// draw red client impact markers
 			debugoverlay->AddBoxOverlay( tr.endpos, Vector(-2,-2,-2), Vector(2,2,2), QAngle( 0, 0, 0), 255,0,0,127, 4 );
 
-			if ( tr.m_pEnt && ((C_BaseEntity*)tr.m_pEnt)->IsPlayer() )
+			if ( tr.m_pEnt && tr.m_pEnt->IsPlayer() )
 			{
-				C_BasePlayer *player = ToBasePlayer((C_BaseEntity*)tr.m_pEnt );
+				C_BasePlayer *player = ToBasePlayer((IClientEntity*)tr.m_pEnt );
 				player->DrawClientHitboxes( 4, true );
 			}
 		}
@@ -496,9 +496,9 @@ void CCSPlayer::FireBullet(
 			// draw blue server impact markers
 			NDebugOverlay::Box( tr.endpos, Vector(-2,-2,-2), Vector(2,2,2), 0,0,255,127, 4 );
 
-			if ( tr.m_pEnt && ((CBaseEntity*)tr.m_pEnt)->IsPlayer() )
+			if ( tr.m_pEnt && tr.m_pEnt->IsPlayer() )
 			{
-				CBasePlayer *player = ToBasePlayer((CBaseEntity*)tr.m_pEnt );
+				CBasePlayer *player = ToBasePlayer((IServerEntity*)tr.m_pEnt );
 				player->DrawServerHitboxes( 4, true );
 			}
 		}

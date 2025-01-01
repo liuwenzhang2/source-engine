@@ -37,8 +37,8 @@ public:
 	void ThinkFunc();
 
 	virtual bool PassesTriggerFilters(CBaseEntity *pOther);
-	virtual void StartTouch( CBaseEntity *pEntity );
-	virtual void EndTouch( CBaseEntity *pEntity );
+	virtual void StartTouch( IServerEntity *pEntity );
+	virtual void EndTouch( IServerEntity *pEntity );
 
 	virtual int	ObjectCaps( void ) { return BaseClass::ObjectCaps() & ~FCAP_ACROSS_TRANSITION; }
 	
@@ -168,13 +168,13 @@ bool CColorCorrectionVolume::PassesTriggerFilters( CBaseEntity *pEntity )
 	return false;
 }
 
-void CColorCorrectionVolume::StartTouch( CBaseEntity *pEntity )
+void CColorCorrectionVolume::StartTouch( IServerEntity *pEntity )
 {
 	m_LastEnterTime = gpGlobals->curtime;
 	m_LastEnterWeight = m_Weight;
 }
 
-void CColorCorrectionVolume::EndTouch( CBaseEntity *pEntity )
+void CColorCorrectionVolume::EndTouch( IServerEntity *pEntity )
 {
 	m_LastExitTime = gpGlobals->curtime;
 	m_LastExitWeight = m_Weight;

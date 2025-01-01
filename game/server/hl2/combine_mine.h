@@ -44,7 +44,7 @@ public:
 	void SettleThink();
 	void CaptiveThink();
 	void ExplodeThink();
-	void ExplodeTouch( CBaseEntity *pOther );
+	void ExplodeTouch( IServerEntity *pOther );
 	void CavernBounceThink(); ///< an alternative style of bouncing used for the citizen modded bouncers
 	bool IsAwake() { return m_bAwake; }
 	void Wake( bool bWake );

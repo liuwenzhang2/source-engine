@@ -21,7 +21,7 @@
 #include "PortalRender.h"
 #endif // CLIENT_DLL
 #ifdef GAME_DLL
-#include "baseentity.h"
+#include "baseanimating.h"
 #endif // GAME_DLL
 
 
@@ -44,9 +44,9 @@ public:
 	CPSCollisionEntity(void);
 	virtual ~CPSCollisionEntity(void);
 #ifdef GAME_DLL
-	virtual void StartTouch(CBaseEntity* pOther);
-	virtual void Touch(CBaseEntity* pOther);
-	virtual void EndTouch(CBaseEntity* pOther);
+	virtual void StartTouch(IServerEntity* pOther);
+	virtual void Touch(IServerEntity* pOther);
+	virtual void EndTouch(IServerEntity* pOther);
 	virtual int UpdateTransmitState(void)	// set transmit filter to transmit always
 	{
 		return SetTransmitState(FL_EDICT_ALWAYS);

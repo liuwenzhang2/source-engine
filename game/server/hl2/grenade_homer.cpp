@@ -346,7 +346,7 @@ void CGrenadeHomer::Event_Killed( const CTakeDamageInfo &info )
 	Detonate( );
 }
 
-void CGrenadeHomer::GrenadeHomerTouch( CBaseEntity *pOther )
+void CGrenadeHomer::GrenadeHomerTouch( IServerEntity *pOther )
 {
 	Assert( pOther );
 

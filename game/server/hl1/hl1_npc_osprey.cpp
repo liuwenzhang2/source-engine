@@ -74,13 +74,13 @@ public:
 
 	void DyingThink( void );
 
-	void CrashTouch( CBaseEntity *pOther );
+	void CrashTouch( IServerEntity *pOther );
 
 /*	
 	
-	void CrashTouch( CBaseEntity *pOther );
+	void CrashTouch( IServerEntity *pOther );
 	void DyingThink( void );
-	void CommandUse( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value );	
+	void CommandUse( IServerEntity *pActivator, IServerEntity *pCaller, USE_TYPE useType, float value );	
 */
 	void TraceAttack( const CTakeDamageInfo &info, const Vector &vecDir, trace_t *ptr, CDmgAccumulator *pAccumulator );
 
@@ -447,7 +447,7 @@ CAI_BaseNPC *CNPC_Osprey::MakeGrunt( Vector vecSrc )
 	trace_t tr;
 	UTIL_TraceLine( vecSrc, vecSrc + Vector( 0, 0, -4096.0), MASK_NPCSOLID,  this, COLLISION_GROUP_NONE, &tr);
 	
-	if ( tr.m_pEnt && ((CBaseEntity*)tr.m_pEnt)->GetEngineObject()->GetSolid() != SOLID_BSP)
+	if ( tr.m_pEnt && tr.m_pEnt->GetEngineObject()->GetSolid() != SOLID_BSP)
 		return NULL;
 
 	for (int i = 0; i < m_iUnits; i++)
@@ -619,7 +619,7 @@ void CNPC_Osprey::DyingThink( void )
 
 }
 
-void CNPC_Osprey::CrashTouch( CBaseEntity *pOther )
+void CNPC_Osprey::CrashTouch( IServerEntity *pOther )
 {
 	Vector vecSize = Vector( 120, 120, 30 );
 	CPVSFilter filter(GetEngineObject()->GetAbsOrigin() );
@@ -1249,7 +1249,7 @@ void CBaseHelicopter::UpdateRotorSoundPitch( int iPitch )
 // Input   :
 // Output  :
 //------------------------------------------------------------------------------
-void CBaseHelicopter::FlyTouch( CBaseEntity *pOther )
+void CBaseHelicopter::FlyTouch( IServerEntity *pOther )
 {
 	// bounce if we hit something solid
 	if ( pOther->GetEngineObject()->GetSolid() == SOLID_BSP)
@@ -1267,7 +1267,7 @@ void CBaseHelicopter::FlyTouch( CBaseEntity *pOther )
 // Input   :
 // Output  :
 //------------------------------------------------------------------------------
-void CBaseHelicopter::CrashTouch( CBaseEntity *pOther )
+void CBaseHelicopter::CrashTouch( IServerEntity *pOther )
 {
 	// only crash if we hit something solid
 	if ( pOther->GetEngineObject()->GetSolid() == SOLID_BSP)

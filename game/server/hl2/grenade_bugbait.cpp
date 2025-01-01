@@ -137,7 +137,7 @@ void CGrenadeBugBait::Precache( void )
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-void CGrenadeBugBait::BugBaitTouch( CBaseEntity *pOther )
+void CGrenadeBugBait::BugBaitTouch( IServerEntity *pOther )
 {
 	// Don't hit triggers or water
 	Assert( pOther );

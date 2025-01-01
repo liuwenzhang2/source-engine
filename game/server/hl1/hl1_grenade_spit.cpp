@@ -93,7 +93,7 @@ void CGrenadeSpit::Event_Killed( const CTakeDamageInfo &info )
 	Detonate( );
 }
 
-void CGrenadeSpit::GrenadeSpitTouch( CBaseEntity *pOther )
+void CGrenadeSpit::GrenadeSpitTouch( IServerEntity *pOther )
 {
 	if (m_fSpitDeathTime != 0)
 	{
@@ -103,7 +103,7 @@ void CGrenadeSpit::GrenadeSpitTouch( CBaseEntity *pOther )
 	{
 		return;
 	}
-	if ( !pOther->m_takedamage )
+	if ( !pOther->GetTakeDamage() )
 	{
 
 		// make a splat on the wall

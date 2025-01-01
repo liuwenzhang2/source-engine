@@ -627,7 +627,7 @@ public:
 
 	//FIXME: May not want to have this used in a radius
 	int		ObjectCaps( void ) { return (BaseClass::ObjectCaps() | (FCAP_IMPULSE_USE|FCAP_USE_IN_RADIUS)); };
-	void	Use( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value );
+	void	Use( IServerEntity *pActivator, IServerEntity *pCaller, USE_TYPE useType, float value );
 
 	void	InputKill( inputdata_t &data );
 	void	CrateThink( void );
@@ -815,14 +815,14 @@ void CItem_AmmoCrate::OnRestore( void )
 //			useType - 
 //			value - 
 //-----------------------------------------------------------------------------
-void CItem_AmmoCrate::Use( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value )
+void CItem_AmmoCrate::Use( IServerEntity *pActivator, IServerEntity *pCaller, USE_TYPE useType, float value )
 {
 	CBasePlayer *pPlayer = ToBasePlayer( pActivator );
 
 	if ( pPlayer == NULL )
 		return;
 
-	m_OnUsed.FireOutput( pActivator, this );
+	m_OnUsed.FireOutput( (CBaseEntity*)pActivator, this );
 
 	int iSequence = GetEngineObject()->LookupSequence( "Open" );
 

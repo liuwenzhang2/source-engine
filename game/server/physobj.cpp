@@ -566,7 +566,7 @@ int CPhysBox::ObjectCaps()
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-void CPhysBox::Use( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value )
+void CPhysBox::Use( IServerEntity *pActivator, IServerEntity *pCaller, USE_TYPE useType, float value )
 {
 	CBasePlayer *pPlayer = ToBasePlayer( pActivator );
 	if ( pPlayer )
@@ -1271,7 +1271,7 @@ public:
 		return caps;
 	}
 
-	void Use( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value )
+	void Use( IServerEntity *pActivator, IServerEntity *pCaller, USE_TYPE useType, float value )
 	{
 		CBasePlayer *pPlayer = ToBasePlayer( pActivator );
 		if ( pPlayer )
@@ -1606,7 +1606,7 @@ void CPhysMagnet::Precache( void )
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-void CPhysMagnet::Touch( CBaseEntity *pOther )
+void CPhysMagnet::Touch( IServerEntity *pOther )
 {
 }
 

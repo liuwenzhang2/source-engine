@@ -79,7 +79,7 @@ public:
 
 	void DeathSound( const CTakeDamageInfo &info );
 	void GatherConditions();
-	void UseFunc( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value );
+	void UseFunc( IServerEntity *pActivator, IServerEntity *pCaller, USE_TYPE useType, float value );
 
 	CAI_FuncTankBehavior		m_FuncTankBehavior;
 	COutputEvent				m_OnPlayerUse;
@@ -256,13 +256,13 @@ void CNPC_Barney::GatherConditions()
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-void CNPC_Barney::UseFunc( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value )
+void CNPC_Barney::UseFunc( IServerEntity *pActivator, IServerEntity *pCaller, USE_TYPE useType, float value )
 {
 	m_bDontUseSemaphore = true;
 	SpeakIfAllowed( TLK_USE );
 	m_bDontUseSemaphore = false;
 
-	m_OnPlayerUse.FireOutput( pActivator, pCaller );
+	m_OnPlayerUse.FireOutput( (CBaseEntity*)pActivator, (CBaseEntity*)pCaller );
 }
 
 //-----------------------------------------------------------------------------

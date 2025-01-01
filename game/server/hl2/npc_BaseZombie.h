@@ -120,7 +120,7 @@ public:
 
 	void Spawn( void );
 	void Precache( void );
-	void StartTouch( CBaseEntity *pOther );
+	void StartTouch( IServerEntity *pOther );
 	bool CreateBehaviors();
 	float MaxYawSpeed( void );
 	bool OverrideMoveFacing( const AILocalMoveGoal_t &move, float flInterval );

@@ -351,7 +351,7 @@ void CBaseTrigger::InitTrigger( )
 // Purpose: Returns true if this entity passes the filter criteria, false if not.
 // Input  : pOther - The entity to be filtered.
 //-----------------------------------------------------------------------------
-bool CBaseTrigger::PassesTriggerFilters(CBaseEntity *pOther)
+bool CBaseTrigger::PassesTriggerFilters(IServerEntity *pOther)
 {
 	// First test spawn flag filters
 	if (GetEngineObject()->HasSpawnFlags(SF_TRIGGER_ALLOW_ALL) ||
@@ -371,7 +371,7 @@ bool CBaseTrigger::PassesTriggerFilters(CBaseEntity *pOther)
 	{
 		if ( pOther->GetEngineObject()->GetFlags() & FL_NPC )
 		{
-			CAI_BaseNPC *pNPC = pOther->MyNPCPointer();
+			CAI_BaseNPC *pNPC = ((CBaseEntity*)pOther)->MyNPCPointer();
 
 			if (GetEngineObject()->HasSpawnFlags( SF_TRIGGER_ONLY_PLAYER_ALLY_NPCS ) )
 			{
@@ -424,7 +424,7 @@ bool CBaseTrigger::PassesTriggerFilters(CBaseEntity *pOther)
 		}
 
 		CBaseFilter *pFilter = m_hFilter.Get();
-		return (!pFilter) ? true : pFilter->PassesFilter( this, pOther );
+		return (!pFilter) ? true : pFilter->PassesFilter( this, (CBaseEntity*)pOther );
 	}
 	return false;
 }
@@ -452,12 +452,12 @@ void CBaseTrigger::InputEndTouch( inputdata_t &inputdata )
 // Purpose: Called when an entity starts touching us.
 // Input  : pOther - The entity that is touching us.
 //-----------------------------------------------------------------------------
-void CBaseTrigger::StartTouch(CBaseEntity *pOther)
+void CBaseTrigger::StartTouch(IServerEntity *pOther)
 {
 	if (PassesTriggerFilters(pOther) )
 	{
 		EHANDLE hOther;
-		hOther = pOther;
+		hOther = (CBaseEntity*)pOther;
 		
 		bool bAdded = false;
 		if ( m_hTouchingEntities.Find( hOther ) == m_hTouchingEntities.InvalidIndex() )
@@ -466,12 +466,12 @@ void CBaseTrigger::StartTouch(CBaseEntity *pOther)
 			bAdded = true;
 		}
 
-		m_OnStartTouch.FireOutput(pOther, this);
+		m_OnStartTouch.FireOutput((CBaseEntity*)pOther, this);
 
 		if ( bAdded && ( m_hTouchingEntities.Count() == 1 ) )
 		{
 			// First entity to touch us that passes our filters
-			m_OnStartTouchAll.FireOutput( pOther, this );
+			m_OnStartTouchAll.FireOutput((CBaseEntity*)pOther, this );
 		}
 	}
 }
@@ -481,18 +481,18 @@ void CBaseTrigger::StartTouch(CBaseEntity *pOther)
 // Purpose: Called when an entity stops touching us.
 // Input  : pOther - The entity that was touching us.
 //-----------------------------------------------------------------------------
-void CBaseTrigger::EndTouch(CBaseEntity *pOther)
+void CBaseTrigger::EndTouch(IServerEntity *pOther)
 {
 	if ( IsTouching( pOther ) )
 	{
 		EHANDLE hOther;
-		hOther = pOther;
+		hOther = (CBaseEntity*)pOther;
 		m_hTouchingEntities.FindAndRemove( hOther );
 		
 		//FIXME: Without this, triggers fire their EndTouch outputs when they are disabled!
 		//if ( !m_bDisabled )
 		//{
-			m_OnEndTouch.FireOutput(pOther, this);
+			m_OnEndTouch.FireOutput((CBaseEntity*)pOther, this);
 		//}
 
 		// If there are no more entities touching this trigger, fire the lost all touches
@@ -526,7 +526,7 @@ void CBaseTrigger::EndTouch(CBaseEntity *pOther)
 		// Didn't find one?
 		if ( !bFoundOtherTouchee /*&& !m_bDisabled*/ )
 		{
-			m_OnEndTouchAll.FireOutput(pOther, this);
+			m_OnEndTouchAll.FireOutput((CBaseEntity*)pOther, this);
 		}
 	}
 }
@@ -534,10 +534,10 @@ void CBaseTrigger::EndTouch(CBaseEntity *pOther)
 //-----------------------------------------------------------------------------
 // Purpose: Return true if the specified entity is touching us
 //-----------------------------------------------------------------------------
-bool CBaseTrigger::IsTouching( CBaseEntity *pOther )
+bool CBaseTrigger::IsTouching( IServerEntity *pOther )
 {
 	EHANDLE hOther;
-	hOther = pOther;
+	hOther = (CBaseEntity*)pOther;
 	return ( m_hTouchingEntities.Find( hOther ) != m_hTouchingEntities.InvalidIndex() );
 }
 
@@ -585,7 +585,7 @@ public:
 	DECLARE_CLASS( CTriggerRemove, CBaseTrigger );
 
 	void Spawn( void );
-	void Touch( CBaseEntity *pOther );
+	void Touch( IServerEntity *pOther );
 	
 	DECLARE_DATADESC();
 	
@@ -619,7 +619,7 @@ void CTriggerRemove::Spawn( void )
 //			the player's geiger counter level according to distance from center
 //			of trigger.
 //-----------------------------------------------------------------------------
-void CTriggerRemove::Touch( CBaseEntity *pOther )
+void CTriggerRemove::Touch( IServerEntity *pOther )
 {
 	if (!PassesTriggerFilters(pOther))
 		return;
@@ -773,17 +773,17 @@ void CTriggerHurt::HurtThink()
 	}
 }
 
-void CTriggerHurt::EndTouch( CBaseEntity *pOther )
+void CTriggerHurt::EndTouch( IServerEntity *pOther )
 {
 	if (PassesTriggerFilters(pOther))
 	{
 		EHANDLE hOther;
-		hOther = pOther;
+		hOther = (CBaseEntity*)pOther;
 
 		// if this guy has never taken damage, hurt him now
 		if ( !m_hurtEntities.HasElement( hOther ) )
 		{
-			HurtEntity( pOther, m_flDamage * 0.5 );
+			HurtEntity((CBaseEntity*)pOther, m_flDamage * 0.5 );
 		}
 	}
 	BaseClass::EndTouch( pOther );
@@ -855,7 +855,7 @@ int CTriggerHurt::HurtAllTouchers( float dt )
 	return hurtCount;
 }
 
-void CTriggerHurt::Touch( CBaseEntity *pOther )
+void CTriggerHurt::Touch( IServerEntity *pOther )
 {
 	if (GetEngineObject()->GetPfnThink() == NULL)
 	{
@@ -907,11 +907,11 @@ void CTriggerMultiple::Spawn( void )
 // Purpose: Touch function. Activates the trigger.
 // Input  : pOther - The thing that touched us.
 //-----------------------------------------------------------------------------
-void CTriggerMultiple::MultiTouch(CBaseEntity *pOther)
+void CTriggerMultiple::MultiTouch(IServerEntity *pOther)
 {
 	if (PassesTriggerFilters(pOther))
 	{
-		ActivateMultiTrigger( pOther );
+		ActivateMultiTrigger( (CBaseEntity*)pOther );
 	}
 }
 
@@ -998,9 +998,9 @@ public:
 	EHANDLE m_hActivator;		// The entity that triggered us.
 
 	void Spawn( void );
-	void Touch( CBaseEntity *pOther );
-	void StartTouch(CBaseEntity *pOther);
-	void EndTouch( CBaseEntity *pOther );
+	void Touch( IServerEntity *pOther );
+	void StartTouch(IServerEntity *pOther);
+	void EndTouch( IServerEntity *pOther );
 	int	 DrawDebugTextOverlays(void);
 
 	DECLARE_DATADESC();
@@ -1051,14 +1051,14 @@ void CTriggerLook::Spawn( void )
 // Purpose: 
 // Input  : pOther - 
 //-----------------------------------------------------------------------------
-void CTriggerLook::StartTouch(CBaseEntity *pOther)
+void CTriggerLook::StartTouch(IServerEntity *pOther)
 {
 	BaseClass::StartTouch(pOther);
 
 	if (pOther->IsPlayer() && m_flTimeoutDuration)
 	{
 		m_bTimeoutFired = false;
-		m_hActivator = pOther;
+		m_hActivator = (CBaseEntity*)pOther;
 		SetThink(&CTriggerLook::TimeoutThink);
 		GetEngineObject()->SetNextThink(gpGlobals->curtime + m_flTimeoutDuration);
 	}
@@ -1077,7 +1077,7 @@ void CTriggerLook::TimeoutThink(void)
 //------------------------------------------------------------------------------
 // Purpose:
 //------------------------------------------------------------------------------
-void CTriggerLook::EndTouch(CBaseEntity *pOther)
+void CTriggerLook::EndTouch(IServerEntity *pOther)
 {
 	BaseClass::EndTouch(pOther);
 
@@ -1094,7 +1094,7 @@ void CTriggerLook::EndTouch(CBaseEntity *pOther)
 //------------------------------------------------------------------------------
 // Purpose:
 //------------------------------------------------------------------------------
-void CTriggerLook::Touch(CBaseEntity *pOther)
+void CTriggerLook::Touch(IServerEntity *pOther)
 {
 	// Don't fire the OnTrigger if we've already fired the OnTimeout. This will be
 	// reset in OnEndTouch.
@@ -1160,7 +1160,7 @@ void CTriggerLook::Touch(CBaseEntity *pOther)
 
 			if (m_flLookTimeTotal >= m_flLookTime)
 			{
-				Trigger(pOther, false);
+				Trigger((CBaseEntity*)pOther, false);
 			}
 		}
 		else
@@ -1274,7 +1274,7 @@ public:
 	const char* GetNewMapName() { return m_szMapName; };
 
 private:
-	void TouchChangeLevel( CBaseEntity *pOther );
+	void TouchChangeLevel( IServerEntity *pOther );
 	void ChangeLevelNow( CBaseEntity *pActivator );
 
 	void InputChangeLevel( inputdata_t &inputdata );
@@ -1569,7 +1569,7 @@ void CChangeLevel::ChangeLevelNow( CBaseEntity *pActivator )
 //
 // GLOBALS ASSUMED SET:  st_szNextMap
 //
-void CChangeLevel::TouchChangeLevel( CBaseEntity *pOther )
+void CChangeLevel::TouchChangeLevel( IServerEntity *pOther )
 {
 	CBasePlayer *pPlayer = ToBasePlayer(pOther);
 	if ( !pPlayer )
@@ -1593,7 +1593,7 @@ void CChangeLevel::TouchChangeLevel( CBaseEntity *pOther )
 		return;
 	}
 
-	ChangeLevelNow( pOther );
+	ChangeLevelNow( (CBaseEntity*)pOther );
 }
 
 //int BuildChangeList( levellist_t *pLevelList, int maxList )
@@ -1611,7 +1611,7 @@ public:
 
 	void Spawn( void );
 	void Activate( void );
-	void Touch( CBaseEntity *pOther );
+	void Touch( IServerEntity *pOther );
 	void Untouch( CBaseEntity *pOther );
 
 	Vector m_vecPushDir;
@@ -1679,7 +1679,7 @@ void CTriggerPush::Activate()
 // Purpose: 
 // Input  : *pOther - 
 //-----------------------------------------------------------------------------
-void CTriggerPush::Touch( CBaseEntity *pOther )
+void CTriggerPush::Touch( IServerEntity *pOther )
 {
 	if ( !pOther->GetEngineObject()->IsSolid() || (pOther->GetEngineObject()->GetMoveType() == MOVETYPE_PUSH || pOther->GetEngineObject()->GetMoveType() == MOVETYPE_NONE ) )
 		return;
@@ -1784,7 +1784,7 @@ public:
 	DECLARE_CLASS( CTriggerTeleport, CBaseTrigger );
 
 	void Spawn( void );
-	void Touch( CBaseEntity *pOther );
+	void Touch( IServerEntity *pOther );
 
 	string_t m_iLandmark;
 
@@ -1818,7 +1818,7 @@ void CTriggerTeleport::Spawn( void )
 //
 // Input  : pOther - The entity that touched us.
 //-----------------------------------------------------------------------------
-void CTriggerTeleport::Touch( CBaseEntity *pOther )
+void CTriggerTeleport::Touch( IServerEntity *pOther )
 {
 	CBaseEntity	*pentTarget = NULL;
 
@@ -1828,7 +1828,7 @@ void CTriggerTeleport::Touch( CBaseEntity *pOther )
 	}
 
 	// The activator and caller are the same
-	pentTarget = EntityList()->FindEntityByName( pentTarget, m_target, NULL, pOther, pOther );
+	pentTarget = EntityList()->FindEntityByName( pentTarget, m_target, NULL, (CBaseEntity*)pOther, (CBaseEntity*)pOther );
 	if (!pentTarget)
 	{
 	   return;
@@ -1842,7 +1842,7 @@ void CTriggerTeleport::Touch( CBaseEntity *pOther )
 	if (m_iLandmark != NULL_STRING)
 	{
 		// The activator and caller are the same
-		pentLandmark = EntityList()->FindEntityByName(pentLandmark, m_iLandmark, NULL, pOther, pOther );
+		pentLandmark = EntityList()->FindEntityByName(pentLandmark, m_iLandmark, NULL, (CBaseEntity*)pOther, (CBaseEntity*)pOther );
 		if (pentLandmark)
 		{
 			vecLandmarkOffset = pOther->GetEngineObject()->GetAbsOrigin() - pentLandmark->GetEngineObject()->GetAbsOrigin();
@@ -1881,7 +1881,7 @@ void CTriggerTeleport::Touch( CBaseEntity *pOther )
 	}
 
 	tmp += vecLandmarkOffset;
-	pOther->Teleport( &tmp, pAngles, pVelocity );
+	((CBaseEntity*)pOther)->Teleport( &tmp, pAngles, pVelocity );
 }
 
 
@@ -1897,7 +1897,7 @@ public:
 	DECLARE_CLASS( CTriggerToggleSave, CBaseTrigger );
 
 	void Spawn( void );
-	void Touch( CBaseEntity *pOther );
+	void Touch( IServerEntity *pOther );
 
 	void InputEnable( inputdata_t &inputdata )
 	{
@@ -1943,7 +1943,7 @@ void CTriggerToggleSave::Spawn( void )
 // Purpose: Performs the autosave when the player touches us.
 // Input  : pOther - 
 //-----------------------------------------------------------------------------
-void CTriggerToggleSave::Touch( CBaseEntity *pOther )
+void CTriggerToggleSave::Touch( IServerEntity *pOther )
 {
 	if( m_bDisabled )
 		return;
@@ -1967,7 +1967,7 @@ public:
 	DECLARE_CLASS( CTriggerSave, CBaseTrigger );
 
 	void Spawn( void );
-	void Touch( CBaseEntity *pOther );
+	void Touch( IServerEntity *pOther );
 	DECLARE_DATADESC();
 
 	bool m_bForceNewLevelUnit;
@@ -2007,7 +2007,7 @@ void CTriggerSave::Spawn( void )
 // Purpose: Performs the autosave when the player touches us.
 // Input  : pOther - 
 //-----------------------------------------------------------------------------
-void CTriggerSave::Touch( CBaseEntity *pOther )
+void CTriggerSave::Touch( IServerEntity *pOther )
 {
 	// Only save on clients
 	if ( !pOther->IsPlayer() || !pOther->IsAlive() )
@@ -2060,7 +2060,7 @@ public:
 	DECLARE_DATADESC();
 
 	void Spawn( void );
-	void GravityTouch( CBaseEntity *pOther );
+	void GravityTouch( IServerEntity *pOther );
 };
 LINK_ENTITY_TO_CLASS( trigger_gravity, CTriggerGravity );
 
@@ -2078,7 +2078,7 @@ void CTriggerGravity::Spawn( void )
 	SetTouch( &CTriggerGravity::GravityTouch );
 }
 
-void CTriggerGravity::GravityTouch( CBaseEntity *pOther )
+void CTriggerGravity::GravityTouch( IServerEntity *pOther )
 {
 	// Only save on clients
 	if ( !pOther->IsPlayer() )
@@ -2253,7 +2253,7 @@ public:
 	bool KeyValue( const char *szKeyName, const char *szValue );
 	void Enable( void );
 	void Disable( void );
-	void Use( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value );
+	void Use( IServerEntity *pActivator, IServerEntity *pCaller, USE_TYPE useType, float value );
 	void FollowTarget( void );
 	void Move(void);
 
@@ -2651,7 +2651,7 @@ void CTriggerCamera::Disable( void )
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-void CTriggerCamera::Use( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value )
+void CTriggerCamera::Use( IServerEntity *pActivator, IServerEntity *pCaller, USE_TYPE useType, float value )
 {
 	if ( !ShouldToggle( useType, m_state ) )
 		return;
@@ -2663,7 +2663,7 @@ void CTriggerCamera::Use( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYP
 	}
 	else
 	{
-		m_hPlayer = pActivator;
+		m_hPlayer = (CBaseEntity*)pActivator;
 		Enable();
 	}
 }
@@ -2864,9 +2864,9 @@ public:
 
 	void Spawn( void );
 
-	virtual void Use( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value );
+	virtual void Use( IServerEntity *pActivator, IServerEntity *pCaller, USE_TYPE useType, float value );
 	void PlayTrack( void );
-	void Touch ( CBaseEntity *pOther );
+	void Touch ( IServerEntity *pOther );
 };
 
 LINK_ENTITY_TO_CLASS( trigger_cdaudio, CTriggerCDAudio );
@@ -2876,7 +2876,7 @@ LINK_ENTITY_TO_CLASS( trigger_cdaudio, CTriggerCDAudio );
 // Purpose: Changes tracks or stops CD when player touches
 // Input  : pOther - The entity that touched us.
 //-----------------------------------------------------------------------------
-void CTriggerCDAudio::Touch ( CBaseEntity *pOther )
+void CTriggerCDAudio::Touch ( IServerEntity *pOther )
 {
 	if ( !pOther->IsPlayer() )
 	{
@@ -2897,7 +2897,7 @@ void CTriggerCDAudio::Spawn( void )
 }
 
 
-void CTriggerCDAudio::Use( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value )
+void CTriggerCDAudio::Use( IServerEntity *pActivator, IServerEntity *pCaller, USE_TYPE useType, float value )
 {
 	PlayTrack();
 }
@@ -2962,8 +2962,8 @@ public:
 
 	virtual void Spawn(void);
 	virtual void Activate(void);
-	virtual void StartTouch(CBaseEntity *pOther);
-	virtual void EndTouch(CBaseEntity *pOther);
+	virtual void StartTouch(IServerEntity *pOther);
+	virtual void EndTouch(IServerEntity *pOther);
 
 	void MeasureThink(void);
 
@@ -3042,7 +3042,7 @@ void CTriggerProximity::Activate(void)
 //			zero.
 // Input  : pOther - 
 //-----------------------------------------------------------------------------
-void CTriggerProximity::StartTouch(CBaseEntity *pOther)
+void CTriggerProximity::StartTouch(IServerEntity *pOther)
 {
 	BaseClass::StartTouch( pOther );
 
@@ -3061,7 +3061,7 @@ void CTriggerProximity::StartTouch(CBaseEntity *pOther)
 //			zero.
 // Input  : pOther - 
 //-----------------------------------------------------------------------------
-void CTriggerProximity::EndTouch(CBaseEntity *pOther)
+void CTriggerProximity::EndTouch(IServerEntity *pOther)
 {
 	BaseClass::EndTouch( pOther );
 
@@ -3208,8 +3208,8 @@ public:
 	void	OnRestore();
 	void	UpdateOnRemove();
 	bool	CreateVPhysics();
-	void	StartTouch( CBaseEntity *pOther );
-	void	EndTouch( CBaseEntity *pOther );
+	void	StartTouch( IServerEntity *pOther );
+	void	EndTouch( IServerEntity *pOther );
 	void	WindThink( void );
 	int		DrawDebugTextOverlays( void );
 
@@ -3338,7 +3338,7 @@ void CTriggerWind::OnRestore()
 //------------------------------------------------------------------------------
 // Purpose:
 //------------------------------------------------------------------------------
-void CTriggerWind::StartTouch(CBaseEntity *pOther)
+void CTriggerWind::StartTouch(IServerEntity *pOther)
 {
 	if ( !PassesTriggerFilters(pOther) )
 		return;
@@ -3356,7 +3356,7 @@ void CTriggerWind::StartTouch(CBaseEntity *pOther)
 //------------------------------------------------------------------------------
 // Purpose:
 //------------------------------------------------------------------------------
-void CTriggerWind::EndTouch(CBaseEntity *pOther)
+void CTriggerWind::EndTouch(IServerEntity *pOther)
 {
 	if ( !PassesTriggerFilters(pOther) )
 		return;
@@ -3496,7 +3496,7 @@ public:
 	float	m_flViewkick;
 
 	void	Spawn( void );
-	void	StartTouch( CBaseEntity *pOther );
+	void	StartTouch( IServerEntity *pOther );
 
 	// Inputs
 	void InputSetMagnitude( inputdata_t &inputdata );
@@ -3566,7 +3566,7 @@ void CTriggerImpact::InputImpact( inputdata_t &inputdata )
 //------------------------------------------------------------------------------
 // Purpose:
 //------------------------------------------------------------------------------
-void CTriggerImpact::StartTouch(CBaseEntity *pOther)
+void CTriggerImpact::StartTouch(IServerEntity *pOther)
 {
 	//If the entity is valid and has physics, hit it
 	if ( ( pOther != NULL  ) && ( pOther->GetEngineObject()->VPhysicsGetObject() != NULL ) )
@@ -3629,8 +3629,8 @@ class CTriggerPlayerMovement : public CBaseTrigger
 public:
 
 	void Spawn( void );
-	void StartTouch( CBaseEntity *pOther );
-	void EndTouch( CBaseEntity *pOther );
+	void StartTouch( IServerEntity *pOther );
+	void EndTouch( IServerEntity *pOther );
 	
 	DECLARE_DATADESC();
 
@@ -3664,7 +3664,7 @@ void CTriggerPlayerMovement::Spawn( void )
 
 // UNDONE: This will not support a player touching more than one of these
 // UNDONE: Do we care?  If so, ref count automovement in the player?
-void CTriggerPlayerMovement::StartTouch( CBaseEntity *pOther )
+void CTriggerPlayerMovement::StartTouch( IServerEntity *pOther )
 {	
 	if (!PassesTriggerFilters(pOther))
 		return;
@@ -3686,7 +3686,7 @@ void CTriggerPlayerMovement::StartTouch( CBaseEntity *pOther )
 	}
 }
 
-void CTriggerPlayerMovement::EndTouch( CBaseEntity *pOther )
+void CTriggerPlayerMovement::EndTouch( IServerEntity *pOther )
 {
 	if (!PassesTriggerFilters(pOther))
 		return;
@@ -3841,21 +3841,21 @@ void CBaseVPhysicsTrigger::InputDisable( inputdata_t &inputdata )
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-void CBaseVPhysicsTrigger::StartTouch( CBaseEntity *pOther )
+void CBaseVPhysicsTrigger::StartTouch( IServerEntity *pOther )
 {
 }
 
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-void CBaseVPhysicsTrigger::EndTouch( CBaseEntity *pOther )
+void CBaseVPhysicsTrigger::EndTouch( IServerEntity *pOther )
 {
 }
 
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-bool CBaseVPhysicsTrigger::PassesTriggerFilters( CBaseEntity *pOther )
+bool CBaseVPhysicsTrigger::PassesTriggerFilters( IServerEntity *pOther )
 {
 	if ( pOther->GetEngineObject()->GetMoveType() != MOVETYPE_VPHYSICS && !pOther->IsPlayer() )
 		return false;
@@ -3870,7 +3870,7 @@ bool CBaseVPhysicsTrigger::PassesTriggerFilters( CBaseEntity *pOther )
 		bool bOtherIsPlayer = pOther->IsPlayer();
 		if(GetEngineObject()->HasSpawnFlags(SF_TRIGGER_ONLY_PLAYER_ALLY_NPCS) && !bOtherIsPlayer )
 		{
-			CAI_BaseNPC *pNPC = pOther->MyNPCPointer();
+			CAI_BaseNPC *pNPC = ((CBaseEntity*)pOther)->MyNPCPointer();
 
 			if( !pNPC || !pNPC->IsPlayerAlly() )
 			{
@@ -3891,7 +3891,7 @@ bool CBaseVPhysicsTrigger::PassesTriggerFilters( CBaseEntity *pOther )
 		}
 
 		CBaseFilter *pFilter = m_hFilter.Get();
-		return (!pFilter) ? true : pFilter->PassesFilter( this, pOther );
+		return (!pFilter) ? true : pFilter->PassesFilter( this, (CBaseEntity*)pOther );
 	}
 	return false;
 }
@@ -3914,8 +3914,8 @@ public:
 	// UNDONE: Pass trigger event in or change Start/EndTouch.  Add ITriggerVPhysics perhaps?
 	// BUGBUG: If a player touches two of these, his movement will screw up.
 	// BUGBUG: If a player uses crouch/uncrouch it will generate touch events and clear the motioncontroller flag
-	void StartTouch( CBaseEntity *pOther );
-	void EndTouch( CBaseEntity *pOther );
+	void StartTouch( IServerEntity *pOther );
+	void EndTouch( IServerEntity *pOther );
 
 	void InputSetVelocityLimitTime( inputdata_t &inputdata );
 
@@ -4071,7 +4071,7 @@ void CTriggerVPhysicsMotion::OnRestore()
 // UNDONE: Pass trigger event in or change Start/EndTouch.  Add ITriggerVPhysics perhaps?
 // BUGBUG: If a player touches two of these, his movement will screw up.
 // BUGBUG: If a player uses crouch/uncrouch it will generate touch events and clear the motioncontroller flag
-void CTriggerVPhysicsMotion::StartTouch( CBaseEntity *pOther )
+void CTriggerVPhysicsMotion::StartTouch( IServerEntity *pOther )
 {
 	BaseClass::StartTouch( pOther );
 
@@ -4097,21 +4097,21 @@ void CTriggerVPhysicsMotion::StartTouch( CBaseEntity *pOther )
 #ifndef _XBOX
 	if ( m_ParticleTrail.m_strMaterialName != NULL_STRING )
 	{
-		CEntityParticleTrail *pTrail = CEntityParticleTrail::Create( pOther, m_ParticleTrail, this ); 
+		CEntityParticleTrail *pTrail = CEntityParticleTrail::Create((CBaseEntity*)pOther, m_ParticleTrail, this );
 		pTrail->SetShouldDeletedOnChangelevel( true );
 	}
 #endif
 
-	if ( pOther->GetBaseAnimating() && pOther->GetBaseAnimating()->GetEngineObject()->IsRagdoll() )
+	if ( pOther->GetEngineObject()->IsRagdoll() )
 	{
-		CRagdollBoogie::IncrementSuppressionCount( pOther );
+		CRagdollBoogie::IncrementSuppressionCount( (CBaseEntity*)pOther );
 	}
 }
 
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-void CTriggerVPhysicsMotion::EndTouch( CBaseEntity *pOther )
+void CTriggerVPhysicsMotion::EndTouch( IServerEntity *pOther )
 {
 	BaseClass::EndTouch( pOther );
 
@@ -4134,13 +4134,13 @@ void CTriggerVPhysicsMotion::EndTouch( CBaseEntity *pOther )
 #ifndef _XBOX
 	if ( m_ParticleTrail.m_strMaterialName != NULL_STRING )
 	{
-		CEntityParticleTrail::Destroy( pOther, m_ParticleTrail ); 
+		CEntityParticleTrail::Destroy((CBaseEntity*)pOther, m_ParticleTrail );
 	}
 #endif //!_XBOX
 
-	if ( pOther->GetBaseAnimating() && pOther->GetBaseAnimating()->GetEngineObject()->IsRagdoll() )
+	if ( pOther->GetEngineObject()->IsRagdoll() )
 	{
-		CRagdollBoogie::DecrementSuppressionCount( pOther );
+		CRagdollBoogie::DecrementSuppressionCount((CBaseEntity*)pOther );
 	}
 }
 
@@ -4253,8 +4253,8 @@ class CServerRagdollTrigger : public CBaseTrigger
 
 public:
 
-	virtual void StartTouch( CBaseEntity *pOther );
-	virtual void EndTouch( CBaseEntity *pOther );
+	virtual void StartTouch( IServerEntity *pOther );
+	virtual void EndTouch( IServerEntity *pOther );
 	virtual void Spawn( void );
 
 };
@@ -4268,14 +4268,14 @@ void CServerRagdollTrigger::Spawn( void )
 	InitTrigger();
 }
 
-void CServerRagdollTrigger::StartTouch(CBaseEntity *pOther)
+void CServerRagdollTrigger::StartTouch(IServerEntity *pOther)
 {
 	BaseClass::StartTouch( pOther );
 
 	if ( pOther->IsPlayer() )
 		return;
 
-	CBaseCombatCharacter *pCombatChar = pOther->MyCombatCharacterPointer();
+	CBaseCombatCharacter *pCombatChar = ((CBaseEntity*)pOther)->MyCombatCharacterPointer();
 
 	if ( pCombatChar )
 	{
@@ -4283,14 +4283,14 @@ void CServerRagdollTrigger::StartTouch(CBaseEntity *pOther)
 	}
 }
 
-void CServerRagdollTrigger::EndTouch(CBaseEntity *pOther)
+void CServerRagdollTrigger::EndTouch(IServerEntity *pOther)
 {
 	BaseClass::EndTouch( pOther );
 
 	if ( pOther->IsPlayer() )
 		return;
 
-	CBaseCombatCharacter *pCombatChar = pOther->MyCombatCharacterPointer();
+	CBaseCombatCharacter *pCombatChar = ((CBaseEntity*)pOther)->MyCombatCharacterPointer();
 
 	if ( pCombatChar )
 	{
@@ -4310,8 +4310,8 @@ public:
 	void		Spawn( void );
 	bool		KeyValue( const char *szKeyName, const char *szValue );
 
-	virtual void StartTouch(CBaseEntity *pOther);
-	virtual void EndTouch(CBaseEntity *pOther);
+	virtual void StartTouch(IServerEntity *pOther);
+	virtual void EndTouch(IServerEntity *pOther);
 
 	virtual int	ObjectCaps( void ) { return CBaseEntity::ObjectCaps() & ~FCAP_ACROSS_TRANSITION; }
 	float		m_frictionFraction;
@@ -4348,7 +4348,7 @@ bool CFrictionModifier::KeyValue( const char *szKeyName, const char *szValue )
 	return true;
 }
 
-void CFrictionModifier::StartTouch( CBaseEntity *pOther )
+void CFrictionModifier::StartTouch( IServerEntity *pOther )
 {
 	if ( !pOther->IsPlayer() )		// ignore player
 	{
@@ -4356,7 +4356,7 @@ void CFrictionModifier::StartTouch( CBaseEntity *pOther )
 	}
 }
 
-void CFrictionModifier::EndTouch( CBaseEntity *pOther )
+void CFrictionModifier::EndTouch( IServerEntity *pOther )
 {
 	if ( !pOther->IsPlayer() )		// ignore player
 	{

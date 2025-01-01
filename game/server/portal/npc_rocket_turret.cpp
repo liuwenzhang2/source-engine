@@ -288,7 +288,7 @@ public:
 	virtual void SetLauncher( EHANDLE hLauncher );
 	virtual void CreateSmokeTrail( void );		// overloaded from base
 
-	virtual void MissileTouch( CBaseEntity *pOther );
+	virtual void MissileTouch( IServerEntity *pOther );
 
 	EHANDLE			m_hLauncher;
 	CSoundPatch		*m_pAmbientSound;
@@ -1269,7 +1269,7 @@ void CRocket_Turret_Projectile::Spawn( void )
 // Purpose: 
 // Input  : *pOther - 
 //-----------------------------------------------------------------------------
-void CRocket_Turret_Projectile::MissileTouch( CBaseEntity *pOther )
+void CRocket_Turret_Projectile::MissileTouch( IServerEntity *pOther )
 {
 	Assert( pOther );
 	Vector vVel = GetEngineObject()->GetAbsVelocity();

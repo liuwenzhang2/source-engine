@@ -95,7 +95,7 @@ public:
 
 	void	IdleThink( void );
 	void	FlinchThink( void );
-	void	GrubTouch( CBaseEntity *pOther );
+	void	GrubTouch( IServerEntity *pOther );
 
 	DECLARE_DATADESC();
 
@@ -669,14 +669,14 @@ void CAntlionGrub::FlinchThink( void )
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-void CAntlionGrub::GrubTouch( CBaseEntity *pOther )
+void CAntlionGrub::GrubTouch( IServerEntity *pOther )
 {
 	// We can be squished by the player, Vort, or flying heavy things.
 	IPhysicsObject *pPhysOther = pOther->GetEngineObject()->VPhysicsGetObject(); // bool bThrown = ( pTarget->VPhysicsGetObject()->GetGameFlags() & FVPHYSICS_WAS_THROWN ) != 0;
 	if ( pOther->IsPlayer() || FClassnameIs(pOther,"npc_vortigaunt") || ( pPhysOther && (pPhysOther->GetGameFlags() & FVPHYSICS_WAS_THROWN )) )
 	{
-		m_OnAgitated.FireOutput( pOther, pOther );
-		Squash( pOther, true, true );
+		m_OnAgitated.FireOutput( (CBaseEntity*)pOther, (CBaseEntity*)pOther );
+		Squash((CBaseEntity*)pOther, true, true );
 	}
 }
 

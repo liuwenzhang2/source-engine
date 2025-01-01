@@ -2478,8 +2478,8 @@ CON_COMMAND_F(surfaceprop, "Reports the surface properties at the cursor", FCVAR
 
 	if (tr.DidHit())
 	{
-		const model_t* pModel = modelinfo->GetModel(((CBaseEntity*)tr.m_pEnt)->GetEngineObject()->GetModelIndex());
-		const char* pModelName = STRING(((CBaseEntity*)tr.m_pEnt)->GetEngineObject()->GetModelName());
+		const model_t* pModel = modelinfo->GetModel(tr.m_pEnt->GetEngineObject()->GetModelIndex());
+		const char* pModelName = STRING(tr.m_pEnt->GetEngineObject()->GetModelName());
 		if (tr.DidHitWorld() && tr.hitbox > 0)
 		{
 			ICollideable* pCollide = staticpropmgr->GetStaticPropByIndex(tr.hitbox - 1);
@@ -2497,7 +2497,7 @@ CON_COMMAND_F(surfaceprop, "Reports the surface properties at the cursor", FCVAR
 		Vector vecVelocity = tr.startpos - tr.endpos;
 		int length = vecVelocity.Length();
 
-		Msg("Hit surface \"%s\" (entity %s, model \"%s\" %s), texture \"%s\"\n", EntityList()->PhysGetProps()->GetPropName(tr.surface.surfaceProps), ((CBaseEntity*)tr.m_pEnt)->GetClassname(), pModelName, modelStuff.Access(), tr.surface.name);
+		Msg("Hit surface \"%s\" (entity %s, model \"%s\" %s), texture \"%s\"\n", EntityList()->PhysGetProps()->GetPropName(tr.surface.surfaceProps), tr.m_pEnt->GetClassname(), pModelName, modelStuff.Access(), tr.surface.name);
 		Msg("Distance to surface: %d\n", length);
 	}
 }

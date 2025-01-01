@@ -1772,7 +1772,7 @@ bool CProtoSniper::VerifyShot( CBaseEntity *pTarget )
 		// Trace hit something.
 		if( tr.m_pEnt )
 		{
-			if(((CBaseEntity*)tr.m_pEnt)->m_takedamage == DAMAGE_YES )
+			if(tr.m_pEnt->GetTakeDamage() == DAMAGE_YES)
 			{
 				// Just shoot it if I can hurt it. Probably a breakable or glass pane.
 				return true;
@@ -3254,16 +3254,16 @@ void CSniperBullet::BulletThink( void )
 		m_iImpacts++;
 
 #ifdef HL2_EPISODIC
-		if(((CBaseEntity*)tr.m_pEnt)->IsNPC() || m_iImpacts == NUM_PENETRATIONS )
+		if(tr.m_pEnt->IsNPC() || m_iImpacts == NUM_PENETRATIONS )
 #else	 
-		if(((CBaseEntity*)tr.m_pEnt)->m_takedamage == DAMAGE_YES || m_iImpacts == NUM_PENETRATIONS )
+		if(tr.m_pEnt->GetTakeDamage() == DAMAGE_YES || m_iImpacts == NUM_PENETRATIONS)
 #endif//HL2_EPISODIC
 		{
 			// Bullet stops when it hits an NPC, or when it has penetrated enough times.
 			
-			if( tr.m_pEnt && ((CBaseEntity*)tr.m_pEnt)->GetEngineObject()->VPhysicsGetObject() )
+			if( tr.m_pEnt && tr.m_pEnt->GetEngineObject()->VPhysicsGetObject() )
 			{
-				if(((CBaseEntity*)tr.m_pEnt)->GetEngineObject()->VPhysicsGetObject()->GetGameFlags() & FVPHYSICS_PLAYER_HELD )
+				if(tr.m_pEnt->GetEngineObject()->VPhysicsGetObject()->GetGameFlags() & FVPHYSICS_PLAYER_HELD )
 				{
 					Pickup_ForcePlayerToDropThisObject((CBaseEntity*)tr.m_pEnt);
 				}

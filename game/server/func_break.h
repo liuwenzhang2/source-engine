@@ -47,7 +47,7 @@ public:
 	virtual bool KeyValue( const char *szKeyName, const char *szValue );
 	virtual void VPhysicsCollision( int index, gamevcollisionevent_t *pEvent );
 
-	void BreakTouch( CBaseEntity *pOther );
+	void BreakTouch( IServerEntity *pOther );
 	void DamageSound( void );
 	void Break( CBaseEntity *pBreaker );
 

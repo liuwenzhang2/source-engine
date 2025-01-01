@@ -360,9 +360,9 @@ void CFlare::FlareThink( void )
 // Purpose: 
 // Input  : *pOther - 
 //-----------------------------------------------------------------------------
-void CFlare::FlareBurnTouch( CBaseEntity *pOther )
+void CFlare::FlareBurnTouch( IServerEntity *pOther )
 {
-	if ( pOther && pOther->m_takedamage && ( m_flNextDamage < gpGlobals->curtime ) )
+	if ( pOther && pOther->GetTakeDamage() && (m_flNextDamage < gpGlobals->curtime))
 	{
 		pOther->TakeDamage( CTakeDamageInfo( this, m_pOwner, 1, (DMG_BULLET|DMG_BURN) ) );
 		m_flNextDamage = gpGlobals->curtime + 1.0f;
@@ -373,7 +373,7 @@ void CFlare::FlareBurnTouch( CBaseEntity *pOther )
 // Purpose: 
 // Input  : *pOther - 
 //-----------------------------------------------------------------------------
-void CFlare::FlareTouch( CBaseEntity *pOther )
+void CFlare::FlareTouch( IServerEntity *pOther )
 {
 	Assert( pOther );
 	if ( !pOther->GetEngineObject()->IsSolid() )
@@ -386,7 +386,7 @@ void CFlare::FlareTouch( CBaseEntity *pOther )
 	}
 
 	//If the flare hit a person or NPC, do damage here.
-	if ( pOther && pOther->m_takedamage )
+	if ( pOther && pOther->GetTakeDamage() )
 	{
 		/*
 			The Flare is the iRifle round right now. No damage, just ignite. (sjb)
@@ -461,7 +461,7 @@ void CFlare::FlareTouch( CBaseEntity *pOther )
 						if ( index >= 0 )
 						{
 							CBroadcastRecipientFilter filter;
-							te->Decal( filter, 0.0, &tr.endpos, &tr.startpos, ((CBaseEntity*)tr.m_pEnt )->entindex(), tr.hitbox, index);
+							te->Decal( filter, 0.0, &tr.endpos, &tr.startpos, tr.m_pEnt->entindex(), tr.hitbox, index);
 						}
 						
 						CPASAttenuationFilter filter2( this, "Flare.Touch" );
@@ -480,7 +480,7 @@ void CFlare::FlareTouch( CBaseEntity *pOther )
 			if ( index >= 0 )
 			{
 				CBroadcastRecipientFilter filter;
-				te->Decal( filter, 0.0, &tr.endpos, &tr.startpos, ((CBaseEntity*)tr.m_pEnt )->entindex(), tr.hitbox, index);
+				te->Decal( filter, 0.0, &tr.endpos, &tr.startpos, tr.m_pEnt->entindex(), tr.hitbox, index);
 			}
 		}
 

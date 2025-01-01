@@ -14,6 +14,7 @@
 
 #include "baseanimating.h"
 #include "GameEventListener.h"
+#include "util_shared.h"
 
 class CFishPool;
 
@@ -36,7 +37,7 @@ public:
 	virtual void Spawn( void );
 
 	virtual void Event_Killed( const CTakeDamageInfo &info );
-	virtual void Touch( CBaseEntity *other );			///< in contact with "other"
+	virtual void Touch( IServerEntity *other );			///< in contact with "other"
 
 	void Update( float deltaT );						///< invoked each server tick
 

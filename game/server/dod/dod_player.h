@@ -642,7 +642,7 @@ public:
 };
 
 
-inline CDODPlayer *ToDODPlayer( CBaseEntity *pEntity )
+inline CDODPlayer *ToDODPlayer( IServerEntity *pEntity )
 {
 	if ( !pEntity || !pEntity->IsPlayer() )
 		return NULL;

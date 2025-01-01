@@ -68,7 +68,7 @@ public:
 	void UpdateMotion( void );
 
 	void RecalculateWaterlevel( void );
-	void Touch( CBaseEntity *pOther );
+	void Touch( IServerEntity *pOther );
 
 	Disposition_t IRelationType(CBaseEntity *pTarget);
 
@@ -231,7 +231,7 @@ Disposition_t CNPC_Leech::IRelationType( CBaseEntity *pTarget )
 	return BaseClass::IRelationType( pTarget );
 }
 
-void CNPC_Leech::Touch( CBaseEntity *pOther )
+void CNPC_Leech::Touch( IServerEntity *pOther )
 {
 	if ( !pOther->IsPlayer() )
 		 return;

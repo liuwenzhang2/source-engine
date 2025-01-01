@@ -370,9 +370,9 @@ void CPhysicsCannister::Explode( CBaseEntity *pAttacker )
 //-----------------------------------------------------------------------------
 // Purpose: Explode when I next hit a damageable entity
 //-----------------------------------------------------------------------------
-void CPhysicsCannister::ExplodeTouch( CBaseEntity *pOther )
+void CPhysicsCannister::ExplodeTouch( IServerEntity *pOther )
 {
-	if ( !pOther->m_takedamage )
+	if ( !pOther->GetTakeDamage() )
 		return;
 
 	Explode( m_hLauncher );

@@ -28,7 +28,7 @@ public:
 	bool		ShouldSavePhysics( void );
 
 	void		MoveTo(Vector vPosition, float flSpeed);
-	void		Use( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value );
+	void		Use( IServerEntity *pActivator, IServerEntity *pCaller, USE_TYPE useType, float value );
 	void		MoveDone( void );
 	void		StopMoveSound( void );
 	void		Blocked( CBaseEntity *pOther );

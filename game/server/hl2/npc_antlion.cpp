@@ -3420,7 +3420,7 @@ bool CNPC_Antlion::FindBurrow( const Vector &origin, float distance, int type, b
 //			value - 
 //-----------------------------------------------------------------------------
 
-void CNPC_Antlion::BurrowUse( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value )
+void CNPC_Antlion::BurrowUse( IServerEntity *pActivator, IServerEntity *pCaller, USE_TYPE useType, float value )
 {
 	//Don't allow us to do this again
 	SetUse( NULL );
@@ -3431,7 +3431,7 @@ void CNPC_Antlion::BurrowUse( CBaseEntity *pActivator, CBaseEntity *pCaller, USE
 	//If the player activated this, then take them as an enemy
 	if ( ( pCaller != NULL ) && ( pCaller->IsPlayer() ) )
 	{
-		SetEnemy( pActivator );
+		SetEnemy( (CBaseEntity*)pActivator );
 	}
 
 	//Start trying to surface
@@ -4166,7 +4166,7 @@ bool CNPC_Antlion::CorpseGib( const CTakeDamageInfo &info )
 // Purpose: 
 // Input  : *pOther - 
 //-----------------------------------------------------------------------------
-void CNPC_Antlion::Touch( CBaseEntity *pOther )
+void CNPC_Antlion::Touch( IServerEntity *pOther )
 {
 	//See if the touching entity is a vehicle
 	CBasePlayer *pPlayer = ToBasePlayer( AI_GetSinglePlayer() );
@@ -4232,7 +4232,7 @@ void CNPC_Antlion::Touch( CBaseEntity *pOther )
 	// in episodic, an antlion colliding with the player in midair does him damage.
 	// pursuant bugs 58590, 56960, this happens only once per glide.
 #ifdef HL2_EPISODIC 
-	if ( GetActivity() == ACT_GLIDE && IsValidEnemy( pOther ) && !m_bHasDoneAirAttack )
+	if ( GetActivity() == ACT_GLIDE && IsValidEnemy((CBaseEntity*)pOther ) && !m_bHasDoneAirAttack )
 	{
 		CTakeDamageInfo	dmgInfo( this, this, sk_antlion_air_attack_dmg.GetInt(), DMG_SLASH );
 
@@ -4258,7 +4258,7 @@ void CNPC_Antlion::Touch( CBaseEntity *pOther )
 	if ( pOther->IsPlayer() )
 	{
 		// Don't test for this if the pusher isn't friendly
-		if ( IsValidEnemy( pOther ) )
+		if ( IsValidEnemy((CBaseEntity*)pOther ) )
 			return;
 
 		// Ignore if pissed at player
@@ -4266,18 +4266,18 @@ void CNPC_Antlion::Touch( CBaseEntity *pOther )
 			return;
 	
 		if ( !IsCurSchedule( SCHED_MOVE_AWAY ) && !IsCurSchedule( SCHED_ANTLION_BURROW_OUT ) )
-			 TestPlayerPushing( pOther );
+			 TestPlayerPushing((CBaseEntity*)pOther );
 	}
 
 	//Adrian: Explode if hit by gunship!
 	//Maybe only do this if hit by the propellers?
 	if ( pOther->IsNPC() )
 	{
-		if ( pOther->Classify() == CLASS_COMBINE_GUNSHIP )
+		if (((CBaseEntity*)pOther)->Classify() == CLASS_COMBINE_GUNSHIP )
 		{
 			float flDamage = m_iHealth + 25;
 						
-			CTakeDamageInfo	dmgInfo( pOther, pOther, flDamage, DMG_GENERIC );
+			CTakeDamageInfo	dmgInfo((CBaseEntity*)pOther, (CBaseEntity*)pOther, flDamage, DMG_GENERIC );
 			GuessDamageForce( &dmgInfo, (pOther->GetEngineObject()->GetAbsOrigin() - GetEngineObject()->GetAbsOrigin()), pOther->GetEngineObject()->GetAbsOrigin() );
 			TakeDamage( dmgInfo );
 		}

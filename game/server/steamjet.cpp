@@ -88,7 +88,7 @@ void CSteamJet::Precache( void )
 	g_ServerGameDLL.PrecacheMaterial( "sprites/heatwave" );
 }
 
- void CSteamJet::Use( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value )
+ void CSteamJet::Use( IServerEntity *pActivator, IServerEntity *pCaller, USE_TYPE useType, float value )
  {
 	if (!pActivator->IsPlayer())
 	{

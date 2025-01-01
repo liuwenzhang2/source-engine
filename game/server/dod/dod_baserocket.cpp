@@ -206,7 +206,7 @@ void CDODBaseRocket::Explode( void )
 // Purpose: 
 // Input  : *pOther - 
 //-----------------------------------------------------------------------------
-void CDODBaseRocket::RocketTouch( CBaseEntity *pOther )
+void CDODBaseRocket::RocketTouch( IServerEntity *pOther )
 {
 	Assert( pOther );
 	if ( !pOther->GetEngineObject()->IsSolid() || pOther->GetEngineObject()->IsSolidFlagSet(FSOLID_VOLUME_CONTENTS) )
@@ -227,7 +227,7 @@ void CDODBaseRocket::RocketTouch( CBaseEntity *pOther )
 		return;
 	}
 
-	if( !pOther->IsPlayer() && pOther->m_takedamage == DAMAGE_YES )
+	if( !pOther->IsPlayer() && pOther->GetTakeDamage() == DAMAGE_YES)
 	{
 		CTakeDamageInfo info;
 		info.SetAttacker( this );

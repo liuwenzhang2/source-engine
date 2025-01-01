@@ -361,7 +361,7 @@ protected:
 
 	bool CreateSprites( bool bBright );
 
-	void FlechetteTouch( CBaseEntity *pOther );
+	void FlechetteTouch( IServerEntity *pOther );
 
 	Vector m_vecShootPosition;
 	EHANDLE m_hSeekTarget;
@@ -668,12 +668,12 @@ void CHunterFlechette::StickTo( CBaseEntity *pOther, trace_t &tr )
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-void CHunterFlechette::FlechetteTouch( CBaseEntity *pOther )
+void CHunterFlechette::FlechetteTouch( IServerEntity *pOther )
 {
 	if ( pOther->GetEngineObject()->IsSolidFlagSet(FSOLID_VOLUME_CONTENTS | FSOLID_TRIGGER) )
 	{
 		// Some NPCs are triggers that can take damage (like antlion grubs). We should hit them.
-		if ( ( pOther->m_takedamage == DAMAGE_NO ) || ( pOther->m_takedamage == DAMAGE_EVENTS_ONLY ) )
+		if ( ( pOther->GetTakeDamage() == DAMAGE_NO) || (pOther->GetTakeDamage() == DAMAGE_EVENTS_ONLY))
 			return;
 	}
 
@@ -683,7 +683,7 @@ void CHunterFlechette::FlechetteTouch( CBaseEntity *pOther )
 	trace_t	tr;
 	tr = GetEngineObject()->GetTouchTrace();
 
-	if ( pOther->m_takedamage != DAMAGE_NO )
+	if (pOther->GetTakeDamage() != DAMAGE_NO )
 	{
 		Vector	vecNormalizedVel = GetEngineObject()->GetAbsVelocity();
 
@@ -747,7 +747,7 @@ void CHunterFlechette::FlechetteTouch( CBaseEntity *pOther )
 			}
 		}
 
-		if ( ( ( pOther->GetEngineObject()->GetMoveType() == MOVETYPE_VPHYSICS ) || ( pOther->GetEngineObject()->GetMoveType() == MOVETYPE_PUSH ) ) && ( ( pOther->GetHealth() > 0 ) || ( pOther->m_takedamage == DAMAGE_EVENTS_ONLY ) ) )
+		if ( ( ( pOther->GetEngineObject()->GetMoveType() == MOVETYPE_VPHYSICS ) || ( pOther->GetEngineObject()->GetMoveType() == MOVETYPE_PUSH ) ) && ( ( pOther->GetHealth() > 0 ) || (pOther->GetTakeDamage() == DAMAGE_EVENTS_ONLY)))
 		{
 			CPhysicsProp *pProp = dynamic_cast<CPhysicsProp *>( pOther );
 			if ( pProp )
@@ -756,7 +756,7 @@ void CHunterFlechette::FlechetteTouch( CBaseEntity *pOther )
 			}
 		
 			// We hit a physics object that survived the impact. Stick to it.
-			StickTo( pOther, tr );
+			StickTo((CBaseEntity*)pOther, tr );
 		}
 		else
 		{
@@ -773,13 +773,13 @@ void CHunterFlechette::FlechetteTouch( CBaseEntity *pOther )
 		if ( pOther->GetEngineObject()->GetMoveType() == MOVETYPE_NONE && !( tr.surface.flags & SURF_SKY ) )
 		{
 			// We hit a physics object that survived the impact. Stick to it.
-			StickTo( pOther, tr );
+			StickTo((CBaseEntity*)pOther, tr );
 		}
 		else if( pOther->GetEngineObject()->GetMoveType() == MOVETYPE_PUSH && FClassnameIs(pOther, "func_breakable") )
 		{
 			// We hit a func_breakable, stick to it.
 			// The MOVETYPE_PUSH is a micro-optimization to cut down on the classname checks.
-			StickTo( pOther, tr );
+			StickTo((CBaseEntity*)pOther, tr );
 		}
 		else
 		{
@@ -5005,7 +5005,7 @@ int CNPC_Hunter::MeleeAttack1Conditions ( float flDot, float flDist )
 		return COND_TOO_FAR_TO_ATTACK;
 	}
 
-	if ( tr.m_pEnt == GetEnemy() || ((CBaseEntity*)tr.m_pEnt)->IsNPC() || (((CBaseEntity*)tr.m_pEnt)->m_takedamage == DAMAGE_YES && (dynamic_cast<CBreakableProp*>(tr.m_pEnt))) )
+	if ( tr.m_pEnt == GetEnemy() || tr.m_pEnt->IsNPC() || (tr.m_pEnt->GetTakeDamage() == DAMAGE_YES && (dynamic_cast<CBreakableProp*>(tr.m_pEnt))))
 	{
 		// Let the hunter swipe at his enemy if he's going to hit them.
 		// Also let him swipe at NPC's that happen to be between the hunter and the enemy. 
@@ -5028,7 +5028,7 @@ int CNPC_Hunter::MeleeAttack1Conditions ( float flDot, float flDist )
 		}
 	}*/
 
-	if (!((CBaseEntity*)tr.m_pEnt)->IsWorld() && GetEnemy() && (GetEnemy()->GetEngineObject()->GetGroundEntity() ? GetEnemy()->GetEngineObject()->GetGroundEntity()->GetOuter() : NULL) == tr.m_pEnt)
+	if (!tr.m_pEnt->IsWorld() && GetEnemy() && (GetEnemy()->GetEngineObject()->GetGroundEntity() ? GetEnemy()->GetEngineObject()->GetGroundEntity()->GetOuter() : NULL) == tr.m_pEnt)
 	{
 		// Try to swat whatever the player is standing on instead of acting like a dill.
 		return COND_CAN_MELEE_ATTACK1;

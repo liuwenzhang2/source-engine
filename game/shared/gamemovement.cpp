@@ -1314,7 +1314,7 @@ void CGameMovement::CheckWaterJump( void )
 	TracePlayerBBox( vecStart, vecEnd, PlayerSolidMask(), COLLISION_GROUP_PLAYER_MOVEMENT, tr );
 	if ( tr.fraction < 1.0 )		// solid at waist
 	{
-		IPhysicsObject *pPhysObj = ((CBaseEntity*)tr.m_pEnt)->GetEngineObject()->VPhysicsGetObject();
+		IPhysicsObject *pPhysObj = tr.m_pEnt->GetEngineObject()->VPhysicsGetObject();
 		if ( pPhysObj )
 		{
 			if ( pPhysObj->GetGameFlags() & FVPHYSICS_PLAYER_HELD )

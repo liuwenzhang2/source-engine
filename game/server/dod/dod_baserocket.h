@@ -32,7 +32,7 @@ public:
 	
 	void	Spawn( void );
 	void	Precache( void );
-	void	RocketTouch( CBaseEntity *pOther );
+	void	RocketTouch( IServerEntity *pOther );
 	void	Explode( void );
 	void	Fire( void );
 	

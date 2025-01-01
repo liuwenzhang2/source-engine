@@ -108,14 +108,14 @@ public:
 	bool IsHeldByPhyscannon( )	{ return GetEngineObject()->VPhysicsGetObject() && (GetEngineObject()->VPhysicsGetObject()->GetGameFlags() & FVPHYSICS_PLAYER_HELD); }
 
 	// Use functions
-	void	ToggleUse( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value );
+	void	ToggleUse( IServerEntity *pActivator, IServerEntity *pCaller, USE_TYPE useType, float value );
 
 	int ObjectCaps() 
 	{ 
 		return BaseClass::ObjectCaps() | FCAP_IMPULSE_USE;
 	}
 
-	void Use( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value )
+	void Use( IServerEntity *pActivator, IServerEntity *pCaller, USE_TYPE useType, float value )
 	{
 		CBasePlayer *pPlayer = ToBasePlayer( pActivator );
 		if ( pPlayer )

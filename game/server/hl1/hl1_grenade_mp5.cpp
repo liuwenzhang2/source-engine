@@ -71,7 +71,7 @@ void CGrenadeMP5::Event_Killed( CBaseEntity *pInflictor, CBaseEntity *pAttacker,
 }
 
 
-void CGrenadeMP5::GrenadeMP5Touch( CBaseEntity *pOther )
+void CGrenadeMP5::GrenadeMP5Touch( IServerEntity *pOther )
 {
 	if ( !pOther->GetEngineObject()->IsSolid() )
 		return;

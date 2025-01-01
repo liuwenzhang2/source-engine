@@ -16,7 +16,7 @@ public:
 	void CHostageRescue();
 	void Spawn();
 
-	void HostageRescueTouch( CBaseEntity* pOther );
+	void HostageRescueTouch( IServerEntity* pOther );
 };
 
 
@@ -37,7 +37,7 @@ void CHostageRescueZone::Spawn()
 	SetTouch( &CHostageRescueZone::HostageRescueTouch );
 }
 
-void CHostageRescueZone::HostageRescueTouch( CBaseEntity *pOther )
+void CHostageRescueZone::HostageRescueTouch( IServerEntity *pOther )
 {
 	variant_t emptyVariant;
 	pOther->AcceptInput( "OnRescueZoneTouch", NULL, NULL, emptyVariant, 0 );

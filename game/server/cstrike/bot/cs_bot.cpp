@@ -244,7 +244,7 @@ extern void UTIL_DrawBox( Extent *extent, int lifetime, int red, int green, int 
 /**
  * When bot is touched by another entity.
  */
-void CCSBot::Touch( CBaseEntity *other )
+void CCSBot::Touch( IServerEntity *other )
 {
 	// EXTEND
 	BaseClass::Touch( other );
@@ -284,7 +284,7 @@ void CCSBot::Touch( CBaseEntity *other )
 			}
 		}
 
-		m_avoid = other;
+		m_avoid = (CBaseEntity*)other;
 		m_avoidTimestamp = gpGlobals->curtime;
 	}
 
@@ -294,7 +294,7 @@ void CCSBot::Touch( CBaseEntity *other )
 		return;
 
 	// See if it's breakable
-	if ( IsBreakableEntity( other ) )
+	if ( IsBreakableEntity((CBaseEntity*)other ) )
 	{
 		// it's breakable - try to shoot it.
 		SetLookAt( "Breakable", other->WorldSpaceCenter(), PRIORITY_HIGH, 0.1f, false, 5.0f, true );

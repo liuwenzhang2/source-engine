@@ -187,10 +187,10 @@ public:
 	void	RunAI();
 	void	StartTask( const Task_t *pTask );
 	void	RunTask( const Task_t *pTask );
-	void	SpikeTouch( CBaseEntity *pOther );
-	void	ShockTouch( CBaseEntity *pOther );
-	void	CloseTouch( CBaseEntity *pOther );
-	void	EmbedTouch( CBaseEntity *pOther );
+	void	SpikeTouch( IServerEntity *pOther );
+	void	ShockTouch( IServerEntity *pOther );
+	void	CloseTouch( IServerEntity *pOther );
+	void	EmbedTouch( IServerEntity *pOther );
 	float	GetAttackDamageScale( CBaseEntity *pVictim );
 	void	VPhysicsCollision( int index, gamevcollisionevent_t *pEvent );
 	void	Precache( void );
@@ -1767,7 +1767,7 @@ void CNPC_RollerMine::Close( void )
 // Input  :
 // Output :
 //-----------------------------------------------------------------------------
-void CNPC_RollerMine::SpikeTouch( CBaseEntity *pOther )
+void CNPC_RollerMine::SpikeTouch( IServerEntity *pOther )
 {
 	/*
 	if ( pOther->IsSolidFlagSet(FSOLID_TRIGGER | FSOLID_VOLUME_CONTENTS) )
@@ -1797,7 +1797,7 @@ void CNPC_RollerMine::SpikeTouch( CBaseEntity *pOther )
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-void CNPC_RollerMine::CloseTouch( CBaseEntity *pOther )
+void CNPC_RollerMine::CloseTouch( IServerEntity *pOther )
 {
 	if ( pOther->GetEngineObject()->IsSolidFlagSet(FSOLID_TRIGGER | FSOLID_VOLUME_CONTENTS) )
 		return;
@@ -1805,12 +1805,12 @@ void CNPC_RollerMine::CloseTouch( CBaseEntity *pOther )
 	if ( IsShocking() )
 		return;
 
-	bool bOtherIsDead = ( pOther->MyNPCPointer() && !pOther->MyNPCPointer()->IsAlive() );
+	bool bOtherIsDead = ( ((CBaseEntity*)pOther)->MyNPCPointer() && !((CBaseEntity*)pOther)->MyNPCPointer()->IsAlive() );
 	bool bOtherIsNotarget = ( ( pOther->GetEngineObject()->GetFlags() & FL_NOTARGET ) != 0 );
 
 	if ( !bOtherIsDead && !bOtherIsNotarget )
 	{
-		Disposition_t disp = IRelationType(pOther);
+		Disposition_t disp = IRelationType((CBaseEntity*)pOther);
 
 		if ( (disp == D_HT || disp == D_FR) )
 		{
@@ -1825,7 +1825,7 @@ void CNPC_RollerMine::CloseTouch( CBaseEntity *pOther )
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-void CNPC_RollerMine::EmbedTouch( CBaseEntity *pOther )
+void CNPC_RollerMine::EmbedTouch( IServerEntity *pOther )
 {
 	if ( pOther->GetEngineObject()->IsSolidFlagSet(FSOLID_TRIGGER | FSOLID_VOLUME_CONTENTS) )
 		return;
@@ -1995,7 +1995,7 @@ void CNPC_RollerMine::NotifyInteraction( CAI_BaseNPC *pUser )
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-void CNPC_RollerMine::ShockTouch( CBaseEntity *pOther )
+void CNPC_RollerMine::ShockTouch( IServerEntity *pOther )
 {
 	if ( pOther->GetEngineObject()->IsSolidFlagSet(FSOLID_TRIGGER | FSOLID_VOLUME_CONTENTS) )
 		return;
@@ -2006,7 +2006,7 @@ void CNPC_RollerMine::ShockTouch( CBaseEntity *pOther )
 	// error?
 	Assert( !m_bIsPrimed );
 
-	Disposition_t disp = IRelationType(pOther);
+	Disposition_t disp = IRelationType((CBaseEntity*)pOther);
 
 	// Ignore anyone that I'm friendly or neutral to.
 	if( disp != D_HT && disp != D_FR)
@@ -2050,7 +2050,7 @@ void CNPC_RollerMine::ShockTouch( CBaseEntity *pOther )
 	params.m_bWarnOnDirectWaveReference = true;
 	g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 	// Do a shock effect
-	ShockTarget( pOther );
+	ShockTarget((CBaseEntity*)pOther );
 
 	m_flShockTime = gpGlobals->curtime + 1.25;
 
@@ -2079,7 +2079,7 @@ void CNPC_RollerMine::ShockTouch( CBaseEntity *pOther )
 				vecDamageForce.z = pPhysics->GetMass() * 200.0f;
 			}
 
-			pOther->MyCombatCharacterPointer()->BecomeRagdollBoogie( this, vecDamageForce, 5.0f, SF_RAGDOLL_BOOGIE_ELECTRICAL );
+			((CBaseEntity*)pOther)->MyCombatCharacterPointer()->BecomeRagdollBoogie( this, vecDamageForce, 5.0f, SF_RAGDOLL_BOOGIE_ELECTRICAL );
 			return;
 		}
 		else

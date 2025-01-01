@@ -41,7 +41,7 @@ public:
 	void Off(void);
 	void Recharge(void);
 	bool KeyValue( const char *szKeyName, const char *szValue );
-	void Use( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value );
+	void Use( IServerEntity *pActivator, IServerEntity *pCaller, USE_TYPE useType, float value );
 	virtual int	ObjectCaps( void ) { return (BaseClass::ObjectCaps() | FCAP_CONTINUOUS_USE); }
 
 private:
@@ -200,7 +200,7 @@ void CRecharge::InputRecharge( inputdata_t &inputdata )
 	Recharge();
 }
 
-void CRecharge::Use( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value )
+void CRecharge::Use( IServerEntity *pActivator, IServerEntity *pCaller, USE_TYPE useType, float value )
 { 
 	// if it's not a player, ignore
 	if ( !pActivator || !pActivator->IsPlayer() )
@@ -262,7 +262,7 @@ void CRecharge::Use( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE use
 	if (!pActivator)
 		return;
 
-	m_hActivator = pActivator;
+	m_hActivator = (CBaseEntity*)pActivator;
 
 	//only recharge the player
 
@@ -284,7 +284,7 @@ void CRecharge::Use( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE use
 		g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 		m_flSoundTime = 0.56 + gpGlobals->curtime;
 
-		m_OnPlayerUse.FireOutput( pActivator, this );
+		m_OnPlayerUse.FireOutput((CBaseEntity*)pActivator, this );
 	}
 
 	if ((m_iOn == 1) && (m_flSoundTime <= gpGlobals->curtime))
@@ -320,7 +320,7 @@ void CRecharge::Use( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE use
 
 	// Send the output.
 	float flRemaining = m_iJuice / MaxJuice();
-	m_OutRemainingCharge.Set(flRemaining, pActivator, this);
+	m_OutRemainingCharge.Set(flRemaining, (CBaseEntity*)pActivator, this);
 
 	// govern the rate of charge
 	m_flNextCharge = gpGlobals->curtime + 0.1;
@@ -367,7 +367,7 @@ public:
 	void Off(void);
 	void Recharge(void);
 	bool KeyValue( const char *szKeyName, const char *szValue );
-	void Use( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value );
+	void Use( IServerEntity *pActivator, IServerEntity *pCaller, USE_TYPE useType, float value );
 	virtual int	ObjectCaps( void ) { return (BaseClass::ObjectCaps() | m_iCaps ); }
 
 	void SetInitialCharge( void );
@@ -612,7 +612,7 @@ void CNewRecharge::InputSetCharge( inputdata_t &inputdata )
 	StudioFrameAdvance();
 }
 
-void CNewRecharge::Use( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value )
+void CNewRecharge::Use( IServerEntity *pActivator, IServerEntity *pCaller, USE_TYPE useType, float value )
 { 
 	// if it's not a player, ignore
 	if ( !pActivator || !pActivator->IsPlayer() )
@@ -754,7 +754,7 @@ void CNewRecharge::Use( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE 
 		g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 		m_flSoundTime = 0.56 + gpGlobals->curtime;
 
-		m_OnPlayerUse.FireOutput( pActivator, this );
+		m_OnPlayerUse.FireOutput( (CBaseEntity*)pActivator, this );
 	}
 
 	if ((m_iOn == 1) && (m_flSoundTime <= gpGlobals->curtime))
@@ -774,7 +774,7 @@ void CNewRecharge::Use( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE 
 
 	// Send the output.
 	float flRemaining = m_iJuice / MaxJuice();
-	m_OutRemainingCharge.Set(flRemaining, pActivator, this);
+	m_OutRemainingCharge.Set(flRemaining, (CBaseEntity*)pActivator, this);
 
 	// govern the rate of charge
 	m_flNextCharge = gpGlobals->curtime + 0.1;

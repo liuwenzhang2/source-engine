@@ -27,7 +27,7 @@ public:
 
 	void Spawn( void );
 	void Think( void );
-	void Touch( CBaseEntity *pOther );
+	void Touch( IServerEntity *pOther );
 	int ObjectCaps( void ) { return FCAP_DONT_SAVE; }
 };
 
@@ -74,7 +74,7 @@ void CShower::Think( void )
 }
 
 
-void CShower::Touch( CBaseEntity *pOther )
+void CShower::Touch( IServerEntity *pOther )
 {
 	Vector vecNewVelocity = GetEngineObject()->GetAbsVelocity();
 

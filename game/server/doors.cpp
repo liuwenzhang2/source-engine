@@ -606,7 +606,7 @@ void CBaseDoor::Precache( void )
 //			to make them activate.
 // Input  : *pOther - 
 //-----------------------------------------------------------------------------
-void CBaseDoor::DoorTouch( CBaseEntity *pOther )
+void CBaseDoor::DoorTouch( IServerEntity *pOther )
 {
 	if( m_ChainTarget != NULL_STRING )
 		ChainTouch( pOther );
@@ -615,7 +615,7 @@ void CBaseDoor::DoorTouch( CBaseEntity *pOther )
 	if ( !pOther->IsPlayer() )
 	{
 #ifdef HL1_DLL
-		if( PassesBlockTouchFilter( pOther ) && m_toggle_state == TS_GOING_DOWN )
+		if( PassesBlockTouchFilter( (CBaseEntity*)pOther ) && m_toggle_state == TS_GOING_DOWN )
 		{
 			DoorGoUp();
 		}
@@ -638,20 +638,20 @@ void CBaseDoor::DoorTouch( CBaseEntity *pOther )
 	
 	// If door has master, and it's not ready to trigger, 
 	// play 'locked' sound.
-	if (m_sMaster != NULL_STRING && !UTIL_IsMasterTriggered(m_sMaster, pOther))
+	if (m_sMaster != NULL_STRING && !UTIL_IsMasterTriggered(m_sMaster, (CBaseEntity*)pOther))
 	{
 		PlayLockSounds(this, &m_ls, TRUE, FALSE);
 	}
 
 	if (m_bLocked)
 	{
-		m_OnLockedUse.FireOutput( pOther, pOther );
+		m_OnLockedUse.FireOutput((CBaseEntity*)pOther, (CBaseEntity*)pOther );
 		PlayLockSounds(this, &m_ls, TRUE, FALSE);
 		return; 
 	}
 	
 	// Remember who activated the door.
-	m_hActivator = pOther;
+	m_hActivator = (CBaseEntity*)pOther;
 
 	if (DoorActivate( ))
 	{
@@ -714,9 +714,9 @@ void CBaseDoor::UpdateAreaPortals( bool isOpen )
 //			useType - 
 //			value - 
 //-----------------------------------------------------------------------------
-void CBaseDoor::Use( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value )
+void CBaseDoor::Use( IServerEntity *pActivator, IServerEntity *pCaller, USE_TYPE useType, float value )
 {
-	m_hActivator = pActivator;
+	m_hActivator = (CBaseEntity*)pActivator;
 
 	if( m_ChainTarget != NULL_STRING )
 		ChainUse();
@@ -752,7 +752,7 @@ void CBaseDoor::Use( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE use
 	{
 		if (m_bLocked)
 		{
-			m_OnLockedUse.FireOutput( pActivator, pCaller );
+			m_OnLockedUse.FireOutput((CBaseEntity*)pActivator, (CBaseEntity*)pCaller );
 			PlayLockSounds(this, &m_ls, TRUE, FALSE);
 		}
 		else
@@ -790,7 +790,7 @@ void CBaseDoor::ChainUse( void )
 //-----------------------------------------------------------------------------
 // Purpose: Passes Touch along to certain named doors.
 //-----------------------------------------------------------------------------
-void CBaseDoor::ChainTouch( CBaseEntity *pOther )
+void CBaseDoor::ChainTouch( IServerEntity *pOther )
 {
 	if ( m_isChaining )
 		return;

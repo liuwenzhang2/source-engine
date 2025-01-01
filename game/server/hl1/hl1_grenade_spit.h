@@ -33,7 +33,7 @@ public:
 	void		Spawn( void );
 	void		Precache( void );
 	void		SpitThink( void );
-	void 		GrenadeSpitTouch( CBaseEntity *pOther );
+	void 		GrenadeSpitTouch( IServerEntity *pOther );
 	void		Event_Killed( const CTakeDamageInfo &info );
 	void		SetSpitSize(int nSize);
 

@@ -341,7 +341,7 @@ void CWeaponIFMSteadyCam::LockCamera()
 	m_vecOffset = tr.endpos;
 	if ( tr.m_pEnt )
 	{
-		m_vecOffset -= ((CBaseEntity*)tr.m_pEnt)->GetEngineObject()->GetAbsOrigin();
+		m_vecOffset -= tr.m_pEnt->GetEngineObject()->GetAbsOrigin();
 	}
 }
 

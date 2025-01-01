@@ -452,7 +452,7 @@ Disposition_t CHL1NPCTalker::IRelationType( CBaseEntity *pTarget )
 	return BaseClass::IRelationType( pTarget );
 }
 
-void CHL1NPCTalker::Touch( CBaseEntity *pOther )
+void CHL1NPCTalker::Touch( IServerEntity *pOther )
 {
 	if ( m_NPCState == NPC_STATE_SCRIPT )
 		 return;
@@ -492,7 +492,7 @@ void CHL1NPCTalker::TraceAttack( const CTakeDamageInfo &info, const Vector &vecD
 	BaseClass::TraceAttack( info, vecDir, ptr, pAccumulator );
 }
 
-void CHL1NPCTalker::FollowerUse( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value )
+void CHL1NPCTalker::FollowerUse( IServerEntity *pActivator, IServerEntity *pCaller, USE_TYPE useType, float value )
 {
 	// Don't allow use during a scripted_sentence
 	if ( GetUseTime() > gpGlobals->curtime )
@@ -506,13 +506,13 @@ void CHL1NPCTalker::FollowerUse( CBaseEntity *pActivator, CBaseEntity *pCaller, 
 		// Pre-disaster followers can't be used
 		if (GetEngineObject()->GetSpawnFlags() & SF_NPC_PREDISASTER )
 		{
-			SetSpeechTarget( pCaller );
+			SetSpeechTarget( (CBaseEntity*)pCaller );
 			DeclineFollowing();
 			return;
 		}
 	}
 
-	BaseClass::FollowerUse( pActivator, pCaller, useType, value );
+	BaseClass::FollowerUse(pActivator, pCaller, useType, value );
 }
 
 int CHL1NPCTalker::TranslateSchedule( int scheduleType )

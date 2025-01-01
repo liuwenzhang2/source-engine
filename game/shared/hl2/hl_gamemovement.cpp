@@ -357,7 +357,7 @@ void CHL2GameMovement::Findladder( float maxdist, CFuncLadder **ppLadder, Vector
 			if ( tr.fraction != 1.0f &&
 				 tr.m_pEnt &&
 				 tr.m_pEnt != ladder &&
-				 !((CBaseEntity*)tr.m_pEnt)->GetEngineObject()->IsSolidFlagSet( FSOLID_TRIGGER ) )
+				 !tr.m_pEnt->GetEngineObject()->IsSolidFlagSet( FSOLID_TRIGGER ) )
 			{
 				continue;
 			}

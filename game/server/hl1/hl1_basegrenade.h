@@ -34,7 +34,7 @@ public:
 	void	Spawn( void );
 	void	Precache( void );
 	void	BounceSound( void );
-	void	BounceTouch( CBaseEntity *pOther );
+	void	BounceTouch( IServerEntity *pOther );
 
 	void ShootTimed( CBaseCombatCharacter *pOwner, Vector vecVelocity, float flTime );
 };

@@ -23,7 +23,7 @@ public:
 	virtual void Precache();
 
 	void EXPORT FlyThink( void );
-	void EXPORT BoxTouch( CBaseEntity *pOther );
+	void EXPORT BoxTouch( IServerEntity *pOther );
 	bool MyTouch( CBasePlayer *pBasePlayer );
 
 	static CAmmoBox *Create( const Vector &vecOrigin, const QAngle &vecAngles, CBaseEntity *pOwner, int team );

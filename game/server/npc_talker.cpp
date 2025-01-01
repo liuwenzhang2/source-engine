@@ -898,7 +898,7 @@ void CNPCSimpleTalker::OnStoppingFollow( CBaseEntity *pTarget )
 	}
 }
 
-void CNPCSimpleTalker::FollowerUse( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value )
+void CNPCSimpleTalker::FollowerUse( IServerEntity *pActivator, IServerEntity *pCaller, USE_TYPE useType, float value )
 {
 	// Don't allow use during a scripted_sentence
 	if ( m_useTime > gpGlobals->curtime )
@@ -916,7 +916,7 @@ void CNPCSimpleTalker::FollowerUse( CBaseEntity *pActivator, CBaseEntity *pCalle
 				Msg( "I'm not following you, you evil person!\n" );
 			else
 			{
-				StartFollowing( pCaller );
+				StartFollowing( (CBaseEntity*)pCaller );
 			}
 		}
 		else

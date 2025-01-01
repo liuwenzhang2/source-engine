@@ -24,7 +24,7 @@ public:
 	virtual void Precache();
 	virtual void Spawn( void );
 	virtual bool MyTouch( CBasePlayer *pBasePlayer );
-	virtual void ItemTouch( CBaseEntity *pOther );
+	virtual void ItemTouch( IServerEntity *pOther );
 	void DropSoundThink( void );
 
 public:

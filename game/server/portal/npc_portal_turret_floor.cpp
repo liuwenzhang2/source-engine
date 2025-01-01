@@ -139,7 +139,7 @@ public:
 	virtual void	DisabledThink( void );
 	virtual void	HackFindEnemy( void );
 
-	virtual void	StartTouch( CBaseEntity *pOther );
+	virtual void	StartTouch( IServerEntity *pOther );
 
 	bool	IsLaserOn( void ) { return m_bLaserOn; }
 	void	LaserOff( void );
@@ -542,7 +542,7 @@ void CNPC_Portal_FloorTurret::Shoot( const Vector &vecSrc, const Vector &vecDirT
 	GetEngineObject()->GetAttachment( m_iBarrelAttachments[ iBarrelIndex ], info.m_vecSrc, angBarrelDir );
 	Vector vecCenter = GetEngineObject()->GetAbsOrigin();
 	UTIL_TraceLine( vecCenter, info.m_vecSrc, MASK_SHOT, this, COLLISION_GROUP_NONE, &tr );
-	if ( !tr.m_pEnt || !((CBaseEntity*)tr.m_pEnt)->IsWorld() )
+	if ( !tr.m_pEnt || !tr.m_pEnt->IsWorld() )
 	{
 		FireBullets( info );
 	}
@@ -551,7 +551,7 @@ void CNPC_Portal_FloorTurret::Shoot( const Vector &vecSrc, const Vector &vecDirT
 	GetEngineObject()->GetAttachment( m_iBarrelAttachments[ iBarrelIndex + 1 ], info.m_vecSrc, angBarrelDir );
 	vecCenter = GetEngineObject()->GetAbsOrigin();
 	UTIL_TraceLine( vecCenter, info.m_vecSrc, MASK_SHOT, this, COLLISION_GROUP_NONE, &tr );
-	if ( !tr.m_pEnt || !((CBaseEntity*)tr.m_pEnt)->IsWorld() )
+	if ( !tr.m_pEnt || !tr.m_pEnt->IsWorld() )
 	{
 		FireBullets( info );
 	}
@@ -1409,7 +1409,7 @@ void CNPC_Portal_FloorTurret::HackFindEnemy( void )
 	}
 }
 
-void CNPC_Portal_FloorTurret::StartTouch( CBaseEntity *pOther )
+void CNPC_Portal_FloorTurret::StartTouch( IServerEntity *pOther )
 {
 	BaseClass::StartTouch( pOther );
 

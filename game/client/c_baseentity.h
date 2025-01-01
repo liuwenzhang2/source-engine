@@ -750,13 +750,13 @@ public:
 
 	bool							IsInWorld(void) { return true; }
 
-	bool							IsWorld() { return entindex() == 0; }
+	bool							IsWorld() const { return entindex() == 0; }
 	/////////////////
 
 	virtual bool					IsPlayer(void) const { return false; };
 	virtual bool					IsBaseCombatCharacter(void) { return false; };
 	virtual C_BaseCombatCharacter* MyCombatCharacterPointer(void) { return NULL; }
-	virtual bool					IsNPC(void) { return false; }
+	virtual bool					IsNPC(void) const { return false; }
 	C_AI_BaseNPC* MyNPCPointer(void);
 	virtual bool					IsNextBot() { return false; }
 	// TF2 specific
@@ -980,6 +980,9 @@ public:
 #ifdef TF_CLIENT_DLL
 	int								m_nModelIndexOverrides[MAX_VISION_MODES];
 #endif
+	const char& GetTakeDamage() const {
+		return m_takedamage;
+	}
 
 	char							m_takedamage;
 	char							m_lifeState;

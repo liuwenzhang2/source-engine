@@ -30,7 +30,7 @@ public:
 
 	void			Spawn( void );
 	void			Precache( void );
-	void			PaneTouch( CBaseEntity *pOther );
+	void			PaneTouch( IServerEntity *pOther );
 	void			Die( void );
 	DECLARE_DATADESC();
 };
@@ -65,7 +65,7 @@ public:
 	Vector				m_vURVertex;
 	int					m_nQuadError;
 
-	void			SurfaceTouch( CBaseEntity *pOther );
+	void			SurfaceTouch( IServerEntity *pOther );
 	void			PanePos(const Vector &vPos, float *flWidth, float *flHeight);
 
 	bool			IsBroken(int nWidth, int nHeight);

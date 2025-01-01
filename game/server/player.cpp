@@ -2842,7 +2842,7 @@ bool CBasePlayer::IsUseableEntity( CBaseEntity *pEntity, unsigned int requiredCa
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-bool CBasePlayer::CanPickupObject( CBaseEntity *pObject, float massLimit, float sizeLimit )
+bool CBasePlayer::CanPickupObject( IServerEntity *pObject, float massLimit, float sizeLimit )
 {
 	// UNDONE: Make this virtual and move to HL2 player
 #ifdef HL2_DLL
@@ -4644,7 +4644,7 @@ void CBasePlayer::PostThink()
 }
 
 // handles touching physics objects
-void CBasePlayer::Touch( CBaseEntity *pOther )
+void CBasePlayer::Touch( IServerEntity *pOther )
 {
 	if (pOther == (GetEngineObject()->GetGroundEntity() ? GetEngineObject()->GetGroundEntity()->GetOuter() : NULL))
 		return;
@@ -7025,7 +7025,7 @@ QAngle CBasePlayer::AutoaimDeflection( Vector &vecSrc, autoaim_params_t &params 
 
 	CBaseEntity *pEntHit = (CBaseEntity*)tr.m_pEnt;
 
-	if ( pEntHit && pEntHit->m_takedamage != DAMAGE_NO && pEntHit->GetHealth() > 0 )
+	if ( pEntHit && pEntHit->GetTakeDamage() != DAMAGE_NO && pEntHit->GetHealth() > 0 )
 	{
 		// don't look through water
 		if (!((GetWaterLevel() != 3 && pEntHit->GetWaterLevel() == 3) || (GetWaterLevel() == 3 && pEntHit->GetWaterLevel() == 0)))
@@ -7567,7 +7567,7 @@ class CRevertSaved : public CPointEntity
 {
 	DECLARE_CLASS( CRevertSaved, CPointEntity );
 public:
-	void	Use( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value );
+	void	Use( IServerEntity *pActivator, IServerEntity *pCaller, USE_TYPE useType, float value );
 	void	LoadThink( void );
 
 	DECLARE_DATADESC();
@@ -7643,7 +7643,7 @@ CBaseEntity *CreatePlayerLoadSave( Vector vOrigin, float flDuration, float flHol
 
 
 
-void CRevertSaved::Use( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value )
+void CRevertSaved::Use( IServerEntity *pActivator, IServerEntity *pCaller, USE_TYPE useType, float value )
 {
 	UTIL_ScreenFadeAll( m_clrRender, Duration(), HoldTime(), FFADE_OUT );
 	GetEngineObject()->SetNextThink( gpGlobals->curtime + LoadTime() );

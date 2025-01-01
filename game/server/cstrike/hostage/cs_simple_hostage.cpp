@@ -555,7 +555,7 @@ void CHostage::HostageRescueZoneTouch( inputdata_t &inputdata )
 /**
  * In contact with "other"
  */
-void CHostage::Touch( CBaseEntity *other )
+void CHostage::Touch( IServerEntity *other )
 {
 	BaseClass::Touch( other );
 
@@ -1016,7 +1016,7 @@ CCSPlayer *CHostage::GetLeader( void ) const
 /**
  * Invoked when a Hostage is "used" by a player
  */
-void CHostage::HostageUse( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value )
+void CHostage::HostageUse( IServerEntity *pActivator, IServerEntity *pCaller, USE_TYPE useType, float value )
 {
 	Vector to = pActivator->GetEngineObject()->GetAbsOrigin() - GetEngineObject()->GetAbsOrigin();
 

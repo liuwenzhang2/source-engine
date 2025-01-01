@@ -108,7 +108,7 @@ public:
 	DECLARE_CLASS( CTankTargetChange, CPointEntity );
 
 	void Precache( void );
-	void Use( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value );
+	void Use( IServerEntity *pActivator, IServerEntity *pCaller, USE_TYPE useType, float value );
 
 	DECLARE_DATADESC();
 
@@ -135,16 +135,16 @@ void CTankTargetChange::Precache( void )
 	m_newTarget.SetString( m_newTargetName );
 }
 
-void CTankTargetChange::Use( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value )
+void CTankTargetChange::Use( IServerEntity *pActivator, IServerEntity *pCaller, USE_TYPE useType, float value )
 {
-	CBaseEntity *pTarget = EntityList()->FindEntityByName( NULL, m_target, NULL, pActivator, pCaller );
+	CBaseEntity *pTarget = EntityList()->FindEntityByName( NULL, m_target, NULL, (CBaseEntity*)pActivator, (CBaseEntity*)pCaller );
 
 	// UNDONE: This should use more of the event system
 	while ( pTarget )
 	{
 		// Change the target over
 		pTarget->AcceptInput( "TargetEntity", this, this, m_newTarget, 0 );
-		pTarget = EntityList()->FindEntityByName( pTarget, m_target, NULL, pActivator, pCaller );
+		pTarget = EntityList()->FindEntityByName( pTarget, m_target, NULL, (CBaseEntity*)pActivator, (CBaseEntity*)pCaller );
 	}
 }
 

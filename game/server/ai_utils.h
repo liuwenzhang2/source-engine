@@ -15,7 +15,7 @@
 #pragma once
 #endif
 
-extern CBasePlayer* ToBasePlayer(CBaseEntity* pEntity);
+extern CBasePlayer* ToBasePlayer(IServerEntity* pEntity);
 
 //-----------------------------------------------------------------------------
 //

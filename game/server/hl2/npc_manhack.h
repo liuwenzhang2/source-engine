@@ -94,7 +94,7 @@ public:
 
 	void			TurnHeadRandomly( float flInterval );
 
-	void			CrashTouch( CBaseEntity *pOther );
+	void			CrashTouch( IServerEntity *pOther );
 
 	void			StartEngine( bool fStartSound );
 

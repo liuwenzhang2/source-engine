@@ -188,7 +188,7 @@ void CFish::Event_Killed( const CTakeDamageInfo &info )
 /**
  * In contact with "other"
  */
-void CFish::Touch( CBaseEntity *other )
+void CFish::Touch( IServerEntity *other )
 {
 	if (other && other->IsPlayer())
 	{

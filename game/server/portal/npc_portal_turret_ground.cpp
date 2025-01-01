@@ -161,7 +161,7 @@ void CNPC_Portal_GroundTurret::Shoot()
 		Vector vecEnd = info.m_vecSrc + vecDir * info.m_flDistance;
 		AI_TraceLine( info.m_vecSrc, vecEnd, MASK_SHOT, &traceFilter, &tr );
 
-		if ( tr.m_pEnt && !((CBaseEntity*)tr.m_pEnt)->IsPlayer() && ( vecDir * info.m_flDistance * tr.fraction ).Length() < 16.0f )
+		if ( tr.m_pEnt && !tr.m_pEnt->IsPlayer() && ( vecDir * info.m_flDistance * tr.fraction ).Length() < 16.0f )
 		{
 			CTakeDamageInfo damageInfo;
 			damageInfo.SetAttacker( this );

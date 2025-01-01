@@ -57,7 +57,7 @@ public:
 	void Precache( void );
 	bool CreateVPhysics();
 	bool KeyValue( const char *szKeyName, const char *szValue );
-	virtual void Use( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value );
+	virtual void Use( IServerEntity *pActivator, IServerEntity *pCaller, USE_TYPE useType, float value );
 
 	virtual void StartBlocked( CBaseEntity *pOther );
 	virtual void Blocked( CBaseEntity *pOther );
@@ -83,7 +83,7 @@ public:
 	virtual bool IsRotatingDoor() { return false; }
 	virtual bool ShouldSavePhysics();
 	// used to selectivly override defaults
-	void DoorTouch( CBaseEntity *pOther );
+	void DoorTouch( IServerEntity *pOther );
 
 	// local functions
 	int DoorActivate( );
@@ -153,7 +153,7 @@ public:
 
 private:
 	void ChainUse( void );	///< Chains +use on through to m_ChainTarget
-	void ChainTouch( CBaseEntity *pOther );	///< Chains touch on through to m_ChainTarget
+	void ChainTouch( IServerEntity *pOther );	///< Chains touch on through to m_ChainTarget
 	void SetChaining( bool chaining )	{ m_isChaining = chaining; }	///< Latch to prevent recursion
 	bool m_isChaining;
 

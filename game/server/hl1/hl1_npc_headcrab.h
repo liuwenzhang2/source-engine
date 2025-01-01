@@ -29,13 +29,13 @@ public:
 	float	MaxYawSpeed( void );
 	Class_T Classify( void );
 
-	void LeapTouch ( CBaseEntity *pOther );
+	void LeapTouch ( IServerEntity *pOther );
 	void BiteSound( void );
 	void AttackSound( void );
 	void TouchDamage( CBaseEntity *pOther );
 	void HandleAnimEvent( animevent_t *pEvent );
 	int	 SelectSchedule( void );
-	void Touch( CBaseEntity *pOther );
+	void Touch( IServerEntity *pOther );
 	int OnTakeDamage_Alive( const CTakeDamageInfo &inputInfo );
 	int TranslateSchedule( int scheduleType );
 	void PrescheduleThink( void );

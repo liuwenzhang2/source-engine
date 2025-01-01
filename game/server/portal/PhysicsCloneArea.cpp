@@ -27,7 +27,7 @@ const Vector CPhysicsCloneArea::vLocalMaxs( PORTAL_HALF_HEIGHT * PHYSICSCLONEARE
 
 extern ConVar sv_portal_debug_touch;
 
-void CPhysicsCloneArea::StartTouch( CBaseEntity *pOther )
+void CPhysicsCloneArea::StartTouch( IServerEntity *pOther )
 {
 	if( !m_bActive )
 		return;
@@ -48,7 +48,7 @@ void CPhysicsCloneArea::StartTouch( CBaseEntity *pOther )
 	}
 }
 
-void CPhysicsCloneArea::Touch( CBaseEntity *pOther )
+void CPhysicsCloneArea::Touch( IServerEntity *pOther )
 {
 	if( !m_bActive )
 		return;
@@ -57,7 +57,7 @@ void CPhysicsCloneArea::Touch( CBaseEntity *pOther )
 	
 }
 
-void CPhysicsCloneArea::EndTouch( CBaseEntity *pOther )
+void CPhysicsCloneArea::EndTouch( IServerEntity *pOther )
 {
 	if( !m_bActive )
 		return;

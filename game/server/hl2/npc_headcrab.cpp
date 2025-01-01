@@ -938,19 +938,19 @@ bool CBaseHeadcrab::HasHeadroom()
 // Purpose: LeapTouch - this is the headcrab's touch function when it is in the air.
 // Input  : *pOther - 
 //-----------------------------------------------------------------------------
-void CBaseHeadcrab::LeapTouch( CBaseEntity *pOther )
+void CBaseHeadcrab::LeapTouch( IServerEntity *pOther )
 {
 	m_bMidJump = false;
 
-	if ( IRelationType( pOther ) == D_HT )
+	if ( IRelationType((CBaseEntity*)pOther ) == D_HT )
 	{
 		// Don't hit if back on ground
 		if ( !(GetEngineObject()->GetFlags() & FL_ONGROUND ) )
 		{
-	 		if ( pOther->m_takedamage != DAMAGE_NO )
+	 		if (pOther->GetTakeDamage() != DAMAGE_NO )
 			{
 				BiteSound();
-				TouchDamage( pOther );
+				TouchDamage((CBaseEntity*)pOther );
 
 				// attack succeeded, so don't delay our next attack if we previously thought we failed
 				m_bAttackFailed = false;
@@ -1685,7 +1685,7 @@ bool CBaseHeadcrab::CorpseGib( const CTakeDamageInfo &info )
 // Purpose:
 // Input  :
 //------------------------------------------------------------------------------
-void CBaseHeadcrab::Touch( CBaseEntity *pOther )
+void CBaseHeadcrab::Touch( IServerEntity *pOther )
 { 
 	// If someone has smacked me into a wall then gib!
 	if (m_NPCState == NPC_STATE_DEAD) 
@@ -3485,7 +3485,7 @@ void CBlackHeadcrab::Eject( const QAngle &vecAngles, float flVelocityScale, CBas
 // Purpose: Touch function for when we are ejected from the poison zombie.
 //			Panic when we hit the ground.
 //-----------------------------------------------------------------------------
-void CBlackHeadcrab::EjectTouch( CBaseEntity *pOther )
+void CBlackHeadcrab::EjectTouch( IServerEntity *pOther )
 {
 	LeapTouch( pOther );
 	if (GetEngineObject()->GetFlags() & FL_ONGROUND )

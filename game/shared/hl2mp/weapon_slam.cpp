@@ -154,7 +154,7 @@ void CWeapon_SLAM::SetPickupTouch( void )
 // Output :
 //-----------------------------------------------------------------------------
 #ifdef GAME_DLL
-void CWeapon_SLAM::SlamTouch(CBaseEntity* pOther)
+void CWeapon_SLAM::SlamTouch(IServerEntity* pOther)
 {
 #ifdef GAME_DLL
 	CBaseCombatCharacter* pBCC = ToBaseCombatCharacter( pOther );

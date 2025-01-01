@@ -195,21 +195,21 @@ public:
 	void GreenBallInit( void );
 	
 
-	void RemoveTouch( CBaseEntity *pOther );
+	void RemoveTouch( IServerEntity *pOther );
 	
 	/*void Zap( void );
 	void Teleport( void );*/
 	
 	void HoverThink( void );
 	bool CircleTarget( Vector vecTarget );
-	void BounceTouch( CBaseEntity *pOther );
+	void BounceTouch( IServerEntity *pOther );
 
 	void ZapThink( void );
 	void ZapInit( CBaseEntity *pEnemy );
-	void ZapTouch( CBaseEntity *pOther );
+	void ZapTouch( IServerEntity *pOther );
 
 	void TeleportThink( void );
-	void TeleportTouch( CBaseEntity *pOther );
+	void TeleportTouch( IServerEntity *pOther );
 
 	void MovetoTarget( Vector vecTarget );
 
@@ -1346,7 +1346,7 @@ void CNihilanthHVR::HoverThink( void  )
 	}
 }
 
-void CNihilanthHVR::BounceTouch( CBaseEntity *pOther )
+void CNihilanthHVR::BounceTouch( IServerEntity *pOther )
 {
 	Vector vecDir = m_vecIdeal;
 
@@ -1521,7 +1521,7 @@ void CNihilanthHVR::ZapThink( void  )
 }
 
 
-void CNihilanthHVR::ZapTouch( CBaseEntity *pOther )
+void CNihilanthHVR::ZapTouch( IServerEntity *pOther )
 {
 	UTIL_EmitAmbientSound( GetSoundSourceIndex(), GetEngineObject()->GetAbsOrigin(), "Controller.ElectroSound", 1.0, SNDLVL_NORM, 0, random->RandomInt( 90, 95 ) );
 
@@ -1689,7 +1689,7 @@ void CNihilanthHVR::TeleportThink( void  )
 	te->DynamicLight( filterlight, 0.0, &GetEngineObject()->GetAbsOrigin(), 0, 255, 0, 0, 256, 1.0, 256 );
 }
 
-void CNihilanthHVR::TeleportTouch( CBaseEntity *pOther )
+void CNihilanthHVR::TeleportTouch( IServerEntity *pOther )
 {
 	CBaseEntity *pEnemy = GetEnemy();
 
@@ -1736,7 +1736,7 @@ void CNihilanthHVR::GreenBallInit( )
 	SetTouch( &CNihilanthHVR::RemoveTouch );
 }
 
-void CNihilanthHVR::RemoveTouch( CBaseEntity *pOther )
+void CNihilanthHVR::RemoveTouch( IServerEntity *pOther )
 {
 	g_pSoundEmitterSystem->StopSound( entindex(), "NihilanthHVR.TeleAttack" );
 	EntityList()->DestroyEntity( this );

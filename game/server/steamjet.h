@@ -53,7 +53,7 @@ public:
 	CNetworkVar( int, m_nType );		// Type of steam (normal, heatwave)
 	CNetworkVar( float, m_flRollSpeed );
 
-	virtual void Use( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value );
+	virtual void Use( IServerEntity *pActivator, IServerEntity *pCaller, USE_TYPE useType, float value );
 };
 
 #endif // STEAMJET_H

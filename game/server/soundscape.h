@@ -108,8 +108,8 @@ public:
 private:
 
 	// Passed through from CTriggerSoundscape.
-	void DelegateStartTouch( CBaseEntity *pEnt );
-	void DelegateEndTouch( CBaseEntity *pEnt );
+	void DelegateStartTouch( IServerEntity *pEnt );
+	void DelegateEndTouch( IServerEntity *pEnt );
 };
 
 

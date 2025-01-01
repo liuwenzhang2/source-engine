@@ -129,7 +129,7 @@ public:
 	void SpriteInit( const char *pSpriteName, const Vector &origin );
 
 #if !defined( CLIENT_DLL )
-	void Use( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value );
+	void Use( IServerEntity *pActivator, IServerEntity *pCaller, USE_TYPE useType, float value );
 	// Input handlers
 	void InputHideSprite( inputdata_t &inputdata );
 	void InputShowSprite( inputdata_t &inputdata );

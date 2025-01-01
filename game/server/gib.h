@@ -39,14 +39,14 @@ public:
 	void Spawn( const char *szGibModel, float flLifetime );
 
 	void InitGib( CBaseEntity *pVictim, float fMaxVelocity, float fMinVelocity );
-	void BounceGibTouch ( CBaseEntity *pOther );
-	void StickyGibTouch ( CBaseEntity *pOther );
+	void BounceGibTouch ( IServerEntity *pOther );
+	void StickyGibTouch ( IServerEntity *pOther );
 	void WaitTillLand( void );
 	void DieThink( void );
 	void LimitVelocity( void );
 	virtual bool SUB_AllowedToFade( void );
 
-	void Use( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value );
+	void Use( IServerEntity *pActivator, IServerEntity *pCaller, USE_TYPE useType, float value );
 
 	virtual int	ObjectCaps( void ) { return (BaseClass::ObjectCaps() & ~FCAP_ACROSS_TRANSITION) | FCAP_DONT_SAVE | FCAP_IMPULSE_USE; }
 	static	void SpawnHeadGib( CBaseEntity *pVictim );

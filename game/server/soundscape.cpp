@@ -423,7 +423,7 @@ CEnvSoundscapeTriggerable::CEnvSoundscapeTriggerable()
 }
 
 
-void CEnvSoundscapeTriggerable::DelegateStartTouch( CBaseEntity *pEnt )
+void CEnvSoundscapeTriggerable::DelegateStartTouch( IServerEntity *pEnt )
 {
 	CBasePlayer *pPlayer = dynamic_cast< CBasePlayer* >( pEnt );
 	if ( !pPlayer )
@@ -439,7 +439,7 @@ void CEnvSoundscapeTriggerable::DelegateStartTouch( CBaseEntity *pEnt )
 }
 
 
-void CEnvSoundscapeTriggerable::DelegateEndTouch( CBaseEntity *pEnt )
+void CEnvSoundscapeTriggerable::DelegateEndTouch( IServerEntity *pEnt )
 {
 	CBasePlayer *pPlayer = dynamic_cast< CBasePlayer* >( pEnt );
 	if ( !pPlayer )
@@ -485,8 +485,8 @@ public:
 
 	CTriggerSoundscape();
 
-	virtual void StartTouch( CBaseEntity *pOther );
-	virtual void EndTouch( CBaseEntity *pOther );
+	virtual void StartTouch( IServerEntity *pOther );
+	virtual void EndTouch( IServerEntity *pOther );
 
 	virtual void Spawn();
 	virtual void Activate();
@@ -516,7 +516,7 @@ CTriggerSoundscape::CTriggerSoundscape()
 }
 
 
-void CTriggerSoundscape::StartTouch( CBaseEntity *pOther )
+void CTriggerSoundscape::StartTouch( IServerEntity *pOther )
 {
 	if ( m_hSoundscape )
 		m_hSoundscape->DelegateStartTouch( pOther );
@@ -525,7 +525,7 @@ void CTriggerSoundscape::StartTouch( CBaseEntity *pOther )
 }
 
 
-void CTriggerSoundscape::EndTouch( CBaseEntity *pOther )
+void CTriggerSoundscape::EndTouch( IServerEntity *pOther )
 {
 	if ( m_hSoundscape )
 		m_hSoundscape->DelegateEndTouch( pOther );

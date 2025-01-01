@@ -101,7 +101,7 @@ public:
 	virtual void	UpdateOnRemove( void );
 	virtual void	NotifySystemEvent( CBaseEntity *pNotify, notify_system_event_t eventType, const notify_system_event_params_t &params );
 	virtual int		ObjectCaps( void );
-	void			Use( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value );
+	void			Use( IServerEntity *pActivator, IServerEntity *pCaller, USE_TYPE useType, float value );
 
 	// Think functions
 	void	Retire( void );
@@ -392,7 +392,7 @@ int CNPC_SecurityCamera::ObjectCaps( void )
 	return ( BaseClass::ObjectCaps() | FCAP_USE_IN_RADIUS | FCAP_USE_ONGROUND | FCAP_IMPULSE_USE );
 }
 
-void CNPC_SecurityCamera::Use( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value )
+void CNPC_SecurityCamera::Use( IServerEntity *pActivator, IServerEntity *pCaller, USE_TYPE useType, float value )
 {
 	CBasePlayer *pPlayer = ToBasePlayer( pActivator );
 	if ( pPlayer )

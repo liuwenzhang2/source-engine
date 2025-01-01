@@ -649,7 +649,7 @@ END_PREDICTION_DATA()
 
 	
 	// For CTs to defuse the c4
-	void CPlantedC4::Use( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value )
+	void CPlantedC4::Use( IServerEntity *pActivator, IServerEntity *pCaller, USE_TYPE useType, float value )
 	{
 		//Can't defuse if its already defused or if it has blown up
 		if( !m_bBombTicking )

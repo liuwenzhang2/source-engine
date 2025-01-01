@@ -59,7 +59,7 @@ public:
 	void Spawn( void );
 	void Precache( void );
 	void BubbleThink( void );
-	void BoltTouch( CBaseEntity *pOther );
+	void BoltTouch( IServerEntity *pOther );
 	bool CreateVPhysics( void );
 	unsigned int PhysicsSolidMaskForEntity() const;
 	static CCrossbowBolt *BoltCreate( const Vector &vecOrigin, const QAngle &angAngles, int iDamage, CBasePlayer *pentOwner = NULL );
@@ -198,12 +198,12 @@ void CCrossbowBolt::Precache( void )
 // Purpose: 
 // Input  : *pOther - 
 //-----------------------------------------------------------------------------
-void CCrossbowBolt::BoltTouch( CBaseEntity *pOther )
+void CCrossbowBolt::BoltTouch( IServerEntity *pOther )
 {
 	if ( !pOther->GetEngineObject()->IsSolid() || pOther->GetEngineObject()->IsSolidFlagSet(FSOLID_VOLUME_CONTENTS) )
 		return;
 
-	if ( pOther->m_takedamage != DAMAGE_NO )
+	if ( pOther->GetTakeDamage() != DAMAGE_NO )
 	{
 		trace_t	tr, tr2;
 		tr = GetEngineObject()->GetTouchTrace();

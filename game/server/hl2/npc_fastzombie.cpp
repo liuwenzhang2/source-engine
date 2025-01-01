@@ -216,8 +216,8 @@ public:
 
 	Activity NPC_TranslateActivity( Activity baseAct );
 
-	void LeapAttackTouch( CBaseEntity *pOther );
-	void ClimbTouch( CBaseEntity *pOther );
+	void LeapAttackTouch( IServerEntity *pOther );
+	void ClimbTouch( IServerEntity *pOther );
 
 	void StartTask( const Task_t *pTask );
 	void RunTask( const Task_t *pTask );
@@ -300,7 +300,7 @@ public:
 	virtual	void	UpdateEfficiency( bool bInPVS );
 	virtual bool	IsInAVehicle( void );
 	void			InputAttachToVehicle( inputdata_t &inputdata );
-	void			VehicleLeapAttackTouch( CBaseEntity *pOther );
+	void			VehicleLeapAttackTouch( IServerEntity *pOther );
 
 private:
 	void			VehicleLeapAttack( void );
@@ -1582,7 +1582,7 @@ Activity CFastZombie::NPC_TranslateActivity( Activity baseAct )
 
 //---------------------------------------------------------
 //---------------------------------------------------------
-void CFastZombie::LeapAttackTouch( CBaseEntity *pOther )
+void CFastZombie::LeapAttackTouch( IServerEntity *pOther )
 {
 	if ( !pOther->GetEngineObject()->IsSolid() )
 	{
@@ -1607,7 +1607,7 @@ void CFastZombie::LeapAttackTouch( CBaseEntity *pOther )
 //-----------------------------------------------------------------------------
 // Purpose: Lets us know if we touch the player while we're climbing.
 //-----------------------------------------------------------------------------
-void CFastZombie::ClimbTouch( CBaseEntity *pOther )
+void CFastZombie::ClimbTouch( IServerEntity *pOther )
 {
 	if ( pOther->IsPlayer() )
 	{
@@ -1639,7 +1639,7 @@ void CFastZombie::ClimbTouch( CBaseEntity *pOther )
 	}
 	else if ( dynamic_cast<CPhysicsProp *>(pOther) )
 	{
-		this->NPCPhysics_CreateSolver( pOther, true, 5.0 );
+		this->NPCPhysics_CreateSolver( (CBaseEntity*)pOther, true, 5.0 );
 	}
 }
 
@@ -2105,7 +2105,7 @@ bool CFastZombie::CanEnterVehicle( CPropJeepEpisodic *pVehicle )
 // Purpose: FIXME: Move into behavior?
 // Input  : *pOther - 
 //-----------------------------------------------------------------------------
-void CFastZombie::VehicleLeapAttackTouch( CBaseEntity *pOther )
+void CFastZombie::VehicleLeapAttackTouch( IServerEntity *pOther )
 {
 	if ( pOther->GetServerVehicle() )
 	{

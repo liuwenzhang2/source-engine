@@ -93,10 +93,10 @@ public:
 	void GibMonster( void );
 
 	void EXPORT HuntThink( void );
-	void EXPORT FlyTouch( CBaseEntity *pOther );
-	void EXPORT CrashTouch( CBaseEntity *pOther );
+	void EXPORT FlyTouch( IServerEntity *pOther );
+	void EXPORT CrashTouch( IServerEntity *pOther );
 	void EXPORT DyingThink( void );
-	void EXPORT StartupUse( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value );
+	void EXPORT StartupUse( IServerEntity *pActivator, IServerEntity *pCaller, USE_TYPE useType, float value );
 	void EXPORT NullThink( void );
 
 	void ShowDamage( void );

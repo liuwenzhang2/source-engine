@@ -28,7 +28,7 @@ public:
 	DECLARE_CLASS( CFuncWall, CBaseEntity );
 	void	Spawn( void );
 	bool	CreateVPhysics( void );
-	void	Use( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value );
+	void	Use( IServerEntity *pActivator, IServerEntity *pCaller, USE_TYPE useType, float value );
 
 	int		m_nState;
 };
@@ -77,7 +77,7 @@ bool CFuncWall::CreateVPhysics( void )
 }
 
 
-void CFuncWall::Use( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value )
+void CFuncWall::Use( IServerEntity *pActivator, IServerEntity *pCaller, USE_TYPE useType, float value )
 {
 	if ( ShouldToggle( useType, m_nState ) )
 	{
@@ -96,7 +96,7 @@ public:
 	DECLARE_DATADESC();
 
 	void	Spawn( void );
-	void	Use( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value );
+	void	Use( IServerEntity *pActivator, IServerEntity *pCaller, USE_TYPE useType, float value );
 
 	void	InputToggle( inputdata_t &inputdata );
 
@@ -169,7 +169,7 @@ void CFuncWallToggle::InputToggle( inputdata_t &inputdata )
 }
 
 //Adrian - Is this function needed at all?
-void CFuncWallToggle::Use( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value )
+void CFuncWallToggle::Use( IServerEntity *pActivator, IServerEntity *pCaller, USE_TYPE useType, float value )
 {
 	int status = IsOn();
 
@@ -267,7 +267,7 @@ public:
 	CFuncConveyor();
 
 	void	Spawn( void );
-	void	Use( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value );
+	void	Use( IServerEntity *pActivator, IServerEntity *pCaller, USE_TYPE useType, float value );
 	void	UpdateSpeed( float flNewSpeed );
 
 	void	GetGroundVelocityToApply( Vector &vecGroundVel );
@@ -335,7 +335,7 @@ void CFuncConveyor::UpdateSpeed( float flNewSpeed )
 }
 
 
-void CFuncConveyor::Use( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value )
+void CFuncConveyor::Use( IServerEntity *pActivator, IServerEntity *pCaller, USE_TYPE useType, float value )
 {
     m_flSpeed = -m_flSpeed;
 	UpdateSpeed( m_flSpeed );
@@ -406,8 +406,8 @@ public:
 	void SpinUpMove( void );
 	void SpinDownMove( void );
 	bool KeyValue( const char *szKeyName, const char *szValue );
-	void HurtTouch ( CBaseEntity *pOther );
-	void RotatingUse( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value );
+	void HurtTouch ( IServerEntity *pOther );
+	void RotatingUse( IServerEntity *pActivator, IServerEntity *pCaller, USE_TYPE useType, float value );
 	void RotateMove( void );
 	void ReverseMove( void );
 	void RampPitchVol( void );
@@ -856,10 +856,10 @@ void CFuncRotating::Precache( void )
 // Purpose: Will hurt others based on how fast the brush is spinning.
 // Input  : pOther - 
 //-----------------------------------------------------------------------------
-void CFuncRotating::HurtTouch ( CBaseEntity *pOther )
+void CFuncRotating::HurtTouch ( IServerEntity *pOther )
 {
 	// we can't hurt this thing, so we're not concerned with it
-	if ( !pOther->m_takedamage )
+	if ( !pOther->GetTakeDamage() )
 		return;
 
 	// calculate damage based on rotation speed
@@ -1274,7 +1274,7 @@ void CFuncRotating::SetTargetSpeed( float flSpeed )
 //			useType - 
 //			value - 
 //-----------------------------------------------------------------------------
-void CFuncRotating::RotatingUse( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value )
+void CFuncRotating::RotatingUse( IServerEntity *pActivator, IServerEntity *pCaller, USE_TYPE useType, float value )
 {
 	//
 	// If the rotator is spinning, stop it.

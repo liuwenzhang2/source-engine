@@ -646,7 +646,7 @@ public:
 	virtual IGrabControllerClient* GetGrabController() = 0;
 };
 
-class IEngineWorldClient {
+class IEngineWorldClient : public IEngineWorld {
 public:
 	// Sweeps a particular entity through the world
 	virtual void TraceEntity(IEngineObjectClient* pEntity, const Vector& vecAbsStart, const Vector& vecAbsEnd, unsigned int mask, trace_t* ptr) = 0;
@@ -657,7 +657,7 @@ public:
 
 class IEnginePortalClient;
 
-class IEnginePlayerClient {
+class IEnginePlayerClient : public IEnginePlayer {
 public:
 	virtual IEnginePortalClient* GetPortalEnvironment() = 0;
 	virtual IEnginePortalClient* GetHeldObjectPortal(void) = 0;
@@ -731,17 +731,17 @@ public:
 	virtual void				SetPortal2(bool bPortal2) = 0;
 };
 
-class IEngineShadowCloneClient {
+class IEngineShadowCloneClient : public IEngineShadowClone {
 public:
 
 };
 
-class IEngineVehicleClient {
+class IEngineVehicleClient : public IEngineVehicle {
 public:
 
 };
 
-class IEngineRopeClient {
+class IEngineRopeClient : public IEngineRope {
 public:
 	// Use this when rope length and slack change to recompute the spring length.
 	virtual void			RecomputeSprings() = 0;
@@ -790,7 +790,7 @@ public:
 	virtual Vector& GetImpulse() = 0;
 };
 
-class IEngineGhostClient {
+class IEngineGhostClient : public IEngineGhost {
 public:
 	virtual void SetMatGhostTransform(const VMatrix& matGhostTransform) = 0;
 	virtual void SetGhostedSource(IClientEntity* pGhostedSource) = 0;
@@ -854,7 +854,9 @@ public:
 	virtual IClientEntity* GetOwnerEntity(void) const = 0;
 	virtual bool GetAttachmentVelocity(int number, Vector& originVel, Quaternion& angleVel) = 0;
 
-	virtual bool IsNPC(void) = 0;
+	virtual bool IsWorld() const = 0;
+	virtual bool IsBSPModel() const = 0;
+	virtual bool IsNPC(void) const = 0;
 	virtual bool IsPlayer(void) const = 0;
 	virtual bool IsViewModel() const = 0;
 	virtual bool IsBaseCombatCharacter(void) = 0;
@@ -862,6 +864,7 @@ public:
 	virtual bool IsAlive(void) = 0;
 	virtual bool IsFloating() = 0;
 	virtual bool IsStandable() const = 0;
+	virtual const char& GetTakeDamage() const = 0;
 	virtual int CalcOverrideModelIndex() = 0;
 	virtual void ValidateModelIndex(void) = 0;
 	virtual IStudioHdr* OnNewModel() = 0;

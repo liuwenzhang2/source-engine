@@ -31,7 +31,7 @@ public:
 
 	virtual void	Spawn( void );
 	virtual void	Precache( void );
-	virtual void	Use( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value );
+	virtual void	Use( IServerEntity *pActivator, IServerEntity *pCaller, USE_TYPE useType, float value );
 	virtual bool	KeyValue( const char *szKeyName, const char *szValue );
 	virtual int		UpdateTransmitState();
 
@@ -141,7 +141,7 @@ bool CAreaPortal::UpdateVisibility( const Vector &vOrigin, float fovDistanceAdju
 // Input   :
 // Output  :
 //------------------------------------------------------------------------------
-void CAreaPortal::Use( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value )
+void CAreaPortal::Use( IServerEntity *pActivator, IServerEntity *pCaller, USE_TYPE useType, float value )
 {
 	if ( useType == USE_ON )
 	{

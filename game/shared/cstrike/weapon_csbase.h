@@ -114,7 +114,7 @@ public:
 
 		void Materialize();
 		void AttemptToMaterialize();
-		virtual void Use( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value );
+		virtual void Use( IServerEntity *pActivator, IServerEntity *pCaller, USE_TYPE useType, float value );
 
 		virtual bool IsRemoveable();
 		
@@ -197,7 +197,7 @@ public:
 	virtual Activity GetDeployActivity( void );
 	virtual bool	DefaultDeploy( char *szViewModel, char *szWeaponModel, int iActivity, char *szAnimExt );
 #ifdef GAME_DLL
-	virtual void 	DefaultTouch( CBaseEntity *pOther );	// default weapon touch
+	virtual void 	DefaultTouch( IServerEntity *pOther );	// default weapon touch
 #endif // GAME_DLL
 	virtual bool	DefaultPistolReload();
 

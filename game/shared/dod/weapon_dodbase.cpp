@@ -1413,7 +1413,7 @@ void CWeaponDODBase::Smack()
 		return 0.0f;
 	}
 
-	void CWeaponDODBase::Use( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value )
+	void CWeaponDODBase::Use( IServerEntity *pActivator, IServerEntity *pCaller, USE_TYPE useType, float value )
 	{
 		if ( CanDrop() == false )
 			return;

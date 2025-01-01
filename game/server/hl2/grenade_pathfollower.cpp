@@ -81,7 +81,7 @@ void CGrenadePathfollower::Event_Killed( const CTakeDamageInfo &info )
 	Detonate( );
 }
 
-void CGrenadePathfollower::GrenadeTouch( CBaseEntity *pOther )
+void CGrenadePathfollower::GrenadeTouch( IServerEntity *pOther )
 {
 	// ----------------------------------
 	// If I hit the sky, don't explode

@@ -25,8 +25,8 @@ class CBaseSpriteProjectile : public CSprite
 	DECLARE_CLASS( CBaseSpriteProjectile, CSprite );
 
 public:
-	void Touch( CBaseEntity *pOther );
-	virtual void HandleTouch( CBaseEntity *pOther );
+	void Touch( IServerEntity *pOther );
+	virtual void HandleTouch( IServerEntity *pOther );
 
 	void Think();
 	virtual void HandleThink();

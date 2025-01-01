@@ -1304,7 +1304,7 @@ public:
 	void Init( CBasePlayer *pPlayer, CBaseEntity *pObject );
 	void Shutdown( bool bThrown = false );
 	bool OnControls( CBaseEntity *pControls ) { return true; }
-	void Use( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value );
+	void Use( IServerEntity *pActivator, IServerEntity *pCaller, USE_TYPE useType, float value );
 	void OnRestore()
 	{
 		BaseClass::OnRestore();
@@ -1404,7 +1404,7 @@ void CPlayerPickupController::Shutdown( bool bThrown )
 }
 
 
-void CPlayerPickupController::Use( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value )
+void CPlayerPickupController::Use( IServerEntity *pActivator, IServerEntity *pCaller, USE_TYPE useType, float value )
 {
 	if ( ToBasePlayer(pActivator) == m_pPlayer )
 	{

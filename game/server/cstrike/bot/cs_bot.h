@@ -426,7 +426,7 @@ public:
 	virtual bool Initialize( const BotProfile *profile, int team );		///< (EXTEND) prepare bot for action
 
 	virtual void Spawn( void );									///< (EXTEND) spawn the bot into the game
-	virtual void Touch( CBaseEntity *other );					///< (EXTEND) when touched by another entity
+	virtual void Touch( IServerEntity *other );					///< (EXTEND) when touched by another entity
 
 	virtual void Upkeep( void );								///< lightweight maintenance, invoked frequently
 	virtual void Update( void );								///< heavyweight algorithms, invoked less often

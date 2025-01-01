@@ -91,7 +91,7 @@ void CWaterBullet::BulletThink()
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-void CWaterBullet::Touch( CBaseEntity *pOther )
+void CWaterBullet::Touch( IServerEntity *pOther )
 {
 	Vector	vecDir = GetEngineObject()->GetAbsVelocity();
 	float speed = VectorNormalize( vecDir );

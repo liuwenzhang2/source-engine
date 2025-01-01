@@ -821,7 +821,7 @@ void CBaseCombatWeapon::GiveTo( CBaseEntity *pOther )
 // Output :
 //-----------------------------------------------------------------------------
 #ifdef GAME_DLL
-void CBaseCombatWeapon::DefaultTouch( CBaseEntity *pOther )
+void CBaseCombatWeapon::DefaultTouch( IServerEntity *pOther )
 {
 #if !defined( CLIENT_DLL )
 	// Can't pick up dissolving weapons
@@ -840,7 +840,7 @@ void CBaseCombatWeapon::DefaultTouch( CBaseEntity *pOther )
 		// the player WILL end up taking the object, but cache interactions
 		// are fired as soon as you prove you have found the object, not
 		// when you finally acquire it.
-		m_OnCacheInteraction.FireOutput( pOther, this );
+		m_OnCacheInteraction.FireOutput( (CBaseEntity*)pOther, this );
 	}
 
 	if(GetEngineObject()->HasSpawnFlags(SF_WEAPON_NO_PLAYER_PICKUP) )

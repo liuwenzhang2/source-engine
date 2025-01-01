@@ -567,7 +567,7 @@ void CBreakable::DamageSound( void )
 	}
 }
 
-void CBreakable::BreakTouch( CBaseEntity *pOther )
+void CBreakable::BreakTouch( IServerEntity *pOther )
 {
 	float flDamage;
 	
@@ -587,10 +587,10 @@ void CBreakable::BreakTouch( CBaseEntity *pOther )
 			m_takedamage = DAMAGE_YES;
 
 			SetTouch( NULL );
-			OnTakeDamage( CTakeDamageInfo( pOther, pOther, flDamage, DMG_CRUSH ) );
+			OnTakeDamage( CTakeDamageInfo( (CBaseEntity*)pOther, (CBaseEntity*)pOther, flDamage, DMG_CRUSH ) );
 
 			// do a little damage to player if we broke glass or computer
-			CTakeDamageInfo info( pOther, pOther, flDamage/4, DMG_SLASH );
+			CTakeDamageInfo info((CBaseEntity*)pOther, (CBaseEntity*)pOther, flDamage/4, DMG_SLASH );
 			CalculateMeleeDamageForce( &info, (pOther->GetEngineObject()->GetAbsOrigin() - GetEngineObject()->GetAbsOrigin()), GetEngineObject()->GetAbsOrigin() );
 			pOther->TakeDamage( info );
 		}
@@ -602,7 +602,7 @@ void CBreakable::BreakTouch( CBaseEntity *pOther )
 		// play creaking sound here.
 		DamageSound();
 
-		m_hBreaker = pOther;
+		m_hBreaker = (CBaseEntity*)pOther;
 
 		SetThink ( &CBreakable::Die );
 		SetTouch( NULL );
@@ -1224,7 +1224,7 @@ public:
 
 	void	Spawn ( void );
 	bool	CreateVPhysics( void );
-	void	Use( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value );
+	void	Use( IServerEntity *pActivator, IServerEntity *pCaller, USE_TYPE useType, float value );
 
 	virtual int	ObjectCaps( void ) { return BaseClass::ObjectCaps() | FCAP_ONOFF_USE; }
 
@@ -1278,7 +1278,7 @@ bool CPushable::CreateVPhysics( void )
 }
 
 // Pull the func_pushable
-void CPushable::Use( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value )
+void CPushable::Use( IServerEntity *pActivator, IServerEntity *pCaller, USE_TYPE useType, float value )
 {
 #ifdef HL1_DLL
 	if(GetEngineObject()->GetSpawnFlags() & SF_PUSH_NO_USE)

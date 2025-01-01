@@ -181,7 +181,7 @@ public:
 
 	void EXPORT HuntThink( void );
 	void EXPORT KillThink( void );
-	void EXPORT BounceTouch( CBaseEntity *pOther );
+	void EXPORT BounceTouch( IServerEntity *pOther );
 	void MovetoTarget( Vector vecTarget );
 
 	float m_flSpawnTime;
@@ -202,7 +202,7 @@ public:
 	void Precache( void );
 
 	void EXPORT AnimateThink( void );
-	void EXPORT ExplodeTouch( CBaseEntity *pOther );
+	void EXPORT ExplodeTouch( IServerEntity *pOther );
 
 	void Kill( void );
 
@@ -1146,7 +1146,7 @@ void CNPC_ControllerHeadBall::HuntThink( void  )
 			int fadelength = 0;
 			int amplitude = 0;
 			const Vector vecEnd = tr.endpos;
-			te->BeamEntPoint( filter, 0.0, entindex(), NULL, 0, &(((CBaseEntity*)tr.m_pEnt)->GetEngineObject()->GetAbsOrigin()),
+			te->BeamEntPoint( filter, 0.0, entindex(), NULL, 0, &(tr.m_pEnt->GetEngineObject()->GetAbsOrigin()),
 				g_sModelIndexLaser, haloindex /* no halo */, 0, 10, 3, 20, 20, fadelength, 
 				amplitude, 255, 255, 255, 255, 10 );
 
@@ -1183,7 +1183,7 @@ void CNPC_ControllerHeadBall::MovetoTarget( Vector vecTarget )
 	GetEngineObject()->SetAbsVelocity(m_vecIdeal);
 }
 
-void CNPC_ControllerHeadBall::BounceTouch( CBaseEntity *pOther )
+void CNPC_ControllerHeadBall::BounceTouch( IServerEntity *pOther )
 {
 	Vector vecDir = m_vecIdeal;
 	VectorNormalize( vecDir );
@@ -1270,7 +1270,7 @@ void CNPC_ControllerZapBall::AnimateThink( void  )
 }
 
 
-void CNPC_ControllerZapBall::ExplodeTouch( CBaseEntity *pOther )
+void CNPC_ControllerZapBall::ExplodeTouch( IServerEntity *pOther )
 {
 	if (m_takedamage = DAMAGE_YES )
 	{

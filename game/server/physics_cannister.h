@@ -73,7 +73,7 @@ public:
 	{ 
 		return (BaseClass::ObjectCaps() | FCAP_IMPULSE_USE);
 	}
-	void Use( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value )
+	void Use( IServerEntity *pActivator, IServerEntity *pCaller, USE_TYPE useType, float value )
 	{
 		CBasePlayer *pPlayer = ToBasePlayer( pActivator );
 		if ( pPlayer )
@@ -86,7 +86,7 @@ public:
 	void CannisterFire( CBaseEntity *pActivator );
 	void Deactivate( void );
 	void Explode( CBaseEntity *pAttacker );
-	void ExplodeTouch( CBaseEntity *pOther );
+	void ExplodeTouch( IServerEntity *pOther );
 	void VPhysicsCollision( int index, gamevcollisionevent_t *pEvent );
 
 	// Don't treat as a live target

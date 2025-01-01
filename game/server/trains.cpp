@@ -229,7 +229,7 @@ public:
 	void Setup( void );
 
 	virtual void Blocked( CBaseEntity *pOther );
-	void PlatUse( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value );
+	void PlatUse( IServerEntity *pActivator, IServerEntity *pCaller, USE_TYPE useType, float value );
 
 	void	CallGoDown( void ) { GoDown(); }
 	void	CallHitTop( void  ) { HitTop(); }
@@ -280,7 +280,7 @@ class CPlatTrigger : public CBaseEntity
 public:
 	virtual int	ObjectCaps( void ) { return BaseClass::ObjectCaps() | FCAP_DONT_SAVE; }
 	void SpawnInsideTrigger( CFuncPlat *pPlatform );
-	void Touch( CBaseEntity *pOther );
+	void Touch( IServerEntity *pOther );
 	CFuncPlat *m_pPlatform;
 };
 
@@ -409,7 +409,7 @@ void CPlatTrigger::SpawnInsideTrigger( CFuncPlat *pPlatform )
 //
 // When the platform's trigger field is touched, the platform ???
 //
-void CPlatTrigger::Touch( CBaseEntity *pOther )
+void CPlatTrigger::Touch( IServerEntity *pOther )
 {
 	// Ignore touches by non-players
 	if ( !pOther->IsPlayer() )
@@ -474,7 +474,7 @@ void CFuncPlat::InputGoDown(inputdata_t &data)
 //			useType - 
 //			value - 
 //-----------------------------------------------------------------------------
-void CFuncPlat::PlatUse( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value )
+void CFuncPlat::PlatUse( IServerEntity *pActivator, IServerEntity *pCaller, USE_TYPE useType, float value )
 {
 	if ( IsTogglePlat() )
 	{
@@ -732,7 +732,7 @@ public:
 
 	void SetupTarget( void );
 	void Blocked( CBaseEntity *pOther );
-	void Use( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value );
+	void Use( IServerEntity *pActivator, IServerEntity *pCaller, USE_TYPE useType, float value );
 
 	void Wait( void );
 	void Next( void );
@@ -799,7 +799,7 @@ void CFuncTrain::Blocked( CBaseEntity *pOther )
 }
 
 
-void CFuncTrain::Use( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value )
+void CFuncTrain::Use( IServerEntity *pActivator, IServerEntity *pCaller, USE_TYPE useType, float value )
 {
 	//If we've been waiting to be retriggered, move to the next destination
 	if (GetEngineObject()->GetSpawnFlags() & SF_TRAIN_WAIT_RETRIGGER)
@@ -1438,7 +1438,7 @@ void CFuncTrackTrain::InputToggle( inputdata_t &inputdata )
 //-----------------------------------------------------------------------------
 // Purpose: Handles player use so players can control the speed of the train.
 //-----------------------------------------------------------------------------
-void CFuncTrackTrain::Use( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value )
+void CFuncTrackTrain::Use( IServerEntity *pActivator, IServerEntity *pCaller, USE_TYPE useType, float value )
 {
 	// player +USE
 	if ( useType == USE_SET )
@@ -2874,13 +2874,13 @@ public:
 	virtual void	GoUp( void );
 	virtual void	GoDown( void );
 
-	void			Use( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value );
+	void			Use( IServerEntity *pActivator, IServerEntity *pCaller, USE_TYPE useType, float value );
 	void			Find( void );
 	TRAIN_CODE		EvaluateTrain( CPathTrack *pcurrent );
 	void			UpdateTrain( QAngle &dest );
 	virtual void	HitBottom( void );
 	virtual void	HitTop( void );
-	void			Touch( CBaseEntity *pOther );
+	void			Touch( IServerEntity *pOther );
 	virtual void	UpdateAutoTargets( int toggleState );
 	virtual	bool	IsTogglePlat( void ) { return true; }
 
@@ -2962,7 +2962,7 @@ void CFuncTrackChange::Precache( void )
 
 
 // UNDONE: Filter touches before re-evaluating the train.
-void CFuncTrackChange::Touch( CBaseEntity *pOther )
+void CFuncTrackChange::Touch( IServerEntity *pOther )
 {
 }
 
@@ -3173,7 +3173,7 @@ void CFuncTrackChange::UpdateAutoTargets( int toggleState )
 }
 
 
-void CFuncTrackChange::Use( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value )
+void CFuncTrackChange::Use( IServerEntity *pActivator, IServerEntity *pCaller, USE_TYPE useType, float value )
 {
 	if ( m_toggle_state != TS_AT_TOP && m_toggle_state != TS_AT_BOTTOM )
 		return;
@@ -3256,7 +3256,7 @@ class CFuncTrackAuto : public CFuncTrackChange
 {
 	DECLARE_CLASS( CFuncTrackAuto, CFuncTrackChange );
 public:
-	void			Use( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value );
+	void			Use( IServerEntity *pActivator, IServerEntity *pCaller, USE_TYPE useType, float value );
 	virtual void	UpdateAutoTargets( int toggleState );
 	void			TriggerTrackChange( inputdata_t &inputdata );
 
@@ -3349,7 +3349,7 @@ void CFuncTrackAuto::TriggerTrackChange ( inputdata_t &inputdata )
 }
 
 
-void CFuncTrackAuto::Use( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value )
+void CFuncTrackAuto::Use( IServerEntity *pActivator, IServerEntity *pCaller, USE_TYPE useType, float value )
 {
 	CPathTrack *pTarget;
 

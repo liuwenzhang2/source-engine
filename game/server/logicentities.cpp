@@ -1110,7 +1110,7 @@ public:
 
 	void Spawn( );
 	bool KeyValue( const char *szKeyName, const char *szValue );
-	void Use( ::CBaseEntity *pActivator, ::CBaseEntity *pCaller, USE_TYPE useType, float value );
+	void Use( IServerEntity *pActivator, IServerEntity *pCaller, USE_TYPE useType, float value );
 	int	ObjectCaps( void ) { return(BaseClass::ObjectCaps() | FCAP_MASTER); }
 	bool IsTriggered( ::CBaseEntity *pActivator );
 	void Register( void );
@@ -1190,7 +1190,7 @@ void CMultiSource::Spawn()
 //			useType - 
 //			value - 
 //-----------------------------------------------------------------------------
-void CMultiSource::Use( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value )
+void CMultiSource::Use( IServerEntity *pActivator, IServerEntity *pCaller, USE_TYPE useType, float value )
 { 
 	int i = 0;
 
@@ -1211,14 +1211,14 @@ void CMultiSource::Use( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE 
 	m_rgTriggered[i-1] ^= 1;
 
 	// 
-	if ( IsTriggered( pActivator ) )
+	if ( IsTriggered( (CBaseEntity*)pActivator ) )
 	{
 		DevMsg( 2, "Multisource %s enabled (%d inputs)\n", GetDebugName(), m_iTotal );
 		USE_TYPE useType = USE_TOGGLE;
 		if ( m_globalstate != NULL_STRING )
 			useType = USE_ON;
 
-		m_OnTrigger.FireOutput(pActivator, this);
+		m_OnTrigger.FireOutput((CBaseEntity*)pActivator, this);
 	}
 }
 

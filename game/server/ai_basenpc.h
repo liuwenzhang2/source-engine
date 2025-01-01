@@ -1668,7 +1668,7 @@ public:
 	virtual void		AddEntityRelationship( CBaseEntity *pEntity, Disposition_t nDisposition, int nPriority );
 	virtual void		AddClassRelationship( Class_T nClass, Disposition_t nDisposition, int nPriority );
 
-	void				NPCUse( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value );
+	void				NPCUse( IServerEntity *pActivator, IServerEntity *pCaller, USE_TYPE useType, float value );
 
 	CBaseGrenade*		IncomingGrenade(void);
 
@@ -1917,7 +1917,7 @@ public:
 	float				GetHullHeight() const	{ return NAI_Hull::Height(GetHullType()); }
 
 	void				SetupVPhysicsHull();
-	virtual void		StartTouch( CBaseEntity *pOther );
+	virtual void		StartTouch( IServerEntity *pOther );
 	void				CheckPhysicsContacts();
 
 private:

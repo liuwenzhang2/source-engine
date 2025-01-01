@@ -57,14 +57,15 @@ public:
 
 	virtual void		Explode( trace_t *pTrace, int bitsDamageType );
 	void				Smoke( void );
-
-	void				BounceTouch( CBaseEntity *pOther );
-	void				SlideTouch( CBaseEntity *pOther );
-	void				ExplodeTouch( CBaseEntity *pOther );
+#ifdef GAME_DLL
+	void				BounceTouch( IServerEntity *pOther );
+	void				SlideTouch( IServerEntity *pOther );
+	void				ExplodeTouch( IServerEntity *pOther );
+#endif // GAME_DLL
 	void				DangerSoundThink( void );
 	void				PreDetonate( void );
 	virtual void		Detonate( void );
-	void				DetonateUse( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value );
+	void				DetonateUse( IServerEntity *pActivator, IServerEntity *pCaller, USE_TYPE useType, float value );
 	void				TumbleThink( void );
 
 	virtual Vector		GetBlastForce() { return vec3_origin; }
@@ -113,7 +114,7 @@ public:
 		return (BaseClass::ObjectCaps() | FCAP_IMPULSE_USE | FCAP_USE_IN_RADIUS);
 	}
 
-	void				Use( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value );
+	void				Use( IServerEntity *pActivator, IServerEntity *pCaller, USE_TYPE useType, float value );
 #endif
 
 public:

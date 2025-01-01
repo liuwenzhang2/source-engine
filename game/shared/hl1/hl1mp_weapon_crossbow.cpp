@@ -63,7 +63,7 @@ public:
 	void Spawn( void );
 	void Precache( void );
 	void BubbleThink( void );
-	void BoltTouch( CBaseEntity *pOther );
+	void BoltTouch( IServerEntity *pOther );
     void ExplodeThink( void );
     void SetExplode( bool bVal ) { m_bExplode = bVal; }
 	bool CreateVPhysics( void );
@@ -123,7 +123,7 @@ void CCrossbowBolt::Precache( )
 	g_pSoundEmitterSystem->PrecacheScriptSound( "BaseGrenade.Explode" );
 }
 
-void CCrossbowBolt::BoltTouch( CBaseEntity *pOther )
+void CCrossbowBolt::BoltTouch( IServerEntity *pOther )
 {
 	if ( !pOther->GetEngineObject()->IsSolid() || pOther->GetEngineObject()->IsSolidFlagSet(FSOLID_VOLUME_CONTENTS) )
 		return;
@@ -131,7 +131,7 @@ void CCrossbowBolt::BoltTouch( CBaseEntity *pOther )
 	SetTouch( NULL );
 	SetThink( NULL );
 
-	if ( pOther->m_takedamage != DAMAGE_NO )
+	if ( pOther->GetTakeDamage() != DAMAGE_NO )
 	{
 		trace_t tr, tr2;
 		tr = GetEngineObject()->GetTouchTrace( );
@@ -504,10 +504,10 @@ void CWeaponCrossbow::FireBolt( void )
         pBolt->GetEngineObject()->SetAbsOrigin( trace.endpos );
 
         // We hit someone
-        if ( trace.m_pEnt && ((CBaseEntity*)trace.m_pEnt)->m_takedamage )
+        if ( trace.m_pEnt && trace.m_pEnt->GetTakeDamage() )
         {
             pBolt->SetExplode( false );            
-            pBolt->BoltTouch((CBaseEntity*)trace.m_pEnt );
+            pBolt->BoltTouch((IServerEntity*)trace.m_pEnt );
             return;
         }
     }

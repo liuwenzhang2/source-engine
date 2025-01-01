@@ -558,7 +558,7 @@ public:
 
 	// physics interactions
 	// mass/size limit set to zero for none
-	static bool				CanPickupObject( CBaseEntity *pObject, float massLimit, float sizeLimit );
+	static bool				CanPickupObject( IServerEntity *pObject, float massLimit, float sizeLimit );
 
 
 	void					CheckSuitUpdate();
@@ -638,7 +638,7 @@ public:
 	virtual void			VPhysicsShadowUpdate( IPhysicsObject *pPhysics );
 	virtual bool			IsFollowingPhysics( void ) { return false; }
 
-	virtual void			Touch( CBaseEntity *pOther );
+	virtual void			Touch( IServerEntity *pOther );
 	void					SetTouchedPhysics( bool bTouch );
 	bool					TouchedPhysics( void );
 	Vector					GetSmoothedVelocity( void );
@@ -1348,7 +1348,7 @@ inline bool CBasePlayer::IsFiringWeapon( void ) const
 //-----------------------------------------------------------------------------
 // Converts an entity to a player
 //-----------------------------------------------------------------------------
-inline CBasePlayer *ToBasePlayer( CBaseEntity *pEntity )
+inline CBasePlayer *ToBasePlayer( IServerEntity *pEntity )
 {
 	if ( !pEntity || !pEntity->IsPlayer() )
 		return NULL;
@@ -1359,7 +1359,7 @@ inline CBasePlayer *ToBasePlayer( CBaseEntity *pEntity )
 #endif
 }
 
-inline const CBasePlayer *ToBasePlayer( const CBaseEntity *pEntity )
+inline const CBasePlayer *ToBasePlayer( const IServerEntity *pEntity )
 {
 	if ( !pEntity || !pEntity->IsPlayer() )
 		return NULL;

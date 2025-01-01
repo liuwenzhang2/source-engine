@@ -447,7 +447,7 @@ void CGib::DieThink ( void )
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-void CGib::Use( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value )
+void CGib::Use( IServerEntity *pActivator, IServerEntity *pCaller, USE_TYPE useType, float value )
 {
 	CBasePlayer *pPlayer = ToBasePlayer( pActivator );
 
@@ -498,7 +498,7 @@ CBasePlayer *CGib::HasPhysicsAttacker( float dt )
 //
 // Gib bounces on the ground or wall, sponges some blood down, too!
 //
-void CGib::BounceGibTouch ( CBaseEntity *pOther )
+void CGib::BounceGibTouch ( IServerEntity *pOther )
 {
 	Vector	vecSpot;
 	trace_t	tr;
@@ -550,7 +550,7 @@ void CGib::BounceGibTouch ( CBaseEntity *pOther )
 //
 // Sticky gib puts blood on the wall and stays put. 
 //
-void CGib::StickyGibTouch ( CBaseEntity *pOther )
+void CGib::StickyGibTouch ( IServerEntity *pOther )
 {
 	Vector	vecSpot;
 	trace_t tr;

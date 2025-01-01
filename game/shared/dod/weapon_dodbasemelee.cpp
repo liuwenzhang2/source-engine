@@ -157,7 +157,7 @@ CBaseEntity *CWeaponDODBaseMelee::MeleeAttack( int iDamageAmount, int iDamageTyp
 
 	bool bDoStrongAttack = false;
 
-	if ( bDidHit && ((CBaseEntity*)tr.m_pEnt)->IsPlayer() && ((CBaseEntity*)tr.m_pEnt)->m_takedamage != DAMAGE_YES )
+	if ( bDidHit && ((CBaseEntity*)tr.m_pEnt)->IsPlayer() && tr.m_pEnt->GetTakeDamage() != DAMAGE_YES )
 	{
 		bDidHit = 0;	// still play the animation, we just dont attempt to damage this player
 	}
@@ -179,8 +179,8 @@ CBaseEntity *CWeaponDODBaseMelee::MeleeAttack( int iDamageAmount, int iDamageTyp
 		int iVictimTeam = ((CBaseEntity*)tr.m_pEnt)->GetTeamNumber();
 
 		// do the mega attack if its a player, and we would do damage
-		if (((CBaseEntity*)tr.m_pEnt)->IsPlayer() &&
-			((CBaseEntity*)tr.m_pEnt)->m_takedamage == DAMAGE_YES &&
+		if (tr.m_pEnt->IsPlayer() &&
+			tr.m_pEnt->GetTakeDamage() == DAMAGE_YES &&
 			( iVictimTeam != iOwnerTeam || ( iVictimTeam == iOwnerTeam && friendlyfire.GetBool() ) ) )
 		{
 			CDODPlayer *pVictim = ToDODPlayer((CBaseEntity*)tr.m_pEnt );

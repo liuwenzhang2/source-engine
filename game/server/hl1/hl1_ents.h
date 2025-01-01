@@ -22,10 +22,10 @@ public:
 	void	Spawn ( void );
 	void	KeyValue( KeyValueData *pkvd );
 	void	Swing( void );
-	void	PendulumUse( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value );
+	void	PendulumUse( IServerEntity *pActivator, IServerEntity *pCaller, USE_TYPE useType, float value );
 	void	Stop( void );
-	void	Touch( CBaseEntity *pOther );
-	void	RopeTouch ( CBaseEntity *pOther );// this touch func makes the pendulum a rope
+	void	Touch( IServerEntity *pOther );
+	void	RopeTouch ( IServerEntity *pOther );// this touch func makes the pendulum a rope
 	void	Blocked( CBaseEntity *pOther );
 
 	// Input handlers.
@@ -51,8 +51,8 @@ class CHL1Gib : public CBaseEntity
 
 public:
 	void Spawn( const char *szGibModel );
-	void BounceGibTouch ( CBaseEntity *pOther );
-	void StickyGibTouch ( CBaseEntity *pOther );
+	void BounceGibTouch ( IServerEntity *pOther );
+	void StickyGibTouch ( IServerEntity *pOther );
 	void WaitTillLand( void );
 	void LimitVelocity( void );
 

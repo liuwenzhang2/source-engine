@@ -66,10 +66,10 @@ public:
 	virtual void InputEndTouch( inputdata_t &inputdata );
 
 	virtual bool UsesFilter( void ){ return ( m_hFilter.Get() != NULL ); }
-	virtual bool PassesTriggerFilters(CBaseEntity *pOther);
-	virtual void StartTouch(CBaseEntity *pOther);
-	virtual void EndTouch(CBaseEntity *pOther);
-	bool IsTouching( CBaseEntity *pOther );
+	virtual bool PassesTriggerFilters(IServerEntity *pOther);
+	virtual void StartTouch(IServerEntity *pOther);
+	virtual void EndTouch(IServerEntity *pOther);
+	bool IsTouching( IServerEntity *pOther );
 
 	CBaseEntity *GetTouchedEntityOfType( const char *sClassName );
 
@@ -110,7 +110,7 @@ class CTriggerMultiple : public CBaseTrigger
 	DECLARE_CLASS( CTriggerMultiple, CBaseTrigger );
 public:
 	void Spawn( void );
-	void MultiTouch( CBaseEntity *pOther );
+	void MultiTouch( IServerEntity *pOther );
 	void MultiWaitOver( void );
 	void ActivateMultiTrigger(CBaseEntity *pActivator);
 
@@ -142,13 +142,13 @@ public:
 	virtual void UpdateOnRemove();
 	virtual bool CreateVPhysics();
 	virtual void Activate( void );
-	virtual bool PassesTriggerFilters(CBaseEntity *pOther);
+	virtual bool PassesTriggerFilters(IServerEntity *pOther);
 
 	// UNDONE: Pass trigger event in or change Start/EndTouch.  Add ITriggerVPhysics perhaps?
 	// BUGBUG: If a player touches two of these, his movement will screw up.
 	// BUGBUG: If a player uses crouch/uncrouch it will generate touch events and clear the motioncontroller flag
-	virtual void StartTouch( CBaseEntity *pOther );
-	virtual void EndTouch( CBaseEntity *pOther );
+	virtual void StartTouch( IServerEntity *pOther );
+	virtual void EndTouch( IServerEntity *pOther );
 
 	void InputToggle( inputdata_t &inputdata );
 	void InputEnable( inputdata_t &inputdata );
@@ -179,8 +179,8 @@ public:
 	void Spawn( void );
 	void RadiationThink( void );
 	void HurtThink( void );
-	void Touch( CBaseEntity *pOther );
-	void EndTouch( CBaseEntity *pOther );
+	void Touch( IServerEntity *pOther );
+	void EndTouch( IServerEntity *pOther );
 	bool HurtEntity( CBaseEntity *pOther, float damage );
 	int HurtAllTouchers( float dt );
 

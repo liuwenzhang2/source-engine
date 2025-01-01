@@ -35,9 +35,9 @@ class CTeamTrainWatcher;
 // This class is to get around the fact that DEFINE_FUNCTION doesn't like multiple inheritance
 class CTriggerAreaCaptureShim : public CBaseTrigger
 {
-	virtual void AreaTouch( CBaseEntity *pOther ) = 0;
+	virtual void AreaTouch( IServerEntity *pOther ) = 0;
 public:
-	void	Touch( CBaseEntity *pOther ) { return AreaTouch( pOther ) ; }
+	void	Touch( IServerEntity *pOther ) { return AreaTouch( pOther ) ; }
 };
 
 DECLARE_AUTO_LIST( ITriggerAreaCaptureAutoList );
@@ -83,8 +83,8 @@ public:
 	void	SetTrainWatcher( CTeamTrainWatcher *pTrainWatcher ){ m_hTrainWatcher = pTrainWatcher; } // used for train watchers that control train movement
 	CTeamTrainWatcher *GetTrainWatcher( void ) const { return m_hTrainWatcher; }
 
-	virtual void StartTouch(CBaseEntity *pOther) OVERRIDE;
-	virtual void EndTouch(CBaseEntity *pOther) OVERRIDE;
+	virtual void StartTouch(IServerEntity *pOther) OVERRIDE;
+	virtual void EndTouch(IServerEntity *pOther) OVERRIDE;
 
 	float GetCapTime() const { return m_flCapTime; }
 
@@ -93,7 +93,7 @@ protected:
 	virtual bool CaptureModeScalesWithPlayers() const;
 
 private:
-	virtual void AreaTouch( CBaseEntity *pOther ) OVERRIDE;
+	virtual void AreaTouch( IServerEntity *pOther ) OVERRIDE;
 	void	CaptureThink( void );
 
 	void	StartCapture( int team, int capmode );

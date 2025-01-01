@@ -77,7 +77,7 @@ public:
 	Vector			BodyTarget( const Vector &posSrc, bool bNoisy );
 
 	
-	virtual void	Use( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value );
+	virtual void	Use( IServerEntity *pActivator, IServerEntity *pCaller, USE_TYPE useType, float value );
 
 private:
 	enum

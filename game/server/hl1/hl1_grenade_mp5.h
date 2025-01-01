@@ -30,7 +30,7 @@ public:
 
 	void		Spawn( void );
 	void		Precache( void );
-	void 		GrenadeMP5Touch( CBaseEntity *pOther );
+	void 		GrenadeMP5Touch( IServerEntity *pOther );
 	void		Event_Killed( CBaseEntity *pInflictor, CBaseEntity *pAttacker, float flDamage, int bitsDamageType );
 
 public:

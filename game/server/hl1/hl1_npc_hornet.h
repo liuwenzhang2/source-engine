@@ -37,9 +37,9 @@ public:
 	Class_T	 Classify ( void );
 	Disposition_t		IRelationType(CBaseEntity *pTarget);
 
-	void DieTouch ( CBaseEntity *pOther );
-	void DartTouch( CBaseEntity *pOther );
-	void TrackTouch ( CBaseEntity *pOther );
+	void DieTouch ( IServerEntity *pOther );
+	void DartTouch( IServerEntity *pOther );
+	void TrackTouch ( IServerEntity *pOther );
 	void TrackTarget ( void );
 	void StartDart ( void );
 	void IgniteTrail( void );
@@ -57,8 +57,8 @@ public:
 	void EXPORT StartTrack ( void );
 	
 	void EXPORT TrackTarget ( void );
-	void EXPORT TrackTouch ( CBaseEntity *pOther );
-	void EXPORT DartTouch( CBaseEntity *pOther );
+	void EXPORT TrackTouch ( IServerEntity *pOther );
+	void EXPORT DartTouch( IServerEntity *pOther );
 	
 	
 	int TakeDamage( entvars_t *pevInflictor, entvars_t *pevAttacker, float flDamage, int bitsDamageType );*/

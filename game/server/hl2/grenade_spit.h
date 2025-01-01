@@ -40,7 +40,7 @@ public:
 
 	virtual	unsigned int	PhysicsSolidMaskForEntity( void ) const { return ( BaseClass::PhysicsSolidMaskForEntity() | CONTENTS_WATER ); }
 
-	void 				GrenadeSpitTouch( CBaseEntity *pOther );
+	void 				GrenadeSpitTouch( IServerEntity *pOther );
 	void				SetSpitSize( int nSize );
 	void				Detonate( void );
 	void				Think( void );

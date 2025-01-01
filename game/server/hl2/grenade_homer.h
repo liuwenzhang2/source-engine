@@ -69,7 +69,7 @@ private:
 	void		UpdateRocketTrail(float fScale);
 	void		StopRocketTrail(void);
 	void		PlayFlySound( void );
-	void 		GrenadeHomerTouch( CBaseEntity *pOther );
+	void 		GrenadeHomerTouch( IServerEntity *pOther );
 	void		Event_Killed( const CTakeDamageInfo &info );
 	int			OnTakeDamage( const CTakeDamageInfo &info );
 

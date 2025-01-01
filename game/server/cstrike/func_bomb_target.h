@@ -17,8 +17,8 @@ public:
 	CBombTarget();
 
 	void Spawn();
-	void EXPORT BombTargetTouch( CBaseEntity* pOther );
-	void EXPORT BombTargetUse( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value );
+	void EXPORT BombTargetTouch( IServerEntity* pOther );
+	void EXPORT BombTargetUse( IServerEntity *pActivator, IServerEntity *pCaller, USE_TYPE useType, float value );
 
 	void OnBombExplode( inputdata_t &inputdata );
 	void OnBombPlanted( inputdata_t &inputdata );

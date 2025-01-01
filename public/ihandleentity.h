@@ -10,6 +10,7 @@
 #pragma once
 #endif
 #include "platform.h"
+#include "const.h"
 
 class IHandleEntity;
 class CBaseHandle;
@@ -26,6 +27,14 @@ class ITraceFilter;
 class CGameTrace;
 typedef CGameTrace trace_t;
 struct cplane_t;
+class IPhysicsObject;
+class IEngineWorld;
+class IEnginePlayer;
+class IEnginePortal;
+class IEngineShadowClone;
+class IEngineVehicle;
+class IEngineRope;
+class IEngineGhost;
 
 class IEngineObject {
 public:
@@ -33,8 +42,20 @@ public:
 	virtual const CBaseHandle& GetRefEHandle() const = 0;
 	virtual IEntityList* GetEntityList() const = 0;
 	virtual int entindex() const = 0;
+	virtual const string_t& GetClassname() const = 0;
+	virtual int GetFlags(void) const = 0;
+	virtual bool IsEFlagSet(int nEFlagMask) const = 0;
+	virtual IEngineObject* GetMoveParent(void) const = 0;
+	//virtual void SetMoveParent(IEngineObjectServer* hMoveParent) = 0;
+	virtual IEngineObject* GetRootMoveParent() = 0;
+	virtual IEngineObject* FirstMoveChild(void) const = 0;
+	//virtual void SetFirstMoveChild(IEngineObjectServer* hMoveChild) = 0;
+	virtual IEngineObject* NextMovePeer(void) const = 0;
 	virtual int GetModelIndex(void) const = 0;
 	virtual string_t GetModelName(void) const = 0;
+	virtual void AddSolidFlags(int flags) = 0;
+	virtual SolidType_t GetSolid() const = 0;
+	virtual bool IsSolidFlagSet(int flagMask) const = 0;
 	virtual bool IsMarkedForDeletion(void) = 0;
 	virtual void CollisionRulesChanged() = 0;
 	virtual const Vector& GetAbsOrigin(void) const = 0;
@@ -50,6 +71,27 @@ public:
 	virtual const Vector& OBBSize() const = 0;
 	virtual const Vector& GetCollisionOrigin() const = 0;
 	virtual const QAngle& GetCollisionAngles() const = 0;
+	virtual MoveType_t GetMoveType() const = 0;
+	virtual IPhysicsObject* VPhysicsGetObject(void) const = 0;
+	virtual bool IsRagdoll() const = 0;
+
+	virtual bool IsWorld() = 0;
+	virtual bool IsPlayer() = 0;
+	virtual bool IsPortal() = 0;
+	virtual bool IsShadowClone() = 0;
+	virtual bool IsVehicle() = 0;
+	virtual bool IsRope() = 0;
+	virtual bool IsGhost() = 0;
+};
+
+class IEngineWorld {
+public:
+
+};
+
+class IEnginePlayer {
+public:
+
 };
 
 class IEnginePortal {
@@ -68,6 +110,26 @@ public:
 	virtual const PS_SD_Static_SurfaceProperties_t& GetSurfaceProperties() const = 0;
 };
 
+class IEngineShadowClone {
+public:
+
+};
+
+class IEngineVehicle {
+public:
+
+};
+
+class IEngineRope {
+public:
+
+};
+
+class IEngineGhost {
+public:
+
+};
+
 // An IHandleEntity-derived class can go into an entity list and use ehandles.
 class SINGLE_INHERITANCE IHandleEntity
 {
@@ -84,6 +146,13 @@ public:
 	virtual void PostConstructor(const char* szClassname, int iForceEdictIndex) {}
 	virtual bool Init(int entnum, int iSerialNum) { return true; }
 	virtual void AfterInit() {};
+	virtual char const* GetClassname(void) { return NULL; }
+	virtual bool IsWorld() const { return false; }
+	virtual bool IsBSPModel() const { return false; }
+	virtual bool IsNPC(void) const { return false; }
+	virtual bool IsPlayer(void) const { return false; }
+	virtual const char& GetTakeDamage() const { return 0; }
+	virtual bool IsStandable() const { return false; }
 };
 
 abstract_class IEntityCallBack{

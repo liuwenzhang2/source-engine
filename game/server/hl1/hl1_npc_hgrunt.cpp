@@ -1859,7 +1859,7 @@ class CNPC_HGruntRepel:public CAI_BaseNPC
 public:
 	void Spawn( void );
 	void Precache( void );
-	void RepelUse ( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value );
+	void RepelUse ( IServerEntity *pActivator, IServerEntity *pCaller, USE_TYPE useType, float value );
 	int m_iSpriteTexture;	// Don't save, precache
 
 	DECLARE_DATADESC();
@@ -1891,7 +1891,7 @@ void CNPC_HGruntRepel::Precache( void )
 	m_iSpriteTexture = engine->PrecacheModel( "sprites/rope.vmt" );
 }
 
-void CNPC_HGruntRepel::RepelUse ( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value )
+void CNPC_HGruntRepel::RepelUse ( IServerEntity *pActivator, IServerEntity *pCaller, USE_TYPE useType, float value )
 {
 	trace_t tr;
 	UTIL_TraceLine(GetEngineObject()->GetAbsOrigin(), GetEngineObject()->GetAbsOrigin() + Vector( 0, 0, -4096.0), MASK_NPCSOLID, this,COLLISION_GROUP_NONE, &tr);

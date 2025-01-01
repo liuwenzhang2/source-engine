@@ -744,7 +744,7 @@ int CNPC_Ichthyosaur::RangeAttack1Conditions( float flDot, float flDist )
 	return COND_NONE;
 }
 
-void CNPC_Ichthyosaur::BiteTouch( CBaseEntity *pOther )
+void CNPC_Ichthyosaur::BiteTouch( IServerEntity *pOther )
 {
 	// bite if we hit who we want to eat
 	if ( pOther == GetEnemy() ) 
@@ -885,7 +885,7 @@ Vector CNPC_Ichthyosaur::DoProbe( const Vector &Probe )
 	//NDebugOverlay::Line( tr.startpos, tr.endpos, 255.0f*(1.0f-tr.fraction), 255.0f * tr.fraction, 0.0f, true, 0.05f );
 	//NOTENOTE: Debug end
 
-	if (bBumpedSomething && (GetEnemy() == NULL || !tr.m_pEnt || ((CBaseEntity*)tr.m_pEnt)->entindex() != GetEnemy()->entindex()))
+	if (bBumpedSomething && (GetEnemy() == NULL || !tr.m_pEnt || tr.m_pEnt->entindex() != GetEnemy()->entindex()))
 	{
 		Vector ProbeDir = Probe - GetEngineObject()->GetAbsOrigin();
 

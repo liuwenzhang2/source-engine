@@ -48,7 +48,7 @@ public:
 	virtual void TraceAttack( const CTakeDamageInfo &info, const Vector &vecDir, trace_t *ptr, CDmgAccumulator *pAccumulator );
 
 	virtual void Event_Killed( const CTakeDamageInfo &info );
-	virtual void Touch( CBaseEntity *other );				// in contact with "other"
+	virtual void Touch( IServerEntity *other );				// in contact with "other"
 	
 	void HostageRescueZoneTouch( inputdata_t &inputdata );	// invoked when hostage touches a rescue zone
 
@@ -116,7 +116,7 @@ public:
 
 
 protected:
-	virtual void HostageUse( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value );
+	virtual void HostageUse( IServerEntity *pActivator, IServerEntity *pCaller, USE_TYPE useType, float value );
 
 private:
 	float GetModifiedDamage( float flDamage, int nHitGroup );

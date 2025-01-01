@@ -21,7 +21,7 @@ class CWaterBullet : public CBaseAnimating
 public:
 	void Precache();
 	void Spawn( const Vector &vecOrigin, const Vector &vecDir );
-	void Touch( CBaseEntity *pOther );
+	void Touch( IServerEntity *pOther );
 	void BulletThink();
 
 	DECLARE_DATADESC();

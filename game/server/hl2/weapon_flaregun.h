@@ -54,8 +54,8 @@ public:
 
 	Class_T Classify( void );
 
-	void	FlareTouch( CBaseEntity *pOther );
-	void	FlareBurnTouch( CBaseEntity *pOther );
+	void	FlareTouch( IServerEntity *pOther );
+	void	FlareBurnTouch( IServerEntity *pOther );
 	void	FlareThink( void );
 
 	void	InputStart( inputdata_t &inputdata );
