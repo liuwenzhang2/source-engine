@@ -988,7 +988,7 @@ public:
 	// fundamental callbacks
 	void (CBaseEntity ::*m_pfnTouch)( IServerEntity *pOther );
 	void (CBaseEntity ::*m_pfnUse)( IServerEntity *pActivator, IServerEntity *pCaller, USE_TYPE useType, float value );
-	void (CBaseEntity ::*m_pfnBlocked)( CBaseEntity *pOther );
+	void (CBaseEntity ::*m_pfnBlocked)( IServerEntity *pOther );
 
 	virtual void			Use( IServerEntity *pActivator, IServerEntity *pCaller, USE_TYPE useType, float value );
 	virtual void			StartTouch( IServerEntity *pOther );
