@@ -170,7 +170,7 @@ void CCSSpectatorGUI::ShowPanel( bool bShow )
 void CCSSpectatorGUI::UpdateTimer()
 {
 	// these could be NULL if players modified the UI
-	if ( !ControlsPresent() )
+	if (!ControlsPresent() || !CSGameRules())
 		return;
 
 	Color timerColor = m_pTimer->GetFgColor();
