@@ -81,7 +81,7 @@ public:
 	bool PropDataOverrodeBlockLOS( void ) { return m_bBlockLOSSetByPropData; }
 	bool PropDataOverrodeAIWalkable( void ) { return m_bIsWalkableSetByPropData; }
 
-	virtual bool   HasPreferredCarryAnglesForPlayer( CBaseEntity *pPlayer )
+	virtual bool   HasPreferredCarryAnglesForPlayer( IServerEntity *pPlayer )
 	{
 		if ( HasInteraction( PROPINTER_PHYSGUN_LAUNCH_SPIN_Z ) )
 			return true;
@@ -153,7 +153,7 @@ public:
 
 protected:
 
-	bool			UpdateHealth( int iNewHealth, CBaseEntity *pActivator );
+	bool			UpdateHealth( int iNewHealth, IServerEntity *pActivator );
 	virtual void	OnBreak( const Vector &vecVelocity, const AngularImpulse &angVel, CBaseEntity *pBreaker ) {}
 
 protected:
@@ -278,7 +278,7 @@ public:
 	void	HandleAnimEvent( animevent_t *pEvent );
 
 	// baseentity - watch dynamic hierarchy updates
-	virtual void	AfterParentChanged( CBaseEntity* pOldParent, int iOldAttachment = -1 );
+	virtual void	AfterParentChanged(IServerEntity* pOldParent, int iOldAttachment = -1 );
 	bool			TestCollision( const Ray_t &ray, unsigned int mask, trace_t& trace );
 
 	// breakable prop
@@ -338,7 +338,7 @@ public:
 	CPhysicsProp( void ) 
 	{
 	}
-	virtual bool IsPhysicsProp() { return true; }
+	virtual bool IsPhysicsProp() const { return true; }
 	void UpdateOnRemove(void);
 	void Spawn( void );
 	void Precache();
@@ -360,7 +360,7 @@ public:
 	void OnPhysGunDrop( CBasePlayer *pPhysGunUser, PhysGunDrop_t reason );
 	bool IsObjectAllowedOverhead();
 	bool GetPropDataAngles( const char *pKeyName, QAngle &vecAngles );
-	bool HasPreferredCarryAnglesForPlayer(CBaseEntity* pPlayer) { 
+	bool HasPreferredCarryAnglesForPlayer(IServerEntity* pPlayer) {
 		QAngle vecPreferredCarryAngles;
 		vecPreferredCarryAngles.Init();
 		return GetPropDataAngles("preferred_carryangles", vecPreferredCarryAngles);
@@ -383,7 +383,7 @@ public:
 
 	virtual int OnTakeDamage( const CTakeDamageInfo &info );
 	int DrawDebugTextOverlays(void);
-	bool IsGib();
+	bool IsGib() const;
 	DECLARE_DATADESC();
 
 	// Specific interactions

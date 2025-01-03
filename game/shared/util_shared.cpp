@@ -441,7 +441,7 @@ void UTIL_Portal_NDebugOverlay(const Vector& ptPortalCenter, const QAngle& qPort
 	Vector pvTri1[3], pvTri2[3];
 
 	UTIL_Portal_Triangles(ptPortalCenter, qPortalAngles, pvTri1, pvTri2);
-	CBaseEntity* player = EntityList()->GetLocalPlayer();
+	IServerEntity* player = EntityList()->GetLocalPlayer();
 	if (!player)
 		return;
 	{

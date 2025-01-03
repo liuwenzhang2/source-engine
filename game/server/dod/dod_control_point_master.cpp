@@ -87,7 +87,7 @@ void CControlPointMaster::Reset( void )
 bool CControlPointMaster::FindControlPoints( void )
 {
 	//go through all the points
-	CBaseEntity *pEnt = EntityList()->FindEntityByClassname( NULL, "dod_control_point" );
+	IServerEntity *pEnt = EntityList()->FindEntityByClassname( NULL, "dod_control_point" );
 
 	int numFound = 0;
 	
@@ -380,7 +380,7 @@ void CControlPointMaster::InputRoundInit( inputdata_t &input )
 	//init the ClientAreas
 	int index = 0;
 	
-	CBaseEntity *pEnt = EntityList()->FindEntityByClassname( NULL, "dod_capture_area" );
+	IServerEntity *pEnt = EntityList()->FindEntityByClassname( NULL, "dod_capture_area" );
 	while( pEnt )
 	{
 		CAreaCapture *pArea = (CAreaCapture *)pEnt;

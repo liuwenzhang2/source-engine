@@ -851,7 +851,7 @@ void CTeamplayRoundBasedWorld::CheckWaitingForPlayers( void )
 #ifndef CSTRIKE_DLL
 				variant_t sVariant;
 				m_hWaitingForPlayersTimer = (CTeamRoundTimer*)CBaseEntity::Create( "team_round_timer", vec3_origin, vec3_angle );
-				m_hWaitingForPlayersTimer->SetName( "zz_teamplay_waiting_timer" );
+				m_hWaitingForPlayersTimer->GetEngineObject()->SetName( "zz_teamplay_waiting_timer" );
 				m_hWaitingForPlayersTimer->KeyValue( "show_in_hud", "1" );
 				sVariant.SetInt( m_flWaitingForPlayersTimeEnds - gpGlobals->curtime );
 				m_hWaitingForPlayersTimer->AcceptInput( "SetTime", NULL, NULL, sVariant, 0 );
@@ -1884,7 +1884,7 @@ void CTeamplayRoundBasedWorld::HideActiveTimer( void )
 	m_hPreviousActiveTimer = NULL;
 
 #ifndef CSTRIKE_DLL
-	CBaseEntity *pEntity = NULL;
+	IServerEntity *pEntity = NULL;
 	variant_t sVariant;
 	sVariant.SetInt( false );
 
@@ -2483,7 +2483,7 @@ void CTeamplayRoundBasedWorld::HandleTimeLimitChange( void )
 bool CTeamplayRoundBasedWorld::MapHasActiveTimer( void )
 {
 #ifndef CSTRIKE_DLL
-	CBaseEntity *pEntity = NULL;
+	IServerEntity *pEntity = NULL;
 	while ( ( pEntity = EntityList()->FindEntityByClassname( pEntity, "team_round_timer" ) ) != NULL )
 	{
 		CTeamRoundTimer *pTimer = assert_cast<CTeamRoundTimer*>( pEntity );
@@ -2508,7 +2508,7 @@ void CTeamplayRoundBasedWorld::CreateTimeLimitTimer( void )
 	if ( !m_hTimeLimitTimer )
 	{
 		m_hTimeLimitTimer = (CTeamRoundTimer*)CBaseEntity::Create( "team_round_timer", vec3_origin, vec3_angle );
-		m_hTimeLimitTimer->SetName( "zz_teamplay_timelimit_timer" );
+		m_hTimeLimitTimer->GetEngineObject()->SetName( "zz_teamplay_timelimit_timer" );
 	}
 
 	variant_t sVariant;
@@ -2618,10 +2618,10 @@ void CTeamplayRoundBasedWorld::CleanUpMap()
 	}
 
 	// Get rid of all entities except players.
-	CBaseEntity *pCur = EntityList()->FirstEnt();
+	IServerEntity *pCur = EntityList()->FirstEnt();
 	while ( pCur )
 	{
-		if ( !RoundCleanupShouldIgnore( pCur ) )
+		if ( !RoundCleanupShouldIgnore((CBaseEntity*)pCur ) )
 		{
 			if( mp_showcleanedupents.GetInt() & 1 )
 			{
@@ -2677,7 +2677,7 @@ void CTeamplayRoundBasedWorld::CleanUpMap()
 		}
 
 
-		virtual CBaseEntity* CreateNextEntity( const char *pClassname )
+		virtual IServerEntity* CreateNextEntity( const char *pClassname )
 		{
 			if ( m_iIterator == g_MapEntityRefs.InvalidIndex() )
 			{
@@ -2696,13 +2696,13 @@ void CTeamplayRoundBasedWorld::CleanUpMap()
 				{
 					// Doh! The entity was delete and its slot was reused.
 					// Just use any old edict slot. This case sucks because we lose the baseline.
-					return (CBaseEntity*)EntityList()->CreateEntityByName( pClassname );
+					return EntityList()->CreateEntityByName( pClassname );
 				}
 				else
 				{
 					// Cool, the slot where this entity was is free again (most likely, the entity was 
 					// freed above). Now create an entity with this specific index.
-					return (CBaseEntity*)EntityList()->CreateEntityByName( pClassname, ref.m_iEdict );
+					return EntityList()->CreateEntityByName( pClassname, ref.m_iEdict );
 				}
 			}
 		}

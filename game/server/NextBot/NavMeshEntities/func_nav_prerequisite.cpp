@@ -55,7 +55,7 @@ CBaseEntity *CFuncNavPrerequisite::GetTaskEntity( void )
 {
 	if ( m_hTaskEntity == NULL )
 	{
-		m_hTaskEntity = EntityList()->FindEntityByName( NULL, m_taskEntityName );
+		m_hTaskEntity = (CBaseEntity*)EntityList()->FindEntityByName( NULL, m_taskEntityName );
 	}
 	return m_hTaskEntity;
 }

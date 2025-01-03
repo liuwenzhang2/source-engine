@@ -52,10 +52,10 @@ bool IsTriggerClass( CBaseEntity *pEntity );
 void Cmd_ShowtriggersToggle_f( const CCommand &args )
 {
 	// Loop through the entities in the game and make visible anything derived from CBaseTrigger
-	CBaseEntity *pEntity = EntityList()->FirstEnt();
+	IServerEntity *pEntity = EntityList()->FirstEnt();
 	while ( pEntity )
 	{
-		if ( IsTriggerClass(pEntity) )
+		if ( IsTriggerClass((CBaseEntity*)pEntity) )
 		{
 			// If a classname is specified, only show triggles of that type
 			if ( args.ArgC() > 1 )
@@ -466,12 +466,12 @@ void CBaseTrigger::StartTouch(IServerEntity *pOther)
 			bAdded = true;
 		}
 
-		m_OnStartTouch.FireOutput((CBaseEntity*)pOther, this);
+		m_OnStartTouch.FireOutput(pOther, this);
 
 		if ( bAdded && ( m_hTouchingEntities.Count() == 1 ) )
 		{
 			// First entity to touch us that passes our filters
-			m_OnStartTouchAll.FireOutput((CBaseEntity*)pOther, this );
+			m_OnStartTouchAll.FireOutput(pOther, this );
 		}
 	}
 }
@@ -492,7 +492,7 @@ void CBaseTrigger::EndTouch(IServerEntity *pOther)
 		//FIXME: Without this, triggers fire their EndTouch outputs when they are disabled!
 		//if ( !m_bDisabled )
 		//{
-			m_OnEndTouch.FireOutput((CBaseEntity*)pOther, this);
+			m_OnEndTouch.FireOutput(pOther, this);
 		//}
 
 		// If there are no more entities touching this trigger, fire the lost all touches
@@ -526,7 +526,7 @@ void CBaseTrigger::EndTouch(IServerEntity *pOther)
 		// Didn't find one?
 		if ( !bFoundOtherTouchee /*&& !m_bDisabled*/ )
 		{
-			m_OnEndTouchAll.FireOutput((CBaseEntity*)pOther, this);
+			m_OnEndTouchAll.FireOutput(pOther, this);
 		}
 	}
 }
@@ -811,10 +811,10 @@ int CTriggerHurt::HurtAllTouchers( float dt )
 	{
 		for ( servertouchlink_t *link = root->nextLink; link != root; link = link->nextLink )
 		{
-			CBaseEntity *pTouch = EntityList()->GetBaseEntityFromHandle(link->entityTouched);
+			IServerEntity *pTouch = EntityList()->GetBaseEntityFromHandle(link->entityTouched);
 			if ( pTouch )
 			{
-				if ( HurtEntity( pTouch, fldmg ) )
+				if ( HurtEntity((CBaseEntity*)pTouch, fldmg ) )
 				{
 					hurtCount++;
 				}
@@ -911,7 +911,7 @@ void CTriggerMultiple::MultiTouch(IServerEntity *pOther)
 {
 	if (PassesTriggerFilters(pOther))
 	{
-		ActivateMultiTrigger( (CBaseEntity*)pOther );
+		ActivateMultiTrigger( pOther );
 	}
 }
 
@@ -920,12 +920,12 @@ void CTriggerMultiple::MultiTouch(IServerEntity *pOther)
 // Purpose: 
 // Input  : pActivator - 
 //-----------------------------------------------------------------------------
-void CTriggerMultiple::ActivateMultiTrigger(CBaseEntity *pActivator)
+void CTriggerMultiple::ActivateMultiTrigger(IServerEntity *pActivator)
 {
 	if (GetEngineObject()->GetNextThink() > gpGlobals->curtime)
 		return;         // still waiting for reset time
 
-	m_hActivator = pActivator;
+	m_hActivator = (CBaseEntity*)pActivator;
 
 	m_OnTrigger.FireOutput(m_hActivator, this);
 
@@ -1007,7 +1007,7 @@ public:
 
 private:
 
-	void Trigger(CBaseEntity *pActivator, bool bTimeout);
+	void Trigger(IServerEntity *pActivator, bool bTimeout);
 	void TimeoutThink();
 
 	COutputEvent m_OnTimeout;
@@ -1160,7 +1160,7 @@ void CTriggerLook::Touch(IServerEntity *pOther)
 
 			if (m_flLookTimeTotal >= m_flLookTime)
 			{
-				Trigger((CBaseEntity*)pOther, false);
+				Trigger(pOther, false);
 			}
 		}
 		else
@@ -1174,7 +1174,7 @@ void CTriggerLook::Touch(IServerEntity *pOther)
 //-----------------------------------------------------------------------------
 // Purpose: Called when the trigger is fired by look logic or timeout.
 //-----------------------------------------------------------------------------
-void CTriggerLook::Trigger(CBaseEntity *pActivator, bool bTimeout)
+void CTriggerLook::Trigger(IServerEntity *pActivator, bool bTimeout)
 {
 	if (bTimeout)
 	{
@@ -1269,13 +1269,13 @@ public:
 	bool KeyValue( const char *szKeyName, const char *szValue );
 
 	//static int ChangeList( levellist_t *pLevelList, int maxList );
-	bool	IsChangeLevelTrigger() { return true; };
+	bool	IsChangeLevelTrigger() const { return true; };
 	const char* GetNewLandmarkName() { return m_szLandmarkName; };
 	const char* GetNewMapName() { return m_szMapName; };
 
 private:
 	void TouchChangeLevel( IServerEntity *pOther );
-	void ChangeLevelNow( CBaseEntity *pActivator );
+	void ChangeLevelNow( IServerEntity *pActivator );
 
 	void InputChangeLevel( inputdata_t &inputdata );
 
@@ -1385,7 +1385,7 @@ void CChangeLevel::Activate( void )
 	}
 
 	// Level transitions will bust if they are in solid
-	CBaseEntity *pLandmark = EntityList()->FindLandmark( m_szLandmarkName );
+	IServerEntity *pLandmark = EntityList()->FindLandmark( m_szLandmarkName );
 	if ( pLandmark )
 	{
 		int clusterIndex = engine->GetClusterForOrigin( pLandmark->GetEngineObject()->GetAbsOrigin() );
@@ -1427,7 +1427,7 @@ void CChangeLevel::InputChangeLevel( inputdata_t &inputdata )
 
 void CChangeLevel::NotifyEntitiesOutOfTransition()
 {
-	CBaseEntity *pEnt = EntityList()->FirstEnt();
+	IServerEntity *pEnt = EntityList()->FirstEnt();
 	while ( pEnt )
 	{
 		// Found the landmark
@@ -1472,9 +1472,9 @@ void CChangeLevel::WarnAboutActiveLead( void )
 	}
 }
 
-void CChangeLevel::ChangeLevelNow( CBaseEntity *pActivator )
+void CChangeLevel::ChangeLevelNow( IServerEntity *pActivator )
 {
-	CBaseEntity	*pLandmark;
+	IServerEntity	*pLandmark;
 	levellist_t	levels[16];
 
 	Assert(!FStrEq(m_szMapName, ""));
@@ -1489,7 +1489,7 @@ void CChangeLevel::ChangeLevelNow( CBaseEntity *pActivator )
 
 	m_bTouched = true;
 
-	CBaseEntity *pPlayer = (pActivator && pActivator->IsPlayer()) ? pActivator : EntityList()->GetLocalPlayer();
+	IServerEntity *pPlayer = (pActivator && pActivator->IsPlayer()) ? pActivator : EntityList()->GetLocalPlayer();
 
 	int transitionState = EntityList()->InTransitionVolume(pPlayer, m_szLandmarkName);
 	if ( transitionState == TRANSITION_VOLUME_SCREENED_OUT )
@@ -1532,7 +1532,7 @@ void CChangeLevel::ChangeLevelNow( CBaseEntity *pActivator )
 
 	EntityList()->OnChangeLevel(m_szMapName, m_szLandmarkName);
 
-	m_hActivator = pActivator;
+	m_hActivator = (CBaseEntity*)pActivator;
 
 	m_OnChangeLevel.FireOutput(pActivator, this);
 
@@ -1593,7 +1593,7 @@ void CChangeLevel::TouchChangeLevel( IServerEntity *pOther )
 		return;
 	}
 
-	ChangeLevelNow( (CBaseEntity*)pOther );
+	ChangeLevelNow( pOther );
 }
 
 //int BuildChangeList( levellist_t *pLevelList, int maxList )
@@ -1820,7 +1820,7 @@ void CTriggerTeleport::Spawn( void )
 //-----------------------------------------------------------------------------
 void CTriggerTeleport::Touch( IServerEntity *pOther )
 {
-	CBaseEntity	*pentTarget = NULL;
+	IServerEntity	*pentTarget = NULL;
 
 	if (!PassesTriggerFilters(pOther))
 	{
@@ -1828,7 +1828,7 @@ void CTriggerTeleport::Touch( IServerEntity *pOther )
 	}
 
 	// The activator and caller are the same
-	pentTarget = EntityList()->FindEntityByName( pentTarget, m_target, NULL, (CBaseEntity*)pOther, (CBaseEntity*)pOther );
+	pentTarget = EntityList()->FindEntityByName( pentTarget, m_target, NULL, pOther, pOther );
 	if (!pentTarget)
 	{
 	   return;
@@ -1837,12 +1837,12 @@ void CTriggerTeleport::Touch( IServerEntity *pOther )
 	//
 	// If a landmark was specified, offset the player relative to the landmark.
 	//
-	CBaseEntity	*pentLandmark = NULL;
+	IServerEntity	*pentLandmark = NULL;
 	Vector vecLandmarkOffset(0, 0, 0);
 	if (m_iLandmark != NULL_STRING)
 	{
 		// The activator and caller are the same
-		pentLandmark = EntityList()->FindEntityByName(pentLandmark, m_iLandmark, NULL, (CBaseEntity*)pOther, (CBaseEntity*)pOther );
+		pentLandmark = EntityList()->FindEntityByName(pentLandmark, m_iLandmark, NULL, pOther, pOther );
 		if (pentLandmark)
 		{
 			vecLandmarkOffset = pOther->GetEngineObject()->GetAbsOrigin() - pentLandmark->GetEngineObject()->GetAbsOrigin();
@@ -1881,7 +1881,7 @@ void CTriggerTeleport::Touch( IServerEntity *pOther )
 	}
 
 	tmp += vecLandmarkOffset;
-	((CBaseEntity*)pOther)->Teleport( &tmp, pAngles, pVelocity );
+	pOther->Teleport( &tmp, pAngles, pVelocity );
 }
 
 
@@ -2118,12 +2118,12 @@ END_DATADESC()
 
 void CAI_ChangeTarget::InputActivate( inputdata_t &inputdata )
 {
-	CBaseEntity *pTarget = NULL;
+	IServerEntity *pTarget = NULL;
 
 	while ((pTarget = EntityList()->FindEntityByName( pTarget, m_target, NULL, inputdata.pActivator, inputdata.pCaller )) != NULL)
 	{
-		pTarget->m_target = m_iszNewTarget;
-		CAI_BaseNPC *pNPC = pTarget->MyNPCPointer( );
+		pTarget->SetTarget(m_iszNewTarget);
+		CAI_BaseNPC *pNPC = ((CBaseEntity*)pTarget)->MyNPCPointer( );
 		if (pNPC)
 		{
 			pNPC->SetGoalEnt( NULL );
@@ -2154,7 +2154,7 @@ public:
 	DECLARE_DATADESC();
 
 private:
-	CAI_BaseNPC *FindQualifiedNPC( CAI_BaseNPC *pPrev, CBaseEntity *pActivator, CBaseEntity *pCaller );
+	CAI_BaseNPC *FindQualifiedNPC( CAI_BaseNPC *pPrev, IServerEntity *pActivator, IServerEntity *pCaller );
 
 	int			m_iSearchType;
 	string_t	m_strSearchName;
@@ -2176,9 +2176,9 @@ BEGIN_DATADESC( CAI_ChangeHintGroup )
 
 END_DATADESC()
 
-CAI_BaseNPC *CAI_ChangeHintGroup::FindQualifiedNPC( CAI_BaseNPC *pPrev, CBaseEntity *pActivator, CBaseEntity *pCaller )
+CAI_BaseNPC *CAI_ChangeHintGroup::FindQualifiedNPC( CAI_BaseNPC *pPrev, IServerEntity *pActivator, IServerEntity *pCaller )
 {
-	CBaseEntity *pEntity = pPrev;
+	IServerEntity *pEntity = pPrev;
 	CAI_BaseNPC *pResult = NULL;
 	const char *pszSearchName = STRING(m_strSearchName);
 	while ( !pResult )
@@ -2209,7 +2209,7 @@ CAI_BaseNPC *CAI_ChangeHintGroup::FindQualifiedNPC( CAI_BaseNPC *pPrev, CBaseEnt
 			return NULL;
 
 		// Qualify
-		pResult = pEntity->MyNPCPointer();
+		pResult = ((CBaseEntity*)pEntity)->MyNPCPointer();
 		if ( pResult && m_iSearchType == 2 && (!FStrEq( STRING(pResult->GetHintGroup()), pszSearchName ) ) )
 		{
 			pResult = NULL;
@@ -2421,7 +2421,7 @@ bool CTriggerCamera::KeyValue( const char *szKeyName, const char *szValue )
 //------------------------------------------------------------------------------
 void CTriggerCamera::InputEnable( inputdata_t &inputdata )
 { 
-	m_hPlayer = inputdata.pActivator;
+	m_hPlayer = (CBaseEntity*)inputdata.pActivator;
 	Enable();
 }
 
@@ -2547,7 +2547,7 @@ void CTriggerCamera::Enable( void )
 
 	if ( m_sPath != NULL_STRING )
 	{
-		m_pPath = EntityList()->FindEntityByName( NULL, m_sPath, NULL, m_hPlayer );
+		m_pPath = (CBaseEntity*)EntityList()->FindEntityByName( NULL, m_sPath, NULL, m_hPlayer );
 	}
 	else
 	{
@@ -3025,7 +3025,7 @@ void CTriggerProximity::Spawn(void)
 void CTriggerProximity::Activate(void)
 {
 	BaseClass::Activate();
-	m_hMeasureTarget = EntityList()->FindEntityByName(NULL, m_iszMeasureTarget );
+	m_hMeasureTarget = (CBaseEntity*)EntityList()->FindEntityByName(NULL, m_iszMeasureTarget );
 
 	//
 	// Disable our Touch function if we were given a bad measure target.
@@ -3097,7 +3097,7 @@ void CTriggerProximity::MeasureThink( void )
 	// measure target.
 	//
 	float fMinDistance = m_fRadius + 100;
-	CBaseEntity *pNearestEntity = NULL;
+	IServerEntity *pNearestEntity = NULL;
 
 	servertouchlink_t *root = (servertouchlink_t* )GetEngineObject()->GetDataObject( TOUCHLINK );
 	if ( root )
@@ -3105,7 +3105,7 @@ void CTriggerProximity::MeasureThink( void )
 		servertouchlink_t *pLink = root->nextLink;
 		while (pLink && pLink != root)
 		{
-			CBaseEntity *pEntity = EntityList()->GetBaseEntityFromHandle(pLink->entityTouched);
+			IServerEntity *pEntity = EntityList()->GetBaseEntityFromHandle(pLink->entityTouched);
 
 			// If this is an entity that we care about, check its distance.
 			if ( ( pEntity != NULL ) && PassesTriggerFilters( pEntity ) )

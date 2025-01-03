@@ -197,7 +197,7 @@ public:
 		pOther->GetEngineObject()->SetMoveType( MOVETYPE_NONE );
 
 		// Parent the object to our owner
-		pOther->GetEngineObject()->SetParent( GetOwnerEntity()?GetOwnerEntity()->GetEngineObject():NULL );
+		pOther->GetEngineObject()->SetParent(GetOwnerEntity() ? GetOwnerEntity()->GetEngineObject() : NULL);
 
 		// The car now owns the entity
 		pJeep->AddPropToCargoHold( pProp );
@@ -621,12 +621,12 @@ void CPropJeepEpisodic::InputAddBusterToCargo( inputdata_t &data )
 		m_hCargoProp = NULL;
 	}
 
-	CBaseEntity *pNewBomb = (CBaseEntity*)EntityList()->CreateEntityByName( "weapon_striderbuster" );
+	IServerEntity *pNewBomb = EntityList()->CreateEntityByName( "weapon_striderbuster" );
 	if ( pNewBomb )
 	{
 		DispatchSpawn( pNewBomb );
 		pNewBomb->Teleport( &m_hCargoTrigger->GetEngineObject()->GetAbsOrigin(), NULL, NULL );
-		m_hCargoTrigger->AddCargo( pNewBomb );
+		m_hCargoTrigger->AddCargo((CBaseEntity*)pNewBomb );
 	}
 }
 
@@ -868,7 +868,7 @@ void CPropJeepEpisodic::UpdateRadar( bool forceUpdate )
 	m_flNextRadarUpdateTime = gpGlobals->curtime + RADAR_UPDATE_FREQUENCY;
 	m_iNumRadarContacts = 0;
 
-	CBaseEntity *pEnt = EntityList()->FirstEnt();
+	IServerEntity *pEnt = EntityList()->FirstEnt();
 	string_t iszRadarTarget = FindPooledString( "info_radar_target" );
 	string_t iszStriderName = FindPooledString( "npc_strider" );
 	string_t iszHunterName = FindPooledString( "npc_hunter" );
@@ -1255,8 +1255,8 @@ static void KillBlockingEnemyNPCs( CBasePlayer *pPlayer, CBaseEntity *pVehicleEn
 	{
 		IPhysicsObject *pOther = pSnapshot->GetObject(1);
 		float otherMass = pOther->GetMass();
-		CBaseEntity *pOtherEntity = static_cast<CBaseEntity *>(pOther->GetGameData());
-		CAI_BaseNPC *pNPC = pOtherEntity ? pOtherEntity->MyNPCPointer() : NULL;
+		IServerEntity *pOtherEntity = static_cast<IServerEntity*>(pOther->GetGameData());
+		CAI_BaseNPC *pNPC = pOtherEntity ? ((CBaseEntity*)pOtherEntity)->MyNPCPointer() : NULL;
 		// Is this an enemy NPC with a small enough mass?
 		if ( pNPC && pPlayer->IRelationType(pNPC) != D_LI && ((otherMass*2.0f) < vehicleMass) )
 		{

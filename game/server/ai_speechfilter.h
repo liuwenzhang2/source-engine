@@ -15,7 +15,7 @@
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-class CAI_SpeechFilter : public CBaseEntity, public IEntityListener<CBaseEntity>
+class CAI_SpeechFilter : public CBaseEntity, public IEntityListener<IServerEntity>
 {
 	DECLARE_CLASS( CAI_SpeechFilter, CBaseEntity );
 public:
@@ -37,8 +37,8 @@ public:
 	float	GetIdleModifier( void ) { return m_flIdleModifier; }
 	bool	NeverSayHello( void ) { return m_bNeverSayHello; }
 
-	void	OnEntityCreated( CBaseEntity *pEntity );
-	void	OnEntityDeleted( CBaseEntity *pEntity );
+	void	OnEntityCreated( IServerEntity *pEntity );
+	void	OnEntityDeleted( IServerEntity *pEntity );
 
 protected:
 	string_t	m_iszSubject;

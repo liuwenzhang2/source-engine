@@ -505,7 +505,7 @@ void CFastZombie::PrescheduleThink( void )
 {
 	BaseClass::PrescheduleThink();
 
-	if(GetEngineObject()->GetGroundEntity() && GetEngineObject()->GetGroundEntity()->GetOuter()->Classify() == CLASS_HEADCRAB)
+	if(GetEngineObject()->GetGroundEntity() && ((CBaseEntity*)GetEngineObject()->GetGroundEntity()->GetOuter())->Classify() == CLASS_HEADCRAB)
 	{
 		// Kill!
 		CTakeDamageInfo info;
@@ -2018,7 +2018,7 @@ void CFastZombie::InputAttachToVehicle( inputdata_t &inputdata )
 	SetCondition( COND_PROVOKED );
 
 	// Find the target vehicle
-	CBaseEntity *pEntity = FindNamedEntity( inputdata.value.String() );
+	IServerEntity *pEntity = FindNamedEntity( inputdata.value.String() );
 	CPropJeepEpisodic *pVehicle = dynamic_cast<CPropJeepEpisodic *>(pEntity);
 
 	// Get in the car if it's valid

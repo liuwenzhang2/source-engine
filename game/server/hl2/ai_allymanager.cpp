@@ -146,7 +146,7 @@ void CAI_AllyManager::CountAllies( int *pTotal, int *pMedics )
 				continue;
 			
 			// They only count if I can use them.
-			if( ppAIs[i]->IRelationType(EntityList()->GetLocalPlayer() ) != D_LI )
+			if( ppAIs[i]->IRelationType((CBaseEntity*)EntityList()->GetLocalPlayer() ) != D_LI )
 				continue;
 
 			// Skip distant NPCs

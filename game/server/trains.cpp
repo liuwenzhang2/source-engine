@@ -228,7 +228,7 @@ public:
 	bool CreateVPhysics();
 	void Setup( void );
 
-	virtual void Blocked( CBaseEntity *pOther );
+	virtual void Blocked( IServerEntity *pOther );
 	void PlatUse( IServerEntity *pActivator, IServerEntity *pCaller, USE_TYPE useType, float value );
 
 	void	CallGoDown( void ) { GoDown(); }
@@ -587,7 +587,7 @@ void CFuncPlat::HitTop( void )
 //-----------------------------------------------------------------------------
 // Purpose: Called when we are blocked.
 //-----------------------------------------------------------------------------
-void CFuncPlat::Blocked( CBaseEntity *pOther )
+void CFuncPlat::Blocked( IServerEntity *pOther )
 {
 	DevMsg( 2, "%s Blocked by %s\n", GetClassname(), pOther->GetClassname() );
 
@@ -731,7 +731,7 @@ public:
 	void OnRestore( void );
 
 	void SetupTarget( void );
-	void Blocked( CBaseEntity *pOther );
+	void Blocked( IServerEntity *pOther );
 	void Use( IServerEntity *pActivator, IServerEntity *pCaller, USE_TYPE useType, float value );
 
 	void Wait( void );
@@ -787,7 +787,7 @@ END_DATADESC()
 // Purpose: Handles a train being blocked by an entity.
 // Input  : pOther - What was hit.
 //-----------------------------------------------------------------------------
-void CFuncTrain::Blocked( CBaseEntity *pOther )
+void CFuncTrain::Blocked( IServerEntity *pOther )
 {
 	if ( gpGlobals->curtime < m_flNextBlockTime )
 		return;
@@ -1018,7 +1018,7 @@ void CFuncTrain::SetupTarget( void )
 	// Find our target whenever we don't have one (level transition)
 	if ( !m_hCurrentTarget )
 	{
-		CBaseEntity	*pTarg = EntityList()->FindEntityByName( NULL, m_target );
+		IServerEntity	*pTarg = EntityList()->FindEntityByName( NULL, m_target );
 
 		if ( pTarg == NULL )
 		{
@@ -1027,8 +1027,8 @@ void CFuncTrain::SetupTarget( void )
 		}
 		
 		// Keep track of this since path corners change our target for us
-		m_target = pTarg->m_target;
-		m_hCurrentTarget = pTarg;
+		m_target = pTarg->GetTarget();
+		m_hCurrentTarget = (CBaseEntity*)pTarg;
 	}
 }
 
@@ -1668,7 +1668,7 @@ static CBaseEntity *FindPhysicsBlockerForHierarchy( CBaseEntity *pParentEntity )
 // Purpose: Called when we are blocked by another entity.
 // Input  : pOther - 
 //-----------------------------------------------------------------------------
-void CFuncTrackTrain::Blocked( CBaseEntity *pOther )
+void CFuncTrackTrain::Blocked( IServerEntity *pOther )
 {
 	// Blocker is on-ground on the train
 	if ( ( pOther->GetEngineObject()->GetFlags() & FL_ONGROUND ) && pOther->GetEngineObject()->GetGroundEntity() == this->GetEngineObject() )
@@ -2814,7 +2814,7 @@ LINK_ENTITY_TO_CLASS( func_traincontrols, CFuncTrainControls );
 
 void CFuncTrainControls::Find( void )
 {
-	CBaseEntity *pTarget = NULL;
+	IServerEntity *pTarget = NULL;
 
 	do 
 	{
@@ -2970,7 +2970,7 @@ void CFuncTrackChange::Touch( IServerEntity *pOther )
 void CFuncTrackChange::Find( void )
 {
 	// Find track entities
-	CBaseEntity *target;
+	IServerEntity *target;
 
 	target = EntityList()->FindEntityByName( NULL, m_trackTopName );
 	if ( target )

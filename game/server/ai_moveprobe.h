@@ -77,7 +77,7 @@ public:
 	bool				TestGroundMove( const Vector &vecActualStart, const Vector &vecDesiredEnd, 
 										unsigned int collisionMask, float pctToCheckStandPositions, unsigned flags, AIMoveTrace_t *pMoveTrace ) const;
 
-	bool				ShouldBrushBeIgnored( CBaseEntity *pEntity );
+	bool				ShouldBrushBeIgnored( IServerEntity *pEntity );
 
 	void				ClearBlockingEntity()	{ m_hLastBlockingEnt = NULL; }
 	CBaseEntity *		GetBlockingEntity()	{ return m_hLastBlockingEnt; }

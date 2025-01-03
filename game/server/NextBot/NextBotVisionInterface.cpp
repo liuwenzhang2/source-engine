@@ -488,9 +488,9 @@ void IVision::UpdateKnownEntities( void )
 		CBasePlayer *watcher = UTIL_GetListenServerHost();
 		if ( watcher )
 		{
-			CBaseEntity *subject = watcher->GetObserverTarget();
+			IServerEntity *subject = watcher->GetObserverTarget();
 
-			if ( subject && GetBot()->IsSelf( subject ) )
+			if ( subject && GetBot()->IsSelf( (CBaseEntity*)subject ) )
 			{
 				CUtlVector< CKnownEntity > knownVector;
 				CollectKnownEntities( &knownVector );

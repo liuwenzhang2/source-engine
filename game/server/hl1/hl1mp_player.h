@@ -75,7 +75,7 @@ private:
 	float						m_flNextTeamChangeTime;
 };
 
-inline CHL1MP_Player *ToHL1MPPlayer( CBaseEntity *pEntity )
+inline CHL1MP_Player *ToHL1MPPlayer( IServerEntity *pEntity )
 {
 	if ( !pEntity || !pEntity->IsPlayer() )
 		return NULL;

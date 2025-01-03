@@ -513,7 +513,7 @@ void CLogicLineToEntity::Activate(void)
 
 	if (m_target != NULL_STRING)
 	{
-		m_EndEntity = EntityList()->FindEntityByName( NULL, m_target );
+		m_EndEntity = (CBaseEntity*)EntityList()->FindEntityByName( NULL, m_target );
 
 		//
 		// If we were given a bad measure target, just measure sound where we are.
@@ -531,7 +531,7 @@ void CLogicLineToEntity::Activate(void)
 
 	if (m_SourceName != NULL_STRING)
 	{
-		m_StartEntity = EntityList()->FindEntityByName( NULL, m_SourceName );
+		m_StartEntity = (CBaseEntity*)EntityList()->FindEntityByName( NULL, m_SourceName );
 
 		//
 		// If we were given a bad measure target, just measure sound where we are.
@@ -1112,7 +1112,7 @@ public:
 	bool KeyValue( const char *szKeyName, const char *szValue );
 	void Use( IServerEntity *pActivator, IServerEntity *pCaller, USE_TYPE useType, float value );
 	int	ObjectCaps( void ) { return(BaseClass::ObjectCaps() | FCAP_MASTER); }
-	bool IsTriggered( ::CBaseEntity *pActivator );
+	bool IsTriggered( IServerEntity *pActivator );
 	void Register( void );
 
 	DECLARE_DATADESC();
@@ -1211,14 +1211,14 @@ void CMultiSource::Use( IServerEntity *pActivator, IServerEntity *pCaller, USE_T
 	m_rgTriggered[i-1] ^= 1;
 
 	// 
-	if ( IsTriggered( (CBaseEntity*)pActivator ) )
+	if ( IsTriggered( pActivator ) )
 	{
 		DevMsg( 2, "Multisource %s enabled (%d inputs)\n", GetDebugName(), m_iTotal );
 		USE_TYPE useType = USE_TOGGLE;
 		if ( m_globalstate != NULL_STRING )
 			useType = USE_ON;
 
-		m_OnTrigger.FireOutput((CBaseEntity*)pActivator, this);
+		m_OnTrigger.FireOutput(pActivator, this);
 	}
 }
 
@@ -1226,7 +1226,7 @@ void CMultiSource::Use( IServerEntity *pActivator, IServerEntity *pCaller, USE_T
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-bool CMultiSource::IsTriggered( CBaseEntity * )
+bool CMultiSource::IsTriggered( IServerEntity * )
 {
 	// Is everything triggered?
 	int i = 0;
@@ -1257,7 +1257,7 @@ bool CMultiSource::IsTriggered( CBaseEntity * )
 //-----------------------------------------------------------------------------
 void CMultiSource::Register(void)
 { 
-	CBaseEntity *pTarget = NULL;
+	IServerEntity *pTarget = NULL;
 
 	m_iTotal = 0;
 	memset( m_rgEntities, 0, MS_MAX_TARGETS * sizeof(EHANDLE) );
@@ -1272,7 +1272,7 @@ void CMultiSource::Register(void)
 	while ( pTarget && (m_iTotal < MS_MAX_TARGETS) )
 	{
 		if ( pTarget )
-			m_rgEntities[m_iTotal++] = pTarget;
+			m_rgEntities[m_iTotal++] = (CBaseEntity*)pTarget;
 
 		pTarget = EntityList()->FindEntityByTarget( pTarget, STRING(GetEntityName()) );
 	}
@@ -1281,7 +1281,7 @@ void CMultiSource::Register(void)
 	while (pTarget && (m_iTotal < MS_MAX_TARGETS))
 	{
 		if ( pTarget && pTarget->HasTarget(GetEntityName()) )
-			m_rgEntities[m_iTotal++] = pTarget;
+			m_rgEntities[m_iTotal++] = (CBaseEntity*)pTarget;
 
 		pTarget = EntityList()->FindEntityByClassname( pTarget, "multi_manager" );
 	}
@@ -1309,7 +1309,7 @@ private:
 
 	int DrawDebugTextOverlays(void);
 
-	void UpdateOutValue(CBaseEntity *pActivator, float fNewValue);
+	void UpdateOutValue(IServerEntity *pActivator, float fNewValue);
 
 	// Inputs
 	void InputAdd( inputdata_t &inputdata );
@@ -1618,7 +1618,7 @@ void CMathCounter::InputDisable( inputdata_t &inputdata )
 // Purpose: Sets the value to the new value, clamping and firing the output value.
 // Input  : fNewValue - Value to set.
 //-----------------------------------------------------------------------------
-void CMathCounter::UpdateOutValue(CBaseEntity *pActivator, float fNewValue)
+void CMathCounter::UpdateOutValue(IServerEntity *pActivator, float fNewValue)
 {
 	if ((m_flMin != 0) || (m_flMax != 0))
 	{
@@ -1922,7 +1922,7 @@ private:
 	void InputSetCompareValue( inputdata_t &inputdata );
 	void InputCompare( inputdata_t &inputdata );
 
-	void DoCompare(CBaseEntity *pActivator, float flInValue);
+	void DoCompare(IServerEntity *pActivator, float flInValue);
 
 	float m_flInValue;					// Place to hold the last input value for a recomparison.
 	float m_flCompareValue;				// The value to compare the input value against.
@@ -2002,7 +2002,7 @@ void CLogicCompare::InputCompare( inputdata_t &inputdata )
 //			output(s) based on the comparison result.
 // Input  : flInValue - Value to compare against the comparison value.
 //-----------------------------------------------------------------------------
-void CLogicCompare::DoCompare(CBaseEntity *pActivator, float flInValue)
+void CLogicCompare::DoCompare(IServerEntity *pActivator, float flInValue)
 {
 	if (flInValue == m_flCompareValue)
 	{
@@ -2079,7 +2079,7 @@ private:
 	void InputToggleTest( inputdata_t &inputdata );
 	void InputTest( inputdata_t &inputdata );
 
-	void UpdateValue(bool bNewValue, CBaseEntity *pActivator, LogicBranchFire_t eFire);
+	void UpdateValue(bool bNewValue, IServerEntity *pActivator, LogicBranchFire_t eFire);
 
 	bool m_bInValue;					// Place to hold the last input value for a future test.
 	
@@ -2186,7 +2186,7 @@ void CLogicBranch::InputTest( inputdata_t &inputdata )
 //			the test result.
 // Input  : bInValue - 
 //-----------------------------------------------------------------------------
-void CLogicBranch::UpdateValue( bool bNewValue, CBaseEntity *pActivator, LogicBranchFire_t eFire )
+void CLogicBranch::UpdateValue( bool bNewValue, IServerEntity *pActivator, LogicBranchFire_t eFire )
 {
 	if ( m_bInValue != bNewValue )
 	{
@@ -2537,7 +2537,7 @@ private:
 		LOGIC_BRANCH_LISTENER_MIXED,
 	};
 
-	void DoTest( CBaseEntity *pActivator );
+	void DoTest( IServerEntity *pActivator );
 
 	string_t m_nLogicBranchNames[MAX_LOGIC_BRANCH_NAMES];
 	CUtlVector<EHANDLE> m_LogicBranchList;
@@ -2614,7 +2614,7 @@ void CLogicBranchList::Activate( void )
 {
 	for ( int i = 0; i < MAX_LOGIC_BRANCH_NAMES; i++ )
 	{
-		CBaseEntity *pEntity = NULL;
+		IServerEntity *pEntity = NULL;
 		while ( ( pEntity = EntityList()->FindEntityGeneric( pEntity, STRING( m_nLogicBranchNames[i] ), this ) ) != NULL )
 		{
 			if ( FClassnameIs( pEntity, "logic_branch" ) )
@@ -2640,7 +2640,7 @@ void CLogicBranchList::Activate( void )
 //-----------------------------------------------------------------------------
 void CLogicBranchList::Input_OnLogicBranchRemoved( inputdata_t &inputdata )
 {
-	int nIndex = m_LogicBranchList.Find( inputdata.pActivator );
+	int nIndex = m_LogicBranchList.Find((CBaseEntity*)inputdata.pActivator );
 	if ( nIndex != -1 )
 	{
 		m_LogicBranchList.FastRemove( nIndex );
@@ -2675,7 +2675,7 @@ void CLogicBranchList::InputTest( inputdata_t &inputdata )
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-void CLogicBranchList::DoTest( CBaseEntity *pActivator )
+void CLogicBranchList::DoTest( IServerEntity *pActivator )
 {
 	bool bOneTrue = false;
 	bool bOneFalse = false;

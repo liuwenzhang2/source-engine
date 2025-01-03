@@ -78,5 +78,15 @@ private:
 friend class CHL2GameMovement;
 };
 
+inline C_BaseHLPlayer* ToHL2Player(IClientEntity* pEntity)
+{
+	if ( !pEntity || !pEntity->IsPlayer() )
+		return NULL;
+#if _DEBUG
+	return dynamic_cast<C_BaseHLPlayer*>(pEntity);
+#else
+	return static_cast<C_BaseHLPlayer*>(pEntity);
+#endif
+}
 
 #endif

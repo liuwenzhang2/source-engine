@@ -82,7 +82,7 @@ public:
 	bool				IsValidEnemy(CBaseEntity *pTarget );
 	void				LaunchGrenade(CBaseEntity* pLauncher );
 	void				LauncherThink(void );
-	bool				FInViewCone( CBaseEntity *pEntity );
+	bool				FInViewCone( IServerEntity *pEntity );
 
 	int					DrawDebugTextOverlays(void);
 
@@ -314,7 +314,7 @@ void CNPC_Launcher::LaunchGrenade( CBaseEntity* pEnemy )
 //------------------------------------------------------------------------------
 // Purpose : Launcher sees 360 degrees
 //------------------------------------------------------------------------------
-bool CNPC_Launcher::FInViewCone( CBaseEntity *pEntity )
+bool CNPC_Launcher::FInViewCone( IServerEntity *pEntity )
 {
 	return true;
 }

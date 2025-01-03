@@ -62,7 +62,7 @@ inline T* CHandle<T>::Get() const
 template< class U >
 U* NextEntByClass(U* start)
 {
-	for (CBaseEntity* x = EntityList()->NextEnt(start); x; x = EntityList()->NextEnt(x))
+	for (IServerEntity* x = EntityList()->NextEnt(start); x; x = EntityList()->NextEnt(x))
 	{
 		start = dynamic_cast<U*>(x);
 		if (start)

@@ -124,7 +124,7 @@ public:
 class IEngineObjectClient : public IEngineObject, public IClientNetworkable, public IClientRenderable {
 public:
 
-	virtual datamap_t* GetPredDescMap(void) = 0;
+	virtual datamap_t* GetPredDescMap(void) const = 0;
 	virtual IClientEntity* GetClientEntity() = 0;
 	virtual IClientEntity* GetOuter() = 0;
 	virtual IHandleEntity* GetHandleEntity() const = 0;
@@ -339,6 +339,7 @@ public:
 	//virtual const ICollideable* CollisionProp() const = 0;
 	virtual ICollideable* GetCollideable() = 0;
 	virtual void SetCollisionBounds(const Vector& mins, const Vector& maxs) = 0;
+	virtual void SetSize(const Vector& vecMin, const Vector& vecMax) = 0;
 	virtual SolidType_t GetSolid() const = 0;
 	virtual bool IsSolid() const = 0;
 	virtual void SetSolid(SolidType_t val) = 0;
@@ -467,7 +468,7 @@ public:
 	virtual bool IsModelScaled() const = 0;
 	virtual void UpdateModelScale(void) = 0;
 	virtual const model_t* GetModel(void) const = 0;
-	virtual IStudioHdr* GetModelPtr() const = 0;
+	virtual IStudioHdr* GetModelPtr(void) const = 0;
 	virtual void InvalidateMdlCache() = 0;
 	virtual float GetCycle() const = 0;
 	virtual void SetCycle(float flCycle) = 0;
@@ -812,15 +813,16 @@ public:
 abstract_class IClientEntity : public IClientUnknown, public IClientNetworkable, public IClientThinkable
 {
 public:
+	virtual ~IClientEntity() {}
 	virtual ClientClass* GetClientClass() = 0;
-	virtual datamap_t* GetPredDescMap(void) = 0;
+	virtual datamap_t* GetPredDescMap(void) const = 0;
 	virtual void* GetDataTableBasePtr() { return this; }
 	virtual RecvTable* GetRecvTable() {
 		return GetClientClass()->m_pRecvTable;
 	}
 	virtual int entindex() const { return IClientUnknown::entindex(); }
-	virtual char const* GetClassname(void) = 0;
-	virtual char const* GetDebugName(void) = 0;
+	virtual char const* GetClassname(void) const = 0;
+	virtual char const* GetDebugName(void) const = 0;
 	virtual IEngineObjectClient* GetEngineObject() = 0;
 	virtual const IEngineObjectClient* GetEngineObject() const = 0;
 	virtual IEngineWorldClient* GetEngineWorld() = 0;
@@ -849,11 +851,6 @@ public:
 	// Delete yourself.
 	virtual void Release(void) = 0;
 
-	virtual void SetBlocksLOS(bool bBlocksLOS) = 0;
-	virtual bool BlocksLOS(void) = 0;
-	virtual IClientEntity* GetOwnerEntity(void) const = 0;
-	virtual bool GetAttachmentVelocity(int number, Vector& originVel, Quaternion& angleVel) = 0;
-
 	virtual bool IsWorld() const = 0;
 	virtual bool IsBSPModel() const = 0;
 	virtual bool IsNPC(void) const = 0;
@@ -864,23 +861,37 @@ public:
 	virtual bool IsAlive(void) = 0;
 	virtual bool IsFloating() = 0;
 	virtual bool IsStandable() const = 0;
-	virtual const char& GetTakeDamage() const = 0;
 	virtual int CalcOverrideModelIndex() = 0;
 	virtual void ValidateModelIndex(void) = 0;
 	virtual IStudioHdr* OnNewModel() = 0;
+	virtual void SetBlocksLOS(bool bBlocksLOS) = 0;
+	virtual bool BlocksLOS(void) = 0;
+	virtual IClientEntity* GetOwnerEntity(void) const = 0;
+	virtual bool GetAttachmentVelocity(int number, Vector& originVel, Quaternion& angleVel) = 0;
+	virtual void OnAddEffects(int nEffects) = 0;
+	virtual void OnRemoveEffects(int nEffects) = 0;
+	virtual void MoveToAimEnt() = 0;
+	virtual void CheckInitPredictable(const char* context) = 0;
+	virtual bool GetPredictable(void) const = 0;
+	virtual bool ShouldInterpolate() = 0;
+	virtual float GetInterpolationAmount(int flags) = 0;
+	virtual bool Interpolate(float currentTime) = 0;
+	virtual void OnPostRestoreData() = 0;
+	virtual float GetFinalPredictedTime() const = 0;
+	virtual unsigned int ComputeClientSideAnimationFlags() = 0;
+	virtual void ClientSideAnimationChanged() = 0;
+	virtual void UpdateClientSideAnimation() = 0;
+	virtual void PhysicsSimulate(void) = 0;
+	virtual void Think(void) = 0;
+	virtual void SetNextClientThink(float nextThinkTime) = 0;
 	virtual void OnPositionChanged() = 0;
 	virtual void OnAnglesChanged() = 0;
 	virtual void OnAnimationChanged() = 0;
-	virtual void MoveToAimEnt() = 0;
-	virtual void OnAddEffects(int nEffects) = 0;
-	virtual void OnRemoveEffects(int nEffects) = 0;
-	virtual void SetNextClientThink(float nextThinkTime) = 0;
-	virtual void Think(void) = 0;
 	virtual void NotifyVPhysicsStateChanged(IPhysicsObject* pPhysics, bool bAwake) = 0;
 	virtual void VPhysicsUpdate(IPhysicsObject* pPhysics) = 0;
-	virtual	void RefreshCollisionBounds(void) = 0;
 	virtual unsigned int PhysicsSolidMaskForEntity(void) const = 0;
 	virtual void ComputeWorldSpaceSurroundingBox(Vector* pVecWorldMins, Vector* pVecWorldMaxs) = 0;
+	virtual	void RefreshCollisionBounds(void) = 0;
 	virtual void UpdatePartitionListEntry() = 0;
 	virtual bool TestCollision(const Ray_t& ray, unsigned int fContentsMask, trace_t& tr) = 0;
 	virtual bool TestHitboxes(const Ray_t& ray, unsigned int fContentsMask, trace_t& tr) = 0;
@@ -890,20 +901,6 @@ public:
 	virtual void StartGroundContact(IClientEntity* ground) = 0;
 	virtual void EndGroundContact(IClientEntity* ground) = 0;
 	virtual IClientEntity* BecomeRagdollOnClient() = 0;
-
-	virtual void PhysicsSimulate(void) = 0;
-
-	virtual void CheckInitPredictable(const char* context) = 0;
-	virtual bool GetPredictable(void) const = 0;
-	virtual bool ShouldInterpolate() = 0;
-	virtual float GetInterpolationAmount(int flags) = 0;
-	virtual bool Interpolate(float currentTime) = 0;
-	virtual void OnPostRestoreData() = 0;
-	virtual float GetFinalPredictedTime() const = 0;
-
-	virtual unsigned int ComputeClientSideAnimationFlags() = 0;
-	virtual void ClientSideAnimationChanged() = 0;
-	virtual void UpdateClientSideAnimation() = 0;
 
 	virtual	void StandardBlendingRules(IStudioHdr* pStudioHdr, Vector pos[], Quaternion q[], float currentTime, int boneMask) = 0;
 	virtual void UpdateIKLocks(float currentTime) = 0;
@@ -929,8 +926,10 @@ public:
 	virtual bool UsesFlexDelayedWeights() = 0;
 	virtual void SetupWeights(const matrix3x4_t* pBoneToWorld, int nFlexWeightCount, float* pFlexWeights, float* pFlexDelayedWeights) = 0;
 	virtual const Vector& WorldSpaceCenter() const = 0;
+	virtual Vector EyePosition(void) const = 0;			// position of eyes
 	virtual const QAngle& EyeAngles(void) const = 0;
 	virtual void EyeVectors(Vector* pForward, Vector* pRight = NULL, Vector* pUp = NULL) = 0;
+	virtual const Vector& EarPosition(void) const = 0;			// position of ears
 	virtual const Vector& GetViewOffset() const = 0;
 	virtual Vector Weapon_ShootPosition() = 0;
 	virtual bool ShouldReceiveProjectedTextures(int flags) = 0;
@@ -953,6 +952,12 @@ public:
 	// Return false to indicate sound is not audible
 	virtual bool GetSoundSpatialization(SpatializationInfo_t& info) = 0;
 	virtual bool InitializeAsClientEntity(const char* pszModelName, RenderGroup_t renderGroup) = 0;
+	virtual int GetMaxHealth() const = 0;
+	virtual int GetHealth() const = 0;
+	virtual const char& GetTakeDamage() const = 0;
+	virtual float GetAttackDamageScale(IHandleEntity* pVictim) = 0;
+	virtual int GetWaterLevel() const = 0;
+	virtual int GetTeamNumber(void) const = 0;
 };
 
 #define INPVS_YES			0x0001		// The entity thinks it's in the PVS.

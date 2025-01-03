@@ -150,7 +150,7 @@ public:
 	virtual void PlayerThink( CBasePlayer *pPlayer );
 	virtual bool FPlayerCanRespawn( CBasePlayer *pPlayer );
 	virtual float FlPlayerSpawnTime( CBasePlayer *pPlayer );
-	virtual CBaseEntity *GetPlayerSpawnSpot( CBasePlayer *pPlayer );
+	virtual IServerEntity *GetPlayerSpawnSpot( CBasePlayer *pPlayer );
 
 	virtual bool AllowAutoTargetCrosshair( void );
 

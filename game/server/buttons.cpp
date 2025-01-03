@@ -207,7 +207,7 @@ void CBaseButton::InputUnlock( inputdata_t &inputdata )
 //-----------------------------------------------------------------------------
 // Presses or unpresses the button.
 //-----------------------------------------------------------------------------
-void CBaseButton::Press( CBaseEntity *pActivator, BUTTON_CODE eCode )
+void CBaseButton::Press( IServerEntity *pActivator, BUTTON_CODE eCode )
 {
 	if ( ( eCode == BUTTON_PRESS ) && ( m_toggle_state == TS_GOING_UP || m_toggle_state == TS_GOING_DOWN ) )
 	{
@@ -313,7 +313,7 @@ int CBaseButton::OnTakeDamage( const CTakeDamageInfo &info )
 	if ( code == BUTTON_NOTHING )
 		return 0;
 
-	m_hActivator = info.GetAttacker();
+	m_hActivator = (CBaseEntity*)info.GetAttacker();
 
 	// dvsents2: why would activator be NULL here?
 	if ( m_hActivator == NULL )
@@ -492,7 +492,7 @@ void CBaseButton::ButtonSpark ( void )
 //-----------------------------------------------------------------------------
 // Purpose: Called when someone uses us whilst we are locked.
 //-----------------------------------------------------------------------------
-bool CBaseButton::OnUseLocked( CBaseEntity *pActivator )
+bool CBaseButton::OnUseLocked( IServerEntity *pActivator )
 {
 	PlayLockSounds(this, &m_ls, TRUE, TRUE);
 
@@ -523,7 +523,7 @@ void CBaseButton::ButtonUse( IServerEntity *pActivator, IServerEntity *pCaller, 
 
 	if (m_bLocked)
 	{
-		OnUseLocked( (CBaseEntity*)pActivator );
+		OnUseLocked( pActivator );
 		return;
 	}
 
@@ -608,7 +608,7 @@ void CBaseButton::ButtonTouch( IServerEntity *pOther )
 	if ( code == BUTTON_NOTHING )
 		return;
 
-	if (!UTIL_IsMasterTriggered(m_sMaster, (CBaseEntity*)pOther) || m_bLocked)
+	if (!UTIL_IsMasterTriggered(m_sMaster, pOther) || m_bLocked)
 	{
 		// play button locked sound
 		PlayLockSounds(this, &m_ls, TRUE, TRUE);
@@ -1314,7 +1314,7 @@ void CMomentaryRotButton::Use( IServerEntity *pActivator, IServerEntity *pCaller
 
 	if (m_bLocked)
 	{
-		if ( OnUseLocked( (CBaseEntity*)pActivator ) && GetEngineObject()->HasSpawnFlags( SF_BUTTON_JIGGLE_ON_USE_LOCKED ) )
+		if ( OnUseLocked( pActivator ) && GetEngineObject()->HasSpawnFlags( SF_BUTTON_JIGGLE_ON_USE_LOCKED ) )
 		{
 			// Jiggle two degrees.
 			float flDist = 2.0 / m_flMoveDistance;
@@ -1427,7 +1427,7 @@ void CMomentaryRotButton::UpdateSelf( float value, bool bPlaySound )
 // Purpose: Updates the value of our position, firing any targets.
 // Input  : value - New position, from 0 - 1.
 //-----------------------------------------------------------------------------
-void CMomentaryRotButton::UpdateTarget( float value, CBaseEntity *pActivator )
+void CMomentaryRotButton::UpdateTarget( float value, IServerEntity *pActivator )
 {
 	if ( !m_bUpdateTarget )
 		return;

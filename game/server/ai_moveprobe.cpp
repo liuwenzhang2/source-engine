@@ -87,7 +87,7 @@ AIMoveResult_t AIComputeBlockerMoveResult( CBaseEntity *pBlocker )
 }
 
 //-----------------------------------------------------------------------------
-bool CAI_MoveProbe::ShouldBrushBeIgnored( CBaseEntity *pEntity )
+bool CAI_MoveProbe::ShouldBrushBeIgnored( IServerEntity *pEntity )
 {
 	if ( pEntity->GetEngineObject()->GetClassname() == g_iszFuncBrushClassname)
 	{
@@ -383,11 +383,11 @@ bool CAI_MoveProbe::CheckStep( const CheckStepArgs_t &args, CheckStepResult_t *p
 		Assert( pResult->endPoint == args.vecStart );
 		if ( const_cast<CAI_MoveProbe *>(this)->GetOuter()->GetEngineObject()->GetGroundEntity() )
 		{
-			pResult->pBlocker = const_cast<CAI_MoveProbe *>(this)->GetOuter()->GetEngineObject()->GetGroundEntity()->GetOuter();
+			pResult->pBlocker = (CBaseEntity*)const_cast<CAI_MoveProbe *>(this)->GetOuter()->GetEngineObject()->GetGroundEntity()->GetOuter();
 		}
 		else
 		{
-			pResult->pBlocker = EntityList()->GetBaseEntity( 0 );
+			pResult->pBlocker = (CBaseEntity*)EntityList()->GetBaseEntity( 0 );
 		}
 		return false;
 	}
@@ -660,7 +660,7 @@ bool CAI_MoveProbe::TestGroundMove( const Vector &vecActualStart, const Vector &
 			NDebugOverlay::Cross3D( pMoveTrace->vEndPosition, 8, 255, 0, 0, false, 0.1 );
 #endif
 			// Ok, we ended up on a ledge above or below the desired destination
-			pMoveTrace->pObstruction = EntityList()->GetBaseEntity(0);
+			pMoveTrace->pObstruction = (CBaseEntity*)EntityList()->GetBaseEntity(0);
 			pMoveTrace->vHitNormal	 = vec3_origin;
 			pMoveTrace->fStatus = AIMR_BLOCKED_WORLD;
 			pMoveTrace->flDistObstructed = ComputePathDistance( NAV_GROUND, pMoveTrace->vEndPosition, vecDesiredEnd );
@@ -691,7 +691,7 @@ void CAI_MoveProbe::GroundMoveLimit( const Vector &vecStart, const Vector &vecEn
 	if ( !IterativeFloorPoint( vecStart, collisionMask, &vecActualStart ) )
 	{
 		pTrace->flDistObstructed = pTrace->flTotalDist;
-		pTrace->pObstruction	= EntityList()->GetBaseEntity( 0 );
+		pTrace->pObstruction	= (CBaseEntity*)EntityList()->GetBaseEntity( 0 );
 		pTrace->vHitNormal		= vec3_origin;
 		pTrace->fStatus			= AIMR_BLOCKED_WORLD;
 		pTrace->vEndPosition	= vecStart;
@@ -754,7 +754,7 @@ void CAI_MoveProbe::FlyMoveLimit( const Vector &vecStart, const Vector &vecEnd,
 
 	if ( tr.fraction < 1 )
 	{
-		CBaseEntity *pBlocker = (CBaseEntity*)tr.m_pEnt;
+		IHandleEntity *pBlocker = tr.m_pEnt;
 		if ( pBlocker )
 		{
 			if ( pTarget == pBlocker )
@@ -765,9 +765,9 @@ void CAI_MoveProbe::FlyMoveLimit( const Vector &vecStart, const Vector &vecEnd,
 			}
 
 			// If blocked by an npc remember
-			pMoveTrace->pObstruction = pBlocker;
+			pMoveTrace->pObstruction = (CBaseEntity*)pBlocker;
 			pMoveTrace->vHitNormal	 = vec3_origin;
-			pMoveTrace->fStatus = AIComputeBlockerMoveResult( pBlocker );
+			pMoveTrace->fStatus = AIComputeBlockerMoveResult((CBaseEntity*)pBlocker );
 		}
 		pMoveTrace->flDistObstructed = ComputePathDistance( NAV_FLY, tr.endpos, vecEnd );
 		pMoveTrace->vEndPosition = tr.endpos;
@@ -977,7 +977,7 @@ void CAI_MoveProbe::ClimbMoveLimit( const Vector &vecStart, const Vector &vecEnd
 
 	if (tr.fraction < 1.0)
 	{
-		CBaseEntity *pEntity = (CBaseEntity*)tr.m_pEnt;
+		IHandleEntity *pEntity = tr.m_pEnt;
 		if (pEntity == pTarget)
 		{
 			return;
@@ -987,9 +987,9 @@ void CAI_MoveProbe::ClimbMoveLimit( const Vector &vecStart, const Vector &vecEnd
 			// ----------------------------------------------------------
 			// If blocked by an npc remember
 			// ----------------------------------------------------------
-			pMoveTrace->pObstruction = pEntity;
+			pMoveTrace->pObstruction = (CBaseEntity*)pEntity;
 			pMoveTrace->vHitNormal = vec3_origin;
-			pMoveTrace->fStatus = AIComputeBlockerMoveResult( pEntity );
+			pMoveTrace->fStatus = AIComputeBlockerMoveResult((CBaseEntity*)pEntity );
 
 			float flDist = (1.0 - tr.fraction) * ComputePathDistance( NAV_CLIMB, vecStart, vecEnd );
 			if (flDist <= 0.001) 
@@ -1049,7 +1049,7 @@ bool CAI_MoveProbe::MoveLimit( Navigation_t navType, const Vector &vecStart,
 			GroundMoveLimit(vecStart, vecEnd, collisionMask, pTarget, testGroundMoveFlags, pctToCheckStandPositions, pTrace);
 		else
 		{
-			pTrace->pObstruction = EntityList()->GetBaseEntity( 0 );
+			pTrace->pObstruction = (CBaseEntity*)EntityList()->GetBaseEntity( 0 );
 			pTrace->vHitNormal	 = vec3_origin;
 			pTrace->fStatus		= AIMR_BLOCKED_WORLD;
 			pTrace->flDistObstructed = ComputePathDistance( NAV_GROUND, vecStart, vecEnd );

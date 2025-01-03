@@ -74,7 +74,7 @@ public:
 	virtual void Weapon_Drop( CBaseCombatWeapon *pWeapon, const Vector *pvecTarget = NULL, const Vector *pVelocity = NULL );
 	virtual void UpdateOnRemove( void );
 	virtual void DeathSound( const CTakeDamageInfo &info );
-	virtual CBaseEntity* EntSelectSpawnPoint( void );
+	virtual IServerEntity* EntSelectSpawnPoint( void );
 		
 	int FlashlightIsOn( void );
 	void FlashlightTurnOn( void );
@@ -165,7 +165,7 @@ private:
 	bool m_bReady;
 };
 
-inline CHL2MP_Player *ToHL2MPPlayer( CBaseEntity *pEntity )
+inline CHL2MP_Player *ToHL2MPPlayer( IServerEntity *pEntity )
 {
 	if ( !pEntity || !pEntity->IsPlayer() )
 		return NULL;

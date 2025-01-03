@@ -128,7 +128,7 @@ void CSun::Activate()
 	}
 	else
 	{
-		CBaseEntity *pEnt = EntityList()->FindEntityByName( 0, m_target );
+		IServerEntity *pEnt = EntityList()->FindEntityByName( 0, m_target );
 		if( pEnt )
 		{
 			Vector vDirection = GetEngineObject()->GetAbsOrigin() - pEnt->GetEngineObject()->GetAbsOrigin();

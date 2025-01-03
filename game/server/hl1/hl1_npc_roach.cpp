@@ -162,7 +162,7 @@ bool CNPC_Roach::ShouldEat( void )
 //=========================================================
 void CNPC_Roach::NPCThink( void  )
 {
-	CBaseEntity* pEnt = EntityList()->FindClientInPVS(this);
+	IServerEntity* pEnt = EntityList()->FindClientInPVS(this);
 	if (pEnt==NULL||pEnt->entindex()<=0)
 		GetEngineObject()->SetNextThink( gpGlobals->curtime + random->RandomFloat( 1.0f , 1.5f ) );
 	else
@@ -332,7 +332,7 @@ void CNPC_Roach::Look ( int iDistance )
 
 	// don't let monsters outside of the player's PVS act up, or most of the interesting
 	// things will happen before the player gets there!
-	CBaseEntity* pEnt = EntityList()->FindClientInPVS(this);
+	IServerEntity* pEnt = EntityList()->FindClientInPVS(this);
 	if (pEnt==NULL||pEnt->entindex()<=0)
 	{
 		return;
@@ -441,7 +441,7 @@ void CNPC_Roach::Touch ( IServerEntity *pOther )
 	UTIL_DecalTrace( &tr, "YellowBlood" );
 
 	// DMG_GENERIC because we don't want any physics force generated
-	TakeDamage( CTakeDamageInfo((CBaseEntity*)pOther, (CBaseEntity*)pOther, m_iHealth, DMG_GENERIC ) );
+	TakeDamage( CTakeDamageInfo(pOther, pOther, m_iHealth, DMG_GENERIC ) );
 }
 
 void CNPC_Roach::Event_Killed( const CTakeDamageInfo &info )

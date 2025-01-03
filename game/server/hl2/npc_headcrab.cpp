@@ -1056,7 +1056,7 @@ void CBaseHeadcrab::GatherConditions( void )
 
 	// See if I've landed on an NPC or player or something else illegal
 	ClearCondition( COND_HEADCRAB_ILLEGAL_GROUNDENT );
-	CBaseEntity* ground = GetEngineObject()->GetGroundEntity() ? GetEngineObject()->GetGroundEntity()->GetOuter() : NULL;
+	CBaseEntity* ground = GetEngineObject()->GetGroundEntity() ? (CBaseEntity*)GetEngineObject()->GetGroundEntity()->GetOuter() : NULL;
 	if( (GetEngineObject()->GetFlags() & FL_ONGROUND) && ground && !ground->IsWorld() )
 	{
 		if ( IsHangingFromCeiling() == false )
@@ -1460,7 +1460,7 @@ void CBaseHeadcrab::StartTask( const Task_t *pTask )
 
 	case TASK_HEADCRAB_HOP_OFF_NPC:
 		{
-		CBaseEntity* ground = GetEngineObject()->GetGroundEntity() ? GetEngineObject()->GetGroundEntity()->GetOuter() : NULL;
+		CBaseEntity* ground = GetEngineObject()->GetGroundEntity() ? (CBaseEntity*)GetEngineObject()->GetGroundEntity()->GetOuter() : NULL;
 			if( ground )
 			{
 				// If jumping off of a physics object that the player is holding, create a 
@@ -3515,7 +3515,7 @@ void CBlackHeadcrab::Panic( float flDuration )
 //			This vision extends only 24 feet.
 //-----------------------------------------------------------------------------
 #define CRAB_360_VIEW_DIST_SQR	(12 * 12 * 24 * 24)
-bool CBlackHeadcrab::FInViewCone( CBaseEntity *pEntity )
+bool CBlackHeadcrab::FInViewCone( IServerEntity *pEntity )
 {
 	if(  IsCurSchedule( SCHED_HEADCRAB_AMBUSH ) &&
 		 (( pEntity->IsNPC() || pEntity->IsPlayer() ) && pEntity->GetEngineObject()->GetAbsOrigin().DistToSqr(GetEngineObject()->GetAbsOrigin()) <= CRAB_360_VIEW_DIST_SQR ) )

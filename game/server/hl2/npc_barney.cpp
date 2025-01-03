@@ -262,7 +262,7 @@ void CNPC_Barney::UseFunc( IServerEntity *pActivator, IServerEntity *pCaller, US
 	SpeakIfAllowed( TLK_USE );
 	m_bDontUseSemaphore = false;
 
-	m_OnPlayerUse.FireOutput( (CBaseEntity*)pActivator, (CBaseEntity*)pCaller );
+	m_OnPlayerUse.FireOutput( pActivator, pCaller );
 }
 
 //-----------------------------------------------------------------------------

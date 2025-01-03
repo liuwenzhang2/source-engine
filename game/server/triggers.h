@@ -112,7 +112,7 @@ public:
 	void Spawn( void );
 	void MultiTouch( IServerEntity *pOther );
 	void MultiWaitOver( void );
-	void ActivateMultiTrigger(CBaseEntity *pActivator);
+	void ActivateMultiTrigger(IServerEntity *pActivator);
 
 	DECLARE_DATADESC();
 

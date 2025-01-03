@@ -160,7 +160,7 @@ float GetFloorZ(const Vector &origin, float fMaxDrop)
 		// If it was a world brush entity, copy the node location
 		if ( trEnt.m_pEnt )
 		{
-			CBaseEntity *e = (CBaseEntity*)trEnt.m_pEnt;
+			IHandleEntity *e = trEnt.m_pEnt;
 			if ( e && ( e->GetEngineObject()->GetFlags() & FL_WORLDBRUSH ) )
 			{
 				tr.endpos = trEnt.endpos;

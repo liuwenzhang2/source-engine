@@ -197,7 +197,7 @@ void CWeaponSatchel::PrimaryAttack( void )
 			SendWeaponAnim( ACT_VM_PRIMARYATTACK );
 
 #ifndef CLIENT_DLL
-			CBaseEntity *pSatchel = NULL;
+			IServerEntity *pSatchel = NULL;
 
 			while ( (pSatchel = EntityList()->FindEntityByClassname( pSatchel, "monster_satchel" ) ) != NULL)
 			{

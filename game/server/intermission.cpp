@@ -33,7 +33,7 @@ void CInfoIntermission::Spawn( void )
 
 void CInfoIntermission::Think ( void )
 {
-	CBaseEntity *pTarget;
+	IServerEntity *pTarget;
 
 	// find my target
 	pTarget = EntityList()->FindEntityByName( NULL, m_target );

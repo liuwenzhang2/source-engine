@@ -411,7 +411,7 @@ public:
 	void RotateMove( void );
 	void ReverseMove( void );
 	void RampPitchVol( void );
-	void Blocked( CBaseEntity *pOther );
+	void Blocked( IServerEntity *pOther );
 	void SetTargetSpeed( float flSpeed );
 	void UpdateSpeed( float flNewSpeed );
 	
@@ -1389,7 +1389,7 @@ void CFuncRotating::InputToggle( inputdata_t &inputdata )
 // Purpose: An entity has blocked the brush.
 // Input  : pOther - 
 //-----------------------------------------------------------------------------
-void CFuncRotating::Blocked( CBaseEntity *pOther )
+void CFuncRotating::Blocked( IServerEntity *pOther )
 {
 #ifdef HL1_DLL
 	if( m_flBlockDamage > 0 )
@@ -1430,7 +1430,7 @@ public:
 	bool CreateVPhysics( void );
 
 	bool EntityPassesFilter( CBaseEntity *pOther );
-	bool ForceVPhysicsCollide( CBaseEntity *pEntity );
+	bool ForceVPhysicsCollide( IServerEntity *pEntity );
 
 	void InputEnable( inputdata_t &inputdata );
 	void InputDisable( inputdata_t &inputdata );
@@ -1501,9 +1501,9 @@ bool CFuncVPhysicsClip::EntityPassesFilter( CBaseEntity *pOther )
 }
 
 
-bool CFuncVPhysicsClip::ForceVPhysicsCollide( CBaseEntity *pEntity )
+bool CFuncVPhysicsClip::ForceVPhysicsCollide( IServerEntity *pEntity )
 {
-	return EntityPassesFilter(pEntity);
+	return EntityPassesFilter((CBaseEntity*)pEntity);
 }
 
 void CFuncVPhysicsClip::InputEnable( inputdata_t &inputdata )

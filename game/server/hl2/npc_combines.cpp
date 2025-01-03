@@ -287,7 +287,7 @@ void CNPC_CombineS::Event_Killed( const CTakeDamageInfo &info )
 		return;
 	}
 
-	CBasePlayer *pPlayer = ToBasePlayer( info.GetAttacker() );
+	CBasePlayer *pPlayer = ToBasePlayer((IServerEntity*)info.GetAttacker() );
 
 	if ( !pPlayer )
 	{

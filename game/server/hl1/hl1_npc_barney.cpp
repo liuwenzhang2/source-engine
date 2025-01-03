@@ -347,7 +347,7 @@ int CNPC_Barney::OnTakeDamage_Alive( const CTakeDamageInfo &inputInfo )
 		if ( GetEnemy() == NULL )
 		{
 			// If the player was facing directly at me, or I'm already suspicious, get mad
-			if ( HasMemory( bits_MEMORY_SUSPICIOUS ) || IsFacing( inputInfo.GetAttacker(), GetEngineObject()->GetAbsOrigin() ) )
+			if ( HasMemory( bits_MEMORY_SUSPICIOUS ) || IsFacing((CBaseEntity*)inputInfo.GetAttacker(), GetEngineObject()->GetAbsOrigin() ) )
 			{
 				// Alright, now I'm pissed!
 				Speak( BA_MAD );

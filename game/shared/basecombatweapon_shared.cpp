@@ -752,7 +752,7 @@ void CBaseCombatWeapon::OnPickedUp( CBaseCombatCharacter *pNewOwner )
 		// Robin: We don't want to delete weapons the player has picked up, so 
 		// clear the name of the weapon. This prevents wildcards that are meant 
 		// to find NPCs finding weapons dropped by the NPCs as well.
-		SetName( "");
+		GetEngineObject()->SetName( "");
 	}
 	else
 	{
@@ -840,7 +840,7 @@ void CBaseCombatWeapon::DefaultTouch( IServerEntity *pOther )
 		// the player WILL end up taking the object, but cache interactions
 		// are fired as soon as you prove you have found the object, not
 		// when you finally acquire it.
-		m_OnCacheInteraction.FireOutput( (CBaseEntity*)pOther, this );
+		m_OnCacheInteraction.FireOutput( pOther, this );
 	}
 
 	if(GetEngineObject()->HasSpawnFlags(SF_WEAPON_NO_PLAYER_PICKUP) )
@@ -2512,7 +2512,7 @@ void CDmgAccumulator::Process( void )
 {
 	FOR_EACH_MAP( m_TargetsDmgInfo, i )
 	{
-		CBaseEntity *pEntity = EntityList()->GetBaseEntity( m_TargetsDmgInfo.Key( i ) );
+		IHandleEntity *pEntity = EntityList()->GetBaseEntity( m_TargetsDmgInfo.Key( i ) );
 		if ( pEntity )
 		{
 			AddMultiDamage( m_TargetsDmgInfo[i], pEntity );

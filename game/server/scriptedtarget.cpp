@@ -196,13 +196,13 @@ CBaseEntity* CScriptedTarget::FindEntity( void )
 	// ---------------------------------------------------
 	//	First try to find the entity by name
 	// ---------------------------------------------------
-	CBaseEntity *pEntity = EntityList()->FindEntityByName( NULL, m_iszEntity );
+	IServerEntity *pEntity = EntityList()->FindEntityByName( NULL, m_iszEntity );
 	if (pEntity && pEntity->GetEngineObject()->GetFlags() & FL_NPC)
 	{
-		CAI_BaseNPC* pNPC	= pEntity->MyNPCPointer();
+		CAI_BaseNPC* pNPC	= ((CBaseEntity*)pEntity)->MyNPCPointer();
 		if (pNPC->DispatchInteraction( g_interactionScriptedTarget, NULL, this ))
 		{
-			return pEntity;
+			return (CBaseEntity*)pEntity;
 		}
 	}
 
@@ -211,8 +211,8 @@ CBaseEntity* CScriptedTarget::FindEntity( void )
 	//  and find nearest entity in radius of that class
 	// ---------------------------------------------------
 	float			flNearestDist	= MAX_COORD_RANGE;
-	CBaseEntity*	pNearestEnt		= NULL;
-	CBaseEntity*	pTestEnt		= NULL;
+	IServerEntity*	pNearestEnt		= NULL;
+	IServerEntity*	pTestEnt		= NULL;
 
 	for ( CEntitySphereQuery sphere(GetEngineObject()->GetAbsOrigin(), m_flRadius ); ( pTestEnt = sphere.GetCurrentEntity() ) != NULL; sphere.NextEntity() )
 	{
@@ -233,10 +233,10 @@ CBaseEntity* CScriptedTarget::FindEntity( void )
 	// UNDONE: If nearest fails, try next nearest
 	if (pNearestEnt)
 	{
-		CAI_BaseNPC* pNPC	= pNearestEnt->MyNPCPointer();
+		CAI_BaseNPC* pNPC	= ((CBaseEntity*)pNearestEnt)->MyNPCPointer();
 		if (pNPC->DispatchInteraction( g_interactionScriptedTarget, NULL, this ))
 		{
-			return pNearestEnt;
+			return (CBaseEntity*)pNearestEnt;
 		}
 	}
 

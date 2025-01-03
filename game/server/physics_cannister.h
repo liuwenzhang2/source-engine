@@ -55,7 +55,7 @@ public:
 	virtual void VPhysicsUpdate( IPhysicsObject *pPhysics );
 
 	virtual QAngle PreferredCarryAngles( void ) { return QAngle( -90, 0, 0 ); }
-	virtual bool HasPreferredCarryAnglesForPlayer( CBaseEntity *pPlayer ) { return true; }
+	virtual bool HasPreferredCarryAnglesForPlayer( IServerEntity *pPlayer ) { return true; }
 
 	//
 	// Input handlers.
@@ -82,8 +82,8 @@ public:
 		}
 	}
 
-	void CannisterActivate( CBaseEntity *pActivator, const Vector &thrustOffset );
-	void CannisterFire( CBaseEntity *pActivator );
+	void CannisterActivate( IServerEntity *pActivator, const Vector &thrustOffset );
+	void CannisterFire( IServerEntity *pActivator );
 	void Deactivate( void );
 	void Explode( CBaseEntity *pAttacker );
 	void ExplodeTouch( IServerEntity *pOther );

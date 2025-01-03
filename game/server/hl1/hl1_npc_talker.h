@@ -81,7 +81,7 @@ public:
 	// Essentially does the opposite of what it says
 	virtual bool ShouldPlayerAvoid( void ) { return false; }
 
-	bool IsValidSpeechTarget( int flags, CBaseEntity *pEntity );
+	bool IsValidSpeechTarget( int flags, IServerEntity *pEntity );
 
 protected:
 	virtual void 	FollowerUse( IServerEntity *pActivator, IServerEntity *pCaller, USE_TYPE useType, float value );

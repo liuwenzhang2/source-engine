@@ -776,7 +776,7 @@ void CPrediction::SetupMove( C_BasePlayer *player, CUserCmd *ucmd, IMoveHelper *
 
 #ifdef HL2_CLIENT_DLL
 	// Convert to HL2 data.
-	C_BaseHLPlayer *pHLPlayer = static_cast<C_BaseHLPlayer*>( player );
+	C_BaseHLPlayer *pHLPlayer = ToHL2Player( player );
 	Assert( pHLPlayer );
 
 	CHLMoveData *pHLMove = static_cast<CHLMoveData*>( move );

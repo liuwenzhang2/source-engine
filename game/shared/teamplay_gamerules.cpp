@@ -305,7 +305,7 @@ void CTeamplayWorld::DeathNotice( CBasePlayer *pVictim, const CTakeDamageInfo &i
 	if ( m_DisableDeathMessages )
 		return;
 
-	CBaseEntity *pKiller = info.GetAttacker();
+	CBaseEntity *pKiller = (CBaseEntity*)info.GetAttacker();
 	if ( pVictim && pKiller && pKiller->IsPlayer() )
 	{
 		CBasePlayer *pk = (CBasePlayer*)pKiller;
@@ -482,7 +482,7 @@ const char *CTeamplayWorld::TeamWithFewestPlayers( void )
 	// loop through all clients, count number of players on each team
 	for ( i = 1; i <= gpGlobals->maxClients; i++ )
 	{
-		CBaseEntity *plr = EntityList()->GetPlayerByIndex( i );
+		IServerEntity *plr = EntityList()->GetPlayerByIndex( i );
 
 		if ( plr )
 		{

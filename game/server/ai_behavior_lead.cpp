@@ -150,7 +150,7 @@ void CAI_LeadBehavior::LeadPlayer( const AI_LeadArgs_t &leadArgs, CAI_LeadBehavi
 	CAI_PlayerAlly *pOuter = dynamic_cast<CAI_PlayerAlly*>(GetOuter());
 	if ( pOuter && AI_IsSinglePlayer() )
 	{
-		pOuter->SetSpeechTarget(EntityList()->GetLocalPlayer() );
+		pOuter->SetSpeechTarget( EntityList()->GetLocalPlayer() );
 	}
 #endif
 
@@ -202,7 +202,7 @@ void CAI_LeadBehavior::BeginScheduleSelection()
 
 bool CAI_LeadBehavior::SetGoal( const AI_LeadArgs_t &args )
 {
-	CBaseEntity *pGoalEnt;
+	IServerEntity *pGoalEnt;
 	pGoalEnt = EntityList()->FindEntityByName( NULL, args.pszGoal );
 	
 	if ( !pGoalEnt )
@@ -228,7 +228,7 @@ bool CAI_LeadBehavior::SetGoal( const AI_LeadArgs_t &args )
 
 	if ( args.pszWaitPoint && args.pszWaitPoint[0] )
 	{
-		CBaseEntity *pWaitPoint = EntityList()->FindEntityByName( NULL, args.pszWaitPoint );
+		IServerEntity *pWaitPoint = EntityList()->FindEntityByName( NULL, args.pszWaitPoint );
 		if ( pWaitPoint )
 		{
 			m_waitpoint = pWaitPoint->GetEngineObject()->GetLocalOrigin();

@@ -19,7 +19,7 @@ extern ConVar think_limit;
 //extern bool ParseKeyvalue(void* pObject, typedescription_t* pFields, int iNumFields, const char* szKeyName, const char* szValue);
 //extern bool ExtractKeyvalue(void* pObject, typedescription_t* pFields, int iNumFields, const char* szKeyName, char* szValue, int iMaxLen);
 
-CGlobalEntityList<CBaseEntity> gEntList;
+CGlobalEntityList<IServerEntity> gEntList;
 IServerEntityList* serverEntitylist = &gEntList;
 
 // Expose list to engine
@@ -139,7 +139,7 @@ void CEntitySaveUtils::PostSave()
 //-----------------------------------------------------------------------------
 // Gets the # of dependencies for a particular entity
 //-----------------------------------------------------------------------------
-int CEntitySaveUtils::GetEntityDependencyCount(CBaseEntity* pEntity)
+int CEntitySaveUtils::GetEntityDependencyCount(IServerEntity* pEntity)
 {
 	return m_pLevelAdjacencyDependencyHash->GetPairCountForObject(pEntity);
 }
@@ -148,7 +148,7 @@ int CEntitySaveUtils::GetEntityDependencyCount(CBaseEntity* pEntity)
 //-----------------------------------------------------------------------------
 // Gets all dependencies for a particular entity
 //-----------------------------------------------------------------------------
-int CEntitySaveUtils::GetEntityDependencies(CBaseEntity* pEntity, int nCount, CBaseEntity** ppEntList)
+int CEntitySaveUtils::GetEntityDependencies(IServerEntity* pEntity, int nCount, IServerEntity** ppEntList)
 {
 	return m_pLevelAdjacencyDependencyHash->GetPairListForObject(pEntity, nCount, (void**)ppEntList);
 }
@@ -157,7 +157,7 @@ int CEntitySaveUtils::GetEntityDependencies(CBaseEntity* pEntity, int nCount, CB
 //-----------------------------------------------------------------------------
 // Methods of IEntitySaveUtils
 //-----------------------------------------------------------------------------
-void CEntitySaveUtils::AddLevelTransitionSaveDependency(CBaseEntity* pEntity1, CBaseEntity* pEntity2)
+void CEntitySaveUtils::AddLevelTransitionSaveDependency(IServerEntity* pEntity1, IServerEntity* pEntity2)
 {
 	if (pEntity1 != pEntity2)
 	{
@@ -211,7 +211,7 @@ const char* PhysCheck(IPhysicsObject* pPhys)
 
 // vehicle wheels can only collide with things that can't get stuck in them during game physics
 // because they aren't in the game physics world at present
-static bool WheelCollidesWith(IPhysicsObject* pObj, CBaseEntity* pEntity)
+static bool WheelCollidesWith(IPhysicsObject* pObj, IServerEntity* pEntity)
 {
 #if defined( INVASION_DLL )
 	if (pEntity->GetEngineObject()->GetCollisionGroup() == TFCOLLISION_GROUP_OBJECT)
@@ -249,8 +249,8 @@ int CCollisionEvent::ShouldCollide_2(IPhysicsObject* pObj0, IPhysicsObject* pObj
 {
 	CallbackContext check(this);
 
-	CBaseEntity* pEntity0 = static_cast<CBaseEntity*>(pGameData0);
-	CBaseEntity* pEntity1 = static_cast<CBaseEntity*>(pGameData1);
+	IServerEntity* pEntity0 = static_cast<IServerEntity*>(pGameData0);
+	IServerEntity* pEntity1 = static_cast<IServerEntity*>(pGameData1);
 
 	if (!pEntity0 || !pEntity1)
 		return 1;
@@ -305,8 +305,8 @@ int CCollisionEvent::ShouldCollide_2(IPhysicsObject* pObj0, IPhysicsObject* pObj
 
 	if (pEntity0->GetEngineObject()->GetMoveParent() || pEntity1->GetEngineObject()->GetMoveParent())
 	{
-		CBaseEntity* pParent0 = pEntity0->GetEngineObject()->GetRootMoveParent()->GetOuter();
-		CBaseEntity* pParent1 = pEntity1->GetEngineObject()->GetRootMoveParent()->GetOuter();
+		IServerEntity* pParent0 = pEntity0->GetEngineObject()->GetRootMoveParent()->GetOuter();
+		IServerEntity* pParent1 = pEntity1->GetEngineObject()->GetRootMoveParent()->GetOuter();
 
 		// NOTE: Don't let siblings/parents collide.  If you want this behavior, do it
 		// with constraints, not hierarchy!
@@ -439,7 +439,7 @@ bool FindMaxContact(IPhysicsObject* pObject, float minForce, IPhysicsObject** pO
 	return false;
 }
 
-CBaseEntity* Physics_CreateSolver(CBaseEntity* pMovingEntity, CBaseEntity* pPhysicsObject, bool disableCollisions, float separationDuration)
+IServerEntity* Physics_CreateSolver(IServerEntity* pMovingEntity, IServerEntity* pPhysicsObject, bool disableCollisions, float separationDuration)
 {
 	return pMovingEntity->EntityPhysics_CreateSolver(pPhysicsObject, disableCollisions, separationDuration);
 }
@@ -451,7 +451,7 @@ bool CCollisionEvent::ShouldFreezeObject(IPhysicsObject* pObject)
 	// to inform the logic in VPhysicsUpdatePusher() about the limit being applied so 
 	// that it doesn't falsely block the object when it's simply been temporarily frozen
 	// for performance reasons
-	CBaseEntity* pEntity = static_cast<CBaseEntity*>(pObject->GetGameData());
+	IServerEntity* pEntity = static_cast<IServerEntity*>(pObject->GetGameData());
 	if (pEntity)
 	{
 		if (pEntity->GetEngineObject()->GetMoveType() == MOVETYPE_PUSH)
@@ -477,9 +477,9 @@ bool CCollisionEvent::ShouldFreezeObject(IPhysicsObject* pObject)
 		// find the contact with the moveable object applying the most contact force
 		if (FindMaxContact(pObject, pObject->GetMass() * 10, &pOtherObject, &contactPos, &force))
 		{
-			CBaseEntity* pOther = static_cast<CBaseEntity*>(pOtherObject->GetGameData());
+			IServerEntity* pOther = static_cast<IServerEntity*>(pOtherObject->GetGameData());
 			// this object can take damage, crush it
-			if (pEntity->m_takedamage > DAMAGE_EVENTS_ONLY)
+			if (pEntity->GetTakeDamage() > DAMAGE_EVENTS_ONLY)
 			{
 				CTakeDamageInfo dmgInfo(pOther, pOther, force, contactPos, force.Length() * 0.1f, DMG_CRUSH);
 				gEntList.PhysCallbackDamage(pEntity, dmgInfo);
@@ -512,8 +512,8 @@ bool CCollisionEvent::ShouldFreezeContacts(IPhysicsObject** pObjectList, int obj
 #if _DEBUG
 		for (int i = 0; i < objectCount; i++)
 		{
-			CBaseEntity* pEntity = static_cast<CBaseEntity*>(pObjectList[i]->GetGameData());
-			pEntity->m_debugOverlays |= OVERLAY_ABSBOX_BIT | OVERLAY_PIVOT_BIT;
+			IServerEntity* pEntity = static_cast<IServerEntity*>(pObjectList[i]->GetGameData());
+			pEntity->GetDebugOverlays() |= OVERLAY_ABSBOX_BIT | OVERLAY_PIVOT_BIT;
 		}
 #endif
 	}
@@ -525,7 +525,7 @@ bool CCollisionEvent::ShouldFreezeContacts(IPhysicsObject** pObjectList, int obj
 // called when an object wakes up (starts simulating)
 void CCollisionEvent::ObjectWake(IPhysicsObject* pObject)
 {
-	CBaseEntity* pEntity = static_cast<CBaseEntity*>(pObject->GetGameData());
+	IServerEntity* pEntity = static_cast<IServerEntity*>(pObject->GetGameData());
 	if (pEntity && pEntity->GetEngineObject()->HasDataObjectType(VPHYSICSWATCHER))
 	{
 		//ReportVPhysicsStateChanged( pObject, pEntity, true );
@@ -535,7 +535,7 @@ void CCollisionEvent::ObjectWake(IPhysicsObject* pObject)
 // called when an object goes to sleep (no longer simulating)
 void CCollisionEvent::ObjectSleep(IPhysicsObject* pObject)
 {
-	CBaseEntity* pEntity = static_cast<CBaseEntity*>(pObject->GetGameData());
+	IServerEntity* pEntity = static_cast<IServerEntity*>(pObject->GetGameData());
 	if (pEntity && pEntity->GetEngineObject()->HasDataObjectType(VPHYSICSWATCHER))
 	{
 		//ReportVPhysicsStateChanged( pObject, pEntity, false );
@@ -544,21 +544,21 @@ void CCollisionEvent::ObjectSleep(IPhysicsObject* pObject)
 }
 
 
-static void ReportPenetration(CBaseEntity* pEntity, float duration)
+static void ReportPenetration(IServerEntity* pEntity, float duration)
 {
 	if (pEntity->GetEngineObject()->GetMoveType() == MOVETYPE_VPHYSICS)
 	{
 		ConVarRef developer("developer");
 		if (developer.GetInt() > 1)
 		{
-			pEntity->m_debugOverlays |= OVERLAY_ABSBOX_BIT;
+			pEntity->GetDebugOverlays() |= OVERLAY_ABSBOX_BIT;
 		}
 
 		pEntity->AddTimedOverlay(UTIL_VarArgs("VPhysics Penetration Error (%s)!", pEntity->GetDebugName()), duration);
 	}
 }
 
-static void UpdateEntityPenetrationFlag(CBaseEntity* pEntity, bool isPenetrating)
+static void UpdateEntityPenetrationFlag(IServerEntity* pEntity, bool isPenetrating)
 {
 	if (!pEntity)
 		return;
@@ -580,7 +580,7 @@ static void UpdateEntityPenetrationFlag(CBaseEntity* pEntity, bool isPenetrating
 	}
 }
 
-void CCollisionEvent::GetListOfPenetratingEntities(CBaseEntity* pSearch, CUtlVector<CBaseEntity*>& list)
+void CCollisionEvent::GetListOfPenetratingEntities(IServerEntity* pSearch, CUtlVector<IServerEntity*>& list)
 {
 	for (int i = m_penetrateEvents.Count() - 1; i >= 0; --i)
 	{
@@ -599,8 +599,8 @@ void CCollisionEvent::UpdatePenetrateEvents(void)
 {
 	for (int i = m_penetrateEvents.Count() - 1; i >= 0; --i)
 	{
-		CBaseEntity* pEntity0 = m_penetrateEvents[i].hEntity0;
-		CBaseEntity* pEntity1 = m_penetrateEvents[i].hEntity1;
+		IServerEntity* pEntity0 = m_penetrateEvents[i].hEntity0;
+		IServerEntity* pEntity1 = m_penetrateEvents[i].hEntity1;
 
 		if (m_penetrateEvents[i].collisionState == COLLSTATE_TRYDISABLE)
 		{
@@ -626,8 +626,8 @@ void CCollisionEvent::UpdatePenetrateEvents(void)
 			if (pEntity0 && pEntity1)
 			{
 				bool IsNPC = pEntity0->IsNPC();
-				CBaseEntity* pNPC = pEntity0;
-				CBaseEntity* pBlocker = pEntity1;
+				IServerEntity* pNPC = pEntity0;
+				IServerEntity* pBlocker = pEntity1;
 				if (!IsNPC)
 				{
 					IsNPC = pEntity1->IsNPC();
@@ -645,7 +645,7 @@ void CCollisionEvent::UpdatePenetrateEvents(void)
 			{
 				if (!IsDebris(pEntity1->GetEngineObject()->GetCollisionGroup()) || pEntity1->GetEngineObject()->GetMoveType() != MOVETYPE_VPHYSICS)
 				{
-					CBaseEntity* pTmp = pEntity0;
+					IServerEntity* pTmp = pEntity0;
 					pEntity0 = pEntity1;
 					pEntity1 = pTmp;
 				}
@@ -682,7 +682,7 @@ void CCollisionEvent::UpdatePenetrateEvents(void)
 	}
 }
 
-penetrateevent_t& CCollisionEvent::FindOrAddPenetrateEvent(CBaseEntity* pEntity0, CBaseEntity* pEntity1)
+penetrateevent_t& CCollisionEvent::FindOrAddPenetrateEvent(IServerEntity* pEntity0, IServerEntity* pEntity1)
 {
 	int index = -1;
 	for (int i = m_penetrateEvents.Count() - 1; i >= 0; --i)
@@ -709,7 +709,7 @@ penetrateevent_t& CCollisionEvent::FindOrAddPenetrateEvent(CBaseEntity* pEntity0
 	return event;
 }
 
-static bool CanResolvePenetrationWithNPC(CBaseEntity* pEntity, IPhysicsObject* pObject)
+static bool CanResolvePenetrationWithNPC(IServerEntity* pEntity, IPhysicsObject* pObject)
 {
 	if (pEntity->GetEngineObject()->GetMoveType() == MOVETYPE_VPHYSICS)
 	{
@@ -728,8 +728,8 @@ int CCollisionEvent::ShouldSolvePenetration(IPhysicsObject* pObj0, IPhysicsObjec
 	CallbackContext check(this);
 
 	// Pointers to the entity for each physics object
-	CBaseEntity* pEntity0 = static_cast<CBaseEntity*>(pGameData0);
-	CBaseEntity* pEntity1 = static_cast<CBaseEntity*>(pGameData1);
+	IServerEntity* pEntity0 = static_cast<IServerEntity*>(pGameData0);
+	IServerEntity* pEntity1 = static_cast<IServerEntity*>(pGameData1);
 
 	// this can get called as entities are being constructed on the other side of a game load or level transition
 	// Some entities may not be fully constructed, so don't call into their code until the level is running
@@ -740,7 +740,7 @@ int CCollisionEvent::ShouldSolvePenetration(IPhysicsObject* pObj0, IPhysicsObjec
 	if (pEntity0 > pEntity1)
 	{
 		// swap sort
-		CBaseEntity* pTmp = pEntity0;
+		IServerEntity* pTmp = pEntity0;
 		pEntity0 = pEntity1;
 		pEntity1 = pTmp;
 		IPhysicsObject* pTmpObj = pObj0;
@@ -761,8 +761,8 @@ int CCollisionEvent::ShouldSolvePenetration(IPhysicsObject* pObj0, IPhysicsObjec
 	float eventTime = gpGlobals->curtime - event.startTime;
 
 	// NPC vs. physics object.  Create a game DLL solver and remove this event
-	if ((pEntity0->MyNPCPointer() && CanResolvePenetrationWithNPC(pEntity1, pObj1)) ||
-		(pEntity1->MyNPCPointer() && CanResolvePenetrationWithNPC(pEntity0, pObj0)))
+	if ((pEntity0->IsNPC() && CanResolvePenetrationWithNPC(pEntity1, pObj1)) ||
+		(pEntity1->IsNPC() && CanResolvePenetrationWithNPC(pEntity0, pObj0)))
 	{
 		event.collisionState = COLLSTATE_TRYNPCSOLVER;
 	}
@@ -835,7 +835,7 @@ static int BestAxisMatchingNormal(const matrix3x4_t& matrix, const Vector& norma
 	return best;
 }
 
-void PhysicsSplash(IPhysicsFluidController* pFluid, IPhysicsObject* pObject, CBaseEntity* pEntity)
+void PhysicsSplash(IPhysicsFluidController* pFluid, IPhysicsObject* pObject, IServerEntity* pEntity)
 {
 	Vector normal;
 	float dist;
@@ -1047,7 +1047,7 @@ void CCollisionEvent::FluidStartTouch(IPhysicsObject* pObject, IPhysicsFluidCont
 	if ((pObject == NULL) || (pFluid == NULL))
 		return;
 
-	CBaseEntity* pEntity = static_cast<CBaseEntity*>(pObject->GetGameData());
+	IServerEntity* pEntity = static_cast<IServerEntity*>(pObject->GetGameData());
 	if (!pEntity)
 		return;
 
@@ -1097,7 +1097,7 @@ void CCollisionEvent::FluidEndTouch(IPhysicsObject* pObject, IPhysicsFluidContro
 	if ((pObject == NULL) || (pFluid == NULL))
 		return;
 
-	CBaseEntity* pEntity = static_cast<CBaseEntity*>(pObject->GetGameData());
+	IServerEntity* pEntity = static_cast<IServerEntity*>(pObject->GetGameData());
 	if (!pEntity)
 		return;
 
@@ -1128,7 +1128,7 @@ void CCollisionEvent::PreCollision(vcollisionevent_t* pEvent)
 		{
 			if (pObject->GetGameFlags() & FVPHYSICS_PLAYER_HELD)
 			{
-				CBaseEntity* pOtherEntity = reinterpret_cast<CBaseEntity*>(pEvent->pObjects[!i]->GetGameData());
+				IServerEntity* pOtherEntity = reinterpret_cast<IServerEntity*>(pEvent->pObjects[!i]->GetGameData());
 				if (pOtherEntity && !pOtherEntity->IsPlayer())
 				{
 					Vector velocity;
@@ -1162,7 +1162,7 @@ void CCollisionEvent::PostCollision(vcollisionevent_t* pEvent)
 		IPhysicsObject* pObject = pEvent->pObjects[i];
 		if (pObject)
 		{
-			CBaseEntity* pEntity = reinterpret_cast<CBaseEntity*>(pObject->GetGameData());
+			IServerEntity* pEntity = reinterpret_cast<IServerEntity*>(pObject->GetGameData());
 			if (!pEntity)
 				return;
 
@@ -1222,7 +1222,7 @@ void CCollisionEvent::Friction(IPhysicsObject* pObject, float energy, int surfac
 	pData->GetContactPoint(vecPos);
 	pObject->GetVelocityAtPoint(vecPos, &vecVel);
 
-	CBaseEntity* pEntity = reinterpret_cast<CBaseEntity*>(pObject->GetGameData());
+	IServerEntity* pEntity = reinterpret_cast<IServerEntity*>(pObject->GetGameData());
 
 	if (pEntity)
 	{
@@ -1246,7 +1246,7 @@ void CCollisionEvent::Friction(IPhysicsObject* pObject, float energy, int surfac
 }
 
 
-friction_t* CCollisionEvent::FindFriction(CBaseEntity* pObject)
+friction_t* CCollisionEvent::FindFriction(IServerEntity* pObject)
 {
 	friction_t* pFree = NULL;
 
@@ -1335,7 +1335,7 @@ void CCollisionEvent::UpdateFluidEvents(void)
 }
 
 
-float CCollisionEvent::DeltaTimeSinceLastFluid(CBaseEntity* pEntity)
+float CCollisionEvent::DeltaTimeSinceLastFluid(IServerEntity* pEntity)
 {
 	for (int i = m_fluidEvents.Count() - 1; i >= 0; --i)
 	{
@@ -1367,7 +1367,7 @@ void CCollisionEvent::UpdateFrictionSounds(void)
 }
 
 
-void CCollisionEvent::DispatchStartTouch(CBaseEntity* pEntity0, CBaseEntity* pEntity1, const Vector& point, const Vector& normal)
+void CCollisionEvent::DispatchStartTouch(IServerEntity* pEntity0, IServerEntity* pEntity1, const Vector& point, const Vector& normal)
 {
 	trace_t trace;
 	memset(&trace, 0, sizeof(trace));
@@ -1379,7 +1379,7 @@ void CCollisionEvent::DispatchStartTouch(CBaseEntity* pEntity0, CBaseEntity* pEn
 	pEntity0->GetEngineObject()->PhysicsMarkEntitiesAsTouchingEventDriven(pEntity1->GetEngineObject(), trace);
 }
 
-void CCollisionEvent::DispatchEndTouch(CBaseEntity* pEntity0, CBaseEntity* pEntity1)
+void CCollisionEvent::DispatchEndTouch(IServerEntity* pEntity0, IServerEntity* pEntity1)
 {
 	// frees the event-driven touchlinks
 	pEntity1->GetEngineObject()->PhysicsNotifyOtherOfUntouch(pEntity0->GetEngineObject());
@@ -1397,12 +1397,12 @@ void CCollisionEvent::UpdateTouchEvents(void)
 		const touchevent_t& event = m_touchEvents[i];
 		if (event.touchType == TOUCH_START)
 		{
-			DispatchStartTouch((CBaseEntity*)event.pEntity0, (CBaseEntity*)event.pEntity1, event.endPoint, event.normal);
+			DispatchStartTouch((IServerEntity*)event.pEntity0, (IServerEntity*)event.pEntity1, event.endPoint, event.normal);
 		}
 		else
 		{
 			// TOUCH_END
-			DispatchEndTouch((CBaseEntity*)event.pEntity0, (CBaseEntity*)event.pEntity1);
+			DispatchEndTouch((IServerEntity*)event.pEntity0, (IServerEntity*)event.pEntity1);
 		}
 	}
 	m_touchEvents.RemoveAll();
@@ -1540,7 +1540,7 @@ bool CCollisionEvent::GetInflictorVelocity(IPhysicsObject* pInflictor, Vector& v
 
 
 
-void CCollisionEvent::AddTouchEvent(CBaseEntity* pEntity0, CBaseEntity* pEntity1, int touchType, const Vector& point, const Vector& normal)
+void CCollisionEvent::AddTouchEvent(IServerEntity* pEntity0, IServerEntity* pEntity1, int touchType, const Vector& point, const Vector& normal)
 {
 	if (!pEntity0 || !pEntity1)
 		return;
@@ -1554,7 +1554,7 @@ void CCollisionEvent::AddTouchEvent(CBaseEntity* pEntity0, CBaseEntity* pEntity1
 	event.normal = normal;
 }
 
-void CCollisionEvent::AddDamageEvent(CBaseEntity* pEntity, const CTakeDamageInfo& info, IPhysicsObject* pInflictorPhysics, bool bRestoreVelocity, const Vector& savedVel, const AngularImpulse& savedAngVel)
+void CCollisionEvent::AddDamageEvent(IServerEntity* pEntity, const CTakeDamageInfo& info, IPhysicsObject* pInflictorPhysics, bool bRestoreVelocity, const Vector& savedVel, const AngularImpulse& savedAngVel)
 {
 	if (pEntity->GetEngineObject()->IsMarkedForDeletion())
 		return;
@@ -1612,7 +1612,7 @@ void PostSimulation_SetVelocityEvent(IPhysicsObject* pPhysicsObject, const Vecto
 	pPhysicsObject->SetVelocity(&vecVelocity, NULL);
 }
 
-void CCollisionEvent::AddRemoveObject(CBaseEntity* pRemove)
+void CCollisionEvent::AddRemoveObject(IServerEntity* pRemove)
 {
 	if (pRemove && m_removeObjects.Find(pRemove) == -1)
 	{
@@ -1653,7 +1653,7 @@ int CCollisionEvent::AddDamageInflictor(IPhysicsObject* pInflictorPhysics, float
 
 	if (addList)
 	{
-		CBaseEntity* pEntity = static_cast<CBaseEntity*>(pInflictorPhysics->GetGameData());
+		IServerEntity* pEntity = static_cast<IServerEntity*>(pInflictorPhysics->GetGameData());
 		if (pEntity)
 		{
 			IPhysicsObject* pList[VPHYSICS_MAX_OBJECT_LIST_COUNT];
@@ -1695,8 +1695,8 @@ void CCollisionEvent::LevelShutdown(void)
 void CCollisionEvent::StartTouch(IPhysicsObject* pObject1, IPhysicsObject* pObject2, IPhysicsCollisionData* pTouchData)
 {
 	CallbackContext check(this);
-	CBaseEntity* pEntity1 = static_cast<CBaseEntity*>(pObject1->GetGameData());
-	CBaseEntity* pEntity2 = static_cast<CBaseEntity*>(pObject2->GetGameData());
+	IServerEntity* pEntity1 = static_cast<IServerEntity*>(pObject1->GetGameData());
+	IServerEntity* pEntity2 = static_cast<IServerEntity*>(pObject2->GetGameData());
 
 	if (!pEntity1 || !pEntity2)
 		return;
@@ -1714,14 +1714,14 @@ void CCollisionEvent::StartTouch(IPhysicsObject* pObject1, IPhysicsObject* pObje
 	}
 }
 
-static int CountPhysicsObjectEntityContacts(IPhysicsObject* pObject, CBaseEntity* pEntity)
+static int CountPhysicsObjectEntityContacts(IPhysicsObject* pObject, IServerEntity* pEntity)
 {
 	IPhysicsFrictionSnapshot* pSnapshot = pObject->CreateFrictionSnapshot();
 	int count = 0;
 	while (pSnapshot->IsValid())
 	{
 		IPhysicsObject* pOther = pSnapshot->GetObject(1);
-		CBaseEntity* pOtherEntity = static_cast<CBaseEntity*>(pOther->GetGameData());
+		IServerEntity* pOtherEntity = static_cast<IServerEntity*>(pOther->GetGameData());
 		if (pOtherEntity == pEntity)
 			count++;
 		pSnapshot->NextFrictionData();
@@ -1733,8 +1733,8 @@ static int CountPhysicsObjectEntityContacts(IPhysicsObject* pObject, CBaseEntity
 void CCollisionEvent::EndTouch(IPhysicsObject* pObject1, IPhysicsObject* pObject2, IPhysicsCollisionData* pTouchData)
 {
 	CallbackContext check(this);
-	CBaseEntity* pEntity1 = static_cast<CBaseEntity*>(pObject1->GetGameData());
-	CBaseEntity* pEntity2 = static_cast<CBaseEntity*>(pObject2->GetGameData());
+	IServerEntity* pEntity1 = static_cast<IServerEntity*>(pObject1->GetGameData());
+	IServerEntity* pEntity2 = static_cast<IServerEntity*>(pObject2->GetGameData());
 
 	if (!pEntity1 || !pEntity2)
 		return;
@@ -1773,8 +1773,8 @@ void CCollisionEvent::EndTouch(IPhysicsObject* pObject1, IPhysicsObject* pObject
 // UNDONE: This is functional, but minimally.
 void CCollisionEvent::ObjectEnterTrigger(IPhysicsObject* pTrigger, IPhysicsObject* pObject)
 {
-	CBaseEntity* pTriggerEntity = static_cast<CBaseEntity*>(pTrigger->GetGameData());
-	CBaseEntity* pEntity = static_cast<CBaseEntity*>(pObject->GetGameData());
+	IServerEntity* pTriggerEntity = static_cast<IServerEntity*>(pTrigger->GetGameData());
+	IServerEntity* pEntity = static_cast<IServerEntity*>(pObject->GetGameData());
 	if (pTriggerEntity && pEntity)
 	{
 		// UNDONE: Don't buffer these until we can solve generating touches at object creation time
@@ -1795,8 +1795,8 @@ void CCollisionEvent::ObjectEnterTrigger(IPhysicsObject* pTrigger, IPhysicsObjec
 
 void CCollisionEvent::ObjectLeaveTrigger(IPhysicsObject* pTrigger, IPhysicsObject* pObject)
 {
-	CBaseEntity* pTriggerEntity = static_cast<CBaseEntity*>(pTrigger->GetGameData());
-	CBaseEntity* pEntity = static_cast<CBaseEntity*>(pObject->GetGameData());
+	IServerEntity* pTriggerEntity = static_cast<IServerEntity*>(pTrigger->GetGameData());
+	IServerEntity* pEntity = static_cast<IServerEntity*>(pObject->GetGameData());
 	if (pTriggerEntity && pEntity)
 	{
 		// UNDONE: Don't buffer these until we can solve generating touches at object creation time
@@ -1815,7 +1815,7 @@ void CCollisionEvent::ObjectLeaveTrigger(IPhysicsObject* pTrigger, IPhysicsObjec
 	}
 }
 
-bool CCollisionEvent::GetTriggerEvent(triggerevent_t* pEvent, CBaseEntity* pTriggerEntity)
+bool CCollisionEvent::GetTriggerEvent(triggerevent_t* pEvent, IServerEntity* pTriggerEntity)
 {
 	if (pEvent && pTriggerEntity == m_currentTriggerEvent.pTriggerEntity)
 	{
@@ -1847,10 +1847,10 @@ int CPortal_CollisionEvent::ShouldCollide(IPhysicsObject* pObj0, IPhysicsObject*
 				//at least one is held
 
 				//don't let players collide with objects they're holding, they get kinda messed up sometimes
-				if (pGameData0 && ((CBaseEntity*)pGameData0)->IsPlayer() && (((CBaseEntity*)pGameData0)->GetPlayerHeldEntity() == (CBaseEntity*)pGameData1))
+				if (pGameData0 && ((IServerEntity*)pGameData0)->IsPlayer() && (((IServerEntity*)pGameData0)->GetPlayerHeldEntity() == (IServerEntity*)pGameData1))
 					return 0;
 
-				if (pGameData1 && ((CBaseEntity*)pGameData1)->IsPlayer() && (((CBaseEntity*)pGameData1)->GetPlayerHeldEntity() == (CBaseEntity*)pGameData0))
+				if (pGameData1 && ((IServerEntity*)pGameData1)->IsPlayer() && (((IServerEntity*)pGameData1)->GetPlayerHeldEntity() == (IServerEntity*)pGameData0))
 					return 0;
 			}
 		}
@@ -1861,7 +1861,7 @@ int CPortal_CollisionEvent::ShouldCollide(IPhysicsObject* pObj0, IPhysicsObject*
 		if (pGameData0 != pGameData1)
 		{
 			//this code only decides what CAN'T collide due to portal environment differences, things that should collide will pass through here to deeper ShouldCollide() code
-			CBaseEntity* pEntities[2] = { (CBaseEntity*)pGameData0, (CBaseEntity*)pGameData1 };
+			IServerEntity* pEntities[2] = { (IServerEntity*)pGameData0, (IServerEntity*)pGameData1 };
 			IPhysicsObject* pPhysObjects[2] = { pObj0, pObj1 };
 			bool bStatic[2] = { pObj0->IsStatic(), pObj1->IsStatic() };
 			CEnginePortalInternal* pSimulators[2];
@@ -1877,7 +1877,7 @@ int CPortal_CollisionEvent::ShouldCollide(IPhysicsObject* pObj0, IPhysicsObject*
 			{
 				if ((pSimulators[i] != NULL) && pEntities[i]->GetEngineObject()->IsShadowClone())
 				{
-					CBaseEntity* pSource = pEntities[i]->GetEngineShadowClone()->GetClonedEntity();
+					IServerEntity* pSource = pEntities[i]->GetEngineShadowClone()->GetClonedEntity();
 
 					CEnginePortalInternal* pSourceSimulator = (CEnginePortalInternal*)pSource->GetEngineObject()->GetPortalThatOwnsEntity();
 					Assert((pSimulators[i]->m_EntFlags[pEntities[i]->entindex()] & PSEF_IS_IN_PORTAL_HOLE) == (pSourceSimulator->m_EntFlags[pSource->entindex()] & PSEF_IS_IN_PORTAL_HOLE));
@@ -1980,34 +1980,34 @@ int CPortal_CollisionEvent::ShouldSolvePenetration(IPhysicsObject* pObj0, IPhysi
 		if ((pGameData0 == NULL) || (pGameData1 == NULL))
 			return 0;
 
-		if (((CBaseEntity*)pGameData0)->GetEngineObject()->IsPortal() ||
-			((CBaseEntity*)pGameData1)->GetEngineObject()->IsPortal())
+		if (((IServerEntity*)pGameData0)->GetEngineObject()->IsPortal() ||
+			((IServerEntity*)pGameData1)->GetEngineObject()->IsPortal())
 			return 0;
 
 		// For portal, don't solve penetrations on combine balls
-		if (((CBaseEntity*)pGameData0)->ClassMatches("prop_energy_ball") ||
-			((CBaseEntity*)pGameData1)->ClassMatches("prop_energy_ball"))
+		if (((IServerEntity*)pGameData0)->ClassMatches("prop_energy_ball") ||
+			((IServerEntity*)pGameData1)->ClassMatches("prop_energy_ball"))
 			return 0;
 
 		if ((pObj0->GetGameFlags() | pObj1->GetGameFlags()) & FVPHYSICS_PLAYER_HELD)
 		{
 			//at least one is held
-			CBaseEntity* pHeld;
-			CBaseEntity* pOther;
+			IServerEntity* pHeld;
+			IServerEntity* pOther;
 			IPhysicsObject* pPhysHeld;
 			IPhysicsObject* pPhysOther;
 			if (pObj0->GetGameFlags() & FVPHYSICS_PLAYER_HELD)
 			{
-				pHeld = (CBaseEntity*)pGameData0;
+				pHeld = (IServerEntity*)pGameData0;
 				pPhysHeld = pObj0;
-				pOther = (CBaseEntity*)pGameData1;
+				pOther = (IServerEntity*)pGameData1;
 				pPhysOther = pObj1;
 			}
 			else
 			{
-				pHeld = (CBaseEntity*)pGameData1;
+				pHeld = (IServerEntity*)pGameData1;
 				pPhysHeld = pObj1;
-				pOther = (CBaseEntity*)pGameData0;
+				pOther = (IServerEntity*)pGameData0;
 				pPhysOther = pObj0;
 			}
 
@@ -2063,7 +2063,7 @@ int CPortal_CollisionEvent::ShouldSolvePenetration(IPhysicsObject* pObj0, IPhysi
 					if (!pObjects[j]->IsMoveable())
 						return 0; //don't solve between shadow clones and statics
 
-					if (((CBaseEntity*)(pObjects[i]->GetGameData()))->GetEngineShadowClone()->GetClonedEntity() == (pObjects[j]->GetGameData()))
+					if (((IServerEntity*)(pObjects[i]->GetGameData()))->GetEngineShadowClone()->GetClonedEntity() == (pObjects[j]->GetGameData()))
 						return 0; //don't solve between a shadow clone and its source entity
 				}
 			}
@@ -2085,14 +2085,14 @@ static void ModifyWeight_PreCollision(vcollisionevent_t* pEvent)
 {
 	Assert((pEvent->pObjects[0] != NULL) && (pEvent->pObjects[1] != NULL));
 
-	CBaseEntity* pUnshadowedEntities[2];
+	IServerEntity* pUnshadowedEntities[2];
 	IPhysicsObject* pUnshadowedObjects[2];
 
 	for (int i = 0; i != 2; ++i)
 	{
 		if (pEvent->pObjects[i]->GetGameFlags() & FVPHYSICS_IS_SHADOWCLONE)
 		{
-			CBaseEntity* pClone = ((CBaseEntity*)pEvent->pObjects[i]->GetGameData());
+			IServerEntity* pClone = ((IServerEntity*)pEvent->pObjects[i]->GetGameData());
 			pUnshadowedEntities[i] = pClone->GetEngineShadowClone()->GetClonedEntity();
 
 			if (pUnshadowedEntities[i] == NULL)
@@ -2105,7 +2105,7 @@ static void ModifyWeight_PreCollision(vcollisionevent_t* pEvent)
 		}
 		else
 		{
-			pUnshadowedEntities[i] = (CBaseEntity*)pEvent->pObjects[i]->GetGameData();
+			pUnshadowedEntities[i] = (IServerEntity*)pEvent->pObjects[i]->GetGameData();
 			pUnshadowedObjects[i] = pEvent->pObjects[i];
 		}
 	}
@@ -2185,7 +2185,7 @@ static void ModifyWeight_PreCollision(vcollisionevent_t* pEvent)
 				s_fSavedMass[i] = pUnshadowedObjects[i]->GetMass();
 
 				IGrabControllerServer* pGrabController = NULL;
-				CBaseEntity* pLookingForEntity = (CBaseEntity*)pEvent->pObjects[i]->GetGameData();
+				IServerEntity* pLookingForEntity = (IServerEntity*)pEvent->pObjects[i]->GetGameData();
 				IServerEntity* pHoldingPlayer = gEntList.GetPlayerHoldingEntity(pLookingForEntity);
 				if (pHoldingPlayer)
 					pGrabController = pHoldingPlayer->GetGrabController();
@@ -2260,7 +2260,7 @@ void CPortal_CollisionEvent::PortalPostSimulationFrame(void)
 }
 
 
-void CPortal_CollisionEvent::AddDamageEvent(CBaseEntity* pEntity, const CTakeDamageInfo& info, IPhysicsObject* pInflictorPhysics, bool bRestoreVelocity, const Vector& savedVel, const AngularImpulse& savedAngVel)
+void CPortal_CollisionEvent::AddDamageEvent(IServerEntity* pEntity, const CTakeDamageInfo& info, IPhysicsObject* pInflictorPhysics, bool bRestoreVelocity, const Vector& savedVel, const AngularImpulse& savedAngVel)
 {
 	if (gEntList.m_ActivePortals.Count() > 0) {
 		const CTakeDamageInfo* pPassDownInfo = &info;
@@ -2492,7 +2492,7 @@ void CGrabControllerInternal::OnRestore()
 // player can reach down 2ft below his feet (otherwise he'll hold the object above the bottom)
 #define PLAYER_REACH_DOWN_DISTANCE	24
 
-static void ComputePlayerMatrix(CBaseEntity* pPlayer, matrix3x4_t& out)
+static void ComputePlayerMatrix(IServerEntity* pPlayer, matrix3x4_t& out)
 {
 	if (!pPlayer)
 		return;
@@ -2524,9 +2524,9 @@ static void ComputePlayerMatrix(CBaseEntity* pPlayer, matrix3x4_t& out)
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-bool CGrabControllerInternal::UpdateObject(CBaseEntity* pPlayer, float flError)
+bool CGrabControllerInternal::UpdateObject(IServerEntity* pPlayer, float flError)
 {
-	CBaseEntity* pPenetratedEntity = m_PenetratedEntity.Get();
+	IServerEntity* pPenetratedEntity = m_PenetratedEntity.Get();
 	if (pPenetratedEntity)
 	{
 		//FindClosestPassableSpace( pPenetratedEntity, Vector( 0.0f, 0.0f, 1.0f ) );
@@ -2537,7 +2537,7 @@ bool CGrabControllerInternal::UpdateObject(CBaseEntity* pPlayer, float flError)
 		m_PenetratedEntity = NULL; //assume we won
 	}
 
-	CBaseEntity* pEntity = GetAttached();
+	IServerEntity* pEntity = GetAttached();
 	if (!pEntity || ComputeError() > flError || (pPlayer->GetEngineObject()->GetGroundEntity() ? pPlayer->GetEngineObject()->GetGroundEntity()->GetOuter() : NULL) == pEntity || !pEntity->GetEngineObject()->VPhysicsGetObject())
 	{
 		return false;
@@ -2785,7 +2785,7 @@ void CGrabControllerInternal::SetTargetPosition(const Vector& target, const QAng
 
 	m_timeToArrive = gpGlobals->frametime;
 
-	CBaseEntity* pAttached = GetAttached();
+	IServerEntity* pAttached = GetAttached();
 	if (pAttached)
 	{
 		IPhysicsObject* pObj = pAttached->GetEngineObject()->VPhysicsGetObject();
@@ -2818,7 +2818,7 @@ float CGrabControllerInternal::ComputeError()
 	if (m_errorTime <= 0)
 		return 0;
 
-	CBaseEntity* pAttached = GetAttached();
+	IServerEntity* pAttached = GetAttached();
 	if (pAttached)
 	{
 		Vector pos;
@@ -2894,7 +2894,7 @@ float CGrabControllerInternal::ComputeError()
 #define MASS_SPEED_SCALE	60
 #define MAX_MASS			40
 
-void CGrabControllerInternal::ComputeMaxSpeed(CBaseEntity* pEntity, IPhysicsObject* pPhysics)
+void CGrabControllerInternal::ComputeMaxSpeed(IServerEntity* pEntity, IPhysicsObject* pPhysics)
 {
 	m_shadow.maxSpeed = 1000;
 	m_shadow.maxAngular = DEFAULT_MAX_ANGULAR;
@@ -2925,7 +2925,7 @@ void CGrabControllerInternal::ComputeMaxSpeed(CBaseEntity* pEntity, IPhysicsObje
 }
 
 
-QAngle CGrabControllerInternal::TransformAnglesToPlayerSpace(const QAngle& anglesIn, CBaseEntity* pPlayer)
+QAngle CGrabControllerInternal::TransformAnglesToPlayerSpace(const QAngle& anglesIn, IServerEntity* pPlayer)
 {
 	if (m_bIgnoreRelativePitch)
 	{
@@ -2938,7 +2938,7 @@ QAngle CGrabControllerInternal::TransformAnglesToPlayerSpace(const QAngle& angle
 	return TransformAnglesToLocalSpace(anglesIn, pPlayer->GetEngineObject()->EntityToWorldTransform());
 }
 
-QAngle CGrabControllerInternal::TransformAnglesFromPlayerSpace(const QAngle& anglesIn, CBaseEntity* pPlayer)
+QAngle CGrabControllerInternal::TransformAnglesFromPlayerSpace(const QAngle& anglesIn, IServerEntity* pPlayer)
 {
 	if (m_bIgnoreRelativePitch)
 	{
@@ -2957,7 +2957,7 @@ QAngle CGrabControllerInternal::TransformAnglesFromPlayerSpace(const QAngle& ang
 //			&position - position we're testing against
 // Output : IPhysicsObject - sub-object (if any)
 //-----------------------------------------------------------------------------
-IPhysicsObject* GetRagdollChildAtPosition(CBaseEntity* pTarget, const Vector& position)
+IPhysicsObject* GetRagdollChildAtPosition(IServerEntity* pTarget, const Vector& position)
 {
 	// Check for a ragdoll
 	if (!pTarget->GetEngineObject()->GetRagdoll())
@@ -3045,7 +3045,7 @@ static QAngle AlignAngles(const QAngle& angles, float cosineAlignAngle)
 	return out;
 }
 
-void CGrabControllerInternal::AttachEntity(CBaseEntity* pPlayer, CBaseEntity* pEntity, IPhysicsObject* pPhys, bool bIsMegaPhysCannon, const Vector& vGrabPosition, bool bUseGrabPosition)
+void CGrabControllerInternal::AttachEntity(IServerEntity* pPlayer, IServerEntity* pEntity, IPhysicsObject* pPhys, bool bIsMegaPhysCannon, const Vector& vGrabPosition, bool bUseGrabPosition)
 {
 	// play the impact sound of the object hitting the player
 	// used as feedback to let the player know he picked up the object
@@ -3224,7 +3224,7 @@ static void ClampPhysicsVelocity(IPhysicsObject* pPhys, float linearLimit, float
 void CGrabControllerInternal::DetachEntity(bool bClearVelocity)
 {
 	Assert(!gEntList.PhysIsInCallback());
-	CBaseEntity* pEntity = GetAttached();
+	IServerEntity* pEntity = GetAttached();
 	if (pEntity)
 	{
 		// Restore the LS blocking state
@@ -3311,7 +3311,7 @@ IMotionEvent::simresult_e CGrabControllerInternal::Simulate(IPhysicsMotionContro
 
 float CGrabControllerInternal::GetSavedMass(IPhysicsObject* pObject)
 {
-	CBaseEntity* pHeld = m_attachedEntity;
+	IServerEntity* pHeld = m_attachedEntity;
 	if (pHeld)
 	{
 		if (pObject->GetGameData() == (void*)pHeld)
@@ -3330,7 +3330,7 @@ float CGrabControllerInternal::GetSavedMass(IPhysicsObject* pObject)
 
 void CGrabControllerInternal::GetSavedParamsForCarriedPhysObject(IPhysicsObject* pObject, float* pSavedMassOut, float* pSavedRotationalDampingOut)
 {
-	CBaseEntity* pHeld = m_attachedEntity;
+	IServerEntity* pHeld = m_attachedEntity;
 	if (pHeld)
 	{
 		if (pObject->GetGameData() == (void*)pHeld)
@@ -3367,7 +3367,7 @@ void CGrabControllerInternal::GetSavedParamsForCarriedPhysObject(IPhysicsObject*
 // directly overhead? The default behavior prevents lifting objects directly
 // overhead, but there are exceptions for gameplay purposes.
 //-----------------------------------------------------------------------------
-bool CGrabControllerInternal::IsObjectAllowedOverhead(CBaseEntity* pEntity)
+bool CGrabControllerInternal::IsObjectAllowedOverhead(IServerEntity* pEntity)
 {
 	// Allow combine balls overhead 
 	if (pEntity->IsCombineBall())
@@ -3383,7 +3383,7 @@ bool CGrabControllerInternal::IsObjectAllowedOverhead(CBaseEntity* pEntity)
 	return pEntity->IsObjectAllowedOverhead();
 }
 
-void CGrabControllerInternal::SetPortalPenetratingEntity(CBaseEntity* pPenetrated)
+void CGrabControllerInternal::SetPortalPenetratingEntity(IServerEntity* pPenetrated)
 {
 	m_PenetratedEntity = pPenetrated;
 }
@@ -3513,13 +3513,13 @@ END_DATADESC()
 	DEFINE_FIELD( m_ragdoll.list[i].parentIndex, FIELD_INTEGER )
 
 BEGIN_DATADESC_NO_BASE(CEngineObjectInternal)
-	DEFINE_FIELD(m_vecOrigin, FIELD_VECTOR),			// NOTE: MUST BE IN LOCAL SPACE, NOT POSITION_VECTOR!!! (see CBaseEntity::Restore)
+	DEFINE_FIELD(m_vecOrigin, FIELD_VECTOR),			// NOTE: MUST BE IN LOCAL SPACE, NOT POSITION_VECTOR!!! (see IServerEntity::Restore)
 	DEFINE_FIELD(m_angRotation, FIELD_VECTOR),
 	DEFINE_KEYFIELD(m_vecVelocity, FIELD_VECTOR, "velocity"),
 	DEFINE_FIELD(m_vecAbsOrigin, FIELD_POSITION_VECTOR),
 	DEFINE_FIELD(m_angAbsRotation, FIELD_VECTOR),
 	DEFINE_FIELD(m_vecAbsVelocity, FIELD_VECTOR),
-	DEFINE_ARRAY( m_rgflCoordinateFrame, FIELD_FLOAT, 12 ), // NOTE: MUST BE IN LOCAL SPACE, NOT POSITION_VECTOR!!! (see CBaseEntity::Restore)
+	DEFINE_ARRAY( m_rgflCoordinateFrame, FIELD_FLOAT, 12 ), // NOTE: MUST BE IN LOCAL SPACE, NOT POSITION_VECTOR!!! (see IServerEntity::Restore)
 	DEFINE_GLOBAL_FIELD(m_hMoveParent, FIELD_EHANDLE),
 	DEFINE_GLOBAL_FIELD(m_hMoveChild, FIELD_EHANDLE),
 	DEFINE_GLOBAL_FIELD(m_hMovePeer, FIELD_EHANDLE),
@@ -3709,7 +3709,7 @@ void SendProxy_MoveParentToInt(const SendProp* pProp, const void* pStruct, const
 	CEngineObjectInternal* entity = (CEngineObjectInternal*)pStruct;
 	Assert(entity);
 
-	CBaseEntity* pMoveParent = entity->GetMoveParent() ? entity->GetMoveParent()->GetOuter() : NULL;
+	IServerEntity* pMoveParent = entity->GetMoveParent() ? entity->GetMoveParent()->GetOuter() : NULL;
 	if (pMoveParent&& pMoveParent->entindex()==1) {
 		int aaa = 0;
 	}
@@ -3878,7 +3878,7 @@ IMPLEMENT_SERVERCLASS(CEngineObjectInternal, DT_EngineObject)
 
 #include "tier0/memdbgoff.h"
 //-----------------------------------------------------------------------------
-// CBaseEntity new/delete
+// IServerEntity new/delete
 // allocates and frees memory for itself from the engine->
 // All fields in the object are all initialized to 0.
 //-----------------------------------------------------------------------------
@@ -4272,7 +4272,7 @@ int CEngineObjectInternal::Save(ISave& save)
 // Purpose: Recursively saves all the classes in an object, in reverse order (top down)
 // Output : int 0 on failure, 1 on success
 //-----------------------------------------------------------------------------
-//int CBaseEntity::SaveDataDescBlock( ISave &save, datamap_t *dmap )
+//int IServerEntity::SaveDataDescBlock( ISave &save, datamap_t *dmap )
 //{
 //	return save.WriteAll( this, dmap );
 //}
@@ -4358,7 +4358,7 @@ void CEngineObjectInternal::OnSave(IEntitySaveUtils* pUtils)
 		Assert(m_ragdoll.list[0].originParentSpace == vec3_origin);
 		Assert(m_ragdoll.list[0].pObject != NULL);
 		VPhysicsSetObject(NULL);	// squelch a warning message
-		VPhysicsSetObject(m_ragdoll.list[0].pObject);	// make sure object zero is saved by CBaseEntity
+		VPhysicsSetObject(m_ragdoll.list[0].pObject);	// make sure object zero is saved by IServerEntity
 	}
 	m_pOuter->OnSave(pUtils);
 }
@@ -4421,7 +4421,7 @@ void CEngineObjectInternal::OnRestore()
 //-----------------------------------------------------------------------------
 // PVS rules
 //-----------------------------------------------------------------------------
-bool CEngineObjectInternal::IsInPVS(const CBaseEntity* pRecipient, const void* pvs, int pvssize)
+bool CEngineObjectInternal::IsInPVS(const IServerEntity* pRecipient, const void* pvs, int pvssize)
 {
 	RecomputePVSInformation();
 
@@ -4668,7 +4668,7 @@ void CEngineObjectInternal::UnlinkChild(IEngineObjectServer* pChild)
 
 void CEngineObjectInternal::LinkChild(IEngineObjectServer* pChild)
 {
-	//EHANDLE hParent;
+	//ENTHANDLE hParent;
 	//hParent.Set( pParent->GetOuter() );
 	((CEngineObjectInternal*)pChild)->SetNextMovePeer(this->FirstMoveChild());
 	this->SetFirstMoveChild(pChild);
@@ -4847,7 +4847,8 @@ void CEngineObjectInternal::ComputeAbsDirection(const Vector& vecLocalDirection,
 	}
 }
 
-void CEngineObjectInternal::GetVectors(Vector* forward, Vector* right, Vector* up) const {
+void CEngineObjectInternal::GetVectors(Vector* forward, Vector* right, Vector* up) const 
+{
 	m_pOuter->GetVectors(forward, right, up);
 }
 
@@ -5343,7 +5344,7 @@ void CEngineObjectInternal::WorldToEntitySpace(const Vector& in, Vector* pOut) c
 	}
 }
 
-void EntityTouch_Add(CBaseEntity* pEntity);
+void EntityTouch_Add(IServerEntity* pEntity);
 
 void CEngineObjectInternal::SetCheckUntouch(bool check)
 {
@@ -5925,7 +5926,7 @@ void CEngineObjectInternal::PhysicsRemoveToucher(servertouchlink_t* link)
 	if ((link->flags & FTOUCHLINK_START_TOUCH) &&
 		link->entityTouched != INVALID_EHANDLE_INDEX)
 	{
-		CBaseEntity* pEntity = gEntList.GetBaseEntityFromHandle(link->entityTouched);
+		IServerEntity* pEntity = gEntList.GetBaseEntityFromHandle(link->entityTouched);
 		this->m_pOuter->EndTouch(pEntity);
 	}
 
@@ -6043,8 +6044,8 @@ void CEngineObjectInternal::PhysicsRemoveGround(servergroundlink_t* link)
 	// Every start Touch gets a corresponding end touch
 	if (link->entity != INVALID_EHANDLE_INDEX)
 	{
-		CBaseEntity* linkEntity = gEntList.GetBaseEntityFromHandle(link->entity);
-		CBaseEntity* otherEntity = this->m_pOuter;
+		IServerEntity* linkEntity = gEntList.GetBaseEntityFromHandle(link->entity);
+		IServerEntity* otherEntity = this->m_pOuter;
 		if (linkEntity && otherEntity)
 		{
 			linkEntity->EndGroundContact(otherEntity);
@@ -6094,7 +6095,7 @@ void CEngineObjectInternal::SetGroundEntity(IEngineObjectServer* ground)
 	// so trap it here and release held objects when they become player ground
 	if (ground && m_pOuter->IsPlayer() && ground->GetMoveType() == MOVETYPE_VPHYSICS)
 	{
-		CBaseEntity* pPlayer = static_cast<CBaseEntity*>(this->m_pOuter);
+		IServerEntity* pPlayer = static_cast<IServerEntity*>(this->m_pOuter);
 		IPhysicsObject* pPhysGround = ground->VPhysicsGetObject();
 		if (pPhysGround && pPlayer)
 		{
@@ -6105,7 +6106,7 @@ void CEngineObjectInternal::SetGroundEntity(IEngineObjectServer* ground)
 		}
 	}
 
-	CBaseEntity* oldGround = m_hGroundEntity;
+	IServerEntity* oldGround = m_hGroundEntity;
 	m_hGroundEntity = ground ? ground->GetOuter() : NULL;
 
 	// Just starting to touch
@@ -6645,7 +6646,7 @@ bool CEngineObjectInternal::PhysicsRunThink(thinkmethods_t thinkMethod)
 	// Don't fire the base if we're avoiding it
 	if (thinkMethod != THINK_FIRE_ALL_BUT_BASE)
 	{
-		bAlive = PhysicsRunSpecificThink(-1, (THINKPTR) & CBaseEntity::Think);
+		bAlive = PhysicsRunSpecificThink(-1, (THINKPTR) & IServerEntity::Think);
 		if (!bAlive)
 			return false;
 	}
@@ -6683,7 +6684,7 @@ struct ThinkSync
 {
 	float					thinktime;
 	int						thinktick;
-	CUtlVector< EHANDLE >	entities;
+	CUtlVector< ENTHANDLE >	entities;
 
 	ThinkSync()
 	{
@@ -6715,7 +6716,7 @@ public:
 		m_bShouldCheck = false;
 	}
 
-	void EntityThinking(int framecount, CBaseEntity* ent, float thinktime, int thinktick)
+	void EntityThinking(int framecount, IServerEntity* ent, float thinktime, int thinktick)
 	{
 #if !defined( CLIENT_DLL )
 		if (m_nLastFrameCount != framecount)
@@ -6742,7 +6743,7 @@ public:
 
 		p->thinktime = thinktime;
 		p->thinktick = thinktick;
-		EHANDLE h;
+		ENTHANDLE h;
 		h = ent;
 		p->entities.AddToTail(h);
 #endif
@@ -6755,7 +6756,7 @@ private:
 		return item1.thinktime < item2.thinktime;
 	}
 
-	ThinkSync* FindOrAddItem(CBaseEntity* ent, float thinktime)
+	ThinkSync* FindOrAddItem(IServerEntity* ent, float thinktime)
 	{
 		ThinkSync item;
 		item.thinktime = thinktime;
@@ -6794,10 +6795,10 @@ private:
 			Msg("thinktime %f, %i entities\n", p->thinktime, ecount);
 			for (int j = 0; j < ecount; j++)
 			{
-				EHANDLE h = p->entities[j];
+				ENTHANDLE h = p->entities[j];
 				int lastthinktick = 0;
 				int nextthinktick = 0;
-				CBaseEntity* e = h.Get();
+				IServerEntity* e = h.Get();
 				if (e)
 				{
 					lastthinktick = e->GetEngineObject()->GetLastThinkTick();
@@ -6860,7 +6861,7 @@ bool CEngineObjectInternal::PhysicsRunSpecificThink(int nContextIndex, THINKPTR 
 void CEngineObjectInternal::PhysicsDispatchThink(THINKPTR thinkFunc)
 {
 	VPROF_ENTER_SCOPE((!vprof_scope_entity_thinks.GetBool()) ?
-		"CBaseEntity::PhysicsDispatchThink" :
+		"IServerEntity::PhysicsDispatchThink" :
 		gEntList.GetCannonicalName(GetClassname()));
 
 	float thinkLimit = think_limit.GetFloat();
@@ -8435,10 +8436,10 @@ void CEngineObjectInternal::InitRagdoll(const Vector& forceVector, int forceBone
 	SetMoveType(MOVETYPE_VPHYSICS);
 	SetSolid(SOLID_VPHYSICS);
 	AddSolidFlags(FSOLID_CUSTOMRAYTEST | FSOLID_CUSTOMBOXTEST);
-	m_pOuter->m_takedamage = DAMAGE_EVENTS_ONLY;
+	m_pOuter->SetTakeDamage(DAMAGE_EVENTS_ONLY);
 
 	ragdollparams_t params;
-	params.pGameData = static_cast<void*>(static_cast<CBaseEntity*>(this->m_pOuter));
+	params.pGameData = static_cast<void*>(static_cast<IServerEntity*>(this->m_pOuter));
 	params.modelIndex = GetModelIndex();
 	params.pCollide = modelinfo->GetVCollide(params.modelIndex);
 	params.pStudioHdr = GetModelPtr();
@@ -8630,7 +8631,7 @@ void CEngineObjectInternal::DrawRawSkeleton(matrix3x4_t boneToWorld[], int boneM
 			{
 				Vector p2;
 				MatrixPosition(boneToWorld[pStudioHdr->pBone(i)->parent], p2);
-				CBaseEntity* player = gEntList.GetLocalPlayer();
+				IServerEntity* player = gEntList.GetLocalPlayer();
 
 				if (player == NULL)
 					return;
@@ -9451,7 +9452,7 @@ CEngineWorldInternal::~CEngineWorldInternal()
 	gEntList.m_pGameRules = NULL;
 }
 
-void CEngineWorldInternal::Init(CBaseEntity* pOuter) 
+void CEngineWorldInternal::Init(IServerEntity* pOuter) 
 {
 	BaseClass::Init(pOuter);
 	gEntList.m_pGameRules = dynamic_cast<IServerGameRules*>(pOuter);
@@ -9463,7 +9464,7 @@ void CEngineWorldInternal::Init(CBaseEntity* pOuter)
 //-----------------------------------------------------------------------------
 // Purpose: A version of trace entity which detects portals and translates the trace through portals
 //-----------------------------------------------------------------------------
-void UTIL_TraceEntityThroughPortal(CBaseEntity* pEntity, const Vector& vecAbsStart, const Vector& vecAbsEnd,
+void UTIL_TraceEntityThroughPortal(IServerEntity* pEntity, const Vector& vecAbsStart, const Vector& vecAbsEnd,
 	unsigned int mask, ITraceFilter* pFilter, trace_t* pTrace)
 {
 #ifdef CLIENT_DLL
@@ -9490,7 +9491,7 @@ class CTraceFilterEntity : public CTraceFilterSimple
 	DECLARE_CLASS(CTraceFilterEntity, CTraceFilterSimple);
 
 public:
-	CTraceFilterEntity(CBaseEntity* pEntity, int nCollisionGroup)
+	CTraceFilterEntity(IServerEntity* pEntity, int nCollisionGroup)
 		: CTraceFilterSimple(pEntity, nCollisionGroup)
 	{
 		m_pRootParent = pEntity->GetEngineObject()->GetRootMoveParent() ? pEntity->GetEngineObject()->GetRootMoveParent()->GetOuter() : NULL;
@@ -9500,7 +9501,7 @@ public:
 
 	bool ShouldHitEntity(IHandleEntity* pHandleEntity, int contentsMask)
 	{
-		CBaseEntity* pEntity = EntityFromEntityHandle(pHandleEntity);
+		IServerEntity* pEntity = EntityFromEntityHandle(pHandleEntity);
 		if (!pEntity)
 			return false;
 
@@ -9529,8 +9530,8 @@ public:
 
 private:
 
-	CBaseEntity* m_pRootParent;
-	CBaseEntity* m_pEntity;
+	IServerEntity* m_pRootParent;
+	IServerEntity* m_pEntity;
 	bool		m_checkHash;
 };
 
@@ -9559,7 +9560,7 @@ class CTraceFilterEntityIgnoreOther : public CTraceFilterEntity
 {
 	DECLARE_CLASS(CTraceFilterEntityIgnoreOther, CTraceFilterEntity);
 public:
-	CTraceFilterEntityIgnoreOther(CBaseEntity* pEntity, const IHandleEntity* pIgnore, int nCollisionGroup) :
+	CTraceFilterEntityIgnoreOther(IServerEntity* pEntity, const IHandleEntity* pIgnore, int nCollisionGroup) :
 		CTraceFilterEntity(pEntity, nCollisionGroup), m_pIgnoreOther(pIgnore)
 	{
 	}
@@ -9653,7 +9654,7 @@ CEnginePlayerInternal::~CEnginePlayerInternal()
 
 void CEnginePlayerInternal::VPhysicsDestroyObject()
 {
-	// Since CBasePlayer aliases its pointer to the physics object, tell CBaseEntity to 
+	// Since CBasePlayer aliases its pointer to the physics object, tell IServerEntity to 
 	// clear out its physics object pointer so we don't wind up deleting one of
 	// the aliased objects twice.
 	VPhysicsSetObject(NULL);
@@ -10215,7 +10216,7 @@ bool CEnginePortalInternal::TraceTransformedWorldBrushes(const IEnginePortalServ
 class CPortalCollideableEnumerator : public IPartitionEnumerator
 {
 private:
-	EHANDLE m_hTestPortal; //the associated portal that we only want objects in front of
+	ENTHANDLE m_hTestPortal; //the associated portal that we only want objects in front of
 	Vector m_vPlaneNormal; //portal plane normal
 	float m_fPlaneDist; //plane equation distance
 	Vector m_ptForward1000; //a point exactly 1000 units from the portal center along its forward vector
@@ -10246,9 +10247,9 @@ CPortalCollideableEnumerator::CPortalCollideableEnumerator(const CEnginePortalIn
 
 IterationRetval_t CPortalCollideableEnumerator::EnumElement(IHandleEntity* pHandleEntity)
 {
-	EHANDLE hEnt = pHandleEntity->GetRefEHandle();
+	ENTHANDLE hEnt = pHandleEntity->GetRefEHandle();
 
-	CBaseEntity* pEnt = hEnt.Get();
+	IServerEntity* pEnt = hEnt.Get();
 	if (pEnt == NULL) //I really never thought this would be necessary
 		return ITERATION_CONTINUE;
 
@@ -12401,7 +12402,7 @@ void UpdateShadowClonesPortalSimulationFlags(const IServerEntity* pSourceEntity,
 	IEngineObjectServer* pClones = pSourceEntity->GetEngineObject()->GetClonesOfEntity();
 	while (pClones)
 	{
-		CBaseEntity* pClone = pClones->GetOuter();
+		IServerEntity* pClone = pClones->GetOuter();
 		CEnginePortalInternal* pCloneSimulator = (CEnginePortalInternal*)pClone->GetEngineObject()->GetPortalThatOwnsEntity();
 
 		unsigned int* pFlags = (unsigned int*)&pCloneSimulator->m_EntFlags[pClone->entindex()];
@@ -12467,7 +12468,7 @@ void CEnginePortalInternal::TakeOwnershipOfEntity(IServerEntity* pEntity)
 	pEntity->GetEngineObject()->GetAllChildren( childrenList);
 	for (int i = childrenList.Count(); --i >= 0; )
 	{
-		CBaseEntity* pEnt = childrenList[i]->GetOuter();
+		IServerEntity* pEnt = childrenList[i]->GetOuter();
 		IEnginePortalServer* pOwningSimulator = pEnt->GetEngineObject()->GetPortalThatOwnsEntity();
 		if (pOwningSimulator != this)
 		{
@@ -12823,7 +12824,7 @@ int CEnginePortalInternal::GetMoveableOwnedEntities(IServerEntity** pEntsOut, in
 void CEnginePortalInternal::BeforeMove()
 {
 	//create a list of all entities that are actually within the portal hole, they will likely need to be moved out of solid space when the portal moves
-	m_pFixEntities = new IServerEntity * [m_OwnedEntities.Count()]; //(CBaseEntity**)stackalloc(sizeof(CBaseEntity*) * m_OwnedEntities.Count());
+	m_pFixEntities = new IServerEntity * [m_OwnedEntities.Count()]; //(IServerEntity**)stackalloc(sizeof(IServerEntity*) * m_OwnedEntities.Count());
 	m_iFixEntityCount = 0;
 	for (int i = m_OwnedEntities.Count(); --i >= 0; )
 	{
@@ -13050,10 +13051,10 @@ CEngineShadowCloneInternal::~CEngineShadowCloneInternal()
 	gEntList.m_ActiveShadowClones.FindAndRemove(this); //also removed in UpdateOnRemove()
 }
 
-void CEngineShadowCloneInternal::SetClonedEntity(CBaseEntity* pEntToClone)
+void CEngineShadowCloneInternal::SetClonedEntity(IServerEntity* pEntToClone)
 {
 	VPhysicsDestroyObject();
-	CBaseEntity* pSource = m_hClonedEntity.Get();
+	IServerEntity* pSource = m_hClonedEntity.Get();
 	if (pSource)
 	{
 		CPhysicsShadowCloneLL* pCloneListHead = gEntList.m_EntityClones[pSource->entindex()];
@@ -13108,7 +13109,7 @@ void CEngineShadowCloneInternal::SetClonedEntity(CBaseEntity* pEntToClone)
 	//FullSyncClonedPhysicsObjects();
 }
 
-CBaseEntity* CEngineShadowCloneInternal::GetClonedEntity(void)
+IServerEntity* CEngineShadowCloneInternal::GetClonedEntity(void)
 {
 	return m_hClonedEntity.Get();
 }
@@ -13339,7 +13340,7 @@ void CEngineShadowCloneInternal::FullSync(bool bAllowAssumedSync)
 		if (modelinfo->GetModelType(pClonedEntity->GetModel()) == mod_studio)
 			m_pOuter->SetModel(STRING(pClonedEntity->GetModelName()));
 
-		m_pOuter->SetSize(pClonedEntity->OBBMins(), pClonedEntity->OBBMaxs());
+		SetSize(pClonedEntity->OBBMins(), pClonedEntity->OBBMaxs());
 	}
 
 	FullSyncClonedPhysicsObjects(bBigChanges);
@@ -13356,7 +13357,7 @@ void CEngineShadowCloneInternal::SyncEntity(bool bPullChanges)
 {
 	m_bShouldUpSync = false;
 
-	CBaseEntity* pSource, * pDest;
+	IServerEntity* pSource, * pDest;
 	VMatrix* pTransform;
 	if (bPullChanges)
 	{
@@ -13423,7 +13424,7 @@ void FullSyncPhysicsObject(IPhysicsObject* pSource, IPhysicsObject* pDest, const
 			//CBasePlayer *pPlayer = gEntList.GetPlayerByIndex( 1 );
 			//Assert( pPlayer );
 
-			CBaseEntity* pLookingForEntity = (CBaseEntity*)pSource->GetGameData();
+			IServerEntity* pLookingForEntity = (IServerEntity*)pSource->GetGameData();
 
 			IServerEntity* pHoldingPlayer = gEntList.GetPlayerHoldingEntity(pLookingForEntity);
 			if (pHoldingPlayer)
@@ -13797,14 +13798,14 @@ IPhysicsObject* CEngineShadowCloneInternal::TranslatePhysicsToClonedEnt(const IP
 	return NULL;
 }
 
-CEngineShadowCloneInternal* CEngineShadowCloneInternal::CreateShadowClone(IPhysicsEnvironment* pInPhysicsEnvironment, EHANDLE hEntToClone, const char* szDebugMarker, const matrix3x4_t* pTransformationMatrix /*= NULL*/)
+CEngineShadowCloneInternal* CEngineShadowCloneInternal::CreateShadowClone(IPhysicsEnvironment* pInPhysicsEnvironment, ENTHANDLE hEntToClone, const char* szDebugMarker, const matrix3x4_t* pTransformationMatrix /*= NULL*/)
 {
 	AssertMsg(szDebugMarker != NULL, "All shadow clones must have a debug marker for where it came from in debug builds.");
 
 	if (!sv_use_shadow_clones.GetBool())
 		return NULL;
 
-	CBaseEntity* pClonedEntity = hEntToClone.Get();
+	IServerEntity* pClonedEntity = hEntToClone.Get();
 	if (pClonedEntity == NULL)
 		return NULL;
 
@@ -14808,13 +14809,13 @@ void CEngineVehicleInternal::UpdateDriverControls(CUserCmd* cmd, float flFrameTi
 	// (The inverse is true when driving in reverse and the stick is moved slightly forward)
 	//-------------------------------------------------------------------------
 	IDrivableVehicle* pDrivableVehicle = dynamic_cast<IDrivableVehicle*>(m_pOuter->GetServerVehicle());
-	CBaseEntity* pDriver = pDrivableVehicle ? pDrivableVehicle->GetDriver() : NULL;
-	CBaseEntity* pPlayerDriver;
+	IServerEntity* pDriver = pDrivableVehicle ? pDrivableVehicle->GetDriver() : NULL;
+	IServerEntity* pPlayerDriver;
 	float flBiasThreshold = xbox_throttlebias.GetFloat();
 
 	if (pDriver && pDriver->IsPlayer())
 	{
-		pPlayerDriver = dynamic_cast<CBaseEntity*>(pDriver);
+		pPlayerDriver = dynamic_cast<IServerEntity*>(pDriver);
 
 		if (cmd->forwardmove == 0.0f && (fabs(cmd->sidemove) < 200.0f))
 		{
@@ -15204,7 +15205,7 @@ CEngineRopeInternal::~CEngineRopeInternal() {
 
 void CEngineRopeInternal::EndpointsChanged()
 {
-	CBaseEntity* pStartEnt = m_hStartPoint.Get();
+	IServerEntity* pStartEnt = m_hStartPoint.Get();
 	if (pStartEnt)
 	{
 		if ((pStartEnt != this->m_pOuter) || GetMoveParent())
@@ -15213,7 +15214,7 @@ void CEngineRopeInternal::EndpointsChanged()
 			pStartEnt->AddWatcherToEntity(this->m_pOuter, POSITIONWATCHER);
 		}
 	}
-	CBaseEntity* pEndEnt = m_hEndPoint.Get();
+	IServerEntity* pEndEnt = m_hEndPoint.Get();
 	if (pEndEnt)
 	{
 		if ((pEndEnt != this->m_pOuter) || GetMoveParent())
@@ -15224,10 +15225,10 @@ void CEngineRopeInternal::EndpointsChanged()
 	}
 }
 
-void CEngineRopeInternal::SetAttachmentPoint(CBaseHandle& hOutEnt, short& iOutAttachment, CBaseEntity* pEnt, int iAttachment)
+void CEngineRopeInternal::SetAttachmentPoint(CBaseHandle& hOutEnt, short& iOutAttachment, IServerEntity* pEnt, int iAttachment)
 {
 	// Unforce our previously attached entity from transmitting.
-	CBaseEntity* pCurEnt = gEntList.GetBaseEntityFromHandle(hOutEnt);
+	IServerEntity* pCurEnt = gEntList.GetBaseEntityFromHandle(hOutEnt);
 	if (pCurEnt && pCurEnt->entindex() != -1)
 	{
 		pCurEnt->DecrementTransmitStateOwnedCounter();
@@ -15247,12 +15248,12 @@ void CEngineRopeInternal::SetAttachmentPoint(CBaseHandle& hOutEnt, short& iOutAt
 	EndpointsChanged();
 }
 
-void CEngineRopeInternal::SetStartPoint(CBaseEntity* pStartPoint, int attachment)
+void CEngineRopeInternal::SetStartPoint(IServerEntity* pStartPoint, int attachment)
 {
 	SetAttachmentPoint(m_hStartPoint.GetForModify(), m_iStartAttachment.GetForModify(), pStartPoint, attachment);
 }
 
-void CEngineRopeInternal::SetEndPoint(CBaseEntity* pEndPoint, int attachment)
+void CEngineRopeInternal::SetEndPoint(IServerEntity* pEndPoint, int attachment)
 {
 	SetAttachmentPoint(m_hEndPoint.GetForModify(), m_iEndAttachment.GetForModify(), pEndPoint, attachment);
 }
@@ -15284,8 +15285,8 @@ void CEngineRopeInternal::ActivateEndDirectionConstraints(bool bEnable)
 
 bool CEngineRopeInternal::SetupHangDistance(float flHangDist)
 {
-	CBaseEntity* pEnt1 = m_hStartPoint.Get();
-	CBaseEntity* pEnt2 = m_hEndPoint.Get();
+	IServerEntity* pEnt1 = m_hStartPoint.Get();
+	IServerEntity* pEnt2 = m_hEndPoint.Get();
 	if (!pEnt1 || !pEnt2)
 		return false;
 
@@ -15314,8 +15315,8 @@ void CEngineRopeInternal::RecalculateLength(void)
 	// Get my entities
 	if (m_hEndPoint.Get())
 	{
-		CBaseEntity* pStartEnt = m_hStartPoint.Get();
-		CBaseEntity* pEndEnt = m_hEndPoint.Get();
+		IServerEntity* pStartEnt = m_hStartPoint.Get();
+		IServerEntity* pEndEnt = m_hEndPoint.Get();
 
 		// Set the length
 		m_RopeLength = (int)(pStartEnt->GetEngineObject()->GetAbsOrigin() - pEndEnt->GetEngineObject()->GetAbsOrigin()).Length();
@@ -15326,7 +15327,7 @@ void CEngineRopeInternal::RecalculateLength(void)
 	}
 }
 
-bool CEngineRopeInternal::GetEndPointPos2(CBaseEntity* pAttached, int iAttachment, Vector& vPos)
+bool CEngineRopeInternal::GetEndPointPos2(IServerEntity* pAttached, int iAttachment, Vector& vPos)
 {
 	if (!pAttached)
 		return false;
@@ -15409,7 +15410,7 @@ void CEngineRopeInternal::NotifyPositionChanged()
 	// Update our bbox?
 	UpdateBBox(false);
 
-	CBaseEntity* ents[2] = { m_hStartPoint.Get(), m_hEndPoint.Get() };
+	IServerEntity* ents[2] = { m_hStartPoint.Get(), m_hEndPoint.Get() };
 	if ((m_RopeFlags & ROPE_RESIZE) && ents[0] && ents[0]->entindex() != -1 && ents[1] && ents[1]->entindex() != -1)
 	{
 		int len = (int)(ents[0]->GetEngineObject()->GetAbsOrigin() - ents[1]->GetEngineObject()->GetAbsOrigin()).Length() + m_Slack;
@@ -15468,7 +15469,7 @@ void CEngineRopeInternal::EnableWind(bool bEnable)
 
 struct watcher_t
 {
-	EHANDLE				hWatcher;
+	ENTHANDLE				hWatcher;
 	IWatcherCallback* pWatcherCallback;
 };
 
@@ -15542,7 +15543,7 @@ void CWatcherList::AddToList(IHandleEntity* pWatcher)
 	{
 		watcher_t watcher;
 		watcher.hWatcher = pWatcher->GetRefEHandle();
-		// save this separately so we can use the EHANDLE to test for deletion
+		// save this separately so we can use the ENTHANDLE to test for deletion
 		watcher.pWatcherCallback = dynamic_cast<IWatcherCallback*> (pWatcher);
 
 		if (watcher.pWatcherCallback)
@@ -15634,7 +15635,7 @@ bool TestEntityTriggerIntersection_Accurate(IEngineObjectServer* pTrigger, IEngi
 	return false;
 }
 
-bool ShouldRemoveThisRagdoll(CBaseEntity* pRagdoll)
+bool ShouldRemoveThisRagdoll(IServerEntity* pRagdoll)
 {
 	if (serverGameDLL->IsLowViolence())
 	{
@@ -15681,7 +15682,7 @@ bool ShouldRemoveThisRagdoll(CBaseEntity* pRagdoll)
 
 #else
 	for (int i = 1; i <= gpGlobals->maxClients; i++) {
-		CBaseEntity* pPlayer = gEntList.GetBaseEntity(i);
+		IServerEntity* pPlayer = gEntList.GetBaseEntity(i);
 
 		if (!gEntList.FindClientInPVS(pRagdoll))
 		{
@@ -15690,7 +15691,7 @@ bool ShouldRemoveThisRagdoll(CBaseEntity* pRagdoll)
 				// Clip the line before sending so we 
 				// don't overflow the client message buffer
 				// --------------------------------------------------------------
-				CBaseEntity* player = gEntList.GetLocalPlayer();
+				IServerEntity* player = gEntList.GetLocalPlayer();
 
 				if (player != NULL) {
 					// Clip line that is far away
@@ -15726,7 +15727,7 @@ bool ShouldRemoveThisRagdoll(CBaseEntity* pRagdoll)
 				// Clip the line before sending so we 
 				// don't overflow the client message buffer
 				// --------------------------------------------------------------
-				CBaseEntity* player = gEntList.GetLocalPlayer();
+				IServerEntity* player = gEntList.GetLocalPlayer();
 
 				if (player != NULL) {
 					// Clip line that is far away
@@ -15782,7 +15783,7 @@ void CAimTargetManager::ForceRepopulateList()
 {
 	Clear();
 
-	CBaseEntity* pEnt = gEntList.FirstEnt();
+	IServerEntity* pEnt = gEntList.FirstEnt();
 
 	while (pEnt)
 	{
@@ -15793,26 +15794,26 @@ void CAimTargetManager::ForceRepopulateList()
 	}
 }
 
-bool CAimTargetManager::ShouldAddEntity(CBaseEntity* pEntity)
+bool CAimTargetManager::ShouldAddEntity(IServerEntity* pEntity)
 {
 	return ((pEntity->GetEngineObject()->GetFlags() & FL_AIMTARGET) != 0);
 }
 
 // IEntityListener
-void CAimTargetManager::OnEntityCreated(CBaseEntity* pEntity) {}
-void CAimTargetManager::OnEntityDeleted(CBaseEntity* pEntity)
+void CAimTargetManager::OnEntityCreated(IServerEntity* pEntity) {}
+void CAimTargetManager::OnEntityDeleted(IServerEntity* pEntity)
 {
 	if (!(pEntity->GetEngineObject()->GetFlags() & FL_AIMTARGET))
 		return;
 	RemoveEntity(pEntity);
 }
-void CAimTargetManager::AddEntity(CBaseEntity* pEntity)
+void CAimTargetManager::AddEntity(IServerEntity* pEntity)
 {
 	if (pEntity->GetEngineObject()->IsMarkedForDeletion())
 		return;
 	m_targetList.AddToTail(pEntity);
 }
-void CAimTargetManager::RemoveEntity(CBaseEntity* pEntity)
+void CAimTargetManager::RemoveEntity(IServerEntity* pEntity)
 {
 	int index = m_targetList.Find(pEntity);
 	if (m_targetList.IsValidIndex(index))
@@ -15821,10 +15822,10 @@ void CAimTargetManager::RemoveEntity(CBaseEntity* pEntity)
 	}
 }
 int CAimTargetManager::ListCount() { return m_targetList.Count(); }
-int CAimTargetManager::ListCopy(CBaseEntity* pList[], int listMax)
+int CAimTargetManager::ListCopy(IServerEntity* pList[], int listMax)
 {
 	int count = MIN(listMax, ListCount());
-	memcpy(pList, m_targetList.Base(), sizeof(CBaseEntity*) * count);
+	memcpy(pList, m_targetList.Base(), sizeof(IServerEntity*) * count);
 	return count;
 }
 
@@ -15855,12 +15856,12 @@ void CSimThinkManager::LevelShutdownPostEntity()
 	Clear();
 }
 
-void CSimThinkManager::OnEntityCreated(CBaseEntity* pEntity)
+void CSimThinkManager::OnEntityCreated(IServerEntity* pEntity)
 {
 	Assert(m_entinfoIndex[pEntity->GetRefEHandle().GetEntryIndex()] == 0xFFFF);
 }
 
-void CSimThinkManager::OnEntityDeleted(CBaseEntity* pEntity)
+void CSimThinkManager::OnEntityDeleted(IServerEntity* pEntity)
 {
 	RemoveEntinfoIndex(pEntity->GetRefEHandle().GetEntryIndex());
 }
@@ -15888,7 +15889,7 @@ int CSimThinkManager::ListCount()
 	return m_simThinkList.Count();
 }
 
-int CSimThinkManager::ListCopy(CBaseEntity* pList[], int listMax)
+int CSimThinkManager::ListCopy(IServerEntity* pList[], int listMax)
 {
 	int count = MIN(listMax, ListCount());
 	int out = 0;
@@ -15899,8 +15900,8 @@ int CSimThinkManager::ListCopy(CBaseEntity* pList[], int listMax)
 		{
 			Assert(m_simThinkList[i].nextThinkTick >= 0);
 			int entinfoIndex = m_simThinkList[i].entEntry;
-			const CEntInfo<CBaseEntity>* pInfo = gEntList.GetEntInfoPtrByIndex(entinfoIndex);
-			pList[out] = (CBaseEntity*)pInfo->m_pEntity;
+			const CEntInfo<IServerEntity>* pInfo = gEntList.GetEntInfoPtrByIndex(entinfoIndex);
+			pList[out] = (IServerEntity*)pInfo->m_pEntity;
 			Assert(m_simThinkList[i].nextThinkTick == 0 || pList[out]->GetEngineObject()->GetFirstThinkTick() == m_simThinkList[i].nextThinkTick);
 			Assert(gEntList.IsEntityPtr(pList[out]));
 			out++;
@@ -15910,7 +15911,7 @@ int CSimThinkManager::ListCopy(CBaseEntity* pList[], int listMax)
 	return out;
 }
 
-void CSimThinkManager::EntityChanged(CBaseEntity* pEntity)
+void CSimThinkManager::EntityChanged(IServerEntity* pEntity)
 {
 	// might change after deletion, don't put back into the list
 	if (pEntity->GetEngineObject()->IsMarkedForDeletion())
@@ -15958,7 +15959,7 @@ void CSimThinkManager::EntityChanged(CBaseEntity* pEntity)
 
 CSimThinkManager g_SimThinkManager;
 
-class CEntityTouchManager : public IEntityListener<CBaseEntity>
+class CEntityTouchManager : public IEntityListener<IServerEntity>
 {
 public:
 	// called by CEntityListSystem
@@ -15981,8 +15982,8 @@ public:
 		if (count)
 		{
 			// copy off the list
-			CBaseEntity** ents = (CBaseEntity**)stackalloc(sizeof(CBaseEntity*) * count);
-			memcpy(ents, m_updateList.Base(), sizeof(CBaseEntity*) * count);
+			IServerEntity** ents = (IServerEntity**)stackalloc(sizeof(IServerEntity*) * count);
+			memcpy(ents, m_updateList.Base(), sizeof(IServerEntity*) * count);
 			// clear it
 			m_updateList.RemoveAll();
 
@@ -16005,8 +16006,8 @@ public:
 	}
 
 	// IEntityListener
-	virtual void OnEntityCreated(CBaseEntity* pEntity) {}
-	virtual void OnEntityDeleted(CBaseEntity* pEntity)
+	virtual void OnEntityCreated(IServerEntity* pEntity) {}
+	virtual void OnEntityDeleted(IServerEntity* pEntity)
 	{
 		if (!pEntity->GetEngineObject()->GetCheckUntouch())
 			return;
@@ -16016,7 +16017,7 @@ public:
 			m_updateList.FastRemove(index);
 		}
 	}
-	void AddEntity(CBaseEntity* pEntity)
+	void AddEntity(IServerEntity* pEntity)
 	{
 		if (pEntity->GetEngineObject()->IsMarkedForDeletion())
 			return;
@@ -16024,12 +16025,12 @@ public:
 	}
 
 private:
-	CUtlVector<CBaseEntity*>	m_updateList;
+	CUtlVector<IServerEntity*>	m_updateList;
 };
 
 static CEntityTouchManager g_TouchManager;
 
-void EntityTouch_Add(CBaseEntity* pEntity)
+void EntityTouch_Add(IServerEntity* pEntity)
 {
 	g_TouchManager.AddEntity(pEntity);
 }
@@ -16081,7 +16082,7 @@ class CSortedEntityList
 public:
 	CSortedEntityList() : m_sortedList(), m_emptyCount(0) {}
 
-	typedef CBaseEntity* ENTITYPTR;
+	typedef IServerEntity* ENTITYPTR;
 	class CEntityReportLess
 	{
 	public:
@@ -16094,7 +16095,7 @@ public:
 		}
 	};
 
-	void AddEntityToList(CBaseEntity* pEntity)
+	void AddEntityToList(IServerEntity* pEntity)
 	{
 		if (!pEntity)
 		{
@@ -16112,7 +16113,7 @@ public:
 		int edicts = 0;
 		for (int i = 0; i < m_sortedList.Count(); i++)
 		{
-			CBaseEntity* pEntity = m_sortedList[i];
+			IServerEntity* pEntity = m_sortedList[i];
 			if (!pEntity)
 				continue;
 
@@ -16143,7 +16144,7 @@ public:
 		}
 	}
 private:
-	CUtlSortVector< CBaseEntity*, CEntityReportLess > m_sortedList;
+	CUtlSortVector< IServerEntity*, CEntityReportLess > m_sortedList;
 	int		m_emptyCount;
 };
 
@@ -16155,7 +16156,7 @@ CON_COMMAND(report_entities, "Lists all entities")
 	//	return;
 
 	CSortedEntityList list;
-	CBaseEntity* pEntity = gEntList.FirstEnt();
+	IServerEntity* pEntity = gEntList.FirstEnt();
 	while (pEntity)
 	{
 		list.AddEntityToList(pEntity);
@@ -16171,7 +16172,7 @@ CON_COMMAND(report_touchlinks, "Lists all touchlinks")
 	//	return;
 
 	CSortedEntityList list;
-	CBaseEntity* pEntity = gEntList.FirstEnt();
+	IServerEntity* pEntity = gEntList.FirstEnt();
 	const char* pClassname = NULL;
 	if (args.ArgC() > 1)
 	{
@@ -16202,7 +16203,7 @@ CON_COMMAND(report_simthinklist, "Lists all simulating/thinking entities")
 	//if (!UTIL_IsCommandIssuedByServerAdmin())
 	//	return;
 
-	CBaseEntity* pTmp[NUM_ENT_ENTRIES];
+	IServerEntity* pTmp[NUM_ENT_ENTRIES];
 	int count = gEntList.SimThink_ListCopy(pTmp, ARRAYSIZE(pTmp));
 
 	CSortedEntityList list;

@@ -54,7 +54,7 @@ public:
 	// Flush any cached results (e.g., hull changed, results not valid)
 	void Reset();
 	
-	void AddObstacle( const Vector &pos, float radius, CBaseEntity *pEntity = NULL, AI_MoveSuggType_t type = AIMST_AVOID_OBJECT );
+	void AddObstacle( const Vector &pos, float radius, IServerEntity *pEntity = NULL, AI_MoveSuggType_t type = AIMST_AVOID_OBJECT );
 	bool HaveObstacles()	{ return ( m_Obstacles.Count() != 0 ); }
 
 private:
@@ -105,7 +105,7 @@ private:
 											 float *pYawTest, float *pYawCenter );
 	
 	float CalculateRegulationWeight( const AIMoveTrace_t &moveTrace, float pctBlockedt );
-	float AdjustRegulationWeight( CBaseEntity *pEntity, float weight );
+	float AdjustRegulationWeight( IServerEntity *pEntity, float weight );
 	unsigned ComputeTurnBiasFlags( const AILocalMoveGoal_t &goal, const AIMoveTrace_t &directTrace );
 
 
@@ -134,7 +134,7 @@ private:
 	
 	struct CircleObstacles_t
 	{
-		CircleObstacles_t( const Vector &center, float radius, CBaseEntity *pEntity, AI_MoveSuggType_t type )
+		CircleObstacles_t( const Vector &center, float radius, IServerEntity *pEntity, AI_MoveSuggType_t type )
 		 :	center(center), 
 			radius(radius), 
 			hEntity(pEntity),
@@ -145,7 +145,7 @@ private:
 		Vector				center;
 		float				radius;
 		AI_MoveSuggType_t 	type;
-		EHANDLE				hEntity;
+		CHandle<IServerEntity> hEntity;
 	};
 	
 	CUtlVector<CircleObstacles_t> m_Obstacles;

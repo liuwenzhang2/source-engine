@@ -253,7 +253,7 @@ int CHostage::OnTakeDamage_Alive( const CTakeDamageInfo &info )
 	params.m_bWarnOnDirectWaveReference = true;
 	g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 
-	CCSPlayer *player = ToCSPlayer( info.GetAttacker() );
+	CCSPlayer *player = ToCSPlayer((IServerEntity*)info.GetAttacker() );
 
 	if (player)
 	{
@@ -365,7 +365,7 @@ void CHostage::Event_Killed( const CTakeDamageInfo &info )
 	// HPE_END
 	//=============================================================================
 
-	CCSPlayer *attacker = ToCSPlayer( info.GetAttacker() );
+	CCSPlayer *attacker = ToCSPlayer((IServerEntity*)info.GetAttacker() );
 
 	if (attacker)
 	{

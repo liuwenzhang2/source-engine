@@ -281,8 +281,8 @@ void CEP2GameStats::Event_PlayerKilled( CBasePlayer *pPlayer, const CTakeDamageI
 	StatsLog( "CEP2GameStats::Event_PlayerKilled at location [%d %d %d]\n", (int)death.nPosition[ 0 ], (int)death.nPosition[ 1 ], (int)death.nPosition[ 2 ] );
 
 	// set the class of the attacker
-	CBaseEntity *pInflictor = info.GetInflictor();
-	CBaseEntity *pKiller = info.GetAttacker();
+	CBaseEntity *pInflictor = (CBaseEntity*)info.GetInflictor();
+	CBaseEntity *pKiller = (CBaseEntity*)info.GetAttacker();
 
 	if ( pInflictor )
 	{

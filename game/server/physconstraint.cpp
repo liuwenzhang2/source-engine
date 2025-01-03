@@ -63,7 +63,7 @@ public:
 		int index = m_list.AddToTail();
 		constraint_anchor_t *pAnchor = &m_list[index];
 
-		pAnchor->hEntity = pEntity->GetEngineObject()->GetMoveParent()? pEntity->GetEngineObject()->GetMoveParent()->GetOuter():NULL;
+		pAnchor->hEntity = pEntity->GetEngineObject()->GetMoveParent() ? (CBaseEntity*)pEntity->GetEngineObject()->GetMoveParent()->GetOuter() : NULL;
 		pAnchor->parentAttachment = pEntity->GetEngineObject()->GetParentAttachment();
 		pAnchor->name = pEntity->GetEntityName();
 		pAnchor->localOrigin = pEntity->GetEngineObject()->GetLocalOrigin();
@@ -401,7 +401,7 @@ void CPhysConstraint::Spawn( void )
 
 // debug function - slow, uses dynamic_cast<> - use this to query the attached objects
 // physics_debug_entity toggles the constraint system for an object using this
-bool GetConstraintAttachments( CBaseEntity *pEntity, CBaseEntity *pAttachOut[2], IPhysicsObject *pAttachVPhysics[2] )
+bool GetConstraintAttachments( IServerEntity *pEntity, IServerEntity *pAttachOut[2], IPhysicsObject *pAttachVPhysics[2] )
 {
 	CPhysConstraint *pConstraintEntity = dynamic_cast<CPhysConstraint *>(pEntity);
 	if ( pConstraintEntity )
@@ -411,17 +411,17 @@ bool GetConstraintAttachments( CBaseEntity *pEntity, CBaseEntity *pAttachOut[2],
 		{
 			IPhysicsObject *pRef = pConstraint->GetReferenceObject();
 			pAttachVPhysics[0] = pRef;
-			pAttachOut[0] = pRef ? static_cast<CBaseEntity *>(pRef->GetGameData()) : NULL;
+			pAttachOut[0] = pRef ? static_cast<IServerEntity*>(pRef->GetGameData()) : NULL;
 			IPhysicsObject *pAttach = pConstraint->GetAttachedObject();
 			pAttachVPhysics[1] = pAttach;
-			pAttachOut[1] = pAttach ? static_cast<CBaseEntity *>(pAttach->GetGameData()) : NULL;
+			pAttachOut[1] = pAttach ? static_cast<IServerEntity*>(pAttach->GetGameData()) : NULL;
 			return true;
 		}
 	}
 	return false;
 }
 
-void DebugConstraint(CBaseEntity *pEntity)
+void DebugConstraint(IServerEntity *pEntity)
 {
 	CPhysConstraint *pConstraintEntity = dynamic_cast<CPhysConstraint *>(pEntity);
 	if ( pConstraintEntity )
@@ -578,7 +578,7 @@ void CPhysConstraint::Activate( void )
 
 IPhysicsConstraintGroup *GetConstraintGroup( string_t systemName )
 {
-	CBaseEntity *pMachine = EntityList()->FindEntityByName( NULL, systemName );
+	IServerEntity *pMachine = EntityList()->FindEntityByName( NULL, systemName );
 
 	if ( pMachine )
 	{

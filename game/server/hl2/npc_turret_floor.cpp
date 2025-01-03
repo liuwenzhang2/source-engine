@@ -577,10 +577,10 @@ void CNPC_FloorTurret::OnPhysGunDrop( CBasePlayer *pPhysGunUser, PhysGunDrop_t R
 // Purpose: Whether this should return carry angles
 // Output : Returns true on success, false on failure.
 //-----------------------------------------------------------------------------
-bool CNPC_FloorTurret::HasPreferredCarryAnglesForPlayer( CBaseEntity *pPlayer )
+bool CNPC_FloorTurret::HasPreferredCarryAnglesForPlayer( IServerEntity *pPlayer )
 {
 	// Don't use preferred angles on enemy turrets
-	if ( IRelationType( pPlayer ) == D_HT )
+	if ( IRelationType( (CBaseEntity*)pPlayer ) == D_HT )
 		return false;
 
 	return m_bUseCarryAngles;
@@ -1930,7 +1930,7 @@ int CNPC_FloorTurret::VPhysicsTakeDamage( const CTakeDamageInfo &info )
 	// Ignore bullets from the front
 	if ( !bShouldIgnoreFromFront )
 	{
-		bShouldIgnoreFromFront = FClassnameIs( info.GetInflictor(), "crossbow_bolt" );
+		bShouldIgnoreFromFront = FClassnameIs((CBaseEntity*)info.GetInflictor(), "crossbow_bolt" );
 	}
 
 	// Did it hit us on the front?
@@ -2038,9 +2038,9 @@ void CNPC_FloorTurret::SpinDown( void )
 // Input  : *pVictim - 
 // Output : float
 //-----------------------------------------------------------------------------
-float CNPC_FloorTurret::GetAttackDamageScale( CBaseEntity *pVictim )
+float CNPC_FloorTurret::GetAttackDamageScale( IHandleEntity *pVictim )
 {
-	CBaseCombatCharacter *pBCC = pVictim->MyCombatCharacterPointer();
+	CBaseCombatCharacter *pBCC = ((CBaseEntity*)pVictim)->MyCombatCharacterPointer();
 
 	// Do extra damage to antlions & combine
 	if ( pBCC )

@@ -547,10 +547,10 @@ public:
 	//---------------------------------
 
 	virtual bool			IsNPC( void ) const { return true; }
-	bool NPC_CheckBrushExclude(CBaseEntity* pBrush);
+	bool NPC_CheckBrushExclude(IServerEntity* pBrush);
 	//---------------------------------
 
-	void TestPlayerPushing( CBaseEntity *pPlayer );
+	void TestPlayerPushing( IServerEntity *pPlayer );
 	void CascadePlayerPush( const Vector &push, const Vector &pushOrigin );
 	void NotifyPushMove();
 
@@ -1411,7 +1411,7 @@ public:
 	virtual Vector		EyeDirection2D( void );
 	virtual Vector		EyeDirection3D( void );
 
-	virtual CBaseEntity *EyeLookTarget( void );		// Overridden by subclass to force look at an entity
+	virtual IServerEntity *EyeLookTarget( void );		// Overridden by subclass to force look at an entity
 	virtual void		AddLookTarget( CBaseEntity *pTarget, float flImportance, float flDuration, float flRamp = 0.0 ) { };
 	virtual void		AddLookTarget( const Vector &vecPosition, float flImportance, float flDuration, float flRamp = 0.0 ) { };
 	virtual void		SetHeadDirection( const Vector &vTargetPos, float flInterval );
@@ -1663,7 +1663,7 @@ public:
 	//-----------------------------------------------------
 
 	void				InitRelationshipTable( void );
-	void				AddRelationship( const char *pszRelationship, CBaseEntity *pActivator );
+	void				AddRelationship( const char *pszRelationship, IServerEntity *pActivator );
 
 	virtual void		AddEntityRelationship( CBaseEntity *pEntity, Disposition_t nDisposition, int nPriority );
 	virtual void		AddClassRelationship( Class_T nClass, Disposition_t nDisposition, int nPriority );
@@ -1695,7 +1695,7 @@ public:
 
 	//---------------------------------
 	
-	virtual	CBaseEntity *FindNamedEntity( const char *pszName, IEntityFindFilter *pFilter = NULL );
+	virtual	IServerEntity *FindNamedEntity( const char *pszName, IEntityFindFilter *pFilter = NULL );
 
 	//---------------------------------
 	//  States

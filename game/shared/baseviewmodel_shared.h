@@ -101,7 +101,7 @@ public:
 #endif
 
 #if !defined( CLIENT_DLL )
-	virtual bool			IsViewModel() { return true; }
+	virtual bool			IsViewModel() const { return true; }
 	virtual void			OnRestore();
 	virtual int				UpdateTransmitState( void );
 	virtual int				ShouldTransmit( const CCheckTransmitInfo *pInfo );

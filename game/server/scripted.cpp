@@ -459,7 +459,7 @@ bool CAI_ScriptedSequence::IsWaitingForBegin( void )
 // Purpose: This doesn't really make sense since only MOVETYPE_PUSH get 'Blocked' events
 // Input  : pOther - The entity blocking us.
 //-----------------------------------------------------------------------------
-void CAI_ScriptedSequence::Blocked( CBaseEntity *pOther )
+void CAI_ScriptedSequence::Blocked( IServerEntity *pOther )
 {
 }
 
@@ -509,7 +509,7 @@ CAI_BaseNPC *CAI_ScriptedSequence::FindScriptEntity( )
 {
 	CAI_BaseNPC *pEnqueueNPC = NULL;
 
-	CBaseEntity *pEntity;
+	IServerEntity *pEntity;
 	int interrupt;
 	if ( m_hForcedTarget )
 	{
@@ -530,7 +530,7 @@ CAI_BaseNPC *CAI_ScriptedSequence::FindScriptEntity( )
 
 	while ( pEntity != NULL )
 	{
-		CAI_BaseNPC *pNPC = pEntity->MyNPCPointer( );
+		CAI_BaseNPC *pNPC = ((CBaseEntity*)pEntity)->MyNPCPointer( );
 		if ( pNPC )
 		{
 			//
@@ -976,7 +976,7 @@ void CAI_ScriptedSequence::SynchNewSequence( CAI_BaseNPC::SCRIPTSTATE newState, 
 	{
 		//Msg("%s (for %s) forcing synch of %s at %0.2f\n", GetTarget()->GetDebugName(), GetDebugName(), iszSequence, gpGlobals->curtime);
 
- 		CBaseEntity *pentCine = EntityList()->FindEntityByName( NULL, GetEntityName(), NULL );
+ 		IServerEntity *pentCine = EntityList()->FindEntityByName( NULL, GetEntityName(), NULL );
 		while ( pentCine )
 		{
 			CAI_ScriptedSequence *pScene = dynamic_cast<CAI_ScriptedSequence *>(pentCine);
@@ -1215,7 +1215,7 @@ void CAI_ScriptedSequence::StopActionLoop( bool bStopSynchronizedScenes )
 	if ( !bStopSynchronizedScenes || GetEntityName() == NULL_STRING )
 		return;
 
-	CBaseEntity *pentCine = EntityList()->FindEntityByName( NULL, GetEntityName(), NULL );
+	IServerEntity *pentCine = EntityList()->FindEntityByName( NULL, GetEntityName(), NULL );
 	while ( pentCine )
 	{
 		CAI_ScriptedSequence *pScene = dynamic_cast<CAI_ScriptedSequence *>(pentCine);
@@ -1345,11 +1345,11 @@ void CAI_ScriptedSequence::CancelScript( void )
 		return;
 	}
 
-	CBaseEntity *pentCineTarget = EntityList()->FindEntityByName( NULL, GetEntityName() );
+	IServerEntity *pentCineTarget = EntityList()->FindEntityByName( NULL, GetEntityName() );
 
 	while ( pentCineTarget )
 	{
-		ScriptEntityCancel( pentCineTarget );
+		ScriptEntityCancel((CBaseEntity*)pentCineTarget );
 		pentCineTarget = EntityList()->FindEntityByName( pentCineTarget, GetEntityName() );
 	}
 }
@@ -1387,7 +1387,7 @@ void CAI_ScriptedSequence::DelayStart( bool bDelay )
 		return;
 	}
 
-	CBaseEntity *pentCine = EntityList()->FindEntityByName( NULL, GetEntityName() );
+	IServerEntity *pentCine = EntityList()->FindEntityByName( NULL, GetEntityName() );
 
 	while ( pentCine )
 	{
@@ -1436,7 +1436,7 @@ void CAI_ScriptedSequence::Activate( void )
 	//
 	// See if there is another script specified to run immediately after this one.
 	//
-	m_hNextCine = EntityList()->FindEntityByName( NULL, m_iszNextScript );
+	m_hNextCine = (CBaseEntity*)EntityList()->FindEntityByName( NULL, m_iszNextScript );
 	if ( m_hNextCine == NULL )
 	{
 		m_iszNextScript = NULL_STRING;
@@ -1693,11 +1693,11 @@ void CAI_ScriptedSchedule::ScriptThink( void )
 //-----------------------------------------------------------------------------
 CAI_BaseNPC *CAI_ScriptedSchedule::FindScriptEntity( bool bCyclic )
 {
-	CBaseEntity *pEntity = EntityList()->FindEntityGenericWithin( m_hLastFoundEntity, STRING( m_iszEntity ), GetEngineObject()->GetAbsOrigin(), m_flRadius, this, m_hActivator );
+	IServerEntity *pEntity = EntityList()->FindEntityGenericWithin( m_hLastFoundEntity, STRING( m_iszEntity ), GetEngineObject()->GetAbsOrigin(), m_flRadius, this, m_hActivator );
 
 	while ( pEntity != NULL )
 	{
-		CAI_BaseNPC *pNPC = pEntity->MyNPCPointer();
+		CAI_BaseNPC *pNPC = ((CBaseEntity*)pEntity)->MyNPCPointer();
 		if ( pNPC && pNPC->IsAlive() && pNPC->IsInterruptable())
 		{
 			if ( bCyclic )
@@ -1726,7 +1726,7 @@ void CAI_ScriptedSchedule::StartSchedule( CAI_BaseNPC *pTarget )
 	if ( pTarget == NULL )
 		return;
 
-	CBaseEntity *pGoalEnt = EntityList()->FindEntityGeneric( NULL, STRING( m_sGoalEnt ), this, NULL );
+	IServerEntity *pGoalEnt = EntityList()->FindEntityGeneric( NULL, STRING( m_sGoalEnt ), this, NULL );
 
 	// NOTE: !!! all possible choices require a goal ent currently
 	if ( !pGoalEnt ) 
@@ -1772,10 +1772,10 @@ void CAI_ScriptedSchedule::StartSchedule( CAI_BaseNPC *pTarget )
 	//
 	if ( m_nSchedule == SCHED_SCRIPT_ENEMY_IS_GOAL || m_nSchedule == SCHED_SCRIPT_ENEMY_IS_GOAL_AND_RUN_TO_GOAL )
 	{
-		if ( pGoalEnt && pGoalEnt->MyCombatCharacterPointer() )
+		if ( pGoalEnt && pGoalEnt->IsCombatCharacter() )
 		{
-			pTarget->SetEnemy( pGoalEnt );
-			pTarget->UpdateEnemyMemory( pGoalEnt, pGoalEnt->GetEngineObject()->GetAbsOrigin() );
+			pTarget->SetEnemy( (CBaseEntity*)pGoalEnt );
+			pTarget->UpdateEnemyMemory((CBaseEntity*)pGoalEnt, pGoalEnt->GetEngineObject()->GetAbsOrigin() );
 			pTarget->SetCondition( COND_SCHEDULE_DONE );
 		}
 		else
@@ -1800,7 +1800,7 @@ void CAI_ScriptedSchedule::StartSchedule( CAI_BaseNPC *pTarget )
 				movementActivity = ACT_FLY;
 			}
 
-			if (!pTarget->ScheduledMoveToGoalEntity( SCHED_IDLE_WALK, pGoalEnt, movementActivity ))
+			if (!pTarget->ScheduledMoveToGoalEntity( SCHED_IDLE_WALK, (CBaseEntity*)pGoalEnt, movementActivity ))
 			{
 				if (!(GetEngineObject()->GetSpawnFlags() & SF_SCRIPT_NO_COMPLAINTS))
 				{
@@ -1822,7 +1822,7 @@ void CAI_ScriptedSchedule::StartSchedule( CAI_BaseNPC *pTarget )
 			{
 				movementActivity = ACT_FLY;
 			}
-			if (!pTarget->ScheduledFollowPath( SCHED_IDLE_WALK, pGoalEnt, movementActivity ))
+			if (!pTarget->ScheduledFollowPath( SCHED_IDLE_WALK, (CBaseEntity*)pGoalEnt, movementActivity ))
 			{
 				if (!(GetEngineObject()->GetSpawnFlags() & SF_SCRIPT_NO_COMPLAINTS))
 				{
@@ -1857,7 +1857,7 @@ void CAI_ScriptedSchedule::InputStartSchedule( inputdata_t &inputdata )
 	if ( !m_bDidFireOnce || (GetEngineObject()->GetSpawnFlags() & SF_SCRIPT_REPEATABLE))
 	{
 		// DVS TODO: Is the NPC already playing the script?
-		m_hActivator = inputdata.pActivator;
+		m_hActivator = (CBaseEntity*)inputdata.pActivator;
 		SetThink( &CAI_ScriptedSchedule::ScriptThink );
 		GetEngineObject()->SetNextThink( gpGlobals->curtime );
 	}
@@ -2016,7 +2016,7 @@ void CAI_ScriptedSentence::InputBeginSentence( inputdata_t &inputdata )
 	if ( !m_active )
 		return;
 
-	m_pActivator = inputdata.pActivator;
+	m_pActivator = (CBaseEntity*)inputdata.pActivator;
 
 	//Msg( "Firing sentence: %s\n", STRING( m_iszSentence ));
 	SetThink( &CAI_ScriptedSentence::FindThink );
@@ -2146,7 +2146,7 @@ bool CAI_ScriptedSentence::AcceptableSpeaker( CAI_BaseNPC *pNPC )
 //-----------------------------------------------------------------------------
 CAI_BaseNPC *CAI_ScriptedSentence::FindEntity( void )
 {
-	CBaseEntity *pentTarget;
+	IServerEntity *pentTarget;
 	CAI_BaseNPC *pNPC;
 
 	pentTarget = EntityList()->FindEntityByName( NULL, m_iszEntity );
@@ -2154,7 +2154,7 @@ CAI_BaseNPC *CAI_ScriptedSentence::FindEntity( void )
 
 	while (pentTarget)
 	{
-		pNPC = pentTarget->MyNPCPointer();
+		pNPC = ((CBaseEntity*)pentTarget)->MyNPCPointer();
 		if ( pNPC != NULL )
 		{
 			if ( AcceptableSpeaker( pNPC ) )
@@ -2164,12 +2164,12 @@ CAI_BaseNPC *CAI_ScriptedSentence::FindEntity( void )
 		pentTarget = EntityList()->FindEntityByName( pentTarget, m_iszEntity );
 	}
 	
-	CBaseEntity *pEntity = NULL;
+	IServerEntity *pEntity = NULL;
 	for ( CEntitySphereQuery sphere(GetEngineObject()->GetAbsOrigin(), m_flRadius, FL_NPC ); ( pEntity = sphere.GetCurrentEntity() ) != NULL; sphere.NextEntity() )
 	{
 		if (FClassnameIs( pEntity, STRING(m_iszEntity)))
 		{
-			pNPC = pEntity->MyNPCPointer( );
+			pNPC = ((CBaseEntity*)pEntity)->MyNPCPointer( );
 			if ( AcceptableSpeaker( pNPC ) )
 				return pNPC;
 		}
@@ -2196,7 +2196,7 @@ int CAI_ScriptedSentence::StartSentence( CAI_BaseNPC *pTarget )
 	if ( !(GetEngineObject()->GetSpawnFlags() & SF_SENTENCE_CONCURRENT))
 		bConcurrent = true;
 
-	CBaseEntity *pListener = NULL;
+	IServerEntity *pListener = NULL;
 
 	if (GetEngineObject()->GetSpawnFlags() & SF_SENTENCE_SPEAKTOACTIVATOR)
 	{
@@ -2212,7 +2212,7 @@ int CAI_ScriptedSentence::StartSentence( CAI_BaseNPC *pTarget )
 		pListener = EntityList()->FindEntityGenericNearest( STRING( m_iszListener ), pTarget->GetEngineObject()->GetAbsOrigin(), radius, this, NULL );
 	}
 
-	int sentenceIndex = pTarget->PlayScriptedSentence( STRING(m_iszSentence), m_flDelay,  m_flVolume, m_iSoundLevel, bConcurrent, pListener );
+	int sentenceIndex = pTarget->PlayScriptedSentence( STRING(m_iszSentence), m_flDelay,  m_flVolume, m_iSoundLevel, bConcurrent, (CBaseEntity*)pListener );
 	DevMsg( 2, "Playing sentence %s\n", STRING(m_iszSentence) );
 
 	m_OnBeginSentence.FireOutput(NULL, this);

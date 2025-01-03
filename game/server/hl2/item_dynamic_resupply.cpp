@@ -266,7 +266,7 @@ void CItem_DynamicResupply::Precache( void )
 //-----------------------------------------------------------------------------
 void CItem_DynamicResupply::CheckPVSThink( void )
 {
-	CBaseEntity *pentPlayer = EntityList()->FindClientInPVS( this );
+	IServerEntity *pentPlayer = EntityList()->FindClientInPVS( this );
 	if ( pentPlayer )
 	{
 		CBasePlayer *pPlayer = (CBasePlayer *)pentPlayer;
@@ -397,7 +397,7 @@ void CItem_DynamicResupply::FindPotentialItems( int nCount, DynamicResupplyItems
 	}
 
 	// Count the potential addition of items in the PVS
-	CBaseEntity *pEntity = NULL;
+	IServerEntity *pEntity = NULL;
 	while ( (pEntity = EntityList()->EntitiesInPVS( this, pEntity )) != NULL )
 	{
 		if ( pEntity->WorldSpaceCenter().DistToSqr( WorldSpaceCenter() ) > (POTENTIAL_ITEM_RADIUS * POTENTIAL_ITEM_RADIUS) )
@@ -644,7 +644,7 @@ void DynamicResupply_InitFromAlternateMaster( CBaseEntity *pTargetEnt, string_t 
 	}
 
 	CItem_DynamicResupply *pTargetResupply = assert_cast<CItem_DynamicResupply *>( pTargetEnt );
-	CBaseEntity *pMasterEnt = EntityList()->FindEntityByName( NULL, iszMaster );
+	IServerEntity *pMasterEnt = EntityList()->FindEntityByName( NULL, iszMaster );
 
 	if ( !pMasterEnt || !pMasterEnt->ClassMatches( pTargetResupply->GetClassname() ) )
 	{

@@ -656,6 +656,7 @@ public:
 	//	SOLID_BSP:		Entity space
 	//	SOLID_VPHYSICS	Not used
 	void SetCollisionBounds(const Vector& mins, const Vector& maxs);
+	void SetSize(const Vector& vecMin, const Vector& vecMax); // GetEngineObject()->SetSize( mins, maxs );
 	SolidType_t GetSolid(void) const;
 	bool IsSolid() const;
 	void SetSolid(SolidType_t val);	// Set to one of the SOLID_ defines.
@@ -843,7 +844,7 @@ public:
 	void UpdateModelScale(void);
 	const model_t* GetModel(void) const;
 	void SetModelPointer(const model_t* pModel);
-	IStudioHdr* GetModelPtr() const;
+	IStudioHdr* GetModelPtr(void) const;
 	void InvalidateMdlCache();
 	void SetCycle(float flCycle);
 	float GetCycle() const;
@@ -1700,6 +1701,12 @@ inline void C_EngineObjectInternal::SetCollisionBounds(const Vector& mins, const
 	m_Collision.SetCollisionBounds(mins, maxs);
 }
 
+// Stuff implemented for weapon prediction code
+inline void C_EngineObjectInternal::SetSize(const Vector& vecMin, const Vector& vecMax)
+{
+	SetCollisionBounds(vecMin, vecMax);
+}
+
 inline const Vector& C_EngineObjectInternal::GetCollisionOrigin() const
 {
 	return m_Collision.GetCollisionOrigin();
@@ -2046,7 +2053,7 @@ inline const model_t* C_EngineObjectInternal::GetModel(void) const
 // Purpose: return a pointer to an updated studiomdl cache cache
 //-----------------------------------------------------------------------------
 
-inline IStudioHdr* C_EngineObjectInternal::GetModelPtr() const
+inline IStudioHdr* C_EngineObjectInternal::GetModelPtr(void) const
 {
 	//if ( IsDynamicModelLoading() )
 	//	return NULL;

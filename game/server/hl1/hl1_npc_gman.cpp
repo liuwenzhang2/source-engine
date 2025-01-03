@@ -156,7 +156,7 @@ void CNPC_GMan::StartTask( const Task_t *pTask )
 	case TASK_WAIT:
 		if (m_hPlayer == NULL)
 		{
-			m_hPlayer = EntityList()->FindEntityByClassname( NULL, "player" );
+			m_hPlayer = (CBaseEntity*)EntityList()->FindEntityByClassname( NULL, "player" );
 		}
 		break;
 	}

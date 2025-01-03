@@ -863,7 +863,7 @@ void CNavArea::ComputeEarliestOccupyTimes( void )
 	const float playerSpeed = 240.0f;
 
 	ShortestPathCost cost;
-	CBaseEntity *spot;
+	IServerEntity *spot;
 
 	// determine the shortest time it will take a Terrorist to reach this area
 	int team = TEAM_TERRORIST % MAX_NAV_TEAMS;

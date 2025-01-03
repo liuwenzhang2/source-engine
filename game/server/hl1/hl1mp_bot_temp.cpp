@@ -113,7 +113,7 @@ void Bot_RunAll( void )
 {
 	for ( int i = 1; i <= gpGlobals->maxClients; i++ )
 	{
-		CHL1MP_Player *pPlayer = ToHL1MPPlayer( EntityList()->GetPlayerByIndex( i ) );
+		CHL1MP_Player *pPlayer = ToHL1MPPlayer(EntityList()->GetPlayerByIndex( i ) );
 
 		if ( pPlayer && (pPlayer->GetEngineObject()->GetFlags() & FL_FAKECLIENT) )
 		{

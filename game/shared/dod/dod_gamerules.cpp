@@ -224,14 +224,14 @@ static CDODViewVectors g_DODViewVectors(
 				if ( CanLoadEntityFromEntText( pNodeName ) )
 				{
 					// Spawn the entity
-					CBaseEntity *pNode = (CBaseEntity*)EntityList()->CreateEntityByName( pNodeName );
+					IServerEntity *pNode = EntityList()->CreateEntityByName( pNodeName );
 					if ( pNode )
 					{
-						ParseEntKVBlock( pNode, pkvNode );
+						ParseEntKVBlock((CBaseEntity*)pNode, pkvNode );
 						DispatchSpawn( pNode );
 
 						EHANDLE hHandle;
-						hHandle = pNode;
+						hHandle = (CBaseEntity*)pNode;
 						m_hSpawnedEntities.AddToTail( hHandle );
 					}
 					else
@@ -965,7 +965,7 @@ static CDODViewVectors g_DODViewVectors(
 		{
 			retval = 1.0;
 		}
-		else if (!(tr.DidHitWorld()) && (tr.m_pEnt != NULL) && (((CBaseEntity*)tr.m_pEnt)->GetOwnerEntity() != pEntityToIgnore))
+		else if (!(tr.DidHitWorld()) && (tr.m_pEnt != NULL) && (tr.m_pEnt->GetOwnerEntity() != pEntityToIgnore))
 		{
 			// if we didn't hit world geometry perhaps there's still damage to be done here.
 
@@ -1257,7 +1257,7 @@ static CDODViewVectors g_DODViewVectors(
 				{
 					// get the percentage of the target entity that is visible from the
 					// explosion position.
-					flDamagePercentage = GetAmountOfEntityVisible(vecSrc, pEntity, info.GetInflictor() );
+					flDamagePercentage = GetAmountOfEntityVisible(vecSrc, pEntity, (CBaseEntity*)info.GetInflictor() );
 				}
 
 				if (flDamagePercentage > 0.0)
@@ -1304,7 +1304,7 @@ static CDODViewVectors g_DODViewVectors(
 
 	void CDODGameWorld::RadiusStun( const CTakeDamageInfo &info, const Vector &vecSrc, float flRadius )
 	{
-		CBaseEntity *pEntity = NULL;
+		IServerEntity *pEntity = NULL;
 		trace_t		tr;
 		float		flAdjustedDamage, falloff;
 		Vector		vecSpot;
@@ -1334,7 +1334,7 @@ static CDODViewVectors g_DODViewVectors(
 			if ( !pEntity || !pEntity->IsPlayer() )
 				continue;
 
-			if ( pEntity->m_takedamage != DAMAGE_NO )
+			if ( pEntity->GetTakeDamage() != DAMAGE_NO )
 			{
 				// radius damage can only be blocked by the world
 				vecSpot = pEntity->BodyTarget( vecSrc );
@@ -1688,12 +1688,12 @@ static CDODViewVectors g_DODViewVectors(
 	void TestSpawnPointType( const char *pEntClassName )
 	{
 		// Find the next spawn spot.
-		CBaseEntity *pSpot = EntityList()->FindEntityByClassname( NULL, pEntClassName );
+		IServerEntity *pSpot = EntityList()->FindEntityByClassname( NULL, pEntClassName );
 
 		while( pSpot )
 		{
 			// check if pSpot is valid
-			if( g_pGameRules->IsSpawnPointValid( pSpot, NULL ) )
+			if( g_pGameRules->IsSpawnPointValid((CBaseEntity*)pSpot, NULL ) )
 			{
 				// the successful spawn point's location
 				NDebugOverlay::Box( pSpot->GetEngineObject()->GetAbsOrigin(), VEC_HULL_MIN, VEC_HULL_MAX, 0, 255, 0, 100, 60 );
@@ -1728,10 +1728,10 @@ static CDODViewVectors g_DODViewVectors(
 	}
 	ConCommand cc_TestSpawns( "map_showspawnpoints", TestSpawns, "Dev - test the spawn points, draws for 60 seconds", FCVAR_CHEAT );
 
-	CBaseEntity *CDODGameWorld::GetPlayerSpawnSpot( CBasePlayer *pPlayer )
+	IServerEntity *CDODGameWorld::GetPlayerSpawnSpot( CBasePlayer *pPlayer )
 	{
 		// get valid spawn point
-		CBaseEntity *pSpawnSpot = pPlayer->EntSelectSpawnPoint();
+		IServerEntity *pSpawnSpot = pPlayer->EntSelectSpawnPoint();
 
 		// drop down to ground
 		Vector GroundPos = DropToGround( pPlayer, pSpawnSpot->GetEngineObject()->GetAbsOrigin(), VEC_HULL_MIN, VEC_HULL_MAX );
@@ -2530,7 +2530,7 @@ const CDODViewVectors *CDODGameWorld::GetDODViewVectors() const
 		m_iLastAxisCapEvent = CAP_EVENT_NONE;
 
 		//find all the control points, init the timer
-		CBaseEntity *pEnt =	EntityList()->FindEntityByClassname( NULL, "dod_control_point_master" );
+		IServerEntity *pEnt = EntityList()->FindEntityByClassname( NULL, "dod_control_point_master" );
 
 		if( !pEnt )
 		{
@@ -2593,7 +2593,7 @@ const CDODViewVectors *CDODGameWorld::GetDODViewVectors() const
 		}
 
 		//init the cap areas
-		pEnt =	EntityList()->FindEntityByClassname( NULL, "dod_capture_area" );
+		pEnt = EntityList()->FindEntityByClassname( NULL, "dod_capture_area" );
 		while( pEnt )
 		{
 			variant_t emptyVariant;
@@ -2610,7 +2610,7 @@ const CDODViewVectors *CDODGameWorld::GetDODViewVectors() const
 		m_bAlliesAreBombing = false;
 		m_bAxisAreBombing = false;
 
-		pEnt =	EntityList()->FindEntityByClassname( NULL, "dod_bomb_target" );
+		pEnt = EntityList()->FindEntityByClassname( NULL, "dod_bomb_target" );
 		while( pEnt )
 		{
 			CDODBombTarget *pTarget = dynamic_cast<CDODBombTarget *>( pEnt );
@@ -2645,7 +2645,7 @@ const CDODViewVectors *CDODGameWorld::GetDODViewVectors() const
 	void CDODGameWorld::State_Enter_RND_RUNNING( void )
 	{
 		//find all the control points, init the timer
-		CBaseEntity *pEnt =	EntityList()->FindEntityByClassname( NULL, "dod_control_point_master" );
+		IServerEntity *pEnt = EntityList()->FindEntityByClassname( NULL, "dod_control_point_master" );
 
 		while( pEnt )
 		{
@@ -2686,7 +2686,7 @@ const CDODViewVectors *CDODGameWorld::GetDODViewVectors() const
 				bool bBombBlocksWin = false;
 
 				//find all the control points, init the timer
-				CBaseEntity *pEnt =	EntityList()->FindEntityByClassname( NULL, "dod_bomb_target" );
+				IServerEntity *pEnt = EntityList()->FindEntityByClassname( NULL, "dod_bomb_target" );
 
 				while( pEnt )
 				{
@@ -2709,7 +2709,7 @@ const CDODViewVectors *CDODGameWorld::GetDODViewVectors() const
 						{
 							// find active dod_control_point_masters, ask them if this flag capping 
 							// would end the game
-							CBaseEntity *pEnt =	EntityList()->FindEntityByClassname( NULL, "dod_control_point_master" );
+							IServerEntity *pEnt = EntityList()->FindEntityByClassname( NULL, "dod_control_point_master" );
 
 							while( pEnt )
 							{
@@ -2742,7 +2742,7 @@ const CDODViewVectors *CDODGameWorld::GetDODViewVectors() const
 					// minor hackage - dod_gamerules should be responsible for team win events, not dod_cpm
 
 					//find all the control points, init the timer
-					CBaseEntity *pEnt =	EntityList()->FindEntityByClassname( NULL, "dod_control_point_master" );
+					IServerEntity *pEnt = EntityList()->FindEntityByClassname( NULL, "dod_control_point_master" );
 
 					while( pEnt )
 					{
@@ -3037,7 +3037,7 @@ const CDODViewVectors *CDODGameWorld::GetDODViewVectors() const
 		}
 
 		// Get rid of all entities except players.
-		CBaseEntity *pCur = EntityList()->FirstEnt();
+		IServerEntity *pCur = EntityList()->FirstEnt();
 		while ( pCur )
 		{
 			if ( !FindInList( s_PreserveEnts, pCur->GetClassname() ) )
@@ -3077,7 +3077,7 @@ const CDODViewVectors *CDODGameWorld::GetDODViewVectors() const
 			}
 
 
-			virtual CBaseEntity* CreateNextEntity( const char *pClassname )
+			virtual IServerEntity* CreateNextEntity( const char *pClassname )
 			{
 				if ( m_iIterator == g_MapEntityRefs.InvalidIndex() )
 				{
@@ -3096,13 +3096,13 @@ const CDODViewVectors *CDODGameWorld::GetDODViewVectors() const
 					{
 						// Doh! The entity was delete and its slot was reused.
 						// Just use any old edict slot. This case sucks because we lose the baseline.
-						return (CBaseEntity*)EntityList()->CreateEntityByName( pClassname );
+						return EntityList()->CreateEntityByName( pClassname );
 					}
 					else
 					{
 						// Cool, the slot where this entity was is free again (most likely, the entity was 
 						// freed above). Now create an entity with this specific index.
-						return (CBaseEntity*)EntityList()->CreateEntityByName( pClassname, ref.m_iEdict );
+						return EntityList()->CreateEntityByName( pClassname, ref.m_iEdict );
 					}
 				}
 			}
@@ -3802,19 +3802,19 @@ const CDODViewVectors *CDODGameWorld::GetDODViewVectors() const
 			// Count the number of spawn points for each team
 			// This determines the maximum number of players allowed on each
 
-			CBaseEntity* ent = NULL;
+			IServerEntity* ent = NULL;
 			
 			m_iSpawnPointCount_Allies	= 0;
 			m_iSpawnPointCount_Axis		= 0;
 
 			while ( ( ent = EntityList()->FindEntityByClassname( ent, "info_player_allies" ) ) != NULL )
 			{
-				if ( IsSpawnPointValid( ent, NULL ) )
+				if ( IsSpawnPointValid((CBaseEntity*)ent, NULL ) )
 				{
 					m_iSpawnPointCount_Allies++;
 
 					// store in a list
-					m_AlliesSpawnPoints.AddToTail( ent );
+					m_AlliesSpawnPoints.AddToTail((CBaseEntity*)ent );
 				}
 				else
 				{
@@ -3825,12 +3825,12 @@ const CDODViewVectors *CDODGameWorld::GetDODViewVectors() const
 
 			while ( ( ent = EntityList()->FindEntityByClassname( ent, "info_player_axis" ) ) != NULL )
 			{
-				if ( IsSpawnPointValid( ent, NULL ) ) 
+				if ( IsSpawnPointValid((CBaseEntity*)ent, NULL ) )
 				{
 					m_iSpawnPointCount_Axis++;
 
 					// store in a list
-					m_AxisSpawnPoints.AddToTail( ent );
+					m_AxisSpawnPoints.AddToTail((CBaseEntity*)ent );
 				}
 				else
 				{
@@ -4063,8 +4063,8 @@ const CDODViewVectors *CDODGameWorld::GetDODViewVectors() const
 		//	pDODVictim->HintMessage( HINT_DEATHCAM );
 		//}
 
-		CBaseEntity *pInflictor = info.GetInflictor();
-		CBaseEntity *pKiller = info.GetAttacker();
+		CBaseEntity *pInflictor = (CBaseEntity*)info.GetInflictor();
+		CBaseEntity *pKiller = (CBaseEntity*)info.GetAttacker();
 		CDODPlayer *pScorer = ToDODPlayer( GetDeathScorer( pKiller, pInflictor ) );
 
 		if( pScorer && pScorer->IsPlayer() && pScorer != pVictim )
@@ -4166,7 +4166,7 @@ const CDODViewVectors *CDODGameWorld::GetDODViewVectors() const
 	{
 		bool bFound = false;
 
-		CBaseEntity *pEnt = NULL;
+		IServerEntity *pEnt = NULL;
 		
 		pEnt = EntityList()->FindEntityByClassname( pEnt, "info_doddetect" );
 
@@ -4372,8 +4372,8 @@ const CDODViewVectors *CDODGameWorld::GetDODViewVectors() const
 		int killer_ID = 0;
 
 		// Find the killer & the scorer
-		CBaseEntity *pInflictor = info.GetInflictor();
-		CBaseEntity *pKiller = info.GetAttacker();
+		CBaseEntity *pInflictor = (CBaseEntity*)info.GetInflictor();
+		CBaseEntity *pKiller = (CBaseEntity*)info.GetAttacker();
 		CDODPlayer *pScorer = ToDODPlayer( GetDeathScorer( pKiller, pInflictor ) );
 		CDODPlayer *pDODVictim = ToDODPlayer( pVictim );
 
@@ -4865,8 +4865,8 @@ int CDODGameWorld::DODPointsForKill( CBasePlayer *pVictim, const CTakeDamageInfo
 	if ( IsInWarmup() )
 		return 0;
 
-	CBaseEntity *pInflictor = info.GetInflictor();
-	CBaseEntity *pKiller = info.GetAttacker();
+	CBaseEntity *pInflictor = (CBaseEntity*)info.GetInflictor();
+	CBaseEntity *pKiller = (CBaseEntity*)info.GetAttacker();
 	CDODPlayer *pScorer = ToDODPlayer( GetDeathScorer( pKiller, pInflictor ) );
 
 	// Don't give -1 points for killing a teammate with the bomb.

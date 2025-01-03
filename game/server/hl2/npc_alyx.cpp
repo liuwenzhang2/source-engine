@@ -186,7 +186,7 @@ void CNPC_Alyx::CreateEmpTool( void )
 	if ( m_hEmpTool )
 	{
 		m_hEmpTool->SetModel( "models/alyx_emptool_prop.mdl" );
-		m_hEmpTool->SetName( "Alyx_Emptool" );
+		m_hEmpTool->GetEngineObject()->SetName( "Alyx_Emptool" );
 		int iAttachment = GetEngineObject()->LookupAttachment( "Emp_Holster" );
 		m_hEmpTool->GetEngineObject()->SetParent(this->GetEngineObject(), iAttachment);
 		m_hEmpTool->SetOwnerEntity(this);

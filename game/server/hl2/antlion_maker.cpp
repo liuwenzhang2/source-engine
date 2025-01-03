@@ -99,7 +99,7 @@ void CAntlionMakerManager::BroadcastFollowGoal( CBaseEntity *pFollowGoal )
 //-----------------------------------------------------------------------------
 void CAntlionMakerManager::GatherMakers( void )
 {
-	CBaseEntity				*pSearch = NULL;
+	IServerEntity				*pSearch = NULL;
 	CAntlionTemplateMaker	*pMaker;
 
 	m_Makers.Purge();
@@ -224,7 +224,7 @@ void CAntlionTemplateMaker::RemoveChild( CNPC_Antlion *pAnt )
 //-----------------------------------------------------------------------------
 void CAntlionTemplateMaker::FixupOrphans( void )
 {
-	CBaseEntity		*pSearch = NULL;
+	IServerEntity		*pSearch = NULL;
 	CNPC_Antlion	*pAntlion = NULL;
 
 	// Iterate through all antlions and see if there are any orphans
@@ -248,7 +248,7 @@ void CAntlionTemplateMaker::FixupOrphans( void )
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-void CAntlionTemplateMaker::PrecacheTemplateEntity( CBaseEntity *pEntity )
+void CAntlionTemplateMaker::PrecacheTemplateEntity( IServerEntity *pEntity )
 {
 	BaseClass::PrecacheTemplateEntity( pEntity );
 
@@ -318,7 +318,7 @@ void CAntlionTemplateMaker::ActivateSpore( const char* sporename, Vector vOrigin
 		return;
 	}
 
-	CBaseEntity *pEnt = (CBaseEntity*)EntityList()->CreateEntityByName( "env_sporeexplosion" );
+	IServerEntity *pEnt = EntityList()->CreateEntityByName( "env_sporeexplosion" );
 
 	if ( pEnt )
 	{
@@ -327,7 +327,7 @@ void CAntlionTemplateMaker::ActivateSpore( const char* sporename, Vector vOrigin
 		if ( pSpore )
 		{
 			pSpore->GetEngineObject()->SetAbsOrigin( vOrigin );
-			pSpore->SetName( szName );
+			pSpore->GetEngineObject()->SetName( szName );
 			pSpore->m_flSpawnRate = ANTLION_MAKE_SPORE_SPAWNRATE;
 		}
 	}
@@ -463,27 +463,27 @@ void CAntlionTemplateMaker::UpdateChildren( void )
 // Purpose: 
 // Input  : strTarget - 
 //-----------------------------------------------------------------------------
-void CAntlionTemplateMaker::SetFightTarget( string_t strTarget, CBaseEntity *pActivator, CBaseEntity *pCaller )
+void CAntlionTemplateMaker::SetFightTarget( string_t strTarget, IServerEntity *pActivator, IServerEntity *pCaller )
 {
 	if (GetEngineObject()->HasSpawnFlags( SF_ANTLIONMAKER_RANDOM_FIGHT_TARGET ) )
 	{
-		CBaseEntity *pSearch = m_hFightTarget;
+		IServerEntity *pSearch = m_hFightTarget;
 
 		for ( int i = random->RandomInt(1,5); i > 0; i-- )
 			pSearch = EntityList()->FindEntityByName( pSearch, strTarget, this, pActivator, pCaller );
 
 		if ( pSearch != NULL )
 		{
-			SetFightTarget( pSearch );
+			SetFightTarget((CBaseEntity*)pSearch );
 		}
 		else
 		{
-			SetFightTarget( EntityList()->FindEntityByName( NULL, strTarget, this, pActivator, pCaller ) );
+			SetFightTarget((CBaseEntity*)EntityList()->FindEntityByName( NULL, strTarget, this, pActivator, pCaller ) );
 		}
 	}
 	else 
 	{
-		SetFightTarget( EntityList()->FindEntityByName( NULL, strTarget, this, pActivator, pCaller ) );
+		SetFightTarget((CBaseEntity*)EntityList()->FindEntityByName( NULL, strTarget, this, pActivator, pCaller ) );
 	}
 }
 
@@ -521,13 +521,13 @@ void CAntlionTemplateMaker::SetFollowTarget( CBaseEntity *pTarget )
 // Purpose: 
 // Input  : *pTarget - 
 //-----------------------------------------------------------------------------
-void CAntlionTemplateMaker::SetFollowTarget( string_t strTarget, CBaseEntity *pActivator, CBaseEntity *pCaller )
+void CAntlionTemplateMaker::SetFollowTarget( string_t strTarget, IServerEntity *pActivator, IServerEntity *pCaller )
 {
-	CBaseEntity *pSearch = EntityList()->FindEntityByName( NULL, strTarget, NULL, pActivator, pCaller );
+	IServerEntity *pSearch = EntityList()->FindEntityByName( NULL, strTarget, NULL, pActivator, pCaller );
 
 	if ( pSearch != NULL )
 	{
-		SetFollowTarget( pSearch );
+		SetFollowTarget((CBaseEntity*)pSearch );
 	}
 }
 
@@ -664,12 +664,12 @@ void CAntlionTemplateMaker::MakeNPC( void )
 	QAngle	targetAngles = GetEngineObject()->GetAbsAngles();
 
 	// Look for our target entity
-	CBaseEntity *pTarget = EntityList()->FindEntityByName( NULL, m_strSpawnTarget, this );
+	IServerEntity *pTarget = EntityList()->FindEntityByName( NULL, m_strSpawnTarget, this );
 
 	// Take its position if it exists
 	if ( pTarget != NULL )
 	{
-		UTIL_PredictedPosition( pTarget, 1.5f, &targetOrigin );
+		UTIL_PredictedPosition((CBaseEntity*)pTarget, 1.5f, &targetOrigin );
 	}
 
 	Vector	spawnOrigin = vec3_origin;
@@ -680,7 +680,7 @@ void CAntlionTemplateMaker::MakeNPC( void )
 
 	if (GetEngineObject()->HasSpawnFlags( SF_ANTLIONMAKER_SPAWN_CLOSE_TO_TARGET ) )
 	{
-		if ( FindNearTargetSpawnPosition( spawnOrigin, m_flSpawnRadius, pTarget ) == false )
+		if ( FindNearTargetSpawnPosition( spawnOrigin, m_flSpawnRadius, (CBaseEntity*)pTarget ) == false )
 			return;
 	}
 	else
@@ -700,7 +700,7 @@ void CAntlionTemplateMaker::MakeNPC( void )
  	
 	// Create the entity via a template
 	CAI_BaseNPC	*pent = NULL;
-	CBaseEntity *pEntity = NULL;
+	IServerEntity *pEntity = NULL;
 	MapEntity_ParseEntity( pEntity, STRING(m_iszTemplateData), NULL );
 	
 	if ( pEntity != NULL )
@@ -717,7 +717,7 @@ void CAntlionTemplateMaker::MakeNPC( void )
 	if ( !GetEngineObject()->HasSpawnFlags( SF_ANTLIONMAKER_SPAWN_CLOSE_TO_TARGET ) )
 	{
 		// Lock this hint node
-		pNode->Lock( pEntity );
+		pNode->Lock( (CBaseEntity*)pEntity );
 		
 		// Unlock it in two seconds, this forces subsequent antlions to 
 		// reject this point as a spawn point to spread them out a bit
@@ -1743,7 +1743,7 @@ void CAntlionTemplateMaker::DrawDebugGeometryOverlays( void )
 		if ( m_strSpawnTarget != NULL_STRING )
 		{
 			// Find all the possible targets
-			CBaseEntity *pTarget = EntityList()->FindEntityByName( NULL, m_strSpawnTarget );
+			IServerEntity *pTarget = EntityList()->FindEntityByName( NULL, m_strSpawnTarget );
 			if ( pTarget != NULL )
 			{
 				NDebugOverlay::VertArrow(GetEngineObject()->GetAbsOrigin(), pTarget->WorldSpaceCenter(), 4.0f, 255, 255, 255, 0, true, 0.05f );
@@ -1754,7 +1754,7 @@ void CAntlionTemplateMaker::DrawDebugGeometryOverlays( void )
 		if ( m_strFollowTarget != NULL_STRING )
 		{
 			// Find all the possible targets
-			CBaseEntity *pTarget = EntityList()->FindEntityByName( NULL, m_strFollowTarget );
+			IServerEntity *pTarget = EntityList()->FindEntityByName( NULL, m_strFollowTarget );
 			if ( pTarget != NULL )
 			{
 				NDebugOverlay::VertArrow(GetEngineObject()->GetAbsOrigin(), pTarget->WorldSpaceCenter(), 4.0f, 255, 255, 0, 0, true, 0.05f );
@@ -1765,7 +1765,7 @@ void CAntlionTemplateMaker::DrawDebugGeometryOverlays( void )
 		if ( m_strFightTarget != NULL_STRING )
 		{
 			// Find all the possible targets
-			CBaseEntity *pTarget = EntityList()->FindEntityByName( NULL, m_strFightTarget );
+			IServerEntity *pTarget = EntityList()->FindEntityByName( NULL, m_strFightTarget );
 			if ( pTarget != NULL )
 			{
 				NDebugOverlay::VertArrow(GetEngineObject()->GetAbsOrigin(), pTarget->WorldSpaceCenter(), 4.0f, 255, 0, 0, 0, true, 0.05f );

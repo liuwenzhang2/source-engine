@@ -179,7 +179,7 @@ void CHL1_Player::PreThink(void)
 	// Train speed control
 	if ( m_afPhysicsFlags & PFLAG_DIROVERRIDE )
 	{
-		CBaseEntity* pTrain = GetEngineObject()->GetGroundEntity() ? GetEngineObject()->GetGroundEntity()->GetOuter() : NULL;
+		CBaseEntity* pTrain = GetEngineObject()->GetGroundEntity() ? (CBaseEntity*)GetEngineObject()->GetGroundEntity()->GetOuter() : NULL;
 		float vel;
 
 		if ( pTrain )
@@ -412,9 +412,9 @@ CBaseEntity	*CHL1_Player::GiveNamedItem( const char *pszName, int iSubType )
 
 	// Msg( "giving %s\n", pszName );
 
-	EHANDLE pent;
+	IServerEntity* pent;
 
-	pent = (CBaseEntity*)EntityList()->CreateEntityByName(pszName);
+	pent = EntityList()->CreateEntityByName(pszName);
 	if ( pent == NULL )
 	{
 		Msg( "NULL Ent in GiveNamedItem!\n" );
@@ -426,7 +426,7 @@ CBaseEntity	*CHL1_Player::GiveNamedItem( const char *pszName, int iSubType )
 
 	if ( iSubType )
 	{
-		CBaseCombatWeapon *pWeapon = dynamic_cast<CBaseCombatWeapon*>( (CBaseEntity*)pent );
+		CBaseCombatWeapon *pWeapon = dynamic_cast<CBaseCombatWeapon*>( pent );
 		if ( pWeapon )
 		{
 			pWeapon->SetSubType( iSubType );
@@ -440,7 +440,7 @@ CBaseEntity	*CHL1_Player::GiveNamedItem( const char *pszName, int iSubType )
 		pent->Touch( this );
 	}
 
-	return pent;
+	return (CBaseEntity*)pent;
 }
 
 //-----------------------------------------------------------------------------
@@ -792,7 +792,7 @@ int	CHL1_Player::OnTakeDamage( const CTakeDamageInfo &inputInfo )
 	// go take the damage first
 
 	
-	if ( !g_pGameRules->FPlayerCanTakeDamage( this, info.GetAttacker(), info ) )
+	if ( !g_pGameRules->FPlayerCanTakeDamage( this, (CBaseEntity*)info.GetAttacker(), info ) )
 	{
 		// Refuse the damage
 		return 0;
@@ -1381,13 +1381,13 @@ void CPlayerPickupController::Init( CBasePlayer *pPlayer, CBaseEntity *pObject )
 //-----------------------------------------------------------------------------
 void CPlayerPickupController::Shutdown( bool bThrown )
 {
-	CBaseEntity *pObject = GetGrabController()->GetAttached();
+	IServerEntity *pObject = GetGrabController()->GetAttached();
 
 	GetGrabController()->DetachEntity(false);
 
 	if ( pObject != NULL )
 	{
-		Pickup_OnPhysGunDrop( pObject, m_pPlayer, bThrown ? THROWN_BY_PLAYER : DROPPED_BY_PLAYER );
+		Pickup_OnPhysGunDrop((CBaseEntity*)pObject, m_pPlayer, bThrown ? THROWN_BY_PLAYER : DROPPED_BY_PLAYER );
 	}
 
 	if ( m_pPlayer )
@@ -1408,7 +1408,7 @@ void CPlayerPickupController::Use( IServerEntity *pActivator, IServerEntity *pCa
 {
 	if ( ToBasePlayer(pActivator) == m_pPlayer )
 	{
-		CBaseEntity *pAttached = GetGrabController()->GetAttached();
+		IServerEntity *pAttached = GetGrabController()->GetAttached();
 
 		// UNDONE: Use vphysics stress to decide to drop objects
 		// UNDONE: Must fix case of forcing objects into the ground you're standing on (causes stress) before that will work

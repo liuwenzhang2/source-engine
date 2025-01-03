@@ -153,7 +153,7 @@ public:
 
 	void DumpTimers( void ) const;	// debugging to help track down a stuck server (rare?)
 
-	CBaseEntity *GetPlayerSpawnSpot( CBasePlayer *pPlayer );
+	IServerEntity *GetPlayerSpawnSpot( CBasePlayer *pPlayer );
 
 	static void EndRound();
 

@@ -580,7 +580,7 @@ END_PREDICTION_DATA()
 			flBombRadius = g_pMapInfo->m_flBombRadius;
 
 		// Output to the bomb target ent
-		CBaseEntity *pTarget = NULL;
+		IServerEntity *pTarget = NULL;
 		variant_t emptyVariant;
 		while ((pTarget = EntityList()->FindEntityByClassname( pTarget, "func_bomb_target" )) != NULL)
 		{
@@ -1048,7 +1048,7 @@ void CC4::PrimaryAttack()
 				
 				if ( pBombTarget )
 				{
-					CBaseEntity *pAttachPoint = EntityList()->FindEntityByName( NULL, pBombTarget->GetBombMountTarget() );
+					IServerEntity *pAttachPoint = EntityList()->FindEntityByName( NULL, pBombTarget->GetBombMountTarget() );
 
 					if ( pAttachPoint )
 					{

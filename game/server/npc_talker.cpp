@@ -298,10 +298,10 @@ Activity CNPCSimpleTalker::NPC_TranslateActivity( Activity eNewActivity )
 
 void CNPCSimpleTalker::Event_Killed( const CTakeDamageInfo &info )
 {
-	AlertFriends( info.GetAttacker() );
+	AlertFriends((CBaseEntity*)info.GetAttacker() );
 	if ( info.GetAttacker()->GetEngineObject()->GetFlags() & FL_CLIENT )
 	{
-		LimitFollowers( info.GetAttacker(), 0 );
+		LimitFollowers((CBaseEntity*)info.GetAttacker(), 0 );
 	}
 	BaseClass::Event_Killed( info );
 }
@@ -311,7 +311,7 @@ void CNPCSimpleTalker::Event_Killed( const CTakeDamageInfo &info )
 //-----------------------------------------------------------------------------
 CBaseEntity	*CNPCSimpleTalker::EnumFriends( CBaseEntity *pPrevious, int listNumber, bool bTrace )
 {
-	CBaseEntity *pFriend = pPrevious;
+	IServerEntity *pFriend = pPrevious;
 	char *pszFriend;
 	trace_t tr;
 	Vector vecCheck;
@@ -336,7 +336,7 @@ CBaseEntity	*CNPCSimpleTalker::EnumFriends( CBaseEntity *pPrevious, int listNumb
 
 		if (tr.fraction == 1.0)
 		{
-			return pFriend;
+			return (CBaseEntity*)pFriend;
 		}
 	}
 
@@ -467,12 +467,12 @@ void CNPCSimpleTalker::HandleAnimEvent( animevent_t *pEvent )
 //-----------------------------------------------------------------------------
 // Purpose: Scan for nearest, visible friend. If fPlayer is true, look for nearest player
 //-----------------------------------------------------------------------------
-bool CNPCSimpleTalker::IsValidSpeechTarget( int flags, CBaseEntity *pEntity )
+bool CNPCSimpleTalker::IsValidSpeechTarget( int flags, IServerEntity *pEntity )
 {
 	return BaseClass::IsValidSpeechTarget( flags, pEntity );
 }
 
-CBaseEntity *CNPCSimpleTalker::FindNearestFriend(bool fPlayer)
+IServerEntity *CNPCSimpleTalker::FindNearestFriend(bool fPlayer)
 {
 	return FindSpeechTarget( (fPlayer) ? AIST_PLAYERS : AIST_NPCS );
 }
@@ -527,11 +527,11 @@ int CNPCSimpleTalker::FIdleHello( void )
 		return false;
 
 	// get a player
-	CBaseEntity *pPlayer = FindNearestFriend(true);
+	IServerEntity *pPlayer = FindNearestFriend(true);
 
 	if (pPlayer)
 	{
-		if (FInViewCone(pPlayer) && FVisible(pPlayer))
+		if (FInViewCone(pPlayer) && FVisible((CBaseEntity*)pPlayer))
 		{
 			SayHelloToPlayer( pPlayer );
 			return true;
@@ -544,7 +544,7 @@ int CNPCSimpleTalker::FIdleHello( void )
 //-----------------------------------------------------------------------------
 // Purpose: Say hello to the specified player
 //-----------------------------------------------------------------------------
-void CNPCSimpleTalker::SayHelloToPlayer( CBaseEntity *pPlayer )
+void CNPCSimpleTalker::SayHelloToPlayer( IServerEntity *pPlayer )
 {
 	Assert( !GetExpresser()->SpokeConcept(TLK_HELLO) );
 
@@ -680,7 +680,7 @@ int CNPCSimpleTalker::FIdleSpeak( void )
 	*/
 
 	// Otherwise, play an idle statement, try to face client when making a statement.
-	CBaseEntity *pFriend = FindNearestFriend(true);
+	IServerEntity *pFriend = FindNearestFriend(true);
 	if ( pFriend )
 	{
 		SetSpeechTarget( pFriend );
@@ -717,7 +717,7 @@ int CNPCSimpleTalker::FIdleSpeak( void )
 //-----------------------------------------------------------------------------
 // Purpose: Speak the right question based upon who we're asking
 //-----------------------------------------------------------------------------
-bool CNPCSimpleTalker::SpeakQuestionFriend( CBaseEntity *pFriend )
+bool CNPCSimpleTalker::SpeakQuestionFriend( IServerEntity *pFriend )
 {
 	return Speak( TLK_QUESTION );
 }
@@ -725,7 +725,7 @@ bool CNPCSimpleTalker::SpeakQuestionFriend( CBaseEntity *pFriend )
 //-----------------------------------------------------------------------------
 // Purpose: Speak the right answer based upon who we're answering
 //-----------------------------------------------------------------------------
-bool CNPCSimpleTalker::SpeakAnswerFriend( CBaseEntity *pFriend )
+bool CNPCSimpleTalker::SpeakAnswerFriend( IServerEntity *pFriend )
 {
 	return Speak( TLK_ANSWER );
 }
@@ -793,7 +793,7 @@ int CNPCSimpleTalker::OnTakeDamage_Alive( const CTakeDamageInfo &info )
 	// if player damaged this entity, have other friends talk about it.
 	if (subInfo.GetAttacker() && (subInfo.GetAttacker()->GetEngineObject()->GetFlags() & FL_CLIENT) && subInfo.GetDamage() < GetHealth() )
 	{
-		CBaseEntity *pFriend = FindNearestFriend(false);
+		IServerEntity *pFriend = FindNearestFriend(false);
 
 		if (pFriend && pFriend->IsAlive())
 		{

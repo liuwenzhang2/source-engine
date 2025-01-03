@@ -48,17 +48,17 @@ CVoiceGameMgr g_VoiceGameMgr;
 // ------------------------------------------------------------------------ //
 
 // Find a player with a case-insensitive name search.
-static CBasePlayer* FindPlayerByName(const char *pTestName)
+static IServerEntity* FindPlayerByName(const char *pTestName)
 {
 	for(int i=1; i <= gpGlobals->maxClients; i++)
 	{
-		CBaseEntity *pEnt = EntityList()->GetBaseEntity(i);
+		IServerEntity *pEnt = EntityList()->GetBaseEntity(i);
 		if(pEnt && pEnt->IsPlayer())
 		{			
 			const char *pNetName = STRING(pEnt->GetEntityName());
 			if(stricmp(pNetName, pTestName) == 0)
 			{
-				return (CBasePlayer*)pEnt;
+				return pEnt;
 			}
 		}
 	}
@@ -199,7 +199,7 @@ void CVoiceGameMgr::UpdateMasks()
 
 	for(int iClient=0; iClient < m_nMaxPlayers; iClient++)
 	{
-		CBaseEntity *pEnt = EntityList()->GetPlayerByIndex(iClient+1);
+		IServerEntity *pEnt = EntityList()->GetPlayerByIndex(iClient+1);
 		if(!pEnt || !pEnt->IsPlayer())
 			continue;
 
@@ -225,7 +225,7 @@ void CVoiceGameMgr::UpdateMasks()
 			// Build a mask of who they can hear based on the game rules.
 			for(int iOtherClient=0; iOtherClient < m_nMaxPlayers; iOtherClient++)
 			{
-				CBaseEntity *pEnt = EntityList()->GetPlayerByIndex(iOtherClient+1);
+				IServerEntity *pEnt = EntityList()->GetPlayerByIndex(iOtherClient+1);
 				if(pEnt && pEnt->IsPlayer() && 
 					(bAllTalk || m_pHelper->CanPlayerHearPlayer(pPlayer, (CBasePlayer*)pEnt, bProximity )) )
 				{

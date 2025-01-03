@@ -231,7 +231,7 @@ public:
 	void Use( IServerEntity *pActivator, IServerEntity *pCaller, USE_TYPE useType, float value );
 
 	// input filtering (use/touch/blocked)
-	bool PassesInputFilter( CBaseEntity *pOther, int filter );
+	bool PassesInputFilter( IServerEntity *pOther, int filter );
 
 	// input functions
 	void InputEnable( inputdata_t &inputdata )
@@ -295,9 +295,9 @@ void CTriggerBrush::Spawn( void )
 //-----------------------------------------------------------------------------
 void CTriggerBrush::StartTouch( IServerEntity *pOther )
 {
-	if ( PassesInputFilter((CBaseEntity*)pOther, m_iInputFilter) && !(m_iInputFilter & TRIGGER_IGNORETOUCH) )
+	if ( PassesInputFilter( pOther, m_iInputFilter) && !(m_iInputFilter & TRIGGER_IGNORETOUCH) )
 	{
-		m_OnStartTouch.FireOutput((CBaseEntity*)pOther, this );
+		m_OnStartTouch.FireOutput(pOther, this );
 		if ( !m_iDontMessageParent )
 			BaseClass::StartTouch( pOther );
 	}
@@ -310,9 +310,9 @@ void CTriggerBrush::StartTouch( IServerEntity *pOther )
 //-----------------------------------------------------------------------------
 void CTriggerBrush::EndTouch( IServerEntity *pOther )
 {
-	if ( PassesInputFilter((CBaseEntity*)pOther, m_iInputFilter) && !(m_iInputFilter & TRIGGER_IGNORETOUCH) )
+	if ( PassesInputFilter( pOther, m_iInputFilter) && !(m_iInputFilter & TRIGGER_IGNORETOUCH) )
 	{
-		m_OnEndTouch.FireOutput((CBaseEntity*)pOther, this );
+		m_OnEndTouch.FireOutput(pOther, this );
 
 		if ( !m_iDontMessageParent )
 			BaseClass::EndTouch( pOther );
@@ -329,9 +329,9 @@ void CTriggerBrush::EndTouch( IServerEntity *pOther )
 //-----------------------------------------------------------------------------
 void CTriggerBrush::Use( IServerEntity *pActivator, IServerEntity *pCaller, USE_TYPE useType, float value )
 {
-	if ( PassesInputFilter((CBaseEntity*)pActivator, m_iInputFilter) && !(m_iInputFilter & TRIGGER_IGNOREUSE) )
+	if ( PassesInputFilter( pActivator, m_iInputFilter) && !(m_iInputFilter & TRIGGER_IGNOREUSE) )
 	{
-		m_OnUse.FireOutput((CBaseEntity*)pActivator, this );
+		m_OnUse.FireOutput(pActivator, this );
 		if ( !m_iDontMessageParent )
 		{
 			BaseClass::Use( pActivator, pCaller, useType, value );
@@ -346,7 +346,7 @@ void CTriggerBrush::Use( IServerEntity *pActivator, IServerEntity *pCaller, USE_
 //			filter - a field of standard filters (TriggerFilters_e)
 // Output : Returns true if the input passes, false if it should be ignored
 //-----------------------------------------------------------------------------
-bool CTriggerBrush::PassesInputFilter( CBaseEntity *pOther, int filter )
+bool CTriggerBrush::PassesInputFilter( IServerEntity *pOther, int filter )
 {
 	if ( !filter )
 		return true;

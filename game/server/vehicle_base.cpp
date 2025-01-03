@@ -110,7 +110,7 @@ void CPropVehicle::Spawn( )
 CON_COMMAND(vehicle_flushscript, "Flush and reload all vehicle scripts")
 {
 	EntityList()->FlushVehicleScripts();
-	for ( CBaseEntity *pEnt = EntityList()->FirstEnt(); pEnt != NULL; pEnt = EntityList()->NextEnt(pEnt) )
+	for ( IServerEntity *pEnt = EntityList()->FirstEnt(); pEnt != NULL; pEnt = EntityList()->NextEnt(pEnt) )
 	{
 		IServerVehicle *pServerVehicle = pEnt->GetServerVehicle();
 		if ( pServerVehicle )
@@ -992,7 +992,7 @@ void CPropVehicleDriveable::VPhysicsCollision( int index, gamevcollisionevent_t 
 
 	// Make sure we don't keep hitting the same entity
 	int otherIndex = !index;
-	CBaseEntity *pHitEntity = pEvent->pEntities[otherIndex];
+	CBaseEntity *pHitEntity = (CBaseEntity*)pEvent->pEntities[otherIndex];
 	if ( pEvent->deltaCollisionTime < 0.5 && (pHitEntity == this) )
 		return;
 
@@ -1082,7 +1082,7 @@ void CPropVehicleDriveable::TraceAttack( const CTakeDamageInfo &info, const Vect
 				continue;
 
 			variant_t emptyVariant;
-			m_hPhysicsChildren[i]->AcceptInput( "VehiclePunted", info.GetAttacker(), this, emptyVariant, USE_TOGGLE );
+			m_hPhysicsChildren[i]->AcceptInput( "VehiclePunted", (CBaseEntity*)info.GetAttacker(), this, emptyVariant, USE_TOGGLE );
 		}
 #endif // HL2_EPISODIC
 
@@ -1160,7 +1160,7 @@ bool CPropVehicleDriveable::NPC_RemovePassenger( CAI_BaseNPC *pPassenger )
 // Input  : *pVictim - 
 //			&info - 
 //-----------------------------------------------------------------------------
-void CPropVehicleDriveable::Event_KilledOther( CBaseEntity *pVictim, const CTakeDamageInfo &info )
+void CPropVehicleDriveable::Event_KilledOther( IServerEntity *pVictim, const CTakeDamageInfo &info )
 { 
 	CBaseEntity *pDriver = GetDriver();
 	if ( pDriver != NULL )

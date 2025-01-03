@@ -757,7 +757,7 @@ void CInfoAPCMissileHint::Activate( )
 {
 	BaseClass::Activate();
 
-	m_hTarget = EntityList()->FindEntityByName( NULL, m_target );
+	m_hTarget = (CBaseEntity*)EntityList()->FindEntityByName( NULL, m_target );
 	if ( m_hTarget == NULL )
 	{
 		DevWarning( "%s: Could not find target '%s'!\n", GetClassname(), STRING( m_target ) );

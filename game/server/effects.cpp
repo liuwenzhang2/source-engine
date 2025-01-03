@@ -289,7 +289,7 @@ void CEnvTracer::Activate( void )
 {
 	BaseClass::Activate();
 
-	CBaseEntity *pEnd = EntityList()->FindEntityByName( NULL, m_target );
+	IServerEntity *pEnd = EntityList()->FindEntityByName( NULL, m_target );
 	if (pEnd != NULL)
 	{
 		m_vecEnd = pEnd->GetEngineObject()->GetLocalOrigin();
@@ -1032,7 +1032,7 @@ public:
 	void InputEmitBlood( inputdata_t &inputdata );
 
 	Vector	Direction( void );
-	Vector	BloodPosition( CBaseEntity *pActivator );
+	Vector	BloodPosition( IServerEntity *pActivator );
 
 	DECLARE_DATADESC();
 
@@ -1118,7 +1118,7 @@ Vector CBlood::Direction( void )
 }
 
 
-Vector CBlood::BloodPosition( CBaseEntity *pActivator )
+Vector CBlood::BloodPosition( IServerEntity *pActivator )
 {
 	if (GetEngineObject()->HasSpawnFlags( SF_BLOOD_PLAYER ) )
 	{
@@ -1169,11 +1169,11 @@ void CBlood::InputEmitBlood( inputdata_t &inputdata )
 {
 	if (GetEngineObject()->HasSpawnFlags( SF_BLOOD_STREAM ) )
 	{
-		UTIL_BloodStream( BloodPosition(inputdata.pActivator), Direction(), Color(), BloodAmount() );
+		UTIL_BloodStream( BloodPosition( inputdata.pActivator), Direction(), Color(), BloodAmount() );
 	}
 	else
 	{
-		UTIL_BloodDrips( BloodPosition(inputdata.pActivator), Direction(), Color(), BloodAmount() );
+		UTIL_BloodDrips( BloodPosition( inputdata.pActivator), Direction(), Color(), BloodAmount() );
 	}
 
 	if (GetEngineObject()->HasSpawnFlags( SF_BLOOD_DECAL ) )
@@ -1220,7 +1220,7 @@ void CBlood::InputEmitBlood( inputdata_t &inputdata )
 //-----------------------------------------------------------------------------
 void CC_BloodSpray( const CCommand &args )
 {
-	CBaseEntity *pEnt = NULL;
+	IServerEntity *pEnt = NULL;
 	while ( ( pEnt = EntityList()->FindEntityGeneric( pEnt, args[1] ) ) != NULL )
 	{
 		Vector forward;
@@ -1906,10 +1906,10 @@ LINK_ENTITY_TO_CLASS( env_muzzleflash, CEnvMuzzleFlash );
 //-----------------------------------------------------------------------------
 void CEnvMuzzleFlash::Spawn()
 {
-	if ( (m_iszParentAttachment != NULL_STRING) && GetEngineObject()->GetMoveParent() && GetEngineObject()->GetMoveParent()->GetOuter()->GetBaseAnimating())
+	if ( (m_iszParentAttachment != NULL_STRING) && GetEngineObject()->GetMoveParent() && GetEngineObject()->GetMoveParent()->GetModelPtr())
 	{
-		CBaseAnimating *pAnim = GetEngineObject()->GetMoveParent()->GetOuter()->GetBaseAnimating();
-		int nParentAttachment = pAnim->GetEngineObject()->LookupAttachment( STRING(m_iszParentAttachment) );
+		IEngineObjectServer *pAnim = GetEngineObject()->GetMoveParent();
+		int nParentAttachment = pAnim->LookupAttachment( STRING(m_iszParentAttachment) );
 		if ( nParentAttachment > 0 )
 		{
 			GetEngineObject()->SetParent(GetEngineObject()->GetMoveParent(), nParentAttachment);
@@ -2155,7 +2155,7 @@ void CEnvGunfire::Activate( void )
 	// Find my target
 	if (m_target != NULL_STRING)
 	{
-		m_hTarget = EntityList()->FindEntityByName( NULL, m_target );
+		m_hTarget = (CBaseEntity*)EntityList()->FindEntityByName( NULL, m_target );
 	}
 
 	BaseClass::Activate();

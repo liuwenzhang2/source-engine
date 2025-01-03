@@ -590,7 +590,7 @@ void CBreakable::BreakTouch( IServerEntity *pOther )
 			OnTakeDamage( CTakeDamageInfo( (CBaseEntity*)pOther, (CBaseEntity*)pOther, flDamage, DMG_CRUSH ) );
 
 			// do a little damage to player if we broke glass or computer
-			CTakeDamageInfo info((CBaseEntity*)pOther, (CBaseEntity*)pOther, flDamage/4, DMG_SLASH );
+			CTakeDamageInfo info(pOther, pOther, flDamage/4, DMG_SLASH );
 			CalculateMeleeDamageForce( &info, (pOther->GetEngineObject()->GetAbsOrigin() - GetEngineObject()->GetAbsOrigin()), GetEngineObject()->GetAbsOrigin() );
 			pOther->TakeDamage( info );
 		}
@@ -629,7 +629,7 @@ void CBreakable::InputAddHealth( inputdata_t &inputdata )
 //-----------------------------------------------------------------------------
 void CBreakable::InputBreak( inputdata_t &inputdata )
 {
-	Break( inputdata.pActivator );
+	Break((CBaseEntity*)inputdata.pActivator );
 }
 
 
@@ -677,7 +677,7 @@ void CBreakable::InputSetMass( inputdata_t &inputdata )
 //			pActivator - 
 // Output : Returns true if the breakable survived, false if it died (broke).
 //-----------------------------------------------------------------------------
-bool CBreakable::UpdateHealth( int iNewHealth, CBaseEntity *pActivator )
+bool CBreakable::UpdateHealth( int iNewHealth, IServerEntity *pActivator )
 {
 	if ( iNewHealth != m_iHealth )
 	{
@@ -695,7 +695,7 @@ bool CBreakable::UpdateHealth( int iNewHealth, CBaseEntity *pActivator )
 
 		if ( m_iHealth <= 0 )
 		{
-			Break( pActivator );
+			Break( (CBaseEntity*)pActivator );
 			return false;
 		}
 		else
@@ -788,7 +788,7 @@ void CBreakable::VPhysicsCollision( int index, gamevcollisionevent_t *pEvent )
 	{
 		// We're toast
 		m_bTookPhysicsDamage = true;
-		CBaseEntity *pHitEntity = pEvent->pEntities[!index];
+		CBaseEntity *pHitEntity = (CBaseEntity*)pEvent->pEntities[!index];
 
 		// HACKHACK: Reset mass to get correct collision response for the object breaking this glass
 		if ( m_Material == matGlass )
@@ -801,7 +801,7 @@ void CBreakable::VPhysicsCollision( int index, gamevcollisionevent_t *pEvent )
 	else if ( !GetEngineObject()->HasSpawnFlags( SF_BREAK_DONT_TAKE_PHYSICS_DAMAGE ) )
 	{
 		int otherIndex = !index;
-		CBaseEntity *pOther = pEvent->pEntities[otherIndex];
+		CBaseEntity *pOther = (CBaseEntity*)pEvent->pEntities[otherIndex];
 
 		// We're to take normal damage from this
 		int damageType;
@@ -854,7 +854,7 @@ int CBreakable::OnTakeDamage( const CTakeDamageInfo &info )
 	// HACK: slam health back to what it was so UpdateHealth can do its thing
 	int iNewHealth = m_iHealth;
 	m_iHealth = iPrevHealth;
-	if ( !UpdateHealth( iNewHealth, info.GetAttacker() ) )
+	if ( !UpdateHealth( iNewHealth, (CBaseEntity*)info.GetAttacker() ) )
 		return 1;
 
 	// Make a shard noise each time func breakable is hit, if it's capable of taking damage
@@ -1109,7 +1109,7 @@ void CBreakable::Die( void )
 	ResetOnGroundFlags();
 
 	// Don't fire something that could fire myself
-	SetName( "");
+	GetEngineObject()->SetName( "");
 
 	GetEngineObject()->AddSolidFlags( FSOLID_NOT_SOLID );
 	
@@ -1313,7 +1313,7 @@ int CPushable::OnTakeDamage( const CTakeDamageInfo &info )
 void CPushable::VPhysicsCollision( int index, gamevcollisionevent_t *pEvent )
 {
 	int otherIndex = !index;
-	CBaseEntity *pOther = pEvent->pEntities[otherIndex];
+	CBaseEntity *pOther = (CBaseEntity*)pEvent->pEntities[otherIndex];
 	if ( pOther->IsPlayer() )
 	{
 		// Pushables don't take damage from impacts with the player

@@ -67,7 +67,7 @@ int UTIL_ClientsInGame( void )
 
 	for ( int i = 1; i <= gpGlobals->maxClients; ++i )
 	{
-		CBaseEntity *player = EntityList()->GetPlayerByIndex( i );
+		CBaseEntity *player = (CBaseEntity*)EntityList()->GetPlayerByIndex( i );
 
 		if (player == NULL)
 			continue;
@@ -88,7 +88,7 @@ int UTIL_HumansOnTeam( int teamID, bool isAlive )
 
 	for ( int i = 1; i <= gpGlobals->maxClients; ++i )
 	{
-		CBaseEntity *entity = EntityList()->GetPlayerByIndex( i );
+		CBaseEntity *entity = (CBaseEntity*)EntityList()->GetPlayerByIndex( i );
 
 		if ( entity == NULL )
 			continue;

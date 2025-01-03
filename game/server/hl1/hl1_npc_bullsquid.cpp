@@ -670,7 +670,7 @@ int CNPC_Bullsquid::OnTakeDamage_Alive( const CTakeDamageInfo &inputInfo )
 	}
 #endif
 
-	if ( !FClassnameIs ( inputInfo.GetAttacker(), "monster_headcrab" ) )
+	if ( !FClassnameIs ((CBaseEntity*)inputInfo.GetAttacker(), "monster_headcrab" ) )
 	{
 		// don't forget about headcrabs if it was a headcrab that hurt the squid.
 		m_flLastHurtTime = gpGlobals->curtime;

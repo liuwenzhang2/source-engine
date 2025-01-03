@@ -123,9 +123,9 @@ CBaseEntity* CTesla::GetSourceEntity()
 {
 	if ( m_SourceEntityName != NULL_STRING )
 	{
-		CBaseEntity *pRet = EntityList()->FindEntityByName( NULL, m_SourceEntityName );
+		IServerEntity *pRet = EntityList()->FindEntityByName( NULL, m_SourceEntityName );
 		if ( pRet )
-			return pRet;
+			return (CBaseEntity*)pRet;
 	}
 
 	return this;

@@ -675,7 +675,7 @@ void CGrenadeHomer::AimThink( void )
 int CGrenadeHomer::OnTakeDamage( const CTakeDamageInfo &info )
 {
 	// Don't take damage from other homing grenades so can shoot in vollies
-	if (FClassnameIs( info.GetInflictor(), "grenade_homer"))
+	if (FClassnameIs((CBaseEntity*)info.GetInflictor(), "grenade_homer"))
 	{
 		return 0;
 	}

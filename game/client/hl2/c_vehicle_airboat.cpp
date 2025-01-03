@@ -297,7 +297,7 @@ void C_PropAirboat::UpdateViewAngles( C_BasePlayer *pLocalPlayer, CUserCmd *pCmd
 			if ( IsX360() )
 			{
 				// Only reset this if there isn't an autoaim target!
-				C_BaseHLPlayer *pLocalHLPlayer = (C_BaseHLPlayer *)pLocalPlayer;
+				C_BaseHLPlayer *pLocalHLPlayer = ToHL2Player(pLocalPlayer);
 				if ( pLocalHLPlayer )
 				{
 					// Get the autoaim target.

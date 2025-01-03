@@ -69,7 +69,7 @@ void CFuncAreaPortalWindow::Activate()
 	BaseClass::Activate();
 	
 	// Find our background model.
-	CBaseEntity *pBackground = EntityList()->FindEntityByName( NULL, m_iBackgroundBModelName );
+	IServerEntity *pBackground = EntityList()->FindEntityByName( NULL, m_iBackgroundBModelName );
 	if( pBackground )
 	{
 		m_iBackgroundModelIndex  = modelinfo->GetModelIndex( STRING( pBackground->GetEngineObject()->GetModelName() ) );
@@ -77,7 +77,7 @@ void CFuncAreaPortalWindow::Activate()
 	}
 
 	// Find our target and steal its bmodel.
-	CBaseEntity *pTarget = EntityList()->FindEntityByName( NULL, m_target );
+	IServerEntity*pTarget = EntityList()->FindEntityByName( NULL, m_target );
 	if( pTarget )
 	{
 		SetModel( STRING(pTarget->GetEngineObject()->GetModelName()) );

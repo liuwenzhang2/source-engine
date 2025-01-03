@@ -1345,7 +1345,7 @@ void CBasePlayer::PlayerUse ( void )
 			}
 			else
 			{	// Start controlling the train!
-				CBaseEntity* pTrain = GetEngineObject()->GetGroundEntity() ? GetEngineObject()->GetGroundEntity()->GetOuter() : NULL;
+				CBaseEntity* pTrain = GetEngineObject()->GetGroundEntity() ? (CBaseEntity*)GetEngineObject()->GetGroundEntity()->GetOuter() : NULL;
 				if ( pTrain && !(m_nButtons & IN_JUMP) && (GetEngineObject()->GetFlags() & FL_ONGROUND) && (pTrain->ObjectCaps() & FCAP_DIRECTIONAL_USE) && pTrain->OnControls(this) )
 				{
 					m_afPhysicsFlags |= PFLAG_DIROVERRIDE;

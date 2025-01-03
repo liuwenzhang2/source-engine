@@ -1510,7 +1510,7 @@ void CWeaponCSBase::DefaultTouch(IServerEntity *pOther)
 		
 		if ( pPlayer )
 		{
-			m_OnPlayerUse.FireOutput( (CBaseEntity*)pActivator, (CBaseEntity*)pCaller );
+			m_OnPlayerUse.FireOutput( pActivator, pCaller );
 		}
 	}
 
@@ -1829,7 +1829,7 @@ void CWeaponCSBase::OnPickedUp( CBaseCombatCharacter *pNewOwner )
 		// Robin: We don't want to delete weapons the player has picked up, so
 		// clear the name of the weapon. This prevents wildcards that are meant
 		// to find NPCs finding weapons dropped by the NPCs as well.
-		SetName( "");
+		GetEngineObject()->SetName( "");
 	}
 
 	// Someone picked me up, so make it so that I can't be removed.

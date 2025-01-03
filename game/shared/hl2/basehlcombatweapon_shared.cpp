@@ -120,7 +120,7 @@ bool CBaseHLCombatWeapon::Deploy( void )
 	// We have to ask the player if the last time it checked, the weapon was lowered
 	if ( GetOwner() && GetOwner()->IsPlayer() )
 	{
-		CHL2_Player *pPlayer = assert_cast<CHL2_Player*>( GetOwner() );
+		CHL2_Player *pPlayer = ToHL2Player( GetOwner() );
 		if ( pPlayer->IsWeaponLowered() )
 		{
 			if (GetEngineObject()->SelectWeightedSequence( ACT_VM_IDLE_LOWERED ) != ACTIVITY_NOT_AVAILABLE )
@@ -191,7 +191,7 @@ void CBaseHLCombatWeapon::WeaponIdle( void )
 	if ( WeaponShouldBeLowered() )
 	{
 #if !defined( CLIENT_DLL )
-		CHL2_Player *pPlayer = dynamic_cast<CHL2_Player*>(GetOwner());
+		CHL2_Player *pPlayer = ToHL2Player(GetOwner());
 
 		if( pPlayer )
 		{

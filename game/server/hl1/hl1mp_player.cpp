@@ -190,7 +190,7 @@ void CHL1MP_Player::UpdateOnRemove( void )
 
 void CHL1MP_Player::DetonateSatchelCharges( void )
 {
-	CBaseEntity *pSatchel = NULL;
+	IServerEntity *pSatchel = NULL;
 
 	while ( (pSatchel = EntityList()->FindEntityByClassname( pSatchel, "monster_satchel" ) ) != NULL)
 	{

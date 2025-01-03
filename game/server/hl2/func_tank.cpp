@@ -350,10 +350,10 @@ void CFuncTank::InputFindNPCToManTank( inputdata_t &inputdata )
 		return;
 
 	// NPC assigned to man the func_tank?
-	CBaseEntity *pEntity = EntityList()->FindEntityByName( NULL, inputdata.value.StringID() );
+	IServerEntity *pEntity = EntityList()->FindEntityByName( NULL, inputdata.value.StringID() );
 	if ( pEntity )
 	{
-		CAI_BaseNPC *pNPC = pEntity->MyNPCPointer();
+		CAI_BaseNPC *pNPC = ((CBaseEntity*)pEntity)->MyNPCPointer();
 		if ( pNPC )
 		{
 			// Verify the npc has the func_tank controller behavior.
@@ -678,9 +678,9 @@ void CFuncTank::TraceAttack( CBaseEntity *pAttacker, float flDamage, const Vecto
 // Input  : targetName - 
 //			pActivator - 
 //-----------------------------------------------------------------------------
-CBaseEntity *CFuncTank::FindTarget( string_t targetName, CBaseEntity *pActivator ) 
+CBaseEntity *CFuncTank::FindTarget( string_t targetName, IServerEntity *pActivator ) 
 {
-	return EntityList()->FindEntityGenericNearest( STRING( targetName ), GetEngineObject()->GetAbsOrigin(), 0, this, pActivator );
+	return (CBaseEntity*)EntityList()->FindEntityGenericNearest( STRING( targetName ), GetEngineObject()->GetAbsOrigin(), 0, this, pActivator );
 }
 
 
@@ -752,15 +752,15 @@ void CFuncTank::Spawn( void )
 
 	m_hControlVolume	= NULL;
 
-	if (GetEngineObject()->GetMoveParent() && GetEngineObject()->GetMoveParent()->GetOuter()->GetBaseAnimating())
+	if (GetEngineObject()->GetMoveParent() && GetEngineObject()->GetMoveParent()->GetModelPtr())
 	{
-		CBaseAnimating *pAnim = GetEngineObject()->GetMoveParent()->GetOuter()->GetBaseAnimating();
+		IEngineObjectServer *pAnim = GetEngineObject()->GetMoveParent();
 		if ( m_iszBaseAttachment != NULL_STRING )
 		{
-			int nAttachment = pAnim->GetEngineObject()->LookupAttachment( STRING( m_iszBaseAttachment ) );
+			int nAttachment = pAnim->LookupAttachment( STRING( m_iszBaseAttachment ) );
 			if ( nAttachment != 0 )
 			{
-				GetEngineObject()->SetParent( pAnim->GetEngineObject(), nAttachment);
+				GetEngineObject()->SetParent( pAnim, nAttachment);
 				GetEngineObject()->SetLocalOrigin( vec3_origin );
 				GetEngineObject()->SetLocalAngles( vec3_angle );
 			}
@@ -772,16 +772,16 @@ void CFuncTank::Spawn( void )
 		{
 			if ( m_bUsePoseParameters )
 			{
-				pAnim->GetEngineObject()->SetPoseParameter( STRING( m_iszYawPoseParam ), 0 );
-				pAnim->GetEngineObject()->SetPoseParameter( STRING( m_iszPitchPoseParam ), 0 );
-				pAnim->GetEngineObject()->InvalidateBoneCache();
+				pAnim->SetPoseParameter( STRING( m_iszYawPoseParam ), 0 );
+				pAnim->SetPoseParameter( STRING( m_iszPitchPoseParam ), 0 );
+				pAnim->InvalidateBoneCache();
 			}
 
-			m_nBarrelAttachment = pAnim->GetEngineObject()->LookupAttachment( STRING(m_iszBarrelAttachment) );
+			m_nBarrelAttachment = pAnim->LookupAttachment( STRING(m_iszBarrelAttachment) );
 
 			Vector vecWorldBarrelPos;
 			QAngle worldBarrelAngle;
-			pAnim->GetEngineObject()->GetAttachment( m_nBarrelAttachment, vecWorldBarrelPos, worldBarrelAngle );
+			pAnim->GetAttachment( m_nBarrelAttachment, vecWorldBarrelPos, worldBarrelAngle );
 			VectorITransform( vecWorldBarrelPos, GetEngineObject()->EntityToWorldTransform( ), m_barrelPos );
 		}
 
@@ -866,22 +866,22 @@ void CFuncTank::Activate( void )
 {
 	BaseClass::Activate();
 	
-	CBaseEntity *pParent = EntityList()->FindEntityByName( NULL, GetEngineObject()->GetParentName() );
+	IServerEntity *pParent = EntityList()->FindEntityByName( NULL, GetEngineObject()->GetParentName() );
 
 	if ((pParent != NULL) && (pParent->entindex() != -1))
 	{
 		GetEngineObject()->SetParent( pParent->GetEngineObject() );
 	}
 
-	if (GetEngineObject()->GetMoveParent() && GetEngineObject()->GetMoveParent()->GetOuter()->GetBaseAnimating())
+	if (GetEngineObject()->GetMoveParent() && GetEngineObject()->GetMoveParent()->GetModelPtr())
 	{
-		CBaseAnimating *pAnim = GetEngineObject()->GetMoveParent()->GetOuter()->GetBaseAnimating();
+		IEngineObjectServer *pAnim = GetEngineObject()->GetMoveParent();
 		if ( m_iszBaseAttachment != NULL_STRING )
 		{
-			int nAttachment = pAnim->GetEngineObject()->LookupAttachment( STRING( m_iszBaseAttachment ) );
+			int nAttachment = pAnim->LookupAttachment( STRING( m_iszBaseAttachment ) );
 			if ( nAttachment != 0 )
 			{
-				GetEngineObject()->SetParent( pAnim->GetEngineObject(), nAttachment);
+				GetEngineObject()->SetParent( pAnim, nAttachment);
 				GetEngineObject()->SetLocalOrigin( vec3_origin );
 				GetEngineObject()->SetLocalAngles( vec3_angle );
 			}
@@ -893,16 +893,16 @@ void CFuncTank::Activate( void )
 		{
 			if ( m_bUsePoseParameters )
 			{
-				pAnim->GetEngineObject()->SetPoseParameter( STRING( m_iszYawPoseParam ), 0 );
-				pAnim->GetEngineObject()->SetPoseParameter( STRING( m_iszPitchPoseParam ), 0 );
-				pAnim->GetEngineObject()->InvalidateBoneCache();
+				pAnim->SetPoseParameter( STRING( m_iszYawPoseParam ), 0 );
+				pAnim->SetPoseParameter( STRING( m_iszPitchPoseParam ), 0 );
+				pAnim->InvalidateBoneCache();
 			}
 
-			m_nBarrelAttachment = pAnim->GetEngineObject()->LookupAttachment( STRING(m_iszBarrelAttachment) );
+			m_nBarrelAttachment = pAnim->LookupAttachment( STRING(m_iszBarrelAttachment) );
 
 			Vector vecWorldBarrelPos;
 			QAngle worldBarrelAngle;
-			pAnim->GetEngineObject()->GetAttachment( m_nBarrelAttachment, vecWorldBarrelPos, worldBarrelAngle );
+			pAnim->GetAttachment( m_nBarrelAttachment, vecWorldBarrelPos, worldBarrelAngle );
 			VectorITransform( vecWorldBarrelPos, GetEngineObject()->EntityToWorldTransform( ), m_barrelPos );
 		}
 
@@ -927,10 +927,10 @@ void CFuncTank::Activate( void )
 	// Necessary for save/load
 	if ( (m_iszBarrelAttachment != NULL_STRING) && (m_nBarrelAttachment == 0) )
 	{
-		if (GetEngineObject()->GetMoveParent() && GetEngineObject()->GetMoveParent()->GetOuter()->GetBaseAnimating())
+		if (GetEngineObject()->GetMoveParent() && GetEngineObject()->GetMoveParent()->GetModelPtr())
 		{
-			CBaseAnimating *pAnim = GetEngineObject()->GetMoveParent()->GetOuter()->GetBaseAnimating();
-			m_nBarrelAttachment = pAnim->GetEngineObject()->LookupAttachment( STRING(m_iszBarrelAttachment) );
+			IEngineObjectServer *pAnim = GetEngineObject()->GetMoveParent();
+			m_nBarrelAttachment = pAnim->LookupAttachment( STRING(m_iszBarrelAttachment) );
 		}
 	}
 }
@@ -1002,8 +1002,8 @@ Vector CFuncTank::WorldBarrelPosition( void )
 
 	Vector vecOrigin;
 	QAngle vecAngles;
-	CBaseAnimating *pAnim = GetEngineObject()->GetMoveParent()->GetOuter()->GetBaseAnimating();
-	pAnim->GetEngineObject()->GetAttachment( m_nBarrelAttachment, vecOrigin, vecAngles );
+	IEngineObjectServer *pAnim = GetEngineObject()->GetMoveParent();
+	pAnim->GetAttachment( m_nBarrelAttachment, vecOrigin, vecAngles );
 	return vecOrigin;
 }
 
@@ -1018,10 +1018,10 @@ void CFuncTank::PhysicsSimulate( void )
 	if ( m_bUsePoseParameters && GetEngineObject()->GetMoveParent() )
 	{
 		const QAngle &angles = GetEngineObject()->GetLocalAngles();
-		CBaseAnimating *pAnim = GetEngineObject()->GetMoveParent()->GetOuter()->GetBaseAnimating();
-		pAnim->GetEngineObject()->SetPoseParameter( STRING( m_iszYawPoseParam ), angles.y );
-		pAnim->GetEngineObject()->SetPoseParameter( STRING( m_iszPitchPoseParam ), angles.x );
-		pAnim->StudioFrameAdvance();
+		IEngineObjectServer *pAnim = GetEngineObject()->GetMoveParent();
+		pAnim->SetPoseParameter( STRING( m_iszYawPoseParam ), angles.y );
+		pAnim->SetPoseParameter( STRING( m_iszPitchPoseParam ), angles.x );
+		pAnim->GetOuter()->StudioFrameAdvance();
 	}
 }
 
@@ -1232,7 +1232,7 @@ void CFuncTank::ControllerPostFrame( void )
 		
 		if( tr.m_pEnt && tr.m_pEnt->GetTakeDamage() != DAMAGE_NO && (tr.m_pEnt->GetEngineObject()->GetFlags() & FL_AIMTARGET) )
 		{
-			forward = ((CBaseEntity*)tr.m_pEnt)->WorldSpaceCenter() - start;
+			forward = tr.m_pEnt->WorldSpaceCenter() - start;
 			VectorNormalize( forward );
 		}
 	}
@@ -1291,7 +1291,7 @@ bool CFuncTank::NPC_FindManPoint( Vector &vecPos )
 {
 	if ( m_iszNPCManPoint != NULL_STRING )
 	{	
-		CBaseEntity *pEntity = EntityList()->FindEntityByName( NULL, m_iszNPCManPoint );
+		IServerEntity *pEntity = EntityList()->FindEntityByName( NULL, m_iszNPCManPoint );
 		if ( pEntity )
 		{
 			vecPos = pEntity->GetEngineObject()->GetAbsOrigin();
@@ -2217,8 +2217,8 @@ void CFuncTank::DoMuzzleFlash( void )
 	// If we're parented to something, make it play the muzzleflash
 	if ( m_bUsePoseParameters && GetEngineObject()->GetMoveParent() )
 	{
-		CBaseAnimating *pAnim = GetEngineObject()->GetMoveParent()->GetOuter()->GetBaseAnimating();
-		pAnim->GetEngineObject()->DoMuzzleFlash();
+		IEngineObjectServer *pAnim = GetEngineObject()->GetMoveParent();
+		pAnim->DoMuzzleFlash();
 
 		// Do the AR2 muzzle flash
 		if ( m_iEffectHandling == EH_COMBINE_CANNON )
@@ -2540,7 +2540,7 @@ void CFuncTankGun::Fire( int bulletCount, const Vector &barrelEnd, const Vector 
 	info.m_flDamage = m_iBulletDamage;
 	info.m_iPlayerDamage = m_iBulletDamageVsPlayer;
 	info.m_pAttacker = pAttacker;
-	info.m_pAdditionalIgnoreEnt = GetEngineObject()->GetMoveParent()?GetEngineObject()->GetMoveParent()->GetOuter() : NULL;
+	info.m_pAdditionalIgnoreEnt = GetEngineObject()->GetMoveParent() ? (CBaseEntity*)GetEngineObject()->GetMoveParent()->GetOuter() : NULL;
 
 #ifdef HL2_EPISODIC
 	if ( m_iAmmoType != -1 )
@@ -2728,7 +2728,7 @@ CEnvLaser *CFuncTankLaser::GetLaser( void )
 	if ( m_pLaser )
 		return m_pLaser;
 
-	CBaseEntity *pLaser = EntityList()->FindEntityByName( NULL, m_iszLaserName );
+	IServerEntity *pLaser = EntityList()->FindEntityByName( NULL, m_iszLaserName );
 	while ( pLaser )
 	{
 		// Found the landmark

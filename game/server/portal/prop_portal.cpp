@@ -700,7 +700,7 @@ void CProp_Portal::Activate( void )
 		{
 			for( servertouchlink_t *link = root->nextLink; link != root; link = link->nextLink )
 			{
-				CBaseEntity *pOther = EntityList()->GetBaseEntityFromHandle(link->entityTouched);
+				IServerEntity *pOther = EntityList()->GetBaseEntityFromHandle(link->entityTouched);
 				if( CProp_Portal_Shared::IsEntityTeleportable( pOther ) )
 				{
 					Vector vWorldMins, vWorldMaxs;
@@ -1302,7 +1302,7 @@ void CProp_Portal::Touch( IServerEntity *pOther )
 						//DoFizzleEffect( PORTAL_FIZZLE_KILLED, false );
 						EntityList()->DestroyEntity(this);
 					}
-					else if ( tr.m_pEnt && ((CBaseEntity*)tr.m_pEnt)->IsMoving() )
+					else if ( tr.m_pEnt && ((IServerEntity*)tr.m_pEnt)->IsMoving() )
 					{
 						DevMsg( "Surface behind portal is moving.\n" );
 
@@ -1744,16 +1744,16 @@ void CProp_Portal::UpdatePortalLinkage( void )
 
 				if( !GetEnginePortal()->IsPortal2() )
 				{
-					pSpeaker->SetName( "PortalSpeaker1" );
-					pMicrophone->SetName( "PortalMic1" );
+					pSpeaker->GetEngineObject()->SetName( "PortalSpeaker1" );
+					pMicrophone->GetEngineObject()->SetName( "PortalMic1" );
 					pMicrophone->Activate();
 					pMicrophone->SetSpeakerName( MAKE_STRING( "PortalSpeaker2" ) );
 					pMicrophone->SetSensitivity( 10.0f );
 				}
 				else
 				{
-					pSpeaker->SetName( "PortalSpeaker2" );
-					pMicrophone->SetName( "PortalMic2" );
+					pSpeaker->GetEngineObject()->SetName( "PortalSpeaker2" );
+					pMicrophone->GetEngineObject()->SetName( "PortalMic2" );
 					pMicrophone->Activate();
 					pMicrophone->SetSpeakerName( MAKE_STRING( "PortalSpeaker1" ) );
 					pMicrophone->SetSensitivity( 10.0f );
@@ -1775,16 +1775,16 @@ void CProp_Portal::UpdatePortalLinkage( void )
 
 				if ( !GetEnginePortal()->IsPortal2() )
 				{
-					pLinkedSpeaker->SetName( "PortalSpeaker2" );
-					pLinkedMicrophone->SetName( "PortalMic2" );
+					pLinkedSpeaker->GetEngineObject()->SetName( "PortalSpeaker2" );
+					pLinkedMicrophone->GetEngineObject()->SetName( "PortalMic2" );
 					pLinkedMicrophone->Activate();
 					pLinkedMicrophone->SetSpeakerName( MAKE_STRING( "PortalSpeaker1" ) );
 					pLinkedMicrophone->SetSensitivity( 10.0f );
 				}
 				else
 				{
-					pLinkedSpeaker->SetName( "PortalSpeaker1" );
-					pLinkedMicrophone->SetName( "PortalMic1" );
+					pLinkedSpeaker->GetEngineObject()->SetName( "PortalSpeaker1" );
+					pLinkedMicrophone->GetEngineObject()->SetName( "PortalMic1" );
 					pLinkedMicrophone->Activate();
 					pLinkedMicrophone->SetSpeakerName( MAKE_STRING( "PortalSpeaker2" ) );
 					pLinkedMicrophone->SetSensitivity( 10.0f );
@@ -2197,7 +2197,7 @@ void CProp_Portal::OnClearEverything()
 //};
 //static CUtlVector<UTIL_Remove_PhysicsStack_t> s_UTIL_Remove_PhysicsStack;
 
-class CPortal_AutoGameSys_EntityListener : public CAutoGameSystem, public IEntityListener<CBaseEntity>
+class CPortal_AutoGameSys_EntityListener : public CAutoGameSystem, public IEntityListener<IServerEntity>
 {
 public:
 	virtual void LevelInitPreEntity(void)
@@ -2215,7 +2215,7 @@ public:
 		EntityList()->RemoveListenerEntity(this);
 	}
 
-	virtual void PreEntityRemove(CBaseEntity* pEntity)
+	virtual void PreEntityRemove(IServerEntity* pEntity)
 	{
 		//make sure entities are in the primary physics environment for the portal mod, this code should be safe even if the entity is in neither extra environment
 		if (!pEntity->IsNetworkable() || pEntity->entindex() == -1) {
@@ -2257,12 +2257,12 @@ public:
 		//g_pShadowEntities = g_pShadowEntities_Main;
 	}
 
-	//virtual void OnEntityCreated( CBaseEntity *pEntity ) {}
-	virtual void OnEntitySpawned(CBaseEntity* pEntity)
+	//virtual void OnEntityCreated( IServerEntity *pEntity ) {}
+	virtual void OnEntitySpawned(IServerEntity* pEntity)
 	{
 
 	}
-	virtual void OnEntityDeleted(CBaseEntity* pEntity)
+	virtual void OnEntityDeleted(IServerEntity* pEntity)
 	{
 		IEnginePortalServer* pSimulator = pEntity->GetEngineObject()->GetPortalThatOwnsEntity();
 		if (pSimulator)

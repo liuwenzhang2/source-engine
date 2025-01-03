@@ -73,14 +73,13 @@ void CNPC_Puppet::Spawn( void )
 	SetHealth( 100 );
 
 	// Find our animation target
-	CBaseEntity *pTarget = EntityList()->FindEntityByName( NULL, m_sAnimTargetname );
-	m_hAnimationTarget = pTarget;
+	IServerEntity *pTarget = EntityList()->FindEntityByName( NULL, m_sAnimTargetname );
+	m_hAnimationTarget = (CBaseEntity*)pTarget;
 	if ( pTarget )
 	{
-		CBaseAnimating *pAnimating = pTarget->GetBaseAnimating();
-		if ( pAnimating )
+		if (pTarget->GetEngineObject()->GetModelPtr())
 		{
-			m_nTargetAttachment = pAnimating->GetEngineObject()->LookupAttachment( STRING( m_sAnimAttachmentName ) );
+			m_nTargetAttachment = pTarget->GetEngineObject()->LookupAttachment( STRING( m_sAnimAttachmentName ) );
 		}
 	}
 
@@ -98,20 +97,19 @@ void CNPC_Puppet::InputSetAnimationTarget( inputdata_t &inputdata )
 	m_sAnimTargetname = MAKE_STRING( inputdata.value.String() );
 
 	// Find our animation target
-	CBaseEntity *pTarget = EntityList()->FindEntityByName( NULL, m_sAnimTargetname );
+	IServerEntity *pTarget = EntityList()->FindEntityByName( NULL, m_sAnimTargetname );
 	if ( pTarget == NULL )
 	{
 		Warning("Failed to find animation target %s for npc_puppet (%s)\n", STRING( m_sAnimTargetname ), STRING( GetEntityName() ) );
 		return;
 	}
 	
-	m_hAnimationTarget = pTarget;
+	m_hAnimationTarget = (CBaseEntity*)pTarget;
 	
-	CBaseAnimating *pAnimating = pTarget->GetBaseAnimating();
-	if ( pAnimating )
+	if (pTarget->GetEngineObject()->GetModelPtr())
 	{
 		// Cache off our target attachment
-		m_nTargetAttachment = pAnimating->GetEngineObject()->LookupAttachment( STRING( m_sAnimAttachmentName ) );
+		m_nTargetAttachment = pTarget->GetEngineObject()->LookupAttachment( STRING( m_sAnimAttachmentName ) );
 	}
 
 	// Stuff us at the owner's core for visibility reasons

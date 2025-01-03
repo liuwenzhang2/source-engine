@@ -831,7 +831,7 @@ void CNPC_Gargantua::FlameUpdate( void )
 
 void CNPC_Gargantua::FlameDamage( Vector vecStart, Vector vecEnd, CBaseEntity *pevInflictor, CBaseEntity *pevAttacker, float flDamage, int iClassIgnore, int bitsDamageType )
 {
-	CBaseEntity *pEntity = NULL;
+	IServerEntity *pEntity = NULL;
 	trace_t		tr;
 	float		flAdjustedDamage;
 	Vector		vecSpot;
@@ -850,10 +850,10 @@ void CNPC_Gargantua::FlameDamage( Vector vecStart, Vector vecEnd, CBaseEntity *p
 	while ((pEntity = EntityList()->FindEntityInSphere( pEntity, GetEngineObject()->GetAbsOrigin(), searchRadius )) != NULL)
 	{
 
-		if ( pEntity->m_takedamage != DAMAGE_NO )
+		if ( pEntity->GetTakeDamage() != DAMAGE_NO )
 		{
 			// UNDONE: this should check a damage mask, not an ignore
-			if ( iClassIgnore != CLASS_NONE && pEntity->Classify() == iClassIgnore )
+			if ( iClassIgnore != CLASS_NONE && ((CBaseEntity*)pEntity)->Classify() == iClassIgnore )
 			{// houndeyes don't hurt other houndeyes with their attack
 				continue;
 			}

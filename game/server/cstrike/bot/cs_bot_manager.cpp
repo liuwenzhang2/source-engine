@@ -1341,7 +1341,7 @@ void CCSBotManager::ExtractScenarioData( void )
 	// Search all entities in the map and set the game type and
 	// store all zones (bomb target, etc).
 	//
-	CBaseEntity *entity;
+	IServerEntity *entity;
 	int i;
 	for( i=1; i<gpGlobals->maxEntities; ++i )
 	{
@@ -1402,7 +1402,7 @@ void CCSBotManager::ExtractScenarioData( void )
 				m_zone[ m_zoneCount ].m_center = (isLegacy) ? entity->GetEngineObject()->GetAbsOrigin() : (absmin + absmax)/2.0f;
 				m_zone[ m_zoneCount ].m_isLegacy = isLegacy;
 				m_zone[ m_zoneCount ].m_index = m_zoneCount;
-				m_zone[ m_zoneCount++ ].m_entity = entity;
+				m_zone[ m_zoneCount++ ].m_entity = (CBaseEntity*)entity;
 			}
 			else
 				Msg( "Warning: Too many zones, some will be ignored.\n" );
@@ -1425,7 +1425,7 @@ void CCSBotManager::ExtractScenarioData( void )
 				m_zone[ m_zoneCount ].m_center = entity->GetEngineObject()->GetAbsOrigin();
 				m_zone[ m_zoneCount ].m_isLegacy = true;
 				m_zone[ m_zoneCount ].m_index = m_zoneCount;
-				m_zone[ m_zoneCount++ ].m_entity = entity;
+				m_zone[ m_zoneCount++ ].m_entity = (CBaseEntity*)entity;
 			}
 			else
 			{
@@ -1781,9 +1781,9 @@ void CCSBotManager::OnRoundStart( IGameEvent *event )
 
 
 //--------------------------------------------------------------------------------------------------------------
-static CBaseEntity * SelectSpawnSpot( const char *pEntClassName )
+static IServerEntity* SelectSpawnSpot( const char *pEntClassName )
 {
-	CBaseEntity* pSpot = NULL;
+	IServerEntity* pSpot = NULL;
 
 	// Find the next spawn spot.
 	pSpot = EntityList()->FindEntityByClassname( pSpot, pEntClassName );
@@ -1791,7 +1791,7 @@ static CBaseEntity * SelectSpawnSpot( const char *pEntClassName )
 	if ( pSpot == NULL ) // skip over the null point
 		pSpot = EntityList()->FindEntityByClassname( pSpot, pEntClassName );
 
-	CBaseEntity *pFirstSpot = pSpot;
+	IServerEntity *pFirstSpot = pSpot;
 	do 
 	{
 		if ( pSpot )
@@ -1821,7 +1821,7 @@ static CBaseEntity * SelectSpawnSpot( const char *pEntClassName )
  */
 void CCSBotManager::CheckForBlockedZones( void )
 {
-	CBaseEntity *pSpot = SelectSpawnSpot( "info_player_counterterrorist" );
+	IServerEntity *pSpot = SelectSpawnSpot( "info_player_counterterrorist" );
 	if ( !pSpot )
 		pSpot = SelectSpawnSpot( "info_player_terrorist" );
 
@@ -1939,7 +1939,7 @@ private:
 //--------------------------------------------------------------------------------------------------------------
 void CCSBotManager::OnBreakBreakable( IGameEvent *event )
 {
-	CheckAreasOverlappingBreakable collector(EntityList()->GetBaseEntity( event->GetInt( "entindex" ) ) );
+	CheckAreasOverlappingBreakable collector((CBaseEntity*)EntityList()->GetBaseEntity( event->GetInt( "entindex" ) ) );
 	TheNavMesh->ForAllAreas( collector );
 
 	CCSBOTMANAGER_ITERATE_BOTS( OnBreakBreakable, event );
@@ -1949,7 +1949,7 @@ void CCSBotManager::OnBreakBreakable( IGameEvent *event )
 //--------------------------------------------------------------------------------------------------------------
 void CCSBotManager::OnBreakProp( IGameEvent *event )
 {
-	CheckAreasOverlappingBreakable collector(EntityList()->GetBaseEntity( event->GetInt( "entindex" ) ) );
+	CheckAreasOverlappingBreakable collector((CBaseEntity*)EntityList()->GetBaseEntity( event->GetInt( "entindex" ) ) );
 	TheNavMesh->ForAllAreas( collector );
 
 	CCSBOTMANAGER_ITERATE_BOTS( OnBreakProp, event );
@@ -2157,7 +2157,7 @@ unsigned int CCSBotManager::GetPlayerPriority( CBasePlayer *player ) const
 CBaseEntity *CCSBotManager::GetRandomSpawn( int team ) const
 {
 	CUtlVector< CBaseEntity * > spawnSet;
-	CBaseEntity *spot;
+	IServerEntity *spot;
 
 	if (team == TEAM_TERRORIST || team == TEAM_MAXCOUNT)
 	{
@@ -2166,7 +2166,7 @@ CBaseEntity *CCSBotManager::GetRandomSpawn( int team ) const
 			 spot;
 			 spot = EntityList()->FindEntityByClassname( spot, "info_player_terrorist" ) )
 		{
-			spawnSet.AddToTail( spot );			
+			spawnSet.AddToTail((CBaseEntity*)spot );
 		}
 	}
 
@@ -2177,7 +2177,7 @@ CBaseEntity *CCSBotManager::GetRandomSpawn( int team ) const
 			 spot;
 			 spot = EntityList()->FindEntityByClassname( spot, "info_player_counterterrorist" ) )
 		{
-			spawnSet.AddToTail( spot );			
+			spawnSet.AddToTail((CBaseEntity*)spot );
 		}
 	}
 

@@ -188,7 +188,7 @@ void CTeamControlPointMaster::Reset( void )
 bool CTeamControlPointMaster::FindControlPoints( void )
 {
 	//go through all the points
-	CBaseEntity *pEnt = EntityList()->FindEntityByClassname( NULL, GetControlPointName() );
+	IServerEntity *pEnt = EntityList()->FindEntityByClassname( NULL, GetControlPointName() );
 
 	int numFound = 0;
 	
@@ -311,7 +311,7 @@ bool CTeamControlPointMaster::FindControlPointRounds( void )
 	bool bFoundRounds = false;
 
 	m_ControlPointRounds.RemoveAll();
-	CBaseEntity *pEnt = EntityList()->FindEntityByClassname( NULL, GetControlPointRoundName() );
+	IServerEntity *pEnt = EntityList()->FindEntityByClassname( NULL, GetControlPointRoundName() );
 
 	while( pEnt )
 	{

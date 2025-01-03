@@ -231,7 +231,7 @@ void CRecharge::Use( IServerEntity *pActivator, IServerEntity *pCaller, USE_TYPE
 
 	// Send the output.
 	float flRemaining = m_iJuice / sk_suitcharger.GetFloat();
-	m_OutRemainingCharge.Set(flRemaining, (CBaseEntity*)pActivator, this);
+	m_OutRemainingCharge.Set(flRemaining, pActivator, this);
 
 	// govern the rate of charge
 	m_flNextCharge = gpGlobals->curtime + 0.1;

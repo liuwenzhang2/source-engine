@@ -119,7 +119,7 @@ private:
 };
 
 
-inline C_HL1MP_Player *ToHL1MPPlayer( CBaseEntity *pEntity )
+inline C_HL1MP_Player *ToHL1MPPlayer( IClientEntity *pEntity )
 {
 	if ( !pEntity || !pEntity->IsPlayer() )
 		return NULL;

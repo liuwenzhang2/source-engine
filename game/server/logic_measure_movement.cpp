@@ -112,7 +112,7 @@ void CLogicMeasureMovement::Activate()
 //-----------------------------------------------------------------------------
 void CLogicMeasureMovement::SetMeasureTarget( const char *pName )
 {
-	m_hMeasureTarget = EntityList()->FindEntityByName( NULL, pName );
+	m_hMeasureTarget = (CBaseEntity*)EntityList()->FindEntityByName( NULL, pName );
 	if ( !m_hMeasureTarget )
 	{
 		if ( Q_strnicmp( STRING(m_strMeasureTarget), "!player", 8 ) )
@@ -124,7 +124,7 @@ void CLogicMeasureMovement::SetMeasureTarget( const char *pName )
 
 void CLogicMeasureMovement::SetMeasureReference( const char *pName )
 {
-	m_hMeasureReference = EntityList()->FindEntityByName( NULL, pName );
+	m_hMeasureReference = (CBaseEntity*)EntityList()->FindEntityByName( NULL, pName );
 	if ( !m_hMeasureReference )
 	{
 		Warning("logic_measure_movement: Unable to find measure reference entity %s\n", pName );
@@ -133,7 +133,7 @@ void CLogicMeasureMovement::SetMeasureReference( const char *pName )
 
 void CLogicMeasureMovement::SetTarget( const char *pName )
 {
-	m_hTarget = EntityList()->FindEntityByName( NULL, pName );
+	m_hTarget = (CBaseEntity*)EntityList()->FindEntityByName( NULL, pName );
 	if ( !m_hTarget )
 	{
 		Warning("logic_measure_movement: Unable to find movement target entity %s\n", pName );
@@ -142,7 +142,7 @@ void CLogicMeasureMovement::SetTarget( const char *pName )
 
 void CLogicMeasureMovement::SetTargetReference( const char *pName )
 {
-	m_hTargetReference = EntityList()->FindEntityByName( NULL, pName );
+	m_hTargetReference = (CBaseEntity*)EntityList()->FindEntityByName( NULL, pName );
 	if ( !m_hTargetReference )
 	{
 		Warning("logic_measure_movement: Unable to find movement reference entity %s\n", pName );

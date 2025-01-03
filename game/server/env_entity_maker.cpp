@@ -163,7 +163,7 @@ void CEnvEntityMaker::SpawnEntity( Vector vecAlternateOrigin, QAngle vecAlternat
 		vecSpawnAngles = vecAlternateAngles;
 	}
 
-	CUtlVector<CBaseEntity*> hNewEntities;
+	CUtlVector<IServerEntity*> hNewEntities;
 	if ( !pTemplate->CreateInstance( vecSpawnOrigin, vecSpawnAngles, &hNewEntities ) )
 		return;
 	
@@ -171,7 +171,7 @@ void CEnvEntityMaker::SpawnEntity( Vector vecAlternateOrigin, QAngle vecAlternat
 	if ( hNewEntities.Count() == 0 )
 		 return;
 	
-	m_hCurrentInstance = hNewEntities[0];
+	m_hCurrentInstance = (CBaseEntity*)hNewEntities[0];
 
 	// Assume it'll block us
 	m_hCurrentBlocker = m_hCurrentInstance;
@@ -200,7 +200,7 @@ void CEnvEntityMaker::SpawnEntity( Vector vecAlternateOrigin, QAngle vecAlternat
 	{
 		for ( int i = 0; i < hNewEntities.Count(); i++ )
 		{
-			CBaseEntity *pEntity = hNewEntities[i];
+			IServerEntity *pEntity = hNewEntities[i];
 			if ( pEntity->GetEngineObject()->GetMoveType() == MOVETYPE_NONE )
 				continue;
 
@@ -357,7 +357,7 @@ void CEnvEntityMaker::InputForceSpawn( inputdata_t &inputdata )
 //-----------------------------------------------------------------------------
 void CEnvEntityMaker::InputForceSpawnAtEntityOrigin( inputdata_t &inputdata )
 {
-	CBaseEntity *pTargetEntity = EntityList()->FindEntityByName( NULL, inputdata.value.String(), this, inputdata.pActivator, inputdata.pCaller );
+	IServerEntity *pTargetEntity = EntityList()->FindEntityByName( NULL, inputdata.value.String(), this, inputdata.pActivator, inputdata.pCaller );
 		
 	if( pTargetEntity )
 	{

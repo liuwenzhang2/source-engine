@@ -71,7 +71,7 @@ public:
 	
 	DECLARE_DATADESC();
 
-	CBaseEntity *FindTarget( string_t targetName, CBaseEntity *pActivator );
+	CBaseEntity *FindTarget( string_t targetName, IServerEntity *pActivator );
 
 protected:
 	float			m_yawCenter;	// "Center" yaw
@@ -194,9 +194,9 @@ void CAPCController::DeactivateRocketGuidance(void)
 // Input  : targetName - 
 //			pActivator - 
 //-----------------------------------------------------------------------------
-CBaseEntity *CAPCController::FindTarget( string_t targetName, CBaseEntity *pActivator ) 
+CBaseEntity *CAPCController::FindTarget( string_t targetName, IServerEntity *pActivator ) 
 {
-	return EntityList()->FindEntityGenericNearest( STRING( targetName ), GetEngineObject()->GetAbsOrigin(), 0, this, pActivator );
+	return (CBaseEntity*)EntityList()->FindEntityGenericNearest( STRING( targetName ), GetEngineObject()->GetAbsOrigin(), 0, this, pActivator );
 }
 
 //-----------------------------------------------------------------------------

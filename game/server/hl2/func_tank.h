@@ -197,7 +197,7 @@ private:
 	bool OnControls( CBaseEntity *pTest );
 	bool HasController( void );
 
-	CBaseEntity *FindTarget( string_t targetName, CBaseEntity *pActivator );
+	CBaseEntity *FindTarget( string_t targetName, IServerEntity *pActivator );
 
 	// NPC
 	void		NPC_FindController( void );

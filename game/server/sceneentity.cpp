@@ -422,13 +422,13 @@ public:
 	virtual void			DispatchEndFlexAnimation( CChoreoScene *scene, CBaseFlex *actor, CChoreoEvent *event );
 	virtual void			DispatchStartGesture( CChoreoScene *scene, CBaseFlex *actor, CChoreoEvent *event );
 	virtual void			DispatchEndGesture( CChoreoScene *scene, CBaseFlex *actor, CChoreoEvent *event );
-	virtual void			DispatchStartLookAt( CChoreoScene *scene, CBaseFlex *actor, CBaseEntity *actor2, CChoreoEvent *event );
+	virtual void			DispatchStartLookAt( CChoreoScene *scene, CBaseFlex *actor, IServerEntity *actor2, CChoreoEvent *event );
 	virtual void			DispatchEndLookAt( CChoreoScene *scene, CBaseFlex *actor, CChoreoEvent *event );
-	virtual void			DispatchStartMoveTo( CChoreoScene *scene, CBaseFlex *actor, CBaseEntity *actor2, CChoreoEvent *event );
+	virtual void			DispatchStartMoveTo( CChoreoScene *scene, CBaseFlex *actor, IServerEntity *actor2, CChoreoEvent *event );
 	virtual void			DispatchEndMoveTo( CChoreoScene *scene, CBaseFlex *actor, CChoreoEvent *event );
 	virtual	void			DispatchStartSpeak( CChoreoScene *scene, CBaseFlex *actor, CChoreoEvent *event, soundlevel_t iSoundlevel );
 	virtual void			DispatchEndSpeak( CChoreoScene *scene, CBaseFlex *actor, CChoreoEvent *event );
-	virtual void			DispatchStartFace( CChoreoScene *scene, CBaseFlex *actor, CBaseEntity *actor2, CChoreoEvent *event );
+	virtual void			DispatchStartFace( CChoreoScene *scene, CBaseFlex *actor, IServerEntity *actor2, CChoreoEvent *event );
 	virtual void			DispatchEndFace( CChoreoScene *scene, CBaseFlex *actor, CChoreoEvent *event );
 	virtual void			DispatchStartSequence( CChoreoScene *scene, CBaseFlex *actor, CChoreoEvent *event );
 	virtual void			DispatchEndSequence( CChoreoScene *scene, CBaseFlex *actor, CChoreoEvent *event );
@@ -522,9 +522,9 @@ public:
 	virtual CBaseFlex		*FindNamedActor( int index );
 	virtual CBaseFlex		*FindNamedActor( CChoreoActor *pChoreoActor );
 	virtual CBaseFlex		*FindNamedActor( const char *name );
-	virtual CBaseEntity		*FindNamedEntity( const char *name, CBaseEntity *pActor = NULL, bool bBaseFlexOnly = false, bool bUseClear = false );
-	CBaseEntity				*FindNamedTarget( string_t iszTarget, bool bBaseFlexOnly = false );
-	virtual CBaseEntity		*FindNamedEntityClosest( const char *name, CBaseEntity *pActor = NULL, bool bBaseFlexOnly = false, bool bUseClear = false, const char *pszSecondary = NULL );
+	virtual IServerEntity		*FindNamedEntity( const char *name, IServerEntity *pActor = NULL, bool bBaseFlexOnly = false, bool bUseClear = false );
+	IServerEntity				*FindNamedTarget( string_t iszTarget, bool bBaseFlexOnly = false );
+	virtual IServerEntity		*FindNamedEntityClosest( const char *name, IServerEntity *pActor = NULL, bool bBaseFlexOnly = false, bool bUseClear = false, const char *pszSecondary = NULL );
 
 private:
 
@@ -1489,7 +1489,7 @@ void CSceneEntity::DispatchEndGesture( CChoreoScene *scene, CBaseFlex *actor, CC
 //-----------------------------------------------------------------------------
 void CSceneEntity::DispatchStartGeneric( CChoreoScene *scene, CBaseFlex *actor, CChoreoEvent *event )
 {
-	CBaseEntity *pTarget = FindNamedEntity( event->GetParameters2( ) );
+	IServerEntity *pTarget = FindNamedEntity( event->GetParameters2( ) );
 	actor->AddSceneEvent( scene, event, pTarget );
 }
 
@@ -1509,7 +1509,7 @@ void CSceneEntity::DispatchEndGeneric( CChoreoScene *scene, CBaseFlex *actor, CC
 // Input  : *actor - 
 //			*actor2 - 
 //-----------------------------------------------------------------------------
-void CSceneEntity::DispatchStartLookAt( CChoreoScene *scene, CBaseFlex *actor, CBaseEntity *actor2, CChoreoEvent *event )
+void CSceneEntity::DispatchStartLookAt( CChoreoScene *scene, CBaseFlex *actor, IServerEntity *actor2, CChoreoEvent *event )
 {
 	actor->AddSceneEvent( scene, event, actor2 );
 }
@@ -1528,7 +1528,7 @@ void CSceneEntity::DispatchEndLookAt( CChoreoScene *scene, CBaseFlex *actor, CCh
 // Input  : *actor - 
 //			*parameters - 
 //-----------------------------------------------------------------------------
-void CSceneEntity::DispatchStartMoveTo( CChoreoScene *scene, CBaseFlex *actor, CBaseEntity *actor2, CChoreoEvent *event )
+void CSceneEntity::DispatchStartMoveTo( CChoreoScene *scene, CBaseFlex *actor, IServerEntity *actor2, CChoreoEvent *event )
 {
 	actor->AddSceneEvent( scene, event, actor2 );
 }
@@ -1874,7 +1874,7 @@ void CSceneEntity::DispatchEndSpeak( CChoreoScene *scene, CBaseFlex *actor, CCho
 // Input  : *actor - 
 //			*actor2 - 
 //-----------------------------------------------------------------------------
-void CSceneEntity::DispatchStartFace( CChoreoScene *scene, CBaseFlex *actor, CBaseEntity *actor2, CChoreoEvent *event )
+void CSceneEntity::DispatchStartFace( CChoreoScene *scene, CBaseFlex *actor, IServerEntity *actor2, CChoreoEvent *event )
 {
 	actor->AddSceneEvent( scene, event, actor2 );
 }
@@ -2057,7 +2057,7 @@ void CSceneEntity::InputStartPlayback( inputdata_t &inputdata )
 		return;
 
 	ClearActivatorTargets();
-	m_hActivator = inputdata.pActivator;
+	m_hActivator = (CBaseEntity*)inputdata.pActivator;
 	StartPlayback();
 }
 
@@ -2908,7 +2908,7 @@ void CSceneEntity::StartEvent( float currenttime, CChoreoScene *scene, CChoreoEv
 		{
 			if ( pActor && !IsMultiplayer() )
 			{
-				CBaseEntity *pActor2 = FindNamedEntity( event->GetParameters( ), pActor );
+				IServerEntity *pActor2 = FindNamedEntity( event->GetParameters( ), pActor );
 				if ( pActor2 )
 				{
 					// Huh?
@@ -2950,7 +2950,7 @@ void CSceneEntity::StartEvent( float currenttime, CChoreoScene *scene, CChoreoEv
 
 			if ( pActor && !IsMultiplayer() )
 			{
-				CBaseEntity *pActor2 = NULL;
+				IServerEntity *pActor2 = NULL;
 				if ( event->GetParameters3( ) && strlen( event->GetParameters3( ) ) > 0 )
 				{
 					pActor2 = FindNamedEntityClosest( event->GetParameters( ), pActor, false, true, event->GetParameters3( ) );
@@ -2975,7 +2975,7 @@ void CSceneEntity::StartEvent( float currenttime, CChoreoScene *scene, CChoreoEv
 		{
 			if ( pActor && !IsMultiplayer() )
 			{
-				CBaseEntity *pActor2 = FindNamedEntity( event->GetParameters( ), pActor );
+				IServerEntity *pActor2 = FindNamedEntity( event->GetParameters( ), pActor );
 				if ( pActor2 )
 				{
 					DispatchStartFace( scene, pActor, pActor2, event );
@@ -3546,7 +3546,7 @@ CBaseFlex *CSceneEntity::FindNamedActor( CChoreoActor *pChoreoActor )
 //-----------------------------------------------------------------------------
 CBaseFlex *CSceneEntity::FindNamedActor( const char *name )
 {
-	CBaseEntity *entity = FindNamedEntity( name, NULL, true );
+	IServerEntity *entity = FindNamedEntity( name, NULL, true );
 
 	if ( !entity )
 	{
@@ -3570,7 +3570,7 @@ CBaseFlex *CSceneEntity::FindNamedActor( const char *name )
 // Input  : *name - 
 // Output : CBaseEntity
 //-----------------------------------------------------------------------------
-CBaseEntity *CSceneEntity::FindNamedTarget( string_t iszTarget, bool bBaseFlexOnly )
+IServerEntity *CSceneEntity::FindNamedTarget( string_t iszTarget, bool bBaseFlexOnly )
 {
 	if ( !stricmp( STRING(iszTarget), "!activator" ) )
 		return m_hActivator;
@@ -3579,7 +3579,7 @@ CBaseEntity *CSceneEntity::FindNamedTarget( string_t iszTarget, bool bBaseFlexOn
 	if ( !strchr( STRING(iszTarget), '*' ) )
 		return EntityList()->FindEntityByName( NULL, iszTarget );
 
-	CBaseEntity *pTarget = NULL;
+	IServerEntity *pTarget = NULL;
 	while ( (pTarget = EntityList()->FindEntityByName( pTarget, iszTarget )) != NULL )
 	{
 		if ( bBaseFlexOnly )
@@ -3609,7 +3609,7 @@ public:
 		m_hActor = pActor;
 	}
 
-	bool ShouldFindEntity( CBaseEntity *pEntity )
+	bool ShouldFindEntity( IServerEntity *pEntity )
 	{
 		if ( !m_hActor )
 			return true;
@@ -3617,7 +3617,7 @@ public:
 		// If we find no truly valid marks, we'll just use the first.
 		if ( !m_hEntityFound.Get() )
 		{
-			m_hEntityFound = pEntity;
+			m_hEntityFound = (CBaseEntity*)pEntity;
 		}
 
 		// We only want marks that are clear
@@ -3628,7 +3628,7 @@ public:
 		{
 			return false;
 		}
-		m_hEntityFound = pEntity;
+		m_hEntityFound = (CBaseEntity*)pEntity;
 		return true;
 	}
 
@@ -3653,7 +3653,7 @@ class CSceneFindNearestMarkFilter : public IEntityFindFilter
 {
 public:
 
-	CSceneFindNearestMarkFilter( const CBaseEntity *pActor, const Vector &vecPos2, float flMaxRadius = MAX_TRACE_LENGTH )
+	CSceneFindNearestMarkFilter( const IServerEntity *pActor, const Vector &vecPos2, float flMaxRadius = MAX_TRACE_LENGTH )
 	{
 		m_vecPos2 = vecPos2;
 
@@ -3664,7 +3664,7 @@ public:
 		m_flNearestToActor = flMaxRadius;
 		m_pNearestToActor = NULL;
 
-		m_hActor = pActor;
+		m_hActor = (CBaseEntity*)pActor;
 		if (pActor)
 		{
 			m_vecPos1 = pActor->GetEngineObject()->GetAbsOrigin();
@@ -3677,7 +3677,7 @@ public:
 		}
 	}
 
-	bool ShouldFindEntity( CBaseEntity *pEntity )
+	bool ShouldFindEntity( IServerEntity *pEntity )
 	{
 		if ( !m_hActor )
 			return true;
@@ -3685,7 +3685,7 @@ public:
 		// If we find no truly valid marks, we'll just use the first.
 		if ( m_pNearestToActor == NULL )
 		{
-			m_pNearestToActor = pEntity;
+			m_pNearestToActor = (CBaseEntity*)pEntity;
 		}
 
 		// We only want marks that are clear
@@ -3704,14 +3704,14 @@ public:
 			// find the point closest to the actor
 			if (dist1 <= m_flNearestToActor)
 			{
-				m_pNearestToActor = pEntity;
+				m_pNearestToActor = (CBaseEntity*)pEntity;
 				m_flNearestToActor = dist2;
 			}
 			// find that node that's closest to both, but the distance to it from the actor isn't farther than 
 			// the distance to the second node.  This should keep the actor from walking past their point of interest
 			if (dist1 <= m_flMaxSegmentDistance && dist2 <= m_flMaxSegmentDistance && dist2 < m_flNearestToTarget)
 			{
-				m_pNearestToTarget = pEntity;
+				m_pNearestToTarget = (CBaseEntity*)pEntity;
 				m_flNearestToTarget = dist2;
 			}
 		}
@@ -3742,19 +3742,19 @@ private:
 // Input  : *name - 
 // Output : CBaseFlex
 //-----------------------------------------------------------------------------
-CBaseEntity *CSceneEntity::FindNamedEntity( const char *name, CBaseEntity *pActor, bool bBaseFlexOnly, bool bUseClear )
+IServerEntity *CSceneEntity::FindNamedEntity( const char *name, IServerEntity *pActor, bool bBaseFlexOnly, bool bUseClear )
 {
-	CBaseEntity *entity = NULL;
+	IServerEntity *entity = NULL;
 
 	if ( !stricmp( name, "Player" ) || !stricmp( name, "!player" ))
 	{
-		entity = ( gpGlobals->maxClients == 1 ) ? ( CBaseEntity * )EntityList()->GetLocalPlayer() : NULL;
+		entity = ( gpGlobals->maxClients == 1 ) ? EntityList()->GetLocalPlayer() : NULL;
 	}
 	else if ( !stricmp( name, "!target1" ) )
 	{
 		if (m_hTarget1 == NULL)
 		{
-			m_hTarget1 = FindNamedTarget( m_iszTarget1, bBaseFlexOnly );
+			m_hTarget1 = (CBaseEntity*)FindNamedTarget( m_iszTarget1, bBaseFlexOnly );
 		}
 		return m_hTarget1;
 	}
@@ -3762,7 +3762,7 @@ CBaseEntity *CSceneEntity::FindNamedEntity( const char *name, CBaseEntity *pActo
 	{
 		if (m_hTarget2 == NULL)
 		{
-			m_hTarget2 = FindNamedTarget( m_iszTarget2, bBaseFlexOnly );
+			m_hTarget2 = (CBaseEntity*)FindNamedTarget( m_iszTarget2, bBaseFlexOnly );
 		}
 		return m_hTarget2;
 	}
@@ -3770,7 +3770,7 @@ CBaseEntity *CSceneEntity::FindNamedEntity( const char *name, CBaseEntity *pActo
 	{
 		if (m_hTarget3 == NULL)
 		{
-			m_hTarget3 = FindNamedTarget( m_iszTarget3, bBaseFlexOnly );
+			m_hTarget3 = (CBaseEntity*)FindNamedTarget( m_iszTarget3, bBaseFlexOnly );
 		}
 		return m_hTarget3;
 	}
@@ -3778,7 +3778,7 @@ CBaseEntity *CSceneEntity::FindNamedEntity( const char *name, CBaseEntity *pActo
 	{
 		if (m_hTarget4 == NULL)
 		{
-			m_hTarget4 = FindNamedTarget( m_iszTarget4, bBaseFlexOnly );
+			m_hTarget4 = (CBaseEntity*)FindNamedTarget( m_iszTarget4, bBaseFlexOnly );
 		}
 		return m_hTarget4;
 	}
@@ -3786,7 +3786,7 @@ CBaseEntity *CSceneEntity::FindNamedEntity( const char *name, CBaseEntity *pActo
 	{
 		if (m_hTarget5 == NULL)
 		{
-			m_hTarget5 = FindNamedTarget( m_iszTarget5, bBaseFlexOnly );
+			m_hTarget5 = (CBaseEntity*)FindNamedTarget( m_iszTarget5, bBaseFlexOnly );
 		}
 		return m_hTarget5;
 	}
@@ -3794,7 +3794,7 @@ CBaseEntity *CSceneEntity::FindNamedEntity( const char *name, CBaseEntity *pActo
 	{
 		if (m_hTarget6 == NULL)
 		{
-			m_hTarget6 = FindNamedTarget( m_iszTarget6, bBaseFlexOnly );
+			m_hTarget6 = (CBaseEntity*)FindNamedTarget( m_iszTarget6, bBaseFlexOnly );
 		}
 		return m_hTarget6;
 	}
@@ -3802,7 +3802,7 @@ CBaseEntity *CSceneEntity::FindNamedEntity( const char *name, CBaseEntity *pActo
 	{
 		if (m_hTarget7 == NULL)
 		{
-			m_hTarget7 = FindNamedTarget( m_iszTarget7, bBaseFlexOnly );
+			m_hTarget7 = (CBaseEntity*)FindNamedTarget( m_iszTarget7, bBaseFlexOnly );
 		}
 		return m_hTarget7;
 	}
@@ -3810,20 +3810,20 @@ CBaseEntity *CSceneEntity::FindNamedEntity( const char *name, CBaseEntity *pActo
 	{
 		if (m_hTarget8 == NULL)
 		{
-			m_hTarget8 = FindNamedTarget( m_iszTarget8, bBaseFlexOnly );
+			m_hTarget8 = (CBaseEntity*)FindNamedTarget( m_iszTarget8, bBaseFlexOnly );
 		}
 		return m_hTarget8;
 	}
-	else if (pActor && pActor->MyNPCPointer())
+	else if (pActor && pActor->IsNPC())
 	{
 		CSceneFindMarkFilter *pFilter = NULL;
 		if ( bUseClear )
 		{
 			pFilter = new CSceneFindMarkFilter();
-			pFilter->SetActor( pActor );
+			pFilter->SetActor( (CBaseEntity*)pActor );
 		}
 
-		entity = pActor->MyNPCPointer()->FindNamedEntity( name, pFilter );
+		entity = ((CBaseEntity*)pActor)->MyNPCPointer()->FindNamedEntity( name, pFilter );
 		if ( !entity && pFilter )
 		{
 			entity = pFilter->GetFilterResult();
@@ -3832,7 +3832,7 @@ CBaseEntity *CSceneEntity::FindNamedEntity( const char *name, CBaseEntity *pActo
 	else
 	{
 		// search for up to 32 entities with the same name and choose one randomly
-		CBaseEntity *entityList[ FINDNAMEDENTITY_MAX_ENTITIES ];
+		IServerEntity *entityList[ FINDNAMEDENTITY_MAX_ENTITIES ];
 		int	iCount;
 
 		entity = NULL;
@@ -3865,9 +3865,9 @@ CBaseEntity *CSceneEntity::FindNamedEntity( const char *name, CBaseEntity *pActo
 // Input  : *name - 
 // Output : CBaseFlex
 //-----------------------------------------------------------------------------
-CBaseEntity *CSceneEntity::FindNamedEntityClosest( const char *name, CBaseEntity *pActor, bool bBaseFlexOnly, bool bUseClear, const char *pszSecondary )
+IServerEntity *CSceneEntity::FindNamedEntityClosest( const char *name, IServerEntity *pActor, bool bBaseFlexOnly, bool bUseClear, const char *pszSecondary )
 {
-	CBaseEntity *entity = NULL;
+	IServerEntity *entity = NULL;
 
 	if ( !stricmp( name, "!activator" ) )
 	{
@@ -3875,7 +3875,7 @@ CBaseEntity *CSceneEntity::FindNamedEntityClosest( const char *name, CBaseEntity
 	} 
 	else if ( !stricmp( name, "Player" ) || !stricmp( name, "!player" ))
 	{
-		entity = ( gpGlobals->maxClients == 1 ) ? ( CBaseEntity * )EntityList()->GetLocalPlayer() : NULL;
+		entity = ( gpGlobals->maxClients == 1 ) ? EntityList()->GetLocalPlayer() : NULL;
 		return entity;
 	}
 	else if ( !stricmp( name, "!target1" ) )
@@ -3907,17 +3907,17 @@ CBaseEntity *CSceneEntity::FindNamedEntityClosest( const char *name, CBaseEntity
 		name = STRING( m_iszTarget7 );
 	}
 
-	if (pActor && pActor->MyNPCPointer())
+	if (pActor && pActor->IsNPC())
 	{
 		if (pszSecondary && strlen( pszSecondary ) > 0)
 		{
-			CBaseEntity *pActor2 = FindNamedEntityClosest( pszSecondary, pActor, false, false, NULL );
+			IServerEntity *pActor2 = FindNamedEntityClosest( pszSecondary, pActor, false, false, NULL );
 
 			if (pActor2)
 			{
 				CSceneFindNearestMarkFilter *pFilter = new CSceneFindNearestMarkFilter( pActor, pActor2->GetEngineObject()->GetAbsOrigin() );
 
-				entity = pActor->MyNPCPointer()->FindNamedEntity( name, pFilter );
+				entity = ((CBaseEntity*)pActor)->MyNPCPointer()->FindNamedEntity( name, pFilter );
 				if (!entity && pFilter)
 				{
 					entity = pFilter->GetFilterResult();
@@ -3930,10 +3930,10 @@ CBaseEntity *CSceneEntity::FindNamedEntityClosest( const char *name, CBaseEntity
 			if ( bUseClear )
 			{
 				pFilter = new CSceneFindMarkFilter();
-				pFilter->SetActor( pActor );
+				pFilter->SetActor( (CBaseEntity*)pActor );
 			}
 
-			entity = pActor->MyNPCPointer()->FindNamedEntity( name, pFilter );
+			entity = ((CBaseEntity*)pActor)->MyNPCPointer()->FindNamedEntity( name, pFilter );
 			if (!entity && pFilter)
 			{
 				entity = pFilter->GetFilterResult();
@@ -3945,7 +3945,7 @@ CBaseEntity *CSceneEntity::FindNamedEntityClosest( const char *name, CBaseEntity
 		// search for up to 32 entities with the same name and choose one randomly
 		int	iCount;
 		entity = NULL;
-		CBaseEntity *current = NULL;
+		IServerEntity *current = NULL;
 		for( iCount = 0; iCount < FINDNAMEDENTITY_MAX_ENTITIES; iCount++ )
 		{
 			current = EntityList()->FindEntityByName( current, name, NULL, pActor );
@@ -4407,7 +4407,7 @@ public:
 	virtual void			StartPlayback( void );
 	virtual void			DoThink( float frametime );
 	virtual CBaseFlex		*FindNamedActor( const char *name );
-	virtual CBaseEntity		*FindNamedEntity( const char *name );
+	virtual IServerEntity		*FindNamedEntity( const char *name );
 	virtual float			GetPostSpeakDelay()	{ return m_flPostSpeakDelay; }
 	virtual void			SetPostSpeakDelay( float flDelay ) { m_flPostSpeakDelay = flDelay; }
 	virtual float			GetPreDelay()	{ return m_flPreDelay; }
@@ -4415,7 +4415,7 @@ public:
 
 	virtual void			OnLoaded();
 
-	virtual void			DispatchStartMoveTo( CChoreoScene *scene, CBaseFlex *actor, CBaseEntity *actor2, CChoreoEvent *event )
+	virtual void			DispatchStartMoveTo( CChoreoScene *scene, CBaseFlex *actor, IServerEntity *actor2, CChoreoEvent *event )
 							{ 
 								if (PassThrough( actor )) BaseClass::DispatchStartMoveTo( scene, actor, actor2, event ); 
 							};
@@ -4425,7 +4425,7 @@ public:
 								if (PassThrough( actor )) BaseClass::DispatchEndMoveTo( scene, actor, event ); 
 							};
 
-	virtual void			DispatchStartFace( CChoreoScene *scene, CBaseFlex *actor, CBaseEntity *actor2, CChoreoEvent *event ) 
+	virtual void			DispatchStartFace( CChoreoScene *scene, CBaseFlex *actor, IServerEntity *actor2, CChoreoEvent *event ) 
 							{ 
 								if (PassThrough( actor )) BaseClass::DispatchStartFace( scene, actor, actor2, event ); 
 							};
@@ -4755,9 +4755,9 @@ CBaseFlex *CInstancedSceneEntity::FindNamedActor( const char *name )
 // Input  : *name - 
 // Output : CBaseFlex
 //-----------------------------------------------------------------------------
-CBaseEntity *CInstancedSceneEntity::FindNamedEntity( const char *name )
+IServerEntity *CInstancedSceneEntity::FindNamedEntity( const char *name )
 {
-	CBaseEntity *pOther = NULL;
+	IServerEntity *pOther = NULL;
 
 	if (m_hOwner != NULL)
 	{
@@ -5427,7 +5427,7 @@ void CSceneListManager::Activate( void )
 		{
 			if ( m_iszScenes[i] != NULL_STRING )
 			{
-				m_hScenes[i] = EntityList()->FindEntityByName( NULL, STRING(m_iszScenes[i]) );
+				m_hScenes[i] = (CBaseEntity*)EntityList()->FindEntityByName( NULL, STRING(m_iszScenes[i]) );
 				if ( m_hScenes[i] )
 				{
 					CSceneEntity *pScene = dynamic_cast<CSceneEntity*>(m_hScenes[i].Get());
@@ -5554,7 +5554,7 @@ void CSceneListManager::RemoveScene( int iIndex )
 	}
 }
 
-void ReloadSceneFromDisk( CBaseEntity *ent )
+void ReloadSceneFromDisk( IServerEntity *ent )
 {
 	CSceneEntity *scene = dynamic_cast< CSceneEntity * >( ent );
 	if ( !scene )
@@ -5567,7 +5567,7 @@ void ReloadSceneFromDisk( CBaseEntity *ent )
 // Input  : *ent - 
 // Output : char const
 //-----------------------------------------------------------------------------
-char const *GetSceneFilename( CBaseEntity *ent )
+char const *GetSceneFilename( IServerEntity *ent )
 {
 	CSceneEntity *scene = dynamic_cast< CSceneEntity * >( ent );
 	if ( !scene )

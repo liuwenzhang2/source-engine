@@ -555,7 +555,7 @@ void CNPC_Antlion::UpdateHead( void )
 // Input  : *pEntity - 
 // Output : Returns true on success, false on failure.
 //-----------------------------------------------------------------------------
-bool CNPC_Antlion::FInViewCone( CBaseEntity *pEntity )
+bool CNPC_Antlion::FInViewCone( IServerEntity *pEntity )
 {
 	m_flFieldOfView = ( GetEnemy() != NULL ) ? ANTLION_VIEW_FIELD_NARROW : VIEW_FIELD_WIDE;
 
@@ -615,7 +615,7 @@ void CNPC_Antlion::Event_Killed( const CTakeDamageInfo &info )
 
 	BaseClass::Event_Killed( info );
 
-	CBaseEntity *pAttacker = info.GetInflictor();
+	CBaseEntity *pAttacker = (CBaseEntity*)info.GetInflictor();
 
 	if ( pAttacker && pAttacker->GetServerVehicle() && ShouldGib( info ) == true )
 	{
@@ -1574,7 +1574,7 @@ void CNPC_Antlion::StartTask( const Task_t *pTask )
 
 	case TASK_ANTLION_DISMOUNT_NPC:
 		{
-		CBaseEntity* pGroundEnt = GetEngineObject()->GetGroundEntity() ? GetEngineObject()->GetGroundEntity()->GetOuter() : NULL;
+		CBaseEntity* pGroundEnt = GetEngineObject()->GetGroundEntity() ? (CBaseEntity*)GetEngineObject()->GetGroundEntity()->GetOuter() : NULL;
 			
 			if( pGroundEnt != NULL )
 			{
@@ -1884,7 +1884,7 @@ void CNPC_Antlion::RunTask( const Task_t *pTask )
 		
 		if (GetEngineObject()->GetFlags() & FL_ONGROUND )
 		{
-			CBaseEntity* pGroundEnt = GetEngineObject()->GetGroundEntity() ? GetEngineObject()->GetGroundEntity()->GetOuter() : NULL;
+			CBaseEntity* pGroundEnt = GetEngineObject()->GetGroundEntity() ? (CBaseEntity*)GetEngineObject()->GetGroundEntity()->GetOuter() : NULL;
 
 			if ( ( pGroundEnt != NULL ) && ( ( pGroundEnt->MyNPCPointer() != NULL ) || pGroundEnt->GetEngineObject()->GetSolidFlags() & FSOLID_NOT_STANDABLE ) )
 			{
@@ -2470,14 +2470,14 @@ int CNPC_Antlion::SelectSchedule( void )
 		if ( m_bHasHeardSound )
 		{		
 			//Mark anything in the area as more interesting
-			CBaseEntity *pTarget = NULL;
+			IServerEntity *pTarget = NULL;
 			CBaseEntity *pNewEnemy = NULL;
 			Vector		soundOrg = m_vecHeardSound;
 
 			//Find all entities within that sphere
 			while ( ( pTarget = EntityList()->FindEntityInSphere( pTarget, soundOrg, bugbait_radius.GetInt() ) ) != NULL )
 			{
-				CAI_BaseNPC *pNPC = pTarget->MyNPCPointer();
+				CAI_BaseNPC *pNPC = ((CBaseEntity*)pTarget)->MyNPCPointer();
 
 				if ( pNPC == NULL )
 					continue;
@@ -2695,7 +2695,7 @@ int CNPC_Antlion::OnTakeDamage_Alive( const CTakeDamageInfo &info )
 	// If we're being hoisted by a barnacle, we only take damage from that barnacle (otherwise we can die too early!)
 	if (GetEngineObject()->IsEFlagSet( EFL_IS_BEING_LIFTED_BY_BARNACLE ) )
 	{
-		if ( info.GetAttacker() && info.GetAttacker()->Classify() != CLASS_BARNACLE )
+		if ( info.GetAttacker() && ((CBaseEntity*)info.GetAttacker())->Classify() != CLASS_BARNACLE )
 			return 0;
 	}
 
@@ -3279,11 +3279,11 @@ public:
 	bool ShouldHitEntity( IHandleEntity *pHandleEntity, int contentsMask )
 	{
 		Assert( dynamic_cast<CBaseEntity*>(pHandleEntity) );
-		CBaseEntity *pTestEntity = static_cast<CBaseEntity*>(pHandleEntity);
+		IServerEntity *pTestEntity = static_cast<CBaseEntity*>(pHandleEntity);
 
 		if ( GetPassEntity() )
 		{
-			CBaseEntity *pEnt = EntityList()->GetBaseEntityFromHandle( GetPassEntity()->GetRefEHandle() );
+			IServerEntity *pEnt = EntityList()->GetBaseEntityFromHandle( GetPassEntity()->GetRefEHandle() );
 
 			if ( pEnt->IsNPC() )
 			{
@@ -3815,7 +3815,7 @@ void CNPC_Antlion::GatherConditions( void )
 	BaseClass::GatherConditions();
 
 	// See if I've landed on an NPC!
-	CBaseEntity* pGroundEnt = GetEngineObject()->GetGroundEntity() ? GetEngineObject()->GetGroundEntity()->GetOuter() : NULL;
+	CBaseEntity* pGroundEnt = GetEngineObject()->GetGroundEntity() ? (CBaseEntity*)GetEngineObject()->GetGroundEntity()->GetOuter() : NULL;
 	
 	if ( ( ( pGroundEnt != NULL ) && ( pGroundEnt->GetEngineObject()->GetSolidFlags() & FSOLID_NOT_STANDABLE ) ) && (GetEngineObject()->GetFlags() & FL_ONGROUND ) && ( !GetEngineObject()->IsEffectActive( EF_NODRAW ) && !pGroundEnt->GetEngineObject()->IsEffectActive( EF_NODRAW ) ) )
 	{
@@ -4029,11 +4029,11 @@ void CNPC_Antlion::InputFightToPosition( inputdata_t &inputdata )
 	if ( IsAlive() == false )
 		return;
 
-	CBaseEntity *pEntity = EntityList()->FindEntityByName( NULL, inputdata.value.String(), NULL, inputdata.pActivator, inputdata.pCaller );
+	IServerEntity *pEntity = EntityList()->FindEntityByName( NULL, inputdata.value.String(), NULL, inputdata.pActivator, inputdata.pCaller );
 
 	if ( pEntity != NULL )
 	{
-		SetFightTarget( pEntity );
+		SetFightTarget((CBaseEntity*)pEntity );
 		SetFollowTarget( NULL );
 	}
 }
@@ -4099,7 +4099,7 @@ bool CNPC_Antlion::ShouldGib( const CTakeDamageInfo &info )
 	// If we're being hoisted, we only want to gib when the barnacle hurts us with his bite!
 	if (GetEngineObject()->IsEFlagSet( EFL_IS_BEING_LIFTED_BY_BARNACLE ) )
 	{
-		if ( info.GetAttacker() && info.GetAttacker()->Classify() != CLASS_BARNACLE )
+		if ( info.GetAttacker() && ((CBaseEntity*)info.GetAttacker())->Classify() != CLASS_BARNACLE )
 			return false;
 
 		return true;
@@ -4266,7 +4266,7 @@ void CNPC_Antlion::Touch( IServerEntity *pOther )
 			return;
 	
 		if ( !IsCurSchedule( SCHED_MOVE_AWAY ) && !IsCurSchedule( SCHED_ANTLION_BURROW_OUT ) )
-			 TestPlayerPushing((CBaseEntity*)pOther );
+			 TestPlayerPushing( pOther );
 	}
 
 	//Adrian: Explode if hit by gunship!
@@ -4277,7 +4277,7 @@ void CNPC_Antlion::Touch( IServerEntity *pOther )
 		{
 			float flDamage = m_iHealth + 25;
 						
-			CTakeDamageInfo	dmgInfo((CBaseEntity*)pOther, (CBaseEntity*)pOther, flDamage, DMG_GENERIC );
+			CTakeDamageInfo	dmgInfo(pOther, pOther, flDamage, DMG_GENERIC );
 			GuessDamageForce( &dmgInfo, (pOther->GetEngineObject()->GetAbsOrigin() - GetEngineObject()->GetAbsOrigin()), pOther->GetEngineObject()->GetAbsOrigin() );
 			TakeDamage( dmgInfo );
 		}
@@ -4496,7 +4496,7 @@ void CNPC_Antlion::Flip( bool bZapped /*= false*/ )
 //-----------------------------------------------------------------------------
 void CNPC_Antlion::InputJumpAtTarget( inputdata_t &inputdata )
 {
-	CBaseEntity *pJumpTarget = EntityList()->FindEntityByName( NULL, inputdata.value.String(), this, inputdata.pActivator, inputdata.pCaller );
+	IServerEntity *pJumpTarget = EntityList()->FindEntityByName( NULL, inputdata.value.String(), this, inputdata.pActivator, inputdata.pCaller );
 	if ( pJumpTarget == NULL )
 	{
 		Msg("Unable to find jump target named (%s)\n", inputdata.value.String() );

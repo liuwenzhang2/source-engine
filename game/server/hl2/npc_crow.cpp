@@ -340,7 +340,7 @@ void CNPC_Crow::InputFlyAway( inputdata_t &inputdata )
 
 	if ( sTarget != NULL_STRING )// this npc has a target
 	{
-		CBaseEntity *pEnt = EntityList()->FindEntityByName( NULL, sTarget );
+		IServerEntity *pEnt = EntityList()->FindEntityByName( NULL, sTarget );
 
 		if ( pEnt )
 		{
@@ -351,7 +351,7 @@ void CNPC_Crow::InputFlyAway( inputdata_t &inputdata )
 				 return;
 
 			// Find the npc's initial target entity, stash it
-			SetGoalEnt( pEnt );
+			SetGoalEnt((CBaseEntity*)pEnt );
 		}
 	}
 	else

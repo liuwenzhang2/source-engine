@@ -38,7 +38,7 @@ private:
 
 	float SampleAngularVelocity(CBaseEntity *pEntity);
 	int CompareToThreshold(CBaseEntity *pEntity, float flThreshold, bool bFireVelocityOutput);
-	void FireCompareOutput(int nCompareResult, CBaseEntity *pActivator);
+	void FireCompareOutput(int nCompareResult, IServerEntity *pActivator);
 	void DrawDebugLines( void );
 
 	// Input handlers
@@ -135,7 +135,7 @@ void CPointAngularVelocitySensor::Activate(void)
 {
 	BaseClass::Activate();
 
-	m_hTargetEntity = EntityList()->FindEntityByName( NULL, m_target );
+	m_hTargetEntity = (CBaseEntity*)EntityList()->FindEntityByName( NULL, m_target );
 
 	if (m_hTargetEntity)
 	{
@@ -355,7 +355,7 @@ void CPointAngularVelocitySensor::InputTest( inputdata_t &inputdata )
 // Input  : nCompareResult - 
 //			pActivator - 
 //-----------------------------------------------------------------------------
-void CPointAngularVelocitySensor::FireCompareOutput( int nCompareResult, CBaseEntity *pActivator )
+void CPointAngularVelocitySensor::FireCompareOutput( int nCompareResult, IServerEntity *pActivator )
 {
 	if (nCompareResult == -1)
 	{
@@ -445,7 +445,7 @@ void CPointVelocitySensor::Activate( void )
 {
 	BaseClass::Activate();
 
-	m_hTargetEntity = EntityList()->FindEntityByName( NULL, m_target );
+	m_hTargetEntity = (CBaseEntity*)EntityList()->FindEntityByName( NULL, m_target );
 	
 	if ( m_bEnabled && m_hTargetEntity )
 	{

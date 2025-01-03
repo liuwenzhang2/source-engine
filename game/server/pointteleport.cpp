@@ -79,11 +79,11 @@ void CPointTeleport::Activate( void )
 	// Save off the spawn position of the target if instructed to do so
 	if (GetEngineObject()->GetSpawnFlags() & SF_TELEPORT_TO_SPAWN_POS)
 	{
-		CBaseEntity *pTarget = EntityList()->FindEntityByName( NULL, m_target );
+		IServerEntity *pTarget = EntityList()->FindEntityByName( NULL, m_target );
 		if ( pTarget )
 		{
 			// If teleport object is in a movement hierarchy, remove it first
-			if ( EntityMayTeleport( pTarget ) )
+			if ( EntityMayTeleport((CBaseEntity*)pTarget ) )
 			{
 				// Save the points
 				m_vSaveOrigin = pTarget->GetEngineObject()->GetAbsOrigin();
@@ -113,12 +113,12 @@ void CPointTeleport::Activate( void )
 void CPointTeleport::InputTeleport( inputdata_t &inputdata )
 {
 	// Attempt to find the entity in question
-	CBaseEntity *pTarget = EntityList()->FindEntityByName( NULL, m_target, this, inputdata.pActivator, inputdata.pCaller );
+	IServerEntity *pTarget = EntityList()->FindEntityByName( NULL, m_target, this, inputdata.pActivator, inputdata.pCaller );
 	if ( pTarget == NULL )
 		return;
 
 	// If teleport object is in a movement hierarchy, remove it first
-	if ( EntityMayTeleport( pTarget ) == false )
+	if ( EntityMayTeleport((CBaseEntity*)pTarget ) == false )
 	{
 		Warning("ERROR: (%s) can't teleport object (%s) as it has a parent (%s)!\n",GetDebugName(),pTarget->GetDebugName(),(pTarget->GetEngineObject()->GetMoveParent()?pTarget->GetEngineObject()->GetMoveParent()->GetOuter()->GetDebugName():NULL));
 		return;

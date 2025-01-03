@@ -77,7 +77,7 @@ void CWorldItem::Spawn( void )
 	else
 	{
 		pEntity->m_target = m_target;
-		pEntity->SetName( STRING(GetEntityName()) );
+		pEntity->GetEngineObject()->SetName( STRING(GetEntityName()) );
 		pEntity->GetEngineObject()->ClearSpawnFlags();
 		pEntity->GetEngineObject()->AddSpawnFlags(GetEngineObject()->GetSpawnFlags() );
 	}
@@ -417,7 +417,7 @@ void CItem::ItemTouch( IServerEntity *pOther )
 	if ( ItemCanBeTouchedByPlayer( pPlayer ) == false )
 		return;
 
-	m_OnCacheInteraction.FireOutput((CBaseEntity*)pOther, this);
+	m_OnCacheInteraction.FireOutput(pOther, this);
 
 	// Can I even pick stuff up?
 	if ( !pPlayer->IsAllowedToPickupWeapons() )
@@ -432,7 +432,7 @@ void CItem::ItemTouch( IServerEntity *pOther )
 
 	if ( MyTouch( pPlayer ) )
 	{
-		m_OnPlayerTouch.FireOutput((CBaseEntity*)pOther, this);
+		m_OnPlayerTouch.FireOutput(pOther, this);
 
 		SetTouch( NULL );
 		SetThink( NULL );

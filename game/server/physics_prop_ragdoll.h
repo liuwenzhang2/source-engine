@@ -140,8 +140,8 @@ void DetachAttachedRagdoll( CBaseEntity *pRagdollIn );
 void DetachAttachedRagdollsForEntity( CBaseEntity *pRagdollParent );
 CBaseAnimating *CreateServerRagdollSubmodel( CBaseAnimating *pOwner, const char *pModelName, const Vector &position, const QAngle &angles, int collisionGroup );
 
-bool Ragdoll_IsPropRagdoll( CBaseEntity *pEntity );
-void Ragdoll_GetAngleOverrideString( char *pOut, int size, CBaseEntity *pEntity );
+bool Ragdoll_IsPropRagdoll( IServerEntity *pEntity );
+void Ragdoll_GetAngleOverrideString( char *pOut, int size, IServerEntity *pEntity );
 extern const char* s_pFadeOutContext;
 extern const char* s_pDebrisContext;
 #endif // PHYSICS_PROP_RAGDOLL_H

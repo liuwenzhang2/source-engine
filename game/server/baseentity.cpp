@@ -922,7 +922,7 @@ int CBaseEntity::DrawDebugTextOverlays(void)
 void CBaseEntity::SetParent( string_t newParent, CBaseEntity *pActivator, int iAttachment )
 {
 	// find and notify the new parent
-	CBaseEntity *pParent = EntityList()->FindEntityByName( NULL, newParent, NULL, pActivator );
+	IServerEntity *pParent = EntityList()->FindEntityByName( NULL, newParent, NULL, pActivator );
 
 	// debug check
 	if ( newParent != NULL_STRING && pParent == NULL )
@@ -1051,7 +1051,7 @@ void CBaseEntity::ValidateEntityConnections()
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-void CBaseEntity::FireNamedOutput( const char *pszOutput, variant_t variant, CBaseEntity *pActivator, CBaseEntity *pCaller, float flDelay )
+void CBaseEntity::FireNamedOutput( const char *pszOutput, variant_t variant, IServerEntity *pActivator, IServerEntity *pCaller, float flDelay )
 {
 	if ( pszOutput == NULL )
 		return;
@@ -1101,7 +1101,7 @@ void CBaseEntity::Activate( void )
 	// Get a handle to my damage filter entity if there is one.
 	if ( m_iszDamageFilterName != NULL_STRING )
 	{
-		m_hDamageFilter = EntityList()->FindEntityByName( NULL, m_iszDamageFilterName );
+		m_hDamageFilter = (CBaseEntity*)EntityList()->FindEntityByName( NULL, m_iszDamageFilterName );
 	}
 
 	// Add any non-null context strings to our context vector
@@ -1283,7 +1283,7 @@ void CBaseEntity::TakeDamage( const CTakeDamageInfo &inputInfo )
 //-----------------------------------------------------------------------------
 // Purpose: Returns a value that scales all damage done by this entity.
 //-----------------------------------------------------------------------------
-float CBaseEntity::GetAttackDamageScale( CBaseEntity *pVictim )
+float CBaseEntity::GetAttackDamageScale( IHandleEntity *pVictim )
 {
 	float flScale = 1;
 	FOR_EACH_LL( m_DamageModifiers, i )
@@ -1299,7 +1299,7 @@ float CBaseEntity::GetAttackDamageScale( CBaseEntity *pVictim )
 //-----------------------------------------------------------------------------
 // Purpose: Returns a value that scales all damage done to this entity
 //-----------------------------------------------------------------------------
-float CBaseEntity::GetReceivedDamageScale( CBaseEntity *pAttacker )
+float CBaseEntity::GetReceivedDamageScale( IHandleEntity *pAttacker )
 {
 	float flScale = 1;
 	FOR_EACH_LL( m_DamageModifiers, i )
@@ -1385,7 +1385,7 @@ void CBaseEntity::Event_Killed( const CTakeDamageInfo &info )
 {
 	if( info.GetAttacker() )
 	{
-		info.GetAttacker()->Event_KilledOther(this, info);
+		((IServerEntity*)info.GetAttacker())->Event_KilledOther(this, info);
 	}
 
 	m_takedamage = DAMAGE_NO;
@@ -1431,7 +1431,7 @@ CBaseEntity *CBaseEntity::GetNextTarget( void )
 {
 	if ( !m_target )
 		return NULL;
-	return EntityList()->FindEntityByName( NULL, m_target );
+	return (CBaseEntity*)EntityList()->FindEntityByName( NULL, m_target );
 }
 
 
@@ -1664,7 +1664,7 @@ int CBaseEntity::ObjectCaps( void )
 
 	// We inherit our parent's use capabilities so that we can forward use commands
 	// to our parent.
-	CBaseEntity *pParent = GetEngineObject()->GetMoveParent()? GetEngineObject()->GetMoveParent()->GetOuter():NULL;
+	IServerEntity *pParent = GetEngineObject()->GetMoveParent()? GetEngineObject()->GetMoveParent()->GetOuter():NULL;
 	if ( pParent )
 	{
 		int caps = pParent->ObjectCaps();
@@ -1734,7 +1734,7 @@ void CBaseEntity::EndTouch( IServerEntity *pOther )
 // Purpose: Dispatches blocked events to this entity's blocked handler, set via SetBlocked.
 // Input  : pOther - The entity that is blocking us.
 //-----------------------------------------------------------------------------
-void CBaseEntity::Blocked( CBaseEntity *pOther )
+void CBaseEntity::Blocked( IServerEntity *pOther )
 { 
 	if ( m_pfnBlocked )
 	{
@@ -2058,7 +2058,7 @@ void CBaseEntity::VPhysicsUpdatePusher( IPhysicsObject *pPhysics )
 		{
 			if ( list[i]->IsSolid())
 			{
-				CheckPushedEntity( list[i]->GetOuter(), params);
+				CheckPushedEntity( (CBaseEntity*)list[i]->GetOuter(), params);
 			}
 		}
 
@@ -2086,7 +2086,7 @@ void CBaseEntity::VPhysicsUpdatePusher( IPhysicsObject *pPhysics )
 						physLocalTime = pList->localMoveTime;
 						for ( int i = 0; i < pList->pushedCount; i++ )
 						{
-							CBaseEntity *pEntity = EntityList()->GetBaseEntityFromHandle(pList->pushedEnts[i]);
+							IServerEntity *pEntity = EntityList()->GetBaseEntityFromHandle(pList->pushedEnts[i]);
 							if ( !pEntity )
 								continue;
 
@@ -2206,7 +2206,7 @@ void CBaseEntity::VPhysicsCollision( int index, gamevcollisionevent_t *pEvent )
 	// UNDONE: Store a sound time for this entity (not just this pair of objects)
 	// and filter repeats on that?
 	int otherIndex = !index;
-	CBaseEntity *pHitEntity = pEvent->pEntities[otherIndex];
+	IServerEntity *pHitEntity = pEvent->pEntities[otherIndex];
 
 	// Don't make sounds / effects if neither entity is MOVETYPE_VPHYSICS.  The game
 	// physics should have done so.
@@ -2421,19 +2421,19 @@ extern ConVar ai_debug_los;
 void CC_AI_LOS_Debug( IConVar *var, const char *pOldString, float flOldValue )
 {
 	int iLOSMode = ai_debug_los.GetInt();
-	for ( CBaseEntity *pEntity = EntityList()->FirstEnt(); pEntity != NULL; pEntity = EntityList()->NextEnt(pEntity) )
+	for ( IServerEntity *pEntity = EntityList()->FirstEnt(); pEntity != NULL; pEntity = EntityList()->NextEnt(pEntity) )
 	{
 		if ( iLOSMode == 1 && pEntity->GetEngineObject()->IsSolid() )
 		{
-			pEntity->m_debugOverlays |= OVERLAY_SHOW_BLOCKSLOS;
+			pEntity->GetDebugOverlays() |= OVERLAY_SHOW_BLOCKSLOS;
 		}
 		else if ( iLOSMode == 2 )
 		{
-			pEntity->m_debugOverlays |= OVERLAY_SHOW_BLOCKSLOS;
+			pEntity->GetDebugOverlays() |= OVERLAY_SHOW_BLOCKSLOS;
 		}
 		else
 		{
-			pEntity->m_debugOverlays &= ~OVERLAY_SHOW_BLOCKSLOS;
+			pEntity->GetDebugOverlays() &= ~OVERLAY_SHOW_BLOCKSLOS;
 		}
 	}
 }
@@ -2644,7 +2644,7 @@ CBaseEntity *CBaseEntity::Create( const char *szName, const Vector &vecOrigin, c
 // will keep a pointer to it after this call.
 CBaseEntity * CBaseEntity::CreateNoSpawn( const char *szName, const Vector &vecOrigin, const QAngle &vecAngles, CBaseEntity *pOwner )
 {
-	CBaseEntity *pEntity = (CBaseEntity*)EntityList()->CreateEntityByName( szName );
+	IServerEntity *pEntity = EntityList()->CreateEntityByName( szName );
 	if ( !pEntity )
 	{
 		Assert( !"CreateNoSpawn: only works for CBaseEntities" );
@@ -2657,7 +2657,7 @@ CBaseEntity * CBaseEntity::CreateNoSpawn( const char *szName, const Vector &vecO
 
 	EntityList()->NotifyCreateEntity( pEntity );
 
-	return pEntity;
+	return (CBaseEntity*)pEntity;
 }
 
 Vector CBaseEntity::GetSoundEmissionOrigin() const
@@ -2790,11 +2790,11 @@ bool CBaseEntity::TestHitboxes( const Ray_t &ray, unsigned int fContentsMask, tr
 }
 
 
-void CBaseEntity::SetOwnerEntity( CBaseEntity* pOwner )
+void CBaseEntity::SetOwnerEntity(IServerEntity* pOwner )
 {
 	if ( m_hOwnerEntity.Get() != pOwner )
 	{
-		m_hOwnerEntity = pOwner;
+		m_hOwnerEntity = (CBaseEntity*)pOwner;
 
 		GetEngineObject()->CollisionRulesChanged();
 	}
@@ -2809,7 +2809,7 @@ void CBaseEntity::Spawn( void )
 
 CBaseEntity* CBaseEntity::Instance( const CBaseHandle &hEnt )
 {
-	return EntityList()->GetBaseEntityFromHandle( hEnt );
+	return (CBaseEntity*)EntityList()->GetBaseEntityFromHandle( hEnt );
 }
 
 //CBaseEntity* CBaseEntity::Instance(const edict_t* pent)
@@ -2828,7 +2828,7 @@ CBaseEntity* CBaseEntity::Instance( const CBaseHandle &hEnt )
 
 CBaseEntity* CBaseEntity::Instance(int iEnt)
 {
-	return EntityList()->GetBaseEntity(iEnt);
+	return (CBaseEntity*)EntityList()->GetBaseEntity(iEnt);
 }
 
 int CBaseEntity::GetTransmitState( void )
@@ -2935,7 +2935,7 @@ int CBaseEntity::ShouldTransmit( const CCheckTransmitInfo *pInfo )
 //		return FL_EDICT_ALWAYS;
 //	}
 
-	CBaseEntity *pRecipientEntity = EntityList()->GetBaseEntity( pInfo->m_pClientEnt );
+	IServerEntity *pRecipientEntity = EntityList()->GetBaseEntity( pInfo->m_pClientEnt );
 
 	Assert( pRecipientEntity->IsPlayer() );
 	
@@ -3290,8 +3290,8 @@ bool CBaseEntity::AcceptInput( const char *szInputName, IServerEntity *pActivato
 					{ 
 						// Package the data into a struct for passing to the input handler.
 						inputdata_t data;
-						data.pActivator = (CBaseEntity*)pActivator;
-						data.pCaller = (CBaseEntity*)pCaller;
+						data.pActivator = pActivator;
+						data.pCaller = pCaller;
 						data.value = Value;
 						data.nOutputID = outputID;
 
@@ -3419,7 +3419,7 @@ void CBaseEntity::InputSetDamageFilter( inputdata_t &inputdata )
 	m_iszDamageFilterName = inputdata.value.StringID();
 	if ( m_iszDamageFilterName != NULL_STRING )
 	{
-		m_hDamageFilter = EntityList()->FindEntityByName( NULL, m_iszDamageFilterName );
+		m_hDamageFilter = (CBaseEntity*)EntityList()->FindEntityByName( NULL, m_iszDamageFilterName );
 	}
 	else
 	{
@@ -3481,7 +3481,7 @@ void CBaseEntity::InputKillHierarchy( inputdata_t &inputdata )
 	for ( pChild = GetEngineObject()->FirstMoveChild(); pChild; pChild = pNext )
 	{
 		pNext = pChild->NextMovePeer();
-		pChild->GetOuter()->InputKillHierarchy(inputdata);
+		((CBaseEntity*)pChild->GetOuter())->InputKillHierarchy(inputdata);
 	}
 
 	// tell owner ( if any ) that we're dead. This is mostly for NPCMaker functionality.
@@ -3507,7 +3507,7 @@ void CBaseEntity::InputSetParent( inputdata_t &inputdata )
 	//}
 
 	GetEngineObject()->ClearParentAttachment();
-	SetParent( inputdata.value.StringID(), inputdata.pActivator );
+	SetParent( inputdata.value.StringID(), (CBaseEntity*)inputdata.pActivator );
 }
 
 //------------------------------------------------------------------------------
@@ -3523,15 +3523,14 @@ void CBaseEntity::SetParentAttachment( const char *szInputName, const char *szAt
 	}
 
 	// Valid only on CBaseAnimating
-	CBaseAnimating *pAnimating = GetEngineObject()->GetMoveParent()->GetOuter()->GetBaseAnimating();
-	if ( !pAnimating )
+	if ( !GetEngineObject()->GetMoveParent()->GetModelPtr())
 	{
 		Warning("ERROR: Tried to %s for entity %s (%s), but its parent has no model.\n", szInputName, GetClassname(), GetDebugName() );
 		return;
 	}
 
 	// Lookup the attachment
-	int iAttachment = pAnimating->GetEngineObject()->LookupAttachment( szAttachment );
+	int iAttachment = GetEngineObject()->GetMoveParent()->LookupAttachment( szAttachment );
 	if ( iAttachment <= 0 )
 	{
 		Warning("ERROR: Tried to %s for entity %s (%s), but it has no attachment named %s.\n", szInputName, GetClassname(), GetDebugName(), szAttachment );
@@ -3853,7 +3852,7 @@ static void BuildTeleportList_r( CBaseEntity *pTeleport, CUtlVector<TeleportList
 	IEngineObjectServer *pList = pTeleport->GetEngineObject()->FirstMoveChild();
 	while ( pList )
 	{
-		BuildTeleportList_r( pList->GetOuter(), teleportList);
+		BuildTeleportList_r((CBaseEntity*)pList->GetOuter(), teleportList);
 		pList = pList->NextMovePeer();
 	}
 }
@@ -3900,12 +3899,6 @@ void CBaseEntity::Teleport( const Vector *newPosition, const QAngle *newAngles, 
 	{
 		Q_memset( step, 0, sizeof( *step ) );
 	}
-}
-
-// Stuff implemented for weapon prediction code
-void CBaseEntity::SetSize( const Vector &vecMin, const Vector &vecMax )
-{
-	GetEngineObject()->SetSize( vecMin, vecMax );
 }
 
 IStudioHdr *ModelSoundsCache_LoadModel( const char *filename )
@@ -4298,7 +4291,7 @@ void CBaseEntity::PrecacheModelComponents( int nModelIndex )
 
 //   Entity degugging console commands
 extern void			SetDebugBits( CBasePlayer* pPlayer, const char *name, int bit );
-extern CBaseEntity *GetNextCommandEntity( CBasePlayer *pPlayer, const char *name, CBaseEntity *ent );
+extern IServerEntity *GetNextCommandEntity( CBasePlayer *pPlayer, const char *name, IServerEntity *ent );
 
 //------------------------------------------------------------------------------
 // Purpose :
@@ -4310,7 +4303,7 @@ void ConsoleFireTargets( CBasePlayer *pPlayer, const char *name)
 	// If no name was given use the picker
 	if (FStrEq(name,"")) 
 	{
-		CBaseEntity *pEntity = EntityList()->FindPickerEntity( pPlayer );
+		IServerEntity *pEntity = EntityList()->FindPickerEntity( pPlayer );
 		if ( pEntity && !pEntity->GetEngineObject()->IsMarkedForDeletion())
 		{
 			Msg( "[%03d] Found: %s, firing\n", gpGlobals->tickcount%1000, pEntity->GetDebugName());
@@ -4380,7 +4373,7 @@ static ConCommand ent_viewoffset("ent_viewoffset", CC_Ent_ViewOffset, "Displays 
 //------------------------------------------------------------------------------
 void CC_Ent_Remove( const CCommand& args )
 {
-	CBaseEntity *pEntity = NULL;
+	IServerEntity *pEntity = NULL;
 
 	// If no name was given set bits based on the picked
 	if ( FStrEq( args[1],"") ) 
@@ -4397,7 +4390,7 @@ void CC_Ent_Remove( const CCommand& args )
 		else
 		{
 			// Otherwise set bits based on name or classname
-			CBaseEntity *ent = NULL;
+			IServerEntity *ent = NULL;
 			while ( (ent = EntityList()->NextEnt(ent)) != NULL )
 			{
 				if (  (ent->GetEntityName() != NULL_STRING	&& FStrEq(args[1], STRING(ent->GetEntityName())))	|| 
@@ -4432,7 +4425,7 @@ void CC_Ent_RemoveAll( const CCommand& args )
 	{
 		// Otherwise remove based on name or classname
 		int iCount = 0;
-		CBaseEntity *ent = NULL;
+		IServerEntity *ent = NULL;
 		while ( (ent = EntityList()->NextEnt(ent)) != NULL )
 		{
 			if (  (ent->GetEntityName() != NULL_STRING	&& FStrEq(args[1], STRING(ent->GetEntityName())))	|| 
@@ -4459,7 +4452,7 @@ static ConCommand ent_remove_all("ent_remove_all", CC_Ent_RemoveAll, "Removes al
 //------------------------------------------------------------------------------
 void CC_Ent_SetName( const CCommand& args )
 {
-	CBaseEntity *pEntity = NULL;
+	IServerEntity *pEntity = NULL;
 
 	if ( args.ArgC() < 1 )
 	{
@@ -4479,7 +4472,7 @@ void CC_Ent_SetName( const CCommand& args )
 		else 
 		{
 			// Otherwise set bits based on name or classname
-			CBaseEntity *ent = NULL;
+			IServerEntity *ent = NULL;
 			while ( (ent = EntityList()->NextEnt(ent)) != NULL )
 			{
 				if (  (ent->GetEntityName() != NULL_STRING	&& FStrEq(args[1], STRING(ent->GetEntityName())))	|| 
@@ -4496,7 +4489,7 @@ void CC_Ent_SetName( const CCommand& args )
 		if ( pEntity )
 		{
 			Msg( "Set the name of %s to %s\n", STRING(pEntity->GetEngineObject()->GetClassname()), args[1] );
-			pEntity->SetName( args[1] );
+			pEntity->GetEngineObject()->SetName( args[1] );
 		}
 	}
 }
@@ -4516,7 +4509,7 @@ void CC_Find_Ent( const CCommand& args )
  	const char *pszSubString = args[1];
 	Msg("Searching for entities with class/target name containing substring: '%s'\n", pszSubString );
 
-	CBaseEntity *ent = NULL;
+	IServerEntity *ent = NULL;
 	while ( (ent = EntityList()->NextEnt(ent)) != NULL )
 	{
 		const char *pszClassname = ent->GetClassname();
@@ -4560,7 +4553,7 @@ void CC_Find_Ent_Index( const CCommand& args )
 	}
 
 	int iIndex = atoi(args[1]);
-	CBaseEntity	*pEnt = EntityList()->GetBaseEntity( iIndex );
+	IServerEntity	*pEnt = EntityList()->GetBaseEntity( iIndex );
 	if ( pEnt )
 	{
 		Msg("   '%s' : '%s' (entindex %d) \n", pEnt->GetClassname(), pEnt->GetEntityName().ToCStr(), iIndex );
@@ -4589,7 +4582,7 @@ void CC_Ent_Dump( const CCommand& args )
 	else
 	{
 		// iterate through all the ents of this name, printing out their details
-		CBaseEntity *ent = NULL;
+		IServerEntity *ent = NULL;
 		bool bFound = false;
 		while ( ( ent = EntityList()->FindEntityByName(ent, args[1] ) ) != NULL )
 		{
@@ -4758,7 +4751,7 @@ public:
 
 		CUtlRBTree< CUtlString > symbols( 0, 0, UtlStringLessFunc );
 
-		CBaseEntity *pos = NULL;
+		IServerEntity *pos = NULL;
 		while ( ( pos = EntityList()->NextEnt( pos ) ) != NULL )
 		{
 			// Check target name against partial string
@@ -4823,7 +4816,7 @@ private:
 		Q_strncat( targetEntity, substring, sizeof( targetEntity ), nEntityNameLength );
 
 		// Find the target entity by name
-		CBaseEntity *target = EntityList()->FindEntityByName( NULL, targetEntity );
+		IServerEntity *target = EntityList()->FindEntityByName( NULL, targetEntity );
 		if ( target == NULL )
 			return 0;
 
@@ -4929,7 +4922,7 @@ void CC_Ent_Info( const CCommand& args )
 	else
 	{
 		// iterate through all the ents printing out their details
-		CBaseEntity *ent = (CBaseEntity*)EntityList()->CreateEntityByName( args[1] );
+		IServerEntity *ent = EntityList()->CreateEntityByName( args[1] );
 
 		if ( ent )
 		{
@@ -5945,7 +5938,7 @@ void CBaseEntity::DumpResponseCriteria( void )
 //------------------------------------------------------------------------------
 void CC_Ent_Show_Response_Criteria( const CCommand& args )
 {
-	CBaseEntity *pEntity = NULL;
+	IServerEntity *pEntity = NULL;
 	while ( (pEntity = GetNextCommandEntity( UTIL_GetCommandClient(), args[1], pEntity )) != NULL )
 	{
 		pEntity->DumpResponseCriteria();
@@ -6081,7 +6074,7 @@ void CInfoLightingRelative::Activate()
 	}
 	else
 	{
-		m_hLightingLandmark = EntityList()->FindEntityByName(NULL, m_strLightingLandmark);
+		m_hLightingLandmark = (CBaseEntity*)EntityList()->FindEntityByName(NULL, m_strLightingLandmark);
 		if (!m_hLightingLandmark)
 		{
 			DevWarning("%s: Could not find lighting landmark '%s'!\n", GetClassname(), STRING(m_strLightingLandmark));
@@ -6142,7 +6135,7 @@ void CBaseEntity::SetLightingOriginRelative(string_t strLightingOriginRelative)
 	}
 	else
 	{
-		CBaseEntity* pLightingOrigin = EntityList()->FindEntityByName(NULL, strLightingOriginRelative);
+		IServerEntity* pLightingOrigin = EntityList()->FindEntityByName(NULL, strLightingOriginRelative);
 		if (!pLightingOrigin)
 		{
 			DevWarning("%s: Could not find info_lighting_relative '%s'!\n", GetClassname(), STRING(strLightingOriginRelative));
@@ -6162,7 +6155,7 @@ void CBaseEntity::SetLightingOriginRelative(string_t strLightingOriginRelative)
 			return;
 		}
 
-		SetLightingOriginRelative(pLightingOrigin);
+		SetLightingOriginRelative((CBaseEntity*)pLightingOrigin);
 	}
 
 	// Save the name so that save/load will correctly restore it in Activate()
@@ -6180,7 +6173,7 @@ void CBaseEntity::SetLightingOrigin(string_t strLightingOrigin)
 	}
 	else
 	{
-		CBaseEntity* pLightingOrigin = EntityList()->FindEntityByName(NULL, strLightingOrigin);
+		IServerEntity* pLightingOrigin = EntityList()->FindEntityByName(NULL, strLightingOrigin);
 		if (!pLightingOrigin)
 		{
 			DevWarning("%s: Could not find lighting origin entity named '%s'!\n", GetClassname(), STRING(strLightingOrigin));
@@ -6188,7 +6181,7 @@ void CBaseEntity::SetLightingOrigin(string_t strLightingOrigin)
 		}
 		else
 		{
-			SetLightingOrigin(pLightingOrigin);
+			SetLightingOrigin((CBaseEntity*)pLightingOrigin);
 		}
 	}
 
@@ -6465,7 +6458,7 @@ bool CBaseEntity::HasNPCsOnIt(void)
 	{
 		for (link = root->nextLink; link != root; link = link->nextLink)
 		{
-			if (EntityList()->GetBaseEntityFromHandle(link->entity) && EntityList()->GetBaseEntityFromHandle(link->entity)->MyNPCPointer())
+			if (EntityList()->GetBaseEntityFromHandle(link->entity) && EntityList()->GetBaseEntityFromHandle(link->entity)->IsNPC())
 				return true;
 		}
 	}
@@ -6473,13 +6466,35 @@ bool CBaseEntity::HasNPCsOnIt(void)
 	return false;
 }
 
-CBaseEntity* CBaseEntity::NPCPhysics_CreateSolver(CBaseEntity* pPhysicsObject, bool disableCollisions, float separationDuration) 
+CBaseEntity* CBaseEntity::NPCPhysics_CreateSolver(IServerEntity* pPhysicsObject, bool disableCollisions, float separationDuration)
 {
-	return ::NPCPhysics_CreateSolver((CAI_BaseNPC*)this, pPhysicsObject, disableCollisions, separationDuration);
+	return ::NPCPhysics_CreateSolver((CAI_BaseNPC*)this, (CBaseEntity*)pPhysicsObject, disableCollisions, separationDuration);
 }
-CBaseEntity* CBaseEntity::EntityPhysics_CreateSolver(CBaseEntity* pPhysicsBlocker, bool disableCollisions, float separationDuration) 
+CBaseEntity* CBaseEntity::EntityPhysics_CreateSolver(IServerEntity* pPhysicsBlocker, bool disableCollisions, float separationDuration)
 {
-	return ::EntityPhysics_CreateSolver(this, pPhysicsBlocker, disableCollisions, separationDuration);
+	return ::EntityPhysics_CreateSolver(this, (CBaseEntity*)pPhysicsBlocker, disableCollisions, separationDuration);
+}
+
+
+void CBaseEntity::AddWatcherToEntity(IServerEntity* pWatcher, int watcherType)
+{
+	IWatcherList* pList = (IWatcherList*)GetEngineObject()->GetDataObject(watcherType);
+	if (!pList)
+	{
+		pList = (IWatcherList*)GetEngineObject()->CreateDataObject(watcherType);
+		pList->Init();
+	}
+
+	pList->AddToList(pWatcher);
+}
+
+void CBaseEntity::RemoveWatcherFromEntity(IServerEntity* pWatcher, int watcherType)
+{
+	IWatcherList* pList = (IWatcherList*)GetEngineObject()->GetDataObject(watcherType);
+	if (pList)
+	{
+		pList->RemoveWatcher(pWatcher);
+	}
 }
 
 //------------------------------------------------------------------------------
@@ -6556,7 +6571,7 @@ static ConCommand ent_create("ent_create", CC_Ent_Create, "Creates an entity of 
 //------------------------------------------------------------------------------
 // Purpose: Teleport a specified entity to where the player is looking
 //------------------------------------------------------------------------------
-bool CC_GetCommandEnt( const CCommand& args, CBaseEntity **ent, Vector *vecTargetPoint, QAngle *vecPlayerAngle )
+bool CC_GetCommandEnt( const CCommand& args, IServerEntity **ent, Vector *vecTargetPoint, QAngle *vecPlayerAngle )
 {
 	// Find the entity
 	*ent = NULL;
@@ -6619,7 +6634,7 @@ void CC_Ent_Teleport( const CCommand& args )
 		return;
 	}
 
-	CBaseEntity *pEnt;
+	IServerEntity *pEnt;
 	Vector vecTargetPoint;
 	if ( CC_GetCommandEnt( args, &pEnt, &vecTargetPoint, NULL ) )
 	{
@@ -6640,7 +6655,7 @@ void CC_Ent_Orient( const CCommand& args )
 		return;
 	}
 
-	CBaseEntity *pEnt;
+	IServerEntity *pEnt;
 	QAngle vecPlayerAngles;
 	if ( CC_GetCommandEnt( args, &pEnt, NULL, &vecPlayerAngles ) )
 	{

@@ -582,7 +582,7 @@ void CTripmineGrenade::Event_Killed( const CTakeDamageInfo &info )
 	if ( info.GetAttacker() && ( info.GetAttacker()->GetEngineObject()->GetFlags() & FL_CLIENT ) )
 	{
 		// some client has destroyed this mine, he'll get credit for any kills
-		SetOwnerEntity( info.GetAttacker() );
+		SetOwnerEntity((CBaseEntity*)info.GetAttacker() );
 	}
 
 	SetThink( &CTripmineGrenade::DelayDeathThink );

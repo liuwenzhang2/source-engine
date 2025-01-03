@@ -52,7 +52,7 @@ float PercentageOfFlashForPlayer(CBaseEntity *player, Vector flashPos, CBaseEnti
 		return 0.0;
 	}
 
-	CBaseEntity *pSGren;
+	IServerEntity *pSGren;
 
 	for( pSGren = EntityList()->FindEntityByClassname( NULL, "env_particlesmokegrenade" );
 		pSGren;
@@ -119,7 +119,7 @@ void RadiusFlash(
 	Vector		vecLOS;
 	float		flDot;
 	
-	CBaseEntity		*pEntity = NULL;
+	IServerEntity		*pEntity = NULL;
 	static float	flRadius = 1500;
 	float			falloff = flDamage / flRadius;
 
@@ -142,7 +142,7 @@ void RadiusFlash(
 		if (!bInWater && pEntity->GetWaterLevel() == 3)
 			continue;
 
-		float percentageOfFlash = PercentageOfFlashForPlayer(pEntity, vecSrc, pevInflictor);
+		float percentageOfFlash = PercentageOfFlashForPlayer((CBaseEntity*)pEntity, vecSrc, pevInflictor);
 
 		if ( percentageOfFlash > 0.0 )
 		{

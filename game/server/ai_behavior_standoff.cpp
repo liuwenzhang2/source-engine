@@ -343,7 +343,7 @@ void CAI_StandoffBehavior::PrescheduleThink()
 	
 	if( DrawBattleLines.GetInt() != 0 )
 	{
-		CBaseEntity *pEntity = NULL;
+		IServerEntity *pEntity = NULL;
 		while ((pEntity = EntityList()->FindEntityByClassname( pEntity, "ai_battle_line" )) != NULL)
 		{
 			// Visualize the battle line and its normal.
@@ -768,7 +768,7 @@ void CAI_StandoffBehavior::UpdateBattleLines()
 			if ( m_params.fPlayerIsBattleline )
 			{
 				const float DIST_PLAYER_PLANE = 180;
-				CBaseEntity *pPlayer = EntityList()->GetLocalPlayer();
+				IServerEntity *pPlayer = EntityList()->GetLocalPlayer();
 				
 				BattleLine_t playerLine;
 

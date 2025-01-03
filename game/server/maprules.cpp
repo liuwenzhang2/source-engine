@@ -27,7 +27,7 @@ public:
 	void	SetMaster( string_t iszMaster ) { m_iszMaster = iszMaster; }
 
 protected:
-	bool	CanFireForActivator( CBaseEntity *pActivator );
+	bool	CanFireForActivator( IServerEntity *pActivator );
 
 private:
 	string_t	m_iszMaster;
@@ -49,7 +49,7 @@ void CRuleEntity::Spawn( void )
 }
 
 
-bool CRuleEntity::CanFireForActivator( CBaseEntity *pActivator )
+bool CRuleEntity::CanFireForActivator( IServerEntity *pActivator )
 {
 	if ( m_iszMaster != NULL_STRING )
 	{
@@ -171,7 +171,7 @@ bool CGameScore::KeyValue( const char *szKeyName, const char *szValue )
 
 void CGameScore::InputApplyScore( inputdata_t &inputdata )
 {
-	CBaseEntity *pActivator = inputdata.pActivator;
+	IServerEntity *pActivator = inputdata.pActivator;
 
 	if ( pActivator == NULL )
 		 return;
@@ -195,7 +195,7 @@ void CGameScore::InputApplyScore( inputdata_t &inputdata )
 
 void CGameScore::Use( IServerEntity *pActivator, IServerEntity *pCaller, USE_TYPE useType, float value )
 {
-	if ( !CanFireForActivator( (CBaseEntity*)pActivator ) )
+	if ( !CanFireForActivator( pActivator ) )
 		return;
 
 	// Only players can use this
@@ -244,7 +244,7 @@ void CGameEnd::InputGameEnd( inputdata_t &inputdata )
 
 void CGameEnd::Use( IServerEntity *pActivator, IServerEntity *pCaller, USE_TYPE useType, float value )
 {
-	if ( !CanFireForActivator( (CBaseEntity*)pActivator ) )
+	if ( !CanFireForActivator( pActivator ) )
 		return;
 
 	g_pGameRules->EndMultiplayerGame();
@@ -340,7 +340,7 @@ bool CGameText::KeyValue( const char *szKeyName, const char *szValue )
 
 void CGameText::InputDisplay( inputdata_t &inputdata )
 {
-	Display( inputdata.pActivator );
+	Display((CBaseEntity*)inputdata.pActivator );
 }
 
 void CGameText::Display( CBaseEntity *pActivator )
@@ -467,7 +467,7 @@ void CGamePlayerZone::InputCountPlayersInZone( inputdata_t &inputdata )
 	if ( !CanFireForActivator( inputdata.pActivator ) )
 		return;
 
-	CBaseEntity *pPlayer = NULL;
+	IServerEntity *pPlayer = NULL;
 
 	for ( int i = 1; i <= gpGlobals->maxClients; i++ )
 	{
@@ -635,7 +635,7 @@ bool CGamePlayerEquip::KeyValue( const char *szKeyName, const char *szValue )
 
 void CGamePlayerEquip::Touch( IServerEntity *pOther )
 {
-	if ( !CanFireForActivator((CBaseEntity*)pOther ) )
+	if ( !CanFireForActivator( pOther ) )
 		return;
 
 	if ( UseOnly() )
@@ -700,7 +700,7 @@ LINK_ENTITY_TO_CLASS( game_player_team, CGamePlayerTeam );
 
 const char *CGamePlayerTeam::TargetTeamName( const char *pszTargetName, CBaseEntity *pActivator )
 {
-	CBaseEntity *pTeamEntity = NULL;
+	IServerEntity *pTeamEntity = NULL;
 
 	while ((pTeamEntity = EntityList()->FindEntityByName( pTeamEntity, pszTargetName, NULL, pActivator )) != NULL)
 	{
@@ -714,7 +714,7 @@ const char *CGamePlayerTeam::TargetTeamName( const char *pszTargetName, CBaseEnt
 
 void CGamePlayerTeam::Use( IServerEntity *pActivator, IServerEntity *pCaller, USE_TYPE useType, float value )
 {
-	if ( !CanFireForActivator( (CBaseEntity*)pActivator ) )
+	if ( !CanFireForActivator( pActivator ) )
 		return;
 
 	if ( pActivator->IsPlayer() )

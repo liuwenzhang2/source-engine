@@ -225,7 +225,7 @@ public:
 	void		 SetExplodeOnContact( bool bExplode ) { m_bExplodeOnContact = bExplode; }
 
 	virtual QAngle PreferredCarryAngles( void ) { return QAngle( -12, 98, 55 ); }
-	virtual bool HasPreferredCarryAnglesForPlayer( CBaseEntity *pPlayer ) { return true; }
+	virtual bool HasPreferredCarryAnglesForPlayer( IServerEntity *pPlayer ) { return true; }
 
 	float GetBombLifetime();
 
@@ -488,7 +488,7 @@ private:
 	void	InputSelfDestruct( inputdata_t &inputdata );
 
 	// Enemy visibility check
-	CBaseEntity *FindTrackBlocker( const Vector &vecViewPoint, const Vector &vecTargetPos );
+	IServerEntity *FindTrackBlocker( const Vector &vecViewPoint, const Vector &vecTargetPos );
 
 	// Special path navigation when we explicitly want to follow a path
 	void UpdateFollowPathNavigation();
@@ -991,7 +991,7 @@ int CNPC_AttackHelicopter::ObjectCaps()
 
 void CNPC_AttackHelicopter::InputOutsideTransition( inputdata_t &inputdata )
 {
-	CBaseEntity *pEnt = EntityList()->FindEntityByName( NULL, m_iszTransitionTarget );
+	IServerEntity *pEnt = EntityList()->FindEntityByName( NULL, m_iszTransitionTarget );
 
 	if ( pEnt )
 	{
@@ -1659,7 +1659,7 @@ CTraceFilterChopper::CTraceFilterChopper( const IHandleEntity *passentity, int c
 
 bool CTraceFilterChopper::ShouldHitEntity( IHandleEntity *pServerEntity, int contentsMask )
 {
-	CBaseEntity *pEnt = static_cast<IServerUnknown*>(pServerEntity)->GetBaseEntity();
+	CBaseEntity *pEnt = (CBaseEntity*)pServerEntity;
 	if ( pEnt )
 	{
 		if ( FClassnameIs( pEnt, "func_breakable" ) || 
@@ -1678,7 +1678,7 @@ bool CTraceFilterChopper::ShouldHitEntity( IHandleEntity *pServerEntity, int con
 //-----------------------------------------------------------------------------
 // Enemy visibility check
 //-----------------------------------------------------------------------------
-CBaseEntity *CNPC_AttackHelicopter::FindTrackBlocker( const Vector &vecViewPoint, const Vector &vecTargetPos )
+IServerEntity *CNPC_AttackHelicopter::FindTrackBlocker( const Vector &vecViewPoint, const Vector &vecTargetPos )
 {
 	if ( m_bIgnorePathVisibilityTests )
 		return NULL;
@@ -1693,7 +1693,7 @@ CBaseEntity *CNPC_AttackHelicopter::FindTrackBlocker( const Vector &vecViewPoint
 		Assert( tr.m_pEnt );
 	}
 
-	return (tr.fraction != 1.0f) ? (CBaseEntity*)tr.m_pEnt : NULL;
+	return (tr.fraction != 1.0f) ? (IServerEntity*)tr.m_pEnt : NULL;
 }
 
 
@@ -2939,7 +2939,7 @@ void CNPC_AttackHelicopter::InputDropBombAtTargetInternal( inputdata_t &inputdat
 
 	// Find our specified target
 	string_t strBombTarget = MAKE_STRING( inputdata.value.String() );
-	CBaseEntity *pBombEnt = EntityList()->FindEntityByName( NULL, strBombTarget );
+	IServerEntity *pBombEnt = EntityList()->FindEntityByName( NULL, strBombTarget );
 	if ( pBombEnt == NULL )
 	{
 		Warning( "%s: Could not find bomb drop target '%s'!\n", GetClassname(), STRING( strBombTarget ) );
@@ -3515,8 +3515,8 @@ void CNPC_AttackHelicopter::TraceAttack( const CTakeDamageInfo &info, const Vect
 	// TraceAttack() as a means for delivering blast damage. Usually when the explosive penetrates
 	// the target. (RPG missiles do this sometimes).
 	if ( ( info.GetDamageType() & DMG_AIRBOAT ) || 
-		 ( info.GetInflictor()->Classify() == CLASS_MISSILE ) || 
-		 ( info.GetAttacker()->Classify() == CLASS_MISSILE ) )
+		 (((CBaseEntity*)info.GetInflictor())->Classify() == CLASS_MISSILE ) ||
+		 (((CBaseEntity*)info.GetAttacker())->Classify() == CLASS_MISSILE ) )
 	{
 		BaseClass::BaseClass::TraceAttack( info, vecDir, ptr, pAccumulator );
 	}
@@ -3532,8 +3532,8 @@ int CNPC_AttackHelicopter::OnTakeDamage( const CTakeDamageInfo &info )
 	if( info.GetInflictor() != this )
 	{
 		if ( ( ( info.GetDamageType() & DMG_AIRBOAT ) == 0 ) && 
-			( info.GetInflictor()->Classify() != CLASS_MISSILE ) && 
-			( info.GetAttacker()->Classify() != CLASS_MISSILE ) )
+			(((CBaseEntity*)info.GetInflictor())->Classify() != CLASS_MISSILE ) &&
+			(((CBaseEntity*)info.GetAttacker())->Classify() != CLASS_MISSILE ) )
 			return 0;
 	}
 
@@ -3580,7 +3580,7 @@ int CNPC_AttackHelicopter::OnTakeDamage_Alive( const CTakeDamageInfo &info )
 {
 	int nPrevHealth = GetHealth();
 
-	if ( ( info.GetInflictor() != NULL ) && ( info.GetInflictor()->GetOwnerEntity() != NULL ) && ( info.GetInflictor()->GetOwnerEntity() == this ) )
+	if ( ( info.GetInflictor() != NULL ) && (info.GetInflictor()->GetOwnerEntity() != NULL ) && (info.GetInflictor()->GetOwnerEntity() == this ) )
 	{
 		// Don't take damage from my own bombs. (Unless the player grabbed them and threw them back)
 		return 0;
@@ -3770,10 +3770,10 @@ void CNPC_AttackHelicopter::Event_Killed( const CTakeDamageInfo &info )
 
 	if( GetCrashPoint() == NULL )
 	{
-		CBaseEntity *pCrashPoint = EntityList()->FindEntityByClassname( NULL, "info_target_helicopter_crash" );
+		IServerEntity *pCrashPoint = EntityList()->FindEntityByClassname( NULL, "info_target_helicopter_crash" );
 		if( pCrashPoint != NULL )
 		{
-			m_hCrashPoint.Set( pCrashPoint );
+			m_hCrashPoint.Set((CBaseEntity*)pCrashPoint );
 			SetDesiredPosition( pCrashPoint->GetEngineObject()->GetAbsOrigin() );
 
 			// Start the failing engine sound
@@ -3818,7 +3818,7 @@ void CNPC_AttackHelicopter::Event_Killed( const CTakeDamageInfo &info )
 	m_iHealth = 0;
 	m_takedamage = DAMAGE_NO;
 
-	m_OnDeath.FireOutput( info.GetAttacker(), this );
+	m_OnDeath.FireOutput((IServerEntity*)info.GetAttacker(), this );
 }
 
 //------------------------------------------------------------------------------
@@ -3827,7 +3827,7 @@ void CNPC_AttackHelicopter::Event_Killed( const CTakeDamageInfo &info )
 void CNPC_AttackHelicopter::CreateChopperHusk()
 {
 	// We're embedded into the ground
-	CBaseEntity *pCorpse = (CBaseEntity*)EntityList()->CreateEntityByName( "prop_physics" );
+	IServerEntity *pCorpse = EntityList()->CreateEntityByName( "prop_physics" );
 	pCorpse->GetEngineObject()->SetAbsOrigin(GetEngineObject()->GetAbsOrigin() );
 	pCorpse->GetEngineObject()->SetAbsAngles(GetEngineObject()->GetAbsAngles() );
 	pCorpse->SetModel( CHOPPER_MODEL_CORPSE_NAME );
@@ -6062,7 +6062,7 @@ void CHelicopterChunk::VPhysicsCollision( int index, gamevcollisionevent_t *pEve
 	if ( m_bLanded == false )
 	{
 		int otherIndex = !index;
-		CBaseEntity *pOther = pEvent->pEntities[otherIndex];
+		CBaseEntity *pOther = (CBaseEntity*)pEvent->pEntities[otherIndex];
 		if ( !pOther )
 			return;
 		

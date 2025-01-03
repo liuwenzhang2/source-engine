@@ -36,7 +36,7 @@ protected:
 	void ButtonBackHome( void );
 	void ButtonUse( IServerEntity *pActivator, IServerEntity *pCaller, USE_TYPE useType, float value );
 
-	bool OnUseLocked( CBaseEntity *pActivator );
+	bool OnUseLocked( IServerEntity *pActivator );
 
 	virtual void Lock();
 	virtual void Unlock();
@@ -53,7 +53,7 @@ protected:
 	enum BUTTON_CODE { BUTTON_NOTHING, BUTTON_ACTIVATE, BUTTON_RETURN, BUTTON_PRESS };
 
 	BUTTON_CODE	ButtonResponseToTouch( void );
-	void Press( CBaseEntity *pActivator, BUTTON_CODE eCode );
+	void Press( IServerEntity *pActivator, BUTTON_CODE eCode );
 	
 	DECLARE_DATADESC();
 
@@ -118,7 +118,7 @@ public:
 	void	UpdateSelf( float value, bool bPlaySound );
 
 	void	PlaySound( void );
-	void	UpdateTarget( float value, CBaseEntity *pActivator );
+	void	UpdateTarget( float value, IServerEntity *pActivator );
 
 	int		DrawDebugTextOverlays(void);
 

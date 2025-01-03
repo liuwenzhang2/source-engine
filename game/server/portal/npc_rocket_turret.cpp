@@ -1240,8 +1240,8 @@ void CNPC_RocketTurret::InputDisable( inputdata_t &inputdata )
 
 void CNPC_RocketTurret::InputSetTarget( inputdata_t &inputdata )
 {
-	CBaseEntity *pTarget = EntityList()->FindEntityByName( NULL, inputdata.value.String(), NULL, NULL );
-	SetTarget( pTarget );
+	IServerEntity *pTarget = EntityList()->FindEntityByName( NULL, inputdata.value.String(), NULL, NULL );
+	SetTarget((CBaseEntity*)pTarget );
 }
 
 //-----------------------------------------------------------------------------
@@ -1356,7 +1356,7 @@ void CRocket_Turret_Projectile::DoExplosion( void )
 		SF_ENVEXPLOSION_NOSPARKS | SF_ENVEXPLOSION_NODLIGHTS | SF_ENVEXPLOSION_NOSMOKE, 100.0f, this);
 
 	// Hackish: Knock turrets in the area
-	CBaseEntity* pTurretIter = NULL;
+	IServerEntity* pTurretIter = NULL;
 
 	while ( (pTurretIter = EntityList()->FindEntityByClassnameWithin( pTurretIter, "npc_portal_turret_floor", GetEngineObject()->GetAbsOrigin(), 128 )) != NULL )
 	{

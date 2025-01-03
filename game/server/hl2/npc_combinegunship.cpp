@@ -992,7 +992,7 @@ void CNPC_CombineGunship::ManageWarningBeam( void )
 				if (tr.m_pEnt->GetTakeDamage() != DAMAGE_NO )
 				{
 					// Deal damage
-					((CBaseEntity*)tr.m_pEnt)->TakeDamage( info );
+					((IServerEntity*)tr.m_pEnt)->TakeDamage( info );
 				}
 			}
 
@@ -1905,7 +1905,7 @@ void CNPC_CombineGunship::Event_Killed( const CTakeDamageInfo &info )
 	m_pRotorSound = controller.SoundCreate( filter2, entindex(), "NPC_CombineGunship.DyingSound" );
 	controller.Play( m_pRotorSound, 1.0, 100 );
 
-	m_OnDeath.FireOutput( info.GetAttacker(), this );
+	m_OnDeath.FireOutput((IServerEntity*)info.GetAttacker(), this );
 	SendOnKilledGameEvent( info );
 
 	BeginCrash();
@@ -1949,7 +1949,7 @@ bool CNPC_CombineGunship::FindNearestGunshipCrash( void )
 	bool bFoundAnyCrashTargets = false;
  	float flNearest = MAX_TRACE_LENGTH * MAX_TRACE_LENGTH;
 	CTargetGunshipCrash *pNearest = NULL;
-	CBaseEntity *pEnt = NULL;
+	IServerEntity *pEnt = NULL;
 	while( (pEnt = EntityList()->FindEntityByClassname(pEnt, "info_target_gunshipcrash")) != NULL )
 	{
 		CTargetGunshipCrash *pCrashTarget = assert_cast<CTargetGunshipCrash*>(pEnt);
@@ -2048,7 +2048,7 @@ void CNPC_CombineGunship::BeginDestruct( void )
 	}
 	FixupBurningServerRagdoll(m_hRagdoll);
 	PhysSetEntityGameFlags(m_hRagdoll, FVPHYSICS_NO_SELF_COLLISIONS);
-	m_hRagdoll->SetName( UTIL_VarArgs("%s_ragdoll", STRING(GetEntityName()) ) );
+	m_hRagdoll->GetEngineObject()->SetName( UTIL_VarArgs("%s_ragdoll", STRING(GetEntityName()) ) );
 
 	// Tell the smoke trail to follow the ragdoll
 	CreateSmokeTrail();
@@ -2414,7 +2414,7 @@ void CNPC_CombineGunship::UpdateRotorSoundPitch( int iPitch )
 	controller.SoundChangePitch( m_pAirExhaustSound, iPitch, 0.1 );
 
 	// FIXME: Doesn't work in multiplayer
-	CBaseEntity *pPlayer = EntityList()->GetPlayerByIndex(1);
+	IServerEntity *pPlayer = EntityList()->GetPlayerByIndex(1);
 	if (pPlayer)
 	{
 		Vector pos;
@@ -2640,11 +2640,11 @@ void CNPC_CombineGunship::InputDisableGroundAttack( inputdata_t &inputdata )
 void CNPC_CombineGunship::InputDoGroundAttack( inputdata_t &inputdata )
 {
 	// Was a target node specified?
-	CBaseEntity *pEntity = EntityList()->FindEntityByName( NULL, inputdata.value.StringID(), NULL, inputdata.pActivator, inputdata.pCaller );
+	IServerEntity *pEntity = EntityList()->FindEntityByName( NULL, inputdata.value.StringID(), NULL, inputdata.pActivator, inputdata.pCaller );
 	if ( pEntity )
 	{
 		// Mapmaker wants us to ground attack a specific target
-		m_hGroundAttackTarget = pEntity;
+		m_hGroundAttackTarget = (CBaseEntity*)pEntity;
 	}
 	else
 	{

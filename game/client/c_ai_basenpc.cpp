@@ -60,7 +60,7 @@ void C_AI_BaseNPC::ClientThink( void )
 	BaseClass::ClientThink();
 
 #ifdef HL2_DLL
-	C_BaseHLPlayer *pPlayer = dynamic_cast<C_BaseHLPlayer*>(EntityList()->GetLocalPlayer() );
+	C_BaseHLPlayer *pPlayer = ToHL2Player(EntityList()->GetLocalPlayer() );
 
 	if ( ShouldModifyPlayerSpeed() == true )
 	{
@@ -95,7 +95,7 @@ void C_AI_BaseNPC::ClientThink( void )
 #endif // HL2_DLL
 
 #ifdef HL2_EPISODIC
-	C_BaseHLPlayer *pPlayer = dynamic_cast<C_BaseHLPlayer*>(EntityList()->GetLocalPlayer() );
+	C_BaseHLPlayer *pPlayer = ToHL2Player(EntityList()->GetLocalPlayer() );
 
 	if ( pPlayer && m_flTimePingEffect > gpGlobals->curtime )
 	{

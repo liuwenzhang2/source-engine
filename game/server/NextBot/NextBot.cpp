@@ -361,9 +361,9 @@ void NextBotCombatCharacter::Ignite( float flFlameLifetime, CBaseEntity *pAttack
 int NextBotCombatCharacter::OnTakeDamage_Alive( const CTakeDamageInfo &info )
 {
 	// track our last attacker
-	if ( info.GetAttacker() && info.GetAttacker()->MyCombatCharacterPointer() )
+	if ( info.GetAttacker() && ((CBaseEntity*)info.GetAttacker())->MyCombatCharacterPointer() )
 	{
-		m_lastAttacker = info.GetAttacker()->MyCombatCharacterPointer();
+		m_lastAttacker = ((CBaseEntity*)info.GetAttacker())->MyCombatCharacterPointer();
 	}
 
 	// propagate event to components
@@ -377,9 +377,9 @@ int NextBotCombatCharacter::OnTakeDamage_Alive( const CTakeDamageInfo &info )
 int NextBotCombatCharacter::OnTakeDamage_Dying( const CTakeDamageInfo &info )
 {
 	// track our last attacker	
-	if ( info.GetAttacker()->MyCombatCharacterPointer() )
+	if (((CBaseEntity*)info.GetAttacker())->MyCombatCharacterPointer() )
 	{
-		m_lastAttacker = info.GetAttacker()->MyCombatCharacterPointer();
+		m_lastAttacker = ((CBaseEntity*)info.GetAttacker())->MyCombatCharacterPointer();
 	}
 
 	// propagate event to components
@@ -396,9 +396,9 @@ static int g_DeathStartEvent = 0;
 void NextBotCombatCharacter::Event_Killed( const CTakeDamageInfo &info )
 {
 	// track our last attacker
-	if ( info.GetAttacker() && info.GetAttacker()->MyCombatCharacterPointer() )
+	if ( info.GetAttacker() && ((CBaseEntity*)info.GetAttacker())->MyCombatCharacterPointer() )
 	{
-		m_lastAttacker = info.GetAttacker()->MyCombatCharacterPointer();
+		m_lastAttacker = ((CBaseEntity*)info.GetAttacker())->MyCombatCharacterPointer();
 	}
 
 	// propagate event to my components

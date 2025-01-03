@@ -398,7 +398,7 @@ CBaseEntity	*CBreakableProp::FindEnableMotionFixup()
 	for ( int i = list.Count()-1; i >= 0; --i )
 	{
 		if ( FClassnameIs( list[i]->GetOuter(), "point_enable_motion_fixup"))
-			return list[i]->GetOuter();
+			return (CBaseEntity*)list[i]->GetOuter();
 	}
 
 	return NULL;
@@ -527,7 +527,7 @@ void CBreakableProp::HandleFirstCollisionInteractions( int index, gamevcollision
 		this->GetEngineObject()->GetAllChildren( children );
 		for (int i = 0; i < children.Count(); i++ )
 		{
-			CBaseEntity *pent = children.Element( i )->GetOuter();
+			CBaseEntity *pent = (CBaseEntity*)children.Element( i )->GetOuter();
 
 			IParentPropInteraction *pPropInter = dynamic_cast<IParentPropInteraction *>( pent );
 			if ( pPropInter )
@@ -579,7 +579,7 @@ void CPhysicsProp::HandleAnyCollisionInteractions( int index, gamevcollisioneven
 			CheckRemoveRagdolls();
 			return;
 		}
-		CBaseEntity *pHitEntity = pEvent->pEntities[!index];
+		CBaseEntity *pHitEntity = (CBaseEntity*)pEvent->pEntities[!index];
 		if ( pHitEntity->IsWorld() )
 		{
 			Vector normal;
@@ -713,7 +713,7 @@ void CBreakableProp::HandleInteractionStick( int index, gamevcollisionevent_t *p
 void CC_Prop_Debug( void )
 {
 	// Toggle the prop debug bit on all props
-	for ( CBaseEntity *pEntity = EntityList()->FirstEnt(); pEntity != NULL; pEntity = EntityList()->NextEnt(pEntity) )
+	for ( IServerEntity *pEntity = EntityList()->FirstEnt(); pEntity != NULL; pEntity = EntityList()->NextEnt(pEntity) )
 	{
 		CBaseProp *pProp = dynamic_cast<CBaseProp*>(pEntity);
 		if ( pProp )
@@ -1051,9 +1051,9 @@ int CBreakableProp::OnTakeDamage( const CTakeDamageInfo &inputInfo )
 		return 1;
 	}
 
-	if( info.GetAttacker() && info.GetAttacker()->MyCombatCharacterPointer() )
+	if( info.GetAttacker() && ((CBaseEntity*)info.GetAttacker())->MyCombatCharacterPointer() )
 	{
-		m_hLastAttacker.Set( info.GetAttacker() );
+		m_hLastAttacker.Set((CBaseEntity*)info.GetAttacker() );
 	}
 
 	float flPropDamage = GetBreakableDamage( info, assert_cast<IBreakableWithPropData*>(this) );
@@ -1163,8 +1163,8 @@ int CBreakableProp::OnTakeDamage( const CTakeDamageInfo &inputInfo )
 
 	// Output the new health as a percentage of max health [0..1]
 	float flRatio = clamp( (float)m_iHealth / (float)m_iMaxHealth, 0.f, 1.f );
-	m_OnHealthChanged.Set( flRatio, info.GetAttacker(), this );
-	m_OnTakeDamage.FireOutput( info.GetAttacker(), this );
+	m_OnHealthChanged.Set( flRatio, (IServerEntity*)info.GetAttacker(), this );
+	m_OnTakeDamage.FireOutput((IServerEntity*)info.GetAttacker(), this );
 
 	return ret;
 }
@@ -1180,7 +1180,7 @@ void CBreakableProp::Event_Killed( const CTakeDamageInfo &info )
 		pPhysics->EnableMotion( true );
 		VPhysicsTakeDamage( info );
 	}
-	Break( info.GetInflictor(), info );
+	Break((CBaseEntity*)info.GetInflictor(), info );
 	BaseClass::Event_Killed( info );
 }
 
@@ -1191,7 +1191,7 @@ void CBreakableProp::InputBreak( inputdata_t &inputdata )
 {
 	CTakeDamageInfo info;
 	info.SetAttacker( this );
-	Break( inputdata.pActivator, info );
+	Break((CBaseEntity*)inputdata.pActivator, info );
 }
 
 
@@ -1229,7 +1229,7 @@ void CBreakableProp::InputSetHealth( inputdata_t &inputdata )
 //			pActivator - 
 // Output : Returns true if the breakable survived, false if it died (broke).
 //-----------------------------------------------------------------------------
-bool CBreakableProp::UpdateHealth( int iNewHealth, CBaseEntity *pActivator )
+bool CBreakableProp::UpdateHealth( int iNewHealth, IServerEntity *pActivator )
 {
 	if ( iNewHealth != m_iHealth )
 	{
@@ -1249,7 +1249,7 @@ bool CBreakableProp::UpdateHealth( int iNewHealth, CBaseEntity *pActivator )
 		{
 			CTakeDamageInfo info;
 			info.SetAttacker( this );
-			Break( pActivator, info );
+			Break( (CBaseEntity*)pActivator, info );
 
 			return false;
 		}
@@ -1683,7 +1683,7 @@ void CBreakableProp::Break( CBaseEntity *pBreaker, const CTakeDamageInfo &info )
 
 	bool bExploded = false;
 
-	CBaseEntity *pAttacker = info.GetAttacker();
+	CBaseEntity *pAttacker = (CBaseEntity*)info.GetAttacker();
 	if ( m_hLastAttacker )
 	{
 		// Pass along the person who made this explosive breakable explode.
@@ -1985,7 +1985,7 @@ void CDynamicProp::OnRestore( void )
 	BoneFollowerHierarchyChanged();
 }
 
-void CDynamicProp::AfterParentChanged( CBaseEntity *pOldParent, int iOldAttachment )
+void CDynamicProp::AfterParentChanged( IServerEntity *pOldParent, int iOldAttachment )
 {
 	BaseClass::AfterParentChanged(pOldParent, iOldAttachment);
 	//BaseClass::SetParent(pNewParent, iAttachment);
@@ -2368,7 +2368,7 @@ public:
 
 	void Spawn();
 	void Activate();
-	void AttachTo( const char *pAttachEntity, CBaseEntity *pActivator = NULL, CBaseEntity *pCaller = NULL );
+	void AttachTo( const char *pAttachEntity, IServerEntity *pActivator = NULL, IServerEntity *pCaller = NULL );
 	void DetachFromOwner();
 
 	// Input handlers
@@ -2419,10 +2419,10 @@ void COrnamentProp::InputSetAttached( inputdata_t &inputdata )
 	AttachTo( inputdata.value.String(), inputdata.pActivator, inputdata.pCaller );
 }
 
-void COrnamentProp::AttachTo( const char *pAttachName, CBaseEntity *pActivator, CBaseEntity *pCaller )
+void COrnamentProp::AttachTo( const char *pAttachName, IServerEntity *pActivator, IServerEntity *pCaller )
 {
 	// find and notify the new parent
-	CBaseEntity *pAttach = EntityList()->FindEntityByName( NULL, pAttachName, NULL, pActivator, pCaller );
+	IServerEntity *pAttach = EntityList()->FindEntityByName( NULL, pAttachName, NULL, pActivator, pCaller );
 	if ( pAttach )
 	{
 		GetEngineObject()->RemoveEffects( EF_NODRAW );
@@ -2495,7 +2495,7 @@ CPhysicsProp::~CPhysicsProp()
 
 }
 
-bool CPhysicsProp::IsGib()
+bool CPhysicsProp::IsGib() const
 {
 	return (GetEngineObject()->GetSpawnFlags() & SF_PHYSPROP_IS_GIB) ? true : false;
 }
@@ -2831,7 +2831,7 @@ void CPhysicsProp::OnPhysGunDrop( CBasePlayer *pPhysGunUser, PhysGunDrop_t Reaso
 		this->GetEngineObject()->GetAllChildren( children );
 		for (int i = 0; i < children.Count(); i++ )
 		{
-			CBaseEntity *pent = children.Element( i )->GetOuter();
+			CBaseEntity *pent = (CBaseEntity*)children.Element( i )->GetOuter();
 
 			IParentPropInteraction *pPropInter = dynamic_cast<IParentPropInteraction *>( pent );
 			if ( pPropInter )
@@ -3078,7 +3078,7 @@ void CPhysicsProp::VPhysicsCollision( int index, gamevcollisionevent_t *pEvent )
 				damage *= 10;
 			}
 
-			CBaseEntity *pHitEntity = pEvent->pEntities[!index];
+			IServerEntity *pHitEntity = pEvent->pEntities[!index];
 			if ( !pHitEntity )
 			{
 				// hit world
@@ -3102,7 +3102,7 @@ void CPhysicsProp::VPhysicsCollision( int index, gamevcollisionevent_t *pEvent )
 	if ( m_bThrownByPlayer || m_bFirstCollisionAfterLaunch )
 	{
 		// If we were thrown by a player, and we've hit an NPC, let the NPC know
-		CBaseEntity *pHitEntity = pEvent->pEntities[!index];
+		CBaseEntity *pHitEntity = (CBaseEntity*)pEvent->pEntities[!index];
 		if ( pHitEntity && pHitEntity->MyNPCPointer() )
 		{
 			pHitEntity->MyNPCPointer()->DispatchInteraction( g_interactionHitByPlayerThrownPhysObj, this, NULL );
@@ -3719,7 +3719,7 @@ void CBasePropDoor::Activate( void )
 	// If we have a name, we may be linked
 	if ( GetEntityName() != NULL_STRING )
 	{
-		CBaseEntity	*pTarget = NULL;
+		IServerEntity	*pTarget = NULL;
 
 		// Find our slaves.
 		// If we have a specified slave name, then use that to find slaves.
@@ -3878,7 +3878,7 @@ void CBasePropDoor::UpdateAreaPortals(bool isOpen)
 	if (!name)
 		return;
 	
-	CBaseEntity *pPortal = NULL;
+	IServerEntity *pPortal = NULL;
 	while ((pPortal = EntityList()->FindEntityByClassname(pPortal, "func_areaportal")) != NULL)
 	{
 		if (pPortal->HasTarget(name))
@@ -3948,7 +3948,7 @@ void CBasePropDoor::OnUse( IServerEntity *pActivator, IServerEntity *pCaller, US
 		{
 			PropSetSequence(GetEngineObject()->SelectWeightedSequence((Activity)ACT_DOOR_LOCKED));
 			PlayLockSounds(this, &m_ls, TRUE, FALSE);
-			m_OnLockedUse.FireOutput((CBaseEntity*)pActivator, (CBaseEntity*)pCaller );
+			m_OnLockedUse.FireOutput(pActivator, pCaller );
 		}
 		else
 		{
@@ -4014,8 +4014,8 @@ void CBasePropDoor::InputOpen(inputdata_t &inputdata)
 //-----------------------------------------------------------------------------
 void CBasePropDoor::InputOpenAwayFrom(inputdata_t &inputdata)
 {
-	CBaseEntity *pOpenAwayFrom = EntityList()->FindEntityByName( NULL, inputdata.value.String(), NULL, inputdata.pActivator, inputdata.pCaller );
-	OpenIfUnlocked(inputdata.pActivator, pOpenAwayFrom);
+	IServerEntity *pOpenAwayFrom = EntityList()->FindEntityByName( NULL, inputdata.value.String(), NULL, inputdata.pActivator, inputdata.pCaller );
+	OpenIfUnlocked(inputdata.pActivator, (CBaseEntity*)pOpenAwayFrom);
 }
 
 
@@ -4027,7 +4027,7 @@ void CBasePropDoor::InputOpenAwayFrom(inputdata_t &inputdata)
 //
 // Input  : *pOpenAwayFrom - 
 //-----------------------------------------------------------------------------
-void CBasePropDoor::OpenIfUnlocked(CBaseEntity *pActivator, CBaseEntity *pOpenAwayFrom)
+void CBasePropDoor::OpenIfUnlocked(IServerEntity *pActivator, CBaseEntity *pOpenAwayFrom)
 {
 	// I'm locked, can't open
 	if (m_bLocked)
@@ -4449,7 +4449,7 @@ void CBasePropDoor::OnStartBlocked( CBaseEntity *pOther )
 // Purpose: Called every frame when the door is blocked while opening or closing.
 // Input  : pOther - The blocking entity.
 //-----------------------------------------------------------------------------
-void CBasePropDoor::Blocked(CBaseEntity *pOther)
+void CBasePropDoor::Blocked(IServerEntity *pOther)
 {
 	// dvs: TODO: will prop_door apply any blocking damage?
 	// Hurt the blocker a little.
@@ -4459,11 +4459,11 @@ void CBasePropDoor::Blocked(CBaseEntity *pOther)
 	//}
 
 	if ( m_bForceClosed && ( pOther->GetEngineObject()->GetMoveType() == MOVETYPE_VPHYSICS ) &&
-		 ( pOther->m_takedamage == DAMAGE_NO || pOther->m_takedamage == DAMAGE_EVENTS_ONLY ) )
+		 ( pOther->GetTakeDamage() == DAMAGE_NO || pOther->GetTakeDamage() == DAMAGE_EVENTS_ONLY))
 	{
 		this->EntityPhysics_CreateSolver( pOther, true, 4.0f );
 	}
-	else if ( m_bForceClosed && ( pOther->GetEngineObject()->GetMoveType() == MOVETYPE_VPHYSICS ) && ( pOther->m_takedamage == DAMAGE_YES ) )
+	else if ( m_bForceClosed && ( pOther->GetEngineObject()->GetMoveType() == MOVETYPE_VPHYSICS ) && ( pOther->GetTakeDamage() == DAMAGE_YES))
 	{
 		pOther->TakeDamage( CTakeDamageInfo( this, this, pOther->GetHealth(), DMG_CRUSH ) );
 	}
@@ -5822,7 +5822,7 @@ void CPhysicsPropRespawnable::Event_Killed( const CTakeDamageInfo &info )
 		VPhysicsTakeDamage( info );
 	}
 
-	Break( info.GetInflictor(), info );
+	Break((CBaseEntity*)info.GetInflictor(), info );
 
 	EntityList()->PhysCleanupFrictionSounds( this );
 
@@ -6189,7 +6189,7 @@ bool UTIL_CreateScaledPhysObject( CBaseAnimating *pInstance, float flScale )
 void CC_Ent_Rotate( const CCommand &args )
 {
 	CBasePlayer* pPlayer = UTIL_GetCommandClient();
-	CBaseEntity* pEntity = EntityList()->FindPickerEntity( pPlayer );
+	IServerEntity* pEntity = EntityList()->FindPickerEntity( pPlayer );
 	if ( !pEntity )
 		return;
 

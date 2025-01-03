@@ -27,52 +27,52 @@ public:
 	virtual int GetPlayerFOV( IClientEntity *pClientPlayer = NULL );
 	virtual bool SetPlayerFOV( int fov, IClientEntity *pClientPlayer = NULL );
 	virtual bool IsInNoClipMode( IClientEntity *pClientPlayer = NULL );
-	virtual CBaseEntity *FirstEntity( void );
-	virtual CBaseEntity *NextEntity( CBaseEntity *pEntity );
-	virtual CBaseEntity *FindEntityByHammerID( int iHammerID );
-	virtual bool GetKeyValue( CBaseEntity *pEntity, const char *szField, char *szValue, int iMaxLen );
-	virtual bool SetKeyValue( CBaseEntity *pEntity, const char *szField, const char *szValue );
-	virtual bool SetKeyValue( CBaseEntity *pEntity, const char *szField, float flValue );
-	virtual bool SetKeyValue( CBaseEntity *pEntity, const char *szField, const Vector &vecValue );
-	virtual CBaseEntity *CreateEntityByName( const char *szClassName );
-	virtual void DispatchSpawn( CBaseEntity *pEntity );
+	virtual IServerEntity *FirstEntity( void );
+	virtual IServerEntity *NextEntity( IServerEntity *pEntity );
+	virtual IServerEntity *FindEntityByHammerID( int iHammerID );
+	virtual bool GetKeyValue( IServerEntity *pEntity, const char *szField, char *szValue, int iMaxLen );
+	virtual bool SetKeyValue( IServerEntity *pEntity, const char *szField, const char *szValue );
+	virtual bool SetKeyValue( IServerEntity *pEntity, const char *szField, float flValue );
+	virtual bool SetKeyValue( IServerEntity *pEntity, const char *szField, const Vector &vecValue );
+	virtual IServerEntity *CreateEntityByName( const char *szClassName );
+	virtual void DispatchSpawn( IServerEntity *pEntity );
 	virtual void ReloadParticleDefintions( const char *pFileName, const void *pBufData, int nLen );
 	virtual void AddOriginToPVS( const Vector &org );
 	virtual void MoveEngineViewTo( const Vector &vPos, const QAngle &vAngles );
 	virtual bool DestroyEntityByHammerId( int iHammerID );
-	virtual CBaseEntity *GetBaseEntityByEntIndex( int iEntIndex );
-	virtual void RemoveEntity( CBaseEntity *pEntity );
-	virtual void RemoveEntityImmediate( CBaseEntity *pEntity );
+	virtual IServerEntity *GetBaseEntityByEntIndex( int iEntIndex );
+	virtual void RemoveEntity( IServerEntity *pEntity );
+	virtual void RemoveEntityImmediate( IServerEntity *pEntity );
 	//virtual IEntityFactoryDictionary *GetEntityFactoryDictionary( void );
-	virtual void SetMoveType( CBaseEntity *pEntity, int val );
-	virtual void SetMoveType( CBaseEntity *pEntity, int val, int moveCollide );
+	virtual void SetMoveType( IServerEntity *pEntity, int val );
+	virtual void SetMoveType( IServerEntity *pEntity, int val, int moveCollide );
 	virtual void ResetSequence( CBaseAnimating *pEntity, int nSequence );
 	virtual void ResetSequenceInfo( CBaseAnimating *pEntity );
 	virtual void ClearMultiDamage( void );
 	virtual void ApplyMultiDamage( void );
-	virtual void AddMultiDamage( const CTakeDamageInfo &pTakeDamageInfo, CBaseEntity *pEntity );
-	virtual void RadiusDamage( const CTakeDamageInfo &info, const Vector &vecSrc, float flRadius, int iClassIgnore, CBaseEntity *pEntityIgnore );
+	virtual void AddMultiDamage( const CTakeDamageInfo &pTakeDamageInfo, IServerEntity *pEntity );
+	virtual void RadiusDamage( const CTakeDamageInfo &info, const Vector &vecSrc, float flRadius, int iClassIgnore, IServerEntity *pEntityIgnore );
 
 	virtual ITempEntsSystem *GetTempEntsSystem( void );
 	virtual CBaseTempEntity *GetTempEntList( void );
 	virtual IServerEntityList *GetEntityList( void );
 	virtual bool IsEntityPtr( void *pTest );
-	virtual CBaseEntity *FindEntityByClassname( CBaseEntity *pStartEntity, const char *szName );
-	virtual CBaseEntity *FindEntityByName( CBaseEntity *pStartEntity, const char *szName, CBaseEntity *pSearchingEntity = NULL, CBaseEntity *pActivator = NULL, CBaseEntity *pCaller = NULL, IEntityFindFilter *pFilter = NULL );
-	virtual CBaseEntity *FindEntityInSphere( CBaseEntity *pStartEntity, const Vector &vecCenter, float flRadius );
-	virtual CBaseEntity *FindEntityByTarget( CBaseEntity *pStartEntity, const char *szName );
-	virtual CBaseEntity *FindEntityByModel( CBaseEntity *pStartEntity, const char *szModelName );
-	virtual CBaseEntity *FindEntityByNameNearest( const char *szName, const Vector &vecSrc, float flRadius, CBaseEntity *pSearchingEntity = NULL, CBaseEntity *pActivator = NULL, CBaseEntity *pCaller = NULL );
-	virtual CBaseEntity *FindEntityByNameWithin( CBaseEntity *pStartEntity, const char *szName, const Vector &vecSrc, float flRadius, CBaseEntity *pSearchingEntity = NULL, CBaseEntity *pActivator = NULL, CBaseEntity *pCaller = NULL );
-	virtual CBaseEntity *FindEntityByClassnameNearest( const char *szName, const Vector &vecSrc, float flRadius );
-	virtual CBaseEntity *FindEntityByClassnameWithin( CBaseEntity *pStartEntity, const char *szName, const Vector &vecSrc, float flRadius );
-	virtual CBaseEntity *FindEntityByClassnameWithin( CBaseEntity *pStartEntity, const char *szName, const Vector &vecMins, const Vector &vecMaxs );
-	virtual CBaseEntity *FindEntityGeneric( CBaseEntity *pStartEntity, const char *szName, CBaseEntity *pSearchingEntity = NULL, CBaseEntity *pActivator = NULL, CBaseEntity *pCaller = NULL );
-	virtual CBaseEntity *FindEntityGenericWithin( CBaseEntity *pStartEntity, const char *szName, const Vector &vecSrc, float flRadius, CBaseEntity *pSearchingEntity = NULL, CBaseEntity *pActivator = NULL, CBaseEntity *pCaller = NULL );
-	virtual CBaseEntity *FindEntityGenericNearest( const char *szName, const Vector &vecSrc, float flRadius, CBaseEntity *pSearchingEntity = NULL, CBaseEntity *pActivator = NULL, CBaseEntity *pCaller = NULL );
-	virtual CBaseEntity *FindEntityNearestFacing( const Vector &origin, const Vector &facing, float threshold );
-	virtual CBaseEntity *FindEntityClassNearestFacing( const Vector &origin, const Vector &facing, float threshold, char *classname );
-	virtual CBaseEntity *FindEntityProcedural( const char *szName, CBaseEntity *pSearchingEntity = NULL, CBaseEntity *pActivator = NULL, CBaseEntity *pCaller = NULL );
+	virtual IServerEntity *FindEntityByClassname( IServerEntity *pStartEntity, const char *szName );
+	virtual IServerEntity *FindEntityByName( IServerEntity *pStartEntity, const char *szName, IServerEntity *pSearchingEntity = NULL, IServerEntity *pActivator = NULL, IServerEntity *pCaller = NULL, IEntityFindFilter *pFilter = NULL );
+	virtual IServerEntity *FindEntityInSphere( IServerEntity *pStartEntity, const Vector &vecCenter, float flRadius );
+	virtual IServerEntity *FindEntityByTarget( IServerEntity *pStartEntity, const char *szName );
+	virtual IServerEntity *FindEntityByModel( IServerEntity *pStartEntity, const char *szModelName );
+	virtual IServerEntity *FindEntityByNameNearest( const char *szName, const Vector &vecSrc, float flRadius, IServerEntity *pSearchingEntity = NULL, IServerEntity *pActivator = NULL, IServerEntity *pCaller = NULL );
+	virtual IServerEntity *FindEntityByNameWithin( IServerEntity *pStartEntity, const char *szName, const Vector &vecSrc, float flRadius, IServerEntity *pSearchingEntity = NULL, IServerEntity *pActivator = NULL, IServerEntity *pCaller = NULL );
+	virtual IServerEntity *FindEntityByClassnameNearest( const char *szName, const Vector &vecSrc, float flRadius );
+	virtual IServerEntity *FindEntityByClassnameWithin( IServerEntity *pStartEntity, const char *szName, const Vector &vecSrc, float flRadius );
+	virtual IServerEntity *FindEntityByClassnameWithin( IServerEntity *pStartEntity, const char *szName, const Vector &vecMins, const Vector &vecMaxs );
+	virtual IServerEntity *FindEntityGeneric( IServerEntity *pStartEntity, const char *szName, IServerEntity *pSearchingEntity = NULL, IServerEntity *pActivator = NULL, IServerEntity *pCaller = NULL );
+	virtual IServerEntity *FindEntityGenericWithin( IServerEntity *pStartEntity, const char *szName, const Vector &vecSrc, float flRadius, IServerEntity *pSearchingEntity = NULL, IServerEntity *pActivator = NULL, IServerEntity *pCaller = NULL );
+	virtual IServerEntity *FindEntityGenericNearest( const char *szName, const Vector &vecSrc, float flRadius, IServerEntity *pSearchingEntity = NULL, IServerEntity *pActivator = NULL, IServerEntity *pCaller = NULL );
+	virtual IServerEntity *FindEntityNearestFacing( const Vector &origin, const Vector &facing, float threshold );
+	virtual IServerEntity *FindEntityClassNearestFacing( const Vector &origin, const Vector &facing, float threshold, char *classname );
+	virtual IServerEntity *FindEntityProcedural( const char *szName, IServerEntity *pSearchingEntity = NULL, IServerEntity *pActivator = NULL, IServerEntity *pCaller = NULL );
 };
 
 
@@ -110,7 +110,7 @@ IServerEntity *CServerTools::GetIServerEntity( IClientEntity *pClientEntity )
 	if ( pNet == NULL )
 		return NULL;
 
-	CBaseEntity *pServerEnt = pNet->GetBaseEntity();
+	IServerEntity *pServerEnt = pNet->GetBaseEntity();
 	return pServerEnt;
 #else
 	IHandleEntity *pEnt = EntityList()->LookupEntityByNetworkIndex( ehandle.GetEntryIndex() );
@@ -122,8 +122,7 @@ IServerEntity *CServerTools::GetIServerEntity( IClientEntity *pClientEntity )
 	if ( !h.IsValid() || ( ( h.GetSerialNumber() & mask ) != ( ehandle.GetSerialNumber() & mask ) ) )
 		return NULL;
 
-	IServerUnknown *pUnk = static_cast< IServerUnknown* >( pEnt );
-	return pUnk->GetBaseEntity();
+	return (IServerEntity*)pEnt;
 #endif
 }
 
@@ -173,8 +172,8 @@ bool CServerTools::SetPlayerFOV( int fov, IClientEntity *pClientPlayer )
 		return false;
 
 	pPlayer->SetDefaultFOV( fov );
-	CBaseEntity *pFOVOwner = pPlayer->GetFOVOwner();
-	return pPlayer->SetFOV( pFOVOwner ? pFOVOwner : pPlayer, fov );
+	IServerEntity *pFOVOwner = pPlayer->GetFOVOwner();
+	return pPlayer->SetFOV( pFOVOwner ? (CBaseEntity*)pFOVOwner : pPlayer, fov );
 }
 
 bool CServerTools::IsInNoClipMode( IClientEntity *pClientPlayer )
@@ -187,14 +186,14 @@ bool CServerTools::IsInNoClipMode( IClientEntity *pClientPlayer )
 	return pPlayer->GetEngineObject()->GetMoveType() == MOVETYPE_NOCLIP;
 }
 
-CBaseEntity *CServerTools::FirstEntity( void )
+IServerEntity *CServerTools::FirstEntity( void )
 {
 	return EntityList()->FirstEnt();
 }
 
-CBaseEntity *CServerTools::NextEntity( CBaseEntity *pEntity )
+IServerEntity *CServerTools::NextEntity( IServerEntity *pEntity )
 {
-	CBaseEntity *pEnt;
+	IServerEntity *pEnt;
 
 	if ( pEntity == NULL )
 	{
@@ -202,40 +201,40 @@ CBaseEntity *CServerTools::NextEntity( CBaseEntity *pEntity )
 	}
 	else
 	{
-		pEnt = EntityList()->NextEnt( (CBaseEntity *)pEntity );
+		pEnt = EntityList()->NextEnt( (IServerEntity *)pEntity );
 	}
 	return pEnt;
 }
 
-CBaseEntity *CServerTools::FindEntityByHammerID( int iHammerID )
+IServerEntity *CServerTools::FindEntityByHammerID( int iHammerID )
 {
-	CBaseEntity *pEntity = EntityList()->FirstEnt();
+	IServerEntity *pEntity = EntityList()->FirstEnt();
 
 	while (pEntity)
 	{
-		if (pEntity->m_iHammerID == iHammerID)
+		if (((CBaseEntity*)pEntity)->m_iHammerID == iHammerID)
 			return pEntity;
 		pEntity = EntityList()->NextEnt( pEntity );
 	}
 	return NULL;
 }
 
-bool CServerTools::GetKeyValue( CBaseEntity *pEntity, const char *szField, char *szValue, int iMaxLen )
+bool CServerTools::GetKeyValue( IServerEntity *pEntity, const char *szField, char *szValue, int iMaxLen )
 {
 	return pEntity->GetKeyValue( szField, szValue, iMaxLen );
 }
 
-bool CServerTools::SetKeyValue( CBaseEntity *pEntity, const char *szField, const char *szValue )
+bool CServerTools::SetKeyValue( IServerEntity *pEntity, const char *szField, const char *szValue )
 {
 	return pEntity->KeyValue( szField, szValue );
 }
 
-bool CServerTools::SetKeyValue( CBaseEntity *pEntity, const char *szField, float flValue )
+bool CServerTools::SetKeyValue( IServerEntity *pEntity, const char *szField, float flValue )
 {
 	return pEntity->KeyValue( szField, flValue );
 }
 
-bool CServerTools::SetKeyValue( CBaseEntity *pEntity, const char *szField, const Vector &vecValue )
+bool CServerTools::SetKeyValue( IServerEntity *pEntity, const char *szField, const Vector &vecValue )
 {
 	return pEntity->KeyValue( szField, vecValue );
 }
@@ -244,12 +243,12 @@ bool CServerTools::SetKeyValue( CBaseEntity *pEntity, const char *szField, const
 //-----------------------------------------------------------------------------
 // entity spawning
 //-----------------------------------------------------------------------------
-CBaseEntity *CServerTools::CreateEntityByName( const char *szClassName )
+IServerEntity *CServerTools::CreateEntityByName( const char *szClassName )
 {
-	return (CBaseEntity*)EntityList()->CreateEntityByName( szClassName );
+	return EntityList()->CreateEntityByName( szClassName );
 }
 
-void CServerTools::DispatchSpawn( CBaseEntity *pEntity )
+void CServerTools::DispatchSpawn( IServerEntity *pEntity )
 {
 	::DispatchSpawn( pEntity );
 }
@@ -287,7 +286,7 @@ void CServerTools::MoveEngineViewTo( const Vector &vPos, const QAngle &vAngles )
 
 bool CServerTools::DestroyEntityByHammerId( int iHammerID )
 {
-	CBaseEntity *pEntity = (CBaseEntity*)FindEntityByHammerID( iHammerID );
+	IServerEntity *pEntity = FindEntityByHammerID( iHammerID );
 	if ( !pEntity )
 		return false;
 
@@ -295,17 +294,17 @@ bool CServerTools::DestroyEntityByHammerId( int iHammerID )
 	return true;
 }
 
-void CServerTools::RemoveEntity( CBaseEntity *pEntity )
+void CServerTools::RemoveEntity( IServerEntity *pEntity )
 {
 	EntityList()->DestroyEntity( pEntity );
 }
 
-void CServerTools::RemoveEntityImmediate( CBaseEntity *pEntity )
+void CServerTools::RemoveEntityImmediate( IServerEntity *pEntity )
 {
 	EntityList()->DestroyEntityImmediate( pEntity );
 }
 
-CBaseEntity *CServerTools::GetBaseEntityByEntIndex( int iEntIndex )
+IServerEntity *CServerTools::GetBaseEntityByEntIndex( int iEntIndex )
 {
 	return EntityList()->GetBaseEntity(iEntIndex);
 }
@@ -316,12 +315,12 @@ CBaseEntity *CServerTools::GetBaseEntityByEntIndex( int iEntIndex )
 //}
 
 
-void CServerTools::SetMoveType( CBaseEntity *pEntity, int val )
+void CServerTools::SetMoveType( IServerEntity *pEntity, int val )
 {
 	pEntity->GetEngineObject()->SetMoveType( (MoveType_t)val );
 }
 
-void CServerTools::SetMoveType( CBaseEntity *pEntity, int val, int moveCollide )
+void CServerTools::SetMoveType( IServerEntity *pEntity, int val, int moveCollide )
 {
 	pEntity->GetEngineObject()->SetMoveType( (MoveType_t)val, (MoveCollide_t)moveCollide );
 }
@@ -347,14 +346,14 @@ void CServerTools::ApplyMultiDamage( void )
 	::ApplyMultiDamage();
 }
 
-void CServerTools::AddMultiDamage( const CTakeDamageInfo &pTakeDamageInfo, CBaseEntity *pEntity )
+void CServerTools::AddMultiDamage( const CTakeDamageInfo &pTakeDamageInfo, IServerEntity *pEntity )
 {
 	::AddMultiDamage( pTakeDamageInfo, pEntity );
 }
 
-void CServerTools::RadiusDamage( const CTakeDamageInfo &info, const Vector &vecSrc, float flRadius, int iClassIgnore, CBaseEntity *pEntityIgnore )
+void CServerTools::RadiusDamage( const CTakeDamageInfo &info, const Vector &vecSrc, float flRadius, int iClassIgnore, IServerEntity *pEntityIgnore )
 {
-	::RadiusDamage( info, vecSrc, flRadius, iClassIgnore, pEntityIgnore );
+	::RadiusDamage( info, vecSrc, flRadius, iClassIgnore, (CBaseEntity*)pEntityIgnore );
 }
 
 
@@ -378,82 +377,82 @@ bool CServerTools::IsEntityPtr( void *pTest )
 	return EntityList()->IsEntityPtr( pTest );
 }
 
-CBaseEntity *CServerTools::FindEntityByClassname( CBaseEntity *pStartEntity, const char *szName )
+IServerEntity *CServerTools::FindEntityByClassname( IServerEntity *pStartEntity, const char *szName )
 {
 	return EntityList()->FindEntityByClassname( pStartEntity, szName );
 }
 
-CBaseEntity *CServerTools::FindEntityByName( CBaseEntity *pStartEntity, const char *szName, CBaseEntity *pSearchingEntity, CBaseEntity *pActivator, CBaseEntity *pCaller, IEntityFindFilter *pFilter )
+IServerEntity *CServerTools::FindEntityByName( IServerEntity *pStartEntity, const char *szName, IServerEntity *pSearchingEntity, IServerEntity *pActivator, IServerEntity *pCaller, IEntityFindFilter *pFilter )
 {
 	return EntityList()->FindEntityByName( pStartEntity, szName, pSearchingEntity, pActivator, pCaller, pFilter );
 }
 
-CBaseEntity *CServerTools::FindEntityInSphere( CBaseEntity *pStartEntity, const Vector &vecCenter, float flRadius )
+IServerEntity *CServerTools::FindEntityInSphere( IServerEntity *pStartEntity, const Vector &vecCenter, float flRadius )
 {
 	return EntityList()->FindEntityInSphere( pStartEntity, vecCenter, flRadius );
 }
 
-CBaseEntity *CServerTools::FindEntityByTarget( CBaseEntity *pStartEntity, const char *szName )
+IServerEntity *CServerTools::FindEntityByTarget( IServerEntity *pStartEntity, const char *szName )
 {
 	return EntityList()->FindEntityByTarget( pStartEntity, szName );
 }
 
-CBaseEntity *CServerTools::FindEntityByModel( CBaseEntity *pStartEntity, const char *szModelName )
+IServerEntity *CServerTools::FindEntityByModel( IServerEntity *pStartEntity, const char *szModelName )
 {
 	return EntityList()->FindEntityByModel( pStartEntity, szModelName );
 }
 
-CBaseEntity *CServerTools::FindEntityByNameNearest( const char *szName, const Vector &vecSrc, float flRadius, CBaseEntity *pSearchingEntity, CBaseEntity *pActivator, CBaseEntity *pCaller )
+IServerEntity *CServerTools::FindEntityByNameNearest( const char *szName, const Vector &vecSrc, float flRadius, IServerEntity *pSearchingEntity, IServerEntity *pActivator, IServerEntity *pCaller )
 {
 	return EntityList()->FindEntityByNameNearest( szName, vecSrc, flRadius, pSearchingEntity, pActivator, pCaller );
 }
 
-CBaseEntity *CServerTools::FindEntityByNameWithin( CBaseEntity *pStartEntity, const char *szName, const Vector &vecSrc, float flRadius, CBaseEntity *pSearchingEntity, CBaseEntity *pActivator, CBaseEntity *pCaller )
+IServerEntity *CServerTools::FindEntityByNameWithin( IServerEntity *pStartEntity, const char *szName, const Vector &vecSrc, float flRadius, IServerEntity *pSearchingEntity, IServerEntity *pActivator, IServerEntity *pCaller )
 {
 	return EntityList()->FindEntityByNameWithin( pStartEntity, szName, vecSrc, flRadius, pSearchingEntity, pActivator, pCaller );
 }
 
-CBaseEntity *CServerTools::FindEntityByClassnameNearest( const char *szName, const Vector &vecSrc, float flRadius )
+IServerEntity *CServerTools::FindEntityByClassnameNearest( const char *szName, const Vector &vecSrc, float flRadius )
 {
 	return EntityList()->FindEntityByClassnameNearest( szName, vecSrc, flRadius );
 }
 
-CBaseEntity *CServerTools::FindEntityByClassnameWithin( CBaseEntity *pStartEntity, const char *szName, const Vector &vecSrc, float flRadius )
+IServerEntity *CServerTools::FindEntityByClassnameWithin( IServerEntity *pStartEntity, const char *szName, const Vector &vecSrc, float flRadius )
 {
 	return EntityList()->FindEntityByClassnameWithin( pStartEntity, szName, vecSrc, flRadius );
 }
 
-CBaseEntity *CServerTools::FindEntityByClassnameWithin( CBaseEntity *pStartEntity, const char *szName, const Vector &vecMins, const Vector &vecMaxs )
+IServerEntity *CServerTools::FindEntityByClassnameWithin( IServerEntity *pStartEntity, const char *szName, const Vector &vecMins, const Vector &vecMaxs )
 {
 	return EntityList()->FindEntityByClassnameWithin( pStartEntity, szName, vecMins, vecMaxs );
 }
 
-CBaseEntity *CServerTools::FindEntityGeneric( CBaseEntity *pStartEntity, const char *szName, CBaseEntity *pSearchingEntity, CBaseEntity *pActivator, CBaseEntity *pCaller )
+IServerEntity *CServerTools::FindEntityGeneric( IServerEntity *pStartEntity, const char *szName, IServerEntity *pSearchingEntity, IServerEntity *pActivator, IServerEntity *pCaller )
 {
 	return EntityList()->FindEntityGeneric( pStartEntity, szName, pSearchingEntity, pActivator, pCaller );
 }
 
-CBaseEntity *CServerTools::FindEntityGenericWithin( CBaseEntity *pStartEntity, const char *szName, const Vector &vecSrc, float flRadius, CBaseEntity *pSearchingEntity, CBaseEntity *pActivator, CBaseEntity *pCaller )
+IServerEntity *CServerTools::FindEntityGenericWithin( IServerEntity *pStartEntity, const char *szName, const Vector &vecSrc, float flRadius, IServerEntity *pSearchingEntity, IServerEntity *pActivator, IServerEntity *pCaller )
 {
 	return EntityList()->FindEntityGenericWithin( pStartEntity, szName, vecSrc, flRadius, pSearchingEntity, pActivator, pCaller );
 }
 
-CBaseEntity *CServerTools::FindEntityGenericNearest( const char *szName, const Vector &vecSrc, float flRadius, CBaseEntity *pSearchingEntity, CBaseEntity *pActivator, CBaseEntity *pCaller )
+IServerEntity *CServerTools::FindEntityGenericNearest( const char *szName, const Vector &vecSrc, float flRadius, IServerEntity *pSearchingEntity, IServerEntity *pActivator, IServerEntity *pCaller )
 {
 	return EntityList()->FindEntityGenericNearest( szName, vecSrc, flRadius, pSearchingEntity, pActivator, pCaller );
 }
 
-CBaseEntity *CServerTools::FindEntityNearestFacing( const Vector &origin, const Vector &facing, float threshold )
+IServerEntity *CServerTools::FindEntityNearestFacing( const Vector &origin, const Vector &facing, float threshold )
 {
 	return EntityList()->FindEntityNearestFacing( origin, facing, threshold );
 }
 
-CBaseEntity *CServerTools::FindEntityClassNearestFacing( const Vector &origin, const Vector &facing, float threshold, char *classname )
+IServerEntity *CServerTools::FindEntityClassNearestFacing( const Vector &origin, const Vector &facing, float threshold, char *classname )
 {
 	return EntityList()->FindEntityClassNearestFacing( origin, facing, threshold, classname );
 }
 
-CBaseEntity *CServerTools::FindEntityProcedural( const char *szName, CBaseEntity *pSearchingEntity, CBaseEntity *pActivator, CBaseEntity *pCaller )
+IServerEntity *CServerTools::FindEntityProcedural( const char *szName, IServerEntity *pSearchingEntity, IServerEntity *pActivator, IServerEntity *pCaller )
 {
 	return EntityList()->FindEntityProcedural( szName, pSearchingEntity, pActivator, pCaller );
 }
@@ -466,14 +465,14 @@ public:
 	// Iterates through ALL entities (separate list for client vs. server)
 	virtual EntitySearchResult	NextChoreoEntity( EntitySearchResult currentEnt )
 	{
-		CBaseEntity *ent = reinterpret_cast< CBaseEntity* >( currentEnt );
+		IServerEntity *ent = reinterpret_cast<IServerEntity* >( currentEnt );
 		ent = EntityList()->FindEntityByClassname( ent, "logic_choreographed_scene" );
 		return reinterpret_cast< EntitySearchResult >( ent );
 	}
 
 	virtual const char			*GetSceneFile( EntitySearchResult sr )
 	{
-		CBaseEntity *ent = reinterpret_cast< CBaseEntity* >( sr );
+		IServerEntity *ent = reinterpret_cast< IServerEntity* >( sr );
 		if ( !sr )
 			return "";
 
@@ -486,7 +485,7 @@ public:
 	// For interactive editing
 	virtual int	GetEntIndex( EntitySearchResult sr )
 	{
-		CBaseEntity *ent = reinterpret_cast< CBaseEntity* >( sr );
+		IServerEntity *ent = reinterpret_cast< IServerEntity* >( sr );
 		if ( !ent )
 			return -1;
 
@@ -495,7 +494,7 @@ public:
 
 	virtual void ReloadSceneFromDisk( int entindex )
 	{
-		CBaseEntity *ent = EntityList()->GetBaseEntity( entindex );
+		IServerEntity *ent = EntityList()->GetBaseEntity( entindex );
 		if ( !ent )
 			return;
 
@@ -521,7 +520,7 @@ void CC_Ent_Keyvalue( const CCommand &args )
 	}
 
 	CBasePlayer *pPlayer = ToBasePlayer( UTIL_GetCommandClient() );
-	CBaseEntity *pEnt;
+	IServerEntity *pEnt;
 	if ( FStrEq( args[1], "" ) || FStrEq( args[1], "!picker" ) )
 	{
 		if (!pPlayer)

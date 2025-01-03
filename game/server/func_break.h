@@ -139,7 +139,7 @@ private:
 
 protected:
 
-	bool		UpdateHealth( int iNewHealth, CBaseEntity *pActivator );
+	bool		UpdateHealth( int iNewHealth, IServerEntity *pActivator );
 
 	float		m_impactEnergyScale;
 

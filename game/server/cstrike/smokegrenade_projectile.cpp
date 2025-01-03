@@ -87,7 +87,7 @@ void CSmokeGrenadeProjectile::Think_Detonate()
 		pGren->GetEngineObject()->SetAbsOrigin(GetEngineObject()->GetAbsOrigin() );
 
 		//tell the hostages about the smoke!
-		CBaseEntity *pEntity = NULL;
+		IServerEntity *pEntity = NULL;
 		variant_t var;	//send the location of the smoke?
 		var.SetVector3D(GetEngineObject()->GetAbsOrigin() );
 		while ( ( pEntity = EntityList()->FindEntityByClassname( pEntity, "hostage_entity" ) ) != NULL)

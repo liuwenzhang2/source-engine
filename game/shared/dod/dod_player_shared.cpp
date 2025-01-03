@@ -236,7 +236,7 @@ void CDODPlayer::FireBullets( const FireBulletsInfo_t &info )
 #ifdef GAME_DLL
 			case HITGROUP_HEAD:
 				{
-					if (((CBaseEntity*)tr.m_pEnt)->GetTeamNumber() != GetTeamNumber() )
+					if (tr.m_pEnt->GetTeamNumber() != GetTeamNumber() )
 					{
 						iNumHeadshots++;
 					}
@@ -367,7 +367,7 @@ void CDODPlayer::FireBullets( const FireBulletsInfo_t &info )
 		CalculateBulletDamageForce( &dmgInfo, info.m_iAmmoType, info.m_vecDirShooting, tr.endpos );
 		((CBaseEntity*)tr.m_pEnt)->DispatchTraceAttack( dmgInfo, info.m_vecDirShooting, &tr );
 
-		DevMsg( 2, "Giving damage ( %.1f ) to entity of type %s\n", flActualDamage, ((CBaseEntity*)tr.m_pEnt)->GetClassname() );
+		DevMsg( 2, "Giving damage ( %.1f ) to entity of type %s\n", flActualDamage, tr.m_pEnt->GetClassname() );
 
 		TraceAttackToTriggers( dmgInfo, tr.startpos, tr.endpos, info.m_vecDirShooting );
 #endif

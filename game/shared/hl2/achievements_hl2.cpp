@@ -194,7 +194,7 @@ class CAchievementHL2DisintegrateSoldiersInField : public CBaseAchievement
 	{
 		if ( 0 == Q_strcmp( event->GetName(), "ragdoll_dissolved" ) )
 		{
-			CBaseEntity *pRagdoll = EntityList()->GetBaseEntity( event->GetInt( "entindex", 0 ) );
+			IHandleEntity *pRagdoll = EntityList()->GetBaseEntity( event->GetInt( "entindex", 0 ) );
 			if ( pRagdoll )
 			{
 				const char *pszName = GetModelName( pRagdoll );

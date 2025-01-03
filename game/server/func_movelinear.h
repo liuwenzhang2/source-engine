@@ -31,7 +31,7 @@ public:
 	void		Use( IServerEntity *pActivator, IServerEntity *pCaller, USE_TYPE useType, float value );
 	void		MoveDone( void );
 	void		StopMoveSound( void );
-	void		Blocked( CBaseEntity *pOther );
+	void		Blocked( IServerEntity *pOther );
 	void		SetPosition( float flPosition );
 
 	int			DrawDebugTextOverlays(void);

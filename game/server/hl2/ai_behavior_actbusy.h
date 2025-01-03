@@ -226,7 +226,7 @@ public:
 	bool IsCombatActBusyTeleportAllowed()	{ return m_bAllowCombatActBusyTeleport; }
 
 protected:
-	CAI_ActBusyBehavior *GetBusyBehaviorForNPC( const char *pszActorName, CBaseEntity *pActivator, CBaseEntity *pCaller, const char *sInputName );
+	CAI_ActBusyBehavior *GetBusyBehaviorForNPC( const char *pszActorName, IServerEntity *pActivator, IServerEntity *pCaller, const char *sInputName );
 	CAI_ActBusyBehavior *GetBusyBehaviorForNPC( CBaseEntity *pEntity, const char *sInputName );
 
 	void		 EnableGoal( CAI_BaseNPC *pAI );

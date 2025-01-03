@@ -1066,7 +1066,7 @@ void CNPC_ControllerHeadBall::Spawn( void )
 	// motor
 	GetEngineObject()->SetMoveType( MOVETYPE_FLY );
 	GetEngineObject()->SetSolid( SOLID_BBOX );
-	SetSize( vec3_origin, vec3_origin );
+	GetEngineObject()->SetSize( vec3_origin, vec3_origin );
 
 	m_pSprite = CSprite::SpriteCreate( "sprites/xspark4.vmt", GetEngineObject()->GetAbsOrigin(), FALSE );
 	m_pSprite->SetTransparency( kRenderTransAdd, 255, 255, 255, 255, kRenderFxNoDissipation );
@@ -1230,7 +1230,7 @@ void CNPC_ControllerZapBall::Spawn( void )
 	GetEngineObject()->SetMoveType( MOVETYPE_FLY );
 //	SetSolid( SOLID_CUSTOM );
 	GetEngineObject()->SetSolid( SOLID_BBOX );
-	SetSize( vec3_origin, vec3_origin );
+	GetEngineObject()->SetSize( vec3_origin, vec3_origin );
 
 	m_pSprite = CSprite::SpriteCreate( "sprites/xspark4.vmt", GetEngineObject()->GetAbsOrigin(), FALSE );
 	m_pSprite->SetTransparency( kRenderTransAdd, 255, 255, 255, 255, kRenderFxNoDissipation );

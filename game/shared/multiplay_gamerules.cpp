@@ -660,7 +660,7 @@ ConVarRef suitcharger( "sk_suitcharger" );
 	void CMultiplayWorld::PlayerSpawn( CBasePlayer *pPlayer )
 	{
 		bool		addDefault;
-		CBaseEntity	*pWeaponEntity = NULL;
+		IServerEntity	*pWeaponEntity = NULL;
 
 		pPlayer->EquipSuit();
 		
@@ -750,8 +750,8 @@ ConVarRef suitcharger( "sk_suitcharger" );
 		DeathNotice( pVictim, info );
 
 		// Find the killer & the scorer
-		CBaseEntity *pInflictor = info.GetInflictor();
-		CBaseEntity *pKiller = info.GetAttacker();
+		CBaseEntity *pInflictor = (CBaseEntity*)info.GetInflictor();
+		CBaseEntity *pKiller = (CBaseEntity*)info.GetAttacker();
 		CBasePlayer *pScorer = GetDeathScorer( pKiller, pInflictor, pVictim );
 		
 		pVictim->IncrementDeathCount( 1 );
@@ -803,8 +803,8 @@ ConVarRef suitcharger( "sk_suitcharger" );
 		int killer_ID = 0;
 
 		// Find the killer & the scorer
-		CBaseEntity *pInflictor = info.GetInflictor();
-		CBaseEntity *pKiller = info.GetAttacker();
+		CBaseEntity *pInflictor = (CBaseEntity*)info.GetInflictor();
+		CBaseEntity *pKiller = (CBaseEntity*)info.GetAttacker();
 		CBasePlayer *pScorer = GetDeathScorer( pKiller, pInflictor, pVictim );
 
 		// Custom damage type?
@@ -1061,9 +1061,9 @@ ConVarRef suitcharger( "sk_suitcharger" );
 		return GR_PLR_DROP_AMMO_ACTIVE;
 	}
 
-	CBaseEntity *CMultiplayWorld::GetPlayerSpawnSpot( CBasePlayer *pPlayer )
+	IServerEntity *CMultiplayWorld::GetPlayerSpawnSpot( CBasePlayer *pPlayer )
 	{
-		CBaseEntity *pentSpawnSpot = BaseClass::GetPlayerSpawnSpot( pPlayer );	
+		IServerEntity *pentSpawnSpot = BaseClass::GetPlayerSpawnSpot( pPlayer );	
 
 	//!! replace this with an Event
 	/*

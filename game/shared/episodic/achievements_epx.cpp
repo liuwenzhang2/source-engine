@@ -41,7 +41,7 @@ protected:
 		if ( 0 == Q_strcmp( event->GetName(), "physgun_pickup" ) )
 		{
 			// was the object picked up a frag grenade?
-			CBaseEntity *pEntityPickedUp = EntityList()->GetBaseEntity( event->GetInt( "entindex" ) );
+			IServerEntity *pEntityPickedUp = EntityList()->GetBaseEntity( event->GetInt( "entindex" ) );
 			if ( pEntityPickedUp && pEntityPickedUp->ClassMatches( "npc_grenade_frag" ) )
 			{
 				// get the grenade object
@@ -85,7 +85,7 @@ protected:
 	{
 		if ( 0 == Q_strcmp( event->GetName(), "flare_ignite_npc" ) )
 		{
-			CBaseEntity *pEntityIgnited = EntityList()->GetBaseEntity( event->GetInt( "entindex" ) );
+			IServerEntity *pEntityIgnited = EntityList()->GetBaseEntity( event->GetInt( "entindex" ) );
 			// was it a zombie that got set on fire?
 			if ( pEntityIgnited && 
 				( ( pEntityIgnited->ClassMatches( "npc_zombie" ) ) || ( pEntityIgnited->ClassMatches( "npc_zombine" ) ) ||

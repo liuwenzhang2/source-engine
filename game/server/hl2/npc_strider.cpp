@@ -654,7 +654,7 @@ void CNPC_Strider::PostNPCInit()
 		GetEngineObject()->RemoveFlag( FL_FLY );
 	}
 
-	m_PlayerFreePass.SetPassTarget( EntityList()->GetPlayerByIndex(1) );
+	m_PlayerFreePass.SetPassTarget((CBaseEntity*)EntityList()->GetPlayerByIndex(1) );
 	
 	AI_FreePassParams_t freePassParams = 
 	{
@@ -780,10 +780,10 @@ int	CNPC_Strider::DrawDebugTextOverlays()
 			text_offset++;
 		}
 
-		CBaseEntity *pPlayer = EntityList()->GetPlayerByIndex(1);
+		IServerEntity *pPlayer = EntityList()->GetPlayerByIndex(1);
 		if ( pPlayer )
 		{
-			if ( GetSenses()->ShouldSeeEntity( pPlayer ) && GetSenses()->CanSeeEntity( pPlayer ) )
+			if ( GetSenses()->ShouldSeeEntity((CBaseEntity*)pPlayer ) && GetSenses()->CanSeeEntity((CBaseEntity*)pPlayer ) )
 			{
 				EntityText(text_offset,"See player",0);
 				text_offset++;
@@ -793,7 +793,7 @@ int	CNPC_Strider::DrawDebugTextOverlays()
 				float temp = m_PlayerFreePass.GetTimeRemaining();
 				m_PlayerFreePass.SetTimeRemaining( 0 );
 
-				if ( BaseClass::FVisible( pPlayer ) && !FVisible( pPlayer ) )
+				if ( BaseClass::FVisible((CBaseEntity*)pPlayer ) && !FVisible((CBaseEntity*)pPlayer ) )
 				{
 					EntityText(text_offset,"Player peeking",0);
 					text_offset++;
@@ -930,7 +930,7 @@ void CNPC_Strider::PrescheduleThink()
 	// Next missile will kill me!
 	if( GetHealth() <= 50 && random->RandomInt( 0, 20 ) == 0 )
 	{
-		CBaseEntity *pTrail = (CBaseEntity*)EntityList()->CreateEntityByName( "sparktrail" );
+		IServerEntity *pTrail = EntityList()->CreateEntityByName( "sparktrail" );
 		pTrail->SetOwnerEntity( this );
 		pTrail->Spawn();
 	}
@@ -1902,7 +1902,7 @@ void CNPC_Strider::HandleAnimEvent( animevent_t *pEvent )
 
 	case STRIDER_AE_SHOOTMINIGUN:
 	{
-		CBaseEntity *pTarget = EntityList()->FindEntityGeneric( NULL, pEvent->options, this, this );
+		IServerEntity *pTarget = EntityList()->FindEntityGeneric( NULL, pEvent->options, this, this );
 		if ( pTarget )
 		{
 			Vector vecTarget = pTarget->GetEngineObject()->WorldSpaceCenter();
@@ -2068,10 +2068,10 @@ void CNPC_Strider::InputSetMinigunTime( inputdata_t &inputdata )
 //---------------------------------------------------------
 void CNPC_Strider::InputSetMinigunTarget( inputdata_t &inputdata )
 {
-	CBaseEntity *pTargetEntity = EntityList()->FindEntityByName( NULL, inputdata.value.String(), NULL, inputdata.pActivator, inputdata.pCaller );
+	IServerEntity *pTargetEntity = EntityList()->FindEntityByName( NULL, inputdata.value.String(), NULL, inputdata.pActivator, inputdata.pCaller );
 
 	m_pMinigun->StopShootingForSeconds( this, m_pMinigun->GetTarget(), 0 );
-	m_pMinigun->ShootAtTarget( this, pTargetEntity, m_miniGunShootDuration );
+	m_pMinigun->ShootAtTarget( this, (CBaseEntity*)pTargetEntity, m_miniGunShootDuration );
 	m_miniGunShootDuration = 0;
 }
 
@@ -2079,7 +2079,7 @@ void CNPC_Strider::InputSetMinigunTarget( inputdata_t &inputdata )
 //---------------------------------------------------------
 void CNPC_Strider::InputSetCannonTarget( inputdata_t &inputdata )
 {
-	CBaseEntity *pTarget = EntityList()->FindEntityByName( NULL, inputdata.value.String(), NULL, inputdata.pActivator, inputdata.pCaller );
+	IServerEntity *pTarget = EntityList()->FindEntityByName( NULL, inputdata.value.String(), NULL, inputdata.pActivator, inputdata.pCaller );
 
 	if ( pTarget )
 	{
@@ -2098,9 +2098,9 @@ void CNPC_Strider::InputSetCannonTarget( inputdata_t &inputdata )
 			}
 		}
 
-		if( pTarget->MyCombatCharacterPointer() && pTarget->IsAlive() )
+		if( pTarget->IsCombatCharacter() && pTarget->IsAlive() )
 		{
-			m_hCannonTarget = pTarget;
+			m_hCannonTarget = (CBaseEntity*)pTarget;
 			m_AttemptCannonLOSTimer.Force();
 			return;
 		}
@@ -2835,7 +2835,7 @@ bool CNPC_Strider::CanShootThrough( const trace_t &tr, const Vector &vecTarget )
 		return false;
 	}
 
-	if( !((CBaseEntity*)tr.m_pEnt)->GetHealth() )
+	if( !tr.m_pEnt->GetHealth() )
 	{
 		return false;
 	}
@@ -3079,7 +3079,7 @@ void CNPC_Strider::TraceAttack( const CTakeDamageInfo &inputInfo, const Vector &
 	{
 		if ( !HasMemory( bits_MEMORY_PROVOKED ) )
 		{
-			GetEnemies()->ClearMemory( info.GetAttacker() );
+			GetEnemies()->ClearMemory((CBaseEntity*)info.GetAttacker() );
 			Remember( bits_MEMORY_PROVOKED );
 			SetCondition( COND_LIGHT_DAMAGE );
 		}
@@ -3129,7 +3129,7 @@ int CNPC_Strider::OnTakeDamage_Alive( const CTakeDamageInfo &info )
 		return 0;
 
 	// special interaction with combine balls
-	if ( UTIL_IsCombineBall( info.GetInflictor() ) )
+	if ( UTIL_IsCombineBall((CBaseEntity*)info.GetInflictor() ) )
 		return TakeDamageFromCombineBall( info );
 
 	if ( info.GetDamageType() == DMG_GENERIC )
@@ -3140,7 +3140,7 @@ int CNPC_Strider::OnTakeDamage_Alive( const CTakeDamageInfo &info )
 		// Any damage the player inflicts gets my attention, even if it doesn't actually harm me.
 		if ( info.GetAttacker()->IsPlayer() )
 		{
-			UpdateEnemyMemory( info.GetAttacker(), info.GetAttacker()->GetEngineObject()->GetAbsOrigin() );
+			UpdateEnemyMemory((CBaseEntity*)info.GetAttacker(), info.GetAttacker()->GetEngineObject()->GetAbsOrigin() );
 		}
 	}
 
@@ -3157,12 +3157,12 @@ int CNPC_Strider::OnTakeDamage_Alive( const CTakeDamageInfo &info )
 			if ( bPlayer )
 			{
 				m_PlayerFreePass.Revoke();
-				AddFacingTarget( info.GetAttacker(), info.GetAttacker()->GetEngineObject()->GetAbsOrigin(), 1.0, 2.0 );
+				AddFacingTarget((CBaseEntity*)info.GetAttacker(), info.GetAttacker()->GetEngineObject()->GetAbsOrigin(), 1.0, 2.0 );
 
-				UpdateEnemyMemory( info.GetAttacker(), info.GetAttacker()->GetEngineObject()->GetAbsOrigin() );
+				UpdateEnemyMemory((CBaseEntity*)info.GetAttacker(), info.GetAttacker()->GetEngineObject()->GetAbsOrigin() );
 			}
 			else
-				AddFacingTarget( info.GetAttacker(), info.GetAttacker()->GetEngineObject()->GetAbsOrigin(), 0.5, 2.0 );
+				AddFacingTarget((CBaseEntity*)info.GetAttacker(), info.GetAttacker()->GetEngineObject()->GetAbsOrigin(), 0.5, 2.0 );
 
 			// Default to NPC damage value
 			int damage = 20;
@@ -3188,14 +3188,14 @@ int CNPC_Strider::OnTakeDamage_Alive( const CTakeDamageInfo &info )
 
 			m_iHealth -= damage;
 
-			m_OnDamaged.FireOutput( info.GetAttacker(), this);
+			m_OnDamaged.FireOutput((IServerEntity*)info.GetAttacker(), this);
 
 			if( info.GetAttacker()->IsPlayer() )
 			{
-				m_OnDamagedByPlayer.FireOutput( info.GetAttacker(), this );
+				m_OnDamagedByPlayer.FireOutput((IServerEntity*)info.GetAttacker(), this );
 
 				// This also counts as being harmed by player's squad.
-				m_OnDamagedByPlayerSquad.FireOutput( info.GetAttacker(), this );
+				m_OnDamagedByPlayerSquad.FireOutput((IServerEntity*)info.GetAttacker(), this );
 			}
 			else
 			{
@@ -3207,7 +3207,7 @@ int CNPC_Strider::OnTakeDamage_Alive( const CTakeDamageInfo &info )
 				{
 					if( pAttacker->GetSquad() != NULL && pAttacker->IsInPlayerSquad() )
 					{
-						m_OnDamagedByPlayerSquad.FireOutput( info.GetAttacker(), this );
+						m_OnDamagedByPlayerSquad.FireOutput((IServerEntity*)info.GetAttacker(), this );
 					}
 				}
 			}
@@ -3223,7 +3223,7 @@ int CNPC_Strider::OnTakeDamage_Alive( const CTakeDamageInfo &info )
 			// Interrupt our gun during the flinch
 			m_pMinigun->StopShootingForSeconds( this, m_pMinigun->GetTarget(), 1.1f );
 
-			GetEnemies()->OnTookDamageFrom( info.GetAttacker() );
+			GetEnemies()->OnTookDamageFrom((CBaseEntity*)info.GetAttacker() );
 
 			if( !IsSmoking() && m_iHealth <= sk_strider_health.GetInt() / 2 )
 			{
@@ -3259,7 +3259,7 @@ int CNPC_Strider::TakeDamageFromCombineBall( const CTakeDamageInfo &info )
 	float damage = info.GetDamage();
 
 	// If it's only an AR2 alt-fire, we don't take much damage
-	if ( UTIL_IsAR2CombineBall( info.GetInflictor() ) )
+	if ( UTIL_IsAR2CombineBall((CBaseEntity*)info.GetInflictor() ) )
 	{
 		damage = strider_ar2_altfire_dmg.GetFloat();
 	}
@@ -3275,8 +3275,8 @@ int CNPC_Strider::TakeDamageFromCombineBall( const CTakeDamageInfo &info )
 		damage = g_pGameRules->AdjustPlayerDamageInflicted(damage);
 	}
 
-	AddFacingTarget( info.GetInflictor(), info.GetInflictor()->GetEngineObject()->GetAbsOrigin(), 0.5, 2.0 );
-	if ( !UTIL_IsAR2CombineBall( info.GetInflictor() ) )
+	AddFacingTarget((CBaseEntity*)info.GetInflictor(), info.GetInflictor()->GetEngineObject()->GetAbsOrigin(), 0.5, 2.0 );
+	if ( !UTIL_IsAR2CombineBall((CBaseEntity*)info.GetInflictor() ) )
 		RestartGesture( ACT_GESTURE_BIG_FLINCH );
 	else
 		RestartGesture( ACT_GESTURE_SMALL_FLINCH );
@@ -3293,7 +3293,7 @@ int CNPC_Strider::TakeDamageFromCombineBall( const CTakeDamageInfo &info )
 void CNPC_Strider::Event_Killed( const CTakeDamageInfo &info )
 {
 	// Do a special death if we're killed by a combine ball in the Citadel
-	if ( info.GetInflictor() && UTIL_IsCombineBall( info.GetInflictor() ) )
+	if ( info.GetInflictor() && UTIL_IsCombineBall((CBaseEntity*)info.GetInflictor() ) )
 	{
 		if ( m_lifeState == LIFE_DYING )
 			return;
@@ -3389,16 +3389,16 @@ void CNPC_Strider::RagdollDeathEffect( CRagdollProp *pRagdoll, float flDuration 
 //-----------------------------------------------------------------------------
 bool CNPC_Strider::ShouldExplodeFromDamage( const CTakeDamageInfo &info )
 {
-	CBaseEntity *pInflictor = info.GetInflictor();
+	CBaseEntity *pInflictor = (CBaseEntity*)info.GetInflictor();
 	if ( pInflictor == NULL )
 		return false;
 
 	// Combine balls make us explode
-	if ( UTIL_IsCombineBall( info.GetInflictor() ) )
+	if ( UTIL_IsCombineBall((CBaseEntity*)info.GetInflictor() ) )
 		return true;
 
 	// Stickybombs make us explode
-	CBaseEntity *pAttacker = info.GetAttacker();
+	CBaseEntity *pAttacker = (CBaseEntity*)info.GetAttacker();
 	if ( pAttacker != NULL && (FClassnameIs( pAttacker, "weapon_striderbuster" ) ||
 								FClassnameIs( pAttacker, "npc_grenade_magna" )))
 		return true;
@@ -3767,7 +3767,7 @@ bool CNPC_Strider::HasPendingTargetPath()
 void CNPC_Strider::SetTargetPath()
 {
 	SetGoalEnt( NULL );
-	CBaseEntity *pGoalEnt = EntityList()->FindEntityByName( NULL, m_strTrackName );
+	IServerEntity *pGoalEnt = EntityList()->FindEntityByName( NULL, m_strTrackName );
 	if ( pGoalEnt == NULL )
 	{
 		DevWarning( "%s: Could not find target path '%s'!\n", GetClassname(), STRING( m_strTrackName ) );
@@ -3781,7 +3781,7 @@ void CNPC_Strider::SetTargetPath()
 
 	const Vector &absOrigin = GetEngineObject()->GetAbsOrigin();
 	CBaseEntity *pClosestEnt = NULL;
-	CBaseEntity *pCurEnt = pGoalEnt;
+	CBaseEntity *pCurEnt = (CBaseEntity*)pGoalEnt;
 	float distClosestSq = FLT_MAX;
 
 	CUtlRBTree<CBaseEntity *> visits;
@@ -4211,7 +4211,7 @@ void CNPC_Strider::VPhysicsShadowCollision( int index, gamevcollisionevent_t *pE
 	if ( !HasMemory( bits_MEMORY_PROVOKED ) )
 	{
 		// if the player threw this in the last 1 seconds
-		CBasePlayer *pPlayer = pEvent->pEntities[!index]->HasPhysicsAttacker( 1 );
+		CBasePlayer *pPlayer = ((CBaseEntity*)pEvent->pEntities[!index])->HasPhysicsAttacker( 1 );
 		if ( pPlayer )
 		{
 			GetEnemies()->ClearMemory( pPlayer );
@@ -4221,7 +4221,7 @@ void CNPC_Strider::VPhysicsShadowCollision( int index, gamevcollisionevent_t *pE
 	}
 
 	int otherIndex = !index;
-	CBaseEntity *pOther = pEvent->pEntities[otherIndex];
+	CBaseEntity *pOther = (CBaseEntity*)pEvent->pEntities[otherIndex];
 	if ( pOther && UTIL_IsCombineBall( pOther ) )
 	{
 		Vector damagePos;

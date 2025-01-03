@@ -106,11 +106,11 @@ void CTriggerWeaponDissolve::Activate( void )
 {
 	BaseClass::Activate();
 
-	CBaseEntity *pEntity = NULL;
+	IServerEntity *pEntity = NULL;
 
 	while ( ( pEntity = EntityList()->FindEntityByName( pEntity, m_strEmitterName ) ) != NULL )
 	{
-		m_pConduitPoints.AddToTail( pEntity );
+		m_pConduitPoints.AddToTail((CBaseEntity*)pEntity );
 	}
 
 	SetContextThink( &CTriggerWeaponDissolve::DissolveThink, gpGlobals->curtime + 0.1f, s_pDissolveThinkContext );
@@ -736,7 +736,7 @@ void CTriggerWateryDeath::Touch( IServerEntity *pOther )
 
 		// Use DMG_GENERIC & make the target inflict the damage on himself.
 		// This ensures that if the target is the player, the damage isn't modified by skill
-		CTakeDamageInfo info = CTakeDamageInfo((CBaseEntity*)pOther, (CBaseEntity*)pOther, m_flPainValue, DMG_GENERIC );
+		CTakeDamageInfo info = CTakeDamageInfo(pOther, pOther, m_flPainValue, DMG_GENERIC );
 
 		GuessDamageForce( &info, (pOther->GetEngineObject()->GetAbsOrigin() - GetEngineObject()->GetAbsOrigin()), pOther->GetEngineObject()->GetAbsOrigin() );
 		pOther->TakeDamage( info );
@@ -777,7 +777,7 @@ void CTriggerWateryDeath::StartTouch(IServerEntity *pOther)
 	{
 		SpawnLeeches((CBaseEntity*)pOther );
 
-		CHL2_Player *pHL2Player = dynamic_cast<CHL2_Player*>( pOther );
+		CHL2_Player *pHL2Player = ToHL2Player( pOther );
 
 		if ( pHL2Player )
 		{
@@ -824,7 +824,7 @@ void CTriggerWateryDeath::EndTouch( IServerEntity *pOther )
 		if ( m_hLeeches.Count() > 0 )
 			 m_hLeeches.Purge();
 
-		CHL2_Player *pHL2Player = dynamic_cast<CHL2_Player*>( pOther );
+		CHL2_Player *pHL2Player = ToHL2Player( pOther );
 
 		if ( pHL2Player )
 		{

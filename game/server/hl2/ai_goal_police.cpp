@@ -61,7 +61,7 @@ CBaseEntity *CAI_PoliceGoal::GetTarget( void )
 {
 	if ( m_hTarget == NULL )
 	{
-		CBaseEntity *pTarget = EntityList()->FindEntityByName( NULL, m_iszTarget );
+		IServerEntity *pTarget = EntityList()->FindEntityByName( NULL, m_iszTarget );
 
 		if ( pTarget == NULL )
 		{
@@ -69,7 +69,7 @@ CBaseEntity *CAI_PoliceGoal::GetTarget( void )
 			return NULL;
 		}
 
-		m_hTarget = pTarget;
+		m_hTarget = (CBaseEntity*)pTarget;
 	}
 
 	return m_hTarget;

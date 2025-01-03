@@ -871,7 +871,7 @@ void CNPC_AntlionGuard::Activate( void )
 	BaseClass::Activate();
 
 	// Find all nearby physics objects and add them to the list of objects we will sense
-	CBaseEntity *pObject = NULL;
+	IServerEntity *pObject = NULL;
 	while ( ( pObject = EntityList()->FindEntityInSphere( pObject, WorldSpaceCenter(), 2500 ) ) != NULL )
 	{
 		// Can't throw around debris
@@ -888,12 +888,12 @@ void CNPC_AntlionGuard::Activate( void )
 			continue;
 
 		// Tell the AI sensing list that we want to consider this
-		g_AI_SensedObjectsManager.AddEntity( pObject );
+		g_AI_SensedObjectsManager.AddEntity( (CBaseEntity*)pObject );
 
 		if ( g_debug_antlionguard.GetInt() == 5 )
 		{
 			Msg("Antlion Guard: Added prop with model '%s' to sense list.\n", STRING(pObject->GetEngineObject()->GetModelName()) );
-			pObject->m_debugOverlays |= OVERLAY_BBOX_BIT;
+			pObject->GetDebugOverlays() |= OVERLAY_BBOX_BIT;
 		}
 	}
 }
@@ -2267,13 +2267,13 @@ int CNPC_AntlionGuard::OnTakeDamage_Alive( const CTakeDamageInfo &info )
 	CTakeDamageInfo dInfo = info;
 
 	// Don't take damage from another antlion guard!
-	if ( dInfo.GetAttacker() && dInfo.GetAttacker() != this && FClassnameIs( dInfo.GetAttacker(), "npc_antlionguard" ) )
+	if ( dInfo.GetAttacker() && dInfo.GetAttacker() != this && FClassnameIs((CBaseEntity*)dInfo.GetAttacker(), "npc_antlionguard" ) )
 		return 0;
 
 	if ( ( dInfo.GetDamageType() & DMG_CRUSH ) && !( dInfo.GetDamageType() & DMG_VEHICLE ) )
 	{
 		// Don't take damage from physics objects that weren't thrown by the player.
-		CBaseEntity *pInflictor = dInfo.GetInflictor();
+		CBaseEntity *pInflictor = (CBaseEntity*)dInfo.GetInflictor();
 
 		IPhysicsObject *pObj = pInflictor->GetEngineObject()->VPhysicsGetObject();
 		if ( !pObj || !( pObj->GetGameFlags() & FVPHYSICS_WAS_THROWN ) )
@@ -2298,7 +2298,7 @@ int CNPC_AntlionGuard::OnTakeDamage_Alive( const CTakeDamageInfo &info )
 	if ( IsHeavyDamage( dInfo ) )
 	{
 		// Always take a set amount of damage from a combine ball
-		if ( info.GetInflictor() && UTIL_IsCombineBall( info.GetInflictor() ) )
+		if ( info.GetInflictor() && UTIL_IsCombineBall((CBaseEntity*)info.GetInflictor() ) )
 		{
 			dInfo.SetDamage( 50 );
 		}
@@ -3467,7 +3467,7 @@ void CNPC_AntlionGuard::InputSetShoveTarget( inputdata_t &inputdata )
 	if ( IsAlive() == false )
 		return;
 
-	CBaseEntity *pTarget = EntityList()->FindEntityByName( NULL, inputdata.value.String(), NULL, inputdata.pActivator, inputdata.pCaller );
+	IServerEntity *pTarget = EntityList()->FindEntityByName( NULL, inputdata.value.String(), NULL, inputdata.pActivator, inputdata.pCaller );
 
 	if ( pTarget == NULL )
 	{
@@ -3476,7 +3476,7 @@ void CNPC_AntlionGuard::InputSetShoveTarget( inputdata_t &inputdata )
 		return;
 	}
 
-	m_hShoveTarget = pTarget;
+	m_hShoveTarget = (CBaseEntity*)pTarget;
 }
 
 //-----------------------------------------------------------------------------
@@ -3493,7 +3493,7 @@ void CNPC_AntlionGuard::InputSetChargeTarget( inputdata_t &inputdata )
 
 	// Get charge target name
 	char *pszParam = strtok(parseString," ");
-	CBaseEntity *pTarget = EntityList()->FindEntityByName( NULL, pszParam, NULL, inputdata.pActivator, inputdata.pCaller );
+	IServerEntity *pTarget = EntityList()->FindEntityByName( NULL, pszParam, NULL, inputdata.pActivator, inputdata.pCaller );
 	if ( !pTarget )
 	{
 		Warning( "ERROR: Guard %s cannot find charge target '%s'\n", STRING(GetEntityName()), pszParam );
@@ -3502,7 +3502,7 @@ void CNPC_AntlionGuard::InputSetChargeTarget( inputdata_t &inputdata )
 
 	// Get the charge position name
 	pszParam = strtok(NULL," ");
-	CBaseEntity *pPosition = EntityList()->FindEntityByName( NULL, pszParam, NULL, inputdata.pActivator, inputdata.pCaller );
+	IServerEntity *pPosition = EntityList()->FindEntityByName( NULL, pszParam, NULL, inputdata.pActivator, inputdata.pCaller );
 	if ( !pPosition )
 	{
 		Warning( "ERROR: Guard %s cannot find charge position '%s'\nMake sure you've specified the parameters as [target start]!\n", STRING(GetEntityName()), pszParam );
@@ -3519,8 +3519,8 @@ void CNPC_AntlionGuard::InputSetChargeTarget( inputdata_t &inputdata )
 	}
 
 	SetCondition( COND_ANTLIONGUARD_HAS_CHARGE_TARGET );
-	m_hChargeTarget = pTarget;
-	m_hChargeTargetPosition = pPosition;
+	m_hChargeTarget = (CBaseEntity*)pTarget;
+	m_hChargeTargetPosition = (CBaseEntity*)pPosition;
 }
 
 //-----------------------------------------------------------------------------
@@ -4068,9 +4068,9 @@ CBaseEntity *CNPC_AntlionGuard::GetNextShoveTarget( CBaseEntity *pLastEntity, AI
 	// Try to find scripted items first
 	if ( m_strShoveTargets != NULL_STRING )
 	{
-		CBaseEntity *pFound = EntityList()->FindEntityByName( pLastEntity, m_strShoveTargets );
+		IServerEntity *pFound = EntityList()->FindEntityByName( pLastEntity, m_strShoveTargets );
 		if ( pFound )
-			return pFound;
+			return (CBaseEntity*)pFound;
 	}
 
 	// Failing that, use our senses
@@ -4272,7 +4272,7 @@ void CNPC_AntlionGuard::ImpactShock( const Vector &origin, float radius, float m
 	Vector	vecSpot;
 	float	falloff = 1.0f / 2.5f;
 
-	CBaseEntity *pEntity = NULL;
+	IServerEntity *pEntity = NULL;
 
 	// Find anything within our radius
 	while ( ( pEntity = EntityList()->FindEntityInSphere( pEntity, origin, radius ) ) != NULL )
@@ -4504,7 +4504,7 @@ void CNPC_AntlionGuard::Event_Killed( const CTakeDamageInfo &info )
 	// Tell all of my antlions to burrow away, 'cos they fear the Freeman
 	if ( m_iNumLiveAntlions )
 	{
-		CBaseEntity	*pSearch = NULL;
+		IServerEntity	*pSearch = NULL;
 
 		// Iterate through all antlions and see if there are any orphans
 		while ( ( pSearch = EntityList()->FindEntityByClassname( pSearch, "npc_antlion" ) ) != NULL )
@@ -4657,7 +4657,7 @@ bool CNPC_AntlionGuard::IsHeavyDamage( const CTakeDamageInfo &info )
 		if ( ( pPhysObject != NULL ) && ( pPhysObject->GetGameFlags() & FVPHYSICS_WAS_THROWN ) )
 		{
 			// Always take hits from a combine ball
-			if ( UTIL_IsAR2CombineBall( info.GetInflictor() ) )
+			if ( UTIL_IsAR2CombineBall((CBaseEntity*)info.GetInflictor() ) )
 				return true;
 
 			// If we're under half health, stop being interrupted by heavy damage

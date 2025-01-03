@@ -374,7 +374,7 @@ void CWallHealth::Use( IServerEntity *pActivator, IServerEntity *pCaller, USE_TY
 		g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 		m_flSoundTime = 0.56 + gpGlobals->curtime;
 
-		m_OnPlayerUse.FireOutput( (CBaseEntity*)pActivator, this );
+		m_OnPlayerUse.FireOutput(pActivator, this );
 	}
 	if ((m_iOn == 1) && (m_flSoundTime <= gpGlobals->curtime))
 	{
@@ -392,7 +392,7 @@ void CWallHealth::Use( IServerEntity *pActivator, IServerEntity *pCaller, USE_TY
 
 	// Send the output.
 	float flRemaining = m_iJuice / sk_healthcharger.GetFloat();
-	m_OutRemainingHealth.Set(flRemaining, (CBaseEntity*)pActivator, this);
+	m_OutRemainingHealth.Set(flRemaining, pActivator, this);
 
 	// govern the rate of charge
 	m_flNextCharge = gpGlobals->curtime + 0.1;
@@ -717,7 +717,7 @@ void CNewWallHealth::Use( IServerEntity *pActivator, IServerEntity *pCaller, USE
 		g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 		m_flSoundTime = 0.56 + gpGlobals->curtime;
 
-		m_OnPlayerUse.FireOutput( (CBaseEntity*)pActivator, this );
+		m_OnPlayerUse.FireOutput(pActivator, this );
 	}
 	if ((m_iOn == 1) && (m_flSoundTime <= gpGlobals->curtime))
 	{
@@ -735,7 +735,7 @@ void CNewWallHealth::Use( IServerEntity *pActivator, IServerEntity *pCaller, USE
 
 	// Send the output.
 	float flRemaining = m_iJuice / sk_healthcharger.GetFloat();
-	m_OutRemainingHealth.Set(flRemaining, (CBaseEntity*)pActivator, this);
+	m_OutRemainingHealth.Set(flRemaining, pActivator, this);
 
 	// govern the rate of charge
 	m_flNextCharge = gpGlobals->curtime + 0.1;

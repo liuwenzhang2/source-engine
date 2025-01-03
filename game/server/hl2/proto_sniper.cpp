@@ -210,7 +210,7 @@ public:
 	bool IsLaserOn( void ) { return m_pBeam != NULL; }
 
 	void Event_Killed( const CTakeDamageInfo &info );
-	void Event_KilledOther( CBaseEntity *pVictim, const CTakeDamageInfo &info );
+	void Event_KilledOther( IServerEntity *pVictim, const CTakeDamageInfo &info );
 	void UpdateOnRemove( void );
 	int OnTakeDamage_Alive( const CTakeDamageInfo &info );
 	bool WeaponLOSCondition(const Vector &ownerPos, const Vector &targetPos, bool bSetConditions) {return true;}
@@ -219,7 +219,7 @@ public:
 
 	bool QuerySeeEntity( CBaseEntity *pEntity, bool bOnlyHateOrFearIfNPC = false );
 
-	virtual bool FInViewCone( CBaseEntity *pEntity );
+	virtual bool FInViewCone( IServerEntity *pEntity );
 
 	void StartTask( const Task_t *pTask );
 	void RunTask( const Task_t *pTask );
@@ -580,7 +580,7 @@ bool CProtoSniper::QuerySeeEntity( CBaseEntity *pEntity, bool bOnlyHateOrFearIfN
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-bool CProtoSniper::FInViewCone ( CBaseEntity *pEntity )
+bool CProtoSniper::FInViewCone ( IServerEntity *pEntity )
 {
 	if( pEntity->GetEngineObject()->GetFlags() & FL_CLIENT )
 	{
@@ -1003,7 +1003,7 @@ void CProtoSniper::Spawn( void )
 //-----------------------------------------------------------------------------
 void CProtoSniper::SetSweepTarget( const char *pszTarget )
 {
-	CBaseEntity *pTarget;
+	IServerEntity *pTarget;
 
 	// In case the sniper was sweeping a random set of targets when asked to sweep a normal chain.
 	ClearTargetGroup();
@@ -1017,7 +1017,7 @@ void CProtoSniper::SetSweepTarget( const char *pszTarget )
 		return;
 	}
 
-	m_hSweepTarget = pTarget;
+	m_hSweepTarget = (CBaseEntity*)pTarget;
 }
 
 //-----------------------------------------------------------------------------
@@ -1065,7 +1065,7 @@ void CProtoSniper::InputSweepGroupRandomly( inputdata_t &inputdata )
 {
 	ClearTargetGroup();
 
-	CBaseEntity *pEnt;
+	IServerEntity *pEnt;
 
 	// PERFORMANCE
 	// Go through the whole ent list? This could hurt. (sjb)
@@ -1110,7 +1110,7 @@ void CProtoSniper::InputStopSweeping( inputdata_t &inputdata )
 //-----------------------------------------------------------------------------
 void CProtoSniper::InputProtectTarget( inputdata_t &inputdata )
 {
-	m_hProtectTarget = EntityList()->FindEntityByName( NULL, inputdata.value.String(), NULL, inputdata.pActivator, inputdata.pCaller );
+	m_hProtectTarget = (CBaseEntity*)EntityList()->FindEntityByName( NULL, inputdata.value.String(), NULL, inputdata.pActivator, inputdata.pCaller );
 
 	if ( !m_hProtectTarget )
 	{
@@ -1345,13 +1345,13 @@ void CProtoSniper::Event_Killed( const CTakeDamageInfo &info )
 
 	}
 
-	m_OnDeath.FireOutput( info.GetAttacker(), this );
+	m_OnDeath.FireOutput((IServerEntity*)info.GetAttacker(), this );
 
 	// Tell my killer that he got me!
 	if( info.GetAttacker() )
 	{
-		info.GetAttacker()->Event_KilledOther(this, info);
-		g_EventQueue.AddEvent( info.GetAttacker(), "KilledNPC", 0.3, this, this );
+		((IServerEntity*)info.GetAttacker())->Event_KilledOther(this, info);
+		g_EventQueue.AddEvent((IServerEntity*)info.GetAttacker(), "KilledNPC", 0.3, this, this );
 	}
 
 	LaserOff();
@@ -1371,7 +1371,7 @@ void CProtoSniper::Event_Killed( const CTakeDamageInfo &info )
 
 //---------------------------------------------------------
 //---------------------------------------------------------
-void CProtoSniper::Event_KilledOther( CBaseEntity *pVictim, const CTakeDamageInfo &info )
+void CProtoSniper::Event_KilledOther( IServerEntity *pVictim, const CTakeDamageInfo &info )
 {
 	if( pVictim && pVictim->IsPlayer() )
 	{
@@ -2218,7 +2218,7 @@ void CProtoSniper::RunTask( const Task_t *pTask )
 		if( IsWaitFinished() )
 		{
 			// Time up! Paint the next target in the chain, or stop.
-			CBaseEntity *pNext;
+			IServerEntity *pNext;
 			pNext = EntityList()->FindEntityByName( NULL, m_hSweepTarget->m_target );
 
 			if ( m_hSweepTarget->GetEngineObject()->HasSpawnFlags( SF_SNIPERTARGET_SHOOTME ) )
@@ -2252,7 +2252,7 @@ void CProtoSniper::RunTask( const Task_t *pTask )
 				else
 				{
 					// If not, go with the next target in the chain.
-					m_hSweepTarget = pNext;
+					m_hSweepTarget = (CBaseEntity*)pNext;
 				}
 
 				m_vecPaintStart = m_vecPaintCursor;

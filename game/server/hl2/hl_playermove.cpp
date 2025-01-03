@@ -68,7 +68,7 @@ void CHLPlayerMove::SetupMove( CBasePlayer *player, CUserCmd *ucmd, IMoveHelper 
 	BaseClass::SetupMove( player, ucmd, pHelper, move );
 
 	// Convert to HL2 data.
-	CHL2_Player *pHLPlayer = static_cast<CHL2_Player*>( player );
+	CHL2_Player *pHLPlayer = ToHL2Player( player );
 	Assert( pHLPlayer );
 
 	CHLMoveData *pHLMove = static_cast<CHLMoveData*>( move );
@@ -153,7 +153,7 @@ void CHLPlayerMove::FinishMove( CBasePlayer *player, CUserCmd *ucmd, CMoveData *
 		}
 		if ( distance > 0 )
 		{
-			gamestats->Event_PlayerTraveled( player, distance, pVehicle ? true : false, !pVehicle && static_cast< CHL2_Player * >( player )->IsSprinting() );
+			gamestats->Event_PlayerTraveled( player, distance, pVehicle ? true : false, !pVehicle && ToHL2Player( player )->IsSprinting() );
 		}
 	}
 

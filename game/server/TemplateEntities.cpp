@@ -71,7 +71,7 @@ int	g_iCurrentTemplateInstance;
 // Purpose: Saves the given entity's keyvalue data for later use by a spawner.
 //			Returns the index into the templates.
 //-----------------------------------------------------------------------------
-int Templates_Add(CBaseEntity *pEntity, const char *pszMapData, int nLen)
+int Templates_Add(IServerEntity *pEntity, const char *pszMapData, int nLen)
 {
 	const char *pszName = STRING(pEntity->GetEntityName());
 	if ((!pszName) || (!strlen(pszName)))

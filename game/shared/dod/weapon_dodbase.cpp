@@ -1071,7 +1071,7 @@ void CWeaponDODBase::Smack()
 	CPASAttenuationFilter attenuationFilter( this );
 	attenuationFilter.UsePredictionRules();
 
-	if(((CBaseEntity*)m_trHit.m_pEnt)->IsPlayer() )
+	if(m_trHit.m_pEnt->IsPlayer() )
 	{
 		if ( m_iSmackDamageType & MELEE_DMG_STRONGATTACK )
 			WeaponSound( SPECIAL1 );
@@ -1119,7 +1119,7 @@ void CWeaponDODBase::Smack()
 #ifdef CLIENT_DLL
 	data.m_hEntity = (C_BaseEntity*)m_trHit.m_pEnt;
 #else
-	data.m_nEntIndex = ((CBaseEntity*)m_trHit.m_pEnt)->entindex();
+	data.m_nEntIndex = m_trHit.m_pEnt->entindex();
 #endif
 
 	CPASFilter effectfilter( data.m_vOrigin );
@@ -1132,11 +1132,11 @@ void CWeaponDODBase::Smack()
 	data.m_fFlags = 0x1;	//IMPACT_NODECAL;
 	data.m_nDamageType = iDamageType;
 
-	bool bHitPlayer = m_trHit.m_pEnt && ((CBaseEntity*)m_trHit.m_pEnt)->IsPlayer();
+	bool bHitPlayer = m_trHit.m_pEnt && m_trHit.m_pEnt->IsPlayer();
 
 	// don't do any impacts if we hit a teammate and ff is off
 	if ( bHitPlayer && 
-		((CBaseEntity*)m_trHit.m_pEnt)->GetTeamNumber() == GetPlayerOwner()->GetTeamNumber() &&
+		m_trHit.m_pEnt->GetTeamNumber() == GetPlayerOwner()->GetTeamNumber() &&
 		!friendlyfire.GetBool() )
 		return;
 

@@ -16,7 +16,7 @@
 #include "variant_t.h"
 //#include "baseentity.h"
 
-class CBaseEntity;
+class IServerEntity;
 class ISave;
 class IRestore;
 
@@ -76,7 +76,7 @@ public:
 
 	fieldtype_t ValueFieldType() { return m_Value.FieldType(); }
 
-	void FireOutput( variant_t Value, CBaseEntity *pActivator, CBaseEntity *pCaller, float fDelay = 0 );
+	void FireOutput( variant_t Value, IServerEntity *pActivator, IServerEntity *pCaller, float fDelay = 0 );
 
 	/// Delete every single action in the action list. 
 	void DeleteAllElements( void ) ;
@@ -111,7 +111,7 @@ public:
 	//
 	// Sets a value and fires the output.
 	//
-	void Set( Type value, CBaseEntity *pActivator, CBaseEntity *pCaller ) 
+	void Set( Type value, IServerEntity *pActivator, IServerEntity *pCaller ) 
 	{
 		m_Value.Set( fieldType, &value );
 		FireOutput( m_Value, pActivator, pCaller );
@@ -139,7 +139,7 @@ public:
 		m_Value.SetVector3D( value );
 	}
 
-	void Set( const Vector &value, CBaseEntity *pActivator, CBaseEntity *pCaller )
+	void Set( const Vector &value, IServerEntity *pActivator, IServerEntity *pCaller )
 	{
 		m_Value.SetVector3D( value );
 		FireOutput( m_Value, pActivator, pCaller );
@@ -161,7 +161,7 @@ public:
 		m_Value.SetPositionVector3D( value );
 	}
 
-	void Set( const Vector &value, CBaseEntity *pActivator, CBaseEntity *pCaller )
+	void Set( const Vector &value, IServerEntity *pActivator, IServerEntity *pCaller )
 	{
 		m_Value.SetPositionVector3D( value );
 		FireOutput( m_Value, pActivator, pCaller );
@@ -181,7 +181,7 @@ class COutputEvent : public CBaseEntityOutput
 {
 public:
 	// void Firing, no parameter
-	void FireOutput( CBaseEntity *pActivator, CBaseEntity *pCaller, float fDelay = 0 );
+	void FireOutput( IServerEntity *pActivator, IServerEntity *pCaller, float fDelay = 0 );
 };
 
 
@@ -190,7 +190,7 @@ typedef CEntityOutputTemplate<variant_t,FIELD_INPUT>		COutputVariant;
 typedef CEntityOutputTemplate<int,FIELD_INTEGER>			COutputInt;
 typedef CEntityOutputTemplate<float,FIELD_FLOAT>			COutputFloat;
 typedef CEntityOutputTemplate<string_t,FIELD_STRING>		COutputString;
-typedef CEntityOutputTemplate<EHANDLE,FIELD_EHANDLE>		COutputEHANDLE;
+typedef CEntityOutputTemplate<CHandle<IServerEntity>,FIELD_EHANDLE>		COutputEHANDLE;
 typedef CEntityOutputTemplate<Vector,FIELD_VECTOR>			COutputVector;
 typedef CEntityOutputTemplate<Vector,FIELD_POSITION_VECTOR>	COutputPositionVector;
 typedef CEntityOutputTemplate<color32,FIELD_COLOR32>		COutputColor32;

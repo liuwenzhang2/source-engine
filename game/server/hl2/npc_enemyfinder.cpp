@@ -346,7 +346,7 @@ void CNPC_EnemyFinder::StartNPC ( void )
 
 	if ( AI_IsSinglePlayer() && m_PlayerFreePass.GetParams().duration > 0.1 )
 	{
-		m_PlayerFreePass.SetPassTarget( EntityList()->GetPlayerByIndex(1) );
+		m_PlayerFreePass.SetPassTarget((CBaseEntity*)EntityList()->GetPlayerByIndex(1) );
 
 		AI_FreePassParams_t freePassParams = m_PlayerFreePass.GetParams();
 
@@ -550,7 +550,7 @@ void CNPC_EnemyFinderCombineCannon::Spawn()
 
 	if( m_iszSnapToEnt != NULL_STRING )
 	{
-		CBaseEntity *pSnapToEnt = EntityList()->FindEntityByName( NULL, m_iszSnapToEnt );
+		IServerEntity *pSnapToEnt = EntityList()->FindEntityByName( NULL, m_iszSnapToEnt );
 
 		if( pSnapToEnt != NULL )
 		{

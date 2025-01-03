@@ -930,7 +930,7 @@ void CAI_NetworkManager::InitializeAINetworks()
 	g_pAINetworkManager = pNetwork = (CAI_NetworkManager*)EntityList()->CreateEntityByName("ai_network");
 	pNetwork->GetEngineObject()->AddEFlags( EFL_KEEP_ON_RECREATE_ENTITIES );
 	g_pBigAINet = pNetwork->GetNetwork();
-	pNetwork->SetName( "BigNet" );
+	pNetwork->GetEngineObject()->SetName( "BigNet" );
 	pNetwork->Spawn();
 	if ( engine->IsInEditMode() )
 	{

@@ -144,7 +144,7 @@ void CEnvScreenOverlay::InputStartOverlay( inputdata_t &inputdata )
 	m_bIsActive = true;
 
 	// Turn off any other screen overlays out there
-	CBaseEntity *pEnt = NULL;
+	IServerEntity *pEnt = NULL;
 	while ( (pEnt = EntityList()->FindEntityByClassname( pEnt, "env_screenoverlay" )) != NULL )
 	{
 		if ( pEnt != this )

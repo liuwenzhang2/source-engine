@@ -152,8 +152,8 @@ extern ConVar ammo_smokegrenade_max;
 #define THROWGRENADE_COUNTER_BITS 3
 
 
-EHANDLE g_pLastCTSpawn;
-EHANDLE g_pLastTerroristSpawn;
+CHandle<IServerEntity> g_pLastCTSpawn;
+CHandle<IServerEntity> g_pLastTerroristSpawn;
 
 void TE_RadioIcon( IRecipientFilter& filter, float delay, CBaseEntity *pPlayer );
 
@@ -468,7 +468,7 @@ void cc_CreatePredictionError_f( const CCommand &args )
 		distance = atof(args[1]);
 	}
 
-	CBaseEntity *pEnt = EntityList()->GetBaseEntity( 1 );
+	IServerEntity *pEnt = EntityList()->GetBaseEntity( 1 );
 	pEnt->GetEngineObject()->SetAbsOrigin( pEnt->GetEngineObject()->GetAbsOrigin() + Vector( distance, 0, 0 ) );
 }
 
@@ -1109,7 +1109,7 @@ int CCSPlayer::OnTakeDamage_Alive( const CTakeDamageInfo &info )
 			event->SetInt( "hitgroup", m_LastHitGroup );
 		}
 
-		CBaseEntity * attacker = info.GetAttacker();
+		CBaseEntity * attacker = (CBaseEntity*)info.GetAttacker();
 		const char *weaponName = "";
 
 		if ( attacker->IsPlayer() )
@@ -1117,7 +1117,7 @@ int CCSPlayer::OnTakeDamage_Alive( const CTakeDamageInfo &info )
 			CBasePlayer *player = ToBasePlayer( attacker );
 			event->SetInt("attacker", player->GetUserID() ); // hurt by other player
 
-			CBaseEntity *pInflictor = info.GetInflictor();
+			CBaseEntity *pInflictor = (CBaseEntity*)info.GetInflictor();
 			if ( pInflictor )
 			{
 				if ( pInflictor == player )
@@ -1204,7 +1204,7 @@ void CCSPlayer::Event_Killed( const CTakeDamageInfo &info )
 	// [pfreese] Process on-death achievements
 	//=============================================================================
 	
-	ProcessPlayerDeathAchievements(ToCSPlayer(info.GetAttacker()), this, info);
+	ProcessPlayerDeathAchievements(ToCSPlayer((IServerEntity*)info.GetAttacker()), this, info);
 
 	//=============================================================================
 	// HPE_END
@@ -1218,7 +1218,7 @@ void CCSPlayer::Event_Killed( const CTakeDamageInfo &info )
 	// [menglish] Keep track of what the player has dropped for the freeze panel callouts
 	//=============================================================================
 	 
-	CBaseEntity* pAttacker = info.GetAttacker();
+	CBaseEntity* pAttacker = (CBaseEntity*)info.GetAttacker();
 	bool friendlyFire = pAttacker && pAttacker->GetTeamNumber() == GetTeamNumber();
 
 	//Only count the drop if it was not friendly fire
@@ -1256,9 +1256,9 @@ void CCSPlayer::Event_Killed( const CTakeDamageInfo &info )
 	FlashlightTurnOff();
 
 	// show killer in death cam mode
-	if( IsValidObserverTarget( info.GetAttacker() ) )
+	if( IsValidObserverTarget((IServerEntity*)info.GetAttacker() ) )
 	{
-		SetObserverTarget( info.GetAttacker() );
+		SetObserverTarget((IServerEntity*)info.GetAttacker() );
 	}
 	else
 	{
@@ -1368,7 +1368,7 @@ void CCSPlayer::Event_Killed( const CTakeDamageInfo &info )
 //=============================================================================
 
 // Notify that I've killed some other entity. (called from Victim's Event_Killed).
-void CCSPlayer::Event_KilledOther( CBaseEntity *pVictim, const CTakeDamageInfo &info )
+void CCSPlayer::Event_KilledOther( IServerEntity *pVictim, const CTakeDamageInfo &info )
 {
 	BaseClass::Event_KilledOther(pVictim, info);
 }
@@ -1898,7 +1898,7 @@ int CCSPlayer::OnTakeDamage( const CTakeDamageInfo &inputInfo )
 {
 	CTakeDamageInfo info = inputInfo;
 
-	CBaseEntity *pInflictor = info.GetInflictor();
+	CBaseEntity *pInflictor = (CBaseEntity*)info.GetInflictor();
 
 	if ( !pInflictor )
 		return 0;
@@ -1920,7 +1920,7 @@ int CCSPlayer::OnTakeDamage( const CTakeDamageInfo &inputInfo )
 	CSGameRules()->PlayerTookDamage(this, inputInfo);
 
 	//Check "Goose Chase" achievement
-	CCSPlayer *pAttacker = ToCSPlayer(info.GetAttacker());
+	CCSPlayer *pAttacker = ToCSPlayer((IServerEntity*)info.GetAttacker());
 	if (m_bIsDefusing && m_gooseChaseStep == GC_NONE && pAttacker && pAttacker->GetTeamNumber() != GetTeamNumber() )
 	{
 
@@ -1960,7 +1960,7 @@ int CCSPlayer::OnTakeDamage( const CTakeDamageInfo &inputInfo )
 	{
 		CCSPlayer *pCSAttacker = ToCSPlayer( pInflictor );
 		if ( !pCSAttacker )
-			pCSAttacker = ToCSPlayer( info.GetAttacker() );
+			pCSAttacker = ToCSPlayer((IServerEntity*)info.GetAttacker() );
 
 		if ( pCSAttacker )
 		{
@@ -2001,7 +2001,7 @@ int CCSPlayer::OnTakeDamage( const CTakeDamageInfo &inputInfo )
 			}
 		}
 
-		if ( ShouldDoLargeFlinch( m_LastHitGroup, info.GetAttacker() ) )
+		if ( ShouldDoLargeFlinch( m_LastHitGroup, (CBaseEntity*)info.GetAttacker() ) )
 		{
 			if (GetEngineObject()->GetAbsVelocity().Length() < 300 )
 			{
@@ -2019,7 +2019,7 @@ int CCSPlayer::OnTakeDamage( const CTakeDamageInfo &inputInfo )
 		// [menglish] Store whether or not the knife did this damage as knives do bullet damage,
 		// so we need to specifically check the weapon here
 		bool bKnifeDamage = false;
-		CCSPlayer *pPlayer = ToCSPlayer( info.GetAttacker() );
+		CCSPlayer *pPlayer = ToCSPlayer((IServerEntity*)info.GetAttacker() );
 
 		if ( pPlayer )
 		{
@@ -2176,7 +2176,7 @@ int CCSPlayer::OnTakeDamage( const CTakeDamageInfo &inputInfo )
 		if(m_iHealth - info.GetDamage() <= 0 && m_iHealth <= AchievementConsts::KillLowDamage_MaxHealthLeft)
 		{
 			bool onlyDamage = true;
-			CCSPlayer *pAttacker = ToCSPlayer(info.GetAttacker());
+			CCSPlayer *pAttacker = ToCSPlayer((IServerEntity*)info.GetAttacker());
 			if(pAttacker && pAttacker->GetTeamNumber() != GetTeamNumber())
 			{
 				//Verify that the killer has not done damage to this player beforehand
@@ -2275,7 +2275,7 @@ void CCSPlayer::TraceAttack( const CTakeDamageInfo &info, const Vector &vecDir, 
 	bool bShouldSpark = false;
 	bool bHitShield = IsHittingShield( vecDir, ptr );
 
-	CBasePlayer *pAttacker = (CBasePlayer*)ToBasePlayer( info.GetAttacker() );
+	CBasePlayer *pAttacker = ToBasePlayer((IServerEntity*)info.GetAttacker() );
 
 	// show blood for firendly fire only if FF is on
 	if ( pAttacker && ( GetTeamNumber() == pAttacker->GetTeamNumber() ) )
@@ -2436,7 +2436,7 @@ void CCSPlayer::TraceAttack( const CTakeDamageInfo &info, const Vector &vecDir, 
 		CEffectData	data;
 		data.m_vOrigin = ptr->endpos;
 		data.m_vNormal = vecDir * -1;
-		data.m_nEntIndex = ptr->m_pEnt ? ((CBaseEntity*)ptr->m_pEnt)->entindex() : 0;
+		data.m_nEntIndex = ptr->m_pEnt ? ptr->m_pEnt->entindex() : 0;
 		data.m_flMagnitude = flDamage;
 
 		// reduce blood effect if target has armor
@@ -2854,14 +2854,14 @@ void CCSPlayer::PreThink()
 
 void CCSPlayer::MoveToNextIntroCamera()
 {
-	m_pIntroCamera = EntityList()->FindEntityByClassname( m_pIntroCamera, "point_viewcontrol" );
+	m_pIntroCamera = (CBaseEntity*)EntityList()->FindEntityByClassname( m_pIntroCamera, "point_viewcontrol" );
 
 	// if m_pIntroCamera is NULL we just were at end of list, start searching from start again
 	if(!m_pIntroCamera)
-		m_pIntroCamera = EntityList()->FindEntityByClassname(m_pIntroCamera, "point_viewcontrol");
+		m_pIntroCamera = (CBaseEntity*)EntityList()->FindEntityByClassname(m_pIntroCamera, "point_viewcontrol");
 
 	// find the target
-	CBaseEntity *Target = NULL;
+	IServerEntity *Target = NULL;
 
 	if( m_pIntroCamera )
 	{
@@ -2870,7 +2870,7 @@ void CCSPlayer::MoveToNextIntroCamera()
 
 	// if we still couldn't find a camera, goto T spawn
 	if(!m_pIntroCamera)
-		m_pIntroCamera = EntityList()->FindEntityByClassname(m_pIntroCamera, "info_player_terrorist");
+		m_pIntroCamera = (CBaseEntity*)EntityList()->FindEntityByClassname(m_pIntroCamera, "info_player_terrorist");
 
 	SetViewOffset( vec3_origin );	// no view offset
 	GetEngineObject()->SetSize( vec3_origin, vec3_origin ); // no bbox
@@ -4172,7 +4172,7 @@ void CCSPlayer::OnDamagedByExplosion( const CTakeDamageInfo &info )
 
 	float distanceFromPlayer = 9999.0f;
 
-	CBaseEntity *inflictor = info.GetInflictor();
+	CBaseEntity *inflictor = (CBaseEntity*)info.GetInflictor();
 	if ( inflictor )
 	{
 		Vector delta = GetEngineObject()->GetAbsOrigin() - inflictor->GetEngineObject()->GetAbsOrigin();
@@ -5147,7 +5147,7 @@ int CCSPlayer::PlayerClass() const
 
 
 
-bool CCSPlayer::SelectSpawnSpot( const char *pEntClassName, CBaseEntity* &pSpot )
+bool CCSPlayer::SelectSpawnSpot( const char *pEntClassName, IServerEntity* &pSpot )
 {
 	// Find the next spawn spot.
 	pSpot = EntityList()->FindEntityByClassname( pSpot, pEntClassName );
@@ -5155,13 +5155,13 @@ bool CCSPlayer::SelectSpawnSpot( const char *pEntClassName, CBaseEntity* &pSpot 
 	if ( pSpot == NULL ) // skip over the null point
 		pSpot = EntityList()->FindEntityByClassname( pSpot, pEntClassName );
 
-	CBaseEntity *pFirstSpot = pSpot;
+	IServerEntity *pFirstSpot = pSpot;
 	do
 	{
 		if ( pSpot )
 		{
 			// check if pSpot is valid
-			if ( g_pGameRules->IsSpawnPointValid( pSpot, this ) )
+			if ( g_pGameRules->IsSpawnPointValid((CBaseEntity*)pSpot, this ) )
 			{
 				if ( pSpot->GetEngineObject()->GetAbsOrigin() == Vector( 0, 0, 0 ) )
 				{
@@ -5183,9 +5183,9 @@ bool CCSPlayer::SelectSpawnSpot( const char *pEntClassName, CBaseEntity* &pSpot 
 }
 
 
-CBaseEntity* CCSPlayer::EntSelectSpawnPoint()
+IServerEntity* CCSPlayer::EntSelectSpawnPoint()
 {
-	CBaseEntity *pSpot;
+	IServerEntity *pSpot;
 
 	/* MIKETODO: VIP
 		// VIP spawn point *************
@@ -6684,7 +6684,7 @@ bool CCSPlayer::IsUseableEntity( CBaseEntity *pEntity, unsigned int requiredCaps
 
 CBaseEntity *CCSPlayer::FindUseEntity()
 {
-	CBaseEntity *entity = NULL;
+	IServerEntity *entity = NULL;
 
 	// Check to see if the bomb is close enough to use before attempting to use anything else.
 
@@ -6694,7 +6694,7 @@ CBaseEntity *CCSPlayer::FindUseEntity()
 		// but we might want to use it anyway if it's close enough.  This should eliminate
 		// the vast majority of bomb placement exploits (places where the bomb can be planted
 		// but can't be "used".  This also mimics goldsrc cstrike behavior.
-		CBaseEntity *bomb = EntityList()->FindEntityByClassname( NULL, PLANTED_C4_CLASSNAME );
+		IServerEntity *bomb = EntityList()->FindEntityByClassname( NULL, PLANTED_C4_CLASSNAME );
 		if (bomb != NULL)
 		{
 			Vector bombPos = bomb->GetEngineObject()->GetAbsOrigin();
@@ -6722,7 +6722,7 @@ CBaseEntity *CCSPlayer::FindUseEntity()
 		entity = BaseClass::FindUseEntity();
 	}
 
-	return entity;
+	return (CBaseEntity*)entity;
 }
 
 void CCSPlayer::StockPlayerAmmo( CBaseCombatWeapon *pNewWeapon )
@@ -6774,7 +6774,7 @@ void CCSPlayer::StockPlayerAmmo( CBaseCombatWeapon *pNewWeapon )
 
 CBaseEntity	*CCSPlayer::GiveNamedItem( const char *pszName, int iSubType )
 {
-	EHANDLE pent;
+	IServerEntity* pent;
 
 	if ( !pszName || !pszName[0] )
 		return  NULL;
@@ -6784,7 +6784,7 @@ CBaseEntity	*CCSPlayer::GiveNamedItem( const char *pszName, int iSubType )
 		return NULL;
 #endif
 
-	pent = (CBaseEntity*)EntityList()->CreateEntityByName(pszName);
+	pent = EntityList()->CreateEntityByName(pszName);
 	if ( pent == NULL )
 	{
 		Msg( "NULL Ent in GiveNamedItem!\n" );
@@ -6794,7 +6794,7 @@ CBaseEntity	*CCSPlayer::GiveNamedItem( const char *pszName, int iSubType )
 	pent->GetEngineObject()->SetLocalOrigin(GetEngineObject()->GetLocalOrigin() );
 	pent->GetEngineObject()->AddSpawnFlags( SF_NORESPAWN );
 
-	CBaseCombatWeapon *pWeapon = dynamic_cast<CBaseCombatWeapon*>( (CBaseEntity*)pent );
+	CBaseCombatWeapon *pWeapon = dynamic_cast<CBaseCombatWeapon*>( pent );
 	if ( pWeapon )
 	{
 		if ( iSubType )
@@ -6813,7 +6813,7 @@ CBaseEntity	*CCSPlayer::GiveNamedItem( const char *pszName, int iSubType )
 	m_bIsBeingGivenItem = false;
 
 	StockPlayerAmmo( pWeapon );
-	return pent;
+	return (CBaseEntity*)pent;
 }
 
 
@@ -7649,8 +7649,8 @@ void CCSPlayer::ResetRoundBasedAchievementVariables()
  */
 CSWeaponID CCSPlayer::GetWeaponIdCausingDamange( const CTakeDamageInfo &info )
 {
-	CBaseEntity *pInflictor = info.GetInflictor();
-	CCSPlayer *pAttacker = ToCSPlayer(info.GetAttacker());
+	IServerEntity *pInflictor = (IServerEntity*)info.GetInflictor();
+	CCSPlayer *pAttacker = ToCSPlayer((IServerEntity*)info.GetAttacker());
 	if (pAttacker == pInflictor)
 	{
 		CWeaponCSBase* pAttackerWeapon = dynamic_cast< CWeaponCSBase * >(pAttacker->GetActiveWeapon());
@@ -7708,7 +7708,7 @@ void CCSPlayer::PlayerUsedFirearm( CBaseCombatWeapon* pBaseWeapon )
 void CCSPlayer::ProcessPlayerDeathAchievements( CCSPlayer *pAttacker, CCSPlayer *pVictim, const CTakeDamageInfo &info )
 {
 	Assert(pVictim != NULL);
-	CBaseEntity *pInflictor = info.GetInflictor();	
+	CBaseEntity *pInflictor = (CBaseEntity*)info.GetInflictor();
   
 	// all these achievements require a valid attacker on a different team
 	if ( pAttacker != NULL && pVictim != NULL && pVictim->GetTeamNumber() != pAttacker->GetTeamNumber() )

@@ -648,7 +648,7 @@ IterationRetval_t CAI_Network::EnumElement( IHandleEntity *pHandleEntity )
 
 //=============================================================================
 
-void CAI_Network::OnEntityDeleted( CBaseEntity *pEntity )
+void CAI_Network::OnEntityDeleted( IServerEntity *pEntity )
 {
 	if( pEntity->IsNPC() )
 		return;

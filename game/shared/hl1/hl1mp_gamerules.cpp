@@ -35,8 +35,8 @@ ConVar sv_hl1mp_item_respawn_time( "sv_hl1mp_item_respawn_time", "30", FCVAR_GAM
 
 extern ConVar mp_chattime;
 
-extern CBaseEntity	 *g_pLastCombineSpawn;
-extern CBaseEntity	 *g_pLastRebelSpawn;
+extern IServerEntity	 *g_pLastCombineSpawn;
+extern IServerEntity	 *g_pLastRebelSpawn;
 
 //#define WEAPON_MAX_DISTANCE_FROM_SPAWN 64
 

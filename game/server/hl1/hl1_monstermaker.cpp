@@ -232,7 +232,7 @@ void CNPCMaker::MakeNPC( void )
 		return;
 	}
 
-	CBaseEntity	*pent = (CBaseEntity*)EntityList()->CreateEntityByName( STRING(m_iszNPCClassname) );
+	IServerEntity	*pent = EntityList()->CreateEntityByName( STRING(m_iszNPCClassname) );
 
 	if ( !pent )
 	{

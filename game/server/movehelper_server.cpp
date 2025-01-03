@@ -141,7 +141,7 @@ void CMoveHelperServer::SetHost( CBasePlayer *host )
 char const* CMoveHelperServer::GetName( EntityHandle_t handle ) const
 {
 	// This ain't pertickulerly fast, but it's for debugging anyways
-	CBaseEntity *ent = EntityList()->GetBaseEntityFromHandle(handle);
+	IServerEntity *ent = EntityList()->GetBaseEntityFromHandle(handle);
 	
 	// Is it the world?
 	if (ent->entindex() == 0)
@@ -151,7 +151,7 @@ char const* CMoveHelperServer::GetName( EntityHandle_t handle ) const
 	if ( ent && ent->GetEngineObject()->GetModelName() != NULL_STRING )
 		return STRING( ent->GetEngineObject()->GetModelName() );
 
-	if ( ent->GetClassname() != NULL )
+	if (ent && ent->GetClassname() != NULL )
 	{
 		return ent->GetClassname();
 	}
@@ -231,7 +231,7 @@ void CMoveHelperServer::ProcessImpacts( void )
 		Assert( entindex.IsValid() );
 
 		// Run the impact function as if we had run it during movement.
-		CBaseEntity *entity = EntityList()->GetBaseEntityFromHandle(entindex);
+		IServerEntity *entity = EntityList()->GetBaseEntityFromHandle(entindex);
 		if ( !entity )
 			continue;
 

@@ -945,7 +945,7 @@ bool CCSBot::FindApproachPointNearestPath( Vector *pos )
  */
 bool CCSBot::IsAtEnemySpawn( void ) const
 {
-	CBaseEntity *spot;
+	IServerEntity *spot;
 	const char *spawnName = (GetTeamNumber() == TEAM_TERRORIST) ? "info_player_counterterrorist" : "info_player_terrorist";
 
 	// check if we are at any of the enemy's spawn points

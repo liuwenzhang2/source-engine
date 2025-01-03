@@ -228,7 +228,7 @@ public:
 
 #ifdef PORTAL_MP
 public:
-	virtual CBaseEntity* EntSelectSpawnPoint( void );
+	virtual IServerEntity* EntSelectSpawnPoint( void );
 	void PickTeam( void );
 #endif
 };

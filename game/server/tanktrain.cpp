@@ -27,7 +27,7 @@ void UTIL_RemoveHierarchy( CBaseEntity *pDead )
 		IEngineObjectServer *pChild = pDead->GetEngineObject()->FirstMoveChild();
 		while ( pChild )
 		{
-			CBaseEntity *pEntity = pChild->GetOuter();
+			CBaseEntity *pEntity = (CBaseEntity*)pChild->GetOuter();
 			pChild = pChild->NextMovePeer();
 
 			UTIL_RemoveHierarchy( pEntity );
@@ -46,7 +46,7 @@ public:
 	// Filter out damage messages that don't contain blast damage (impervious to other forms of attack)
 	int	OnTakeDamage( const CTakeDamageInfo &info );
 	void Event_Killed( const CTakeDamageInfo &info );
-	void Blocked( CBaseEntity *pOther )
+	void Blocked( IServerEntity *pOther )
 	{
 		// FIxme, set speed to zero?
 	}
@@ -95,7 +95,7 @@ void CFuncTankTrain::Event_Killed( const CTakeDamageInfo &info )
 	m_takedamage = DAMAGE_NO;
 	m_lifeState = LIFE_DEAD;
 
-	m_OnDeath.FireOutput( info.GetInflictor(), this );
+	m_OnDeath.FireOutput((IServerEntity*)info.GetInflictor(), this );
 }
 
 
@@ -137,14 +137,14 @@ void CTankTargetChange::Precache( void )
 
 void CTankTargetChange::Use( IServerEntity *pActivator, IServerEntity *pCaller, USE_TYPE useType, float value )
 {
-	CBaseEntity *pTarget = EntityList()->FindEntityByName( NULL, m_target, NULL, (CBaseEntity*)pActivator, (CBaseEntity*)pCaller );
+	IServerEntity *pTarget = EntityList()->FindEntityByName( NULL, m_target, NULL, pActivator, pCaller );
 
 	// UNDONE: This should use more of the event system
 	while ( pTarget )
 	{
 		// Change the target over
 		pTarget->AcceptInput( "TargetEntity", this, this, m_newTarget, 0 );
-		pTarget = EntityList()->FindEntityByName( pTarget, m_target, NULL, (CBaseEntity*)pActivator, (CBaseEntity*)pCaller );
+		pTarget = EntityList()->FindEntityByName( pTarget, m_target, NULL, pActivator, pCaller );
 	}
 }
 
@@ -167,7 +167,7 @@ public:
 	void	SoundEngineStop( void );
 	void	SoundShutdown( void );
 
-	CBaseEntity *FindTarget( string_t target, CBaseEntity *pActivator );
+	CBaseEntity *FindTarget( string_t target, IServerEntity *pActivator );
 
 	DECLARE_DATADESC();
 
@@ -227,9 +227,9 @@ void CTankTrainAI::InputTargetEntity( inputdata_t &inputdata )
 //			pActivator - The activating entity if this is called from an input
 //				or Use handler, NULL otherwise.
 //-----------------------------------------------------------------------------
-CBaseEntity *CTankTrainAI::FindTarget( string_t target, CBaseEntity *pActivator )
+CBaseEntity *CTankTrainAI::FindTarget( string_t target, IServerEntity *pActivator )
 {
-	return EntityList()->FindEntityGeneric( NULL, STRING( target ), this, pActivator );
+	return (CBaseEntity*)EntityList()->FindEntityGeneric( NULL, STRING( target ), this, pActivator );
 }
 
 
@@ -357,7 +357,7 @@ void CTankTrainAI::Activate( void )
 {
 	BaseClass::Activate();
 	
-	CBaseEntity *pTarget = NULL;
+	IServerEntity *pTarget = NULL;
 
 	CFuncTrackTrain *pTrain = NULL;
 

@@ -157,7 +157,7 @@ CBaseEntity *CWeaponDODBaseMelee::MeleeAttack( int iDamageAmount, int iDamageTyp
 
 	bool bDoStrongAttack = false;
 
-	if ( bDidHit && ((CBaseEntity*)tr.m_pEnt)->IsPlayer() && tr.m_pEnt->GetTakeDamage() != DAMAGE_YES )
+	if ( bDidHit && tr.m_pEnt->IsPlayer() && tr.m_pEnt->GetTakeDamage() != DAMAGE_YES )
 	{
 		bDidHit = 0;	// still play the animation, we just dont attempt to damage this player
 	}
@@ -176,7 +176,7 @@ CBaseEntity *CWeaponDODBaseMelee::MeleeAttack( int iDamageAmount, int iDamageTyp
 		m_flSmackTime = gpGlobals->curtime + flDmgDelay;
 
 		int iOwnerTeam = pPlayer->GetTeamNumber();
-		int iVictimTeam = ((CBaseEntity*)tr.m_pEnt)->GetTeamNumber();
+		int iVictimTeam = tr.m_pEnt->GetTeamNumber();
 
 		// do the mega attack if its a player, and we would do damage
 		if (tr.m_pEnt->IsPlayer() &&

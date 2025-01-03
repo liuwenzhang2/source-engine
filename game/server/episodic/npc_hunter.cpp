@@ -735,7 +735,7 @@ void CHunterFlechette::FlechetteTouch( IServerEntity *pOther )
 			//NDebugOverlay::Box( tr2.endpos, Vector( -16, -16, -16 ), Vector( 16, 16, 16 ), 0, 255, 0, 0, 10 );
 			//NDebugOverlay::Box( GetAbsOrigin(), Vector( -16, -16, -16 ), Vector( 16, 16, 16 ), 0, 0, 255, 0, 10 );
 
-			if ( tr2.m_pEnt == NULL || ( tr2.m_pEnt && ((CBaseEntity*)tr2.m_pEnt)->GetEngineObject()->GetMoveType() == MOVETYPE_NONE ) )
+			if ( tr2.m_pEnt == NULL || ( tr2.m_pEnt && tr2.m_pEnt->GetEngineObject()->GetMoveType() == MOVETYPE_NONE ) )
 			{
 				CEffectData	data;
 
@@ -2423,13 +2423,13 @@ void CNPC_Hunter::GatherConditions()
 //-----------------------------------------------------------------------------
 void CNPC_Hunter::CollectSiegeTargets()
 {
-	CBaseEntity *pTarget = EntityList()->FindEntityByName( NULL, m_iszSiegeTargetName );
+	IServerEntity *pTarget = EntityList()->FindEntityByName( NULL, m_iszSiegeTargetName );
 
 	while( pTarget != NULL )
 	{
-		if( pTarget->Classify() == CLASS_BULLSEYE )
+		if(((CBaseEntity*)pTarget)->Classify() == CLASS_BULLSEYE )
 		{
-			m_pSiegeTargets.AddToTail( pTarget );
+			m_pSiegeTargets.AddToTail((CBaseEntity*)pTarget );
 		}
 
 		pTarget = EntityList()->FindEntityByName( pTarget, m_iszSiegeTargetName );
@@ -2515,7 +2515,7 @@ void CNPC_Hunter::ManageSiegeTargets()
 			// Create a bullseye that will live for 20 seconds. If we can't attack it within 20 seconds, it's probably
 			// out of reach anyone, so have it clean itself up after that long.
 			CBaseEntity *pSiegeTarget = CreateCustomTarget( pSiegeTargetLocation->GetEngineObject()->GetAbsOrigin(), 20.0f );
-			pSiegeTarget->SetName( "siegetarget" );
+			pSiegeTarget->GetEngineObject()->SetName( "siegetarget" );
 
 			m_hCurrentSiegeTarget.Set( pSiegeTarget );
 
@@ -3099,7 +3099,7 @@ int CNPC_Hunter::SelectSchedule()
 				}
 				else
 				{
-					SetTarget(EntityList()->GetLocalPlayer() );
+					SetTarget((CBaseEntity*)EntityList()->GetLocalPlayer() );
 					return SCHED_TARGET_FACE;
 				}
 			}
@@ -3131,7 +3131,7 @@ int CNPC_Hunter::SelectSchedule()
 		}
 		else
 		{
-			SetTarget(EntityList()->GetLocalPlayer() );
+			SetTarget((CBaseEntity*)EntityList()->GetLocalPlayer() );
 			return SCHED_TARGET_FACE;
 		}
 
@@ -4541,7 +4541,7 @@ void CNPC_Hunter::FollowStrider( const char *szStrider )
 	if ( !szStrider )
 		return;
 
-	CBaseEntity *pEnt = EntityList()->FindEntityByName( NULL, szStrider, this );
+	IServerEntity *pEnt = EntityList()->FindEntityByName( NULL, szStrider, this );
 	CNPC_Strider *pStrider = dynamic_cast <CNPC_Strider *>( pEnt );
 	FollowStrider(pStrider);
 }
@@ -5377,7 +5377,7 @@ bool CNPC_Hunter::CanShootThrough( const trace_t &tr, const Vector &vecTarget )
 		return false;
 	}
 
-	if ( !((CBaseEntity*)tr.m_pEnt)->GetHealth() )
+	if ( !tr.m_pEnt->GetHealth() )
 	{
 		return false;
 	}
@@ -5488,7 +5488,7 @@ void CNPC_Hunter::TraceAttack( const CTakeDamageInfo &inputInfo, const Vector &v
 	{
 		if ( !HasMemory( bits_MEMORY_PROVOKED ) )
 		{
-			GetEnemies()->ClearMemory( info.GetAttacker() );
+			GetEnemies()->ClearMemory((CBaseEntity*)info.GetAttacker() );
 			Remember( bits_MEMORY_PROVOKED );
 			SetCondition( COND_LIGHT_DAMAGE );
 		}
@@ -5560,7 +5560,7 @@ void CNPC_Hunter::PhysicsDamageEffect( const Vector &vecPos, const Vector &vecDi
 
 	if ( random->RandomInt( 0, 1 ) == 0 )
 	{
-		CBaseEntity *pTrail = (CBaseEntity*)EntityList()->CreateEntityByName( "sparktrail" );
+		IServerEntity *pTrail = EntityList()->CreateEntityByName( "sparktrail" );
 		pTrail->SetOwnerEntity( this );
 		pTrail->Spawn();
 	}
@@ -5739,7 +5739,7 @@ int CNPC_Hunter::OnTakeDamage( const CTakeDamageInfo &info )
 	if ( ( info.GetDamageType() & DMG_CRUSH ) && !( info.GetDamageType() & DMG_VEHICLE ) )
 	{
 		// Don't take damage from physics objects that weren't thrown by the player.
-		CBaseEntity *pInflictor = info.GetInflictor();
+		CBaseEntity *pInflictor = (CBaseEntity*)info.GetInflictor();
 
 		IPhysicsObject *pObj = pInflictor->GetEngineObject()->VPhysicsGetObject();
 		//Assert( pObj );
@@ -5757,7 +5757,7 @@ int CNPC_Hunter::OnTakeDamage( const CTakeDamageInfo &info )
 			pInflictor->GetEngineObject()->GetAllChildren( children );
 			for (int i = 0; i < children.Count(); i++ )
 			{
-				CBaseEntity *pent = children.Element( i )->GetOuter();
+				CBaseEntity *pent = (CBaseEntity*)children.Element( i )->GetOuter();
 				if ( dynamic_cast<CHunterFlechette *>( pent ) )
 				{
 					myInfo.SetInflictor( pent );
@@ -5779,8 +5779,8 @@ int CNPC_Hunter::OnTakeDamage_Alive( const CTakeDamageInfo &info )
 
 	// don't take damage from my own weapons!!!
 	// Exception: I "own" a magnade if it's glued to me.
-	CBaseEntity *pInflictor = info.GetInflictor();
-	CBaseEntity *pAttacker = info.GetAttacker();
+	CBaseEntity *pInflictor = (CBaseEntity*)info.GetInflictor();
+	CBaseEntity *pAttacker = (CBaseEntity*)info.GetAttacker();
 	if ( pInflictor )
 	{
 		if ( IsStriderBuster( pInflictor ) )
@@ -5826,7 +5826,7 @@ int CNPC_Hunter::OnTakeDamage_Alive( const CTakeDamageInfo &info )
 		}
 		else
 		{
-			CBaseEntity *pInflictor = info.GetInflictor();
+			CBaseEntity *pInflictor = (CBaseEntity*)info.GetInflictor();
 			if ( ( info.GetDamageType() & DMG_VEHICLE ) || 
 				 ( pInflictor && pInflictor->GetServerVehicle() && 
 				   ( ( bHitByUnoccupiedCar = ( dynamic_cast<CPropVehicleDriveable *>(pInflictor) && static_cast<CPropVehicleDriveable *>(pInflictor)->GetDriver() == NULL ) )  == false ) ) )
@@ -5958,7 +5958,7 @@ void CNPC_Hunter::Event_Killed( const CTakeDamageInfo &info )
 			m_EscortBehavior.GetEscortTarget()->AlertSound();
 			if ( info.GetAttacker() && info.GetAttacker()->IsPlayer() )
 			{
-				m_EscortBehavior.GetEscortTarget()->UpdateEnemyMemory(EntityList()->GetLocalPlayer(), EntityList()->GetLocalPlayer()->GetEngineObject()->GetAbsOrigin(), this );
+				m_EscortBehavior.GetEscortTarget()->UpdateEnemyMemory((CBaseEntity*)EntityList()->GetLocalPlayer(), EntityList()->GetLocalPlayer()->GetEngineObject()->GetAbsOrigin(), this );
 			}
 		}
 	}
@@ -7302,7 +7302,7 @@ public:
 		for ( i = 0; i < freeHunters.Count() && nNPCs; i++ )
 		{
 			freeHunters[i]->m_EscortBehavior.SetFollowTarget( this ); // this will make them not "free"
-			freeHunters[i]->SetName( STRING(m_iszTemplateName) ); // this will force the hunter to get the FollowStrider input
+			freeHunters[i]->GetEngineObject()->SetName( STRING(m_iszTemplateName) ); // this will force the hunter to get the FollowStrider input
 			nNPCs--;
 			nSummoned++;
 		}

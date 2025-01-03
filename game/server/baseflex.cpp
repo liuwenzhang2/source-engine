@@ -394,7 +394,7 @@ bool CBaseFlex::ClearSceneEvent( CSceneEventInfo *info, bool fastKill, bool canc
 //			expression - 
 //			duration - 
 //-----------------------------------------------------------------------------
-void CBaseFlex::AddSceneEvent( CChoreoScene *scene, CChoreoEvent *event, CBaseEntity *pTarget )
+void CBaseFlex::AddSceneEvent( CChoreoScene *scene, CChoreoEvent *event, IServerEntity *pTarget )
 {
 	if ( !scene || !event )
 	{
@@ -416,7 +416,7 @@ void CBaseFlex::AddSceneEvent( CChoreoScene *scene, CChoreoEvent *event, CBaseEn
 
 	info.m_pEvent		= event;
 	info.m_pScene		= scene;
-	info.m_hTarget		= pTarget;
+	info.m_hTarget		= (CBaseEntity*)pTarget;
 	info.m_bStarted	= false;
 
 	if (StartSceneEvent( &info, scene, event, actor, pTarget ))
@@ -435,7 +435,7 @@ void CBaseFlex::AddSceneEvent( CChoreoScene *scene, CChoreoEvent *event, CBaseEn
 // Starting various expression types 
 //-----------------------------------------------------------------------------
 
-bool CBaseFlex::RequestStartSequenceSceneEvent( CSceneEventInfo *info, CChoreoScene *scene, CChoreoEvent *event, CChoreoActor *actor, CBaseEntity *pTarget )
+bool CBaseFlex::RequestStartSequenceSceneEvent( CSceneEventInfo *info, CChoreoScene *scene, CChoreoEvent *event, CChoreoActor *actor, IServerEntity *pTarget )
 {
 	info->m_nSequence = GetEngineObject()->LookupSequence( event->GetParameters() );
 
@@ -453,7 +453,7 @@ bool CBaseFlex::RequestStartSequenceSceneEvent( CSceneEventInfo *info, CChoreoSc
 	return true;
 }
 
-bool CBaseFlex::RequestStartGestureSceneEvent( CSceneEventInfo *info, CChoreoScene *scene, CChoreoEvent *event, CChoreoActor *actor, CBaseEntity *pTarget )
+bool CBaseFlex::RequestStartGestureSceneEvent( CSceneEventInfo *info, CChoreoScene *scene, CChoreoEvent *event, CChoreoActor *actor, IServerEntity *pTarget )
 {
 	info->m_nSequence = GetEngineObject()->LookupSequence( event->GetParameters() );
 
@@ -685,7 +685,7 @@ bool CBaseFlex::HandleStartGestureSceneEvent( CSceneEventInfo *info, CChoreoScen
 	return true;
 }
 
-bool CBaseFlex::StartFacingSceneEvent( CSceneEventInfo *info, CChoreoScene *scene, CChoreoEvent *event, CChoreoActor *actor, CBaseEntity *pTarget )
+bool CBaseFlex::StartFacingSceneEvent( CSceneEventInfo *info, CChoreoScene *scene, CChoreoEvent *event, CChoreoActor *actor, IServerEntity *pTarget )
 {
 	if ( pTarget )
 	{
@@ -701,7 +701,7 @@ bool CBaseFlex::StartFacingSceneEvent( CSceneEventInfo *info, CChoreoScene *scen
 }
 
 
-bool CBaseFlex::StartMoveToSceneEvent( CSceneEventInfo *info, CChoreoScene *scene, CChoreoEvent *event, CChoreoActor *actor, CBaseEntity *pTarget )
+bool CBaseFlex::StartMoveToSceneEvent( CSceneEventInfo *info, CChoreoScene *scene, CChoreoEvent *event, CChoreoActor *actor, IServerEntity *pTarget )
 {
 	if (pTarget)
 	{
@@ -735,7 +735,7 @@ bool CBaseFlex::StartMoveToSceneEvent( CSceneEventInfo *info, CChoreoScene *scen
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-bool CBaseFlex::StartSceneEvent( CSceneEventInfo *info, CChoreoScene *scene, CChoreoEvent *event, CChoreoActor *actor, CBaseEntity *pTarget )
+bool CBaseFlex::StartSceneEvent( CSceneEventInfo *info, CChoreoScene *scene, CChoreoEvent *event, CChoreoActor *actor, IServerEntity *pTarget )
 {
 	switch ( event->GetType() )
 	{
@@ -753,7 +753,7 @@ bool CBaseFlex::StartSceneEvent( CSceneEventInfo *info, CChoreoScene *scene, CCh
 		return StartMoveToSceneEvent( info, scene, event, actor, pTarget );
 
 	case CChoreoEvent::LOOKAT:
-		info->m_hTarget = pTarget;
+		info->m_hTarget = (CBaseEntity*)pTarget;
 		return true;
 
 	case CChoreoEvent::FLEXANIMATION:
@@ -2714,7 +2714,7 @@ void CFlexCycler::Think( void )
 	Vector forward, right, up;
 	GetVectors( &forward, &right, &up );
 
-	CBaseEntity *pPlayer = EntityList()->GetLocalPlayer();
+	IServerEntity *pPlayer = EntityList()->GetLocalPlayer();
 	if (pPlayer)
 	{
 		if (pPlayer->GetSmoothedVelocity().Length() != 0 && DotProduct( forward, pPlayer->EyePosition() - EyePosition()) > 0.5)

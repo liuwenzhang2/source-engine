@@ -404,19 +404,19 @@ int CAI_Senses::LookForHighPriorityEntities( int iDistance )
 		// Players
 		for ( int i = 1; i <= gpGlobals->maxClients; i++ )
 		{
-			CBaseEntity *pPlayer = EntityList()->GetPlayerByIndex( i );
+			IServerEntity *pPlayer = EntityList()->GetPlayerByIndex( i );
 
 			if ( pPlayer )
 			{
-				if ( origin.DistToSqr(pPlayer->GetEngineObject()->GetAbsOrigin()) < distSq && Look( pPlayer ) )
+				if ( origin.DistToSqr(pPlayer->GetEngineObject()->GetAbsOrigin()) < distSq && Look((CBaseEntity*)pPlayer ) )
 				{
 					nSeen++;
 				}
 #ifdef PORTAL
 				else
 				{
-					IEnginePortalServer *pPortal = GetOuter()->FInViewConeThroughPortal( pPlayer );
-					if ( pPortal && UTIL_Portal_DistanceThroughPortalSqr( pPortal, origin, pPlayer->GetEngineObject()->GetAbsOrigin() ) < distSq && LookThroughPortal( pPortal, pPlayer ) )
+					IEnginePortalServer *pPortal = GetOuter()->FInViewConeThroughPortal((CBaseEntity*)pPlayer );
+					if ( pPortal && UTIL_Portal_DistanceThroughPortalSqr( pPortal, origin, pPlayer->GetEngineObject()->GetAbsOrigin() ) < distSq && LookThroughPortal( pPortal, (CBaseEntity*)pPlayer ) )
 					{
 						nSeen++;
 					}
@@ -671,7 +671,7 @@ void CAI_Senses::PerformSensing( void )
 
 void CAI_SensedObjectsManager::Init()
 {
-	CBaseEntity *pEnt = NULL;
+	IServerEntity *pEnt = NULL;
 	while ( ( pEnt = EntityList()->NextEnt( pEnt ) ) != NULL )
 	{
 		OnEntitySpawned( pEnt );
@@ -719,21 +719,21 @@ CBaseEntity *CAI_SensedObjectsManager::GetNext( int *pIter )
 
 //-----------------------------------------------------------------------------
 
-void CAI_SensedObjectsManager::OnEntitySpawned( CBaseEntity *pEntity )
+void CAI_SensedObjectsManager::OnEntitySpawned( IServerEntity *pEntity )
 {
 	if ( ( pEntity->GetEngineObject()->GetFlags() & FL_OBJECT ) && !pEntity->IsPlayer() && !pEntity->IsNPC() )
 	{
-		m_SensedObjects.AddToTail( pEntity );
+		m_SensedObjects.AddToTail( (CBaseEntity*)pEntity );
 	}
 }
 
 //-----------------------------------------------------------------------------
 
-void CAI_SensedObjectsManager::OnEntityDeleted( CBaseEntity *pEntity )
+void CAI_SensedObjectsManager::OnEntityDeleted( IServerEntity *pEntity )
 {
 	if ( ( pEntity->GetEngineObject()->GetFlags() & FL_OBJECT ) && !pEntity->IsPlayer() && !pEntity->IsNPC() )
 	{
-		int i = m_SensedObjects.Find( pEntity );
+		int i = m_SensedObjects.Find((CBaseEntity*)pEntity );
 		if ( i != m_SensedObjects.InvalidIndex() )
 			m_SensedObjects.FastRemove( i );
 	}

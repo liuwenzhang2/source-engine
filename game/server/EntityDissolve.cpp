@@ -175,10 +175,10 @@ void CEntityDissolve::InputDissolve( inputdata_t &inputdata )
 		strTarget = m_target;
 	}
 
-	CBaseEntity *pTarget = NULL;
+	IServerEntity *pTarget = NULL;
 	while ((pTarget = EntityList()->FindEntityGeneric(pTarget, STRING(strTarget), this, inputdata.pActivator)) != NULL)
 	{
-		CBaseAnimating *pBaseAnim = pTarget->GetBaseAnimating();
+		CBaseAnimating *pBaseAnim = ((CBaseEntity*)pTarget)->GetBaseAnimating();
 		if (pBaseAnim)
 		{
 			pBaseAnim->Dissolve( NULL, gpGlobals->curtime, false, m_nDissolveType, GetEngineObject()->GetAbsOrigin(), m_nMagnitude );
@@ -316,7 +316,7 @@ void CEntityDissolve::SetStartTime( float flStartTime )
 //-----------------------------------------------------------------------------
 void CEntityDissolve::DissolveThink( void )
 {
-	CBaseAnimating *pTarget = (GetEngineObject()->GetMoveParent() ) ? GetEngineObject()->GetMoveParent()->GetOuter()->GetBaseAnimating() : NULL;
+	IServerEntity *pTarget = (GetEngineObject()->GetMoveParent() ) ? GetEngineObject()->GetMoveParent()->GetOuter() : NULL;
 
 	if (GetEngineObject()->GetModelName() == NULL_STRING && pTarget == NULL )
 		 return;

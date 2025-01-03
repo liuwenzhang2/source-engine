@@ -13,7 +13,7 @@
 
 //#include "predictable_entity.h"
 
-class CBaseEntity;
+class IHandleEntity;
 
 //-----------------------------------------------------------------------------
 // Purpose: Interfaces derived from this are able to filter out the local player
@@ -46,12 +46,12 @@ public:
 		m_bSuppressEvent = state;
 	}
 
-	void SetSuppressHost( CBaseEntity *host )
+	void SetSuppressHost( IHandleEntity *host )
 	{
 		m_pSuppressHost = host;
 	}
 
-	CBaseEntity const *GetSuppressHost( void )
+	IHandleEntity const *GetSuppressHost( void )
 	{
 		if ( DisableFiltering() )
 		{
@@ -83,7 +83,7 @@ public:
 		}
 	}
 
-	static void SuppressHostEvents( CBaseEntity *host )
+	static void SuppressHostEvents( IHandleEntity *host )
 	{
 		IPredictionSystem *sys = g_pPredictionSystems;
 		while ( sys )
@@ -131,7 +131,7 @@ private:
 
 	IPredictionSystem	*m_pNextSystem;
 	bool				m_bSuppressEvent;
-	CBaseEntity			*m_pSuppressHost;
+	IHandleEntity		*m_pSuppressHost;
 
 	int					m_nStatusPushed;
 

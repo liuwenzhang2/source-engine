@@ -94,11 +94,11 @@ void CEntityFlame::InputIgnite( inputdata_t &inputdata )
 {
 	if (m_target != NULL_STRING)
 	{
-		CBaseEntity *pTarget = NULL;
+		IServerEntity *pTarget = NULL;
 		while ((pTarget = EntityList()->FindEntityGeneric(pTarget, STRING(m_target), this, inputdata.pActivator)) != NULL)
 		{
 			// Combat characters know how to catch themselves on fire.
-			CBaseCombatCharacter *pBCC = pTarget->MyCombatCharacterPointer();
+			CBaseCombatCharacter *pBCC = ((CBaseEntity*)pTarget)->MyCombatCharacterPointer();
 			if (pBCC)
 			{
 				// DVS TODO: consider promoting Ignite to CBaseEntity and doing everything here
@@ -107,7 +107,7 @@ void CEntityFlame::InputIgnite( inputdata_t &inputdata )
 			// Everything else, we handle here.
 			else
 			{
-				CEntityFlame *pFlame = CEntityFlame::Create(pTarget);
+				CEntityFlame *pFlame = CEntityFlame::Create((CBaseEntity*)pTarget);
 				if (pFlame)
 				{
 					pFlame->SetLifetime(m_flLifetime);

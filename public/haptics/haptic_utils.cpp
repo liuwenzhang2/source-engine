@@ -295,7 +295,7 @@ void HapticsDamage(CBasePlayer* pPlayer, const CTakeDamageInfo &info)
 		return;// do not send to non haptic users.
 
 	Vector DamageDirection(0,0,0);
-	CBaseEntity *eInflictor = info.GetInflictor();
+	CBaseEntity *eInflictor = (CBaseEntity*)info.GetInflictor();
 	// Pat: nuero toxix crash fix
 	if(!eInflictor) {
 		return;

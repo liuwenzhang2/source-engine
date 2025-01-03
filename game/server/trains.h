@@ -71,7 +71,7 @@ public:
 
 	virtual int OnTakeDamage( const CTakeDamageInfo &info );
 
-	void Blocked( CBaseEntity *pOther );
+	void Blocked( IServerEntity *pOther );
 	bool KeyValue( const char *szKeyName, const char *szValue );
 
 	virtual int DrawDebugTextOverlays();

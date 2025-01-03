@@ -76,7 +76,7 @@ public:
 	// Player pickup
 	virtual void	OnPhysGunPickup( CBasePlayer *pPhysGunUser, PhysGunPickup_t reason );
 	virtual void	OnPhysGunDrop( CBasePlayer *pPhysGunUser, PhysGunDrop_t Reason );
-	virtual bool	HasPreferredCarryAnglesForPlayer( CBaseEntity *pPlayer );
+	virtual bool	HasPreferredCarryAnglesForPlayer( IServerEntity *pPlayer );
 	virtual QAngle	PreferredCarryAngles( void );
 	virtual bool	OnAttemptPhysGunPickup( CBasePlayer *pPhysGunUser, PhysGunPickup_t reason );
 
@@ -100,7 +100,7 @@ public:
 	virtual void	BreakThink( void );
 	virtual void	HackFindEnemy( void );
 
-	virtual float	GetAttackDamageScale( CBaseEntity *pVictim );
+	virtual float	GetAttackDamageScale( IHandleEntity *pVictim );
 	virtual Vector	GetAttackSpread( CBaseCombatWeapon *pWeapon, CBaseEntity *pTarget );
 
 	// Do we have a physics attacker?

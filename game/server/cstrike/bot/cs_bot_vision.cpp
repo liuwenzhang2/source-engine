@@ -1239,7 +1239,7 @@ CCSPlayer *CCSBot::FindMostDangerousThreat( void )
 
 		for( i = 1; i <= gpGlobals->maxClients; ++i )
 		{
-			CBaseEntity *entity = EntityList()->GetPlayerByIndex( i );
+			IServerEntity *entity = EntityList()->GetPlayerByIndex( i );
 
 			if (entity == NULL)
 				continue;

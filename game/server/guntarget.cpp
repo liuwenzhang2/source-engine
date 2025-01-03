@@ -215,7 +215,7 @@ int	CGunTarget::OnTakeDamage( const CTakeDamageInfo &info )
 			m_iHealth = 0;
 			Stop();
 
-			m_OnDeath.FireOutput( info.GetInflictor(), this );
+			m_OnDeath.FireOutput((IServerEntity*)info.GetInflictor(), this );
 		}
 	}
 	return 0;

@@ -92,7 +92,7 @@ void CAI_SpeechFilter::InputSetIdleModifier( inputdata_t &inputdata )
 void CAI_SpeechFilter::PopulateSubjectList( bool purge )
 {
 	// Populate the subject list. Try targetname first.
-	CBaseEntity *pSearch = NULL;
+	IServerEntity *pSearch = NULL;
 	int iNumSubjects = 0;
 	do
 	{
@@ -173,7 +173,7 @@ void CAI_SpeechFilter::PopulateSubjectList( bool purge )
 // Purpose: 
 // Input  : *pEntity - 
 //-----------------------------------------------------------------------------
-void CAI_SpeechFilter::OnEntityCreated( CBaseEntity *pEntity )
+void CAI_SpeechFilter::OnEntityCreated( IServerEntity *pEntity )
 {
 	if ( !m_bDisabled && ( pEntity->NameMatches( m_iszSubject ) || pEntity->ClassMatches( m_iszSubject ) ) )
 	{
@@ -195,6 +195,6 @@ void CAI_SpeechFilter::OnEntityCreated( CBaseEntity *pEntity )
 // Purpose: 
 // Input  : *pEntity - 
 //-----------------------------------------------------------------------------
-void CAI_SpeechFilter::OnEntityDeleted( CBaseEntity *pEntity )
+void CAI_SpeechFilter::OnEntityDeleted( IServerEntity *pEntity )
 {
 }

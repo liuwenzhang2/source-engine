@@ -62,7 +62,7 @@ bool CHudSuitPower::ShouldDraw()
 {
 	bool bNeedsDraw = false;
 
-	C_BaseHLPlayer *pPlayer = (C_BaseHLPlayer *)EntityList()->GetLocalPlayer();
+	C_BaseHLPlayer *pPlayer = ToHL2Player(EntityList()->GetLocalPlayer());
 	if ( !pPlayer )
 		return false;
 
@@ -78,7 +78,7 @@ bool CHudSuitPower::ShouldDraw()
 void CHudSuitPower::OnThink( void )
 {
 	float flCurrentPower = 0;
-	C_BaseHLPlayer *pPlayer = (C_BaseHLPlayer *)EntityList()->GetLocalPlayer();
+	C_BaseHLPlayer *pPlayer = ToHL2Player(EntityList()->GetLocalPlayer());
 	if ( !pPlayer )
 		return;
 
@@ -134,7 +134,7 @@ void CHudSuitPower::OnThink( void )
 //-----------------------------------------------------------------------------
 void CHudSuitPower::Paint()
 {
-	C_BaseHLPlayer *pPlayer = (C_BaseHLPlayer *)EntityList()->GetLocalPlayer();
+	C_BaseHLPlayer *pPlayer = ToHL2Player(EntityList()->GetLocalPlayer());
 	if ( !pPlayer )
 		return;
 

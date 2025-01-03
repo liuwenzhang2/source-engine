@@ -304,7 +304,7 @@ bool CNPC_BaseZombie::FindNearestPhysicsObject( int iMaxMass )
 
 		virtual IterationRetval_t EnumElement( IHandleEntity *pHandleEntity )
 		{
-			CBaseEntity *pEntity = EntityList()->GetBaseEntityFromHandle( pHandleEntity->GetRefEHandle() );
+			IServerEntity *pEntity = EntityList()->GetBaseEntityFromHandle( pHandleEntity->GetRefEHandle() );
 			if ( pEntity && 
 				 pEntity->GetEngineObject()->VPhysicsGetObject() &&
 				 pEntity->GetEngineObject()->VPhysicsGetObject()->GetMass() <= m_iMaxMass &&

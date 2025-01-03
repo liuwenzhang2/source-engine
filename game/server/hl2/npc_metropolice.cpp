@@ -325,7 +325,7 @@ public:
 				info.ScaleDamageForce( 0.001 );
 			}
 
-			CBaseCombatCharacter *pBCC = info.GetAttacker()->MyCombatCharacterPointer();
+			CBaseCombatCharacter *pBCC = ((CBaseEntity*)info.GetAttacker())->MyCombatCharacterPointer();
 			CBaseCombatCharacter *pVictimBCC = pEntity->MyCombatCharacterPointer();
 
 			// Only do these comparisons between NPCs
@@ -2441,7 +2441,7 @@ void CNPC_MetroPolice::InputEnableManhackToss( inputdata_t &inputdata )
 //-----------------------------------------------------------------------------
 void CNPC_MetroPolice::InputSetPoliceGoal( inputdata_t &inputdata )
 {
-	CBaseEntity *pGoal = EntityList()->FindEntityByName( NULL, inputdata.value.String() );
+	IServerEntity *pGoal = EntityList()->FindEntityByName( NULL, inputdata.value.String() );
 
 	if ( pGoal == NULL )
 	{
@@ -3096,7 +3096,7 @@ void CNPC_MetroPolice::Event_Killed( const CTakeDamageInfo &info )
 		m_hManhack = NULL;
 	}
 
-	CBasePlayer *pPlayer = ToBasePlayer( info.GetAttacker() );
+	CBasePlayer *pPlayer = ToBasePlayer((IServerEntity*)info.GetAttacker() );
 
 	if ( pPlayer != NULL )
 	{
@@ -3988,7 +3988,7 @@ void CNPC_MetroPolice::AdministerJustice( void )
 				if ( pNPC->GetEngineObject()->HasSpawnFlags( SF_METROPOLICE_ALLOWED_TO_RESPOND ) )
 				{
 					// Is he within site & range?
-					if ( FVisible(pNPC) && pNPC->FVisible( EntityList()->GetPlayerByIndex(1) ) && 
+					if ( FVisible(pNPC) && pNPC->FVisible((CBaseEntity*)EntityList()->GetPlayerByIndex(1) ) &&
 						UTIL_DistApprox( WorldSpaceCenter(), pNPC->WorldSpaceCenter() ) < 512 )
 					{
 						pNPC->AdministerJustice();
@@ -5122,11 +5122,11 @@ void CNPC_MetroPolice::VPhysicsCollision( int index, gamevcollisionevent_t *pEve
 
 	int otherIndex = !index;
 	
-	CBaseEntity *pHitEntity = pEvent->pEntities[otherIndex];
+	CBaseEntity *pHitEntity = (CBaseEntity*)pEvent->pEntities[otherIndex];
 
 	if ( pEvent->pObjects[otherIndex]->GetGameFlags() & FVPHYSICS_PLAYER_HELD )
 	{
-		CHL2_Player *pPlayer = dynamic_cast<CHL2_Player *>(EntityList()->GetPlayerByIndex( 1 ));
+		CHL2_Player *pPlayer = ToHL2Player(EntityList()->GetPlayerByIndex( 1 ));
 
 		// See if it's being held by the player
 		if ( pPlayer != NULL && pPlayer->IsHoldingEntity( pHitEntity ) )

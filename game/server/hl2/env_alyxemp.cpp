@@ -76,7 +76,7 @@ void CAlyxEmpEffect::Activate( void )
 void CAlyxEmpEffect::SetTargetEntity( const char *szEntityName )
 {
 	// Find and store off our target entity
-	CBaseEntity *pTargetEnt = NULL;
+	IServerEntity *pTargetEnt = NULL;
 	if ( szEntityName && szEntityName[0] )
 	{
 		pTargetEnt = EntityList()->FindEntityByName( NULL, szEntityName );
@@ -88,7 +88,7 @@ void CAlyxEmpEffect::SetTargetEntity( const char *szEntityName )
 		}
 	}
 
-	SetTargetEntity( pTargetEnt );
+	SetTargetEntity((CBaseEntity*)pTargetEnt );
 }
 
 //-----------------------------------------------------------------------------

@@ -817,7 +817,7 @@ int CNPC_PlayerCompanion::SelectSchedulePriorityAction()
 		}
 
 		if (GetEngineObject()->GetGroundEntity()->GetOuter()->IsNPC() &&
-			 IRelationType(GetEngineObject()->GetGroundEntity()->GetOuter() ) == D_LI &&
+			 IRelationType((CBaseEntity*)GetEngineObject()->GetGroundEntity()->GetOuter() ) == D_LI &&
 			 WorldSpaceCenter().z - GetEngineObject()->GetGroundEntity()->GetOuter()->WorldSpaceCenter().z > GetHullHeight() * .5)
 		{
 			return SCHED_PC_GET_OFF_COMPANION;
@@ -1097,8 +1097,8 @@ void CNPC_PlayerCompanion::StartTask( const Task_t *pTask )
 
 	case TASK_PC_GET_PATH_OFF_COMPANION:
 		{
-			Assert( (GetEngineObject()->GetGroundEntity() && (GetEngineObject()->GetGroundEntity()->GetOuter()->IsPlayer() || (GetEngineObject()->GetGroundEntity()->GetOuter()->IsNPC() && IRelationType(GetEngineObject()->GetGroundEntity()->GetOuter()) == D_LI))));
-			GetNavigator()->SetAllowBigStep(GetEngineObject()->GetGroundEntity()->GetOuter() );
+			Assert( (GetEngineObject()->GetGroundEntity() && (GetEngineObject()->GetGroundEntity()->GetOuter()->IsPlayer() || (GetEngineObject()->GetGroundEntity()->GetOuter()->IsNPC() && IRelationType((CBaseEntity*)GetEngineObject()->GetGroundEntity()->GetOuter()) == D_LI))));
+			GetNavigator()->SetAllowBigStep((CBaseEntity*)GetEngineObject()->GetGroundEntity()->GetOuter() );
 			ChainStartTask( TASK_MOVE_AWAY_PATH, 48 );
 			
 			/*
@@ -1512,7 +1512,7 @@ void CNPC_PlayerCompanion::Touch( IServerEntity *pOther )
 		if ( m_afMemory & bits_MEMORY_PROVOKED )
 			return;
 			
-		TestPlayerPushing( pOther->IsPlayer() ? (CBaseEntity*)pOther : AI_GetSinglePlayer() );
+		TestPlayerPushing( pOther->IsPlayer() ? pOther : AI_GetSinglePlayer() );
 	}
 }
 
@@ -2729,7 +2729,7 @@ int CNPC_PlayerCompanion::OnTakeDamage_Alive( const CTakeDamageInfo &info )
 	if( info.GetAttacker() )
 	{
 		bool bIsEnvFire;
-		if( ( bIsEnvFire = FClassnameIs( info.GetAttacker(), "env_fire" ) ) != false || FClassnameIs( info.GetAttacker(), "entityflame" ) || FClassnameIs( info.GetAttacker(), "env_entity_igniter" ) )
+		if( ( bIsEnvFire = FClassnameIs((CBaseEntity*)info.GetAttacker(), "env_fire" ) ) != false || FClassnameIs((CBaseEntity*)info.GetAttacker(), "entityflame" ) || FClassnameIs((CBaseEntity*)info.GetAttacker(), "env_entity_igniter" ) )
 		{
 			GetMotor()->SetIdealYawToTarget( info.GetAttacker()->GetEngineObject()->GetAbsOrigin() );
 			SetCondition( COND_PC_HURTBYFIRE );
@@ -3094,7 +3094,7 @@ void CNPC_PlayerCompanion::InputOutsideTransition( inputdata_t &inputdata )
 	if ( IsInAVehicle() )
 		return;
 
-	CBaseEntity *pPlayer = EntityList()->GetLocalPlayer();
+	IServerEntity *pPlayer = EntityList()->GetLocalPlayer();
 	const Vector &playerPos = pPlayer->GetEngineObject()->GetAbsOrigin();
 
 	// Mark us as already having succeeded if we're vital or always meant to come with the player
@@ -3103,7 +3103,7 @@ void CNPC_PlayerCompanion::InputOutsideTransition( inputdata_t &inputdata )
 
 	if ( bAlwaysTransition == false )
 	{
-		AI_Waypoint_t *pPathToPlayer = GetPathfinder()->BuildRoute(GetEngineObject()->GetAbsOrigin(), playerPos, pPlayer, 0 );
+		AI_Waypoint_t *pPathToPlayer = GetPathfinder()->BuildRoute(GetEngineObject()->GetAbsOrigin(), playerPos, (CBaseEntity*)pPlayer, 0 );
 
 		if ( pPathToPlayer )
 		{
@@ -3139,7 +3139,7 @@ void CNPC_PlayerCompanion::InputOutsideTransition( inputdata_t &inputdata )
 			bMadeIt = true;
 			if ( !bPathToPlayer && ( playerPos - GetEngineObject()->GetAbsOrigin() ).LengthSqr() > Square(40*12) )
 			{
-				AI_Waypoint_t *pPathToTeleport = GetPathfinder()->BuildRoute(GetEngineObject()->GetAbsOrigin(), teleportLocation, pPlayer, 0 );
+				AI_Waypoint_t *pPathToTeleport = GetPathfinder()->BuildRoute(GetEngineObject()->GetAbsOrigin(), teleportLocation, (CBaseEntity*)pPlayer, 0 );
 
 				if ( !pPathToTeleport )
 				{
@@ -3332,8 +3332,8 @@ void CNPC_PlayerCompanion::EnterVehicle( CBaseEntity *pEntityVehicle, bool bImme
 //-----------------------------------------------------------------------------
 void CNPC_PlayerCompanion::InputEnterVehicle( inputdata_t &inputdata )
 {
-	CBaseEntity *pEntity = FindNamedEntity( inputdata.value.String() );
-	EnterVehicle( pEntity, false );
+	IServerEntity *pEntity = FindNamedEntity( inputdata.value.String() );
+	EnterVehicle( (CBaseEntity*)pEntity, false );
 }
 
 //-----------------------------------------------------------------------------
@@ -3342,8 +3342,8 @@ void CNPC_PlayerCompanion::InputEnterVehicle( inputdata_t &inputdata )
 //-----------------------------------------------------------------------------
 void CNPC_PlayerCompanion::InputEnterVehicleImmediately( inputdata_t &inputdata )
 {
-	CBaseEntity *pEntity = FindNamedEntity( inputdata.value.String() );
-	EnterVehicle( pEntity, true );
+	IServerEntity *pEntity = FindNamedEntity( inputdata.value.String() );
+	EnterVehicle( (CBaseEntity*)pEntity, true );
 }
 
 //-----------------------------------------------------------------------------
@@ -3570,7 +3570,7 @@ void CNPC_PlayerCompanion::OnPlayerKilledOther( CBaseEntity *pVictim, const CTak
 		return;
 	}
 
-	CBaseEntity *pInflictor = info.GetInflictor();
+	CBaseEntity *pInflictor = (CBaseEntity*)info.GetInflictor();
 	int		iNumBarrels = 0;
 	int		iConsecutivePlayerKills = 0;
 	bool	bPuntedGrenade = false;
@@ -3855,7 +3855,7 @@ AI_END_CUSTOM_NPC()
 
 #define NUM_OVERRIDE_MOVE_CLASSNAMES	4
 
-class COverrideMoveCache : public IEntityListener<CBaseEntity>
+class COverrideMoveCache : public IEntityListener<IServerEntity>
 {
 public:
 
@@ -3887,22 +3887,22 @@ public:
 		return false;
 	}
 
-	virtual void OnEntitySpawned( CBaseEntity *pEntity )
+	virtual void OnEntitySpawned( IServerEntity *pEntity )
 	{
-		if ( MatchesCriteria( pEntity ) )
+		if ( MatchesCriteria((CBaseEntity*)pEntity ) )
 		{
-			m_Cache.AddToTail( pEntity );
+			m_Cache.AddToTail((CBaseEntity*)pEntity );
 		}
 	};
 
-	virtual void OnEntityDeleted( CBaseEntity *pEntity )
+	virtual void OnEntityDeleted( IServerEntity *pEntity )
 	{
 		if ( !m_Cache.Count() )
 			return;
 
-		if ( MatchesCriteria( pEntity ) )
+		if ( MatchesCriteria((CBaseEntity*)pEntity ) )
 		{
-			m_Cache.FindAndRemove( pEntity );
+			m_Cache.FindAndRemove((CBaseEntity*)pEntity );
 		}
 	};
 
@@ -3947,12 +3947,12 @@ public:
 		Clear();
 		CacheClassnames();
 
-		CBaseEntity *pEnt = EntityList()->FirstEnt();
+		IServerEntity *pEnt = EntityList()->FirstEnt();
 		while( pEnt )
 		{
-			if( MatchesCriteria( pEnt ) )
+			if( MatchesCriteria((CBaseEntity*)pEnt ) )
 			{
-				m_Cache.AddToTail( pEnt );
+				m_Cache.AddToTail((CBaseEntity*)pEnt );
 			}
 
 			pEnt = EntityList()->NextEnt( pEnt );

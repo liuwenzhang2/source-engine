@@ -286,7 +286,7 @@ void CNPC_Apache::Flight( void )
 
 			OnReachedTarget( GetGoalEnt() );
 
-			SetGoalEnt( EntityList()->FindEntityByName( NULL, GetGoalEnt()->m_target ) );
+			SetGoalEnt((CBaseEntity*)EntityList()->FindEntityByName( NULL, GetGoalEnt()->m_target ) );
 
 			if (GetGoalEnt())
 			{

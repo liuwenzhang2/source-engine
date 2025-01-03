@@ -274,7 +274,7 @@ CDebugHistory *GetDebugHistory()
 
 	if ( s_DebugHistory == NULL )
 	{
-		CBaseEntity *pEnt = EntityList()->FindEntityByClassname( NULL, "env_debughistory" );
+		IServerEntity *pEnt = EntityList()->FindEntityByClassname( NULL, "env_debughistory" );
 		if ( pEnt )
 		{
 			s_DebugHistory = dynamic_cast<CDebugHistory*>(pEnt);

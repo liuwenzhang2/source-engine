@@ -230,7 +230,7 @@ void CAI_BaseActor::SetModel( const char *szModelName )
 // Purpose: 
 //-----------------------------------------------------------------------------
 
-bool CAI_BaseActor::StartSceneEvent( CSceneEventInfo *info, CChoreoScene *scene, CChoreoEvent *event, CChoreoActor *actor, CBaseEntity *pTarget )
+bool CAI_BaseActor::StartSceneEvent( CSceneEventInfo *info, CChoreoScene *scene, CChoreoEvent *event, CChoreoActor *actor, IServerEntity *pTarget )
 {
 	Assert( info );
 	Assert( info->m_pScene );
@@ -273,7 +273,7 @@ bool CAI_BaseActor::StartSceneEvent( CSceneEventInfo *info, CChoreoScene *scene,
 			else if (stricmp( event->GetParameters(), "AI_AIM") == 0)
 			{
 				info->m_nType = SCENE_AI_AIM;
-				info->m_hTarget = pTarget;
+				info->m_hTarget = (CBaseEntity*)pTarget;
 			}
 			else if (stricmp( event->GetParameters(), "AI_RANDOMLOOK") == 0)
 			{
@@ -293,12 +293,12 @@ bool CAI_BaseActor::StartSceneEvent( CSceneEventInfo *info, CChoreoScene *scene,
 			}	
 			else if (stricmp( event->GetParameters(), "AI_IGNORECOLLISION") == 0)
 			{
-				CBaseEntity *pTarget = FindNamedEntity( event->GetParameters2( ) );
+				IServerEntity *pTarget = FindNamedEntity( event->GetParameters2( ) );
 
 				if (pTarget)
 				{
 					info->m_nType = SCENE_AI_IGNORECOLLISION;
-					info->m_hTarget = pTarget;
+					info->m_hTarget = (CBaseEntity*)pTarget;
 					float remaining = event->GetEndTime() - scene->GetTime();
 					this->NPCPhysics_CreateSolver( pTarget, true, remaining );
 					info->m_flNext = gpGlobals->curtime + remaining;
@@ -1674,7 +1674,7 @@ void CAI_BaseActor::MaintainLookTargets( float flInterval )
 	if ( m_hLookTarget != NULL )
 	{
 		Vector absVel = m_hLookTarget->GetEngineObject()->GetAbsVelocity();
-		CBaseEntity* ground = m_hLookTarget->GetEngineObject()->GetGroundEntity() ? m_hLookTarget->GetEngineObject()->GetGroundEntity()->GetOuter() : NULL;
+		IServerEntity* ground = m_hLookTarget->GetEngineObject()->GetGroundEntity() ? m_hLookTarget->GetEngineObject()->GetGroundEntity()->GetOuter() : NULL;
 		if ( ground && ground->GetEngineObject()->GetMoveType() == MOVETYPE_PUSH)
 		{
 			absVel = absVel + ground->GetEngineObject()->GetAbsVelocity();

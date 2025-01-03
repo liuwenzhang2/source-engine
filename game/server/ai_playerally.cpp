@@ -1075,7 +1075,7 @@ void CAI_PlayerAlly::Touch( IServerEntity *pOther )
 		if ( GetExpresser()->IsSpeaking() )
 			return;
 			
-		TestPlayerPushing( (CBaseEntity*)pOther );
+		TestPlayerPushing( pOther );
 	}
 }
 
@@ -1216,7 +1216,7 @@ void CAI_PlayerAlly::PainSound( const CTakeDamageInfo &info )
 //-----------------------------------------------------------------------------
 // Purpose: Implemented to look at talk target
 //-----------------------------------------------------------------------------
-CBaseEntity *CAI_PlayerAlly::EyeLookTarget( void )
+IServerEntity *CAI_PlayerAlly::EyeLookTarget( void )
 {
 	// FIXME: this should be in the VCD
 	// FIXME: this is dead code
@@ -1230,7 +1230,7 @@ CBaseEntity *CAI_PlayerAlly::EyeLookTarget( void )
 //-----------------------------------------------------------------------------
 // Purpose: returns who we're talking to for vcd's
 //-----------------------------------------------------------------------------
-CBaseEntity *CAI_PlayerAlly::FindNamedEntity( const char *pszName, IEntityFindFilter *pFilter )
+IServerEntity *CAI_PlayerAlly::FindNamedEntity( const char *pszName, IEntityFindFilter *pFilter )
 {
 	if ( !stricmp( pszName, "!speechtarget" ))
 	{
@@ -1248,7 +1248,7 @@ CBaseEntity *CAI_PlayerAlly::FindNamedEntity( const char *pszName, IEntityFindFi
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-bool CAI_PlayerAlly::IsValidSpeechTarget( int flags, CBaseEntity *pEntity )
+bool CAI_PlayerAlly::IsValidSpeechTarget( int flags, IServerEntity *pEntity )
 {
 	if ( pEntity == this )
 		return false;
@@ -1262,7 +1262,7 @@ bool CAI_PlayerAlly::IsValidSpeechTarget( int flags, CBaseEntity *pEntity )
 		}
 		else
 		{
-			if ( IRelationType( pEntity ) != D_LI )
+			if ( IRelationType( (CBaseEntity*)pEntity ) != D_LI )
 				return false;
 		}
 	}		
@@ -1275,7 +1275,7 @@ bool CAI_PlayerAlly::IsValidSpeechTarget( int flags, CBaseEntity *pEntity )
 	if ( pEntity->GetEngineObject()->GetFlags() & FL_NOTARGET )
 		return false;
 
-	CAI_BaseNPC *pNPC = pEntity->MyNPCPointer();
+	CAI_BaseNPC *pNPC = ((CBaseEntity*)pEntity)->MyNPCPointer();
 	if ( pNPC )
 	{
 		// If not a NPC for some reason, or in a script.
@@ -1298,16 +1298,16 @@ bool CAI_PlayerAlly::IsValidSpeechTarget( int flags, CBaseEntity *pEntity )
 			return false;
 	}
 
-	return FVisible( pEntity );
+	return FVisible((CBaseEntity*)pEntity );
 }
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-CBaseEntity *CAI_PlayerAlly::FindSpeechTarget( int flags )
+IServerEntity *CAI_PlayerAlly::FindSpeechTarget( int flags )
 {
 	const Vector &	vAbsOrigin 		= GetEngineObject()->GetAbsOrigin();
 	float 			closestDistSq 	= FLT_MAX;
-	CBaseEntity *	pNearest 		= NULL;
+	IServerEntity *	pNearest 		= NULL;
 	float			distSq;
 	int				i;
 	
@@ -1315,7 +1315,7 @@ CBaseEntity *CAI_PlayerAlly::FindSpeechTarget( int flags )
 	{
 		for ( i = 1; i <= gpGlobals->maxClients; i++ )
 		{
-			CBaseEntity *pPlayer = EntityList()->GetPlayerByIndex( i );
+			IServerEntity *pPlayer = EntityList()->GetPlayerByIndex( i );
 			if ( pPlayer )
 			{
 				distSq = ( vAbsOrigin - pPlayer->GetEngineObject()->GetAbsOrigin() ).LengthSqr();

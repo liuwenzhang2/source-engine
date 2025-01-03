@@ -104,7 +104,7 @@ void CPoseController::Think( void )
 void CPoseController::BuildPropList( void )
 {
 	int iPropNum = 0;
-	CBaseEntity *pEnt = EntityList()->FindEntityByName( NULL, m_iszPropName );
+	IServerEntity *pEnt = EntityList()->FindEntityByName( NULL, m_iszPropName );
 
 	while ( pEnt && iPropNum < MAX_POSE_CONTROLLED_PROPS )
 	{

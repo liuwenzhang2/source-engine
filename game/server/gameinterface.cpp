@@ -450,7 +450,7 @@ void DrawAllDebugOverlays( void )
 		if (pPlayer)
 		{
 			// First try to trace a hull to an entity
-			CBaseEntity *pEntity = EntityList()->FindPickerEntity( pPlayer );
+			IServerEntity *pEntity = EntityList()->FindPickerEntity( pPlayer );
 
 			if ( pEntity ) 
 			{
@@ -549,8 +549,8 @@ void DrawAllDebugOverlays( void )
 	if ( developer.GetInt() && !engine->IsDedicatedServer() )
 	{
 		// iterate through all objects for debug overlays
-		for (CBaseEntity* pEntity = EntityList()->FirstEnt(); pEntity != NULL; pEntity = EntityList()->NextEnt(pEntity)) {
-			if (pEntity->m_debugOverlays || pEntity->m_pTimedOverlay)
+		for (IServerEntity* pEntity = EntityList()->FirstEnt(); pEntity != NULL; pEntity = EntityList()->NextEnt(pEntity)) {
+			if (pEntity->GetDebugOverlays() || pEntity->GetTimedOverlay())
 			{
 				MDLCACHE_CRITICAL_SECTION();
 				pEntity->DrawDebugGeometryOverlays();
@@ -561,7 +561,7 @@ void DrawAllDebugOverlays( void )
 	if ( sv_massreport.GetInt() )
 	{
 		// iterate through all objects for debug overlays
-		for (CBaseEntity* pEntity = EntityList()->FirstEnt(); pEntity != NULL; pEntity = EntityList()->NextEnt(pEntity)) {
+		for (IServerEntity* pEntity = EntityList()->FirstEnt(); pEntity != NULL; pEntity = EntityList()->NextEnt(pEntity)) {
 			if (!pEntity->GetEngineObject()->VPhysicsGetObject())
 				continue;
 
@@ -1003,9 +1003,9 @@ public:
 		return true;
 	}
 
-	virtual CBaseEntity* CreateNextEntity(const char* pClassname)
+	virtual IServerEntity* CreateNextEntity(const char* pClassname)
 	{
-		CBaseEntity* pRet = (CBaseEntity*)EntityList()->CreateEntityByName(pClassname);
+		IServerEntity* pRet = EntityList()->CreateEntityByName(pClassname);
 
 		CMapEntityRef ref;
 		ref.m_iEdict = -1;
@@ -1176,7 +1176,7 @@ void CServerGameDLL::ServerActivate( IServerEntity *pEdictList, int edictCount, 
 		Msg( "%s", "ERROR: Entity delete queue not empty on level start!\n" );
 	}
 
-	for ( CBaseEntity *pEntity = EntityList()->FirstEnt(); pEntity != NULL; pEntity = EntityList()->NextEnt(pEntity) )
+	for ( IServerEntity *pEntity = EntityList()->FirstEnt(); pEntity != NULL; pEntity = EntityList()->NextEnt(pEntity) )
 	{
 		if (pEntity && !pEntity->IsDormant() )
 		{
@@ -1393,7 +1393,7 @@ void CServerGameDLL::PreClientUpdate( bool simulating )
 	if ( sv_showhitboxes.GetInt() == 0 )
 	{
 		// assume it's text
-		CBaseEntity *pEntity = NULL;
+		IServerEntity *pEntity = NULL;
 
 		while (1)
 		{
@@ -1468,7 +1468,8 @@ void CServerGameDLL::LevelShutdown( void )
 	CSoundEnt::ShutdownSoundEnt();
 
 	EntityList()->Clear();
-
+	CBaseEntity::m_nDebugPlayer = -1;
+	CBaseEntity::m_bInDebugSelect = false;
 	InvalidateQueryCache();
 
 	IGameSystem::LevelShutdownPostEntityAllSystems();
@@ -1923,7 +1924,7 @@ bool CServerGameDLL::ShouldHideServer( void )
 void CServerGameDLL::InvalidateMdlCache()
 {
 	CBaseAnimating *pAnimating;
-	for ( CBaseEntity *pEntity = EntityList()->FirstEnt(); pEntity != NULL; pEntity = EntityList()->NextEnt(pEntity) )
+	for ( IServerEntity *pEntity = EntityList()->FirstEnt(); pEntity != NULL; pEntity = EntityList()->NextEnt(pEntity) )
 	{
 		pAnimating = dynamic_cast<CBaseAnimating *>(pEntity);
 		if ( pAnimating )
@@ -2309,7 +2310,7 @@ void CServerGameDLL::InternalEmitCloseCaption(IRecipientFilter& filter, int enti
 			byteflags |= CLOSE_CAPTION_FROMPLAYER;
 		}
 
-		CBaseEntity* pActor = EntityList()->GetBaseEntity(entindex);
+		IServerEntity* pActor = EntityList()->GetBaseEntity(entindex);
 		if (pActor)
 		{
 			char const* pszActorModel = STRING(pActor->GetEngineObject()->GetModelName());
@@ -2380,13 +2381,7 @@ void CServerGameDLL::InternalEmitCloseCaption(IRecipientFilter& filter, int enti
 	}
 
 	bool fromplayer = false;
-	CBaseEntity* ent = NULL;
-#ifdef GAME_DLL
-	ent = EntityList()->GetBaseEntity(entindex);
-#endif // GAME_DLL
-#ifdef CLIENT_DLL
-	ent = CBaseEntity::Instance(entindex);
-#endif // CLIENT_DLL
+	IServerEntity* ent = EntityList()->GetBaseEntity(entindex);
 	if (ent)
 	{
 		while (ent)
@@ -2413,13 +2408,7 @@ void CServerGameDLL::InternalEmitCloseCaption(IRecipientFilter& filter, int enti
 void CServerGameDLL::EmitCloseCaption(IRecipientFilter& filter, int entindex, char const* token, CUtlVector< Vector >& soundorigin, float duration, bool warnifmissing /*= false*/)// CBaseEntity::
 {
 	bool fromplayer = false;
-	CBaseEntity* ent = NULL;
-#ifdef GAME_DLL
-	ent = EntityList()->GetBaseEntity(entindex);
-#endif // GAME_DLL
-#ifdef CLIENT_DLL
-	ent = CBaseEntity::Instance(entindex);
-#endif // CLIENT_DLL
+	IServerEntity* ent = EntityList()->GetBaseEntity(entindex);
 	while (ent)
 	{
 		if (ent->IsPlayer())
@@ -2755,8 +2744,8 @@ void CServerGameEnts::SetDebugEdictBase(IServerEntity *base)
 //-----------------------------------------------------------------------------
 void CServerGameEnts::MarkEntitiesAsTouching( IServerEntity *e1, IServerEntity *e2 )
 {
-	CBaseEntity *entity = e1->GetBaseEntity();
-	CBaseEntity *entityTouched = e2->GetBaseEntity();
+	CBaseEntity *entity = (CBaseEntity*)e1;
+	CBaseEntity *entityTouched = (CBaseEntity*)e2;
 	if ( entity && entityTouched )
 	{
 		// HACKHACK: UNDONE: Pass in the trace here??!?!?
@@ -2815,7 +2804,7 @@ void CServerGameEnts::CheckTransmit( CCheckTransmitInfo *pInfo, const unsigned s
 	// optimization which would be nice to keep.
 
 	// get recipient player's skybox:
-	CBaseEntity *pRecipientEntity = EntityList()->GetBaseEntity( pInfo->m_pClientEnt );
+	IServerEntity *pRecipientEntity = EntityList()->GetBaseEntity( pInfo->m_pClientEnt );
 
 	Assert( pRecipientEntity && pRecipientEntity->IsPlayer() );
 	if ( !pRecipientEntity )
@@ -2863,7 +2852,7 @@ void CServerGameEnts::CheckTransmit( CCheckTransmitInfo *pInfo, const unsigned s
 					pInfo->m_pTransmitAlways->Set( iEdict );
 				}
 #endif	
-				CBaseEntity *pEnt = EntityList()->GetBaseEntity(iEdict);
+				IServerEntity *pEnt = EntityList()->GetBaseEntity(iEdict);
 				if ( !pEnt )
 					break;
 
@@ -2963,7 +2952,7 @@ void CServerGameEnts::CheckTransmit( CCheckTransmitInfo *pInfo, const unsigned s
 			if ( checkFlags == FL_EDICT_FULLCHECK )
 			{
 				// do a full ShouldTransmit() check, may return FL_EDICT_CHECKPVS
-				CBaseEntity *pCheckEntity = check->GetOuter()->GetBaseEntity();
+				CBaseEntity *pCheckEntity = (CBaseEntity*)check->GetOuter();
 				nFlags = pCheckEntity->ShouldTransmit( pInfo );
 				Assert( !(nFlags & FL_EDICT_FULLCHECK) );
 				if ( nFlags & FL_EDICT_ALWAYS )
@@ -3035,7 +3024,7 @@ void CServerGameClients::ClientActive( int pEdict, bool bLoadGame )
 	if ( gpGlobals->eLoadType != MapLoad_LoadGame )
 	{
 		// notify all entities that the player is now in the game
-		for ( CBaseEntity *pEntity = EntityList()->FirstEnt(); pEntity != NULL; pEntity = EntityList()->NextEnt(pEntity) )
+		for ( IServerEntity *pEntity = EntityList()->FirstEnt(); pEntity != NULL; pEntity = EntityList()->NextEnt(pEntity) )
 		{
 			pEntity->PostClientActive();
 		}
@@ -3429,7 +3418,7 @@ float CServerGameClients::ProcessUsercmds( int player, bf_read *buf, int numcmds
 	Assert( ( totalcmds - numcmds ) >= 0 );
 
 	CBasePlayer *pPlayer = NULL;
-	CBaseEntity *pEnt = EntityList()->GetBaseEntity(player);
+	IServerEntity *pEnt = EntityList()->GetBaseEntity(player);
 	if ( pEnt && pEnt->IsPlayer() )
 	{
 		pPlayer = static_cast< CBasePlayer * >( pEnt );
@@ -3548,7 +3537,7 @@ void CServerGameClients::GetBugReportInfo( char *buf, int buflen )
 
 	if ( gpGlobals->maxClients == 1 )
 	{
-		CBaseEntity *ent = EntityList()->FindPickerEntity(ToBasePlayer(EntityList()->GetPlayerByIndex(1)) );
+		IServerEntity *ent = EntityList()->FindPickerEntity(ToBasePlayer(EntityList()->GetPlayerByIndex(1)) );
 		if ( ent )
 		{
 			Q_snprintf( buf, buflen, "Picker %i/%s - ent %s model %s\n",

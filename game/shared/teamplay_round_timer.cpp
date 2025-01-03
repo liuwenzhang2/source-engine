@@ -1407,7 +1407,7 @@ void CTeamRoundTimer::SetActiveTimer( CTeamRoundTimer *pNewlyActive )
 	CBaseEntity *pChosenTimer = pNewlyActive;	
 
 	// Ensure all other timers are off.
-	CBaseEntity *pEntity = NULL;
+	IServerEntity *pEntity = NULL;
 	while ((pEntity = EntityList()->FindEntityByClassname( pEntity, "team_round_timer" )) != NULL)
 	{
 		if ( pEntity == pNewlyActive )

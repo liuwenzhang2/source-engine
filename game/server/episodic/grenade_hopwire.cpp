@@ -189,7 +189,7 @@ bool CGravityVortexController::KillNPCInRange( CBaseEntity *pVictim, IPhysicsObj
 //-----------------------------------------------------------------------------
 void CGravityVortexController::CreateDenseBall( void )
 {
-	CBaseEntity *pBall = (CBaseEntity*)EntityList()->CreateEntityByName( "prop_physics" );
+	IServerEntity *pBall = EntityList()->CreateEntityByName( "prop_physics" );
 	
 	pBall->SetModel( DENSE_BALL_MODEL );
 	pBall->GetEngineObject()->SetAbsOrigin(GetEngineObject()->GetAbsOrigin() );

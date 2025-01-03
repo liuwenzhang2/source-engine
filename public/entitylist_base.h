@@ -1168,7 +1168,7 @@ class CEntityFactory : public IEntityFactory
 				Error("Must be destroy by IEntityFactory!");
 			}
 		}
-		IEntityFactory* GetEntityFactory() { 
+		IEntityFactory* GetEntityFactory() const { 
 			return m_pEntityFactory; 
 		}
 
@@ -1666,8 +1666,8 @@ inline Vector UTIL_YawToVector(float yaw)
 class EntityMatrix : public VMatrix
 {
 public:
-	void InitFromEntity(CBaseEntity* pEntity, int iAttachment = 0);
-	void InitFromEntityLocal(CBaseEntity* entity);
+	void InitFromEntity(IServerEntity* pEntity, int iAttachment = 0);
+	void InitFromEntityLocal(IServerEntity* entity);
 
 	inline Vector LocalToWorld(const Vector& vVec) const
 	{

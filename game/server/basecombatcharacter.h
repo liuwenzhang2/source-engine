@@ -140,7 +140,7 @@ public:
 	virtual	bool		FVisibleThroughPortal( const IEnginePortalServer *pPortal, CBaseEntity *pEntity, int traceMask = MASK_BLOCKLOS, CBaseEntity **ppBlocker = NULL );
 #endif
 
-	virtual bool		FInViewCone( CBaseEntity *pEntity );
+	virtual bool		FInViewCone( IServerEntity *pEntity );
 	virtual bool		FInViewCone( const Vector &vecSpot );
 
 #ifdef PORTAL
@@ -310,6 +310,7 @@ public:
 	virtual CBaseEntity		*CheckTraceHullAttack( float flDist, const Vector &mins, const Vector &maxs, int iDamage, int iDmgType, float forceScale = 1.0f, bool bDamageAnyNPC = false );
 	virtual CBaseEntity		*CheckTraceHullAttack( const Vector &vStart, const Vector &vEnd, const Vector &mins, const Vector &maxs, int iDamage, int iDmgType, float flForceScale = 1.0f, bool bDamageAnyNPC = false );
 
+	bool					IsCombatCharacter() const { return true; }
 	virtual CBaseCombatCharacter *MyCombatCharacterPointer( void ) { return this; }
 
 	// VPHYSICS

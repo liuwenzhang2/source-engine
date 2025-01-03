@@ -415,12 +415,12 @@ void CPropTelescopicArm::AimAt( Vector vTarget )
 
 void CPropTelescopicArm::SetTarget( const char *pchTargetName )
 {
-	CBaseEntity *pTarget = EntityList()->FindEntityByName( NULL, pchTargetName, NULL, NULL );
+	IServerEntity *pTarget = EntityList()->FindEntityByName( NULL, pchTargetName, NULL, NULL );
 
 	//if ( pTarget == NULL )
 	//	pTarget = EntityList()->GetPlayerByIndex( 1 );
 
-	return SetTarget( pTarget );
+	return SetTarget((CBaseEntity*)pTarget );
 }
 
 void CPropTelescopicArm::SetTarget( CBaseEntity *pTarget )

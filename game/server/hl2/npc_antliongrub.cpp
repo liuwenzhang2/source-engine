@@ -290,15 +290,15 @@ void CAntlionGrub::Event_Killed( const CTakeDamageInfo &info )
 	// Fire our output only if the player is the one that killed us
 	if ( info.GetAttacker() && info.GetAttacker()->IsPlayer() )
 	{
-		m_OnDeathByPlayer.FireOutput( info.GetAttacker(), info.GetAttacker() );
+		m_OnDeathByPlayer.FireOutput((IServerEntity*)info.GetAttacker(), (IServerEntity*)info.GetAttacker() );
 	}
 
-	m_OnDeath.FireOutput( info.GetAttacker(), info.GetAttacker() );
+	m_OnDeath.FireOutput((IServerEntity*)info.GetAttacker(), (IServerEntity*)info.GetAttacker() );
 	SendOnKilledGameEvent( info );
 
 	// Crush and crowbar damage hurt us more than others
 	bool bSquashed = ( info.GetDamageType() & (DMG_CRUSH|DMG_CLUB)) ? true : false;
-	Squash( info.GetAttacker(), false, bSquashed );
+	Squash((CBaseEntity*)info.GetAttacker(), false, bSquashed );
 
 	m_takedamage = DAMAGE_NO;
 
@@ -675,7 +675,7 @@ void CAntlionGrub::GrubTouch( IServerEntity *pOther )
 	IPhysicsObject *pPhysOther = pOther->GetEngineObject()->VPhysicsGetObject(); // bool bThrown = ( pTarget->VPhysicsGetObject()->GetGameFlags() & FVPHYSICS_WAS_THROWN ) != 0;
 	if ( pOther->IsPlayer() || FClassnameIs(pOther,"npc_vortigaunt") || ( pPhysOther && (pPhysOther->GetGameFlags() & FVPHYSICS_WAS_THROWN )) )
 	{
-		m_OnAgitated.FireOutput( (CBaseEntity*)pOther, (CBaseEntity*)pOther );
+		m_OnAgitated.FireOutput( pOther, pOther );
 		Squash((CBaseEntity*)pOther, true, true );
 	}
 }
@@ -709,7 +709,7 @@ void CAntlionGrub::Precache( void )
 //-----------------------------------------------------------------------------
 void CAntlionGrub::InputSquash( inputdata_t &data )
 {
-	Squash( data.pActivator, true, true );
+	Squash((CBaseEntity*)data.pActivator, true, true );
 }
 
 //-----------------------------------------------------------------------------
@@ -976,7 +976,7 @@ void CGrubNugget::VPhysicsCollision( int index, gamevcollisionevent_t *pEvent )
 	float damage = CalculateDefaultPhysicsDamage( index, pEvent, 1.0f, true, damageType );
 	if ( damage > 5.0f )
 	{
-		CBaseEntity *pHitEntity = pEvent->pEntities[!index];
+		IServerEntity *pHitEntity = pEvent->pEntities[!index];
 		if ( pHitEntity == NULL )
 		{
 			// hit world

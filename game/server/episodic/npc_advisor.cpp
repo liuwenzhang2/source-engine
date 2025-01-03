@@ -440,9 +440,9 @@ void CNPC_Advisor::Activate()
 {
 	BaseClass::Activate();
 	
-	m_hLevitateGoal1  = EntityList()->FindEntityGeneric( NULL, STRING( m_iszLevitateGoal1 ),  this );
-	m_hLevitateGoal2  = EntityList()->FindEntityGeneric( NULL, STRING( m_iszLevitateGoal2 ),  this );
-	m_hLevitationArea = EntityList()->FindEntityGeneric( NULL, STRING( m_iszLevitationArea ), this );
+	m_hLevitateGoal1  = (CBaseEntity*)EntityList()->FindEntityGeneric( NULL, STRING( m_iszLevitateGoal1 ),  this );
+	m_hLevitateGoal2  = (CBaseEntity*)EntityList()->FindEntityGeneric( NULL, STRING( m_iszLevitateGoal2 ),  this );
+	m_hLevitationArea = (CBaseEntity*)EntityList()->FindEntityGeneric( NULL, STRING( m_iszLevitationArea ), this );
 
 	m_levitateCallback.m_Advisor = this;
 
@@ -1479,7 +1479,7 @@ int	CNPC_Advisor::OnTakeDamage( const CTakeDamageInfo &info )
 	{
 		// only fire once per frame
 
-		m_OnHealthIsNow.Set( GetHealth(), newInfo.GetAttacker(), this);
+		m_OnHealthIsNow.Set( GetHealth(), (CBaseEntity*)newInfo.GetAttacker(), this);
 	}
 
 	return retval;

@@ -101,7 +101,7 @@ void CScriptIntro::Spawn( void )
 	m_iQueuedBlendMode = -1;
 	m_iQueuedNextBlendMode = -1;
 	GetEngineObject()->AddSolidFlags( FSOLID_NOT_SOLID );
-	SetSize( -Vector(5,5,5), Vector(5,5,5) );
+	GetEngineObject()->SetSize( -Vector(5,5,5), Vector(5,5,5) );
 	m_bActive = false;
 	m_iNextFOV = 0;
 	m_iFOV = 0;
@@ -147,14 +147,14 @@ void CScriptIntro::InputSetCameraViewEntity( inputdata_t &inputdata )
 	if ( iszEntityName == NULL_STRING )
 		return;
 
-	CBaseEntity *pEntity = EntityList()->FindEntityByName( NULL, iszEntityName, NULL, inputdata.pActivator, inputdata.pCaller );
+	IServerEntity *pEntity = EntityList()->FindEntityByName( NULL, iszEntityName, NULL, inputdata.pActivator, inputdata.pCaller );
 	if ( !pEntity )
 	{
 		Warning("script_intro %s couldn't find SetCameraViewEntity named %s\n", STRING(GetEntityName()), STRING(iszEntityName) );
 		return;
 	}
 
-	m_hCameraEntity = pEntity;
+	m_hCameraEntity = (CBaseEntity*)pEntity;
 	m_vecCameraView = pEntity->GetEngineObject()->GetAbsOrigin();
 	m_vecCameraViewAngles = pEntity->GetEngineObject()->GetAbsAngles();
 }

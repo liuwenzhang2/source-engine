@@ -238,7 +238,7 @@ void CRpgRocket::IgniteThink( void )
 //-----------------------------------------------------------------------------
 void CRpgRocket::SeekThink( void )
 {
-	CBaseEntity *pOther = NULL;
+	IServerEntity *pOther = NULL;
 	Vector vecTarget;
 	Vector vecFwd;
 	Vector vecDir;

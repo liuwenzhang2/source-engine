@@ -509,7 +509,7 @@ bool CBaseCombatCharacter::FVisibleThroughPortal( const IEnginePortalServer *pPo
 // the caller's forward view cone. The dot product is performed
 // in 2d, making the view cone infinitely tall. 
 //=========================================================
-bool CBaseCombatCharacter::FInViewCone( CBaseEntity *pEntity )
+bool CBaseCombatCharacter::FInViewCone( IServerEntity *pEntity )
 {
 	return FInViewCone( pEntity->WorldSpaceCenter() );
 }
@@ -1162,7 +1162,7 @@ bool CTraceFilterMelee::ShouldHitEntity( IHandleEntity *pHandleEntity, int conte
 		CTakeDamageInfo info = (*m_dmgInfo);				
 		CalculateMeleeDamageForce( &info, attackDir, info.GetAttacker()->WorldSpaceCenter(), m_flForceScale );
 
-		CBaseCombatCharacter *pBCC = info.GetAttacker()->MyCombatCharacterPointer();
+		CBaseCombatCharacter *pBCC = ((CBaseEntity*)info.GetAttacker())->MyCombatCharacterPointer();
 		CBaseCombatCharacter *pVictimBCC = pEntity->MyCombatCharacterPointer();
 
 		// Only do these comparisons between NPCs
@@ -1177,7 +1177,7 @@ bool CTraceFilterMelee::ShouldHitEntity( IHandleEntity *pHandleEntity, int conte
 				}
 				
 				// Put a combat sound in
-				CSoundEnt::InsertSound( SOUND_COMBAT, info.GetDamagePosition(), 200, 0.2f, info.GetAttacker() );
+				CSoundEnt::InsertSound( SOUND_COMBAT, info.GetDamagePosition(), 200, 0.2f, (CBaseEntity*)info.GetAttacker() );
 
 				m_pHit = pEntity;
 				return true;
@@ -1387,10 +1387,10 @@ Vector CBaseCombatCharacter::CalcDamageForceVector( const CTakeDamageInfo &info 
 		return info.GetDamageForce();
 	}
 
-	CBaseEntity *pForce = info.GetInflictor();
+	CBaseEntity *pForce = (CBaseEntity*)info.GetInflictor();
 	if ( !pForce )
 	{
-		pForce = info.GetAttacker();
+		pForce = (CBaseEntity*)info.GetAttacker();
 	}
 
 	if ( pForce )
@@ -1647,8 +1647,8 @@ void CBaseCombatCharacter::Event_Killed( const CTakeDamageInfo &info )
 	// Tell my killer that he got me!
 	if( info.GetAttacker() )
 	{
-		info.GetAttacker()->Event_KilledOther(this, info);
-		g_EventQueue.AddEvent( info.GetAttacker(), "KilledNPC", 0.3, this, this );
+		((IServerEntity*)info.GetAttacker())->Event_KilledOther(this, info);
+		g_EventQueue.AddEvent((IServerEntity*)info.GetAttacker(), "KilledNPC", 0.3, this, this );
 	}
 	SendOnKilledGameEvent( info );
 
@@ -1943,7 +1943,7 @@ void CBaseCombatCharacter::Weapon_Drop( CBaseCombatWeapon *pWeapon, const Vector
 			{
 				// Drop enough ammo to kill 2 of me.
 				// Figure out how much damage one piece of this type of ammo does to this type of enemy.
-				float flAmmoDamage = g_pGameRules->GetAmmoDamage( EntityList()->GetPlayerByIndex(1), this, pWeapon->GetPrimaryAmmoType() );
+				float flAmmoDamage = g_pGameRules->GetAmmoDamage((CBaseEntity*)EntityList()->GetPlayerByIndex(1), this, pWeapon->GetPrimaryAmmoType() );
 				pWeapon->m_iClip1 = (GetMaxHealth() / flAmmoDamage) * 2;
 			}
 		}
@@ -3115,7 +3115,7 @@ ConVar	phys_upimpactforcescale( "phys_upimpactforcescale", "0.375" );
 void CBaseCombatCharacter::VPhysicsShadowCollision( int index, gamevcollisionevent_t *pEvent )
 {
 	int otherIndex = !index;
-	CBaseEntity *pOther = pEvent->pEntities[otherIndex];
+	CBaseEntity *pOther = (CBaseEntity*)pEvent->pEntities[otherIndex];
 	IPhysicsObject *pOtherPhysics = pEvent->pObjects[otherIndex];
 	if ( !pOther )
 		return;
@@ -3227,7 +3227,7 @@ void RadiusDamage( const CTakeDamageInfo &info, const Vector &vecSrc, float flRa
 		// be less than 128 units.
 		float soundRadius = MAX( 128.0f, flRadius * 1.5 );
 
-		CSoundEnt::InsertSound( SOUND_COMBAT | SOUND_CONTEXT_EXPLOSION, vecSrc, soundRadius, 0.25, info.GetInflictor() );
+		CSoundEnt::InsertSound( SOUND_COMBAT | SOUND_CONTEXT_EXPLOSION, vecSrc, soundRadius, 0.25, (CBaseEntity*)info.GetInflictor() );
 	}
 }
 
@@ -3356,7 +3356,7 @@ bool CBaseCombatCharacter::ShouldShootMissTarget( CBaseCombatCharacter *pAttacke
 //-----------------------------------------------------------------------------
 void CBaseCombatCharacter::InputKilledNPC( inputdata_t &inputdata )
 {
-	OnKilledNPC( inputdata.pActivator ? inputdata.pActivator->MyCombatCharacterPointer() : NULL );
+	OnKilledNPC( inputdata.pActivator ? ((CBaseEntity*)inputdata.pActivator)->MyCombatCharacterPointer() : NULL );
 }
 
 //-----------------------------------------------------------------------------

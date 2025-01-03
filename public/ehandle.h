@@ -22,9 +22,4 @@
 #include "networkvar.h"
 //#include "entitylist_base.h"
 
-#ifdef GAME_DLL
-class CBaseEntity;
-typedef CHandle<CBaseEntity> EHANDLE;
-#endif // GAME_DLL
-
 #endif // EHANDLE_H

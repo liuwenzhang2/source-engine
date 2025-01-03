@@ -170,7 +170,7 @@ public:
 	// from CBasePlayer
 	void			SetupVisibility( CBaseEntity *pViewEntity, unsigned char *pvs, int pvssize );
 
-	CBaseEntity*	EntSelectSpawnPoint();
+	IServerEntity*	EntSelectSpawnPoint();
 
 	void			ChangeTeam( int iTeamNum );
 
@@ -423,9 +423,9 @@ public:
 #endif
 
 private:
-	bool SelectSpawnSpot( const char *pEntClassName, CBaseEntity* &pSpot );
+	//bool SelectSpawnSpot( const char *pEntClassName, IServerEntity* &pSpot );
 
-	CBaseEntity *SelectSpawnSpot( CUtlVector<EHANDLE> *pSpawnPoints, int &iLastSpawnIndex );
+	IServerEntity *SelectSpawnSpot( CUtlVector<EHANDLE> *pSpawnPoints, int &iLastSpawnIndex );
 
 	// Copyed from EyeAngles() so we can send it to the client.
 	CNetworkQAngle( m_angEyeAngles );

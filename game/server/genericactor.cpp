@@ -447,7 +447,7 @@ void CFlextalkActor::ProcessSceneEvents( void )
 		}
 		else if (flex_talk.GetInt() == -4)
 		{
-			AddLookTarget( EntityList()->GetPlayerByIndex( 1 ), 0.5, flex_looktime.GetFloat()  );
+			AddLookTarget((CBaseEntity*)EntityList()->GetPlayerByIndex( 1 ), 0.5, flex_looktime.GetFloat()  );
 			flex_talk.SetValue( "0" );
 		}
 		else if (flex_talk.GetInt() == -5)

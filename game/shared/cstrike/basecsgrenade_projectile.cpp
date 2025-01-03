@@ -118,7 +118,7 @@ END_NETWORK_TABLE()
 		GetEngineObject()->SetSolid( SOLID_BBOX );	// So it will collide with physics props!
 
 		// smaller, cube bounding box so we rest on the ground
-		SetSize( Vector ( -2, -2, -2 ), Vector ( 2, 2, 2 ) );
+		GetEngineObject()->SetSize( Vector ( -2, -2, -2 ), Vector ( 2, 2, 2 ) );
 	}
 
 	void CBaseCSGrenadeProjectile::DangerSoundThink( void )
@@ -157,7 +157,7 @@ END_NETWORK_TABLE()
 		float flSurfaceElasticity = 1.0;
 
 		//Don't bounce off of players with perfect elasticity
-		if( trace.m_pEnt && ((CBaseEntity*)trace.m_pEnt)->IsPlayer() )
+		if( trace.m_pEnt && trace.m_pEnt->IsPlayer() )
 		{
 			flSurfaceElasticity = 0.3;
 		}
@@ -184,7 +184,7 @@ END_NETWORK_TABLE()
 
 			ApplyMultiDamage();
 
-			if(((CBaseEntity*)trace.m_pEnt)->m_iHealth <= 0 )
+			if(trace.m_pEnt->GetHealth() <= 0 )
 			{
 				// slow our flight a little bit
 				Vector vel = GetEngineObject()->GetAbsVelocity();

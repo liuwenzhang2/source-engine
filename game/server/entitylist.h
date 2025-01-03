@@ -24,7 +24,7 @@
 
 typedef CHandle<IServerEntity> ENTHANDLE;
 
-//class CBaseEntity;
+//class IServerEntity;
 // We can only ever move 512 entities across a transition
 #define MAX_ENTITY 512
 #define MAX_ENTITY_BYTE_COUNT	(NUM_ENT_ENTRIES >> 3)
@@ -38,7 +38,7 @@ inline string_t AllocPooledStringInEntityList(const char* pStr) {
 	return serverGameDLL->AllocPooledString(pStr);
 }
 
-class CAimTargetManager : public IEntityListener<CBaseEntity>
+class CAimTargetManager : public IEntityListener<IServerEntity>
 {
 public:
 	// Called by CEntityListSystem
@@ -46,17 +46,17 @@ public:
 	void LevelShutdownPostEntity();
 	void Clear();
 	void ForceRepopulateList();
-	bool ShouldAddEntity(CBaseEntity* pEntity);
+	bool ShouldAddEntity(IServerEntity* pEntity);
 	// IEntityListener
-	virtual void OnEntityCreated(CBaseEntity* pEntity);
-	virtual void OnEntityDeleted(CBaseEntity* pEntity);
-	void AddEntity(CBaseEntity* pEntity);
-	void RemoveEntity(CBaseEntity* pEntity);
+	virtual void OnEntityCreated(IServerEntity* pEntity);
+	virtual void OnEntityDeleted(IServerEntity* pEntity);
+	void AddEntity(IServerEntity* pEntity);
+	void RemoveEntity(IServerEntity* pEntity);
 	int ListCount();
-	int ListCopy(CBaseEntity* pList[], int listMax);
+	int ListCopy(IServerEntity* pList[], int listMax);
 
 private:
-	CUtlVector<CBaseEntity*>	m_targetList;
+	CUtlVector<IServerEntity*>	m_targetList;
 };
 
 // Manages a list of all entities currently doing game simulation or thinking
@@ -70,19 +70,19 @@ struct simthinkentry_t
 	int				nextThinkTick;
 };
 
-class CSimThinkManager : public IEntityListener<CBaseEntity>
+class CSimThinkManager : public IEntityListener<IServerEntity>
 {
 public:
 	CSimThinkManager();
 	void Clear();
 	void LevelInitPreEntity();
 	void LevelShutdownPostEntity();
-	void OnEntityCreated(CBaseEntity* pEntity);
-	void OnEntityDeleted(CBaseEntity* pEntity);
+	void OnEntityCreated(IServerEntity* pEntity);
+	void OnEntityDeleted(IServerEntity* pEntity);
 	void RemoveEntinfoIndex(int index);
 	int ListCount();
-	int ListCopy(CBaseEntity* pList[], int listMax);
-	void EntityChanged(CBaseEntity* pEntity);
+	int ListCopy(IServerEntity* pList[], int listMax);
+	void EntityChanged(IServerEntity* pEntity);
 
 private:
 	unsigned short m_entinfoIndex[NUM_ENT_ENTRIES];
@@ -126,11 +126,11 @@ public:
 
 	CGrabControllerInternal(void);
 	~CGrabControllerInternal(void);
-	void AttachEntity(CBaseEntity* pPlayer, CBaseEntity* pEntity, IPhysicsObject* pPhys, bool bIsMegaPhysCannon, const Vector& vGrabPosition, bool bUseGrabPosition);
+	void AttachEntity(IServerEntity* pPlayer, IServerEntity* pEntity, IPhysicsObject* pPhys, bool bIsMegaPhysCannon, const Vector& vGrabPosition, bool bUseGrabPosition);
 	void DetachEntity(bool bClearVelocity);
 	void OnRestore();
 
-	bool UpdateObject(CBaseEntity* pPlayer, float flError);
+	bool UpdateObject(IServerEntity* pPlayer, float flError);
 
 	void SetTargetPosition(const Vector& target, const QAngle& targetOrientation);
 	void GetTargetPosition(Vector* target, QAngle* targetOrientation);
@@ -138,10 +138,10 @@ public:
 	float GetLoadWeight(void) const { return m_flLoadWeight; }
 	void SetAngleAlignment(float alignAngleCosine) { m_angleAlignment = alignAngleCosine; }
 	void SetIgnorePitch(bool bIgnore) { m_bIgnoreRelativePitch = bIgnore; }
-	QAngle TransformAnglesToPlayerSpace(const QAngle& anglesIn, CBaseEntity* pPlayer);
-	QAngle TransformAnglesFromPlayerSpace(const QAngle& anglesIn, CBaseEntity* pPlayer);
+	QAngle TransformAnglesToPlayerSpace(const QAngle& anglesIn, IServerEntity* pPlayer);
+	QAngle TransformAnglesFromPlayerSpace(const QAngle& anglesIn, IServerEntity* pPlayer);
 
-	CBaseEntity* GetAttached() { return (CBaseEntity*)m_attachedEntity; }
+	IServerEntity* GetAttached() { return (IServerEntity*)m_attachedEntity; }
 	const QAngle& GetAttachedAnglesPlayerSpace() { return m_attachedAnglesPlayerSpace; }
 	void SetAttachedAnglesPlayerSpace(const QAngle& attachedAnglesPlayerSpace) { m_attachedAnglesPlayerSpace = attachedAnglesPlayerSpace; }
 	const Vector& GetAttachedPositionObjectSpace() { return m_attachedPositionObjectSpace; }
@@ -151,14 +151,14 @@ public:
 	float GetSavedMass(IPhysicsObject* pObject);
 	void GetSavedParamsForCarriedPhysObject(IPhysicsObject* pObject, float* pSavedMassOut, float* pSavedRotationalDampingOut);
 
-	bool IsObjectAllowedOverhead(CBaseEntity* pEntity);
+	bool IsObjectAllowedOverhead(IServerEntity* pEntity);
 
 	//set when a held entity is penetrating another through a portal. Needed for special fixes
-	void SetPortalPenetratingEntity(CBaseEntity* pPenetrated);
+	void SetPortalPenetratingEntity(IServerEntity* pPenetrated);
 
 private:
 	// Compute the max speed for an attached object
-	void ComputeMaxSpeed(CBaseEntity* pEntity, IPhysicsObject* pPhysics);
+	void ComputeMaxSpeed(IServerEntity* pEntity, IPhysicsObject* pPhysics);
 
 	game_shadowcontrol_params_t	m_shadow;
 	float			m_timeToArrive;
@@ -172,7 +172,7 @@ private:
 	float			m_flLoadWeight;
 	float			m_savedRotDamping[VPHYSICS_MAX_OBJECT_LIST_COUNT];
 	float			m_savedMass[VPHYSICS_MAX_OBJECT_LIST_COUNT];
-	EHANDLE			m_attachedEntity;
+	ENTHANDLE			m_attachedEntity;
 	QAngle			m_vecPreferredCarryAngles;
 	bool			m_bHasPreferredCarryAngles;
 	float			m_flDistanceOffset;
@@ -183,12 +183,12 @@ private:
 	IPhysicsMotionController* m_controller;
 
 	// NVNT player controlling this grab controller
-	CBaseEntity*	m_pControllingPlayer;
+	IServerEntity*	m_pControllingPlayer;
 
 	bool			m_bAllowObjectOverhead; // Can the player hold this object directly overhead? (Default is NO)
 
 	//set when a held entity is penetrating another through a portal. Needed for special fixes
-	EHANDLE			m_PenetratedEntity;
+	ENTHANDLE			m_PenetratedEntity;
 	int				m_frameCount;
 };
 
@@ -309,7 +309,7 @@ public:
 		m_pOuter = NULL;
 	}
 
-	virtual void Init(CBaseEntity* pOuter) {
+	virtual void Init(IServerEntity* pOuter) {
 		m_pOuter = pOuter;
 		m_PVSInfo.m_nClusterCount = 0;
 		m_bPVSInfoDirty = true;
@@ -325,7 +325,7 @@ public:
 		return m_pOuter;
 	}
 
-	CBaseEntity* GetOuter() {
+	IServerEntity* GetOuter() {
 		return m_pOuter;
 	}
 
@@ -409,7 +409,7 @@ public:
 	// are relative to the attachment on this entity. If iAttachment == -1, it'll preserve the
 	// current m_iParentAttachment.
 	void SetParent(IEngineObjectServer* pNewParent, int iAttachment = -1);
-	// FIXME: Make hierarchy a member of CBaseEntity
+	// FIXME: Make hierarchy a member of IServerEntity
 	// or a contained private class...
 	void UnlinkChild(IEngineObjectServer* pChild);
 	void LinkChild(IEngineObjectServer* pChild);
@@ -429,7 +429,7 @@ public:
 	bool IsInPVS(const CCheckTransmitInfo* pInfo);
 
 	// This version doesn't do the area check
-	bool IsInPVS(const CBaseEntity* pRecipient, const void* pvs, int pvssize);
+	bool IsInPVS(const IServerEntity* pRecipient, const void* pvs, int pvssize);
 
 	// Recomputes PVS information
 	void RecomputePVSInformation();
@@ -744,7 +744,7 @@ public:
 
 	const model_t* GetModel(void) const;
 	void SetModelPointer(const model_t* pModel);
-	IStudioHdr* GetModelPtr(void);
+	IStudioHdr* GetModelPtr(void) const;
 	void InvalidateMdlCache();
 	void	ResetClientsideFrame(void);
 	// Cycle access
@@ -961,7 +961,7 @@ private:
 
 private:
 
-	friend class CBaseEntity;
+	friend class IServerEntity;
 	friend class CCollisionProperty;
 
 	IServerEntityList* const m_pServerEntityList = NULL;
@@ -973,11 +973,11 @@ private:
 	QAngle			m_angAbsRotation = QAngle(0, 0, 0);
 	// Global velocity
 	Vector			m_vecAbsVelocity = Vector(0, 0, 0);
-	CBaseEntity*	m_pOuter = NULL;
+	IServerEntity*	m_pOuter = NULL;
 
 	// Our immediate parent in the movement hierarchy.
 	// FIXME: clarify m_pParent vs. m_pMoveParent
-	CNetworkHandle(CBaseEntity, m_hMoveParent);
+	CNetworkHandle(IServerEntity, m_hMoveParent);
 	// cached child list
 	CBaseHandle m_hMoveChild = NULL;
 	// generated from m_pMoveParent
@@ -1008,7 +1008,7 @@ private:
 	int		touchStamp;
 	int		m_fDataObjectTypes;
 
-	CNetworkHandle(CBaseEntity, m_hGroundEntity);
+	CNetworkHandle(IServerEntity, m_hGroundEntity);
 	float			m_flGroundChangeTime; // Time that the ground entity changed
 
 	string_t		m_ModelName;
@@ -1765,7 +1765,7 @@ inline void CEngineObjectInternal::SetSimulationTime(float st)
 //-----------------------------------------------------------------------------
 // Purpose: return a pointer to an updated studiomdl cache cache
 //-----------------------------------------------------------------------------
-inline IStudioHdr* CEngineObjectInternal::GetModelPtr(void)
+inline IStudioHdr* CEngineObjectInternal::GetModelPtr(void) const
 {
 	//if ( IsDynamicModelLoading() )
 	//	return NULL;
@@ -1777,7 +1777,7 @@ inline IStudioHdr* CEngineObjectInternal::GetModelPtr(void)
 #endif
 	if (!m_pStudioHdr && GetModel())
 	{
-		LockStudioHdr();
+		const_cast<CEngineObjectInternal*>(this)->LockStudioHdr();
 	}
 	return (m_pStudioHdr && m_pStudioHdr->IsValid()) ? m_pStudioHdr : NULL;
 }
@@ -1854,7 +1854,7 @@ public:
 	CEngineWorldInternal(IServerEntityList* pServerEntityList, int iForceEdictIndex, int iSerialNum);
 	~CEngineWorldInternal();
 
-	void Init(CBaseEntity* pOuter);
+	void Init(IServerEntity* pOuter);
 	bool IsWorld() { return true; }
 	CEngineWorldInternal* AsEngineWorld() { return this; }
 	const CEngineWorldInternal* AsEngineWorld() const { return this; }
@@ -1904,8 +1904,8 @@ private:
 	// Player Physics Shadow
 	int m_vphysicsCollisionState;
 	bool m_bPlayerIsInSimulator = false;
-	CNetworkHandle(CBaseEntity, m_hPortalEnvironment); //if the player is in a portal environment, this is the associated portal
-	CNetworkHandle(CBaseEntity, m_pHeldObjectPortal);	// networked entity handle
+	CNetworkHandle(IServerEntity, m_hPortalEnvironment); //if the player is in a portal environment, this is the associated portal
+	CNetworkHandle(IServerEntity, m_pHeldObjectPortal);	// networked entity handle
 	CNetworkVar(bool, m_bHeldObjectOnOppositeSideOfPortal);
 	bool m_bSilentDropAndPickup;
 
@@ -2035,7 +2035,7 @@ private:
 	//IPhysicsEnvironment* pPhysicsEnvironment = NULL;
 	CNetworkVar(bool, m_bActivated); //a portal can exist and not be active
 	CNetworkVar(bool, m_bIsPortal2); //For teleportation, this doesn't matter, but for drawing and moving, it matters
-	CNetworkHandle(CBaseEntity, m_hLinkedPortal);
+	CNetworkHandle(IServerEntity, m_hLinkedPortal);
 	bool				m_bSimulateVPhysics;
 	bool				m_bLocalDataIsReady; //this side of the portal is properly setup, no guarantees as to linkage to another portal
 	PS_InternalData_t m_InternalData;
@@ -2093,8 +2093,8 @@ public:
 	virtual int		VPhysicsGetObjectList(IPhysicsObject** pList, int listMax);
 
 	//what entity are we cloning?
-	void			SetClonedEntity(CBaseEntity* pEntToClone);
-	CBaseEntity*	GetClonedEntity(void);
+	void			SetClonedEntity(IServerEntity* pEntToClone);
+	IServerEntity*	GetClonedEntity(void);
 	void			SetCloneTransformationMatrix(const matrix3x4_t& matTransform);
 	void			SetOwnerEnvironment(IPhysicsEnvironment* pOwnerPhysEnvironment) { m_pOwnerPhysEnvironment = pOwnerPhysEnvironment; }
 	IPhysicsEnvironment* GetOwnerEnvironment(void) const { return m_pOwnerPhysEnvironment; }
@@ -2119,10 +2119,10 @@ public:
 	const CEngineObjectInternal* AsEngineObject() const { return this; }
 	CEngineShadowCloneInternal* GetNext() { return m_pNext; }
 
-	static CEngineShadowCloneInternal* CreateShadowClone(IPhysicsEnvironment* pInPhysicsEnvironment, EHANDLE hEntToClone, const char* szDebugMarker, const matrix3x4_t* pTransformationMatrix = NULL);
+	static CEngineShadowCloneInternal* CreateShadowClone(IPhysicsEnvironment* pInPhysicsEnvironment, ENTHANDLE hEntToClone, const char* szDebugMarker, const matrix3x4_t* pTransformationMatrix = NULL);
 	static void ReleaseShadowClone(CEngineShadowCloneInternal* pShadowClone);
 private:
-	EHANDLE			m_hClonedEntity; //the entity we're supposed to be cloning the physics of
+	ENTHANDLE			m_hClonedEntity; //the entity we're supposed to be cloning the physics of
 	VMatrix			m_matrixShadowTransform; //all cloned coordinates and angles will be run through this matrix before being applied
 	VMatrix			m_matrixShadowTransform_Inverse;
 
@@ -2348,12 +2348,12 @@ public:
 	CEngineRopeInternal(IServerEntityList* pServerEntityList, int iForceEdictIndex, int iSerialNum);
 	~CEngineRopeInternal();
 
-	CBaseEntity* GetStartPoint() { return m_hStartPoint; }
-	CBaseEntity* GetEndPoint() { return m_hEndPoint.Get(); }
+	IServerEntity* GetStartPoint() { return m_hStartPoint; }
+	IServerEntity* GetEndPoint() { return m_hEndPoint.Get(); }
 	int				GetEndAttachment() { return m_iStartAttachment; };
 
-	void			SetStartPoint(CBaseEntity* pStartPoint, int attachment = 0);
-	void			SetEndPoint(CBaseEntity* pEndPoint, int attachment = 0);
+	void			SetStartPoint(IServerEntity* pStartPoint, int attachment = 0);
+	void			SetEndPoint(IServerEntity* pEndPoint, int attachment = 0);
 
 	int GetRopeFlags() { return m_RopeFlags; }
 	void SetRopeFlags(int RopeFlags) {
@@ -2376,7 +2376,7 @@ public:
 	// Once-off length recalculation
 	void			RecalculateLength(void);
 	// These work just like the client-side versions.
-	bool			GetEndPointPos2(CBaseEntity* pEnt, int iAttachment, Vector& v);
+	bool			GetEndPointPos2(IServerEntity* pEnt, int iAttachment, Vector& v);
 	bool			GetEndPointPos(int iPt, Vector& v);
 	void			UpdateBBox(bool bForceRelink);
 	// This is normally called by Activate but if you create the rope at runtime,
@@ -2399,7 +2399,7 @@ public:
 	CEngineRopeInternal* AsEngineRope() { return this; }
 	const CEngineRopeInternal* AsEngineRope() const { return this; }
 private:
-	void			SetAttachmentPoint(CBaseHandle& hOutEnt, short& iOutAttachment, CBaseEntity* pEnt, int iAttachment);
+	void			SetAttachmentPoint(CBaseHandle& hOutEnt, short& iOutAttachment, IServerEntity* pEnt, int iAttachment);
 
 
 
@@ -2415,15 +2415,15 @@ private:
 	// Number of subdivisions in between segments.
 	CNetworkVar(int, m_Subdiv);
 
-	//EHANDLE		m_hNextLink;
+	//ENTHANDLE		m_hNextLink;
 
 	CNetworkVar(int, m_RopeLength);	// Rope length at startup, used to calculate tension.
 
 	CNetworkVar(int, m_fLockedPoints);
 	CNetworkVar(float, m_flScrollSpeed);
 
-	CNetworkHandle(CBaseEntity, m_hStartPoint);		// StartPoint/EndPoint are entities
-	CNetworkHandle(CBaseEntity, m_hEndPoint);
+	CNetworkHandle(IServerEntity, m_hStartPoint);		// StartPoint/EndPoint are entities
+	CNetworkHandle(IServerEntity, m_hEndPoint);
 	CNetworkVar(short, m_iStartAttachment);	// StartAttachment/EndAttachment are attachment points.
 	CNetworkVar(short, m_iEndAttachment);
 	// Used to detect changes.
@@ -2456,13 +2456,13 @@ abstract_class IEntitySaveUtils
 {
 public:
 	// Adds a level transition save dependency
-	virtual void AddLevelTransitionSaveDependency(CBaseEntity * pEntity1, CBaseEntity * pEntity2) = 0;
+	virtual void AddLevelTransitionSaveDependency(IServerEntity * pEntity1, IServerEntity * pEntity2) = 0;
 
 	// Gets the # of dependencies for a particular entity
-	virtual int GetEntityDependencyCount(CBaseEntity* pEntity) = 0;
+	virtual int GetEntityDependencyCount(IServerEntity* pEntity) = 0;
 
 	// Gets all dependencies for a particular entity
-	virtual int GetEntityDependencies(CBaseEntity* pEntity, int nCount, CBaseEntity** ppEntList) = 0;
+	virtual int GetEntityDependencies(IServerEntity* pEntity, int nCount, IServerEntity** ppEntList) = 0;
 };
 
 //-----------------------------------------------------------------------------
@@ -2476,22 +2476,22 @@ public:
 	void PostSave();
 
 	// Methods of IEntitySaveUtils
-	virtual void AddLevelTransitionSaveDependency(CBaseEntity* pEntity1, CBaseEntity* pEntity2);
-	virtual int GetEntityDependencyCount(CBaseEntity* pEntity);
-	virtual int GetEntityDependencies(CBaseEntity* pEntity, int nCount, CBaseEntity** ppEntList);
+	virtual void AddLevelTransitionSaveDependency(IServerEntity* pEntity1, IServerEntity* pEntity2);
+	virtual int GetEntityDependencyCount(IServerEntity* pEntity);
+	virtual int GetEntityDependencies(IServerEntity* pEntity, int nCount, IServerEntity** ppEntList);
 
 private:
 	IPhysicsObjectPairHash* m_pLevelAdjacencyDependencyHash;
 };
 
-extern bool ShouldRemoveThisRagdoll(CBaseEntity* pRagdoll);
+extern bool ShouldRemoveThisRagdoll(IServerEntity* pRagdoll);
 
 //-----------------------------------------------------------------------------
 // Purpose: Simple object for storing a list of objects
 //-----------------------------------------------------------------------------
 struct entitem_t
 {
-	EHANDLE hEnt;
+	ENTHANDLE hEnt;
 	struct entitem_t* pNext;
 
 	// uses pool memory
@@ -2523,7 +2523,7 @@ public:
 		m_pItemList = NULL;
 	}
 
-	void AddEntity(CBaseEntity* pEnt)
+	void AddEntity(IServerEntity* pEnt)
 	{
 		// check if it's already in the list; if not, add it
 		entitem_t* e = m_pItemList;
@@ -2555,7 +2555,7 @@ public:
 		m_iNumItems = 1;
 	}
 
-	void DeleteEntity(CBaseEntity* pEnt)
+	void DeleteEntity(IServerEntity* pEnt)
 	{
 		// find the entry in the list and delete it
 		entitem_t* prev = NULL, * e = m_pItemList;
@@ -2600,7 +2600,7 @@ struct vehiclescript_t
 
 struct damageevent_t
 {
-	CBaseEntity* pEntity;
+	IServerEntity* pEntity;
 	IPhysicsObject* pInflictorPhysics;
 	CTakeDamageInfo	info;
 	bool			bRestoreVelocity;
@@ -2627,8 +2627,8 @@ enum
 
 struct penetrateevent_t
 {
-	EHANDLE			hEntity0;
-	EHANDLE			hEntity1;
+	ENTHANDLE			hEntity0;
+	ENTHANDLE			hEntity1;
 	float			startTime;
 	float			timeStamp;
 	int				collisionState;
@@ -2638,7 +2638,7 @@ class CCollisionEvent : public IPhysicsCollisionEvent, public IPhysicsCollisionS
 {
 public:
 	CCollisionEvent();
-	friction_t* FindFriction(CBaseEntity* pObject);
+	friction_t* FindFriction(IServerEntity* pObject);
 	void ShutdownFriction(friction_t& friction);
 	void FrameUpdate();
 	void LevelShutdown(void);
@@ -2655,19 +2655,19 @@ public:
 	void ObjectEnterTrigger(IPhysicsObject* pTrigger, IPhysicsObject* pObject);
 	void ObjectLeaveTrigger(IPhysicsObject* pTrigger, IPhysicsObject* pObject);
 
-	bool GetTriggerEvent(triggerevent_t* pEvent, CBaseEntity* pTriggerEntity);
+	bool GetTriggerEvent(triggerevent_t* pEvent, IServerEntity* pTriggerEntity);
 	void BufferTouchEvents(bool enable) { m_bBufferTouchEvents = enable; }
-	virtual void AddDamageEvent(CBaseEntity* pEntity, const CTakeDamageInfo& info, IPhysicsObject* pInflictorPhysics, bool bRestoreVelocity, const Vector& savedVel, const AngularImpulse& savedAngVel);
+	virtual void AddDamageEvent(IServerEntity* pEntity, const CTakeDamageInfo& info, IPhysicsObject* pInflictorPhysics, bool bRestoreVelocity, const Vector& savedVel, const AngularImpulse& savedAngVel);
 	void AddImpulseEvent(IPhysicsObject* pPhysicsObject, const Vector& vecCenterForce, const AngularImpulse& vecCenterTorque);
 	void AddSetVelocityEvent(IPhysicsObject* pPhysicsObject, const Vector& vecVelocity);
-	void AddRemoveObject(CBaseEntity* pRemove);
+	void AddRemoveObject(IServerEntity* pRemove);
 	void FlushQueuedOperations();
 
 	// IPhysicsCollisionSolver
 	int		ShouldCollide(IPhysicsObject* pObj0, IPhysicsObject* pObj1, void* pGameData0, void* pGameData1);
 	int		ShouldSolvePenetration(IPhysicsObject* pObj0, IPhysicsObject* pObj1, void* pGameData0, void* pGameData1, float dt);
 	bool	ShouldFreezeObject(IPhysicsObject* pObject);
-	static const char* ModuleName() { return CBaseEntity::IsServer() ? "SERVER" : "CLIENT"; }
+	static const char* ModuleName() { return IServerEntity::IsServer() ? "SERVER" : "CLIENT"; }
 	int		AdditionalCollisionChecksThisTick(int currentChecksDone)
 	{
 		//CallbackContext check(this);
@@ -2692,7 +2692,7 @@ public:
 	// locals
 	bool GetInflictorVelocity(IPhysicsObject* pInflictor, Vector& velocity, AngularImpulse& angVelocity);
 
-	void GetListOfPenetratingEntities(CBaseEntity* pSearch, CUtlVector<CBaseEntity*>& list);
+	void GetListOfPenetratingEntities(IServerEntity* pSearch, CUtlVector<IServerEntity*>& list);
 	bool IsInCallback() { return m_inCallback > 0 ? true : false; }
 
 private:
@@ -2706,9 +2706,9 @@ private:
 	void UpdatePenetrateEvents(void);
 	void UpdateFluidEvents();
 	void UpdateRemoveObjects();
-	void AddTouchEvent(CBaseEntity* pEntity0, CBaseEntity* pEntity1, int touchType, const Vector& point, const Vector& normal);
-	penetrateevent_t& FindOrAddPenetrateEvent(CBaseEntity* pEntity0, CBaseEntity* pEntity1);
-	float DeltaTimeSinceLastFluid(CBaseEntity* pEntity);
+	void AddTouchEvent(IServerEntity* pEntity0, IServerEntity* pEntity1, int touchType, const Vector& point, const Vector& normal);
+	penetrateevent_t& FindOrAddPenetrateEvent(IServerEntity* pEntity0, IServerEntity* pEntity1);
+	float DeltaTimeSinceLastFluid(IServerEntity* pEntity);
 
 	void RestoreDamageInflictorState(IPhysicsObject* pInflictor);
 	void RestoreDamageInflictorState(int inflictorStateIndex, float velocityBlend);
@@ -2716,8 +2716,8 @@ private:
 	int	FindDamageInflictor(IPhysicsObject* pInflictorPhysics);
 
 	// make the call into the entity system
-	void DispatchStartTouch(CBaseEntity* pEntity0, CBaseEntity* pEntity1, const Vector& point, const Vector& normal);
-	void DispatchEndTouch(CBaseEntity* pEntity0, CBaseEntity* pEntity1);
+	void DispatchStartTouch(IServerEntity* pEntity0, IServerEntity* pEntity1, const Vector& point, const Vector& normal);
+	void DispatchEndTouch(IServerEntity* pEntity0, IServerEntity* pEntity1);
 
 	class CallbackContext
 	{
@@ -2745,7 +2745,7 @@ private:
 	CUtlVector<inflictorstate_t>	m_damageInflictors;
 	CUtlVector<penetrateevent_t> m_penetrateEvents;
 	CUtlVector<fluidevent_t>	m_fluidEvents;
-	CUtlVector<CBaseEntity*> m_removeObjects;
+	CUtlVector<IServerEntity*> m_removeObjects;
 	int							m_inCallback;
 	int							m_lastTickFrictionError;	// counter to control printing of the dev warning for large contact systems
 	bool						m_bBufferTouchEvents;
@@ -2763,14 +2763,14 @@ public:
 
 	virtual void PostSimulationFrame(void);
 	void PortalPostSimulationFrame(void);
-	void AddDamageEvent(CBaseEntity* pEntity, const CTakeDamageInfo& info, IPhysicsObject* pInflictorPhysics, bool bRestoreVelocity, const Vector& savedVel, const AngularImpulse& savedAngVel);
+	void AddDamageEvent(IServerEntity* pEntity, const CTakeDamageInfo& info, IPhysicsObject* pInflictorPhysics, bool bRestoreVelocity, const Vector& savedVel, const AngularImpulse& savedAngVel);
 };
 
 class CPhysConstraintEvents : public IPhysicsConstraintEvent
 {
 	void ConstraintBroken(IPhysicsConstraint* pConstraint)
 	{
-		CBaseEntity* pEntity = (CBaseEntity*)pConstraint->GetGameData();
+		IServerEntity* pEntity = (IServerEntity*)pConstraint->GetGameData();
 		if (pEntity)
 		{
 			IPhysicsConstraintEvent* pConstraintEvent = dynamic_cast<IPhysicsConstraintEvent*>(pEntity);
@@ -2934,7 +2934,7 @@ public:
 
 	void ReserveSlot(int index);
 	int AllocateFreeSlot(bool bNetworkable = true, int index = -1);
-	CBaseEntity* CreateEntityByName(const char* className, int iForceEdictIndex = -1, int iSerialNum = -1);
+	IServerEntity* CreateEntityByName(const char* className, int iForceEdictIndex = -1, int iSerialNum = -1);
 	// marks the entity for deletion so it will get removed next frame
 	void DestroyEntity(IHandleEntity* oldObj);
 
@@ -2953,16 +2953,16 @@ public:
 	IServerEntity* GetServerEntityFromHandle(CBaseHandle hEnt) const;
 	short		GetNetworkSerialNumber(int iEntity) const;
 	//CBaseNetworkable* GetBaseNetworkable( CBaseHandle hEnt ) const;
-	CBaseEntity* GetBaseEntityFromHandle(CBaseHandle hEnt) const;
-	CBaseEntity* GetBaseEntity(int entnum) const;
+	IServerEntity* GetBaseEntityFromHandle(CBaseHandle hEnt) const;
+	IServerEntity* GetBaseEntity(int entnum) const;
 	//edict_t* GetEdict( CBaseHandle hEnt ) const;
 	// NOTENOTE: Use GetLocalPlayer instead of gEntList.GetPlayerByIndex IF you're in single player
 // and you want the player.
-	CBaseEntity* GetPlayerByIndex(int playerIndex);
+	IServerEntity* GetPlayerByIndex(int playerIndex);
 	// NOTENOTE: Use this instead of gEntList.GetPlayerByIndex IF you're in single player
 // and you want the player.
 // not useable in multiplayer - see UTIL_GetListenServerHost()
-	CBaseEntity* GetLocalPlayer(void);
+	IServerEntity* GetLocalPlayer(void);
 
 	int NumberOfEntities(void);
 	int NumberOfEdicts(void);
@@ -2979,41 +2979,41 @@ public:
 	// Returns true while in the Clear() call.
 	bool	IsClearingEntities() { return m_bClearingEntities; }
 
-	void ReportEntityFlagsChanged(CBaseEntity* pEntity, unsigned int flagsOld, unsigned int flagsNow);
+	void ReportEntityFlagsChanged(IServerEntity* pEntity, unsigned int flagsOld, unsigned int flagsNow);
 
 	// iteration functions
 
 	// returns the next entity after pCurrentEnt;  if pCurrentEnt is NULL, return the first entity
-	CBaseEntity* NextEnt(CBaseEntity* pCurrentEnt);
-	CBaseEntity* FirstEnt() { return NextEnt(NULL); }
+	IServerEntity* NextEnt(IServerEntity* pCurrentEnt);
+	IServerEntity* FirstEnt() { return NextEnt(NULL); }
 
 	// search functions
 	bool		 IsEntityPtr(void* pTest);
-	CBaseEntity* FindEntityByClassname(CBaseEntity* pStartEntity, const char* szName);
-	CBaseEntity* FindEntityByName(CBaseEntity* pStartEntity, const char* szName, CBaseEntity* pSearchingEntity = NULL, CBaseEntity* pActivator = NULL, CBaseEntity* pCaller = NULL, IEntityFindFilter* pFilter = NULL);
-	CBaseEntity* FindEntityByName(CBaseEntity* pStartEntity, string_t iszName, CBaseEntity* pSearchingEntity = NULL, CBaseEntity* pActivator = NULL, CBaseEntity* pCaller = NULL, IEntityFindFilter* pFilter = NULL)
+	IServerEntity* FindEntityByClassname(IServerEntity* pStartEntity, const char* szName);
+	IServerEntity* FindEntityByName(IServerEntity* pStartEntity, const char* szName, IServerEntity* pSearchingEntity = NULL, IServerEntity* pActivator = NULL, IServerEntity* pCaller = NULL, IEntityFindFilter* pFilter = NULL);
+	IServerEntity* FindEntityByName(IServerEntity* pStartEntity, string_t iszName, IServerEntity* pSearchingEntity = NULL, IServerEntity* pActivator = NULL, IServerEntity* pCaller = NULL, IEntityFindFilter* pFilter = NULL)
 	{
 		return FindEntityByName(pStartEntity, STRING(iszName), pSearchingEntity, pActivator, pCaller, pFilter);
 	}
-	CBaseEntity* FindEntityInSphere(CBaseEntity* pStartEntity, const Vector& vecCenter, float flRadius);
-	CBaseEntity* FindEntityByTarget(CBaseEntity* pStartEntity, const char* szName);
-	CBaseEntity* FindEntityByModel(CBaseEntity* pStartEntity, const char* szModelName);
+	IServerEntity* FindEntityInSphere(IServerEntity* pStartEntity, const Vector& vecCenter, float flRadius);
+	IServerEntity* FindEntityByTarget(IServerEntity* pStartEntity, const char* szName);
+	IServerEntity* FindEntityByModel(IServerEntity* pStartEntity, const char* szModelName);
 
-	CBaseEntity* FindEntityByNameNearest(const char* szName, const Vector& vecSrc, float flRadius, CBaseEntity* pSearchingEntity = NULL, CBaseEntity* pActivator = NULL, CBaseEntity* pCaller = NULL);
-	CBaseEntity* FindEntityByNameWithin(CBaseEntity* pStartEntity, const char* szName, const Vector& vecSrc, float flRadius, CBaseEntity* pSearchingEntity = NULL, CBaseEntity* pActivator = NULL, CBaseEntity* pCaller = NULL);
-	CBaseEntity* FindEntityByClassnameNearest(const char* szName, const Vector& vecSrc, float flRadius);
-	CBaseEntity* FindEntityByClassnameWithin(CBaseEntity* pStartEntity, const char* szName, const Vector& vecSrc, float flRadius);
-	CBaseEntity* FindEntityByClassnameWithin(CBaseEntity* pStartEntity, const char* szName, const Vector& vecMins, const Vector& vecMaxs);
+	IServerEntity* FindEntityByNameNearest(const char* szName, const Vector& vecSrc, float flRadius, IServerEntity* pSearchingEntity = NULL, IServerEntity* pActivator = NULL, IServerEntity* pCaller = NULL);
+	IServerEntity* FindEntityByNameWithin(IServerEntity* pStartEntity, const char* szName, const Vector& vecSrc, float flRadius, IServerEntity* pSearchingEntity = NULL, IServerEntity* pActivator = NULL, IServerEntity* pCaller = NULL);
+	IServerEntity* FindEntityByClassnameNearest(const char* szName, const Vector& vecSrc, float flRadius);
+	IServerEntity* FindEntityByClassnameWithin(IServerEntity* pStartEntity, const char* szName, const Vector& vecSrc, float flRadius);
+	IServerEntity* FindEntityByClassnameWithin(IServerEntity* pStartEntity, const char* szName, const Vector& vecMins, const Vector& vecMaxs);
 
-	CBaseEntity* FindEntityGeneric(CBaseEntity* pStartEntity, const char* szName, CBaseEntity* pSearchingEntity = NULL, CBaseEntity* pActivator = NULL, CBaseEntity* pCaller = NULL);
-	CBaseEntity* FindEntityGenericWithin(CBaseEntity* pStartEntity, const char* szName, const Vector& vecSrc, float flRadius, CBaseEntity* pSearchingEntity = NULL, CBaseEntity* pActivator = NULL, CBaseEntity* pCaller = NULL);
-	CBaseEntity* FindEntityGenericNearest(const char* szName, const Vector& vecSrc, float flRadius, CBaseEntity* pSearchingEntity = NULL, CBaseEntity* pActivator = NULL, CBaseEntity* pCaller = NULL);
+	IServerEntity* FindEntityGeneric(IServerEntity* pStartEntity, const char* szName, IServerEntity* pSearchingEntity = NULL, IServerEntity* pActivator = NULL, IServerEntity* pCaller = NULL);
+	IServerEntity* FindEntityGenericWithin(IServerEntity* pStartEntity, const char* szName, const Vector& vecSrc, float flRadius, IServerEntity* pSearchingEntity = NULL, IServerEntity* pActivator = NULL, IServerEntity* pCaller = NULL);
+	IServerEntity* FindEntityGenericNearest(const char* szName, const Vector& vecSrc, float flRadius, IServerEntity* pSearchingEntity = NULL, IServerEntity* pActivator = NULL, IServerEntity* pCaller = NULL);
 
-	CBaseEntity* FindEntityNearestFacing(const Vector& origin, const Vector& facing, float threshold);
-	CBaseEntity* FindEntityClassNearestFacing(const Vector& origin, const Vector& facing, float threshold, char* classname);
-	CBaseEntity* FindEntityByNetname(CBaseEntity* pStartEntity, const char* szModelName);
+	IServerEntity* FindEntityNearestFacing(const Vector& origin, const Vector& facing, float threshold);
+	IServerEntity* FindEntityClassNearestFacing(const Vector& origin, const Vector& facing, float threshold, char* classname);
+	IServerEntity* FindEntityByNetname(IServerEntity* pStartEntity, const char* szModelName);
 
-	CBaseEntity* FindEntityProcedural(const char* szName, CBaseEntity* pSearchingEntity = NULL, CBaseEntity* pActivator = NULL, CBaseEntity* pCaller = NULL);
+	IServerEntity* FindEntityProcedural(const char* szName, IServerEntity* pSearchingEntity = NULL, IServerEntity* pActivator = NULL, IServerEntity* pCaller = NULL);
 
 	//-----------------------------------------------------------------------------
 // Purpose: Returns the nearest COLLIBALE entity in front of the player
@@ -3023,7 +3023,7 @@ public:
 // Input  :
 // Output :
 //-----------------------------------------------------------------------------
-	CBaseEntity* FindEntityForward(CBaseEntity* pMe, bool fHull)
+	IServerEntity* FindEntityForward(IServerEntity* pMe, bool fHull)
 	{
 		if (pMe)
 		{
@@ -3060,7 +3060,7 @@ public:
 			}
 			if (tr.fraction != 1.0 && tr.DidHitNonWorldEntity())
 			{
-				return (CBaseEntity*)tr.m_pEnt;
+				return (IServerEntity*)tr.m_pEnt;
 			}
 		}
 		return NULL;
@@ -3074,12 +3074,12 @@ public:
 // Input  :
 // Output :
 //-----------------------------------------------------------------------------
-	CBaseEntity* FindPickerEntity(CBaseEntity* pPlayer)
+	IServerEntity* FindPickerEntity(IServerEntity* pPlayer)
 	{
 		MDLCACHE_CRITICAL_SECTION();
 
 		// First try to trace a hull to an entity
-		CBaseEntity* pEntity = FindEntityForward(pPlayer, true);
+		IServerEntity* pEntity = FindEntityForward(pPlayer, true);
 
 		// If that fails just look for the nearest facing entity
 		if (!pEntity)
@@ -3100,11 +3100,11 @@ public:
 	void DestroyDataObject(int type, T* instance);
 
 	int AimTarget_ListCount();
-	int AimTarget_ListCopy(CBaseEntity* pList[], int listMax);
+	int AimTarget_ListCopy(IServerEntity* pList[], int listMax);
 	void AimTarget_ForceRepopulateList();
-	void SimThink_EntityChanged(CBaseEntity* pEntity);
+	void SimThink_EntityChanged(IServerEntity* pEntity);
 	int SimThink_ListCount();
-	int SimThink_ListCopy(CBaseEntity* pList[], int listMax);
+	int SimThink_ListCopy(IServerEntity* pList[], int listMax);
 
 	// Call this when hierarchy is not completely set up (such as during Restore) to throw asserts
 // when people call GetAbsAnything. 
@@ -3127,7 +3127,7 @@ public:
 	bool IsSimulatingOnAlternateTicks();
 
 	// Move it to the top of the LRU
-	void MoveToTopOfLRU(CBaseEntity* pRagdoll, bool bImportant = false);
+	void MoveToTopOfLRU(IServerEntity* pRagdoll, bool bImportant = false);
 	void SetMaxRagdollCount(int iMaxCount) { m_iMaxRagdolls = iMaxCount; }
 	int CountRagdolls(bool bOnlySimulatingRagdolls) { return bOnlySimulatingRagdolls ? m_iSimulatedRagdollCount : m_iRagdollCount; }
 	virtual void UpdateRagdolls(float frametime);
@@ -3206,12 +3206,12 @@ public:
 // External interface to collision sounds
 //-----------------------------------------------------------------------------
 
-	void PhysicsImpactSound(CBaseEntity* pEntity, IPhysicsObject* pPhysObject, int channel, int surfaceProps, int surfacePropsHit, float volume, float impactSpeed)
+	void PhysicsImpactSound(IServerEntity* pEntity, IPhysicsObject* pPhysObject, int channel, int surfaceProps, int surfacePropsHit, float volume, float impactSpeed)
 	{
 		physicssound::AddImpactSound(m_impactSounds, pEntity, pEntity->entindex(), channel, pPhysObject, surfaceProps, surfacePropsHit, volume, impactSpeed);
 	}
 
-	void PhysCollisionSound(CBaseEntity* pEntity, IPhysicsObject* pPhysObject, int channel, int surfaceProps, int surfacePropsHit, float deltaTime, float speed)
+	void PhysCollisionSound(IServerEntity* pEntity, IPhysicsObject* pPhysObject, int channel, int surfaceProps, int surfacePropsHit, float deltaTime, float speed)
 	{
 		if (deltaTime < 0.05f || speed < 70.0f)
 			return;
@@ -3223,7 +3223,7 @@ public:
 		PhysicsImpactSound(pEntity, pPhysObject, channel, surfaceProps, surfacePropsHit, volume, speed);
 	}
 
-	void PhysBreakSound(CBaseEntity* pEntity, IPhysicsObject* pPhysObject, Vector vecOrigin)
+	void PhysBreakSound(IServerEntity* pEntity, IPhysicsObject* pPhysObject, Vector vecOrigin)
 	{
 		if (!pPhysObject)
 			return;
@@ -3274,12 +3274,12 @@ public:
 		flVolume = clamp(flVolume, 0.0f, 1.0f);
 		if (flVolume > (1.0f / 128.0f))
 		{
-			friction_t* pFriction = m_Collisions.FindFriction((CBaseEntity*)pEntity);
+			friction_t* pFriction = m_Collisions.FindFriction((IServerEntity*)pEntity);
 			if (!pFriction)
 				return;
 
 			CSoundParameters params;
-			if (!g_pSoundEmitterSystem->GetParametersForSound(pSoundName, handle, params, NULL))//CBaseEntity::
+			if (!g_pSoundEmitterSystem->GetParametersForSound(pSoundName, handle, params, NULL))//IServerEntity::
 				return;
 
 			if (!pFriction->pObject)
@@ -3289,9 +3289,9 @@ public:
 					return;
 
 				pFriction->pObject = pEntity;
-				CPASAttenuationFilter filter((CBaseEntity*)pEntity, params.soundlevel);
+				CPASAttenuationFilter filter((IServerEntity*)pEntity, params.soundlevel);
 				pFriction->patch = CSoundEnvelopeController::GetController().SoundCreate(
-					filter, ((CBaseEntity*)pEntity)->entindex(), CHAN_BODY, pSoundName, params.soundlevel);
+					filter, ((IServerEntity*)pEntity)->entindex(), CHAN_BODY, pSoundName, params.soundlevel);
 				CSoundEnvelopeController::GetController().Play(pFriction->patch, params.volume * flVolume, params.pitch);
 			}
 			else
@@ -3308,7 +3308,7 @@ public:
 
 	void PhysCleanupFrictionSounds(IHandleEntity* pEntity)
 	{
-		friction_t* pFriction = m_Collisions.FindFriction((CBaseEntity*)pEntity);
+		friction_t* pFriction = m_Collisions.FindFriction((IServerEntity*)pEntity);
 		if (pFriction && pFriction->patch)
 		{
 			m_Collisions.ShutdownFriction(*pFriction);
@@ -3339,7 +3339,7 @@ public:
 		return -1;
 	}
 
-	void PhysGetMassCenterOverride(CBaseEntity* pEntity, vcollide_t* pCollide, solid_t& solidOut)
+	void PhysGetMassCenterOverride(IServerEntity* pEntity, vcollide_t* pCollide, solid_t& solidOut)
 	{
 		int index = PhysGetMassCenterOverrideIndex(pEntity->GetEntityName());
 
@@ -3372,18 +3372,18 @@ public:
 		}
 	}
 
-	void PhysCallbackDamage(CBaseEntity* pEntity, const CTakeDamageInfo& info, gamevcollisionevent_t& event, int hurtIndex)
+	void PhysCallbackDamage(IServerEntity* pEntity, const CTakeDamageInfo& info, gamevcollisionevent_t& event, int hurtIndex)
 	{
 		Assert(m_pPhysenv->IsInSimulation());
 		int otherIndex = !hurtIndex;
 		m_Collisions.AddDamageEvent(pEntity, info, event.pObjects[otherIndex], true, event.preVelocity[otherIndex], event.preAngularVelocity[otherIndex]);
 	}
 
-	void PhysCallbackDamage(CBaseEntity* pEntity, const CTakeDamageInfo& info)
+	void PhysCallbackDamage(IServerEntity* pEntity, const CTakeDamageInfo& info)
 	{
 		if (PhysIsInCallback())
 		{
-			CBaseEntity* pInflictor = info.GetInflictor();
+			IServerEntity* pInflictor = (IServerEntity*)info.GetInflictor();
 			IPhysicsObject* pInflictorPhysics = (pInflictor) ? pInflictor->GetEngineObject()->VPhysicsGetObject() : NULL;
 			m_Collisions.AddDamageEvent(pEntity, info, pInflictorPhysics, false, vec3_origin, vec3_origin);
 			if (pEntity && info.GetInflictor())
@@ -3397,7 +3397,7 @@ public:
 		}
 	}
 
-	void PhysCallbackRemove(CBaseEntity* pRemove)
+	void PhysCallbackRemove(IServerEntity* pRemove)
 	{
 		if (PhysIsInCallback())
 		{
@@ -3424,12 +3424,12 @@ public:
 		m_PostSimulationQueue.QueueCall(PostSimulation_SetVelocityEvent, pPhysicsObject, RefToVal(vecVelocity));
 	}
 
-	void PhysGetListOfPenetratingEntities(CBaseEntity* pSearch, CUtlVector<CBaseEntity*>& list)
+	void PhysGetListOfPenetratingEntities(IServerEntity* pSearch, CUtlVector<IServerEntity*>& list)
 	{
 		m_Collisions.GetListOfPenetratingEntities(pSearch, list);
 	}
 
-	bool PhysGetTriggerEvent(triggerevent_t* pEvent, CBaseEntity* pTriggerEntity)
+	bool PhysGetTriggerEvent(triggerevent_t* pEvent, IServerEntity* pTriggerEntity)
 	{
 		return m_Collisions.GetTriggerEvent(pEvent, pTriggerEntity);
 	}
@@ -3448,16 +3448,16 @@ public:
 		return m_Collisions.ShouldCollide(pObj0, pObj1, pGameData0, pGameData1) ? true : false;
 	}
 
-	void PhysTeleportConstrainedEntity(CBaseEntity* pTeleportSource, IPhysicsObject* pObject0, IPhysicsObject* pObject1, const Vector& prevPosition, const QAngle& prevAngles, bool physicsRotate)
+	void PhysTeleportConstrainedEntity(IServerEntity* pTeleportSource, IPhysicsObject* pObject0, IPhysicsObject* pObject1, const Vector& prevPosition, const QAngle& prevAngles, bool physicsRotate)
 	{
 		// teleport the other object
-		CBaseEntity* pEntity0 = static_cast<CBaseEntity*> (pObject0->GetGameData());
-		CBaseEntity* pEntity1 = static_cast<CBaseEntity*> (pObject1->GetGameData());
+		IServerEntity* pEntity0 = static_cast<IServerEntity*> (pObject0->GetGameData());
+		IServerEntity* pEntity1 = static_cast<IServerEntity*> (pObject1->GetGameData());
 		if (!pEntity0 || !pEntity1)
 			return;
 
 		// figure out which entity needs to be fixed up (the one that isn't pTeleportSource)
-		CBaseEntity* pFixup = pEntity1;
+		IServerEntity* pFixup = pEntity1;
 		// teleport the other object
 		if (pTeleportSource != pEntity0)
 		{
@@ -3495,7 +3495,7 @@ public:
 		pFixup->Teleport(&fixupPos, &fixupAngles, NULL);
 	}
 
-	void PhysForceEntityToSleep(CBaseEntity* pEntity, IPhysicsObject* pObject)
+	void PhysForceEntityToSleep(IServerEntity* pEntity, IPhysicsObject* pObject)
 	{
 		// UNDONE: Check to see if the object is touching the player first?
 		// Might get the player stuck?
@@ -3523,7 +3523,7 @@ public:
 			m_pPhysenv->GetActiveObjects(pActiveList);
 			for (int i = 0; i < activeCount; i++)
 			{
-				CBaseEntity* pEntity = reinterpret_cast<CBaseEntity*>(pActiveList[i]->GetGameData());
+				IServerEntity* pEntity = reinterpret_cast<IServerEntity*>(pActiveList[i]->GetGameData());
 				if (pEntity)
 				{
 					func(pEntity);
@@ -3532,19 +3532,19 @@ public:
 		}
 	}
 
-	void PhysAddShadow(CBaseEntity* pEntity)
+	void PhysAddShadow(IServerEntity* pEntity)
 	{
 		m_pShadowEntities->AddEntity(pEntity);
 	}
 
-	void PhysRemoveShadow(CBaseEntity* pEntity)
+	void PhysRemoveShadow(IServerEntity* pEntity)
 	{
 		m_pShadowEntities->DeleteEntity(pEntity);
 	}
 
-	bool PhysHasShadow(CBaseEntity* pEntity)
+	bool PhysHasShadow(IServerEntity* pEntity)
 	{
-		EHANDLE hTestEnt = pEntity;
+		ENTHANDLE hTestEnt = pEntity;
 		entitem_t* pCurrent = m_pShadowEntities->m_pItemList;
 		while (pCurrent)
 		{
@@ -3561,7 +3561,7 @@ public:
 		int activeCount = m_pPhysenv->GetActiveObjectCount();
 
 		IPhysicsObject** pActiveList = NULL;
-		CUtlVector<CBaseEntity*> ents;
+		CUtlVector<IServerEntity*> ents;
 		if (activeCount)
 		{
 			int i;
@@ -3570,7 +3570,7 @@ public:
 			m_pPhysenv->GetActiveObjects(pActiveList);
 			for (i = 0; i < activeCount; i++)
 			{
-				CBaseEntity* pEntity = reinterpret_cast<CBaseEntity*>(pActiveList[i]->GetGameData());
+				IServerEntity* pEntity = reinterpret_cast<IServerEntity*>(pActiveList[i]->GetGameData());
 				if (pEntity)
 				{
 					int index = -1;
@@ -3634,12 +3634,12 @@ public:
 		}
 	}
 
-	void OutputVPhysicsDebugInfo(CBaseEntity* pEntity)
+	void OutputVPhysicsDebugInfo(IServerEntity* pEntity)
 	{
 		if (pEntity)
 		{
 			Msg("Entity %s (%s) %s Collision Group %d\n", pEntity->GetClassname(), pEntity->GetDebugName(), pEntity->IsNavIgnored() ? "NAV IGNORE" : "", pEntity->GetEngineObject()->GetCollisionGroup());
-			CUtlVector<CBaseEntity*> list;
+			CUtlVector<IServerEntity*> list;
 			m_Collisions.GetListOfPenetratingEntities(pEntity, list);
 			for (int i = 0; i < list.Count(); i++)
 			{
@@ -3674,7 +3674,7 @@ public:
 	CEnginePortalInternal* GetPortal(int index) { return m_ActivePortals[index]; }
 	CCallQueue* GetPostTouchQueue();
 
-	void SetClientVisibilityPVS(CBaseEntity* pClient, const unsigned char* pvs, int pvssize)
+	void SetClientVisibilityPVS(IServerEntity* pClient, const unsigned char* pvs, int pvssize)
 	{
 		if (pClient == GetCurrentCheckClient())
 		{
@@ -3724,9 +3724,9 @@ public:
 	// Input  : *pEdict - 
 	// Output : edict_t*
 	//-----------------------------------------------------------------------------
-	CBaseEntity* FindClientInPVS(const Vector& vecBoxMins, const Vector& vecBoxMaxs)
+	IServerEntity* FindClientInPVS(const Vector& vecBoxMins, const Vector& vecBoxMaxs)
 	{
-		CBaseEntity* ent = GetCurrentCheckClient();
+		IServerEntity* ent = GetCurrentCheckClient();
 		if (!ent)
 		{
 			return NULL;
@@ -3741,17 +3741,17 @@ public:
 		return ent;
 	}
 
-	CBaseEntity* FindClientInPVSGuts(CBaseEntity* pEdict, unsigned char* pvs, unsigned pvssize)
+	IServerEntity* FindClientInPVSGuts(IServerEntity* pEdict, unsigned char* pvs, unsigned pvssize)
 	{
 		Vector	view;
 
-		CBaseEntity* ent = GetCurrentCheckClient();
+		IServerEntity* ent = GetCurrentCheckClient();
 		if (!ent)
 		{
 			return NULL;
 		}
 
-		CBaseEntity* pPlayerEntity = (CBaseEntity*)ent;
+		IServerEntity* pPlayerEntity = (IServerEntity*)ent;
 		if ((!pPlayerEntity || (pPlayerEntity->GetEngineObject()->GetFlags() & FL_NOTARGET)) && sv_strict_notarget.GetBool())
 		{
 			return NULL;
@@ -3759,7 +3759,7 @@ public:
 		// if current entity can't possibly see the check entity, return 0
 		// UNDONE: Build a box for this and do it over that box
 		// UNDONE: Use CM_BoxLeafnums()
-		CBaseEntity* pe = pEdict;
+		IServerEntity* pe = pEdict;
 		if (pe)
 		{
 			view = pe->EyePosition();
@@ -3778,7 +3778,7 @@ public:
 	// Purpose: Returns a client that could see the entity directly
 	//-----------------------------------------------------------------------------
 
-	CBaseEntity* FindClientInPVS(CBaseEntity* pEdict)
+	IServerEntity* FindClientInPVS(IServerEntity* pEdict)
 	{
 		return FindClientInPVSGuts(pEdict, m_checkPVS, sizeof(m_checkPVS));
 	}
@@ -3786,7 +3786,7 @@ public:
 	//-----------------------------------------------------------------------------
 	// Purpose: Returns a client that could see the entity, including through a camera
 	//-----------------------------------------------------------------------------
-	CBaseEntity* FindClientInVisibilityPVS(CBaseEntity* pEdict)
+	IServerEntity* FindClientInVisibilityPVS(IServerEntity* pEdict)
 	{
 		return FindClientInPVSGuts(pEdict, m_checkVisibilityPVS, sizeof(m_checkVisibilityPVS));
 	}
@@ -3799,7 +3799,7 @@ public:
 //			*starting_ent - 
 // Output : edict_t
 //-----------------------------------------------------------------------------
-	CBaseEntity* EntitiesInPVS(CBaseEntity* pPVSEntity, CBaseEntity* pStartingEntity)
+	IServerEntity* EntitiesInPVS(IServerEntity* pPVSEntity, IServerEntity* pStartingEntity)
 	{
 		Vector			org;
 		static byte		pvs[MAX_MAP_CLUSTERS / 8];
@@ -3823,13 +3823,13 @@ public:
 			engine->GetPVSForCluster(clusterIndex, sizeof(pvs), pvs);
 		}
 
-		for (CBaseEntity* pEntity = NextEnt(pStartingEntity); pEntity; pEntity = NextEnt(pEntity))
+		for (IServerEntity* pEntity = NextEnt(pStartingEntity); pEntity; pEntity = NextEnt(pEntity))
 		{
 			// Only return attached ents.
 			if (!pEntity->IsNetworkable() || pEntity->entindex() == -1)
 				continue;
 
-			CBaseEntity* pParent = pEntity->GetEngineObject()->GetRootMoveParent()->GetOuter();
+			IServerEntity* pParent = pEntity->GetEngineObject()->GetRootMoveParent()->GetOuter();
 
 			Vector vecSurroundMins, vecSurroundMaxs;
 			pParent->GetEngineObject()->WorldSpaceSurroundingBounds(&vecSurroundMins, &vecSurroundMaxs);
@@ -3902,7 +3902,7 @@ protected:
 	int GetNewCheckClient(int check)
 	{
 		int		i;
-		CBaseEntity* ent = NULL;
+		IServerEntity* ent = NULL;
 		Vector	org;
 
 		// cycle to the next one
@@ -3937,7 +3937,7 @@ protected:
 			//if ( !ent->GetUnknown() )
 			//	continue;
 
-			CBaseEntity* entity = ent;
+			IServerEntity* entity = ent;
 			if (!entity)
 				continue;
 
@@ -3957,7 +3957,7 @@ protected:
 		if (ent)
 		{
 			// get the PVS for the entity
-			CBaseEntity* pce = ent;
+			IServerEntity* pce = ent;
 			if (!pce)
 				return i;
 
@@ -3977,9 +3977,9 @@ protected:
 	//-----------------------------------------------------------------------------
 // Gets the current check client....
 //-----------------------------------------------------------------------------
-	CBaseEntity* GetCurrentCheckClient()
+	IServerEntity* GetCurrentCheckClient()
 	{
-		CBaseEntity* ent;
+		IServerEntity* ent;
 
 		// find a new check if on a new frame
 		float delta = gpGlobals->curtime - m_lastchecktime;
@@ -4006,7 +4006,7 @@ protected:
 
 	// UNDONE: This could be a better test - can we run the absbox through the bsp and see
 // if it contains any solid space?  or would that eliminate some entities we want to keep?
-	int EntityInSolid(CBaseEntity* ent)
+	int EntityInSolid(IServerEntity* ent)
 	{
 		Vector	point;
 
@@ -4034,7 +4034,7 @@ private:
 
 	bool m_bClearingEntities;
 	// removes the entity from the global list
-// only called from with the CBaseEntity destructor
+// only called from with the IServerEntity destructor
 	bool m_bDisableEhandleAccess = false;
 	bool m_bReceivedChainedUpdateOnRemove = false;
 	bool m_fInCleanupDelete;
@@ -4060,8 +4060,8 @@ private:
 	int	m_nPredictionRandomSeed = -1;
 	IEngineObject* m_pPredictionPlayer = NULL;
 
-	CUtlLinkedList< EHANDLE > m_LRU;
-	CUtlLinkedList< EHANDLE > m_LRUImportantRagdolls;
+	CUtlLinkedList< ENTHANDLE > m_LRU;
+	CUtlLinkedList< ENTHANDLE > m_LRUImportantRagdolls;
 
 	int m_iMaxRagdolls;
 	int m_iSimulatedRagdollCount;
@@ -4133,14 +4133,14 @@ bool CGlobalEntityList<T>::Init()
 	m_impactSoundTime = 0;
 	m_vehicleScripts.EnsureCapacity(4);
 
-	AddDataAccessor(TOUCHLINK, new CEntityDataInstantiator<CBaseEntity, servertouchlink_t >);
-	AddDataAccessor(GROUNDLINK, new CEntityDataInstantiator<CBaseEntity, servergroundlink_t >);
-	AddDataAccessor(STEPSIMULATION, new CEntityDataInstantiator<CBaseEntity, StepSimulationData >);
-	AddDataAccessor(MODELSCALE, new CEntityDataInstantiator<CBaseEntity, ModelScale >);
-	AddDataAccessor(POSITIONWATCHER, new CEntityDataInstantiator<CBaseEntity, CWatcherList >);
-	AddDataAccessor(PHYSICSPUSHLIST, new CEntityDataInstantiator<CBaseEntity, physicspushlist_t >);
-	AddDataAccessor(VPHYSICSUPDATEAI, new CEntityDataInstantiator<CBaseEntity, vphysicsupdateai_t >);
-	AddDataAccessor(VPHYSICSWATCHER, new CEntityDataInstantiator<CBaseEntity, CWatcherList >);
+	AddDataAccessor(TOUCHLINK, new CEntityDataInstantiator<IServerEntity, servertouchlink_t >);
+	AddDataAccessor(GROUNDLINK, new CEntityDataInstantiator<IServerEntity, servergroundlink_t >);
+	AddDataAccessor(STEPSIMULATION, new CEntityDataInstantiator<IServerEntity, StepSimulationData >);
+	AddDataAccessor(MODELSCALE, new CEntityDataInstantiator<IServerEntity, ModelScale >);
+	AddDataAccessor(POSITIONWATCHER, new CEntityDataInstantiator<IServerEntity, CWatcherList >);
+	AddDataAccessor(PHYSICSPUSHLIST, new CEntityDataInstantiator<IServerEntity, physicspushlist_t >);
+	AddDataAccessor(VPHYSICSUPDATEAI, new CEntityDataInstantiator<IServerEntity, vphysicsupdateai_t >);
+	AddDataAccessor(VPHYSICSWATCHER, new CEntityDataInstantiator<IServerEntity, CWatcherList >);
 	return true;
 }
 
@@ -4427,7 +4427,7 @@ void CGlobalEntityList<T>::PhysFrame(float deltaTime)
 
 		for (int i = 0; i < activeCount; i++)
 		{
-			CBaseEntity* pEntity = reinterpret_cast<CBaseEntity*>(pActiveList[i]->GetGameData());
+			IServerEntity* pEntity = reinterpret_cast<IServerEntity*>(pActiveList[i]->GetGameData());
 			if (pEntity)
 			{
 				if (pEntity->GetEngineObject()->DoesVPhysicsInvalidateSurroundingBox())
@@ -4442,7 +4442,7 @@ void CGlobalEntityList<T>::PhysFrame(float deltaTime)
 
 	for (pItem = m_pShadowEntities->m_pItemList; pItem; pItem = pItem->pNext)
 	{
-		CBaseEntity* pEntity = pItem->hEnt.Get();
+		IServerEntity* pEntity = pItem->hEnt.Get();
 		if (!pEntity)
 		{
 			Msg("Dangling pointer to physics entity!!!\n");
@@ -4887,7 +4887,7 @@ bool CGlobalEntityList<T>::DoRestoreEntity(T* pEntity, IRestore* pRestore)
 {
 	MDLCACHE_CRITICAL_SECTION();
 
-	EHANDLE hEntity;
+	ENTHANDLE hEntity;
 
 	hEntity = pEntity;
 
@@ -4944,7 +4944,7 @@ template<class T>
 int CGlobalEntityList<T>::RestoreGlobalEntity(T* pEntity, IRestore* pRestore, entitytable_t* pEntInfo)
 {
 	Vector oldOffset;
-	EHANDLE hEntitySafeHandle;
+	ENTHANDLE hEntitySafeHandle;
 	hEntitySafeHandle = pEntity;
 	CGameSaveRestoreInfo* pSaveData = pRestore->GetGameSaveRestoreInfo();
 	oldOffset.Init();
@@ -5008,7 +5008,7 @@ template<class T>
 void CGlobalEntityList<T>::PostRestore()
 {
 	// The entire hierarchy is restored, so we can call GetAbsOrigin again.
-//CBaseEntity::SetAbsQueriesValid( true );
+//IServerEntity::SetAbsQueriesValid( true );
 
 // Call all entities' OnRestore handlers
 	for (int i = m_RestoredEntities.Count() - 1; i >= 0; --i)
@@ -5364,7 +5364,7 @@ int CGlobalEntityList<T>::AddEntityToTransitionList(T* pEntity, int flags, int n
 			Msg("ADDED %s (%s) to transition.\n", pEntity->GetClassname(), pEntity->GetDebugName());
 		}
 
-		pEntity->m_debugOverlays |= (OVERLAY_BBOX_BIT | OVERLAY_NAME_BIT);
+		pEntity->GetDebugOverlays() |= (OVERLAY_BBOX_BIT | OVERLAY_NAME_BIT);
 	}
 
 	return nCount;
@@ -5387,7 +5387,7 @@ int CGlobalEntityList<T>::BuildEntityTransitionList(T* pLandmarkEntity, const ch
 		m_iDebuggingTransition = g_debug_transitions.GetInt();
 
 		// Show us where the landmark entity is
-		pLandmarkEntity->m_debugOverlays |= (OVERLAY_PIVOT_BIT | OVERLAY_BBOX_BIT | OVERLAY_NAME_BIT);
+		pLandmarkEntity->GetDebugOverlays() |= (OVERLAY_PIVOT_BIT | OVERLAY_BBOX_BIT | OVERLAY_NAME_BIT);
 	}
 	else
 	{
@@ -5634,7 +5634,7 @@ inline int CGlobalEntityList<T>::AllocateFreeSlot(bool bNetworkable, int index) 
 }
 
 template<class T>
-inline CBaseEntity* CGlobalEntityList<T>::CreateEntityByName(const char* className, int iForceEdictIndex, int iSerialNum) {
+inline IServerEntity* CGlobalEntityList<T>::CreateEntityByName(const char* className, int iForceEdictIndex, int iSerialNum) {
 	if (m_EntityFactoryDictionary.RequiredEdictIndex(className) != -1) {
 		iForceEdictIndex = m_EntityFactoryDictionary.RequiredEdictIndex(className);
 	}
@@ -5685,7 +5685,7 @@ inline CBaseEntity* CGlobalEntityList<T>::CreateEntityByName(const char* classNa
 			Error("GetEngineObjectType error!\n");
 		}
 	}
-	return (CBaseEntity*)m_EntityFactoryDictionary.Create(this, className, iForceEdictIndex, iSerialNum, this);
+	return (IServerEntity*)m_EntityFactoryDictionary.Create(this, className, iForceEdictIndex, iSerialNum, this);
 }
 
 //-----------------------------------------------------------------------------
@@ -5696,7 +5696,7 @@ inline CBaseEntity* CGlobalEntityList<T>::CreateEntityByName(const char* classNa
 template<class T>
 void CGlobalEntityList<T>::DestroyEntity(IHandleEntity* oldObj)
 {
-	CBaseEntity* pEntity = dynamic_cast<CBaseEntity*>(oldObj);
+	IServerEntity* pEntity = dynamic_cast<IServerEntity*>(oldObj);
 	//CServerNetworkProperty* pProp = static_cast<CServerNetworkProperty*>(oldObj);
 	if (!pEntity || pEntity->GetEngineObject()->IsMarkedForDeletion())
 		return;
@@ -5731,7 +5731,7 @@ void CGlobalEntityList<T>::DestroyEntity(IHandleEntity* oldObj)
 	Assert(IsReceivedChainedUpdateOnRemove());
 
 	// clear oldObj targetname / other flags now
-	pEntity->SetName("");
+	pEntity->GetEngineObject()->SetName("");
 
 	if (bNetworkable && nEntIndex != -1) {
 		for (int i = BaseClass::m_entityListeners.Count() - 1; i >= 0; i--)
@@ -5762,7 +5762,7 @@ void CGlobalEntityList<T>::EnableDestroyImmediate()
 template<class T>
 void CGlobalEntityList<T>::DestroyEntityImmediate(IHandleEntity* oldObj)
 {
-	CBaseEntity* pEntity = dynamic_cast<CBaseEntity*>(oldObj);
+	IServerEntity* pEntity = dynamic_cast<IServerEntity*>(oldObj);
 	// valid pointer or already removed?
 	if (!pEntity || pEntity->GetEngineObject()->IsEFlagSet(EFL_KILLME))
 		return;
@@ -5881,32 +5881,32 @@ short		CGlobalEntityList<T>::GetNetworkSerialNumber(int iEntity) const {
 }
 
 template<class T>
-inline CBaseEntity* CGlobalEntityList<T>::GetBaseEntityFromHandle( CBaseHandle hEnt ) const
+inline IServerEntity* CGlobalEntityList<T>::GetBaseEntityFromHandle( CBaseHandle hEnt ) const
 {
 	T *pUnk = (BaseClass::LookupEntity( hEnt ));
 	if ( pUnk )
-		return pUnk->GetBaseEntity();
+		return (T*)pUnk;
 	else
 		return NULL;
 }
 
 template<class T>
-inline CBaseEntity* CGlobalEntityList<T>::GetBaseEntity(int entnum) const
+inline IServerEntity* CGlobalEntityList<T>::GetBaseEntity(int entnum) const
 {
 	T* pUnk = (BaseClass::LookupEntityByNetworkIndex(entnum));
 	if (pUnk)
-		return pUnk->GetBaseEntity();
+		return (T*)pUnk;
 	else
 		return NULL;
 }
 
-// returns a CBaseEntity pointer to a player by index.  Only returns if the player is spawned and connected
+// returns a IServerEntity pointer to a player by index.  Only returns if the player is spawned and connected
 // otherwise returns NULL
 // Index is 1 based
 template<class T>
-CBaseEntity* CGlobalEntityList<T>::GetPlayerByIndex(int playerIndex)
+IServerEntity* CGlobalEntityList<T>::GetPlayerByIndex(int playerIndex)
 {
-	CBaseEntity* pPlayer = NULL;
+	IServerEntity* pPlayer = NULL;
 
 	if (playerIndex > 0 && playerIndex <= gpGlobals->maxClients)
 	{
@@ -5921,7 +5921,7 @@ CBaseEntity* CGlobalEntityList<T>::GetPlayerByIndex(int playerIndex)
 // If this is a multiplayer game, return NULL.
 // 
 template<class T>
-CBaseEntity* CGlobalEntityList<T>::GetLocalPlayer(void)
+IServerEntity* CGlobalEntityList<T>::GetLocalPlayer(void)
 {
 	if (gpGlobals->maxClients > 1)
 	{
@@ -6019,8 +6019,6 @@ void CGlobalEntityList<T>::Clear(void)
 	// free the memory
 	m_DeleteList.Purge();
 
-	CBaseEntity::m_nDebugPlayer = -1;
-	CBaseEntity::m_bInDebugSelect = false;
 	m_iHighestEnt = 0;
 	m_iNumEnts = 0;
 	m_iHighestEdicts = 0;
@@ -6054,7 +6052,7 @@ int CGlobalEntityList<T>::IndexOfHighestEdict(void) {
 }
 
 template<class T>
-CBaseEntity* CGlobalEntityList<T>::NextEnt(CBaseEntity* pCurrentEnt)
+IServerEntity* CGlobalEntityList<T>::NextEnt(IServerEntity* pCurrentEnt)
 {
 	if (!pCurrentEnt)
 	{
@@ -6062,10 +6060,10 @@ CBaseEntity* CGlobalEntityList<T>::NextEnt(CBaseEntity* pCurrentEnt)
 		if (!pInfo)
 			return NULL;
 
-		return (CBaseEntity*)pInfo->m_pEntity;
+		return (IServerEntity*)pInfo->m_pEntity;
 	}
 
-	// Run through the list until we get a CBaseEntity.
+	// Run through the list until we get a IServerEntity.
 	const CEntInfo<T>* pList = BaseClass::GetEntInfoPtr(pCurrentEnt->GetRefEHandle());
 	if (pList)
 		pList = BaseClass::NextEntInfo(pList);
@@ -6076,12 +6074,12 @@ CBaseEntity* CGlobalEntityList<T>::NextEnt(CBaseEntity* pCurrentEnt)
 		if (pList->m_pEntity)
 		{
 			T* pUnk = (const_cast<T*>(pList->m_pEntity));
-			CBaseEntity* pRet = pUnk->GetBaseEntity();
+			IServerEntity* pRet = pUnk->GetBaseEntity();
 			if (pRet)
 				return pRet;
 		}
 #else
-		return (CBaseEntity*)pList->m_pEntity;
+		return (IServerEntity*)pList->m_pEntity;
 #endif
 		pList = pList->m_pNext;
 	}
@@ -6093,7 +6091,7 @@ CBaseEntity* CGlobalEntityList<T>::NextEnt(CBaseEntity* pCurrentEnt)
 extern CAimTargetManager g_AimManager;
 
 template<class T>
-void CGlobalEntityList<T>::ReportEntityFlagsChanged(CBaseEntity* pEntity, unsigned int flagsOld, unsigned int flagsNow)
+void CGlobalEntityList<T>::ReportEntityFlagsChanged(IServerEntity* pEntity, unsigned int flagsOld, unsigned int flagsNow)
 {
 	if (pEntity->GetEngineObject()->IsMarkedForDeletion())
 		return;
@@ -6122,7 +6120,7 @@ int CGlobalEntityList<T>::AimTarget_ListCount()
 }
 
 template<class T>
-int CGlobalEntityList<T>::AimTarget_ListCopy(CBaseEntity* pList[], int listMax)
+int CGlobalEntityList<T>::AimTarget_ListCopy(IServerEntity* pList[], int listMax)
 {
 	return g_AimManager.ListCopy(pList, listMax);
 }
@@ -6143,13 +6141,13 @@ int CGlobalEntityList<T>::SimThink_ListCount()
 }
 
 template<class T>
-int CGlobalEntityList<T>::SimThink_ListCopy(CBaseEntity* pList[], int listMax)
+int CGlobalEntityList<T>::SimThink_ListCopy(IServerEntity* pList[], int listMax)
 {
 	return g_SimThinkManager.ListCopy(pList, listMax);
 }
 
 template<class T>
-void CGlobalEntityList<T>::SimThink_EntityChanged(CBaseEntity* pEntity)
+void CGlobalEntityList<T>::SimThink_EntityChanged(IServerEntity* pEntity)
 {
 	g_SimThinkManager.EntityChanged(pEntity);
 }
@@ -6180,13 +6178,13 @@ bool CGlobalEntityList<T>::IsEntityPtr(void* pTest)
 //			szName - Classname to search for.
 //-----------------------------------------------------------------------------
 template<class T>
-CBaseEntity* CGlobalEntityList<T>::FindEntityByClassname(CBaseEntity* pStartEntity, const char* szName)
+IServerEntity* CGlobalEntityList<T>::FindEntityByClassname(IServerEntity* pStartEntity, const char* szName)
 {
 	const CEntInfo<T>* pInfo = pStartEntity ? BaseClass::GetEntInfoPtr(pStartEntity->GetRefEHandle())->m_pNext : BaseClass::FirstEntInfo();
 
 	for (; pInfo; pInfo = pInfo->m_pNext)
 	{
-		CBaseEntity* pEntity = (CBaseEntity*)pInfo->m_pEntity;
+		IServerEntity* pEntity = (IServerEntity*)pInfo->m_pEntity;
 		if (!pEntity)
 		{
 			DevWarning("NULL entity in global entity list!\n");
@@ -6208,7 +6206,7 @@ CBaseEntity* CGlobalEntityList<T>::FindEntityByClassname(CBaseEntity* pStartEnti
 //				or Use handler.
 //-----------------------------------------------------------------------------
 template<class T>
-CBaseEntity* CGlobalEntityList<T>::FindEntityProcedural(const char* szName, CBaseEntity* pSearchingEntity, CBaseEntity* pActivator, CBaseEntity* pCaller)
+IServerEntity* CGlobalEntityList<T>::FindEntityProcedural(const char* szName, IServerEntity* pSearchingEntity, IServerEntity* pActivator, IServerEntity* pCaller)
 {
 	//
 	// Check for the name escape character.
@@ -6277,7 +6275,7 @@ CBaseEntity* CGlobalEntityList<T>::FindEntityProcedural(const char* szName, CBas
 //				handler or Use handler.
 //-----------------------------------------------------------------------------
 template<class T>
-CBaseEntity* CGlobalEntityList<T>::FindEntityByName(CBaseEntity* pStartEntity, const char* szName, CBaseEntity* pSearchingEntity, CBaseEntity* pActivator, CBaseEntity* pCaller, IEntityFindFilter* pFilter)
+IServerEntity* CGlobalEntityList<T>::FindEntityByName(IServerEntity* pStartEntity, const char* szName, IServerEntity* pSearchingEntity, IServerEntity* pActivator, IServerEntity* pCaller, IEntityFindFilter* pFilter)
 {
 	if (!szName || szName[0] == 0)
 		return NULL;
@@ -6297,7 +6295,7 @@ CBaseEntity* CGlobalEntityList<T>::FindEntityByName(CBaseEntity* pStartEntity, c
 
 	for (; pInfo; pInfo = pInfo->m_pNext)
 	{
-		CBaseEntity* ent = (CBaseEntity*)pInfo->m_pEntity;
+		IServerEntity* ent = (IServerEntity*)pInfo->m_pEntity;
 		if (!ent)
 		{
 			DevWarning("NULL entity in global entity list!\n");
@@ -6325,13 +6323,13 @@ CBaseEntity* CGlobalEntityList<T>::FindEntityByName(CBaseEntity* pStartEntity, c
 //			szModelName - 
 //-----------------------------------------------------------------------------
 template<class T>
-CBaseEntity* CGlobalEntityList<T>::FindEntityByModel(CBaseEntity* pStartEntity, const char* szModelName)
+IServerEntity* CGlobalEntityList<T>::FindEntityByModel(IServerEntity* pStartEntity, const char* szModelName)
 {
 	const CEntInfo<T>* pInfo = pStartEntity ? BaseClass::GetEntInfoPtr(pStartEntity->GetRefEHandle())->m_pNext : BaseClass::FirstEntInfo();
 
 	for (; pInfo; pInfo = pInfo->m_pNext)
 	{
-		CBaseEntity* ent = (CBaseEntity*)pInfo->m_pEntity;
+		IServerEntity* ent = (IServerEntity*)pInfo->m_pEntity;
 		if (!ent)
 		{
 			DevWarning("NULL entity in global entity list!\n");
@@ -6356,23 +6354,23 @@ CBaseEntity* CGlobalEntityList<T>::FindEntityByModel(CBaseEntity* pStartEntity, 
 //-----------------------------------------------------------------------------
 // FIXME: obsolete, remove
 template<class T>
-CBaseEntity* CGlobalEntityList<T>::FindEntityByTarget(CBaseEntity* pStartEntity, const char* szName)
+IServerEntity* CGlobalEntityList<T>::FindEntityByTarget(IServerEntity* pStartEntity, const char* szName)
 {
 	const CEntInfo<T>* pInfo = pStartEntity ? BaseClass::GetEntInfoPtr(pStartEntity->GetRefEHandle())->m_pNext : BaseClass::FirstEntInfo();
 
 	for (; pInfo; pInfo = pInfo->m_pNext)
 	{
-		CBaseEntity* ent = (CBaseEntity*)pInfo->m_pEntity;
+		IServerEntity* ent = (IServerEntity*)pInfo->m_pEntity;
 		if (!ent)
 		{
 			DevWarning("NULL entity in global entity list!\n");
 			continue;
 		}
 
-		if (!ent->m_target)
+		if (!ent->GetTarget())
 			continue;
 
-		if (datamap_t::FStrEq(STRING(ent->m_target), szName))
+		if (datamap_t::FStrEq(STRING(ent->GetTarget()), szName))
 			return ent;
 	}
 
@@ -6387,13 +6385,13 @@ CBaseEntity* CGlobalEntityList<T>::FindEntityByTarget(CBaseEntity* pStartEntity,
 //			flRadius - 
 //-----------------------------------------------------------------------------
 template<class T>
-CBaseEntity* CGlobalEntityList<T>::FindEntityInSphere(CBaseEntity* pStartEntity, const Vector& vecCenter, float flRadius)
+IServerEntity* CGlobalEntityList<T>::FindEntityInSphere(IServerEntity* pStartEntity, const Vector& vecCenter, float flRadius)
 {
 	const CEntInfo<T>* pInfo = pStartEntity ? BaseClass::GetEntInfoPtr(pStartEntity->GetRefEHandle())->m_pNext : BaseClass::FirstEntInfo();
 
 	for (; pInfo; pInfo = pInfo->m_pNext)
 	{
-		CBaseEntity* ent = (CBaseEntity*)pInfo->m_pEntity;
+		IServerEntity* ent = (IServerEntity*)pInfo->m_pEntity;
 		if (!ent)
 		{
 			DevWarning("NULL entity in global entity list!\n");
@@ -6427,9 +6425,9 @@ CBaseEntity* CGlobalEntityList<T>::FindEntityInSphere(CBaseEntity* pStartEntity,
 // Output : Returns a pointer to the found entity, NULL if none.
 //-----------------------------------------------------------------------------
 template<class T>
-CBaseEntity* CGlobalEntityList<T>::FindEntityByNameNearest(const char* szName, const Vector& vecSrc, float flRadius, CBaseEntity* pSearchingEntity, CBaseEntity* pActivator, CBaseEntity* pCaller)
+IServerEntity* CGlobalEntityList<T>::FindEntityByNameNearest(const char* szName, const Vector& vecSrc, float flRadius, IServerEntity* pSearchingEntity, IServerEntity* pActivator, IServerEntity* pCaller)
 {
-	CBaseEntity* pEntity = NULL;
+	IServerEntity* pEntity = NULL;
 
 	//
 	// Check for matching class names within the search radius.
@@ -6440,7 +6438,7 @@ CBaseEntity* CGlobalEntityList<T>::FindEntityByNameNearest(const char* szName, c
 		flMaxDist2 = MAX_TRACE_LENGTH * MAX_TRACE_LENGTH;
 	}
 
-	CBaseEntity* pSearch = NULL;
+	IServerEntity* pSearch = NULL;
 	while ((pSearch = FindEntityByName(pSearch, szName, pSearchingEntity, pActivator, pCaller)) != NULL)
 	{
 		if (pSearch->entindex()==-1)
@@ -6472,12 +6470,12 @@ CBaseEntity* CGlobalEntityList<T>::FindEntityByNameNearest(const char* szName, c
 // Output : Returns a pointer to the found entity, NULL if none.
 //-----------------------------------------------------------------------------
 template<class T>
-CBaseEntity* CGlobalEntityList<T>::FindEntityByNameWithin(CBaseEntity* pStartEntity, const char* szName, const Vector& vecSrc, float flRadius, CBaseEntity* pSearchingEntity, CBaseEntity* pActivator, CBaseEntity* pCaller)
+IServerEntity* CGlobalEntityList<T>::FindEntityByNameWithin(IServerEntity* pStartEntity, const char* szName, const Vector& vecSrc, float flRadius, IServerEntity* pSearchingEntity, IServerEntity* pActivator, IServerEntity* pCaller)
 {
 	//
 	// Check for matching class names within the search radius.
 	//
-	CBaseEntity* pEntity = pStartEntity;
+	IServerEntity* pEntity = pStartEntity;
 	float flMaxDist2 = flRadius * flRadius;
 	if (flMaxDist2 == 0)
 	{
@@ -6510,9 +6508,9 @@ CBaseEntity* CGlobalEntityList<T>::FindEntityByNameWithin(CBaseEntity* pStartEnt
 // Output : Returns a pointer to the found entity, NULL if none.
 //-----------------------------------------------------------------------------
 template<class T>
-CBaseEntity* CGlobalEntityList<T>::FindEntityByClassnameNearest(const char* szName, const Vector& vecSrc, float flRadius)
+IServerEntity* CGlobalEntityList<T>::FindEntityByClassnameNearest(const char* szName, const Vector& vecSrc, float flRadius)
 {
-	CBaseEntity* pEntity = NULL;
+	IServerEntity* pEntity = NULL;
 
 	//
 	// Check for matching class names within the search radius.
@@ -6523,7 +6521,7 @@ CBaseEntity* CGlobalEntityList<T>::FindEntityByClassnameNearest(const char* szNa
 		flMaxDist2 = MAX_TRACE_LENGTH * MAX_TRACE_LENGTH;
 	}
 
-	CBaseEntity* pSearch = NULL;
+	IServerEntity* pSearch = NULL;
 	while ((pSearch = FindEntityByClassname(pSearch, szName)) != NULL)
 	{
 		if (pSearch->entindex()==-1)
@@ -6552,12 +6550,12 @@ CBaseEntity* CGlobalEntityList<T>::FindEntityByClassnameNearest(const char* szNa
 // Output : Returns a pointer to the found entity, NULL if none.
 //-----------------------------------------------------------------------------
 template<class T>
-CBaseEntity* CGlobalEntityList<T>::FindEntityByClassnameWithin(CBaseEntity* pStartEntity, const char* szName, const Vector& vecSrc, float flRadius)
+IServerEntity* CGlobalEntityList<T>::FindEntityByClassnameWithin(IServerEntity* pStartEntity, const char* szName, const Vector& vecSrc, float flRadius)
 {
 	//
 	// Check for matching class names within the search radius.
 	//
-	CBaseEntity* pEntity = pStartEntity;
+	IServerEntity* pEntity = pStartEntity;
 	float flMaxDist2 = flRadius * flRadius;
 	if (flMaxDist2 == 0)
 	{
@@ -6590,12 +6588,12 @@ CBaseEntity* CGlobalEntityList<T>::FindEntityByClassnameWithin(CBaseEntity* pSta
 // Output : Returns a pointer to the found entity, NULL if none.
 //-----------------------------------------------------------------------------
 template<class T>
-CBaseEntity* CGlobalEntityList<T>::FindEntityByClassnameWithin(CBaseEntity* pStartEntity, const char* szName, const Vector& vecMins, const Vector& vecMaxs)
+IServerEntity* CGlobalEntityList<T>::FindEntityByClassnameWithin(IServerEntity* pStartEntity, const char* szName, const Vector& vecMins, const Vector& vecMaxs)
 {
 	//
 	// Check for matching class names within the search radius.
 	//
-	CBaseEntity* pEntity = pStartEntity;
+	IServerEntity* pEntity = pStartEntity;
 
 	while ((pEntity = FindEntityByClassname(pEntity, szName)) != NULL)
 	{
@@ -6628,9 +6626,9 @@ CBaseEntity* CGlobalEntityList<T>::FindEntityByClassnameWithin(CBaseEntity* pSta
 // Output : Returns a pointer to the found entity, NULL if none.
 //-----------------------------------------------------------------------------
 template<class T>
-CBaseEntity* CGlobalEntityList<T>::FindEntityGeneric(CBaseEntity* pStartEntity, const char* szName, CBaseEntity* pSearchingEntity, CBaseEntity* pActivator, CBaseEntity* pCaller)
+IServerEntity* CGlobalEntityList<T>::FindEntityGeneric(IServerEntity* pStartEntity, const char* szName, IServerEntity* pSearchingEntity, IServerEntity* pActivator, IServerEntity* pCaller)
 {
-	CBaseEntity* pEntity = NULL;
+	IServerEntity* pEntity = NULL;
 
 	pEntity = FindEntityByName(pStartEntity, szName, pSearchingEntity, pActivator, pCaller);
 	if (!pEntity)
@@ -6655,9 +6653,9 @@ CBaseEntity* CGlobalEntityList<T>::FindEntityGeneric(CBaseEntity* pStartEntity, 
 // Output : Returns a pointer to the found entity, NULL if none.
 //-----------------------------------------------------------------------------
 template<class T>
-CBaseEntity* CGlobalEntityList<T>::FindEntityGenericWithin(CBaseEntity* pStartEntity, const char* szName, const Vector& vecSrc, float flRadius, CBaseEntity* pSearchingEntity, CBaseEntity* pActivator, CBaseEntity* pCaller)
+IServerEntity* CGlobalEntityList<T>::FindEntityGenericWithin(IServerEntity* pStartEntity, const char* szName, const Vector& vecSrc, float flRadius, IServerEntity* pSearchingEntity, IServerEntity* pActivator, IServerEntity* pCaller)
 {
-	CBaseEntity* pEntity = NULL;
+	IServerEntity* pEntity = NULL;
 
 	pEntity = FindEntityByNameWithin(pStartEntity, szName, vecSrc, flRadius, pSearchingEntity, pActivator, pCaller);
 	if (!pEntity)
@@ -6681,9 +6679,9 @@ CBaseEntity* CGlobalEntityList<T>::FindEntityGenericWithin(CBaseEntity* pStartEn
 // Output : Returns a pointer to the found entity, NULL if none.
 //-----------------------------------------------------------------------------
 template<class T>
-CBaseEntity* CGlobalEntityList<T>::FindEntityGenericNearest(const char* szName, const Vector& vecSrc, float flRadius, CBaseEntity* pSearchingEntity, CBaseEntity* pActivator, CBaseEntity* pCaller)
+IServerEntity* CGlobalEntityList<T>::FindEntityGenericNearest(const char* szName, const Vector& vecSrc, float flRadius, IServerEntity* pSearchingEntity, IServerEntity* pActivator, IServerEntity* pCaller)
 {
-	CBaseEntity* pEntity = NULL;
+	IServerEntity* pEntity = NULL;
 
 	pEntity = FindEntityByNameNearest(szName, vecSrc, flRadius, pSearchingEntity, pActivator, pCaller);
 	if (!pEntity)
@@ -6705,16 +6703,16 @@ CBaseEntity* CGlobalEntityList<T>::FindEntityGenericNearest(const char* szName, 
 //			classname - 
 //-----------------------------------------------------------------------------
 template<class T>
-CBaseEntity* CGlobalEntityList<T>::FindEntityClassNearestFacing(const Vector& origin, const Vector& facing, float threshold, char* classname)
+IServerEntity* CGlobalEntityList<T>::FindEntityClassNearestFacing(const Vector& origin, const Vector& facing, float threshold, char* classname)
 {
 	float bestDot = threshold;
-	CBaseEntity* best_ent = NULL;
+	IServerEntity* best_ent = NULL;
 
 	const CEntInfo<T>* pInfo = BaseClass::FirstEntInfo();
 
 	for (; pInfo; pInfo = pInfo->m_pNext)
 	{
-		CBaseEntity* ent = (CBaseEntity*)pInfo->m_pEntity;
+		IServerEntity* ent = (IServerEntity*)pInfo->m_pEntity;
 		if (!ent)
 		{
 			DevWarning("NULL entity in global entity list!\n");
@@ -6755,16 +6753,16 @@ CBaseEntity* CGlobalEntityList<T>::FindEntityClassNearestFacing(const Vector& or
 //			threshold - 
 //-----------------------------------------------------------------------------
 template<class T>
-CBaseEntity* CGlobalEntityList<T>::FindEntityNearestFacing(const Vector& origin, const Vector& facing, float threshold)
+IServerEntity* CGlobalEntityList<T>::FindEntityNearestFacing(const Vector& origin, const Vector& facing, float threshold)
 {
 	float bestDot = threshold;
-	CBaseEntity* best_ent = NULL;
+	IServerEntity* best_ent = NULL;
 
 	const CEntInfo<T>* pInfo = BaseClass::FirstEntInfo();
 
 	for (; pInfo; pInfo = pInfo->m_pNext)
 	{
-		CBaseEntity* ent = (CBaseEntity*)pInfo->m_pEntity;
+		IServerEntity* ent = (IServerEntity*)pInfo->m_pEntity;
 		if (!ent)
 		{
 			DevWarning("NULL entity in global entity list!\n");
@@ -6814,8 +6812,8 @@ void CGlobalEntityList<T>::OnAddEntity(T* pEnt, CBaseHandle handle)
 	if (i > m_iHighestEnt)
 		m_iHighestEnt = i;
 
-	// If it's a CBaseEntity, notify the listeners.
-	CBaseEntity* pBaseEnt = (pEnt)->GetBaseEntity();
+	// If it's a IServerEntity, notify the listeners.
+	IServerEntity* pBaseEnt = (IServerEntity*)pEnt;
 	//m_EngineObjectArray[i] = new CEngineObjectInternal();
 	m_EngineObjectArray[i]->Init(pBaseEnt);
 
@@ -6858,7 +6856,7 @@ void CGlobalEntityList<T>::OnRemoveEntity(T* pEnt, CBaseHandle handle)
 	delete m_EngineObjectArray[entnum];
 	m_EngineObjectArray[entnum] = NULL;
 
-	CBaseEntity* pBaseEnt = pEnt->GetBaseEntity();
+	IServerEntity* pBaseEnt = (IServerEntity*)pEnt;
 	if (pBaseEnt->IsNetworkable()) {
 		if (pBaseEnt->entindex() != -1)
 			m_iNumEdicts--;
@@ -6952,7 +6950,7 @@ extern ConVar g_ragdoll_important_maxcount;
 // Move it to the top of the LRU
 //-----------------------------------------------------------------------------
 template<class T>
-void CGlobalEntityList<T>::MoveToTopOfLRU(CBaseEntity* pRagdoll, bool bImportant)
+void CGlobalEntityList<T>::MoveToTopOfLRU(IServerEntity* pRagdoll, bool bImportant)
 {
 	if (bImportant)
 	{
@@ -6962,7 +6960,7 @@ void CGlobalEntityList<T>::MoveToTopOfLRU(CBaseEntity* pRagdoll, bool bImportant
 		{
 			int iIndex = m_LRUImportantRagdolls.Head();
 
-			CBaseEntity* pRagdoll = m_LRUImportantRagdolls[iIndex].Get();
+			IServerEntity* pRagdoll = m_LRUImportantRagdolls[iIndex].Get();
 
 			if (pRagdoll)
 			{
@@ -7019,7 +7017,7 @@ void CGlobalEntityList<T>::UpdateRagdolls(float frametime) // EPISODIC VERSION
 	for (i = m_LRU.Head(); i < m_LRU.InvalidIndex(); i = next)
 	{
 		next = m_LRU.Next(i);
-		CBaseEntity* pRagdoll = m_LRU[i].Get();
+		IServerEntity* pRagdoll = m_LRU[i].Get();
 		if (pRagdoll)
 		{
 			m_iRagdollCount++;
@@ -7053,7 +7051,7 @@ void CGlobalEntityList<T>::UpdateRagdolls(float frametime) // EPISODIC VERSION
 	int furthestOne = m_LRU.Head();
 	float furthestDistSq = 0;
 
-	CBaseEntity* pPlayer = GetLocalPlayer();
+	IServerEntity* pPlayer = GetLocalPlayer();
 
 	if (pPlayer && m_LRU.Count() > iMaxRagdollCount) // find the furthest one algorithm
 	{
@@ -7062,7 +7060,7 @@ void CGlobalEntityList<T>::UpdateRagdolls(float frametime) // EPISODIC VERSION
 
 		for (i = m_LRU.Head(); i < m_LRU.InvalidIndex(); i = next)
 		{
-			CBaseEntity* pRagdoll = m_LRU[i].Get();
+			IServerEntity* pRagdoll = m_LRU[i].Get();
 
 			next = m_LRU.Next(i);
 			IPhysicsObject* pObject = pRagdoll->GetEngineObject()->VPhysicsGetObject();
@@ -7099,7 +7097,7 @@ void CGlobalEntityList<T>::UpdateRagdolls(float frametime) // EPISODIC VERSION
 
 			next = m_LRU.Next(i);
 
-			CBaseEntity* pRagdoll = m_LRU[i].Get();
+			IServerEntity* pRagdoll = m_LRU[i].Get();
 
 			//Just ignore it until we're done burning/dissolving.
 			IPhysicsObject* pObject = pRagdoll->GetEngineObject()->VPhysicsGetObject();
@@ -7138,7 +7136,7 @@ void CGlobalEntityList<T>::UpdateRagdolls(float frametime) // Non-episodic versi
 	for (i = m_LRU.Head(); i < m_LRU.InvalidIndex(); i = next)
 	{
 		next = m_LRU.Next(i);
-		CBaseEntity* pRagdoll = m_LRU[i].Get();
+		IServerEntity* pRagdoll = m_LRU[i].Get();
 		if (pRagdoll)
 		{
 			m_iRagdollCount++;
@@ -7177,7 +7175,7 @@ void CGlobalEntityList<T>::UpdateRagdolls(float frametime) // Non-episodic versi
 
 		next = m_LRU.Next(i);
 
-		CBaseEntity* pRagdoll = m_LRU[i].Get();
+		IServerEntity* pRagdoll = m_LRU[i].Get();
 
 		//Just ignore it until we're done burning/dissolving.
 		if (pRagdoll && pRagdoll->GetEffectEntity())
@@ -7298,7 +7296,7 @@ IServerEntity* CGlobalEntityList<T>::GetPlayerHoldingEntity(IServerEntity* pEnti
 {
 	for (int i = 1; i <= gpGlobals->maxClients; ++i)
 	{
-		CBaseEntity* pPlayer = GetBaseEntity(i);
+		IServerEntity* pPlayer = GetBaseEntity(i);
 		if (pPlayer)
 		{
 			if (pPlayer->GetPlayerHeldEntity() == pEntity || (pPlayer->GetActiveWeapon() && pPlayer->GetActiveWeapon()->PhysCannonGetHeldEntity() == pEntity))
@@ -7321,7 +7319,7 @@ CCallQueue* CGlobalEntityList<T>::GetPostTouchQueue()
 template <class ENT_TYPE>
 inline bool FindEntityByName( const char *pszName, ENT_TYPE **ppResult)
 {
-	CBaseEntity *pBaseEntity = FindEntityByName( NULL, pszName );
+	IServerEntity *pBaseEntity = FindEntityByName( NULL, pszName );
 	
 	if ( pBaseEntity )
 		*ppResult = dynamic_cast<ENT_TYPE *>( pBaseEntity );
@@ -7332,7 +7330,7 @@ inline bool FindEntityByName( const char *pszName, ENT_TYPE **ppResult)
 }
 
 template <>
-inline bool FindEntityByName<CBaseEntity>( const char *pszName, CBaseEntity **ppResult)
+inline bool FindEntityByName<IServerEntity>( const char *pszName, IServerEntity **ppResult)
 {
 	*ppResult = FindEntityByName( NULL, pszName );
 	return ( *ppResult != NULL );
@@ -7341,7 +7339,7 @@ inline bool FindEntityByName<CBaseEntity>( const char *pszName, CBaseEntity **pp
 template <>
 inline bool FindEntityByName<CAI_BaseNPC>( const char *pszName, CAI_BaseNPC **ppResult)
 {
-	CBaseEntity *pBaseEntity = FindEntityByName( NULL, pszName );
+	IServerEntity *pBaseEntity = FindEntityByName( NULL, pszName );
 	
 	if ( pBaseEntity )
 		*ppResult = pBaseEntity->MyNPCPointer();

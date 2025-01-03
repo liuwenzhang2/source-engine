@@ -113,7 +113,7 @@ void CPointHurt::HurtThink( void )
 {
 	if ( m_strTarget != NULL_STRING )
 	{
-		CBaseEntity	*pEnt = NULL;
+		IServerEntity	*pEnt = NULL;
 			
 		CTakeDamageInfo info( this, m_pActivator, m_nDamage, m_bitsDamageType );
 		while ( ( pEnt = EntityList()->FindEntityByName( pEnt, m_strTarget, NULL, m_pActivator ) ) != NULL )
@@ -139,7 +139,7 @@ void CPointHurt::InputTurnOn( inputdata_t &data )
 
 	GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.1f );
 
-	m_pActivator = data.pActivator;
+	m_pActivator = (CBaseEntity*)data.pActivator;
 }
 
 //-----------------------------------------------------------------------------
@@ -149,7 +149,7 @@ void CPointHurt::InputTurnOff( inputdata_t &data )
 {
 	SetThink( NULL );
 
-	m_pActivator = data.pActivator;
+	m_pActivator = (CBaseEntity*)data.pActivator;
 }
 
 //-----------------------------------------------------------------------------
@@ -157,7 +157,7 @@ void CPointHurt::InputTurnOff( inputdata_t &data )
 //-----------------------------------------------------------------------------
 void CPointHurt::InputToggle( inputdata_t &data )
 {
-	m_pActivator = data.pActivator;
+	m_pActivator = (CBaseEntity*)data.pActivator;
 
 	if (GetEngineObject()->GetPfnThink() == (THINKPTR) & CPointHurt::HurtThink)
 	{
@@ -174,7 +174,7 @@ void CPointHurt::InputToggle( inputdata_t &data )
 //-----------------------------------------------------------------------------
 void CPointHurt::InputHurt( inputdata_t &data )
 {
-	m_pActivator = data.pActivator;
+	m_pActivator = (CBaseEntity*)data.pActivator;
 
 	HurtThink();
 }

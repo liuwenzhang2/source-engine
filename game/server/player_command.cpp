@@ -56,13 +56,12 @@ void CPlayerMove::StartCommand( CBasePlayer *player, CUserCmd *cmd )
 	for (i = 0; i < cmd->entitygroundcontact.Count(); i++)
 	{
 		int entindex =  cmd->entitygroundcontact[i].entindex;
-		CBaseEntity *pEntity = EntityList()->GetBaseEntity( entindex);
+		IServerEntity *pEntity = EntityList()->GetBaseEntity( entindex);
 		if (pEntity)
 		{
-			CBaseAnimating *pAnimating = pEntity->GetBaseAnimating();
-			if (pAnimating)
+			if (pEntity->GetEngineObject()->GetModelPtr())
 			{
-				pAnimating->GetEngineObject()->SetIKGroundContactInfo( cmd->entitygroundcontact[i].minheight, cmd->entitygroundcontact[i].maxheight );
+				pEntity->GetEngineObject()->SetIKGroundContactInfo( cmd->entitygroundcontact[i].minheight, cmd->entitygroundcontact[i].maxheight );
 			}
 		}
 	}
@@ -97,7 +96,7 @@ void CPlayerMove::CheckMovingGround( CBasePlayer *player, double frametime )
 
 	if ( player->GetEngineObject()->GetFlags() & FL_ONGROUND )
 	{
-		groundentity = player->GetEngineObject()->GetGroundEntity() ? player->GetEngineObject()->GetGroundEntity()->GetOuter() : NULL;
+		groundentity = player->GetEngineObject()->GetGroundEntity() ? (CBaseEntity*)player->GetEngineObject()->GetGroundEntity()->GetOuter() : NULL;
 		if ( groundentity && ( groundentity->GetEngineObject()->GetFlags() & FL_CONVEYOR) )
 		{
 			Vector vecNewVelocity;

@@ -66,7 +66,7 @@ public:
 	virtual void OnPhysGunPickup( CBasePlayer *pPhysGunUser, PhysGunPickup_t reason );
 	virtual void OnPhysGunDrop( CBasePlayer *pPhysGunUser, PhysGunDrop_t Reason );
 
-	bool		 HasPreferredCarryAnglesForPlayer( CBaseEntity *pPlayer );
+	bool		 HasPreferredCarryAnglesForPlayer( IServerEntity *pPlayer );
 	virtual QAngle PreferredCarryAngles( void ) { return m_angPreferredCarryAngles; }
 
 	// inputs
@@ -112,9 +112,9 @@ public:
 	DECLARE_CLASS( CPhysExplosion, CPointEntity );
 
 	void	Spawn ( void );
-	void	Explode( CBaseEntity *pActivator, CBaseEntity *pCaller );
+	void	Explode( IServerEntity *pActivator, IServerEntity *pCaller );
 
-	CBaseEntity *FindEntity( CBaseEntity *pEntity, CBaseEntity *pActivator, CBaseEntity *pCaller );
+	IServerEntity *FindEntity( IServerEntity *pEntity, IServerEntity *pActivator, IServerEntity *pCaller );
 
 	int DrawDebugTextOverlays(void);
 

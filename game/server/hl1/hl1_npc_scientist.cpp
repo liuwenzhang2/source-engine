@@ -1047,7 +1047,7 @@ int CNPC_SittingScientist::FriendNumber( int arrayNumber )
 //=========================================================
 void CNPC_SittingScientist::SittingThink( void )
 {
-	CBaseEntity *pent;	
+	IServerEntity *pent;	
 
 	StudioFrameAdvance( );
 

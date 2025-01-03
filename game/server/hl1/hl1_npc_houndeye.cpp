@@ -414,11 +414,11 @@ void CNPC_Houndeye::SonicAttack ( void )
 		0												//speed
 		);
 	
-	CBaseEntity *pEntity = NULL;
+	IServerEntity *pEntity = NULL;
 	// iterate on all entities in the vicinity.
 	while ((pEntity = EntityList()->FindEntityInSphere( pEntity, GetEngineObject()->GetAbsOrigin(), HOUNDEYE_MAX_ATTACK_RADIUS )) != NULL)
 	{
-		if ( pEntity->m_takedamage  != DAMAGE_NO )
+		if ( pEntity->GetTakeDamage()  != DAMAGE_NO )
 		{
 			if ( !FClassnameIs(pEntity, "monster_houndeye") )
 			{// houndeyes don't hurt other houndeyes with their attack
@@ -442,7 +442,7 @@ void CNPC_Houndeye::SonicAttack ( void )
 
 				flAdjustedDamage -= ( flDist / HOUNDEYE_MAX_ATTACK_RADIUS ) * flAdjustedDamage;
 
-				if ( !FVisible( pEntity ) )
+				if ( !FVisible( (CBaseEntity*)pEntity ) )
 				{
 					if ( pEntity->IsPlayer() )
 					{
@@ -865,7 +865,7 @@ int CNPC_Houndeye::TranslateSchedule( int scheduleType )
 		{
 			if ( m_NPCState == NPC_STATE_COMBAT )
 			{
-				CBaseEntity* pEnt = EntityList()->FindClientInPVS(this);
+				IServerEntity* pEnt = EntityList()->FindClientInPVS(this);
 				if (pEnt!=NULL && pEnt->entindex()>0)
 				{
 					// client in PVS
@@ -964,7 +964,7 @@ int CNPC_Houndeye::SquadRecruit( int searchRadius, int maxMembers )
 	// I am my own leader
 	squadCount = 1;
 
-	CBaseEntity *pEntity = NULL;
+	IServerEntity *pEntity = NULL;
 
 	if ( m_SquadName != NULL_STRING )
 	{
@@ -973,7 +973,7 @@ int CNPC_Houndeye::SquadRecruit( int searchRadius, int maxMembers )
 
 		while ( pEntity && squadCount < maxMembers )
 		{
-			CNPC_Houndeye *pRecruit = (CNPC_Houndeye*)pEntity->MyNPCPointer();
+			CNPC_Houndeye *pRecruit = (CNPC_Houndeye*)((CBaseEntity*)pEntity)->MyNPCPointer();
 
 			if ( pRecruit )
 			{
@@ -1005,7 +1005,7 @@ int CNPC_Houndeye::SquadRecruit( int searchRadius, int maxMembers )
 			if ( !FClassnameIs ( pEntity, "monster_houndeye" ) )
 				continue;
 
-			CNPC_Houndeye *pRecruit = (CNPC_Houndeye*)pEntity->MyNPCPointer();
+			CNPC_Houndeye *pRecruit = (CNPC_Houndeye*)((CBaseEntity*)pEntity)->MyNPCPointer();
 
 			if ( pRecruit && pRecruit != this && pRecruit->IsAlive() && !pRecruit->m_hCine )
 			{

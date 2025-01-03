@@ -489,7 +489,7 @@ CBaseEntity* CBaseAnimating::CreateServerRagdoll(int forceBone, const CTakeDamag
 
 	// NOTE: This currently is only necessary to prevent manhacks from
 	// colliding with server ragdolls they kill
-	pRagdoll->SetKiller(info.GetInflictor());
+	pRagdoll->SetKiller((CBaseEntity*)info.GetInflictor());
 	pRagdoll->SetSourceClassName(this->GetClassname());
 
 	// NPC_STATE_DEAD npc's will have their COND_IN_PVS cleared, so this needs to force SetupBones to happen

@@ -492,7 +492,7 @@ void CNPC_Alyx::CreateEmpTool( void )
 	if ( m_hEmpTool )
 	{
 		m_hEmpTool->SetModel( "models/alyx_emptool_prop.mdl" );
-		m_hEmpTool->SetName( "Alyx_Emptool" );
+		m_hEmpTool->GetEngineObject()->SetName( "Alyx_Emptool" );
 		int iAttachment = GetEngineObject()->LookupAttachment( "Emp_Holster" );
 		m_hEmpTool->GetEngineObject()->SetParent(this->GetEngineObject(), iAttachment);
 		m_hEmpTool->SetOwnerEntity(this);
@@ -751,7 +751,7 @@ void CNPC_Alyx::GatherConditions()
 			{
 				// If the power level is low, consider it expired, due
 				// to it running out or the player turning it off in anticipation.
-				CHL2_Player *pHLPlayer = assert_cast<CHL2_Player*>( pPlayer );
+				CHL2_Player *pHLPlayer = ToHL2Player( pPlayer );
 				if ( pHLPlayer->SuitPower_GetCurrentPercentage() < 15 )
 				{
 					SetCondition( COND_ALYX_PLAYER_FLASHLIGHT_EXPIRED );
@@ -859,7 +859,7 @@ bool CNPC_Alyx::ShouldPlayerAvoid( void )
 #if 1
 	if( IsCurSchedule( SCHED_PC_GET_OFF_COMPANION, false) )
 	{
-		CBaseEntity* pGroundEnt = GetEngineObject()->GetGroundEntity() ? GetEngineObject()->GetGroundEntity()->GetOuter() : NULL;
+		IServerEntity* pGroundEnt = GetEngineObject()->GetGroundEntity() ? GetEngineObject()->GetGroundEntity()->GetOuter() : NULL;
 		if( pGroundEnt != NULL && pGroundEnt->IsPlayer() )
 		{
 			if(GetEngineObject()->GetAbsOrigin().z < pGroundEnt->EyePosition().z )
@@ -975,7 +975,7 @@ void CNPC_Alyx::Event_Killed( const CTakeDamageInfo &info )
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-void CNPC_Alyx::Event_KilledOther( CBaseEntity *pVictim, const CTakeDamageInfo &info )
+void CNPC_Alyx::Event_KilledOther( IServerEntity *pVictim, const CTakeDamageInfo &info )
 {
 	// comment on killing npc's
 	if ( pVictim->IsNPC() )
@@ -1002,7 +1002,7 @@ void CNPC_Alyx::Event_KilledOther( CBaseEntity *pVictim, const CTakeDamageInfo &
 	{
 		CAI_BaseNPC *pTarget = CreateCustomTarget( pVictim->GetEngineObject()->GetAbsOrigin(), 2.0f );
 
-		AddEntityRelationship( pTarget, IRelationType(pVictim), IRelationPriority(pVictim) );
+		AddEntityRelationship( pTarget, IRelationType((CBaseEntity*)pVictim), IRelationPriority((CBaseEntity*)pVictim) );
 
 		// Update or Create a memory entry for this target and make Alyx think she's seen this target recently.
 		// This prevents the baseclass from not recognizing this target and forcing Alyx into 
@@ -1530,7 +1530,7 @@ int CNPC_Alyx::IRelationPriority( CBaseEntity *pTarget )
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
 #define ALYX_360_VIEW_DIST_SQR	129600 // 30 feet
-bool CNPC_Alyx::FInViewCone( CBaseEntity *pEntity )
+bool CNPC_Alyx::FInViewCone( IServerEntity *pEntity )
 {
 	// Alyx can see 360 degrees but only at limited distance. This allows her to be aware of a 
 	// large mob of enemies (usually antlions or zombies) closing in. This situation is so obvious to the 
@@ -1546,7 +1546,7 @@ bool CNPC_Alyx::FInViewCone( CBaseEntity *pEntity )
 	// Else, fall through...
  	if ( HL2GameRules()->IsAlyxInDarknessMode() )
 	{
-		if ( CanSeeEntityInDarkness( pEntity ) )
+		if ( CanSeeEntityInDarkness( (CBaseEntity*)pEntity ) )
 			return true;
 	}
 
@@ -2260,7 +2260,7 @@ void CNPC_Alyx::TraceAttack( const CTakeDamageInfo &info, const Vector &vecDir, 
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-bool CNPC_Alyx::CanBeHitByMeleeAttack( CBaseEntity *pAttacker )
+bool CNPC_Alyx::CanBeHitByMeleeAttack( IServerEntity *pAttacker )
 {
 	if( IsCurSchedule(SCHED_DUCK_DODGE) )
 	{
@@ -2293,7 +2293,7 @@ int CNPC_Alyx::OnTakeDamage_Alive( const CTakeDamageInfo &info )
 		if ( !HasCondition(COND_SEE_ENEMY) && (info.GetDamageType() & (DMG_SLASH | DMG_CLUB) ) )
 		{
 			// I've taken melee damage. If I haven't seen the enemy for a few seconds, make some noise.
-  			float flLastTimeSeen = GetEnemies()->LastTimeSeen( info.GetAttacker(), false );
+  			float flLastTimeSeen = GetEnemies()->LastTimeSeen((CBaseEntity*)info.GetAttacker(), false );
 			if ( flLastTimeSeen == AI_INVALID_TIME || gpGlobals->curtime - flLastTimeSeen > 3.0 )
 			{
 				SpeakIfAllowed( "TLK_DARKNESS_UNKNOWN_WOUND" );
@@ -2341,9 +2341,9 @@ bool CNPC_Alyx::FCanCheckAttacks()
 //-----------------------------------------------------------------------------
 // Purpose: Half damage against Combine Soldiers in outland_10
 //-----------------------------------------------------------------------------
-float CNPC_Alyx::GetAttackDamageScale( CBaseEntity *pVictim )
+float CNPC_Alyx::GetAttackDamageScale( IHandleEntity *pVictim )
 {
-	if( g_HackOutland10DamageHack && pVictim->Classify() == CLASS_COMBINE )
+	if( g_HackOutland10DamageHack && ((CBaseEntity*)pVictim)->Classify() == CLASS_COMBINE )
 	{
 		return 0.75f;
 	}
@@ -3034,7 +3034,7 @@ void CNPC_Alyx::ModifyOrAppendCriteria( AI_CriteriaSet &set )
 	set.AppendCriteria( "darkness_mode", UTIL_VarArgs( "%d", HasCondition( COND_ALYX_IN_DARK ) ) );
 	set.AppendCriteria( "water_level", UTIL_VarArgs( "%d", GetWaterLevel() ) );
 
-	CHL2_Player *pPlayer = assert_cast<CHL2_Player*>( EntityList()->GetPlayerByIndex( 1 ) );
+	CHL2_Player *pPlayer = ToHL2Player( EntityList()->GetPlayerByIndex( 1 ) );
 	set.AppendCriteria( "num_companions", UTIL_VarArgs( "%d", pPlayer ? pPlayer->GetNumSquadCommandables() : 0 ) );
 	set.AppendCriteria( "flashlight_on", UTIL_VarArgs( "%d", pPlayer ? pPlayer->FlashlightIsOn() : 0 ) );
 
@@ -3169,7 +3169,7 @@ void CNPC_Alyx::Use( IServerEntity *pActivator, IServerEntity *pCaller, USE_TYPE
 	SpeakIfAllowed( TLK_USE );
 	m_bDontUseSemaphore = false;
 
-	m_OnPlayerUse.FireOutput( (CBaseEntity*)pActivator, (CBaseEntity*)pCaller );
+	m_OnPlayerUse.FireOutput(pActivator, pCaller );
 }
 
 //-----------------------------------------------------------------------------

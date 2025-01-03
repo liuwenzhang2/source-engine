@@ -124,7 +124,7 @@ void C_HL2MP_Player::TraceAttack( const CTakeDamageInfo &info, const Vector &vec
 
 		int blood = BloodColor();
 		
-		CBaseEntity *pAttacker = info.GetAttacker();
+		CBaseEntity *pAttacker = (CBaseEntity*)info.GetAttacker();
 
 		if ( pAttacker )
 		{
@@ -234,7 +234,7 @@ void C_HL2MP_Player::ClientThink( void )
 
 	for( int iClient = 1; iClient <= gpGlobals->maxClients; ++iClient )
 	{
-		CBaseEntity *pEnt = (CBaseEntity*)EntityList()->GetPlayerByIndex( iClient );
+		IClientEntity *pEnt = EntityList()->GetPlayerByIndex( iClient );
 		if(!pEnt || !pEnt->IsPlayer())
 			continue;
 

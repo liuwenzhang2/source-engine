@@ -237,7 +237,7 @@ void CPlayerPickupController::Init( CBasePlayer *pPlayer, CBaseEntity *pObject )
 void CPlayerPickupController::Shutdown( bool bThrown )
 {
 #ifndef CLIENT_DLL
-	CBaseEntity *pObject = GetGrabController()->GetAttached();
+	IServerEntity *pObject = GetGrabController()->GetAttached();
 
 	bool bClearVelocity = false;
 	if ( !bThrown && pObject && pObject->GetEngineObject()->VPhysicsGetObject() && pObject->GetEngineObject()->VPhysicsGetObject()->GetContactPoint(NULL,NULL) )
@@ -249,7 +249,7 @@ void CPlayerPickupController::Shutdown( bool bThrown )
 
 	if ( pObject != NULL )
 	{
-		Pickup_OnPhysGunDrop( pObject, m_pPlayer, bThrown ? THROWN_BY_PLAYER : DROPPED_BY_PLAYER );
+		Pickup_OnPhysGunDrop((CBaseEntity*)pObject, m_pPlayer, bThrown ? THROWN_BY_PLAYER : DROPPED_BY_PLAYER );
 	}
 
 	if ( m_pPlayer )
@@ -285,7 +285,7 @@ void CPlayerPickupController::Use( IServerEntity *pActivator, IServerEntity *pCa
 {
 	if ( ToBasePlayer(pActivator) == m_pPlayer )
 	{
-		CBaseEntity *pAttached = GetGrabController()->GetAttached();
+		IServerEntity *pAttached = GetGrabController()->GetAttached();
 
 		// UNDONE: Use vphysics stress to decide to drop objects
 		// UNDONE: Must fix case of forcing objects into the ground you're standing on (causes stress) before that will work
@@ -1720,13 +1720,13 @@ void CWeaponPhysCannon::DetachObject( bool playSound, bool wasLaunched )
 		pOwner->SetMaxSpeed( hl2_normspeed.GetFloat() );
 	}
 
-	CBaseEntity *pObject = GetGrabController()->GetAttached();
+	IServerEntity *pObject = GetGrabController()->GetAttached();
 
 	GetGrabController()->DetachEntity( wasLaunched );
 
 	if ( pObject != NULL )
 	{
-		Pickup_OnPhysGunDrop( pObject, pOwner, wasLaunched ? LAUNCHED_BY_CANNON : DROPPED_BY_CANNON );
+		Pickup_OnPhysGunDrop((CBaseEntity*)pObject, pOwner, wasLaunched ? LAUNCHED_BY_CANNON : DROPPED_BY_CANNON );
 	}
 
 	// Stop our looping sound
@@ -2920,7 +2920,7 @@ CBaseEntity * CWeaponPhysCannon::PhysCannonGetHeldEntity()
 	if ( this )
 	{
 		IGrabControllerServer* grab = this->GetGrabController();
-		return grab->GetAttached();
+		return (CBaseEntity*)grab->GetAttached();
 	}
 
 	return NULL;
@@ -2928,7 +2928,7 @@ CBaseEntity * CWeaponPhysCannon::PhysCannonGetHeldEntity()
 
 CBaseEntity* CHL2_Player::GetPlayerHeldEntity()
 {
-	CBaseEntity* pObject = NULL;
+	IServerEntity* pObject = NULL;
 	CPlayerPickupController* pPlayerPickupController = (CPlayerPickupController*)(this->GetUseEntity());
 
 	if (pPlayerPickupController)
@@ -2936,7 +2936,7 @@ CBaseEntity* CHL2_Player::GetPlayerHeldEntity()
 		pObject = pPlayerPickupController->GetGrabController()->GetAttached();
 	}
 
-	return pObject;
+	return (CBaseEntity*)pObject;
 }
 
 #endif // GAME_DLL

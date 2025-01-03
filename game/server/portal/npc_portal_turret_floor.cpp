@@ -123,7 +123,7 @@ public:
 
 	virtual bool	OnSide( void );
 
-	virtual float	GetAttackDamageScale( CBaseEntity *pVictim );
+	virtual float	GetAttackDamageScale( IHandleEntity *pVictim );
 	virtual Vector	GetAttackSpread( CBaseCombatWeapon *pWeapon, CBaseEntity *pTarget );
 
 	// Think functions
@@ -284,11 +284,11 @@ void CNPC_Portal_FloorTurret::Activate( void )
 	BaseClass::Activate();
 
 	// Find all nearby physics objects and add them to the list of objects we will sense
-	CBaseEntity *pObject = EntityList()->FindEntityByClassname( NULL, "prop_physics" );
+	IServerEntity *pObject = EntityList()->FindEntityByClassname( NULL, "prop_physics" );
 	while ( pObject )
 	{
 		// Tell the AI sensing list that we want to consider this
-		g_AI_SensedObjectsManager.AddEntity( pObject );
+		g_AI_SensedObjectsManager.AddEntity((CBaseEntity*)pObject );
 
 		pObject = EntityList()->FindEntityByClassname( pObject, "prop_physics" );
 	}
@@ -297,7 +297,7 @@ void CNPC_Portal_FloorTurret::Activate( void )
 	while ( pObject )
 	{
 		// Tell the AI sensing list that we want to consider this
-		g_AI_SensedObjectsManager.AddEntity( pObject );
+		g_AI_SensedObjectsManager.AddEntity((CBaseEntity*)pObject );
 
 		pObject = EntityList()->FindEntityByClassname( pObject, "func_physbox" );
 	}
@@ -694,9 +694,9 @@ inline bool CNPC_Portal_FloorTurret::OnSide( void )
 	return ( DotProduct( up, Vector(0,0,1) ) < 0.5f );
 }
 
-float CNPC_Portal_FloorTurret::GetAttackDamageScale( CBaseEntity *pVictim )
+float CNPC_Portal_FloorTurret::GetAttackDamageScale( IHandleEntity *pVictim )
 {
-	CBaseCombatCharacter *pBCC = pVictim->MyCombatCharacterPointer();
+	CBaseCombatCharacter *pBCC = ((CBaseEntity*)pVictim)->MyCombatCharacterPointer();
 
 	// Do extra damage to antlions & combine
 	if ( pBCC )
@@ -1549,7 +1549,7 @@ void CNPC_Portal_FloorTurret::RopesOff( void )
 
 void CNPC_Portal_FloorTurret::FireBullet( const char *pTargetName )
 {
-	CBaseEntity *pEnemy = EntityList()->FindEntityByName( NULL, pTargetName );
+	IServerEntity *pEnemy = EntityList()->FindEntityByName( NULL, pTargetName );
 	if ( !pEnemy )
 		return;
 

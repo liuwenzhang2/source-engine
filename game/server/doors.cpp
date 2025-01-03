@@ -638,14 +638,14 @@ void CBaseDoor::DoorTouch( IServerEntity *pOther )
 	
 	// If door has master, and it's not ready to trigger, 
 	// play 'locked' sound.
-	if (m_sMaster != NULL_STRING && !UTIL_IsMasterTriggered(m_sMaster, (CBaseEntity*)pOther))
+	if (m_sMaster != NULL_STRING && !UTIL_IsMasterTriggered(m_sMaster, pOther))
 	{
 		PlayLockSounds(this, &m_ls, TRUE, FALSE);
 	}
 
 	if (m_bLocked)
 	{
-		m_OnLockedUse.FireOutput((CBaseEntity*)pOther, (CBaseEntity*)pOther );
+		m_OnLockedUse.FireOutput(pOther, pOther );
 		PlayLockSounds(this, &m_ls, TRUE, FALSE);
 		return; 
 	}
@@ -695,7 +695,7 @@ void CBaseDoor::UpdateAreaPortals( bool isOpen )
 	if ( !name )
 		return;
 	
-	CBaseEntity *pPortal = NULL;
+	IServerEntity *pPortal = NULL;
 	while ( ( pPortal = EntityList()->FindEntityByClassname( pPortal, "func_areaportal" ) ) != NULL )
 	{
 		if ( pPortal->HasTarget( name ) )
@@ -752,7 +752,7 @@ void CBaseDoor::Use( IServerEntity *pActivator, IServerEntity *pCaller, USE_TYPE
 	{
 		if (m_bLocked)
 		{
-			m_OnLockedUse.FireOutput((CBaseEntity*)pActivator, (CBaseEntity*)pCaller );
+			m_OnLockedUse.FireOutput(pActivator, pCaller );
 			PlayLockSounds(this, &m_ls, TRUE, FALSE);
 		}
 		else
@@ -770,7 +770,7 @@ void CBaseDoor::ChainUse( void )
 	if ( m_isChaining )
 		return;
 
-	CBaseEntity *ent = NULL;
+	IServerEntity *ent = NULL;
 	while ( ( ent = EntityList()->FindEntityByName( ent, m_ChainTarget, NULL ) ) != NULL )
 	{
 		if ( ent == this )
@@ -795,7 +795,7 @@ void CBaseDoor::ChainTouch( IServerEntity *pOther )
 	if ( m_isChaining )
 		return;
 
-	CBaseEntity *ent = NULL;
+	IServerEntity *ent = NULL;
 	while ( ( ent = EntityList()->FindEntityByName( ent, m_ChainTarget, NULL ) ) != NULL )
 	{
 		if ( ent == this )
@@ -1134,7 +1134,7 @@ void CBaseDoor::DoorHitBottom( void )
 int CBaseDoor::GetDoorMovementGroup( CBaseDoor *pDoorList[], int listMax )
 {
 	int count = 0;
-	CBaseEntity	*pTarget = NULL;
+	IServerEntity	*pTarget = NULL;
 
 	// Block all door pieces with the same targetname here.
 	if ( GetEntityName() != NULL_STRING )
@@ -1186,7 +1186,7 @@ void CBaseDoor::StartBlocked( CBaseEntity *pOther )
 // Purpose: Called every frame when the door is blocked while opening or closing.
 // Input  : pOther - The blocking entity.
 //-----------------------------------------------------------------------------
-void CBaseDoor::Blocked( CBaseEntity *pOther )
+void CBaseDoor::Blocked( IServerEntity *pOther )
 {
 	// Hurt the blocker a little.
 	if ( m_flBlockDamage )
@@ -1196,7 +1196,7 @@ void CBaseDoor::Blocked( CBaseEntity *pOther )
 		// If block damage is set, but this object is a physics prop that can't be damaged, just
 		// give up and disable collisions
 		if ( (m_bForceClosed || m_flWait < 0) && pOther->GetEngineObject()->GetMoveType() == MOVETYPE_VPHYSICS &&
-		   (pOther->m_takedamage == DAMAGE_NO || pOther->m_takedamage == DAMAGE_EVENTS_ONLY) )
+		   (pOther->GetTakeDamage() == DAMAGE_NO || pOther->GetTakeDamage() == DAMAGE_EVENTS_ONLY))
 		{
 			this->EntityPhysics_CreateSolver( pOther, true, 4.0f );
 		}

@@ -341,7 +341,7 @@ void CNPC_Osprey::InitializeRotorSound( void )
 
 void CNPC_Osprey::FindAllThink( void )
 {
-	CBaseEntity *pEntity = NULL;
+	IServerEntity *pEntity = NULL;
 
 	m_iUnits = 0;
 	while ( ( pEntity = EntityList()->FindEntityByClassname( pEntity, "monster_human_grunt" ) ) != NULL)
@@ -351,7 +351,7 @@ void CNPC_Osprey::FindAllThink( void )
 
 		if (pEntity->IsAlive())
 		{
-			m_hGrunt[m_iUnits]		= pEntity;
+			m_hGrunt[m_iUnits]		= (CBaseEntity*)pEntity;
 			m_vecOrigin[m_iUnits]	= pEntity->GetEngineObject()->GetAbsOrigin();
 			m_iUnits++;
 		}
@@ -912,7 +912,7 @@ void CBaseHelicopter::FlyPathCorners( void )
 
 	if ( GetGoalEnt() == NULL && m_target != NULL_STRING )// this monster has a target
 	{
-		SetGoalEnt( EntityList()->FindEntityByName( NULL, m_target ) );
+		SetGoalEnt((CBaseEntity*)EntityList()->FindEntityByName( NULL, m_target ) );
 		if (GetGoalEnt())
 		{
 			m_vecDesiredPosition = GetGoalEnt()->GetEngineObject()->GetLocalOrigin();
@@ -936,7 +936,7 @@ void CBaseHelicopter::FlyPathCorners( void )
 
 			OnReachedTarget( GetGoalEnt() );
 
-			SetGoalEnt( EntityList()->FindEntityByName( NULL, GetGoalEnt()->m_target ) );
+			SetGoalEnt((CBaseEntity*)EntityList()->FindEntityByName( NULL, GetGoalEnt()->m_target ) );
 
 			if (GetGoalEnt())
 			{
@@ -975,7 +975,7 @@ void CBaseHelicopter::UpdatePlayerDopplerShift( )
 	}
 	else
 	{
-		CBaseEntity *pPlayer = NULL;
+		IServerEntity *pPlayer = NULL;
 
 		// UNDONE: this needs to send different sounds to every player for multiplayer.	
 		// FIXME: this isn't the correct way to find a player!!!
@@ -1434,7 +1434,7 @@ void CBaseHelicopter::Event_Killed( const CTakeDamageInfo &info )
 		m_flNextRocket = gpGlobals->curtime + 15.0;
 	}
 */	
-	m_OnDeath.FireOutput( info.GetAttacker(), this );
+	m_OnDeath.FireOutput((IServerEntity*)info.GetAttacker(), this );
 }
 
 
@@ -1462,7 +1462,7 @@ void CBaseHelicopter::ChangePathCorner( const char *pszName )
 
 	if (GetGoalEnt())
 	{
-		SetGoalEnt( EntityList()->FindEntityByName( NULL, pszName ) );
+		SetGoalEnt( (CBaseEntity*)EntityList()->FindEntityByName( NULL, pszName ) );
 
 		// I don't think we need to do this. The FLIGHT() code will do it for us (sjb)
 		if (GetGoalEnt())

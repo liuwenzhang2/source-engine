@@ -12,8 +12,8 @@
 #endif
 
 #include <memory.h>
-//#include "datamap.h"
-//#include "ehandle.h"
+#include "datamap.h"
+#include "ehandle.h"
 #include "tier1/utlstring.h"
 
 #if defined( CLIENT_DLL )
@@ -25,7 +25,8 @@ class IGameSystem;
 IGameSystem* GetPredictionCopyTester( void );
 #endif
 #else
-
+class CBaseEntity;
+typedef CHandle<CBaseEntity> EHANDLE;
 #endif
 
 enum

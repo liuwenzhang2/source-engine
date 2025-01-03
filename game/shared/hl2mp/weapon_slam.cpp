@@ -255,7 +255,7 @@ void CWeapon_SLAM::SecondaryAttack( void )
 void CWeapon_SLAM::SatchelDetonate()
 {
 #ifndef CLIENT_DLL
-	CBaseEntity *pEntity = NULL;
+	IServerEntity *pEntity = NULL;
 
 	while ((pEntity = EntityList()->FindEntityByClassname( pEntity, "npc_satchel" )) != NULL)
 	{
@@ -292,7 +292,7 @@ void CWeapon_SLAM::SatchelDetonate()
 bool CWeapon_SLAM::AnyUndetonatedCharges(void)
 {
 #ifndef CLIENT_DLL
-	CBaseEntity *pEntity = NULL;
+	IServerEntity *pEntity = NULL;
 
 	while ((pEntity = EntityList()->FindEntityByClassname( pEntity, "npc_satchel" )) != NULL)
 	{

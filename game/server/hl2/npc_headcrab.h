@@ -269,7 +269,7 @@ public:
 	virtual void ImpactSound( void );
 	virtual void TelegraphSound( void );
 #if HL2_EPISODIC
-	virtual bool FInViewCone( CBaseEntity *pEntity );
+	virtual bool FInViewCone( IServerEntity *pEntity );
 #endif
 
 	//

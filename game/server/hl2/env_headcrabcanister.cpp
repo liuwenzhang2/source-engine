@@ -339,7 +339,7 @@ void CEnvHeadcrabCanister::SetupWorldModel()
 	float flRadius = GetEngineObject()->BoundingRadius();
 	Vector vecMins( -flRadius, -flRadius, -flRadius );
 	Vector vecMaxs( flRadius, flRadius, flRadius );
-	SetSize( vecMins, vecMaxs );
+	GetEngineObject()->SetSize( vecMins, vecMaxs );
 
 }
 
@@ -378,7 +378,7 @@ CSkyCamera *CEnvHeadcrabCanister::PlaceCanisterInWorld()
 	if ( m_iszLaunchPositionName != NULL_STRING )
 	{
 		// Get the launch position entity
-		CBaseEntity *pLaunchPos = EntityList()->FindEntityByName( NULL, m_iszLaunchPositionName );
+		IServerEntity *pLaunchPos = EntityList()->FindEntityByName( NULL, m_iszLaunchPositionName );
 		if ( !pLaunchPos )
 		{
 			Warning("%s (%s) could not find an entity matching LaunchPositionName of '%s'\n", GetEntityName().ToCStr(), GetDebugName(), STRING(m_iszLaunchPositionName) );
@@ -568,8 +568,8 @@ public:
 		enginetrace->ClipRayToEntity( *m_pRay, m_nContentsMask, pHandleEntity, &tr );
 		if (( tr.fraction < 1.0f ) || (tr.startsolid) || (tr.allsolid))
 		{
-			CBaseEntity *pEntity = EntityList()->GetBaseEntityFromHandle( pHandleEntity->GetRefEHandle() );
-			m_Entities.AddToTail( pEntity );
+			IServerEntity *pEntity = EntityList()->GetBaseEntityFromHandle( pHandleEntity->GetRefEHandle() );
+			m_Entities.AddToTail((CBaseEntity*)pEntity );
 		}
 
 		return true;
@@ -710,7 +710,7 @@ void CEnvHeadcrabCanister::HeadcrabCanisterSpawnHeadcrabThink()
 	int nHeadCrabAttachment = GetEngineObject()->LookupAttachment( "headcrab" );
 	if (GetEngineObject()->GetAttachment( nHeadCrabAttachment, vecSpawnPosition, vecSpawnAngles ) )
 	{
-		CBaseEntity *pEnt = (CBaseEntity*)EntityList()->CreateEntityByName( s_pHeadcrabClass[m_nHeadcrabType] );
+		IServerEntity *pEnt = EntityList()->CreateEntityByName( s_pHeadcrabClass[m_nHeadcrabType] );
 		CBaseHeadcrab *pHeadCrab = assert_cast<CBaseHeadcrab*>(pEnt);
 
 		// Necessary to get it to eject properly (don't allow the NPC

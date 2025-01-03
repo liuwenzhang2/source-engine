@@ -41,8 +41,8 @@ bool IsInInterruptableScenes( CBaseFlex *pActor );
 
 void PrecacheInstancedScene( char const *pszScene );
 
-char const *GetSceneFilename( CBaseEntity *ent );
-void ReloadSceneFromDisk( CBaseEntity *ent );
+char const *GetSceneFilename( IServerEntity *ent );
+void ReloadSceneFromDisk( IServerEntity *ent );
 
 
 #endif // SCENEENTITY_H

@@ -132,7 +132,7 @@ private:
 	// {
 	bool DoorActivate();
 	void DoorOpen( CBaseEntity *pOpenAwayFrom );
-	void OpenIfUnlocked(CBaseEntity *pActivator, CBaseEntity *pOpenAwayFrom);
+	void OpenIfUnlocked(IServerEntity *pActivator, CBaseEntity *pOpenAwayFrom);
 
 	void DoorOpenMoveDone();
 	void DoorCloseMoveDone();
@@ -150,7 +150,7 @@ private:
 	void OnStartBlocked( CBaseEntity *pOther );
 	void MasterStartBlocked( CBaseEntity *pOther );
 
-	void Blocked(CBaseEntity *pOther);
+	void Blocked(IServerEntity *pOther);
 	void EndBlocked(void);
 	void OnEndBlocked( void );
 

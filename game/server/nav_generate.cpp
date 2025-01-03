@@ -3374,7 +3374,7 @@ void CNavMesh::CreateNavAreasFromNodes( void )
 // adds walkable positions for any/all positions a mod specifies
 void CNavMesh::AddWalkableSeeds( void )
 {
-	CBaseEntity *spawn = EntityList()->FindEntityByClassname( NULL, GetPlayerSpawnName() );
+	IServerEntity *spawn = EntityList()->FindEntityByClassname( NULL, GetPlayerSpawnName() );
 
 	if (spawn )
 	{

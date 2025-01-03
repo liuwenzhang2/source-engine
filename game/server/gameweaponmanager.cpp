@@ -141,7 +141,7 @@ void CGameWeaponManager::Spawn()
 {
 	SetThink( &CGameWeaponManager::Think );
 	GetEngineObject()->SetNextThink( gpGlobals->curtime );
-	CBaseEntity *pEntity = (CBaseEntity*)EntityList()->CreateEntityByName( STRING(m_iszWeaponName) );
+	IServerEntity *pEntity = EntityList()->CreateEntityByName( STRING(m_iszWeaponName) );
 	if ( !pEntity )
 	{
 		DevMsg("%s removed itself!\n", GetDebugName() );

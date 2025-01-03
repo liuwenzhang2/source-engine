@@ -294,7 +294,7 @@ const QAngle &CBaseEntity::LocalEyeAngles( void )
 }
 
 // position of ears
-Vector CBaseEntity::EarPosition( void )
+const Vector& CBaseEntity::EarPosition( void )
 { 
 	return EyePosition(); 
 }
@@ -1283,7 +1283,7 @@ void CBaseEntity::FireBullets( const FireBulletsInfo_t &info )
 		{
 #ifdef GAME_DLL
 			surfacedata_t *psurf = EntityList()->PhysGetProps()->GetSurfaceData( tr.surface.surfaceProps );
-			if ( ( psurf != NULL ) && ( psurf->game.material == CHAR_TEX_GLASS ) && (((CBaseEntity*)tr.m_pEnt)->ClassMatches( "func_breakable" ) ) )
+			if ( ( psurf != NULL ) && ( psurf->game.material == CHAR_TEX_GLASS ) && (((IServerEntity*)tr.m_pEnt)->ClassMatches( "func_breakable" ) ) )
 			{
 				// Query the func_breakable for whether it wants to allow for bullet penetration
 				if (((IEngineObjectServer*)tr.m_pEnt->GetEngineObject())->HasSpawnFlags( SF_BREAK_NO_BULLET_PENETRATION ) == false )
@@ -1382,7 +1382,7 @@ void CBaseEntity::FireBullets( const FireBulletsInfo_t &info )
 bool CBaseEntity::ShouldDrawUnderwaterBulletBubbles()
 {
 #if defined( HL2_DLL ) && defined( GAME_DLL )
-	CBaseEntity *pPlayer = ( gpGlobals->maxClients == 1 ) ? EntityList()->GetLocalPlayer() : NULL;
+	IServerEntity *pPlayer = ( gpGlobals->maxClients == 1 ) ? EntityList()->GetLocalPlayer() : NULL;
 	return pPlayer && (pPlayer->GetWaterLevel() == 3);
 #else
 	return false;

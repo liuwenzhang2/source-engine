@@ -278,7 +278,7 @@ void CNPC_Bullseye::DecalTrace( trace_t *pOldTrace, char const *decalName )
 
 	CBroadcastRecipientFilter filter;
 	te->Decal( filter, 0.0, &pNewTrace.endpos, &pNewTrace.startpos,
-		((CBaseEntity*)pNewTrace.m_pEnt )->entindex(), pNewTrace.hitbox, index);
+		pNewTrace.m_pEnt->entindex(), pNewTrace.hitbox, index);
 }
 
 //-----------------------------------------------------------------------------
@@ -396,7 +396,7 @@ void CNPC_Bullseye::TraceAttack( const CTakeDamageInfo &info, const Vector &vecD
 	//If specified, we must be the enemy of the target
 	if (GetEngineObject()->GetSpawnFlags() & SF_BULLSEYE_ENEMYDAMAGEONLY)
 	{
-		CAI_BaseNPC *pInstigator = info.GetAttacker()->MyNPCPointer();
+		CAI_BaseNPC *pInstigator = ((CBaseEntity*)info.GetAttacker())->MyNPCPointer();
 
 		if ( pInstigator == NULL )
 			return;
@@ -430,7 +430,7 @@ int CNPC_Bullseye::OnTakeDamage( const CTakeDamageInfo &info )
 	//If specified, we must be the enemy of the target
 	if (GetEngineObject()->GetSpawnFlags() & SF_BULLSEYE_ENEMYDAMAGEONLY)
 	{
-		CAI_BaseNPC *pInstigator = info.GetAttacker()->MyNPCPointer();
+		CAI_BaseNPC *pInstigator = ((CBaseEntity*)info.GetAttacker())->MyNPCPointer();
 
 		if ( pInstigator == NULL )
 			return 0;

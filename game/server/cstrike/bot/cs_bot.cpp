@@ -35,7 +35,7 @@ int GetBotFollowCount( CCSPlayer *leader )
 
 	for( int i=1; i <= gpGlobals->maxClients; ++i )
 	{
-		CBaseEntity *entity = EntityList()->GetPlayerByIndex( i );
+		IServerEntity *entity = EntityList()->GetPlayerByIndex( i );
 
 		if (entity == NULL)
 			continue;
@@ -102,7 +102,7 @@ bool CCSBot::Jump( bool mustJump )
  */
 int CCSBot::OnTakeDamage( const CTakeDamageInfo &info )
 {
-	CBaseEntity *attacker = info.GetInflictor();
+	CBaseEntity *attacker = (CBaseEntity*)info.GetInflictor();
 
 	// getting hurt makes us alert
 	BecomeAlert();
@@ -633,7 +633,7 @@ CCSPlayer *CCSBot::GetImportantEnemy( bool checkVisibility ) const
 
 	for ( int i = 1; i <= gpGlobals->maxClients; i++ )
 	{
-		CBaseEntity *entity = EntityList()->GetPlayerByIndex( i );
+		IServerEntity *entity = EntityList()->GetPlayerByIndex( i );
 
 		if (entity == NULL)
 			continue;

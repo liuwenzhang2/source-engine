@@ -425,13 +425,7 @@ public:
 
 		// Try to deduce the actor's gender
 		gender_t gender = GENDER_NONE;
-		CBaseEntity* ent = NULL;
-#ifdef GAME_DLL
-		ent = EntityList()->GetBaseEntity(entindex);
-#endif // GAME_DLL
-#ifdef CLIENT_DLL
-		ent = CBaseEntity::Instance(entindex);
-#endif // CLIENT_DLL
+		IHandleEntity* ent = EntityList()->GetBaseEntity(entindex);
 		if ( ent )
 		{
 			char const *actorModel = STRING( ent->GetEngineObject()->GetModelName() );

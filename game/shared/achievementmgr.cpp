@@ -1442,10 +1442,10 @@ void CAchievementMgr::FireGameEvent( IGameEvent *event )
 	if ( 0 == Q_strcmp( name, "entity_killed" ) )
 	{
 #ifdef GAME_DLL
-		CBaseEntity *pVictim = EntityList()->GetBaseEntity( event->GetInt( "entindex_killed", 0 ) );
-		CBaseEntity *pAttacker = EntityList()->GetBaseEntity( event->GetInt( "entindex_attacker", 0 ) );
-		CBaseEntity *pInflictor = EntityList()->GetBaseEntity( event->GetInt( "entindex_inflictor", 0 ) );
-		OnKillEvent( pVictim, pAttacker, pInflictor, event );
+		IServerEntity *pVictim = EntityList()->GetBaseEntity( event->GetInt( "entindex_killed", 0 ) );
+		IServerEntity *pAttacker = EntityList()->GetBaseEntity( event->GetInt( "entindex_attacker", 0 ) );
+		IServerEntity *pInflictor = EntityList()->GetBaseEntity( event->GetInt( "entindex_inflictor", 0 ) );
+		OnKillEvent((CBaseEntity*)pVictim, (CBaseEntity*)pAttacker, (CBaseEntity*)pInflictor, event );
 #endif // GAME_DLL
 	}
 	else if ( 0 == Q_strcmp( name, "game_init" ) )
@@ -1459,9 +1459,9 @@ void CAchievementMgr::FireGameEvent( IGameEvent *event )
 #ifdef CLIENT_DLL
 	else if ( 0 == Q_strcmp( name, "player_death" ) )
 	{
-		CBaseEntity *pVictim = (CBaseEntity*)EntityList()->GetEnt( engine->GetPlayerForUserID( event->GetInt("userid") ) );
-		CBaseEntity *pAttacker = (CBaseEntity*)EntityList()->GetEnt( engine->GetPlayerForUserID( event->GetInt("attacker") ) );
-		OnKillEvent( pVictim, pAttacker, NULL, event );
+		IClientEntity *pVictim = EntityList()->GetEnt( engine->GetPlayerForUserID( event->GetInt("userid") ) );
+		IClientEntity *pAttacker = EntityList()->GetEnt( engine->GetPlayerForUserID( event->GetInt("attacker") ) );
+		OnKillEvent((CBaseEntity*)pVictim, (CBaseEntity*)pAttacker, NULL, event );
 	}
 	else if ( 0 == Q_strcmp( name, "localplayer_changeclass" ) )
 	{
@@ -2062,17 +2062,12 @@ CON_COMMAND_F( achievement_mark_dirty, "Mark achievement data as dirty", FCVAR_C
 //-----------------------------------------------------------------------------
 // Purpose: helper function to get entity model name
 //-----------------------------------------------------------------------------
-const char *GetModelName( CBaseEntity *pBaseEntity )
+const char *GetModelName( IHandleEntity *pBaseEntity )
 {
-	CBaseAnimating *pBaseAnimating = dynamic_cast<CBaseAnimating *>( pBaseEntity );
-	if ( pBaseAnimating )
+	IStudioHdr *pStudioHdr = pBaseEntity->GetEngineObject()->GetModelPtr();
+	if ( pStudioHdr )
 	{
-		IStudioHdr *pStudioHdr = pBaseAnimating->GetEngineObject()->GetModelPtr();
-		if ( pStudioHdr )
-		{
-			return pStudioHdr->pszName();
-		}
+		return pStudioHdr->pszName();
 	}
-
 	return "";
 }

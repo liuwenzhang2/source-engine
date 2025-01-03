@@ -416,7 +416,7 @@ inline bool CPropAPC::ShouldTriggerDamageEffect( int nPrevHealth, int nEffectCou
 //-----------------------------------------------------------------------------
 void CPropAPC::Event_Killed( const CTakeDamageInfo &info )
 {
-	m_OnDeath.FireOutput( info.GetAttacker(), this );
+	m_OnDeath.FireOutput((IServerEntity*)info.GetAttacker(), this );
 
 	Vector vecAbsMins, vecAbsMaxs;
 	GetEngineObject()->WorldSpaceAABB( &vecAbsMins, &vecAbsMaxs );
@@ -526,14 +526,14 @@ void CPropAPC::InputDestroy( inputdata_t &inputdata )
 void CPropAPC::InputFireMissileAt( inputdata_t &inputdata )
 {
 	string_t strMissileTarget = MAKE_STRING( inputdata.value.String() );
-	CBaseEntity *pTarget = EntityList()->FindEntityByName( NULL, strMissileTarget, NULL, inputdata.pActivator, inputdata.pCaller );
+	IServerEntity *pTarget = EntityList()->FindEntityByName( NULL, strMissileTarget, NULL, inputdata.pActivator, inputdata.pCaller );
 	if ( pTarget == NULL )
 	{
 		DevWarning( "%s: Could not find target '%s'!\n", GetClassname(), STRING( strMissileTarget ) );
 		return;
 	}
 
-	m_hSpecificRocketTarget = pTarget;
+	m_hSpecificRocketTarget = (CBaseEntity*)pTarget;
 }
 
 
@@ -545,11 +545,11 @@ int CPropAPC::OnTakeDamage( const CTakeDamageInfo &info )
 	if ( m_iHealth == 0 )
 		return 0;
 
-	m_OnDamaged.FireOutput( info.GetAttacker(), this );
+	m_OnDamaged.FireOutput((IServerEntity*)info.GetAttacker(), this );
 
 	if ( info.GetAttacker() && info.GetAttacker()->IsPlayer() )
 	{
-		m_OnDamagedByPlayer.FireOutput( info.GetAttacker(), this );
+		m_OnDamagedByPlayer.FireOutput((IServerEntity*)info.GetAttacker(), this );
 	}
 
 	CTakeDamageInfo dmgInfo = info;

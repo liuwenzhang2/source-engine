@@ -421,7 +421,7 @@ void CCSGameStats::Event_ShotHit( CBasePlayer *pPlayer, const CTakeDamageInfo &i
 
 	IncrementStat( pCSPlayer, CSSTAT_SHOTS_HIT, 1 );
 
-	CBaseEntity *pInflictor = info.GetInflictor();
+	CBaseEntity *pInflictor = (CBaseEntity*)info.GetInflictor();
 
 	if ( pInflictor )
 	{
@@ -463,7 +463,7 @@ void CCSGameStats::Event_PlayerKilled_PreWeaponDrop( CBasePlayer *pPlayer, const
 {
 	Assert( pPlayer );
 	CCSPlayer *pCSPlayer = ToCSPlayer( pPlayer );
-	CCSPlayer *pAttacker = ToCSPlayer( info.GetAttacker() );
+	CCSPlayer *pAttacker = ToCSPlayer((IServerEntity*)info.GetAttacker() );
 	bool victimZoomed = ( pCSPlayer->GetFOV() != pCSPlayer->GetDefaultFOV() );
 
 	if (victimZoomed)
@@ -916,7 +916,7 @@ void CCSGameStats::Event_PlayerKilledOther( CBasePlayer *pAttacker, CBaseEntity 
 	if ( !pVictim->IsPlayer() )
 		return;
 
-	CBaseEntity *pInflictor = info.GetInflictor();	
+	CBaseEntity *pInflictor = (CBaseEntity*)info.GetInflictor();
 
 	CCSPlayer *pPlayerAttacker = ToCSPlayer( pAttacker );
 	CCSPlayer *pPlayerVictim = ToCSPlayer( pVictim );	
@@ -1112,7 +1112,7 @@ void CCSGameStats::PlayerKilled( CBasePlayer *pVictim, const CTakeDamageInfo &in
 //-----------------------------------------------------------------------------
 void CCSGameStats::Event_PlayerDamage( CBasePlayer *pBasePlayer, const CTakeDamageInfo &info )
 {
-	CCSPlayer *pAttacker = ToCSPlayer( info.GetAttacker() );
+	CCSPlayer *pAttacker = ToCSPlayer((IServerEntity*)info.GetAttacker() );
 	if ( pAttacker && pAttacker->GetTeam() != pBasePlayer->GetTeam() )
 	{
 		CSWeaponMode weaponMode = Primary_Mode;

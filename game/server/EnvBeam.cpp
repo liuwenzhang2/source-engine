@@ -474,7 +474,7 @@ public:
 		CBaseEntity *pEntity = EntityFromEntityHandle( pServerEntity );
 		if ( pEntity )
 		{
-			if ( pEntity->IsPlayer() || pEntity->MyNPCPointer() )
+			if ( pEntity->IsPlayer() || pEntity->IsNPC() )
 				return true;
 		}
 
@@ -494,7 +494,7 @@ public:
 		CBaseEntity *pEntity = EntityFromEntityHandle( pServerEntity );
 		if ( pEntity )
 		{
-			if ( pEntity->IsPlayer() || pEntity->MyNPCPointer() || pEntity->GetEngineObject()->GetClassname() == g_iszPhysicsPropClassname)
+			if ( pEntity->IsPlayer() || pEntity->IsNPC() || pEntity->GetEngineObject()->GetClassname() == g_iszPhysicsPropClassname)
 				return true;
 		}
 
@@ -583,7 +583,7 @@ void CEnvBeam::UpdateThink( void )
 
 		if( tr.fraction != 1.0 && PassesTouchFilters( (CBaseEntity*)tr.m_pEnt ) )
 		{
-			m_OnTouchedByEntity.FireOutput((CBaseEntity*)tr.m_pEnt, this, 0 );
+			m_OnTouchedByEntity.FireOutput((IServerEntity*)tr.m_pEnt, this, 0 );
 			return;
 		}
 	}
@@ -700,8 +700,8 @@ void CEnvBeam::RandomPoint( const Vector &vecSrc )
 //-----------------------------------------------------------------------------
 void CEnvBeam::BeamUpdateVars( void )
 {
-	CBaseEntity *pStart = EntityList()->FindEntityByName( NULL, m_iszStartEntity );
-	CBaseEntity *pEnd = EntityList()->FindEntityByName( NULL, m_iszEndEntity );
+	IServerEntity *pStart = EntityList()->FindEntityByName( NULL, m_iszStartEntity );
+	IServerEntity *pEnd = EntityList()->FindEntityByName( NULL, m_iszEndEntity );
 
 	if (( pStart == NULL ) || ( pEnd == NULL ))
 	{
@@ -727,22 +727,22 @@ void CEnvBeam::BeamUpdateVars( void )
 
 	SetType( BEAM_ENTPOINT );
 
-	if ( IsStaticPointEntity( pStart ) )
+	if ( IsStaticPointEntity((CBaseEntity*)pStart ) )
 	{
 		SetAbsStartPos( pStart->GetEngineObject()->GetAbsOrigin() );
 	}
 	else
 	{
-		SetStartEntity( pStart );
+		SetStartEntity((CBaseEntity*)pStart );
 	}
 
-	if ( IsStaticPointEntity( pEnd ) )
+	if ( IsStaticPointEntity((CBaseEntity*)pEnd ) )
 	{
 		SetAbsEndPos( pEnd->GetEngineObject()->GetAbsOrigin() );
 	}
 	else
 	{
-		SetEndEntity( pEnd );
+		SetEndEntity((CBaseEntity*)pEnd );
 	}
 
 	RelinkBeam();

@@ -24,7 +24,7 @@
 //
 
 class CAI_GoalEntity : public CBaseEntity,
-					   public IEntityListener<CBaseEntity>
+					   public IEntityListener<IServerEntity>
 {
 	DECLARE_CLASS( CAI_GoalEntity, CBaseEntity );
 public:
@@ -68,8 +68,8 @@ public:
 protected:
 	virtual void	UpdateOnRemove();
 
-	virtual void 	OnEntityCreated( CBaseEntity *pEntity );
-	virtual void 	OnEntityDeleted( CBaseEntity *pEntity );
+	virtual void 	OnEntityCreated( IServerEntity *pEntity );
+	virtual void 	OnEntityDeleted( IServerEntity *pEntity );
 
 	virtual void	EnableGoal( CAI_BaseNPC *pAI )	{}
 	virtual void	DisableGoal( CAI_BaseNPC *pAI  ) {}

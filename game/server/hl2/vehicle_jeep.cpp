@@ -284,7 +284,7 @@ void CPropJeep::TraceAttack( const CTakeDamageInfo &inputInfo, const Vector &vec
 //-----------------------------------------------------------------------------
 float CPropJeep::PassengerDamageModifier( const CTakeDamageInfo &info )
 {
-	if ( info.GetInflictor() && FClassnameIs( info.GetInflictor(), "hunter_flechette" ) )
+	if ( info.GetInflictor() && FClassnameIs((CBaseEntity*)info.GetInflictor(), "hunter_flechette" ) )
 		return 0.1f;
 
 	return 1.0f;

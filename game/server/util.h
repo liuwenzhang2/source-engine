@@ -222,7 +222,7 @@ private:
 enum soundlevel_t;
 
 // Drops an entity onto the floor
-int			UTIL_DropToFloor( CBaseEntity *pEntity, unsigned int mask, CBaseEntity *pIgnore = NULL );
+int			UTIL_DropToFloor( IServerEntity *pEntity, unsigned int mask, IServerEntity *pIgnore = NULL );
 
 // Returns false if any part of the bottom of the entity is off an edge that is not a staircase.
 bool		UTIL_CheckBottom( CBaseEntity *pEntity, ITraceFilter *pTraceFilter, float flStepSize );
@@ -240,7 +240,7 @@ void		UTIL_ScreenFade			( CBaseEntity *pEntity, const color32 &color, float fade
 void		UTIL_MuzzleFlash		( const Vector &origin, const QAngle &angles, int scale, int type );
 Vector		UTIL_PointOnLineNearestPoint(const Vector& vStartPos, const Vector& vEndPos, const Vector& vPoint, bool clampEnds = false );
 
-bool		UTIL_IsMasterTriggered	(string_t sMaster, CBaseEntity *pActivator);
+bool		UTIL_IsMasterTriggered	(string_t sMaster, IServerEntity *pActivator);
 void		UTIL_BloodStream( const Vector &origin, const Vector &direction, int color, int amount );
 void		UTIL_BloodSpray( const Vector &pos, const Vector &dir, int color, int amount, int flags );
 Vector		UTIL_RandomBloodVector( void );
@@ -263,11 +263,11 @@ bool		UTIL_TeamsMatch( const char *pTeamName1, const char *pTeamName2 );
 void		UTIL_SnapDirectionToAxis( Vector &direction, float epsilon = 0.002f );
 
 //Set the entity to point at the target specified
-bool UTIL_PointAtEntity( CBaseEntity *pEnt, CBaseEntity *pTarget );
-void UTIL_PointAtNamedEntity( CBaseEntity *pEnt, string_t strTarget );
+bool UTIL_PointAtEntity( IServerEntity *pEnt, IServerEntity *pTarget );
+void UTIL_PointAtNamedEntity( IServerEntity *pEnt, string_t strTarget );
 
 // Copy the pose parameter values from one entity to the other
-bool UTIL_TransferPoseParameters( CBaseEntity *pSourceEntity, CBaseEntity *pDestEntity );
+bool UTIL_TransferPoseParameters( IServerEntity *pSourceEntity, IServerEntity *pDestEntity );
 
 // Search for water transition along a vertical line
 float UTIL_WaterLevel( const Vector &position, float minz, float maxz );

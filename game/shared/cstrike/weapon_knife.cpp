@@ -266,7 +266,7 @@ void CKnife::Smack( void )
 		CPASAttenuationFilter filter( this );
 		filter.UsePredictionRules();
 
-		if(((CBaseEntity*)m_trHit.m_pEnt)->IsPlayer()  )
+		if(m_trHit.m_pEnt->IsPlayer()  )
 		{
 			g_pSoundEmitterSystem->EmitSound( filter, entindex(), m_bStab?"Weapon_Knife.Stab":"Weapon_Knife.Hit" );
 		}
@@ -285,7 +285,7 @@ void CKnife::Smack( void )
 #ifdef CLIENT_DLL
 	data.m_hEntity = ((C_BaseEntity*)m_trHit.m_pEnt);
 #else
-	data.m_nEntIndex = ((CBaseEntity*)m_trHit.m_pEnt)->entindex();
+	data.m_nEntIndex = m_trHit.m_pEnt->entindex();
 #endif
 
 	CPASFilter filter( data.m_vOrigin );

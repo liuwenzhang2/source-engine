@@ -200,7 +200,7 @@ void CC_AI_Hull( const CCommand &args )
 		return;
 
 	bool bSpawned = false;
-	CBaseEntity *pEnt = NULL;
+	IServerEntity *pEnt = NULL;
 
 	if ( !args[1] || !args[1][0] )
 	{		
@@ -220,7 +220,7 @@ void CC_AI_Hull( const CCommand &args )
 		if ( !pEnt )
 		{
 			// Not found, try to create one.
-			pEnt = (CAI_BaseNPC *)EntityList()->CreateEntityByName( args[1] );
+			pEnt = EntityList()->CreateEntityByName( args[1] );
 			if ( !pEnt )
 			{
 				DevMsg( "Entity %s not found, and couldn't create!\n", args[1] );
@@ -407,7 +407,7 @@ void CC_NPC_Create( const CCommand &args )
 
 		if ( args.ArgC() == 3 )
 		{
-			baseNPC->SetName( args[2] );
+			baseNPC->GetEngineObject()->SetName( args[2] );
 		}
 
 		DispatchSpawn(baseNPC);
@@ -572,10 +572,10 @@ void CC_NPC_Freeze( const CCommand &args )
 			//	
 			// No selected NPCs, look for the NPC under the crosshair.
 			//
-			CBaseEntity *pEntity = EntityList()->FindPickerEntity( UTIL_GetCommandClient() );
+			IServerEntity *pEntity = EntityList()->FindPickerEntity( UTIL_GetCommandClient() );
 			if ( pEntity )
 			{
-				CAI_BaseNPC *pNPC = pEntity->MyNPCPointer();
+				CAI_BaseNPC *pNPC = ((CBaseEntity*)pEntity)->MyNPCPointer();
 				if (pNPC)
 				{
 					pNPC->ToggleFreeze();
@@ -611,10 +611,10 @@ CON_COMMAND(npc_thinknow, "Trigger NPC to think")
 	if ( !UTIL_IsCommandIssuedByServerAdmin() )
 		return;
 
-	CBaseEntity *pEntity = EntityList()->FindPickerEntity( UTIL_GetCommandClient() );
+	IServerEntity *pEntity = EntityList()->FindPickerEntity( UTIL_GetCommandClient() );
 	if ( pEntity )
 	{
-		CAI_BaseNPC *pNPC = pEntity->MyNPCPointer();
+		CAI_BaseNPC *pNPC = ((CBaseEntity*)pEntity)->MyNPCPointer();
 		if (pNPC)
 		{
 			pNPC->SetThink( &CAI_BaseNPC::CallNPCThink );
@@ -816,10 +816,10 @@ CON_COMMAND( npc_heal, "Heals the target back to full health" )
 	if ( !UTIL_IsCommandIssuedByServerAdmin() )
 		return;
 
-	CBaseEntity *pEntity = EntityList()->FindPickerEntity( UTIL_GetCommandClient() );
+	IServerEntity *pEntity = EntityList()->FindPickerEntity( UTIL_GetCommandClient() );
 	if ( pEntity )
 	{
-		CAI_BaseNPC *pNPC = pEntity->MyNPCPointer();
+		CAI_BaseNPC *pNPC = ((CBaseEntity*)pEntity)->MyNPCPointer();
 		if (pNPC)
 		{
 			pNPC->SetHealth( pNPC->GetMaxHealth() );
@@ -832,10 +832,10 @@ CON_COMMAND( npc_ammo_deplete, "Subtracts half of the target's ammo" )
 	if ( !UTIL_IsCommandIssuedByServerAdmin() )
 		return;
 
-	CBaseEntity *pEntity = EntityList()->FindPickerEntity( UTIL_GetCommandClient() );
+	IServerEntity *pEntity = EntityList()->FindPickerEntity( UTIL_GetCommandClient() );
 	if ( pEntity )
 	{
-		CAI_BaseNPC *pNPC = pEntity->MyNPCPointer();
+		CAI_BaseNPC *pNPC = ((CBaseEntity*)pEntity)->MyNPCPointer();
 		if (pNPC && pNPC->GetActiveWeapon())
 		{
 			pNPC->GetActiveWeapon()->m_iClip1 *= 0.5;

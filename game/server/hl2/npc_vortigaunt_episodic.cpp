@@ -1216,7 +1216,7 @@ void CNPC_Vortigaunt::Precache()
 //-----------------------------------------------------------------------------
 void CNPC_Vortigaunt::Use( IServerEntity *pActivator, IServerEntity *pCaller, USE_TYPE useType, float value )
 {
-	m_OnPlayerUse.FireOutput( (CBaseEntity*)pActivator, (CBaseEntity*)pCaller );
+	m_OnPlayerUse.FireOutput( pActivator, pCaller );
 
 	// Foremost, try and heal a wounded player
 	if ( HealBehaviorAvailable() )
@@ -1282,7 +1282,7 @@ void CNPC_Vortigaunt::TraceAttack( const CTakeDamageInfo &inputInfo, const Vecto
 {
 	CTakeDamageInfo info = inputInfo;
 
-	if ( (info.GetDamageType() & DMG_SHOCK) && FClassnameIs( info.GetAttacker(), GetClassname() ) )
+	if ( (info.GetDamageType() & DMG_SHOCK) && FClassnameIs((CBaseEntity*)info.GetAttacker(), GetClassname() ) )
 	{
 		// mask off damage from other vorts for now
 		info.SetDamage( 0.01 );
@@ -1655,7 +1655,7 @@ bool CNPC_Vortigaunt::CanBeUsedAsAFriend( void )
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
 #define VORT_360_VIEW_DIST_SQR	((60*12)*(60*12))
-bool CNPC_Vortigaunt::FInViewCone( CBaseEntity *pEntity )
+bool CNPC_Vortigaunt::FInViewCone( IServerEntity *pEntity )
 {
 	// Vort can see 360 degrees but only at limited distance
 	if( ( pEntity->IsNPC() || pEntity->IsPlayer() ) && pEntity->GetEngineObject()->GetAbsOrigin().DistToSqr(GetEngineObject()->GetAbsOrigin()) <= VORT_360_VIEW_DIST_SQR )
@@ -2260,7 +2260,7 @@ void CNPC_Vortigaunt::InputDisableArmorRecharge( inputdata_t &data )
 //-----------------------------------------------------------------------------
 void CNPC_Vortigaunt::InputChargeTarget( inputdata_t &data )
 {
-	CBaseEntity *pTarget = EntityList()->FindEntityByName( NULL, data.value.String(), NULL, data.pActivator, data.pCaller );
+	IServerEntity *pTarget = EntityList()->FindEntityByName( NULL, data.value.String(), NULL, data.pActivator, data.pCaller );
 
 	// Must be valid
 	if ( pTarget == NULL )
@@ -2277,7 +2277,7 @@ void CNPC_Vortigaunt::InputChargeTarget( inputdata_t &data )
 		return;
 	}
 
-	m_hHealTarget = pTarget;
+	m_hHealTarget = (CBaseEntity*)pTarget;
 	m_bForceArmorRecharge = true;
 
 	SetCondition( COND_PROVOKED );
@@ -2288,7 +2288,7 @@ void CNPC_Vortigaunt::InputChargeTarget( inputdata_t &data )
 //-----------------------------------------------------------------------------
 void CNPC_Vortigaunt::InputExtractBugbait( inputdata_t &data )
 {
-	CBaseEntity *pTarget = EntityList()->FindEntityByName( NULL, data.value.String(), NULL, data.pActivator, data.pCaller );
+	IServerEntity *pTarget = EntityList()->FindEntityByName( NULL, data.value.String(), NULL, data.pActivator, data.pCaller );
 
 	// Must be valid
 	if ( pTarget == NULL )
@@ -2298,7 +2298,7 @@ void CNPC_Vortigaunt::InputExtractBugbait( inputdata_t &data )
 	}
 
 	// Keep this as our target
-	SetTarget( pTarget );
+	SetTarget((CBaseEntity*)pTarget );
 
 	// Start to extract
 	m_bExtractingBugbait = true;
@@ -2690,7 +2690,7 @@ int CNPC_Vortigaunt::OnTakeDamage_Alive( const CTakeDamageInfo &info )
 		CTakeDamageInfo subInfo = info;
 
 		// take less damage from antlion worker acid/poison
-		if ( info.GetAttacker()->Classify() == CLASS_ANTLION          &&
+		if (((CBaseEntity*)info.GetAttacker())->Classify() == CLASS_ANTLION          &&
 			 (info.GetDamageType() & ( DMG_ACID | DMG_POISON ))!=0
 			)
 		{

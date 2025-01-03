@@ -153,7 +153,7 @@ public:
 //-----------------------------------------------------------------------------
 // Converts an entity to a HL1 player
 //-----------------------------------------------------------------------------
-inline CHL1_Player *ToHL1Player( CBaseEntity *pEntity )
+inline CHL1_Player *ToHL1Player( IServerEntity *pEntity )
 {
 	if ( !pEntity || !pEntity->IsPlayer() )
 		return NULL;

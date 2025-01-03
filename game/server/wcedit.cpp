@@ -453,7 +453,7 @@ string_t *g_EntityClassnames = NULL;
 //-----------------------------------------------------------------------------
 // Purpose: Saves the entity's position for future communication with Hammer
 //-----------------------------------------------------------------------------
-void NWCEdit::RememberEntityPosition( CBaseEntity *pEntity )
+void NWCEdit::RememberEntityPosition( IServerEntity *pEntity )
 {
 	if ( !(pEntity->ObjectCaps() & FCAP_WCEDIT_POSITION) )
 		return;
@@ -474,7 +474,7 @@ void NWCEdit::RememberEntityPosition( CBaseEntity *pEntity )
 //-----------------------------------------------------------------------------
 // Purpose: Sends Hammer an update to the current position
 //-----------------------------------------------------------------------------
-void NWCEdit::UpdateEntityPosition( CBaseEntity *pEntity )
+void NWCEdit::UpdateEntityPosition( IServerEntity *pEntity )
 {
 	const Vector &newPos = pEntity->GetEngineObject()->GetAbsOrigin();
 	const QAngle &newAng = pEntity->GetEngineObject()->GetAbsAngles();
@@ -754,12 +754,12 @@ CON_COMMAND( hammer_update_entity, "Updates the entity's position/angles when in
 
 		if ( tr.DidHit() && !tr.DidHitWorld() )
 		{
-			NWCEdit::UpdateEntityPosition( (CBaseEntity*)tr.m_pEnt );
+			NWCEdit::UpdateEntityPosition( (IServerEntity*)tr.m_pEnt );
 		}
 	}
 	else
 	{
-		CBaseEntity *pEnt = NULL;
+		IServerEntity *pEnt = NULL;
 		while ((pEnt = EntityList()->FindEntityGeneric( pEnt, args[1] ) ) != NULL)
 		{
 			NWCEdit::UpdateEntityPosition( pEnt );
@@ -770,7 +770,7 @@ CON_COMMAND( hammer_update_entity, "Updates the entity's position/angles when in
 CON_COMMAND( hammer_update_safe_entities, "Updates entities in the map that can safely be updated (don't have parents or are affected by constraints). Also excludes entities mentioned in any hammer_updateignorelist objects in this map." )
 {
 	int iCount = 0;
-	CBaseEntity *pEnt = NULL;
+	IServerEntity *pEnt = NULL;
 
 	if ( !UTIL_IsCommandIssuedByServerAdmin() )
 		return;

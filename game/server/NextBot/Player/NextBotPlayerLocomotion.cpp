@@ -720,7 +720,7 @@ bool PlayerLocomotion::IsOnGround( void ) const
  */
 CBaseEntity *PlayerLocomotion::GetGround( void ) const
 {
-	return m_player->GetEngineObject()->GetGroundEntity() ? m_player->GetEngineObject()->GetGroundEntity()->GetOuter() : NULL;
+	return m_player->GetEngineObject()->GetGroundEntity() ? (CBaseEntity*)m_player->GetEngineObject()->GetGroundEntity()->GetOuter() : NULL;
 }
 
 

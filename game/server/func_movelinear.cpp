@@ -336,12 +336,12 @@ void CFuncMoveLinear::InputSetPosition( inputdata_t &inputdata )
 // Purpose: Called every frame when the bruch is blocked while moving
 // Input  : pOther - The blocking entity.
 //-----------------------------------------------------------------------------
-void CFuncMoveLinear::Blocked( CBaseEntity *pOther )
+void CFuncMoveLinear::Blocked( IServerEntity *pOther )
 {
 	// Hurt the blocker 
 	if ( m_flBlockDamage )
 	{
-		if ( pOther->m_takedamage == DAMAGE_EVENTS_ONLY )
+		if ( pOther->GetTakeDamage() == DAMAGE_EVENTS_ONLY)
 		{
 			if ( FClassnameIs( pOther, "gib" ) )
 				EntityList()->DestroyEntity( pOther );

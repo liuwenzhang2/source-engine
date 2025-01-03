@@ -797,9 +797,9 @@ bool NextBotManager::IsDebugFilterMatch( const INextBot *bot ) const
 			CBasePlayer *watcher = UTIL_GetListenServerHost();
 			if ( watcher )
 			{
-				CBaseEntity *subject = watcher->GetObserverTarget();
+				IServerEntity *subject = watcher->GetObserverTarget();
 
-				if ( subject && bot->IsSelf( subject ) )
+				if ( subject && bot->IsSelf( (CBaseEntity*)subject ) )
 				{
 					return true;
 				}

@@ -238,7 +238,7 @@ bool CFireSphere::AddToList( CFire *pFire )
 
 IterationRetval_t CFireSphere::EnumElement( IHandleEntity *pHandleEntity )
 {
-	CBaseEntity *pEntity = EntityList()->GetBaseEntityFromHandle( pHandleEntity->GetRefEHandle() );
+	IServerEntity *pEntity = EntityList()->GetBaseEntityFromHandle( pHandleEntity->GetRefEHandle() );
 	if ( pEntity )
 	{
 		// UNDONE: Measure which of these is faster

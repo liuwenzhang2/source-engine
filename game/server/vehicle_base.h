@@ -179,7 +179,7 @@ public:
 	virtual void	Use( IServerEntity *pActivator, IServerEntity *pCaller, USE_TYPE useType, float value );
 	virtual void	Think( void );
 	virtual void	TraceAttack( const CTakeDamageInfo &info, const Vector &vecDir, trace_t *ptr, CDmgAccumulator *pAccumulator );
-	virtual void	Event_KilledOther( CBaseEntity *pVictim, const CTakeDamageInfo &info );
+	virtual void	Event_KilledOther( IServerEntity *pVictim, const CTakeDamageInfo &info );
 
 	// Vehicle handling
 	virtual void	VPhysicsCollision( int index, gamevcollisionevent_t *pEvent );

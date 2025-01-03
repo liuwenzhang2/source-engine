@@ -211,7 +211,7 @@ int CNPC_GroundTurret::OnTakeDamage_Alive( const CTakeDamageInfo &info )
 	}
 
 	// Only take damage from self (kill input from my bullseye) or missiles.
-	if( info.GetInflictor() != this && info.GetInflictor()->Classify() != CLASS_MISSILE )
+	if( info.GetInflictor() != this && ((CBaseEntity*)info.GetInflictor())->Classify() != CLASS_MISSILE )
 	{
 		return 0;
 	}

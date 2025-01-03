@@ -976,7 +976,7 @@ static int GetEntityPhysicsObjects( IPhysicsEnvironment *pEnvironment, CBaseEnti
 }
 
 #ifndef CLIENT_DLL
-	class CPS_AutoGameSys_EntityListener : public CAutoGameSystem//, public IEntityListener<CBaseEntity>
+	class CPS_AutoGameSys_EntityListener : public CAutoGameSystem//, public IEntityListener<IServerEntity>
 #else
 	class CPS_AutoGameSys_EntityListener : public CAutoGameSystem
 #endif
@@ -1001,12 +1001,12 @@ public:
 //		return true;
 //	}
 //
-//	//virtual void OnEntityCreated( CBaseEntity *pEntity ) {}
-//	virtual void OnEntitySpawned( CBaseEntity *pEntity )
+//	//virtual void OnEntityCreated( IServerEntity *pEntity ) {}
+//	virtual void OnEntitySpawned( IServerEntity *pEntity )
 //	{
 //
 //	}
-//	virtual void OnEntityDeleted( CBaseEntity *pEntity )
+//	virtual void OnEntityDeleted( IServerEntity *pEntity )
 //	{
 //		CPortalSimulator *pSimulator = CPortalSimulator::GetPortalThatOwnsEntity( pEntity );
 //		if( pSimulator )
@@ -1097,7 +1097,7 @@ void CPSCollisionEntity::Spawn( void )
 	GetEngineObject()->AddEffects(EF_NODRAW | EF_NORECEIVESHADOW | EF_NOSHADOW);
 	GetEngineObject()->SetMoveType(MOVETYPE_NONE);
 	GetEngineObject()->SetCollisionGroup(COLLISION_GROUP_PLAYER);
-	SetSize(vPortalLocalMins, vPortalLocalMaxs);
+	GetEngineObject()->SetSize(vPortalLocalMins, vPortalLocalMaxs);
 	GetEngineObject()->SetSolid(SOLID_OBB);
 	GetEngineObject()->SetSolidFlags(FSOLID_TRIGGER | FSOLID_NOT_SOLID | FSOLID_CUSTOMBOXTEST | FSOLID_CUSTOMRAYTEST);
 }
@@ -1105,7 +1105,7 @@ void CPSCollisionEntity::Spawn( void )
 void CPSCollisionEntity::Activate( void )
 {
 	BaseClass::Activate();
-	SetSize(vPortalLocalMins, vPortalLocalMaxs);
+	GetEngineObject()->SetSize(vPortalLocalMins, vPortalLocalMaxs);
 	GetEngineObject()->SetSolid(SOLID_OBB);
 	GetEngineObject()->SetSolidFlags(FSOLID_TRIGGER | FSOLID_NOT_SOLID | FSOLID_CUSTOMBOXTEST | FSOLID_CUSTOMRAYTEST);
 }

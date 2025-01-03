@@ -68,7 +68,7 @@ void CNPCSpawnDestination::OnSpawnedNPC( CAI_BaseNPC *pNPC )
 	// Rename the NPC
 	if( m_RenameNPC != NULL_STRING )
 	{
-		pNPC->SetName( STRING(m_RenameNPC) );
+		pNPC->GetEngineObject()->SetName( STRING(m_RenameNPC) );
 	}
 
 	m_OnSpawnNPC.FireOutput( pNPC, this );
@@ -174,7 +174,7 @@ bool CBaseNPCMaker::CanMakeNPC( bool bIgnoreSolidEntities )
 
 	if ( m_iszIngoreEnt != NULL_STRING )
 	{
-		m_hIgnoreEntity = EntityList()->FindEntityByName( NULL, m_iszIngoreEnt );
+		m_hIgnoreEntity = (CBaseEntity*)EntityList()->FindEntityByName( NULL, m_iszIngoreEnt );
 	}
 
 	Vector mins = GetEngineObject()->GetAbsOrigin() - Vector( 34, 34, 0 );
@@ -462,7 +462,7 @@ void CNPCMaker::MakeNPC( void )
 	if ( m_ChildTargetName != NULL_STRING )
 	{
 		// if I have a netname (overloaded), give the child NPC that name as a targetname
-		pent->SetName( STRING(m_ChildTargetName) );
+		pent->GetEngineObject()->SetName( STRING(m_ChildTargetName) );
 	}
 
 	ChildPostSpawn( pent );
@@ -582,7 +582,7 @@ END_DATADESC()
 //-----------------------------------------------------------------------------
 // A hook that lets derived NPC makers do special stuff when precaching.
 //-----------------------------------------------------------------------------
-void CTemplateNPCMaker::PrecacheTemplateEntity( CBaseEntity *pEntity )
+void CTemplateNPCMaker::PrecacheTemplateEntity( IServerEntity *pEntity )
 {
 	pEntity->Precache();
 }
@@ -622,7 +622,7 @@ void CTemplateNPCMaker::Precache()
 	//if ( !HasSpawnFlags(SF_NPCMAKER_NOPRELOADMODELS) )
 	if ( m_iszTemplateData != NULL_STRING )
 	{
-		CBaseEntity *pEntity = NULL;
+		IServerEntity *pEntity = NULL;
 		MapEntity_ParseEntity( pEntity, STRING(m_iszTemplateData), NULL );
 		if ( pEntity != NULL )
 		{
@@ -636,7 +636,7 @@ void CTemplateNPCMaker::Precache()
 CNPCSpawnDestination *CTemplateNPCMaker::FindSpawnDestination()
 {
 	CNPCSpawnDestination *pDestinations[ MAX_DESTINATION_ENTS ];
-	CBaseEntity *pEnt = NULL;
+	IServerEntity *pEnt = NULL;
 	CBasePlayer *pPlayer = ToBasePlayer(EntityList()->GetLocalPlayer());
 	int	count = 0;
 
@@ -799,7 +799,7 @@ void CTemplateNPCMaker::MakeNPC( void )
 	}
 
 	CAI_BaseNPC	*pent = NULL;
-	CBaseEntity *pEntity = NULL;
+	IServerEntity *pEntity = NULL;
 	MapEntity_ParseEntity( pEntity, STRING(m_iszTemplateData), NULL );
 	if ( pEntity != NULL )
 	{
@@ -882,7 +882,7 @@ void CTemplateNPCMaker::MakeNPCInLine( void )
 		return;
 
 	CAI_BaseNPC	*pent = NULL;
-	CBaseEntity *pEntity = NULL;
+	IServerEntity *pEntity = NULL;
 	MapEntity_ParseEntity( pEntity, STRING(m_iszTemplateData), NULL );
 	if ( pEntity != NULL )
 	{
@@ -977,7 +977,7 @@ void CTemplateNPCMaker::MakeNPCInRadius( void )
 		return;
 
 	CAI_BaseNPC	*pent = NULL;
-	CBaseEntity *pEntity = NULL;
+	IServerEntity *pEntity = NULL;
 	MapEntity_ParseEntity( pEntity, STRING(m_iszTemplateData), NULL );
 	if ( pEntity != NULL )
 	{

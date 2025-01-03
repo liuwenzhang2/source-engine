@@ -211,7 +211,7 @@ public:
 					bool bHadGag = pAllyNpc->GetEngineObject()->HasSpawnFlags(SF_NPC_GAG);
 
 					pAllyNpc->GetEngineObject()->AddSpawnFlags(SF_NPC_GAG);
-					pAllyNpc->TargetOrder(EntityList()->GetLocalPlayer(), &pAllyNpc, 1 );
+					pAllyNpc->TargetOrder((CBaseEntity*)EntityList()->GetLocalPlayer(), &pAllyNpc, 1 );
 					if ( !bHadGag )
 						pAllyNpc->GetEngineObject()->RemoveSpawnFlags(SF_NPC_GAG);
 				}
@@ -549,7 +549,7 @@ void CNPC_Citizen::PostNPCInit()
 	{
 		if ( (GetEngineObject()->GetSpawnFlags() & SF_CITIZEN_FOLLOW) && AI_IsSinglePlayer())
 		{
-			m_FollowBehavior.SetFollowTarget(EntityList()->GetLocalPlayer() );
+			m_FollowBehavior.SetFollowTarget((CBaseEntity*)EntityList()->GetLocalPlayer() );
 			m_FollowBehavior.SetParameters( AIF_SIMPLE );
 		}
 	}
@@ -755,7 +755,7 @@ void CNPC_Citizen::FixupMattWeapon()
 		Weapon_Drop( pWeapon );
 		EntityList()->DestroyEntity( pWeapon );
 		pWeapon = (CBaseCombatWeapon *)EntityList()->CreateEntityByName( "weapon_crowbar" );
-		pWeapon->SetName( "matt_weapon" );
+		pWeapon->GetEngineObject()->SetName( "matt_weapon" );
 		DispatchSpawn( pWeapon );
 
 #ifdef DEBUG
@@ -896,7 +896,7 @@ void CNPC_Citizen::GatherConditions()
 	if( IsInPlayerSquad() && hl2_episodic.GetBool() )
 	{
 		// Leave the player squad if someone has made me neutral to player.
-		if( IRelationType(EntityList()->GetLocalPlayer()) == D_NU )
+		if( IRelationType((CBaseEntity*)EntityList()->GetLocalPlayer()) == D_NU )
 		{
 			RemoveFromPlayerSquad();
 		}
@@ -1049,7 +1049,7 @@ void CNPC_Citizen::PrescheduleThink()
 	{
 		if ( HaveCommandGoal() )
 		{
-			CBaseEntity *pCommandPoint = EntityList()->FindEntityByClassname( NULL, COMMAND_POINT_CLASSNAME );
+			IServerEntity *pCommandPoint = EntityList()->FindEntityByClassname( NULL, COMMAND_POINT_CLASSNAME );
 			
 			if ( pCommandPoint )
 			{
@@ -1120,7 +1120,7 @@ void CNPC_Citizen::BuildScheduleTestBits()
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-bool CNPC_Citizen::FInViewCone( CBaseEntity *pEntity )
+bool CNPC_Citizen::FInViewCone( IServerEntity *pEntity )
 {
 #if 0
 	if ( IsMortar( pEntity ) )
@@ -1867,7 +1867,7 @@ void CNPC_Citizen::HandleAnimEvent( animevent_t *pEvent )
 			// If I have a name, make my weapon match it with "_weapon" appended
 			if ( GetEntityName() != NULL_STRING )
 			{
-				pWeapon->SetName( UTIL_VarArgs("%s_weapon", STRING(GetEntityName()) ) );
+				pWeapon->GetEngineObject()->SetName( UTIL_VarArgs("%s_weapon", STRING(GetEntityName()) ) );
 			}
 			Weapon_Equip( pWeapon );
 		}
@@ -2292,7 +2292,7 @@ int CNPC_Citizen::OnTakeDamage_Alive( const CTakeDamageInfo &info )
 			// remaining citizens a resistance bonus to this inflictor
 			// to try to avoid having the entire squad wiped out by a
 			// single explosion.
-			if( m_pSquad->IsSquadInflictor( info.GetInflictor() ) )
+			if( m_pSquad->IsSquadInflictor((CBaseEntity*)info.GetInflictor() ) )
 			{
 				newInfo.ScaleDamage( 0.5 );
 			}
@@ -2302,7 +2302,7 @@ int CNPC_Citizen::OnTakeDamage_Alive( const CTakeDamageInfo &info )
 				// so that the rest of the squad can enjoy a damage resist.
 				if( info.GetDamage() >= GetHealth() )
 				{
-					m_pSquad->SetSquadInflictor( info.GetInflictor() );
+					m_pSquad->SetSquadInflictor((CBaseEntity*)info.GetInflictor() );
 				}
 			}
 		}
@@ -2351,7 +2351,7 @@ bool CNPC_Citizen::CanJoinPlayerSquad()
 	if ( !CanBeUsedAsAFriend() )
 		return false;
 
-	if ( IRelationType(EntityList()->GetLocalPlayer() ) != D_LI )
+	if ( IRelationType((CBaseEntity*)EntityList()->GetLocalPlayer() ) != D_LI )
 		return false;
 
 	return true;
@@ -2396,7 +2396,7 @@ bool CNPC_Citizen::ShouldAutoSummon()
 	if ( !AI_IsSinglePlayer() || !IsFollowingCommandPoint() || !IsInPlayerSquad() )
 		return false;
 
-	CHL2_Player *pPlayer = (CHL2_Player *)EntityList()->GetLocalPlayer();
+	CHL2_Player *pPlayer = ToHL2Player(EntityList()->GetLocalPlayer());
 	
 	float distMovedSq = ( pPlayer->GetEngineObject()->GetAbsOrigin() - m_vAutoSummonAnchor ).LengthSqr();
 	float moveTolerance = player_squad_autosummon_move_tolerance.GetFloat() * 12;
@@ -2576,7 +2576,7 @@ void CNPC_Citizen::MoveOrder( const Vector &vecDest, CAI_BaseNPC **Allies, int n
 		return;
 	}
 
-	CHL2_Player *pPlayer = (CHL2_Player *)EntityList()->GetLocalPlayer();
+	CHL2_Player *pPlayer = ToHL2Player(EntityList()->GetLocalPlayer());
 
 	m_AutoSummonTimer.Set( player_squad_autosummon_time.GetFloat() );
 	m_vAutoSummonAnchor = pPlayer->GetEngineObject()->GetAbsOrigin();
@@ -2656,7 +2656,7 @@ void CNPC_Citizen::OnMoveOrder()
 //-----------------------------------------------------------------------------
 void CNPC_Citizen::CommanderUse( IServerEntity *pActivator, IServerEntity *pCaller, USE_TYPE useType, float value )
 {
-	m_OnPlayerUse.FireOutput( (CBaseEntity*)pActivator, (CBaseEntity*)pCaller );
+	m_OnPlayerUse.FireOutput( pActivator, pCaller );
 
 	// Under these conditions, citizens will refuse to go with the player.
 	// Robin: NPCs should always respond to +USE even if someone else has the semaphore.
@@ -2684,7 +2684,7 @@ void CNPC_Citizen::CommanderUse( IServerEntity *pActivator, IServerEntity *pCall
 			{
 				if ( random->RandomInt( 1, 4 ) < 4 )
 				{
-					CBaseEntity *pRespondant = FindSpeechTarget( AIST_NPCS );
+					IServerEntity *pRespondant = FindSpeechTarget( AIST_NPCS );
 					if ( pRespondant )
 					{
 						g_EventQueue.AddEvent( pRespondant, "SpeakIdleResponse", ( GetTimeSpeechComplete() - gpGlobals->curtime ) + .2, this, this );
@@ -3148,7 +3148,7 @@ void CNPC_Citizen::FixupPlayerSquad()
 	}
 	else
 	{
-		m_FollowBehavior.SetFollowTarget(EntityList()->GetLocalPlayer() );
+		m_FollowBehavior.SetFollowTarget((CBaseEntity*)EntityList()->GetLocalPlayer() );
 		m_FollowBehavior.SetParameters( AIF_SIMPLE );
 	}
 }
@@ -3173,24 +3173,24 @@ void CNPC_Citizen::UpdateFollowCommandPoint()
 		if ( HaveCommandGoal() )
 		{
 			CBaseEntity *pFollowTarget = m_FollowBehavior.GetFollowTarget();
-			CBaseEntity *pCommandPoint = EntityList()->FindEntityByClassname( NULL, COMMAND_POINT_CLASSNAME );
+			IServerEntity *pCommandPoint = EntityList()->FindEntityByClassname( NULL, COMMAND_POINT_CLASSNAME );
 			
 			if( !pCommandPoint )
 			{
 				DevMsg("**\nVERY BAD THING\nCommand point vanished! Creating a new one\n**\n");
-				pCommandPoint = (CBaseEntity*)EntityList()->CreateEntityByName( COMMAND_POINT_CLASSNAME );
+				pCommandPoint = EntityList()->CreateEntityByName( COMMAND_POINT_CLASSNAME );
 			}
 
 			if ( pFollowTarget != pCommandPoint )
 			{
-				pFollowTarget = pCommandPoint;
+				pFollowTarget = (CBaseEntity*)pCommandPoint;
 				m_FollowBehavior.SetFollowTarget( pFollowTarget );
 				m_FollowBehavior.SetParameters( AIF_COMMANDER );
 			}
 			
 			if ( ( pCommandPoint->GetEngineObject()->GetAbsOrigin() - GetCommandGoal() ).LengthSqr() > 0.01 )
 			{
-				UTIL_SetOrigin( pCommandPoint, GetCommandGoal(), false );
+				UTIL_SetOrigin((CBaseEntity*)pCommandPoint, GetCommandGoal(), false );
 			}
 		}
 		else
@@ -3200,7 +3200,7 @@ void CNPC_Citizen::UpdateFollowCommandPoint()
 			if ( m_FollowBehavior.GetFollowTarget() != EntityList()->GetLocalPlayer() )
 			{
 				DevMsg( "Expected to be following player, but not\n" );
-				m_FollowBehavior.SetFollowTarget(EntityList()->GetLocalPlayer() );
+				m_FollowBehavior.SetFollowTarget((CBaseEntity*)EntityList()->GetLocalPlayer() );
 				m_FollowBehavior.SetParameters( AIF_SIMPLE );
 			}
 		}
@@ -3710,7 +3710,7 @@ void	CNPC_Citizen::TossHealthKit(CBaseCombatCharacter *pThrowAt, const Vector &o
 	}
 
 	// create a healthkit and toss it into the world
-	CBaseEntity *pHealthKit = (CBaseEntity*)EntityList()->CreateEntityByName( "item_healthkit" );
+	IServerEntity *pHealthKit = EntityList()->CreateEntityByName( "item_healthkit" );
 	Assert(pHealthKit);
 	if (pHealthKit)
 	{
@@ -4175,8 +4175,8 @@ void CCitizenResponseSystem::ResponseThink()
 				{
 					// Try and find the nearest citizen to the player
 					float flNearestDist = (CITIZEN_RESPONSE_DISTANCE * CITIZEN_RESPONSE_DISTANCE);
-					CBaseEntity *pNearestCitizen = NULL;
-					CBaseEntity *pCitizen = NULL;
+					IServerEntity *pNearestCitizen = NULL;
+					IServerEntity *pCitizen = NULL;
 					CBasePlayer *pPlayer = ToBasePlayer(EntityList()->GetLocalPlayer());
 					while ( (pCitizen = EntityList()->FindEntityByClassname( pCitizen, "npc_citizen" ) ) != NULL)
 					{
@@ -4215,7 +4215,7 @@ void CCitizenResponseSystem::ResponseThink()
 
 void CNPC_Citizen::AddInsignia()
 {
-	CBaseEntity *pMark = (CBaseEntity*)EntityList()->CreateEntityByName( "squadinsignia" );
+	IServerEntity *pMark = EntityList()->CreateEntityByName( "squadinsignia" );
 	pMark->SetOwnerEntity( this );
 	pMark->Spawn();
 }
@@ -4223,8 +4223,8 @@ void CNPC_Citizen::AddInsignia()
 void CNPC_Citizen::RemoveInsignia()
 {
 	// This is crap right now.
-	CBaseEntity *FirstEnt();
-	CBaseEntity *pEntity = EntityList()->FirstEnt();
+	IServerEntity *FirstEnt();
+	IServerEntity *pEntity = EntityList()->FirstEnt();
 
 	while( pEntity )
 	{

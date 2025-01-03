@@ -164,7 +164,7 @@ private:
 };
 
 // helper functions
-const char *GetModelName( CBaseEntity *pBaseEntity );
+const char *GetModelName( IHandleEntity *pBaseEntity );
 
 #ifdef CLIENT_DLL
 bool CalcPlayersOnFriendsList( int iMinPlayers );

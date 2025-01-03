@@ -252,7 +252,7 @@ float CAI_BaseNPC::OpenDoorAndWait( CBaseEntity *pDoor )
 		flTravelTime = pDoor->GetMoveDoneTime();
 		if ( pDoor->GetEntityName() != NULL_STRING )
 		{
-			CBaseEntity *pTarget = NULL;
+			IServerEntity *pTarget = NULL;
 			for (;;)
 			{
 				pTarget = EntityList()->FindEntityByName( pTarget, pDoor->GetEntityName() );

@@ -681,8 +681,8 @@ void CDODPlayer::Event_Killed( const CTakeDamageInfo &info )
 	// allow bots to react
 //	TheBots->OnEvent( EVENT_PLAYER_DIED, this, info.GetAttacker() );
 
-	CBaseEntity *pInflictor = info.GetInflictor();
-	CBaseEntity *pKiller = info.GetAttacker();
+	CBaseEntity *pInflictor = (CBaseEntity*)info.GetInflictor();
+	CBaseEntity *pKiller = (CBaseEntity*)info.GetAttacker();
 	CDODPlayer *pScorer = ToDODPlayer( DODGameRules()->GetDeathScorer( pKiller, pInflictor ) );
 
 	// Do this before we drop the victim's weapons to check the streak
@@ -802,7 +802,7 @@ void CDODPlayer::Event_Killed( const CTakeDamageInfo &info )
 	if( info.GetAttacker() && info.GetAttacker()->IsPlayer() )
 	{
 		// set new target
-		m_hObserverTarget.Set( info.GetAttacker() ); 
+		m_hObserverTarget.Set((CBaseEntity*)info.GetAttacker() );
 
 		// reset fov to default
 		SetFOV( this, 0 );
@@ -841,7 +841,7 @@ void CDODPlayer::Event_Killed( const CTakeDamageInfo &info )
 	CSingleUserRecipientFilter user( this );
 	enginesound->SetPlayerDSP( user, 0, false );
 
-	CDODPlayer *pAttacker = ToDODPlayer( info.GetAttacker() );
+	CDODPlayer *pAttacker = ToDODPlayer((IServerEntity*)info.GetAttacker() );
 
 	if( pAttacker && pAttacker->IsPlayer() )
 	{
@@ -849,7 +849,7 @@ void CDODPlayer::Event_Killed( const CTakeDamageInfo &info )
 
 		DODWeaponID weaponID = WEAPON_NONE;
 
-		CBaseEntity *pInflictor = info.GetInflictor();
+		CBaseEntity *pInflictor = (CBaseEntity*)info.GetInflictor();
 
 		if ( pInflictor == pAttacker )
 		{
@@ -1036,9 +1036,9 @@ void CDODPlayer::DoAnimationEvent( PlayerAnimEvent_t event, int nData )
 
 CBaseEntity	*CDODPlayer::GiveNamedItem( const char *pszName, int iSubType )
 {
-	EHANDLE pent;
+	IServerEntity* pent;
 
-	pent = (CBaseEntity*)EntityList()->CreateEntityByName(pszName);
+	pent = EntityList()->CreateEntityByName(pszName);
 	if ( pent == NULL )
 	{
 		Msg( "NULL Ent in GiveNamedItem!\n" );
@@ -1050,7 +1050,7 @@ CBaseEntity	*CDODPlayer::GiveNamedItem( const char *pszName, int iSubType )
 
 	if ( iSubType )
 	{
-		CBaseCombatWeapon *pWeapon = dynamic_cast<CBaseCombatWeapon*>( (CBaseEntity*)pent );
+		CBaseCombatWeapon *pWeapon = dynamic_cast<CBaseCombatWeapon*>( pent );
 		if ( pWeapon )
 		{
 			pWeapon->SetSubType( iSubType );
@@ -1064,7 +1064,7 @@ CBaseEntity	*CDODPlayer::GiveNamedItem( const char *pszName, int iSubType )
 		pent->Touch( this );
 	}
 
-	return pent;
+	return (CBaseEntity*)pent;
 }
 
 extern ConVar flashlight;
@@ -1344,7 +1344,7 @@ void CDODPlayer::TraceAttack( const CTakeDamageInfo &info, const Vector &vecDir,
 {
 	bool bTakeDamage = true;
 
-	CBasePlayer *pAttacker = (CBasePlayer*)ToBasePlayer( info.GetAttacker() );
+	CBasePlayer *pAttacker = ToBasePlayer((IServerEntity*)info.GetAttacker() );
 
 	bool bFriendlyFire = DODGameRules()->IsFriendlyFireOn();
 
@@ -1506,7 +1506,7 @@ void CDODPlayer::TraceAttack( const CTakeDamageInfo &info, const Vector &vecDir,
 		data.m_vNormal = vecDir * -1;
 		data.m_flScale = 4;
 		data.m_fFlags = FX_BLOODSPRAY_ALL;
-		data.m_nEntIndex = ptr->m_pEnt ? ((CBaseEntity*)ptr->m_pEnt)->entindex() : 0;
+		data.m_nEntIndex = ptr->m_pEnt ? ptr->m_pEnt->entindex() : 0;
 		data.m_flMagnitude = flDamage;
 
 		DispatchEffect( "dodblood", data );
@@ -2043,7 +2043,7 @@ int CDODPlayer::GetNearestLocationAsString( char *pDest, int iDestSize )
 
 	const char *pLocationName = "";
 
-	CBaseEntity *pEnt =	EntityList()->FindEntityByClassname( NULL, "dod_control_point" );
+	IServerEntity *pEnt = EntityList()->FindEntityByClassname( NULL, "dod_control_point" );
 
 	while( pEnt )
 	{
@@ -2060,7 +2060,7 @@ int CDODPlayer::GetNearestLocationAsString( char *pDest, int iDestSize )
 		pEnt = EntityList()->FindEntityByClassname( pEnt, "dod_control_point" );
 	}
 
-	pEnt =	EntityList()->FindEntityByClassname( NULL, "dod_location" );
+	pEnt = EntityList()->FindEntityByClassname( NULL, "dod_location" );
 
 	while( pEnt )
 	{
@@ -2911,11 +2911,11 @@ bool CDODPlayer::CanSprint()
 
 void CDODPlayer::MoveToNextIntroCamera()
 {
-	m_pIntroCamera = EntityList()->FindEntityByClassname( m_pIntroCamera, "point_viewcontrol" );
+	m_pIntroCamera = (CBaseEntity*)EntityList()->FindEntityByClassname( m_pIntroCamera, "point_viewcontrol" );
 
 	// if m_pIntroCamera is NULL we just were at end of list, start searching from start again
 	if(!m_pIntroCamera)
-		m_pIntroCamera = EntityList()->FindEntityByClassname(m_pIntroCamera, "point_viewcontrol");
+		m_pIntroCamera = (CBaseEntity*)EntityList()->FindEntityByClassname(m_pIntroCamera, "point_viewcontrol");
 
 	if( !m_pIntroCamera  ) //if there are no cameras find a spawn point and black out the screen
 	{
@@ -2939,13 +2939,13 @@ void CDODPlayer::MoveToNextIntroCamera()
 	}
 }
 
-CBaseEntity *CDODPlayer::SelectSpawnSpot( CUtlVector<EHANDLE> *pSpawnPoints, int &iLastSpawnIndex )
+IServerEntity *CDODPlayer::SelectSpawnSpot( CUtlVector<EHANDLE> *pSpawnPoints, int &iLastSpawnIndex )
 {
 	Assert( pSpawnPoints );
 
 	int iNumSpawns = pSpawnPoints->Count();
 
-	CBaseEntity *pSpot = NULL;
+	IServerEntity *pSpot = NULL;
 
 	for ( int i=0;i<iNumSpawns;i++ )
 	{
@@ -2961,7 +2961,7 @@ CBaseEntity *CDODPlayer::SelectSpawnSpot( CUtlVector<EHANDLE> *pSpawnPoints, int
 		if ( !pSpot )
 			continue;
 
-		if( g_pGameRules->IsSpawnPointValid( pSpot, this ) )
+		if( g_pGameRules->IsSpawnPointValid((CBaseEntity*)pSpot, this ) )
 		{
 			if ( pSpot->GetEngineObject()->GetAbsOrigin() == Vector( 0, 0, 0 ) )
 			{
@@ -2970,7 +2970,7 @@ CBaseEntity *CDODPlayer::SelectSpawnSpot( CUtlVector<EHANDLE> *pSpawnPoints, int
 
 			// if so, go to pSpot
 			iLastSpawnIndex = testIndex;
-			return pSpot;
+			return (CBaseEntity*)pSpot;
 		}
 	}
 
@@ -3028,7 +3028,7 @@ CBaseEntity *CDODPlayer::SelectSpawnSpot( CUtlVector<EHANDLE> *pSpawnPoints, int
 				QAngle spotAngles = pSpot->GetEngineObject()->GetAbsAngles();
 
 				// make a new spawnpoint so we don't have to do this a bunch of times
-				pSpot = (CBaseEntity*)EntityList()->CreateEntityByName( pSpot->GetClassname() );
+				pSpot = EntityList()->CreateEntityByName( pSpot->GetClassname() );
 				pSpot->GetEngineObject()->SetAbsOrigin( origin );
 				pSpot->GetEngineObject()->SetAbsAngles( spotAngles );
 
@@ -3053,9 +3053,9 @@ CBaseEntity *CDODPlayer::SelectSpawnSpot( CUtlVector<EHANDLE> *pSpawnPoints, int
 }
 
 
-CBaseEntity* CDODPlayer::EntSelectSpawnPoint()
+IServerEntity* CDODPlayer::EntSelectSpawnPoint()
 {
-	CBaseEntity *pSpot = NULL;
+	IServerEntity *pSpot = NULL;
 
 	switch( GetTeamNumber() )
 	{
@@ -3268,7 +3268,7 @@ int CDODPlayer::OnTakeDamage_Alive( const CTakeDamageInfo &info )
 		event->SetInt("damage", info.GetDamage() );
 		event->SetInt("hitgroup", m_LastHitGroup );
 
-		CBaseEntity *attacker = info.GetAttacker();
+		CBaseEntity *attacker = (CBaseEntity*)info.GetAttacker();
 		const char *weaponName = "";
 		DODWeaponID weaponID = WEAPON_NONE;
 
@@ -3285,7 +3285,7 @@ int CDODPlayer::OnTakeDamage_Alive( const CTakeDamageInfo &info )
 				pDODPlayer->Hints()->HintMessage( HINT_FRIEND_INJURED );
 			}
 
-			CBaseEntity *pInflictor = info.GetInflictor();
+			CBaseEntity *pInflictor = (CBaseEntity*)info.GetInflictor();
 			if ( pInflictor )
 			{
 				if ( pInflictor == pDODPlayer )
@@ -3363,7 +3363,7 @@ int CDODPlayer::OnTakeDamage_Alive( const CTakeDamageInfo &info )
 				// damage_given is the amount of damage applied, not to exceed how much life we have
 				stats_event->SetInt( "damage_given", MIN( iDamage, iInitialHealth ) );
 
-				CBaseEntity *pInflictor = info.GetInflictor();
+				CBaseEntity *pInflictor = (CBaseEntity*)info.GetInflictor();
 				float flDist = ( pInflictor->GetEngineObject()->GetAbsOrigin() - GetEngineObject()->GetAbsOrigin() ).Length();
 				stats_event->SetFloat( "distance", flDist );
 
@@ -3384,7 +3384,7 @@ int CDODPlayer::OnTakeDamage( const CTakeDamageInfo &inputInfo )
 {
 	CTakeDamageInfo info = inputInfo;
 
-	CBaseEntity *pInflictor = info.GetInflictor();
+	CBaseEntity *pInflictor = (CBaseEntity*)info.GetInflictor();
 
 	if ( !pInflictor )
 		return 0;
@@ -3417,7 +3417,7 @@ int CDODPlayer::OnTakeDamage( const CTakeDamageInfo &inputInfo )
 			return 0;
 		}
 
-		CDODPlayer *pPlayer = ToDODPlayer( info.GetAttacker() );
+		CDODPlayer *pPlayer = ToDODPlayer((IServerEntity*)info.GetAttacker() );
 
 		// keep track of amount of damage last sustained
 		m_lastDamageAmount = info.GetDamage();
@@ -4160,9 +4160,9 @@ CBaseEntity *CDODPlayer::FindUseEntity()
 	// check ground entity first
 	// if you've got a useable ground entity, then shrink the cone of this search to 45 degrees
 	// otherwise, search out in a 90 degree cone (hemisphere)
-	if (GetEngineObject()->GetGroundEntity() && IsUseableEntity(GetEngineObject()->GetGroundEntity()->GetOuter(), FCAP_USE_ONGROUND))
+	if (GetEngineObject()->GetGroundEntity() && IsUseableEntity((CBaseEntity*)GetEngineObject()->GetGroundEntity()->GetOuter(), FCAP_USE_ONGROUND))
 	{
-		pNearest = GetEngineObject()->GetGroundEntity()->GetOuter();
+		pNearest = (CBaseEntity*)GetEngineObject()->GetGroundEntity()->GetOuter();
 		nearestDot = CONE_45_DEGREES;
 	}
 
@@ -4227,7 +4227,7 @@ CBaseEntity *CDODPlayer::FindUseEntity()
 	// Special check for bomb targets, whose radius for +use is larger than other entities
 	if ( pNearest == NULL )
 	{
-		CBaseEntity *pEnt = NULL;
+		IServerEntity *pEnt = NULL;
 		float flBestDist = FLT_MAX;
 
 		// If we didn't find anything, check to see if the bomb target is close enough to use.

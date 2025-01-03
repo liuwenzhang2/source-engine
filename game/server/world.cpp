@@ -84,7 +84,7 @@ static CViewVectors g_DefaultViewVectors(
 	Vector(0, 0, 14)			//VEC_DEAD_VIEWHEIGHT (m_vDeadViewHeight)
 );
 
-extern CBaseEntity				*g_pLastSpawn;
+extern IServerEntity				*g_pLastSpawn;
 void InitBodyQue(void);
 extern void W_Precache(void);
 //extern void ActivityList_Free( void );
@@ -170,7 +170,7 @@ void CDecal::TriggerDecal ( IServerEntity *pActivator, IServerEntity *pCaller, U
 
 	UTIL_TraceLine(GetEngineObject()->GetAbsOrigin() - Vector(5,5,5), GetEngineObject()->GetAbsOrigin() + Vector(5,5,5), MASK_SOLID_BRUSHONLY, this, COLLISION_GROUP_NONE, &trace );
 
-	entityIndex = trace.m_pEnt ? ((CBaseEntity*)trace.m_pEnt)->entindex() : 0;
+	entityIndex = trace.m_pEnt ? trace.m_pEnt->entindex() : 0;
 
 	CBroadcastRecipientFilter filter;
 
@@ -237,7 +237,7 @@ void CDecal::StaticDecal( void )
 
 	bool canDraw = true;
 
-	entityIndex = trace.m_pEnt ? (short)((CBaseEntity*)trace.m_pEnt)->entindex() : 0;
+	entityIndex = trace.m_pEnt ? trace.m_pEnt->entindex() : 0;
 	if ( entityIndex )
 	{
 		CBaseEntity *ent = (CBaseEntity*)trace.m_pEnt;
@@ -848,9 +848,9 @@ bool CWorld::CanHaveAmmo(CBaseCombatCharacter* pPlayer, const char* szName)
 
 //=========================================================
 //=========================================================
-CBaseEntity* CWorld::GetPlayerSpawnSpot(CBasePlayer* pPlayer)
+IServerEntity* CWorld::GetPlayerSpawnSpot(CBasePlayer* pPlayer)
 {
-	CBaseEntity* pSpawnSpot = pPlayer->EntSelectSpawnPoint();
+	IServerEntity* pSpawnSpot = pPlayer->EntSelectSpawnPoint();
 	Assert(pSpawnSpot);
 
 	pPlayer->GetEngineObject()->SetLocalOrigin(pSpawnSpot->GetEngineObject()->GetAbsOrigin() + Vector(0, 0, 1));
@@ -965,7 +965,7 @@ bool IsExplosionTraceBlocked(trace_t* ptr)
 	if (ptr->m_pEnt == NULL)
 		return false;
 
-	if (((CBaseEntity*)ptr->m_pEnt)->GetEngineObject()->GetMoveType() == MOVETYPE_PUSH)
+	if (ptr->m_pEnt->GetEngineObject()->GetMoveType() == MOVETYPE_PUSH)
 	{
 		// All doors are push, but not all things that push are doors. This 
 		// narrows the search before we start to do classname compares.
@@ -1095,7 +1095,7 @@ void CWorld::RadiusDamage(const CTakeDamageInfo& info, const Vector& vecSrcIn, f
 
 				// UNDONE: Probably shouldn't let children block parents either?  Or maybe those guys should set their owner if they want this behavior?
 				// HL2 - Dissolve damage is not reduced by interposing non-world objects
-				if (tr.m_pEnt && tr.m_pEnt != pEntity && ((CBaseEntity*)tr.m_pEnt)->GetOwnerEntity() != pEntity)
+				if (tr.m_pEnt && tr.m_pEnt != pEntity && tr.m_pEnt->GetOwnerEntity() != pEntity)
 				{
 					// Some entity was hit by the trace, meaning the explosion does not have clear
 					// line of sight to the entity that it's trying to hurt. If the world is also
@@ -1202,7 +1202,7 @@ void CWorld::RadiusDamage(const CTakeDamageInfo& info, const Vector& vecSrcIn, f
 
 			// This is a total hack!!!
 			bool bIsPrimary = true;
-			CBasePlayer* player = ToBasePlayer(info.GetAttacker());
+			CBasePlayer* player = ToBasePlayer((IServerEntity*)info.GetAttacker());
 			CBaseCombatWeapon* pWeapon = player->GetActiveWeapon();
 			if (pWeapon && FClassnameIs(pWeapon, "weapon_smg1"))
 			{

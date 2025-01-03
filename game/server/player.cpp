@@ -160,7 +160,7 @@ bool gInitHUD = true;
 extern void respawn(CBaseEntity *pEdict, bool fCopyCorpse);
 int MapTextureTypeStepType(char chTextureType);
 extern void	SpawnBlood(Vector vecSpot, const Vector &vecDir, int bloodColor, float flDamage);
-extern void AddMultiDamage( const CTakeDamageInfo &info, CBaseEntity *pEntity );
+extern void AddMultiDamage( const CTakeDamageInfo &info, IHandleEntity *pEntity );
 
 
 #define CMD_MOSTRECENT 0
@@ -696,7 +696,7 @@ int CBasePlayer::ShouldTransmit( const CCheckTransmitInfo *pInfo )
 	// so transmit these 'cameramans' to the HLTV or Replay client
 	if ( HLTVDirector()->GetCameraMan() == entindex() )
 	{
-		CBaseEntity *pRecipientEntity = EntityList()->GetBaseEntity( pInfo->m_pClientEnt );
+		IServerEntity *pRecipientEntity = EntityList()->GetBaseEntity( pInfo->m_pClientEnt );
 		
 		Assert( pRecipientEntity->IsPlayer() );
 		
@@ -919,14 +919,14 @@ void CBasePlayer::TraceAttack( const CTakeDamageInfo &inputInfo, const Vector &v
 			// --------------------------------------------------
 			//  If an NPC check if friendly fire is disallowed
 			// --------------------------------------------------
-			CAI_BaseNPC *pNPC = info.GetAttacker()->MyNPCPointer();
+			CAI_BaseNPC *pNPC = ((CBaseEntity*)info.GetAttacker())->MyNPCPointer();
 			if ( pNPC && (pNPC->CapabilitiesGet() & bits_CAP_NO_HIT_PLAYER) && pNPC->IRelationType( this ) != D_HT )
 				return;
 
 			// Prevent team damage here so blood doesn't appear
 			if ( info.GetAttacker()->IsPlayer() )
 			{
-				if ( !g_pGameRules->FPlayerCanTakeDamage( this, info.GetAttacker(), info ) )
+				if ( !g_pGameRules->FPlayerCanTakeDamage( this, (CBaseEntity*)info.GetAttacker(), info ) )
 					return;
 			}
 		}
@@ -1160,7 +1160,7 @@ int CBasePlayer::OnTakeDamage( const CTakeDamageInfo &inputInfo )
 	// go take the damage first
 
 	
-	if ( !g_pGameRules->FPlayerCanTakeDamage( this, info.GetAttacker(), inputInfo ) )
+	if ( !g_pGameRules->FPlayerCanTakeDamage( this, (CBaseEntity*)info.GetAttacker(), inputInfo ) )
 	{
 		// Refuse the damage
 		return 0;
@@ -1386,7 +1386,7 @@ int CBasePlayer::OnTakeDamage( const CTakeDamageInfo &inputInfo )
 
 	float flPunch = -2;
 
-	if( hl2_episodic.GetBool() && info.GetAttacker() && !FInViewCone( info.GetAttacker() ) )
+	if( hl2_episodic.GetBool() && info.GetAttacker() && !FInViewCone( (CBaseEntity*)info.GetAttacker() ) )
 	{
 		if( info.GetDamage() > 10.0f )
 			flPunch = -10;
@@ -1459,7 +1459,7 @@ void CBasePlayer::OnDamagedByExplosion( const CTakeDamageInfo &info )
 
 	float distanceFromPlayer = 9999.0f;
 
-	CBaseEntity *inflictor = info.GetInflictor();
+	CBaseEntity *inflictor = (CBaseEntity*)info.GetInflictor();
 	if ( inflictor )
 	{
 		Vector delta = GetEngineObject()->GetAbsOrigin() - inflictor->GetEngineObject()->GetAbsOrigin();
@@ -1630,7 +1630,7 @@ int CBasePlayer::OnTakeDamage_Alive( const CTakeDamageInfo &info )
 	if ( !BaseClass::OnTakeDamage_Alive( info ) )
 		return 0;
 
-	CBaseEntity * attacker = info.GetAttacker();
+	CBaseEntity * attacker = (CBaseEntity*)info.GetAttacker();
 
 	if ( !attacker )
 		return 0;
@@ -2432,7 +2432,7 @@ void CBasePlayer::CheckObserverSettings()
 	// check if we are in forced mode and may go back to old mode
 	if ( m_bForcedObserverMode )
 	{
-		CBaseEntity * target = m_hObserverTarget;
+		IServerEntity* target = m_hObserverTarget;
 
 		if ( !IsValidObserverTarget(target) )
 		{
@@ -2511,7 +2511,7 @@ void CBasePlayer::ValidateCurrentObserverTarget( void )
 	if ( !IsValidObserverTarget( m_hObserverTarget.Get() ) )
 	{
 		// our target is not valid, try to find new target
-		CBaseEntity * target = FindNextObserverTarget( false );
+		IServerEntity* target = FindNextObserverTarget( false );
 		if ( target )
 		{
 			// switch to new valid target
@@ -2582,7 +2582,7 @@ int CBasePlayer::GetReplayEntity()
 	return m_iReplayEntity;
 }
 
-CBaseEntity * CBasePlayer::GetObserverTarget()
+IServerEntity* CBasePlayer::GetObserverTarget()
 {
 	return m_hObserverTarget.Get();
 }
@@ -2671,7 +2671,7 @@ void CBasePlayer::JumptoPosition(const Vector &origin, const QAngle &angles)
     SnapEyeAngles( newangles );
 }
 
-bool CBasePlayer::SetObserverTarget(CBaseEntity *target)
+bool CBasePlayer::SetObserverTarget(IServerEntity *target)
 {
 	if ( !IsValidObserverTarget( target ) )
 		return false;
@@ -2703,7 +2703,7 @@ bool CBasePlayer::SetObserverTarget(CBaseEntity *target)
 	return true;
 }
 
-bool CBasePlayer::IsValidObserverTarget(CBaseEntity * target)
+bool CBasePlayer::IsValidObserverTarget(IServerEntity* target)
 {
 	if ( target == NULL )
 		return false;
@@ -2778,7 +2778,7 @@ int CBasePlayer::GetNextObserverSearchStartPoint( bool bReverse )
 	return startIndex;
 }
 
-CBaseEntity * CBasePlayer::FindNextObserverTarget(bool bReverse)
+IServerEntity* CBasePlayer::FindNextObserverTarget(bool bReverse)
 {
 	// MOD AUTHORS: Modify the logic of this function if you want to restrict the observer to watching
 	//				only a subset of the players. e.g. Make it check the target's team.
@@ -2798,7 +2798,7 @@ CBaseEntity * CBasePlayer::FindNextObserverTarget(bool bReverse)
 	
 	do
 	{
-		CBaseEntity * nextTarget = EntityList()->GetPlayerByIndex( currentIndex );
+		IServerEntity * nextTarget = EntityList()->GetPlayerByIndex( currentIndex );
 
 		if ( IsValidObserverTarget( nextTarget ) )
 		{
@@ -3782,7 +3782,7 @@ void CBasePlayer::HandleFuncTrain(void)
 		return;
 	}
 
-	CBaseEntity* pTrain = GetEngineObject()->GetGroundEntity() ? GetEngineObject()->GetGroundEntity()->GetOuter() : NULL;
+	CBaseEntity* pTrain = GetEngineObject()->GetGroundEntity() ? (CBaseEntity*)GetEngineObject()->GetGroundEntity()->GetOuter() : NULL;
 	float vel;
 
 	if ( pTrain )
@@ -4755,7 +4755,7 @@ Vector CBasePlayer::GetSmoothedVelocity( void )
 }
 
 
-CBaseEntity	*g_pLastSpawn = NULL;
+IServerEntity	*g_pLastSpawn = NULL;
 
 
 //-----------------------------------------------------------------------------
@@ -4770,19 +4770,19 @@ CBaseEntity *FindPlayerStart(const char *pszClassName)
 {
 	#define SF_PLAYER_START_MASTER	1
 	
-	CBaseEntity *pStart = EntityList()->FindEntityByClassname(NULL, pszClassName);
-	CBaseEntity *pStartFirst = pStart;
+	IServerEntity *pStart = EntityList()->FindEntityByClassname(NULL, pszClassName);
+	IServerEntity *pStartFirst = pStart;
 	while (pStart != NULL)
 	{
 		if (pStart->GetEngineObject()->HasSpawnFlags(SF_PLAYER_START_MASTER))
 		{
-			return pStart;
+			return (CBaseEntity*)pStart;
 		}
 
 		pStart = EntityList()->FindEntityByClassname(pStart, pszClassName);
 	}
 
-	return pStartFirst;
+	return (CBaseEntity*)pStartFirst;
 }
 
 /*
@@ -4794,9 +4794,9 @@ Returns the entity to spawn at
 USES AND SETS GLOBAL g_pLastSpawn
 ============
 */
-CBaseEntity *CBasePlayer::EntSelectSpawnPoint()
+IServerEntity *CBasePlayer::EntSelectSpawnPoint()
 {
-	CBaseEntity *pSpot;
+	IServerEntity *pSpot;
 	//edict_t		*player;
 
 	//player = edict();
@@ -4820,14 +4820,14 @@ CBaseEntity *CBasePlayer::EntSelectSpawnPoint()
 		if ( !pSpot )  // skip over the null point
 			pSpot = EntityList()->FindEntityByClassname( pSpot, "info_player_deathmatch" );
 
-		CBaseEntity *pFirstSpot = pSpot;
+		IServerEntity *pFirstSpot = pSpot;
 
 		do 
 		{
 			if ( pSpot )
 			{
 				// check if pSpot is valid
-				if ( g_pGameRules->IsSpawnPointValid( pSpot, this ) )
+				if ( g_pGameRules->IsSpawnPointValid((CBaseEntity*)pSpot, this ) )
 				{
 					if ( pSpot->GetEngineObject()->GetLocalOrigin() == vec3_origin )
 					{
@@ -4846,7 +4846,7 @@ CBaseEntity *CBasePlayer::EntSelectSpawnPoint()
 		// we haven't found a place to spawn yet,  so kill any guy at the first spawn point and spawn there
 		if ( pSpot )
 		{
-			CBaseEntity *ent = NULL;
+			IServerEntity *ent = NULL;
 			for ( CEntitySphereQuery sphere( pSpot->GetEngineObject()->GetAbsOrigin(), 128 ); (ent = sphere.GetCurrentEntity()) != NULL; sphere.NextEntity() )
 			{
 				// if ent is a client, kill em (unless they are ourselves)
@@ -5190,7 +5190,7 @@ int CBasePlayer::Restore( IRestore &restore )
 		Msg( "No Landmark:%s\n", pSaveData->levelInfo.szLandmarkName );
 
 		// default to normal spawn
-		CBaseEntity *pSpawnSpot = EntSelectSpawnPoint();
+		IServerEntity *pSpawnSpot = EntSelectSpawnPoint();
 		GetEngineObject()->SetLocalOrigin( pSpawnSpot->GetEngineObject()->GetLocalOrigin() + Vector(0,0,1) );
 		GetEngineObject()->SetLocalAngles( pSpawnSpot->GetEngineObject()->GetLocalAngles() );
 	}
@@ -5684,9 +5684,9 @@ CBaseEntity	*CBasePlayer::GiveNamedItem( const char *pszName, int iSubType )
 
 	// Msg( "giving %s\n", pszName );
 
-	EHANDLE pent;
+	IServerEntity* pent;
 
-	pent = (CBaseEntity*)EntityList()->CreateEntityByName(pszName);
+	pent = EntityList()->CreateEntityByName(pszName);
 	if ( pent == NULL )
 	{
 		Msg( "NULL Ent in GiveNamedItem!\n" );
@@ -5696,7 +5696,7 @@ CBaseEntity	*CBasePlayer::GiveNamedItem( const char *pszName, int iSubType )
 	pent->GetEngineObject()->SetLocalOrigin(GetEngineObject()->GetLocalOrigin() );
 	pent->GetEngineObject()->AddSpawnFlags( SF_NORESPAWN );
 
-	CBaseCombatWeapon *pWeapon = dynamic_cast<CBaseCombatWeapon*>( (CBaseEntity*)pent );
+	CBaseCombatWeapon *pWeapon = dynamic_cast<CBaseCombatWeapon*>( pent );
 	if ( pWeapon )
 	{
 		pWeapon->SetSubType( iSubType );
@@ -5709,7 +5709,7 @@ CBaseEntity	*CBasePlayer::GiveNamedItem( const char *pszName, int iSubType )
 		pent->Touch( this );
 	}
 
-	return pent;
+	return (CBaseEntity*)pent;
 }
 
 //-----------------------------------------------------------------------------
@@ -5749,7 +5749,7 @@ CBaseEntity *FindEntityClassForward( CBasePlayer *pMe, char *classname )
 CBaseEntity *FindPickerEntityClass( CBasePlayer *pPlayer, char *classname )
 {
 	// First try to trace a hull to an entity
-	CBaseEntity *pEntity = FindEntityClassForward( pPlayer, classname );
+	IServerEntity *pEntity = FindEntityClassForward( pPlayer, classname );
 
 	// If that fails just look for the nearest facing entity
 	if (!pEntity) 
@@ -5760,7 +5760,7 @@ CBaseEntity *FindPickerEntityClass( CBasePlayer *pPlayer, char *classname )
 		origin = pPlayer->WorldSpaceCenter();		
 		pEntity = EntityList()->FindEntityClassNearestFacing( origin, forward,0.95,classname);
 	}
-	return pEntity;
+	return (CBaseEntity*)pEntity;
 }
 
 //-----------------------------------------------------------------------------
@@ -6056,7 +6056,7 @@ void CBasePlayer::CheatImpulseCommands( int iImpulse )
 		return;
 	}
 
-	CBaseEntity *pEntity;
+	IServerEntity *pEntity;
 	trace_t tr;
 
 	switch ( iImpulse )
@@ -6143,7 +6143,7 @@ void CBasePlayer::CheatImpulseCommands( int iImpulse )
 		pEntity = EntityList()->FindEntityForward( this, true );
 		if ( pEntity )
 		{
-			CAI_BaseNPC *pNPC = pEntity->MyNPCPointer();
+			CAI_BaseNPC* pNPC = ((CBaseEntity*)pEntity)->MyNPCPointer();
 			if ( pNPC )
 				pNPC->ReportAIState();
 		}
@@ -6201,7 +6201,7 @@ void CBasePlayer::CheatImpulseCommands( int iImpulse )
 		pEntity = EntityList()->FindEntityForward( this, true );
 		if ( pEntity )
 		{
-			CAI_BaseNPC *pNPC = pEntity->MyNPCPointer();
+			CAI_BaseNPC *pNPC = ((CBaseEntity*)pEntity)->MyNPCPointer();
 			if ( pNPC != NULL )
 			{
 				Msg( "Debugging %s (0x%p)\n", pNPC->GetClassname(), pNPC );
@@ -6402,7 +6402,7 @@ bool CBasePlayer::ClientCommand( const CCommand &args )
 		if ( GetObserverMode() > OBS_MODE_FIXED )
 		{
 			// set new spectator mode
-			CBaseEntity * target = FindNextObserverTarget( false );
+			IServerEntity* target = FindNextObserverTarget( false );
 			if ( target )
 			{
 				SetObserverTarget( target );
@@ -6420,7 +6420,7 @@ bool CBasePlayer::ClientCommand( const CCommand &args )
 		if ( GetObserverMode() > OBS_MODE_FIXED )
 		{
 			// set new spectator mode
-			CBaseEntity * target = FindNextObserverTarget( true );
+			IServerEntity* target = FindNextObserverTarget( true );
 			if ( target )
 			{
 				SetObserverTarget( target );
@@ -7069,14 +7069,14 @@ QAngle CBasePlayer::AutoaimDeflection( Vector &vecSrc, autoaim_params_t &params 
 	int count = EntityList()->AimTarget_ListCount();
 	if ( count )
 	{
-		CBaseEntity **pList = (CBaseEntity **)stackalloc( sizeof(CBaseEntity *) * count );
+		IServerEntity **pList = (IServerEntity **)stackalloc( sizeof(CBaseEntity *) * count );
 		EntityList()->AimTarget_ListCopy( pList, count );
 
 		for ( int i = 0; i < count; i++ )
 		{
 			Vector center;
 			Vector dir;
-			CBaseEntity *pEntity = pList[i];
+			CBaseEntity *pEntity = (CBaseEntity*)pList[i];
 
 			// Don't autoaim at anything that doesn't want to be.
 			if( !pEntity->ShouldAttractAutoAim(this) )
@@ -8034,7 +8034,7 @@ void CBasePlayer::VPhysicsShadowUpdate( IPhysicsObject *pPhysics )
 	// UNDONE: If the player is penetrating, but the player's game collisions are not stuck, teleport the physics shadow to the game position
 	if ( pPhysics->GetGameFlags() & FVPHYSICS_PENETRATING )
 	{
-		CUtlVector<CBaseEntity *> list;
+		CUtlVector<IServerEntity *> list;
 		EntityList()->PhysGetListOfPenetratingEntities( this, list );
 		for ( int i = list.Count()-1; i >= 0; --i )
 		{
@@ -8048,7 +8048,7 @@ void CBasePlayer::VPhysicsShadowUpdate( IPhysicsObject *pPhysics )
 			}
 
 			// if it's an NPC, tell them that the player is intersecting them
-			CAI_BaseNPC *pNPC = list[i]->MyNPCPointer();
+			CAI_BaseNPC *pNPC = ((CBaseEntity*)list[i])->MyNPCPointer();
 			if ( pNPC )
 			{
 				pNPC->PlayerPenetratingVPhysics();
@@ -9169,12 +9169,12 @@ CBotCmd CPlayerInfo::GetLastUserCommand()
 }
 
 // Notify that I've killed some other entity. (called from Victim's Event_Killed).
-void CBasePlayer::Event_KilledOther( CBaseEntity *pVictim, const CTakeDamageInfo &info )
+void CBasePlayer::Event_KilledOther( IServerEntity *pVictim, const CTakeDamageInfo &info )
 {
 	BaseClass::Event_KilledOther( pVictim, info );
 	if ( pVictim != this )
 	{
-		gamestats->Event_PlayerKilledOther( this, pVictim, info );
+		gamestats->Event_PlayerKilledOther( this, (CBaseEntity*)pVictim, info );
 	}
 	else
 	{

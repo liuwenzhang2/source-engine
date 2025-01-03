@@ -363,7 +363,7 @@ int CNPC_CeilingTurret::OnTakeDamage( const CTakeDamageInfo &inputInfo )
 
 		g_pSoundEmitterSystem->StopSound(this, "NPC_CeilingTurret.Alert" );
 
-		m_OnDamaged.FireOutput( info.GetInflictor(), this );
+		m_OnDamaged.FireOutput((IServerEntity*)info.GetInflictor(), this );
 
 		GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.1f );
 

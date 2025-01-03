@@ -159,7 +159,7 @@ struct SCSSDeathData : public BaseStatData
 		m_DeathPos = info.GetDamagePosition();
 		m_iVictimTeam = pVictim->GetTeamNumber();
 		
-		CCSPlayer *pCSPlayer = ToCSPlayer( info.GetAttacker() );
+		CCSPlayer *pCSPlayer = ToCSPlayer((IServerEntity*)info.GetAttacker() );
 		if ( pCSPlayer )
 		{
 			m_iKillerTeam = pCSPlayer->GetTeamNumber();

@@ -131,7 +131,7 @@ void CGrenadeFrag::Spawn( void )
 	m_takedamage	= DAMAGE_YES;
 	m_iHealth		= 1;
 
-	SetSize( -Vector(4,4,4), Vector(4,4,4) );
+	GetEngineObject()->SetSize( -Vector(4,4,4), Vector(4,4,4) );
 	GetEngineObject()->SetCollisionGroup( COLLISION_GROUP_WEAPON );
 	CreateVPhysics();
 
@@ -271,7 +271,7 @@ void CGrenadeFrag::VPhysicsUpdate( IPhysicsObject *pPhysics )
 		VectorNormalize(dir);
 		// send a tiny amount of damage so the character will react to getting bonked
 		CTakeDamageInfo info( this, GetThrower(), pPhysics->GetMass() * vel, GetEngineObject()->GetAbsOrigin(), 0.1f, DMG_CRUSH );
-		((CBaseEntity*)tr.m_pEnt)->TakeDamage( info );
+		((IServerEntity*)tr.m_pEnt)->TakeDamage( info );
 
 		// reflect velocity around normal
 		vel = -2.0f * tr.plane.normal * DotProduct(vel,tr.plane.normal) + vel;

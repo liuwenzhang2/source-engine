@@ -226,7 +226,7 @@ void CC_ToggleZoom( void )
 
 	if( pPlayer )
 	{
-		CHL2_Player *pHL2Player = dynamic_cast<CHL2_Player*>(pPlayer);
+		CHL2_Player *pHL2Player = ToHL2Player(pPlayer);
 
 		if( pHL2Player && pHL2Player->IsSuitEquipped() )
 		{
@@ -739,7 +739,7 @@ void CHL2_Player::PreThink(void)
 	// Train speed control
 	if ( m_afPhysicsFlags & PFLAG_DIROVERRIDE )
 	{
-		CBaseEntity* pTrain = GetEngineObject()->GetGroundEntity() ? GetEngineObject()->GetGroundEntity()->GetOuter() : NULL;
+		CBaseEntity* pTrain = GetEngineObject()->GetGroundEntity() ? (CBaseEntity*)GetEngineObject()->GetGroundEntity()->GetOuter() : NULL;
 		float vel;
 
 		if ( pTrain )
@@ -2197,7 +2197,7 @@ void CHL2_Player::SetPlayerUnderwater( bool state )
 //-----------------------------------------------------------------------------
 bool CHL2_Player::PassesDamageFilter( const CTakeDamageInfo &info )
 {
-	CBaseEntity *pAttacker = info.GetAttacker();
+	CBaseEntity *pAttacker = (CBaseEntity*)info.GetAttacker();
 	if( pAttacker && pAttacker->MyNPCPointer() && pAttacker->MyNPCPointer()->IsPlayerAlly() )
 	{
 		return false;
@@ -2336,7 +2336,7 @@ int	CHL2_Player::OnTakeDamage( const CTakeDamageInfo &info )
 		if( GetWaterLevel() > 2 )
 		{
 			// Don't take blast damage from anything above the surface.
-			if( info.GetInflictor()->GetWaterLevel() == 0 )
+			if(info.GetInflictor()->GetWaterLevel() == 0 )
 			{
 				return 0;
 			}
@@ -2348,7 +2348,7 @@ int	CHL2_Player::OnTakeDamage( const CTakeDamageInfo &info )
 		m_flLastDamageTime = gpGlobals->curtime;
 
 		if ( info.GetAttacker() )
-			NotifyFriendsOfDamage( info.GetAttacker() );
+			NotifyFriendsOfDamage((CBaseEntity*)info.GetAttacker() );
 	}
 	
 	// Modify the amount of damage the player takes, based on skill.
@@ -2451,7 +2451,7 @@ int CHL2_Player::OnTakeDamage_Alive( const CTakeDamageInfo &info )
 //-----------------------------------------------------------------------------
 void CHL2_Player::OnDamagedByExplosion( const CTakeDamageInfo &info )
 {
-	if ( info.GetInflictor() && info.GetInflictor()->ClassMatches( "mortarshell" ) )
+	if ( info.GetInflictor() && ((IServerEntity*)info.GetInflictor())->ClassMatches( "mortarshell" ) )
 	{
 		// No ear ringing for mortar
 		UTIL_ScreenShake( info.GetInflictor()->GetEngineObject()->GetAbsOrigin(), 4.0, 1.0, 0.5, 1000, SHAKE_START, false );
@@ -2491,7 +2491,7 @@ void CHL2_Player::CombineBallSocketed( CPropCombineBall *pCombineBall )
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-void CHL2_Player::Event_KilledOther( CBaseEntity *pVictim, const CTakeDamageInfo &info )
+void CHL2_Player::Event_KilledOther( IServerEntity *pVictim, const CTakeDamageInfo &info )
 {
 	BaseClass::Event_KilledOther( pVictim, info );
 
@@ -2503,7 +2503,7 @@ void CHL2_Player::Event_KilledOther( CBaseEntity *pVictim, const CTakeDamageInfo
 	{
 		if ( ppAIs[i] && ppAIs[i]->IRelationType(this) == D_LI )
 		{
-			ppAIs[i]->OnPlayerKilledOther( pVictim, info );
+			ppAIs[i]->OnPlayerKilledOther( (CBaseEntity*)pVictim, info );
 		}
 	}
 
@@ -2524,7 +2524,7 @@ void CHL2_Player::Event_Killed( const CTakeDamageInfo &info )
 //-----------------------------------------------------------------------------
 void CHL2_Player::NotifyScriptsOfDeath( void )
 {
-	CBaseEntity *pEnt =	EntityList()->FindEntityByClassname( NULL, "scripted_sequence" );
+	IServerEntity *pEnt = EntityList()->FindEntityByClassname( NULL, "scripted_sequence" );
 
 	while( pEnt )
 	{
@@ -2534,7 +2534,7 @@ void CHL2_Player::NotifyScriptsOfDeath( void )
 		pEnt = EntityList()->FindEntityByClassname( pEnt, "scripted_sequence" );
 	}
 
-	pEnt =	EntityList()->FindEntityByClassname( NULL, "logic_choreographed_scene" );
+	pEnt = EntityList()->FindEntityByClassname( NULL, "logic_choreographed_scene" );
 
 	while( pEnt )
 	{
@@ -2862,7 +2862,7 @@ void CHL2_Player::PlayerUse ( void )
 			}
 			else
 			{	// Start controlling the train!
-				CBaseEntity* pTrain = GetEngineObject()->GetGroundEntity() ? GetEngineObject()->GetGroundEntity()->GetOuter() : NULL;
+				CBaseEntity* pTrain = GetEngineObject()->GetGroundEntity() ? (CBaseEntity*)GetEngineObject()->GetGroundEntity()->GetOuter() : NULL;
 				if ( pTrain && !(m_nButtons & IN_JUMP) && (GetEngineObject()->GetFlags() & FL_ONGROUND) && (pTrain->ObjectCaps() & FCAP_DIRECTIONAL_USE) && pTrain->OnControls(this) )
 				{
 					m_afPhysicsFlags |= PFLAG_DIROVERRIDE;
@@ -3834,7 +3834,7 @@ CLogicPlayerProxy *CHL2_Player::GetPlayerProxy( void )
 	return pProxy;
 }
 
-void CHL2_Player::FirePlayerProxyOutput( const char *pszOutputName, variant_t variant, CBaseEntity *pActivator, CBaseEntity *pCaller )
+void CHL2_Player::FirePlayerProxyOutput( const char *pszOutputName, variant_t variant, IServerEntity *pActivator, IServerEntity *pCaller )
 {
 	if ( GetPlayerProxy() == NULL )
 		return;
@@ -3910,7 +3910,7 @@ void CLogicPlayerProxy::InputSetFlashlightSlowDrain( inputdata_t &inputdata )
 	if( m_hPlayer == NULL )
 		return;
 
-	CHL2_Player *pPlayer = dynamic_cast<CHL2_Player*>(m_hPlayer.Get());
+	CHL2_Player *pPlayer = ToHL2Player(m_hPlayer.Get());
 
 	if( pPlayer )
 		pPlayer->SetFlashlightPowerDrainScale( hl2_darkness_flashlight_factor.GetFloat() );
@@ -3921,7 +3921,7 @@ void CLogicPlayerProxy::InputSetFlashlightNormalDrain( inputdata_t &inputdata )
 	if( m_hPlayer == NULL )
 		return;
 
-	CHL2_Player *pPlayer = dynamic_cast<CHL2_Player*>(m_hPlayer.Get());
+	CHL2_Player *pPlayer = ToHL2Player(m_hPlayer.Get());
 
 	if( pPlayer )
 		pPlayer->SetFlashlightPowerDrainScale( 1.0f );
@@ -3932,7 +3932,7 @@ void CLogicPlayerProxy::InputRequestAmmoState( inputdata_t &inputdata )
 	if( m_hPlayer == NULL )
 		return;
 
-	CHL2_Player *pPlayer = dynamic_cast<CHL2_Player*>(m_hPlayer.Get());
+	CHL2_Player *pPlayer = ToHL2Player(m_hPlayer.Get());
 
 	for ( int i = 0 ; i < pPlayer->WeaponCount(); ++i )
 	{
@@ -3956,7 +3956,7 @@ void CLogicPlayerProxy::InputLowerWeapon( inputdata_t &inputdata )
 	if( m_hPlayer == NULL )
 		return;
 
-	CHL2_Player *pPlayer = dynamic_cast<CHL2_Player*>(m_hPlayer.Get());
+	CHL2_Player *pPlayer = ToHL2Player(m_hPlayer.Get());
 
 	pPlayer->Weapon_Lower();
 }
@@ -3966,7 +3966,7 @@ void CLogicPlayerProxy::InputEnableCappedPhysicsDamage( inputdata_t &inputdata )
 	if( m_hPlayer == NULL )
 		return;
 
-	CHL2_Player *pPlayer = dynamic_cast<CHL2_Player*>(m_hPlayer.Get());
+	CHL2_Player *pPlayer = ToHL2Player(m_hPlayer.Get());
 	pPlayer->EnableCappedPhysicsDamage();
 }
 
@@ -3975,7 +3975,7 @@ void CLogicPlayerProxy::InputDisableCappedPhysicsDamage( inputdata_t &inputdata 
 	if( m_hPlayer == NULL )
 		return;
 
-	CHL2_Player *pPlayer = dynamic_cast<CHL2_Player*>(m_hPlayer.Get());
+	CHL2_Player *pPlayer = ToHL2Player(m_hPlayer.Get());
 	pPlayer->DisableCappedPhysicsDamage();
 }
 
@@ -3984,7 +3984,7 @@ void CLogicPlayerProxy::InputSetLocatorTargetEntity( inputdata_t &inputdata )
 	if( m_hPlayer == NULL )
 		return;
 
-	CBaseEntity *pTarget = NULL; // assume no target
+	IServerEntity *pTarget = NULL; // assume no target
 	string_t iszTarget = MAKE_STRING( inputdata.value.String() );
 
 	if( iszTarget != NULL_STRING )
@@ -3992,8 +3992,8 @@ void CLogicPlayerProxy::InputSetLocatorTargetEntity( inputdata_t &inputdata )
 		pTarget = EntityList()->FindEntityByName( NULL, iszTarget );
 	}
 
-	CHL2_Player *pPlayer = dynamic_cast<CHL2_Player*>(m_hPlayer.Get());
-	pPlayer->SetLocatorTargetEntity(pTarget);
+	CHL2_Player *pPlayer = ToHL2Player(m_hPlayer.Get());
+	pPlayer->SetLocatorTargetEntity((CBaseEntity*)pTarget);
 }
 
 #ifdef PORTAL

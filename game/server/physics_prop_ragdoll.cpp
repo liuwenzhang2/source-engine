@@ -390,7 +390,7 @@ void CRagdollProp::VPhysicsCollision( int index, gamevcollisionevent_t *pEvent )
 {
 	BaseClass::VPhysicsCollision( index, pEvent );
 
-	CBaseEntity *pHitEntity = pEvent->pEntities[!index];
+	CBaseEntity *pHitEntity = (CBaseEntity*)pEvent->pEntities[!index];
 	if ( pHitEntity == this )
 		return;
 
@@ -422,7 +422,7 @@ void CRagdollProp::VPhysicsCollision( int index, gamevcollisionevent_t *pEvent )
 				damage *= 10;
 			}
 
-			CBaseEntity *pHitEntity = pEvent->pEntities[!index];
+			IServerEntity *pHitEntity = pEvent->pEntities[!index];
 			if ( !pHitEntity )
 			{
 				// hit world
@@ -1122,11 +1122,11 @@ void DetachAttachedRagdollsForEntity( CBaseEntity *pRagdollParent )
 	pRagdollParent->GetEngineObject()->GetAllChildren( list );
 	for ( int i = list.Count()-1; i >= 0; --i )
 	{
-		DetachAttachedRagdoll( list[i]->GetOuter() );
+		DetachAttachedRagdoll((CBaseEntity*)list[i]->GetOuter() );
 	}
 }
 
-bool Ragdoll_IsPropRagdoll( CBaseEntity *pEntity )
+bool Ragdoll_IsPropRagdoll( IServerEntity *pEntity )
 {
 	if ( dynamic_cast<CRagdollProp *>(pEntity) != NULL )
 		return true;
@@ -1205,7 +1205,7 @@ void CRagdollProp::InputFadeAndRemove( inputdata_t &inputdata )
 	FadeOut( 0.0f, flFadeDuration );
 }
 
-void Ragdoll_GetAngleOverrideString( char *pOut, int size, CBaseEntity *pEntity )
+void Ragdoll_GetAngleOverrideString( char *pOut, int size, IServerEntity *pEntity )
 {
 	CRagdollProp *pRagdoll = dynamic_cast<CRagdollProp *>(pEntity);
 	if ( pRagdoll )

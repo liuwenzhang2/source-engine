@@ -411,7 +411,7 @@ void CPhysicsPushedEntities::FinishPush( bool bIsRotPush, const RotatingPushMove
 		// Register physics impacts...
 		if (info.m_Trace.m_pEnt)
 		{
-			pPushedEntity->GetEngineObject()->PhysicsImpact(((CBaseEntity*)info.m_Trace.m_pEnt)->GetEngineObject(), info.m_Trace );
+			pPushedEntity->GetEngineObject()->PhysicsImpact((IEngineObjectServer*)info.m_Trace.m_pEnt->GetEngineObject(), info.m_Trace );
 		}
 
 		if (bIsRotPush)
@@ -462,7 +462,7 @@ CBaseEntity *CPhysicsPushedEntities::RegisterBlockage()
 	PhysicsPushedInfo_t &info = m_rgMoved[m_nBlocker];
 	if ( info.m_Trace.m_pEnt )
 	{
-		info.m_pEntity->GetEngineObject()->PhysicsImpact(((CBaseEntity*)info.m_Trace.m_pEnt)->GetEngineObject(), info.m_Trace );
+		info.m_pEntity->GetEngineObject()->PhysicsImpact((IEngineObjectServer*)info.m_Trace.m_pEnt->GetEngineObject(), info.m_Trace );
 	}
 
 	// This is the dude 
@@ -527,7 +527,7 @@ public:
 	{
 		// All elements are part of the same hierarchy, so they all have
 		// the same root, so it doesn't matter which one we grab
-		m_pRootHighestParent = m_pPushedEntities->m_rgPusher[0].m_pEntity->GetEngineObject()->GetRootMoveParent()->GetOuter();
+		m_pRootHighestParent = (CBaseEntity*)m_pPushedEntities->m_rgPusher[0].m_pEntity->GetEngineObject()->GetRootMoveParent()->GetOuter();
 		++s_nEnumCount;
 
 		m_collisionGroupCount = 0;
@@ -574,7 +574,7 @@ private:
 
 	bool IsStandingOnPusher( CBaseEntity *pCheck )
 	{
-		CBaseEntity* pGroundEnt = pCheck->GetEngineObject()->GetGroundEntity() ? pCheck->GetEngineObject()->GetGroundEntity()->GetOuter() : NULL;
+		CBaseEntity* pGroundEnt = pCheck->GetEngineObject()->GetGroundEntity() ? (CBaseEntity*)pCheck->GetEngineObject()->GetGroundEntity()->GetOuter() : NULL;
 		if ( pCheck->GetEngineObject()->GetFlags() & FL_ONGROUND || pGroundEnt )
 		{
 			for ( int i = m_pPushedEntities->m_rgPusher.Count(); --i >= 0; )
@@ -601,12 +601,12 @@ private:
 
 	CBaseEntity *GetPushableEntity( IHandleEntity *pHandleEntity )
 	{
-		CBaseEntity *pCheck = EntityList()->GetBaseEntityFromHandle( pHandleEntity->GetRefEHandle() );
+		IServerEntity *pCheck = EntityList()->GetBaseEntityFromHandle( pHandleEntity->GetRefEHandle() );
 		if ( !pCheck )
 			return NULL;
 
 		// Don't bother if we've already seen this one...
-		if (pCheck->m_nPushEnumCount == s_nEnumCount)
+		if (pCheck->GetPushEnumCount() == s_nEnumCount)
 			return NULL;
 
 		if ( !pCheck->GetEngineObject()->IsSolid() )
@@ -638,18 +638,18 @@ private:
 
 		// If we're standing on the pusher or any rigidly attached child
 		// of the pusher, we don't need to bother checking for interpenetration
-		if ( !IsStandingOnPusher(pCheck) )
+		if ( !IsStandingOnPusher((CBaseEntity*)pCheck) )
 		{
 			// Our surrounding boxes are touching. But we may well not be colliding....
 			// see if the ent's bbox is inside the pusher's final position
-			if ( !IntersectsPushers( pCheck ) )
+			if ( !IntersectsPushers((CBaseEntity*)pCheck ) )
 				return NULL;
 		}
 
 		// NOTE: This is pretty tricky here. If a rigidly attached child comes into
 		// contact with a pusher, we *cannot* push the child. Instead, we must push
 		// the highest parent of that child.
-		return pCheckHighestParent->GetOuter();
+		return (CBaseEntity*)pCheckHighestParent->GetOuter();
 	}
 
 private:
@@ -753,7 +753,7 @@ void CPhysicsPushedEntities::SetupAllInHierarchy( CBaseEntity *pParent )
 	IEngineObjectServer *pChild;
 	for ( pChild = pParent->GetEngineObject()->FirstMoveChild(); pChild != NULL; pChild = pChild->NextMovePeer() )
 	{
-		SetupAllInHierarchy( pChild->GetOuter() );
+		SetupAllInHierarchy((CBaseEntity*)pChild->GetOuter() );
 	}
 }
 
@@ -990,7 +990,7 @@ int CBaseEntity::PhysicsTryMove( float flTime, trace_t *steptrace )
 					GetEngineObject()->SetGroundChangeTime( gpGlobals->curtime + (flTime - (1 - trace.fraction) * time_left) );
 				}
 
-				GetEngineObject()->SetGroundEntity(((CBaseEntity*)trace.m_pEnt)->GetEngineObject() );
+				GetEngineObject()->SetGroundEntity((IEngineObjectServer*)trace.m_pEnt->GetEngineObject() );
 			}
 		}
 		if (!trace.plane.normal[2])
@@ -1001,7 +1001,7 @@ int CBaseEntity::PhysicsTryMove( float flTime, trace_t *steptrace )
 		}
 
 		// run the impact function
-		GetEngineObject()->PhysicsImpact(((CBaseEntity*)trace.m_pEnt)->GetEngineObject(), trace );
+		GetEngineObject()->PhysicsImpact((IEngineObjectServer*)trace.m_pEnt->GetEngineObject(), trace );
 		// Removed by the impact function
 		if (GetEngineObject()->IsMarkedForDeletion())// || engine->IsEdictFree(entindex()) 
 			break;		
@@ -1160,7 +1160,7 @@ void CBaseEntity::PhysicsPushEntity( const Vector& push, trace_t *pTrace )
 
 	if ( pTrace->m_pEnt )
 	{
-		GetEngineObject()->PhysicsImpact(((CBaseEntity*)pTrace->m_pEnt)->GetEngineObject(), *pTrace );
+		GetEngineObject()->PhysicsImpact((IEngineObjectServer*)pTrace->m_pEnt->GetEngineObject(), *pTrace );
 	}
 }
 
@@ -1713,7 +1713,7 @@ void CBaseEntity::PhysicsStepRecheckGround()
 
 			if ( trace.startsolid )
 			{
-				GetEngineObject()->SetGroundEntity((CBaseEntity*)trace.m_pEnt ? ((CBaseEntity*)trace.m_pEnt)->GetEngineObject() : NULL);
+				GetEngineObject()->SetGroundEntity(trace.m_pEnt ? (IEngineObjectServer*)trace.m_pEnt->GetEngineObject() : NULL);
 				return;
 			}
 		}
@@ -1938,7 +1938,7 @@ void Physics_RunThinkFunctions( bool simulating )
 		EntityList()->DisableDestroyImmediate();
 		int listMax = EntityList()->SimThink_ListCount();
 		listMax = MAX(listMax,1);
-		CBaseEntity **list = (CBaseEntity **)stackalloc( sizeof(CBaseEntity *) * listMax );
+		IServerEntity **list = (IServerEntity **)stackalloc( sizeof(CBaseEntity *) * listMax );
 		// iterate through all entities and have them think or simulate
 		
 		// UNDONE: This has problems with UTIL_RemoveImmediate() (now disabled during this loop).  
@@ -1952,7 +1952,7 @@ void Physics_RunThinkFunctions( bool simulating )
 				continue;
 			// Always reset clock to real sv.time
 			gpGlobals->curtime = starttime;
-			Physics_SimulateEntity( list[i] );
+			Physics_SimulateEntity((CBaseEntity*)list[i] );
 		}
 
 		stackfree( list );
@@ -1962,13 +1962,13 @@ void Physics_RunThinkFunctions( bool simulating )
 	gpGlobals->curtime = starttime;
 }
 
-void CBaseEntity::StartGroundContact(CBaseEntity* ground)
+void CBaseEntity::StartGroundContact(IServerEntity* ground)
 {
 	GetEngineObject()->AddFlag(FL_ONGROUND);
 	//	Msg( "+++ %s starting contact with ground %s\n", GetClassname(), ground->GetClassname() );
 }
 
-void CBaseEntity::EndGroundContact(CBaseEntity* ground)
+void CBaseEntity::EndGroundContact(IServerEntity* ground)
 {
 	GetEngineObject()->RemoveFlag(FL_ONGROUND);
 	//	Msg( "--- %s ending contact with ground %s\n", GetClassname(), ground->GetClassname() );

@@ -147,7 +147,7 @@ public:
 	virtual void Spawn( void );
 
 	virtual void SetSpawnPoint( CBaseEntity *spawnPoint );						// define place in environment where bot will (re)spawn
-	virtual CBaseEntity		*EntSelectSpawnPoint( void );
+	virtual IServerEntity		*EntSelectSpawnPoint( void );
 
 	virtual void PhysicsSimulate( void );
 
@@ -271,7 +271,7 @@ inline void NextBotPlayer< PlayerType >::SetSpawnPoint( CBaseEntity *spawnPoint 
 }
 
 template < typename PlayerType >
-inline CBaseEntity *NextBotPlayer< PlayerType >::EntSelectSpawnPoint( void )
+inline IServerEntity *NextBotPlayer< PlayerType >::EntSelectSpawnPoint( void )
 {
 	if ( m_spawnPointEntity != NULL )
 		return m_spawnPointEntity;

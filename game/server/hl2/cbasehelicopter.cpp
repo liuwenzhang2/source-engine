@@ -519,7 +519,7 @@ bool CBaseHelicopter::DoWashPush( washentity_t *pWash, const Vector &vecWashOrig
 //-----------------------------------------------------------------------------
 void CBaseHelicopter::DoRotorPhysicsPush( const Vector &vecRotorOrigin, float flAltitude )
 {
-	CBaseEntity *pEntity = NULL;
+	IServerEntity *pEntity = NULL;
 	trace_t tr;
 
 	// First, trace down and find out where the was is hitting the ground
@@ -555,11 +555,11 @@ void CBaseHelicopter::DoRotorPhysicsPush( const Vector &vecRotorOrigin, float fl
 		return;
 
 	// Find the lightest physics entity below us and add it to our list to push around
-	CBaseEntity *pLightestEntity = NULL;
+	IServerEntity *pLightestEntity = NULL;
 	float flLightestMass = 9999;
 	while ((pEntity = EntityList()->FindEntityInSphere(pEntity, vecPhysicsOrigin, BASECHOPPER_WASH_RADIUS )) != NULL)
 	{
-		IRotorWashShooter *pShooter = GetRotorWashShooter( pEntity );
+		IRotorWashShooter *pShooter = GetRotorWashShooter( (CBaseEntity*)pEntity );
 
 		if ( pEntity->GetEngineObject()->IsEFlagSet( EFL_NO_ROTORWASH_PUSH ))
 			continue;
@@ -625,7 +625,7 @@ void CBaseHelicopter::DoRotorPhysicsPush( const Vector &vecRotorOrigin, float fl
 			pLightestEntity = pEntity;
 
 			washentity_t Wash;
-			Wash.hEntity = pLightestEntity;
+			Wash.hEntity = (CBaseEntity*)pLightestEntity;
 			Wash.flWashStartTime = gpGlobals->curtime;
 			m_hEntitiesPushedByWash.AddToTail( Wash );
 
@@ -826,7 +826,7 @@ void CBaseHelicopter::UpdatePlayerDopplerShift( )
 	}
 	else
 	{
-		CBaseEntity *pPlayer = NULL;
+		IServerEntity *pPlayer = NULL;
 
 		// UNDONE: this needs to send different sounds to every player for multiplayer.	
 		// FIXME: this isn't the correct way to find a player!!!
@@ -1349,7 +1349,7 @@ void CBaseHelicopter::Event_Killed( const CTakeDamageInfo &info )
 */	
 	StopRotorWash();
 
-	m_OnDeath.FireOutput( info.GetAttacker(), this );
+	m_OnDeath.FireOutput((IServerEntity*)info.GetAttacker(), this );
 }
 
 

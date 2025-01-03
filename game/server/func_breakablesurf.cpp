@@ -332,7 +332,7 @@ int CBreakableSurface::OnTakeDamage( const CTakeDamageInfo &info )
 	if ( !m_bIsBroken && info.GetDamageType() == DMG_CRUSH )
 	{
 		// physics will kill me now
-		Die( info.GetAttacker(), info.GetDamageForce() );
+		Die((CBaseEntity*)info.GetAttacker(), info.GetDamageForce() );
 		return 0;
 	}
 
@@ -340,14 +340,14 @@ int CBreakableSurface::OnTakeDamage( const CTakeDamageInfo &info )
 	{
 		Vector vecDir = info.GetInflictor()->GetEngineObject()->GetAbsOrigin() - WorldSpaceCenter();
 		VectorNormalize( vecDir );
-		Die( info.GetAttacker(), vecDir );
+		Die((CBaseEntity*)info.GetAttacker(), vecDir );
 		return 0;
 	}
 
 	// Accept slash damage, too. Manhacks and such.
 	if ( m_nSurfaceType == SHATTERSURFACE_GLASS && (info.GetDamageType() & DMG_SLASH) )
 	{
-		Die( info.GetAttacker(), info.GetDamageForce() );
+		Die((CBaseEntity*)info.GetAttacker(), info.GetDamageForce() );
 		return 0;
 	}
 	
@@ -375,13 +375,13 @@ void CBreakableSurface::TraceAttack( const CTakeDamageInfo &info, const Vector &
 
 	// Decrease health
 	m_iHealth -= info.GetDamage();
-	m_OnHealthChanged.Set( m_iHealth, info.GetAttacker(), this );
+	m_OnHealthChanged.Set( m_iHealth, (CBaseEntity*)info.GetAttacker(), this );
 
 	// If I'm not broken yet, break me
 	if (!m_bIsBroken )
 	{
 		Vector vSurfDir = ptr->endpos - ptr->startpos;
-		Die( info.GetAttacker(), vSurfDir );
+		Die((CBaseEntity*)info.GetAttacker(), vSurfDir );
 	}
 
 	if (info.GetDamageType() & (DMG_BULLET | DMG_CLUB))
@@ -399,7 +399,7 @@ void CBreakableSurface::TraceAttack( const CTakeDamageInfo &info, const Vector &
             // [dwenger] Window break stat tracking
             //=============================================================================
 
-            CBasePlayer* pAttacker = ToBasePlayer(info.GetAttacker());
+            CBasePlayer* pAttacker = ToBasePlayer((IServerEntity*)info.GetAttacker());
             if ( ( pAttacker ) && ( !bWasBroken ) )
             {
                 gamestats->Event_WindowShattered( pAttacker );
@@ -500,7 +500,7 @@ void CBreakableSurface::TraceAttack( const CTakeDamageInfo &info, const Vector &
             // [pfreese] Window break stat tracking
             //=============================================================================
 
-            CBasePlayer* pAttacker = ToBasePlayer(info.GetAttacker());
+            CBasePlayer* pAttacker = ToBasePlayer((IServerEntity*)info.GetAttacker());
             if ( ( pAttacker ) && ( !bWasBroken ) )
             {
                 gamestats->Event_WindowShattered( pAttacker );
@@ -1255,7 +1255,7 @@ void CBreakableSurface::VPhysicsCollision( int index, gamevcollisionevent_t *pEv
 			}
 			pEvent->pInternalData->GetContactPoint( damagePos );
 			int otherIndex = !index;
-			CBaseEntity *pInflictor = pEvent->pEntities[otherIndex];
+			CBaseEntity *pInflictor = (CBaseEntity*)pEvent->pEntities[otherIndex];
 			CTakeDamageInfo info( pInflictor, pInflictor, normal, damagePos, damage, damageType );
 			EntityList()->PhysCallbackDamage( this, info, *pEvent, index );
 		}

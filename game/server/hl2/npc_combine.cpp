@@ -260,14 +260,14 @@ void CNPC_Combine::InputThrowGrenadeAtTarget( inputdata_t &inputdata )
 	if ( m_NPCState == NPC_STATE_SCRIPT && m_hCine )
 		return;
 
-	CBaseEntity *pEntity = EntityList()->FindEntityByName( NULL, inputdata.value.String(), NULL, inputdata.pActivator, inputdata.pCaller );
+	IServerEntity *pEntity = EntityList()->FindEntityByName( NULL, inputdata.value.String(), NULL, inputdata.pActivator, inputdata.pCaller );
 	if ( !pEntity )
 	{
 		DevMsg("%s (%s) received ThrowGrenadeAtTarget input, but couldn't find target entity '%s'\n", GetClassname(), GetDebugName(), inputdata.value.String() );
 		return;
 	}
 
-	m_hForcedGrenadeTarget = pEntity;
+	m_hForcedGrenadeTarget = (CBaseEntity*)pEntity;
 	m_flNextGrenadeCheck = 0;
 
 	ClearSchedule( "Told to throw grenade via input" );

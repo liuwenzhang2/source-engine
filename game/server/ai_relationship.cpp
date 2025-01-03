@@ -23,7 +23,7 @@ enum
 
 //=========================================================
 //=========================================================
-class CAI_Relationship : public CBaseEntity, public IEntityListener<CBaseEntity>
+class CAI_Relationship : public CBaseEntity, public IEntityListener<IServerEntity>
 {
 	DECLARE_CLASS( CAI_Relationship, CBaseEntity );
 
@@ -34,11 +34,11 @@ public:
 	void Activate();
 
 	void SetActive( bool bActive );
-	void ChangeRelationships( int disposition, int iReverting, CBaseEntity *pActivator = NULL, CBaseEntity *pCaller = NULL );
+	void ChangeRelationships( int disposition, int iReverting, IServerEntity *pActivator = NULL, IServerEntity *pCaller = NULL );
 
-	void ApplyRelationship( CBaseEntity *pActivator = NULL, CBaseEntity *pCaller = NULL );
-	void RevertRelationship( CBaseEntity *pActivator = NULL, CBaseEntity *pCaller = NULL );
-	void RevertToDefaultRelationship( CBaseEntity *pActivator = NULL, CBaseEntity *pCaller = NULL );
+	void ApplyRelationship( IServerEntity *pActivator = NULL, IServerEntity *pCaller = NULL );
+	void RevertRelationship( IServerEntity *pActivator = NULL, IServerEntity *pCaller = NULL );
+	void RevertToDefaultRelationship( IServerEntity *pActivator = NULL, IServerEntity *pCaller = NULL );
 
 	void UpdateOnRemove();
 	void OnRestore();
@@ -46,13 +46,13 @@ public:
 	bool IsASubject( CBaseEntity *pEntity );
 	bool IsATarget( CBaseEntity *pEntity );
 
-	void OnEntitySpawned( CBaseEntity *pEntity );
-	void OnEntityDeleted( CBaseEntity *pEntity );
+	void OnEntitySpawned( IServerEntity *pEntity );
+	void OnEntityDeleted( IServerEntity *pEntity );
 
 private:
 
 	void	ApplyRelationshipThink( void );
-	CBaseEntity *FindEntityForProceduralName( string_t iszName, CBaseEntity *pActivator, CBaseEntity *pCaller );
+	IServerEntity *FindEntityForProceduralName( string_t iszName, IServerEntity *pActivator, IServerEntity *pCaller );
 	void	DiscloseNPCLocation( CBaseCombatCharacter *pSubject, CBaseCombatCharacter *pTarget );
 
 	string_t	m_iszSubject;
@@ -185,7 +185,7 @@ void CAI_Relationship::ApplyRelationshipThink( void )
 //---------------------------------------------------------
 // Purpose: Applies the desired relationships to an entity
 //---------------------------------------------------------
-void CAI_Relationship::ApplyRelationship( CBaseEntity *pActivator, CBaseEntity *pCaller )
+void CAI_Relationship::ApplyRelationship( IServerEntity *pActivator, IServerEntity *pCaller )
 {
 	// @TODO (toml 10-22-04): sort out MP relationships 
 	
@@ -207,7 +207,7 @@ void CAI_Relationship::ApplyRelationship( CBaseEntity *pActivator, CBaseEntity *
 
 //---------------------------------------------------------
 //---------------------------------------------------------
-void CAI_Relationship::RevertRelationship( CBaseEntity *pActivator, CBaseEntity *pCaller )
+void CAI_Relationship::RevertRelationship( IServerEntity *pActivator, IServerEntity *pCaller )
 {
 	if ( m_bIsActive )
 	{
@@ -218,7 +218,7 @@ void CAI_Relationship::RevertRelationship( CBaseEntity *pActivator, CBaseEntity 
 
 //---------------------------------------------------------
 //---------------------------------------------------------
-void CAI_Relationship::RevertToDefaultRelationship( CBaseEntity *pActivator, CBaseEntity *pCaller )
+void CAI_Relationship::RevertToDefaultRelationship( IServerEntity *pActivator, IServerEntity *pCaller )
 {
 	if ( m_bIsActive )
 	{
@@ -277,12 +277,12 @@ bool CAI_Relationship::IsATarget( CBaseEntity *pEntity )
 
 //---------------------------------------------------------
 //---------------------------------------------------------
-void CAI_Relationship::OnEntitySpawned( CBaseEntity *pEntity )
+void CAI_Relationship::OnEntitySpawned( IServerEntity *pEntity )
 {
 	// NOTE: This cannot use the procedural entity finding code since that only occurs on
 	//		 inputs and not passively.
 
-	if ( IsATarget( pEntity ) || IsASubject( pEntity ) )
+	if ( IsATarget( (CBaseEntity*)pEntity ) || IsASubject((CBaseEntity*)pEntity ) )
 	{
 		ApplyRelationship();
 	}
@@ -290,7 +290,7 @@ void CAI_Relationship::OnEntitySpawned( CBaseEntity *pEntity )
 
 //---------------------------------------------------------
 //---------------------------------------------------------
-void CAI_Relationship::OnEntityDeleted( CBaseEntity *pEntity )
+void CAI_Relationship::OnEntityDeleted( IServerEntity *pEntity )
 {
 }
 
@@ -304,7 +304,7 @@ void CAI_Relationship::OnEntityDeleted( CBaseEntity *pEntity )
 #define ACTIVATOR_KEYNAME "!activator"
 #define CALLER_KEYNAME "!caller"
 
-CBaseEntity *CAI_Relationship::FindEntityForProceduralName( string_t iszName, CBaseEntity *pActivator, CBaseEntity *pCaller )
+IServerEntity *CAI_Relationship::FindEntityForProceduralName( string_t iszName, IServerEntity *pActivator, IServerEntity *pCaller )
 {
 	// Handle the activator token
 	if ( iszName == AllocPooledString( ACTIVATOR_KEYNAME ) )
@@ -336,7 +336,7 @@ void CAI_Relationship::DiscloseNPCLocation( CBaseCombatCharacter *pSubject, CBas
 
 //---------------------------------------------------------
 //---------------------------------------------------------
-void CAI_Relationship::ChangeRelationships( int disposition, int iReverting, CBaseEntity *pActivator, CBaseEntity *pCaller )
+void CAI_Relationship::ChangeRelationships( int disposition, int iReverting, IServerEntity *pActivator, IServerEntity *pCaller )
 {
  	if( iReverting != NOT_REVERTING && m_iPreviousDisposition == -1 )
 	{
@@ -350,17 +350,17 @@ void CAI_Relationship::ChangeRelationships( int disposition, int iReverting, CBa
 	CUtlVectorFixed<CBaseCombatCharacter *, MAX_HANDLED> targetList;
 
 	// Add any special subjects we found
-	CBaseEntity *pSpecialSubject = FindEntityForProceduralName( m_iszSubject, pActivator, pCaller );
-	if ( pSpecialSubject && pSpecialSubject->MyCombatCharacterPointer() )
+	IServerEntity *pSpecialSubject = FindEntityForProceduralName( m_iszSubject, pActivator, pCaller );
+	if ( pSpecialSubject && pSpecialSubject->IsCombatCharacter() )
 	{
-		subjectList.AddToTail( pSpecialSubject->MyCombatCharacterPointer() );
+		subjectList.AddToTail( ((CBaseEntity*)pSpecialSubject)->MyCombatCharacterPointer() );
 	}
 
 	// Add any special targets we found
-	CBaseEntity *pSpecialTarget = FindEntityForProceduralName( m_target, pActivator, pCaller );
-	if ( pSpecialTarget && pSpecialTarget->MyCombatCharacterPointer() )
+	IServerEntity *pSpecialTarget = FindEntityForProceduralName( m_target, pActivator, pCaller );
+	if ( pSpecialTarget && pSpecialTarget->IsCombatCharacter() )
 	{
-		targetList.AddToTail( pSpecialTarget->MyCombatCharacterPointer() );
+		targetList.AddToTail(((CBaseEntity*)pSpecialTarget)->MyCombatCharacterPointer() );
 	}
 
 	// -------------------------------

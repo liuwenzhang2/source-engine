@@ -502,7 +502,7 @@ void StopParticleEffects( CBaseEntity *pEntity )
 
 #ifndef CLIENT_DLL
 
-	extern CBaseEntity *GetNextCommandEntity( CBasePlayer *pPlayer, const char *name, CBaseEntity *ent );
+	extern IServerEntity *GetNextCommandEntity( CBasePlayer *pPlayer, const char *name, IServerEntity *ent );
 
 	ConVar particle_test_file( "particle_test_file", "", FCVAR_CHEAT, "Name of the particle system to dynamically spawn" );
 	ConVar particle_test_attach_mode( "particle_test_attach_mode", "follow_attachment", FCVAR_CHEAT, "Possible Values: 'start_at_attachment', 'follow_attachment', 'start_at_origin', 'follow_origin'" );
@@ -525,7 +525,7 @@ void StopParticleEffects( CBaseEntity *pEntity )
 
 		const char *pszParticleFile = particle_test_file.GetString();
 
-		CBaseEntity *pEntity = NULL;
+		IServerEntity *pEntity = NULL;
 		while ( (pEntity = GetNextCommandEntity( pPlayer, name, pEntity )) != NULL )
 		{
 			/* 
@@ -535,7 +535,7 @@ void StopParticleEffects( CBaseEntity *pEntity )
 			DispatchParticleEffect( 
 				pszParticleFile,
 				(ParticleAttachment_t)iAttachType,
-				pEntity,
+				(CBaseEntity*)pEntity,
 				iAttachmentIndex,
 				true );				// stops existing particle systems
 		}
@@ -553,11 +553,11 @@ void StopParticleEffects( CBaseEntity *pEntity )
 		if ( !pPlayer )
 			return;
 
-		CBaseEntity *pEntity = NULL;
+		IServerEntity *pEntity = NULL;
 		while ( (pEntity = GetNextCommandEntity( pPlayer, name, pEntity )) != NULL )
 		{
 			//Stop all particle systems on the selected entity
-			DispatchParticleEffect( "", PATTACH_ABSORIGIN, pEntity, 0, true );
+			DispatchParticleEffect( "", PATTACH_ABSORIGIN, (CBaseEntity*)pEntity, 0, true );
 		}
 	}
 

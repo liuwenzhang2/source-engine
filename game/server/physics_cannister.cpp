@@ -166,7 +166,7 @@ int CPhysicsCannister::OnTakeDamage( const CTakeDamageInfo &info )
 		m_iHealth -= info.GetDamage();
 		if ( m_iHealth < 0 )
 		{
-			Explode( info.GetAttacker() );
+			Explode((CBaseEntity*)info.GetAttacker() );
 		}
 		else
 		{
@@ -175,7 +175,7 @@ int CPhysicsCannister::OnTakeDamage( const CTakeDamageInfo &info )
 			if ( (info.GetDamageType() & DMG_BLAST) ||
 				( (info.GetDamageType() & (DMG_CLUB|DMG_SLASH|DMG_CRUSH) ) && random->RandomInt(1,100) < 50 ) )
 			{
-				CannisterActivate( info.GetAttacker(), g_vecAttackDir );
+				CannisterActivate((IServerEntity*)info.GetAttacker(), g_vecAttackDir );
 			}
 		}
 		return 1;
@@ -186,7 +186,7 @@ int CPhysicsCannister::OnTakeDamage( const CTakeDamageInfo &info )
 
 	if ( info.GetDamageType() & (DMG_BULLET|DMG_BUCKSHOT|DMG_BURN|DMG_BLAST) )
 	{
-		Explode( info.GetAttacker() );
+		Explode((CBaseEntity*)info.GetAttacker() );
 	}
 
 	return 0;
@@ -200,7 +200,7 @@ void CPhysicsCannister::TraceAttack( const CTakeDamageInfo &info, const Vector &
 		Vector direction = -dir;
 		direction.z -= 5;
 		VectorNormalize( direction );
-		CannisterActivate( info.GetAttacker(), direction );
+		CannisterActivate((IServerEntity*)info.GetAttacker(), direction );
 	}
 	BaseClass::TraceAttack( info, dir, ptr, pAccumulator );
 }
@@ -209,7 +209,7 @@ void CPhysicsCannister::TraceAttack( const CTakeDamageInfo &info, const Vector &
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-void CPhysicsCannister::CannisterActivate( CBaseEntity *pActivator, const Vector &thrustOffset )
+void CPhysicsCannister::CannisterActivate( IServerEntity *pActivator, const Vector &thrustOffset )
 {
 	// already active or spent
 	if ( m_active || !m_thrustTime )
@@ -217,7 +217,7 @@ void CPhysicsCannister::CannisterActivate( CBaseEntity *pActivator, const Vector
 		return;
 	}
 
-	m_hLauncher = pActivator;
+	m_hLauncher = (CBaseEntity*)pActivator;
 
 	Vector thrustDirection = CalcLocalThrust( thrustOffset );
 	m_onActivate.FireOutput( pActivator, this, 0 );
@@ -268,7 +268,7 @@ void CPhysicsCannister::CannisterActivate( CBaseEntity *pActivator, const Vector
 //-----------------------------------------------------------------------------
 // Purpose: The cannister's been fired by a weapon, so it should stay pretty accurate
 //-----------------------------------------------------------------------------
-void CPhysicsCannister::CannisterFire( CBaseEntity *pActivator )
+void CPhysicsCannister::CannisterFire( IServerEntity *pActivator )
 {
 	m_bFired = true;
 
@@ -289,7 +289,7 @@ void CPhysicsCannister::CannisterFire( CBaseEntity *pActivator )
 //-----------------------------------------------------------------------------
 void CPhysicsCannister::InputActivate( inputdata_t &data )
 {
-	CannisterActivate( data.pActivator, Vector(0,0.1,-0.25) );
+	CannisterActivate((IServerEntity*)data.pActivator, Vector(0,0.1,-0.25) );
 }
 
 //-----------------------------------------------------------------------------
@@ -306,7 +306,7 @@ void CPhysicsCannister::InputDeactivate(inputdata_t &data)
 //-----------------------------------------------------------------------------
 void CPhysicsCannister::InputExplode(inputdata_t &data)
 {
-	Explode( data.pActivator );
+	Explode((CBaseEntity*)data.pActivator );
 }
 
 
@@ -386,7 +386,7 @@ void CPhysicsCannister::VPhysicsCollision( int index, gamevcollisionevent_t *pEv
 	if ( m_bFired && m_active )
 	{
 		int otherIndex = !index;
-		CBaseEntity *pHitEntity = pEvent->pEntities[otherIndex];
+		CBaseEntity *pHitEntity = (CBaseEntity*)pEvent->pEntities[otherIndex];
 		if ( pEvent->deltaCollisionTime < 0.5 && (pHitEntity == this) )
 			return;
 

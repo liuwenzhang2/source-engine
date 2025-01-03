@@ -299,7 +299,7 @@ void CRecipientFilter::UsePredictionRules( void )
 	if ( GetRecipientCount() == 0 )
 		return;
 
-	CBasePlayer *pPlayer = ToBasePlayer( (CBaseEntity*)g_RecipientFilterPredictionSystem.GetSuppressHost() );
+	CBasePlayer *pPlayer = ToBasePlayer( (IServerEntity*)g_RecipientFilterPredictionSystem.GetSuppressHost() );
 
 	if ( pPlayer)
 	{
@@ -387,7 +387,7 @@ void CPASAttenuationFilter::Filter( const Vector& origin, float attenuation /*= 
 	{
 		int index = GetRecipientIndex( i );
 
-		CBaseEntity *ent = EntityList()->GetBaseEntity( index );
+		IServerEntity *ent = EntityList()->GetBaseEntity( index );
 		if ( !ent || !ent->IsPlayer() )
 		{
 			Assert( 0 );

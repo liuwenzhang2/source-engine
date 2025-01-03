@@ -52,6 +52,9 @@ class IServerEntity;
 class IServerGameRules;
 class IServerVehicle;
 class variant_t;
+class IEntitySaveUtils;
+class CEventAction;
+struct TimedOverlay_t;
 
 struct servertouchlink_t
 {
@@ -97,9 +100,9 @@ class IEngineGhostServer;
 
 class IGrabControllerServer {
 public:
-	virtual void AttachEntity(CBaseEntity* pPlayer, CBaseEntity* pEntity, IPhysicsObject* pPhys, bool bIsMegaPhysCannon, const Vector& vGrabPosition, bool bUseGrabPosition) = 0;
+	virtual void AttachEntity(IServerEntity* pPlayer, IServerEntity* pEntity, IPhysicsObject* pPhys, bool bIsMegaPhysCannon, const Vector& vGrabPosition, bool bUseGrabPosition) = 0;
 	virtual void DetachEntity(bool bClearVelocity) = 0;
-	virtual CBaseEntity* GetAttached() = 0;
+	virtual IServerEntity* GetAttached() = 0;
 	virtual const QAngle& GetAttachedAnglesPlayerSpace() = 0;
 	virtual void SetAttachedAnglesPlayerSpace(const QAngle& attachedAnglesPlayerSpace) = 0;
 	virtual const Vector& GetAttachedPositionObjectSpace() = 0;
@@ -108,18 +111,18 @@ public:
 	virtual void SetAngleAlignment(float alignAngleCosine) = 0;
 	virtual float GetLoadWeight(void) const = 0;
 	virtual float ComputeError() = 0;
-	virtual bool UpdateObject(CBaseEntity* pPlayer, float flError) = 0;
+	virtual bool UpdateObject(IServerEntity* pPlayer, float flError) = 0;
 	virtual float GetSavedMass(IPhysicsObject* pObject) = 0;
 	virtual void GetSavedParamsForCarriedPhysObject(IPhysicsObject* pObject, float* pSavedMassOut, float* pSavedRotationalDampingOut) = 0;
 	virtual void GetTargetPosition(Vector* target, QAngle* targetOrientation) = 0;
-	virtual void SetPortalPenetratingEntity(CBaseEntity* pPenetrated) = 0;
+	virtual void SetPortalPenetratingEntity(IServerEntity* pPenetrated) = 0;
 };
 
 class IEngineObjectServer : public IEngineObject {
 public:
 
 	virtual IServerEntity* GetServerEntity() = 0;
-	virtual CBaseEntity* GetOuter() = 0;
+	virtual IServerEntity* GetOuter() = 0;
 	virtual IHandleEntity* GetHandleEntity() const = 0;
 
 	virtual void ParseMapData(IEntityMapData* mapData) = 0;
@@ -158,7 +161,7 @@ public:
 // are relative to the attachment on this entity. If iAttachment == -1, it'll preserve the
 // current m_iParentAttachment.
 	virtual void	SetParent(IEngineObjectServer* pNewParent, int iAttachment = -1) = 0;
-	// FIXME: Make hierarchy a member of CBaseEntity
+	// FIXME: Make hierarchy a member of IServerEntity
 	// or a contained private class...
 	virtual void UnlinkChild(IEngineObjectServer* pChild) = 0;
 	virtual void LinkChild(IEngineObjectServer* pChild) = 0;
@@ -209,7 +212,7 @@ public:
 	virtual bool IsInPVS(const CCheckTransmitInfo* pInfo) = 0;
 
 	// This version doesn't do the area check
-	virtual bool IsInPVS(const CBaseEntity* pRecipient, const void* pvs, int pvssize) = 0;
+	virtual bool IsInPVS(const IServerEntity* pRecipient, const void* pvs, int pvssize) = 0;
 
 	// Recomputes PVS information
 	virtual void RecomputePVSInformation() = 0;
@@ -421,7 +424,7 @@ public:
 	virtual float GetModelScale() const = 0;
 	virtual void UpdateModelScale() = 0;
 	virtual const model_t* GetModel(void) const = 0;
-	virtual IStudioHdr* GetModelPtr(void) = 0;
+	virtual IStudioHdr* GetModelPtr(void) const = 0;
 	virtual void InvalidateMdlCache() = 0;
 	virtual float GetCycle() const = 0;
 	virtual void SetCycle(float flCycle) = 0;
@@ -705,8 +708,8 @@ public:
 
 class IEngineShadowCloneServer : public IEngineShadowClone {
 public:
-	virtual void			SetClonedEntity(CBaseEntity* pEntToClone) = 0;
-	virtual CBaseEntity*	GetClonedEntity(void) = 0;
+	virtual void			SetClonedEntity(IServerEntity* pEntToClone) = 0;
+	virtual IServerEntity*	GetClonedEntity(void) = 0;
 	virtual void			SetCloneTransformationMatrix(const matrix3x4_t& matTransform) = 0;
 	virtual void			SetOwnerEnvironment(IPhysicsEnvironment* pOwnerPhysEnvironment) = 0;
 	virtual IPhysicsEnvironment* GetOwnerEnvironment(void) const = 0;
@@ -807,10 +810,10 @@ public:
 
 class IEngineRopeServer : public IEngineRope {
 public:
-	virtual void SetStartPoint(CBaseEntity* pStartPoint, int attachment = 0) = 0;
-	virtual void SetEndPoint(CBaseEntity* pEndPoint, int attachment = 0) = 0;
-	virtual CBaseEntity* GetStartPoint() = 0;
-	virtual CBaseEntity* GetEndPoint() = 0;
+	virtual void SetStartPoint(IServerEntity* pStartPoint, int attachment = 0) = 0;
+	virtual void SetEndPoint(IServerEntity* pEndPoint, int attachment = 0) = 0;
+	virtual IServerEntity* GetStartPoint() = 0;
+	virtual IServerEntity* GetEndPoint() = 0;
 	virtual int GetRopeFlags() = 0;
 	virtual void SetRopeFlags(int RopeFlags) = 0;
 	virtual void SetWidth(float Width) = 0;
@@ -838,38 +841,47 @@ public:
 
 };
 
+//-----------------------------------------------------------------------------
+// Entity events... targetted to a particular entity
+// Each event has a well defined structure to use for parameters
+//-----------------------------------------------------------------------------
+enum EntityEvent_t
+{
+	ENTITY_EVENT_WATER_TOUCH = 0,		// No data needed
+	ENTITY_EVENT_WATER_UNTOUCH,			// No data needed
+	ENTITY_EVENT_PARENT_CHANGED,		// No data needed
+};
+
 // This class is how the engine talks to entities in the game DLL.
-// CBaseEntity implements this interface.
+// IServerEntity implements this interface.
 class IServerEntity	: public IServerUnknown
 {
 public:
-	virtual					~IServerEntity() {}
-	// Delete yourself.
-	virtual void			Release(void) = 0;
-
+	virtual ~IServerEntity() {}
+	virtual int RequiredEdictIndex(void) = 0;
 	virtual bool IsNetworkable(void) = 0;
+	virtual void NetworkStateChanged() = 0;
 	virtual const char* GetClassname() const = 0;
+	virtual bool NameMatches(const char* pszNameOrWildcard) = 0;
+	virtual bool NameMatches(string_t nameStr) = 0;
 	virtual bool ClassMatches(const char* pszClassOrWildcard) = 0;
 	virtual bool ClassMatches(string_t nameStr) = 0;
+	virtual string_t GetEntityName() = 0;
+	virtual const string_t& GetTarget() const = 0;
+	virtual void SetTarget(const string_t& target) = 0;
+	virtual bool HasTarget(string_t targetname) = 0;
 	virtual const char* GetDebugName(void) = 0;
-	virtual bool IsWorld() const = 0;
-	virtual bool IsBSPModel() const = 0;
-	virtual	bool IsPlayer(void) const = 0;
-	virtual bool IsNPC(void) const = 0;
-	virtual bool IsAlive(void) = 0;
-	virtual bool IsStandable() const = 0;
-	virtual bool HasNPCsOnIt() = 0;
-	virtual IServerEntity* GetOwnerEntity() const = 0;
-	virtual int GetMaxHealth()  const = 0;
-	virtual int GetHealth() const = 0;
-	virtual int GetTeamNumber(void) const = 0;
-	virtual void AddPoints(int score, bool bAllowNegativeScore) = 0;
-	virtual void AddPointsToTeam(int score, bool bAllowNegativeScore) = 0;
-	virtual IServerEntity* GetPlayerHeldEntity() = 0;
-	virtual IGrabControllerServer* GetGrabController() = 0;
-	virtual void PickupObject(IServerEntity* pObject, bool bLimitMassAndSize = true) = 0;
-	virtual void ForceDropOfCarriedPhysObjects(IServerEntity* pOnlyIfHoldindThis = NULL) = 0;
-	virtual IServerEntity* GetActiveWeapon() const = 0;
+	virtual int& GetDebugOverlays() = 0;
+	virtual TimedOverlay_t* GetTimedOverlay() = 0;
+	virtual void AddTimedOverlay(const char* msg, int endTime) = 0;
+	virtual void EntityText(int text_offset, const char* text, float flDuration, int r = 255, int g = 255, int b = 255, int a = 255) = 0;
+	virtual void DrawOutputOverlay(CEventAction* ev) = 0;
+	virtual	void DrawDebugGeometryOverlays(void) = 0;
+	virtual int DrawDebugTextOverlays(void) = 0;
+	virtual void DrawBBoxOverlay(float flDuration = 0.0f) = 0;
+	virtual void SendDebugPivotOverlay(void) = 0;
+	virtual void AddContext(const char* nameandvalue) = 0;
+	virtual void DumpResponseCriteria(void) = 0;
 	//can not call this in constructor!
 	virtual IEngineObjectServer* GetEngineObject() = 0;
 	virtual const IEngineObjectServer* GetEngineObject() const = 0;
@@ -885,43 +897,203 @@ public:
 	virtual const IEngineVehicleServer* GetEngineVehicle() const = 0;
 	virtual IEngineRopeServer* GetEngineRope() = 0;
 	virtual const IEngineRopeServer* GetEngineRope() const = 0;
-	virtual void ViewPunch(const QAngle& angleOffset) = 0;
-	virtual void VelocityPunch(const Vector& vecForce) = 0;
-	virtual void GetVelocity(Vector* vVelocity, AngularImpulse* vAngVelocity = NULL) = 0;
-	virtual const Vector& GetBaseVelocity() const = 0;
-	virtual void SetBaseVelocity(const Vector& v) = 0;
-	virtual Vector GetSmoothedVelocity(void) = 0;
-	virtual void ApplyAbsVelocityImpulse(const Vector& vecImpulse) = 0;
-	virtual Vector EyePosition(void) const = 0;			// position of eyes
-	virtual const QAngle& EyeAngles(void) = 0;		// Direction of eyes in world space
-	virtual const Vector& GetViewOffset() const = 0;
-	virtual const Vector& WorldSpaceCenter() const = 0;
-	virtual Vector Weapon_ShootPosition() = 0;
+
+	virtual void OnSave(IEntitySaveUtils* pSaveUtils) = 0;
+	virtual int	Save(ISave& save) = 0;
+	virtual void OnRestore() = 0;
+	virtual int	Restore(IRestore& restore) = 0;
+	virtual bool KeyValue(const char* szKeyName, const char* szValue) = 0;
+	virtual bool KeyValue(const char* szKeyName, float flValue) = 0;
+	virtual bool KeyValue(const char* szKeyName, const Vector& vecValue) = 0;
+	virtual bool GetKeyValue(const char* szKeyName, char* szValue, int iMaxLen) = 0;
+	virtual int	ObjectCaps(void) = 0;
+	virtual void Spawn(void) = 0;
+	virtual void Precache(void) = 0;
+	virtual void Activate(void) = 0;
+	virtual void PostClientActive(void) = 0;
+	virtual void SUB_StartFadeOut(float delay = 10.0f, bool bNotSolid = true) = 0;
+	// Delete yourself.
+	virtual void Release(void) = 0;
+
+	virtual bool IsTemplate(void) = 0;
+	virtual bool IsWorld() const = 0;
+	virtual bool IsBSPModel() const = 0;
+	virtual	bool IsPlayer(void) const = 0;
+	virtual bool IsCombatCharacter() const = 0;
+	virtual bool IsNPC(void) const = 0;
+	virtual bool IsNetClient(void) const = 0;
+	virtual bool IsCombineBall() const = 0;
+	virtual bool IsViewModel() const = 0;
+	virtual bool IsPhysicsProp() const = 0;
+	virtual bool IsGib() const = 0;
+	virtual bool IsChangeLevelTrigger() const = 0;
+	virtual const char* GetNewMapName() = 0;
+	virtual const char* GetNewLandmarkName() = 0;
+	virtual bool IsAlive(void) = 0;
+	virtual bool IsStandable() const = 0;
+	virtual bool IsMoving(void) = 0;
+	virtual bool IsFloating() = 0;
+	virtual bool IsNavIgnored() const = 0;
+	virtual void SetNavIgnore(float duration = FLT_MAX) = 0;
+	virtual void ClearNavIgnore() = 0;
+	virtual bool HasNPCsOnIt() = 0;
+	virtual int GetTextureFrameIndex(void) = 0;
+	virtual void SetTextureFrameIndex(int iIndex) = 0;
+	virtual void SetRenderMode(RenderMode_t nRenderMode) = 0;
+	virtual RenderMode_t GetRenderMode() const = 0;
+	virtual void SetRenderColor(color32 color) = 0;
+	virtual void SetRenderColor(byte r, byte g, byte b) = 0;
+	virtual void SetRenderColor(byte r, byte g, byte b, byte a) = 0;
+	virtual void SetRenderColorR(byte r) = 0;
+	virtual void SetRenderColorG(byte g) = 0;
+	virtual void SetRenderColorB(byte b) = 0;
+	virtual void SetRenderColorA(byte a) = 0;
+	virtual void SetBlocksLOS(bool bBlocksLOS) = 0;
+	virtual bool BlocksLOS(void) = 0;
+	virtual int ShouldTransmit(const CCheckTransmitInfo* pInfo) = 0;
+	virtual int GetTransmitState(void) = 0;
+	virtual int SetTransmitState(int nFlag) = 0;
+	virtual void SetTransmit(CCheckTransmitInfo* pInfo, bool bAlways) = 0;
+	virtual void IncrementTransmitStateOwnedCounter() = 0;
+	virtual void DecrementTransmitStateOwnedCounter() = 0;
+	virtual int DispatchUpdateTransmitState() = 0;
+	virtual void SetModel(const char* szModelName) = 0;
+	virtual IStudioHdr* OnNewModel() = 0;
+	virtual void OnResetSequence(int nSequence) = 0;
+	virtual void StudioFrameAdvance() = 0;
+	virtual bool CanSkipAnimation(void) = 0;
+	virtual	void GetSkeleton(IStudioHdr* pStudioHdr, Vector pos[], Quaternion q[], int boneMask) = 0;
+	virtual void CalculateIKLocks(float currentTime) = 0;
+	virtual void BeforeParentChanged(IServerEntity* pNewParent, int inewAttachment = -1) = 0;
+	virtual void AfterParentChanged(IServerEntity* pOldParent, int iOldAttachment = -1) = 0;
+	virtual IServerEntity* GetEffectEntity() const = 0;
+	virtual void OnAddEffects(int nEffects) = 0;
+	virtual void OnRemoveEffects(int nEffects) = 0;
+	virtual void OnSetEffects(int nEffects) = 0;
+	virtual	bool ShouldCollide(int collisionGroup, int contentsMask) const = 0;
+	virtual bool TestCollision(const Ray_t& ray, unsigned int mask, trace_t& trace) = 0;
+	virtual	bool TestHitboxes(const Ray_t& ray, unsigned int fContentsMask, trace_t& tr) = 0;
+	virtual void AddWatcherToEntity(IServerEntity* pWatcher, int watcherType) = 0;
+	virtual void RemoveWatcherFromEntity(IServerEntity* pWatcher, int watcherType) = 0;
+	virtual void Teleport(const Vector* newPosition, const QAngle* newAngles, const Vector* newVelocity) = 0;
+	virtual int GetPushEnumCount() = 0;
+	virtual void PhysicsSimulate(void) = 0;
+	virtual void Think(void) = 0;
+#ifdef _DEBUG
+	virtual void FunctionCheck(void* pFunction, const char* name) = 0;
+#endif // _DEBUG
+	virtual bool ShouldReportOverThinkLimit() = 0;
+	virtual void ReportOverThinkLimit(float time) = 0;
+	virtual void OnPositionChanged() = 0;
+	virtual void OnAnglesChanged() = 0;
+	virtual void OnAnimationChanged() = 0;
+	virtual void NotifyPositionChanged() = 0;
+	virtual Vector GetSoundEmissionOrigin() const = 0;
+	virtual void ComputeWorldSpaceSurroundingBox(Vector* pWorldMins, Vector* pWorldMaxs) = 0;
+	virtual	void RefreshCollisionBounds(void) = 0;
+	virtual void OnEntityEvent(EntityEvent_t event, void* pEventData) = 0;
+	virtual void NotifyVPhysicsStateChanged(IPhysicsObject* pPhysics, bool bAwake) = 0;
+	virtual bool ForceVPhysicsCollide(IServerEntity* pEntity) = 0;
+	virtual unsigned int PhysicsSolidMaskForEntity(void) const = 0;
+	virtual void VPhysicsUpdate(IPhysicsObject* pPhysics) = 0;
+	virtual void VPhysicsShadowUpdate(IPhysicsObject* pPhysics) = 0;
+	virtual void UpdatePhysicsShadowToCurrentPosition(float deltaTime) = 0;
+	virtual int VPhysicsTakeDamage(const CTakeDamageInfo& info) = 0;
+	virtual void VPhysicsCollision(int index, gamevcollisionevent_t* pEvent) = 0;
+	virtual void VPhysicsShadowCollision(int index, gamevcollisionevent_t* pEvent) = 0;
+	virtual void VPhysicsFriction(IPhysicsObject* pObject, float energy, int surfaceProps, int surfacePropsHit) = 0;
 	virtual void StartTouch(IServerEntity* pOther) = 0;
 	virtual void Touch(IServerEntity* pOther) = 0;
 	virtual void EndTouch(IServerEntity* pOther) = 0;
-	virtual void Use(IServerEntity* pActivator, IServerEntity* pCaller, USE_TYPE useType, float value) = 0;
-	virtual bool AcceptInput(const char* szInputName, IServerEntity* pActivator, IServerEntity* pCaller, variant_t Value, int outputID) = 0;
+	virtual void Blocked(IServerEntity* pOther) = 0;
+	virtual bool IsTriggered(IServerEntity* pActivator) = 0;
+	virtual void StartGroundContact(IServerEntity* ground) = 0;
+	virtual void EndGroundContact(IServerEntity* ground) = 0;
+	virtual void GetVectors(Vector* forward, Vector* right, Vector* up) const = 0;
+	virtual void GetVelocity(Vector* vVelocity, AngularImpulse* vAngVelocity = NULL) = 0;
+	virtual bool FInViewCone(IServerEntity* pEntity) = 0;
+	virtual bool FInViewCone(const Vector& vecSpot) = 0;
+	virtual Vector EyePosition(void) const = 0;			// position of eyes
+	virtual const QAngle& EyeAngles(void) = 0;		// Direction of eyes in world space
+	virtual void EyeVectors(Vector* pForward, Vector* pRight = NULL, Vector* pUp = NULL) = 0;
+	virtual const Vector& EarPosition(void) const = 0;
+	virtual Vector	BodyTarget(const Vector& posSrc, bool bNoisy = true) = 0;		// position to shoot at
+	virtual Vector	HeadTarget(const Vector& posSrc) = 0;
+	virtual const Vector& GetViewOffset() const = 0;
+	virtual void ViewPunch(const QAngle& angleOffset) = 0;
+	virtual const Vector& WorldSpaceCenter() const = 0;
+	virtual	Vector GetStepOrigin(void) const = 0;
+	virtual	QAngle GetStepAngles(void) const = 0;
+	virtual const Vector& GetBaseVelocity() const = 0;
+	virtual void SetBaseVelocity(const Vector& v) = 0;
+	virtual void SetLocalAngularVelocity(const QAngle& vecAngVelocity) = 0;
+	virtual const QAngle& GetLocalAngularVelocity() const = 0;
+	virtual Vector GetSmoothedVelocity(void) = 0;
+	virtual void VelocityPunch(const Vector& vecForce) = 0;
+	virtual void ApplyAbsVelocityImpulse(const Vector& vecImpulse) = 0;
+	virtual float GetStepHeight() const = 0;
+	virtual int IsDormant(void) = 0;
+	virtual void MakeDormant(void) = 0;
+	virtual float GetMoveDoneTime() const = 0;
+	virtual IServerEntity* GetOwnerEntity() const = 0;
+	virtual void SetOwnerEntity(IServerEntity* pOwner) = 0;
+	virtual IServerEntity* GetActiveWeapon() const = 0;
+	virtual Vector Weapon_ShootPosition() = 0;
+	virtual IServerEntity* PhysCannonGetHeldEntity() = 0;
+	virtual int GetMaxHealth() const = 0;
+	virtual int GetHealth() const = 0;
 	virtual int TakeHealth(float flHealth, int bitsDamageType) = 0;
+	virtual bool CanBeHitByMeleeAttack(IServerEntity* pAttacker) = 0;
 	virtual const char& GetTakeDamage() const = 0;
+	virtual void SetTakeDamage(int takedamage) = 0;
+	virtual float GetAttackDamageScale(IHandleEntity* pVictim) = 0;
+	virtual bool PassesDamageFilter(const CTakeDamageInfo& info) = 0;
 	virtual void TakeDamage(const CTakeDamageInfo& info) = 0;
 	virtual int OnTakeDamage(const CTakeDamageInfo& info) = 0;
+	virtual void Event_Killed(const CTakeDamageInfo& info) = 0;
+	virtual void Event_KilledOther(IServerEntity* pVictim, const CTakeDamageInfo& info) = 0;
+	virtual int GetTeamNumber(void) const = 0;
+	virtual const char* TeamID(void) const = 0;
+	virtual void AddPoints(int score, bool bAllowNegativeScore) = 0;
+	virtual void AddPointsToTeam(int score, bool bAllowNegativeScore) = 0;
+	virtual IServerEntity* GetPlayerHeldEntity() = 0;
+	virtual IGrabControllerServer* GetGrabController() = 0;
+	virtual bool IsObjectAllowedOverhead() = 0;
+	virtual bool HasPreferredCarryAnglesForPlayer(IServerEntity* pPlayer) = 0;
+	virtual bool Pickup_GetPreferredCarryAngles(IServerEntity* pPlayer, const matrix3x4_t& localToWorld, QAngle& outputAnglesWorldSpace) = 0;
+	virtual QAngle PreferredCarryAngles(void) = 0;
+	virtual float GetCarryDistanceOffset(void) = 0;
+	virtual void PickupObject(IServerEntity* pObject, bool bLimitMassAndSize = true) = 0;
+	virtual void ForceDropOfCarriedPhysObjects(IServerEntity* pOnlyIfHoldindThis = NULL) = 0;
+	virtual void Use(IServerEntity* pActivator, IServerEntity* pCaller, USE_TYPE useType, float value) = 0;
+	virtual bool AcceptInput(const char* szInputName, IServerEntity* pActivator, IServerEntity* pCaller, variant_t Value, int outputID) = 0;
 	virtual IServerVehicle* GetServerVehicle() = 0;
+	virtual int GetVehicleAnalogControlBias() = 0;
+	virtual void SetVehicleAnalogControlBias(int bias) = 0;
+	virtual void PhysicsRelinkChildren(float dt) = 0;
+	virtual bool PhysicsSplash(const Vector& centerPoint, const Vector& normal, float rawSpeed, float scaledSpeed) = 0;
 	virtual void PortalSimulator_TookOwnershipOfEntity(IEnginePortalServer* pEntity) = 0;
 	virtual void PortalSimulator_ReleasedOwnershipOfEntity(IEnginePortalServer* pEntity) = 0;
 	virtual bool FindClosestPassableSpace(const Vector& vIndecisivePush, unsigned int fMask = MASK_SOLID) = 0;
 	virtual void DispatchTraceAttack(const CTakeDamageInfo& info, const Vector& vecDir, trace_t* ptr, CDmgAccumulator* pAccumulator = NULL) = 0;
+	virtual IServerEntity* EntityPhysics_CreateSolver(IServerEntity* pPhysicsBlocker, bool disableCollisions, float separationDuration) = 0;
+	virtual IServerEntity* NPCPhysics_CreateSolver(IServerEntity* pPhysicsObject, bool disableCollisions, float separationDuration) = 0;
+	virtual bool NPC_CheckBrushExclude(IServerEntity* pBrush) = 0;
+	virtual int GetWaterLevel() const = 0;
+	virtual int GetWaterType() const = 0;
+	virtual void UpdateWaterState() = 0;
+	static bool IsServer(void) { return true; }
 };
 
 // Derive a class from this if you want to filter entity list searches
 abstract_class IEntityFindFilter
 {
 public:
-	virtual bool ShouldFindEntity(CBaseEntity * pEntity) = 0;
-	virtual CBaseEntity* GetFilterResult(void) = 0;
+	virtual bool ShouldFindEntity(IServerEntity * pEntity) = 0;
+	virtual IServerEntity* GetFilterResult(void) = 0;
 };
 
-typedef void (*EntityCallbackFunction) (CBaseEntity* pEntity);
+typedef void (*EntityCallbackFunction) (IServerEntity* pEntity);
 typedef short HSOUNDSCRIPTHANDLE;
 
 const int MAX_PUSHED_ENTITIES = 32;
@@ -1024,25 +1196,25 @@ public:
 	virtual bool PhysIsFinalTick() = 0;
 	virtual float PhysGetTimeScale() = 0;
 	virtual bool PhysIsInCallback() = 0;
-	virtual void PhysCallbackRemove(CBaseEntity* pRemove) = 0;
+	virtual void PhysCallbackRemove(IServerEntity* pRemove) = 0;
 	virtual void PhysCallbackImpulse(IPhysicsObject* pPhysicsObject, const Vector& vecCenterForce, const AngularImpulse& vecCenterTorque) = 0;
 	virtual void PhysCallbackSetVelocity(IPhysicsObject* pPhysicsObject, const Vector& vecVelocity) = 0;
-	virtual void PhysCallbackDamage(CBaseEntity* pEntity, const CTakeDamageInfo& info) = 0;
-	virtual void PhysCallbackDamage(CBaseEntity* pEntity, const CTakeDamageInfo& info, gamevcollisionevent_t& event, int hurtIndex) = 0;
-	virtual void PhysicsImpactSound(CBaseEntity* pEntity, IPhysicsObject* pPhysObject, int channel, int surfaceProps, int surfacePropsHit, float volume, float impactSpeed) = 0;
-	virtual void PhysCollisionSound(CBaseEntity* pEntity, IPhysicsObject* pPhysObject, int channel, int surfaceProps, int surfacePropsHit, float deltaTime, float speed) = 0;
+	virtual void PhysCallbackDamage(IServerEntity* pEntity, const CTakeDamageInfo& info) = 0;
+	virtual void PhysCallbackDamage(IServerEntity* pEntity, const CTakeDamageInfo& info, gamevcollisionevent_t& event, int hurtIndex) = 0;
+	virtual void PhysicsImpactSound(IServerEntity* pEntity, IPhysicsObject* pPhysObject, int channel, int surfaceProps, int surfacePropsHit, float volume, float impactSpeed) = 0;
+	virtual void PhysCollisionSound(IServerEntity* pEntity, IPhysicsObject* pPhysObject, int channel, int surfaceProps, int surfacePropsHit, float deltaTime, float speed) = 0;
 	virtual void PhysCleanupFrictionSounds(IHandleEntity* pEntity) = 0;
-	virtual void PhysBreakSound(CBaseEntity* pEntity, IPhysicsObject* pPhysObject, Vector vecOrigin) = 0;
+	virtual void PhysBreakSound(IServerEntity* pEntity, IPhysicsObject* pPhysObject, Vector vecOrigin) = 0;
 	virtual void PhysFrictionSound(IHandleEntity* pEntity, IPhysicsObject* pObject, float energy, int surfaceProps, int surfacePropsHit) = 0;
 	virtual void PhysFrictionSound(IHandleEntity* pEntity, IPhysicsObject* pObject, const char* pSoundName, HSOUNDSCRIPTHANDLE& handle, float flVolume) = 0;
 	virtual void PhysSetMassCenterOverride(masscenteroverride_t & override) = 0;
-	virtual void PhysGetMassCenterOverride(CBaseEntity* pEntity, vcollide_t* pCollide, solid_t& solidOut) = 0;
-	virtual void PhysTeleportConstrainedEntity(CBaseEntity* pTeleportSource, IPhysicsObject* pObject0, IPhysicsObject* pObject1, const Vector& prevPosition, const QAngle& prevAngles, bool physicsRotate) = 0;
-	virtual void PhysGetListOfPenetratingEntities(CBaseEntity* pSearch, CUtlVector<CBaseEntity*>& list) = 0;
-	virtual bool PhysGetTriggerEvent(triggerevent_t* pEvent, CBaseEntity* pTriggerEntity) = 0;
+	virtual void PhysGetMassCenterOverride(IServerEntity* pEntity, vcollide_t* pCollide, solid_t& solidOut) = 0;
+	virtual void PhysTeleportConstrainedEntity(IServerEntity* pTeleportSource, IPhysicsObject* pObject0, IPhysicsObject* pObject1, const Vector& prevPosition, const QAngle& prevAngles, bool physicsRotate) = 0;
+	virtual void PhysGetListOfPenetratingEntities(IServerEntity* pSearch, CUtlVector<IServerEntity*>& list) = 0;
+	virtual bool PhysGetTriggerEvent(triggerevent_t* pEvent, IServerEntity* pTriggerEntity) = 0;
 	virtual void IterateActivePhysicsEntities(EntityCallbackFunction func) = 0;
 	virtual void OutputVPhysicsBudgetInfo() = 0;
-	virtual void OutputVPhysicsDebugInfo(CBaseEntity* pEntity) = 0;
+	virtual void OutputVPhysicsDebugInfo(IServerEntity* pEntity) = 0;
 
 	virtual void InstallEntityFactory(IEntityFactory* pFactory) = 0;
 	virtual void UninstallEntityFactory(IEntityFactory* pFactory) = 0;
@@ -1066,24 +1238,24 @@ public:
 	virtual void Restore(IRestore* pRestore, bool createPlayers) = 0;
 	virtual void PostRestore() = 0;
 
-	virtual CBaseEntity* FindLandmark(const char* pLandmarkName) = 0;
+	virtual IServerEntity* FindLandmark(const char* pLandmarkName) = 0;
 	virtual void OnChangeLevel(const char* pNewMapName, const char* pNewLandmarkName) = 0;
-	virtual bool IsEntityInTransition(CBaseEntity* pEntity, const char* pLandmarkName) = 0;
-	virtual int InTransitionVolume(CBaseEntity* pEntity, const char* pVolumeName) = 0;
+	virtual bool IsEntityInTransition(IServerEntity* pEntity, const char* pLandmarkName) = 0;
+	virtual int InTransitionVolume(IServerEntity* pEntity, const char* pVolumeName) = 0;
 	// Returns the number of entities moved across the transition
 	virtual int CreateEntityTransitionList(IRestore* pRestore, int) = 0;
 	// Build the list of maps adjacent to the current map
 	virtual void BuildAdjacentMapList(ISave* pSave) = 0;
 
-	virtual void AddListenerEntity(IEntityListener<CBaseEntity>* pListener) = 0;
-	virtual void RemoveListenerEntity(IEntityListener<CBaseEntity>* pListener) = 0;
+	virtual void AddListenerEntity(IEntityListener<IServerEntity>* pListener) = 0;
+	virtual void RemoveListenerEntity(IEntityListener<IServerEntity>* pListener) = 0;
 
 	virtual void ReserveSlot(int index) = 0;
 	virtual int AllocateFreeSlot(bool bNetworkable = true, int index = -1) = 0;
 	virtual IServerEntity* CreateEntityByName(const char* className, int iForceEdictIndex = -1, int iSerialNum = -1) = 0;
-	virtual void NotifyCreateEntity(CBaseEntity* pEnt) = 0;
-	virtual void NotifyRemoveEntity(CBaseEntity* pEnt) = 0;
-	virtual void NotifySpawn(CBaseEntity* pEnt) = 0;
+	virtual void NotifyCreateEntity(IServerEntity* pEnt) = 0;
+	virtual void NotifyRemoveEntity(IServerEntity* pEnt) = 0;
+	virtual void NotifySpawn(IServerEntity* pEnt) = 0;
 	// marks the entity for deletion so it will get removed next frame
 	virtual void DestroyEntity(IHandleEntity* pEntity) = 0;
 	// deletes an entity, without any delay.  Only use this when sure no pointers rely on this entity.
@@ -1112,50 +1284,50 @@ public:
 	virtual IServerUnknown* GetServerUnknownFromHandle(CBaseHandle hEnt) const = 0;
 
 	// returns the next entity after pCurrentEnt;  if pCurrentEnt is NULL, return the first entity
-	virtual CBaseEntity* NextEnt(CBaseEntity* pCurrentEnt) = 0;
-	virtual CBaseEntity* FirstEnt() { return NextEnt(NULL); }
+	virtual IServerEntity* NextEnt(IServerEntity* pCurrentEnt) = 0;
+	virtual IServerEntity* FirstEnt() { return NextEnt(NULL); }
 
 	// NOTE: This function is only a convenience wrapper.
 	// It returns GetServerNetworkable( entnum )->GetIServerEntity().
 	virtual IServerEntity* GetServerEntity(int entnum) const = 0;
 	virtual IServerEntity* GetServerEntityFromHandle(CBaseHandle hEnt) const = 0;
 	virtual short GetNetworkSerialNumber(int entnum) const = 0;
-	virtual CBaseEntity* GetBaseEntity(int entnum) const = 0;
-	virtual CBaseEntity* GetBaseEntityFromHandle(CBaseHandle hEnt) const = 0;
-	virtual CBaseEntity* GetPlayerByIndex(int playerIndex) = 0;
-	virtual CBaseEntity* GetLocalPlayer() = 0;
+	virtual IServerEntity* GetBaseEntity(int entnum) const = 0;
+	virtual IServerEntity* GetBaseEntityFromHandle(CBaseHandle hEnt) const = 0;
+	virtual IServerEntity* GetPlayerByIndex(int playerIndex) = 0;
+	virtual IServerEntity* GetLocalPlayer() = 0;
 
-	virtual CBaseEntity* FindEntityGeneric(CBaseEntity* pStartEntity, const char* szName, CBaseEntity* pSearchingEntity = NULL, CBaseEntity* pActivator = NULL, CBaseEntity* pCaller = NULL) = 0;
-	virtual CBaseEntity* FindEntityGenericWithin(CBaseEntity* pStartEntity, const char* szName, const Vector& vecSrc, float flRadius, CBaseEntity* pSearchingEntity = NULL, CBaseEntity* pActivator = NULL, CBaseEntity* pCaller = NULL) = 0;
-	virtual CBaseEntity* FindEntityGenericNearest(const char* szName, const Vector& vecSrc, float flRadius, CBaseEntity* pSearchingEntity = NULL, CBaseEntity* pActivator = NULL, CBaseEntity* pCaller = NULL) = 0;
+	virtual IServerEntity* FindEntityGeneric(IServerEntity* pStartEntity, const char* szName, IServerEntity* pSearchingEntity = NULL, IServerEntity* pActivator = NULL, IServerEntity* pCaller = NULL) = 0;
+	virtual IServerEntity* FindEntityGenericWithin(IServerEntity* pStartEntity, const char* szName, const Vector& vecSrc, float flRadius, IServerEntity* pSearchingEntity = NULL, IServerEntity* pActivator = NULL, IServerEntity* pCaller = NULL) = 0;
+	virtual IServerEntity* FindEntityGenericNearest(const char* szName, const Vector& vecSrc, float flRadius, IServerEntity* pSearchingEntity = NULL, IServerEntity* pActivator = NULL, IServerEntity* pCaller = NULL) = 0;
 
-	virtual CBaseEntity* FindEntityByClassname(CBaseEntity* pStartEntity, const char* szName) = 0;
-	virtual CBaseEntity* FindEntityByClassnameNearest(const char* szName, const Vector& vecSrc, float flRadius) = 0;
-	virtual CBaseEntity* FindEntityByClassnameWithin(CBaseEntity* pStartEntity, const char* szName, const Vector& vecSrc, float flRadius) = 0;
-	virtual CBaseEntity* FindEntityByClassnameWithin(CBaseEntity* pStartEntity, const char* szName, const Vector& vecMins, const Vector& vecMaxs) = 0;
+	virtual IServerEntity* FindEntityByClassname(IServerEntity* pStartEntity, const char* szName) = 0;
+	virtual IServerEntity* FindEntityByClassnameNearest(const char* szName, const Vector& vecSrc, float flRadius) = 0;
+	virtual IServerEntity* FindEntityByClassnameWithin(IServerEntity* pStartEntity, const char* szName, const Vector& vecSrc, float flRadius) = 0;
+	virtual IServerEntity* FindEntityByClassnameWithin(IServerEntity* pStartEntity, const char* szName, const Vector& vecMins, const Vector& vecMaxs) = 0;
 
-	virtual CBaseEntity* FindEntityByName(CBaseEntity* pStartEntity, const char* szName, CBaseEntity* pSearchingEntity = NULL, CBaseEntity* pActivator = NULL, CBaseEntity* pCaller = NULL, IEntityFindFilter* pFilter = NULL) = 0;
-	virtual CBaseEntity* FindEntityByName(CBaseEntity* pStartEntity, string_t iszName, CBaseEntity* pSearchingEntity = NULL, CBaseEntity* pActivator = NULL, CBaseEntity* pCaller = NULL, IEntityFindFilter* pFilter = NULL) = 0;
-	virtual CBaseEntity* FindEntityByNameNearest(const char* szName, const Vector& vecSrc, float flRadius, CBaseEntity* pSearchingEntity = NULL, CBaseEntity* pActivator = NULL, CBaseEntity* pCaller = NULL) = 0;
-	virtual CBaseEntity* FindEntityByNameWithin(CBaseEntity* pStartEntity, const char* szName, const Vector& vecSrc, float flRadius, CBaseEntity* pSearchingEntity = NULL, CBaseEntity* pActivator = NULL, CBaseEntity* pCaller = NULL) = 0;
+	virtual IServerEntity* FindEntityByName(IServerEntity* pStartEntity, const char* szName, IServerEntity* pSearchingEntity = NULL, IServerEntity* pActivator = NULL, IServerEntity* pCaller = NULL, IEntityFindFilter* pFilter = NULL) = 0;
+	virtual IServerEntity* FindEntityByName(IServerEntity* pStartEntity, string_t iszName, IServerEntity* pSearchingEntity = NULL, IServerEntity* pActivator = NULL, IServerEntity* pCaller = NULL, IEntityFindFilter* pFilter = NULL) = 0;
+	virtual IServerEntity* FindEntityByNameNearest(const char* szName, const Vector& vecSrc, float flRadius, IServerEntity* pSearchingEntity = NULL, IServerEntity* pActivator = NULL, IServerEntity* pCaller = NULL) = 0;
+	virtual IServerEntity* FindEntityByNameWithin(IServerEntity* pStartEntity, const char* szName, const Vector& vecSrc, float flRadius, IServerEntity* pSearchingEntity = NULL, IServerEntity* pActivator = NULL, IServerEntity* pCaller = NULL) = 0;
 
-	virtual CBaseEntity* FindEntityByTarget(CBaseEntity* pStartEntity, const char* szName) = 0;
-	virtual CBaseEntity* FindEntityByModel(CBaseEntity* pStartEntity, const char* szModelName) = 0;
-	virtual CBaseEntity* FindEntityInSphere(CBaseEntity* pStartEntity, const Vector& vecCenter, float flRadius) = 0;
+	virtual IServerEntity* FindEntityByTarget(IServerEntity* pStartEntity, const char* szName) = 0;
+	virtual IServerEntity* FindEntityByModel(IServerEntity* pStartEntity, const char* szModelName) = 0;
+	virtual IServerEntity* FindEntityInSphere(IServerEntity* pStartEntity, const Vector& vecCenter, float flRadius) = 0;
 
-	virtual CBaseEntity* FindEntityNearestFacing(const Vector& origin, const Vector& facing, float threshold) = 0;
-	virtual CBaseEntity* FindEntityClassNearestFacing(const Vector& origin, const Vector& facing, float threshold, char* classname) = 0;
-	virtual CBaseEntity* FindEntityProcedural(const char* szName, CBaseEntity* pSearchingEntity = NULL, CBaseEntity* pActivator = NULL, CBaseEntity* pCaller = NULL) = 0;
+	virtual IServerEntity* FindEntityNearestFacing(const Vector& origin, const Vector& facing, float threshold) = 0;
+	virtual IServerEntity* FindEntityClassNearestFacing(const Vector& origin, const Vector& facing, float threshold, char* classname) = 0;
+	virtual IServerEntity* FindEntityProcedural(const char* szName, IServerEntity* pSearchingEntity = NULL, IServerEntity* pActivator = NULL, IServerEntity* pCaller = NULL) = 0;
 
-	virtual CBaseEntity* FindEntityForward(CBaseEntity* pMe, bool fHull) = 0;
-	virtual CBaseEntity* FindPickerEntity(CBaseEntity* pPlayer) = 0;
+	virtual IServerEntity* FindEntityForward(IServerEntity* pMe, bool fHull) = 0;
+	virtual IServerEntity* FindPickerEntity(IServerEntity* pPlayer) = 0;
 
 	virtual int AimTarget_ListCount() = 0;
-	virtual int AimTarget_ListCopy(CBaseEntity* pList[], int listMax) = 0;
+	virtual int AimTarget_ListCopy(IServerEntity* pList[], int listMax) = 0;
 	virtual void AimTarget_ForceRepopulateList() = 0;
-	virtual void SimThink_EntityChanged(CBaseEntity* pEntity) = 0;
+	virtual void SimThink_EntityChanged(IServerEntity* pEntity) = 0;
 	virtual int SimThink_ListCount() = 0;
-	virtual int SimThink_ListCopy(CBaseEntity* pList[], int listMax) = 0;
+	virtual int SimThink_ListCopy(IServerEntity* pList[], int listMax) = 0;
 
 	virtual bool IsAccurateTriggerBboxChecks() = 0;
 	virtual void SetAccurateTriggerBboxChecks(bool bAccurateTriggerBboxChecks) = 0;
@@ -1175,22 +1347,22 @@ public:
 	virtual IEnginePortalServer* GetPortal(int index) = 0;
 	virtual CCallQueue* GetPostTouchQueue() = 0;
 
-	virtual void MoveToTopOfLRU(CBaseEntity* pRagdoll, bool bImportant = false) = 0;
+	virtual void MoveToTopOfLRU(IServerEntity* pRagdoll, bool bImportant = false) = 0;
 	virtual void SetMaxRagdollCount(int iMaxCount) = 0;
 	virtual int CountRagdolls(bool bOnlySimulatingRagdolls) = 0;
 
 	virtual bool FindOrAddVehicleScript(const char* pScriptName, vehicleparams_t* pVehicle, vehiclesounds_t* pSounds) = 0;
 	virtual void FlushVehicleScripts() = 0;
 
-	virtual void SetClientVisibilityPVS(CBaseEntity* pClient, const unsigned char* pvs, int pvssize) = 0;
+	virtual void SetClientVisibilityPVS(IServerEntity* pClient, const unsigned char* pvs, int pvssize) = 0;
 	virtual bool ClientPVSIsExpanded() = 0;
 
-	virtual CBaseEntity* FindClientInPVS(CBaseEntity* pEdict) = 0;
-	virtual CBaseEntity* FindClientInVisibilityPVS(CBaseEntity* pEdict) = 0;
+	virtual IServerEntity* FindClientInPVS(IServerEntity* pEdict) = 0;
+	virtual IServerEntity* FindClientInVisibilityPVS(IServerEntity* pEdict) = 0;
 
 	// This is a version which finds any clients whose PVS intersects the box
-	virtual CBaseEntity* FindClientInPVS(const Vector& vecBoxMins, const Vector& vecBoxMaxs) = 0;
-	virtual CBaseEntity* EntitiesInPVS(CBaseEntity* pPVSEntity, CBaseEntity* pStartingEntity) = 0;
+	virtual IServerEntity* FindClientInPVS(const Vector& vecBoxMins, const Vector& vecBoxMaxs) = 0;
+	virtual IServerEntity* EntitiesInPVS(IServerEntity* pPVSEntity, IServerEntity* pStartingEntity) = 0;
 
 	virtual IServerGameRules* GetGameRules() = 0;
 

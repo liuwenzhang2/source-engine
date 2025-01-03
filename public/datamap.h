@@ -923,17 +923,17 @@ public:
 
 #define	DECLARE_DATADESC() \
 	DECLARE_SIMPLE_DATADESC() \
-	virtual datamap_t *GetDataDescMap( void );
+	virtual datamap_t *GetDataDescMap( void ) const;
 
 #define BEGIN_DATADESC( className ) \
 	datamap_t className::m_DataMap = { 0, 0, #className, NULL }; \
-	datamap_t *className::GetDataDescMap( void ) { return &m_DataMap; } \
+	datamap_t *className::GetDataDescMap( void ) const { return &m_DataMap; } \
 	datamap_t *className::GetBaseMap() { datamap_t *pResult; DataMapAccess((BaseClass *)NULL, &pResult); return pResult; } \
 	BEGIN_DATADESC_GUTS( className )
 
 #define BEGIN_DATADESC_NO_BASE( className ) \
 	datamap_t className::m_DataMap = { 0, 0, #className, NULL }; \
-	datamap_t *className::GetDataDescMap( void ) { return &m_DataMap; } \
+	datamap_t *className::GetDataDescMap( void ) const { return &m_DataMap; } \
 	datamap_t *className::GetBaseMap() { return NULL; } \
 	BEGIN_DATADESC_GUTS( className )
 
@@ -1063,7 +1063,7 @@ private:
 	public:																\
 		static typedescription_t m_PredDesc[];							\
 		static datamap_t m_PredMap;										\
-		virtual datamap_t *GetPredDescMap( void );						\
+		virtual datamap_t *GetPredDescMap( void ) const;						\
 		template <typename T> friend datamap_t *PredMapInit(T *)
 #else
 #define DECLARE_PREDICTABLE()	template <typename T> friend datamap_t *PredMapInit(T *)
@@ -1072,12 +1072,12 @@ private:
 #ifndef NO_ENTITY_PREDICTION
 #define BEGIN_PREDICTION_DATA( className ) \
 	datamap_t className::m_PredMap = { 0, 0, #className, &BaseClass::m_PredMap }; \
-	datamap_t *className::GetPredDescMap( void ) { return &m_PredMap; } \
+	datamap_t *className::GetPredDescMap( void ) const { return &m_PredMap; } \
 	BEGIN_PREDICTION_DATA_GUTS( className )
 
 #define BEGIN_PREDICTION_DATA_NO_BASE( className ) \
 	datamap_t className::m_PredMap = { 0, 0, #className, NULL }; \
-	datamap_t *className::GetPredDescMap( void ) { return &m_PredMap; } \
+	datamap_t *className::GetPredDescMap( void ) const { return &m_PredMap; } \
 	BEGIN_PREDICTION_DATA_GUTS( className )
 
 #define BEGIN_PREDICTION_DATA_GUTS( className ) \

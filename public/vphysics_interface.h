@@ -1244,13 +1244,13 @@ struct fluidevent_t
 	float			impactTime;
 };
 
-class CBaseEntity;
+class IServerEntity;
 struct gamevcollisionevent_t : public vcollisionevent_t
 {
 	Vector			preVelocity[2];
 	Vector			postVelocity[2];
 	AngularImpulse	preAngularVelocity[2];
-	CBaseEntity* pEntities[2];
+	IServerEntity* pEntities[2];
 
 	void Init(vcollisionevent_t* pEvent)
 	{
@@ -1262,13 +1262,13 @@ struct gamevcollisionevent_t : public vcollisionevent_t
 
 struct triggerevent_t
 {
-	CBaseEntity* pTriggerEntity;
+	IServerEntity* pTriggerEntity;
 	IPhysicsObject* pTriggerPhysics;
-	CBaseEntity* pEntity;
+	IServerEntity* pEntity;
 	IPhysicsObject* pObject;
 	bool			bStart;
 
-	inline void Init(CBaseEntity* triggerEntity, IPhysicsObject* triggerPhysics, CBaseEntity* entity, IPhysicsObject* object, bool startTouch)
+	inline void Init(IServerEntity* triggerEntity, IPhysicsObject* triggerPhysics, IServerEntity* entity, IPhysicsObject* object, bool startTouch)
 	{
 		pTriggerEntity = triggerEntity;
 		pTriggerPhysics = triggerPhysics;

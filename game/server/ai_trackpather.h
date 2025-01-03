@@ -91,7 +91,7 @@ protected:
 	CPathTrack *AdjustForMovementDirection( CPathTrack *pPath ) const;
 
 	// Enemy visibility check
-	virtual CBaseEntity *FindTrackBlocker( const Vector &vecViewPoint, const Vector &vecTargetPos );
+	virtual IServerEntity *FindTrackBlocker( const Vector &vecViewPoint, const Vector &vecTargetPos );
 
 	// Compute a point n units along a path
 	void ComputePointAlongPath( const Vector &vecStartPoint, float flDistance, Vector *pTarget );

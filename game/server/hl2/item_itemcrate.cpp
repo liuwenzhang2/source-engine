@@ -191,11 +191,11 @@ void CItem_ItemCrate::OnBreak( const Vector &vecVelocity, const AngularImpulse &
 
 	for ( int i = 0; i < m_nItemCount; ++i )
 	{
-		CBaseEntity *pSpawn = NULL;
+		IServerEntity *pSpawn = NULL;
 		switch( m_CrateType )
 		{
 		case CRATE_SPECIFIC_ITEM:
-			pSpawn = (CBaseEntity*)EntityList()->CreateEntityByName( STRING(m_strItemClass) );
+			pSpawn = EntityList()->CreateEntityByName( STRING(m_strItemClass) );
 			break;
 
 		default:
@@ -240,7 +240,7 @@ void CItem_ItemCrate::OnBreak( const Vector &vecVelocity, const AngularImpulse &
 		{
 			if ( m_strAlternateMaster != NULL_STRING )
 			{
-				DynamicResupply_InitFromAlternateMaster( pSpawn, m_strAlternateMaster );
+				DynamicResupply_InitFromAlternateMaster( (CBaseEntity*)pSpawn, m_strAlternateMaster );
 			}
 			if ( i == 0 )
 			{

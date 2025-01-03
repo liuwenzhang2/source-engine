@@ -14,6 +14,7 @@
 
 #include "baseentity.h"
 #include "baseanimating.h"
+#include "engine/IEngineTrace.h"
 
 class CPhysicsShadowClone;
 class IPhysicsEnvironment;
@@ -62,7 +63,7 @@ public:
 
 	//damage relays to source entity if anything ever hits the clone
 	virtual bool	PassesDamageFilter( const CTakeDamageInfo &info );
-	virtual bool	CanBeHitByMeleeAttack( CBaseEntity *pAttacker );
+	virtual bool	CanBeHitByMeleeAttack( IServerEntity *pAttacker );
 	virtual int		OnTakeDamage( const CTakeDamageInfo &info );
 	virtual int		TakeHealth( float flHealth, int bitsDamageType );
 	virtual void	Event_Killed( const CTakeDamageInfo &info );

@@ -83,7 +83,7 @@ private:
 //			are all satisfied, fires the relevant output
 //-----------------------------------------------------------------------------
 
-class CAI_ScriptConditions : public CBaseEntity, public IEntityListener<CBaseEntity>
+class CAI_ScriptConditions : public CBaseEntity, public IEntityListener<IServerEntity>
 {
 	DECLARE_CLASS( CAI_ScriptConditions, CBaseEntity );
 
@@ -150,7 +150,7 @@ private:
 	bool EvalPlayerInVehicle( const EvalArgs_t &args );
 	bool EvalActorInVehicle( const EvalArgs_t &args );
 
-	void OnEntitySpawned( CBaseEntity *pEntity );
+	void OnEntitySpawned( IServerEntity *pEntity );
 
 	int AddNewElement( CBaseEntity *pActor );
 

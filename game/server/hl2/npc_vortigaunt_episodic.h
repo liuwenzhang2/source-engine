@@ -67,7 +67,7 @@ public:
 	virtual float	InnateRange1MinRange( void ) { return 0.0f; }
 	virtual float	InnateRange1MaxRange( void ) { return sk_vortigaunt_zap_range.GetFloat()*12; }
 	virtual int		OnTakeDamage_Alive( const CTakeDamageInfo &info );
-	virtual bool	FInViewCone( CBaseEntity *pEntity );
+	virtual bool	FInViewCone( IServerEntity *pEntity );
 	virtual bool	ShouldMoveAndShoot( void );
 
 	// vorts have a very long head/neck swing, so debounce heavily

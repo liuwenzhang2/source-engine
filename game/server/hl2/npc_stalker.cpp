@@ -145,7 +145,7 @@ int	CNPC_Stalker::OnTakeDamage_Alive( const CTakeDamageInfo &inputInfo )
 	// --------------------------------------------
 	//	Don't take a lot of damage from Vortigaunt
 	// --------------------------------------------
-	if (info.GetAttacker()->Classify() == CLASS_VORTIGAUNT)
+	if (((CBaseEntity*)info.GetAttacker())->Classify() == CLASS_VORTIGAUNT)
 	{
 		info.ScaleDamage( 0.25 );
 	}
@@ -384,7 +384,7 @@ void CNPC_Stalker::Event_Killed( const CTakeDamageInfo &info )
 			{
 				CNPC_Stalker *pStalker = dynamic_cast <CNPC_Stalker*>(pSquadMember);
 
-				if( pStalker && pStalker->FVisible(info.GetAttacker()) )
+				if( pStalker && pStalker->FVisible((CBaseEntity*)info.GetAttacker()) )
 				{
 					pStalker->m_iPlayerAggression++;
 				}

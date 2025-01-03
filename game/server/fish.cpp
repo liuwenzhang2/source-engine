@@ -126,7 +126,7 @@ void CFish::Initialize( CFishPool *pool, unsigned int id )
 	m_id = id;
 
 	m_poolOrigin = pool->GetEngineObject()->GetAbsOrigin();
-	m_waterLevel = pool->GetWaterLevel();
+	m_waterLevel = pool->GetFWaterLevel();
 
 	// pass relative position to the client
 	Vector deltaPos = GetEngineObject()->GetAbsOrigin() - m_poolOrigin;

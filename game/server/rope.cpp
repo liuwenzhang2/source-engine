@@ -88,7 +88,7 @@ void CRopeKeyframe::UpdateOnRemove()
 
 
 
-void CRopeKeyframe::BeforeParentChanged( CBaseEntity *pNewParent, int iNewAttachment )
+void CRopeKeyframe::BeforeParentChanged( IServerEntity *pNewParent, int iNewAttachment )
 {
 	BaseClass::BeforeParentChanged(pNewParent, iNewAttachment);
 	IEngineObjectServer *pCurParent = GetEngineObject()->GetMoveParent();
@@ -211,7 +211,7 @@ void CRopeKeyframe::Activate()
 		GetEngineRope()->SetRopeMaterialModelIndex(engine->PrecacheModel( "cable/cable.vmt" ));
 
 	// Find the next entity in our chain.
-	CBaseEntity *pEnt = EntityList()->FindEntityByName( NULL, m_iNextLinkName );
+	IServerEntity *pEnt = EntityList()->FindEntityByName( NULL, m_iNextLinkName );
 	if( pEnt && pEnt->entindex()!=-1 )
 	{
 		GetEngineRope()->SetEndPoint( pEnt );
@@ -261,11 +261,11 @@ void CRopeKeyframe::SetTransmit( CCheckTransmitInfo *pInfo, bool bAlways )
 		BaseClass::SetTransmit( pInfo, bAlways );
 	
 		// Make sure our target ents are sent too.
-		CBaseEntity *pEnt = GetEngineRope()->GetStartPoint();
+		CBaseEntity *pEnt = (CBaseEntity*)GetEngineRope()->GetStartPoint();
 		if ( pEnt )
 			pEnt->SetTransmit( pInfo, bAlways );
 
-		pEnt = GetEngineRope()->GetEndPoint();
+		pEnt = (CBaseEntity*)GetEngineRope()->GetEndPoint();
 		if ( pEnt )
 			pEnt->SetTransmit( pInfo, bAlways );
 	}
@@ -277,7 +277,7 @@ void CRopeKeyframe::SetTransmit( CCheckTransmitInfo *pInfo, bool bAlways )
 // Input   :
 // Output  :
 //------------------------------------------------------------------------------
-void CRopeKeyframe::PropagateForce(CBaseEntity *pActivator, CBaseEntity *pCaller, CBaseEntity *pFirstLink, float x, float y, float z)
+void CRopeKeyframe::PropagateForce(IServerEntity *pActivator, IServerEntity *pCaller, CBaseEntity *pFirstLink, float x, float y, float z)
 {
 	EntityMessageBegin( this, true );
 		WRITE_FLOAT( x );
@@ -302,7 +302,7 @@ void CRopeKeyframe::InputSetForce( inputdata_t &inputdata )
 {
 	Vector vecForce;
 	inputdata.value.Vector3D(vecForce);
-	PropagateForce( inputdata.pActivator, inputdata.pCaller, this, vecForce.x, vecForce.y, vecForce.z );
+	PropagateForce(inputdata.pActivator, inputdata.pCaller, this, vecForce.x, vecForce.y, vecForce.z );
 }
 
 //-----------------------------------------------------------------------------

@@ -42,7 +42,7 @@ public:
 	bool	ShouldPlayerAvoid( void );
 	void	AnalyzeGunfireSound( CSound *pSound );
 	bool	IsValidEnemy( CBaseEntity *pEnemy );
-	void	Event_KilledOther( CBaseEntity *pVictim, const CTakeDamageInfo &info );
+	void	Event_KilledOther( IServerEntity *pVictim, const CTakeDamageInfo &info );
 	void	Event_Killed( const CTakeDamageInfo &info );
 	void	EnemyIgnited( CAI_BaseNPC *pVictim );
 	void	CombineBallSocketed( int iNumBounces );
@@ -78,7 +78,7 @@ public:
 	bool	FValidateHintType( CAI_Hint *pHint );
 	int		ObjectCaps();
 	void	HandleAnimEvent( animevent_t *pEvent );
-	bool	FInViewCone( CBaseEntity *pEntity );
+	bool	FInViewCone( IServerEntity *pEntity );
 	bool	QuerySeeEntity( CBaseEntity *pEntity, bool bOnlyHateOrFearIfNPC = false );
 	bool	CanSeeEntityInDarkness( CBaseEntity *pEntity );
 	bool	IsCoverPosition( const Vector &vecThreat, const Vector &vecPosition );
@@ -96,10 +96,10 @@ public:
 	// bool	IsNavigationUrgent();
 
 	void	TraceAttack( const CTakeDamageInfo &info, const Vector &vecDir, trace_t *ptr, CDmgAccumulator *pAccumulator );
-	bool	CanBeHitByMeleeAttack( CBaseEntity *pAttacker );
+	bool	CanBeHitByMeleeAttack( IServerEntity *pAttacker );
 	int		OnTakeDamage_Alive( const CTakeDamageInfo &info );
 	bool	FCanCheckAttacks();
-	float	GetAttackDamageScale( CBaseEntity *pVictim );
+	float	GetAttackDamageScale( IHandleEntity *pVictim );
 
 
 	bool	HandleInteraction(int interactionType, void *data, CBaseCombatCharacter* sourceEnt);

@@ -591,8 +591,8 @@ public:
 			return;
 
 		// Spawn the commentary semaphore entity
-		CBaseEntity *pSemaphore = (CBaseEntity*)EntityList()->CreateEntityByName( "info_target" );
-		pSemaphore->SetName( COMMENTARY_SPAWNED_SEMAPHORE );
+		IServerEntity *pSemaphore = EntityList()->CreateEntityByName( "info_target" );
+		pSemaphore->GetEngineObject()->SetName( COMMENTARY_SPAWNED_SEMAPHORE );
 
 		bool oldLock = engine->LockNetworkStringTables( false );
 
@@ -626,14 +626,14 @@ public:
 				}
 
 				// Spawn the commentary entity
-				CBaseEntity *pNode = (CBaseEntity*)EntityList()->CreateEntityByName( pNodeName );
+				IServerEntity *pNode = EntityList()->CreateEntityByName( pNodeName );
 				if ( pNode )
 				{
-					ParseEntKVBlock( pNode, pkvNode );
+					ParseEntKVBlock((CBaseEntity*)pNode, pkvNode );
 					DispatchSpawn( pNode );
 
 					EHANDLE hHandle;
-					hHandle = pNode;
+					hHandle = (CBaseEntity*)pNode;
 					m_hSpawnedEntities.AddToTail( hHandle );
 
 					CPointCommentaryNode *pCommNode = dynamic_cast<CPointCommentaryNode*>(pNode);
@@ -685,7 +685,7 @@ public:
 		m_iCommentaryNodeCount = 0;
 
 		// Remove the commentary semaphore
-		CBaseEntity *pSemaphore = EntityList()->FindEntityByName( NULL, COMMENTARY_SPAWNED_SEMAPHORE );
+		IServerEntity *pSemaphore = EntityList()->FindEntityByName( NULL, COMMENTARY_SPAWNED_SEMAPHORE );
 		if ( pSemaphore )
 		{
 			EntityList()->DestroyEntity( pSemaphore );
@@ -761,7 +761,7 @@ public:
 		if ( m_flNextTeleportTime > gpGlobals->curtime || m_iTeleportStage != TELEPORT_NONE )
 			return;
 
-		CBaseEntity *pEnt = m_hLastCommentaryNode;
+		IServerEntity *pEnt = m_hLastCommentaryNode;
 		while ( ( pEnt = EntityList()->FindEntityByClassname( pEnt, "point_commentary_node" ) ) != m_hLastCommentaryNode )
 		{
 			CPointCommentaryNode *pNode = dynamic_cast<CPointCommentaryNode *>( pEnt );
@@ -915,7 +915,7 @@ void CPointCommentaryNode::Activate( void )
 
 	if ( m_iszViewTarget != NULL_STRING )
 	{
-		m_hViewTarget = EntityList()->FindEntityByName( NULL, m_iszViewTarget );
+		m_hViewTarget = (CBaseEntity*)EntityList()->FindEntityByName( NULL, m_iszViewTarget );
 		if ( !m_hViewTarget )
 		{
 			Warning("%s: %s could not find viewtarget %s.\n", GetClassname(), GetDebugName(), STRING(m_iszViewTarget) );
@@ -924,7 +924,7 @@ void CPointCommentaryNode::Activate( void )
 
 	if ( m_iszViewPosition != NULL_STRING )
 	{
-		m_hViewPosition = EntityList()->FindEntityByName( NULL, m_iszViewPosition );
+		m_hViewPosition = (CBaseEntity*)EntityList()->FindEntityByName( NULL, m_iszViewPosition );
 		if ( !m_hViewPosition.Get() )
 		{
 			Warning("%s: %s could not find viewposition %s.\n", GetClassname(), GetDebugName(), STRING(m_iszViewPosition) );

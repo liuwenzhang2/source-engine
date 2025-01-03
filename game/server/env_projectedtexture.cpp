@@ -239,7 +239,7 @@ void CEnvProjectedTexture::Activate( void )
 
 void CEnvProjectedTexture::InitialThink( void )
 {
-	m_hTargetEntity = EntityList()->FindEntityByName( NULL, m_target );
+	m_hTargetEntity = (CBaseEntity*)EntityList()->FindEntityByName( NULL, m_target );
 }
 
 int CEnvProjectedTexture::UpdateTransmitState()
@@ -261,7 +261,7 @@ void CC_CreateFlashlight( const CCommand &args )
 	CEnvProjectedTexture *pFlashlight = dynamic_cast< CEnvProjectedTexture * >(EntityList()->CreateEntityByName("env_projectedtexture") );
 	if( args.ArgC() > 1 )
 	{
-		pFlashlight->SetName( args[1] );
+		pFlashlight->GetEngineObject()->SetName( args[1] );
 	}
 
 	pFlashlight->Teleport( &origin, &angles, NULL );

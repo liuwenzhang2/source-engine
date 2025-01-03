@@ -285,7 +285,7 @@ void CNPC_FlockingFlyer::IdleThink( void )
 	GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.2 );
 
 	// see if there's a client in the same pvs as the monster
-	CBaseEntity* pEnt = EntityList()->FindClientInPVS(this);
+	IServerEntity* pEnt = EntityList()->FindClientInPVS(this);
 	if (pEnt&& pEnt->entindex()>0)
 	{
 		SetThink( &CNPC_FlockingFlyer::Start );
@@ -842,7 +842,7 @@ void CNPC_FlockingFlyer::FallHack( void )
 {
 	if (GetEngineObject()->GetFlags() & FL_ONGROUND )
 	{
-		CBaseEntity *groundentity = EntityList()->GetBaseEntity(GetEngineObject()->GetGroundEntity()->entindex());
+		IServerEntity *groundentity = EntityList()->GetBaseEntity(GetEngineObject()->GetGroundEntity()->entindex());
 
 		if ( !FClassnameIs ( groundentity, "worldspawn" ) )
 		{

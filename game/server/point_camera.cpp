@@ -183,7 +183,7 @@ void CPointCamera::ChangeFOVThink( void )
 //-----------------------------------------------------------------------------
 void CPointCamera::InputSetOnAndTurnOthersOff( inputdata_t &inputdata )
 {
-	CBaseEntity *pEntity = NULL;
+	IServerEntity *pEntity = NULL;
 	while ((pEntity = EntityList()->FindEntityByClassname( pEntity, "point_camera" )) != NULL)
 	{
 		CPointCamera *pCamera = (CPointCamera*)pEntity;

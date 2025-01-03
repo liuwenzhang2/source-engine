@@ -43,7 +43,7 @@ called each time a player is spawned into the game
 void ClientPutInServer( int pEdict, const char *playername )
 {
 	// Allocate a CBasePlayer for pev, and call spawn
-	CHL2_Player* pPlayer = (CHL2_Player*)EntityList()->GetBaseEntity(pEdict);
+	CHL2_Player* pPlayer = ToHL2Player(EntityList()->GetBaseEntity(pEdict));
 	if (pPlayer == NULL) {
 		pPlayer = CHL2_Player::CreatePlayer("player", pEdict);
 	}
@@ -64,7 +64,7 @@ void ClientPutInServer( int pEdict, const char *playername )
 
 void ClientActive( int pEdict, bool bLoadGame )
 {
-	CHL2_Player *pPlayer = dynamic_cast< CHL2_Player* >( CBaseEntity::Instance( pEdict ) );
+	CHL2_Player *pPlayer = ToHL2Player( CBaseEntity::Instance( pEdict ) );
 	Assert( pPlayer );
 
 	if ( !pPlayer )
@@ -144,7 +144,7 @@ void respawn( CBaseEntity *pEdict, bool fCopyCorpse )
 		if ( fCopyCorpse )
 		{
 			// make a copy of the dead body for appearances sake
-			((CHL2_Player *)pEdict)->CreateCorpse();
+			ToHL2Player(pEdict)->CreateCorpse();
 		}
 
 		// respawn player

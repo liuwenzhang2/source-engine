@@ -133,7 +133,7 @@ void SmokeTrail::SetEmit(bool bVal)
 //-----------------------------------------------------------------------------
 SmokeTrail* SmokeTrail::CreateSmokeTrail()
 {
-	CBaseEntity *pEnt = (CBaseEntity*)EntityList()->CreateEntityByName(SMOKETRAIL_ENTITYNAME);
+	IServerEntity *pEnt = EntityList()->CreateEntityByName(SMOKETRAIL_ENTITYNAME);
 	if(pEnt)
 	{
 		SmokeTrail *pSmoke = dynamic_cast<SmokeTrail*>(pEnt);
@@ -255,7 +255,7 @@ void RocketTrail::SetEmit(bool bVal)
 //-----------------------------------------------------------------------------
 RocketTrail* RocketTrail::CreateRocketTrail()
 {
-	CBaseEntity *pEnt = (CBaseEntity*)EntityList()->CreateEntityByName( "env_rockettrail" );
+	IServerEntity *pEnt = EntityList()->CreateEntityByName( "env_rockettrail" );
 	
 	if( pEnt != NULL )
 	{
@@ -341,7 +341,7 @@ SporeTrail::SporeTrail( void )
 //-----------------------------------------------------------------------------
 SporeTrail* SporeTrail::CreateSporeTrail()
 {
-	CBaseEntity *pEnt = (CBaseEntity*)EntityList()->CreateEntityByName( SPORETRAIL_ENTITYNAME );
+	IServerEntity *pEnt = EntityList()->CreateEntityByName( SPORETRAIL_ENTITYNAME );
 	
 	if(pEnt)
 	{
@@ -420,7 +420,7 @@ void SporeExplosion::Spawn( void )
 //-----------------------------------------------------------------------------
 SporeExplosion *SporeExplosion::CreateSporeExplosion()
 {
-	CBaseEntity *pEnt = (CBaseEntity*)EntityList()->CreateEntityByName( SPOREEXPLOSION_ENTITYNAME );
+	IServerEntity *pEnt = EntityList()->CreateEntityByName( SPOREEXPLOSION_ENTITYNAME );
 	
 	if ( pEnt )
 	{
@@ -504,7 +504,7 @@ void CFireTrail::FollowEntity( CBaseEntity *pEntity, const char *pAttachmentName
 //-----------------------------------------------------------------------------
 CFireTrail *CFireTrail::CreateFireTrail( void )
 {
-	CBaseEntity *pEnt = (CBaseEntity*)EntityList()->CreateEntityByName( "env_fire_trail" );
+	IServerEntity *pEnt = EntityList()->CreateEntityByName( "env_fire_trail" );
 	
 	if ( pEnt )
 	{
@@ -627,7 +627,7 @@ void DustTrail::SetEmit(bool bVal)
 //-----------------------------------------------------------------------------
 DustTrail* DustTrail::CreateDustTrail()
 {
-	CBaseEntity *pEnt = (CBaseEntity*)EntityList()->CreateEntityByName(DUSTTRAIL_ENTITYNAME);
+	IServerEntity *pEnt = EntityList()->CreateEntityByName(DUSTTRAIL_ENTITYNAME);
 	if(pEnt)
 	{
 		DustTrail *pDust = dynamic_cast<DustTrail*>(pEnt);

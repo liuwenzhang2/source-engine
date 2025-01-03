@@ -23,7 +23,7 @@
 // Precaches a grenade and ensures clients know of it's "ammo"
 void UTIL_PrecacheOtherGrenade( const char *szClassname )
 {
-	CBaseEntity *pEntity = (CBaseEntity*)EntityList()->CreateEntityByName( szClassname );
+	IServerEntity *pEntity = EntityList()->CreateEntityByName( szClassname );
 	if ( !pEntity )
 	{
 		Msg( "NULL Ent in UTIL_PrecacheOtherGrenade\n" );

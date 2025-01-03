@@ -42,7 +42,7 @@ class CBaseDMStart : public CPointEntity
 public:
 	DECLARE_CLASS( CBaseDMStart, CPointEntity );
 
-	bool IsTriggered( CBaseEntity *pEntity );
+	bool IsTriggered( IServerEntity *pEntity );
 
 	DECLARE_DATADESC();
 
@@ -63,7 +63,7 @@ LINK_ENTITY_TO_CLASS(info_player_deathmatch,CBaseDMStart);
 LINK_ENTITY_TO_CLASS(info_player_start,CPointEntity);
 LINK_ENTITY_TO_CLASS(info_landmark,CPointEntity);
 
-bool CBaseDMStart::IsTriggered( CBaseEntity *pEntity )
+bool CBaseDMStart::IsTriggered( IServerEntity *pEntity )
 {
 	bool master = UTIL_IsMasterTriggered( m_Master, pEntity );
 

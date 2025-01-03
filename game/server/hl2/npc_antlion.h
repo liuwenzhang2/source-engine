@@ -85,7 +85,7 @@ public:
 
 	float		GetIdealAccel( void ) const;
 	float		MaxYawSpeed( void );
-	bool		FInViewCone( CBaseEntity *pEntity );
+	bool		FInViewCone( IServerEntity *pEntity );
 	bool		FInViewCone( const Vector &vecSpot );
 				
 	void		Activate( void );

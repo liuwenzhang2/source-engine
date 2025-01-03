@@ -240,7 +240,7 @@ public:
 
 	virtual const char *GetChatPrefix( bool bTeamOnly, CBasePlayer *pPlayer );
 	
-	CBaseEntity *GetPlayerSpawnSpot( CBasePlayer *pPlayer );
+	IServerEntity *GetPlayerSpawnSpot( CBasePlayer *pPlayer );
 	bool IsSpawnPointValid( CBaseEntity *pSpot, CBasePlayer *pPlayer );
 	virtual void PlayerSpawn( CBasePlayer *pPlayer );
 

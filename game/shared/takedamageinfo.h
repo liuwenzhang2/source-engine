@@ -18,7 +18,7 @@
 // hasn't been modified by a user. 
 #define BASEDAMAGE_NOT_SPECIFIED	FLT_MAX
 
-class CBaseEntity;
+class IHandleEntity;
 
 
 class CTakeDamageInfo
@@ -27,25 +27,25 @@ public:
 	DECLARE_CLASS_NOBASE( CTakeDamageInfo );
 
 					CTakeDamageInfo();
-					CTakeDamageInfo( CBaseEntity *pInflictor, CBaseEntity *pAttacker, float flDamage, int bitsDamageType, int iKillType = 0 );
-					CTakeDamageInfo( CBaseEntity *pInflictor, CBaseEntity *pAttacker, CBaseEntity *pWeapon, float flDamage, int bitsDamageType, int iKillType = 0 );
-					CTakeDamageInfo( CBaseEntity *pInflictor, CBaseEntity *pAttacker, const Vector &damageForce, const Vector &damagePosition, float flDamage, int bitsDamageType, int iKillType = 0, Vector *reportedPosition = NULL );
-					CTakeDamageInfo( CBaseEntity *pInflictor, CBaseEntity *pAttacker, CBaseEntity *pWeapon, const Vector &damageForce, const Vector &damagePosition, float flDamage, int bitsDamageType, int iKillType = 0, Vector *reportedPosition = NULL );
+					CTakeDamageInfo( IHandleEntity *pInflictor, IHandleEntity *pAttacker, float flDamage, int bitsDamageType, int iKillType = 0 );
+					CTakeDamageInfo( IHandleEntity *pInflictor, IHandleEntity *pAttacker, IHandleEntity *pWeapon, float flDamage, int bitsDamageType, int iKillType = 0 );
+					CTakeDamageInfo( IHandleEntity *pInflictor, IHandleEntity *pAttacker, const Vector &damageForce, const Vector &damagePosition, float flDamage, int bitsDamageType, int iKillType = 0, Vector *reportedPosition = NULL );
+					CTakeDamageInfo( IHandleEntity *pInflictor, IHandleEntity *pAttacker, IHandleEntity *pWeapon, const Vector &damageForce, const Vector &damagePosition, float flDamage, int bitsDamageType, int iKillType = 0, Vector *reportedPosition = NULL );
 	
 
 	// Inflictor is the weapon or rocket (or player) that is dealing the damage.
-	CBaseEntity*	GetInflictor() const;
-	void			SetInflictor( CBaseEntity *pInflictor );
+	IHandleEntity*	GetInflictor() const;
+	void			SetInflictor( IHandleEntity *pInflictor );
 
 	// Weapon is the weapon that did the attack.
 	// For hitscan weapons, it'll be the same as the inflictor. For projectile weapons, the projectile 
 	// is the inflictor, and this contains the weapon that created the projectile.
-	CBaseEntity*	GetWeapon() const;
-	void			SetWeapon( CBaseEntity *pWeapon );
+	IHandleEntity*	GetWeapon() const;
+	void			SetWeapon( IHandleEntity *pWeapon );
 
 	// Attacker is the character who originated the attack (like a player or an AI).
-	CBaseEntity*	GetAttacker() const;
-	void			SetAttacker( CBaseEntity *pAttacker );
+	IHandleEntity*	GetAttacker() const;
+	void			SetAttacker( IHandleEntity *pAttacker );
 
 	float			GetDamage() const;
 	void			SetDamage( float flDamage );
@@ -90,10 +90,10 @@ public:
 	int				GetDamagedOtherPlayers() const     { return m_iDamagedOtherPlayers; }
 	void			SetDamagedOtherPlayers( int iVal ) { m_iDamagedOtherPlayers = iVal; }
 
-	void			Set( CBaseEntity *pInflictor, CBaseEntity *pAttacker, float flDamage, int bitsDamageType, int iKillType = 0 );
-	void			Set( CBaseEntity *pInflictor, CBaseEntity *pAttacker, CBaseEntity *pWeapon, float flDamage, int bitsDamageType, int iKillType = 0 );
-	void			Set( CBaseEntity *pInflictor, CBaseEntity *pAttacker, const Vector &damageForce, const Vector &damagePosition, float flDamage, int bitsDamageType, int iKillType = 0, Vector *reportedPosition = NULL );
-	void			Set( CBaseEntity *pInflictor, CBaseEntity *pAttacker, CBaseEntity *pWeapon, const Vector &damageForce, const Vector &damagePosition, float flDamage, int bitsDamageType, int iKillType = 0, Vector *reportedPosition = NULL );
+	void			Set( IHandleEntity *pInflictor, IHandleEntity *pAttacker, float flDamage, int bitsDamageType, int iKillType = 0 );
+	void			Set( IHandleEntity *pInflictor, IHandleEntity *pAttacker, IHandleEntity *pWeapon, float flDamage, int bitsDamageType, int iKillType = 0 );
+	void			Set( IHandleEntity *pInflictor, IHandleEntity *pAttacker, const Vector &damageForce, const Vector &damagePosition, float flDamage, int bitsDamageType, int iKillType = 0, Vector *reportedPosition = NULL );
+	void			Set( IHandleEntity *pInflictor, IHandleEntity *pAttacker, IHandleEntity *pWeapon, const Vector &damageForce, const Vector &damagePosition, float flDamage, int bitsDamageType, int iKillType = 0, Vector *reportedPosition = NULL );
 
 	void			AdjustPlayerDamageInflictedForSkillLevel();
 	void			AdjustPlayerDamageTakenForSkillLevel();
@@ -107,14 +107,14 @@ public:
 	void			CopyDamageToBaseDamage();
 
 protected:
-	void			Init( CBaseEntity *pInflictor, CBaseEntity *pAttacker, CBaseEntity *pWeapon, const Vector &damageForce, const Vector &damagePosition, const Vector &reportedPosition, float flDamage, int bitsDamageType, int iKillType );
+	void			Init( IHandleEntity *pInflictor, IHandleEntity *pAttacker, IHandleEntity *pWeapon, const Vector &damageForce, const Vector &damagePosition, const Vector &reportedPosition, float flDamage, int bitsDamageType, int iKillType );
 
 	Vector			m_vecDamageForce;
 	Vector			m_vecDamagePosition;
 	Vector			m_vecReportedPosition;	// Position players are told damage is coming from
-	EHANDLE			m_hInflictor;
-	EHANDLE			m_hAttacker;
-	EHANDLE			m_hWeapon;
+	CHandle<IHandleEntity>	m_hInflictor;
+	CHandle<IHandleEntity>	m_hAttacker;
+	CHandle<IHandleEntity>	m_hWeapon;
 	float			m_flDamage;
 	float			m_flMaxDamage;
 	float			m_flBaseDamage;			// The damage amount before skill leve adjustments are made. Used to get uniform damage forces.
@@ -140,13 +140,13 @@ public:
 	CMultiDamage();
 
 	bool			IsClear( void ) { return (m_hTarget == NULL); }
-	CBaseEntity		*GetTarget() const;
-	void			SetTarget( CBaseEntity *pTarget );
+	IHandleEntity		*GetTarget() const;
+	void			SetTarget( IHandleEntity *pTarget );
 
-	void			Init( CBaseEntity *pTarget, CBaseEntity *pInflictor, CBaseEntity *pAttacker, CBaseEntity *pWeapon, const Vector &damageForce, const Vector &damagePosition, const Vector &reportedPosition, float flDamage, int bitsDamageType, int iKillType );
+	void			Init( IHandleEntity *pTarget, IHandleEntity *pInflictor, IHandleEntity *pAttacker, IHandleEntity *pWeapon, const Vector &damageForce, const Vector &damagePosition, const Vector &reportedPosition, float flDamage, int bitsDamageType, int iKillType );
 
 protected:
-	EHANDLE			m_hTarget;
+	CHandle<IHandleEntity> m_hTarget;
 
 	DECLARE_SIMPLE_DATADESC();
 };
@@ -156,7 +156,7 @@ extern CMultiDamage g_MultiDamage;
 // Multidamage accessors
 void ClearMultiDamage( void );
 void ApplyMultiDamage( void );
-void AddMultiDamage( const CTakeDamageInfo &info, CBaseEntity *pEntity );
+void AddMultiDamage( const CTakeDamageInfo &info, IHandleEntity *pEntity );
 
 //-----------------------------------------------------------------------------
 // Purpose: Utility functions for physics damage force calculation 
@@ -172,36 +172,36 @@ void GuessDamageForce( CTakeDamageInfo *info, const Vector &vecForceDir, const V
 // Inlines.
 // -------------------------------------------------------------------------------------------------- //
 
-inline CBaseEntity* CTakeDamageInfo::GetInflictor() const
+inline IHandleEntity* CTakeDamageInfo::GetInflictor() const
 {
 	return m_hInflictor;
 }
 
 
-inline void CTakeDamageInfo::SetInflictor( CBaseEntity *pInflictor )
+inline void CTakeDamageInfo::SetInflictor( IHandleEntity *pInflictor )
 {
 	m_hInflictor = pInflictor;
 }
 
 
-inline CBaseEntity* CTakeDamageInfo::GetAttacker() const
+inline IHandleEntity* CTakeDamageInfo::GetAttacker() const
 {
 	return m_hAttacker;
 }
 
 
-inline void CTakeDamageInfo::SetAttacker( CBaseEntity *pAttacker )
+inline void CTakeDamageInfo::SetAttacker( IHandleEntity *pAttacker )
 {
 	m_hAttacker = pAttacker;
 }
 
-inline CBaseEntity* CTakeDamageInfo::GetWeapon() const
+inline IHandleEntity* CTakeDamageInfo::GetWeapon() const
 {
 	return m_hWeapon;
 }
 
 
-inline void CTakeDamageInfo::SetWeapon( CBaseEntity *pWeapon )
+inline void CTakeDamageInfo::SetWeapon( IHandleEntity *pWeapon )
 {
 	m_hWeapon = pWeapon;
 }
@@ -358,12 +358,12 @@ inline void CTakeDamageInfo::CopyDamageToBaseDamage()
 // -------------------------------------------------------------------------------------------------- //
 // Inlines.
 // -------------------------------------------------------------------------------------------------- //
-inline CBaseEntity *CMultiDamage::GetTarget() const
+inline IHandleEntity *CMultiDamage::GetTarget() const
 {
 	return m_hTarget;
 }
 
-inline void CMultiDamage::SetTarget( CBaseEntity *pTarget )
+inline void CMultiDamage::SetTarget( IHandleEntity *pTarget )
 {
 	m_hTarget = pTarget;
 }

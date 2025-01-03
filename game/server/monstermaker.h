@@ -141,7 +141,7 @@ public:
 	virtual void MakeMultipleNPCS( int nNPCs );
 
 protected:
-	virtual void PrecacheTemplateEntity( CBaseEntity *pEntity );
+	virtual void PrecacheTemplateEntity( IServerEntity *pEntity );
 
 	bool PlaceNPCInRadius( CAI_BaseNPC *pNPC );
 	bool PlaceNPCInLine( CAI_BaseNPC *pNPC );

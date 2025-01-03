@@ -109,7 +109,7 @@ void CAI_LookTarget::Reserve( float flDuration )
 //---------------------------------------------------------
 CAI_LookTarget *CAI_LookTarget::GetFirstLookTarget()
 {
-	CBaseEntity		*pEnt;
+	IServerEntity		*pEnt;
 
 	string_t iszLookTarget = FindPooledString( "ai_looktarget" );
 	if( iszLookTarget == NULL_STRING )
@@ -130,7 +130,7 @@ CAI_LookTarget *CAI_LookTarget::GetFirstLookTarget()
 //---------------------------------------------------------
 CAI_LookTarget *CAI_LookTarget::GetNextLookTarget( CAI_LookTarget *pCurrentTarget )
 {
-	CBaseEntity		*pEnt;
+	IServerEntity		*pEnt;
 
 	string_t iszLookTarget = FindPooledString( "ai_looktarget" );
 	if( iszLookTarget == NULL_STRING )

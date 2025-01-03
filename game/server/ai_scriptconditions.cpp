@@ -492,7 +492,7 @@ void CAI_ScriptConditions::EvaluationThink()
 		}
 
 		CBaseEntity *pActor = pConditionElement->GetActor();
-		CBaseEntity *pActivator = this;
+		IServerEntity *pActivator = this;
 
 #ifdef HL2_EPISODIC
 		if ( pActor && GetEngineObject()->HasSpawnFlags( SF_ACTOR_AS_ACTIVATOR ) )
@@ -605,9 +605,9 @@ int CAI_ScriptConditions::AddNewElement( CBaseEntity *pActor )
 
 void CAI_ScriptConditions::Enable( void )
 {
-	m_hTarget = EntityList()->FindEntityByName( NULL, m_target );
+	m_hTarget = (CBaseEntity*)EntityList()->FindEntityByName( NULL, m_target );
 
-	CBaseEntity *pActor = EntityList()->FindEntityByName( NULL, m_Actor );
+	IServerEntity *pActor = EntityList()->FindEntityByName( NULL, m_Actor );
 	if ( m_ElementList.Count() == 0 )
 	{
 		if ( m_Actor != NULL_STRING && pActor == NULL )
@@ -618,7 +618,7 @@ void CAI_ScriptConditions::Enable( void )
 			return;
 		}
 
-		if ( pActor && pActor->MyNPCPointer() == NULL )
+		if ( pActor && ((CBaseEntity*)pActor)->MyNPCPointer() == NULL )
 		{
 			Warning( "Script condition warning: warning actor is not an NPC\n" );
 			Disable();
@@ -628,9 +628,9 @@ void CAI_ScriptConditions::Enable( void )
 
 	while( pActor != NULL )
 	{
-		if( !ActorInList(pActor) )
+		if( !ActorInList((CBaseEntity*)pActor) )
 		{
-			AddNewElement( pActor );
+			AddNewElement((CBaseEntity*)pActor );
 		}
 
 		pActor = EntityList()->FindEntityByName( pActor, m_Actor );
@@ -639,7 +639,7 @@ void CAI_ScriptConditions::Enable( void )
 	//If we are hitting this it means we are using a Target->Player condition
 	if ( m_Actor == NULL_STRING )
 	{
-		if( !ActorInList(pActor) )
+		if( !ActorInList((CBaseEntity*)pActor) )
 		{
 			AddNewElement( NULL );
 		}
@@ -817,7 +817,7 @@ bool CAI_ScriptConditions::ActorInList( CBaseEntity *pActor )
 
 //-----------------------------------------------------------------------------
 
-void CAI_ScriptConditions::OnEntitySpawned( CBaseEntity *pEntity )
+void CAI_ScriptConditions::OnEntitySpawned( IServerEntity *pEntity )
 {
 	if( m_fDisabled && m_bLeaveAsleep )
 	{
@@ -826,14 +826,14 @@ void CAI_ScriptConditions::OnEntitySpawned( CBaseEntity *pEntity )
 		return;
 	}
 
-	if ( pEntity->MyNPCPointer() == NULL )
+	if ( !pEntity->IsNPC() )
 		 return;
 
 	if ( pEntity->NameMatches( m_Actor ) )
 	{
-		if ( ActorInList( pEntity ) == false )
+		if ( ActorInList((CBaseEntity*)pEntity ) == false )
 		{
-			AddNewElement( pEntity );
+			AddNewElement((CBaseEntity*)pEntity );
 
 			if ( m_fDisabled == true && m_bLeaveAsleep == false )
 			{

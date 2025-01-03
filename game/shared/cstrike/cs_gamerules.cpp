@@ -807,7 +807,7 @@ ConVar cl_autohelp(
 		
 		bool addDefault = true;
 
-		CBaseEntity	*pWeaponEntity = NULL;
+		IServerEntity	*pWeaponEntity = NULL;
 		while ( ( pWeaponEntity = EntityList()->FindEntityByClassname( pWeaponEntity, "game_player_equip" )) != NULL )
 		{
 			if ( addDefault )
@@ -859,7 +859,7 @@ ConVar cl_autohelp(
 		{
 			retval = 1.0;
 		}
-		else if (!(tr.DidHitWorld()) && (tr.m_pEnt != NULL) && (tr.m_pEnt != pEntityToIgnore) && (((CBaseEntity*)tr.m_pEnt)->GetOwnerEntity() != pEntityToIgnore))
+		else if (!(tr.DidHitWorld()) && (tr.m_pEnt != NULL) && (tr.m_pEnt != pEntityToIgnore) && (tr.m_pEnt->GetOwnerEntity() != pEntityToIgnore))
 		{
 			// if we didn't hit world geometry perhaps there's still damage to be done here.
 
@@ -1003,10 +1003,10 @@ ConVar cl_autohelp(
         int numberOfEnemyPlayersKilledByThisExplosion = 0;
 		
 		// [tj] who we award the achievement to if enough players are killed
-		CCSPlayer* pCSExplosionAttacker = ToCSPlayer(info.GetAttacker());
+		CCSPlayer* pCSExplosionAttacker = ToCSPlayer((IServerEntity*)info.GetAttacker());
 
 		// [tj] used to determine which achievement to award for sufficient kills
-		CBaseEntity* pInflictor = info.GetInflictor();
+		IServerEntity* pInflictor = (IServerEntity*)info.GetInflictor();
 		bool isGrenade = pInflictor && V_strcmp(pInflictor->GetClassname(), "hegrenade_projectile") == 0;
 		bool isBomb = pInflictor && V_strcmp(pInflictor->GetClassname(), "planted_c4") == 0;
          
@@ -1239,8 +1239,8 @@ ConVar cl_autohelp(
 		int killer_ID = 0;
 
 		// Find the killer & the scorer
-		CBaseEntity *pInflictor = info.GetInflictor();
-		CBaseEntity *pKiller = info.GetAttacker();
+		CBaseEntity *pInflictor = (CBaseEntity*)info.GetInflictor();
+		CBaseEntity *pKiller = (CBaseEntity*)info.GetAttacker();
 		CBasePlayer *pScorer = GetDeathScorer( pKiller, pInflictor );
 		CCSPlayer *pCSVictim = (CCSPlayer*)(pVictim);
 
@@ -1325,8 +1325,8 @@ ConVar cl_autohelp(
 	//=========================================================
 	void CCSGameWorld::PlayerKilled( CBasePlayer *pVictim, const CTakeDamageInfo &info )
 	{
-		CBaseEntity *pInflictor = info.GetInflictor();
-		CBaseEntity *pKiller = info.GetAttacker();
+		CBaseEntity *pInflictor = (CBaseEntity*)info.GetInflictor();
+		CBaseEntity *pKiller = (CBaseEntity*)info.GetAttacker();
 		CBasePlayer *pScorer = GetDeathScorer( pKiller, pInflictor );
 		CCSPlayer *pCSVictim = (CCSPlayer *)pVictim;
 		CCSPlayer *pCSScorer = (CCSPlayer *)pScorer;
@@ -3544,14 +3544,14 @@ ConVar cl_autohelp(
 			// Count the number of spawn points for each team
 			// This determines the maximum number of players allowed on each
 
-			CBaseEntity* ent = NULL; 
+			IServerEntity* ent = NULL; 
 			
 			m_iSpawnPointCount_Terrorist	= 0;
 			m_iSpawnPointCount_CT			= 0;
 
 			while ( ( ent = EntityList()->FindEntityByClassname( ent, "info_player_terrorist" ) ) != NULL )
 			{
-				if ( IsSpawnPointValid( ent, NULL ) )
+				if ( IsSpawnPointValid((CBaseEntity*)ent, NULL ) )
 				{
 					m_iSpawnPointCount_Terrorist++;
 				}
@@ -3564,7 +3564,7 @@ ConVar cl_autohelp(
 
 			while ( ( ent = EntityList()->FindEntityByClassname( ent, "info_player_counterterrorist" ) ) != NULL )
 			{
-				if ( IsSpawnPointValid( ent, NULL ) ) 
+				if ( IsSpawnPointValid((CBaseEntity*)ent, NULL ) )
 				{
 					m_iSpawnPointCount_CT++;
 				}
@@ -3585,11 +3585,11 @@ ConVar cl_autohelp(
 
 	void CCSGameWorld::ShowSpawnPoints( void )
 	{
-		CBaseEntity* ent = NULL;
+		IServerEntity* ent = NULL;
 		
 		while ( ( ent = EntityList()->FindEntityByClassname( ent, "info_player_terrorist" ) ) != NULL )
 		{
-			if ( IsSpawnPointValid( ent, NULL ) )
+			if ( IsSpawnPointValid((CBaseEntity*)ent, NULL ) )
 			{
 				NDebugOverlay::Box( ent->GetEngineObject()->GetAbsOrigin(), VEC_HULL_MIN, VEC_HULL_MAX, 0, 255, 0, 200, 600 );
 			}
@@ -3601,7 +3601,7 @@ ConVar cl_autohelp(
 
 		while ( ( ent = EntityList()->FindEntityByClassname( ent, "info_player_counterterrorist" ) ) != NULL )
 		{
-			if ( IsSpawnPointValid( ent, NULL ) ) 
+			if ( IsSpawnPointValid((CBaseEntity*)ent, NULL ) )
 			{
 				NDebugOverlay::Box( ent->GetEngineObject()->GetAbsOrigin(), VEC_HULL_MIN, VEC_HULL_MAX, 0, 255, 0, 200, 600 );
 			}
@@ -4529,7 +4529,7 @@ ConVar cl_autohelp(
 		// then remove everything else except the players.
 
 		// Get rid of all entities except players.
-		CBaseEntity *pCur = EntityList()->FirstEnt();
+		IServerEntity *pCur = EntityList()->FirstEnt();
 		while ( pCur )
 		{
 			CWeaponCSBase *pWeapon = dynamic_cast< CWeaponCSBase* >( pCur );
@@ -4590,7 +4590,7 @@ ConVar cl_autohelp(
 			}
 
 
-			virtual CBaseEntity* CreateNextEntity( const char *pClassname )
+			virtual IServerEntity* CreateNextEntity( const char *pClassname )
 			{
 				if ( m_iIterator == g_MapEntityRefs.InvalidIndex() )
 				{
@@ -4609,13 +4609,13 @@ ConVar cl_autohelp(
 					{
 						// Doh! The entity was delete and its slot was reused.
 						// Just use any old edict slot. This case sucks because we lose the baseline.
-						return (CBaseEntity*)EntityList()->CreateEntityByName( pClassname );
+						return EntityList()->CreateEntityByName( pClassname );
 					}
 					else
 					{
 						// Cool, the slot where this entity was is free again (most likely, the entity was 
 						// freed above). Now create an entity with this specific index.
-						return (CBaseEntity*)EntityList()->CreateEntityByName( pClassname, ref.m_iEdict );
+						return EntityList()->CreateEntityByName( pClassname, ref.m_iEdict );
 					}
 				}
 			}
@@ -4659,10 +4659,10 @@ ConVar cl_autohelp(
 		CSGameRules()->TerminateRound( 0.0f, Round_Draw );
 	}
 
-	CBaseEntity *CCSGameWorld::GetPlayerSpawnSpot( CBasePlayer *pPlayer )
+	IServerEntity *CCSGameWorld::GetPlayerSpawnSpot( CBasePlayer *pPlayer )
 	{
 		// gat valid spwan point
-		CBaseEntity *pSpawnSpot = pPlayer->EntSelectSpawnPoint();
+		IServerEntity *pSpawnSpot = pPlayer->EntSelectSpawnPoint();
 
 		// drop down to ground
 		Vector GroundPos = DropToGround( pPlayer, pSpawnSpot->GetEngineObject()->GetAbsOrigin(), VEC_HULL_MIN, VEC_HULL_MAX );
@@ -5326,7 +5326,7 @@ CON_COMMAND_F( map_showbombradius, "Shows bomb radius from the center of each bo
 	float flBombRadius = flBombDamage * 3.5f;
 	Msg( "Bomb Damage is %.0f, Radius is %.0f\n", flBombDamage, flBombRadius );
 
-	CBaseEntity* ent = NULL;
+	IServerEntity* ent = NULL;
 	while ( ( ent = EntityList()->FindEntityByClassname( ent, "func_bomb_target" ) ) != NULL )
 	{
 		const Vector &pos = ent->WorldSpaceCenter();
@@ -5429,8 +5429,8 @@ bool CCSGameWorld::IsPistolRound()
 
 void CCSGameWorld::PlayerTookDamage(CCSPlayer* player, const CTakeDamageInfo &damageInfo)
 {
-	CBaseEntity *pInflictor = damageInfo.GetInflictor();
-	CBaseEntity *pAttacker = damageInfo.GetAttacker();
+	CBaseEntity *pInflictor = (CBaseEntity*)damageInfo.GetInflictor();
+	CBaseEntity *pAttacker = (CBaseEntity*)damageInfo.GetAttacker();
 	CCSPlayer *pCSScorer = (CCSPlayer *)(GetDeathScorer( pAttacker, pInflictor ));
 
 	if ( player && pCSScorer )

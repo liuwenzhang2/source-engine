@@ -407,7 +407,7 @@ void CBounceBomb::Flip( const Vector &vecForce, const AngularImpulse &torque )
 #define MINE_MIN_PROXIMITY_SQR	676 // 27 inches
 bool CBounceBomb::IsValidLocation() 
 {
-	CBaseEntity *pAvoidObject = NULL;
+	IServerEntity *pAvoidObject = NULL;
 	float flAvoidForce = 0.0f;
 	CAI_Hint *pHint;
 	CHintCriteria criteria;
@@ -424,7 +424,7 @@ bool CBounceBomb::IsValidLocation()
 	else
 	{
 		// Look for other mines that are too close to me.
-		CBaseEntity *pEntity = EntityList()->FirstEnt();
+		IServerEntity *pEntity = EntityList()->FirstEnt();
 		Vector vecMyPosition = GetEngineObject()->GetAbsOrigin();
 		while( pEntity )
 		{

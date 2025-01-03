@@ -15,6 +15,7 @@
 // Includes
 //-----------------------------------------------------------------------------
 #include "player_pickup.h"	// for combine ball inheritance
+#include "baseanimating.h"
 
 //-----------------------------------------------------------------------------
 // Forward declarations
@@ -34,7 +35,7 @@ public:
 
 	virtual void Precache();
 	virtual void Spawn();
-	virtual bool IsCombineBall() { return true; }
+	virtual bool IsCombineBall() const { return true; }
 	virtual void UpdateOnRemove();
 	void StopLoopingSounds();
 

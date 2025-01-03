@@ -60,7 +60,7 @@ void CFunc_LiquidPortal::Spawn( void )
 	GetEngineObject()->SetMoveType( MOVETYPE_NONE );
 	SetModel( STRING(GetEngineObject()->GetModelName() ) );
 
-	CBaseEntity *pBaseEnt = EntityList()->FindEntityByName( NULL, STRING(m_strInitialLinkedPortal) );
+	IServerEntity *pBaseEnt = EntityList()->FindEntityByName( NULL, STRING(m_strInitialLinkedPortal) );
 	Assert( (pBaseEnt == NULL) || (dynamic_cast<CFunc_LiquidPortal *>(pBaseEnt) != NULL) );
 	SetLinkedLiquidPortal( (CFunc_LiquidPortal *)pBaseEnt );
 	SetThink( &CFunc_LiquidPortal::Think );
@@ -154,7 +154,7 @@ int	CFunc_LiquidPortal::Restore( IRestore &restore )
 
 void CFunc_LiquidPortal::InputSetLinkedLiquidPortal( inputdata_t &inputdata )
 {
-	CBaseEntity *pBaseEnt = EntityList()->FindEntityByName( NULL, inputdata.value.String() );
+	IServerEntity *pBaseEnt = EntityList()->FindEntityByName( NULL, inputdata.value.String() );
 	Assert( (pBaseEnt == NULL) || (dynamic_cast<CFunc_LiquidPortal *>(pBaseEnt) != NULL) );
 	SetLinkedLiquidPortal( (CFunc_LiquidPortal *)pBaseEnt );
 }
@@ -189,9 +189,9 @@ void CFunc_LiquidPortal::InputAddActivatorToTeleportList( inputdata_t &inputdata
 			return; //only have 1 reference of each entity
 	}
 
-	m_hTeleportList.AddToTail( inputdata.pActivator );
+	m_hTeleportList.AddToTail((CBaseEntity*)inputdata.pActivator );
 	if( m_bFillInProgress )
-		m_hLeftToTeleportThisFill.AddToTail( inputdata.pActivator );
+		m_hLeftToTeleportThisFill.AddToTail((CBaseEntity*)inputdata.pActivator );
 	
 	if( inputdata.pActivator->IsPlayer() )
 		((CPortal_Player *)inputdata.pActivator)->m_hSurroundingLiquidPortal = this;

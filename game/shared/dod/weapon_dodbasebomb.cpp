@@ -148,7 +148,7 @@ void CDODBaseBombWeapon::PrimaryAttack()
 	}
 
 	// find nearby, visible bomb targets
-	CBaseEntity *pEnt = NULL;
+	IServerEntity *pEnt = NULL;
 	CDODBombTarget *pBestTarget = NULL;
 
 	float flBestDist = FLT_MAX;

@@ -594,7 +594,7 @@ void CPropCombineBall::InputSocketed( inputdata_t &inputdata )
 	}
 
 	// if our owner is a player, tell them we were socketed
-	CHL2_Player *pPlayer = dynamic_cast<CHL2_Player *>( pOwner );
+	CHL2_Player *pPlayer = ToHL2Player( pOwner );
 	if ( pPlayer )
 	{
 		pPlayer->CombineBallSocketed( this );
@@ -1150,7 +1150,7 @@ void CPropCombineBall::DoExplosion( )
 	if( !m_bStruckEntity && hl2_episodic.GetBool() && GetOwnerEntity() != NULL )
 	{
 		// Notify the player proxy that this combine ball missed so that it can fire an output.
-		CHL2_Player *pPlayer = dynamic_cast<CHL2_Player *>( GetOwnerEntity() );
+		CHL2_Player *pPlayer = ToHL2Player( GetOwnerEntity() );
 		if ( pPlayer )
 		{
 			pPlayer->MissedAR2AltFire();
@@ -1349,7 +1349,7 @@ void CPropCombineBall::DoImpactEffect( const Vector &preVelocity, int index, gam
 	trace_t tr;
 	CollisionEventToTrace( !index, pEvent, tr );
 	
-	CBaseEntity *pTraceEntity = pEvent->pEntities[index];
+	CBaseEntity *pTraceEntity = (CBaseEntity*)pEvent->pEntities[index];
 	UTIL_TraceLine( tr.startpos - preVelocity * 2.0f, tr.startpos + preVelocity * 2.0f, MASK_SOLID, pTraceEntity, COLLISION_GROUP_NONE, &tr );
 
 	if ( tr.fraction < 1.0f )
@@ -1638,7 +1638,7 @@ void CPropCombineBall::VPhysicsCollision( int index, gamevcollisionevent_t *pEve
 
 		if( pHit->game.material != CHAR_TEX_FLESH || !hl2_episodic.GetBool() )
 		{
-			CBaseEntity *pHitEntity = pEvent->pEntities[!index];
+			CBaseEntity *pHitEntity = (CBaseEntity*)pEvent->pEntities[!index];
 			if ( pHitEntity && IsHittableEntity( pHitEntity ) )
 			{
 				OnHitEntity( pHitEntity, flSpeed, index, pEvent );
@@ -1675,7 +1675,7 @@ void CPropCombineBall::VPhysicsCollision( int index, gamevcollisionevent_t *pEve
 	vecFinalVelocity *= GetSpeed();
 	EntityList()->PhysCallbackSetVelocity( pEvent->pObjects[index], vecFinalVelocity );
 
-	CBaseEntity *pHitEntity = pEvent->pEntities[!index];
+	CBaseEntity *pHitEntity = (CBaseEntity*)pEvent->pEntities[!index];
 	if ( pHitEntity && IsHittableEntity( pHitEntity ) )
 	{
 		OnHitEntity( pHitEntity, flSpeed, index, pEvent );

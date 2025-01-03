@@ -191,7 +191,7 @@ public:
 	void	ShockTouch( IServerEntity *pOther );
 	void	CloseTouch( IServerEntity *pOther );
 	void	EmbedTouch( IServerEntity *pOther );
-	float	GetAttackDamageScale( CBaseEntity *pVictim );
+	float	GetAttackDamageScale( IHandleEntity *pVictim );
 	void	VPhysicsCollision( int index, gamevcollisionevent_t *pEvent );
 	void	Precache( void );
 	void	OnPhysGunPickup( CBasePlayer *pPhysGunUser, PhysGunPickup_t reason );
@@ -438,7 +438,7 @@ bool NPC_Rollermine_IsRollermine( CBaseEntity *pEntity )
 
 CBaseEntity *NPC_Rollermine_DropFromPoint( const Vector &originStart, CBaseEntity *pOwner, const char *pszTemplate )
 {
-	CBaseEntity *pEntity = NULL;
+	IServerEntity *pEntity = NULL;
 	CNPC_RollerMine *pMine = NULL;
 
 	// Use the template, if we have it
@@ -934,7 +934,7 @@ int CNPC_RollerMine::GetHackedIdleSchedule( void )
 		return SCHED_NONE;
 
 	// Are we near the player?
-	CBaseEntity *pPlayer = EntityList()->FindEntityByName( NULL, "!player" );
+	IServerEntity *pPlayer = EntityList()->FindEntityByName( NULL, "!player" );
 	if ( !pPlayer )
 		return SCHED_NONE;
 
@@ -1566,7 +1566,7 @@ void CNPC_RollerMine::RunTask( const Task_t *pTask )
 				return;
 			}
 
-			CBaseEntity *pPlayer = EntityList()->FindEntityByName( NULL, "!player" );
+			IServerEntity *pPlayer = EntityList()->FindEntityByName( NULL, "!player" );
 			if ( !pPlayer || m_bHeld || m_hVehicleStuckTo )
 			{
 				TaskFail( FAIL_NO_TARGET );
@@ -1880,7 +1880,7 @@ bool CNPC_RollerMine::IsPlayerVehicle( CBaseEntity *pEntity )
 // Input  : *pVictim - 
 // Output : float
 //-----------------------------------------------------------------------------
-float CNPC_RollerMine::GetAttackDamageScale( CBaseEntity *pVictim )
+float CNPC_RollerMine::GetAttackDamageScale( IHandleEntity *pVictim )
 {
 	// If we're friendly, don't damage players or player-friendly NPCs, even with collisions
 	if (GetEngineObject()->HasSpawnFlags( SF_ROLLERMINE_FRIENDLY ) )
@@ -1888,11 +1888,11 @@ float CNPC_RollerMine::GetAttackDamageScale( CBaseEntity *pVictim )
 		if ( pVictim->IsPlayer() )
 			return 0;
 		
-		if ( pVictim->MyNPCPointer() )
+		if ( pVictim->IsNPC() )
 		{
 			// If we don't hate the player, we're immune
 			CBasePlayer *pPlayer = ToBasePlayer(EntityList()->GetPlayerByIndex(1));
-			if ( pPlayer && pVictim->MyNPCPointer()->IRelationType( pPlayer ) != D_HT )
+			if ( pPlayer && ((CBaseEntity*)pVictim)->MyNPCPointer()->IRelationType( pPlayer ) != D_HT )
 				return 0.0;
 		}
 	}
@@ -2105,7 +2105,7 @@ void CNPC_RollerMine::VPhysicsCollision( int index, gamevcollisionevent_t *pEven
 {
 	// Make sure we don't keep hitting the same entity
 	int otherIndex = !index;
-	CBaseEntity *pOther = pEvent->pEntities[otherIndex];
+	CBaseEntity *pOther = (CBaseEntity*)pEvent->pEntities[otherIndex];
 	if ( pEvent->deltaCollisionTime < 0.5 && (pOther == this) )
 		return;
 

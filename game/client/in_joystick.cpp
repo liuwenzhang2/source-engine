@@ -241,7 +241,7 @@ float AutoAimDampening( float x, int axis, float dist )
 	if( joy_autoaimdampen.GetFloat() > 0.0f && fabs(x) < joy_autoaimdampenrange.GetFloat() )
 	{
 		// Get the HL2 player
-		C_BaseHLPlayer *pLocalPlayer = (C_BaseHLPlayer *)EntityList()->GetLocalPlayer();
+		C_BaseHLPlayer *pLocalPlayer = ToHL2Player(EntityList()->GetLocalPlayer());
 
 		if( pLocalPlayer )
 		{

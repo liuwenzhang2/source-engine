@@ -379,9 +379,9 @@ int	CNPC_Barnacle::OnTakeDamage_Alive( const CTakeDamageInfo &inputInfo )
 		SetActivity( ACT_SMALL_FLINCH );
 	}
 
-	if( hl2_episodic.GetBool() && info.GetAttacker() && info.GetAttacker()->Classify() == CLASS_PLAYER_ALLY_VITAL )
+	if( hl2_episodic.GetBool() && info.GetAttacker() && ((CBaseEntity*)info.GetAttacker())->Classify() == CLASS_PLAYER_ALLY_VITAL )
 	{
-		if( FClassnameIs( info.GetAttacker(), "npc_alyx" ) )
+		if( FClassnameIs((CBaseEntity*)info.GetAttacker(), "npc_alyx" ) )
 		{
 			// Alyx does double damage to barnacles, so that she can save the 
 			// player's life in a more timely fashion. (sjb)
@@ -2094,7 +2094,7 @@ void CNPC_Barnacle::SpawnDeathGibs( void )
 //-----------------------------------------------------------------------------
 void CNPC_Barnacle::Event_Killed( const CTakeDamageInfo &info )
 {
-	m_OnDeath.FireOutput( info.GetAttacker(), this );
+	m_OnDeath.FireOutput((IServerEntity*)info.GetAttacker(), this );
 	SendOnKilledGameEvent( info );
 
 	GetEngineObject()->AddSolidFlags( FSOLID_NOT_SOLID );
@@ -2445,10 +2445,10 @@ bool CTongueEntitiesEnum::AddToList( CBaseEntity *pEntity )
 
 IterationRetval_t CTongueEntitiesEnum::EnumElement( IHandleEntity *pHandleEntity )
 {
-	CBaseEntity *pEntity = EntityList()->GetBaseEntityFromHandle( pHandleEntity->GetRefEHandle() );
+	IServerEntity *pEntity = EntityList()->GetBaseEntityFromHandle( pHandleEntity->GetRefEHandle() );
 	if ( pEntity )
 	{
-		if ( !AddToList( pEntity ) )
+		if ( !AddToList((CBaseEntity*)pEntity ) )
 			return ITERATION_STOP;
 	}
 	return ITERATION_CONTINUE;

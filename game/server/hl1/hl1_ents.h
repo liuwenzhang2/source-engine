@@ -26,7 +26,7 @@ public:
 	void	Stop( void );
 	void	Touch( IServerEntity *pOther );
 	void	RopeTouch ( IServerEntity *pOther );// this touch func makes the pendulum a rope
-	void	Blocked( CBaseEntity *pOther );
+	void	Blocked( IServerEntity *pOther );
 
 	// Input handlers.
 	void	InputActivate( inputdata_t &inputdata );

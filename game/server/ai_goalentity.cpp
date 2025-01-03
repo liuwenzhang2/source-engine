@@ -94,7 +94,7 @@ void CAI_GoalEntity::ResolveNames()
 {
 	m_actors.SetCount( 0 );
 	
-	CBaseEntity *pEntity = NULL;
+	IServerEntity *pEntity = NULL;
 	for (;;)
 	{
 		switch ( m_SearchType )
@@ -115,7 +115,7 @@ void CAI_GoalEntity::ResolveNames()
 		if ( !pEntity )
 			break;
 			
-		CAI_BaseNPC *pActor = pEntity->MyNPCPointer();
+		CAI_BaseNPC *pActor = ((CBaseEntity*)pEntity)->MyNPCPointer();
 		
 		if ( pActor  && pActor->GetState() != NPC_STATE_DEAD )
 		{
@@ -125,7 +125,7 @@ void CAI_GoalEntity::ResolveNames()
 		}
 	}
 		
-	m_hGoalEntity = EntityList()->FindEntityByName( NULL, m_iszGoal );
+	m_hGoalEntity = (CBaseEntity*)EntityList()->FindEntityByName( NULL, m_iszGoal );
 }
 
 //-------------------------------------
@@ -242,11 +242,11 @@ void CAI_GoalEntity::UpdateOnRemove()
 
 //-------------------------------------
 
-void CAI_GoalEntity::OnEntityCreated( CBaseEntity *pEntity )
+void CAI_GoalEntity::OnEntityCreated( IServerEntity *pEntity )
 {
 	Assert( m_flags & ACTIVE );
 	
-	if ( pEntity->MyNPCPointer() )
+	if ( pEntity->IsNPC() )
 	{
 		SetThink( &CAI_GoalEntity::DelayedRefresh );
 		GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.1f );
@@ -256,7 +256,7 @@ void CAI_GoalEntity::OnEntityCreated( CBaseEntity *pEntity )
 
 //-------------------------------------
 
-void CAI_GoalEntity::OnEntityDeleted( CBaseEntity *pEntity )
+void CAI_GoalEntity::OnEntityDeleted( IServerEntity *pEntity )
 {
 	Assert( pEntity != this );
 }

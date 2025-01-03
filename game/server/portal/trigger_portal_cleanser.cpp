@@ -81,16 +81,16 @@ void CTriggerPortalCleanser::Spawn( void )
 // Uses simple physics entities declared in physobj.cpp
 CBaseEntity* ConvertToSimpleProp ( CBaseEntity* pEnt )
 {
-	CBaseEntity *pRetVal = NULL;
+	IServerEntity *pRetVal = NULL;
 	int modelindex = pEnt->GetEngineObject()->GetModelIndex();
 	const model_t *model = modelinfo->GetModel( modelindex );
 	if ( model && modelinfo->GetModelType(model) == mod_brush )
 	{
-		pRetVal = (CBaseEntity*)EntityList()->CreateEntityByName( "simple_physics_brush" );
+		pRetVal = EntityList()->CreateEntityByName( "simple_physics_brush" );
 	}
 	else
 	{
-		pRetVal = (CBaseEntity*)EntityList()->CreateEntityByName( "simple_physics_prop" );
+		pRetVal = EntityList()->CreateEntityByName( "simple_physics_prop" );
 	}
 
 	pRetVal->KeyValue( "model", STRING(pEnt->GetEngineObject()->GetModelName()) );
@@ -99,7 +99,7 @@ CBaseEntity* ConvertToSimpleProp ( CBaseEntity* pEnt )
 	pRetVal->Spawn();
 	pRetVal->GetEngineObject()->VPhysicsInitNormal( SOLID_VPHYSICS, 0, false );
 	
-	return pRetVal;
+	return (CBaseEntity*)pRetVal;
 }
 
 
@@ -170,7 +170,7 @@ void CTriggerPortalCleanser::Touch( IServerEntity *pOther )
 				{
 					pPortalgun->SendWeaponAnim( ACT_VM_FIZZLE );
 					pPortalgun->SetLastFiredPortal( 0 );
-					m_OnFizzle.FireOutput((CBaseEntity*)pOther, this );
+					m_OnFizzle.FireOutput(pOther, this );
 					pPlayer->RumbleEffect( RUMBLE_RPG_MISSILE, 0, RUMBLE_FLAG_RESTART );
 				}
 			}
@@ -200,7 +200,7 @@ void CTriggerPortalCleanser::Touch( IServerEntity *pOther )
 		// always being 'box'. We use special logic when the cleanser dissolves a box so this is a special output for it.
 		if ( pBaseAnimating->NameMatches( "box" ) )
 		{
-			m_OnDissolveBox.FireOutput((CBaseEntity*)pOther, this );
+			m_OnDissolveBox.FireOutput(pOther, this );
 		}
 
 		if ( FClassnameIs( pBaseAnimating, "updateitem2" ) )
@@ -241,7 +241,7 @@ void CTriggerPortalCleanser::Touch( IServerEntity *pOther )
 		if ( pDisolvingObj )
 		{
 			// Remove old prop, transfer name and children to the new simple prop
-			pDisolvingObj->SetName( STRING(pBaseAnimating->GetEntityName()) );
+			pDisolvingObj->GetEngineObject()->SetName( STRING(pBaseAnimating->GetEntityName()) );
 			UTIL_TransferPoseParameters( pBaseAnimating, pDisolvingObj );
 			pBaseAnimating->GetEngineObject()->TransferChildren(pDisolvingObj->GetEngineObject());
 			pDisolvingObj->GetEngineObject()->SetCollisionGroup( COLLISION_GROUP_INTERACTIVE_DEBRIS );
@@ -273,6 +273,6 @@ void CTriggerPortalCleanser::Touch( IServerEntity *pOther )
 			pDisolvingAnimating->Dissolve( "", gpGlobals->curtime, false, ENTITY_DISSOLVE_NORMAL );
 		}
 
-		m_OnDissolve.FireOutput((CBaseEntity*)pOther, this );
+		m_OnDissolve.FireOutput(pOther, this );
 	}
 }

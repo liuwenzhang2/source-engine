@@ -111,7 +111,7 @@ extern IPhysicsGameTrace* physgametrace;
 class CPhysSaveRestoreBlockHandler : public CDefSaveRestoreBlockHandler, 
 									 public IPhysSaveRestoreManager
 #if !defined( CLIENT_DLL )
-									 , public IEntityListener<CBaseEntity>
+									 , public IEntityListener<IServerEntity>
 #endif
 {
 	struct QueuedItem_t;
@@ -515,15 +515,15 @@ public:
 	//-----------------------------------------------------
 	// IEntityListener methods
 	// This object is only a listener during restore	
-	virtual void OnEntityCreated( CBaseEntity *pEntity )
+	virtual void OnEntityCreated( IServerEntity *pEntity )
 	{
 	}
 
 	//---------------------------------
 	
-	virtual void OnEntityDeleted( CBaseEntity *pEntity )
+	virtual void OnEntityDeleted( IServerEntity *pEntity )
 	{
-		unsigned short iEntitySet = m_QueuedRestores.Find( pEntity );
+		unsigned short iEntitySet = m_QueuedRestores.Find( (CBaseEntity*)pEntity );
 		
 		if ( iEntitySet != m_QueuedRestores.InvalidIndex() )
 		{
@@ -699,7 +699,7 @@ static bool IsValidEntityPointer( void *ptr )
 	int c = EntityList()->GetHighestEntityIndex();
 	for ( int i = 0; i <= c; i++ )
 	{
-		CBaseEntity *e = (CBaseEntity*)EntityList()->GetBaseEntity( i );
+		IClientEntity *e = EntityList()->GetBaseEntity( i );
 		if ( !e )
 			continue;
 

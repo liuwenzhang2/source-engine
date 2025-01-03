@@ -636,7 +636,7 @@ void CNPC_Monk::GatherConditions()
 //-----------------------------------------------------------------------------
 bool CNPC_Monk::PassesDamageFilter( const CTakeDamageInfo &info )
 {
-	if ( info.GetAttacker()->ClassMatches( "npc_headcrab_black" ) || info.GetAttacker()->ClassMatches( "npc_headcrab_poison" ) )
+	if ( ((IServerEntity*)info.GetAttacker())->ClassMatches( "npc_headcrab_black" ) || ((IServerEntity*)info.GetAttacker())->ClassMatches( "npc_headcrab_poison" ) )
 		return false;
 
 	return BaseClass::PassesDamageFilter( info );

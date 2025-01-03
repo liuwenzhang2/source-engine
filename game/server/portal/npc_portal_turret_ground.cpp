@@ -25,7 +25,7 @@ public:
 
 	virtual void	Spawn( void );
 
-	virtual float	GetAttackDamageScale( CBaseEntity *pVictim );
+	virtual float	GetAttackDamageScale( IHandleEntity *pVictim );
 
 	virtual void	Shoot();
 	virtual void	Scan();
@@ -108,9 +108,9 @@ void CNPC_Portal_GroundTurret::Spawn( void )
 	m_vecLightOffset = vecPos - GetEngineObject()->GetAbsOrigin();
 }
 
-float CNPC_Portal_GroundTurret::GetAttackDamageScale( CBaseEntity *pVictim )
+float CNPC_Portal_GroundTurret::GetAttackDamageScale( IHandleEntity *pVictim )
 {
-	CBaseCombatCharacter *pBCC = pVictim->MyCombatCharacterPointer();
+	CBaseCombatCharacter *pBCC = ((CBaseEntity*)pVictim)->MyCombatCharacterPointer();
 
 	// Do extra damage to antlions & combine
 	if ( pBCC )

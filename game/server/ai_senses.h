@@ -142,7 +142,7 @@ private:
 
 //-----------------------------------------------------------------------------
 
-class CAI_SensedObjectsManager : public IEntityListener<CBaseEntity>
+class CAI_SensedObjectsManager : public IEntityListener<IServerEntity>
 {
 public:
 	void Init();
@@ -154,8 +154,8 @@ public:
 	virtual void 	AddEntity( CBaseEntity *pEntity );
 
 private:
-	virtual void 	OnEntitySpawned( CBaseEntity *pEntity );
-	virtual void 	OnEntityDeleted( CBaseEntity *pEntity );
+	virtual void 	OnEntitySpawned( IServerEntity *pEntity );
+	virtual void 	OnEntityDeleted( IServerEntity *pEntity );
 
 	CUtlVector<EHANDLE> m_SensedObjects;
 };

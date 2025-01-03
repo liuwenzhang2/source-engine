@@ -19,7 +19,7 @@ abstract_class IMapEntityFilter
 {
 public:
 	virtual bool ShouldCreateEntity( const char *pClassname ) = 0;
-	virtual CBaseEntity* CreateNextEntity( const char *pClassname ) = 0;
+	virtual IServerEntity* CreateNextEntity( const char *pClassname ) = 0;
 };
 
 // Use the filter so you can prevent certain entities from being created out of the map.
@@ -27,7 +27,7 @@ public:
 // entities like the world entity need to be left intact.
 void MapEntity_ParseAllEntities( const char *pMapData, IMapEntityFilter *pFilter=NULL, bool bActivateEntities=false );
 
-const char *MapEntity_ParseEntity( CBaseEntity *&pEntity, const char *pEntData, IMapEntityFilter *pFilter );
+const char *MapEntity_ParseEntity( IServerEntity *&pEntity, const char *pEntData, IMapEntityFilter *pFilter );
 void MapEntity_PrecacheEntity( const char *pEntData, int &nStringSize );
 
 
@@ -36,7 +36,7 @@ void MapEntity_PrecacheEntity( const char *pEntData, int &nStringSize );
 //-----------------------------------------------------------------------------
 struct HierarchicalSpawn_t
 {
-	CBaseEntity *m_pEntity;
+	IServerEntity *m_pEntity;
 	int			m_nDepth;
 	//CBaseEntity	*m_pDeferredParent;			// attachment parents can't be set until the parents are spawned
 	//const char	*m_pDeferredParentAttachment; // so defer setting them up until the second pass

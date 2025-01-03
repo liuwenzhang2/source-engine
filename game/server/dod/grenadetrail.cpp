@@ -70,7 +70,7 @@ void CGrenadeTrail::SetEmit(bool bVal)
 //-----------------------------------------------------------------------------
 CGrenadeTrail* CGrenadeTrail::CreateGrenadeTrail()
 {
-	CBaseEntity *pEnt = (CBaseEntity*)EntityList()->CreateEntityByName(GRENADETRAIL_ENTITYNAME);
+	IServerEntity *pEnt = EntityList()->CreateEntityByName(GRENADETRAIL_ENTITYNAME);
 	if(pEnt)
 	{
 		CGrenadeTrail *pTrail = dynamic_cast<CGrenadeTrail*>(pEnt);

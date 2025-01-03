@@ -82,7 +82,7 @@ void CEnvZoom::InputZoom( inputdata_t &inputdata )
 #ifdef HL2_DLL
 		if ( pPlayer == pPlayer->GetFOVOwner() )
 		{
-			CHL2_Player *pHLPlayer = static_cast<CHL2_Player*>( pPlayer );
+			CHL2_Player *pHLPlayer = ToHL2Player( pPlayer );
 
 			pHLPlayer->StopZooming();
 		}

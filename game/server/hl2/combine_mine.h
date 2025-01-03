@@ -24,6 +24,7 @@ class CSoundPatch;
 #define BOUNCEBOMB_EXPLODE_RADIUS	125.0
 #define BOUNCEBOMB_EXPLODE_DAMAGE	150.0
 #include "player_pickup.h"
+#include "baseanimating.h"
 
 class CBounceBomb : public CBaseAnimating//, public CDefaultPlayerPickupVPhysics
 {
@@ -59,7 +60,7 @@ public:
 	void OnPhysGunPickup( CBasePlayer *pPhysGunUser, PhysGunPickup_t reason = PICKED_UP_BY_CANNON );
 	void OnPhysGunDrop( CBasePlayer *pPhysGunUser, PhysGunDrop_t reason );
 	bool ForcePhysgunOpen( CBasePlayer *pPlayer ) { return true; }
-	bool HasPreferredCarryAnglesForPlayer( CBaseEntity *pPlayer ) { return true; }
+	bool HasPreferredCarryAnglesForPlayer( IServerEntity *pPlayer ) { return true; }
 	virtual QAngle	PreferredCarryAngles( void ) { return vec3_angle; }
 	CBasePlayer *HasPhysicsAttacker( float dt );
 

@@ -472,7 +472,7 @@ void CNPC_Manhack::TakeDamageFromVehicle( int index, gamevcollisionevent_t *pEve
 {
 	// Use the vehicle velocity to determine the damage
 	int otherIndex = !index;
-	CBaseEntity *pOther = pEvent->pEntities[otherIndex];
+	CBaseEntity *pOther = (CBaseEntity*)pEvent->pEntities[otherIndex];
 
 	float flSpeed = pEvent->preVelocity[ otherIndex ].Length();
 	flSpeed = clamp( flSpeed, 300.0f, 600.0f );
@@ -503,7 +503,7 @@ void CNPC_Manhack::TakeDamageFromVehicle( int index, gamevcollisionevent_t *pEve
 //-----------------------------------------------------------------------------
 void CNPC_Manhack::TakeDamageFromPhysicsImpact( int index, gamevcollisionevent_t *pEvent )
 {
-	CBaseEntity *pHitEntity = pEvent->pEntities[!index];
+	CBaseEntity *pHitEntity = (CBaseEntity*)pEvent->pEntities[!index];
 
 	// NOTE: Bypass the normal impact energy scale here.
 	float flDamageScale = PlayerHasMegaPhysCannon() ? 10.0f : 1.0f;
@@ -546,7 +546,7 @@ void CNPC_Manhack::VPhysicsCollision( int index, gamevcollisionevent_t *pEvent )
 	}
 
 	int otherIndex = !index;
-	CBaseEntity *pHitEntity = pEvent->pEntities[otherIndex];
+	CBaseEntity *pHitEntity = (CBaseEntity*)pEvent->pEntities[otherIndex];
 
 	CBasePlayer *pPlayer = HasPhysicsAttacker( MANHACK_SMASH_TIME );
 	if( pPlayer )
@@ -598,7 +598,7 @@ void CNPC_Manhack::VPhysicsCollision( int index, gamevcollisionevent_t *pEvent )
 void CNPC_Manhack::VPhysicsShadowCollision( int index, gamevcollisionevent_t *pEvent )
 {
 	int otherIndex = !index;
-	CBaseEntity *pOther = pEvent->pEntities[otherIndex];
+	CBaseEntity *pOther = (CBaseEntity*)pEvent->pEntities[otherIndex];
 
 	if ( pOther->GetEngineObject()->GetMoveType() == MOVETYPE_VPHYSICS )
 	{

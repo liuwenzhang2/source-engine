@@ -29,7 +29,7 @@ class ClientClass;
 abstract_class IClientUnknown : public IHandleEntity
 {
 public:
-	virtual datamap_t* GetDataDescMap(void) { return NULL; }
+	virtual datamap_t* GetDataDescMap(void) const { return NULL; }
 	virtual void SetRefEHandle(const CBaseHandle& handle) { m_RefEHandle = handle; }
 	virtual const CBaseHandle& GetRefEHandle() const { return m_RefEHandle; }
 	virtual int				entindex() const {

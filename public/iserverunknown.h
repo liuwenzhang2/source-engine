@@ -17,7 +17,6 @@
 
 class ICollideable;
 class IServerNetworkable;
-class CBaseEntity;
 class ServerClass;
 
 
@@ -31,7 +30,6 @@ public:
 	virtual const CBaseHandle& GetRefEHandle() const { return m_RefEHandle; }
 	virtual ICollideable*		GetCollideable() = 0;
 	virtual IServerNetworkable*	GetNetworkable() = 0;
-	virtual CBaseEntity*		GetBaseEntity() = 0;
 	//virtual int					entindex() const = 0;
 	virtual int				entindex() const {
 		CBaseHandle Handle = this->GetRefEHandle();

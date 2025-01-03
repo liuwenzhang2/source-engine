@@ -46,8 +46,8 @@ ConVar sv_report_client_settings("sv_report_client_settings", "0", FCVAR_GAMEDLL
 
 extern ConVar mp_chattime;
 
-extern CBaseEntity	 *g_pLastCombineSpawn;
-extern CBaseEntity	 *g_pLastRebelSpawn;
+extern IServerEntity	 *g_pLastCombineSpawn;
+extern IServerEntity	 *g_pLastRebelSpawn;
 
 #define WEAPON_MAX_DISTANCE_FROM_SPAWN 64
 
@@ -645,8 +645,8 @@ void CHL2MPWorld::DeathNotice( CBasePlayer *pVictim, const CTakeDamageInfo &info
 	int killer_ID = 0;
 
 	// Find the killer & the scorer
-	CBaseEntity *pInflictor = info.GetInflictor();
-	CBaseEntity *pKiller = info.GetAttacker();
+	CBaseEntity *pInflictor = (CBaseEntity*)info.GetInflictor();
+	CBaseEntity *pKiller = (CBaseEntity*)info.GetAttacker();
 	CBasePlayer *pScorer = GetDeathScorer( pKiller, pInflictor );
 
 	// Custom kill type?
@@ -1048,7 +1048,7 @@ void CHL2MPWorld::CleanUpMap()
 	// then remove everything else except the players.
 
 	// Get rid of all entities except players.
-	CBaseEntity *pCur = EntityList()->FirstEnt();
+	IServerEntity *pCur = EntityList()->FirstEnt();
 	while ( pCur )
 	{
 		CBaseHL2MPCombatWeapon *pWeapon = dynamic_cast< CBaseHL2MPCombatWeapon* >( pCur );
@@ -1098,7 +1098,7 @@ void CHL2MPWorld::CleanUpMap()
 		}
 
 
-		virtual CBaseEntity* CreateNextEntity( const char *pClassname )
+		virtual IServerEntity* CreateNextEntity( const char *pClassname )
 		{
 			if ( m_iIterator == g_MapEntityRefs.InvalidIndex() )
 			{
@@ -1117,13 +1117,13 @@ void CHL2MPWorld::CleanUpMap()
 				{
 					// Doh! The entity was delete and its slot was reused.
 					// Just use any old edict slot. This case sucks because we lose the baseline.
-					return (CBaseEntity*)EntityList()->CreateEntityByName( pClassname );
+					return EntityList()->CreateEntityByName( pClassname );
 				}
 				else
 				{
 					// Cool, the slot where this entity was is free again (most likely, the entity was 
 					// freed above). Now create an entity with this specific index.
-					return (CBaseEntity*)EntityList()->CreateEntityByName( pClassname, ref.m_iEdict );
+					return EntityList()->CreateEntityByName( pClassname, ref.m_iEdict );
 				}
 			}
 		}

@@ -107,7 +107,7 @@ public:
 
 	void Update( void );					///< invoked each server tick
 
-	float GetWaterLevel( void ) const;		///< return Z coordinate of water in world coords
+	float GetFWaterLevel( void ) const;		///< return Z coordinate of water in world coords
 	float GetMaxRange( void ) const;		///< return how far a fish is allowed to wander
 
 private:
@@ -131,7 +131,7 @@ inline float CFishPool::GetMaxRange( void ) const
 }
 
 
-inline float CFishPool::GetWaterLevel( void ) const
+inline float CFishPool::GetFWaterLevel( void ) const
 {
 	return m_waterLevel;
 }

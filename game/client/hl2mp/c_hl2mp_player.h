@@ -131,7 +131,7 @@ private:
 	bool m_fIsWalking;
 };
 
-inline C_HL2MP_Player *ToHL2MPPlayer( CBaseEntity *pEntity )
+inline C_HL2MP_Player *ToHL2MPPlayer( IClientEntity *pEntity )
 {
 	if ( !pEntity || !pEntity->IsPlayer() )
 		return NULL;

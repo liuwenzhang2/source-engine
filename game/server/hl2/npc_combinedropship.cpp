@@ -639,7 +639,7 @@ int CCombineDropshipContainer::OnTakeDamage( const CTakeDamageInfo &info )
 		if ( (info.GetInflictor() != m_hLastInflictor) || (gpGlobals->curtime != m_flLastHitTime) )
 		{
 			m_iHealth -= (m_iMaxHealth / DROPSHIP_CRATE_ROCKET_HITS) + 1;
-			m_hLastInflictor = info.GetInflictor();
+			m_hLastInflictor = (CBaseEntity*)info.GetInflictor();
 			m_flLastHitTime = gpGlobals->curtime; 
 		}
 	}
@@ -876,7 +876,7 @@ void CNPC_CombineDropship::Spawn( void )
 		m_hContainer = (CBaseAnimating*)EntityList()->CreateEntityByName( "prop_dropship_container" );
 		if ( m_hContainer )
 		{
-			m_hContainer->SetName( "dropship_container" );
+			m_hContainer->GetEngineObject()->SetName( "dropship_container" );
 			m_hContainer->GetEngineObject()->SetAbsOrigin(GetEngineObject()->GetAbsOrigin() );
 			m_hContainer->GetEngineObject()->SetAbsAngles(GetEngineObject()->GetAbsAngles() );
 			m_hContainer->GetEngineObject()->SetParent(this->GetEngineObject(), 0);
@@ -957,7 +957,7 @@ void CNPC_CombineDropship::Spawn( void )
 		if ( m_hContainer )
 		{
 			m_hContainer->SetModel( "models/buggy.mdl" );
-			m_hContainer->SetName( "dropship_jeep" );
+			m_hContainer->GetEngineObject()->SetName( "dropship_jeep" );
 
 			m_hContainer->GetEngineObject()->SetAbsOrigin(GetEngineObject()->GetAbsOrigin() );//- Vector( 0, 0 , 25 ) );
 			QAngle angles = GetEngineObject()->GetAbsAngles();
@@ -1078,7 +1078,7 @@ void CNPC_CombineDropship::Precache( void )
 				}
 				if ( m_sNPCTemplateData[i] != NULL_STRING )
 				{
-					CBaseEntity *pEntity = NULL;
+					IServerEntity *pEntity = NULL;
 					MapEntity_ParseEntity( pEntity, STRING(m_sNPCTemplateData[i]), NULL );
 					if ( pEntity != NULL )
 					{
@@ -1553,7 +1553,7 @@ void CNPC_CombineDropship::UpdateRotorWashVolume( CSoundPatch *pRotorSound, floa
 void CNPC_CombineDropship::UpdateRotorWashVolume()
 {
 	float flNearFactor = 0.0f; 
-	CBaseEntity *pPlayer = EntityList()->GetPlayerByIndex( 1 );
+	IServerEntity *pPlayer = EntityList()->GetPlayerByIndex( 1 );
 	if (pPlayer)
 	{
 		float flDist = pPlayer->GetEngineObject()->GetAbsOrigin().DistTo(GetEngineObject()->GetAbsOrigin() );
@@ -1669,7 +1669,7 @@ void CNPC_CombineDropship::LandCommon( bool bHover )
 	// Do we have a land target?
 	if ( m_iszLandTarget != NULL_STRING )
 	{
-		CBaseEntity *pTarget = EntityList()->FindEntityByName( NULL, m_iszLandTarget );
+		IServerEntity *pTarget = EntityList()->FindEntityByName( NULL, m_iszLandTarget );
 		if ( !pTarget )
 		{
 			Warning("npc_combinedropship %s couldn't find land target named %s\n", STRING(GetEntityName()), STRING(m_iszLandTarget) );
@@ -1677,7 +1677,7 @@ void CNPC_CombineDropship::LandCommon( bool bHover )
 		}
 
 		// Start heading to the point
-		m_hLandTarget = pTarget;
+		m_hLandTarget = (CBaseEntity*)pTarget;
 	}
 }
 
@@ -1843,7 +1843,7 @@ void CNPC_CombineDropship::InputPickup( inputdata_t &inputdata )
 		Warning("npc_combinedropship %s tried to pickup with no specified pickup target.\n", STRING(GetEntityName()) );
 		return;
 	}
-	CBaseEntity *pTarget = EntityList()->FindEntityByName( NULL, iszTargetName );
+	IServerEntity *pTarget = EntityList()->FindEntityByName( NULL, iszTargetName );
 	if ( !pTarget )
 	{
 		Warning("npc_combinedropship %s couldn't find pickup target named %s\n", STRING(GetEntityName()), STRING(iszTargetName) );
@@ -1851,7 +1851,7 @@ void CNPC_CombineDropship::InputPickup( inputdata_t &inputdata )
 	}
 
 	// Start heading to the point
-	m_hPickupTarget = pTarget;
+	m_hPickupTarget = (CBaseEntity*)pTarget;
 
 	m_bHasDroppedOff = false;
 
@@ -2109,7 +2109,7 @@ void CNPC_CombineDropship::PrescheduleThink( void )
 				if ( tr.m_pEnt && tr.m_pEnt->GetTakeDamage() != DAMAGE_NO )
 				{
 					CTakeDamageInfo info( this, this, 20 * dt, DMG_BURN );
-					((CBaseEntity*)tr.m_pEnt)->TakeDamage( info );
+					((IServerEntity*)tr.m_pEnt)->TakeDamage( info );
 				}
 			}
 
@@ -2430,7 +2430,7 @@ void CNPC_CombineDropship::SpawnTroop( void )
 	m_hContainer->GetEngineObject()->GetAttachment( m_iAttachmentDeployStart, vecSpawnOrigin, vecSpawnAngles );
 
 	// Spawn the templated NPC
-	CBaseEntity *pEntity = NULL;
+	IServerEntity *pEntity = NULL;
 	MapEntity_ParseEntity( pEntity, STRING(m_sNPCTemplateData[m_iCurrentTroopExiting]), NULL );
 
 	// Increment troop count
@@ -2441,7 +2441,7 @@ void CNPC_CombineDropship::SpawnTroop( void )
 		Warning("Dropship could not create template NPC\n" );
 		return;
 	}
-	CAI_BaseNPC	*pNPC = pEntity->MyNPCPointer();
+	CAI_BaseNPC	*pNPC = ((CBaseEntity*)pEntity)->MyNPCPointer();
 	Assert( pNPC );
 
 	// Spawn an entity blocker.
@@ -2520,18 +2520,18 @@ Vector CNPC_CombineDropship::GetDropoffFinishPosition( Vector vecOrigin, CAI_Bas
 //-----------------------------------------------------------------------------
 void CNPC_CombineDropship::InputNPCFinishDustoff( inputdata_t &inputdata )
 {
-	CBaseEntity *pEnt = EntityList()->FindEntityByName( NULL, inputdata.value.StringID(), NULL, inputdata.pActivator, inputdata.pCaller );
+	IServerEntity *pEnt = EntityList()->FindEntityByName( NULL, inputdata.value.StringID(), NULL, inputdata.pActivator, inputdata.pCaller );
 	if ( !pEnt )
 		return;
 
-	CAI_BaseNPC *pNPC = pEnt->MyNPCPointer();
+	CAI_BaseNPC *pNPC = ((CBaseEntity*)pEnt)->MyNPCPointer();
 	Assert( pNPC );
 
 	Vector vecOrigin = GetDropoffFinishPosition( pNPC->GetEngineObject()->GetAbsOrigin(), pNPC, vec3_origin, vec3_origin );
 	pNPC->GetEngineObject()->SetAbsOrigin( vecOrigin );
 
 	// Do we have a dustoff point?
-	CBaseEntity *pDustoff = NULL;
+	IServerEntity *pDustoff = NULL;
 	if ( m_sDustoffPoints[m_iCurrentTroopExiting-1] != NULL_STRING )
 	{
 		pDustoff = EntityList()->FindEntityByName( NULL, m_sDustoffPoints[m_iCurrentTroopExiting-1] );
@@ -2555,7 +2555,7 @@ void CNPC_CombineDropship::InputNPCFinishDustoff( inputdata_t &inputdata )
 
 		// Tell the NPC to move to the dustoff position
 		pNPC->SetState( NPC_STATE_ALERT );
-		pNPC->ScheduledMoveToGoalEntity( SCHED_DROPSHIP_DUSTOFF, pDustoff, ACT_RUN );
+		pNPC->ScheduledMoveToGoalEntity( SCHED_DROPSHIP_DUSTOFF, (CBaseEntity*)pDustoff, ACT_RUN );
 		pNPC->GetNavigator()->SetArrivalDirection( pDustoff->GetEngineObject()->GetAbsAngles() );
 
 		// Make sure they ignore a bunch of conditions

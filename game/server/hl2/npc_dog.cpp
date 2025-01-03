@@ -710,7 +710,7 @@ void CNPC_Dog::InputPlayerPickupObject ( inputdata_t &inputdata )
 
 			//Reset this cause CleanCatchAndThrow clears it.
 			m_bDoWaitforObjectBehavior = true;
-			m_hPhysicsEnt = inputdata.pCaller;
+			m_hPhysicsEnt = (CBaseEntity*)inputdata.pCaller;
 		}
 	}
 	else if ( m_bDoCatchThrowBehavior == true )
@@ -724,7 +724,7 @@ void CNPC_Dog::InputPlayerPickupObject ( inputdata_t &inputdata )
 
 				//Reset this cause CleanCatchAndThrow clears it.
 				m_bDoCatchThrowBehavior = true;
-				m_hPhysicsEnt = inputdata.pCaller;
+				m_hPhysicsEnt = (CBaseEntity*)inputdata.pCaller;
 			}
 		}
 	}
@@ -778,7 +778,7 @@ void CNPC_Dog::InputStopCatchThrowBehavior( inputdata_t &inputdata )
 
 void CNPC_Dog::InputSetThrowTarget( inputdata_t &inputdata )
 {
-	m_hThrowTarget = EntityList()->FindEntityByName( NULL, inputdata.value.String(), NULL, inputdata.pActivator, inputdata.pCaller );
+	m_hThrowTarget = (CBaseEntity*)EntityList()->FindEntityByName( NULL, inputdata.value.String(), NULL, inputdata.pActivator, inputdata.pCaller );
 }
 
 void CNPC_Dog::SetTurnActivity( void )
@@ -1082,8 +1082,8 @@ void CNPC_Dog::CreateBeams( void )
 
 bool CNPC_Dog::FindPhysicsObject( const char *pPickupName, CBaseEntity *pIgnore )
 {
-	CBaseEntity		*pEnt = NULL;
-	CBaseEntity		*pNearest = NULL;
+	IServerEntity		*pEnt = NULL;
+	IServerEntity		*pNearest = NULL;
 	float			flDist;
 	IPhysicsObject	*pPhysObj = NULL;
 	float			flNearestDist = 99999;
@@ -1092,10 +1092,10 @@ bool CNPC_Dog::FindPhysicsObject( const char *pPickupName, CBaseEntity *pIgnore 
 	{
 		pEnt = EntityList()->FindEntityByName( NULL, pPickupName );
 		
-		if ( m_hUnreachableObjects.Find( pEnt ) == -1  )
+		if ( m_hUnreachableObjects.Find((CBaseEntity*)pEnt ) == -1  )
 		{
 			m_bHasObject = false;
-			m_hPhysicsEnt = pEnt;
+			m_hPhysicsEnt = (CBaseEntity*)pEnt;
 			return true;
 		}
 	}
@@ -1106,7 +1106,7 @@ bool CNPC_Dog::FindPhysicsObject( const char *pPickupName, CBaseEntity *pIgnore 
 		if ( pEnt == pIgnore )
 			 continue;
 
-		if ( m_hUnreachableObjects.Find( pEnt ) != -1 )
+		if ( m_hUnreachableObjects.Find((CBaseEntity*)pEnt ) != -1 )
 			 continue;
 
 		pPhysObj = pEnt->GetEngineObject()->VPhysicsGetObject();
@@ -1141,7 +1141,7 @@ bool CNPC_Dog::FindPhysicsObject( const char *pPickupName, CBaseEntity *pIgnore 
 		if ( flDist >= flNearestDist )
 			 continue;
 
-		if ( FVisible( pEnt ) == false )
+		if ( FVisible((CBaseEntity*)pEnt ) == false )
 			 continue;
 		
 		pNearest = pEnt;
@@ -1149,7 +1149,7 @@ bool CNPC_Dog::FindPhysicsObject( const char *pPickupName, CBaseEntity *pIgnore 
 	}
 
 	m_bHasObject = false;
-	m_hPhysicsEnt = pNearest;
+	m_hPhysicsEnt = (CBaseEntity*)pNearest;
 
 	if ( dog_debug.GetBool() == true )
 	{

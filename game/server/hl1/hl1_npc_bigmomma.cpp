@@ -494,7 +494,7 @@ void CNPC_BigMomma::NodeStart( string_t iszNextNode )
 
 	const char *pTargetName = STRING( m_iszTarget );
 
-	CBaseEntity *pTarget = NULL;
+	IServerEntity *pTarget = NULL;
 
 	if ( pTargetName )
 		 pTarget = EntityList()->FindEntityByName( NULL, pTargetName );
@@ -506,7 +506,7 @@ void CNPC_BigMomma::NodeStart( string_t iszNextNode )
 		return;
 	}
 
-	SetTarget( pTarget );
+	SetTarget((CBaseEntity*)pTarget );
 }
 
 
@@ -808,7 +808,7 @@ void CNPC_BigMomma::RunTask( const Task_t *pTask )
 
 		if (GetEngineObject()->IsSequenceFinished() )
 		{
-			CBaseEntity *pTarget = NULL;
+			IServerEntity *pTarget = NULL;
 
 			if (  GetTarget() )
 				 pTarget = EntityList()->FindEntityByName( NULL, STRING( GetTarget()->m_target ) );

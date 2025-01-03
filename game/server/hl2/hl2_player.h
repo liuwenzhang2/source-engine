@@ -204,7 +204,7 @@ public:
 
 	void				CombineBallSocketed( CPropCombineBall *pCombineBall );
 
-	virtual void		Event_KilledOther( CBaseEntity *pVictim, const CTakeDamageInfo &info );
+	virtual void		Event_KilledOther( IServerEntity *pVictim, const CTakeDamageInfo &info );
 
 	virtual void		GetAutoaimVector( autoaim_params_t &params );
 	bool				ShouldKeepLockedAutoaimTarget( EHANDLE hLockedTarget );
@@ -221,7 +221,7 @@ public:
 	virtual bool		Weapon_Switch( CBaseCombatWeapon *pWeapon, int viewmodelindex = 0 );
 	virtual bool		Weapon_CanSwitchTo( CBaseCombatWeapon *pWeapon );
 
-	void FirePlayerProxyOutput( const char *pszOutputName, variant_t variant, CBaseEntity *pActivator, CBaseEntity *pCaller );
+	void FirePlayerProxyOutput( const char *pszOutputName, variant_t variant, IServerEntity *pActivator, IServerEntity *pCaller );
 
 	CLogicPlayerProxy	*GetPlayerProxy( void );
 
@@ -382,5 +382,15 @@ void CHL2_Player::DisableCappedPhysicsDamage()
 	m_bUseCappedPhysicsDamageTable = false;
 }
 
+inline CHL2_Player* ToHL2Player(IServerEntity* pEntity)
+{
+	if ( !pEntity || !pEntity->IsPlayer() )
+		return NULL;
+#if _DEBUG
+	return dynamic_cast<CHL2_Player*>(pEntity);
+#else
+	return static_cast<CHL2_Player*>(pEntity);
+#endif
+}
 
 #endif	//HL2_PLAYER_H

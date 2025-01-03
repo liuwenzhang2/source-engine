@@ -108,7 +108,7 @@ bool CHudSquadStatus::ShouldDraw( void )
 {
 	bool bNeedsDraw = false;
 
-	C_BaseHLPlayer *pPlayer = (C_BaseHLPlayer *)EntityList()->GetLocalPlayer();
+	C_BaseHLPlayer *pPlayer = ToHL2Player(EntityList()->GetLocalPlayer());
 	if ( !pPlayer )
 		return false;
 
@@ -126,7 +126,7 @@ bool CHudSquadStatus::ShouldDraw( void )
 //-----------------------------------------------------------------------------
 void CHudSquadStatus::OnThink( void )
 {
-	C_BaseHLPlayer *pPlayer = (C_BaseHLPlayer *)EntityList()->GetLocalPlayer();
+	C_BaseHLPlayer *pPlayer = ToHL2Player(EntityList()->GetLocalPlayer());
 	if ( !pPlayer )
 		return;
 
@@ -207,7 +207,7 @@ void CHudSquadStatus::MsgFunc_SquadMemberDied(bf_read &msg)
 //-----------------------------------------------------------------------------
 void CHudSquadStatus::Paint()
 {
-	C_BaseHLPlayer *pPlayer = (C_BaseHLPlayer *)EntityList()->GetLocalPlayer();
+	C_BaseHLPlayer *pPlayer = ToHL2Player(EntityList()->GetLocalPlayer());
 	if ( !pPlayer )
 		return;
 

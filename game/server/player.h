@@ -364,7 +364,7 @@ public:
 	virtual int				OnTakeDamage_Alive( const CTakeDamageInfo &info );
 	virtual void			Event_Killed( const CTakeDamageInfo &info );
 	// Notifier that I've killed some other entity. (called from Victim's Event_Killed).
-	virtual void			Event_KilledOther( CBaseEntity *pVictim, const CTakeDamageInfo &info );
+	virtual void			Event_KilledOther( IServerEntity *pVictim, const CTakeDamageInfo &info );
 
 	virtual void			Event_Dying( const CTakeDamageInfo &info );
 
@@ -483,12 +483,12 @@ public:
 	virtual bool			ModeWantsSpectatorGUI( int iMode ) { return true; }
 	virtual bool			SetObserverMode(int mode); // sets new observer mode, returns true if successful
 	virtual int				GetObserverMode( void ); // returns observer mode or OBS_NONE
-	virtual bool			SetObserverTarget(CBaseEntity * target);
+	virtual bool			SetObserverTarget(IServerEntity* target);
 	virtual void			ObserverUse( bool bIsPressed ); // observer pressed use
-	virtual CBaseEntity		*GetObserverTarget( void ); // returns players targer or NULL
-	virtual CBaseEntity		*FindNextObserverTarget( bool bReverse ); // returns next/prev player to follow or NULL
+	virtual IServerEntity		*GetObserverTarget( void ); // returns players targer or NULL
+	virtual IServerEntity		*FindNextObserverTarget( bool bReverse ); // returns next/prev player to follow or NULL
 	virtual int				GetNextObserverSearchStartPoint( bool bReverse ); // Where we should start looping the player list in a FindNextObserverTarget call
-	virtual bool			IsValidObserverTarget(CBaseEntity * target); // true, if player is allowed to see this target
+	virtual bool			IsValidObserverTarget(IServerEntity * target); // true, if player is allowed to see this target
 	virtual void			CheckObserverSettings(); // checks, if target still valid (didn't die etc)
 	virtual void			JumptoPosition(const Vector &origin, const QAngle &angles);
 	virtual void			ForceObserverMode(int mode); // sets a temporary mode, force because of invalid targets
@@ -502,7 +502,7 @@ public:
 	virtual int				GetReplayEntity();
 
 	virtual void			CreateCorpse( void ) { }
-	virtual CBaseEntity		*EntSelectSpawnPoint( void );
+	virtual IServerEntity		*EntSelectSpawnPoint( void );
 
 	// Vehicles
 	virtual bool			IsInAVehicle( void ) const;
@@ -676,7 +676,7 @@ public:
 	float	PlayerDrownTime() const	{ return m_AirFinished; }
 
 	int		GetObserverMode() const	{ return m_iObserverMode; }
-	CBaseEntity *GetObserverTarget() const	{ return m_hObserverTarget; }
+	IServerEntity *GetObserverTarget() const	{ return m_hObserverTarget; }
 
 	// Round gamerules
 	virtual bool	IsReadyToPlay( void ) { return true; }
@@ -952,7 +952,7 @@ protected:
 	CNetworkVar( float,	m_flFOVTime );		// Time our FOV change started
 	
 	int						m_iObserverLastMode; // last used observer mode
-	CNetworkHandle( CBaseEntity, m_hObserverTarget );	// entity handle to m_iObserverTarget
+	CNetworkHandle(IServerEntity, m_hObserverTarget );	// entity handle to m_iObserverTarget
 	bool					m_bForcedObserverMode; // true, player was forced by invalid targets to switch mode
 	
 	CNetworkHandle( CBaseEntity, m_hZoomOwner );	//This is a pointer to the entity currently controlling the player's zoom

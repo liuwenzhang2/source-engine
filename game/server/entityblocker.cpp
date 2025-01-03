@@ -26,7 +26,7 @@ CEntityBlocker *CEntityBlocker::Create( const Vector &origin, const Vector &mins
 	
 	if ( pBlocker != NULL )
 	{
-		pBlocker->SetSize( mins, maxs );
+		pBlocker->GetEngineObject()->SetSize( mins, maxs );
 		if ( bBlockPhysics )
 		{
 			pBlocker->GetEngineObject()->VPhysicsInitStatic();

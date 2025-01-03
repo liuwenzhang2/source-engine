@@ -251,12 +251,12 @@ CON_COMMAND( clear_debug_overlays, "clears debug overlays" )
 	if ( !UTIL_IsCommandIssuedByServerAdmin() )
 		return;
 
-	CBaseEntity *pEntity = EntityList()->FirstEnt();
+	IServerEntity *pEntity = EntityList()->FirstEnt();
 	
 	// Clear all entities of their debug overlays
 	while ( pEntity )
 	{
-		pEntity->m_debugOverlays = 0;
+		pEntity->GetDebugOverlays() = 0;
 		// UNDONE: Clear out / expire timed overlays?
 		pEntity = EntityList()->NextEnt( pEntity );
 	}

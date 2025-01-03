@@ -158,12 +158,12 @@ void CPointTemplate::StartBuildingTemplates( void )
 	{
 		if ( m_iszTemplateEntityNames[i] != NULL_STRING )
 		{
-			CBaseEntity	*pEntity = NULL;
+			IServerEntity	*pEntity = NULL;
 			int iOldNum = m_hTemplateEntities.Count();
 			// Add all the entities with the matching targetname
 			while ( (pEntity = EntityList()->FindEntityByName( pEntity, STRING(m_iszTemplateEntityNames[i]) )) != NULL )
 			{
-				m_hTemplateEntities.AddToTail( pEntity );
+				m_hTemplateEntities.AddToTail((CBaseEntity*)pEntity );
 			}
 
 			// Useful mapmaker warning
@@ -315,7 +315,7 @@ void CPointTemplate::PerformPrecache()
 //			pEntities - 
 // Output : Returns true on success, false on failure.
 //-----------------------------------------------------------------------------
-bool CPointTemplate::CreateInstance( const Vector &vecOrigin, const QAngle &vecAngles, CUtlVector<CBaseEntity*> *pEntities )
+bool CPointTemplate::CreateInstance( const Vector &vecOrigin, const QAngle &vecAngles, CUtlVector<IServerEntity*> *pEntities )
 {
 	// Go through all our templated map data and spawn all the entities in it
 	int iTemplates = m_hTemplates.Count();
@@ -333,7 +333,7 @@ bool CPointTemplate::CreateInstance( const Vector &vecOrigin, const QAngle &vecA
 	int i;
 	for ( i = 0; i < iTemplates; i++ )
 	{
-		CBaseEntity *pEntity = NULL;
+		IServerEntity *pEntity = NULL;
 		char *pMapData;
 		int iTemplateIndex = m_hTemplates[i].iTemplateIndex;
 
@@ -400,7 +400,7 @@ bool CPointTemplate::CreateInstance( const Vector &vecOrigin, const QAngle &vecA
 void CPointTemplate::InputForceSpawn( inputdata_t &inputdata )
 {
 	// Spawn our template
-	CUtlVector<CBaseEntity*> hNewEntities;
+	CUtlVector<IServerEntity*> hNewEntities;
 	if ( !CreateInstance(GetEngineObject()->GetAbsOrigin(), GetEngineObject()->GetAbsAngles(), &hNewEntities ) )
 		return;
 	

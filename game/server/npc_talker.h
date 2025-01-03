@@ -192,13 +192,13 @@ public:
 	};
 
 //private:
-	virtual bool IsValidSpeechTarget( int flags, CBaseEntity *pEntity );
+	virtual bool IsValidSpeechTarget( int flags, IServerEntity *pEntity );
 	
-	CBaseEntity		*FindNearestFriend(bool fPlayer);
+	IServerEntity		*FindNearestFriend(bool fPlayer);
 
 	bool IsOkToSpeak( void );
 
-	void SayHelloToPlayer( CBaseEntity *pPlayer );
+	void SayHelloToPlayer( IServerEntity *pPlayer );
 	virtual bool CanSayHello( void );
 	virtual int	 FIdleHello( void );
 
@@ -210,8 +210,8 @@ public:
 	int				FIdleSpeak( void );
 	void			FIdleSpeakWhileMoving( void );
 	int				FIdleStare( void );
-	bool			SpeakQuestionFriend( CBaseEntity *pFriend );
-	bool			SpeakAnswerFriend( CBaseEntity *pFriend );
+	bool			SpeakQuestionFriend( IServerEntity *pFriend );
+	bool			SpeakAnswerFriend( IServerEntity *pFriend );
 	void			TrySmellTalk( void );
 
 	virtual void	SetAnswerQuestion( CNPCSimpleTalker *pSpeaker );

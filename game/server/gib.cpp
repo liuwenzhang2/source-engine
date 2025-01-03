@@ -136,7 +136,7 @@ void CGib::SpawnHeadGib( CBaseEntity *pVictim )
 
 		pGib->GetEngineObject()->SetLocalOrigin( pVictim->EyePosition() );
 		
-		CBaseEntity *pentPlayer = EntityList()->FindClientInPVS( pGib );
+		IServerEntity *pentPlayer = EntityList()->FindClientInPVS( pGib );
 		
 		if ( random->RandomInt ( 0, 100 ) <= 5 && pentPlayer )
 		{

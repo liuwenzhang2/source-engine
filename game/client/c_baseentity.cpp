@@ -2567,14 +2567,6 @@ bool C_BaseEntity::GetPredictable( void ) const
 	return m_bPredictable;
 }
 
-
-
-// Stuff implemented for weapon prediction code
-void C_BaseEntity::SetSize( const Vector &vecMin, const Vector &vecMax )
-{
-	GetEngineObject()->SetCollisionBounds( vecMin, vecMax );
-}
-
 //-----------------------------------------------------------------------------
 // Purpose: Just look up index
 // Input  : *name - 
@@ -2625,7 +2617,7 @@ C_BaseEntity *C_BaseEntity::Instance( int iEnt )
 // Purpose: 
 // Output : char const
 //-----------------------------------------------------------------------------
-const char *C_BaseEntity::GetClassname( void )
+const char *C_BaseEntity::GetClassname( void ) const
 {
 	static char outstr[ 256 ];
 	outstr[ 0 ] = 0;
@@ -2650,7 +2642,7 @@ const char *C_BaseEntity::GetClassname( void )
 	return outstr;
 }
 
-const char *C_BaseEntity::GetDebugName( void )
+const char *C_BaseEntity::GetDebugName( void ) const
 {
 	return GetClassname();
 }
@@ -2977,7 +2969,7 @@ void C_BaseEntity::UpdateOnRemove( void )
 //-----------------------------------------------------------------------------
 // Purpose: Returns a value that scales all damage done by this entity.
 //-----------------------------------------------------------------------------
-float C_BaseEntity::GetAttackDamageScale( void )
+float C_BaseEntity::GetAttackDamageScale(IHandleEntity* pVictim)
 {
 	float flScale = 1;
 // Not hooked up to prediction yet

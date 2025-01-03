@@ -264,7 +264,7 @@ public:
 	// [tj] We have a custom implementation so we can check for achievements.
 	//=============================================================================
 	
-	virtual void		Event_KilledOther( CBaseEntity *pVictim, const CTakeDamageInfo &info );
+	virtual void		Event_KilledOther( IServerEntity *pVictim, const CTakeDamageInfo &info );
 
 	//=============================================================================
 	// HPE_END
@@ -480,7 +480,7 @@ public:
 	// Used to be GETINTOGAME state.
 	void GetIntoGame();
 
-	CBaseEntity* EntSelectSpawnPoint();
+	IServerEntity* EntSelectSpawnPoint();
 	
 	void SetProgressBarTime( int barTime );
 	virtual void PlayerDeathThink();
@@ -744,7 +744,7 @@ protected:
 
 	bool RunMimicCommand( CUserCmd& cmd );
 
-	bool SelectSpawnSpot( const char *pEntClassName, CBaseEntity* &pSpot );
+	bool SelectSpawnSpot( const char *pEntClassName, IServerEntity* &pSpot );
 
 	void SetModelFromClass( void );
 	CNetworkVar( int, m_iClass ); // One of the CS_CLASS_ enums.

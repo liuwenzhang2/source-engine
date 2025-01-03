@@ -252,7 +252,7 @@ CBaseEntityOutput::~CBaseEntityOutput()
 // Input  : pActivator - Entity that initiated this sequence of actions.
 //			pCaller - Entity that is actually causing the event.
 //-----------------------------------------------------------------------------
-void CBaseEntityOutput::FireOutput(variant_t Value, CBaseEntity *pActivator, CBaseEntity *pCaller, float fDelay)
+void CBaseEntityOutput::FireOutput(variant_t Value, IServerEntity *pActivator, IServerEntity *pCaller, float fDelay)
 {
 	//
 	// Iterate through all eventactions and fire them off.
@@ -320,7 +320,7 @@ void CBaseEntityOutput::FireOutput(variant_t Value, CBaseEntity *pActivator, CBa
 			ADD_DEBUG_HISTORY( HISTORY_ENTITY_IO, szBuffer );
 		}
 
-		if ( pCaller && pCaller->m_debugOverlays & OVERLAY_MESSAGE_BIT)
+		if ( pCaller && pCaller->GetDebugOverlays() & OVERLAY_MESSAGE_BIT)
 		{
 			pCaller->DrawOutputOverlay(ev);
 		}
@@ -372,7 +372,7 @@ void CBaseEntityOutput::FireOutput(variant_t Value, CBaseEntity *pActivator, CBa
 // Input  : pActivator - 
 //			pCaller - 
 //-----------------------------------------------------------------------------
-void COutputEvent::FireOutput(CBaseEntity *pActivator, CBaseEntity *pCaller, float fDelay)
+void COutputEvent::FireOutput(IServerEntity *pActivator, IServerEntity *pCaller, float fDelay)
 {
 	variant_t Val;
 	Val.Set( FIELD_VOID, NULL );
@@ -809,7 +809,7 @@ void CEventQueue::Dump( void )
 //-----------------------------------------------------------------------------
 // Purpose: adds the action into the correct spot in the priority queue, targeting entity via string name
 //-----------------------------------------------------------------------------
-void CEventQueue::AddEvent( const char *target, const char *targetInput, variant_t Value, float fireDelay, CBaseEntity *pActivator, CBaseEntity *pCaller, int outputID )
+void CEventQueue::AddEvent( const char *target, const char *targetInput, variant_t Value, float fireDelay, IServerEntity *pActivator, IServerEntity *pCaller, int outputID )
 {
 	// build the new event
 	EventQueuePrioritizedEvent_t *newEvent = new EventQueuePrioritizedEvent_t;
@@ -832,7 +832,7 @@ void CEventQueue::AddEvent( const char *target, const char *targetInput, variant
 //-----------------------------------------------------------------------------
 // Purpose: adds the action into the correct spot in the priority queue, targeting entity via pointer
 //-----------------------------------------------------------------------------
-void CEventQueue::AddEvent( CBaseEntity *target, const char *targetInput, variant_t Value, float fireDelay, CBaseEntity *pActivator, CBaseEntity *pCaller, int outputID )
+void CEventQueue::AddEvent( IServerEntity *target, const char *targetInput, variant_t Value, float fireDelay, IServerEntity *pActivator, IServerEntity *pCaller, int outputID )
 {
 	// build the new event
 	EventQueuePrioritizedEvent_t *newEvent = new EventQueuePrioritizedEvent_t;
@@ -852,7 +852,7 @@ void CEventQueue::AddEvent( CBaseEntity *target, const char *targetInput, varian
 	AddEvent( newEvent );
 }
 
-void CEventQueue::AddEvent( CBaseEntity *target, const char *action, float fireDelay, CBaseEntity *pActivator, CBaseEntity *pCaller, int outputID )
+void CEventQueue::AddEvent( IServerEntity *target, const char *action, float fireDelay, IServerEntity *pActivator, IServerEntity *pCaller, int outputID )
 {
 	variant_t Value;
 	Value.Set( FIELD_VOID, NULL );
@@ -925,8 +925,8 @@ void CEventQueue::ServiceEvents( void )
 		if ( pe->m_iTarget != NULL_STRING )
 		{
 			// In the context the event, the searching entity is also the caller
-			CBaseEntity *pSearchingEntity = pe->m_pCaller;
-			CBaseEntity *target = NULL;
+			IServerEntity *pSearchingEntity = pe->m_pCaller;
+			IServerEntity *target = NULL;
 			while ( 1 )
 			{
 				target = EntityList()->FindEntityByName( target, pe->m_iTarget, pSearchingEntity, pe->m_pActivator, pe->m_pCaller );
@@ -951,7 +951,7 @@ void CEventQueue::ServiceEvents( void )
 			// See if we can find a target if we treat the target as a classname
 			if ( pe->m_iTarget != NULL_STRING )
 			{
-				CBaseEntity *target = NULL;
+				IServerEntity *target = NULL;
 				while ( 1 )
 				{
 					target = EntityList()->FindEntityByClassname( target, STRING(pe->m_iTarget) );
@@ -1021,7 +1021,7 @@ static ConCommand dumpeventqueue( "dumpeventqueue", CC_DumpEventQueue, "Dump the
 //			TODO: This is only as reliable as callers are in passing the correct
 //				  caller pointer when they fire the outputs. Make more foolproof.
 //-----------------------------------------------------------------------------
-void CEventQueue::CancelEvents( CBaseEntity *pCaller )
+void CEventQueue::CancelEvents( IServerEntity *pCaller )
 {
 	if (!pCaller)
 		return;
@@ -1059,7 +1059,7 @@ void CEventQueue::CancelEvents( CBaseEntity *pCaller )
 //			TODO: This is only as reliable as callers are in passing the correct
 //				  caller pointer when they fire the outputs. Make more foolproof.
 //-----------------------------------------------------------------------------
-void CEventQueue::CancelEventOn( CBaseEntity *pTarget, const char *sInputName )
+void CEventQueue::CancelEventOn( IServerEntity *pTarget, const char *sInputName )
 {
 	if (!pTarget)
 		return;
@@ -1094,7 +1094,7 @@ void CEventQueue::CancelEventOn( CBaseEntity *pTarget, const char *sInputName )
 // Input  : *pTarget - 
 //			*sInputName - NULL for any input, or a specified one
 //-----------------------------------------------------------------------------
-bool CEventQueue::HasEventPending( CBaseEntity *pTarget, const char *sInputName )
+bool CEventQueue::HasEventPending( IServerEntity *pTarget, const char *sInputName )
 {
 	if (!pTarget)
 		return false;
@@ -1442,13 +1442,13 @@ bool variant_t::Convert( fieldtype_t newType )
 				case FIELD_EHANDLE:
 				{
 					// convert the string to an entity by locating it by classname
-					CBaseEntity *ent = NULL;
+					IServerEntity *ent = NULL;
 					if ( iszVal != NULL_STRING )
 					{
 						// FIXME: do we need to pass an activator in here?
 						ent = EntityList()->FindEntityByName( NULL, iszVal );
 					}
-					SetEntity( ent );
+					SetEntity((CBaseEntity*)ent );
 					return true;
 				}
 			}
@@ -1775,7 +1775,7 @@ struct entitynotify_t
 	CBaseEntity* pNotify;
 	CBaseEntity* pWatched;
 };
-class CNotifyList : public INotify, public IEntityListener<CBaseEntity>
+class CNotifyList : public INotify, public IEntityListener<IServerEntity>
 {
 public:
 	// INotify
@@ -1786,8 +1786,8 @@ public:
 	void ReportSystemEvent(CBaseEntity* pEntity, notify_system_event_t eventType, const notify_system_event_params_t& params);
 
 	// IEntityListener
-	virtual void OnEntityCreated(CBaseEntity* pEntity);
-	virtual void OnEntityDeleted(CBaseEntity* pEntity);
+	virtual void OnEntityCreated(IServerEntity* pEntity);
+	virtual void OnEntityDeleted(IServerEntity* pEntity);
 
 	// Called from CEntityListSystem
 	void LevelInitPreEntity();
@@ -1847,14 +1847,14 @@ void CNotifyList::LevelShutdownPreEntity(void)
 	m_notifyList.Purge();
 }
 
-void CNotifyList::OnEntityCreated(CBaseEntity* pEntity)
+void CNotifyList::OnEntityCreated(IServerEntity* pEntity)
 {
 }
 
-void CNotifyList::OnEntityDeleted(CBaseEntity* pEntity)
+void CNotifyList::OnEntityDeleted(IServerEntity* pEntity)
 {
-	ReportDestroyEvent(pEntity);
-	ClearEntity(pEntity);
+	ReportDestroyEvent((CBaseEntity*)pEntity);
+	ClearEntity((CBaseEntity*)pEntity);
 }
 
 
@@ -1906,9 +1906,9 @@ public:
 		return Q_stricmp(pClassname, "worldspawn") != 0;
 	}
 
-	virtual CBaseEntity* CreateNextEntity(const char* pClassname)
+	virtual IServerEntity* CreateNextEntity(const char* pClassname)
 	{
-		return (CBaseEntity*)EntityList()->CreateEntityByName(pClassname);
+		return EntityList()->CreateEntityByName(pClassname);
 	}
 };
 
@@ -1961,10 +1961,10 @@ public:
 
 			// Remove all entities
 			int nPlayerIndex = -1;
-			CBaseEntity* pEnt = EntityList()->FirstEnt();
+			IServerEntity* pEnt = EntityList()->FirstEnt();
 			while (pEnt)
 			{
-				CBaseEntity* pNextEnt = EntityList()->NextEnt(pEnt);
+				IServerEntity* pNextEnt = EntityList()->NextEnt(pEnt);
 				if (pEnt->IsPlayer())
 				{
 					nPlayerIndex = pEnt->entindex();
@@ -1992,7 +1992,7 @@ public:
 			// Allocate a CBasePlayer for pev, and call spawn
 			if (nPlayerIndex >= 0)
 			{
-				CBaseEntity* pEdict = EntityList()->GetBaseEntity(nPlayerIndex);
+				IServerEntity* pEdict = EntityList()->GetBaseEntity(nPlayerIndex);
 				ClientPutInServer(nPlayerIndex, "unnamed");
 				ClientActive(nPlayerIndex, false);
 

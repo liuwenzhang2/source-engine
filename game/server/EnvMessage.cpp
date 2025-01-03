@@ -91,7 +91,7 @@ void CMessage::Precache( void )
 //-----------------------------------------------------------------------------
 void CMessage::InputShowMessage( inputdata_t &inputdata )
 {
-	CBaseEntity *pPlayer = NULL;
+	IServerEntity *pPlayer = NULL;
 
 	if (GetEngineObject()->GetSpawnFlags() & SF_MESSAGE_ALL )
 	{

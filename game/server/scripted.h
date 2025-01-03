@@ -78,7 +78,7 @@ class CAI_ScriptedSequence : public CBaseEntity
 	DECLARE_CLASS( CAI_ScriptedSequence, CBaseEntity );
 public:
 	void Spawn( void );
-	virtual void Blocked( CBaseEntity *pOther );
+	virtual void Blocked( IServerEntity *pOther );
 	virtual void Touch( IServerEntity *pOther );
 	virtual int	 ObjectCaps( void ) { return (BaseClass::ObjectCaps() & ~FCAP_ACROSS_TRANSITION); }
 	virtual void Activate( void );

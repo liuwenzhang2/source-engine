@@ -1708,10 +1708,10 @@ void CAI_BaseNPC::StartTask( const Task_t *pTask )
 
 	case TASK_TARGET_PLAYER:
 		{
-			CBaseEntity *pPlayer = EntityList()->FindEntityByName( NULL, "!player" );
+			IServerEntity *pPlayer = EntityList()->FindEntityByName( NULL, "!player" );
 			if ( pPlayer )
 			{
-				SetTarget( pPlayer );
+				SetTarget((CBaseEntity*)pPlayer );
 				TaskComplete();
 			}
 			else
@@ -2206,13 +2206,13 @@ void CAI_BaseNPC::StartTask( const Task_t *pTask )
 
 	case TASK_GET_PATH_TO_PLAYER:
 		{
-			CBaseEntity *pPlayer = EntityList()->FindEntityByName( NULL, "!player" );
+			IServerEntity *pPlayer = EntityList()->FindEntityByName( NULL, "!player" );
 
 			AI_NavGoal_t goal;
 
 			goal.type = GOALTYPE_LOCATION;
 			goal.dest = pPlayer->WorldSpaceCenter();
-			goal.pTarget = pPlayer;
+			goal.pTarget = (CBaseEntity*)pPlayer;
 
 			GetNavigator()->SetGoal( goal );
 			break;
@@ -4117,7 +4117,7 @@ void CAI_BaseNPC::RunTask( const Task_t *pTask )
 				if( trace.m_pEnt )
 				{
 					// Found something!
-					GetEngineObject()->SetGroundEntity((CBaseEntity*)trace.m_pEnt ? ((CBaseEntity*)trace.m_pEnt)->GetEngineObject() : NULL);
+					GetEngineObject()->SetGroundEntity(trace.m_pEnt ? (IEngineObjectServer*)trace.m_pEnt->GetEngineObject() : NULL);
 					TaskComplete();
 				}
 				else

@@ -528,7 +528,7 @@ int	CHalfLife1World::Damage_GetShowOnHud( void )
 		
 	float CHalfLife1World::FlPlayerFallDamage( CBasePlayer *pPlayer )
 	{
-		CBaseEntity* pGroundEntity = pPlayer->GetEngineObject()->GetGroundEntity() ? pPlayer->GetEngineObject()->GetGroundEntity()->GetOuter() : NULL;
+		CBaseEntity* pGroundEntity = pPlayer->GetEngineObject()->GetGroundEntity() ? (CBaseEntity*)pPlayer->GetEngineObject()->GetGroundEntity()->GetOuter() : NULL;
 
 		if( pGroundEntity && pGroundEntity->ClassMatches( "func_breakable" ) )
 		{		

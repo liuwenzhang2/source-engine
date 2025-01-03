@@ -91,7 +91,7 @@ void CPhysicsCloneArea::Spawn( void )
 	GetEngineObject()->SetMoveType( MOVETYPE_NONE );
 	GetEngineObject()->SetCollisionGroup( COLLISION_GROUP_PLAYER );
 
-	SetSize( vLocalMins, vLocalMaxs );
+	GetEngineObject()->SetSize( vLocalMins, vLocalMaxs );
 }
 
 void CPhysicsCloneArea::Activate( void )
@@ -114,14 +114,14 @@ void CPhysicsCloneArea::UpdatePosition( void )
 	if( root )
 	{
 		//don't want to risk list corruption while untouching
-		CUtlVector<CBaseEntity *> TouchingEnts;
+		CUtlVector<IServerEntity *> TouchingEnts;
 		for( servertouchlink_t *link = root->nextLink; link != root; link = link->nextLink )
-			TouchingEnts.AddToTail( EntityList()->GetBaseEntityFromHandle(link->entityTouched) );
+			TouchingEnts.AddToTail(EntityList()->GetBaseEntityFromHandle(link->entityTouched) );
 
 
 		for( int i = TouchingEnts.Count(); --i >= 0; )
 		{
-			CBaseEntity *pTouch = TouchingEnts[i];
+			IServerEntity *pTouch = TouchingEnts[i];
 
 			pTouch->GetEngineObject()->PhysicsNotifyOtherOfUntouch( this->GetEngineObject());
 			GetEngineObject()->PhysicsNotifyOtherOfUntouch( pTouch->GetEngineObject());

@@ -189,7 +189,7 @@ void CTriggerRelay::RefireThink( void )
 
 void CTriggerRelay::Use( IServerEntity *pActivator, IServerEntity *pCaller, USE_TYPE useType, float value )
 {
-	m_OnTrigger.FireOutput((CBaseEntity*)pActivator, this);
+	m_OnTrigger.FireOutput(pActivator, this);
 	
 	if (GetEngineObject()->GetSpawnFlags() & SF_RELAY_FIREONCE)
 	{
@@ -376,7 +376,7 @@ void CMultiManager::ManagerUse ( IServerEntity *pActivator, IServerEntity *pCall
 	m_index = 0;
 	m_startTime = gpGlobals->curtime;
 
-	m_OnTrigger.FireOutput((CBaseEntity*)pActivator, this);
+	m_OnTrigger.FireOutput(pActivator, this);
 	
 	// Calculate the time to re-enable the multimanager - just after the last output is fired.
 	// dvsents2: need to disable multimanager until last output is fired
@@ -523,7 +523,7 @@ void CPendulum::Stop( void )
 }
 
 
-void CPendulum::Blocked( CBaseEntity *pOther )
+void CPendulum::Blocked( IServerEntity *pOther )
 {
 	m_flTime = gpGlobals->curtime;
 }
@@ -694,7 +694,7 @@ void CFuncMortarField::InputTrigger( inputdata_t &inputdata )
 		break;
 	case 2: // table
 		{
-			CBaseEntity *pController;
+			IServerEntity *pController;
 
 			if ( m_iszXController != NULL_STRING )
 			{
@@ -751,7 +751,7 @@ void CFuncMortarField::InputTrigger( inputdata_t &inputdata )
 		trace_t tr;
 		UTIL_TraceLine( vecSpot, vecSpot + Vector( 0, 0, -1 ) * MAX_TRACE_LENGTH, MASK_SOLID_BRUSHONLY, this,  COLLISION_GROUP_NONE, &tr );
 
-		CBaseEntity *pMortar = Create( "monster_mortar", tr.endpos, QAngle( 0, 0, 0 ), inputdata.pActivator );
+		CBaseEntity *pMortar = Create( "monster_mortar", tr.endpos, QAngle( 0, 0, 0 ), (CBaseEntity*)inputdata.pActivator );
 		pMortar->GetEngineObject()->SetNextThink( gpGlobals->curtime + t );
 		t += random->RandomFloat( 0.2, 0.5 );
 
@@ -929,7 +929,7 @@ void CRenderFxManager::Use( IServerEntity *pActivator, IServerEntity *pCaller, U
 {
 	if ( m_target != NULL_STRING )
 	{
-		CBaseEntity *pEntity = NULL;
+		IServerEntity *pEntity = NULL;
 		while ( ( pEntity = EntityList()->FindEntityByName( pEntity, STRING( m_target ) ) ) != NULL )
 		{
 			if ( !GetEngineObject()->HasSpawnFlags( SF_RENDER_MASKFX ) )
@@ -937,9 +937,9 @@ void CRenderFxManager::Use( IServerEntity *pActivator, IServerEntity *pCaller, U
 			if ( !GetEngineObject()->HasSpawnFlags( SF_RENDER_MASKAMT ) )
 				pEntity->SetRenderColorA( GetRenderColor().a );
 			if ( !GetEngineObject()->HasSpawnFlags( SF_RENDER_MASKMODE ) )
-				pEntity->m_nRenderMode = m_nRenderMode;
+				pEntity->SetRenderMode( GetRenderMode() );
 			if ( !GetEngineObject()->HasSpawnFlags( SF_RENDER_MASKCOLOR ) )
-				pEntity->m_clrRender = m_clrRender;
+				pEntity->SetRenderColor(GetRenderColor());
 		}
 	}
 }

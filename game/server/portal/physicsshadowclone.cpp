@@ -67,7 +67,7 @@ void CPhysicsShadowClone::Spawn( void )
 
 bool CPhysicsShadowClone::ShouldCollide( int collisionGroup, int contentsMask ) const
 {
-	CBaseEntity *pClonedEntity = ((CPhysicsShadowClone*)(this))->GetEngineShadowClone()->GetClonedEntity();
+	IServerEntity *pClonedEntity = ((CPhysicsShadowClone*)(this))->GetEngineShadowClone()->GetClonedEntity();
 
 	if( pClonedEntity )
 		return pClonedEntity->ShouldCollide( collisionGroup, contentsMask );
@@ -95,7 +95,7 @@ int	CPhysicsShadowClone::ObjectCaps( void )
 //damage relays to source entity
 bool CPhysicsShadowClone::PassesDamageFilter( const CTakeDamageInfo &info )
 {
-	CBaseEntity *pClonedEntity = GetEngineShadowClone()->GetClonedEntity();
+	IServerEntity *pClonedEntity = GetEngineShadowClone()->GetClonedEntity();
 
 	if( pClonedEntity )
 		return pClonedEntity->PassesDamageFilter( info );
@@ -103,9 +103,9 @@ bool CPhysicsShadowClone::PassesDamageFilter( const CTakeDamageInfo &info )
 		return BaseClass::PassesDamageFilter( info );
 }
 
-bool CPhysicsShadowClone::CanBeHitByMeleeAttack( CBaseEntity *pAttacker )
+bool CPhysicsShadowClone::CanBeHitByMeleeAttack( IServerEntity *pAttacker )
 {
-	CBaseEntity *pClonedEntity = GetEngineShadowClone()->GetClonedEntity();
+	IServerEntity *pClonedEntity = GetEngineShadowClone()->GetClonedEntity();
 
 	if( pClonedEntity )
 		return pClonedEntity->CanBeHitByMeleeAttack( pAttacker );
@@ -115,7 +115,7 @@ bool CPhysicsShadowClone::CanBeHitByMeleeAttack( CBaseEntity *pAttacker )
 
 int CPhysicsShadowClone::OnTakeDamage( const CTakeDamageInfo &info )
 {
-	CBaseEntity *pClonedEntity = GetEngineShadowClone()->GetClonedEntity();
+	IServerEntity *pClonedEntity = GetEngineShadowClone()->GetClonedEntity();
 
 	if( pClonedEntity )
 		return pClonedEntity->OnTakeDamage( info );
@@ -125,7 +125,7 @@ int CPhysicsShadowClone::OnTakeDamage( const CTakeDamageInfo &info )
 
 int CPhysicsShadowClone::TakeHealth( float flHealth, int bitsDamageType )
 {
-	CBaseEntity *pClonedEntity = GetEngineShadowClone()->GetClonedEntity();
+	IServerEntity *pClonedEntity = GetEngineShadowClone()->GetClonedEntity();
 
 	if( pClonedEntity )
 		return pClonedEntity->TakeHealth( flHealth, bitsDamageType );
@@ -135,7 +135,7 @@ int CPhysicsShadowClone::TakeHealth( float flHealth, int bitsDamageType )
 
 void CPhysicsShadowClone::Event_Killed( const CTakeDamageInfo &info )
 {
-	CBaseEntity *pClonedEntity = GetEngineShadowClone()->GetClonedEntity();
+	IServerEntity *pClonedEntity = GetEngineShadowClone()->GetClonedEntity();
 
 	if( pClonedEntity )
 		pClonedEntity->Event_Killed( info );
@@ -168,7 +168,7 @@ bool CTraceFilterTranslateClones::ShouldHitEntity( IHandleEntity *pEntity, int c
 	CBaseEntity *pEnt = EntityFromEntityHandle( pEntity );
 	if(pEnt->GetEngineObject()->IsShadowClone() )
 	{
-		CBaseEntity *pClonedEntity = ((CPhysicsShadowClone *)pEnt)->GetEngineShadowClone()->GetClonedEntity();
+		IServerEntity *pClonedEntity = pEnt->GetEngineShadowClone()->GetClonedEntity();
 		IEnginePortalServer *pSimulator = pClonedEntity->GetEngineObject()->GetPortalThatOwnsEntity();
 		if( pSimulator->GetEntFlags(pClonedEntity->entindex()) & PSEF_IS_IN_PORTAL_HOLE )
 			return m_pActualFilter->ShouldHitEntity( pClonedEntity, contentsMask );

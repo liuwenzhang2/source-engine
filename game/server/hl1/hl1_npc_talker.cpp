@@ -225,7 +225,7 @@ int CHL1NPCTalker::FIdleSpeak ( void )
 
 	// if there is a friend nearby to speak to, play sentence, set friend's response time, return
 	// try to talk to any standing or sitting scientists nearby
-	CBaseEntity *pentFriend = FindNearestFriend( false );
+	IServerEntity *pentFriend = FindNearestFriend( false );
 	CHL1NPCTalker *pentTalker = dynamic_cast<CHL1NPCTalker *>( pentFriend );
 	if (pentTalker && random->RandomInt(0,1) )
 	{
@@ -260,7 +260,7 @@ int CHL1NPCTalker::FIdleSpeak ( void )
 
 
 
-bool CHL1NPCTalker::IsValidSpeechTarget( int flags, CBaseEntity *pEntity )
+bool CHL1NPCTalker::IsValidSpeechTarget( int flags, IServerEntity *pEntity )
 {
 	if ( pEntity == this )
 		return false;
@@ -277,7 +277,7 @@ bool CHL1NPCTalker::IsValidSpeechTarget( int flags, CBaseEntity *pEntity )
 			}
 			else
 			{
-				if ( IRelationType( pEntity ) != D_LI )
+				if ( IRelationType( (CBaseEntity*)pEntity ) != D_LI )
 					return false;
 			}
 		}		
@@ -290,7 +290,7 @@ bool CHL1NPCTalker::IsValidSpeechTarget( int flags, CBaseEntity *pEntity )
 		if ( pEntity->GetEngineObject()->GetFlags() & FL_NOTARGET )
 			return false;
 
-		CAI_BaseNPC *pNPC = pEntity->MyNPCPointer();
+		CAI_BaseNPC *pNPC = ((CBaseEntity*)pEntity)->MyNPCPointer();
 		if ( pNPC )
 		{
 			// If not a NPC for some reason, or in a script.
@@ -313,7 +313,7 @@ bool CHL1NPCTalker::IsValidSpeechTarget( int flags, CBaseEntity *pEntity )
 				return false;
 		}
 
-		return FVisible( pEntity );
+		return FVisible((CBaseEntity*)pEntity );
 	}
 	else
 		return BaseClass::IsValidSpeechTarget( flags, pEntity );
@@ -506,7 +506,7 @@ void CHL1NPCTalker::FollowerUse( IServerEntity *pActivator, IServerEntity *pCall
 		// Pre-disaster followers can't be used
 		if (GetEngineObject()->GetSpawnFlags() & SF_NPC_PREDISASTER )
 		{
-			SetSpeechTarget( (CBaseEntity*)pCaller );
+			SetSpeechTarget( (IServerEntity*)pCaller );
 			DeclineFollowing();
 			return;
 		}

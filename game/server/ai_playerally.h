@@ -317,14 +317,14 @@ public:
 	//---------------------------------
 	// Speech & Acting
 	//---------------------------------
-	CBaseEntity	*EyeLookTarget( void );		// Override to look at talk target
-	CBaseEntity	*FindNamedEntity( const char *pszName, IEntityFindFilter *pFilter = NULL );
+	IServerEntity	*EyeLookTarget( void );		// Override to look at talk target
+	IServerEntity	*FindNamedEntity( const char *pszName, IEntityFindFilter *pFilter = NULL );
 
-	CBaseEntity *FindSpeechTarget( int flags );
-	virtual bool IsValidSpeechTarget( int flags, CBaseEntity *pEntity );
+	IServerEntity *FindSpeechTarget( int flags );
+	virtual bool IsValidSpeechTarget( int flags, IServerEntity *pEntity );
 	
 	CBaseEntity *GetSpeechTarget()								{ return m_hTalkTarget.Get(); }
-	void		SetSpeechTarget( CBaseEntity *pSpeechTarget ) 	{ m_hTalkTarget = pSpeechTarget; }
+	void		SetSpeechTarget( IServerEntity *pSpeechTarget ) 	{ m_hTalkTarget = (CBaseEntity*)pSpeechTarget; }
 	
 	void		SetSpeechFilter( CAI_SpeechFilter *pFilter )	{ m_hSpeechFilter = pFilter; }
 	CAI_SpeechFilter *GetSpeechFilter( void )					{ return m_hSpeechFilter; }

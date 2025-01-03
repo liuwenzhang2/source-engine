@@ -92,7 +92,7 @@ void CPathTrack::Activate( void )
 //-----------------------------------------------------------------------------
 void CPathTrack::Link( void  )
 {
-	CBaseEntity *pTarget;
+	IServerEntity *pTarget;
 
 	if ( m_target != NULL_STRING )
 	{

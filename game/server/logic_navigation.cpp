@@ -21,7 +21,7 @@ enum navproperties_t
 // Purpose: 
 //-----------------------------------------------------------------------------
 class CLogicNavigation : public CLogicalEntity,
-						 public IEntityListener<CBaseEntity>
+						 public IEntityListener<IServerEntity>
 {
 	DECLARE_CLASS( CLogicNavigation, CLogicalEntity );
 public:
@@ -32,7 +32,7 @@ public:
 	void UpdateOnRemove();
 private:
 
-	void OnEntitySpawned( CBaseEntity *pEntity );
+	void OnEntitySpawned( IServerEntity *pEntity );
 
 	// Inputs
 	void InputTurnOn( inputdata_t &inputdata ) { TurnOn(); }
@@ -130,7 +130,7 @@ void CLogicNavigation::UpdateOnRemove()
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-void CLogicNavigation::OnEntitySpawned( CBaseEntity *pEntity )
+void CLogicNavigation::OnEntitySpawned( IServerEntity *pEntity )
 {
 	if ( m_isOn && ( m_navProperty & NAV_IGNORE ) && pEntity->NameMatches( m_target ) )
 	{
@@ -152,7 +152,7 @@ void CLogicNavigation::TurnOn()
 
 void CLogicNavigation::UpdateProperty()
 {
-	CBaseEntity *pEntity = NULL;
+	IServerEntity *pEntity = NULL;
 	while ( ( pEntity = EntityList()->FindEntityByName( pEntity, STRING(m_target) ) ) != NULL )
 	{
 		if ( m_isOn )

@@ -105,7 +105,7 @@ void CWeaponBugBait::Spawn( void )
 
 	// Increase the bugbait's pickup volume. It spawns inside the antlion guard's body,
 	// and playtesters seem to be wary about moving into the body.
-	SetSize( Vector( -4, -4, -4), Vector(4, 4, 4) );
+	GetEngineObject()->SetSize( Vector( -4, -4, -4), Vector(4, 4, 4) );
 	GetEngineObject()->UseTriggerBounds( true, 100 );
 }
 

@@ -67,7 +67,7 @@ void FreeContainingEntity( int ed )
 {
 	if ( ed!=-1 )
 	{
-		CBaseEntity *ent = EntityList()->GetBaseEntity( ed );
+		IServerEntity *ent = EntityList()->GetBaseEntity( ed );
 		if ( ent )
 		{
 			//engine->SetEdict(ed, false );
@@ -123,7 +123,7 @@ static int __cdecl CompareSpawnOrder(HierarchicalSpawn_t *pEnt1, HierarchicalSpa
 //-----------------------------------------------------------------------------
 // Computes the hierarchical depth of the entities to spawn..
 //-----------------------------------------------------------------------------
-static int ComputeSpawnHierarchyDepth_r( CBaseEntity *pEntity )
+static int ComputeSpawnHierarchyDepth_r( IServerEntity *pEntity )
 {
 	if ( !pEntity )
 		return 1;
@@ -131,7 +131,7 @@ static int ComputeSpawnHierarchyDepth_r( CBaseEntity *pEntity )
 	if (pEntity->GetEngineObject()->GetParentName() == NULL_STRING)
 		return 1;
 
-	CBaseEntity *pParent = EntityList()->FindEntityByName( NULL, ExtractParentName(pEntity->GetEngineObject()->GetParentName()) );
+	IServerEntity *pParent = EntityList()->FindEntityByName( NULL, ExtractParentName(pEntity->GetEngineObject()->GetParentName()) );
 	if (!pParent)
 		return 1;
 	
@@ -141,7 +141,7 @@ static int ComputeSpawnHierarchyDepth_r( CBaseEntity *pEntity )
 		return 1;
 	}
 
-	return 1 + ComputeSpawnHierarchyDepth_r( pParent );
+	return 1 + ComputeSpawnHierarchyDepth_r(pParent );
 }
 
 static void ComputeSpawnHierarchyDepth( int nEntities, HierarchicalSpawn_t *pSpawnList )
@@ -152,7 +152,7 @@ static void ComputeSpawnHierarchyDepth( int nEntities, HierarchicalSpawn_t *pSpa
 	int nEntity;
 	for (nEntity = 0; nEntity < nEntities; nEntity++)
 	{
-		CBaseEntity *pEntity = pSpawnList[nEntity].m_pEntity;
+		IServerEntity *pEntity = pSpawnList[nEntity].m_pEntity;
 		if (pEntity && !pEntity->IsDormant())
 		{
 			pSpawnList[nEntity].m_nDepth = ComputeSpawnHierarchyDepth_r( pEntity );
@@ -202,7 +202,7 @@ void SetupParentsForSpawnList( int nEntities, HierarchicalSpawn_t *pSpawnList )
 	int nEntity;
 	for (nEntity = nEntities - 1; nEntity >= 0; nEntity--)
 	{
-		CBaseEntity *pEntity = pSpawnList[nEntity].m_pEntity;
+		IServerEntity *pEntity = pSpawnList[nEntity].m_pEntity;
 		if ( pEntity )
 		{
 			if ( strchr(STRING(pEntity->GetEngineObject()->GetParentName()), ',') )
@@ -210,12 +210,11 @@ void SetupParentsForSpawnList( int nEntities, HierarchicalSpawn_t *pSpawnList )
 				char szToken[256];
 				const char *pAttachmentName = nexttoken(szToken, STRING(pEntity->GetEngineObject()->GetParentName()), ',');
 				pEntity->GetEngineObject()->SetParentName( szToken);
-				CBaseEntity *pParent = EntityList()->FindEntityByName( NULL, pEntity->GetEngineObject()->GetParentName() );
+				IServerEntity *pParent = EntityList()->FindEntityByName( NULL, pEntity->GetEngineObject()->GetParentName() );
 				int iAttachment = -1;
-				CBaseAnimating* pAnim = pParent->GetBaseAnimating();
-				if (pAnim)
+				if (pParent->GetEngineObject()->GetModelPtr())
 				{
-					iAttachment = pAnim->GetEngineObject()->LookupAttachment(pAttachmentName);
+					iAttachment = pParent->GetEngineObject()->LookupAttachment(pAttachmentName);
 				}
 				pEntity->GetEngineObject()->SetParent(pParent->GetEngineObject(), iAttachment);
 				// setparent in the spawn pass instead - so the model will have been set & loaded
@@ -224,7 +223,7 @@ void SetupParentsForSpawnList( int nEntities, HierarchicalSpawn_t *pSpawnList )
 			}
 			else
 			{
-				CBaseEntity *pParent = EntityList()->FindEntityByName( NULL, pEntity->GetEngineObject()->GetParentName() );
+				IServerEntity *pParent = EntityList()->FindEntityByName( NULL, pEntity->GetEngineObject()->GetParentName() );
 
 				if ((pParent != NULL) && (pParent->entindex() != -1))
 				{
@@ -240,7 +239,7 @@ void RememberInitialEntityPositions( int nEntities, HierarchicalSpawn_t *pSpawnL
 {
 	for (int nEntity = 0; nEntity < nEntities; nEntity++)
 	{
-		CBaseEntity *pEntity = pSpawnList[nEntity].m_pEntity;
+		IServerEntity *pEntity = pSpawnList[nEntity].m_pEntity;
 
 		if ( pEntity )
 		{
@@ -256,7 +255,7 @@ void SpawnAllEntities( int nEntities, HierarchicalSpawn_t *pSpawnList, bool bAct
 	for (nEntity = 0; nEntity < nEntities; nEntity++)
 	{
 		VPROF( "MapEntity_ParseAllEntities_Spawn");
-		CBaseEntity *pEntity = pSpawnList[nEntity].m_pEntity;
+		IServerEntity *pEntity = pSpawnList[nEntity].m_pEntity;
 
 		//if ( pSpawnList[nEntity].m_pDeferredParent )
 		//{
@@ -297,7 +296,7 @@ void SpawnAllEntities( int nEntities, HierarchicalSpawn_t *pSpawnList, bool bAct
 		bool bAsyncAnims = mdlcache->SetAsyncLoad( MDLCACHE_ANIMBLOCK, false );
 		for (nEntity = 0; nEntity < nEntities; nEntity++)
 		{
-			CBaseEntity *pEntity = pSpawnList[nEntity].m_pEntity;
+			IServerEntity *pEntity = pSpawnList[nEntity].m_pEntity;
 
 			if ( pEntity )
 			{
@@ -355,7 +354,7 @@ void MapEntity_ParseAllEntities(const char *pMapData, IMapEntityFilter *pFilter,
 		//
 		// Parse the entity and add it to the spawn list.
 		//
-		CBaseEntity *pEntity;
+		IServerEntity *pEntity;
 		const char *pCurMapData = pMapData;
 		pMapData = MapEntity_ParseEntity(pEntity, pMapData, pFilter);
 		if (pEntity == NULL)
@@ -532,7 +531,7 @@ void MapEntity_PrecacheEntity( const char *pEntData, int &nStringSize )
 	}
 
 	// Construct via the LINK_ENTITY_TO_CLASS factory.
-	CBaseEntity *pEntity = (CBaseEntity*)EntityList()->CreateEntityByName(className);
+	IServerEntity *pEntity = EntityList()->CreateEntityByName(className);
 
 	//
 	// Set up keyvalues, which can set the model name, which is why we don't just do UTIL_PrecacheOther here...
@@ -551,7 +550,7 @@ void MapEntity_PrecacheEntity( const char *pEntData, int &nStringSize )
 //			pEntData - Data block to parse to extract entity keys.
 // Output : Returns the current position in the entity data block.
 //-----------------------------------------------------------------------------
-const char *MapEntity_ParseEntity(CBaseEntity *&pEntity, const char *pEntData, IMapEntityFilter *pFilter)
+const char *MapEntity_ParseEntity(IServerEntity *&pEntity, const char *pEntData, IMapEntityFilter *pFilter)
 {
 	CEntityMapData entData( (char*)pEntData );
 	char className[MAPKEY_MAXLENGTH];
@@ -570,7 +569,7 @@ const char *MapEntity_ParseEntity(CBaseEntity *&pEntity, const char *pEntData, I
 		if ( pFilter )
 			pEntity = pFilter->CreateNextEntity( className );
 		else
-			pEntity = (CBaseEntity*)EntityList()->CreateEntityByName(className);
+			pEntity = EntityList()->CreateEntityByName(className);
 
 		//
 		// Set up keyvalues.

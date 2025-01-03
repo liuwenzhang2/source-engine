@@ -539,7 +539,7 @@ bool NextBotGroundLocomotion::DetectCollision( trace_t *pTrace, int &recursionLi
 	}
 	else
 	{
-		((CBaseEntity*)pTrace->m_pEnt)->Touch( GetBot()->GetEntity() );
+		((IServerEntity*)pTrace->m_pEnt)->Touch( GetBot()->GetEntity() );
 	}
 
 	return true;
@@ -626,7 +626,7 @@ Vector NextBotGroundLocomotion::ResolveCollision( const Vector &from, const Vect
 
 			nPosture = body->GetDesiredPosture();
 
-			if ( !((CBaseEntity*)trace.m_pEnt)->MyNextBotPointer() && !((CBaseEntity*)trace.m_pEnt)->IsPlayer() )
+			if ( !((CBaseEntity*)trace.m_pEnt)->MyNextBotPointer() && !trace.m_pEnt->IsPlayer() )
 			{
 				// Here, our standing trace hit the world or something non-breakable
 				// If we're not currently crouching, then see if we could travel
@@ -674,12 +674,12 @@ Vector NextBotGroundLocomotion::ResolveCollision( const Vector &from, const Vect
 		{
 			// stuck inside solid; don't move
 
-			if ( trace.m_pEnt && !((CBaseEntity*)trace.m_pEnt)->IsWorld() )
+			if ( trace.m_pEnt && !trace.m_pEnt->IsWorld() )
 			{
 				// only ignore physics props that are not doors
 				if ( dynamic_cast< CPhysicsProp * >( trace.m_pEnt ) != NULL && dynamic_cast< CBasePropDoor * >( trace.m_pEnt ) == NULL )
 				{
-					IPhysicsObject *physicObject = ((CBaseEntity*)trace.m_pEnt)->GetEngineObject()->VPhysicsGetObject();
+					IPhysicsObject *physicObject = trace.m_pEnt->GetEngineObject()->VPhysicsGetObject();
 					if (physicObject && physicObject->IsMoveable() )
 					{
 						// we've intersected a (likely moving) physics prop - ignore it for awhile so we can move out of it
@@ -1011,7 +1011,7 @@ void NextBotGroundLocomotion::UpdateGroundConstraint( void )
 		}
 		
 		// inform other components of collision if we didn't land on the 'world'
-		if ( ground.m_pEnt && !((CBaseEntity*)ground.m_pEnt)->IsWorld() )
+		if ( ground.m_pEnt && !ground.m_pEnt->IsWorld() )
 		{
 			GetBot()->OnContact((CBaseEntity*)ground.m_pEnt, &ground );
 		}
@@ -1037,7 +1037,7 @@ void NextBotGroundLocomotion::UpdateGroundConstraint( void )
 		// not on the ground
 		if ( IsOnGround() )
 		{
-			GetBot()->OnLeaveGround( m_nextBot->GetEngineObject()->GetGroundEntity()->GetOuter() );
+			GetBot()->OnLeaveGround((CBaseEntity*)m_nextBot->GetEngineObject()->GetGroundEntity()->GetOuter() );
 			if ( !IsClimbingUpToLedge() && !IsJumpingAcrossGap() )
 			{
 				m_isUsingFullFeetTrace = true; // We're in the air and there's space below us, so use the full trace
@@ -1131,7 +1131,7 @@ void NextBotGroundLocomotion::JumpAcrossGap( const Vector &landingGoal, const Ve
 	m_isJumpingAcrossGap = true;
 	m_isClimbingUpToLedge = false;
 
-	GetBot()->OnLeaveGround( m_nextBot->GetEngineObject()->GetGroundEntity()->GetOuter() );
+	GetBot()->OnLeaveGround((CBaseEntity*)m_nextBot->GetEngineObject()->GetGroundEntity()->GetOuter() );
 }
 
 
@@ -1160,7 +1160,7 @@ void NextBotGroundLocomotion::Jump( void )
 	m_isJumping = true;
 	m_isClimbingUpToLedge = false;
 
-	GetBot()->OnLeaveGround( m_nextBot->GetEngineObject()->GetGroundEntity()->GetOuter() );
+	GetBot()->OnLeaveGround((CBaseEntity*)m_nextBot->GetEngineObject()->GetGroundEntity()->GetOuter() );
 }
 
 

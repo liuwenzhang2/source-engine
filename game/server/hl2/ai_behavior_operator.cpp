@@ -365,7 +365,7 @@ void CAI_OperatorGoal::EnableGoal( CAI_BaseNPC *pAI )
 		return;
 	}
 
-	CBaseEntity *pPosition = EntityList()->FindEntityByName(NULL, m_target);
+	IServerEntity *pPosition = EntityList()->FindEntityByName(NULL, m_target);
 
 	if( !pPosition )
 	{
@@ -374,14 +374,14 @@ void CAI_OperatorGoal::EnableGoal( CAI_BaseNPC *pAI )
 	}
 
 	
-	CBaseEntity *pContextTarget = NULL;
+	IServerEntity *pContextTarget = NULL;
 	
 	if( m_iszContextTarget != NULL_STRING )
 	{
 		pContextTarget = EntityList()->FindEntityByName( NULL, m_iszContextTarget );
 	}
 
-	pBehavior->SetParameters(this, pPosition, pContextTarget);
+	pBehavior->SetParameters(this, (CBaseEntity*)pPosition, (CBaseEntity*)pContextTarget);
 }
 
 //-----------------------------------------------------------------------------

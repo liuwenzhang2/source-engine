@@ -195,7 +195,7 @@ void CDODBaseRocket::Explode( void )
 
 	DoExplosion( newTrace );
 
-	if ( newTrace->m_pEnt && !((CBaseEntity*)newTrace->m_pEnt)->IsPlayer() )
+	if ( newTrace->m_pEnt && !newTrace->m_pEnt->IsPlayer() )
 		UTIL_DecalTrace( newTrace, "Scorch" );
 
 	g_pSoundEmitterSystem->StopSound(this, "Weapon_Bazooka.Shoot" );

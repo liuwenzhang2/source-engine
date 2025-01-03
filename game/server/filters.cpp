@@ -54,7 +54,7 @@ bool CBaseFilter::PassesDamageFilter(const CTakeDamageInfo &info)
 
 bool CBaseFilter::PassesDamageFilterImpl( const CTakeDamageInfo &info )
 {
-	return PassesFilterImpl( NULL, info.GetAttacker() );
+	return PassesFilterImpl( NULL, (CBaseEntity*)info.GetAttacker() );
 }
 
 //-----------------------------------------------------------------------------
@@ -63,7 +63,7 @@ bool CBaseFilter::PassesDamageFilterImpl( const CTakeDamageInfo &info )
 //-----------------------------------------------------------------------------
 void CBaseFilter::InputTestActivator( inputdata_t &inputdata )
 {
-	if ( PassesFilter( inputdata.pCaller, inputdata.pActivator ) )
+	if ( PassesFilter( (CBaseEntity*)inputdata.pCaller, (CBaseEntity*)inputdata.pActivator ) )
 	{
 		m_OnPass.FireOutput( inputdata.pActivator, this );
 	}
@@ -137,7 +137,7 @@ void CFilterMultiple::Activate( void )
 	{
 		if ( m_iFilterName[i] != NULL_STRING )
 		{
-			CBaseEntity *pEntity = EntityList()->FindEntityByName( NULL, m_iFilterName[i] );
+			IServerEntity *pEntity = EntityList()->FindEntityByName( NULL, m_iFilterName[i] );
 			CBaseFilter *pFilter = dynamic_cast<CBaseFilter *>(pEntity);
 			if ( pFilter == NULL )
 			{

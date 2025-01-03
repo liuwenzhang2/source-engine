@@ -106,7 +106,7 @@ public:
 	void 			PrescheduleThink();
 	void			BuildScheduleTestBits();
 
-	bool			FInViewCone( CBaseEntity *pEntity );
+	bool			FInViewCone( IServerEntity *pEntity );
 
 	int				SelectFailSchedule( int failedSchedule, int failedTask, AI_TaskFailureCode_t taskFailCode );
 	int				SelectSchedule();

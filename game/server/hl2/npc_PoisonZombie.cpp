@@ -445,7 +445,7 @@ void CNPC_PoisonZombie::Event_Killed( const CTakeDamageInfo &info )
 
 	if ( !m_fIsTorso )
 	{
-		EvacuateNest(info.GetDamageType() == DMG_BLAST, info.GetDamage(), info.GetAttacker() );
+		EvacuateNest(info.GetDamageType() == DMG_BLAST, info.GetDamage(), (CBaseEntity*)info.GetAttacker() );
 	}
 
 	BaseClass::Event_Killed( info );

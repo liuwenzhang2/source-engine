@@ -919,7 +919,7 @@ inline int CBot< PlayerType >::GetEnemiesRemaining( void ) const
 
 	for ( int i = 1; i <= gpGlobals->maxClients; ++i )
 	{
-		CBaseEntity *player = EntityList()->GetPlayerByIndex( i );
+		CBaseEntity *player = (CBaseEntity*)EntityList()->GetPlayerByIndex( i );
 
 		if (player == NULL)
 			continue;
@@ -947,7 +947,7 @@ inline int CBot< PlayerType >::GetFriendsRemaining( void ) const
 
 	for ( int i = 1; i <= gpGlobals->maxClients; ++i )
 	{
-		CBaseEntity *player = EntityList()->GetPlayerByIndex( i );
+		CBaseEntity *player = (CBaseEntity*)EntityList()->GetPlayerByIndex( i );
 
 		if (player == NULL)
 			continue;

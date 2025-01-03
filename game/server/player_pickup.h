@@ -67,7 +67,7 @@ CBaseEntity	*Pickup_OnFailedPhysGunPickup( CBaseEntity *pPickedUpObject, Vector 
 //	virtual CBaseEntity		*OnFailedPhysGunPickup( Vector vPhysgunPos ) = 0;
 //	virtual void			OnPhysGunPickup( CBasePlayer *pPhysGunUser, PhysGunPickup_t reason = PICKED_UP_BY_CANNON ) = 0;
 //	virtual void			OnPhysGunDrop( CBasePlayer *pPhysGunUser, PhysGunDrop_t Reason ) = 0;
-//	virtual bool			HasPreferredCarryAnglesForPlayer( CBasePlayer *pPlayer = NULL ) = 0;
+//	virtual bool			HasPreferredCarryAnglesForPlayer( IServerEntity *pPlayer = NULL ) = 0;
 //	virtual QAngle			PreferredCarryAngles( void )  = 0;
 //	virtual bool			ForcePhysgunOpen( CBasePlayer *pPlayer ) = 0;
 //	virtual AngularImpulse	PhysGunLaunchAngularImpulse() = 0;

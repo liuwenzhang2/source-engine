@@ -21,10 +21,10 @@ struct EventQueuePrioritizedEvent_t
 	float m_flFireTime;
 	string_t m_iTarget;
 	string_t m_iTargetInput;
-	EHANDLE m_pActivator;
-	EHANDLE m_pCaller;
+	CHandle<IServerEntity> m_pActivator;
+	CHandle<IServerEntity> m_pCaller;
 	int m_iOutputID;
-	EHANDLE m_pEntTarget;  // a pointer to the entity to target; overrides m_iTarget
+	CHandle<IServerEntity> m_pEntTarget;  // a pointer to the entity to target; overrides m_iTarget
 
 	variant_t m_VariantValue;	// variable-type parameter
 
@@ -40,13 +40,13 @@ class CEventQueue
 {
 public:
 	// pushes an event into the queue, targeting a string name (m_iName), or directly by a pointer
-	void AddEvent( const char *target, const char *action, variant_t Value, float fireDelay, CBaseEntity *pActivator, CBaseEntity *pCaller, int outputID = 0 );
-	void AddEvent( CBaseEntity *target, const char *action, float fireDelay, CBaseEntity *pActivator, CBaseEntity *pCaller, int outputID = 0 );
-	void AddEvent( CBaseEntity *target, const char *action, variant_t Value, float fireDelay, CBaseEntity *pActivator, CBaseEntity *pCaller, int outputID = 0 );
+	void AddEvent( const char *target, const char *action, variant_t Value, float fireDelay, IServerEntity *pActivator, IServerEntity *pCaller, int outputID = 0 );
+	void AddEvent( IServerEntity *target, const char *action, float fireDelay, IServerEntity *pActivator, IServerEntity *pCaller, int outputID = 0 );
+	void AddEvent( IServerEntity *target, const char *action, variant_t Value, float fireDelay, IServerEntity *pActivator, IServerEntity *pCaller, int outputID = 0 );
 
-	void CancelEvents( CBaseEntity *pCaller );
-	void CancelEventOn( CBaseEntity *pTarget, const char *sInputName );
-	bool HasEventPending( CBaseEntity *pTarget, const char *sInputName );
+	void CancelEvents( IServerEntity *pCaller );
+	void CancelEventOn( IServerEntity *pTarget, const char *sInputName );
+	bool HasEventPending( IServerEntity *pTarget, const char *sInputName );
 
 	// services the queue, firing off any events who's time hath come
 	void ServiceEvents( void );

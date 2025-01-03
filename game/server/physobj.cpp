@@ -112,16 +112,16 @@ END_DATADESC()
 
 // debug function - slow, uses dynamic_cast<> - use this to query the attached objects
 // physics_debug_entity toggles the constraint system for an object using this
-bool GetSpringAttachments( CBaseEntity *pEntity, CBaseEntity *pAttachOut[2], IPhysicsObject *pAttachVPhysics[2] )
+bool GetSpringAttachments( IServerEntity *pEntity, IServerEntity *pAttachOut[2], IPhysicsObject *pAttachVPhysics[2] )
 {
 	CPhysicsSpring *pSpringEntity = dynamic_cast<CPhysicsSpring *>(pEntity);
 	if ( pSpringEntity )
 	{
 		IPhysicsObject *pRef = pSpringEntity->GetStartObject();
-		pAttachOut[0] = pRef ? static_cast<CBaseEntity *>(pRef->GetGameData()) : NULL;
+		pAttachOut[0] = pRef ? static_cast<IServerEntity*>(pRef->GetGameData()) : NULL;
 		pAttachVPhysics[0] = pRef;
 		IPhysicsObject *pAttach = pSpringEntity->GetEndObject();
-		pAttachOut[1] = pAttach ? static_cast<CBaseEntity *>(pAttach->GetGameData()) : NULL;
+		pAttachOut[1] = pAttach ? static_cast<IServerEntity*>(pAttach->GetGameData()) : NULL;
 		pAttachVPhysics[1] = pAttach;
 		return true;
 	}
@@ -806,7 +806,7 @@ int CPhysBox::OnTakeDamage( const CTakeDamageInfo &info )
 
 	if ( info.GetInflictor() )
 	{
-		m_OnDamaged.FireOutput( info.GetAttacker(), this );
+		m_OnDamaged.FireOutput((IServerEntity*)info.GetAttacker(), this );
 	}
 
 	// Have we been broken? If so, abort
@@ -841,7 +841,7 @@ int CPhysBox::OnTakeDamage( const CTakeDamageInfo &info )
 //-----------------------------------------------------------------------------
 // Purpose: Return true if this physbox has preferred carry angles
 //-----------------------------------------------------------------------------
-bool CPhysBox::HasPreferredCarryAnglesForPlayer( CBaseEntity *pPlayer )
+bool CPhysBox::HasPreferredCarryAnglesForPlayer( IServerEntity *pPlayer )
 {
 	return GetEngineObject()->HasSpawnFlags( SF_PHYSBOX_USEPREFERRED );
 }
@@ -895,13 +895,13 @@ float CPhysExplosion::GetRadius( void )
 	return radius;
 }
 
-CBaseEntity *CPhysExplosion::FindEntity( CBaseEntity *pEntity, CBaseEntity *pActivator, CBaseEntity *pCaller )
+IServerEntity *CPhysExplosion::FindEntity( IServerEntity *pEntity, IServerEntity *pActivator, IServerEntity *pCaller )
 {
 	// Filter by name or classname
 	if ( m_targetEntityName != NULL_STRING )
 	{
 		// Try an explicit name first
-		CBaseEntity *pTarget = EntityList()->FindEntityByName( pEntity, m_targetEntityName, NULL, pActivator, pCaller );
+		IServerEntity *pTarget = EntityList()->FindEntityByName( pEntity, m_targetEntityName, NULL, pActivator, pCaller );
 		if ( pTarget != NULL )
 			return pTarget;
 
@@ -926,9 +926,9 @@ void CPhysExplosion::InputExplode( inputdata_t &inputdata )
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-void CPhysExplosion::Explode( CBaseEntity *pActivator, CBaseEntity *pCaller )
+void CPhysExplosion::Explode( IServerEntity *pActivator, IServerEntity *pCaller )
 {
-	CBaseEntity *pEntity = NULL;
+	IServerEntity *pEntity = NULL;
 	float		adjustedDamage, falloff, flDist;
 	Vector		vecSpot, vecOrigin;
 
@@ -941,7 +941,7 @@ void CPhysExplosion::Explode( CBaseEntity *pActivator, CBaseEntity *pCaller )
 	while ((pEntity = FindEntity( pEntity, pActivator, pCaller )) != NULL)
 	{
 		// UNDONE: Ask the object if it should get force if it's not MOVETYPE_VPHYSICS?
-		if ( pEntity->m_takedamage != DAMAGE_NO && (pEntity->GetEngineObject()->GetMoveType() == MOVETYPE_VPHYSICS || (pEntity->GetEngineObject()->VPhysicsGetObject() /*&& !pEntity->IsPlayer()*/)) )
+		if ( pEntity->GetTakeDamage() != DAMAGE_NO && (pEntity->GetEngineObject()->GetMoveType() == MOVETYPE_VPHYSICS || (pEntity->GetEngineObject()->VPhysicsGetObject() /*&& !pEntity->IsPlayer()*/)) )
 		{
 			vecOrigin = GetEngineObject()->GetAbsOrigin();
 			
@@ -1285,7 +1285,7 @@ LINK_ENTITY_TO_CLASS( simple_physics_prop, CSimplePhysicsProp );
 
 // UNDONE: Is this worth it?, just recreate the object instead? (that happens when this returns false anyway)
 // recreating works, but is more expensive and won't inherit properties (velocity, constraints, etc)
-bool TransferPhysicsObject( CBaseEntity *pFrom, CBaseEntity *pTo, bool wakeUp )
+bool TransferPhysicsObject( IServerEntity *pFrom, IServerEntity *pTo, bool wakeUp )
 {
 	IPhysicsObject *pVPhysics = pFrom->GetEngineObject()->VPhysicsGetObject();
 	if ( !pVPhysics || pVPhysics->IsStatic() )
@@ -1315,18 +1315,18 @@ bool TransferPhysicsObject( CBaseEntity *pFrom, CBaseEntity *pTo, bool wakeUp )
 }
 
 // UNDONE: Move/rename this function
-static CBaseEntity *CreateSimplePhysicsObject( CBaseEntity *pEntity, bool createAsleep, bool createAsDebris )
+static IServerEntity *CreateSimplePhysicsObject( IServerEntity *pEntity, bool createAsleep, bool createAsDebris )
 {
-	CBaseEntity *pPhysEntity = NULL;
+	IServerEntity *pPhysEntity = NULL;
 	int modelindex = pEntity->GetEngineObject()->GetModelIndex();
 	const model_t *model = modelinfo->GetModel( modelindex );
 	if ( model && modelinfo->GetModelType(model) == mod_brush )
 	{
-		pPhysEntity = (CBaseEntity*)EntityList()->CreateEntityByName( "simple_physics_brush" );
+		pPhysEntity = EntityList()->CreateEntityByName( "simple_physics_brush" );
 	}
 	else
 	{
-		pPhysEntity = (CBaseEntity*)EntityList()->CreateEntityByName( "simple_physics_prop" );
+		pPhysEntity = EntityList()->CreateEntityByName( "simple_physics_prop" );
 	}
 
 	pPhysEntity->KeyValue( "model", STRING(pEntity->GetEngineObject()->GetModelName()) );
@@ -1390,9 +1390,9 @@ void CPhysConvert::InputConvertTarget( inputdata_t &inputdata )
 	// Fire output
 	m_OnConvert.FireOutput( inputdata.pActivator, this );
 
-	CBaseEntity *entlist[512];
-	CBaseEntity *pSwap = EntityList()->FindEntityByName( NULL, m_swapModel, NULL, inputdata.pActivator, inputdata.pCaller );
-	CBaseEntity *pEntity = NULL;
+	IServerEntity *entlist[512];
+	IServerEntity *pSwap = EntityList()->FindEntityByName( NULL, m_swapModel, NULL, inputdata.pActivator, inputdata.pCaller );
+	IServerEntity *pEntity = NULL;
 	
 	int count = 0;
 	while ( (pEntity = EntityList()->FindEntityByName( pEntity, m_target, NULL, inputdata.pActivator, inputdata.pCaller )) != NULL )
@@ -1431,7 +1431,7 @@ void CPhysConvert::InputConvertTarget( inputdata_t &inputdata )
 		}
 
 		// created phys object, now move hierarchy over
-		CBaseEntity *pPhys = CreateSimplePhysicsObject( pEntity, createAsleep, createAsDebris );
+		IServerEntity *pPhys = CreateSimplePhysicsObject( pEntity, createAsleep, createAsDebris );
 		if ( pPhys )
 		{
 			// Override the mass if specified
@@ -1444,7 +1444,7 @@ void CPhysConvert::InputConvertTarget( inputdata_t &inputdata )
 				}
 			}
 
-			pPhys->SetName( STRING(pEntity->GetEntityName()) );
+			pPhys->GetEngineObject()->SetName( STRING(pEntity->GetEntityName()) );
 			UTIL_TransferPoseParameters( pEntity, pPhys );
 			pEntity->GetEngineObject()->TransferChildren(pPhys->GetEngineObject());
 			pEntity->GetEngineObject()->AddSolidFlags( FSOLID_NOT_SOLID );
@@ -1616,14 +1616,14 @@ void CPhysMagnet::Touch( IServerEntity *pOther )
 void CPhysMagnet::VPhysicsCollision( int index, gamevcollisionevent_t *pEvent )
 {
 	int otherIndex = !index;
-	CBaseEntity *pOther = pEvent->pEntities[otherIndex];
+	CBaseEntity *pOther = (CBaseEntity*)pEvent->pEntities[otherIndex];
 
 	// Ignore triggers
 	if ( pOther->GetEngineObject()->IsSolidFlagSet( FSOLID_NOT_SOLID ) )
 		return;
 
 	m_bHasHitSomething = true;
-	DoMagnetSuck( pEvent->pEntities[!index] );
+	DoMagnetSuck((CBaseEntity*)pEvent->pEntities[!index] );
 
 	// Don't pickup if we're not active
 	if ( !m_bActive )

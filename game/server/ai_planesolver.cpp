@@ -150,9 +150,9 @@ bool CAI_PlaneSolver::DetectUnsolvable( const AILocalMoveGoal_t &goal )
 
 //-----------------------------------------------------------------------------
 
-float CAI_PlaneSolver::AdjustRegulationWeight( CBaseEntity *pEntity, float weight )
+float CAI_PlaneSolver::AdjustRegulationWeight( IServerEntity *pEntity, float weight )
 {
-	if ( pEntity->MyNPCPointer() != NULL )
+	if ( pEntity->IsNPC() )
 	{
 		// @TODO (toml 10-03-02): How to do this with non-NPC entities. Should be using intended solve velocity...
 		Vector2D velOwner = GetNpc()->GetMotor()->GetCurVel().AsVector2D();
@@ -351,7 +351,7 @@ void CAI_PlaneSolver::GenerateObstacleNpcs( const AILocalMoveGoal_t &goal, float
 			}
 		}
 
-		CBaseEntity *pPlayer = EntityList()->GetPlayerByIndex( 1 );
+		IServerEntity *pPlayer = EntityList()->GetPlayerByIndex( 1 );
 		if ( pPlayer )
 		{
 			Vector mins, maxs;
@@ -734,7 +734,7 @@ float CAI_PlaneSolver::CalcProbeDist( float speed )
 
 //-----------------------------------------------------------------------------
 
-void CAI_PlaneSolver::AddObstacle( const Vector &center, float radius, CBaseEntity *pEntity, AI_MoveSuggType_t type )
+void CAI_PlaneSolver::AddObstacle( const Vector &center, float radius, IServerEntity *pEntity, AI_MoveSuggType_t type )
 {
 	m_Obstacles.AddToTail( CircleObstacles_t( center, radius, pEntity, type ) );
 }
@@ -751,7 +751,7 @@ bool CAI_PlaneSolver::GenerateCircleObstacleSuggestions( const AILocalMoveGoal_t
 	
 	for ( int i = 0; i < m_Obstacles.Count(); i++ )
 	{
-		CBaseEntity *pObstacleEntity = NULL;
+		IServerEntity *pObstacleEntity = NULL;
 
 		float zDistTooFar;
 		if ( m_Obstacles[i].hEntity && m_Obstacles[i].hEntity->GetEngineObject()->GetCollideable())

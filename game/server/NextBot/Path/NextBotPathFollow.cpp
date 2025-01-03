@@ -835,7 +835,7 @@ CBaseEntity *PathFollower::FindBlocker( INextBot *bot )
 		if ( result.DidHitNonWorldEntity() )
 		{
 			// if blocker is close, they could be behind us - check
-			Vector toBlocker = ((CBaseEntity*)result.m_pEnt)->GetEngineObject()->GetAbsOrigin() - bot->GetLocomotionInterface()->GetFeet();
+			Vector toBlocker = result.m_pEnt->GetEngineObject()->GetAbsOrigin() - bot->GetLocomotionInterface()->GetFeet();
 
 			Vector alongPath = s->pos - from;
 			alongPath.z = 0.0f;
@@ -848,7 +848,7 @@ CBaseEntity *PathFollower::FindBlocker( INextBot *bot )
 					if ( bot->IsDebugging( NEXTBOT_PATH ) )
 					{
 						NDebugOverlay::Circle( bot->GetLocomotionInterface()->GetFeet(), QAngle( -90.0f, 0, 0 ), 10.0f, 255, 0, 0, 255, true, 1.0f );
-						NDebugOverlay::HorzArrow( bot->GetLocomotionInterface()->GetFeet(), ((CBaseEntity*)result.m_pEnt)->GetEngineObject()->GetAbsOrigin(), 1.0f, 255, 0, 0, 255, true, 1.0f );
+						NDebugOverlay::HorzArrow( bot->GetLocomotionInterface()->GetFeet(), result.m_pEnt->GetEngineObject()->GetAbsOrigin(), 1.0f, 255, 0, 0, 255, true, 1.0f );
 					}
 
 					// we are blocked

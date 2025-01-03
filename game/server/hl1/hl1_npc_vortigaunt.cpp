@@ -459,7 +459,7 @@ void CNPC_Vortigaunt::StartTask( const Task_t *pTask )
 int CNPC_Vortigaunt::OnTakeDamage_Alive( const CTakeDamageInfo &inputInfo )
 {
 	// don't slash one of your own
-	if ( ( inputInfo.GetDamageType() & DMG_SLASH ) && inputInfo.GetAttacker() && IRelationType( inputInfo.GetAttacker() ) == D_NU )
+	if ( ( inputInfo.GetDamageType() & DMG_SLASH ) && inputInfo.GetAttacker() && IRelationType((CBaseEntity*)inputInfo.GetAttacker() ) == D_NU )
 		   return 0;
 
 	Remember( bits_MEMORY_PROVOKED );
@@ -584,7 +584,7 @@ void CNPC_Vortigaunt::ArmBeam( int side )
 		CTakeDamageInfo info( this, this, 10, DMG_SHOCK );
 		CalculateMeleeDamageForce( &info, vecAim, tr.endpos );
 
-		((CBaseEntity*)tr.m_pEnt)->TakeDamage( info );
+		((IServerEntity*)tr.m_pEnt)->TakeDamage( info );
 	}
 
 	UTIL_DecalTrace( &tr, "FadingScorch" );

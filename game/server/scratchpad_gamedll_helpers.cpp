@@ -25,7 +25,7 @@ void ScratchPad_DrawWorldToScratchPad(
 
 	if ( flags & (SPDRAWWORLD_DRAW_PLAYERS | SPDRAWWORLD_DRAW_ENTITIES) )
 	{
-		CBaseEntity *pCur = EntityList()->FirstEnt();
+		IServerEntity *pCur = EntityList()->FirstEnt();
 		while ( pCur )
 		{
 			bool bPlayer = ( dynamic_cast< CBasePlayer* >( pCur ) != 0 );
@@ -39,7 +39,7 @@ void ScratchPad_DrawWorldToScratchPad(
 			ScratchPad_DrawEntityToScratchPad( 
 				pPad, 
 				flags,
-				pCur, 
+				(CBaseEntity*)pCur,
 				bPlayer ? Vector( 1.0, 0.5, 0 ) : Vector( 0.3, 0.3, 1.0 )
 				);
 

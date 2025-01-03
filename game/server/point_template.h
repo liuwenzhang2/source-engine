@@ -48,7 +48,7 @@ public:
 	int				GetTemplateIndexForTemplate( int iTemplate );
 
 	// Template instancing
-	bool			CreateInstance( const Vector &vecOrigin, const QAngle &vecAngles, CUtlVector<CBaseEntity*> *pEntities );
+	bool			CreateInstance( const Vector &vecOrigin, const QAngle &vecAngles, CUtlVector<IServerEntity*> *pEntities );
 
 	// Inputs
 	void			InputForceSpawn( inputdata_t &inputdata );

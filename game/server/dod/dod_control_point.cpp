@@ -305,7 +305,7 @@ void CControlPoint::InternalSetOwner( int owner, bool bMakeSound, int iNumCapper
 		SendCapString( m_iTeam, iNumCappers, pCappingPlayers );
 
 	// have control point master check the win conditions now!
-	CBaseEntity *pEnt =	EntityList()->FindEntityByClassname( NULL, "dod_control_point_master" );
+	IServerEntity *pEnt = EntityList()->FindEntityByClassname( NULL, "dod_control_point_master" );
 
 	while( pEnt )
 	{

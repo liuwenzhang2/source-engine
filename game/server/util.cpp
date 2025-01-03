@@ -113,13 +113,13 @@ bool CFlaggedEntitiesEnum::AddToList( CBaseEntity *pEntity )
 
 IterationRetval_t CFlaggedEntitiesEnum::EnumElement( IHandleEntity *pHandleEntity )
 {
-	CBaseEntity *pEntity = EntityList()->GetBaseEntityFromHandle( pHandleEntity->GetRefEHandle() );
+	IServerEntity *pEntity = EntityList()->GetBaseEntityFromHandle( pHandleEntity->GetRefEHandle() );
 	if ( pEntity )
 	{
 		if ( m_flagMask && !(pEntity->GetEngineObject()->GetFlags() & m_flagMask) )	// Does it meet the criteria?
 			return ITERATION_CONTINUE;
 
-		if ( !AddToList( pEntity ) )
+		if ( !AddToList((CBaseEntity*)pEntity ) )
 			return ITERATION_STOP;
 	}
 
@@ -218,7 +218,7 @@ private:
 //-----------------------------------------------------------------------------
 // Drops an entity onto the floor
 //-----------------------------------------------------------------------------
-int UTIL_DropToFloor( CBaseEntity *pEntity, unsigned int mask, CBaseEntity *pIgnore )
+int UTIL_DropToFloor( IServerEntity *pEntity, unsigned int mask, IServerEntity *pIgnore )
 {
 	// Assume no ground
 	pEntity->GetEngineObject()->SetGroundEntity( NULL );
@@ -248,7 +248,7 @@ int UTIL_DropToFloor( CBaseEntity *pEntity, unsigned int mask, CBaseEntity *pIgn
 		return 0;
 
 	pEntity->GetEngineObject()->SetAbsOrigin( trace.endpos );
-	pEntity->GetEngineObject()->SetGroundEntity((CBaseEntity*)trace.m_pEnt ? ((CBaseEntity*)trace.m_pEnt)->GetEngineObject() : NULL);
+	pEntity->GetEngineObject()->SetGroundEntity(trace.m_pEnt ? (IEngineObjectServer*)trace.m_pEnt->GetEngineObject() : NULL);
 
 	return 1;
 }
@@ -561,7 +561,7 @@ void UTIL_ScreenShake( const Vector &center, float amplitude, float frequency, f
 	}
 	for ( i = 1; i <= gpGlobals->maxClients; i++ )
 	{
-		CBaseEntity *pPlayer = EntityList()->GetPlayerByIndex( i );
+		IServerEntity *pPlayer = EntityList()->GetPlayerByIndex( i );
 
 		//
 		// Only start shakes for players that are on the ground unless doing an air shake.
@@ -591,10 +591,10 @@ void UTIL_ScreenShakeObject( CBaseEntity *pEnt, const Vector &center, float ampl
 	int			i;
 	float		localAmplitude;
 
-	CBaseEntity *pHighestParent = pEnt->GetEngineObject()->GetRootMoveParent()->GetOuter();
+	IServerEntity *pHighestParent = pEnt->GetEngineObject()->GetRootMoveParent()->GetOuter();
 	for ( i = 1; i <= gpGlobals->maxClients; i++ )
 	{
-		CBaseEntity *pPlayer = EntityList()->GetPlayerByIndex( i );
+		IServerEntity *pPlayer = EntityList()->GetPlayerByIndex( i );
 		if (!pPlayer)
 			continue;
 
@@ -649,7 +649,7 @@ void UTIL_ViewPunch( const Vector &center, QAngle angPunch, float radius, bool b
 {
 	for ( int i = 1; i <= gpGlobals->maxClients; i++ )
 	{
-		CBaseEntity *pPlayer = EntityList()->GetPlayerByIndex( i );
+		IServerEntity *pPlayer = EntityList()->GetPlayerByIndex( i );
 
 		//
 		// Only apply the punch to players that are on the ground unless doing an air punch.
@@ -725,9 +725,9 @@ void UTIL_ScreenFadeAll( const color32 &color, float fadeTime, float fadeHold, i
 
 	for ( i = 1; i <= gpGlobals->maxClients; i++ )
 	{
-		CBaseEntity *pPlayer = EntityList()->GetPlayerByIndex( i );
+		IServerEntity *pPlayer = EntityList()->GetPlayerByIndex( i );
 	
-		UTIL_ScreenFadeWrite( fade, pPlayer );
+		UTIL_ScreenFadeWrite( fade, (CBaseEntity*)pPlayer );
 	}
 }
 
@@ -1033,11 +1033,11 @@ void UTIL_SnapDirectionToAxis( Vector &direction, float epsilon )
 	}
 }
 
-bool UTIL_IsMasterTriggered(string_t sMaster, CBaseEntity *pActivator)
+bool UTIL_IsMasterTriggered(string_t sMaster, IServerEntity *pActivator)
 {
 	if (sMaster != NULL_STRING)
 	{
-		CBaseEntity *pMaster = EntityList()->FindEntityByName( NULL, sMaster, NULL, pActivator );
+		IServerEntity *pMaster = EntityList()->FindEntityByName( NULL, sMaster, NULL, pActivator );
 	
 		if ( pMaster && (pMaster->ObjectCaps() & FCAP_MASTER) )
 		{
@@ -1438,7 +1438,7 @@ void UTIL_PrecacheOther( const char *szClassname, const char *modelName )
 		return;
 #endif
 
-	CBaseEntity	*pEntity = (CBaseEntity*)EntityList()->CreateEntityByName( szClassname );
+	IServerEntity	*pEntity = EntityList()->CreateEntityByName( szClassname );
 	if ( !pEntity )
 	{
 		Warning( "NULL Ent in UTIL_PrecacheOther\n" );
@@ -1537,14 +1537,14 @@ extern "C" void Sys_Error( char *error, ... )
 //			*mapData - pointer a block of entity map data
 // Output : -1 if the entity was not successfully created; 0 on success
 //-----------------------------------------------------------------------------
-int DispatchSpawn( CBaseEntity *pEntity )
+int DispatchSpawn( IServerEntity *pEntity )
 {
 	if ( pEntity )
 	{
 		MDLCACHE_CRITICAL_SECTION();
 
 		// keep a smart pointer that will now if the object gets deleted
-		EHANDLE pEntSafe;
+		CHandle<IServerEntity> pEntSafe;
 		pEntSafe = pEntity;
 
 		// Initialize these or entities who don't link to the world won't have anything in here
@@ -1560,18 +1560,17 @@ int DispatchSpawn( CBaseEntity *pEntity )
 		}
 #endif
 		bool bAsyncAnims = mdlcache->SetAsyncLoad( MDLCACHE_ANIMBLOCK, false );
-		CBaseAnimating *pAnimating = pEntity->GetBaseAnimating();
-		if (!pAnimating)
+		if (!pEntity->GetEngineObject()->GetModelPtr())
 		{
 			pEntity->Spawn();
 		}
 		else
 		{
 			// Don't allow the PVS check to skip animation setup during spawning
-			pAnimating->GetEngineObject()->SetBoneCacheFlags( BCF_IS_IN_SPAWN );
+			pEntity->GetEngineObject()->SetBoneCacheFlags( BCF_IS_IN_SPAWN );
 			pEntity->Spawn();
 			if ( pEntSafe != NULL )
-				pAnimating->GetEngineObject()->ClearBoneCacheFlags( BCF_IS_IN_SPAWN );
+				pEntity->GetEngineObject()->ClearBoneCacheFlags( BCF_IS_IN_SPAWN );
 		}
 		mdlcache->SetAsyncLoad( MDLCACHE_ANIMBLOCK, bAsyncAnims );
 
@@ -1625,7 +1624,7 @@ int DispatchSpawn( CBaseEntity *pEntity )
 // Purpose: Initialize the matrix from an entity
 // Input  : *pEntity - 
 //-----------------------------------------------------------------------------
-void EntityMatrix::InitFromEntity( CBaseEntity *pEntity, int iAttachment )
+void EntityMatrix::InitFromEntity( IServerEntity *pEntity, int iAttachment )
 {
 	if ( !pEntity )
 	{
@@ -1636,12 +1635,11 @@ void EntityMatrix::InitFromEntity( CBaseEntity *pEntity, int iAttachment )
 	// Get an attachment's matrix?
 	if ( iAttachment != 0 )
 	{
-		CBaseAnimating *pAnimating = pEntity->GetBaseAnimating();
-		if ( pAnimating && pAnimating->GetEngineObject()->GetModelPtr() )
+		if (pEntity->GetEngineObject()->GetModelPtr() )
 		{
 			Vector vOrigin;
 			QAngle vAngles;
-			if ( pAnimating->GetEngineObject()->GetAttachment( iAttachment, vOrigin, vAngles ) )
+			if ( pEntity->GetEngineObject()->GetAttachment( iAttachment, vOrigin, vAngles ) )
 			{
 				((VMatrix *)this)->SetupMatrixOrgAngles( vOrigin, vAngles );
 				return;
@@ -1653,7 +1651,7 @@ void EntityMatrix::InitFromEntity( CBaseEntity *pEntity, int iAttachment )
 }
 
 
-void EntityMatrix::InitFromEntityLocal( CBaseEntity *entity )
+void EntityMatrix::InitFromEntityLocal( IServerEntity *entity )
 {
 	if ( !entity || entity->entindex()==-1 )
 	{
@@ -1790,7 +1788,7 @@ void UTIL_PredictedPosition( CBaseEntity *pTarget, float flTimeDelta, Vector *ve
 // Input  : *pDest - entity to be pointed at the target
 //			*pTarget - target to point at
 //-----------------------------------------------------------------------------
-bool UTIL_PointAtEntity( CBaseEntity *pDest, CBaseEntity *pTarget )
+bool UTIL_PointAtEntity( IServerEntity *pDest, IServerEntity *pTarget )
 {
 	if ( ( pDest == NULL ) || ( pTarget == NULL ) )
 	{
@@ -1814,7 +1812,7 @@ bool UTIL_PointAtEntity( CBaseEntity *pDest, CBaseEntity *pTarget )
 // Input  : *pDest - entity to be pointed at the target
 //			strTarget - name of entity to target (will only choose the first!)
 //-----------------------------------------------------------------------------
-void UTIL_PointAtNamedEntity( CBaseEntity *pDest, string_t strTarget )
+void UTIL_PointAtNamedEntity( IServerEntity *pDest, string_t strTarget )
 {
 	//Attempt to find the entity
 	if ( !UTIL_PointAtEntity( pDest, EntityList()->FindEntityByName( NULL, strTarget ) ) )
@@ -1828,7 +1826,7 @@ void UTIL_PointAtNamedEntity( CBaseEntity *pDest, string_t strTarget )
 // Input  : *pSourceEntity - entity to copy from
 //			*pDestEntity - entity to copy to
 //-----------------------------------------------------------------------------
-bool UTIL_TransferPoseParameters( CBaseEntity *pSourceEntity, CBaseEntity *pDestEntity )
+bool UTIL_TransferPoseParameters( IServerEntity *pSourceEntity, IServerEntity *pDestEntity )
 {
 	CBaseAnimating *pSourceBaseAnimating = dynamic_cast<CBaseAnimating*>( pSourceEntity );
 	CBaseAnimating *pDestBaseAnimating = dynamic_cast<CBaseAnimating*>( pDestEntity );
@@ -2071,13 +2069,13 @@ bool UTIL_LoadAndSpawnEntitiesFromScript( CUtlVector <CBaseEntity*> &entities, c
 			}
 
 			// Spawn the entity
-			CBaseEntity *pNode = (CBaseEntity*)EntityList()->CreateEntityByName( pNodeName );
+			IServerEntity *pNode = EntityList()->CreateEntityByName( pNodeName );
 
 			if ( pNode )
 			{
-				LoadAndSpawnEntities_ParseEntKVBlockHelper( pNode, pkvNode );
+				LoadAndSpawnEntities_ParseEntKVBlockHelper((CBaseEntity*)pNode, pkvNode );
 				DispatchSpawn( pNode );
-				entities.AddToTail( pNode );
+				entities.AddToTail((CBaseEntity*)pNode );
 			}
 			else
 			{
@@ -2405,7 +2403,7 @@ IPhysicsObject* FindPhysicsObjectByName(const char* pName, CBaseEntity* pErrorEn
 	if (!pName || !strlen(pName))
 		return NULL;
 
-	CBaseEntity* pEntity = NULL;
+	IServerEntity* pEntity = NULL;
 	IPhysicsObject* pBestObject = NULL;
 	while (1)
 	{
@@ -2432,9 +2430,9 @@ IPhysicsObject* FindPhysicsObjectByName(const char* pName, CBaseEntity* pErrorEn
 	return pBestObject;
 }
 
-static void CallbackHighlight(CBaseEntity* pEntity)
+static void CallbackHighlight(IServerEntity* pEntity)
 {
-	pEntity->m_debugOverlays |= OVERLAY_ABSBOX_BIT | OVERLAY_PIVOT_BIT;
+	pEntity->GetDebugOverlays() |= OVERLAY_ABSBOX_BIT | OVERLAY_PIVOT_BIT;
 }
 
 CON_COMMAND(physics_highlight_active, "Turns on the absbox for all active physics objects")
@@ -2445,7 +2443,7 @@ CON_COMMAND(physics_highlight_active, "Turns on the absbox for all active physic
 	EntityList()->IterateActivePhysicsEntities(CallbackHighlight);
 }
 
-static void CallbackReport(CBaseEntity* pEntity)
+static void CallbackReport(IServerEntity* pEntity)
 {
 	const char* pName = STRING(pEntity->GetEntityName());
 	if (!Q_strlen(pName))
@@ -2507,7 +2505,7 @@ class CConstraintFloodEntry
 public:
 	CConstraintFloodEntry() : isMarked(false), isConstraint(false) {}
 
-	CUtlVector<CBaseEntity*> linkList;
+	CUtlVector<IServerEntity*> linkList;
 	bool isMarked;
 	bool isConstraint;
 };
@@ -2522,14 +2520,14 @@ public:
 		m_entryList.EnsureCapacity(64);
 	}
 
-	bool IsWorldEntity(CBaseEntity* pEnt)
+	bool IsWorldEntity(IServerEntity* pEnt)
 	{
 		if (pEnt->entindex() != -1)
 			return pEnt->IsWorld();
 		return false;
 	}
 
-	void AddLink(CBaseEntity* pEntity, CBaseEntity* pLink, bool bIsConstraint)
+	void AddLink(IServerEntity* pEntity, IServerEntity* pLink, bool bIsConstraint)
 	{
 		if (!pEntity || !pLink || IsWorldEntity(pEntity) || IsWorldEntity(pLink))
 			return;
@@ -2549,7 +2547,7 @@ public:
 		}
 	}
 
-	void BuildGraphFromEntity(CBaseEntity* pEntity, CUtlVector<CBaseEntity*>& constraintList)
+	void BuildGraphFromEntity(IServerEntity* pEntity, CUtlVector<IServerEntity*>& constraintList)
 	{
 		int listIndex = m_list.Find(pEntity);
 		if (listIndex != m_list.InvalidIndex())
@@ -2572,11 +2570,11 @@ public:
 			}
 		}
 	}
-	CUtlMap<CBaseEntity*, int>	m_list;
+	CUtlMap<IServerEntity*, int>	m_list;
 	CUtlVector<CConstraintFloodEntry> m_entryList;
 };
 
-void PhysicsCommand(const CCommand& args, void (*func)(CBaseEntity* pEntity))
+void PhysicsCommand(const CCommand& args, void (*func)(IServerEntity* pEntity))
 {
 	if (args.ArgC() < 2)
 	{
@@ -2595,30 +2593,30 @@ void PhysicsCommand(const CCommand& args, void (*func)(CBaseEntity* pEntity))
 	}
 	else
 	{
-		CBaseEntity* pEnt = NULL;
+		IServerEntity* pEnt = NULL;
 		while ((pEnt = EntityList()->FindEntityGeneric(pEnt, args[1])) != NULL)
 		{
-			func(pEnt);
+			func((CBaseEntity*)pEnt);
 		}
 	}
 }
 
 // traverses the graph of attachments (currently supports springs & constraints) starting at an entity
 // Then turns on debug info for each link in the graph (springs/constraints are links)
-static void DebugConstraints(CBaseEntity* pEntity)
+static void DebugConstraints(IServerEntity* pEntity)
 {
-	extern bool GetSpringAttachments(CBaseEntity * pEntity, CBaseEntity * pAttach[2], IPhysicsObject * pAttachVPhysics[2]);
-	extern bool GetConstraintAttachments(CBaseEntity * pEntity, CBaseEntity * pAttach[2], IPhysicsObject * pAttachVPhysics[2]);
-	extern void DebugConstraint(CBaseEntity * pEntity);
+	extern bool GetSpringAttachments(IServerEntity * pEntity, IServerEntity * pAttach[2], IPhysicsObject * pAttachVPhysics[2]);
+	extern bool GetConstraintAttachments(IServerEntity * pEntity, IServerEntity * pAttach[2], IPhysicsObject * pAttachVPhysics[2]);
+	extern void DebugConstraint(IServerEntity * pEntity);
 
 	if (!pEntity)
 		return;
 
-	CBaseEntity* pAttach[2];
+	IServerEntity* pAttach[2];
 	IPhysicsObject* pAttachVPhysics[2];
 	CConstraintFloodList list;
 
-	for (CBaseEntity* pList = EntityList()->FirstEnt(); pList != NULL; pList = EntityList()->NextEnt(pList))
+	for (IServerEntity* pList = EntityList()->FirstEnt(); pList != NULL; pList = EntityList()->NextEnt(pList))
 	{
 		if (GetConstraintAttachments(pList, pAttach, pAttachVPhysics) || GetSpringAttachments(pList, pAttach, pAttachVPhysics))
 		{
@@ -2629,7 +2627,7 @@ static void DebugConstraints(CBaseEntity* pEntity)
 		}
 	}
 
-	CUtlVector<CBaseEntity*> constraints;
+	CUtlVector<IServerEntity*> constraints;
 	list.BuildGraphFromEntity(pEntity, constraints);
 	for (int i = 0; i < constraints.Count(); i++)
 	{
@@ -2657,7 +2655,7 @@ static void DebugConstraints(CBaseEntity* pEntity)
 		}
 		Msg("**********************\n%s connects %s(%s:%d) to %s(%s:%d)\n", constraints[i]->GetClassname(), pName0, pModel0, index0, pName1, pModel1, index1);
 		DebugConstraint(constraints[i]);
-		constraints[i]->m_debugOverlays |= OVERLAY_BBOX_BIT | OVERLAY_TEXT_BIT;
+		constraints[i]->GetDebugOverlays() |= OVERLAY_BBOX_BIT | OVERLAY_TEXT_BIT;
 	}
 }
 
@@ -2669,7 +2667,7 @@ CON_COMMAND(physics_constraints, "Highlights constraint system graph for an enti
 	PhysicsCommand(args, DebugConstraints);
 }
 
-static void OutputVPhysicsDebugInfo(CBaseEntity* pEntity)
+static void OutputVPhysicsDebugInfo(IServerEntity* pEntity)
 {
 	EntityList()->OutputVPhysicsDebugInfo(pEntity);
 }
@@ -2682,7 +2680,7 @@ CON_COMMAND(physics_debug_entity, "Dumps debug info for an entity")
 	PhysicsCommand(args, OutputVPhysicsDebugInfo);
 }
 
-static void MarkVPhysicsDebug(CBaseEntity* pEntity)
+static void MarkVPhysicsDebug(IServerEntity* pEntity)
 {
 	if (pEntity)
 	{
@@ -3094,7 +3092,7 @@ void CC_CollisionTest( const CCommand &args )
 	Msg( "Testing collision system\n" );
 	partition->ReportStats( "" );
 	int i;
-	CBaseEntity *pSpot = EntityList()->FindEntityByClassname( NULL, "info_player_start");
+	IServerEntity *pSpot = EntityList()->FindEntityByClassname( NULL, "info_player_start");
 	Vector start = pSpot->GetEngineObject()->GetAbsOrigin();
 	static Vector *targets = NULL;
 	static bool first = true;

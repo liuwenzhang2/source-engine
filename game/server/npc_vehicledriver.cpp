@@ -161,7 +161,7 @@ void CNPC_VehicleDriver::Activate( void )
 		return;
 	}
 
-	m_hVehicleEntity = (EntityList()->FindEntityByName( NULL, STRING(m_iszVehicleName) ));
+	m_hVehicleEntity = (CBaseEntity*)EntityList()->FindEntityByName( NULL, STRING(m_iszVehicleName) );
 	if ( !m_hVehicleEntity )
 	{
 		Warning( "npc_vehicledriver %s couldn't find his vehicle named %s.\n", STRING(GetEntityName()), STRING(m_iszVehicleName) );
@@ -1109,7 +1109,7 @@ void CNPC_VehicleDriver::InputGotoPathCorner( inputdata_t &inputdata )
 	string_t iszPathName = inputdata.value.StringID();
 	if ( iszPathName != NULL_STRING )
 	{
-		CBaseEntity *pEntity = EntityList()->FindEntityByName( NULL, iszPathName );
+		IServerEntity *pEntity = EntityList()->FindEntityByName( NULL, iszPathName );
 		if ( !pEntity )
 		{
 			Warning("npc_vehicledriver %s couldn't find entity named %s\n", STRING(GetEntityName()), STRING(iszPathName) );
@@ -1119,7 +1119,7 @@ void CNPC_VehicleDriver::InputGotoPathCorner( inputdata_t &inputdata )
 		ClearWaypoints();
 
 		// Drive to the point
-		SetGoalEnt( pEntity );
+		SetGoalEnt((CBaseEntity*)pEntity );
 		if ( m_NPCState == NPC_STATE_IDLE )
 		{
 			SetState( NPC_STATE_ALERT );

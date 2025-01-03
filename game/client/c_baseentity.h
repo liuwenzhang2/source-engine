@@ -292,7 +292,7 @@ public:
 
 	// This function returns a value that scales all damage done by this entity.
 	// Use CDamageModifier to hook in damage modifiers on a guy.
-	virtual float					GetAttackDamageScale(void);
+	virtual float					GetAttackDamageScale(IHandleEntity* pVictim);
 	virtual void					ApplyBoneMatrixTransform(matrix3x4_t& transform) {}
 	virtual	void					StandardBlendingRules(IStudioHdr* pStudioHdr, Vector pos[], Quaternion q[], float currentTime, int boneMask) {}
 	virtual void					UpdateIKLocks(float currentTime) {}
@@ -678,9 +678,8 @@ public:
 
 	// Methods implemented on both client and server
 public:
-	void							SetSize(const Vector& vecMin, const Vector& vecMax); // GetEngineObject()->SetSize( mins, maxs );
-	char const* GetClassname(void);
-	char const* GetDebugName(void);
+	char const* GetClassname(void) const;
+	char const* GetDebugName(void) const;
 	static int						PrecacheModel(const char* name);
 	//static bool						PrecacheSound( const char *name );
 	//static void						PrefetchSound( const char *name );
@@ -778,12 +777,12 @@ public:
 		GetEngineObject()->GetVectors(pForward, pRight, pUp);
 	}
 	// position of ears
-	virtual Vector		EarPosition(void);
+	virtual const Vector& EarPosition(void);
 
 	Vector	EyePosition(void) const;			// position of eyes
 	const QAngle& EyeAngles(void) const;		// Direction of eyes in world space
 	const QAngle& LocalEyeAngles(void) const;	// Direction of eyes
-	Vector	EarPosition(void) const;			// position of ears
+	const Vector& EarPosition(void) const;			// position of ears
 
 	// Called by physics to see if we should avoid a collision test....
 	virtual bool		ShouldCollide(int collisionGroup, int contentsMask) const;
@@ -845,8 +844,8 @@ public:
 	void					OnPositionChanged();
 	void					OnAnglesChanged();
 	void					OnAnimationChanged();
-	void					AddWatcherToEntity(CBaseEntity* pWatcher, int watcherType);
-	void					RemoveWatcherFromEntity(CBaseEntity* pWatcher, int watcherType);
+	//void					AddWatcherToEntity(CBaseEntity* pWatcher, int watcherType);
+	//void					RemoveWatcherFromEntity(CBaseEntity* pWatcher, int watcherType);
 	void					NotifyPositionChanged();
 	void					NotifyVPhysicsStateChanged(IPhysicsObject* pPhysics, bool bAwake);
 
@@ -982,6 +981,10 @@ public:
 #endif
 	const char& GetTakeDamage() const {
 		return m_takedamage;
+	}
+
+	void SetTakeDamage(int takedamage) {
+		m_takedamage = takedamage;
 	}
 
 	char							m_takedamage;
@@ -1395,7 +1398,7 @@ inline const QAngle &C_BaseEntity::LocalEyeAngles( void ) const	// Direction of 
 	return const_cast<C_BaseEntity*>(this)->LocalEyeAngles();
 }
 
-inline Vector	C_BaseEntity::EarPosition( void ) const			// position of ears
+inline const Vector& C_BaseEntity::EarPosition( void ) const			// position of ears
 {
 	return const_cast<C_BaseEntity*>(this)->EarPosition();
 }

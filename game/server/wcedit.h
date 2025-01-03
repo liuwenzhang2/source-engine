@@ -29,8 +29,8 @@ namespace NWCEdit
 	void	CreateAILink(	CBasePlayer *pPlayer );
 	void	DestroyAILink(  CBasePlayer *pPlayer );
 	void	UndoDestroyAINode(void);
-	void	RememberEntityPosition( CBaseEntity *pEntity );
-	void	UpdateEntityPosition( CBaseEntity *pEntity );
+	void	RememberEntityPosition( IServerEntity *pEntity );
+	void	UpdateEntityPosition( IServerEntity *pEntity );
 };
 
 #endif // WCEDIT_H

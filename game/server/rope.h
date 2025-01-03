@@ -71,7 +71,7 @@ public:
 	virtual int		OnTakeDamage( const CTakeDamageInfo &info );
 	virtual bool	KeyValue( const char *szKeyName, const char *szValue );
 
-	void			PropagateForce(CBaseEntity *pActivator, CBaseEntity *pCaller, CBaseEntity *pFirstLink, float x, float y, float z);
+	void			PropagateForce(IServerEntity *pActivator, IServerEntity *pCaller, CBaseEntity *pFirstLink, float x, float y, float z);
 
 	
 
@@ -80,7 +80,7 @@ public:
 
 	virtual int		UpdateTransmitState(void);
 	virtual void	SetTransmit( CCheckTransmitInfo *pInfo, bool bAlways );
-	virtual void	BeforeParentChanged( CBaseEntity *pNewParent, int iNewAttachment );
+	virtual void	BeforeParentChanged( IServerEntity *pNewParent, int iNewAttachment );
 
 // Input functions.
 public:

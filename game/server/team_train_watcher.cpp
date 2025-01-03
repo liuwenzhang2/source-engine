@@ -698,7 +698,7 @@ void CTeamTrainWatcher::SetNumTrainCappers( int iNumCappers, CBaseEntity *pTrigg
 
 void CTeamTrainWatcher::InputSetNumTrainCappers( inputdata_t &inputdata )
 {
-	InternalSetNumTrainCappers( inputdata.value.Int(), inputdata.pCaller );
+	InternalSetNumTrainCappers( inputdata.value.Int(), (CBaseEntity*)inputdata.pCaller );
 }
 
 void CTeamTrainWatcher::InputSetTrainRecedeTime( inputdata_t &inputdata )

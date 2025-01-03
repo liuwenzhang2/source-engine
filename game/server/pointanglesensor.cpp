@@ -136,12 +136,12 @@ void CPointAngleSensor::Activate(void)
 
 	if (!m_hTargetEntity)
 	{
-		m_hTargetEntity = EntityList()->FindEntityByName( NULL, m_target );
+		m_hTargetEntity = (CBaseEntity*)EntityList()->FindEntityByName( NULL, m_target );
 	}
 
 	if (!m_hLookAtEntity && (m_nLookAtName != NULL_STRING))
 	{
-		m_hLookAtEntity = EntityList()->FindEntityByName( NULL, m_nLookAtName );
+		m_hLookAtEntity = (CBaseEntity*)EntityList()->FindEntityByName( NULL, m_nLookAtName );
 		if (!m_hLookAtEntity)
 		{
 			DevMsg(1, "Angle sensor '%s' could not find look at entity '%s'.\n", GetDebugName(), STRING(m_nLookAtName));
@@ -294,7 +294,7 @@ void CPointAngleSensor::InputSetTargetEntity(inputdata_t &inputdata)
 	else
 	{
 		m_target = AllocPooledString(inputdata.value.String());
-		m_hTargetEntity = EntityList()->FindEntityByName( NULL, m_target, NULL, inputdata.pActivator, inputdata.pCaller );
+		m_hTargetEntity = (CBaseEntity*)EntityList()->FindEntityByName( NULL, m_target, NULL, inputdata.pActivator, inputdata.pCaller );
 		if (!m_bDisabled && m_hTargetEntity)
 		{
 			GetEngineObject()->SetNextThink( gpGlobals->curtime );
@@ -453,7 +453,7 @@ void CPointProximitySensor::Activate( void )
 
 	if ( m_hTargetEntity == NULL )
 	{
-		m_hTargetEntity = EntityList()->FindEntityByName( NULL, m_target );
+		m_hTargetEntity = (CBaseEntity*)EntityList()->FindEntityByName( NULL, m_target );
 	}
 
 	if ( m_bDisabled == false && m_hTargetEntity != NULL )
@@ -476,7 +476,7 @@ void CPointProximitySensor::InputSetTargetEntity(inputdata_t &inputdata)
 	else
 	{
 		m_target = AllocPooledString(inputdata.value.String());
-		m_hTargetEntity = EntityList()->FindEntityByName( NULL, m_target, NULL, inputdata.pActivator, inputdata.pCaller );
+		m_hTargetEntity = (CBaseEntity*)EntityList()->FindEntityByName( NULL, m_target, NULL, inputdata.pActivator, inputdata.pCaller );
 		if (!m_bDisabled && m_hTargetEntity)
 		{
 			GetEngineObject()->SetNextThink( gpGlobals->curtime );

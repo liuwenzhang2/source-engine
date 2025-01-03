@@ -701,13 +701,13 @@ CBaseEntity* CNPC_CScanner::BestInspectTarget(void)
 		// Players
 		for ( i = 1; i <= gpGlobals->maxClients; i++ )
 		{
-			CBaseEntity *pPlayer = EntityList()->GetPlayerByIndex( i );
+			IServerEntity *pPlayer = EntityList()->GetPlayerByIndex( i );
 
 			if ( pPlayer )
 			{
 				if ( vSearchOrigin.DistToSqr(pPlayer->GetEngineObject()->GetAbsOrigin()) < fSearchDistSq )
 				{
-					candidates.AddToTail( pPlayer );
+					candidates.AddToTail((CBaseEntity*)pPlayer );
 				}
 			}
 		}
@@ -930,7 +930,7 @@ void CNPC_CScanner::DeployMine()
 		{
 			child->SetParent( NULL );
 			child->SetAbsVelocity(GetEngineObject()->GetAbsVelocity() );
-			child->GetOuter()->SetOwnerEntity(this);
+			((CBaseEntity*)child->GetOuter())->SetOwnerEntity(this);
 
 			ScannerEmitSound( "DeployMine" );
 
@@ -990,9 +990,9 @@ void CNPC_CScanner::InputEquipMine(inputdata_t &inputdata)
 		}
 	}
 
-	CBaseEntity *pEnt;
+	IServerEntity *pEnt;
 
-	pEnt = (CBaseEntity*)EntityList()->CreateEntityByName( "combine_mine" );
+	pEnt = EntityList()->CreateEntityByName( "combine_mine" );
 	bool bPlacedMine = false;
 
 	if( m_bIsClawScanner )
@@ -1062,12 +1062,12 @@ void CNPC_CScanner::InputInspectTargetSpotlight(inputdata_t &inputdata)
 //-----------------------------------------------------------------------------
 void CNPC_CScanner::InspectTarget( inputdata_t &inputdata, ScannerFlyMode_t eFlyMode )
 {
-	CBaseEntity *pEnt = EntityList()->FindEntityGeneric( NULL, inputdata.value.String(), this, inputdata.pActivator );
+	IServerEntity *pEnt = EntityList()->FindEntityGeneric( NULL, inputdata.value.String(), this, inputdata.pActivator );
 	
 	if ( pEnt != NULL )
 	{
 		// Set and begin to inspect our target
-		SetInspectTargetToEnt( pEnt, SCANNER_CIT_INSPECT_LENGTH );
+		SetInspectTargetToEnt((CBaseEntity*)pEnt, SCANNER_CIT_INSPECT_LENGTH );
 		
 		m_nFlyMode = eFlyMode;
 		SetCondition( COND_CSCANNER_HAVE_INSPECT_TARGET );

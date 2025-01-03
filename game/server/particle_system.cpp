@@ -241,7 +241,7 @@ void CParticleSystem::ReadControlPointEnts( void )
 		if ( m_iszControlPointNames[i] == NULL_STRING )
 			continue;
 
-		CBaseEntity *pPointEnt = EntityList()->FindEntityGeneric( NULL, STRING( m_iszControlPointNames[i] ), this );
+		IServerEntity *pPointEnt = EntityList()->FindEntityGeneric( NULL, STRING( m_iszControlPointNames[i] ), this );
 		Assert( pPointEnt != NULL );
 		if ( pPointEnt == NULL )
 		{
@@ -249,6 +249,6 @@ void CParticleSystem::ReadControlPointEnts( void )
 			continue;
 		}
 
-		m_hControlPointEnts.Set( i, pPointEnt );
+		m_hControlPointEnts.Set( i, (CBaseEntity*)pPointEnt );
 	}
 }

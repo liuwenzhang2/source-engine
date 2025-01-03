@@ -23,6 +23,7 @@
 #ifdef _DEBUG
 #define DEBUG 1
 #endif
+class CBaseEntity;
 
 // Misc C-runtime library headers
 #include <math.h>
@@ -58,7 +59,7 @@
 // Shared header between the client DLL and the game DLLs
 #include "shareddefs.h"
 #include "ehandle.h"
-
+typedef CHandle<CBaseEntity> EHANDLE;
 // app
 #if defined(_X360)
 #define DISABLE_DEBUG_HISTORY 1

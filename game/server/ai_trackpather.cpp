@@ -229,11 +229,11 @@ inline CPathTrack *CAI_TrackPather::AdjustForMovementDirection( CPathTrack *pPat
 //-----------------------------------------------------------------------------
 // Enemy visibility check
 //-----------------------------------------------------------------------------
-CBaseEntity *CAI_TrackPather::FindTrackBlocker( const Vector &vecViewPoint, const Vector &vecTargetPos )
+IServerEntity *CAI_TrackPather::FindTrackBlocker( const Vector &vecViewPoint, const Vector &vecTargetPos )
 {
 	trace_t	tr;
 	AI_TraceHull( vecViewPoint, vecTargetPos, -Vector(4,4,4), Vector(4,4,4), MASK_SHOT, this, COLLISION_GROUP_NONE, &tr );
-	return (tr.fraction != 1.0f) ? (CBaseEntity*)tr.m_pEnt : NULL;
+	return (tr.fraction != 1.0f) ? (IServerEntity*)tr.m_pEnt : NULL;
 }
 
 
@@ -321,7 +321,7 @@ CPathTrack *CAI_TrackPather::BestPointOnPath( CPathTrack *pPath, const Vector &t
 			if ( visible )
 			{
 				// If it has to be visible, run those checks
-				CBaseEntity *pBlocker = FindTrackBlocker( pTravPath->GetEngineObject()->GetAbsOrigin(), targetPos );
+				IServerEntity *pBlocker = FindTrackBlocker( pTravPath->GetEngineObject()->GetAbsOrigin(), targetPos );
 
 				// Check to see if we've hit the target, or the player's vehicle if it's a player in a vehicle
 				bool bHitTarget = ( pTargetEnt && ( pTargetEnt == pBlocker ) ) ||
@@ -499,7 +499,7 @@ bool CAI_TrackPather::HasLOSToTarget( CPathTrack *pTrack )
 	}
 
 	// If it has to be visible, run those checks
-	CBaseEntity *pBlocker = FindTrackBlocker( pTrack->GetEngineObject()->GetAbsOrigin(), targetPos );
+	IServerEntity *pBlocker = FindTrackBlocker( pTrack->GetEngineObject()->GetAbsOrigin(), targetPos );
 
 	// Check to see if we've hit the target, or the player's vehicle if it's a player in a vehicle
 	bool bHitTarget = ( pTargetEnt && ( pTargetEnt == pBlocker ) ) ||
@@ -1616,14 +1616,14 @@ void CAI_TrackPather::SetTrack( CBaseEntity *pGoalEnt )
 void CAI_TrackPather::SetTrack( string_t strTrackName )
 {
 	// Find our specified target
-	CBaseEntity *pGoalEnt = EntityList()->FindEntityByName( NULL, strTrackName );
+	IServerEntity *pGoalEnt = EntityList()->FindEntityByName( NULL, strTrackName );
 	if ( pGoalEnt == NULL )
 	{
 		DevWarning( "%s: Could not find path_track '%s'!\n", GetClassname(), STRING( strTrackName ) );
 		return;
 	}
 
-	SetTrack( pGoalEnt );
+	SetTrack((CBaseEntity*)pGoalEnt );
 }
 
 
@@ -1644,7 +1644,7 @@ void CAI_TrackPather::InputSetTrack( inputdata_t &inputdata )
 //-----------------------------------------------------------------------------
 void CAI_TrackPather::FlyToPathTrack( string_t strTrackName )
 {
-	CBaseEntity *pGoalEnt = EntityList()->FindEntityByName( NULL, strTrackName );
+	IServerEntity *pGoalEnt = EntityList()->FindEntityByName( NULL, strTrackName );
 	if ( pGoalEnt == NULL )
 	{
 		DevWarning( "%s: Could not find path_track '%s'!\n", GetClassname(), STRING( strTrackName ) );

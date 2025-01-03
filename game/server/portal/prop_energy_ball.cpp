@@ -383,7 +383,7 @@ void CPropEnergyBall::StartTouch( IServerEntity *pOther )
 
 	if(pOther->GetEngineObject()->IsShadowClone() )
 	{
-		CBaseEntity *pCloned = ((CPhysicsShadowClone *)pOther)->GetEngineShadowClone()->GetClonedEntity();
+		IServerEntity *pCloned = ((CPhysicsShadowClone *)pOther)->GetEngineShadowClone()->GetClonedEntity();
 		if( pCloned )
 			pOther = pCloned;
 	}

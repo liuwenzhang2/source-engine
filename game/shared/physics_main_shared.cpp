@@ -35,27 +35,6 @@
 
 ConVar think_limit( "think_limit", DEF_THINK_LIMIT, FCVAR_REPLICATED, "Maximum think time in milliseconds, warning is printed if this is exceeded." );
 
-void CBaseEntity::AddWatcherToEntity(CBaseEntity* pWatcher, int watcherType)
-{
-	IWatcherList* pList = (IWatcherList*)GetEngineObject()->GetDataObject(watcherType);
-	if (!pList)
-	{
-		pList = (IWatcherList*)GetEngineObject()->CreateDataObject(watcherType);
-		pList->Init();
-	}
-
-	pList->AddToList(pWatcher);
-}
-
-void CBaseEntity::RemoveWatcherFromEntity(CBaseEntity* pWatcher, int watcherType)
-{
-	IWatcherList* pList = (IWatcherList*)GetEngineObject()->GetDataObject(watcherType);
-	if (pList)
-	{
-		pList->RemoveWatcher(pWatcher);
-	}
-}
-
 void CBaseEntity::NotifyPositionChanged()
 {
 	IWatcherList* pList = (IWatcherList*)GetEngineObject()->GetDataObject(POSITIONWATCHER);
@@ -133,7 +112,7 @@ void CBaseEntity::NotifyVPhysicsStateChanged(IPhysicsObject* pPhysics, bool bAwa
 void SpewLinks()
 {
 	int nCount = 0;
-	for ( CBaseEntity *pClass = EntityList()->FirstEnt(); pClass != NULL; pClass = EntityList()->NextEnt(pClass) )
+	for ( IServerEntity *pClass = EntityList()->FirstEnt(); pClass != NULL; pClass = EntityList()->NextEnt(pClass) )
 	{
 		if ( pClass /*&& !pClass->IsDormant()*/ )
 		{
@@ -832,7 +811,7 @@ void CBaseEntity::UpdateBaseVelocity( void )
 #if !defined( CLIENT_DLL )
 	if (GetEngineObject()->GetFlags() & FL_ONGROUND )
 	{
-		CBaseEntity* groundentity = GetEngineObject()->GetGroundEntity() ? GetEngineObject()->GetGroundEntity()->GetOuter() : NULL;
+		CBaseEntity* groundentity = GetEngineObject()->GetGroundEntity() ? (CBaseEntity*)GetEngineObject()->GetGroundEntity()->GetOuter() : NULL;
 		if ( groundentity )
 		{
 			// On conveyor belt that's moving?

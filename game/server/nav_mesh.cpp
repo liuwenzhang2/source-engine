@@ -416,7 +416,7 @@ void CNavMesh::FireGameEvent( IGameEvent *gameEvent )
 
 	if ( FStrEq( gameEvent->GetName(), "break_prop" ) || FStrEq( gameEvent->GetName(), "break_breakable" ) )
 	{
-		CheckAreasOverlappingBreakable collector(EntityList()->GetBaseEntity( gameEvent->GetInt( "entindex" ) ) );
+		CheckAreasOverlappingBreakable collector((CBaseEntity*)EntityList()->GetBaseEntity( gameEvent->GetInt( "entindex" ) ) );
 		ForAllAreas( collector );
 	}
 

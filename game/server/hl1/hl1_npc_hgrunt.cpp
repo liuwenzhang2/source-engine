@@ -455,7 +455,7 @@ int CNPC_HGrunt::SquadRecruit( int searchRadius, int maxMembers )
 	// I am my own leader
 	squadCount = 1;
 	
-	CBaseEntity *pEntity = NULL;
+	IServerEntity *pEntity = NULL;
 
 	if ( m_SquadName != NULL_STRING )
 	{
@@ -464,7 +464,7 @@ int CNPC_HGrunt::SquadRecruit( int searchRadius, int maxMembers )
 
 		while ( pEntity )
 		{
-			CNPC_HGrunt *pRecruit = (CNPC_HGrunt*)pEntity->MyNPCPointer();
+			CNPC_HGrunt *pRecruit = (CNPC_HGrunt*)((CBaseEntity*)pEntity)->MyNPCPointer();
 
 			if ( pRecruit )
 			{
@@ -496,7 +496,7 @@ int CNPC_HGrunt::SquadRecruit( int searchRadius, int maxMembers )
 			if ( !FClassnameIs ( pEntity, "monster_human_grunt" ) )
 				  continue;
 
-			CNPC_HGrunt *pRecruit = (CNPC_HGrunt*)pEntity->MyNPCPointer();
+			CNPC_HGrunt *pRecruit = (CNPC_HGrunt*)((CBaseEntity*)pEntity)->MyNPCPointer();
 
 			if ( pRecruit && pRecruit != this && pRecruit->IsAlive() && !pRecruit->m_hCine )
 			{

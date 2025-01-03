@@ -489,7 +489,7 @@ bool CAI_Expresser::SpeakDispatchResponse( AIConcept_t concept, AI_Response *res
 
 		if ( result->IsApplyContextToWorld() )
 		{
-			CBaseEntity *pEntity = EntityList()->GetBaseEntity( 0 ) ;
+			IServerEntity *pEntity = EntityList()->GetBaseEntity( 0 ) ;
 			if ( pEntity )
 			{
 				pEntity->AddContext( result->GetContext() );
@@ -993,7 +993,7 @@ CON_COMMAND( npc_speakall, "Force the npc to try and speak all their responses" 
 	if ( !UTIL_IsCommandIssuedByServerAdmin() )
 		return;
 
-	CBaseEntity *pEntity;
+	IServerEntity *pEntity;
 
 	if ( args[1] && *args[1] )
 	{
@@ -1010,7 +1010,7 @@ CON_COMMAND( npc_speakall, "Force the npc to try and speak all their responses" 
 		
 	if ( pEntity )
 	{
-		CAI_BaseNPC *pNPC = pEntity->MyNPCPointer();
+		CAI_BaseNPC *pNPC = ((CBaseEntity*)pEntity)->MyNPCPointer();
 		if (pNPC)
 		{
 			if ( pNPC->GetExpresser() )

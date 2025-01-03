@@ -85,7 +85,7 @@ private:
 //-----------------------------------------------------------------------------
 inline CHL2_Player	*CHL2GameMovement::GetHL2Player()
 {
-	return static_cast< CHL2_Player * >( player );
+	return ToHL2Player( player );
 }
 
 //-----------------------------------------------------------------------------

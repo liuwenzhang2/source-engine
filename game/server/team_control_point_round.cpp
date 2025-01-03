@@ -68,7 +68,7 @@ void CTeamControlPointRound::FindControlPoints( void )
 	if ( pMaster )
 	{
 		// go through all the points
-		CBaseEntity *pEnt = EntityList()->FindEntityByClassname( NULL, pMaster->GetControlPointName() );
+		IServerEntity *pEnt = EntityList()->FindEntityByClassname( NULL, pMaster->GetControlPointName() );
 		
 		while( pEnt )
 		{

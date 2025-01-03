@@ -465,7 +465,7 @@ void CNPC_BaseScanner::TakeDamageFromPhyscannon( CBasePlayer *pPlayer )
 //-----------------------------------------------------------------------------
 void CNPC_BaseScanner::TakeDamageFromPhysicsImpact( int index, gamevcollisionevent_t *pEvent )
 {
-	CBaseEntity *pHitEntity = pEvent->pEntities[!index];
+	CBaseEntity *pHitEntity = (CBaseEntity*)pEvent->pEntities[!index];
 
 	// NOTE: Augment the normal impact energy scale here.
 	float flDamageScale = PlayerHasMegaPhysCannon() ? 10.0f : 5.0f;
@@ -521,7 +521,7 @@ void CNPC_BaseScanner::VPhysicsCollision( int index, gamevcollisionevent_t *pEve
 
 	// It also can take physics damage from things thrown by the player.
 	int otherIndex = !index;
-	CBaseEntity *pHitEntity = pEvent->pEntities[otherIndex];
+	CBaseEntity *pHitEntity = (CBaseEntity*)pEvent->pEntities[otherIndex];
 	if ( pHitEntity )
 	{
 		if ( pHitEntity->HasPhysicsAttacker( 0.5f ) )
@@ -1367,7 +1367,7 @@ bool CNPC_BaseScanner::IsEnemyPlayerInSuit()
 	if( GetEnemy() && GetEnemy()->IsPlayer() )
 	{
 		CHL2_Player *pPlayer = NULL;
-		pPlayer = (CHL2_Player *)GetEnemy();
+		pPlayer = ToHL2Player(GetEnemy());
 
 		if( pPlayer && pPlayer->IsSuitEquipped() )
 		{

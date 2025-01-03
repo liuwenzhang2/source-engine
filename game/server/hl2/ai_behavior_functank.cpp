@@ -195,7 +195,7 @@ int CAI_FuncTankBehavior::OnTakeDamage_Alive( const CTakeDamageInfo &info )
 
 	// If we've been hit by the player, and the player's not targetable 
 	// by our func_tank, get off the tank.
-	CBaseEntity *pAttacker = info.GetAttacker();
+	CBaseEntity *pAttacker = (CBaseEntity*)info.GetAttacker();
 	bool bValidDismountAttacker = (pAttacker && pAttacker->IsPlayer());
 
 #ifdef HL2_EPISODIC 

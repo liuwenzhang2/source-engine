@@ -587,7 +587,7 @@ void CAI_BaseNPC::Event_Killed( const CTakeDamageInfo &info )
 
 	m_lifeState = LIFE_DYING;
 
-	CleanupOnDeath( info.GetAttacker() );
+	CleanupOnDeath((CBaseEntity*)info.GetAttacker() );
 
 	StopLoopingSounds();
 	DeathSound( info );
@@ -666,11 +666,11 @@ bool CAI_BaseNPC::PassesDamageFilter( const CTakeDamageInfo &info )
 	if ( (CapabilitiesGet() & bits_CAP_FRIENDLY_DMG_IMMUNE) && info.GetAttacker() && info.GetAttacker() != this )
 	{
 		// check attackers relationship with me
-		CBaseCombatCharacter *npcEnemy = info.GetAttacker()->MyCombatCharacterPointer();
+		CBaseCombatCharacter *npcEnemy = ((CBaseEntity*)info.GetAttacker())->MyCombatCharacterPointer();
 		bool bHitByVehicle = false;
 		if ( !npcEnemy )
 		{
-			if ( info.GetAttacker()->GetServerVehicle() )
+			if (((IServerEntity*)info.GetAttacker())->GetServerVehicle() )
 			{
 				bHitByVehicle = true;
 			}
@@ -682,9 +682,9 @@ bool CAI_BaseNPC::PassesDamageFilter( const CTakeDamageInfo &info )
 
 			if ( npcEnemy && npcEnemy->IsPlayer() )
 			{
-				m_OnDamagedByPlayer.FireOutput( info.GetAttacker(), this );
+				m_OnDamagedByPlayer.FireOutput((IServerEntity*)info.GetAttacker(), this );
 				// This also counts as being harmed by player's squad.
-				m_OnDamagedByPlayerSquad.FireOutput( info.GetAttacker(), this );
+				m_OnDamagedByPlayerSquad.FireOutput((IServerEntity*)info.GetAttacker(), this );
 			}
 
 			return false;
@@ -720,7 +720,7 @@ int CAI_BaseNPC::OnTakeDamage_Alive( const CTakeDamageInfo &info )
 
 	// REVISIT: Combine soldiers shoot each other a lot and then talk about it
 	// this improves that case a bunch, but it seems kind of harsh.
-	if ( !m_pSquad || !m_pSquad->SquadIsMember( info.GetAttacker() ) )
+	if ( !m_pSquad || !m_pSquad->SquadIsMember((CBaseEntity*)info.GetAttacker() ) )
 	{
 		PainSound( info );// "Ouch!"
 	}
@@ -762,14 +762,14 @@ int CAI_BaseNPC::OnTakeDamage_Alive( const CTakeDamageInfo &info )
 	if ( m_flLastDamageTime != gpGlobals->curtime )
 	{
 		// only fire once per frame
-		m_OnDamaged.FireOutput( info.GetAttacker(), this);
+		m_OnDamaged.FireOutput((IServerEntity*)info.GetAttacker(), this);
 
 		if( info.GetAttacker()->IsPlayer() )
 		{
-			m_OnDamagedByPlayer.FireOutput( info.GetAttacker(), this );
+			m_OnDamagedByPlayer.FireOutput((IServerEntity*)info.GetAttacker(), this );
 			
 			// This also counts as being harmed by player's squad.
-			m_OnDamagedByPlayerSquad.FireOutput( info.GetAttacker(), this );
+			m_OnDamagedByPlayerSquad.FireOutput((IServerEntity*)info.GetAttacker(), this );
 		}
 		else
 		{
@@ -781,7 +781,7 @@ int CAI_BaseNPC::OnTakeDamage_Alive( const CTakeDamageInfo &info )
 			{
 				if( pAttacker->GetSquad() != NULL && pAttacker->IsInPlayerSquad() )
 				{
-					m_OnDamagedByPlayerSquad.FireOutput( info.GetAttacker(), this );
+					m_OnDamagedByPlayerSquad.FireOutput((IServerEntity*)info.GetAttacker(), this );
 				}
 			}
 		}
@@ -794,7 +794,7 @@ int CAI_BaseNPC::OnTakeDamage_Alive( const CTakeDamageInfo &info )
 
 	if ( m_iHealth <= ( m_iMaxHealth / 2 ) )
 	{
-		m_OnHalfHealth.FireOutput( info.GetAttacker(), this );
+		m_OnHalfHealth.FireOutput((IServerEntity*)info.GetAttacker(), this );
 	}
 
 	// react to the damage (get mad)
@@ -808,7 +808,7 @@ int CAI_BaseNPC::OnTakeDamage_Alive( const CTakeDamageInfo &info )
 		//				DO NOT CHANGE THIS CODE W/O CONSULTING
 		// Only update information about my attacker I don't see my attacker
 		// ------------------------------------------------------------------
-		if ( !FInViewCone( info.GetAttacker() ) || !FVisible( info.GetAttacker() ) )
+		if ( !FInViewCone((IServerEntity*)info.GetAttacker() ) || !FVisible((CBaseEntity*)info.GetAttacker() ) )
 		{
 			// -------------------------------------------------------------
 			//  If I have an inflictor (enemy / grenade) update memory with
@@ -832,7 +832,7 @@ int CAI_BaseNPC::OnTakeDamage_Alive( const CTakeDamageInfo &info )
 			//  unless I already know about the attacker or I can see my enemy
 			// ----------------------------------------------------------------
 			if ( GetEnemy() != NULL							&&
-				!GetEnemies()->HasMemory( info.GetAttacker() )			&&
+				!GetEnemies()->HasMemory((CBaseEntity*)info.GetAttacker() )			&&
 				!HasCondition(COND_SEE_ENEMY)	)
 			{
 				UpdateEnemyMemory(GetEnemy(), vAttackPos, GetEnemy());
@@ -840,9 +840,9 @@ int CAI_BaseNPC::OnTakeDamage_Alive( const CTakeDamageInfo &info )
 			// ----------------------------------------------------------------
 			//  If I already know about this enemy, update his position
 			// ----------------------------------------------------------------
-			else if (GetEnemies()->HasMemory( info.GetAttacker() ))
+			else if (GetEnemies()->HasMemory((CBaseEntity*)info.GetAttacker() ))
 			{
-				UpdateEnemyMemory(info.GetAttacker(), vAttackPos);
+				UpdateEnemyMemory((CBaseEntity*)info.GetAttacker(), vAttackPos);
 			}
 			// -----------------------------------------------------------------
 			//  Otherwise just note the position, but don't add enemy to my list
@@ -877,14 +877,14 @@ int CAI_BaseNPC::OnTakeDamage_Alive( const CTakeDamageInfo &info )
 		m_flLastDamageTime = gpGlobals->curtime;
 		if ( info.GetAttacker() && info.GetAttacker()->IsPlayer() )
 			m_flLastPlayerDamageTime = gpGlobals->curtime;
-		GetEnemies()->OnTookDamageFrom( info.GetAttacker() );
+		GetEnemies()->OnTookDamageFrom((CBaseEntity*)info.GetAttacker() );
 
 		if (m_flSumDamage > m_iMaxHealth*0.3)
 		{
 			SetCondition(COND_REPEATED_DAMAGE);
 		}
 	
-		NotifyFriendsOfDamage( info.GetAttacker() );
+		NotifyFriendsOfDamage((CBaseEntity*)info.GetAttacker() );
 	}
 
 	// ---------------------------------------------------------------
@@ -1368,7 +1368,7 @@ public:
 	{
 		trace_t tr;
 
-		CBaseEntity *pEnt = EntityList()->GetBaseEntityFromHandle( pHandleEntity->GetRefEHandle() );
+		IServerEntity *pEnt = EntityList()->GetBaseEntityFromHandle( pHandleEntity->GetRefEHandle() );
 
 		// Done to avoid hitting an entity that's both solid & a trigger.
 		if ( pEnt->GetEngineObject()->IsSolid() )
@@ -2531,15 +2531,15 @@ Vector CAI_BaseNPC::HeadDirection3D( void )
 // Input  :
 // Output :
 //-----------------------------------------------------------------------------
-CBaseEntity *CAI_BaseNPC::EyeLookTarget( void )
+IServerEntity *CAI_BaseNPC::EyeLookTarget( void )
 {
 	if (m_flNextEyeLookTime < gpGlobals->curtime)
 	{
-		CBaseEntity*	pBestEntity = NULL;
+		IServerEntity*	pBestEntity = NULL;
 		float			fBestDist	= MAX_COORD_RANGE;
 		float			fTestDist;
 
-		CBaseEntity *pEntity = NULL;
+		IServerEntity *pEntity = NULL;
 
 		for ( CEntitySphereQuery sphere(GetEngineObject()->GetAbsOrigin(), 1024, 0 ); (pEntity = sphere.GetCurrentEntity()) != NULL; sphere.NextEntity() )
 		{
@@ -2547,7 +2547,7 @@ CBaseEntity *CAI_BaseNPC::EyeLookTarget( void )
 			{
 				continue;
 			}
-			CAI_BaseNPC *pNPC = pEntity->MyNPCPointer();
+			CAI_BaseNPC *pNPC = ((CBaseEntity*)pEntity)->MyNPCPointer();
 			if (pNPC || (pEntity->GetEngineObject()->GetFlags() & FL_CLIENT))
 			{
 				fTestDist = (GetEngineObject()->GetAbsOrigin() - pEntity->EyePosition()).Length();
@@ -2564,7 +2564,7 @@ CBaseEntity *CAI_BaseNPC::EyeLookTarget( void )
 		if (pBestEntity)
 		{
 			m_flNextEyeLookTime = gpGlobals->curtime + random->RandomInt(1,5);
-			m_hEyeLookTarget = pBestEntity;
+			m_hEyeLookTarget = (CBaseEntity*)pBestEntity;
 		}
 	}
 	return m_hEyeLookTarget;
@@ -2712,7 +2712,7 @@ void CAI_BaseNPC::MaintainLookTargets ( float flInterval )
 	// --------------------------------------------------------
 	// Try to look at enemy if I have one
 	// --------------------------------------------------------
-	if ((CBaseEntity*)GetEnemy())
+	if (GetEnemy())
 	{
 		if ( ValidEyeTarget(GetEnemy()->EyePosition()) )
 		{
@@ -2726,7 +2726,7 @@ void CAI_BaseNPC::MaintainLookTargets ( float flInterval )
 	// --------------------------------------------------------
 	// First check if I've been assigned to look at an entity
 	// --------------------------------------------------------
-	CBaseEntity *lookTarget = EyeLookTarget();
+	IServerEntity *lookTarget = EyeLookTarget();
 	if (lookTarget && ValidEyeTarget(lookTarget->EyePosition()))
 	{
 		SetHeadDirection(lookTarget->EyePosition(),flInterval);
@@ -3775,7 +3775,7 @@ void CAI_BaseNPC::CallNPCThink( void )
 	PostNPCThink();
 } 
 
-bool CAI_BaseNPC::NPC_CheckBrushExclude(CBaseEntity *pBrush )
+bool CAI_BaseNPC::NPC_CheckBrushExclude(IServerEntity *pBrush )
 {
 	return GetMoveProbe()->ShouldBrushBeIgnored(pBrush);
 }
@@ -4525,8 +4525,8 @@ void CAI_BaseNPC::CheckOnGround( void )
 					}
 					else
 					{
-						if ( trace.startsolid && ((CBaseEntity*)trace.m_pEnt)->GetEngineObject()->GetMoveType() == MOVETYPE_VPHYSICS &&
-							((CBaseEntity*)trace.m_pEnt)->GetEngineObject()->VPhysicsGetObject() && ((CBaseEntity*)trace.m_pEnt)->GetEngineObject()->VPhysicsGetObject()->GetMass() < VPHYSICS_LARGE_OBJECT_MASS )
+						if ( trace.startsolid && trace.m_pEnt->GetEngineObject()->GetMoveType() == MOVETYPE_VPHYSICS &&
+							trace.m_pEnt->GetEngineObject()->VPhysicsGetObject() && trace.m_pEnt->GetEngineObject()->VPhysicsGetObject()->GetMass() < VPHYSICS_LARGE_OBJECT_MASS )
 						{
 							// stuck inside a small physics object?  
 							m_CheckOnGroundTimer.Set(0.1f);
@@ -4539,7 +4539,7 @@ void CAI_BaseNPC::CheckOnGround( void )
 						// Check to see if someone changed the ground on us...
 						if (trace.m_pEnt && (!GetEngineObject()->GetGroundEntity() || trace.m_pEnt != GetEngineObject()->GetGroundEntity()->GetOuter()))
 						{
-							GetEngineObject()->SetGroundEntity(((CBaseEntity*)trace.m_pEnt)->GetEngineObject());
+							GetEngineObject()->SetGroundEntity((IEngineObjectServer*)trace.m_pEnt->GetEngineObject());
 						}
 					}
 				}
@@ -5142,7 +5142,7 @@ void CAI_BaseNPC::GiveWeapon( string_t iszWeaponName )
 	// If I have a name, make my weapon match it with "_weapon" appended
 	if ( GetEntityName() != NULL_STRING )
 	{
-		pWeapon->SetName( UTIL_VarArgs("%s_weapon", STRING(GetEntityName()) ));
+		pWeapon->GetEngineObject()->SetName( UTIL_VarArgs("%s_weapon", STRING(GetEntityName()) ));
 	}
 
 	Weapon_Equip( pWeapon );
@@ -6598,7 +6598,7 @@ void CAI_BaseNPC::CheckPhysicsContacts()
 	{
 		IPhysicsObject *pPhysics = GetEngineObject()->VPhysicsGetObject();
 		IPhysicsFrictionSnapshot *pSnapshot = pPhysics->CreateFrictionSnapshot();
-		CBaseEntity* pGroundEntity = GetEngineObject()->GetGroundEntity() ? GetEngineObject()->GetGroundEntity()->GetOuter() : NULL;
+		IServerEntity* pGroundEntity = GetEngineObject()->GetGroundEntity() ? GetEngineObject()->GetGroundEntity()->GetOuter() : NULL;
 		float heightCheck = GetEngineObject()->GetAbsOrigin().z + GetHullMaxs().z;
 		Vector npcVel;
 		pPhysics->GetVelocity( &npcVel, NULL );
@@ -6857,7 +6857,7 @@ void CAI_BaseNPC::NPCInit ( void )
 				// If I have a name, make my weapon match it with "_weapon" appended
 				if ( GetEntityName() != NULL_STRING )
 				{
-					pWeapon->SetName( UTIL_VarArgs("%s_weapon", STRING(GetEntityName())) );
+					pWeapon->GetEngineObject()->SetName( UTIL_VarArgs("%s_weapon", STRING(GetEntityName())) );
 				}
 
 				if (GetEngineObject()->GetEffects() & EF_NOSHADOW )
@@ -7147,7 +7147,7 @@ void CAI_BaseNPC::InitRelationshipTable(void)
 //-----------------------------------------------------------------------------
 // Purpose:
 //-----------------------------------------------------------------------------
-void CAI_BaseNPC::AddRelationship( const char *pszRelationship, CBaseEntity *pActivator )
+void CAI_BaseNPC::AddRelationship( const char *pszRelationship, IServerEntity *pActivator )
 {
 	// Parse the keyvalue data
 	char parseString[1000];
@@ -7200,12 +7200,12 @@ void CAI_BaseNPC::AddRelationship( const char *pszRelationship, CBaseEntity *pAc
 		bool bFoundEntity = false;
 
 		// Try to get pointer to an entity of this name
-		CBaseEntity *entity = EntityList()->FindEntityByName( NULL, entityString );
+		IServerEntity *entity = EntityList()->FindEntityByName( NULL, entityString );
 		while( entity )
 		{
 			// make sure you catch all entities of this name.
 			bFoundEntity = true;
-			AddEntityRelationship(entity, disposition, priority );
+			AddEntityRelationship((CBaseEntity*)entity, disposition, priority );
 			entity = EntityList()->FindEntityByName( entity, entityString );
 		}
 
@@ -7220,10 +7220,10 @@ void CAI_BaseNPC::AddRelationship( const char *pszRelationship, CBaseEntity *pAc
 			else
 			{
 				// HACKHACK:
-				CBaseEntity *pEntity = EntityList()->CanCreateEntityClass( entityString ) ? (CBaseEntity*)EntityList()->CreateEntityByName( entityString ) : NULL;
+				IServerEntity *pEntity = EntityList()->CanCreateEntityClass( entityString ) ? EntityList()->CreateEntityByName( entityString ) : NULL;
 				if (pEntity)
 				{
-					AddClassRelationship( pEntity->Classify(), disposition, priority );
+					AddClassRelationship(((CBaseEntity*)pEntity)->Classify(), disposition, priority );
 					EntityList()->DestroyEntityImmediate(pEntity);
 				}
 				else
@@ -7326,7 +7326,7 @@ void CAI_BaseNPC::StartNPC( void )
 	if ( m_target != NULL_STRING )// this npc has a target
 	{
 		// Find the npc's initial target entity, stash it
-		SetGoalEnt( EntityList()->FindEntityByName( NULL, m_target ) );
+		SetGoalEnt((CBaseEntity*)EntityList()->FindEntityByName( NULL, m_target ) );
 
 		if ( !GetGoalEnt() )
 		{
@@ -8280,7 +8280,7 @@ void CAI_BaseNPC::HandleAnimEvent( animevent_t *pEvent )
 
 	case NPC_EVENT_ITEM_PICKUP:
 		{
-			CBaseEntity *pPickup = NULL;
+			IServerEntity *pPickup = NULL;
 
 			//
 			// Figure out what we're supposed to pick up.
@@ -8338,7 +8338,7 @@ void CAI_BaseNPC::HandleAnimEvent( animevent_t *pEvent )
 			else
 			{
 				// Picking up an item.
-				PickupItem( pPickup );
+				PickupItem( (CBaseEntity*)pPickup );
 				TaskComplete();
 			}
 
@@ -8393,7 +8393,7 @@ void CAI_BaseNPC::HandleAnimEvent( animevent_t *pEvent )
 			//
 			// Drop our active weapon (or throw it at the specified target entity).
 			//
-			CBaseEntity *pTarget = NULL;
+			IServerEntity *pTarget = NULL;
 			if (pEvent->options)
 			{
 				pTarget = EntityList()->FindEntityGeneric(NULL, pEvent->options, this);
@@ -8569,7 +8569,7 @@ void CAI_BaseNPC::HandleAnimEvent( animevent_t *pEvent )
  			else if ( pEvent->event == AE_NPC_WEAPON_DROP )
 			{
 				// Drop our active weapon (or throw it at the specified target entity).
-				CBaseEntity *pTarget = NULL;
+				IServerEntity *pTarget = NULL;
 				if (pEvent->options)
 				{
 					pTarget = EntityList()->FindEntityGeneric(NULL, pEvent->options, this);
@@ -9947,11 +9947,11 @@ int CAI_BaseNPC::PlayScriptedSentence( const char *pszSentence, float delay, flo
 // Input  :
 // Output :
 //-----------------------------------------------------------------------------
-CBaseEntity *CAI_BaseNPC::FindNamedEntity( const char *name, IEntityFindFilter *pFilter )
+IServerEntity *CAI_BaseNPC::FindNamedEntity( const char *name, IEntityFindFilter *pFilter )
 {
 	if ( !stricmp( name, "!player" ))
 	{
-		return ( CBaseEntity * )AI_GetSinglePlayer();
+		return AI_GetSinglePlayer();
 	}
 	else if ( !stricmp( name, "!enemy" ) )
 	{
@@ -9966,7 +9966,7 @@ CBaseEntity *CAI_BaseNPC::FindNamedEntity( const char *name, IEntityFindFilter *
 	{
 		// FIXME: look at CBaseEntity *CNPCSimpleTalker::FindNearestFriend(bool fPlayer)
 		// punt for now
-		return ( CBaseEntity * )AI_GetSinglePlayer();
+		return AI_GetSinglePlayer();
 	}
 	else if (!stricmp( name, "self" ))
 	{
@@ -9986,13 +9986,13 @@ CBaseEntity *CAI_BaseNPC::FindNamedEntity( const char *name, IEntityFindFilter *
 		{
 			DevMsg( "ERROR: \"player\" is no longer used, use \"!player\" in vcd instead!\n" );
 		}
-		return ( CBaseEntity * )AI_GetSinglePlayer();
+		return AI_GetSinglePlayer();
 	}
 	else
 	{
 		// search for up to 32 entities with the same name and choose one randomly
-		CBaseEntity *entityList[ FINDNAMEDENTITY_MAX_ENTITIES ];
-		CBaseEntity *entity;
+		IServerEntity *entityList[ FINDNAMEDENTITY_MAX_ENTITIES ];
+		IServerEntity *entity;
 		int	iCount;
 
 		entity = NULL;
@@ -10903,7 +10903,7 @@ void CAI_BaseNPC::Activate( void )
 	// Get a handle to my enemy filter entity if there is one.
 	if ( m_iszEnemyFilterName != NULL_STRING )
 	{
-		CBaseEntity *pFilter = EntityList()->FindEntityByName( NULL, m_iszEnemyFilterName );
+		IServerEntity *pFilter = EntityList()->FindEntityByName( NULL, m_iszEnemyFilterName );
 		if ( pFilter != NULL )
 		{
 			m_hEnemyFilter = dynamic_cast<CBaseFilter*>(pFilter);
@@ -11591,7 +11591,7 @@ void CAI_BaseNPC::InputSetRelationship( inputdata_t &inputdata )
 void CAI_BaseNPC::InputSetEnemyFilter( inputdata_t &inputdata )
 {
 	// Get a handle to my enemy filter entity if there is one.
-	CBaseEntity *pFilter = EntityList()->FindEntityByName( NULL, inputdata.value.StringID() );
+	IServerEntity *pFilter = EntityList()->FindEntityByName( NULL, inputdata.value.StringID() );
 	m_hEnemyFilter = dynamic_cast<CBaseFilter*>(pFilter);
 }
 
@@ -11660,7 +11660,7 @@ void CAI_BaseNPC::InputWake( inputdata_t &inputdata )
 	if ( m_target != NULL_STRING )// this npc has a target
 	{
 		// Find the npc's initial target entity, stash it
-		SetGoalEnt( EntityList()->FindEntityByName( NULL, m_target ) );
+		SetGoalEnt((CBaseEntity*)EntityList()->FindEntityByName( NULL, m_target ) );
 
 		if ( !GetGoalEnt() )
 		{
@@ -11683,7 +11683,7 @@ void CAI_BaseNPC::InputForgetEntity( inputdata_t &inputdata )
 	if ( developer.GetInt() && pszEntityToForget[strlen( pszEntityToForget ) - 1] == '*' )
 		DevMsg( "InputForgetEntity does not support wildcards\n" );
 
-	CBaseEntity *pEntity = EntityList()->FindEntityByName( NULL, pszEntityToForget );
+	IServerEntity *pEntity = EntityList()->FindEntityByName( NULL, pszEntityToForget );
 	if ( pEntity )
 	{
 		if ( GetEnemy() == pEntity )
@@ -11691,7 +11691,7 @@ void CAI_BaseNPC::InputForgetEntity( inputdata_t &inputdata )
 			SetEnemy( NULL );
 			SetIdealState( NPC_STATE_ALERT );
 		}
-		GetEnemies()->ClearMemory( pEntity );
+		GetEnemies()->ClearMemory( (CBaseEntity*)pEntity );
 	}
 }
 
@@ -11715,11 +11715,11 @@ void CAI_BaseNPC::InputIgnoreDangerSounds( inputdata_t &inputdata )
 void CAI_BaseNPC::InputUpdateEnemyMemory( inputdata_t &inputdata )
 {
 	const char *pszEnemy = inputdata.value.String();
-	CBaseEntity *pEnemy = EntityList()->FindEntityByName( NULL, pszEnemy );
+	IServerEntity *pEnemy = EntityList()->FindEntityByName( NULL, pszEnemy );
 
 	if( pEnemy )
 	{
-		UpdateEnemyMemory( pEnemy, pEnemy->GetEngineObject()->GetAbsOrigin(), this );
+		UpdateEnemyMemory( (CBaseEntity*)pEnemy, pEnemy->GetEngineObject()->GetAbsOrigin(), this );
 	}
 }
 
@@ -12506,7 +12506,7 @@ int CAI_BaseNPC::WalkMove( const Vector& vecPosition, unsigned int mask )
 	}
 
 	// the move is ok
-	GetEngineObject()->SetGroundEntity((CBaseEntity*)trace.m_pEnt ? ((CBaseEntity*)trace.m_pEnt)->GetEngineObject() : NULL);
+	GetEngineObject()->SetGroundEntity(trace.m_pEnt ? (IEngineObjectServer*)trace.m_pEnt->GetEngineObject() : NULL);
 	GetEngineObject()->PhysicsTouchTriggers();
 	return true;
 }
@@ -12716,7 +12716,7 @@ bool CAI_BaseNPC::IsWaitSet()
 	return ( m_flWaitFinished != FLT_MAX );
 }
 
-void CAI_BaseNPC::TestPlayerPushing( CBaseEntity *pEntity )
+void CAI_BaseNPC::TestPlayerPushing( IServerEntity *pEntity )
 {
 	if (GetEngineObject()->HasSpawnFlags( SF_NPC_NO_PLAYER_PUSHAWAY ) )
 		return;
@@ -12830,7 +12830,7 @@ void CAI_BaseNPC::Break( CBaseEntity *pBreaker )
 //-----------------------------------------------------------------------------
 void CAI_BaseNPC::InputBreak( inputdata_t &inputdata )
 {
-	Break( inputdata.pActivator );
+	Break( (CBaseEntity*)inputdata.pActivator );
 }
 
 
@@ -13299,7 +13299,7 @@ void CAI_BaseNPC::StartScriptedNPCInteraction( CAI_BaseNPC *pOtherNPC, ScriptedN
 
 	pMySequence->GetEngineObject()->SetAbsAngles( angDesired );
 	pMySequence->ForceSetTargetEntity( this, true );
-	pMySequence->SetName( szSSName );
+	pMySequence->GetEngineObject()->SetName( szSSName );
  	pMySequence->GetEngineObject()->AddSpawnFlags( SF_SCRIPT_NOINTERRUPT | SF_SCRIPT_HIGH_PRIORITY | SF_SCRIPT_OVERRIDESTATE );
 	if ((pInteraction->iFlags & SCNPC_FLAG_DONT_TELEPORT_AT_END_ME) != 0)
 	{
@@ -13324,7 +13324,7 @@ void CAI_BaseNPC::StartScriptedNPCInteraction( CAI_BaseNPC *pOtherNPC, ScriptedN
 		pTheirSequence->GetEngineObject()->SetAbsOrigin( vecOtherOrigin );
 		pTheirSequence->GetEngineObject()->SetAbsAngles( angOtherAngles );
 		pTheirSequence->ForceSetTargetEntity( pOtherNPC, true );
-		pTheirSequence->SetName( szSSName );
+		pTheirSequence->GetEngineObject()->SetName( szSSName );
 		pTheirSequence->GetEngineObject()->AddSpawnFlags( SF_SCRIPT_NOINTERRUPT | SF_SCRIPT_HIGH_PRIORITY | SF_SCRIPT_OVERRIDESTATE );
 		if ((pInteraction->iFlags & SCNPC_FLAG_DONT_TELEPORT_AT_END_THEM) != 0) 
 		{
@@ -13881,13 +13881,13 @@ void CAI_BaseNPC::InputForceInteractionWithNPC( inputdata_t &inputdata )
 		return;
 	}
 	// Find the target
- 	CBaseEntity *pTarget = FindNamedEntity( pszParam );
+ 	IServerEntity *pTarget = FindNamedEntity( pszParam );
 	if ( !pTarget )
 	{
 		Warning("%s(%s) received ForceInteractionWithNPC input, but couldn't find entity named: %s\n", GetClassname(), GetDebugName(), pszParam );
 		return;
 	}
-	CAI_BaseNPC *pNPC = pTarget->MyNPCPointer();
+	CAI_BaseNPC *pNPC = ((CBaseEntity*)pTarget)->MyNPCPointer();
 	if ( !pNPC || !pNPC->GetEngineObject()->GetModelPtr() )
 	{
 		Warning("%s(%s) received ForceInteractionWithNPC input, but entity named %s cannot run dynamic interactions.\n", GetClassname(), GetDebugName(), pszParam );

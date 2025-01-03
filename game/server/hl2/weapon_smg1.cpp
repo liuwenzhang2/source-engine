@@ -475,12 +475,12 @@ int CWeaponSMG1::WeaponRangeAttack2Condition(/* float flDot, float flDist */)
 	// ---------------------------------------------------------------------
 	// Are any friendlies near the intended grenade impact area?
 	// ---------------------------------------------------------------------
-	CBaseEntity *pTarget = NULL;
+	IServerEntity *pTarget = NULL;
 
 	while ( ( pTarget = EntityList()->FindEntityInSphere( pTarget, vecTarget, COMBINE_MIN_GRENADE_CLEAR_DIST ) ) != NULL )
 	{
 		//Check to see if the default relationship is hatred, and if so intensify that
-		if ( npcOwner->IRelationType( pTarget ) == D_LI )
+		if ( npcOwner->IRelationType((CBaseEntity*)pTarget ) == D_LI )
 		{
 			// crap, I might blow my own guy up. Don't throw a grenade and don't check again for a while.
 			m_flNextGrenadeCheck = gpGlobals->curtime + 1; // one full second.

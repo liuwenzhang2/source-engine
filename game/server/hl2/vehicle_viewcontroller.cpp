@@ -105,7 +105,7 @@ void CPropVehicleViewController::EnterVehicle( CBasePlayer *pPlayer )
 	GetEngineVehicle()->GetVehicle()->OnVehicleEnter();
 
 	// Stop the player sprint and flashlight.
-	CHL2_Player *pHL2Player = dynamic_cast<CHL2_Player*>( pPlayer );
+	CHL2_Player *pHL2Player = ToHL2Player( pPlayer );
 	if ( pHL2Player )
 	{
 		if ( pHL2Player->IsSprinting() )

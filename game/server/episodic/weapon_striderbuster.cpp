@@ -83,7 +83,7 @@ public:
 	virtual int		OnTakeDamage( const CTakeDamageInfo &info );
 	virtual bool	ShouldPuntUseLaunchForces( PhysGunForce_t reason ) { return ( reason == PHYSGUN_FORCE_LAUNCHED ); }
 	virtual QAngle	PreferredCarryAngles( void ) { return m_CarryAngles; }
-	virtual bool	HasPreferredCarryAnglesForPlayer( CBaseEntity *pPlayer ) { return true; }
+	virtual bool	HasPreferredCarryAnglesForPlayer( IServerEntity *pPlayer ) { return true; }
 
 	virtual void OnPhysGunPickup( CBasePlayer *pPhysGunUser, PhysGunPickup_t reason );
 	virtual void OnPhysGunDrop( CBasePlayer *pPhysGunUser, PhysGunDrop_t Reason );
@@ -533,13 +533,13 @@ bool CWeaponStriderBuster::StickToEntity( CBaseEntity *pOther )
 //-----------------------------------------------------------------------------
 void CWeaponStriderBuster::CreateDestroyedEffect( void )
 {
-	CBaseEntity *pTrail;
+	IServerEntity *pTrail;
 
 	StopParticleEffects( this );
 	
 	for ( int i = 0; i < 3; i++ )
 	{
-		pTrail = (CBaseEntity*)EntityList()->CreateEntityByName( "sparktrail" );
+		pTrail = EntityList()->CreateEntityByName( "sparktrail" );
 		pTrail->SetOwnerEntity( this );
 		DispatchSpawn( pTrail );
 	}
@@ -576,7 +576,7 @@ void CWeaponStriderBuster::VPhysicsCollision( int index, gamevcollisionevent_t *
 {
 	// Find out what we hit.
 	// Don't do anything special if we're already attached to a strider.
-	CBaseEntity *pVictim = pEvent->pEntities[!index];
+	CBaseEntity *pVictim = (CBaseEntity*)pEvent->pEntities[!index];
 	if ( pVictim == NULL || m_pConstraint != NULL )
 	{
 		BaseClass::VPhysicsCollision( index, pEvent );
@@ -707,8 +707,8 @@ void CWeaponStriderBuster::Detonate( void )
 int CWeaponStriderBuster::OnTakeDamage( const CTakeDamageInfo &info )
 {
 	// If we're attached, any damage from the player makes us trigger
-	CBaseEntity *pInflictor = info.GetInflictor();
-	CBaseEntity *pAttacker = info.GetAttacker();
+	CBaseEntity *pInflictor = (CBaseEntity*)info.GetInflictor();
+	CBaseEntity *pAttacker = (CBaseEntity*)info.GetAttacker();
 	bool bInflictorIsPlayer = ( pInflictor != NULL && pInflictor->IsPlayer() );
 	bool bAttackerIsPlayer = ( pAttacker != NULL && pAttacker->IsPlayer() );
 
@@ -784,7 +784,7 @@ int CWeaponStriderBuster::OnTakeDamage( const CTakeDamageInfo &info )
 					DispatchParticleEffect( "striderbuster_break_flechette", GetEngineObject()->GetAbsOrigin(), GetEngineObject()->GetAbsAngles() );
 					SetHealth( 0 );
 
-					Shatter( info.GetAttacker() );
+					Shatter((CBaseEntity*)info.GetAttacker() );
 					return 0;
 				}
 			}

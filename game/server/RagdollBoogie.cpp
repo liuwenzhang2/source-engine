@@ -94,7 +94,7 @@ void CRagdollBoogie::ZapThink()
 	if ( !GetEngineObject()->GetMoveParent() )
 		return;
 
-	CBaseAnimating *pRagdoll = GetEngineObject()->GetMoveParent()->GetOuter()->GetBaseAnimating();
+	IServerEntity *pRagdoll = GetEngineObject()->GetMoveParent()->GetOuter();
 	if ( !pRagdoll )
 		return;
 
@@ -103,7 +103,7 @@ void CRagdollBoogie::ZapThink()
 	if (!pStudioHdr)
 		return;
 
-	mstudiohitboxset_t *set = pStudioHdr->pHitboxSet( pRagdoll->GetHitboxSet() );
+	mstudiohitboxset_t *set = pStudioHdr->pHitboxSet( pRagdoll->GetEngineObject()->GetHitboxSet() );
 
 	if ( set->numhitboxes == 0 )
 		return;

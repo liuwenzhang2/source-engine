@@ -27,6 +27,7 @@ class ITraceFilter;
 class CGameTrace;
 typedef CGameTrace trace_t;
 struct cplane_t;
+class IStudioHdr;
 class IPhysicsObject;
 class IEngineWorld;
 class IEnginePlayer;
@@ -38,7 +39,7 @@ class IEngineGhost;
 
 class IEngineObject {
 public:
-	virtual datamap_t* GetDataDescMap(void) = 0;
+	virtual datamap_t* GetDataDescMap(void) const = 0;
 	virtual const CBaseHandle& GetRefEHandle() const = 0;
 	virtual IEntityList* GetEntityList() const = 0;
 	virtual int entindex() const = 0;
@@ -53,6 +54,7 @@ public:
 	virtual IEngineObject* NextMovePeer(void) const = 0;
 	virtual int GetModelIndex(void) const = 0;
 	virtual string_t GetModelName(void) const = 0;
+	virtual IStudioHdr* GetModelPtr(void) const = 0;
 	virtual void AddSolidFlags(int flags) = 0;
 	virtual SolidType_t GetSolid() const = 0;
 	virtual bool IsSolidFlagSet(int flagMask) const = 0;
@@ -60,6 +62,7 @@ public:
 	virtual void CollisionRulesChanged() = 0;
 	virtual const Vector& GetAbsOrigin(void) const = 0;
 	virtual const QAngle& GetAbsAngles(void) const = 0;
+	virtual const Vector& GetAbsVelocity() const = 0;
 	virtual void GetVectors(Vector* forward, Vector* right, Vector* up) const = 0;
 	virtual IHandleEntity* GetHandleEntity() const = 0;
 	virtual const Vector& WorldAlignMins() const = 0;
@@ -136,23 +139,33 @@ class SINGLE_INHERITANCE IHandleEntity
 public:
 	virtual ~IHandleEntity() {}
 	virtual int entindex() const = 0;
-	virtual datamap_t* GetDataDescMap(void) = 0;
+	virtual datamap_t* GetDataDescMap(void) const = 0;
 	virtual void SetRefEHandle( const CBaseHandle &handle ) = 0;
 	virtual const CBaseHandle& GetRefEHandle() const = 0;
-	virtual IEntityFactory* GetEntityFactory() { return NULL; }
+	virtual IEntityFactory* GetEntityFactory() const { return NULL; }
 	virtual IEntityList* GetEntityList() const { return NULL; }
 	virtual IEngineObject* GetEngineObject() { return NULL; }
 	virtual const IEngineObject* GetEngineObject() const { return NULL; }
 	virtual void PostConstructor(const char* szClassname, int iForceEdictIndex) {}
 	virtual bool Init(int entnum, int iSerialNum) { return true; }
 	virtual void AfterInit() {};
-	virtual char const* GetClassname(void) { return NULL; }
+	virtual char const* GetClassname(void) const { return NULL; }
+	virtual char const* GetDebugName(void) const { return NULL; }
 	virtual bool IsWorld() const { return false; }
 	virtual bool IsBSPModel() const { return false; }
 	virtual bool IsNPC(void) const { return false; }
 	virtual bool IsPlayer(void) const { return false; }
-	virtual const char& GetTakeDamage() const { return 0; }
+	virtual bool IsAlive(void) { return false; }
 	virtual bool IsStandable() const { return false; }
+	virtual const Vector& WorldSpaceCenter() const { return *(Vector*)0; }
+	virtual IHandleEntity* GetOwnerEntity(void) const { return NULL; }
+	virtual int GetTeamNumber(void) const { return 0; }
+	virtual int GetMaxHealth() const { return 0; }
+	virtual int GetHealth() const { return 0; }
+	virtual const char& GetTakeDamage() const { return *(char*)0; }
+	virtual float GetAttackDamageScale(IHandleEntity* pVictim) { return 0.0f; }
+	virtual const Vector& EarPosition(void) const { return *(Vector*)0; }
+	virtual int GetWaterLevel() const { return 0; }
 };
 
 abstract_class IEntityCallBack{

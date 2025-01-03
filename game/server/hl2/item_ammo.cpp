@@ -822,7 +822,7 @@ void CItem_AmmoCrate::Use( IServerEntity *pActivator, IServerEntity *pCaller, US
 	if ( pPlayer == NULL )
 		return;
 
-	m_OnUsed.FireOutput( (CBaseEntity*)pActivator, this );
+	m_OnUsed.FireOutput(pActivator, this );
 
 	int iSequence = GetEngineObject()->LookupSequence( "Open" );
 
@@ -869,7 +869,7 @@ void CItem_AmmoCrate::Use( IServerEntity *pActivator, IServerEntity *pCaller, US
 int CItem_AmmoCrate::OnTakeDamage( const CTakeDamageInfo &info )
 {
 	// if it's the player hitting us with a crowbar, open up
-	CBasePlayer *player = ToBasePlayer(info.GetAttacker());
+	CBasePlayer *player = ToBasePlayer((IServerEntity*)info.GetAttacker());
 	if (player)
 	{
 		CBaseCombatWeapon *weapon = player->GetActiveWeapon();
@@ -888,7 +888,7 @@ int CItem_AmmoCrate::OnTakeDamage( const CTakeDamageInfo &info )
 			g_pSoundEmitterSystem->EmitSound(filter, player->entindex(), params);
 			//g_pSoundEmitterSystem->EmitSound(player, "HL2Player.Use" );//player->
 			// open the crate
-			Use(info.GetAttacker(), info.GetAttacker(), USE_TOGGLE, 0.0f);
+			Use((IServerEntity*)info.GetAttacker(), (IServerEntity*)info.GetAttacker(), USE_TOGGLE, 0.0f);
 		}
 	}
 
@@ -910,7 +910,7 @@ void CItem_AmmoCrate::HandleAnimEvent( animevent_t *pEvent )
 		{
 			if ( m_pGiveWeapon[m_nAmmoType] && !m_hActivator->Weapon_OwnsThisType( m_pGiveWeapon[m_nAmmoType] ) )
 			{
-				CBaseEntity *pEntity = (CBaseEntity*)EntityList()->CreateEntityByName( m_pGiveWeapon[m_nAmmoType] );
+				IServerEntity *pEntity = EntityList()->CreateEntityByName( m_pGiveWeapon[m_nAmmoType] );
 				CBaseCombatWeapon *pWeapon = dynamic_cast<CBaseCombatWeapon*>(pEntity);
 				if ( pWeapon )
 				{

@@ -84,7 +84,7 @@ void NDebugOverlay::SweptBox( const Vector& start, const Vector& end, const Vect
 //-----------------------------------------------------------------------------
 // Purpose: Draws a box around an entity
 //-----------------------------------------------------------------------------
-void NDebugOverlay::EntityBounds( const CBaseEntity *pEntity, int r, int g, int b, int a, float flDuration )
+void NDebugOverlay::EntityBounds( const IHandleEntity *pEntity, int r, int g, int b, int a, float flDuration )
 {
 	BoxAngles(pEntity->GetEngineObject()->GetCollisionOrigin(), pEntity->GetEngineObject()->OBBMins(), pEntity->GetEngineObject()->OBBMaxs(), pEntity->GetEngineObject()->GetCollisionAngles(), r, g, b, a, flDuration );
 }

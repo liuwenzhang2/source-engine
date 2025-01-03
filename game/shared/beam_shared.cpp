@@ -478,7 +478,7 @@ const Vector &CBeam::GetAbsStartPos( void ) const
 {
 	if ( GetType() == BEAM_ENTS && GetStartEntity() )
 	{
-		CBaseEntity* ent =  EntityList()->GetBaseEntity( GetStartEntity() );
+		IHandleEntity* ent = EntityList()->GetBaseEntity( GetStartEntity() );
 		if ( !ent )
 		{
 			return GetEngineObject()->GetAbsOrigin();
@@ -493,7 +493,7 @@ const Vector &CBeam::GetAbsEndPos( void ) const
 {
 	if ( GetType() != BEAM_POINTS && GetType() != BEAM_HOSE && GetEndEntity() ) 
 	{
-		CBaseEntity *ent =  EntityList()->GetBaseEntity( GetEndEntity() );
+		IHandleEntity *ent = EntityList()->GetBaseEntity( GetEndEntity() );
 		if ( ent )
 			return ent->GetEngineObject()->GetAbsOrigin();
 	}
@@ -735,15 +735,15 @@ CBaseEntity *CBeam::RandomTargetname( const char *szName )
 #if !defined( CLIENT_DLL )
 	int total = 0;
 
-	CBaseEntity *pEntity = NULL;
-	CBaseEntity *pNewEntity = NULL;
+	IServerEntity *pEntity = NULL;
+	IServerEntity *pNewEntity = NULL;
 	while ((pNewEntity = EntityList()->FindEntityByName( pNewEntity, szName )) != NULL)
 	{
 		total++;
 		if (random->RandomInt(0,total-1) < 1)
 			pEntity = pNewEntity;
 	}
-	return pEntity;
+	return (CBaseEntity*)pEntity;
 #else
 	return NULL;
 #endif

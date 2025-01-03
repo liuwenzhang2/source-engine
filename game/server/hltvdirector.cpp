@@ -262,11 +262,11 @@ void CHLTVDirector::BuildCameraList( void )
 	m_nNumFixedCameras = 0;
 	memset( m_pFixedCameras, 0, sizeof ( m_pFixedCameras ) );
 
-	CBaseEntity *pCamera = EntityList()->FindEntityByClassname( NULL, GetFixedCameraEntityName() );
+	IServerEntity *pCamera = EntityList()->FindEntityByClassname( NULL, GetFixedCameraEntityName() );
 
 	while ( pCamera && m_nNumFixedCameras < MAX_NUM_CAMERAS)
 	{
-		CBaseEntity *pTarget = EntityList()->FindEntityByName( NULL, STRING(pCamera->m_target) );
+		IServerEntity *pTarget = EntityList()->FindEntityByName( NULL, STRING(pCamera->GetTarget()) );
 
 		if ( pTarget )
 		{
@@ -276,7 +276,7 @@ void CHLTVDirector::BuildCameraList( void )
 			pCamera->GetEngineObject()->SetAbsAngles( angles );
 		}
 
-		m_pFixedCameras[m_nNumFixedCameras] = pCamera;
+		m_pFixedCameras[m_nNumFixedCameras] = (CBaseEntity*)pCamera;
 
 		m_nNumFixedCameras++;
 		pCamera = EntityList()->FindEntityByClassname( pCamera, GetFixedCameraEntityName() );

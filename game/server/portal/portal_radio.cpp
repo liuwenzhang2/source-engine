@@ -84,7 +84,7 @@ public:
 	virtual void Spawn();
 	virtual void Precache();
 	virtual QAngle PreferredCarryAngles( void ) { return QAngle( 0, 180, 0 ); }
-	virtual bool HasPreferredCarryAnglesForPlayer( CBaseEntity *pPlayer ) { return true; }
+	virtual bool HasPreferredCarryAnglesForPlayer( IServerEntity *pPlayer ) { return true; }
 	virtual void Activate();
 
 
@@ -605,7 +605,7 @@ void CSpawnDinosaurHack::ApplyMapSpecificHacks()
 {
 	if ( V_strcmp( STRING(gpGlobals->mapname), "testchmb_a_02" ) == 0 )
 	{
-		CBaseEntity *pFilter = (CBaseEntity*)EntityList()->CreateEntityByName( "filter_activator_name" );
+		IServerEntity *pFilter = EntityList()->CreateEntityByName( "filter_activator_name" );
 		Assert( pFilter );
 		if ( pFilter )
 		{

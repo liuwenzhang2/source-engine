@@ -452,7 +452,7 @@ void CAmbientGeneric::Activate( void )
 	{
 		if (m_sSourceEntName != NULL_STRING)
 		{
-			m_hSoundSource = EntityList()->FindEntityByName( NULL, m_sSourceEntName );
+			m_hSoundSource = (CBaseEntity*)EntityList()->FindEntityByName( NULL, m_sSourceEntName );
 			if ( m_hSoundSource != NULL )
 			{
 				m_nSoundSourceEntIndex = m_hSoundSource->entindex();
@@ -533,7 +533,7 @@ void CAmbientGeneric::SetTransmit( CCheckTransmitInfo *pInfo, bool bAlways )
 		return;
 
 	Assert( pInfo->m_pClientEnt );
-	CBaseEntity *pClient = EntityList()->GetBaseEntity( pInfo->m_pClientEnt);
+	IServerEntity *pClient = EntityList()->GetBaseEntity( pInfo->m_pClientEnt);
 	if ( !pClient )
 		return;
 

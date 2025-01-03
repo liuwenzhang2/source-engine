@@ -284,7 +284,7 @@ void CRecharge::Use( IServerEntity *pActivator, IServerEntity *pCaller, USE_TYPE
 		g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 		m_flSoundTime = 0.56 + gpGlobals->curtime;
 
-		m_OnPlayerUse.FireOutput((CBaseEntity*)pActivator, this );
+		m_OnPlayerUse.FireOutput(pActivator, this );
 	}
 
 	if ((m_iOn == 1) && (m_flSoundTime <= gpGlobals->curtime))
@@ -320,7 +320,7 @@ void CRecharge::Use( IServerEntity *pActivator, IServerEntity *pCaller, USE_TYPE
 
 	// Send the output.
 	float flRemaining = m_iJuice / MaxJuice();
-	m_OutRemainingCharge.Set(flRemaining, (CBaseEntity*)pActivator, this);
+	m_OutRemainingCharge.Set(flRemaining, pActivator, this);
 
 	// govern the rate of charge
 	m_flNextCharge = gpGlobals->curtime + 0.1;
@@ -754,7 +754,7 @@ void CNewRecharge::Use( IServerEntity *pActivator, IServerEntity *pCaller, USE_T
 		g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 		m_flSoundTime = 0.56 + gpGlobals->curtime;
 
-		m_OnPlayerUse.FireOutput( (CBaseEntity*)pActivator, this );
+		m_OnPlayerUse.FireOutput(pActivator, this );
 	}
 
 	if ((m_iOn == 1) && (m_flSoundTime <= gpGlobals->curtime))
@@ -774,7 +774,7 @@ void CNewRecharge::Use( IServerEntity *pActivator, IServerEntity *pCaller, USE_T
 
 	// Send the output.
 	float flRemaining = m_iJuice / MaxJuice();
-	m_OutRemainingCharge.Set(flRemaining, (CBaseEntity*)pActivator, this);
+	m_OutRemainingCharge.Set(flRemaining, pActivator, this);
 
 	// govern the rate of charge
 	m_flNextCharge = gpGlobals->curtime + 0.1;

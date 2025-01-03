@@ -1764,7 +1764,7 @@ void SixenseInput::CheckWeaponForScope()
 #endif
 
 #if defined( HL2_CLIENT_DLL )
-	C_BaseHLPlayer *hlPlayer = dynamic_cast<C_BaseHLPlayer *>(EntityList()->GetLocalPlayer());
+	C_BaseHLPlayer *hlPlayer = ToHL2Player(EntityList()->GetLocalPlayer());
 
 	if ( hlPlayer && hlPlayer->m_HL2Local.m_bZooming )
 	{

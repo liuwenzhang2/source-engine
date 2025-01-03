@@ -45,7 +45,7 @@ static inline CBaseEntity *TranslateGroundEntity( CBaseEntity *pGroundEntity )
 
 	if( pClone && pClone->GetEngineShadowClone()->IsUntransformedClone() )
 	{
-		CBaseEntity *pSource = pClone->GetEngineShadowClone()->GetClonedEntity();
+		CBaseEntity *pSource = (CBaseEntity*)pClone->GetEngineShadowClone()->GetClonedEntity();
 
 		if( pSource )
 			return pSource;

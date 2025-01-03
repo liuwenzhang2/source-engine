@@ -233,7 +233,7 @@ ConVar  alyx_darkness_force( "alyx_darkness_force", "0", FCVAR_CHEAT | FCVAR_REP
 		if( BaseClass::ClientCommand( pEdict, args ) )
 			return true;
 
-		CHL2_Player *pPlayer = (CHL2_Player *) pEdict;
+		CHL2_Player *pPlayer = ToHL2Player(pEdict);
 
 		if ( pPlayer->ClientCommand( args ) )
 			return true;
@@ -1377,7 +1377,7 @@ ConVar  alyx_darkness_force( "alyx_darkness_force", "0", FCVAR_CHEAT | FCVAR_REP
 
 					if( pCannon )
 					{
-						if( PhysCannonAccountableForObject(pCannon, info.GetInflictor() ) )
+						if( PhysCannonAccountableForObject(pCannon, (CBaseEntity*)info.GetInflictor() ) )
 						{
 							// Antlions can always be squashed!
 							if ( pVictim->Classify() == CLASS_ANTLION )

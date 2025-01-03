@@ -1653,7 +1653,7 @@ void CAI_FollowBehavior::RunTask( const Task_t *pTask )
 					}
 					else
 					{
-						goal.pTarget = m_hFollowTarget->GetEngineObject()->GetMoveParent()->GetOuter();
+						goal.pTarget = (CBaseEntity*)m_hFollowTarget->GetEngineObject()->GetMoveParent()->GetOuter();
 					}
 
 					bool bSuccess = true;
@@ -2129,13 +2129,13 @@ void CAI_FollowGoal::EnableGoal( CAI_BaseNPC *pAI )
 	if ( !pAI->GetBehavior( &pBehavior ) )
 		return;
 	
-	CBaseEntity *pGoalEntity = GetGoalEntity();
+	IServerEntity *pGoalEntity = GetGoalEntity();
 	if ( !pGoalEntity && AI_IsSinglePlayer() )
 	{
-		if ( pAI->IRelationType(EntityList()->GetLocalPlayer()) == D_LI )
+		if ( pAI->IRelationType((CBaseEntity*)EntityList()->GetLocalPlayer()) == D_LI )
 		{
 			pGoalEntity = EntityList()->GetLocalPlayer();
-			SetGoalEntity( pGoalEntity );
+			SetGoalEntity((CBaseEntity*)pGoalEntity );
 		}
 	}
 

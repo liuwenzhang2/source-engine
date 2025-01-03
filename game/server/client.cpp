@@ -385,7 +385,7 @@ CON_COMMAND_F( cast_hull, "Tests hull collision detection", FCVAR_CHEAT )
 //			Without a name, returns the entity under the player's crosshair.
 //			With a name it finds entities via name/classname/index
 //-----------------------------------------------------------------------------
-CBaseEntity *GetNextCommandEntity( CBasePlayer *pPlayer, const char *name, CBaseEntity *ent )
+IServerEntity *GetNextCommandEntity( CBasePlayer *pPlayer, const char *name, IServerEntity *ent )
 {
 	if ( !pPlayer )
 		return NULL;
@@ -434,21 +434,21 @@ void SetDebugBits( CBasePlayer* pPlayer, const char *name, int bit )
 	if ( !pPlayer )
 		return;
 
-	CBaseEntity *pEntity = NULL;
+	IServerEntity *pEntity = NULL;
 	while ( (pEntity = GetNextCommandEntity( pPlayer, name, pEntity )) != NULL )
 	{
-		if (pEntity->m_debugOverlays & bit)
+		if (pEntity->GetDebugOverlays() & bit)
 		{
-			pEntity->m_debugOverlays &= ~bit;
+			pEntity->GetDebugOverlays() &= ~bit;
 		}
 		else
 		{
-			pEntity->m_debugOverlays |= bit;
+			pEntity->GetDebugOverlays() |= bit;
 
 #ifdef AI_MONITOR_FOR_OSCILLATION
 			if( pEntity->IsNPC() )
 			{
-				pEntity->MyNPCPointer()->m_ScheduleHistory.RemoveAll();
+				((CBaseEntity*)pEntity)->MyNPCPointer()->m_ScheduleHistory.RemoveAll();
 			}
 #endif//AI_MONITOR_FOR_OSCILLATION
 		}
@@ -462,7 +462,7 @@ void SetDebugBits( CBasePlayer* pPlayer, const char *name, int bit )
 //-----------------------------------------------------------------------------
 void KillTargets( const char *pKillTargetName )
 {
-	CBaseEntity *pentKillTarget = NULL;
+	IServerEntity *pentKillTarget = NULL;
 
 	DevMsg( 2, "KillTarget: %s\n", pKillTargetName );
 	pentKillTarget = EntityList()->FindEntityByName( NULL, pKillTargetName );
@@ -484,7 +484,7 @@ void ConsoleKillTarget( CBasePlayer *pPlayer, const char *name )
 	// If no name was given use the picker
 	if (FStrEq(name,"")) 
 	{
-		CBaseEntity *pEntity = EntityList()->FindPickerEntity( pPlayer );
+		IServerEntity *pEntity = EntityList()->FindPickerEntity( pPlayer );
 		if ( pEntity )
 		{
 			EntityList()->DestroyEntity( pEntity );
@@ -1357,7 +1357,7 @@ static bool IsInGroundList( CBaseEntity *ent, CBaseEntity *ground )
 		servergroundlink_t *link = root->nextLink;
 		while ( link != root )
 		{
-			CBaseEntity *other = EntityList()->GetBaseEntityFromHandle(link->entity);
+			IServerEntity *other = EntityList()->GetBaseEntityFromHandle(link->entity);
 			if ( other == ent )
 				return true;
 			link = link->nextLink;
@@ -1384,7 +1384,7 @@ static int DescribeGroundList( CBaseEntity *ent )
 		servergroundlink_t *link = root->nextLink;
 		while ( link != root )
 		{
-			CBaseEntity *other = EntityList()->GetBaseEntityFromHandle(link->entity);
+			IServerEntity *other = EntityList()->GetBaseEntityFromHandle(link->entity);
 			if ( other )
 			{
 				Msg( "  %02i:  %i %s\n", c++, other->entindex(), other->GetClassname() );
@@ -1406,7 +1406,7 @@ static int DescribeGroundList( CBaseEntity *ent )
 
 	if ( ent->GetEngineObject()->GetGroundEntity() != NULL )
 	{
-		Assert( IsInGroundList( ent, ent->GetEngineObject()->GetGroundEntity()->GetOuter() ) );
+		Assert( IsInGroundList( ent, (CBaseEntity*)ent->GetEngineObject()->GetGroundEntity()->GetOuter() ) );
 	}
 
 	return c - 1;
@@ -1421,19 +1421,19 @@ void CC_GroundList_f(const CCommand &args)
 	{
 		int idx = atoi( args[1] );
 
-		CBaseEntity *ground = EntityList()->GetBaseEntity( idx );
+		IServerEntity *ground = EntityList()->GetBaseEntity( idx );
 		if ( ground )
 		{
-			DescribeGroundList( ground );
+			DescribeGroundList((CBaseEntity*)ground );
 		}
 	}
 	else
 	{
-		CBaseEntity *ent = NULL;
+		IServerEntity *ent = NULL;
 		int linkCount = 0;
 		while ( (ent = EntityList()->NextEnt(ent)) != NULL )
 		{
-			linkCount += DescribeGroundList( ent );
+			linkCount += DescribeGroundList((CBaseEntity*)ent );
 		}
 
 		extern int groundlinksallocated;
@@ -1501,10 +1501,10 @@ void ClientCommand( CBasePlayer *pPlayer, const CCommand &args )
 			{
 				// Destroy it
 				//
-				CBaseEntity *ent = EntityList()->FindEntityByClassname( NULL, "te_tester" );
+				IServerEntity *ent = EntityList()->FindEntityByClassname( NULL, "te_tester" );
 				while ( ent )
 				{
-					CBaseEntity *next = EntityList()->FindEntityByClassname( ent, "te_tester" );
+					IServerEntity *next = EntityList()->FindEntityByClassname( ent, "te_tester" );
 					EntityList()->DestroyEntity( ent );
 					ent = next;
 				}

@@ -29,9 +29,9 @@
 int g_iLastCitizenModel = 0;
 int g_iLastCombineModel = 0;
 
-CBaseEntity	 *g_pLastCombineSpawn = NULL;
-CBaseEntity	 *g_pLastRebelSpawn = NULL;
-extern CBaseEntity				*g_pLastSpawn;
+IServerEntity	 *g_pLastCombineSpawn = NULL;
+IServerEntity	 *g_pLastRebelSpawn = NULL;
+extern IServerEntity				*g_pLastSpawn;
 
 #define HL2MP_COMMAND_MAX_RATE 0.3
 
@@ -1257,7 +1257,7 @@ void CHL2MP_Player::Weapon_Drop( CBaseCombatWeapon *pWeapon, const Vector *pvecT
 
 void CHL2MP_Player::DetonateTripmines( void )
 {
-	CBaseEntity *pEntity = NULL;
+	IServerEntity *pEntity = NULL;
 
 	while ((pEntity = EntityList()->FindEntityByClassname( pEntity, "npc_satchel" )) != NULL)
 	{
@@ -1304,7 +1304,7 @@ void CHL2MP_Player::Event_Killed( const CTakeDamageInfo &info )
 		}
 	}
 
-	CBaseEntity *pAttacker = info.GetAttacker();
+	CBaseEntity *pAttacker = (CBaseEntity*)info.GetAttacker();
 
 	if ( pAttacker )
 	{
@@ -1371,10 +1371,10 @@ void CHL2MP_Player::DeathSound( const CTakeDamageInfo &info )
 	g_pSoundEmitterSystem->EmitSound( filter, entindex(), ep );
 }
 
-CBaseEntity* CHL2MP_Player::EntSelectSpawnPoint( void )
+IServerEntity* CHL2MP_Player::EntSelectSpawnPoint( void )
 {
-	CBaseEntity *pSpot = NULL;
-	CBaseEntity *pLastSpawnPoint = g_pLastSpawn;
+	IServerEntity *pSpot = NULL;
+	IServerEntity *pLastSpawnPoint = g_pLastSpawn;
 	//edict_t		*player = edict();
 	const char *pSpawnpointName = "info_player_deathmatch";
 
@@ -1405,14 +1405,14 @@ CBaseEntity* CHL2MP_Player::EntSelectSpawnPoint( void )
 	if ( !pSpot )  // skip over the null point
 		pSpot = EntityList()->FindEntityByClassname( pSpot, pSpawnpointName );
 
-	CBaseEntity *pFirstSpot = pSpot;
+	IServerEntity *pFirstSpot = pSpot;
 
 	do 
 	{
 		if ( pSpot )
 		{
 			// check if pSpot is valid
-			if ( g_pGameRules->IsSpawnPointValid( pSpot, this ) )
+			if ( g_pGameRules->IsSpawnPointValid((CBaseEntity*)pSpot, this ) )
 			{
 				if ( pSpot->GetEngineObject()->GetLocalOrigin() == vec3_origin )
 				{
@@ -1431,7 +1431,7 @@ CBaseEntity* CHL2MP_Player::EntSelectSpawnPoint( void )
 	// we haven't found a place to spawn yet,  so kill any guy at the first spawn point and spawn there
 	if ( pSpot )
 	{
-		CBaseEntity *ent = NULL;
+		IServerEntity *ent = NULL;
 		for ( CEntitySphereQuery sphere( pSpot->GetEngineObject()->GetAbsOrigin(), 128 ); (ent = sphere.GetCurrentEntity()) != NULL; sphere.NextEntity() )
 		{
 			// if ent is a client, kill em (unless they are ourselves)

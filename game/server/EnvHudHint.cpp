@@ -82,7 +82,7 @@ void CEnvHudHint::InputShowHudHint( inputdata_t &inputdata )
 	}
 	else
 	{
-		CBaseEntity *pPlayer = NULL;
+		IServerEntity *pPlayer = NULL;
 		if ( inputdata.pActivator && inputdata.pActivator->IsPlayer() )
 		{
 			pPlayer = inputdata.pActivator;
@@ -118,7 +118,7 @@ void CEnvHudHint::InputHideHudHint( inputdata_t &inputdata )
 	}
 	else
 	{
-		CBaseEntity *pPlayer = NULL;
+		IServerEntity *pPlayer = NULL;
 
 		if ( inputdata.pActivator && inputdata.pActivator->IsPlayer() )
 		{

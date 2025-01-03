@@ -68,11 +68,11 @@ class CAntlionTemplateMaker : public CTemplateNPCMaker
 	void	CreateProxyTarget( const Vector &position );
 	void	DestroyProxyTarget( void );
 
-	void	SetFightTarget( string_t strTarget, CBaseEntity *pActivator = NULL, CBaseEntity *pCaller = NULL );
+	void	SetFightTarget( string_t strTarget, IServerEntity *pActivator = NULL, IServerEntity *pCaller = NULL );
 	void	SetFightTarget( CBaseEntity *pEntity );
 	void	SetFightTarget( const Vector &position );
 	
-	void	SetFollowTarget( string_t strTarget, CBaseEntity *pActivator = NULL, CBaseEntity *pCaller = NULL );
+	void	SetFollowTarget( string_t strTarget, IServerEntity *pActivator = NULL, IServerEntity *pCaller = NULL );
 	void	SetFollowTarget( CBaseEntity *pEntity );
 
 	void	SetChildMoveState( AntlionMoveState_e state );
@@ -102,7 +102,7 @@ class CAntlionTemplateMaker : public CTemplateNPCMaker
 
 protected:
 
-	void		PrecacheTemplateEntity( CBaseEntity *pEntity );
+	void		PrecacheTemplateEntity( IServerEntity *pEntity );
 
 	bool		FindHintSpawnPosition( const Vector &origin, float radius, string_t hintGroupName, CAI_Hint **pHint, bool bRandom = false );
 	bool		FindNearTargetSpawnPosition( Vector &origin, float radius, CBaseEntity *pTarget );

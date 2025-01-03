@@ -382,7 +382,7 @@ void CNPC_HAssassin::RunTask ( const Task_t *pTask )
 
 			if( trace.DidHitWorld() )
 			{
-				GetEngineObject()->SetGroundEntity((CBaseEntity*)trace.m_pEnt ? ((CBaseEntity*)trace.m_pEnt)->GetEngineObject() : NULL);
+				GetEngineObject()->SetGroundEntity(trace.m_pEnt ? (IEngineObjectServer*)trace.m_pEnt->GetEngineObject() : NULL);
 			}
 			else
 			{

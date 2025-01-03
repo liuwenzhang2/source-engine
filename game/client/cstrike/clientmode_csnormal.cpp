@@ -184,7 +184,7 @@ void SetBuyData( const ConVar &buyVar, const char *filename )
 
 void MsgFunc_KillCam(bf_read &msg) 
 {
-	C_CSPlayer *pPlayer = ToCSPlayer((C_BasePlayer*)EntityList()->GetLocalPlayer() );
+	C_CSPlayer *pPlayer = ToCSPlayer( EntityList()->GetLocalPlayer() );
 
 	if ( !pPlayer )
 		return;

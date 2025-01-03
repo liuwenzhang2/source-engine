@@ -153,7 +153,7 @@ void CGrenadePathfollower::Detonate(void)
 //------------------------------------------------------------------------------
 void CGrenadePathfollower::Launch( float flLaunchSpeed, string_t sPathCornerName)
 {
-	m_pPathTarget = EntityList()->FindEntityByName( NULL, sPathCornerName );
+	m_pPathTarget = (CBaseEntity*)EntityList()->FindEntityByName( NULL, sPathCornerName );
 	if (m_pPathTarget)
 	{
 		m_flFlySpeed = flLaunchSpeed;
@@ -241,7 +241,7 @@ void CGrenadePathfollower::AimThink( void )
 		float flLength = (GetEngineObject()->GetAbsOrigin() - m_pPathTarget->GetEngineObject()->GetAbsOrigin()).Length();
 		if (flLength < GRENADE_PF_TOLERANCE)
 		{
-			m_pPathTarget = EntityList()->FindEntityByName( NULL, m_pPathTarget->m_target );
+			m_pPathTarget = (CBaseEntity*)EntityList()->FindEntityByName( NULL, m_pPathTarget->m_target );
 			if (!m_pPathTarget)
 			{	
 				GetEngineObject()->SetGravity( 1.0 );

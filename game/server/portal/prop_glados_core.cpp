@@ -47,7 +47,7 @@ public:
 	virtual void Precache( void );
 
 	virtual QAngle	PreferredCarryAngles( void ) { return QAngle( 180, -90, 180 ); }
-	virtual bool	HasPreferredCarryAnglesForPlayer( CBaseEntity *pPlayer ) { return true; }
+	virtual bool	HasPreferredCarryAnglesForPlayer( IServerEntity *pPlayer ) { return true; }
 
 	void	InputPanic( inputdata_t &inputdata );
 	void	InputStartTalking( inputdata_t &inputdata );

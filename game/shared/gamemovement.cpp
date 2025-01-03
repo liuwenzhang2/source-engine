@@ -2148,7 +2148,7 @@ void CGameMovement::FullObserverMove( void )
 
 	if ( mode == OBS_MODE_IN_EYE || mode == OBS_MODE_CHASE )
 	{
-		CBaseEntity * target = player->GetObserverTarget();
+		IHandleEntity * target = player->GetObserverTarget();
 
 		if ( target != NULL )
 		{

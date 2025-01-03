@@ -212,7 +212,7 @@ void CCSPlayerResource::UpdatePlayerData( void )
 	if( !m_foundGoalPositions )
 	{
 		// We only need to update these once a map, but we need the client to know about them.
-		CBaseEntity* ent = NULL;
+		IServerEntity* ent = NULL;
 		while ( ( ent = EntityList()->FindEntityByClassname( ent, "func_bomb_target" ) ) != NULL )
 		{
 			const Vector &pos = ent->WorldSpaceCenter();

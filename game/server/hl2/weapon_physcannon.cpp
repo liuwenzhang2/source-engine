@@ -353,7 +353,7 @@ void CPlayerPickupController::Init( CBasePlayer *pPlayer, CBaseEntity *pObject )
 		}
 	}
 
-	CHL2_Player *pOwner = (CHL2_Player *)ToBasePlayer( pPlayer );
+	CHL2_Player *pOwner = ToHL2Player( pPlayer );
 	if ( pOwner )
 	{
 		pOwner->EnableSprint( false );
@@ -392,7 +392,7 @@ void CPlayerPickupController::Init( CBasePlayer *pPlayer, CBaseEntity *pObject )
 //-----------------------------------------------------------------------------
 void CPlayerPickupController::Shutdown( bool bThrown )
 {
-	CBaseEntity *pObject = GetGrabController()->GetAttached();
+	IServerEntity *pObject = GetGrabController()->GetAttached();
 
 	bool bClearVelocity = false;
 	if ( !bThrown && pObject && pObject->GetEngineObject()->VPhysicsGetObject() && pObject->GetEngineObject()->VPhysicsGetObject()->GetContactPoint(NULL,NULL) )
@@ -408,12 +408,12 @@ void CPlayerPickupController::Shutdown( bool bThrown )
 #endif
 	if ( pObject != NULL )
 	{
-		Pickup_OnPhysGunDrop( pObject, m_pPlayer, bThrown ? THROWN_BY_PLAYER : DROPPED_BY_PLAYER );
+		Pickup_OnPhysGunDrop((CBaseEntity*)pObject, m_pPlayer, bThrown ? THROWN_BY_PLAYER : DROPPED_BY_PLAYER );
 	}
 
 	if ( m_pPlayer )
 	{
-		CHL2_Player *pOwner = (CHL2_Player *)ToBasePlayer( m_pPlayer );
+		CHL2_Player *pOwner = ToHL2Player( m_pPlayer );
 		if ( pOwner )
 		{
 			pOwner->EnableSprint( true );
@@ -441,7 +441,7 @@ void CPlayerPickupController::Use( IServerEntity *pActivator, IServerEntity *pCa
 {
 	if ( ToBasePlayer(pActivator) == m_pPlayer )
 	{
-		CBaseEntity *pAttached = GetGrabController()->GetAttached();
+		IServerEntity *pAttached = GetGrabController()->GetAttached();
 
 		// UNDONE: Use vphysics stress to decide to drop objects
 		// UNDONE: Must fix case of forcing objects into the ground you're standing on (causes stress) before that will work
@@ -967,7 +967,7 @@ bool CWeaponPhysCannon::DropIfEntityHeld( CBaseEntity *pTarget )
 	if ( pTarget == NULL )
 		return false;
 
-	CBaseEntity *pHeld = GetGrabController()->GetAttached();
+	IServerEntity *pHeld = GetGrabController()->GetAttached();
 	
 	if ( pHeld == NULL )
 		return false;
@@ -1451,7 +1451,7 @@ void CWeaponPhysCannon::PrimaryAttack( void )
 		pOwner->EyeVectors( &forward );
 
 		// Validate the item is within punt range
-		CBaseEntity *pHeld = GetGrabController()->GetAttached();
+		IServerEntity *pHeld = GetGrabController()->GetAttached();
 		Assert( pHeld != NULL );
 
 		if ( pHeld != NULL )
@@ -1729,7 +1729,7 @@ bool CWeaponPhysCannon::AttachObject( CBaseEntity *pObject, const Vector &vPosit
 	if ( !pPhysics )
 		return false;
 
-	CHL2_Player *pOwner = (CHL2_Player *)ToBasePlayer( GetOwner() );
+	CHL2_Player *pOwner = ToHL2Player( GetOwner() );
 
 	m_bActive = true;
 	if( pOwner )
@@ -2077,7 +2077,7 @@ void CWeaponPhysCannon::DetachObject( bool playSound, bool wasLaunched )
 	if ( m_bActive == false )
 		return;
 
-	CHL2_Player *pOwner = (CHL2_Player *)ToBasePlayer( GetOwner() );
+	CHL2_Player *pOwner = ToHL2Player( GetOwner() );
 	if( pOwner != NULL )
 	{
 		pOwner->EnableSprint( true );
@@ -2093,13 +2093,13 @@ void CWeaponPhysCannon::DetachObject( bool playSound, bool wasLaunched )
 #endif
 	}
 
-	CBaseEntity *pObject = GetGrabController()->GetAttached();
+	IServerEntity *pObject = GetGrabController()->GetAttached();
 
 	GetGrabController()->DetachEntity( wasLaunched );
 
 	if ( pObject != NULL )
 	{
-		Pickup_OnPhysGunDrop( pObject, pOwner, wasLaunched ? LAUNCHED_BY_CANNON : DROPPED_BY_CANNON );
+		Pickup_OnPhysGunDrop((CBaseEntity*)pObject, pOwner, wasLaunched ? LAUNCHED_BY_CANNON : DROPPED_BY_CANNON );
 	}
 
 	// Stop our looping sound
@@ -2117,7 +2117,7 @@ void CWeaponPhysCannon::DetachObject( bool playSound, bool wasLaunched )
 		WeaponSound( MELEE_MISS );
 	}
 
-	RecordThrownObject( pObject );
+	RecordThrownObject((CBaseEntity*)pObject );
 }
 
 
@@ -2275,7 +2275,7 @@ void CWeaponPhysCannon::WaitForUpgradeThink()
 	DestroyEffects();
 
 	// HACK: Hacky notification back to the level that we've finish upgrading
-	CBaseEntity *pEnt = EntityList()->FindEntityByName( NULL, "script_physcannon_upgrade" );
+	IServerEntity *pEnt = EntityList()->FindEntityByName( NULL, "script_physcannon_upgrade" );
 	if ( pEnt )
 	{
 		variant_t emptyVariant;
@@ -2329,7 +2329,7 @@ void CWeaponPhysCannon::DoEffectIdle( void )
 #ifdef HL2_EPISODIC
 			ForceDrop();
 
-			CHL2_Player *pPlayer = dynamic_cast<CHL2_Player*>( pOwner );
+			CHL2_Player *pPlayer = ToHL2Player( pOwner );
 
 			if ( pPlayer )
 			{
@@ -2593,9 +2593,9 @@ void CWeaponPhysCannon::LaunchObject( const Vector &vecDir, float flForce )
 	// FIRE!!!
 	if(GetGrabController()->GetAttached() )
 	{
-		CBaseEntity *pObject = GetGrabController()->GetAttached();
+		IServerEntity *pObject = GetGrabController()->GetAttached();
 
-		gamestats->Event_Punted( pObject );
+		gamestats->Event_Punted((CBaseEntity*)pObject );
 
 		DetachObject( false, true );
 
@@ -2613,12 +2613,12 @@ void CWeaponPhysCannon::LaunchObject( const Vector &vecDir, float flForce )
 
 		for( i = PHYSCANNON_DANGER_SOUND_RADIUS ; i < iLength ; i += PHYSCANNON_DANGER_SOUND_RADIUS )
 		{
-			CSoundEnt::InsertSound( SOUND_PHYSICS_DANGER, vecSpot, PHYSCANNON_DANGER_SOUND_RADIUS, 0.5, pObject );
+			CSoundEnt::InsertSound( SOUND_PHYSICS_DANGER, vecSpot, PHYSCANNON_DANGER_SOUND_RADIUS, 0.5, (CBaseEntity*)pObject );
 			vecSpot = vecSpot + ( vecDir * PHYSCANNON_DANGER_SOUND_RADIUS );
 		}
 				
 		// Launch
-		ApplyVelocityBasedForce( pObject, vecDir, tr.endpos, PHYSGUN_FORCE_LAUNCHED );
+		ApplyVelocityBasedForce((CBaseEntity*)pObject, vecDir, tr.endpos, PHYSGUN_FORCE_LAUNCHED );
 
 		// Don't allow the gun to regrab a thrown object!!
 		m_flNextSecondaryAttack = m_flNextPrimaryAttack = gpGlobals->curtime + 0.5;
@@ -3776,7 +3776,7 @@ CBaseEntity * CWeaponPhysCannon::PhysCannonGetHeldEntity()
 	if ( this )
 	{
 		IGrabControllerServer* grab = this->GetGrabController();
-		return grab->GetAttached();
+		return (CBaseEntity*)grab->GetAttached();
 	}
 
 	return NULL;
@@ -3789,7 +3789,7 @@ CBaseEntity * CHL2_Player::GetPlayerHeldEntity()
 
 	if ( pPlayerPickupController )
 	{
-		pObject = pPlayerPickupController->GetGrabController()->GetAttached();
+		pObject = (CBaseEntity*)pPlayerPickupController->GetGrabController()->GetAttached();
 	}
 
 	return pObject;

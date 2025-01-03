@@ -1045,7 +1045,7 @@ void CNPC_Blob::FormShapeFromPath( string_t iszPathName )
 			break;
 		}
 
-		CBaseEntity *pEntity = EntityList()->FindEntityByName( NULL, iszPathName );
+		IServerEntity *pEntity = EntityList()->FindEntityByName( NULL, iszPathName );
 
 		if( pEntity != NULL )
 		{
@@ -1063,7 +1063,7 @@ void CNPC_Blob::FormShapeFromPath( string_t iszPathName )
 			}
 
 			vertex[ i ] = pEntity->GetEngineObject()->GetAbsOrigin();
-			iszPathName = pEntity->m_target;
+			iszPathName = pEntity->GetTarget();
 			iNumVerts++;
 
 			if( bClosedPath )
@@ -1145,7 +1145,7 @@ void CNPC_Blob::InputSetRadius( inputdata_t &inputdata )
 //-----------------------------------------------------------------------------
 void CNPC_Blob::InputChaseEntity( inputdata_t &inputdata )
 {
-	CBaseEntity *pEntity = EntityList()->FindEntityByName( NULL, inputdata.value.StringID(), NULL, inputdata.pActivator, inputdata.pCaller );
+	IServerEntity *pEntity = EntityList()->FindEntityByName( NULL, inputdata.value.StringID(), NULL, inputdata.pActivator, inputdata.pCaller );
 	
 	if ( pEntity )
 	{
@@ -1153,7 +1153,7 @@ void CNPC_Blob::InputChaseEntity( inputdata_t &inputdata )
 		{
 			CBlobElement *pElement = m_Elements[ i ];
 
-			pElement->SetTargetEntity( pEntity );
+			pElement->SetTargetEntity( (CBaseEntity*)pEntity );
 			pElement->SetActiveMovementRule( BLOB_MOVE_TO_TARGET_ENTITY );
 		}
 	}
@@ -1336,7 +1336,7 @@ void CNPC_Blob::InitializeElements()
 		angDistributor.y += step;
 	}
 
-	CBaseEntity *pEntity = EntityList()->FindEntityByClassname( NULL, "info_target" );
+	IServerEntity *pEntity = EntityList()->FindEntityByClassname( NULL, "info_target" );
 	for( i = 0 ; i < BLOB_MAX_AVOID_ORIGINS ; i++ )
 	{
 		if( pEntity )

@@ -205,7 +205,7 @@ void CAI_RappelBehavior::StartTask( const Task_t *pTask )
 			// Although I tried to get NPC's out from under me, I landed on one. Kill it, so long as it's the same type of character as me.
 			variant_t val;
 			val.SetFloat( 0 );
-			g_EventQueue.AddEvent( GetOuter()->GetEngineObject()->GetGroundEntity()->GetOuter(), "sethealth", val, 0, GetOuter(), GetOuter());
+			g_EventQueue.AddEvent(GetOuter()->GetEngineObject()->GetGroundEntity()->GetOuter(), "sethealth", val, 0, GetOuter(), GetOuter());
 		}
 
 		TaskComplete();
@@ -245,7 +245,7 @@ void CAI_RappelBehavior::RunTask( const Task_t *pTask )
 			SetDescentSpeed();
 			if( GetOuter()->GetEngineObject()->GetFlags() & FL_ONGROUND )
 			{
-				CBaseEntity* pGroundEnt = GetOuter()->GetEngineObject()->GetGroundEntity() ? GetOuter()->GetEngineObject()->GetGroundEntity()->GetOuter() : NULL;
+				IServerEntity* pGroundEnt = GetOuter()->GetEngineObject()->GetGroundEntity() ? GetOuter()->GetEngineObject()->GetGroundEntity()->GetOuter() : NULL;
 
 				if( pGroundEnt && pGroundEnt->IsPlayer() )
 				{
@@ -355,7 +355,7 @@ void CAI_RappelBehavior::BeginRappel()
 		Vector forward;
 		GetOuter()->GetVectors( &forward, NULL, NULL );
 
-		CSoundEnt::InsertSound( SOUND_DANGER, ((CBaseEntity*)tr.m_pEnt)->EarPosition() - forward * 12.0f, 32.0f, 0.2f, GetOuter() );
+		CSoundEnt::InsertSound( SOUND_DANGER, tr.m_pEnt->EarPosition() - forward * 12.0f, 32.0f, 0.2f, GetOuter() );
 	}
 }
 
@@ -368,7 +368,7 @@ void CAI_RappelBehavior::CutZipline()
 		EntityList()->DestroyEntity( m_hLine );
 	}
 
-	CBaseEntity *pAnchor = (CBaseEntity*)EntityList()->CreateEntityByName( "rope_anchor" );
+	IServerEntity *pAnchor = EntityList()->CreateEntityByName( "rope_anchor" );
 	pAnchor->SetOwnerEntity( GetOuter() ); // Boy, this is a hack!!
 	pAnchor->GetEngineObject()->SetAbsOrigin( m_vecRopeAnchor );
 	pAnchor->Spawn();

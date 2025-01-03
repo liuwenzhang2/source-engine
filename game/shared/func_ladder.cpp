@@ -343,7 +343,7 @@ CInfoLadderDismount *CFuncLadder::GetDismount( int index )
 void CFuncLadder::FindNearbyDismountPoints( const Vector& origin, float radius, CUtlVector< CInfoLadderDismountHandle >& list )
 {
 #if !defined( CLIENT_DLL )
-	CBaseEntity *pEntity = NULL;
+	IServerEntity *pEntity = NULL;
 	while ( (pEntity = EntityList()->FindEntityByClassnameWithin( pEntity, "info_ladder_dismount", origin, radius)) != NULL )
 	{
 		CInfoLadderDismount *landingspot = static_cast< CInfoLadderDismount * >( pEntity );

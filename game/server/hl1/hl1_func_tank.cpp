@@ -116,7 +116,7 @@ public:
 	void StopControl( void );
 	void ControllerPostFrame( void );
 
-	CBaseEntity *FindTarget( string_t targetName, CBaseEntity *pActivator );
+	CBaseEntity *FindTarget( string_t targetName, IServerEntity *pActivator );
 
 protected:
 	CBasePlayer*	m_pController;
@@ -514,9 +514,9 @@ void CFuncTank::TraceAttack( CBaseEntity *pAttacker, float flDamage, const Vecto
 // Input  : targetName - 
 //			pActivator - 
 //-----------------------------------------------------------------------------
-CBaseEntity *CFuncTank::FindTarget( string_t targetName, CBaseEntity *pActivator ) 
+CBaseEntity *CFuncTank::FindTarget( string_t targetName, IServerEntity *pActivator ) 
 {
-	return EntityList()->FindEntityGenericNearest( STRING( targetName ), GetEngineObject()->GetAbsOrigin(), 0, this, pActivator );
+	return (CBaseEntity*)EntityList()->FindEntityGenericNearest( STRING( targetName ), GetEngineObject()->GetAbsOrigin(), 0, this, pActivator );
 }
 
 
@@ -1397,7 +1397,7 @@ CEnvLaser *CFuncTankLaser::GetLaser( void )
 	if ( m_pLaser )
 		return m_pLaser;
 
-	CBaseEntity *pLaser = EntityList()->FindEntityByName( NULL, m_iszLaserName );
+	IServerEntity *pLaser = EntityList()->FindEntityByName( NULL, m_iszLaserName );
 	while ( pLaser )
 	{
 		// Found the landmark
@@ -1616,7 +1616,7 @@ void CFuncTankMortar::Fire( int bulletCount, const Vector &barrelEnd, const Vect
 	if ( g_pGameRules->IsMultiplayer() )
 	{
 		// temp remove suppress host
-		ent = te->GetSuppressHost();
+		ent = (CBaseEntity*)te->GetSuppressHost();
 		te->SetSuppressHost( NULL );
 	}
 

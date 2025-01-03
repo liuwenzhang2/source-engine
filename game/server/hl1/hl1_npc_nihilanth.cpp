@@ -474,7 +474,7 @@ void CNPC_Nihilanth::StartupThink( void )
 	m_irritation = 0;
 	m_flAdj = 512;
 
-	CBaseEntity *pEntity;
+	IServerEntity *pEntity;
 
 	pEntity = EntityList()->FindEntityByName( NULL, "n_min" );
 	if (pEntity)
@@ -514,7 +514,7 @@ void CNPC_Nihilanth::InputTurnBabyOn( inputdata_t &inputdata )
 
 void CNPC_Nihilanth::InputTurnBabyOff( inputdata_t &inputdata )
 {
-	CBaseEntity *pTouch = EntityList()->FindEntityByName( NULL, m_szDeadTouch );
+	IServerEntity *pTouch = EntityList()->FindEntityByName( NULL, m_szDeadTouch );
 	
 	if ( pTouch && GetEnemy() != NULL )
 		 pTouch->Touch( GetEnemy() );
@@ -715,8 +715,8 @@ void CNPC_Nihilanth::NextActivity( )
 	{
 		char szName[64];
 
-		CBaseEntity *pEnt = NULL;
-		CBaseEntity *pRecharger = NULL;
+		IServerEntity *pEnt = NULL;
+		IServerEntity *pRecharger = NULL;
 		float flDist = 8192;
 
 		Q_snprintf(szName, sizeof( szName ), "%s%d", m_szRechargerTarget, m_iLevel );
@@ -734,7 +734,7 @@ void CNPC_Nihilanth::NextActivity( )
 		
 		if (pRecharger)
 		{
-			m_hRecharger = pRecharger;
+			m_hRecharger = (CBaseEntity*)pRecharger;
 			m_posDesired = Vector(GetEngineObject()->GetAbsOrigin().x, GetEngineObject()->GetAbsOrigin().y, pRecharger->GetEngineObject()->GetAbsOrigin().z );
 			m_vecDesired = pRecharger->GetEngineObject()->GetAbsOrigin() - m_posDesired;
 
@@ -819,10 +819,10 @@ void CNPC_Nihilanth::NextActivity( )
 					char szText[64];
 
 					Q_snprintf( szText, sizeof( szText ), "%s%d", m_szTeleportTouch, m_iTeleport );
-					CBaseEntity *pTouch = EntityList()->FindEntityByName( NULL, szText );
+					IServerEntity *pTouch = EntityList()->FindEntityByName( NULL, szText );
 
 					Q_snprintf( szText, sizeof( szText ), "%s%d", m_szTeleportUse, m_iTeleport );
-					CBaseEntity *pTrigger = EntityList()->FindEntityByName( NULL, szText );
+					IServerEntity *pTrigger = EntityList()->FindEntityByName( NULL, szText );
 
 					if (pTrigger != NULL || pTouch != NULL)
 					{
@@ -1010,7 +1010,7 @@ void CNPC_Nihilanth::DyingThink( void )
 
 		if (fabs(GetEngineObject()->GetAbsOrigin().z - m_flMaxZ ) < 16)
 		{
-			CBaseEntity *pTrigger = NULL;
+			IServerEntity *pTrigger = NULL;
 
 			GetEngineObject()->SetAbsVelocity( Vector( 0, 0, 0 ) );
 			GetEngineObject()->SetGravity( 0 );
@@ -1161,10 +1161,10 @@ void CNPC_Nihilanth::HandleAnimEvent( animevent_t *pEvent )
 			char szText[32];
 
 			Q_snprintf( szText, sizeof( szText ), "%s%d", m_szTeleportTouch, m_iTeleport );
-			CBaseEntity *pTouch = EntityList()->FindEntityByName( NULL, szText );
+			IServerEntity *pTouch = EntityList()->FindEntityByName( NULL, szText );
 
 			Q_snprintf( szText, sizeof( szText ), "%s%d", m_szTeleportUse, m_iTeleport );
-			CBaseEntity *pTrigger = EntityList()->FindEntityByName( NULL, szText );
+			IServerEntity *pTrigger = EntityList()->FindEntityByName( NULL, szText );
 
 			if (pTrigger != NULL || pTouch != NULL)
 			{
@@ -1183,7 +1183,7 @@ void CNPC_Nihilanth::HandleAnimEvent( animevent_t *pEvent )
 				pEntity->SetOwnerEntity( this );
 				pEntity->Spawn();
 
-				pEntity->TeleportInit( this, GetEnemy(), pTrigger, pTouch );
+				pEntity->TeleportInit( this, GetEnemy(), (CBaseEntity*)pTrigger, (CBaseEntity*)pTouch );
 
 				pEntity->GetEngineObject()->SetAbsVelocity(GetEngineObject()->GetAbsOrigin() - vecSrc );
 				pEntity->GetEngineObject()->SetAbsVelocity( Vector(GetEngineObject()->GetAbsVelocity().x, GetEngineObject()->GetAbsVelocity().y, GetEngineObject()->GetAbsVelocity().z * 0.2 ) );

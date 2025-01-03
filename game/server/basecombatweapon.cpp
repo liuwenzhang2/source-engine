@@ -738,7 +738,7 @@ void CBaseCombatWeapon::Use( IServerEntity *pActivator, IServerEntity *pCaller, 
 	
 	if ( pPlayer )
 	{
-		m_OnPlayerUse.FireOutput( (CBaseEntity*)pActivator, (CBaseEntity*)pCaller );
+		m_OnPlayerUse.FireOutput( pActivator, pCaller );
 
 		//
 		// Bump the weapon to try equipping it before picking it up physically. This is

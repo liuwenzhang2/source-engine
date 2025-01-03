@@ -822,7 +822,7 @@ void CTriggerAreaCapture::GetNumCappingPlayers( int team, int &numcappers, int *
 
 	for ( int i = 1; i <= gpGlobals->maxClients; i++ )
 	{
-		CBaseEntity *ent = EntityList()->GetPlayerByIndex( i );
+		IServerEntity *ent = EntityList()->GetPlayerByIndex( i );
 		if ( ent )
 		{
 			CBaseMultiplayerPlayer *player = ToBaseMultiplayerPlayer(ent);

@@ -597,7 +597,7 @@ void CLagCompensationManager::BacktrackPlayer( CBasePlayer *pPlayer, float flTar
 		restore->m_vecMinsPreScaled = pPlayer->GetEngineObject()->OBBMinsPreScaled();
 		restore->m_vecMaxsPreScaled = pPlayer->GetEngineObject()->OBBMaxsPreScaled();
 		
-		pPlayer->SetSize( minsPreScaled, maxsPreScaled );
+		pPlayer->GetEngineObject()->SetSize( minsPreScaled, maxsPreScaled );
 		
 		change->m_vecMinsPreScaled = minsPreScaled;
 		change->m_vecMaxsPreScaled = maxsPreScaled;
@@ -768,7 +768,7 @@ void CLagCompensationManager::FinishLagCompensation( CBasePlayer *player )
 				pPlayer->GetEngineObject()->OBBMaxsPreScaled() == change->m_vecMaxsPreScaled )
 			{
 				// Restore it
-				pPlayer->SetSize( restore->m_vecMinsPreScaled, restore->m_vecMaxsPreScaled );
+				pPlayer->GetEngineObject()->SetSize( restore->m_vecMinsPreScaled, restore->m_vecMaxsPreScaled );
 			}
 #ifdef STAGING_ONLY
 			else

@@ -1481,7 +1481,7 @@ bool C_BaseFlex::ClearSceneEvent( CSceneEventInfo *info, bool fastKill, bool can
 //			expression - 
 //			duration - 
 //-----------------------------------------------------------------------------
-void C_BaseFlex::AddSceneEvent( CChoreoScene *scene, CChoreoEvent *event, CBaseEntity *pTarget, bool bClientSide )
+void C_BaseFlex::AddSceneEvent( CChoreoScene *scene, CChoreoEvent *event, IClientEntity *pTarget, bool bClientSide )
 {
 	if ( !scene || !event )
 	{
@@ -1503,7 +1503,7 @@ void C_BaseFlex::AddSceneEvent( CChoreoScene *scene, CChoreoEvent *event, CBaseE
 
 	info.m_pEvent		= event;
 	info.m_pScene		= scene;
-	info.m_hTarget		= pTarget;
+	info.m_hTarget		= (C_BaseEntity*)pTarget;
 	info.m_bStarted		= false;
 	info.m_bClientSide	= bClientSide;
 
@@ -1521,7 +1521,7 @@ void C_BaseFlex::AddSceneEvent( CChoreoScene *scene, CChoreoEvent *event, CBaseE
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-bool C_BaseFlex::StartSceneEvent( CSceneEventInfo *info, CChoreoScene *scene, CChoreoEvent *event, CChoreoActor *actor, CBaseEntity *pTarget )
+bool C_BaseFlex::StartSceneEvent( CSceneEventInfo *info, CChoreoScene *scene, CChoreoEvent *event, CChoreoActor *actor, IClientEntity *pTarget )
 {
 	switch ( event->GetType() )
 	{
@@ -1556,7 +1556,7 @@ bool C_BaseFlex::StartSceneEvent( CSceneEventInfo *info, CChoreoScene *scene, CC
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-bool C_BaseFlex::RequestStartSequenceSceneEvent( CSceneEventInfo *info, CChoreoScene *scene, CChoreoEvent *event, CChoreoActor *actor, CBaseEntity *pTarget )
+bool C_BaseFlex::RequestStartSequenceSceneEvent( CSceneEventInfo *info, CChoreoScene *scene, CChoreoEvent *event, CChoreoActor *actor, IClientEntity *pTarget )
 {
 	info->m_nSequence = GetEngineObject()->LookupSequence( event->GetParameters() );
 

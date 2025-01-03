@@ -39,7 +39,7 @@ void CEnvSoundscapeProxy::Activate()
 {
 	if ( m_MainSoundscapeName != NULL_STRING )
 	{
-		CBaseEntity *pEntity = EntityList()->FindEntityByName( NULL, m_MainSoundscapeName );
+		IServerEntity *pEntity = EntityList()->FindEntityByName( NULL, m_MainSoundscapeName );
 		if ( pEntity )
 		{
 			m_hProxySoundscape = dynamic_cast< CEnvSoundscape* >( pEntity );
@@ -225,7 +225,7 @@ void CEnvSoundscape::WriteAudioParamsTo( audioparams_t &audio )
 		if ( m_positionNames[i] != NULL_STRING )
 		{
 			// We are a valid entity for a sound position
-			CBaseEntity *pEntity = EntityList()->FindEntityByName( NULL, m_positionNames[i], this, this );
+			IServerEntity *pEntity = EntityList()->FindEntityByName( NULL, m_positionNames[i], this, this );
 			if ( pEntity )
 			{
 				audio.localBits |= 1<<i;

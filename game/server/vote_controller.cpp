@@ -441,10 +441,10 @@ CVoteController::TryCastVoteResult CVoteController::TryCastVote( int iEntIndex, 
 
 	if( m_potentialIssues[m_iActiveIssueIndex] && m_potentialIssues[m_iActiveIssueIndex]->IsAllyRestrictedVote() )
 	{
-		CBaseEntity *pVoteHolder = EntityList()->GetBaseEntity( m_iEntityHoldingVote );
-		CBaseEntity *pVoter = EntityList()->GetBaseEntity( iEntIndex );
+		IServerEntity *pVoteHolder = EntityList()->GetBaseEntity( m_iEntityHoldingVote );
+		IServerEntity *pVoter = EntityList()->GetBaseEntity( iEntIndex );
 
-		if( ( pVoteHolder == NULL ) || ( pVoter == NULL ) || ( GetVoterTeam( pVoteHolder ) != GetVoterTeam( pVoter ) ) )
+		if( ( pVoteHolder == NULL ) || ( pVoter == NULL ) || ( GetVoterTeam((CBaseEntity*)pVoteHolder ) != GetVoterTeam((CBaseEntity*)pVoter ) ) )
 		{
 			return CAST_FAIL_TEAM_RESTRICTED;
 		}
@@ -958,8 +958,8 @@ bool CBaseIssue::CanCallVote( int iEntIndex, const char *pszDetails, vote_create
 	}
 #endif // TF_DLL
 
-	CBaseEntity *pVoteCaller = EntityList()->GetBaseEntity( iEntIndex );
-	if( pVoteCaller && !CanTeamCallVote( GetVoterTeam( pVoteCaller ) ) )
+	IServerEntity *pVoteCaller = EntityList()->GetBaseEntity( iEntIndex );
+	if( pVoteCaller && !CanTeamCallVote( GetVoterTeam((CBaseEntity*)pVoteCaller ) ) )
 	{
 		nFailCode = VOTE_FAILED_TEAM_CANT_CALL;
 		return false;

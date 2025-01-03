@@ -129,7 +129,7 @@ void CEnvMicrophone::Activate(void)
 
 	if (m_target != NULL_STRING)
 	{
-		m_hMeasureTarget = EntityList()->FindEntityByName(NULL, STRING(m_target) );
+		m_hMeasureTarget = (CBaseEntity*)EntityList()->FindEntityByName(NULL, STRING(m_target) );
 
 		//
 		// If we were given a bad measure target, just measure sound where we are.
@@ -302,7 +302,7 @@ bool CEnvMicrophone::CanHearSound( int entindex, soundlevel_t soundlevel, float 
 	}
 
 	// Sound might be coming from an origin or from an entity.
-	CBaseEntity *pEntity = NULL;
+	IServerEntity *pEntity = NULL;
 	if ( entindex )
 	{
 		pEntity = EntityList()->GetBaseEntity(entindex) ;
@@ -312,7 +312,7 @@ bool CEnvMicrophone::CanHearSound( int entindex, soundlevel_t soundlevel, float 
 	CBaseFilter *pFilter = m_hListenFilter.Get();
 	if ( pFilter )
 	{
-		if ( !pEntity || !pFilter->PassesFilter( this, pEntity ) )
+		if ( !pEntity || !pFilter->PassesFilter( this, (CBaseEntity*)pEntity ) )
 		{
 			flVolume = 0;
 			return false;
@@ -458,7 +458,7 @@ MicrophoneResult_t CEnvMicrophone::SoundPlayed( int entindex, const char *soundn
 		// find players, and we need to be able to specify !player for a speaker.
 		if ( m_iszSpeakerName != NULL_STRING )
 		{
-			m_hSpeaker = EntityList()->FindEntityByName(NULL, STRING(m_iszSpeakerName) );
+			m_hSpeaker = (CBaseEntity*)EntityList()->FindEntityByName(NULL, STRING(m_iszSpeakerName) );
 
 			if ( !m_hSpeaker )
 			{

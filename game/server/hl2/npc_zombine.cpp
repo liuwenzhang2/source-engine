@@ -617,7 +617,7 @@ bool CNPC_Zombine::AllowedToSprint( void )
 
 	int iChance = SPRINT_CHANCE_VALUE;
 
-	CHL2_Player *pPlayer = dynamic_cast <CHL2_Player*> ( AI_GetSinglePlayer() );
+	CHL2_Player *pPlayer = ToHL2Player( AI_GetSinglePlayer() );
 
 	if ( pPlayer )
 	{

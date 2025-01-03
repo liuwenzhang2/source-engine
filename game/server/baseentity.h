@@ -30,7 +30,6 @@ struct CSoundParameters;
 
 class AI_CriteriaSet;
 class IResponseSystem;
-class IEntitySaveUtils;
 class CRecipientFilter;
 class IStudioHdr;
 class CServerGameDLL;
@@ -209,8 +208,8 @@ enum Class_T
 //
 struct inputdata_t
 {
-	CBaseEntity *pActivator;		// The entity that initially caused this chain of output events.
-	CBaseEntity *pCaller;			// The entity that fired this particular output.
+	IServerEntity *pActivator;		// The entity that initially caused this chain of output events.
+	IServerEntity *pCaller;			// The entity that fired this particular output.
 	variant_t value;				// The data parameter for this output.
 	int nOutputID;					// The unique ID of the output that was fired.
 };
@@ -224,18 +223,6 @@ struct ResponseContext_t
 	string_t		m_iszName;
 	string_t		m_iszValue;
 	float			m_fExpirationTime;		// when to expire context (0 == never)
-};
-
-
-//-----------------------------------------------------------------------------
-// Entity events... targetted to a particular entity
-// Each event has a well defined structure to use for parameters
-//-----------------------------------------------------------------------------
-enum EntityEvent_t
-{
-	ENTITY_EVENT_WATER_TOUCH = 0,		// No data needed
-	ENTITY_EVENT_WATER_UNTOUCH,			// No data needed
-	ENTITY_EVENT_PARENT_CHANGED,		// No data needed
 };
 
 enum notify_system_event_t
@@ -321,7 +308,7 @@ a list of all CBaseEntitys is kept in gEntList
 //extern void SpawnEntityByName( const char *className, CEntityMapData *mapData = NULL );
 
 // calls the spawn functions for an entity
-extern int DispatchSpawn( CBaseEntity *pEntity );
+extern int DispatchSpawn( IServerEntity *pEntity );
 
 //extern ISaveRestoreOps* engineObjectFuncs;
 extern ISoundEmitterSystem* g_pSoundEmitterSystem;
@@ -443,7 +430,7 @@ public:
 	// Owner entity.
 	// FIXME: These are virtual only because of CNodeEnt
 	CBaseEntity				*GetOwnerEntity() const;
-	virtual void			SetOwnerEntity( CBaseEntity* pOwner );
+	virtual void			SetOwnerEntity( IServerEntity* pOwner );
 	void					SetEffectEntity( CBaseEntity *pEffectEnt );
 	CBaseEntity				*GetEffectEntity() const;
 
@@ -452,8 +439,8 @@ public:
 	virtual int				ShouldTransmit( const CCheckTransmitInfo *pInfo );
 
 	// update the global transmit state if a transmission rule changed
-		    int				SetTransmitState( int nFlag);
-			int				GetTransmitState( void );
+	int						SetTransmitState( int nFlag);
+	int						GetTransmitState( void );
 	int						DispatchUpdateTransmitState();
 	
 	// Do NOT call this directly. Use DispatchUpdateTransmitState.
@@ -515,7 +502,7 @@ public:
 	virtual bool GetKeyValue( const char *szKeyName, char *szValue, int iMaxLen );
 
 	void ValidateEntityConnections();
-	void FireNamedOutput( const char *pszOutput, variant_t variant, CBaseEntity *pActivator, CBaseEntity *pCaller, float flDelay = 0.0f );
+	void FireNamedOutput( const char *pszOutput, variant_t variant, IServerEntity *pActivator, IServerEntity *pCaller, float flDelay = 0.0f );
 
 	// Activate - called for each entity after each load game and level load
 	virtual void Activate( void );
@@ -525,17 +512,11 @@ public:
 	//CBaseEntity *GetRootMoveParent();
 	//CBaseEntity *FirstMoveChild( void );
 	//CBaseEntity *NextMovePeer( void );
-
-	//void		SetName( string_t newTarget );
-	void SetName(const char* newName)
-	{
-		GetEngineObject()->SetName(newName);
-	}
 	void		SetParent( string_t newParent, CBaseEntity *pActivator, int iAttachment = -1 );
 	
 	
-	virtual void	BeforeParentChanged(CBaseEntity* pNewParent, int inewAttachment = -1) {}
-	virtual void	AfterParentChanged(CBaseEntity* pOldParent, int iOldAttachment = -1) {
+	virtual void	BeforeParentChanged(IServerEntity* pNewParent, int inewAttachment = -1) {}
+	virtual void	AfterParentChanged(IServerEntity* pOldParent, int iOldAttachment = -1) {
 		if (GetEngineObject()->GetMoveParent()) {
 			// Move our step data into the correct space
 			if (pOldParent == NULL)
@@ -546,12 +527,12 @@ public:
 			else
 			{
 				// Transform step data between parent-spaces
-				TransformStepData_ParentToParent(pOldParent, this);
+				TransformStepData_ParentToParent((CBaseEntity*)pOldParent, this);
 			}
 		}
 		else {
 			// Transform step data from parent to worldspace
-			TransformStepData_ParentToWorld(pOldParent);
+			TransformStepData_ParentToWorld((CBaseEntity*)pOldParent);
 		}
 	}
 
@@ -798,6 +779,7 @@ public:
 	// was pev->rendercolor
 	CNetworkColor32( m_clrRender );
 	const color32 GetRenderColor() const;
+	void SetRenderColor(color32 color);
 	void SetRenderColor( byte r, byte g, byte b );
 	void SetRenderColor( byte r, byte g, byte b, byte a );
 	void SetRenderColorR( byte r );
@@ -811,7 +793,7 @@ public:
 
 
 
-
+	virtual void	StudioFrameAdvance() {}
 
 //#if !defined( NO_ENTITY_PREDICTION )
 //	// Certain entities (projectiles) can be created on the client and thus need a matching id number
@@ -881,7 +863,7 @@ protected:
 
 public:
 
-	virtual bool	CanBeHitByMeleeAttack( CBaseEntity *pAttacker ) { return true; }
+	virtual bool	CanBeHitByMeleeAttack( IServerEntity *pAttacker ) { return true; }
 
 	// returns the amount of damage inflicted
 	virtual int		OnTakeDamage( const CTakeDamageInfo &info );
@@ -899,16 +881,16 @@ public:
 	void SendOnKilledGameEvent( const CTakeDamageInfo &info );
 
 	// Notifier that I've killed some other entity. (called from Victim's Event_Killed).
-	virtual void	Event_KilledOther( CBaseEntity *pVictim, const CTakeDamageInfo &info ) { return; }
+	virtual void	Event_KilledOther( IServerEntity *pVictim, const CTakeDamageInfo &info ) { return; }
 
 	// UNDONE: Make this data?
 	virtual int				BloodColor( void );
 
 	void					TraceBleed( float flDamage, const Vector &vecDir, trace_t *ptr, int bitsDamageType );
-	virtual bool			IsTriggered( CBaseEntity *pActivator ) {return true;}
+	virtual bool			IsTriggered( IServerEntity *pActivator ) {return true;}
 	virtual bool			IsNPC( void ) const { return false; }
 	CAI_BaseNPC				*MyNPCPointer( void ); 
-	virtual bool			NPC_CheckBrushExclude(CBaseEntity* pBrush) { return false; }
+	virtual bool			NPC_CheckBrushExclude(IServerEntity* pBrush) { return false; }
 	virtual float			GetStepHeight() const { return 0.0f; }
 	virtual CBaseCombatCharacter *MyCombatCharacterPointer( void ) { return NULL; }
 	virtual INextBot		*MyNextBotPointer( void ) { return NULL; }
@@ -932,9 +914,10 @@ public:
 	virtual bool	IsBaseTrain( void ) const { return false; }
 	bool			IsBSPModel() const;
 	bool			IsCombatCharacter() { return MyCombatCharacterPointer() == NULL ? false : true; }
+	virtual bool	IsCombatCharacter() const { return false; }
 	bool			IsInWorld( void ) const;
 	virtual bool	IsCombatItem( void ) const { return false; }
-	virtual bool	IsViewModel() { return false; }
+	virtual bool	IsViewModel() const { return false; }
 
 	virtual bool	IsBaseCombatWeapon( void ) const { return false; }
 	virtual bool	IsWearable( void ) const { return false; }
@@ -948,11 +931,11 @@ public:
 	// UNDONE: Make this data instead of procedural?
 	virtual bool	IsViewable( void );					// is this something that would be looked at (model, sprite, etc.)?
 	
-	virtual bool	IsChangeLevelTrigger() { return false; };
-	virtual bool	IsGib() { return false; }
-	virtual bool	IsCombineBall() { return false; }
+	virtual bool	IsChangeLevelTrigger() const { return false; };
+	virtual bool	IsGib() const { return false; }
+	virtual bool	IsCombineBall() const { return false; }
 	virtual bool	IsPortal() { return false; }
-	virtual bool	IsPhysicsProp() { return false; }
+	virtual bool	IsPhysicsProp() const { return false; }
 	virtual const char* GetNewLandmarkName() { return ""; };
 	virtual const char* GetNewMapName() { return ""; };
 
@@ -977,7 +960,7 @@ public:
 	//virtual bool	CanStandOn( edict_t	*ent ) const { return CanStandOn( GetContainingEntity( ent ) ); }
 	virtual CBaseEntity		*GetEnemy( void ) { return NULL; }
 	virtual CBaseEntity		*GetEnemy( void ) const { return NULL; }
-	virtual bool		FInViewCone(CBaseEntity* pEntity) { return false; }
+	virtual bool		FInViewCone(IServerEntity* pEntity) { return false; }
 	virtual bool		FInViewCone(const Vector& vecSpot) { return false; }
 
 	void	ViewPunch( const QAngle &angleOffset );
@@ -995,7 +978,7 @@ public:
 	virtual void			Touch( IServerEntity *pOther ); 
 	virtual void			EndTouch( IServerEntity *pOther );
 	virtual void			StartBlocked( CBaseEntity *pOther ) {}
-	virtual void			Blocked( CBaseEntity *pOther );
+	virtual void			Blocked( IServerEntity *pOther );
 	virtual void			EndBlocked( void ) {}
 
 	// Physics simulation
@@ -1003,8 +986,8 @@ public:
 
 public:
 
-	void					StartGroundContact( CBaseEntity *ground );
-	void					EndGroundContact( CBaseEntity *ground );
+	void					StartGroundContact( IServerEntity *ground );
+	void					EndGroundContact( IServerEntity *ground );
 
 
 
@@ -1154,6 +1137,14 @@ private:
 	CBaseEntity	*m_pLink;// used for temporary link-list operations. 
 
 public:
+
+	const string_t& GetTarget() const {
+		return m_target;
+	}
+
+	void SetTarget(const string_t& target) {
+		m_target = target;
+	}
 	// variables promoted from edict_t
 	string_t	m_target;
 	CNetworkVarForDerived( int, m_iMaxHealth ); // CBaseEntity doesn't care about changes to this variable, but there are derived classes that do.
@@ -1163,12 +1154,24 @@ public:
 		return m_takedamage;
 	}
 
+	void SetTakeDamage(int takedamage) {
+		m_takedamage = takedamage;
+	}
+
 	CNetworkVarForDerived( char, m_lifeState );
 	CNetworkVarForDerived( char , m_takedamage );
 
 	// Damage filtering
 	string_t	m_iszDamageFilterName;	// The name of the entity to use as our damage filter.
 	EHANDLE		m_hDamageFilter;		// The entity that controls who can damage us.
+
+	int& GetDebugOverlays() {
+		return m_debugOverlays;
+	}
+
+	TimedOverlay_t* GetTimedOverlay() {
+		return m_pTimedOverlay;
+	}
 
 	// Debugging / devolopment fields
 	int				m_debugOverlays;	// For debug only (bitfields)
@@ -1188,12 +1191,12 @@ public:
 	virtual Vector	EyePosition( void );			// position of eyes
 	virtual const QAngle &EyeAngles( void );		// Direction of eyes in world space
 	virtual const QAngle &LocalEyeAngles( void );	// Direction of eyes
-	virtual Vector	EarPosition( void );			// position of ears
+	virtual const Vector& EarPosition( void );			// position of ears
 
 	Vector	EyePosition( void ) const;			// position of eyes
 	const QAngle &EyeAngles( void ) const;		// Direction of eyes in world space
 	const QAngle &LocalEyeAngles( void ) const;	// Direction of eyes
-	Vector	EarPosition( void ) const;			// position of ears
+	const Vector& EarPosition( void ) const;			// position of ears
 
 	virtual Vector	BodyTarget( const Vector &posSrc, bool bNoisy = true);		// position to shoot at
 	virtual Vector	HeadTarget( const Vector &posSrc );
@@ -1256,10 +1259,10 @@ public:
 
 	// This function returns a value that scales all damage done by this entity.
 	// Use CDamageModifier to hook in damage modifiers on a guy.
-	virtual float			GetAttackDamageScale( CBaseEntity *pVictim );
+	virtual float			GetAttackDamageScale( IHandleEntity *pVictim );
 	// This returns a value that scales all damage done to this entity
 	// Use CDamageModifier to hook in damage modifiers on a guy.
-	virtual float			GetReceivedDamageScale( CBaseEntity *pAttacker );
+	virtual float			GetReceivedDamageScale( IHandleEntity *pAttacker );
 
 	// Gets the velocity we impart to a player standing on us
 	virtual void			GetGroundVelocityToApply( Vector &vecGroundVel ) { vecGroundVel = vec3_origin; }
@@ -1375,7 +1378,7 @@ public:
 
 
 	// Force a non-solid (ie. solid_trigger) physics object to collide with other entities.
-	virtual bool	ForceVPhysicsCollide( CBaseEntity *pEntity ) { return false; }
+	virtual bool	ForceVPhysicsCollide( IServerEntity *pEntity ) { return false; }
 
 private:
 
@@ -1415,12 +1418,12 @@ public:
 	virtual void			OnPhysGunPickup(CBasePlayer* pPhysGunUser, PhysGunPickup_t reason = PICKED_UP_BY_CANNON) {}
 	virtual void			OnPhysGunDrop(CBasePlayer* pPhysGunUser, PhysGunDrop_t reason) {}
 	virtual bool			IsObjectAllowedOverhead() { return false; }
-	virtual bool			HasPreferredCarryAnglesForPlayer(CBaseEntity* pPlayer) { return false; }
-	virtual bool			Pickup_GetPreferredCarryAngles(CBaseEntity* pPlayer, const matrix3x4_t& localToWorld, QAngle& outputAnglesWorldSpace) {
+	virtual bool			HasPreferredCarryAnglesForPlayer(IServerEntity* pPlayer) { return false; }
+	virtual bool			Pickup_GetPreferredCarryAngles(IServerEntity* pPlayer, const matrix3x4_t& localToWorld, QAngle& outputAnglesWorldSpace) {
 		return ::Pickup_GetPreferredCarryAngles(this, (CBasePlayer*)pPlayer, localToWorld, outputAnglesWorldSpace);
 	}
 	virtual QAngle			PreferredCarryAngles(void) { return vec3_angle; }
-	virtual float			GetCarryDistanceOffset(void) { return 0; }
+	virtual float			GetCarryDistanceOffset(void) { return 0.0f; }
 	virtual bool			ForcePhysgunOpen(CBasePlayer* pPlayer) { return false; }
 	virtual AngularImpulse	PhysGunLaunchAngularImpulse() { return RandomAngularImpulse(-600, 600); }
 	virtual bool			ShouldPuntUseLaunchForces(PhysGunForce_t reason) { return reason == PHYSGUN_FORCE_LAUNCHED; }
@@ -1428,8 +1431,8 @@ public:
 	{
 		return Pickup_DefaultPhysGunLaunchVelocity(vecForward, flMass);
 	}
-	virtual CBaseEntity* NPCPhysics_CreateSolver(CBaseEntity* pPhysicsObject, bool disableCollisions, float separationDuration);
-	virtual CBaseEntity* EntityPhysics_CreateSolver(CBaseEntity* pPhysicsBlocker, bool disableCollisions, float separationDuration);
+	virtual CBaseEntity* NPCPhysics_CreateSolver(IServerEntity* pPhysicsObject, bool disableCollisions, float separationDuration);
+	virtual CBaseEntity* EntityPhysics_CreateSolver(IServerEntity* pPhysicsBlocker, bool disableCollisions, float separationDuration);
 	virtual void			PortalSimulator_TookOwnershipOfEntity(IEnginePortalServer* pEntity) {}
 	virtual void			PortalSimulator_ReleasedOwnershipOfEntity(IEnginePortalServer* pEntity) {}
 	bool FindClosestPassableSpace(const Vector& vIndecisivePush, unsigned int fMask = MASK_SOLID); //assumes the object is already in a mostly passable space
@@ -1470,8 +1473,8 @@ public:
 	void					OnPositionChanged();
 	void					OnAnglesChanged();
 	void					OnAnimationChanged();
-	void					AddWatcherToEntity(CBaseEntity* pWatcher, int watcherType);
-	void					RemoveWatcherFromEntity(CBaseEntity* pWatcher, int watcherType);
+	void					AddWatcherToEntity(IServerEntity* pWatcher, int watcherType);
+	void					RemoveWatcherFromEntity(IServerEntity* pWatcher, int watcherType);
 	void					NotifyPositionChanged();
 	void					NotifyVPhysicsStateChanged(IPhysicsObject* pPhysics, bool bAwake);
 protected:
@@ -1638,6 +1641,9 @@ private:
 	// local time the movement has ended
 	float			m_flMoveDoneTime;
 
+	int				GetPushEnumCount() {
+		return m_nPushEnumCount;
+	}
 	// A counter to help quickly build a list of potentially pushed objects for physics
 	int				m_nPushEnumCount;
 
@@ -1699,7 +1705,6 @@ public:
 
 // Methods shared by client and server
 public:
-	void							SetSize( const Vector &vecMin, const Vector &vecMax ); // GetEngineObject()->SetSize( mins, maxs );
 	//static int						PrecacheModel( const char *name, bool bPreload = true ); 
 	//static bool						PrecacheSound( const char *name );
 	//static void						PrefetchSound( const char *name );
@@ -1993,6 +1998,11 @@ inline const color32 CBaseEntity::GetRenderColor() const
 	return m_clrRender.Get();
 }
 
+inline void CBaseEntity::SetRenderColor(color32 color) 
+{
+	m_clrRender.Set(color);
+}
+
 inline void CBaseEntity::SetRenderColor( byte r, byte g, byte b )
 {
 	m_clrRender.Init( r, g, b );
@@ -2106,7 +2116,7 @@ inline const QAngle &CBaseEntity::LocalEyeAngles( void ) const	// Direction of e
 	return const_cast<CBaseEntity*>(this)->LocalEyeAngles();
 }
 
-inline Vector	CBaseEntity::EarPosition( void ) const			// position of ears
+inline const Vector& CBaseEntity::EarPosition( void ) const			// position of ears
 {
 	return const_cast<CBaseEntity*>(this)->EarPosition();
 }
@@ -2226,9 +2236,9 @@ inline bool FClassnameIs(IServerEntity *pEntity, const char *szClassname)
 //			useType - 
 //			value - 
 //-----------------------------------------------------------------------------
-inline void FireTargets(const char* targetName, CBaseEntity* pActivator, CBaseEntity* pCaller, USE_TYPE useType, float value)
+inline void FireTargets(const char* targetName, IServerEntity* pActivator, IServerEntity* pCaller, USE_TYPE useType, float value)
 {
-	CBaseEntity* pTarget = NULL;
+	IServerEntity* pTarget = NULL;
 	if (!targetName || !targetName[0])
 		return;
 
@@ -2236,7 +2246,7 @@ inline void FireTargets(const char* targetName, CBaseEntity* pActivator, CBaseEn
 
 	for (;;)
 	{
-		CBaseEntity* pSearchingEntity = pActivator;
+		IServerEntity* pSearchingEntity = pActivator;
 		pTarget = EntityList()->FindEntityByName(pTarget, targetName, pSearchingEntity, pActivator, pCaller);
 		if (!pTarget)
 			break;

@@ -38,7 +38,7 @@
 #define PORTAL_PLAYER_MAX_LIFT_MASS 85
 #define PORTAL_PLAYER_MAX_LIFT_SIZE 128
 
-extern CBaseEntity	*g_pLastSpawn;
+extern IServerEntity	*g_pLastSpawn;
 
 extern void respawn(CBaseEntity *pEdict, bool fCopyCorpse);
 
@@ -1143,7 +1143,7 @@ void CPortal_Player::VPhysicsShadowUpdate( IPhysicsObject *pPhysics )
 	// UNDONE: If the player is penetrating, but the player's game collisions are not stuck, teleport the physics shadow to the game position
 	if ( pPhysics->GetGameFlags() & FVPHYSICS_PENETRATING )
 	{
-		CUtlVector<CBaseEntity *> list;
+		CUtlVector<IServerEntity *> list;
 		EntityList()->PhysGetListOfPenetratingEntities( this, list );
 		for ( int i = list.Count()-1; i >= 0; --i )
 		{
@@ -1455,7 +1455,7 @@ void CPortal_Player::PlayerUse( void )
 			}
 			else
 			{	// Start controlling the train!
-				CBaseEntity* pTrain = GetEngineObject()->GetGroundEntity() ? GetEngineObject()->GetGroundEntity()->GetOuter() : NULL;
+				CBaseEntity* pTrain = GetEngineObject()->GetGroundEntity() ? (CBaseEntity*)GetEngineObject()->GetGroundEntity()->GetOuter() : NULL;
 				if ( pTrain && !(m_nButtons & IN_JUMP) && (GetEngineObject()->GetFlags() & FL_ONGROUND) && (pTrain->ObjectCaps() & FCAP_DIRECTIONAL_USE) && pTrain->OnControls(this) )
 				{
 					m_afPhysicsFlags |= PFLAG_DIROVERRIDE;
@@ -1786,8 +1786,8 @@ int CPortal_Player::OnTakeDamage( const CTakeDamageInfo &inputInfo )
 		inputInfoCopy.ScaleDamageForce( 0.05f );
 	}
 
-	CBaseEntity *pAttacker = inputInfoCopy.GetAttacker();
-	CBaseEntity *pInflictor = inputInfoCopy.GetInflictor();
+	CBaseEntity *pAttacker = (CBaseEntity*)inputInfoCopy.GetAttacker();
+	CBaseEntity *pInflictor = (CBaseEntity*)inputInfoCopy.GetInflictor();
 
 	bool bIsTurret = false;
 
@@ -1865,7 +1865,7 @@ int CPortal_Player::OnTakeDamage_Alive( const CTakeDamageInfo &info )
 	if ( !CBaseCombatCharacter::OnTakeDamage_Alive( info ) )
 		return 0;
 
-	CBaseEntity * attacker = info.GetAttacker();
+	CBaseEntity * attacker = (CBaseEntity*)info.GetAttacker();
 
 	if ( !attacker )
 		return 0;
@@ -2209,10 +2209,10 @@ CProp_Portal* CPortal_Player::GetPortalEnvironment()
 
 #ifdef PORTAL_MP
 
-CBaseEntity* CPortal_Player::EntSelectSpawnPoint( void )
+IServerEntity* CPortal_Player::EntSelectSpawnPoint( void )
 {
-	CBaseEntity *pSpot = NULL;
-	CBaseEntity *pLastSpawnPoint = g_pLastSpawn;
+	IServerEntity *pSpot = NULL;
+	IServerEntity *pLastSpawnPoint = g_pLastSpawn;
 	//edict_t		*player = edict();
 	const char *pSpawnpointName = "info_player_start";
 
@@ -2243,7 +2243,7 @@ CBaseEntity* CPortal_Player::EntSelectSpawnPoint( void )
 	if ( !pSpot )  // skip over the null point
 		pSpot = EntityList()->FindEntityByClassname( pSpot, pSpawnpointName );
 
-	CBaseEntity *pFirstSpot = pSpot;
+	IServerEntity *pFirstSpot = pSpot;
 
 	do 
 	{
@@ -2269,7 +2269,7 @@ CBaseEntity* CPortal_Player::EntSelectSpawnPoint( void )
 	// we haven't found a place to spawn yet,  so kill any guy at the first spawn point and spawn there
 	if ( pSpot )
 	{
-		CBaseEntity *ent = NULL;
+		IServerEntity *ent = NULL;
 		for ( CEntitySphereQuery sphere( pSpot->GetAbsOrigin(), 128 ); (ent = sphere.GetCurrentEntity()) != NULL; sphere.NextEntity() )
 		{
 			// if ent is a client, kill em (unless they are ourselves)
