@@ -896,10 +896,12 @@ public:
 	virtual IEngineRopeServer* GetEngineRope() = 0;
 	virtual const IEngineRopeServer* GetEngineRope() const = 0;
 
+	virtual bool ShouldSavePhysics() = 0;
 	virtual void OnSave(IEntitySaveUtils* pSaveUtils) = 0;
 	virtual int	Save(ISave& save) = 0;
 	virtual void OnRestore() = 0;
 	virtual int	Restore(IRestore& restore) = 0;
+	virtual bool CreateVPhysics() = 0;
 	virtual bool KeyValue(const char* szKeyName, const char* szValue) = 0;
 	virtual bool KeyValue(const char* szKeyName, float flValue) = 0;
 	virtual bool KeyValue(const char* szKeyName, const Vector& vecValue) = 0;
@@ -1250,6 +1252,7 @@ public:
 	virtual void ReserveSlot(int index) = 0;
 	virtual int AllocateFreeSlot(bool bNetworkable = true, int index = -1) = 0;
 	virtual IServerEntity* CreateEntityByName(const char* className, int iForceEdictIndex = -1, int iSerialNum = -1) = 0;
+	virtual int DispatchSpawn(IServerEntity* pEntity) = 0;
 	virtual void NotifyCreateEntity(IServerEntity* pEnt) = 0;
 	virtual void NotifyRemoveEntity(IServerEntity* pEnt) = 0;
 	virtual void NotifySpawn(IServerEntity* pEnt) = 0;

@@ -250,7 +250,7 @@ IServerEntity *CServerTools::CreateEntityByName( const char *szClassName )
 
 void CServerTools::DispatchSpawn( IServerEntity *pEntity )
 {
-	::DispatchSpawn( pEntity );
+	EntityList()->DispatchSpawn( pEntity );
 }
 
 

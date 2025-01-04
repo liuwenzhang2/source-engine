@@ -129,6 +129,7 @@ public:
 	virtual IClientEntity* GetOuter() = 0;
 	virtual IHandleEntity* GetHandleEntity() const = 0;
 	virtual int entindex() const = 0;
+	virtual const string_t& GetGlobalname() const { Error("Not Support!\n"); }
 	virtual void ParseMapData(IEntityMapData* mapData) = 0;
 	virtual int Save(ISave& save) = 0;
 	virtual int Restore(IRestore& restore) = 0;
@@ -840,10 +841,12 @@ public:
 
 	virtual int ObjectCaps(void) = 0;
 	virtual void Spawn(void) = 0;
+	virtual bool ShouldSavePhysics() = 0;
 	virtual void OnSave() = 0;
 	virtual int Save(ISave& save) = 0;
 	virtual void OnRestore() = 0;
 	virtual int Restore(IRestore& restore) = 0;
+	virtual bool CreateVPhysics() = 0;
 	virtual bool KeyValue(const char* szKeyName, const char* szValue) = 0;
 	virtual bool KeyValue(const char* szKeyName, float flValue) = 0;
 	virtual bool KeyValue(const char* szKeyName, const Vector& vecValue) = 0;

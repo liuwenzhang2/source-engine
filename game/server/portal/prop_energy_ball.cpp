@@ -510,7 +510,7 @@ void CEnergyBallLauncher::SpawnBall()
 	vDirection *= flSpeed;
 	pBall->GetEngineObject()->SetAbsVelocity( vDirection );
 
-	DispatchSpawn(pBall);
+	EntityList()->DispatchSpawn(pBall);
 	pBall->Activate();
 	pBall->SetState( CPropCombineBall::STATE_LAUNCHED );
 	pBall->GetEngineObject()->SetCollisionGroup( COLLISION_GROUP_PROJECTILE );
@@ -603,7 +603,7 @@ static void fire_energy_ball_f( void )
 
 		pBall->GetEngineObject()->SetAbsVelocity( vForward * 400.0f );
 
-		DispatchSpawn(pBall);
+		EntityList()->DispatchSpawn(pBall);
 		pBall->Activate();
 		pBall->SetState( CPropCombineBall::STATE_LAUNCHED );
 		pBall->GetEngineObject()->SetCollisionGroup( COLLISION_GROUP_PROJECTILE );

@@ -2799,7 +2799,7 @@ CGrenadeHelicopter *CNPC_AttackHelicopter::SpawnBombEntity( const Vector &vecPos
 	pGrenade->SetOwnerEntity( this );
 	pGrenade->SetThrower( this );
 	pGrenade->GetEngineObject()->SetAbsVelocity( vecVelocity );
-	DispatchSpawn( pGrenade );
+	EntityList()->DispatchSpawn( pGrenade );
 	pGrenade->SetExplodeOnContact( m_bBombsExplodeOnContact );
 
 #ifdef HL2_EPISODIC

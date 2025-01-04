@@ -42,7 +42,7 @@ CON_COMMAND_F( simple_bot_add, "Add a simple bot.", FCVAR_CHEAT )
 		bot->GetEngineObject()->SetAbsAngles( angles );
 		bot->GetEngineObject()->SetAbsOrigin( result.endpos + Vector( 0, 0, 10.0f ) );
 
-		DispatchSpawn( bot );
+		EntityList()->DispatchSpawn( bot );
 	}
 }
 

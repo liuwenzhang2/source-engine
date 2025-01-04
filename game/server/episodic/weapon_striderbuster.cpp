@@ -251,7 +251,7 @@ void CWeaponStriderBuster::Spawn( void )
 	{
 		m_hParticleEffect->KeyValue( "start_active", "1" );
 		m_hParticleEffect->KeyValue( "effect_name", "striderbuster_smoke" );
-		DispatchSpawn( m_hParticleEffect );
+		EntityList()->DispatchSpawn( m_hParticleEffect );
 		if ( gpGlobals->curtime > 0.2f )
 		{
 			m_hParticleEffect->Activate();
@@ -477,7 +477,7 @@ bool CWeaponStriderBuster::StickToEntity( CBaseEntity *pOther )
 						pFlare->KeyValue( "effect_name", "striderbuster_attached_pulse" );
 						pFlare->GetEngineObject()->SetParent( this->GetEngineObject() );
 						pFlare->GetEngineObject()->SetLocalOrigin( vec3_origin );
-						DispatchSpawn( pFlare );
+						EntityList()->DispatchSpawn( pFlare );
 						pFlare->Activate();
 					}
 				}
@@ -541,7 +541,7 @@ void CWeaponStriderBuster::CreateDestroyedEffect( void )
 	{
 		pTrail = EntityList()->CreateEntityByName( "sparktrail" );
 		pTrail->SetOwnerEntity( this );
-		DispatchSpawn( pTrail );
+		EntityList()->DispatchSpawn( pTrail );
 	}
 	
 	DispatchParticleEffect( "striderbuster_explode_core", GetEngineObject()->GetAbsOrigin(), GetEngineObject()->GetAbsAngles() );

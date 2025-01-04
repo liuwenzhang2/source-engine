@@ -4506,7 +4506,7 @@ float InstancedScriptedScene( CBaseFlex *pActor, const char *pszScene, EHANDLE *
 	pScene->m_bHadOwner = pActor != NULL;
 	pScene->m_bMultiplayer = bMultiplayer;
 	pScene->SetPostSpeakDelay( flPostDelay );
-	DispatchSpawn( pScene );
+	EntityList()->DispatchSpawn( pScene );
 	pScene->Activate();
 	pScene->m_bIsBackground = bIsBackground;
 

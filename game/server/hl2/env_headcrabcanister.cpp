@@ -720,7 +720,7 @@ void CEnvHeadcrabCanister::HeadcrabCanisterSpawnHeadcrabThink()
 		// So we don't collide with the canister
 		// NOTE: Hierarchical attachment is necessary here to get the animations to work
 		pHeadCrab->SetOwnerEntity( this );
-		DispatchSpawn( pHeadCrab );
+		EntityList()->DispatchSpawn( pHeadCrab );
 		pHeadCrab->GetEngineObject()->SetParent( this->GetEngineObject(), nHeadCrabAttachment);
 		pHeadCrab->GetEngineObject()->SetLocalOrigin( vec3_origin );
 		pHeadCrab->GetEngineObject()->SetLocalAngles( vec3_angle );

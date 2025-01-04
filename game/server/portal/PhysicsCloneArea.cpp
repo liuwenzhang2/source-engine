@@ -248,7 +248,7 @@ CPhysicsCloneArea *CPhysicsCloneArea::CreatePhysicsCloneArea( CProp_Portal *pFol
 	pCloneArea->m_pAttachedPortal = pFollowPortal;
 	pCloneArea->m_pAttachedSimulator = pFollowPortal;//->m_hPortalSimulator
 
-	DispatchSpawn( pCloneArea );
+	EntityList()->DispatchSpawn( pCloneArea );
 
 	pCloneArea->UpdatePosition();
 

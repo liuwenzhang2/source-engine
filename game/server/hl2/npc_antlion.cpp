@@ -1119,7 +1119,7 @@ void CNPC_Antlion::HandleAnimEvent( animevent_t *pEvent )
 					CGrenadeSpit *pGrenade = (CGrenadeSpit*)EntityList()->CreateEntityByName( "grenade_spit" );
 					pGrenade->GetEngineObject()->SetAbsOrigin( vSpitPos );
 					pGrenade->GetEngineObject()->SetAbsAngles( vec3_angle );
-					DispatchSpawn( pGrenade );
+					EntityList()->DispatchSpawn( pGrenade );
 					pGrenade->SetThrower( this );
 					pGrenade->SetOwnerEntity( this );
 										

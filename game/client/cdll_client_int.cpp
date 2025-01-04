@@ -692,9 +692,6 @@ private:
 	void UncacheAllMaterials( );
 	void ResetStringTablePointers();
 
-	
-	//Vector ModelSpaceLandmark(int modelIndex);
-
 	CUtlVector< IMaterial * > m_CachedMaterials;
 };
 
@@ -890,20 +887,6 @@ void CHLClient::PostRestore()
 	// Tell hud elements to modify behavior based on game restoration, if applicable
 	gHUD.OnRestore();
 }
-
-//---------------------------------
-// Get a reference position in model space to compute
-// changes in model space for global brush entities (designer models them in different coords!)
-//Vector CHLClient::ModelSpaceLandmark(int modelIndex)
-//{
-//	const model_t* pModel = modelinfo->GetModel(modelIndex);
-//	if (modelinfo->GetModelType(pModel) != mod_brush)
-//		return vec3_origin;
-//
-//	Vector mins, maxs;
-//	modelinfo->GetModelBounds(pModel, mins, maxs);
-//	return mins;
-//}
 
 // Purpose: Called when the DLL is first loaded.
 // Input  : engineFactory - 

@@ -395,7 +395,7 @@ void AddEntityToDarknessCheck( CBaseEntity *pEntity, float flLightRadius /*=DARK
 	if ( pLightSource )	
 	{
 		pLightSource->SetLightRadius( flLightRadius );
-		DispatchSpawn( pLightSource );
+		EntityList()->DispatchSpawn( pLightSource );
   		pLightSource->GetEngineObject()->SetAbsOrigin( pEntity->WorldSpaceCenter() );
 		pLightSource->GetEngineObject()->SetParent( pEntity->GetEngineObject());
 		pLightSource->Activate();

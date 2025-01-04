@@ -228,7 +228,7 @@ void CC_AI_Hull( const CCommand &args )
 			}
 
 			bSpawned = true;
-			DispatchSpawn( pEnt );
+			EntityList()->DispatchSpawn( pEnt );
 		}
 	}
 
@@ -410,7 +410,7 @@ void CC_NPC_Create( const CCommand &args )
 			baseNPC->GetEngineObject()->SetName( args[2] );
 		}
 
-		DispatchSpawn(baseNPC);
+		EntityList()->DispatchSpawn(baseNPC);
 		// Now attempt to drop into the world
 		CBasePlayer* pPlayer = UTIL_GetCommandClient();
 		trace_t tr;
@@ -471,7 +471,7 @@ void CC_NPC_Create_Aimed( const CCommand &args )
 	{
 		baseNPC->KeyValue( "additionalequipment", npc_create_equipment.GetString() );
 		baseNPC->Precache();
-		DispatchSpawn( baseNPC );
+		EntityList()->DispatchSpawn( baseNPC );
 
 		// Now attempt to drop into the world
 		QAngle angles;

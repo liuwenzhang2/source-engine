@@ -44,6 +44,7 @@ public:
 	virtual IEntityList* GetEntityList() const = 0;
 	virtual int entindex() const = 0;
 	virtual const string_t& GetClassname() const = 0;
+	virtual const string_t& GetGlobalname() const = 0;
 	virtual int GetFlags(void) const = 0;
 	virtual bool IsEFlagSet(int nEFlagMask) const = 0;
 	virtual IEngineObject* GetMoveParent(void) const = 0;
@@ -151,6 +152,8 @@ public:
 	virtual void AfterInit() {};
 	virtual char const* GetClassname(void) const { return NULL; }
 	virtual char const* GetDebugName(void) const { return NULL; }
+	virtual bool ShouldSavePhysics() { return false; }
+	virtual bool CreateVPhysics() { return false; }
 	virtual bool IsWorld() const { return false; }
 	virtual bool IsBSPModel() const { return false; }
 	virtual bool IsNPC(void) const { return false; }

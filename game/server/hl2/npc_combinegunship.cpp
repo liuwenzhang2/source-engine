@@ -516,7 +516,7 @@ void CNPC_CombineGunship::CreateBellyBlastEnergyCore( void )
 	pCore->GetEngineObject()->SetAbsOrigin( vOrigin );
 	pCore->GetEngineObject()->SetAbsAngles( vAngle );
 
-	DispatchSpawn( pCore );
+	EntityList()->DispatchSpawn( pCore );
 	pCore->Activate();
 
 	pCore->GetEngineObject()->SetParent( this->GetEngineObject(), iAttachment );

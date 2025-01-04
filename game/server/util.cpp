@@ -1530,96 +1530,6 @@ extern "C" void Sys_Error( char *error, ... )
 	Assert(0);
 }
 
-
-//-----------------------------------------------------------------------------
-// Purpose: Spawns an entity into the game, initializing it with the map ent data block
-// Input  : *pEntity - the newly created entity
-//			*mapData - pointer a block of entity map data
-// Output : -1 if the entity was not successfully created; 0 on success
-//-----------------------------------------------------------------------------
-int DispatchSpawn( IServerEntity *pEntity )
-{
-	if ( pEntity )
-	{
-		MDLCACHE_CRITICAL_SECTION();
-
-		// keep a smart pointer that will now if the object gets deleted
-		CHandle<IServerEntity> pEntSafe;
-		pEntSafe = pEntity;
-
-		// Initialize these or entities who don't link to the world won't have anything in here
-		// is this necessary?
-		//pEntity->SetAbsMins( pEntity->GetOrigin() - Vector(1,1,1) );
-		//pEntity->SetAbsMaxs( pEntity->GetOrigin() + Vector(1,1,1) );
-
-#if defined(TRACK_ENTITY_MEMORY) && defined(USE_MEM_DEBUG)
-		const char *pszClassname = EntityList()->GetCannonicalName(pEntity->GetClassname());
-		if ( pszClassname )
-		{
-			MemAlloc_PushAllocDbgInfo( pszClassname, __LINE__ );
-		}
-#endif
-		bool bAsyncAnims = mdlcache->SetAsyncLoad( MDLCACHE_ANIMBLOCK, false );
-		if (!pEntity->GetEngineObject()->GetModelPtr())
-		{
-			pEntity->Spawn();
-		}
-		else
-		{
-			// Don't allow the PVS check to skip animation setup during spawning
-			pEntity->GetEngineObject()->SetBoneCacheFlags( BCF_IS_IN_SPAWN );
-			pEntity->Spawn();
-			if ( pEntSafe != NULL )
-				pEntity->GetEngineObject()->ClearBoneCacheFlags( BCF_IS_IN_SPAWN );
-		}
-		mdlcache->SetAsyncLoad( MDLCACHE_ANIMBLOCK, bAsyncAnims );
-
-#if defined(TRACK_ENTITY_MEMORY) && defined(USE_MEM_DEBUG)
-		if ( pszClassname )
-		{
-			MemAlloc_PopAllocDbgInfo();
-		}
-#endif
-		// Try to get the pointer again, in case the spawn function deleted the entity.
-		// UNDONE: Spawn() should really return a code to ask that the entity be deleted, but
-		// that would touch too much code for me to do that right now.
-
-		if ( pEntSafe == NULL || pEntity->GetEngineObject()->IsMarkedForDeletion() )
-			return -1;
-
-		if ( pEntity->GetEngineObject()->GetGlobalname() != NULL_STRING )
-		{
-			// Handle global stuff here
-			int globalIndex = engine->GlobalEntity_GetIndex( pEntity->GetEngineObject()->GetGlobalname() );
-			if ( globalIndex >= 0 )
-			{
-				// Already dead? delete
-				if (engine->GlobalEntity_GetState(globalIndex) == GLOBAL_DEAD )
-				{
-					pEntity->Release();
-					return -1;
-				}
-				else if ( !FStrEq(STRING(gpGlobals->mapname), engine->GlobalEntity_GetMap(globalIndex)) )
-				{
-					pEntity->MakeDormant();	// Hasn't been moved to this level yet, wait but stay alive
-				}
-				// In this level & not dead, continue on as normal
-			}
-			else
-			{
-				// Spawned entities default to 'On'
-				engine->GlobalEntity_Add( pEntity->GetEngineObject()->GetGlobalname(), gpGlobals->mapname, GLOBAL_ON);
-//					Msg( "Added global entity %s (%s)\n", pEntity->GetClassname(), STRING(pEntity->m_iGlobalname) );
-			}
-		}
-
-		EntityList()->NotifySpawn( pEntity );
-	}
-
-	return 0;
-}
-
-
 //-----------------------------------------------------------------------------
 // Purpose: Initialize the matrix from an entity
 // Input  : *pEntity - 
@@ -2074,7 +1984,7 @@ bool UTIL_LoadAndSpawnEntitiesFromScript( CUtlVector <CBaseEntity*> &entities, c
 			if ( pNode )
 			{
 				LoadAndSpawnEntities_ParseEntKVBlockHelper((CBaseEntity*)pNode, pkvNode );
-				DispatchSpawn( pNode );
+				EntityList()->DispatchSpawn( pNode );
 				entities.AddToTail((CBaseEntity*)pNode );
 			}
 			else

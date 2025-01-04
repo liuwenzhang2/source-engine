@@ -153,7 +153,7 @@ void CPortalSimulator::PostConstructor(const char* szClassname, int iForceEdictI
 	pCollisionEntity = (CPSCollisionEntity*)EntityList()->CreateEntityByName("portalsimulator_collisionentity");
 	Assert(pCollisionEntity != NULL);
 	pCollisionEntity->m_pOwningSimulator = this;
-	DispatchSpawn(pCollisionEntity);
+	EntityList()->DispatchSpawn(pCollisionEntity);
 }
 #endif // GAME_DLL
 

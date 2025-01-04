@@ -84,7 +84,7 @@ void CGrenadeSpit::Spawn( void )
 		m_hSpitEffect->KeyValue( "effect_name", "antlion_spit_trail" );
 		m_hSpitEffect->GetEngineObject()->SetParent( this->GetEngineObject() );
 		m_hSpitEffect->GetEngineObject()->SetLocalOrigin( vec3_origin );
-		DispatchSpawn( m_hSpitEffect );
+		EntityList()->DispatchSpawn( m_hSpitEffect );
 		if ( gpGlobals->curtime > 0.5f )
 			m_hSpitEffect->Activate();
 	}

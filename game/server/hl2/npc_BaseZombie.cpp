@@ -2491,7 +2491,7 @@ void CNPC_BaseZombie::ReleaseHeadcrab( const Vector &vecOrigin, const Vector &ve
 
 		pCrab->GetEngineObject()->SetAbsOrigin( vecSpot );
 		pCrab->GetEngineObject()->SetAbsAngles(GetEngineObject()->GetAbsAngles() );
-		DispatchSpawn( pCrab );
+		EntityList()->DispatchSpawn( pCrab );
 
 		pCrab->GetMotor()->SetIdealYaw(GetEngineObject()->GetAbsAngles().y );
 

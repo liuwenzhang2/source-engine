@@ -75,7 +75,7 @@ struct PhysObjectHeader_t
 	}
 
 	PhysInterfaceId_t 	type;
-	EHANDLE				hEntity;
+	CHandle<IHandleEntity> hEntity;
 	string_t			fieldName;
 	int 				nObjects;
 	string_t			modelName;
@@ -148,7 +148,7 @@ public:
 		{
 			const QueuedItem_t &item = m_QueuedSaves.ElementAtHead();
 			
-			CBaseEntity *pOwner = item.header.hEntity.Get();
+			IHandleEntity *pOwner = item.header.hEntity.Get();
 			
 			if ( pOwner )
 			{
@@ -252,7 +252,7 @@ public:
 	
 	void RestoreBlock( IRestore *pRestore, const PhysObjectHeader_t &header ) 
 	{
-		CBaseEntity *  pOwner  = header.hEntity.Get();
+		IHandleEntity *  pOwner  = header.hEntity.Get();
 		unsigned short iQueued = m_QueuedRestores.Find( pOwner );
 		
 		if ( iQueued != m_QueuedRestores.InvalidIndex() )
@@ -317,7 +317,7 @@ public:
 			
 			if ( header.modelName != NULL_STRING )
 			{
-				CBaseEntity *pGlobalEntity = header.hEntity;
+				IHandleEntity *pGlobalEntity = header.hEntity;
 #if !defined( CLIENT_DLL )
 				if ( NULL_STRING != pGlobalEntity->GetEngineObject()->GetGlobalname() )
 				{
@@ -409,7 +409,7 @@ public:
 	
 	//---------------------------------
 	
-	void QueueSave( CBaseEntity *pOwner, typedescription_t *pTypeDesc, void **ppPhysObj, PhysInterfaceId_t type )
+	void QueueSave( IHandleEntity *pOwner, typedescription_t *pTypeDesc, void **ppPhysObj, PhysInterfaceId_t type )
 	{
 		if ( !pOwner )
 			return;
@@ -468,7 +468,7 @@ public:
 
 	//---------------------------------
 	
-	void QueueRestore( CBaseEntity *pOwner, typedescription_t *pTypeDesc, void **ppPhysObj, PhysInterfaceId_t type )
+	void QueueRestore( IHandleEntity *pOwner, typedescription_t *pTypeDesc, void **ppPhysObj, PhysInterfaceId_t type )
 	{
 		CEntityRestoreSet *pEntitySet = NULL;
 		unsigned short 	   iEntitySet = m_QueuedRestores.Find( pOwner );
@@ -490,7 +490,7 @@ public:
 
 	//---------------------------------
 	
-	void SavePhysicsObject( ISave *pSave, CBaseEntity *pOwner, void *pObject, PhysInterfaceId_t type )
+	void SavePhysicsObject( ISave *pSave, IHandleEntity *pOwner, void *pObject, PhysInterfaceId_t type )
 	{
 		if (EntityList()->PhysGetEnv())
 		{
@@ -523,7 +523,7 @@ public:
 	
 	virtual void OnEntityDeleted( IServerEntity *pEntity )
 	{
-		unsigned short iEntitySet = m_QueuedRestores.Find( (CBaseEntity*)pEntity );
+		unsigned short iEntitySet = m_QueuedRestores.Find( pEntity );
 		
 		if ( iEntitySet != m_QueuedRestores.InvalidIndex() )
 		{
@@ -615,7 +615,7 @@ private:
 	class CEntityRestoreSet : public CUtlVector<QueuedItem_t>
 	{
 	public:
-		int Add( CBaseEntity *pOwner, typedescription_t *pTypeDesc, void **ppPhysObj, PhysInterfaceId_t type )
+		int Add( IHandleEntity *pOwner, typedescription_t *pTypeDesc, void **ppPhysObj, PhysInterfaceId_t type )
 		{
 			int i = AddToTail();
 			
@@ -663,7 +663,7 @@ private:
 	//---------------------------------
 
 	CUtlPriorityQueue<QueuedItem_t> 			m_QueuedSaves;
-	CUtlMap<CBaseEntity *, CEntityRestoreSet *>	m_QueuedRestores;
+	CUtlMap<IHandleEntity*, CEntityRestoreSet *>	m_QueuedRestores;
 	bool 										m_fDoLoad;
 
 	//---------------------------------
@@ -719,7 +719,7 @@ class CPhysObjSaveRestoreOps : public CDefSaveRestoreOps
 public:
 	virtual void Save( const SaveRestoreFieldInfo_t &fieldInfo, ISave *pSave )
 	{
-		CBaseEntity *pOwnerEntity = (CBaseEntity*)pSave->GetGameSaveRestoreInfo()->GetCurrentEntityContext();
+		IHandleEntity *pOwnerEntity = pSave->GetGameSaveRestoreInfo()->GetCurrentEntityContext();
 
 		bool bFoundEntity = true;
 		
@@ -728,7 +728,7 @@ public:
 			bFoundEntity = false;
 
 #if defined( CLIENT_DLL )
-			pOwnerEntity = (C_BaseEntity*)EntityList()->GetBaseEntityFromHandle( pOwnerEntity->GetRefEHandle() );
+			pOwnerEntity = EntityList()->GetBaseEntityFromHandle( pOwnerEntity->GetRefEHandle() );
 
 			if ( pOwnerEntity  )
 			{
@@ -749,7 +749,7 @@ public:
 	
 	virtual void Restore( const SaveRestoreFieldInfo_t &fieldInfo, IRestore *pRestore )
 	{
-		CBaseEntity *pOwnerEntity = (CBaseEntity*)pRestore->GetGameSaveRestoreInfo()->GetCurrentEntityContext();
+		IHandleEntity *pOwnerEntity = pRestore->GetGameSaveRestoreInfo()->GetCurrentEntityContext();
 
 		bool bFoundEntity = true;
 		
@@ -758,7 +758,7 @@ public:
 			bFoundEntity = false;
 
 #if defined( CLIENT_DLL )
-			pOwnerEntity = (C_BaseEntity*)EntityList()->GetBaseEntityFromHandle( pOwnerEntity->GetRefEHandle() );
+			pOwnerEntity = EntityList()->GetBaseEntityFromHandle( pOwnerEntity->GetRefEHandle() );
 
 			if ( pOwnerEntity  )
 			{

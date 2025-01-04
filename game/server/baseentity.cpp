@@ -2634,7 +2634,7 @@ CBaseEntity *CBaseEntity::Create( const char *szName, const Vector &vecOrigin, c
 {
 	CBaseEntity *pEntity = CreateNoSpawn( szName, vecOrigin, vecAngles, pOwner );
 
-	DispatchSpawn( pEntity );
+	EntityList()->DispatchSpawn( pEntity );
 	return pEntity;
 }
 
@@ -6545,7 +6545,7 @@ void CC_Ent_Create( const CCommand& args )
 			entity->KeyValue( pKeyName, pValue );
 		}
 
-		DispatchSpawn(entity);
+		EntityList()->DispatchSpawn(entity);
 
 		// Now attempt to drop into the world
 		trace_t tr;

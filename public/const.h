@@ -738,5 +738,49 @@ enum
 
 #define MAPKEY_MAXLENGTH	2048
 
+// Debug overlay bits
+enum DebugOverlayBits_t
+{
+	OVERLAY_TEXT_BIT = 0x00000001,		// show text debug overlay for this entity
+	OVERLAY_NAME_BIT = 0x00000002,		// show name debug overlay for this entity
+	OVERLAY_BBOX_BIT = 0x00000004,		// show bounding box overlay for this entity
+	OVERLAY_PIVOT_BIT = 0x00000008,		// show pivot for this entity
+	OVERLAY_MESSAGE_BIT = 0x00000010,		// show messages for this entity
+	OVERLAY_ABSBOX_BIT = 0x00000020,		// show abs bounding box overlay
+	OVERLAY_RBOX_BIT = 0x00000040,     // show the rbox overlay
+	OVERLAY_SHOW_BLOCKSLOS = 0x00000080,		// show entities that block NPC LOS
+	OVERLAY_ATTACHMENTS_BIT = 0x00000100,		// show attachment points
+	OVERLAY_AUTOAIM_BIT = 0x00000200,		// Display autoaim radius
+
+	OVERLAY_NPC_SELECTED_BIT = 0x00001000,		// the npc is current selected
+	OVERLAY_NPC_NEAREST_BIT = 0x00002000,		// show the nearest node of this npc
+	OVERLAY_NPC_ROUTE_BIT = 0x00004000,		// draw the route for this npc
+	OVERLAY_NPC_TRIANGULATE_BIT = 0x00008000,		// draw the triangulation for this npc
+	OVERLAY_NPC_ZAP_BIT = 0x00010000,		// destroy the NPC
+	OVERLAY_NPC_ENEMIES_BIT = 0x00020000,		// show npc's enemies
+	OVERLAY_NPC_CONDITIONS_BIT = 0x00040000,		// show NPC's current conditions
+	OVERLAY_NPC_SQUAD_BIT = 0x00080000,		// show npc squads
+	OVERLAY_NPC_TASK_BIT = 0x00100000,		// show npc task details
+	OVERLAY_NPC_FOCUS_BIT = 0x00200000,		// show line to npc's enemy and target
+	OVERLAY_NPC_VIEWCONE_BIT = 0x00400000,		// show npc's viewcone
+	OVERLAY_NPC_KILL_BIT = 0x00800000,		// kill the NPC, running all appropriate AI.
+
+	OVERLAY_WC_CHANGE_ENTITY = 0x01000000,		// object changed during WC edit
+	OVERLAY_BUDDHA_MODE = 0x02000000,		// take damage but don't die
+
+	OVERLAY_NPC_STEERING_REGULATIONS = 0x04000000,	// Show the steering regulations associated with the NPC
+
+	OVERLAY_TASK_TEXT_BIT = 0x08000000,		// show task and schedule names when they start
+
+	OVERLAY_PROP_DEBUG = 0x10000000,
+
+	OVERLAY_NPC_RELATION_BIT = 0x20000000,		// show relationships between target and all children
+
+	OVERLAY_VIEWOFFSET = 0x40000000,		// show view offset
+};
+
+#define	BCF_NO_ANIMATION_SKIP	( 1 << 0 )	// Do not allow PVS animation skipping (mostly for attachments being critical to an entity)
+#define	BCF_IS_IN_SPAWN			( 1 << 1 )	// Is currently inside of spawn, always evaluate animations
+
 #endif
 

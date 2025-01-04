@@ -2358,7 +2358,7 @@ int CNPC_AntlionGuard::OnTakeDamage_Alive( const CTakeDamageInfo &info )
 				pParticle->SetParent( this );
 				pParticle->SetParentAttachment( "SetParentAttachment", "attach_glow2", true );
 				pParticle->SetLocalOrigin( Vector( -16, 24, 0 ) );
-				DispatchSpawn( pParticle );
+				EntityList()->DispatchSpawn( pParticle );
 				if ( gpGlobals->curtime > 0.5f )
 					pParticle->Activate();
 				
@@ -3403,7 +3403,7 @@ void CNPC_AntlionGuard::SummonAntlions( void )
 
 		// Start the antlion burrowed, and tell him to come up
 		pAntlion->m_bStartBurrowed = true;
-		DispatchSpawn( pAntlion );
+		EntityList()->DispatchSpawn( pAntlion );
 		pAntlion->Activate();
 		g_EventQueue.AddEvent( pAntlion, "Unburrow", RandomFloat(0.1, 1.0), this, this );
 

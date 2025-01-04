@@ -2274,7 +2274,7 @@ void CNPC_FloorTurret::InputSelfDestruct( inputdata_t &inputdata )
 		m_hFizzleEffect->KeyValue( "effect_name", "explosion_turret_fizzle" );
 		m_hFizzleEffect->GetEngineObject()->SetParent( this->GetEngineObject() );
 		m_hFizzleEffect->GetEngineObject()->SetAbsOrigin( WorldSpaceCenter() + ( vecUp * 12.0f ) );
-		DispatchSpawn( m_hFizzleEffect );
+		EntityList()->DispatchSpawn( m_hFizzleEffect );
 		m_hFizzleEffect->Activate();
 	}
 }

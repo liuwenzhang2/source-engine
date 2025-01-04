@@ -1737,7 +1737,7 @@ void CProp_Portal::UpdatePortalLinkage( void )
 				CEnvMicrophone *pMicrophone = static_cast<CEnvMicrophone*>( m_hMicrophone.Get() );
 				pMicrophone->GetEngineObject()->AddSpawnFlags( SF_MICROPHONE_IGNORE_NONATTENUATED );
 				pMicrophone->GetEngineObject()->AddSpawnFlags( SF_MICROPHONE_SOUND_COMBAT | SF_MICROPHONE_SOUND_WORLD | SF_MICROPHONE_SOUND_PLAYER | SF_MICROPHONE_SOUND_BULLET_IMPACT | SF_MICROPHONE_SOUND_EXPLOSION );
-				DispatchSpawn( pMicrophone );
+				EntityList()->DispatchSpawn( pMicrophone );
 
 				m_hSpeaker = (CBaseEntity*)EntityList()->CreateEntityByName( "env_speaker" );
 				CSpeaker *pSpeaker = static_cast<CSpeaker*>( m_hSpeaker.Get() );
@@ -1768,7 +1768,7 @@ void CProp_Portal::UpdatePortalLinkage( void )
 				CEnvMicrophone *pLinkedMicrophone = static_cast<CEnvMicrophone*>(GetLinkedPortal()->m_hMicrophone.Get() );
 				pLinkedMicrophone->GetEngineObject()->AddSpawnFlags( SF_MICROPHONE_IGNORE_NONATTENUATED );
 				pLinkedMicrophone->GetEngineObject()->AddSpawnFlags( SF_MICROPHONE_SOUND_COMBAT | SF_MICROPHONE_SOUND_WORLD | SF_MICROPHONE_SOUND_PLAYER | SF_MICROPHONE_SOUND_BULLET_IMPACT | SF_MICROPHONE_SOUND_EXPLOSION );
-				DispatchSpawn( pLinkedMicrophone );
+				EntityList()->DispatchSpawn( pLinkedMicrophone );
 
 				GetLinkedPortal()->m_hSpeaker = (CBaseEntity*)EntityList()->CreateEntityByName( "env_speaker" );
 				CSpeaker *pLinkedSpeaker = static_cast<CSpeaker*>(GetLinkedPortal()->m_hSpeaker.Get() );
@@ -2163,7 +2163,7 @@ CProp_Portal *CProp_Portal::FindPortal( unsigned char iLinkageGroupID, bool bPor
 	if( bCreateIfNothingFound )
 	{
 		CProp_Portal *pPortal = (CProp_Portal *)EntityList()->CreateEntityByName( "prop_portal" );
-		DispatchSpawn(pPortal);
+		EntityList()->DispatchSpawn(pPortal);
 		pPortal->m_iLinkageGroupID = iLinkageGroupID;
 		pPortal->GetEnginePortal()->SetPortal2(bPortal2);
 		return pPortal;

@@ -272,7 +272,7 @@ void SpawnAllEntities( int nEntities, HierarchicalSpawn_t *pSpawnList, bool bAct
 		//}
 		if ( pEntity )
 		{
-			if (DispatchSpawn(pEntity) < 0)
+			if (EntityList()->DispatchSpawn(pEntity) < 0)
 			{
 				for ( int i = nEntity+1; i < nEntities; i++ )
 				{
@@ -380,7 +380,7 @@ void MapEntity_ParseAllEntities(const char *pMapData, IMapEntityFilter *pFilter,
 
 			pEntity->GetEngineObject()->SetParentName( "");	// don't allow a parent on the first entity (worldspawn)
 
-			DispatchSpawn(pEntity);
+			EntityList()->DispatchSpawn(pEntity);
 			continue;
 		}
 				
@@ -412,7 +412,7 @@ void MapEntity_ParseAllEntities(const char *pMapData, IMapEntityFilter *pFilter,
 			// Nodes & Lights remove themselves immediately on Spawn(), so dispatch their
 			// spawn now, to free up the slot inside this loop.
 			// NOTE: This solution prevents nodes & lights from being used inside point_templates.
-			if (DispatchSpawn(pEntity) < 0)
+			if (EntityList()->DispatchSpawn(pEntity) < 0)
 			{
 				EntityList()->CleanupDeleteList();
 			}
@@ -447,7 +447,7 @@ void MapEntity_ParseAllEntities(const char *pMapData, IMapEntityFilter *pFilter,
 		CPointTemplate *pPointTemplate = pPointTemplates[i];
 
 		// First, tell the Point template to Spawn
-		if ( DispatchSpawn(pPointTemplate) < 0 )
+		if (EntityList()->DispatchSpawn(pPointTemplate) < 0 )
 		{
 			EntityList()->DestroyEntity(pPointTemplate);
 			EntityList()->CleanupDeleteList();

@@ -237,7 +237,7 @@ public:
 					pCamera->KeyValue( "origin", pkvCamera->GetString( "origin", "0 0 0" ) );
 					pCamera->KeyValue( "angles", pkvCamera->GetString( "angles", "0 0 0" ) );
 					pCamera->KeyValue( "FOV", pkvCamera->GetString( "FOV", "75" ) );
-					DispatchSpawn( pCamera );
+					EntityList()->DispatchSpawn( pCamera );
 					pCamera->Activate();
 
 					// Move to next camera

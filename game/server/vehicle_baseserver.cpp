@@ -229,12 +229,12 @@ CBaseEntity	*CBaseServerVehicle::GetDriver( void )
 CBaseCombatCharacter *CBaseServerVehicle::GetPassenger( int nRole ) 
 { 
 	Assert( nRole == VEHICLE_ROLE_DRIVER ); 
-	CBaseEntity *pDriver = GetDrivableVehicle()->GetDriver();
+	IServerEntity *pDriver = GetDrivableVehicle()->GetDriver();
 
 	if ( pDriver == NULL )
 		return NULL;
 
-	return pDriver->MyCombatCharacterPointer();
+	return ((CBaseEntity*)pDriver)->MyCombatCharacterPointer();
 }
 
 //-----------------------------------------------------------------------------

@@ -1057,7 +1057,7 @@ CBaseEntity	*CDODPlayer::GiveNamedItem( const char *pszName, int iSubType )
 		}
 	}
 
-	DispatchSpawn( pent );
+	EntityList()->DispatchSpawn( pent );
 
 	if ( pent != NULL && !(pent->GetEngineObject()->IsMarkedForDeletion()) )
 	{
@@ -3780,7 +3780,7 @@ void CDODPlayer::CreateViewModel( int index /*=0*/ )
 		vm->GetEngineObject()->SetAbsOrigin(GetEngineObject()->GetAbsOrigin() );
 		vm->SetOwner( this );
 		vm->SetIndex( index );
-		DispatchSpawn( vm );
+		EntityList()->DispatchSpawn( vm );
 		vm->GetEngineObject()->FollowEntity( this->GetEngineObject(), false );
 		m_hViewModel.Set( index, vm );
 	}

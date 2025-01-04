@@ -5936,7 +5936,7 @@ void CC_Prop_Dynamic_Create( const CCommand &args )
 		pProp->KeyValue( "MinAnimTime", "5" );
 		pProp->KeyValue( "MaxAnimTime", "10" );
 		pProp->Precache();
-		DispatchSpawn( pProp );
+		EntityList()->DispatchSpawn( pProp );
 		pProp->Activate();
 	}
 	engine->SetAllowPrecache( bAllowPrecache );//CBaseEntity::
@@ -6019,7 +6019,7 @@ CPhysicsProp* CreatePhysicsProp( const char *pModelName, const Vector &vTraceSta
 		pProp->KeyValue( "inertiaScale", "1.0" );
 		pProp->KeyValue( "physdamagescale", "0.1" );
 		pProp->Precache();
-		DispatchSpawn( pProp );
+		EntityList()->DispatchSpawn( pProp );
 		pProp->Activate();
 	}
 	engine->SetAllowPrecache( bAllowPrecache );//CBaseEntity::

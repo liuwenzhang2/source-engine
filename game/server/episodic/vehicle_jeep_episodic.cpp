@@ -624,7 +624,7 @@ void CPropJeepEpisodic::InputAddBusterToCargo( inputdata_t &data )
 	IServerEntity *pNewBomb = EntityList()->CreateEntityByName( "weapon_striderbuster" );
 	if ( pNewBomb )
 	{
-		DispatchSpawn( pNewBomb );
+		EntityList()->DispatchSpawn( pNewBomb );
 		pNewBomb->Teleport( &m_hCargoTrigger->GetEngineObject()->GetAbsOrigin(), NULL, NULL );
 		m_hCargoTrigger->AddCargo((CBaseEntity*)pNewBomb );
 	}
@@ -762,7 +762,7 @@ void CPropJeepEpisodic::UpdateWheelDust( void )
 			m_hWheelDust[i]->KeyValue( "effect_name", "WheelDust" );
 			m_hWheelDust[i]->GetEngineObject()->SetParent( this->GetEngineObject() );
 			m_hWheelDust[i]->GetEngineObject()->SetLocalOrigin( vec3_origin );
-			DispatchSpawn( m_hWheelDust[i] );
+			EntityList()->DispatchSpawn( m_hWheelDust[i] );
 			if ( gpGlobals->curtime > 0.5f )
 				m_hWheelDust[i]->Activate();
 		}
@@ -780,7 +780,7 @@ void CPropJeepEpisodic::UpdateWheelDust( void )
 			m_hWheelWater[i]->KeyValue( "effect_name", "WheelSplash" );
 			m_hWheelWater[i]->GetEngineObject()->SetParent( this->GetEngineObject() );
 			m_hWheelWater[i]->GetEngineObject()->SetLocalOrigin( vec3_origin );
-			DispatchSpawn( m_hWheelWater[i] );
+			EntityList()->DispatchSpawn( m_hWheelWater[i] );
 			if ( gpGlobals->curtime > 0.5f )
 				m_hWheelWater[i]->Activate();
 		}

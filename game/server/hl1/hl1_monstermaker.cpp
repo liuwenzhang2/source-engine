@@ -253,7 +253,7 @@ void CNPCMaker::MakeNPC( void )
 	}
 
 
-	DispatchSpawn( pent );
+	EntityList()->DispatchSpawn( pent );
 	pent->SetOwnerEntity( this );
 
 	m_cLiveChildren++;// count this NPC

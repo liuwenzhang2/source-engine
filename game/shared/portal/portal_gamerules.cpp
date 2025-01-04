@@ -68,7 +68,7 @@ void CC_Create_PortalWeightBox( void )
 		entity->GetEngineObject()->SetName( "box" );
 		entity->GetEngineObject()->AddSpawnFlags( SF_PHYSPROP_ENABLE_PICKUP_OUTPUT );
 		entity->Precache();
-		DispatchSpawn(entity);
+		EntityList()->DispatchSpawn(entity);
 
 		// Now attempt to drop into the world
 		CBasePlayer* pPlayer = UTIL_GetCommandClient();
@@ -111,7 +111,7 @@ void CC_Create_PortalMetalSphere( void )
 		entity->GetEngineObject()->SetName( "sphere" );
 		entity->GetEngineObject()->AddSpawnFlags( SF_PHYSPROP_ENABLE_PICKUP_OUTPUT );
 		entity->Precache();
-		DispatchSpawn(entity);
+		EntityList()->DispatchSpawn(entity);
 
 		// Now attempt to drop into the world
 		CBasePlayer* pPlayer = UTIL_GetCommandClient();

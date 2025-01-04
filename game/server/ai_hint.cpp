@@ -605,7 +605,7 @@ CAI_Hint* CAI_HintManager::CreateHint( HintNodeData *pNodeData, const char *pMap
 		pHint->GetEngineObject()->SetName( STRING( pNodeData->strEntityName) );
 		pHint->GetEngineObject()->SetAbsOrigin( pNodeData->vecPosition );
 		memcpy( &(pHint->m_NodeData), pNodeData, sizeof(HintNodeData) );
-		DispatchSpawn( pHint );
+		EntityList()->DispatchSpawn( pHint );
 
 		return pHint;
 	}

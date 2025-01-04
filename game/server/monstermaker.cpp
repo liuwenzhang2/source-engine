@@ -455,7 +455,7 @@ void CNPCMaker::MakeNPC( void )
 
 	ChildPreSpawn( pent );
 
-	DispatchSpawn( pent );
+	EntityList()->DispatchSpawn( pent );
 	pent->SetOwnerEntity( this );
 	DispatchActivate( pent );
 
@@ -851,7 +851,7 @@ void CTemplateNPCMaker::MakeNPC( void )
 
 	ChildPreSpawn( pent );
 
-	DispatchSpawn( pent );
+	EntityList()->DispatchSpawn( pent );
 	pent->SetOwnerEntity( this );
 	DispatchActivate( pent );
 
@@ -904,7 +904,7 @@ void CTemplateNPCMaker::MakeNPCInLine( void )
 	pent->GetEngineObject()->RemoveSpawnFlags( SF_NPC_TEMPLATE );
 	ChildPreSpawn( pent );
 
-	DispatchSpawn( pent );
+	EntityList()->DispatchSpawn( pent );
 	pent->SetOwnerEntity( this );
 	DispatchActivate( pent );
 
@@ -1004,7 +1004,7 @@ void CTemplateNPCMaker::MakeNPCInRadius( void )
 	pent->GetEngineObject()->RemoveSpawnFlags( SF_NPC_TEMPLATE );
 	ChildPreSpawn( pent );
 
-	DispatchSpawn( pent );
+	EntityList()->DispatchSpawn( pent );
 
 	pent->SetOwnerEntity( this );
 	DispatchActivate( pent );

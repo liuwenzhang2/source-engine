@@ -425,7 +425,7 @@ void CC_Hunter_Shoot_Flechette( const CCommand& args )
 	if ( entity )
 	{
 		entity->Precache();
-		DispatchSpawn( entity );
+		EntityList()->DispatchSpawn( entity );
 
 		// Shoot the flechette.		
 		Vector forward;

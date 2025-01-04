@@ -266,7 +266,7 @@ void CAntlionGrub::CreateNugget( void )
 	
 	pNugget->GetEngineObject()->SetAbsOrigin( vecOrigin );
 	pNugget->GetEngineObject()->SetAbsAngles( RandomAngle( 0, 360 ) );
-	DispatchSpawn( pNugget );
+	EntityList()->DispatchSpawn( pNugget );
 
 	IPhysicsObject *pPhys = pNugget->GetEngineObject()->VPhysicsGetObject();
 	if ( pPhys )

@@ -751,7 +751,7 @@ void CAntlionTemplateMaker::MakeNPC( void )
 	}
 
 	pent->GetEngineObject()->SetLocalAngles( spawnAngles );
-	DispatchSpawn( pent );
+	EntityList()->DispatchSpawn( pent );
 	
 	pent->Activate();
 

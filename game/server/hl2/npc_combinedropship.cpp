@@ -2458,7 +2458,7 @@ void CNPC_CombineDropship::SpawnTroop( void )
 	// Move it to the container spawnpoint
 	pNPC->GetEngineObject()->SetAbsOrigin( vecSpawnOrigin );
 	pNPC->GetEngineObject()->SetAbsAngles( vecSpawnAngles );
-	DispatchSpawn( pNPC );
+	EntityList()->DispatchSpawn( pNPC );
 	pNPC->m_NPCState = NPC_STATE_IDLE;
 	pNPC->Activate();
 

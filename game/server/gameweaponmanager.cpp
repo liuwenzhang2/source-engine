@@ -79,7 +79,7 @@ void CreateWeaponManager( const char *pWeaponName, int iMaxPieces )
 	{
 		pManager->m_iszWeaponName = MAKE_STRING( pWeaponName );
 		pManager->m_iMaxPieces = iMaxPieces;
-		DispatchSpawn( pManager );
+		EntityList()->DispatchSpawn( pManager );
 	}
 }
 

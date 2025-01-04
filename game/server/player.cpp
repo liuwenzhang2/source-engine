@@ -502,7 +502,7 @@ void CBasePlayer::CreateViewModel( int index /*=0*/ )
 		vm->GetEngineObject()->SetAbsOrigin(GetEngineObject()->GetAbsOrigin() );
 		vm->SetOwner( this );
 		vm->SetIndex( index );
-		DispatchSpawn( vm );
+		EntityList()->DispatchSpawn( vm );
 		vm->GetEngineObject()->FollowEntity( this->GetEngineObject());
 		m_hViewModel.Set( index, vm );
 	}
@@ -5702,7 +5702,7 @@ CBaseEntity	*CBasePlayer::GiveNamedItem( const char *pszName, int iSubType )
 		pWeapon->SetSubType( iSubType );
 	}
 
-	DispatchSpawn( pent );
+	EntityList()->DispatchSpawn( pent );
 
 	if ( pent != NULL && !(pent->GetEngineObject()->IsMarkedForDeletion()) )
 	{
@@ -5950,7 +5950,7 @@ static void CreateJalopy( CBasePlayer *pPlayer )
 		pJeep->KeyValue( "solid", "6" );
 		pJeep->KeyValue( "targetname", "jeep" );
 		pJeep->KeyValue( "vehiclescript", "scripts/vehicles/jalopy.txt" );
-		DispatchSpawn( pJeep );
+		EntityList()->DispatchSpawn( pJeep );
 		pJeep->Activate();
 		pJeep->Teleport( &vecOrigin, &vecAngles, NULL );
 	}
@@ -5987,7 +5987,7 @@ static void CreateJeep( CBasePlayer *pPlayer )
 		pJeep->KeyValue( "solid", "6" );
 		pJeep->KeyValue( "targetname", "jeep" );
 		pJeep->KeyValue( "vehiclescript", "scripts/vehicles/jeep_test.txt" );
-		DispatchSpawn( pJeep );
+		EntityList()->DispatchSpawn( pJeep );
 		pJeep->Activate();
 		pJeep->Teleport( &vecOrigin, &vecAngles, NULL );
 	}
@@ -6024,7 +6024,7 @@ static void CreateAirboat( CBasePlayer *pPlayer )
 		pJeep->KeyValue( "solid", "6" );
 		pJeep->KeyValue( "targetname", "airboat" );
 		pJeep->KeyValue( "vehiclescript", "scripts/vehicles/airboat.txt" );
-		DispatchSpawn( pJeep );
+		EntityList()->DispatchSpawn( pJeep );
 		pJeep->Activate();
 	}
 }

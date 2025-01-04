@@ -147,7 +147,7 @@ public:
 abstract_class IDrivableVehicle
 {
 public:
-	virtual CBaseEntity		*GetDriver( void ) = 0;
+	virtual IServerEntity*	GetDriver( void ) = 0;
 
 	// Process movement
 	//virtual void			ItemPostFrame( CBasePlayer *pPlayer ) = 0;

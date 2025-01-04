@@ -2195,7 +2195,7 @@ void CPointCombineBallLauncher::SpawnBall()
 	vDirection *= flSpeed;
 	pBall->GetEngineObject()->SetAbsVelocity( vDirection );
 
-	DispatchSpawn(pBall);
+	EntityList()->DispatchSpawn(pBall);
 	pBall->Activate();
 	pBall->SetState( CPropCombineBall::STATE_LAUNCHED );
 	pBall->SetMaxBounces( m_iBounces );
@@ -2217,7 +2217,7 @@ void CPointCombineBallLauncher::SpawnBall()
 			pBullseye->KeyValue( "targetname", STRING(m_iszBullseyeName) );
 			pBullseye->Spawn();
 
-			DispatchSpawn(pBullseye);
+			EntityList()->DispatchSpawn(pBullseye);
 			pBullseye->Activate();
 
 			pBullseye->GetEngineObject()->SetParent(pBall->GetEngineObject());

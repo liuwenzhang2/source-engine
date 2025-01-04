@@ -21,6 +21,8 @@
 #include "init_factory.h"
 #include "gameinterface.h"
 #include "te_effect_dispatch.h"
+#include "ServerNetworkProperty.h"
+#include "variant_t.h"
 
 typedef CHandle<IServerEntity> ENTHANDLE;
 
@@ -2935,6 +2937,8 @@ public:
 	void ReserveSlot(int index);
 	int AllocateFreeSlot(bool bNetworkable = true, int index = -1);
 	IServerEntity* CreateEntityByName(const char* className, int iForceEdictIndex = -1, int iSerialNum = -1);
+	// calls the spawn functions for an entity
+	int DispatchSpawn(IServerEntity* pEntity);
 	// marks the entity for deletion so it will get removed next frame
 	void DestroyEntity(IHandleEntity* oldObj);
 
@@ -4024,6 +4028,8 @@ protected:
 		return (enginetrace->GetPointContents(point) & MASK_SOLID);
 	}
 
+	Vector ModelSpaceLandmark(int modelIndex);
+
 private:
 	CEntityFactoryDictionary m_EntityFactoryDictionary;
 	int m_iHighestEnt; // the topmost used array index
@@ -4680,7 +4686,7 @@ void CGlobalEntityList<T>::Save(ISave* pSave)
 			pEntInfo->classname = pEnt->GetEngineObject()->GetClassname();	// Remember entity class for respawn
 
 			pEntInfo->globalname = pEnt->GetEngineObject()->GetGlobalname(); // remember global name
-			pEntInfo->landmarkModelSpace = g_ServerGameDLL.ModelSpaceLandmark(pEnt->GetEngineObject()->GetModelIndex());
+			pEntInfo->landmarkModelSpace = ModelSpaceLandmark(pEnt->GetEngineObject()->GetModelIndex());
 			int nEntIndex = pEnt->IsNetworkable() ? pEnt->entindex() : -1;
 			bool bIsPlayer = ((nEntIndex >= 1) && (nEntIndex <= gpGlobals->maxClients)) ? true : false;
 			if (bIsPlayer)
@@ -4940,6 +4946,21 @@ int CGlobalEntityList<T>::RestoreEntity(T* pEntity, IRestore* pRestore, entityta
 }
 
 //---------------------------------
+// Get a reference position in model space to compute
+// changes in model space for global brush entities (designer models them in different coords!)
+template<class T>
+Vector CGlobalEntityList<T>::ModelSpaceLandmark(int modelIndex)
+{
+	const model_t* pModel = modelinfo->GetModel(modelIndex);
+	if (modelinfo->GetModelType(pModel) != mod_brush)
+		return vec3_origin;
+
+	Vector mins, maxs;
+	modelinfo->GetModelBounds(pModel, mins, maxs);
+	return mins;
+}
+
+//---------------------------------
 template<class T>
 int CGlobalEntityList<T>::RestoreGlobalEntity(T* pEntity, IRestore* pRestore, entitytable_t* pEntInfo)
 {
@@ -4973,7 +4994,7 @@ int CGlobalEntityList<T>::RestoreGlobalEntity(T* pEntity, IRestore* pRestore, en
 				// Tell the restore code we're overlaying a global entity from another level
 		pRestore->SetGlobalMode(1);	// Don't overwrite global fields
 
-		pSaveData->modelSpaceOffset = pEntInfo->landmarkModelSpace - g_ServerGameDLL.ModelSpaceLandmark(pNewEntity->GetEngineObject()->GetModelIndex());
+		pSaveData->modelSpaceOffset = pEntInfo->landmarkModelSpace - ModelSpaceLandmark(pNewEntity->GetEngineObject()->GetModelIndex());
 
 		DestroyEntity(pEntity);
 		pEntity = pNewEntity;// we're going to restore this data OVER the old entity
@@ -5686,6 +5707,95 @@ inline IServerEntity* CGlobalEntityList<T>::CreateEntityByName(const char* class
 		}
 	}
 	return (IServerEntity*)m_EntityFactoryDictionary.Create(this, className, iForceEdictIndex, iSerialNum, this);
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: Spawns an entity into the game, initializing it with the map ent data block
+// Input  : *pEntity - the newly created entity
+//			*mapData - pointer a block of entity map data
+// Output : -1 if the entity was not successfully created; 0 on success
+//-----------------------------------------------------------------------------
+template<class T>
+int CGlobalEntityList<T>::DispatchSpawn(IServerEntity* pEntity)
+{
+	if (pEntity)
+	{
+		MDLCACHE_CRITICAL_SECTION();
+
+		// keep a smart pointer that will now if the object gets deleted
+		CHandle<IServerEntity> pEntSafe;
+		pEntSafe = pEntity;
+
+		// Initialize these or entities who don't link to the world won't have anything in here
+		// is this necessary?
+		//pEntity->SetAbsMins( pEntity->GetOrigin() - Vector(1,1,1) );
+		//pEntity->SetAbsMaxs( pEntity->GetOrigin() + Vector(1,1,1) );
+
+#if defined(TRACK_ENTITY_MEMORY) && defined(USE_MEM_DEBUG)
+		const char* pszClassname = GetCannonicalName(pEntity->GetClassname());
+		if (pszClassname)
+		{
+			MemAlloc_PushAllocDbgInfo(pszClassname, __LINE__);
+		}
+#endif
+		bool bAsyncAnims = mdlcache->SetAsyncLoad(MDLCACHE_ANIMBLOCK, false);
+		if (!pEntity->GetEngineObject()->GetModelPtr())
+		{
+			pEntity->Spawn();
+		}
+		else
+		{
+			// Don't allow the PVS check to skip animation setup during spawning
+			pEntity->GetEngineObject()->SetBoneCacheFlags(BCF_IS_IN_SPAWN);
+			pEntity->Spawn();
+			if (pEntSafe != NULL)
+				pEntity->GetEngineObject()->ClearBoneCacheFlags(BCF_IS_IN_SPAWN);
+		}
+		mdlcache->SetAsyncLoad(MDLCACHE_ANIMBLOCK, bAsyncAnims);
+
+#if defined(TRACK_ENTITY_MEMORY) && defined(USE_MEM_DEBUG)
+		if (pszClassname)
+		{
+			MemAlloc_PopAllocDbgInfo();
+		}
+#endif
+		// Try to get the pointer again, in case the spawn function deleted the entity.
+		// UNDONE: Spawn() should really return a code to ask that the entity be deleted, but
+		// that would touch too much code for me to do that right now.
+
+		if (pEntSafe == NULL || pEntity->GetEngineObject()->IsMarkedForDeletion())
+			return -1;
+
+		if (pEntity->GetEngineObject()->GetGlobalname() != NULL_STRING)
+		{
+			// Handle global stuff here
+			int globalIndex = engine->GlobalEntity_GetIndex(pEntity->GetEngineObject()->GetGlobalname());
+			if (globalIndex >= 0)
+			{
+				// Already dead? delete
+				if (engine->GlobalEntity_GetState(globalIndex) == GLOBAL_DEAD)
+				{
+					pEntity->Release();
+					return -1;
+				}
+				else if (!datamap_t::FStrEq(STRING(gpGlobals->mapname), engine->GlobalEntity_GetMap(globalIndex)))
+				{
+					pEntity->MakeDormant();	// Hasn't been moved to this level yet, wait but stay alive
+				}
+				// In this level & not dead, continue on as normal
+			}
+			else
+			{
+				// Spawned entities default to 'On'
+				engine->GlobalEntity_Add(pEntity->GetEngineObject()->GetGlobalname(), gpGlobals->mapname, GLOBAL_ON);
+				//					Msg( "Added global entity %s (%s)\n", pEntity->GetClassname(), STRING(pEntity->m_iGlobalname) );
+			}
+		}
+
+		NotifySpawn(pEntity);
+	}
+
+	return 0;
 }
 
 //-----------------------------------------------------------------------------

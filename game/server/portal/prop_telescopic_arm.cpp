@@ -152,7 +152,7 @@ void CPropTelescopicArm::Spawn( void )
 	CPoseController *pPoseController;
 
 	pPoseController = static_cast<CPoseController*>(EntityList()->CreateEntityByName( "point_posecontroller" ) );
-	DispatchSpawn( pPoseController );
+	EntityList()->DispatchSpawn( pPoseController );
 	if ( pPoseController )
 	{
 		pPoseController->SetProp( this );
@@ -162,7 +162,7 @@ void CPropTelescopicArm::Spawn( void )
 	}
 
 	pPoseController = static_cast<CPoseController*>(EntityList()->CreateEntityByName( "point_posecontroller" ) );
-	DispatchSpawn( pPoseController );
+	EntityList()->DispatchSpawn( pPoseController );
 	if ( pPoseController )
 	{
 		pPoseController->SetProp( this );
@@ -172,7 +172,7 @@ void CPropTelescopicArm::Spawn( void )
 	}
 
 	pPoseController = static_cast<CPoseController*>(EntityList()->CreateEntityByName( "point_posecontroller" ) );
-	DispatchSpawn( pPoseController );
+	EntityList()->DispatchSpawn( pPoseController );
 	if ( pPoseController )
 	{
 		pPoseController->SetProp( this );

@@ -26,9 +26,6 @@ class KeyValues;
 class CRagdollProp;
 FORWARD_DECLARE_HANDLE( memhandle_t );
 
-#define	BCF_NO_ANIMATION_SKIP	( 1 << 0 )	// Do not allow PVS animation skipping (mostly for attachments being critical to an entity)
-#define	BCF_IS_IN_SPAWN			( 1 << 1 )	// Is currently inside of spawn, always evaluate animations
-
 class CBaseAnimating : public CBaseEntity
 {
 public:

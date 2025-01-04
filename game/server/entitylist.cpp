@@ -9501,7 +9501,9 @@ public:
 
 	bool ShouldHitEntity(IHandleEntity* pHandleEntity, int contentsMask)
 	{
-		IServerEntity* pEntity = EntityFromEntityHandle(pHandleEntity);
+		if (staticpropmgr->IsStaticProp(pHandleEntity))
+			return false;
+		IServerEntity* pEntity = (IServerEntity*)pHandleEntity;
 		if (!pEntity)
 			return false;
 
@@ -13862,7 +13864,7 @@ CEngineShadowCloneInternal* CEngineShadowCloneInternal::CreateShadowClone(IPhysi
 		pClone->SetCloneTransformationMatrix(*pTransformationMatrix);
 	}
 
-	DispatchSpawn(pClone->AsEngineObject()->GetOuter());
+	EntityList()->DispatchSpawn(pClone->AsEngineObject()->GetOuter());
 
 	return pClone;
 }

@@ -647,21 +647,6 @@ void CServerGameDLL::PostRestore()
 {
 }
 
-
-//---------------------------------
-// Get a reference position in model space to compute
-// changes in model space for global brush entities (designer models them in different coords!)
-Vector CServerGameDLL::ModelSpaceLandmark(int modelIndex)
-{
-	const model_t* pModel = modelinfo->GetModel(modelIndex);
-	if (modelinfo->GetModelType(pModel) != mod_brush)
-		return vec3_origin;
-
-	Vector mins, maxs;
-	modelinfo->GetModelBounds(pModel, mins, maxs);
-	return mins;
-}
-
 bool CServerGameDLL::DLLInit( CreateInterfaceFn appSystemFactory, 
 		CreateInterfaceFn physicsFactory, CreateInterfaceFn fileSystemFactory, 
 		CGlobalVars *pGlobals)

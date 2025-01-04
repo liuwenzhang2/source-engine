@@ -46,7 +46,7 @@ public:
 	virtual void OnPreQuery( SpatialPartitionListMask_t listMask );
 	virtual void OnPostQuery( SpatialPartitionListMask_t listMask );
 
-	void AddEntity( CBaseEntity *pEntity );
+	void AddEntity( IEngineObject *pEntity );
 
 	~CDirtySpatialPartitionEntityList();
 	void LockPartitionForRead()
@@ -136,7 +136,7 @@ void CDirtySpatialPartitionEntityList::Shutdown()
 //-----------------------------------------------------------------------------
 // Makes sure all entries in the KD tree are in the correct position
 //-----------------------------------------------------------------------------
-void CDirtySpatialPartitionEntityList::AddEntity( CBaseEntity *pEntity )
+void CDirtySpatialPartitionEntityList::AddEntity( IEngineObject *pEntity )
 {
 	m_DirtyEntities.PushItem( pEntity->GetRefEHandle() );
 }
@@ -1352,7 +1352,7 @@ void CCollisionProperty::MarkPartitionHandleDirty()
 	if ( !m_pOuter->IsEFlagSet( EFL_DIRTY_SPATIAL_PARTITION ) )
 	{
 		m_pOuter->AddEFlags( EFL_DIRTY_SPATIAL_PARTITION );
-		s_DirtyKDTree.AddEntity((CBaseEntity*)m_pOuter->GetOuter() );
+		s_DirtyKDTree.AddEntity(m_pOuter);
 	}
 
 #ifdef CLIENT_DLL

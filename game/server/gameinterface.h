@@ -203,7 +203,6 @@ public:
 
 	string_t AllocPooledString(const char* pszValue);
 
-	Vector ModelSpaceLandmark(int modelIndex);
 private:
 
 	// This can just be a wrapper on MapEntity_ParseAllEntities, but CS does some tricks in here

@@ -698,7 +698,7 @@ void CNPC_Strider::Activate()
 		CNPC_Strider *pStrider = (CNPC_Strider *)EntityList()->CreateEntityByName( "npc_strider" );
 		Assert(pStrider);
 		pStrider->m_bDisableBoneFollowers = true; // don't create these since we're just going to destroy him
-		DispatchSpawn( pStrider );
+		EntityList()->DispatchSpawn( pStrider );
 
 		pStrider->SetActivity( ACT_DIERAGDOLL );
 		pStrider->GetEngineObject()->InvalidateBoneCache();
@@ -4551,7 +4551,7 @@ void AdjustStriderNodePosition( CAI_Network *pNetwork, CAI_Node *pNode )
 			engine->SetAllowPrecache( true );//CBaseEntity::
 			pStrider = (CNPC_Strider *)EntityList()->CreateEntityByName( "npc_strider" );
 			pStrider->m_bDisableBoneFollowers = true; // don't create these since we're just going to destroy him
-			DispatchSpawn( pStrider );
+			EntityList()->DispatchSpawn( pStrider );
 			engine->SetAllowPrecache( allowPrecache );//CBaseEntity::
 			bCreated = true;
 		}

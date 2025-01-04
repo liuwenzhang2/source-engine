@@ -569,7 +569,7 @@ CPortal_Dinosaur *CSpawnDinosaurHack::SpawnDinosaur( radiolocs& loc )
 	{
 		pDinosaur->GetEngineObject()->SetAbsOrigin( vSpawnPos );
 		pDinosaur->GetEngineObject()->SetAbsAngles( vSpawnAng );
-		DispatchSpawn( pDinosaur );
+		EntityList()->DispatchSpawn( pDinosaur );
 	}
 
 	return pDinosaur;
@@ -594,7 +594,7 @@ CDinosaurSignal *CSpawnDinosaurHack::SpawnSignal( radiolocs& loc )
 		pSignal->m_flOuterRadius	= loc.soundouterrad;
 		V_strncpy( pSignal->m_szSoundName.GetForModify(), loc.soundname, 128 );
 		pSignal->m_nSignalID		= loc.id;
-		DispatchSpawn( pSignal );
+		EntityList()->DispatchSpawn( pSignal );
 	}
 
 	return pSignal;
@@ -611,7 +611,7 @@ void CSpawnDinosaurHack::ApplyMapSpecificHacks()
 		{
 			pFilter->KeyValue( "filtername", "box_2" );
 			pFilter->KeyValue( "targetname", "filter_weight_box" );
-			DispatchSpawn( pFilter );
+			EntityList()->DispatchSpawn( pFilter );
 		}
 	}
 }

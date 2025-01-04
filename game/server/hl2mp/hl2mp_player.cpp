@@ -1068,7 +1068,7 @@ void CHL2MP_Player::CreateViewModel( int index /*=0*/ )
 		vm->GetEngineObject()->SetAbsOrigin(GetEngineObject()->GetAbsOrigin() );
 		vm->SetOwner( this );
 		vm->SetIndex( index );
-		DispatchSpawn( vm );
+		EntityList()->DispatchSpawn( vm );
 		vm->GetEngineObject()->FollowEntity( this->GetEngineObject(), false );
 		m_hViewModel.Set( index, vm );
 	}

@@ -756,7 +756,7 @@ void CNPC_Citizen::FixupMattWeapon()
 		EntityList()->DestroyEntity( pWeapon );
 		pWeapon = (CBaseCombatWeapon *)EntityList()->CreateEntityByName( "weapon_crowbar" );
 		pWeapon->GetEngineObject()->SetName( "matt_weapon" );
-		DispatchSpawn( pWeapon );
+		EntityList()->DispatchSpawn( pWeapon );
 
 #ifdef DEBUG
 		extern bool g_bReceivedChainedActivate;
@@ -3717,7 +3717,7 @@ void	CNPC_Citizen::TossHealthKit(CBaseCombatCharacter *pThrowAt, const Vector &o
 		pHealthKit->GetEngineObject()->SetAbsOrigin( medKitOriginPoint );
 		pHealthKit->SetOwnerEntity( this );
 		// pHealthKit->SetAbsVelocity( tossVelocity );
-		DispatchSpawn( pHealthKit );
+		EntityList()->DispatchSpawn( pHealthKit );
 
 		{
 			IPhysicsObject *pPhysicsObject = pHealthKit->GetEngineObject()->VPhysicsGetObject();

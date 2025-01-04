@@ -228,7 +228,7 @@ static CDODViewVectors g_DODViewVectors(
 					if ( pNode )
 					{
 						ParseEntKVBlock((CBaseEntity*)pNode, pkvNode );
-						DispatchSpawn( pNode );
+						EntityList()->DispatchSpawn( pNode );
 
 						EHANDLE hHandle;
 						hHandle = (CBaseEntity*)pNode;

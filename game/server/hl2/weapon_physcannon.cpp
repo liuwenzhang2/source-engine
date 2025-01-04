@@ -2356,7 +2356,7 @@ void CWeaponPhysCannon::DoEffectIdle( void )
 				pCore->GetEngineObject()->SetAbsOrigin( vOrigin );
 				pCore->GetEngineObject()->SetAbsAngles( vAngle );
 
-				DispatchSpawn( pCore );
+				EntityList()->DispatchSpawn( pCore );
 				pCore->Activate();
 
 				pCore->GetEngineObject()->SetParent( pBeamEnt->GetEngineObject(), iAttachment);

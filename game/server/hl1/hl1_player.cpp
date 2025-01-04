@@ -433,7 +433,7 @@ CBaseEntity	*CHL1_Player::GiveNamedItem( const char *pszName, int iSubType )
 		}
 	}
 
-	DispatchSpawn( pent );
+	EntityList()->DispatchSpawn( pent );
 
 	if ( pent != NULL && !(pent->GetEngineObject()->IsMarkedForDeletion()) )
 	{
@@ -1247,7 +1247,7 @@ void CHL1_Player::CreateViewModel( int index /*=0*/ )
 		vm->GetEngineObject()->SetAbsOrigin(GetEngineObject()->GetAbsOrigin() );
 		vm->SetOwner( this );
 		vm->SetIndex( index );
-		DispatchSpawn( vm );
+		EntityList()->DispatchSpawn( vm );
 		vm->GetEngineObject()->FollowEntity( this->GetEngineObject());
 		m_hViewModel.Set( index, vm );
 	}
