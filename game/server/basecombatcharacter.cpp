@@ -3382,7 +3382,7 @@ void CBaseCombatCharacter::DoMuzzleFlash()
 //-----------------------------------------------------------------------------
 bool CBaseCombatCharacter::IsHiddenByFog( const Vector &target ) const
 {
-	float range = EyePosition().DistTo( target );
+	float range = const_cast<CBaseCombatCharacter*>(this)->EyePosition().DistTo( target );
 	return IsHiddenByFog( range );
 }
 
@@ -3394,7 +3394,7 @@ bool CBaseCombatCharacter::IsHiddenByFog( CBaseEntity *target ) const
 	if ( !target )
 		return false;
 
-	float range = EyePosition().DistTo( target->WorldSpaceCenter() );
+	float range = const_cast<CBaseCombatCharacter*>(this)->EyePosition().DistTo( target->WorldSpaceCenter() );
 	return IsHiddenByFog( range );
 }
 
@@ -3414,7 +3414,7 @@ bool CBaseCombatCharacter::IsHiddenByFog( float range ) const
 //-----------------------------------------------------------------------------
 float CBaseCombatCharacter::GetFogObscuredRatio( const Vector &target ) const
 {
-	float range = EyePosition().DistTo( target );
+	float range = const_cast<CBaseCombatCharacter*>(this)->EyePosition().DistTo( target );
 	return GetFogObscuredRatio( range );
 }
 
@@ -3426,7 +3426,7 @@ float CBaseCombatCharacter::GetFogObscuredRatio( CBaseEntity *target ) const
 	if ( !target )
 		return false;
 
-	float range = EyePosition().DistTo( target->WorldSpaceCenter() );
+	float range = const_cast<CBaseCombatCharacter*>(this)->EyePosition().DistTo( target->WorldSpaceCenter() );
 	return GetFogObscuredRatio( range );
 }
 

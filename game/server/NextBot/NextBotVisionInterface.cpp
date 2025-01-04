@@ -755,7 +755,7 @@ bool IVision::IsLineOfSightClearToEntity( const CBaseEntity *subject, Vector *vi
 	UTIL_TraceLine( GetBot()->GetBodyInterface()->GetEyePosition(), subject->WorldSpaceCenter(), MASK_BLOCKLOS_AND_NPCS|CONTENTS_IGNORE_NODRAW_OPAQUE, &filter, &result );
 	if ( result.DidHit() )
 	{
-		UTIL_TraceLine( GetBot()->GetBodyInterface()->GetEyePosition(), subject->EyePosition(), MASK_BLOCKLOS_AND_NPCS|CONTENTS_IGNORE_NODRAW_OPAQUE, &filter, &result );
+		UTIL_TraceLine( GetBot()->GetBodyInterface()->GetEyePosition(), const_cast<CBaseEntity*>(subject)->EyePosition(), MASK_BLOCKLOS_AND_NPCS|CONTENTS_IGNORE_NODRAW_OPAQUE, &filter, &result );
 
 		if ( result.DidHit() )
 		{
@@ -796,7 +796,7 @@ bool IVision::IsLookingAt( const Vector &pos, float cosTolerance ) const
  */
 bool IVision::IsLookingAt( const CBaseCombatCharacter *actor, float cosTolerance ) const
 {
-	return IsLookingAt( actor->EyePosition(), cosTolerance );
+	return IsLookingAt( const_cast<CBaseCombatCharacter*>(actor)->EyePosition(), cosTolerance );
 }
 
 

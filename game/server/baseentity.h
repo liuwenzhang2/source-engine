@@ -1188,22 +1188,14 @@ public:
 	virtual float	GetDamage() { return 0; }
 	virtual void	SetDamage(float flDamage) {}
 
-	virtual Vector	EyePosition( void );			// position of eyes
+	virtual Vector EyePosition( void );			// position of eyes
 	virtual const QAngle &EyeAngles( void );		// Direction of eyes in world space
 	virtual const QAngle &LocalEyeAngles( void );	// Direction of eyes
-	virtual const Vector& EarPosition( void );			// position of ears
-
-	Vector	EyePosition( void ) const;			// position of eyes
-	const QAngle &EyeAngles( void ) const;		// Direction of eyes in world space
-	const QAngle &LocalEyeAngles( void ) const;	// Direction of eyes
-	const Vector& EarPosition( void ) const;			// position of ears
+	virtual Vector EarPosition( void );			// position of ears
 
 	virtual Vector	BodyTarget( const Vector &posSrc, bool bNoisy = true);		// position to shoot at
 	virtual Vector	HeadTarget( const Vector &posSrc );
 	virtual void	GetVectors(Vector* forward, Vector* right, Vector* up) const;
-	virtual void	EyeVectors(Vector* pForward, Vector* pRight = NULL, Vector* pUp = NULL) {
-		GetVectors(pForward, pRight, pUp);
-	}
 
 	virtual const Vector &GetViewOffset() const;
 	virtual void SetViewOffset( const Vector &v );
@@ -1406,7 +1398,6 @@ public:
 	void SetScaledPhysics(IPhysicsObject* pNewObject);
 
 	virtual CBaseEntity*	GetActiveWeapon() const { return NULL; }
-	virtual Vector			Weapon_ShootPosition() { return EyePosition(); }
 	virtual CBaseEntity*	GetPlayerHeldEntity() { return NULL; }
 	virtual CBaseEntity*	PhysCannonGetHeldEntity() { return NULL; }
 	virtual float			GetHeldObjectMass(IPhysicsObject* pHeldObject) { return 0; }
@@ -2096,31 +2087,6 @@ inline RenderMode_t CBaseEntity::GetRenderMode() const
 {
 	return (RenderMode_t)m_nRenderMode.Get();
 }
-
-
-//-----------------------------------------------------------------------------
-// Methods to cast away const
-//-----------------------------------------------------------------------------
-inline Vector CBaseEntity::EyePosition( void ) const
-{
-	return const_cast<CBaseEntity*>(this)->EyePosition();
-}
-
-inline const QAngle &CBaseEntity::EyeAngles( void ) const		// Direction of eyes in world space
-{
-	return const_cast<CBaseEntity*>(this)->EyeAngles();
-}
-
-inline const QAngle &CBaseEntity::LocalEyeAngles( void ) const	// Direction of eyes
-{
-	return const_cast<CBaseEntity*>(this)->LocalEyeAngles();
-}
-
-inline const Vector& CBaseEntity::EarPosition( void ) const			// position of ears
-{
-	return const_cast<CBaseEntity*>(this)->EarPosition();
-}
-
 
 //-----------------------------------------------------------------------------
 // Methods relating to networking

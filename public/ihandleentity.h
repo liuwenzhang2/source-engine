@@ -11,6 +11,8 @@
 #endif
 #include "platform.h"
 #include "const.h"
+#include "mathlib/mathlib.h"
+#include "mathlib/vector.h"
 
 class IHandleEntity;
 class CBaseHandle;
@@ -18,8 +20,6 @@ class IEntityFactory;
 class IEntityList;
 class datamap_t;
 struct string_t;
-class Vector;
-class QAngle;
 class VMatrix;
 struct Ray_t;
 struct PS_SD_Static_SurfaceProperties_t;
@@ -164,7 +164,12 @@ public:
 	virtual int GetHealth() const { return 0; }
 	virtual const char& GetTakeDamage() const { return *(char*)0; }
 	virtual float GetAttackDamageScale(IHandleEntity* pVictim) { return 0.0f; }
-	virtual const Vector& EarPosition(void) const { return *(Vector*)0; }
+	virtual Vector EyePosition(void) { return *(Vector*)0; } // position of eyes
+	virtual const QAngle& EyeAngles(void) { return *(QAngle*)0; }// Direction of eyes in world space
+	virtual void EyeVectors(Vector* pForward, Vector* pRight = NULL, Vector* pUp = NULL) { AngleVectors(EyeAngles(), pForward, pRight, pUp); }
+	virtual const QAngle& LocalEyeAngles(void) { return *(QAngle*)0; }	// Direction of eyes in local space (pl.v_angle)
+	virtual Vector EarPosition(void) { return EyePosition(); }// position of ears
+	virtual Vector Weapon_ShootPosition() { return EyePosition(); }
 	virtual int GetWaterLevel() const { return 0; }
 };
 

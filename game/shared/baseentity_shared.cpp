@@ -294,7 +294,7 @@ const QAngle &CBaseEntity::LocalEyeAngles( void )
 }
 
 // position of ears
-const Vector& CBaseEntity::EarPosition( void )
+Vector CBaseEntity::EarPosition( void )
 { 
 	return EyePosition(); 
 }

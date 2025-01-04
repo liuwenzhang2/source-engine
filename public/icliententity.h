@@ -926,12 +926,11 @@ public:
 	virtual bool UsesFlexDelayedWeights() = 0;
 	virtual void SetupWeights(const matrix3x4_t* pBoneToWorld, int nFlexWeightCount, float* pFlexWeights, float* pFlexDelayedWeights) = 0;
 	virtual const Vector& WorldSpaceCenter() const = 0;
-	virtual Vector EyePosition(void) const = 0;			// position of eyes
-	virtual const QAngle& EyeAngles(void) const = 0;
-	virtual void EyeVectors(Vector* pForward, Vector* pRight = NULL, Vector* pUp = NULL) = 0;
-	virtual const Vector& EarPosition(void) const = 0;			// position of ears
+	virtual Vector EyePosition(void) = 0;
+	virtual const QAngle& EyeAngles(void) = 0;
+	virtual const QAngle& LocalEyeAngles(void) = 0;
+	virtual Vector EarPosition(void) = 0;
 	virtual const Vector& GetViewOffset() const = 0;
-	virtual Vector Weapon_ShootPosition() = 0;
 	virtual bool ShouldReceiveProjectedTextures(int flags) = 0;
 	virtual const Vector& GetRenderOrigin(void) = 0;
 	virtual const QAngle& GetRenderAngles(void) = 0;

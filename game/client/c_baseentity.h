@@ -769,20 +769,10 @@ public:
 	virtual bool					IsBaseTrain(void) const { return false; }
 
 	// Returns the eye point + angles (used for viewing + shooting)
-	virtual Vector			EyePosition(void);
+	virtual Vector EyePosition(void);
 	virtual const QAngle& EyeAngles(void);		// Direction of eyes
 	virtual const QAngle& LocalEyeAngles(void);	// Direction of eyes in local space (pl.v_angle)
-	virtual Vector			Weapon_ShootPosition() { return EyePosition(); }
-	virtual void	EyeVectors(Vector* pForward, Vector* pRight = NULL, Vector* pUp = NULL) {
-		GetEngineObject()->GetVectors(pForward, pRight, pUp);
-	}
-	// position of ears
-	virtual const Vector& EarPosition(void);
-
-	Vector	EyePosition(void) const;			// position of eyes
-	const QAngle& EyeAngles(void) const;		// Direction of eyes in world space
-	const QAngle& LocalEyeAngles(void) const;	// Direction of eyes
-	const Vector& EarPosition(void) const;			// position of ears
+	virtual Vector EarPosition(void);// position of ears
 
 	// Called by physics to see if we should avoid a collision test....
 	virtual bool		ShouldCollide(int collisionGroup, int contentsMask) const;
@@ -1379,30 +1369,6 @@ inline void CBaseEntity::SetEyeAngleOffset( const QAngle & qa )
 }
 
 #endif
-
-//-----------------------------------------------------------------------------
-// Methods to cast away const
-//-----------------------------------------------------------------------------
-inline Vector C_BaseEntity::EyePosition( void ) const
-{
-	return const_cast<C_BaseEntity*>(this)->EyePosition();
-}
-
-inline const QAngle &C_BaseEntity::EyeAngles( void ) const		// Direction of eyes in world space
-{
-	return const_cast<C_BaseEntity*>(this)->EyeAngles();
-}
-
-inline const QAngle &C_BaseEntity::LocalEyeAngles( void ) const	// Direction of eyes
-{
-	return const_cast<C_BaseEntity*>(this)->LocalEyeAngles();
-}
-
-inline const Vector& C_BaseEntity::EarPosition( void ) const			// position of ears
-{
-	return const_cast<C_BaseEntity*>(this)->EarPosition();
-}
-
 
 class C_BaseEntityIterator
 {

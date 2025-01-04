@@ -24,8 +24,6 @@ struct Ray_t;
 class ServerClass;
 class ICollideable;
 class IServerNetworkable;
-class Vector;
-class QAngle;
 struct PVSInfo_t;
 class CCheckTransmitInfo;
 struct matrix3x4_t;
@@ -1013,12 +1011,12 @@ public:
 	virtual void GetVelocity(Vector* vVelocity, AngularImpulse* vAngVelocity = NULL) = 0;
 	virtual bool FInViewCone(IServerEntity* pEntity) = 0;
 	virtual bool FInViewCone(const Vector& vecSpot) = 0;
-	virtual Vector EyePosition(void) const = 0;			// position of eyes
-	virtual const QAngle& EyeAngles(void) = 0;		// Direction of eyes in world space
-	virtual void EyeVectors(Vector* pForward, Vector* pRight = NULL, Vector* pUp = NULL) = 0;
-	virtual const Vector& EarPosition(void) const = 0;
-	virtual Vector	BodyTarget(const Vector& posSrc, bool bNoisy = true) = 0;		// position to shoot at
-	virtual Vector	HeadTarget(const Vector& posSrc) = 0;
+	virtual Vector EyePosition(void) = 0;
+	virtual const QAngle& EyeAngles(void) = 0;
+	virtual const QAngle& LocalEyeAngles(void) = 0;
+	virtual Vector EarPosition(void) = 0;
+	virtual Vector BodyTarget(const Vector& posSrc, bool bNoisy = true) = 0;
+	virtual Vector HeadTarget(const Vector& posSrc) = 0;
 	virtual const Vector& GetViewOffset() const = 0;
 	virtual void ViewPunch(const QAngle& angleOffset) = 0;
 	virtual const Vector& WorldSpaceCenter() const = 0;
@@ -1038,7 +1036,6 @@ public:
 	virtual IServerEntity* GetOwnerEntity() const = 0;
 	virtual void SetOwnerEntity(IServerEntity* pOwner) = 0;
 	virtual IServerEntity* GetActiveWeapon() const = 0;
-	virtual Vector Weapon_ShootPosition() = 0;
 	virtual IServerEntity* PhysCannonGetHeldEntity() = 0;
 	virtual int GetMaxHealth() const = 0;
 	virtual int GetHealth() const = 0;

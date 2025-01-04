@@ -571,7 +571,7 @@ bool CBaseCombatCharacter::ComputeTargetIsInDarkness( const Vector &vecEyePositi
 */
 bool CBaseCombatCharacter::IsLookingTowards( const CBaseEntity *target, float cosTolerance ) const
 {
-	return IsLookingTowards( target->WorldSpaceCenter(), cosTolerance ) || IsLookingTowards( target->EyePosition(), cosTolerance ) || IsLookingTowards( target->GetEngineObject()->GetAbsOrigin(), cosTolerance );
+	return IsLookingTowards( target->WorldSpaceCenter(), cosTolerance ) || IsLookingTowards(const_cast<CBaseEntity*>(target)->EyePosition(), cosTolerance ) || IsLookingTowards( target->GetEngineObject()->GetAbsOrigin(), cosTolerance );
 }
 
 
@@ -582,11 +582,11 @@ bool CBaseCombatCharacter::IsLookingTowards( const CBaseEntity *target, float co
 */
 bool CBaseCombatCharacter::IsLookingTowards( const Vector &target, float cosTolerance ) const
 {
-	Vector toTarget = target - EyePosition();
+	Vector toTarget = target - const_cast<CBaseCombatCharacter*>(this)->EyePosition();
 	toTarget.NormalizeInPlace();
 
 	Vector forward;
-	AngleVectors( EyeAngles(), &forward );
+	AngleVectors(const_cast<CBaseCombatCharacter*>(this)->EyeAngles(), &forward );
 
 	return ( DotProduct( forward, toTarget ) >= cosTolerance );
 }
@@ -603,8 +603,8 @@ bool CBaseCombatCharacter::IsInFieldOfView( CBaseEntity *entity ) const
 	float flTolerance = pPlayer ? cos( (float)pPlayer->GetFOV() * 0.5f ) : BCC_DEFAULT_LOOK_TOWARDS_TOLERANCE;
 
 	Vector vecForward;
-	Vector vecEyePosition = EyePosition();
-	AngleVectors( EyeAngles(), &vecForward );
+	Vector vecEyePosition = const_cast<CBaseCombatCharacter*>(this)->EyePosition();
+	AngleVectors(const_cast<CBaseCombatCharacter*>(this)->EyeAngles(), &vecForward );
 
 	// FIXME: Use a faster check than this!
 
@@ -692,7 +692,7 @@ bool CBaseCombatCharacter::IsLineOfSightClear( const Vector &pos, LineOfSightChe
 #else
 		trace_t trace;
 		CTraceFilterNoCombatCharacters traceFilter( entityToIgnore, COLLISION_GROUP_NONE );
-		UTIL_TraceLine( EyePosition(), pos, MASK_OPAQUE | CONTENTS_IGNORE_NODRAW_OPAQUE | CONTENTS_MONSTER, &traceFilter, &trace );
+		UTIL_TraceLine(const_cast<CBaseCombatCharacter*>(this)->EyePosition(), pos, MASK_OPAQUE | CONTENTS_IGNORE_NODRAW_OPAQUE | CONTENTS_MONSTER, &traceFilter, &trace );
 
 		return trace.fraction == 1.0f;
 #endif
@@ -701,7 +701,7 @@ bool CBaseCombatCharacter::IsLineOfSightClear( const Vector &pos, LineOfSightChe
 	{
 		trace_t trace;
 		CTraceFilterSkipTwoEntities traceFilter( this, entityToIgnore, COLLISION_GROUP_NONE );
-		UTIL_TraceLine( EyePosition(), pos, MASK_OPAQUE | CONTENTS_IGNORE_NODRAW_OPAQUE, &traceFilter, &trace );
+		UTIL_TraceLine(const_cast<CBaseCombatCharacter*>(this)->EyePosition(), pos, MASK_OPAQUE | CONTENTS_IGNORE_NODRAW_OPAQUE, &traceFilter, &trace );
 
 		return trace.fraction == 1.0f;
 	}
