@@ -5,10 +5,11 @@
 // $Workfile:     $
 // $NoKeywords: $
 //=============================================================================//
-#include "cbase.h"
+//#include "cbase.h"
+#include "convar.h"
 #include "iviewrender_beams.h"
 #include "tempentity.h"
-#include "beam_shared.h"
+//#include "beam_shared.h"
 #include "ivieweffects.h"
 #include "beamdraw.h"
 #include "engine/ivdebugoverlay.h"
@@ -72,10 +73,9 @@ public:
 	// Updates the state of the temp ent beams
 	virtual void		UpdateTempEntBeams();
 
-	virtual void		DrawBeam( C_Beam* pbeam, ITraceFilter *pEntityBeamTraceFilter = NULL );
 	virtual void		DrawBeam( Beam_t *pbeam );
 
-	virtual	void		KillDeadBeams( C_BaseEntity *pDeadEntity );
+	virtual	void		KillDeadBeams( IClientEntity *pDeadEntity );
 
 	virtual Beam_t		*CreateBeamEnts( BeamInfo_t &beamInfo );
 	virtual Beam_t		*CreateBeamEntPoint( BeamInfo_t &beamInfo );
@@ -215,7 +215,7 @@ static void SineNoise( float *noise, int divs )
 	}
 }
 
-bool ComputeBeamEntPosition( C_BaseEntity *pEnt, int nAttachment, bool bInterpretAttachmentIndexAsHitboxIndex, Vector& pt )
+bool ComputeBeamEntPosition( IClientEntity *pEnt, int nAttachment, bool bInterpretAttachmentIndexAsHitboxIndex, Vector& pt )
 {
 	// NOTE: This will *leave* the pt at its current value, essential for
 	// beam follow ents what want to stick around a little after their ent has died
@@ -230,17 +230,16 @@ bool ComputeBeamEntPosition( C_BaseEntity *pEnt, int nAttachment, bool bInterpre
 	}
 	else
 	{
-		C_BaseAnimating *pAnimating = pEnt->GetBaseAnimating();
-		if ( pAnimating )
+		if (pEnt->GetEngineObject()->GetModelPtr())
 		{
-			IStudioHdr *pStudioHdr = modelinfo->GetStudiomodel( pAnimating->GetEngineObject()->GetModel() );
+			IStudioHdr *pStudioHdr = modelinfo->GetStudiomodel(pEnt->GetEngineObject()->GetModel() );
 			if (pStudioHdr)
 			{
-				mstudiohitboxset_t *set = pStudioHdr->pHitboxSet( pAnimating->GetHitboxSet() );
+				mstudiohitboxset_t *set = pStudioHdr->pHitboxSet( pEnt->GetEngineObject()->GetHitboxSet() );
 				if ( set && (set->numhitboxes >= nAttachment) && (nAttachment > 0) )
 				{
 					const matrix3x4_t	*hitboxbones[MAXSTUDIOBONES];
-					if ( pAnimating->HitboxToWorldTransforms( hitboxbones ) )
+					if ( pEnt->GetEngineObject()->HitboxToWorldTransforms( hitboxbones ) )
 					{
 						mstudiobbox_t *pHitbox = set->pHitbox( nAttachment - 1 );
 						Vector vecViewPt = MainViewOrigin();
@@ -455,8 +454,8 @@ int Beam_t::DrawModel( int flags )
 		// If the beam is attached
 		for (int i=0;i<MAX_BEAM_ENTS;i++)
 		{
-			C_BaseViewModel *vm = dynamic_cast<C_BaseViewModel *>(entity[i].Get());
-			if ( vm )
+			//C_BaseViewModel *vm = dynamic_cast<C_BaseViewModel *>(entity[i].Get());
+			if (entity[i].Get()->IsViewModel())
 			{
 				return 0;
 			}
@@ -636,7 +635,7 @@ void CViewRenderBeams::BeamFree( Beam_t* pBeam )
 // Purpose: Iterates through active list and kills beams associated with deadEntity
 // Input  : deadEntity - 
 //-----------------------------------------------------------------------------
-void CViewRenderBeams::KillDeadBeams( C_BaseEntity *pDeadEntity )
+void CViewRenderBeams::KillDeadBeams( IClientEntity *pDeadEntity )
 {
 	Beam_t *pbeam;
 	Beam_t *pnewlist;
@@ -862,9 +861,9 @@ void CViewRenderBeams::CreateBeamEnts( int startEnt, int endEnt, int modelIndex,
 	BeamInfo_t beamInfo;
 
 	beamInfo.m_nType = type;
-	beamInfo.m_pStartEnt = (C_BaseEntity*)EntityList()->GetEnt( BEAMENT_ENTITY( startEnt ) );
+	beamInfo.m_pStartEnt = EntityList()->GetEnt( BEAMENT_ENTITY( startEnt ) );
 	beamInfo.m_nStartAttachment = BEAMENT_ATTACHMENT( startEnt );
-	beamInfo.m_pEndEnt = (C_BaseEntity*)EntityList()->GetEnt( BEAMENT_ENTITY( endEnt ) );
+	beamInfo.m_pEndEnt = EntityList()->GetEnt( BEAMENT_ENTITY( endEnt ) );
 	beamInfo.m_nEndAttachment = BEAMENT_ATTACHMENT( endEnt );
 	beamInfo.m_nModelIndex = modelIndex;
 	beamInfo.m_nHaloIndex = haloIndex;
@@ -956,7 +955,7 @@ void CViewRenderBeams::CreateBeamEntPoint( int nStartEntity, const Vector *pStar
 	}
 	else
 	{
-		beamInfo.m_pStartEnt = (C_BaseEntity*)EntityList()->GetEnt( BEAMENT_ENTITY( nStartEntity ) );
+		beamInfo.m_pStartEnt = EntityList()->GetEnt( BEAMENT_ENTITY( nStartEntity ) );
 		beamInfo.m_nStartAttachment = BEAMENT_ATTACHMENT( nStartEntity );
 
 		// Don't start beams out of the PVS
@@ -971,7 +970,7 @@ void CViewRenderBeams::CreateBeamEntPoint( int nStartEntity, const Vector *pStar
 	}
 	else
 	{
-		beamInfo.m_pEndEnt = (C_BaseEntity*)EntityList()->GetEnt( BEAMENT_ENTITY( nEndEntity ) );
+		beamInfo.m_pEndEnt = EntityList()->GetEnt( BEAMENT_ENTITY( nEndEntity ) );
 		beamInfo.m_nEndAttachment = BEAMENT_ATTACHMENT( nEndEntity );
 
 		// Don't start beams out of the PVS
@@ -1217,7 +1216,7 @@ void CViewRenderBeams::CreateBeamFollow( int startEnt, int modelIndex, int haloI
 {
 	BeamInfo_t beamInfo;
 
-	beamInfo.m_pStartEnt = (C_BaseEntity*)EntityList()->GetEnt( BEAMENT_ENTITY( startEnt ) );
+	beamInfo.m_pStartEnt = EntityList()->GetEnt( BEAMENT_ENTITY( startEnt ) );
 	beamInfo.m_nStartAttachment = BEAMENT_ATTACHMENT( startEnt );
 	beamInfo.m_nModelIndex = modelIndex;
 	beamInfo.m_nHaloIndex = haloIndex;
@@ -1358,9 +1357,9 @@ void CViewRenderBeams::CreateBeamRing( int startEnt, int endEnt, int modelIndex,
 {
 	BeamInfo_t beamInfo;
 
-	beamInfo.m_pStartEnt = (C_BaseEntity*)EntityList()->GetEnt( BEAMENT_ENTITY( startEnt ) );
+	beamInfo.m_pStartEnt = EntityList()->GetEnt( BEAMENT_ENTITY( startEnt ) );
 	beamInfo.m_nStartAttachment = BEAMENT_ATTACHMENT( startEnt );
-	beamInfo.m_pEndEnt = (C_BaseEntity*)EntityList()->GetEnt( BEAMENT_ENTITY( endEnt ) );
+	beamInfo.m_pEndEnt = EntityList()->GetEnt( BEAMENT_ENTITY( endEnt ) );
 	beamInfo.m_nEndAttachment = BEAMENT_ATTACHMENT( endEnt );
 	beamInfo.m_nModelIndex = modelIndex;
 	beamInfo.m_nHaloIndex = haloIndex;
@@ -2112,243 +2111,4 @@ bool CViewRenderBeams::RecomputeBeamEndpoints( Beam_t *pbeam )
 	return true;
 }
 
-#ifdef PORTAL
-	bool bBeamDrawingThroughPortal = false;
-#endif
 
-//-----------------------------------------------------------------------------
-// Draws a single beam
-//-----------------------------------------------------------------------------
-void CViewRenderBeams::DrawBeam( C_Beam* pbeam, ITraceFilter *pEntityBeamTraceFilter )
-{
-	Beam_t beam;
-
-	// Set up the beam.
-	int beamType = pbeam->GetType();
-
-	BeamInfo_t beamInfo;
-	beamInfo.m_vecStart = pbeam->GetAbsStartPos();
-	beamInfo.m_vecEnd = pbeam->GetAbsEndPos();
-	beamInfo.m_pStartEnt = beamInfo.m_pEndEnt = NULL;
-	beamInfo.m_nModelIndex = pbeam->GetEngineObject()->GetModelIndex();
-	beamInfo.m_nHaloIndex = pbeam->m_nHaloIndex;
-	beamInfo.m_flHaloScale = pbeam->m_fHaloScale;
-	beamInfo.m_flLife = 0;
-	beamInfo.m_flWidth = pbeam->GetWidth();
-	beamInfo.m_flEndWidth = pbeam->GetEndWidth();
-	beamInfo.m_flFadeLength = pbeam->GetFadeLength();
-	beamInfo.m_flAmplitude = pbeam->GetNoise();
-	beamInfo.m_flBrightness = pbeam->GetFxBlend();
-	beamInfo.m_flSpeed = pbeam->GetScrollRate();
-
-#ifdef PORTAL	// Beams need to recursively draw through portals
-	// Trace to see if we've intersected a portal
-	float fEndFraction;
-	Ray_t rayBeam;
-
-	bool bIsReversed = ( pbeam->GetBeamFlags() & FBEAM_REVERSED ) != 0x0;
-
-	Vector vRayStartPoint, vRayEndPoint;
-
-	vRayStartPoint = beamInfo.m_vecStart;
-	vRayEndPoint = beamInfo.m_vecEnd;
-
-	if ( beamType == BEAM_ENTPOINT || beamType == BEAM_ENTS || beamType == BEAM_LASER )
-	{
-		ComputeBeamEntPosition( pbeam->m_hAttachEntity[0], pbeam->m_nAttachIndex[0], false, vRayStartPoint );
-		ComputeBeamEntPosition( pbeam->m_hAttachEntity[1], pbeam->m_nAttachIndex[1], false, vRayEndPoint );
-	}
-
-	if ( !bIsReversed )
-		rayBeam.Init( vRayStartPoint, vRayEndPoint );
-	else
-		rayBeam.Init( vRayEndPoint, vRayStartPoint );
-
-	CBaseEntity *pStartEntity = pbeam->GetStartEntityPtr();
-
-	CTraceFilterSkipClassname traceFilter( pStartEntity, "prop_energy_ball", COLLISION_GROUP_NONE );
-
-	if ( !pEntityBeamTraceFilter && pStartEntity )
-		pEntityBeamTraceFilter = pStartEntity->GetBeamTraceFilter();
-
-	CTraceFilterChain traceFilterChain( &traceFilter, pEntityBeamTraceFilter );
-
-	IEnginePortalClient *pPortal = (IEnginePortalClient*)UTIL_Portal_TraceRay_Beam(EntityList(), rayBeam, MASK_SHOT, &traceFilterChain, &fEndFraction );
-
-	// Get the point that we hit a portal or wall
-	Vector vEndPoint = rayBeam.m_Start + rayBeam.m_Delta * fEndFraction;
-
-	if ( pPortal )
-	{
-		// Prevent infinite recursion by lower the brightness each call
-		int iOldBrightness = pbeam->GetBrightness();
-
-		if ( iOldBrightness > 16 )
-		{
-			// Remember the old values of the beam before changing it for the next call
-			Vector vOldStart = pbeam->GetAbsStartPos();
-			Vector vOldEnd = pbeam->GetAbsEndPos();
-			//float fOldWidth = pbeam->GetEndWidth();
-			C_BaseEntity *pOldStartEntity = pbeam->GetStartEntityPtr();
-			C_BaseEntity *pOldEndEntity = pbeam->GetEndEntityPtr();
-			int iOldStartAttachment = pbeam->GetStartAttachment();
-			int iOldEndAttachment = pbeam->GetEndAttachment();
-			int iOldType = pbeam->GetType();
-
-			// Get the transformed positions of the sub beam in the other portal's space
-			Vector vTransformedStart, vTransformedEnd;
-			VMatrix matThisToLinked = pPortal->MatrixThisToLinked();
-			UTIL_Portal_PointTransform( matThisToLinked, vEndPoint, vTransformedStart );
-			UTIL_Portal_PointTransform( matThisToLinked, rayBeam.m_Start + rayBeam.m_Delta, vTransformedEnd );
-
-			// Set up the sub beam for the next call
-			pbeam->SetBrightness( iOldBrightness - 16 );
-			if ( bIsReversed )
-				pbeam->PointsInit( vTransformedEnd, vTransformedStart );
-			else
-				pbeam->PointsInit( vTransformedStart, vTransformedEnd );
-			if ( bIsReversed )
-				pbeam->SetEndWidth( pbeam->GetWidth() );
-			pbeam->SetStartEntity((C_BaseEntity*)pPortal->GetLinkedPortal()->AsEngineObject()->GetOuter() );
-
-			// Draw the sub beam
-			bBeamDrawingThroughPortal = true;
-			DrawBeam( pbeam, pEntityBeamTraceFilter );
-			bBeamDrawingThroughPortal = true;
-
-			// Restore the original values
-			pbeam->SetBrightness( iOldBrightness );
-			pbeam->SetStartPos( vOldStart );
-			pbeam->SetEndPos( vOldEnd );
-			//if ( bIsReversed )
-			//	pbeam->SetEndWidth( fOldWidth );
-			if ( pOldStartEntity )
-				pbeam->SetStartEntity( pOldStartEntity );
-			if ( pOldEndEntity )
-				pbeam->SetEndEntity( pOldEndEntity );
-			pbeam->SetStartAttachment( iOldStartAttachment );
-			pbeam->SetEndAttachment( iOldEndAttachment );
-			pbeam->SetType( iOldType );
-
-			// Doesn't use a hallow or taper the beam because we recursed
-			beamInfo.m_nHaloIndex = 0;
-			if ( !bIsReversed )
-				beamInfo.m_flEndWidth = beamInfo.m_flWidth;
-		}
-	}
-
-	// Clip to the traced end point (portal or wall)
-	if ( bBeamDrawingThroughPortal )
-	{
-		if ( bIsReversed )
-			beamInfo.m_vecStart = vEndPoint;
-		else
-			beamInfo.m_vecEnd = vEndPoint;
-	}
-
-	bBeamDrawingThroughPortal = false;
-#endif
-
-	SetupBeam( &beam, beamInfo );
-
-	beamInfo.m_nStartFrame = pbeam->m_fStartFrame;
-	beamInfo.m_flFrameRate = pbeam->m_flFrameRate;
-	beamInfo.m_flRed = pbeam->m_clrRender->r;
-	beamInfo.m_flGreen = pbeam->m_clrRender->g;
-	beamInfo.m_flBlue = pbeam->m_clrRender->b;
-
-	SetBeamAttributes( &beam, beamInfo );
-
-	if ( pbeam->m_nHaloIndex > 0 )
-	{
-		// HACKHACK: heuristic to estimate proxy size.  Revisit this!
-		float size = 1.0f + (pbeam->m_fHaloScale * pbeam->m_fWidth / pbeam->m_fEndWidth);
-		size = clamp( size, 1.0f, 8.0f );
-		beam.m_queryHandleHalo = &pbeam->m_queryHandleHalo;
-		beam.m_haloProxySize = size;
-	}
-	else
-	{
-		beam.m_queryHandleHalo = NULL;
-	}
-
-	// Handle code from relinking.
-	switch( beamType )
-	{
-		case BEAM_ENTS:
-		{
-			beam.type			= TE_BEAMPOINTS;
-			beam.flags			= FBEAM_STARTENTITY | FBEAM_ENDENTITY;
-			beam.entity[0]		= pbeam->m_hAttachEntity[0];
-			beam.attachmentIndex[0]	= pbeam->m_nAttachIndex[0];
-			beam.entity[1]		= pbeam->m_hAttachEntity[1];
-			beam.attachmentIndex[1]	= pbeam->m_nAttachIndex[1];
-			beam.numAttachments	= pbeam->m_nNumBeamEnts;
-			break;
-		}
-		case BEAM_LASER:
-		{
-			beam.type			= TE_BEAMLASER;
-			beam.flags			= FBEAM_STARTENTITY | FBEAM_ENDENTITY;
-			beam.entity[0]		= pbeam->m_hAttachEntity[0];
-			beam.attachmentIndex[0]	= pbeam->m_nAttachIndex[0];
-			beam.entity[1]		= pbeam->m_hAttachEntity[1];
-			beam.attachmentIndex[1]	= pbeam->m_nAttachIndex[1];
-			beam.numAttachments	= pbeam->m_nNumBeamEnts;
-			break;
-		}
-		case BEAM_SPLINE:
-		{
-			beam.type			= TE_BEAMSPLINE;
-			beam.flags			= FBEAM_STARTENTITY | FBEAM_ENDENTITY;
-			beam.numAttachments	= pbeam->m_nNumBeamEnts;
-			for (int i=0;i<beam.numAttachments;i++)
-			{
-				beam.entity[i]		= pbeam->m_hAttachEntity[i];
-				beam.attachmentIndex[i]	= pbeam->m_nAttachIndex[i];
-			}
-			break;
-		}
-		case BEAM_ENTPOINT:
-		{
-			beam.type			= TE_BEAMPOINTS;
-			beam.flags = 0;
-			beam.entity[0]		= pbeam->m_hAttachEntity[0];
-			beam.attachmentIndex[0]	= pbeam->m_nAttachIndex[0];
-			beam.entity[1]		= pbeam->m_hAttachEntity[1];
-			beam.attachmentIndex[1]	= pbeam->m_nAttachIndex[1];
-			if ( beam.entity[0].Get() )
-			{
-				beam.flags |= FBEAM_STARTENTITY;
-			}
-			if ( beam.entity[1].Get() )
-			{
-				beam.flags |= FBEAM_ENDENTITY;
-			}
-			beam.numAttachments	= pbeam->m_nNumBeamEnts;
-			break;
-		}
-		case BEAM_POINTS:
-			// Already set up
-			break;
-	}
-
-	beam.flags |= pbeam->GetBeamFlags() & (FBEAM_SINENOISE|FBEAM_SOLID|FBEAM_SHADEIN|FBEAM_SHADEOUT|FBEAM_NOTILE);
-
-	if ( beam.entity[0] )
-	{
-		// don't draw viewmodel effects in reflections
-		if ( CurrentViewID() == VIEW_REFLECTION )
-		{
-			int group = beam.entity[0]->GetRenderGroup();
-			if (group == RENDER_GROUP_VIEW_MODEL_TRANSLUCENT || group == RENDER_GROUP_VIEW_MODEL_OPAQUE)
-				return;
-		}
-	}
-
-	beam.m_flHDRColorScale = pbeam->GetHDRColorScale();
-
-	// Draw it
-	UpdateBeam( &beam, gpGlobals->frametime );
-	DrawBeam( &beam );
-}

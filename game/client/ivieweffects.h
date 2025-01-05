@@ -16,6 +16,8 @@
 #pragma once
 #endif
 
+#include "shake.h"
+
 class Vector;
 class QAngle;
 class bf_read;

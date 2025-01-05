@@ -29,8 +29,6 @@ class IScreenSpaceEffect;
 class CClientViewSetup;
 class CViewRender;
 struct ClientWorldListInfo_t;
-class C_BaseEntity;
-class C_BasePlayer;
 struct WriteReplayScreenshotParams_t;
 class CReplayScreenshotTaker;
 
@@ -379,8 +377,8 @@ public:
 
 	virtual void	GetScreenFadeDistances( float *min, float *max );
 
-	virtual C_BaseEntity *GetCurrentlyDrawingEntity();
-	virtual void		  SetCurrentlyDrawingEntity( C_BaseEntity *pEnt );
+	virtual IClientEntity *GetCurrentlyDrawingEntity();
+	virtual void		  SetCurrentlyDrawingEntity( IClientEntity *pEnt );
 
 	virtual bool		UpdateShadowDepthTexture( ITexture *pRenderTarget, ITexture *pDepthTexture, const CViewSetup &shadowView );
 
@@ -416,7 +414,7 @@ private:
 
 	void			DrawMonitors( const CViewSetup &cameraView );
 
-	bool			DrawOneMonitor( ITexture *pRenderTarget, int cameraNum, C_PointCamera *pCameraEnt, const CViewSetup &cameraView, C_BasePlayer *localPlayer, 
+	bool			DrawOneMonitor( ITexture *pRenderTarget, int cameraNum, C_PointCamera *pCameraEnt, const CViewSetup &cameraView, IClientEntity *localPlayer, 
 						int x, int y, int width, int height );
 
 	// Drawing primitives
@@ -481,7 +479,7 @@ private:
 	bool				m_bDrawOverlay;
 
 	int					m_BaseDrawFlags;	// Set in ViewDrawScene and OR'd into m_DrawFlags as it goes.
-	C_BaseEntity		*m_pCurrentlyDrawingEntity;
+	IClientEntity		*m_pCurrentlyDrawingEntity;
 
 #if defined( CSTRIKE_DLL )
 	float				m_flLastFOV;

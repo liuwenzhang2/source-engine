@@ -10,6 +10,7 @@
 #define ICLIENTMODE_H
 
 #include <vgui/VGUI.h>
+#include "inputsystem/ButtonCode.h"
 #include "client_virtualreality.h"
 
 class CViewSetup;

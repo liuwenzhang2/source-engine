@@ -99,11 +99,6 @@ public:
 
 	virtual void	GetAimEntOrigin( IClientEntity *pAttachedTo, Vector *pAbsOrigin, QAngle *pAbsAngles );
 
-
-
-	// Gets the hitbox-to-world transforms, returns false if there was a problem
-	bool HitboxToWorldTransforms(const matrix3x4_t *pHitboxToWorld[MAXSTUDIOBONES] );
-
 	// base model functionality
 	float		  ClampCycle( float cycle, bool isLooping );
 

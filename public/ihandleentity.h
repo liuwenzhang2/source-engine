@@ -46,6 +46,7 @@ public:
 	virtual const string_t& GetClassname() const = 0;
 	virtual const string_t& GetGlobalname() const = 0;
 	virtual int GetFlags(void) const = 0;
+	virtual void AddEFlags(int nEFlagMask) = 0;
 	virtual bool IsEFlagSet(int nEFlagMask) const = 0;
 	virtual IEngineObject* GetMoveParent(void) const = 0;
 	//virtual void SetMoveParent(IEngineObjectServer* hMoveParent) = 0;
@@ -174,6 +175,7 @@ public:
 	virtual Vector EarPosition(void) { return EyePosition(); }// position of ears
 	virtual Vector Weapon_ShootPosition() { return EyePosition(); }
 	virtual int GetWaterLevel() const { return 0; }
+	virtual ITraceFilter* GetBeamTraceFilter(void) { return NULL; }
 };
 
 abstract_class IEntityCallBack{

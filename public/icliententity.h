@@ -37,6 +37,7 @@ typedef unsigned int HTOOLHANDLE;
 class CUserCmd;
 class IClientEntity;
 class IClientGameRules;
+struct fogparams_t;
 
 class VarMapEntry_t
 {
@@ -585,6 +586,7 @@ public:
 	virtual void GetHitboxBoneTransform(int iBone, matrix3x4_t& pBoneToWorld) = 0;
 	virtual void GetHitboxBoneTransforms(const matrix3x4_t* hitboxbones[MAXSTUDIOBONES]) = 0;
 	virtual void GetHitboxBonePosition(int iBone, Vector& origin, QAngle& angles) = 0;
+	virtual bool HitboxToWorldTransforms(const matrix3x4_t* pHitboxToWorld[MAXSTUDIOBONES]) = 0;
 	virtual bool GetRootBone(matrix3x4_t& rootBone) = 0;
 	virtual bool GetAimEntOrigin(Vector* pAbsOrigin, QAngle* pAbsAngles) = 0;
 	virtual void InvalidateBoneCache() = 0;
@@ -949,6 +951,7 @@ public:
 	virtual RenderGroup_t GetRenderGroup() = 0;
 	virtual IClientEntity* GetRenderedWeaponModel() = 0;
 	virtual int GetWorldModelIndex(void) = 0;
+	virtual fogparams_t* GetFogParams(void) = 0;
 	virtual int DrawModel(int flags) = 0;
 
 	virtual void RecordToolMessage() = 0;
@@ -963,6 +966,7 @@ public:
 	virtual float GetAttackDamageScale(IHandleEntity* pVictim) = 0;
 	virtual int GetWaterLevel() const = 0;
 	virtual int GetTeamNumber(void) const = 0;
+	virtual ITraceFilter* GetBeamTraceFilter(void) = 0;
 };
 
 #define INPVS_YES			0x0001		// The entity thinks it's in the PVS.

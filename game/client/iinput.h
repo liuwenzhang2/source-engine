@@ -11,6 +11,8 @@
 #pragma once
 #endif
 
+#include "inputsystem/ButtonCode.h"
+
 class bf_write;
 class bf_read;
 class CUserCmd;

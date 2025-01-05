@@ -85,8 +85,8 @@ public:
 	const Vector &GetAbsStartPos( void ) const;
 	const Vector &GetAbsEndPos( void ) const;
 
-	void SetStartEntity( CBaseEntity *pEntity );
-	void SetEndEntity( CBaseEntity *pEntity );
+	void SetStartEntity( IHandleEntity *pEntity );
+	void SetEndEntity( IHandleEntity *pEntity );
 
 	void SetStartAttachment( int attachment );
 	void SetEndAttachment( int attachment );
@@ -112,9 +112,9 @@ public:
 
 	int	GetType( void ) const;
 	int	GetBeamFlags( void ) const;
-	CBaseEntity* GetStartEntityPtr( void ) const;
+	IHandleEntity* GetStartEntityPtr( void ) const;
 	int	GetStartEntity( void ) const;
-	CBaseEntity* GetEndEntityPtr( void ) const;
+	IHandleEntity* GetEndEntityPtr( void ) const;
 	int	GetEndEntity( void ) const;
 	int GetStartAttachment() const;
 	int GetEndAttachment() const;
@@ -169,6 +169,7 @@ public:
 #if defined( CLIENT_DLL )
 // IClientEntity overrides.
 public:
+	virtual void		DrawBeam(C_Beam* pbeam, ITraceFilter* pEntityBeamTraceFilter = NULL);
 	virtual int			DrawModel( int flags );
 	virtual bool		IsTransparent( void );
 	virtual bool		ShouldDraw();
@@ -217,7 +218,7 @@ private:
 	CNetworkVar( int, m_nHaloIndex );
 	CNetworkVar( int, m_nBeamType );
 	CNetworkVar( int, m_nBeamFlags );
-	CNetworkArray( EHANDLE, m_hAttachEntity, MAX_BEAM_ENTS );
+	CNetworkArray( CHandle<IHandleEntity>, m_hAttachEntity, MAX_BEAM_ENTS );
 	CNetworkArray( int, m_nAttachIndex, MAX_BEAM_ENTS );
 	CNetworkVar( float, m_fWidth );
 	CNetworkVar( float, m_fEndWidth );
@@ -356,25 +357,25 @@ inline void CBeam::SetScrollRate( int speed )
 	m_fSpeed = speed; 
 }
 
-inline CBaseEntity* CBeam::GetStartEntityPtr( void ) const 
+inline IHandleEntity* CBeam::GetStartEntityPtr( void ) const
 { 
 	return m_hAttachEntity[0].Get(); 
 }
 
 inline int CBeam::GetStartEntity( void ) const 
 { 
-	CBaseEntity *pEntity = m_hAttachEntity[0].Get();
+	IHandleEntity *pEntity = m_hAttachEntity[0].Get();
 	return pEntity ? pEntity->entindex() : 0; 
 }
 
-inline CBaseEntity* CBeam::GetEndEntityPtr( void ) const 
+inline IHandleEntity* CBeam::GetEndEntityPtr( void ) const 
 { 
 	return m_hAttachEntity[1].Get(); 
 }
 
 inline int CBeam::GetEndEntity( void ) const	
 { 
-	CBaseEntity *pEntity = m_hAttachEntity[m_nNumBeamEnts-1].Get();
+	IHandleEntity *pEntity = m_hAttachEntity[m_nNumBeamEnts-1].Get();
 	return pEntity ? pEntity->entindex() : 0; 
 }
 
@@ -454,10 +455,6 @@ bool IsStaticPointEntity( CBaseEntity *pEnt );
 
 //#define BEAM_CREATE_PREDICTABLE_PERSIST( name, width, player ) \
 //	CBeam::BeamCreatePredictable( __FILE__, __LINE__, true, name, width, player )
-
-// Start/End Entity is encoded as 12 bits of entity index, and 4 bits of attachment (4:12)
-#define BEAMENT_ENTITY(x)		((x)&0xFFF)
-#define BEAMENT_ATTACHMENT(x)	(((x)>>12)&0xF)
 
 
 // Beam types, encoded as a byte

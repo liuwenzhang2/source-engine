@@ -176,7 +176,7 @@ void C_EntityParticleTrail::Update( float fTimeDelta )
 	if (!pAnimating)
 		goto trailNoHitboxes;
 
-	if ( !pAnimating->HitboxToWorldTransforms( hitboxbones ) )
+	if ( !pAnimating->GetEngineObject()->HitboxToWorldTransforms( hitboxbones ) )
 		goto trailNoHitboxes;
 
 	pStudioHdr = modelinfo->GetStudiomodel( pAnimating->GetEngineObject()->GetModel() );

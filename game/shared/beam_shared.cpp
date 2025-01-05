@@ -21,7 +21,7 @@
 #include "iclientmode.h"
 #include "viewrender.h"
 #include "view.h"
-
+#include "beamdraw.h"
 #ifdef PORTAL
 	#include "c_prop_portal.h"
 #endif //ifdef PORTAL
@@ -78,7 +78,7 @@ bool IsStaticPointEntity( CBaseEntity *pEnt )
 }
 
 #if defined( CLIENT_DLL )
-extern bool ComputeBeamEntPosition( CBaseEntity *pEnt, int nAttachment, bool bInterpretAttachmentIndexAsHitboxIndex, Vector& pt );
+extern bool ComputeBeamEntPosition( IClientEntity *pEnt, int nAttachment, bool bInterpretAttachmentIndexAsHitboxIndex, Vector& pt );
 
 void RecvProxy_Beam_ScrollSpeed( const CRecvProxyData *pData, void *pStruct, void *pOut )
 {
@@ -419,20 +419,20 @@ int CBeam::GetBeamFlags( void ) const
 	return m_nBeamFlags;
 }
 
-void CBeam::SetStartEntity( CBaseEntity *pEntity )
+void CBeam::SetStartEntity( IHandleEntity *pEntity )
 { 
 	Assert( m_nNumBeamEnts >= 2 );
 	m_hAttachEntity.Set( 0, pEntity );
-	SetOwnerEntity( pEntity );
+	SetOwnerEntity( (CBaseEntity*)pEntity );
 	RelinkBeam();
 	pEntity->GetEngineObject()->AddEFlags( EFL_FORCE_CHECK_TRANSMIT );
 }
 
-void CBeam::SetEndEntity( CBaseEntity *pEntity ) 
+void CBeam::SetEndEntity( IHandleEntity *pEntity ) 
 { 
 	Assert( m_nNumBeamEnts >= 2 );
 	m_hAttachEntity.Set( m_nNumBeamEnts-1, pEntity );
-	m_hEndEntity = pEntity;
+	m_hEndEntity = (CBaseEntity*)pEntity;
 	RelinkBeam();
 	pEntity->GetEngineObject()->AddEFlags( EFL_FORCE_CHECK_TRANSMIT );
 }
@@ -517,7 +517,7 @@ const Vector &C_Beam::GetAbsStartPos( void ) const
 	static Vector vecStartAbsPosition;
 	if ( GetType() != BEAM_POINTS && GetType() != BEAM_HOSE ) 
 	{
-		if (ComputeBeamEntPosition( m_hAttachEntity[0], m_nAttachIndex[0], false, vecStartAbsPosition ))
+		if (ComputeBeamEntPosition( (IClientEntity*)m_hAttachEntity[0].Get(), m_nAttachIndex[0], false, vecStartAbsPosition))
 			return vecStartAbsPosition;
 	}
 
@@ -530,7 +530,7 @@ const Vector &C_Beam::GetAbsEndPos( void ) const
 	static Vector vecEndAbsPosition;
 	if ( GetType() != BEAM_POINTS && GetType() != BEAM_HOSE ) 
 	{
-		if (ComputeBeamEntPosition( m_hAttachEntity[m_nNumBeamEnts-1], m_nAttachIndex[m_nNumBeamEnts-1], false, vecEndAbsPosition ))
+		if (ComputeBeamEntPosition( (IClientEntity*)m_hAttachEntity[m_nNumBeamEnts-1].Get(), m_nAttachIndex[m_nNumBeamEnts - 1], false, vecEndAbsPosition))
 			return vecEndAbsPosition;
 	}
 
@@ -698,7 +698,7 @@ void CBeam::RelinkBeam( void )
 	bool bUseExtraPoints = false;
 
 #ifdef PORTAL
-	CBaseEntity *pStartEntity = GetStartEntityPtr();
+	IHandleEntity *pStartEntity = GetStartEntityPtr();
 	
 	CTraceFilterSkipClassname traceFilter( pStartEntity, "prop_energy_ball", COLLISION_GROUP_NONE );
 	
@@ -887,7 +887,7 @@ void CBeam::SetTransmit( CCheckTransmitInfo *pInfo, bool bAlways )
 	{
 		if ( m_hAttachEntity[i].Get() )
 		{
-			m_hAttachEntity[i]->SetTransmit( pInfo, bAlways );
+			((IServerEntity*)m_hAttachEntity[i].Get())->SetTransmit( pInfo, bAlways );
 		}
 	}
 }
@@ -968,6 +968,243 @@ int CBeam::DrawDebugTextOverlays(void)
 
 extern bool g_bRenderingScreenshot;
 extern ConVar r_drawviewmodel;
+#ifdef PORTAL
+bool bBeamDrawingThroughPortal = false;
+#endif
+void CBeam::DrawBeam(C_Beam* pbeam, ITraceFilter* pEntityBeamTraceFilter)
+{
+
+	Beam_t beam;
+
+	// Set up the beam.
+	int beamType = pbeam->GetType();
+
+	BeamInfo_t beamInfo;
+	beamInfo.m_vecStart = pbeam->GetAbsStartPos();
+	beamInfo.m_vecEnd = pbeam->GetAbsEndPos();
+	beamInfo.m_pStartEnt = beamInfo.m_pEndEnt = NULL;
+	beamInfo.m_nModelIndex = pbeam->GetEngineObject()->GetModelIndex();
+	beamInfo.m_nHaloIndex = pbeam->m_nHaloIndex;
+	beamInfo.m_flHaloScale = pbeam->m_fHaloScale;
+	beamInfo.m_flLife = 0;
+	beamInfo.m_flWidth = pbeam->GetWidth();
+	beamInfo.m_flEndWidth = pbeam->GetEndWidth();
+	beamInfo.m_flFadeLength = pbeam->GetFadeLength();
+	beamInfo.m_flAmplitude = pbeam->GetNoise();
+	beamInfo.m_flBrightness = pbeam->GetFxBlend();
+	beamInfo.m_flSpeed = pbeam->GetScrollRate();
+
+#ifdef PORTAL	// Beams need to recursively draw through portals
+	// Trace to see if we've intersected a portal
+	float fEndFraction;
+	Ray_t rayBeam;
+
+	bool bIsReversed = (pbeam->GetBeamFlags() & FBEAM_REVERSED) != 0x0;
+
+	Vector vRayStartPoint, vRayEndPoint;
+
+	vRayStartPoint = beamInfo.m_vecStart;
+	vRayEndPoint = beamInfo.m_vecEnd;
+
+	if (beamType == BEAM_ENTPOINT || beamType == BEAM_ENTS || beamType == BEAM_LASER)
+	{
+		ComputeBeamEntPosition((IClientEntity*)pbeam->m_hAttachEntity[0].Get(), pbeam->m_nAttachIndex[0], false, vRayStartPoint);
+		ComputeBeamEntPosition((IClientEntity*)pbeam->m_hAttachEntity[1].Get(), pbeam->m_nAttachIndex[1], false, vRayEndPoint);
+	}
+
+	if (!bIsReversed)
+		rayBeam.Init(vRayStartPoint, vRayEndPoint);
+	else
+		rayBeam.Init(vRayEndPoint, vRayStartPoint);
+
+	IHandleEntity* pStartEntity = pbeam->GetStartEntityPtr();
+
+	CTraceFilterSkipClassname traceFilter(pStartEntity, "prop_energy_ball", COLLISION_GROUP_NONE);
+
+	if (!pEntityBeamTraceFilter && pStartEntity)
+		pEntityBeamTraceFilter = pStartEntity->GetBeamTraceFilter();
+
+	CTraceFilterChain traceFilterChain(&traceFilter, pEntityBeamTraceFilter);
+
+	IEnginePortalClient* pPortal = (IEnginePortalClient*)UTIL_Portal_TraceRay_Beam(EntityList(), rayBeam, MASK_SHOT, &traceFilterChain, &fEndFraction);
+
+	// Get the point that we hit a portal or wall
+	Vector vEndPoint = rayBeam.m_Start + rayBeam.m_Delta * fEndFraction;
+
+	if (pPortal)
+	{
+		// Prevent infinite recursion by lower the brightness each call
+		int iOldBrightness = pbeam->GetBrightness();
+
+		if (iOldBrightness > 16)
+		{
+			// Remember the old values of the beam before changing it for the next call
+			Vector vOldStart = pbeam->GetAbsStartPos();
+			Vector vOldEnd = pbeam->GetAbsEndPos();
+			//float fOldWidth = pbeam->GetEndWidth();
+			IHandleEntity* pOldStartEntity = pbeam->GetStartEntityPtr();
+			IHandleEntity* pOldEndEntity = pbeam->GetEndEntityPtr();
+			int iOldStartAttachment = pbeam->GetStartAttachment();
+			int iOldEndAttachment = pbeam->GetEndAttachment();
+			int iOldType = pbeam->GetType();
+
+			// Get the transformed positions of the sub beam in the other portal's space
+			Vector vTransformedStart, vTransformedEnd;
+			VMatrix matThisToLinked = pPortal->MatrixThisToLinked();
+			UTIL_Portal_PointTransform(matThisToLinked, vEndPoint, vTransformedStart);
+			UTIL_Portal_PointTransform(matThisToLinked, rayBeam.m_Start + rayBeam.m_Delta, vTransformedEnd);
+
+			// Set up the sub beam for the next call
+			pbeam->SetBrightness(iOldBrightness - 16);
+			if (bIsReversed)
+				pbeam->PointsInit(vTransformedEnd, vTransformedStart);
+			else
+				pbeam->PointsInit(vTransformedStart, vTransformedEnd);
+			if (bIsReversed)
+				pbeam->SetEndWidth(pbeam->GetWidth());
+			pbeam->SetStartEntity((C_BaseEntity*)pPortal->GetLinkedPortal()->AsEngineObject()->GetOuter());
+
+			// Draw the sub beam
+			bBeamDrawingThroughPortal = true;
+			DrawBeam(pbeam, pEntityBeamTraceFilter);
+			bBeamDrawingThroughPortal = true;
+
+			// Restore the original values
+			pbeam->SetBrightness(iOldBrightness);
+			pbeam->SetStartPos(vOldStart);
+			pbeam->SetEndPos(vOldEnd);
+			//if ( bIsReversed )
+			//	pbeam->SetEndWidth( fOldWidth );
+			if (pOldStartEntity)
+				pbeam->SetStartEntity(pOldStartEntity);
+			if (pOldEndEntity)
+				pbeam->SetEndEntity(pOldEndEntity);
+			pbeam->SetStartAttachment(iOldStartAttachment);
+			pbeam->SetEndAttachment(iOldEndAttachment);
+			pbeam->SetType(iOldType);
+
+			// Doesn't use a hallow or taper the beam because we recursed
+			beamInfo.m_nHaloIndex = 0;
+			if (!bIsReversed)
+				beamInfo.m_flEndWidth = beamInfo.m_flWidth;
+		}
+	}
+
+	// Clip to the traced end point (portal or wall)
+	if (bBeamDrawingThroughPortal)
+	{
+		if (bIsReversed)
+			beamInfo.m_vecStart = vEndPoint;
+		else
+			beamInfo.m_vecEnd = vEndPoint;
+	}
+
+	bBeamDrawingThroughPortal = false;
+#endif
+
+	beams->SetupBeam(&beam, beamInfo);
+
+	beamInfo.m_nStartFrame = pbeam->m_fStartFrame;
+	beamInfo.m_flFrameRate = pbeam->m_flFrameRate;
+	beamInfo.m_flRed = pbeam->m_clrRender->r;
+	beamInfo.m_flGreen = pbeam->m_clrRender->g;
+	beamInfo.m_flBlue = pbeam->m_clrRender->b;
+
+	beams->SetBeamAttributes(&beam, beamInfo);
+
+	if (pbeam->m_nHaloIndex > 0)
+	{
+		// HACKHACK: heuristic to estimate proxy size.  Revisit this!
+		float size = 1.0f + (pbeam->m_fHaloScale * pbeam->m_fWidth / pbeam->m_fEndWidth);
+		size = clamp(size, 1.0f, 8.0f);
+		beam.m_queryHandleHalo = &pbeam->m_queryHandleHalo;
+		beam.m_haloProxySize = size;
+	}
+	else
+	{
+		beam.m_queryHandleHalo = NULL;
+	}
+
+	// Handle code from relinking.
+	switch (beamType)
+	{
+	case BEAM_ENTS:
+	{
+		beam.type = TE_BEAMPOINTS;
+		beam.flags = FBEAM_STARTENTITY | FBEAM_ENDENTITY;
+		beam.entity[0] = pbeam->m_hAttachEntity[0];
+		beam.attachmentIndex[0] = pbeam->m_nAttachIndex[0];
+		beam.entity[1] = pbeam->m_hAttachEntity[1];
+		beam.attachmentIndex[1] = pbeam->m_nAttachIndex[1];
+		beam.numAttachments = pbeam->m_nNumBeamEnts;
+		break;
+	}
+	case BEAM_LASER:
+	{
+		beam.type = TE_BEAMLASER;
+		beam.flags = FBEAM_STARTENTITY | FBEAM_ENDENTITY;
+		beam.entity[0] = pbeam->m_hAttachEntity[0];
+		beam.attachmentIndex[0] = pbeam->m_nAttachIndex[0];
+		beam.entity[1] = pbeam->m_hAttachEntity[1];
+		beam.attachmentIndex[1] = pbeam->m_nAttachIndex[1];
+		beam.numAttachments = pbeam->m_nNumBeamEnts;
+		break;
+	}
+	case BEAM_SPLINE:
+	{
+		beam.type = TE_BEAMSPLINE;
+		beam.flags = FBEAM_STARTENTITY | FBEAM_ENDENTITY;
+		beam.numAttachments = pbeam->m_nNumBeamEnts;
+		for (int i = 0; i < beam.numAttachments; i++)
+		{
+			beam.entity[i] = pbeam->m_hAttachEntity[i];
+			beam.attachmentIndex[i] = pbeam->m_nAttachIndex[i];
+		}
+		break;
+	}
+	case BEAM_ENTPOINT:
+	{
+		beam.type = TE_BEAMPOINTS;
+		beam.flags = 0;
+		beam.entity[0] = pbeam->m_hAttachEntity[0];
+		beam.attachmentIndex[0] = pbeam->m_nAttachIndex[0];
+		beam.entity[1] = pbeam->m_hAttachEntity[1];
+		beam.attachmentIndex[1] = pbeam->m_nAttachIndex[1];
+		if (beam.entity[0].Get())
+		{
+			beam.flags |= FBEAM_STARTENTITY;
+		}
+		if (beam.entity[1].Get())
+		{
+			beam.flags |= FBEAM_ENDENTITY;
+		}
+		beam.numAttachments = pbeam->m_nNumBeamEnts;
+		break;
+	}
+	case BEAM_POINTS:
+		// Already set up
+		break;
+	}
+
+	beam.flags |= pbeam->GetBeamFlags() & (FBEAM_SINENOISE | FBEAM_SOLID | FBEAM_SHADEIN | FBEAM_SHADEOUT | FBEAM_NOTILE);
+
+	if (beam.entity[0])
+	{
+		// don't draw viewmodel effects in reflections
+		if (CurrentViewID() == VIEW_REFLECTION)
+		{
+			int group = beam.entity[0]->GetRenderGroup();
+			if (group == RENDER_GROUP_VIEW_MODEL_TRANSLUCENT || group == RENDER_GROUP_VIEW_MODEL_OPAQUE)
+				return;
+		}
+	}
+
+	beam.m_flHDRColorScale = pbeam->GetHDRColorScale();
+
+	// Draw it
+	beams->UpdateBeam(&beam, gpGlobals->frametime);
+	beams->DrawBeam(&beam);
+}
 
 int CBeam::DrawModel( int flags )
 {
@@ -1003,7 +1240,7 @@ int CBeam::DrawModel( int flags )
 		}
 	}
 
-	beams->DrawBeam( this );
+	DrawBeam( this );//beams->
 	return 0;
 }
 
@@ -1017,7 +1254,7 @@ void CBeam::OnDataChanged( DataUpdateType_t updateType )
 	// Convert weapon world models to viewmodels if they're weapons being carried by the local player
 	for (int i=0;i<MAX_BEAM_ENTS;i++)
 	{
-		C_BaseEntity *pEnt = m_hAttachEntity[i].Get();
+		IHandleEntity *pEnt = m_hAttachEntity[i].Get();
 		if ( pEnt )
 		{
 			C_BaseCombatWeapon *pWpn = dynamic_cast<C_BaseCombatWeapon *>(pEnt);
@@ -1094,7 +1331,7 @@ void CBeam::ComputeBounds( Vector& mins, Vector& maxs )
 	Vector vecAbsExtra1, vecAbsExtra2;
 
 #ifdef PORTAL
-	CBaseEntity *pStartEntity = GetStartEntityPtr();
+	IHandleEntity *pStartEntity = GetStartEntityPtr();
 
 	CTraceFilterSkipClassname traceFilter( pStartEntity, "prop_energy_ball", COLLISION_GROUP_NONE );
 
@@ -1120,7 +1357,7 @@ void CBeam::ComputeBounds( Vector& mins, Vector& maxs )
 			maxs.Init( -99999, -99999, -99999 );
 			for (int i = 0; i < m_nNumBeamEnts; ++i )
 			{
-				C_BaseEntity *pTestEnt = m_hAttachEntity[i].Get();
+				IHandleEntity *pTestEnt = m_hAttachEntity[i].Get();
 				if ( pTestEnt )
 				{
 					if ( pTestEnt == this )
@@ -1131,7 +1368,7 @@ void CBeam::ComputeBounds( Vector& mins, Vector& maxs )
 					{
 						// We do this so we don't have to calculate attachments (and do expensive bone-setup calculations) on our attachments.
 						Vector attMins, attMaxs;
-						m_hAttachEntity[i]->GetRenderBoundsWorldspace( attMins, attMaxs );
+						((IClientEntity*)m_hAttachEntity[i].Get())->GetRenderBoundsWorldspace( attMins, attMaxs );
 
 						mins = mins.Min( attMins );
 						mins = mins.Min( attMaxs );

@@ -29,7 +29,7 @@ inline const matrix3x4_t& CLocalSpaceEmitter::GetTransformMatrix() const
 // Purpose: Creates a local space emitter
 //-----------------------------------------------------------------------------
 CSmartPtr<CLocalSpaceEmitter> CLocalSpaceEmitter::Create( const char *pDebugName, 
-	C_BaseEntity* hEntity, int nAttachment, int fFlags )
+	IClientEntity* hEntity, int nAttachment, int fFlags )
 {
 	CLocalSpaceEmitter *pRet = new CLocalSpaceEmitter( pDebugName );
 	pRet->SetDynamicallyAllocated( true );

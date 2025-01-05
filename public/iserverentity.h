@@ -1081,6 +1081,7 @@ public:
 	virtual int GetWaterLevel() const = 0;
 	virtual int GetWaterType() const = 0;
 	virtual void UpdateWaterState() = 0;
+	virtual ITraceFilter* GetBeamTraceFilter(void) = 0;
 	static bool IsServer(void) { return true; }
 };
 

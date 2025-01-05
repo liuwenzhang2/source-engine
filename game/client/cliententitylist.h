@@ -1044,6 +1044,8 @@ public:
 	void GetHitboxBoneTransform(int iBone, matrix3x4_t& pBoneToWorld);
 	void GetHitboxBoneTransforms(const matrix3x4_t* hitboxbones[MAXSTUDIOBONES]);
 	void GetHitboxBonePosition(int iBone, Vector& origin, QAngle& angles);
+	// Gets the hitbox-to-world transforms, returns false if there was a problem
+	bool HitboxToWorldTransforms(const matrix3x4_t* pHitboxToWorld[MAXSTUDIOBONES]);
 	void GetBoneCache(IStudioHdr* pStudioHdr);
 	bool GetRootBone(matrix3x4_t& rootBone);
 	bool GetAimEntOrigin(Vector* pAbsOrigin, QAngle* pAbsAngles);

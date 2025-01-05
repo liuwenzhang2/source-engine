@@ -113,7 +113,7 @@ void FX_RicochetSound( const Vector& pos )
 //			*angles - 
 // Output : Returns true on success, false on failure.
 //-----------------------------------------------------------------------------
-bool FX_GetAttachmentTransform(C_BaseEntity* hEntity, int attachmentIndex, Vector *origin, QAngle *angles )
+bool FX_GetAttachmentTransform(IClientEntity* hEntity, int attachmentIndex, Vector *origin, QAngle *angles )
 {
 	// Validate our input
 	if ( ( hEntity == NULL ) || ( attachmentIndex < 1 ) )
@@ -163,7 +163,7 @@ bool FX_GetAttachmentTransform(C_BaseEntity* hEntity, int attachmentIndex, Vecto
 //			attachmentIndex - 
 //			&transform - 
 //-----------------------------------------------------------------------------
-bool FX_GetAttachmentTransform(C_BaseEntity* hEntity, int attachmentIndex, matrix3x4_t &transform )
+bool FX_GetAttachmentTransform(IClientEntity* hEntity, int attachmentIndex, matrix3x4_t &transform )
 {
 	Vector	origin;
 	QAngle	angles;
@@ -186,7 +186,7 @@ void FX_MuzzleEffect(
 	const Vector &origin, 
 	const QAngle &angles, 
 	float scale, 
-	C_BaseEntity* hEntity, 
+	IClientEntity* hEntity,
 	unsigned char *pFlashColor,
 	bool bOneFrame )
 {
@@ -297,7 +297,7 @@ void FX_MuzzleEffect(
 //-----------------------------------------------------------------------------
 void FX_MuzzleEffectAttached( 
 	float scale, 
-	C_BaseEntity* hEntity, 
+	IClientEntity* hEntity,
 	int attachmentIndex, 
 	unsigned char *pFlashColor,
 	bool bOneFrame )
@@ -380,7 +380,7 @@ void FX_MuzzleEffectAttached(
 	if ( !clienttools->IsInRecordingMode() )
 		return;
 
-	C_BaseEntity *pEnt = hEntity;//EntityList()->GetBaseEntityFromHandle( 
+	IClientEntity*pEnt = hEntity;//EntityList()->GetBaseEntityFromHandle( 
 	if ( pEnt )
 	{
 		pEnt->RecordToolMessage();
@@ -1270,7 +1270,7 @@ void FX_BuildTeslaHitbox( const CEffectData &data )
 		return;
 	}
 	const matrix3x4_t	*hitboxbones[MAXSTUDIOBONES];
-	if ( !pAnimating->HitboxToWorldTransforms( hitboxbones ) )
+	if ( !pAnimating->GetEngineObject()->HitboxToWorldTransforms( hitboxbones ) )
 		return;
 
 	int nBeamCount = (int)(data.m_flMagnitude + 0.5f);

@@ -266,7 +266,7 @@ public:
 
 	// Determine the color modulation amount
 	virtual void					GetColorModulation(float* color);
-
+	virtual fogparams_t*			GetFogParams(void) { return NULL; }
 	virtual void OnThreadedDrawSetup() {}
 public:
 	virtual bool					TestCollision(const Ray_t& ray, unsigned int fContentsMask, trace_t& tr);

@@ -54,9 +54,7 @@ enum DrawFlags_t
 // Purpose: View setup and rendering
 //-----------------------------------------------------------------------------
 class CViewSetup;
-class C_BaseEntity;
 struct vrect_t;
-class C_BaseViewModel;
 struct WriteReplayScreenshotParams_t;
 class IReplayScreenshotSystem;
 
@@ -130,8 +128,8 @@ public:
 
 	virtual void		GetScreenFadeDistances( float *min, float *max ) = 0;
 
-	virtual C_BaseEntity *GetCurrentlyDrawingEntity() = 0;
-	virtual void		SetCurrentlyDrawingEntity( C_BaseEntity *pEnt ) = 0;
+	virtual IClientEntity *GetCurrentlyDrawingEntity() = 0;
+	virtual void		SetCurrentlyDrawingEntity( IClientEntity *pEnt ) = 0;
 
 	virtual bool		UpdateShadowDepthTexture( ITexture *pRenderTarget, ITexture *pDepthTexture, const CViewSetup &shadowView ) = 0;
 

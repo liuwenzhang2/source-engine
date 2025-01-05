@@ -1279,12 +1279,12 @@ void CViewRender::GetScreenFadeDistances( float *min, float *max )
 	}
 }
 
-C_BaseEntity *CViewRender::GetCurrentlyDrawingEntity()
+IClientEntity *CViewRender::GetCurrentlyDrawingEntity()
 {
 	return m_pCurrentlyDrawingEntity;
 }
 
-void CViewRender::SetCurrentlyDrawingEntity( C_BaseEntity *pEnt )
+void CViewRender::SetCurrentlyDrawingEntity( IClientEntity *pEnt )
 {
 	m_pCurrentlyDrawingEntity = pEnt;
 }
@@ -3027,7 +3027,7 @@ void CViewRender::ViewDrawScene_Intro( const CViewSetup &view, int nClearFlags, 
 // Output : Returns true on success, false on failure.
 //-----------------------------------------------------------------------------
 bool CViewRender::DrawOneMonitor( ITexture *pRenderTarget, int cameraNum, C_PointCamera *pCameraEnt, 
-	const CViewSetup &cameraView, C_BasePlayer *localPlayer, int x, int y, int width, int height )
+	const CViewSetup &cameraView, IClientEntity *localPlayer, int x, int y, int width, int height )
 {
 #ifdef USE_MONITORS
 	VPROF_INCREMENT_COUNTER( "cameras rendered", 1 );

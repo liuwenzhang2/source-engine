@@ -4,7 +4,8 @@
 //
 //===========================================================================//
 
-#include "cbase.h"
+//#include "cbase.h"
+#include "convar.h"
 #include "view.h"
 #include "iviewrender.h"
 #include "iviewrender_beams.h"

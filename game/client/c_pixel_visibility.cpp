@@ -6,7 +6,8 @@
 //
 //===========================================================================//
 
-#include "cbase.h"
+#include "engine/ICollideable.h"
+#include "cdll_client_int.h"
 #include "c_pixel_visibility.h"
 #include "materialsystem/imesh.h"
 #include "materialsystem/imaterial.h"
@@ -17,6 +18,9 @@
 #include "vprof.h"
 #include "icommandline.h"
 #include "sourcevr/isourcevirtualreality.h"
+#include "shared_classnames.h"
+#include "c_baseentity.h"
+#include "util_shared.h"
 
 static void PixelvisDrawChanged( IConVar *pPixelvisVar, const char *pOld, float flOldValue );
 
@@ -783,7 +787,7 @@ public:
 float GlowSightDistance( const Vector &glowOrigin, bool bShouldTrace )
 {
 	float dist = (glowOrigin - CurrentViewOrigin()).Length();
-	C_BasePlayer *local = (C_BasePlayer*)EntityList()->GetLocalPlayer();
+	IClientEntity *local = EntityList()->GetLocalPlayer();
 	if ( local )
 	{
 		dist *= local->GetFOVDistanceAdjustFactor();

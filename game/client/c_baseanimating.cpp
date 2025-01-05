@@ -1630,33 +1630,6 @@ int C_BaseAnimating::DrawModel( int flags )
 }
 
 //-----------------------------------------------------------------------------
-// Gets the hitbox-to-world transforms, returns false if there was a problem
-//-----------------------------------------------------------------------------
-bool C_BaseAnimating::HitboxToWorldTransforms(const matrix3x4_t *pHitboxToWorld[MAXSTUDIOBONES] )
-{
-	MDLCACHE_CRITICAL_SECTION();
-
-	if ( !GetEngineObject()->GetModel() )
-		return false;
-
-	IStudioHdr *pStudioHdr = GetEngineObject()->GetModelPtr();
-	if (!pStudioHdr)
-		return false;
-
-	mstudiohitboxset_t *set = pStudioHdr->pHitboxSet( GetHitboxSet() );
-	if ( !set )
-		return false;
-
-	if ( !set->numhitboxes )
-		return false;
-
-	GetEngineObject()->GetHitboxBoneTransforms(pHitboxToWorld);
-	return true;
-}
-
-
-
-//-----------------------------------------------------------------------------
 // 
 //-----------------------------------------------------------------------------
 void C_BaseAnimating::DoInternalDrawModel( ClientModelRenderInfo_t *pInfo, DrawModelState_t *pState, matrix3x4_t *pBoneToWorldArray )

@@ -11,6 +11,7 @@
 #pragma once
 #endif
 
+#include "platform.h"
 
 enum SolidType_t;
 class IHandleEntity;
@@ -21,7 +22,7 @@ class QAngle;
 class CGameTrace;
 typedef CGameTrace trace_t;
 class IClientUnknown;
-
+struct matrix3x4_t;
 
 
 abstract_class ICollideable

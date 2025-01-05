@@ -14,6 +14,7 @@
 #include "mathlib/vector.h"
 // common to server, too
 #include "beam_flags.h"
+#include "icliententity.h"
 #include "tempentity.h"
 
 extern void SetBeamCreationAllowed( bool state );
@@ -23,8 +24,10 @@ extern bool BeamCreationAllowed( void );
 // beam flags
 //-----------------------------------------------------------------------------
 
+// Start/End Entity is encoded as 12 bits of entity index, and 4 bits of attachment (4:12)
+#define BEAMENT_ENTITY(x)		((x)&0xFFF)
+#define BEAMENT_ATTACHMENT(x)	(((x)>>12)&0xF)
 
-class C_Beam;
 class Beam_t;
 
 //-----------------------------------------------------------------------------
@@ -48,9 +51,9 @@ struct BeamInfo_t
 	int			m_nType;
 
 	// Entities
-	C_BaseEntity* m_pStartEnt;
+	IClientEntity* m_pStartEnt;
 	int			m_nStartAttachment;
-	C_BaseEntity* m_pEndEnt;
+	IClientEntity* m_pEndEnt;
 	int			m_nEndAttachment;
 
 	// Points
@@ -118,10 +121,12 @@ public:
 	// Updates the state of the temp ent beams
 	virtual void	UpdateTempEntBeams() = 0;
 
-	virtual void	DrawBeam( C_Beam* pbeam, ITraceFilter *pEntityBeamTraceFilter = NULL ) = 0;
+	virtual void	SetupBeam(Beam_t* pBeam, const BeamInfo_t& beamInfo) = 0;
+	virtual void	SetBeamAttributes(Beam_t* pBeam, const BeamInfo_t& beamInfo) = 0;
+	virtual void	UpdateBeam(Beam_t* pbeam, float frametime) = 0;
 	virtual void	DrawBeam( Beam_t *pbeam ) = 0;
 
-	virtual void	KillDeadBeams( CBaseEntity *pEnt ) = 0;
+	virtual void	KillDeadBeams( IClientEntity *pEnt ) = 0;
 
 	// New interfaces!
 	virtual Beam_t	*CreateBeamEnts( BeamInfo_t &beamInfo ) = 0;

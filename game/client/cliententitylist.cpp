@@ -8369,6 +8369,31 @@ void C_EngineObjectInternal::GetHitboxBoneTransforms(const matrix3x4_t* hitboxbo
 }
 
 //-----------------------------------------------------------------------------
+// Gets the hitbox-to-world transforms, returns false if there was a problem
+//-----------------------------------------------------------------------------
+bool C_EngineObjectInternal::HitboxToWorldTransforms(const matrix3x4_t* pHitboxToWorld[MAXSTUDIOBONES])
+{
+	MDLCACHE_CRITICAL_SECTION();
+
+	if (!GetModel())
+		return false;
+
+	IStudioHdr* pStudioHdr = GetModelPtr();
+	if (!pStudioHdr)
+		return false;
+
+	mstudiohitboxset_t* set = pStudioHdr->pHitboxSet(GetHitboxSet());
+	if (!set)
+		return false;
+
+	if (!set->numhitboxes)
+		return false;
+
+	GetHitboxBoneTransforms(pHitboxToWorld);
+	return true;
+}
+
+//-----------------------------------------------------------------------------
 // Purpose: Get the index of the attachment point with the specified name
 //-----------------------------------------------------------------------------
 int C_EngineObjectInternal::LookupAttachment(const char* pAttachmentName)

@@ -257,7 +257,7 @@ void ToolFramework_RecordMaterialParams( IMaterial *pMaterial )
 	if ( !clienttools->IsInRecordingMode() )
 		return;
 
-	C_BaseEntity *pEnt = view->GetCurrentlyDrawingEntity();
+	IClientEntity *pEnt = view->GetCurrentlyDrawingEntity();
 	if ( !pEnt || !pEnt->GetEngineObject()->IsToolRecording() )
 		return;
 

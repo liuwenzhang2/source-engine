@@ -220,7 +220,7 @@ int C_WeaponPhysCannon::DrawModel( int flags )
 			return 0;
 
 		const matrix3x4_t	*hitboxbones[MAXSTUDIOBONES];
-		if ( !pAnimating->HitboxToWorldTransforms( hitboxbones ) )
+		if ( !pAnimating->GetEngineObject()->HitboxToWorldTransforms( hitboxbones ) )
 			return 0;
 
 		IStudioHdr *pStudioHdr = modelinfo->GetStudiomodel( pAnimating->GetEngineObject()->GetModel() );

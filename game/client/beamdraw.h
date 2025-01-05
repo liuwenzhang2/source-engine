@@ -14,6 +14,8 @@
 #include "materialsystem/imesh.h"
 #include "mathlib/vector.h"
 #include "tier2/beamsegdraw.h"
+#include "shareddefs.h"
+#include "ehandle.h"
 #include "c_pixel_visibility.h"
 
 #define NOISE_DIVISIONS		128
@@ -24,8 +26,6 @@
 
 struct model_t;
 struct BeamTrail_t;
-class C_BaseEntity;
-typedef CHandle<C_BaseEntity> EHANDLE;
 
 //-----------------------------------------------------------------------------
 // Purpose: Beams fill out this data structure
@@ -99,7 +99,7 @@ public:
 	int				segments;
 
 	// Attachment entities for the beam
-	EHANDLE			entity[MAX_BEAM_ENTS];
+	CHandle<IClientEntity> entity[MAX_BEAM_ENTS];
 	int				attachmentIndex[MAX_BEAM_ENTS];
 
 	// Model info
