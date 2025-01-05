@@ -12,8 +12,8 @@
 #endif
 
 #include "platform.h"
+#include "const.h"
 
-enum SolidType_t;
 class IHandleEntity;
 struct Ray_t;
 struct model_t;
