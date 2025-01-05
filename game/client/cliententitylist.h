@@ -4733,9 +4733,9 @@ void CClientEntityList<T>::InterpolateServerEntities()
 		m_bWasSkipping = IsSimulatingOnAlternateTicks();
 		m_bWasThreaded = IsEngineThreaded();
 
-		for (CBaseHandle handle = g_EntityList.FirstHandle(); handle != g_EntityList.InvalidHandle(); handle = g_EntityList.NextHandle(handle))
+		for (CBaseHandle handle = FirstHandle(); handle != InvalidHandle(); handle = NextHandle(handle))
 		{
-			IClientEntity* pEnt = g_EntityList.GetBaseEntityFromHandle(handle);
+			IClientEntity* pEnt = GetBaseEntityFromHandle(handle);
 			if (!pEnt)
 				continue;
 
