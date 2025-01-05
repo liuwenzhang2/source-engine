@@ -761,7 +761,7 @@ public:
 	virtual const QAngle& EyeAngles(void);		// Direction of eyes
 	virtual const QAngle& LocalEyeAngles(void);	// Direction of eyes in local space (pl.v_angle)
 	virtual Vector EarPosition(void);// position of ears
-
+	virtual float GetFOVDistanceAdjustFactor() { Error("Player should implement this!\n"); }
 	// Called by physics to see if we should avoid a collision test....
 	virtual bool		ShouldCollide(int collisionGroup, int contentsMask) const;
 	virtual	void					RefreshCollisionBounds(void);

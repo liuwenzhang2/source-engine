@@ -904,7 +904,13 @@ public:
 	virtual void EndTouch(IClientEntity* pOther) = 0;
 	virtual void StartGroundContact(IClientEntity* ground) = 0;
 	virtual void EndGroundContact(IClientEntity* ground) = 0;
-	virtual IClientEntity* BecomeRagdollOnClient() = 0;
+	virtual const Vector& WorldSpaceCenter() const = 0;
+	virtual Vector EyePosition(void) = 0;
+	virtual const QAngle& EyeAngles(void) = 0;
+	virtual const QAngle& LocalEyeAngles(void) = 0;
+	virtual Vector EarPosition(void) = 0;
+	virtual float GetFOVDistanceAdjustFactor() = 0;
+	virtual const Vector& GetViewOffset() const = 0;
 
 	virtual	void StandardBlendingRules(IStudioHdr* pStudioHdr, Vector pos[], Quaternion q[], float currentTime, int boneMask) = 0;
 	virtual void UpdateIKLocks(float currentTime) = 0;
@@ -929,12 +935,6 @@ public:
 	virtual void GetColorModulation(float* color) = 0;
 	virtual bool UsesFlexDelayedWeights() = 0;
 	virtual void SetupWeights(const matrix3x4_t* pBoneToWorld, int nFlexWeightCount, float* pFlexWeights, float* pFlexDelayedWeights) = 0;
-	virtual const Vector& WorldSpaceCenter() const = 0;
-	virtual Vector EyePosition(void) = 0;
-	virtual const QAngle& EyeAngles(void) = 0;
-	virtual const QAngle& LocalEyeAngles(void) = 0;
-	virtual Vector EarPosition(void) = 0;
-	virtual const Vector& GetViewOffset() const = 0;
 	virtual bool ShouldReceiveProjectedTextures(int flags) = 0;
 	virtual const Vector& GetRenderOrigin(void) = 0;
 	virtual const QAngle& GetRenderAngles(void) = 0;
@@ -956,6 +956,7 @@ public:
 	// Return false to indicate sound is not audible
 	virtual bool GetSoundSpatialization(SpatializationInfo_t& info) = 0;
 	virtual bool InitializeAsClientEntity(const char* pszModelName, RenderGroup_t renderGroup) = 0;
+	virtual IClientEntity* BecomeRagdollOnClient() = 0;
 	virtual int GetMaxHealth() const = 0;
 	virtual int GetHealth() const = 0;
 	virtual const char& GetTakeDamage() const = 0;

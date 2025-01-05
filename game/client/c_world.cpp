@@ -161,6 +161,12 @@ void C_World::OnDataChanged( DataUpdateType_t updateType )
 	}
 }
 
+void C_World::PostDataUpdate(DataUpdateType_t updateType)
+{
+	ConVarRef cl_detail_sprite_material("cl_detail_sprite_material");
+	cl_detail_sprite_material.SetValue(m_iszDetailSpriteMaterial);
+}
+
 void C_World::RegisterSharedActivities( void )
 {
 	ActivityList_RegisterSharedActivities();

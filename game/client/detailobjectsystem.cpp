@@ -30,14 +30,15 @@
 #include "playerenumerator.h"
 #endif
 
+#include "clientleafsystem.h"
 #include "sharedInterface.h"
 #include "cdll_client_int.h"
 #include "view.h"
 #include "iviewrender.h"
 #include "clientmode.h"
 #include "detailobjectsystem.h"
-#include "c_baseplayer.h"
-#include "c_world.h"
+//#include "c_baseplayer.h"
+//#include "c_world.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
@@ -52,6 +53,7 @@ struct model_t;
 
 ConVar cl_detaildist( "cl_detaildist", "1200", 0, "Distance at which detail props are no longer visible" );
 ConVar cl_detailfade( "cl_detailfade", "400", 0, "Distance across which detail props fade in" );
+ConVar cl_detail_sprite_material("cl_detail_sprite_material", DETAIL_SPRITE_MATERIAL, 0, "Material of detail props");
 #if defined( USE_DETAIL_SHAPES ) 
 ConVar cl_detail_max_sway( "cl_detail_max_sway", "0", FCVAR_ARCHIVE, "Amplitude of the detail prop sway" );
 ConVar cl_detail_avoid_radius( "cl_detail_avoid_radius", "0", FCVAR_ARCHIVE, "radius around detail sprite to avoid players" );
@@ -135,7 +137,7 @@ public:
 	virtual IClientNetworkable*	GetClientNetworkable()	{ return 0; }
 	virtual IClientRenderable*	GetClientRenderable()	{ return this; }
 	virtual IClientEntity*		GetIClientEntity()		{ return 0; }
-	virtual C_BaseEntity*		GetBaseEntity()			{ return 0; }
+	virtual IClientEntity*		GetBaseEntity()			{ return 0; }
 	virtual IClientThinkable*	GetClientThinkable()	{ return 0; }
 
 	// IClientRenderable overrides.
@@ -1519,10 +1521,9 @@ void CDetailObjectSystem::LevelInitPreEntity()
 void CDetailObjectSystem::LevelInitPostEntity()
 {
 	const char *pDetailSpriteMaterial = DETAIL_SPRITE_MATERIAL;
-	C_World *pWorld = GetClientWorldEntity();
-	if ( pWorld && pWorld->GetDetailSpriteMaterial() && *(pWorld->GetDetailSpriteMaterial()) )
+	if (cl_detail_sprite_material.GetString() && *(cl_detail_sprite_material.GetString()) )
 	{
-		pDetailSpriteMaterial = pWorld->GetDetailSpriteMaterial(); 
+		pDetailSpriteMaterial = cl_detail_sprite_material.GetString();
 	}
 	m_DetailSpriteMaterial.Init( pDetailSpriteMaterial, TEXTURE_GROUP_OTHER );
 
@@ -2051,7 +2052,7 @@ int CDetailObjectSystem::SortSpritesBackToFront( int nLeaf, const Vector &viewOr
 	ClientLeafSystem()->GetDetailObjectsInLeaf( nLeaf, nFirstDetailObject, nDetailObjectCount );
 
 	float flFactor = 1.0f;
-	C_BasePlayer *pLocalPlayer = (C_BasePlayer*)EntityList()->GetLocalPlayer();
+	IClientEntity *pLocalPlayer = EntityList()->GetLocalPlayer();
 	if ( pLocalPlayer )
 	{
 		flFactor = 1.0 / pLocalPlayer->GetFOVDistanceAdjustFactor();
@@ -2806,7 +2807,7 @@ void CDetailObjectSystem::BuildDetailObjectRenderLists( const Vector &vViewOrigi
 	}
 
 	float factor = 1.0f;
-	C_BasePlayer *local = (C_BasePlayer*)EntityList()->GetLocalPlayer();
+	IClientEntity *local = EntityList()->GetLocalPlayer();
 	if ( local )
 	{
 		factor = local->GetFOVDistanceAdjustFactor();

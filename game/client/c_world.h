@@ -41,6 +41,7 @@ public:
 
 	virtual void OnDataChanged( DataUpdateType_t updateType );
 	virtual void PreDataUpdate( DataUpdateType_t updateType );
+	virtual void PostDataUpdate(DataUpdateType_t updateType);
 
 	float GetWaveHeight() const;
 	const char *GetDetailSpriteMaterial() const;
