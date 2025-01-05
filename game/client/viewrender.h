@@ -30,6 +30,7 @@ class CClientViewSetup;
 class CViewRender;
 struct ClientWorldListInfo_t;
 class C_BaseEntity;
+class C_BasePlayer;
 struct WriteReplayScreenshotParams_t;
 class CReplayScreenshotTaker;
 

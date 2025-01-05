@@ -815,7 +815,7 @@ DECLARE_CLIENT_EFFECT( "CommandPointer", CommandPointerCallback );
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-void FX_GunshipMuzzleEffect( const Vector &origin, const QAngle &angles, float scale, ClientEntityHandle_t hEntity, unsigned char *pFlashColor )
+void FX_GunshipMuzzleEffect( const Vector &origin, const QAngle &angles, float scale, CBaseHandle hEntity, unsigned char *pFlashColor )
 {
 	VPROF_BUDGET( "FX_GunshipMuzzleEffect", VPROF_BUDGETGROUP_PARTICLE_RENDERING );
 	CSmartPtr<CSimpleEmitter> pSimple = CSimpleEmitter::Create( "MuzzleFlash" );
@@ -890,7 +890,7 @@ void FX_GunshipTracer( Vector& start, Vector& end, int velocity, bool makeWhiz )
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-void FX_StriderMuzzleEffect( const Vector &origin, const QAngle &angles, float scale, ClientEntityHandle_t hEntity, unsigned char *pFlashColor )
+void FX_StriderMuzzleEffect( const Vector &origin, const QAngle &angles, float scale, CBaseHandle hEntity, unsigned char *pFlashColor )
 {
 	Vector vecDir;
 	AngleVectors( angles, &vecDir );

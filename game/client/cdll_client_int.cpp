@@ -1048,7 +1048,7 @@ int CHLClient::Init( CreateInterfaceFn appSystemFactory, CreateInterfaceFn physi
 	IGameSystem::Add( DetailObjectSystem() );
 	IGameSystem::Add( ViewportClientSystem() );
 	IGameSystem::Add( ClientEffectPrecacheSystem() );
-	IGameSystem::Add( g_pClientShadowMgr );
+	//IGameSystem::Add( g_pClientShadowMgr );
 	IGameSystem::Add( g_pColorCorrectionMgr );	// NOTE: This must happen prior to ClientThinkList (color correction is updated there)
 	IGameSystem::Add( ClientThinkList() );
 	IGameSystem::Add( ClientSoundscapeSystem() );
@@ -1080,6 +1080,7 @@ int CHLClient::Init( CreateInterfaceFn appSystemFactory, CreateInterfaceFn physi
 
 	g_pClientMode->Init();
 
+	g_pClientShadowMgr->Init();
 	if ( !IGameSystem::InitAllSystems() )
 		return false;
 
@@ -1241,6 +1242,7 @@ void CHLClient::Shutdown( void )
 	UncacheAllMaterials();
 
 	IGameSystem::ShutdownAllSystems();
+	g_pClientShadowMgr->Shutdown();
 	
 	gHUD.Shutdown();
 	VGui_Shutdown();
@@ -1784,6 +1786,7 @@ void CHLClient::LevelShutdown( void )
 
 	// Now do the post-entity shutdown of all systems
 	IGameSystem::LevelShutdownPostEntityAllSystems();
+	g_pClientShadowMgr->LevelShutdownPostEntity();
 	EntityList()->LevelShutdownPostEntity();
 
 	view->LevelShutdown();

@@ -13,8 +13,8 @@
 #pragma once
 #endif
 
-#include "igamesystem.h"
-#include "icliententityinternal.h"
+//#include "igamesystem.h"
+//#include "icliententityinternal.h"
 #include "engine/ishadowmgr.h"
 #include "ivrenderview.h"
 #include "toolframework/itoolentity.h"
@@ -24,8 +24,6 @@
 // Forward decls
 //-----------------------------------------------------------------------------
 struct FlashlightState_t;
-class C_BaseEntity;
-typedef CHandle<C_BaseEntity> EHANDLE;
 
 //-----------------------------------------------------------------------------
 // Handles to a client shadow
@@ -41,11 +39,16 @@ enum ShadowReceiver_t
 //-----------------------------------------------------------------------------
 // The class responsible for dealing with shadows on the client side
 //-----------------------------------------------------------------------------
-abstract_class IClientShadowMgr : public IGameSystemPerFrame
+abstract_class IClientShadowMgr
 {
 public:
+	virtual bool Init() = 0;
+	virtual void Shutdown() = 0;
+	virtual void LevelInitPreEntity() = 0;
+	virtual void LevelShutdownPostEntity() = 0;
+
 	// Create, destroy shadows
-	virtual ClientShadowHandle_t CreateShadow( ClientEntityHandle_t entity, int flags ) = 0;
+	virtual ClientShadowHandle_t CreateShadow( CBaseHandle entity, int flags ) = 0;
 	virtual void DestroyShadow( ClientShadowHandle_t handle ) = 0;
 
 	// Create flashlight.
@@ -94,7 +97,7 @@ public:
 	virtual void AdvanceFrame() = 0;
 
 	// Set and clear flashlight target renderable
-	virtual void SetFlashlightTarget( ClientShadowHandle_t shadowHandle, EHANDLE targetEntity ) = 0;
+	virtual void SetFlashlightTarget( ClientShadowHandle_t shadowHandle, CHandle<IClientEntity> targetEntity ) = 0;
 
 	// Set flashlight light world flag
 	virtual void SetFlashlightLightWorld( ClientShadowHandle_t shadowHandle, bool bLightWorld ) = 0;
@@ -102,6 +105,8 @@ public:
 	virtual void SetShadowsDisabled( bool bDisabled ) = 0;
 
 	virtual void ComputeShadowDepthTextures( const CViewSetup &pView ) = 0;
+
+	virtual void PreRender() = 0;
 
 };
 

@@ -125,6 +125,7 @@ class IEngineObjectClient : public IEngineObject, public IClientNetworkable, pub
 public:
 
 	virtual datamap_t* GetPredDescMap(void) const = 0;
+	virtual IClientRenderable* GetClientRenderable() { return this; }
 	virtual IClientEntity* GetClientEntity() = 0;
 	virtual IClientEntity* GetOuter() = 0;
 	virtual IHandleEntity* GetHandleEntity() const = 0;
@@ -939,6 +940,7 @@ public:
 	virtual const QAngle& GetRenderAngles(void) = 0;
 	virtual void GetRenderBounds(Vector& mins, Vector& maxs) = 0;
 	virtual void GetRenderBoundsWorldspace(Vector& absMins, Vector& absMaxs) = 0;
+	virtual bool IsEnableRenderingClipPlane() = 0;
 	virtual float* GetRenderClipPlane(void) = 0;
 	virtual ShadowType_t ShadowCastType() = 0;
 	virtual void GetShadowRenderBounds(Vector& mins, Vector& maxs, ShadowType_t shadowType) = 0;

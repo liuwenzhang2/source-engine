@@ -54,9 +54,6 @@
 // the shadow from all studio models
 //===========================================================================//
 
-
-#include "cbase.h"
-#include "engine/ishadowmgr.h"
 #include "model_types.h"
 #include "bitmap/imageformat.h"
 #include "materialsystem/imaterialproxy.h"
@@ -67,21 +64,21 @@
 #include "bsptreedata.h"
 #include "utlmultilist.h"
 #include "collisionutils.h"
-#include "iviewrender.h"
-#include "ivrenderview.h"
 #include "tier0/vprof.h"
 #include "engine/ivmodelinfo.h"
 #include "view_shared.h"
 #include "engine/ivdebugoverlay.h"
 #include "engine/IStaticPropMgr.h"
 #include "datacache/imdlcache.h"
-#include "viewrender.h"
 #include "tier0/icommandline.h"
 #include "vstdlib/jobthread.h"
-#include "toolframework_client.h"
-#include "bonetoworldarray.h"
 #include "cmodel.h"
 
+#include "bonetoworldarray.h"
+#include "cdll_client_int.h"
+#include "iclientshadowmgr.h"
+#include "iviewrender.h"
+#include "clientleafsystem.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
@@ -716,7 +713,7 @@ public:
 	virtual void OnRestore() {}
 	virtual void SafeRemoveIfDesired() {}
 
-	virtual ClientShadowHandle_t CreateShadow( ClientEntityHandle_t entity, int flags );
+	virtual ClientShadowHandle_t CreateShadow( CBaseHandle entity, int flags );
 	virtual void DestroyShadow( ClientShadowHandle_t handle );
 
 	// Create flashlight (projected texture light source)
@@ -805,7 +802,7 @@ private:
 
 	struct ClientShadow_t
 	{
-		ClientEntityHandle_t	m_Entity;
+		CBaseHandle	m_Entity;
 		ShadowHandle_t			m_ShadowHandle;
 		ClientLeafShadowHandle_t m_ClientLeafShadowHandle;
 		unsigned short			m_Flags;
@@ -816,7 +813,7 @@ private:
 		TextureHandle_t			m_ShadowTexture;
 		CTextureReference		m_ShadowDepthTexture;
 		int						m_nRenderFrame;
-		EHANDLE					m_hTargetEntity;
+		CHandle<IClientEntity>	m_hTargetEntity;
 	};
 
 private:
@@ -924,14 +921,14 @@ private:
 		return lhs < rhs;
 	}
 
-	ClientShadowHandle_t CreateProjectedTexture( ClientEntityHandle_t entity, int flags );
+	ClientShadowHandle_t CreateProjectedTexture( CBaseHandle entity, int flags );
 
 	// Lock down the usage of a shadow depth texture...must be unlocked use on subsequent views / frames
 	bool	LockShadowDepthTexture( CTextureReference *shadowDepthTexture );
 	void	UnlockAllShadowDepthTextures();
 
 	// Set and clear flashlight target renderable
-	void	SetFlashlightTarget( ClientShadowHandle_t shadowHandle, EHANDLE targetEntity );
+	void	SetFlashlightTarget( ClientShadowHandle_t shadowHandle, CHandle<IClientEntity> targetEntity );
 
 	// Set flashlight light world flag
 	void	SetFlashlightLightWorld( ClientShadowHandle_t shadowHandle, bool bLightWorld );
@@ -1021,8 +1018,8 @@ static CVisibleShadowList			s_VisibleShadowList;
 //-----------------------------------------------------------------------------
 //
 //-----------------------------------------------------------------------------
-static CUtlVector<C_BaseAnimating *> s_NPCShadowBoneSetups;
-static CUtlVector<C_BaseAnimating *> s_NonNPCShadowBoneSetups;
+static CUtlVector<IClientEntity *> s_NPCShadowBoneSetups;
+static CUtlVector<IClientEntity *> s_NonNPCShadowBoneSetups;
 
 //-----------------------------------------------------------------------------
 // CVisibleShadowList - Constructor and Accessors
@@ -1796,7 +1793,7 @@ void CClientShadowMgr::RenderShadowTexture( int w, int h )
 //-----------------------------------------------------------------------------
 // Create/destroy a shadow
 //-----------------------------------------------------------------------------
-ClientShadowHandle_t CClientShadowMgr::CreateProjectedTexture( ClientEntityHandle_t entity, int flags )
+ClientShadowHandle_t CClientShadowMgr::CreateProjectedTexture( CBaseHandle entity, int flags )
 {
 	// We need to know if it's a brush model for shadows
 	if( !( flags & SHADOW_FLAGS_FLASHLIGHT ) )
@@ -1859,7 +1856,7 @@ ClientShadowHandle_t CClientShadowMgr::CreateProjectedTexture( ClientEntityHandl
 ClientShadowHandle_t CClientShadowMgr::CreateFlashlight( const FlashlightState_t &lightState )
 {
 	// We don't really need a model entity handle for a projective light source, so use an invalid one.
-	static ClientEntityHandle_t invalidHandle = INVALID_CLIENTENTITY_HANDLE;
+	static CBaseHandle invalidHandle(INVALID_EHANDLE_INDEX);
 
 	int shadowFlags = SHADOW_FLAGS_FLASHLIGHT | SHADOW_FLAGS_LIGHT_WORLD;
 	if( lightState.m_bEnableShadows && r_flashlightdepthtexture.GetBool() )
@@ -1874,7 +1871,7 @@ ClientShadowHandle_t CClientShadowMgr::CreateFlashlight( const FlashlightState_t
 	return shadowHandle;
 }
 		 
-ClientShadowHandle_t CClientShadowMgr::CreateShadow( ClientEntityHandle_t entity, int flags )
+ClientShadowHandle_t CClientShadowMgr::CreateShadow( CBaseHandle entity, int flags )
 {
 	// We don't really need a model entity handle for a projective light source, so use an invalid one.
 	flags &= ~SHADOW_FLAGS_PROJECTED_TEXTURE_TYPE_MASK;
@@ -2200,13 +2197,13 @@ void CClientShadowMgr::ComputeExtraClipPlanes( IClientRenderable* pRenderable,
 	}
 
 	ClientShadow_t& shadow = m_Shadows[handle];
-	C_BaseEntity *pEntity = (C_BaseEntity*)EntityList()->GetBaseEntityFromHandle( shadow.m_Entity );
-	if ( pEntity && pEntity->m_bEnableRenderingClipPlane )
+	IClientEntity *pEntity = EntityList()->GetBaseEntityFromHandle( shadow.m_Entity );
+	if ( pEntity && pEntity->IsEnableRenderingClipPlane() )
 	{
-		normal[ 0 ] = -pEntity->m_fRenderingClipPlane[ 0 ];
-		normal[ 1 ] = -pEntity->m_fRenderingClipPlane[ 1 ];
-		normal[ 2 ] = -pEntity->m_fRenderingClipPlane[ 2 ];
-		AddExtraClipPlane( handle, normal, -pEntity->m_fRenderingClipPlane[ 3 ] - 0.5f );
+		normal[ 0 ] = -pEntity->GetRenderClipPlane()[ 0 ];
+		normal[ 1 ] = -pEntity->GetRenderClipPlane()[ 1 ];
+		normal[ 2 ] = -pEntity->GetRenderClipPlane()[ 2 ];
+		AddExtraClipPlane( handle, normal, -pEntity->GetRenderClipPlane()[ 3 ] - 0.5f );
 	}
 }
 
@@ -2437,7 +2434,7 @@ void CClientShadowMgr::DrawRenderToTextureDebugInfo( IClientRenderable* pRendera
 	VectorMA( start, -vecSize.y, vec[1], end );
 	debugoverlay->AddLineOverlay( start, end, 255, 0, 0, true, 0.01 ); 
 
-	C_BaseEntity *pEnt = (C_BaseEntity*)pRenderable->GetIClientUnknown()->GetBaseEntity();
+	IClientEntity *pEnt = pRenderable->GetIClientUnknown()->GetBaseEntity();
 	if ( pEnt )
 	{
 		debugoverlay->AddTextOverlay( vecOrigin, 0, "%d", pEnt->entindex() );
@@ -2662,20 +2659,20 @@ void CClientShadowMgr::BuildFlashlight( ClientShadowHandle_t handle )
 	// We know what we are focused on, so just add the shadow directly to that receiver
 	Assert( shadow.m_hTargetEntity->GetEngineObject()->GetModel() );
 
-	C_BaseEntity* pChild = shadow.m_hTargetEntity->GetEngineObject()->FirstMoveChild() ? (C_BaseEntity*)shadow.m_hTargetEntity->GetEngineObject()->FirstMoveChild()->GetOuter() : NULL;
+	IEngineObjectClient* pChild = shadow.m_hTargetEntity->GetEngineObject()->FirstMoveChild();
 	while( pChild )
 	{
-		int modelType = modelinfo->GetModelType( pChild->GetEngineObject()->GetModel() );
+		int modelType = modelinfo->GetModelType( pChild->GetModel() );
 		if (modelType == mod_brush)
 		{
-			AddShadowToReceiver( handle, pChild->GetEngineObject(), SHADOW_RECEIVER_BRUSH_MODEL );
+			AddShadowToReceiver( handle, pChild, SHADOW_RECEIVER_BRUSH_MODEL );
 		}
 		else if ( modelType == mod_studio )
 		{
-			AddShadowToReceiver( handle, pChild->GetEngineObject(), SHADOW_RECEIVER_STUDIO_MODEL );
+			AddShadowToReceiver( handle, pChild, SHADOW_RECEIVER_STUDIO_MODEL );
 		}
 
-		pChild = pChild->GetEngineObject()->NextMovePeer() ? (C_BaseEntity*)pChild->GetEngineObject()->NextMovePeer()->GetOuter() : NULL;
+		pChild = pChild->NextMovePeer();
 	}
 
 	int modelType = modelinfo->GetModelType( shadow.m_hTargetEntity->GetEngineObject()->GetModel() );
@@ -3480,7 +3477,7 @@ void CClientShadowMgr::AddShadowToReceiver( ClientShadowHandle_t handle,
 		{
 			// Also don't add them unless an NPC or player casts them..
 			// They are wickedly expensive!!!
-			C_BaseEntity *pEnt = (C_BaseEntity*)pSourceRenderable->GetIClientUnknown()->GetBaseEntity();
+			IClientEntity *pEnt = pSourceRenderable->GetIClientUnknown()->GetBaseEntity();
 			if ( pEnt && ( pEnt->GetEngineObject()->GetFlags() & (FL_NPC | FL_CLIENT)) )
 			{
 				staticpropmgr->AddShadowToStaticProp( shadow.m_ShadowHandle, pRenderable );
@@ -3605,16 +3602,16 @@ bool CClientShadowMgr::BuildSetupShadowHierarchy( IClientRenderable *pRenderable
 
 		if ( bDrawModelShadow )
 		{
-			C_BaseEntity *pEntity = (C_BaseEntity*)pRenderable->GetIClientUnknown()->GetBaseEntity();
+			IClientEntity *pEntity = pRenderable->GetIClientUnknown()->GetBaseEntity();
 			if ( pEntity )
 			{
 				if ( pEntity->IsNPC() )
 				{
-					s_NPCShadowBoneSetups.AddToTail( assert_cast<C_BaseAnimating *>( pEntity ) );
+					s_NPCShadowBoneSetups.AddToTail( pEntity );
 				}
-				else if ( pEntity->GetBaseAnimating() )
+				else if ( pEntity->GetEngineObject()->GetModelPtr() )
 				{
-					s_NonNPCShadowBoneSetups.AddToTail( assert_cast<C_BaseAnimating *>( pEntity ) );
+					s_NonNPCShadowBoneSetups.AddToTail( pEntity );
 				}
 
 			}
@@ -3984,7 +3981,7 @@ void CClientShadowMgr::ComputeShadowDepthTextures( const CViewSetup &viewSetup )
 //-----------------------------------------------------------------------------
 // Re-renders all shadow textures for shadow casters that lie in the leaf list
 //-----------------------------------------------------------------------------
-static void SetupBonesOnBaseAnimating( C_BaseAnimating *&pBaseAnimating )
+static void SetupBonesOnBaseAnimating( IClientEntity *&pBaseAnimating )
 {
 	pBaseAnimating->GetEngineObject()->SetupBones( NULL, -1, -1, gpGlobals->curtime );
 }
@@ -4130,7 +4127,7 @@ void CClientShadowMgr::UnlockAllShadowDepthTextures()
 	SetViewFlashlightState( 0, NULL );
 }
 
-void CClientShadowMgr::SetFlashlightTarget( ClientShadowHandle_t shadowHandle, EHANDLE targetEntity )
+void CClientShadowMgr::SetFlashlightTarget( ClientShadowHandle_t shadowHandle, CHandle<IClientEntity> targetEntity )
 {
 	Assert( m_Shadows.IsValidIndex( shadowHandle ) );
 
@@ -4169,13 +4166,13 @@ bool CClientShadowMgr::IsFlashlightTarget( ClientShadowHandle_t shadowHandle, IC
 	if( shadow.m_hTargetEntity->GetClientRenderable() == pRenderable )
 		return true;
 
-	C_BaseEntity* pChild = shadow.m_hTargetEntity->GetEngineObject()->FirstMoveChild() ? (C_BaseEntity*)shadow.m_hTargetEntity->GetEngineObject()->FirstMoveChild()->GetOuter() : NULL;
+	IEngineObjectClient* pChild = shadow.m_hTargetEntity->GetEngineObject()->FirstMoveChild();
 	while( pChild )
 	{
 		if( pChild->GetClientRenderable()==pRenderable )
 			return true;
 
-		pChild = pChild->GetEngineObject()->NextMovePeer() ? (C_BaseEntity*)pChild->GetEngineObject()->NextMovePeer()->GetOuter() : NULL;
+		pChild = pChild->NextMovePeer();
 	}
 							
 	return false;
@@ -4220,10 +4217,10 @@ void CShadowProxy::OnBind( void *pProxyData )
 	unsigned short clientShadowHandle = ( unsigned short )(intp)pProxyData&0xffff;
 	ITexture* pTex = s_ClientShadowMgr.GetShadowTexture( clientShadowHandle );
 	m_BaseTextureVar->SetTextureValue( pTex );
-	if ( ToolsEnabled() )
-	{
-		ToolFramework_RecordMaterialParams( GetMaterial() );
-	}
+//	if ( ToolsEnabled() )
+//	{
+//		ToolFramework_RecordMaterialParams( GetMaterial() );
+//	}
 }
 
 IMaterial *CShadowProxy::GetMaterial()
@@ -4313,10 +4310,10 @@ void CShadowModelProxy::OnBind( void *pProxyData )
 	m_FalloffDistanceVar->SetFloatValue( info.m_MaxDist );
 	m_FalloffAmountVar->SetFloatValue( info.m_FalloffAmount );
 
-	if ( ToolsEnabled() )
-	{
-		ToolFramework_RecordMaterialParams( GetMaterial() );
-	}
+//	if ( ToolsEnabled() )
+//	{
+//		ToolFramework_RecordMaterialParams( GetMaterial() );
+//	}
 }
 
 IMaterial *CShadowModelProxy::GetMaterial()

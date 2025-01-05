@@ -1180,6 +1180,10 @@ private:
 	EHANDLE							m_hEffectEntity;
 	
 public:
+
+	bool							IsEnableRenderingClipPlane() {
+		return m_bEnableRenderingClipPlane;
+	}
 	float							m_fRenderingClipPlane[4]; //world space clip plane when drawing
 	bool							m_bEnableRenderingClipPlane; //true to use the custom clip plane when drawing
 	float *							GetRenderClipPlane( void ); // Rendering clip plane, should be 4 floats, return value of NULL indicates a disabled render clip plane
