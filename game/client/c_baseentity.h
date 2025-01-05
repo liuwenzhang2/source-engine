@@ -137,19 +137,6 @@ typedef C_BaseEntity* (*DISPATCHFUNCTION)( void );
 //#define CREATE_PREDICTED_ENTITY( className )	\
 //	C_BaseEntity::CreatePredictedEntityByName( className, __FILE__, __LINE__ );
 
-
-
-// Entity flags that only exist on the client.
-#define ENTCLIENTFLAG_GETTINGSHADOWRENDERBOUNDS	0x0001		// Tells us if we're getting the real ent render bounds or the shadow render bounds.
-#define ENTCLIENTFLAG_DONTUSEIK					0x0002		// Don't use IK on this entity even if its model has IK.
-#define ENTCLIENTFLAG_ALWAYS_INTERPOLATE		0x0004		// Used by view models.
-
-enum
-{
-	INTERPOLATE_STOP = 0,
-	INTERPOLATE_CONTINUE
-};
-
 struct ClientModelRenderInfo_t : public ModelRenderInfo_t
 {
 	// Added space for lighting origin override. Just allocated space, need to set base pointer

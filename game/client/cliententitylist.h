@@ -15,14 +15,11 @@
 #include "ragdoll_shared.h"
 
 #include "recvproxy.h"
+#include "iclientshadowmgr.h"
 #include "client_factorylist.h"
-#include "toolframework_client.h"
-#include "clientleafsystem.h"
 #include "interpolatedvar.h"
 #include "bone_merge_cache.h"
-#include "view.h"
-#include "beamdraw.h"
-#include "c_te_effect_dispatch.h"
+#include "tier2/beamsegdraw.h"
 #include "fx_water.h"
 #include "mouthinfo.h"
 
@@ -2746,7 +2743,6 @@ extern ConVar cl_phys_timescale;
 template<class T>// = IHandleEntity
 class CClientEntityList : public CBaseEntityList<T>, public IClientEntityList, public IEntityCallBack
 {
-	friend class C_BaseEntityIterator;
 	friend class C_EngineObjectInternal;
 	friend class C_EngineWorldInternal;
 	friend class C_EnginePortalInternal;
@@ -4412,7 +4408,7 @@ void CClientEntityList<T>::ToolRecordEntities()
 {
 	VPROF_BUDGET("IClientEntity::ToolRecordEnties", VPROF_BUDGETGROUP_TOOLS);
 
-	if (!ToolsEnabled() || !clienttools->IsInRecordingMode())
+	if (!clienttools->IsInRecordingMode())//!ToolsEnabled() || 
 		return;
 
 	// Let non-dormant client created predictables get added, too
@@ -4737,10 +4733,12 @@ void CClientEntityList<T>::InterpolateServerEntities()
 		m_bWasSkipping = IsSimulatingOnAlternateTicks();
 		m_bWasThreaded = IsEngineThreaded();
 
-		C_BaseEntityIterator iterator;
-		IClientEntity* pEnt;
-		while ((pEnt = iterator.Next()) != NULL)
+		for (CBaseHandle handle = g_EntityList.FirstHandle(); handle != g_EntityList.InvalidHandle(); handle = g_EntityList.NextHandle(handle))
 		{
+			IClientEntity* pEnt = g_EntityList.GetBaseEntityFromHandle(handle);
+			if (!pEnt)
+				continue;
+
 			pEnt->GetEngineObject()->Interp_UpdateInterpolationAmounts();
 		}
 	}

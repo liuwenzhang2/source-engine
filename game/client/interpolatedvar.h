@@ -13,7 +13,7 @@
 #include "tier1/utllinkedlist.h"
 #include "rangecheckedvar.h"
 #include "lerp_functions.h"
-#include "animationlayer.h"
+#include "ihandleentity.h"
 #include "convar.h"
 #include "globalvars_base.h"
 
@@ -46,7 +46,6 @@
 
 // this global keeps the last known server packet tick (to avoid calling engine->GetLastTimestamp() all the time)
 extern float g_flLastPacketTimestamp;
-extern int addVarCount;
 extern CGlobalVarsBase* gpGlobals;
 
 inline void Interpolation_SetLastPacketTimeStamp( float timestamp)
@@ -263,12 +262,6 @@ struct CInterpolatedVarEntryBase<Type, false>
 	Type *NewEntry( const Type *pValue, int maxCount, float time )
 	{
 		Assert(maxCount==1);
-		if (addVarCount++ > 725) {
-			int aaa = 0;
-		}
-		if (maxCount == 0) {
-			int aaa = 0;
-		}
 		changetime = time;
 		memcpy( &value, pValue, maxCount*sizeof(Type) );
 		return &value;

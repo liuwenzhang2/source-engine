@@ -371,5 +371,5 @@ public:
 	//virtual void EmitCloseCaption(IRecipientFilter& filter, int entindex, char const* token, CUtlVector< Vector >& soundorigins, float duration, bool warnifmissing = false) = 0;
 };
 
-
+extern ISoundEmitterSystem* g_pSoundEmitterSystem;
 #endif // ISOUNDEMITTERSYSTEMBASE_H

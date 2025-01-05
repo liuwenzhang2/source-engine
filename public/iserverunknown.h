@@ -14,6 +14,7 @@
 
 
 #include "ihandleentity.h"
+#include "basehandle.h"
 
 class ICollideable;
 class IServerNetworkable;

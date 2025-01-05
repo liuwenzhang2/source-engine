@@ -15,8 +15,10 @@
 #include "const.h"
 #include "mathlib/vector.h"
 #include "tier1/utlvector.h"
-//#include "player.h"
 #include "bitvec.h"
+#include "soundflags.h"
+#include "SoundEmitterSystem/isoundemittersystembase.h"
+#include "iserverentity.h"
 
 class CBaseEntity;
 class CBasePlayer;

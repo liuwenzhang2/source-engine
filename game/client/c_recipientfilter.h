@@ -13,7 +13,7 @@
 
 #include "irecipientfilter.h"
 #include "utlvector.h"
-#include "c_baseentity.h"
+#include "icliententity.h"
 #include "soundflags.h"
 #include "bitvec.h"
 

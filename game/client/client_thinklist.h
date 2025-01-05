@@ -19,10 +19,6 @@
 #include "utlrbtree.h"
 
 
-#define CLIENT_THINK_ALWAYS	-1293
-#define CLIENT_THINK_NEVER	-1
-
-
 #define INVALID_THINK_HANDLE ClientThinkList()->GetInvalidThinkHandle()
 
 

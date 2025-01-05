@@ -25,6 +25,7 @@
 #include "isaverestore.h"
 #include "tier1/KeyValues.h"
 #include "cmodel.h"
+#include "engine/ivmodelinfo.h"
 #include "globalvars_base.h"
 
 #if !defined( _X360 )
@@ -695,6 +696,10 @@ public:
 
 	// Apply screen fade directly from engine
 	virtual void			View_Fade( ScreenFade_t *pSF ) = 0;
+
+	virtual const Vector&	MainViewOrigin() = 0;
+	virtual const Vector&	CurrentViewOrigin() = 0;
+	virtual const Vector&  CurrentViewForward() = 0;
 
 	// The engine has parsed a crosshair angle message, this function is called to dispatch the new crosshair angle
 	virtual void			SetCrosshairAngle( const QAngle& angle ) = 0;

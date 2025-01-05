@@ -568,6 +568,9 @@ public:
 	virtual void					View_Render( vrect_t *rect );
 	virtual void					RenderView( const CViewSetup &view, int nClearFlags, int whatToDraw );
 	virtual void					View_Fade( ScreenFade_t *pSF );
+	virtual const Vector&			MainViewOrigin();
+	virtual const Vector&			CurrentViewOrigin();
+	virtual const Vector&			CurrentViewForward();
 	
 	virtual void					SetCrosshairAngle( const QAngle& angle );
 
@@ -1615,6 +1618,21 @@ void CHLClient::View_Fade( ScreenFade_t *pSF )
 {
 	if ( pSF != NULL )
 		vieweffects->Fade( *pSF );
+}
+
+const Vector& CHLClient::MainViewOrigin()
+{
+	return ::MainViewOrigin();
+}
+
+const Vector& CHLClient::CurrentViewOrigin()
+{
+	return ::CurrentViewOrigin();
+}
+
+const Vector& CHLClient::CurrentViewForward()
+{
+	return ::CurrentViewForward();
 }
 
 //-----------------------------------------------------------------------------

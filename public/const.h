@@ -12,6 +12,8 @@
 #pragma once
 #endif
 
+#include "bspflags.h"
+
 // the command line param that tells the engine to use steam
 #define STEAM_PARM					"-steam"
 // the command line param to tell dedicated server to restart 
@@ -781,6 +783,20 @@ enum DebugOverlayBits_t
 
 #define	BCF_NO_ANIMATION_SKIP	( 1 << 0 )	// Do not allow PVS animation skipping (mostly for attachments being critical to an entity)
 #define	BCF_IS_IN_SPAWN			( 1 << 1 )	// Is currently inside of spawn, always evaluate animations
+
+// Entity flags that only exist on the client.
+#define ENTCLIENTFLAG_GETTINGSHADOWRENDERBOUNDS	0x0001		// Tells us if we're getting the real ent render bounds or the shadow render bounds.
+#define ENTCLIENTFLAG_DONTUSEIK					0x0002		// Don't use IK on this entity even if its model has IK.
+#define ENTCLIENTFLAG_ALWAYS_INTERPOLATE		0x0004		// Used by view models.
+
+enum
+{
+	INTERPOLATE_STOP = 0,
+	INTERPOLATE_CONTINUE
+};
+
+#define CLIENT_THINK_ALWAYS	-1293
+#define CLIENT_THINK_NEVER	-1
 
 #endif
 

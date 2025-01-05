@@ -17,6 +17,7 @@
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
+extern CClientEntityList<IClientEntity> g_EntityList;
 //-----------------------------------------------------------------------------
 // Globals
 //-----------------------------------------------------------------------------
@@ -25,10 +26,12 @@ void cc_cl_interp_all_changed(IConVar* pConVar, const char* pOldString, float fl
 	ConVarRef var(pConVar);
 	if (var.GetInt())
 	{
-		C_BaseEntityIterator iterator;
-		IClientEntity* pEnt;
-		while ((pEnt = iterator.Next()) != NULL)
+		for (CBaseHandle handle = g_EntityList.FirstHandle(); handle != g_EntityList.InvalidHandle(); handle = g_EntityList.NextHandle(handle))
 		{
+			IClientEntity* pEnt = g_EntityList.GetBaseEntityFromHandle(handle);
+			if (!pEnt)
+				continue;
+
 			if (pEnt->ShouldInterpolate())
 			{
 				pEnt->GetEngineObject()->AddToInterpolationList();
@@ -75,7 +78,7 @@ static ConVar rope_shake("rope_shake", "0");
 static ConVar rope_collide("rope_collide", "1", 0, "Collide rope with the world");
 static ConVar r_drawropes("r_drawropes", "1", FCVAR_CHEAT);
 static ConVar mat_fullbright("mat_fullbright", "0", FCVAR_CHEAT); // get it from the engine
-static ConVar r_rope_holiday_light_scale("r_rope_holiday_light_scale", "0.055", FCVAR_DEVELOPMENTONLY);
+//static ConVar r_rope_holiday_light_scale("r_rope_holiday_light_scale", "0.055", FCVAR_DEVELOPMENTONLY);
 static ConVar rope_smooth("rope_smooth", "1", 0, "Do an antialiasing effect on ropes");
 static ConVar rope_smooth_enlarge("rope_smooth_enlarge", "1.4", 0, "How much to enlarge ropes in screen space for antialiasing effect");
 static ConVar rope_smooth_minwidth("rope_smooth_minwidth", "0.3", 0, "When using smoothing, this is the min screenspace width it lets a rope shrink to");
@@ -1958,7 +1961,6 @@ void C_GrabControllerInternal::SetPortalPenetratingEntity(IClientEntity* pPenetr
 // -------------------------------------------------------------------------------------------------- //
 // Game-code CBaseHandle implementation.
 // -------------------------------------------------------------------------------------------------- //
-int addVarCount = 0;
 const float coordTolerance = 2.0f / (float)(1 << COORD_FRACTIONAL_BITS);
 
 BEGIN_PREDICTION_DATA_NO_BASE(C_EngineObjectInternal)
@@ -8967,7 +8969,8 @@ public:
 
 	bool ShouldHitEntity(IHandleEntity* pHandleEntity, int contentsMask)
 	{
-		IClientEntity* pEntity = EntityFromEntityHandle(pHandleEntity);
+		IClientUnknown* pUnk = (IClientUnknown*)pHandleEntity;
+		IClientEntity* pEntity = pUnk->GetBaseEntity();
 		if (!pEntity)
 			return false;
 
@@ -11805,6 +11808,7 @@ void BuildRope(C_EngineRopeInternal* pRope, RopeSegData_t* pSegmentData, const V
 		pSegmentData->m_Segments[nSegmentCount].m_vPos = pPredictedPositions[iNode];
 		pSegmentData->m_Segments[nSegmentCount].m_vColor = pLightValues[iNode] * vColorMod;
 
+		/*
 		CEffectData data;
 
 		if (!bQueued && RopeManager()->IsHolidayLightMode() && r_rope_holiday_light_scale.GetFloat() > 0.0f)
@@ -11815,6 +11819,7 @@ void BuildRope(C_EngineRopeInternal* pRope, RopeSegData_t* pSegmentData, const V
 			data.m_vOrigin = pSegmentData->m_Segments[nSegmentCount].m_vPos;
 			DispatchEffect("TF_HolidayLight", data);
 		}
+		*/
 
 		++nSegmentCount;
 
@@ -11842,6 +11847,7 @@ void BuildRope(C_EngineRopeInternal* pRope, RopeSegData_t* pSegmentData, const V
 				// simple eval using precomputed basis
 				Catmull_Rom_Eval(spline, pSubdivVecList[iSubdiv], pSegmentData->m_Segments[nSegmentCount].m_vPos);
 
+				/*
 				if (!bQueued && RopeManager()->IsHolidayLightMode() && r_rope_holiday_light_scale.GetFloat() > 0.0f)
 				{
 					data.m_nHitBox++;
@@ -11849,6 +11855,7 @@ void BuildRope(C_EngineRopeInternal* pRope, RopeSegData_t* pSegmentData, const V
 					data.m_vOrigin = pSegmentData->m_Segments[nSegmentCount].m_vPos;
 					DispatchEffect("TF_HolidayLight", data);
 				}
+				*/
 
 				++nSegmentCount;
 				Assert(nSegmentCount <= MAX_ROPE_SEGMENTS);
@@ -12071,8 +12078,8 @@ void CRopeManager::DrawRenderCache(bool bShadowDepth)
 	if (iRenderCacheCount == 0)
 		return;
 
-	Vector vForward = CurrentViewForward();
-	Vector vOrigin = CurrentViewOrigin();
+	Vector vForward = clientdll->CurrentViewForward();
+	Vector vOrigin = clientdll->CurrentViewOrigin();
 
 	ICallQueue* pCallQueue;
 	if (r_queued_ropes.GetBool() && (pCallQueue = materials->GetRenderContext()->GetCallQueue()) != NULL)
@@ -12755,7 +12762,7 @@ bool C_EngineRopeInternal::DetectRestingState(bool& bApplyWind)
 	if (!(m_RopeFlags & ROPE_NO_WIND))
 	{
 		// Don't apply wind if more than half of the nodes are touching something.
-		float flDist1 = CalcDistanceToLineSegment(MainViewOrigin(), vEnd1, vEnd2);
+		float flDist1 = CalcDistanceToLineSegment(clientdll->MainViewOrigin(), vEnd1, vEnd2);
 		if (m_nLinksTouchingSomething < (m_RopePhysics.NumNodes() >> 1))
 			bApplyWind = flDist1 < rope_wind_dist.GetFloat();
 	}
