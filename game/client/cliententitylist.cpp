@@ -10064,39 +10064,6 @@ void C_EnginePortalInternal::ClearPhysicsEnvironment()
 	m_pPhysicsEnvironment = NULL;
 }
 
-class CStaticCollisionPolyhedronCache : public CAutoGameSystem
-{
-public:
-	CStaticCollisionPolyhedronCache(void);
-	~CStaticCollisionPolyhedronCache(void);
-
-	void LevelInitPreEntity(void);
-	void Shutdown(void);
-
-	const CPolyhedron* GetBrushPolyhedron(int iBrushNumber);
-	int GetStaticPropPolyhedrons(ICollideable* pStaticProp, CPolyhedron** pOutputPolyhedronArray, int iOutputArraySize);
-
-private:
-	// See comments in LevelInitPreEntity for why these members are commented out
-//	CUtlString	m_CachedMap;
-
-	CUtlVector<CPolyhedron*> m_BrushPolyhedrons;
-
-	struct StaticPropPolyhedronCacheInfo_t
-	{
-		int iStartIndex;
-		int iNumPolyhedrons;
-		int iStaticPropIndex; //helps us remap ICollideable pointers when the map is restarted
-	};
-
-	CUtlVector<CPolyhedron*> m_StaticPropPolyhedrons;
-	CUtlMap<ICollideable*, StaticPropPolyhedronCacheInfo_t> m_CollideableIndicesMap;
-
-
-	void Clear(void);
-	void Update(void);
-};
-
 class CPolyhedron_LumpedMemory : public CPolyhedron //we'll be allocating one big chunk of memory for all our polyhedrons. No individual will own any memory.
 {
 public:
@@ -10561,11 +10528,7 @@ int CStaticCollisionPolyhedronCache::GetStaticPropPolyhedrons(ICollideable* pSta
 	return iOutputArraySize;
 }
 
-CStaticCollisionPolyhedronCache g_StaticCollisionPolyhedronCache;
-
-
-
-static void ConvertBrushListToClippedPolyhedronList(const int* pBrushes, int iBrushCount, const float* pOutwardFacingClipPlanes, int iClipPlaneCount, float fClipEpsilon, CUtlVector<CPolyhedron*>* pPolyhedronList)
+void C_EnginePortalInternal::ConvertBrushListToClippedPolyhedronList(const int* pBrushes, int iBrushCount, const float* pOutwardFacingClipPlanes, int iClipPlaneCount, float fClipEpsilon, CUtlVector<CPolyhedron*>* pPolyhedronList)
 {
 	if (pPolyhedronList == NULL)
 		return;
@@ -10575,7 +10538,7 @@ static void ConvertBrushListToClippedPolyhedronList(const int* pBrushes, int iBr
 
 	for (int i = 0; i != iBrushCount; ++i)
 	{
-		CPolyhedron* pPolyhedron = ClipPolyhedron(g_StaticCollisionPolyhedronCache.GetBrushPolyhedron(pBrushes[i]), pOutwardFacingClipPlanes, iClipPlaneCount, fClipEpsilon);
+		CPolyhedron* pPolyhedron = ClipPolyhedron(g_EntityList.m_StaticCollisionPolyhedronCache.GetBrushPolyhedron(pBrushes[i]), pOutwardFacingClipPlanes, iClipPlaneCount, fClipEpsilon);
 		if (pPolyhedron)
 			pPolyhedronList->AddToTail(pPolyhedron);
 	}
@@ -10695,7 +10658,7 @@ void C_EnginePortalInternal::CreatePolyhedrons(void)
 				ICollideable* pProp = StaticProps[i];
 
 				CPolyhedron* PolyhedronArray[1024];
-				int iPolyhedronCount = g_StaticCollisionPolyhedronCache.GetStaticPropPolyhedrons(pProp, PolyhedronArray, 1024);
+				int iPolyhedronCount = g_EntityList.m_StaticCollisionPolyhedronCache.GetStaticPropPolyhedrons(pProp, PolyhedronArray, 1024);
 
 				StaticPropPolyhedronGroups_t indices;
 				indices.iStartIndex = m_InternalData.Simulation.Static.World.StaticProps.Polyhedrons.Count();
@@ -13527,44 +13490,6 @@ bool ShouldRemoveThisRagdoll(IClientEntity* pRagdoll)
 
 	return false;
 }
-
-// One hook to rule them all...
-// Since most of the little list managers in here only need one or two of the game
-// system callbacks, this hook is a game system that passes them the appropriate callbacks
-class CEntityListSystem : public CAutoGameSystemPerFrame
-{
-public:
-	CEntityListSystem(char const* name) : CAutoGameSystemPerFrame(name)
-	{
-
-	}
-	void LevelInitPreEntity()
-	{
-
-	}
-	void LevelShutdownPreEntity()
-	{
-
-	}
-	void LevelShutdownPostEntity()
-	{
-
-	}
-
-	void Update(float frametime) 
-	{
-		g_EntityList.UpdateRagdolls(frametime);
-	}
-
-	void FrameUpdatePostEntityThink()
-	{
-		//This is pretty hacky, it's only called on the server so it just calls the update method.
-		g_EntityList.UpdateRagdolls(0);
-	}
-
-};
-
-static CEntityListSystem g_EntityListSystem("CEntityListSystem");
 
 struct watcher_t
 {

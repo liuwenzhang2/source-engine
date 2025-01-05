@@ -21,6 +21,7 @@
 #include "engine/ivmodelrender.h"
 #include "client_class.h"
 #include "iclientshadowmgr.h"
+#include "detailobjectsystem.h"
 #include "ehandle.h"
 #include "iclientunknown.h"
 #include "client_thinklist.h"

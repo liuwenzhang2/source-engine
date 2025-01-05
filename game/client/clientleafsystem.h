@@ -15,7 +15,7 @@
 #pragma once
 #endif
 
-#include "igamesystem.h"
+#include "iclientrenderable.h"
 #include "engine/IClientLeafSystem.h"
 #include "cdll_int.h"
 #include "ivrenderview.h"
@@ -132,9 +132,16 @@ public:
 //-----------------------------------------------------------------------------
 // The client leaf system
 //-----------------------------------------------------------------------------
-abstract_class IClientLeafSystem : public IClientLeafSystemEngine, public IGameSystemPerFrame
+abstract_class IClientLeafSystem : public IClientLeafSystemEngine
 {
 public:
+	virtual bool Init() = 0;
+	virtual void Shutdown() = 0;
+	virtual void LevelInitPreEntity() = 0;
+	virtual void LevelShutdownPostEntity() = 0;
+
+	virtual void PreRender() = 0;
+
 	// Adds and removes renderables from the leaf lists
 	virtual void AddRenderable( IClientRenderable* pRenderable, RenderGroup_t group ) = 0;
 

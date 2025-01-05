@@ -1044,8 +1044,8 @@ int CHLClient::Init( CreateInterfaceFn appSystemFactory, CreateInterfaceFn physi
 	IGameSystem::Add( GameStringSystem() );
 	IGameSystem::Add( SoundEmitterSystem() );
 	IGameSystem::Add( ToolFrameworkClientSystem() );
-	IGameSystem::Add( ClientLeafSystem() );
-	IGameSystem::Add( DetailObjectSystem() );
+	//IGameSystem::Add( ClientLeafSystem() );
+	//IGameSystem::Add( DetailObjectSystem() );
 	IGameSystem::Add( ViewportClientSystem() );
 	IGameSystem::Add( ClientEffectPrecacheSystem() );
 	//IGameSystem::Add( g_pClientShadowMgr );
@@ -1081,6 +1081,9 @@ int CHLClient::Init( CreateInterfaceFn appSystemFactory, CreateInterfaceFn physi
 	g_pClientMode->Init();
 
 	g_pClientShadowMgr->Init();
+	g_pClientLeafSystem->Init();
+	g_pDetailObjectSystem->Init();
+
 	if ( !IGameSystem::InitAllSystems() )
 		return false;
 
@@ -1242,7 +1245,10 @@ void CHLClient::Shutdown( void )
 	UncacheAllMaterials();
 
 	IGameSystem::ShutdownAllSystems();
+
+	g_pDetailObjectSystem->Shutdown();
 	g_pClientShadowMgr->Shutdown();
+	g_pClientLeafSystem->Shutdown();
 	
 	gHUD.Shutdown();
 	VGui_Shutdown();
@@ -1320,6 +1326,7 @@ void CHLClient::HudUpdate( bool bActive )
 
 	{
 		EntityList()->PushAllowBoneAccess(true, false, (char const*)1);
+		EntityList()->Update(frametime);
 		IGameSystem::UpdateAllSystems( frametime );
 		EntityList()->PopBoneAccess((char const*)1);
 	}
@@ -1717,6 +1724,8 @@ void CHLClient::LevelInitPreEntity()
 void CHLClient::LevelInitPostEntity( )
 {
 	IGameSystem::LevelInitPostEntityAllSystems();
+
+	g_pDetailObjectSystem->LevelInitPostEntity();
 	EntityList()->LevelInitPostEntity();
 	C_PhysPropClientside::RecreateAll();
 	internalCenterPrint->Clear();
@@ -1764,6 +1773,8 @@ void CHLClient::LevelShutdown( void )
 	// Level shutdown sequence.
 	// First do the pre-entity shutdown of all systems
 	EntityList()->LevelShutdownPreEntity();
+	g_pDetailObjectSystem->LevelShutdownPreEntity();
+
 	IGameSystem::LevelShutdownPreEntityAllSystems();
 
 	C_PhysPropClientside::DestroyAll();
@@ -1786,7 +1797,10 @@ void CHLClient::LevelShutdown( void )
 
 	// Now do the post-entity shutdown of all systems
 	IGameSystem::LevelShutdownPostEntityAllSystems();
+
+	g_pDetailObjectSystem->LevelShutdownPostEntity();
 	g_pClientShadowMgr->LevelShutdownPostEntity();
+	g_pClientLeafSystem->LevelShutdownPostEntity();
 	EntityList()->LevelShutdownPostEntity();
 
 	view->LevelShutdown();

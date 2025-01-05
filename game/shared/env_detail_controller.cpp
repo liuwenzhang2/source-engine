@@ -12,6 +12,35 @@
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
+#ifdef CLIENT_DLL
+#define CEnvDetailController C_EnvDetailController
+#endif // CLIENT_DLL
+
+//-----------------------------------------------------------------------------
+// Implementation of the class that controls detail prop fade distances
+//-----------------------------------------------------------------------------
+class CEnvDetailController : public CBaseEntity
+{
+public:
+	DECLARE_CLASS(CEnvDetailController, CBaseEntity);
+	DECLARE_NETWORKCLASS();
+
+	CEnvDetailController();
+	virtual ~CEnvDetailController();
+
+#ifndef CLIENT_DLL
+	virtual bool KeyValue(const char* szKeyName, const char* szValue);
+#else
+	virtual void PostDataUpdate(DataUpdateType_t updateType);
+#endif // !CLIENT_DLL
+
+	CNetworkVar(float, m_flFadeStartDist);
+	CNetworkVar(float, m_flFadeEndDist);
+
+	// ALWAYS transmit to all clients.
+	virtual int UpdateTransmitState(void);
+};
+
 LINK_ENTITY_TO_CLASS(env_detail_controller,	CEnvDetailController);
 
 IMPLEMENT_NETWORKCLASS_ALIASED( EnvDetailController, DT_DetailController )
@@ -71,5 +100,15 @@ int CEnvDetailController::UpdateTransmitState()
 
 		return true;
 	}
+
+#else
+void CEnvDetailController::PostDataUpdate(DataUpdateType_t updateType) 
+{
+	BaseClass::PostDataUpdate(updateType);
+	ConVarRef cl_detailfade("cl_detailfade");
+	ConVarRef cl_detaildist("cl_detaildist");
+	cl_detailfade.SetValue(MIN(cl_detailfade.GetFloat(), GetDetailController()->m_flFadeStartDist));
+	cl_detaildist.SetValue(MIN(cl_detaildist.GetFloat(), GetDetailController()->m_flFadeEndDist));
+}
 
 #endif // !CLIENT_DLL

@@ -2354,6 +2354,7 @@ public:
 	bool IsPortal() { return true; }
 	C_EnginePortalInternal* AsEnginePortal() { return this; }
 	const C_EnginePortalInternal* AsEnginePortal() const { return this; }
+	void ConvertBrushListToClippedPolyhedronList(const int* pBrushes, int iBrushCount, const float* pOutwardFacingClipPlanes, int iClipPlaneCount, float fClipEpsilon, CUtlVector<CPolyhedron*>* pPolyhedronList);
 private:
 	int					m_iPortalSimulatorGUID;
 	//IPhysicsEnvironment* pPhysicsEnvironment = NULL;
@@ -2710,6 +2711,39 @@ private:
 	bool						m_bBufferTouchEvents;
 };
 
+class CStaticCollisionPolyhedronCache
+{
+public:
+	CStaticCollisionPolyhedronCache(void);
+	~CStaticCollisionPolyhedronCache(void);
+
+	void LevelInitPreEntity(void);
+	void Shutdown(void);
+
+	const CPolyhedron* GetBrushPolyhedron(int iBrushNumber);
+	int GetStaticPropPolyhedrons(ICollideable* pStaticProp, CPolyhedron** pOutputPolyhedronArray, int iOutputArraySize);
+
+private:
+	// See comments in LevelInitPreEntity for why these members are commented out
+//	CUtlString	m_CachedMap;
+
+	CUtlVector<CPolyhedron*> m_BrushPolyhedrons;
+
+	struct StaticPropPolyhedronCacheInfo_t
+	{
+		int iStartIndex;
+		int iNumPolyhedrons;
+		int iStaticPropIndex; //helps us remap ICollideable pointers when the map is restarted
+	};
+
+	CUtlVector<CPolyhedron*> m_StaticPropPolyhedrons;
+	CUtlMap<ICollideable*, StaticPropPolyhedronCacheInfo_t> m_CollideableIndicesMap;
+
+
+	void Clear(void);
+	void Update(void);
+};
+
 class C_WatcherList : public IWatcherList
 {
 public:
@@ -2762,6 +2796,9 @@ public:
 	// Level init, shutdown
 	virtual void LevelInitPreEntity();
 	virtual void LevelInitPostEntity();
+
+	// Gets called each frame
+	virtual void Update(float frametime);
 
 	// The level is shutdown in two parts
 	virtual void LevelShutdownPreEntity();
@@ -3218,7 +3255,7 @@ private:
 	IPhysicsObject* m_PhysWorldObject = NULL;
 	physicssound::soundlist_t m_impactSounds;
 	CCollisionEvent m_Collisions;
-
+	CStaticCollisionPolyhedronCache m_StaticCollisionPolyhedronCache;
 	CUtlVector<C_EnginePortalInternal*> m_ActivePortals;
 	int m_nTouchDepth = 0;
 	CCallQueue m_PostTouchQueue;
@@ -3772,6 +3809,7 @@ void CClientEntityList<T>::Shutdown()
 	RemoveDataAccessor(PHYSICSPUSHLIST);
 	RemoveDataAccessor(VPHYSICSUPDATEAI);
 	RemoveDataAccessor(VPHYSICSWATCHER);
+	m_StaticCollisionPolyhedronCache.Shutdown();
 }
 
 // Level init, shutdown
@@ -3783,6 +3821,7 @@ void CClientEntityList<T>::LevelInitPreEntity()
 	if (!m_pGameRules) {
 		Error("m_pGameRules not inited!\n");
 	}
+	m_StaticCollisionPolyhedronCache.LevelInitPreEntity();
 	m_pGameRules->LevelInitPreEntity();
 }
 
@@ -3817,6 +3856,12 @@ void CClientEntityList<T>::LevelInitPostEntity()
 		Error("m_pGameRules not inited!\n");
 	}
 	m_pGameRules->LevelInitPostEntity();
+}
+
+template<class T>
+void CClientEntityList<T>::Update(float frametime) 
+{
+	UpdateRagdolls(frametime);
 }
 
 // The level is shutdown in two parts

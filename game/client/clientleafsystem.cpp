@@ -8,21 +8,24 @@
 // This file contains code to allow us to associate client data with bsp leaves.
 //===========================================================================//
 
-#include "cbase.h"
-#include "clientleafsystem.h"
+//#include "cbase.h"
+#include "tier3/tier3.h"
 #include "utlbidirectionalset.h"
 #include "model_types.h"
 #include "ivrenderview.h"
 #include "tier0/vprof.h"
 #include "bsptreedata.h"
-#include "detailobjectsystem.h"
 #include "engine/IStaticPropMgr.h"
 #include "engine/ivdebugoverlay.h"
 #include "vstdlib/jobthread.h"
 #include "tier1/utllinkedlist.h"
 #include "datacache/imdlcache.h"
-#include "view.h"
-#include "viewrender.h"
+//#include "view.h"
+//#include "viewrender.h"
+#include "cdll_client_int.h"
+#include "clientleafsystem.h"
+#include "iclientshadowmgr.h"
+#include "detailobjectsystem.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
@@ -81,7 +84,7 @@ public:
 
 	void LevelInitPreEntity();
 	void LevelInitPostEntity() {}
-	void LevelShutdownPreEntity();
+	void LevelShutdownPreEntity() {}
 	void LevelShutdownPostEntity();
 
 	virtual void OnSave() {}
@@ -343,7 +346,7 @@ void DefaultRenderBoundsWorldspace( IClientRenderable *pRenderable, Vector &absM
 {
 	// Tracker 37433:  This fixes a bug where if the stunstick is being wielded by a combine soldier, the fact that the stick was
 	//  attached to the soldier's hand would move it such that it would get frustum culled near the edge of the screen.
-	C_BaseEntity *pEnt = (C_BaseEntity*)pRenderable->GetIClientUnknown()->GetBaseEntity();
+	IClientEntity *pEnt = pRenderable->GetIClientUnknown()->GetBaseEntity();
 	if ( pEnt && pEnt->GetEngineObject()->IsFollowingEntity() )
 	{
 		IEngineObjectClient *pParent = pEnt->GetEngineObject()->GetFollowedEntity();
@@ -403,7 +406,7 @@ inline void CalcRenderableWorldSpaceAABB(
 // This is used for placement in the leaves, but the more expensive version is used for culling.
 void CalcRenderableWorldSpaceAABB_Fast( IClientRenderable *pRenderable, Vector &absMin, Vector &absMax )
 {
-	C_BaseEntity *pEnt = (C_BaseEntity*)pRenderable->GetIClientUnknown()->GetBaseEntity();
+	IClientEntity *pEnt = pRenderable->GetIClientUnknown()->GetBaseEntity();
 	if ( pEnt && pEnt->GetEngineObject()->IsFollowingEntity() )
 	{
 		IEngineObjectClient *pParent = pEnt->GetEngineObject()->GetMoveParent();
@@ -489,10 +492,6 @@ void CClientLeafSystem::LevelInitPreEntity()
 	{
 		m_Leaf.AddToTail( newLeaf );
 	}
-}
-
-void CClientLeafSystem::LevelShutdownPreEntity()
-{
 }
 
 void CClientLeafSystem::LevelShutdownPostEntity()

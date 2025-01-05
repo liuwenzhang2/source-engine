@@ -11,6 +11,8 @@
 #pragma once
 #endif
 
+#include "platform.h"
+
 class CBasePlayer;
 class CUserCmd;
 //-----------------------------------------------------------------------------

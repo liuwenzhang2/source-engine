@@ -1015,6 +1015,9 @@ public:
 	virtual void LevelInitPreEntity() = 0;
 	virtual void LevelInitPostEntity() = 0;
 
+	// Gets called each frame
+	virtual void Update(float frametime) = 0;
+
 	// The level is shutdown in two parts
 	virtual void LevelShutdownPreEntity() = 0;
 	virtual void LevelShutdownPostEntity() = 0;

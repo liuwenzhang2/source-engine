@@ -5,22 +5,18 @@
 // $Revision: $
 // $NoKeywords: $
 //===========================================================================//
-#include "cbase.h"
-#include "detailobjectsystem.h"
+//#include "cbase.h"
 #include "gamebspfile.h"
 #include "tier1/utlbuffer.h"
 #include "tier1/utlmap.h"
-#include "view.h"
-#include "clientmode.h"
-#include "iviewrender.h"
 #include "bsptreedata.h"
 #include "tier0/vprof.h"
 #include "engine/ivmodelinfo.h"
 #include "materialsystem/imesh.h"
+#include "materialsystem/imaterialsystemhardwareconfig.h"
 #include "model_types.h"
-#include "env_detail_controller.h"
 #include "tier0/icommandline.h"
-#include "c_world.h"
+#include "entitylist_base.h"
 
 #include "tier0/valve_minmax_off.h"
 #include <algorithm>
@@ -29,13 +25,19 @@
 #if defined(DOD_DLL) || defined(CSTRIKE_DLL)
 #define USE_DETAIL_SHAPES
 #endif
-
 #ifdef USE_DETAIL_SHAPES
 #include "engine/ivdebugoverlay.h"
 #include "playerenumerator.h"
 #endif
 
-#include "materialsystem/imaterialsystemhardwareconfig.h"
+#include "sharedInterface.h"
+#include "cdll_client_int.h"
+#include "view.h"
+#include "iviewrender.h"
+#include "clientmode.h"
+#include "detailobjectsystem.h"
+#include "c_baseplayer.h"
+#include "c_world.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
@@ -366,8 +368,8 @@ public:
 	// Init, shutdown
 	bool Init()
 	{
-		m_flDefaultFadeStart = cl_detailfade.GetFloat();
-		m_flDefaultFadeEnd = cl_detaildist.GetFloat();
+		//m_flDefaultFadeStart = cl_detailfade.GetFloat();
+		//m_flDefaultFadeEnd = cl_detaildist.GetFloat();
 		return true;
 	}
 	void PostInit() {}
@@ -486,8 +488,8 @@ private:
 	SortInfo_t *m_pFastSortInfo;
 	FastSpriteQuadBuildoutBufferX4_t *m_pBuildoutBuffer;
 
-	float m_flDefaultFadeStart;
-	float m_flDefaultFadeEnd;
+	//float m_flDefaultFadeStart;
+	//float m_flDefaultFadeEnd;
 
 
 	// pre calcs for the current render frame
@@ -502,10 +504,10 @@ private:
 // System for dealing with detail objects
 //-----------------------------------------------------------------------------
 static CDetailObjectSystem s_DetailObjectSystem;
-
+IDetailObjectSystem* g_pDetailObjectSystem = &s_DetailObjectSystem;
 IDetailObjectSystem* DetailObjectSystem()
 {
-	return &s_DetailObjectSystem;
+	return g_pDetailObjectSystem;
 }
 
 
@@ -1315,7 +1317,7 @@ void CDetailModel::UpdatePlayerAvoid( void )
 	float flRecoverSpeed = cl_detail_avoid_recover_speed.GetFloat();
 
 	Vector vecAvoid;
-	C_BaseEntity *pEnt;
+	IHandleEntity *pEnt;
 
 	float flMaxForce = 0;
 	Vector vecMaxAvoid(0,0,0);
@@ -1329,7 +1331,7 @@ void CDetailModel::UpdatePlayerAvoid( void )
 	{
 		if ( i == c )
 		{
-			pEnt = (C_BasePlayer*)EntityList()->GetLocalPlayer();
+			pEnt = EntityList()->GetLocalPlayer();
 			if ( !pEnt ) continue;
 		}
 		else
@@ -1524,17 +1526,17 @@ void CDetailObjectSystem::LevelInitPostEntity()
 	}
 	m_DetailSpriteMaterial.Init( pDetailSpriteMaterial, TEXTURE_GROUP_OTHER );
 
-	if ( GetDetailController() )
-	{
-		cl_detailfade.SetValue( MIN( m_flDefaultFadeStart, GetDetailController()->m_flFadeStartDist ) );
-		cl_detaildist.SetValue( MIN( m_flDefaultFadeEnd, GetDetailController()->m_flFadeEndDist ) );
-	}
-	else
-	{
-		// revert to default values if the map doesn't specify
-		cl_detailfade.SetValue( m_flDefaultFadeStart );
-		cl_detaildist.SetValue( m_flDefaultFadeEnd );
-	}
+	//if ( GetDetailController() )
+	//{
+	//	cl_detailfade.SetValue( MIN( m_flDefaultFadeStart, GetDetailController()->m_flFadeStartDist ) );
+	//	cl_detaildist.SetValue( MIN( m_flDefaultFadeEnd, GetDetailController()->m_flFadeEndDist ) );
+	//}
+	//else
+	//{
+	//	// revert to default values if the map doesn't specify
+	//	cl_detailfade.SetValue( m_flDefaultFadeStart );
+	//	cl_detaildist.SetValue( m_flDefaultFadeEnd );
+	//}
 }
 
 void CDetailObjectSystem::LevelShutdownPreEntity()

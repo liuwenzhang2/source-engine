@@ -1332,6 +1332,8 @@ void CViewRender::ViewDrawScene( bool bDrew3dSkybox, SkyboxVisibility_t nSkyboxV
 	SetupCurrentView( view.origin, view.angles, viewID );
 
 	g_pClientShadowMgr->PreRender();
+	g_pClientLeafSystem->PreRender();
+
 	// Invoke pre-render methods
 	IGameSystem::PreRenderAllSystems();
 
@@ -2874,6 +2876,8 @@ void CViewRender::ViewDrawScene_Intro( const CViewSetup &view, int nClearFlags, 
 		SetupCurrentView( playerView.origin, playerView.angles, VIEW_INTRO_PLAYER );
 
 		g_pClientShadowMgr->PreRender();
+		g_pClientLeafSystem->PreRender();
+
 		// Invoke pre-render methods
 		IGameSystem::PreRenderAllSystems();
 
@@ -2911,6 +2915,8 @@ void CViewRender::ViewDrawScene_Intro( const CViewSetup &view, int nClearFlags, 
 	SetupCurrentView( view.origin, view.angles, VIEW_INTRO_CAMERA );
 
 	g_pClientShadowMgr->PreRender();
+	g_pClientLeafSystem->PreRender();
+
 	// Invoke pre-render methods
 	IGameSystem::PreRenderAllSystems();
 
@@ -4751,6 +4757,8 @@ void CSkyboxView::DrawInternal( view_id_t iSkyBoxViewID, bool bInvokePreAndPostR
 	if ( bInvokePreAndPostRender )
 	{
 		g_pClientShadowMgr->PreRender();
+		g_pClientLeafSystem->PreRender();
+
 		IGameSystem::PreRenderAllSystems();
 	}
 

@@ -15,8 +15,6 @@
 #include "ehandle.h"
 #include "ispatialpartition.h"
 
-class C_BaseEntity;
-
 class CPlayerEnumerator : public IPartitionEnumerator
 {
 	DECLARE_CLASS_NOBASE( CPlayerEnumerator );
@@ -31,7 +29,7 @@ public:
 
 	int	GetObjectCount() { return m_Objects.Size(); }
 
-	C_BaseEntity *GetObject( int index )
+	IHandleEntity *GetObject( int index )
 	{
 		if ( index < 0 || index >= GetObjectCount() )
 			return NULL;
@@ -42,7 +40,7 @@ public:
 	//Actual work code
 	virtual IterationRetval_t EnumElement( IHandleEntity *pHandleEntity )
 	{
-		C_BaseEntity *pEnt = (C_BaseEntity*)EntityList()->GetBaseEntityFromHandle( pHandleEntity->GetRefEHandle() );
+		IHandleEntity* pEnt = pHandleEntity;//EntityList()->GetBaseEntityFromHandle(pHandleEntity->GetRefEHandle());
 		if ( pEnt == NULL )
 			return ITERATION_CONTINUE;
 
@@ -53,7 +51,7 @@ public:
 		if ( deltaPos.LengthSqr() > m_flRadiusSquared )
 			return ITERATION_CONTINUE;
 
-		CHandle< C_BaseEntity > h;
+		CHandle< IHandleEntity > h;
 		h = pEnt;
 		m_Objects.AddToTail( h );
 
@@ -65,7 +63,7 @@ public:
 	float	m_flRadiusSquared;
 	Vector m_vecOrigin;
 
-	CUtlVector< CHandle< C_BaseEntity > > m_Objects;
+	CUtlVector< CHandle< IHandleEntity > > m_Objects;
 };
 
-#endif // PLAYERENUMERATOR_H
+#endif // PLAYERENUm_ObjectsMERATOR_H

@@ -12,8 +12,6 @@
 #pragma once
 #endif
 
-#include "igamesystem.h"
-#include "icliententityinternal.h"
 #include "engine/ivmodelrender.h"
 #include "mathlib/vector.h"
 #include "ivrenderview.h"
@@ -24,9 +22,19 @@ struct model_t;
 //-----------------------------------------------------------------------------
 // Responsible for managing detail objects
 //-----------------------------------------------------------------------------
-abstract_class IDetailObjectSystem : public IGameSystem
+abstract_class IDetailObjectSystem
 {
 public:
+
+	virtual bool Init() = 0;
+	virtual void Shutdown() = 0;
+
+	// Level init, shutdown
+	virtual void LevelInitPreEntity() = 0;
+	virtual void LevelInitPostEntity() = 0;
+	virtual void LevelShutdownPreEntity() = 0;
+	virtual void LevelShutdownPostEntity() = 0;
+
     // Gets a particular detail object
 	virtual IClientRenderable* GetDetailModel( int idx ) = 0;
 
@@ -51,7 +59,7 @@ public:
 // System for dealing with detail objects
 //-----------------------------------------------------------------------------
 IDetailObjectSystem* DetailObjectSystem();
-
+extern IDetailObjectSystem* g_pDetailObjectSystem;
 
 #endif // DETAILOBJECTSYSTEM_H
 

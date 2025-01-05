@@ -212,6 +212,9 @@ void C_World::Precache( void )
 
 	EntityList()->LevelInitPreEntity();
 	g_pClientShadowMgr->LevelInitPreEntity();
+	g_pClientLeafSystem->LevelInitPreEntity();
+	g_pDetailObjectSystem->LevelInitPreEntity();
+
 	IGameSystem::LevelInitPreEntityAllSystems();//pMapName
 
 	// Get weapon precaches
