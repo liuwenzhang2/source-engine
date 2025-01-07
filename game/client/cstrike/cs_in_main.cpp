@@ -11,7 +11,7 @@
 //-----------------------------------------------------------------------------
 // Purpose: TF Input interface
 //-----------------------------------------------------------------------------
-class CCSInput : public CInput
+class CCSInput : public CUserInput
 {
 public:
 };
@@ -19,5 +19,5 @@ public:
 static CCSInput g_Input;
 
 // Expose this interface
-IInput *input = ( IInput * )&g_Input;
+IUserInput *input = ( IUserInput * )&g_Input;
 

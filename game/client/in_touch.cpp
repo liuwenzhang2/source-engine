@@ -53,7 +53,7 @@ ConVar touch_accel( "touch_accel", "1.f", FCVAR_ARCHIVE );
 ConVar touch_reverse( "touch_reverse", "0", FCVAR_ARCHIVE );
 ConVar touch_sensitivity( "touch_sensitivity", "3.0", FCVAR_ARCHIVE, "touch look sensitivity" );
 
-void CInput::TouchScale( float &dx, float &dy )
+void CUserInput::TouchScale( float &dx, float &dy )
 {
 	dx *= touch_yaw.GetFloat();
 	dy *= touch_pitch.GetFloat();
@@ -76,7 +76,7 @@ void CInput::TouchScale( float &dx, float &dy )
 	}
 }
 
-void CInput::ApplyTouch( QAngle &viewangles, CUserCmd *cmd, float dx, float dy )
+void CUserInput::ApplyTouch( QAngle &viewangles, CUserCmd *cmd, float dx, float dy )
 {
 	viewangles[YAW] -= dx;
 	viewangles[PITCH] += dy;
@@ -84,7 +84,7 @@ void CInput::ApplyTouch( QAngle &viewangles, CUserCmd *cmd, float dx, float dy )
 	cmd->mousedy = dy;
 }
 
-void CInput::TouchMove( CUserCmd *cmd )
+void CUserInput::TouchMove( CUserCmd *cmd )
 {
 	QAngle viewangles;
 	float dx,dy,side,forward,pitch,yaw;

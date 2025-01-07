@@ -235,7 +235,7 @@ void CInputSystem::ShutdownJoysticks()
 	m_bJoystickInitialized = false;
 }
 
-// Update the joy_xcontroller_found convar to force CInput::JoyStickMove to re-exec 360controller-linux.cfg
+// Update the joy_xcontroller_found convar to force CUserInput::JoyStickMove to re-exec 360controller-linux.cfg
 static void SetJoyXControllerFound( bool found )
 {
 	static ConVarRef xcontrollerVar( "joy_xcontroller_found" );

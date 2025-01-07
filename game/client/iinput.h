@@ -29,7 +29,7 @@ struct CameraThirdData_t
 	Vector	m_vecHullMax;
 };
 
-abstract_class IInput
+abstract_class IUserInput
 {
 public:
 	// Initialization/shutdown of the subsystem
@@ -115,6 +115,6 @@ public:
 	virtual	bool		EnableJoystickMode() = 0;
 };
 
-extern ::IInput *input;
+extern IUserInput *input;
 
 #endif // IINPUT_H

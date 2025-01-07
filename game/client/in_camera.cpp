@@ -233,7 +233,7 @@ CAM_Think
 
 ==============================
 */
-void CInput::CAM_Think( void )
+void CUserInput::CAM_Think( void )
 {
 	VPROF("CAM_Think");
 	//
@@ -582,7 +582,7 @@ void ClampRange180( float &value )
 //------------------------------------------------------------------------------
 // Purpose:
 //------------------------------------------------------------------------------
-void CInput::CAM_SetCameraThirdData( CameraThirdData_t *pCameraData, const QAngle &vecCameraOffset )
+void CUserInput::CAM_SetCameraThirdData( CameraThirdData_t *pCameraData, const QAngle &vecCameraOffset )
 {
 	m_pCameraThirdData = pCameraData;
 
@@ -599,7 +599,7 @@ void CInput::CAM_SetCameraThirdData( CameraThirdData_t *pCameraData, const QAngl
 //------------------------------------------------------------------------------
 // Purpose:
 //------------------------------------------------------------------------------
-void CInput::CAM_CameraThirdThink( void )
+void CUserInput::CAM_CameraThirdThink( void )
 {
 	// Verify data.
 	if ( !m_pCameraThirdData )
@@ -672,7 +672,7 @@ CAM_ToThirdPerson
 
 ==============================
 */
-void CInput::CAM_ToThirdPerson(void)
+void CUserInput::CAM_ToThirdPerson(void)
 { 
 	QAngle viewangles;
 
@@ -694,7 +694,7 @@ CAM_ToFirstPerson
 
 ==============================
 */
-void CInput::CAM_ToFirstPerson(void)
+void CUserInput::CAM_ToFirstPerson(void)
 {
 	g_ThirdPersonManager.SetDesiredCameraOffset( vec3_origin );
 
@@ -715,7 +715,7 @@ CAM_ToFirstPerson
 
 ==============================
 */
-bool CInput::CAM_IsOrthographic(void) const
+bool CUserInput::CAM_IsOrthographic(void) const
 {
 	return m_CameraIsOrthographic;
 }
@@ -727,7 +727,7 @@ CAM_ToFirstPerson
 
 ==============================
 */
-void CInput::CAM_OrthographicSize(float& w, float& h) const
+void CUserInput::CAM_OrthographicSize(float& w, float& h) const
 {
 	w = c_orthowidth.GetFloat(); h = c_orthoheight.GetFloat();
 }
@@ -739,7 +739,7 @@ CAM_ToFirstPerson
 
 ==============================
 */
-void CInput::CAM_ToOrthographic(void)
+void CUserInput::CAM_ToOrthographic(void)
 {
 	m_fCameraInThirdPerson = false;
 	m_CameraIsOrthographic = true;
@@ -752,7 +752,7 @@ CAM_StartMouseMove
 
 ==============================
 */
-void CInput::CAM_StartMouseMove(void)
+void CUserInput::CAM_StartMouseMove(void)
 {
 	float flSensitivity;
 		
@@ -804,7 +804,7 @@ the key has been released for camera movement
 tell the engine that mouse camera movement is off
 ==============================
 */
-void CInput::CAM_EndMouseMove(void)
+void CUserInput::CAM_EndMouseMove(void)
 {
    m_fCameraMovingWithMouse=false;
    m_fCameraInterceptingMouse=false;
@@ -818,7 +818,7 @@ routines to start the process of moving the cam in or out
 using the mouse
 ==============================
 */
-void CInput::CAM_StartDistance(void)
+void CUserInput::CAM_StartDistance(void)
 {
 	//only move the cam with mouse if we are in third person.
 	if ( m_fCameraInThirdPerson )
@@ -863,7 +863,7 @@ the key has been released for camera movement
 tell the engine that mouse camera movement is off
 ==============================
 */
-void CInput::CAM_EndDistance(void)
+void CUserInput::CAM_EndDistance(void)
 {
    m_fCameraDistanceMove=false;
    m_fCameraMovingWithMouse=false;
@@ -876,7 +876,7 @@ CAM_IsThirdPerson
 
 ==============================
 */
-int CInput::CAM_IsThirdPerson( void )
+int CUserInput::CAM_IsThirdPerson( void )
 {
 	return m_fCameraInThirdPerson;
 }
@@ -887,7 +887,7 @@ CAM_InterceptingMouse
 
 ==============================
 */
-int CInput::CAM_InterceptingMouse( void )
+int CUserInput::CAM_InterceptingMouse( void )
 {
 	return m_fCameraInterceptingMouse;
 }
@@ -926,7 +926,7 @@ Init_Camera
 
 ==============================
 */
-void CInput::Init_Camera( void )
+void CUserInput::Init_Camera( void )
 {
 	m_CameraIsOrthographic = false;
 }

@@ -36,12 +36,12 @@ public:
 
 class ConVar;
 
-class CInput : public IInput
+class CUserInput : public IUserInput
 {
 // Interface
 public:
-							CInput( void );
-							~CInput( void );
+							CUserInput( void );
+							~CUserInput( void );
 
 	virtual		void		Init_All( void );
 	virtual		void		Shutdown_All( void );

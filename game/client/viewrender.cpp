@@ -9,7 +9,6 @@
 #include "iviewrender.h"
 #include "view_shared.h"
 #include "ivieweffects.h"
-#include "iinput.h"
 #include "model_types.h"
 #include "clientsideeffects.h"
 #include "particlemgr.h"

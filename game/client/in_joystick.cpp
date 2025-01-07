@@ -127,7 +127,7 @@ extern ConVar thirdperson_screenspace;
 //-----------------------------------------------------------------
 // Purpose: Returns true if there's an active joystick connected.
 //-----------------------------------------------------------------
-bool CInput::EnableJoystickMode()
+bool CUserInput::EnableJoystickMode()
 {
 	return IsConsole() || in_joystick.GetBool();
 }
@@ -453,7 +453,7 @@ static float ResponseCurveLook( int curve, float x, int axis, float otherAxis, f
 //-----------------------------------------------------------------------------
 // Purpose: Advanced joystick setup
 //-----------------------------------------------------------------------------
-void CInput::Joystick_Advanced(void)
+void CUserInput::Joystick_Advanced(void)
 {
 	// called whenever an update is needed
 	int	i;
@@ -555,7 +555,7 @@ void CInput::Joystick_Advanced(void)
 // Input  : index - 
 // Output : char const
 //-----------------------------------------------------------------------------
-char const *CInput::DescribeAxis( int index )
+char const *CUserInput::DescribeAxis( int index )
 {
 	switch ( index )
 	{
@@ -581,7 +581,7 @@ char const *CInput::DescribeAxis( int index )
 // Input  : *axis - 
 //			*mapping - 
 //-----------------------------------------------------------------------------
-void CInput::DescribeJoystickAxis( char const *axis, joy_axis_t *mapping )
+void CUserInput::DescribeJoystickAxis( char const *axis, joy_axis_t *mapping )
 {
 	if ( !mapping->AxisMap )
 	{
@@ -601,7 +601,7 @@ void CInput::DescribeJoystickAxis( char const *axis, joy_axis_t *mapping )
 // Purpose: Allow joystick to issue key events
 // Not currently used - controller button events are pumped through the windprocs. KWD
 //-----------------------------------------------------------------------------
-void CInput::ControllerCommands( void )
+void CUserInput::ControllerCommands( void )
 {
 }
 
@@ -609,7 +609,7 @@ void CInput::ControllerCommands( void )
 //-----------------------------------------------------------------------------
 // Purpose: Scales the raw analog value to lie withing the axis range (full range - deadzone )
 //-----------------------------------------------------------------------------
-float CInput::ScaleAxisValue( const float axisValue, const float axisThreshold )
+float CUserInput::ScaleAxisValue( const float axisValue, const float axisThreshold )
 {
 	// Xbox scales the range of all axes in the inputsystem. PC can't do that because each axis mapping
 	// has a (potentially) unique threshold value.  If all axes were restricted to a single threshold
@@ -636,27 +636,27 @@ float CInput::ScaleAxisValue( const float axisValue, const float axisThreshold )
 }
 
 
-void CInput::Joystick_SetSampleTime(float frametime)
+void CUserInput::Joystick_SetSampleTime(float frametime)
 {
 	m_flRemainingJoystickSampleTime = frametime;
 }
 
-float CInput::Joystick_GetForward( void )
+float CUserInput::Joystick_GetForward( void )
 {
 	return m_flPreviousJoystickForward;
 }
 
-float CInput::Joystick_GetSide( void )
+float CUserInput::Joystick_GetSide( void )
 {
 	return m_flPreviousJoystickSide;
 }
 
-float CInput::Joystick_GetPitch( void )
+float CUserInput::Joystick_GetPitch( void )
 {
 	return m_flPreviousJoystickPitch;
 }
 
-float CInput::Joystick_GetYaw( void )
+float CUserInput::Joystick_GetYaw( void )
 {
 	return m_flPreviousJoystickYaw;
 }
@@ -666,7 +666,7 @@ float CInput::Joystick_GetYaw( void )
 // Input  : frametime - 
 //			*cmd - 
 //-----------------------------------------------------------------------------
-void CInput::JoyStickMove( float frametime, CUserCmd *cmd )
+void CUserInput::JoyStickMove( float frametime, CUserCmd *cmd )
 {
 	// complete initialization if first time in ( needed as cvars are not available at initialization time )
 	if ( !m_fJoystickAdvancedInit )

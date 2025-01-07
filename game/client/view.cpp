@@ -11,7 +11,6 @@
 #include "iviewrender_beams.h"
 #include "view_shared.h"
 #include "ivieweffects.h"
-#include "iinput.h"
 #include "iclientmode.h"
 #include "prediction.h"
 #include "viewrender.h"

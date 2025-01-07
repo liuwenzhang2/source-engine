@@ -14,7 +14,7 @@
 //-----------------------------------------------------------------------------
 // Purpose: HL Input interface
 //-----------------------------------------------------------------------------
-class CHLInput : public CInput
+class CHLInput : public CUserInput
 {
 public:
 };
@@ -22,4 +22,4 @@ public:
 static CHLInput g_Input;
 
 // Expose this interface
-IInput *input = ( IInput * )&g_Input;
+IUserInput *input = ( IUserInput * )&g_Input;

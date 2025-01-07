@@ -119,7 +119,7 @@ void SetVGUICursorPos( int x, int y );
 //-----------------------------------------------------------------------------
 // Purpose: Hides cursor and starts accumulation/re-centering
 //-----------------------------------------------------------------------------
-void CInput::ActivateMouse (void)
+void CUserInput::ActivateMouse (void)
 {
 	if ( m_fMouseActive )
 		return;
@@ -153,7 +153,7 @@ void CInput::ActivateMouse (void)
 //-----------------------------------------------------------------------------
 // Purpose: Gives back the cursor and stops centering of mouse
 //-----------------------------------------------------------------------------
-void CInput::DeactivateMouse (void)
+void CUserInput::DeactivateMouse (void)
 {
 	// This gets called whenever the mouse should be inactive. We only respond to it if we had 
 	// previously activated the mouse. We'll show the cursor in here.
@@ -184,7 +184,7 @@ void CInput::DeactivateMouse (void)
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-void CInput::CheckMouseAcclerationVars()
+void CUserInput::CheckMouseAcclerationVars()
 {
 	// Don't change them if the mouse is inactive, invalid, or not using parameters for restore
 	if ( !m_fMouseActive ||
@@ -247,7 +247,7 @@ void CInput::CheckMouseAcclerationVars()
 //-----------------------------------------------------------------------------
 // Purpose: One-time initialization
 //-----------------------------------------------------------------------------
-void CInput::Init_Mouse (void)
+void CUserInput::Init_Mouse (void)
 {
 	if ( CommandLine()->FindParm("-nomouse" ) ) 
 		return; 
@@ -308,7 +308,7 @@ void CInput::Init_Mouse (void)
 // Input  : int&x - 
 //			y - 
 //-----------------------------------------------------------------------------
-void CInput::GetWindowCenter( int&x, int& y )
+void CUserInput::GetWindowCenter( int&x, int& y )
 {
 	int w, h;
 	engine->GetScreenSize( w, h );
@@ -320,7 +320,7 @@ void CInput::GetWindowCenter( int&x, int& y )
 //-----------------------------------------------------------------------------
 // Purpose: Recenter the mouse
 //-----------------------------------------------------------------------------
-void CInput::ResetMouse( void )
+void CUserInput::ResetMouse( void )
 {
 	int x, y;
 	GetWindowCenter( x,  y );
@@ -334,7 +334,7 @@ void CInput::ResetMouse( void )
 // Input  : *mx - 
 //			*my - 
 //-----------------------------------------------------------------------------
-void CInput::GetAccumulatedMouseDeltasAndResetAccumulators( float *mx, float *my )
+void CUserInput::GetAccumulatedMouseDeltasAndResetAccumulators( float *mx, float *my )
 {
 	Assert( mx );
 	Assert( my );
@@ -365,7 +365,7 @@ void CInput::GetAccumulatedMouseDeltasAndResetAccumulators( float *mx, float *my
 //			*x - 
 //			*y - 
 //-----------------------------------------------------------------------------
-void CInput::GetMouseDelta( float inmousex, float inmousey, float *pOutMouseX, float *pOutMouseY )
+void CUserInput::GetMouseDelta( float inmousex, float inmousey, float *pOutMouseX, float *pOutMouseY )
 {
 	// Apply filtering?
 	if ( m_filter.GetBool() )
@@ -393,7 +393,7 @@ void CInput::GetMouseDelta( float inmousex, float inmousey, float *pOutMouseX, f
 // Input  : *x - 
 //			*y - 
 //-----------------------------------------------------------------------------
-void CInput::ScaleMouse( float *x, float *y )
+void CUserInput::ScaleMouse( float *x, float *y )
 {
 	float mx = *x;
 	float my = *y;
@@ -450,7 +450,7 @@ void CInput::ScaleMouse( float *x, float *y )
 //			mouse_x - 
 //			mouse_y - 
 //-----------------------------------------------------------------------------
-void CInput::ApplyMouse( QAngle& viewangles, CUserCmd *cmd, float mouse_x, float mouse_y )
+void CUserInput::ApplyMouse( QAngle& viewangles, CUserCmd *cmd, float mouse_x, float mouse_y )
 {
 	if ( !((in_strafe.state & 1) || lookstrafe.GetInt()) )
 	{
@@ -474,7 +474,7 @@ void CInput::ApplyMouse( QAngle& viewangles, CUserCmd *cmd, float mouse_x, float
 
 					g_ThirdPersonManager.SetCameraOffsetAngles( vTempOffset );
 
-					// why doesn't this work??? CInput::AdjustYaw is why
+					// why doesn't this work??? CUserInput::AdjustYaw is why
 					//cam_idealyaw.SetValue( cam_idealyaw.GetFloat() - m_yaw.GetFloat() * mouse_x );
 				}
 			}
@@ -516,7 +516,7 @@ void CInput::ApplyMouse( QAngle& viewangles, CUserCmd *cmd, float mouse_x, float
 
 					g_ThirdPersonManager.SetCameraOffsetAngles( vTempOffset );
 
-					// why doesn't this work??? CInput::AdjustYaw is why
+					// why doesn't this work??? CUserInput::AdjustYaw is why
 					//cam_idealpitch.SetValue( cam_idealpitch.GetFloat() + m_pitch->GetFloat() * mouse_y );
 				}
 			}
@@ -559,7 +559,7 @@ void CInput::ApplyMouse( QAngle& viewangles, CUserCmd *cmd, float mouse_x, float
 //-----------------------------------------------------------------------------
 // Purpose: AccumulateMouse
 //-----------------------------------------------------------------------------
-void CInput::AccumulateMouse( void )
+void CUserInput::AccumulateMouse( void )
 {
 	if( !cl_mouseenable.GetBool() )
 	{
@@ -625,7 +625,7 @@ void CInput::AccumulateMouse( void )
 // Input  : &ox - 
 //			&oy - 
 //-----------------------------------------------------------------------------
-void CInput::GetMousePos(int &ox, int &oy)
+void CUserInput::GetMousePos(int &ox, int &oy)
 {
 	GetVGUICursorPos( ox, oy );
 }
@@ -635,7 +635,7 @@ void CInput::GetMousePos(int &ox, int &oy)
 // Input  : x - 
 //			y - 
 //-----------------------------------------------------------------------------
-void CInput::SetMousePos(int x, int y)
+void CUserInput::SetMousePos(int x, int y)
 {
 	SetVGUICursorPos(x, y);
 }
@@ -644,7 +644,7 @@ void CInput::SetMousePos(int x, int y)
 // Purpose: MouseMove -- main entry point for applying mouse
 // Input  : *cmd - 
 //-----------------------------------------------------------------------------
-void CInput::MouseMove( CUserCmd *cmd )
+void CUserInput::MouseMove( CUserCmd *cmd )
 {
 	float	mouse_x, mouse_y;
 	float	mx, my;
@@ -697,7 +697,7 @@ void CInput::MouseMove( CUserCmd *cmd )
 //			*unclampedx - 
 //			*unclampedy - 
 //-----------------------------------------------------------------------------
-void CInput::GetFullscreenMousePos( int *mx, int *my, int *unclampedx /*=NULL*/, int *unclampedy /*=NULL*/ )
+void CUserInput::GetFullscreenMousePos( int *mx, int *my, int *unclampedx /*=NULL*/, int *unclampedy /*=NULL*/ )
 {
 	Assert( mx );
 	Assert( my );
@@ -751,7 +751,7 @@ void CInput::GetFullscreenMousePos( int *mx, int *my, int *unclampedx /*=NULL*/,
 // Input  : mx - 
 //			my - 
 //-----------------------------------------------------------------------------
-void CInput::SetFullscreenMousePos( int mx, int my )
+void CUserInput::SetFullscreenMousePos( int mx, int my )
 {
 	SetMousePos( mx, my );
 }
@@ -759,7 +759,7 @@ void CInput::SetFullscreenMousePos( int mx, int my )
 //-----------------------------------------------------------------------------
 // Purpose: ClearStates -- Resets mouse accumulators so you don't get a pop when returning to trapped mouse
 //-----------------------------------------------------------------------------
-void CInput::ClearStates (void)
+void CUserInput::ClearStates (void)
 {
 	if ( !m_fMouseActive )
 		return;
