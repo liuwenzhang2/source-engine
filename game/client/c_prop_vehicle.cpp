@@ -11,7 +11,6 @@
 #include "hud.h"		
 #include <vgui_controls/Controls.h>
 #include <Color.h>
-#include "view.h"
 #include "engine/ivdebugoverlay.h"
 #include "movevars_shared.h"
 #include "iviewrender.h"

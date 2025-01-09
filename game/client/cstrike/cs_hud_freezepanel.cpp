@@ -18,7 +18,6 @@
 #include "VGUI/bordered_panel.h"
 #include "fmtstr.h"
 #include "cs_gamerules.h"
-#include "view.h"
 #include "ivieweffects.h"
 #include "viewrender.h"
 #include "usermessages.h"

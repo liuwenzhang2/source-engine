@@ -10,7 +10,7 @@
 #include "tier1/KeyValues.h"
 #include "toolframework_client.h"
 #include "fx.h"
-#include "view.h"
+#include "viewrender.h"
 #include "smoke_fog_overlay.h"
 
 IMPLEMENT_NETWORKCLASS_ALIASED( DODSmokeGrenade, DT_DODSmokeGrenade )

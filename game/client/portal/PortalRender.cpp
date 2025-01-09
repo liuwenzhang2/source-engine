@@ -9,7 +9,6 @@
 #include "cbase.h"
 #include "PortalRender.h"
 #include "clienteffectprecachesystem.h"
-#include "view.h"
 #include "c_pixel_visibility.h"
 #include "glow_overlay.h"
 #include "portal_render_targets.h" //depth doubler

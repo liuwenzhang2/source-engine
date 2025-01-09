@@ -9,7 +9,7 @@
 #include "tier0/vprof.h"
 #include "clientsideeffects.h"
 #include "clienteffectprecachesystem.h"
-#include "view.h"
+#include "viewrender.h"
 #include "collisionutils.h"
 #include "SoundEmitterSystem/isoundemittersystembase.h"
 #include "engine/IEngineSound.h"

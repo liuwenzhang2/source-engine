@@ -9,7 +9,6 @@
 #include "smoke_fog_overlay.h"
 #include "materialsystem/imaterial.h"
 #include "materialsystem/imesh.h"
-#include "view.h"
 #include "clienteffectprecachesystem.h"
 #include "tier0/vprof.h"
 

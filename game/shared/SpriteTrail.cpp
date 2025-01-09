@@ -13,7 +13,6 @@
 #include "materialsystem/imaterialsystem.h"
 #include "materialsystem/imesh.h"
 #include "mathlib/vmatrix.h"
-#include "view.h"
 #include "beamdraw.h"
 #include "enginesprite.h"
 #include "tier0/vprof.h"

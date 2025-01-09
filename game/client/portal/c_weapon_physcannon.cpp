@@ -9,7 +9,6 @@
 #include "weapon_portalbasecombatweapon.h"
 #include "fx.h"
 #include "particles_localspace.h"
-#include "view.h"
 #include "particles_attractor.h"
 
 class C_WeaponPhysCannon: public CBasePortalCombatWeapon

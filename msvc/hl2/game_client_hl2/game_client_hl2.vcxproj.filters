@@ -948,9 +948,6 @@
     <ClCompile Include="..\..\..\game\client\vgui_slideshow_display_screen.cpp">
       <Filter>源文件\Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\game\client\view.cpp">
-      <Filter>源文件\Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\game\client\view_beams.cpp">
       <Filter>源文件\Source Files</Filter>
     </ClCompile>

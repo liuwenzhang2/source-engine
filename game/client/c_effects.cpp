@@ -7,7 +7,6 @@
 //=============================================================================//
 #include "cbase.h"
 #include "c_tracer.h"
-#include "view.h"
 //#include "initializer.h"
 #include "particles_simple.h"
 #include "env_wind_shared.h"

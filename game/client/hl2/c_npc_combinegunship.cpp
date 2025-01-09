@@ -16,6 +16,7 @@
 #include "c_sprite.h"
 #include "clienteffectprecachesystem.h"
 #include <bitbuf.h>
+#include "viewrender.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"

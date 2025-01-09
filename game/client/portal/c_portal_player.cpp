@@ -7,7 +7,6 @@
 #include "cbase.h"
 #include "vcollide_parse.h"
 #include "c_portal_player.h"
-#include "view.h"
 #include "c_basetempentity.h"
 #include "takedamageinfo.h"
 #include "in_buttons.h"

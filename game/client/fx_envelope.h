@@ -12,7 +12,6 @@
 
 #include "cbase.h"
 #include "fx.h"
-#include "view.h"
 #include "view_scene.h"
 #include "materialsystem/imaterialvar.h"
 

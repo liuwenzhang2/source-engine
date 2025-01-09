@@ -6,8 +6,6 @@
 #include "cbase.h"
 #include "shareddefs.h"
 #include "materialsystem/imesh.h"
-#include "view.h"
-#include "iviewrender.h"
 #include "view_shared.h"
 #include "viewrender.h"
 

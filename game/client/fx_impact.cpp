@@ -9,7 +9,6 @@
 #include "IEffects.h"
 #include "fx.h"
 #include "fx_impact.h"
-#include "view.h"
 #ifdef TF_CLIENT_DLL
 #include "cdll_util.h"
 #endif

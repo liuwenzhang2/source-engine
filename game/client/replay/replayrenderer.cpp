@@ -18,7 +18,6 @@
 #include "replay/ireplaymanager.h"
 #include "replay/ienginereplay.h"
 #include "replay/iclientreplaycontext.h"
-#include "view.h"
 #include "iviewrender.h"
 #include "view_shared.h"
 #include "replay/replaycamera.h"

@@ -16,7 +16,6 @@
 #include <vgui/ISurface.h>
 #include "fmtstr.h"
 #include "dod_gamerules.h"
-#include "view.h"
 #include "ivieweffects.h"
 #include "viewrender.h"
 

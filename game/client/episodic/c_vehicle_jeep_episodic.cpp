@@ -8,7 +8,6 @@
 #include "c_prop_vehicle.h"
 #include "c_vehicle_jeep.h"
 #include "movevars_shared.h"
-#include "view.h"
 #include "flashlighteffect.h"
 #include "c_baseplayer.h"
 #include "c_te_effect_dispatch.h"

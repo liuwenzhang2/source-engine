@@ -8,7 +8,6 @@
 //
 
 #include "cbase.h"
-#include "view.h"
 
 #include "iclientmode.h"
 

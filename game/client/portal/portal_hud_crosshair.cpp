@@ -10,7 +10,6 @@
 #include "portal_hud_crosshair.h"
 #include "iclientmode.h"
 #include "c_portal_player.h"
-#include "view.h"
 #include "weapon_portalbase.h"
 #include "vgui_controls/Controls.h"
 #include "vgui/ISurface.h"

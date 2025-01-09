@@ -12,7 +12,6 @@
 #include "fx.h"
 #include "fx_quad.h"
 #include "c_te_effect_dispatch.h"
-#include "view.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"

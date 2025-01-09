@@ -13,7 +13,6 @@
 #include "replay/iclientreplaycontext.h"
 #include "replay/ireplayscreenshotmanager.h"
 #include "replay_screenshot.h"
-#include "view.h"
 #include "filesystem.h"
 #include "view_shared.h"
 #include "iviewrender.h"

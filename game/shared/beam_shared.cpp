@@ -20,7 +20,6 @@
 #include "c_pixel_visibility.h"
 #include "iclientmode.h"
 #include "viewrender.h"
-#include "view.h"
 #include "beamdraw.h"
 #ifdef PORTAL
 	#include "c_prop_portal.h"

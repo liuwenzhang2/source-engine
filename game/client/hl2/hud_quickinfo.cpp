@@ -19,7 +19,6 @@
 
 #ifdef SIXENSE
 #include "sixense/in_sixense.h"
-#include "view.h"
 int ScreenTransform( const Vector& point, Vector& screen );
 #endif
 

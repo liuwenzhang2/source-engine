@@ -5,8 +5,7 @@
 // $NoKeywords: $
 //=============================================================================//
 #include "cbase.h"
-#include "view.h"
-#include "iviewrender.h"
+#include "viewrender.h"
 #include "c_sun.h"
 #include "particles_simple.h"
 #include "clienteffectprecachesystem.h"
@@ -342,6 +341,20 @@ void CGlowOverlay::CalcBasis(
 	vUp *= flVertSize;
 }
 
+// Returns true of the sphere is outside the frustum defined by pPlanes.
+// (planes point inwards).
+bool R_CullSphere(
+	VPlane const* pPlanes,
+	int nPlanes,
+	Vector const* pCenter,
+	float radius)
+{
+	for (int i = 0; i < nPlanes; i++)
+		if (pPlanes[i].DistTo(*pCenter) < -radius)
+			return true;
+
+	return false;
+}
 
 void CGlowOverlay::Draw( bool bCacheFullSceneState )
 {

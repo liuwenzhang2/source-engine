@@ -16,7 +16,6 @@
 #include "engine/ivdebugoverlay.h"
 #include "shareddefs.h"
 #include "fx_blood.h"
-#include "view.h"
 #include "c_dod_player.h"
 #include "fx.h"
 

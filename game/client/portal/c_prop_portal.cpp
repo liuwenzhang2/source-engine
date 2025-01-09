@@ -13,7 +13,6 @@
 #include "materialsystem/itexture.h"
 #include "hud_macros.h"
 #include "igamesystem.h"
-#include "view.h"						// For MainViewOrigin()
 #include "clientleafsystem.h"			// For finding the leaves our portals are in
 #include "portal_render_targets.h"		// Access to static references to Portal-specific render textures
 #include "toolframework/itoolframework.h"

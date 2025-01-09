@@ -20,8 +20,6 @@
 #include "vstdlib/jobthread.h"
 #include "tier1/utllinkedlist.h"
 #include "datacache/imdlcache.h"
-//#include "view.h"
-//#include "viewrender.h"
 #include "cdll_client_int.h"
 #include "clientleafsystem.h"
 #include "iclientshadowmgr.h"

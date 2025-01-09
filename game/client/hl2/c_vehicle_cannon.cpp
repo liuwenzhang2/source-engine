@@ -9,7 +9,6 @@
 #include <vgui_controls/Controls.h>
 #include <Color.h>
 #include "c_vehicle_crane.h"
-#include "view.h"
 #include "vehicle_viewblend_shared.h"
 
 // memdbgon must be the last include file in a .cpp file!!!

@@ -12,7 +12,7 @@
 #include "decals.h"
 #include "iviewrender.h"
 #include "engine/ivmodelinfo.h"
-#include "view.h"
+#include "viewrender.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"

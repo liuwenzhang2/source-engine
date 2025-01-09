@@ -15,7 +15,7 @@
 #include "fx_explosion.h"
 #include "tier1/KeyValues.h"
 #include "toolframework_client.h"
-#include "view.h"
+#include "viewrender.h"
 #include "clienteffectprecachesystem.h"
 
 // memdbgon must be the last include file in a .cpp file!!!

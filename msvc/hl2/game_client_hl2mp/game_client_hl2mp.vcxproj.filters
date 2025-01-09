@@ -960,9 +960,6 @@
     <ClCompile Include="..\..\..\game\client\vgui_video_player.cpp">
       <Filter>源文件\Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\game\client\view.cpp">
-      <Filter>源文件\Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\game\client\viewangleanim.cpp">
       <Filter>源文件\Source Files</Filter>
     </ClCompile>

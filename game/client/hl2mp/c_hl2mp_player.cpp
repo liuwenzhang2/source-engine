@@ -7,7 +7,7 @@
 #include "cbase.h"
 #include "vcollide_parse.h"
 #include "c_hl2mp_player.h"
-#include "view.h"
+#include "viewrender.h"
 #include "takedamageinfo.h"
 #include "hl2mp_gamerules.h"
 #include "in_buttons.h"

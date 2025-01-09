@@ -9,7 +9,6 @@
 #include "hud.h"
 #include "hud_vehicle.h"
 #include "iclientmode.h"
-#include "view.h"
 #include <vgui_controls/Controls.h>
 #include <vgui/ISurface.h>
 #include "game/client/iclientvehicle.h"

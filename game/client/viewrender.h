@@ -10,12 +10,13 @@
 #pragma once
 #endif
 
+#include "networkvar.h"
 #include "shareddefs.h"
 #include "tier1/utlstack.h"
 #include "iviewrender.h"
 #include "view_shared.h"
 #include "replay/ireplayscreenshotsystem.h"
-
+#include "cdll_int.h"
 
 //-----------------------------------------------------------------------------
 // Forward declarations
@@ -505,5 +506,63 @@ private:
 	CReplayScreenshotTaker	*m_pReplayScreenshotTaker;
 #endif
 };
+
+//-----------------------------------------------------------------------------
+// There's a difference between the 'current view' and the 'main view'
+// The 'main view' is where the player is sitting. Current view is just
+// what's currently being rendered, which, owing to monitors or water,
+// could be just about anywhere.
+//-----------------------------------------------------------------------------
+const Vector& MainViewOrigin();
+const QAngle& MainViewAngles();
+const Vector& PrevMainViewOrigin();
+const QAngle& PrevMainViewAngles();
+const VMatrix& MainWorldToViewMatrix();
+const Vector& MainViewForward();
+const Vector& MainViewRight();
+const Vector& MainViewUp();
+
+const Vector& CurrentViewOrigin();
+const QAngle& CurrentViewAngles();
+const VMatrix& CurrentWorldToViewMatrix();
+const Vector& CurrentViewForward();
+const Vector& CurrentViewRight();
+const Vector& CurrentViewUp();
+
+float ScaleFOVByWidthRatio(float fovDegrees, float ratio);
+void AllowCurrentViewAccess(bool allow);
+bool IsCurrentViewAccessAllowed();
+
+extern ConVar mat_wireframe;
+extern const ConVar* sv_cheats;
+static inline int WireFrameMode(void)
+{
+	if (!sv_cheats)
+	{
+		sv_cheats = cvar->FindVar("sv_cheats");
+	}
+
+	if (sv_cheats && sv_cheats->GetBool())
+		return mat_wireframe.GetInt();
+	else
+		return 0;
+}
+
+static inline bool ShouldDrawInWireFrameMode(void)
+{
+	if (!sv_cheats)
+	{
+		sv_cheats = cvar->FindVar("sv_cheats");
+	}
+
+	if (sv_cheats && sv_cheats->GetBool())
+		return (mat_wireframe.GetInt() != 0);
+	else
+		return false;
+}
+
+// near and far Z it uses to render the world.
+#define VIEW_NEARZ	3
+//#define VIEW_FARZ	28400
 
 #endif // VIEWRENDER_H

@@ -8,7 +8,6 @@
 #include "c_sprite.h"
 #include "model_types.h"
 #include "iviewrender.h"
-#include "view.h"
 #include "enginesprite.h"
 #include "engine/ivmodelinfo.h"
 #include "util_shared.h"

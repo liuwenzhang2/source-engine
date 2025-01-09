@@ -6,7 +6,7 @@
 //
 //=============================================================================//
 #include "cbase.h"
-#include "view.h"
+#include "viewrender.h"
 #include "model_types.h"
 #include "ivrenderview.h"
 #include "engine/ivmodelinfo.h"

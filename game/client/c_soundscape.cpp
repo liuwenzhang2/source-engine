@@ -12,7 +12,7 @@
 #include "filesystem.h"
 #include "SoundEmitterSystem/isoundemittersystembase.h"
 #include "soundchars.h"
-#include "view.h"
+#include "viewrender.h"
 #include "engine/ivdebugoverlay.h"
 #include "tier0/icommandline.h"
 

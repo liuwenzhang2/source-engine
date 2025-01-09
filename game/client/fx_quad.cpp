@@ -5,7 +5,6 @@
 //=============================================================================//
 
 #include "cbase.h"
-#include "view.h"
 #include "materialsystem/imesh.h"
 #include "fx_quad.h"
 #include "tier0/vprof.h"

@@ -428,7 +428,6 @@
     <ClCompile Include="..\..\..\game\client\vgui_slideshow_display_screen.cpp" />
     <ClCompile Include="..\..\..\game\client\vgui_video.cpp" />
     <ClCompile Include="..\..\..\game\client\vgui_video_player.cpp" />
-    <ClCompile Include="..\..\..\game\client\view.cpp" />
     <ClCompile Include="..\..\..\game\client\viewangleanim.cpp" />
     <ClCompile Include="..\..\..\game\client\ViewConeImage.cpp" />
     <ClCompile Include="..\..\..\game\client\viewdebug.cpp" />

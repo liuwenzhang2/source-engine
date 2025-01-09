@@ -6,7 +6,7 @@
 //=============================================================================//
 #include "cbase.h"
 #include "glow_overlay.h"
-#include "view.h"
+#include "viewrender.h"
 #include "c_pixel_visibility.h"
 
 // memdbgon must be the last include file in a .cpp file!!!

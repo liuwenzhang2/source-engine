@@ -14,7 +14,7 @@
 #include "materialsystem/imaterialvar.h"
 #include "materialsystem/itexture.h"
 #include "bitmap/tgaloader.h"
-#include "view.h"
+#include "viewrender.h"
 #include "datacache/idatacache.h"
 #include "materialsystem/imaterial.h"
 #include "vtf/vtf.h"

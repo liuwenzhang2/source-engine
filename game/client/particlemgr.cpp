@@ -17,7 +17,7 @@
 #include "view_scene.h"
 #include "tier0/vprof.h"
 #include "engine/ivdebugoverlay.h"
-#include "view.h"
+#include "viewrender.h"
 #include "KeyValues.h"
 #include "particles/particles.h"							// get new particle system access
 #include "tier1/utlintrusivelist.h"

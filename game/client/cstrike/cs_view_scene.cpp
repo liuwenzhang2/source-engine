@@ -5,7 +5,6 @@
 // $NoKeywords: $
 //=============================================================================//
 #include "cbase.h"
-#include "view.h"
 #include "iviewrender.h"
 #include "view_shared.h"
 #include "ivieweffects.h"

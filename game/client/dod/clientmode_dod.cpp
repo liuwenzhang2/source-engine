@@ -19,7 +19,6 @@
 #include "vgui/IVGui.h"
 #include "hud_basechat.h"
 #include "view_shared.h"
-#include "view.h"
 #include "ivrenderview.h"
 #include "model_types.h"
 #include "iefx.h"

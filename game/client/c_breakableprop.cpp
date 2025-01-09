@@ -11,7 +11,6 @@
 #include "engine/ivmodelinfo.h"
 //#include "physics.h"
 #include "c_breakableprop.h"
-#include "view.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"

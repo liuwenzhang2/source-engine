@@ -14,7 +14,7 @@
 	#include "model_types.h"
 	#include "beamdraw.h"
 	#include "fx_line.h"
-	#include "view.h"
+	#include "viewrender.h"
 #else
 	#include "basecombatcharacter.h"
 	#include "movie_explosion.h"

@@ -9,7 +9,6 @@
 #include "tier0/vprof.h"
 #include "fx_line.h"
 #include "fx_quad.h"
-#include "view.h"
 #include "particles_localspace.h"
 #include "dlight.h"
 #include "iefx.h"

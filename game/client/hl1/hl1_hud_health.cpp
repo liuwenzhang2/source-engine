@@ -13,7 +13,6 @@
 #include "cbase.h"
 #include "hud.h"
 #include "hud_macros.h"
-#include "view.h"
 
 #include "iclientmode.h"
 

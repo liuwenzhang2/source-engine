@@ -11,6 +11,7 @@
 #include "materialsystem/imaterialvar.h"
 #include "particles_simple.h"
 #include "particles_attractor.h"
+#include "viewrender.h"
 
 // FIXME: Move out
 extern void DrawSpriteTangentSpace( const Vector &vecOrigin, float flWidth, float flHeight, color32 color );

@@ -8,7 +8,7 @@
 #include "engine/IEngineTrace.h"
 #include "fx_sparks.h"
 #include "particles_ez.h"
-#include "view.h"
+#include "viewrender.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"

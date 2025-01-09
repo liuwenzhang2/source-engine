@@ -12,6 +12,7 @@
 #endif
 
 #include "platform.h"
+#include "iserverentity.h"
 
 // Debug history should be disabled in release builds
 //#define DISABLE_DEBUG_HISTORY	

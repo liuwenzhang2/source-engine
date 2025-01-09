@@ -14,7 +14,6 @@
 #include "beamdraw.h"
 #include "engine/ivdebugoverlay.h"
 #include "engine/ivmodelinfo.h"
-#include "view.h"
 #include "fx.h"
 #include "tier0/icommandline.h"
 #include "tier0/vprof.h"

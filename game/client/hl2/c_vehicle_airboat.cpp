@@ -22,7 +22,6 @@
 #include "fx.h"
 #include "fx_water.h"
 #include "engine/ivdebugoverlay.h"
-#include "view.h"
 #include "clienteffectprecachesystem.h"
 #include "c_basehlplayer.h"
 #include "vgui_controls/Controls.h"

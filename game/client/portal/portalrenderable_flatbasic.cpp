@@ -10,7 +10,6 @@
 #include "clienteffectprecachesystem.h"
 #include "Portal_DynamicMeshRenderingUtils.h"
 #include "portal_shareddefs.h"
-#include "view.h"
 #include "c_pixel_visibility.h"
 #include "glow_overlay.h"
 #include "portal_render_targets.h"

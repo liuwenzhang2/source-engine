@@ -9,7 +9,6 @@
 #include "text_message.h"
 #include "hud_macros.h"
 #include "iclientmode.h"
-#include "view.h"
 #include "KeyValues.h"
 #include "vgui_controls/AnimationController.h"
 #include "vgui/ILocalize.h"

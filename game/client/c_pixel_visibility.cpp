@@ -12,7 +12,6 @@
 #include "materialsystem/imesh.h"
 #include "materialsystem/imaterial.h"
 #include "clienteffectprecachesystem.h"
-#include "view.h"
 #include "viewrender.h"
 #include "utlmultilist.h"
 #include "vprof.h"

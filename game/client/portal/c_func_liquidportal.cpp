@@ -9,7 +9,6 @@
 #include "c_func_liquidportal.h"
 #include "debugoverlay_shared.h"
 #include "view_scene.h"
-#include "view.h"
 #include "ScreenSpaceEffects.h"
 #include "materialsystem/imaterialvar.h"
 

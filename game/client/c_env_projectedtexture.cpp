@@ -8,7 +8,6 @@
 #include "shareddefs.h"
 #include "materialsystem/imesh.h"
 #include "materialsystem/imaterial.h"
-#include "view.h"
 #include "iviewrender.h"
 #include "view_shared.h"
 #include "texture_group_names.h"

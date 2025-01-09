@@ -5,7 +5,6 @@
 // $NoKeywords: $
 //=============================================================================//
 #include "cbase.h"
-#include "view.h"
 #include "viewrender.h"
 #include "c_tracer.h"
 #include "dlight.h"

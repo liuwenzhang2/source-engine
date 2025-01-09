@@ -9,7 +9,6 @@
 #include "dlight.h"
 #include "iefx.h"
 #include "iviewrender.h"
-#include "view.h"
 #include "engine/ivdebugoverlay.h"
 #include "tier0/vprof.h"
 #include "tier1/KeyValues.h"

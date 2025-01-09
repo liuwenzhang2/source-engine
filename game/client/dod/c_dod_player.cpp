@@ -7,7 +7,7 @@
 #include "cbase.h"
 #include "c_dod_player.h"
 #include "c_user_message_register.h"
-#include "view.h"
+#include "viewrender.h"
 #include "game/client/iclientvehicle.h"
 #include "ivieweffects.h"
 #include "input.h"

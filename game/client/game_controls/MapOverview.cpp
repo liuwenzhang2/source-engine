@@ -18,7 +18,7 @@
 #include "gamevars_shared.h"
 #include "spectatorgui.h"
 #include "c_playerresource.h"
-#include "view.h"
+#include "viewrender.h"
 
 #include "clientmode.h"
 #include <vgui_controls/AnimationController.h>
