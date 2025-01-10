@@ -844,7 +844,7 @@ Vector C_SoundscapeSystem::GenerateRandomSoundPosition()
 	}
 	else
 	{
-		return CurrentViewOrigin() + DEFAULT_SOUND_RADIUS * (cosAngle * CurrentViewRight() + sinAngle * CurrentViewForward());
+		return g_pViewRender->CurrentViewOrigin() + DEFAULT_SOUND_RADIUS * (cosAngle * g_pViewRender->CurrentViewRight() + sinAngle * g_pViewRender->CurrentViewForward());
 	}
 }
 

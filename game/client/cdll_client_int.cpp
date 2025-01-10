@@ -1089,12 +1089,12 @@ int CHLClient::Init( CreateInterfaceFn appSystemFactory, CreateInterfaceFn physi
 
 	g_pClientMode->Enable();
 
-	if ( !view )
+	if ( !g_pViewRender)
 	{
-		view = ( IViewRender * )&g_DefaultViewRender;
+		g_pViewRender = ( IViewRender * )&g_DefaultViewRender;
 	}
 
-	view->Init();
+	g_pViewRender->Init();
 	vieweffects->Init();
 
 	C_BaseTempEntity::PrecacheTempEnts();
@@ -1240,7 +1240,7 @@ void CHLClient::Shutdown( void )
 	input->Shutdown_All();
 	C_BaseTempEntity::ClearDynamicTempEnts();
 	TermSmokeFogOverlay();
-	view->Shutdown();
+	g_pViewRender->Shutdown();
 	g_pParticleSystemMgr->UncacheAllParticleSystems();
 	UncacheAllMaterials();
 
@@ -1561,7 +1561,7 @@ void CHLClient::View_Render( vrect_t *rect )
 	if ( rect->width == 0 || rect->height == 0 )
 		return;
 
-	view->Render( rect );
+	g_pViewRender->Render( rect );
 	UpdatePerfStats();
 }
 
@@ -1571,7 +1571,7 @@ void CHLClient::View_Render( vrect_t *rect )
 //-----------------------------------------------------------------------------
 bool CHLClient::GetPlayerView( CViewSetup &playerView )
 {
-	playerView = *view->GetPlayerViewSetup();
+	playerView = *g_pViewRender->GetPlayerViewSetup();
 	return true;
 }
 
@@ -1636,12 +1636,12 @@ const Vector& CHLClient::MainViewOrigin()
 
 const Vector& CHLClient::CurrentViewOrigin()
 {
-	return ::CurrentViewOrigin();
+	return g_pViewRender->CurrentViewOrigin();
 }
 
 const Vector& CHLClient::CurrentViewForward()
 {
-	return ::CurrentViewForward();
+	return g_pViewRender->CurrentViewForward();
 }
 
 //-----------------------------------------------------------------------------
@@ -1669,7 +1669,7 @@ void CHLClient::LevelInitPreEntity()
 
 	C_BaseTempEntity::ClearDynamicTempEnts();
 	clienteffects->Flush();
-	view->LevelInit();
+	g_pViewRender->LevelInit();
 	tempents->LevelInit();
 	ResetToneMapping(1.0);
 
@@ -1803,7 +1803,7 @@ void CHLClient::LevelShutdown( void )
 	g_pClientLeafSystem->LevelShutdownPostEntity();
 	EntityList()->LevelShutdownPostEntity();
 
-	view->LevelShutdown();
+	g_pViewRender->LevelShutdown();
 	beams->ClearBeams();
 	ParticleMgr()->RemoveAllEffects();
 	
@@ -2239,7 +2239,7 @@ void OnRenderStart()
 	// This will place the player + the view models + all parent
 	// entities	at the correct abs position so that their attachment points
 	// are at the correct location
-	view->OnRenderStart();
+	g_pViewRender->OnRenderStart();
 
 	EntityList()->RopeManager()->OnRenderStart();
 	
@@ -2465,7 +2465,7 @@ void CHLClient::FrameStageNotify( ClientFrameStage_t curStage )
 
 void CHLClient::WriteSaveGameScreenshot( const char *pFilename )
 {
-	view->WriteSaveGameScreenshot( pFilename );
+	g_pViewRender->WriteSaveGameScreenshot( pFilename );
 }
 
 // Given a list of "S(wavname) S(wavname2)" tokens, look up the localized text and emit
@@ -2820,14 +2820,14 @@ int CHLClient::GetScreenHeight()
 void CHLClient::WriteSaveGameScreenshotOfSize( const char *pFilename, int width, int height, bool bCreatePowerOf2Padded/*=false*/,
 											   bool bWriteVTF/*=false*/ )
 {
-	view->WriteSaveGameScreenshotOfSize( pFilename, width, height, bCreatePowerOf2Padded, bWriteVTF );
+	g_pViewRender->WriteSaveGameScreenshotOfSize( pFilename, width, height, bCreatePowerOf2Padded, bWriteVTF );
 }
 
 // See RenderViewInfo_t
 void CHLClient::RenderView( const CViewSetup &setup, int nClearFlags, int whatToDraw )
 {
 	VPROF("RenderView");
-	view->RenderView( setup, nClearFlags, whatToDraw );
+	g_pViewRender->RenderView( setup, nClearFlags, whatToDraw );
 }
 
 void ReloadSoundEntriesInList(IFileList* pFilesToReload)

@@ -283,7 +283,7 @@ int C_HopwireExplosion::DrawModel( int flags )
 
 	// FIXME: The ball needs to sort properly at all times
 	static color32 white = {255,255,255,255};
-	DrawSpriteTangentSpace( GetRenderOrigin() + ( CurrentViewForward() * 128.0f ), scale+scaleX, scale+scaleY, white );
+	DrawSpriteTangentSpace( GetRenderOrigin() + (g_pViewRender->CurrentViewForward() * 128.0f ), scale+scaleX, scale+scaleY, white );
 
 	return 1;
 }

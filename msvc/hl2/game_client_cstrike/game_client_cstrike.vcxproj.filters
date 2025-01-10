@@ -378,9 +378,6 @@
     <ClCompile Include="..\..\..\game\client\cdll_util.cpp">
       <Filter>源文件\Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\game\client\classmap.cpp">
-      <Filter>源文件\Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\game\client\clienteffectprecachesystem.cpp">
       <Filter>源文件\Source Files</Filter>
     </ClCompile>

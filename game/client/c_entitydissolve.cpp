@@ -316,7 +316,7 @@ void C_EntityDissolve::ComputeRenderInfo( mstudiobbox_t *pHitBox, const matrix3x
 //	vec[1] *= -1.0f;
 
 	Vector vecViewDir;
-	VectorSubtract( CurrentViewOrigin(), *pVecAbsOrigin, vecViewDir );
+	VectorSubtract(g_pViewRender->CurrentViewOrigin(), *pVecAbsOrigin, vecViewDir );
 	VectorNormalize( vecViewDir );
 
 	// Project the shadow casting direction into the space of the hitbox
@@ -626,7 +626,7 @@ int C_EntityDissolve::DrawModel( int flags )
 	}
 
 	// Skew the particles in front or in back of their targets
-	vecSkew = CurrentViewForward() * ( 8.0f - ( ( 1.0f - fadePerc ) * 32.0f ) );
+	vecSkew = g_pViewRender->CurrentViewForward() * ( 8.0f - ( ( 1.0f - fadePerc ) * 32.0f ) );
 
 	float spriteScale = ( ( gpGlobals->curtime - m_flStartTime ) / m_flFadeOutLength );
 	spriteScale = clamp( spriteScale, 0.75f, 1.0f );

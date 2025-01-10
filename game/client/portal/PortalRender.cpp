@@ -888,8 +888,8 @@ void CPortalRenderable::ShiftFogForExitPortalView() const
 	pRenderContext->GetFogDistances( &fFogStart, &fFogEnd, &fFogZ );
 
 	Vector vFogOrigin = GetFogOrigin();
-	Vector vCameraToExitPortal = vFogOrigin - CurrentViewOrigin();
-	float fDistModifier = vCameraToExitPortal.Dot( CurrentViewForward() );
+	Vector vCameraToExitPortal = vFogOrigin - g_pViewRender->CurrentViewOrigin();
+	float fDistModifier = vCameraToExitPortal.Dot(g_pViewRender->CurrentViewForward() );
 
 	fFogStart += fDistModifier;
 	fFogEnd += fDistModifier;

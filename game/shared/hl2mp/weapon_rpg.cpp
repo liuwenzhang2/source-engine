@@ -2263,8 +2263,8 @@ int CLaserDot::DrawModel( int flags )
 		if ( pOwner->IsLocalPlayer() )
 		{
 			// Take our view position and orientation
-			vecAttachment = CurrentViewOrigin();
-			vecDir = CurrentViewForward();
+			vecAttachment = g_pViewRender->CurrentViewOrigin();
+			vecDir = g_pViewRender->CurrentViewForward();
 		}
 		else
 		{

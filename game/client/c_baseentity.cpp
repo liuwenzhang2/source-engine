@@ -1918,8 +1918,8 @@ void C_BaseEntity::ComputeFxBlend( void )
 			float	dist;
 			
 			VectorCopy(GetEngineObject()->GetAbsOrigin(), tmp );
-			VectorSubtract( tmp, CurrentViewOrigin(), tmp );
-			dist = DotProduct( tmp, CurrentViewForward() );
+			VectorSubtract( tmp, g_pViewRender->CurrentViewOrigin(), tmp );
+			dist = DotProduct( tmp, g_pViewRender->CurrentViewForward() );
 			
 			// Turn off distance fade
 			if (GetEngineObject()->GetRenderFX() == kRenderFxDistort)

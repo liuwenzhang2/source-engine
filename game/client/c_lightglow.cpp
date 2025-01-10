@@ -21,7 +21,7 @@ public:
 		*flHorzSize = pSprite->m_flHorzSize;
 		*flVertSize = pSprite->m_flVertSize;
 		
-		Vector viewDir = ( CurrentViewOrigin() - m_vecOrigin );
+		Vector viewDir = (g_pViewRender->CurrentViewOrigin() - m_vecOrigin );
 		float distToViewer = VectorNormalize( viewDir );
 
 		if ( m_bOneSided )

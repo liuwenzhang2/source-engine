@@ -26,7 +26,7 @@ private:
 		if ( m_bFadeFromAbove )
 		{
 			// The sprites become less visible the more you look down or up at them
-			Vector vToPos = GetEngineObject()->GetLocalOrigin() - CurrentViewOrigin();
+			Vector vToPos = GetEngineObject()->GetLocalOrigin() - g_pViewRender->CurrentViewOrigin();
 			VectorNormalize( vToPos );
 
 			float fUpAmount = vToPos.z;
@@ -60,7 +60,7 @@ class C_FireFromAboveSprite : public C_Sprite
 	virtual int DrawModel( int flags )
 	{
 		// The sprites become more visible the more you look down or up at them
-		Vector vToPos = GetEngineObject()->GetLocalOrigin() - CurrentViewOrigin();
+		Vector vToPos = GetEngineObject()->GetLocalOrigin() - g_pViewRender->CurrentViewOrigin();
 		VectorNormalize( vToPos );
 
 		float fUpAmount = vToPos.z;
@@ -242,7 +242,7 @@ public:
 		m_Sprites[0].m_flHorzSize = ( newScale * 0.2f ) + ( m_Sprites[0].m_flHorzSize * 0.8f );
 		m_Sprites[0].m_flVertSize = m_Sprites[0].m_flHorzSize * 1.5f;
 		
-		float	cameraDistance = ( CurrentViewOrigin() - (m_pOwner->GetEngineObject()->GetAbsOrigin())).Length();
+		float	cameraDistance = (g_pViewRender->CurrentViewOrigin() - (m_pOwner->GetEngineObject()->GetAbsOrigin())).Length();
 
 		C_BasePlayer *local = (C_BasePlayer*)EntityList()->GetLocalPlayer();
 		if ( local )

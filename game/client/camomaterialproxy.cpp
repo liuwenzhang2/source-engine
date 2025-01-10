@@ -277,7 +277,7 @@ void CCamoMaterialProxy::GetColors( Vector &diffuseColor, Vector &baseColor, int
 	transformedPosition[1] = right[1] * position[0] + forward[1] * position[1] + up[1] * position[2];
 	transformedPosition[2] = right[2] * position[0] + forward[2] * position[1] + up[2] * position[2];
 	transformedPosition = transformedPosition + entityPosition;
-	Vector direction = transformedPosition - CurrentViewOrigin();
+	Vector direction = transformedPosition - g_pViewRender->CurrentViewOrigin();
 	VectorNormalize( direction );
 	direction = direction * ( COORD_EXTENT * 1.74f );
 	Vector endPoint = position + direction;

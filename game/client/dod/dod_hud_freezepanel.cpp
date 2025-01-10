@@ -583,7 +583,7 @@ int	CDODFreezePanel::HudElementKeyInput( int down, ButtonCode_t keynum, const ch
 
 				//Extend Freezecam by a couple more seconds.
 				engine->ClientCmd( "extendfreeze" );
-				view->FreezeFrame( 3.0f );
+				g_pViewRender->FreezeFrame( 3.0f );
 
 				//Hide the reminder panel
 				m_flShowSnapshotReminderAt = 0;

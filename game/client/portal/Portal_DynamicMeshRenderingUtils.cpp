@@ -139,7 +139,7 @@ void Clip_And_Render_Convex_Polygon( PortalMeshPoint_t *pVerts, int iVertCount, 
 
 	//clip by the viewing frustum
 	{
-		VPlane *pFrustum = view->GetFrustum();
+		VPlane *pFrustum = g_pViewRender->GetFrustum();
 		
 		//clip by first plane and put output into pInVerts
 		iVertCount = ClipPolyToPlane_LerpTexCoords( pVerts, iVertCount, pInVerts, pFrustum[0].m_Normal, pFrustum[0].m_Dist, 0.01f );

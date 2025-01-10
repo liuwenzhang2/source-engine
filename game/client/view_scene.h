@@ -35,12 +35,11 @@ int HudTransform( const Vector& point, Vector& screen );
 extern ConVar r_updaterefracttexture;
 extern int g_viewscene_refractUpdateFrame;
 extern bool g_bAllowMultipleRefractUpdatesPerScenePerFrame;
-bool DrawingShadowDepthView( void );
-bool DrawingMainView();
+
 
 inline void UpdateRefractTexture( int x, int y, int w, int h, bool bForceUpdate = false )
 {
-	Assert( !DrawingShadowDepthView() );
+	Assert( !g_pViewRender->DrawingShadowDepthView() );
 
 	if ( !IsRetail() && !r_updaterefracttexture.GetBool() )
 		return;
@@ -64,7 +63,7 @@ inline void UpdateRefractTexture( int x, int y, int w, int h, bool bForceUpdate 
 
 inline void UpdateRefractTexture( bool bForceUpdate = false )
 {
-	Assert( !DrawingShadowDepthView() );
+	Assert( !g_pViewRender->DrawingShadowDepthView() );
 
 	CMatRenderContextPtr pRenderContext( materials );
 
@@ -137,7 +136,7 @@ inline void DrawScreenEffectMaterial( IMaterial *pMaterial, int x, int y, int w,
 //intended for use by dynamic meshes to naively update front buffer textures needed by a material
 inline void UpdateFrontBufferTexturesForMaterial( IMaterial *pMaterial, bool bForce = false )
 {
-	Assert( !DrawingShadowDepthView() );
+	Assert( !g_pViewRender->DrawingShadowDepthView() );
 
 	if( pMaterial->NeedsPowerOfTwoFrameBufferTexture() )
 	{
@@ -145,16 +144,16 @@ inline void UpdateFrontBufferTexturesForMaterial( IMaterial *pMaterial, bool bFo
 	}
 	else if( pMaterial->NeedsFullFrameBufferTexture() )
 	{
-		const CViewSetup *pView = view->GetViewSetup();
+		const CViewSetup *pView = g_pViewRender->GetViewSetup();
 		UpdateScreenEffectTexture( 0, pView->x, pView->y, pView->width, pView->height );
 	}
 }
 
 inline void UpdateScreenEffectTexture( void )
 {
-	Assert( !DrawingShadowDepthView() );
+	Assert( !g_pViewRender->DrawingShadowDepthView() );
 
-	const CViewSetup *pViewSetup = view->GetViewSetup();
+	const CViewSetup *pViewSetup = g_pViewRender->GetViewSetup();
 	UpdateScreenEffectTexture( 0, pViewSetup->x, pViewSetup->y, pViewSetup->width, pViewSetup->height);
 }
 

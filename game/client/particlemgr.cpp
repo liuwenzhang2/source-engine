@@ -1686,7 +1686,7 @@ static ConVar cl_particle_retire_cost( "cl_particle_retire_cost", "0", FCVAR_CHE
 bool CParticleMgr::EarlyRetireParticleSystems( int nCount, CNewParticleEffect **ppEffects )
 {
 	// NOTE: Doing a cheap and hacky estimate of worst-case fillrate
-	const CViewSetup *pViewSetup = view->GetPlayerViewSetup();
+	const CViewSetup *pViewSetup = g_pViewRender->GetPlayerViewSetup();
 	if ( pViewSetup->width == 0 || pViewSetup->height == 0 )
 		return false;
 

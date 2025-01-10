@@ -1080,7 +1080,7 @@ static unsigned char ComputeDistanceFade( C_BaseEntity *pEntity, float flMinDist
 	flMinDist *= flMinDist;
 	flMaxDist *= flMaxDist;
 
-	float flCurrentDistanceSq = CurrentViewOrigin().DistToSqr( pEntity->WorldSpaceCenter() );
+	float flCurrentDistanceSq = g_pViewRender->CurrentViewOrigin().DistToSqr( pEntity->WorldSpaceCenter() );
 	C_BasePlayer *pLocal = (C_BasePlayer*)EntityList()->GetLocalPlayer();
 	if ( pLocal )
 	{

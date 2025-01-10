@@ -65,7 +65,7 @@ float PixelVisibility_DrawProxy( IMatRenderContext *pRenderContext, OcclusionQue
 	if ( screenspace )
 	{
 		// Force this to be the size of a sphere of diameter "scale" at some reference distance (1.0 unit)
-		float pixelsPerUnit2 = pRenderContext->ComputePixelDiameterOfSphere( CurrentViewOrigin() + CurrentViewForward()*1.0f, scale*0.5f );
+		float pixelsPerUnit2 = pRenderContext->ComputePixelDiameterOfSphere(g_pViewRender->CurrentViewOrigin() + g_pViewRender->CurrentViewForward()*1.0f, scale*0.5f );
 		// force drawing of "scale" pixels
 		scale = pixelsPerUnit2 / pixelsPerUnit;
 	}
@@ -81,7 +81,7 @@ float PixelVisibility_DrawProxy( IMatRenderContext *pRenderContext, OcclusionQue
 	}
 
 	// collapses the pyramid to a plane - so this could be a quad instead
-	Vector dir = origin - CurrentViewOrigin();
+	Vector dir = origin - g_pViewRender->CurrentViewOrigin();
 	VectorNormalize(dir);
 	origin -= dir * forwardScale;
 	forwardScale = 0.0f;
@@ -92,11 +92,11 @@ float PixelVisibility_DrawProxy( IMatRenderContext *pRenderContext, OcclusionQue
 	scale *= sqrt2;
 	float scale45x = scale;
 	float scale45y = scale / proxyAspect;
-	verts[0] = origin - CurrentViewForward() * forwardScale;					  // the apex of the pyramid
-	verts[1] = origin + CurrentViewUp() * scale45y - CurrentViewRight() * scale45x; // these four form the base
-	verts[2] = origin + CurrentViewUp() * scale45y + CurrentViewRight() * scale45x; // the pyramid is a sprite with a point that
-	verts[3] = origin - CurrentViewUp() * scale45y + CurrentViewRight() * scale45x; // pokes back toward the camera through any nearby 
-	verts[4] = origin - CurrentViewUp() * scale45y - CurrentViewRight() * scale45x; // geometry
+	verts[0] = origin - g_pViewRender->CurrentViewForward() * forwardScale;					  // the apex of the pyramid
+	verts[1] = origin + g_pViewRender->CurrentViewUp() * scale45y - g_pViewRender->CurrentViewRight() * scale45x; // these four form the base
+	verts[2] = origin + g_pViewRender->CurrentViewUp() * scale45y + g_pViewRender->CurrentViewRight() * scale45x; // the pyramid is a sprite with a point that
+	verts[3] = origin - g_pViewRender->CurrentViewUp() * scale45y + g_pViewRender->CurrentViewRight() * scale45x; // pokes back toward the camera through any nearby 
+	verts[4] = origin - g_pViewRender->CurrentViewUp() * scale45y - g_pViewRender->CurrentViewRight() * scale45x; // geometry
 
 	// get screen coords of edges
 	Vector screen[4];
@@ -346,7 +346,7 @@ float CPixelVisibilityQuery::GetFractionVisible( float fadeTimeInv )
 				pixels = pRenderContext->OcclusionQuery_GetNumPixelsRendered( m_queryHandle );
 			}
 
-			if ( r_pixelvisibility_spew.GetBool() && CurrentViewID() == 0 ) 
+			if ( r_pixelvisibility_spew.GetBool() && g_pViewRender->CurrentViewID() == 0 )
 			{
 				DevMsg( 1, "Pixels visible: %d (qh:%d) Pixels possible: %d (qh:%d) (frame:%d)\n", pixels, (int)(intp)m_queryHandle, pixelsPossible, (int)(intp)m_queryHandleCount, gpGlobals->framecount );
 			}
@@ -377,7 +377,7 @@ float CPixelVisibilityQuery::GetFractionVisible( float fadeTimeInv )
 				pixels = pRenderContext->OcclusionQuery_GetNumPixelsRendered( m_queryHandle );
 			}
 
-			if ( r_pixelvisibility_spew.GetBool() && CurrentViewID() == 0 ) 
+			if ( r_pixelvisibility_spew.GetBool() && g_pViewRender->CurrentViewID() == 0 )
 			{
 				DevMsg( 1, "Pixels visible: %d (qh:%d) (frame:%d)\n", pixels, (int)(intp)m_queryHandle, gpGlobals->framecount );
 			}
@@ -416,7 +416,7 @@ void CPixelVisibilityQuery::IssueQuery( IMatRenderContext *pRenderContext, float
 	{
 		Assert( IsValid() );
 
-		if ( r_pixelvisibility_spew.GetBool() && CurrentViewID() == 0 ) 
+		if ( r_pixelvisibility_spew.GetBool() && g_pViewRender->CurrentViewID() == 0 )
 		{
 			DevMsg( 1, "Draw Proxy: qh:%d org:<%d,%d,%d> (frame:%d)\n", (int)(intp)m_queryHandle, (int)m_origin[0], (int)m_origin[1], (int)m_origin[2], gpGlobals->framecount );
 		}
@@ -571,12 +571,12 @@ float CPixelVisibilitySystem::GetFractionVisible( const pixelvis_queryparams_t &
 	{
 		return GlowSightDistance( params.position, true ) > 0 ? 1.0f : 0.0f;
 	}
-	if ( CurrentViewID() < 0 )
+	if (g_pViewRender->CurrentViewID() < 0 )
 		return 0.0f;
 
 	CPixelVisSet *pSet = FindOrCreatePixelVisSet( params, queryHandle );
 	Assert( pSet );
-	unsigned short node = FindOrCreateQueryForView( pSet, CurrentViewID() );
+	unsigned short node = FindOrCreateQueryForView( pSet, g_pViewRender->CurrentViewID() );
 	m_queryList[node].m_origin = params.position;
 	float fraction = m_queryList[node].GetFractionVisible( pSet->fadeTimeInv );
 	pSet->MarkActive();
@@ -585,7 +585,7 @@ float CPixelVisibilitySystem::GetFractionVisible( const pixelvis_queryparams_t &
 
 void CPixelVisibilitySystem::EndView()
 {
-	if ( !PixelVisibility_IsAvailable() && CurrentViewID() >= 0 )
+	if ( !PixelVisibility_IsAvailable() && g_pViewRender->CurrentViewID() >= 0 )
 		return;
 	
 	if ( m_setList.Head( m_activeSetsList ) == m_setList.InvalidIndex() )
@@ -604,7 +604,7 @@ void CPixelVisibilitySystem::EndView()
 		while( node != m_setList.InvalidIndex() )
 		{
 			CPixelVisSet *pSet = &m_setList[node];
-			unsigned short queryNode = FindQueryForView( pSet, CurrentViewID() );
+			unsigned short queryNode = FindQueryForView( pSet, g_pViewRender->CurrentViewID() );
 			if ( queryNode != m_queryList.InvalidIndex() )
 			{
 				m_queryList[queryNode].IssueCountingQuery( pRenderContext, pSet->proxySize, pSet->proxyAspect, pProxy, pSet->sizeIsScreenSpace );
@@ -619,7 +619,7 @@ void CPixelVisibilitySystem::EndView()
 		while( node != m_setList.InvalidIndex() )
 		{
 			CPixelVisSet *pSet = &m_setList[node];
-			unsigned short queryNode = FindQueryForView( pSet, CurrentViewID() );
+			unsigned short queryNode = FindQueryForView( pSet, g_pViewRender->CurrentViewID() );
 			if ( queryNode != m_queryList.InvalidIndex() )
 			{
 				m_queryList[queryNode].IssueQuery( pRenderContext, pSet->proxySize, pSet->proxyAspect, pProxy, pSet->sizeIsScreenSpace );
@@ -785,7 +785,7 @@ public:
 };
 float GlowSightDistance( const Vector &glowOrigin, bool bShouldTrace )
 {
-	float dist = (glowOrigin - CurrentViewOrigin()).Length();
+	float dist = (glowOrigin - g_pViewRender->CurrentViewOrigin()).Length();
 	IClientEntity *local = EntityList()->GetLocalPlayer();
 	if ( local )
 	{
@@ -799,13 +799,13 @@ float GlowSightDistance( const Vector &glowOrigin, bool bShouldTrace )
 		//			allow a little error...
 		if ( dist > 4 )
 		{
-			end -= CurrentViewForward()*4;
+			end -= g_pViewRender->CurrentViewForward()*4;
 		}
 		int traceFlags = MASK_OPAQUE|CONTENTS_MONSTER|CONTENTS_DEBRIS;
 		
 		CTraceFilterGlow filter(NULL, COLLISION_GROUP_NONE);
 		trace_t tr;
-		UTIL_TraceLine( CurrentViewOrigin(), end, traceFlags, &filter, &tr );
+		UTIL_TraceLine(g_pViewRender->CurrentViewOrigin(), end, traceFlags, &filter, &tr );
 		if ( tr.fraction != 1.0f )
 			return -1;
 	}

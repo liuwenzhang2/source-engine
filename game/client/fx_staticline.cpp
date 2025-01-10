@@ -61,7 +61,7 @@ void CFXStaticLine::Draw( double frametime )
 
 	// Get the proper orientation for the line
 	VectorSubtract( m_vecEnd, m_vecStart, lineDir );
-	VectorSubtract( m_vecEnd, CurrentViewOrigin(), viewDir );
+	VectorSubtract( m_vecEnd, g_pViewRender->CurrentViewOrigin(), viewDir );
 	
 	cross = lineDir.Cross( viewDir );
 

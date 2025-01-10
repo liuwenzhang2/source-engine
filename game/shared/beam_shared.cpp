@@ -1190,7 +1190,7 @@ void CBeam::DrawBeam(C_Beam* pbeam, ITraceFilter* pEntityBeamTraceFilter)
 	if (beam.entity[0])
 	{
 		// don't draw viewmodel effects in reflections
-		if (CurrentViewID() == VIEW_REFLECTION)
+		if (g_pViewRender->CurrentViewID() == VIEW_REFLECTION)
 		{
 			int group = beam.entity[0]->GetRenderGroup();
 			if (group == RENDER_GROUP_VIEW_MODEL_TRANSLUCENT || group == RENDER_GROUP_VIEW_MODEL_OPAQUE)
@@ -1213,7 +1213,7 @@ int CBeam::DrawModel( int flags )
 	if (GetEngineObject()->IsMarkedForDeletion() )
 		return 0;
 
-	if ( CurrentViewID() == VIEW_SHADOW_DEPTH_TEXTURE )
+	if (g_pViewRender->CurrentViewID() == VIEW_SHADOW_DEPTH_TEXTURE )
 		return 0;
 
 #ifdef PORTAL

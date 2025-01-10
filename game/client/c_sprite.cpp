@@ -281,9 +281,9 @@ void C_SpriteRenderer::GetSpriteAxes( SPRITETYPE type,
 			// position relative to the viewer
 			for (i=0 ; i<3 ; i++)
 			{
-				up[i]		= CurrentViewUp()[i];
-				right[i]	= CurrentViewRight()[i];
-				forward[i]	= CurrentViewForward()[i];
+				up[i]		= g_pViewRender->CurrentViewUp()[i];
+				right[i]	= g_pViewRender->CurrentViewRight()[i];
+				forward[i]	= g_pViewRender->CurrentViewForward()[i];
 			}
 		}
 		break;
@@ -296,16 +296,16 @@ void C_SpriteRenderer::GetSpriteAxes( SPRITETYPE type,
 			// down, because the cross product will be between two nearly parallel
 			// vectors and starts to approach an undefined state, so we don't draw if
 			// the two vectors are less than 1 degree apart
-			dot = CurrentViewForward()[2];	// same as DotProduct (vpn, r_spritedesc.g_vecVUp) because
+			dot = g_pViewRender->CurrentViewForward()[2];	// same as DotProduct (vpn, r_spritedesc.g_vecVUp) because
 			//  r_spritedesc.vup is 0, 0, 1
 			if ((dot > 0.999848f) || (dot < -0.999848f))	// cos(1 degree) = 0.999848
 				return;
 			up[0] = 0;
 			up[1] = 0;
 			up[2] = 1;
-			right[0] = CurrentViewForward()[1];
+			right[0] = g_pViewRender->CurrentViewForward()[1];
 			// CrossProduct (r_spritedesc.vup, vpn,
-			right[1] = -CurrentViewForward()[0];	//  r_spritedesc.vright)
+			right[1] = -g_pViewRender->CurrentViewForward()[0];	//  r_spritedesc.vright)
 			right[2] = 0;
 			VectorNormalize (right);
 			forward[0] = -right[1];
@@ -333,9 +333,9 @@ void C_SpriteRenderer::GetSpriteAxes( SPRITETYPE type,
 			
 			for (i=0 ; i<3 ; i++)
 			{
-				forward[i] = CurrentViewForward()[i];
-				right[i] = CurrentViewRight()[i] * cr + CurrentViewUp()[i] * sr;
-				up[i] = CurrentViewRight()[i] * -sr + CurrentViewUp()[i] * cr;
+				forward[i] = g_pViewRender->CurrentViewForward()[i];
+				right[i] = g_pViewRender->CurrentViewRight()[i] * cr + g_pViewRender->CurrentViewUp()[i] * sr;
+				up[i] = g_pViewRender->CurrentViewRight()[i] * -sr + g_pViewRender->CurrentViewUp()[i] * cr;
 			}
 		}
 		break;
@@ -392,7 +392,7 @@ int C_SpriteRenderer::DrawSprite(
 		if ( ent )
 		{
 			// don't draw viewmodel effects in reflections
-			if ( CurrentViewID() == VIEW_REFLECTION )
+			if ( g_pViewRender->CurrentViewID() == VIEW_REFLECTION )
 			{
 				int group = ent->GetRenderGroup();
 				if ( group == RENDER_GROUP_VIEW_MODEL_TRANSLUCENT || group == RENDER_GROUP_VIEW_MODEL_OPAQUE )

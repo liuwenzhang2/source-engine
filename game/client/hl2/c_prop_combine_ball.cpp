@@ -187,8 +187,8 @@ void DrawHaloOriented( const Vector& source, float scale, float const *color, fl
 
 	for ( int i = 0; i < 3; i++ )
 	{
-		right[i] = CurrentViewRight()[i] * cr + CurrentViewUp()[i] * sr;
-		up[i] = CurrentViewRight()[i] * -sr + CurrentViewUp()[i] * cr;
+		right[i] = g_pViewRender->CurrentViewRight()[i] * cr + g_pViewRender->CurrentViewUp()[i] * sr;
+		up[i] = g_pViewRender->CurrentViewRight()[i] * -sr + g_pViewRender->CurrentViewUp()[i] * cr;
 	}
 
 	meshBuilder.Color3fv (color);
@@ -254,7 +254,7 @@ int C_PropCombineBall::DrawModel( int flags )
 	if ( m_bHeld )
 	{
 		QAngle	angles;
-		VectorAngles( -CurrentViewForward(), angles );
+		VectorAngles( -g_pViewRender->CurrentViewForward(), angles );
 
 		// Always orient towards the camera!
 		GetEngineObject()->SetAbsAngles( angles );

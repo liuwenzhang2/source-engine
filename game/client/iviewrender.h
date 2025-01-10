@@ -136,8 +136,20 @@ public:
 	virtual void		FreezeFrame( float flFreezeTime ) = 0;
 
 	virtual IReplayScreenshotSystem *GetReplayScreenshotSystem() = 0;
+
+	virtual void AllowCurrentViewAccess(bool allow) = 0;
+	virtual bool IsCurrentViewAccessAllowed() = 0;
+	virtual view_id_t CurrentViewID() = 0;
+	virtual const Vector& CurrentViewOrigin() = 0;
+	virtual const QAngle& CurrentViewAngles() = 0;
+	virtual const VMatrix& CurrentWorldToViewMatrix() = 0;
+	virtual const Vector& CurrentViewForward() = 0;
+	virtual const Vector& CurrentViewRight() = 0;
+	virtual const Vector& CurrentViewUp() = 0;
+	virtual bool DrawingShadowDepthView(void) = 0;
+	virtual bool DrawingMainView() = 0;
 };
 
-extern IViewRender *view;
+extern IViewRender *g_pViewRender;
 
 #endif // IVIEWRENDER_H

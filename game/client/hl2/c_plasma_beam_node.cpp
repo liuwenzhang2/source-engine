@@ -144,7 +144,7 @@ void CPlasmaSpray::RenderParticles( CParticleRenderIterator *pIterator )
 		TransformParticle(ParticleMgr()->GetModelView(), pParticle->m_Pos, start);
 		float sortKey = start.z;
 
-		Vector3DMultiply( CurrentWorldToViewMatrix(), pParticle->m_vecVelocity, delta );
+		Vector3DMultiply(g_pViewRender->CurrentWorldToViewMatrix(), pParticle->m_vecVelocity, delta );
 
 		delta[0] *= scale;
 		delta[1] *= scale;

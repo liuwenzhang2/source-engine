@@ -87,11 +87,11 @@ void CHudPortalCrosshair::Paint( void )
 	if ( !m_pCrosshair )
 		return;
 
-	if ( !IsCurrentViewAccessAllowed() )
+	if ( !g_pViewRender->IsCurrentViewAccessAllowed() )
 		return;
 
-	m_curViewAngles = CurrentViewAngles();
-	m_curViewOrigin = CurrentViewOrigin();
+	m_curViewAngles = g_pViewRender->CurrentViewAngles();
+	m_curViewOrigin = g_pViewRender->CurrentViewOrigin();
 
 	float x, y;
 	x = ScreenWidth()/2;

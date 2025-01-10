@@ -866,14 +866,14 @@ void CUserInput::JoyStickMove( float frametime, CUserCmd *cmd )
 		}
 		viewangles[PITCH] += angle;
 		cmd->mousedy = angle;
-		view->StopPitchDrift();
+		g_pViewRender->StopPitchDrift();
 		if( m_flPreviousJoystickPitch == 0.f && lookspring.GetFloat() == 0.f )
 		{
 			// no pitch movement
 			// disable pitch return-to-center unless requested by user
 			// *** this code can be removed when the lookspring bug is fixed
 			// *** the bug always has the lookspring feature on
-			view->StopPitchDrift();
+			g_pViewRender->StopPitchDrift();
 		}
 	}
 

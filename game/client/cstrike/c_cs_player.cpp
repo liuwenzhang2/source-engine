@@ -817,7 +817,7 @@ C_CSPlayer::C_CSPlayer() :
 
 	m_serverIntendedCycle = -1.0f;
 
-	view->SetScreenOverlayMaterial( NULL );
+	g_pViewRender->SetScreenOverlayMaterial( NULL );
 
     m_bPlayingFreezeCamSound = false;
 }
@@ -2546,7 +2546,7 @@ void C_CSPlayer::CalcFreezeCamView( Vector& eyeOrigin, QAngle& eyeAngles, float&
 		}
 
 		m_bSentFreezeFrame = true;
-		view->FreezeFrame( spec_freeze_time.GetFloat() );
+		g_pViewRender->FreezeFrame( spec_freeze_time.GetFloat() );
 	}
 }
 

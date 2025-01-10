@@ -1778,7 +1778,7 @@ void CViewRenderBeams::DrawBeamWithHalo(	Beam_t*			pbeam,
 	Vector beamDir = pbeam->attachment[1] - pbeam->attachment[0];
 	VectorNormalize( beamDir );
 	
-	Vector localDir = CurrentViewOrigin() - pbeam->attachment[0];
+	Vector localDir = g_pViewRender->CurrentViewOrigin() - pbeam->attachment[0];
 	VectorNormalize( localDir );
 	
 	float dotpr = DotProduct( beamDir, localDir );
@@ -1797,9 +1797,9 @@ void CViewRenderBeams::DrawBeamWithHalo(	Beam_t*			pbeam,
 	Vector	out;
 
 	// Find out how close we are to the "line" of the spotlight
-	CalcClosestPointOnLine( CurrentViewOrigin(), pbeam->attachment[0], pbeam->attachment[0] + ( beamDir * 2 ), out, &distToLine );
+	CalcClosestPointOnLine(g_pViewRender->CurrentViewOrigin(), pbeam->attachment[0], pbeam->attachment[0] + ( beamDir * 2 ), out, &distToLine );
 
-	distToLine = ( CurrentViewOrigin() - out ).Length();
+	distToLine = (g_pViewRender->CurrentViewOrigin() - out ).Length();
 
 	float scaleColor[4];
 	float dotScale = 1.0f;
@@ -1869,7 +1869,7 @@ void CViewRenderBeams::DrawLaser( Beam_t *pbeam, int frame, int rendermode, floa
 	Vector vecForward;
 	Vector	beamDir	= pbeam->attachment[1] - pbeam->attachment[0];
 	VectorNormalize( beamDir );
-	AngleVectors( CurrentViewAngles(), &vecForward );
+	AngleVectors(g_pViewRender->CurrentViewAngles(), &vecForward );
 	float flDot = DotProduct(beamDir, vecForward);
 
 	// abort if the player's looking along it away from the source
@@ -1883,7 +1883,7 @@ void CViewRenderBeams::DrawLaser( Beam_t *pbeam, int frame, int rendermode, floa
 		float flFade = pow( flDot, 10 );
 
 		// Fade the beam based on the player's proximity to the beam
-		Vector localDir = CurrentViewOrigin() - pbeam->attachment[0];
+		Vector localDir = g_pViewRender->CurrentViewOrigin() - pbeam->attachment[0];
 		flDot = DotProduct( beamDir, localDir );
 		Vector vecProjection = flDot * beamDir;
 		float flDistance = ( localDir - vecProjection ).Length();

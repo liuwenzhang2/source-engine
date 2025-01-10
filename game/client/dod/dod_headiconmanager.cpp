@@ -120,8 +120,8 @@ void CHeadIconManager::DrawHeadIcons()
 		return;
 	}
 
-	Vector vUp = CurrentViewUp();
-	Vector vRight = CurrentViewRight();
+	Vector vUp = g_pViewRender->CurrentViewUp();
+	Vector vRight = g_pViewRender->CurrentViewRight();
 	if ( fabs( vRight.z ) > 0.95 )	// don't draw it edge-on
 		return;
 

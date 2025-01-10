@@ -42,7 +42,7 @@ ConVar cl_deatheffect_force_on( "cl_deatheffect_always_on", "0", FCVAR_CLIENTDLL
 // Console variables to define lookup maps
 static void UpdateCameraLookups( IConVar *var, char const *pOldString, float flOldValue )
 {
-	CDODViewRender *pView = static_cast<CDODViewRender*>(view);
+	CDODViewRender *pView = static_cast<CDODViewRender*>(g_pViewRender);
 	pView->InitColorCorrection();
 }
 
@@ -56,7 +56,7 @@ CLIENTEFFECT_REGISTER_END()
 
 CDODViewRender::CDODViewRender()
 {
-	view = ( IViewRender * )this;
+	g_pViewRender = ( IViewRender * )this;
 
 	m_SpectatorLookupHandle = (ClientCCHandle_t)0;
 	m_DeathLookupHandle = (ClientCCHandle_t)0;

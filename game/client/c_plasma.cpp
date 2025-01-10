@@ -249,7 +249,7 @@ void C_Plasma::AddEntity( void )
 //-----------------------------------------------------------------------------
 void C_Plasma::AddFlames( void )
 {
-	Vector	viewDir = GetEngineObject()->GetAbsOrigin() - CurrentViewOrigin();
+	Vector	viewDir = GetEngineObject()->GetAbsOrigin() - g_pViewRender->CurrentViewOrigin();
 	VectorNormalize(viewDir);
 	float	dot		= viewDir.Dot( Vector( 0, 0, 1 ) );	//NOTENOTE: Flames always point up
 	float	alpha	= 1.0f;

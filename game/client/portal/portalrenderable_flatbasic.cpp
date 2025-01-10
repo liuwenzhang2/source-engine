@@ -915,7 +915,7 @@ void CPortalRenderable_FlatBasic::DrawRenderFixMesh( const IMaterial *pMaterialO
 	if( g_pPortalRender->GetViewRecursionLevel() != 0 )
 		return; //a render fix should only ever be necessary in the primary view
 
-	Vector ptCameraOrigin = CurrentViewOrigin();
+	Vector ptCameraOrigin = g_pViewRender->CurrentViewOrigin();
 
 	Vector vPortalCenterToCamera = ptCameraOrigin - m_ptOrigin;
 	if( (vPortalCenterToCamera.Dot( m_vForward ) < -1.0f) ) //camera coplanar (to 1.0 units) or in front of portal plane
@@ -956,11 +956,11 @@ void CPortalRenderable_FlatBasic::Internal_DrawRenderFixMesh( const IMaterial *p
 
 	//view->GetViewSetup()->zNear;
 	Vector vForward, vUp, vRight, vOrigin;
-	vForward = CurrentViewForward();
-	vUp = CurrentViewUp();
-	vRight = CurrentViewRight();
+	vForward = g_pViewRender->CurrentViewForward();
+	vUp = g_pViewRender->CurrentViewUp();
+	vRight = g_pViewRender->CurrentViewRight();
 
-	vOrigin = CurrentViewOrigin() + vForward * (view->GetViewSetup()->zNear + 0.05f);
+	vOrigin = g_pViewRender->CurrentViewOrigin() + vForward * (g_pViewRender->GetViewSetup()->zNear + 0.05f);
 
 	for( int i = 0; i != 4; ++i )
 	{
@@ -1005,7 +1005,7 @@ void CPortalRenderable_FlatBasic::ClipFixToBoundingAreaAndDraw( PortalMeshPoint_
 
 	//clip by the viewing frustum
 	{
-		VPlane *pFrustum = view->GetFrustum();
+		VPlane *pFrustum = g_pViewRender->GetFrustum();
 
 		for( int i = 0; i != FRUSTUM_NUMPLANES; ++i )
 		{
@@ -1165,7 +1165,7 @@ void CPortalRenderable_FlatBasic::RenderFogQuad( void )
 
 void CPortalRenderable_FlatBasic::DrawPortal( void )
 {
-	if( (view->GetDrawFlags() & DF_RENDER_REFLECTION) != 0 )
+	if( (g_pViewRender->GetDrawFlags() & DF_RENDER_REFLECTION) != 0 )
 		return;
 
 	if ( g_pPortalRender->ShouldUseStencilsToRenderPortals() )

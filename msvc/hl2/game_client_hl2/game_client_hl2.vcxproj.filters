@@ -456,9 +456,6 @@
     <ClCompile Include="..\..\..\game\client\cl_mat_stub.cpp">
       <Filter>源文件\Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\game\client\classmap.cpp">
-      <Filter>源文件\Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\game\client\client_factorylist.cpp">
       <Filter>源文件\Source Files</Filter>
     </ClCompile>

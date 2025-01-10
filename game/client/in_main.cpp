@@ -710,7 +710,7 @@ void CUserInput::AdjustPitch( float speed, QAngle& viewangles )
 
 		if ( in_klook.state & 1 )
 		{
-			view->StopPitchDrift ();
+			g_pViewRender->StopPitchDrift ();
 			viewangles[PITCH] -= speed*cl_pitchspeed.GetFloat() * KeyState (&in_forward);
 			viewangles[PITCH] += speed*cl_pitchspeed.GetFloat() * KeyState (&in_back);
 		}
@@ -723,7 +723,7 @@ void CUserInput::AdjustPitch( float speed, QAngle& viewangles )
 
 		if ( up || down )
 		{
-			view->StopPitchDrift ();
+			g_pViewRender->StopPitchDrift ();
 		}
 	}	
 }

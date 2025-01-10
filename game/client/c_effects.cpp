@@ -486,11 +486,11 @@ inline void CClient_Precipitation::RenderParticle( CPrecipitationParticle* pPart
 		scale = lifetimeRemaining * pParticle->m_Ramp;
 	
 	// NOTE: We need to do everything in screen space
-	Vector3DMultiplyPosition( CurrentWorldToViewMatrix(), pParticle->m_Pos, start );
+	Vector3DMultiplyPosition(g_pViewRender->CurrentWorldToViewMatrix(), pParticle->m_Pos, start );
 	if ( start.z > -1 )
 		return;
 
-	Vector3DMultiply( CurrentWorldToViewMatrix(), pParticle->m_Velocity, delta );
+	Vector3DMultiply(g_pViewRender->CurrentWorldToViewMatrix(), pParticle->m_Velocity, delta );
 
 	// give a spiraling pattern to snow particles
 	if ( m_nPrecipType == PRECIPITATION_TYPE_SNOW )
@@ -508,7 +508,7 @@ inline void CClient_Precipitation::RenderParticle( CPrecipitationParticle* pPart
 			spiral[1] = 28 * s;
 			spiral[2] = 0.0f;
 
-			Vector3DMultiply( CurrentWorldToViewMatrix(), spiral, camSpiral );
+			Vector3DMultiply(g_pViewRender->CurrentWorldToViewMatrix(), spiral, camSpiral );
 
 			// X and Y are measured in world space; need to convert to camera space
 			VectorAdd( start, camSpiral, start );
@@ -547,7 +547,7 @@ void CClient_Precipitation::CreateWaterSplashes()
 	{
 		Vector vSplash = m_Splashes[i];
 		
-		if ( CurrentViewForward().Dot( vSplash - CurrentViewOrigin() ) > 1 )
+		if (g_pViewRender->CurrentViewForward().Dot( vSplash - g_pViewRender->CurrentViewOrigin() ) > 1 )
 		{
 			FX_WaterRipple( vSplash, g_flSplashScale, &g_vSplashColor, g_flSplashLifetime, g_flSplashAlpha );
 		}
@@ -562,10 +562,10 @@ void CClient_Precipitation::Render()
 		return;
 
 	// Don't render in monitors or in reflections or refractions.
-	if ( CurrentViewID() == VIEW_MONITOR )
+	if (g_pViewRender->CurrentViewID() == VIEW_MONITOR )
 		return;
 
-	if ( view->GetDrawFlags() & (DF_RENDER_REFLECTION | DF_RENDER_REFRACTION) )
+	if (g_pViewRender->GetDrawFlags() & (DF_RENDER_REFLECTION | DF_RENDER_REFRACTION) )
 		return;
 
 	if ( m_nPrecipType == PRECIPITATION_TYPE_ASH )

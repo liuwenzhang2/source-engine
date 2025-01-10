@@ -456,12 +456,12 @@ void CPortalRenderable_Func_LiquidPortal::DrawInnerLiquid( bool bClipToBounds, f
 	
 	//view->GetViewSetup()->zNear;
 	Vector vForward, vUp, vRight, vOrigin;
-	vForward = CurrentViewForward();
-	vUp = CurrentViewUp();
-	vRight = CurrentViewRight();
+	vForward = g_pViewRender->CurrentViewForward();
+	vUp = g_pViewRender->CurrentViewUp();
+	vRight = g_pViewRender->CurrentViewRight();
 
 	//vOrigin = CurrentViewOrigin() + vForward * (view->GetViewSetup()->zNear + 0.011f); //experimentation has shown this to be the optimal distance on the Nvidia 6800 cards we develop on
-	vOrigin = CurrentViewOrigin() + vForward * (view->GetViewSetup()->zNear + 1.0f );
+	vOrigin = g_pViewRender->CurrentViewOrigin() + vForward * (g_pViewRender->GetViewSetup()->zNear + 1.0f );
 
 	const float fScalingAmount = 5.0f;
 

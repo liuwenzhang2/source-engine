@@ -268,7 +268,7 @@ static inline const Vector& EngineGetVecRenderOrigin()
 		static Vector dummy(0,0,0);
 		return dummy;
 	#else
-		return CurrentViewOrigin();
+		return g_pViewRender->CurrentViewOrigin();
 	#endif
 }
 

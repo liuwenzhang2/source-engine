@@ -2184,7 +2184,7 @@ void C_DODPlayer::CalcFreezeCamView( Vector& eyeOrigin, QAngle& eyeAngles, float
 		}
 
 		m_bSentFreezeFrame = true;
-		view->FreezeFrame( spec_freeze_time.GetFloat() );
+		g_pViewRender->FreezeFrame( spec_freeze_time.GetFloat() );
 	}
 }
 

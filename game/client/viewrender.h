@@ -17,6 +17,7 @@
 #include "view_shared.h"
 #include "replay/ireplayscreenshotsystem.h"
 #include "cdll_int.h"
+#include "clientleafsystem.h"
 
 //-----------------------------------------------------------------------------
 // Forward declarations
@@ -62,7 +63,6 @@ struct IntroData_t
 extern IntroData_t *g_pIntroData;
 
 
-view_id_t CurrentViewID();
 
 //-----------------------------------------------------------------------------
 // Purpose: Stored pitch drifting variables
@@ -279,6 +279,12 @@ public:
 class CViewRender : public IViewRender,
 					public IReplayScreenshotSystem
 {
+	friend class CRendering3dView;
+	friend class CSkyboxView;
+	friend class CBaseWorldView;
+	friend class CAboveWaterView;
+	friend class CShadowDepthView;
+	friend class CPortalSkyboxView;
 	DECLARE_CLASS_NOBASE( CViewRender );
 public:
 	virtual void	Init( void );
@@ -295,7 +301,7 @@ public:
 	virtual void	OnRenderStart();
 	void			DriftPitch (void);
 
-	static CViewRender *	GetMainView() { return assert_cast<CViewRender *>( view ); }
+	//static CViewRender *	GetMainView() { return assert_cast<CViewRender *>( view ); }
 
 	void			AddViewToScene( CRendering3dView *pView ) { m_SimpleExecutor.AddView( pView ); }
 protected:
@@ -405,7 +411,28 @@ public:
 	{
 		m_UnderWaterOverlayMaterial.Init( pMaterial );
 	}
+
+	void AllowCurrentViewAccess(bool allow);
+	bool IsCurrentViewAccessAllowed();
+	view_id_t CurrentViewID();
+	const Vector& CurrentViewOrigin();
+	const QAngle& CurrentViewAngles();
+	const VMatrix& CurrentWorldToViewMatrix();
+	const Vector& CurrentViewForward();
+	const Vector& CurrentViewRight();
+	const Vector& CurrentViewUp();
+	bool DrawingShadowDepthView(void);
+	bool DrawingMainView();
 private:
+
+	void SetupCurrentView(const Vector& vecOrigin, const QAngle& angles, view_id_t viewID);
+	void FinishCurrentView()
+	{
+		s_bCanAccessCurrentView = false;
+	}
+
+	void DrawOpaqueRenderables_DrawStaticProps(CClientRenderablesList::CEntry* pEntitiesBegin, CClientRenderablesList::CEntry* pEntitiesEnd, ERenderDepthMode DepthMode);
+
 	int				m_BuildWorldListsNumber;
 
 
@@ -505,6 +532,19 @@ private:
 #if defined( REPLAY_ENABLED )
 	CReplayScreenshotTaker	*m_pReplayScreenshotTaker;
 #endif
+
+	//-----------------------------------------------------------------------------
+// Globals
+//-----------------------------------------------------------------------------
+	Vector g_vecCurrentRenderOrigin = Vector(0, 0, 0);
+	QAngle g_vecCurrentRenderAngles = QAngle(0, 0, 0);
+	Vector g_vecCurrentVForward = Vector(0, 0, 0);
+	Vector g_vecCurrentVRight = Vector(0, 0, 0);
+	Vector g_vecCurrentVUp = Vector(0, 0, 0);
+	VMatrix g_matCurrentCamInverse;
+	int g_CurrentViewID = VIEW_NONE;
+	bool s_bCanAccessCurrentView = false;
+
 };
 
 //-----------------------------------------------------------------------------
@@ -522,16 +562,10 @@ const Vector& MainViewForward();
 const Vector& MainViewRight();
 const Vector& MainViewUp();
 
-const Vector& CurrentViewOrigin();
-const QAngle& CurrentViewAngles();
-const VMatrix& CurrentWorldToViewMatrix();
-const Vector& CurrentViewForward();
-const Vector& CurrentViewRight();
-const Vector& CurrentViewUp();
+
 
 float ScaleFOVByWidthRatio(float fovDegrees, float ratio);
-void AllowCurrentViewAccess(bool allow);
-bool IsCurrentViewAccessAllowed();
+
 
 extern ConVar mat_wireframe;
 extern const ConVar* sv_cheats;
