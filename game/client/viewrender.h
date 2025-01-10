@@ -26,7 +26,6 @@ class ConVar;
 class CClientRenderablesList;
 class IClientVehicle;
 class C_PointCamera;
-class C_EnvProjectedTexture;
 class IScreenSpaceEffect;
 class CClientViewSetup;
 class CViewRender;
@@ -37,32 +36,6 @@ class CReplayScreenshotTaker;
 #ifdef HL2_EPISODIC
 	class CStunEffect;
 #endif // HL2_EPISODIC
-
-//-----------------------------------------------------------------------------
-// Data specific to intro mode to control rendering.
-//-----------------------------------------------------------------------------
-struct IntroDataBlendPass_t
-{
-	int m_BlendMode;
-	float m_Alpha; // in [0.0f,1.0f]  This needs to add up to 1.0 for all passes, unless you are fading out.
-};
-
-struct IntroData_t
-{
-	bool	m_bDrawPrimary;
-	Vector	m_vecCameraView;
-	QAngle	m_vecCameraViewAngles;
-	float	m_playerViewFOV;
-	CUtlVector<IntroDataBlendPass_t> m_Passes;
-
-	// Fade overriding for the intro
-	float	m_flCurrentFadeColor[4];
-};
-
-// Robin, make this point at something to get intro mode.
-extern IntroData_t *g_pIntroData;
-
-
 
 //-----------------------------------------------------------------------------
 // Purpose: Stored pitch drifting variables
@@ -285,6 +258,7 @@ class CViewRender : public IViewRender,
 	friend class CAboveWaterView;
 	friend class CShadowDepthView;
 	friend class CPortalSkyboxView;
+	friend class CFreezeFrameView;
 	DECLARE_CLASS_NOBASE( CViewRender );
 public:
 	virtual void	Init( void );
@@ -412,6 +386,21 @@ public:
 		m_UnderWaterOverlayMaterial.Init( pMaterial );
 	}
 
+//-----------------------------------------------------------------------------
+// There's a difference between the 'current view' and the 'main view'
+// The 'main view' is where the player is sitting. Current view is just
+// what's currently being rendered, which, owing to monitors or water,
+// could be just about anywhere.
+//-----------------------------------------------------------------------------
+	const Vector& PrevMainViewOrigin();
+	const QAngle& PrevMainViewAngles();
+	const Vector& MainViewOrigin();
+	const QAngle& MainViewAngles();
+	const VMatrix& MainWorldToViewMatrix();
+	const Vector& MainViewForward();
+	const Vector& MainViewRight();
+	const Vector& MainViewUp();
+
 	void AllowCurrentViewAccess(bool allow);
 	bool IsCurrentViewAccessAllowed();
 	view_id_t CurrentViewID();
@@ -423,6 +412,21 @@ public:
 	const Vector& CurrentViewUp();
 	bool DrawingShadowDepthView(void);
 	bool DrawingMainView();
+
+	bool IsRenderingScreenshot() {
+		return g_bRenderingScreenshot;
+	}
+
+	IntroData_t* GetIntroData() {
+		return g_pIntroData;
+	}
+	void SetIntroData(IntroData_t* pIntroData) {
+		g_pIntroData = pIntroData;
+	}
+
+	void SetFreezeFlash(float flFreezeFlash) {
+		g_flFreezeFlash = flFreezeFlash;
+	}
 private:
 
 	void SetupCurrentView(const Vector& vecOrigin, const QAngle& angles, view_id_t viewID);
@@ -432,6 +436,11 @@ private:
 	}
 
 	void DrawOpaqueRenderables_DrawStaticProps(CClientRenderablesList::CEntry* pEntitiesBegin, CClientRenderablesList::CEntry* pEntitiesEnd, ERenderDepthMode DepthMode);
+	void DrawOpaqueRenderables_DrawBrushModels(CClientRenderablesList::CEntry* pEntitiesBegin, CClientRenderablesList::CEntry* pEntitiesEnd, ERenderDepthMode DepthMode);
+	void DrawOpaqueRenderable(IClientRenderable* pEnt, bool bTwoPass, ERenderDepthMode DepthMode, int nDefaultFlags = 0);
+	void DrawOpaqueRenderables_Range(CClientRenderablesList::CEntry* pEntitiesBegin, CClientRenderablesList::CEntry* pEntitiesEnd, ERenderDepthMode DepthMode);
+	void DrawTranslucentRenderable(IClientRenderable* pEnt, bool twoPass, bool bShadowDepth, bool bIgnoreDepth);
+	void DrawClippedDepthBox(IClientRenderable* pEnt, float* pClipPlane);
 
 	int				m_BuildWorldListsNumber;
 
@@ -545,22 +554,32 @@ private:
 	int g_CurrentViewID = VIEW_NONE;
 	bool s_bCanAccessCurrentView = false;
 
+	// These are the vectors for the "main" view - the one the player is looking down.
+// For stereo views, they are the vectors for the middle eye.
+	Vector g_vecPrevRenderOrigin = Vector(0, 0, 0);	// Last frame's render origin
+	QAngle g_vecPrevRenderAngles = QAngle(0, 0, 0); // Last frame's render angles
+	Vector g_vecRenderOrigin = Vector(0, 0, 0);
+	QAngle g_vecRenderAngles = QAngle(0, 0, 0);
+	Vector g_vecVForward = Vector(0, 0, 0);
+	Vector g_vecVRight = Vector(0, 0, 0);
+	Vector g_vecVUp = Vector(0, 0, 0);
+	VMatrix g_matCamInverse;
+
+	bool g_bRenderingView = false;			// For debugging...
+	bool g_bRenderingScreenshot = false;
+#if _DEBUG
+	bool g_bRenderingCameraView = false;
+#endif
+	float g_flFreezeFlash = 0.0f;
+
+	// Robin, make this point at something to get intro mode.
+	IntroData_t* g_pIntroData = NULL;
+
+	CMaterialReference g_material_WriteZ; //init'ed on by CViewRender::Init()
+
 };
 
-//-----------------------------------------------------------------------------
-// There's a difference between the 'current view' and the 'main view'
-// The 'main view' is where the player is sitting. Current view is just
-// what's currently being rendered, which, owing to monitors or water,
-// could be just about anywhere.
-//-----------------------------------------------------------------------------
-const Vector& MainViewOrigin();
-const QAngle& MainViewAngles();
-const Vector& PrevMainViewOrigin();
-const QAngle& PrevMainViewAngles();
-const VMatrix& MainWorldToViewMatrix();
-const Vector& MainViewForward();
-const Vector& MainViewRight();
-const Vector& MainViewUp();
+
 
 
 

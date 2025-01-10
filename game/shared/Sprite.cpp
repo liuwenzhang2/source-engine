@@ -14,6 +14,7 @@
 #if defined( CLIENT_DLL )
 	#include "enginesprite.h"
 	#include "iclientmode.h"
+	#include "viewrender.h"
 	#include "c_baseviewmodel.h"
 #	ifdef PORTAL
 		#include "c_prop_portal.h"
@@ -739,7 +740,6 @@ void CSprite::ClientThink( void )
 	}
 }
 
-extern bool g_bRenderingScreenshot;
 extern ConVar r_drawviewmodel;
 
 //-----------------------------------------------------------------------------
@@ -764,7 +764,7 @@ int CSprite::DrawModel( int flags )
 
 	// Tracker 16432:  If rendering a savegame screenshot then don't draw sprites 
 	//   who have viewmodels as their moveparent
-	if ( g_bRenderingScreenshot || !r_drawviewmodel.GetBool() )
+	if ( g_pViewRender->IsRenderingScreenshot() || !r_drawviewmodel.GetBool())
 	{
 		C_BaseViewModel *vm = dynamic_cast< C_BaseViewModel * >(GetEngineObject()->GetMoveParent() );
 		if ( vm )

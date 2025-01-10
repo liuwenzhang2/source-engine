@@ -35,7 +35,7 @@ void FX_DoDTracerSound( const Vector &start, const Vector &end, int iTracerType 
 	
 	const char *pszSoundName = "Bullets.DefaultNearmiss";
 	float flWhizDist = 64;
-	Vector vecListenOrigin = MainViewOrigin();
+	Vector vecListenOrigin = g_pViewRender->MainViewOrigin();
 
 	switch( iTracerType )
 	{

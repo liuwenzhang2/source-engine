@@ -965,7 +965,6 @@ int CBeam::DrawDebugTextOverlays(void)
 //	return true;
 //}
 
-extern bool g_bRenderingScreenshot;
 extern ConVar r_drawviewmodel;
 #ifdef PORTAL
 bool bBeamDrawingThroughPortal = false;
@@ -1226,7 +1225,7 @@ int CBeam::DrawModel( int flags )
 
 	// Tracker 16432:  If rendering a savegame screenshot don't draw beams 
 	//   who have viewmodels as their attached entity
-	if ( g_bRenderingScreenshot || !r_drawviewmodel.GetBool() )
+	if (g_pViewRender->IsRenderingScreenshot() || !r_drawviewmodel.GetBool())
 	{
 		// If the beam is attached
 		for (int i=0;i<MAX_BEAM_ENTS;i++)

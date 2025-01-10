@@ -51,7 +51,7 @@ bool EffectOccluded( const Vector &pos, pixelvis_handle_t *queryHandle )
 		// NOTE: This is called by networking code before the current view is set up.
 		// so use the main view instead
 		trace_t	tr;
-		UTIL_TraceLine( pos, MainViewOrigin(), MASK_OPAQUE, NULL, COLLISION_GROUP_NONE, &tr );
+		UTIL_TraceLine( pos, g_pViewRender->MainViewOrigin(), MASK_OPAQUE, NULL, COLLISION_GROUP_NONE, &tr );
 		
 		return ( tr.fraction < 1.0f ) ? true : false;
 	}

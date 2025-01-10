@@ -17,7 +17,7 @@
 #include "c_pixel_visibility.h"
 
 #ifdef PORTAL
-#include "c_prop_portal.h" //MAX_PORTAL_RECURSIVE_VIEWS
+//#include "c_prop_portal.h" //MAX_PORTAL_RECURSIVE_VIEWS
 #endif
 
 extern float g_flOverlayRange;

@@ -848,7 +848,7 @@ void C_BasePlayer::PostDataUpdate( DataUpdateType_t updateType )
 
 		if ( !m_bWasFreezeFraming && GetObserverMode() == OBS_MODE_FREEZECAM )
 		{
-			m_vecFreezeFrameStart = MainViewOrigin();
+			m_vecFreezeFrameStart = g_pViewRender->MainViewOrigin();
 			m_flFreezeFrameStartTime = gpGlobals->curtime;
 			m_flFreezeFrameDistance = RandomFloat( spec_freeze_distance_min.GetFloat(), spec_freeze_distance_max.GetFloat() );
 			m_flFreezeZOffset = RandomFloat( -30, 20 );
@@ -2898,9 +2898,9 @@ void C_BasePlayer::BuildFirstPersonMeathookTransformations( IStudioHdr *hdr, Vec
 	{
 		// figure out where to put the body from the aim angles
 		Vector vForward, vRight, vUp;
-		AngleVectors( MainViewAngles(), &vForward, &vRight, &vUp );
+		AngleVectors(g_pViewRender->MainViewAngles(), &vForward, &vRight, &vUp );
 		
-		vRealPivotPoint = MainViewOrigin() - ( vUp * cl_meathook_neck_pivot_ingame_up.GetFloat() ) - ( vForward * cl_meathook_neck_pivot_ingame_fwd.GetFloat() );		
+		vRealPivotPoint = g_pViewRender->MainViewOrigin() - ( vUp * cl_meathook_neck_pivot_ingame_up.GetFloat() ) - ( vForward * cl_meathook_neck_pivot_ingame_fwd.GetFloat() );		
 	}
 
 	Vector vDeltaToAdd = vRealPivotPoint - vHeadTransformTranslation;

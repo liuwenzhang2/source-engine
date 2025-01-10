@@ -346,7 +346,7 @@ Vector CBasePlayer::EyePosition( )
 			{
 				if ( IsLocalPlayer() )
 				{
-					return MainViewOrigin();
+					return g_pViewRender->MainViewOrigin();
 				}
 			}
 		}

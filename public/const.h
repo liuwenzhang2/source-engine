@@ -13,6 +13,7 @@
 #endif
 
 #include "bspflags.h"
+#include "worldsize.h"
 
 // the command line param that tells the engine to use steam
 #define STEAM_PARM					"-steam"
@@ -558,6 +559,8 @@ enum engineObjectType {
 	ENGINEOBJECT_GHOST
 };
 
+#define MAX_PORTAL_RECURSIVE_VIEWS 11 //maximum number of recursions we allow when drawing views through portals. Seeing as how 5 is extremely choppy under best conditions and is barely visible, 10 is a safe limit. Adding one because 0 tends to be the primary view in most arrays of this size
+
 #define PORTAL_WALL_FARDIST 200.0f
 #define PORTAL_WALL_TUBE_DEPTH 1.0f
 #define PORTAL_WALL_TUBE_OFFSET 0.01f
@@ -817,6 +820,15 @@ enum view_id_t
 	VIEW_SSAO = 8,
 	VIEW_ID_COUNT
 };
+
+#if !defined( _X360 )
+#define SAVEGAME_SCREENSHOT_WIDTH	180
+#define SAVEGAME_SCREENSHOT_HEIGHT	100
+#else
+#define SAVEGAME_SCREENSHOT_WIDTH	128
+#define SAVEGAME_SCREENSHOT_HEIGHT	128
+#endif
+#define FREEZECAM_SNAPSHOT_FADE_SPEED 340
 
 #endif
 

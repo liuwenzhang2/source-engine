@@ -2296,7 +2296,7 @@ void C_BaseAnimating::FireEvent( const Vector& origin, const QAngle& angles, int
 	case CL_EVENT_EJECTBRASS1:
 		if (GetEngineObject()->GetAttachmentCount() > 0 )
 		{
-			if ( MainViewOrigin().DistToSqr(GetEngineObject()->GetAbsOrigin() ) < (256 * 256) )
+			if (g_pViewRender->MainViewOrigin().DistToSqr(GetEngineObject()->GetAbsOrigin() ) < (256 * 256) )
 			{
 				Vector attachOrigin;
 				QAngle attachAngles; 

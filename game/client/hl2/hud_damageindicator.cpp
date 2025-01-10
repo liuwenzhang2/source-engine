@@ -354,7 +354,7 @@ void CHudDamageIndicator::MsgFunc_Damage( bf_read &msg )
 	if ( vecFrom == vec3_origin && !(bitsDamage & DMG_DROWN))
 		return;
 
-	Vector vecDelta = (vecFrom - MainViewOrigin());
+	Vector vecDelta = (vecFrom - g_pViewRender->MainViewOrigin());
 	VectorNormalize( vecDelta );
 
 	int highDamage = DAMAGE_LOW;
@@ -410,8 +410,8 @@ void CHudDamageIndicator::GetDamagePosition( const Vector &vecDelta, float *flRo
 	float flRadius = 360.0f;
 
 	// Player Data
-	Vector playerPosition = MainViewOrigin();
-	QAngle playerAngles = MainViewAngles();
+	Vector playerPosition = g_pViewRender->MainViewOrigin();
+	QAngle playerAngles = g_pViewRender->MainViewAngles();
 
 	Vector forward, right, up(0,0,1);
 	AngleVectors (playerAngles, &forward, NULL, NULL );

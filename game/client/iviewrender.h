@@ -58,6 +58,27 @@ struct vrect_t;
 struct WriteReplayScreenshotParams_t;
 class IReplayScreenshotSystem;
 
+//-----------------------------------------------------------------------------
+// Data specific to intro mode to control rendering.
+//-----------------------------------------------------------------------------
+struct IntroDataBlendPass_t
+{
+	int m_BlendMode;
+	float m_Alpha; // in [0.0f,1.0f]  This needs to add up to 1.0 for all passes, unless you are fading out.
+};
+
+struct IntroData_t
+{
+	bool	m_bDrawPrimary;
+	Vector	m_vecCameraView;
+	QAngle	m_vecCameraViewAngles;
+	float	m_playerViewFOV;
+	CUtlVector<IntroDataBlendPass_t> m_Passes;
+
+	// Fade overriding for the intro
+	float	m_flCurrentFadeColor[4];
+};
+
 abstract_class IViewRender
 {
 public:
@@ -137,6 +158,15 @@ public:
 
 	virtual IReplayScreenshotSystem *GetReplayScreenshotSystem() = 0;
 
+	virtual const Vector& PrevMainViewOrigin() = 0;
+	virtual const QAngle& PrevMainViewAngles() = 0;
+	virtual const Vector& MainViewOrigin() = 0;
+	virtual const QAngle& MainViewAngles() = 0;
+	virtual const VMatrix& MainWorldToViewMatrix() = 0;
+	virtual const Vector& MainViewForward() = 0;
+	virtual const Vector& MainViewRight() = 0;
+	virtual const Vector& MainViewUp() = 0;
+
 	virtual void AllowCurrentViewAccess(bool allow) = 0;
 	virtual bool IsCurrentViewAccessAllowed() = 0;
 	virtual view_id_t CurrentViewID() = 0;
@@ -148,6 +178,11 @@ public:
 	virtual const Vector& CurrentViewUp() = 0;
 	virtual bool DrawingShadowDepthView(void) = 0;
 	virtual bool DrawingMainView() = 0;
+
+	virtual bool IsRenderingScreenshot() = 0;
+	virtual IntroData_t* GetIntroData() = 0;
+	virtual void SetIntroData(IntroData_t* pIntroData) = 0;
+	virtual void SetFreezeFlash(float flFreezeFlash) = 0;
 };
 
 extern IViewRender *g_pViewRender;

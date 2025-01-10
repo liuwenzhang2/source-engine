@@ -1482,8 +1482,8 @@ void C_CSPlayer::UpdateIDTarget()
 
 	trace_t tr;
 	Vector vecStart, vecEnd;
-	VectorMA( MainViewOrigin(), 2500, MainViewForward(), vecEnd );
-	VectorMA( MainViewOrigin(), 10,   MainViewForward(), vecStart );
+	VectorMA(g_pViewRender->MainViewOrigin(), 2500, g_pViewRender->MainViewForward(), vecEnd );
+	VectorMA(g_pViewRender->MainViewOrigin(), 10, g_pViewRender->MainViewForward(), vecStart );
 	UTIL_TraceLine( vecStart, vecEnd, MASK_VISIBLE_AND_NPCS, GetLocalOrInEyeCSPlayer(), COLLISION_GROUP_NONE, &tr );
 	if ( !tr.startsolid && !tr.DidHitNonWorldEntity() )
 	{
@@ -1491,7 +1491,7 @@ void C_CSPlayer::UpdateIDTarget()
 
 		// Check for player hitboxes extending outside their collision bounds
 		const float rayExtension = 40.0f;
-		UTIL_ClipTraceToPlayers(vecStart, vecEnd + MainViewForward() * rayExtension, MASK_SOLID|CONTENTS_HITBOX, &filter, &tr );
+		UTIL_ClipTraceToPlayers(vecStart, vecEnd + g_pViewRender->MainViewForward() * rayExtension, MASK_SOLID|CONTENTS_HITBOX, &filter, &tr );
 	}
 
 	if ( !tr.startsolid && tr.DidHitNonWorldEntity() )
@@ -1525,7 +1525,7 @@ void C_CSPlayer::UpdateIDTarget()
 					/*debugoverlay->AddBoxOverlay( pSmokeGrenade->GetAbsOrigin(), Vector( flRadius, flRadius, flRadius ),
 					 Vector( -flRadius, -flRadius, -flRadius ), QAngle( 0, 0, 0 ), 255, 0, 0, 255, 0.2 );*/
 
-					if ( IntersectInfiniteRayWithSphere( MainViewOrigin(), MainViewForward(), vPos, flRadius, &flHit1, &flHit2 ) )
+					if ( IntersectInfiniteRayWithSphere(g_pViewRender->MainViewOrigin(), g_pViewRender->MainViewForward(), vPos, flRadius, &flHit1, &flHit2 ) )
 					{
 						 return;
 					}

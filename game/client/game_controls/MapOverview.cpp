@@ -320,7 +320,7 @@ void CMapOverview::UpdateFollowEntity()
 
 		if ( ent )
 		{
-			Vector position = MainViewOrigin();	// Use MainViewOrigin so SourceTV works in 3rd person
+			Vector position = g_pViewRender->MainViewOrigin();	// Use MainViewOrigin so SourceTV works in 3rd person
 			QAngle angle = ent->EyeAngles();
 
 			if ( m_nFollowEntity <= MAX_PLAYERS )

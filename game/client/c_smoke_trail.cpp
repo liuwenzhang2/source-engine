@@ -1052,7 +1052,7 @@ void C_SporeExplosion::Update( float fTimeDelta )
 	{
 		float tempDelta = fTimeDelta;
 
-		float flDist = (MainViewOrigin() - GetEngineObject()->GetAbsOrigin()).Length();
+		float flDist = (g_pViewRender->MainViewOrigin() - GetEngineObject()->GetAbsOrigin()).Length();
 
 		//Lower the spawnrate by half if we're far away from it.
 		if ( cl_sporeclipdistance.GetFloat() <= flDist )

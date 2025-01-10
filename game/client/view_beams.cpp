@@ -241,7 +241,7 @@ bool ComputeBeamEntPosition( IClientEntity *pEnt, int nAttachment, bool bInterpr
 					if ( pEnt->GetEngineObject()->HitboxToWorldTransforms( hitboxbones ) )
 					{
 						mstudiobbox_t *pHitbox = set->pHitbox( nAttachment - 1 );
-						Vector vecViewPt = MainViewOrigin();
+						Vector vecViewPt = g_pViewRender->MainViewOrigin();
 						Vector vecLocalViewPt;
 						VectorITransform( vecViewPt, *hitboxbones[ pHitbox->bone ], vecLocalViewPt );
 
@@ -433,7 +433,6 @@ int	Beam_t::GetFxBlend( )
 	return 255;
 }
 
-extern bool g_bRenderingScreenshot;
 extern ConVar r_drawviewmodel;
 
 int Beam_t::DrawModel( int flags )
@@ -448,7 +447,7 @@ int Beam_t::DrawModel( int flags )
 
 	// Tracker 16432:  If rendering a savegame screenshot don't draw beams 
 	//   who have viewmodels as their attached entity
-	if ( g_bRenderingScreenshot || !r_drawviewmodel.GetBool() )
+	if (g_pViewRender->IsRenderingScreenshot() || !r_drawviewmodel.GetBool())
 	{
 		// If the beam is attached
 		for (int i=0;i<MAX_BEAM_ENTS;i++)

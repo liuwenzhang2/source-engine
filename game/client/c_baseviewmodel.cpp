@@ -58,7 +58,7 @@ void FormatViewModelAttachment( Vector &vOrigin, bool bInverse )
 	
 	// Get the coordinates in the viewer's space.
 	Vector tmp = vOrigin - pViewSetup->origin;
-	Vector vTransformed( MainViewRight().Dot( tmp ), MainViewUp().Dot( tmp ), MainViewForward().Dot( tmp ) );
+	Vector vTransformed(g_pViewRender->MainViewRight().Dot( tmp ), g_pViewRender->MainViewUp().Dot( tmp ), g_pViewRender->MainViewForward().Dot( tmp ) );
 
 	// Now squash X and Y.
 	if ( bInverse )
@@ -83,7 +83,7 @@ void FormatViewModelAttachment( Vector &vOrigin, bool bInverse )
 
 
 	// Transform back to world space.
-	Vector vOut = (MainViewRight() * vTransformed.x) + (MainViewUp() * vTransformed.y) + (MainViewForward() * vTransformed.z);
+	Vector vOut = (g_pViewRender->MainViewRight() * vTransformed.x) + (g_pViewRender->MainViewUp() * vTransformed.y) + (g_pViewRender->MainViewForward() * vTransformed.z);
 	vOrigin = pViewSetup->origin + vOut;
 }
 

@@ -12,10 +12,11 @@
 #endif
 
 #include "inputsystem/ButtonCode.h"
+#include "usercmd.h"
 
 class bf_write;
 class bf_read;
-class CUserCmd;
+//class CUserCmd;
 class C_BaseCombatWeapon;
 struct kbutton_t;
 

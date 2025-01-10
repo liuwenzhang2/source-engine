@@ -408,7 +408,7 @@ void C_ParticleSmokeGrenade::ClientThink()
 	{
 		// Add our influence to the global smoke fog alpha.
 		
-		float testDist = (MainViewOrigin() - m_SmokeBasePos ).Length();
+		float testDist = (g_pViewRender->MainViewOrigin() - m_SmokeBasePos ).Length();
 
 		float fadeEnd = m_ExpandRadius;
 

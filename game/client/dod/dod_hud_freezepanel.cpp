@@ -27,8 +27,6 @@ DECLARE_HUDELEMENT_DEPTH( CDODFreezePanel, 1 );
 #define CALLOUT_WIDE		(XRES(100))
 #define CALLOUT_TALL		(XRES(50))
 
-extern float g_flFreezeFlash;
-
 ConVar cl_dod_freezecam( "cl_dod_freezecam", "1", FCVAR_ARCHIVE, "Client option to not show freeze camera on death" );
 
 #define FREEZECAM_SCREENSHOT_STRING "is looking good!"
@@ -366,7 +364,7 @@ CDODFreezePanelCallout *CDODFreezePanel::TestAndAddCallout( Vector &origin, Vect
 					{
 						// Verify that we have LOS to the gib
 						trace_t	tr;
-						UTIL_TraceLine( origin, MainViewOrigin(), MASK_OPAQUE, NULL, COLLISION_GROUP_NONE, &tr );
+						UTIL_TraceLine( origin, g_pViewRender->MainViewOrigin(), MASK_OPAQUE, NULL, COLLISION_GROUP_NONE, &tr );
 						bClear = ( tr.fraction >= 1.0f );
 					}
 
@@ -568,7 +566,7 @@ int	CDODFreezePanel::HudElementKeyInput( int down, ButtonCode_t keynum, const ch
 			if ( pPlayer )
 			{
 				//Do effects
-				g_flFreezeFlash = gpGlobals->curtime + 0.75f;
+				g_pViewRender->SetFreezeFlash(gpGlobals->curtime + 0.75f);
 
 				const char* soundname = "Camera.SnapShot";
 				CPASAttenuationFilter filter(pPlayer, soundname);

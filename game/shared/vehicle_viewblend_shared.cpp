@@ -238,8 +238,8 @@ void SharedVehicleViewSmoothing(CBasePlayer *pPlayer,
 		pData->flEnterExitDuration = pData->pVehicle->GetEngineObject()->SequenceDuration( pData->pVehicle->GetEngineObject()->GetSequence() );
 
 #ifdef CLIENT_DLL
-		pData->vecOriginSaved = PrevMainViewOrigin();
-		pData->vecAnglesSaved = PrevMainViewAngles();
+		pData->vecOriginSaved = g_pViewRender->PrevMainViewOrigin();
+		pData->vecAnglesSaved = g_pViewRender->PrevMainViewAngles();
 #endif
 
 		// Save our initial angular error, which we will blend out over the length of the animation.

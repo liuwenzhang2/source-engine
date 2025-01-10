@@ -21,7 +21,7 @@
 
 extern ConVar mat_wireframe;
 extern ConVar building_cubemaps;
-
+extern CGlobalVarsBase* gpGlobals;
 
 // Transform into view space (translate and rotate the camera into the origin).
 void ViewTransform( const Vector &worldSpace, Vector &viewSpace );

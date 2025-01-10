@@ -632,7 +632,7 @@ void CTouchControls::Frame()
 
 	C_BasePlayer *pPlayer = (C_BasePlayer*)EntityList()->GetLocalPlayer();
 
-	if( pPlayer && (pPlayer->GetEngineObject()->GetFlags() & FL_FROZEN || g_pIntroData != NULL) )
+	if( pPlayer && (pPlayer->GetEngineObject()->GetFlags() & FL_FROZEN || g_pViewRender->GetIntroData() != NULL) )
 	{
 		if( !m_bCutScene )
 		{

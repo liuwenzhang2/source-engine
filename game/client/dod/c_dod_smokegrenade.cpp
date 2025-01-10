@@ -119,7 +119,7 @@ void C_DODSmokeGrenade::ClientThink( void )
 		Vector vecSmokePos = GetEngineObject()->GetAbsOrigin();
 		vecSmokePos.z += 32;
 
-		float testDist = (MainViewOrigin() - vecSmokePos).Length();
+		float testDist = (g_pViewRender->MainViewOrigin() - vecSmokePos).Length();
 
 		// The center of the smoke cloud that always gives full fog overlay
 		float flCoreDistance = flExpandRadius * 0.3;

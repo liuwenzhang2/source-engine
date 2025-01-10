@@ -166,8 +166,8 @@ void CMumbleSystem::PostRender()
 
 	g_pMumbleMemory->uiTick++;
 
-	Vector vecOriginPlayer, vecOriginCamera = MainViewOrigin();
-	QAngle anglesPlayer, anglesCamera = MainViewAngles();
+	Vector vecOriginPlayer, vecOriginCamera = g_pViewRender->MainViewOrigin();
+	QAngle anglesPlayer, anglesCamera = g_pViewRender->MainViewAngles();
 
 	C_BasePlayer *pPlayer = (C_BasePlayer*)EntityList()->GetLocalPlayer();
 	if ( pPlayer )

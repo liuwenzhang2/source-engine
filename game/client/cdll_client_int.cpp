@@ -1631,7 +1631,7 @@ void CHLClient::View_Fade( ScreenFade_t *pSF )
 
 const Vector& CHLClient::MainViewOrigin()
 {
-	return ::MainViewOrigin();
+	return g_pViewRender->MainViewOrigin();
 }
 
 const Vector& CHLClient::CurrentViewOrigin()

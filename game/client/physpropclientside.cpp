@@ -952,7 +952,7 @@ bool C_FuncPhysicsRespawnZone::CanMovePropAt( Vector vecOrigin, const Vector &ve
 	float flDist = cl_phys_props_respawndist.GetFloat();
 
 	// Do a distance check first. We don't want to move props when the player is near 'em.
-	if ( (MainViewOrigin() - vecOrigin).LengthSqr() < (flDist*flDist) )
+	if ( (g_pViewRender->MainViewOrigin() - vecOrigin).LengthSqr() < (flDist*flDist) )
 		return false;
 
 	// Now make sure it's not in view
