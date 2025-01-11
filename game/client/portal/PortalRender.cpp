@@ -731,15 +731,6 @@ bool CPortalRender::DrawPortalsUsingStencils( CViewRender *pViewRender )
 	return bRebuildDrawListsWhenDone;
 }
 
-
-
-
-
-
-#ifdef _DEBUG
-extern bool g_bRenderingCameraView;
-#endif
-
 void CPortalRender::DrawPortalsToTextures( CViewRender *pViewRender, const CViewSetup &cameraView )
 {
 	if( ShouldUseStencilsToRenderPortals() )
@@ -760,7 +751,7 @@ void CPortalRender::DrawPortalsToTextures( CViewRender *pViewRender, const CView
 
 
 #ifdef _DEBUG
-	g_bRenderingCameraView = true;
+	g_pViewRender->SetRenderingCameraView(true);
 #endif
 
 	int iNumRenderablePortals = g_pPortalRender->m_ActivePortals.Count();
@@ -809,7 +800,7 @@ void CPortalRender::DrawPortalsToTextures( CViewRender *pViewRender, const CView
 	m_pRenderingViewExitPortal = NULL;
 
 #ifdef _DEBUG
-	g_bRenderingCameraView = false;
+	g_pViewRender->SetRenderingCameraView(false);
 #endif
 }
 

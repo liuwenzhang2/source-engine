@@ -427,6 +427,10 @@ public:
 	void SetFreezeFlash(float flFreezeFlash) {
 		g_flFreezeFlash = flFreezeFlash;
 	}
+
+	void SetRenderingCameraView(bool bRenderingCameraView) {
+		g_bRenderingCameraView = bRenderingCameraView;
+	}
 private:
 
 	void SetupCurrentView(const Vector& vecOrigin, const QAngle& angles, view_id_t viewID);
