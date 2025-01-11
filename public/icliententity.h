@@ -867,6 +867,7 @@ public:
 	virtual bool IsAlive(void) = 0;
 	virtual bool IsFloating() = 0;
 	virtual bool IsStandable() const = 0;
+	virtual	bool IsVisible() const = 0;
 	virtual int CalcOverrideModelIndex() = 0;
 	virtual void ValidateModelIndex(void) = 0;
 	virtual IStudioHdr* OnNewModel() = 0;

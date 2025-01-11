@@ -79,6 +79,7 @@ public:
 #ifdef CLIENT_DLL
 	virtual bool Init(int entnum, int iSerialNum);
 	virtual void GetToolRecordingState(KeyValues* msg);
+	virtual IClientEntity* GetClientEntity() { return this; }
 #endif // CLIENT_DLL
 
 #ifdef GAME_DLL

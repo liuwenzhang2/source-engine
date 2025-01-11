@@ -6,7 +6,9 @@
 //===========================================================================//
 
 
-#include "cbase.h"
+//#include "cbase.h"
+#include "cdll_client_int.h"
+#include "igamesystem.h"
 #include "PortalRender.h"
 #include "clienteffectprecachesystem.h"
 #include "c_pixel_visibility.h"
@@ -229,7 +231,7 @@ void CPortalRender::LevelShutdownPreEntity()
 	int nCount = m_RecordedPortals.Count();
 	for ( int i = 0; i < nCount; ++i )
 	{
-		EntityList()->DestroyEntity( (IHandleEntity*)m_RecordedPortals[i].m_pActivePortal);
+		EntityList()->DestroyEntity( m_RecordedPortals[i].m_pActivePortal->GetClientEntity());
 	}
 	m_RecordedPortals.RemoveAll();
 }
@@ -471,7 +473,7 @@ bool CPortalRender::DrawPortalsUsingStencils( CViewRender *pViewRender )
 	for ( int i = 0; i < iNumRenderablePortals; ++i )
 	{
 		CPortalRenderable *pPortalRenderable = m_ActivePortals[i];
-		C_BaseEntity *pPairedEntity = pPortalRenderable->PortalRenderable_GetPairedEntity();
+		IClientEntity *pPairedEntity = pPortalRenderable->GetClientEntity();
 		bool bIsVisible = (pPairedEntity == NULL) || (pPairedEntity->IsVisible() && pPairedEntity->ShouldDraw()); //either unknown visibility or definitely visible.
 
 		if ( !pPortalRenderable->m_bIsPlaybackPortal )
@@ -1043,7 +1045,7 @@ void CPortalRender::HandlePortalPlaybackMessage( KeyValues *pKeyValues )
 			//search through registered creation functions for one that makes this type of portal
 			for( int i = m_PortalRenderableCreators.Count(); --i >= 0; )
 			{
-				if( FStrEq( szType, m_PortalRenderableCreators[i].portalType.String() ) )
+				if( datamap_t::FStrEq( szType, m_PortalRenderableCreators[i].portalType.String() ) )
 				{
 					pPortal = m_PortalRenderableCreators[i].creationFunc();
 					break;
@@ -1087,7 +1089,7 @@ void CPortalRender::HandlePortalPlaybackMessage( KeyValues *pKeyValues )
 		if ( j == nFoundCount )
 		{
 			RemovePortal( m_RecordedPortals[i].m_pActivePortal );
-			EntityList()->DestroyEntity((IHandleEntity*)m_RecordedPortals[i].m_pActivePortal);
+			EntityList()->DestroyEntity(m_RecordedPortals[i].m_pActivePortal->GetClientEntity());
 			m_RecordedPortals.FastRemove(i);
 		}
 	}
@@ -1118,7 +1120,7 @@ void CPortalRender::AddPortalCreationFunc( const char *szPortalType, PortalRende
 #ifdef _DEBUG
 	for( int i = m_PortalRenderableCreators.Count(); --i >= 0; )
 	{
-		AssertMsg( FStrEq( m_PortalRenderableCreators[i].portalType.String(), szPortalType ) == false, "Multiple portal renderable creation functions for same type of portal renderable."  );
+		AssertMsg( datamap_t::FStrEq( m_PortalRenderableCreators[i].portalType.String(), szPortalType ) == false, "Multiple portal renderable creation functions for same type of portal renderable."  );
 	}
 #endif
 

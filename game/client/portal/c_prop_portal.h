@@ -76,8 +76,6 @@ public:
 
 	//CHandle<CPortalSimulator>		m_hPortalSimulator = NULL;
 
-	virtual C_BaseEntity *	PortalRenderable_GetPairedEntity( void ) { return this; };
-
 private:
 
 	CUtlVector<EHANDLE>		m_hGhostingEntities;

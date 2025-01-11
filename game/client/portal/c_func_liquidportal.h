@@ -87,7 +87,7 @@ public:
 
 	C_Func_LiquidPortal( void );
 	~C_Func_LiquidPortal( void );
-
+	virtual IClientEntity* GetClientEntity() { return this; }
 	virtual bool IsTransparent( void ) { return true; };
 	virtual bool UsesPowerOfTwoFrameBufferTexture() { return true; };
 	virtual int DrawModel( int flags );

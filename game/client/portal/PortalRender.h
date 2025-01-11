@@ -22,7 +22,7 @@ public:
 	CPortalRenderable( void );
 	virtual ~CPortalRenderable( void );
 
-
+	virtual IClientEntity* GetClientEntity() = 0;
 	//----------------------------------------------------------------------------
 	//Stencil-based drawing helpers, these are ONLY used in stencil drawing mode
 	//----------------------------------------------------------------------------
@@ -68,7 +68,6 @@ public:
 	virtual bool	ShouldUpdateDepthDoublerTexture( const CViewSetup &viewSetup ) { return false; };
 	virtual void	DrawPortal( void ) { }; //sort of like what you'd expect to happen in C_BaseAnimating::DrawModel() if portals were fully compatible with models
 
-	virtual C_BaseEntity *PortalRenderable_GetPairedEntity( void ) { return NULL; }; //Pairing a portal with an entity is common but not required. Accessing that entity allows the CPortalRender system to better optimize.
 	//VMatrix			m_matrixThisToLinked; //Always going to need a matrix
 
 
