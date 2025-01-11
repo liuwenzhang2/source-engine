@@ -183,7 +183,9 @@ public:
 	virtual IntroData_t* GetIntroData() = 0;
 	virtual void SetIntroData(IntroData_t* pIntroData) = 0;
 	virtual void SetFreezeFlash(float flFreezeFlash) = 0;
+#ifdef _DEBUG
 	virtual void SetRenderingCameraView(bool bRenderingCameraView) = 0;
+#endif
 };
 
 extern IViewRender *g_pViewRender;
