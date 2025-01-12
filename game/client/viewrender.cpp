@@ -59,11 +59,10 @@
 #include "hltvcamera.h"
 #include "bitmap/tgawriter.h"
 #include "cl_mat_stub.h"
-#include "portal_render_targets.h" //depth doubler
 
 #ifdef PORTAL
 //#include "C_Portal_Player.h"
-//#include "portal_render_targets.h"
+#include "portal_render_targets.h" //depth doubler
 #include "PortalRender.h"
 #endif
 #if defined( HL2_CLIENT_DLL ) || defined( CSTRIKE_DLL )
