@@ -3472,7 +3472,7 @@ void CBaseCombatCharacter::UpdateLastKnownArea( void )
 	if ( nb_last_area_update_tolerance.GetFloat() > 0.0f )
 	{
 		// skip this test if we're not standing on the world (ie: elevators that move us)
-		if ( GetGroundEntity() == NULL || GetGroundEntity()->IsWorld() )
+		if (GetEngineObject()->GetGroundEntity() == NULL || GetEngineObject()->GetGroundEntity()->IsWorld() )
 		{
 			if ( m_lastNavArea && m_NavAreaUpdateMonitor.IsMarkSet() && !m_NavAreaUpdateMonitor.TargetMoved( this ) )
 				return;

@@ -88,7 +88,7 @@ public:
 
 		for( int i=m_botList.Head(); i != m_botList.InvalidIndex(); i = m_botList.Next( i ) )
 		{
-			float rangeSq = ( m_botList[i]->GetEntity()->GetAbsOrigin() - pos ).LengthSqr();
+			float rangeSq = ( m_botList[i]->GetEntity()->GetEngineObject()->GetAbsOrigin() - pos ).LengthSqr();
 			if ( rangeSq < closeRangeSq && filter( m_botList[i] ) )
 			{
 				closeRangeSq = rangeSq;

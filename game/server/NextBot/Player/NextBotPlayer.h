@@ -282,19 +282,19 @@ inline IServerEntity *NextBotPlayer< PlayerType >::EntSelectSpawnPoint( void )
 template < typename PlayerType >
 inline float NextBotPlayer< PlayerType >::GetDistanceBetween( CBaseEntity *other ) const
 {
-	return (this->GetAbsOrigin() - other->GetAbsOrigin()).Length();
+	return (this->GetAbsOrigin() - other->GetEngineObject()->GetAbsOrigin()).Length();
 }
 
 template < typename PlayerType >
 inline bool NextBotPlayer< PlayerType >::IsDistanceBetweenLessThan( CBaseEntity *other, float range ) const
 {
-	return (this->GetAbsOrigin() - other->GetAbsOrigin()).IsLengthLessThan( range );
+	return (this->GetAbsOrigin() - other->GetEngineObject()->GetAbsOrigin()).IsLengthLessThan( range );
 }
 
 template < typename PlayerType >
 inline bool NextBotPlayer< PlayerType >::IsDistanceBetweenGreaterThan( CBaseEntity *other, float range ) const
 {
-	return (this->GetAbsOrigin() - other->GetAbsOrigin()).IsLengthGreaterThan( range );
+	return (this->GetAbsOrigin() - other->GetEngineObject()->GetAbsOrigin()).IsLengthGreaterThan( range );
 }
 
 template < typename PlayerType >
