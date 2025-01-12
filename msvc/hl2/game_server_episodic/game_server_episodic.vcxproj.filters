@@ -1743,5 +1743,11 @@
     <ClCompile Include="..\..\..\public\gamerules.cpp">
       <Filter>源文件\Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\game\shared\portal_shareddefs.cpp">
+      <Filter>源文件\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\shared\PortalSimulation.cpp">
+      <Filter>源文件\Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

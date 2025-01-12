@@ -1599,5 +1599,23 @@
     <ClCompile Include="..\..\..\public\gamerules.cpp">
       <Filter>源文件\Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\game\client\PortalRender.cpp">
+      <Filter>源文件\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\portalrenderable_flatbasic.cpp">
+      <Filter>源文件\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\portal_render_targets.cpp">
+      <Filter>源文件\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\shared\PortalSimulation.cpp">
+      <Filter>源文件\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\Portal_DynamicMeshRenderingUtils.cpp">
+      <Filter>源文件\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\shared\portal_shareddefs.cpp">
+      <Filter>源文件\Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

@@ -476,6 +476,10 @@
     <ClCompile Include="..\..\..\game\client\physpropclientside.cpp" />
     <ClCompile Include="..\..\..\game\client\playerandobjectenumerator.cpp" />
     <ClCompile Include="..\..\..\game\client\playerspawncache.cpp" />
+    <ClCompile Include="..\..\..\game\client\PortalRender.cpp" />
+    <ClCompile Include="..\..\..\game\client\portalrenderable_flatbasic.cpp" />
+    <ClCompile Include="..\..\..\game\client\Portal_DynamicMeshRenderingUtils.cpp" />
+    <ClCompile Include="..\..\..\game\client\portal_render_targets.cpp" />
     <ClCompile Include="..\..\..\game\client\prediction.cpp" />
     <ClCompile Include="..\..\..\game\client\proxyentity.cpp" />
     <ClCompile Include="..\..\..\game\client\ProxyHealth.cpp" />
@@ -610,6 +614,8 @@
     <ClCompile Include="..\..\..\game\shared\physics_main_shared.cpp" />
     <ClCompile Include="..\..\..\game\shared\point_bonusmaps_accessor.cpp" />
     <ClCompile Include="..\..\..\game\shared\point_posecontroller.cpp" />
+    <ClCompile Include="..\..\..\game\shared\PortalSimulation.cpp" />
+    <ClCompile Include="..\..\..\game\shared\portal_shareddefs.cpp" />
     <ClCompile Include="..\..\..\game\shared\portal_util_shared.cpp" />
     <ClCompile Include="..\..\..\game\shared\precache_register.cpp" />
     <ClCompile Include="..\..\..\game\shared\predictableid.cpp" />

@@ -554,10 +554,6 @@ void CGlowOverlay::UpdateSkyOverlays( float zFar, bool bCacheFullSceneState )
 }
 
 
-
-
-#ifdef PORTAL
-
 void CGlowOverlay::BackupSkyOverlayData( int iBackupToSlot )
 {
 	unsigned short iNext;
@@ -588,5 +584,4 @@ void CGlowOverlay::RestoreSkyOverlayData( int iRestoreFromSlot )
 	}
 }
 
-#endif //#ifdef PORTAL
 

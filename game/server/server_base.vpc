@@ -660,6 +660,10 @@ $Project
 		$File	"$SRCDIR\game\shared\SharedFunctorUtils.h"
 		$File	"$SRCDIR\game\server\vote_controller.h"
 		$File	"$SRCDIR\game\server\vote_controller.cpp"
+		$File	"$SRCDIR\game\shared\portal_shareddefs.cpp"
+		$File	"$SRCDIR\game\shared\portal_shareddefs.h"
+		$File	"$SRCDIR\game\shared\PortalSimulation.cpp"
+		$File	"$SRCDIR\game\shared\PortalSimulation.h"
 		//Haptics
 		$File	"$SRCDIR\public\haptics\haptic_msgs.cpp"
 		$File	"$SRCDIR\public\haptics\haptic_utils.cpp"	[$WIN32]

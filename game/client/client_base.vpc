@@ -497,7 +497,18 @@ $Project
 		$File	"$SRCDIR\public\haptics\haptic_utils.cpp"	[$WIN32&&!$X360]
 
 		$File	"$SRCDIR\game\client\touch.cpp"
-
+		$File	"PortalRender.cpp"
+		$File	"PortalRender.h"
+		$File	"$SRCDIR\game\shared\PortalSimulation.cpp"
+		$File	"$SRCDIR\game\shared\PortalSimulation.h"
+		$File	"portal_render_targets.cpp"
+		$File	"portal_render_targets.h"
+		$File	"portalrenderable_flatbasic.cpp"
+		$File	"portalrenderable_flatbasic.h"
+		$File	"Portal_DynamicMeshRenderingUtils.cpp"
+		$File	"Portal_DynamicMeshRenderingUtils.h"
+		$File	"$SRCDIR\game\shared\portal_shareddefs.cpp"
+		$File	"$SRCDIR\game\shared\portal_shareddefs.h"
 		$Folder	"Sixense"
 		{
 			$File	"sixense\in_sixense.cpp"

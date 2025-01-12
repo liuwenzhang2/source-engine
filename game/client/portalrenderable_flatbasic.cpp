@@ -17,7 +17,7 @@
 #include "toolframework/itoolframework.h"
 #include "toolframework_client.h"
 #include "tier1/KeyValues.h"
-#include "prop_portal_shared.h"
+//#include "prop_portal_shared.h"
 #include "view_scene.h"
 #include "materialsystem/imaterialvar.h"
 #include "tier0/vprof.h"
@@ -109,10 +109,10 @@ void CPortalRenderable_FlatBasic::GetToolRecordingState( bool bActive, KeyValues
 	BaseClass::GetToolRecordingState( msg );
 	CPortalRenderable::GetToolRecordingState( bActive, msg );
 
-	C_Prop_Portal *pLinkedPortal = static_cast<C_Prop_Portal*>(GetLinkedPortal());
+	CPortalRenderable_FlatBasic *pLinkedPortal = GetLinkedPortal();
 
 	static PortalRecordingState_t state;
-	state.m_nPortalId = static_cast<C_Prop_Portal*>( this )->entindex();
+	state.m_nPortalId = this->entindex();
 	state.m_nLinkedPortalId = pLinkedPortal ? pLinkedPortal->entindex() : -1;
 	state.m_fStaticAmount = m_fStaticAmount;
 	state.m_fSecondaryStaticAmount = m_fSecondaryStaticAmount;

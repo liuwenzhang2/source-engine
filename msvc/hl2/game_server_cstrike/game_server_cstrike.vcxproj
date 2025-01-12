@@ -522,6 +522,8 @@
     <ClCompile Include="..\..\..\game\shared\physics_main_shared.cpp" />
     <ClCompile Include="..\..\..\game\shared\point_bonusmaps_accessor.cpp" />
     <ClCompile Include="..\..\..\game\shared\point_posecontroller.cpp" />
+    <ClCompile Include="..\..\..\game\shared\PortalSimulation.cpp" />
+    <ClCompile Include="..\..\..\game\shared\portal_shareddefs.cpp" />
     <ClCompile Include="..\..\..\game\shared\portal_util_shared.cpp" />
     <ClCompile Include="..\..\..\game\shared\precache_register.cpp" />
     <ClCompile Include="..\..\..\game\shared\predictableid.cpp" />

@@ -10,23 +10,23 @@
 #include "PortalSimulation.h"
 //#include "physics.h"
 #include "portal_shareddefs.h"
-#include "StaticCollisionPolyhedronCache.h"
+//#include "StaticCollisionPolyhedronCache.h"
 #include "model_types.h"
 #include "filesystem.h"
 #include "collisionutils.h"
 #include "tier1/callqueue.h"
-#include "portal_collideable_enumerator.h"
+//#include "portal_collideable_enumerator.h"
 
 #ifndef CLIENT_DLL
 
 #include "world.h"
-#include "portal_player.h" //TODO: Move any portal mod specific code to callback functions or something
-#include "physicsshadowclone.h"
-#include "portal/weapon_physcannon.h"
-#include "player_pickup.h"
-#include "isaverestore.h"
-#include "hierarchy.h"
-#include "env_debughistory.h"
+//#include "portal_player.h" //TODO: Move any portal mod specific code to callback functions or something
+//#include "physicsshadowclone.h"
+//#include "portal/weapon_physcannon.h"
+//#include "player_pickup.h"
+//#include "isaverestore.h"
+//#include "hierarchy.h"
+//#include "env_debughistory.h"
 
 #else
 

@@ -59,11 +59,11 @@
 #include "hltvcamera.h"
 #include "bitmap/tgawriter.h"
 #include "cl_mat_stub.h"
+#include "portal_render_targets.h" //depth doubler
+#include "PortalRender.h"
 
 #ifdef PORTAL
 //#include "C_Portal_Player.h"
-#include "portal_render_targets.h" //depth doubler
-#include "PortalRender.h"
 #endif
 #if defined( HL2_CLIENT_DLL ) || defined( CSTRIKE_DLL )
 #define USE_MONITORS
@@ -408,7 +408,6 @@ protected:
 //-----------------------------------------------------------------------------
 // 3d skybox view when drawing portals
 //-----------------------------------------------------------------------------
-#ifdef PORTAL
 class CPortalSkyboxView : public CSkyboxView
 {
 	DECLARE_CLASS( CPortalSkyboxView, CSkyboxView );
@@ -428,8 +427,6 @@ private:
 
 	ITexture *m_pRenderTarget;
 };
-#endif
-
 
 //-----------------------------------------------------------------------------
 // Shadow depth texture
@@ -3840,8 +3837,6 @@ bool CViewRender::DoesViewPlaneIntersectWater( float waterZ, int leafWaterDataID
 	return render->DoesBoxIntersectWaterVolume( mins, maxs, leafWaterDataID );
 } 
 
-#ifdef PORTAL 
-
 //-----------------------------------------------------------------------------
 // Purpose: Draw the scene during another draw scene call. We must draw our portals
 //			after opaques but before translucents, so this ViewDrawScene resets the view
@@ -3963,8 +3958,6 @@ void CViewRender::Draw3dSkyboxworld_Portal( const CViewSetup &view, int &nClearF
 		AddViewToScene( pSkyView );
 	}
 }
-
-#endif //PORTAL
 
 //-----------------------------------------------------------------------------
 // Methods related to controlling the cheap water distance
@@ -6010,8 +6003,6 @@ void CSkyboxView::Draw()
 	DrawInternal(VIEW_3DSKY, true, pRTColor, pRTDepth );
 }
 
-
-#ifdef PORTAL
 //-----------------------------------------------------------------------------
 // 
 //-----------------------------------------------------------------------------
@@ -6066,8 +6057,6 @@ void CPortalSkyboxView::Draw()
 
 	m_pMainView->g_CurrentViewID = iCurrentViewID;
 }
-#endif // PORTAL
-
 
 //-----------------------------------------------------------------------------
 // 

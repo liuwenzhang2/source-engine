@@ -1629,19 +1629,7 @@
     <ClCompile Include="..\..\..\game\client\portal\portal_credits.cpp">
       <Filter>源文件\Portal</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\game\client\portal\Portal_DynamicMeshRenderingUtils.cpp">
-      <Filter>源文件\Portal</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\game\client\portal\portal_hud_crosshair.cpp">
-      <Filter>源文件\Portal</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\game\client\portal\portal_render_targets.cpp">
-      <Filter>源文件\Portal</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\game\client\portal\PortalRender.cpp">
-      <Filter>源文件\Portal</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\game\client\portal\portalrenderable_flatbasic.cpp">
       <Filter>源文件\Portal</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\game\client\portal\vgui_neurotoxin_countdown_screen.cpp">
@@ -1668,16 +1656,10 @@
     <ClCompile Include="..\..\..\game\shared\portal\portal_playeranimstate.cpp">
       <Filter>源文件\Portal</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\game\shared\portal\portal_shareddefs.cpp">
-      <Filter>源文件\Portal</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\game\shared\portal\portal_usermessages.cpp">
       <Filter>源文件\Portal</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\game\shared\portal\portal_weapon_parse.cpp">
-      <Filter>源文件\Portal</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\game\shared\portal\PortalSimulation.cpp">
       <Filter>源文件\Portal</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\game\shared\portal\prop_portal_shared.cpp">
@@ -1723,6 +1705,24 @@
       <Filter>源文件\Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\public\gamerules.cpp">
+      <Filter>源文件\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\PortalRender.cpp">
+      <Filter>源文件\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\portalrenderable_flatbasic.cpp">
+      <Filter>源文件\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\portal_render_targets.cpp">
+      <Filter>源文件\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\shared\PortalSimulation.cpp">
+      <Filter>源文件\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\Portal_DynamicMeshRenderingUtils.cpp">
+      <Filter>源文件\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\shared\portal_shareddefs.cpp">
       <Filter>源文件\Source Files</Filter>
     </ClCompile>
   </ItemGroup>

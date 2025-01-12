@@ -1698,16 +1698,10 @@
     <ClCompile Include="..\..\..\game\shared\portal\portal_playeranimstate.cpp">
       <Filter>源文件\Portal</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\game\shared\portal\portal_shareddefs.cpp">
-      <Filter>源文件\Portal</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\game\shared\portal\portal_usermessages.cpp">
       <Filter>源文件\Portal</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\game\shared\portal\portal_weapon_parse.cpp">
-      <Filter>源文件\Portal</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\game\shared\portal\PortalSimulation.cpp">
       <Filter>源文件\Portal</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\game\shared\portal\prop_portal_shared.cpp">
@@ -1846,6 +1840,12 @@
       <Filter>源文件\Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\public\gamerules.cpp">
+      <Filter>源文件\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\shared\portal_shareddefs.cpp">
+      <Filter>源文件\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\shared\PortalSimulation.cpp">
       <Filter>源文件\Source Files</Filter>
     </ClCompile>
   </ItemGroup>
