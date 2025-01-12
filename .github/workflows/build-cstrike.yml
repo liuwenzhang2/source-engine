@@ -10,7 +10,7 @@ jobs:
     - uses: actions/checkout@v2
     - name: Build linux-i386
       run: |
-        scripts/build-ubuntu-i386.sh
+        scripts/build-ubuntu-i386.sh --build-games cstrike
 
   build-linux-amd64:
     runs-on: ubuntu-20.04
@@ -19,7 +19,7 @@ jobs:
     - uses: actions/checkout@v2
     - name: Build linux-amd64
       run: |
-        scripts/build-ubuntu-amd64.sh
+        scripts/build-ubuntu-amd64.sh --build-games cstrike
 
   build-android-armv7a:
     runs-on: ubuntu-20.04
@@ -28,7 +28,7 @@ jobs:
     - uses: actions/checkout@v2
     - name: Build android-armv7a
       run: |
-        scripts/build-android-armv7a.sh
+        scripts/build-android-armv7a.sh --build-games cstrike
 
   build-windows-i386:
     runs-on: windows-2019
@@ -38,7 +38,7 @@ jobs:
     - name: Build windows-i386
       run: |
         git submodule init && git submodule update
-        ./waf.bat configure -T debug --32bits
+        ./waf.bat configure -T debug --build-games cstrike --32bits
         ./waf.bat build
 
   build-windows-amd64:
@@ -49,7 +49,7 @@ jobs:
     - name: Build windows-amd64
       run: |
         git submodule init && git submodule update
-        ./waf.bat configure -T debug
+        ./waf.bat configure -T debug --build-games cstrike
         ./waf.bat build
 
   build-dedicated-windows-i386:
@@ -60,7 +60,7 @@ jobs:
     - name: Build dedicated windows-i386
       run: |
         git submodule init && git submodule update
-        ./waf.bat configure -T debug -d
+        ./waf.bat configure -T debug -d --build-games cstrike
         ./waf.bat build
 
   build-dedicated-windows-amd64:
@@ -71,7 +71,7 @@ jobs:
     - name: Build dedicated windows-amd64
       run: |
         git submodule init && git submodule update
-        ./waf.bat configure -T debug -d
+        ./waf.bat configure -T debug -d --build-games cstrike
         ./waf.bat build
 
   build-dedicated-linux-i386:
@@ -81,7 +81,7 @@ jobs:
     - uses: actions/checkout@v2
     - name: Build dedicated linux-i386
       run: |
-        scripts/build-ubuntu-i386.sh -d
+        scripts/build-ubuntu-i386.sh -d --build-games cstrike
 
   build-dedicated-linux-amd64:
     runs-on: ubuntu-20.04
@@ -90,7 +90,7 @@ jobs:
     - uses: actions/checkout@v2
     - name: Build dedicated linux-amd64
       run: |
-        scripts/build-ubuntu-amd64.sh -d
+        scripts/build-ubuntu-amd64.sh -d --build-games cstrike
 
   build-macos-amd64:
     runs-on: macos-latest
@@ -99,7 +99,7 @@ jobs:
     - uses: actions/checkout@v2
     - name: Build macos-amd64
       run: |
-        scripts/build-macos-amd64.sh
+        scripts/build-macos-amd64.sh --build-games cstrike
 
   build-dedicated-macos-amd64:
     runs-on: macos-latest
@@ -108,4 +108,4 @@ jobs:
     - uses: actions/checkout@v2
     - name: Build dedicated macos-amd64
       run: |
-        scripts/build-macos-amd64.sh -d
+        scripts/build-macos-amd64.sh -d --build-games cstrike
