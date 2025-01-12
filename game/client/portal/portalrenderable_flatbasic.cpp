@@ -202,11 +202,11 @@ void CPortalRenderable_FlatBasic::PortalMoved( void )
 
 bool CPortalRenderable_FlatBasic::WillUseDepthDoublerThisDraw( void ) const
 {
-	return g_pPortalRender->ShouldUseStencilsToRenderPortals() &&
+	return g_pViewRender->ShouldUseStencilsToRenderPortals() &&
 		m_InternallyMaintainedData.m_bUsableDepthDoublerConfiguration && 
-		(g_pPortalRender->GetRemainingPortalViewDepth() == 0) && 
-		(g_pPortalRender->GetViewRecursionLevel() > 1) &&
-		(g_pPortalRender->GetCurrentViewExitPortal() != this);
+		(g_pViewRender->GetRemainingPortalViewDepth() == 0) &&
+		(g_pViewRender->GetViewRecursionLevel() > 1) &&
+		(g_pViewRender->GetCurrentViewExitPortal() != this);
 }
 
 
@@ -220,7 +220,7 @@ bool CPortalRenderable_FlatBasic::CalcFrustumThroughPortal( const Vector &ptCurr
 
 	int i;
 
-	int iViewRecursionLevel = g_pPortalRender->GetViewRecursionLevel();
+	int iViewRecursionLevel = g_pViewRender->GetViewRecursionLevel();
 	int iNextViewRecursionLevel = iViewRecursionLevel + 1;
 
 	if( (iViewRecursionLevel == 0) && 
@@ -238,8 +238,8 @@ bool CPortalRenderable_FlatBasic::CalcFrustumThroughPortal( const Vector &ptCurr
 
 	//VPlane *pInputFrustum = view->GetFrustum(); //g_pPortalRender->m_RecursiveViewComplexFrustums[iViewRecursionLevel].Base();
 	//int iInputFrustumPlaneCount = 6; //g_pPortalRender->m_RecursiveViewComplexFrustums[iViewRecursionLevel].Count();
-	VPlane *pInputFrustum = g_pPortalRender->m_RecursiveViewComplexFrustums[iViewRecursionLevel].Base();
-	int iInputFrustumPlaneCount = g_pPortalRender->m_RecursiveViewComplexFrustums[iViewRecursionLevel].Count();
+	VPlane *pInputFrustum = g_pViewRender->GetRecursiveViewComplexFrustums()[iViewRecursionLevel].Base();
+	int iInputFrustumPlaneCount = g_pViewRender->GetRecursiveViewComplexFrustums()[iViewRecursionLevel].Count();
 	Assert( iInputFrustumPlaneCount > 0 );
 
 	Vector ptTempWork[2];
@@ -265,7 +265,7 @@ bool CPortalRenderable_FlatBasic::CalcFrustumThroughPortal( const Vector &ptCurr
 	if( iVertCount < 3 )
 		return false; //nothing left in the frustum
 
-	g_pPortalRender->m_RecursiveViewComplexFrustums[iNextViewRecursionLevel].SetCount( iVertCount + 2 ); //+2 for near and far z planes
+	g_pViewRender->GetRecursiveViewComplexFrustums()[iNextViewRecursionLevel].SetCount( iVertCount + 2 ); //+2 for near and far z planes
 
 	Vector ptTransformedCamera = MatrixThisToLinked() * ptCurrentViewOrigin;
 
@@ -282,18 +282,18 @@ bool CPortalRenderable_FlatBasic::CalcFrustumThroughPortal( const Vector &ptCurr
 		vNormal.NormalizeInPlace();
 
 		vNormal = MatrixThisToLinked().ApplyRotation(vNormal);
-		g_pPortalRender->m_RecursiveViewComplexFrustums[iNextViewRecursionLevel].Element(i).Init( vNormal, vNormal.Dot( ptTransformedCamera ) );
+		g_pViewRender->GetRecursiveViewComplexFrustums()[iNextViewRecursionLevel].Element(i).Init( vNormal, vNormal.Dot( ptTransformedCamera ) );
 	}
 
 	//Near Z
-	g_pPortalRender->m_RecursiveViewComplexFrustums[iNextViewRecursionLevel].Element(i).Init( GetLinkedPortal()->m_vForward, GetLinkedPortal()->m_InternallyMaintainedData.m_fPlaneDist );
+	g_pViewRender->GetRecursiveViewComplexFrustums()[iNextViewRecursionLevel].Element(i).Init( GetLinkedPortal()->m_vForward, GetLinkedPortal()->m_InternallyMaintainedData.m_fPlaneDist );
 
 	//Far Z
 	++i;
 	{
 		Vector vNormal = MatrixThisToLinked().ApplyRotation(pInputFrustum[iInputFrustumPlaneCount - 1].m_Normal);
 		Vector ptOnPlane = pInputFrustum[iInputFrustumPlaneCount - 1].m_Dist * pInputFrustum[iInputFrustumPlaneCount - 1].m_Normal;
-		g_pPortalRender->m_RecursiveViewComplexFrustums[iNextViewRecursionLevel].Element(i).Init( vNormal, vNormal.Dot( MatrixThisToLinked() * ptOnPlane ) );
+		g_pViewRender->GetRecursiveViewComplexFrustums()[iNextViewRecursionLevel].Element(i).Init( vNormal, vNormal.Dot( MatrixThisToLinked() * ptOnPlane ) );
 	}
 
 
@@ -304,7 +304,7 @@ bool CPortalRenderable_FlatBasic::CalcFrustumThroughPortal( const Vector &ptCurr
 		float *fLineLengthSqr = (float *)stackalloc( sizeof( float ) * iVertCount );
 		VPlane *Planes = (VPlane *)stackalloc( sizeof( VPlane ) * iVertCount );
 
-		memcpy( Planes, g_pPortalRender->m_RecursiveViewComplexFrustums[iNextViewRecursionLevel].Base(), sizeof( VPlane ) * iVertCount );
+		memcpy( Planes, g_pViewRender->GetRecursiveViewComplexFrustums()[iNextViewRecursionLevel].Base(), sizeof( VPlane ) * iVertCount );
 
 		for( i = 0; i != (iVertCount - 1); ++i )
 		{
@@ -400,7 +400,7 @@ bool CPortalRenderable_FlatBasic::CalcFrustumThroughPortal( const Vector &ptCurr
 	{
 		for( i = 0; i != iVertCount; ++i )
 		{
-			OutputFrustum[i] = g_pPortalRender->m_RecursiveViewComplexFrustums[iNextViewRecursionLevel].Element(i);
+			OutputFrustum[i] = g_pViewRender->GetRecursiveViewComplexFrustums()[iNextViewRecursionLevel].Element(i);
 		}
 
 		for( ; i != 4; ++i )
@@ -411,9 +411,9 @@ bool CPortalRenderable_FlatBasic::CalcFrustumThroughPortal( const Vector &ptCurr
 	}
 
 	//copy near/far planes
-	int iComplexCount = g_pPortalRender->m_RecursiveViewComplexFrustums[iNextViewRecursionLevel].Count();
-	OutputFrustum[FRUSTUM_NEARZ] = g_pPortalRender->m_RecursiveViewComplexFrustums[iNextViewRecursionLevel].Element(iComplexCount-2);
-	OutputFrustum[FRUSTUM_FARZ] = g_pPortalRender->m_RecursiveViewComplexFrustums[iNextViewRecursionLevel].Element(iComplexCount-1);
+	int iComplexCount = g_pViewRender->GetRecursiveViewComplexFrustums()[iNextViewRecursionLevel].Count();
+	OutputFrustum[FRUSTUM_NEARZ] = g_pViewRender->GetRecursiveViewComplexFrustums()[iNextViewRecursionLevel].Element(iComplexCount-2);
+	OutputFrustum[FRUSTUM_FARZ] = g_pViewRender->GetRecursiveViewComplexFrustums()[iNextViewRecursionLevel].Element(iComplexCount-1);
 
 	return true;
 }
@@ -489,10 +489,10 @@ void CPortalRenderable_FlatBasic::RenderPortalViewToBackBuffer( CViewRender *pVi
 				memcpy( pViewRender->GetFrustum(), seeThroughFrustum, sizeof( Frustum ) );
 
 			render->OverrideViewFrustum( pViewRender->GetFrustum() );
-			SetViewRecursionLevel( g_pPortalRender->GetViewRecursionLevel() + 1 );
+			SetViewRecursionLevel(g_pViewRender->GetViewRecursionLevel() + 1 );
 
-			CPortalRenderable *pRenderingViewForPortalBackup = g_pPortalRender->GetCurrentViewEntryPortal();
-			CPortalRenderable *pRenderingViewExitPortalBackup = g_pPortalRender->GetCurrentViewExitPortal();
+			CPortalRenderable *pRenderingViewForPortalBackup = g_pViewRender->GetCurrentViewEntryPortal();
+			CPortalRenderable *pRenderingViewExitPortalBackup = g_pViewRender->GetCurrentViewExitPortal();
 			SetViewEntranceAndExitPortals( this, GetLinkedPortal() );
 
 			//DRAW!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -500,7 +500,7 @@ void CPortalRenderable_FlatBasic::RenderPortalViewToBackBuffer( CViewRender *pVi
 
 			SetViewEntranceAndExitPortals( pRenderingViewForPortalBackup, pRenderingViewExitPortalBackup );
 
-			if( m_InternallyMaintainedData.m_bUsableDepthDoublerConfiguration && (g_pPortalRender->GetRemainingPortalViewDepth() == 1) )
+			if( m_InternallyMaintainedData.m_bUsableDepthDoublerConfiguration && (g_pViewRender->GetRemainingPortalViewDepth() == 1) )
 			{
 				//save the view matrix for usage with the depth doubler. 
 				//It's important that we do this AFTER using the depth doubler this frame to compensate for the fact that the front buffer is 1 frame behind the current view matrix
@@ -508,7 +508,7 @@ void CPortalRenderable_FlatBasic::RenderPortalViewToBackBuffer( CViewRender *pVi
 				pRenderContext->GetVMatrix( MATERIAL_VIEW, &m_InternallyMaintainedData.m_DepthDoublerTextureView );
 			}
 
-			SetViewRecursionLevel( g_pPortalRender->GetViewRecursionLevel() - 1 );
+			SetViewRecursionLevel(g_pViewRender->GetViewRecursionLevel() - 1 );
 		}
 		render->PopView( pViewRender->GetFrustum() );
 
@@ -532,7 +532,7 @@ void CPortalRenderable_FlatBasic::RenderPortalViewToTexture( CViewRender *pViewR
 	if( GetLinkedPortal() == NULL ) //not linked to any portal, so we'll be all static anyways
 		return;
 
-	float fPixelVisibilty = g_pPortalRender->GetPixelVisilityForPortalSurface( this );
+	float fPixelVisibilty = g_pViewRender->GetPixelVisilityForPortalSurface( this );
 	if( (fPixelVisibilty >= 0.0f) && (fPixelVisibilty <= PORTALRENDERABLE_FLATBASIC_MINPIXELVIS) )
 		return;
 
@@ -599,8 +599,8 @@ void CPortalRenderable_FlatBasic::RenderPortalViewToTexture( CViewRender *pViewR
 			SetRemainingViewDepth( 0 );
 			SetViewRecursionLevel( 1 );
 
-			CPortalRenderable *pRenderingViewForPortalBackup = g_pPortalRender->GetCurrentViewEntryPortal();
-			CPortalRenderable *pRenderingViewExitPortalBackup = g_pPortalRender->GetCurrentViewExitPortal();
+			CPortalRenderable *pRenderingViewForPortalBackup = g_pViewRender->GetCurrentViewEntryPortal();
+			CPortalRenderable *pRenderingViewExitPortalBackup = g_pViewRender->GetCurrentViewExitPortal();
 			SetViewEntranceAndExitPortals( this, GetLinkedPortal() );
 
 			bool bDrew3dSkybox = false;
@@ -619,7 +619,7 @@ void CPortalRenderable_FlatBasic::RenderPortalViewToTexture( CViewRender *pViewR
 
 			pRenderContext->EnableUserClipTransformOverride( false );
 
-			ViewDrawScene( pViewRender, bDrew3dSkybox, nSkyboxVisible, portalView, nClearFlags, (view_id_t)g_pPortalRender->GetCurrentViewId(), false, 0, &customVisibility );
+			ViewDrawScene( pViewRender, bDrew3dSkybox, nSkyboxVisible, portalView, nClearFlags, (view_id_t)g_pViewRender->GetCurrentViewId(), false, 0, &customVisibility );
 
 			SetViewEntranceAndExitPortals( pRenderingViewForPortalBackup, pRenderingViewExitPortalBackup );
 
@@ -672,7 +672,7 @@ void CPortalRenderable_FlatBasic::DrawPreStencilMask( void )
 void CPortalRenderable_FlatBasic::DrawStencilMask( void )
 {
 	DrawSimplePortalMesh( m_Materials.m_Portal_Stencil_Hole );
-	DrawRenderFixMesh( g_pPortalRender->m_MaterialsAccess.m_WriteZ_Model );
+	DrawRenderFixMesh(g_pViewRender->GetMaterialsAccess().m_WriteZ_Model);
 }
 
 void CPortalRenderable_FlatBasic::DrawPostStencilFixes( void )
@@ -686,8 +686,8 @@ void CPortalRenderable_FlatBasic::DrawPostStencilFixes( void )
 	RenderFogQuad();
 
 	//replace depth
-	DrawSimplePortalMesh( g_pPortalRender->m_MaterialsAccess.m_WriteZ_Model, 0.0f );
-	DrawRenderFixMesh( g_pPortalRender->m_MaterialsAccess.m_WriteZ_Model, 0.0f );
+	DrawSimplePortalMesh(g_pViewRender->GetMaterialsAccess().m_WriteZ_Model, 0.0f);
+	DrawRenderFixMesh(g_pViewRender->GetMaterialsAccess().m_WriteZ_Model, 0.0f);
 }
 
 bool CPortalRenderable_FlatBasic::ShouldUpdateDepthDoublerTexture( const CViewSetup &viewSetup )
@@ -869,7 +869,7 @@ void CPortalRenderable_FlatBasic::DrawSimplePortalMesh( const IMaterial *pMateri
 	
 	if( mat_wireframe.GetBool() )
 	{
-		pRenderContext->Bind( (IMaterial *)(const IMaterial *)g_pPortalRender->m_MaterialsAccess.m_Wireframe, (CPortalRenderable*)this );
+		pRenderContext->Bind( (IMaterial *)(const IMaterial *)g_pViewRender->GetMaterialsAccess().m_Wireframe, (CPortalRenderable*)this);
 
 		IMesh* pMesh = pRenderContext->GetDynamicMesh( false );
 		meshBuilder.Begin( pMesh, MATERIAL_TRIANGLE_STRIP, 2 );
@@ -912,7 +912,7 @@ void CPortalRenderable_FlatBasic::DrawRenderFixMesh( const IMaterial *pMaterialO
 	else
 		pMaterial = m_Materials.m_PortalRenderFixMaterials[(GetEnginePortal()->IsPortal2())?1:0];
 
-	if( g_pPortalRender->GetViewRecursionLevel() != 0 )
+	if(g_pViewRender->GetViewRecursionLevel() != 0 )
 		return; //a render fix should only ever be necessary in the primary view
 
 	Vector ptCameraOrigin = g_pViewRender->CurrentViewOrigin();
@@ -1129,7 +1129,7 @@ void CPortalRenderable_FlatBasic::RenderFogQuad( void )
 	ptCorners[3] = (m_ptOrigin - vUp) - vRight;
 
 
-	pRenderContext->Bind( (IMaterial *)(const IMaterial *)g_pPortalRender->m_MaterialsAccess.m_TranslucentVertexColor );
+	pRenderContext->Bind( (IMaterial *)(const IMaterial *)g_pViewRender->GetMaterialsAccess().m_TranslucentVertexColor);
 	IMesh* pMesh = pRenderContext->GetDynamicMesh( true );
 
 	CMeshBuilder meshBuilder;
@@ -1168,10 +1168,10 @@ void CPortalRenderable_FlatBasic::DrawPortal( void )
 	if( (g_pViewRender->GetDrawFlags() & DF_RENDER_REFLECTION) != 0 )
 		return;
 
-	if ( g_pPortalRender->ShouldUseStencilsToRenderPortals() )
+	if (g_pViewRender->ShouldUseStencilsToRenderPortals() )
 	{
 		//stencil-based rendering
-		if( g_pPortalRender->IsRenderingPortal() == false ) //main view
+		if(g_pViewRender->IsRenderingPortal() == false ) //main view
 		{
 			if( GetLinkedPortal() == NULL ) //didn't pass through pre-stencil mask
 			{
@@ -1182,9 +1182,9 @@ void CPortalRenderable_FlatBasic::DrawPortal( void )
 			}
 
 			DrawSimplePortalMesh( m_Materials.m_PortalStaticOverlay[((GetEnginePortal()->IsPortal2())?(1):(0))] );
-			DrawRenderFixMesh( g_pPortalRender->m_MaterialsAccess.m_WriteZ_Model );
+			DrawRenderFixMesh(g_pViewRender->GetMaterialsAccess().m_WriteZ_Model);
 		}
-		else if( g_pPortalRender->GetCurrentViewExitPortal() != this )
+		else if(g_pViewRender->GetCurrentViewExitPortal() != this )
 		{
 			if( GetLinkedPortal() == NULL ) //didn't pass through pre-stencil mask
 			{
@@ -1195,8 +1195,8 @@ void CPortalRenderable_FlatBasic::DrawPortal( void )
 			}
 
 			if( (m_InternallyMaintainedData.m_bUsableDepthDoublerConfiguration) 
-				&& (g_pPortalRender->GetRemainingPortalViewDepth() == 0) 
-				&& (g_pPortalRender->GetViewRecursionLevel() > 1) )
+				&& (g_pViewRender->GetRemainingPortalViewDepth() == 0)
+				&& (g_pViewRender->GetViewRecursionLevel() > 1) )
 			{
 				DrawDepthDoublerMesh();
 			}
@@ -1211,7 +1211,7 @@ void CPortalRenderable_FlatBasic::DrawPortal( void )
 		BeginPortalPixelVisibilityQuery();
 
 		//texture-based rendering
-		if( g_pPortalRender->IsRenderingPortal() == false )
+		if(g_pViewRender->IsRenderingPortal() == false )
 		{			
 			if ( ( m_fOpenAmount > 0.0f ) && ( m_fOpenAmount < 1.0f ) )
 			{
@@ -1221,7 +1221,7 @@ void CPortalRenderable_FlatBasic::DrawPortal( void )
 			DrawComplexPortalMesh();
 			DrawRenderFixMesh();
 		}
-		else if( g_pPortalRender->GetCurrentViewExitPortal() != this ) //don't render portals that our view is exiting from
+		else if(g_pViewRender->GetCurrentViewExitPortal() != this ) //don't render portals that our view is exiting from
 		{
 			if ( ( m_fOpenAmount > 0.0f ) && ( m_fOpenAmount < 1.0f ) )
 			{
@@ -1256,7 +1256,7 @@ bool CPortalRenderable_FlatBasic::ShouldUpdatePortalView_BasedOnView( const CVie
 
 	Vector vCameraPos = currentView.origin;
 
-	if( (g_pPortalRender->GetViewRecursionLevel() == 0) &&
+	if( (g_pViewRender->GetViewRecursionLevel() == 0) &&
 		((m_ptOrigin - vCameraPos).LengthSqr() < (PORTAL_HALF_HEIGHT * PORTAL_HALF_HEIGHT)) ) //FIXME: Player closeness check might need reimplementation
 	{
 		return true; //fudgery time. The player might not be able to see the surface, but they can probably see the render fix

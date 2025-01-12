@@ -830,5 +830,15 @@ enum view_id_t
 #endif
 #define FREEZECAM_SNAPSHOT_FADE_SPEED 340
 
+//-----------------------------------------------------------------------------
+// Skybox visibility
+//-----------------------------------------------------------------------------
+enum SkyboxVisibility_t
+{
+	SKYBOX_NOT_VISIBLE = 0,
+	SKYBOX_3DSKYBOX_VISIBLE,
+	SKYBOX_2DSKYBOX_VISIBLE,
+};
+
 #endif
 

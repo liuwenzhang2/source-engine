@@ -56,11 +56,11 @@ float CPortalStaticProxy::ComputeStaticAmount( CPortalRenderable_FlatBasic *pFla
 	{
 		flStaticAmount = 0.0f;
 	}
-	else if ( g_pPortalRender->GetRemainingPortalViewDepth() == 0 ) //end of the line, no more views
+	else if (g_pViewRender->GetRemainingPortalViewDepth() == 0 ) //end of the line, no more views
 	{
 		flStaticAmount = 1.0f;
 	}
-	else if ( (g_pPortalRender->GetRemainingPortalViewDepth() == 1) && (pFlatBasic->m_fSecondaryStaticAmount > flStaticAmount) ) //fading in from no views to another view (player just walked through it)
+	else if ( (g_pViewRender->GetRemainingPortalViewDepth() == 1) && (pFlatBasic->m_fSecondaryStaticAmount > flStaticAmount) ) //fading in from no views to another view (player just walked through it)
 	{
 		flStaticAmount = pFlatBasic->m_fSecondaryStaticAmount;
 	}
@@ -74,7 +74,7 @@ void CPortalStaticProxy::OnBind( void *pBind )
 	
 	float flStaticAmount;
 	IClientRenderable *pRenderable = (IClientRenderable*)pBind;
-	CPortalRenderable *pRecordedPortal = g_pPortalRender->FindRecordedPortal( pRenderable );
+	CPortalRenderable *pRecordedPortal = g_pViewRender->FindRecordedPortal( pRenderable );
 
 	if ( pRecordedPortal )
 	{

@@ -195,7 +195,7 @@ C_Prop_Portal::~C_Prop_Portal( void )
 		EntityList()->DestroyEntity((IHandleEntity*)m_GhostRenderables[i]);
 	}
 	m_GhostRenderables.RemoveAll();
-	g_pPortalRender->RemovePortal(this);
+	g_pViewRender->RemovePortal(this);
 	CProp_Portal_Shared::AllPortals.FindAndRemove(this);
 }
 
@@ -492,7 +492,7 @@ void C_Prop_Portal::UpdateOnRemove( void )
 	//	m_hPortalSimulator = NULL;
 	//}
 	BaseClass::UpdateOnRemove();
-	g_pPortalRender->RemovePortal(this);
+	g_pViewRender->RemovePortal(this);
 	CProp_Portal_Shared::AllPortals.FindAndRemove(this);
 }
 
@@ -572,7 +572,7 @@ void C_Prop_Portal::OnDataChanged( DataUpdateType_t updateType )
 			pRemote->GetEngineObject()->GetVectors( &vRemoteForward, &vRemoteRight, &vRemoteUp );
 			ptRemoteOrigin = pRemote->GetEngineObject()->GetNetworkOrigin();
 		}
-		g_pPortalRender->AddPortal( this ); //will know if we're already added and avoid adding twice
+		g_pViewRender->AddPortal( this ); //will know if we're already added and avoid adding twice
 		 
 		if( bPortalMoved )
 		{			
@@ -798,7 +798,7 @@ void C_Prop_Portal::OnDataChanged( DataUpdateType_t updateType )
 	}
 	else
 	{
-		g_pPortalRender->RemovePortal( this );
+		g_pViewRender->RemovePortal( this );
 
 		DetachFromLinked();//m_hPortalSimulator->
 
@@ -865,7 +865,7 @@ int C_Prop_Portal::DrawModel( int flags )
 		SetNextClientThink( CLIENT_THINK_ALWAYS ); // we need this to help fade out
 	}
 
-	if ( !g_pPortalRender->ShouldUseStencilsToRenderPortals() )
+	if ( !g_pViewRender->ShouldUseStencilsToRenderPortals() )
 	{
 		DrawPortal();
 	}

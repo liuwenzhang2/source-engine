@@ -831,10 +831,10 @@ int C_Portal_Player::DrawModel( int flags )
 	{
 		if ( !C_BasePlayer::ShouldDrawThisPlayer() )
 		{
-			if ( !g_pPortalRender->IsRenderingPortal() )
+			if ( !g_pViewRender->IsRenderingPortal() )
 				return 0;
 
-			if( (g_pPortalRender->GetViewRecursionLevel() == 1) && (m_iForceNoDrawInPortalSurface != -1) ) //CPortalRender::s_iRenderingPortalView )
+			if( (g_pViewRender->GetViewRecursionLevel() == 1) && (m_iForceNoDrawInPortalSurface != -1) ) //CPortalRender::s_iRenderingPortalView )
 				return 0;
 		}
 	}
@@ -1030,7 +1030,7 @@ void C_Portal_Player::PlayerPortalled( C_Prop_Portal *pEnteredPortal )
 		m_PendingPortalMatrix = pEnteredPortal->MatrixThisToLinked();
 
 		if( IsLocalPlayer() )
-			g_pPortalRender->EnteredPortal( pEnteredPortal );
+			g_pViewRender->EnteredPortal( pEnteredPortal );
 	}
 }
 

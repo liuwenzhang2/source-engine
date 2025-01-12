@@ -438,8 +438,8 @@ extern ConVar r_drawviewmodel;
 int Beam_t::DrawModel( int flags )
 {
 #ifdef PORTAL
-	if ( ( !g_pPortalRender->IsRenderingPortal() && !m_bDrawInMainRender ) || 
-		( g_pPortalRender->IsRenderingPortal() && !m_bDrawInPortalRender ) )
+	if ( ( !g_pViewRender->IsRenderingPortal() && !m_bDrawInMainRender ) ||
+		(g_pViewRender->IsRenderingPortal() && !m_bDrawInPortalRender ) )
 	{
 		return 0;
 	}

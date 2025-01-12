@@ -129,12 +129,12 @@ int C_PortalGhostRenderable::DrawModel( int flags )
 				// Dead player uses a ragdoll to draw, so don't ghost the dead entity
 				return 0;
 			}
-			else if( g_pPortalRender->GetViewRecursionLevel() == 0 )
+			else if(g_pViewRender->GetViewRecursionLevel() == 0 )
 			{
 				if( pPlayer->m_bEyePositionIsTransformedByPortal )
 					return 0;
 			}
-			else if( g_pPortalRender->GetViewRecursionLevel() == 1 )
+			else if(g_pViewRender->GetViewRecursionLevel() == 1 )
 			{
 				if( !pPlayer->m_bEyePositionIsTransformedByPortal )
 					return 0;

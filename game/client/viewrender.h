@@ -245,6 +245,43 @@ public:
 	void Execute() {}
 };
 
+struct RecordedPortalInfo_t
+{
+	CPortalRenderable* m_pActivePortal;
+	int m_nPortalId;
+	IClientRenderable* m_pPlaybackRenderable;
+};
+
+//-----------------------------------------------------------------------------
+// Portal rendering materials
+//-----------------------------------------------------------------------------
+struct PortalRenderingMaterials_t
+{
+	CMaterialReference	m_Wireframe;
+	CMaterialReference	m_WriteZ_Model;
+	CMaterialReference	m_TranslucentVertexColor;
+};
+
+struct PortalRenderableCreationFunction_t
+{
+	CUtlString portalType;
+	PortalRenderableCreationFunc creationFunc;
+};
+
+struct PortalViewIDNode_t
+{
+	CUtlVector<PortalViewIDNode_t*> ChildNodes; //links will only be non-null if they're useful (can see through the portal at that depth and view setup)
+	int iPrimaryViewID;
+	//skybox view id is always primary + 1
+
+	//In stencil mode this wraps CPortalRenderable::DrawStencilMask() and gives previous frames' results to CPortalRenderable::RenderPortalViewToBackBuffer()
+	//In texture mode there's no good spot to auto-wrap occlusion tests. So you'll need to wrap it yourself for that.
+	OcclusionQueryObjectHandle_t occlusionQueryHandle;
+	int iWindowPixelsAtQueryTime;
+	int iOcclusionQueryPixelsRendered;
+	float fScreenFilledByPortalSurfaceLastFrame_Normalized;
+};
+
 //-----------------------------------------------------------------------------
 // Purpose: Implements the interface to view rendering for the client .dll
 //-----------------------------------------------------------------------------
@@ -259,6 +296,7 @@ class CViewRender : public IViewRender,
 	friend class CShadowDepthView;
 	friend class CPortalSkyboxView;
 	friend class CFreezeFrameView;
+	friend class CSimpleWorldView;
 	DECLARE_CLASS_NOBASE( CViewRender );
 public:
 	virtual void	Init( void );
@@ -435,13 +473,103 @@ public:
 		g_bRenderingCameraView = bRenderingCameraView;
 	}
 #endif
+
+	// tests if the parameter ID is being used by portal pixel vis queries
+	bool IsPortalViewID(view_id_t id);
+	PortalViewIDNode_t* AllocPortalViewIDNode(int iChildLinkCount);
+	void FreePortalViewIDNode(PortalViewIDNode_t* pNode);
+	PortalViewIDNode_t& GetHeadPortalViewIDNode() { return m_HeadPortalViewIDNode; }
+	PortalViewIDNode_t** GetPortalViewIDNodeChain() { return m_PortalViewIDNodeChain; }
+	int	GetViewRecursionLevel() { return m_iViewRecursionLevel; }
+	void SetViewRecursionLevel(int iViewRecursionLevel) { m_iViewRecursionLevel = iViewRecursionLevel; }
+	void SetRemainingPortalViewDepth(int iRemainingPortalViewDepth) { m_iRemainingPortalViewDepth = iRemainingPortalViewDepth; }
+	void SetRenderingViewForPortal(CPortalRenderable* pRenderingViewForPortal) { m_pRenderingViewForPortal = pRenderingViewForPortal; }
+	void SetRenderingViewExitPortal(CPortalRenderable* pRenderingViewExitPortal) { m_pRenderingViewExitPortal = pRenderingViewExitPortal; }
+	const PortalRenderingMaterials_t& GetMaterialsAccess() { return m_MaterialsAccess; }
+	CUtlVector<VPlane>* GetRecursiveViewComplexFrustums() { return m_RecursiveViewComplexFrustums; }
+	CUtlVector<CPortalRenderable*>& GetAllPortals() { return m_AllPortals; }
+
+	// Are we currently rendering a portal?
+	bool IsRenderingPortal() const;
+
+	// Returns the current View IDs. Portal View IDs will change often (especially with recursive views) and should not be cached
+	int GetCurrentViewId() const;
+	int GetCurrentSkyboxViewId() const;
+
+	// Returns view recursion level
+	int GetViewRecursionLevel() const;
+
+	float GetPixelVisilityForPortalSurface(const CPortalRenderable* pPortal) const; //normalized for how many of the screen's possible pixels it takes up, less than zero indicates a lack of data from last frame
+
+	// Returns the remaining number of portals to render within other portals
+	// lets portals know that they should do "end of the line" kludges to cover up that portals don't go infinitely recursive
+	int	GetRemainingPortalViewDepth() const;
+
+	inline CPortalRenderable* GetCurrentViewEntryPortal(void) const { return m_pRenderingViewForPortal; }; //if rendering a portal view, this is the portal the current view enters into
+	inline CPortalRenderable* GetCurrentViewExitPortal(void) const { return m_pRenderingViewExitPortal; }; //if rendering a portal view, this is the portal the current view exits from
+
+	// true if the rendering path for portals uses stencils instead of textures
+	bool ShouldUseStencilsToRenderPortals() const;
+
+	//it's a good idea to force cheaper water when the ratio of performance gain to noticability is high
+	//0 = force no reflection/refraction
+	//1/2 = downgrade to simple/world reflections as seen in advanced video options
+	//3 = no downgrade
+	int ShouldForceCheaperWaterLevel() const;
+
+	bool ShouldObeyStencilForClears() const;
+
+	//sometimes we have to tweak some systems to render water properly with portals
+	void WaterRenderingHandler_PreReflection() const;
+	void WaterRenderingHandler_PostReflection() const;
+	void WaterRenderingHandler_PreRefraction() const;
+	void WaterRenderingHandler_PostRefraction() const;
+
+	// return value indicates that something was done, and render lists should be rebuilt afterwards
+	bool DrawPortalsUsingStencils();
+
+	void DrawPortalsToTextures(const CViewSetup& cameraView); //updates portal textures
+	void OverlayPortalRenderTargets(float w, float h);
+
+	void UpdateDepthDoublerTexture(const CViewSetup& viewSetup); //our chance to update all depth doubler texture before the view model is added to the back buffer
+
+	void EnteredPortal(CPortalRenderable* pEnteredPortal); //does a bit of internal maintenance whenever the player/camera has logically passed the portal threshold
+
+	// adds, removes a portal to the set of renderable portals
+	void AddPortal(CPortalRenderable* pPortal);
+	void RemovePortal(CPortalRenderable* pPortal);
+
+	// Methods to query about the exit portal associated with the currently rendering portal
+	void ShiftFogForExitPortalView() const;
+	const Vector& GetExitPortalFogOrigin() const;
+	SkyboxVisibility_t IsSkyboxVisibleFromExitPortal() const;
+	bool DoesExitPortalViewIntersectWaterPlane(float waterZ, int leafWaterDataID) const;
+
+	void HandlePortalPlaybackMessage(KeyValues* pKeyValues);
+
+	CPortalRenderable* FindRecordedPortal(IClientRenderable* pRenderable);
+	void AddPortalCreationFunc(const char* szPortalType, PortalRenderableCreationFunc creationFunc);
+
+	CViewSetup m_RecursiveViewSetups[MAX_PORTAL_RECURSIVE_VIEWS]; //before we recurse into a view, we backup the view setup here for reference
+
+	void UpdatePortalPixelVisibility(void); //updates pixel visibility for portal surfaces
 private:
+	bool IsMainView(view_id_t id);
 
 	void SetupCurrentView(const Vector& vecOrigin, const QAngle& angles, view_id_t viewID);
 	void FinishCurrentView()
 	{
 		s_bCanAccessCurrentView = false;
 	}
+
+	bool DoesViewPlaneIntersectWater(float waterZ, int leafWaterDataID);
+
+	// Handles a portal update message
+	void HandlePortalUpdateMessage(KeyValues* pKeyValues);
+
+	// Finds a recorded portal
+	int FindRecordedPortalIndex(int nPortalId);
+	CPortalRenderable* FindRecordedPortal(int nPortalId);
 
 	void DrawOpaqueRenderables_DrawStaticProps(CClientRenderablesList::CEntry* pEntitiesBegin, CClientRenderablesList::CEntry* pEntitiesEnd, ERenderDepthMode DepthMode);
 	void DrawOpaqueRenderables_DrawBrushModels(CClientRenderablesList::CEntry* pEntitiesBegin, CClientRenderablesList::CEntry* pEntitiesEnd, ERenderDepthMode DepthMode);
@@ -585,6 +713,32 @@ private:
 
 	CMaterialReference g_material_WriteZ; //init'ed on by CViewRender::Init()
 
+	//-------------------------------------------
+//Portal View ID Node helpers
+//-------------------------------------------
+	CUtlVector<int> s_iFreedViewIDs; //when a view id node gets freed, it's primary view id gets added here
+
+	PortalViewIDNode_t m_HeadPortalViewIDNode; //pseudo node. Primary view id will be VIEW_MAIN. The child links are what we really care about
+	PortalViewIDNode_t* m_PortalViewIDNodeChain[MAX_PORTAL_RECURSIVE_VIEWS]; //the view id node chain we're following, 0 always being &m_HeadPortalViewIDNode (offsetting by 1 seems like it'd cause bugs in the long run)
+
+	CUtlVector<PortalRenderableCreationFunction_t> m_PortalRenderableCreators; //for SFM compatibility
+
+	PortalRenderingMaterials_t	m_Materials;
+	int							m_iViewRecursionLevel;
+	int							m_iRemainingPortalViewDepth; //let's portals know that they should do "end of the line" kludges to cover up that portals don't go infinitely recursive
+
+	CPortalRenderable* m_pRenderingViewForPortal; //the specific pointer for the portal that we're rending a view for
+	CPortalRenderable* m_pRenderingViewExitPortal; //the specific pointer for the portal that our view exits from
+
+	CUtlVector<CPortalRenderable*>		m_AllPortals; //All portals currently in memory, active or not
+	CUtlVector<CPortalRenderable*>		m_ActivePortals;
+	CUtlVector< RecordedPortalInfo_t >	m_RecordedPortals;
+
+	//frustums with more (or less) than 6 planes. Store each recursion level's custom frustum here so further recursions can be better optimized.
+	//When going into further recursions, if you've failed to fill in a complex frustum, the standard frustum will be copied in.
+	//So all parent levels are guaranteed to contain valid data
+	CUtlVector<VPlane>					m_RecursiveViewComplexFrustums[MAX_PORTAL_RECURSIVE_VIEWS];
+	const PortalRenderingMaterials_t& m_MaterialsAccess;
 };
 
 

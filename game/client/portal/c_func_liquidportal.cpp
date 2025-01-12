@@ -30,12 +30,12 @@ END_RECV_TABLE()
 
 C_Func_LiquidPortal::C_Func_LiquidPortal( void )
 {
-	g_pPortalRender->AddPortal( this );
+	g_pViewRender->AddPortal( this );
 }
 
 C_Func_LiquidPortal::~C_Func_LiquidPortal( void )
 {
-	g_pPortalRender->RemovePortal( this );
+	g_pViewRender->RemovePortal( this );
 }
 
 
@@ -131,14 +131,14 @@ void CPortalRenderable_Func_LiquidPortal::DrawPreStencilMask( void )
 
 void CPortalRenderable_Func_LiquidPortal::DrawStencilMask( void )
 {
-	DrawOutwardBox( g_pPortalRender->m_MaterialsAccess.m_WriteZ_Model );
-	DrawInnerLiquid( true, 1.0f, g_pPortalRender->m_MaterialsAccess.m_WriteZ_Model );
+	DrawOutwardBox(g_pViewRender->GetMaterialsAccess().m_WriteZ_Model);
+	DrawInnerLiquid( true, 1.0f, g_pViewRender->GetMaterialsAccess().m_WriteZ_Model);
 }
 
 void CPortalRenderable_Func_LiquidPortal::DrawPostStencilFixes( void )
 {
-	DrawOutwardBox( g_pPortalRender->m_MaterialsAccess.m_WriteZ_Model );
-	DrawInnerLiquid( true, 1.0f, g_pPortalRender->m_MaterialsAccess.m_WriteZ_Model );
+	DrawOutwardBox(g_pViewRender->GetMaterialsAccess().m_WriteZ_Model);
+	DrawInnerLiquid( true, 1.0f, g_pViewRender->GetMaterialsAccess().m_WriteZ_Model);
 }
 
 
@@ -153,7 +153,7 @@ void CPortalRenderable_Func_LiquidPortal::RenderPortalViewToBackBuffer( CViewRen
 	Frustum seeThroughFrustum;
 	bool bUseSeeThroughFrustum;
 
-	if ( g_pPortalRender->GetViewRecursionLevel() == 0 )
+	if ( g_pViewRender->GetViewRecursionLevel() == 0 )
 	{
 		bUseSeeThroughFrustum = CalcFrustumThroughPortal( cameraView.origin, seeThroughFrustum, pViewRender->GetFrustum(), FRUSTUM_NUMPLANES );
 	}
@@ -196,10 +196,10 @@ void CPortalRenderable_Func_LiquidPortal::RenderPortalViewToBackBuffer( CViewRen
 				memcpy( pViewRender->GetFrustum(), seeThroughFrustum, sizeof( Frustum ) );
 
 			render->OverrideViewFrustum( pViewRender->GetFrustum() );
-			SetViewRecursionLevel( g_pPortalRender->GetViewRecursionLevel() + 1 );
+			SetViewRecursionLevel( g_pViewRender->GetViewRecursionLevel() + 1 );
 
-			CPortalRenderable *pRenderingViewForPortalBackup = g_pPortalRender->GetCurrentViewEntryPortal();
-			CPortalRenderable *pRenderingViewExitPortalBackup = g_pPortalRender->GetCurrentViewExitPortal();
+			CPortalRenderable *pRenderingViewForPortalBackup = g_pViewRender->GetCurrentViewEntryPortal();
+			CPortalRenderable *pRenderingViewExitPortalBackup = g_pViewRender->GetCurrentViewExitPortal();
 			SetViewEntranceAndExitPortals( this, m_pLinkedPortal );
 
 			//DRAW!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -207,7 +207,7 @@ void CPortalRenderable_Func_LiquidPortal::RenderPortalViewToBackBuffer( CViewRen
 
 			SetViewEntranceAndExitPortals( pRenderingViewForPortalBackup, pRenderingViewExitPortalBackup );
 
-			SetViewRecursionLevel( g_pPortalRender->GetViewRecursionLevel() - 1 );
+			SetViewRecursionLevel(g_pViewRender->GetViewRecursionLevel() - 1 );
 		}
 		render->PopView( pViewRender->GetFrustum() );
 

@@ -748,13 +748,13 @@ void CClientTools::PostToolMessage( KeyValues *pKeyValues )
 #ifdef PORTAL
 	if ( !Q_stricmp( pKeyValues->GetName(), "portals" ) )
 	{
-		g_pPortalRender->HandlePortalPlaybackMessage( pKeyValues );
+		g_pViewRender->HandlePortalPlaybackMessage( pKeyValues );
 		return;
 	}
 	
 	if ( !Q_stricmp( pKeyValues->GetName(), "query CPortalRenderer" ) )
 	{
-		pKeyValues->SetInt( "IsRenderingPortal", g_pPortalRender->IsRenderingPortal() ? 1 : 0 );
+		pKeyValues->SetInt( "IsRenderingPortal", g_pViewRender->IsRenderingPortal() ? 1 : 0 );
 		return;
 	}
 #endif
