@@ -1774,6 +1774,7 @@ void CHLClient::LevelShutdown( void )
 	// First do the pre-entity shutdown of all systems
 	EntityList()->LevelShutdownPreEntity();
 	g_pDetailObjectSystem->LevelShutdownPreEntity();
+	g_pViewRender->LevelShutdownPreEntity();
 
 	IGameSystem::LevelShutdownPreEntityAllSystems();
 

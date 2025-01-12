@@ -88,6 +88,9 @@ public:
 
 	// Clear any systems between levels
 	virtual void		LevelInit( void ) = 0;
+	// Inherited from IGameSystem
+	virtual void		LevelInitPreEntity() = 0;
+	virtual void		LevelShutdownPreEntity() = 0;
 	virtual void		LevelShutdown( void ) = 0;
 
 	// Shutdown

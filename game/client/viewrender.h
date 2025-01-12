@@ -332,6 +332,8 @@ public:
 
 	// Called once per level change
 	void			LevelInit( void );
+	void			LevelInitPreEntity();
+	void			LevelShutdownPreEntity();
 	void			LevelShutdown( void );
 
 	// Add entity to transparent entity queue

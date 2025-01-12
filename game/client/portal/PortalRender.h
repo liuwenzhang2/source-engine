@@ -147,7 +147,7 @@ struct PortalViewIDNode_t
 //-----------------------------------------------------------------------------
 // Portal rendering management class
 //-----------------------------------------------------------------------------
-class CPortalRender	: public CAutoGameSystem
+class CPortalRender//	: public CAutoGameSystem
 {
 public:
 	CPortalRender();

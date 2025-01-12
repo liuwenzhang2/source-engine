@@ -8,7 +8,6 @@
 
 //#include "cbase.h"
 #include "cdll_client_int.h"
-#include "igamesystem.h"
 #include "PortalRender.h"
 #include "clienteffectprecachesystem.h"
 #include "c_pixel_visibility.h"

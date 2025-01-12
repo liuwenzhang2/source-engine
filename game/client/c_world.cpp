@@ -10,6 +10,7 @@
 #include "activitylist.h"
 #include "decals.h"
 #include "engine/ivmodelinfo.h"
+#include "iviewrender.h"
 #include "ivieweffects.h"
 #include "shake.h"
 #include "eventlist.h"
@@ -220,6 +221,7 @@ void C_World::Precache( void )
 	g_pClientShadowMgr->LevelInitPreEntity();
 	g_pClientLeafSystem->LevelInitPreEntity();
 	g_pDetailObjectSystem->LevelInitPreEntity();
+	g_pViewRender->LevelInitPreEntity();
 
 	IGameSystem::LevelInitPreEntityAllSystems();//pMapName
 

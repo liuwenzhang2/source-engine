@@ -1056,6 +1056,16 @@ void CViewRender::LevelInit(void)
 	g_pScreenSpaceEffects->InitScreenSpaceEffects();
 }
 
+void CViewRender::LevelInitPreEntity() 
+{
+	g_pPortalRender->LevelInitPreEntity();
+}
+
+void CViewRender::LevelShutdownPreEntity() 
+{
+	g_pPortalRender->LevelShutdownPreEntity();
+}
+
 //-----------------------------------------------------------------------------
 // Purpose: Called once per level change
 //-----------------------------------------------------------------------------
