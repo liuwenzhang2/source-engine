@@ -768,7 +768,7 @@ inline void NextBotPlayer< PlayerType >::Touch( IServerEntity *other )
 		// propagate touch into NextBot event responders
 		trace_t result;
 		result = this->GetTouchTrace();
-		OnContact( other, &result );
+		OnContact( (CBaseEntity*)other, &result );
 	}
 
 	BaseClass::Touch( other );
