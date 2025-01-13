@@ -119,7 +119,7 @@ void CDODViewRender::PerformStunEffect( const CViewSetup &view )
 	if ( pPlayer->m_flStunAlpha < pPlayer->m_flStunMaxAlpha )
 	{
 		// copy current screen content into texture buffer
-		UpdateScreenEffectTexture( 0, view.x, view.y, view.width, view.height );
+		g_pViewRender->UpdateScreenEffectTexture( 0, view.x, view.y, view.width, view.height );
 
 		pPlayer->m_flStunAlpha += 45;
 
