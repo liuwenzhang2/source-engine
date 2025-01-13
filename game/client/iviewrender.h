@@ -238,6 +238,16 @@ public:
 
 	virtual IReplayScreenshotSystem *GetReplayScreenshotSystem() = 0;
 
+	virtual void		UpdateScreenEffectTexture(void) = 0;
+	virtual void		UpdateScreenEffectTexture(int textureIndex, int x, int y, int w, int h, bool bDestFullScreen = false, Rect_t* pActualRect = NULL) = 0;
+	virtual void		UpdateFullScreenDepthTexture(void) = 0;
+	virtual void		DrawScreenEffectMaterial(IMaterial* pMaterial, int x, int y, int w, int h) = 0;
+
+	virtual void		UpdateRefractTexture(bool bForceUpdate = false) = 0;
+	virtual void		UpdateRefractTexture(int x, int y, int w, int h, bool bForceUpdate = false) = 0;
+
+	virtual void		UpdateFrontBufferTexturesForMaterial(IMaterial* pMaterial, bool bForce = false) = 0;
+
 	virtual const Vector& PrevMainViewOrigin() = 0;
 	virtual const QAngle& PrevMainViewAngles() = 0;
 	virtual const Vector& MainViewOrigin() = 0;

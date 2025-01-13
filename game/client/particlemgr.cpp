@@ -350,12 +350,12 @@ int CParticleEffectBinding::DrawModel( int flags )
 		
 		if ( pMaterial->m_pGroup->m_pPageMaterial && pMaterial->m_pGroup->m_pPageMaterial->NeedsPowerOfTwoFrameBufferTexture() )
 		{
-			UpdateRefractTexture();
+			g_pViewRender->UpdateRefractTexture();
 		}
 
 		if ( pMaterial->m_pGroup->m_pPageMaterial && pMaterial->m_pGroup->m_pPageMaterial->NeedsFullFrameBufferTexture() )
 		{
-			UpdateScreenEffectTexture();
+			g_pViewRender->UpdateScreenEffectTexture();
 		}
 		
 		DrawMaterialParticles( 

@@ -518,17 +518,23 @@ private:
 	bool			ShouldDrawViewModel( bool drawViewmodel );
 	void			DrawViewModels( const CViewSetup &view, bool drawViewmodel );
 
+	void			UpdateFrontBufferTexturesForMaterial(IMaterial* pMaterial, bool bForce = false);
 	void			PerformScreenSpaceEffects( int x, int y, int w, int h );
 
 	// Overlays
 	void			SetScreenOverlayMaterial( IMaterial *pMaterial );
 	IMaterial		*GetScreenOverlayMaterial( );
+	void			DrawScreenEffectMaterial(IMaterial* pMaterial, int x, int y, int w, int h);
 	void			PerformScreenOverlay( int x, int y, int w, int h );
 
 	void DrawUnderwaterOverlay( void );
 
 	// Water-related methods
 	void			DrawWorldAndEntities( bool drawSkybox, const CViewSetup &view, int nClearFlags, ViewCustomVisibility_t *pCustomVisibility = NULL );
+
+	void			UpdateScreenEffectTexture(void);
+	void			UpdateScreenEffectTexture(int textureIndex, int x, int y, int w, int h, bool bDestFullScreen = false, Rect_t* pActualRect = NULL);
+	void			UpdateFullScreenDepthTexture(void);
 
 	virtual void			ViewDrawScene_Intro( const CViewSetup &view, int nClearFlags, const IntroData_t &introData );
 
@@ -539,6 +545,8 @@ private:
 	// Determines what kind of water we're going to use
 	void			DetermineWaterRenderInfo( const VisibleFogVolumeInfo_t &fogVolumeInfo, WaterRenderInfo_t &info );
 
+	void			UpdateRefractTexture(bool bForceUpdate = false);
+	void			UpdateRefractTexture(int x, int y, int w, int h, bool bForceUpdate = false);
 	bool			UpdateRefractIfNeededByList( CUtlVector< IClientRenderable * > &list );
 	void			DrawRenderablesInList( CUtlVector< IClientRenderable * > &list, int flags = 0 );
 
@@ -659,9 +667,10 @@ private:
 	//So all parent levels are guaranteed to contain valid data
 	CUtlVector<VPlane>					m_RecursiveViewComplexFrustums[MAX_PORTAL_RECURSIVE_VIEWS];
 	const PortalRenderingMaterials_t& m_MaterialsAccess;
+
+	int g_viewscene_refractUpdateFrame = 0;
+	bool g_bAllowMultipleRefractUpdatesPerScenePerFrame = false;
+
 };
-
-extern ConVar mat_wireframe;
-
 
 #endif // VIEWRENDER_H

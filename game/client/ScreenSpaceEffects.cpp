@@ -306,7 +306,7 @@ void CExampleEffect::Render( int x, int y, int w, int h )
 
 	// Render Effect
 	Rect_t actualRect;
-	UpdateScreenEffectTexture( 0, x, y, w, h, false, &actualRect );
+	g_pViewRender->UpdateScreenEffectTexture( 0, x, y, w, h, false, &actualRect );
 	ITexture *pTexture = GetFullFrameFrameBufferTexture( 0 );
 
 	CMatRenderContextPtr pRenderContext( materials );

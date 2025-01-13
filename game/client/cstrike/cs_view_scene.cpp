@@ -122,7 +122,7 @@ void CCSViewRender::PerformNightVisionEffect( const CViewSetup &view )
 			
 			if ( g_pMaterialSystemHardwareConfig->GetDXSupportLevel() >= 80 )
 			{
-				UpdateScreenEffectTexture( 0, view.x, view.y, view.width, view.height );
+				g_pViewRender->UpdateScreenEffectTexture( 0, view.x, view.y, view.width, view.height );
 			}
 			else
 			{

@@ -17,29 +17,7 @@
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
-//-----------------------------------------------------------------------------
-// Convars related to controlling rendering
-//-----------------------------------------------------------------------------
-ConVar r_updaterefracttexture( "r_updaterefracttexture", "1", FCVAR_CHEAT );
-ConVar r_depthoverlay( "r_depthoverlay", "0", FCVAR_CHEAT, "Replaces opaque objects with their grayscaled depth values. r_showz_power scales the output." );
 
-
-int g_viewscene_refractUpdateFrame = 0;
-bool g_bAllowMultipleRefractUpdatesPerScenePerFrame = false;
-
-#if defined( _X360 )
-class CAllowMultipleRefractsLogic : public CAutoGameSystem
-{
-public:
-	void LevelInitPreEntity()
-	{
-		// EP1 core room needs many refract updates per frame to avoid looking broken (ep1_citadel_03)
-		// Same with Kleiner's lab (d1_trainstation_05)
-		g_bAllowMultipleRefractUpdatesPerScenePerFrame = FStrEq( MapName(), "ep1_citadel_03" ) || FStrEq( MapName(), "d1_trainstation_05" );
-	}
-};
-static CAllowMultipleRefractsLogic s_AllowMultipleRefractsLogic;
-#endif
 
 void ViewTransform( const Vector &worldSpace, Vector &viewSpace )
 {
@@ -109,47 +87,5 @@ int HudTransform( const Vector& point, Vector& screen )
 	else
 	{
 		return FrustumTransform ( engine->WorldToScreenMatrix(), point, screen );
-	}
-}
-
-
-
-void UpdateFullScreenDepthTexture( void )
-{
-	if( !g_pMaterialSystemHardwareConfig->SupportsPixelShaders_2_b() )
-		return;
-
-	ITexture *pDepthTex = GetFullFrameDepthTexture();
-	CMatRenderContextPtr pRenderContext( materials );
-
-	if( IsX360() )
-	{	
-		pRenderContext->CopyRenderTargetToTextureEx( pDepthTex, -1, NULL, NULL );
-	}
-	else
-	{
-		pRenderContext->CopyRenderTargetToTextureEx( pDepthTex, 0, NULL, NULL );
-	}
-
-	pRenderContext->SetFullScreenDepthTextureValidityFlag( true );
-
-	if( r_depthoverlay.GetBool() )
-	{
-		IMaterial *pMaterial = materials->FindMaterial( "debug/showz", TEXTURE_GROUP_OTHER, true );
-		pMaterial->IncrementReferenceCount();
-		IMaterialVar *BaseTextureVar = pMaterial->FindVar( "$basetexture", NULL, false );
-		IMaterialVar *pDepthInAlpha = NULL;
-		if( IsPC() )
-		{
-			pDepthInAlpha = pMaterial->FindVar( "$ALPHADEPTH", NULL, false );
-			pDepthInAlpha->SetIntValue( 1 );
-		}
-		
-		BaseTextureVar->SetTextureValue( pDepthTex );
-
-		pRenderContext->OverrideDepthEnable( true, false ); //don't write to depth, or else we'll never see translucents
-		pRenderContext->DrawScreenSpaceQuad( pMaterial );
-		pRenderContext->OverrideDepthEnable( false, true );
-		pMaterial->DecrementReferenceCount();
 	}
 }

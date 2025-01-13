@@ -13,7 +13,7 @@
 #include "materialsystem/materialsystem_config.h"
 #include "tier1/callqueue.h"
 #include "colorcorrectionmgr.h"
-#include "view_scene.h"
+//#include "view_scene.h"
 #include "c_world.h"
 #include "bitmap/tgawriter.h"
 #include "filesystem.h"
@@ -1419,6 +1419,7 @@ static void DrawBloomDebugBoxes( IMatRenderContext *pRenderContext )
 	pRenderContext->Viewport( 0, 0, dest_width, dest_height );
 }
 
+extern ConVar building_cubemaps;
 static float GetBloomAmount( void )
 {
 	// return bloom amount ( 0.0 if disabled or otherwise turned off )
@@ -1608,7 +1609,7 @@ static void DoPreBloomTonemapping( IMatRenderContext *pRenderContext, int nX, in
 		if ( s_bScreenEffectTextureIsUpdated == false )
 		{
 			// FIXME: nX/nY/nWidth/nHeight are used here, but the equivalent parameters are ignored in Generate8BitBloomTexture
-			UpdateScreenEffectTexture( 0, nX, nY, nWidth, nHeight, true );
+			g_pViewRender->UpdateScreenEffectTexture( 0, nX, nY, nWidth, nHeight, true );
 			s_bScreenEffectTextureIsUpdated = true;
 		}
 
@@ -2347,7 +2348,7 @@ void DoEnginePostProcessing( int x, int y, int w, int h, bool bFlashlightIsOn, b
 				{
 					// NOTE: UpdateScreenEffectTexture() uses StretchRect, so _rt_FullFrameFB is always 100%
 					//		 filled, even when the viewport is not fullscreen (e.g. with 'mat_viewportscale 0.5')
-					UpdateScreenEffectTexture( 0, x, y, w, h, true );
+					g_pViewRender->UpdateScreenEffectTexture( 0, x, y, w, h, true );
 					s_bScreenEffectTextureIsUpdated = true;
 				}
 
@@ -2484,7 +2485,7 @@ void DoEnginePostProcessing( int x, int y, int w, int h, bool bFlashlightIsOn, b
 							if ( bFBUpdated )
 							{
 								Rect_t actualRect;
-								UpdateScreenEffectTexture( 0, x, y, w, h, false, &actualRect );
+								g_pViewRender->UpdateScreenEffectTexture( 0, x, y, w, h, false, &actualRect );
 							}
 
 							IMaterial *colcorrect_mat = CEnginePostMaterialProxy::SetupEnginePostMaterial( fullViewportPostSrcCorners, fullViewportPostDestCorners, destTexSize, false, false, bPerformColCorrect, flAAStrength );
@@ -2518,7 +2519,7 @@ void DoEnginePostProcessing( int x, int y, int w, int h, bool bFlashlightIsOn, b
 						if ( bFBUpdated )
 						{
 							Rect_t actualRect;
-							UpdateScreenEffectTexture( 0, x, y, w, h, false, &actualRect );
+							g_pViewRender->UpdateScreenEffectTexture( 0, x, y, w, h, false, &actualRect );
 						}
 
 						DrawPyroVignette(
@@ -2973,7 +2974,7 @@ void DoImageSpaceMotionBlur( const CViewSetup &view, int x, int y, int w, int h 
 
 		if ( g_pMaterialSystemHardwareConfig->GetHDRType() != HDR_TYPE_FLOAT )
 		{
-			UpdateScreenEffectTexture( 0, x, y, w, h, true ); // Do we need to check if we already did this?
+			g_pViewRender->UpdateScreenEffectTexture( 0, x, y, w, h, true ); // Do we need to check if we already did this?
 		}
 
 		// Get material pointer

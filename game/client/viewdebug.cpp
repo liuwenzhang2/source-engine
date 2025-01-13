@@ -8,11 +8,12 @@
 
 #include "tier0/vprof.h"
 
-#include "view_scene.h"
+//#include "view_scene.h"
 #include "viewrender.h"
 #include "viewdebug.h"
 #include "smoke_fog_overlay.h"
 #include "materialsystem/imaterialvar.h"
+#include "materialsystem/itexture.h"
 
 #ifdef PORTAL
 //#include "C_Portal_Player.h"
@@ -540,7 +541,7 @@ void CDebugViewRender::Draw2DDebuggingInfo( const CViewSetup &view )
 		if( !IsErrorMaterial( pMaterial ) )
 		{
 			pMaterial->IncrementReferenceCount();
-			DrawScreenEffectMaterial( pMaterial, view.x, view.y, view.width, view.height );
+			g_pViewRender->DrawScreenEffectMaterial( pMaterial, view.x, view.y, view.width, view.height );
 			pMaterial->DecrementReferenceCount();
 		}
 	}
@@ -552,7 +553,7 @@ void CDebugViewRender::Draw2DDebuggingInfo( const CViewSetup &view )
 		if( !IsErrorMaterial( pMaterial ) )
 		{
 			pMaterial->IncrementReferenceCount();
-			DrawScreenEffectMaterial( pMaterial, view.x, view.y, view.width, view.height );
+			g_pViewRender->DrawScreenEffectMaterial( pMaterial, view.x, view.y, view.width, view.height );
 			pMaterial->DecrementReferenceCount();
 		}
 	}

@@ -18,7 +18,7 @@
 #include "toolframework_client.h"
 #include "tier1/KeyValues.h"
 //#include "prop_portal_shared.h"
-#include "view_scene.h"
+//#include "view_scene.h"
 #include "materialsystem/imaterialvar.h"
 #include "tier0/vprof.h"
 
@@ -820,7 +820,7 @@ void CPortalRenderable_FlatBasic::DrawSimplePortalMesh( const IMaterial *pMateri
 	pRenderContext->Bind( (IMaterial *)pMaterial, GetClientRenderable() );
 	
 	// This can depend on the Bind command above, so keep this after!
-	UpdateFrontBufferTexturesForMaterial( (IMaterial *)pMaterial );
+	g_pViewRender->UpdateFrontBufferTexturesForMaterial( (IMaterial *)pMaterial );
 
 	pRenderContext->MatrixMode( MATERIAL_MODEL ); //just in case
 	pRenderContext->PushMatrix();

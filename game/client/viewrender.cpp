@@ -28,7 +28,7 @@
 #include "engine/IEngineTrace.h"
 #include "engine/ivmodelinfo.h"
 #include "tier0/icommandline.h"
-#include "view_scene.h"
+//#include "view_scene.h"
 #include "particles_ez.h"
 #include "engine/IStaticPropMgr.h"
 #include "engine/ivdebugoverlay.h"
@@ -99,7 +99,6 @@ static ConVar r_visocclusion( "r_visocclusion", "0", FCVAR_CHEAT );
 extern ConVar r_flashlightdepthtexture;
 extern ConVar vcollide_wireframe;
 extern ConVar mat_motion_blur_enabled;
-extern ConVar r_depthoverlay;
 //extern ConVar mat_viewportscale;
 //extern ConVar mat_viewportupscale;
 extern bool g_bDumpRenderTargets;
@@ -205,6 +204,11 @@ ConVar cl_leveloverview("cl_leveloverview", "0", FCVAR_CHEAT);
 ConVar r_portal_use_stencils("r_portal_use_stencils", "1", FCVAR_CLIENTDLL, "Render portal views using stencils (if available)"); //draw portal views using stencil rendering
 ConVar r_portal_stencil_depth("r_portal_stencil_depth", "2", FCVAR_CLIENTDLL | FCVAR_ARCHIVE, "When using stencil views, this changes how many views within views we see");
 static ConVar r_forcecheapwater("r_forcecheapwater", "0", FCVAR_CLIENTDLL | FCVAR_CHEAT, "Force all water to be cheap water, will show old renders if enabled after water has been seen");
+//-----------------------------------------------------------------------------
+// Convars related to controlling rendering
+//-----------------------------------------------------------------------------
+ConVar r_updaterefracttexture("r_updaterefracttexture", "1", FCVAR_CHEAT);
+ConVar r_depthoverlay("r_depthoverlay", "0", FCVAR_CHEAT, "Replaces opaque objects with their grayscaled depth values. r_showz_power scales the output.");
 
 #ifdef TF_CLIENT_DLL
 static ConVar pyro_dof( "pyro_dof", "1", FCVAR_ARCHIVE );
@@ -1071,6 +1075,11 @@ void CViewRender::LevelInitPreEntity()
 	m_Materials.m_Wireframe.Init("shadertest/wireframe", TEXTURE_GROUP_CLIENT_EFFECTS);
 	m_Materials.m_WriteZ_Model.Init("engine/writez_model", TEXTURE_GROUP_CLIENT_EFFECTS);
 	m_Materials.m_TranslucentVertexColor.Init("engine/TranslucentVertexColor", TEXTURE_GROUP_CLIENT_EFFECTS);
+#if defined( _X360 )
+	// EP1 core room needs many refract updates per frame to avoid looking broken (ep1_citadel_03)
+	// Same with Kleiner's lab (d1_trainstation_05)
+	g_bAllowMultipleRefractUpdatesPerScenePerFrame = datamap_t::FStrEq(MapName(), "ep1_citadel_03") || datamap_t::FStrEq(MapName(), "d1_trainstation_05");
+#endif
 }
 
 void CViewRender::LevelShutdownPreEntity() 
@@ -2119,6 +2128,41 @@ bool CViewRender::ShouldDrawViewModel( bool bDrawViewmodel )
 	return true;
 }
 
+void CViewRender::UpdateRefractTexture(int x, int y, int w, int h, bool bForceUpdate)
+{
+	Assert(!DrawingShadowDepthView());
+
+	if (!IsRetail() && !r_updaterefracttexture.GetBool())
+		return;
+
+	CMatRenderContextPtr pRenderContext(materials);
+	ITexture* pTexture = GetPowerOfTwoFrameBufferTexture();
+	if (IsPC() || bForceUpdate || g_bAllowMultipleRefractUpdatesPerScenePerFrame || (gpGlobals->framecount != g_viewscene_refractUpdateFrame))
+	{
+		// forced or only once per frame 
+		Rect_t rect;
+		rect.x = x;
+		rect.y = y;
+		rect.width = w;
+		rect.height = h;
+		pRenderContext->CopyRenderTargetToTextureEx(pTexture, 0, &rect, NULL);
+
+		g_viewscene_refractUpdateFrame = gpGlobals->framecount;
+	}
+	pRenderContext->SetFrameBufferCopyTexture(pTexture);
+}
+
+void CViewRender::UpdateRefractTexture(bool bForceUpdate)
+{
+	Assert(!DrawingShadowDepthView());
+
+	CMatRenderContextPtr pRenderContext(materials);
+
+	int x, y, w, h;
+	pRenderContext->GetViewport(x, y, w, h);
+	UpdateRefractTexture(x, y, w, h, bForceUpdate);
+}
+
 
 //-----------------------------------------------------------------------------
 // Purpose: 
@@ -2295,6 +2339,21 @@ bool CViewRender::ShouldDrawBrushModels( void )
 	return true;
 }
 
+//intended for use by dynamic meshes to naively update front buffer textures needed by a material
+void CViewRender::UpdateFrontBufferTexturesForMaterial(IMaterial* pMaterial, bool bForce)
+{
+	Assert(!DrawingShadowDepthView());
+
+	if (pMaterial->NeedsPowerOfTwoFrameBufferTexture())
+	{
+		UpdateRefractTexture(bForce);
+	}
+	else if (pMaterial->NeedsFullFrameBufferTexture())
+	{
+		const CViewSetup* pView = GetViewSetup();
+		UpdateScreenEffectTexture(0, pView->x, pView->y, pView->width, pView->height);
+	}
+}
 
 //-----------------------------------------------------------------------------
 // Purpose: Performs screen space effects, if any
@@ -2329,6 +2388,21 @@ IMaterial *CViewRender::GetScreenOverlayMaterial( )
 	return m_ScreenOverlayMaterial;
 }
 
+//-----------------------------------------------------------------------------
+// Draws the screen effect
+//-----------------------------------------------------------------------------
+void CViewRender::DrawScreenEffectMaterial(IMaterial* pMaterial, int x, int y, int w, int h)
+{
+	Rect_t actualRect;
+	UpdateScreenEffectTexture(0, x, y, w, h, false, &actualRect);
+	ITexture* pTexture = GetFullFrameFrameBufferTexture(0);
+
+	CMatRenderContextPtr pRenderContext(materials);
+
+	pRenderContext->DrawScreenSpaceRectangle(pMaterial, x, y, w, h,
+		actualRect.x, actualRect.y, actualRect.x + actualRect.width - 1, actualRect.y + actualRect.height - 1,
+		pTexture->GetActualWidth(), pTexture->GetActualHeight());
+}
 
 //-----------------------------------------------------------------------------
 // Purpose: Performs screen space effects, if any
@@ -2367,6 +2441,8 @@ void CViewRender::PerformScreenOverlay( int x, int y, int w, int h )
 		}
 	}
 }
+
+
 
 void CViewRender::DrawUnderwaterOverlay( void )
 {
@@ -3050,7 +3126,7 @@ void CViewRender::FreezeFrame( float flFreezeTime )
 
 const char *COM_GetModDirectory();
 
-
+extern ConVar building_cubemaps;
 //-----------------------------------------------------------------------------
 // Purpose: This renders the entire 3D view and the in-game hud/viewmodel
 // Input  : &view - 
@@ -3972,6 +4048,98 @@ void CViewRender::GetWaterLODParams( float &flCheapWaterStartDistance, float &fl
 {
 	flCheapWaterStartDistance = m_flCheapWaterStartDistance;
 	flCheapWaterEndDistance = m_flCheapWaterEndDistance;
+}
+
+void CViewRender::UpdateScreenEffectTexture(int textureIndex, int x, int y, int w, int h, bool bDestFullScreen, Rect_t* pActualRect)
+{
+	Rect_t srcRect;
+	srcRect.x = x;
+	srcRect.y = y;
+	srcRect.width = w;
+	srcRect.height = h;
+
+	CMatRenderContextPtr pRenderContext(materials);
+	ITexture* pTexture = GetFullFrameFrameBufferTexture(textureIndex);
+	int nSrcWidth, nSrcHeight;
+	pRenderContext->GetRenderTargetDimensions(nSrcWidth, nSrcHeight);
+	int nDestWidth = pTexture->GetActualWidth();
+	int nDestHeight = pTexture->GetActualHeight();
+
+	Rect_t destRect = srcRect;
+	if (!bDestFullScreen && (nSrcWidth > nDestWidth || nSrcHeight > nDestHeight))
+	{
+		// the source and target sizes aren't necessarily the same (specifically in dx7 where 
+		// nonpow2 rendertargets aren't supported), so lets figure it out here.
+		float scaleX = (float)nDestWidth / (float)nSrcWidth;
+		float scaleY = (float)nDestHeight / (float)nSrcHeight;
+		destRect.x = srcRect.x * scaleX;
+		destRect.y = srcRect.y * scaleY;
+		destRect.width = srcRect.width * scaleX;
+		destRect.height = srcRect.height * scaleY;
+		destRect.x = clamp(destRect.x, 0, nDestWidth);
+		destRect.y = clamp(destRect.y, 0, nDestHeight);
+		destRect.width = clamp(destRect.width, 0, nDestWidth - destRect.x);
+		destRect.height = clamp(destRect.height, 0, nDestHeight - destRect.y);
+	}
+
+	pRenderContext->CopyRenderTargetToTextureEx(pTexture, 0, &srcRect, bDestFullScreen ? NULL : &destRect);
+	pRenderContext->SetFrameBufferCopyTexture(pTexture, textureIndex);
+
+	if (pActualRect)
+	{
+		pActualRect->x = destRect.x;
+		pActualRect->y = destRect.y;
+		pActualRect->width = destRect.width;
+		pActualRect->height = destRect.height;
+	}
+}
+
+void CViewRender::UpdateScreenEffectTexture(void)
+{
+	Assert(!DrawingShadowDepthView());
+
+	const CViewSetup* pViewSetup = GetViewSetup();
+	UpdateScreenEffectTexture(0, pViewSetup->x, pViewSetup->y, pViewSetup->width, pViewSetup->height);
+}
+
+void CViewRender::UpdateFullScreenDepthTexture(void)
+{
+	if (!g_pMaterialSystemHardwareConfig->SupportsPixelShaders_2_b())
+		return;
+
+	ITexture* pDepthTex = GetFullFrameDepthTexture();
+	CMatRenderContextPtr pRenderContext(materials);
+
+	if (IsX360())
+	{
+		pRenderContext->CopyRenderTargetToTextureEx(pDepthTex, -1, NULL, NULL);
+	}
+	else
+	{
+		pRenderContext->CopyRenderTargetToTextureEx(pDepthTex, 0, NULL, NULL);
+	}
+
+	pRenderContext->SetFullScreenDepthTextureValidityFlag(true);
+
+	if (r_depthoverlay.GetBool())
+	{
+		IMaterial* pMaterial = materials->FindMaterial("debug/showz", TEXTURE_GROUP_OTHER, true);
+		pMaterial->IncrementReferenceCount();
+		IMaterialVar* BaseTextureVar = pMaterial->FindVar("$basetexture", NULL, false);
+		IMaterialVar* pDepthInAlpha = NULL;
+		if (IsPC())
+		{
+			pDepthInAlpha = pMaterial->FindVar("$ALPHADEPTH", NULL, false);
+			pDepthInAlpha->SetIntValue(1);
+		}
+
+		BaseTextureVar->SetTextureValue(pDepthTex);
+
+		pRenderContext->OverrideDepthEnable(true, false); //don't write to depth, or else we'll never see translucents
+		pRenderContext->DrawScreenSpaceQuad(pMaterial);
+		pRenderContext->OverrideDepthEnable(false, true);
+		pMaterial->DecrementReferenceCount();
+	}
 }
 
 //-----------------------------------------------------------------------------
@@ -4948,19 +5116,19 @@ void CViewRender::DrawOpaqueRenderable( IClientRenderable *pEnt, bool bTwoPass, 
 			pRenderContext->PushCustomClipPlane( pRenderClipPlane );
 		else
 			DrawClippedDepthBox( pEnt, pRenderClipPlane );
-		Assert(g_pViewRender->GetCurrentlyDrawingEntity() == NULL );
-		g_pViewRender->SetCurrentlyDrawingEntity(pEnt->GetIClientUnknown()->GetBaseEntity() );
+		Assert(GetCurrentlyDrawingEntity() == NULL );
+		SetCurrentlyDrawingEntity(pEnt->GetIClientUnknown()->GetBaseEntity() );
 		pEnt->DrawModel( flags );
-		g_pViewRender->SetCurrentlyDrawingEntity( NULL );
+		SetCurrentlyDrawingEntity( NULL );
 		if( pRenderClipPlane && !materials->UsingFastClipping() )	
 			pRenderContext->PopCustomClipPlane();
 	}
 	else
 	{
-		Assert(g_pViewRender->GetCurrentlyDrawingEntity() == NULL );
-		g_pViewRender->SetCurrentlyDrawingEntity(pEnt->GetIClientUnknown()->GetBaseEntity() );
+		Assert(GetCurrentlyDrawingEntity() == NULL );
+		SetCurrentlyDrawingEntity(pEnt->GetIClientUnknown()->GetBaseEntity() );
 		pEnt->DrawModel( flags );
-		g_pViewRender->SetCurrentlyDrawingEntity( NULL );
+		SetCurrentlyDrawingEntity( NULL );
 	}
 }
 
@@ -5349,20 +5517,20 @@ void CViewRender::DrawTranslucentRenderable( IClientRenderable *pEnt, bool twoPa
 			pRenderContext->PushCustomClipPlane( pRenderClipPlane );
 		else
 			DrawClippedDepthBox( pEnt, pRenderClipPlane );
-		Assert(g_pViewRender->GetCurrentlyDrawingEntity() == NULL );
-		g_pViewRender->SetCurrentlyDrawingEntity(pEnt->GetIClientUnknown()->GetBaseEntity() );
+		Assert(GetCurrentlyDrawingEntity() == NULL );
+		SetCurrentlyDrawingEntity(pEnt->GetIClientUnknown()->GetBaseEntity() );
 		pEnt->DrawModel( flags );
-		g_pViewRender->SetCurrentlyDrawingEntity( NULL );
+		SetCurrentlyDrawingEntity( NULL );
 
 		if( pRenderClipPlane && !materials->UsingFastClipping() )	
 			pRenderContext->PopCustomClipPlane();
 	}
 	else
 	{
-		Assert(g_pViewRender->GetCurrentlyDrawingEntity() == NULL );
-		g_pViewRender->SetCurrentlyDrawingEntity(pEnt->GetIClientUnknown()->GetBaseEntity() );
+		Assert(GetCurrentlyDrawingEntity() == NULL );
+		SetCurrentlyDrawingEntity(pEnt->GetIClientUnknown()->GetBaseEntity() );
 		pEnt->DrawModel( flags );
-		g_pViewRender->SetCurrentlyDrawingEntity( NULL );
+		SetCurrentlyDrawingEntity( NULL );
 	}
 }
 
@@ -5390,12 +5558,12 @@ void CRendering3dView::DrawTranslucentRenderablesNoWorld( bool bInSkybox )
 		IClientRenderable *pRenderable = pEntities[iCurTranslucentEntity].m_pRenderable;
 		if ( pRenderable->UsesPowerOfTwoFrameBufferTexture() )
 		{
-			UpdateRefractTexture();
+			m_pMainView->UpdateRefractTexture();
 		}
 
 		if ( pRenderable->UsesFullFrameBufferTexture() )
 		{
-			UpdateScreenEffectTexture();
+			m_pMainView->UpdateScreenEffectTexture();
 		}
 
 		m_pMainView->DrawTranslucentRenderable( pRenderable, pEntities[iCurTranslucentEntity].m_TwoPass != 0, bShadowDepth, false );
@@ -5427,12 +5595,12 @@ void CRendering3dView::DrawNoZBufferTranslucentRenderables( void )
 		IClientRenderable *pRenderable = pEntities[iCurTranslucentEntity].m_pRenderable;
 		if ( pRenderable->UsesPowerOfTwoFrameBufferTexture() )
 		{
-			UpdateRefractTexture();
+			m_pMainView->UpdateRefractTexture();
 		}
 
 		if ( pRenderable->UsesFullFrameBufferTexture() )
 		{
-			UpdateScreenEffectTexture();
+			m_pMainView->UpdateScreenEffectTexture();
 		}
 
 		m_pMainView->DrawTranslucentRenderable( pRenderable, pEntities[iCurTranslucentEntity].m_TwoPass != 0, bShadowDepth, true );
@@ -5520,7 +5688,7 @@ void CRendering3dView::DrawTranslucentRenderables( bool bInSkybox, bool bShadowD
 		case VIEW_INTRO_CAMERA:
 		case VIEW_INTRO_PLAYER:
 #endif
-			UpdateFullScreenDepthTexture();
+			m_pMainView->UpdateFullScreenDepthTexture();
 			break;
 
 		default:
@@ -5607,11 +5775,11 @@ void CRendering3dView::DrawTranslucentRenderables( bool bInSkybox, bool bShadowD
 
 						if ( rt && bUsesFullFB )
 						{
-							UpdateScreenEffectTexture( 0, 0, 0, rt->GetActualWidth(), rt->GetActualHeight(), true );
+							m_pMainView->UpdateScreenEffectTexture( 0, 0, 0, rt->GetActualWidth(), rt->GetActualHeight(), true );
 						}
 						else if ( bUsesPowerOfTwoFB )
 						{
-							UpdateRefractTexture();
+							m_pMainView->UpdateRefractTexture();
 						}
 
 						pRenderContext.SafeRelease();
@@ -5651,18 +5819,18 @@ void CRendering3dView::DrawTranslucentRenderables( bool bInSkybox, bool bShadowD
 						{
 							if ( bUsesFullFB )
 							{
-								UpdateScreenEffectTexture( 0, 0, 0, rt->GetActualWidth(), rt->GetActualHeight(), true );
+								m_pMainView->UpdateScreenEffectTexture( 0, 0, 0, rt->GetActualWidth(), rt->GetActualHeight(), true );
 							}
 							else if ( bUsesPowerOfTwoFB )
 							{
-								UpdateRefractTexture(0, 0, rt->GetActualWidth(), rt->GetActualHeight());
+								m_pMainView->UpdateRefractTexture(0, 0, rt->GetActualWidth(), rt->GetActualHeight());
 							}
 						}
 						else
 						{
 							if ( bUsesPowerOfTwoFB )
 							{
-								UpdateRefractTexture();
+								m_pMainView->UpdateRefractTexture();
 							}
 						}
 
@@ -6026,7 +6194,7 @@ SkyboxVisibility_t CPortalSkyboxView::ComputeSkyboxVisibility()
 //-----------------------------------------------------------------------------
 void CPortalSkyboxView::Draw()
 {
-	AssertMsg( (g_pViewRender->GetViewRecursionLevel() != 0) && g_pViewRender->IsRenderingPortal(), "This is designed for through-portal views. Use the regular skybox drawing code for primary views" );
+	AssertMsg( (m_pMainView->GetViewRecursionLevel() != 0) && m_pMainView->IsRenderingPortal(), "This is designed for through-portal views. Use the regular skybox drawing code for primary views" );
 
 	VPROF_BUDGET( "CViewRender::Draw3dSkyboxworld_Portal", "3D Skybox (portal view)" );
 
@@ -7950,7 +8118,7 @@ void CViewRender::DrawPortalsToTextures(const CViewSetup& cameraView)
 
 
 #ifdef _DEBUG
-	g_pViewRender->SetRenderingCameraView(true);
+	SetRenderingCameraView(true);
 #endif
 
 	int iNumRenderablePortals = this->m_ActivePortals.Count();
@@ -7999,7 +8167,7 @@ void CViewRender::DrawPortalsToTextures(const CViewSetup& cameraView)
 	m_pRenderingViewExitPortal = NULL;
 
 #ifdef _DEBUG
-	g_pViewRender->SetRenderingCameraView(false);
+	SetRenderingCameraView(false);
 #endif
 }
 

@@ -15,7 +15,7 @@
 #include "materialsystem/itexture.h"
 #include "toolframework/itoolframework.h"
 #include "tier1/KeyValues.h"
-#include "view_scene.h"
+//#include "view_scene.h"
 #include "iviewrender.h"
 #include "vprof.h"
 
