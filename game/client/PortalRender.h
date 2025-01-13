@@ -14,7 +14,6 @@
 
 #include "iviewrender.h"
 #include "view_shared.h"
-#include "viewrender.h"
 
 class CPortalRenderable
 {
@@ -36,8 +35,8 @@ public:
 	//----------------------------------------------------------------------------
 	//Rendering of views beyond the portal
 	//----------------------------------------------------------------------------
-	virtual void	RenderPortalViewToBackBuffer( CViewRender *pViewRender, const CViewSetup &cameraView ) { };
-	virtual void	RenderPortalViewToTexture( CViewRender *pViewRender, const CViewSetup &cameraView ) { };
+	virtual void	RenderPortalViewToBackBuffer( const CViewSetup &cameraView ) { };
+	virtual void	RenderPortalViewToTexture( const CViewSetup &cameraView ) { };
 
 
 	//----------------------------------------------------------------------------
@@ -78,6 +77,7 @@ public:
 	virtual void	GetToolRecordingState( bool bActive, KeyValues *msg ) { };
 	virtual void	HandlePortalPlaybackMessage( KeyValues *pKeyValues ) { };
 
+	int GetPortalViewIDNodeIndex() const { return m_iPortalViewIDNodeIndex; }
 protected:
 	//-----------------------------------------------------------------------------
 	// Wrap the draw of the surface that makes use of your portal render targets with these. Only required for texture mode, but won't hurt stencil mode.
@@ -89,18 +89,17 @@ protected:
 	CPortalRenderable *FindRecordedPortal( int nPortalId ); //routed through here to get friend access to CPortalRender
 
 	//routed through here to get friend access to CViewRender
-	void CopyToCurrentView( CViewRender *pViewRender, const CViewSetup &viewSetup ); 
-	void ViewDrawScene_PortalStencil( CViewRender *pViewRender, const CViewSetup &viewIn, ViewCustomVisibility_t *pCustomVisibility );
-	void Draw3dSkyboxworld_Portal( CViewRender *pViewRender, const CViewSetup &viewIn, int &nClearFlags, bool &bDrew3dSkybox, SkyboxVisibility_t &nSkyboxVisible, ITexture *pRenderTarget = NULL );
-	void ViewDrawScene( CViewRender *pViewRender, bool bDrew3dSkybox, SkyboxVisibility_t nSkyboxVisible, const CViewSetup &viewIn, int nClearFlags, view_id_t viewID, bool bDrawViewModel = false, int baseDrawFlags = 0, ViewCustomVisibility_t *pCustomVisibility = NULL );
-	void SetViewRecursionLevel( int iViewRecursionLevel );
-	void SetRemainingViewDepth( int iRemainingViewDepth );
-	void SetViewEntranceAndExitPortals( CPortalRenderable *pEntryPortal, CPortalRenderable *pExitPortal );
+	//void CopyToCurrentView( IViewRender *pViewRender, const CViewSetup &viewSetup ); 
+	//void ViewDrawScene_PortalStencil( IViewRender *pViewRender, const CViewSetup &viewIn, ViewCustomVisibility_t *pCustomVisibility );
+	//void Draw3dSkyboxworld_Portal( IViewRender *pViewRender, const CViewSetup &viewIn, int &nClearFlags, bool &bDrew3dSkybox, SkyboxVisibility_t &nSkyboxVisible, ITexture *pRenderTarget = NULL );
+	//void ViewDrawScene( IViewRender *pViewRender, bool bDrew3dSkybox, SkyboxVisibility_t nSkyboxVisible, const CViewSetup &viewIn, int nClearFlags, view_id_t viewID, bool bDrawViewModel = false, int baseDrawFlags = 0, ViewCustomVisibility_t *pCustomVisibility = NULL );
+	//void SetViewRecursionLevel( int iViewRecursionLevel );
+	//void SetRemainingViewDepth( int iRemainingViewDepth );
+	//void SetViewEntranceAndExitPortals( CPortalRenderable *pEntryPortal, CPortalRenderable *pExitPortal );
 
 private:
 	int m_iPortalViewIDNodeIndex; //each PortalViewIDNode_t has a child node link for each CPortalRenderable in CPortalRender::m_ActivePortals. This portal follows the same indexed link from each node
 	friend class CPortalRender;
-	friend class CViewRender;
 };
 
 //-----------------------------------------------------------------------------
@@ -111,63 +110,11 @@ private:
 //	return m_matrixThisToLinked;
 //}
 
-
-
-inline CPortalRenderable *CPortalRenderable::FindRecordedPortal( int nPortalId )
-{ 
-	return g_pViewRender->FindRecordedPortal( nPortalId );
-}
-
-
 class CPortalRenderableCreator //create one of these as a global and ensure you register exactly once
 {
 public:
-	CPortalRenderableCreator( const char *szPortalType, PortalRenderableCreationFunc creationFunction )
-	{
-		if(g_pViewRender) g_pViewRender->AddPortalCreationFunc( szPortalType, creationFunction );
-	}
+	CPortalRenderableCreator(const char* szPortalType, PortalRenderableCreationFunc creationFunction);
 };
-
-
-
-//-----------------------------------------------------------------------------
-// inline friend access redirects
-//-----------------------------------------------------------------------------
-inline void CPortalRenderable::CopyToCurrentView( CViewRender *pViewRender, const CViewSetup &viewSetup )
-{
-	pViewRender->m_CurrentView = viewSetup;
-}
-
-inline void CPortalRenderable::ViewDrawScene_PortalStencil( CViewRender *pViewRender, const CViewSetup &viewIn, ViewCustomVisibility_t *pCustomVisibility )
-{
-	pViewRender->ViewDrawScene_PortalStencil( viewIn, pCustomVisibility );
-}
-
-inline void CPortalRenderable::Draw3dSkyboxworld_Portal( CViewRender *pViewRender, const CViewSetup &viewIn, int &nClearFlags, bool &bDrew3dSkybox, SkyboxVisibility_t &nSkyboxVisible, ITexture *pRenderTarget )
-{
-	pViewRender->Draw3dSkyboxworld_Portal( viewIn, nClearFlags, bDrew3dSkybox, nSkyboxVisible, pRenderTarget );
-}
-
-inline void CPortalRenderable::ViewDrawScene( CViewRender *pViewRender, bool bDrew3dSkybox, SkyboxVisibility_t nSkyboxVisible, const CViewSetup &viewIn, int nClearFlags, view_id_t viewID, bool bDrawViewModel, int baseDrawFlags, ViewCustomVisibility_t *pCustomVisibility )
-{
-	pViewRender->ViewDrawScene( bDrew3dSkybox, nSkyboxVisible, viewIn, nClearFlags, viewID, bDrawViewModel, baseDrawFlags, pCustomVisibility );
-}
-
-inline void CPortalRenderable::SetViewRecursionLevel( int iViewRecursionLevel )
-{
-	g_pViewRender->SetViewRecursionLevel(iViewRecursionLevel);
-}
-
-inline void CPortalRenderable::SetRemainingViewDepth( int iRemainingViewDepth )
-{
-	g_pViewRender->SetRemainingPortalViewDepth(iRemainingViewDepth);
-}
-
-inline void CPortalRenderable::SetViewEntranceAndExitPortals( CPortalRenderable *pEntryPortal, CPortalRenderable *pExitPortal )
-{
-	g_pViewRender->SetRenderingViewForPortal(pEntryPortal);
-	g_pViewRender->SetRenderingViewExitPortal(pExitPortal);
-}
 
 #endif //#ifndef PORTALRENDER_H
 

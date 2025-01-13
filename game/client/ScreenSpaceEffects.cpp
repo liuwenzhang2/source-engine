@@ -4,7 +4,7 @@
 #include "KeyValues.h"
 #include "cdll_client_int.h"
 #include "view_scene.h"
-#include "viewrender.h"
+#include "iviewrender.h"
 #include "tier0/icommandline.h"
 #include "materialsystem/imesh.h"
 #include "materialsystem/imaterial.h"

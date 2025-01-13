@@ -12,7 +12,7 @@
 #include "history_resource.h"
 #include "iinput.h"
 #include "input.h"
-#include "viewrender.h"
+#include "iviewrender.h"
 #include "iclientmode.h"
 #include "in_buttons.h"
 #include "engine/IEngineSound.h"

@@ -18,6 +18,7 @@
 #include "replay/ireplayscreenshotsystem.h"
 #include "cdll_int.h"
 #include "clientleafsystem.h"
+#include "PortalRender.h"
 
 //-----------------------------------------------------------------------------
 // Forward declarations
@@ -47,57 +48,6 @@ public:
 	bool		nodrift;
 	float		driftmove;
 	double		laststop;
-};
-
-
-
-//-----------------------------------------------------------------------------
-// 
-//-----------------------------------------------------------------------------
-struct ViewCustomVisibility_t
-{
-	ViewCustomVisibility_t()
-	{
-		m_nNumVisOrigins = 0;
-		m_VisData.m_fDistToAreaPortalTolerance = FLT_MAX; 
-		m_iForceViewLeaf = -1;
-	}
-
-	void AddVisOrigin( const Vector& origin )
-	{
-		// Don't allow them to write past array length
-		AssertMsg( m_nNumVisOrigins < MAX_VIS_LEAVES, "Added more origins than will fit in the array!" );
-
-		// If the vis origin count is greater than the size of our array, just fail to add this origin
-		if ( m_nNumVisOrigins >= MAX_VIS_LEAVES )
-			return;
-
-		m_rgVisOrigins[ m_nNumVisOrigins++ ] = origin;
-	}
-
-	void ForceVisOverride( VisOverrideData_t& visData )
-	{
-		m_VisData = visData;
-	}
-
-	void ForceViewLeaf ( int iViewLeaf )
-	{
-		m_iForceViewLeaf = iViewLeaf;
-	}
-
-	// Set to true if you want to use multiple origins for doing client side map vis culling
-	// NOTE:  In generaly, you won't want to do this, and by default the 3d origin of the camera, as above,
-	//  will be used as the origin for vis, too.
-	int				m_nNumVisOrigins;
-	// Array of origins
-	Vector			m_rgVisOrigins[ MAX_VIS_LEAVES ];
-
-	// The view data overrides for visibility calculations with area portals
-	VisOverrideData_t m_VisData;
-
-	// The starting leaf to determing which area to start in when performing area portal culling on the engine
-	// Default behavior is to use the leaf the camera position is in.
-	int				m_iForceViewLeaf;
 };
 
 //-----------------------------------------------------------------------------
@@ -250,34 +200,10 @@ struct RecordedPortalInfo_t
 	IClientRenderable* m_pPlaybackRenderable;
 };
 
-//-----------------------------------------------------------------------------
-// Portal rendering materials
-//-----------------------------------------------------------------------------
-struct PortalRenderingMaterials_t
-{
-	CMaterialReference	m_Wireframe;
-	CMaterialReference	m_WriteZ_Model;
-	CMaterialReference	m_TranslucentVertexColor;
-};
-
 struct PortalRenderableCreationFunction_t
 {
 	CUtlString portalType;
 	PortalRenderableCreationFunc creationFunc;
-};
-
-struct PortalViewIDNode_t
-{
-	CUtlVector<PortalViewIDNode_t*> ChildNodes; //links will only be non-null if they're useful (can see through the portal at that depth and view setup)
-	int iPrimaryViewID;
-	//skybox view id is always primary + 1
-
-	//In stencil mode this wraps CPortalRenderable::DrawStencilMask() and gives previous frames' results to CPortalRenderable::RenderPortalViewToBackBuffer()
-	//In texture mode there's no good spot to auto-wrap occlusion tests. So you'll need to wrap it yourself for that.
-	OcclusionQueryObjectHandle_t occlusionQueryHandle;
-	int iWindowPixelsAtQueryTime;
-	int iOcclusionQueryPixelsRendered;
-	float fScreenFilledByPortalSurfaceLastFrame_Normalized;
 };
 
 //-----------------------------------------------------------------------------
@@ -362,7 +288,7 @@ public:
 	virtual void	RenderPlayerSprites();
 	virtual void	Render2DEffectsPreHUD( const CViewSetup &view );
 	virtual void	Render2DEffectsPostHUD( const CViewSetup &view );
-
+	virtual void	CopyToCurrentView(const CViewSetup& viewSetup);
 
 	void			DisableFog( void );
 
@@ -655,7 +581,7 @@ private:
 #endif
 
 	//friend class CPortalRender; //portal drawing needs muck with views in weird ways
-	friend class CPortalRenderable;
+	//friend class CPortalRenderable;
 	int				m_BuildRenderableListsNumber;
 
 	friend class CBase3dView;
@@ -735,43 +661,7 @@ private:
 	const PortalRenderingMaterials_t& m_MaterialsAccess;
 };
 
-
-
-
-
-float ScaleFOVByWidthRatio(float fovDegrees, float ratio);
-
-
 extern ConVar mat_wireframe;
-extern const ConVar* sv_cheats;
-static inline int WireFrameMode(void)
-{
-	if (!sv_cheats)
-	{
-		sv_cheats = cvar->FindVar("sv_cheats");
-	}
 
-	if (sv_cheats && sv_cheats->GetBool())
-		return mat_wireframe.GetInt();
-	else
-		return 0;
-}
-
-static inline bool ShouldDrawInWireFrameMode(void)
-{
-	if (!sv_cheats)
-	{
-		sv_cheats = cvar->FindVar("sv_cheats");
-	}
-
-	if (sv_cheats && sv_cheats->GetBool())
-		return (mat_wireframe.GetInt() != 0);
-	else
-		return false;
-}
-
-// near and far Z it uses to render the world.
-#define VIEW_NEARZ	3
-//#define VIEW_FARZ	28400
 
 #endif // VIEWRENDER_H

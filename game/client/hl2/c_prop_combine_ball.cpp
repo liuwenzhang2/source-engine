@@ -13,7 +13,7 @@
 #include "fx_quad.h"
 #include "fx.h"
 #include "clienteffectprecachesystem.h"
-#include "viewrender.h"
+#include "iviewrender.h"
 #include "view_scene.h"
 #include "beamdraw.h"
 

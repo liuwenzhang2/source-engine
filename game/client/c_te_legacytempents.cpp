@@ -9,7 +9,7 @@
 #include "model_types.h"
 #include "view_shared.h"
 #include "iviewrender.h"
-#include "viewrender.h"
+#include "iviewrender.h"
 #include "tempentity.h"
 #include "dlight.h"
 #include "tempent.h"

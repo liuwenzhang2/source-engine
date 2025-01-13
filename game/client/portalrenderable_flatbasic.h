@@ -64,8 +64,8 @@ public:
 	virtual void	DrawStencilMask( void ); //Draw to wherever you can see through the portal. The mask will later be filled with the portal view.
 	virtual void	DrawPostStencilFixes( void ); //After done drawing to the portal mask, we need to fix the depth buffer as well as fog. So draw your mesh again, writing to z and with the fog color alpha'd in by distance
 
-	virtual void	RenderPortalViewToBackBuffer( CViewRender *pViewRender, const CViewSetup &cameraView );
-	virtual void	RenderPortalViewToTexture( CViewRender *pViewRender, const CViewSetup &cameraView );
+	virtual void	RenderPortalViewToBackBuffer( const CViewSetup &cameraView );
+	virtual void	RenderPortalViewToTexture( const CViewSetup &cameraView );
 
 	void			AddToVisAsExitPortal( ViewCustomVisibility_t *pCustomVisibility );
 

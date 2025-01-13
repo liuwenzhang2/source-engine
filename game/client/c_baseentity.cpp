@@ -10,7 +10,7 @@
 #include "model_types.h"
 #include "iviewrender_beams.h"
 #include "dlight.h"
-#include "viewrender.h"
+#include "iviewrender.h"
 #include "iefx.h"
 #include "c_team.h"
 #include "clientmode.h"

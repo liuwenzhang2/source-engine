@@ -9,7 +9,7 @@
 #include "particles_simple.h"
 #include "c_tracer.h"
 #include "particle_collision.h"
-#include "viewrender.h"
+#include "iviewrender.h"
 #include "clienteffectprecachesystem.h"
 
 // memdbgon must be the last include file in a .cpp file!!!

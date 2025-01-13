@@ -24,7 +24,7 @@
 #include "gamestringpool.h"
 #include "model_types.h"
 #include "view_shared.h"
-#include "viewrender.h"
+#include "iviewrender.h"
 #include "iefx.h"
 #include "dlight.h"
 #include "activitylist.h"

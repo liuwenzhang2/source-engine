@@ -32,7 +32,7 @@
 #include "physics_saverestore.h"
 #include "vphysics/constraints.h"
 //#include "ragdoll_shared.h"
-#include "viewrender.h"
+#include "iviewrender.h"
 #include "c_ai_basenpc.h"
 #include "c_entitydissolve.h"
 #include "saverestoretypes.h"

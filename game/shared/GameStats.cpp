@@ -32,7 +32,6 @@
 #include "vgui_int.h"
 #include "igameresources.h"
 #include "voice_status.h"
-extern const ConVar *sv_cheats;
 #if !defined(NO_STEAM)
 #include "steam/steam_api.h"
 #endif
@@ -1137,9 +1136,10 @@ bool CBaseGameStats_Driver::AddBaseDataForSend( KeyValues *pKV, StatSendType_t s
 			// We need to filter out client side dev work from playtest work for the stat reporting.
 			// The simplest way is to check for sv_cheats, since we also do NOT want client stat reports
 			// where the player has cheated.
-			if ( NULL != sv_cheats )
+			ConVarRef sv_cheats("sv_cheats");
+			if ( sv_cheats.IsValid() )
 			{
-				int iCheats = sv_cheats->GetInt();
+				int iCheats = sv_cheats.GetInt();
 				pKV->SetInt( "Cheats", iCheats );
 			}
 

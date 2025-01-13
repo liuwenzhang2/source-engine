@@ -19,7 +19,7 @@
 #include "iviewrender_beams.h"
 #include "c_pixel_visibility.h"
 #include "iclientmode.h"
-#include "viewrender.h"
+#include "iviewrender.h"
 #include "beamdraw.h"
 #ifdef PORTAL
 	#include "c_prop_portal.h"

@@ -16,7 +16,7 @@
 
 #include "cbase.h"
 #include "shareddefs.h"
-#include "viewrender.h"
+#include "iviewrender.h"
 #include "mumble.h"
 
 #if !defined( _X360 ) && !defined( NO_STEAM )

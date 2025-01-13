@@ -11,7 +11,6 @@
 #pragma once
 #endif
 
-#include "iviewrender.h"
 #include "viewrender.h"
 
 #include "colorcorrectionmgr.h"

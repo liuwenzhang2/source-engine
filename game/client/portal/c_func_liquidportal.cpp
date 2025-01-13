@@ -142,20 +142,20 @@ void CPortalRenderable_Func_LiquidPortal::DrawPostStencilFixes( void )
 }
 
 
-void CPortalRenderable_Func_LiquidPortal::RenderPortalViewToBackBuffer( CViewRender *pViewRender, const CViewSetup &cameraView )
+void CPortalRenderable_Func_LiquidPortal::RenderPortalViewToBackBuffer( const CViewSetup &cameraView )
 {
 	if( m_pLinkedPortal == NULL ) //not linked to any portal
 		return;
 
 	Frustum FrustumBackup;
-	memcpy( FrustumBackup, pViewRender->GetFrustum(), sizeof( Frustum ) );
+	memcpy( FrustumBackup, g_pViewRender->GetFrustum(), sizeof( Frustum ) );
 
 	Frustum seeThroughFrustum;
 	bool bUseSeeThroughFrustum;
 
 	if ( g_pViewRender->GetViewRecursionLevel() == 0 )
 	{
-		bUseSeeThroughFrustum = CalcFrustumThroughPortal( cameraView.origin, seeThroughFrustum, pViewRender->GetFrustum(), FRUSTUM_NUMPLANES );
+		bUseSeeThroughFrustum = CalcFrustumThroughPortal( cameraView.origin, seeThroughFrustum, g_pViewRender->GetFrustum(), FRUSTUM_NUMPLANES );
 	}
 	else
 	{
@@ -183,44 +183,44 @@ void CPortalRenderable_Func_LiquidPortal::RenderPortalViewToBackBuffer( CViewRen
 	portalView.m_bOrtho = false;
 	portalView.m_flAspectRatio = cameraView.m_flAspectRatio; //use the screen aspect ratio, 0.0f doesn't work as advertised
 
-	CopyToCurrentView( pViewRender, portalView );
+	g_pViewRender->CopyToCurrentView( portalView );
 
 	CMatRenderContextPtr pRenderContext( materials );
 
 	{
 		ViewCustomVisibility_t customVisibility;
 		m_pLinkedPortal->AddToVisAsExitPortal( &customVisibility );
-		render->Push3DView( portalView, 0, NULL, pViewRender->GetFrustum() );		
+		render->Push3DView( portalView, 0, NULL, g_pViewRender->GetFrustum() );
 		{
 			if( bUseSeeThroughFrustum)
-				memcpy( pViewRender->GetFrustum(), seeThroughFrustum, sizeof( Frustum ) );
+				memcpy(g_pViewRender->GetFrustum(), seeThroughFrustum, sizeof( Frustum ) );
 
-			render->OverrideViewFrustum( pViewRender->GetFrustum() );
-			SetViewRecursionLevel( g_pViewRender->GetViewRecursionLevel() + 1 );
+			render->OverrideViewFrustum(g_pViewRender->GetFrustum() );
+			g_pViewRender->SetViewRecursionLevel( g_pViewRender->GetViewRecursionLevel() + 1 );
 
 			CPortalRenderable *pRenderingViewForPortalBackup = g_pViewRender->GetCurrentViewEntryPortal();
 			CPortalRenderable *pRenderingViewExitPortalBackup = g_pViewRender->GetCurrentViewExitPortal();
-			SetViewEntranceAndExitPortals( this, m_pLinkedPortal );
+			g_pViewRender->SetRenderingViewForPortal(this);
+			g_pViewRender->SetRenderingViewExitPortal(m_pLinkedPortal);
 
 			//DRAW!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-			ViewDrawScene_PortalStencil( pViewRender, portalView, &customVisibility );
-
-			SetViewEntranceAndExitPortals( pRenderingViewForPortalBackup, pRenderingViewExitPortalBackup );
-
-			SetViewRecursionLevel(g_pViewRender->GetViewRecursionLevel() - 1 );
+			g_pViewRender->ViewDrawScene_PortalStencil( portalView, &customVisibility );
+			g_pViewRender->SetRenderingViewForPortal(pRenderingViewForPortalBackup);
+			g_pViewRender->SetRenderingViewExitPortal(pRenderingViewExitPortalBackup);
+			g_pViewRender->SetViewRecursionLevel(g_pViewRender->GetViewRecursionLevel() - 1 );
 		}
-		render->PopView( pViewRender->GetFrustum() );
+		render->PopView(g_pViewRender->GetFrustum() );
 
 		//restore old frustum
-		memcpy( pViewRender->GetFrustum(), FrustumBackup, sizeof( Frustum ) );
+		memcpy(g_pViewRender->GetFrustum(), FrustumBackup, sizeof( Frustum ) );
 		render->OverrideViewFrustum( FrustumBackup );
 	}
 
 	//restore old vis data
-	CopyToCurrentView( pViewRender, cameraView );
+	g_pViewRender->CopyToCurrentView( cameraView );
 }
 
-void CPortalRenderable_Func_LiquidPortal::RenderPortalViewToTexture( CViewRender *pViewRender, const CViewSetup &cameraView )
+void CPortalRenderable_Func_LiquidPortal::RenderPortalViewToTexture( const CViewSetup &cameraView )
 {
 
 }

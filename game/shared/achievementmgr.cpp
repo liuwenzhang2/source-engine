@@ -425,10 +425,6 @@ void CAchievementMgr::InitializeAchievements()
 	PostInit();
 }
 
-#ifdef CLIENT_DLL
-extern const ConVar *sv_cheats;
-#endif
-
 #ifdef GAME_DLL
 void CAchievementMgr::FrameUpdatePostEntityThink()
 {
@@ -441,18 +437,12 @@ void CAchievementMgr::FrameUpdatePostEntityThink()
 //-----------------------------------------------------------------------------
 void CAchievementMgr::Update( float frametime )
 {
-#ifdef CLIENT_DLL
-	if ( !sv_cheats )
-	{
-		sv_cheats = cvar->FindVar( "sv_cheats" );
-	}
-#endif
-
 #ifndef _DEBUG
 	// keep track if cheats have ever been turned on during this level
 	if ( !WereCheatsEverOn() )
 	{
-		if ( sv_cheats && sv_cheats->GetBool() )
+		ConVarRef sv_cheats("sv_cheats");
+		if ( sv_cheats.IsValid() && sv_cheats.GetBool())
 		{
 			m_bCheatsEverOn = true;
 		}

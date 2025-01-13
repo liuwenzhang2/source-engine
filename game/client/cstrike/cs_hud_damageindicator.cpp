@@ -9,7 +9,7 @@
 #include "text_message.h"
 #include "hud_macros.h"
 #include "iclientmode.h"
-#include "viewrender.h"
+#include "iviewrender.h"
 #include <KeyValues.h>
 #include <vgui/ISurface.h>
 #include <vgui_controls/Panel.h>

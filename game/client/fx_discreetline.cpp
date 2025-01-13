@@ -14,7 +14,7 @@
 #include "fx_discreetline.h"
 #include "materialsystem/imaterial.h"
 #include "materialsystem/imesh.h"
-#include "viewrender.h"
+#include "iviewrender.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"

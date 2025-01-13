@@ -10,7 +10,7 @@
 #include "materialsystem/imaterialsystemhardwareconfig.h"
 #include "rendertexture.h"
 #include "view_scene.h"
-#include "viewrender.h"
+#include "iviewrender.h"
 #include "sourcevr/isourcevirtualreality.h"
 #include "client_virtualreality.h"
 

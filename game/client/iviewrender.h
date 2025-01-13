@@ -12,9 +12,9 @@
 #pragma once
 #endif
 
-
+#include "tier1/convar.h"
 #include "ivrenderview.h"
-
+#include "materialsystem/MaterialSystemUtil.h"
 
 // These are set as it draws reflections, refractions, etc, so certain effects can avoid 
 // drawing themselves in reflections.
@@ -58,8 +58,6 @@ struct vrect_t;
 struct WriteReplayScreenshotParams_t;
 class IReplayScreenshotSystem;
 class CPortalRenderable;
-struct PortalViewIDNode_t;
-struct PortalRenderingMaterials_t;
 
 //-----------------------------------------------------------------------------
 // Data specific to intro mode to control rendering.
@@ -80,6 +78,79 @@ struct IntroData_t
 
 	// Fade overriding for the intro
 	float	m_flCurrentFadeColor[4];
+};
+
+//-----------------------------------------------------------------------------
+// Portal rendering materials
+//-----------------------------------------------------------------------------
+struct PortalRenderingMaterials_t
+{
+	CMaterialReference	m_Wireframe;
+	CMaterialReference	m_WriteZ_Model;
+	CMaterialReference	m_TranslucentVertexColor;
+};
+
+struct PortalViewIDNode_t
+{
+	CUtlVector<PortalViewIDNode_t*> ChildNodes; //links will only be non-null if they're useful (can see through the portal at that depth and view setup)
+	int iPrimaryViewID;
+	//skybox view id is always primary + 1
+
+	//In stencil mode this wraps CPortalRenderable::DrawStencilMask() and gives previous frames' results to CPortalRenderable::RenderPortalViewToBackBuffer()
+	//In texture mode there's no good spot to auto-wrap occlusion tests. So you'll need to wrap it yourself for that.
+	OcclusionQueryObjectHandle_t occlusionQueryHandle;
+	int iWindowPixelsAtQueryTime;
+	int iOcclusionQueryPixelsRendered;
+	float fScreenFilledByPortalSurfaceLastFrame_Normalized;
+};
+
+//-----------------------------------------------------------------------------
+// 
+//-----------------------------------------------------------------------------
+struct ViewCustomVisibility_t
+{
+	ViewCustomVisibility_t()
+	{
+		m_nNumVisOrigins = 0;
+		m_VisData.m_fDistToAreaPortalTolerance = FLT_MAX;
+		m_iForceViewLeaf = -1;
+	}
+
+	void AddVisOrigin(const Vector& origin)
+	{
+		// Don't allow them to write past array length
+		AssertMsg(m_nNumVisOrigins < MAX_VIS_LEAVES, "Added more origins than will fit in the array!");
+
+		// If the vis origin count is greater than the size of our array, just fail to add this origin
+		if (m_nNumVisOrigins >= MAX_VIS_LEAVES)
+			return;
+
+		m_rgVisOrigins[m_nNumVisOrigins++] = origin;
+	}
+
+	void ForceVisOverride(VisOverrideData_t& visData)
+	{
+		m_VisData = visData;
+	}
+
+	void ForceViewLeaf(int iViewLeaf)
+	{
+		m_iForceViewLeaf = iViewLeaf;
+	}
+
+	// Set to true if you want to use multiple origins for doing client side map vis culling
+	// NOTE:  In generaly, you won't want to do this, and by default the 3d origin of the camera, as above,
+	//  will be used as the origin for vis, too.
+	int				m_nNumVisOrigins;
+	// Array of origins
+	Vector			m_rgVisOrigins[MAX_VIS_LEAVES];
+
+	// The view data overrides for visibility calculations with area portals
+	VisOverrideData_t m_VisData;
+
+	// The starting leaf to determing which area to start in when performing area portal culling on the engine
+	// Default behavior is to use the leaf the camera position is in.
+	int				m_iForceViewLeaf;
 };
 
 typedef CPortalRenderable* (*PortalRenderableCreationFunc)(void);
@@ -112,6 +183,7 @@ public:
 	// Called to render just a particular setup ( for timerefresh and envmap creation )
 	virtual void		RenderView( const CViewSetup &view, int nClearFlags, int whatToDraw ) = 0;
 
+	virtual void		CopyToCurrentView(const CViewSetup& viewSetup) = 0;
 	// What are we currently rendering? Returns a combination of DF_ flags.
 	virtual int GetDrawFlags() = 0;
 
@@ -234,6 +306,10 @@ public:
 	// true if the rendering path for portals uses stencils instead of textures
 	virtual bool ShouldUseStencilsToRenderPortals() const = 0;
 
+	// Intended for use in the middle of another ViewDrawScene call, this allows stencils to be drawn after opaques but before translucents are drawn in the main view.
+	virtual void ViewDrawScene_PortalStencil(const CViewSetup& view, ViewCustomVisibility_t* pCustomVisibility) = 0;
+	virtual void Draw3dSkyboxworld_Portal(const CViewSetup& view, int& nClearFlags, bool& bDrew3dSkybox, SkyboxVisibility_t& nSkyboxVisible, ITexture* pRenderTarget = NULL) = 0;
+	virtual void ViewDrawScene(bool bDrew3dSkybox, SkyboxVisibility_t nSkyboxVisible, const CViewSetup& view, int nClearFlags, view_id_t viewID, bool bDrawViewModel = false, int baseDrawFlags = 0, ViewCustomVisibility_t* pCustomVisibility = NULL) = 0;
 	//it's a good idea to force cheaper water when the ratio of performance gain to noticability is high
 	//0 = force no reflection/refraction
 	//1/2 = downgrade to simple/world reflections as seen in advanced video options
@@ -279,6 +355,38 @@ public:
 
 extern IViewRender *g_pViewRender;
 
+// near and far Z it uses to render the world.
+#define VIEW_NEARZ	3
+//#define VIEW_FARZ	28400
 #define TEMP_DISABLE_PORTAL_VIS_QUERY
+
+static inline int WireFrameMode(void)
+{
+	ConVarRef sv_cheats("sv_cheats");
+	ConVarRef mat_wireframe("mat_wireframe");
+	if (sv_cheats.IsValid() && sv_cheats.GetBool())
+		return mat_wireframe.GetInt();
+	else
+		return 0;
+}
+
+static inline bool ShouldDrawInWireFrameMode(void)
+{
+	ConVarRef sv_cheats("sv_cheats");
+	ConVarRef mat_wireframe("mat_wireframe");
+	if (sv_cheats.IsValid() && sv_cheats.GetBool())
+		return (mat_wireframe.GetInt() != 0);
+	else
+		return false;
+}
+
+static inline float ScaleFOVByWidthRatio(float fovDegrees, float ratio)
+{
+	float halfAngleRadians = fovDegrees * (0.5f * M_PI / 180.0f);
+	float t = tan(halfAngleRadians);
+	t *= ratio;
+	float retDegrees = (180.0f / M_PI) * atan(t);
+	return retDegrees * 2.0f;
+}
 
 #endif // IVIEWRENDER_H

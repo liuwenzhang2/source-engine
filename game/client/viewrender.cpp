@@ -1757,16 +1757,6 @@ void CViewRender::WriteSaveGameScreenshot(const char* pFilename)
 	WriteSaveGameScreenshotOfSize(pFilename, SAVEGAME_SCREENSHOT_WIDTH, SAVEGAME_SCREENSHOT_HEIGHT);
 }
 
-
-float ScaleFOVByWidthRatio(float fovDegrees, float ratio)
-{
-	float halfAngleRadians = fovDegrees * (0.5f * M_PI / 180.0f);
-	float t = tan(halfAngleRadians);
-	t *= ratio;
-	float retDegrees = (180.0f / M_PI) * atan(t);
-	return retDegrees * 2.0f;
-}
-
 //-----------------------------------------------------------------------------
 // Purpose: Sets view parameters for level overview mode
 // Input  : *rect - 
@@ -3514,7 +3504,13 @@ void CViewRender::Render2DEffectsPostHUD( const CViewSetup &view )
 {
 }
 
-
+//-----------------------------------------------------------------------------
+// inline friend access redirects
+//-----------------------------------------------------------------------------
+void CViewRender::CopyToCurrentView(const CViewSetup& viewSetup)
+{
+	this->m_CurrentView = viewSetup;
+}
 
 //-----------------------------------------------------------------------------
 //
@@ -7411,7 +7407,7 @@ int CViewRender::ShouldForceCheaperWaterLevel() const
 		if (portalrendertargets->GetWaterReflectionTextureForStencilDepth(m_iViewRecursionLevel) == NULL)
 			return 0;
 
-		PortalViewIDNode_t* pPixelVisNode = m_PortalViewIDNodeChain[m_iViewRecursionLevel - 1]->ChildNodes[m_pRenderingViewForPortal->m_iPortalViewIDNodeIndex];
+		PortalViewIDNode_t* pPixelVisNode = m_PortalViewIDNodeChain[m_iViewRecursionLevel - 1]->ChildNodes[m_pRenderingViewForPortal->GetPortalViewIDNodeIndex()];
 
 		if (pPixelVisNode->fScreenFilledByPortalSurfaceLastFrame_Normalized >= 0.0f)
 		{
@@ -7604,8 +7600,8 @@ void CViewRender::EnteredPortal(CPortalRenderable* pEnteredPortal)
 
 	int iNodeLinkCount = m_HeadPortalViewIDNode.ChildNodes.Count();
 
-	PortalViewIDNode_t* pNewHead = m_HeadPortalViewIDNode.ChildNodes[pEnteredPortal->m_iPortalViewIDNodeIndex];
-	m_HeadPortalViewIDNode.ChildNodes[pEnteredPortal->m_iPortalViewIDNodeIndex] = NULL;
+	PortalViewIDNode_t* pNewHead = m_HeadPortalViewIDNode.ChildNodes[pEnteredPortal->GetPortalViewIDNodeIndex()];
+	m_HeadPortalViewIDNode.ChildNodes[pEnteredPortal->GetPortalViewIDNodeIndex()] = NULL;
 
 	//Create a new node that will preserve main's visibility. This new node will be linked to the new head node at the exit portal's index (imagine entering a portal walking backwards)
 	PortalViewIDNode_t* pExitPortalsNewNode = AllocPortalViewIDNode(iNodeLinkCount);
@@ -7625,7 +7621,7 @@ void CViewRender::EnteredPortal(CPortalRenderable* pEnteredPortal)
 	if (pNewHead) //it's possible we entered a portal we couldn't see through
 	{
 		Assert(pNewHead->ChildNodes.Count() == m_HeadPortalViewIDNode.ChildNodes.Count());
-		Assert(pNewHead->ChildNodes[pExitPortal->m_iPortalViewIDNodeIndex] == NULL); //seeing out of an exit portal back into itself should be impossible
+		Assert(pNewHead->ChildNodes[pExitPortal->GetPortalViewIDNodeIndex()] == NULL); //seeing out of an exit portal back into itself should be impossible
 
 		for (int i = 0; i != iNodeLinkCount; ++i)
 		{
@@ -7640,8 +7636,8 @@ void CViewRender::EnteredPortal(CPortalRenderable* pEnteredPortal)
 		FreePortalViewIDNode(pNewHead);
 	}
 
-	Assert(m_HeadPortalViewIDNode.ChildNodes[pExitPortal->m_iPortalViewIDNodeIndex] == NULL); //asserted above in pNewHead code, but call me paranoid
-	m_HeadPortalViewIDNode.ChildNodes[pExitPortal->m_iPortalViewIDNodeIndex] = pExitPortalsNewNode;
+	Assert(m_HeadPortalViewIDNode.ChildNodes[pExitPortal->GetPortalViewIDNodeIndex()] == NULL); //asserted above in pNewHead code, but call me paranoid
+	m_HeadPortalViewIDNode.ChildNodes[pExitPortal->GetPortalViewIDNodeIndex()] = pExitPortalsNewNode;
 
 	//Because pixel visibility is based off of *last* frame's visibility. We can get cases where a certain portal
 	//wasn't visible last frame, but is takes up most of the screen this frame.
@@ -7684,10 +7680,10 @@ bool CViewRender::DrawPortalsUsingStencils()
 			if (!bIsVisible)
 			{
 				//can't see through the portal, free up it's view id node for use elsewhere
-				if (m_PortalViewIDNodeChain[m_iViewRecursionLevel]->ChildNodes[pPortalRenderable->m_iPortalViewIDNodeIndex] != NULL)
+				if (m_PortalViewIDNodeChain[m_iViewRecursionLevel]->ChildNodes[pPortalRenderable->GetPortalViewIDNodeIndex()] != NULL)
 				{
-					FreePortalViewIDNode(m_PortalViewIDNodeChain[m_iViewRecursionLevel]->ChildNodes[pPortalRenderable->m_iPortalViewIDNodeIndex]);
-					m_PortalViewIDNodeChain[m_iViewRecursionLevel]->ChildNodes[pPortalRenderable->m_iPortalViewIDNodeIndex] = NULL;
+					FreePortalViewIDNode(m_PortalViewIDNodeChain[m_iViewRecursionLevel]->ChildNodes[pPortalRenderable->GetPortalViewIDNodeIndex()]);
+					m_PortalViewIDNodeChain[m_iViewRecursionLevel]->ChildNodes[pPortalRenderable->GetPortalViewIDNodeIndex()] = NULL;
 				}
 
 				continue;
@@ -7774,20 +7770,20 @@ bool CViewRender::DrawPortalsUsingStencils()
 			(pCurrentPortal->ShouldUpdatePortalView_BasedOnView(*pViewSetup, m_RecursiveViewComplexFrustums[m_iViewRecursionLevel]) == false))
 		{
 			//can't see through the portal, free up it's view id node for use elsewhere
-			if (m_PortalViewIDNodeChain[m_iViewRecursionLevel]->ChildNodes[pCurrentPortal->m_iPortalViewIDNodeIndex] != NULL)
+			if (m_PortalViewIDNodeChain[m_iViewRecursionLevel]->ChildNodes[pCurrentPortal->GetPortalViewIDNodeIndex()] != NULL)
 			{
-				FreePortalViewIDNode(m_PortalViewIDNodeChain[m_iViewRecursionLevel]->ChildNodes[pCurrentPortal->m_iPortalViewIDNodeIndex]);
-				m_PortalViewIDNodeChain[m_iViewRecursionLevel]->ChildNodes[pCurrentPortal->m_iPortalViewIDNodeIndex] = NULL;
+				FreePortalViewIDNode(m_PortalViewIDNodeChain[m_iViewRecursionLevel]->ChildNodes[pCurrentPortal->GetPortalViewIDNodeIndex()]);
+				m_PortalViewIDNodeChain[m_iViewRecursionLevel]->ChildNodes[pCurrentPortal->GetPortalViewIDNodeIndex()] = NULL;
 			}
 			continue;
 		}
 
-		Assert(m_PortalViewIDNodeChain[m_iViewRecursionLevel]->ChildNodes.Count() > pCurrentPortal->m_iPortalViewIDNodeIndex);
+		Assert(m_PortalViewIDNodeChain[m_iViewRecursionLevel]->ChildNodes.Count() > pCurrentPortal->GetPortalViewIDNodeIndex());
 
-		if (m_PortalViewIDNodeChain[m_iViewRecursionLevel]->ChildNodes[pCurrentPortal->m_iPortalViewIDNodeIndex] == NULL)
-			m_PortalViewIDNodeChain[m_iViewRecursionLevel]->ChildNodes[pCurrentPortal->m_iPortalViewIDNodeIndex] = AllocPortalViewIDNode(m_HeadPortalViewIDNode.ChildNodes.Count());
+		if (m_PortalViewIDNodeChain[m_iViewRecursionLevel]->ChildNodes[pCurrentPortal->GetPortalViewIDNodeIndex()] == NULL)
+			m_PortalViewIDNodeChain[m_iViewRecursionLevel]->ChildNodes[pCurrentPortal->GetPortalViewIDNodeIndex()] = AllocPortalViewIDNode(m_HeadPortalViewIDNode.ChildNodes.Count());
 
-		PortalViewIDNode_t* pCurrentPortalViewNode = m_PortalViewIDNodeChain[m_iViewRecursionLevel]->ChildNodes[pCurrentPortal->m_iPortalViewIDNodeIndex];
+		PortalViewIDNode_t* pCurrentPortalViewNode = m_PortalViewIDNodeChain[m_iViewRecursionLevel]->ChildNodes[pCurrentPortal->GetPortalViewIDNodeIndex()];
 
 		// Step 0, Allow for special effects to happen before cutting a hole
 		{
@@ -7843,11 +7839,11 @@ bool CViewRender::DrawPortalsUsingStencils()
 				pRenderContext->GetFogDistances(&fFogStartBackup, &fFogEndBackup, &fFogZBackup);
 				CGlowOverlay::BackupSkyOverlayData(m_iViewRecursionLevel);
 
-				Assert(m_PortalViewIDNodeChain[m_iViewRecursionLevel]->ChildNodes.Count() > pCurrentPortal->m_iPortalViewIDNodeIndex);
+				Assert(m_PortalViewIDNodeChain[m_iViewRecursionLevel]->ChildNodes.Count() > pCurrentPortal->GetPortalViewIDNodeIndex());
 
-				m_PortalViewIDNodeChain[m_iViewRecursionLevel + 1] = m_PortalViewIDNodeChain[m_iViewRecursionLevel]->ChildNodes[pCurrentPortal->m_iPortalViewIDNodeIndex];
+				m_PortalViewIDNodeChain[m_iViewRecursionLevel + 1] = m_PortalViewIDNodeChain[m_iViewRecursionLevel]->ChildNodes[pCurrentPortal->GetPortalViewIDNodeIndex()];
 
-				pCurrentPortal->RenderPortalViewToBackBuffer(this, *pViewSetup);
+				pCurrentPortal->RenderPortalViewToBackBuffer(*pViewSetup);
 
 				m_PortalViewIDNodeChain[m_iViewRecursionLevel + 1] = NULL;
 
@@ -7972,22 +7968,22 @@ void CViewRender::DrawPortalsToTextures(const CViewSetup& cameraView)
 			(pCurrentPortal->GetLinkedPortal() == NULL))
 		{
 			//can't see through the portal, free up it's view id node for use elsewhere
-			if (m_PortalViewIDNodeChain[m_iViewRecursionLevel]->ChildNodes[pCurrentPortal->m_iPortalViewIDNodeIndex] != NULL)
+			if (m_PortalViewIDNodeChain[m_iViewRecursionLevel]->ChildNodes[pCurrentPortal->GetPortalViewIDNodeIndex()] != NULL)
 			{
-				FreePortalViewIDNode(m_PortalViewIDNodeChain[m_iViewRecursionLevel]->ChildNodes[pCurrentPortal->m_iPortalViewIDNodeIndex]);
-				m_PortalViewIDNodeChain[m_iViewRecursionLevel]->ChildNodes[pCurrentPortal->m_iPortalViewIDNodeIndex] = NULL;
+				FreePortalViewIDNode(m_PortalViewIDNodeChain[m_iViewRecursionLevel]->ChildNodes[pCurrentPortal->GetPortalViewIDNodeIndex()]);
+				m_PortalViewIDNodeChain[m_iViewRecursionLevel]->ChildNodes[pCurrentPortal->GetPortalViewIDNodeIndex()] = NULL;
 			}
 			continue;
 		}
 
-		Assert(m_PortalViewIDNodeChain[m_iViewRecursionLevel]->ChildNodes.Count() > pCurrentPortal->m_iPortalViewIDNodeIndex);
+		Assert(m_PortalViewIDNodeChain[m_iViewRecursionLevel]->ChildNodes.Count() > pCurrentPortal->GetPortalViewIDNodeIndex());
 
-		if (m_PortalViewIDNodeChain[m_iViewRecursionLevel]->ChildNodes[pCurrentPortal->m_iPortalViewIDNodeIndex] == NULL)
-			m_PortalViewIDNodeChain[m_iViewRecursionLevel]->ChildNodes[pCurrentPortal->m_iPortalViewIDNodeIndex] = AllocPortalViewIDNode(m_HeadPortalViewIDNode.ChildNodes.Count());
+		if (m_PortalViewIDNodeChain[m_iViewRecursionLevel]->ChildNodes[pCurrentPortal->GetPortalViewIDNodeIndex()] == NULL)
+			m_PortalViewIDNodeChain[m_iViewRecursionLevel]->ChildNodes[pCurrentPortal->GetPortalViewIDNodeIndex()] = AllocPortalViewIDNode(m_HeadPortalViewIDNode.ChildNodes.Count());
 
-		m_PortalViewIDNodeChain[m_iViewRecursionLevel + 1] = m_PortalViewIDNodeChain[m_iViewRecursionLevel]->ChildNodes[pCurrentPortal->m_iPortalViewIDNodeIndex];
+		m_PortalViewIDNodeChain[m_iViewRecursionLevel + 1] = m_PortalViewIDNodeChain[m_iViewRecursionLevel]->ChildNodes[pCurrentPortal->GetPortalViewIDNodeIndex()];
 
-		pCurrentPortal->RenderPortalViewToTexture(this, cameraView);
+		pCurrentPortal->RenderPortalViewToTexture(cameraView);
 
 		m_PortalViewIDNodeChain[m_iViewRecursionLevel + 1] = NULL;
 	}
@@ -8053,7 +8049,7 @@ int CViewRender::GetViewRecursionLevel() const
 //-----------------------------------------------------------------------------
 float CViewRender::GetPixelVisilityForPortalSurface(const CPortalRenderable* pPortal) const
 {
-	PortalViewIDNode_t* pNode = m_PortalViewIDNodeChain[m_iViewRecursionLevel]->ChildNodes[pPortal->m_iPortalViewIDNodeIndex];
+	PortalViewIDNode_t* pNode = m_PortalViewIDNodeChain[m_iViewRecursionLevel]->ChildNodes[pPortal->GetPortalViewIDNodeIndex()];
 	if (pNode)
 		return pNode->fScreenFilledByPortalSurfaceLastFrame_Normalized;
 

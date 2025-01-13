@@ -11,7 +11,7 @@
 #include "filesystem.h"
 #include "tier0/icommandline.h"
 #include "vgui_controls/Button.h"
-#include "viewrender.h"
+#include "iviewrender.h"
 
 #define STB_RECT_PACK_IMPLEMENTATION
 #include "stb_rect_pack.h"

@@ -15,6 +15,10 @@
 //-----------------------------------------------------------------------------
 
 class IViewRender;
+class CViewSetup;
+class IMaterialSystem;
+class IVTFTexture;
+class ITexture;
 
 //-----------------------------------------------------------------------------
 

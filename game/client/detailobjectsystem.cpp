@@ -33,7 +33,7 @@
 #include "clientleafsystem.h"
 #include "sharedInterface.h"
 #include "cdll_client_int.h"
-#include "viewrender.h"
+#include "iviewrender.h"
 #include "clientmode.h"
 #include "detailobjectsystem.h"
 //#include "c_baseplayer.h"

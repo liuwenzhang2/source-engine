@@ -10,7 +10,7 @@
 #include "model_types.h"
 #include "hud.h"
 #include "view_shared.h"
-#include "viewrender.h"
+#include "iviewrender.h"
 #include "mathlib/vmatrix.h"
 #include "cl_animevent.h"
 #include "eventlist.h"

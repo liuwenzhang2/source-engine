@@ -18,7 +18,7 @@
 #include "steam/steam_api.h"
 //#include "initializer.h"
 #include "smoke_fog_overlay.h"
-#include "viewrender.h"
+#include "iviewrender.h"
 #include "ienginevgui.h"
 #include "iefx.h"
 #include "enginesprite.h"

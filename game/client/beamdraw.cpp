@@ -10,7 +10,7 @@
 #include "beamdraw.h"
 #include "enginesprite.h"
 #include "iviewrender_beams.h"
-#include "viewrender.h"
+#include "iviewrender.h"
 #include "engine/ivmodelinfo.h"
 #include "fx_line.h"
 #include "materialsystem/imaterialvar.h"

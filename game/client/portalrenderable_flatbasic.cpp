@@ -420,7 +420,7 @@ bool CPortalRenderable_FlatBasic::CalcFrustumThroughPortal( const Vector &ptCurr
 
 
 
-void CPortalRenderable_FlatBasic::RenderPortalViewToBackBuffer( CViewRender *pViewRender, const CViewSetup &cameraView )
+void CPortalRenderable_FlatBasic::RenderPortalViewToBackBuffer( const CViewSetup &cameraView )
 {
 	VPROF( "CPortalRenderable_FlatBasic::RenderPortalViewToBackBuffer" );
 
@@ -431,7 +431,7 @@ void CPortalRenderable_FlatBasic::RenderPortalViewToBackBuffer( CViewRender *pVi
 		return;
 
 	Frustum FrustumBackup;
-	memcpy( FrustumBackup, pViewRender->GetFrustum(), sizeof( Frustum ) );
+	memcpy( FrustumBackup, g_pViewRender->GetFrustum(), sizeof( Frustum ) );
 
 	Frustum seeThroughFrustum;
 	bool bUseSeeThroughFrustum;
@@ -465,7 +465,7 @@ void CPortalRenderable_FlatBasic::RenderPortalViewToBackBuffer( CViewRender *pVi
 	portalView.m_bOrtho = false;
 	portalView.m_flAspectRatio = cameraView.m_flAspectRatio;
 
-	CopyToCurrentView( pViewRender, portalView );
+	g_pViewRender->CopyToCurrentView( portalView );
 
 	CMatRenderContextPtr pRenderContext( materials );
 
@@ -483,22 +483,24 @@ void CPortalRenderable_FlatBasic::RenderPortalViewToBackBuffer( CViewRender *pVi
 	{
 		ViewCustomVisibility_t customVisibility;
 		GetLinkedPortal()->AddToVisAsExitPortal( &customVisibility );
-		render->Push3DView( portalView, 0, NULL, pViewRender->GetFrustum() );		
+		render->Push3DView( portalView, 0, NULL, g_pViewRender->GetFrustum() );
 		{
 			if( bUseSeeThroughFrustum)
-				memcpy( pViewRender->GetFrustum(), seeThroughFrustum, sizeof( Frustum ) );
+				memcpy(g_pViewRender->GetFrustum(), seeThroughFrustum, sizeof( Frustum ) );
 
-			render->OverrideViewFrustum( pViewRender->GetFrustum() );
-			SetViewRecursionLevel(g_pViewRender->GetViewRecursionLevel() + 1 );
+			render->OverrideViewFrustum(g_pViewRender->GetFrustum() );
+			g_pViewRender->SetViewRecursionLevel(g_pViewRender->GetViewRecursionLevel() + 1 );
 
 			CPortalRenderable *pRenderingViewForPortalBackup = g_pViewRender->GetCurrentViewEntryPortal();
 			CPortalRenderable *pRenderingViewExitPortalBackup = g_pViewRender->GetCurrentViewExitPortal();
-			SetViewEntranceAndExitPortals( this, GetLinkedPortal() );
+			g_pViewRender->SetRenderingViewForPortal(this);
+			g_pViewRender->SetRenderingViewExitPortal(GetLinkedPortal());
 
 			//DRAW!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-			ViewDrawScene_PortalStencil( pViewRender, portalView, &customVisibility );
+			g_pViewRender->ViewDrawScene_PortalStencil( portalView, &customVisibility );
 
-			SetViewEntranceAndExitPortals( pRenderingViewForPortalBackup, pRenderingViewExitPortalBackup );
+			g_pViewRender->SetRenderingViewForPortal(pRenderingViewForPortalBackup);
+			g_pViewRender->SetRenderingViewExitPortal(pRenderingViewExitPortalBackup);
 
 			if( m_InternallyMaintainedData.m_bUsableDepthDoublerConfiguration && (g_pViewRender->GetRemainingPortalViewDepth() == 1) )
 			{
@@ -508,23 +510,23 @@ void CPortalRenderable_FlatBasic::RenderPortalViewToBackBuffer( CViewRender *pVi
 				pRenderContext->GetVMatrix( MATERIAL_VIEW, &m_InternallyMaintainedData.m_DepthDoublerTextureView );
 			}
 
-			SetViewRecursionLevel(g_pViewRender->GetViewRecursionLevel() - 1 );
+			g_pViewRender->SetViewRecursionLevel(g_pViewRender->GetViewRecursionLevel() - 1 );
 		}
-		render->PopView( pViewRender->GetFrustum() );
+		render->PopView(g_pViewRender->GetFrustum() );
 
 		//restore old frustum
-		memcpy( pViewRender->GetFrustum(), FrustumBackup, sizeof( Frustum ) );
+		memcpy(g_pViewRender->GetFrustum(), FrustumBackup, sizeof( Frustum ) );
 		render->OverrideViewFrustum( FrustumBackup );
 	}
 
 	pRenderContext->PopCustomClipPlane();
 
 	//restore old vis data
-	CopyToCurrentView( pViewRender, cameraView );
+	g_pViewRender->CopyToCurrentView( cameraView );
 }
 
 
-void CPortalRenderable_FlatBasic::RenderPortalViewToTexture( CViewRender *pViewRender, const CViewSetup &cameraView )
+void CPortalRenderable_FlatBasic::RenderPortalViewToTexture( const CViewSetup &cameraView )
 {
 	if( m_fStaticAmount == 1.0f )
 		return; //not going to see anything anyways
@@ -565,7 +567,7 @@ void CPortalRenderable_FlatBasic::RenderPortalViewToTexture( CViewRender *pViewR
 
 	CViewSetup portalView = cameraView;
 	Frustum frustumBackup;
-	memcpy( frustumBackup, pViewRender->GetFrustum(), sizeof( Frustum ) );
+	memcpy( frustumBackup, g_pViewRender->GetFrustum(), sizeof( Frustum ) );
 
 	QAngle qPOVAngles = TransformAnglesToWorldSpace( cameraView.angles, MatrixThisToLinked().As3x4());
 
@@ -590,54 +592,56 @@ void CPortalRenderable_FlatBasic::RenderPortalViewToTexture( CViewRender *pViewR
 	pRenderContext->PushCustomClipPlane( fCustomClipPlane );
 
 	{
-		render->Push3DView( portalView, VIEW_CLEAR_DEPTH, pRenderTarget, pViewRender->GetFrustum() );
+		render->Push3DView( portalView, VIEW_CLEAR_DEPTH, pRenderTarget, g_pViewRender->GetFrustum() );
 
 		{
 			ViewCustomVisibility_t customVisibility;
 			GetLinkedPortal()->AddToVisAsExitPortal( &customVisibility );
 
-			SetRemainingViewDepth( 0 );
-			SetViewRecursionLevel( 1 );
+			g_pViewRender->SetRemainingPortalViewDepth( 0 );
+			g_pViewRender->SetViewRecursionLevel( 1 );
 
 			CPortalRenderable *pRenderingViewForPortalBackup = g_pViewRender->GetCurrentViewEntryPortal();
 			CPortalRenderable *pRenderingViewExitPortalBackup = g_pViewRender->GetCurrentViewExitPortal();
-			SetViewEntranceAndExitPortals( this, GetLinkedPortal() );
+			g_pViewRender->SetRenderingViewForPortal(this);
+			g_pViewRender->SetRenderingViewExitPortal(GetLinkedPortal());
 
 			bool bDrew3dSkybox = false;
 			SkyboxVisibility_t nSkyboxVisible = SKYBOX_NOT_VISIBLE;
 
 			// if the 3d skybox world is drawn, then don't draw the normal skybox
 			int nClearFlags = 0;
-			Draw3dSkyboxworld_Portal( pViewRender, portalView, nClearFlags, bDrew3dSkybox, nSkyboxVisible, pRenderTarget );
+			g_pViewRender->Draw3dSkyboxworld_Portal( portalView, nClearFlags, bDrew3dSkybox, nSkyboxVisible, pRenderTarget );
 
 			if( bUseSeeThroughFrustum )
 			{
-				memcpy( pViewRender->GetFrustum(), seeThroughFrustum, sizeof( Frustum ) );
+				memcpy(g_pViewRender->GetFrustum(), seeThroughFrustum, sizeof( Frustum ) );
 			}
 
-			render->OverrideViewFrustum( pViewRender->GetFrustum() );
+			render->OverrideViewFrustum(g_pViewRender->GetFrustum() );
 
 			pRenderContext->EnableUserClipTransformOverride( false );
 
-			ViewDrawScene( pViewRender, bDrew3dSkybox, nSkyboxVisible, portalView, nClearFlags, (view_id_t)g_pViewRender->GetCurrentViewId(), false, 0, &customVisibility );
+			g_pViewRender->ViewDrawScene( bDrew3dSkybox, nSkyboxVisible, portalView, nClearFlags, (view_id_t)g_pViewRender->GetCurrentViewId(), false, 0, &customVisibility );
 
-			SetViewEntranceAndExitPortals( pRenderingViewForPortalBackup, pRenderingViewExitPortalBackup );
+			g_pViewRender->SetRenderingViewForPortal(pRenderingViewForPortalBackup);
+			g_pViewRender->SetRenderingViewExitPortal(pRenderingViewExitPortalBackup);
 
-			SetRemainingViewDepth( 1 );
-			SetViewRecursionLevel( 0 );
+			g_pViewRender->SetRemainingPortalViewDepth( 1 );
+			g_pViewRender->SetViewRecursionLevel( 0 );
 
-			memcpy( pViewRender->GetFrustum(), frustumBackup, sizeof( Frustum ) );
-			render->OverrideViewFrustum( pViewRender->GetFrustum() );
+			memcpy(g_pViewRender->GetFrustum(), frustumBackup, sizeof( Frustum ) );
+			render->OverrideViewFrustum(g_pViewRender->GetFrustum() );
 		}
 
-		render->PopView( pViewRender->GetFrustum() );
+		render->PopView(g_pViewRender->GetFrustum() );
 	}
 
 	pRenderContext->PopCustomClipPlane();
 
 	//pRenderContext->Flush( false );
 
-	CopyToCurrentView( pViewRender, cameraView );
+	g_pViewRender->CopyToCurrentView( cameraView );
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

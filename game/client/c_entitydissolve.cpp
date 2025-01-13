@@ -7,7 +7,7 @@
 
 #include "cbase.h"
 
-#include "viewrender.h"
+#include "iviewrender.h"
 #include "studio.h"
 #include "bone_setup.h"
 #include "model_types.h"

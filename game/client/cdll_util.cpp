@@ -25,7 +25,7 @@
 #include <vgui_controls/Controls.h>
 #include <vgui/ISurface.h>
 #include <vgui/ILocalize.h>
-#include "viewrender.h"
+#include "iviewrender.h"
 #include "ixboxsystem.h"
 #include "cdll_util.h"
 

@@ -9,7 +9,7 @@
 #include "particles_simple.h"
 #include "iefx.h"
 #include "dlight.h"
-#include "viewrender.h"
+#include "iviewrender.h"
 #include "fx.h"
 #include "clientsideeffects.h"
 #include "c_pixel_visibility.h"

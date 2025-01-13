@@ -18,9 +18,6 @@
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
-extern const ConVar *sv_cheats;
-
-
 CUtlVector< C_PropPortalStatsDisplay* > g_PropPortalStatsDisplays;
 
 
@@ -109,11 +106,8 @@ void C_PropPortalStatsDisplay::ClientThink( void )
 	// Remembers if the player has cheated
 	// This doesn't persist across save/loads, 
 	// this is only to prevent players from accidentally wiping their stats while no clipping through a map
-	if ( !sv_cheats )
-	{
-		sv_cheats = cvar->FindVar( "sv_cheats" );
-	}
-	if ( sv_cheats && sv_cheats->GetInt() != 0 )
+	ConVarRef sv_cheats("sv_cheats");
+	if ( sv_cheats.IsValid() && sv_cheats.GetInt() != 0)
 		m_bHasCheated = true;
 
 	if ( !m_bEnabled )

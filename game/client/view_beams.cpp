@@ -20,7 +20,7 @@
 #include "c_pixel_visibility.h"
 #include "iviewrender.h"
 #include "view_shared.h"
-#include "viewrender.h"
+#include "iviewrender.h"
 
 #ifdef PORTAL
 	#include "prop_portal_shared.h"

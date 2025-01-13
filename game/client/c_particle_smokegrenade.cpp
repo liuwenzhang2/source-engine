@@ -9,7 +9,7 @@
 #include "c_smoke_trail.h"
 #include "smoke_fog_overlay.h"
 #include "engine/IEngineTrace.h"
-#include "viewrender.h"
+#include "iviewrender.h"
 #include "dlight.h"
 #include "iefx.h"
 #include "tier1/KeyValues.h"

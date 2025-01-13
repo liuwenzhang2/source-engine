@@ -17,7 +17,7 @@
 #include "c_rope.h"
 #include "fx_line.h"
 #include "c_sprite.h"
-#include "viewrender.h"
+#include "iviewrender.h"
 #include "view_scene.h"
 #include "materialsystem/imaterialvar.h"
 #include "simple_keys.h"

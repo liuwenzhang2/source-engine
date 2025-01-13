@@ -16,7 +16,7 @@
 #include "toolframework/itoolframework.h"
 #include "tier1/KeyValues.h"
 #include "view_scene.h"
-#include "viewrender.h"
+#include "iviewrender.h"
 #include "vprof.h"
 
 CLIENTEFFECT_REGISTER_BEGIN( PrecachePortalDrawingMaterials )
@@ -88,7 +88,6 @@ CPortalRenderable::~CPortalRenderable( void )
 	RemovePortalViewIDChildLinkIndex( &g_pViewRender->GetHeadPortalViewIDNode(), m_iPortalViewIDNodeIndex); //does the same transplant operation as above to all portal view id nodes
 }
 
-
 void CPortalRenderable::BeginPortalPixelVisibilityQuery( void )
 {
 #ifndef TEMP_DISABLE_PORTAL_VIS_QUERY
@@ -130,6 +129,11 @@ void CPortalRenderable::EndPortalPixelVisibilityQuery( void )
 	}
 }
 
+inline CPortalRenderable* CPortalRenderable::FindRecordedPortal(int nPortalId)
+{
+	return g_pViewRender->FindRecordedPortal(nPortalId);
+}
+
 void CPortalRenderable::ShiftFogForExitPortalView() const
 {
 	CMatRenderContextPtr pRenderContext( materials );
@@ -149,7 +153,10 @@ void CPortalRenderable::ShiftFogForExitPortalView() const
 	pRenderContext->SetFogZ( fFogZ );
 }
 
-
+CPortalRenderableCreator::CPortalRenderableCreator(const char* szPortalType, PortalRenderableCreationFunc creationFunction)
+{
+	if (g_pViewRender) g_pViewRender->AddPortalCreationFunc(szPortalType, creationFunction);
+}
 
 
 

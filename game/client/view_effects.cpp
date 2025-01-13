@@ -11,7 +11,7 @@
 #include "isaverestore.h"
 #include "view_shared.h"
 #include "iviewrender.h"
-#include "viewrender.h"
+#include "iviewrender.h"
 #include "con_nprint.h"
 #include "saverestoretypes.h"
 #include "c_rumble.h"

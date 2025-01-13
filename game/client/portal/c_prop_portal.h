@@ -15,7 +15,7 @@
 #include "portalrenderable_flatbasic.h"
 #include "iviewrender.h"
 #include "view_shared.h"
-#include "viewrender.h"
+#include "iviewrender.h"
 //#include "PortalSimulation.h"
 #include "C_PortalGhostRenderable.h" 
 

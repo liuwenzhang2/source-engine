@@ -14,7 +14,7 @@
 #if defined( CLIENT_DLL )
 	#include "enginesprite.h"
 	#include "iclientmode.h"
-	#include "viewrender.h"
+	#include "iviewrender.h"
 	#include "c_baseviewmodel.h"
 #	ifdef PORTAL
 		#include "c_prop_portal.h"

@@ -12,7 +12,7 @@
 #include "props_shared.h"
 #include "c_te_effect_dispatch.h"
 #include "datacache/imdlcache.h"
-#include "viewrender.h"
+#include "iviewrender.h"
 #include "tier0/vprof.h"
 
 // memdbgon must be the last include file in a .cpp file!!!

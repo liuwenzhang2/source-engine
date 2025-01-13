@@ -18,9 +18,6 @@ static Vector CAM_HULL_MAX( CAM_HULL_OFFSET, CAM_HULL_OFFSET, CAM_HULL_OFFSET);
 
 #include "input.h"
 
-
-extern const ConVar *sv_cheats;
-
 extern ConVar cam_idealdist;
 extern ConVar cam_idealdistright;
 extern ConVar cam_idealdistup;
@@ -73,13 +70,9 @@ void CThirdPersonManager::Update( void )
 {
 
 #ifdef CLIENT_DLL
-	if ( !sv_cheats )
-	{
-		sv_cheats = cvar->FindVar( "sv_cheats" );
-	}
-
 	// If cheats have been disabled, pull us back out of third-person view.
-	if ( sv_cheats && !sv_cheats->GetBool() && GameRules() && GameRules()->AllowThirdPersonCamera() == false )
+	ConVarRef sv_cheats("sv_cheats");
+	if ( sv_cheats.IsValid() && !sv_cheats.GetBool() && GameRules() && GameRules()->AllowThirdPersonCamera() == false)
 	{
 		if ( (bool)input->CAM_IsThirdPerson() == true )
 		{

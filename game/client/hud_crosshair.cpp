@@ -9,7 +9,7 @@
 #include "hud.h"
 #include "hud_crosshair.h"
 #include "iclientmode.h"
-#include "viewrender.h"
+#include "iviewrender.h"
 #include "vgui_controls/Controls.h"
 #include "vgui/ISurface.h"
 #include "materialsystem/imaterialsystem.h"

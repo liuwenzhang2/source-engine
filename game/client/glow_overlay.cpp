@@ -5,7 +5,7 @@
 // $NoKeywords: $
 //=============================================================================//
 #include "cbase.h"
-#include "viewrender.h"
+#include "iviewrender.h"
 #include "c_sun.h"
 #include "particles_simple.h"
 #include "clienteffectprecachesystem.h"

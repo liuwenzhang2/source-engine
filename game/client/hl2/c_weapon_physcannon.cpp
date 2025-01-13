@@ -9,7 +9,7 @@
 #include "c_basehlcombatweapon.h"
 #include "fx.h"
 #include "particles_localspace.h"
-#include "viewrender.h"
+#include "iviewrender.h"
 #include "particles_attractor.h"
 
 class C_WeaponPhysCannon: public C_BaseHLCombatWeapon

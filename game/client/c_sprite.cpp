@@ -15,7 +15,7 @@
 #include "materialsystem/imaterial.h"
 #include "materialsystem/imaterialvar.h"
 #include "view_shared.h"
-#include "viewrender.h"
+#include "iviewrender.h"
 #include "tier1/KeyValues.h"
 #include "toolframework/itoolframework.h"
 #include "toolframework_client.h"
