@@ -5674,7 +5674,7 @@ void CRendering3dView::DrawTranslucentRenderables( bool bInSkybox, bool bShadowD
 			//done recursing in, time to go back out and do translucents
 			CMatRenderContextPtr pRenderContext( materials );		
 
-			UpdateFullScreenDepthTexture();
+			m_pMainView->UpdateFullScreenDepthTexture();
 		}
 	}
 #else
