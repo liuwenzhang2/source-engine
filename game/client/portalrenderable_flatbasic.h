@@ -33,12 +33,18 @@ struct FlatBasicPortalRenderingMaterials_t
 };
 
 //As seen in "Portal"
-class CPortalRenderable_FlatBasic : public CPortalSimulator// , public CPortalRenderable
+class CPortalRenderable_FlatBasic : public C_PortalSimulator, public CPortalRenderable
 {
-	DECLARE_CLASS( CPortalRenderable_FlatBasic, CPortalSimulator);
+	DECLARE_CLASS( CPortalRenderable_FlatBasic, C_PortalSimulator);
 
 public:
 	CPortalRenderable_FlatBasic( void );
+
+	virtual IClientEntity* GetClientEntity() { return this; }
+	virtual CPortalRenderable_FlatBasic* GetLinkedPortal() { return (CPortalRenderable_FlatBasic*)C_PortalSimulator::GetLinkedPortal(); }
+	virtual const VMatrix& MatrixThisToLinked() const {
+		return BaseClass::MatrixThisToLinked();
+	}
 
 	//generates a 8x6 tiled set of quads, each clipped to the view frustum. Helps vs11/ps11 portal shaders interpolate correctly. Not necessary for vs20/ps20 portal shaders or stencil mode.
 	virtual void	DrawComplexPortalMesh( const IMaterial *pMaterialOverride = NULL, float fForwardOffsetModifier = 0.25f ); 
@@ -76,7 +82,6 @@ public:
 
 	bool			WillUseDepthDoublerThisDraw( void ) const; //returns true if the DrawPortal() would draw a depth doubler mesh if you were to call it right now
 
-	virtual CPortalRenderable_FlatBasic* GetLinkedPortal() { return (CPortalRenderable_FlatBasic*)CPortalSimulator::GetLinkedPortal(); }
 	bool			CalcFrustumThroughPortal( const Vector &ptCurrentViewOrigin, Frustum OutputFrustum );
 
 protected:

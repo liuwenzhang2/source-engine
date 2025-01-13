@@ -7,8 +7,8 @@
 
 #include "cbase.h"
 #include "prop_portal.h"
-#include "portal_player.h"
-#include "portal/weapon_physcannon.h"
+//#include "portal_player.h"
+//#include "portal/weapon_physcannon.h"
 #include "physics_npc_solver.h"
 #include "envmicrophone.h"
 #include "env_speaker.h"
@@ -851,6 +851,17 @@ bool CProp_Portal::ShouldTeleportTouchingEntity( CBaseEntity *pOther )
 	}
 
 	return false;
+}
+
+void UpdateGrabControllerTargetPosition(CBasePlayer* pPlayer, Vector* vPosition, QAngle* qAngles)
+{
+	IGrabControllerServer* pGrabController = pPlayer->GetGrabController();
+
+	if (!pGrabController)
+		return;
+
+	pGrabController->UpdateObject(pPlayer, 12);
+	pGrabController->GetTargetPosition(vPosition, qAngles);
 }
 
 void CProp_Portal::TeleportTouchingEntity( CBaseEntity *pOther )

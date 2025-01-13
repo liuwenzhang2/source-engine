@@ -88,7 +88,6 @@ public:
 	virtual Vector			EyePosition();
 	Vector					EyeFootPosition( const QAngle &qEyeAngles );//interpolates between eyes and feet based on view angle roll
 	inline Vector			EyeFootPosition( void ) { return EyeFootPosition( EyeAngles() ); }; 
-	void					PlayerPortalled( C_Prop_Portal *pEnteredPortal );
 
 	virtual void	CalcView( Vector &eyeOrigin, QAngle &eyeAngles, float &zNear, float &zFar, float &fov );
 	void			CalcPortalView( Vector &eyeOrigin, QAngle &eyeAngles );
@@ -190,9 +189,6 @@ private:
 
 	ClientCCHandle_t	m_CCDeathHandle;	// handle to death cc effect
 	float				m_flDeathCCWeight;	// for fading in cc effect	
-
-	bool	m_bPortalledMessagePending; //Player portalled. It's easier to wait until we get a OnDataChanged() event or a CalcView() before we do anything about it. Otherwise bits and pieces can get undone
-	VMatrix m_PendingPortalMatrix;
 
 public:
 	bool	m_bPitchReorientation;

@@ -3838,16 +3838,7 @@ IGrabControllerServer* CPortal_Player::GetGrabController()
 	return NULL;
 }
 
-void UpdateGrabControllerTargetPosition( CBasePlayer *pPlayer, Vector *vPosition, QAngle *qAngles )
-{
-	IGrabControllerServer*pGrabController = pPlayer->GetGrabController();
 
-	if ( !pGrabController )
-		return;
-
-	pGrabController->UpdateObject( pPlayer, 12 );
-	pGrabController->GetTargetPosition( vPosition, qAngles );
-}
 
 
 bool PhysCannonAccountableForObject( CBaseCombatWeapon *pPhysCannon, CBaseEntity *pObject )

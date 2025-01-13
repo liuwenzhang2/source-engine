@@ -139,10 +139,6 @@ bool CPortalSimulator::Init(int entnum, int iSerialNum) {
 	return ret;
 }
 
-void CPortalSimulator::GetToolRecordingState(KeyValues* msg) {
-	BaseClass::GetToolRecordingState(msg);
-	//CPortalRenderable::GetToolRecordingState(m_bActivated, msg);
-}
 #endif // CLIENT_DLL
 
 

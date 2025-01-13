@@ -16,7 +16,7 @@
 #include "iviewrender.h"
 #include "view_shared.h"
 #include "viewrender.h"
-#include "PortalSimulation.h"
+//#include "PortalSimulation.h"
 #include "C_PortalGhostRenderable.h" 
 
 struct dlight_t;
@@ -33,7 +33,7 @@ public:
 
 	// Handle recording for the SFM
 	virtual void GetToolRecordingState( KeyValues *msg );
-	C_Prop_Portal* GetLinkedPortal() { return (C_Prop_Portal*)CPortalSimulator::GetLinkedPortal(); }
+	C_Prop_Portal* GetLinkedPortal() { return (C_Prop_Portal*)CPortalRenderable_FlatBasic::GetLinkedPortal(); }
 	//CHandle<C_Prop_Portal>	m_hLinkedPortal; //the portal this portal is linked to
 	
 	bool					m_bSharedEnvironmentConfiguration; //this will be set by an instance of CPortal_Environment when two environments are in close proximity

@@ -2944,7 +2944,17 @@ void C_BasePlayer::BuildFirstPersonMeathookTransformations( IStudioHdr *hdr, Vec
 	}
 }
 
+void C_BasePlayer::PlayerPortalled(CPortalRenderable_FlatBasic* pEnteredPortal)
+{
+	if (pEnteredPortal)
+	{
+		m_bPortalledMessagePending = true;
+		m_PendingPortalMatrix = pEnteredPortal->MatrixThisToLinked();
 
+		if (IsLocalPlayer())
+			g_pViewRender->EnteredPortal(pEnteredPortal);
+	}
+}
 
 void CC_DumpClientSoundscapeData( const CCommand& args )
 {

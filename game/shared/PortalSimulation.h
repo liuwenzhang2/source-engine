@@ -18,7 +18,6 @@
 #include "tier1/utlvector.h"
 #ifdef CLIENT_DLL
 #include "c_baseanimating.h"
-#include "PortalRender.h"
 #endif // CLIENT_DLL
 #ifdef GAME_DLL
 #include "baseanimating.h"
@@ -63,9 +62,6 @@ private:
 };
 
 class CPortalSimulator : public CBaseAnimating
-#ifdef CLIENT_DLL
-	, public CPortalRenderable
-#endif // CLIENT_DLL
 {
 	DECLARE_CLASS(CPortalSimulator, CBaseEntity);
 public:
@@ -78,8 +74,6 @@ public:
 	static int GetEngineObjectTypeStatic() { return ENGINEOBJECT_PORTAL; }
 #ifdef CLIENT_DLL
 	virtual bool Init(int entnum, int iSerialNum);
-	virtual void GetToolRecordingState(KeyValues* msg);
-	virtual IClientEntity* GetClientEntity() { return this; }
 #endif // CLIENT_DLL
 
 #ifdef GAME_DLL

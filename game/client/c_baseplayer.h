@@ -27,6 +27,7 @@
 #include "c_env_fog_controller.h"
 #include "igameevents.h"
 #include "GameEventListener.h"
+#include "portalrenderable_flatbasic.h"
 
 #if defined USES_ECON_ITEMS
 #include "econ_item.h"
@@ -401,10 +402,13 @@ public:
 
 	virtual bool			CanUseFirstPersonCommand( void ){ return true; }
 	
+	void					PlayerPortalled(CPortalRenderable_FlatBasic* pEnteredPortal);
+
 protected:
 	fogparams_t				m_CurrentFog;
 	EHANDLE					m_hOldFogController;
-
+	bool					m_bPortalledMessagePending; //Player portalled. It's easier to wait until we get a OnDataChanged() event or a CalcView() before we do anything about it. Otherwise bits and pieces can get undone
+	VMatrix					m_PendingPortalMatrix;
 public:
 	int m_StuckLast;
 	

@@ -1021,19 +1021,6 @@ const IEngineObjectClient* C_Portal_Player::GetRepresentativeRagdoll() const
 	}
 }
 
-
-void C_Portal_Player::PlayerPortalled( C_Prop_Portal *pEnteredPortal )
-{
-	if( pEnteredPortal )
-	{
-		m_bPortalledMessagePending = true;
-		m_PendingPortalMatrix = pEnteredPortal->MatrixThisToLinked();
-
-		if( IsLocalPlayer() )
-			g_pViewRender->EnteredPortal( pEnteredPortal );
-	}
-}
-
 void C_Portal_Player::OnPreDataChanged( DataUpdateType_t type )
 {
 	Assert( m_pPortalEnvironment_LastCalcView == GetPortalEnvironment() );
