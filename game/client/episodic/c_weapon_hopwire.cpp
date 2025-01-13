@@ -263,7 +263,7 @@ int C_HopwireExplosion::DrawModel( int flags )
 
 	CMatRenderContextPtr pRenderContext( materials );
 	pRenderContext->Flush();
-	UpdateRefractTexture();
+	g_pViewRender->UpdateRefractTexture();
 
 	IMaterial *pMat = materials->FindMaterial( "effects/strider_pinch_dudv", TEXTURE_GROUP_CLIENT_EFFECTS );
 

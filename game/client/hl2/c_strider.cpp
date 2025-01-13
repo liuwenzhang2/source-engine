@@ -526,7 +526,7 @@ int	C_StriderFX::DrawModel( int )
 		{
 			updated = true;
 			pRenderContext->Flush();
-			UpdateRefractTexture();
+			g_pViewRender->UpdateRefractTexture();
 		}
 
 		IMaterial *pMat = materials->FindMaterial( "effects/strider_pinch_dudv", TEXTURE_GROUP_CLIENT_EFFECTS );
@@ -571,7 +571,7 @@ int	C_StriderFX::DrawModel( int )
 			{
 				updated = true;
 				pRenderContext->Flush();
-				UpdateRefractTexture();
+				g_pViewRender->UpdateRefractTexture();
 			}
 			IMaterial *pMat = materials->FindMaterial( "effects/strider_bulge_dudv", TEXTURE_GROUP_CLIENT_EFFECTS );
 			float refract = endFractionVisible * WARP_BUBBLE_REFRACT * params[STRIDERFX_BUBBLE_REFRACT].x;
