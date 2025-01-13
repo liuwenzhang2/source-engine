@@ -1,4 +1,4 @@
-name: Build
+name: Build-cstrike
 
 on: [push, pull_request]
 
