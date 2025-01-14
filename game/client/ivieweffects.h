@@ -16,6 +16,7 @@
 #pragma once
 #endif
 
+#include "platform.h"
 #include "shake.h"
 
 class Vector;

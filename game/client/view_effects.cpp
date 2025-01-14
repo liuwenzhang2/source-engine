@@ -4,13 +4,14 @@
 //
 // $NoKeywords: $
 //=============================================================================//
-#include "cbase.h"
+//#include "cbase.h"
+#include "cdll_client_int.h"
+#include "sharedInterface.h"
 #include "ivieweffects.h"
 #include "shake.h"
 #include "hud_macros.h"
 #include "isaverestore.h"
 #include "view_shared.h"
-#include "iviewrender.h"
 #include "iviewrender.h"
 #include "con_nprint.h"
 #include "saverestoretypes.h"
