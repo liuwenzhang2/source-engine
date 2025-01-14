@@ -40,7 +40,7 @@ ConVar sv_unlag_fixstuck( "sv_unlag_fixstuck", "0", FCVAR_DEVELOPMENTONLY, "Disa
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-#define MAX_LAYER_RECORDS (CBaseAnimatingOverlay::MAX_OVERLAYS)
+#define MAX_LAYER_RECORDS (CAnimationLayer::MAX_OVERLAYS)
 
 struct LayerRecord
 {

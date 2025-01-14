@@ -19,6 +19,7 @@
 #include "c_entitydissolve.h"
 #include "movevars_shared.h"
 #include "clienteffectprecachesystem.h"
+#include "ragdoll.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"

@@ -45,7 +45,7 @@ BEGIN_RECV_TABLE_NOBASE(CAnimationLayer, DT_Animationlayer)
 	RecvPropInt(	RECVINFO_NAME(m_nOrder, m_nOrder))
 END_RECV_TABLE()
 
-const char *s_m_iv_AnimOverlayNames[C_BaseAnimatingOverlay::MAX_OVERLAYS] =
+const char *s_m_iv_AnimOverlayNames[C_AnimationLayer::MAX_OVERLAYS] =
 {
 	"C_BaseAnimatingOverlay::m_iv_AnimOverlay00",
 	"C_BaseAnimatingOverlay::m_iv_AnimOverlay01",
@@ -72,7 +72,7 @@ void ResizeAnimationLayerCallback( void *pStruct, int offsetToUtlVector, int len
 	
 	Assert( (char*)pVec - (char*)pEnt == offsetToUtlVector );
 	Assert( pVec->Count() == pVecIV->Count() );
-	Assert( pVec->Count() <= C_BaseAnimatingOverlay::MAX_OVERLAYS );
+	Assert( pVec->Count() <= C_AnimationLayer::MAX_OVERLAYS );
 	
 	int diff = len - pVec->Count();
 
@@ -124,7 +124,7 @@ void ResizeAnimationLayerCallback( void *pStruct, int offsetToUtlVector, int len
 BEGIN_RECV_TABLE_NOBASE( C_BaseAnimatingOverlay, DT_OverlayVars )
 	 RecvPropUtlVector( 
 		RECVINFO_UTLVECTOR_SIZEFN( m_AnimOverlay, ResizeAnimationLayerCallback ), 
-		C_BaseAnimatingOverlay::MAX_OVERLAYS,
+		 C_AnimationLayer::MAX_OVERLAYS,
 		RecvPropDataTable(NULL, 0, 0, &REFERENCE_RECV_TABLE( DT_Animationlayer ) ) )
 END_RECV_TABLE()
 
@@ -158,7 +158,7 @@ END_PREDICTION_DATA()
 
 C_AnimationLayer* C_BaseAnimatingOverlay::GetAnimOverlay( int i )
 {
-	Assert( i >= 0 && i < MAX_OVERLAYS );
+	Assert( i >= 0 && i < C_AnimationLayer::MAX_OVERLAYS );
 	return &m_AnimOverlay[i];
 }
 
@@ -309,23 +309,23 @@ void C_BaseAnimatingOverlay::AccumulateLayers( IBoneSetup &boneSetup, Vector pos
 	int i;
 
 	// resort the layers
-	int layer[MAX_OVERLAYS];
-	for (i = 0; i < MAX_OVERLAYS; i++)
+	int layer[C_AnimationLayer::MAX_OVERLAYS];
+	for (i = 0; i < C_AnimationLayer::MAX_OVERLAYS; i++)
 	{
-		layer[i] = MAX_OVERLAYS;
+		layer[i] = C_AnimationLayer::MAX_OVERLAYS;
 	}
 	for (i = 0; i < m_AnimOverlay.Count(); i++)
 	{
-		if (m_AnimOverlay[i].m_nOrder < MAX_OVERLAYS)
+		if (m_AnimOverlay[i].m_nOrder < C_AnimationLayer::MAX_OVERLAYS)
 		{
 			/*
 			Assert( layer[m_AnimOverlay[i].m_nOrder] == MAX_OVERLAYS );
 			layer[m_AnimOverlay[i].m_nOrder] = i;
 			*/
 			// hacky code until initialization of new layers is finished
-			if (layer[m_AnimOverlay[i].m_nOrder] != MAX_OVERLAYS)
+			if (layer[m_AnimOverlay[i].m_nOrder] != C_AnimationLayer::MAX_OVERLAYS)
 			{
-				m_AnimOverlay[i].m_nOrder = MAX_OVERLAYS;
+				m_AnimOverlay[i].m_nOrder = C_AnimationLayer::MAX_OVERLAYS;
 			}
 			else
 			{
@@ -340,7 +340,7 @@ void C_BaseAnimatingOverlay::AccumulateLayers( IBoneSetup &boneSetup, Vector pos
 
 	// add in the overlay layers
 	int j;
-	for (j = 0; j < MAX_OVERLAYS; j++)
+	for (j = 0; j < C_AnimationLayer::MAX_OVERLAYS; j++)
 	{
 		i = layer[ j ];
 		if (i < m_AnimOverlay.Count())
@@ -571,7 +571,7 @@ IStudioHdr *C_BaseAnimatingOverlay::OnNewModel()
 	for ( int i=0; i < m_AnimOverlay.Count(); i++ )
 	{
 		m_AnimOverlay[i].Reset();
-		m_AnimOverlay[i].m_nOrder = MAX_OVERLAYS;
+		m_AnimOverlay[i].m_nOrder = C_AnimationLayer::MAX_OVERLAYS;
 	}
 
 	return hdr;

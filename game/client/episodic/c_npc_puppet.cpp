@@ -114,22 +114,22 @@ void C_NPC_Puppet::AccumulateLayers( IBoneSetup &boneSetup, Vector pos[], Quater
 		return;
 
 	// resort the layers
-	int layer[MAX_OVERLAYS];
+	int layer[C_AnimationLayer::MAX_OVERLAYS];
 	int i;
-	for (i = 0; i < MAX_OVERLAYS; i++)
+	for (i = 0; i < C_AnimationLayer::MAX_OVERLAYS; i++)
 	{
-		layer[i] = MAX_OVERLAYS;
+		layer[i] = C_AnimationLayer::MAX_OVERLAYS;
 	}
 	for (i = 0; i < pTarget->m_AnimOverlay.Count(); i++)
 	{
-		if (pTarget->m_AnimOverlay[i].m_nOrder < MAX_OVERLAYS)
+		if (pTarget->m_AnimOverlay[i].m_nOrder < C_AnimationLayer::MAX_OVERLAYS)
 		{
 			layer[pTarget->m_AnimOverlay[i].m_nOrder] = i;
 		}
 	}
 
 	int j;
-	for (j = 0; j < MAX_OVERLAYS; j++)
+	for (j = 0; j < C_AnimationLayer::MAX_OVERLAYS; j++)
 	{
 		i = layer[ j ];
 		if (i < pTarget->m_AnimOverlay.Count())

@@ -143,11 +143,7 @@ public:
 	
 	void					GetVelocity(Vector *vVelocity, AngularImpulse *vAngVelocity);
 
-	// these two need to move somewhere else
-	LocalFlexController_t GetNumFlexControllers( void );
-	const char *GetFlexDescFacs( int iFlexDesc );
-	const char *GetFlexControllerName( LocalFlexController_t iFlexController );
-	const char *GetFlexControllerType( LocalFlexController_t iFlexController );
+
 
 	virtual	Vector GetGroundSpeedVelocity( void );
 
@@ -167,7 +163,6 @@ public:
 
 	void InputBecomeRagdoll(inputdata_t& inputdata);
 
-	bool PrefetchSequence( int iSequence );
 	bool CanSkipAnimation(void);
 
 private:

@@ -96,18 +96,72 @@ public:
 	IPhysicsObject* GetElement(int elementNum);
 	virtual void UpdateOnRemove();
 
-
-
-
-
-
-
 private:
 	C_ServerRagdoll(const C_ServerRagdoll& src);
 
 	typedef CHandle<C_BaseAnimating> CBaseAnimatingHandle;
 	//CNetworkVar( CBaseAnimatingHandle, m_hUnragdoll );
 	CNetworkVar(float, m_flBlendWeight);
+};
+
+enum
+{
+	RAGDOLL_FRICTION_OFF = -2,
+	RAGDOLL_FRICTION_NONE,
+	RAGDOLL_FRICTION_IN,
+	RAGDOLL_FRICTION_HOLD,
+	RAGDOLL_FRICTION_OUT,
+};
+
+class C_ClientRagdoll : public C_BaseAnimating, public IPVSNotify
+{
+
+public:
+	C_ClientRagdoll();//bool bRestoring 
+	DECLARE_CLASS(C_ClientRagdoll, C_BaseAnimating);
+	DECLARE_DATADESC();
+
+	bool Init(int entnum, int iSerialNum);
+
+	void IgniteRagdoll(C_BaseEntity* pSource);
+	void TransferDissolveFrom(C_BaseEntity* pSource);
+	// inherited from IPVSNotify
+	virtual void OnPVSStatusChanged(bool bInPVS);
+
+	virtual void SetupWeights(const matrix3x4_t* pBoneToWorld, int nFlexWeightCount, float* pFlexWeights, float* pFlexDelayedWeights);
+	virtual void ImpactTrace(trace_t* pTrace, int iDamageType, const char* pCustomImpactName);
+	void ClientThink(void);
+	void ReleaseRagdoll(void) { m_bReleaseRagdoll = true; }
+	bool ShouldSavePhysics(void) { return true; }
+	virtual void	OnSave();
+	virtual void	OnRestore();
+	virtual int ObjectCaps(void) { return BaseClass::ObjectCaps() | FCAP_SAVE_NON_NETWORKABLE; }
+	virtual IPVSNotify* GetPVSNotifyInterface() { return this; }
+
+	void	HandleAnimatedFriction(void);
+	virtual void SUB_Remove(void);
+
+	void	FadeOut(void);
+
+	bool m_bFadeOut;
+	bool m_bImportant;
+	float m_flEffectTime;
+
+private:
+	int m_iCurrentFriction;
+	int m_iMinFriction;
+	int m_iMaxFriction;
+	float m_flFrictionModTime;
+	float m_flFrictionTime;
+
+	int  m_iFrictionAnimState;
+	bool m_bReleaseRagdoll;
+
+	bool m_bFadingOut;
+
+	float m_flScaleEnd[NUM_HITBOX_FIRES];
+	float m_flScaleTimeStart[NUM_HITBOX_FIRES];
+	float m_flScaleTimeEnd[NUM_HITBOX_FIRES];
 };
 
 #endif // RAGDOLL_H

@@ -21,8 +21,13 @@ class CBaseAnimatingOverlay;
 class CAnimationLayer
 {
 public:	
+
+	enum
+	{
+		MAX_OVERLAYS = 15,
+	};
+
 	DECLARE_CLASS_NOBASE( CAnimationLayer );
-	
 	CAnimationLayer( void );
 	void	Init( CBaseAnimatingOverlay *pOverlay );
 
@@ -129,10 +134,6 @@ class CBaseAnimatingOverlay : public CBaseAnimating
 	DECLARE_CLASS( CBaseAnimatingOverlay, CBaseAnimating );
 
 public:
-	enum 
-	{
-		MAX_OVERLAYS = 15,
-	};
 
 private:
 	CUtlVector< CAnimationLayer	> m_AnimOverlay;

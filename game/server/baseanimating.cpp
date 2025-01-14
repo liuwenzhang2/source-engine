@@ -1174,49 +1174,6 @@ void CBaseAnimating::ReportMissingActivity( int iActivity )
 }
 
 
-LocalFlexController_t CBaseAnimating::GetNumFlexControllers( void )
-{
-	IStudioHdr *pstudiohdr = GetEngineObject()->GetModelPtr( );
-	if (! pstudiohdr)
-		return LocalFlexController_t(0);
-
-	return pstudiohdr->numflexcontrollers();
-}
-
-
-const char *CBaseAnimating::GetFlexDescFacs( int iFlexDesc )
-{
-	IStudioHdr *pstudiohdr = GetEngineObject()->GetModelPtr( );
-	if (! pstudiohdr)
-		return 0;
-
-	mstudioflexdesc_t *pflexdesc = pstudiohdr->pFlexdesc( iFlexDesc );
-
-	return pflexdesc->pszFACS( );
-}
-
-const char *CBaseAnimating::GetFlexControllerName( LocalFlexController_t iFlexController )
-{
-	IStudioHdr *pstudiohdr = GetEngineObject()->GetModelPtr( );
-	if (! pstudiohdr)
-		return 0;
-
-	mstudioflexcontroller_t *pflexcontroller = pstudiohdr->pFlexcontroller( iFlexController );
-
-	return pflexcontroller->pszName( );
-}
-
-const char *CBaseAnimating::GetFlexControllerType( LocalFlexController_t iFlexController )
-{
-	IStudioHdr *pstudiohdr = GetEngineObject()->GetModelPtr( );
-	if (! pstudiohdr)
-		return 0;
-
-	mstudioflexcontroller_t *pflexcontroller = pstudiohdr->pFlexcontroller( iFlexController );
-
-	return pflexcontroller->pszType( );
-}
-
 //-----------------------------------------------------------------------------
 // Purpose: Converts the ground speed of the animating entity into a true velocity
 // Output : Vector - velocity of the character at its current m_flGroundSpeed
@@ -1538,20 +1495,6 @@ void CBaseAnimating::InputBecomeRagdoll(inputdata_t& inputdata)
 	PhysSetEntityGameFlags(pRagdoll, FVPHYSICS_NO_SELF_COLLISIONS);
 	RemoveDeferred();
 	//BecomeRagdollOnClient(vec3_origin);
-}
-
-//-----------------------------------------------------------------------------
-// Purpose: Async prefetches all anim data used by a particular sequence.  Returns true if all of the required data is memory resident
-// Input  : iSequence - 
-// Output : Returns true on success, false on failure.
-//-----------------------------------------------------------------------------
-bool CBaseAnimating::PrefetchSequence( int iSequence )
-{
-	IStudioHdr *pStudioHdr = GetEngineObject()->GetModelPtr();
-	if ( !pStudioHdr )
-		return true;
-
-	return pStudioHdr->Studio_PrefetchSequence( iSequence );
 }
 
 //-----------------------------------------------------------------------------

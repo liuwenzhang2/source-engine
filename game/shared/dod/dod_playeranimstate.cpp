@@ -816,7 +816,7 @@ void CDODPlayerAnimState::ClearAnimationLayers()
 	m_pOuter->SetNumAnimOverlays( NUM_LAYERS_WANTED );
 	for ( int i=0; i < m_pOuter->GetNumAnimOverlays(); i++ )
 	{
-		m_pOuter->GetAnimOverlay( i )->SetOrder( CBaseAnimatingOverlay::MAX_OVERLAYS );
+		m_pOuter->GetAnimOverlay( i )->SetOrder(CAnimationLayer::MAX_OVERLAYS );
 	}
 }
 
@@ -1366,7 +1366,7 @@ void CDODPlayerAnimState::DebugShowAnimStateForPlayer( bool bIsServer )
 	for ( int iAnim = 0; iAnim < GetOuter()->GetNumAnimOverlays(); ++iAnim )
 	{
 		CAnimationLayer *pLayer = GetOuter()->GetAnimOverlay( iAnim );
-		if ( pLayer && ( pLayer->m_nOrder != CBaseAnimatingOverlay::MAX_OVERLAYS ) )
+		if ( pLayer && ( pLayer->m_nOrder != CAnimationLayer::MAX_OVERLAYS ) )
 		{
 			Anim_StatePrintf( iLine++, "Layer %s: Weight: %.2f, Cycle: %.2f", GetOuter()->GetEngineObject()->GetModelPtr()->GetSequenceName( pLayer->m_nSequence ), (float)pLayer->m_flWeight, (float)pLayer->m_flCycle );
 		}

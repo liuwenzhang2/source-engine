@@ -19,6 +19,11 @@ class C_AnimationLayer
 {
 public:
 
+	enum
+	{
+		MAX_OVERLAYS = 15,
+	};
+
 	// This allows the datatables to access private members.
 	ALLOW_DATATABLES_PRIVATE_ACCESS();
 
@@ -107,6 +112,11 @@ inline float C_AnimationLayer::GetFadeout( float flCurTime )
 	return s;
 }
 
+
+inline bool C_AnimationLayer::IsActive(void)
+{
+	return (m_nOrder != C_AnimationLayer::MAX_OVERLAYS);
+}
 
 inline C_AnimationLayer LoopingLerp( float flPercent, C_AnimationLayer& from, C_AnimationLayer& to )
 {

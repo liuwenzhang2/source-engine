@@ -71,6 +71,8 @@ extern void RecvProxy_IntToColor32( const CRecvProxyData *pData, void *pStruct, 
 //extern void RecvProxy_LocalVelocity( const CRecvProxyData *pData, void *pStruct, void *pOut );
 //extern ISaveRestoreOps* engineObjectFuncs;
 extern ISoundEmitterSystem* g_pSoundEmitterSystem;
+extern ConVar vcollide_wireframe;
+
 //extern HSOUNDSCRIPTHANDLE PrecacheScriptSound(const char* soundname);
 //extern void PrefetchScriptSound(const char* soundname);
 //extern bool PrecacheSound(const char* name);
@@ -1404,7 +1406,26 @@ private:
 	CBaseHandle m_CurBaseEntity;
 };
 
-
 //C_BaseEntity *CreateEntityByName( const char *className );
+
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
+inline void DevMsgRT(PRINTF_FORMAT_STRING char const* pMsg, ...)
+{
+	if (gpGlobals->frametime != 0.0f)
+	{
+		va_list argptr;
+		va_start(argptr, pMsg);
+		// 
+		{
+			static char	string[1024];
+			Q_vsnprintf(string, sizeof(string), pMsg, argptr);
+			DevMsg(1, "%s", string);
+		}
+		// DevMsg( pMsg, argptr );
+		va_end(argptr);
+	}
+}
 
 #endif // C_BASEENTITY_H

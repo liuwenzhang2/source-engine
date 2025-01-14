@@ -73,7 +73,7 @@ END_SEND_TABLE()
 BEGIN_SEND_TABLE_NOBASE( CBaseAnimatingOverlay, DT_OverlayVars )
 	SendPropUtlVector( 
 		SENDINFO_UTLVECTOR( m_AnimOverlay ),
-		CBaseAnimatingOverlay::MAX_OVERLAYS, // max elements
+		CAnimationLayer::MAX_OVERLAYS, // max elements
 		SendPropDataTable( NULL, 0, &REFERENCE_SEND_TABLE( DT_Animationlayer ) )  )
 END_SEND_TABLE()
 
@@ -103,7 +103,7 @@ void CAnimationLayer::Init( CBaseAnimatingOverlay *pOverlay )
 	m_nActivity = ACT_INVALID;
 	m_nSequence = 0;
 	m_nPriority = 0;
-	m_nOrder.Set( CBaseAnimatingOverlay::MAX_OVERLAYS );
+	m_nOrder.Set(CAnimationLayer::MAX_OVERLAYS );
 
 	m_flBlendIn = 0.0;
 	m_flBlendOut = 0.0;
@@ -206,18 +206,18 @@ void CBaseAnimatingOverlay::VerifyOrder( void )
 #ifdef _DEBUG
 	int i, j;
 	// test sorting of the layers
-	int layer[MAX_OVERLAYS];
+	int layer[CAnimationLayer::MAX_OVERLAYS];
 	int maxOrder = -1;
-	for (i = 0; i < MAX_OVERLAYS; i++)
+	for (i = 0; i < CAnimationLayer::MAX_OVERLAYS; i++)
 	{
-		layer[i] = MAX_OVERLAYS;
+		layer[i] = CAnimationLayer::MAX_OVERLAYS;
 	}
 	for (i = 0; i < m_AnimOverlay.Count(); i++)
 	{
-		if (m_AnimOverlay[ i ].m_nOrder < MAX_OVERLAYS)
+		if (m_AnimOverlay[ i ].m_nOrder < CAnimationLayer::MAX_OVERLAYS)
 		{
 			j = m_AnimOverlay[ i ].m_nOrder;
-			Assert( layer[j] == MAX_OVERLAYS );
+			Assert( layer[j] == CAnimationLayer::MAX_OVERLAYS );
 			layer[j] = i;
 			if (j > maxOrder)
 				maxOrder = j;
@@ -453,11 +453,11 @@ void CBaseAnimatingOverlay::GetSkeleton( IStudioHdr *pStudioHdr, Vector pos[], Q
 	boneSetup.AccumulatePose( pos, q, GetEngineObject()->GetSequence(), GetEngineObject()->GetCycle(), 1.0, gpGlobals->curtime, GetEngineObject()->GetIk() );
 
 	// sort the layers
-	int layer[MAX_OVERLAYS] = {};
+	int layer[CAnimationLayer::MAX_OVERLAYS] = {};
 	int i;
 	for (i = 0; i < m_AnimOverlay.Count(); i++)
 	{
-		layer[i] = MAX_OVERLAYS;
+		layer[i] = CAnimationLayer::MAX_OVERLAYS;
 	}
 	for (i = 0; i < m_AnimOverlay.Count(); i++)
 	{
@@ -508,7 +508,7 @@ void CBaseAnimatingOverlay::OnRestore( )
 
 		if ( !m_AnimOverlay[i].IsActive())
 		{
-			m_AnimOverlay[i].m_nOrder.Set( MAX_OVERLAYS );
+			m_AnimOverlay[i].m_nOrder.Set(CAnimationLayer::MAX_OVERLAYS );
 		}
 	}
 
@@ -710,7 +710,7 @@ int CBaseAnimatingOverlay::AllocateLayer( int iPriority )
 
 	if (iOpenLayer == -1)
 	{
-		if (m_AnimOverlay.Count() >= MAX_OVERLAYS)
+		if (m_AnimOverlay.Count() >= CAnimationLayer::MAX_OVERLAYS)
 		{
 			return -1;
 		}
@@ -722,7 +722,7 @@ int CBaseAnimatingOverlay::AllocateLayer( int iPriority )
 	// make sure there's always an empty unused layer so that history slots will be available on the client when it is used
 	if (iNumOpen == 0)
 	{
-		if (m_AnimOverlay.Count() < MAX_OVERLAYS)
+		if (m_AnimOverlay.Count() < CAnimationLayer::MAX_OVERLAYS)
 		{
 			i = m_AnimOverlay.AddToTail();
 			m_AnimOverlay[i].Init( this );
@@ -731,7 +731,7 @@ int CBaseAnimatingOverlay::AllocateLayer( int iPriority )
 
 	for (i = 0; i < m_AnimOverlay.Count(); i++)
 	{
-		if ( m_AnimOverlay[i].m_nOrder >= iNewOrder && m_AnimOverlay[i].m_nOrder < MAX_OVERLAYS)
+		if ( m_AnimOverlay[i].m_nOrder >= iNewOrder && m_AnimOverlay[i].m_nOrder < CAnimationLayer::MAX_OVERLAYS)
 		{
 			m_AnimOverlay[i].m_nOrder++;
 		}

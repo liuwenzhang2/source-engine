@@ -771,6 +771,7 @@ public:
 	void SetPlaybackRate(float rate);
 	inline int GetSequence() { return m_nSequence; }
 	void SetSequence(int nSequence);
+	bool PrefetchSequence(int iSequence);
 	const char* GetSequenceName(int iSequence);
 	int FindTransitionSequence(int iCurrentSequence, int iGoalSequence, int* piDir);
 	bool GotoSequence(int iCurrentSequence, float flCurrentCycle, float flCurrentRate, int iGoalSequence, int& iNextSequence, float& flCycle, int& iDir);
@@ -802,10 +803,10 @@ public:
 		m_bSequenceFinished = bFinished;
 	}
 	inline float SequenceDuration(void) { return SequenceDuration(m_nSequence); }
-	float	SequenceDuration(IStudioHdr* pStudioHdr, int iSequence);
+	float SequenceDuration(IStudioHdr* pStudioHdr, int iSequence);
 	inline float SequenceDuration(int iSequence) { return SequenceDuration(GetModelPtr(), iSequence); }
-	float	GetSequenceCycleRate(IStudioHdr* pStudioHdr, int iSequence);
-	inline float	GetSequenceCycleRate(int iSequence) { return GetSequenceCycleRate(GetModelPtr(), iSequence); }
+	float GetSequenceCycleRate(IStudioHdr* pStudioHdr, int iSequence);
+	inline float GetSequenceCycleRate(int iSequence) { return GetSequenceCycleRate(GetModelPtr(), iSequence); }
 	float GetSequenceMoveDist(IStudioHdr* pStudioHdr, int iSequence);
 	inline float GetSequenceMoveDist(int iSequence) { return GetSequenceMoveDist(GetModelPtr(), iSequence); }
 	float GetSequenceMoveYaw(int iSequence);
@@ -817,7 +818,7 @@ public:
 	float GetEntryVelocity(int iSequence);
 	float GetExitVelocity(int iSequence);
 	float GetInstantaneousVelocity(float flInterval = 0.0);
-	virtual float	GetSequenceGroundSpeed(IStudioHdr* pStudioHdr, int iSequence);
+	virtual float GetSequenceGroundSpeed(IStudioHdr* pStudioHdr, int iSequence);
 	inline float GetSequenceGroundSpeed(int iSequence) { return GetSequenceGroundSpeed(GetModelPtr(), iSequence); }
 
 	float GetLastEventCheck() {
@@ -829,20 +830,24 @@ public:
 	// Send a muzzle flash event to the client for this entity.
 	void DoMuzzleFlash();
 
-	int		LookupPoseParameter(IStudioHdr* pStudioHdr, const char* szName);
-	int	    LookupPoseParameter(const char* szName) { return LookupPoseParameter(GetModelPtr(), szName); }
-	float	GetPoseParameter(const char* szName);
-	float	GetPoseParameter(int iParameter);
-	float	SetPoseParameter(IStudioHdr* pStudioHdr, const char* szName, float flValue);
-	float	SetPoseParameter(IStudioHdr* pStudioHdr, int iParameter, float flValue);
-	float   SetPoseParameter(const char* szName, float flValue) { return SetPoseParameter(GetModelPtr(), szName, flValue); }
-	float   SetPoseParameter(int iParameter, float flValue) { return SetPoseParameter(GetModelPtr(), iParameter, flValue); }
+	int LookupPoseParameter(IStudioHdr* pStudioHdr, const char* szName);
+	int LookupPoseParameter(const char* szName) { return LookupPoseParameter(GetModelPtr(), szName); }
+	float GetPoseParameter(const char* szName);
+	float GetPoseParameter(int iParameter);
+	float SetPoseParameter(IStudioHdr* pStudioHdr, const char* szName, float flValue);
+	float SetPoseParameter(IStudioHdr* pStudioHdr, int iParameter, float flValue);
+	float SetPoseParameter(const char* szName, float flValue) { return SetPoseParameter(GetModelPtr(), szName, flValue); }
+	float SetPoseParameter(int iParameter, float flValue) { return SetPoseParameter(GetModelPtr(), iParameter, flValue); }
 	// Return's the controller's angle/position in bone space.
-	float					GetBoneController(int iController);
+	float GetBoneController(int iController);
 	// Maps the angle/position value you specify into the bone's start/end and sets the specified controller to the value.
-	float					SetBoneController(int iController, float flValue);
-	bool	GetPoseParameterRange(int index, float& minValue, float& maxValue);
-
+	float SetBoneController(int iController, float flValue);
+	bool GetPoseParameterRange(int index, float& minValue, float& maxValue);
+	// these two need to move somewhere else
+	LocalFlexController_t GetNumFlexControllers(void);
+	const char* GetFlexDescFacs(int iFlexDesc);
+	const char* GetFlexControllerName(LocalFlexController_t iFlexController);
+	const char* GetFlexControllerType(LocalFlexController_t iFlexController);
 	virtual IPhysicsObject* VPhysicsGetObject(void) const { return m_pPhysicsObject; }
 	virtual int		VPhysicsGetObjectList(IPhysicsObject** pList, int listMax);
 	// destroy and remove the physics object for this entity

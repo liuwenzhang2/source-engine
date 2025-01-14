@@ -122,7 +122,7 @@ void CBaseFlex::SetModel( const char *szModelName )
 
 	BaseClass::SetModel( szModelName );
 
-	for (LocalFlexController_t i = LocalFlexController_t(0); i < GetNumFlexControllers(); i++)
+	for (LocalFlexController_t i = LocalFlexController_t(0); i < GetEngineObject()->GetNumFlexControllers(); i++)
 	{
 		SetFlexWeight( i, 0.0f );
 	}
@@ -136,7 +136,7 @@ void CBaseFlex::SetViewtarget( const Vector &viewtarget )
 
 void CBaseFlex::SetFlexWeight( LocalFlexController_t index, float value )
 {
-	if (index >= 0 && index < GetNumFlexControllers())
+	if (index >= 0 && index < GetEngineObject()->GetNumFlexControllers())
 	{
 		IStudioHdr *pstudiohdr = GetEngineObject()->GetModelPtr( );
 		if (! pstudiohdr)
@@ -156,7 +156,7 @@ void CBaseFlex::SetFlexWeight( LocalFlexController_t index, float value )
 
 float CBaseFlex::GetFlexWeight( LocalFlexController_t index )
 {
-	if (index >= 0 && index < GetNumFlexControllers())
+	if (index >= 0 && index < GetEngineObject()->GetNumFlexControllers())
 	{
 		IStudioHdr *pstudiohdr = GetEngineObject()->GetModelPtr( );
 		if (! pstudiohdr)
@@ -176,9 +176,9 @@ float CBaseFlex::GetFlexWeight( LocalFlexController_t index )
 
 LocalFlexController_t CBaseFlex::FindFlexController( const char *szName )
 {
-	for (LocalFlexController_t i = LocalFlexController_t(0); i < GetNumFlexControllers(); i++)
+	for (LocalFlexController_t i = LocalFlexController_t(0); i < GetEngineObject()->GetNumFlexControllers(); i++)
 	{
-		if (stricmp( GetFlexControllerName( i ), szName ) == 0)
+		if (stricmp(GetEngineObject()->GetFlexControllerName( i ), szName ) == 0)
 		{
 			return i;
 		}
@@ -898,7 +898,7 @@ void CBaseFlex::ProcessSceneEvents( void )
 {
 	VPROF( "CBaseFlex::ProcessSceneEvents" );
 	// slowly decay to netural expression
-	for ( LocalFlexController_t i = LocalFlexController_t(0); i < GetNumFlexControllers(); i++)
+	for ( LocalFlexController_t i = LocalFlexController_t(0); i < GetEngineObject()->GetNumFlexControllers(); i++)
 	{
 		SetFlexWeight( i, GetFlexWeight( i ) * 0.95 );
 	}
@@ -2314,7 +2314,7 @@ void CFlexCycler::GenericCyclerSpawn(char *szModel, Vector vecMin, Vector vecMax
 
 	InitBoneControllers();
 
-	if (GetNumFlexControllers() < 5)
+	if (GetEngineObject()->GetNumFlexControllers() < 5)
 		Warning( "cycler_flex used on model %s without enough flexes.\n", szModel );
 }
 
@@ -2415,14 +2415,14 @@ void CFlexCycler::SetFlexTarget( LocalFlexController_t flexnum )
 {
 	m_flextarget[flexnum] = random->RandomFloat( 0.5, 1.0 );
 
-	const char *pszType = GetFlexControllerType( flexnum );
+	const char *pszType = GetEngineObject()->GetFlexControllerType( flexnum );
 
 	// zero out all other flexes of the same type
-	for (LocalFlexController_t i = LocalFlexController_t(0); i < GetNumFlexControllers(); i++)
+	for (LocalFlexController_t i = LocalFlexController_t(0); i < GetEngineObject()->GetNumFlexControllers(); i++)
 	{
 		if (i != flexnum)
 		{
-			const char *pszOtherType = GetFlexControllerType( i );
+			const char *pszOtherType = GetEngineObject()->GetFlexControllerType( i );
 			if (stricmp( pszType, pszOtherType ) == 0)
 			{
 				m_flextarget[i] = 0;
@@ -2431,11 +2431,11 @@ void CFlexCycler::SetFlexTarget( LocalFlexController_t flexnum )
 	}
 
 	// HACK, for now, consider then linked is named "right_" or "left_"
-	if (strncmp( "right_", GetFlexControllerName( flexnum ), 6 ) == 0)
+	if (strncmp( "right_", GetEngineObject()->GetFlexControllerName( flexnum ), 6 ) == 0)
 	{
 		m_flextarget[flexnum+1] = m_flextarget[flexnum];
 	}
-	else if (strncmp( "left_", GetFlexControllerName( flexnum ), 5 ) == 0)
+	else if (strncmp( "left_", GetEngineObject()->GetFlexControllerName( flexnum ), 5 ) == 0)
 	{
 		m_flextarget[flexnum-1] = m_flextarget[flexnum];
 	}
@@ -2444,9 +2444,9 @@ void CFlexCycler::SetFlexTarget( LocalFlexController_t flexnum )
 
 LocalFlexController_t CFlexCycler::LookupFlex( const char *szTarget  )
 {
-	for (LocalFlexController_t i = LocalFlexController_t(0); i < GetNumFlexControllers(); i++)
+	for (LocalFlexController_t i = LocalFlexController_t(0); i < GetEngineObject()->GetNumFlexControllers(); i++)
 	{
-		const char *pszFlex = GetFlexControllerName( i );
+		const char *pszFlex = GetEngineObject()->GetFlexControllerName( i );
 		if (stricmp( szTarget, pszFlex ) == 0)
 		{
 			return i;
@@ -2474,7 +2474,7 @@ void CFlexCycler::Think( void )
 	}
 
 	// only do this if they have more than eyelid movement
-	if (GetNumFlexControllers() > 2)
+	if (GetEngineObject()->GetNumFlexControllers() > 2)
 	{
 		const char *pszExpression = flex_expression.GetString();
 
@@ -2482,7 +2482,7 @@ void CFlexCycler::Think( void )
 		{
 			int i;
 			int j = atoi( &pszExpression[1] );
-			for ( i = 0; i < GetNumFlexControllers(); i++)
+			for ( i = 0; i < GetEngineObject()->GetNumFlexControllers(); i++)
 			{
 				m_flextarget[m_flexnum] = 0;
 			}
@@ -2496,7 +2496,7 @@ void CFlexCycler::Think( void )
 		}
 		else if ( pszExpression && (pszExpression[0] == '1') && (pszExpression[1] == '\0') ) // 1 for maxed controller values
 		{
-			for ( LocalFlexController_t i = LocalFlexController_t(0); i < GetNumFlexControllers(); i++ )
+			for ( LocalFlexController_t i = LocalFlexController_t(0); i < GetEngineObject()->GetNumFlexControllers(); i++ )
 			{
 				// Max everything out...
 				m_flextarget[i] = 1.0f;
@@ -2505,10 +2505,10 @@ void CFlexCycler::Think( void )
 		}
 		else if ( pszExpression && (pszExpression[0] == '^') && (pszExpression[1] == '\0') ) // ^ for sine wave
 		{
-			for ( LocalFlexController_t i = LocalFlexController_t(0); i < GetNumFlexControllers(); i++ )
+			for ( LocalFlexController_t i = LocalFlexController_t(0); i < GetEngineObject()->GetNumFlexControllers(); i++ )
 			{
 				// Throw a differently offset sine wave on all of the flex controllers
-				float fFlexTime = i * (1.0f / (float)GetNumFlexControllers()) + gpGlobals->curtime;
+				float fFlexTime = i * (1.0f / (float)GetEngineObject()->GetNumFlexControllers()) + gpGlobals->curtime;
 				m_flextarget[i] = sinf( fFlexTime ) * 0.5f + 0.5f;
 				SetFlexWeight( i, m_flextarget[i] );
 			}
@@ -2537,16 +2537,16 @@ void CFlexCycler::Think( void )
 				{
 					if (*pszExpression == '-')
 					{
-						for (LocalFlexController_t i = LocalFlexController_t(0); i < GetNumFlexControllers(); i++)
+						for (LocalFlexController_t i = LocalFlexController_t(0); i < GetEngineObject()->GetNumFlexControllers(); i++)
 						{
 							m_flextarget[i] = 0;
 						}
 					}
 					else if (*pszExpression == '?')
 					{
-						for (LocalFlexController_t i = LocalFlexController_t(0); i < GetNumFlexControllers(); i++)
+						for (LocalFlexController_t i = LocalFlexController_t(0); i < GetEngineObject()->GetNumFlexControllers(); i++)
 						{
-							Msg( "\"%s\" ", GetFlexControllerName( i ) );
+							Msg( "\"%s\" ", GetEngineObject()->GetFlexControllerName( i ) );
 						}
 						Msg( "\n" );
 						flex_expression.SetValue( "" );
@@ -2572,8 +2572,8 @@ void CFlexCycler::Think( void )
 		else if (m_flextime < gpGlobals->curtime)
 		{
 			// m_flextime = gpGlobals->curtime + 1.0; // RandomFloat( 0.1, 0.5 );
-			m_flextime = gpGlobals->curtime + random->RandomFloat( 0.3, 0.5 ) * (30.0 / GetNumFlexControllers());
-			m_flexnum = (LocalFlexController_t)random->RandomInt( 0, GetNumFlexControllers() - 1 );
+			m_flextime = gpGlobals->curtime + random->RandomFloat( 0.3, 0.5 ) * (30.0 / GetEngineObject()->GetNumFlexControllers());
+			m_flexnum = (LocalFlexController_t)random->RandomInt( 0, GetEngineObject()->GetNumFlexControllers() - 1 );
 
 			// m_flexnum = (pflex->num + 1) % r_psubmodel->numflexes;
 
@@ -2582,11 +2582,11 @@ void CFlexCycler::Think( void )
 				m_flextarget[m_flexnum] = 0;
 				// pflex->time = cl.time + 0.1;
 			}
-			else if (stricmp( GetFlexControllerType( m_flexnum ), "phoneme" ) != 0)
+			else if (stricmp(GetEngineObject()->GetFlexControllerType( m_flexnum ), "phoneme" ) != 0)
 			{
-				if (strstr( GetFlexControllerName( m_flexnum ), "upper_raiser" ) == NULL)
+				if (strstr(GetEngineObject()->GetFlexControllerName( m_flexnum ), "upper_raiser" ) == NULL)
 				{
-					Msg( "%s:%s\n", GetFlexControllerType( m_flexnum ), GetFlexControllerName( m_flexnum ) );
+					Msg( "%s:%s\n", GetEngineObject()->GetFlexControllerType( m_flexnum ), GetEngineObject()->GetFlexControllerName( m_flexnum ) );
 					SetFlexTarget( m_flexnum );
 				}
 			}
@@ -2613,7 +2613,7 @@ void CFlexCycler::Think( void )
 		}
 
 		// slide it up.
-		for (LocalFlexController_t i = LocalFlexController_t(0); i < GetNumFlexControllers(); i++)
+		for (LocalFlexController_t i = LocalFlexController_t(0); i < GetEngineObject()->GetNumFlexControllers(); i++)
 		{
 			float weight = GetFlexWeight( i );
 

@@ -7725,6 +7725,20 @@ void CEngineObjectInternal::SetSequence(int nSequence)
 	m_nSequence = nSequence;
 }
 
+//-----------------------------------------------------------------------------
+// Purpose: Async prefetches all anim data used by a particular sequence.  Returns true if all of the required data is memory resident
+// Input  : iSequence - 
+// Output : Returns true on success, false on failure.
+//-----------------------------------------------------------------------------
+bool CEngineObjectInternal::PrefetchSequence(int iSequence)
+{
+	IStudioHdr* pStudioHdr = GetModelPtr();
+	if (!pStudioHdr)
+		return true;
+
+	return pStudioHdr->Studio_PrefetchSequence(iSequence);
+}
+
 void CEngineObjectInternal::ResetSequence(int nSequence)
 {
 	m_pOuter->OnResetSequence(nSequence);
@@ -8346,6 +8360,49 @@ bool CEngineObjectInternal::GetPoseParameterRange(int index, float& minValue, fl
 	minValue = 0.0f;
 	maxValue = 1.0f;
 	return false;
+}
+
+LocalFlexController_t CEngineObjectInternal::GetNumFlexControllers(void)
+{
+	IStudioHdr* pstudiohdr = GetModelPtr();
+	if (!pstudiohdr)
+		return LocalFlexController_t(0);
+
+	return pstudiohdr->numflexcontrollers();
+}
+
+
+const char* CEngineObjectInternal::GetFlexDescFacs(int iFlexDesc)
+{
+	IStudioHdr* pstudiohdr = GetModelPtr();
+	if (!pstudiohdr)
+		return 0;
+
+	mstudioflexdesc_t* pflexdesc = pstudiohdr->pFlexdesc(iFlexDesc);
+
+	return pflexdesc->pszFACS();
+}
+
+const char* CEngineObjectInternal::GetFlexControllerName(LocalFlexController_t iFlexController)
+{
+	IStudioHdr* pstudiohdr = GetModelPtr();
+	if (!pstudiohdr)
+		return 0;
+
+	mstudioflexcontroller_t* pflexcontroller = pstudiohdr->pFlexcontroller(iFlexController);
+
+	return pflexcontroller->pszName();
+}
+
+const char* CEngineObjectInternal::GetFlexControllerType(LocalFlexController_t iFlexController)
+{
+	IStudioHdr* pstudiohdr = GetModelPtr();
+	if (!pstudiohdr)
+		return 0;
+
+	mstudioflexcontroller_t* pflexcontroller = pstudiohdr->pFlexcontroller(iFlexController);
+
+	return pflexcontroller->pszType();
 }
 
 //-----------------------------------------------------------------------------

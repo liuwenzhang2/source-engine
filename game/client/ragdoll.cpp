@@ -16,6 +16,10 @@
 #include "tier0/vprof.h"
 #include "physics_saverestore.h"
 #include "vphysics/constraints.h"
+#include "engine/ivdebugoverlay.h"
+#include "c_entitydissolve.h"
+#include "c_fire_smoke.h"
+
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
@@ -351,6 +355,470 @@ void C_ServerRagdollAttached::OnDataChanged( DataUpdateType_t updateType )
 			m_parentTime = gpGlobals->curtime;
 		}
 		m_bHasParent = bParentNow;
+	}
+}
+
+
+C_EntityFlame* FireEffect(C_BaseAnimating* pTarget, C_BaseEntity* pServerFire, float* flScaleEnd, float* flTimeStart, float* flTimeEnd)
+{
+	C_EntityFlame* pFire = (C_EntityFlame*)EntityList()->CreateEntityByName("C_EntityFlame");
+
+	if (pFire->InitializeAsClientEntity(NULL, RENDER_GROUP_TRANSLUCENT_ENTITY) == false)
+	{
+		EntityList()->DestroyEntity(pFire);// ->Release();
+		return NULL;
+	}
+
+	if (pFire != NULL)
+	{
+		pFire->GetEngineObject()->RemoveFromLeafSystem();
+
+		pTarget->GetEngineObject()->AddFlag(FL_ONFIRE);
+		pFire->GetEngineObject()->SetParent(pTarget->GetEngineObject());
+		pFire->m_hEntAttached = (C_BaseEntity*)pTarget;
+
+		pFire->OnDataChanged(DATA_UPDATE_CREATED);
+		pFire->GetEngineObject()->SetAbsOrigin(pTarget->GetEngineObject()->GetAbsOrigin());
+
+#ifdef HL2_EPISODIC
+		if (pServerFire)
+		{
+			if (pServerFire->GetEngineObject()->IsEffectActive(EF_DIMLIGHT))
+			{
+				pFire->GetEngineObject()->AddEffects(EF_DIMLIGHT);
+			}
+			if (pServerFire->GetEngineObject()->IsEffectActive(EF_BRIGHTLIGHT))
+			{
+				pFire->GetEngineObject()->AddEffects(EF_BRIGHTLIGHT);
+			}
+		}
+#endif
+
+		//Play a sound
+		CPASAttenuationFilter filter(pTarget);
+		g_pSoundEmitterSystem->EmitSound(filter, pTarget->GetSoundSourceIndex(), "General.BurningFlesh");//pTarget->
+
+		pFire->SetNextClientThink(gpGlobals->curtime + 7.0f);
+	}
+
+	return pFire;
+}
+
+#define DEFAULT_FADE_START 2.0f
+#define DEFAULT_MODEL_FADE_START 1.9f
+#define DEFAULT_MODEL_FADE_LENGTH 0.1f
+#define DEFAULT_FADEIN_LENGTH 1.0f
+
+C_EntityDissolve* DissolveEffect(C_BaseEntity* pTarget, float flTime)
+{
+	C_EntityDissolve* pDissolve = (C_EntityDissolve*)EntityList()->CreateEntityByName("C_EntityDissolve");
+
+	if (pDissolve->InitializeAsClientEntity("sprites/blueglow1.vmt", RENDER_GROUP_TRANSLUCENT_ENTITY) == false)
+	{
+		EntityList()->DestroyEntity(pDissolve);// ->Release();
+		return NULL;
+	}
+
+	if (pDissolve != NULL)
+	{
+		pTarget->GetEngineObject()->AddFlag(FL_DISSOLVING);
+		pDissolve->GetEngineObject()->SetParent(pTarget->GetEngineObject());
+		pDissolve->OnDataChanged(DATA_UPDATE_CREATED);
+		pDissolve->GetEngineObject()->SetAbsOrigin(pTarget->GetEngineObject()->GetAbsOrigin());
+
+		pDissolve->m_flStartTime = flTime;
+		pDissolve->m_flFadeOutStart = DEFAULT_FADE_START;
+		pDissolve->m_flFadeOutModelStart = DEFAULT_MODEL_FADE_START;
+		pDissolve->m_flFadeOutModelLength = DEFAULT_MODEL_FADE_LENGTH;
+		pDissolve->m_flFadeInLength = DEFAULT_FADEIN_LENGTH;
+
+		pDissolve->m_nDissolveType = 0;
+		pDissolve->m_flNextSparkTime = 0.0f;
+		pDissolve->m_flFadeOutLength = 0.0f;
+		pDissolve->m_flFadeInStart = 0.0f;
+
+		// Let this entity know it needs to delete itself when it's done
+		pDissolve->SetServerLinkState(false);
+		pTarget->SetEffectEntity(pDissolve);
+	}
+
+	return pDissolve;
+
+}
+
+LINK_ENTITY_TO_CLASS(client_ragdoll, C_ClientRagdoll);
+
+BEGIN_DATADESC(C_ClientRagdoll)
+DEFINE_FIELD(m_bFadeOut, FIELD_BOOLEAN),
+DEFINE_FIELD(m_bImportant, FIELD_BOOLEAN),
+DEFINE_FIELD(m_iCurrentFriction, FIELD_INTEGER),
+DEFINE_FIELD(m_iMinFriction, FIELD_INTEGER),
+DEFINE_FIELD(m_iMaxFriction, FIELD_INTEGER),
+DEFINE_FIELD(m_flFrictionModTime, FIELD_FLOAT),
+DEFINE_FIELD(m_flFrictionTime, FIELD_TIME),
+DEFINE_FIELD(m_iFrictionAnimState, FIELD_INTEGER),
+DEFINE_FIELD(m_bReleaseRagdoll, FIELD_BOOLEAN),
+//DEFINE_FIELD( m_nBody, FIELD_INTEGER ),
+//DEFINE_FIELD( m_nSkin, FIELD_INTEGER ),
+//DEFINE_FIELD( m_nRenderFX, FIELD_CHARACTER ),
+DEFINE_FIELD(m_nRenderMode, FIELD_CHARACTER),
+DEFINE_FIELD(m_clrRender, FIELD_COLOR32),
+DEFINE_FIELD(m_flEffectTime, FIELD_TIME),
+DEFINE_FIELD(m_bFadingOut, FIELD_BOOLEAN),
+
+DEFINE_AUTO_ARRAY(m_flScaleEnd, FIELD_FLOAT),
+DEFINE_AUTO_ARRAY(m_flScaleTimeStart, FIELD_FLOAT),
+DEFINE_AUTO_ARRAY(m_flScaleTimeEnd, FIELD_FLOAT),
+//DEFINE_EMBEDDEDBYREF( m_pRagdoll ),
+
+END_DATADESC()
+
+C_ClientRagdoll::C_ClientRagdoll()//bool bRestoring 
+{
+	m_iCurrentFriction = 0;
+	m_iFrictionAnimState = RAGDOLL_FRICTION_NONE;
+	m_bReleaseRagdoll = false;
+	m_bFadeOut = false;
+	m_bFadingOut = false;
+	m_bImportant = false;
+	m_bNoModelParticles = false;
+
+	//if ( bRestoring == true )
+	//{
+	//	m_pRagdoll = new CRagdoll;
+	//}
+}
+
+bool C_ClientRagdoll::Init(int entnum, int iSerialNum) {
+	GetEngineObject()->SetClassname("client_ragdoll");
+	return true;
+}
+
+void C_ClientRagdoll::OnSave(void)
+{
+}
+
+void C_ClientRagdoll::OnRestore(void)
+{
+	ragdoll_t* pRagdollT = GetEngineObject()->GetRagdoll();
+	if (pRagdollT == NULL || pRagdollT->list[0].pObject == NULL)
+	{
+		m_bReleaseRagdoll = true;
+		//m_pRagdoll = NULL;
+		Error("Attempted to restore a ragdoll without physobjects!");
+		Assert(!"Attempted to restore a ragdoll without physobjects!");
+		return;
+	}
+
+	if (GetEngineObject()->GetFlags() & FL_DISSOLVING)
+	{
+		DissolveEffect(this, m_flEffectTime);
+	}
+	else if (GetEngineObject()->GetFlags() & FL_ONFIRE)
+	{
+		C_EntityFlame* pFireChild = dynamic_cast<C_EntityFlame*>(GetEffectEntity());
+		C_EntityFlame* pNewFireChild = FireEffect(this, pFireChild, m_flScaleEnd, m_flScaleTimeStart, m_flScaleTimeEnd);
+
+		//Set the new fire child as the new effect entity.
+		SetEffectEntity(pNewFireChild);
+	}
+
+	SetNextClientThink(CLIENT_THINK_ALWAYS);
+	if (m_bFadeOut == true)
+	{
+		EntityList()->MoveToTopOfLRU(this, m_bImportant);
+	}
+	NoteRagdollCreationTick(this);
+	BaseClass::OnRestore();
+}
+
+void C_ClientRagdoll::ImpactTrace(trace_t* pTrace, int iDamageType, const char* pCustomImpactName)
+{
+	VPROF("C_ClientRagdoll::ImpactTrace");
+
+	IPhysicsObject* pPhysicsObject = GetEngineObject()->VPhysicsGetObject();
+
+	if (!pPhysicsObject)
+		return;
+
+	Vector dir = pTrace->endpos - pTrace->startpos;
+
+	if (iDamageType == DMG_BLAST)
+	{
+		dir *= 500;  // adjust impact strenght
+
+		// apply force at object mass center
+		pPhysicsObject->ApplyForceCenter(dir);
+	}
+	else
+	{
+		Vector hitpos;
+
+		VectorMA(pTrace->startpos, pTrace->fraction, dir, hitpos);
+		VectorNormalize(dir);
+
+		dir *= 4000;  // adjust impact strenght
+
+		// apply force where we hit it
+		pPhysicsObject->ApplyForceOffset(dir, hitpos);
+	}
+
+	GetEngineObject()->ResetRagdollSleepAfterTime();
+}
+
+ConVar g_debug_ragdoll_visualize("g_debug_ragdoll_visualize", "0", FCVAR_CHEAT);
+
+void C_ClientRagdoll::HandleAnimatedFriction(void)
+{
+	if (m_iFrictionAnimState == RAGDOLL_FRICTION_OFF)
+		return;
+
+	ragdoll_t* pRagdollT = NULL;
+	int iBoneCount = 0;
+
+	if (GetEngineObject()->RagdollBoneCount())
+	{
+		pRagdollT = GetEngineObject()->GetRagdoll();
+		iBoneCount = GetEngineObject()->RagdollBoneCount();
+
+	}
+
+	if (pRagdollT == NULL)
+		return;
+
+	switch (m_iFrictionAnimState)
+	{
+	case RAGDOLL_FRICTION_NONE:
+	{
+		m_iMinFriction = pRagdollT->animfriction.iMinAnimatedFriction;
+		m_iMaxFriction = pRagdollT->animfriction.iMaxAnimatedFriction;
+
+		if (m_iMinFriction != 0 || m_iMaxFriction != 0)
+		{
+			m_iFrictionAnimState = RAGDOLL_FRICTION_IN;
+
+			m_flFrictionModTime = pRagdollT->animfriction.flFrictionTimeIn;
+			m_flFrictionTime = gpGlobals->curtime + m_flFrictionModTime;
+
+			m_iCurrentFriction = m_iMinFriction;
+		}
+		else
+		{
+			m_iFrictionAnimState = RAGDOLL_FRICTION_OFF;
+		}
+
+		break;
+	}
+
+	case RAGDOLL_FRICTION_IN:
+	{
+		float flDeltaTime = (m_flFrictionTime - gpGlobals->curtime);
+
+		m_iCurrentFriction = RemapValClamped(flDeltaTime, m_flFrictionModTime, 0, m_iMinFriction, m_iMaxFriction);
+
+		if (flDeltaTime <= 0.0f)
+		{
+			m_flFrictionModTime = pRagdollT->animfriction.flFrictionTimeHold;
+			m_flFrictionTime = gpGlobals->curtime + m_flFrictionModTime;
+			m_iFrictionAnimState = RAGDOLL_FRICTION_HOLD;
+		}
+		break;
+	}
+
+	case RAGDOLL_FRICTION_HOLD:
+	{
+		if (m_flFrictionTime < gpGlobals->curtime)
+		{
+			m_flFrictionModTime = pRagdollT->animfriction.flFrictionTimeOut;
+			m_flFrictionTime = gpGlobals->curtime + m_flFrictionModTime;
+			m_iFrictionAnimState = RAGDOLL_FRICTION_OUT;
+		}
+
+		break;
+	}
+
+	case RAGDOLL_FRICTION_OUT:
+	{
+		float flDeltaTime = (m_flFrictionTime - gpGlobals->curtime);
+
+		m_iCurrentFriction = RemapValClamped(flDeltaTime, 0, m_flFrictionModTime, m_iMinFriction, m_iMaxFriction);
+
+		if (flDeltaTime <= 0.0f)
+		{
+			m_iFrictionAnimState = RAGDOLL_FRICTION_OFF;
+		}
+
+		break;
+	}
+	}
+
+	for (int i = 0; i < iBoneCount; i++)
+	{
+		if (pRagdollT->list[i].pConstraint)
+			pRagdollT->list[i].pConstraint->SetAngularMotor(0, m_iCurrentFriction);
+	}
+
+	IPhysicsObject* pPhysicsObject = GetEngineObject()->VPhysicsGetObject();
+
+	if (pPhysicsObject)
+	{
+		pPhysicsObject->Wake();
+	}
+}
+
+ConVar g_ragdoll_fadespeed("g_ragdoll_fadespeed", "600");
+ConVar g_ragdoll_lvfadespeed("g_ragdoll_lvfadespeed", "100");
+
+void C_ClientRagdoll::OnPVSStatusChanged(bool bInPVS)
+{
+	if (bInPVS)
+	{
+		GetEngineObject()->CreateShadow();
+	}
+	else
+	{
+		GetEngineObject()->DestroyShadow();
+	}
+}
+
+void C_ClientRagdoll::FadeOut(void)
+{
+	if (m_bFadingOut == false)
+	{
+		return;
+	}
+
+	int iAlpha = GetRenderColor().a;
+	int iFadeSpeed = (g_RagdollLVManager.IsLowViolence()) ? g_ragdoll_lvfadespeed.GetInt() : g_ragdoll_fadespeed.GetInt();
+
+	iAlpha = MAX(iAlpha - (iFadeSpeed * gpGlobals->frametime), 0);
+
+	SetRenderMode(kRenderTransAlpha);
+	SetRenderColorA(iAlpha);
+
+	if (iAlpha == 0)
+	{
+		m_bReleaseRagdoll = true;
+	}
+}
+
+void C_ClientRagdoll::SUB_Remove(void)
+{
+	m_bFadingOut = true;
+	SetNextClientThink(CLIENT_THINK_ALWAYS);
+}
+
+void C_ClientRagdoll::IgniteRagdoll(C_BaseEntity* pSource)
+{
+	C_BaseEntity* pChild = pSource->GetEffectEntity();
+
+	if (pChild)
+	{
+		C_EntityFlame* pFireChild = dynamic_cast<C_EntityFlame*>(pChild);
+		C_ClientRagdoll* pRagdoll = dynamic_cast<C_ClientRagdoll*> (this);
+
+		if (pFireChild)
+		{
+			pRagdoll->SetEffectEntity(FireEffect(pRagdoll, pFireChild, NULL, NULL, NULL));
+		}
+	}
+}
+
+void C_ClientRagdoll::TransferDissolveFrom(C_BaseEntity* pSource)
+{
+	C_BaseEntity* pChild = pSource->GetEffectEntity();
+
+	if (pChild)
+	{
+		C_EntityDissolve* pDissolveChild = dynamic_cast<C_EntityDissolve*>(pChild);
+
+		if (pDissolveChild)
+		{
+			C_ClientRagdoll* pRagdoll = dynamic_cast<C_ClientRagdoll*> (this);
+
+			if (pRagdoll)
+			{
+				pRagdoll->m_flEffectTime = pDissolveChild->m_flStartTime;
+
+				C_EntityDissolve* pDissolve = DissolveEffect(pRagdoll, pRagdoll->m_flEffectTime);
+
+				if (pDissolve)
+				{
+					pDissolve->SetRenderMode(pDissolveChild->GetRenderMode());
+					pDissolve->GetEngineObject()->SetRenderFX(pDissolveChild->GetEngineObject()->GetRenderFX());
+					pDissolve->SetRenderColor(255, 255, 255, 255);
+					pDissolveChild->SetRenderColorA(0);
+
+					pDissolve->m_vDissolverOrigin = pDissolveChild->m_vDissolverOrigin;
+					pDissolve->m_nDissolveType = pDissolveChild->m_nDissolveType;
+
+					if (pDissolve->m_nDissolveType == ENTITY_DISSOLVE_CORE)
+					{
+						pDissolve->m_nMagnitude = pDissolveChild->m_nMagnitude;
+						pDissolve->m_flFadeOutStart = CORE_DISSOLVE_FADE_START;
+						pDissolve->m_flFadeOutModelStart = CORE_DISSOLVE_MODEL_FADE_START;
+						pDissolve->m_flFadeOutModelLength = CORE_DISSOLVE_MODEL_FADE_LENGTH;
+						pDissolve->m_flFadeInLength = CORE_DISSOLVE_FADEIN_LENGTH;
+					}
+				}
+			}
+		}
+	}
+}
+
+void C_ClientRagdoll::ClientThink(void)
+{
+	if (m_bReleaseRagdoll == true)
+	{
+		//DestroyBoneAttachments();
+		EntityList()->DestroyEntity(this);// Release();
+		return;
+	}
+
+	if (g_debug_ragdoll_visualize.GetBool())
+	{
+		Vector vMins, vMaxs;
+
+		Vector origin = GetEngineObject()->GetRagdollOrigin();
+		GetEngineObject()->GetRagdollBounds(vMins, vMaxs);
+
+		debugoverlay->AddBoxOverlay(origin, vMins, vMaxs, QAngle(0, 0, 0), 0, 255, 0, 16, 0);
+	}
+
+	HandleAnimatedFriction();
+
+	FadeOut();
+}
+
+
+//-----------------------------------------------------------------------------
+// Purpose: clear out any face/eye values stored in the material system
+//-----------------------------------------------------------------------------
+void C_ClientRagdoll::SetupWeights(const matrix3x4_t* pBoneToWorld, int nFlexWeightCount, float* pFlexWeights, float* pFlexDelayedWeights)
+{
+	BaseClass::SetupWeights(pBoneToWorld, nFlexWeightCount, pFlexWeights, pFlexDelayedWeights);
+
+	IStudioHdr* hdr = GetEngineObject()->GetModelPtr();
+	if (!hdr)
+		return;
+
+	int nFlexDescCount = hdr->numflexdesc();
+	if (nFlexDescCount)
+	{
+		Assert(!pFlexDelayedWeights);
+		memset(pFlexWeights, 0, nFlexWeightCount * sizeof(float));
+	}
+
+	if (m_iEyeAttachment > 0)
+	{
+		matrix3x4_t attToWorld;
+		if (GetEngineObject()->GetAttachment(m_iEyeAttachment, attToWorld))
+		{
+			Vector local, tmp;
+			local.Init(1000.0f, 0.0f, 0.0f);
+			VectorTransform(local, attToWorld, tmp);
+			modelrender->SetViewTarget(GetEngineObject()->GetModelPtr(), GetEngineObject()->GetBody(), tmp);
+		}
 	}
 }
 

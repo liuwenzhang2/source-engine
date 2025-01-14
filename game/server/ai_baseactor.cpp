@@ -605,7 +605,7 @@ bool CAI_BaseActor::RandomFaceFlex( CSceneEventInfo *info, CChoreoScene *scene, 
 	float intensity = info->UpdateWeight( this ) * event->GetIntensity( scene->GetTime() );
 
 	// slide it up.
-	for (LocalFlexController_t i = LocalFlexController_t(0); i < GetNumFlexControllers(); i++)
+	for (LocalFlexController_t i = LocalFlexController_t(0); i < GetEngineObject()->GetNumFlexControllers(); i++)
 	{
 		float weight = GetFlexWeight( i );
 

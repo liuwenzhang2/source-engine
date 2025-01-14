@@ -929,6 +929,10 @@ public:
 	float SetPoseParameter(int iParameter, float flValue) { return SetPoseParameter(GetModelPtr(), iParameter, flValue); }
 	virtual void ResetClientsideFrame(void) { SetCycle(0); }
 	bool GetPoseParameterRange(int iPoseParameter, float& minValue, float& maxValue);
+	LocalFlexController_t GetNumFlexControllers(void);
+	const char* GetFlexDescFacs(int iFlexDesc);
+	const char* GetFlexControllerName(LocalFlexController_t iFlexController);
+	const char* GetFlexControllerType(LocalFlexController_t iFlexController);
 	void UpdateRelevantInterpolatedVars();
 	void AddBaseAnimatingInterpolatedVars();
 	void RemoveBaseAnimatingInterpolatedVars();

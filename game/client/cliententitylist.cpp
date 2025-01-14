@@ -6832,6 +6832,48 @@ void C_EngineObjectInternal::SetReceivedSequence(void)
 	m_bReceivedSequence = true;
 }
 
+LocalFlexController_t C_EngineObjectInternal::GetNumFlexControllers(void)
+{
+	IStudioHdr* pstudiohdr = GetModelPtr();
+	if (!pstudiohdr)
+		return LocalFlexController_t(0);
+
+	return pstudiohdr->numflexcontrollers();
+}
+
+const char* C_EngineObjectInternal::GetFlexDescFacs(int iFlexDesc)
+{
+	IStudioHdr* pstudiohdr = GetModelPtr();
+	if (!pstudiohdr)
+		return 0;
+
+	mstudioflexdesc_t* pflexdesc = pstudiohdr->pFlexdesc(iFlexDesc);
+
+	return pflexdesc->pszFACS();
+}
+
+const char* C_EngineObjectInternal::GetFlexControllerName(LocalFlexController_t iFlexController)
+{
+	IStudioHdr* pstudiohdr = GetModelPtr();
+	if (!pstudiohdr)
+		return 0;
+
+	mstudioflexcontroller_t* pflexcontroller = pstudiohdr->pFlexcontroller(iFlexController);
+
+	return pflexcontroller->pszName();
+}
+
+const char* C_EngineObjectInternal::GetFlexControllerType(LocalFlexController_t iFlexController)
+{
+	IStudioHdr* pstudiohdr = GetModelPtr();
+	if (!pstudiohdr)
+		return 0;
+
+	mstudioflexcontroller_t* pflexcontroller = pstudiohdr->pFlexcontroller(iFlexController);
+
+	return pflexcontroller->pszType();
+}
+
 void C_EngineObjectInternal::UpdateRelevantInterpolatedVars()
 {
 	MDLCACHE_CRITICAL_SECTION();

@@ -56,6 +56,15 @@ static ConVar  cl_interp_npcs( "cl_interp_npcs", "0.0", FCVAR_USERINFO, "Interpo
 ConVar  r_drawmodeldecals( "r_drawmodeldecals", "1" );
 extern ConVar	cl_showerror;
 static ConVar  r_drawrenderboxes( "r_drawrenderboxes", "0", FCVAR_CHEAT );  
+static void VCollideWireframe_ChangeCallback(IConVar* pConVar, char const* pOldString, float flOldValue)
+{
+	for (IClientEntity* pEntity = EntityList()->FirstBaseEntity(); pEntity; pEntity = EntityList()->NextBaseEntity(pEntity))
+	{
+		pEntity->UpdateVisibility();
+	}
+}
+
+ConVar vcollide_wireframe("vcollide_wireframe", "0", FCVAR_CHEAT, "Render physics collision models in wireframe", VCollideWireframe_ChangeCallback);
 
 // Should these be somewhere else?
 #define PITCH 0
@@ -3622,6 +3631,76 @@ bool C_BaseEntity::HasNPCsOnIt(void)
 	}
 
 	return false;
+}
+
+
+//-----------------------------------------------------------------------------
+// Purpose: Clientside bone follower class. Used just to visualize them.
+//			Bone followers WON'T be sent to the client if VISUALIZE_FOLLOWERS is
+//			undefined in the server's physics_bone_followers.cpp
+//-----------------------------------------------------------------------------
+class C_BoneFollower : public C_BaseEntity
+{
+	DECLARE_CLASS(C_BoneFollower, C_BaseEntity);
+	DECLARE_CLIENTCLASS();
+public:
+	C_BoneFollower(void)
+	{
+	}
+
+	bool	ShouldDraw(void);
+	int		DrawModel(int flags);
+	bool	TestCollision(const Ray_t& ray, unsigned int mask, trace_t& trace);
+
+private:
+	int m_modelIndex;
+	int m_solidIndex;
+};
+
+IMPLEMENT_CLIENTCLASS_DT(C_BoneFollower, DT_BoneFollower, CBoneFollower)
+	RecvPropInt(RECVINFO(m_modelIndex)),
+	RecvPropInt(RECVINFO(m_solidIndex)),
+END_RECV_TABLE()
+
+//-----------------------------------------------------------------------------
+// Purpose: Returns whether object should render.
+//-----------------------------------------------------------------------------
+bool C_BoneFollower::ShouldDraw(void)
+{
+	return (vcollide_wireframe.GetBool());  //MOTODO
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
+int C_BoneFollower::DrawModel(int flags)
+{
+	vcollide_t* pCollide = modelinfo->GetVCollide(m_modelIndex);
+	if (pCollide)
+	{
+		static color32 debugColor = { 0,255,255,0 };
+		matrix3x4_t matrix;
+		AngleMatrix(GetEngineObject()->GetAbsAngles(), GetEngineObject()->GetAbsOrigin(), matrix);
+		engine->DebugDrawPhysCollide(pCollide->solids[m_solidIndex], NULL, matrix, debugColor);
+	}
+	return 1;
+}
+
+bool C_BoneFollower::TestCollision(const Ray_t& ray, unsigned int mask, trace_t& trace)
+{
+	vcollide_t* pCollide = modelinfo->GetVCollide(m_modelIndex);
+	Assert(pCollide && pCollide->solidCount > m_solidIndex);
+
+	EntityList()->PhysGetCollision()->TraceBox(ray, pCollide->solids[m_solidIndex], GetEngineObject()->GetAbsOrigin(), GetEngineObject()->GetAbsAngles(), &trace);
+
+	if (trace.fraction >= 1)
+		return false;
+
+	// return owner as trace hit
+	trace.m_pEnt = GetOwnerEntity();
+	trace.hitgroup = 0;//m_hitGroup;
+	trace.physicsbone = 0;//m_physicsBone; // UNDONE: Get physics bone index & hitgroup
+	return trace.DidHit();
 }
 
 //------------------------------------------------------------------------------

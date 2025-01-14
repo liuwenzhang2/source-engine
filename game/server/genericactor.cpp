@@ -251,13 +251,13 @@ void CFlextalkActor::SetFlexTarget( LocalFlexController_t flexnum, float value )
 {
 	m_flextarget[flexnum] = value;
 
-	const char *pszType = GetFlexControllerType( flexnum );
+	const char *pszType = GetEngineObject()->GetFlexControllerType( flexnum );
 
-	for (LocalFlexController_t i = LocalFlexController_t(0); i < GetNumFlexControllers(); i++)
+	for (LocalFlexController_t i = LocalFlexController_t(0); i < GetEngineObject()->GetNumFlexControllers(); i++)
 	{
 		if (i != flexnum)
 		{
-			const char *pszOtherType = GetFlexControllerType( i );
+			const char *pszOtherType = GetEngineObject()->GetFlexControllerType( i );
 			if (stricmp( pszType, pszOtherType ) == 0)
 			{
 				m_flextarget[i] = 0;
@@ -274,11 +274,11 @@ void CFlextalkActor::SetFlexTarget( LocalFlexController_t flexnum, float value )
 
 
 	// HACK, for now, consider then linked is named "right_" or "left_"
-	if (strncmp( "right_", GetFlexControllerName( flexnum ), 6 ) == 0)
+	if (strncmp( "right_", GetEngineObject()->GetFlexControllerName( flexnum ), 6 ) == 0)
 	{
 		m_flextarget[flexnum+1] = value2;
 	}
-	else if (strncmp( "left_", GetFlexControllerName( flexnum ), 5 ) == 0)
+	else if (strncmp( "left_", GetEngineObject()->GetFlexControllerName( flexnum ), 5 ) == 0)
 	{
 		m_flextarget[flexnum-1] = value2;
 	}
@@ -287,9 +287,9 @@ void CFlextalkActor::SetFlexTarget( LocalFlexController_t flexnum, float value )
 
 LocalFlexController_t CFlextalkActor::LookupFlex( const char *szTarget  )
 {
-	for (LocalFlexController_t i = LocalFlexController_t(0); i < GetNumFlexControllers(); i++)
+	for (LocalFlexController_t i = LocalFlexController_t(0); i < GetEngineObject()->GetNumFlexControllers(); i++)
 	{
-		const char *pszFlex = GetFlexControllerName( i );
+		const char *pszFlex = GetEngineObject()->GetFlexControllerName( i );
 		if (stricmp( szTarget, pszFlex ) == 0)
 		{
 			return i;
@@ -308,7 +308,7 @@ void CFlextalkActor::ProcessSceneEvents( void )
 	}
 	
 	// only do this if they have more than eyelid movement
-	if (GetNumFlexControllers() > 2)
+	if (GetEngineObject()->GetNumFlexControllers() > 2)
 	{
 		const char *pszExpression = flex_expression.GetString();
 
@@ -316,7 +316,7 @@ void CFlextalkActor::ProcessSceneEvents( void )
 		{
 			int i;
 			int j = atoi( &pszExpression[1] );
-			for (i = 0; i < GetNumFlexControllers(); i++)
+			for (i = 0; i < GetEngineObject()->GetNumFlexControllers(); i++)
 			{
 				m_flextarget[m_flexnum] = 0;
 			}
@@ -352,16 +352,16 @@ void CFlextalkActor::ProcessSceneEvents( void )
 				{
 					if (*pszExpression == '-')
 					{
-						for (LocalFlexController_t i = LocalFlexController_t(0); i < GetNumFlexControllers(); i++)
+						for (LocalFlexController_t i = LocalFlexController_t(0); i < GetEngineObject()->GetNumFlexControllers(); i++)
 						{
 							m_flextarget[i] = 0;
 						}
 					}
 					else if (*pszExpression == '?')
 					{
-						for (LocalFlexController_t i = LocalFlexController_t(0); i < GetNumFlexControllers(); i++)
+						for (LocalFlexController_t i = LocalFlexController_t(0); i < GetEngineObject()->GetNumFlexControllers(); i++)
 						{
-							Msg( "\"%s\" ", GetFlexControllerName( i ) );
+							Msg( "\"%s\" ", GetEngineObject()->GetFlexControllerName( i ) );
 						}
 						Msg( "\n" );
 						flex_expression.SetValue( "" );
@@ -386,25 +386,25 @@ void CFlextalkActor::ProcessSceneEvents( void )
 		} 
 		else if (m_flextime < gpGlobals->curtime)
 		{
-			m_flextime = gpGlobals->curtime + random->RandomFloat( 0.3, 0.5 ) * (30.0 / GetNumFlexControllers());
-			m_flexnum = (LocalFlexController_t)random->RandomInt( 0, GetNumFlexControllers() - 1 );
+			m_flextime = gpGlobals->curtime + random->RandomFloat( 0.3, 0.5 ) * (30.0 / GetEngineObject()->GetNumFlexControllers());
+			m_flexnum = (LocalFlexController_t)random->RandomInt( 0, GetEngineObject()->GetNumFlexControllers() - 1 );
 
 			if (m_flextarget[m_flexnum] == 1)
 			{
 				m_flextarget[m_flexnum] = 0;
 			}
-			else if (stricmp( GetFlexControllerType( m_flexnum ), "phoneme" ) != 0)
+			else if (stricmp(GetEngineObject()->GetFlexControllerType( m_flexnum ), "phoneme" ) != 0)
 			{
-				if (strstr( GetFlexControllerName( m_flexnum ), "upper_raiser" ) == NULL)
+				if (strstr(GetEngineObject()->GetFlexControllerName( m_flexnum ), "upper_raiser" ) == NULL)
 				{
-					Msg( "%s:%s\n", GetFlexControllerType( m_flexnum ), GetFlexControllerName( m_flexnum ) );
+					Msg( "%s:%s\n", GetEngineObject()->GetFlexControllerType( m_flexnum ), GetEngineObject()->GetFlexControllerName( m_flexnum ) );
 					SetFlexTarget( m_flexnum, random->RandomFloat( 0.5, 1.0 ) );
 				}
 			}
 		}
 
 		// slide it up.
-		for (LocalFlexController_t i = LocalFlexController_t(0); i < GetNumFlexControllers(); i++)
+		for (LocalFlexController_t i = LocalFlexController_t(0); i < GetEngineObject()->GetNumFlexControllers(); i++)
 		{
 			float weight = GetFlexWeight( i );
 

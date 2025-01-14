@@ -49,19 +49,15 @@ class IBoneSetup;
 FORWARD_DECLARE_HANDLE( memhandle_t );
 typedef unsigned short MDLHandle_t;
 class C_ClientRagdoll;
-extern ConVar vcollide_wireframe;
 
-
-
-
-struct RagdollInfo_t
-{
-	bool		m_bActive;
-	float		m_flSaveTime;
-	int			m_nNumBones;
-	Vector		m_rgBonePos[MAXSTUDIOBONES];
-	Quaternion	m_rgBoneQuaternion[MAXSTUDIOBONES];
-};
+//struct RagdollInfo_t
+//{
+//	bool		m_bActive;
+//	float		m_flSaveTime;
+//	int			m_nNumBones;
+//	Vector		m_rgBonePos[MAXSTUDIOBONES];
+//	Quaternion	m_rgBoneQuaternion[MAXSTUDIOBONES];
+//};
 
 
 class C_BaseAnimating : public C_BaseEntity//, private IModelLoadCallback
@@ -88,14 +84,6 @@ public:
 	virtual void	Simulate();	
 
 	float	GetAnimTimeInterval( void ) const;
-
-
-
-
-	LocalFlexController_t GetNumFlexControllers( void );
-	const char *GetFlexDescFacs( int iFlexDesc );
-	const char *GetFlexControllerName( LocalFlexController_t iFlexController );
-	const char *GetFlexControllerType( LocalFlexController_t iFlexController );
 
 	virtual void	GetAimEntOrigin( IClientEntity *pAttachedTo, Vector *pAbsOrigin, QAngle *pAbsAngles );
 
@@ -204,8 +192,6 @@ public:
 	virtual bool					TestHitboxes( const Ray_t &ray, unsigned int fContentsMask, trace_t& tr );
 
 	virtual C_ClientRagdoll*		CreateRagdollCopy();
-	void							IgniteRagdoll(C_BaseEntity* pSource);
-	void							TransferDissolveFrom(C_BaseEntity* pSource);
 	virtual C_BaseEntity*			BecomeRagdollOnClient();
 
 
@@ -400,92 +386,10 @@ private:
 
 };
 
-enum 
-{
-	RAGDOLL_FRICTION_OFF = -2,
-	RAGDOLL_FRICTION_NONE,
-	RAGDOLL_FRICTION_IN,
-	RAGDOLL_FRICTION_HOLD,
-	RAGDOLL_FRICTION_OUT,
-};
-
-class C_ClientRagdoll : public C_BaseAnimating, public IPVSNotify
-{
-	
-public:
-	C_ClientRagdoll( );//bool bRestoring 
-	DECLARE_CLASS( C_ClientRagdoll, C_BaseAnimating );
-	DECLARE_DATADESC();
-
-	bool Init(int entnum, int iSerialNum);
-
-	// inherited from IPVSNotify
-	virtual void OnPVSStatusChanged( bool bInPVS );
-
-	virtual void SetupWeights( const matrix3x4_t *pBoneToWorld, int nFlexWeightCount, float *pFlexWeights, float *pFlexDelayedWeights );
-	virtual void ImpactTrace( trace_t *pTrace, int iDamageType, const char *pCustomImpactName );
-	void ClientThink( void );
-	void ReleaseRagdoll( void ) { m_bReleaseRagdoll = true;	}
-	bool ShouldSavePhysics( void ) { return true; }
-	virtual void	OnSave();
-	virtual void	OnRestore();
-	virtual int ObjectCaps( void ) { return BaseClass::ObjectCaps() | FCAP_SAVE_NON_NETWORKABLE; }
-	virtual IPVSNotify*				GetPVSNotifyInterface() { return this; }
-
-	void	HandleAnimatedFriction( void );
-	virtual void SUB_Remove( void );
-
-	void	FadeOut( void );
-
-	bool m_bFadeOut;
-	bool m_bImportant;
-	float m_flEffectTime;
-
-private:
-	int m_iCurrentFriction;
-	int m_iMinFriction;
-	int m_iMaxFriction;
-	float m_flFrictionModTime;
-	float m_flFrictionTime;
-
-	int  m_iFrictionAnimState;
-	bool m_bReleaseRagdoll;
-
-	bool m_bFadingOut;
-
-	float m_flScaleEnd[NUM_HITBOX_FIRES];
-	float m_flScaleTimeStart[NUM_HITBOX_FIRES];
-	float m_flScaleTimeEnd[NUM_HITBOX_FIRES];
-};
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 // FIXME: move these to somewhere that makes sense
-void GetColumn( matrix3x4_t& src, int column, Vector &dest );
-void SetColumn( Vector &src, int column, matrix3x4_t& dest );
+//void GetColumn( matrix3x4_t& src, int column, Vector &dest );
+//void SetColumn( Vector &src, int column, matrix3x4_t& dest );
 
 EXTERN_RECV_TABLE(DT_BaseAnimating);
-
-
-extern void DevMsgRT( PRINTF_FORMAT_STRING char const* pMsg, ... );
 
 #endif // C_BASEANIMATING_H

@@ -1637,7 +1637,7 @@ bool C_BaseFlex::CheckSceneEventCompletion( CSceneEventInfo *info, float current
 
 void C_BaseFlex::SetFlexWeight( LocalFlexController_t index, float value )
 {
-	if (index >= 0 && index < GetNumFlexControllers())
+	if (index >= 0 && index < GetEngineObject()->GetNumFlexControllers())
 	{
 		IStudioHdr *pstudiohdr = GetEngineObject()->GetModelPtr( );
 		if (! pstudiohdr)
@@ -1657,7 +1657,7 @@ void C_BaseFlex::SetFlexWeight( LocalFlexController_t index, float value )
 
 float C_BaseFlex::GetFlexWeight( LocalFlexController_t index )
 {
-	if (index >= 0 && index < GetNumFlexControllers())
+	if (index >= 0 && index < GetEngineObject()->GetNumFlexControllers())
 	{
 		IStudioHdr *pstudiohdr = GetEngineObject()->GetModelPtr( );
 		if (! pstudiohdr)
@@ -1677,9 +1677,9 @@ float C_BaseFlex::GetFlexWeight( LocalFlexController_t index )
 
 LocalFlexController_t C_BaseFlex::FindFlexController( const char *szName )
 {
-	for (LocalFlexController_t i = LocalFlexController_t(0); i < GetNumFlexControllers(); i++)
+	for (LocalFlexController_t i = LocalFlexController_t(0); i < GetEngineObject()->GetNumFlexControllers(); i++)
 	{
-		if (stricmp( GetFlexControllerName( i ), szName ) == 0)
+		if (stricmp(GetEngineObject()->GetFlexControllerName( i ), szName ) == 0)
 		{
 			return i;
 		}
@@ -1704,7 +1704,7 @@ void C_BaseFlex::ProcessSceneEvents( bool bFlexEvents )
 
 	if ( bFlexEvents )
 	{
-		for ( LocalFlexController_t i = LocalFlexController_t(0); i < GetNumFlexControllers(); i++)
+		for ( LocalFlexController_t i = LocalFlexController_t(0); i < GetEngineObject()->GetNumFlexControllers(); i++)
 		{
 			SetFlexWeight( i, GetFlexWeight( i ) * 0.95 );
 		}

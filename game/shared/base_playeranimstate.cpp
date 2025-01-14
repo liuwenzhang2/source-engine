@@ -214,7 +214,7 @@ void CBasePlayerAnimState::ClearAnimationLayers()
 	m_pOuter->SetNumAnimOverlays( AIMSEQUENCE_LAYER+NUM_AIMSEQUENCE_LAYERS );
 	for ( int i=0; i < m_pOuter->GetNumAnimOverlays(); i++ )
 	{
-		m_pOuter->GetAnimOverlay( i )->SetOrder( CBaseAnimatingOverlay::MAX_OVERLAYS );
+		m_pOuter->GetAnimOverlay( i )->SetOrder(CAnimationLayer::MAX_OVERLAYS );
 #ifndef CLIENT_DLL
 		m_pOuter->GetAnimOverlay( i )->m_fFlags = 0;
 #endif
@@ -413,9 +413,9 @@ void CBasePlayerAnimState::OptimizeLayerWeights( int iFirstLayer, int nLayers )
 		{
 			CAnimationLayer *pLayer = m_pOuter->GetAnimOverlay( iFirstLayer+i );
 #ifdef CLIENT_DLL 
-			pLayer->m_nOrder = CBaseAnimatingOverlay::MAX_OVERLAYS;
+			pLayer->m_nOrder = CAnimationLayer::MAX_OVERLAYS;
 #else
-			pLayer->m_nOrder.Set( CBaseAnimatingOverlay::MAX_OVERLAYS );
+			pLayer->m_nOrder.Set(CAnimationLayer::MAX_OVERLAYS );
 			pLayer->m_fFlags = 0;
 #endif
 		}

@@ -10,6 +10,7 @@
 #define C_BASEANIMATINGOVERLAY_H
 #pragma once
 
+#include "animationlayer.h"
 #include "c_baseanimating.h"
 
 // For shared code.
@@ -41,16 +42,11 @@ public:
 	virtual void	AccumulateLayers( IBoneSetup &boneSetup, Vector pos[], Quaternion q[], float currentTime );
 	virtual void DoAnimationEvents( IStudioHdr *pStudioHdr );
 
-	enum
-	{
-		MAX_OVERLAYS = 15,
-	};
-
 	CUtlVector < C_AnimationLayer >	m_AnimOverlay;
 
 	CUtlVector < CInterpolatedVar< C_AnimationLayer >* >	m_iv_AnimOverlay;
 
-	float m_flOverlayPrevEventCycle[ MAX_OVERLAYS ];
+	float m_flOverlayPrevEventCycle[C_AnimationLayer::MAX_OVERLAYS ];
 
 private:
 	C_BaseAnimatingOverlay( const C_BaseAnimatingOverlay & ); // not defined, not accessible

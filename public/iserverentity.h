@@ -490,6 +490,10 @@ public:
 	virtual float SetPoseParameter(IStudioHdr* pStudioHdr, int iParameter, float flValue) = 0;
 	virtual float SetPoseParameter(const char* szName, float flValue) = 0;
 	virtual float SetPoseParameter(int iParameter, float flValue) = 0;
+	virtual LocalFlexController_t GetNumFlexControllers(void) = 0;
+	virtual const char* GetFlexDescFacs(int iFlexDesc) = 0;
+	virtual const char* GetFlexControllerName(LocalFlexController_t iFlexController) = 0;
+	virtual const char* GetFlexControllerType(LocalFlexController_t iFlexController) = 0;
 	virtual void ResetClientsideFrame(void) = 0;
 	virtual void DoMuzzleFlash() = 0;
 	virtual void VPhysicsDestroyObject(void) = 0;
