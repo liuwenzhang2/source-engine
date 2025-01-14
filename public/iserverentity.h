@@ -53,6 +53,7 @@ class variant_t;
 class IEntitySaveUtils;
 class CEventAction;
 struct TimedOverlay_t;
+class KeyValues;
 
 struct servertouchlink_t
 {
