@@ -2365,7 +2365,7 @@ bool CBaseCombatWeapon::SetIdealActivity( Activity ideal )
 	m_nIdealSequence = idealSequence;
 
 	//Find the next sequence in the potential chain of sequences leading to our ideal one
-	int nextSequence = FindTransitionSequence(GetEngineObject()->GetSequence(), m_nIdealSequence, NULL );
+	int nextSequence = GetEngineObject()->FindTransitionSequence(GetEngineObject()->GetSequence(), m_nIdealSequence, NULL );
 
 	// Don't use transitions when we're deploying
 	if ( ideal != ACT_VM_DRAW && IsWeaponVisible() && nextSequence != m_nIdealSequence )

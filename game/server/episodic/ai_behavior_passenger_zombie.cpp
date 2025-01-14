@@ -778,7 +778,7 @@ bool CAI_PassengerBehaviorZombie::AttachToVehicle( void )
 	if ( pAlyx )
 	{
 		// Tell Alyx to play along!
-		pAlyx->ForceVehicleInteraction( GetOuter()->GetSequenceName( nSequence ), GetOuter() );
+		pAlyx->ForceVehicleInteraction( GetOuter()->GetEngineObject()->GetSequenceName( nSequence ), GetOuter() );
 	}
 
 	return true;

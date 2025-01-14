@@ -369,7 +369,7 @@ bool CNPC_Manhack::ShouldGib( const CTakeDamageInfo &info )
 void CNPC_Manhack::Event_Killed( const CTakeDamageInfo &info )
 {
 	// turn off the blur!
-	SetBodygroup( MANHACK_BODYGROUP_BLUR, MANHACK_BODYGROUP_OFF );
+	GetEngineObject()->SetBodygroup( MANHACK_BODYGROUP_BLUR, MANHACK_BODYGROUP_OFF );
 
 	// Sparks
 	for (int i = 0; i < 3; i++)
@@ -2084,8 +2084,8 @@ void CNPC_Manhack::SpinBlades(float flInterval)
 {
 	if (!m_bBladesActive)
 	{
-		SetBodygroup( MANHACK_BODYGROUP_BLADE, MANHACK_BODYGROUP_OFF );
-		SetBodygroup( MANHACK_BODYGROUP_BLUR, MANHACK_BODYGROUP_OFF );
+		GetEngineObject()->SetBodygroup( MANHACK_BODYGROUP_BLADE, MANHACK_BODYGROUP_OFF );
+		GetEngineObject()->SetBodygroup( MANHACK_BODYGROUP_BLUR, MANHACK_BODYGROUP_OFF );
 		m_flBladeSpeed = 0.0;
 		GetEngineObject()->SetPlaybackRate(1.0);
 		return;
@@ -2115,18 +2115,18 @@ void CNPC_Manhack::SpinBlades(float flInterval)
 		// blend through blades, blades+blur, blur
 		if (m_flBladeSpeed < 20)
 		{
-			SetBodygroup( MANHACK_BODYGROUP_BLADE, MANHACK_BODYGROUP_ON );
-			SetBodygroup( MANHACK_BODYGROUP_BLUR, MANHACK_BODYGROUP_OFF );
+			GetEngineObject()->SetBodygroup( MANHACK_BODYGROUP_BLADE, MANHACK_BODYGROUP_ON );
+			GetEngineObject()->SetBodygroup( MANHACK_BODYGROUP_BLUR, MANHACK_BODYGROUP_OFF );
 		}
 		else if (m_flBladeSpeed < 40)
 		{
-			SetBodygroup( MANHACK_BODYGROUP_BLADE, MANHACK_BODYGROUP_ON );
-			SetBodygroup( MANHACK_BODYGROUP_BLUR, MANHACK_BODYGROUP_ON );
+			GetEngineObject()->SetBodygroup( MANHACK_BODYGROUP_BLADE, MANHACK_BODYGROUP_ON );
+			GetEngineObject()->SetBodygroup( MANHACK_BODYGROUP_BLUR, MANHACK_BODYGROUP_ON );
 		}
 		else
 		{
-			SetBodygroup( MANHACK_BODYGROUP_BLADE, MANHACK_BODYGROUP_OFF );
-			SetBodygroup( MANHACK_BODYGROUP_BLUR, MANHACK_BODYGROUP_ON );
+			GetEngineObject()->SetBodygroup( MANHACK_BODYGROUP_BLADE, MANHACK_BODYGROUP_OFF );
+			GetEngineObject()->SetBodygroup( MANHACK_BODYGROUP_BLUR, MANHACK_BODYGROUP_ON );
 		}
 
 		GetEngineObject()->SetPlaybackRate(m_flBladeSpeed / 100.0);
@@ -2600,7 +2600,7 @@ void CNPC_Manhack::StartEngine( bool fStartSound )
 	}
 
 	// Make the blade appear.
-	SetBodygroup( 1, 1 );
+	GetEngineObject()->SetBodygroup( 1, 1 );
 
 	// Pop up a little if falling fast!
 	Vector vecVelocity;

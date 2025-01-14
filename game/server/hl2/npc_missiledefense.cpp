@@ -295,10 +295,10 @@ void CNPC_MissileDefense::Spawn( void )
 	GetEngineObject()->SetBoneController( MD_BC_YAW, 10 );
 	GetEngineObject()->SetBoneController( MD_BC_PITCH, 0 );
 
-	SetBodygroup( 1, 1 );
-	SetBodygroup( 2, 1 );
-	SetBodygroup( 3, 1 );
-	SetBodygroup( 4, 1 );
+	GetEngineObject()->SetBodygroup( 1, 1 );
+	GetEngineObject()->SetBodygroup( 2, 1 );
+	GetEngineObject()->SetBodygroup( 3, 1 );
+	GetEngineObject()->SetBodygroup( 4, 1 );
 
 	m_NPCState = NPC_STATE_IDLE;
 }
@@ -358,10 +358,10 @@ void CNPC_MissileDefense::Gib(void)
 			&GetEngineObject()->GetAbsOrigin(), 255, 180, 100, 0, 100, 0.1, 0 );
 
 	// Remove top parts
-	SetBodygroup( 1, 0 );
-	SetBodygroup( 2, 0 );
-	SetBodygroup( 3, 0 );
-	SetBodygroup( 4, 0 );
+	GetEngineObject()->SetBodygroup( 1, 0 );
+	GetEngineObject()->SetBodygroup( 2, 0 );
+	GetEngineObject()->SetBodygroup( 3, 0 );
+	GetEngineObject()->SetBodygroup( 4, 0 );
 	m_takedamage = 0;
 	SetThink(NULL);
 	

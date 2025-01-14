@@ -1127,7 +1127,7 @@ void CMultiPlayerAnimState::ComputeMainSequence()
 
 	// Export to our outer class..
 	int animDesired = SelectWeightedSequence( TranslateActivity( idealActivity ) );
-	if ( pPlayer->GetSequenceActivity( pPlayer->GetEngineObject()->GetSequence() ) == pPlayer->GetSequenceActivity( animDesired ) )
+	if ( pPlayer->GetEngineObject()->GetSequenceActivity( pPlayer->GetEngineObject()->GetSequence() ) == pPlayer->GetEngineObject()->GetSequenceActivity( animDesired ) )
 		return;
 
 	if ( animDesired < 0 )
@@ -1432,7 +1432,7 @@ void CMultiPlayerAnimState::DoMovementTest( IStudioHdr *pStudioHdr, float flX, f
 	float flTestSpeed = GetBasePlayer()->GetSequenceGroundSpeed( m_nMovementSequence );
 	if ( flTestSpeed < 10.0f )
 	{
-		Warning( "%s : %s (X %.0f Y %.0f) missing movement\n", pStudioHdr->pszName(), GetBasePlayer()->GetSequenceName( m_nMovementSequence ), flX, flY );
+		Warning( "%s : %s (X %.0f Y %.0f) missing movement\n", pStudioHdr->pszName(), GetBasePlayer()->GetEngineObject()->GetSequenceName( m_nMovementSequence ), flX, flY );
 	}
 #endif
 
@@ -1487,7 +1487,7 @@ void CMultiPlayerAnimState::GetMovementFlags( IStudioHdr *pStudioHdr )
 	m_nMovementSequence = GetBasePlayer()->GetEngineObject()->GetSequence();
 	m_LegAnimType = LEGANIM_9WAY;
 
-	KeyValues *seqKeyValues = GetBasePlayer()->GetSequenceKeyValues( m_nMovementSequence );
+	KeyValues *seqKeyValues = GetBasePlayer()->GetEngineObject()->GetSequenceKeyValues( m_nMovementSequence );
 	// Msg("sequence %d : %s (%d)\n", sequence,  GetOuter()->GetSequenceName( sequence ), seqKeyValues != NULL );
 	if (seqKeyValues)
 	{

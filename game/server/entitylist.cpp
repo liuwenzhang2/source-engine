@@ -7334,6 +7334,241 @@ void CEngineObjectInternal::SimulationChanged() {
 	NetworkStateChanged(&m_angRotation);
 }
 
+//=========================================================
+//=========================================================
+
+void CEngineObjectInternal::SetBodygroup(int iGroup, int iValue)
+{
+	// SetBodygroup is not supported on pending dynamic models. Wait for it to load!
+	// XXX TODO we could buffer up the group and value if we really needed to. -henryg
+	Assert(GetModelPtr());
+	int newBody = GetBody();
+	GetModelPtr()->SetBodygroup(newBody, iGroup, iValue);
+	SetBody(newBody);
+}
+
+int CEngineObjectInternal::GetBodygroup(int iGroup)
+{
+	//Assert( IsDynamicModelLoading() || GetModelPtr() );
+	return GetModelPtr()->GetBodygroup(GetBody(), iGroup);//IsDynamicModelLoading() ? 0 : 
+}
+
+const char* CEngineObjectInternal::GetBodygroupName(int iGroup)
+{
+	//Assert( IsDynamicModelLoading() || GetModelPtr() );
+	return GetModelPtr()->GetBodygroupName(iGroup);//IsDynamicModelLoading() ? "" : 
+}
+
+int CEngineObjectInternal::FindBodygroupByName(const char* name)
+{
+	//Assert( IsDynamicModelLoading() || GetModelPtr() );
+	return GetModelPtr()->FindBodygroupByName(name);//IsDynamicModelLoading() ? -1 : 
+}
+
+int CEngineObjectInternal::GetBodygroupCount(int iGroup)
+{
+	//Assert( IsDynamicModelLoading() || GetModelPtr() );
+	return GetModelPtr()->GetBodygroupCount(iGroup);//IsDynamicModelLoading() ? 0 : 
+}
+
+int CEngineObjectInternal::GetNumBodyGroups(void)
+{
+	//Assert( IsDynamicModelLoading() || GetModelPtr() );
+	return GetModelPtr()->GetNumBodyGroups();//IsDynamicModelLoading() ? 0 : 
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: 
+// Output : char const
+//-----------------------------------------------------------------------------
+const char* CEngineObjectInternal::GetHitboxSetName(void)
+{
+	Assert(GetModelPtr());
+	return GetModelPtr()->GetHitboxSetName(GetHitboxSet());
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: 
+// Output : int
+//-----------------------------------------------------------------------------
+int CEngineObjectInternal::GetHitboxSetCount(void)
+{
+	Assert(GetModelPtr());
+	return GetModelPtr()->GetHitboxSetCount();
+}
+
+int CEngineObjectInternal::GetHitboxBone(int hitboxIndex)
+{
+	IStudioHdr* pStudioHdr = GetModelPtr();
+	if (pStudioHdr)
+	{
+		mstudiohitboxset_t* set = pStudioHdr->pHitboxSet(GetHitboxSet());
+		if (set && hitboxIndex < set->numhitboxes)
+		{
+			return set->pHitbox(hitboxIndex)->bone;
+		}
+	}
+	return 0;
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: 
+// Input  : setnum - 
+//-----------------------------------------------------------------------------
+void CEngineObjectInternal::SetHitboxSet(int setnum)
+{
+#ifdef _DEBUG
+	IStudioHdr* pStudioHdr = GetModelPtr();
+	if (!pStudioHdr)
+		return;
+
+	if (setnum > pStudioHdr->numhitboxsets())
+	{
+		// Warn if an bogus hitbox set is being used....
+		static bool s_bWarned = false;
+		if (!s_bWarned)
+		{
+			Warning("Using bogus hitbox set in entity %s!\n", GetClassname());
+			s_bWarned = true;
+		}
+		setnum = 0;
+	}
+#endif
+
+	m_nHitboxSet = setnum;
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: 
+// Input  : *setname - 
+//-----------------------------------------------------------------------------
+void CEngineObjectInternal::SetHitboxSetByName(const char* setname)
+{
+	Assert(GetModelPtr());
+	SetHitboxSet(GetModelPtr()->FindHitboxSetByName(setname));
+}
+
+bool CEngineObjectInternal::LookupHitbox(const char* szName, int& outSet, int& outBox)
+{
+	IStudioHdr* pHdr = GetModelPtr();
+
+	outSet = -1;
+	outBox = -1;
+
+	if (!pHdr)
+		return false;
+
+	for (int set = 0; set < pHdr->numhitboxsets(); set++)
+	{
+		for (int i = 0; i < pHdr->iHitboxCount(set); i++)
+		{
+			mstudiobbox_t* pBox = pHdr->pHitbox(i, set);
+
+			if (!pBox)
+				continue;
+
+			const char* szBoxName = pBox->pszHitboxName();
+			if (Q_stricmp(szBoxName, szName) == 0)
+			{
+				outSet = set;
+				outBox = i;
+				return true;
+			}
+		}
+	}
+
+	return false;
+}
+
+int CEngineObjectInternal::GetHitboxesFrontside(int* boxList, int boxMax, const Vector& normal, float dist)
+{
+	int count = 0;
+	IStudioHdr* pStudioHdr = GetModelPtr();
+	if (pStudioHdr)
+	{
+		mstudiohitboxset_t* set = pStudioHdr->pHitboxSet(GetHitboxSet());
+		if (set)
+		{
+			matrix3x4_t matrix;
+			for (int b = 0; b < set->numhitboxes; b++)
+			{
+				mstudiobbox_t* pbox = set->pHitbox(b);
+
+				GetHitboxBoneTransform(pbox->bone, matrix);
+				Vector center = (pbox->bbmax + pbox->bbmin) * 0.5;
+				Vector centerWs;
+				VectorTransform(center, matrix, centerWs);
+				if (DotProduct(centerWs, normal) >= dist)
+				{
+					if (count < boxMax)
+					{
+						boxList[count] = b;
+						count++;
+					}
+				}
+			}
+		}
+	}
+
+	return count;
+}
+
+static Vector	hullcolor[8] =
+{
+	Vector(1.0, 1.0, 1.0),
+	Vector(1.0, 0.5, 0.5),
+	Vector(0.5, 1.0, 0.5),
+	Vector(1.0, 1.0, 0.5),
+	Vector(0.5, 0.5, 1.0),
+	Vector(1.0, 0.5, 1.0),
+	Vector(0.5, 1.0, 1.0),
+	Vector(1.0, 1.0, 1.0)
+};
+
+//-----------------------------------------------------------------------------
+// Purpose: Send the current hitboxes for this model to the client ( to compare with
+//  r_drawentities 3 client side boxes ).
+// WARNING:  This uses a ton of bandwidth, only use on a listen server
+//-----------------------------------------------------------------------------
+void CEngineObjectInternal::DrawServerHitboxes(float duration /*= 0.0f*/, bool monocolor /*= false*/)
+{
+	IStudioHdr* pStudioHdr = GetModelPtr();
+	if (!pStudioHdr)
+		return;
+
+	mstudiohitboxset_t* set = pStudioHdr->pHitboxSet(GetHitboxSet());
+	if (!set)
+		return;
+
+	Vector position;
+	QAngle angles;
+
+	int r = 0;
+	int g = 0;
+	int b = 255;
+
+	for (int i = 0; i < set->numhitboxes; i++)
+	{
+		mstudiobbox_t* pbox = set->pHitbox(i);
+
+		GetHitboxBonePosition(pbox->bone, position, angles);
+
+		if (!monocolor)
+		{
+			int j = (pbox->group % 8);
+
+			r = (int)(255.0f * hullcolor[j][0]);
+			g = (int)(255.0f * hullcolor[j][1]);
+			b = (int)(255.0f * hullcolor[j][2]);
+		}
+
+		if (debugoverlay)
+		{
+			debugoverlay->AddBoxOverlay(position, pbox->bbmin * GetModelScale(), pbox->bbmax * GetModelScale(), angles, r, g, b, 0, duration);
+		}
+	}
+}
+
 //-----------------------------------------------------------------------------
 // Purpose: 
 // Input  : scale - 
@@ -7544,6 +7779,198 @@ void CEngineObjectInternal::ResetSequenceInfo()
 	{
 		mdlcache->SetEventIndexForSequence(pStudioHdr->pSeqdesc(GetSequence()));
 	}
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: 
+//
+// Input  : iSequence - 
+//
+// Output : char
+//-----------------------------------------------------------------------------
+const char* CEngineObjectInternal::GetSequenceName(int iSequence)
+{
+	if (iSequence == -1)
+	{
+		return "Not Found!";
+	}
+
+	if (!GetModelPtr())
+		return "No model!";
+
+	return GetModelPtr()->GetSequenceName(iSequence);
+}
+
+//=========================================================
+//=========================================================
+int CEngineObjectInternal::FindTransitionSequence(int iCurrentSequence, int iGoalSequence, int* piDir)
+{
+	Assert(GetModelPtr());
+
+	if (piDir == NULL)
+	{
+		int iDir = 1;
+		int sequence = GetModelPtr()->FindTransitionSequence(iCurrentSequence, iGoalSequence, &iDir);
+		if (iDir != 1)
+			return -1;
+		else
+			return sequence;
+	}
+
+	return GetModelPtr()->FindTransitionSequence(iCurrentSequence, iGoalSequence, piDir);
+}
+
+bool CEngineObjectInternal::GotoSequence(int iCurrentSequence, float flCurrentCycle, float flCurrentRate, int iGoalSequence, int& nNextSequence, float& flNextCycle, int& iNextDir)
+{
+	return GetModelPtr()->GotoSequence(iCurrentSequence, flCurrentCycle, flCurrentRate, iGoalSequence, nNextSequence, flNextCycle, iNextDir);
+}
+
+int CEngineObjectInternal::GetEntryNode(int iSequence)
+{
+	IStudioHdr* pstudiohdr = GetModelPtr();
+	if (!pstudiohdr)
+		return 0;
+
+	return pstudiohdr->EntryNode(iSequence);
+}
+
+int CEngineObjectInternal::GetExitNode(int iSequence)
+{
+	IStudioHdr* pstudiohdr = GetModelPtr();
+	if (!pstudiohdr)
+		return 0;
+
+	return pstudiohdr->ExitNode(iSequence);
+}
+
+int CEngineObjectInternal::ExtractBbox(int sequence, Vector& mins, Vector& maxs)
+{
+	//Assert( IsDynamicModelLoading() || GetModelPtr() );
+	return GetModelPtr()->ExtractBbox(sequence, mins, maxs);//IsDynamicModelLoading() ? 0 : 
+}
+
+//=========================================================
+//=========================================================
+
+void CEngineObjectInternal::SetSequenceBox(void)
+{
+	Vector mins, maxs;
+
+	// Get sequence bbox
+	if (ExtractBbox(GetSequence(), mins, maxs))
+	{
+		// expand box for rotation
+		// find min / max for rotations
+		float yaw = GetLocalAngles().y * (M_PI / 180.0);
+
+		Vector xvector, yvector;
+		xvector.x = cos(yaw);
+		xvector.y = sin(yaw);
+		yvector.x = -sin(yaw);
+		yvector.y = cos(yaw);
+		Vector bounds[2];
+
+		bounds[0] = mins;
+		bounds[1] = maxs;
+
+		Vector rmin(9999, 9999, 9999);
+		Vector rmax(-9999, -9999, -9999);
+		Vector base, transformed;
+
+		for (int i = 0; i <= 1; i++)
+		{
+			base.x = bounds[i].x;
+			for (int j = 0; j <= 1; j++)
+			{
+				base.y = bounds[j].y;
+				for (int k = 0; k <= 1; k++)
+				{
+					base.z = bounds[k].z;
+
+					// transform the point
+					transformed.x = xvector.x * base.x + yvector.x * base.y;
+					transformed.y = xvector.y * base.x + yvector.y * base.y;
+					transformed.z = base.z;
+
+					for (int l = 0; l < 3; l++)
+					{
+						if (transformed[l] < rmin[l])
+							rmin[l] = transformed[l];
+						if (transformed[l] > rmax[l])
+							rmax[l] = transformed[l];
+					}
+				}
+			}
+		}
+		rmin.z = 0;
+		rmax.z = rmin.z + 1;
+		SetSize(rmin, rmax);
+	}
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: 
+//
+// Input  : iSequence - 
+//
+// Output : char
+//-----------------------------------------------------------------------------
+const char* CEngineObjectInternal::GetSequenceActivityName(int iSequence)
+{
+	if (iSequence == -1)
+	{
+		return "Not Found!";
+	}
+
+	if (!GetModelPtr())
+		return "No model!";
+
+	return GetModelPtr()->GetSequenceActivityName(iSequence);
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: Looks up an activity by name.
+// Input  : label - Name of the activity, ie "ACT_IDLE".
+// Output : Returns the activity ID or ACT_INVALID.
+//-----------------------------------------------------------------------------
+int CEngineObjectInternal::LookupActivity(const char* label)
+{
+	Assert(GetModelPtr());
+	return GetModelPtr()->LookupActivity(label);
+}
+
+//-----------------------------------------------------------------------------
+// Purpose:
+// Input  :
+// Output :
+//-----------------------------------------------------------------------------
+KeyValues* CEngineObjectInternal::GetSequenceKeyValues(int iSequence)
+{
+	const char* szText = GetModelPtr()->Studio_GetKeyValueText(iSequence);
+
+	if (szText)
+	{
+		KeyValues* seqKeyValues = new KeyValues("");
+		if (seqKeyValues->LoadFromBuffer(modelinfo->GetModelName(GetModel()), szText))
+		{
+			return seqKeyValues;
+		}
+		seqKeyValues->deleteThis();
+	}
+	return NULL;
+}
+
+int CEngineObjectInternal::GetSequenceActivity(int iSequence)
+{
+	if (iSequence == -1)
+	{
+		return ACT_INVALID;
+	}
+
+	if (!GetModelPtr())
+		return ACT_INVALID;
+
+	return GetModelPtr()->GetSequenceActivity(iSequence);
 }
 
 void CEngineObjectInternal::DoMuzzleFlash()

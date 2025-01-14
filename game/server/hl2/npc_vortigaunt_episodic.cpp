@@ -2111,7 +2111,7 @@ void CNPC_Vortigaunt::ZapBeam( int nHand )
 			CBaseAnimating *pAnim = GetEnemy()->GetBaseAnimating();
 			if ( pAnim )
 			{
-				pAnim->DrawServerHitboxes( 10.0f );
+				pAnim->GetEngineObject()->DrawServerHitboxes( 10.0f );
 			}
 		}
 	}

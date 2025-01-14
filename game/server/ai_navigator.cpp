@@ -2273,7 +2273,7 @@ AIMoveResult_t CAI_Navigator::MoveNormal()
 	{
 		if ( GetActivity() == ACT_TRANSITION )
 			return AIMR_OK;
-		DevMsg( "%s moving with speed <= 0 (%s)\n", GetEntClassname(), GetOuter()->GetSequenceName( GetSequence() ) );
+		DevMsg( "%s moving with speed <= 0 (%s)\n", GetEntClassname(), GetOuter()->GetEngineObject()->GetSequenceName( GetSequence() ) );
 	}
 			
 	// --------------------------------

@@ -367,7 +367,7 @@ void CAI_BlendedMotor::SetMoveScriptAnim( float flNewSpeed )
 		if (m_nGoalSequence != ACT_INVALID && m_nPrimarySequence != m_nGoalSequence)
 		{
 			// Msg("From %s to %s\n", GetOuter()->GetSequenceName( m_nPrimarySequence ), GetOuter()->GetSequenceName( m_nGoalSequence ) );
-			m_nSecondarySequence = GetOuter()->FindTransitionSequence(m_nPrimarySequence, m_nGoalSequence, NULL);
+			m_nSecondarySequence = GetOuter()->GetEngineObject()->FindTransitionSequence(m_nPrimarySequence, m_nGoalSequence, NULL);
 			if (m_nSecondarySequence == ACT_INVALID)
 				m_nSecondarySequence = m_nGoalSequence;
 		}
@@ -447,7 +447,7 @@ int CAI_BlendedMotor::GetInteriorSequence( int fromSequence )
 
 	m_nPrevMovementSequence = sequence;
 
-	KeyValues *seqKeyValues = GetOuter()->GetSequenceKeyValues( sequence );
+	KeyValues *seqKeyValues = GetOuter()->GetEngineObject()->GetSequenceKeyValues( sequence );
 	// Msg("sequence %d : %s (%d)\n", sequence,  GetOuter()->GetSequenceName( sequence ), seqKeyValues != NULL );
 	if (seqKeyValues)
 	{
@@ -456,7 +456,7 @@ int CAI_BlendedMotor::GetInteriorSequence( int fromSequence )
 		{
 			const char *szActivity = pkvInterior->GetString();
 		
-			Activity activity = ( Activity )GetOuter()->LookupActivity( szActivity );
+			Activity activity = ( Activity )GetOuter()->GetEngineObject()->LookupActivity( szActivity );
 			if ( activity != ACT_INVALID )
 			{
 				m_nInteriorSequence = GetOuter()->GetEngineObject()->SelectWeightedSequence( GetOuter()->TranslateActivity( activity ), fromSequence );

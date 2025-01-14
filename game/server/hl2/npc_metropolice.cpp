@@ -716,7 +716,7 @@ void CNPC_MetroPolice::Spawn( void )
 	// Start us with a visible manhack if we have one
 	if ( m_iManhacks )
 	{
-		SetBodygroup( METROPOLICE_BODYGROUP_MANHACK, true );
+		GetEngineObject()->SetBodygroup( METROPOLICE_BODYGROUP_MANHACK, true );
 	}
 }
 
@@ -2769,7 +2769,7 @@ void CNPC_MetroPolice::OnAnimEventStartDeployManhack( void )
 	// Turn off the manhack on our body
 	if ( m_iManhacks <= 0 )
 	{
-		SetBodygroup( METROPOLICE_BODYGROUP_MANHACK, false );
+		GetEngineObject()->SetBodygroup( METROPOLICE_BODYGROUP_MANHACK, false );
 	}
 
 	// Create the manhack to throw

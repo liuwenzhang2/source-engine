@@ -727,6 +727,12 @@ public:
 	void SetBody(int nBody) {
 		m_nBody = nBody;
 	}
+	void SetBodygroup(int iGroup, int iValue);
+	int GetBodygroup(int iGroup);
+	const char* GetBodygroupName(int iGroup);
+	int FindBodygroupByName(const char* name);
+	int GetBodygroupCount(int iGroup);
+	int GetNumBodyGroups(void);
 	int GetSkin() {
 		return m_nSkin;
 	}
@@ -736,9 +742,16 @@ public:
 	int GetHitboxSet() {
 		return m_nHitboxSet;
 	}
-	void SetHitboxSet(int nHitboxSet) {
-		m_nHitboxSet = nHitboxSet;
-	}
+	char const* GetHitboxSetName(void);
+	int GetHitboxSetCount(void);
+	int GetHitboxBone(int hitboxIndex);
+	void SetHitboxSet(int setnum);
+	void SetHitboxSetByName(const char* setname);
+	bool LookupHitbox(const char* szName, int& outSet, int& outBox);
+	// for ragdoll vs. car
+	int GetHitboxesFrontside(int* boxList, int boxMax, const Vector& normal, float dist);
+	// See note in code re: bandwidth usage!!!
+	void DrawServerHitboxes(float duration = 0.0f, bool monocolor = false);
 
 	void				SetModelScale(float scale, float change_duration = 0.0f);
 	float				GetModelScale() const { return m_flModelScale; }
@@ -758,6 +771,17 @@ public:
 	void SetPlaybackRate(float rate);
 	inline int GetSequence() { return m_nSequence; }
 	void SetSequence(int nSequence);
+	const char* GetSequenceName(int iSequence);
+	int FindTransitionSequence(int iCurrentSequence, int iGoalSequence, int* piDir);
+	bool GotoSequence(int iCurrentSequence, float flCurrentCycle, float flCurrentRate, int iGoalSequence, int& iNextSequence, float& flCycle, int& iDir);
+	int GetEntryNode(int iSequence);
+	int GetExitNode(int iSequence);
+	int ExtractBbox(int sequence, Vector& mins, Vector& maxs);
+	void SetSequenceBox(void);
+	int GetSequenceActivity(int iSequence);
+	const char* GetSequenceActivityName(int iSequence);
+	KeyValues* GetSequenceKeyValues(int iSequence);
+	int LookupActivity(const char* label);
 	/* inline */ void ResetSequence(int nSequence);
 	void ResetSequenceInfo();
 	float GetGroundSpeed() const{

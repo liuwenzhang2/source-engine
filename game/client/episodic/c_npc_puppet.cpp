@@ -84,7 +84,7 @@ void C_NPC_Puppet::ClientThink( void )
 		return;
 
 	int nTargetSequence = pTarget->GetEngineObject()->GetSequence();
-	const char *pSequenceName = pTarget->GetSequenceName( nTargetSequence );
+	const char *pSequenceName = pTarget->GetEngineObject()->GetSequenceName( nTargetSequence );
 
 	int nSequence = GetEngineObject()->LookupSequence( pSequenceName );
 	if ( nSequence >= 0 )
@@ -138,7 +138,7 @@ void C_NPC_Puppet::AccumulateLayers( IBoneSetup &boneSetup, Vector pos[], Quater
 
 			if (fWeight > 0)
 			{
-				const char *pSequenceName = pTarget->GetSequenceName( pTarget->m_AnimOverlay[i].m_nSequence );
+				const char *pSequenceName = pTarget->GetEngineObject()->GetSequenceName( pTarget->m_AnimOverlay[i].m_nSequence );
 
 				int nSequence = GetEngineObject()->LookupSequence( pSequenceName );
 				if ( nSequence >= 0 )

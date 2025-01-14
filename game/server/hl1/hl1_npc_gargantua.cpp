@@ -636,7 +636,7 @@ void CNPC_Gargantua::RunTask( const Task_t *pTask )
 				if ( parts > 1 )
 					 bodyPart = random->RandomInt( 0, parts-1 );
 
-				pGib->SetBodygroup( 0, bodyPart );
+				pGib->GetEngineObject()->SetBodygroup( 0, bodyPart );
 				pGib->SetBloodColor( BLOOD_COLOR_YELLOW );
 				pGib->m_material = matNone;
 				pGib->GetEngineObject()->SetAbsOrigin(GetEngineObject()->GetAbsOrigin() );

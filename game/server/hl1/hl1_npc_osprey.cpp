@@ -184,7 +184,7 @@ void CNPC_Osprey::Spawn( void )
 	BaseClass::Spawn();
 	
 	Vector mins, maxs;
-	ExtractBbox( 0, mins, maxs );
+	GetEngineObject()->ExtractBbox( 0, mins, maxs );
 	GetEngineObject()->SetSize( mins, maxs ); 
 	UTIL_SetOrigin( this, GetEngineObject()->GetAbsOrigin() );
 

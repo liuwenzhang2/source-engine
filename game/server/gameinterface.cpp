@@ -1390,7 +1390,7 @@ void CServerGameDLL::PreClientUpdate( bool simulating )
 
 			if (anim)
 			{
-				anim->DrawServerHitboxes();
+				anim->GetEngineObject()->DrawServerHitboxes();
 			}
 		}
 		return;
@@ -1400,7 +1400,7 @@ void CServerGameDLL::PreClientUpdate( bool simulating )
 	if ( !anim )
 		return;
 
-	anim->DrawServerHitboxes();
+	anim->GetEngineObject()->DrawServerHitboxes();
 #endif
 }
 

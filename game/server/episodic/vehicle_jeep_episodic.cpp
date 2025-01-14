@@ -463,11 +463,11 @@ void CPropJeepEpisodic::Spawn( void )
 	}
 
 
-	SetBodygroup( JEEP_HOPPER_BODYGROUP, m_bBusterHopperVisible ? 1 : 0);
+	GetEngineObject()->SetBodygroup( JEEP_HOPPER_BODYGROUP, m_bBusterHopperVisible ? 1 : 0);
 	CreateCargoTrigger();
 
 	// carbar bodygroup is always on
-	SetBodygroup( JEEP_CARBAR_BODYGROUP, 1 );
+	GetEngineObject()->SetBodygroup( JEEP_CARBAR_BODYGROUP, 1 );
 
 	m_bRadarDetectsEnemies = false;
 }
@@ -584,7 +584,7 @@ void CPropJeepEpisodic::InputEnableRadar( inputdata_t &data )
 	if( m_bRadarEnabled )
 		return; // Already enabled
 
-	SetBodygroup( JEEP_RADAR_BODYGROUP, 1 );
+	GetEngineObject()->SetBodygroup( JEEP_RADAR_BODYGROUP, 1 );
 
 	SpawnRadarPanel();
 }
@@ -597,7 +597,7 @@ void CPropJeepEpisodic::InputDisableRadar( inputdata_t &data )
 	if( !m_bRadarEnabled )
 		return; // Already disabled
 
-	SetBodygroup( JEEP_RADAR_BODYGROUP, 0 );
+	GetEngineObject()->SetBodygroup( JEEP_RADAR_BODYGROUP, 0 );
 
 	DestroyRadarPanel();
 }
@@ -1446,7 +1446,7 @@ void CPropJeepEpisodic::SetBusterHopperVisibility(bool visible)
 	if (visible == m_bBusterHopperVisible)
 		return;
 
-	SetBodygroup( JEEP_HOPPER_BODYGROUP, visible ? 1 : 0);
+	GetEngineObject()->SetBodygroup( JEEP_HOPPER_BODYGROUP, visible ? 1 : 0);
 	m_bBusterHopperVisible = visible;
 }
 

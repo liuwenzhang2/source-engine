@@ -111,11 +111,11 @@ bool CWeapon357::Deploy( void )
 //	if ( g_pGameRules->IsMultiplayer() )
 //	{
 		// enable laser sight geometry.
-//		SetBodygroup( 4, 1 );
+//		GetEngineObject()->SetBodygroup( 4, 1 );
 //	}
 //	else
 //	{
-//		SetBodygroup( 4, 0 );
+//		GetEngineObject()->SetBodygroup( 4, 0 );
 //	}
 
 	return BaseClass::Deploy();

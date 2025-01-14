@@ -756,7 +756,7 @@ void CItem_AmmoCrate::Spawn( void )
 	CreateVPhysics();
 
 	GetEngineObject()->ResetSequence(GetEngineObject()->LookupSequence( "Idle" ) );
-	SetBodygroup( 1, true );
+	GetEngineObject()->SetBodygroup( 1, true );
 
 	m_flCloseTime = gpGlobals->curtime;
 	GetEngineObject()->SetAnimTime(gpGlobals->curtime);
@@ -924,14 +924,14 @@ void CItem_AmmoCrate::HandleAnimEvent( animevent_t *pEvent )
 					}
 					else
 					{
-						SetBodygroup( 1, false );
+						GetEngineObject()->SetBodygroup( 1, false );
 					}
 				}
 			}
 
 			if ( m_hActivator->GiveAmmo( m_nAmmoAmounts[m_nAmmoType], m_nAmmoIndex ) != 0 )
 			{
-				SetBodygroup( 1, false );
+				GetEngineObject()->SetBodygroup( 1, false );
 			}
 			m_hActivator = NULL;
 		}
@@ -977,7 +977,7 @@ void CItem_AmmoCrate::CrateThink( void )
 			// but setting Think to NULL will cause this to never have
 			// StudioFrameAdvance called. What are the consequences of that?
 			GetEngineObject()->ResetSequence(GetEngineObject()->LookupSequence( "Idle" ) );
-			SetBodygroup( 1, true );
+			GetEngineObject()->SetBodygroup( 1, true );
 		}
 	}
 }

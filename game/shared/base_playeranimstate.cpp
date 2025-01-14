@@ -269,7 +269,7 @@ void CBasePlayerAnimState::ComputeMainSequence()
 	int animDesired = SelectWeightedSequence( TranslateActivity(idealActivity) );
 
 #if !defined( HL1_CLIENT_DLL ) && !defined ( HL1_DLL )
-	if ( pPlayer->GetSequenceActivity( pPlayer->GetEngineObject()->GetSequence() ) == pPlayer->GetSequenceActivity( animDesired ) )
+	if ( pPlayer->GetEngineObject()->GetSequenceActivity( pPlayer->GetEngineObject()->GetSequence() ) == pPlayer->GetEngineObject()->GetSequenceActivity( animDesired ) )
 		return;
 #endif
 

@@ -6112,8 +6112,8 @@ void CAI_BaseNPC::SetActivityAndSequence(Activity NewActivity, int iSequence, Ac
 	if (ai_sequence_debug.GetBool() == true && (m_debugOverlays & OVERLAY_NPC_SELECTED_BIT))
 	{
 		DevMsg("SetActivityAndSequence : %s: %s:%s -> %s:%s / %s:%s\n", GetClassname(), 
-			GetActivityName(GetActivity()), GetSequenceName(GetEngineObject()->GetSequence()),
-			GetActivityName(NewActivity), GetSequenceName(iSequence), 
+			GetActivityName(GetActivity()), GetEngineObject()->GetSequenceName(GetEngineObject()->GetSequence()),
+			GetActivityName(NewActivity), GetEngineObject()->GetSequenceName(iSequence),
 			GetActivityName(translatedActivity), GetActivityName(weaponActivity) );
 	
 	}
@@ -6253,7 +6253,7 @@ void CAI_BaseNPC::SetIdealActivity( Activity NewActivity )
 void CAI_BaseNPC::AdvanceToIdealActivity(void)
 {
 	// If there is a transition sequence between the current sequence and the ideal sequence...
-	int nNextSequence = FindTransitionSequence(GetEngineObject()->GetSequence(), m_nIdealSequence, NULL);
+	int nNextSequence = GetEngineObject()->FindTransitionSequence(GetEngineObject()->GetSequence(), m_nIdealSequence, NULL);
 	if (nNextSequence != -1)
 	{
 		// We found a transition sequence or possibly went straight to
@@ -6267,7 +6267,7 @@ void CAI_BaseNPC::AdvanceToIdealActivity(void)
 
 			// Figure out if the transition sequence has an associated activity that
 			// we can use for our weapon. Do activity translation also.
-			Activity eTransitionActivity = GetSequenceActivity(nNextSequence);
+			Activity eTransitionActivity = (Activity)GetEngineObject()->GetSequenceActivity(nNextSequence);
 			if (eTransitionActivity != ACT_INVALID)
 			{
 				int nDiscard;
@@ -6332,8 +6332,8 @@ void CAI_BaseNPC::MaintainActivity(void)
 		if (ai_sequence_debug.GetBool() == true && (m_debugOverlays & OVERLAY_NPC_SELECTED_BIT))
 		{
 			DevMsg("MaintainActivity %s : %s:%s -> %s:%s\n", GetClassname(), 
-				GetActivityName(GetActivity()), GetSequenceName(GetEngineObject()->GetSequence()),
-				GetActivityName(m_IdealActivity), GetSequenceName(m_nIdealSequence));
+				GetActivityName(GetActivity()), GetEngineObject()->GetSequenceName(GetEngineObject()->GetSequence()),
+				GetActivityName(m_IdealActivity), GetEngineObject()->GetSequenceName(m_nIdealSequence));
 		}
 		
 		bool bAdvance = false;
@@ -8378,7 +8378,7 @@ void CAI_BaseNPC::HandleAnimEvent( animevent_t *pEvent )
 		CBaseCombatWeapon *pWeapon = GetActiveWeapon();
 		if ((pWeapon) && (pEvent->options))
 		{
-			Activity act = (Activity)pWeapon->LookupActivity(pEvent->options);
+			Activity act = (Activity)pWeapon->GetEngineObject()->LookupActivity(pEvent->options);
 			if (act != ACT_INVALID)
 			{
 				// FIXME: where should the duration come from? normally it would come from the current sequence
@@ -8542,7 +8542,7 @@ void CAI_BaseNPC::HandleAnimEvent( animevent_t *pEvent )
 			}
 			else if ( pEvent->event == AE_NPC_ADDGESTURE )
 			{
-				Activity act = ( Activity )LookupActivity( pEvent->options );
+				Activity act = ( Activity )GetEngineObject()->LookupActivity( pEvent->options );
 				if (act != ACT_INVALID)
 				{
 					act = TranslateActivity( act );
@@ -8555,7 +8555,7 @@ void CAI_BaseNPC::HandleAnimEvent( animevent_t *pEvent )
 			}
 			else if ( pEvent->event == AE_NPC_RESTARTGESTURE )
 			{
-				Activity act = ( Activity )LookupActivity( pEvent->options );
+				Activity act = ( Activity )GetEngineObject()->LookupActivity( pEvent->options );
 				if (act != ACT_INVALID)
 				{
 					act = TranslateActivity( act );
@@ -8591,7 +8591,7 @@ void CAI_BaseNPC::HandleAnimEvent( animevent_t *pEvent )
 				CBaseCombatWeapon *pWeapon = GetActiveWeapon();
 				if ((pWeapon) && (pEvent->options))
 				{
-					Activity act = (Activity)pWeapon->LookupActivity(pEvent->options);
+					Activity act = (Activity)pWeapon->GetEngineObject()->LookupActivity(pEvent->options);
 					if (act == ACT_INVALID)
 					{
 						// Try and translate it
@@ -10024,7 +10024,7 @@ void CAI_BaseNPC::CorpseFallThink( void )
 	{
 		SetThink ( NULL );
 
-		SetSequenceBox( );
+		GetEngineObject()->SetSequenceBox( );
 	}
 	else
 	{
@@ -11052,7 +11052,7 @@ int CAI_BaseNPC::Save( ISave &save )
 
 	if (GetEngineObject()->GetSequence() != ACT_INVALID && GetEngineObject()->GetModelPtr() )
 	{
-		const char *pszSequenceName = GetSequenceName(GetEngineObject()->GetSequence() );
+		const char *pszSequenceName = GetEngineObject()->GetSequenceName(GetEngineObject()->GetSequence() );
 		if ( pszSequenceName && *pszSequenceName )
 		{
 			Assert( Q_strlen( pszSequenceName ) < sizeof( saveHeader.szSequence ) - 1 );
@@ -13195,7 +13195,7 @@ const char *CAI_BaseNPC::GetScriptedNPCInteractionSequence( ScriptedNPCInteracti
 	if ( pInteraction->sPhases[iPhase].iActivity != ACT_INVALID )
 	{
 		int iSequence = GetEngineObject()->SelectWeightedSequence( (Activity)pInteraction->sPhases[iPhase].iActivity );
-		return GetSequenceName( iSequence );
+		return GetEngineObject()->GetSequenceName( iSequence );
 	}
 
 	if ( pInteraction->sPhases[iPhase].iszSequence != NULL_STRING )
@@ -13754,7 +13754,7 @@ bool CAI_BaseNPC::InteractionCouldStart( CAI_BaseNPC *pOtherNPC, ScriptedNPCInte
 		if ( pOtherNPC )
 		{
 			float flOtherSpeed = pOtherNPC->GetEngineObject()->GetSequenceGroundSpeed( pOtherNPC->GetEngineObject()->GetSequence() );
-			Msg("   %s Speed: %.2f\n", pOtherNPC->GetSequenceName( pOtherNPC->GetEngineObject()->GetSequence() ), flOtherSpeed);
+			Msg("   %s Speed: %.2f\n", pOtherNPC->GetEngineObject()->GetSequenceName( pOtherNPC->GetEngineObject()->GetSequence() ), flOtherSpeed);
 		}
 	}
 
@@ -13917,7 +13917,7 @@ void CAI_BaseNPC::InputForceInteractionWithNPC( inputdata_t &inputdata )
 				// Other NPC may have all the matching sequences, but just without the activity specified.
 				// Lets find a single sequence for us, and ensure they have a matching one.
 				int iMySeq = GetEngineObject()->SelectWeightedSequence( (Activity)m_ScriptedInteractions[i].sPhases[SNPCINT_SEQUENCE].iActivity );
-				if ( pNPC->GetEngineObject()->LookupSequence( GetSequenceName(iMySeq) ) == -1 )
+				if ( pNPC->GetEngineObject()->LookupSequence(GetEngineObject()->GetSequenceName(iMySeq) ) == -1 )
 					continue;
 			}
 		}

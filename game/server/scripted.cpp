@@ -824,7 +824,7 @@ bool CAI_ScriptedSequence::StartSequence( CAI_BaseNPC *pTarget, string_t iszSeq,
 	}
 
 	// look for the activity that this represents
-	Activity act = pTarget->GetSequenceActivity( nSequence );
+	Activity act = (Activity)pTarget->GetEngineObject()->GetSequenceActivity( nSequence );
 	if (act == ACT_INVALID)
 		act = ACT_IDLE;
 

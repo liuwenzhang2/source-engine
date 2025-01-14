@@ -1811,7 +1811,7 @@ static CDODViewVectors g_DODViewVectors(
 				Assert( pClassInfo.m_iTeam == team );
 								
 				pPlayer->SetModel( pClassInfo.m_szPlayerModel );
-				pPlayer->SetHitboxSet( 0 );
+				pPlayer->GetEngineObject()->SetHitboxSet( 0 );
 
 				char buf[64];
 				int bufsize = sizeof(buf);
@@ -1886,10 +1886,10 @@ static CDODViewVectors g_DODViewVectors(
 				pPlayer->Weapon_Switch( (CBaseCombatWeapon *)pPrimaryWpn );
 
 				// you get a helmet
-				pPlayer->SetBodygroup( BODYGROUP_HELMET, pClassInfo.m_iHelmetGroup );
+				pPlayer->GetEngineObject()->SetBodygroup( BODYGROUP_HELMET, pClassInfo.m_iHelmetGroup );
 
 				// no jumpgear
-				pPlayer->SetBodygroup( BODYGROUP_JUMPGEAR, BODYGROUP_JUMPGEAR_OFF );
+				pPlayer->GetEngineObject()->SetBodygroup( BODYGROUP_JUMPGEAR, BODYGROUP_JUMPGEAR_OFF );
 
 				pPlayer->SetMaxSpeed( 600 );
 

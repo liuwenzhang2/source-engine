@@ -4272,7 +4272,7 @@ Activity CAI_BaseNPC::GetScriptCustomMoveActivity( void )
 	if ( ( m_hCine != NULL ) && ( m_hCine->m_iszCustomMove != NULL_STRING ) )
 	{
 		// We have a valid script. Look up the custom movement activity.
-		eActivity = ( Activity )LookupActivity( STRING( m_hCine->m_iszCustomMove ) );
+		eActivity = ( Activity )GetEngineObject()->LookupActivity( STRING( m_hCine->m_iszCustomMove ) );
 		if ( eActivity == ACT_INVALID )
 		{
 			// Not an activity, at least make sure it's a valid sequence.

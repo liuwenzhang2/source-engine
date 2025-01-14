@@ -404,7 +404,7 @@ void CNPC_PoisonZombie::EnableCrab( int nCrab, bool bEnable )
 		}
 
 		m_bCrabs[nCrab] = bEnable;
-		SetBodygroup( ZOMBIE_BODYGROUP_NEST_BASE + nCrab, bEnable );
+		GetEngineObject()->SetBodygroup( ZOMBIE_BODYGROUP_NEST_BASE + nCrab, bEnable );
 	}
 }
 
@@ -516,7 +516,7 @@ void CNPC_PoisonZombie::SetZombieModel( void )
 		SetHullType(HULL_HUMAN);
 	}
 
-	SetBodygroup( ZOMBIE_BODYGROUP_HEADCRAB, !m_fIsHeadless );
+	GetEngineObject()->SetBodygroup( ZOMBIE_BODYGROUP_HEADCRAB, !m_fIsHeadless );
 
 	SetHullSizeNormal( true );
 	SetDefaultEyeOffset();
@@ -659,7 +659,7 @@ void CNPC_PoisonZombie::HandleAnimEvent( animevent_t *pEvent )
 	if ( pEvent->event == AE_ZOMBIE_POISON_PICKUP_CRAB )
 	{
 		EnableCrab( m_nThrowCrab, false );
-		SetBodygroup( ZOMBIE_BODYGROUP_THROW, 1 );
+		GetEngineObject()->SetBodygroup( ZOMBIE_BODYGROUP_THROW, 1 );
 		return;
 	}
 
@@ -695,7 +695,7 @@ void CNPC_PoisonZombie::HandleAnimEvent( animevent_t *pEvent )
 
 	if ( pEvent->event == AE_ZOMBIE_POISON_THROW_CRAB )
 	{
-		SetBodygroup( ZOMBIE_BODYGROUP_THROW, 0 );
+		GetEngineObject()->SetBodygroup( ZOMBIE_BODYGROUP_THROW, 0 );
 
 		CBlackHeadcrab *pCrab = (CBlackHeadcrab *)CreateNoSpawn( GetHeadcrabClassname(), EyePosition(), vec3_angle, this );
 		pCrab->GetEngineObject()->AddSpawnFlags( SF_NPC_FALL_TO_GROUND );
@@ -781,9 +781,9 @@ int CNPC_PoisonZombie::RandomThrowCrab( void )
 void CNPC_PoisonZombie::EvacuateNest( bool bExplosion, float flDamage, CBaseEntity *pAttacker )
 {
 	// HACK: if we were in mid-throw, drop the throwing crab also.
-	if ( GetBodygroup( ZOMBIE_BODYGROUP_THROW ) )
+	if (GetEngineObject()->GetBodygroup( ZOMBIE_BODYGROUP_THROW ) )
 	{
-		SetBodygroup( ZOMBIE_BODYGROUP_THROW, 0 );
+		GetEngineObject()->SetBodygroup( ZOMBIE_BODYGROUP_THROW, 0 );
 		m_nCrabCount++;
 	}
 

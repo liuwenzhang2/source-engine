@@ -711,7 +711,7 @@ void CLagCompensationManager::BacktrackPlayer( CBasePlayer *pPlayer, float flTar
 		pPlayer->GetEngineObject()->InvalidateBoneCache();
 
 	/*char text[256]; Q_snprintf( text, sizeof(text), "time %.2f", flTargetTime );
-	pPlayer->DrawServerHitboxes( 10 );
+	pPlayer->GetEngineObject()->DrawServerHitboxes( 10 );
 	NDebugOverlay::Text( org, text, false, 10 );
 	NDebugOverlay::EntityBounds( pPlayer, 255, 0, 0, 32, 10 ); */
 
@@ -722,7 +722,7 @@ void CLagCompensationManager::BacktrackPlayer( CBasePlayer *pPlayer, float flTar
 
 	if( sv_showlagcompensation.GetInt() == 1 )
 	{
-		pPlayer->DrawServerHitboxes(4, true);
+		pPlayer->GetEngineObject()->DrawServerHitboxes(4, true);
 	}
 }
 

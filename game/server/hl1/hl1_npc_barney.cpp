@@ -117,7 +117,7 @@ void CNPC_Barney::Spawn()
 	m_flFieldOfView		= VIEW_FIELD_WIDE; // NOTE: we need a wide field of view so npc will notice player and say hello
 	m_NPCState			= NPC_STATE_NONE;
 
-	SetBodygroup( 1, 0 );
+	GetEngineObject()->SetBodygroup( 1, 0 );
 
 	m_fGunDrawn			= false;
 
@@ -452,7 +452,7 @@ void CNPC_Barney::Event_Killed( const CTakeDamageInfo &info )
 		QAngle angGunAngles;
 		CBaseEntity *pGun = NULL;
 
-		SetBodygroup( 1, BARNEY_BODY_GUNGONE);
+		GetEngineObject()->SetBodygroup( 1, BARNEY_BODY_GUNGONE);
 
 		GetEngineObject()->GetAttachment( "0", vecGunPos, angGunAngles );
 		
@@ -554,13 +554,13 @@ void CNPC_Barney::HandleAnimEvent( animevent_t *pEvent )
 
 	case BARNEY_AE_DRAW:
 		// barney's bodygroup switches here so he can pull gun from holster
-		SetBodygroup( 1, BARNEY_BODY_GUNDRAWN);
+		GetEngineObject()->SetBodygroup( 1, BARNEY_BODY_GUNDRAWN);
 		m_fGunDrawn = true;
 		break;
 
 	case BARNEY_AE_HOLSTER:
 		// change bodygroup to replace gun in holster
-		SetBodygroup( 1, BARNEY_BODY_GUNHOLSTERED);
+		GetEngineObject()->SetBodygroup( 1, BARNEY_BODY_GUNHOLSTERED);
 		m_fGunDrawn = false;
 		break;
 

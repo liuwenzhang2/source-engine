@@ -398,8 +398,8 @@ void CPropAirboat::Spawn( void )
 
 	m_takedamage = DAMAGE_EVENTS_ONLY;
 
-	SetBodygroup(AIRBOAT_BODYGROUP_GUN, m_bHasGun);
-	SetBodygroup(AIRBOAT_BODYGROUP_PROP, true);
+	GetEngineObject()->SetBodygroup(AIRBOAT_BODYGROUP_GUN, m_bHasGun);
+	GetEngineObject()->SetBodygroup(AIRBOAT_BODYGROUP_PROP, true);
 
 	GetEngineObject()->SetPoseParameter( AIRBOAT_GUN_YAW, 0 );
 	GetEngineObject()->SetPoseParameter( AIRBOAT_GUN_PITCH, 0 );
@@ -603,7 +603,7 @@ void CPropAirboat::InputWake( inputdata_t &inputdata )
 void CPropAirboat::InputEnableGun( inputdata_t &inputdata )
 {
 	m_bHasGun = inputdata.value.Bool();
-	SetBodygroup(AIRBOAT_BODYGROUP_GUN, m_bHasGun);
+	GetEngineObject()->SetBodygroup(AIRBOAT_BODYGROUP_GUN, m_bHasGun);
 
 	// When enabling the gun, give full ammo
 	if ( m_bHasGun )
@@ -1263,8 +1263,8 @@ void CPropAirboat::UpdatePropeller()
 	{
 		if (fabs(flPrevSpinRate) <= SPIN_RATE_HIGH)
 		{
-			SetBodygroup(AIRBOAT_BODYGROUP_PROP, false);
-			SetBodygroup(AIRBOAT_BODYGROUP_BLUR, true);
+			GetEngineObject()->SetBodygroup(AIRBOAT_BODYGROUP_PROP, false);
+			GetEngineObject()->SetBodygroup(AIRBOAT_BODYGROUP_BLUR, true);
 			GetEngineObject()->SetSequence(GetEngineObject()->LookupSequence("propeller_spin1"));
 		}
 	}
@@ -1272,8 +1272,8 @@ void CPropAirboat::UpdatePropeller()
 	{
 		if ((fabs(flPrevSpinRate) <= SPIN_RATE_MED) || (fabs(flPrevSpinRate) > SPIN_RATE_HIGH))
 		{
-			SetBodygroup(AIRBOAT_BODYGROUP_PROP, true);
-			SetBodygroup(AIRBOAT_BODYGROUP_BLUR, true);
+			GetEngineObject()->SetBodygroup(AIRBOAT_BODYGROUP_PROP, true);
+			GetEngineObject()->SetBodygroup(AIRBOAT_BODYGROUP_BLUR, true);
 			GetEngineObject()->SetSequence(GetEngineObject()->LookupSequence("propeller_spin1"));
 		}
 	}
@@ -1281,8 +1281,8 @@ void CPropAirboat::UpdatePropeller()
 	{
 		if (fabs(flPrevSpinRate) > SPIN_RATE_MED)
 		{
-			SetBodygroup(AIRBOAT_BODYGROUP_PROP, true);
-			SetBodygroup(AIRBOAT_BODYGROUP_BLUR, false);
+			GetEngineObject()->SetBodygroup(AIRBOAT_BODYGROUP_PROP, true);
+			GetEngineObject()->SetBodygroup(AIRBOAT_BODYGROUP_BLUR, false);
 			GetEngineObject()->SetSequence(GetEngineObject()->LookupSequence("propeller_spin1"));
 		}
 	}

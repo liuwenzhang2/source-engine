@@ -544,7 +544,7 @@ bool CBaseFlex::HandleStartGestureSceneEvent( CSceneEventInfo *info, CChoreoScen
 
 	// FIXME: this seems like way too much code
 	info->m_bIsGesture = false;
-	KeyValues *seqKeyValues = GetSequenceKeyValues( info->m_nSequence );
+	KeyValues *seqKeyValues = GetEngineObject()->GetSequenceKeyValues( info->m_nSequence );
 	if (seqKeyValues)
 	{
 		// Do we have a build point section?

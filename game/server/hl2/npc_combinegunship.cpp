@@ -539,7 +539,7 @@ void CNPC_CombineGunship::Spawn( void )
 		SetModel( "models/gunship.mdl" );
 	}
 	
-	ExtractBbox(GetEngineObject()->SelectHeaviestSequence( ACT_GUNSHIP_PATROL ), m_cullBoxMins, m_cullBoxMaxs );
+	GetEngineObject()->ExtractBbox(GetEngineObject()->SelectHeaviestSequence( ACT_GUNSHIP_PATROL ), m_cullBoxMins, m_cullBoxMaxs );
 	BaseClass::Spawn();
 
 	InitPathingData( GUNSHIP_ARRIVE_DIST, GUNSHIP_MIN_CHASE_DIST_DIFF, sk_gunship_burst_min.GetFloat() );
@@ -2603,7 +2603,7 @@ void CNPC_CombineGunship::InputSetNormalBBox( inputdata_t &inputdata )
 {
 	Vector vecBBMin, vecBBMax;
 
-	ExtractBbox(GetEngineObject()->SelectHeaviestSequence( ACT_GUNSHIP_PATROL ), vecBBMin, vecBBMax );
+	GetEngineObject()->ExtractBbox(GetEngineObject()->SelectHeaviestSequence( ACT_GUNSHIP_PATROL ), vecBBMin, vecBBMax );
 
 	// Trim the bounding box a bit. It's huge.
 #define GUNSHIP_TRIM_BOX 38

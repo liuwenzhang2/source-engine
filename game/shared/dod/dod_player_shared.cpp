@@ -252,7 +252,7 @@ void CDODPlayer::FireBullets( const FireBulletsInfo_t &info )
 					CDODPlayer *pPlayer = ToDODPlayer((CBaseEntity*)tr.m_pEnt );
 
 					// set hitbox set to "dod_no_arms"
-					pPlayer->SetHitboxSet( 1 );
+					pPlayer->GetEngineObject()->SetHitboxSet( 1 );
 
 					trace_t newTr;
 
@@ -271,7 +271,7 @@ void CDODPlayer::FireBullets( const FireBulletsInfo_t &info )
 					}
 
 					// set hitboxes back to "dod"
-					pPlayer->SetHitboxSet( 0 );
+					pPlayer->GetEngineObject()->SetHitboxSet( 0 );
 				}
 				break;
 
@@ -291,7 +291,7 @@ void CDODPlayer::FireBullets( const FireBulletsInfo_t &info )
 			if ( tr.m_pEnt && tr.m_pEnt->IsPlayer() )
 			{
 				C_BasePlayer *player = ToBasePlayer((CBaseEntity*)tr.m_pEnt );
-				player->DrawClientHitboxes( 4, true );
+				player->GetEngineObject()->DrawClientHitboxes( 4, true );
 			}
 #else
 			// draw blue server impact markers
@@ -300,7 +300,7 @@ void CDODPlayer::FireBullets( const FireBulletsInfo_t &info )
 			if ( tr.m_pEnt && tr.m_pEnt->IsPlayer() )
 			{
 				CBasePlayer *player = ToBasePlayer((CBaseEntity*)tr.m_pEnt );
-				player->DrawServerHitboxes( 4, true );
+				player->GetEngineObject()->DrawServerHitboxes( 4, true );
 			}
 #endif
 		}

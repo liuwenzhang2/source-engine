@@ -410,9 +410,9 @@ void CCSPlayer::FireBullet(
 		if( lagPlayer )
 		{
 #ifdef CLIENT_DLL
-			lagPlayer->DrawClientHitboxes(4, true);
+			lagPlayer->GetEngineObject()->DrawClientHitboxes(4, true);
 #else
-			lagPlayer->DrawServerHitboxes(4, true);
+			lagPlayer->GetEngineObject()->DrawServerHitboxes(4, true);
 #endif
 		}
 	}
@@ -487,7 +487,7 @@ void CCSPlayer::FireBullet(
 			if ( tr.m_pEnt && tr.m_pEnt->IsPlayer() )
 			{
 				C_BasePlayer *player = ToBasePlayer((IClientEntity*)tr.m_pEnt );
-				player->DrawClientHitboxes( 4, true );
+				player->GetEngineObject()->DrawClientHitboxes( 4, true );
 			}
 		}
 #else
@@ -499,7 +499,7 @@ void CCSPlayer::FireBullet(
 			if ( tr.m_pEnt && tr.m_pEnt->IsPlayer() )
 			{
 				CBasePlayer *player = ToBasePlayer((IServerEntity*)tr.m_pEnt );
-				player->DrawServerHitboxes( 4, true );
+				player->GetEngineObject()->DrawServerHitboxes( 4, true );
 			}
 		}
 #endif

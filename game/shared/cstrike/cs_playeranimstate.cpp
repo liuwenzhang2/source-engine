@@ -900,7 +900,7 @@ bool CCSPlayerAnimState::CanThePlayerMove()
 
 float CCSPlayerAnimState::GetCurrentMaxGroundSpeed()
 {
-	Activity currentActivity = 	m_pOuter->GetSequenceActivity( m_pOuter->GetEngineObject()->GetSequence() );
+	Activity currentActivity = (Activity)m_pOuter->GetEngineObject()->GetSequenceActivity( m_pOuter->GetEngineObject()->GetSequence() );
 	if ( currentActivity == ACT_WALK || currentActivity == ACT_IDLE )
 		return ANIM_TOPSPEED_WALK;
 	else if ( currentActivity == ACT_RUN )

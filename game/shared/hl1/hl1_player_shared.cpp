@@ -327,7 +327,7 @@ float CPlayerAnimState::CalcMovementPlaybackRate( bool *bIsMoving )
 
 	float flReturnValue = BaseClass::CalcMovementPlaybackRate( bIsMoving );
 
-	Activity eActivity = GetOuter()->GetSequenceActivity( GetOuter()->GetEngineObject()->GetSequence() ) ;
+	Activity eActivity = (Activity)GetOuter()->GetEngineObject()->GetSequenceActivity( GetOuter()->GetEngineObject()->GetSequence() ) ;
 
 	if ( eActivity == ACT_RUN || eActivity == ACT_WALK || eActivity == ACT_CROUCH )
 	{

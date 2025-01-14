@@ -208,7 +208,7 @@ void CPropJeep::Spawn( void )
 
 	if ( m_bHasGun )
 	{
-		SetBodygroup( 1, true );
+		GetEngineObject()->SetBodygroup( 1, true );
 
 		// Initialize pose parameters
 		GetEngineObject()->SetPoseParameter( JEEP_GUN_YAW, 0 );
@@ -220,7 +220,7 @@ void CPropJeep::Spawn( void )
 	}
 	else
 	{
-		SetBodygroup( 1, false );
+		GetEngineObject()->SetBodygroup( 1, false );
 	}
 
 	GetEngineObject()->AddSolidFlags( FSOLID_NOT_STANDABLE );
@@ -1658,7 +1658,7 @@ void CPropJeep::InputStartRemoveTauCannon( inputdata_t &inputdata )
 void CPropJeep::InputFinishRemoveTauCannon( inputdata_t &inputdata )
 {
 	// Remove & hide the gun
-	SetBodygroup( 1, false );
+	GetEngineObject()->SetBodygroup( 1, false );
 	m_bHasGun = false;
 }
 

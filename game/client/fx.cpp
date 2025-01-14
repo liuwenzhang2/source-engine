@@ -1265,7 +1265,7 @@ void FX_BuildTeslaHitbox( const CEffectData &data )
 	if (!pStudioHdr)
 		return;
 
-	mstudiohitboxset_t *set = pStudioHdr->pHitboxSet( pAnimating->GetHitboxSet() );
+	mstudiohitboxset_t *set = pStudioHdr->pHitboxSet( pAnimating->GetEngineObject()->GetHitboxSet() );
 	if (!set) {
 		return;
 	}

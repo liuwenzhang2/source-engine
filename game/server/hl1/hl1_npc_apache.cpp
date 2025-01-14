@@ -188,7 +188,7 @@ void CNPC_Apache::Spawn( void )
 	m_iRockets = 10;
 
 	Vector mins, maxs;
-	ExtractBbox(0, mins, maxs);
+	GetEngineObject()->ExtractBbox(0, mins, maxs);
 	GetEngineObject()->SetSize(mins, maxs);
 
 	//GetEngineObject()->SetSurroundingBoundsType( USE_SPECIFIED_BOUNDS, &s_vecSurroundingMins, &s_vecSurroundingMaxs );

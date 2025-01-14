@@ -1769,11 +1769,11 @@ void CDODPlayer::PopHelmet( Vector vecDir, Vector vecForceOrigin )
 	const CDODPlayerClassInfo &pClassInfo = pTeam->GetPlayerClassInfo( iPlayerClass );
 
 	// See if they already lost their helmet
-	if( GetBodygroup( BODYGROUP_HELMET ) == pClassInfo.m_iHairGroup )
+	if(GetEngineObject()->GetBodygroup( BODYGROUP_HELMET ) == pClassInfo.m_iHairGroup )
 		return;
 	
 	// Nope.. take it off
-	SetBodygroup( BODYGROUP_HELMET, pClassInfo.m_iHairGroup );
+	GetEngineObject()->SetBodygroup( BODYGROUP_HELMET, pClassInfo.m_iHairGroup );
 
 	// Add the velocity of the player
 	vecDir += GetEngineObject()->GetAbsVelocity();

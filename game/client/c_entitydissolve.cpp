@@ -604,7 +604,7 @@ int C_EntityDissolve::DrawModel( int flags )
 	if ( pStudioHdr == NULL )
 		return false;
 
-	mstudiohitboxset_t *set = pStudioHdr->pHitboxSet( pAnimating->GetHitboxSet() );
+	mstudiohitboxset_t *set = pStudioHdr->pHitboxSet( pAnimating->GetEngineObject()->GetHitboxSet() );
 	if (set == NULL) {
 		return false;
 	}

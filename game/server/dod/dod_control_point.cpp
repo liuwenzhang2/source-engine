@@ -227,7 +227,7 @@ void CControlPoint::InternalSetOwner( int owner, bool bMakeSound, int iNumCapper
 			}
 			
 			SetModel( STRING(m_iszResetModel) );	
-			SetBodygroup( 0, m_iResetModelBodygroup );
+			GetEngineObject()->SetBodygroup( 0, m_iResetModelBodygroup );
 			
 			m_PointResetOutput.FireOutput( this, this );
 		}
@@ -241,7 +241,7 @@ void CControlPoint::InternalSetOwner( int owner, bool bMakeSound, int iNumCapper
 			}
 			
 			SetModel( STRING(m_iszAlliesModel) );	
-			SetBodygroup( 0, m_iAlliesModelBodygroup );
+			GetEngineObject()->SetBodygroup( 0, m_iAlliesModelBodygroup );
 			
 			m_AlliesCapOutput.FireOutput( this, this );
 		}
@@ -255,7 +255,7 @@ void CControlPoint::InternalSetOwner( int owner, bool bMakeSound, int iNumCapper
 			}
 			
 			SetModel( STRING(m_iszAxisModel) );	
-			SetBodygroup( 0, m_iAxisModelBodygroup );
+			GetEngineObject()->SetBodygroup( 0, m_iAxisModelBodygroup );
 			
 			m_AxisCapOutput.FireOutput( this, this );
 		}		

@@ -78,7 +78,6 @@ const float RUN_SPEED_ESTIMATE_SQR = 150.0f * 150.0f;
 static ConVar dbganimmodel( "dbganimmodel", "" );
 #endif
 
-
 C_EntityDissolve *DissolveEffect( C_BaseEntity *pTarget, float flTime );
 C_EntityFlame *FireEffect( C_BaseAnimating *pTarget, C_BaseEntity *pServerFire, float *flScaleEnd, float *flTimeStart, float *flTimeEnd );
 void VCollideWireframe_ChangeCallback( IConVar *pConVar, char const *pOldString, float flOldValue );
@@ -693,26 +692,6 @@ IStudioHdr *C_BaseAnimating::OnNewModel()
 	return hdr;
 }
 
-
-//=============================================================================
-// HPE_BEGIN:
-// [menglish] Finds the bone associated with the given hitbox
-//=============================================================================
-
-int C_BaseAnimating::GetHitboxBone( int hitboxIndex )
-{
-	IStudioHdr *pStudioHdr = GetEngineObject()->GetModelPtr();
-	if ( pStudioHdr )
-	{
-		mstudiohitboxset_t *set =pStudioHdr->pHitboxSet( GetEngineObject()->GetHitboxSet() );
-		if ( set && hitboxIndex < set->numhitboxes )
-		{
-			return set->pHitbox( hitboxIndex )->bone;
-		}
-	}
-	return 0;
-}
-
 //=============================================================================
 // HPE_END
 //=============================================================================
@@ -905,8 +884,6 @@ void C_BaseAnimating::ApplyBoneMatrixTransform( matrix3x4_t& transform )
 	}
 }
 
-
-
 //-----------------------------------------------------------------------------
 // Should we collide?
 //-----------------------------------------------------------------------------
@@ -974,8 +951,6 @@ void C_BaseAnimating::MaintainSequenceTransitions( IBoneSetup &boneSetup, float 
 	}
 }
 
-
-
 void C_BaseAnimating::AccumulateLayers( IBoneSetup &boneSetup, Vector pos[], Quaternion q[], float currentTime )
 {
 	// Nothing here
@@ -1022,7 +997,6 @@ void C_BaseAnimating::AccumulateLayers( IBoneSetup &boneSetup, Vector pos[], Qua
 //		}
 //	}
 //}
-
 
 //-----------------------------------------------------------------------------
 // Purpose: Do the default sequence blending rules as done in HL1
@@ -1094,8 +1068,6 @@ void C_BaseAnimating::StandardBlendingRules( IStudioHdr *hdr, Vector pos[], Quat
 
 }
 
-
-
 //-----------------------------------------------------------------------------
 // Purpose: Get attachment point by index (position only)
 // Input  : number - which point
@@ -1122,11 +1094,6 @@ void C_BaseAnimating::StandardBlendingRules( IStudioHdr *hdr, Vector pos[], Quat
 //{
 //	return GetAttachment( LookupAttachment( szName ), absOrigin );
 //}
-
-
-
-
-
 
 //-----------------------------------------------------------------------------
 // Returns the attachment in local space
@@ -1512,30 +1479,6 @@ void C_BaseAnimating::CalculateIKLocks( float currentTime )
 	EntityList()->PopEnableAbsRecomputations();
 	partition->SuppressLists( curSuppressed, true );
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 C_BaseAnimating::AutoAllowBoneAccess::AutoAllowBoneAccess( bool bAllowForNormalModels, bool bAllowForViewModels )
 {
@@ -2351,20 +2294,20 @@ void C_BaseAnimating::FireEvent( const Vector& origin, const QAngle& angles, int
 
 	case AE_CL_ENABLE_BODYGROUP:
 		{
-			int index = FindBodygroupByName( options );
+			int index = GetEngineObject()->FindBodygroupByName( options );
 			if ( index >= 0 )
 			{
-				SetBodygroup( index, 1 );
+				GetEngineObject()->SetBodygroup( index, 1 );
 			}
 		}
 		break;
 
 	case AE_CL_DISABLE_BODYGROUP:
 		{
-			int index = FindBodygroupByName( options );
+			int index = GetEngineObject()->FindBodygroupByName( options );
 			if ( index >= 0 )
 			{
-				SetBodygroup( index, 0 );
+				GetEngineObject()->SetBodygroup( index, 0 );
 			}
 		}
 		break;
@@ -2392,10 +2335,10 @@ void C_BaseAnimating::FireEvent( const Vector& origin, const QAngle& angles, int
 				value = atoi( token );
 			}
 
-			int index = FindBodygroupByName( szBodygroupName );
+			int index = GetEngineObject()->FindBodygroupByName( szBodygroupName );
 			if ( index >= 0 )
 			{
-				SetBodygroup( index, value );
+				GetEngineObject()->SetBodygroup( index, value );
 			}
 		}
 		break;
@@ -2699,10 +2642,6 @@ bool C_BaseAnimating::Interpolate( float flCurrentTime )
 	GetEngineObject()->BaseInterpolatePart2( oldOrigin, oldAngles, oldVel, nChangeFlags );
 	return true;
 }
-
-
-
-
 
 //-----------------------------------------------------------------------------
 // Lets us check our sequence number after a network update
@@ -3158,26 +3097,6 @@ void C_BaseAnimating::AddEntity( void )
 	BaseClass::AddEntity();
 }
 
-
-
-//-----------------------------------------------------------------------------
-// Purpose: Get a random index of an attachment point with the specified substring in its name
-//-----------------------------------------------------------------------------
-int C_BaseAnimating::LookupRandomAttachment( const char *pAttachmentNameSubstring )
-{
-	IStudioHdr *hdr = GetEngineObject()->GetModelPtr();
-	if ( !hdr )
-	{
-		return -1;
-	}
-
-	// NOTE: Currently, the network uses 0 to mean "no attachment" 
-	// thus the client must add one to the index of the attachment
-	// UNDONE: Make the server do this too to be consistent.
-	return hdr->Studio_FindRandomAttachment(  pAttachmentNameSubstring ) + 1;
-}
-
-
 void C_BaseAnimating::ClientSideAnimationChanged()
 {
 	m_SequenceTransitioner.CheckForSequenceChange( 
@@ -3213,7 +3132,6 @@ void C_BaseAnimating::UpdateClientSideAnimation()
 	}
 }
 
-
 void C_BaseAnimating::Simulate()
 {
 	if ( m_bInitModelEffects )
@@ -3231,7 +3149,6 @@ void C_BaseAnimating::Simulate()
 		GetEngineObject()->ResetLatched();
 	}
 }
-
 
 bool C_BaseAnimating::TestCollision( const Ray_t &ray, unsigned int fContentsMask, trace_t& tr )
 {
@@ -3255,7 +3172,6 @@ bool C_BaseAnimating::TestCollision( const Ray_t &ray, unsigned int fContentsMas
 	Assert(0);
 	return false;
 }
-
 
 // UNDONE: This almost works.  The client entities have no control over their solid box
 // Also they have no ability to expose FSOLID_ flags to the engine to force the accurate
@@ -3306,9 +3222,6 @@ bool C_BaseAnimating::TestHitboxes( const Ray_t &ray, unsigned int fContentsMask
 	return true;
 }
 
-
-
-
 float C_BaseAnimating::GetAnimTimeInterval( void ) const
 {
 #define MAX_ANIMTIME_INTERVAL 0.2f
@@ -3316,12 +3229,6 @@ float C_BaseAnimating::GetAnimTimeInterval( void ) const
 	float flInterval = MIN( gpGlobals->curtime - GetEngineObject()->GetAnimTime(), MAX_ANIMTIME_INTERVAL);
 	return flInterval;
 }
-
-
-
-
-
-
 
 //=========================================================
 // StudioFrameAdvance - advance the animation frame up some interval (default 0.1) into the future
@@ -3394,7 +3301,7 @@ void C_BaseAnimating::StudioFrameAdvance()
 
 	if ( watch )
 	{
-		Msg("%s : %s : %5.1f\n", GetClassname(), GetSequenceName(GetEngineObject()->GetSequence() ), GetEngineObject()->GetCycle() );
+		Msg("%s : %s : %5.1f\n", GetClassname(), GetEngineObject()->GetSequenceName(GetEngineObject()->GetSequence() ), GetEngineObject()->GetCycle() );
 	}
 }
 
@@ -3405,7 +3312,6 @@ void C_BaseAnimating::StudioFrameAdvance()
 //			*pVec - 
 //	
 //-----------------------------------------------------------------------------
-
 
 void C_BaseAnimating::GetBlendedLinearVelocity( Vector *pVec )
 {
@@ -3524,194 +3430,6 @@ float C_BaseAnimating::FrameAdvance( float flInterval )
 	return flInterval;
 }
 
-
-int C_BaseAnimating::FindTransitionSequence( int iCurrentSequence, int iGoalSequence, int *piDir )
-{
-	IStudioHdr *hdr = GetEngineObject()->GetModelPtr();
-	if ( !hdr )
-	{
-		return -1;
-	}
-
-	if (piDir == NULL)
-	{
-		int iDir = 1;
-		int sequence = hdr->FindTransitionSequence( iCurrentSequence, iGoalSequence, &iDir );
-		if (iDir != 1)
-			return -1;
-		else
-			return sequence;
-	}
-
-	return hdr->FindTransitionSequence( iCurrentSequence, iGoalSequence, piDir );
-
-}
-
-void C_BaseAnimating::SetBodygroup( int iGroup, int iValue )
-{
-	// SetBodygroup is not supported on pending dynamic models. Wait for it to load!
-	// XXX TODO we could buffer up the group and value if we really needed to. -henryg
-	Assert(GetEngineObject()->GetModelPtr() );
-	int nBody = GetEngineObject()->GetBody();
-	GetEngineObject()->GetModelPtr()->SetBodygroup(nBody, iGroup, iValue);
-	GetEngineObject()->SetBody(nBody);//aaa need check
-}
-
-int C_BaseAnimating::GetBodygroup( int iGroup )
-{
-	//Assert( IsDynamicModelLoading() || GetModelPtr() );
-	return GetEngineObject()->GetModelPtr()->GetBodygroup(GetEngineObject()->GetBody(), iGroup);//IsDynamicModelLoading() ? 0 : 
-}
-
-const char *C_BaseAnimating::GetBodygroupName( int iGroup )
-{
-	//Assert( IsDynamicModelLoading() || GetModelPtr() );
-	return GetEngineObject()->GetModelPtr()->GetBodygroupName( iGroup );//IsDynamicModelLoading() ? "" : 
-}
-
-int C_BaseAnimating::FindBodygroupByName( const char *name )
-{
-	//Assert( IsDynamicModelLoading() || GetModelPtr() );
-	return GetEngineObject()->GetModelPtr()->FindBodygroupByName( name );//IsDynamicModelLoading() ? -1 : 
-}
-
-int C_BaseAnimating::GetBodygroupCount( int iGroup )
-{
-	//Assert( IsDynamicModelLoading() || GetModelPtr() );
-	return GetEngineObject()->GetModelPtr()->GetBodygroupCount( iGroup );//IsDynamicModelLoading() ? 0 : 
-}
-
-int C_BaseAnimating::GetNumBodyGroups( void )
-{
-	//Assert( IsDynamicModelLoading() || GetModelPtr() );
-	return GetEngineObject()->GetModelPtr()->GetNumBodyGroups();//IsDynamicModelLoading() ? 0 : 
-}
-
-//-----------------------------------------------------------------------------
-// Purpose: 
-// Input  : setnum - 
-//-----------------------------------------------------------------------------
-void C_BaseAnimating::SetHitboxSet( int setnum )
-{
-	//if ( IsDynamicModelLoading() )
-	//	return;
-
-#ifdef _DEBUG
-	IStudioHdr *pStudioHdr = GetEngineObject()->GetModelPtr();
-	if ( !pStudioHdr )
-		return;
-
-	if (setnum > pStudioHdr->numhitboxsets())
-	{
-		// Warn if an bogus hitbox set is being used....
-		static bool s_bWarned = false;
-		if (!s_bWarned)
-		{
-			Warning("Using bogus hitbox set in entity %s!\n", GetClassname() );
-			s_bWarned = true;
-		}
-		setnum = 0;
-	}
-#endif
-
-	GetEngineObject()->SetHitboxSet(setnum);
-}
-
-//-----------------------------------------------------------------------------
-// Purpose: 
-// Input  : *setname - 
-//-----------------------------------------------------------------------------
-void C_BaseAnimating::SetHitboxSetByName( const char *setname )
-{
-	//if ( IsDynamicModelLoading() )
-	//	return;
-
-	GetEngineObject()->SetHitboxSet(GetEngineObject()->GetModelPtr()->FindHitboxSetByName( setname ));
-}
-
-//-----------------------------------------------------------------------------
-// Purpose: 
-// Output : int
-//-----------------------------------------------------------------------------
-int C_BaseAnimating::GetHitboxSet( void )
-{
-	return GetEngineObject()->GetHitboxSet();
-}
-
-//-----------------------------------------------------------------------------
-// Purpose: 
-// Output : char const
-//-----------------------------------------------------------------------------
-const char *C_BaseAnimating::GetHitboxSetName( void )
-{
-	//if ( IsDynamicModelLoading() )
-	//	return "";
-
-	return GetEngineObject()->GetModelPtr()->GetHitboxSetName(GetEngineObject()->GetHitboxSet() );
-}
-
-//-----------------------------------------------------------------------------
-// Purpose: 
-// Output : int
-//-----------------------------------------------------------------------------
-int C_BaseAnimating::GetHitboxSetCount( void )
-{
-	//if ( IsDynamicModelLoading() )
-	//	return 0;
-
-	return GetEngineObject()->GetModelPtr()->GetHitboxSetCount();
-}
-
-static Vector	hullcolor[8] = 
-{
-	Vector( 1.0, 1.0, 1.0 ),
-	Vector( 1.0, 0.5, 0.5 ),
-	Vector( 0.5, 1.0, 0.5 ),
-	Vector( 1.0, 1.0, 0.5 ),
-	Vector( 0.5, 0.5, 1.0 ),
-	Vector( 1.0, 0.5, 1.0 ),
-	Vector( 0.5, 1.0, 1.0 ),
-	Vector( 1.0, 1.0, 1.0 )
-};
-
-//-----------------------------------------------------------------------------
-// Purpose: Draw the current hitboxes
-//-----------------------------------------------------------------------------
-void C_BaseAnimating::DrawClientHitboxes( float duration /*= 0.0f*/, bool monocolor /*= false*/  )
-{
-	IStudioHdr *pStudioHdr = GetEngineObject()->GetModelPtr();
-	if ( !pStudioHdr )
-		return;
-
-	mstudiohitboxset_t *set =pStudioHdr->pHitboxSet(GetEngineObject()->GetHitboxSet() );
-	if ( !set )
-		return;
-
-	Vector position;
-	QAngle angles;
-
-	int r = 255;
-	int g = 0;
-	int b = 0;
-
-	for ( int i = 0; i < set->numhitboxes; i++ )
-	{
-		mstudiobbox_t *pbox = set->pHitbox( i );
-
-		GetEngineObject()->GetHitboxBonePosition( pbox->bone, position, angles );
-
-		if ( !monocolor )
-		{
-			int j = (pbox->group % 8);
-			r = ( int ) ( 255.0f * hullcolor[j][0] );
-			g = ( int ) ( 255.0f * hullcolor[j][1] );
-			b = ( int ) ( 255.0f * hullcolor[j][2] );
-		}
-
-		debugoverlay->AddBoxOverlay( position, pbox->bbmin, pbox->bbmax, angles, r, g, b, 0 ,duration );
-	}
-}
-
 void C_BaseAnimating::Clear( void )
 {
 
@@ -3720,42 +3438,6 @@ void C_BaseAnimating::Clear( void )
 	//m_AutoRefModelIndex.Clear();
 	BaseClass::Clear();	
 }
-
-
-
-//-----------------------------------------------------------------------------
-// Purpose: Looks up an activity by name.
-// Input  : label - Name of the activity, ie "ACT_IDLE".
-// Output : Returns the activity ID or ACT_INVALID.
-//-----------------------------------------------------------------------------
-int C_BaseAnimating::LookupActivity( const char *label )
-{
-	Assert(GetEngineObject()->GetModelPtr() );
-	return GetEngineObject()->GetModelPtr()->LookupActivity( label );
-}
-
-//-----------------------------------------------------------------------------
-// Purpose: 
-//
-// Input  : iSequence - 
-//
-// Output : char
-//-----------------------------------------------------------------------------
-const char *C_BaseAnimating::GetSequenceActivityName( int iSequence )
-{
-	if( iSequence == -1 )
-	{
-		return "Not Found!";
-	}
-
-	if ( !GetEngineObject()->GetModelPtr() )
-		return "No model!";
-
-	return GetEngineObject()->GetModelPtr()->GetSequenceActivityName( iSequence );
-}
-
-
-
 
 void C_BaseAnimating::GetAimEntOrigin( IClientEntity *pAttachedTo, Vector *pAbsOrigin, QAngle *pAbsAngles )
 {
@@ -3771,61 +3453,6 @@ void C_BaseAnimating::GetAimEntOrigin( IClientEntity *pAttachedTo, Vector *pAbsO
 		if (!GetEngineObject()->GetAimEntOrigin(pAbsOrigin, pAbsAngles))
 			BaseClass::GetAimEntOrigin( pAttachedTo, pAbsOrigin, pAbsAngles );
 	}
-}
-
-
-//-----------------------------------------------------------------------------
-// Purpose: 
-//
-// Input  : iSequence - 
-//
-// Output : char
-//-----------------------------------------------------------------------------
-const char *C_BaseAnimating::GetSequenceName( int iSequence )
-{
-	if( iSequence == -1 )
-	{
-		return "Not Found!";
-	}
-
-	if ( !GetEngineObject()->GetModelPtr() )
-		return "No model!";
-
-	return GetEngineObject()->GetModelPtr()->GetSequenceName( iSequence );
-}
-
-Activity C_BaseAnimating::GetSequenceActivity( int iSequence )
-{
-	if( iSequence == -1 )
-	{
-		return ACT_INVALID;
-	}
-
-	if ( !GetEngineObject()->GetModelPtr() )
-		return ACT_INVALID;
-
-	return (Activity)GetEngineObject()->GetModelPtr()->GetSequenceActivity( iSequence );
-}
-
-
-
-//-----------------------------------------------------------------------------
-// returns the sequence keyvalue text as a KeyValues pointer
-//-----------------------------------------------------------------------------
-KeyValues *C_BaseAnimating::GetSequenceKeyValues( int iSequence )
-{
-	const char *szText = GetEngineObject()->GetModelPtr()->Studio_GetKeyValueText( iSequence );
-
-	if (szText)
-	{
-		KeyValues *seqKeyValues = new KeyValues("");
-		if ( seqKeyValues->LoadFromBuffer( modelinfo->GetModelName(GetEngineObject()->GetModel() ), szText ) )
-		{
-			return seqKeyValues;
-		}
-		seqKeyValues->deleteThis();
-	}
-	return NULL;
 }
 
 //-----------------------------------------------------------------------------
@@ -3904,10 +3531,6 @@ bool C_BoneFollower::TestCollision( const Ray_t &ray, unsigned int mask, trace_t
 	trace.physicsbone = 0;//m_physicsBone; // UNDONE: Get physics bone index & hitgroup
 	return trace.DidHit();
 }
-
-
-
-
 
 //-----------------------------------------------------------------------------
 // Purpose: 
@@ -4073,10 +3696,6 @@ const char *C_BaseAnimating::GetFlexControllerType( LocalFlexController_t iFlexC
 
 	return pflexcontroller->pszType( );
 }
-
-
-
-
 
 //-----------------------------------------------------------------------------
 // Purpose: See if we should force reset our sequence on a new model

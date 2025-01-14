@@ -208,13 +208,13 @@ void CWeaponPortalgun::Think( void )
 	int iSlot1State = ( ( m_bCanFirePortal1 ) ? ( 0 ) : ( 1 ) ); // FIXME: Portal gun might have only red but not blue;
 	int iSlot2State = ( ( m_bCanFirePortal2 ) ? ( 0 ) : ( 1 ) );
 
-	SetBodygroup( 1, iSlot1State );
-	SetBodygroup( 2, iSlot2State );
+	GetEngineObject()->SetBodygroup( 1, iSlot1State );
+	GetEngineObject()->SetBodygroup( 2, iSlot2State );
 
 	if ( pPlayer->GetViewModel() )
 	{
-		pPlayer->GetViewModel()->SetBodygroup( 1, iSlot1State );
-		pPlayer->GetViewModel()->SetBodygroup( 2, iSlot2State );
+		pPlayer->GetViewModel()->GetEngineObject()->SetBodygroup( 1, iSlot1State );
+		pPlayer->GetViewModel()->GetEngineObject()->SetBodygroup( 2, iSlot2State );
 	}
 
 	// HACK HACK! Used to make the gun visually change when going through a cleanser!

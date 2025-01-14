@@ -81,13 +81,7 @@ public:
 	void	ResetActivityIndexes ( void );
 	void    ResetEventIndexes ( void );
 
-	int		LookupActivity( const char *label );
-	KeyValues *GetSequenceKeyValues( int iSequence );
 
-
-	const char *GetSequenceName( int iSequence );
-	const char *GetSequenceActivityName( int iSequence );
-	Activity GetSequenceActivity( int iSequence );
 
 	// This will stop animation until you call ResetSequenceInfo() at some point in the future
 	inline void StopAnimation( void ) { GetEngineObject()->SetPlaybackRate(0); }
@@ -119,13 +113,6 @@ protected:
 
 
 public:
-
-
-
-	int  FindTransitionSequence( int iCurrentSequence, int iGoalSequence, int *piDir );
-	bool GotoSequence( int iCurrentSequence, float flCurrentCycle, float flCurrentRate,  int iGoalSequence, int &iNextSequence, float &flCycle, int &iDir );
-	int  GetEntryNode( int iSequence );
-	int  GetExitNode( int iSequence );
 	
 	void GetEyeballs( Vector &origin, QAngle &angles ); // ?? remove ??
 
@@ -140,31 +127,14 @@ public:
 	
 	
 
-	void SetBodygroup( int iGroup, int iValue );
-	int GetBodygroup( int iGroup );
-
-	const char *GetBodygroupName( int iGroup );
-	int FindBodygroupByName( const char *name );
-	int GetBodygroupCount( int iGroup );
-	int GetNumBodyGroups( void );
-
-	void					SetHitboxSet( int setnum );
-	void					SetHitboxSetByName( const char *setname );
-	int						GetHitboxSet( void );
-	char const				*GetHitboxSetName( void );
-	int						GetHitboxSetCount( void );
-	int						GetHitboxBone( int hitboxIndex );
-	bool					LookupHitbox( const char *szName, int& outSet, int& outBox );
 
 
 	
+
 	// Clone a CBaseAnimating from another (copies model & sequence data)
 	void CopyAnimationDataFrom( CBaseAnimating *pSource );
 
-	int ExtractBbox( int sequence, Vector& mins, Vector& maxs );
-	void SetSequenceBox( void );
 	int RegisterPrivateActivity( const char *pszActivityName );
-
 
 // Controllers.
 	virtual	void			InitBoneControllers ( void );
@@ -189,14 +159,6 @@ public:
 	
 	virtual int DrawDebugTextOverlays( void );
 	
-	// See note in code re: bandwidth usage!!!
-	void				DrawServerHitboxes( float duration = 0.0f, bool monocolor = false );
-	
-	
-
-	// for ragdoll vs. car
-	int GetHitboxesFrontside( int *boxList, int boxMax, const Vector &normal, float dist );
-
 	void	GetInputDispatchEffectPosition( const char *sInputString, Vector &pOrigin, QAngle &pAngles );
 
 	//virtual void	ModifyOrAppendCriteria( AI_CriteriaSet& set );

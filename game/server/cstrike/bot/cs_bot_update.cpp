@@ -1046,7 +1046,7 @@ void CCSBot::DebugDisplay( void ) const
 		if ( !pStudioHdr )
 			return;
 
-		mstudiohitboxset_t *set = pStudioHdr->pHitboxSet( const_cast< CCSBot *>( this )->GetHitboxSet() );
+		mstudiohitboxset_t *set = pStudioHdr->pHitboxSet( const_cast< CCSBot *>( this )->GetEngineObject()->GetHitboxSet() );
 		if ( !set )
 			return;
 

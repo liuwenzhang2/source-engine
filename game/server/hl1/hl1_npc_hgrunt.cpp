@@ -265,7 +265,7 @@ void CNPC_HGrunt::Spawn()
 
 	if (FBitSet( m_iWeapons, HGRUNT_SHOTGUN ))
 	{
-		SetBodygroup( GUN_GROUP, GUN_SHOTGUN );
+		GetEngineObject()->SetBodygroup( GUN_GROUP, GUN_SHOTGUN );
 		m_iClipSize		= 8;
 	}
 	else
@@ -281,11 +281,11 @@ void CNPC_HGrunt::Spawn()
 
 	if (FBitSet( m_iWeapons, HGRUNT_SHOTGUN ))
 	{
-		SetBodygroup( HEAD_GROUP, HEAD_SHOTGUN);
+		GetEngineObject()->SetBodygroup( HEAD_GROUP, HEAD_SHOTGUN);
 	}
 	else if (FBitSet( m_iWeapons, HGRUNT_GRENADELAUNCHER ))
 	{
-		SetBodygroup( HEAD_GROUP, HEAD_M203 );
+		GetEngineObject()->SetBodygroup( HEAD_GROUP, HEAD_M203 );
 		GetEngineObject()->SetSkin(1); // alway dark skin
 	}
 
@@ -586,7 +586,7 @@ void CNPC_HGrunt::StartNPC ( void )
 
 	if ( m_pSquad && m_pSquad->IsLeader( this ) )
 	{
-		SetBodygroup( 1, 1 ); // UNDONE: truly ugly hack
+		GetEngineObject()->SetBodygroup( 1, 1 ); // UNDONE: truly ugly hack
 		GetEngineObject()->SetSkin(0);
 	}
 }
@@ -828,7 +828,7 @@ void CNPC_HGrunt::TraceAttack( const CTakeDamageInfo &inputInfo, const Vector &v
 	if (ptr->hitgroup == 11)
 	{
 		// make sure we're wearing one
-		if ( GetBodygroup( 1 ) == HEAD_GRUNT && (info.GetDamageType() & (DMG_BULLET | DMG_SLASH | DMG_BLAST | DMG_CLUB)))
+		if (GetEngineObject()->GetBodygroup( 1 ) == HEAD_GRUNT && (info.GetDamageType() & (DMG_BULLET | DMG_SLASH | DMG_BLAST | DMG_CLUB)))
 		{
 			// absorb damage
 			info.SetDamage( info.GetDamage() - 20 );
@@ -1033,7 +1033,7 @@ void CNPC_HGrunt::Event_Killed( const CTakeDamageInfo &info )
 	GetEngineObject()->GetAttachment( "0", vecGunPos, vecGunAngles );
 
 	// switch to body group with no gun.
-	SetBodygroup( GUN_GROUP, GUN_NONE );
+	GetEngineObject()->SetBodygroup( GUN_GROUP, GUN_NONE );
 
 	// If the gun would drop into a wall, spawn it at our origin
 	if( UTIL_PointContents( vecGunPos ) & CONTENTS_SOLID )
@@ -2616,26 +2616,26 @@ void CNPC_DeadHGrunt::Spawn( void )
 	case 0: // Grunt with Gun
 		GetEngineObject()->SetBody(0);
 		GetEngineObject()->SetSkin(0);
-		SetBodygroup( HEAD_GROUP, HEAD_GRUNT );
-		SetBodygroup( GUN_GROUP, GUN_MP5 );
+		GetEngineObject()->SetBodygroup( HEAD_GROUP, HEAD_GRUNT );
+		GetEngineObject()->SetBodygroup( GUN_GROUP, GUN_MP5 );
 		break;
 	case 1: // Commander with Gun
 		GetEngineObject()->SetBody(0);
 		GetEngineObject()->SetSkin(0);
-		SetBodygroup( HEAD_GROUP, HEAD_COMMANDER );
-		SetBodygroup( GUN_GROUP, GUN_MP5 );
+		GetEngineObject()->SetBodygroup( HEAD_GROUP, HEAD_COMMANDER );
+		GetEngineObject()->SetBodygroup( GUN_GROUP, GUN_MP5 );
 		break;
 	case 2: // Grunt no Gun
 		GetEngineObject()->SetBody(0);
 		GetEngineObject()->SetSkin(0);
-		SetBodygroup( HEAD_GROUP, HEAD_GRUNT );
-		SetBodygroup( GUN_GROUP, GUN_NONE );
+		GetEngineObject()->SetBodygroup( HEAD_GROUP, HEAD_GRUNT );
+		GetEngineObject()->SetBodygroup( GUN_GROUP, GUN_NONE );
 		break;
 	case 3: // Commander no Gun
 		GetEngineObject()->SetBody(0);
 		GetEngineObject()->SetSkin(0);
-		SetBodygroup( HEAD_GROUP, HEAD_COMMANDER );
-		SetBodygroup( GUN_GROUP, GUN_NONE );
+		GetEngineObject()->SetBodygroup( HEAD_GROUP, HEAD_COMMANDER );
+		GetEngineObject()->SetBodygroup( GUN_GROUP, GUN_NONE );
 		break;
 	}
 

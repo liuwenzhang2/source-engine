@@ -1148,7 +1148,7 @@ void CNPC_BaseZombie::DieChopped( const CTakeDamageInfo &info )
 		CBaseAnimating *pAnimating = dynamic_cast<CBaseAnimating*>(pTorsoGib);
 		if( pAnimating )
 		{
-			pAnimating->SetBodygroup( ZOMBIE_BODYGROUP_HEADCRAB, !m_fIsHeadless );
+			pAnimating->GetEngineObject()->SetBodygroup( ZOMBIE_BODYGROUP_HEADCRAB, !m_fIsHeadless );
 		}
 
 		pTorsoGib->SetOwnerEntity( this );
@@ -1976,7 +1976,7 @@ bool CNPC_BaseZombie::IsSlumped( void )
 		int sequence = GetEngineObject()->GetSequence();
 		if ( sequence != -1 )
 		{
-			return ( strncmp( GetSequenceName( sequence ), "slump", 5 ) == 0 );
+			return ( strncmp(GetEngineObject()->GetSequenceName( sequence ), "slump", 5 ) == 0 );
 		}
 	}
 

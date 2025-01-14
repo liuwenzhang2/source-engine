@@ -468,7 +468,7 @@ void CCSBot::ComputePartPositions( CCSPlayer *player )
 	IStudioHdr *studioHdr = player->GetEngineObject()->GetModelPtr();
 	if (studioHdr)
 	{
-		mstudiohitboxset_t *set = studioHdr->pHitboxSet( player->GetHitboxSet() );
+		mstudiohitboxset_t *set = studioHdr->pHitboxSet( player->GetEngineObject()->GetHitboxSet() );
 		if (set && maxBoxIndex < set->numhitboxes)
 		{
 			QAngle angles;

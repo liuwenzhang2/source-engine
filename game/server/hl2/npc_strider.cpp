@@ -574,7 +574,7 @@ void CNPC_Strider::SetupGlobalModelData()
 
 	// BMCD: Get the conservative boxes from sequences
 	Vector mins, maxs;
-	ExtractBbox(GetEngineObject()->SelectHeaviestSequence( ACT_WALK ), mins, maxs );
+	GetEngineObject()->ExtractBbox(GetEngineObject()->SelectHeaviestSequence( ACT_WALK ), mins, maxs );
 	CNPC_Strider::gm_strideLength = (maxs.x - mins.x) * 0.5;
 
 	// UNDONE: use crouch when crouched

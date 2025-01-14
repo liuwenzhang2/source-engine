@@ -2331,7 +2331,7 @@ void CCSPlayer::TraceAttack( const CTakeDamageInfo &info, const Vector &vecDir, 
 //=============================================================================
 		 
 		matrix3x4_t boneTransformToWorld, boneTransformToObject;
-		GetEngineObject()->GetHitboxBoneTransform(GetHitboxBone(ptr->hitbox), boneTransformToWorld);
+		GetEngineObject()->GetHitboxBoneTransform(GetEngineObject()->GetHitboxBone(ptr->hitbox), boneTransformToWorld);
 		MatrixInvert(boneTransformToWorld, boneTransformToObject);
 		VectorTransform(ptr->endpos, boneTransformToObject, m_vLastHitLocationObjectSpace);
 		 

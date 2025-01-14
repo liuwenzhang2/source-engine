@@ -615,7 +615,7 @@ void CPhysicsProp::HandleAnyCollisionInteractions( int index, gamevcollisioneven
 			{
 				Vector vecBonePos;
 				QAngle vecBoneAngles;
-				iBone = pNPC->GetHitboxBone( tr.hitbox );
+				iBone = pNPC->GetEngineObject()->GetHitboxBone( tr.hitbox );
 				pNPC->GetEngineObject()->GetHitboxBonePosition( iBone, vecBonePos, vecBoneAngles );
 
 				Teleport( &vecBonePos, NULL, NULL );
@@ -2325,7 +2325,7 @@ void CDynamicProp::PropSetSequence( int nSequence )
 	float nextCycle;
 	float flInterval = 0.1f;
 
-	if (GotoSequence(GetEngineObject()->GetSequence(), GetEngineObject()->GetCycle(), GetEngineObject()->GetPlaybackRate(), m_iGoalSequence, nNextSequence, nextCycle, m_iTransitionDirection ))
+	if (GetEngineObject()->GotoSequence(GetEngineObject()->GetSequence(), GetEngineObject()->GetCycle(), GetEngineObject()->GetPlaybackRate(), m_iGoalSequence, nNextSequence, nextCycle, m_iTransitionDirection ))
 	{
 		FinishSetSequence( nNextSequence );
 	}
@@ -3653,7 +3653,7 @@ void CBasePropDoor::Spawn()
 	GetEngineObject()->VPhysicsInitShadow(false, false);
 	GetEngineObject()->AddSolidFlags( FSOLID_CUSTOMRAYTEST | FSOLID_CUSTOMBOXTEST );
 
-	SetBodygroup( DOOR_HARDWARE_GROUP, m_nHardwareType );
+	GetEngineObject()->SetBodygroup( DOOR_HARDWARE_GROUP, m_nHardwareType );
 	if ((m_nHardwareType == 0) && (!GetEngineObject()->HasSpawnFlags(SF_DOOR_LOCKED)))
 	{
 		// Doors with no hardware must always be locked.

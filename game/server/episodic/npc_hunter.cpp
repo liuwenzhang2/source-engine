@@ -1898,10 +1898,10 @@ void CNPC_Hunter::SetupGlobalModelData()
 	gm_flHeadRadius = ( vecHeadCenter - vecHeadBottom ).Length();
 
 	int nSequence = GetEngineObject()->SelectWeightedSequence( ACT_HUNTER_RANGE_ATTACK2_UNPLANTED );
-	gm_nUnplantedNode = GetEntryNode( nSequence );
+	gm_nUnplantedNode = GetEngineObject()->GetEntryNode( nSequence );
 
 	nSequence = GetEngineObject()->SelectWeightedSequence( ACT_RANGE_ATTACK2 );
-	gm_nPlantedNode = GetEntryNode( nSequence );
+	gm_nPlantedNode = GetEngineObject()->GetEntryNode( nSequence );
 
 	GetEngineObject()->SetSurroundingBoundsType( USE_HITBOXES );
 }
@@ -2232,7 +2232,7 @@ void CNPC_Hunter::NPCThink()
 	BaseClass::NPCThink();
 
 	// Update our planted/unplanted state.
-	m_bPlanted = ( GetEntryNode(GetEngineObject()->GetSequence() ) == gm_nPlantedNode );
+	m_bPlanted = (GetEngineObject()->GetEntryNode(GetEngineObject()->GetSequence() ) == gm_nPlantedNode );
 
 	UpdateAim();
 	UpdateEyes();
@@ -6550,22 +6550,22 @@ void CNPC_Hunter::DrawDebugGeometryOverlays()
 		vRightDir.z			=  vEyeDir.z;
 
 		int nSeq = GetEngineObject()->GetSequence();
-		if ( ( GetEntryNode( nSeq ) == gm_nPlantedNode ) && ( GetExitNode( nSeq ) == gm_nPlantedNode ) )
+		if ( (GetEngineObject()->GetEntryNode( nSeq ) == gm_nPlantedNode ) && (GetEngineObject()->GetExitNode( nSeq ) == gm_nPlantedNode ) )
 		{
 			// planted - green
 			NDebugOverlay::Box(GetEngineObject()->GetAbsOrigin(), GetHullMins(), GetHullMaxs(), 0, 255, 0, 128, 0 );
 		}
-		else if ( ( GetEntryNode( nSeq ) == gm_nUnplantedNode ) && ( GetExitNode( nSeq ) == gm_nUnplantedNode ) )
+		else if ( (GetEngineObject()->GetEntryNode( nSeq ) == gm_nUnplantedNode ) && (GetEngineObject()->GetExitNode( nSeq ) == gm_nUnplantedNode ) )
 		{
 			// unplanted - blue
 			NDebugOverlay::Box(GetEngineObject()->GetAbsOrigin(), GetHullMins(), GetHullMaxs(), 0, 0, 255, 128, 0 );
 		}
-		else if ( ( GetEntryNode( nSeq ) == gm_nUnplantedNode ) && ( GetExitNode( nSeq ) == gm_nPlantedNode ) )
+		else if ( (GetEngineObject()->GetEntryNode( nSeq ) == gm_nUnplantedNode ) && (GetEngineObject()->GetExitNode( nSeq ) == gm_nPlantedNode ) )
 		{
 			// planting transition - cyan
 			NDebugOverlay::Box(GetEngineObject()->GetAbsOrigin(), GetHullMins(), GetHullMaxs(), 0, 255, 255, 128, 0 );
 		}
-		else if ( ( GetEntryNode( nSeq ) == gm_nPlantedNode ) && ( GetExitNode( nSeq ) == gm_nUnplantedNode ) ) 
+		else if ( (GetEngineObject()->GetEntryNode( nSeq ) == gm_nPlantedNode ) && (GetEngineObject()->GetExitNode( nSeq ) == gm_nUnplantedNode ) )
 		{
 			// unplanting transition - purple
 			NDebugOverlay::Box(GetEngineObject()->GetAbsOrigin(), GetHullMins(), GetHullMaxs(), 255, 0, 255, 128, 0 );
@@ -6573,7 +6573,7 @@ void CNPC_Hunter::DrawDebugGeometryOverlays()
 		else
 		{
 			// unknown / other node - red
-			Msg( "UNKNOWN: %s\n", GetSequenceName(GetEngineObject()->GetSequence() ) );
+			Msg( "UNKNOWN: %s\n", GetEngineObject()->GetSequenceName(GetEngineObject()->GetSequence() ) );
 			NDebugOverlay::Box(GetEngineObject()->GetAbsOrigin(), GetHullMins(), GetHullMaxs(), 255, 0, 0, 128, 0 );
 		}
 

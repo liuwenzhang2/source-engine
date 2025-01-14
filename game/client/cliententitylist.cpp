@@ -5985,6 +5985,181 @@ void C_EngineObjectInternal::UseClientSideAnimation()
 	m_bClientSideAnimation = true;
 }
 
+void C_EngineObjectInternal::SetBodygroup(int iGroup, int iValue)
+{
+	// SetBodygroup is not supported on pending dynamic models. Wait for it to load!
+	// XXX TODO we could buffer up the group and value if we really needed to. -henryg
+	Assert(GetModelPtr());
+	int nBody = GetBody();
+	GetModelPtr()->SetBodygroup(nBody, iGroup, iValue);
+	SetBody(nBody);//aaa need check
+}
+
+int C_EngineObjectInternal::GetBodygroup(int iGroup)
+{
+	//Assert( IsDynamicModelLoading() || GetModelPtr() );
+	return GetModelPtr()->GetBodygroup(GetBody(), iGroup);//IsDynamicModelLoading() ? 0 : 
+}
+
+const char* C_EngineObjectInternal::GetBodygroupName(int iGroup)
+{
+	//Assert( IsDynamicModelLoading() || GetModelPtr() );
+	return GetModelPtr()->GetBodygroupName(iGroup);//IsDynamicModelLoading() ? "" : 
+}
+
+int C_EngineObjectInternal::FindBodygroupByName(const char* name)
+{
+	//Assert( IsDynamicModelLoading() || GetModelPtr() );
+	return GetModelPtr()->FindBodygroupByName(name);//IsDynamicModelLoading() ? -1 : 
+}
+
+int C_EngineObjectInternal::GetBodygroupCount(int iGroup)
+{
+	//Assert( IsDynamicModelLoading() || GetModelPtr() );
+	return GetModelPtr()->GetBodygroupCount(iGroup);//IsDynamicModelLoading() ? 0 : 
+}
+
+int C_EngineObjectInternal::GetNumBodyGroups(void)
+{
+	//Assert( IsDynamicModelLoading() || GetModelPtr() );
+	return GetModelPtr()->GetNumBodyGroups();//IsDynamicModelLoading() ? 0 : 
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: 
+// Output : char const
+//-----------------------------------------------------------------------------
+const char* C_EngineObjectInternal::GetHitboxSetName(void)
+{
+	//if ( IsDynamicModelLoading() )
+	//	return "";
+
+	return GetModelPtr()->GetHitboxSetName(GetHitboxSet());
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: 
+// Output : int
+//-----------------------------------------------------------------------------
+int C_EngineObjectInternal::GetHitboxSetCount(void)
+{
+	//if ( IsDynamicModelLoading() )
+	//	return 0;
+
+	return GetModelPtr()->GetHitboxSetCount();
+}
+
+//=============================================================================
+// HPE_BEGIN:
+// [menglish] Finds the bone associated with the given hitbox
+//=============================================================================
+
+int C_EngineObjectInternal::GetHitboxBone(int hitboxIndex)
+{
+	IStudioHdr* pStudioHdr = GetModelPtr();
+	if (pStudioHdr)
+	{
+		mstudiohitboxset_t* set = pStudioHdr->pHitboxSet(GetHitboxSet());
+		if (set && hitboxIndex < set->numhitboxes)
+		{
+			return set->pHitbox(hitboxIndex)->bone;
+		}
+	}
+	return 0;
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: 
+// Input  : setnum - 
+//-----------------------------------------------------------------------------
+void C_EngineObjectInternal::SetHitboxSet(int setnum)
+{
+	//if ( IsDynamicModelLoading() )
+	//	return;
+
+#ifdef _DEBUG
+	IStudioHdr* pStudioHdr = GetModelPtr();
+	if (!pStudioHdr)
+		return;
+
+	if (setnum > pStudioHdr->numhitboxsets())
+	{
+		// Warn if an bogus hitbox set is being used....
+		static bool s_bWarned = false;
+		if (!s_bWarned)
+		{
+			Warning("Using bogus hitbox set in entity %s!\n", GetClassname());
+			s_bWarned = true;
+		}
+		setnum = 0;
+	}
+#endif
+
+	m_nHitboxSet = setnum;
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: 
+// Input  : *setname - 
+//-----------------------------------------------------------------------------
+void C_EngineObjectInternal::SetHitboxSetByName(const char* setname)
+{
+	//if ( IsDynamicModelLoading() )
+	//	return;
+
+	SetHitboxSet(GetModelPtr()->FindHitboxSetByName(setname));
+}
+
+static Vector	hullcolor[8] =
+{
+	Vector(1.0, 1.0, 1.0),
+	Vector(1.0, 0.5, 0.5),
+	Vector(0.5, 1.0, 0.5),
+	Vector(1.0, 1.0, 0.5),
+	Vector(0.5, 0.5, 1.0),
+	Vector(1.0, 0.5, 1.0),
+	Vector(0.5, 1.0, 1.0),
+	Vector(1.0, 1.0, 1.0)
+};
+
+//-----------------------------------------------------------------------------
+// Purpose: Draw the current hitboxes
+//-----------------------------------------------------------------------------
+void C_EngineObjectInternal::DrawClientHitboxes(float duration /*= 0.0f*/, bool monocolor /*= false*/)
+{
+	IStudioHdr* pStudioHdr = GetModelPtr();
+	if (!pStudioHdr)
+		return;
+
+	mstudiohitboxset_t* set = pStudioHdr->pHitboxSet(GetHitboxSet());
+	if (!set)
+		return;
+
+	Vector position;
+	QAngle angles;
+
+	int r = 255;
+	int g = 0;
+	int b = 0;
+
+	for (int i = 0; i < set->numhitboxes; i++)
+	{
+		mstudiobbox_t* pbox = set->pHitbox(i);
+
+		GetHitboxBonePosition(pbox->bone, position, angles);
+
+		if (!monocolor)
+		{
+			int j = (pbox->group % 8);
+			r = (int)(255.0f * hullcolor[j][0]);
+			g = (int)(255.0f * hullcolor[j][1]);
+			b = (int)(255.0f * hullcolor[j][2]);
+		}
+
+		debugoverlay->AddBoxOverlay(position, pbox->bbmin, pbox->bbmax, angles, r, g, b, 0, duration);
+	}
+}
+
 //-----------------------------------------------------------------------------
 // Purpose: 
 // Input  : scale - 
@@ -6282,6 +6457,111 @@ void C_EngineObjectInternal::ResetSequenceInfo(void)
 
 	// FIXME: why is this called here?  Nothing should have changed to make this nessesary
 	mdlcache->SetEventIndexForSequence(pStudioHdr->pSeqdesc(GetSequence()));
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: 
+//
+// Input  : iSequence - 
+//
+// Output : char
+//-----------------------------------------------------------------------------
+const char* C_EngineObjectInternal::GetSequenceName(int iSequence)
+{
+	if (iSequence == -1)
+	{
+		return "Not Found!";
+	}
+
+	if (!GetModelPtr())
+		return "No model!";
+
+	return GetModelPtr()->GetSequenceName(iSequence);
+}
+
+int C_EngineObjectInternal::FindTransitionSequence(int iCurrentSequence, int iGoalSequence, int* piDir)
+{
+	IStudioHdr* hdr = GetModelPtr();
+	if (!hdr)
+	{
+		return -1;
+	}
+
+	if (piDir == NULL)
+	{
+		int iDir = 1;
+		int sequence = hdr->FindTransitionSequence(iCurrentSequence, iGoalSequence, &iDir);
+		if (iDir != 1)
+			return -1;
+		else
+			return sequence;
+	}
+
+	return hdr->FindTransitionSequence(iCurrentSequence, iGoalSequence, piDir);
+
+}
+
+int C_EngineObjectInternal::GetSequenceActivity(int iSequence)
+{
+	if (iSequence == -1)
+	{
+		return ACT_INVALID;
+	}
+
+	if (!GetModelPtr())
+		return ACT_INVALID;
+
+	return GetModelPtr()->GetSequenceActivity(iSequence);
+}
+
+//-----------------------------------------------------------------------------
+// returns the sequence keyvalue text as a KeyValues pointer
+//-----------------------------------------------------------------------------
+KeyValues* C_EngineObjectInternal::GetSequenceKeyValues(int iSequence)
+{
+	const char* szText = GetModelPtr()->Studio_GetKeyValueText(iSequence);
+
+	if (szText)
+	{
+		KeyValues* seqKeyValues = new KeyValues("");
+		if (seqKeyValues->LoadFromBuffer(modelinfo->GetModelName(GetModel()), szText))
+		{
+			return seqKeyValues;
+		}
+		seqKeyValues->deleteThis();
+	}
+	return NULL;
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: Looks up an activity by name.
+// Input  : label - Name of the activity, ie "ACT_IDLE".
+// Output : Returns the activity ID or ACT_INVALID.
+//-----------------------------------------------------------------------------
+int C_EngineObjectInternal::LookupActivity(const char* label)
+{
+	Assert(GetModelPtr());
+	return GetModelPtr()->LookupActivity(label);
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: 
+//
+// Input  : iSequence - 
+//
+// Output : char
+//-----------------------------------------------------------------------------
+const char* C_EngineObjectInternal::GetSequenceActivityName(int iSequence)
+{
+	if (iSequence == -1)
+	{
+		return "Not Found!";
+	}
+
+	if (!GetModelPtr())
+		return "No model!";
+
+	return GetModelPtr()->GetSequenceActivityName(iSequence);
 }
 
 void C_EngineObjectInternal::DisableMuzzleFlash()
@@ -8408,6 +8688,23 @@ int C_EngineObjectInternal::LookupAttachment(const char* pAttachmentName)
 	// thus the client must add one to the index of the attachment
 	// UNDONE: Make the server do this too to be consistent.
 	return hdr->Studio_FindAttachment(pAttachmentName) + 1;
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: Get a random index of an attachment point with the specified substring in its name
+//-----------------------------------------------------------------------------
+int C_EngineObjectInternal::LookupRandomAttachment(const char* pAttachmentNameSubstring)
+{
+	IStudioHdr* hdr = GetModelPtr();
+	if (!hdr)
+	{
+		return -1;
+	}
+
+	// NOTE: Currently, the network uses 0 to mean "no attachment" 
+	// thus the client must add one to the index of the attachment
+	// UNDONE: Make the server do this too to be consistent.
+	return hdr->Studio_FindRandomAttachment(pAttachmentNameSubstring) + 1;
 }
 
 //-----------------------------------------------------------------------------

@@ -372,7 +372,7 @@ void CModelPanel::SetBodyGroup( const char* pszBodyGroupName, int nGroup )
 	if ( !m_hModel.Get() )
 		return;
 
-	int nBodyGroupNum = m_hModel->FindBodygroupByName( pszBodyGroupName );
+	int nBodyGroupNum = m_hModel->GetEngineObject()->FindBodygroupByName( pszBodyGroupName );
 
 	if ( nBodyGroupNum == -1 )
 		return;
@@ -424,7 +424,7 @@ void CModelPanel::SetupModel( void )
 
 	FOR_EACH_MAP_FAST( m_pModelInfo->m_mapBodygroupValues, i )
 	{
-		pEnt->SetBodygroup( m_pModelInfo->m_mapBodygroupValues.Key( i ), m_pModelInfo->m_mapBodygroupValues[ i ] );
+		pEnt->GetEngineObject()->SetBodygroup( m_pModelInfo->m_mapBodygroupValues.Key( i ), m_pModelInfo->m_mapBodygroupValues[ i ] );
 	}
 
 	// do we have any animation information?

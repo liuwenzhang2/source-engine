@@ -1305,7 +1305,7 @@ CRagdollProp *CNPC_Barnacle::AttachRagdollToTongue( CBaseAnimating *pAnimating )
 	IStudioHdr *pHdr = pAnimating->GetEngineObject()->GetModelPtr();
 	if ( pHdr )
 	{
-		int set = pAnimating->GetHitboxSet();
+		int set = pAnimating->GetEngineObject()->GetHitboxSet();
 		for( int i = 0; i < pHdr->iHitboxCount(set); i++ )
 		{
 			mstudiobbox_t *pBox = pHdr->pHitbox( i, set );
@@ -1721,7 +1721,7 @@ void CNPC_Barnacle::BitePrey( void )
 	{
 		if ( m_hRagdoll )
 		{
-			m_hRagdoll->SetBodygroup( ZOMBIE_BODYGROUP_HEADCRAB, false );
+			m_hRagdoll->GetEngineObject()->SetBodygroup( ZOMBIE_BODYGROUP_HEADCRAB, false );
 			DetachAttachedRagdoll( m_hRagdoll );
 			m_hLastSpitEnemy = m_hRagdoll.Get();
 			const char* soundname = "NPC_HeadCrab.Die";

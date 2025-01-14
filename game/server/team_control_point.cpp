@@ -600,7 +600,7 @@ void CTeamControlPoint::InternalSetOwner( int iCapTeam, bool bMakeSound, int iNu
 
 	// Update visuals
 	SetModel( STRING(m_TeamData[m_iTeam].iszModel) );
-	SetBodygroup( 0, m_iTeam );
+	GetEngineObject()->SetBodygroup( 0, m_iTeam );
 	GetEngineObject()->SetSkin(( m_iTeam == TEAM_UNASSIGNED ) ? 2 : (m_iTeam - 2));
 	GetEngineObject()->ResetSequence(GetEngineObject()->LookupSequence("idle") );
 

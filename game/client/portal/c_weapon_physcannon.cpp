@@ -226,7 +226,7 @@ int C_WeaponPhysCannon::DrawModel( int flags )
 		if (!pStudioHdr)
 			return false;
 
-		mstudiohitboxset_t *set = pStudioHdr->pHitboxSet( pAnimating->GetHitboxSet() );
+		mstudiohitboxset_t *set = pStudioHdr->pHitboxSet( pAnimating->GetEngineObject()->GetHitboxSet() );
 		if (!set) {
 			return false;
 		}

@@ -141,16 +141,7 @@ public:
 
 	//virtual void ChildLayerBlend( Vector pos[], Quaternion q[], float currentTime, int boneMask );
 
-	// Attachments
-	int		LookupRandomAttachment( const char *pAttachmentNameSubstring );
 
-
-	//=============================================================================
-	// HPE_BEGIN:
-	// [menglish] Finds the bone associated with the given hitbox
-	//=============================================================================
-
-	int		GetHitboxBone( int hitboxIndex );
 
 	//=============================================================================
 	// HPE_END
@@ -227,11 +218,7 @@ public:
 	//virtual int GetSkin()			{ return GetEngineObject()->GetSkin(); }
 
 	void							GetBlendedLinearVelocity( Vector *pVec );
-	int								LookupActivity( const char *label );
-	char const						*GetSequenceName( int iSequence ); 
-	char const						*GetSequenceActivityName( int iSequence );
-	Activity						GetSequenceActivity( int iSequence );
-	KeyValues						*GetSequenceKeyValues( int iSequence );
+
 	virtual void					StudioFrameAdvance(); // advance animation frame to some time in the future
 
 	// Clientside animation
@@ -239,24 +226,6 @@ public:
 	virtual void					UpdateClientSideAnimation();
 	void							ClientSideAnimationChanged();
 	virtual unsigned int			ComputeClientSideAnimationFlags();
-
-
-
-
-	void SetBodygroup( int iGroup, int iValue );
-	int GetBodygroup( int iGroup );
-
-	const char *GetBodygroupName( int iGroup );
-	int FindBodygroupByName( const char *name );
-	int GetBodygroupCount( int iGroup );
-	int GetNumBodyGroups( void );
-
-	void							SetHitboxSet( int setnum );
-	void							SetHitboxSetByName( const char *setname );
-	int								GetHitboxSet( void );
-	char const						*GetHitboxSetName( void );
-	int								GetHitboxSetCount( void );
-	void							DrawClientHitboxes( float duration = 0.0f, bool monocolor = false );
 
 
 	//virtual bool					IsActivityFinished( void ) { return m_bSequenceFinished; }
@@ -304,11 +273,6 @@ public:
 	// Sometimes the server wants to update the client's cycle to get the two to run in sync (for proper hit detection)
 	virtual void SetServerIntendedCycle( float intended ) { (void)intended; }
 	virtual float GetServerIntendedCycle( void ) { return -1.0f; }
-
-
-
-	int								FindTransitionSequence( int iCurrentSequence, int iGoalSequence, int *piDir );
-
 
 	virtual void					GetToolRecordingState( KeyValues *msg );
 	virtual void					CleanupToolRecordingState( KeyValues *msg );

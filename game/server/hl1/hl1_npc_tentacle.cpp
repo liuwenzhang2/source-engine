@@ -775,7 +775,7 @@ void CNPC_Tentacle::Cycle( void )
 				m_flSoundYaw -= random->RandomFloat( 2, 8 );
 		}
 
-		GetEngineObject()->SetSequence( FindTransitionSequence(GetEngineObject()->GetSequence(), m_iGoalAnim, &m_iDir ) );
+		GetEngineObject()->SetSequence(GetEngineObject()->FindTransitionSequence(GetEngineObject()->GetSequence(), m_iGoalAnim, &m_iDir ) );
 		
 
 		if (m_iDir > 0)

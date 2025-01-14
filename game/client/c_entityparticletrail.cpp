@@ -183,7 +183,7 @@ void C_EntityParticleTrail::Update( float fTimeDelta )
 	if (!pStudioHdr)
 		goto trailNoHitboxes;
 
-	set = pStudioHdr->pHitboxSet( pAnimating->GetHitboxSet() );
+	set = pStudioHdr->pHitboxSet( pAnimating->GetEngineObject()->GetHitboxSet() );
 	if ( !set )
 		goto trailNoHitboxes;
 

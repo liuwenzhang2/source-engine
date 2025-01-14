@@ -821,6 +821,12 @@ public:
 	void SetBody(int nBody) {
 		m_nBody = nBody;
 	}
+	void SetBodygroup(int iGroup, int iValue);
+	int GetBodygroup(int iGroup);
+	const char* GetBodygroupName(int iGroup);
+	int FindBodygroupByName(const char* name);
+	int GetBodygroupCount(int iGroup);
+	int GetNumBodyGroups(void);
 	int GetSkin() {
 		return m_nSkin;
 	}
@@ -830,9 +836,17 @@ public:
 	int GetHitboxSet() {
 		return m_nHitboxSet;
 	}
-	void SetHitboxSet(int nHitboxSet) {
-		m_nHitboxSet = nHitboxSet;
-	}
+	char const* GetHitboxSetName(void);
+	int GetHitboxSetCount(void);
+	//=============================================================================
+// HPE_BEGIN:
+// [menglish] Finds the bone associated with the given hitbox
+//=============================================================================
+
+	int GetHitboxBone(int hitboxIndex);
+	void SetHitboxSet(int setnum);
+	void SetHitboxSetByName(const char* setname);
+	void DrawClientHitboxes(float duration = 0.0f, bool monocolor = false);
 
 	void SetModelScale(float scale, float change_duration = 0.0f);
 	float GetModelScale() const { return m_flModelScale; }
@@ -852,7 +866,13 @@ public:
 		return m_bReceivedSequence;
 	}
 	int GetSequence();
-	virtual void SetSequence(int nSequence);
+	void SetSequence(int nSequence);
+	char const* GetSequenceName(int iSequence);
+	int FindTransitionSequence(int iCurrentSequence, int iGoalSequence, int* piDir);
+	int GetSequenceActivity(int iSequence);
+	char const* GetSequenceActivityName(int iSequence);
+	KeyValues* GetSequenceKeyValues(int iSequence);
+	int LookupActivity(const char* label);
 	inline void ResetSequence(int nSequence);
 	void ResetSequenceInfo(void);
 	int GetNewSequenceParity() {
@@ -1057,8 +1077,10 @@ public:
 	void SetBlendWeightCurrent(float flBlendWeightCurrent) { m_flBlendWeightCurrent = flBlendWeightCurrent; }
 	int	GetOverlaySequence() { return m_nOverlaySequence; }
 
-	int		LookupAttachment(const char* pAttachmentName);
-	int		GetAttachmentCount() { return m_Attachments.Count(); }
+	int LookupAttachment(const char* pAttachmentName);
+	// Attachments
+	int LookupRandomAttachment(const char* pAttachmentNameSubstring);
+	int GetAttachmentCount() { return m_Attachments.Count(); }
 	bool PutAttachment(int number, const matrix3x4_t& attachmentToWorld);
 	bool GetAttachment(int number, Vector& origin, QAngle& angles);
 	bool GetAttachment(int number, matrix3x4_t& matrix);

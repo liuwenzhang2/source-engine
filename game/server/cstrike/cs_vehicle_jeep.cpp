@@ -320,11 +320,11 @@ void CPropJeep::Spawn( void )
 
 	if ( m_bHasGun )
 	{
-		SetBodygroup( 1, true );
+		GetEngineObject()->SetBodygroup( 1, true );
 	}
 	else
 	{
-		SetBodygroup( 1, false );
+		GetEngineObject()->SetBodygroup( 1, false );
 	}
 
 	// Initialize pose parameters
@@ -1491,7 +1491,7 @@ void CPropJeep::InputStartRemoveTauCannon( inputdata_t &inputdata )
 void CPropJeep::InputFinishRemoveTauCannon( inputdata_t &inputdata )
 {
 	// Remove & hide the gun
-	SetBodygroup( 1, false );
+	GetEngineObject()->SetBodygroup( 1, false );
 	m_bHasGun = false;
 }
 

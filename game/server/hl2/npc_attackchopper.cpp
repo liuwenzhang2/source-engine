@@ -1046,7 +1046,7 @@ void CNPC_AttackHelicopter::Spawn( void )
 		SetModel( CHOPPER_DRONE_NAME );
 	}
 
-	ExtractBbox(GetEngineObject()->SelectHeaviestSequence( ACT_IDLE ), m_cullBoxMins, m_cullBoxMaxs );
+	GetEngineObject()->ExtractBbox(GetEngineObject()->SelectHeaviestSequence( ACT_IDLE ), m_cullBoxMins, m_cullBoxMaxs );
 	GetEnemies()->SetFreeKnowledgeDuration( DEFAULT_FREE_KNOWLEDGE_DURATION );
 
 	float flLoadedSpeed = m_flMaxSpeed;

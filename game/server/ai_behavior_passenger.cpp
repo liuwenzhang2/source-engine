@@ -1493,7 +1493,7 @@ void CAI_PassengerBehavior::ModifyOrAppendCriteria( AI_CriteriaSet& criteriaSet 
 void CAI_PassengerBehavior::CacheBlendTargets( void )
 {
 	// Get the keyvalues for this sequence
-	KeyValues *seqValues = GetOuter()->GetSequenceKeyValues( m_nTransitionSequence );
+	KeyValues *seqValues = GetOuter()->GetEngineObject()->GetSequenceKeyValues( m_nTransitionSequence );
 	if ( seqValues == NULL )
 	{
 		Assert( 0 );
@@ -1545,7 +1545,7 @@ void CAI_PassengerBehavior::SetTransitionSequence( int nSequence )
 {
 	// We need to use the ACT_SCRIPT_CUSTOM_MOVE scenario for this type of custom anim
 	m_nTransitionSequence = nSequence;
-	GetOuter()->m_iszSceneCustomMoveSeq = AllocPooledString( GetOuter()->GetSequenceName( m_nTransitionSequence ) );
+	GetOuter()->m_iszSceneCustomMoveSeq = AllocPooledString( GetOuter()->GetEngineObject()->GetSequenceName( m_nTransitionSequence ) );
 
 	// Cache off our blending information at this point
 	CacheBlendTargets();

@@ -3539,13 +3539,13 @@ void CNPC_Antlion::SetWings( bool state )
 		filter.MakeReliable();
 
 		g_pSoundEmitterSystem->EmitSound( filter, entindex(), "NPC_Antlion.WingsOpen" );
-		SetBodygroup( 1, 1 );
+		GetEngineObject()->SetBodygroup( 1, 1 );
 		m_bLoopingStarted = true;
 	}
 	else
 	{
 		g_pSoundEmitterSystem->StopSound(this, "NPC_Antlion.WingsOpen" );
-		SetBodygroup( 1, 0 );
+		GetEngineObject()->SetBodygroup( 1, 0 );
 	}
 }
 

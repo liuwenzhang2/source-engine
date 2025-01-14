@@ -846,7 +846,7 @@ void CRagdollProp::DrawDebugGeometryOverlays()
 {
 	if (m_debugOverlays & OVERLAY_BBOX_BIT) 
 	{
-		DrawServerHitboxes();
+		GetEngineObject()->DrawServerHitboxes();
 	}
 	if (m_debugOverlays & OVERLAY_PIVOT_BIT)
 	{

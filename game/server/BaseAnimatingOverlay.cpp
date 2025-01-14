@@ -294,7 +294,7 @@ void CBaseAnimatingOverlay::StudioFrameAdvance ()
 					// shift the other layers down in order
 					if (ai_sequence_debug.GetBool() == true && m_debugOverlays & OVERLAY_NPC_SELECTED_BIT)
 					{
-						Msg("removing %d (%d): %s : %5.3f (%.3f)\n", i, pLayer->m_nOrder.Get(), GetSequenceName( pLayer->m_nSequence ), pLayer->m_flCycle.Get(), pLayer->m_flWeight.Get() );
+						Msg("removing %d (%d): %s : %5.3f (%.3f)\n", i, pLayer->m_nOrder.Get(), GetEngineObject()->GetSequenceName( pLayer->m_nSequence ), pLayer->m_flCycle.Get(), pLayer->m_flWeight.Get() );
 					}
 					FastRemoveLayer( i );
 					// needs at least one thing cycle dead to trigger sequence change
@@ -335,7 +335,7 @@ void CBaseAnimatingOverlay::StudioFrameAdvance ()
 					Msg(" %d abandoned %.2f (%.2f)\n", i, gpGlobals->curtime, m_AnimOverlay[ i ].m_flLastAccess );
 				}
 				*/
-				Msg(" %d (%d): %s : %5.3f (%.3f)\n", i, m_AnimOverlay[ i ].m_nOrder.Get(), GetSequenceName( m_AnimOverlay[ i ].m_nSequence ), m_AnimOverlay[ i ].m_flCycle.Get(), m_AnimOverlay[ i ].m_flWeight.Get() );
+				Msg(" %d (%d): %s : %5.3f (%.3f)\n", i, m_AnimOverlay[ i ].m_nOrder.Get(), GetEngineObject()->GetSequenceName( m_AnimOverlay[ i ].m_nSequence ), m_AnimOverlay[ i ].m_flCycle.Get(), m_AnimOverlay[ i ].m_flWeight.Get() );
 			}
 		}
 	}
@@ -655,7 +655,7 @@ int	CBaseAnimatingOverlay::AddLayeredSequence( int sequence, int iPriority )
 		m_AnimOverlay[i].m_bLooping = ((GetEngineObject()->GetModelPtr()->GetSequenceFlags( sequence ) & STUDIO_LOOPING) != 0);
 		if (ai_sequence_debug.GetBool() == true && m_debugOverlays & OVERLAY_NPC_SELECTED_BIT)
 		{
-			Msg("%5.3f : adding %d (%d): %s : %5.3f (%.3f)\n", gpGlobals->curtime, i, m_AnimOverlay[ i ].m_nOrder.Get(), GetSequenceName( m_AnimOverlay[ i ].m_nSequence ), m_AnimOverlay[ i ].m_flCycle.Get(), m_AnimOverlay[ i ].m_flWeight.Get() );
+			Msg("%5.3f : adding %d (%d): %s : %5.3f (%.3f)\n", gpGlobals->curtime, i, m_AnimOverlay[ i ].m_nOrder.Get(), GetEngineObject()->GetSequenceName( m_AnimOverlay[ i ].m_nSequence ), m_AnimOverlay[ i ].m_flCycle.Get(), m_AnimOverlay[ i ].m_flWeight.Get() );
 		}
 	}
 

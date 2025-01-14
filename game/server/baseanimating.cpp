@@ -34,8 +34,6 @@
 extern ConVar ai_sequence_debug;
 
 
-
-
 BEGIN_DATADESC( CBaseAnimating )
 
 	//DEFINE_FIELD( m_flGroundSpeed, FIELD_FLOAT ),
@@ -155,7 +153,6 @@ void CBaseAnimating::Activate()
 	}
 }
 
-
 //-----------------------------------------------------------------------------
 // Force our lighting origin to be trasmitted
 //-----------------------------------------------------------------------------
@@ -189,7 +186,6 @@ void CBaseAnimating::OnRestore()
 	PopulatePoseParameters();
 }
 
-
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
 void CBaseAnimating::Spawn()
@@ -197,8 +193,6 @@ void CBaseAnimating::Spawn()
 	BaseClass::Spawn();
 	GetEngineObject()->InitStepHeightAdjust();
 }
-
-
 
 #define MAX_ANIMTIME_INTERVAL 0.2f
 
@@ -221,7 +215,6 @@ float CBaseAnimating::GetAnimTimeInterval( void ) const
 	}
 	return flInterval;
 }
-
 
 //-----------------------------------------------------------------------------
 // Purpose: 
@@ -263,8 +256,6 @@ void CBaseAnimating::StudioFrameAdvanceInternal( IStudioHdr *pStudioHdr, float f
 	GetEngineObject()->InvalidateBoneCacheIfOlderThan( 0 );
 }
 
-
-
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
@@ -280,7 +271,6 @@ void CBaseAnimating::StudioFrameAdvanceManual( float flInterval )
 	float flCycleRate = GetEngineObject()->GetSequenceCycleRate( pStudioHdr, GetEngineObject()->GetSequence() ) * GetEngineObject()->GetPlaybackRate();
 	StudioFrameAdvanceInternal(GetEngineObject()->GetModelPtr(), flInterval * flCycleRate );
 }
-
 
 //=========================================================
 // StudioFrameAdvance - advance the animation frame up some interval (default 0.1) into the future
@@ -324,10 +314,9 @@ void CBaseAnimating::StudioFrameAdvance()
 
 	if (ai_sequence_debug.GetBool() == true && m_debugOverlays & OVERLAY_NPC_SELECTED_BIT)
 	{
-		Msg("%5.2f : %s : %s : %5.3f\n", gpGlobals->curtime, GetClassname(), GetSequenceName(GetEngineObject()->GetSequence() ), GetEngineObject()->GetCycle() );
+		Msg("%5.2f : %s : %s : %5.3f\n", gpGlobals->curtime, GetClassname(), GetEngineObject()->GetSequenceName(GetEngineObject()->GetSequence() ), GetEngineObject()->GetCycle() );
 	}
 }
-
 
 //-----------------------------------------------------------------------------
 // Purpose: SetModelScale input handler
@@ -339,9 +328,6 @@ void CBaseAnimating::InputSetModelScale( inputdata_t &inputdata )
 
 	GetEngineObject()->SetModelScale( vecScale.x, vecScale.y );
 }
-
-
-
 
 //=========================================================
 // ResetActivityIndexes
@@ -359,80 +345,6 @@ void CBaseAnimating::ResetEventIndexes ( void )
 {
 	Assert(GetEngineObject()->GetModelPtr() );
 	GetEngineObject()->GetModelPtr()->ResetEventIndexes();
-}
-
-
-
-
-//-----------------------------------------------------------------------------
-// Purpose: Looks up an activity by name.
-// Input  : label - Name of the activity, ie "ACT_IDLE".
-// Output : Returns the activity ID or ACT_INVALID.
-//-----------------------------------------------------------------------------
-int CBaseAnimating::LookupActivity( const char *label )
-{
-	Assert(GetEngineObject()->GetModelPtr() );
-	return GetEngineObject()->GetModelPtr()->LookupActivity( label );
-}
-
-//-----------------------------------------------------------------------------
-// Purpose:
-// Input  :
-// Output :
-//-----------------------------------------------------------------------------
-KeyValues *CBaseAnimating::GetSequenceKeyValues( int iSequence )
-{
-	const char *szText = GetEngineObject()->GetModelPtr()->Studio_GetKeyValueText( iSequence );
-
-	if (szText)
-	{
-		KeyValues *seqKeyValues = new KeyValues("");
-		if ( seqKeyValues->LoadFromBuffer( modelinfo->GetModelName( GetEngineObject()->GetModel() ), szText ) )
-		{
-			return seqKeyValues;
-		}
-		seqKeyValues->deleteThis();
-	}
-	return NULL;
-}
-
-//-----------------------------------------------------------------------------
-// Purpose: 
-//
-// Input  : iSequence - 
-//
-// Output : char
-//-----------------------------------------------------------------------------
-const char *CBaseAnimating::GetSequenceName( int iSequence )
-{
-	if( iSequence == -1 )
-	{
-		return "Not Found!";
-	}
-
-	if ( !GetEngineObject()->GetModelPtr() )
-		return "No model!";
-
-	return GetEngineObject()->GetModelPtr()->GetSequenceName( iSequence );
-}
-//-----------------------------------------------------------------------------
-// Purpose: 
-//
-// Input  : iSequence - 
-//
-// Output : char
-//-----------------------------------------------------------------------------
-const char *CBaseAnimating::GetSequenceActivityName( int iSequence )
-{
-	if( iSequence == -1 )
-	{
-		return "Not Found!";
-	}
-
-	if ( !GetEngineObject()->GetModelPtr() )
-		return "No model!";
-
-	return GetEngineObject()->GetModelPtr()->GetSequenceActivityName( iSequence );
 }
 
 static void SyncAnimatingWithPhysics(CBaseAnimating* pAnimating)
@@ -577,7 +489,7 @@ CBaseEntity* CBaseAnimating::CreateServerRagdoll(int forceBone, const CTakeDamag
 		// Get a list of bones with hitboxes below the plane of impact
 		int boxList[128];
 		Vector normal(0, 0, -1);
-		int count = this->GetHitboxesFrontside(boxList, ARRAYSIZE(boxList), normal, DotProduct(normal, info.GetDamagePosition()));
+		int count = this->GetEngineObject()->GetHitboxesFrontside(boxList, ARRAYSIZE(boxList), normal, DotProduct(normal, info.GetDamagePosition()));
 
 		// distribute force over mass of entire character
 		float massScale = this->GetEngineObject()->GetModelPtr()->Studio_GetMass();
@@ -589,7 +501,7 @@ CBaseEntity* CBaseAnimating::CreateServerRagdoll(int forceBone, const CTakeDamag
 		ragdoll_t* pRagInfo = pRagdoll->GetEngineObject()->GetRagdoll();
 		for (int i = 0; i < count; i++)
 		{
-			int physBone = this->GetEngineObject()->GetPhysicsBone(this->GetHitboxBone(boxList[i]));
+			int physBone = this->GetEngineObject()->GetPhysicsBone(this->GetEngineObject()->GetHitboxBone(boxList[i]));
 			IPhysicsObject* pPhysics = pRagInfo->list[physBone].pObject;
 			pPhysics->ApplyForceCenter(info.GetDamageForce() * pPhysics->GetMass() * massScale);
 		}
@@ -675,8 +587,6 @@ CBaseEntity* CBaseAnimating::CreateServerRagdoll(int forceBone, const CTakeDamag
 //	return false;
 //}
 
-
-
 bool CBaseAnimating::CanBecomeRagdoll( void ) 
 {
 	MDLCACHE_CRITICAL_SECTION();
@@ -691,8 +601,6 @@ bool CBaseAnimating::CanBecomeRagdoll( void )
 
 	return true;
 }
-
-
 
 //=========================================================
 //=========================================================
@@ -986,7 +894,6 @@ bool CBaseAnimating::HasPoseParameter( int iSequence, int iParameter )
 	return false;
 }
 
-
 //=========================================================
 // Each class that wants to use pose parameters should populate
 // static variables in this entry point, rather than calling
@@ -1027,8 +934,6 @@ float CBaseAnimating::EdgeLimitPoseParameter( int iParameter, float flValue, flo
 	return RangeCompressor( flValue, Pose.start, Pose.end, flBase );
 }
 
-
-
 class CTraceFilterSkipNPCs : public CTraceFilterSimple
 {
 public:
@@ -1050,8 +955,6 @@ public:
 		return false;
 	}
 };
-
-
 
 //-----------------------------------------------------------------------------
 // Purpose: Find IK collisions with world
@@ -1140,7 +1043,6 @@ void CBaseAnimating::CalculateIKLocks( float currentTime )
 	}
 }
 
-
 //-----------------------------------------------------------------------------
 // Purpose: Clear out animation states that are invalidated with Teleport
 //-----------------------------------------------------------------------------
@@ -1155,13 +1057,7 @@ void CBaseAnimating::Teleport( const Vector *newPosition, const QAngle *newAngle
 	GetEngineObject()->InitStepHeightAdjust();
 }
 
-
-
-
 ConVar sv_pvsskipanimation( "sv_pvsskipanimation", "1", FCVAR_ARCHIVE, "Skips SetupBones when npc's are outside the PVS" );
-
-
-
 
 inline bool CBaseAnimating::CanSkipAnimation( void )
 {
@@ -1221,7 +1117,6 @@ bool CBaseAnimating::GetAttachmentLocal( int iAttachment, matrix3x4_t &attachmen
 	return bRet;
 }
 
-
 //=========================================================
 //=========================================================
 void CBaseAnimating::GetEyeballs( Vector &origin, QAngle &angles )
@@ -1248,161 +1143,6 @@ void CBaseAnimating::GetEyeballs( Vector &origin, QAngle &angles )
 				MatrixAngles( bonetoworld, angles ); // ???
 			}
 		}
-	}
-}
-
-
-//=========================================================
-//=========================================================
-int CBaseAnimating::FindTransitionSequence( int iCurrentSequence, int iGoalSequence, int *piDir )
-{
-	Assert(GetEngineObject()->GetModelPtr() );
-
-	if (piDir == NULL)
-	{
-		int iDir = 1;
-		int sequence = GetEngineObject()->GetModelPtr()->FindTransitionSequence( iCurrentSequence, iGoalSequence, &iDir );
-		if (iDir != 1)
-			return -1;
-		else
-			return sequence;
-	}
-
-	return GetEngineObject()->GetModelPtr()->FindTransitionSequence( iCurrentSequence, iGoalSequence, piDir );
-}
-
-
-bool CBaseAnimating::GotoSequence( int iCurrentSequence, float flCurrentCycle, float flCurrentRate, int iGoalSequence, int &nNextSequence, float &flNextCycle, int &iNextDir )
-{
-	return GetEngineObject()->GetModelPtr()->GotoSequence( iCurrentSequence, flCurrentCycle, flCurrentRate, iGoalSequence, nNextSequence, flNextCycle, iNextDir );
-}
-
-
-int CBaseAnimating::GetEntryNode( int iSequence )
-{
-	IStudioHdr *pstudiohdr = GetEngineObject()->GetModelPtr();
-	if (! pstudiohdr)
-		return 0;
-
-	return pstudiohdr->EntryNode( iSequence );
-}
-
-
-int CBaseAnimating::GetExitNode( int iSequence )
-{
-	IStudioHdr *pstudiohdr = GetEngineObject()->GetModelPtr();
-	if (! pstudiohdr)
-		return 0;
-	
-	return pstudiohdr->ExitNode( iSequence );
-}
-
-
-//=========================================================
-//=========================================================
-
-void CBaseAnimating::SetBodygroup( int iGroup, int iValue )
-{
-	// SetBodygroup is not supported on pending dynamic models. Wait for it to load!
-	// XXX TODO we could buffer up the group and value if we really needed to. -henryg
-	Assert(GetEngineObject()->GetModelPtr() );
-	int newBody = GetEngineObject()->GetBody();
-	GetEngineObject()->GetModelPtr()->SetBodygroup( newBody, iGroup, iValue );
-	GetEngineObject()->SetBody(newBody);
-}
-
-int CBaseAnimating::GetBodygroup( int iGroup )
-{
-	//Assert( IsDynamicModelLoading() || GetModelPtr() );
-	return GetEngineObject()->GetModelPtr()->GetBodygroup(GetEngineObject()->GetBody(), iGroup);//IsDynamicModelLoading() ? 0 : 
-}
-
-const char *CBaseAnimating::GetBodygroupName( int iGroup )
-{
-	//Assert( IsDynamicModelLoading() || GetModelPtr() );
-	return GetEngineObject()->GetModelPtr()->GetBodygroupName( iGroup );//IsDynamicModelLoading() ? "" : 
-}
-
-int CBaseAnimating::FindBodygroupByName( const char *name )
-{
-	//Assert( IsDynamicModelLoading() || GetModelPtr() );
-	return GetEngineObject()->GetModelPtr()->FindBodygroupByName( name );//IsDynamicModelLoading() ? -1 : 
-}
-
-int CBaseAnimating::GetBodygroupCount( int iGroup )
-{
-	//Assert( IsDynamicModelLoading() || GetModelPtr() );
-	return GetEngineObject()->GetModelPtr()->GetBodygroupCount( iGroup );//IsDynamicModelLoading() ? 0 : 
-}
-
-int CBaseAnimating::GetNumBodyGroups( void )
-{
-	//Assert( IsDynamicModelLoading() || GetModelPtr() );
-	return GetEngineObject()->GetModelPtr()->GetNumBodyGroups( );//IsDynamicModelLoading() ? 0 : 
-}
-
-int CBaseAnimating::ExtractBbox( int sequence, Vector& mins, Vector& maxs )
-{
-	//Assert( IsDynamicModelLoading() || GetModelPtr() );
-	return GetEngineObject()->GetModelPtr()->ExtractBbox( sequence, mins, maxs );//IsDynamicModelLoading() ? 0 : 
-}
-
-//=========================================================
-//=========================================================
-
-void CBaseAnimating::SetSequenceBox( void )
-{
-	Vector mins, maxs;
-
-	// Get sequence bbox
-	if ( ExtractBbox(GetEngineObject()->GetSequence(), mins, maxs ) )
-	{
-		// expand box for rotation
-		// find min / max for rotations
-		float yaw = GetEngineObject()->GetLocalAngles().y * (M_PI / 180.0);
-		
-		Vector xvector, yvector;
-		xvector.x = cos(yaw);
-		xvector.y = sin(yaw);
-		yvector.x = -sin(yaw);
-		yvector.y = cos(yaw);
-		Vector bounds[2];
-
-		bounds[0] = mins;
-		bounds[1] = maxs;
-		
-		Vector rmin( 9999, 9999, 9999 );
-		Vector rmax( -9999, -9999, -9999 );
-		Vector base, transformed;
-
-		for (int i = 0; i <= 1; i++ )
-		{
-			base.x = bounds[i].x;
-			for ( int j = 0; j <= 1; j++ )
-			{
-				base.y = bounds[j].y;
-				for ( int k = 0; k <= 1; k++ )
-				{
-					base.z = bounds[k].z;
-					
-				// transform the point
-					transformed.x = xvector.x*base.x + yvector.x*base.y;
-					transformed.y = xvector.y*base.x + yvector.y*base.y;
-					transformed.z = base.z;
-					
-					for ( int l = 0; l < 3; l++ )
-					{
-						if (transformed[l] < rmin[l])
-							rmin[l] = transformed[l];
-						if (transformed[l] > rmax[l])
-							rmax[l] = transformed[l];
-					}
-				}
-			}
-		}
-		rmin.z = 0;
-		rmax.z = rmin.z + 1;
-		GetEngineObject()->SetSize( rmin, rmax );
 	}
 }
 
@@ -1502,7 +1242,6 @@ Vector CBaseAnimating::GetGroundSpeedVelocity( void )
 
 	return vecVelocity;
 }
-
 
 //-----------------------------------------------------------------------------
 // Purpose: 
@@ -1621,8 +1360,6 @@ void CBaseAnimating::InitBoneControllers ( void ) // FIXME: rename
 	}
 }
 
-
-
 //------------------------------------------------------------------------------
 // Purpose : Returns velcocity of the NPC from it's animation.  
 //			 If physically simulated gets velocity from physics object
@@ -1659,7 +1396,6 @@ void CBaseAnimating::GetVelocity(Vector *vVelocity, AngularImpulse *vAngVelocity
 		}
 	}
 }
-
 
 //=========================================================
 //=========================================================
@@ -1700,10 +1436,10 @@ int CBaseAnimating::DrawDebugTextOverlays(void)
 		// Print Look time
 		// ----------------
 		char tempstr[1024];
-		Q_snprintf(tempstr, sizeof(tempstr), "Sequence: (%3d) %s", GetEngineObject()->GetSequence(), GetSequenceName(GetEngineObject()->GetSequence() ) );
+		Q_snprintf(tempstr, sizeof(tempstr), "Sequence: (%3d) %s", GetEngineObject()->GetSequence(), GetEngineObject()->GetSequenceName(GetEngineObject()->GetSequence() ) );
 		EntityText(text_offset,tempstr,0);
 		text_offset++;
-		const char *pActname = GetSequenceActivityName(GetEngineObject()->GetSequence());
+		const char *pActname = GetEngineObject()->GetSequenceActivityName(GetEngineObject()->GetSequence());
 		if ( pActname && strlen(pActname) )
 		{
 			Q_snprintf(tempstr, sizeof(tempstr), "Activity %s", pActname );
@@ -1745,8 +1481,6 @@ int CBaseAnimating::DrawDebugTextOverlays(void)
 	return text_offset;
 }
 
-
-
 //-----------------------------------------------------------------------------
 // Purpose: Returns the origin at which to play an inputted dispatcheffect 
 //-----------------------------------------------------------------------------
@@ -1767,175 +1501,6 @@ void CBaseAnimating::GetInputDispatchEffectPosition( const char *sInputString, V
 	BaseClass::GetInputDispatchEffectPosition( sInputString, pOrigin, pAngles );
 }
 
-//-----------------------------------------------------------------------------
-// Purpose: 
-// Input  : setnum - 
-//-----------------------------------------------------------------------------
-void CBaseAnimating::SetHitboxSet( int setnum )
-{
-#ifdef _DEBUG
-	IStudioHdr *pStudioHdr = GetEngineObject()->GetModelPtr();
-	if ( !pStudioHdr )
-		return;
-
-	if (setnum > pStudioHdr->numhitboxsets())
-	{
-		// Warn if an bogus hitbox set is being used....
-		static bool s_bWarned = false;
-		if (!s_bWarned)
-		{
-			Warning("Using bogus hitbox set in entity %s!\n", GetClassname() );
-			s_bWarned = true;
-		}
-		setnum = 0;
-	}
-#endif
-
-	GetEngineObject()->SetHitboxSet( setnum);
-}
-
-//-----------------------------------------------------------------------------
-// Purpose: 
-// Input  : *setname - 
-//-----------------------------------------------------------------------------
-void CBaseAnimating::SetHitboxSetByName( const char *setname )
-{
-	Assert(GetEngineObject()->GetModelPtr() );
-	GetEngineObject()->SetHitboxSet(GetEngineObject()->GetModelPtr()->FindHitboxSetByName( setname ));
-}
-
-//-----------------------------------------------------------------------------
-// Purpose: 
-// Output : int
-//-----------------------------------------------------------------------------
-int CBaseAnimating::GetHitboxSet( void )
-{
-	return GetEngineObject()->GetHitboxSet();
-}
-
-//-----------------------------------------------------------------------------
-// Purpose: 
-// Output : char const
-//-----------------------------------------------------------------------------
-const char *CBaseAnimating::GetHitboxSetName( void )
-{
-	Assert(GetEngineObject()->GetModelPtr() );
-	return GetEngineObject()->GetModelPtr()->GetHitboxSetName(GetEngineObject()->GetHitboxSet() );
-}
-
-//-----------------------------------------------------------------------------
-// Purpose: 
-// Output : int
-//-----------------------------------------------------------------------------
-int CBaseAnimating::GetHitboxSetCount( void )
-{
-	Assert(GetEngineObject()->GetModelPtr() );
-	return GetEngineObject()->GetModelPtr()->GetHitboxSetCount();
-}
-
-static Vector	hullcolor[8] = 
-{
-	Vector( 1.0, 1.0, 1.0 ),
-	Vector( 1.0, 0.5, 0.5 ),
-	Vector( 0.5, 1.0, 0.5 ),
-	Vector( 1.0, 1.0, 0.5 ),
-	Vector( 0.5, 0.5, 1.0 ),
-	Vector( 1.0, 0.5, 1.0 ),
-	Vector( 0.5, 1.0, 1.0 ),
-	Vector( 1.0, 1.0, 1.0 )
-};
-
-//-----------------------------------------------------------------------------
-// Purpose: Send the current hitboxes for this model to the client ( to compare with
-//  r_drawentities 3 client side boxes ).
-// WARNING:  This uses a ton of bandwidth, only use on a listen server
-//-----------------------------------------------------------------------------
-void CBaseAnimating::DrawServerHitboxes( float duration /*= 0.0f*/, bool monocolor /*= false*/  )
-{
-	IStudioHdr *pStudioHdr = GetEngineObject()->GetModelPtr();
-	if ( !pStudioHdr )
-		return;
-
-	mstudiohitboxset_t *set =pStudioHdr->pHitboxSet(GetEngineObject()->GetHitboxSet() );
-	if ( !set )
-		return;
-
-	Vector position;
-	QAngle angles;
-
-	int r = 0;
-	int g = 0;
-	int b = 255;
-
-	for ( int i = 0; i < set->numhitboxes; i++ )
-	{
-		mstudiobbox_t *pbox = set->pHitbox( i );
-
-		GetEngineObject()->GetHitboxBonePosition( pbox->bone, position, angles );
-
-		if ( !monocolor )
-		{
-			int j = (pbox->group % 8);
-			
-			r = ( int ) ( 255.0f * hullcolor[j][0] );
-			g = ( int ) ( 255.0f * hullcolor[j][1] );
-			b = ( int ) ( 255.0f * hullcolor[j][2] );
-		}
-
-		NDebugOverlay::BoxAngles( position, pbox->bbmin * GetEngineObject()->GetModelScale(), pbox->bbmax * GetEngineObject()->GetModelScale(), angles, r, g, b, 0 ,duration );
-	}
-}
-
-
-
-
-
-int CBaseAnimating::GetHitboxBone( int hitboxIndex )
-{
-	IStudioHdr *pStudioHdr = GetEngineObject()->GetModelPtr();
-	if ( pStudioHdr )
-	{
-		mstudiohitboxset_t *set =pStudioHdr->pHitboxSet(GetEngineObject()->GetHitboxSet() );
-		if ( set && hitboxIndex < set->numhitboxes )
-		{
-			return set->pHitbox( hitboxIndex )->bone;
-		}
-	}
-	return 0;
-}
-
-bool CBaseAnimating::LookupHitbox( const char *szName, int& outSet, int& outBox )
-{
-	IStudioHdr* pHdr = GetEngineObject()->GetModelPtr();
-
-	outSet = -1;
-	outBox = -1;
-
-	if( !pHdr )
-		return false;
-
-	for( int set=0; set < pHdr->numhitboxsets(); set++ )
-	{
-		for( int i = 0; i < pHdr->iHitboxCount(set); i++ )
-		{
-			mstudiobbox_t* pBox = pHdr->pHitbox( i, set );
-			
-			if( !pBox )
-				continue;
-			
-			const char* szBoxName = pBox->pszHitboxName();
-			if( Q_stricmp( szBoxName, szName ) == 0 )
-			{
-				outSet = set;
-				outBox = i;
-				return true;
-			}
-		}
-	}
-
-	return false;
-}
-
 void CBaseAnimating::CopyAnimationDataFrom( CBaseAnimating *pSource )
 {
 	this->GetEngineObject()->SetModelName( pSource->GetEngineObject()->GetModelName() );
@@ -1950,54 +1515,6 @@ void CBaseAnimating::CopyAnimationDataFrom( CBaseAnimating *pSource )
 	this->GetEngineObject()->GetModelPtr();// LockStudioHdr();
 }
 
-int CBaseAnimating::GetHitboxesFrontside( int *boxList, int boxMax, const Vector &normal, float dist )
-{
-	int count = 0;
-	IStudioHdr *pStudioHdr = GetEngineObject()->GetModelPtr();
-	if ( pStudioHdr )
-	{
-		mstudiohitboxset_t *set = pStudioHdr->pHitboxSet(GetEngineObject()->GetHitboxSet() );
-		if ( set )
-		{
-			matrix3x4_t matrix;
-			for ( int b = 0; b < set->numhitboxes; b++ )
-			{
-				mstudiobbox_t *pbox = set->pHitbox( b );
-
-				GetEngineObject()->GetHitboxBoneTransform( pbox->bone, matrix );
-				Vector center = (pbox->bbmax + pbox->bbmin) * 0.5;
-				Vector centerWs;
-				VectorTransform( center, matrix, centerWs );
-				if ( DotProduct( centerWs, normal ) >= dist )
-				{
-					if ( count < boxMax )
-					{
-						boxList[count] = b;
-						count++;
-					}
-				}
-			}
-		}
-	}
-
-	return count;
-}
-
-
-
-Activity CBaseAnimating::GetSequenceActivity( int iSequence )
-{
-	if( iSequence == -1 )
-	{
-		return ACT_INVALID;
-	}
-
-	if ( !GetEngineObject()->GetModelPtr() )
-		return ACT_INVALID;
-
-	return (Activity)GetEngineObject()->GetModelPtr()->GetSequenceActivity( iSequence );
-}
-
 //void CBaseAnimating::ModifyOrAppendCriteria( AI_CriteriaSet& set )
 //{
 //	BaseClass::ModifyOrAppendCriteria( set );
@@ -2009,7 +1526,7 @@ Activity CBaseAnimating::GetSequenceActivity( int iSequence )
 void CBaseAnimating::OnResetSequence(int nSequence) {
 	if (ai_sequence_debug.GetBool() == true && (m_debugOverlays & OVERLAY_NPC_SELECTED_BIT))
 	{
-		DevMsg("ResetSequence : %s: %s -> %s\n", GetClassname(), GetSequenceName(GetEngineObject()->GetSequence()), GetSequenceName(nSequence));
+		DevMsg("ResetSequence : %s: %s -> %s\n", GetClassname(), GetEngineObject()->GetSequenceName(GetEngineObject()->GetSequence()), GetEngineObject()->GetSequenceName(nSequence));
 	}
 }
 
@@ -2022,7 +1539,6 @@ void CBaseAnimating::InputBecomeRagdoll(inputdata_t& inputdata)
 	RemoveDeferred();
 	//BecomeRagdollOnClient(vec3_origin);
 }
-
 
 //-----------------------------------------------------------------------------
 // Purpose: Async prefetches all anim data used by a particular sequence.  Returns true if all of the required data is memory resident
@@ -2037,8 +1553,6 @@ bool CBaseAnimating::PrefetchSequence( int iSequence )
 
 	return pStudioHdr->Studio_PrefetchSequence( iSequence );
 }
-
-
 
 //-----------------------------------------------------------------------------
 // Purpose: model-change notification. Fires on dynamic load completion as well

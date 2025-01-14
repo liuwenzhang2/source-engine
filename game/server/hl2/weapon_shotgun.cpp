@@ -303,7 +303,7 @@ bool CWeaponShotgun::StartReload( void )
 	SendWeaponAnim( ACT_SHOTGUN_RELOAD_START );
 
 	// Make shotgun shell visible
-	SetBodygroup(1,0);
+	GetEngineObject()->SetBodygroup(1,0);
 
 	pOwner->m_flNextAttack = gpGlobals->curtime;
 	m_flNextPrimaryAttack = gpGlobals->curtime + GetEngineObject()->SequenceDuration();
@@ -360,7 +360,7 @@ bool CWeaponShotgun::Reload( void )
 void CWeaponShotgun::FinishReload( void )
 {
 	// Make shotgun shell invisible
-	SetBodygroup(1,1);
+	GetEngineObject()->SetBodygroup(1,1);
 
 	CBaseCombatCharacter *pOwner  = GetOwner();
 	
@@ -601,7 +601,7 @@ void CWeaponShotgun::ItemPostFrame( void )
 	else
 	{			
 		// Make shotgun shell invisible
-		SetBodygroup(1,1);
+		GetEngineObject()->SetBodygroup(1,1);
 	}
 
 	if ((m_bNeedPump) && (m_flNextPrimaryAttack <= gpGlobals->curtime))
