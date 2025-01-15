@@ -470,20 +470,20 @@ void CTriggerPhysicsTrap::Touch( IServerEntity *pOther )
 	if ( !PassesTriggerFilters(pOther) )
 		return;
 
-	CBaseAnimating *pAnim = ((CBaseEntity*)pOther)->GetBaseAnimating();
-	if ( !pAnim )
+	//CBaseAnimating *pAnim = ((CBaseEntity*)pOther)->GetBaseAnimating();
+	if ( !pOther->GetEngineObject()->GetModelPtr())
 		return;
 
 #ifdef HL2_DLL
 	// HACK: Upgrade the physcannon
-	if ( FClassnameIs( pAnim, "weapon_physcannon" ) )
+	if ( FClassnameIs(pOther, "weapon_physcannon" ) )
 	{
-		PhysCannonBeginUpgrade( pAnim );
+		PhysCannonBeginUpgrade(pOther);
 		return;
 	}
 #endif
 
-	pAnim->Dissolve( NULL, gpGlobals->curtime, false, m_nDissolveType );
+	((CBaseEntity*)pOther)->Dissolve( NULL, gpGlobals->curtime, false, m_nDissolveType );
 }
 
 //-----------------------------------------------------------------------------

@@ -159,9 +159,9 @@ SmokeTrail* SmokeTrail::CreateSmokeTrail()
 void SmokeTrail::FollowEntity( CBaseEntity *pEntity, const char *pAttachmentName )
 {
 	// For attachments
-	if ( pAttachmentName && pEntity && pEntity->GetBaseAnimating() )
+	if ( pAttachmentName && pEntity && pEntity->GetEngineObject()->GetModelPtr() )
 	{
-		m_nAttachment = pEntity->GetBaseAnimating()->GetEngineObject()->LookupAttachment( pAttachmentName );
+		m_nAttachment = pEntity->GetEngineObject()->LookupAttachment( pAttachmentName );
 	}
 	else
 	{
@@ -283,9 +283,9 @@ RocketTrail* RocketTrail::CreateRocketTrail()
 void RocketTrail::FollowEntity( CBaseEntity *pEntity, const char *pAttachmentName )
 {
 	// For attachments
-	if ( pAttachmentName && pEntity && pEntity->GetBaseAnimating() )
+	if ( pAttachmentName && pEntity && pEntity->GetEngineObject()->GetModelPtr() )
 	{
-		m_nAttachment = pEntity->GetBaseAnimating()->GetEngineObject()->LookupAttachment( pAttachmentName );
+		m_nAttachment = pEntity->GetEngineObject()->LookupAttachment( pAttachmentName );
 	}
 	else
 	{
@@ -487,9 +487,9 @@ void CFireTrail::Precache( void )
 void CFireTrail::FollowEntity( CBaseEntity *pEntity, const char *pAttachmentName )
 {
 	// For attachments
-	if ( pAttachmentName && pEntity && pEntity->GetBaseAnimating() )
+	if ( pAttachmentName && pEntity && pEntity->GetEngineObject()->GetModelPtr() )
 	{
-		m_nAttachment = pEntity->GetBaseAnimating()->GetEngineObject()->LookupAttachment( pAttachmentName );
+		m_nAttachment = pEntity->GetEngineObject()->LookupAttachment( pAttachmentName );
 	}
 	else
 	{

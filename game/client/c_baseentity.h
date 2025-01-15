@@ -224,7 +224,7 @@ public:
 	void							operator delete(void* pMem, int nBlockUse, const char* pFileName, int nLine) { operator delete(pMem); }
 
 
-	virtual C_BaseAnimating* GetBaseAnimating() { return NULL; }
+	//virtual C_BaseAnimating* GetBaseAnimating() { return NULL; }
 
 	// IClientUnknown overrides.
 public:

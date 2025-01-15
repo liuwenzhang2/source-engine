@@ -214,19 +214,19 @@ int C_WeaponPhysCannon::DrawModel( int flags )
 		if (GetEngineObject()->IsReadyToDraw() == false)
 			return 0;
 
-		C_BaseAnimating *pAnimating = GetBaseAnimating();
-		if (!pAnimating)
+		//C_BaseAnimating *pAnimating = GetBaseAnimating();
+		if (!GetEngineObject()->GetModelPtr())
 			return 0;
 
 		const matrix3x4_t	*hitboxbones[MAXSTUDIOBONES];
-		if ( !pAnimating->GetEngineObject()->HitboxToWorldTransforms( hitboxbones ) )
+		if ( !GetEngineObject()->HitboxToWorldTransforms( hitboxbones ) )
 			return 0;
 
-		IStudioHdr *pStudioHdr = modelinfo->GetStudiomodel( pAnimating->GetEngineObject()->GetModel() );
+		IStudioHdr *pStudioHdr = modelinfo->GetStudiomodel( GetEngineObject()->GetModel() );
 		if (!pStudioHdr)
 			return false;
 
-		mstudiohitboxset_t *set = pStudioHdr->pHitboxSet( pAnimating->GetEngineObject()->GetHitboxSet() );
+		mstudiohitboxset_t *set = pStudioHdr->pHitboxSet( GetEngineObject()->GetHitboxSet() );
 		if (!set) {
 			return false;
 		}

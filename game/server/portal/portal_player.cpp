@@ -1761,7 +1761,7 @@ void CPortal_Player::Event_Killed( const CTakeDamageInfo &info )
 	{
 		if ( m_hRagdoll )
 		{
-			m_hRagdoll->GetBaseAnimating()->Dissolve( NULL, gpGlobals->curtime, false, ENTITY_DISSOLVE_NORMAL );
+			m_hRagdoll->Dissolve( NULL, gpGlobals->curtime, false, ENTITY_DISSOLVE_NORMAL );
 		}
 	}
 

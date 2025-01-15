@@ -555,7 +555,7 @@ void PlayerPickupObject( CBasePlayer *pPlayer, CBaseEntity *pObject )
 	if ( pObject->GetEngineObject()->VPhysicsGetObject() == NULL )
 		return;
 
-	if ( pObject->GetBaseAnimating() && pObject->GetBaseAnimating()->IsDissolving() )
+	if ( pObject->GetEngineObject()->GetModelPtr() && pObject->IsDissolving())
 		return;
 
 	CPlayerPickupController *pController = (CPlayerPickupController *)CBaseEntity::Create( "player_pickup", pObject->GetEngineObject()->GetAbsOrigin(), vec3_angle, pPlayer );
@@ -2667,7 +2667,7 @@ bool CWeaponPhysCannon::CanPickupObject( CBaseEntity *pTarget )
 	if ( pTarget == NULL )
 		return false;
 
-	if ( pTarget->GetBaseAnimating() && pTarget->GetBaseAnimating()->IsDissolving() )
+	if ( pTarget->GetEngineObject()->GetModelPtr() && pTarget->IsDissolving())
 		return false;
 
 	if ( pTarget->GetEngineObject()->HasSpawnFlags( SF_PHYSBOX_ALWAYS_PICK_UP ) || pTarget->GetEngineObject()->HasSpawnFlags( SF_PHYSBOX_NEVER_PICK_UP ) )
@@ -3757,7 +3757,7 @@ void PhysCannonForceDrop( CBaseCombatWeapon *pActiveWeapon, CBaseEntity *pOnlyIf
 	}
 }
 
-void PhysCannonBeginUpgrade( CBaseAnimating *pAnim )
+void PhysCannonBeginUpgrade( IServerEntity *pAnim )
 {
 	CWeaponPhysCannon *pWeaponPhyscannon = assert_cast<	CWeaponPhysCannon* >( pAnim );
 	pWeaponPhyscannon->BeginUpgrade();

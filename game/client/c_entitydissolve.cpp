@@ -511,8 +511,8 @@ void C_EntityDissolve::ClientThink( void )
 #ifdef TF_CLIENT_DLL
 	bIsRagdoll = true;
 #else
-	C_BaseAnimating *pAnimating = GetEngineObject()->GetMoveParent() ? ((C_BaseEntity*)GetEngineObject()->GetMoveParent()->GetOuter())->GetBaseAnimating() : NULL;
-	if (!pAnimating)
+	C_BaseEntity *pAnimating = GetEngineObject()->GetMoveParent() ? (C_BaseEntity*)GetEngineObject()->GetMoveParent()->GetOuter() : NULL;
+	if (!pAnimating || !pAnimating->GetEngineObject()->GetModelPtr())
 		return;
 	bIsRagdoll = pAnimating->GetEngineObject()->IsRagdoll();
 #endif
@@ -593,8 +593,8 @@ int C_EntityDissolve::DrawModel( int flags )
 	if ( gpGlobals->frametime == 0 || GetEngineObject()->IsReadyToDraw() == false)
 		return 0;
 
-	C_BaseAnimating *pAnimating = GetEngineObject()->GetMoveParent() ? ((C_BaseEntity*)GetEngineObject()->GetMoveParent()->GetOuter())->GetBaseAnimating() : NULL;
-	if ( pAnimating == NULL )
+	C_BaseEntity *pAnimating = GetEngineObject()->GetMoveParent() ? (C_BaseEntity*)GetEngineObject()->GetMoveParent()->GetOuter() : NULL;
+	if (pAnimating == NULL || pAnimating->GetEngineObject()->GetModelPtr() == NULL)
 		return 0;
 
 	const matrix3x4_t	*hitboxbones[MAXSTUDIOBONES];

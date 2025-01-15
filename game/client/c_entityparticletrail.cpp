@@ -172,8 +172,8 @@ void C_EntityParticleTrail::Update( float fTimeDelta )
 	if ( !pMoveParent )
 		return;
 
-	C_BaseAnimating *pAnimating = ((C_BaseEntity*)pMoveParent->GetOuter())->GetBaseAnimating();
-	if (!pAnimating)
+	C_BaseEntity*pAnimating = (C_BaseEntity*)pMoveParent->GetOuter();
+	if (!pAnimating || !pAnimating->GetEngineObject()->GetModelPtr())
 		goto trailNoHitboxes;
 
 	if ( !pAnimating->GetEngineObject()->HitboxToWorldTransforms( hitboxbones ) )

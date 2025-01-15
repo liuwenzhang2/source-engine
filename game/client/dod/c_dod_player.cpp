@@ -2133,7 +2133,7 @@ void C_DODPlayer::CalcFreezeCamView( Vector& eyeOrigin, QAngle& eyeAngles, float
 	Vector vecCamTarget = vecCamDesired;
 	if ( !pTarget->IsAlive() )
 	{
-		vecCamTarget.z += pTarget->GetBaseAnimating() ? VEC_DEAD_VIEWHEIGHT_SCALED( pTarget->GetBaseAnimating() ).z : VEC_DEAD_VIEWHEIGHT.z;	// look over ragdoll, not through
+		vecCamTarget.z += pTarget->GetEngineObject()->GetModelPtr() ? VEC_DEAD_VIEWHEIGHT_SCALED(pTarget).z : VEC_DEAD_VIEWHEIGHT.z;	// look over ragdoll, not through
 	}
 
 	// Figure out a view position in front of the target
@@ -2388,17 +2388,17 @@ void C_DODPlayer::CalculateIKLocks( float currentTime )
 				// FIXME: what should the radius check be?
 				for ( CEntitySphereQuery sphere( pTarget->est.pos, 64 ); ( pEntity = sphere.GetCurrentEntity() ) != NULL; sphere.NextEntity() )
 				{
-					C_BaseAnimating *pAnim = pEntity->GetBaseAnimating( );
-					if (!pAnim)
+					//C_BaseAnimating *pAnim = pEntity->GetBaseAnimating( );
+					if (!pEntity->GetEngineObject()->GetModelPtr())
 						continue;
 
-					int iAttachment = pAnim->GetEngineObject()->LookupAttachment( pTarget->offset.pAttachmentName );
+					int iAttachment = pEntity->GetEngineObject()->LookupAttachment( pTarget->offset.pAttachmentName );
 					if (iAttachment <= 0)
 						continue;
 
 					Vector origin;
 					QAngle angles;
-					pAnim->GetEngineObject()->GetAttachment( iAttachment, origin, angles );
+					pEntity->GetEngineObject()->GetAttachment( iAttachment, origin, angles );
 
 					// debugoverlay->AddBoxOverlay( origin, Vector( -1, -1, -1 ), Vector( 1, 1, 1 ), QAngle( 0, 0, 0 ), 255, 0, 0, 0, 0 );
 

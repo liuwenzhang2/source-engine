@@ -980,10 +980,10 @@ void UTIL_SetModel( CBaseEntity *pEntity, const char *pModelName )
 			pEntity->GetClassname(), pModelName);
 	}
 
-	CBaseAnimating *pAnimating = pEntity->GetBaseAnimating();
-	if ( pAnimating )
+	//CBaseAnimating *pAnimating = pEntity->GetBaseAnimating();
+	if (pEntity->GetEngineObject()->GetModelPtr())
 	{
-		pAnimating->GetEngineObject()->SetForceBone(0);
+		pEntity->GetEngineObject()->SetForceBone(0);
 	}
 
 	pEntity->GetEngineObject()->SetModelName( AllocPooledString( pModelName ) );

@@ -266,11 +266,11 @@ public:
 		// interpolate offset over some time
 		offset = m_vecOffset * (1-frac);
 
-		C_BaseAnimating* parent = GetEngineObject()->GetMoveParent() ? ((C_BaseEntity*)GetEngineObject()->GetMoveParent()->GetOuter())->GetBaseAnimating() : NULL;
+		C_BaseEntity* parent = GetEngineObject()->GetMoveParent() ? (C_BaseEntity*)GetEngineObject()->GetMoveParent()->GetOuter() : NULL;
 		worldOrigin.Init();
 
 
-		if ( parent )
+		if ( parent->GetEngineObject()->GetModelPtr() )
 		{
 			Assert( parent != this );
 			parent->GetEngineObject()->SetupBones( NULL, -1, BONE_USED_BY_ANYTHING, gpGlobals->curtime );
@@ -292,8 +292,8 @@ public:
 
 		
 		//BaseClass::BuildTransformations(hdr, pos, q, cameraTransform, boneMask, boneComputed);
-		C_BaseAnimating* parent = GetEngineObject()->GetMoveParent() ? ((C_BaseEntity*)GetEngineObject()->GetMoveParent()->GetOuter())->GetBaseAnimating() : NULL;
-		if (parent)
+		C_BaseEntity* parent = GetEngineObject()->GetMoveParent() ? (C_BaseEntity*)GetEngineObject()->GetMoveParent()->GetOuter() : NULL;
+		if (parent->GetEngineObject()->GetModelPtr())
 		{
 			int index = GetEngineObject()->GetBoneIndex(m_ragdollAttachedObjectIndex);
 			const matrix3x4_t& matrix = GetEngineObject()->GetBone(index);

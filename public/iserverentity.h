@@ -438,6 +438,7 @@ public:
 	virtual void SetCycle(float flCycle) = 0;
 	virtual float GetPlaybackRate() = 0;
 	virtual void SetPlaybackRate(float rate) = 0;
+	virtual bool IsValidSequence(int iSequence) = 0;
 	virtual int GetSequence() = 0;
 	virtual void SetSequence(int nSequence) = 0;
 	virtual const char* GetSequenceName(int iSequence) = 0;
@@ -451,6 +452,8 @@ public:
 	virtual const char* GetSequenceActivityName(int iSequence) = 0;
 	virtual KeyValues* GetSequenceKeyValues(int iSequence) = 0;
 	virtual int LookupActivity(const char* label) = 0;
+	virtual void ResetActivityIndexes(void) = 0;
+	virtual void ResetEventIndexes(void) = 0;
 	virtual void ResetSequence(int nSequence) = 0;
 	virtual void ResetSequenceInfo() = 0;
 	virtual bool SequenceLoops(void) = 0;
@@ -458,6 +461,7 @@ public:
 	virtual void SetSequenceFinished(bool bFinished) = 0;
 	virtual float GetLastEventCheck() = 0;
 	virtual void SetLastEventCheck(float flLastEventCheck) = 0;
+	virtual float GetLastVisibleCycle(int iSequence) = 0;
 	virtual float SequenceDuration(int iSequence) = 0;
 	virtual float SequenceDuration(void) = 0;
 	virtual float GetSequenceMoveYaw(int iSequence) = 0;
@@ -480,6 +484,9 @@ public:
 	virtual const float* GetEncodedControllerArray() = 0;
 	virtual float GetBoneController(int iController) = 0;
 	virtual float SetBoneController(int iController, float flValue) = 0;
+	virtual bool HasPoseParameter(int iSequence, const char* szName) = 0;
+	virtual bool HasPoseParameter(int iSequence, int iParameter) = 0;
+	virtual float EdgeLimitPoseParameter(int iParameter, float flValue, float flBase = 0.0f) = 0;
 	virtual int LookupPoseParameter(IStudioHdr* pStudioHdr, const char* szName) = 0;
 	virtual int LookupPoseParameter(const char* szName) = 0;
 	virtual bool GetPoseParameterRange(int index, float& minValue, float& maxValue) = 0;

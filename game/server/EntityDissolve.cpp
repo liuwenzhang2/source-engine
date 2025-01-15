@@ -178,10 +178,10 @@ void CEntityDissolve::InputDissolve( inputdata_t &inputdata )
 	IServerEntity *pTarget = NULL;
 	while ((pTarget = EntityList()->FindEntityGeneric(pTarget, STRING(strTarget), this, inputdata.pActivator)) != NULL)
 	{
-		CBaseAnimating *pBaseAnim = ((CBaseEntity*)pTarget)->GetBaseAnimating();
-		if (pBaseAnim)
+		//CBaseAnimating *pBaseAnim = ((CBaseEntity*)pTarget)->GetBaseAnimating();
+		if (pTarget->GetEngineObject()->GetModelPtr())
 		{
-			pBaseAnim->Dissolve( NULL, gpGlobals->curtime, false, m_nDissolveType, GetEngineObject()->GetAbsOrigin(), m_nMagnitude );
+			((CBaseEntity*)pTarget)->Dissolve( NULL, gpGlobals->curtime, false, m_nDissolveType, GetEngineObject()->GetAbsOrigin(), m_nMagnitude );
 		}
 	}
 }

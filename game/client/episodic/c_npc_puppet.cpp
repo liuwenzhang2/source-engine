@@ -55,11 +55,11 @@ void C_NPC_Puppet::BeforeBuildTransformations( IStudioHdr *pStudioHdr, Vector *p
 {
 	if ( m_hAnimationTarget && m_nTargetAttachment != -1 )
 	{
-		C_BaseAnimating *pTarget = m_hAnimationTarget->GetBaseAnimating();
-		if ( pTarget )
+		//C_BaseAnimating *pTarget = m_hAnimationTarget->GetBaseAnimating();
+		if (m_hAnimationTarget->GetEngineObject()->GetModelPtr())
 		{
 			matrix3x4_t matTarget;
-			pTarget->GetEngineObject()->GetAttachment( m_nTargetAttachment, matTarget );
+			m_hAnimationTarget->GetEngineObject()->GetAttachment( m_nTargetAttachment, matTarget );
 
 			MatrixCopy( matTarget, GetEngineObject()->GetBoneForWrite( 0 ) );
 			boneComputed.ClearAll(); // FIXME: Why is this calculated already?
@@ -79,12 +79,12 @@ void C_NPC_Puppet::ClientThink( void )
 	if ( m_hAnimationTarget == NULL )
 		return;
 
-	C_BaseAnimating *pTarget = m_hAnimationTarget->GetBaseAnimating();
-	if ( pTarget == NULL )
+	//C_BaseAnimating *pTarget = m_hAnimationTarget->GetBaseAnimating();
+	if (m_hAnimationTarget->GetEngineObject()->GetModelPtr() == NULL)
 		return;
 
-	int nTargetSequence = pTarget->GetEngineObject()->GetSequence();
-	const char *pSequenceName = pTarget->GetEngineObject()->GetSequenceName( nTargetSequence );
+	int nTargetSequence = m_hAnimationTarget->GetEngineObject()->GetSequence();
+	const char *pSequenceName = m_hAnimationTarget->GetEngineObject()->GetSequenceName( nTargetSequence );
 
 	int nSequence = GetEngineObject()->LookupSequence( pSequenceName );
 	if ( nSequence >= 0 )
@@ -95,8 +95,8 @@ void C_NPC_Puppet::ClientThink( void )
 			UpdateVisibility();
 		}
 
-		GetEngineObject()->SetCycle( pTarget->GetEngineObject()->GetCycle() );
-		GetEngineObject()->SetPlaybackRate( pTarget->GetEngineObject()->GetPlaybackRate() );
+		GetEngineObject()->SetCycle(m_hAnimationTarget->GetEngineObject()->GetCycle() );
+		GetEngineObject()->SetPlaybackRate(m_hAnimationTarget->GetEngineObject()->GetPlaybackRate() );
 	}
 }
 
@@ -109,7 +109,7 @@ void C_NPC_Puppet::AccumulateLayers( IBoneSetup &boneSetup, Vector pos[], Quater
 	if ( m_hAnimationTarget == NULL )
 		return;
 
-	C_BaseAnimatingOverlay *pTarget = dynamic_cast<C_BaseAnimatingOverlay *>( m_hAnimationTarget->GetBaseAnimating() );
+	C_BaseAnimatingOverlay *pTarget = dynamic_cast<C_BaseAnimatingOverlay *>( m_hAnimationTarget.Get() );
 	if ( pTarget == NULL )
 		return;
 

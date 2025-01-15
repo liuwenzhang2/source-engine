@@ -2108,10 +2108,10 @@ void CNPC_Vortigaunt::ZapBeam( int nHand )
 		if ( g_debug_vortigaunt_aim.GetBool() )
 		{
 			NDebugOverlay::Cross3D( vecTarget, 4.0f, 255, 0, 0, true, 10.0f );
-			CBaseAnimating *pAnim = GetEnemy()->GetBaseAnimating();
-			if ( pAnim )
+			//CBaseAnimating *pAnim = GetEnemy()->GetBaseAnimating();
+			if (GetEnemy()->GetEngineObject()->GetModelPtr())
 			{
-				pAnim->GetEngineObject()->DrawServerHitboxes( 10.0f );
+				GetEnemy()->GetEngineObject()->DrawServerHitboxes( 10.0f );
 			}
 		}
 	}

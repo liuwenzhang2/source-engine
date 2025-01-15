@@ -1525,9 +1525,9 @@ void CBaseEntity::StepSimulationThink( float dt )
 		GetEngineObject()->PhysicsRunThink( THINK_FIRE_BASE_ONLY );
 
 		// do any local processing that's needed
-		if (GetBaseAnimating() != NULL)
+		if (GetEngineObject()->GetModelPtr() != NULL)
 		{
-			GetBaseAnimating()->GetEngineObject()->UpdateStepOrigin();
+			GetEngineObject()->UpdateStepOrigin();
 		}
 
 		// Latch new values to see if external code modifies our position/orientation

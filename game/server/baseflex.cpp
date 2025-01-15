@@ -2399,7 +2399,7 @@ float predef_flexcontroller_values[7][30] = {
 int CFlexCycler::OnTakeDamage( const CTakeDamageInfo &info )
 {
 	int nSequence = GetEngineObject()->GetSequence() + 1;
-	if (!IsValidSequence( nSequence ))
+	if (!GetEngineObject()->IsValidSequence( nSequence ))
 	{
 		nSequence = 0;
 	}

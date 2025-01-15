@@ -76,7 +76,7 @@ public:
 	bool Init(int entnum, int iSerialNum);
 	void UpdateOnRemove(void);
 
-	virtual C_BaseAnimating*		GetBaseAnimating() { return this; }
+	//virtual C_BaseAnimating*		GetBaseAnimating() { return this; }
 
 	bool UsesPowerOfTwoFrameBufferTexture( void );
 

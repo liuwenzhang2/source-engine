@@ -1377,13 +1377,13 @@ void CNPC_CombineDropship::Flight( void )
 	float finAccelBlend = SimpleSplineRemapVal( finspeed, -60, 60, -1, 1 );
 	float curFinAccel = GetEngineObject()->GetPoseParameter( poseBodyAccel );
 	curFinAccel = UTIL_Approach( finAccelBlend, curFinAccel, 0.1f );
-	GetEngineObject()->SetPoseParameter( poseBodyAccel, EdgeLimitPoseParameter( poseBodyAccel, curFinAccel ) );
+	GetEngineObject()->SetPoseParameter( poseBodyAccel, GetEngineObject()->EdgeLimitPoseParameter( poseBodyAccel, curFinAccel ) );
 
 	// Apply the spin sway to the fins
 	float finSwayBlend = SimpleSplineRemapVal( swayspeed, -60, 60, -1, 1 );
 	float curFinSway = GetEngineObject()->GetPoseParameter( poseBodySway );
 	curFinSway = UTIL_Approach( finSwayBlend, curFinSway, 0.1f );
-	GetEngineObject()->SetPoseParameter( poseBodySway, EdgeLimitPoseParameter( poseBodySway, curFinSway ) );
+	GetEngineObject()->SetPoseParameter( poseBodySway, GetEngineObject()->EdgeLimitPoseParameter( poseBodySway, curFinSway ) );
 
 	if ( bRunFlight )
 	{

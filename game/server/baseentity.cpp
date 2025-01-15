@@ -895,7 +895,7 @@ int CBaseEntity::DrawDebugTextOverlays(void)
 		EntityText( offset, tempstr, 0 );
 		offset++;
 
-		if(GetEngineObject()->GetModelName() != NULL_STRING || GetBaseAnimating() )
+		if(GetEngineObject()->GetModelName() != NULL_STRING || GetEngineObject()->GetModelPtr() )
 		{
 			Q_snprintf(tempstr, sizeof(tempstr), "Model:%s", STRING(GetEngineObject()->GetModelName()) );
 			EntityText(offset,tempstr,0);

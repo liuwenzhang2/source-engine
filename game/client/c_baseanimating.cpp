@@ -1105,17 +1105,17 @@ void C_BaseAnimating::CalculateIKLocks( float currentTime )
 				// FIXME: what should the radius check be?
 				for ( CEntitySphereQuery sphere( pTarget->est.pos, 64 ); ( pEntity = sphere.GetCurrentEntity() ) != NULL; sphere.NextEntity() )
 				{
-					C_BaseAnimating *pAnim = pEntity->GetBaseAnimating( );
-					if (!pAnim)
+					//C_BaseAnimating *pAnim = pEntity->GetBaseAnimating( );
+					if (!pEntity->GetEngineObject()->GetModelPtr())
 						continue;
 
-					int iAttachment = pAnim->GetEngineObject()->LookupAttachment( pTarget->offset.pAttachmentName );
+					int iAttachment = pEntity->GetEngineObject()->LookupAttachment( pTarget->offset.pAttachmentName );
 					if (iAttachment <= 0)
 						continue;
 
 					Vector origin;
 					QAngle angles;
-					pAnim->GetEngineObject()->GetAttachment( iAttachment, origin, angles );
+					pEntity->GetEngineObject()->GetAttachment( iAttachment, origin, angles );
 
 					// debugoverlay->AddBoxOverlay( origin, Vector( -1, -1, -1 ), Vector( 1, 1, 1 ), QAngle( 0, 0, 0 ), 255, 0, 0, 0, 0 );
 
@@ -3094,176 +3094,3 @@ bool C_BaseAnimating::ShouldResetSequenceOnNewModel( void )
 	return (GetEngineObject()->GetReceivedSequence() == false);
 }
 
-//-----------------------------------------------------------------------------
-// Purpose: 
-//-----------------------------------------------------------------------------
-//void C_BaseAnimating::UpdateBoneAttachments( void )
-//{
-//	if ( !m_pAttachedTo )
-//		return;
-//
-////	Assert( IsFollowingEntity() );
-////	Assert( m_boneIndexAttached >= 0 );
-//
-//	IEngineObjectClient *follow = GetEngineObject()->FindFollowedEntity();
-//	if ( follow && (m_boneIndexAttached >= 0) )
-//	{
-//		matrix3x4_t localSpace;
-//		const matrix3x4_t& boneToWorld = follow->GetBone(m_boneIndexAttached);
-//		AngleMatrix( m_boneAngles, m_bonePosition, localSpace );
-//		ConcatTransforms( boneToWorld, localSpace, GetEngineObject()->GetBoneForWrite( 0 ) );
-//
-//		Vector absOrigin;
-//		MatrixGetColumn(GetEngineObject()->GetBone( 0 ), 3, absOrigin );
-//		GetEngineObject()->SetAbsOrigin( absOrigin );
-//
-//		QAngle absAngle;
-//		MatrixAngles(GetEngineObject()->GetBone( 0 ), absAngle );
-//		GetEngineObject()->SetAbsAngles( absAngle);
-//	}
-//}
-
-//-----------------------------------------------------------------------------
-// Purpose: 
-//-----------------------------------------------------------------------------
-//void C_BaseAnimating::AttachEntityToBone( C_BaseAnimating* attachTarget, int boneIndexAttached, Vector bonePosition, QAngle boneAngles )
-//{
-//	if ( !attachTarget )
-//		return;
-//
-//	GetEngineObject()->SetCollisionGroup( COLLISION_GROUP_DEBRIS );
-//
-//	GetEngineObject()->FollowEntity( attachTarget->GetEngineObject());
-//	SetOwnerEntity( attachTarget );
-//
-////	Assert( boneIndexAttached >= 0 );		// We should be attaching to a bone.
-//
-//	if ( boneIndexAttached >= 0 )
-//	{
-//		m_boneIndexAttached = boneIndexAttached;
-//		m_bonePosition = bonePosition;
-//		m_boneAngles = boneAngles;
-//	}
-//
-//	GetEngineObject()->SetReadableBones( BONE_USED_BY_ANYTHING );
-//	GetEngineObject()->SetWritableBones( BONE_USED_BY_ANYTHING );
-//
-//	attachTarget->AddBoneAttachment( this );
-//
-//	NotifyBoneAttached( attachTarget );
-//}
-
-//-----------------------------------------------------------------------------
-// Purpose: 
-//-----------------------------------------------------------------------------
-//void C_BaseAnimating::NotifyBoneAttached( C_BaseAnimating* attachTarget )
-//{
-//	// If we're already attached to something, remove us from it.
-//	if ( m_pAttachedTo )
-//	{
-//		m_pAttachedTo->RemoveBoneAttachment( this );
-//		m_pAttachedTo = NULL;
-//	}
-//
-//	// Remember the new attach target.
-//	m_pAttachedTo = attachTarget;
-//
-//	// Special case: if we just attached to the local player and he is hidden, hide us as well.
-//	C_BasePlayer *pPlayer = dynamic_cast<C_BasePlayer*>(attachTarget);
-//	if ( pPlayer && pPlayer->IsLocalPlayer() )
-//	{
-//		if ( !C_BasePlayer::ShouldDrawLocalPlayer() )
-//		{
-//			GetEngineObject()->AddEffects( EF_NODRAW );
-//		}
-//	}
-//	else
-//	{
-//		GetEngineObject()->RemoveEffects( EF_NODRAW );
-//	}
-//}
-
-//-----------------------------------------------------------------------------
-// Purpose: 
-//-----------------------------------------------------------------------------
-//void C_BaseAnimating::AddBoneAttachment( C_BaseAnimating* newBoneAttachment )
-//{
-//	if ( !newBoneAttachment )
-//		return;
-//
-//	m_BoneAttachments.AddToTail( newBoneAttachment );
-//}
-
-//-----------------------------------------------------------------------------
-// Purpose: 
-//-----------------------------------------------------------------------------
-//void C_BaseAnimating::RemoveBoneAttachment( C_BaseAnimating* boneAttachment )
-//{
-//	if ( !boneAttachment )
-//		return;
-//
-//	m_BoneAttachments.FindAndRemove( boneAttachment );
-//}
-
-//-----------------------------------------------------------------------------
-// Purpose: 
-//-----------------------------------------------------------------------------
-//int C_BaseAnimating::GetNumBoneAttachments()
-//{
-//	return m_BoneAttachments.Count();
-//}
-
-//-----------------------------------------------------------------------------
-// Purpose: 
-//-----------------------------------------------------------------------------
-//C_BaseAnimating* C_BaseAnimating::GetBoneAttachment( int i )
-//{
-//	if ( m_BoneAttachments.IsValidIndex(i) )
-//	{
-//		return m_BoneAttachments[i];
-//	}
-//	return NULL;
-//}
-
-//-----------------------------------------------------------------------------
-// Purpose: 
-//-----------------------------------------------------------------------------
-//void C_BaseAnimating::DestroyBoneAttachments()
-//{
-//	while ( GetNumBoneAttachments() )
-//	{
-//		C_BaseAnimating *pAttachment = GetBoneAttachment(0);
-//		if ( pAttachment )
-//		{
-//			DestroyEntity(pAttachment);// ->Release();
-//		}
-//		else
-//		{
-//			m_BoneAttachments.Remove(0);
-//		}
-//	}
-//}
-
-//-----------------------------------------------------------------------------
-// Purpose: 
-//-----------------------------------------------------------------------------
-//void C_BaseAnimating::MoveBoneAttachments( C_BaseAnimating* attachTarget )
-//{
-//	if ( !attachTarget )
-//		return;
-//
-//	// Move all of our bone attachments to this new object.
-//	// Preserves the specific bone and attachment location information.
-//	while ( GetNumBoneAttachments() )
-//	{
-//		C_BaseAnimating *pAttachment = GetBoneAttachment(0);
-//		if ( pAttachment )
-//		{
-//			pAttachment->AttachEntityToBone( attachTarget );
-//		}
-//		else
-//		{
-//			m_BoneAttachments.Remove(0);
-//		}
-//	}
-//}

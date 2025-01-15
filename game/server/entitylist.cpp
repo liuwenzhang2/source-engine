@@ -4064,13 +4064,13 @@ void CEngineObjectInternal::ParseMapData(IEntityMapData* mapData)
 			if (m_pOuter->KeyValue(keyName, value)) 
 			{
 				if (KeyValue(keyName, value)) {
-					Msg("Entity %s has multiparsed key: %s!\n", GetClassname(), keyName);
+					Msg("Entity %s has multiparsed key: %s!\n", STRING(GetClassname()), keyName);
 				}
 			}
 			else 
 			{
 				if (!KeyValue(keyName, value)) {
-					Msg("Entity %s has unparsed key: %s!\n", GetClassname(), keyName);
+					Msg("Entity %s has unparsed key: %s!\n", STRING(GetClassname()), keyName);
 				}
 			}
 		} while (mapData->GetNextKey(keyName, value));
@@ -4392,7 +4392,7 @@ void CEngineObjectInternal::OnRestore()
 			// generally this means you've got something marked FCAP_DONT_SAVE
 			// in a hierarchy.  That's probably ok given this fixup, but the hierarhcy
 			// linked list is just saved/loaded in-place
-			Warning("Fixing up parent on %s\n", GetClassname());
+			Warning("Fixing up parent on %s\n", STRING(GetClassname()));
 #endif
 			// We only need to be back in the parent's list because we're already in the right place and with the right data
 			GetMoveParent()->LinkChild(this);
@@ -5578,7 +5578,7 @@ void CEngineObjectInternal::PhysicsTouchTriggers(const Vector* pPrevAbsOrigin)
 		{
 			if (!GetModel() && Q_strlen(STRING(GetModelName())) == 0)
 			{
-				Warning("Inserted %s with no model\n", GetClassname());
+				Warning("Inserted %s with no model\n", STRING(GetClassname()));
 				return;
 			}
 		}
@@ -6875,7 +6875,7 @@ void CEngineObjectInternal::PhysicsDispatchThink(THINKPTR thinkFunc)
 
 	if (m_pOuter->IsDormant())
 	{
-		Warning("Dormant entity %s (%s) is thinking!!\n", GetClassname(), m_pOuter->GetDebugName());
+		Warning("Dormant entity %s (%s) is thinking!!\n", STRING(GetClassname()), m_pOuter->GetDebugName());
 		Assert(0);
 	}
 
@@ -7428,7 +7428,7 @@ void CEngineObjectInternal::SetHitboxSet(int setnum)
 		static bool s_bWarned = false;
 		if (!s_bWarned)
 		{
-			Warning("Using bogus hitbox set in entity %s!\n", GetClassname());
+			Warning("Using bogus hitbox set in entity %s!\n", STRING(GetClassname()));
 			s_bWarned = true;
 		}
 		setnum = 0;
@@ -7719,6 +7719,19 @@ void CEngineObjectInternal::ResetClientsideFrame(void)
 
 //=========================================================
 //=========================================================
+bool CEngineObjectInternal::IsValidSequence(int iSequence)
+{
+	Assert(GetModelPtr());
+	IStudioHdr* pstudiohdr = GetModelPtr();
+	if (iSequence < 0 || iSequence >= pstudiohdr->GetNumSeq())
+	{
+		return false;
+	}
+	return true;
+}
+
+//=========================================================
+//=========================================================
 void CEngineObjectInternal::SetSequence(int nSequence)
 {
 	Assert(nSequence == 0 /* || IsDynamicModelLoading()*/ || (GetModelPtr() && (nSequence < GetModelPtr()->GetNumSeq()) && (GetModelPtr()->GetNumSeq() < (1 << ANIMATION_SEQUENCE_BITS))));
@@ -7793,6 +7806,24 @@ void CEngineObjectInternal::ResetSequenceInfo()
 	{
 		mdlcache->SetEventIndexForSequence(pStudioHdr->pSeqdesc(GetSequence()));
 	}
+}
+
+//=========================================================
+// ResetActivityIndexes
+//=========================================================
+void CEngineObjectInternal::ResetActivityIndexes(void)
+{
+	Assert(GetModelPtr());
+	GetModelPtr()->ResetActivityIndexes();
+}
+
+//=========================================================
+// ResetEventIndexes
+//=========================================================
+void CEngineObjectInternal::ResetEventIndexes(void)
+{
+	Assert(GetModelPtr());
+	GetModelPtr()->ResetEventIndexes();
 }
 
 //-----------------------------------------------------------------------------
@@ -7994,6 +8025,75 @@ void CEngineObjectInternal::DoMuzzleFlash()
 
 //=========================================================
 //=========================================================
+bool CEngineObjectInternal::HasPoseParameter(int iSequence, const char* szName)
+{
+	int iParameter = LookupPoseParameter(szName);
+	if (iParameter == -1)
+	{
+		return false;
+	}
+
+	return HasPoseParameter(iSequence, iParameter);
+}
+
+//=========================================================
+//=========================================================
+bool CEngineObjectInternal::HasPoseParameter(int iSequence, int iParameter)
+{
+	IStudioHdr* pstudiohdr = GetModelPtr();
+
+	if (!pstudiohdr)
+	{
+		return false;
+	}
+
+	if (!pstudiohdr->SequencesAvailable())
+	{
+		return false;
+	}
+
+	if (iSequence < 0 || iSequence >= pstudiohdr->GetNumSeq())
+	{
+		return false;
+	}
+
+	mstudioseqdesc_t& seqdesc = pstudiohdr->pSeqdesc(iSequence);
+	if (pstudiohdr->GetSharedPoseParameter(iSequence, seqdesc.paramindex[0]) == iParameter ||
+		pstudiohdr->GetSharedPoseParameter(iSequence, seqdesc.paramindex[1]) == iParameter)
+	{
+		return true;
+	}
+	return false;
+}
+
+//=========================================================
+// Purpose: from input of 75% to 200% of maximum range, rescale smoothly from 75% to 100%
+//=========================================================
+float CEngineObjectInternal::EdgeLimitPoseParameter(int iParameter, float flValue, float flBase)
+{
+	IStudioHdr* pstudiohdr = GetModelPtr();
+	if (!pstudiohdr)
+	{
+		return flValue;
+	}
+
+	if (iParameter < 0 || iParameter >= pstudiohdr->GetNumPoseParameters())
+	{
+		return flValue;
+	}
+
+	const mstudioposeparamdesc_t& Pose = pstudiohdr->pPoseParameter(iParameter);
+
+	if (Pose.loop || Pose.start == Pose.end)
+	{
+		return flValue;
+	}
+
+	return RangeCompressor(flValue, Pose.start, Pose.end, flBase);
+}
+
+//=========================================================
+//=========================================================
 int CEngineObjectInternal::LookupPoseParameter(IStudioHdr* pStudioHdr, const char* szName)
 {
 	if (!pStudioHdr)
@@ -8101,13 +8201,31 @@ float CEngineObjectInternal::GetBoneController(int iController)
 	return pmodel->Studio_GetController(iController, m_flEncodedController[iController]);
 }
 
+float CEngineObjectInternal::GetLastVisibleCycle(int iSequence)
+{
+	if (!GetModelPtr())
+	{
+		DevWarning(2, "CBaseAnimating::LastVisibleCycle( %d ) NULL pstudiohdr on %s!\n", iSequence, STRING(GetClassname()));
+		return 1.0;
+	}
+
+	if (!(GetModelPtr()->GetSequenceFlags(iSequence) & STUDIO_LOOPING))
+	{
+		return 1.0f - (GetModelPtr()->pSeqdesc(iSequence).fadeouttime) * GetSequenceCycleRate(iSequence) * GetPlaybackRate();
+	}
+	else
+	{
+		return 1.0;
+	}
+}
+
 //=========================================================
 //=========================================================
 float CEngineObjectInternal::SequenceDuration(IStudioHdr* pStudioHdr, int iSequence)
 {
 	if (!pStudioHdr)
 	{
-		DevWarning(2, "CBaseAnimating::SequenceDuration( %d ) NULL pstudiohdr on %s!\n", iSequence, GetClassname());
+		DevWarning(2, "CBaseAnimating::SequenceDuration( %d ) NULL pstudiohdr on %s!\n", iSequence, STRING(GetClassname()));
 		return 0.1;
 	}
 	if (!pStudioHdr->SequencesAvailable())
@@ -8454,7 +8572,7 @@ void CEngineObjectInternal::VPhysicsSetObject(IPhysicsObject* pPhysics)
 {
 	if (m_pPhysicsObject && pPhysics)
 	{
-		Warning("Overwriting physics object for %s\n", GetClassname());
+		Warning("Overwriting physics object for %s\n", STRING(GetClassname()));
 	}
 	m_pPhysicsObject = pPhysics;
 	if (pPhysics && !m_pPhysicsObject)

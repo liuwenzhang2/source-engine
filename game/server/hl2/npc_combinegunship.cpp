@@ -1088,9 +1088,9 @@ void CNPC_CombineGunship::DoBellyBlastDamage( trace_t &tr, Vector vMins, Vector 
 		// If the creature was killed, then dissolve it
 		if ( pEntity->GetHealth() <= 0.0f )
 		{
-			if ( pEntity->GetBaseAnimating() != NULL && !pEntity->GetEngineObject()->IsEFlagSet( EFL_NO_DISSOLVE ) )
+			if ( pEntity->GetEngineObject()->GetModelPtr() != NULL && !pEntity->GetEngineObject()->IsEFlagSet( EFL_NO_DISSOLVE ) )
 			{
-				pEntity->GetBaseAnimating()->Dissolve( NULL, gpGlobals->curtime );
+				pEntity->Dissolve( NULL, gpGlobals->curtime );
 			}
 		}
 	}

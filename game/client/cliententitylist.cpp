@@ -5841,9 +5841,9 @@ void C_EngineObjectInternal::PhysicsDispatchThink(CTHINKPTR thinkFunc)
 #endif
 			{
 #ifdef WIN32
-				Msg("CLIENT:  %s(%s) thinking for %.02f ms!!!\n", GetClassname(), typeid(m_pOuter).raw_name(), time);
+				Msg("CLIENT:  %s(%s) thinking for %.02f ms!!!\n", STRING(GetClassname()), typeid(m_pOuter).raw_name(), time);
 #else
-				Msg("CLIENT:  %s(%s) thinking for %.02f ms!!!\n", GetClassname(), typeid(m_pOuter).name(), time);
+				Msg("CLIENT:  %s(%s) thinking for %.02f ms!!!\n", STRING(GetClassname()), typeid(m_pOuter).name(), time);
 #endif
 			}
 		}
@@ -6088,7 +6088,7 @@ void C_EngineObjectInternal::SetHitboxSet(int setnum)
 		static bool s_bWarned = false;
 		if (!s_bWarned)
 		{
-			Warning("Using bogus hitbox set in entity %s!\n", GetClassname());
+			Warning("Using bogus hitbox set in entity %s!\n", STRING(GetClassname()));
 			s_bWarned = true;
 		}
 		setnum = 0;
@@ -6941,7 +6941,7 @@ void C_EngineObjectInternal::VPhysicsSetObject(IPhysicsObject* pPhysics)
 {
 	if (m_pPhysicsObject && pPhysics)
 	{
-		Warning("Overwriting physics object for %s\n", GetClassname());
+		Warning("Overwriting physics object for %s\n", STRING(GetClassname()));
 	}
 	m_pPhysicsObject = pPhysics;
 	if (pPhysics && !m_pPhysicsObject)
@@ -8258,7 +8258,7 @@ bool C_EngineObjectInternal::SetupBones(matrix3x4_t* pBoneToWorldOut, int nMaxBo
 		// Prevent spammage!!!
 		if (gpGlobals->realtime >= lastWarning + 1.0f)
 		{
-			DevMsgRT("*** ERROR: Bone access not allowed (entity %i:%s)\n", entindex(), GetClassname());
+			DevMsgRT("*** ERROR: Bone access not allowed (entity %i:%s)\n", entindex(), STRING(GetClassname()));
 			lastWarning = gpGlobals->realtime;
 		}
 	}

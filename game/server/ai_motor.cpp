@@ -1011,7 +1011,7 @@ float CAI_Motor::GetPoseParameter( const char *szName )
 
 bool CAI_Motor::HasPoseParameter( int iSequence, const char *szName )
 {
-	return GetOuter()->HasPoseParameter( iSequence, szName );
+	return GetOuter()->GetEngineObject()->HasPoseParameter( iSequence, szName );
 }
 
 float CAI_Motor::SetPoseParameter( int iParameter, float flValue ) 
@@ -1021,7 +1021,7 @@ float CAI_Motor::SetPoseParameter( int iParameter, float flValue )
 
 bool CAI_Motor::HasPoseParameter( int iSequence, int iParameter ) 
 { 
-	return GetOuter()->HasPoseParameter( iSequence, iParameter ); 
+	return GetOuter()->GetEngineObject()->HasPoseParameter( iSequence, iParameter );
 }
 
 void CAI_Motor::SetMoveType( MoveType_t val, MoveCollide_t moveCollide )

@@ -212,20 +212,20 @@ void CParticleSystemQuery::GetRandomPointsOnControllingObjectHitBox(
 		pParticles->GetControlPointAtTime( nControlPointNumber, pParticles->m_flCurTime, &vecBasePos );
 
 		s_BoneMutex.Lock();
-		C_BaseAnimating *pAnimating = pMoveParent->GetBaseAnimating();
-		if ( pAnimating )
+		//C_BaseAnimating *pAnimating = pMoveParent->GetBaseAnimating();
+		if ( pMoveParent->GetEngineObject()->GetModelPtr())
 		{
 			
 			const matrix3x4_t	*hitboxbones[MAXSTUDIOBONES];
 			
-			if ( pAnimating->GetEngineObject()->HitboxToWorldTransforms( hitboxbones ) )
+			if ( pMoveParent->GetEngineObject()->HitboxToWorldTransforms( hitboxbones ) )
 			{
 		
-				IStudioHdr *pStudioHdr = modelinfo->GetStudiomodel( pAnimating->GetEngineObject()->GetModel() );
+				IStudioHdr *pStudioHdr = modelinfo->GetStudiomodel( pMoveParent->GetEngineObject()->GetModel() );
 				
 				if ( pStudioHdr )
 				{
-					mstudiohitboxset_t *set = pStudioHdr->pHitboxSet( pAnimating->GetEngineObject()->GetHitboxSet() );
+					mstudiohitboxset_t *set = pStudioHdr->pHitboxSet( pMoveParent->GetEngineObject()->GetHitboxSet() );
 					
 					if ( set )
 					{
@@ -252,9 +252,9 @@ void CParticleSystemQuery::GetRandomPointsOnControllingObjectHitBox(
 								float flTryW = pParticles->RandomFloat( flRandMin, flRandMax );
 
 								Vector vecLocalPosition;
-								vecLocalPosition.x = GetSurfaceCoord( flTryU, pBox->bbmin.x * pAnimating->GetEngineObject()->GetModelScale(), pBox->bbmax.x * pAnimating->GetEngineObject()->GetModelScale() );
-								vecLocalPosition.y = GetSurfaceCoord( flTryV, pBox->bbmin.y * pAnimating->GetEngineObject()->GetModelScale(), pBox->bbmax.y * pAnimating->GetEngineObject()->GetModelScale() );
-								vecLocalPosition.z = GetSurfaceCoord( flTryW, pBox->bbmin.z * pAnimating->GetEngineObject()->GetModelScale(), pBox->bbmax.z * pAnimating->GetEngineObject()->GetModelScale() );
+								vecLocalPosition.x = GetSurfaceCoord( flTryU, pBox->bbmin.x * pMoveParent->GetEngineObject()->GetModelScale(), pBox->bbmax.x * pMoveParent->GetEngineObject()->GetModelScale() );
+								vecLocalPosition.y = GetSurfaceCoord( flTryV, pBox->bbmin.y * pMoveParent->GetEngineObject()->GetModelScale(), pBox->bbmax.y * pMoveParent->GetEngineObject()->GetModelScale() );
+								vecLocalPosition.z = GetSurfaceCoord( flTryW, pBox->bbmin.z * pMoveParent->GetEngineObject()->GetModelScale(), pBox->bbmax.z * pMoveParent->GetEngineObject()->GetModelScale() );
 
 								Vector vecTryWorldPosition;
 
@@ -405,19 +405,19 @@ int CParticleSystemQuery::GetControllingObjectHitBoxInfo(
 
 	if ( pMoveParent )
 	{
-		C_BaseAnimating *pAnimating = pMoveParent->GetBaseAnimating();
-		if ( pAnimating )
+		//C_BaseAnimating *pAnimating = pMoveParent->GetBaseAnimating();
+		if (pMoveParent->GetEngineObject()->GetModelPtr())
 		{
 			const matrix3x4_t	*hitboxbones[MAXSTUDIOBONES];
 			
-			if ( pAnimating->GetEngineObject()->HitboxToWorldTransforms( hitboxbones ) )
+			if (pMoveParent->GetEngineObject()->HitboxToWorldTransforms( hitboxbones ) )
 			{
 		
-				IStudioHdr *pStudioHdr = modelinfo->GetStudiomodel( pAnimating->GetEngineObject()->GetModel() );
+				IStudioHdr *pStudioHdr = modelinfo->GetStudiomodel(pMoveParent->GetEngineObject()->GetModel() );
 				
 				if ( pStudioHdr )
 				{
-					mstudiohitboxset_t *set = pStudioHdr->pHitboxSet( pAnimating->GetEngineObject()->GetHitboxSet() );
+					mstudiohitboxset_t *set = pStudioHdr->pHitboxSet(pMoveParent->GetEngineObject()->GetHitboxSet() );
 					
 					if ( set )
 					{
@@ -475,7 +475,7 @@ bool CParticleSystemQuery::IsPointInControllingObjectHitBox(
 	if ( pMoveParent )
 	{
 		s_BoneMutex.Lock();
-		C_BaseAnimating *pAnimating = pMoveParent->GetBaseAnimating();
+		//C_BaseAnimating *pAnimating = pMoveParent->GetBaseAnimating();
 
 		bool bInBBox = false;
 		Vector vecBBoxMin;
@@ -494,17 +494,17 @@ bool CParticleSystemQuery::IsPointInControllingObjectHitBox(
 
 		if ( bInBBox && bBBoxOnly )
 			bSuccess = true;
-		else if ( pAnimating && bInBBox )
+		else if (pMoveParent->GetEngineObject()->GetModelPtr() && bInBBox)
 		{
 			const matrix3x4_t	*hitboxbones[MAXSTUDIOBONES];
-			if ( pAnimating->GetEngineObject()->HitboxToWorldTransforms( hitboxbones ) )
+			if (pMoveParent->GetEngineObject()->HitboxToWorldTransforms( hitboxbones ) )
 			{
 
-				IStudioHdr *pStudioHdr = modelinfo->GetStudiomodel( pAnimating->GetEngineObject()->GetModel() );
+				IStudioHdr *pStudioHdr = modelinfo->GetStudiomodel(pMoveParent->GetEngineObject()->GetModel() );
 
 				if ( pStudioHdr )
 				{
-					mstudiohitboxset_t *set = pStudioHdr->pHitboxSet( pAnimating->GetEngineObject()->GetHitboxSet() );
+					mstudiohitboxset_t *set = pStudioHdr->pHitboxSet(pMoveParent->GetEngineObject()->GetHitboxSet() );
 
 					if ( set )
 					{

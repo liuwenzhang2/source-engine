@@ -516,7 +516,7 @@ void CBaseAnimatingOverlay::OnRestore( )
 	for (i = 0; i < m_AnimOverlay.Count(); i++)
 	{
 		if ( ( m_AnimOverlay[i].IsActive() && (m_AnimOverlay[i].m_fFlags & ANIM_LAYER_DONTRESTORE) ) ||
-			 (GetEngineObject()->GetModelPtr() && !IsValidSequence(m_AnimOverlay[i].m_nSequence) ) )
+			 (GetEngineObject()->GetModelPtr() && !GetEngineObject()->IsValidSequence(m_AnimOverlay[i].m_nSequence) ) )
 		{
 			FastRemoveLayer( i );
 		}

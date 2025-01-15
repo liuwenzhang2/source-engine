@@ -646,10 +646,10 @@ CBaseEntity *CreateRagGib( const char *szModel, const Vector &vecOrigin, const Q
 
 	if ( bShouldIgnite )
 	{
-		CBaseAnimating *pAnimating = pGib->GetBaseAnimating();
-		if (pAnimating != NULL )
+		//CBaseAnimating *pAnimating = pGib->GetBaseAnimating();
+		if (pGib->GetEngineObject()->GetModelPtr() != NULL )
 		{
-			pAnimating->Ignite( random->RandomFloat( 8.0, 12.0 ), false );
+			pGib->Ignite( random->RandomFloat( 8.0, 12.0 ), false );
 		}
 	}
 

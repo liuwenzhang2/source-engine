@@ -1441,7 +1441,7 @@ void C_BasePlayer::CalcChaseCamView(Vector& eyeOrigin, QAngle& eyeAngles, float&
 	// If our target isn't visible, we're at a camera point of some kind.
 	// Instead of letting the player rotate around an invisible point, treat
 	// the point as a fixed camera.
-	if ( !target->GetBaseAnimating() && !target->GetEngineObject()->GetModel() )
+	if ( !target->GetEngineObject()->GetModelPtr() && !target->GetEngineObject()->GetModel())
 	{
 		CalcRoamingView( eyeOrigin, eyeAngles, fov );
 		return;
@@ -1607,12 +1607,12 @@ void C_BasePlayer::CalcFreezeCamView( Vector& eyeOrigin, QAngle& eyeAngles, floa
 	if ( pTarget->IsAlive() )
 	{
 		// Look at their chest, not their head
-		Vector maxs = pTarget->GetBaseAnimating() ? VEC_HULL_MAX_SCALED( pTarget->GetBaseAnimating() ) : VEC_HULL_MAX;
+		Vector maxs = pTarget->GetEngineObject()->GetModelPtr() ? VEC_HULL_MAX_SCALED(pTarget) : VEC_HULL_MAX;
 		vecCamTarget.z -= (maxs.z * 0.5);
 	}
 	else
 	{
-		vecCamTarget.z += pTarget->GetBaseAnimating() ? VEC_DEAD_VIEWHEIGHT_SCALED( pTarget->GetBaseAnimating() ).z : VEC_DEAD_VIEWHEIGHT.z;	// look over ragdoll, not through
+		vecCamTarget.z += pTarget->GetEngineObject()->GetModelPtr() ? VEC_DEAD_VIEWHEIGHT_SCALED(pTarget).z : VEC_DEAD_VIEWHEIGHT.z;	// look over ragdoll, not through
 	}
 
 	// Figure out a view position in front of the target
@@ -1702,14 +1702,14 @@ void C_BasePlayer::CalcInEyeCamView(Vector& eyeOrigin, QAngle& eyeAngles, float&
 	if( engine->IsHLTV() )
 #endif
 	{
-		C_BaseAnimating *pTargetAnimating = target->GetBaseAnimating();
+		//C_BaseAnimating *pTargetAnimating = target->GetBaseAnimating();
 		if ( target->GetEngineObject()->GetFlags() & FL_DUCKING )
 		{
-			eyeOrigin += pTargetAnimating ? VEC_DUCK_VIEW_SCALED( pTargetAnimating ) : VEC_DUCK_VIEW;
+			eyeOrigin += target->GetEngineObject()->GetModelPtr() ? VEC_DUCK_VIEW_SCALED(target) : VEC_DUCK_VIEW;
 		}
 		else
 		{
-			eyeOrigin += pTargetAnimating ? VEC_VIEW_SCALED( pTargetAnimating ) : VEC_VIEW;
+			eyeOrigin += target->GetEngineObject()->GetModelPtr() ? VEC_VIEW_SCALED(target) : VEC_VIEW;
 		}
 	}
 	else

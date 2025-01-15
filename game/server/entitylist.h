@@ -769,7 +769,8 @@ public:
 	const float* GetEncodedControllerArray() { return m_flEncodedController.Base(); }
 	float GetPlaybackRate();
 	void SetPlaybackRate(float rate);
-	inline int GetSequence() { return m_nSequence; }
+	bool IsValidSequence(int iSequence);
+	int GetSequence() { return m_nSequence; }
 	void SetSequence(int nSequence);
 	bool PrefetchSequence(int iSequence);
 	const char* GetSequenceName(int iSequence);
@@ -785,6 +786,8 @@ public:
 	int LookupActivity(const char* label);
 	/* inline */ void ResetSequence(int nSequence);
 	void ResetSequenceInfo();
+	void ResetActivityIndexes(void);
+	void ResetEventIndexes(void);
 	float GetGroundSpeed() const{
 		return m_flGroundSpeed;
 	}
@@ -802,7 +805,8 @@ public:
 	void SetSequenceFinished(bool bFinished) {
 		m_bSequenceFinished = bFinished;
 	}
-	inline float SequenceDuration(void) { return SequenceDuration(m_nSequence); }
+	float GetLastVisibleCycle(int iSequence);
+	float SequenceDuration(void) { return SequenceDuration(m_nSequence); }
 	float SequenceDuration(IStudioHdr* pStudioHdr, int iSequence);
 	inline float SequenceDuration(int iSequence) { return SequenceDuration(GetModelPtr(), iSequence); }
 	float GetSequenceCycleRate(IStudioHdr* pStudioHdr, int iSequence);
@@ -829,7 +833,9 @@ public:
 	}
 	// Send a muzzle flash event to the client for this entity.
 	void DoMuzzleFlash();
-
+	bool HasPoseParameter(int iSequence, const char* szName);
+	bool HasPoseParameter(int iSequence, int iParameter);
+	float EdgeLimitPoseParameter(int iParameter, float flValue, float flBase = 0.0f);
 	int LookupPoseParameter(IStudioHdr* pStudioHdr, const char* szName);
 	int LookupPoseParameter(const char* szName) { return LookupPoseParameter(GetModelPtr(), szName); }
 	float GetPoseParameter(const char* szName);

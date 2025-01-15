@@ -6821,8 +6821,8 @@ void CAI_BaseNPC::NPCInit ( void )
 	InitBoneControllers( ); // FIX: should be done in Spawn
 	if (GetEngineObject()->GetModelPtr() )
 	{
-		ResetActivityIndexes();
-		ResetEventIndexes();
+		GetEngineObject()->ResetActivityIndexes();
+		GetEngineObject()->ResetEventIndexes();
 	}
 
 	SetHintNode( NULL );
@@ -9366,7 +9366,7 @@ void CAI_BaseNPC::ReportAIState( void )
 
 	if (GetEngineObject()->GetGroundEntity() )
 	{
-		DevMsg( "Groundent:%s\n\n", GetEngineObject()->GetGroundEntity()->GetClassname() );
+		DevMsg( "Groundent:%s\n\n", STRING(GetEngineObject()->GetGroundEntity()->GetClassname()) );
 	}
 	else
 	{
@@ -11188,7 +11188,7 @@ int CAI_BaseNPC::Restore( IRestore &restore )
 			bLostSequence = true;
 		}
 
-		Assert( IsValidSequence(GetEngineObject()->GetSequence() ) );
+		Assert(GetEngineObject()->IsValidSequence(GetEngineObject()->GetSequence() ) );
 	}
 
 	bool bLostScript = ( m_NPCState == NPC_STATE_SCRIPT && m_hCine == NULL );

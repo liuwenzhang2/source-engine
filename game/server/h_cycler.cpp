@@ -167,7 +167,7 @@ int CCycler::OnTakeDamage( const CTakeDamageInfo &info )
 	if (m_animate)
 	{
 		int nSequence = GetEngineObject()->GetSequence() + 1;
-		if ( !IsValidSequence(nSequence) )
+		if ( !GetEngineObject()->IsValidSequence(nSequence) )
 		{
 			nSequence = 0;
 		}

@@ -442,7 +442,7 @@ float CNPC_BaseZombie::MaxYawSpeed( void )
 	{
 		return( 60 );
 	}
-	else if (IsMoving() && HasPoseParameter(GetEngineObject()->GetSequence(), m_poseMove_Yaw ))
+	else if (IsMoving() && GetEngineObject()->HasPoseParameter(GetEngineObject()->GetSequence(), m_poseMove_Yaw ))
 	{
 		return( 15 );
 	}
@@ -480,7 +480,7 @@ float CNPC_BaseZombie::MaxYawSpeed( void )
 //-----------------------------------------------------------------------------
 bool CNPC_BaseZombie::OverrideMoveFacing( const AILocalMoveGoal_t &move, float flInterval )
 {
-	if (!HasPoseParameter(GetEngineObject()->GetSequence(), m_poseMove_Yaw ))
+	if (!GetEngineObject()->HasPoseParameter(GetEngineObject()->GetSequence(), m_poseMove_Yaw ))
 	{
 		return BaseClass::OverrideMoveFacing( move, flInterval );
 	}

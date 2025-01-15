@@ -1209,7 +1209,7 @@ bool CPropCombineBall::DissolveEntity( CBaseEntity *pEntity )
 	if( !pEntity->IsNPC() && !(dynamic_cast<CRagdollProp*>(pEntity)) )
 		return false;
 
-	pEntity->GetBaseAnimating()->Dissolve( "", gpGlobals->curtime, false, ENTITY_DISSOLVE_NORMAL );
+	pEntity->Dissolve( "", gpGlobals->curtime, false, ENTITY_DISSOLVE_NORMAL );
 	
 	// Note that we've struck an entity
 	m_bStruckEntity = true;

@@ -2495,7 +2495,7 @@ void C_CSPlayer::CalcFreezeCamView( Vector& eyeOrigin, QAngle& eyeAngles, float&
 
 	// look over ragdoll, not through
 	if ( !pTarget->IsAlive() )
-		vLookAt.z += pTarget->GetBaseAnimating() ? VEC_DEAD_VIEWHEIGHT_SCALED( pTarget->GetBaseAnimating() ).z : VEC_DEAD_VIEWHEIGHT.z;
+		vLookAt.z += pTarget->GetEngineObject()->GetModelPtr() ? VEC_DEAD_VIEWHEIGHT_SCALED(pTarget).z : VEC_DEAD_VIEWHEIGHT.z;
 
 	// Figure out a view position in front of the target
 	Vector vEyeOnPlane = eyeOrigin;

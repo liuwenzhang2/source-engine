@@ -447,17 +447,17 @@ void FindPhysicsAnchor( string_t name, hl_constraint_info_t &info, int index, CB
 			bool bWroteAttachment = false;
 			if ( pAnchor->parentAttachment > 0 )
 			{
-				CBaseAnimating *pAnim = pAnchor->hEntity->GetBaseAnimating();
-				if ( pAnim )
+				//CBaseAnimating *pAnim = pAnchor->hEntity->GetBaseAnimating();
+				if (pAnchor->hEntity->GetEngineObject()->GetModelPtr())
 				{
 					IPhysicsObject *list[VPHYSICS_MAX_OBJECT_LIST_COUNT];
 					int listCount = pAnchor->hEntity->GetEngineObject()->VPhysicsGetObjectList( list, ARRAYSIZE(list) );
-					int iPhysicsBone = pAnim->GetEngineObject()->GetPhysicsBone( pAnim->GetEngineObject()->GetAttachmentBone( pAnchor->parentAttachment ) );
+					int iPhysicsBone = pAnchor->hEntity->GetEngineObject()->GetPhysicsBone(pAnchor->hEntity->GetEngineObject()->GetAttachmentBone( pAnchor->parentAttachment ) );
 					if ( iPhysicsBone < listCount )
 					{
 						Vector pos;
 						info.pObjects[index] = list[iPhysicsBone];
-						pAnim->GetEngineObject()->GetAttachment( pAnchor->parentAttachment, pos );
+						pAnchor->hEntity->GetEngineObject()->GetAttachment( pAnchor->parentAttachment, pos );
 						list[iPhysicsBone]->WorldToLocal( &info.anchorPosition[index], pos );
 						bWroteAttachment = true;
 					}

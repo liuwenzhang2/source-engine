@@ -2525,13 +2525,13 @@ void CTriggerCamera::Enable( void )
 		m_iAttachmentIndex = 0;
 		if ( m_iszTargetAttachment != NULL_STRING )
 		{
-			if ( !m_hTarget->GetBaseAnimating() )
+			if ( !m_hTarget->GetEngineObject()->GetModelPtr() )
 			{
 				Warning("%s tried to target an attachment (%s) on target %s, which has no model.\n", GetClassname(), STRING(m_iszTargetAttachment), STRING(m_hTarget->GetEntityName()) );
 			}
 			else
 			{
-				m_iAttachmentIndex = m_hTarget->GetBaseAnimating()->GetEngineObject()->LookupAttachment( STRING(m_iszTargetAttachment) );
+				m_iAttachmentIndex = m_hTarget->GetEngineObject()->LookupAttachment( STRING(m_iszTargetAttachment) );
 				if ( m_iAttachmentIndex <= 0 )
 				{
 					Warning("%s could not find attachment %s on target %s.\n", GetClassname(), STRING(m_iszTargetAttachment), STRING(m_hTarget->GetEntityName()) );
@@ -2692,7 +2692,7 @@ void CTriggerCamera::FollowTarget( )
 	if ( m_iAttachmentIndex )
 	{
 		Vector vecOrigin;
-		m_hTarget->GetBaseAnimating()->GetEngineObject()->GetAttachment( m_iAttachmentIndex, vecOrigin );
+		m_hTarget->GetEngineObject()->GetAttachment( m_iAttachmentIndex, vecOrigin );
 		VectorAngles( vecOrigin - GetEngineObject()->GetAbsOrigin(), vecGoal );
 	}
 	else

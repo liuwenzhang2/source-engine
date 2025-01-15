@@ -1257,20 +1257,20 @@ void FX_BuildTeslaHitbox( const CEffectData &data )
 	Vector vColor( 1, 1, 1 );
 
 	C_BaseEntity *pEntity = (C_BaseEntity*)EntityList()->GetEnt( data.entindex() );
-	C_BaseAnimating *pAnimating = pEntity ? pEntity->GetBaseAnimating() : NULL;
-	if (!pAnimating)
+	//C_BaseAnimating *pAnimating = pEntity ? pEntity->GetBaseAnimating() : NULL;
+	if (!pEntity->GetEngineObject()->GetModelPtr())
 		return;
 
-	IStudioHdr *pStudioHdr = modelinfo->GetStudiomodel( pAnimating->GetEngineObject()->GetModel() );
+	IStudioHdr *pStudioHdr = modelinfo->GetStudiomodel(pEntity->GetEngineObject()->GetModel() );
 	if (!pStudioHdr)
 		return;
 
-	mstudiohitboxset_t *set = pStudioHdr->pHitboxSet( pAnimating->GetEngineObject()->GetHitboxSet() );
+	mstudiohitboxset_t *set = pStudioHdr->pHitboxSet(pEntity->GetEngineObject()->GetHitboxSet() );
 	if (!set) {
 		return;
 	}
 	const matrix3x4_t	*hitboxbones[MAXSTUDIOBONES];
-	if ( !pAnimating->GetEngineObject()->HitboxToWorldTransforms( hitboxbones ) )
+	if ( !pEntity->GetEngineObject()->HitboxToWorldTransforms( hitboxbones ) )
 		return;
 
 	int nBeamCount = (int)(data.m_flMagnitude + 0.5f);

@@ -104,9 +104,9 @@ void CAlyxEmpEffect::SetTargetEntity( CBaseEntity *pTarget )
 //-----------------------------------------------------------------------------
 void CAlyxEmpEffect::ActivateAutomatic( CBaseEntity *pAlyx, CBaseEntity *pTarget )
 {
-	Assert( pAlyx->GetBaseAnimating() != NULL );
+	Assert( pAlyx->GetEngineObject()->GetModelPtr() != NULL );
 
-	GetEngineObject()->SetParent( pAlyx->GetEngineObject(), pAlyx->GetBaseAnimating()->GetEngineObject()->LookupAttachment("LeftHand"));
+	GetEngineObject()->SetParent( pAlyx->GetEngineObject(), pAlyx->GetEngineObject()->LookupAttachment("LeftHand"));
 	GetEngineObject()->SetLocalOrigin( vec3_origin );
 
 	m_iState = ALYXEMP_STATE_OFF;

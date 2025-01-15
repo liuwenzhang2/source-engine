@@ -263,13 +263,13 @@ void PrecacheStandardParticleSystems( )
 void DispatchParticleEffect( const char *pszParticleName, ParticleAttachment_t iAttachType, CBaseEntity *pEntity, const char *pszAttachmentName, bool bResetAllParticlesOnEntity )
 {
 	int iAttachment = -1;
-	if ( pEntity && pEntity->GetBaseAnimating() )
+	if ( pEntity && pEntity->GetEngineObject()->GetModelPtr() )
 	{
 		// Find the attachment point index
-		iAttachment = pEntity->GetBaseAnimating()->GetEngineObject()->LookupAttachment( pszAttachmentName );
+		iAttachment = pEntity->GetEngineObject()->LookupAttachment( pszAttachmentName );
 		if ( iAttachment <= 0 )
 		{
-			Warning("Model '%s' doesn't have attachment '%s' to attach particle system '%s' to.\n", STRING(pEntity->GetBaseAnimating()->GetEngineObject()->GetModelName()), pszAttachmentName, pszParticleName );
+			Warning("Model '%s' doesn't have attachment '%s' to attach particle system '%s' to.\n", STRING(pEntity->GetEngineObject()->GetModelName()), pszAttachmentName, pszParticleName );
 			return;
 		}
 	}
@@ -326,13 +326,13 @@ void DispatchParticleEffect( const char *pszParticleName, ParticleAttachment_t i
 void DispatchParticleEffect( const char *pszParticleName, ParticleAttachment_t iAttachType, CBaseEntity *pEntity, const char *pszAttachmentName, Vector vecColor1, Vector vecColor2, bool bUseColors, bool bResetAllParticlesOnEntity )
 {
 	int iAttachment = -1;
-	if ( pEntity && pEntity->GetBaseAnimating() )
+	if ( pEntity && pEntity->GetEngineObject()->GetModelPtr() )
 	{
 		// Find the attachment point index
-		iAttachment = pEntity->GetBaseAnimating()->GetEngineObject()->LookupAttachment( pszAttachmentName );
+		iAttachment = pEntity->GetEngineObject()->LookupAttachment( pszAttachmentName );
 		if ( iAttachment <= 0 )
 		{
-			Warning("Model '%s' doesn't have attachment '%s' to attach particle system '%s' to.\n", STRING(pEntity->GetBaseAnimating()->GetEngineObject()->GetModelName()), pszAttachmentName, pszParticleName );
+			Warning("Model '%s' doesn't have attachment '%s' to attach particle system '%s' to.\n", STRING(pEntity->GetEngineObject()->GetModelName()), pszAttachmentName, pszParticleName );
 			return;
 		}
 	}

@@ -846,7 +846,7 @@ void CAI_BaseActor::SetHeadDirection( const Vector &vTargetPos, float flInterval
 
 float CAI_BaseActor::ClampWithBias( PoseParameter_t index, float value, float base )
 {
-	return EdgeLimitPoseParameter( (int)index, value, base );
+	return GetEngineObject()->EdgeLimitPoseParameter( (int)index, value, base );
 }
 
 

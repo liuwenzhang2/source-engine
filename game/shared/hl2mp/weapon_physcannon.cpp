@@ -91,7 +91,7 @@ extern ConVar hl2_walkspeed;
 
 #ifndef CLIENT_DLL
 
-void PhysCannonBeginUpgrade( CBaseAnimating *pAnim )
+void PhysCannonBeginUpgrade( IServerEntity *pAnim )
 {
 
 }
@@ -2117,7 +2117,7 @@ bool CWeaponPhysCannon::CanPickupObject( CBaseEntity *pTarget )
 	if ( pTarget == NULL )
 		return false;
 
-	if ( pTarget->GetBaseAnimating() && pTarget->GetBaseAnimating()->IsDissolving() )
+	if ( pTarget->GetEngineObject()->GetModelPtr() && pTarget->IsDissolving())
 		return false;
 
 	if ( pTarget->GetEngineObject()->IsEFlagSet( EFL_NO_PHYSCANNON_INTERACTION ) )

@@ -76,15 +76,15 @@ void CParticleProperty::Init( CBaseEntity *pEntity )
 //-----------------------------------------------------------------------------
 int CParticleProperty::GetParticleAttachment( C_BaseEntity *pEntity, const char *pszAttachmentName, const char *pszParticleName )
 {
-	Assert( pEntity && pEntity->GetBaseAnimating() );
-	if ( !pEntity || !pEntity->GetBaseAnimating() )
+	Assert( pEntity && pEntity->GetEngineObject()->GetModelPtr() );
+	if ( !pEntity || !pEntity->GetEngineObject()->GetModelPtr() )
 		return INVALID_PARTICLE_ATTACHMENT;
 
 	// Find the attachment point index
-	int iAttachment = pEntity->GetBaseAnimating()->GetEngineObject()->LookupAttachment( pszAttachmentName );
+	int iAttachment = pEntity->GetEngineObject()->LookupAttachment( pszAttachmentName );
 	if ( iAttachment == INVALID_PARTICLE_ATTACHMENT )
 	{
-		Warning("Model '%s' doesn't have attachment '%s' to attach particle system '%s' to.\n", STRING(pEntity->GetBaseAnimating()->GetEngineObject()->GetModelName()), pszAttachmentName, pszParticleName );
+		Warning("Model '%s' doesn't have attachment '%s' to attach particle system '%s' to.\n", STRING(pEntity->GetEngineObject()->GetModelName()), pszAttachmentName, pszParticleName );
 	}
 
 	return iAttachment;
@@ -549,8 +549,8 @@ void CParticleProperty::UpdateControlPoint( ParticleEffectList_t *pEffect, int i
 	CBaseEntity *pWearable = (CBaseEntity*) pPoint->hEntity.Get();
 	if ( pWearable && dynamic_cast<IHasAttributes*>( pWearable ) && !pWearable->IsPlayer() )
 	{
-		C_BaseAnimating *pAnimating = pPoint->hEntity->GetBaseAnimating();
-		if ( pAnimating )
+		//C_BaseAnimating *pAnimating = pPoint->hEntity->GetBaseAnimating();
+		if (pPoint->hEntity->GetEngineObject()->GetModelPtr())
 		{
 			int bUseHeadOrigin = 0;
 			CALL_ATTRIB_HOOK_INT_ON_OTHER( pAnimating, bUseHeadOrigin, particle_effect_use_head_origin );
@@ -588,20 +588,20 @@ void CParticleProperty::UpdateControlPoint( ParticleEffectList_t *pEffect, int i
 		case PATTACH_POINT:
 		case PATTACH_POINT_FOLLOW:
 			{
-				C_BaseAnimating *pAnimating = pPoint->hEntity->GetBaseAnimating();
+				//C_BaseAnimating *pAnimating = pPoint->hEntity->GetBaseAnimating();
 
-				Assert( pAnimating );
-				if ( pAnimating )
+				//Assert( pAnimating );
+				if ( pPoint->hEntity->GetEngineObject()->GetModelPtr())
 				{
 					matrix3x4_t attachmentToWorld;
 
-					if ( !pAnimating->GetEngineObject()->GetAttachment( pPoint->iAttachmentPoint, attachmentToWorld ) )
+					if ( !pPoint->hEntity->GetEngineObject()->GetAttachment( pPoint->iAttachmentPoint, attachmentToWorld ) )
 					{
 						// try C_BaseAnimating if attach point is not on the weapon
-						if ( !pAnimating->GetEngineObject()->GetAttachment( pPoint->iAttachmentPoint, attachmentToWorld ) )
+						if ( !pPoint->hEntity->GetEngineObject()->GetAttachment( pPoint->iAttachmentPoint, attachmentToWorld ) )
 						{
 							Warning( "Cannot update control point %d for effect '%s'.\n", pPoint->iAttachmentPoint, pEffect->pParticleEffect->GetEffectName() );
-							attachmentToWorld = pAnimating->GetEngineObject()->RenderableToWorldTransform();
+							attachmentToWorld = pPoint->hEntity->GetEngineObject()->RenderableToWorldTransform();
 						}
 					}
 
@@ -629,13 +629,13 @@ void CParticleProperty::UpdateControlPoint( ParticleEffectList_t *pEffect, int i
 
 		case PATTACH_ROOTBONE_FOLLOW:
 			{
-				C_BaseAnimating *pAnimating = pPoint->hEntity->GetBaseAnimating();
+				//C_BaseAnimating *pAnimating = pPoint->hEntity->GetBaseAnimating();
 
-				Assert( pAnimating );
-				if ( pAnimating )
+				//Assert( pAnimating );
+				if (pPoint->hEntity->GetEngineObject()->GetModelPtr())
 				{
 					matrix3x4_t rootBone;
-					if ( pAnimating->GetEngineObject()->GetRootBone( rootBone ) )
+					if (pPoint->hEntity->GetEngineObject()->GetRootBone( rootBone ) )
 					{
 						MatrixVectors( rootBone, &vecForward, &vecRight, &vecUp );
 						MatrixPosition( rootBone, vecOrigin );

@@ -739,7 +739,7 @@ public:
 	CGameGibManager() : m_iCurrentMaxPieces(-1), m_iMaxPieces(-1), m_iMaxPiecesDX8(-1) {}
 
 	void Activate( void );
-	void AddGibToLRU( CBaseAnimating *pEntity );
+	void AddGibToLRU( CBaseEntity *pEntity );
 
 	inline bool AllowedToSpawnGib( void );
 
@@ -750,7 +750,7 @@ private:
 	void InputSetMaxPieces( inputdata_t &inputdata );
 	void InputSetMaxPiecesDX8( inputdata_t &inputdata );
 
-	typedef CHandle<CBaseAnimating> CGibHandle;
+	typedef CHandle<CBaseEntity> CGibHandle;
 	CUtlLinkedList< CGibHandle > m_LRU; 
 
 	bool		m_bAllowNewGibs;
@@ -840,7 +840,7 @@ void CGameGibManager::InputSetMaxPiecesDX8( inputdata_t &inputdata )
 	UpdateMaxPieces();
 }
 
-void CGameGibManager::AddGibToLRU( CBaseAnimating *pEntity )
+void CGameGibManager::AddGibToLRU( CBaseEntity *pEntity )
 {
 	int i, next;
 
@@ -938,17 +938,17 @@ void PropBreakableCreateAll( int modelindex, IPhysicsObject *pPhysics, const bre
 
 	int nSkin = 0;
 	CBaseEntity *pOwnerEntity = pEntity;
-	CBaseAnimating *pOwnerAnim = NULL;
+	//CBaseAnimating *pOwnerAnim = NULL;
 	if ( pPhysics )
 	{
 		pOwnerEntity = static_cast<CBaseEntity *>(pPhysics->GetGameData());
 	}
 	if ( pOwnerEntity )
 	{
-		pOwnerAnim = pOwnerEntity->GetBaseAnimating();
-		if ( pOwnerAnim )
+		//pOwnerAnim = pOwnerEntity->GetBaseAnimating();
+		if (pOwnerEntity->GetEngineObject()->GetModelPtr())
 		{
-			nSkin = pOwnerAnim->GetEngineObject()->GetSkin();
+			nSkin = pOwnerEntity->GetEngineObject()->GetSkin();
 		}
 	}
 	static matrix3x4_t localToWorld;
@@ -1023,14 +1023,14 @@ void PropBreakableCreateAll( int modelindex, IPhysicsObject *pPhysics, const bre
 
 			Vector position = vec3_origin;
 			QAngle angles = params.angles;
-			if ( pOwnerAnim && list[i].placementName[0] )
+			if (pOwnerEntity->GetEngineObject()->GetModelPtr() && list[i].placementName[0])
 			{
 				if ( list[i].placementIsBone )
 				{
-					int boneIndex = pOwnerAnim->GetEngineObject()->LookupBone( list[i].placementName );
+					int boneIndex = pOwnerEntity->GetEngineObject()->LookupBone( list[i].placementName );
 					if ( boneIndex >= 0 )
 					{
-						pOwnerAnim->GetEngineObject()->GetHitboxBonePosition( boneIndex, position, angles );
+						pOwnerEntity->GetEngineObject()->GetHitboxBonePosition( boneIndex, position, angles );
 						AngleMatrix( angles, position, matrix );
 					}
 				}
@@ -1039,7 +1039,7 @@ void PropBreakableCreateAll( int modelindex, IPhysicsObject *pPhysics, const bre
 					int attachmentIndex = studioHdr->Studio_FindAttachment( list[i].placementName ) + 1;
 					if ( attachmentIndex > 0 )
 					{
-						pOwnerAnim->GetEngineObject()->GetAttachment( attachmentIndex, matrix );
+						pOwnerEntity->GetEngineObject()->GetAttachment( attachmentIndex, matrix );
 						MatrixAngles( matrix, angles );
 					}
 				}
@@ -1082,7 +1082,7 @@ void PropBreakableCreateAll( int modelindex, IPhysicsObject *pPhysics, const bre
 #ifdef GAME_DLL
 				if ( GetGibManager() )
 				{
-					GetGibManager()->AddGibToLRU( pBreakable->GetBaseAnimating() );
+					GetGibManager()->AddGibToLRU( pBreakable );
 				}
 #endif
 				if ( pOwnerEntity && pOwnerEntity->GetEngineObject()->IsEffectActive( EF_NOSHADOW ) )
@@ -1181,7 +1181,7 @@ void PropBreakableCreateAll( int modelindex, IPhysicsObject *pPhysics, const bre
 #ifdef GAME_DLL
 					if ( GetGibManager() )
 					{
-						GetGibManager()->AddGibToLRU( pBreakable->GetBaseAnimating() );
+						GetGibManager()->AddGibToLRU( pBreakable );
 					}
 #endif
 					Vector vecBreakableObbSize = pBreakable->GetEngineObject()->OBBSize();
@@ -1476,7 +1476,7 @@ CBaseEntity *CreateGibsFromList( CUtlVector<breakmodel_t> &list, int modelindex,
 #ifdef GAME_DLL
 				if ( GetGibManager() )
 				{
-					GetGibManager()->AddGibToLRU( pBreakable->GetBaseAnimating() );
+					GetGibManager()->AddGibToLRU( pBreakable );
 				}
 #endif
 
@@ -1588,7 +1588,7 @@ CBaseEntity *CreateGibsFromList( CUtlVector<breakmodel_t> &list, int modelindex,
 #ifdef GAME_DLL
 					if ( GetGibManager() )
 					{
-						GetGibManager()->AddGibToLRU( pBreakable->GetBaseAnimating() );
+						GetGibManager()->AddGibToLRU( pBreakable );
 					}
 #endif
 					Vector vecBreakableObbSize = pBreakable->GetEngineObject()->OBBSize();

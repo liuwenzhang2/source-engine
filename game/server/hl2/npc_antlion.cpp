@@ -4439,8 +4439,8 @@ Vector CNPC_Antlion::BodyTarget( const Vector &posSrc, bool bNoisy /*= true*/ )
 	// Cache the bone away to avoid future lookups
 	if ( m_nBodyBone == -1 )
 	{
-		CBaseAnimating *pAnimating = GetBaseAnimating();
-		m_nBodyBone = pAnimating->GetEngineObject()->LookupBone( "Antlion.Body_Bone" );
+		//CBaseAnimating *pAnimating = GetBaseAnimating();
+		m_nBodyBone = GetEngineObject()->LookupBone( "Antlion.Body_Bone" );
 	}
 
 	// Get the exact position in our center of mass (thorax)

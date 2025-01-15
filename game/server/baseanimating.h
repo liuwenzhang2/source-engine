@@ -55,7 +55,7 @@ public:
 
 	virtual IStudioHdr *OnNewModel();
 
-	virtual CBaseAnimating*	GetBaseAnimating() { return this; }
+	//virtual CBaseAnimating*	GetBaseAnimating() { return this; }
 
 
 
@@ -66,7 +66,6 @@ public:
 	virtual float	GetIdealAccel( ) const;
 	virtual void	StudioFrameAdvance(); // advance animation frame to some time in the future
 	void StudioFrameAdvanceManual( float flInterval );
-	bool	IsValidSequence( int iSequence );
 
 
 
@@ -74,13 +73,6 @@ public:
 	// FIXME: push transitions support down into CBaseAnimating?
 	//virtual bool IsActivityFinished( void ) { return m_bSequenceFinished; }
 	inline bool	 IsSequenceLooping( int iSequence ) { return GetEngineObject()->GetModelPtr()->IsSequenceLooping(iSequence); }
-
-
-	float	GetLastVisibleCycle( IStudioHdr *pStudioHdr, int iSequence );
-
-	void	ResetActivityIndexes ( void );
-	void    ResetEventIndexes ( void );
-
 
 
 	// This will stop animation until you call ResetSequenceInfo() at some point in the future
@@ -101,9 +93,7 @@ public:
 	virtual void HandleAnimEvent( animevent_t *pEvent );
 
 
-	bool	HasPoseParameter( int iSequence, const char *szName );
-	bool	HasPoseParameter( int iSequence, int iParameter );
-	float	EdgeLimitPoseParameter( int iParameter, float flValue, float flBase = 0.0f );
+
 
 protected:
 	// The modus operandi for pose parameters is that you should not use the const char * version of the functions
@@ -168,7 +158,7 @@ public:
 private:
 
 
-	void StudioFrameAdvanceInternal( IStudioHdr *pStudioHdr, float flInterval );
+	void StudioFrameAdvanceInternal( float flInterval );
 
 	void InputSetModelScale( inputdata_t &inputdata );
 

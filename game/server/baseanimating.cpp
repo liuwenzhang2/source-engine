@@ -180,7 +180,7 @@ void CBaseAnimating::OnRestore()
 {
 	BaseClass::OnRestore();
 
-	if (GetEngineObject()->GetSequence() != -1 && GetEngineObject()->GetModelPtr() && !IsValidSequence(GetEngineObject()->GetSequence() ) )
+	if (GetEngineObject()->GetSequence() != -1 && GetEngineObject()->GetModelPtr() && !GetEngineObject()->IsValidSequence(GetEngineObject()->GetSequence() ) )
 		GetEngineObject()->SetSequence(0);
 
 	PopulatePoseParameters();
@@ -219,7 +219,7 @@ float CBaseAnimating::GetAnimTimeInterval( void ) const
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-void CBaseAnimating::StudioFrameAdvanceInternal( IStudioHdr *pStudioHdr, float flCycleDelta )
+void CBaseAnimating::StudioFrameAdvanceInternal( float flCycleDelta )
 {
 	float flNewCycle = GetEngineObject()->GetCycle() + flCycleDelta;
 	if (flNewCycle < 0.0 || flNewCycle >= 1.0) 
@@ -234,7 +234,7 @@ void CBaseAnimating::StudioFrameAdvanceInternal( IStudioHdr *pStudioHdr, float f
 		}
 		GetEngineObject()->SetSequenceFinished(true);	// just in case it wasn't caught in GetEvents
 	}
-	else if (flNewCycle > GetLastVisibleCycle( pStudioHdr, GetEngineObject()->GetSequence() ))
+	else if (flNewCycle > GetEngineObject()->GetLastVisibleCycle( GetEngineObject()->GetSequence() ))
 	{
 		GetEngineObject()->SetSequenceFinished(true);
 	}
@@ -248,7 +248,7 @@ void CBaseAnimating::StudioFrameAdvanceInternal( IStudioHdr *pStudioHdr, float f
 			m_flAnimTime.Get(), m_flPrevAnimTime, flInterval, GetCycle() );
 	*/
  
-	GetEngineObject()->SetGroundSpeed(GetEngineObject()->GetSequenceGroundSpeed( pStudioHdr, GetEngineObject()->GetSequence() ) * GetEngineObject()->GetModelScale());
+	GetEngineObject()->SetGroundSpeed(GetEngineObject()->GetSequenceGroundSpeed( GetEngineObject()->GetSequence() ) * GetEngineObject()->GetModelScale());
 
 	// Msg("%s : %s : %5.1f\n", GetClassname(), GetSequenceName( GetSequence() ), GetCycle() );
 	GetEngineObject()->InvalidatePhysicsRecursive( ANIMATION_CHANGED );
@@ -269,7 +269,7 @@ void CBaseAnimating::StudioFrameAdvanceManual( float flInterval )
 	GetEngineObject()->SetAnimTime(gpGlobals->curtime);
 	m_flPrevAnimTime = GetEngineObject()->GetAnimTime() - flInterval;
 	float flCycleRate = GetEngineObject()->GetSequenceCycleRate( pStudioHdr, GetEngineObject()->GetSequence() ) * GetEngineObject()->GetPlaybackRate();
-	StudioFrameAdvanceInternal(GetEngineObject()->GetModelPtr(), flInterval * flCycleRate );
+	StudioFrameAdvanceInternal( flInterval * flCycleRate );
 }
 
 //=========================================================
@@ -310,7 +310,7 @@ void CBaseAnimating::StudioFrameAdvance()
 	// Drive cycle
 	float flCycleRate = GetEngineObject()->GetSequenceCycleRate( pStudioHdr, GetEngineObject()->GetSequence() ) * GetEngineObject()->GetPlaybackRate();
 
-	StudioFrameAdvanceInternal( pStudioHdr, flInterval * flCycleRate );
+	StudioFrameAdvanceInternal( flInterval * flCycleRate );
 
 	if (ai_sequence_debug.GetBool() == true && m_debugOverlays & OVERLAY_NPC_SELECTED_BIT)
 	{
@@ -329,23 +329,7 @@ void CBaseAnimating::InputSetModelScale( inputdata_t &inputdata )
 	GetEngineObject()->SetModelScale( vecScale.x, vecScale.y );
 }
 
-//=========================================================
-// ResetActivityIndexes
-//=========================================================
-void CBaseAnimating::ResetActivityIndexes ( void )
-{
-	Assert(GetEngineObject()->GetModelPtr() );
-	GetEngineObject()->GetModelPtr()->ResetActivityIndexes();
-}
 
-//=========================================================
-// ResetEventIndexes
-//=========================================================
-void CBaseAnimating::ResetEventIndexes ( void )
-{
-	Assert(GetEngineObject()->GetModelPtr() );
-	GetEngineObject()->GetModelPtr()->ResetEventIndexes();
-}
 
 static void SyncAnimatingWithPhysics(CBaseAnimating* pAnimating)
 {
@@ -602,37 +586,6 @@ bool CBaseAnimating::CanBecomeRagdoll( void )
 	return true;
 }
 
-//=========================================================
-//=========================================================
-bool CBaseAnimating::IsValidSequence( int iSequence )
-{
-	Assert(GetEngineObject()->GetModelPtr() );
-	IStudioHdr* pstudiohdr = GetEngineObject()->GetModelPtr( );
-	if (iSequence < 0 || iSequence >= pstudiohdr->GetNumSeq())
-	{
-		return false;
-	}
-	return true;
-}
-
-float CBaseAnimating::GetLastVisibleCycle( IStudioHdr *pStudioHdr, int iSequence )
-{
-	if ( !pStudioHdr )
-	{
-		DevWarning( 2, "CBaseAnimating::LastVisibleCycle( %d ) NULL pstudiohdr on %s!\n", iSequence, GetClassname() );
-		return 1.0;
-	}
-
-	if (!(pStudioHdr->GetSequenceFlags( iSequence ) & STUDIO_LOOPING))
-	{
-		return 1.0f - (pStudioHdr->pSeqdesc( iSequence ).fadeouttime) * GetEngineObject()->GetSequenceCycleRate( iSequence ) * GetEngineObject()->GetPlaybackRate();
-	}
-	else
-	{
-		return 1.0;
-	}
-}
-
 float CBaseAnimating::GetIdealSpeed( ) const
 {
 	return GetEngineObject()->GetGroundSpeed();
@@ -852,49 +805,6 @@ void CBaseAnimating::HandleAnimEvent( animevent_t *pEvent )
 // SetPoseParamater()
 
 //=========================================================
-//=========================================================
-bool CBaseAnimating::HasPoseParameter( int iSequence, const char *szName )
-{
-	int iParameter = GetEngineObject()->LookupPoseParameter( szName );
-	if (iParameter == -1)
-	{
-		return false;
-	}
-
-	return HasPoseParameter( iSequence, iParameter );
-}
-
-//=========================================================
-//=========================================================
-bool CBaseAnimating::HasPoseParameter( int iSequence, int iParameter )
-{
-	IStudioHdr *pstudiohdr = GetEngineObject()->GetModelPtr( );
-
-	if ( !pstudiohdr )
-	{
-		return false;
-	}
-
-	if ( !pstudiohdr->SequencesAvailable() )
-	{
-		return false;
-	}
-
-	if (iSequence < 0 || iSequence >= pstudiohdr->GetNumSeq())
-	{
-		return false;
-	}
-
-	mstudioseqdesc_t &seqdesc = pstudiohdr->pSeqdesc( iSequence );
-	if (pstudiohdr->GetSharedPoseParameter( iSequence, seqdesc.paramindex[0] ) == iParameter || 
-		pstudiohdr->GetSharedPoseParameter( iSequence, seqdesc.paramindex[1] ) == iParameter)
-	{
-		return true;
-	}
-	return false;
-}
-
-//=========================================================
 // Each class that wants to use pose parameters should populate
 // static variables in this entry point, rather than calling
 // GetPoseParameter(const char*) every time you want to adjust
@@ -906,32 +816,6 @@ bool CBaseAnimating::HasPoseParameter( int iSequence, int iParameter )
 void	CBaseAnimating::PopulatePoseParameters( void )
 {
 
-}
-
-//=========================================================
-// Purpose: from input of 75% to 200% of maximum range, rescale smoothly from 75% to 100%
-//=========================================================
-float CBaseAnimating::EdgeLimitPoseParameter( int iParameter, float flValue, float flBase )
-{
-	IStudioHdr *pstudiohdr = GetEngineObject()->GetModelPtr( );
-	if ( !pstudiohdr )
-	{
-		return flValue;
-	}
-
-	if (iParameter < 0 || iParameter >= pstudiohdr->GetNumPoseParameters())
-	{
-		return flValue;
-	}
-
-	const mstudioposeparamdesc_t &Pose = pstudiohdr->pPoseParameter( iParameter );
-
-	if (Pose.loop || Pose.start == Pose.end)
-	{
-		return flValue;
-	}
-
-	return RangeCompressor( flValue, Pose.start, Pose.end, flBase );
 }
 
 class CTraceFilterSkipNPCs : public CTraceFilterSimple
