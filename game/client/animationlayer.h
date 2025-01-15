@@ -14,6 +14,7 @@
 #include "rangecheckedvar.h"
 #include "lerp_functions.h"
 #include "networkvar.h"
+#include "sequence_Transitioner.h"
 
 class C_AnimationLayer
 {
@@ -32,6 +33,16 @@ public:
 
 	void SetOrder( int order );
 
+	C_AnimationLayer& operator=(const CAnimationData& animationData) 
+	{
+		this->m_flLayerAnimtime = animationData.GetLayerAnimtime();
+		this->m_nSequence = animationData.GetSequence();
+		this->m_flLayerFadeOuttime = animationData.GetLayerFadeOuttime();
+		this->m_flCycle = animationData.GetCycle();
+		this->m_flPlaybackRate = animationData.GetPlaybackRate();
+		this->m_flWeight = animationData.GetWeight();
+		return *this;
+	}
 public:
 
 	bool IsActive( void );

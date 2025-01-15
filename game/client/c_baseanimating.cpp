@@ -604,22 +604,22 @@ void C_BaseAnimating::MaintainSequenceTransitions( IBoneSetup &boneSetup, float 
 
 
 	// process previous sequences
-	for (int i = m_SequenceTransitioner.m_animationQueue.Count() - 2; i >= 0; i--)
+	for (int i = m_SequenceTransitioner.GetAnimationDataCount() - 2; i >= 0; i--)
 	{
-		C_AnimationLayer *blend = &m_SequenceTransitioner.m_animationQueue[i];
+		const CAnimationData& blend = m_SequenceTransitioner.GetAnimationData(i);
 
-		float dt = (gpGlobals->curtime - blend->m_flLayerAnimtime);
-		flCycle = blend->m_flCycle + dt * blend->m_flPlaybackRate * GetEngineObject()->GetSequenceCycleRate( boneSetup.GetStudioHdr(), blend->m_nSequence );
-		flCycle = ClampCycle( flCycle, GetEngineObject()->IsSequenceLooping( boneSetup.GetStudioHdr(), blend->m_nSequence ) );
+		float dt = (gpGlobals->curtime - blend.GetLayerAnimtime());
+		flCycle = blend.GetCycle() + dt * blend.GetPlaybackRate() * GetEngineObject()->GetSequenceCycleRate(boneSetup.GetStudioHdr(), blend.GetSequence());
+		flCycle = ClampCycle( flCycle, GetEngineObject()->IsSequenceLooping( boneSetup.GetStudioHdr(), blend.GetSequence() ) );
 
 #if 1 // _DEBUG
 		if (/*Q_stristr( hdr->pszName(), r_sequence_debug.GetString()) != NULL || */ r_sequence_debug.GetInt() == entindex())
 		{
-			DevMsgRT( "%8.4f : %30s : %5.3f : %4.2f  +\n", gpGlobals->curtime, boneSetup.GetStudioHdr()->pSeqdesc( blend->m_nSequence ).pszLabel(), flCycle, (float)blend->m_flWeight );
+			DevMsgRT( "%8.4f : %30s : %5.3f : %4.2f  +\n", gpGlobals->curtime, boneSetup.GetStudioHdr()->pSeqdesc( blend.GetSequence() ).pszLabel(), flCycle, (float)blend.GetWeight() );
 		}
 #endif
 
-		boneSetup.AccumulatePose( pos, q, blend->m_nSequence, flCycle, blend->m_flWeight, gpGlobals->curtime, GetEngineObject()->GetIk() );
+		boneSetup.AccumulatePose( pos, q, blend.GetSequence(), flCycle, blend.GetWeight(), gpGlobals->curtime, GetEngineObject()->GetIk());
 	}
 }
 
@@ -2850,16 +2850,16 @@ void C_BaseAnimating::GetBlendedLinearVelocity( Vector *pVec )
 	VectorScale( vecDist, 1.0 / flDuration, *pVec );
 
 	Vector tmp;
-	for (int i = m_SequenceTransitioner.m_animationQueue.Count() - 2; i >= 0; i--)
+	for (int i = m_SequenceTransitioner.GetAnimationDataCount() - 2; i >= 0; i--)
 	{
-		C_AnimationLayer *blend = &m_SequenceTransitioner.m_animationQueue[i];
+		const CAnimationData& blend = m_SequenceTransitioner.GetAnimationData(i);
 	
-		GetEngineObject()->GetSequenceLinearMotion( blend->m_nSequence, &vecDist );
-		flDuration = GetEngineObject()->SequenceDuration( blend->m_nSequence );
+		GetEngineObject()->GetSequenceLinearMotion( blend.GetSequence(), &vecDist);
+		flDuration = GetEngineObject()->SequenceDuration( blend.GetSequence() );
 
 		VectorScale( vecDist, 1.0 / flDuration, tmp );
 
-		float flWeight = blend->GetFadeout( gpGlobals->curtime );
+		float flWeight = blend.GetFadeout( gpGlobals->curtime );
 		*pVec = Lerp( flWeight, *pVec, tmp );
 	}
 }

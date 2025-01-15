@@ -33,7 +33,7 @@ void CSequenceTransitioner::CheckForSequenceChange(
 		m_animationQueue.AddToTail();
 	}
 
-	CAnimationLayer *currentblend = &m_animationQueue[m_animationQueue.Count()-1];
+	CAnimationData *currentblend = &m_animationQueue[m_animationQueue.Count()-1];
 
 	if (currentblend->m_flLayerAnimtime && 
 		(currentblend->m_nSequence != nCurSequence || bForceNewSequence ))
@@ -88,7 +88,7 @@ void CSequenceTransitioner::UpdateCurrent(
 		m_animationQueue.AddToTail();
 	}
 
-	CAnimationLayer *currentblend = &m_animationQueue[m_animationQueue.Count()-1];
+	CAnimationData *currentblend = &m_animationQueue[m_animationQueue.Count()-1];
 
 	// keep track of current sequence
 	currentblend->m_nSequence = nCurSequence;

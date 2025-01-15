@@ -15,6 +15,7 @@
 #endif
 
 #include "baseanimating.h"
+#include "sequence_Transitioner.h"
 
 class CBaseAnimatingOverlay;
 
@@ -35,6 +36,17 @@ public:
 	void	StudioFrameAdvance( float flInterval, CBaseAnimating *pOwner );
 	void	DispatchAnimEvents( CBaseAnimating *eventHandler, CBaseAnimating *pOwner );
 	void	SetOrder( int nOrder );
+
+	CAnimationLayer& operator=(const CAnimationData& animationData)
+	{
+		this->m_flLayerAnimtime = animationData.GetLayerAnimtime();
+		this->m_nSequence = animationData.GetSequence();
+		this->m_flLayerFadeOuttime = animationData.GetLayerFadeOuttime();
+		this->m_flCycle = animationData.GetCycle();
+		this->m_flPlaybackRate = animationData.GetPlaybackRate();
+		this->m_flWeight = animationData.GetWeight();
+		return *this;
+	}
 
 	float GetFadeout( float flCurTime );
 

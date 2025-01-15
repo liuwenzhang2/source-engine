@@ -327,11 +327,11 @@ void CBasePlayerAnimState::UpdateAimSequenceLayers(
 	CAnimationLayer *pDest0 = m_pOuter->GetAnimOverlay( iFirstLayer );
 	CAnimationLayer *pDest1 = m_pOuter->GetAnimOverlay( iFirstLayer+1 );
 
-	if ( pTransitioner->m_animationQueue.Count() == 1 )
+	if ( pTransitioner->GetAnimationDataCount() == 1 )
 	{
 		// If only 1 animation, then blend it in fully.
-		CAnimationLayer *pSource0 = &pTransitioner->m_animationQueue[0];
-		*pDest0 = *pSource0;
+		const CAnimationData& pSource0 = pTransitioner->GetAnimationData(0);
+		*pDest0 = pSource0;
 		
 		pDest0->m_flWeight = 1;
 		pDest1->m_flWeight = 0;
@@ -341,14 +341,14 @@ void CBasePlayerAnimState::UpdateAimSequenceLayers(
 		pDest0->m_fFlags |= ANIM_LAYER_ACTIVE;
 #endif
 	}
-	else if ( pTransitioner->m_animationQueue.Count() >= 2 )
+	else if ( pTransitioner->GetAnimationDataCount() >= 2 )
 	{
 		// The first one should be fading out. Fade in the new one inversely.
-		CAnimationLayer *pSource0 = &pTransitioner->m_animationQueue[0];
-		CAnimationLayer *pSource1 = &pTransitioner->m_animationQueue[1];
+		const CAnimationData& pSource0 = pTransitioner->GetAnimationData(0);
+		const CAnimationData& pSource1 = pTransitioner->GetAnimationData(1);
 
-		*pDest0 = *pSource0;
-		*pDest1 = *pSource1;
+		*pDest0 = pSource0;
+		*pDest1 = pSource1;
 		Assert( pDest0->m_flWeight >= 0.0f && pDest0->m_flWeight <= 1.0f );
 		pDest1->m_flWeight = 1 - pDest0->m_flWeight;	// This layer just mirrors the other layer's weight (one fades in while the other fades out).
 
