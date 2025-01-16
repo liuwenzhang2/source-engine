@@ -512,7 +512,6 @@
     <ClCompile Include="..\..\..\game\shared\props_shared.cpp" />
     <ClCompile Include="..\..\..\game\shared\sceneentity_shared.cpp" />
     <ClCompile Include="..\..\..\game\shared\script_intro_shared.cpp" />
-    <ClCompile Include="..\..\..\game\shared\sequence_Transitioner.cpp" />
     <ClCompile Include="..\..\..\game\shared\sheetsimulator.cpp" />
     <ClCompile Include="..\..\..\game\shared\simtimer.cpp" />
     <ClCompile Include="..\..\..\game\shared\singleplay_gamerules.cpp" />
@@ -560,6 +559,7 @@
     <ClCompile Include="..\..\..\public\scratchpad3d.cpp" />
     <ClCompile Include="..\..\..\public\ScratchPadUtils.cpp" />
     <ClCompile Include="..\..\..\public\sentence.cpp" />
+    <ClCompile Include="..\..\..\public\sequence_Transitioner.cpp" />
     <ClCompile Include="..\..\..\public\simple_physics.cpp" />
     <ClCompile Include="..\..\..\public\SoundParametersInternal.cpp" />
     <ClCompile Include="..\..\..\public\stringregistry.cpp" />

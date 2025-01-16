@@ -822,9 +822,6 @@
     <ClCompile Include="..\..\..\game\client\ScreenSpaceEffects.cpp">
       <Filter>源文件\Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\game\shared\sequence_Transitioner.cpp">
-      <Filter>源文件\Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\game\client\simple_keys.cpp">
       <Filter>源文件\Source Files</Filter>
     </ClCompile>
@@ -1615,6 +1612,9 @@
       <Filter>源文件\Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\game\shared\portal_shareddefs.cpp">
+      <Filter>源文件\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\public\sequence_Transitioner.cpp">
       <Filter>源文件\Source Files</Filter>
     </ClCompile>
   </ItemGroup>

@@ -879,9 +879,6 @@
     <ClCompile Include="..\..\..\game\server\sendproxy.cpp">
       <Filter>源文件\Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\game\shared\sequence_Transitioner.cpp">
-      <Filter>源文件\Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\public\server_class.cpp">
       <Filter>源文件\Source Files</Filter>
     </ClCompile>
@@ -1735,6 +1732,9 @@
       <Filter>源文件\Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\game\shared\PortalSimulation.cpp">
+      <Filter>源文件\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\public\sequence_Transitioner.cpp">
       <Filter>源文件\Source Files</Filter>
     </ClCompile>
   </ItemGroup>
