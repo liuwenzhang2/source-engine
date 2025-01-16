@@ -924,7 +924,6 @@ public:
 	virtual void SetFadeMinMax(float fademin, float fademax);
 	bool IsOnFire() { return ((GetEngineObject()->GetFlags() & FL_ONFIRE) != 0); }
 	virtual unsigned int ComputeClientSideAnimationFlags() { return FCLIENTANIM_SEQUENCE_CYCLE; }
-	virtual void ClientSideAnimationChanged() {}
 	virtual void UpdateClientSideAnimation() {}
 public:	
 

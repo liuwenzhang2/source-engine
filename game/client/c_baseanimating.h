@@ -87,9 +87,6 @@ public:
 
 	virtual void	GetAimEntOrigin( IClientEntity *pAttachedTo, Vector *pAbsOrigin, QAngle *pAbsAngles );
 
-	// base model functionality
-	float		  ClampCycle( float cycle, bool isLooping );
-
 	virtual void ApplyBoneMatrixTransform( matrix3x4_t& transform );
 
 	virtual void UpdateIKLocks( float currentTime );
@@ -124,7 +121,6 @@ public:
 
 	virtual	void StandardBlendingRules( IStudioHdr *pStudioHdr, Vector pos[], Quaternion q[], float currentTime, int boneMask );
 
-	void MaintainSequenceTransitions( IBoneSetup &boneSetup, float flCycle, Vector pos[], Quaternion q[] );
 	virtual void AccumulateLayers( IBoneSetup &boneSetup, Vector pos[], Quaternion q[], float currentTime );
 
 	//virtual void ChildLayerBlend( Vector pos[], Quaternion q[], float currentTime, int boneMask );
@@ -203,14 +199,12 @@ public:
 	//virtual int GetBody()			{ return GetEngineObject()->GetBody(); }
 	//virtual int GetSkin()			{ return GetEngineObject()->GetSkin(); }
 
-	void							GetBlendedLinearVelocity( Vector *pVec );
 
 	virtual void					StudioFrameAdvance(); // advance animation frame to some time in the future
 
 	// Clientside animation
 	virtual float					FrameAdvance( float flInterval = 0.0f );
 	virtual void					UpdateClientSideAnimation();
-	void							ClientSideAnimationChanged();
 	virtual unsigned int			ComputeClientSideAnimationFlags();
 
 
@@ -294,7 +288,6 @@ public:
 
 
 
-	CSequenceTransitioner			m_SequenceTransitioner;
 
 protected:
 

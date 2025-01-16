@@ -72,7 +72,7 @@ void CSequenceTransitioner::CheckForSequenceChange(
 }
 
 
-void CSequenceTransitioner::UpdateCurrent( 
+void CSequenceTransitioner::UpdateCurrentSequence(
 	IStudioHdr *hdr,
 	int nCurSequence, 
 	float flCurCycle,

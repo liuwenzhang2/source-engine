@@ -18,8 +18,6 @@
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
-extern ConVar r_sequence_debug;
-
 C_BaseAnimatingOverlay::C_BaseAnimatingOverlay()
 {
 	// FIXME: where does this initialization go now?
@@ -243,6 +241,7 @@ void C_BaseAnimatingOverlay::CheckForLayerChanges( IStudioHdr *hdr, float curren
 		{
 			bLayersChanged = true;
 	#if 1 // _DEBUG
+			ConVarRef r_sequence_debug("r_sequence_debug");
 			if (/* Q_stristr( hdr->pszName(), r_sequence_debug.GetString()) != NULL || */ r_sequence_debug.GetInt() == entindex())
 			{
 				DevMsgRT( "(%7.4f : %30s : %5.3f : %4.2f : %1d)\n", t0, hdr->pSeqdesc( pHead->m_nSequence ).pszLabel(),  (float)pHead->m_flCycle,  (float)pHead->m_flWeight, i );
@@ -381,6 +380,7 @@ void C_BaseAnimatingOverlay::AccumulateLayers( IBoneSetup &boneSetup, Vector pos
 				boneSetup.AccumulatePose( pos, q, m_AnimOverlay[i].m_nSequence, fCycle, fWeight, currentTime, GetEngineObject()->GetIk() );
 
 #if 1 // _DEBUG
+				ConVarRef r_sequence_debug("r_sequence_debug");
 				if (/* Q_stristr( hdr->pszName(), r_sequence_debug.GetString()) != NULL || */ r_sequence_debug.GetInt() == entindex())
 				{
 					if (1)

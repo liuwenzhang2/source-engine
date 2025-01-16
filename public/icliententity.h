@@ -38,6 +38,7 @@ class CUserCmd;
 class IClientEntity;
 class IClientGameRules;
 struct fogparams_t;
+class IBoneSetup;
 
 class VarMapEntry_t
 {
@@ -530,6 +531,10 @@ public:
 	virtual CMouthInfo* GetMouth(void) = 0;
 	virtual CMouthInfo& MouthInfo() = 0;
 	virtual void ControlMouth(IStudioHdr* pStudioHdr) = 0;
+	virtual void MaintainSequenceTransitions(IBoneSetup& boneSetup, float flCycle, Vector pos[], Quaternion q[]) = 0;
+	virtual void GetBlendedLinearVelocity(Vector* pVec) = 0;
+	virtual void CheckForSequenceChange(int nCurSequence, bool bForceNewSequence, bool bInterpolate) = 0;
+	virtual void UpdateCurrentSequence(int nCurSequence, float flCurCycle, float flCurPlaybackRate, float flCurTime) = 0;
 	virtual bool ShouldMuzzleFlash() const = 0;
 	virtual void DisableMuzzleFlash() = 0;
 	virtual void DoMuzzleFlash() = 0;
@@ -903,7 +908,6 @@ public:
 	virtual void OnPostRestoreData() = 0;
 	virtual float GetFinalPredictedTime() const = 0;
 	virtual unsigned int ComputeClientSideAnimationFlags() = 0;
-	virtual void ClientSideAnimationChanged() = 0;
 	virtual void UpdateClientSideAnimation() = 0;
 	virtual void PhysicsSimulate(void) = 0;
 	virtual void Think(void) = 0;

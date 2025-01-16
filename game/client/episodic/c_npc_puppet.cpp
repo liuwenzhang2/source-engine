@@ -12,8 +12,6 @@
 #include "memdbgon.h"
 
 
-extern ConVar r_sequence_debug;
-
 class C_NPC_Puppet : public C_AI_BaseNPC
 {
 	DECLARE_CLASS( C_NPC_Puppet, C_AI_BaseNPC );
@@ -153,6 +151,7 @@ void C_NPC_Puppet::AccumulateLayers( IBoneSetup &boneSetup, Vector pos[], Quater
 					boneSetup.AccumulatePose( pos, q, nSequence, fCycle, fWeight, currentTime, NULL );
 
 #if _DEBUG
+					ConVarRef r_sequence_debug("r_sequence_debug");
 					if (Q_stristr( boneSetup.GetStudioHdr()->pszName(), r_sequence_debug.GetString()) != NULL)
 					{
 						DevMsgRT( "%6.2f : %30s : %5.3f : %4.2f : %1d\n", currentTime, boneSetup.GetStudioHdr()->pSeqdesc( nSequence ).pszLabel(), fCycle, fWeight, i );

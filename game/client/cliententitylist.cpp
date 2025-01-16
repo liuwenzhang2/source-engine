@@ -171,6 +171,7 @@ ConVar g_ragdoll_maxcount("g_ragdoll_maxcount", "8", FCVAR_REPLICATED);
 ConVar g_debug_ragdoll_removal("g_debug_ragdoll_removal", "0", FCVAR_REPLICATED | FCVAR_CHEAT);
 ConVar	cl_phys_timescale("cl_phys_timescale", "1.0", FCVAR_CHEAT, "Sets the scale of time for client-side physics (ragdolls)");
 ConVar cl_ragdoll_collide("cl_ragdoll_collide", "0");
+ConVar r_sequence_debug("r_sequence_debug", "");
 
 int CCollisionEvent::ShouldCollide(IPhysicsObject* pObj0, IPhysicsObject* pObj1, void* pGameData0, void* pGameData1)
 #if _DEBUG
@@ -6387,6 +6388,8 @@ void C_EngineObjectInternal::SetModelPointer(const model_t* pModel)
 			}
 		}
 
+		// remove transition animations playback
+		m_SequenceTransitioner.RemoveAll();
 		m_pOuter->OnNewModel();
 
 		m_pOuter->UpdateVisibility();
@@ -6562,6 +6565,94 @@ const char* C_EngineObjectInternal::GetSequenceActivityName(int iSequence)
 		return "No model!";
 
 	return GetModelPtr()->GetSequenceActivityName(iSequence);
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: if the active sequence changes, keep track of the previous ones and decay them based on their decay rate
+//-----------------------------------------------------------------------------
+void C_EngineObjectInternal::MaintainSequenceTransitions(IBoneSetup& boneSetup, float flCycle, Vector pos[], Quaternion q[])
+{
+	VPROF("C_BaseAnimating::MaintainSequenceTransitions");
+
+	if (!boneSetup.GetStudioHdr())
+		return;
+
+	if (prediction->InPrediction())
+	{
+		SetPrevNewSequenceParity(GetNewSequenceParity());
+		return;
+	}
+
+	m_SequenceTransitioner.CheckForSequenceChange(
+		boneSetup.GetStudioHdr(),
+		GetSequence(),
+		GetNewSequenceParity() != GetPrevNewSequenceParity(),
+		!IsNoInterpolationFrame()
+	);
+
+	SetPrevNewSequenceParity(GetNewSequenceParity());
+
+	// Update the transition sequence list.
+	m_SequenceTransitioner.UpdateCurrentSequence(
+		boneSetup.GetStudioHdr(),
+		GetSequence(),
+		flCycle,
+		GetPlaybackRate(),
+		gpGlobals->curtime
+	);
+
+
+	// process previous sequences
+	for (int i = m_SequenceTransitioner.GetAnimationDataCount() - 2; i >= 0; i--)
+	{
+		const CAnimationData& blend = m_SequenceTransitioner.GetAnimationData(i);
+
+		float dt = (gpGlobals->curtime - blend.GetLayerAnimtime());
+		flCycle = blend.GetCycle() + dt * blend.GetPlaybackRate() * GetSequenceCycleRate(boneSetup.GetStudioHdr(), blend.GetSequence());
+		flCycle = ClampCycle(flCycle, IsSequenceLooping(boneSetup.GetStudioHdr(), blend.GetSequence()));
+
+#if 1 // _DEBUG
+		if (/*Q_stristr( hdr->pszName(), r_sequence_debug.GetString()) != NULL || */ r_sequence_debug.GetInt() == entindex())
+		{
+			DevMsgRT("%8.4f : %30s : %5.3f : %4.2f  +\n", gpGlobals->curtime, boneSetup.GetStudioHdr()->pSeqdesc(blend.GetSequence()).pszLabel(), flCycle, (float)blend.GetWeight());
+		}
+#endif
+
+		boneSetup.AccumulatePose(pos, q, blend.GetSequence(), flCycle, blend.GetWeight(), gpGlobals->curtime, GetIk());
+	}
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: 
+//
+// Input  : iSequence - 
+//			*pVec - 
+//	
+//-----------------------------------------------------------------------------
+
+void C_EngineObjectInternal::GetBlendedLinearVelocity(Vector* pVec)
+{
+	Vector vecDist;
+	float flDuration;
+
+	GetSequenceLinearMotion(GetSequence(), &vecDist);
+	flDuration = SequenceDuration(GetSequence());
+
+	VectorScale(vecDist, 1.0 / flDuration, *pVec);
+
+	Vector tmp;
+	for (int i = m_SequenceTransitioner.GetAnimationDataCount() - 2; i >= 0; i--)
+	{
+		const CAnimationData& blend = m_SequenceTransitioner.GetAnimationData(i);
+
+		GetSequenceLinearMotion(blend.GetSequence(), &vecDist);
+		flDuration = SequenceDuration(blend.GetSequence());
+
+		VectorScale(vecDist, 1.0 / flDuration, tmp);
+
+		float flWeight = blend.GetFadeout(gpGlobals->curtime);
+		*pVec = Lerp(flWeight, *pVec, tmp);
+	}
 }
 
 void C_EngineObjectInternal::DisableMuzzleFlash()
@@ -9172,7 +9263,12 @@ void C_EngineObjectInternal::ClientSideAnimationChanged()
 	Assert(anim.pAnimating == this);
 	anim.flags = m_pOuter->ComputeClientSideAnimationFlags();
 
-	m_pOuter->ClientSideAnimationChanged();
+	m_SequenceTransitioner.CheckForSequenceChange(
+		GetModelPtr(),
+		GetSequence(),
+		GetNewSequenceParity() != GetPrevNewSequenceParity(),
+		!IsNoInterpolationFrame()
+	);
 }
 
 void C_EngineObjectInternal::ForceClientSideAnimationOn()

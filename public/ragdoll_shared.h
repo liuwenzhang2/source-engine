@@ -78,6 +78,7 @@ class IStudioHdr;
 #include "inetchannelinfo.h"
 #include "gamerules.h"
 #include "entitylist_base.h"
+#include "sequence_Transitioner.h"
 
 #include "takedamageinfo.h"
 #include "IEffects.h"

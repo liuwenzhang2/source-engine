@@ -1055,7 +1055,7 @@ void CDODPlayerAnimState::ComputePoseParam_MoveYaw( IStudioHdr *pStudioHdr )
 			GetOuter()->GetEngineObject()->SetPoseParameter( pStudioHdr, m_iMoveX, vecCurrentMoveYaw.x );
 			GetOuter()->GetEngineObject()->SetPoseParameter( pStudioHdr, m_iMoveY, vecCurrentMoveYaw.y );
 
-			GetOuterDOD()->GetBlendedLinearVelocity( &vecAnimVelocity );
+			GetOuterDOD()->GetEngineObject()->GetBlendedLinearVelocity( &vecAnimVelocity );
 
 			// adjust X pose parameter based on movement error
 			if (fabs( vecAnimVelocity.x ) > 0.001)

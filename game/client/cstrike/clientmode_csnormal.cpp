@@ -877,14 +877,12 @@ void UpdateClassImageEntity(
 	pPlayerModel->GetEngineObject()->SetAbsAngles( QAngle( 0, 210, 0 ) );
 
 	// wacky hacky, set upper body animation
-	pPlayerModel->m_SequenceTransitioner.CheckForSequenceChange( 
-		pPlayerModel->GetEngineObject()->GetModelPtr(),
+	pPlayerModel->GetEngineObject()->CheckForSequenceChange(
 		pPlayerModel->GetEngineObject()->LookupSequence( "walk_lower" ),
 		false,
 		true
 	);
-	pPlayerModel->m_SequenceTransitioner.UpdateCurrent( 
-		pPlayerModel->GetEngineObject()->GetModelPtr(),
+	pPlayerModel->GetEngineObject()->UpdateCurrentSequence(
 		pPlayerModel->GetEngineObject()->LookupSequence( "walk_lower" ),
 		pPlayerModel->GetEngineObject()->GetCycle(),
 		pPlayerModel->GetEngineObject()->GetPlaybackRate(),

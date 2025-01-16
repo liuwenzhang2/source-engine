@@ -1712,4 +1712,22 @@ inline void NormalizeAngles(QAngle& angles)
 	}
 }
 
+inline float ClampCycle(float flCycle, bool isLooping)
+{
+	if (isLooping)
+	{
+		// FIXME: does this work with negative framerate?
+		flCycle -= (int)flCycle;
+		if (flCycle < 0.0f)
+		{
+			flCycle += 1.0f;
+		}
+	}
+	else
+	{
+		flCycle = clamp(flCycle, 0.0f, 0.999f);
+	}
+	return flCycle;
+}
+
 #endif // ENTITYLIST_BASE_H

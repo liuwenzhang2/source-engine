@@ -74,7 +74,7 @@ public:
 		bool bInterpolate
 		);
 
-	void UpdateCurrent( 
+	void UpdateCurrentSequence(
 		// Describe the current animation state with these parameters.
 		IStudioHdr *hdr,
 		int nCurSequence, 

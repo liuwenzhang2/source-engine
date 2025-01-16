@@ -316,7 +316,7 @@ void CBasePlayerAnimState::UpdateAimSequenceLayers(
 		true	// yes, interpolate when transitioning
 		);
 
-	pTransitioner->UpdateCurrent(
+	pTransitioner->UpdateCurrentSequence(
 		m_pOuter->GetEngineObject()->GetModelPtr(),
 		iAimSequence,
 		flCycle,

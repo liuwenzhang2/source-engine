@@ -22,6 +22,7 @@
 #include "tier2/beamsegdraw.h"
 #include "fx_water.h"
 #include "mouthinfo.h"
+#include "prediction.h"
 
 //class C_Beam;
 //class C_BaseViewModel;
@@ -898,6 +899,30 @@ public:
 	void SetSequenceFinished(bool bFinished) {
 		m_bSequenceFinished = bFinished;
 	}
+	void CheckForSequenceChange(
+		// Describe the current animation state with these parameters.
+		int nCurSequence,
+		// Even if the sequence hasn't changed, you can force it to interpolate from the previous
+		// spot in the same sequence to the current spot in the same sequence by setting this to true.
+		bool bForceNewSequence,
+
+		// Follows EF_NOINTERP.
+		bool bInterpolate
+	) {
+		m_SequenceTransitioner.CheckForSequenceChange(GetModelPtr(), nCurSequence, bForceNewSequence, bInterpolate);
+	}
+
+	void UpdateCurrentSequence(
+		// Describe the current animation state with these parameters.
+		int nCurSequence,
+		float flCurCycle,
+		float flCurPlaybackRate,
+		float flCurTime
+	) {
+		m_SequenceTransitioner.UpdateCurrentSequence(GetModelPtr(), nCurSequence, flCurCycle, flCurPlaybackRate, flCurTime);
+	}
+	void MaintainSequenceTransitions(IBoneSetup& boneSetup, float flCycle, Vector pos[], Quaternion q[]);
+	void GetBlendedLinearVelocity(Vector* pVec);
 
 	void DisableMuzzleFlash();		// Turn off the muzzle flash (ie: signal that we handled the server's event).
 	virtual void DoMuzzleFlash();	// Force a muzzle flash event. Note: this only QUEUES an event, so
@@ -1385,6 +1410,7 @@ protected:
 
 	int								m_nNewSequenceParity;
 	int								m_nPrevNewSequenceParity;
+	CSequenceTransitioner			m_SequenceTransitioner;
 
 	int								m_nResetEventsParity;
 	// These are compared against each other to determine if the entity should muzzle flash.

@@ -61,7 +61,6 @@
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
-ConVar r_sequence_debug( "r_sequence_debug", "" );
 
 // If an NPC is moving faster than this, he should play the running footstep sound
 const float RUN_SPEED_ESTIMATE_SQR = 150.0f * 150.0f;
@@ -281,8 +280,7 @@ void C_BaseAnimating::ValidateModelIndex()
 IStudioHdr *C_BaseAnimating::OnNewModel()
 {
 
-	// remove transition animations playback
-	m_SequenceTransitioner.RemoveAll();
+	
 
 	//if ( m_bDynamicModelPending )
 	//{
@@ -475,24 +473,6 @@ void C_BaseAnimating::TermRopes()
 	m_Ropes.Purge();
 }
 
-float C_BaseAnimating::ClampCycle( float flCycle, bool isLooping )
-{
-	if (isLooping) 
-	{
-		// FIXME: does this work with negative framerate?
-		flCycle -= (int)flCycle;
-		if (flCycle < 0.0f)
-		{
-			flCycle += 1.0f;
-		}
-	}
-	else 
-	{
-		flCycle = clamp( flCycle, 0.0f, 0.999f );
-	}
-	return flCycle;
-}
-
 
 //-----------------------------------------------------------------------------
 // Purpose: Special effects
@@ -568,60 +548,7 @@ CollideType_t C_BaseAnimating::GetCollideType( void )
 	return BaseClass::GetCollideType();
 }
 
-//-----------------------------------------------------------------------------
-// Purpose: if the active sequence changes, keep track of the previous ones and decay them based on their decay rate
-//-----------------------------------------------------------------------------
-void C_BaseAnimating::MaintainSequenceTransitions( IBoneSetup &boneSetup, float flCycle, Vector pos[], Quaternion q[] )
-{
-	VPROF( "C_BaseAnimating::MaintainSequenceTransitions" );
 
-	if ( !boneSetup.GetStudioHdr() )
-		return;
-
-	if ( prediction->InPrediction() )
-	{
-		GetEngineObject()->SetPrevNewSequenceParity(GetEngineObject()->GetNewSequenceParity());
-		return;
-	}
-
-	m_SequenceTransitioner.CheckForSequenceChange( 
-		boneSetup.GetStudioHdr(),
-		GetEngineObject()->GetSequence(),
-		GetEngineObject()->GetNewSequenceParity() != GetEngineObject()->GetPrevNewSequenceParity(),
-		!GetEngineObject()->IsNoInterpolationFrame()
-		);
-
-	GetEngineObject()->SetPrevNewSequenceParity( GetEngineObject()->GetNewSequenceParity());
-
-	// Update the transition sequence list.
-	m_SequenceTransitioner.UpdateCurrent( 
-		boneSetup.GetStudioHdr(),
-		GetEngineObject()->GetSequence(),
-		flCycle,
-		GetEngineObject()->GetPlaybackRate(),
-		gpGlobals->curtime
-		);
-
-
-	// process previous sequences
-	for (int i = m_SequenceTransitioner.GetAnimationDataCount() - 2; i >= 0; i--)
-	{
-		const CAnimationData& blend = m_SequenceTransitioner.GetAnimationData(i);
-
-		float dt = (gpGlobals->curtime - blend.GetLayerAnimtime());
-		flCycle = blend.GetCycle() + dt * blend.GetPlaybackRate() * GetEngineObject()->GetSequenceCycleRate(boneSetup.GetStudioHdr(), blend.GetSequence());
-		flCycle = ClampCycle( flCycle, GetEngineObject()->IsSequenceLooping( boneSetup.GetStudioHdr(), blend.GetSequence() ) );
-
-#if 1 // _DEBUG
-		if (/*Q_stristr( hdr->pszName(), r_sequence_debug.GetString()) != NULL || */ r_sequence_debug.GetInt() == entindex())
-		{
-			DevMsgRT( "%8.4f : %30s : %5.3f : %4.2f  +\n", gpGlobals->curtime, boneSetup.GetStudioHdr()->pSeqdesc( blend.GetSequence() ).pszLabel(), flCycle, (float)blend.GetWeight() );
-		}
-#endif
-
-		boneSetup.AccumulatePose( pos, q, blend.GetSequence(), flCycle, blend.GetWeight(), gpGlobals->curtime, GetEngineObject()->GetIk());
-	}
-}
 
 void C_BaseAnimating::AccumulateLayers( IBoneSetup &boneSetup, Vector pos[], Quaternion q[], float currentTime )
 {
@@ -698,6 +625,7 @@ void C_BaseAnimating::StandardBlendingRules( IStudioHdr *hdr, Vector pos[], Quat
 	float fCycle = GetEngineObject()->GetCycle();
 
 #if 1 //_DEBUG
+	ConVarRef r_sequence_debug("r_sequence_debug");
 	if (/* Q_stristr( hdr->pszName(), r_sequence_debug.GetString()) != NULL || */ r_sequence_debug.GetInt() == entindex())
 	{
 		DevMsgRT( "%8.4f : %30s : %5.3f : %4.2f\n", currentTime, hdr->pSeqdesc(GetEngineObject()->GetSequence() ).pszLabel(), fCycle, 1.0 );
@@ -710,7 +638,7 @@ void C_BaseAnimating::StandardBlendingRules( IStudioHdr *hdr, Vector pos[], Quat
 
 	// debugoverlay->AddTextOverlay( GetAbsOrigin() + Vector( 0, 0, 64 ), 0, 0, "%30s %6.2f : %6.2f", hdr->pSeqdesc( GetSequence() )->pszLabel( ), fCycle, 1.0 );
 
-	MaintainSequenceTransitions( boneSetup, fCycle, pos, q );
+	GetEngineObject()->MaintainSequenceTransitions( boneSetup, fCycle, pos, q );
 
 	AccumulateLayers( boneSetup, pos, q, currentTime );
 
@@ -2623,16 +2551,6 @@ void C_BaseAnimating::AddEntity( void )
 	BaseClass::AddEntity();
 }
 
-void C_BaseAnimating::ClientSideAnimationChanged()
-{
-	m_SequenceTransitioner.CheckForSequenceChange( 
-		GetEngineObject()->GetModelPtr(),
-		GetEngineObject()->GetSequence(),
-		GetEngineObject()->GetNewSequenceParity() != GetEngineObject()->GetPrevNewSequenceParity(),
-		!GetEngineObject()->IsNoInterpolationFrame()
-		);
-}
-
 unsigned int C_BaseAnimating::ComputeClientSideAnimationFlags()
 {
 	return FCLIENTANIM_SEQUENCE_CYCLE;
@@ -2828,39 +2746,6 @@ void C_BaseAnimating::StudioFrameAdvance()
 	if ( watch )
 	{
 		Msg("%s : %s : %5.1f\n", GetClassname(), GetEngineObject()->GetSequenceName(GetEngineObject()->GetSequence() ), GetEngineObject()->GetCycle() );
-	}
-}
-
-//-----------------------------------------------------------------------------
-// Purpose: 
-//
-// Input  : iSequence - 
-//			*pVec - 
-//	
-//-----------------------------------------------------------------------------
-
-void C_BaseAnimating::GetBlendedLinearVelocity( Vector *pVec )
-{
-	Vector vecDist;
-	float flDuration;
-
-	GetEngineObject()->GetSequenceLinearMotion(GetEngineObject()->GetSequence(), &vecDist );
-	flDuration = GetEngineObject()->SequenceDuration(GetEngineObject()->GetSequence() );
-
-	VectorScale( vecDist, 1.0 / flDuration, *pVec );
-
-	Vector tmp;
-	for (int i = m_SequenceTransitioner.GetAnimationDataCount() - 2; i >= 0; i--)
-	{
-		const CAnimationData& blend = m_SequenceTransitioner.GetAnimationData(i);
-	
-		GetEngineObject()->GetSequenceLinearMotion( blend.GetSequence(), &vecDist);
-		flDuration = GetEngineObject()->SequenceDuration( blend.GetSequence() );
-
-		VectorScale( vecDist, 1.0 / flDuration, tmp );
-
-		float flWeight = blend.GetFadeout( gpGlobals->curtime );
-		*pVec = Lerp( flWeight, *pVec, tmp );
 	}
 }
 
