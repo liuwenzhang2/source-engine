@@ -868,7 +868,7 @@ public:
 	virtual void					SetVehicleAnalogControlBias(int bias) {}
 
 	// UNDONE: Make this data instead of procedural?
-	virtual bool	IsViewable( void );					// is this something that would be looked at (model, sprite, etc.)?
+	virtual bool	IsVisible( void );					// is this something that would be looked at (model, sprite, etc.)?
 	
 	virtual bool	IsChangeLevelTrigger() const { return false; };
 	virtual bool	IsGib() const { return false; }

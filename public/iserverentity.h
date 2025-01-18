@@ -979,7 +979,7 @@ public:
 	virtual bool IsAlive(void) = 0;
 	virtual bool IsStandable() const = 0;
 	virtual bool IsMoving(void) = 0;
-	virtual bool IsViewable(void) = 0;
+	virtual bool IsVisible(void) = 0;
 	virtual bool IsFloating() = 0;
 	virtual bool IsNavIgnored() const = 0;
 	virtual void SetNavIgnore(float duration = FLT_MAX) = 0;

@@ -50,7 +50,7 @@ public:
 #endif // GAME_DLL
 
 
-	bool IsViewable(void) { return false; }
+	bool IsVisible(void) { return false; }
 
 	virtual void					UpdateOnRemove( void );
 

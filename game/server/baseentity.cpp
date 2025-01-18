@@ -2589,7 +2589,7 @@ bool CBaseEntity::IsInWorld( void ) const
 }
 
 
-bool CBaseEntity::IsViewable( void )
+bool CBaseEntity::IsVisible( void )
 {
 	if (GetEngineObject()->IsEffectActive( EF_NODRAW ) )
 	{

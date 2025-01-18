@@ -312,7 +312,7 @@ private:
 	int					DrawDebugTextOverlays(void);
 	virtual int			ObjectCaps( void ) { return (BaseClass::ObjectCaps() & ~FCAP_ACROSS_TRANSITION); }
 	virtual void		OnRestore();
-	bool				IsViewable( void );
+	bool				IsVisible( void );
 
 	// Input handlers
 	void				InputEnableHint( inputdata_t &inputdata );

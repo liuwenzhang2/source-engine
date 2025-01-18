@@ -1025,7 +1025,7 @@ float CAI_Hint::Yaw(void)
 // Input   :
 // Output  :
 //------------------------------------------------------------------------------
-bool CAI_Hint::IsViewable(void)
+bool CAI_Hint::IsVisible(void)
 {
 	if (m_NodeData.iDisabled)
 	{
