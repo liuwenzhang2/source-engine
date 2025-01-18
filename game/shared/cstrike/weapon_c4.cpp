@@ -272,7 +272,7 @@ END_PREDICTION_DATA()
 
 		GetEngineObject()->SetAbsOrigin( vecStart );
 		GetEngineObject()->SetAbsAngles( vecAngles );
-		SetOwnerEntity( pevOwner );
+		GetEngineObject()->SetOwnerEntity( pevOwner );
         
         //=============================================================================
         // HPE_BEGIN:
@@ -338,7 +338,7 @@ END_PREDICTION_DATA()
 		if (m_flC4Blow <= gpGlobals->curtime)
 		{
 			// give the defuser credit for defusing the bomb
-			CCSPlayer* pBombOwner = ToCSPlayer(GetOwnerEntity());
+			CCSPlayer* pBombOwner = ToCSPlayer(GetEngineObject()->GetOwnerEntity());
 			if ( pBombOwner )
 			{
                 if (CSGameRules()->m_iRoundWinStatus == WINNER_NONE)
@@ -552,7 +552,7 @@ END_PREDICTION_DATA()
         // [dwenger] Server-side processing for winning round by planting a bomb
         if (bWin)
         {
-            CCSPlayer *pBombOwner = ToCSPlayer( GetOwnerEntity() );
+            CCSPlayer *pBombOwner = ToCSPlayer(GetEngineObject()->GetOwnerEntity() );
             if ( pBombOwner )
             {
                 pBombOwner->AwardAchievement(CSWinBombPlant);
@@ -626,10 +626,10 @@ END_PREDICTION_DATA()
 		UTIL_ScreenShake( pTrace->endpos, 25.0, 150.0, 1.0, 3000, SHAKE_START );
 
 
-		SetOwnerEntity( NULL ); // can't traceline attack owner if this is set
+		GetEngineObject()->SetOwnerEntity( NULL ); // can't traceline attack owner if this is set
 
 		CSGameRules()->RadiusDamage( 
-			CTakeDamageInfo( this, GetOwnerEntity(), flBombRadius, bitsDamageType ),
+			CTakeDamageInfo( this, GetEngineObject()->GetOwnerEntity(), flBombRadius, bitsDamageType ),
 			GetEngineObject()->GetAbsOrigin(),
 			flBombRadius * 3.5,	//Matt - don't ask me, this is how CS does it.
 			CLASS_NONE,
@@ -1304,7 +1304,7 @@ void CC4::Drop( const Vector &vecVelocity )
 		// tell the bots about the dropped bomb
 		TheCSBots()->SetLooseBomb( this );
 
-		CBasePlayer *pPlayer = dynamic_cast<CBasePlayer *>(GetOwnerEntity());
+		CBasePlayer *pPlayer = dynamic_cast<CBasePlayer *>(GetEngineObject()->GetOwnerEntity());
 		Assert( pPlayer );
 		if ( pPlayer )
 		{

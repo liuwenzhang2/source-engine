@@ -51,7 +51,7 @@ void CBaseAnimatingProjectile::Spawn(	char *pszModel,
 	UTIL_SetOrigin( this, vecOrigin );
 	GetEngineObject()->SetAbsVelocity( vecVelocity );
 
-	SetOwnerEntity( pOwner );
+	GetEngineObject()->SetOwnerEntity( pOwner );
 
 	QAngle qAngles;
 	VectorAngles( vecVelocity, qAngles );
@@ -63,9 +63,9 @@ void CBaseAnimatingProjectile::Spawn(	char *pszModel,
 //---------------------------------------------------------
 void CBaseAnimatingProjectile::Touch( IServerEntity *pOther )
 {
-	CBaseEntity *pOwner;
+	IServerEntity *pOwner;
 
-	pOwner = GetOwnerEntity();
+	pOwner = GetEngineObject()->GetOwnerEntity();
 
 	if( !pOwner )
 	{

@@ -110,7 +110,7 @@ private:
 
 	void	Launch( CBasePlayer *pPhysGunUser );
 	void	Detonate( void );
-	void	Shatter( CBaseEntity *pAttacker );
+	void	Shatter( IServerEntity *pAttacker );
 	bool	StickToEntity( CBaseEntity *pOther );
 	bool	CreateConstraintToObject( CBaseEntity *pObject );
 	void	DestroyConstraint( void );
@@ -350,7 +350,7 @@ bool CWeaponStriderBuster::CreateConstraintToObject( CBaseEntity *pObject )
 	// Hold on to us
 	m_pConstraint = pConstraint;
 	pConstraint->SetGameData( (void *)this );
-	m_hConstrainedEntity = pObject->GetOwnerEntity();;
+	m_hConstrainedEntity = (CBaseEntity*)pObject->GetEngineObject()->GetOwnerEntity();;
 
 	// Disable collisions between the two ents
 	PhysDisableObjectCollisions( pPhysObject, pMyPhysObject );
@@ -399,7 +399,7 @@ bool CWeaponStriderBuster::ShouldStickToEntity( CBaseEntity *pEntity )
 		return false;
 
 	// Must have a follow parent
-	CBaseEntity *pFollowParent = pEntity->GetOwnerEntity();
+	IServerEntity *pFollowParent = pEntity->GetEngineObject()->GetOwnerEntity();
 	if ( pFollowParent == NULL )
 		return false;
 
@@ -445,12 +445,12 @@ bool CWeaponStriderBuster::StickToEntity( CBaseEntity *pOther )
 			if ( CreateConstraintToObject( pOther ) )
 			{
 				// Only works for striders, at the moment
-				CBaseEntity *pFollowParent = pOther->GetOwnerEntity();
+				IServerEntity *pFollowParent = pOther->GetEngineObject()->GetOwnerEntity();
 				if ( pFollowParent == NULL )
 					return false;
 
 				// Allows us to identify our constrained object later
-				SetOwnerEntity( pFollowParent );
+				GetEngineObject()->SetOwnerEntity( pFollowParent );
 
 				// Make a sound
 				const char* soundname = "Weapon_StriderBuster.StickToEntity";
@@ -540,7 +540,7 @@ void CWeaponStriderBuster::CreateDestroyedEffect( void )
 	for ( int i = 0; i < 3; i++ )
 	{
 		pTrail = EntityList()->CreateEntityByName( "sparktrail" );
-		pTrail->SetOwnerEntity( this );
+		pTrail->GetEngineObject()->SetOwnerEntity( this );
 		EntityList()->DispatchSpawn( pTrail );
 	}
 	
@@ -607,7 +607,7 @@ void CWeaponStriderBuster::VPhysicsCollision( int index, gamevcollisionevent_t *
 		return;
 
 	// Determine if we should shatter
-	CBaseEntity *pOwnerEntity = pVictim->GetOwnerEntity();
+	IServerEntity *pOwnerEntity = pVictim->GetEngineObject()->GetOwnerEntity();
 	bool bVictimIsStrider = ( ( pOwnerEntity != NULL ) && FClassnameIs( pOwnerEntity, "npc_strider" ) );
 
 	// Break if we hit anything other than a strider while going fast enough.
@@ -638,7 +638,7 @@ void CWeaponStriderBuster::BusterTouch( IServerEntity *pOther )
 //-----------------------------------------------------------------------------
 inline bool CWeaponStriderBuster::IsAttachedToStrider( void ) const
 {
-	CBaseEntity *pAttachedEnt = GetOwnerEntity();
+	IServerEntity *pAttachedEnt = GetEngineObject()->GetOwnerEntity();
 	if ( pAttachedEnt && FClassnameIs( pAttachedEnt, "npc_strider" ) )
 		return true;
 
@@ -650,7 +650,7 @@ inline bool CWeaponStriderBuster::IsAttachedToStrider( void ) const
 //-----------------------------------------------------------------------------
 void CWeaponStriderBuster::Detonate( void )
 {
-	CBaseEntity *pVictim = GetOwnerEntity();
+	IServerEntity *pVictim = GetEngineObject()->GetOwnerEntity();
 	if ( !m_bDud && pVictim )
 	{
 		// Kill the strider (with magic effect)
@@ -750,7 +750,7 @@ int CWeaponStriderBuster::OnTakeDamage( const CTakeDamageInfo &info )
 					// Make the buster fall off and break.
 					m_takedamage = DAMAGE_NO;
 
-					CNPC_Strider *pStrider = dynamic_cast<CNPC_Strider *>(GetOwnerEntity());
+					CNPC_Strider *pStrider = dynamic_cast<CNPC_Strider *>(GetEngineObject()->GetOwnerEntity());
 					Assert( pStrider != NULL );
 					pStrider->StriderBusterDetached( this );
 					DestroyConstraint();
@@ -908,7 +908,7 @@ Vector CWeaponStriderBuster::PhysGunLaunchVelocity( const Vector &forward, float
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-void CWeaponStriderBuster::Shatter( CBaseEntity *pAttacker )
+void CWeaponStriderBuster::Shatter( IServerEntity *pAttacker )
 {
 	if( m_bNoseDiving )
 		m_OnShotDown.FireOutput( this, this );

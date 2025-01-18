@@ -170,14 +170,14 @@ void CDODBaseRocket::DoExplosion( trace_t *pTrace )
 	CPVSFilter filter( vecOrigin );
 	TE_DODExplosion( filter, 0.0f, vecOrigin, pTrace->plane.normal );
 
-	CTakeDamageInfo info( this, GetOwnerEntity(), vec3_origin, GetEngineObject()->GetAbsOrigin(), GetDamage(), DMG_BLAST, 0 );
+	CTakeDamageInfo info( this, GetEngineObject()->GetOwnerEntity(), vec3_origin, GetEngineObject()->GetAbsOrigin(), GetDamage(), DMG_BLAST, 0 );
 	RadiusDamage( info, vecOrigin, mp_rocketradius.GetFloat() /* GetDamageRadius() */, CLASS_NONE, NULL );
 
 	// stun players in a radius
 	const float flStunDamage = 75;
 	const float flRadius = 150;
 
-	CTakeDamageInfo stunInfo( this, GetOwnerEntity(), vec3_origin, GetEngineObject()->GetAbsOrigin(), flStunDamage, DMG_STUN );
+	CTakeDamageInfo stunInfo( this, GetEngineObject()->GetOwnerEntity(), vec3_origin, GetEngineObject()->GetAbsOrigin(), flStunDamage, DMG_STUN );
 	DODGameRules()->RadiusStun( stunInfo, GetEngineObject()->GetAbsOrigin(), flRadius );
 }
 
@@ -285,7 +285,7 @@ void CDODBaseRocket::FlyThink( void )
 CDODBaseRocket *CDODBaseRocket::Create( const char *szClassname, const Vector &vecOrigin, const QAngle &vecAngles, CBaseEntity *pOwner = NULL )
 {
 	CDODBaseRocket *pMissile = (CDODBaseRocket *) CBaseEntity::Create( szClassname, vecOrigin, vecAngles, pOwner );
-	pMissile->SetOwnerEntity( pOwner );
+	pMissile->GetEngineObject()->SetOwnerEntity( pOwner );
 	pMissile->Spawn();
 	
 	Vector vecForward;

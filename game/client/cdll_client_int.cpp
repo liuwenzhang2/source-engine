@@ -2696,13 +2696,7 @@ void CHLClient::InternalEmitCloseCaption(IRecipientFilter& filter, int entindex,
 	}
 
 	bool fromplayer = false;
-	CBaseEntity* ent = NULL;
-#ifdef GAME_DLL
-	ent = EntityList()->GetBaseEntity(entindex);
-#endif // GAME_DLL
-#ifdef CLIENT_DLL
-	ent = CBaseEntity::Instance(entindex);
-#endif // CLIENT_DLL
+	IClientEntity* ent = EntityList()->GetBaseEntity(entindex);
 	if (ent)
 	{
 		while (ent)
@@ -2713,7 +2707,7 @@ void CHLClient::InternalEmitCloseCaption(IRecipientFilter& filter, int entindex,
 				break;
 			}
 
-			ent = ent->GetOwnerEntity();
+			ent = ent->GetEngineObject()->GetOwnerEntity();
 		}
 	}
 	InternalEmitCloseCaption(filter, entindex, fromplayer, ep.m_pSoundName, ep.m_UtlVecSoundOrigin, duration, ep.m_bWarnOnMissingCloseCaption);
@@ -2739,13 +2733,7 @@ void CHLClient::ModifyEmitSoundParams(EmitSound_t& params)
 void CHLClient::EmitCloseCaption(IRecipientFilter& filter, int entindex, char const* token, CUtlVector< Vector >& soundorigin, float duration, bool warnifmissing /*= false*/)// CBaseEntity::
 {
 	bool fromplayer = false;
-	CBaseEntity* ent = NULL;
-#ifdef GAME_DLL
-	ent = EntityList()->GetBaseEntity(entindex);
-#endif // GAME_DLL
-#ifdef CLIENT_DLL
-	ent = CBaseEntity::Instance(entindex);
-#endif // CLIENT_DLL
+	IClientEntity* ent = EntityList()->GetBaseEntity(entindex);
 	while (ent)
 	{
 		if (ent->IsPlayer())
@@ -2753,7 +2741,7 @@ void CHLClient::EmitCloseCaption(IRecipientFilter& filter, int entindex, char co
 			fromplayer = true;
 			break;
 		}
-		ent = ent->GetOwnerEntity();
+		ent = ent->GetEngineObject()->GetOwnerEntity();
 	}
 
 	InternalEmitCloseCaption(filter, entindex, fromplayer, token, soundorigin, duration, warnifmissing);

@@ -95,7 +95,7 @@ void CNPC_Hornet::Spawn( void )
 	SetTouch( &CNPC_Hornet::DieTouch );
 	SetThink( &CNPC_Hornet::StartTrack );
 
-	if ( GetOwnerEntity() && (GetOwnerEntity()->GetEngineObject()->GetFlags() & FL_CLIENT) )
+	if (GetEngineObject()->GetOwnerEntity() && (GetEngineObject()->GetOwnerEntity()->GetEngineObject()->GetFlags() & FL_CLIENT) )
 	{
 		m_flDamage = sk_plr_dmg_hornet.GetFloat();
 	}
@@ -141,7 +141,7 @@ Disposition_t CNPC_Hornet::IRelationType( CBaseEntity *pTarget )
 //=========================================================
 Class_T CNPC_Hornet::Classify ( void )
 {
-	if ( GetOwnerEntity() && (GetOwnerEntity()->GetEngineObject()->GetFlags() & FL_CLIENT) )
+	if (GetEngineObject()->GetOwnerEntity() && (GetEngineObject()->GetOwnerEntity()->GetEngineObject()->GetFlags() & FL_CLIENT) )
 	{
 		return CLASS_PLAYER_BIOWEAPON;
 	}
@@ -173,7 +173,7 @@ void CNPC_Hornet::DieTouch ( IServerEntity *pOther )
 	CPASAttenuationFilter filter( this );
 	g_pSoundEmitterSystem->EmitSound( filter, entindex(), "Hornet.Die" );
 			
-	CTakeDamageInfo info( this, GetOwnerEntity(), m_flDamage, DMG_BULLET );
+	CTakeDamageInfo info( this, GetEngineObject()->GetOwnerEntity(), m_flDamage, DMG_BULLET );
 	CalculateBulletDamageForce( &info, GetAmmoDef()->Index("Hornet"), GetEngineObject()->GetAbsVelocity(), GetEngineObject()->GetAbsOrigin() );
 	pOther->TakeDamage( info );
 
@@ -249,7 +249,7 @@ void CNPC_Hornet::TrackTouch ( IServerEntity *pOther )
 		return;
 	}
 
-	if ( pOther == GetOwnerEntity() || pOther->GetEngineObject()->GetModelIndex() == GetEngineObject()->GetModelIndex() )
+	if ( pOther == GetEngineObject()->GetOwnerEntity() || pOther->GetEngineObject()->GetModelIndex() == GetEngineObject()->GetModelIndex() )
 	{// bumped into the guy that shot it.
 		//SetSolid( SOLID_NOT );
 		return;
@@ -345,7 +345,7 @@ void CNPC_Hornet::TrackTarget ( void )
 	Vector vecVel = vecFlightDir + vecDirToEnemy;
 	VectorNormalize( vecVel );
 
-	if ( GetOwnerEntity() && (GetOwnerEntity()->GetEngineObject()->GetFlags() & FL_NPC) )
+	if (GetEngineObject()->GetOwnerEntity() && (GetEngineObject()->GetOwnerEntity()->GetEngineObject()->GetFlags() & FL_NPC) )
 	{
 		// random pattern only applies to hornets fired by monsters, not players. 
 

@@ -271,7 +271,7 @@ bool C_VGuiScreen::IsVisibleToTeam( int nTeam )
 	if (IsVisibleOnlyToTeammates() && (nTeam > 0))
 	{
 		// Hmmm... sort of a hack...
-		C_BaseEntity *pOwner = GetOwnerEntity();
+		IClientEntity *pOwner = GetEngineObject()->GetOwnerEntity();
 		if ( pOwner && (nTeam != pOwner->GetTeamNumber()) )
 			return false;
 	}

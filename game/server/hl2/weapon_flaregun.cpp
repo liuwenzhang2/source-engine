@@ -287,7 +287,7 @@ CFlare *CFlare::Create( Vector vecOrigin, QAngle vecAngles, CBaseEntity *pOwner,
 
 	pFlare->GetEngineObject()->SetMoveType( MOVETYPE_FLYGRAVITY, MOVECOLLIDE_FLY_BOUNCE );
 
-	pFlare->SetOwnerEntity( pOwner );
+	pFlare->GetEngineObject()->SetOwnerEntity( pOwner );
 	pFlare->m_pOwner	= pOwner;
 
 	return pFlare;
@@ -491,7 +491,7 @@ void CFlare::FlareTouch( IServerEntity *pOther )
 		m_nBounces++;
 
 		//After the first bounce, smacking into whoever fired the flare is fair game
-		SetOwnerEntity( this );	
+		GetEngineObject()->SetOwnerEntity( this );
 
 		// Slow down
 		Vector vecNewVelocity = GetEngineObject()->GetAbsVelocity();

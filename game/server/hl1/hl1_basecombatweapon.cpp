@@ -100,7 +100,7 @@ void CBaseHL1CombatWeapon::FallThink ( void )
 	{
 		// clatter if we have an owner (i.e., dropped by someone)
 		// don't clatter if the gun is waiting to respawn (if it's waiting, it is invisible!)
-		if ( GetOwnerEntity() )
+		if (GetEngineObject()->GetOwnerEntity() )
 		{
 			const char* soundname = "BaseCombatWeapon.WeaponDrop";
 			CPASAttenuationFilter filter(this, soundname);

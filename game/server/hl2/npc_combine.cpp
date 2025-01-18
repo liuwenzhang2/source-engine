@@ -1778,7 +1778,7 @@ int CNPC_Combine::SelectSchedule( void )
 						// dangerous sound nearby!, call it out
 						const char *pSentenceName = "COMBINE_DANGER";
 
-						CBaseEntity *pSoundOwner = pSound->m_hOwner;
+						CBaseEntity *pSoundOwner = (CBaseEntity*)pSound->m_hOwner.Get();
 						if ( pSoundOwner )
 						{
 							CBaseGrenade *pGrenade = dynamic_cast<CBaseGrenade *>(pSoundOwner);

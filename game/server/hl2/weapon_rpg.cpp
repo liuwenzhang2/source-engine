@@ -59,7 +59,7 @@ public:
 	CLaserDot( void );
 	~CLaserDot( void );
 
-	static CLaserDot *Create( const Vector &origin, CBaseEntity *pOwner = NULL, bool bVisibleDot = true );
+	static CLaserDot *Create( const Vector &origin, IServerEntity *pOwner = NULL, bool bVisibleDot = true );
 
 	void	SetTargetEntity( CBaseEntity *pTarget ) { m_hTargetEnt = pTarget; }
 	CBaseEntity *GetTargetEntity( void ) { return m_hTargetEnt; }
@@ -357,7 +357,7 @@ void CMissile::ShotDown( void )
 void CMissile::DoExplosion( void )
 {
 	// Explode
-	ExplosionCreate(GetEngineObject()->GetAbsOrigin(), GetEngineObject()->GetAbsAngles(), GetOwnerEntity(), GetDamage(), CMissile::EXPLOSION_RADIUS,
+	ExplosionCreate(GetEngineObject()->GetAbsOrigin(), GetEngineObject()->GetAbsAngles(), GetEngineObject()->GetOwnerEntity(), GetDamage(), CMissile::EXPLOSION_RADIUS,
 		SF_ENVEXPLOSION_NOSPARKS | SF_ENVEXPLOSION_NODLIGHTS | SF_ENVEXPLOSION_NOSMOKE, 0.0f, this);
 }
 
@@ -498,10 +498,10 @@ void CMissile::IgniteThink( void )
 //-----------------------------------------------------------------------------
 void CMissile::GetShootPosition( CLaserDot *pLaserDot, Vector *pShootPosition )
 {
-	if ( pLaserDot->GetOwnerEntity() != NULL )
+	if ( pLaserDot->GetEngineObject()->GetOwnerEntity() != NULL )
 	{
 		//FIXME: Do we care this isn't exactly the muzzle position?
-		*pShootPosition = pLaserDot->GetOwnerEntity()->WorldSpaceCenter();
+		*pShootPosition = pLaserDot->GetEngineObject()->GetOwnerEntity()->WorldSpaceCenter();
 	}
 	else
 	{
@@ -585,7 +585,7 @@ void CMissile::SeekThink( void )
 		if ( !pEnt->IsOn() )
 			continue;
 
-		if ( pEnt->GetOwnerEntity() != GetOwnerEntity() )
+		if ( pEnt->GetEngineObject()->GetOwnerEntity() != GetEngineObject()->GetOwnerEntity() )
 			continue;
 
 		dotDist = (GetEngineObject()->GetAbsOrigin() - pEnt->GetEngineObject()->GetAbsOrigin()).Length();
@@ -738,7 +738,7 @@ CMissile *CMissile::Create( const Vector &vecOrigin, const QAngle &vecAngles, CB
 {
 	//CMissile *pMissile = (CMissile *)CreateEntityByName("rpg_missile" );
 	CMissile *pMissile = (CMissile *) CBaseEntity::Create( "rpg_missile", vecOrigin, vecAngles, pentOwner );
-	pMissile->SetOwnerEntity( pentOwner );
+	pMissile->GetEngineObject()->SetOwnerEntity( pentOwner );
 	pMissile->Spawn();
 	pMissile->GetEngineObject()->AddEffects( EF_NOSHADOW );
 	
@@ -985,7 +985,7 @@ LINK_ENTITY_TO_CLASS( apc_missile, CAPCMissile );
 CAPCMissile *CAPCMissile::Create( const Vector &vecOrigin, const QAngle &vecAngles, const Vector &vecVelocity, CBaseEntity *pOwner )
 {
 	CAPCMissile *pMissile = (CAPCMissile *)CBaseEntity::Create( "apc_missile", vecOrigin, vecAngles, pOwner );
-	pMissile->SetOwnerEntity( pOwner );
+	pMissile->GetEngineObject()->SetOwnerEntity( pOwner );
 	pMissile->Spawn();
 	pMissile->GetEngineObject()->SetAbsVelocity( vecVelocity );
 	pMissile->GetEngineObject()->AddFlag( FL_NOTARGET );
@@ -1114,7 +1114,7 @@ void CAPCMissile::APCSeekThink( void )
 		if ( !pEnt->IsOn() )
 			continue;
 
-		if ( pEnt->GetOwnerEntity() != GetOwnerEntity() )
+		if ( pEnt->GetEngineObject()->GetOwnerEntity() != GetEngineObject()->GetOwnerEntity() )
 			continue;
 
 		bFoundDot = true;
@@ -1182,7 +1182,7 @@ void CAPCMissile::DoExplosion( void )
 #ifdef HL2_EPISODIC
 		ExplosionCreate(GetEngineObject()->GetAbsOrigin(), GetEngineObject()->GetAbsAngles(), this, APC_MISSILE_DAMAGE, 100, true, 20000 );
 #else
-		ExplosionCreate(GetEngineObject()->GetAbsOrigin(), GetEngineObject()->GetAbsAngles(), GetOwnerEntity(), APC_MISSILE_DAMAGE, 100, true, 20000 );
+		ExplosionCreate(GetEngineObject()->GetAbsOrigin(), GetEngineObject()->GetAbsAngles(), GetEngineObject()->GetOwnerEntity(), APC_MISSILE_DAMAGE, 100, true, 20000 );
 #endif
 	}
 }
@@ -2007,7 +2007,7 @@ void CWeaponRPG::CreateLaserPointer( void )
 	if ( m_hLaserDot != NULL )
 		return;
 
-	m_hLaserDot = CLaserDot::Create(GetEngineObject()->GetAbsOrigin(), GetOwnerEntity() );
+	m_hLaserDot = CLaserDot::Create(GetEngineObject()->GetAbsOrigin(), GetEngineObject()->GetOwnerEntity() );
 	m_hLaserDot->TurnOff();
 
 	UpdateLaserPosition();
@@ -2299,7 +2299,7 @@ CLaserDot::~CLaserDot( void )
 // Input  : &origin - 
 // Output : CLaserDot
 //-----------------------------------------------------------------------------
-CLaserDot *CLaserDot::Create( const Vector &origin, CBaseEntity *pOwner, bool bVisibleDot )
+CLaserDot *CLaserDot::Create( const Vector &origin, IServerEntity *pOwner, bool bVisibleDot )
 {
 	CLaserDot *pLaserDot = (CLaserDot *) CBaseEntity::Create( "env_laserdot", origin, QAngle(0,0,0) );
 
@@ -2320,7 +2320,7 @@ CLaserDot *CLaserDot::Create( const Vector &origin, CBaseEntity *pOwner, bool bV
 	pLaserDot->SetTransparency( kRenderGlow, 255, 255, 255, 255, kRenderFxNoDissipation );
 	pLaserDot->SetScale( 0.5f );
 
-	pLaserDot->SetOwnerEntity( pOwner );
+	pLaserDot->GetEngineObject()->SetOwnerEntity( pOwner );
 
 	pLaserDot->SetContextThink( &CLaserDot::LaserThink, gpGlobals->curtime + 0.1f, g_pLaserDotThink );
 	pLaserDot->GetEngineObject()->SetSimulatedEveryTick( true );
@@ -2340,10 +2340,10 @@ void CLaserDot::LaserThink( void )
 {
 	GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.05f, g_pLaserDotThink );
 
-	if ( GetOwnerEntity() == NULL )
+	if (GetEngineObject()->GetOwnerEntity() == NULL )
 		return;
 
-	Vector	viewDir = GetEngineObject()->GetAbsOrigin() - GetOwnerEntity()->GetEngineObject()->GetAbsOrigin();
+	Vector	viewDir = GetEngineObject()->GetAbsOrigin() - GetEngineObject()->GetOwnerEntity()->GetEngineObject()->GetAbsOrigin();
 	float	dist = VectorNormalize( viewDir );
 
 	float	scale = RemapVal( dist, 32, 1024, 0.01f, 0.5f );

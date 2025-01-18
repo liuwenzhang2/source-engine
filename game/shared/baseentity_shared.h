@@ -54,16 +54,6 @@ inline bool CBaseEntity::IsAlive( void )
 	return m_lifeState == LIFE_ALIVE; 
 }
 
-inline CBaseEntity	*CBaseEntity::GetOwnerEntity() const
-{
-	return m_hOwnerEntity.Get();
-}
-
-inline CBaseEntity	*CBaseEntity::GetEffectEntity() const
-{
-	return m_hEffectEntity.Get();
-}
-
 // Shared EntityMessage between game and client .dlls
 #define BASEENTITY_MSG_REMOVE_DECALS	1
 

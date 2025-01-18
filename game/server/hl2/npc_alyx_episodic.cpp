@@ -495,7 +495,7 @@ void CNPC_Alyx::CreateEmpTool( void )
 		m_hEmpTool->GetEngineObject()->SetName( "Alyx_Emptool" );
 		int iAttachment = GetEngineObject()->LookupAttachment( "Emp_Holster" );
 		m_hEmpTool->GetEngineObject()->SetParent(this->GetEngineObject(), iAttachment);
-		m_hEmpTool->SetOwnerEntity(this);
+		m_hEmpTool->GetEngineObject()->SetOwnerEntity(this);
 		m_hEmpTool->GetEngineObject()->SetSolid( SOLID_NONE );
 		m_hEmpTool->GetEngineObject()->SetLocalOrigin( Vector( 0, 0, 0 ) );
 		m_hEmpTool->GetEngineObject()->SetLocalAngles( QAngle( 0, 0, 0 ) );
@@ -892,11 +892,11 @@ void CNPC_Alyx::AnalyzeGunfireSound( CSound *pSound )
 	if( pSound->m_hTarget.Get() == NULL )
 		return;
 
-	CBaseCombatCharacter *pSoundOriginBCC = pSound->m_hOwner->MyCombatCharacterPointer();
+	CBaseCombatCharacter *pSoundOriginBCC = ((CBaseEntity*)pSound->m_hOwner.Get())->MyCombatCharacterPointer();
 	if( pSoundOriginBCC == NULL )
 		return;
 
-	CBaseEntity *pSoundTarget = pSound->m_hTarget.Get();
+	IServerEntity *pSoundTarget = pSound->m_hTarget.Get();
 
 	CBasePlayer *pPlayer = AI_GetSinglePlayer();
 
@@ -1195,7 +1195,7 @@ void CNPC_Alyx::DoCustomSpeechAI( void )
 				SpeakIfAllowed( "TLK_SPOTTED_INCOMING_HEADCRAB" );
 			}
 			// If we see a headcrab leaving a zombie that just died, mention it
-			else if ( pHC->GetOwnerEntity() && ( pHC->GetOwnerEntity()->Classify() == CLASS_ZOMBIE ) && !pHC->GetOwnerEntity()->IsAlive() )
+			else if ( pHC->GetEngineObject()->GetOwnerEntity() && ( ((CBaseEntity*)pHC->GetEngineObject()->GetOwnerEntity())->Classify() == CLASS_ZOMBIE ) && !pHC->GetEngineObject()->GetOwnerEntity()->IsAlive() )
 			{
 				SpeakIfAllowed( "TLK_SPOTTED_HEADCRAB_LEAVING_ZOMBIE" );
 			}
@@ -1714,7 +1714,7 @@ int CNPC_Alyx::SelectSchedule( void )
 			CSound *pBestSound = GetBestSound();
 			if ( pBestSound && pBestSound->m_hOwner )
 			{
-				if ( pBestSound->m_hOwner->Classify() == CLASS_ZOMBIE && pBestSound->SoundChannel() == SOUNDENT_CHANNEL_NPC_FOOTSTEP )
+				if (((CBaseEntity*)pBestSound->m_hOwner.Get())->Classify() == CLASS_ZOMBIE && pBestSound->SoundChannel() == SOUNDENT_CHANNEL_NPC_FOOTSTEP )
 					return SCHED_ALYX_ALERT_FACE_AWAYFROM_BESTSOUND;
 			}
 		}

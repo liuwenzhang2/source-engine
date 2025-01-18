@@ -194,7 +194,7 @@ void CHL1MP_Player::DetonateSatchelCharges( void )
 
 	while ( (pSatchel = EntityList()->FindEntityByClassname( pSatchel, "monster_satchel" ) ) != NULL)
 	{
-		if ( pSatchel->GetOwnerEntity() == this )
+		if ( pSatchel->GetEngineObject()->GetOwnerEntity() == this )
 		{
 			pSatchel->Use( this, this, USE_ON, 0 );
 		}

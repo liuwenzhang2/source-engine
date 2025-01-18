@@ -1067,7 +1067,7 @@ void CNPC_MetroPolice::AnnounceOutOfAmmo( )
 //-----------------------------------------------------------------------------
 void CNPC_MetroPolice::AnnounceTakeCoverFromDanger( CSound *pSound )
 {
-	CBaseEntity *pSoundOwner = pSound->m_hOwner;
+	CBaseEntity *pSoundOwner = (CBaseEntity*)pSound->m_hOwner.Get();
 	if ( pSoundOwner )
 	{
 		CBaseGrenade *pGrenade = dynamic_cast<CBaseGrenade *>(pSoundOwner);
@@ -5104,7 +5104,7 @@ bool CNPC_MetroPolice::QueryHearSound( CSound *pSound )
 	if ( PlayerIsCriminal() == false )
 	{
 		// If the person making the sound was a friend, don't respond
-		if ( pSound->IsSoundType( SOUND_DANGER ) && pSound->m_hOwner && IRelationType( pSound->m_hOwner ) == D_NU )
+		if ( pSound->IsSoundType( SOUND_DANGER ) && pSound->m_hOwner && IRelationType((CBaseEntity*)pSound->m_hOwner.Get() ) == D_NU )
 			return false;
 	}
 

@@ -242,7 +242,7 @@ public:
 	virtual void Event_PlayerConnected( CBasePlayer *pPlayer );
 	virtual void Event_PlayerDisconnected( CBasePlayer *pPlayer );
 	virtual void Event_WindowShattered( CBasePlayer *pPlayer );
-	virtual void Event_PlayerKilledOther( CBasePlayer *pAttacker, CBaseEntity *pVictim, const CTakeDamageInfo &info );
+	virtual void Event_PlayerKilledOther( CBasePlayer *pAttacker, IServerEntity *pVictim, const CTakeDamageInfo &info );
 			
 
 	// CSS specific events

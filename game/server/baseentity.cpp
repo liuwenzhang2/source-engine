@@ -114,8 +114,6 @@ ConVar ai_sequence_debug("ai_sequence_debug", "0");
 IMPLEMENT_SERVERCLASS_ST_NOBASE(CBaseEntity, DT_BaseEntity)
 SendPropInt(SENDINFO(m_iTeamNum), TEAMNUM_NUM_BITS, 0),
 SendPropFloat(SENDINFO(m_flShadowCastDistance), 12, SPROP_UNSIGNED),
-SendPropEHandle(SENDINFO(m_hOwnerEntity)),
-SendPropEHandle(SENDINFO(m_hEffectEntity)),
 
 
 SendPropInt(SENDINFO(m_iTextureFrameIndex), 8, SPROP_UNSIGNED),
@@ -209,7 +207,6 @@ CBaseEntity::CBaseEntity()
 	//m_bDynamicModelPending = false;
 	//m_bDynamicModelSetBounds = false;
 
-	SetOwnerEntity( NULL );
 	m_nTransmitStateOwnedCounter = 0;
 
 
@@ -408,6 +405,7 @@ void CBaseEntity::UpdateOnRemove(void)
 		// Remove this entity from the ent list (NOTE:  This Makes EHANDLES go NULL)
 		//EntityList()->DestroyEntity( this );
 	}
+	GetEngineObject()->SetOwnerEntity(NULL);
 }
 
 //-----------------------------------------------------------------------------
@@ -1502,7 +1500,7 @@ BEGIN_DATADESC_NO_BASE( CBaseEntity )
 
 	//DEFINE_FIELD( m_MoveType, FIELD_CHARACTER ),
 	//DEFINE_FIELD( m_MoveCollide, FIELD_CHARACTER ),
-	DEFINE_FIELD( m_hOwnerEntity, FIELD_EHANDLE ),
+	//DEFINE_FIELD( m_hOwnerEntity, FIELD_EHANDLE ),
 	//DEFINE_FIELD( m_CollisionGroup, FIELD_INTEGER ),
 	//DEFINE_PHYSPTR( m_pPhysicsObject),
 	//DEFINE_FIELD( m_flElasticity, FIELD_FLOAT ),
@@ -1626,7 +1624,7 @@ BEGIN_DATADESC_NO_BASE( CBaseEntity )
 	DEFINE_FUNCTION( SUB_CallUseToggle ),
 	DEFINE_THINKFUNC( ShadowCastDistThink ),
 
-	DEFINE_FIELD( m_hEffectEntity, FIELD_EHANDLE ),
+	//DEFINE_FIELD( m_hEffectEntity, FIELD_EHANDLE ),
 
 	DEFINE_KEYFIELD(m_iszLightingOriginRelative, FIELD_STRING, "LightingOriginHack"),
 	DEFINE_KEYFIELD(m_iszLightingOrigin, FIELD_STRING, "LightingOrigin"),
@@ -2175,7 +2173,7 @@ void CBaseEntity::PhysicsRelinkChildren( float dt )
 		{
 			child->GetOuter()->UpdatePhysicsShadowToCurrentPosition( dt );
 		}
-		else if ( child->GetOuter()->GetOwnerEntity() != this )
+		else if ( child->GetOwnerEntity() != this )
 		{
 			// the only case where this is valid is if this entity is an attached ragdoll.
 			// So assert here to catch the non-ragdoll case.
@@ -2627,7 +2625,7 @@ int CBaseEntity::ShouldToggle( USE_TYPE useType, int currentState )
 
 // NOTE: szName must be a pointer to constant memory, e.g. "NPC_class" because the entity
 // will keep a pointer to it after this call.
-CBaseEntity *CBaseEntity::Create( const char *szName, const Vector &vecOrigin, const QAngle &vecAngles, CBaseEntity *pOwner )
+CBaseEntity *CBaseEntity::Create( const char *szName, const Vector &vecOrigin, const QAngle &vecAngles, IServerEntity *pOwner )
 {
 	CBaseEntity *pEntity = CreateNoSpawn( szName, vecOrigin, vecAngles, pOwner );
 
@@ -2639,7 +2637,7 @@ CBaseEntity *CBaseEntity::Create( const char *szName, const Vector &vecOrigin, c
 
 // NOTE: szName must be a pointer to constant memory, e.g. "NPC_class" because the entity
 // will keep a pointer to it after this call.
-CBaseEntity * CBaseEntity::CreateNoSpawn( const char *szName, const Vector &vecOrigin, const QAngle &vecAngles, CBaseEntity *pOwner )
+CBaseEntity * CBaseEntity::CreateNoSpawn( const char *szName, const Vector &vecOrigin, const QAngle &vecAngles, IServerEntity *pOwner )
 {
 	IServerEntity *pEntity = EntityList()->CreateEntityByName( szName );
 	if ( !pEntity )
@@ -2650,7 +2648,7 @@ CBaseEntity * CBaseEntity::CreateNoSpawn( const char *szName, const Vector &vecO
 
 	pEntity->GetEngineObject()->SetLocalOrigin( vecOrigin );
 	pEntity->GetEngineObject()->SetLocalAngles( vecAngles );
-	pEntity->SetOwnerEntity( pOwner );
+	pEntity->GetEngineObject()->SetOwnerEntity( pOwner );
 
 	EntityList()->NotifyCreateEntity( pEntity );
 
@@ -2785,19 +2783,6 @@ bool CBaseEntity::TestHitboxes( const Ray_t &ray, unsigned int fContentsMask, tr
 {
 	return false;
 }
-
-
-void CBaseEntity::SetOwnerEntity(IServerEntity* pOwner )
-{
-	if ( m_hOwnerEntity.Get() != pOwner )
-	{
-		m_hOwnerEntity = (CBaseEntity*)pOwner;
-
-		GetEngineObject()->CollisionRulesChanged();
-	}
-}
-
-
 
 void CBaseEntity::Spawn( void ) 
 {
@@ -3462,11 +3447,11 @@ void CBaseEntity::GetInputDispatchEffectPosition( const char *sInputString, Vect
 void CBaseEntity::InputKill( inputdata_t &inputdata )
 {
 	// tell owner ( if any ) that we're dead.This is mostly for NPCMaker functionality.
-	CBaseEntity *pOwner = GetOwnerEntity();
+	IServerEntity *pOwner = GetEngineObject()->GetOwnerEntity();
 	if ( pOwner )
 	{
 		pOwner->DeathNotice( this );
-		SetOwnerEntity( NULL );
+		GetEngineObject()->SetOwnerEntity( NULL );
 	}
 
 	EntityList()->DestroyEntity( this );
@@ -3482,11 +3467,11 @@ void CBaseEntity::InputKillHierarchy( inputdata_t &inputdata )
 	}
 
 	// tell owner ( if any ) that we're dead. This is mostly for NPCMaker functionality.
-	CBaseEntity *pOwner = GetOwnerEntity();
+	IServerEntity *pOwner = GetEngineObject()->GetOwnerEntity();
 	if ( pOwner )
 	{
 		pOwner->DeathNotice( this );
-		SetOwnerEntity( NULL );
+		GetEngineObject()->SetOwnerEntity( NULL );
 	}
 
 	EntityList()->DestroyEntity( this );
@@ -5524,7 +5509,7 @@ void CBaseEntity::Ignite(float flFlameLifetime, bool bNPCOnly, float flSize, boo
 		pFlame->SetLifetime(flFlameLifetime);
 		GetEngineObject()->AddFlag(FL_ONFIRE);
 
-		SetEffectEntity(pFlame);
+		GetEngineObject()->SetEffectEntity(pFlame);
 
 		if (flSize > 0.0f)
 		{
@@ -5540,7 +5525,7 @@ void CBaseEntity::IgniteLifetime(float flFlameLifetime)
 	if (!IsOnFire())
 		Ignite(30, false, 0.0f, true);
 
-	CEntityFlame* pFlame = dynamic_cast<CEntityFlame*>(GetEffectEntity());
+	CEntityFlame* pFlame = dynamic_cast<CEntityFlame*>(GetEngineObject()->GetEffectEntity());
 
 	if (!pFlame)
 		return;
@@ -5553,7 +5538,7 @@ void CBaseEntity::IgniteNumHitboxFires(int iNumHitBoxFires)
 	if (!IsOnFire())
 		Ignite(30, false, 0.0f, true);
 
-	CEntityFlame* pFlame = dynamic_cast<CEntityFlame*>(GetEffectEntity());
+	CEntityFlame* pFlame = dynamic_cast<CEntityFlame*>(GetEngineObject()->GetEffectEntity());
 
 	if (!pFlame)
 		return;
@@ -5566,7 +5551,7 @@ void CBaseEntity::IgniteHitboxFireScale(float flHitboxFireScale)
 	if (!IsOnFire())
 		Ignite(30, false, 0.0f, true);
 
-	CEntityFlame* pFlame = dynamic_cast<CEntityFlame*>(GetEffectEntity());
+	CEntityFlame* pFlame = dynamic_cast<CEntityFlame*>(GetEngineObject()->GetEffectEntity());
 
 	if (!pFlame)
 		return;
@@ -5591,7 +5576,7 @@ bool CBaseEntity::Dissolve(const char* pMaterialName, float flStartTime, bool bN
 	CEntityDissolve* pDissolve = CEntityDissolve::Create(this, pMaterialName, flStartTime, nDissolveType, &bRagdollCreated);
 	if (pDissolve)
 	{
-		SetEffectEntity(pDissolve);
+		GetEngineObject()->SetEffectEntity(pDissolve);
 
 		GetEngineObject()->AddFlag(FL_DISSOLVING);
 		m_flDissolveStartTime = flStartTime;
@@ -5628,7 +5613,7 @@ void CBaseEntity::TransferDissolveFrom(CBaseEntity* pAnim)
 		GetEngineObject()->AddFlag(FL_DISSOLVING);
 		m_flDissolveStartTime = pAnim->m_flDissolveStartTime;
 
-		CEntityDissolve* pDissolveFrom = dynamic_cast <CEntityDissolve*> (pAnim->GetEffectEntity());
+		CEntityDissolve* pDissolveFrom = dynamic_cast <CEntityDissolve*> (pAnim->GetEngineObject()->GetEffectEntity());
 
 		if (pDissolveFrom)
 		{

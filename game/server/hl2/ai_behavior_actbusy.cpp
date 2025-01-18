@@ -1099,11 +1099,11 @@ int	CAI_ActBusyBehavior::SelectScheduleForLeaving( void )
 			{
 				if ( !GetOuter()->GetEngineObject()->IsMarkedForDeletion() )
 				{
-					CBaseEntity *pOwner = GetOuter()->GetOwnerEntity();
+					IServerEntity *pOwner = GetOuter()->GetEngineObject()->GetOwnerEntity();
 					if ( pOwner )
 					{
 						pOwner->DeathNotice( GetOuter() );
-						GetOuter()->SetOwnerEntity( NULL );
+						GetOuter()->GetEngineObject()->SetOwnerEntity( NULL );
 					}
 					GetOuter()->SetThink( &CBaseEntity::SUB_Remove); //SUB_Remove) ; //GetOuter()->SUB_Remove );
 					GetOuter()->GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.1 );
@@ -1449,7 +1449,7 @@ bool CAI_ActBusyBehavior::QueryHearSound( CSound *pSound )
 	// player fires shots at their feet.
 	if ( pSound->IsSoundType( SOUND_COMBAT ) || pSound->IsSoundType( SOUND_BULLET_IMPACT ) )
 	{
-		if ( GetOuter()->IRelationType( pSound->m_hOwner ) == D_LI )
+		if ( GetOuter()->IRelationType( (CBaseEntity*)pSound->m_hOwner.Get() ) == D_LI )
 			return false;
 	}
 

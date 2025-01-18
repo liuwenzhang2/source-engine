@@ -1102,7 +1102,7 @@ void CNPC_AttackHelicopter::Spawn( void )
 	m_hSensor->GetEngineObject()->SetParent( this->GetEngineObject(), nBombAttachment);
 	m_hSensor->GetEngineObject()->SetLocalOrigin( vec3_origin );
 	m_hSensor->GetEngineObject()->SetLocalAngles( vec3_angle );
-	m_hSensor->SetOwnerEntity( this );
+	m_hSensor->GetEngineObject()->SetOwnerEntity( this );
 
 	GetEngineObject()->AddFlag( FL_AIMTARGET );
 
@@ -2796,7 +2796,7 @@ CGrenadeHelicopter *CNPC_AttackHelicopter::SpawnBombEntity( const Vector &vecPos
 	// Create the grenade and set it up
 	CGrenadeHelicopter *pGrenade = static_cast<CGrenadeHelicopter*>(EntityList()->CreateEntityByName( "grenade_helicopter" ));
 	pGrenade->GetEngineObject()->SetAbsOrigin( vecPos );
-	pGrenade->SetOwnerEntity( this );
+	pGrenade->GetEngineObject()->SetOwnerEntity( this );
 	pGrenade->SetThrower( this );
 	pGrenade->GetEngineObject()->SetAbsVelocity( vecVelocity );
 	EntityList()->DispatchSpawn( pGrenade );
@@ -3379,7 +3379,7 @@ void Chopper_CreateChunk( CBaseEntity *pChopper, const Vector &vecChunkPos, cons
 	pChunk->GetEngineObject()->SetAbsOrigin( vecChunkPos );
 	pChunk->GetEngineObject()->SetAbsAngles( vecChunkAngles );
 
-	pChunk->SetOwnerEntity( pChopper );
+	pChunk->GetEngineObject()->SetOwnerEntity( pChopper );
 	
 	if ( bSmall )
 	{
@@ -3501,7 +3501,7 @@ void CNPC_AttackHelicopter::DropCorpse( int nDamage )
 	CBaseEntity *pGib = CreateRagGib( "models/combine_soldier.mdl", GetEngineObject()->GetAbsOrigin(), GetEngineObject()->GetAbsAngles(), vecForceVector );
 	if ( pGib )
 	{
-		pGib->SetOwnerEntity( this );
+		pGib->GetEngineObject()->SetOwnerEntity( this );
 	}
 }
 
@@ -3580,7 +3580,7 @@ int CNPC_AttackHelicopter::OnTakeDamage_Alive( const CTakeDamageInfo &info )
 {
 	int nPrevHealth = GetHealth();
 
-	if ( ( info.GetInflictor() != NULL ) && (info.GetInflictor()->GetOwnerEntity() != NULL ) && (info.GetInflictor()->GetOwnerEntity() == this ) )
+	if ( ( info.GetInflictor() != NULL ) && (((IEngineObjectServer*)info.GetInflictor()->GetEngineObject())->GetOwnerEntity() != NULL ) && (((IEngineObjectServer*)info.GetInflictor()->GetEngineObject())->GetOwnerEntity() == this ) )
 	{
 		// Don't take damage from my own bombs. (Unless the player grabbed them and threw them back)
 		return 0;
@@ -4954,35 +4954,35 @@ void CBombDropSensor::InputDropBomb( inputdata_t &inputdata )
 {
 	inputdata_t myVersion = inputdata;
 	myVersion.pActivator = this;
-	assert_cast<CNPC_AttackHelicopter*>(GetOwnerEntity())->InputDropBomb( myVersion );
+	assert_cast<CNPC_AttackHelicopter*>(GetEngineObject()->GetOwnerEntity())->InputDropBomb( myVersion );
 }
 
 void CBombDropSensor::InputDropBombStraightDown( inputdata_t &inputdata )
 {
 	inputdata_t myVersion = inputdata;
 	myVersion.pActivator = this;
-	assert_cast<CNPC_AttackHelicopter*>(GetOwnerEntity())->InputDropBombStraightDown( myVersion );
+	assert_cast<CNPC_AttackHelicopter*>(GetEngineObject()->GetOwnerEntity())->InputDropBombStraightDown( myVersion );
 }
 
 void CBombDropSensor::InputDropBombAtTarget( inputdata_t &inputdata )
 {
 	inputdata_t myVersion = inputdata;
 	myVersion.pActivator = this;
-	assert_cast<CNPC_AttackHelicopter*>(GetOwnerEntity())->InputDropBombAtTarget( myVersion );
+	assert_cast<CNPC_AttackHelicopter*>(GetEngineObject()->GetOwnerEntity())->InputDropBombAtTarget( myVersion );
 }
 
 void CBombDropSensor::InputDropBombAtTargetAlways( inputdata_t &inputdata )
 {
 	inputdata_t myVersion = inputdata;
 	myVersion.pActivator = this;
-	assert_cast<CNPC_AttackHelicopter*>(GetOwnerEntity())->InputDropBombAtTargetAlways( myVersion );
+	assert_cast<CNPC_AttackHelicopter*>(GetEngineObject()->GetOwnerEntity())->InputDropBombAtTargetAlways( myVersion );
 }
 
 void CBombDropSensor::InputDropBombDelay( inputdata_t &inputdata )
 {
 	inputdata_t myVersion = inputdata;
 	myVersion.pActivator = this;
-	assert_cast<CNPC_AttackHelicopter*>(GetOwnerEntity())->InputDropBombDelay( myVersion );
+	assert_cast<CNPC_AttackHelicopter*>(GetEngineObject()->GetOwnerEntity())->InputDropBombDelay( myVersion );
 }
 
 //------------------------------------------------------------------------------
@@ -5435,7 +5435,7 @@ int CGrenadeHelicopter::OnTakeDamage( const CTakeDamageInfo &info )
 //------------------------------------------------------------------------------
 void CGrenadeHelicopter::DoExplosion( const Vector &vecOrigin, const Vector &vecVelocity )
 {
-	ExplosionCreate(GetEngineObject()->GetAbsOrigin(), GetEngineObject()->GetAbsAngles(), GetOwnerEntity() ? GetOwnerEntity() : this, sk_helicopter_grenadedamage.GetFloat(),
+	ExplosionCreate(GetEngineObject()->GetAbsOrigin(), GetEngineObject()->GetAbsAngles(), GetEngineObject()->GetOwnerEntity() ? GetEngineObject()->GetOwnerEntity() : this, sk_helicopter_grenadedamage.GetFloat(),
 		sk_helicopter_grenaderadius.GetFloat(), (SF_ENVEXPLOSION_NOSPARKS|SF_ENVEXPLOSION_NODLIGHTS|SF_ENVEXPLOSION_NODECAL|SF_ENVEXPLOSION_NOFIREBALL|SF_ENVEXPLOSION_NOPARTICLES), 
 		sk_helicopter_grenadeforce.GetFloat(), this );
 
@@ -5535,9 +5535,9 @@ void CGrenadeHelicopter::ExplodeConcussion( IServerEntity *pOther )
 
 #ifdef HL2_EPISODIC
 	IServerEntity *pEntityHit = pOther;
-	if ( pEntityHit->ClassMatches( "phys_bone_follower" ) && pEntityHit->GetOwnerEntity() )
+	if ( pEntityHit->ClassMatches( "phys_bone_follower" ) && pEntityHit->GetEngineObject()->GetOwnerEntity() )
 	{
-		pEntityHit = pEntityHit->GetOwnerEntity();
+		pEntityHit = pEntityHit->GetEngineObject()->GetOwnerEntity();
 	}
 	if ( ( CLASS_COMBINE_GUNSHIP != ((CBaseEntity*)pEntityHit)->Classify() ) || !pEntityHit->ClassMatches( "npc_helicopter" ) )
 	{
@@ -5596,7 +5596,7 @@ void CGrenadeHelicopter::OnPhysGunPickup(CBasePlayer *pPhysGunUser, PhysGunPicku
 #endif//HL2_EPISODIC
 			
 			// Stop us from sparing damage to the helicopter that dropped us
-			SetOwnerEntity( pPhysGunUser );
+			GetEngineObject()->SetOwnerEntity( pPhysGunUser );
 			PhysEnableEntityCollisions( this, m_hCollisionObject );
 
 			// Don't do this again!
@@ -5635,7 +5635,7 @@ void CGrenadeHelicopter::OnPhysGunDrop( CBasePlayer *pPhysGunUser, PhysGunDrop_t
 bool CGrenadeHelicopter::IsThrownByPlayer()
 {
 	// if player is the owner and we're set to explode on contact, then the player threw this grenade.
-	return ( ( GetOwnerEntity() == EntityList()->GetLocalPlayer() ) && m_bExplodeOnContact );
+	return ( (GetEngineObject()->GetOwnerEntity() == EntityList()->GetLocalPlayer() ) && m_bExplodeOnContact );
 }
 
 //-----------------------------------------------------------------------------
@@ -5686,7 +5686,7 @@ CBaseEntity *CreateHelicopterAvoidanceSphere( CBaseEntity *pParent, int nAttachm
 	pSphere->GetEngineObject()->SetParent( pParent?pParent->GetEngineObject():NULL, nAttachment);
 	pSphere->GetEngineObject()->SetLocalOrigin( vec3_origin );
 	pSphere->GetEngineObject()->SetLocalAngles( vec3_angle );
-	pSphere->SetOwnerEntity( pParent );
+	pSphere->GetEngineObject()->SetOwnerEntity( pParent );
 	return pSphere;
 }
 

@@ -254,7 +254,7 @@ void CNPCMaker::MakeNPC( void )
 
 
 	EntityList()->DispatchSpawn( pent );
-	pent->SetOwnerEntity( this );
+	pent->GetEngineObject()->SetOwnerEntity( this );
 
 	m_cLiveChildren++;// count this NPC
 
@@ -287,7 +287,7 @@ void CNPCMaker::MakerThink ( void )
 // Purpose: 
 // Input  : *pVictim - 
 //-----------------------------------------------------------------------------
-void CNPCMaker::DeathNotice( CBaseEntity *pVictim )
+void CNPCMaker::DeathNotice( IServerEntity *pVictim )
 {
 	// ok, we've gotten the deathnotice from our child, now clear out its owner if we don't want it to fade.
 	m_cLiveChildren--;

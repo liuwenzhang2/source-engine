@@ -439,7 +439,7 @@ C_EntityDissolve* DissolveEffect(C_BaseEntity* pTarget, float flTime)
 
 		// Let this entity know it needs to delete itself when it's done
 		pDissolve->SetServerLinkState(false);
-		pTarget->SetEffectEntity(pDissolve);
+		pTarget->GetEngineObject()->SetEffectEntity(pDissolve);
 	}
 
 	return pDissolve;
@@ -515,11 +515,11 @@ void C_ClientRagdoll::OnRestore(void)
 	}
 	else if (GetEngineObject()->GetFlags() & FL_ONFIRE)
 	{
-		C_EntityFlame* pFireChild = dynamic_cast<C_EntityFlame*>(GetEffectEntity());
+		C_EntityFlame* pFireChild = dynamic_cast<C_EntityFlame*>(GetEngineObject()->GetEffectEntity());
 		C_EntityFlame* pNewFireChild = FireEffect(this, pFireChild, m_flScaleEnd, m_flScaleTimeStart, m_flScaleTimeEnd);
 
 		//Set the new fire child as the new effect entity.
-		SetEffectEntity(pNewFireChild);
+		GetEngineObject()->SetEffectEntity(pNewFireChild);
 	}
 
 	SetNextClientThink(CLIENT_THINK_ALWAYS);
@@ -709,7 +709,7 @@ void C_ClientRagdoll::SUB_Remove(void)
 
 void C_ClientRagdoll::IgniteRagdoll(C_BaseEntity* pSource)
 {
-	C_BaseEntity* pChild = pSource->GetEffectEntity();
+	IClientEntity* pChild = pSource->GetEngineObject()->GetEffectEntity();
 
 	if (pChild)
 	{
@@ -718,14 +718,14 @@ void C_ClientRagdoll::IgniteRagdoll(C_BaseEntity* pSource)
 
 		if (pFireChild)
 		{
-			pRagdoll->SetEffectEntity(FireEffect(pRagdoll, pFireChild, NULL, NULL, NULL));
+			pRagdoll->GetEngineObject()->SetEffectEntity(FireEffect(pRagdoll, pFireChild, NULL, NULL, NULL));
 		}
 	}
 }
 
 void C_ClientRagdoll::TransferDissolveFrom(C_BaseEntity* pSource)
 {
-	C_BaseEntity* pChild = pSource->GetEffectEntity();
+	IClientEntity* pChild = pSource->GetEngineObject()->GetEffectEntity();
 
 	if (pChild)
 	{

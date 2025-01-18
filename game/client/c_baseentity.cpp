@@ -105,8 +105,6 @@ BEGIN_RECV_TABLE_NOBASE(C_BaseEntity, DT_BaseEntity)
 
 	RecvPropInt(RECVINFO(m_iTeamNum)),
 	RecvPropFloat(RECVINFO(m_flShadowCastDistance)),
-	RecvPropEHandle( RECVINFO(m_hOwnerEntity) ),
-	RecvPropEHandle( RECVINFO(m_hEffectEntity) ),
 
 
 	//RecvPropDataTable( RECVINFO_DT( m_Collision ), 0, &REFERENCE_RECV_TABLE(DT_CollisionProperty) ),
@@ -149,7 +147,7 @@ BEGIN_PREDICTION_DATA_NO_BASE( C_BaseEntity )
 //	DEFINE_PRED_FIELD( m_nModelIndex, FIELD_SHORT, FTYPEDESC_INSENDTABLE | FTYPEDESC_MODELINDEX ),
 	//DEFINE_PRED_FIELD( m_flFriction, FIELD_FLOAT, FTYPEDESC_INSENDTABLE ),
 	DEFINE_PRED_FIELD( m_iTeamNum, FIELD_INTEGER, FTYPEDESC_INSENDTABLE ),
-	DEFINE_PRED_FIELD( m_hOwnerEntity, FIELD_EHANDLE, FTYPEDESC_INSENDTABLE ),
+	//DEFINE_PRED_FIELD( m_hOwnerEntity, FIELD_EHANDLE, FTYPEDESC_INSENDTABLE ),
 
 //	DEFINE_FIELD( m_nSimulationTick, FIELD_INTEGER ),
 
@@ -2852,14 +2850,7 @@ CON_COMMAND_F( dlight_debug, "Creates a dlight in front of the player", FCVAR_CH
 //	return true;
 //}
 
-//-----------------------------------------------------------------------------
-// Purpose: 
-// Input  : *pOwner - 
-//-----------------------------------------------------------------------------
-void C_BaseEntity::SetOwnerEntity( C_BaseEntity *pOwner )
-{
-	m_hOwnerEntity = pOwner;
-}
+
 
 //-----------------------------------------------------------------------------
 // Purpose: Put the entity in the specified team
@@ -3457,7 +3448,7 @@ void C_BaseEntity::GetToolRecordingState( KeyValues *msg )
 
 	VPROF_BUDGET( "C_BaseEntity::GetToolRecordingState", VPROF_BUDGETGROUP_TOOLS );
 
-	C_BaseEntity *pOwner = m_hOwnerEntity;
+	IClientEntity *pOwner = GetEngineObject()->GetOwnerEntity();
 
 	static BaseEntityRecordingState_t state;
 	state.m_flTime = gpGlobals->curtime;
@@ -3477,7 +3468,7 @@ void C_BaseEntity::GetToolRecordingState( KeyValues *msg )
 	IEngineObjectClient *pParent = GetEngineObject()->GetMoveParent();
 	while ( pParent )
 	{
-		if ( pParent->GetOuter()->GetEngineObject()->IsNoInterpolationFrame() )
+		if ( pParent->IsNoInterpolationFrame() )
 		{
 			state.m_nEffects |= EF_NOINTERP;
 			break;
@@ -3668,7 +3659,7 @@ bool C_BoneFollower::TestCollision(const Ray_t& ray, unsigned int mask, trace_t&
 		return false;
 
 	// return owner as trace hit
-	trace.m_pEnt = GetOwnerEntity();
+	trace.m_pEnt = GetEngineObject()->GetOwnerEntity();
 	trace.hitgroup = 0;//m_hitGroup;
 	trace.physicsbone = 0;//m_physicsBone; // UNDONE: Get physics bone index & hitgroup
 	return trace.DidHit();

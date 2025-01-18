@@ -36,7 +36,7 @@ public:
 	void MakerThink( void );
 	bool CanMakeNPC( void );
 
-	void DeathNotice( CBaseEntity *pChild );// NPC maker children use this to tell the NPC maker that they have died.
+	void DeathNotice( IServerEntity *pChild );// NPC maker children use this to tell the NPC maker that they have died.
 	void MakeNPC( void );
 
 	// Input handlers

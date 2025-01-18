@@ -586,9 +586,9 @@ void CWateryDeathLeech::LeechThink( void )
 	}
 
 
-	if ( GetOwnerEntity() )
+	if (GetEngineObject()->GetOwnerEntity() )
 	{
-		if ( GetOwnerEntity()->GetWaterLevel() < 3 )
+		if (GetEngineObject()->GetOwnerEntity()->GetWaterLevel() < 3 )
 		{
 			GetEngineObject()->AddEffects( EF_NODRAW );
 		}
@@ -597,7 +597,7 @@ void CWateryDeathLeech::LeechThink( void )
 			GetEngineObject()->RemoveEffects( EF_NODRAW );
 		}
 
-		GetEngineObject()->SetAbsOrigin( GetOwnerEntity()->GetEngineObject()->GetAbsOrigin() + GetOwnerEntity()->GetViewOffset() );
+		GetEngineObject()->SetAbsOrigin(GetEngineObject()->GetOwnerEntity()->GetEngineObject()->GetAbsOrigin() + GetEngineObject()->GetOwnerEntity()->GetViewOffset() );
 	}
 }
 
@@ -692,7 +692,7 @@ void CTriggerWateryDeath::SpawnLeeches( CBaseEntity *pOther )
 
 			pLeech->Spawn();
 			pLeech->GetEngineObject()->SetAbsOrigin( pOther->GetEngineObject()->GetAbsOrigin() );
-			pLeech->SetOwnerEntity( pOther );
+			pLeech->GetEngineObject()->SetOwnerEntity( pOther );
 
 			if ( i <= 8 )
 				 pLeech->GetEngineObject()->SetSequence( i % 4 );

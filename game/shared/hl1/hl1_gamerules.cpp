@@ -193,11 +193,11 @@ int	CHalfLife1World::Damage_GetShowOnHud( void )
 		{
 			CCorpse *next = ( CCorpse * )EntityList()->CreateEntityByName( "bodyque" );
 			next->GetEngineObject()->AddEFlags( EFL_KEEP_ON_RECREATE_ENTITIES );
-			p->SetOwnerEntity( next );
+			p->GetEngineObject()->SetOwnerEntity( next );
 			p = next;
 		}
 		
-		p->SetOwnerEntity( g_pBodyQueueHead );
+		p->GetEngineObject()->SetOwnerEntity( g_pBodyQueueHead );
 	}
 
 	//-----------------------------------------------------------------------------
@@ -222,7 +222,7 @@ int	CHalfLife1World::Damage_GetShowOnHud( void )
 		UTIL_SetOrigin(pHead, pCorpse->GetEngineObject()->GetAbsOrigin());
 
 		pHead->GetEngineObject()->SetSize(pCorpse->GetEngineObject()->WorldAlignMins(), pCorpse->GetEngineObject()->WorldAlignMaxs());
-		g_pBodyQueueHead = (CCorpse *)pHead->GetOwnerEntity();
+		g_pBodyQueueHead = (CCorpse *)pHead->GetEngineObject()->GetOwnerEntity();
 	}
 
 	//------------------------------------------------------------------------------

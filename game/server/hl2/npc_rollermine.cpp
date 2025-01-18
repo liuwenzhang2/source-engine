@@ -455,7 +455,7 @@ CBaseEntity *NPC_Rollermine_DropFromPoint( const Vector &originStart, CBaseEntit
 	if ( pMine )
 	{
 		pMine->GetEngineObject()->SetAbsOrigin( originStart );
-		pMine->SetOwnerEntity( pOwner );
+		pMine->GetEngineObject()->SetOwnerEntity( pOwner );
 		pMine->Spawn();
 
 		if ( !pszTemplate || !pszTemplate[0] )

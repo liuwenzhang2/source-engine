@@ -299,7 +299,7 @@ int CCollisionEvent::ShouldCollide_2(IPhysicsObject* pObj0, IPhysicsObject* pObj
 	if (pEntity0->entindex() != -1 && pEntity1->entindex() != -1)
 	{
 		// don't collide with your owner
-		if (pEntity0->GetOwnerEntity() == pEntity1 || pEntity1->GetOwnerEntity() == pEntity0)
+		if (pEntity0->GetEngineObject()->GetOwnerEntity() == pEntity1 || pEntity1->GetEngineObject()->GetOwnerEntity() == pEntity0)
 			return 0;
 	}
 
@@ -3619,6 +3619,8 @@ BEGIN_DATADESC_NO_BASE(CEngineObjectInternal)
 	DEFINE_EMBEDDED(m_grabController),
 	// Physptrs can't be inside embedded classes
 	DEFINE_PHYSPTR(m_grabController.m_controller),
+	DEFINE_FIELD(m_hOwnerEntity, FIELD_EHANDLE),
+	DEFINE_FIELD(m_hEffectEntity, FIELD_EHANDLE),
 END_DATADESC()
 
 void SendProxy_Origin(const SendProp* pProp, const void* pStruct, const void* pData, DVariant* pOut, int iElement, int objectID)
@@ -3875,7 +3877,8 @@ BEGIN_SEND_TABLE_NOBASE(CEngineObjectInternal, DT_EngineObject)
 	SendPropInt(SENDINFO(m_nOverlaySequence), 11),
 	SendPropBool(SENDINFO(m_bAlternateSorting)),
 	SendPropInt(SENDINFO(m_ubInterpolationFrame), NOINTERP_PARITY_MAX_BITS, SPROP_UNSIGNED),
-
+	SendPropEHandle(SENDINFO(m_hOwnerEntity)),
+	SendPropEHandle(SENDINFO(m_hEffectEntity)),
 END_SEND_TABLE()
 
 IMPLEMENT_SERVERCLASS(CEngineObjectInternal, DT_EngineObject)
@@ -5257,26 +5260,26 @@ CEngineObjectInternal* CEngineObjectInternal::GetMoveParent(void) const
 }
 
 void CEngineObjectInternal::SetMoveParent(IEngineObjectServer* hMoveParent) {
-	m_hMoveParent = hMoveParent? hMoveParent->GetOuter():NULL;
+	m_hMoveParent = hMoveParent ? hMoveParent->GetOuter() : NULL;
 	//this->NetworkStateChanged();
 }
 
 CEngineObjectInternal* CEngineObjectInternal::FirstMoveChild(void) const
 {
-	return gEntList.GetBaseEntityFromHandle(m_hMoveChild) ? (CEngineObjectInternal*)gEntList.GetBaseEntityFromHandle(m_hMoveChild)->GetEngineObject() : NULL;
+	return (CEngineObjectInternal*)gEntList.GetEngineObjectFromHandle(m_hMoveChild);
 }
 
 void CEngineObjectInternal::SetFirstMoveChild(IEngineObjectServer* hMoveChild) {
-	m_hMoveChild = hMoveChild? hMoveChild->GetOuter():NULL;
+	m_hMoveChild = hMoveChild ? hMoveChild->GetOuter() : NULL;
 }
 
 CEngineObjectInternal* CEngineObjectInternal::NextMovePeer(void) const
 {
-	return gEntList.GetBaseEntityFromHandle(m_hMovePeer) ? (CEngineObjectInternal*)gEntList.GetBaseEntityFromHandle(m_hMovePeer)->GetEngineObject() : NULL;
+	return (CEngineObjectInternal*)gEntList.GetEngineObjectFromHandle(m_hMovePeer);
 }
 
 void CEngineObjectInternal::SetNextMovePeer(IEngineObjectServer* hMovePeer) {
-	m_hMovePeer = hMovePeer? hMovePeer->GetOuter():NULL;
+	m_hMovePeer = hMovePeer ? hMovePeer->GetOuter() : NULL;
 }
 
 CEngineObjectInternal* CEngineObjectInternal::GetRootMoveParent()
@@ -10041,10 +10044,34 @@ bool CEngineObjectInternal::EntityHasMatchingRootParent(IEngineObjectServer* pRo
 		// NOTE: Don't let siblings/parents collide.
 		if (pRootParent == this->GetRootMoveParent())
 			return true;
-		if (this->m_pOuter->GetOwnerEntity() && pRootParent == this->m_pOuter->GetOwnerEntity()->GetEngineObject()->GetRootMoveParent())
+		if (this->GetOwnerEntity() && pRootParent == this->GetOwnerEntity()->GetEngineObject()->GetRootMoveParent())
 			return true;
 	}
 	return false;
+}
+
+void CEngineObjectInternal::SetOwnerEntity(IServerEntity* pOwner)
+{
+	if (m_pOuter->IsNodeEnt()) {
+		m_hOwnerEntity = NULL;
+	}
+	else 
+	{
+		if (m_hOwnerEntity.Get() != pOwner)
+		{
+			m_hOwnerEntity = pOwner;
+
+			CollisionRulesChanged();
+		}
+	}
+}
+
+void CEngineObjectInternal::SetEffectEntity(IServerEntity* pEffectEnt)
+{
+	if (m_hEffectEntity.Get() != pEffectEnt)
+	{
+		m_hEffectEntity = pEffectEnt;
+	}
 }
 
 CEngineWorldInternal::CEngineWorldInternal(IServerEntityList* pServerEntityList, int iForceEdictIndex, int iSerialNum)

@@ -331,7 +331,7 @@ void CNPC_AlienGrunt::HandleAnimEvent( animevent_t *pEvent )
 			AngleVectors( angDir, &vForward );
 	
 			pHornet->GetEngineObject()->SetAbsVelocity( vForward * 300 );
-			pHornet->SetOwnerEntity( this );
+			pHornet->GetEngineObject()->SetOwnerEntity( this );
 			
 			const char* soundname = "Weapon_Hornetgun.Single";
 			CPASAttenuationFilter filter(this, soundname);

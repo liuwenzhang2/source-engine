@@ -500,7 +500,7 @@ void CNPC_Dog::PrescheduleThink( void )
 
 		if ( pPhysObj && pPhysObj->GetGameFlags() & FVPHYSICS_PLAYER_HELD )
 		{
-			m_hPhysicsEnt->SetOwnerEntity( NULL );
+			m_hPhysicsEnt->GetEngineObject()->SetOwnerEntity( NULL );
 		}
 	}
 
@@ -591,7 +591,7 @@ void CNPC_Dog::PullObject( bool bMantain )
 	{
 		if ( flDistance <= DOG_CATCH_DISTANCE )
 		{
-			m_hPhysicsEnt->SetOwnerEntity( this );
+			m_hPhysicsEnt->GetEngineObject()->SetOwnerEntity( this );
 
 			GetNavigator()->StopMoving();
 
@@ -658,7 +658,7 @@ void CNPC_Dog::CleanCatchAndThrow( bool bClearTimers )
 			IPhysicsObject *pPhysObj = m_hPhysicsEnt->GetEngineObject()->VPhysicsGetObject();
 
 			m_hPhysicsEnt->GetEngineObject()->SetParent( NULL );
-			m_hPhysicsEnt->SetOwnerEntity( NULL );
+			m_hPhysicsEnt->GetEngineObject()->SetOwnerEntity( NULL );
 
 			Vector vGunPos;
 			QAngle angGunAngles;
@@ -822,7 +822,7 @@ void CNPC_Dog::ThrowObject( const char *pAttachmentName )
 			{
 				m_hPhysicsEnt->GetEngineObject()->SetParent( NULL );
 				m_hPhysicsEnt->GetEngineObject()->SetMoveType( (MoveType_t)m_iContainerMoveType );
-				m_hPhysicsEnt->SetOwnerEntity( this );
+				m_hPhysicsEnt->GetEngineObject()->SetOwnerEntity( this );
 
 				pPhysObj->RemoveShadowController();
 				pPhysObj->SetPosition( m_hPhysicsEnt->GetEngineObject()->GetLocalOrigin(), m_hPhysicsEnt->GetEngineObject()->GetLocalAngles(), true );
@@ -953,8 +953,8 @@ void CNPC_Dog::PickupOrCatchObject( const char *pAttachmentName )
 		m_hPhysicsEnt->GetEngineObject()->SetGroundEntity( NULL );
 		
 
-		if ( m_hPhysicsEnt->GetOwnerEntity() == NULL )
-			 m_hPhysicsEnt->SetOwnerEntity( this );
+		if ( m_hPhysicsEnt->GetEngineObject()->GetOwnerEntity() == NULL )
+			 m_hPhysicsEnt->GetEngineObject()->SetOwnerEntity( this );
 
 		if ( pPhysicsObject )
 			 pPhysicsObject->RecheckCollisionFilter();
@@ -1235,8 +1235,8 @@ void CNPC_Dog::RunTask( const Task_t *pTask )
 			VectorNormalize(vecDir);
 			vecDir.z = 0;
 		
-			if ( m_hPhysicsEnt->GetOwnerEntity() == NULL )
-				 m_hPhysicsEnt->SetOwnerEntity( this );
+			if ( m_hPhysicsEnt->GetEngineObject()->GetOwnerEntity() == NULL )
+				 m_hPhysicsEnt->GetEngineObject()->SetOwnerEntity( this );
 		
 			if ( pPhysicsObject )
 				 pPhysicsObject->RecheckCollisionFilter();
@@ -1295,7 +1295,7 @@ void CNPC_Dog::RunTask( const Task_t *pTask )
 		{
 			if ( m_hPhysicsEnt )
 			{
-				m_hPhysicsEnt->SetOwnerEntity( NULL );
+				m_hPhysicsEnt->GetEngineObject()->SetOwnerEntity( NULL );
 			}
 
 			TaskComplete();
@@ -1375,11 +1375,11 @@ void CNPC_Dog::RunTask( const Task_t *pTask )
 					m_flTimeToCatch = 0.0f;
 					ClearBeams();
 					TaskFail( "Lost sight of the object!" );
-					m_hPhysicsEnt->SetOwnerEntity( NULL );
+					m_hPhysicsEnt->GetEngineObject()->SetOwnerEntity( NULL );
 					return;
 				}
 
-				m_hPhysicsEnt->SetOwnerEntity( this );
+				m_hPhysicsEnt->GetEngineObject()->SetOwnerEntity( this );
 
 				Vector vForward;
 				AngleVectors(GetEngineObject()->GetAbsAngles(), &vForward );
@@ -1482,7 +1482,7 @@ void CNPC_Dog::RunTask( const Task_t *pTask )
 
 				if ( m_flTimeToCatch < gpGlobals->curtime && m_bDoWaitforObjectBehavior == false ) 
 				{
-					m_hPhysicsEnt->SetOwnerEntity( NULL );
+					m_hPhysicsEnt->GetEngineObject()->SetOwnerEntity( NULL );
 					m_flTimeToCatch = 0.0f;
 					ClearBeams();
 					TaskFail( "Done waiting!" );
@@ -1567,8 +1567,8 @@ void CNPC_Dog::StartTask( const Task_t *pTask )
 			VectorNormalize(vecDir);
 			vecDir.z = 0;
 		
-			if ( m_hPhysicsEnt->GetOwnerEntity() == NULL )
-				 m_hPhysicsEnt->SetOwnerEntity( this );
+			if ( m_hPhysicsEnt->GetEngineObject()->GetOwnerEntity() == NULL )
+				 m_hPhysicsEnt->GetEngineObject()->SetOwnerEntity( this );
 		
 			if ( pPhysicsObject )
 				 pPhysicsObject->RecheckCollisionFilter();

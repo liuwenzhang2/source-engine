@@ -189,7 +189,7 @@ void CNPC_Alyx::CreateEmpTool( void )
 		m_hEmpTool->GetEngineObject()->SetName( "Alyx_Emptool" );
 		int iAttachment = GetEngineObject()->LookupAttachment( "Emp_Holster" );
 		m_hEmpTool->GetEngineObject()->SetParent(this->GetEngineObject(), iAttachment);
-		m_hEmpTool->SetOwnerEntity(this);
+		m_hEmpTool->GetEngineObject()->SetOwnerEntity(this);
 		m_hEmpTool->GetEngineObject()->SetSolid( SOLID_NONE );
 		m_hEmpTool->GetEngineObject()->SetLocalOrigin( Vector( 0, 0, 0 ) );
 		m_hEmpTool->GetEngineObject()->SetLocalAngles( QAngle( 0, 0, 0 ) );

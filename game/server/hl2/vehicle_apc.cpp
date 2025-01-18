@@ -365,7 +365,7 @@ void CPropAPC::ExplodeAndThrowChunk( const Vector &vecExplosionPos )
 
 	int nGib = random->RandomInt( 0, APC_MAX_CHUNKS - 1 );
 	pChunk->Spawn( s_pChunkModelName[nGib] );
-	pChunk->SetOwnerEntity( this );
+	pChunk->GetEngineObject()->SetOwnerEntity( this );
 	pChunk->m_lifeTime = random->RandomFloat( 6.0f, 8.0f );
 	pChunk->GetEngineObject()->SetCollisionGroup( COLLISION_GROUP_DEBRIS );
 	IPhysicsObject *pPhysicsObject = pChunk->GetEngineObject()->VPhysicsInitNormal( SOLID_VPHYSICS, pChunk->GetEngineObject()->GetSolidFlags(), false );
@@ -453,7 +453,7 @@ void CPropAPC::Event_Killed( const CTakeDamageInfo &info )
 
 		int nGib = random->RandomInt( 0, APC_MAX_CHUNKS - 1 );
 		pChunk->Spawn( s_pChunkModelName[nGib] );
-		pChunk->SetOwnerEntity( this );
+		pChunk->GetEngineObject()->SetOwnerEntity( this );
 		pChunk->m_lifeTime = random->RandomFloat( 6.0f, 8.0f );
 		pChunk->GetEngineObject()->SetCollisionGroup( COLLISION_GROUP_DEBRIS );
 		IPhysicsObject *pPhysicsObject = pChunk->GetEngineObject()->VPhysicsInitNormal( SOLID_VPHYSICS, pChunk->GetEngineObject()->GetSolidFlags(), false );

@@ -664,7 +664,7 @@ char const *CClientTools::GetGlobalFlexControllerName( int idx )
 EntitySearchResult CClientTools::GetOwnerEntity( EntitySearchResult currentEnt )
 {
 	C_BaseEntity *ent = reinterpret_cast< C_BaseEntity* >( currentEnt );
-	return ent ? ent->GetOwnerEntity() : NULL;
+	return ent ? ent->GetEngineObject()->GetOwnerEntity() : NULL;
 }
 //-----------------------------------------------------------------------------
 // common and useful types to query for hierarchically

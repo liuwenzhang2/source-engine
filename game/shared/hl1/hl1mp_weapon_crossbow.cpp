@@ -92,7 +92,7 @@ CCrossbowBolt *CCrossbowBolt::BoltCreate( const Vector &vecOrigin, const QAngle 
 	UTIL_SetOrigin( pBolt, vecOrigin );
 	pBolt->GetEngineObject()->SetAbsAngles( angAngles );
 	pBolt->Spawn();
-	pBolt->SetOwnerEntity( pentOwner );
+	pBolt->GetEngineObject()->SetOwnerEntity( pentOwner );
 
 	return pBolt;
 }
@@ -148,13 +148,13 @@ void CCrossbowBolt::BoltTouch( IServerEntity *pOther )
             if ( g_pGameRules->IsMultiplayer() && !m_bExplode )
                 m_fDamage *= 4;
             
-			CTakeDamageInfo	dmgInfo( this, GetOwnerEntity(), m_fDamage,DMG_NEVERGIB );
+			CTakeDamageInfo	dmgInfo( this, GetEngineObject()->GetOwnerEntity(), m_fDamage,DMG_NEVERGIB );
 			CalculateMeleeDamageForce( &dmgInfo, vecNormalizedVel, tr.endpos );
 			pOther->DispatchTraceAttack( dmgInfo, vecNormalizedVel, &tr );
 		}
 		else
 		{
-			CTakeDamageInfo	dmgInfo( this, GetOwnerEntity(), sk_plr_dmg_xbow_bolt_npc.GetFloat() * g_pGameRules->GetDamageMultiplier(), DMG_BULLET | DMG_NEVERGIB );
+			CTakeDamageInfo	dmgInfo( this, GetEngineObject()->GetOwnerEntity(), sk_plr_dmg_xbow_bolt_npc.GetFloat() * g_pGameRules->GetDamageMultiplier(), DMG_BULLET | DMG_NEVERGIB );
 			CalculateMeleeDamageForce( &dmgInfo, vecNormalizedVel, tr.endpos );
 			pOther->DispatchTraceAttack( dmgInfo, vecNormalizedVel, &tr );
 		}
@@ -247,7 +247,7 @@ void CCrossbowBolt::BoltTouch( IServerEntity *pOther )
 void CCrossbowBolt::ExplodeThink( void )
 {
     //    int iContents = UTIL_PointContents( pev->origin );
-    CTakeDamageInfo	dmgInfo( this, GetOwnerEntity(), sk_plr_dmg_xbow_bolt_npc.GetFloat() * g_pGameRules->GetDamageMultiplier(), DMG_BLAST );
+    CTakeDamageInfo	dmgInfo( this, GetEngineObject()->GetOwnerEntity(), sk_plr_dmg_xbow_bolt_npc.GetFloat() * g_pGameRules->GetDamageMultiplier(), DMG_BLAST );
 
     ::RadiusDamage( dmgInfo, GetEngineObject()->GetAbsOrigin(), 128, CLASS_NONE, NULL );
 

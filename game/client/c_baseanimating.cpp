@@ -169,7 +169,7 @@ bool C_BaseAnimating::Init(int entnum, int iSerialNum) {
 
 void C_BaseAnimating::UpdateOnRemove(void)
 {
-	C_BaseEntity* pChild = GetEffectEntity();
+	IClientEntity* pChild = GetEngineObject()->GetEffectEntity();
 
 	if (pChild && pChild->GetEngineObject()->IsMarkedForDeletion() == false)
 	{

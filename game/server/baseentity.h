@@ -384,12 +384,6 @@ public:
 
 	// virtual methods; you can override these
 public:
-	// Owner entity.
-	// FIXME: These are virtual only because of CNodeEnt
-	CBaseEntity				*GetOwnerEntity() const;
-	virtual void			SetOwnerEntity( IServerEntity* pOwner );
-	void					SetEffectEntity( CBaseEntity *pEffectEnt );
-	CBaseEntity				*GetEffectEntity() const;
 
 	// Only CBaseEntity implements these. CheckTransmit calls the virtual ShouldTransmit to see if the
 	// entity wants to be sent. If so, it calls SetTransmit, which will mark any dependents for transmission too.
@@ -791,7 +785,7 @@ public:
 // Classify - returns the type of group (i.e, "houndeye", or "human military" so that NPCs with different classnames
 // still realize that they are teammates. (overridden for NPCs that form groups)
 	virtual Class_T Classify ( void );
-	virtual void	DeathNotice ( CBaseEntity *pVictim ) {}// NPC maker children use this to tell the NPC maker that they have died.
+	virtual void	DeathNotice ( IServerEntity *pVictim ) {}// NPC maker children use this to tell the NPC maker that they have died.
 	virtual bool	ShouldAttractAutoAim( CBaseEntity *pAimingEnt ) { return ((GetEngineObject()->GetFlags() & FL_AIMTARGET) != 0); }
 	virtual float	GetAutoAimRadius();
 	virtual Vector	GetAutoAimCenter() { return WorldSpaceCenter(); }
@@ -1125,8 +1119,8 @@ public:
 	// virtual functions used by a few classes
 	
 	// creates an entity of a specified class, by name
-	static CBaseEntity *Create( const char *szName, const Vector &vecOrigin, const QAngle &vecAngles, CBaseEntity *pOwner = NULL );
-	static CBaseEntity *CreateNoSpawn( const char *szName, const Vector &vecOrigin, const QAngle &vecAngles, CBaseEntity *pOwner = NULL );
+	static CBaseEntity *Create( const char *szName, const Vector &vecOrigin, const QAngle &vecAngles, IServerEntity *pOwner = NULL );
+	static CBaseEntity *CreateNoSpawn( const char *szName, const Vector &vecOrigin, const QAngle &vecAngles, IServerEntity *pOwner = NULL );
 
 	// Damage accessors
 	virtual int		GetDamageType() const;
@@ -1214,7 +1208,7 @@ public:
 
 
 	
-	
+	virtual bool IsNodeEnt() { return false; }
 
 
 
@@ -1536,8 +1530,6 @@ private:
 
 	friend class CServerNetworkProperty;
 
-	CNetworkHandle( CBaseEntity, m_hOwnerEntity );	// only used to point to an edict it won't collide with
-	CNetworkHandle( CBaseEntity, m_hEffectEntity );	// Fire/Dissolve entity.
 
 
 	CNetworkVar( float, m_flShadowCastDistance );

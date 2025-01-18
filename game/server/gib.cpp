@@ -283,7 +283,7 @@ void CGib::SpawnSpecificGibs(	CBaseEntity*	pVictim,
 		
 		if ( pVictim != NULL )
 		{
-			pGib->SetOwnerEntity( pVictim );
+			pGib->GetEngineObject()->SetOwnerEntity( pVictim );
 		}
 	}
 }

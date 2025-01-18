@@ -1151,7 +1151,7 @@ CXenTreeTrigger *CXenTreeTrigger::TriggerCreate( CBaseEntity *pOwner, const Vect
 	pTrigger->GetEngineObject()->SetSolid( SOLID_BBOX );
 	pTrigger->GetEngineObject()->AddSolidFlags( FSOLID_TRIGGER | FSOLID_NOT_SOLID );
 	pTrigger->GetEngineObject()->SetMoveType( MOVETYPE_NONE );
-	pTrigger->SetOwnerEntity( pOwner );
+	pTrigger->GetEngineObject()->SetOwnerEntity( pOwner );
 
 	return pTrigger;
 }
@@ -1159,9 +1159,9 @@ CXenTreeTrigger *CXenTreeTrigger::TriggerCreate( CBaseEntity *pOwner, const Vect
 
 void CXenTreeTrigger::Touch( IServerEntity *pOther )
 {
-	if ( GetOwnerEntity() )
+	if (GetEngineObject()->GetOwnerEntity() )
 	{
-		GetOwnerEntity()->Touch( pOther );
+		GetEngineObject()->GetOwnerEntity()->Touch( pOther );
 	}
 }
 
@@ -1267,7 +1267,7 @@ void CXenTree::HandleAnimEvent( animevent_t *pEvent )
 			{
 				if ( pList[i] != this )
 				{
-					if ( pList[i]->GetOwnerEntity() != this )
+					if ( pList[i]->GetEngineObject()->GetOwnerEntity() != this )
 					{
 						sound = true;
 						pList[i]->TakeDamage( CTakeDamageInfo(this, this, 25, DMG_CRUSH | DMG_SLASH ) );
@@ -1362,7 +1362,7 @@ CXenHull *CXenHull::CreateHull( CBaseEntity *source, const Vector &mins, const V
 	UTIL_SetOrigin( pHull, source->GetEngineObject()->GetAbsOrigin() + offset );
 	pHull->GetEngineObject()->SetSolid( SOLID_BBOX );
 	pHull->GetEngineObject()->SetMoveType( MOVETYPE_NONE );
-	pHull->SetOwnerEntity( source );
+	pHull->GetEngineObject()->SetOwnerEntity( source );
 	pHull->GetEngineObject()->SetSize( mins, maxs );
 	pHull->GetEngineObject()->SetRenderColorA( 0 );
 	pHull->GetEngineObject()->SetRenderMode(kRenderTransTexture);

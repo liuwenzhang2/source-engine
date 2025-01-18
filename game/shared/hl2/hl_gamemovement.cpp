@@ -81,7 +81,7 @@ CReservePlayerSpot *CReservePlayerSpot::ReserveSpot(
 
 	spot->GetEngineObject()->SetAbsOrigin( org );
 	spot->GetEngineObject()->SetSize( mins, maxs );
-	spot->SetOwnerEntity( owner );
+	spot->GetEngineObject()->SetOwnerEntity( owner );
 	spot->Spawn();
 
 	// See if spot is valid

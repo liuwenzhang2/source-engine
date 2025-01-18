@@ -69,7 +69,7 @@ void CGrenadeAR2::Spawn( void )
 	SetThink( &CGrenadeAR2::GrenadeAR2Think );
 	GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.1f );
 
-	if( GetOwnerEntity() && GetOwnerEntity()->IsPlayer() )
+	if(GetEngineObject()->GetOwnerEntity() && GetEngineObject()->GetOwnerEntity()->IsPlayer() )
 	{
 		m_flDamage = sk_plr_dmg_smg1_grenade.GetFloat();
 	}

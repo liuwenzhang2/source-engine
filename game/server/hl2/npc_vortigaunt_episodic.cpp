@@ -3128,7 +3128,7 @@ CVortigauntChargeToken *CVortigauntChargeToken::CreateChargeToken( const Vector 
 
 	// Set up our internal data
 	UTIL_SetOrigin( pToken, vecOrigin );
-	pToken->SetOwnerEntity( pOwner );
+	pToken->GetEngineObject()->SetOwnerEntity( pOwner );
 	pToken->SetTargetEntity( pTarget );
 	pToken->SetThink( &CVortigauntChargeToken::SeekThink );
 	pToken->SetTouch( &CVortigauntChargeToken::SeekTouch );
@@ -3213,7 +3213,7 @@ Vector CVortigauntChargeToken::GetSteerVector( const Vector &vecForward )
 	// We ignore multiple targets
 	CTraceFilterSimpleList filterSkip( COLLISION_GROUP_NONE );
 	filterSkip.AddEntityToIgnore( this );
-	filterSkip.AddEntityToIgnore( GetOwnerEntity() );
+	filterSkip.AddEntityToIgnore(GetEngineObject()->GetOwnerEntity() );
 	filterSkip.AddEntityToIgnore( m_hTarget );
 
 	trace_t tr;
@@ -3366,7 +3366,7 @@ CVortigauntEffectDispel *CVortigauntEffectDispel::CreateEffectDispel( const Vect
 
 	// Set up our internal data
 	UTIL_SetOrigin( pToken, vecOrigin );
-	pToken->SetOwnerEntity( pOwner );
+	pToken->GetEngineObject()->SetOwnerEntity( pOwner );
 	pToken->Spawn();
 
 	return pToken;

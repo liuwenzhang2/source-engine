@@ -348,7 +348,7 @@ void NextBotCombatCharacter::Ignite( float flFlameLifetime, CBaseEntity *pAttack
 		pFlame->SetLifetime( flFlameLifetime );
 		GetEngineObject()->AddFlag( FL_ONFIRE );
 
-		SetEffectEntity( pFlame );
+		GetEngineObject()->SetEffectEntity( pFlame );
 	}
 	m_OnIgnite.FireOutput( this, this );
 
@@ -418,9 +418,9 @@ void NextBotCombatCharacter::Event_Killed( const CTakeDamageInfo &info )
 	TerrorGameRules()->DeathNoticeForInfected( this, info );
 #endif
 
-	if ( GetOwnerEntity() != NULL )
+	if (GetEngineObject()->GetOwnerEntity() != NULL )
 	{
-		GetOwnerEntity()->DeathNotice( this );
+		GetEngineObject()->GetOwnerEntity()->DeathNotice( this );
 	}
 
 	// inform the other bots

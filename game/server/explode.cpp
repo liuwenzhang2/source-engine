@@ -322,7 +322,7 @@ void CEnvExplosion::InputExplode( inputdata_t &inputdata )
 	// do damage
 	if ( !(GetEngineObject()->GetSpawnFlags() & SF_ENVEXPLOSION_NODAMAGE))
 	{
-		CBaseEntity *pAttacker = GetOwnerEntity() ? GetOwnerEntity() : this;
+		IServerEntity *pAttacker = GetEngineObject()->GetOwnerEntity() ? GetEngineObject()->GetOwnerEntity() : this;
 
 		// Only calculate damage type if we didn't get a custom one passed in
 		int iDamageType = m_iCustomDamageType;
@@ -381,7 +381,7 @@ void CEnvExplosion::Smoke( void )
 
 // HACKHACK -- create one of these and fake a keyvalue to get the right explosion setup
 void ExplosionCreate( const Vector &center, const QAngle &angles, 
-	CBaseEntity *pOwner, int magnitude, int radius, int nSpawnFlags, float flExplosionForce, CBaseEntity *pInflictor, int iCustomDamageType,
+	IServerEntity *pOwner, int magnitude, int radius, int nSpawnFlags, float flExplosionForce, CBaseEntity *pInflictor, int iCustomDamageType,
 	const EHANDLE *ignoredEntity , Class_T ignoredClass )
 {
 	char			buf[128];
@@ -408,7 +408,7 @@ void ExplosionCreate( const Vector &center, const QAngle &angles,
 
 	variant_t emptyVariant;
 	pExplosion->GetEngineObject()->SetRenderMode(kRenderTransAdd);
-	pExplosion->SetOwnerEntity( pOwner );
+	pExplosion->GetEngineObject()->SetOwnerEntity( pOwner );
 	pExplosion->Spawn();
 	pExplosion->m_hInflictor = pInflictor;
 	pExplosion->SetCustomDamageType( iCustomDamageType );
@@ -423,7 +423,7 @@ void ExplosionCreate( const Vector &center, const QAngle &angles,
 
 
 void ExplosionCreate( const Vector &center, const QAngle &angles, 
-	CBaseEntity *pOwner, int magnitude, int radius, bool doDamage, float flExplosionForce, bool bSurfaceOnly, bool bSilent, int iCustomDamageType )
+	IServerEntity *pOwner, int magnitude, int radius, bool doDamage, float flExplosionForce, bool bSurfaceOnly, bool bSilent, int iCustomDamageType )
 {
 	// For E3, no sparks
 	int nFlags = SF_ENVEXPLOSION_NOSPARKS | SF_ENVEXPLOSION_NODLIGHTS | SF_ENVEXPLOSION_NOSMOKE;
@@ -447,7 +447,7 @@ void ExplosionCreate( const Vector &center, const QAngle &angles,
 
 // this version lets you specify classes or entities to be ignored
 void ExplosionCreate( const Vector &center, const QAngle &angles, 
-					 CBaseEntity *pOwner, int magnitude, int radius, bool doDamage, 
+					 IServerEntity *pOwner, int magnitude, int radius, bool doDamage, 
 					 const EHANDLE *ignoredEntity, Class_T ignoredClass,
 					 float flExplosionForce , bool bSurfaceOnly , bool bSilent , int iCustomDamageType )
 {

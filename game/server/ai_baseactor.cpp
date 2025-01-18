@@ -1279,7 +1279,7 @@ bool CAI_BaseActor::PickRandomLookTarget( AILookTargetArgs_t *pArgs )
 			continue;
 		}
 
-		if ( pEntity->GetOwnerEntity() && !pEntity->GetOwnerEntity()->IsViewable() )
+		if ( pEntity->GetEngineObject()->GetOwnerEntity() && !pEntity->GetEngineObject()->GetOwnerEntity()->IsViewable() )
 		{
 			// Don't look at things that are associated with non-viewable owners. 
 			// Specifically, this prevents NPC's looking at beams or sprites that

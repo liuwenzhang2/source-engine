@@ -160,7 +160,7 @@ public:
 
 };
 
-inline C_BaseCombatCharacter *ToBaseCombatCharacter( C_BaseEntity *pEntity )
+inline C_BaseCombatCharacter *ToBaseCombatCharacter( IClientEntity *pEntity )
 {
 	if ( !pEntity || !pEntity->IsBaseCombatCharacter() )
 		return NULL;

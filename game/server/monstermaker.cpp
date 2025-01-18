@@ -456,7 +456,7 @@ void CNPCMaker::MakeNPC( void )
 	ChildPreSpawn( pent );
 
 	EntityList()->DispatchSpawn( pent );
-	pent->SetOwnerEntity( this );
+	pent->GetEngineObject()->SetOwnerEntity( this );
 	DispatchActivate( pent );
 
 	if ( m_ChildTargetName != NULL_STRING )
@@ -512,7 +512,7 @@ void CBaseNPCMaker::ChildPostSpawn( CAI_BaseNPC *pChild )
 	}
 	if ( m_hIgnoreEntity != NULL )
 	{
-		pChild->SetOwnerEntity( m_hIgnoreEntity );
+		pChild->GetEngineObject()->SetOwnerEntity( m_hIgnoreEntity );
 	}
 }
 
@@ -531,7 +531,7 @@ void CBaseNPCMaker::MakerThink ( void )
 // Purpose: 
 // Input  : *pVictim - 
 //-----------------------------------------------------------------------------
-void CBaseNPCMaker::DeathNotice( CBaseEntity *pVictim )
+void CBaseNPCMaker::DeathNotice( IServerEntity *pVictim )
 {
 	// ok, we've gotten the deathnotice from our child, now clear out its owner if we don't want it to fade.
 	m_nLiveChildren--;
@@ -852,7 +852,7 @@ void CTemplateNPCMaker::MakeNPC( void )
 	ChildPreSpawn( pent );
 
 	EntityList()->DispatchSpawn( pent );
-	pent->SetOwnerEntity( this );
+	pent->GetEngineObject()->SetOwnerEntity( this );
 	DispatchActivate( pent );
 
 	ChildPostSpawn( pent );
@@ -905,7 +905,7 @@ void CTemplateNPCMaker::MakeNPCInLine( void )
 	ChildPreSpawn( pent );
 
 	EntityList()->DispatchSpawn( pent );
-	pent->SetOwnerEntity( this );
+	pent->GetEngineObject()->SetOwnerEntity( this );
 	DispatchActivate( pent );
 
 	ChildPostSpawn( pent );
@@ -1006,7 +1006,7 @@ void CTemplateNPCMaker::MakeNPCInRadius( void )
 
 	EntityList()->DispatchSpawn( pent );
 
-	pent->SetOwnerEntity( this );
+	pent->GetEngineObject()->SetOwnerEntity( this );
 	DispatchActivate( pent );
 
 	ChildPostSpawn( pent );

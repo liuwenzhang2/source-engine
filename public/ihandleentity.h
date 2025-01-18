@@ -79,6 +79,8 @@ public:
 	virtual MoveType_t GetMoveType() const = 0;
 	virtual IPhysicsObject* VPhysicsGetObject(void) const = 0;
 	virtual bool IsRagdoll() const = 0;
+	//virtual IHandleEntity* GetOwnerEntity(void) const = 0;
+	//virtual IHandleEntity* GetEffectEntity(void) const = 0;
 
 	virtual bool IsWorld() = 0;
 	virtual bool IsPlayer() = 0;
@@ -162,7 +164,6 @@ public:
 	virtual bool IsAlive(void) { return false; }
 	virtual bool IsStandable() const { return false; }
 	virtual const Vector& WorldSpaceCenter() const { return *(Vector*)0; }
-	virtual IHandleEntity* GetOwnerEntity(void) const { return NULL; }
 	virtual int GetTeamNumber(void) const { return 0; }
 	virtual int GetMaxHealth() const { return 0; }
 	virtual int GetHealth() const { return 0; }

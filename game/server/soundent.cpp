@@ -427,7 +427,7 @@ int CSoundEnt::IAllocSound( void )
 // InsertSound - Allocates a free sound and fills it with 
 // sound info.
 //=========================================================
-void CSoundEnt::InsertSound ( int iType, const Vector &vecOrigin, int iVolume, float flDuration, CBaseEntity *pOwner, int soundChannelIndex, CBaseEntity *pSoundTarget )
+void CSoundEnt::InsertSound ( int iType, const Vector &vecOrigin, int iVolume, float flDuration, IServerEntity *pOwner, int soundChannelIndex, IServerEntity *pSoundTarget )
 {
 	int	iThisSound;
 
@@ -490,7 +490,7 @@ void CSoundEnt::InsertSound ( int iType, const Vector &vecOrigin, int iVolume, f
 
 //---------------------------------------------------------
 //---------------------------------------------------------
-int CSoundEnt::FindOrAllocateSound( CBaseEntity *pOwner, int soundChannelIndex )
+int CSoundEnt::FindOrAllocateSound( IServerEntity *pOwner, int soundChannelIndex )
 {
 	int iSound = m_iActiveSound; 
 

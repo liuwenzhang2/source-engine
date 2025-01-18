@@ -365,12 +365,12 @@ CBaseEntity* CBaseAnimating::CreateServerRagdoll(int forceBone, const CTakeDamag
 
 	pRagdoll->GetEngineObject()->SetLocalOrigin(this->GetEngineObject()->GetAbsOrigin());
 	pRagdoll->GetEngineObject()->SetLocalAngles(vec3_angle);
-	pRagdoll->SetOwnerEntity(NULL);
+	pRagdoll->GetEngineObject()->SetOwnerEntity(NULL);
 
 	EntityList()->NotifyCreateEntity(pRagdoll);
 
 	pRagdoll->CopyAnimationDataFrom(this);
-	pRagdoll->SetOwnerEntity(this);
+	pRagdoll->GetEngineObject()->SetOwnerEntity(this);
 
 	pRagdoll->InitRagdollAnimation();
 	matrix3x4_t pBoneToWorld[MAXSTUDIOBONES], pBoneToWorldNext[MAXSTUDIOBONES];

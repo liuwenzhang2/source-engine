@@ -319,7 +319,7 @@ CGrenadePathfollower* CGrenadePathfollower::CreateGrenadePathfollower( string_t 
 	if ( pGrenade->entindex()!=-1 )
 	{
 		pGrenade->m_sFlySound	= sFlySound;
-		pGrenade->SetOwnerEntity( pentOwner );
+		pGrenade->GetEngineObject()->SetOwnerEntity( pentOwner );
 		pGrenade->GetEngineObject()->SetLocalOrigin( vecOrigin );
 		pGrenade->GetEngineObject()->SetLocalAngles( vecAngles );
 		pGrenade->SetModel( STRING(sModelName) );

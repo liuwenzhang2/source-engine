@@ -1499,9 +1499,9 @@ bool CWeaponPhysCannon::AttachObject( CBaseEntity *pObject, const Vector &vPosit
 
 	m_bResetOwnerEntity = false;
 
-	if ( m_hAttachedObject->GetOwnerEntity() == NULL )
+	if ( m_hAttachedObject->GetEngineObject()->GetOwnerEntity() == NULL )
 	{
-		m_hAttachedObject->SetOwnerEntity( pOwner );
+		m_hAttachedObject->GetEngineObject()->SetOwnerEntity( pOwner );
 		m_bResetOwnerEntity = true;
 	}
 
@@ -1738,7 +1738,7 @@ void CWeaponPhysCannon::DetachObject( bool playSound, bool wasLaunched )
 	
 	if ( pObject && m_bResetOwnerEntity == true )
 	{
-		pObject->SetOwnerEntity( NULL );
+		pObject->GetEngineObject()->SetOwnerEntity( NULL );
 	}
 
 	m_bActive = false;

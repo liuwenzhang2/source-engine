@@ -439,7 +439,7 @@ void CBreakableProp::Ignite( float flFlameLifetime, bool bNPCOnly, float flSize,
 
 	if ( g_pGameRules->ShouldBurningPropsEmitLight() )
 	{
-		GetEffectEntity()->GetEngineObject()->AddEffects( EF_DIMLIGHT );
+		GetEngineObject()->GetEffectEntity()->GetEngineObject()->AddEffects( EF_DIMLIGHT );
 	}
 
 	// Frighten AIs, just in case this is an exploding thing.
@@ -2398,7 +2398,7 @@ void COrnamentProp::Spawn()
 
 void COrnamentProp::DetachFromOwner()
 {
-	SetOwnerEntity( NULL );
+	GetEngineObject()->SetOwnerEntity( NULL );
 	GetEngineObject()->AddSolidFlags( FSOLID_NOT_SOLID );
 	GetEngineObject()->SetMoveType( MOVETYPE_NONE );
 	GetEngineObject()->AddEffects( EF_NODRAW );
@@ -3323,7 +3323,7 @@ static CBreakableProp *BreakModelCreate_Prop( CBaseEntity *pOwner, breakmodel_t 
 		CBaseAnimating *pAnimating = dynamic_cast<CBreakableProp *>(pOwner);
 		if ( pAnimating && pAnimating->IsOnFire() )
 		{
-			CEntityFlame *pOwnerFlame = dynamic_cast<CEntityFlame*>( pAnimating->GetEffectEntity() );
+			CEntityFlame *pOwnerFlame = dynamic_cast<CEntityFlame*>( pAnimating->GetEngineObject()->GetEffectEntity() );
 
 			if ( pOwnerFlame )
 			{
@@ -3744,7 +3744,7 @@ void CBasePropDoor::Activate( void )
 				{
 					m_hDoorList.AddToTail( pDoor );
 					pDoor->SetMaster( this );
-					pDoor->SetOwnerEntity( this );
+					pDoor->GetEngineObject()->SetOwnerEntity( this );
 				}
 			}
 		}
@@ -5810,7 +5810,7 @@ void CPhysicsPropRespawnable::Spawn( void )
 		m_flRespawnTime = RESPAWNABLE_PROP_DEFAULT_TIME;
 	}
 
-	SetOwnerEntity( NULL );
+	GetEngineObject()->SetOwnerEntity( NULL );
 }
 
 void CPhysicsPropRespawnable::Event_Killed( const CTakeDamageInfo &info )
@@ -5836,7 +5836,7 @@ void CPhysicsPropRespawnable::Event_Killed( const CTakeDamageInfo &info )
 
 	if ( IsOnFire() || IsDissolving() )
 	{
-		EntityList()->DestroyEntity( GetEffectEntity() );
+		EntityList()->DestroyEntity(GetEngineObject()->GetEffectEntity() );
 	}
 
 	Teleport( &m_vOriginalSpawnOrigin, &m_vOriginalSpawnAngles, NULL );

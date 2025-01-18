@@ -150,7 +150,7 @@ public:
 			);
 
 		//Do the radius damage
-		RadiusDamage( CTakeDamageInfo( this, GetOwnerEntity(), 200, DMG_BLAST|DMG_DISSOLVE ), GetEngineObject()->GetAbsOrigin(), 256, CLASS_NONE, NULL );
+		RadiusDamage( CTakeDamageInfo( this, GetEngineObject()->GetOwnerEntity(), 200, DMG_BLAST|DMG_DISSOLVE ), GetEngineObject()->GetAbsOrigin(), 256, CLASS_NONE, NULL );
 
 		EntityList()->DestroyEntity( this );
 	}

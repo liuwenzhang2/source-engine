@@ -453,7 +453,7 @@ bool CNPC_Nihilanth::EmitSphere( void )
 	
 	pEntity->GetEngineObject()->SetAbsOrigin( vecSrc );
 	pEntity->GetEngineObject()->SetAbsAngles(GetEngineObject()->GetAbsAngles() );
-	pEntity->SetOwnerEntity( this );
+	pEntity->GetEngineObject()->SetOwnerEntity( this );
 	pEntity->Spawn();
 
 	pEntity->GetEngineObject()->SetAbsVelocity(GetEngineObject()->GetAbsOrigin() - vecSrc );
@@ -925,7 +925,7 @@ void CNPC_Nihilanth::ShootBalls( void )
 
 				pEntity->GetEngineObject()->SetAbsOrigin( vecSrc );
 				pEntity->GetEngineObject()->SetAbsAngles( vecAngle );
-				pEntity->SetOwnerEntity( this );
+				pEntity->GetEngineObject()->SetOwnerEntity( this );
 				pEntity->Spawn();
 
 				pEntity->GetEngineObject()->SetAbsVelocity( vecDir * 200.0 );
@@ -942,7 +942,7 @@ void CNPC_Nihilanth::ShootBalls( void )
 
 				pEntity->GetEngineObject()->SetAbsOrigin( vecSrc );
 				pEntity->GetEngineObject()->SetAbsAngles( vecAngle );
-				pEntity->SetOwnerEntity( this );
+				pEntity->GetEngineObject()->SetOwnerEntity( this );
 				pEntity->Spawn();
 
 				pEntity->GetEngineObject()->SetAbsVelocity( vecDir * 200.0 );
@@ -1114,7 +1114,7 @@ void CNPC_Nihilanth::DyingThink( void )
 	
 	pEntity->GetEngineObject()->SetAbsOrigin( vecSrc );
 	pEntity->GetEngineObject()->SetAbsAngles(GetEngineObject()->GetAbsAngles() );
-	pEntity->SetOwnerEntity( this );
+	pEntity->GetEngineObject()->SetOwnerEntity( this );
 	pEntity->GetEngineObject()->SetAbsVelocity( Vector ( random->RandomFloat( -0.7, 0.7 ), random->RandomFloat( -0.7, 0.7 ), 1.0 ) * 600.0 );
 	pEntity->Spawn();
 
@@ -1180,7 +1180,7 @@ void CNPC_Nihilanth::HandleAnimEvent( animevent_t *pEvent )
 				
 				pEntity->GetEngineObject()->SetAbsOrigin( vecSrc );
 				pEntity->GetEngineObject()->SetAbsAngles( vecAngles );
-				pEntity->SetOwnerEntity( this );
+				pEntity->GetEngineObject()->SetOwnerEntity( this );
 				pEntity->Spawn();
 
 				pEntity->TeleportInit( this, GetEnemy(), (CBaseEntity*)pTrigger, (CBaseEntity*)pTouch );
@@ -1243,7 +1243,7 @@ void CNPC_Nihilanth::HandleAnimEvent( animevent_t *pEvent )
 
 			pEntity->GetEngineObject()->SetAbsOrigin( vecSrc );
 			pEntity->GetEngineObject()->SetAbsAngles( vecAngles );
-			pEntity->SetOwnerEntity( this );
+			pEntity->GetEngineObject()->SetOwnerEntity( this );
 			pEntity->Spawn();
 
 			pEntity->GetEngineObject()->SetAbsVelocity(GetEngineObject()->GetAbsOrigin() - vecSrc );
@@ -1324,7 +1324,7 @@ CSprite *CNihilanthHVR::SpriteInit( const char *pSpriteName, CNihilanthHVR *pOwn
 	if ( pSprite )
 	{
 		pSprite->SetAttachment( pOwner, 0 );
-		pSprite->SetOwnerEntity( pOwner );
+		pSprite->GetEngineObject()->SetOwnerEntity( pOwner );
 		pSprite->AnimateForTime( 5, 9999 );
 	}
 

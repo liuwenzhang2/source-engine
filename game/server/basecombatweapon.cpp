@@ -199,7 +199,7 @@ CBaseEntity* CBaseCombatWeapon::Respawn( void )
 {
 	// make a copy of this weapon that is invisible and inaccessible to players (no touch function). The weapon spawn/respawn code
 	// will decide when to make the weapon visible and touchable.
-	CBaseEntity *pNewWeapon = CBaseEntity::Create( GetClassname(), g_pGameRules->VecWeaponRespawnSpot( this ), GetEngineObject()->GetLocalAngles(), GetOwnerEntity() );
+	CBaseEntity *pNewWeapon = CBaseEntity::Create( GetClassname(), g_pGameRules->VecWeaponRespawnSpot( this ), GetEngineObject()->GetLocalAngles(), GetEngineObject()->GetOwnerEntity() );
 
 	if ( pNewWeapon )
 	{
@@ -313,7 +313,7 @@ bool CBaseCombatWeapon::WeaponLOSCondition( const Vector &ownerPos, const Vector
 		// Also, check to see if the owner of the entity is the vehicle, in which case it's valid too.
 		// This catches vehicles that use bone followers.
 		CBaseEntity	*pVehicle  = pEnemyPlayer->GetVehicle()->GetVehicleEnt();
-		if ( pHitEnt == pVehicle || pHitEnt->GetOwnerEntity() == pVehicle )
+		if ( pHitEnt == pVehicle || pHitEnt->GetEngineObject()->GetOwnerEntity() == pVehicle )
 			return true;
 	}
 
@@ -548,7 +548,7 @@ void CBaseCombatWeapon::FallThink ( void )
 	{
 		// clatter if we have an owner (i.e., dropped by someone)
 		// don't clatter if the gun is waiting to respawn (if it's waiting, it is invisible!)
-		if ( GetOwnerEntity() )
+		if (GetEngineObject()->GetOwnerEntity() )
 		{
 			const char* soundname = "BaseCombatWeapon.WeaponDrop";
 			CPASAttenuationFilter filter(this, soundname);

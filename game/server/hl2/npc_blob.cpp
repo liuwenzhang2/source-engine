@@ -1285,7 +1285,7 @@ CBlobElement *CNPC_Blob::CreateNewElement()
 
 	if( pElement != NULL )
 	{
-		pElement->SetOwnerEntity( this );
+		pElement->GetEngineObject()->SetOwnerEntity( this );
 		pElement->SetSinePhase( fabs( sin(((float)m_iNumElements)/10.0f) ) );
 		pElement->SetActiveMovementRule( BLOB_MOVE_TO_TARGET_ENTITY );
 		pElement->SetTargetEntity( this );

@@ -254,7 +254,7 @@ bool CEnvMicrophone::CanHearSound(CSound *pSound, float &flVolume)
 	CBaseFilter *pFilter = m_hListenFilter.Get();
 	if ( pFilter )
 	{
-		CBaseEntity *pSoundOwner = pSound->m_hOwner.Get();
+		CBaseEntity *pSoundOwner = (CBaseEntity*)pSound->m_hOwner.Get();
 		if ( !pSoundOwner || !pFilter->PassesFilter( this, pSoundOwner ) )
 		{
 			return false;

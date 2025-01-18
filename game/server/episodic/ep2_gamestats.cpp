@@ -212,7 +212,7 @@ void CEP2GameStats::Event_PlayerDamage( CBasePlayer *pBasePlayer, const CTakeDam
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-void CEP2GameStats::Event_PlayerKilledOther( CBasePlayer *pAttacker, CBaseEntity *pVictim, const CTakeDamageInfo &info )
+void CEP2GameStats::Event_PlayerKilledOther( CBasePlayer *pAttacker, IServerEntity *pVictim, const CTakeDamageInfo &info )
 {
 	BaseClass::Event_PlayerKilledOther( pAttacker, pVictim, info );
 

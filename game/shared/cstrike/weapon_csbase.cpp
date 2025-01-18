@@ -994,7 +994,7 @@ void CWeaponCSBase::Drop(const Vector &vecVelocity)
 
 	GetEngineObject()->SetNextThink( gpGlobals->curtime );
 
-	SetOwnerEntity( NULL );
+	GetEngineObject()->SetOwnerEntity( NULL );
 	SetOwner( NULL );
 #endif
 }

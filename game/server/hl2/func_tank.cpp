@@ -2496,7 +2496,7 @@ bool CFuncTank::HasLOSTo( CBaseEntity *pEntity )
 		// Also, check to see if the owner of the entity is the vehicle, in which case it's valid too.
 		// This catches vehicles that use bone followers.
 		CBaseEntity	*pVehicle  = pCCEntity->GetVehicle()->GetVehicleEnt();
-		if ( pHitEntity == pVehicle || ( pHitEntity != NULL && pHitEntity->GetOwnerEntity() == pVehicle ) )
+		if ( pHitEntity == pVehicle || ( pHitEntity != NULL && pHitEntity->GetEngineObject()->GetOwnerEntity() == pVehicle ) )
 			return true;
 	}
 
@@ -3780,7 +3780,7 @@ void CMortarShell::Impact( void )
 		FBEAM_FADEOUT
 		);
 
-	RadiusDamage( CTakeDamageInfo( this, GetOwnerEntity(), MORTAR_BLAST_DAMAGE, (DMG_BLAST|DMG_DISSOLVE) ), GetEngineObject()->GetAbsOrigin(), MORTAR_BLAST_RADIUS, CLASS_NONE, NULL );
+	RadiusDamage( CTakeDamageInfo( this, GetEngineObject()->GetOwnerEntity(), MORTAR_BLAST_DAMAGE, (DMG_BLAST|DMG_DISSOLVE) ), GetEngineObject()->GetAbsOrigin(), MORTAR_BLAST_RADIUS, CLASS_NONE, NULL );
 
 	const char* soundname = "Weapon_Mortar.Impact";
 	CPASAttenuationFilter filter(this, soundname);

@@ -468,7 +468,7 @@ CAI_BaseNPC *CNPC_Osprey::MakeGrunt( Vector vecSrc )
 			pGrunt->SetActivity( ACT_GLIDE );
 			pGrunt->GetEngineObject()->SetGroundEntity( NULL );
 
-			pGrunt->SetOwnerEntity(this);
+			pGrunt->GetEngineObject()->SetOwnerEntity(this);
 
 
 			CBeam *pBeam = CBeam::BeamCreate( "sprites/rope.vmt", 1.0 );

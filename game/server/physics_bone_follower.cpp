@@ -235,7 +235,7 @@ END_SEND_TABLE()
 
 bool CBoneFollower::Init( CBaseEntity *pOwner, const char *pModelName, solid_t &solid, const Vector &position, const QAngle &orientation )
 {
-	SetOwnerEntity( pOwner );
+	GetEngineObject()->SetOwnerEntity( pOwner );
 	UTIL_SetModel( this, pModelName );
 
 	GetEngineObject()->AddEffects( EF_NODRAW ); // invisible
@@ -294,7 +294,7 @@ void CBoneFollower::VPhysicsUpdate( IPhysicsObject *pPhysics )
 class CPhysicsSwapTemp
 {
 public:
-	CPhysicsSwapTemp( CBaseEntity *pEntity, IPhysicsObject *pTmpPhysics )
+	CPhysicsSwapTemp( IServerEntity *pEntity, IPhysicsObject *pTmpPhysics )
 	{
 		Assert(pEntity);
 		Assert(pTmpPhysics);
@@ -315,14 +315,14 @@ public:
 	}
 
 private:
-	CBaseEntity *m_pEntity;
+	IServerEntity *m_pEntity;
 	IPhysicsObject *m_pPhysics;
 };
 
 
 void CBoneFollower::VPhysicsCollision( int index, gamevcollisionevent_t *pEvent )
 {
-	CBaseEntity *pOwner = GetOwnerEntity();
+	IServerEntity *pOwner = GetEngineObject()->GetOwnerEntity();
 	if ( pOwner )
 	{
 		CPhysicsSwapTemp tmp(pOwner, pEvent->pObjects[index] );
@@ -332,7 +332,7 @@ void CBoneFollower::VPhysicsCollision( int index, gamevcollisionevent_t *pEvent 
 
 void CBoneFollower::VPhysicsShadowCollision( int index, gamevcollisionevent_t *pEvent )
 {
-	CBaseEntity *pOwner = GetOwnerEntity();
+	IServerEntity *pOwner = GetEngineObject()->GetOwnerEntity();
 	if ( pOwner )
 	{
 		CPhysicsSwapTemp tmp(pOwner, pEvent->pObjects[index] );
@@ -342,7 +342,7 @@ void CBoneFollower::VPhysicsShadowCollision( int index, gamevcollisionevent_t *p
 
 void CBoneFollower::VPhysicsFriction( IPhysicsObject *pObject, float energy, int surfaceProps, int surfacePropsHit )
 {
-	CBaseEntity *pOwner = GetOwnerEntity();
+	IServerEntity *pOwner = GetEngineObject()->GetOwnerEntity();
 	if ( pOwner )
 	{
 		CPhysicsSwapTemp tmp(pOwner, pObject );
@@ -363,7 +363,7 @@ bool CBoneFollower::TestCollision( const Ray_t &ray, unsigned int mask, trace_t&
 		return false;
 
 	// return owner as trace hit
-	trace.m_pEnt = GetOwnerEntity();
+	trace.m_pEnt = GetEngineObject()->GetOwnerEntity();
 	trace.hitgroup = m_hitGroup;
 	trace.physicsbone = m_physicsBone;
 	return true;
@@ -396,7 +396,7 @@ CBoneFollower *CBoneFollower::Create( CBaseEntity *pOwner, const char *pModelNam
 //-----------------------------------------------------------------------------
 int CBoneFollower::ObjectCaps() 
 { 
-	CBaseEntity *pOwner = GetOwnerEntity();
+	IServerEntity *pOwner = GetEngineObject()->GetOwnerEntity();
 	if ( pOwner )
 	{
 		if( pOwner->GetEngineObject()->GetGlobalname() != NULL_STRING )
@@ -414,7 +414,7 @@ int CBoneFollower::ObjectCaps()
 //-----------------------------------------------------------------------------
 void CBoneFollower::Use( IServerEntity *pActivator, IServerEntity *pCaller, USE_TYPE useType, float value )
 {
-	CBaseEntity *pOwner = GetOwnerEntity();
+	IServerEntity *pOwner = GetEngineObject()->GetOwnerEntity();
 	if ( pOwner )
 	{
 		pOwner->Use( pActivator, pCaller, useType, value );
@@ -429,7 +429,7 @@ void CBoneFollower::Use( IServerEntity *pActivator, IServerEntity *pCaller, USE_
 //-----------------------------------------------------------------------------
 void CBoneFollower::Touch( IServerEntity *pOther )
 {
-	CBaseEntity *pOwner = GetOwnerEntity();
+	IServerEntity *pOwner = GetEngineObject()->GetOwnerEntity();
 	if ( pOwner )
 	{
 		//TODO: fill in the touch trace with the hitbox number associated with this bone
@@ -445,7 +445,7 @@ void CBoneFollower::Touch( IServerEntity *pOther )
 //-----------------------------------------------------------------------------
 void CBoneFollower::TraceAttack( const CTakeDamageInfo &info, const Vector &vecDir, trace_t *ptr, CDmgAccumulator *pAccumulator )
 {
-	CBaseEntity *pOwner = GetOwnerEntity();
+	IServerEntity *pOwner = GetEngineObject()->GetOwnerEntity();
 	if ( pOwner )
 	{
 		pOwner->DispatchTraceAttack( info, vecDir, ptr, pAccumulator );

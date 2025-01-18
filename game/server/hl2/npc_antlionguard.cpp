@@ -4512,7 +4512,7 @@ void CNPC_AntlionGuard::Event_Killed( const CTakeDamageInfo &info )
 			CNPC_Antlion *pAntlion = assert_cast<CNPC_Antlion *>(pSearch);
 
 			// See if it's a live orphan
-			if ( pAntlion && pAntlion->GetOwnerEntity() == NULL && pAntlion->IsAlive() )
+			if ( pAntlion && pAntlion->GetEngineObject()->GetOwnerEntity() == NULL && pAntlion->IsAlive() )
 			{
 				g_EventQueue.AddEvent( pAntlion, "BurrowAway", RandomFloat(0.1, 2.0), this, this );
 			}
@@ -4710,7 +4710,7 @@ void CNPC_AntlionGuard::InputSummonedAntlionDied( inputdata_t &inputdata )
 bool CNPC_AntlionGuard::QueryHearSound( CSound *pSound )
 {
 	// Don't bother with danger sounds from antlions or other guards
-	if ( pSound->SoundType() == SOUND_DANGER && ( pSound->m_hOwner != NULL && pSound->m_hOwner->Classify() == CLASS_ANTLION ) )
+	if ( pSound->SoundType() == SOUND_DANGER && ( pSound->m_hOwner != NULL && ((CBaseEntity*)pSound->m_hOwner.Get())->Classify() == CLASS_ANTLION ) )
 		return false;
 
 	return BaseClass::QueryHearSound( pSound );

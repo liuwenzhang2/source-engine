@@ -116,7 +116,7 @@ private:
 	float			m_flLoadWeight;
 	float			m_savedRotDamping[VPHYSICS_MAX_OBJECT_LIST_COUNT];
 	float			m_savedMass[VPHYSICS_MAX_OBJECT_LIST_COUNT];
-	ENTHANDLE			m_attachedEntity;
+	ENTHANDLE		m_attachedEntity;
 	QAngle			m_vecPreferredCarryAngles;
 	bool			m_bHasPreferredCarryAngles;
 	float			m_flDistanceOffset;
@@ -1237,6 +1237,12 @@ public:
 	bool PhysModelParseSolidByIndex(solid_t& solid, int solidIndex);
 	void PhysForceClearVelocity(IPhysicsObject* pPhys);
 
+	// To mimic server call convention
+	IClientEntity* GetOwnerEntity(void) const;
+	void SetOwnerEntity(IClientEntity* pOwner);
+	IClientEntity* GetEffectEntity(void) const;
+	void SetEffectEntity(IClientEntity* pEffectEnt);
+
 	bool IsWorld() { return false; }
 	IEngineWorldClient* AsEngineWorld() { Error("I am not EngineWorld!"); }
 	const IEngineWorldClient* AsEngineWorld() const { Error("I am not EngineWorld!"); }
@@ -1540,7 +1546,9 @@ protected:
 	byte							m_ubOldInterpolationFrame;
 	// Interpolation says don't draw yet
 	bool							m_bReadyToDraw;
-
+	// The owner!
+	ENTHANDLE					m_hOwnerEntity;
+	ENTHANDLE					m_hEffectEntity;
 	C_GrabControllerInternal		m_grabController;
 };
 
@@ -2377,6 +2385,16 @@ inline void C_EngineObjectInternal::SetRenderColorA(byte a)
 	SetRenderColor(GetRenderColor().r, GetRenderColor().g, GetRenderColor().b, a);
 }
 
+inline IClientEntity* C_EngineObjectInternal::GetOwnerEntity() const
+{
+	return m_hOwnerEntity.Get();
+}
+
+inline IClientEntity* C_EngineObjectInternal::GetEffectEntity() const
+{
+	return m_hEffectEntity.Get();
+}
+
 class C_EngineWorldInternal : public C_EngineObjectInternal, public IEngineWorldClient {
 public:
 	DECLARE_CLASS(C_EngineWorldInternal, C_EngineObjectInternal);
@@ -2491,7 +2509,7 @@ private:
 	//IPhysicsEnvironment* pPhysicsEnvironment = NULL;
 	bool				m_bActivated; //a portal can exist and not be active
 	bool				m_bIsPortal2; //For teleportation, this doesn't matter, but for drawing and moving, it matters
-	ENTHANDLE				m_hLinkedPortal;
+	ENTHANDLE			m_hLinkedPortal;
 	bool				m_bSimulateVPhysics;
 	bool				m_bLocalDataIsReady; //this side of the portal is properly setup, no guarantees as to linkage to another portal
 	PS_InternalData_t m_InternalData;
@@ -2652,8 +2670,8 @@ private:
 	Vector			m_LightValues[ROPE_MAX_SEGMENTS]; // light info when the rope is created.
 	bool			m_bEndPointAttachmentPositionsDirty : 1;
 	bool			m_bEndPointAttachmentAnglesDirty : 1;
-	ENTHANDLE			m_hStartPoint;		// StartPoint/EndPoint are entities
-	ENTHANDLE			m_hEndPoint;
+	ENTHANDLE		m_hStartPoint;		// StartPoint/EndPoint are entities
+	ENTHANDLE		m_hEndPoint;
 	short			m_iStartAttachment;	// StartAttachment/EndAttachment are attachment points.
 	short			m_iEndAttachment;
 	bool							m_bApplyWind;
@@ -4619,7 +4637,7 @@ template<class T>
 void CClientEntityList<T>::SetupBonesOnBaseAnimating(IEngineObjectClient*& pBaseAnimating)
 {
 	if (!pBaseAnimating->GetMoveParent())
-		pBaseAnimating->GetOuter()->GetEngineObject()->SetupBones(NULL, -1, -1, gpGlobals->curtime);
+		pBaseAnimating->SetupBones(NULL, -1, -1, gpGlobals->curtime);
 }
 
 template<class T>
@@ -5133,7 +5151,7 @@ void CClientEntityList<T>::UpdateRagdolls(float frametime) // EPISODIC VERSION
 
 			next = m_LRU.Next(i);
 			IPhysicsObject* pObject = pRagdoll->GetEngineObject()->VPhysicsGetObject();
-			if (pRagdoll && (pRagdoll->GetEffectEntity() || (pObject && !pObject->IsAsleep())))
+			if (pRagdoll && (pRagdoll->GetEngineObject()->GetEffectEntity() || (pObject && !pObject->IsAsleep())))
 				continue;
 
 			if (pRagdoll)
@@ -5170,7 +5188,7 @@ void CClientEntityList<T>::UpdateRagdolls(float frametime) // EPISODIC VERSION
 
 			//Just ignore it until we're done burning/dissolving.
 			IPhysicsObject* pObject = pRagdoll->GetEngineObject()->VPhysicsGetObject();
-			if (pRagdoll && (pRagdoll->GetEffectEntity() || (pObject && !pObject->IsAsleep())))
+			if (pRagdoll && (pRagdoll->GetEngineObject()->GetEffectEntity() || (pObject && !pObject->IsAsleep())))
 				continue;
 
 			m_LRU[i]->SUB_Remove();
@@ -5247,7 +5265,7 @@ void CClientEntityList<T>::UpdateRagdolls(float frametime) // Non-episodic versi
 		IClientEntity* pRagdoll = m_LRU[i].Get();
 
 		//Just ignore it until we're done burning/dissolving.
-		if (pRagdoll && pRagdoll->GetEffectEntity())
+		if (pRagdoll && pRagdoll->GetEngineObject()->GetEffectEntity())
 			continue;
 
 		m_LRU[i]->SUB_Remove();

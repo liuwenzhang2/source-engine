@@ -507,9 +507,9 @@ void CBaseGrenade::Precache( void )
 CBaseCombatCharacter *CBaseGrenade::GetThrower( void )
 {
 	CBaseCombatCharacter *pResult = ToBaseCombatCharacter( m_hThrower );
-	if ( !pResult && GetOwnerEntity() != NULL )
+	if ( !pResult && GetEngineObject()->GetOwnerEntity() != NULL )
 	{
-		pResult = ToBaseCombatCharacter( GetOwnerEntity() );
+		pResult = ToBaseCombatCharacter(GetEngineObject()->GetOwnerEntity() );
 	}
 	return pResult;
 }

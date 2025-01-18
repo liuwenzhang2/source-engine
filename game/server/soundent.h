@@ -126,8 +126,8 @@ public:
 	int		SoundChannel( void ) const;
 	bool	ValidateOwner() const;
 
-	EHANDLE	m_hOwner;				// sound's owner
-	EHANDLE	m_hTarget;				// Sounds's target - an odd concept. For a gunfire sound, the target is the entity being fired at
+	CHandle<IServerEntity> m_hOwner;				// sound's owner
+	CHandle<IServerEntity> m_hTarget;				// Sounds's target - an odd concept. For a gunfire sound, the target is the entity being fired at
 	int		m_iVolume;				// how loud the sound is
 	float	m_flOcclusionScale;		// How loud the sound is when occluded by the world. (volume * occlusionscale)
 	int		m_iType;				// what type of sound this is
@@ -231,7 +231,7 @@ public:
 	void Initialize ( void );
 	int ObjectCaps( void ) { return BaseClass::ObjectCaps() & ~FCAP_ACROSS_TRANSITION; }
 
-	static void		InsertSound ( int iType, const Vector &vecOrigin, int iVolume, float flDuration, CBaseEntity *pOwner = NULL, int soundChannelIndex = SOUNDENT_CHANNEL_UNSPECIFIED, CBaseEntity *pSoundTarget = NULL );
+	static void		InsertSound ( int iType, const Vector &vecOrigin, int iVolume, float flDuration, IServerEntity *pOwner = NULL, int soundChannelIndex = SOUNDENT_CHANNEL_UNSPECIFIED, IServerEntity *pSoundTarget = NULL );
 	static void		FreeSound ( int iSound, int iPrevious );
 	static int		ActiveList( void );// return the head of the active list
 	static int		FreeList( void );// return the head of the free list
@@ -242,7 +242,7 @@ public:
 	bool	IsEmpty( void );
 	int		ISoundsInList ( int iListType );
 	int		IAllocSound ( void );
-	int		FindOrAllocateSound( CBaseEntity *pOwner, int soundChannelIndex );
+	int		FindOrAllocateSound( IServerEntity *pOwner, int soundChannelIndex );
 	
 private:
 	int		m_iFreeSound;	// index of the first sound in the free sound list

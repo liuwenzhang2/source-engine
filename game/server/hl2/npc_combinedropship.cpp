@@ -547,7 +547,7 @@ void CCombineDropshipContainer::ThrowFlamingGib( void )
 
 	int nGib = random->RandomInt( 0, DROPSHIP_CONTAINER_MAX_CHUNKS - 1 );
 	pChunk->Spawn( s_pChunkModelName[nGib] );
-	pChunk->SetOwnerEntity( this );
+	pChunk->GetEngineObject()->SetOwnerEntity( this );
 	pChunk->m_lifeTime = random->RandomFloat( 6.0f, 8.0f );
 	pChunk->GetEngineObject()->SetCollisionGroup( COLLISION_GROUP_DEBRIS );
 	IPhysicsObject *pPhysicsObject = pChunk->GetEngineObject()->VPhysicsInitNormal( SOLID_VPHYSICS, pChunk->GetEngineObject()->GetSolidFlags(), false );
@@ -606,9 +606,9 @@ void CCombineDropshipContainer::ThrowFlamingGib( void )
 //-----------------------------------------------------------------------------
 void CCombineDropshipContainer::Event_Killed( const CTakeDamageInfo &info )
 {
-	if ( GetOwnerEntity() )
+	if (GetEngineObject()->GetOwnerEntity() )
 	{
-		CNPC_CombineDropship *pDropship = assert_cast<CNPC_CombineDropship *>(GetOwnerEntity() );
+		CNPC_CombineDropship *pDropship = assert_cast<CNPC_CombineDropship *>(GetEngineObject()->GetOwnerEntity() );
 		pDropship->DropSoldierContainer();
 	}
 
@@ -880,7 +880,7 @@ void CNPC_CombineDropship::Spawn( void )
 			m_hContainer->GetEngineObject()->SetAbsOrigin(GetEngineObject()->GetAbsOrigin() );
 			m_hContainer->GetEngineObject()->SetAbsAngles(GetEngineObject()->GetAbsAngles() );
 			m_hContainer->GetEngineObject()->SetParent(this->GetEngineObject(), 0);
-			m_hContainer->SetOwnerEntity(this);
+			m_hContainer->GetEngineObject()->SetOwnerEntity(this);
 			m_hContainer->Spawn();
 
 			IPhysicsObject *pPhysicsObject = m_hContainer->GetEngineObject()->VPhysicsGetObject();
@@ -911,7 +911,7 @@ void CNPC_CombineDropship::Spawn( void )
 		m_hContainer->GetEngineObject()->SetAbsOrigin(GetEngineObject()->GetAbsOrigin() - Vector( 0, 0 , 100 ) );
 		m_hContainer->GetEngineObject()->SetAbsAngles(GetEngineObject()->GetAbsAngles() );
 		m_hContainer->GetEngineObject()->SetParent(this->GetEngineObject(), 0);
-		m_hContainer->SetOwnerEntity(this);
+		m_hContainer->GetEngineObject()->SetOwnerEntity(this);
 		m_hContainer->Spawn();
 		m_hContainer->GetEngineObject()->SetAbsOrigin(GetEngineObject()->GetAbsOrigin() - Vector( 0, 0 , 100 ) );
 		break;
@@ -945,7 +945,7 @@ void CNPC_CombineDropship::Spawn( void )
 			}
 
 			m_hContainer->GetEngineObject()->SetParent(this->GetEngineObject(), 0);
-			m_hContainer->SetOwnerEntity(this);
+			m_hContainer->GetEngineObject()->SetOwnerEntity(this);
 			m_hContainer->GetEngineObject()->SetMoveType( MOVETYPE_PUSH );
 			m_hContainer->GetEngineObject()->SetGroundEntity( NULL );
 			m_hContainer->UpdatePhysicsShadowToCurrentPosition(0);
@@ -969,7 +969,7 @@ void CNPC_CombineDropship::Spawn( void )
 			m_hContainer->GetEngineObject()->SetAbsAngles( angles );
 
 			m_hContainer->GetEngineObject()->SetParent(this->GetEngineObject(), 0);
-			m_hContainer->SetOwnerEntity(this);
+			m_hContainer->GetEngineObject()->SetOwnerEntity(this);
 			m_hContainer->GetEngineObject()->SetSolid( SOLID_VPHYSICS );
 			m_hContainer->Spawn();
 		}
@@ -1719,7 +1719,7 @@ void CNPC_CombineDropship::InputDropStrider( inputdata_t &inputdata )
 	angles.z = 0.0;
 
 	m_hContainer->GetEngineObject()->SetParent(NULL, 0);
-	m_hContainer->SetOwnerEntity(NULL);
+	m_hContainer->GetEngineObject()->SetOwnerEntity(NULL);
 	m_hContainer->GetEngineObject()->SetAbsAngles( angles );
 	m_hContainer->GetEngineObject()->SetAbsVelocity( vec3_origin );
 
@@ -1856,7 +1856,7 @@ void CNPC_CombineDropship::InputPickup( inputdata_t &inputdata )
 	m_bHasDroppedOff = false;
 
 	// Disable collisions to my target
-	m_hPickupTarget->SetOwnerEntity(this);
+	m_hPickupTarget->GetEngineObject()->SetOwnerEntity(this);
 	if ( m_NPCState == NPC_STATE_IDLE )
 	{
 		SetState( NPC_STATE_ALERT );

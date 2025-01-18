@@ -122,11 +122,11 @@ bool PassServerEntityFilter( const IHandleEntity *pTouch, const IHandleEntity *p
 		return true;
 
 	// don't clip against own missiles
-	if ( pEntTouch->GetOwnerEntity() == pEntPass )
+	if ( pEntTouch->GetEngineObject()->GetOwnerEntity() == pEntPass )
 		return false;
 	
 	// don't clip against owner
-	if ( pEntPass->GetOwnerEntity() == pEntTouch )
+	if ( pEntPass->GetEngineObject()->GetOwnerEntity() == pEntTouch )
 		return false;	
 
 

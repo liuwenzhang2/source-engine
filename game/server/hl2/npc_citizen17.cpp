@@ -3715,7 +3715,7 @@ void	CNPC_Citizen::TossHealthKit(CBaseCombatCharacter *pThrowAt, const Vector &o
 	if (pHealthKit)
 	{
 		pHealthKit->GetEngineObject()->SetAbsOrigin( medKitOriginPoint );
-		pHealthKit->SetOwnerEntity( this );
+		pHealthKit->GetEngineObject()->SetOwnerEntity( this );
 		// pHealthKit->SetAbsVelocity( tossVelocity );
 		EntityList()->DispatchSpawn( pHealthKit );
 
@@ -4216,7 +4216,7 @@ void CCitizenResponseSystem::ResponseThink()
 void CNPC_Citizen::AddInsignia()
 {
 	IServerEntity *pMark = EntityList()->CreateEntityByName( "squadinsignia" );
-	pMark->SetOwnerEntity( this );
+	pMark->GetEngineObject()->SetOwnerEntity( this );
 	pMark->Spawn();
 }
 
@@ -4228,7 +4228,7 @@ void CNPC_Citizen::RemoveInsignia()
 
 	while( pEntity )
 	{
-		if( pEntity->GetOwnerEntity() == this )
+		if( pEntity->GetEngineObject()->GetOwnerEntity() == this )
 		{
 			// Is this my insignia?
 			CSquadInsignia *pInsignia = dynamic_cast<CSquadInsignia *>(pEntity);
@@ -4249,15 +4249,15 @@ LINK_ENTITY_TO_CLASS( squadinsignia, CSquadInsignia );
 
 void CSquadInsignia::Spawn()
 {
-	CAI_BaseNPC *pOwner = ( GetOwnerEntity() ) ? GetOwnerEntity()->MyNPCPointer() : NULL;
+	CAI_BaseNPC *pOwner = (GetEngineObject()->GetOwnerEntity() ) ? ((CBaseEntity*)GetEngineObject()->GetOwnerEntity())->MyNPCPointer() : NULL;
 
 	if ( pOwner )
 	{
 		int attachment = pOwner->GetEngineObject()->LookupAttachment( "eyes" );
 		if ( attachment )
 		{
-			GetEngineObject()->SetAbsAngles( GetOwnerEntity()->GetEngineObject()->GetAbsAngles() );
-			GetEngineObject()->SetParent( GetOwnerEntity()->GetEngineObject(), attachment);
+			GetEngineObject()->SetAbsAngles(GetEngineObject()->GetOwnerEntity()->GetEngineObject()->GetAbsAngles() );
+			GetEngineObject()->SetParent(GetEngineObject()->GetOwnerEntity()->GetEngineObject(), attachment);
 
 			Vector vecPosition;
 			vecPosition.Init( -2.5, 0, 3.9 );

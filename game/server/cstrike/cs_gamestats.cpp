@@ -910,7 +910,7 @@ void CCSGameStats::Event_PlayerDisconnected( CBasePlayer *pPlayer )
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-void CCSGameStats::Event_PlayerKilledOther( CBasePlayer *pAttacker, CBaseEntity *pVictim, const CTakeDamageInfo &info )
+void CCSGameStats::Event_PlayerKilledOther( CBasePlayer *pAttacker, IServerEntity *pVictim, const CTakeDamageInfo &info )
 {
 	// This also gets called when the victim is a building.  That gets tracked separately as building destruction, don't count it here
 	if ( !pVictim->IsPlayer() )
@@ -925,7 +925,7 @@ void CCSGameStats::Event_PlayerKilledOther( CBasePlayer *pAttacker, CBaseEntity 
     TrackKillStats( pPlayerAttacker, pPlayerVictim );
 
 	// Skip rest of stat reporting for friendly fire
-	if ( pPlayerAttacker->GetTeam() == pVictim->GetTeam() )
+	if ( pPlayerAttacker->GetTeam() == ((CBaseEntity*)pVictim)->GetTeam() )
 		return;
 
 	CSWeaponID weaponId = WEAPON_NONE;

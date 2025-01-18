@@ -514,7 +514,7 @@ void CGibShooter::InitPointGib( CGib *pGib, const Vector &vecShootDir, float flS
 			if ( pSprite )
 			{
 				pSprite->SetAttachment( pGib, 0 );
-				pSprite->SetOwnerEntity( pGib );
+				pSprite->GetEngineObject()->SetOwnerEntity( pGib );
 
 				pSprite->SetScale( 1 );
 				pSprite->SetTransparency(GetEngineObject()->GetRenderMode(), GetEngineObject()->GetRenderColor().r, GetEngineObject()->GetRenderColor().g, GetEngineObject()->GetRenderColor().b, GetEngineObject()->GetRenderColor().a, GetEngineObject()->GetRenderFX());
@@ -1464,10 +1464,10 @@ void CItemSoda::CanTouch ( IServerEntity *pOther )
 
 	pOther->TakeHealth( 1, DMG_GENERIC );// a bit of health.
 
-	if ( GetOwnerEntity() )
+	if (GetEngineObject()->GetOwnerEntity() )
 	{
 		// tell the machine the can was taken
-		CEnvBeverage *bev = (CEnvBeverage *)GetOwnerEntity();
+		CEnvBeverage *bev = (CEnvBeverage *)GetEngineObject()->GetOwnerEntity();
 		bev->m_CanInDispenser = false;
 	}
 

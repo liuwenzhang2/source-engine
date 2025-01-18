@@ -381,7 +381,7 @@ void CMissile::DoExplosion( void )
 	GetEngineObject()->SetAbsOrigin( origin );
 
 	// Explode
-	ExplosionCreate(GetEngineObject()->GetAbsOrigin(), GetEngineObject()->GetAbsAngles(), GetOwnerEntity(), GetDamage(), GetDamage() * 2,
+	ExplosionCreate(GetEngineObject()->GetAbsOrigin(), GetEngineObject()->GetAbsAngles(), GetEngineObject()->GetOwnerEntity(), GetDamage(), GetDamage() * 2,
 		SF_ENVEXPLOSION_NOSPARKS | SF_ENVEXPLOSION_NODLIGHTS | SF_ENVEXPLOSION_NOSMOKE, 0.0f, this);
 }
 
@@ -513,10 +513,10 @@ void CMissile::IgniteThink( void )
 //-----------------------------------------------------------------------------
 void CMissile::GetShootPosition( CLaserDot *pLaserDot, Vector *pShootPosition )
 {
-	if ( pLaserDot->GetOwnerEntity() != NULL )
+	if ( pLaserDot->GetEngineObject()->GetOwnerEntity() != NULL )
 	{
 		//FIXME: Do we care this isn't exactly the muzzle position?
-		*pShootPosition = pLaserDot->GetOwnerEntity()->WorldSpaceCenter();
+		*pShootPosition = pLaserDot->GetEngineObject()->GetOwnerEntity()->WorldSpaceCenter();
 	}
 	else
 	{
@@ -600,7 +600,7 @@ void CMissile::SeekThink( void )
 		if ( !pEnt->IsOn() )
 			continue;
 
-		if ( pEnt->GetOwnerEntity() != GetOwnerEntity() )
+		if ( pEnt->GetEngineObject()->GetOwnerEntity() != GetEngineObject()->GetOwnerEntity() )
 			continue;
 
 		dotDist = (GetEngineObject()->GetAbsOrigin() - pEnt->GetEngineObject()->GetAbsOrigin()).Length();
@@ -688,7 +688,7 @@ CMissile *CMissile::Create( const Vector &vecOrigin, const QAngle &vecAngles, CB
 {
 	//CMissile *pMissile = (CMissile *)CreateEntityByName("rpg_missile" );
 	CMissile *pMissile = (CMissile *) CBaseEntity::Create( "rpg_missile", vecOrigin, vecAngles, pentOwner );
-	pMissile->SetOwnerEntity( pentOwner );
+	pMissile->GetEngineObject()->SetOwnerEntity( pentOwner );
 	pMissile->Spawn();
 	pMissile->GetEngineObject()->AddEffects( EF_NOSHADOW );
 	
@@ -907,7 +907,7 @@ LINK_ENTITY_TO_CLASS( apc_missile, CAPCMissile );
 CAPCMissile *CAPCMissile::Create( const Vector &vecOrigin, const QAngle &vecAngles, const Vector &vecVelocity, CBaseEntity *pOwner )
 {
 	CAPCMissile *pMissile = (CAPCMissile *)CBaseEntity::Create( "apc_missile", vecOrigin, vecAngles, pOwner );
-	pMissile->SetOwnerEntity( pOwner );
+	pMissile->GetEngineObject()->SetOwnerEntity( pOwner );
 	pMissile->Spawn();
 	pMissile->GetEngineObject()->SetAbsVelocity( vecVelocity );
 	pMissile->GetEngineObject()->AddFlag( FL_NOTARGET );
@@ -1065,7 +1065,7 @@ void CAPCMissile::DoExplosion( void )
 	}
 	else
 	{
-		ExplosionCreate(GetEngineObject()->GetAbsOrigin(), GetEngineObject()->GetAbsAngles(), GetOwnerEntity(),
+		ExplosionCreate(GetEngineObject()->GetAbsOrigin(), GetEngineObject()->GetAbsAngles(), GetEngineObject()->GetOwnerEntity(),
 			APC_MISSILE_DAMAGE, 100, true, 20000 );
 	}
 }
@@ -2182,7 +2182,7 @@ CLaserDot *CLaserDot::Create( const Vector &origin, CBaseEntity *pOwner, bool bV
 	pLaserDot->GetEngineObject()->AddEffects( EF_NOSHADOW );
 	pLaserDot->GetEngineObject()->SetSize( -Vector(4,4,4), Vector(4,4,4) );
 
-	pLaserDot->SetOwnerEntity( pOwner );
+	pLaserDot->GetEngineObject()->SetOwnerEntity( pOwner );
 
 	pLaserDot->GetEngineObject()->AddEFlags( EFL_FORCE_CHECK_TRANSMIT );
 
@@ -2255,7 +2255,7 @@ int CLaserDot::DrawModel( int flags )
 	float	scale;
 	Vector	endPos;
 
-	C_HL2MP_Player *pOwner = ToHL2MPPlayer( GetOwnerEntity() );
+	C_HL2MP_Player *pOwner = ToHL2MPPlayer(GetEngineObject()->GetOwnerEntity() );
 
 	if ( pOwner != NULL && pOwner->IsDormant() == false )
 	{

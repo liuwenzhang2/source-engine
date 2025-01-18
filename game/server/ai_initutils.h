@@ -60,7 +60,9 @@ class CNodeEnt : public CServerOnlyPointEntity
 	DECLARE_CLASS( CNodeEnt, CServerOnlyPointEntity );
 
 public:
-	virtual void SetOwnerEntity( IServerEntity* pOwner ) { BaseClass::SetOwnerEntity( NULL ); }
+
+	virtual bool IsNodeEnt() { return true; }
+	//virtual void SetOwnerEntity( IServerEntity* pOwner ) { BaseClass::SetOwnerEntity( NULL ); }
 
 	static int			m_nNodeCount;
 

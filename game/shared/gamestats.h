@@ -204,7 +204,7 @@ public:
 	virtual void Event_PlayerConnected( CBasePlayer *pBasePlayer );
 	virtual void Event_PlayerDisconnected( CBasePlayer *pBasePlayer );
 	virtual void Event_PlayerDamage( CBasePlayer *pBasePlayer, const CTakeDamageInfo &info );
-	virtual void Event_PlayerKilledOther( CBasePlayer *pAttacker, CBaseEntity *pVictim, const CTakeDamageInfo &info );
+	virtual void Event_PlayerKilledOther( CBasePlayer *pAttacker, IServerEntity *pVictim, const CTakeDamageInfo &info );
 	virtual void Event_PlayerSuicide( CBasePlayer* pPlayer ) {}
 	virtual void Event_Credits();
 	virtual void Event_Commentary();

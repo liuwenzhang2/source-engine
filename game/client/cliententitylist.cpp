@@ -1999,6 +1999,7 @@ BEGIN_PREDICTION_DATA_NO_BASE(C_EngineObjectInternal)
 	DEFINE_PRED_FIELD(m_nRenderMode, FIELD_CHARACTER, FTYPEDESC_INSENDTABLE),
 	DEFINE_PRED_FIELD(m_nRenderFX, FIELD_CHARACTER, FTYPEDESC_INSENDTABLE),
 	DEFINE_PRED_FIELD(m_clrRender, FIELD_INTEGER, FTYPEDESC_INSENDTABLE),
+	DEFINE_PRED_FIELD(m_hOwnerEntity, FIELD_EHANDLE, FTYPEDESC_INSENDTABLE),
 
 END_PREDICTION_DATA()
 
@@ -2280,7 +2281,8 @@ BEGIN_RECV_TABLE_NOBASE(C_EngineObjectInternal, DT_EngineObject)
 	RecvPropInt(RECVINFO(m_nOverlaySequence)),
 	RecvPropBool(RECVINFO(m_bAlternateSorting)),
 	RecvPropInt(RECVINFO(m_ubInterpolationFrame)),
-
+	RecvPropEHandle(RECVINFO(m_hOwnerEntity)),
+	RecvPropEHandle(RECVINFO(m_hEffectEntity)),
 END_RECV_TABLE()
 
 IMPLEMENT_CLIENTCLASS_NO_FACTORY(C_EngineObjectInternal, DT_EngineObject, CEngineObjectInternal);
@@ -3366,7 +3368,7 @@ bool C_EngineObjectInternal::EntityHasMatchingRootParent(IEngineObjectClient* pR
 		// NOTE: Don't let siblings/parents collide.
 		if (pRootParent == this->GetRootMoveParent())
 			return true;
-		if (this->m_pOuter->GetOwnerEntity() && pRootParent == this->m_pOuter->GetOwnerEntity()->GetEngineObject()->GetRootMoveParent())
+		if (this->GetOwnerEntity() && pRootParent == this->GetOwnerEntity()->GetEngineObject()->GetRootMoveParent())
 			return true;
 	}
 	return false;
@@ -9478,6 +9480,23 @@ bool C_EngineObjectInternal::PhysModelParseSolidByIndex(solid_t& solid, int soli
 void C_EngineObjectInternal::PhysForceClearVelocity(IPhysicsObject* pPhys)
 {
 	::PhysForceClearVelocity(pPhys);
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: 
+// Input  : *pOwner - 
+//-----------------------------------------------------------------------------
+void C_EngineObjectInternal::SetOwnerEntity(IClientEntity* pOwner)
+{
+	m_hOwnerEntity = pOwner;
+}
+
+void C_EngineObjectInternal::SetEffectEntity(IClientEntity* pEffectEnt)
+{
+	if (m_hEffectEntity.Get() != pEffectEnt)
+	{
+		m_hEffectEntity = pEffectEnt;
+	}
 }
 
 C_EngineWorldInternal::C_EngineWorldInternal(IClientEntityList* pClientEntityList, int iForceEdictIndex, int iSerialNum)

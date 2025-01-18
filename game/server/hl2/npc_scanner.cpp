@@ -930,7 +930,7 @@ void CNPC_CScanner::DeployMine()
 		{
 			child->SetParent( NULL );
 			child->SetAbsVelocity(GetEngineObject()->GetAbsVelocity() );
-			((CBaseEntity*)child->GetOuter())->SetOwnerEntity(this);
+			child->SetOwnerEntity(this);
 
 			ScannerEmitSound( "DeployMine" );
 
@@ -1009,7 +1009,7 @@ void CNPC_CScanner::InputEquipMine(inputdata_t &inputdata)
 			
 			pEnt->GetEngineObject()->SetAbsOrigin( vecOrigin );
 			pEnt->GetEngineObject()->SetAbsAngles( angles );
-			pEnt->SetOwnerEntity( this );
+			pEnt->GetEngineObject()->SetOwnerEntity( this );
 			pEnt->GetEngineObject()->SetParent( this->GetEngineObject(), attachment);
 
 			m_bIsOpen = true;
@@ -1026,7 +1026,7 @@ void CNPC_CScanner::InputEquipMine(inputdata_t &inputdata)
 
 		pEnt->GetEngineObject()->SetAbsOrigin( vecMineLocation );
 		pEnt->GetEngineObject()->SetAbsAngles(GetEngineObject()->GetAbsAngles() );
-		pEnt->SetOwnerEntity( this );
+		pEnt->GetEngineObject()->SetOwnerEntity( this );
 		pEnt->GetEngineObject()->SetParent( this->GetEngineObject() );
 	}
 
@@ -1150,12 +1150,12 @@ void CNPC_CScanner::GatherConditions( void )
 			if ( pSound->m_hOwner != NULL )
 			{
 				// Don't inspect sounds of things we like
-				if ( IRelationType( pSound->m_hOwner ) != D_LI )
+				if ( IRelationType((CBaseEntity*)pSound->m_hOwner.Get() ) != D_LI )
 				{
 					// Only bother if we can see it
-					if ( FVisible( pSound->m_hOwner ) )
+					if ( FVisible( (CBaseEntity*)pSound->m_hOwner.Get() ) )
 					{
-						SetInspectTargetToEnt( pSound->m_hOwner, SCANNER_SOUND_INSPECT_LENGTH );
+						SetInspectTargetToEnt((CBaseEntity*)pSound->m_hOwner.Get(), SCANNER_SOUND_INSPECT_LENGTH);
 					}
 				}
 			}
@@ -1592,7 +1592,7 @@ void CNPC_CScanner::SpotlightCreate(void)
 	m_hSpotlightTarget = (CSpotlightEnd*)EntityList()->CreateEntityByName( "spotlight_end" );
 	m_hSpotlightTarget->Spawn();
 	m_hSpotlightTarget->GetEngineObject()->SetLocalOrigin( tr.endpos );
-	m_hSpotlightTarget->SetOwnerEntity( this );
+	m_hSpotlightTarget->GetEngineObject()->SetOwnerEntity( this );
 	// YWB:  Because the scanner only moves the target during think, make sure we interpolate over 0.1 sec instead of every tick!!!
 	m_hSpotlightTarget->GetEngineObject()->SetSimulatedEveryTick( false );
 

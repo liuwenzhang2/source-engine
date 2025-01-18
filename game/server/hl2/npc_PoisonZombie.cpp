@@ -707,7 +707,7 @@ void CNPC_PoisonZombie::HandleAnimEvent( animevent_t *pEvent )
 		}
 
 		// make me the crab's owner to avoid collision issues
-		pCrab->SetOwnerEntity( this );
+		pCrab->GetEngineObject()->SetOwnerEntity( this );
 
 		pCrab->Spawn();
 

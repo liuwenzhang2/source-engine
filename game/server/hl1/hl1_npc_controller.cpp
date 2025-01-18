@@ -1083,7 +1083,7 @@ void CNPC_ControllerHeadBall::Spawn( void )
 
 	GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.1 );
 
-	m_hOwner = GetOwnerEntity();
+	m_hOwner = (CBaseEntity*)GetEngineObject()->GetOwnerEntity();
 
 	m_flSpawnTime = gpGlobals->curtime;
 }
@@ -1243,7 +1243,7 @@ void CNPC_ControllerZapBall::Spawn( void )
 	SetThink( &CNPC_ControllerZapBall::AnimateThink );
 	SetTouch( &CNPC_ControllerZapBall::ExplodeTouch );
 
-	m_hOwner = GetOwnerEntity();
+	m_hOwner = (CBaseEntity*)GetEngineObject()->GetOwnerEntity();
 
 	m_flSpawnTime = gpGlobals->curtime; // keep track of when ball spawned
 	GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.1 );

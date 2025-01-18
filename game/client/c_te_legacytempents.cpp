@@ -420,7 +420,7 @@ bool C_LocalTempEntity::Frame( float frametime, int framenumber )
 					collisionGroup = GetEngineObject()->GetCollisionGroup();
 				}
 
-				UTIL_TraceLine( vPrevOrigin, GetEngineObject()->GetLocalOrigin(), MASK_SOLID, GetOwnerEntity(), collisionGroup, &trace );
+				UTIL_TraceLine( vPrevOrigin, GetEngineObject()->GetLocalOrigin(), MASK_SOLID, GetEngineObject()->GetOwnerEntity(), collisionGroup, &trace );
 
 				if ( (flags & FTENT_COLLIDEPROPS) && trace.m_pEnt )
 				{
@@ -1182,7 +1182,7 @@ C_LocalTempEntity *CTempEnts::ClientProjectile( const Vector& vecOrigin, const V
 	pTemp->die = gpGlobals->curtime + lifetime;
 	pTemp->flags = FTENT_COLLIDEALL | FTENT_ATTACHTOTARGET | FTENT_ALIGNTOMOTION;
 	pTemp->clientIndex = ( pOwner != NULL ) ? pOwner->entindex() : 0; 
-	pTemp->SetOwnerEntity( pOwner );
+	pTemp->GetEngineObject()->SetOwnerEntity( pOwner );
 	//pTemp->SetImpactEffect( pszImpactEffect );
 	//if ( pszParticleEffect )
 	//{

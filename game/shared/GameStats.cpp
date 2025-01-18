@@ -475,7 +475,7 @@ void CBaseGameStats::Event_PlayerDamage( CBasePlayer *pBasePlayer, const CTakeDa
 	//StatsLog( "CBaseGameStats::Event_PlayerDamage [%s] took %.2f damage\n", pBasePlayer->GetPlayerName(), info.GetDamage() );
 }
 
-void CBaseGameStats::Event_PlayerKilledOther( CBasePlayer *pAttacker, CBaseEntity *pVictim, const CTakeDamageInfo &info )
+void CBaseGameStats::Event_PlayerKilledOther( CBasePlayer *pAttacker, IServerEntity *pVictim, const CTakeDamageInfo &info )
 {
 	StatsLog( "CBaseGameStats::Event_PlayerKilledOther [%s] killed [%s]\n", pAttacker->GetPlayerName(), pVictim->GetClassname() );
 }

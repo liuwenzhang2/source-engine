@@ -447,7 +447,7 @@ void CNPC_Zombine::DropGrenade( Vector vDir )
 		 return;
 
 	m_hGrenade->GetEngineObject()->SetParent( NULL );
-	m_hGrenade->SetOwnerEntity( NULL );
+	m_hGrenade->GetEngineObject()->SetOwnerEntity( NULL );
 
 	Vector vGunPos;
 	QAngle angles;

@@ -124,7 +124,7 @@ void CNPC_APCDriver::InputDisableFiring( inputdata_t &inputdata )
 //-----------------------------------------------------------------------------
 Disposition_t CNPC_APCDriver::IRelationType(CBaseEntity *pTarget)
 {
-	if ( pTarget == m_hAPC || (pTarget->GetOwnerEntity() == m_hAPC) )
+	if ( pTarget == m_hAPC || (pTarget->GetEngineObject()->GetOwnerEntity() == m_hAPC) )
 		return D_LI;
 
 	return BaseClass::IRelationType(pTarget);

@@ -1331,7 +1331,7 @@ void CRocket_Turret_Projectile::NotifySystemEvent(CBaseEntity *pNotify, notify_s
 		// HACK: Clearing the owner allows collisions with launcher.
 		// Players have had trouble realizing a launcher's own rockets don't kill it
 		// because they didn't ever collide. We do this after a portal teleport so it avoids self-collisions on launch.
-		SetOwnerEntity( NULL );
+		GetEngineObject()->SetOwnerEntity( NULL );
 
 		// Restart smoke trail
 		EntityList()->DestroyEntity( m_hRocketTrail );
@@ -1352,7 +1352,7 @@ void CRocket_Turret_Projectile::DoExplosion( void )
 	StopLoopingSounds();
 
 	// Explode
-	ExplosionCreate(GetEngineObject()->GetAbsOrigin(), GetEngineObject()->GetAbsAngles(), GetOwnerEntity(), 200, 25,
+	ExplosionCreate(GetEngineObject()->GetAbsOrigin(), GetEngineObject()->GetAbsAngles(), GetEngineObject()->GetOwnerEntity(), 200, 25,
 		SF_ENVEXPLOSION_NOSPARKS | SF_ENVEXPLOSION_NODLIGHTS | SF_ENVEXPLOSION_NOSMOKE, 100.0f, this);
 
 	// Hackish: Knock turrets in the area

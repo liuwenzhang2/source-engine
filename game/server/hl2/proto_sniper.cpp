@@ -1926,7 +1926,7 @@ bool CProtoSniper::FireBullet( const Vector &vecTarget, bool bDirectShot )
 		return false;
 	}
 
-	pBullet->SetOwnerEntity( this );
+	pBullet->GetEngineObject()->SetOwnerEntity( this );
 
 	CPASAttenuationFilter filternoatten( this, ATTN_NONE );
 	g_pSoundEmitterSystem->EmitSound( filternoatten, entindex(), "NPC_Sniper.FireBullet" );
@@ -3197,7 +3197,7 @@ void CSniperBullet::BulletThink( void )
 	// Set the bullet up to think again.
 	GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.05 );
 
-	if( !GetOwnerEntity() )
+	if( !GetEngineObject()->GetOwnerEntity() )
 	{
 		// Owner died!
 		Stop();
@@ -3210,20 +3210,20 @@ void CSniperBullet::BulletThink( void )
 		CPASAttenuationFilter filter( this, ATTN_NONE );
 		g_pSoundEmitterSystem->EmitSound( filter, entindex(), "NPC_Sniper.SonicBoom" );
 
-		if( GetOwnerEntity() )
+		if(GetEngineObject()->GetOwnerEntity() )
 		{
 			CAI_BaseNPC *pSniper;
 			CAI_BaseNPC *pEnemyNPC;
-			pSniper = GetOwnerEntity()->MyNPCPointer();
+			pSniper = ((CBaseEntity*)GetEngineObject()->GetOwnerEntity())->MyNPCPointer();
 
 			if( pSniper && pSniper->GetEnemy() )
 			{
 				pEnemyNPC = pSniper->GetEnemy()->MyNPCPointer();
 
 				// Warn my enemy if they can see the sniper.
-				if( pEnemyNPC && GetOwnerEntity() && pEnemyNPC->FVisible( GetOwnerEntity()->WorldSpaceCenter() ) )
+				if( pEnemyNPC && GetEngineObject()->GetOwnerEntity() && pEnemyNPC->FVisible(GetEngineObject()->GetOwnerEntity()->WorldSpaceCenter() ) )
 				{
-					CSoundEnt::InsertSound( SOUND_DANGER | SOUND_CONTEXT_FROM_SNIPER, pSniper->GetEnemy()->EarPosition(), 16, 1.0f, GetOwnerEntity() );
+					CSoundEnt::InsertSound( SOUND_DANGER | SOUND_CONTEXT_FROM_SNIPER, pSniper->GetEnemy()->EarPosition(), 16, 1.0f, GetEngineObject()->GetOwnerEntity() );
 				}
 			}
 		}
@@ -3250,7 +3250,7 @@ void CSniperBullet::BulletThink( void )
 	if( tr.fraction != 1.0 )
 	{
 		// This slice of bullet will hit something.
-		GetOwnerEntity()->FireBullets( 1, vecStart, m_vecDir, vec3_origin, flDist, m_AmmoType, 0 );
+		((CBaseEntity*)GetEngineObject()->GetOwnerEntity())->FireBullets( 1, vecStart, m_vecDir, vec3_origin, flDist, m_AmmoType, 0 );
 		m_iImpacts++;
 
 #ifdef HL2_EPISODIC
@@ -3300,7 +3300,7 @@ void CSniperBullet::BulletThink( void )
 			//Msg("#\n");
 			if( m_bDirectShot )
 			{
-				CProtoSniper *pSniper = dynamic_cast<CProtoSniper*>(GetOwnerEntity());
+				CProtoSniper *pSniper = dynamic_cast<CProtoSniper*>(GetEngineObject()->GetOwnerEntity());
 				if( pSniper )
 				{
 					pSniper->NotifyShotMissedTarget();
@@ -3341,7 +3341,7 @@ bool CSniperBullet::Start( const Vector &vecOrigin, const Vector &vecTarget, CBa
 		return false;
 	}
 
-	SetOwnerEntity( pOwner );
+	GetEngineObject()->SetOwnerEntity( pOwner );
 
 	UTIL_SetOrigin( this, vecOrigin );
 

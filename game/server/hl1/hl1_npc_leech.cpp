@@ -683,7 +683,7 @@ void CNPC_Leech::Event_Killed( const CTakeDamageInfo &info )
 
 	//ALERT(at_aiconsole, "Leech: killed\n");
 	// tell owner ( if any ) that we're dead.This is mostly for MonsterMaker functionality.
-	CBaseEntity *pOwner = GetOwnerEntity();
+	IServerEntity *pOwner = GetEngineObject()->GetOwnerEntity();
 	if (pOwner)
 		pOwner->DeathNotice( this );
 

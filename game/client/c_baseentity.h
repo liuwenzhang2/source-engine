@@ -273,12 +273,7 @@ public:
 public:
 	virtual bool					TestCollision(const Ray_t& ray, unsigned int fContentsMask, trace_t& tr);
 	virtual bool					TestHitboxes(const Ray_t& ray, unsigned int fContentsMask, trace_t& tr);
-	// To mimic server call convention
-	C_BaseEntity* GetOwnerEntity(void) const;
-	void							SetOwnerEntity(C_BaseEntity* pOwner);
 
-	C_BaseEntity* GetEffectEntity(void) const;
-	void							SetEffectEntity(C_BaseEntity* pEffectEnt);
 
 	// This function returns a value that scales all damage done by this entity.
 	// Use CDamageModifier to hook in damage modifiers on a guy.
@@ -1161,9 +1156,6 @@ private:
 //	CHandle< CBasePlayer >			m_hPlayerSimulationOwner;
 //#endif
 
-	// The owner!
-	EHANDLE							m_hOwnerEntity;
-	EHANDLE							m_hEffectEntity;
 	
 public:
 

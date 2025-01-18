@@ -206,7 +206,7 @@ void CAntlionTemplateMaker::AddChild( CNPC_Antlion *pAnt )
 	m_Children.AddToTail( pAnt );
 	m_nLiveChildren = m_Children.Count();
 
-	pAnt->SetOwnerEntity( this );
+	pAnt->GetEngineObject()->SetOwnerEntity( this );
 }
 
 //-----------------------------------------------------------------------------
@@ -233,7 +233,7 @@ void CAntlionTemplateMaker::FixupOrphans( void )
 		pAntlion = dynamic_cast<CNPC_Antlion *>(pSearch);
 
 		// See if it's a live orphan
-		if ( pAntlion && pAntlion->GetOwnerEntity() == NULL && pAntlion->IsAlive() )
+		if ( pAntlion && pAntlion->GetEngineObject()->GetOwnerEntity() == NULL && pAntlion->IsAlive() )
 		{
 			// See if its parent was named the same as we are
 			if ( stricmp( pAntlion->GetParentSpawnerName(), STRING( GetEntityName() ) ) == 0 )
@@ -1372,7 +1372,7 @@ void CAntlionTemplateMaker::ChildPostSpawn( CAI_BaseNPC *pChild )
 
 	if ( m_hIgnoreEntity != NULL )
 	{
-		pChild->SetOwnerEntity( m_hIgnoreEntity );
+		pChild->GetEngineObject()->SetOwnerEntity( m_hIgnoreEntity );
 	}
 }
 
@@ -1525,7 +1525,7 @@ void CAntlionTemplateMaker::PoolRegenThink( void )
 // Purpose: 
 // Input  : *pVictim - 
 //-----------------------------------------------------------------------------
-void CAntlionTemplateMaker::DeathNotice( CBaseEntity *pVictim )
+void CAntlionTemplateMaker::DeathNotice( IServerEntity *pVictim )
 {
 	CNPC_Antlion *pAnt = dynamic_cast<CNPC_Antlion *>(pVictim);
 	if ( pAnt == NULL )

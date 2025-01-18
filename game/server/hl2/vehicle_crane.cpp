@@ -877,13 +877,13 @@ void CPropCrane::SetNPCDriver( CNPC_VehicleDriver *pDriver )
 		m_flTurnDecel = CRANE_DECEL * 10;	// Npcs stop quickly to make them more accurate
 
 		// Set our owner entity to be the NPC, so it can path check without hitting us
-		SetOwnerEntity( pDriver );
+		GetEngineObject()->SetOwnerEntity( pDriver );
 	}
 	else
 	{
 		// Restore player crane speeds
 		InitCraneSpeeds();
-		SetOwnerEntity( NULL );
+		GetEngineObject()->SetOwnerEntity( NULL );
 
 		// Shutdown the crane's sounds
 		this->SoundShutdown( 1.0 );

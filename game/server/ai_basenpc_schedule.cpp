@@ -1309,7 +1309,7 @@ void CAI_BaseNPC::StartTask( const Task_t *pTask )
 			if ( pBestSound )
 			{
 				m_vSavePosition = pBestSound->GetSoundOrigin();
-				CBaseEntity *pSoundEnt = pBestSound->m_hOwner;
+				IServerEntity *pSoundEnt = pBestSound->m_hOwner;
 				if ( pSoundEnt )
 				{
 					Vector vel;
@@ -3782,7 +3782,7 @@ void CAI_BaseNPC::RunTask( const Task_t *pTask )
 			CBaseEntity *pTarget = m_hTargetEnt;
 			if ( pTarget )
 			{
-				if ( pTarget->GetOwnerEntity() )
+				if ( pTarget->GetEngineObject()->GetOwnerEntity() )
 				{
 					TaskFail(FAIL_WEAPON_OWNED);
 				}

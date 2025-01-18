@@ -965,7 +965,7 @@ static CDODViewVectors g_DODViewVectors(
 		{
 			retval = 1.0;
 		}
-		else if (!(tr.DidHitWorld()) && (tr.m_pEnt != NULL) && (tr.m_pEnt->GetOwnerEntity() != pEntityToIgnore))
+		else if (!(tr.DidHitWorld()) && (tr.m_pEnt != NULL) && (((IEngineObjectServer*)tr.m_pEnt->GetEngineObject())->GetOwnerEntity() != pEntityToIgnore))
 		{
 			// if we didn't hit world geometry perhaps there's still damage to be done here.
 

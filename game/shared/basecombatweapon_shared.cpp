@@ -130,8 +130,8 @@ void CBaseCombatWeapon::Activate( void )
 {
 	BaseClass::Activate();
 
-#ifndef CLIENT_DLL
-	if ( GetOwnerEntity() )
+#ifdef GAME_DLL
+	if (GetEngineObject()->GetOwnerEntity() )
 		return;
 
 	if ( g_pGameRules->IsAllowedToSpawn( this ) == false )
@@ -662,7 +662,7 @@ float CBaseCombatWeapon::GetWeaponIdleTime( void )
 //-----------------------------------------------------------------------------
 void CBaseCombatWeapon::Drop( const Vector &vecVelocity )
 {
-#if !defined( CLIENT_DLL )
+#if defined( GAME_DLL )
 
 	// Once somebody drops a gun, it's fair game for removal when/if
 	// a game_weapon_manager does a cleanup on surplus weapons in the
@@ -701,10 +701,10 @@ void CBaseCombatWeapon::Drop( const Vector &vecVelocity )
 		GetEngineObject()->SetAbsVelocity( vecVelocity );
 	}
 
-	CBaseEntity *pOwner = GetOwnerEntity();
+	IServerEntity *pOwner = GetEngineObject()->GetOwnerEntity();
 
 	GetEngineObject()->SetNextThink( gpGlobals->curtime + 1.0f );
-	SetOwnerEntity( NULL );
+	GetEngineObject()->SetOwnerEntity( NULL );
 	SetOwner( NULL );
 
 	// If we're not allowing to spawn due to the gamerules,
@@ -979,7 +979,7 @@ void CBaseCombatWeapon::Equip( CBaseCombatCharacter *pOwner )
 	GetEngineObject()->RemoveSolidFlags( FSOLID_TRIGGER );
 	GetEngineObject()->FollowEntity(pOwner->GetEngineObject());
 	SetOwner( pOwner );
-	SetOwnerEntity( pOwner );
+	GetEngineObject()->SetOwnerEntity( pOwner );
 
 	// Break any constraint I might have to the world.
 	GetEngineObject()->RemoveEffects( EF_ITEM_BLINK );

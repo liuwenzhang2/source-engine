@@ -919,7 +919,7 @@ public:
 		{
 			CBaseEntity *pEntity = EntityFromEntityHandle( pHandleEntity );
 			CBaseEntity *pPassEntity = EntityFromEntityHandle( m_PassEntities[0] );
-			if ( pEntity && pPassEntity && pEntity->GetOwnerEntity() == pPassEntity && 
+			if ( pEntity && pPassEntity && pEntity->GetEngineObject()->GetOwnerEntity() == pPassEntity &&
 				pPassEntity->GetEngineObject()->IsSolidFlagSet(FSOLID_NOT_SOLID) && pPassEntity->GetEngineObject()->IsSolidFlagSet( FSOLID_CUSTOMBOXTEST ) &&
 				pPassEntity->GetEngineObject()->IsSolidFlagSet( FSOLID_CUSTOMRAYTEST ) )
 			{
@@ -1674,16 +1674,6 @@ void CBaseEntity::TraceBleed( float flDamage, const Vector &vecDir, trace_t *ptr
 const char* CBaseEntity::GetTracerType()
 {
 	return NULL;
-}
-
-
-
-void CBaseEntity::SetEffectEntity( CBaseEntity *pEffectEnt )
-{
-	if ( m_hEffectEntity.Get() != pEffectEnt )
-	{
-		m_hEffectEntity = pEffectEnt;
-	}
 }
 
 void CBaseEntity::ApplyLocalVelocityImpulse( const Vector &inVecImpulse )

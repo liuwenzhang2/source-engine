@@ -379,9 +379,9 @@ void CBeam::Spawn( void )
 
 void CBeam::Precache( void )
 {
-	if ( GetOwnerEntity() )
+	if (GetEngineObject()->GetOwnerEntity() )
 	{
-		SetStartEntity( GetOwnerEntity() );
+		SetStartEntity(GetEngineObject()->GetOwnerEntity() );
 	}
 	
 	if ( m_hEndEntity.Get() )
@@ -422,7 +422,7 @@ void CBeam::SetStartEntity( IHandleEntity *pEntity )
 { 
 	Assert( m_nNumBeamEnts >= 2 );
 	m_hAttachEntity.Set( 0, pEntity );
-	SetOwnerEntity( (CBaseEntity*)pEntity );
+	GetEngineObject()->SetOwnerEntity( (CBaseEntity*)pEntity );
 	RelinkBeam();
 	pEntity->GetEngineObject()->AddEFlags( EFL_FORCE_CHECK_TRANSMIT );
 }

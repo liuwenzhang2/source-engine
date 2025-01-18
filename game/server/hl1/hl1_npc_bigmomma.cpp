@@ -227,7 +227,7 @@ public:
 	void HandleAnimEvent( animevent_t *pEvent );
 	void LayHeadcrab( void );
 	void LaunchMortar( void );
-	void DeathNotice( CBaseEntity *pevChild );
+	void DeathNotice( IServerEntity *pevChild );
 
 	int MeleeAttack1Conditions( float flDot, float flDist );	// Slash
 	int MeleeAttack2Conditions( float flDot, float flDist );	// Lay a crab
@@ -861,7 +861,7 @@ void CNPC_BigMomma::HandleAnimEvent( animevent_t *pEvent )
 			{
 				if ( pList[i] != this )
 				{
-					if ( pList[i]->GetOwnerEntity() != this )
+					if ( pList[i]->GetEngineObject()->GetOwnerEntity() != this )
 					{
 						pHurt = pList[i];
 					}
@@ -978,7 +978,7 @@ void CNPC_BigMomma::LayHeadcrab( void )
 
 	pChild->GetEngineObject()->AddSpawnFlags( SF_NPC_FALL_TO_GROUND );
 
-	pChild->SetOwnerEntity( this );
+	pChild->GetEngineObject()->SetOwnerEntity( this );
 
 	// Is this the second crab in a pair?
 	if ( HasMemory( bits_MEMORY_CHILDPAIR ) )
@@ -1002,7 +1002,7 @@ void CNPC_BigMomma::LayHeadcrab( void )
 	m_crabCount++;
 }
 
-void CNPC_BigMomma::DeathNotice( CBaseEntity *pevChild )
+void CNPC_BigMomma::DeathNotice( IServerEntity *pevChild )
 {
 	if ( m_crabCount > 0 )		// Some babies may cross a transition, but we reset the count then
 	{
@@ -1200,7 +1200,7 @@ CBMortar *CBMortar::Shoot( CBaseEntity *pOwner, Vector vecStart, Vector vecVeloc
 	
 	UTIL_SetOrigin( pSpit, vecStart );
 	pSpit->GetEngineObject()->SetAbsVelocity( vecVelocity );
-	pSpit->SetOwnerEntity( pOwner );
+	pSpit->GetEngineObject()->SetOwnerEntity( pOwner );
 	pSpit->SetThink ( &CBMortar::Animate );
 	pSpit->GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.1 );
 
@@ -1274,7 +1274,7 @@ void CBMortar::Touch( IServerEntity *pOther )
 	// make some flecks
 	MortarSpray( tr.endpos + Vector( 0, 0, 15 ), tr.plane.normal, gSpitSprite, 24 );
 
-	CBaseEntity *pOwner = GetOwnerEntity();
+	IServerEntity *pOwner = GetEngineObject()->GetOwnerEntity();
 
 	RadiusDamage( CTakeDamageInfo( this, pOwner, sk_bigmomma_dmg_blast.GetFloat(), DMG_ACID ), GetEngineObject()->GetAbsOrigin(), sk_bigmomma_radius_blast.GetFloat(), CLASS_NONE, NULL );
 		

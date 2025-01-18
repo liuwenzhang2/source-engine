@@ -44,7 +44,7 @@ bool C_DynamicProp::TestBoneFollowers( const Ray_t &ray, unsigned int fContentsM
 	int count = UTIL_EntitiesInBox( pList, ARRAYSIZE(pList), mins, maxs, 0, PARTITION_CLIENT_SOLID_EDICTS );
 	for ( int i = 0; i < count; i++ )
 	{
-		if ( pList[i]->GetOwnerEntity() == this )
+		if ( pList[i]->GetEngineObject()->GetOwnerEntity() == this )
 		{
 			if ( pList[i]->TestCollision(ray, fContentsMask, tr) )
 			{

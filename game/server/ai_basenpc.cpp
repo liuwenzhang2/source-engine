@@ -5367,7 +5367,7 @@ bool CAI_BaseNPC::InnateWeaponLOSCondition( const Vector &ownerPos, const Vector
 			// Also, check to see if the owner of the entity is the vehicle, in which case it's valid too.
 			// This catches vehicles that use bone followers.
 			CBaseEntity *pVehicleEnt = pCCEnemy->GetVehicleEntity();
-			if ( pHitEntity == pVehicleEnt || pHitEntity->GetOwnerEntity() == pVehicleEnt )
+			if ( pHitEntity == pVehicleEnt || pHitEntity->GetEngineObject()->GetOwnerEntity() == pVehicleEnt )
 				return true;
 		}
 	}

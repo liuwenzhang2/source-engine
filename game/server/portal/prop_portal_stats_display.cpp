@@ -464,7 +464,7 @@ void CPropPortalStatsDisplay::RestoreControlPanels( void )
 
 		CVGuiScreen *pScreen = (CVGuiScreen *)EntityList()->FindEntityByClassname( NULL, pScreenClassname );
 
-		while ( pScreen && pScreen->GetOwnerEntity() != this && Q_strcmp( pScreen->GetPanelName(), pScreenName ) == 0 )
+		while ( pScreen && pScreen->GetEngineObject()->GetOwnerEntity() != this && Q_strcmp( pScreen->GetPanelName(), pScreenName ) == 0 )
 		{
 			pScreen = (CVGuiScreen *)EntityList()->FindEntityByClassname( pScreen, pScreenClassname );
 		}

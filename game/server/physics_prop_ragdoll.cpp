@@ -979,7 +979,7 @@ void CRagdollPropAttached::VPhysicsUpdate( IPhysicsObject *pPhysics )
 void CRagdollPropAttached::Detach()
 {
 	GetEngineObject()->SetParent(NULL);
-	SetOwnerEntity( NULL );
+	GetEngineObject()->SetOwnerEntity( NULL );
 	GetEngineObject()->SetAbsAngles( vec3_angle );
 	GetEngineObject()->SetMoveType( MOVETYPE_VPHYSICS );
 	GetEngineObject()->RemoveSolidFlags( FSOLID_NOT_SOLID );
@@ -1066,7 +1066,7 @@ void CRagdollPropAttached::InitRagdollAttached(
 	m_pAttachConstraint = EntityList()->PhysGetEnv()->CreateRagdollConstraint( pRefObject, pAttached, GetEngineObject()->GetConstraintGroup(), constraint);
 
 	GetEngineObject()->SetParent( pFollow->GetEngineObject() );
-	SetOwnerEntity( pFollow );
+	GetEngineObject()->SetOwnerEntity( pFollow );
 
 	GetEngineObject()->ActiveRagdoll();
 

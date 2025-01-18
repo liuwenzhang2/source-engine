@@ -80,7 +80,7 @@ C_BaseCombatWeapon *CViewC4Panel::GetOwningWeapon()
 	if (!pScreenEnt)
 		return NULL;
 
-	C_BaseEntity *pOwner = pScreenEnt->GetOwnerEntity();
+	IClientEntity *pOwner = pScreenEnt->GetEngineObject()->GetOwnerEntity();
 	if (!pOwner)
 		return NULL;
 

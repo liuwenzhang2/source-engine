@@ -1095,7 +1095,7 @@ void CWorld::RadiusDamage(const CTakeDamageInfo& info, const Vector& vecSrcIn, f
 
 				// UNDONE: Probably shouldn't let children block parents either?  Or maybe those guys should set their owner if they want this behavior?
 				// HL2 - Dissolve damage is not reduced by interposing non-world objects
-				if (tr.m_pEnt && tr.m_pEnt != pEntity && tr.m_pEnt->GetOwnerEntity() != pEntity)
+				if (tr.m_pEnt && tr.m_pEnt != pEntity && ((IEngineObjectServer*)tr.m_pEnt->GetEngineObject())->GetOwnerEntity() != pEntity)
 				{
 					// Some entity was hit by the trace, meaning the explosion does not have clear
 					// line of sight to the entity that it's trying to hurt. If the world is also

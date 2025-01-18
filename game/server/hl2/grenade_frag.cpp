@@ -117,7 +117,7 @@ void CGrenadeFrag::Spawn( void )
 
 	SetModel( GRENADE_MODEL );
 
-	if( GetOwnerEntity() && GetOwnerEntity()->IsPlayer() )
+	if(GetEngineObject()->GetOwnerEntity() && GetEngineObject()->GetOwnerEntity()->IsPlayer() )
 	{
 		m_flDamage		= sk_plr_dmg_fraggrenade.GetFloat();
 		m_DmgRadius		= sk_fraggrenade_radius.GetFloat();

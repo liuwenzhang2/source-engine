@@ -144,7 +144,7 @@ public:
 
 		UTIL_SetOrigin( pTrigger, vecOrigin );
 		pTrigger->GetEngineObject()->SetSize( vecMins, vecMaxs );
-		pTrigger->SetOwnerEntity( pOwner );
+		pTrigger->GetEngineObject()->SetOwnerEntity( pOwner );
 		pTrigger->GetEngineObject()->SetParent( pOwner?pOwner->GetEngineObject():NULL );
 
 		pTrigger->Spawn();
@@ -184,7 +184,7 @@ public:
 		if ( pOther == NULL )
 			return false;
 
-		CPropJeepEpisodic *pJeep = dynamic_cast< CPropJeepEpisodic * >( GetOwnerEntity() );
+		CPropJeepEpisodic *pJeep = dynamic_cast< CPropJeepEpisodic * >(GetEngineObject()->GetOwnerEntity() );
 		if ( pJeep == NULL )
 			return false;
 
@@ -197,7 +197,7 @@ public:
 		pOther->GetEngineObject()->SetMoveType( MOVETYPE_NONE );
 
 		// Parent the object to our owner
-		pOther->GetEngineObject()->SetParent(GetOwnerEntity() ? GetOwnerEntity()->GetEngineObject() : NULL);
+		pOther->GetEngineObject()->SetParent(GetEngineObject()->GetOwnerEntity() ? GetEngineObject()->GetOwnerEntity()->GetEngineObject() : NULL);
 
 		// The car now owns the entity
 		pJeep->AddPropToCargoHold( pProp );
@@ -1722,7 +1722,7 @@ void CPropJeepEpisodic::InputCreateLinkController( inputdata_t &data )
 		pLinkController->m_flRadius = flRadius;
 		pLinkController->Spawn();
 		pLinkController->GetEngineObject()->SetAbsOrigin( vecFront );
-		pLinkController->SetOwnerEntity( this );
+		pLinkController->GetEngineObject()->SetOwnerEntity( this );
 		pLinkController->GetEngineObject()->SetParent( this->GetEngineObject() );
 		pLinkController->Activate();
 		m_hLinkControllerFront.Set( pLinkController );
@@ -1736,7 +1736,7 @@ void CPropJeepEpisodic::InputCreateLinkController( inputdata_t &data )
 		pLinkController->m_flRadius = flRadius;
 		pLinkController->Spawn();
 		pLinkController->GetEngineObject()->SetAbsOrigin( vecRear );
-		pLinkController->SetOwnerEntity( this );
+		pLinkController->GetEngineObject()->SetOwnerEntity( this );
 		pLinkController->GetEngineObject()->SetParent( this->GetEngineObject() );
 		pLinkController->Activate();
 		m_hLinkControllerRear.Set( pLinkController );

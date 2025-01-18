@@ -931,7 +931,7 @@ void CNPC_Strider::PrescheduleThink()
 	if( GetHealth() <= 50 && random->RandomInt( 0, 20 ) == 0 )
 	{
 		IServerEntity *pTrail = EntityList()->CreateEntityByName( "sparktrail" );
-		pTrail->SetOwnerEntity( this );
+		pTrail->GetEngineObject()->SetOwnerEntity( this );
 		pTrail->Spawn();
 	}
 
@@ -3125,7 +3125,7 @@ void CNPC_Strider::TraceAttack( const CTakeDamageInfo &inputInfo, const Vector &
 int CNPC_Strider::OnTakeDamage_Alive( const CTakeDamageInfo &info )
 {
 	// don't take damage from my own weapons!!!
-	if ( info.GetInflictor() && info.GetInflictor()->GetOwnerEntity() == this )
+	if ( info.GetInflictor() && ((IEngineObjectServer*)info.GetInflictor()->GetEngineObject())->GetOwnerEntity() == this )
 		return 0;
 
 	// special interaction with combine balls
@@ -4267,7 +4267,7 @@ bool CNPC_Strider::TestCollision( const Ray_t &ray, unsigned int mask, trace_t& 
 //---------------------------------------------------------
 bool CNPC_Strider::CarriedByDropship()
 {
-	if( GetOwnerEntity() && FClassnameIs( GetOwnerEntity(), "npc_combinedropship" ) )
+	if(GetEngineObject()->GetOwnerEntity() && FClassnameIs(GetEngineObject()->GetOwnerEntity(), "npc_combinedropship" ) )
 		return true;
 
 	return false;
@@ -5471,7 +5471,7 @@ void CSparkTrail::Spawn()
 	g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 
 	m_iHealth = 20 + random->RandomInt( 0, 5 );
-	UTIL_SetOrigin( this, GetOwnerEntity()->EyePosition() );
+	UTIL_SetOrigin( this, GetEngineObject()->GetOwnerEntity()->EyePosition() );
 
 	Vector vecVelocity;
 

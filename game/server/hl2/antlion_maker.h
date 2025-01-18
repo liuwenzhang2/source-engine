@@ -77,7 +77,7 @@ class CAntlionTemplateMaker : public CTemplateNPCMaker
 
 	void	SetChildMoveState( AntlionMoveState_e state );
 
-	void	DeathNotice( CBaseEntity *pVictim );
+	void	DeathNotice( IServerEntity *pVictim );
 	bool	IsDepleted( void );
 
 	bool	ShouldHearBugbait( void ) { return (m_bIgnoreBugbait==false); }

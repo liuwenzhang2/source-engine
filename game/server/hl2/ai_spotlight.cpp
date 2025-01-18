@@ -154,7 +154,7 @@ void CAI_Spotlight::CreateSpotlightEntities( void )
 	m_hSpotlightTarget = (CSpotlightEnd*)EntityList()->CreateEntityByName( "spotlight_end" );
 	m_hSpotlightTarget->Spawn();
 	m_hSpotlightTarget->GetEngineObject()->SetAbsOrigin( vecEndPoint );
-	m_hSpotlightTarget->SetOwnerEntity( GetOuter() );
+	m_hSpotlightTarget->GetEngineObject()->SetOwnerEntity( GetOuter() );
 	m_hSpotlightTarget->GetEngineObject()->SetRenderColor( 255, 255, 255 );
 	m_hSpotlightTarget->m_Radius = m_flSpotlightMaxLength;
 	if ( FBitSet (m_nFlags, AI_SPOTLIGHT_NO_DLIGHTS) )

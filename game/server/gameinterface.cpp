@@ -2377,7 +2377,7 @@ void CServerGameDLL::InternalEmitCloseCaption(IRecipientFilter& filter, int enti
 				break;
 			}
 
-			ent = ent->GetOwnerEntity();
+			ent = ent->GetEngineObject()->GetOwnerEntity();
 		}
 	}
 	InternalEmitCloseCaption(filter, entindex, fromplayer, ep.m_pSoundName, ep.m_UtlVecSoundOrigin, duration, ep.m_bWarnOnMissingCloseCaption);
@@ -2401,7 +2401,7 @@ void CServerGameDLL::EmitCloseCaption(IRecipientFilter& filter, int entindex, ch
 			fromplayer = true;
 			break;
 		}
-		ent = ent->GetOwnerEntity();
+		ent = ent->GetEngineObject()->GetOwnerEntity();
 	}
 
 	InternalEmitCloseCaption(filter, entindex, fromplayer, token, soundorigin, duration, warnifmissing);

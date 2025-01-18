@@ -134,18 +134,18 @@ void CSatchelCharge::SatchelThink( void )
 
 	// See if I can lose my owner (has dropper moved out of way?)
 	// Want do this so owner can shoot the satchel charge
-	if (GetOwnerEntity())
+	if (GetEngineObject()->GetOwnerEntity())
 	{
 		trace_t tr;
 		Vector	vUpABit = GetEngineObject()->GetAbsOrigin();
 		vUpABit.z += 5.0;
 
-		CBaseEntity* saveOwner	= GetOwnerEntity();
-		SetOwnerEntity( NULL );
+		IServerEntity* saveOwner	= GetEngineObject()->GetOwnerEntity();
+		GetEngineObject()->SetOwnerEntity( NULL );
 		EntityList()->GetEngineWorld()->TraceEntity( this->GetEngineObject(), GetEngineObject()->GetAbsOrigin(), vUpABit, MASK_SOLID, &tr);
 		if ( tr.startsolid || tr.fraction != 1.0 )
 		{
-			SetOwnerEntity( saveOwner );
+			GetEngineObject()->SetOwnerEntity( saveOwner );
 		}
 	}
 	

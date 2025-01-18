@@ -658,6 +658,10 @@ public:
 	virtual bool PhysModelParseSolid(solid_t& solid) = 0;
 	virtual bool PhysModelParseSolidByIndex(solid_t& solid, int solidIndex) = 0;
 	virtual void PhysForceClearVelocity(IPhysicsObject* pPhys) = 0;
+	virtual IClientEntity* GetOwnerEntity(void) const = 0;
+	virtual void SetOwnerEntity(IClientEntity* pOwner) = 0;
+	virtual IClientEntity* GetEffectEntity(void) const = 0;
+	virtual void SetEffectEntity(IClientEntity* pEffectEnt) = 0;
 
 	virtual bool IsWorld() = 0;
 	virtual IEngineWorldClient* AsEngineWorld() = 0;
@@ -905,7 +909,6 @@ public:
 	virtual IStudioHdr* OnNewModel() = 0;
 	virtual void SetBlocksLOS(bool bBlocksLOS) = 0;
 	virtual bool BlocksLOS(void) = 0;
-	virtual IClientEntity* GetOwnerEntity(void) const = 0;
 	virtual bool GetAttachmentVelocity(int number, Vector& originVel, Quaternion& angleVel) = 0;
 	virtual void OnAddEffects(int nEffects) = 0;
 	virtual void OnRemoveEffects(int nEffects) = 0;
@@ -955,7 +958,6 @@ public:
 	virtual void FormatViewModelAttachment(int nAttachment, matrix3x4_t& attachmentToWorld) = 0;
 
 	virtual void UpdateVisibility() = 0;
-	virtual IClientEntity* GetEffectEntity(void) const = 0;
 	virtual IPVSNotify* GetPVSNotifyInterface() = 0;
 	virtual void OnThreadedDrawSetup() = 0;
 	virtual bool ShouldDraw(void) = 0;

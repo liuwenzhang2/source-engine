@@ -403,7 +403,7 @@ CHunterFlechette *CHunterFlechette::FlechetteCreate( const Vector &vecOrigin, co
 	pFlechette->GetEngineObject()->SetAbsAngles( angAngles );
 	pFlechette->Spawn();
 	pFlechette->Activate();
-	pFlechette->SetOwnerEntity( pentOwner );
+	pFlechette->GetEngineObject()->SetOwnerEntity( pentOwner );
 
 	return pFlechette;
 }
@@ -697,7 +697,7 @@ void CHunterFlechette::FlechetteTouch( IServerEntity *pOther )
 			flDamage = MAX( pOther->GetHealth(), flDamage );
 		}
 
-		CTakeDamageInfo	dmgInfo( this, GetOwnerEntity(), flDamage, DMG_DISSOLVE | DMG_NEVERGIB );
+		CTakeDamageInfo	dmgInfo( this, GetEngineObject()->GetOwnerEntity(), flDamage, DMG_DISSOLVE | DMG_NEVERGIB );
 		CalculateMeleeDamageForce( &dmgInfo, vecNormalizedVel, tr.endpos, 0.7f );
 		dmgInfo.SetDamagePosition( tr.endpos );
 		pOther->DispatchTraceAttack( dmgInfo, vecNormalizedVel, &tr );
@@ -958,7 +958,7 @@ void CHunterFlechette::Explode()
 		nDamageType |= DMG_PREVENT_PHYSICS_FORCE;
 	}
 
-	RadiusDamage( CTakeDamageInfo( this, GetOwnerEntity(), sk_hunter_flechette_explode_dmg.GetFloat(), nDamageType ), GetEngineObject()->GetAbsOrigin(), sk_hunter_flechette_explode_radius.GetFloat(), CLASS_NONE, NULL );
+	RadiusDamage( CTakeDamageInfo( this, GetEngineObject()->GetOwnerEntity(), sk_hunter_flechette_explode_dmg.GetFloat(), nDamageType ), GetEngineObject()->GetAbsOrigin(), sk_hunter_flechette_explode_radius.GetFloat(), CLASS_NONE, NULL );
 		
 	GetEngineObject()->AddEffects( EF_NODRAW );
 
@@ -5561,7 +5561,7 @@ void CNPC_Hunter::PhysicsDamageEffect( const Vector &vecPos, const Vector &vecDi
 	if ( random->RandomInt( 0, 1 ) == 0 )
 	{
 		IServerEntity *pTrail = EntityList()->CreateEntityByName( "sparktrail" );
-		pTrail->SetOwnerEntity( this );
+		pTrail->GetEngineObject()->SetOwnerEntity( this );
 		pTrail->Spawn();
 	}
 }

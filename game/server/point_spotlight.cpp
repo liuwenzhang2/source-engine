@@ -338,7 +338,7 @@ void CPointSpotlight::SpotlightCreate(void)
 	m_hSpotlightTarget = (CSpotlightEnd*)EntityList()->CreateEntityByName( "spotlight_end" );
 	m_hSpotlightTarget->Spawn();
 	m_hSpotlightTarget->GetEngineObject()->SetAbsOrigin( tr.endpos );
-	m_hSpotlightTarget->SetOwnerEntity( this );
+	m_hSpotlightTarget->GetEngineObject()->SetOwnerEntity( this );
 	m_hSpotlightTarget->GetEngineObject()->SetRenderColor(GetEngineObject()->GetRenderColor());
 	m_hSpotlightTarget->m_Radius = m_flSpotlightMaxLength;
 

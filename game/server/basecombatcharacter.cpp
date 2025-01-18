@@ -843,11 +843,11 @@ void CBaseCombatCharacter::UpdateOnRemove( void )
 	}
 
 	// tell owner ( if any ) that we're dead.This is mostly for NPCMaker functionality.
-	CBaseEntity *pOwner = GetOwnerEntity();
+	IServerEntity *pOwner = GetEngineObject()->GetOwnerEntity();
 	if ( pOwner )
 	{
 		pOwner->DeathNotice( this );
-		SetOwnerEntity( NULL );
+		GetEngineObject()->SetOwnerEntity( NULL );
 	}
 
 #ifdef GLOWS_ENABLE
@@ -1177,7 +1177,7 @@ bool CTraceFilterMelee::ShouldHitEntity( IHandleEntity *pHandleEntity, int conte
 				}
 				
 				// Put a combat sound in
-				CSoundEnt::InsertSound( SOUND_COMBAT, info.GetDamagePosition(), 200, 0.2f, (CBaseEntity*)info.GetAttacker() );
+				CSoundEnt::InsertSound( SOUND_COMBAT, info.GetDamagePosition(), 200, 0.2f, (IServerEntity*)info.GetAttacker() );
 
 				m_pHit = pEntity;
 				return true;
@@ -1455,15 +1455,15 @@ void CBaseCombatCharacter::FixupBurningServerRagdoll( CBaseEntity *pRagdoll )
 		return;
 
 	// Move the fire effects entity to the ragdoll
-	CEntityFlame *pFireChild = dynamic_cast<CEntityFlame *>( GetEffectEntity() );
+	CEntityFlame *pFireChild = dynamic_cast<CEntityFlame *>(GetEngineObject()->GetEffectEntity() );
 	if ( pFireChild )
 	{
-		SetEffectEntity( NULL );
+		GetEngineObject()->SetEffectEntity( NULL );
 		pRagdoll->GetEngineObject()->AddFlag( FL_ONFIRE );
 		pFireChild->GetEngineObject()->SetAbsOrigin( pRagdoll->GetEngineObject()->GetAbsOrigin() );
 		pFireChild->AttachToEntity( pRagdoll );
 		pFireChild->GetEngineObject()->AddEFlags( EFL_FORCE_CHECK_TRANSMIT );
- 		pRagdoll->SetEffectEntity( pFireChild );
+ 		pRagdoll->GetEngineObject()->SetEffectEntity( pFireChild );
 
 		color32 color = GetEngineObject()->GetRenderColor();
 		pRagdoll->GetEngineObject()->SetRenderColor( color.r, color.g, color.b );
@@ -3227,7 +3227,7 @@ void RadiusDamage( const CTakeDamageInfo &info, const Vector &vecSrc, float flRa
 		// be less than 128 units.
 		float soundRadius = MAX( 128.0f, flRadius * 1.5 );
 
-		CSoundEnt::InsertSound( SOUND_COMBAT | SOUND_CONTEXT_EXPLOSION, vecSrc, soundRadius, 0.25, (CBaseEntity*)info.GetInflictor() );
+		CSoundEnt::InsertSound( SOUND_COMBAT | SOUND_CONTEXT_EXPLOSION, vecSrc, soundRadius, 0.25, (IServerEntity*)info.GetInflictor() );
 	}
 }
 

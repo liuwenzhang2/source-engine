@@ -589,6 +589,10 @@ public:
 	virtual float PhysGetEntityMass() = 0;
 	virtual IEngineObjectServer* GetClonesOfEntity() const = 0;
 	virtual IEnginePortalServer* GetPortalThatOwnsEntity() = 0;
+	virtual IServerEntity* GetOwnerEntity() const = 0;
+	virtual void SetOwnerEntity(IServerEntity* pOwner) = 0;
+	virtual IServerEntity* GetEffectEntity() const = 0;
+	virtual void SetEffectEntity(IServerEntity* pEffectEnt) = 0;
 
 	virtual bool IsWorld() = 0;
 	virtual IEngineWorldServer* AsEngineWorld() = 0;
@@ -971,9 +975,11 @@ public:
 	virtual bool IsChangeLevelTrigger() const = 0;
 	virtual const char* GetNewMapName() = 0;
 	virtual const char* GetNewLandmarkName() = 0;
+	virtual bool IsNodeEnt() = 0;
 	virtual bool IsAlive(void) = 0;
 	virtual bool IsStandable() const = 0;
 	virtual bool IsMoving(void) = 0;
+	virtual bool IsViewable(void) = 0;
 	virtual bool IsFloating() = 0;
 	virtual bool IsNavIgnored() const = 0;
 	virtual void SetNavIgnore(float duration = FLT_MAX) = 0;
@@ -999,7 +1005,6 @@ public:
 	virtual void CalculateIKLocks(float currentTime) = 0;
 	virtual void BeforeParentChanged(IServerEntity* pNewParent, int inewAttachment = -1) = 0;
 	virtual void AfterParentChanged(IServerEntity* pOldParent, int iOldAttachment = -1) = 0;
-	virtual IServerEntity* GetEffectEntity() const = 0;
 	virtual void OnAddEffects(int nEffects) = 0;
 	virtual void OnRemoveEffects(int nEffects) = 0;
 	virtual void OnSetEffects(int nEffects) = 0;
@@ -1068,8 +1073,6 @@ public:
 	virtual int IsDormant(void) = 0;
 	virtual void MakeDormant(void) = 0;
 	virtual float GetMoveDoneTime() const = 0;
-	virtual IServerEntity* GetOwnerEntity() const = 0;
-	virtual void SetOwnerEntity(IServerEntity* pOwner) = 0;
 	virtual IServerEntity* GetActiveWeapon() const = 0;
 	virtual IServerEntity* PhysCannonGetHeldEntity() = 0;
 	virtual int GetMaxHealth() const = 0;
@@ -1084,6 +1087,7 @@ public:
 	virtual int OnTakeDamage(const CTakeDamageInfo& info) = 0;
 	virtual void Event_Killed(const CTakeDamageInfo& info) = 0;
 	virtual void Event_KilledOther(IServerEntity* pVictim, const CTakeDamageInfo& info) = 0;
+	virtual void DeathNotice(IServerEntity* pVictim) = 0;
 	virtual int GetTeamNumber(void) const = 0;
 	virtual const char* TeamID(void) const = 0;
 	virtual void AddPoints(int score, bool bAllowNegativeScore) = 0;

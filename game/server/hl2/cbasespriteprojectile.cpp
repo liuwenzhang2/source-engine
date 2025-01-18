@@ -53,7 +53,7 @@ void CBaseSpriteProjectile::Spawn(	char *pszModel,
 	UTIL_SetOrigin( this, vecOrigin );
 	GetEngineObject()->SetAbsVelocity( vecVelocity );
 
-	SetOwnerEntity( pOwner );
+	GetEngineObject()->SetOwnerEntity( pOwner );
 
 	m_hIntendedTarget.Set( pIntendedTarget );
 
@@ -72,9 +72,9 @@ void CBaseSpriteProjectile::Touch( IServerEntity *pOther )
 //---------------------------------------------------------
 void CBaseSpriteProjectile::HandleTouch( IServerEntity *pOther )
 {
-	CBaseEntity *pOwner;
+	IServerEntity *pOwner;
 
-	pOwner = GetOwnerEntity();
+	pOwner = GetEngineObject()->GetOwnerEntity();
 
 	if( !pOwner )
 	{

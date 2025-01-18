@@ -84,7 +84,7 @@ CGrenadeHomer* CGrenadeHomer::CreateGrenadeHomer( string_t sModelName, string_t 
 	if ( pGrenade->entindex()!=-1 )
 	{
 		pGrenade->m_sFlySound	= sFlySound;
-		pGrenade->SetOwnerEntity( pentOwner );
+		pGrenade->GetEngineObject()->SetOwnerEntity( pentOwner );
 		pGrenade->GetEngineObject()->SetLocalOrigin( vecOrigin );
 		pGrenade->GetEngineObject()->SetLocalAngles( vecAngles );
 		pGrenade->SetModel( STRING(sModelName) );
@@ -299,7 +299,7 @@ void CGrenadeHomer::Launch( CBaseEntity*		pOwner,
 							float				flGravity,
 							int					nRocketTrailType)
 {
-	SetOwnerEntity( pOwner );
+	GetEngineObject()->SetOwnerEntity( pOwner );
 	m_hTarget					= pTarget;
 	GetEngineObject()->SetAbsVelocity( vInitVelocity );
 	m_flHomingSpeed				= flHomingSpeed;
@@ -456,7 +456,7 @@ void CGrenadeHomer::Detonate(void)
 
 	UTIL_ScreenShake(GetEngineObject()->GetAbsOrigin(), 25.0, 150.0, 1.0, 750, SHAKE_START );
 
-	RadiusDamage ( CTakeDamageInfo( this, GetOwnerEntity(), m_flDamage, DMG_BLAST ), GetEngineObject()->GetAbsOrigin(), m_DmgRadius, CLASS_NONE, NULL );
+	RadiusDamage ( CTakeDamageInfo( this, GetEngineObject()->GetOwnerEntity(), m_flDamage, DMG_BLAST ), GetEngineObject()->GetAbsOrigin(), m_DmgRadius, CLASS_NONE, NULL );
 	CPASAttenuationFilter filter2( this, "GrenadeHomer.StopSounds" );
 	g_pSoundEmitterSystem->EmitSound( filter2, entindex(), "GrenadeHomer.StopSounds" );
 	EntityList()->DestroyEntity( this );

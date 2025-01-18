@@ -174,7 +174,7 @@ private:
 	float			m_flLoadWeight;
 	float			m_savedRotDamping[VPHYSICS_MAX_OBJECT_LIST_COUNT];
 	float			m_savedMass[VPHYSICS_MAX_OBJECT_LIST_COUNT];
-	ENTHANDLE			m_attachedEntity;
+	ENTHANDLE		m_attachedEntity;
 	QAngle			m_vecPreferredCarryAngles;
 	bool			m_bHasPreferredCarryAngles;
 	float			m_flDistanceOffset;
@@ -190,7 +190,7 @@ private:
 	bool			m_bAllowObjectOverhead; // Can the player hold this object directly overhead? (Default is NO)
 
 	//set when a held entity is penetrating another through a portal. Needed for special fixes
-	ENTHANDLE			m_PenetratedEntity;
+	ENTHANDLE		m_PenetratedEntity;
 	int				m_frameCount;
 };
 
@@ -969,6 +969,13 @@ public:
 	CEngineObjectInternal* GetClonesOfEntity() const;
 	IEnginePortalServer* GetPortalThatOwnsEntity(); //fairly cheap to call
 
+	// Owner entity.
+// FIXME: These are virtual only because of CNodeEnt
+	IServerEntity* GetOwnerEntity() const;
+	virtual void SetOwnerEntity(IServerEntity* pOwner);
+	void SetEffectEntity(IServerEntity* pEffectEnt);
+	IServerEntity* GetEffectEntity() const;
+
 	bool IsWorld() { return false; }
 	IEngineWorldServer* AsEngineWorld() { Error("I am not EngineWorld!"); }
 	const IEngineWorldServer* AsEngineWorld() const { Error("I am not EngineWorld!"); }
@@ -1163,6 +1170,8 @@ private:
 	CNetworkVar(bool, m_bAlternateSorting);
 	CNetworkVar(int, m_ubInterpolationFrame);
 
+	CNetworkHandle(IServerEntity, m_hOwnerEntity);	// only used to point to an edict it won't collide with
+	CNetworkHandle(IServerEntity, m_hEffectEntity);	// Fire/Dissolve entity.
 	CGrabControllerInternal m_grabController;
 };
 
@@ -1948,6 +1957,16 @@ inline void CEngineObjectInternal::SetRenderColorB(byte b)
 inline void CEngineObjectInternal::SetRenderColorA(byte a)
 {
 	m_clrRender.SetA(a);
+}
+
+inline IServerEntity* CEngineObjectInternal::GetOwnerEntity() const
+{
+	return m_hOwnerEntity.Get();
+}
+
+inline IServerEntity* CEngineObjectInternal::GetEffectEntity() const
+{
+	return m_hEffectEntity.Get();
 }
 
 class CEngineWorldInternal : public CEngineObjectInternal, public IEngineWorldServer {
@@ -7274,7 +7293,7 @@ void CGlobalEntityList<T>::UpdateRagdolls(float frametime) // EPISODIC VERSION
 
 			next = m_LRU.Next(i);
 			IPhysicsObject* pObject = pRagdoll->GetEngineObject()->VPhysicsGetObject();
-			if (pRagdoll && (pRagdoll->GetEffectEntity() || (pObject && !pObject->IsAsleep())))
+			if (pRagdoll && (pRagdoll->GetEngineObject()->GetEffectEntity() || (pObject && !pObject->IsAsleep())))
 				continue;
 
 			if (pRagdoll)
@@ -7311,7 +7330,7 @@ void CGlobalEntityList<T>::UpdateRagdolls(float frametime) // EPISODIC VERSION
 
 			//Just ignore it until we're done burning/dissolving.
 			IPhysicsObject* pObject = pRagdoll->GetEngineObject()->VPhysicsGetObject();
-			if (pRagdoll && (pRagdoll->GetEffectEntity() || (pObject && !pObject->IsAsleep())))
+			if (pRagdoll && (pRagdoll->GetEngineObject()->GetEffectEntity() || (pObject && !pObject->IsAsleep())))
 				continue;
 
 			m_LRU[i]->SUB_StartFadeOut(0);
@@ -7388,7 +7407,7 @@ void CGlobalEntityList<T>::UpdateRagdolls(float frametime) // Non-episodic versi
 		IServerEntity* pRagdoll = m_LRU[i].Get();
 
 		//Just ignore it until we're done burning/dissolving.
-		if (pRagdoll && pRagdoll->GetEffectEntity())
+		if (pRagdoll && pRagdoll->GetEngineObject()->GetEffectEntity())
 			continue;
 
 		m_LRU[i]->SUB_StartFadeOut(0);

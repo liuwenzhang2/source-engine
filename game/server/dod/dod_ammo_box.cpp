@@ -27,7 +27,7 @@ void CAmmoBox::Spawn( void )
 
 	SetTouch( &CAmmoBox::BoxTouch );
 
-	m_hOldOwner = GetOwnerEntity();
+	m_hOldOwner = (CBaseEntity*)GetEngineObject()->GetOwnerEntity();
 }
 
 void CAmmoBox::Precache( void )
@@ -69,7 +69,7 @@ void CAmmoBox::SetAmmoTeam( int team )
 
 void CAmmoBox::FlyThink( void )
 {
-	SetOwnerEntity( NULL );	//so our owner can pick it back up
+	GetEngineObject()->SetOwnerEntity( NULL );	//so our owner can pick it back up
 }
 
 void CAmmoBox::BoxTouch( IServerEntity *pOther )
@@ -84,7 +84,7 @@ void CAmmoBox::BoxTouch( IServerEntity *pOther )
 
 	//Don't let the person who threw this ammo pick it up until it hits the ground.
 	//This way we can throw ammo to people, but not touch it as soon as we throw it ourselves
-	if( GetOwnerEntity() == pOther )
+	if(GetEngineObject()->GetOwnerEntity() == pOther )
 		return;
 
 	CDODPlayer *pPlayer = ToDODPlayer( pOther );
