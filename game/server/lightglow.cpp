@@ -50,7 +50,7 @@ public:
 //extern void SendProxy_MoveParentToInt(const SendProp* pProp, const void* pStruct, const void* pData, DVariant* pOut, int iElement, int objectID);
 
 IMPLEMENT_SERVERCLASS_ST_NOBASE( CLightGlow, DT_LightGlow )
-	SendPropInt( SENDINFO(m_clrRender), 32, SPROP_UNSIGNED, SendProxy_Color32ToInt ),
+	//SendPropInt( SENDINFO(m_clrRender), 32, SPROP_UNSIGNED, SendProxy_Color32ToInt ),
 	SendPropInt( SENDINFO(m_nHorizontalSize), 16, SPROP_UNSIGNED ),
 	SendPropInt( SENDINFO(m_nVerticalSize), 16, SPROP_UNSIGNED ),
 	SendPropInt( SENDINFO(m_nMinDist), 16, SPROP_UNSIGNED ),
@@ -134,5 +134,5 @@ void CLightGlow::Activate()
 
 void CLightGlow::InputColor(inputdata_t &inputdata)
 {
-	m_clrRender = inputdata.value.Color32();
+	GetEngineObject()->SetRenderColor(inputdata.value.Color32());
 }

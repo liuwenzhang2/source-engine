@@ -274,7 +274,7 @@ void CClient_Precipitation::OnDataChanged( DataUpdateType_t updateType )
 		}
 	}
 
-	m_flDensity = RemapVal( m_clrRender->a, 0, 255, 0, 0.001 );
+	m_flDensity = RemapVal(GetEngineObject()->GetRenderColor().a, 0, 255, 0, 0.001 );
 
 	BaseClass::OnDataChanged( updateType );
 }
@@ -1438,9 +1438,9 @@ void C_Embers::SpawnEmber( void )
 	sParticle->m_flLifetime = 0.0f;
 	sParticle->m_flDieTime	= m_nLifetime;
 
-	sParticle->m_uchColor[0]	= m_clrRender->r * cScale;
-	sParticle->m_uchColor[1]	= m_clrRender->g * cScale;
-	sParticle->m_uchColor[2]	= m_clrRender->b * cScale;
+	sParticle->m_uchColor[0]	= GetEngineObject()->GetRenderColor().r * cScale;
+	sParticle->m_uchColor[1]	= GetEngineObject()->GetRenderColor().g * cScale;
+	sParticle->m_uchColor[2]	= GetEngineObject()->GetRenderColor().b * cScale;
 	sParticle->m_uchStartAlpha	= 255;
 	sParticle->m_uchEndAlpha	= 0;
 	sParticle->m_uchStartSize	= 1;
@@ -1510,8 +1510,8 @@ Vector Color32ToVector( const color32 &color )
 
 int	C_QuadraticBeam::DrawModel( int )
 {
-	Draw_SetSpriteTexture(GetEngineObject()->GetModel(), 0, GetRenderMode() );
-	Vector color = Color32ToVector( GetRenderColor() );
+	Draw_SetSpriteTexture(GetEngineObject()->GetModel(), 0, GetEngineObject()->GetRenderMode() );
+	Vector color = Color32ToVector(GetEngineObject()->GetRenderColor() );
 	DrawBeamQuadratic( GetRenderOrigin(), m_controlPosition, m_targetPosition, m_flWidth, color, gpGlobals->curtime*m_scrollRate );
 	return 1;
 }

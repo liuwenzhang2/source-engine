@@ -260,8 +260,8 @@ void CBaseHeadcrab::Spawn( void )
 	{
 		m_bHidden = true;
 		GetEngineObject()->AddSolidFlags( FSOLID_NOT_SOLID );
-		SetRenderColorA( 0 );
-		m_nRenderMode = kRenderTransTexture;
+		GetEngineObject()->SetRenderColorA( 0 );
+		GetEngineObject()->SetRenderMode(kRenderTransTexture);
 		GetEngineObject()->AddEffects( EF_NODRAW );
 	}
 	else
@@ -1081,17 +1081,17 @@ void CBaseHeadcrab::PrescheduleThink( void )
 	BaseClass::PrescheduleThink();
 	
 	// Are we fading in after being hidden?
-	if ( !m_bHidden && (m_nRenderMode != kRenderNormal) )
+	if ( !m_bHidden && (GetEngineObject()->GetRenderMode() != kRenderNormal) )
 	{
-		int iNewAlpha = MIN( 255, GetRenderColor().a + 120 );
+		int iNewAlpha = MIN( 255, GetEngineObject()->GetRenderColor().a + 120 );
 		if ( iNewAlpha >= 255 )
 		{
-			m_nRenderMode = kRenderNormal;
-			SetRenderColorA( 0 );
+			GetEngineObject()->SetRenderMode(kRenderNormal);
+			GetEngineObject()->SetRenderColorA( 0 );
 		}
 		else
 		{
-			SetRenderColorA( iNewAlpha );
+			GetEngineObject()->SetRenderColorA( iNewAlpha );
 		}
 	}
 

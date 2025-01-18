@@ -342,8 +342,8 @@ void CGib::WaitTillLand ( void )
 
 	if (GetEngineObject()->GetAbsVelocity() == vec3_origin )
 	{
-		SetRenderColorA( 255 );
-		m_nRenderMode = kRenderTransTexture;
+		GetEngineObject()->SetRenderColorA( 255 );
+		GetEngineObject()->SetRenderMode(kRenderTransTexture);
 		if (GetEngineObject()->GetMoveType() != MOVETYPE_VPHYSICS )
 		{
 			GetEngineObject()->AddSolidFlags( FSOLID_NOT_SOLID );
@@ -587,8 +587,8 @@ void CGib::Spawn( const char *szGibModel )
 	
 	// sometimes an entity inherits the edict from a former piece of glass,
 	// and will spawn using the same render FX or m_nRenderMode! bad!
-	SetRenderColorA( 255 );
-	m_nRenderMode = kRenderNormal;
+	GetEngineObject()->SetRenderColorA( 255 );
+	GetEngineObject()->SetRenderMode(kRenderNormal);
 	GetEngineObject()->SetRenderFX(kRenderFxNone);
 	
 	// hopefully this will fix the VELOCITY TOO LOW crap

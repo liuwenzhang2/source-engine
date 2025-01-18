@@ -239,7 +239,7 @@ void CSprite::Spawn( void )
 	}
 
 	//Set our state
-	SetBrightness( m_clrRender->a );
+	SetBrightness( GetEngineObject()->GetRenderColor().a );
 	SetScale( scale );
 
 #if defined( CLIENT_DLL )
@@ -473,14 +473,14 @@ void CSprite::ExpandThink( void )
 	SetSpriteScale( m_flSpriteScale + m_flSpeed * frametime );
 
 	int sub = (int)(m_iHealth * frametime);
-	if ( sub > m_clrRender->a )
+	if ( sub > GetEngineObject()->GetRenderColor().a )
 	{
-		SetRenderColorA( 0 );
+		GetEngineObject()->SetRenderColorA( 0 );
 		Release( );
 	}
 	else
 	{
-		SetRenderColorA( m_clrRender->a - sub );
+		GetEngineObject()->SetRenderColorA( GetEngineObject()->GetRenderColor().a - sub );
 		GetEngineObject()->SetNextThink( gpGlobals->curtime );
 		m_flLastTime		= gpGlobals->curtime;
 	}
@@ -605,19 +605,19 @@ void CSprite::InputShowSprite( inputdata_t &inputdata )
 void CSprite::InputColorRedValue( inputdata_t &inputdata )
 {
 	int nNewColor = clamp( FastFloatToSmallInt( inputdata.value.Float() ), 0, 255 );
-	SetColor( nNewColor, m_clrRender->g, m_clrRender->b );
+	SetColor( nNewColor, GetEngineObject()->GetRenderColor().g, GetEngineObject()->GetRenderColor().b );
 }
 
 void CSprite::InputColorGreenValue( inputdata_t &inputdata )
 {
 	int nNewColor = clamp( FastFloatToSmallInt( inputdata.value.Float() ), 0, 255 );
-	SetColor( m_clrRender->r, nNewColor, m_clrRender->b );
+	SetColor( GetEngineObject()->GetRenderColor().r, nNewColor, GetEngineObject()->GetRenderColor().b );
 }
 
 void CSprite::InputColorBlueValue( inputdata_t &inputdata )
 {
 	int nNewColor = clamp( FastFloatToSmallInt( inputdata.value.Float() ), 0, 255 );
-	SetColor( m_clrRender->r, m_clrRender->g, nNewColor );
+	SetColor( GetEngineObject()->GetRenderColor().r, GetEngineObject()->GetRenderColor().g, nNewColor );
 }
 
 //-----------------------------------------------------------------------------
@@ -797,12 +797,12 @@ int CSprite::DrawModel( int flags )
 		m_flFrame,				// sprite frame to render
 		m_hAttachedToEntity,	// attach to
 		m_nAttachment,			// attachment point
-		GetRenderMode(),		// rendermode
+		GetEngineObject()->GetRenderMode(),		// rendermode
 		GetEngineObject()->GetRenderFX(),
 		GetRenderBrightness(),	// alpha
-		m_clrRender->r,
-		m_clrRender->g,
-		m_clrRender->b,
+		GetEngineObject()->GetRenderColor().r,
+		GetEngineObject()->GetRenderColor().g,
+		GetEngineObject()->GetRenderColor().b,
 		renderscale,			// sprite scale
 		GetHDRColorScale()		// HDR Color Scale
 		);

@@ -2359,8 +2359,8 @@ void CTriggerCamera::Spawn( void )
 
 	GetEngineObject()->SetMoveType( MOVETYPE_NOCLIP );
 	GetEngineObject()->SetSolid( SOLID_NONE );								// Remove model & collisions
-	SetRenderColorA( 0 );								// The engine won't draw this model if this is set to 0 and blending is on
-	m_nRenderMode = kRenderTransTexture;
+	GetEngineObject()->SetRenderColorA( 0 );								// The engine won't draw this model if this is set to 0 and blending is on
+	GetEngineObject()->SetRenderMode(kRenderTransTexture);
 
 	m_state = USE_OFF;
 	

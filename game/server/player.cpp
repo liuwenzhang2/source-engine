@@ -7645,7 +7645,7 @@ CBaseEntity *CreatePlayerLoadSave( Vector vOrigin, float flDuration, float flHol
 
 void CRevertSaved::Use( IServerEntity *pActivator, IServerEntity *pCaller, USE_TYPE useType, float value )
 {
-	UTIL_ScreenFadeAll( m_clrRender, Duration(), HoldTime(), FFADE_OUT );
+	UTIL_ScreenFadeAll(GetEngineObject()->GetRenderColor(), Duration(), HoldTime(), FFADE_OUT );
 	GetEngineObject()->SetNextThink( gpGlobals->curtime + LoadTime() );
 	SetThink( &CRevertSaved::LoadThink );
 
@@ -7665,7 +7665,7 @@ void CRevertSaved::Use( IServerEntity *pActivator, IServerEntity *pCaller, USE_T
 
 void CRevertSaved::InputReload( inputdata_t &inputdata )
 {
-	UTIL_ScreenFadeAll( m_clrRender, Duration(), HoldTime(), FFADE_OUT );
+	UTIL_ScreenFadeAll(GetEngineObject()->GetRenderColor(), Duration(), HoldTime(), FFADE_OUT );
 
 #ifdef HL1_DLL
 	GetEngineObject()->SetNextThink( gpGlobals->curtime + MessageTime() );

@@ -189,17 +189,17 @@ void CPointSpotlight::ComputeRenderInfo()
 	// Fade out spotlight end if past max length.  
 	if ( m_flSpotlightCurLength > 2*m_flSpotlightMaxLength )
 	{
-		m_hSpotlightTarget->SetRenderColorA( 0 );
+		m_hSpotlightTarget->GetEngineObject()->SetRenderColorA( 0 );
 		m_hSpotlight->SetFadeLength( m_flSpotlightMaxLength );
 	}
 	else if ( m_flSpotlightCurLength > m_flSpotlightMaxLength )		
 	{
-		m_hSpotlightTarget->SetRenderColorA( (1-((m_flSpotlightCurLength-m_flSpotlightMaxLength)/m_flSpotlightMaxLength)) );
+		m_hSpotlightTarget->GetEngineObject()->SetRenderColorA( (1-((m_flSpotlightCurLength-m_flSpotlightMaxLength)/m_flSpotlightMaxLength)) );
 		m_hSpotlight->SetFadeLength( m_flSpotlightMaxLength );
 	}
 	else
 	{
-		m_hSpotlightTarget->SetRenderColorA( 1.0 );
+		m_hSpotlightTarget->GetEngineObject()->SetRenderColorA( 1.0 );
 		m_hSpotlight->SetFadeLength( m_flSpotlightCurLength );
 	}
 
@@ -339,7 +339,7 @@ void CPointSpotlight::SpotlightCreate(void)
 	m_hSpotlightTarget->Spawn();
 	m_hSpotlightTarget->GetEngineObject()->SetAbsOrigin( tr.endpos );
 	m_hSpotlightTarget->SetOwnerEntity( this );
-	m_hSpotlightTarget->m_clrRender = m_clrRender;
+	m_hSpotlightTarget->GetEngineObject()->SetRenderColor(GetEngineObject()->GetRenderColor());
 	m_hSpotlightTarget->m_Radius = m_flSpotlightMaxLength;
 
 	if (GetEngineObject()->HasSpawnFlags(SF_SPOTLIGHT_NO_DYNAMIC_LIGHT) )
@@ -352,7 +352,7 @@ void CPointSpotlight::SpotlightCreate(void)
 	// Set the temporary spawnflag on the beam so it doesn't save (we'll recreate it on restore)
 	m_hSpotlight->SetHDRColorScale( m_flHDRColorScale );
 	m_hSpotlight->GetEngineObject()->AddSpawnFlags( SF_BEAM_TEMPORARY );
-	m_hSpotlight->SetColor( m_clrRender->r, m_clrRender->g, m_clrRender->b ); 
+	m_hSpotlight->SetColor( GetEngineObject()->GetRenderColor().r, GetEngineObject()->GetRenderColor().g, GetEngineObject()->GetRenderColor().b ); 
 	m_hSpotlight->SetHaloTexture(m_nHaloSprite);
 	m_hSpotlight->SetHaloScale(60);
 	m_hSpotlight->SetEndWidth(m_flSpotlightGoalWidth);

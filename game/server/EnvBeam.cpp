@@ -408,7 +408,10 @@ void CEnvBeam::Strike( void )
 			m_boltWidth,	// End width
 			0,				// No fade
 			m_noiseAmplitude,
-			m_clrRender->r,	m_clrRender->g,	m_clrRender->b,	m_clrRender->a,
+			GetEngineObject()->GetRenderColor().r,	
+			GetEngineObject()->GetRenderColor().g,	
+			GetEngineObject()->GetRenderColor().b,	
+			GetEngineObject()->GetRenderColor().a,
 			m_speed );
 	}
 	else
@@ -426,10 +429,10 @@ void CEnvBeam::Strike( void )
 				m_boltWidth,
 				0,	// No spread
 				m_noiseAmplitude,
-				m_clrRender->r,
-				m_clrRender->g,
-				m_clrRender->b,
-				m_clrRender->a,
+				GetEngineObject()->GetRenderColor().r,
+				GetEngineObject()->GetRenderColor().g,
+				GetEngineObject()->GetRenderColor().b,
+				GetEngineObject()->GetRenderColor().a,
 				m_speed );
 		}
 		else
@@ -446,10 +449,10 @@ void CEnvBeam::Strike( void )
 				m_boltWidth,	// End width
 				0,				// No fade
 				m_noiseAmplitude,
-				m_clrRender->r,
-				m_clrRender->g,
-				m_clrRender->b,
-				m_clrRender->a,
+				GetEngineObject()->GetRenderColor().r,
+				GetEngineObject()->GetRenderColor().g,
+				GetEngineObject()->GetRenderColor().b,
+				GetEngineObject()->GetRenderColor().a,
 				m_speed );
 
 		}
@@ -613,10 +616,10 @@ void CEnvBeam::Zap( const Vector &vecSrc, const Vector &vecDest )
 		m_boltWidth,	// End width
 		0,				// No fade
 		m_noiseAmplitude,
-		m_clrRender->r,
-		m_clrRender->g,
-		m_clrRender->b,
-		m_clrRender->a,
+		GetEngineObject()->GetRenderColor().r,
+		GetEngineObject()->GetRenderColor().g,
+		GetEngineObject()->GetRenderColor().b,
+		GetEngineObject()->GetRenderColor().a,
 		m_speed );
 
 	DoSparks( vecSrc, vecDest );

@@ -120,7 +120,7 @@ void C_LocalTempEntity::Prepare( const model_t *pmodel, float time )
 	flags = FTENT_NONE;		
 	die = time + 0.75;
 	GetEngineObject()->SetModelPointer( pmodel );
-	SetRenderMode( kRenderNormal );
+	GetEngineObject()->SetRenderMode( kRenderNormal );
 	GetEngineObject()->SetRenderFX(kRenderFxNone);
 	GetEngineObject()->SetBody(0);
 	GetEngineObject()->SetSkin(0);
@@ -200,7 +200,7 @@ int	C_LocalTempEntity::DrawModel( int flags )
 		return drawn;
 	}
 
-	if ( GetRenderMode() == kRenderNone )
+	if (GetEngineObject()->GetRenderMode() == kRenderNone )
 		return drawn;
 
 	if ( this->flags & FTENT_BEOCCLUDED )
@@ -213,7 +213,7 @@ int	C_LocalTempEntity::DrawModel( int flags )
 		{
 			float flAlpha = RemapVal( MIN(flDot,0.3), 0, 0.3, 0, 1 );
 			flAlpha = MAX( 1.0, tempent_renderamt - (tempent_renderamt * flAlpha) );
-			SetRenderColorA( flAlpha );
+			GetEngineObject()->SetRenderColorA( flAlpha );
 		}
 	}
 
@@ -228,12 +228,12 @@ int	C_LocalTempEntity::DrawModel( int flags )
 			m_flFrame,  // sprite frame to render
 			GetEngineObject()->GetBody() > 0 ? EntityList()->GetBaseEntity(GetEngineObject()->GetBody()) : NULL,  // attach to
 			GetEngineObject()->GetSkin(),  // attachment point
-			GetRenderMode(), // rendermode
+			GetEngineObject()->GetRenderMode(), // rendermode
 			GetEngineObject()->GetRenderFX(), // renderfx
-			m_clrRender->a, // alpha
-			m_clrRender->r,
-			m_clrRender->g,
-			m_clrRender->b,
+			GetEngineObject()->GetRenderColor().a, // alpha
+			GetEngineObject()->GetRenderColor().r,
+			GetEngineObject()->GetRenderColor().g,
+			GetEngineObject()->GetRenderColor().b,
 			m_flSpriteScale		  // sprite scale
 			);
 		break;
@@ -262,9 +262,9 @@ bool C_LocalTempEntity::IsActive( void )
 		if ( flags & FTENT_FADEOUT )
 		{
 			int alpha;
-			if (GetRenderMode() == kRenderNormal)
+			if (GetEngineObject()->GetRenderMode() == kRenderNormal)
 			{
-				SetRenderMode( kRenderTransTexture );
+				GetEngineObject()->SetRenderMode( kRenderTransTexture );
 			}
 			
 			alpha = tempent_renderamt * ( 1 + life * fadeSpeed );
@@ -275,7 +275,7 @@ bool C_LocalTempEntity::IsActive( void )
 				alpha = 0;
 			}
 
-			SetRenderColorA( alpha );
+			GetEngineObject()->SetRenderColorA( alpha );
 		}
 		else 
 		{
@@ -307,7 +307,7 @@ bool C_LocalTempEntity::Frame( float frametime, int framenumber )
 
 	if ( flags & FTENT_PLYRATTACHMENT )
 	{
-		if ( C_BaseEntity *pClient = (C_BaseEntity*)EntityList()->GetBaseEntity( clientIndex ) )
+		if ( IClientEntity *pClient = EntityList()->GetBaseEntity( clientIndex ) )
 		{
 			GetEngineObject()->SetLocalOrigin( pClient->GetEngineObject()->GetAbsOrigin() + tentOffset );
 		}
@@ -840,8 +840,8 @@ void CTempEnts::FizzEffect( C_BaseEntity *pent, int modelIndex, int density, int
 		pTemp->m_flFrame = random->RandomInt(0,frameCount-1);
 		// Set sprite scale
 		pTemp->m_flSpriteScale = 1.0 / random->RandomFloat(2,5);
-		pTemp->SetRenderMode( kRenderTransAlpha );
-		pTemp->SetRenderColorA( 255 );
+		pTemp->GetEngineObject()->SetRenderMode( kRenderTransAlpha );
+		pTemp->GetEngineObject()->SetRenderColorA( 255 );
 	}
 }
 
@@ -893,9 +893,9 @@ void CTempEnts::Bubbles( const Vector &mins, const Vector &maxs, float height, i
 		
 		// Set sprite scale
 		pTemp->m_flSpriteScale = 1.0 / random->RandomFloat(4,16);
-		pTemp->SetRenderMode( kRenderTransAlpha );
+		pTemp->GetEngineObject()->SetRenderMode( kRenderTransAlpha );
 		
-		pTemp->SetRenderColor( 255, 255, 255, 192 );
+		pTemp->GetEngineObject()->SetRenderColor( 255, 255, 255, 192 );
 	}
 }
 
@@ -945,9 +945,9 @@ void CTempEnts::BubbleTrail( const Vector &start, const Vector &end, float flWat
 		pTemp->m_flFrame = random->RandomInt(0,frameCount-1);
 		// Set sprite scale
 		pTemp->m_flSpriteScale = 1.0 / random->RandomFloat(4,8);
-		pTemp->SetRenderMode( kRenderTransAlpha );
+		pTemp->GetEngineObject()->SetRenderMode( kRenderTransAlpha );
 		
-		pTemp->SetRenderColor( 255, 255, 255, 192 );
+		pTemp->GetEngineObject()->SetRenderColor( 255, 255, 255, 192 );
 	}
 }
 
@@ -1073,14 +1073,14 @@ void CTempEnts::BreakModel( const Vector &pos, const QAngle &angles, const Vecto
 
 		if ((flags & BREAK_GLASS) || (flags & BREAK_TRANS))
 		{
-			pTemp->SetRenderMode( kRenderTransTexture );
-			pTemp->SetRenderColorA( 128 );
+			pTemp->GetEngineObject()->SetRenderMode( kRenderTransTexture );
+			pTemp->GetEngineObject()->SetRenderColorA( 128 );
 			pTemp->tempent_renderamt = 128;
 			pTemp->bounceFactor = 0.3f;
 		}
 		else
 		{
-			pTemp->SetRenderMode( kRenderNormal );
+			pTemp->GetEngineObject()->SetRenderMode( kRenderNormal );
 			pTemp->tempent_renderamt = 255;		// Set this for fadeout
 		}
 
@@ -1234,12 +1234,12 @@ C_LocalTempEntity *CTempEnts::TempSprite( const Vector &pos, const Vector &dir, 
 
 	pTemp->m_flFrameMax = frameCount - 1;
 	pTemp->m_flFrameRate = 10;
-	pTemp->SetRenderMode( (RenderMode_t)rendermode );
+	pTemp->GetEngineObject()->SetRenderMode( (RenderMode_t)rendermode );
 	pTemp->GetEngineObject()->SetRenderFX(renderfx);
 	pTemp->m_flSpriteScale = scale;
 	pTemp->tempent_renderamt = a * 255;
 	pTemp->m_vecNormal = normal;
-	pTemp->SetRenderColor( 255, 255, 255, a * 255 );
+	pTemp->GetEngineObject()->SetRenderColor( 255, 255, 255, a * 255 );
 
 	pTemp->flags |= flags;
 
@@ -1298,8 +1298,8 @@ void CTempEnts::Sprite_Spray( const Vector &pos, const Vector &dir, int modelInd
 		if (!pTemp)
 			return;
 
-		pTemp->SetRenderMode( kRenderTransAlpha );
-		pTemp->SetRenderColor( 255, 255, 255, 255 );
+		pTemp->GetEngineObject()->SetRenderMode( kRenderTransAlpha );
+		pTemp->GetEngineObject()->SetRenderColor( 255, 255, 255, 255 );
 		pTemp->tempent_renderamt = 255;
 		pTemp->GetEngineObject()->SetRenderFX(kRenderFxNoDissipation);
 		//pTemp->scale = random->RandomFloat( 0.1, 0.25 );
@@ -1376,10 +1376,10 @@ void CTempEnts::Sprite_Trail( const Vector &vecStart, const Vector &vecEnd, int 
 		pTemp->GetEngineObject()->SetLocalOrigin( vecPos );
 
 		pTemp->m_flSpriteScale		= flSize;
-		pTemp->SetRenderMode( kRenderGlow );
+		pTemp->GetEngineObject()->SetRenderMode( kRenderGlow );
 		pTemp->GetEngineObject()->SetRenderFX(kRenderFxNoDissipation);
 		pTemp->tempent_renderamt	= nRenderamt;
-		pTemp->SetRenderColor( 255, 255, 255 );
+		pTemp->GetEngineObject()->SetRenderColor( 255, 255, 255 );
 
 		pTemp->m_flFrame	= random->RandomInt( 0, flFrameCount - 1 );
 		pTemp->m_flFrameMax	= flFrameCount - 1;
@@ -1432,8 +1432,8 @@ void CTempEnts::AttachTentToPlayer( int client, int modelIndex, float zoffset, f
 		return;
 	}
 
-	pTemp->SetRenderMode( kRenderNormal );
-	pTemp->SetRenderColorA( 255 );
+	pTemp->GetEngineObject()->SetRenderMode( kRenderNormal );
+	pTemp->GetEngineObject()->SetRenderColorA( 255 );
 	pTemp->tempent_renderamt = 255;
 	pTemp->GetEngineObject()->SetRenderFX(kRenderFxNoDissipation);
 	
@@ -1505,9 +1505,9 @@ void CTempEnts::RicochetSprite( const Vector &pos, model_t *pmodel, float durati
 	if (!pTemp)
 		return;
 
-	pTemp->SetRenderMode( kRenderGlow );
+	pTemp->GetEngineObject()->SetRenderMode( kRenderGlow );
 	pTemp->GetEngineObject()->SetRenderFX(kRenderFxNoDissipation);
-	pTemp->SetRenderColorA( 200 );
+	pTemp->GetEngineObject()->SetRenderColorA( 200 );
 	pTemp->tempent_renderamt = 200;
 	pTemp->m_flSpriteScale = scale;
 	pTemp->flags = FTENT_FADEOUT;
@@ -1545,13 +1545,13 @@ void CTempEnts::BloodSprite( const Vector &org, int r, int g, int b, int a, int 
 		//Large, single blood sprite is a high-priority tent
 		if ( ( pTemp = TempEntAllocHigh( org, model ) ) != NULL )
 		{
-			pTemp->SetRenderMode( kRenderTransTexture );
+			pTemp->GetEngineObject()->SetRenderMode( kRenderTransTexture );
 			pTemp->GetEngineObject()->SetRenderFX(kRenderFxClampMinScale);
 			pTemp->m_flSpriteScale	= random->RandomFloat( size / 25, size / 35);
 			pTemp->flags			= FTENT_SPRANIMATE;
  
-			pTemp->m_clrRender		= impactcolor;
-			pTemp->tempent_renderamt= pTemp->m_clrRender->a;
+			pTemp->GetEngineObject()->SetRenderColor(impactcolor);
+			pTemp->tempent_renderamt= pTemp->GetEngineObject()->GetRenderColor().a;
 
 			pTemp->SetVelocity( vec3_origin );
 
@@ -1620,11 +1620,11 @@ void CTempEnts::Sprite_Smoke( C_LocalTempEntity *pTemp, float scale )
 	if ( !pTemp )
 		return;
 
-	pTemp->SetRenderMode( kRenderTransAlpha );
+	pTemp->GetEngineObject()->SetRenderMode( kRenderTransAlpha );
 	pTemp->GetEngineObject()->SetRenderFX(kRenderFxNone);
 	pTemp->SetVelocity( Vector( 0, 0, 30 ) );
 	int iColor = random->RandomInt(20,35);
-	pTemp->SetRenderColor( iColor,
+	pTemp->GetEngineObject()->SetRenderColor( iColor,
 		iColor,
 		iColor,
 		255 );
@@ -1676,7 +1676,7 @@ void CTempEnts::EjectBrass( const Vector &pos1, const QAngle &angles, const QAng
 	//Face forward
 	pTemp->GetEngineObject()->SetAbsAngles( gunAngles );
 
-	pTemp->SetRenderMode( kRenderNormal );
+	pTemp->GetEngineObject()->SetRenderMode( kRenderNormal );
 	pTemp->tempent_renderamt = 255;		// Set this for fadeout
 
 	Vector	dir;
@@ -1710,7 +1710,7 @@ C_LocalTempEntity * CTempEnts::SpawnTempModel( const model_t *pModel, const Vect
 	pTemp->m_vecTempEntAngVelocity[0] = random->RandomFloat(-255,255);
 	pTemp->m_vecTempEntAngVelocity[1] = random->RandomFloat(-255,255);
 	pTemp->m_vecTempEntAngVelocity[2] = random->RandomFloat(-255,255);
-	pTemp->SetRenderMode( kRenderNormal );
+	pTemp->GetEngineObject()->SetRenderMode( kRenderNormal );
 	pTemp->tempent_renderamt = 255;
 	pTemp->SetVelocity( vecVelocity );
 	pTemp->die = gpGlobals->curtime + flLifeTime;
@@ -1891,20 +1891,20 @@ void CTempEnts::Sprite_Explode( C_LocalTempEntity *pTemp, float scale, int flags
 	if ( flags & TE_EXPLFLAG_NOADDITIVE )
 	{
 		// solid sprite
-		pTemp->SetRenderMode( kRenderNormal );
-		pTemp->SetRenderColorA( 255 ); 
+		pTemp->GetEngineObject()->SetRenderMode( kRenderNormal );
+		pTemp->GetEngineObject()->SetRenderColorA( 255 );
 	}
 	else if( flags & TE_EXPLFLAG_DRAWALPHA )
 	{
 		// alpha sprite
-		pTemp->SetRenderMode( kRenderTransAlpha ); 
-		pTemp->SetRenderColorA( 180 );
+		pTemp->GetEngineObject()->SetRenderMode( kRenderTransAlpha );
+		pTemp->GetEngineObject()->SetRenderColorA( 180 );
 	}
 	else
 	{
 		// additive sprite
-		pTemp->SetRenderMode( kRenderTransAdd );
-		pTemp->SetRenderColorA( 180 );
+		pTemp->GetEngineObject()->SetRenderMode( kRenderTransAdd );
+		pTemp->GetEngineObject()->SetRenderColorA( 180 );
 	}
 
 	if ( flags & TE_EXPLFLAG_ROTATE )
@@ -1914,7 +1914,7 @@ void CTempEnts::Sprite_Explode( C_LocalTempEntity *pTemp, float scale, int flags
 
 	pTemp->GetEngineObject()->SetRenderFX(kRenderFxNone);
 	pTemp->SetVelocity( Vector( 0, 0, 8 ) );
-	pTemp->SetRenderColor( 255, 255, 255 );
+	pTemp->GetEngineObject()->SetRenderColor( 255, 255, 255 );
 	pTemp->GetEngineObject()->SetLocalOriginDim( Z_INDEX, pTemp->GetEngineObject()->GetLocalOriginDim( Z_INDEX ) + 10 );
 	pTemp->m_flSpriteScale = scale;
 }
@@ -3262,7 +3262,7 @@ void CTempEnts::RocketFlare( const Vector& pos )
 		return;
 
 	pTemp->m_flFrameMax = nframeCount - 1;
-	pTemp->SetRenderMode( kRenderGlow );
+	pTemp->GetEngineObject()->SetRenderMode( kRenderGlow );
 	pTemp->GetEngineObject()->SetRenderFX(kRenderFxNoDissipation);
 	pTemp->tempent_renderamt = 255;
 	pTemp->m_flFrameRate = 1.0;
@@ -3318,7 +3318,7 @@ void CTempEnts::HL1EjectBrass( const Vector &vecPosition, const QAngle &angAngle
 	//Face forward
 	pTemp->GetEngineObject()->SetAbsAngles( angAngles );
 
-	pTemp->SetRenderMode( kRenderNormal );
+	pTemp->GetEngineObject()->SetRenderMode( kRenderNormal );
 	pTemp->tempent_renderamt	= 255;		// Set this for fadeout
 
 	pTemp->SetVelocity( vecVelocity );
@@ -3408,7 +3408,7 @@ void CTempEnts::CSEjectBrass( const Vector &vecPosition, const QAngle &angVeloci
 	pTemp->m_vecTempEntAngVelocity[0] = random->RandomFloat(-256,256);
 	pTemp->m_vecTempEntAngVelocity[1] = random->RandomFloat(-256,256);
 	pTemp->m_vecTempEntAngVelocity[2] = 0;
-	pTemp->SetRenderMode( kRenderNormal );
+	pTemp->GetEngineObject()->SetRenderMode( kRenderNormal );
 	pTemp->tempent_renderamt = 255;
 	
 	pTemp->die = gpGlobals->curtime + 10;

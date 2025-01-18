@@ -45,6 +45,9 @@ public:
 #ifdef CLIENT_DLL
 	bool Init(int entnum, int iSerialNum);
 #endif // CLIENT_DLL
+#ifdef GAME_DLL
+	void PostConstructor(const char* szClassname, int iForceEdictIndex);
+#endif // GAME_DLL
 
 
 	bool IsViewable(void) { return false; }

@@ -711,8 +711,7 @@ public:
 
 
 	bool				IsTransparent() const;
-	void				SetRenderMode( RenderMode_t nRenderMode );
-	RenderMode_t		GetRenderMode() const;
+
 
 private:
 	// NOTE: Keep this near vtable so it's in cache with vtable.
@@ -726,23 +725,12 @@ public:
 	// was pev->speed
 	float		m_flSpeed;
 
-	// was pev->rendermode
-	CNetworkVar( unsigned char, m_nRenderMode );
-	
 #ifdef TF_DLL
 	CNetworkArray( int, m_nModelIndexOverrides, MAX_VISION_MODES ); // used to override the base model index on the client if necessary
 #endif
 
-	// was pev->rendercolor
-	CNetworkColor32( m_clrRender );
-	const color32 GetRenderColor() const;
-	void SetRenderColor(color32 color);
-	void SetRenderColor( byte r, byte g, byte b );
-	void SetRenderColor( byte r, byte g, byte b, byte a );
-	void SetRenderColorR( byte r );
-	void SetRenderColorG( byte g );
-	void SetRenderColorB( byte b );
-	void SetRenderColorA( byte a );
+	
+
 
 
 	// was pev->animtime:  consider moving to CBaseAnimating
@@ -1941,46 +1929,6 @@ inline void CBaseEntity::SetWaterLevel( int nLevel )
 	m_nWaterLevel = nLevel;
 }
 
-inline const color32 CBaseEntity::GetRenderColor() const
-{
-	return m_clrRender.Get();
-}
-
-inline void CBaseEntity::SetRenderColor(color32 color) 
-{
-	m_clrRender.Set(color);
-}
-
-inline void CBaseEntity::SetRenderColor( byte r, byte g, byte b )
-{
-	m_clrRender.Init( r, g, b );
-}
-
-inline void CBaseEntity::SetRenderColor( byte r, byte g, byte b, byte a )
-{
-	m_clrRender.Init( r, g, b, a );
-}
-
-inline void CBaseEntity::SetRenderColorR( byte r )
-{
-	m_clrRender.SetR( r );
-}
-
-inline void CBaseEntity::SetRenderColorG( byte g )
-{
-	m_clrRender.SetG( g );
-}
-
-inline void CBaseEntity::SetRenderColorB( byte b )
-{
-	m_clrRender.SetB( b );
-}
-
-inline void CBaseEntity::SetRenderColorA( byte a )
-{
-	m_clrRender.SetA( a );
-}
-
 inline int	CBaseEntity::GetTextureFrameIndex( void )
 {
 	return m_iTextureFrameIndex;
@@ -2032,17 +1980,7 @@ inline CBaseEntity *CBaseEntity::GetBaseEntity()
 
 inline bool CBaseEntity::IsTransparent() const
 {
-	return m_nRenderMode != kRenderNormal;
-}
-
-inline void CBaseEntity::SetRenderMode( RenderMode_t nRenderMode )
-{
-	m_nRenderMode = nRenderMode;
-}
-
-inline RenderMode_t CBaseEntity::GetRenderMode() const
-{
-	return (RenderMode_t)m_nRenderMode.Get();
+	return GetEngineObject()->GetRenderMode() != kRenderNormal;
 }
 
 //-----------------------------------------------------------------------------

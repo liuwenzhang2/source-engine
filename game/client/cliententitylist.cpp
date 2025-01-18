@@ -1996,7 +1996,9 @@ BEGIN_PREDICTION_DATA_NO_BASE(C_EngineObjectInternal)
 	DEFINE_PRED_FIELD(m_nResetEventsParity, FIELD_INTEGER, FTYPEDESC_INSENDTABLE | FTYPEDESC_NOERRORCHECK),
 	DEFINE_PRED_FIELD(m_nMuzzleFlashParity, FIELD_CHARACTER, FTYPEDESC_INSENDTABLE),
 	DEFINE_FIELD(m_nPrevSequence, FIELD_INTEGER),
+	DEFINE_PRED_FIELD(m_nRenderMode, FIELD_CHARACTER, FTYPEDESC_INSENDTABLE),
 	DEFINE_PRED_FIELD(m_nRenderFX, FIELD_CHARACTER, FTYPEDESC_INSENDTABLE),
+	DEFINE_PRED_FIELD(m_clrRender, FIELD_INTEGER, FTYPEDESC_INSENDTABLE),
 
 END_PREDICTION_DATA()
 
@@ -2045,8 +2047,9 @@ BEGIN_DATADESC_NO_BASE(C_EngineObjectInternal)
 	DEFINE_RAGDOLL_ELEMENT(21),
 	DEFINE_RAGDOLL_ELEMENT(22),
 	DEFINE_RAGDOLL_ELEMENT(23),
+	DEFINE_FIELD(m_nRenderMode, FIELD_CHARACTER),
 	DEFINE_FIELD(m_nRenderFX, FIELD_CHARACTER),
-
+	DEFINE_FIELD(m_clrRender, FIELD_COLOR32),
 END_DATADESC()
 
 //-----------------------------------------------------------------------------
@@ -2271,7 +2274,9 @@ BEGIN_RECV_TABLE_NOBASE(C_EngineObjectInternal, DT_EngineObject)
 	RecvPropInt(RECVINFO(m_ragdollListCount)),
 	RecvPropArray(RecvPropQAngles(RECVINFO(m_ragAngles[0])), m_ragAngles),
 	RecvPropArray(RecvPropVector(RECVINFO(m_ragPos[0])), m_ragPos),
+	RecvPropInt(RECVINFO(m_nRenderMode)),
 	RecvPropInt(RECVINFO(m_nRenderFX)),
+	RecvPropInt(RECVINFO(m_clrRender)),
 	RecvPropInt(RECVINFO(m_nOverlaySequence)),
 	RecvPropBool(RECVINFO(m_bAlternateSorting)),
 	RecvPropInt(RECVINFO(m_ubInterpolationFrame)),
@@ -2658,6 +2663,7 @@ void C_EngineObjectInternal::PreDataUpdate(DataUpdateType_t updateType)
 		ClientLeafSystem()->EnableAlternateSorting(GetRenderHandle(), m_bAlternateSorting);
 	}
 	m_ubOldInterpolationFrame = m_ubInterpolationFrame;
+	m_nOldRenderMode = m_nRenderMode;
 	m_pOuter->PreDataUpdate(updateType);
 }
 
@@ -2860,6 +2866,11 @@ void C_EngineObjectInternal::PostDataUpdate(DataUpdateType_t updateType)
 		AddToTeleportList();
 	}
 	//	}
+
+	if (m_nOldRenderMode != m_nRenderMode)
+	{
+		SetRenderMode((RenderMode_t)m_nRenderMode, true);
+	}
 	m_pOuter->PostDataUpdate(updateType);
 }
 

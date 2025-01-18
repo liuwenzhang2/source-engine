@@ -332,7 +332,12 @@ SporeTrail::SporeTrail( void )
 	m_flStartSize			= 1.0f;
 	m_flEndSize				= 0.0f;
 	m_flSpawnRadius			= 16.0f;
-	SetRenderColor( 255, 255, 255, 255 );
+}
+
+void SporeTrail::PostConstructor(const char* szClassname, int iForceEdictIndex)
+{
+	BaseClass::PostConstructor(szClassname, iForceEdictIndex);
+	GetEngineObject()->SetRenderColor(255, 255, 255, 255);
 }
 
 //-----------------------------------------------------------------------------
@@ -400,9 +405,14 @@ SporeExplosion::SporeExplosion( void )
 	m_flStartSize			= 1.0f;
 	m_flEndSize				= 0.0f;
 	m_flSpawnRadius			= 16.0f;
-	SetRenderColor( 255, 255, 255, 255 );
 	m_bEmit = true;
 	m_bDisabled = false;
+}
+
+void SporeExplosion::PostConstructor(const char* szClassname, int iForceEdictIndex)
+{
+	BaseClass::PostConstructor(szClassname, iForceEdictIndex);
+	GetEngineObject()->SetRenderColor(255, 255, 255, 255);
 }
 
 //-----------------------------------------------------------------------------

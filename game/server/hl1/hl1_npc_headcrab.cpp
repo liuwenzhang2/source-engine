@@ -74,7 +74,7 @@ void CNPC_Headcrab::Spawn( void )
 {
 	Precache();
 
-	SetRenderColor( 255, 255, 255, 255 );
+	GetEngineObject()->SetRenderColor( 255, 255, 255, 255 );
 
 	SetModel( "models/headcrab.mdl" );
 	m_iHealth = sk_headcrab_health.GetFloat();
@@ -662,9 +662,9 @@ void CNPC_BabyCrab::Spawn( void )
 {
 	CNPC_Headcrab::Spawn();
 	SetModel( "models/baby_headcrab.mdl" );
-	m_nRenderMode = kRenderTransTexture;
+	GetEngineObject()->SetRenderMode(kRenderTransTexture);
 
-	SetRenderColor( 255, 255, 255, 192 );
+	GetEngineObject()->SetRenderColor( 255, 255, 255, 192 );
 
 	GetEngineObject()->SetSize(Vector(-12, -12, 0), Vector(12, 12, 24));
 	

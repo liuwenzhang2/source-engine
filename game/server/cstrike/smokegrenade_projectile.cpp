@@ -126,7 +126,7 @@ void CSmokeGrenadeProjectile::Think_Detonate()
 	params.m_bWarnOnDirectWaveReference = true;
 	g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 
-	m_nRenderMode = kRenderTransColor;
+	GetEngineObject()->SetRenderMode(kRenderTransColor);
 	GetEngineObject()->SetNextThink( gpGlobals->curtime + 5 );
 	SetThink( &CSmokeGrenadeProjectile::Think_Fade );
 }
@@ -137,9 +137,9 @@ void CSmokeGrenadeProjectile::Think_Fade()
 {
 	GetEngineObject()->SetNextThink( gpGlobals->curtime );
 
-	color32 c = GetRenderColor();
+	color32 c = GetEngineObject()->GetRenderColor();
 	c.a -= 1;
-	SetRenderColor( c.r, c.b, c.g, c.a );
+	GetEngineObject()->SetRenderColor( c.r, c.b, c.g, c.a );
 
 	if ( !c.a )
 	{

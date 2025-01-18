@@ -47,7 +47,7 @@ void CAlphaMaterialProxy::OnBind( C_BaseEntity *pEnt )
 {
 	if (m_AlphaVar)
 	{
-		m_AlphaVar->SetFloatValue( pEnt->m_clrRender->a );
+		m_AlphaVar->SetFloatValue( pEnt->GetEngineObject()->GetRenderColor().a);
 	}
 }
 

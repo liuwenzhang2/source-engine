@@ -152,9 +152,9 @@ void C_DynamicLight::ClientThink(void)
 		m_pDynamicLight->flags = m_Flags;
 		if ( m_OuterAngle > 0 )
 			m_pDynamicLight->flags |= DLIGHT_NO_WORLD_ILLUMINATION;
-		m_pDynamicLight->color.r = m_clrRender->r;
-		m_pDynamicLight->color.g = m_clrRender->g;
-		m_pDynamicLight->color.b = m_clrRender->b;
+		m_pDynamicLight->color.r = GetEngineObject()->GetRenderColor().r;
+		m_pDynamicLight->color.g = GetEngineObject()->GetRenderColor().g;
+		m_pDynamicLight->color.b = GetEngineObject()->GetRenderColor().b;
 		m_pDynamicLight->color.exponent	= m_Exponent;	// this makes it match the world
 		m_pDynamicLight->origin		= GetEngineObject()->GetAbsOrigin();
 		m_pDynamicLight->m_InnerAngle = m_InnerAngle;
@@ -210,9 +210,9 @@ void C_DynamicLight::ClientThink(void)
 			m_pSpotlightEnd->flags = DLIGHT_NO_MODEL_ILLUMINATION | (m_Flags & DLIGHT_DISPLACEMENT_MASK);
 			m_pSpotlightEnd->radius		= m_SpotRadius; // * falloff;
 			m_pSpotlightEnd->die		= gpGlobals->curtime + 1e6;
-			m_pSpotlightEnd->color.r	= m_clrRender->r * falloff;
-			m_pSpotlightEnd->color.g	= m_clrRender->g * falloff;
-			m_pSpotlightEnd->color.b	= m_clrRender->b * falloff;
+			m_pSpotlightEnd->color.r	= GetEngineObject()->GetRenderColor().r * falloff;
+			m_pSpotlightEnd->color.g	= GetEngineObject()->GetRenderColor().g * falloff;
+			m_pSpotlightEnd->color.b	= GetEngineObject()->GetRenderColor().b * falloff;
 			m_pSpotlightEnd->color.exponent	= m_Exponent;
 
 			// For bumped lighting

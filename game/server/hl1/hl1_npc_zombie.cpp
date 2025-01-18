@@ -40,7 +40,7 @@ void CNPC_Zombie::Spawn()
 
 	SetModel( "models/zombie.mdl" );
 	
-	SetRenderColor( 255, 255, 255, 255 );
+	GetEngineObject()->SetRenderColor( 255, 255, 255, 255 );
 	
 	SetHullType(HULL_HUMAN);
 	SetHullSizeNormal();

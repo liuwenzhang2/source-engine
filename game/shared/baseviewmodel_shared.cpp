@@ -42,7 +42,6 @@ CBaseViewModel::CBaseViewModel()
 	// NOTE: We do this here because the color is never transmitted for the view model.
 	m_nOldAnimationParity = 0;
 #endif
-	SetRenderColor( 255, 255, 255, 255 );
 
 	// View model of this weapon
 	m_sVMName			= NULL_STRING;		
@@ -59,9 +58,18 @@ bool CBaseViewModel::Init(int entnum, int iSerialNum)
 {
 	bool bRet = BaseClass::Init(entnum, iSerialNum);
 	GetEngineObject()->GetEntClientFlags() |= ENTCLIENTFLAG_ALWAYS_INTERPOLATE;
+	GetEngineObject()->SetRenderColor(255, 255, 255, 255);
 	return bRet;
 }
 #endif // CLIENT_DLL
+
+#ifdef GAME_DLL
+void CBaseViewModel::PostConstructor(const char* szClassname, int iForceEdictIndex)
+{
+	BaseClass::PostConstructor(szClassname, iForceEdictIndex);
+	GetEngineObject()->SetRenderColor(255, 255, 255, 255);
+}
+#endif // GAME_DLL
 
 
 //-----------------------------------------------------------------------------

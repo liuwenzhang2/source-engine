@@ -616,7 +616,7 @@ void CNPC_Gargantua::RunTask( const Task_t *pTask )
 		{
 			//TEMP TEMP
 			GetEngineObject()->SetRenderFX(kRenderFxExplode);
-			SetRenderColor( 255, 0, 0 , 255 );
+			GetEngineObject()->SetRenderColor( 255, 0, 0 , 255 );
 			StopAnimation();
 			GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.15 );
 			SetThink( &CBaseEntity::SUB_Remove );

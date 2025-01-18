@@ -545,7 +545,7 @@ void CWateryDeathLeech::Spawn( void )
 	GetEngineObject()->SetAbsAngles( vAngle );
 
 	m_iFadeState = 1;
-	SetRenderColorA( 1 );
+	GetEngineObject()->SetRenderColorA( 1 );
 }
 
 void CWateryDeathLeech::LeechThink( void )
@@ -563,19 +563,19 @@ void CWateryDeathLeech::LeechThink( void )
 		{
 			dt = 0.1f;
 		}
-		m_nRenderMode = kRenderTransTexture;
+		GetEngineObject()->SetRenderMode(kRenderTransTexture);
 		int speed = MAX(1,256*dt); // fade out over 1 second
 
 		if ( m_iFadeState == -1 )
-			 SetRenderColorA( UTIL_Approach( 0, m_clrRender->a, speed ) );
+			GetEngineObject()->SetRenderColorA( UTIL_Approach( 0, GetEngineObject()->GetRenderColor().a, speed ) );
 		else
-			 SetRenderColorA( UTIL_Approach( 255, m_clrRender->a, speed ) );
+			GetEngineObject()->SetRenderColorA( UTIL_Approach( 255, GetEngineObject()->GetRenderColor().a, speed ) );
 
-		if ( m_clrRender->a == 0 )
+		if ( GetEngineObject()->GetRenderColor().a == 0 )
 		{
 			EntityList()->DestroyEntity(this);
 		}
-		else if ( m_clrRender->a == 255 )
+		else if ( GetEngineObject()->GetRenderColor().a == 255 )
 		{
 			m_iFadeState = 0;
 		}

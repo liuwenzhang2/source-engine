@@ -261,7 +261,7 @@ void CEntityFlame::FlameThink( void )
 	{
 		if ( m_hEntAttached->GetEngineObject()->GetFlags() & FL_TRANSRAGDOLL )
 		{
-			SetRenderColorA( 0 );
+			GetEngineObject()->SetRenderColorA( 0 );
 			return;
 		}
 	

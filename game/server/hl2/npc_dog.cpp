@@ -1075,7 +1075,7 @@ void CNPC_Dog::CreateBeams( void )
 		m_hBeams[i]->SetBrightness( 255 );
 		m_hBeams[i]->SetColor( 255, 255, 255 );
 		m_hBeams[i]->SetNoise( 5.5 );
-		m_hBeams[i]->SetRenderMode( kRenderTransAdd );
+		m_hBeams[i]->GetEngineObject()->SetRenderMode( kRenderTransAdd );
 	}
 
 }

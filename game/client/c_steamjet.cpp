@@ -415,7 +415,7 @@ void C_SteamJet::RenderParticles( CParticleRenderIterator *pIterator )
 				pIterator->GetParticleDraw(),
 				tPos,
 				vRampColor,
-				sinLifetime * (m_clrRender->a/255.0f),
+				sinLifetime * (GetEngineObject()->GetRenderColor().a/255.0f),
 				FLerp(m_StartSize, m_EndSize, pParticle->m_Lifetime));
 		}
 		else
@@ -424,7 +424,7 @@ void C_SteamJet::RenderParticles( CParticleRenderIterator *pIterator )
 				pIterator->GetParticleDraw(),
 				tPos,
 				vRampColor,
-				sinLifetime * (m_clrRender->a/255.0f),
+				sinLifetime * (GetEngineObject()->GetRenderColor().a/255.0f),
 				FLerp(pParticle->m_uchStartSize, pParticle->m_uchEndSize, pParticle->m_Lifetime),
 				pParticle->m_flRoll );
 		}
@@ -498,9 +498,9 @@ void C_SteamJet::UpdateLightingRamp()
 		
 		if ( IsEmissive() )
 		{
-			pRamp->x += (m_clrRender->r/255.0f);
-			pRamp->y += (m_clrRender->g/255.0f);
-			pRamp->z += (m_clrRender->b/255.0f);
+			pRamp->x += (GetEngineObject()->GetRenderColor().r/255.0f);
+			pRamp->y += (GetEngineObject()->GetRenderColor().g/255.0f);
+			pRamp->z += (GetEngineObject()->GetRenderColor().b/255.0f);
 
 			pRamp->x = clamp( pRamp->x, 0.0f, 1.0f );
 			pRamp->y = clamp( pRamp->y, 0.0f, 1.0f );
@@ -508,9 +508,9 @@ void C_SteamJet::UpdateLightingRamp()
 		}
 		else
 		{
-			pRamp->x *= (m_clrRender->r/255.0f);
-			pRamp->y *= (m_clrRender->g/255.0f);
-			pRamp->z *= (m_clrRender->b/255.0f);
+			pRamp->x *= (GetEngineObject()->GetRenderColor().r/255.0f);
+			pRamp->y *= (GetEngineObject()->GetRenderColor().g/255.0f);
+			pRamp->z *= (GetEngineObject()->GetRenderColor().b/255.0f);
 		}
 
 		// Renormalize?

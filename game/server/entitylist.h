@@ -299,6 +299,7 @@ public:
 		m_iIKCounter = 0;
 		m_fBoneCacheFlags = 0;
 		m_bAlternateSorting = false;
+		SetRenderColor(255, 255, 255, 255);
 	}
 
 	virtual ~CEngineObjectInternal()
@@ -905,8 +906,18 @@ public:
 	void ActiveRagdoll();
 	void ApplyAnimationAsVelocityToRagdoll(const matrix3x4_t* pPrevBones, const matrix3x4_t* pCurrentBones, float dt);
 
+	void SetRenderMode(RenderMode_t nRenderMode);
+	RenderMode_t GetRenderMode() const;
 	unsigned char GetRenderFX() const { return m_nRenderFX; }
 	void SetRenderFX(unsigned char nRenderFX) { m_nRenderFX = nRenderFX; }
+	const color32 GetRenderColor() const;
+	void SetRenderColor(color32 color);
+	void SetRenderColor(byte r, byte g, byte b);
+	void SetRenderColor(byte r, byte g, byte b, byte a);
+	void SetRenderColorR(byte r);
+	void SetRenderColorG(byte g);
+	void SetRenderColorB(byte b);
+	void SetRenderColorA(byte a);
 
 	void SetOverlaySequence(int nOverlaySequence) { m_nOverlaySequence = nOverlaySequence; }
 	const matrix3x4_t& GetBone(int iBone) const;
@@ -1126,8 +1137,12 @@ private:
 	Vector				m_ragdollMaxs[RAGDOLL_MAX_ELEMENTS];
 	string_t			m_anglesOverrideString;
 
+	// was pev->rendermode
+	CNetworkVar(unsigned char, m_nRenderMode);
 	// was pev->renderfx
 	CNetworkVar(unsigned char, m_nRenderFX);
+	// was pev->rendercolor
+	CNetworkColor32(m_clrRender);
 	CNetworkVar(int, m_nOverlaySequence);
 
 	CThreadFastMutex	m_BoneSetupMutex;
@@ -1883,6 +1898,56 @@ inline const matrix3x4_t& CEngineObjectInternal::GetBone(int iBone) const
 inline matrix3x4_t& CEngineObjectInternal::GetBoneForWrite(int iBone)
 {
 	return m_BoneAccessor.GetBoneForWrite(iBone);
+}
+
+inline void CEngineObjectInternal::SetRenderMode(RenderMode_t nRenderMode)
+{
+	m_nRenderMode = nRenderMode;
+}
+
+inline RenderMode_t CEngineObjectInternal::GetRenderMode() const
+{
+	return (RenderMode_t)m_nRenderMode.Get();
+}
+
+inline const color32 CEngineObjectInternal::GetRenderColor() const
+{
+	return m_clrRender.Get();
+}
+
+inline void CEngineObjectInternal::SetRenderColor(color32 color)
+{
+	m_clrRender.Set(color);
+}
+
+inline void CEngineObjectInternal::SetRenderColor(byte r, byte g, byte b)
+{
+	m_clrRender.Init(r, g, b);
+}
+
+inline void CEngineObjectInternal::SetRenderColor(byte r, byte g, byte b, byte a)
+{
+	m_clrRender.Init(r, g, b, a);
+}
+
+inline void CEngineObjectInternal::SetRenderColorR(byte r)
+{
+	m_clrRender.SetR(r);
+}
+
+inline void CEngineObjectInternal::SetRenderColorG(byte g)
+{
+	m_clrRender.SetG(g);
+}
+
+inline void CEngineObjectInternal::SetRenderColorB(byte b)
+{
+	m_clrRender.SetB(b);
+}
+
+inline void CEngineObjectInternal::SetRenderColorA(byte a)
+{
+	m_clrRender.SetA(a);
 }
 
 class CEngineWorldInternal : public CEngineObjectInternal, public IEngineWorldServer {

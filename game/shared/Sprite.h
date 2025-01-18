@@ -156,13 +156,13 @@ public:
 	inline float Frames( void ) { return m_flMaxFrame; }
 	inline void SetTransparency( int rendermode, int r, int g, int b, int a, int fx )
 	{
-		SetRenderMode( (RenderMode_t)rendermode );
+		GetEngineObject()->SetRenderMode( (RenderMode_t)rendermode );
 		SetColor( r, g, b );
 		SetBrightness( a );
 		GetEngineObject()->SetRenderFX(fx);
 	}
 	inline void SetTexture( int spriteIndex ) { GetEngineObject()->SetModelIndex( spriteIndex ); }
-	inline void SetColor( int r, int g, int b ) { SetRenderColor( r, g, b, GetRenderColor().a ); }
+	inline void SetColor( int r, int g, int b ) { GetEngineObject()->SetRenderColor( r, g, b, GetEngineObject()->GetRenderColor().a ); }
 	
 	void SetBrightness( int brightness, float duration = 0.0f );
 	void SetScale( float scale, float duration = 0.0f );

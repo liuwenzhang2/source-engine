@@ -248,7 +248,7 @@ void CPhysicsCannister::CannisterActivate( IServerEntity *pActivator, const Vect
 
 	m_pJet->m_Rate = 52 + (int)extra*20;
 	m_pJet->m_JetLength = 64;
-	m_pJet->m_clrRender = m_clrRender;
+	m_pJet->GetEngineObject()->SetRenderColor(GetEngineObject()->GetRenderColor());
 
 	m_pJet->Use( this, this, USE_ON, 1 );
 	if ( m_gasSound != NULL_STRING )

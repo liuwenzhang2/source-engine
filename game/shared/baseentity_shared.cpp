@@ -372,14 +372,14 @@ bool CBaseEntity::KeyValue( const char *szKeyName, const char *szValue )
 	{
 		color32 tmp;
 		UTIL_StringToColor32( &tmp, szValue );
-		SetRenderColor( tmp.r, tmp.g, tmp.b );
+		GetEngineObject()->SetRenderColor( tmp.r, tmp.g, tmp.b );
 		// don't copy alpha, legacy support uses renderamt
 		return true;
 	}
 	
 	if ( FStrEq( szKeyName, "renderamt" ) )
 	{
-		SetRenderColorA( atoi( szValue ) );
+		GetEngineObject()->SetRenderColorA( atoi( szValue ) );
 		return true;
 	}
 
@@ -567,14 +567,14 @@ bool CBaseEntity::GetKeyValue( const char *szKeyName, char *szValue, int iMaxLen
 {
 	if ( FStrEq( szKeyName, "rendercolor" ) || FStrEq( szKeyName, "rendercolor32" ))
 	{
-		color32 tmp = GetRenderColor();
+		color32 tmp = GetEngineObject()->GetRenderColor();
 		Q_snprintf( szValue, iMaxLen, "%d %d %d %d", tmp.r, tmp.g, tmp.b, tmp.a );
 		return true;
 	}
 	
 	if ( FStrEq( szKeyName, "renderamt" ) )
 	{
-		color32 tmp = GetRenderColor();
+		color32 tmp = GetEngineObject()->GetRenderColor();
 		Q_snprintf( szValue, iMaxLen, "%d", tmp.a );
 		return true;
 	}
@@ -727,10 +727,10 @@ void CBaseEntity::ImpactTrace( trace_t *pTrace, int iDamageType, const char *pCu
 //-----------------------------------------------------------------------------
 char const *CBaseEntity::DamageDecal( int bitsDamageType, int gameMaterial )
 {
-	if ( m_nRenderMode == kRenderTransAlpha )
+	if (GetEngineObject()->GetRenderMode() == kRenderTransAlpha)
 		return "";
 
-	if ( m_nRenderMode != kRenderNormal && gameMaterial == 'G' )
+	if (GetEngineObject()->GetRenderMode() != kRenderNormal && gameMaterial == 'G' )
 		return "BulletProof";
 
 	if ( bitsDamageType == DMG_SLASH )

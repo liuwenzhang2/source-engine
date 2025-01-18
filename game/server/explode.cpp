@@ -282,11 +282,11 @@ void CEnvExplosion::InputExplode( inputdata_t &inputdata )
 		nFlags |= TE_EXPLFLAG_ROTATE;
 	}
 
-	if ( m_nRenderMode == kRenderTransAlpha )
+	if (GetEngineObject()->GetRenderMode() == kRenderTransAlpha)
 	{
 		nFlags |= TE_EXPLFLAG_DRAWALPHA;
 	}
-	else if ( m_nRenderMode != kRenderTransAdd )
+	else if (GetEngineObject()->GetRenderMode() != kRenderTransAdd )
 	{
 		nFlags |= TE_EXPLFLAG_NOADDITIVE;
 	}
@@ -407,7 +407,7 @@ void ExplosionCreate( const Vector &center, const QAngle &angles,
 	}
 
 	variant_t emptyVariant;
-	pExplosion->m_nRenderMode = kRenderTransAdd;
+	pExplosion->GetEngineObject()->SetRenderMode(kRenderTransAdd);
 	pExplosion->SetOwnerEntity( pOwner );
 	pExplosion->Spawn();
 	pExplosion->m_hInflictor = pInflictor;

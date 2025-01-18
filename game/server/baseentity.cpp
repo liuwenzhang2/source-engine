@@ -112,8 +112,6 @@ ConVar ai_sequence_debug("ai_sequence_debug", "0");
 
 // This table encodes the CBaseEntity data.
 IMPLEMENT_SERVERCLASS_ST_NOBASE(CBaseEntity, DT_BaseEntity)
-SendPropInt(SENDINFO(m_nRenderMode), 8, SPROP_UNSIGNED),
-SendPropInt(SENDINFO(m_clrRender), 32, SPROP_UNSIGNED),
 SendPropInt(SENDINFO(m_iTeamNum), TEAMNUM_NUM_BITS, 0),
 SendPropFloat(SENDINFO(m_flShadowCastDistance), 12, SPROP_UNSIGNED),
 SendPropEHandle(SENDINFO(m_hOwnerEntity)),
@@ -201,7 +199,6 @@ CBaseEntity::CBaseEntity()
 	m_debugOverlays  = 0;
 	m_pTimedOverlay  = NULL;
 	m_flShadowCastDistance = m_flDesiredShadowCastDistance = 0;
-	SetRenderColor( 255, 255, 255, 255 );
 	m_iTeamNum = m_iInitialTeamNum = TEAM_UNASSIGNED;
 	m_nSimulationTick = -1;
 	m_pBlocker = NULL;
@@ -1454,7 +1451,7 @@ BEGIN_DATADESC_NO_BASE( CBaseEntity )
 
 	DEFINE_KEYFIELD( m_flSpeed, FIELD_FLOAT, "speed" ),
 	//DEFINE_KEYFIELD( m_nRenderFX, FIELD_CHARACTER, "renderfx" ),
-	DEFINE_KEYFIELD( m_nRenderMode, FIELD_CHARACTER, "rendermode" ),
+	//DEFINE_KEYFIELD( m_nRenderMode, FIELD_CHARACTER, "rendermode" ),
 
 	// Consider moving to CBaseAnimating?
 	DEFINE_FIELD( m_flPrevAnimTime, FIELD_TIME ),
@@ -1464,7 +1461,7 @@ BEGIN_DATADESC_NO_BASE( CBaseEntity )
 
 	//DEFINE_KEYFIELD( m_nNextThinkTick, FIELD_TICK, "nextthink" ),
 	//DEFINE_KEYFIELD( m_fEffects, FIELD_INTEGER, "effects" ),
-	DEFINE_KEYFIELD( m_clrRender, FIELD_COLOR32, "rendercolor" ),
+	//DEFINE_KEYFIELD( m_clrRender, FIELD_COLOR32, "rendercolor" ),
 //#if !defined( NO_ENTITY_PREDICTION )
 //	DEFINE_FIELD( m_PredictableID, CPredictableId ),
 //#endif
@@ -3328,7 +3325,7 @@ bool CBaseEntity::AcceptInput( const char *szInputName, IServerEntity *pActivato
 //-----------------------------------------------------------------------------
 void CBaseEntity::InputAlpha( inputdata_t &inputdata )
 {
-	SetRenderColorA( clamp( inputdata.value.Int(), 0, 255 ) );
+	GetEngineObject()->SetRenderColorA( clamp( inputdata.value.Int(), 0, 255 ) );
 }
 
 
@@ -3350,7 +3347,7 @@ void CBaseEntity::InputColor( inputdata_t &inputdata )
 {
 	color32 clr = inputdata.value.Color32();
 
-	SetRenderColor( clr.r, clr.g, clr.b );
+	GetEngineObject()->SetRenderColor( clr.r, clr.g, clr.b );
 }
 
 
@@ -5655,7 +5652,7 @@ void CBaseEntity::TransferDissolveFrom(CBaseEntity* pAnim)
 //-----------------------------------------------------------------------------
 void CBaseEntity::Scorch(int rate, int floor)
 {
-	color32 color = GetRenderColor();
+	color32 color = GetEngineObject()->GetRenderColor();
 
 	if (color.r > floor)
 		color.r -= rate;
@@ -5666,7 +5663,7 @@ void CBaseEntity::Scorch(int rate, int floor)
 	if (color.b > floor)
 		color.b -= rate;
 
-	SetRenderColor(color.r, color.g, color.b);
+	GetEngineObject()->SetRenderColor(color.r, color.g, color.b);
 }
 
 //-----------------------------------------------------------------------------
@@ -6283,8 +6280,8 @@ void CBaseEntity::SUB_StartFadeOut( float delay, bool notSolid )
 {
 	SetThink( &CBaseEntity::SUB_FadeOut );
 	GetEngineObject()->SetNextThink( gpGlobals->curtime + delay );
-	SetRenderColorA( 255 );
-	m_nRenderMode = kRenderNormal;
+	GetEngineObject()->SetRenderColorA( 255 );
+	GetEngineObject()->SetRenderMode(kRenderNormal);
 
 	if ( notSolid )
 	{
@@ -6349,9 +6346,9 @@ void CBaseEntity::SUB_PerformFadeOut( void )
 	{
 		dt = 0.1f;
 	}
-	m_nRenderMode = kRenderTransTexture;
+	GetEngineObject()->SetRenderMode(kRenderTransTexture);
 	int speed = MAX(1,256*dt); // fade out over 1 second
-	SetRenderColorA( UTIL_Approach( 0, m_clrRender->a, speed ) );
+	GetEngineObject()->SetRenderColorA( UTIL_Approach( 0, GetEngineObject()->GetRenderColor().a, speed ) );
 }
 
 bool CBaseEntity::SUB_AllowedToFade( void )
@@ -6381,13 +6378,13 @@ void CBaseEntity::SUB_FadeOut( void  )
 	if ( SUB_AllowedToFade() == false )
 	{
 		GetEngineObject()->SetNextThink( gpGlobals->curtime + 1 );
-		SetRenderColorA( 255 );
+		GetEngineObject()->SetRenderColorA( 255 );
 		return;
 	}
     
 	SUB_PerformFadeOut();
 
-	if ( m_clrRender->a == 0 )
+	if ( GetEngineObject()->GetRenderColor().a == 0 )
 	{
 		EntityList()->DestroyEntity(this);
 	}

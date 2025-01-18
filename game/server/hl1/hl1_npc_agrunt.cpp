@@ -211,7 +211,7 @@ void CNPC_AlienGrunt::Spawn()
 	SetHullType(HULL_WIDE_HUMAN);
 	SetHullSizeNormal();	
 
-	SetRenderColor( 255, 255, 255, 255 );
+	GetEngineObject()->SetRenderColor( 255, 255, 255, 255 );
 	
 	NPCInit();
 	

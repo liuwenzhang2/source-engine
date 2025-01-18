@@ -32,6 +32,7 @@ public:
 	C_SmokeStack();
 	~C_SmokeStack();
 
+	bool					Init(int entnum, int iSerialNum);
 	class SmokeStackParticle : public Particle
 	{
 	public:
@@ -177,10 +178,6 @@ C_SmokeStack::C_SmokeStack()
 	m_flBaseSpread = 20;
 	m_bInView = false;
 
-	// Lighting is (base color) + (ambient / dist^2) + bump(directional / dist^2)
-	// By default, we use bottom-up lighting for the directional.
-	SetRenderColor( 0, 0, 0, 255 );
-
 	m_AmbientLight.m_vPos.Init(0,0,-100);
 	m_AmbientLight.m_vColor.Init( 40, 40, 40 );
 	m_AmbientLight.m_flIntensity = 8000;
@@ -192,6 +189,14 @@ C_SmokeStack::C_SmokeStack()
 	m_flTwist = 0;
 }
 
+bool C_SmokeStack::Init(int entnum, int iSerialNum)
+{
+	bool bRet = BaseClass::Init(entnum, iSerialNum);
+	// Lighting is (base color) + (ambient / dist^2) + bump(directional / dist^2)
+	// By default, we use bottom-up lighting for the directional.
+	GetEngineObject()->SetRenderColor(0, 0, 0, 255);
+	return bRet;
+}
 
 C_SmokeStack::~C_SmokeStack()
 {
@@ -386,10 +391,10 @@ void C_SmokeStack::StartRender( VMatrix &effectMatrix )
 
 void C_SmokeStack::QueueLightParametersInRenderer()
 {
-	m_Renderer.SetBaseColor( Vector( m_clrRender->r / 255.0f, m_clrRender->g / 255.0f, m_clrRender->b / 255.0f ) );
+	m_Renderer.SetBaseColor( Vector( GetEngineObject()->GetRenderColor().r / 255.0f, GetEngineObject()->GetRenderColor().g / 255.0f, GetEngineObject()->GetRenderColor().b / 255.0f ) );
 	m_Renderer.SetAmbientLight( m_AmbientLight );
 	m_Renderer.SetDirectionalLight( m_DirLight );
-	m_flAlphaScale = (float)m_clrRender->a;
+	m_flAlphaScale = GetEngineObject()->GetRenderColor().a;
 } 
 
 

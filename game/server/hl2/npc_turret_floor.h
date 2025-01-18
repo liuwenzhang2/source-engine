@@ -173,7 +173,7 @@ public:
 	virtual void	NotifyInteraction( CAI_BaseNPC *pUser )
 	{
 		// For now, turn green so we can tell who is hacked.
-		SetRenderColor( 0, 255, 0 );
+		GetEngineObject()->SetRenderColor( 0, 255, 0 );
 		m_bHackedByAlyx = true; 
 	}
 

@@ -183,7 +183,7 @@ void CNPC_Apache::Spawn( void )
 
 	InitBoneControllers();
 
-	SetRenderColor( 255, 255, 255, 255 );
+	GetEngineObject()->SetRenderColor( 255, 255, 255, 255 );
 
 	m_iRockets = 10;
 

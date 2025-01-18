@@ -171,7 +171,7 @@ void CNPC_Leech::Spawn( void )
 	SetState( NPC_STATE_IDLE );
 	m_stateTime = gpGlobals->curtime + random->RandomFloat( 1, 5 );
 
-	SetRenderColor( 255, 255, 255, 255 );
+	GetEngineObject()->SetRenderColor( 255, 255, 255, 255 );
 
 	m_bloodColor		= DONT_BLEED;
 	GetEngineObject()->SetCollisionGroup( COLLISION_GROUP_DEBRIS );

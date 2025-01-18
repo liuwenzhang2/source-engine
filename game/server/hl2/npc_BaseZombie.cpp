@@ -1270,8 +1270,8 @@ void CNPC_BaseZombie::Ignite( float flFlameLifetime, bool bNPCOnly, float flSize
 //---------------------------------------------------------
 void CNPC_BaseZombie::CopyRenderColorTo( CBaseEntity *pOther )
 {
-	color32 color = GetRenderColor();
-	pOther->SetRenderColor( color.r, color.g, color.b, color.a );
+	color32 color = GetEngineObject()->GetRenderColor();
+	pOther->GetEngineObject()->SetRenderColor( color.r, color.g, color.b, color.a );
 }
 
 //-----------------------------------------------------------------------------

@@ -91,7 +91,7 @@ void CDODSmokeGrenade::Think_Emit( void )
 	// if its past our bedtime, fade out
 	if ( m_flRemoveTime > 0 && gpGlobals->curtime > m_flRemoveTime )
 	{
-		m_nRenderMode = kRenderTransColor;
+		GetEngineObject()->SetRenderMode(kRenderTransColor);
 		SetThink( &CDODSmokeGrenade::Think_Fade );
 	}
 
@@ -105,9 +105,9 @@ void CDODSmokeGrenade::Think_Fade()
 
 	GetEngineObject()->SetNextThink( gpGlobals->curtime );
 
-	color32 c = GetRenderColor();
+	color32 c = GetEngineObject()->GetRenderColor();
 	c.a -= 1;
-	SetRenderColor( c.r, c.b, c.g, c.a );
+	GetEngineObject()->SetRenderColor( c.r, c.b, c.g, c.a );
 
 	if ( !c.a )
 	{

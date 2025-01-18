@@ -145,7 +145,7 @@ void CNPC_Scientist::Spawn( void )
 		GetEngineObject()->SetBody(random->RandomInt( 0, NUM_SCIENTIST_HEADS-1 ));// pick a head, any head
 	
 
-	SetRenderColor( 255, 255, 255, 255 );
+	GetEngineObject()->SetRenderColor( 255, 255, 255, 255 );
 	
 	Precache();
 
@@ -271,8 +271,8 @@ void CNPC_Scientist::SUB_StartLVFadeOut( float delay, bool notSolid )
 {
 	SetThink( &CNPC_Scientist::SUB_LVFadeOut );
 	GetEngineObject()->SetNextThink( gpGlobals->curtime + delay );
-	SetRenderColorA( 255 );
-	m_nRenderMode = kRenderNormal;
+	GetEngineObject()->SetRenderColorA( 255 );
+	GetEngineObject()->SetRenderMode(kRenderNormal);
 
 	if ( notSolid )
 	{
@@ -289,7 +289,7 @@ void CNPC_Scientist::SUB_LVFadeOut( void  )
 		{
 			// Try again in a few seconds.
 			GetEngineObject()->SetNextThink( gpGlobals->curtime + 5 );
-			SetRenderColorA( 255 );
+			GetEngineObject()->SetRenderColorA( 255 );
 			return;
 		}
 	}
@@ -299,12 +299,12 @@ void CNPC_Scientist::SUB_LVFadeOut( void  )
 	{
 		dt = 0.1f;
 	}
-	m_nRenderMode = kRenderTransTexture;
+	GetEngineObject()->SetRenderMode(kRenderTransTexture);
 	int speed = MAX(3,256*dt); // fade out over 3 seconds
-	SetRenderColorA( UTIL_Approach( 0, m_clrRender->a, speed ) );
+	GetEngineObject()->SetRenderColorA( UTIL_Approach( 0, GetEngineObject()->GetRenderColor().a, speed ) );
 	NetworkStateChanged();
 
-	if ( m_clrRender->a == 0 )
+	if ( GetEngineObject()->GetRenderColor().a == 0 )
 	{
 		EntityList()->DestroyEntity(this);
 	}
@@ -917,7 +917,7 @@ void CNPC_DeadScientist::Spawn( void )
 	GetEngineObject()->SetSequence( 0 );
 	m_bloodColor		= BLOOD_COLOR_RED;
 
-	SetRenderColor( 255, 255, 255, 255 );
+	GetEngineObject()->SetRenderColor( 255, 255, 255, 255 );
 
 	if (GetEngineObject()->GetBody() == -1)
 	{// -1 chooses a random head

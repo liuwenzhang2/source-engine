@@ -793,8 +793,8 @@ void CRagdollProp::FadeOutThink(void)
 	{
 		float alpha = 1.0f - dt / m_flFadeTime;
 		int nFade = (int)(alpha * 255.0f);
-		m_nRenderMode = kRenderTransTexture;
-		SetRenderColorA( nFade );
+		GetEngineObject()->SetRenderMode(kRenderTransTexture);
+		GetEngineObject()->SetRenderColorA( nFade );
 		NetworkStateChanged();
 		SetContextThink( &CRagdollProp::FadeOutThink, gpGlobals->curtime + TICK_INTERVAL, s_pFadeOutContext );
 	}

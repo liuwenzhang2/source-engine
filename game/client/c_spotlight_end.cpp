@@ -101,9 +101,9 @@ void C_SpotlightEnd::ClientThink(void)
 		return;
 
 	ColorRGBExp32 color;
-	color.r	= m_clrRender->r * m_clrRender->a;
-	color.g	= m_clrRender->g * m_clrRender->a;
-	color.b	= m_clrRender->b * m_clrRender->a;
+	color.r	= GetEngineObject()->GetRenderColor().r * GetEngineObject()->GetRenderColor().a;
+	color.g	= GetEngineObject()->GetRenderColor().g * GetEngineObject()->GetRenderColor().a;
+	color.b	= GetEngineObject()->GetRenderColor().b * GetEngineObject()->GetRenderColor().a;
 	color.exponent = 0;
 	if ( color.r == 0 && color.g == 0 && color.b == 0 )
 		return;
@@ -134,9 +134,9 @@ void C_SpotlightEnd::ClientThink(void)
 
 	m_pModelLight->radius = m_Radius;
 	m_pModelLight->flags = DLIGHT_NO_WORLD_ILLUMINATION;
-	m_pModelLight->color.r = m_clrRender->r * m_clrRender->a;
-	m_pModelLight->color.g = m_clrRender->g * m_clrRender->a;
-	m_pModelLight->color.b = m_clrRender->b * m_clrRender->a;
+	m_pModelLight->color.r = GetEngineObject()->GetRenderColor().r * GetEngineObject()->GetRenderColor().a;
+	m_pModelLight->color.g = GetEngineObject()->GetRenderColor().g * GetEngineObject()->GetRenderColor().a;
+	m_pModelLight->color.b = GetEngineObject()->GetRenderColor().b * GetEngineObject()->GetRenderColor().a;
 	m_pModelLight->color.exponent	= 1;
 	m_pModelLight->origin		= m_vSpotlightOrg;
 	m_pModelLight->m_InnerAngle = 6;

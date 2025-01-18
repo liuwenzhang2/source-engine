@@ -578,8 +578,18 @@ public:
 	virtual int GetBoneIndex(int index) = 0;
 	virtual const Vector& GetRagPos(int index) = 0;
 	virtual const QAngle& GetRagAngles(int index) = 0;
+	virtual RenderMode_t GetRenderMode() const = 0;
+	virtual void SetRenderMode(RenderMode_t nRenderMode, bool bForceUpdate = false) = 0;
 	virtual unsigned char GetRenderFX() const = 0;
 	virtual void SetRenderFX(unsigned char nRenderFX) = 0;
+	virtual const color32 GetRenderColor() const = 0;
+	virtual void SetRenderColor(color32 color) = 0;
+	virtual void SetRenderColor(byte r, byte g, byte b) = 0;
+	virtual void SetRenderColor(byte r, byte g, byte b, byte a) = 0;
+	virtual void SetRenderColorR(byte r) = 0;
+	virtual void SetRenderColorG(byte g) = 0;
+	virtual void SetRenderColorB(byte b) = 0;
+	virtual void SetRenderColorA(byte a) = 0;
 	virtual void SetToolHandle(HTOOLHANDLE handle) = 0;
 	virtual HTOOLHANDLE GetToolHandle() const = 0;
 	virtual void EnableInToolView(bool bEnable) = 0;

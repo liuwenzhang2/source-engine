@@ -94,10 +94,10 @@ bool C_Gib::InitializeGib( const char *pszModelName, Vector vecOrigin, Vector ve
 //-----------------------------------------------------------------------------
 void C_Gib::ClientThink( void )
 {
-	SetRenderMode( kRenderTransAlpha );
+	GetEngineObject()->SetRenderMode( kRenderTransAlpha );
 	GetEngineObject()->SetRenderFX(kRenderFxFadeFast);
 
-	if ( m_clrRender->a == 0 )
+	if (GetEngineObject()->GetRenderColor().a == 0 )
 	{
 #ifdef HL2_CLIENT_DLL
 		s_AntlionGibManager.RemoveGib( this );

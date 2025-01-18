@@ -461,8 +461,7 @@ DEFINE_FIELD(m_bReleaseRagdoll, FIELD_BOOLEAN),
 //DEFINE_FIELD( m_nBody, FIELD_INTEGER ),
 //DEFINE_FIELD( m_nSkin, FIELD_INTEGER ),
 //DEFINE_FIELD( m_nRenderFX, FIELD_CHARACTER ),
-DEFINE_FIELD(m_nRenderMode, FIELD_CHARACTER),
-DEFINE_FIELD(m_clrRender, FIELD_COLOR32),
+//DEFINE_FIELD(m_nRenderMode, FIELD_CHARACTER),
 DEFINE_FIELD(m_flEffectTime, FIELD_TIME),
 DEFINE_FIELD(m_bFadingOut, FIELD_BOOLEAN),
 
@@ -688,13 +687,13 @@ void C_ClientRagdoll::FadeOut(void)
 		return;
 	}
 
-	int iAlpha = GetRenderColor().a;
+	int iAlpha = GetEngineObject()->GetRenderColor().a;
 	int iFadeSpeed = (g_RagdollLVManager.IsLowViolence()) ? g_ragdoll_lvfadespeed.GetInt() : g_ragdoll_fadespeed.GetInt();
 
 	iAlpha = MAX(iAlpha - (iFadeSpeed * gpGlobals->frametime), 0);
 
-	SetRenderMode(kRenderTransAlpha);
-	SetRenderColorA(iAlpha);
+	GetEngineObject()->SetRenderMode(kRenderTransAlpha);
+	GetEngineObject()->SetRenderColorA(iAlpha);
 
 	if (iAlpha == 0)
 	{
@@ -744,10 +743,10 @@ void C_ClientRagdoll::TransferDissolveFrom(C_BaseEntity* pSource)
 
 				if (pDissolve)
 				{
-					pDissolve->SetRenderMode(pDissolveChild->GetRenderMode());
+					pDissolve->GetEngineObject()->SetRenderMode(pDissolveChild->GetEngineObject()->GetRenderMode());
 					pDissolve->GetEngineObject()->SetRenderFX(pDissolveChild->GetEngineObject()->GetRenderFX());
-					pDissolve->SetRenderColor(255, 255, 255, 255);
-					pDissolveChild->SetRenderColorA(0);
+					pDissolve->GetEngineObject()->SetRenderColor(255, 255, 255, 255);
+					pDissolveChild->GetEngineObject()->SetRenderColorA(0);
 
 					pDissolve->m_vDissolverOrigin = pDissolveChild->m_vDissolverOrigin;
 					pDissolve->m_nDissolveType = pDissolveChild->m_nDissolveType;

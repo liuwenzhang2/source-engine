@@ -2307,7 +2307,7 @@ void CFuncTank::Fire( int bulletCount, const Vector &barrelEnd, const Vector &fo
 		{
 			CSprite *pSprite = CSprite::SpriteCreate( STRING(m_iszSpriteSmoke), barrelEnd, TRUE );
 			pSprite->AnimateAndDie( random->RandomFloat( 15.0, 20.0 ) );
-			pSprite->SetTransparency( kRenderTransAlpha, m_clrRender->r, m_clrRender->g, m_clrRender->b, 255, kRenderFxNone );
+			pSprite->SetTransparency( kRenderTransAlpha, GetEngineObject()->GetRenderColor().r, GetEngineObject()->GetRenderColor().g, GetEngineObject()->GetRenderColor().b, 255, kRenderFxNone );
 
 			Vector vecVelocity( 0, 0, random->RandomFloat(40, 80) ); 
 			pSprite->GetEngineObject()->SetAbsVelocity( vecVelocity );

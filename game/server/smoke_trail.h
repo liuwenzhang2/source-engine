@@ -100,7 +100,7 @@ public:
 	DECLARE_SERVERCLASS();
 
 	SporeTrail( void );
-
+	void PostConstructor(const char* szClassname, int iForceEdictIndex);
 	static SporeTrail*		CreateSporeTrail();
 
 //Data members
@@ -129,6 +129,7 @@ public:
 	DECLARE_SERVERCLASS();
 
 	SporeExplosion( void );
+	void PostConstructor(const char* szClassname, int iForceEdictIndex);
 	void Spawn( void );
 
 	static SporeExplosion*		CreateSporeExplosion();

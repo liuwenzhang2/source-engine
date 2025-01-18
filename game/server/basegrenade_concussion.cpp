@@ -102,7 +102,7 @@ void CBaseGrenadeConcussion::Spawn( void )
 	GetEngineObject()->SetLocalAngles( angles );
 
 	GetEngineObject()->SetRenderFX(kRenderFxGlowShell);
-	SetRenderColor( 200, 200, 20, 255 );
+	GetEngineObject()->SetRenderColor( 200, 200, 20, 255 );
 	
 	// make NPCs afaid of it while in the air
 	SetThink( &CBaseGrenadeConcussion::FallThink );

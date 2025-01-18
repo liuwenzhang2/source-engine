@@ -169,11 +169,11 @@ BEGIN_NETWORK_TABLE_NOBASE( CBeam, DT_Beam )
 	SendPropFloat	(SENDINFO(m_fStartFrame),	8,	SPROP_ROUNDDOWN,	0.0f,   256.0f),
 	SendPropFloat	(SENDINFO(m_fSpeed),		8,	SPROP_NOSCALE,	0.0f,	MAX_BEAM_SCROLLSPEED),
 	//SendPropInt		(SENDINFO(m_nRenderFX),		8,	SPROP_UNSIGNED ),
-	SendPropInt		(SENDINFO(m_nRenderMode),	8,	SPROP_UNSIGNED ),
+	//SendPropInt		(SENDINFO(m_nRenderMode),	8,	SPROP_UNSIGNED ),
 	SendPropFloat	(SENDINFO(m_flFrameRate),	10, SPROP_ROUNDUP, -25.0f, 25.0f ),
 	SendPropFloat	(SENDINFO(m_flHDRColorScale),	0, SPROP_NOSCALE, 0.0f, 100.0f ),
 	SendPropFloat	(SENDINFO(m_flFrame),		20, SPROP_ROUNDDOWN | SPROP_CHANGES_OFTEN,	0.0f,   256.0f),
-	SendPropInt		(SENDINFO(m_clrRender),		32,	SPROP_UNSIGNED | SPROP_CHANGES_OFTEN ),
+	//SendPropInt		(SENDINFO(m_clrRender),		32,	SPROP_UNSIGNED | SPROP_CHANGES_OFTEN ),
 	SendPropVector	(SENDINFO(m_vecEndPos),		-1,	SPROP_COORD ),
 #ifdef PORTAL
 	SendPropBool	(SENDINFO(m_bDrawInMainRender) ),
@@ -211,9 +211,9 @@ BEGIN_NETWORK_TABLE_NOBASE( CBeam, DT_Beam )
 	RecvPropFloat	(RECVINFO(m_fSpeed), 0, RecvProxy_Beam_ScrollSpeed ),
 	RecvPropFloat(RECVINFO(m_flFrameRate)),
 	RecvPropFloat(RECVINFO(m_flHDRColorScale)),
-	RecvPropInt(RECVINFO(m_clrRender)),
+	//RecvPropInt(RECVINFO(m_clrRender)),
 	//RecvPropInt(RECVINFO(m_nRenderFX)),
-	RecvPropInt(RECVINFO(m_nRenderMode)),
+	//RecvPropInt(RECVINFO(m_nRenderMode)),
 	RecvPropFloat(RECVINFO(m_flFrame)),
 	RecvPropVector(RECVINFO(m_vecEndPos)),
 #ifdef PORTAL
@@ -299,10 +299,10 @@ BEGIN_PREDICTION_DATA( CBeam )
 	DEFINE_PRED_FIELD( m_fStartFrame, FIELD_FLOAT, FTYPEDESC_INSENDTABLE ),
 	DEFINE_PRED_FIELD( m_fSpeed, FIELD_FLOAT, FTYPEDESC_INSENDTABLE ),
 	//DEFINE_PRED_FIELD( m_nRenderFX, FIELD_INTEGER, FTYPEDESC_INSENDTABLE ),
-	DEFINE_PRED_FIELD( m_nRenderMode, FIELD_INTEGER, FTYPEDESC_INSENDTABLE ),
+	//DEFINE_PRED_FIELD( m_nRenderMode, FIELD_INTEGER, FTYPEDESC_INSENDTABLE ),
 	DEFINE_PRED_FIELD( m_flFrameRate, FIELD_FLOAT, FTYPEDESC_INSENDTABLE ),
 	DEFINE_PRED_FIELD( m_flFrame, FIELD_FLOAT, FTYPEDESC_INSENDTABLE ),
-	DEFINE_PRED_FIELD( m_clrRender, FIELD_INTEGER, FTYPEDESC_INSENDTABLE ),
+	//DEFINE_PRED_FIELD( m_clrRender, FIELD_INTEGER, FTYPEDESC_INSENDTABLE ),
 	DEFINE_PRED_FIELD( m_nMinDXLevel, FIELD_INTEGER, FTYPEDESC_INSENDTABLE ),
 	DEFINE_PRED_FIELD_TOL( m_vecEndPos, FIELD_VECTOR, FTYPEDESC_INSENDTABLE, 0.125f ),
 #ifdef PORTAL
@@ -368,7 +368,7 @@ void CBeam::Spawn( void )
 {
 	GetEngineObject()->SetMoveType( MOVETYPE_NONE );
 	GetEngineObject()->SetSolid( SOLID_NONE );							// Remove model & collisions
-	SetRenderMode( kRenderTransTexture );
+	GetEngineObject()->SetRenderMode( kRenderTransTexture );
 
 	// Opt out of all shadow routines
 	GetEngineObject()->AddEffects( EF_NOSHADOW | EF_NORECEIVESHADOW );
@@ -589,7 +589,7 @@ void CBeam::BeamInit( const char *pSpriteName, float width )
 	SetFrame( 0 );
 	SetScrollRate( 0 );
 	GetEngineObject()->SetModelName( MAKE_STRING( pSpriteName ) );
-	SetRenderMode( kRenderTransTexture );
+	GetEngineObject()->SetRenderMode( kRenderTransTexture );
 	SetTexture(engine->PrecacheModel( pSpriteName ) );
 	SetWidth( width );
 	SetEndWidth( width );
@@ -844,19 +844,19 @@ void CBeam::InputWidth( inputdata_t &inputdata )
 void CBeam::InputColorRedValue( inputdata_t &inputdata )
 {
 	int nNewColor = clamp( FastFloatToSmallInt(inputdata.value.Float()), 0, 255 );
-	SetColor( nNewColor, m_clrRender->g, m_clrRender->b );
+	SetColor( nNewColor, GetEngineObject()->GetRenderColor().g, GetEngineObject()->GetRenderColor().b );
 }
 
 void CBeam::InputColorGreenValue( inputdata_t &inputdata )
 {
 	int nNewColor =clamp( FastFloatToSmallInt(inputdata.value.Float()), 0, 255 );
-	SetColor( m_clrRender->r, nNewColor, m_clrRender->b );
+	SetColor( GetEngineObject()->GetRenderColor().r, nNewColor, GetEngineObject()->GetRenderColor().b );
 }
 
 void CBeam::InputColorBlueValue( inputdata_t &inputdata )
 {
 	int nNewColor = clamp( FastFloatToSmallInt(inputdata.value.Float()), 0, 255 );
-	SetColor( m_clrRender->r, m_clrRender->g, nNewColor );
+	SetColor( GetEngineObject()->GetRenderColor().r, GetEngineObject()->GetRenderColor().g, nNewColor );
 }
 
 void CBeam::InputNoise( inputdata_t &inputdata )
@@ -1104,9 +1104,9 @@ void CBeam::DrawBeam(C_Beam* pbeam, ITraceFilter* pEntityBeamTraceFilter)
 
 	beamInfo.m_nStartFrame = pbeam->m_fStartFrame;
 	beamInfo.m_flFrameRate = pbeam->m_flFrameRate;
-	beamInfo.m_flRed = pbeam->m_clrRender->r;
-	beamInfo.m_flGreen = pbeam->m_clrRender->g;
-	beamInfo.m_flBlue = pbeam->m_clrRender->b;
+	beamInfo.m_flRed = pbeam->GetEngineObject()->GetRenderColor().r;
+	beamInfo.m_flGreen = pbeam->GetEngineObject()->GetRenderColor().g;
+	beamInfo.m_flBlue = pbeam->GetEngineObject()->GetRenderColor().b;
 
 	beams->SetBeamAttributes(&beam, beamInfo);
 

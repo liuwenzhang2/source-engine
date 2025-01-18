@@ -1465,8 +1465,8 @@ void CBaseCombatCharacter::FixupBurningServerRagdoll( CBaseEntity *pRagdoll )
 		pFireChild->GetEngineObject()->AddEFlags( EFL_FORCE_CHECK_TRANSMIT );
  		pRagdoll->SetEffectEntity( pFireChild );
 
-		color32 color = GetRenderColor();
-		pRagdoll->SetRenderColor( color.r, color.g, color.b );
+		color32 color = GetEngineObject()->GetRenderColor();
+		pRagdoll->GetEngineObject()->SetRenderColor( color.r, color.g, color.b );
 	}
 }
 

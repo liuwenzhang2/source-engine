@@ -419,7 +419,7 @@ void CNPC_BigMomma::Spawn()
 	m_flFieldOfView	= 0.3;// indicates the width of this monster's forward view cone ( as a dotproduct result )
 	m_NPCState = NPC_STATE_NONE;
 
-	SetRenderColor( 255, 255, 255, 255 );
+	GetEngineObject()->SetRenderColor( 255, 255, 255, 255 );
 
 	m_bDoneWithPath = false;
 
@@ -1157,7 +1157,7 @@ void CBMortar:: Spawn( void )
 		pSprite->SetAttachment( this, 0 );
 		pSprite->m_flSpriteFramerate = 5;
 
-		pSprite->m_nRenderMode = kRenderTransAlpha;
+		pSprite->GetEngineObject()->SetRenderMode(kRenderTransAlpha);
 		pSprite->SetBrightness( 255 );
 
 		m_iFrame = 0;

@@ -292,7 +292,7 @@ void CBreakable::Spawn( void )
 	}
 
 	// Flag unbreakable glass as "worldbrush" so it will block ALL tracelines
-	if ( !IsBreakable() && m_nRenderMode != kRenderNormal )
+	if ( !IsBreakable() && GetEngineObject()->GetRenderMode() != kRenderNormal )
 		GetEngineObject()->AddFlag( FL_WORLDBRUSH );
 
 	if ( m_impactEnergyScale == 0 )

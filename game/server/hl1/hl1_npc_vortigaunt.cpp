@@ -68,7 +68,7 @@ void CNPC_Vortigaunt::Spawn()
 
 	SetModel( "models/islave.mdl" );
 	
-	SetRenderColor( 255, 255, 255, 255 );
+	GetEngineObject()->SetRenderColor( 255, 255, 255, 255 );
 
 	SetHullType(HULL_HUMAN);
 	SetHullSizeNormal();

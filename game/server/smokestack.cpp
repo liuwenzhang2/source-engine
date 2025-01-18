@@ -102,13 +102,17 @@ CSmokeStack::CSmokeStack()
 	//IMPLEMENT_NETWORKVAR_CHAIN( &m_DirLight );
 
 	m_flTwist = 0;
-	SetRenderColor( 0, 0, 0, 255 );
 	m_vWind.GetForModify().Init();
 	m_WindAngle = m_WindSpeed = 0;
 	m_iMaterialModel = -1;
 	m_flRollSpeed = 0.0f;
 }
 
+void CSmokeStack::PostConstructor(const char* szClassname, int iForceEdictIndex)
+{
+	BaseClass::PostConstructor(szClassname, iForceEdictIndex);
+	GetEngineObject()->SetRenderColor(0, 0, 0, 255);
+}
 
 CSmokeStack::~CSmokeStack()
 {

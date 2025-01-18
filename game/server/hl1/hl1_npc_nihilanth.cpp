@@ -850,7 +850,7 @@ void CNPC_Nihilanth::MakeFriend( Vector vecStart )
 	{
 		if (m_hFriend[i] != NULL && !m_hFriend[i]->IsAlive())
 		{
-			if ( m_nRenderMode == kRenderNormal) // don't do it if they are already fading
+			if (GetEngineObject()->GetRenderMode() == kRenderNormal) // don't do it if they are already fading
 				m_hFriend[i]->MyNPCPointer()->CorpseFade();
 
 			m_hFriend[i] = NULL;
@@ -1539,7 +1539,7 @@ void CNihilanthHVR::AbsorbInit( void  )
 	CBroadcastRecipientFilter filter;
 
 	SetThink( &CNihilanthHVR::DissipateThink );
-	SetRenderColorA( 255 );
+	GetEngineObject()->SetRenderColorA( 255 );
 
 	SetBeam( CBeam::BeamCreate( "sprites/laserbeam.vmt", 8.0f ) );
 

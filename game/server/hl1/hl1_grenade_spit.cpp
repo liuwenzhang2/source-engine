@@ -44,8 +44,8 @@ void CGrenadeSpit::Spawn( void )
 	SetModel( "models/spitball_large.mdl" );
 	GetEngineObject()->SetSize(Vector(-3, -3, -3), Vector(3, 3, 3));
 
-	m_nRenderMode		= kRenderTransAdd;
-	SetRenderColor( 255, 255, 255, 255 );
+	GetEngineObject()->SetRenderMode(kRenderTransAdd);
+	GetEngineObject()->SetRenderColor( 255, 255, 255, 255 );
 	GetEngineObject()->SetRenderFX(kRenderFxNone);
 
 	SetThink( &CGrenadeSpit::SpitThink );

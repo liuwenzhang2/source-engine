@@ -145,8 +145,8 @@ void CSquidSpit:: Spawn( void )
 	
 	GetEngineObject()->SetSolid( SOLID_BBOX );
 
-	m_nRenderMode = kRenderTransAlpha;
-	SetRenderColorA( 255 );
+	GetEngineObject()->SetRenderMode(kRenderTransAlpha);
+	GetEngineObject()->SetRenderColorA( 255 );
 	SetModel( "" );
 
 	SetSprite( CSprite::SpriteCreate( "sprites/bigspit.vmt", GetEngineObject()->GetAbsOrigin(), true ) );
@@ -173,7 +173,7 @@ void CSquidSpit::Shoot( CBaseEntity *pOwner, Vector vecStart, Vector vecVelocity
 		pSprite->SetOwnerEntity( pSpit );
 
 		pSprite->SetScale( 0.5 );
-		pSprite->SetTransparency( pSpit->m_nRenderMode, pSpit->m_clrRender->r, pSpit->m_clrRender->g, pSpit->m_clrRender->b, pSpit->m_clrRender->a, pSpit->GetEngineObject()->GetRenderFX() );
+		pSprite->SetTransparency( pSpit->GetEngineObject()->GetRenderMode(), pSpit->GetEngineObject()->GetRenderColor().r, pSpit->GetEngineObject()->GetRenderColor().g, pSpit->GetEngineObject()->GetRenderColor().b, pSpit->GetEngineObject()->GetRenderColor().a, pSpit->GetEngineObject()->GetRenderFX());
 	}
 
 
@@ -279,7 +279,7 @@ void CNPC_Bullsquid::Spawn()
 	GetEngineObject()->SetMoveType( MOVETYPE_STEP );
 	m_bloodColor		= BLOOD_COLOR_GREEN;
 	
-	SetRenderColor( 255, 255, 255, 255 );
+	GetEngineObject()->SetRenderColor( 255, 255, 255, 255 );
 	
 	m_iHealth			= sk_bullsquid_health.GetFloat();
 	m_flFieldOfView		= 0.2;// indicates the width of this monster's forward view cone ( as a dotproduct result )

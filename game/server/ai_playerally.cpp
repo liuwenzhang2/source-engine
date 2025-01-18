@@ -380,7 +380,7 @@ void CAI_PlayerAlly::DisplayDeathMessage( void )
 
 	if ( pReload )
 	{
-		pReload->SetRenderColor( 0, 0, 0, 255 );
+		pReload->GetEngineObject()->SetRenderColor( 0, 0, 0, 255 );
 
 		g_EventQueue.AddEvent( pReload, "Reload", 1.5f, pReload, pReload );
 	}

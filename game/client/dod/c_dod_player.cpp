@@ -598,13 +598,13 @@ void C_DODRagdoll::ClientThink( void )
 
 	if ( m_bFadingOut == true )
 	{
-		int iAlpha = GetRenderColor().a;
+		int iAlpha = GetEngineObject()->GetRenderColor().a;
 		int iFadeSpeed = 600.0f;
 
 		iAlpha = MAX( iAlpha - ( iFadeSpeed * gpGlobals->frametime ), 0 );
 
-		SetRenderMode( kRenderTransAlpha );
-		SetRenderColorA( iAlpha );
+		GetEngineObject()->SetRenderMode( kRenderTransAlpha );
+		GetEngineObject()->SetRenderColorA( iAlpha );
 
 		if ( iAlpha == 0 )
 		{
@@ -1002,7 +1002,7 @@ void C_DODPlayer::GetToolRecordingState( KeyValues *msg )
 	if ( IsLocalPlayer() )
 	{
 		pBaseEntityState->m_bVisible = !IsDormant() && IsAlive() && ( GetTeamNumber() != TEAM_SPECTATOR ) &&
-			( GetRenderMode() != kRenderNone ) && (GetObserverMode() != OBS_MODE_DEATHCAM) && !GetEngineObject()->IsEffectActive(EF_NODRAW);
+			(GetEngineObject()->GetRenderMode() != kRenderNone ) && (GetObserverMode() != OBS_MODE_DEATHCAM) && !GetEngineObject()->IsEffectActive(EF_NODRAW);
 	}
 #endif
 }
@@ -1358,7 +1358,7 @@ public:
 	virtual void ImpactTrace( trace_t *pTrace, int iDamageType, const char *pCustomImpactName )
 	{
 		// If we haven't started fading
-		if( GetRenderColor().a >= 255 )
+		if(GetEngineObject()->GetRenderColor().a >= 255 )
 		{
 			// delay the fade
 			StartFadeOut( 10.0 );

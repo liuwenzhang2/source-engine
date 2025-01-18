@@ -430,14 +430,14 @@ int CSpriteTrail::DrawModel( int flags )
 	if ( !IsVisible() || (GetEngineObject()->IsReadyToDraw() == false))
 		return 0;
 
-	CEngineSprite *pSprite = Draw_SetSpriteTexture(GetEngineObject()->GetModel(), m_flFrame, GetRenderMode() );
+	CEngineSprite *pSprite = Draw_SetSpriteTexture(GetEngineObject()->GetModel(), m_flFrame, GetEngineObject()->GetRenderMode() );
 	if ( pSprite == NULL )
 		return 0;
 
 	// Specify all the segments.
 	CMatRenderContextPtr pRenderContext( g_pMaterialSystem );
 	CBeamSegDraw segDraw;
-	segDraw.Start( pRenderContext, m_nStepCount + 1, pSprite->GetMaterial( GetRenderMode() ) );
+	segDraw.Start( pRenderContext, m_nStepCount + 1, pSprite->GetMaterial(GetEngineObject()->GetRenderMode() ) );
 	
 	// Setup the first point, always emanating from the attachment point
 	TrailPoint_t *pLast = GetTrailPoint( m_nStepCount-1 );
@@ -464,9 +464,9 @@ int CSpriteTrail::DrawModel( int flags )
 		flLifePerc = clamp( flLifePerc, 0.0f, 1.0f );
 
 		BeamSeg_t curSeg;
-		curSeg.m_vColor.x = (float) m_clrRender->r / 255.0f;
-		curSeg.m_vColor.y = (float) m_clrRender->g / 255.0f;
-		curSeg.m_vColor.z = (float) m_clrRender->b / 255.0f;
+		curSeg.m_vColor.x = GetEngineObject()->GetRenderColor().r / 255.0f;
+		curSeg.m_vColor.y = GetEngineObject()->GetRenderColor().g / 255.0f;
+		curSeg.m_vColor.z = GetEngineObject()->GetRenderColor().b / 255.0f;
 
 		float flAlphaFade = flLifePerc;
 		if ( flTailAlphaDist > 0.0f )

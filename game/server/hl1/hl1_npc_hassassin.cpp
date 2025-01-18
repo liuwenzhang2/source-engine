@@ -173,8 +173,8 @@ void CNPC_HAssassin::Spawn()
 	m_HackedGunPos		= Vector( 0, 24, 48 );
 
 	m_iTargetRanderamt	= 20;
-	SetRenderColor( 255, 255, 255, 20 );
-	m_nRenderMode		= kRenderTransTexture;
+	GetEngineObject()->SetRenderColor( 255, 255, 255, 20 );
+	GetEngineObject()->SetRenderMode(kRenderTransTexture);
 
 	CapabilitiesClear();
 	CapabilitiesAdd( bits_CAP_MOVE_GROUND );
@@ -683,21 +683,21 @@ void CNPC_HAssassin::RunAI( void )
 
 	CPASAttenuationFilter filter( this );
 
-	if ( GetRenderColor().a > m_iTargetRanderamt)
+	if (GetEngineObject()->GetRenderColor().a > m_iTargetRanderamt)
 	{
-		if ( GetRenderColor().a == 255)
+		if (GetEngineObject()->GetRenderColor().a == 255)
 		{
 			g_pSoundEmitterSystem->EmitSound( filter, entindex(), "HAssassin.Beamsound" );
 		}
 
-		SetRenderColorA( MAX( GetRenderColor().a - 50, m_iTargetRanderamt ) );
-		m_nRenderMode = kRenderTransTexture;
+		GetEngineObject()->SetRenderColorA( MAX(GetEngineObject()->GetRenderColor().a - 50, m_iTargetRanderamt ) );
+		GetEngineObject()->SetRenderMode(kRenderTransTexture);
 	}
-	else if ( GetRenderColor().a < m_iTargetRanderamt)
+	else if (GetEngineObject()->GetRenderColor().a < m_iTargetRanderamt)
 	{
-		SetRenderColorA ( MIN( GetRenderColor().a + 50, m_iTargetRanderamt ) );
-		if (GetRenderColor().a == 255)
-			m_nRenderMode = kRenderNormal;
+		GetEngineObject()->SetRenderColorA ( MIN(GetEngineObject()->GetRenderColor().a + 50, m_iTargetRanderamt ) );
+		if (GetEngineObject()->GetRenderColor().a == 255)
+			GetEngineObject()->SetRenderMode(kRenderNormal);
 	}
 
 	if ( GetActivity() == ACT_RUN || GetActivity() == ACT_WALK)

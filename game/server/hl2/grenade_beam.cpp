@@ -153,7 +153,7 @@ CGrenadeBeam* CGrenadeBeam::Create( CBaseEntity* pOwner, const Vector &vStart)
 	CGrenadeBeam *pEnergy = (CGrenadeBeam *)EntityList()->CreateEntityByName( "grenade_beam" );
 	pEnergy->Spawn();
 	pEnergy->SetOwnerEntity( pOwner );
-	pEnergy->SetRenderColor( 255, 0, 0, 0 );
+	pEnergy->GetEngineObject()->SetRenderColor( 255, 0, 0, 0 );
 	pEnergy->m_flBeamWidth		= GRENADEBEAM_DEFAULTWIDTH;
 	UTIL_SetOrigin( pEnergy, vStart );
 
@@ -167,7 +167,7 @@ CGrenadeBeam* CGrenadeBeam::Create( CBaseEntity* pOwner, const Vector &vStart)
 //------------------------------------------------------------------------------
 void CGrenadeBeam::Format(color32 clrColor, float flWidth)
 {
-	m_clrRender		= clrColor;
+	GetEngineObject()->SetRenderColor(clrColor);
 	m_flBeamWidth	= flWidth;
 }
 
@@ -348,7 +348,7 @@ void CGrenadeBeam::CreateBeams(void)
 	for ( int i=0; i < GRENADEBEAM_MAXBEAMS; ++i )
 	{
 		m_pBeam[i] = CBeam::BeamCreate( "sprites/laser.vmt", m_flBeamWidth );
-		m_pBeam[i]->SetColor( m_clrRender->r, m_clrRender->g, m_clrRender->b );
+		m_pBeam[i]->SetColor( GetEngineObject()->GetRenderColor().r, GetEngineObject()->GetRenderColor().g, GetEngineObject()->GetRenderColor().b );
 		m_pBeam[i]->EntsInit( this, m_hBeamChaser );
 		m_pBeam[i]->SetBrightness( 255 );
 		m_pBeam[i]->SetNoise( 1 );

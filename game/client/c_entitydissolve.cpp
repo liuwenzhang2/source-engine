@@ -541,8 +541,8 @@ void C_EntityDissolve::ClientThink( void )
 	color.a = GetModelFadeOutPercentage() * 255.0f;
 
 	// Setup the entity fade
-	pEnt->SetRenderMode( kRenderTransColor );
-	pEnt->SetRenderColor( color.r, color.g, color.b, color.a );
+	pEnt->GetEngineObject()->SetRenderMode( kRenderTransColor );
+	pEnt->GetEngineObject()->SetRenderColor( color.r, color.g, color.b, color.a );
 
 	if ( GetModelFadeOutPercentage() <= 0.2f )
 	{

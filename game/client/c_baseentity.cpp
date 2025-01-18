@@ -103,8 +103,6 @@ IMPLEMENT_CLIENTCLASS(C_BaseEntity, DT_BaseEntity, CBaseEntity);
 
 BEGIN_RECV_TABLE_NOBASE(C_BaseEntity, DT_BaseEntity)
 
-	RecvPropInt(RECVINFO(m_nRenderMode)),
-	RecvPropInt(RECVINFO(m_clrRender)),
 	RecvPropInt(RECVINFO(m_iTeamNum)),
 	RecvPropFloat(RECVINFO(m_flShadowCastDistance)),
 	RecvPropEHandle( RECVINFO(m_hOwnerEntity) ),
@@ -142,7 +140,7 @@ BEGIN_PREDICTION_DATA_NO_BASE( C_BaseEntity )
 	//DEFINE_FIELD( m_vecAbsVelocity, FIELD_VECTOR ),
 	//DEFINE_PRED_FIELD_TOL( m_vecVelocity, FIELD_VECTOR, FTYPEDESC_INSENDTABLE, 0.5f ),
 //	DEFINE_PRED_FIELD( m_fEffects, FIELD_INTEGER, FTYPEDESC_INSENDTABLE ),
-	DEFINE_PRED_FIELD( m_nRenderMode, FIELD_CHARACTER, FTYPEDESC_INSENDTABLE ),
+	//DEFINE_PRED_FIELD( m_nRenderMode, FIELD_CHARACTER, FTYPEDESC_INSENDTABLE ),
 	//DEFINE_PRED_FIELD( m_nRenderFX, FIELD_CHARACTER, FTYPEDESC_INSENDTABLE ),
 //	DEFINE_PRED_FIELD( m_flAnimTime, FIELD_FLOAT, FTYPEDESC_INSENDTABLE ),
 //	DEFINE_PRED_FIELD( m_flSimulationTime, FIELD_FLOAT, FTYPEDESC_INSENDTABLE ),
@@ -483,12 +481,6 @@ void C_BaseEntity::Clear( void )
 	m_vecViewOffset.Init();
 	m_vecBaseVelocity.Init();
 
-
-
-	m_nRenderMode = 0;
-	m_nOldRenderMode = 0;
-	SetRenderColor( 255, 255, 255, 255 );
-
 	m_ShadowDirUseOtherEntity = NULL;
 
 
@@ -695,13 +687,13 @@ void C_BaseEntity::UpdateVisibility()
 			{
 				if ( !m_bWasDeemedInvalid )
 				{
-					m_PreviousRenderMode = GetRenderMode();
-					m_PreviousRenderColor = GetRenderColor();
+					m_PreviousRenderMode = GetEngineObject()->GetRenderMode();
+					m_PreviousRenderColor = GetEngineObject()->GetRenderColor();
 					m_bWasDeemedInvalid = true;
 				}
 
-				SetRenderMode( kRenderTransColor );
-				SetRenderColor( 255, 0, 0, 200 );
+				GetEngineObject()->SetRenderMode( kRenderTransColor );
+				GetEngineObject()->SetRenderColor( 255, 0, 0, 200 );
 
 			}
 			else
@@ -715,8 +707,8 @@ void C_BaseEntity::UpdateVisibility()
 			if ( bIsStaging )
 			{
 				// We need to fix up the rendering.
-				SetRenderMode( m_PreviousRenderMode );
-				SetRenderColor( m_PreviousRenderColor.r, m_PreviousRenderColor.g, m_PreviousRenderColor.b, m_PreviousRenderColor.a );
+				GetEngineObject()->SetRenderMode( m_PreviousRenderMode );
+				GetEngineObject()->SetRenderColor( m_PreviousRenderColor.r, m_PreviousRenderColor.g, m_PreviousRenderColor.b, m_PreviousRenderColor.a );
 			}
 
 			m_bWasDeemedInvalid = false;
@@ -749,7 +741,7 @@ bool C_BaseEntity::ShouldDraw()
 #endif
 
 	// Some rendermodes prevent rendering
-	if ( m_nRenderMode == kRenderNone )
+	if (GetEngineObject()->GetRenderMode() == kRenderNone)
 		return false;
 
 	return (GetEngineObject()->GetModel() != 0) && !GetEngineObject()->IsEffectActive(EF_NODRAW) && (entindex() != 0);
@@ -873,7 +865,7 @@ bool C_BaseEntity::ShouldReceiveProjectedTextures( int flags )
 
 	if( flags & SHADOW_FLAGS_FLASHLIGHT )
 	{
-		if ( GetRenderMode() > kRenderNormal && GetRenderColor().a == 0 )
+		if (GetEngineObject()->GetRenderMode() > kRenderNormal && GetEngineObject()->GetRenderColor().a == 0 )
 			 return false;
 
 		return true;
@@ -1361,7 +1353,6 @@ void C_BaseEntity::PreDataUpdate( DataUpdateType_t updateType )
 	}
 #endif
 
-	m_nOldRenderMode = m_nRenderMode;
 }
 
 //-----------------------------------------------------------------------------
@@ -1429,12 +1420,6 @@ void C_BaseEntity::PostDataUpdate( DataUpdateType_t updateType )
 	MDLCACHE_CRITICAL_SECTION();
 
 	PREDICTION_TRACKVALUECHANGESCOPE_ENTITY( this, "postdataupdate" );
-
-
-	if ( m_nOldRenderMode != m_nRenderMode )
-	{
-		SetRenderMode( (RenderMode_t)m_nRenderMode, true );
-	}
 
 	// It's possible that a new entity will need to be forceably added to the 
 	//   player simulation list.  If so, do this here
@@ -1792,11 +1777,11 @@ void C_BaseEntity::ComputeFxBlend( void )
 	switch(GetEngineObject()->GetRenderFX() )
 	{
 	case kRenderFxPulseSlowWide:
-		blend = m_clrRender->a + 0x40 * sin( gpGlobals->curtime * 2 + offset );	
+		blend = GetEngineObject()->GetRenderColor().a + 0x40 * sin( gpGlobals->curtime * 2 + offset );
 		break;
 		
 	case kRenderFxPulseFastWide:
-		blend = m_clrRender->a + 0x40 * sin( gpGlobals->curtime * 8 + offset );
+		blend = GetEngineObject()->GetRenderColor().a + 0x40 * sin( gpGlobals->curtime * 8 + offset );
 		break;
 	
 	case kRenderFxPulseFastWider:
@@ -1804,60 +1789,60 @@ void C_BaseEntity::ComputeFxBlend( void )
 		break;
 
 	case kRenderFxPulseSlow:
-		blend = m_clrRender->a + 0x10 * sin( gpGlobals->curtime * 2 + offset );
+		blend = GetEngineObject()->GetRenderColor().a + 0x10 * sin( gpGlobals->curtime * 2 + offset );
 		break;
 		
 	case kRenderFxPulseFast:
-		blend = m_clrRender->a + 0x10 * sin( gpGlobals->curtime * 8 + offset );
+		blend = GetEngineObject()->GetRenderColor().a + 0x10 * sin( gpGlobals->curtime * 8 + offset );
 		break;
 		
 	// JAY: HACK for now -- not time based
 	case kRenderFxFadeSlow:			
-		if ( m_clrRender->a > 0 ) 
+		if (GetEngineObject()->GetRenderColor().a > 0 )
 		{
-			SetRenderColorA( m_clrRender->a - 1 );
+			GetEngineObject()->SetRenderColorA(GetEngineObject()->GetRenderColor().a - 1 );
 		}
 		else
 		{
-			SetRenderColorA( 0 );
+			GetEngineObject()->SetRenderColorA( 0 );
 		}
-		blend = m_clrRender->a;
+		blend = GetEngineObject()->GetRenderColor().a;
 		break;
 		
 	case kRenderFxFadeFast:
-		if ( m_clrRender->a > 3 ) 
+		if (GetEngineObject()->GetRenderColor().a > 3 )
 		{
-			SetRenderColorA( m_clrRender->a - 4 );
+			GetEngineObject()->SetRenderColorA(GetEngineObject()->GetRenderColor().a - 4 );
 		}
 		else
 		{
-			SetRenderColorA( 0 );
+			GetEngineObject()->SetRenderColorA( 0 );
 		}
-		blend = m_clrRender->a;
+		blend = GetEngineObject()->GetRenderColor().a;
 		break;
 		
 	case kRenderFxSolidSlow:
-		if ( m_clrRender->a < 255 )
+		if (GetEngineObject()->GetRenderColor().a < 255 )
 		{
-			SetRenderColorA( m_clrRender->a + 1 );
+			GetEngineObject()->SetRenderColorA(GetEngineObject()->GetRenderColor().a + 1 );
 		}
 		else
 		{
-			SetRenderColorA( 255 );
+			GetEngineObject()->SetRenderColorA( 255 );
 		}
-		blend = m_clrRender->a;
+		blend = GetEngineObject()->GetRenderColor().a;
 		break;
 		
 	case kRenderFxSolidFast:
-		if ( m_clrRender->a < 252 )
+		if (GetEngineObject()->GetRenderColor().a < 252 )
 		{
-			SetRenderColorA( m_clrRender->a + 4 );
+			GetEngineObject()->SetRenderColorA(GetEngineObject()->GetRenderColor().a + 4 );
 		}
 		else
 		{
-			SetRenderColorA( 255 );
+			GetEngineObject()->SetRenderColorA( 255 );
 		}
-		blend = m_clrRender->a;
+		blend = GetEngineObject()->GetRenderColor().a;
 		break;
 		
 	case kRenderFxStrobeSlow:
@@ -1868,7 +1853,7 @@ void C_BaseEntity::ComputeFxBlend( void )
 		}
 		else
 		{
-			blend = m_clrRender->a;
+			blend = GetEngineObject()->GetRenderColor().a;
 		}
 		break;
 		
@@ -1880,7 +1865,7 @@ void C_BaseEntity::ComputeFxBlend( void )
 		}
 		else
 		{
-			blend = m_clrRender->a;
+			blend = GetEngineObject()->GetRenderColor().a;
 		}
 		break;
 		
@@ -1892,7 +1877,7 @@ void C_BaseEntity::ComputeFxBlend( void )
 		}
 		else
 		{
-			blend = m_clrRender->a;
+			blend = GetEngineObject()->GetRenderColor().a;
 		}
 		break;
 		
@@ -1904,7 +1889,7 @@ void C_BaseEntity::ComputeFxBlend( void )
 		}
 		else
 		{
-			blend = m_clrRender->a;
+			blend = GetEngineObject()->GetRenderColor().a;
 		}
 		break;
 		
@@ -1916,7 +1901,7 @@ void C_BaseEntity::ComputeFxBlend( void )
 		}
 		else
 		{
-			blend = m_clrRender->a;
+			blend = GetEngineObject()->GetRenderColor().a;
 		}
 		break;
 		
@@ -1941,11 +1926,11 @@ void C_BaseEntity::ComputeFxBlend( void )
 			}
 			else 
 			{
-				SetRenderColorA( 180 );
+				GetEngineObject()->SetRenderColorA( 180 );
 				if ( dist <= 100 )
-					blend = m_clrRender->a;
+					blend = GetEngineObject()->GetRenderColor().a;
 				else
-					blend = (int) ((1.0 - (dist - 100) * (1.0 / 400.0)) * m_clrRender->a);
+					blend = (int) ((1.0 - (dist - 100) * (1.0 / 400.0)) * GetEngineObject()->GetRenderColor().a);
 				blend += random->RandomInt(-32,31);
 			}
 		}
@@ -1954,10 +1939,10 @@ void C_BaseEntity::ComputeFxBlend( void )
 	case kRenderFxNone:
 	case kRenderFxClampMinScale:
 	default:
-		if (m_nRenderMode == kRenderNormal)
+		if (GetEngineObject()->GetRenderMode() == kRenderNormal)
 			blend = 255;
 		else
-			blend = m_clrRender->a;
+			blend = GetEngineObject()->GetRenderColor().a;
 		break;	
 		
 	}
@@ -2005,9 +1990,9 @@ int C_BaseEntity::GetFxBlend( void )
 
 void C_BaseEntity::GetColorModulation( float* color )
 {
-	color[0] = m_clrRender->r / 255.0f;
-	color[1] = m_clrRender->g / 255.0f;
-	color[2] = m_clrRender->b / 255.0f;
+	color[0] = GetEngineObject()->GetRenderColor().r / 255.0f;
+	color[1] = GetEngineObject()->GetRenderColor().g / 255.0f;
+	color[2] = GetEngineObject()->GetRenderColor().b / 255.0f;
 }
 
 
@@ -3199,27 +3184,13 @@ void C_BaseEntity::DrawBBoxVisualizations( void )
 bool C_BaseEntity::IsTransparent(void)
 {
 	bool modelIsTransparent = modelinfo->IsTranslucent(GetEngineObject()->GetModel());
-	return modelIsTransparent || (m_nRenderMode != kRenderNormal);
+	return modelIsTransparent || (GetEngineObject()->GetRenderMode() != kRenderNormal);
 }
 
 bool C_BaseEntity::IgnoresZBuffer(void) const
 {
-	return m_nRenderMode == kRenderGlow || m_nRenderMode == kRenderWorldGlow;
+	return GetEngineObject()->GetRenderMode() == kRenderGlow || GetEngineObject()->GetRenderMode() == kRenderWorldGlow;
 }
-
-RenderMode_t C_BaseEntity::GetRenderMode() const
-{
-	return (RenderMode_t)m_nRenderMode;
-}
-
-//-----------------------------------------------------------------------------
-// Sets the render mode
-//-----------------------------------------------------------------------------
-void C_BaseEntity::SetRenderMode( RenderMode_t nRenderMode, bool bForceUpdate )
-{
-	m_nRenderMode = nRenderMode;
-}
-
 
 //-----------------------------------------------------------------------------
 // Purpose: 
@@ -3228,7 +3199,7 @@ void C_BaseEntity::SetRenderMode( RenderMode_t nRenderMode, bool bForceUpdate )
 RenderGroup_t C_BaseEntity::GetRenderGroup()
 {
 	// Don't sort things that don't need rendering
-	if ( m_nRenderMode == kRenderNone )
+	if (GetEngineObject()->GetRenderMode() == kRenderNone)
 		return RENDER_GROUP_OPAQUE_ENTITY;
 
 	// When an entity has a material proxy, we have to recompute
@@ -3256,7 +3227,7 @@ RenderGroup_t C_BaseEntity::GetRenderGroup()
 	RenderGroup_t renderGroup = (modelType == mod_brush) ? RENDER_GROUP_OPAQUE_BRUSH : RENDER_GROUP_OPAQUE_ENTITY;
 	if ( ( nFXBlend != 255 ) || IsTransparent() )
 	{
-		if ( m_nRenderMode != kRenderEnvironmental )
+		if (GetEngineObject()->GetRenderMode() != kRenderEnvironmental )
 		{
 			renderGroup = RENDER_GROUP_TRANSLUCENT_ENTITY;
 		}

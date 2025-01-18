@@ -935,11 +935,11 @@ void CRenderFxManager::Use( IServerEntity *pActivator, IServerEntity *pCaller, U
 			if ( !GetEngineObject()->HasSpawnFlags( SF_RENDER_MASKFX ) )
 				pEntity->GetEngineObject()->SetRenderFX(GetEngineObject()->GetRenderFX());
 			if ( !GetEngineObject()->HasSpawnFlags( SF_RENDER_MASKAMT ) )
-				pEntity->SetRenderColorA( GetRenderColor().a );
+				pEntity->GetEngineObject()->SetRenderColorA(GetEngineObject()->GetRenderColor().a );
 			if ( !GetEngineObject()->HasSpawnFlags( SF_RENDER_MASKMODE ) )
-				pEntity->SetRenderMode( GetRenderMode() );
+				pEntity->GetEngineObject()->SetRenderMode(GetEngineObject()->GetRenderMode() );
 			if ( !GetEngineObject()->HasSpawnFlags( SF_RENDER_MASKCOLOR ) )
-				pEntity->SetRenderColor(GetRenderColor());
+				pEntity->GetEngineObject()->SetRenderColor(GetEngineObject()->GetRenderColor());
 		}
 	}
 }
@@ -1009,7 +1009,7 @@ void CXenPLight::Spawn( void )
 	GetEngineObject()->SetCycle( random->RandomFloat(0,1) );
 
 	m_pGlow = CSprite::SpriteCreate( XEN_PLANT_GLOW_SPRITE, GetEngineObject()->GetLocalOrigin() + Vector(0,0,(GetEngineObject()->WorldAlignMins().z+ GetEngineObject()->WorldAlignMaxs().z)*0.5), FALSE );
-	m_pGlow->SetTransparency( kRenderGlow, GetRenderColor().r, GetRenderColor().g, GetRenderColor().b, GetRenderColor().a, GetEngineObject()->GetRenderFX() );
+	m_pGlow->SetTransparency( kRenderGlow, GetEngineObject()->GetRenderColor().r, GetEngineObject()->GetRenderColor().g, GetEngineObject()->GetRenderColor().b, GetEngineObject()->GetRenderColor().a, GetEngineObject()->GetRenderFX() );
 	m_pGlow->SetAttachment( this, 1 );
 }
 
@@ -1364,8 +1364,8 @@ CXenHull *CXenHull::CreateHull( CBaseEntity *source, const Vector &mins, const V
 	pHull->GetEngineObject()->SetMoveType( MOVETYPE_NONE );
 	pHull->SetOwnerEntity( source );
 	pHull->GetEngineObject()->SetSize( mins, maxs );
-	pHull->SetRenderColorA( 0 );
-	pHull->m_nRenderMode  = kRenderTransTexture;
+	pHull->GetEngineObject()->SetRenderColorA( 0 );
+	pHull->GetEngineObject()->SetRenderMode(kRenderTransTexture);
 	return pHull;
 }
 
@@ -1573,8 +1573,8 @@ void CHL1Gib::Spawn( const char *szGibModel )
 	
 	// sometimes an entity inherits the edict from a former piece of glass,
 	// and will spawn using the same render FX or rendermode! bad!
-	SetRenderColorA( 255 );
-	m_nRenderMode = kRenderNormal;
+	GetEngineObject()->SetRenderColorA( 255 );
+	GetEngineObject()->SetRenderMode(kRenderNormal);
 	GetEngineObject()->SetRenderFX(kRenderFxNone);
 	GetEngineObject()->SetSolid( SOLID_BBOX );
 	GetEngineObject()->AddSolidFlags( FSOLID_NOT_STANDABLE );

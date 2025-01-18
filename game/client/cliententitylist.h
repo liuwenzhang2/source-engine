@@ -310,6 +310,9 @@ public:
 		m_ClientSideAnimationListHandle = INVALID_CLIENTSIDEANIMATION_LIST_HANDLE;
 		m_InterpolationListEntry = 0xFFFF;
 		m_TeleportListEntry = 0xFFFF;
+		m_nRenderMode = 0;
+		m_nOldRenderMode = 0;
+		SetRenderColor(255, 255, 255, 255);
 		// Assume drawing everything
 		m_bReadyToDraw = true;
 	}
@@ -600,6 +603,9 @@ public:
 		m_ClientSideAnimationListHandle = INVALID_CLIENTSIDEANIMATION_LIST_HANDLE;
 		m_InterpolationListEntry = 0xFFFF;
 		m_TeleportListEntry = 0xFFFF;
+		m_nRenderMode = 0;
+		m_nOldRenderMode = 0;
+		SetRenderColor(255, 255, 255, 255);
 		// Assume drawing everything
 		m_bReadyToDraw = true;
 	}
@@ -1049,8 +1055,19 @@ public:
 	int GetBoneIndex(int index) { return m_boneIndex[index]; }
 	const Vector& GetRagPos(int index) { return m_ragPos[index]; }
 	const QAngle& GetRagAngles(int index) { return m_ragAngles[index]; }
+	void SetRenderMode(RenderMode_t nRenderMode, bool bForceUpdate = false);
+	RenderMode_t GetRenderMode() const;
 	unsigned char GetRenderFX() const { return m_nRenderFX; }
 	void SetRenderFX(unsigned char nRenderFX) { m_nRenderFX = nRenderFX; }
+	// Accessors for color.
+	const color32 GetRenderColor() const;
+	void SetRenderColor(color32 color);
+	void SetRenderColor(byte r, byte g, byte b);
+	void SetRenderColor(byte r, byte g, byte b, byte a);
+	void SetRenderColorR(byte r);
+	void SetRenderColorG(byte g);
+	void SetRenderColorB(byte b);
+	void SetRenderColorA(byte a);
 
 	void					SetToolHandle(HTOOLHANDLE handle);
 	HTOOLHANDLE				GetToolHandle() const;
@@ -1472,7 +1489,10 @@ protected:
 	float		m_flLastBoneChangeTime;
 
 	// Render information
+	unsigned char 					m_nRenderMode;
+	unsigned char 					m_nOldRenderMode;
 	unsigned char					m_nRenderFX;
+	color32							m_clrRender;
 	int								m_iPrevBoneMask;
 	// Set by tools if this entity should route "info" to various tools listening to HTOOLENTITIES
 #ifndef NO_TOOLFRAMEWORK
@@ -2300,6 +2320,61 @@ inline const ClientRenderHandle_t& C_EngineObjectInternal::GetRenderHandle() con
 inline bool C_EngineObjectInternal::IsNoInterpolationFrame()
 {
 	return m_ubOldInterpolationFrame != m_ubInterpolationFrame;
+}
+
+inline RenderMode_t C_EngineObjectInternal::GetRenderMode() const
+{
+	return (RenderMode_t)m_nRenderMode;
+}
+
+//-----------------------------------------------------------------------------
+// Sets the render mode
+//-----------------------------------------------------------------------------
+inline void C_EngineObjectInternal::SetRenderMode(RenderMode_t nRenderMode, bool bForceUpdate)
+{
+	m_nRenderMode = nRenderMode;
+}
+
+inline const color32 C_EngineObjectInternal::GetRenderColor() const
+{
+	return m_clrRender;
+}
+
+inline void C_EngineObjectInternal::SetRenderColor(color32 color)
+{
+	m_clrRender = color;
+}
+
+inline void C_EngineObjectInternal::SetRenderColor(byte r, byte g, byte b)
+{
+	color32 clr = { r, g, b, m_clrRender.a };
+	m_clrRender = clr;
+}
+
+inline void C_EngineObjectInternal::SetRenderColor(byte r, byte g, byte b, byte a)
+{
+	color32 clr = { r, g, b, a };
+	m_clrRender = clr;
+}
+
+inline void C_EngineObjectInternal::SetRenderColorR(byte r)
+{
+	SetRenderColor(r, GetRenderColor().g, GetRenderColor().b);
+}
+
+inline void C_EngineObjectInternal::SetRenderColorG(byte g)
+{
+	SetRenderColor(GetRenderColor().r, g, GetRenderColor().b);
+}
+
+inline void C_EngineObjectInternal::SetRenderColorB(byte b)
+{
+	SetRenderColor(GetRenderColor().r, GetRenderColor().g, b);
+}
+
+inline void C_EngineObjectInternal::SetRenderColorA(byte a)
+{
+	SetRenderColor(GetRenderColor().r, GetRenderColor().g, GetRenderColor().b, a);
 }
 
 class C_EngineWorldInternal : public C_EngineObjectInternal, public IEngineWorldClient {

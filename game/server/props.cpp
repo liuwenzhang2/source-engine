@@ -1494,8 +1494,8 @@ void CBreakableProp::CreateFlare( float flLifetime )
 
 		pFlare->GetEngineObject()->SetMoveType( MOVETYPE_NONE );
 		pFlare->GetEngineObject()->SetSolid( SOLID_NONE );
-		pFlare->SetRenderMode( kRenderTransAlpha );
-		pFlare->SetRenderColorA( 1 );
+		pFlare->GetEngineObject()->SetRenderMode( kRenderTransAlpha );
+		pFlare->GetEngineObject()->SetRenderColorA( 1 );
 		pFlare->GetEngineObject()->SetLocalOrigin( vOrigin );
 		pFlare->GetEngineObject()->SetParent( this->GetEngineObject(), iAttachment );
 		RemoveInteraction( PROPINTER_PHYSGUN_CREATE_FLARE );

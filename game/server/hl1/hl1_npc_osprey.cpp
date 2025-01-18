@@ -454,7 +454,7 @@ CAI_BaseNPC *CNPC_Osprey::MakeGrunt( Vector vecSrc )
 	{
 		if (m_hGrunt[i] == NULL || !m_hGrunt[i]->IsAlive())
 		{
-			if (m_hGrunt[i] != NULL && m_hGrunt[i]->m_nRenderMode == kRenderNormal)
+			if (m_hGrunt[i] != NULL && m_hGrunt[i]->GetEngineObject()->GetRenderMode() == kRenderNormal)
 			{
 				m_hGrunt[i]->SUB_StartFadeOut( );
 			}

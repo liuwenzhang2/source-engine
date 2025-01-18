@@ -2383,8 +2383,8 @@ C_BaseEntity *C_BaseAnimating::BecomeRagdollOnClient()
 		pRagdoll->GetEngineObject()->AddEffects(EF_NOSHADOW);
 	}
 	pRagdoll->GetEngineObject()->SetRenderFX(kRenderFxRagdoll);
-	pRagdoll->SetRenderMode(GetRenderMode());
-	pRagdoll->SetRenderColor(GetRenderColor().r, GetRenderColor().g, GetRenderColor().b, GetRenderColor().a);
+	pRagdoll->GetEngineObject()->SetRenderMode(GetEngineObject()->GetRenderMode());
+	pRagdoll->GetEngineObject()->SetRenderColor(GetEngineObject()->GetRenderColor().r, GetEngineObject()->GetRenderColor().g, GetEngineObject()->GetRenderColor().b, GetEngineObject()->GetRenderColor().a);
 
 	pRagdoll->GetEngineObject()->SetBody(GetEngineObject()->GetBody());
 	pRagdoll->GetEngineObject()->SetSkin(GetEngineObject()->GetSkin());

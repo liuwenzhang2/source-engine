@@ -265,7 +265,7 @@ void C_Plasma::AddFlames( void )
 	{
 		if ( m_entFlames[i].GetScale() > 0.0f )
 		{
-			m_entFlames[i].SetRenderColor( ( 255.0f * alpha ), ( 255.0f * alpha ), ( 255.0f * alpha ) );
+			m_entFlames[i].GetEngineObject()->SetRenderColor( ( 255.0f * alpha ), ( 255.0f * alpha ), ( 255.0f * alpha ) );
 			m_entFlames[i].SetBrightness( 255.0f * alpha );
 		}
 
@@ -330,9 +330,9 @@ void C_Plasma::Start( void )
 		m_entFlames[i].m_flFrame			= random->RandomInt( 0.0f, maxFrames );
 		m_entFlames[i].m_flSpriteFramerate	= (float) random->RandomInt( 15, 20 );
 		m_entFlames[i].SetScale( m_flStartScale );
-		m_entFlames[i].SetRenderMode( kRenderTransAddFrameBlend );
+		m_entFlames[i].GetEngineObject()->SetRenderMode( kRenderTransAddFrameBlend );
 		m_entFlames[i].GetEngineObject()->SetRenderFX(kRenderFxNone);
-		m_entFlames[i].SetRenderColor( 255, 255, 255, 255 );
+		m_entFlames[i].GetEngineObject()->SetRenderColor( 255, 255, 255, 255 );
 		m_entFlames[i].SetBrightness( 255 );
 		//m_entFlames[i].index				= -1;
 		
@@ -351,9 +351,9 @@ void C_Plasma::Start( void )
 	m_entGlow.SetModelByIndex( m_nGlowModelIndex );
 	m_entGlow.GetEngineObject()->SetLocalOrigin(GetEngineObject()->GetLocalOrigin() );
 	m_entGlow.SetScale( m_flStartScale );
-	m_entGlow.SetRenderMode( kRenderTransAdd );
+	m_entGlow.GetEngineObject()->SetRenderMode( kRenderTransAdd );
 	m_entGlow.GetEngineObject()->SetRenderFX(kRenderFxNone);
-	m_entGlow.SetRenderColor( 255, 255, 255, 255 );
+	m_entGlow.GetEngineObject()->SetRenderColor( 255, 255, 255, 255 );
 	m_entGlow.SetBrightness( 255 );
 	//m_entGlow.index				= -1;
 	

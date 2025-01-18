@@ -155,7 +155,7 @@ void CAI_Spotlight::CreateSpotlightEntities( void )
 	m_hSpotlightTarget->Spawn();
 	m_hSpotlightTarget->GetEngineObject()->SetAbsOrigin( vecEndPoint );
 	m_hSpotlightTarget->SetOwnerEntity( GetOuter() );
-	m_hSpotlightTarget->SetRenderColor( 255, 255, 255 );
+	m_hSpotlightTarget->GetEngineObject()->SetRenderColor( 255, 255, 255 );
 	m_hSpotlightTarget->m_Radius = m_flSpotlightMaxLength;
 	if ( FBitSet (m_nFlags, AI_SPOTLIGHT_NO_DLIGHTS) )
 	{
@@ -360,17 +360,17 @@ void CAI_Spotlight::UpdateSpotlightEndpoint( void )
 	// Fade out spotlight end if past max length.  
 	if (m_flSpotlightCurLength > 2*m_flSpotlightMaxLength)
 	{
-		m_hSpotlightTarget->SetRenderColorA( 0 );
+		m_hSpotlightTarget->GetEngineObject()->SetRenderColorA( 0 );
 		m_hSpotlight->SetFadeLength(m_flSpotlightMaxLength);
 	}
 	else if (m_flSpotlightCurLength > m_flSpotlightMaxLength)		
 	{
-		m_hSpotlightTarget->SetRenderColorA( (1-((m_flSpotlightCurLength-m_flSpotlightMaxLength)/m_flSpotlightMaxLength)) );
+		m_hSpotlightTarget->GetEngineObject()->SetRenderColorA( (1-((m_flSpotlightCurLength-m_flSpotlightMaxLength)/m_flSpotlightMaxLength)) );
 		m_hSpotlight->SetFadeLength(m_flSpotlightMaxLength);
 	}
 	else
 	{
-		m_hSpotlightTarget->SetRenderColorA( 1.0 );
+		m_hSpotlightTarget->GetEngineObject()->SetRenderColorA( 1.0 );
 		m_hSpotlight->SetFadeLength(m_flSpotlightCurLength);
 	}
 

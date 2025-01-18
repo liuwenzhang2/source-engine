@@ -150,12 +150,12 @@ void C_LowViolenceHostageDeathModel::ClientThink( void )
 		 return;
 	}
 
-	int iAlpha = GetRenderColor().a;
+	int iAlpha = GetEngineObject()->GetRenderColor().a;
 
 	iAlpha = MAX( iAlpha - ( g_ragdoll_fadespeed.GetInt() * gpGlobals->frametime ), 0 );
 
-	SetRenderMode( kRenderTransAlpha );
-	SetRenderColorA( iAlpha );
+	GetEngineObject()->SetRenderMode( kRenderTransAlpha );
+	GetEngineObject()->SetRenderColorA( iAlpha );
 
 	if ( iAlpha == 0 )
 	{
@@ -175,7 +175,7 @@ void C_CHostage::RecvProxy_Rescued( const CRecvProxyData *pData, void *pStruct, 
 	{
 		// hostage was rescued
 		pHostage->m_flDeadOrRescuedTime = gpGlobals->curtime + 2;
-		pHostage->SetRenderMode( kRenderGlow );
+		pHostage->GetEngineObject()->SetRenderMode( kRenderGlow );
 		pHostage->SetNextClientThink( gpGlobals->curtime );
 	}
 
@@ -475,13 +475,13 @@ void C_CHostage::ClientThink()
 	C_BaseCombatCharacter::ClientThink();
 
 	int speed = 2;
-	int a = m_clrRender->a;
+	int a = GetEngineObject()->GetRenderColor().a;
 
 	a = MAX( 0, a - speed );
 
-	SetRenderColorA( a );
+	GetEngineObject()->SetRenderColorA( a );
 
-	if ( m_clrRender->a > 0 )
+	if (GetEngineObject()->GetRenderColor().a > 0 )
 	{
 		SetNextClientThink( gpGlobals->curtime + 0.001 );
 	}

@@ -107,7 +107,7 @@ void CBubbling::Spawn( void )
 	SetModel( STRING(GetEngineObject()->GetModelName() ) );		// Set size
 
 	// Make it invisible to client
-	SetRenderColorA( 0 );
+	GetEngineObject()->SetRenderColorA( 0 );
 
 	GetEngineObject()->SetSolid( SOLID_NONE );						// Remove model & collisions
 
@@ -517,7 +517,7 @@ void CGibShooter::InitPointGib( CGib *pGib, const Vector &vecShootDir, float flS
 				pSprite->SetOwnerEntity( pGib );
 
 				pSprite->SetScale( 1 );
-				pSprite->SetTransparency( m_nRenderMode, m_clrRender->r, m_clrRender->g, m_clrRender->b, m_clrRender->a, GetEngineObject()->GetRenderFX() );
+				pSprite->SetTransparency(GetEngineObject()->GetRenderMode(), GetEngineObject()->GetRenderColor().r, GetEngineObject()->GetRenderColor().g, GetEngineObject()->GetRenderColor().b, GetEngineObject()->GetRenderColor().a, GetEngineObject()->GetRenderFX());
 				pSprite->AnimateForTime( 5, m_flGibLife + 1 ); //This framerate is totally wrong
 			}
 		}
@@ -756,8 +756,8 @@ CGib *CEnvShooter::CreateGib ( void )
 	pGib->SetBloodColor( DONT_BLEED );
 	pGib->m_material = m_iGibMaterial;
 
-	pGib->m_nRenderMode = m_nRenderMode;
-	pGib->m_clrRender = m_clrRender;
+	pGib->GetEngineObject()->SetRenderMode(GetEngineObject()->GetRenderMode());
+	pGib->GetEngineObject()->SetRenderColor(GetEngineObject()->GetRenderColor());
 	pGib->GetEngineObject()->SetRenderFX(GetEngineObject()->GetRenderFX());
 	pGib->GetEngineObject()->SetSkin(GetEngineObject()->GetSkin());
 	pGib->m_lifeTime = gpGlobals->curtime + m_flGibLife;
@@ -1531,7 +1531,7 @@ void CPrecipitation::Spawn( void )
 	if ( m_nPrecipType < 0 || m_nPrecipType > NUM_PRECIPITATION_TYPES )
 		m_nPrecipType = PRECIPITATION_TYPE_RAIN;
 
-	m_nRenderMode = kRenderEnvironmental;
+	GetEngineObject()->SetRenderMode(kRenderEnvironmental);
 }
 #endif
 
@@ -1708,8 +1708,8 @@ void CEmbers::Spawn( void )
 	SetModel( STRING(GetEngineObject()->GetModelName() ) );
 
 	GetEngineObject()->SetSolid( SOLID_NONE );
-	SetRenderColorA( 0 );
-	m_nRenderMode	= kRenderTransTexture;
+	GetEngineObject()->SetRenderColorA( 0 );
+	GetEngineObject()->SetRenderMode(kRenderTransTexture);
 
 	SetUse( &CEmbers::EmberUse );
 
@@ -2300,8 +2300,8 @@ END_SEND_TABLE()
 void CEnvQuadraticBeam::Spawn()
 {
 	BaseClass::Spawn();
-	m_nRenderMode = kRenderTransAdd;
-	SetRenderColor( 255, 255, 255 );
+	GetEngineObject()->SetRenderMode(kRenderTransAdd);
+	GetEngineObject()->SetRenderColor( 255, 255, 255 );
 }
 
 CEnvQuadraticBeam *CreateQuadraticBeam( const char *pSpriteName, const Vector &start, const Vector &control, const Vector &end, float width, CBaseEntity *pOwner )

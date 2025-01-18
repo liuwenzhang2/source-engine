@@ -106,7 +106,7 @@ void CNPC_Houndeye::Spawn()
 {
 	Precache( );
 	
-	SetRenderColor( 255, 255, 255, 255 );
+	GetEngineObject()->SetRenderColor( 255, 255, 255, 255 );
 
 	SetModel( "models/houndeye.mdl" );
 	

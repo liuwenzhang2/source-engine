@@ -145,8 +145,8 @@ void CEntityDissolve::Spawn()
 		m_flFadeInLength = CORE_DISSOLVE_FADEIN_LENGTH;
 	}
 
-	m_nRenderMode = kRenderTransColor;
-	SetRenderColor( 255, 255, 255, 255 );
+	GetEngineObject()->SetRenderMode(kRenderTransColor);
+	GetEngineObject()->SetRenderColor( 255, 255, 255, 255 );
 	GetEngineObject()->SetRenderFX(kRenderFxNone);
 
 	SetThink( &CEntityDissolve::DissolveThink );
@@ -332,7 +332,7 @@ void CEntityDissolve::DissolveThink( void )
 
 	if ( pTarget && pTarget->GetEngineObject()->GetFlags() & FL_TRANSRAGDOLL )
 	{
-		SetRenderColorA( 0 );
+		GetEngineObject()->SetRenderColorA( 0 );
 	}
 
 	float dt = gpGlobals->curtime - m_flStartTime;

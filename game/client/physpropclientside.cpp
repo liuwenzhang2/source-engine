@@ -431,9 +431,9 @@ void C_PhysPropClientside::ClientThink( void )
 
 	float alpha = (m_fDeathTime - gpGlobals->curtime)/FADEOUT_TIME;
 
-	SetRenderMode( kRenderTransTexture );
+	GetEngineObject()->SetRenderMode( kRenderTransTexture );
 
-	SetRenderColorA( alpha * 256 );
+	GetEngineObject()->SetRenderColorA( alpha * 256 );
 
 	SetNextClientThink( CLIENT_THINK_ALWAYS );
 }

@@ -442,6 +442,7 @@ public:
 	virtual int GetSequence() = 0;
 	virtual void SetSequence(int nSequence) = 0;
 	virtual const char* GetSequenceName(int iSequence) = 0;
+	virtual void SetOverlaySequence(int nOverlaySequence) = 0;
 	virtual int FindTransitionSequence(int iCurrentSequence, int iGoalSequence, int* piDir) = 0;
 	virtual bool GotoSequence(int iCurrentSequence, float flCurrentCycle, float flCurrentRate, int iGoalSequence, int& iNextSequence, float& flCycle, int& iDir) = 0;
 	virtual int GetEntryNode(int iSequence) = 0;
@@ -537,9 +538,18 @@ public:
 	virtual void ActiveRagdoll() = 0;
 	virtual void ApplyAnimationAsVelocityToRagdoll(const matrix3x4_t* pPrevBones, const matrix3x4_t* pCurrentBones, float dt) = 0;
 
+	virtual RenderMode_t GetRenderMode() const = 0;
+	virtual void SetRenderMode(RenderMode_t nRenderMode) = 0;
 	virtual unsigned char GetRenderFX() const = 0;
 	virtual void SetRenderFX(unsigned char nRenderFX) = 0;
-	virtual void SetOverlaySequence(int nOverlaySequence) = 0;
+	virtual const color32 GetRenderColor() const = 0;
+	virtual void SetRenderColor(color32 color) = 0;
+	virtual void SetRenderColor(byte r, byte g, byte b) = 0;
+	virtual void SetRenderColor(byte r, byte g, byte b, byte a) = 0;
+	virtual void SetRenderColorR(byte r) = 0;
+	virtual void SetRenderColorG(byte g) = 0;
+	virtual void SetRenderColorB(byte b) = 0;
+	virtual void SetRenderColorA(byte a) = 0;
 
 	virtual void SetupBones(matrix3x4_t* pBoneToWorldOut, int nMaxBones, int boneMask, float currentTime) = 0;
 	virtual void DrawRawSkeleton(matrix3x4_t boneToWorld[], int boneMask, bool noDepthTest = true, float duration = 0.0f, bool monocolor = false) = 0;
@@ -971,15 +981,6 @@ public:
 	virtual bool HasNPCsOnIt() = 0;
 	virtual int GetTextureFrameIndex(void) = 0;
 	virtual void SetTextureFrameIndex(int iIndex) = 0;
-	virtual void SetRenderMode(RenderMode_t nRenderMode) = 0;
-	virtual RenderMode_t GetRenderMode() const = 0;
-	virtual void SetRenderColor(color32 color) = 0;
-	virtual void SetRenderColor(byte r, byte g, byte b) = 0;
-	virtual void SetRenderColor(byte r, byte g, byte b, byte a) = 0;
-	virtual void SetRenderColorR(byte r) = 0;
-	virtual void SetRenderColorG(byte g) = 0;
-	virtual void SetRenderColorB(byte b) = 0;
-	virtual void SetRenderColorA(byte a) = 0;
 	virtual void SetBlocksLOS(bool bBlocksLOS) = 0;
 	virtual bool BlocksLOS(void) = 0;
 	virtual int ShouldTransmit(const CCheckTransmitInfo* pInfo) = 0;

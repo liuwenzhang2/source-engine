@@ -1597,7 +1597,7 @@ void CNPC_CScanner::SpotlightCreate(void)
 	m_hSpotlightTarget->GetEngineObject()->SetSimulatedEveryTick( false );
 
 	// Using the same color as the beam...
-	m_hSpotlightTarget->SetRenderColor( 255, 255, 255 );
+	m_hSpotlightTarget->GetEngineObject()->SetRenderColor( 255, 255, 255 );
 	m_hSpotlightTarget->m_Radius = m_flSpotlightMaxLength;
 
 	m_hSpotlight = CBeam::BeamCreate( "sprites/glow_test02.vmt", SPOTLIGHT_WIDTH );
@@ -1828,17 +1828,17 @@ void CNPC_CScanner::SpotlightUpdate(void)
 	// Fade out spotlight end if past max length.  
 	if (m_flSpotlightCurLength > 2*m_flSpotlightMaxLength)
 	{
-		m_hSpotlightTarget->SetRenderColorA( 0 );
+		m_hSpotlightTarget->GetEngineObject()->SetRenderColorA( 0 );
 		m_hSpotlight->SetFadeLength(m_flSpotlightMaxLength);
 	}
 	else if (m_flSpotlightCurLength > m_flSpotlightMaxLength)		
 	{
-		m_hSpotlightTarget->SetRenderColorA( (1-((m_flSpotlightCurLength-m_flSpotlightMaxLength)/m_flSpotlightMaxLength)) );
+		m_hSpotlightTarget->GetEngineObject()->SetRenderColorA( (1-((m_flSpotlightCurLength-m_flSpotlightMaxLength)/m_flSpotlightMaxLength)) );
 		m_hSpotlight->SetFadeLength(m_flSpotlightMaxLength);
 	}
 	else
 	{
-		m_hSpotlightTarget->SetRenderColorA( 1.0 );
+		m_hSpotlightTarget->GetEngineObject()->SetRenderColorA( 1.0 );
 		m_hSpotlight->SetFadeLength(m_flSpotlightCurLength);
 	}
 

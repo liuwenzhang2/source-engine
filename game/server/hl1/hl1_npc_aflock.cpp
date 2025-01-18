@@ -163,7 +163,7 @@ void CNPC_FlockingFlyerFlock::Spawn( void )
 {
 	Precache( );
 
-	SetRenderColor( 255, 255, 255, 255 );
+	GetEngineObject()->SetRenderColor( 255, 255, 255, 255 );
 	SpawnFlock();
 
 

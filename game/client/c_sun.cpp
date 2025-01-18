@@ -20,7 +20,7 @@ static void RecvProxy_HDRColorScale( const CRecvProxyData *pData, void *pStruct,
 
 IMPLEMENT_CLIENTCLASS_DT_NOBASE( C_Sun, DT_Sun, CSun )
 	
-	RecvPropInt( RECVINFO(m_clrRender), 0, RecvProxy_IntToColor32 ),
+	//RecvPropInt( RECVINFO(m_clrRender), 0, RecvProxy_IntToColor32 ),
 	RecvPropInt( RECVINFO(m_clrOverlay), 0, RecvProxy_IntToColor32 ),
 	RecvPropVector( RECVINFO( m_vDirection ) ),
 	RecvPropInt( RECVINFO( m_bOn ) ),
@@ -57,7 +57,7 @@ void C_Sun::OnDataChanged( DataUpdateType_t updateType )
 	// for the sun, which should always be completely opaque at its core.  Here, we renormalize the
 	// components to make sure only hue is altered.
 
-	float maxComponent = MAX ( m_clrRender->r, MAX ( m_clrRender->g, m_clrRender->b ) );
+	float maxComponent = MAX ( GetEngineObject()->GetRenderColor().r, MAX ( GetEngineObject()->GetRenderColor().g, GetEngineObject()->GetRenderColor().b ) );
 
 	Vector vOverlayColor;
 	Vector vMainColor;
@@ -70,9 +70,9 @@ void C_Sun::OnDataChanged( DataUpdateType_t updateType )
 	}
 	else
 	{
-		vMainColor.x = m_clrRender->r / maxComponent;
-		vMainColor.y = m_clrRender->g / maxComponent;
-		vMainColor.z = m_clrRender->b / maxComponent;
+		vMainColor.x = GetEngineObject()->GetRenderColor().r / maxComponent;
+		vMainColor.y = GetEngineObject()->GetRenderColor().g / maxComponent;
+		vMainColor.z = GetEngineObject()->GetRenderColor().b / maxComponent;
 	}
 	
 	// If we're non-zero, use the value (otherwise use the value we calculated above)

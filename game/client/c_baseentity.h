@@ -907,19 +907,11 @@ public:
 	virtual void BoneMergeFastCullBloat(Vector& localMins, Vector& localMaxs, const Vector& thisEntityMins, const Vector& thisEntityMaxs) const;
 
 
-	// Accessors for color.
-	const color32 GetRenderColor() const;
-	void SetRenderColor(byte r, byte g, byte b);
-	void SetRenderColor(byte r, byte g, byte b, byte a);
-	void SetRenderColorR(byte r);
-	void SetRenderColorG(byte g);
-	void SetRenderColorB(byte b);
-	void SetRenderColorA(byte a);
+
 
 	virtual bool IsTransparent(void);
 	virtual bool IgnoresZBuffer(void) const;
-	void SetRenderMode(RenderMode_t nRenderMode, bool bForceUpdate = false);
-	RenderMode_t GetRenderMode() const;
+
 	virtual unsigned char	GetClientSideFade(void);
 	virtual void SetFadeMinMax(float fademin, float fademax);
 	bool IsOnFire() { return ((GetEngineObject()->GetFlags() & FL_ONFIRE) != 0); }
@@ -935,7 +927,6 @@ public:
 
 
 
-	CNetworkColor32( m_clrRender );
 
 private:
 	
@@ -945,13 +936,6 @@ public:
 
 	
 	float							m_flCreateTime;
-
-
-
-private:
-
-	unsigned char 					m_nRenderMode;
-	unsigned char 					m_nOldRenderMode;
 
 public:
 	
@@ -1297,47 +1281,6 @@ inline void C_BaseEntity::SetWaterLevel( int nLevel )
 {
 	m_nWaterLevel = nLevel;
 }
-
-
-
-inline const color32 C_BaseEntity::GetRenderColor() const
-{
-	return m_clrRender.Get();
-}
-
-inline void C_BaseEntity::SetRenderColor( byte r, byte g, byte b )
-{
-	color32 clr = { r, g, b, m_clrRender->a };
-	m_clrRender = clr;
-}
-
-inline void C_BaseEntity::SetRenderColor( byte r, byte g, byte b, byte a )
-{
-	color32 clr = { r, g, b, a };
-	m_clrRender = clr;
-}
-
-inline void C_BaseEntity::SetRenderColorR( byte r )
-{
-	SetRenderColor( r, GetRenderColor().g, GetRenderColor().b );
-}
-
-inline void C_BaseEntity::SetRenderColorG( byte g )
-{
-	SetRenderColor( GetRenderColor().r, g, GetRenderColor().b );
-}
-
-inline void C_BaseEntity::SetRenderColorB( byte b )
-{
-	SetRenderColor( GetRenderColor().r, GetRenderColor().g, b );
-}
-
-inline void C_BaseEntity::SetRenderColorA( byte a )
-{
-	SetRenderColor( GetRenderColor().r, GetRenderColor().g, GetRenderColor().b, a );
-}
-
-
 
 #ifdef SIXENSE
 

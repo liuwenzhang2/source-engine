@@ -43,7 +43,7 @@ public:
 
 					CSmokeStack();
 					~CSmokeStack();
-
+	void PostConstructor(const char* szClassname, int iForceEdictIndex);
 	virtual void	Spawn( void );
 	virtual void	Activate();
 	virtual bool	KeyValue( const char *szKeyName, const char *szValue );

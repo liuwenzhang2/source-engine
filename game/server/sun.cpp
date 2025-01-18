@@ -54,7 +54,7 @@ public:
 };
 
 IMPLEMENT_SERVERCLASS_ST_NOBASE( CSun, DT_Sun )
-	SendPropInt( SENDINFO(m_clrRender), 32, SPROP_UNSIGNED, SendProxy_Color32ToInt ),
+	//SendPropInt( SENDINFO(m_clrRender), 32, SPROP_UNSIGNED, SendProxy_Color32ToInt ),
 	SendPropInt( SENDINFO(m_clrOverlay), 32, SPROP_UNSIGNED, SendProxy_Color32ToInt ),
 	SendPropVector( SENDINFO(m_vDirection), 0, SPROP_NORMAL ),
 	SendPropInt( SENDINFO(m_bOn), 1, SPROP_UNSIGNED ),
@@ -198,7 +198,7 @@ void CSun::InputTurnOff( inputdata_t &inputdata )
 
 void CSun::InputSetColor( inputdata_t &inputdata )
 {
-	m_clrRender = inputdata.value.Color32();
+	GetEngineObject()->SetRenderColor(inputdata.value.Color32());
 }
 
 int CSun::UpdateTransmitState()
