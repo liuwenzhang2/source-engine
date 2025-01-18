@@ -79,7 +79,7 @@ public:
 	virtual void FinishMove( C_BasePlayer *player, CUserCmd *ucmd, CMoveData *move ) {}
 	virtual bool IsPredicted() const { return false; }
 	virtual void ItemPostFrame( C_BasePlayer *pPlayer ) {}
-	virtual bool IsSelfAnimating() { return false; };
+	//virtual bool IsSelfAnimating() { return false; };
 
 private:
 

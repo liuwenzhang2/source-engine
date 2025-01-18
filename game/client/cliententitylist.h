@@ -1084,6 +1084,8 @@ public:
 	}
 	// model specific
 	virtual bool SetupBones(matrix3x4_t* pBoneToWorldOut, int nMaxBones, int boneMask, float currentTime);
+	virtual void UpdateIKLocks(float currentTime);
+	virtual	void StandardBlendingRules(IStudioHdr* pStudioHdr, Vector pos[], Quaternion q[], float currentTime, int boneMask);
 	virtual void BuildTransformations(IStudioHdr* pStudioHdr, Vector* pos, Quaternion q[], const matrix3x4_t& cameraTransform, int boneMask, CBoneBitList& boneComputed);
 	// Call this if SetupBones() has already been called this frame but you need to move the
 // entity and rerender.

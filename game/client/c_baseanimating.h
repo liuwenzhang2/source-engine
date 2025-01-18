@@ -89,7 +89,6 @@ public:
 
 	virtual void ApplyBoneMatrixTransform( matrix3x4_t& transform );
 
-	virtual void UpdateIKLocks( float currentTime );
 	virtual void CalculateIKLocks( float currentTime );
 	virtual bool ShouldDraw();
 	virtual int DrawModel( int flags );
@@ -119,9 +118,8 @@ public:
 
 	// C_BaseClientShader **p_ClientShaders;
 
-	virtual	void StandardBlendingRules( IStudioHdr *pStudioHdr, Vector pos[], Quaternion q[], float currentTime, int boneMask );
 
-	virtual void AccumulateLayers( IBoneSetup &boneSetup, Vector pos[], Quaternion q[], float currentTime );
+	//virtual void AccumulateLayers( IBoneSetup &boneSetup, Vector pos[], Quaternion q[], float currentTime );
 
 	//virtual void ChildLayerBlend( Vector pos[], Quaternion q[], float currentTime, int boneMask );
 
@@ -156,7 +154,7 @@ public:
 	virtual void					OnDataChanged( DataUpdateType_t updateType );
 	virtual void					AddEntity( void );
 
-	virtual bool					IsSelfAnimating();
+	//virtual bool					IsSelfAnimating();
 
 	// implements these so ragdolls can handle frustum culling & leaf visibility
 	virtual void					GetRenderBounds( Vector& theMins, Vector& theMaxs );

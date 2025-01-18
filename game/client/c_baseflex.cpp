@@ -227,9 +227,9 @@ IStudioHdr *C_BaseFlex::OnNewModel()
 }
 
 
-void C_BaseFlex::StandardBlendingRules( IStudioHdr *hdr, Vector pos[], Quaternion q[], float currentTime, int boneMask )
+void C_BaseFlex::AfterStandardBlendingRules( IStudioHdr *hdr, Vector pos[], Quaternion q[], float currentTime, int boneMask )
 {
-	BaseClass::StandardBlendingRules( hdr, pos, q, currentTime, boneMask );
+	//BaseClass::StandardBlendingRules( hdr, pos, q, currentTime, boneMask );
 
 #ifdef HL2_CLIENT_DLL
 	// shift pelvis, rotate body

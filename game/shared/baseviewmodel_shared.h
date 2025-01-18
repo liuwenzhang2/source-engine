@@ -84,10 +84,10 @@ public:
 	
 	virtual CBaseEntity	*GetOwnerViaInterface( void ) { return GetOwner(); }
 
-	virtual bool			IsSelfAnimating()
-	{
-		return true;
-	}
+	//virtual bool			IsSelfAnimating()
+	//{
+	//	return true;
+	//}
 
 	Vector					m_vecLastFacing;
 

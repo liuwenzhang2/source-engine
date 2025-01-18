@@ -1498,10 +1498,10 @@ void C_BaseEntity::CheckInitPredictable( const char *context )
 #endif
 }
 
-bool C_BaseEntity::IsSelfAnimating()
-{
-	return true;
-}
+//bool C_BaseEntity::IsSelfAnimating()
+//{
+//	return true;
+//}
 
 
 //-----------------------------------------------------------------------------

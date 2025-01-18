@@ -8107,6 +8107,107 @@ void DisplayBoneSetupEnts()
 }
 
 //-----------------------------------------------------------------------------
+// Purpose: update latched IK contacts if they're in a moving reference frame.
+//-----------------------------------------------------------------------------
+
+void C_EngineObjectInternal::UpdateIKLocks(float currentTime)
+{
+	if (!GetIk())
+		return;
+
+	int targetCount = GetIk()->m_target.Count();
+	if (targetCount == 0)
+		return;
+
+	for (int i = 0; i < targetCount; i++)
+	{
+		CIKTarget* pTarget = &GetIk()->m_target[i];
+
+		if (!pTarget->IsActive())
+			continue;
+
+		if (pTarget->GetOwner() != -1)
+		{
+			IClientEntity* pOwner = EntityList()->GetEnt(pTarget->GetOwner());
+			if (pOwner != NULL)
+			{
+				pTarget->UpdateOwner(pOwner->entindex(), pOwner->GetEngineObject()->GetAbsOrigin(), pOwner->GetEngineObject()->GetAbsAngles());
+			}
+		}
+	}
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: Do the default sequence blending rules as done in HL1
+//-----------------------------------------------------------------------------
+void C_EngineObjectInternal::StandardBlendingRules(IStudioHdr* hdr, Vector pos[], Quaternion q[], float currentTime, int boneMask)
+{
+	VPROF("C_BaseAnimating::StandardBlendingRules");
+
+	float		poseparam[MAXSTUDIOPOSEPARAM];
+
+	if (!hdr)
+		return;
+
+	if (!hdr->SequencesAvailable())
+	{
+		return;
+	}
+
+	if (GetSequence() >= hdr->GetNumSeq() || GetSequence() == -1)
+	{
+		SetSequence(0);
+	}
+
+	GetPoseParameters(hdr, poseparam);
+
+	// build root animation
+	float fCycle = GetCycle();
+
+#if 1 //_DEBUG
+	if (/* Q_stristr( hdr->pszName(), r_sequence_debug.GetString()) != NULL || */ r_sequence_debug.GetInt() == entindex())
+	{
+		DevMsgRT("%8.4f : %30s : %5.3f : %4.2f\n", currentTime, hdr->pSeqdesc(GetSequence()).pszLabel(), fCycle, 1.0);
+	}
+#endif
+
+	IBoneSetup boneSetup(hdr, boneMask, poseparam);
+	boneSetup.InitPose(pos, q);
+	boneSetup.AccumulatePose(pos, q, GetSequence(), fCycle, 1.0, currentTime, GetIk());
+
+	// debugoverlay->AddTextOverlay( GetAbsOrigin() + Vector( 0, 0, 64 ), 0, 0, "%30s %6.2f : %6.2f", hdr->pSeqdesc( GetSequence() )->pszLabel( ), fCycle, 1.0 );
+
+	MaintainSequenceTransitions(boneSetup, fCycle, pos, q);
+
+	m_pOuter->AccumulateLayers(boneSetup, pos, q, currentTime);
+
+	CIKContext auto_ik;
+	auto_ik.Init(hdr, GetRenderAngles(), GetRenderOrigin(), currentTime, gpGlobals->framecount, boneMask);
+	boneSetup.CalcAutoplaySequences(pos, q, currentTime, &auto_ik);
+
+	if (hdr->numbonecontrollers())
+	{
+		float controllers[MAXSTUDIOBONECTRLS];
+		GetBoneControllers(controllers);
+		boneSetup.CalcBoneAdj(pos, q, controllers);
+	}
+
+	//ChildLayerBlend( pos, q, currentTime, boneMask );
+
+	//GetEngineObject()->UnragdollBlend( hdr, pos, q, currentTime );
+
+#ifdef STUDIO_ENABLE_PERF_COUNTERS
+#if _DEBUG
+	if (Q_stristr(hdr->pszName(), r_sequence_debug.GetString()) != NULL)
+	{
+		DevMsgRT("layers %4d : bones %4d : animated %4d\n", hdr->GetPerfAnimationLayers(), hdr->GetPerfUsedBones(), hdr->GetPerfAnimatedBones());
+	}
+#endif
+#endif
+
+}
+
+//-----------------------------------------------------------------------------
 // Purpose:	move position and rotation transforms into global matrices
 //-----------------------------------------------------------------------------
 void C_EngineObjectInternal::BuildTransformations(IStudioHdr* hdr, Vector* pos, Quaternion* q, const matrix3x4_t& cameraTransform, int boneMask, CBoneBitList& boneComputed)
@@ -8517,16 +8618,15 @@ bool C_EngineObjectInternal::SetupBones(matrix3x4_t* pBoneToWorldOut, int nMaxBo
 			// Let pose debugger know that we are blending
 			g_pPoseDebugger->StartBlending(this->m_pOuter, hdr);
 
-			m_pOuter->StandardBlendingRules(hdr, pos, q, currentTime, bonesMaskNeedRecalc);
+			StandardBlendingRules(hdr, pos, q, currentTime, bonesMaskNeedRecalc);
+			m_pOuter->AfterStandardBlendingRules(hdr, pos, q, currentTime, bonesMaskNeedRecalc);
 
 			CBoneBitList boneComputed;
 			// don't calculate IK on ragdolls
 			if (m_pIk && !IsRagdoll())
 			{
-				m_pOuter->UpdateIKLocks(currentTime);
-
+				UpdateIKLocks(currentTime);
 				m_pIk->UpdateTargets(pos, q, m_BoneAccessor.GetBoneArrayForWrite(), boneComputed);
-
 				m_pOuter->CalculateIKLocks(currentTime);
 				m_pIk->SolveDependencies(pos, q, m_BoneAccessor.GetBoneArrayForWrite(), boneComputed);
 			}

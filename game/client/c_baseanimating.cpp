@@ -550,10 +550,10 @@ CollideType_t C_BaseAnimating::GetCollideType( void )
 
 
 
-void C_BaseAnimating::AccumulateLayers( IBoneSetup &boneSetup, Vector pos[], Quaternion q[], float currentTime )
-{
+//void C_BaseAnimating::AccumulateLayers( IBoneSetup &boneSetup, Vector pos[], Quaternion q[], float currentTime )
+//{
 	// Nothing here
-}
+//}
 
 //void C_BaseAnimating::ChildLayerBlend( Vector pos[], Quaternion q[], float currentTime, int boneMask )
 //{
@@ -596,77 +596,6 @@ void C_BaseAnimating::AccumulateLayers( IBoneSetup &boneSetup, Vector pos[], Qua
 //		}
 //	}
 //}
-
-//-----------------------------------------------------------------------------
-// Purpose: Do the default sequence blending rules as done in HL1
-//-----------------------------------------------------------------------------
-void C_BaseAnimating::StandardBlendingRules( IStudioHdr *hdr, Vector pos[], Quaternion q[], float currentTime, int boneMask )
-{
-	VPROF( "C_BaseAnimating::StandardBlendingRules" );
-
-	float		poseparam[MAXSTUDIOPOSEPARAM];
-
-	if ( !hdr )
-		return;
-
-	if ( !hdr->SequencesAvailable() )
-	{
-		return;
-	}
-
-	if (GetEngineObject()->GetSequence() >= hdr->GetNumSeq() || GetEngineObject()->GetSequence() == -1 )
-	{
-		GetEngineObject()->SetSequence( 0 );
-	}
-
-	GetEngineObject()->GetPoseParameters( hdr, poseparam );
-
-	// build root animation
-	float fCycle = GetEngineObject()->GetCycle();
-
-#if 1 //_DEBUG
-	ConVarRef r_sequence_debug("r_sequence_debug");
-	if (/* Q_stristr( hdr->pszName(), r_sequence_debug.GetString()) != NULL || */ r_sequence_debug.GetInt() == entindex())
-	{
-		DevMsgRT( "%8.4f : %30s : %5.3f : %4.2f\n", currentTime, hdr->pSeqdesc(GetEngineObject()->GetSequence() ).pszLabel(), fCycle, 1.0 );
-	}
-#endif
-
-	IBoneSetup boneSetup( hdr, boneMask, poseparam );
-	boneSetup.InitPose( pos, q );
-	boneSetup.AccumulatePose( pos, q, GetEngineObject()->GetSequence(), fCycle, 1.0, currentTime, GetEngineObject()->GetIk());
-
-	// debugoverlay->AddTextOverlay( GetAbsOrigin() + Vector( 0, 0, 64 ), 0, 0, "%30s %6.2f : %6.2f", hdr->pSeqdesc( GetSequence() )->pszLabel( ), fCycle, 1.0 );
-
-	GetEngineObject()->MaintainSequenceTransitions( boneSetup, fCycle, pos, q );
-
-	AccumulateLayers( boneSetup, pos, q, currentTime );
-
-	CIKContext auto_ik;
-	auto_ik.Init( hdr, GetRenderAngles(), GetRenderOrigin(), currentTime, gpGlobals->framecount, boneMask );
-	boneSetup.CalcAutoplaySequences( pos, q, currentTime, &auto_ik );
-
-	if ( hdr->numbonecontrollers() )
-	{
-		float controllers[MAXSTUDIOBONECTRLS];
-		GetEngineObject()->GetBoneControllers(controllers);
-		boneSetup.CalcBoneAdj( pos, q, controllers );
-	}
-
-	//ChildLayerBlend( pos, q, currentTime, boneMask );
-
-	//GetEngineObject()->UnragdollBlend( hdr, pos, q, currentTime );
-
-#ifdef STUDIO_ENABLE_PERF_COUNTERS
-#if _DEBUG
-	if (Q_stristr( hdr->pszName(), r_sequence_debug.GetString()) != NULL)
-	{
-		DevMsgRT( "layers %4d : bones %4d : animated %4d\n", hdr->GetPerfAnimationLayers(), hdr->GetPerfUsedBones(), hdr->GetPerfAnimatedBones());
-	}
-#endif
-#endif
-
-}
 
 //-----------------------------------------------------------------------------
 // Purpose: Get attachment point by index (position only)
@@ -808,37 +737,6 @@ void drawLine(const Vector& origin, const Vector& dest, int r, int g, int b, boo
 	debugoverlay->AddLineOverlay( origin, dest, r, g, b, noDepthTest, duration );
 }
 */
-
-//-----------------------------------------------------------------------------
-// Purpose: update latched IK contacts if they're in a moving reference frame.
-//-----------------------------------------------------------------------------
-
-void C_BaseAnimating::UpdateIKLocks( float currentTime )
-{
-	if (!GetEngineObject()->GetIk()) 
-		return;
-
-	int targetCount = GetEngineObject()->GetIk()->m_target.Count();
-	if ( targetCount == 0 )
-		return;
-
-	for (int i = 0; i < targetCount; i++)
-	{
-		CIKTarget *pTarget = &GetEngineObject()->GetIk()->m_target[i];
-
-		if (!pTarget->IsActive())
-			continue;
-
-		if (pTarget->GetOwner() != -1)
-		{
-			C_BaseEntity *pOwner = (C_BaseEntity*)EntityList()->GetEnt( pTarget->GetOwner() );
-			if (pOwner != NULL)
-			{
-				pTarget->UpdateOwner( pOwner->entindex(), pOwner->GetEngineObject()->GetAbsOrigin(), pOwner->GetEngineObject()->GetAbsAngles() );
-			}				
-		}
-	}
-}
 
 //-----------------------------------------------------------------------------
 // Purpose: Find the ground or external attachment points needed by IK rules
@@ -2182,24 +2080,24 @@ void C_BaseAnimating::FireObsoleteEvent( const Vector& origin, const QAngle& ang
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-bool C_BaseAnimating::IsSelfAnimating()
-{
-	if (GetEngineObject()->IsUsingClientSideAnimation())
-		return true;
-
-	// Yes, we use animtime.
-	int iMoveType = GetEngineObject()->GetMoveType();
-	if ( iMoveType != MOVETYPE_STEP && 
-		  iMoveType != MOVETYPE_NONE && 
-		  iMoveType != MOVETYPE_WALK &&
-		  iMoveType != MOVETYPE_FLY &&
-		  iMoveType != MOVETYPE_FLYGRAVITY )
-	{
-		return true;
-	}
-
-	return false;
-}
+//bool C_BaseAnimating::IsSelfAnimating()
+//{
+//	if (GetEngineObject()->IsUsingClientSideAnimation())
+//		return true;
+//
+//	// Yes, we use animtime.
+//	int iMoveType = GetEngineObject()->GetMoveType();
+//	if ( iMoveType != MOVETYPE_STEP && 
+//		  iMoveType != MOVETYPE_NONE && 
+//		  iMoveType != MOVETYPE_WALK &&
+//		  iMoveType != MOVETYPE_FLY &&
+//		  iMoveType != MOVETYPE_FLYGRAVITY )
+//	{
+//		return true;
+//	}
+//
+//	return false;
+//}
 
 //-----------------------------------------------------------------------------
 // Purpose: 

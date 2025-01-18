@@ -284,8 +284,8 @@ public:
 	// Use CDamageModifier to hook in damage modifiers on a guy.
 	virtual float					GetAttackDamageScale(IHandleEntity* pVictim);
 	virtual void					ApplyBoneMatrixTransform(matrix3x4_t& transform) {}
-	virtual	void					StandardBlendingRules(IStudioHdr* pStudioHdr, Vector pos[], Quaternion q[], float currentTime, int boneMask) {}
-	virtual void					UpdateIKLocks(float currentTime) {}
+	virtual void					AccumulateLayers(IBoneSetup& boneSetup, Vector pos[], Quaternion q[], float currentTime) {}
+	virtual	void					AfterStandardBlendingRules(IStudioHdr* pStudioHdr, Vector pos[], Quaternion q[], float currentTime, int boneMask) {}
 	virtual void					CalculateIKLocks(float currentTime) {}
 	// View models scale their attachment positions to account for FOV. To get the unmodified
 	// attachment position (like if you're rendering something else during the view model's DrawModel call),
@@ -544,7 +544,7 @@ public:
 	// Returns true if the entity changes its position every frame on the server but it doesn't
 	// set animtime. In that case, the client returns true here so it copies the server time to
 	// animtime in OnDataChanged and the position history is correct for interpolation.
-	virtual bool					IsSelfAnimating();
+	//virtual bool					IsSelfAnimating();
 
 
 

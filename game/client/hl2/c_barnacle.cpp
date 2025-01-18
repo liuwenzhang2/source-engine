@@ -56,7 +56,7 @@ public:
 	void	OnDataChanged( DataUpdateType_t updateType );
 	void	InitTonguePhysics( void );
 	void	ClientThink( void );
-	void	StandardBlendingRules( IStudioHdr *pStudioHdr, Vector pos[], Quaternion q[], float currentTime, int boneMask );
+	void	AfterStandardBlendingRules( IStudioHdr *pStudioHdr, Vector pos[], Quaternion q[], float currentTime, int boneMask );
 
 	void	SetVecTip( const float *pPosition );
 	void	SetAltitude( float flAltitude );
@@ -200,9 +200,9 @@ void C_NPC_Barnacle::ClientThink( void )
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-void C_NPC_Barnacle::StandardBlendingRules( IStudioHdr *hdr, Vector pos[], Quaternion q[], float currentTime, int boneMask )
+void C_NPC_Barnacle::AfterStandardBlendingRules( IStudioHdr *hdr, Vector pos[], Quaternion q[], float currentTime, int boneMask )
 {
-	BaseClass::StandardBlendingRules( hdr, pos, q, currentTime, boneMask );
+	//BaseClass::StandardBlendingRules( hdr, pos, q, currentTime, boneMask );
 
 	if ( !hdr )
 		return;

@@ -63,7 +63,7 @@ public:
 
 	virtual IClientVehicle*	GetClientVehicle() { return this; }
 	virtual C_BaseEntity	*GetVehicleEnt() { return this; }
-	virtual bool IsSelfAnimating() { return false; };
+	//virtual bool IsSelfAnimating() { return false; };
 
 	virtual void OnPreDataChanged( DataUpdateType_t updateType );
 	virtual void OnDataChanged( DataUpdateType_t updateType );
