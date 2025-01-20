@@ -245,7 +245,7 @@ private:
 };
 
 
-class CBasePlayer : public CBaseCombatCharacter
+class CBasePlayer : public CBaseCombatCharacter, public IServerPlayer
 {
 public:
 	DECLARE_CLASS( CBasePlayer, CBaseCombatCharacter );
@@ -259,7 +259,7 @@ public:
 	
 	CBasePlayer();
 	~CBasePlayer();
-
+	virtual IServerPlayer* GetServerPlayer() { return this; }
 	// IPlayerInfo passthrough (because we can't do multiple inheritance)
 	IPlayerInfo *GetPlayerInfo() { return &m_PlayerInfo; }
 	IBotController *GetBotController() { return &m_PlayerInfo; }

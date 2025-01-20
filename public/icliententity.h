@@ -847,6 +847,7 @@ public:
 	virtual const matrix3x4_t& RenderableToWorldTransform() = 0;
 };
 
+class IClientPlayer;
 //-----------------------------------------------------------------------------
 // Purpose: All client entities must implement this interface.
 //-----------------------------------------------------------------------------
@@ -897,6 +898,7 @@ public:
 	virtual bool IsBSPModel() const = 0;
 	virtual bool IsNPC(void) const = 0;
 	virtual bool IsPlayer(void) const = 0;
+	virtual IClientPlayer* GetClientPlayer() = 0;
 	virtual bool IsViewModel() const = 0;
 	virtual bool IsBaseCombatCharacter(void) = 0;
 	virtual bool IsBaseCombatWeapon(void) const = 0;
@@ -1001,6 +1003,11 @@ public:
 	virtual int GetWaterLevel() const = 0;
 	virtual int GetTeamNumber(void) const = 0;
 	virtual ITraceFilter* GetBeamTraceFilter(void) = 0;
+};
+
+class IClientPlayer {
+public:
+
 };
 
 #define INPVS_YES			0x0001		// The entity thinks it's in the PVS.

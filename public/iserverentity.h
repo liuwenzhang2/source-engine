@@ -896,6 +896,7 @@ enum EntityEvent_t
 	ENTITY_EVENT_PARENT_CHANGED,		// No data needed
 };
 
+class IServerPlayer;
 // This class is how the engine talks to entities in the game DLL.
 // IServerEntity implements this interface.
 class IServerEntity	: public IServerUnknown
@@ -965,6 +966,7 @@ public:
 	virtual bool IsWorld() const = 0;
 	virtual bool IsBSPModel() const = 0;
 	virtual	bool IsPlayer(void) const = 0;
+	virtual IServerPlayer* GetServerPlayer() = 0;
 	virtual bool IsCombatCharacter() const = 0;
 	virtual bool IsNPC(void) const = 0;
 	virtual bool IsNetClient(void) const = 0;
@@ -1120,6 +1122,11 @@ public:
 	virtual void UpdateWaterState() = 0;
 	virtual ITraceFilter* GetBeamTraceFilter(void) = 0;
 	static bool IsServer(void) { return true; }
+};
+
+class IServerPlayer {
+public:
+
 };
 
 // Derive a class from this if you want to filter entity list searches

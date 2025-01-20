@@ -71,7 +71,7 @@ bool IsInFreezeCam( void );
 //-----------------------------------------------------------------------------
 // Purpose: Base Player class
 //-----------------------------------------------------------------------------
-class C_BasePlayer : public C_BaseCombatCharacter, public CGameEventListener
+class C_BasePlayer : public C_BaseCombatCharacter, public CGameEventListener, public IClientPlayer
 {
 public:
 	DECLARE_CLASS( C_BasePlayer, C_BaseCombatCharacter );
@@ -81,7 +81,7 @@ public:
 
 	C_BasePlayer();
 	virtual			~C_BasePlayer();
-
+	virtual IClientPlayer* GetClientPlayer() { return this; }
 	bool Init(int entnum, int iSerialNum);
 
 	virtual void	Spawn( void );

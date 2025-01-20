@@ -210,7 +210,7 @@ extern ISaveRestoreOps *eventFuncs;
 
 // replaces EXPORT table for portability and non-DLL based systems (xbox)
 #define DEFINE_FUNCTION_RAW( function, func_type )			{ FIELD_VOID, nameHolder.GenerateName(#function), { NULL, NULL }, 1, FTYPEDESC_FUNCTIONTABLE, NULL, NULL, (inputfunc_t)((func_type)(&classNameTypedef::function)) }
-#define DEFINE_FUNCTION( function )			DEFINE_FUNCTION_RAW( function, inputfunc_t )
+#define DEFINE_FUNCTION( function )			DEFINE_FUNCTION_RAW( function, inputfuncnoarg_t )
 
 
 #define FTYPEDESC_GLOBAL			0x0001		// This field is masked for global entity save/restore
@@ -248,6 +248,7 @@ class ISaveRestoreOps;
 // Function prototype for all input handlers.
 //
 typedef void (IHandleEntity::* inputfunc_t)(inputdata_t& data);
+typedef void (IHandleEntity::* inputfuncnoarg_t)();
 
 class datamap_t;
 class typedescription_t;
